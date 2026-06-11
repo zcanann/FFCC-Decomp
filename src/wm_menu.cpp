@@ -8402,13 +8402,20 @@ void CMenuPcs::DrawChara()
 
 		{
 			Mtx44 projectionMtx;
-			C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+			const float* pFovA = &FLOAT_80331470;
+			const float* pAspectA = &FLOAT_80331474;
+			const float* pNearA = &FLOAT_80331478;
+			const float* pFarA = &FLOAT_8033147c;
+			C_MTXPerspective(projectionMtx, *pFovA, *pAspectA, *pNearA, *pFarA);
 			GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 			PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
 			Mtx lookAtMtx;
+			const float* pZeroA1 = &FLOAT_803313dc;
+			const float* pOneA = &FLOAT_803313e8;
+			const float* pZeroA2 = &FLOAT_803313dc;
 			C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10),
-			            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
-			            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
+			            reinterpret_cast<Vec*>(&CVector(*pZeroA1, *pOneA, *pZeroA1)),
+			            reinterpret_cast<Vec*>(&CVector(*pZeroA2, *pZeroA2, *pZeroA2)));
 			PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
 			PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 			CharaPcs.InitEnv(5);
@@ -8417,11 +8424,13 @@ void CMenuPcs::DrawChara()
 			GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
 			GXSetColorUpdate(1);
 			GXSetAlphaUpdate(1);
+			const float* pZeroV = &FLOAT_803313dc;
+			const float* pOneV = &FLOAT_803313e8;
 			GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)),
 			              static_cast<float>(*reinterpret_cast<short*>(view + 0xA)),
 			              static_cast<float>(*reinterpret_cast<short*>(view + 0xC)),
 			              static_cast<float>(*reinterpret_cast<short*>(view + 0xE)),
-			              FLOAT_803313dc, FLOAT_803313e8);
+			              *pZeroV, *pOneV);
 			GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40),
 			             *reinterpret_cast<unsigned int*>(view + 0x44),
 			             *reinterpret_cast<unsigned int*>(view + 0x48),
@@ -8443,13 +8452,20 @@ void CMenuPcs::DrawChara()
 			GXSetZMode(GX_TRUE, static_cast<GXCompare>(7), GX_TRUE);
 			{
 				Mtx44 projectionMtx;
-				C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+				const float* pFovB = &FLOAT_80331470;
+				const float* pAspectB = &FLOAT_80331474;
+				const float* pNearB = &FLOAT_80331478;
+				const float* pFarB = &FLOAT_8033147c;
+				C_MTXPerspective(projectionMtx, *pFovB, *pAspectB, *pNearB, *pFarB);
 				GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 				PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
 				Mtx lookAtMtx;
+				const float* pZeroB1 = &FLOAT_803313dc;
+				const float* pOneB = &FLOAT_803313e8;
+				const float* pZeroB2 = &FLOAT_803313dc;
 				C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10),
-				            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
-				            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
+				            reinterpret_cast<Vec*>(&CVector(*pZeroB1, *pOneB, *pZeroB1)),
+				            reinterpret_cast<Vec*>(&CVector(*pZeroB2, *pZeroB2, *pZeroB2)));
 				PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
 				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 				CharaPcs.InitEnv(5);
@@ -8458,11 +8474,13 @@ void CMenuPcs::DrawChara()
 				GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
 				GXSetColorUpdate(1);
 				GXSetAlphaUpdate(1);
+				const float* pZeroV2 = &FLOAT_803313dc;
+				const float* pOneV2 = &FLOAT_803313e8;
 				GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)),
 				              static_cast<float>(*reinterpret_cast<short*>(view + 0xA)),
 				              static_cast<float>(*reinterpret_cast<short*>(view + 0xC)),
 				              static_cast<float>(*reinterpret_cast<short*>(view + 0xE)),
-				              FLOAT_803313dc, FLOAT_803313e8);
+				              *pZeroV2, *pOneV2);
 				GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40),
 				             *reinterpret_cast<unsigned int*>(view + 0x44),
 				             *reinterpret_cast<unsigned int*>(view + 0x48),
@@ -8472,29 +8490,43 @@ void CMenuPcs::DrawChara()
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			float alpha;
 			if (worldState->m_mainState == 2) {
-				alpha = FLOAT_803313e8;
+				const float* pOneAl = &FLOAT_803313e8;
+				alpha = *pOneAl;
 			} else {
 				alpha = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C);
 			}
-			const float rgbMul = FLOAT_80331458;
-			const float colorScale = static_cast<float>(selectedMask != 0 ? DOUBLE_80331420 : DOUBLE_80331448);
+			const float* pRgbMul = &FLOAT_80331458;
+			const double* pFull = &DOUBLE_80331420;
+			const double* pDim = &DOUBLE_80331448;
+			const double* pAScale = &DOUBLE_80331508;
+			const float rgbMul = *pRgbMul;
+			const float colorScale = static_cast<float>(selectedMask != 0 ? *pFull : *pDim);
 			const unsigned char rgb = static_cast<unsigned char>(static_cast<int>(rgbMul * colorScale));
 			GXColor color = {
 			    rgb,
 			    rgb,
 			    rgb,
-			    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(alpha)))};
+			    static_cast<unsigned char>(static_cast<int>(*pAScale * static_cast<double>(alpha)))};
 			GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-			float x = FLOAT_8033161C - FLOAT_8033168C;
-			float y = FLOAT_803314cc;
-			float scale = FLOAT_80331690;
+			const float* pX1 = &FLOAT_8033161C;
+			const float* pX2 = &FLOAT_8033168C;
+			const float* pY1 = &FLOAT_803314cc;
+			const float* pSc1 = &FLOAT_80331690;
+			float x = *pX1 - *pX2;
+			float y = *pY1;
+			float scale = *pSc1;
 			if (selectedMask != 0) {
-				x *= FLOAT_803315d4;
-				y *= FLOAT_803315d4;
-				scale *= FLOAT_803315d4;
+				const float* pSel = &FLOAT_803315d4;
+				x *= *pSel;
+				y *= *pSel;
+				scale *= *pSel;
 			}
-			MenuPcs.DrawRect3d(0, x, y, FLOAT_80331694, FLOAT_80331578, FLOAT_80331520,
-			                   FLOAT_803313dc, FLOAT_803313dc, scale, scale);
+			const float* pR1 = &FLOAT_80331694;
+			const float* pR2 = &FLOAT_80331578;
+			const float* pR3 = &FLOAT_80331520;
+			const float* pZeroR3 = &FLOAT_803313dc;
+			MenuPcs.DrawRect3d(0, x, y, *pR1, *pR2, *pR3,
+			                   *pZeroR3, *pZeroR3, scale, scale);
 			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 		}
 		if (worldState->m_mainState == 2 && selectedMask != 0) {

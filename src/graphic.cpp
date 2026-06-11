@@ -915,8 +915,8 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
         if (count > 0) {
             GXBegin((GXPrimitive)0x80, (GXVtxFmt)0, (u16)((count & 0x3FFF) << 2));
             for (int i = 0; i < count; i++) {
-                int px = x + i * charSize;
                 int glyph = text[i] - 0x20;
+                int px = x + i * charSize;
                 int tx = (glyph % 8) * 16;
                 int ty = (glyph / 8) * 16;
 
@@ -926,13 +926,13 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
                 GXWGFifo.s16 = tx;
                 GXWGFifo.s16 = ty;
 
-                GXWGFifo.s16 = (s16)(px + charSize);
+                GXWGFifo.s16 = (s16)(charSize + px);
                 GXWGFifo.s16 = (s16)y;
                 GXWGFifo.s16 = 0;
                 GXWGFifo.s16 = (s16)(tx + 0x10);
                 GXWGFifo.s16 = ty;
 
-                GXWGFifo.s16 = (s16)(px + charSize);
+                GXWGFifo.s16 = (s16)(charSize + px);
                 GXWGFifo.s16 = (s16)(y + charSize);
                 GXWGFifo.s16 = 0;
                 GXWGFifo.s16 = (s16)(tx + 0x10);

@@ -397,12 +397,12 @@ void CPad::Frame()
 	int iVar6;
 	u16 uVar1;
 	u16 uVar8;
+	u16* puVar13;
 	u16* puVar7;
 	s8 cVar9;
 	u16* puVar10;
 	int iVar11;
 	u16* puVar12;
-	u16* puVar13;
 	int iVar14;
 	u32 port;
 	u32 uVar16;

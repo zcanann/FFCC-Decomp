@@ -8,6 +8,8 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+#pragma readonly_strings on
+
 typedef signed short s16;
 
 static FoodRank s_rank[8];

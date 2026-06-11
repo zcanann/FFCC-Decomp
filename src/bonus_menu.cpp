@@ -4167,7 +4167,7 @@ void CMenuPcs::createBonus()
 				int bFood = s_Rinfo->m_party[order[j]].m_foodValue;
 				int aArtifact = s_Rinfo->m_party[leftIndex].m_artifactValue;
 				int bArtifact = s_Rinfo->m_party[order[j]].m_artifactValue;
-				unsigned int coin = rand() & 1;
+				int coin = rand() & 1;
 
 				if (aTotal < bTotal ||
 				    (aTotal == bTotal && aArtifact < bArtifact) ||
@@ -4212,7 +4212,7 @@ void CMenuPcs::createBonus()
 			slotIdx++;
 		}
 
-		int handleIndex = s_Rinfo->m_partyCount * 2;
+		int handleIndex = i;
 		for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++, handleIndex++) {
 			short itemId = s_Rinfo->m_tempArtifacts[artifactIndex];
 			if (itemId > 0) {

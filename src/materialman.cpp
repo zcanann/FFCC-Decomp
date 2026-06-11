@@ -2657,9 +2657,10 @@ int CMaterialMan::GetCharaShadow(
         }
     }
 
+    ShadowCandidate* candidateRead = shadowCandidates;
+    float maxDist = kMaterialMaxDistance;
     ShadowCandidate* nearest = 0;
     float nearestDist = kMaterialNearestDistanceInit;
-    ShadowCandidate* candidateRead = shadowCandidates;
     for (int i = 0; i < candidateCount; i++) {
         float candidateDist = candidateRead->distance;
         if (nearestDist > candidateDist) {
@@ -2670,11 +2671,10 @@ int CMaterialMan::GetCharaShadow(
     }
 
     if (nearest != 0) {
-        nearest->distance = kMaterialMaxDistance;
+        nearest->distance = maxDist;
         if (outputCount < maxShadows) {
-            CMapShadow* nearestShadow = nearest->shadow;
-            materialsOut[outputCount] = MapMng.m_materialSet->m_materials[nearestShadow->m_materialIndex];
-            shadowMtxOut[outputOffset] = nearestShadow->m_shadowMtx;
+            materialsOut[outputCount] = MapMng.m_materialSet->m_materials[nearest->shadow->m_materialIndex];
+            shadowMtxOut[outputOffset] = nearest->shadow->m_shadowMtx;
             outputCount++;
             outputOffset++;
         }

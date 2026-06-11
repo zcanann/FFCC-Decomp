@@ -6542,6 +6542,7 @@ void CMenuPcs::CalcFukidashi()
 		return;
 	}
 	float fVar1 = FLOAT_803313dc;
+	int bitIdx;
 #define WOBJ() reinterpret_cast<int>(m_wm.m_worldObjData)
 
 #define BUB() reinterpret_cast<int>(m_wm.m_bubbleData)
@@ -6597,8 +6598,8 @@ void CMenuPcs::CalcFukidashi()
 		*reinterpret_cast<int*>(iVar9 + 0x6C) = *reinterpret_cast<int*>(iVar9 + 0x50);
 
 		short flagsF = *reinterpret_cast<short*>(bytes + 0x1A);
-		int bitIdx = 0;
 		int cnt = 0;
+		bitIdx = 0;
 		iVar9 = BUB();
 		int sVar15 = *reinterpret_cast<short*>(iVar9 + 0x1C) + *reinterpret_cast<short*>(iVar9 + 0x20);
 		if ((flagsF & 0xF) != 0) {
@@ -6865,13 +6866,9 @@ void CMenuPcs::CalcFukidashi()
 	unsigned int field1a = (unsigned int)*reinterpret_cast<short*>(bytes + 0x1A);
 	if ((field1a & 0x200) != 0 && (field1a & 0xF) != 0) {
 		int playerCount = 0;
-		int iter = 4;
-		int idx = 0;
-		do {
-			if ((field1a & (1 << idx)) != 0) playerCount++;
-			idx++;
-			iter--;
-		} while (iter != 0);
+		for (bitIdx = 0; bitIdx < 4; bitIdx++) {
+			if ((field1a & (1 << bitIdx)) != 0) playerCount++;
+		}
 
 		int slotIdx = 0;
 		for (int padIdx = 0; padIdx < 4; padIdx++) {

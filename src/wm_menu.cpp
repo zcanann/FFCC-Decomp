@@ -8439,8 +8439,8 @@ void CMenuPcs::CalcCharaSelect()
 
 	unsigned short padRepeat[4];
 	unsigned short padTrig[4];
-	int requestCancel = 0;
-	int requestFinalize = 0;
+	int requestCancel;
+	int requestFinalize;
 
 	*reinterpret_cast<short*>(bytes + 0x74) = static_cast<short>(*reinterpret_cast<short*>(bytes + 0x74) + 1);
 	const unsigned int clz = __cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_menuStageMode));
@@ -8448,6 +8448,8 @@ void CMenuPcs::CalcCharaSelect()
 		*reinterpret_cast<short*>(bytes + 0x74) = 0;
 	}
 
+	requestCancel = 0;
+	requestFinalize = 0;
 	for (int i = 0; i < 4; i++) {
 		WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 

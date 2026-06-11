@@ -893,7 +893,7 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
         return;
     }
 
-    char* lineStart = text;
+    char* cursor = text;
 
     GXClearVtxDesc();
     GXSetVtxDesc((GXAttr)9, (GXAttrType)1);
@@ -905,7 +905,7 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
     while (true) {
         int ch;
         while (true) {
-            ch = *text++;
+            ch = *cursor++;
             if (ch < ' ' || ch > 0x7F) {
                 break;
             }
@@ -916,7 +916,7 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
             GXBegin((GXPrimitive)0x80, (GXVtxFmt)0, (u16)((count & 0x3FFF) << 2));
             for (int i = 0; i < count; i++) {
                 int px = x + i * charSize;
-                int glyph = lineStart[i] - 0x20;
+                int glyph = text[i] - 0x20;
                 int tx = (glyph % 8) * 16;
                 int ty = (glyph / 8) * 16;
 
@@ -947,7 +947,7 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
             count = 0;
         }
 
-        lineStart = text;
+        text = cursor;
         if (ch != '\n') {
             break;
         }

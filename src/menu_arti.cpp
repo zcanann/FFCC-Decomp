@@ -654,7 +654,6 @@ void CMenuPcs::ArtiInit1()
  */
 void CMenuPcs::ArtiInit()
 {
-	int yOffset;
 	int index;
 	ArtiOpenAnim* entry;
 
@@ -677,7 +676,6 @@ void CMenuPcs::ArtiInit()
 	float titleAlpha = LoadFloat(kArtiInitX);
 	float titleScale = LoadFloat(kArtiInitYOffset);
 	float one = LoadFloat(kArtiOne);
-	yOffset = 0;
 	float zero = LoadFloat(kArtiZero);
 	entry->u = titleAlpha;
 	entry->v = titleScale;
@@ -728,14 +726,13 @@ void CMenuPcs::ArtiInit()
 		entry->flags = 2;
 		entry->tex = 0x37;
 		entry->x = entry0->x + 0x24;
-		entry->y = entry0->y + yOffset;
+		entry->y = entry0->y + loopCount * 0x20;
 		entry->w = 200;
 		entry->h = 0x28;
 		entry->u = zero;
 		entry->v = zero;
 		entry->startFrame = 7;
 		entry->duration = 5;
-		yOffset = yOffset + 0x20;
 	}
 
 	GetArtiOpenAnimList(this)->count = index;

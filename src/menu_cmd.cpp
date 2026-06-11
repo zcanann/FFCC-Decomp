@@ -1904,7 +1904,8 @@ void CMenuPcs::GetCmdItem()
 		write3[1] = 0xa3;
 	}
 
-	*reinterpret_cast<u16*>(Joybus.GetLetterBuffer(0)) = static_cast<u16>(count + 2);
+	s16* out = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+	*out = count + 2;
 }
 
 /*

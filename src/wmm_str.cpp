@@ -18,7 +18,6 @@ extern const char sWmmRanuraB[];
 
 extern const float kWmmWindowTextScale;
 extern const double kWmmCenteringHalf;
-extern const double kWmmUnsignedToDoubleBias;
 
 extern const char* s_McStr_en[];
 extern const char* s_McStr_de[];
@@ -85,16 +84,16 @@ int CMenuPcs::GetSlotABXPos(int right)
     }
 
     font = m_fonts[0];
-    font->SetMargin(kWmmWindowTextScale);
+    font->SetMargin(1.0f);
     font->SetShadow(0);
-    font->SetScale(kWmmWindowTextScale);
+    font->SetScale(1.0f);
     font->SetTlut(0x23);
 
     const int slotAWidth = (int)font->GetWidth((char*)(slotAText + 1));
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - slotAWidth);
     double windowLeft = (double)windowInfo->x;
-    double half = kWmmCenteringHalf;
+    double half = 0.5;
     int x = (int)(centeredWidth * half + windowLeft);
     if (right != 0) {
         const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
@@ -138,15 +137,15 @@ int CMenuPcs::GetYesNoXPos(int right)
     }
 
     font = m_fonts[0];
-    font->SetMargin(kWmmWindowTextScale);
+    font->SetMargin(1.0f);
     font->SetShadow(0);
-    font->SetScale(kWmmWindowTextScale);
+    font->SetScale(1.0f);
 
     const int yesWidth = (int)font->GetWidth((char*)(yesText + 1));
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - yesWidth);
     double windowLeft = (double)windowInfo->x;
-    double half = kWmmCenteringHalf;
+    double half = 0.5;
     int x = (int)(centeredWidth * half + windowLeft);
     if (right != 0) {
         const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
@@ -276,8 +275,6 @@ const char* CMenuPcs::GetMcStr(int index)
         return s_McStr_en[index];
     }
 }
-
-extern const double kWmmUnsignedToDoubleBias = 4503601774854144.0;
 
 #include "src/wmm_str_data.inc"
 

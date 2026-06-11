@@ -1083,7 +1083,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 			if (sprite->startFrame + sprite->duration <= frame) {
 				sprite->alpha = kBonusZClearOrigin;
 			} else {
-				sprite->alpha = (float)(DOUBLE_80331ED8 - (DOUBLE_80331ED8 / (double)sprite->duration) * (double)sprite->timer);
+				sprite->alpha = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			}
 		}
 
@@ -1094,7 +1094,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		if ((BonusSpriteFlags(sprite) & 2) == 0 && (sprite->motionX != kBonusZClearOrigin || sprite->motionY != kBonusZClearOrigin)) {
 			float fy = (float)sprite->y;
 			float ty = sprite->targetY;
-			float progress = (float)(DOUBLE_80331ED8 - (DOUBLE_80331ED8 / (double)sprite->duration) * (double)sprite->timer);
+			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
 			sprite->motionY = (ty - fy) * progress;
 		}
@@ -1120,7 +1120,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 			*(short*)(this->m_bonus.m_bonusBoardPtr + o0a) = (short)centerY;
 			*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = (int)(FLOAT_80331EF8 + ((float)sprite->x + sprite->motionX));
 			*(int*)(this->m_bonus.m_bonusBoardPtr + o44) = (int)(((float)sprite->y + sprite->motionY) - FLOAT_80331EFC);
-			if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o40) < DOUBLE_80331E90) {
+			if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o40) < 0.0) {
 				*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = 0;
 			}
 			{
@@ -2099,7 +2099,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		if ((BonusSpriteFlags(sprite) & 2) == 0 && (sprite->motionX != kBonusZClearOrigin || sprite->motionY != kBonusZClearOrigin)) {
 			float fy = (float)sprite->y;
 			float ty = sprite->targetY;
-			float progress = (float)(DOUBLE_80331ED8 - (DOUBLE_80331ED8 / (double)sprite->duration) * (double)sprite->timer);
+			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
 			sprite->motionY = (ty - fy) * progress;
 		}
@@ -2125,7 +2125,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			*(short*)(this->m_bonus.m_bonusBoardPtr + o0a) = (short)centerY;
 			*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = (int)(FLOAT_80331EF8 + ((float)sprite->x + sprite->motionX));
 			*(int*)(this->m_bonus.m_bonusBoardPtr + o44) = (int)(((float)sprite->y + sprite->motionY) - FLOAT_80331EFC);
-			if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o40) < DOUBLE_80331E90) {
+			if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o40) < 0.0) {
 				*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = 0;
 			}
 			{

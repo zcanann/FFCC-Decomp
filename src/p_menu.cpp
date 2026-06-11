@@ -426,9 +426,10 @@ void CMenuPcs::destroy()
         i++;
     } while (i < 2);
 
-    if (m_fonts[0] != nullptr) {
-        if (m_fonts[0]->DecRef() == 0) {
-            delete m_fonts[0];
+    CFont* font = m_fonts[0];
+    if (font != nullptr) {
+        if (font->DecRef() == 0) {
+            delete font;
         }
         m_fonts[0] = 0;
     }

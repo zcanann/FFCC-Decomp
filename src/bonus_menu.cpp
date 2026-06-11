@@ -3153,10 +3153,11 @@ void CMenuPcs::DrawResultOpenAnim()
 		DrawInit();
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
+		int off;
+		int i = 0;
 		int modelIndex = 0;
 		int lastKind = 0;
-		int i = 0;
-		int off = i << 6;
+		off = i << 6;
 		int partyOff = 0;
 		for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; off += 0x40, i++) {
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);

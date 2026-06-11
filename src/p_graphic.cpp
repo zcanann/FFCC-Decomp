@@ -911,14 +911,7 @@ void CGraphicPcs::drawBegin()
  */
 void CGraphicPcs::calc()
 {
-    for (int i = 0; i < 4; i++) {
-        if (m_screenFade[i].m_timer > 0 && i != 1) {
-            m_screenFade[i].m_timer--;
-            if (m_screenFade[i].m_timer == 0) {
-                m_screenFade[i].m_targetObj = 0;
-            }
-        }
-    }
+    calcScreenFade();
 }
 
 /*

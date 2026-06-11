@@ -320,16 +320,15 @@ void CMenuPcs::ArtiDraw()
 	listFont->SetScale(kArtiListFontScale);
 	listFont->DrawInit();
 
-	ArtiOpenAnim* listStart = GetArtiOpenAnimList(this)->entries;
-	int listCount = GetArtiOpenAnimList(this)->count;
-	for (int i = 0; i < listCount; i++) {
-		if (listStart->tex == 0x37) {
+	ArtiOpenAnimList* list = GetArtiOpenAnimList(this);
+	for (int li = 0; li < list->count; li++) {
+		entry = &list->entries[li];
+		if (entry->tex == 0x37) {
 			break;
 		}
-		listStart++;
 	}
 
-	ArtiOpenAnim* textEntry = listStart;
+	ArtiOpenAnim* textEntry = entry;
 	for (int i = 0; i < 8; i++) {
 		u8 alpha = (u8)(kArtiColorMax * textEntry->alpha);
 		int menuIndex = i + m_artiState->scrollOffset;
@@ -337,14 +336,14 @@ void CMenuPcs::ArtiDraw()
 
 		short itemCount = caravanWork->m_artifacts[menuIndex];
 		const char* text;
-		if (itemCount > 0) {
+		if (itemCount <= 0) {
+			text = GetMenuStr(0x14);
+		} else {
 			text = Game.m_cFlatDataArr[1].TableStrings(0)[itemCount * 5 + 4];
 			if (menuIndex == (int)m_artiState->selections[0] + (int)m_artiState->scrollOffset) {
 				selectedArtifactId = itemCount;
 				hasSelectedArtifact = 1;
 			}
-		} else {
-			text = GetMenuStr(0x14);
 		}
 
 		listFont->GetWidth(text);
@@ -358,38 +357,37 @@ void CMenuPcs::ArtiDraw()
 
 	DrawInit();
 
-	ArtiOpenAnim* iconEntry = listStart;
+	ArtiOpenAnim* iconEntry = entry;
 	for (int i = 0; i < 8; i++) {
 		short itemCount = caravanWork->m_artifacts[i + m_artiState->scrollOffset];
 		if (itemCount > 0) {
 			int iconY = (int)((float)(iconEntry->y + 6) - kArtiOne);
 			int iconX = (int)((float)(iconEntry->x + iconEntry->w - 0x10));
-			DrawSingleIcon(itemCount, iconX, iconY, iconEntry->alpha, 0, 0.0f);
+			DrawSingleIcon(itemCount, iconX, iconY, entry->alpha, 0, 0.0f);
 		}
 		iconEntry++;
 	}
 
 	if (artiState == 1) {
-		ArtiOpenAnim* firstEntry = GetArtiOpenAnimList(this)->entries;
+		entry = GetArtiOpenAnimList(this)->entries;
 		float mark = static_cast<float>(CalcListPos(m_artiState->scrollOffset, 0x49, 0));
 		if (mark > 0.0f) {
-			DrawListPosMark((float)firstEntry->x, (float)firstEntry->y, mark);
+			DrawListPosMark((float)entry->x, (float)entry->y, mark);
 		}
 	}
 
 	if (artiState == 1) {
-		ArtiOpenAnim* cursorBase = GetArtiOpenAnimList(this)->entries;
-		int cursorCount = GetArtiOpenAnimList(this)->count;
-		for (int i = 0; i < cursorCount; i++) {
-			if (cursorBase->tex == 0x37) {
+		ArtiOpenAnimList* cursorList = GetArtiOpenAnimList(this);
+		for (int i = 0; i < cursorList->count; i++) {
+			entry = &cursorList->entries[i];
+			if (entry->tex == 0x37) {
 				break;
 			}
-			cursorBase++;
 		}
 
-		cursorBase += m_artiState->selections[0];
-		int cursorY = (int)(float)((double)(cursorBase->h - 0x20) * kArtiHalfDouble + (double)cursorBase->y);
-		int cursorX = (int)((float)(cursorBase->x - 0x14) + (float)((int)System.m_frameCounter % 8));
+		entry += m_artiState->selections[0];
+		int cursorY = (int)(float)((double)(entry->h - 0x20) * kArtiHalfDouble + (double)entry->y);
+		int cursorX = (int)((float)(entry->x - 0x14) + (float)((int)System.m_frameCounter % 8));
 		DrawCursor(cursorX, cursorY, kArtiOne);
 	}
 

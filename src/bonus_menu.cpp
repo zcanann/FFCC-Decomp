@@ -52,6 +52,7 @@ extern const float FLOAT_80331FA0;
 extern const float FLOAT_80331FA4;
 extern const float FLOAT_80331FA8;
 extern const double DOUBLE_80331E90;
+extern const double DOUBLE_80331F98;
 extern const double DOUBLE_80331ED8;
 extern const double DOUBLE_80331EE0;
 extern const double DOUBLE_80331FB0;
@@ -2820,8 +2821,9 @@ void CMenuPcs::DrawResultCountAnim()
 
 	int modelIndex = 0;
 	int lastKind = 0;
-	int off = 0;
-	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
+	int i = 0;
+	int off = i << 6;
+	for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
 		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 
 		if (sprite->kind >= 0 || sprite->kind == -2) {
@@ -2858,38 +2860,43 @@ void CMenuPcs::DrawResultCountAnim()
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
 				if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
-					int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
+					int total = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
+					int value;
 					if (*(short*)(this->m_bonusStatePtr + 0x10) == 0) {
-						double frame = (double)*(short*)(this->m_bonusStatePtr + 0x22) - 8.0;
-						if (frame <= 0.0) {
+						double frame = (double)*(short*)(this->m_bonusStatePtr + 0x22) - DOUBLE_80331F98;
+						if (frame <= DOUBLE_80331E90) {
 							value = 0;
-						} else if (frame < (double)value) {
+						} else if (frame < (double)total) {
 							value = (int)frame;
+						} else {
+							value = total;
 						}
+					} else {
+						value = total;
 					}
-					unsigned int digits[3];
+					int digits[3];
 					int digitCount;
 
 					if (value >= 100) {
 						digitCount = 3;
 						digits[0] = value / 100;
-						value -= digits[0] * 100;
+						value %= 100;
 						digits[1] = value / 10;
-						digits[2] = value - digits[1] * 10;
+						digits[2] = value % 10;
 					} else if (value >= 10) {
 						digitCount = 2;
 						digits[0] = value / 10;
-						digits[1] = value - digits[0] * 10;
+						digits[1] = value % 10;
 					} else {
 						digitCount = 1;
 						digits[0] = value;
 					}
 
 					float digitW = (float)sprite->w;
-					float digitX = (float)((3.0 * (double)sprite->w - (double)(digitCount * sprite->w)) * 0.5 + (double)sprite->x);
+					float digitX = (float)((DOUBLE_80331EC8 * (double)sprite->w - (float)(digitCount * sprite->w)) * DOUBLE_80331E78 + (double)sprite->x);
 					for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
 						MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
-						    digitW * (float)digits[digitIndex], sprite->mulY,
+						    (float)(sprite->w * digits[digitIndex]), sprite->mulY,
 						    sprite->depth, sprite->depth, kBonusZClearOrigin);
 						digitX += digitW;
 					}
@@ -2913,29 +2920,30 @@ void CMenuPcs::DrawResultCountAnim()
 
 	int textIndex = 0;
 	char text[128];
-	off = 0;
-	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
-		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
+	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++) {
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (i << 6) + 8);
 		if (sprite->kind == -1) {
 			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
 			font->SetColor(color.color);
 
 			int partyIndex = textIndex % activePartyCount;
-			CCaravanWork* caravanWork =
-			    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[s_Rinfo->m_party[partyIndex].m_partySlot]);
+			int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;
 			if (textIndex < activePartyCount) {
+				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
 				strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 			} else {
-				strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[(int)caravanWork->m_bonusCondition * 2 + 1]);
+				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
+				int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
+				strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[strIdx]);
 			}
 
-			float y = (float)sprite->y + sprite->motionY;
 			float x = (float)sprite->x + sprite->motionX;
+			float y = (float)sprite->y + sprite->motionY;
 			if (textIndex < activePartyCount) {
-				y -= 6.0f;
+				y -= FLOAT_80331F3C;
 			}
 			font->SetPosX(x);
-			font->SetPosY(y - 6.0f);
+			font->SetPosY(y - FLOAT_80331F3C);
 			font->Draw(text);
 
 			textIndex++;
@@ -3355,7 +3363,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			spr->alpha = kBonusZClearOrigin;
 		}
 
-		{
+		if (0 < activePartyCount) {
 			for (int i = 0; i < activePartyCount; i++) {
 				BonusAnimSprite* spr = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i + 1];
 				spr->kind = 0x17;
@@ -3404,8 +3412,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		// model sprites: startFrame chained from icons
 		base += activePartyCount;
 		{
-			int delta = (base - (activePartyCount + 1)) << 6;
 			for (int i = 0; i < activePartyCount; i++) {
+				int delta = (base - (activePartyCount + 1)) << 6;
 				int off = ((base + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				spr->kind = -2;
@@ -3425,18 +3433,20 @@ void CMenuPcs::CalcResultOpenAnim()
 		// zeroed model sprites; startFrame fixed up later
 		base += activePartyCount;
 		int zeroBase = base;
-		for (int i = 0; i < activePartyCount; i++) {
-			int off = ((base + i) << 6) + 8;
-			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
-			spr->kind = -2;
-			spr->x = 0;
-			spr->y = 0;
-			spr->w = 0;
-			spr->h = 0;
-			spr->mulX = kBonusZClearOrigin;
-			spr->mulY = kBonusZClearOrigin;
-			spr->duration = 8;
-			spr->depth = FLOAT_80331EB0;
+		if (0 < activePartyCount) {
+			for (int i = 0; i < activePartyCount; i++) {
+				int off = ((base + i) << 6) + 8;
+				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+				spr->kind = -2;
+				spr->x = 0;
+				spr->y = 0;
+				spr->w = 0;
+				spr->h = 0;
+				spr->mulX = kBonusZClearOrigin;
+				spr->mulY = kBonusZClearOrigin;
+				spr->duration = 8;
+				spr->depth = FLOAT_80331EB0;
+			}
 		}
 
 		// staggered model sprites
@@ -3444,8 +3454,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		{
 			int i = 0;
 			int bump = i;
-			int delta = base << 6;
 			for (; i < activePartyCount; i++) {
+				int delta = base << 6;
 				int off = ((base + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				spr->kind = -2;
@@ -3469,8 +3479,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		// icon echo sprites (copies shifted down)
 		base += activePartyCount;
 		{
-			int delta = (base - (activePartyCount + 1)) << 6;
 			for (int i = 0; i < activePartyCount; i++) {
+				int delta = (base - (activePartyCount + 1)) << 6;
 				int off = ((base + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				BonusAnimSprite* src = (BonusAnimSprite*)((int)spr - delta);
@@ -3486,9 +3496,9 @@ void CMenuPcs::CalcResultOpenAnim()
 		base += activePartyCount;
 
 		// frame rows start after their icons
-		{
-			int fwd = activePartyCount << 6;
+		if (0 < activePartyCount) {
 			for (int i = 0; i < activePartyCount; i++) {
+				int fwd = activePartyCount << 6;
 				int off = ((i + 1) << 6) + 8;
 				int spr = this->m_bonusAnimPtr + off;
 				int src = spr + fwd;
@@ -3497,9 +3507,9 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// zeroed model sprites follow the frame rows
-		{
-			int delta = (zeroBase - 1) << 6;
+		if (0 < activePartyCount) {
 			for (int i = 0; i < activePartyCount; i++) {
+				int delta = (zeroBase - 1) << 6;
 				int off = ((zeroBase + i) << 6) + 8;
 				int spr = this->m_bonusAnimPtr + off;
 				int src = spr - delta;
@@ -3526,8 +3536,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		s_CntTop = (unsigned char)countTop;
 
 		{
-			int delta = (base + 0) << 6;
 			for (int i = 0; i < activePartyCount; i++) {
+				int delta = (base + 0) << 6;
 				int off = ((countTop + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				spr->kind = 0x19;
@@ -3547,8 +3557,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		// name sprites
 		base = countTop + activePartyCount;
 		{
-			int delta = (base - (activePartyCount + 1)) << 6;
 			for (int i = 0; i < activePartyCount; i++) {
+				int delta = (base - (activePartyCount + 1)) << 6;
 				int off = ((base + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				spr->kind = -1;
@@ -3568,8 +3578,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		// value text sprites
 		base += activePartyCount;
 		{
-			int delta = (base - 1) << 6;
 			for (int i = 0; i < activePartyCount; i++) {
+				int delta = (base - 1) << 6;
 				int off = ((base + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				spr->kind = -1;
@@ -3601,8 +3611,8 @@ void CMenuPcs::CalcResultOpenAnim()
 				int o48 = boardOff + 0x48;
 				int o4c = boardOff + 0x4c;
 				int centerX = (int)(float)((double)(float)(DOUBLE_80331EE0 + ((double)sprite->w * DOUBLE_80331E78 + (double)sprite->x)) - DOUBLE_80331EE8);
-				*(short*)(this->m_bonus.m_bonusBoardPtr + o08) = (short)centerX;
 				int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)sprite->y) - DOUBLE_80331EF0);
+				*(short*)(this->m_bonus.m_bonusBoardPtr + o08) = (short)centerX;
 				*(short*)(this->m_bonus.m_bonusBoardPtr + o0a) = (short)centerY;
 				*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = sprite->x + 0xC;
 				*(int*)(this->m_bonus.m_bonusBoardPtr + o44) = sprite->y - 8;
@@ -3622,8 +3632,8 @@ void CMenuPcs::CalcResultOpenAnim()
 				int w3 = sprite->w * 3;
 				int extent = w3 + 0x20;
 				int centerX = (int)(float)((double)(float)((double)w3 * DOUBLE_80331E78 + (double)sprite->x) - DOUBLE_80331EE8);
-				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x8 + half) = (short)centerX;
 				int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)sprite->y) - DOUBLE_80331EF0);
+				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x8 + half) = (short)centerX;
 				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0xa + half) = (short)centerY;
 				*(int*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x40 + half) = sprite->x - 0x10;
 				*(int*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x44 + half) = sprite->y - 0x10;
@@ -3633,12 +3643,13 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		{
+		if (0 < activePartyCount) {
 			int i = 0;
 			int total2 = activePartyCount * 2;
+			int boardBase = total2 * 0x50;
 			for (; i < activePartyCount; i++) {
 				BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i + 1];
-				int boardOff = (total2 + i) * 0x50;
+				int boardOff = boardBase + i * 0x50;
 				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x8) = (short)(int)kBonusZClearOrigin;
 				int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)sprite->y) - DOUBLE_80331EF0);
 				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0xa) = (short)centerY;
@@ -3681,12 +3692,11 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 
 			if (sprite->kind == 0x17) {
-				BonusAnimSprite* sound = sprite;
 				for (int j = 0; j < s_Rinfo->m_partyCount; j++) {
-					if (sound->timer - 1 == 0) {
+					if (sprite->timer - 1 == 0) {
 						Sound.PlaySe(0x49, 0x40, 0x7f, 0);
 					}
-					sound++;
+					sprite++;
 				}
 			}
 		}
@@ -4086,19 +4096,20 @@ void CMenuPcs::createBonus()
 			s_Rinfo->m_party[activeCount].m_tribeId = (unsigned int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_tribeId;
 			activeCount++;
 
-			int treasure0 = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[0];
+			unsigned int* slot = &Game.m_scriptFoodBase[i];
+			int treasure0 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_treasures[0];
 			if (treasure0 > 0) {
 				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure0;
 			}
-			int treasure1 = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[1];
+			int treasure1 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_treasures[1];
 			if (treasure1 > 0) {
 				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure1;
 			}
-			int treasure2 = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[2];
+			int treasure2 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_treasures[2];
 			if (treasure2 > 0) {
 				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure2;
 			}
-			int treasure3 = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_treasures[3];
+			int treasure3 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_treasures[3];
 			if (treasure3 > 0) {
 				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure3;
 			}
@@ -4112,35 +4123,33 @@ void CMenuPcs::createBonus()
 		}
 
 		s_Rinfo->m_missingArtifactMask = 0;
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 8; i++) {
 			if (s_Rinfo->m_tempArtifacts[i] < 0) {
 				s_Rinfo->m_missingArtifactMask =
 				    (unsigned char)(s_Rinfo->m_missingArtifactMask | (1 << i));
 			}
-			if (s_Rinfo->m_bossArtifacts[i] < 0) {
-				s_Rinfo->m_missingArtifactMask =
-				    (unsigned char)(s_Rinfo->m_missingArtifactMask | (1 << (i + 4)));
-			}
 		}
 
-		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-			CCaravanWork* caravanWork =
-			    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[s_Rinfo->m_party[i].m_partySlot]);
+		{
+			int i = 0;
+			int partyOff = i;
+			for (; i < s_Rinfo->m_partyCount; i++) {
+				unsigned int* slot = &Game.m_scriptFoodBase[s_Rinfo->m_party[i].m_partySlot];
 
-			short* rewardItems = &s_Rinfo->m_tempArtifacts[0];
-			for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++) {
-				short itemId = rewardItems[artifactIndex];
-				if (itemId <= 0) {
-					continue;
-				}
+				for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++) {
+					short itemId = s_Rinfo->m_tempArtifacts[artifactIndex];
+					if (itemId <= 0) {
+						continue;
+					}
 
-				if (GetItemType(itemId, 1) == 2) {
-					int artifactSlot = itemId - 0x9F;
-					if (caravanWork->m_artifacts[artifactSlot] == itemId) {
+					if (GetItemType(itemId, 1) == 2) {
+						int artifactSlot = s_Rinfo->m_tempArtifacts[artifactIndex] - 0x9F;
+						if (reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[artifactSlot] == s_Rinfo->m_tempArtifacts[artifactIndex]) {
+							s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
+						}
+					} else if (reinterpret_cast<CCaravanWork*>(*slot)->m_inventoryItemCount + 1 > 0x40) {
 						s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 					}
-				} else if (caravanWork->m_inventoryItemCount + 1 > 0x40) {
-					s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 				}
 			}
 		}
@@ -4153,21 +4162,19 @@ void CMenuPcs::createBonus()
 		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
 			int leftIndex = order[i];
 			for (int j = i + 1; j < s_Rinfo->m_partyCount; j++) {
-				BonusPartySummary& a = s_Rinfo->m_party[leftIndex];
-				BonusPartySummary& b = s_Rinfo->m_party[order[j]];
-				int aTotal = a.m_totalValue;
-				int aArtifact = a.m_artifactValue;
-				int bTotal = b.m_totalValue;
-				int bArtifact = b.m_artifactValue;
-				int aFood = a.m_foodValue;
-				int bFood = b.m_foodValue;
-				unsigned int coin = rand();
+				int aTotal = s_Rinfo->m_party[leftIndex].m_totalValue;
+				int aFood = s_Rinfo->m_party[leftIndex].m_foodValue;
+				int bTotal = s_Rinfo->m_party[order[j]].m_totalValue;
+				int bFood = s_Rinfo->m_party[order[j]].m_foodValue;
+				int aArtifact = s_Rinfo->m_party[leftIndex].m_artifactValue;
+				int bArtifact = s_Rinfo->m_party[order[j]].m_artifactValue;
+				int coin = rand() & 1;
 
 				if (aTotal < bTotal ||
 				    (aTotal == bTotal && aArtifact < bArtifact) ||
 				    (aTotal == bTotal && aArtifact == bArtifact && aFood < bFood) ||
-				    (aTotal == bTotal && aArtifact == bArtifact && aFood == bFood && (coin & 1) != 0)) {
-					int temp =  (leftIndex - 0);
+				    (aTotal == bTotal && aArtifact == bArtifact && aFood == bFood && coin != 0)) {
+					int temp = order[i];
 					order[i] = order[j];
 					order[j] = temp;
 					leftIndex = order[i];
@@ -4176,10 +4183,9 @@ void CMenuPcs::createBonus()
 		}
 
 		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-			BonusPartySummary& ranked = s_Rinfo->m_party[order[i]];
-			ranked.m_rank = i;
+			s_Rinfo->m_party[order[i]].m_rank = i;
 			if (i == 0) {
-				s_Rinfo->m_winnerTotalValue = ranked.m_totalValue;
+				s_Rinfo->m_winnerTotalValue = s_Rinfo->m_party[order[i]].m_totalValue;
 			}
 		}
 
@@ -4187,60 +4193,61 @@ void CMenuPcs::createBonus()
 			this->m_wm.m_handles[i] = 0;
 		}
 
-		CCharaPcs::CHandle** slot = this->m_wm.m_handles;
-		for (int i = 0; s_Rinfo->m_partyCount > i * 2; i++) {
+		int slotIdx = 0;
+		int i;
+		for (i = 0; i < 0x18; i++) {
+			int pc = s_Rinfo->m_partyCount;
+			if (pc * 2 <= i) {
+				break;
+			}
 			CCharaPcs::CHandle* handle =
 			    new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0x183) CCharaPcs::CHandle;
-			slot[0] = handle;
-			slot[0]->Add();
-			unsigned long modelCode = s_Rinfo->m_party[i % s_Rinfo->m_partyCount].m_partySlot + 0x83;
-			if (i < s_Rinfo->m_partyCount) {
-				modelCode = s_Rinfo->m_party[i % s_Rinfo->m_partyCount].m_partySlot + 0x87;
+			this->m_wm.m_handles[slotIdx] = handle;
+			this->m_wm.m_handles[slotIdx]->Add();
+			unsigned long modelCode = s_Rinfo->m_party[i % pc].m_partySlot + 0x83;
+			if (i < pc) {
+				modelCode = s_Rinfo->m_party[i % pc].m_partySlot + 0x87;
 			}
-			slot[0]->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
-			slot = (CCharaPcs::CHandle**)((char*)slot + 4);
-			slot[-1]->m_flags = 0x300543;
+			this->m_wm.m_handles[slotIdx]->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
+			this->m_wm.m_handles[slotIdx]->m_flags = 0x300543;
+			slotIdx++;
 		}
 
-		CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
-		int handleIndex = s_Rinfo->m_partyCount * 2;
-		short* rewardItems = &s_Rinfo->m_tempArtifacts[0];
-		for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++) {
-			short itemId = rewardItems[artifactIndex];
-			if (itemId < 1) {
-				displaySlots[handleIndex] = 0;
+		int handleIndex = i;
+		for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++, handleIndex++) {
+			int itemId = s_Rinfo->m_tempArtifacts[artifactIndex];
+			if (itemId <= 0) {
+				GetBonusDisplayHandleSlots(this)[handleIndex] = 0;
 			} else {
 				CCharaPcs::CHandle* itemHandle =
 				    new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0x19C) CCharaPcs::CHandle;
-				displaySlots[handleIndex] = itemHandle;
-				itemHandle->Add();
+				GetBonusDisplayHandleSlots(this)[handleIndex] = itemHandle;
+				GetBonusDisplayHandleSlots(this)[handleIndex]->Add();
 				unsigned short itemModelCode =
 				    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2);
 				int modelNo = itemModelCode & 0x0FFF;
-				itemHandle->LoadModel(3, modelNo, (itemModelCode >> 12) & 0xF, 0, -1, 0, 0);
-				itemHandle->m_flags = 0x300543;
+				GetBonusDisplayHandleSlots(this)[handleIndex]->LoadModel(3, modelNo, (itemModelCode >> 12) & 0xF, 0, -1, 0, 0);
+				GetBonusDisplayHandleSlots(this)[handleIndex]->m_flags = 0x300543;
 
 				if (modelNo == 0x79) {
-					itemId = rewardItems[artifactIndex];
-					int effectNo = -1;
-					if (itemId == 0xDF) {
+					short itemId2 = s_Rinfo->m_tempArtifacts[artifactIndex];
+					int effectNo;
+					if (itemId2 == 0xDF) {
 						effectNo = 0x75;
-					} else if (itemId == 0xE0) {
+					} else if (itemId2 == 0xE0) {
 						effectNo = 0x76;
-					} else if (itemId == 0xE1) {
+					} else if (itemId2 == 0xE1) {
 						effectNo = 0x77;
-					} else if (itemId == 0xE2) {
+					} else if (itemId2 == 0xE2) {
 						effectNo = 0x78;
-					} else if (itemId == 0xE3) {
+					} else if (itemId2 == 0xE3) {
 						effectNo = 0x79;
+					} else {
+						continue;
 					}
-					if (effectNo >= 0) {
-						BindEffect(handleIndex, effectNo, -1);
-					}
+					BindEffect(handleIndex, effectNo, -1);
 				}
 			}
-
-			handleIndex++;
 		}
 	}
 

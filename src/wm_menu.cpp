@@ -7924,8 +7924,10 @@ void CMenuPcs::DrawCharaBase()
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
 
 	alpha = FLOAT_803313dc;
-	int yBase = 0x22;
-	for (int row = 0; row < 2; row++) {
+	int yBase;
+	int row = 0;
+	yBase = 0x22;
+	for (; row < 2; row++) {
 		for (int col = 0; col < 4; col++) {
 			int yInt = yBase;
 			if (row != 0) {
@@ -7933,7 +7935,7 @@ void CMenuPcs::DrawCharaBase()
 			}
 			const float y = static_cast<float>(yInt);
 			const float x = static_cast<float>(0x1C + col * 0x90);
-			MenuPcs.DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, alpha, alpha, FLOAT_803313e8, FLOAT_803313e8, alpha);
+			MenuPcs.DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, alpha, alpha, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 		yBase += 0xB8;
 	}

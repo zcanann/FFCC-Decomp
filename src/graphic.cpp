@@ -1981,10 +1981,9 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     GXSetNumTexGens(1);
 
     int blurOffsetInt = offset;
-    int textureOffset = 0;
     for (int i = 0; i < static_cast<int>(m_blurTextureCount); i++) {
         int negativeBlurOffset = -blurOffsetInt;
-        u8* textureBase = reinterpret_cast<u8*>(m_savedFrameBuffer) + textureOffset;
+        u8* textureBase = reinterpret_cast<u8*>(m_savedFrameBuffer) + i * 0x46000;
         GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
@@ -2006,7 +2005,6 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
             quadMax.z = kGraphicZeroF;
             gUtil.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
         }
-        textureOffset += 0x46000;
     }
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);

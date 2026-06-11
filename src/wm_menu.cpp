@@ -10222,13 +10222,15 @@ input_check_done:
 		WM_MENU_EVAL_SPLINE(selectedRotZ, DAT_8032E8DC, DAT_8032E8D8, t);
 		WM_MENU_EVAL_SPLINE(selectedYOffset, DAT_8032E8E4, DAT_8032E8E0, t);
 
-		float openScale = FLOAT_803313dc;
+		float openScale;
 		if (m_wmWorldState->m_nextMenuMode != -1) {
 			t = static_cast<float>(0x14 - m_wmWorldState->m_delay) / FLOAT_803314c0;
 			WM_MENU_EVAL_SPLINE(openScale, DAT_8032E8EC, DAT_8032E8E8, t);
+		} else {
+			openScale = FLOAT_803313dc;
 		}
 
-		if (state == 2 && m_wmWorldState->m_delay == 0) {
+		if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_delay == 0) {
 			m_wmWorldState->m_titleState++;
 			if (m_wmWorldState->m_titleState >= 100) {
 				m_wmWorldState->m_titleState = 0;

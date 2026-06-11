@@ -9487,14 +9487,9 @@ void CMenuPcs::WMChgMenu()
 				gameBytes += 4;
 			}
 
-			double raw1;
-			reinterpret_cast<int*>(&raw1)[0] = 0x43300000;
-			reinterpret_cast<int*>(&raw1)[1] = (int)m_wmWorldState->m_cardChannel ^ 0x80000000;
-			*reinterpret_cast<float*>(bytes + 0x78) = -(FLOAT_8033151c * (float)(raw1 - DOUBLE_80331408));
-			double raw2;
-			reinterpret_cast<int*>(&raw2)[0] = 0x43300000;
-			reinterpret_cast<int*>(&raw2)[1] = (int)m_wmWorldState->m_cardChannel ^ 0x80000000;
-			*reinterpret_cast<float*>(bytes + 0x7C) = -(FLOAT_8033151c * (float)(raw2 - DOUBLE_80331408));
+			const float scrollStep = FLOAT_8033151c;
+			*reinterpret_cast<float*>(bytes + 0x78) = -(scrollStep * (float)(int)m_wmWorldState->m_cardChannel);
+			*reinterpret_cast<float*>(bytes + 0x7C) = -(scrollStep * (float)(int)m_wmWorldState->m_cardChannel);
 			m_effectTimer = 0;
 		break;
 	}

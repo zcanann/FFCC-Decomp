@@ -1987,7 +1987,7 @@ void CGObject::update()
         m_groundHitOffset.z = sZeroFloat;
     }
 
-    if ((m_stateFlags0 & 0x80) != 0) {
+    if (m_stateFlags0Bits.unk0) {
         m_groundHitOffset.x *= m_bounceFactor;
         m_groundHitOffset.z *= m_bounceFactor;
     }

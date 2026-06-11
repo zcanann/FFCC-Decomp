@@ -323,6 +323,8 @@ void CMenuPcs::MoneyDraw()
 	MoneyMenuAnim* entry = this->m_moneyPanel->anims;
 	int i;
 	GXColor color;
+	float x;
+	float y;
 	int mode = this->m_moneyState->mode;
 
 	for (i = 0; i < this->m_moneyPanel->count; i++, entry++) {
@@ -331,8 +333,8 @@ void CMenuPcs::MoneyDraw()
 			continue;
 		}
 
-		float x = (float)entry->x;
-		float y = (float)entry->y;
+		x = (float)entry->x;
+		y = (float)entry->y;
 		float w = (float)entry->w;
 		float h = (float)entry->h;
 		float u = entry->u;
@@ -358,8 +360,8 @@ void CMenuPcs::MoneyDraw()
 	}
 
 	for (i = 0; i < 2; i++) {
-		float y = (float)(drawBase->y + 0x18) + 32.0f * (float)i;
-		float x = (float)(drawBase->x + 0x20);
+		y = (float)(drawBase->y + 0x18) + 32.0f * (float)i;
+		x = (float)(drawBase->x + 0x20);
 		for (int j = 0; j < 8; j++) {
 			signed char digit = s_place[i * 8 + j];
 			if (digit >= 0) {
@@ -416,11 +418,13 @@ void CMenuPcs::MoneyDraw()
 
 	if ((mode != 0) && (this->m_moneyState->optionState == 1)) {
 		MenuWindowInfo* window = this->m_menuWindowInfo;
-		float cursorY = (float)(window->y + 0x20);
-		cursorY += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
+		y = (float)(window->y + 0x20);
+		y += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
 
 		int anim = (int)System.m_frameCounter % 8;
-		DrawCursor((unsigned int)((float)window->x + (float)anim), (int)cursorY, 1.0f);
+		x = (float)window->x;
+		x += (float)anim;
+		DrawCursor((int)x, (int)y, 1.0f);
 	}
 }
 

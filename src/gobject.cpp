@@ -378,8 +378,10 @@ struct SAnimFillGroup {
 #pragma push
 #pragma optimization_level 3
 #pragma opt_lifetimes off
+#pragma opt_propagation off
 void CGObject::onCreate()
 {
+    int cFill = -1;
     m_worldPosition.z = sZeroFloat;
     m_worldPosition.y = sZeroFloat;
     m_worldPosition.x = sZeroFloat;
@@ -408,12 +410,12 @@ void CGObject::onCreate()
     m_weaponModelHandle = 0;
     m_shieldModelHandle = 0;
 
-    *reinterpret_cast<char*>(&m_animStateMisc) = -1;
+    *reinterpret_cast<char*>(&m_animStateMisc) = cFill;
     m_weaponNodeFlagAll.m_bits1.m_shield = 0;
     m_weaponNodeFlagAll.m_bits1.m_menuReady = 1;
 
     m_moveBaseSpeed = sDefaultMoveBaseSpeed;
-    m_currentAnimSlot = -1;
+    m_currentAnimSlot = cFill;
 
     m_bodyEllipsoidRadius = sStepProbeHeight;
     m_bodyEllipsoidOffset = sZeroFloat;
@@ -436,7 +438,7 @@ void CGObject::onCreate()
     m_rotationY = sAnimFrameOffset;
     m_rotationZ = sAnimFrameOffset;
     m_attrFlags = 0;
-    m_ownerType = -1;
+    m_ownerType = cFill;
     m_classWorkIndex = 0;
     m_scriptHandle = 0;
 
@@ -445,8 +447,8 @@ void CGObject::onCreate()
     m_weaponNodeFlagBits.m_attached = 0;
     m_weaponNodeFlagBits.m_unk20 = 1;
     m_weaponNodeFlagBits.m_unk40 = 0;
-    m_bgHitMask = -1;
-    m_animSlotSel = -1;
+    m_bgHitMask = cFill;
+    m_animSlotSel = cFill;
     m_turnSpeed = sZeroFloat;
     m_pushParamB = 0;
     m_pushParamA = 0;
@@ -500,12 +502,12 @@ void CGObject::onCreate()
     m_hitNormal.y = sZeroFloat;
     m_worldParam = sZeroFloat;
 
-    m_lookAtTargetNodeIndex = -1;
+    m_lookAtTargetNodeIndex = cFill;
     m_worldParamA = 0;
     m_lookAtAccumYaw = sZeroFloat;
     m_lookAtAccumPitch = sZeroFloat;
-    m_weaponAttachNode = -1;
-    m_shieldAttachNodeIndex = -1;
+    m_weaponAttachNode = cFill;
+    m_shieldAttachNodeIndex = cFill;
     *reinterpret_cast<u16*>(&m_lastMapIdHit) = 0;
     m_weaponNodeFlagBits.m_prg = 0;
     m_extraMoveVec.z = sZeroFloat;
@@ -520,45 +522,45 @@ void CGObject::onCreate()
         s8* animState;
         animState = reinterpret_cast<s8*>(animStateOffset + 0x9d);
         animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
-        animState[0] = -1;
-        animState[1] = -1;
-        animState[2] = -1;
-        animState[3] = -1;
-        animState[4] = -1;
-        animState[5] = -1;
-        animState[6] = -1;
-        animState[7] = -1;
+        animState[0] = cFill;
+        animState[1] = cFill;
+        animState[2] = cFill;
+        animState[3] = cFill;
+        animState[4] = cFill;
+        animState[5] = cFill;
+        animState[6] = cFill;
+        animState[7] = cFill;
         animState = reinterpret_cast<s8*>(animStateOffset + 0xa5);
         animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
-        animState[0] = -1;
-        animState[1] = -1;
-        animState[2] = -1;
-        animState[3] = -1;
-        animState[4] = -1;
-        animState[5] = -1;
-        animState[6] = -1;
-        animState[7] = -1;
+        animState[0] = cFill;
+        animState[1] = cFill;
+        animState[2] = cFill;
+        animState[3] = cFill;
+        animState[4] = cFill;
+        animState[5] = cFill;
+        animState[6] = cFill;
+        animState[7] = cFill;
         animState = reinterpret_cast<s8*>(animStateOffset + 0xad);
         animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
-        animState[0] = -1;
-        animState[1] = -1;
-        animState[2] = -1;
-        animState[3] = -1;
-        animState[4] = -1;
-        animState[5] = -1;
-        animState[6] = -1;
-        animState[7] = -1;
+        animState[0] = cFill;
+        animState[1] = cFill;
+        animState[2] = cFill;
+        animState[3] = cFill;
+        animState[4] = cFill;
+        animState[5] = cFill;
+        animState[6] = cFill;
+        animState[7] = cFill;
         animState = reinterpret_cast<s8*>(animStateOffset + 0xb5);
         animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
         animStateOffset += 0x20;
-        animState[0] = -1;
-        animState[1] = -1;
-        animState[2] = -1;
-        animState[3] = -1;
-        animState[4] = -1;
-        animState[5] = -1;
-        animState[6] = -1;
-        animState[7] = -1;
+        animState[0] = cFill;
+        animState[1] = cFill;
+        animState[2] = cFill;
+        animState[3] = cFill;
+        animState[4] = cFill;
+        animState[5] = cFill;
+        animState[6] = cFill;
+        animState[7] = cFill;
     }
 
     memset(&m_attackColliders[0].m_localStart.y, 0, 0x180);

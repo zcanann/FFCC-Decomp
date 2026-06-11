@@ -3075,8 +3075,8 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
             cursorBase = yesX;
         }
         cursorBase -= 0x24;
-        int frame = static_cast<int>(System.m_frameCounter) % 8;
-        DrawCursor(cursorBase + frame, 0x175, alpha);
+        cursorBase += static_cast<int>(System.m_frameCounter) % 8;
+        DrawCursor(cursorBase, 0x175, alpha);
     }
 }
 #pragma opt_propagation on
@@ -3382,8 +3382,9 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     DrawInit();
 
     if (yesNoSel != 0) {
-        int frame = static_cast<int>(System.m_frameCounter) % 8;
-        DrawCursor(tx - 0x20 + frame, cursorY, alpha);
+        tx -= 0x20;
+        tx += static_cast<int>(System.m_frameCounter) % 8;
+        DrawCursor(tx, cursorY, alpha);
     }
 }
 

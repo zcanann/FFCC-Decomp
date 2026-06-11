@@ -1949,9 +1949,7 @@ void CMenuPcs::ChkCmdActive(int itemIndex)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_propagation off
-#pragma opt_lifetimes off
+
 int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 {
 	u8* self = reinterpret_cast<u8*>(this);
@@ -1964,16 +1962,10 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	int k;
 
 	if (comboOut != nullptr) {
-		comboOut[0][0] = -1;
-		comboOut[0][1] = -1;
-		comboOut[1][0] = -1;
-		comboOut[1][1] = -1;
-		comboOut[2][0] = -1;
-		comboOut[2][1] = -1;
-		comboOut[3][0] = -1;
-		comboOut[3][1] = -1;
-		comboOut[4][0] = -1;
-		comboOut[4][1] = -1;
+		for (int i = 0; i < 5; i++) {
+			comboOut[i][0] = -1;
+			comboOut[i][1] = -1;
+		}
 	}
 
 	const s16 selectedState = caravan->m_commandListExtra[selected];
@@ -2081,23 +2073,21 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			}
 			ok = 0;
 			k = 0;
-			const s16* q = &pat[ok];
-			while (k < len1 - 1) {
+			for (const s16* q = &pat[3 + ok]; k < len1 - 1; k++, q++) {
 				const int slot = selected - (len1 - 1 - k);
-				if (candidates[slot] != 0) {
+				int __p5 = slot;
+				if (candidates[__p5] != 0) {
 					break;
 				}
-				if (q[3] == itemKinds[slot]) {
+				if (*q == itemKinds[slot]) {
 					ok++;
 				}
-				q++;
-				k++;
 			}
-			if (ok == len1 - 1) {
+			if (len1 == ok - 1) {
 				mp[0] = patIdx;
+				matchCount++;
 				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = selected - (len1 - 1);
 				mp += 2;
-				matchCount++;
 				w += 8;
 			}
 		}
@@ -2106,21 +2096,21 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		int start = selected - (baseLen - 1);
 		for (int i = 0; i < baseLen; i++, start++) {
 			ok = 0;
-			const s16* q = &s_uniteRecipePatterns[ok];
-			for (k = 0; k < baseLen; q++, k++) {
+			k = 0;
+			for (const s16* q = &s_uniteRecipePatterns[3 + ok]; k < baseLen; k++, q++) {
 				const int slot = i + (selected - ((baseLen - 1) - k));
 				if (candidates[slot] != 0) {
 					break;
 				}
-				if (q[3] == itemKinds[slot]) {
+				if (*q == itemKinds[slot]) {
 					ok++;
 				}
 			}
 			if (ok == baseLen) {
 				mp[0] = 0;
+				matchCount++;
 				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = start;
 				mp += 2;
-				matchCount++;
 				w += 8;
 			}
 		}
@@ -2142,22 +2132,22 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			}
 
 			ok = 0;
-			const s16* q = &pat[ok];
-			for (k = 0; k < len; q++, k++) {
+			k = 0;
+			for (const s16* q = &pat[3 + ok]; k < len; k++, q++) {
 				const int slot = start + (selected - ((len - 1) - k));
 				if (candidates[slot] != 0) {
 					break;
 				}
-				if (q[3] == itemKinds[slot]) {
+				if (*q == itemKinds[slot]) {
 					ok++;
 				}
 			}
 
 			if (ok == len) {
 				mp[0] = group;
+				matchCount++;
 				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = start + (selected - (len - 1));
 				mp += 2;
-				matchCount++;
 				w += 8;
 			}
 		}
@@ -2177,7 +2167,6 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	return matchCount;
 }
-#pragma pop
 
 /*
  * --INFO--

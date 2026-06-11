@@ -6542,12 +6542,12 @@ void CMenuPcs::CalcFukidashi()
 	if ((char)bytes[0x09] != 1) {
 		return;
 	}
-	float fVar1 = FLOAT_803313dc;
 	int bitIdx;
 #define WOBJ() reinterpret_cast<int>(m_wm.m_worldObjData)
 
 #define BUB() reinterpret_cast<int>(m_wm.m_bubbleData)
 	*reinterpret_cast<unsigned short*>(BUB()) = *reinterpret_cast<short*>(bytes + 0x1C);
+	float fVar1 = FLOAT_803313dc;
 	*reinterpret_cast<short*>(BUB() + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
 	*reinterpret_cast<short*>(BUB() + 4) = 0xF0;
 	*reinterpret_cast<short*>(BUB() + 6) = 0xC4;

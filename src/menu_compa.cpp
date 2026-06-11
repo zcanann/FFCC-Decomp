@@ -198,23 +198,25 @@ void CMenuPcs::CompaDraw()
 			kCompaOne, kCompaZero);
 	}
 
-	int memberIndex = 0;
+	int drawIndex = 0;
 	int shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		float iconX = static_cast<float>(compaList->entries[0].x + 0x128);
 		float iconY = static_cast<float>(compaList->entries[0].y + 0x40);
 
-		int drawIndex = shown;
-		if (shown >= 2) {
-			drawIndex = memberIndex;
-			for (; drawIndex < 7; drawIndex++) {
-				if (caravanWork->m_evtWordArr[19 + drawIndex] != 0) {
+		if (i >= 2) {
+			int scan = drawIndex;
+			for (; scan < 7; scan++) {
+				if (caravanWork->m_evtWordArr[19 + scan] != 0) {
+					drawIndex = scan;
 					break;
 				}
 			}
-			if (drawIndex >= 8) {
+			if (scan >= 8) {
 				break;
 			}
+		} else {
+			drawIndex = i;
 		}
 
 		const u8* foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][drawIndex + 1];
@@ -243,7 +245,7 @@ void CMenuPcs::CompaDraw()
 			compaList->entries[0].alpha, 1, kCompaOne);
 
 		shown++;
-		memberIndex = drawIndex + 1;
+		drawIndex++;
 	}
 
 	CFont* font = m_fonts[4];
@@ -256,20 +258,22 @@ void CMenuPcs::CompaDraw()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
 
 	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	memberIndex = 0;
+	drawIndex = 0;
 	shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
-		int drawIndex = shown;
-		if (shown >= 2) {
-			drawIndex = memberIndex;
-			for (; drawIndex < 7; drawIndex++) {
-				if (nameWork->m_evtWordArr[19 + drawIndex] > 0) {
+		if (i >= 2) {
+			int scan = drawIndex;
+			for (; scan < 7; scan++) {
+				if (nameWork->m_evtWordArr[19 + scan] > 0) {
+					drawIndex = scan;
 					break;
 				}
 			}
-			if (drawIndex >= 8) {
+			if (scan >= 8) {
 				break;
 			}
+		} else {
+			drawIndex = i;
 		}
 
 		const char* name = GetMenuStr(drawIndex + 0x16);
@@ -285,7 +289,7 @@ void CMenuPcs::CompaDraw()
 		font->Draw(value);
 
 		shown++;
-		memberIndex = drawIndex + 1;
+		drawIndex++;
 	}
 
 	font = m_fonts[4];

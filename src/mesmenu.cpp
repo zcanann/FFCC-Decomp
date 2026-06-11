@@ -524,6 +524,11 @@ void CMesMenu::onDraw()
         stateBlend = FLOAT_803308d8;
     }
 
+    float width;
+    float height;
+    float drawX;
+    float drawY;
+
     if (m_menuIndex < 4) {
         CCaravanWork* scriptFood = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
         if (scriptFood == 0) {
@@ -550,15 +555,15 @@ void CMesMenu::onDraw()
         float baseY = (m_baseY + m_offsetY) + pulseY;
 
         if (FLOAT_803308d8 < stateBlend) {
-            float width = m_windowWidth * stateBlend;
-            float height = m_windowHeight * stateBlend;
+            width = m_windowWidth * stateBlend;
+            height = m_windowHeight * stateBlend;
             float edgeX;
             if (maskX != 0) {
                 edgeX = -m_windowWidth;
             } else {
                 edgeX = m_windowWidth - width;
             }
-            float drawX = baseX + edgeX;
+            drawX = baseX + edgeX;
 
             float edgeY;
             if (maskY != 0) {
@@ -566,7 +571,7 @@ void CMesMenu::onDraw()
             } else {
                 edgeY = FLOAT_803308f8;
             }
-            float drawY = baseY + edgeY;
+            drawY = baseY + edgeY;
 
             float stateAlpha = FLOAT_80330908 * stateBlend;
             float alphaF = stateAlpha * stageBlend;
@@ -761,10 +766,10 @@ void CMesMenu::onDraw()
             (float)foodU, (float)foodV, FLOAT_80330914, FLOAT_80330914,
             FLOAT_803308d8);
     } else {
-        float sizeX = m_windowWidth * stateBlend;
-        float sizeY = m_windowHeight * stateBlend;
-        float drawX = (FLOAT_803308ec * m_windowWidth + (m_baseX + m_offsetX)) - FLOAT_803308ec * sizeX;
-        float drawY = (FLOAT_803308ec * m_windowHeight + (m_baseY + m_offsetY)) - FLOAT_803308ec * sizeY;
+        width = m_windowWidth * stateBlend;
+        height = m_windowHeight * stateBlend;
+        drawX = (FLOAT_803308ec * m_windowWidth + (m_baseX + m_offsetX)) - FLOAT_803308ec * width;
+        drawY = (FLOAT_803308ec * m_windowHeight + (m_baseY + m_offsetY)) - FLOAT_803308ec * height;
 
         if ((m_flags & 1) == 0) {
             float stateAlpha = FLOAT_80330908 * stateBlend;
@@ -775,7 +780,7 @@ void CMesMenu::onDraw()
             if ((m_flags & 0x200) != 0) {
                 tex = 2;
             }
-            MenuPcs.DrawWindow(drawX, drawY, sizeX, sizeY, static_cast<CMenuPcs::TEX>(tex), FLOAT_8033092c);
+            MenuPcs.DrawWindow(drawX, drawY, width, height, static_cast<CMenuPcs::TEX>(tex), FLOAT_8033092c);
 
             if ((m_itemIndex >= 0) || (m_nameIndex >= 0)) {
                 unsigned int iconAnchor = (m_flags >> 10) & 7;
@@ -787,13 +792,13 @@ void CMesMenu::onDraw()
                     if (anchorX != 0) {
                         iconEdgeX = FLOAT_80330938;
                     } else {
-                        iconEdgeX = (sizeX - FLOAT_8033093C) - FLOAT_80330938;
+                        iconEdgeX = (width - FLOAT_8033093C) - FLOAT_80330938;
                     }
                     unsigned int anchorY = (iconAnchor - 1) & 2;
                     float iconX = (drawX + FLOAT_803308d8) + iconEdgeX;
                     float iconEdgeY;
                     if (anchorY != 0) {
-                        iconEdgeY = FLOAT_80330940 + sizeY;
+                        iconEdgeY = FLOAT_80330940 + height;
                     } else {
                         iconEdgeY = FLOAT_80330944;
                     }

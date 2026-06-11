@@ -946,11 +946,10 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
 
 cylinder_body:
     {
-        const f32 vx = localDirection.x;
         const f32 vy = localDirection.y;
         const f32 radialC = (px * px + py * py) - radiusSq;
-        const f32 radialB = px * vx + py * vy;
-        const f32 vxSq = vx * vx;
+        const f32 radialB = px * localDirection.x + py * vy;
+        const f32 vxSq = localDirection.x * localDirection.x;
         const f32 vySq = vy * vy;
         const f32 radialA = vxSq + vySq;
         f32 disc = radialB * radialB - radialA * radialC;

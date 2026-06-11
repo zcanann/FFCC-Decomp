@@ -11782,10 +11782,12 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	const float centerX = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * DOUBLE_803313f8);
 	const float centerY = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * DOUBLE_803313f8);
 
-	float sx;
-	float sy;
+	float right;
 	float sw;
+	float sy;
 	float sh;
+	float sx;
+	float bottom;
 	if (m_menuWindowInfo->state != 1) {
 		const float xAdd = (((centerX - static_cast<float>(m_menuWindowInfo->x)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(m_menuWindowInfo->frame);
 		const float yAdd = (((centerY - static_cast<float>(m_menuWindowInfo->y)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(m_menuWindowInfo->frame);
@@ -11817,8 +11819,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	unsigned long flags;
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x24 : 0x2C));
-	const float right = (sx + sw) - FLOAT_80331410;
-	const float bottom = (sy + sh) - FLOAT_80331410;
+	right = (sx + sw) - FLOAT_80331410;
+	bottom = (sy + sh) - FLOAT_80331410;
 	const float uv0 = FLOAT_803313dc;
 	for (rectIdx = 0; rectIdx < 4; rectIdx++) {
 		float x;

@@ -99,11 +99,6 @@ static inline unsigned char* MenuPcsRaw()
     return reinterpret_cast<unsigned char*>(&MenuPcs);
 }
 
-static inline CColor& RingMenuColorRef(const CColor& color)
-{
-	return (CColor&)color;
-}
-
 static inline int clampDecToZero(int value)
 {
 	unsigned int next = static_cast<unsigned int>(value - 1);
@@ -150,7 +145,7 @@ void CRingMenu::DrawIcon()
 	Vec4d clipPos;
 	Vec viewInput;
 	CVector offset(kRingMenuZero, kRingMenuHalf * partyObj->unk_0x188, kRingMenuZero);
-	CVector baseWorldPos(partyObj->m_worldPosition);
+	Vec* baseWorldPos = CVector(partyObj->m_worldPosition);
 	CVector worldPos;
 	PSVECAdd(baseWorldPos, offset, worldPos);
 
@@ -200,14 +195,12 @@ void CRingMenu::DrawIcon()
 		iconCol = foodProgress % 100 + (foodProgress - 100) / 100 * 4;
 	}
 
-	CColor bgColor(0, 0, 0, 0x80);
-	MenuPcs.SetColor(bgColor);
+	MenuPcs.SetColor(CColor(0, 0, 0, 0x80));
 	MenuPcs.DrawRect(3, kRingMenuShadowOffset + posX,
 	                                 kRingMenuShadowOffset + posY, kRingMenuCommandCellSize, kRingMenuCommandCellSize,
 	                                 kRingMenuZero, kRingMenuZero, kRingMenuOne, kRingMenuOne, angle);
 
-	CColor fgColor(0xFF, 0xFF, 0xFF, 0xFF);
-	MenuPcs.SetColor(fgColor);
+	MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF));
 	MenuPcs.DrawRect(3, posX, posY, kRingMenuCommandCellSize, kRingMenuCommandCellSize, kRingMenuZero,
 	    static_cast<float>(iconRow * 0x38), kRingMenuOne, kRingMenuOne,
 	    angle);
@@ -228,8 +221,7 @@ void CRingMenu::DrawIcon()
 	_GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	_GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 
-	CColor iconColor(0xFF, 0xFF, 0xFF, blinkAlpha);
-	MenuPcs.SetColor(iconColor);
+	MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, blinkAlpha));
 
 	float u = static_cast<float>(uInt);
 	float v = static_cast<float>(vInt);
@@ -567,7 +559,7 @@ void CRingMenu::onDraw()
 		}
 
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
-		MenuPcs.SetColor(RingMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(buttonAlpha * alphaScaleBase))));
+		MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(buttonAlpha * alphaScaleBase)));
 
 		float drawX;
 		float drawY;
@@ -769,13 +761,13 @@ void CRingMenu::onDraw()
 
 							float blink;
 							if (charge != 0) {
-								MenuPcs.SetColor(RingMenuColorRef(CColor(0x00, 0xFF, 0x00, static_cast<unsigned char>(fullAlpha))));
+								MenuPcs.SetColor(CColor(0x00, 0xFF, 0x00, static_cast<unsigned char>(fullAlpha)));
 								blink = static_cast<float>(static_cast<int>((System.m_frameCounter >> 2) & 1));
 							} else if (caravanWork->IsSelectedCmdList(i)) {
-								MenuPcs.SetColor(RingMenuColorRef(CColor(0x20, 0xFF, 0x20, static_cast<unsigned char>(fullAlpha))));
+								MenuPcs.SetColor(CColor(0x20, 0xFF, 0x20, static_cast<unsigned char>(fullAlpha)));
 								blink = kRingMenuZero;
 							} else {
-								MenuPcs.SetColor(RingMenuColorRef(CColor(0x80, 0x80, 0x80, static_cast<unsigned char>(dimAlpha))));
+								MenuPcs.SetColor(CColor(0x80, 0x80, 0x80, static_cast<unsigned char>(dimAlpha)));
 								blink = kRingMenuZero;
 							}
 

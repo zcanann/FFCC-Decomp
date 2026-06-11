@@ -724,12 +724,11 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	const int requiredWords = classLocalCount + 0x60;
 	u8* scanNode = reinterpret_cast<u8*>(m_freeListNext);
 	const int noScan = static_cast<u8>(scanNode == self + 0x978);
-	if (noScan == 0) {
-		u8* next;
-		while (((*reinterpret_cast<int*>(scanNode + 0xC) + requiredWords) + *reinterpret_cast<int*>(scanNode + 8))
-		       > *reinterpret_cast<int*>((next = *reinterpret_cast<u8**>(scanNode + 4)) + 8)) {
-			scanNode = next;
-		}
+	u8* next;
+	while ((noScan == 0)
+	       && (((*reinterpret_cast<int*>(scanNode + 8) + requiredWords) + *reinterpret_cast<int*>(scanNode + 0xC))
+	           > *reinterpret_cast<int*>((next = *reinterpret_cast<u8**>(scanNode + 4)) + 8))) {
+		scanNode = next;
 	}
 
 	void** const freeNode = m_objectFreeListHead;
@@ -766,15 +765,11 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	object->m_codeIndex.m_codeFunc = -1;
 	object->m_argCount = 0;
 
-	int allowKeep = 1;
-	if (classIndex == -1) {
-		allowKeep = static_cast<u8>(m_0x970 == 0);
-	}
-
-	u8* defs = (classIndex == -1) ? m_permanentVarDefs : 0;
-	int clearCount = (classIndex == -1) ? m_permanentVarCount : classBase->m_localCount;
+	const int allowKeep = (classIndex == -1) ? static_cast<u8>(m_0x970 == 0) : 1;
 
 	unsigned int* write = object->m_thisBase;
+	u8* defs = (classIndex == -1) ? m_permanentVarDefs : 0;
+	int clearCount = (classIndex == -1) ? m_permanentVarCount : classBase->m_localCount;
 	while (clearCount > 0) {
 		if ((allowKeep != 0) || ((defs[1] & 0x20) == 0)) {
 			*write = 0;

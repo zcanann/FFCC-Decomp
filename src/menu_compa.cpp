@@ -188,19 +188,23 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
+	int yOffset = 0;
 	for (int i = 0; i < familyCount; i++) {
+		float rowY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(yOffset);
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
-			static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(i * 0x28),
+			rowY,
 			kCompaFoodIconWidth, kCompaFoodIconHeight, kCompaZero, kCompaZero, kCompaOne,
 			kCompaOne, kCompaZero);
+		yOffset += 0x28;
 	}
 
 	int drawIndex = 0;
 	int shown = 0;
+	yOffset = drawIndex * 0x28;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
-		float iconY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(shown * 0x28);
+		float iconY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(yOffset);
 		float iconX = static_cast<float>(compaList->entries[0].x + 0x128);
 
 		if (i >= 2) {
@@ -243,6 +247,7 @@ void CMenuPcs::CompaDraw()
 			static_cast<int>(iconY),
 			compaList->entries[0].alpha, 1, kCompaOne);
 
+		yOffset += 0x28;
 		shown++;
 		drawIndex++;
 	}
@@ -260,6 +265,7 @@ void CMenuPcs::CompaDraw()
 	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	drawIndex = 0;
 	shown = 0;
+	yOffset = drawIndex * 0x28;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		if (i >= 2) {
 			int scan = drawIndex;
@@ -277,8 +283,8 @@ void CMenuPcs::CompaDraw()
 		}
 
 		const char* name = GetMenuStr(drawIndex + 0x16);
+		float y = static_cast<float>(compaList->entries[0].y + 0x45) + static_cast<float>(yOffset);
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
-		float y = static_cast<float>(compaList->entries[0].y + 0x45) + static_cast<float>(shown * 0x28);
 		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(name);
 
@@ -288,6 +294,7 @@ void CMenuPcs::CompaDraw()
 		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(value);
 
+		yOffset += 0x28;
 		shown++;
 		drawIndex++;
 	}

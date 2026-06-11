@@ -2942,8 +2942,7 @@ unsigned int CMenuPcs::CmdClose2()
 		return 0;
 	} else if (GetCmdStateView(this)->uniteState == 3) {
 		for (s32 i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++) {
-			int __p7 = i;
-			CmdListEntry* entry = &GetCmdListStorage(this)->entries[__p7];
+			CmdListEntry* entry = &GetCmdListStorage(this)->entries[i];
 			if (static_cast<f64>(entry->alpha) >= kCmdMenuOneD) {
 				continue;
 			}

@@ -1453,9 +1453,11 @@ void CMenuPcs::CmakeResultDraw()
             1.0f, 1.0f, 0.0f);
     }
 
-    int yesNoSel = 0;
+    int yesNoSel;
     if (CmakeState(this)->m_mode == 1) {
         yesNoSel = CmakeState(this)->m_select + 1;
+    } else {
+        yesNoSel = 0;
     }
     DrawCmakeYesNo(yesNoSel, alpha);
 

@@ -3775,7 +3775,8 @@ void CMenuPcs::CalcResultOpenAnim()
 				scaleMtx[2][3] = kBonusZClearOrigin;
 				scaleMtx[1][3] = s_BonusModelYPos[tribeId];
 			} else if (i >= total2) {
-				scaleMtx[0][3] = GetFcvValue(s_BallTrnsX, (float)(sprite->timer - 1));
+				double tx = GetFcvValue(s_BallTrnsX, (float)(sprite->timer - 1));
+				scaleMtx[0][3] = tx;
 				if (sprite->timer - 1 == 7) {
 					Sound.PlaySe(0x47, 0x40, 0x7f, 0);
 				}

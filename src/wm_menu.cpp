@@ -6323,7 +6323,7 @@ void CMenuPcs::CalcSpl(CMenuPcs::SPL* out, CMenuPcs::SPL* in, float t)
  * JP Address: TODO
  * JP Size: TODO
  */
-double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
+float CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 {
 	int keyCount = fcv.keyCount;
 	float t = value / FLOAT_803314c0;
@@ -6331,7 +6331,7 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 	float result = FLOAT_803313dc;
 
 	if (t >= keys[keyCount * 4 - 4]) {
-		return static_cast<double>(keys[keyCount * 4 - 3]);
+		return keys[keyCount * 4 - 3];
 	}
 
 	float* cur = keys;
@@ -6357,7 +6357,7 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 			break;
 		}
 	}
-	return static_cast<double>(result);
+	return result;
 }
 
 /*
@@ -11293,88 +11293,26 @@ void CMenuPcs::CalcMcObj()
 			Mtx scaleMtx;
 			Mtx rotXMtx;
 			Mtx rotYMtx;
-			float* spl;
-			int cnt;
-			float* splR;
-			int cntR;
 
 			panelState[0] = 1;
 			reinterpret_cast<float*>(panelState)[7] = 0.6f;
 			reinterpret_cast<float*>(panelState)[8] = -1.4f;
-			float yResult = 0.0f;
-			reinterpret_cast<float*>(panelState)[9] = yResult;
+			reinterpret_cast<float*>(panelState)[9] = FLOAT_803313dc;
 			reinterpret_cast<float*>(panelState)[0xD] = 0.5f;
 			reinterpret_cast<float*>(panelState)[0xE] = 0.5f;
 			reinterpret_cast<float*>(panelState)[0xF] = 0.5f;
 			reinterpret_cast<float*>(panelState)[10] = 0.17453292f;
 			reinterpret_cast<float*>(panelState)[0xB] = reinterpret_cast<float*>(panelState)[0xB] + 0.017453292f;
 
-			float t = static_cast<float>(static_cast<int>(panelState[1])) / 25.0f;
-			cnt = gWmModelYOffsetSplineCount;
-			spl = gWmModelYOffsetSpline;
-			float* end = spl + cnt * 4;
-			if (t >= end[-4]) {
-				yResult = end[-3];
-			} else {
-				int idx = 0;
-				float* spline = spl;
-				for (int n = cnt; n != 0; n--) {
-					if (t <= *spline) {
-						if (idx == 0) {
-							yResult = spl[idx * 4 + 1];
-						} else {
-							float* cur = spl + idx * 4;
-							float* prev = spl + (idx - 1) * 4;
-							float width = *cur - *prev;
-							float u = (t - *prev) / width;
-							float u2 = u * u;
-							float u3 = u2 * u;
-							yResult =
-							    width * (prev[3] * (u + (u3 - 2.0f * u2)) + cur[2] * (u3 - u2)) +
-							    (prev[1] * (1.0f + (2.0f * u3 - 3.0f * u2)) +
-							    cur[1] * (-2.0f * u3 + 3.0f * u2));
-						}
-						break;
-					}
-					spline += 4;
-					idx++;
-				}
-			}
-			reinterpret_cast<float*>(panelState)[8] = reinterpret_cast<float*>(panelState)[8] + yResult;
+			reinterpret_cast<float*>(panelState)[8] =
+			    reinterpret_cast<float*>(panelState)[8] +
+			    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelYOffsetSplineCount),
+			                                   static_cast<float>(static_cast<int>(panelState[1]))));
 
-			float rotResult = 0.0f;
-			t = static_cast<float>(static_cast<int>(panelState[1])) / 25.0f;
-			cntR = gWmModelRotationSplineCount;
-			splR = gWmModelRotationSpline;
-			float* endR = splR + cntR * 4;
-			if (!(t >= endR[-4])) {
-				int idx = 0;
-				float* spline = splR;
-				for (int n = cntR; n != 0; n--) {
-					if (t <= *spline) {
-						if (idx == 0) {
-							rotResult = splR[idx * 4 + 1];
-						} else {
-							float* cur = splR + idx * 4;
-							float* prev = splR + (idx - 1) * 4;
-							float width = *cur - *prev;
-							float u = (t - *prev) / width;
-							float u2 = u * u;
-							float u3 = u2 * u;
-							rotResult =
-							    width * (prev[3] * (u + (u3 - 2.0f * u2)) + cur[2] * (u3 - u2)) +
-							    (prev[1] * (1.0f + (2.0f * u3 - 3.0f * u2)) +
-							    cur[1] * (-2.0f * u3 + 3.0f * u2));
-						}
-						break;
-					}
-					spline += 4;
-					idx++;
-				}
-			} else {
-				rotResult = endR[-3];
-			}
-			reinterpret_cast<float*>(panelState)[0xB] = 0.017453292f * rotResult;
+			reinterpret_cast<float*>(panelState)[0xB] =
+			    0.017453292f *
+			    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelRotationSplineCount),
+			                                   static_cast<float>(static_cast<int>(panelState[1]))));
 			PSMTXScale(scaleMtx, reinterpret_cast<float*>(panelState)[0xD], reinterpret_cast<float*>(panelState)[0xE],
 			           reinterpret_cast<float*>(panelState)[0xF]);
 			PSMTXRotRad(rotXMtx, 'x', reinterpret_cast<float*>(panelState)[10]);

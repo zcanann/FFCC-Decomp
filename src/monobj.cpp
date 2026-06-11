@@ -3077,9 +3077,10 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 				Vec result;
 				float targetDist = PSVECDistance(&targetPos, &object->m_worldPosition);
 				__ct__7CVectorFRC3Vec(&portalVec, &escapePos->m_position);
-				CVector* myVecPtr = __ct__7CVectorFRC3Vec(&myVec, &object->m_worldPosition);
+				Vec* capturePtr;
+				capturePtr = reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(&myVec, &object->m_worldPosition));
 				__ct__7CVectorFv(&dirRaw);
-				PSVECSubtract(reinterpret_cast<Vec*>(myVecPtr), &portalVec, &dirRaw);
+				PSVECSubtract(capturePtr, &portalVec, &dirRaw);
 				dir.x = dirRaw.x;
 				dir.y = dirRaw.y;
 				dir.z = dirRaw.z;
@@ -3089,9 +3090,9 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 				dirScaled.x = scaled.x;
 				dirScaled.y = scaled.y;
 				dirScaled.z = scaled.z;
-				CVector* myVec2Ptr = __ct__7CVectorFRC3Vec(&myVec2, &object->m_worldPosition);
+				capturePtr = reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(&myVec2, &object->m_worldPosition));
 				__ct__7CVectorFv(&result);
-				PSVECAdd(reinterpret_cast<Vec*>(myVec2Ptr), &dirScaled, &result);
+				PSVECAdd(capturePtr, &dirScaled, &result);
 				float rx = result.x;
 				float ry = result.y;
 				float rz = result.z;

@@ -321,114 +321,23 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma inline_depth(6)
+#pragma inline_max_size(10000)
+#pragma inline_max_total_size(10000)
 void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode* octNode)
 {
-	int iVar1;
-	int iVar2;
-	COctNode* pCVar3;
-	COctNode* pCVar4;
-	COctNode* pCVar5;
-	COctNode* pCVar6;
-	COctNode* pCVar7;
-	COctNode* pCVar8;
-	int iVar9;
-	int iVar10;
-	int iVar11;
-	int iVar12;
-	int iVar13;
+	int i;
 
 	if ((octNode->m_meshCount != 0) && ((octNode->m_drawFlags & 1) != 0)) {
 		static_cast<CMapMesh*>(m_mapObject->m_mapData)
 			->DrawMeshCharaShadow(octNode->m_meshStart, octNode->m_meshCount);
 	}
-
-	iVar1 = 0;
-	do {
-		pCVar3 = octNode->m_children[0];
-		if (pCVar3 == 0) {
+	for (i = 0; i < 8; i++) {
+		if (octNode->m_children[i] == 0) {
 			return;
 		}
-		if ((pCVar3->m_meshCount != 0) && ((pCVar3->m_drawFlags & 1) != 0)) {
-			static_cast<CMapMesh*>(m_mapObject->m_mapData)
-				->DrawMeshCharaShadow(pCVar3->m_meshStart, pCVar3->m_meshCount);
-		}
-		iVar2 = 0;
-		do {
-			pCVar8 = pCVar3->m_children[0];
-			if (pCVar8 == 0) {
-				break;
-			}
-			if ((pCVar8->m_meshCount != 0) && ((pCVar8->m_drawFlags & 1) != 0)) {
-				static_cast<CMapMesh*>(m_mapObject->m_mapData)
-					->DrawMeshCharaShadow(pCVar8->m_meshStart, pCVar8->m_meshCount);
-			}
-			iVar13 = 0;
-			do {
-				pCVar7 = pCVar8->m_children[0];
-				if (pCVar7 == 0) {
-					break;
-				}
-				if ((pCVar7->m_meshCount != 0) && ((pCVar7->m_drawFlags & 1) != 0)) {
-					static_cast<CMapMesh*>(m_mapObject->m_mapData)
-						->DrawMeshCharaShadow(pCVar7->m_meshStart, pCVar7->m_meshCount);
-				}
-				iVar12 = 0;
-				do {
-					pCVar6 = pCVar7->m_children[0];
-					if (pCVar6 == 0) {
-						break;
-					}
-					if ((pCVar6->m_meshCount != 0) && ((pCVar6->m_drawFlags & 1) != 0)) {
-						static_cast<CMapMesh*>(m_mapObject->m_mapData)
-							->DrawMeshCharaShadow(pCVar6->m_meshStart, pCVar6->m_meshCount);
-					}
-					iVar11 = 0;
-					do {
-						pCVar5 = pCVar6->m_children[0];
-						if (pCVar5 == 0) {
-							break;
-						}
-						if ((pCVar5->m_meshCount != 0) && ((pCVar5->m_drawFlags & 1) != 0)) {
-							static_cast<CMapMesh*>(m_mapObject->m_mapData)
-								->DrawMeshCharaShadow(pCVar5->m_meshStart, pCVar5->m_meshCount);
-						}
-						iVar10 = 0;
-						do {
-							pCVar4 = pCVar5->m_children[0];
-							if (pCVar4 == 0) {
-								break;
-							}
-							if ((pCVar4->m_meshCount != 0) && ((pCVar4->m_drawFlags & 1) != 0)) {
-								static_cast<CMapMesh*>(m_mapObject->m_mapData)
-									->DrawMeshCharaShadow(pCVar4->m_meshStart, pCVar4->m_meshCount);
-							}
-							iVar9 = 0;
-							do {
-								if (pCVar4->m_children[0] == 0) {
-									break;
-								}
-								DrawCharaShadowTypeMeshFlag_r(pCVar4->m_children[0]);
-								iVar9 = iVar9 + 1;
-								pCVar4 = reinterpret_cast<COctNode*>(Ptr(pCVar4, 4));
-							} while (iVar9 < 8);
-							iVar10 = iVar10 + 1;
-							pCVar5 = reinterpret_cast<COctNode*>(Ptr(pCVar5, 4));
-						} while (iVar10 < 8);
-						iVar11 = iVar11 + 1;
-						pCVar6 = reinterpret_cast<COctNode*>(Ptr(pCVar6, 4));
-					} while (iVar11 < 8);
-					iVar12 = iVar12 + 1;
-					pCVar7 = reinterpret_cast<COctNode*>(Ptr(pCVar7, 4));
-				} while (iVar12 < 8);
-				iVar13 = iVar13 + 1;
-				pCVar8 = reinterpret_cast<COctNode*>(Ptr(pCVar8, 4));
-			} while (iVar13 < 8);
-			iVar2 = iVar2 + 1;
-			pCVar3 = reinterpret_cast<COctNode*>(Ptr(pCVar3, 4));
-		} while (iVar2 < 8);
-		iVar1 = iVar1 + 1;
-		octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
-	} while (iVar1 < 8);
+		DrawCharaShadowTypeMeshFlag_r(octNode->m_children[i]);
+	}
 }
 
 /*

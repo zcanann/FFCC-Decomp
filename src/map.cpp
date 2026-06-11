@@ -1846,7 +1846,7 @@ int CMapMng::ReadMtx(char* mapName)
                 while (chunkFile.GetNextChunk(chunk)) {
                     switch (chunk.m_id) {
                     case 0x54534554:
-                        m_textureSet->Create(chunkFile, MapMng.m_stage, append, 0, 0, 0);
+                        m_textureSet->Create(chunkFile, m_stage, append, 0, 0, 0);
                         append = 1;
                         if (chunk.m_arg0 == 1) {
                             return 1;

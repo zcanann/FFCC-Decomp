@@ -494,8 +494,8 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 	} else {
 		Vec localCorner;
 		Vec viewPos;
-		float maxDepth = kMapOctTreeBoundMinInit;
-		float minDepth = kMapOctTreeBoundMaxInit;
+		float maxDepth = -1000000000000.0f;
+		float minDepth = kMapOctTreeDefaultOffsetZ;
 
 		andMask = 0xF;
 		orMask = 0;

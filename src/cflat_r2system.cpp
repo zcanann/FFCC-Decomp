@@ -2614,7 +2614,7 @@ renderedDone:
         outResult = 0;
         break;
     case -99: {
-        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
+        CFlatRuntime::CObject* targetObject = static_cast<CFlatRuntime::CObject*>(this->intToClass(*object->m_localBase));
         this->SetParticleWorkTrace(targetObject);
         this->push(object, 0);
         outResult = 0;
@@ -2626,14 +2626,14 @@ renderedDone:
         outResult = 0;
         break;
     case -0x4E: {
-        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
+        CFlatRuntime::CObject* targetObject = static_cast<CFlatRuntime::CObject*>(this->intToClass(*object->m_localBase));
         this->SetParticleWorkBind(targetObject);
         this->push(object, 0);
         outResult = 0;
         break;
     }
     case -0x5B: {
-        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
+        CFlatRuntime::CObject* targetObject = static_cast<CFlatRuntime::CObject*>(this->intToClass(object->m_localBase[1]));
         this->SetParticleWorkParam(*object->m_localBase, targetObject);
         this->push(object, 0);
         outResult = 0;
@@ -2664,7 +2664,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x5C: {
-        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
+        CFlatRuntime::CObject* targetObject = static_cast<CFlatRuntime::CObject*>(this->intToClass(object->m_localBase[1]));
         this->IgnoreParticle(static_cast<short>(*object->m_localBase), targetObject);
         this->push(object, 0);
         outResult = 0;

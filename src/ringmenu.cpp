@@ -99,6 +99,11 @@ static inline unsigned char* MenuPcsRaw()
     return reinterpret_cast<unsigned char*>(&MenuPcs);
 }
 
+static inline CColor& RingMenuColorRef(const CColor& color)
+{
+	return (CColor&)color;
+}
+
 static inline int clampDecToZero(int value)
 {
 	unsigned int next = static_cast<unsigned int>(value - 1);
@@ -562,8 +567,7 @@ void CRingMenu::onDraw()
 		}
 
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
-		CColor buttonColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(buttonAlpha * alphaScaleBase));
-		MenuPcs.SetColor(buttonColor);
+		MenuPcs.SetColor(RingMenuColorRef(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(buttonAlpha * alphaScaleBase))));
 
 		float drawX;
 		float drawY;
@@ -765,16 +769,13 @@ void CRingMenu::onDraw()
 
 							float blink;
 							if (charge != 0) {
-								CColor color(0x00, 0xFF, 0x00, static_cast<unsigned char>(fullAlpha));
-								MenuPcs.SetColor(color);
+								MenuPcs.SetColor(RingMenuColorRef(CColor(0x00, 0xFF, 0x00, static_cast<unsigned char>(fullAlpha))));
 								blink = static_cast<float>(static_cast<int>((System.m_frameCounter >> 2) & 1));
 							} else if (caravanWork->IsSelectedCmdList(i)) {
-								CColor color(0x20, 0xFF, 0x20, static_cast<unsigned char>(fullAlpha));
-								MenuPcs.SetColor(color);
+								MenuPcs.SetColor(RingMenuColorRef(CColor(0x20, 0xFF, 0x20, static_cast<unsigned char>(fullAlpha))));
 								blink = kRingMenuZero;
 							} else {
-								CColor color(0x80, 0x80, 0x80, static_cast<unsigned char>(dimAlpha));
-								MenuPcs.SetColor(color);
+								MenuPcs.SetColor(RingMenuColorRef(CColor(0x80, 0x80, 0x80, static_cast<unsigned char>(dimAlpha))));
 								blink = kRingMenuZero;
 							}
 

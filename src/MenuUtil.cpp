@@ -1547,46 +1547,49 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 
 	font->SetPosX(kOptionRowLeft);
+	int x = 0x38;
 	int detailY = static_cast<int>(lineStep + static_cast<float>(static_cast<int>(baseY)));
 	font->SetPosY(static_cast<float>(detailY));
 
 		if ((*reinterpret_cast<u16*>(itemBase + 4) & 0x1000) != 0) {
-			if ((*reinterpret_cast<u16*>(itemBase + 8) >= 1) && (*reinterpret_cast<u16*>(itemBase + 8) <= 0x13)) {
-				strcpy(scratch, GetAttrStr(*reinterpret_cast<u16*>(itemBase + 8)));
-				font->SetTlut(4);
-				font->Draw(scratch);
-				int valueX = static_cast<int>(kOptionRowLeft + (kOptionTextNudge + font->GetWidth(scratch)));
-				font->SetPosX(static_cast<float>(valueX));
-				font->SetTlut(9);
-
-				unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
-				if ((attr >= 1) && (attr <= 8)) {
-					sprintf(scratch, sMenuUtilStringFormat, sMenuUtilPlusOneText);
+			if (*reinterpret_cast<u16*>(itemBase + 8) >= 1) {
+				if (*reinterpret_cast<u16*>(itemBase + 8) > 0x13) {
+					return;
 				} else {
-					if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
+					strcpy(scratch, GetAttrStr(*reinterpret_cast<u16*>(itemBase + 8)));
+					font->SetTlut(4);
+					font->Draw(scratch);
+					x = static_cast<int>(static_cast<float>(x) + (kOptionTextNudge + font->GetWidth(scratch)));
+					font->SetPosX(static_cast<float>(x));
+					font->SetTlut(9);
+
+					unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
+					if ((attr >= 1) && (attr <= 8)) {
+						sprintf(scratch, sMenuUtilStringFormat, sMenuUtilPlusOneText);
+					} else if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
 						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
-					} else {
-						if ((static_cast<unsigned short>(attr - 9) > 1) && (attr != 0xC)) {
-							return;
-						}
+					} else if ((static_cast<unsigned short>(attr - 9) <= 1) || (attr == 0xC)) {
 						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
 						font->SetTlut(3);
+					} else {
+						return;
 					}
-				}
 
-				font->Draw(scratch);
+					font->Draw(scratch);
+				}
 			}
 		} else {
 			strcat(scratch, sMenuUtilSpaceText);
 			font->Draw(scratch);
 
-			int valueX = static_cast<int>(kOptionRowLeft + (kOptionTextNudge + font->GetWidth(scratch)));
+			x = static_cast<int>(static_cast<float>(x) + (kOptionTextNudge + font->GetWidth(scratch)));
 			font->SetTlut(1);
-			font->SetPosX(static_cast<float>(valueX));
+			font->SetPosX(static_cast<float>(x));
 			sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
 			font->Draw(scratch);
 
-			if ((m_battleStateFlag == 2) && (m_artiState->currentSelection == 1)) {
+			int sel = m_artiState->currentSelection;
+			if ((m_battleStateFlag == 2) && (sel == 1)) {
 				u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
 
 				if ((effectFlags & 0x1000) == 0) {
@@ -1608,7 +1611,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					unsigned int equipmentSlot = caravanWork->m_equipment[currentItem];
 					currentItem = (equipmentSlot >= 0) ? caravanWork->m_inventoryItems[equipmentSlot] : -1;
 
-					if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(m_artiState->selections[1]) +
+					if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(m_artiState->selections[sel]) +
 					                                              static_cast<int>(m_artiState->scrollOffset))) != 0) {
 						int currentItemBase = Game.unkCFlatData0[2] + currentItem * 0x48;
 						unsigned int currentValue;
@@ -1619,7 +1622,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 						}
 
 						int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
-						int deltaX = static_cast<int>(static_cast<float>(valueX) + (kOptionTextNudge + font->GetWidth(scratch)));
+						int deltaX = static_cast<int>(static_cast<float>(x) + (kOptionTextNudge + font->GetWidth(scratch)));
 						font->SetPosX(static_cast<float>(deltaX));
 						if (delta >= 0) {
 							font->SetTlut(9);
@@ -1647,8 +1650,10 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
 					if ((attr >= 1) && (attr <= 8)) {
 						sprintf(scratch, sMenuUtilAttrBonusFormat, sMenuUtilPlusOneText);
-						font->Draw(scratch);
+					} else {
+						return;
 					}
+					font->Draw(scratch);
 				}
 			}
 		}
@@ -1673,7 +1678,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 		delete[] temp;
 
-		int y = lineBaseY[lineCount + drawPrefix - 1];
+		const u32* lb = lineBaseY;
+		int y = lb[lineCount + drawPrefix - 1];
 		if (drawPrefix != 0) {
 			font->SetPosX(kOptionRowLeft);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));

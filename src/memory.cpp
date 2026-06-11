@@ -255,6 +255,22 @@ static inline void stageReleaseMode2Buffer(CMemory::CStage* stage)
     }
 }
 
+static inline void releaseStageBufferBase(unsigned int ptr, const char* strBase) throw()
+{
+    if (ptr != 0) {
+        freeStageBlockBase(reinterpret_cast<void*>(ptr - 0x10), strBase);
+    }
+}
+
+static inline void stageReleaseMode2BufferBase(CMemory::CStage* stage, const char* strBase)
+{
+    unsigned int ptr = static_cast<unsigned int>(stageGetHeapHead(stage));
+    if (ptr != 0) {
+        releaseStageBufferBase(ptr, strBase);
+        stageSetHeapHead(stage, 0);
+    }
+}
+
 static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage, const char* strBase)
 {
     int mode = stageGetAllocationMode(stage);
@@ -266,7 +282,7 @@ static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage, 
             stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
         }
     } else {
-        stageReleaseMode2Buffer(stage);
+        stageReleaseMode2BufferBase(stage, strBase);
     }
 
     stage->m_prev->m_next = stage->m_next;

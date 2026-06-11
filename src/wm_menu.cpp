@@ -2799,9 +2799,10 @@ void CMenuPcs::CalcLoadMenu()
 	unsigned short uVar7 = GetButtonRepeat(0);
 
 	if (m_wmWorldState->m_worldReady == 0) {
-		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 4) = 0x10;
+		float one;
 		float zero = FLOAT_803313dc;
-		float one = FLOAT_803313e8;
+		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 4) = 0x10;
+		one = FLOAT_803313e8;
 		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 6) = 0x10;
 		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 8) = 0xE8;
 		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 0xA) = 0x168;

@@ -86,7 +86,8 @@ int CMenuPcs::GetSlotABXPos(int right)
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - slotAWidth);
     double windowLeft = (double)windowInfo->x;
-    int x = (int)(centeredWidth * kWmmCenteringHalf + windowLeft);
+    double half = kWmmCenteringHalf;
+    int x = (int)(centeredWidth * half + windowLeft);
     if (right != 0) {
         const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
         x += slotAWidth - slotBWidth;
@@ -137,7 +138,8 @@ int CMenuPcs::GetYesNoXPos(int right)
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - yesWidth);
     double windowLeft = (double)windowInfo->x;
-    int x = (int)(centeredWidth * kWmmCenteringHalf + windowLeft);
+    double half = kWmmCenteringHalf;
+    int x = (int)(centeredWidth * half + windowLeft);
     if (right != 0) {
         const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
         x += yesWidth - noWidth;

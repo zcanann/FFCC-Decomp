@@ -5589,13 +5589,17 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		        *reinterpret_cast<unsigned short*>(work + 0xBC6), *reinterpret_cast<unsigned short*>(work + 0xBC8),
 		        *reinterpret_cast<unsigned short*>(work + 0xBCA), *reinterpret_cast<unsigned short*>(work + 0xBCC));
 
+		float curY3 = y;
 		float width = static_cast<float>(font->GetWidth(text));
 		font->SetPosX(x - width * 0.5f);
-		font->SetPosY(y);
+		font->SetPosY(curY3);
 		font->SetPosZ(z);
 		font->Draw(text);
 	}
-	y -= static_cast<float>(font->m_glyphHeight) * font->scaleY;
+	{
+		float lineH = static_cast<float>(font->m_glyphHeight) * font->scaleY;
+		y = y - lineH;
+	}
 }
 
 /*

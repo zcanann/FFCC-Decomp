@@ -1081,13 +1081,14 @@ void CGraphic::makeSphere()
 
     vertexCount++;
     float* vertex = &vertices[vertexCount * 3];
+    float* rowVertex;
 
     for (int ring = 0; ring < 5; ring++) {
         float pitch = (kGraphicSpherePi * (float)(ring + 1)) / kGraphicSphereRingDivisor;
         float x = kGraphicSphereNegativeX * (float)cos(pitch);
         float radius = kGraphicSphereNegativeX * (float)sin(pitch);
 
-        float* rowVertex = vertex;
+        rowVertex = vertex;
         for (int seg = 0; seg < 8; seg++) {
             rowVertex[0] = x;
             rowVertex[1] = radius * (float)sin(kGraphicSphereSegmentAngle * (float)seg);

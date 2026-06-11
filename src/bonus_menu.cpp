@@ -2698,9 +2698,9 @@ void CMenuPcs::CalcResultCloseAnim()
 	}
 
 	{
+		int base2 = activePartyCount + 1;
 		int i = 0;
 		int boardOff =  (i - 0);
-		int base2 = activePartyCount + 1;
 		for (; i < activePartyCount; i++) {
 			int sprOff2 = ((base2 + i) << 6) + 8;
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff2);

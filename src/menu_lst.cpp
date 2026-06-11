@@ -8,21 +8,21 @@
 #include "ffcc/system.h"
 #include <string.h>
 
-static const float kMLstZero = 0.0f;
-static const float kMLstColorMax = 255.0f;
-static const double kMLstSelectedOffsetX = 20.0;
-static const float kMLstRowHeight = 40.0f;
-static const double kMLstHalfDouble = 0.5;
-static const float kMLstOne = 1.0f;
-static const float kMLstTextYOffset = 4.0f;
-static const float kMLstHelpCenterX = 320.0f;
-static const float kMLstHalf = 0.5f;
-static const float kMLstHelpY = 352.0f;
-static const float kMLstHelpScale = 3.0f;
-static const double kMLstIntToDoubleBias = 4503601774854144.0;
-static const double kMLstOneDouble = 1.0;
-static const double kMLstZeroDouble = 0.0;
-static const double kMLstWindowCenterX = 216.0;
+extern const float kMLstZero = 0.0f;
+extern const float kMLstColorMax = 255.0f;
+extern const double kMLstSelectedOffsetX = 20.0;
+extern const float kMLstRowHeight = 40.0f;
+extern const double kMLstHalfDouble = 0.5;
+extern const float kMLstOne = 1.0f;
+extern const float kMLstTextYOffset = 4.0f;
+extern const float kMLstHelpCenterX = 320.0f;
+extern const float kMLstHalf = 0.5f;
+extern const float kMLstHelpY = 352.0f;
+extern const float kMLstHelpScale = 3.0f;
+extern const double kMLstIntToDoubleBias = 4503601774854144.0;
+extern const double kMLstOneDouble = 1.0;
+extern const double kMLstZeroDouble = 0.0;
+extern const double kMLstWindowCenterX = 216.0;
 
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);

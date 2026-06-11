@@ -6201,10 +6201,11 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
 
-    unsigned char modeFlag =
-        (signed char)(((unsigned int)(-controlMode | controlMode)) >> 31);
+    JoyBus* jb = (JoyBus*)((char*)this + portIndex * sizeof(ThreadParam));
 
-    if (GbaQue.IsSingleMode(m_threadParams[portIndex].m_portIndex))
+    unsigned char modeFlag = (controlMode != 0);
+
+    if (GbaQue.IsSingleMode(jb->m_threadParams[0].m_portIndex))
 	{
         modeFlag = 0;
 	}
@@ -6221,18 +6222,18 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
     }
     else
     {
-        OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+        OSWaitSemaphore(&m_accessSemaphores[jb->m_threadParams[0].m_portIndex]);
 
-        if ((int)m_cmdCount[m_threadParams[portIndex].m_portIndex] >= 0x40)
+        if ((int)m_cmdCount[jb->m_threadParams[0].m_portIndex] >= 0x40)
         {
-            OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+            OSSignalSemaphore(&m_accessSemaphores[jb->m_threadParams[0].m_portIndex]);
             result = -1;
         }
         else
         {
-            m_cmdQueueData[m_threadParams[portIndex].m_portIndex][m_cmdCount[m_threadParams[portIndex].m_portIndex]] = cmdWord;
-            m_cmdCount[m_threadParams[portIndex].m_portIndex]++;
-            OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+            m_cmdQueueData[jb->m_threadParams[0].m_portIndex][m_cmdCount[jb->m_threadParams[0].m_portIndex]] = cmdWord;
+            m_cmdCount[jb->m_threadParams[0].m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[jb->m_threadParams[0].m_portIndex]);
             result = 0;
         }
     }
@@ -6240,7 +6241,7 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
     // If successful, update local mode tracking
     if (result == 0)
     {
-        m_ctrlModeArr[m_threadParams[portIndex].m_portIndex] = modeFlag;
+        m_ctrlModeArr[jb->m_threadParams[0].m_portIndex] = modeFlag;
     }
 
     return result;

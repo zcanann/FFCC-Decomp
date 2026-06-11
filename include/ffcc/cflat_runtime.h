@@ -143,7 +143,7 @@ public:
 	void deleteObject(CFlatRuntime::CObject*);
 	CFlatRuntime::CObject* createObject(int);
 	int getTopBit(unsigned int);
-	void searchFunc(int, int, int);
+	CFlatRuntime::CFunc* searchFunc(int, int, int);
 
 	int SystemCall(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 

@@ -19,9 +19,7 @@
 #include "ffcc/ppp_linkage.h"
 
 extern const Vec kPppCharaBreakUpVector = {0.0f, 1.0f, 0.0f};
-extern const int kCharaBreakInitialVertexFlag0;
-extern const int kCharaBreakInitialVertexFlag1;
-extern const int kCharaBreakInitialVertexFlag2;
+extern const int kCharaBreakInitialVertexFlags[3] = {0, 0, 0};
 static const char s_pppCharaBreak_cpp[] = "pppCharaBreak.cpp";
 extern const float kPppCharaBreakZero = 0.0f;
 extern const float kPppCharaBreakOne = 1.0f;
@@ -483,9 +481,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                 if (polygon->m_enabled == 0) {
                     int flags[3];
-                    flags[0] = kCharaBreakInitialVertexFlag0;
-                    flags[1] = kCharaBreakInitialVertexFlag1;
-                    flags[2] = kCharaBreakInitialVertexFlag2;
+                    flags[0] = 0;
+                    flags[1] = 0;
+                    flags[2] = 0;
 
                     for (int i = 0; i < 3; i++) {
                         S16Vec* dst = &transformed[i];
@@ -984,7 +982,3 @@ static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel* model, void* mode
 
     return (u32)__cntlzw(1 - (u32)stepData->m_worldSpaceMode) >> 5;
 }
-
-const int kCharaBreakInitialVertexFlag0 = 0;
-const int kCharaBreakInitialVertexFlag1 = 0;
-const int kCharaBreakInitialVertexFlag2 = 0;

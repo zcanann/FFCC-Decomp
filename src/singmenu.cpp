@@ -2143,8 +2143,7 @@ void CMenuPcs::SingleCalcCtrl()
         return;
     }
 
-    SingMenuState* state = m_singMenuState;
-    if ((m_singleMenuCtrlResetFlag != 0) && (state->stepState != 0)) {
+    if ((m_singleMenuCtrlResetFlag != 0) && (m_singMenuState->stepState != 0)) {
         m_singleMenuCtrlResetFlag = 0;
     }
 

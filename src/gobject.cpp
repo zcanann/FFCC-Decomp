@@ -1651,9 +1651,9 @@ void CGObject::update()
             m_radiusCtrlVel.y += sBgAttrNormal * swayDz;
             m_groundFriction += sBgAttrNormal * swayDx;
 
-            float mtx2;
-            float mtx1;
             float mtx0;
+            float mtx1;
+            float mtx2;
             Vec swayDir;
             PSVECNormalize(reinterpret_cast<Vec*>(&m_radiusCtrlVel.y), &swayDir);
             const float swayDot = PSVECDotProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat));
@@ -1663,9 +1663,9 @@ void CGObject::update()
                 PSVECCrossProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &swayAxis);
                 PSMTXRotAxisRad(rotScratch, &swayAxis, negSwayAngle);
 
-                mtx2 = modelMtx[2][3];
-                mtx1 = modelMtx[1][3];
                 mtx0 = modelMtx[0][3];
+                mtx1 = modelMtx[1][3];
+                mtx2 = modelMtx[2][3];
                 modelMtx[0][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).x;
                 modelMtx[1][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).y;
                 modelMtx[2][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).z;

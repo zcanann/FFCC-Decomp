@@ -6858,8 +6858,9 @@ void CMenuPcs::CalcFukidashi()
 #undef modelPtr
 
 		puVar20[1] = puVar20[1] + 1;
-		if (static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1]))) >=
-		    DOUBLE_803314A8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4])) {
+		if (static_cast<double>(static_cast<float>(puVar20[1])) >=
+		    DOUBLE_803314A8 * static_cast<double>(
+		        reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount)->data[gWmModelYOffsetSplineCount * 4 - 4])) {
 			puVar20[1] = 0;
 		}
 	}
@@ -6867,6 +6868,7 @@ void CMenuPcs::CalcFukidashi()
 	// Player character model slots
 	unsigned int field1a = (unsigned int)*reinterpret_cast<short*>(bytes + 0x1A);
 	if ((field1a & 0x200) != 0 && (field1a & 0xF) != 0) {
+		SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
 		int playerCount = 0;
 		for (bitIdx = 0; bitIdx < 4; bitIdx++) {
 			if ((field1a & (1 << bitIdx)) != 0) playerCount++;
@@ -6937,8 +6939,8 @@ void CMenuPcs::CalcFukidashi()
 #undef mdl
 
 				puVar20[1] = puVar20[1] + 1;
-				if (static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1]))) >=
-				    DOUBLE_803314A8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4])) {
+				if (static_cast<double>(static_cast<float>(puVar20[1])) >=
+				    DOUBLE_803314A8 * static_cast<double>(yTbl->data[gWmModelYOffsetSplineCount * 4 - 4])) {
 					puVar20[1] = 0;
 				}
 				slotIdx++;

@@ -1614,8 +1614,8 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	float projX;
 	float projY;
 	float projZ;
-	_GXColor dofColor;
 	_GXColor chanColor;
+	_GXColor dofColor;
 	int nearAlpha;
 	int farAlpha;
 	unsigned int texBufferSize;

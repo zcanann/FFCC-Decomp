@@ -1601,10 +1601,6 @@ void CGraphic::RenderNoTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXCol
  */
 void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist, float farDist, Vec targetPos, int blurPasses)
 {
-	_GXTexObj smallBackTex;
-	_GXTexObj backBufferTex;
-	_GXColor dofColor;
-	_GXColor chanColor;
 	Vec cameraPos;
 	Vec cameraToTarget;
 	Vec scaledDir;
@@ -1612,10 +1608,14 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	Vec quadMax;
 	float gxProjection[7];
 	float gxViewport[6];
+	_GXTexObj smallBackTex;
+	_GXTexObj backBufferTex;
 	Mtx cameraMtx;
 	float projX;
 	float projY;
 	float projZ;
+	_GXColor dofColor;
+	_GXColor chanColor;
 	int nearAlpha;
 	int farAlpha;
 	unsigned int texBufferSize;

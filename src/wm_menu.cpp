@@ -4869,17 +4869,17 @@ void CMenuPcs::DrawCMakeMenu()
 		byteOffset += 0x1C;
 	} while (bit < 2);
 
-	short contentState = m_wmWorldState->m_mainState;
-	int __p11 = contentState;
-	int __p12 =  (int)(unsigned int)(contentState);
-	if (__p12 > 0 && __p11 < 4) {
+	short contentState;
+	WmWorldState* const contentWS = m_wmWorldState;
+	contentState = contentWS->m_mainState;
+	if (contentState > 0 && contentState < 4) {
 		float contentAlpha;
 		if (contentState == 1) {
-			contentAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+			contentAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(contentWS->m_frameCounter));
 		} else if (contentState == 2) {
 			contentAlpha = FLOAT_803313e8;
 		} else {
-			contentAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
+			contentAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(contentWS->m_frameCounter) - DOUBLE_80331420));
 		}
 
 		DrawCharaBase();

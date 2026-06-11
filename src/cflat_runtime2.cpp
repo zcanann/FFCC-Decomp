@@ -168,46 +168,48 @@ void CLine<64>::Draw()
 	}
 
 	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
-	u32 i = 0;
-	while (i < pointCount) {
-		const float x = points[i].x;
-		const float y = points[i].y;
-		const float z = points[i].z;
+	for (u32 i = 0; i < pointCount; i++) {
+		float x;
+		float y;
+		float z;
+		z = points[i].z;
+		y = points[i].y;
+		x = points[i].x;
 		GXWGFifo.f32 = x;
 		GXWGFifo.f32 = y;
 		GXWGFifo.f32 = z;
-		i++;
 	}
 
 	const float yOffset = 5.0f;
 	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
-	i = 0;
-	while (i < pointCount) {
+	for (u32 i = 0; i < pointCount; i++) {
 		const float x = points[i].x;
 		const float y = yOffset + points[i].y;
 		const float z = points[i].z;
 		GXWGFifo.f32 = x;
 		GXWGFifo.f32 = y;
 		GXWGFifo.f32 = z;
-		i++;
 	}
 
 	GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((pointCount & 0x7FFF) << 1));
-	i = 0;
-	while (i < pointCount) {
-		const float x = points[i].x;
-		const float y = points[i].y;
-		const float z = points[i].z;
+	for (u32 i = 0; i < pointCount; i++) {
+		float x;
+		float y;
+		float z;
+		z = points[i].z;
+		y = points[i].y;
+		x = points[i].x;
 		GXWGFifo.f32 = x;
 		GXWGFifo.f32 = y;
 		GXWGFifo.f32 = z;
-		const float x2 = points[i].x;
-		const float y2 = points[i].y;
-		const float z2 = points[i].z;
-		GXWGFifo.f32 = x2;
-		GXWGFifo.f32 = yOffset + y2;
-		GXWGFifo.f32 = z2;
-		i++;
+		{
+			float raisedY = yOffset + points[i].y;
+			float raisedZ = points[i].z;
+			float raisedX = points[i].x;
+			GXWGFifo.f32 = raisedX;
+			GXWGFifo.f32 = raisedY;
+			GXWGFifo.f32 = raisedZ;
+		}
 	}
 }
 
@@ -1669,7 +1671,7 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
  * JP Address: TODO
  * JP Size: TODO
  */
-int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius, float angle, int maxCount, CGObject** objects)
+int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle, float radius, int maxCount, CGObject** objects)
 {
 	const float radiusSq = radius * radius;
 	int count = 0;

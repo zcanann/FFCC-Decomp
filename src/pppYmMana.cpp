@@ -1336,8 +1336,8 @@ static int UpdateWaterMesh(VYmMana* mana)
     do {
         currentScale = kPppYmMoveParabolaZero;
         neighborScale = kYmManaHalf;
-        int col = 1;
-        int index = rowBase + 1;
+        unsigned int col = 1;
+        unsigned int index = rowBase + 1;
         while (col < 0x10) {
             int above0 = index - 0x11;
             int below0 = index + 0x11;
@@ -1375,7 +1375,7 @@ static int UpdateWaterMesh(VYmMana* mana)
                                                     center3[-1] + center3[1]) -
                                    waterHeightB[index3];
 
-            int index4 = index + 4;
+            unsigned int index4 = index + 4;
             int above4 = index4 - 0x11;
             int below4 = index4 + 0x11;
             float* center4 = &waterHeightA[index4];

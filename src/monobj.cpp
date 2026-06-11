@@ -1839,14 +1839,16 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		char text[0x100];
 		int targetIndex = m_targetPartyIndex;
 		int targetChar = '-';
-		unsigned short aiState = m_groupTag;
-		int aiChar = '-';
+		int aiMasked = aiState & 0x7FFF;
 
 		if (targetIndex >= 0) {
 			targetChar = targetIndex + '0';
 		}
-		if ((aiState & 0x7FFF) != 0) {
-			aiChar = (aiState & 0x7FFF) + 0x40;
+		int aiChar;
+		if (aiMasked == 0) {
+			aiChar = '-';
+		} else {
+			aiChar = aiMasked + 0x40;
 		}
 
 		sprintf(text, s_pctd_pctc_pctd_pctc_801DCA2C, (int)object->m_scriptHandle[2], aiChar,

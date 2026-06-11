@@ -4438,7 +4438,7 @@ int GbaQueue::GetTmpArtifactData(int channel, unsigned char* outData)
  * JP Address: TODO
  * JP Size: TODO
  */
-char GbaQueue::GetRadarType(int channel)
+int GbaQueue::GetRadarType(int channel)
 {
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	int radarType;

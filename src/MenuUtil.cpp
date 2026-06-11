@@ -913,7 +913,7 @@ void CMenuPcs::DrawOptionMenu()
 		int y = k;
 		int uvY =  (k | 0);
 		int uvY2 = 0x18;
-		int modeU = 0x280;
+		unsigned int modeU = 0x280;
 		int __p1 = i;
 		for (int i = 0; __p1 < 4; i++, y += 0x28, uvY += 0x20, uvY2 += 0x20, modeU += 0x40, k = 0) {
 			CTexture* cursorPanel = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 4);

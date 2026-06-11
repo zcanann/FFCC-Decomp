@@ -62,6 +62,21 @@ STATIC_ASSERT(offsetof(CChara::MogFurState, m_alphaScore) == 0x2050);
 
 class CMaterial;
 
+inline void* operator new(unsigned long, void* ptr) { return ptr; }
+
+struct FurPickPointerTable {
+	CVector* volatile m_areaCA2;
+	CVector* volatile m_areaBC2;
+	CVector* volatile m_hitToC2;
+	CVector* volatile m_hitToB2;
+	CVector* volatile m_areaCA1;
+	CVector* volatile m_areaBC1;
+	CVector* volatile m_hitToC1;
+	CVector* volatile m_hitToB1;
+	CVector* volatile m_rayEndB;
+	CVector* volatile m_rayEndA;
+};
+
 extern char sYmEnvSeparator[4];
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
@@ -1351,6 +1366,12 @@ int CChara::CModel::PickFur(
 	FurProjectedVertex verts[3];
 	FurProjectedVertex incoming;
 	Mtx44 invScreenMtx;
+	Vec rayEndMem;
+	Vec hitToBMem;
+	Vec hitToCMem;
+	Vec areaBCMem;
+	Vec areaCAMem;
+	FurPickPointerTable ptrTable;
 
 	for (unsigned int meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
@@ -1373,6 +1394,17 @@ int CChara::CModel::PickFur(
 		const int normGqr = ModelNormQuant(this);
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7,
 		              normGqr << 0x18 | 0x70000 | normGqr << 8 | 7, 0xc070c07);
+
+		ptrTable.m_rayEndA = reinterpret_cast<CVector*>(&rayEndMem);
+		ptrTable.m_rayEndB = reinterpret_cast<CVector*>(&rayEndMem);
+		ptrTable.m_hitToB1 = reinterpret_cast<CVector*>(&hitToBMem);
+		ptrTable.m_hitToC1 = reinterpret_cast<CVector*>(&hitToCMem);
+		ptrTable.m_areaBC1 = reinterpret_cast<CVector*>(&areaBCMem);
+		ptrTable.m_areaCA1 = reinterpret_cast<CVector*>(&areaCAMem);
+		ptrTable.m_hitToB2 = reinterpret_cast<CVector*>(&hitToBMem);
+		ptrTable.m_hitToC2 = reinterpret_cast<CVector*>(&hitToCMem);
+		ptrTable.m_areaBC2 = reinterpret_cast<CVector*>(&areaBCMem);
+		ptrTable.m_areaCA2 = reinterpret_cast<CVector*>(&areaCAMem);
 
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		int displayCount = mesh->m_data->m_displayListCount;
@@ -1404,6 +1436,17 @@ int CChara::CModel::PickFur(
 
 				verts[0].m_valid = 0;
 				verts[1].m_valid = 0;
+
+				CVector* rayEndCtorP = ptrTable.m_rayEndA;
+				CVector* rayEndP = ptrTable.m_rayEndB;
+				CVector* hitToBCtorP = ptrTable.m_hitToB1;
+				CVector* hitToCCtorP = ptrTable.m_hitToC1;
+				CVector* areaBCCtorP = ptrTable.m_areaBC1;
+				CVector* areaCACtorP = ptrTable.m_areaCA1;
+				CVector* hitToBP = ptrTable.m_hitToB2;
+				CVector* hitToCP = ptrTable.m_hitToC2;
+				CVector* areaBCP = ptrTable.m_areaBC2;
+				CVector* areaCAP = ptrTable.m_areaCA2;
 
 				for (unsigned int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
@@ -1506,7 +1549,7 @@ int CChara::CModel::PickFur(
 						C_MTX44Inverse(invScreenMtx, invScreenMtx);
 
 						CVector rayStart;
-						CVector rayEnd;
+						new (rayEndCtorP) CVector;
 						CVector rayStartInit(
 						    (static_cast<float>(cursorXd) - kCharaFurScreenCenterX) / kCharaFurScreenCenterX,
 						    static_cast<float>(negCursorY) / kCharaFurScreenCenterY, kCharaFurDepthZero);
@@ -1514,15 +1557,15 @@ int CChara::CModel::PickFur(
 						rayStart.y = rayStartInit.y;
 						rayStart.z = rayStartInit.z;
 						CVector rayEndInit(rayStartInit.x, rayStartInit.y, kCharaFurPickRayFarZ);
-						rayEnd.x = rayEndInit.x;
-						rayEnd.y = rayEndInit.y;
-						rayEnd.z = rayEndInit.z;
+						rayEndP->x = rayEndInit.x;
+						rayEndMem.y = rayEndInit.y;
+						rayEndMem.z = rayEndInit.z;
 						PSMTX44MultVec(invScreenMtx, rayStart, rayStart);
-						PSMTX44MultVec(invScreenMtx, rayEnd, rayEnd);
+						PSMTX44MultVec(invScreenMtx, *rayEndP, *rayEndP);
 
 						Vec ray;
 						CVector raySub;
-						PSVECSubtract(rayEnd, rayStart, raySub);
+						PSVECSubtract(*rayEndP, rayStart, raySub);
 						ray.x = raySub.x;
 						ray.y = raySub.y;
 						ray.z = raySub.z;
@@ -1555,11 +1598,11 @@ int CChara::CModel::PickFur(
 						PSVECAdd(rayStart, &scaledRay, hitViewPos);
 
 						CVector hitToA;
-						CVector hitToC;
-						CVector hitToB;
+						new (hitToBCtorP) CVector;
+						new (hitToCCtorP) CVector;
 						CVector areaAB;
-						CVector areaBC;
-						CVector areaCA;
+						new (areaBCCtorP) CVector;
+						new (areaCACtorP) CVector;
 						const CVector& vertA1 = CVector(verts[0].m_viewPos);
 						CVector hitToASub;
 						PSVECSubtract(const_cast<CVector&>(vertA1), hitViewPos, hitToASub);
@@ -1569,22 +1612,22 @@ int CChara::CModel::PickFur(
 						const CVector& vertB = CVector(verts[1].m_viewPos);
 						CVector hitToBSub;
 						PSVECSubtract(const_cast<CVector&>(vertB), hitViewPos, hitToBSub);
-						hitToB.y = hitToBSub.y;
-						hitToB.x = hitToBSub.x;
-						hitToB.z = hitToBSub.z;
+						hitToBMem.y = hitToBSub.y;
+						hitToBP->x = hitToBSub.x;
+						hitToBMem.z = hitToBSub.z;
 						const CVector& vertC = CVector(verts[2].m_viewPos);
 						CVector hitToCSub;
 						PSVECSubtract(const_cast<CVector&>(vertC), hitViewPos, hitToCSub);
-						hitToC.x = hitToCSub.x;
-						hitToC.y = hitToCSub.y;
-						hitToC.z = hitToCSub.z;
+						hitToCP->x = hitToCSub.x;
+						hitToCMem.y = hitToCSub.y;
+						hitToCMem.z = hitToCSub.z;
 
-						PSVECCrossProduct(hitToA, hitToB, areaAB);
-						PSVECCrossProduct(hitToB, hitToC, areaBC);
-						PSVECCrossProduct(hitToC, hitToA, areaCA);
+						PSVECCrossProduct(hitToA, *hitToBP, areaAB);
+						PSVECCrossProduct(*hitToBP, *hitToCP, *areaBCP);
+						PSVECCrossProduct(*hitToCP, hitToA, *areaCAP);
 						const float magAB = PSVECMag(areaAB);
-						const float magCA = PSVECMag(areaCA);
-						const float magBC = PSVECMag(areaBC);
+						const float magCA = PSVECMag(*areaCAP);
+						const float magBC = PSVECMag(*areaBCP);
 						const CVector& weightsInit = CVector(magBC, magCA, magAB);
 						CVector weightsScale;
 						CVector weights;

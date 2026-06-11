@@ -1094,8 +1094,8 @@ void CGraphic::makeSphere()
             rowVertex[0] = x;
             rowVertex[1] = radius * (float)sin(kGraphicSphereSegmentAngle * (float)seg);
             vertices[vertexCount * 3 + 2] = radius * (float)cos(kGraphicSphereSegmentAngle * (float)seg);
-            rowVertex += 3;
             vertex += 3;
+            rowVertex += 3;
             vertexCount++;
         }
     }
@@ -1111,8 +1111,9 @@ void CGraphic::makeSphere()
     GXBeginDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
     GXBegin(GX_LINES, GX_VTXFMT0, 0xB0);
 
+    int ring = 0;
     int ringStart = 1;
-    for (int ring = 0; ring < 5; ring++) {
+    for (; ring < 5; ring++) {
         int current = ringStart;
         for (int seg = 0; seg < 8; seg += 2) {
             int i0 = current;

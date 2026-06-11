@@ -108,6 +108,8 @@ int CMenuPcs::MoneyCtrlCur()
 	bool blocked;
 	u16 pressRaw;
 	u16 holdRaw;
+	s16 hold;
+	s16 press;
 
 	int padLock = Pad.m_debugPadLock;
 	blocked = false;
@@ -121,7 +123,7 @@ int CMenuPcs::MoneyCtrlCur()
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		pressRaw = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
-	s16 press = pressRaw;
+	press = pressRaw;
 
 	blocked = false;
 	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
@@ -134,15 +136,15 @@ int CMenuPcs::MoneyCtrlCur()
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		holdRaw = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
-	s16 hold = holdRaw;
+	hold = holdRaw;
 
 	if (hold == 0) {
 		return 0;
 	}
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	int mode = this->m_moneyState->mode;
 	int maxDigits = 1;
+	int mode = this->m_moneyState->mode;
 	int maxGil = caravanWork->m_gil;
 	int digitPlace = 10;
 

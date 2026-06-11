@@ -10214,18 +10214,17 @@ input_check_done:
 		PSMTXRotRad(rotMtx, 'y', FLOAT_803314bc * -*reinterpret_cast<float*>(bytes + 0x7C));
 		PSMTXConcat(baseMtx, rotMtx, baseMtx);
 
-		float t = static_cast<float>(m_wmWorldState->m_titleState) / FLOAT_803314c0;
-		float selectedRotY;
-		float selectedRotZ;
-		float selectedYOffset;
-		WM_MENU_EVAL_SPLINE(selectedRotY, DAT_8032E8D4, DAT_8032E8D0, t);
-		WM_MENU_EVAL_SPLINE(selectedRotZ, DAT_8032E8DC, DAT_8032E8D8, t);
-		WM_MENU_EVAL_SPLINE(selectedYOffset, DAT_8032E8E4, DAT_8032E8E0, t);
+		float selectedRotY = GetFcvValue(*reinterpret_cast<FCV*>(&DAT_8032E8D0),
+		                                 static_cast<float>(m_wmWorldState->m_titleState));
+		float selectedRotZ = GetFcvValue(*reinterpret_cast<FCV*>(&DAT_8032E8D8),
+		                                 static_cast<float>(m_wmWorldState->m_titleState));
+		float selectedYOffset = GetFcvValue(*reinterpret_cast<FCV*>(&DAT_8032E8E0),
+		                                    static_cast<float>(m_wmWorldState->m_titleState));
 
 		float openScale;
 		if (m_wmWorldState->m_nextMenuMode != -1) {
-			t = static_cast<float>(0x14 - m_wmWorldState->m_delay) / FLOAT_803314c0;
-			WM_MENU_EVAL_SPLINE(openScale, DAT_8032E8EC, DAT_8032E8E8, t);
+			openScale = GetFcvValue(*reinterpret_cast<FCV*>(&DAT_8032E8E8),
+			                        static_cast<float>(0x14 - m_wmWorldState->m_delay));
 		} else {
 			openScale = FLOAT_803313dc;
 		}

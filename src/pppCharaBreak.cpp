@@ -40,6 +40,11 @@ static inline Mtx& CameraMatrix()
     return CameraPcs.m_cameraMatrix;
 }
 
+static inline float CharaBreakConst(const float& value)
+{
+    return *reinterpret_cast<const float*>(&value);
+}
+
 STATIC_ASSERT(sizeof(POLYGON_DATA) == 0x34);
 STATIC_ASSERT(sizeof(CharaBreakStep) == 0x44);
 STATIC_ASSERT(sizeof(CharaBreakWork) == 0x48);
@@ -147,7 +152,7 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTab
         pppSetDrawEnv(
             reinterpret_cast<pppCVECTOR*>(&colorWork->result),
             &charaBreak->m_drawMatrix,
-            kPppCharaBreakZero,
+            CharaBreakConst(kPppCharaBreakZero),
             0,
             0,
             0,
@@ -402,10 +407,10 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    float fVar1 = kPppCharaBreakZero;
+    float fVar1 = CharaBreakConst(kPppCharaBreakZero);
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
-    work->m_value2 = kPppCharaBreakZero;
+    work->m_value2 = CharaBreakConst(kPppCharaBreakZero);
     work->m_value1 = fVar1;
     work->m_value0 = fVar1;
     work->m_value5 = fVar1;
@@ -424,7 +429,7 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    float fVar1 = kPppCharaBreakZero;
+    float fVar1 = CharaBreakConst(kPppCharaBreakZero);
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
     work->m_meshBuffers = 0;
@@ -663,7 +668,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
     u32 count = polygonCount;
     CChara::CModel* modelPtr = model;
     POLYGON_DATA* polygon = polygonData;
-    f32 zero = kPppCharaBreakZero;
+    f32 zero = CharaBreakConst(kPppCharaBreakZero);
 
     const volatile u32* upSrc = (const volatile u32*)&kPppCharaBreakUpVector.x;
     for (u32 i = 0; i < count; i++) {
@@ -688,12 +693,12 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
         }
 
         if (MeshData(mesh)->m_skinCount == 0) {
-            normal.x = Math.RandF(kPppCharaBreakOne);
-            normal.y = Math.RandF(kPppCharaBreakOne);
-            normal.z = Math.RandF(kPppCharaBreakOne);
-            normal.x *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
-            normal.y *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
-            normal.z *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
+            normal.x = Math.RandF(CharaBreakConst(kPppCharaBreakOne));
+            normal.y = Math.RandF(CharaBreakConst(kPppCharaBreakOne));
+            normal.z = Math.RandF(CharaBreakConst(kPppCharaBreakOne));
+            normal.x *= (rand() % 2) ? CharaBreakConst(kPppCharaBreakOne) : CharaBreakConst(kPppCharaBreakRandomSign);
+            normal.y *= (rand() % 2) ? CharaBreakConst(kPppCharaBreakOne) : CharaBreakConst(kPppCharaBreakRandomSign);
+            normal.z *= (rand() % 2) ? CharaBreakConst(kPppCharaBreakOne) : CharaBreakConst(kPppCharaBreakRandomSign);
             PSVECNormalize(&normal, &normal);
             gUtil.ConvF2IVector(polygon->m_normalA, normal, ModelData(modelPtr)->m_normQuant);
         } else {
@@ -708,11 +713,11 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             tangent.y = zero;
             tangent.z = zero;
         } else {
-            PSVECScale(&tangent, &tangent, kPppCharaBreakOne / tangentMag);
+            PSVECScale(&tangent, &tangent, CharaBreakConst(kPppCharaBreakOne) / tangentMag);
         }
 
         if (zero == tangent.x && zero == tangent.y && zero == tangent.z) {
-            tangent.x = kPppCharaBreakOne;
+            tangent.x = CharaBreakConst(kPppCharaBreakOne);
             tangent.y = zero;
             tangent.z = zero;
         }

@@ -8420,7 +8420,6 @@ int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_propagation off
 void CMenuPcs::CalcCharaSelect()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);

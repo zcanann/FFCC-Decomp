@@ -304,10 +304,9 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         float pulseAmp = FLOAT_8033091c;
         float pulseOne = FLOAT_80330914;
         float pulseTimerScale = FLOAT_80330918;
-        int heartValueOffset = 0;
 
         for (int heartIndex = 0; heartIndex < (int)((unsigned int)scriptFood->m_maxHp >> 1); heartIndex++) {
-            int heartValue = m_heartValue - heartValueOffset;
+            int heartValue = m_heartValue - heartIndex * 0xC;
             float heartTimer = (float)m_heartGrowTimers[heartIndex];
             float heartPulse =
                 pulseAmp * (float)sin(pulseSinScale * -(heartTimer * pulseTimerScale - pulseOne)) + pulseOne;
@@ -349,7 +348,6 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
             }
 
             heartBaseX += ((m_menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
-            heartValueOffset += 0x0C;
         }
     }
 }
@@ -680,11 +678,10 @@ void CMesMenu::onDraw()
                 float pulseAmp = FLOAT_8033091c;
                 float pulseBase = FLOAT_80330920;
                 float heartZero = FLOAT_803308d8;
-                int heartValueOffset = 0;
 
                 for (int heartIndex = 0; heartIndex < (int)((unsigned int)heartFood->m_maxHp >> 1);
                      heartIndex++) {
-                    int heartValue = m_heartValue - heartValueOffset;
+                    int heartValue = m_heartValue - heartIndex * 0xC;
                     float heartTimer = (float)m_heartGrowTimers[heartIndex];
                     float heartPulse =
                         pulseAmp * (float)sin(pulseSinScale * -(heartTimer * pulseTimerScale - pulseOne)) + pulseOne;
@@ -726,7 +723,6 @@ void CMesMenu::onDraw()
                     }
 
                     heartBaseX += ((m_menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
-                    heartValueOffset += 0x0C;
                 }
             }
         }

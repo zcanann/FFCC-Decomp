@@ -4075,7 +4075,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                             if (targetModel != 0) {
                                 CChunkFile rsdFile;
                                 rsdFile.SetBuf(pdtFile.GetAddress());
-                                unsigned int meshSize = pppReadRsd(rsdFile, targetModel);
+                                unsigned int meshSize = PartMng.pppReadRsd(rsdFile, targetModel);
                                 targetModel->Ptr2Off();
 
                                 void** meshDataPtr =
@@ -4106,16 +4106,18 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
 
                             pppShapeSt* searchShape = shapeArray;
                             unsigned int i = 0;
-                            do {
+                            for (;;) {
                                 if (searchShape->m_inUse != 0 && strcmp(searchShape->m_name, name) == 0) {
-                                    break;
+                                    goto shapeNameSearchDone;
                                 }
                                 i++;
                                 searchShape++;
-                            } while (i < 0x100);
-                            if (i >= 0x100) {
-                                searchShape = 0;
+                                if (i >= 0x100) {
+                                    searchShape = 0;
+                                    goto shapeNameSearchDone;
+                                }
                             }
+                        shapeNameSearchDone:
 
                             if (searchShape == 0) {
                                 pppShapeSt* freeShape = shapeArray;
@@ -4141,7 +4143,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                             if (targetShape != 0) {
                                 CChunkFile shpFile;
                                 shpFile.SetBuf(pdtFile.GetAddress());
-                                pppReadShp(shpFile, targetShape);
+                                PartMng.pppReadShp(shpFile, targetShape);
                                 targetShape = 0;
                             }
                             break;
@@ -4153,13 +4155,13 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                     _pppDataHead* sourceHead = reinterpret_cast<_pppDataHead*>(pdtFile.GetAddress());
                     pppInitData(sourceHead, pppGetSysProgTable(), cachePriority);
 
-                    unsigned long copySize = sourceHead->m_partCount * 0x60 + 0x20;
                     _pppDataHead* copiedHead = static_cast<_pppDataHead*>(
                         operator new[](
-                            copySize, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xd56));
+                            sourceHead->m_partCount * 0x60 + 0x20, PartPcs.m_usbStreamState.m_stageLoad,
+                            const_cast<char*>(s_partMng_cpp), 0xd56));
                     pdtSlot->m_pppDataHead = copiedHead;
 
-                    memcpy(copiedHead, sourceHead, copySize);
+                    memcpy(copiedHead, sourceHead, sourceHead->m_partCount * 0x60 + 0x20);
 
                     ppvEnv = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
                     pdtSlot->m_envFields[1] = reinterpret_cast<unsigned int>(m_materialSet);

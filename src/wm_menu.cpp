@@ -10854,10 +10854,14 @@ LAB_next:
 		int* digitWidths = reinterpret_cast<int*>(lbl_801DB7F8 + 0x920);
 		int* playWidths = reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0);
 		const double rowSlopeD = DOUBLE_80331498;
+		const double rowBias = DOUBLE_80331408;
 		const double rowBaseD = DOUBLE_80331490;
 		for (int slot = 0, slotOff = slot; slot < kMcListCount; slot++, slotOff += kMcListEntrySize) {
+			double rawR;
 			unsigned char* const slotData = m_wmCharaState + slotOff;
-			const float slotY = (float)(rowSlopeD * static_cast<double>(slot) + rowBaseD);
+			reinterpret_cast<int*>(&rawR)[1] = slot ^ 0x80000000;
+			reinterpret_cast<int*>(&rawR)[0] = 0x43300000;
+			const float slotY = (float)(rowSlopeD * (rawR - rowBias) + rowBaseD);
 			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<char*>(slotData + 0x41) != 0) {
 				float rowY = FLOAT_80331440 + slotY;
 				float capX = FLOAT_80331468;

@@ -14,7 +14,6 @@ static FoodRank s_rank[8];
 
 extern "C" const float kCompaFoodIconUvScale = 0.75f;
 extern "C" const float kCompaFrameU = 72.0f;
-static const char sFavoRankFormat[] = "%d";
 extern "C" const float kFavoWideTextureWidth;
 extern "C" const float kFavoIconUvScale;
 
@@ -205,7 +204,7 @@ void CMenuPcs::FavoDraw()
 		float posY = static_cast<float>(drawEntry->y + 0xA);
 		rankFont->renderFlags = (rankFont->renderFlags & 0xEF) | 0x10;
 		rankFont->SetMargin(1.0f);
-		sprintf(textBuf, sFavoRankFormat, static_cast<int>(rank->place));
+		sprintf(textBuf, "%d", static_cast<int>(rank->place));
 		rankFont->SetPosX(posX);
 		rankFont->SetPosY(posY - 4.0f);
 		rankFont->Draw(textBuf);

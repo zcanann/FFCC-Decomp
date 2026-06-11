@@ -440,6 +440,17 @@ static inline CCaravanWork* ShopMenuCaravanWork(CShopMenu* shopMenu)
     return shopMenu->m_caravanWork;
 }
 
+static inline int CountShopMenuInventoryItems(CShopMenu* shopMenu, short itemNo)
+{
+    int total = 0;
+    for (int slot = 0; slot < 0x40; slot++) {
+        if (ShopMenuCaravanWork(shopMenu)->m_inventoryItems[slot] == itemNo) {
+            ++total;
+        }
+    }
+    return total;
+}
+
 static float CalcCenteredShopMenuX(CFont* font, const char* text, int centerX)
 {
     return static_cast<float>(static_cast<int>((FLOAT_80332DD4 - font->GetWidth(text)) * FLOAT_80332d78 + centerX));
@@ -2492,15 +2503,7 @@ void CShopMenu::SelectMake()
             break;
         }
 
-        if (canSelect) {
-            int total = 0;
-            for (int slot = 0; slot < 0x40; slot++) {
-                if (ShopMenuCaravanWork(this)->m_inventoryItems[slot] == itemNo) {
-                    ++total;
-                }
-            }
-            canSelect = material[3] <= total;
-        }
+        canSelect = canSelect && (material[3] <= CountShopMenuInventoryItems(this, itemNo));
     }
 
     if (!canSelect) {

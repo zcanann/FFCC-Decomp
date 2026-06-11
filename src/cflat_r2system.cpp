@@ -2376,7 +2376,7 @@ renderedDone:
         CLine<64>* line = &m_debugLines[*object->m_localBase];
         unsigned long segment;
         float segmentRatio;
-        float distance = kCFlatPadStickZero;
+        float distance;
 
         if (line->Calc((Vec*)0, (float*)0, &segment, &segmentRatio, &target, kCFlatPadStickZero) != 0) {
             distance = line->segments[segment].length * segmentRatio + line->segments[segment].startLength;

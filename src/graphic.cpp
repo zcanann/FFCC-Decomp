@@ -1073,6 +1073,8 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
 void CGraphic::makeSphere()
 {
     float vertices[126];
+    float* rowVertex;
+    float* vertex;
 
     int vertexCount = 0;
     vertices[0] = kGraphicSphereNegativeX;
@@ -1080,8 +1082,7 @@ void CGraphic::makeSphere()
     vertices[vertexCount * 3 + 2] = kGraphicZeroF;
 
     vertexCount++;
-    float* vertex = &vertices[vertexCount * 3];
-    float* rowVertex;
+    vertex = &vertices[vertexCount * 3];
 
     for (int ring = 0; ring < 5; ring++) {
         float pitch = (kGraphicSpherePi * (float)(ring + 1)) / kGraphicSphereRingDivisor;
@@ -1093,8 +1094,8 @@ void CGraphic::makeSphere()
             rowVertex[0] = x;
             rowVertex[1] = radius * (float)sin(kGraphicSphereSegmentAngle * (float)seg);
             vertices[vertexCount * 3 + 2] = radius * (float)cos(kGraphicSphereSegmentAngle * (float)seg);
-            rowVertex += 3;
             vertex += 3;
+            rowVertex += 3;
             vertexCount++;
         }
     }
@@ -1110,30 +1111,31 @@ void CGraphic::makeSphere()
     GXBeginDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
     GXBegin(GX_LINES, GX_VTXFMT0, 0xB0);
 
+    int ring = 0;
     int ringStart = 1;
-    for (int ring = 0; ring < 5; ring++) {
+    for (; ring < 5; ring++) {
         int current = ringStart;
         for (int seg = 0; seg < 8; seg += 2) {
-            GXWGFifo.f32 = vertices[current * 3 + 1];
-            GXWGFifo.f32 = vertices[current * 3 + 0];
-            GXWGFifo.f32 = vertices[current * 3 + 2];
+            int i0 = current;
+            current += 2;
+
+            GXWGFifo.f32 = vertices[i0 * 3 + 1];
+            GXWGFifo.f32 = vertices[i0 * 3 + 0];
+            GXWGFifo.f32 = vertices[i0 * 3 + 2];
 
             int next0 = ringStart + ((seg + 1) % 8);
             GXWGFifo.f32 = vertices[next0 * 3 + 1];
             GXWGFifo.f32 = vertices[next0 * 3 + 0];
             GXWGFifo.f32 = vertices[next0 * 3 + 2];
 
-            current++;
             int next1 = ringStart + ((seg + 2) % 8);
-            GXWGFifo.f32 = vertices[current * 3 + 1];
-            GXWGFifo.f32 = vertices[current * 3 + 0];
-            GXWGFifo.f32 = vertices[current * 3 + 2];
+            GXWGFifo.f32 = vertices[(i0 + 1) * 3 + 1];
+            GXWGFifo.f32 = vertices[(i0 + 1) * 3 + 0];
+            GXWGFifo.f32 = vertices[(i0 + 1) * 3 + 2];
 
             GXWGFifo.f32 = vertices[next1 * 3 + 1];
             GXWGFifo.f32 = vertices[next1 * 3 + 0];
             GXWGFifo.f32 = vertices[next1 * 3 + 2];
-
-            current++;
         }
         ringStart += 8;
     }

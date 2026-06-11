@@ -1070,7 +1070,8 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
         if (material->m_materialType == 3) {
             GXSetArray(GX_VA_NRM, m_geometryArraySource, 6);
             material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
-            unsigned int tevBit = m_curEnvTevBit & material->m_tevBit;
+            unsigned int tevBit = m_curEnvTevBit;
+            tevBit &= material->m_tevBit;
             if (m_activeEnvTevBit != tevBit) {
                 m_activeEnvTevBit = tevBit;
                 if ((tevBit & 2) != 0) {
@@ -1238,7 +1239,8 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             }
             GXSetArray(GX_VA_NRM, m_geometryArraySource, 6);
             material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
-            unsigned int tevBit = m_curEnvTevBit & material->m_tevBit;
+            unsigned int tevBit = m_curEnvTevBit;
+            tevBit &= material->m_tevBit;
             if (m_activeEnvTevBit != tevBit) {
                 m_activeEnvTevBit = tevBit;
                 m_bumpTexMapIds[0] = m_texMapIdCur + 1;
@@ -1308,7 +1310,8 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             }
             GXSetArray(GX_VA_NRM, m_geometryArraySource, 0x12);
             material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
-            unsigned int tevBit = m_curEnvTevBit & material->m_tevBit;
+            unsigned int tevBit = m_curEnvTevBit;
+            tevBit &= material->m_tevBit;
             if (m_activeEnvTevBit != tevBit) {
                 unsigned int scrollSel = tevBit & 0x60;
                 m_activeEnvTevBit = tevBit;
@@ -1396,7 +1399,8 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
         GXSetArray(GX_VA_NRM, m_geometryArraySource, 6);
     }
     material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
-    unsigned int tevBit = m_curEnvTevBit & material->m_tevBit;
+    unsigned int tevBit = m_curEnvTevBit;
+    tevBit &= material->m_tevBit;
     if (m_activeEnvTevBit == tevBit) {
         return;
     }
@@ -3167,11 +3171,13 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 chunkFile.GetF4();
             } break;
             case CHUNK_BUMP: {
-                unsigned char bumpLightDirect = 0;
+                unsigned char bumpLightDirect;
                 if (chunk.m_version == 1) {
                     bumpLightDirect = chunkFile.Get1();
                     material->m_unkA5 = chunkFile.Get1();
                     chunkFile.Get2();
+                } else {
+                    bumpLightDirect = 0;
                 }
 
                 material = m_materials[materialIndex];
@@ -3282,14 +3288,14 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                         } break;
                         case CHUNK_UFRM:
                             keyFrameU = AllocMapKeyFrame(0xDD3);
-                            keyFrameU->ReadFrame(chunkFile, 0);
+                            keyFrameU->ReadFrame(chunkFile, chunk.m_arg0);
                             break;
                         case CHUNK_UKEY:
                             keyFrameU->ReadKey(chunkFile, chunk.m_arg0);
                             break;
                         case CHUNK_VFRM:
                             keyFrameV = AllocMapKeyFrame(0xDDD);
-                            keyFrameV->ReadFrame(chunkFile, 0);
+                            keyFrameV->ReadFrame(chunkFile, chunk.m_arg0);
                             break;
                         case CHUNK_VKEY:
                             keyFrameV->ReadKey(chunkFile, chunk.m_arg0);
@@ -3304,9 +3310,13 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     material->GetTexScroll(slot)->m_v1 = chunkFile.GetF4();
                     if (kTextureZero != material->GetTexScroll(slot)->m_u1) {
                         material->GetTexScroll(slot)->m_type0 = 1;
+                    } else {
+                        material->GetTexScroll(slot)->m_type0 = 0;
                     }
                     if (kTextureZero != material->GetTexScroll(slot)->m_v1) {
                         material->GetTexScroll(slot)->m_type1 = 1;
+                    } else {
+                        material->GetTexScroll(slot)->m_type1 = 0;
                     }
                 }
             } break;

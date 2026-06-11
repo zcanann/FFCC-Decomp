@@ -3258,9 +3258,9 @@ int CMenuPcs::GetSmithItem(int itemNo)
     if (smithItem > 0) {
         unsigned int genderMask = 0x10;
         int flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
-        unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e0) & 3);
         int raceFlags = flags & 0xF;
         int genderFlags = flags & 0x30;
+        unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e0) & 3);
         if (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e2) != 0) {
             genderMask = 0x20;
         }

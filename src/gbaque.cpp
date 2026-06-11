@@ -160,7 +160,7 @@ extern const unsigned int ITEM_ATTACH;
  * Address:	TODO
  * Size:	TODO
  */
-GbaQueue::GbaQueue()
+inline GbaQueue::GbaQueue()
 {
 	Init();
 }
@@ -535,7 +535,7 @@ void GbaQueue::ClrShopMode()
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::LoadMask()
+inline void GbaQueue::LoadMask()
 {
 	int* scriptFoodBase = reinterpret_cast<int*>(Game.m_scriptFoodBase);
 
@@ -594,7 +594,7 @@ int GbaQueue::SetQueue(int channel, unsigned int value)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ResetQueue()
+inline void GbaQueue::ResetQueue()
 {
 	GbaQueueSetQueueView* queue = GetSetQueueView(this);
 
@@ -933,7 +933,7 @@ void GbaQueue::ExecutQueue()
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::SetSellData(int, unsigned int)
+inline void GbaQueue::SetSellData(int, unsigned int)
 {
 	// TODO
 }
@@ -943,7 +943,7 @@ void GbaQueue::SetSellData(int, unsigned int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::SetBuyData(int, unsigned int)
+inline void GbaQueue::SetBuyData(int, unsigned int)
 {
 	// TODO
 }
@@ -1281,7 +1281,7 @@ void GbaQueue::GetMBasePos(int channel, short* outX, short* outY)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::LoadAllStat()
+inline void GbaQueue::LoadAllStat()
 {
 	LoadPlayerStat();
 	LoadEnemyStat();
@@ -3219,7 +3219,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::CMakeEnd(int, unsigned int)
+inline void GbaQueue::CMakeEnd(int, unsigned int)
 {
 	// TODO
 }
@@ -3229,7 +3229,7 @@ void GbaQueue::CMakeEnd(int, unsigned int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::CMakeBarthday(int, unsigned int)
+inline void GbaQueue::CMakeBarthday(int, unsigned int)
 {
 	// TODO
 }
@@ -3445,16 +3445,15 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	count = 0;
-	writePtr = outData + 4;
-	size = 4;
-
 	outData[0] = 0;
 	outData[1] = 0;
-	outData[2] = 0;
-	outData[3] = 0;
 	itemPtr = localPlayerData;
+	outData[2] = 0;
+	writePtr = outData + 4;
+	outData[3] = 0;
+	size = 4;
 
-	for (i = 0; i < 0x40; i++, itemPtr += 2) {
+	for (i = 0; i < 0x40; i++) {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
 		if (MenuPcs.GetItemType(itemId, 1) == 1) {
 		const int iconMask = localPlayerData[2] & 3;
@@ -3471,6 +3470,7 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 			count++;
 		}
 		}
+		itemPtr += 2;
 	}
 
 	outData[0] = count;
@@ -3650,7 +3650,7 @@ inline void GbaQueue::ClrSmithFlg(int channel)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ShopEnd(int channel)
+inline void GbaQueue::ShopEnd(int channel)
 {
 	ClrShopFlg(channel);
 
@@ -3665,7 +3665,7 @@ void GbaQueue::ShopEnd(int channel)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::SmithEnd(int channel)
+inline void GbaQueue::SmithEnd(int channel)
 {
 	ClrSmithFlg(channel);
 

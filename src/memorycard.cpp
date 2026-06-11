@@ -735,6 +735,62 @@ void CMemoryCardMan::CnvPlayTime(unsigned int frames, int* hours, int* minutes)
  * Address:	TODO
  * Size:	TODO
  */
+void CMemoryCardMan::McWrite(char* buffer, int length, int offset)
+{
+    if (buffer == nullptr)
+    {
+        buffer = m_saveBuffer;
+    }
+
+    m_opDoneFlag = 0;
+    m_state = 9;
+
+    int result = CARDWriteAsync(
+        &m_fileInfo,
+        buffer,
+        length,
+        offset,
+        &Attach
+    );
+
+    if (result < 0)
+    {
+        m_opDoneFlag = 1;
+    }
+
+    m_result = result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::McRead(char* buffer, int length, int offset)
+{
+    if (buffer == nullptr)
+    {
+        buffer = m_saveBuffer;
+    }
+
+    m_opDoneFlag = 0;
+    m_state = 8;
+
+    int result = CARDReadAsync(&m_fileInfo, buffer, length, offset, &Attach);
+
+    if (result < 0)
+    {
+        m_opDoneFlag = 1;
+    }
+
+    m_result = result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 int CMemoryCardMan::DummyLoad()
 {
     int result;
@@ -808,28 +864,7 @@ int CMemoryCardMan::DummyLoad()
     }
 
     memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
-    char* readBuf = m_saveBuffer;
-    if (readBuf == nullptr)
-    {
-        readBuf = m_saveBuffer;
-    }
-    m_opDoneFlag = 0;
-    m_state = 8;
-
-    result = CARDReadAsync(
-        &m_fileInfo,
-        readBuf,
-        kMemoryCardSaveBufferSize,
-        0x4000,
-        &Attach
-    );
-
-    if (result < 0)
-    {
-        m_opDoneFlag = 1;
-    }
-
-    m_result = result;
+    McRead(m_saveBuffer, kMemoryCardSaveBufferSize, 0x4000);
 
     // Wait for read to finish
     while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
@@ -1068,27 +1103,7 @@ int CMemoryCardMan::DummySave()
 
         SetMcIconImage();
 
-        char* writeBuf = m_saveBuffer;
-        if (writeBuf == nullptr)
-        {
-            writeBuf = m_saveBuffer;
-        }
-        m_opDoneFlag = 0;
-        m_state = 9;
-
-        result = CARDWriteAsync(
-            &m_fileInfo,
-            writeBuf,
-            0x4000,
-            0,
-            &Attach
-        );
-
-        if (result < 0)
-        {
-            m_opDoneFlag = 1;
-        }
-        m_result = result;
+        McWrite(m_saveBuffer, 0x4000, 0);
 
         while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
         {
@@ -1161,27 +1176,7 @@ int CMemoryCardMan::DummySave()
 
     MakeSaveData();
 
-    char* writeBuf2 = m_saveBuffer;
-    if (writeBuf2 == nullptr)
-    {
-        writeBuf2 = m_saveBuffer;
-    }
-    m_opDoneFlag = 0;
-    m_state = 9;
-
-    result = CARDWriteAsync(
-        &m_fileInfo,
-        writeBuf2,
-        kMemoryCardSaveBufferSize,
-        0x4000,
-        &Attach
-    );
-
-    if (result < 0)
-    {
-        m_opDoneFlag = 1;
-    }
-    m_result = result;
+    McWrite(m_saveBuffer, kMemoryCardSaveBufferSize, 0x4000);
 
     while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
     {
@@ -1767,62 +1762,6 @@ void CMemoryCardMan::McFormat(int chan)
         chan,
         &Attach
     );
-
-    if (result < 0)
-    {
-        m_opDoneFlag = 1;
-    }
-
-    m_result = result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::McWrite(char* buffer, int length, int offset)
-{
-    if (buffer == nullptr)
-    {
-        buffer = m_saveBuffer;
-    }
-
-    m_opDoneFlag = 0;
-    m_state = 9;
-
-    int result = CARDWriteAsync(
-        &m_fileInfo,
-        buffer,
-        length,
-        offset,
-        &Attach
-    );
-
-    if (result < 0)
-    {
-        m_opDoneFlag = 1;
-    }
-
-    m_result = result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::McRead(char* buffer, int length, int offset)
-{
-    if (buffer == nullptr)
-    {
-        buffer = m_saveBuffer;
-    }
-
-    m_opDoneFlag = 0;
-    m_state = 8;
-
-    int result = CARDReadAsync(&m_fileInfo, buffer, length, offset, &Attach);
 
     if (result < 0)
     {

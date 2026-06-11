@@ -11880,8 +11880,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	}
 
 	sx = static_cast<float>(static_cast<int>(static_cast<double>(sx) - DOUBLE_803313f8));
-	sy = static_cast<float>(static_cast<int>(static_cast<double>(sy) - DOUBLE_803313f8));
 	sw = static_cast<float>(static_cast<int>(static_cast<double>(sw) - DOUBLE_80331420));
+	sy = static_cast<float>(static_cast<int>(static_cast<double>(sy) - DOUBLE_803313f8));
 	sh = static_cast<float>(static_cast<int>(static_cast<double>(sh) - DOUBLE_80331420));
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));

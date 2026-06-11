@@ -5043,8 +5043,7 @@ void CMenuPcs::DrawCMakeMenu()
 			unsigned int ti = 5;
 			textList[0] = langText[ti];
 			ti = 6;
-			int __p7 = ti;
-			textList[1] = langText[__p7];
+			textList[1] = langText[ti];
 			ti = 7;
 			textList[2] = langText[ti];
 			_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;

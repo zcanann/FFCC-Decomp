@@ -380,6 +380,10 @@ static CMapObj* getMapHitObject()
 	return MapMng.m_hitMapObj;
 }
 
+// Original passes only two args at both statCharge/checkTargetParticle call
+// sites (target never loads r6); bind the mangled symbol with a 2-arg shape.
+extern "C" void sendCombiToScript__10CGCharaObjFP10CGCharaObjii(CGCharaObj* self, CGCharaObj* target, int scriptArg);
+
 /*
  * --INFO--
  * Address:	TODO
@@ -2328,7 +2332,7 @@ void CGPartyObj::statCharge()
 
 		if (phase == 0) {
 			if (m_comboLinkCount != 0) {
-				sendCombiToScript(reinterpret_cast<CGCharaObj*>(m_comboScriptArg), m_comboScriptMode, m_subFrame);
+				sendCombiToScript__10CGCharaObjFP10CGCharaObjii(this, reinterpret_cast<CGCharaObj*>(m_comboScriptArg), m_comboScriptMode);
 			}
 			resetIgnoreHit();
 			putParticleFromItem(m_itemId, 0, m_particleSlots[0], static_cast<Vec*>(0));
@@ -3204,7 +3208,7 @@ void CGPartyObj::onStatMagic()
 			}
 		}
 		if (m_subFrame == 8 && m_comboLinkCount != 0) {
-			sendCombiToScript(reinterpret_cast<CGCharaObj*>(m_comboScriptArg), m_comboScriptMode, m_subFrame);
+			sendCombiToScript__10CGCharaObjFP10CGCharaObjii(this, reinterpret_cast<CGCharaObj*>(m_comboScriptArg), m_comboScriptMode);
 		}
 		moveCenterTargetParticle();
 		if (m_subFrame >= 0x12) {

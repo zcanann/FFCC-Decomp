@@ -1426,8 +1426,9 @@ void CChara::CModel::CalcMatrix()
  */
 void CChara::CModel::CalcSkin()
 {
+	u32 normQuant;
 	u32 posQuant = ModelPosQuant(this);
-	u32 normQuant = ModelNormQuant(this);
+	normQuant = ModelNormQuant(this);
 
 	u32 posGqr = (posQuant << 24) | 0x70000 | (posQuant << 8) | 7;
 	u32 normGqr = (normQuant << 24) | 0x70000 | (normQuant << 8) | 7;

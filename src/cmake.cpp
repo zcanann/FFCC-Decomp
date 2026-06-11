@@ -1724,8 +1724,7 @@ void CMenuPcs::CmakeJobDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
-    font->SetColor(textColor.color);
+    SetCmakeFontColor(font, alpha);
 
     for (int i = 0; i < 8; ++i) {
         const char* txt = GetJobStr(i);

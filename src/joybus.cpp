@@ -4522,8 +4522,8 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             GbaQue.GetCaravanName((char*)body);
 
             signed char* p = (signed char*)&playerInfo;
-            unsigned char* cf = classFlags;
             unsigned char lowBits = 0;
+            unsigned char* cf = classFlags;
 
             for (int highBits = 0; highBits < 4; highBits++)
             {
@@ -4559,7 +4559,8 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             body[0x8C] = playerData[threadParam->m_portIndex * 0xDC + 2];
 
             unsigned char* q = body + 0x8D;
-            memcpy(q, (unsigned char*)&playerInfo + (threadParam->m_portIndex * 0xDC + 0x20), 3);
+            int statOffset = threadParam->m_portIndex * 0xDC;
+            memcpy(q, (unsigned char*)&playerInfo + statOffset + 0x20, 3);
 
             unsigned short statHalf = __lhbrx(&playerInfo, threadParam->m_portIndex * 0xDC + 0x14);
             memcpy(q + 3, &statHalf, 2);
@@ -4572,7 +4573,8 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             const int byteLen = compatLen + 0x97;
 
-            memcpy(q, (unsigned char*)&playerInfo + (threadParam->m_portIndex * 0xDC + 0x18), 8);
+            int statOffset2 = threadParam->m_portIndex * 0xDC;
+            memcpy(q, (unsigned char*)&playerInfo + statOffset2 + 0x18, 8);
 
             unsigned int statWord = __lwbrx(&playerInfo, threadParam->m_portIndex * 0xDC + 0x24);
             memcpy(q + 8, &statWord, sizeof(statWord));
@@ -4868,7 +4870,6 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
         break;
     }
     default:
-        result = 0;
         break;
     }
 
@@ -5014,7 +5015,7 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
  */
 int JoyBus::SendFavorite(ThreadParam* threadParam)
 {
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)
@@ -5065,7 +5066,6 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
         break;
     }
     default:
-        result = 0;
         break;
     }
 
@@ -5131,9 +5131,10 @@ void JoyBus::GetRecvBuffer(int playerIndex, unsigned char* outBuffer)
  */
 int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
 {
+    unsigned int cmd = 0;
+
     ResetQueue(threadParam);
 
-    unsigned int cmd = 0;
     unsigned int cmd0 = 0;
     unsigned char* cmd0Bytes = reinterpret_cast<unsigned char*>(&cmd0);
     cmd0Bytes[0] = 0x10;
@@ -5626,7 +5627,7 @@ int JoyBus::SendStrength(ThreadParam* threadParam)
 {
     unsigned int cmd = 0;
     unsigned char* cmdBytes = (unsigned char*)&cmd;
-    unsigned char strength[3];
+    unsigned char strength[0x10];
 
     GbaQue.GetStrengthData(threadParam->m_portIndex, strength);
 

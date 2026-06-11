@@ -602,6 +602,7 @@ void CChara::CalcMogScore()
 
 			const int ring = dist % 12;
 			int angle = static_cast<int>(kYmEnvRadToDeg * atan2(static_cast<double>(dx), static_cast<double>(dy))) + 0x168;
+			angle = static_cast<unsigned int>(angle);
 			angle %= 0x2D;
 
 			for (int i = 0; i < 3; i++) {

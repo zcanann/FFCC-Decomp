@@ -1397,7 +1397,7 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 {
 	int particleOffset = 0;
 	int particleBank;
-	unsigned short particleSpec;
+	int particleSpec;
 	unsigned short particleFlags;
 	unsigned short seSpec;
 

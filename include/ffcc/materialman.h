@@ -270,11 +270,11 @@ public:
         m_stdTexMapId = 0;
         m_stdTexMtx = 0x1E;
         m_stdTexCoordId = 0;
-        m_curEnvTevBit = stdTevBit;
+        m_curEnvTevBit |= 0x1000;
         m_stdTexMapId = 0;
         m_stdTexMtx = 0x1E;
         m_stdTexCoordId = 0;
-        m_stdEnvTevBit = stdTevBit;
+        m_stdEnvTevBit = m_curEnvTevBit;
     }
     void SetChangeTexReflectionState(_GXTexObj* texObj, unsigned int tevBit, unsigned int stdTevBit)
     {
@@ -292,12 +292,12 @@ public:
         m_shadowMaterialCount = 0;
         m_shadowTextureCount = 0;
         m_shadowKColorMask = 0;
-        m_curEnvTevBit = stdTevBit;
+        m_curEnvTevBit |= 0x1000;
         m_manaParaboloidTexObj0 = texObj;
         m_stdTexMapId = 0;
         m_stdTexMtx = 0x1E;
         m_stdTexCoordId = 0;
-        m_stdEnvTevBit = stdTevBit;
+        m_stdEnvTevBit = m_curEnvTevBit;
     }
     void SetEmissionTextureEnv(unsigned int tevBit)
     {

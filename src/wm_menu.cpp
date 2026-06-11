@@ -1129,7 +1129,7 @@ void CMenuPcs::loadData()
 
 	for (int i = 0; i < 4; i++) {
 		PPPCREATEPARAM param;
-		const int slot = i + 0x20;
+		const int slot =  (int)(unsigned int)(i + 0x20);
 		unsigned int* effect =
 		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + slot * 0x524);
 		if (slot == 5 && i + 0xA < 0x13) {

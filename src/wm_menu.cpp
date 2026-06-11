@@ -11281,14 +11281,14 @@ void CMenuPcs::CalcMcObj()
 			Mtx rotYMtx;
 
 			panelState[0] = 1;
-			reinterpret_cast<float*>(panelState)[7] = 0.6f;
-			reinterpret_cast<float*>(panelState)[8] = -1.4f;
+			reinterpret_cast<float*>(panelState)[7] = FLOAT_803314B0;
+			reinterpret_cast<float*>(panelState)[8] = FLOAT_803314B4;
 			reinterpret_cast<float*>(panelState)[9] = FLOAT_803313dc;
-			reinterpret_cast<float*>(panelState)[0xD] = 0.5f;
-			reinterpret_cast<float*>(panelState)[0xE] = 0.5f;
-			reinterpret_cast<float*>(panelState)[0xF] = 0.5f;
-			reinterpret_cast<float*>(panelState)[10] = 0.17453292f;
-			reinterpret_cast<float*>(panelState)[0xB] = reinterpret_cast<float*>(panelState)[0xB] + 0.017453292f;
+			reinterpret_cast<float*>(panelState)[0xD] = FLOAT_80331434;
+			reinterpret_cast<float*>(panelState)[0xE] = FLOAT_80331434;
+			reinterpret_cast<float*>(panelState)[0xF] = FLOAT_80331434;
+			reinterpret_cast<float*>(panelState)[10] = FLOAT_803314B8;
+			reinterpret_cast<float*>(panelState)[0xB] = reinterpret_cast<float*>(panelState)[0xB] + FLOAT_803314bc;
 
 			reinterpret_cast<float*>(panelState)[8] =
 			    reinterpret_cast<float*>(panelState)[8] +
@@ -11296,7 +11296,7 @@ void CMenuPcs::CalcMcObj()
 			                                   static_cast<float>(static_cast<int>(panelState[1]))));
 
 			reinterpret_cast<float*>(panelState)[0xB] =
-			    0.017453292f *
+			    FLOAT_803314bc *
 			    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelRotationSplineCount),
 			                                   static_cast<float>(static_cast<int>(panelState[1]))));
 			PSMTXScale(scaleMtx, reinterpret_cast<float*>(panelState)[0xD], reinterpret_cast<float*>(panelState)[0xE],

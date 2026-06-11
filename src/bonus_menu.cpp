@@ -3185,14 +3185,12 @@ void CMenuPcs::DrawResultOpenAnim()
 		DrawInit();
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-		int off;
 		int i = 0;
 		int modelIndex = 0;
 		int lastKind = 0;
-		off = i << 6;
 		int partyOff = 0;
-		for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; off += 0x40, i++) {
-			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
+		for (; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
+			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
 
 			if (sprite->kind >= 0 || sprite->kind == -2) {
 				if (sprite->kind == -2) {
@@ -3324,8 +3322,7 @@ void CMenuPcs::DrawResultOpenAnim()
 			for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; off2 += 0x40, i++) {
 				BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off2 + 8);
 				if (sprite->kind == -1) {
-					CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(FLOAT_80331E98 * sprite->alpha));
-					font->SetColor(color.color);
+					font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(FLOAT_80331E98 * sprite->alpha)).color);
 
 					int partyIndex = textIndex % activePartyCount;
 					int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;

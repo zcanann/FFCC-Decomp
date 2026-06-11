@@ -840,10 +840,10 @@ CChara::CModel::CModel()
 
 	PSMTXIdentity(m_matrix);
 
-	m_furStep = 0.2f;
-	m_furLenScale = 3.0f;
-	m_curFrame = 0.0f;
+	m_furLenScale = 0.2f;
+	m_furStep = 3.0f;
 	m_time = 0.0f;
+	m_curFrame = 0.0f;
 	m_dynJitter.x = 0.0f;
 	m_dynJitter.y = 0.0f;
 	m_dynJitter.z = 0.0f;

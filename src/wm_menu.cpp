@@ -6344,8 +6344,8 @@ float CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 			} else {
 				float* next = keys + idx * 4;
 				float* prev = keys + (idx - 1) * 4;
+				float u = (t - *prev) / (*next - *prev);
 				float span = *next - *prev;
-				float u = (t - *prev) / span;
 				float u2 = u * u;
 				float u3 = u2 * u;
 				float c4u2 = FLOAT_803314c4 * u2;

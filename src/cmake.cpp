@@ -1130,7 +1130,6 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             } else {
                 Sound.PlaySe(4, 0x40, 0x7f, 0);
             }
-            return 0;
         }
     }
     return 0;

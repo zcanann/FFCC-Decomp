@@ -237,7 +237,7 @@ struct CmdState {
 	s16 uniteSelected;
 	unsigned char pad_002E[0x30 - 0x2E];
 	s16 mode;
-	u16 prevMode;
+	s16 prevMode;
 	s16 scrollTop;
 };
 

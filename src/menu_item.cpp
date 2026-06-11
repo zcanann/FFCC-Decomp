@@ -311,6 +311,7 @@ void CMenuPcs::ItemDraw()
     float h;
     float u;
     float v;
+    GXColor colors[4];
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -339,7 +340,6 @@ void CMenuPcs::ItemDraw()
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
-            GXColor colors[4];
             colors[0].r = 0xFF;
             colors[0].g = 0xFF;
             colors[0].b = 0xFF;
@@ -409,12 +409,11 @@ void CMenuPcs::ItemDraw()
             }
 
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
-            GXColor color;
-            color.r = 0xFF;
-            color.g = 0xFF;
-            color.b = 0xFF;
-            color.a = (u8)(itemAlpha * LoadFloat(kItemColorMax));
-            GXSetChanMatColor(GX_COLOR0A0, color);
+            colors[0].r = 0xFF;
+            colors[0].g = 0xFF;
+            colors[0].b = 0xFF;
+            colors[0].a = (u8)(itemAlpha * LoadFloat(kItemColorMax));
+            GXSetChanMatColor(GX_COLOR0A0, colors[0]);
             MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, LoadFloat(kItemZero));
         }
     }

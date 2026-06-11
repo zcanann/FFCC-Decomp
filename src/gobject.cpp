@@ -1948,7 +1948,7 @@ void CGObject::update()
             PSMTXTransApply(modelMtx, ecScratch, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
             m_weaponModelHandle->m_model->SetMatrix(ecScratch);
             m_weaponModelHandle->m_model->CalcMatrix();
-            if (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0) {
+            if (m_weaponNodeFlagBits.m_unk20) {
                 m_weaponModelHandle->m_model->CalcSkin();
             }
 
@@ -1968,7 +1968,7 @@ void CGObject::update()
             m_shieldModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
                 static_cast<s32>(static_cast<s32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0;
             m_shieldModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
-            if (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0) {
+            if (m_weaponNodeFlagBits.m_unk20) {
                 m_shieldModelHandle->m_model->CalcSkin();
             }
         }

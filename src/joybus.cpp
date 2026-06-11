@@ -1216,8 +1216,8 @@ timeout_expiry:
 
             if ((int)GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
             {
-                unsigned int money = GbaQue.GetMoney(threadParam->m_portIndex);
-                if (SetMoney(threadParam->m_portIndex, money) == 0)
+                localBuf = GbaQue.GetMoney(threadParam->m_portIndex);
+                if (SetMoney(threadParam->m_portIndex, localBuf) == 0)
                 {
                     GbaQue.ClrMoneyFlg(threadParam->m_portIndex);
                 }
@@ -1287,8 +1287,8 @@ timeout_expiry:
 
             if ((int)GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
             {
-                unsigned int money = GbaQue.GetMoney(threadParam->m_portIndex);
-                if (SetMoney(threadParam->m_portIndex, money) == 0)
+                localBuf = GbaQue.GetMoney(threadParam->m_portIndex);
+                if (SetMoney(threadParam->m_portIndex, localBuf) == 0)
                 {
                     GbaQue.ClrMoneyFlg(threadParam->m_portIndex);
                 }
@@ -2492,7 +2492,7 @@ timeout_expiry:
             threadParam->m_errorRetry++;
             m_ctrlModeArr[threadParam->m_portIndex] = 0;
 
-            if (GbaQue.GetControllerMode() != 0)
+            if ((unsigned char)GbaQue.GetControllerMode() != 0)
                 m_nextModeTypeArr[threadParam->m_portIndex] = 4;
             else
                 m_nextModeTypeArr[threadParam->m_portIndex] = 0;

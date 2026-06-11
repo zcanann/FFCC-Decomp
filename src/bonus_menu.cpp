@@ -3355,7 +3355,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			spr->alpha = kBonusZClearOrigin;
 		}
 
-		{
+		if (0 < activePartyCount) {
 			for (int i = 0; i < activePartyCount; i++) {
 				BonusAnimSprite* spr = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i + 1];
 				spr->kind = 0x17;

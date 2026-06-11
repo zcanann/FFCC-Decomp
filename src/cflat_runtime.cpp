@@ -2055,8 +2055,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 							char specChar;
 							int specLen = 0;
 							while (((specChar = *format) != '\0') && ((specLen == 0) || (specChar != '%'))) {
-								spec[specLen] = specChar;
 								format++;
+								spec[specLen] = specChar;
 								specLen++;
 							}
 							spec[specLen] = '\0';
@@ -2127,7 +2127,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				}
 			}
 
-			*object->m_sp++ = 0;
+			*object->m_sp = 0;
+			object->m_sp++;
 			result = 0;
 			break;
 		default: {
@@ -2149,7 +2150,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				*object->m_sp = 0;
 				object->m_sp++;
 				result = 0;
-				return ret;
+				goto done;
 			}
 
 			const u32 requestIndex = object->m_localBase[0];
@@ -2161,25 +2162,25 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			            reinterpret_cast<CStack*>(object->m_localBase + 2)) != 0) {
 				if (object == reinterpret_cast<CObject*>(object->m_engineObject)) {
 					result = 2;
-					return ret;
+					goto done;
 				}
 
 				*object->m_sp = 0;
 				object->m_sp++;
 				result = 0;
-				return ret;
+				goto done;
 			}
 
 			*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
 
 			if (noPush != 0) {
-				return ret;
+				goto done;
 			}
 
 			*object->m_sp = 0;
 			object->m_sp++;
 			result = 0;
-			return ret;
+			goto done;
 		}
 		case -2: {
 			CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
@@ -2208,7 +2209,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			*object->m_sp = 0;
 			object->m_sp++;
 			result = 0;
-			return ret;
+			goto done;
 		}
 		case -3: {
 			CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
@@ -2232,7 +2233,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			*object->m_sp = 0;
 			object->m_sp++;
 			result = 0;
-			return ret;
+			goto done;
 		}
 		case -4:
 			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
@@ -2241,7 +2242,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			*object->m_sp = 0;
 			object->m_sp++;
 			result = 0;
-			return ret;
+			goto done;
 		}
 
 		CStopWatch watch("no name");
@@ -2253,6 +2254,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x64C) += 1;
 	}
 
+done:
 	return ret;
 }
 

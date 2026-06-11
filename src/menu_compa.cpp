@@ -163,16 +163,15 @@ void CMenuPcs::CompaDraw()
 		entry++;
 	}
 
-	CompaOpenAnimList* compaList = this->m_compaList;
-
 	colors[0].r = 0xFF;
 	colors[0].g = 0xFF;
 	colors[0].b = 0xFF;
-	colors[0].a = static_cast<signed char>(compaList->entries[0].alpha * kCompaColorMax);
+	colors[0].a = static_cast<signed char>(this->m_compaList->entries[0].alpha * kCompaColorMax);
 	GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
 	int familyCount = 2;
+	CompaOpenAnimList* compaList = this->m_compaList;
 	const short* evtWord = &caravanWork->m_evtWordArr[19];
 	int i = 2;
 	do {
@@ -201,8 +200,8 @@ void CMenuPcs::CompaDraw()
 	int drawIndex = 0;
 	int shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
+		float iconY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(shown * 0x28);
 		float iconX = static_cast<float>(compaList->entries[0].x + 0x128);
-		float iconY = static_cast<float>(compaList->entries[0].y + 0x40);
 
 		if (i >= 2) {
 			int scan = drawIndex;
@@ -241,7 +240,7 @@ void CMenuPcs::CompaDraw()
 		DrawSingleIcon(
 			icon,
 			static_cast<int>(iconX),
-			static_cast<int>(iconY + static_cast<float>(shown * 0x28)),
+			static_cast<int>(iconY),
 			compaList->entries[0].alpha, 1, kCompaOne);
 
 		shown++;
@@ -249,6 +248,7 @@ void CMenuPcs::CompaDraw()
 	}
 
 	CFont* font = m_fonts[4];
+	compaList = this->m_compaList;
 	font->SetMargin(kCompaOne);
 	font->SetShadow(0);
 	font->SetScaleX(kCompaNameFontScaleX);
@@ -277,8 +277,8 @@ void CMenuPcs::CompaDraw()
 		}
 
 		const char* name = GetMenuStr(drawIndex + 0x16);
-		float y = static_cast<float>(compaList->entries[0].y + 0x45) + static_cast<float>(shown * 0x28);
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
+		float y = static_cast<float>(compaList->entries[0].y + 0x45) + static_cast<float>(shown * 0x28);
 		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(name);
 
@@ -297,7 +297,8 @@ void CMenuPcs::CompaDraw()
 	font->SetShadow(0);
 	font->SetScale(kCompaJobFontScale);
 	font->DrawInit();
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * this->m_compaList->entries[0].alpha)).color);
+	compaList = this->m_compaList;
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
 
 	const char* job = GetJobStr(nameWork->unk_0x3ac);
 	font->GetWidth(job);

@@ -2785,7 +2785,7 @@ void CMenuPcs::CalcLoadMenu()
 	WmWorldState* const worldState = m_wmWorldState;
 	m_textureLocIndex = 0;
 
-	bool bVar1 = false;
+	int bVar1 = 0;
 	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
@@ -2963,7 +2963,6 @@ void CMenuPcs::CalcLoadMenu()
 		}
 		break;
 	case 3:
-		MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
 		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
 		break;
 	case 5:

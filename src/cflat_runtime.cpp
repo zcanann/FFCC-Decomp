@@ -727,22 +727,26 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	const int requiredWords = classLocalCount + 0x60;
 	u8* scanNode = reinterpret_cast<u8*>(m_freeListNext);
 	const int noScan = static_cast<u8>(scanNode == self + 0x978);
-	u8* next;
-	while ((noScan == 0)
-	       && (((*reinterpret_cast<int*>(scanNode + 8) + requiredWords) + *reinterpret_cast<int*>(scanNode + 0xC))
-	           > *reinterpret_cast<int*>((next = *reinterpret_cast<u8**>(scanNode + 4)) + 8))) {
-		scanNode = next;
-	}
+	u8* selectedNode;
+	do {
+		selectedNode = scanNode;
+		if (noScan != 0) {
+			break;
+		}
+		scanNode = *reinterpret_cast<u8**>(selectedNode + 4);
+	} while (*reinterpret_cast<int*>(scanNode + 8) <
+	         (*reinterpret_cast<int*>(selectedNode + 8) + requiredWords) +
+	             *reinterpret_cast<int*>(selectedNode + 0xC));
 
 	void** const freeNode = m_objectFreeListHead;
 	m_objectFreeListHead = reinterpret_cast<void**>(freeNode[1]);
-	freeNode[0] = scanNode;
-	freeNode[1] = *reinterpret_cast<void**>(scanNode + 4);
+	freeNode[0] = selectedNode;
+	freeNode[1] = *reinterpret_cast<void**>(selectedNode + 4);
 	*reinterpret_cast<void***>(freeNode[1]) = freeNode;
-	*reinterpret_cast<void**>(scanNode + 4) = freeNode;
+	*reinterpret_cast<void**>(selectedNode + 4) = freeNode;
 
-	const int scanOffset = *reinterpret_cast<int*>(scanNode + 0xC);
-	const int baseWords = (noScan != 0) ? 0 : *reinterpret_cast<int*>(scanNode + 8);
+	const int scanOffset = *reinterpret_cast<int*>(selectedNode + 0xC);
+	const int baseWords = (noScan != 0) ? 0 : *reinterpret_cast<int*>(selectedNode + 8);
 	freeNode[2] = reinterpret_cast<void*>(static_cast<int>(scanOffset + baseWords));
 	freeNode[3] = reinterpret_cast<void*>(requiredWords);
 

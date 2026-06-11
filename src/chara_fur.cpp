@@ -1831,9 +1831,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, reinterpret_cast<Vec*>(&modelPos), kCharaFurShadowRange, kCharaFurShadowFade, 0);
 			CMaterial** shadowMatP = shadowMaterials;
 			MtxPtr* shadowMtxP = shadowMatrices;
-			int shadowTexMtxId = 0x21;
+			int shadowTexMtxBase = 0;
 			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
 				const int shadowTexMap = shadowIndex + 3;
+				const int shadowTexMtxId = shadowTexMtxBase + 0x21;
 				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowTexMap), (*shadowMatP)->GetTexture(0));
 
 				Mtx shadowTexMtx;
@@ -1841,7 +1842,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				GXLoadTexMtxImm(shadowTexMtx, shadowTexMtxId, GX_MTX3x4);
 				GXSetTexCoordGen2(static_cast<GXTexCoordID>(shadowTexMap), GX_TG_MTX3x4, GX_TG_POS,
 				                  shadowTexMtxId, GX_FALSE, GX_PTIDENTITY);
-				shadowTexMtxId += 3;
+				shadowTexMtxBase += 3;
 				shadowMatP++;
 				shadowMtxP++;
 			}

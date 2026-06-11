@@ -958,12 +958,12 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 float t0 = dFactor * fy;
                 float x0 = t0 * dScale - dHalf;
                 float xd0 = x0 / dInv;
-                float t1 = dFactor * (float)(y + 1);
-                float x1 = t1 * dScale - dHalf;
-                float xd1 = x1 / dInv;
                 float tz = dFactor * (float)x;
                 float z0 = tz * dScale - dHalf;
                 float zd = z0 / dInv;
+                float t1 = dFactor * (float)(y + 1);
+                float x1 = t1 * dScale - dHalf;
+                float xd1 = x1 / dInv;
                 float dist0 = z0 * z0 + x0 * x0;
                 if (dist0 < dHalf) {
                     dist0 = sqrtf(dHalf - dist0);

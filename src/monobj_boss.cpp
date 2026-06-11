@@ -449,6 +449,7 @@ void CGMonObj::changeStatFuncGolem(int stat)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma bool off
 int CGMonObj::calcBranchFuncGolem(int)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
@@ -461,6 +462,7 @@ int CGMonObj::calcBranchFuncGolem(int)
 	           __cntlzw(script[0x1C / 2] >= static_cast<int>(static_cast<unsigned int>(script[0x1A / 2]) >> 1))) >>
 	       5;
 }
+#pragma bool on
 
 /*
  * --INFO--

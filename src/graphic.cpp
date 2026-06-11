@@ -1073,6 +1073,8 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
 void CGraphic::makeSphere()
 {
     float vertices[126];
+    float* rowVertex;
+    float* vertex;
 
     int vertexCount = 0;
     vertices[0] = kGraphicSphereNegativeX;
@@ -1080,8 +1082,7 @@ void CGraphic::makeSphere()
     vertices[vertexCount * 3 + 2] = kGraphicZeroF;
 
     vertexCount++;
-    float* vertex = &vertices[vertexCount * 3];
-    float* rowVertex;
+    vertex = &vertices[vertexCount * 3];
 
     for (int ring = 0; ring < 5; ring++) {
         float pitch = (kGraphicSpherePi * (float)(ring + 1)) / kGraphicSphereRingDivisor;

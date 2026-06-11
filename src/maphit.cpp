@@ -125,8 +125,8 @@ void CMapHit::Draw()
     while (faceIndex < m_faceCount) {
         if ((face->m_drawFlags & 1) == 0) {
             const CMapIdGrp* mapIdGrp = &MapMng.m_mapIdGrpArray[face->m_groupIndex];
-            const GXColor colorABytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_primaryColor);
-            const GXColor colorBBytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
+            GXColor colorABytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_primaryColor);
+            GXColor colorBBytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
             int i = 0;

@@ -1168,8 +1168,8 @@ void CMapObj::SetShow(int show)
 #pragma inline_depth(8)
 void CMapObj::SetLink()
 {
-    CMapObj* head = 0;
     CMapObj* cursor = MapMng.m_mapObjArray;
+    CMapObj* head = 0;
 
     while ((cursor = MapMng.SearchChildMapObj(cursor, this)) != 0) {
         CMapObj* child = cursor;

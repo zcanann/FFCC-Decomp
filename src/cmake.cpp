@@ -864,11 +864,10 @@ void CMenuPcs::CmakeVillageDraw()
     DrawInit();
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
         int cursorLeft = (villageWork->m_select == 0) ? 0xC8 : 0xC8;
-        int wobble = static_cast<int>(System.m_frameCounter) % 8;
-        DrawCursor(
-            static_cast<int>(26.9f * static_cast<float>(villageWork->m_select) +
-                static_cast<float>(cursorLeft)) + wobble,
-            villageWork->m_row * 0x20 + 0x70, 1.0f);
+        cursorLeft = static_cast<int>(26.9f * static_cast<float>(villageWork->m_select) +
+            static_cast<float>(cursorLeft));
+        cursorLeft += static_cast<int>(System.m_frameCounter) % 8;
+        DrawCursor(cursorLeft, villageWork->m_row * 0x20 + 0x70, 1.0f);
     }
 
     int showNameCursor = static_cast<int>(
@@ -2548,11 +2547,10 @@ void CMenuPcs::CmakeNameDraw()
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
         int cursorLeft = (CmakeState(this)->m_select == 0) ? 0xC8 : 0xC8;
-        int wobble = static_cast<int>(System.m_frameCounter) % 8;
-        DrawCursor(
-            static_cast<int>(26.9f * static_cast<float>(CmakeState(this)->m_select) +
-                static_cast<float>(cursorLeft)) + wobble,
-            CmakeState(this)->m_row * 0x20 + 0x70, 1.0f);
+        cursorLeft = static_cast<int>(26.9f * static_cast<float>(CmakeState(this)->m_select) +
+            static_cast<float>(cursorLeft));
+        cursorLeft += static_cast<int>(System.m_frameCounter) % 8;
+        DrawCursor(cursorLeft, CmakeState(this)->m_row * 0x20 + 0x70, 1.0f);
     }
 
     char* name = GetCmakeNameBuffer();

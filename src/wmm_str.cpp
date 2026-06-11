@@ -40,6 +40,9 @@ extern const char* s_McWinMessGroup2_it[];
 extern const char* s_McWinMessGroup2_es[];
 extern const char* s_McWinMessGroup2_fr[];
 
+extern const float kWmmWindowTextScale = 1.0f;
+extern const double kWmmCenteringHalf = 0.5;
+
 struct WinMessEntry
 {
     unsigned int words[5];

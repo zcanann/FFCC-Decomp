@@ -1564,8 +1564,6 @@ void CShopMenu::DrawBuySellInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void CShopMenu::DrawItemList()
 {
     int y = 0x4C;
@@ -1664,7 +1662,6 @@ void CShopMenu::DrawItemList()
         drawShapeSeqScale(2, 0, 0x24E, 0xEC, scale, scale, alpha);
     }
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801524C4

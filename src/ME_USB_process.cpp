@@ -137,7 +137,9 @@ void CMaterialEditorPcs::SetUSBData()
 
         memcpy(rsdItem->ptr10, usb.m_data, usb.m_sizeBytes * 0xC);
 
-        for (u32 offset = 0, i = 0; i < usb.m_sizeBytes; offset += 0xC, i++) {
+        u32 offset;
+        u32 i;
+        for (i = 0, offset = 0; i < usb.m_sizeBytes; offset += 0xC, i++) {
             StoreSwapFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x0));
             StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x4));
             StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x8));
@@ -241,7 +243,9 @@ void CMaterialEditorPcs::SetUSBData()
 
         memcpy(rsdItem->ptr14, usb.m_data, usb.m_sizeBytes * 0xC);
 
-        for (u32 offset = 0, i = 0; i < usb.m_sizeBytes; offset += 0xC, i++) {
+        u32 offset;
+        u32 i;
+        for (i = 0, offset = 0; i < usb.m_sizeBytes; offset += 0xC, i++) {
             StoreSwapFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x0));
             StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x4));
             StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x8));

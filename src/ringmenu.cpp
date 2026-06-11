@@ -519,29 +519,11 @@ void CRingMenu::onDraw()
 		float posY;
 
 		if (group == 2) {
-			float sideX = posLeft;
-			if ((m_menuIndex & 1) != 0) {
-				sideX = posAltX;
-			}
-			posX = kRingMenuButtonInsetX + sideX;
-
-			float sideY = posLeft;
-			if ((m_menuIndex & 2) != 0) {
-				sideY = posAltY;
-			}
-			posY = kRingMenuPanelWidth80 + sideY;
+			posX = kRingMenuButtonInsetX + (((m_menuIndex & 1) != 0) ? posAltX : posLeft);
+			posY = kRingMenuPanelWidth80 + (((m_menuIndex & 2) != 0) ? posAltY : posLeft);
 		} else {
-			float sideX = posLeft;
-			if ((m_menuIndex & 1) != 0) {
-				sideX = posMainX;
-			}
-			posX = kRingMenuButtonWidth + sideX;
-
-			float sideY = posLeft;
-			if ((m_menuIndex & 2) != 0) {
-				sideY = posMainY;
-			}
-			posY = kRingMenuMainButtonY + sideY;
+			posX = kRingMenuButtonWidth + (((m_menuIndex & 1) != 0) ? posMainX : posLeft);
+			posY = kRingMenuMainButtonY + (((m_menuIndex & 2) != 0) ? posMainY : posLeft);
 		}
 
 		float buttonAlpha = static_cast<float>(m_buttonTimers[group * 3 + 2]) * kRingMenuButtonFadeStep;

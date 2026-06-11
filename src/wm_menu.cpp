@@ -11206,6 +11206,8 @@ void CMenuPcs::CalcMcObj()
 	const float six = FLOAT_803314a4;
 	const double doubleD = DOUBLE_803314a8;
 
+	SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
+
 	union I2D {
 		double d;
 		struct {
@@ -11236,7 +11238,7 @@ void CMenuPcs::CalcMcObj()
 		pConv.u.hi = 0x43300000;
 		pConv.u.lo = panelState[1] ^ 0x80000000;
 		if (static_cast<float>(pConv.d - bias) >=
-		    doubleD * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4])) {
+		    doubleD * static_cast<double>(yTbl->data[gWmModelYOffsetSplineCount * 4 - 4])) {
 			panelState[1] = 0;
 		}
 

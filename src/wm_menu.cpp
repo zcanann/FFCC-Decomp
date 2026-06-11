@@ -608,6 +608,8 @@ CMenuPcs::EffectInfo::EffectInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma peephole off
 void CMenuPcs::WmInit()
 {
 	float initValue = FLOAT_803313dc;
@@ -646,6 +648,7 @@ void CMenuPcs::WmInit()
 		gWmMenuScriptValueCache = 100;
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

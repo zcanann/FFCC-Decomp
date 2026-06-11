@@ -842,7 +842,7 @@ int CMenuPcs::LetterCtrl()
 						*reinterpret_cast<float*>(panel + 8) =
 						    static_cast<float>(DOUBLE_803330e8 -
 						                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
-						                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
+						                           static_cast<double>(static_cast<float>(*reinterpret_cast<unsigned int*>(panel + 0x10))));
 						if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
 							f = static_cast<float>(DOUBLE_803330e8 -
 							                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *

@@ -1888,25 +1888,25 @@ void CGObject::update()
         }
 
         if (m_currentAnimSlot != -1 && !m_weaponNodeFlagAll.m_bits1.m_bit01) {
-            bool animFinished = HasLoadedModel(m_charaModelHandle);
-            if (animFinished && m_currentAnimSlot != -1) {
-                if (ModelAnim(m_charaModelHandle->m_model) == 0) {
-                    animFinished = true;
+            const char animSlotNow = m_currentAnimSlot;
+            bool hasAnimModel = HasLoadedModel(m_charaModelHandle);
+            int animFinished;
+            if (!hasAnimModel || animSlotNow == -1) {
+                animFinished = 1;
+            } else if (ModelAnim(m_charaModelHandle->m_model) != 0) {
+                const float animSpan = sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
+                if (sAnimFrameOffset == animSpan) {
+                    animFinished = 1;
                 } else {
-                    const float animSpan = sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
-                    if (animSpan == sAnimFrameOffset) {
-                        animFinished = true;
+                    const float modelTime = m_charaModelHandle->m_model->m_time;
+                    if (m_lastBgAttr < sZeroFloat) {
+                        animFinished = sZeroFloat >= modelTime;
                     } else {
-                        const float modelTime = m_charaModelHandle->m_model->m_time;
-                        if (m_lastBgAttr < sZeroFloat) {
-                            animFinished = sZeroFloat >= modelTime;
-                        } else {
-                            animFinished = animSpan - sAnimFrameOffset < modelTime;
-                        }
+                        animFinished = animSpan - sAnimFrameOffset < modelTime;
                     }
                 }
             } else {
-                animFinished = true;
+                animFinished = 1;
             }
 
             if (animFinished) {

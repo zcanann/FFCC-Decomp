@@ -2426,12 +2426,11 @@ renderedDone:
             PSMTXConcat(viewMtx, drawMtx, drawMtx);
             GXLoadPosMtxImm(drawMtx, GX_PNMTX0);
 
-            GXColor color = {
-                static_cast<u8>(object->m_localBase[4]),
-                static_cast<u8>(object->m_localBase[5]),
-                static_cast<u8>(object->m_localBase[6]),
-                0xFF,
-            };
+            GXColor color;
+            color.a = 0xFF;
+            color.r = static_cast<u8>(object->m_localBase[4]);
+            color.g = static_cast<u8>(object->m_localBase[5]);
+            color.b = static_cast<u8>(object->m_localBase[6]);
             GXSetChanMatColor(GX_COLOR0A0, color);
             Graphic.DrawSphere();
         }

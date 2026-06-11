@@ -3297,9 +3297,16 @@ void CMenuPcs::DrawCmakeBallCursor(int kind, int frame, float alpha)
  */
 void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 {
-    SetCmakeBlendMatColor(alpha);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     float alpha255 = 255.0f * alpha;
+    GXColor col;
+    col.r = 0xFF;
+    col.g = 0xFF;
+    col.b = 0xFF;
+    col.a = static_cast<unsigned char>(alpha255);
+    GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
         0, 480.0f, 368.0f, 48.0f, 32.0f,
@@ -3325,11 +3332,13 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)).color);
 
+    int tx;
+    int cursorY;
     const char* txt = GetMenuStr(0x29);
     float w = static_cast<float>(font->GetWidth(txt));
     double cursorYBase = 373.0;
-    int tx = static_cast<int>((120.0f - w) / 2.0 + 480.0);
-    int cursorY = static_cast<int>(cursorYBase);
+    tx = static_cast<int>((120.0f - w) / 2.0 + 480.0);
+    cursorY = static_cast<int>(cursorYBase);
     font->SetPosX(static_cast<float>(tx));
     font->SetPosY(static_cast<float>(cursorY - 4));
     font->Draw(txt);

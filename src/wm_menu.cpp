@@ -2876,7 +2876,7 @@ void CMenuPcs::CalcLoadMenu()
 			int absOff = ((int)uVar15 ^ s16) - s16;
 			if (absOff < 0) absOff = 0;
 			if (absOff > 10) absOff = 10;
-			wave = wave * (float)sin((double)(FLOAT_803314bc * (float)absOff * FLOAT_803316d4));
+			wave = wave * (float)sin((double)(FLOAT_803314bc * ((float)absOff * FLOAT_803316d4)));
 		}
 
 		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) - wave);

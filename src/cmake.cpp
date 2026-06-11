@@ -2303,8 +2303,9 @@ void CMenuPcs::CmakeSexDraw()
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
     float maxWidth = 0.0f;
-    int y = 0x9C;
-    for (int i = 0; i < 2; ++i) {
+    int y;
+    int i;
+    for (i = 0, y = 0x9C; i < 2; ++i) {
         const char* txt = GetMenuStr(0x11 + i);
         float width = static_cast<float>(font->GetWidth(txt));
         if (maxWidth < width) {

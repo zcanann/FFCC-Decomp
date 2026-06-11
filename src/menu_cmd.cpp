@@ -1917,8 +1917,6 @@ void CMenuPcs::ChkCmdActive(int itemIndex)
 	cmd->commandResult = static_cast<s8>(active != 0);
 }
 
-#pragma push
-#pragma optimization_level 3
 /*
  * --INFO--
  * Address:	TODO
@@ -2126,7 +2124,6 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	return matchCount;
 }
-#pragma pop
 
 /*
  * --INFO--

@@ -2503,6 +2503,8 @@ void CMenuPcs::DrawResultCloseAnim()
 #pragma opt_dead_assignments off
 void CMenuPcs::CalcResultCloseAnim()
 {
+	int doneCount;
+	int delta;
 	const int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
@@ -2532,11 +2534,11 @@ void CMenuPcs::CalcResultCloseAnim()
 		// iconBase block: src = frameBase (back = activePartyCount sprites); dance
 		int base = activePartyCount + 1;
 		int __p13 = activePartyCount;
-		int delta;
-		delta = (base - 1) * 0x40;
+		delta = base - 1;
+		int byteDelta = delta * 0x40;
 		for (int i = 0; i < __p13; i++) {
 			int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
-			int src = spr - delta;
+			int src = spr - byteDelta;
 			*(int*)(spr + 0x24) = *(int*)(src + 0x24) + *(int*)(src + 0x28);
 			*(int*)(spr + 0x2c) = 1;
 			*(float*)(spr + 0x38) = (float)*(short*)spr;
@@ -2571,10 +2573,11 @@ void CMenuPcs::CalcResultCloseAnim()
 		// digitEchoBase block: src = iconBase (back = base - iconBase = base - (pc+1)); dance
 		base += activePartyCount;
 		{
-			delta = (base - activePartyCount - 1) * 0x40;
+			int back = base - activePartyCount - 1;
+			int byteDelta = back * 0x40;
 			for (int i = 0; i < activePartyCount; i++) {
 				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
-				int src = spr - delta;
+				int src = spr - byteDelta;
 				*(int*)(spr + 0x24) = *(int*)(src + 0x24);
 				*(int*)(spr + 0x2c) = 1;
 				*(float*)(spr + 0x38) = (float)*(short*)spr;
@@ -2602,10 +2605,11 @@ void CMenuPcs::CalcResultCloseAnim()
 		// extraBase block: src = iconBase (back = base - (pc+1)); dance
 		base += activePartyCount;
 		{
-			delta = (base - activePartyCount - 1) * 0x40;
+			int back = base - activePartyCount - 1;
+			int byteDelta = back * 0x40;
 			for (int i = 0; i < activePartyCount; i++) {
 				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
-				int src = spr - delta;
+				int src = spr - byteDelta;
 				*(int*)(spr + 0x24) = *(int*)(src + 0x24);
 				*(int*)(spr + 0x2c) = 1;
 				*(float*)(spr + 0x38) = (float)*(short*)spr;
@@ -2624,10 +2628,11 @@ void CMenuPcs::CalcResultCloseAnim()
 		// extraBase + 2*pc block: src = extraBase + pc (back = activePartyCount sprites); dance
 		base += activePartyCount;
 		{
-			delta = activePartyCount * 0x40;
+			int back = activePartyCount;
+			int byteDelta = back * 0x40;
 			for (int i = 0; i < activePartyCount; i++) {
 				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
-				int src = spr - delta;
+				int src = spr - byteDelta;
 				*(int*)(spr + 0x24) = *(int*)(src + 0x24);
 				*(int*)(spr + 0x2c) = 1;
 				*(float*)(spr + 0x38) = (float)*(short*)spr;
@@ -2655,7 +2660,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 	}
 
-	int doneCount = 0;
+	doneCount = 0;
 	*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
 	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
 
@@ -2750,17 +2755,16 @@ void CMenuPcs::CalcResultCloseAnim()
 			int aOff = __p2 + 0x8;
 			BonusAnimSprite* alphaSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + aOff);
 			CCharaPcs::CHandle* handle;
-			int tribeId;
 			if (!(!(i < activePartyCount))) {
 				int p = (int)s_Rinfo + partyOff;
 				handle = *(CCharaPcs::CHandle**)(p + 0x20);
-				tribeId = *(int*)(p + 0x44);
+				delta = *(int*)(p + 0x44);
 			} else {
 				int slotOff = (i - activePartyCount) * 4 + 0x774;
 				handle = *(CCharaPcs::CHandle**)((int)this + slotOff);
 			}
 			if (i < activePartyCount) {
-				float modelScale = s_BonusModelScale[tribeId];
+				float modelScale = s_BonusModelScale[delta];
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else {
 				PSMTXScale(scaleMtx, FLOAT_80331EB0, FLOAT_80331EB0, FLOAT_80331EB0);
@@ -2776,7 +2780,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			if (i < activePartyCount) {
 				scaleMtx[0][3] = kBonusZClearOrigin;
 				scaleMtx[2][3] = kBonusZClearOrigin;
-				scaleMtx[1][3] = s_BonusModelYPos[tribeId];
+				scaleMtx[1][3] = s_BonusModelYPos[delta];
 			} else {
 				scaleMtx[0][3] = kBonusZClearOrigin;
 				scaleMtx[1][3] = kBonusZClearOrigin;

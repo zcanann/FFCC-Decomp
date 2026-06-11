@@ -655,7 +655,7 @@ void CMenuPcs::ArtiInit()
 
 	memset(GetArtiOpenAnimList(this), 0, sizeof(*GetArtiOpenAnimList(this)));
 	{
-		float one = kArtiOne;
+		float one = LoadFloat(kArtiOne);
 		ArtiOpenAnim* p = GetArtiOpenAnimList(this)->entries;
 		for (int i = 0; i < 64; i++, p++) {
 			p->scale = one;
@@ -669,11 +669,11 @@ void CMenuPcs::ArtiInit()
 	entry->y = 0x28;
 	entry->w = 0x78;
 	entry->h = 0x108;
-	float titleAlpha = kArtiInitX;
-	float titleScale = kArtiInitYOffset;
-	float one = kArtiOne;
+	float titleAlpha = LoadFloat(kArtiInitX);
+	float titleScale = LoadFloat(kArtiInitYOffset);
+	float one = LoadFloat(kArtiOne);
 	yOffset = 0;
-	float zero = kArtiZero;
+	float zero = LoadFloat(kArtiZero);
 	entry->u = titleAlpha;
 	entry->v = titleScale;
 	entry->scale = one;
@@ -698,7 +698,7 @@ void CMenuPcs::ArtiInit()
 	entry->w = 0x30;
 	entry->h = 0x30;
 	entry->y = 0x150 - entry->h;
-	float rightScale = kArtiInitScale;
+	float rightScale = LoadFloat(kArtiInitScale);
 	entry->u = zero;
 	entry->v = zero;
 	entry->scale = rightScale;

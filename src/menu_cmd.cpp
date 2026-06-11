@@ -2004,9 +2004,19 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			} else {
 				itemKinds[index] = 0x107;
 			}
-		} else if ((icon == 0) || (icon == 1) || (icon == 2) || (icon == 3)) {
+		} else if (icon == 0) {
+			goto setFood;
+		} else if (icon == 1) {
+			goto setFood;
+		} else if (icon == 2) {
+			goto setFood;
+		} else if (icon == 3) {
+		setFood:
 			itemKinds[index] = 999;
-		} else if ((icon == 0x10) || (icon == 0x11)) {
+		} else if (icon == 0x10) {
+			goto setItem;
+		} else if (icon == 0x11) {
+		setItem:
 			itemKinds[index] = itemId;
 		} else {
 			itemKinds[index] = -1;

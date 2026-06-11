@@ -1190,7 +1190,7 @@ void CMenuPcs::CmdDraw()
 		DrawInit();
 
 		CmdListEntry* iconRow = scan;
-		for (s32 row =  (int)(unsigned int)(0); row < 8; row++, iconRow++) {
+		for (s32 row = 0; row < 8; row++, iconRow++) {
 			if ((itemCount <= 8) && (row + GetCmdStateView(this)->scrollTop >= itemCount)) {
 				break;
 			}

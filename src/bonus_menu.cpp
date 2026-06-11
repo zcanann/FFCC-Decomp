@@ -1796,8 +1796,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 #pragma opt_lifetimes off
 void CMenuPcs::CalcSelectOpenAnim()
 {
-	int activePartyCount = s_Rinfo->m_partyCount;
 	char* anchor = lbl_801DD510;
+	int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int idx;

@@ -60,7 +60,6 @@ inline void CMenuPcs::MoneySetPlace(int row)
 			gil = gil % digitPlace;
 		}
 		digitIndex++;
-		place++;
 		digitPlace /= 10;
 	} while (digitIndex < 8);
 }

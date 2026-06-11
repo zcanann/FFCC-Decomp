@@ -1165,20 +1165,26 @@ void CShopMenu::Destroy()
 #pragma peephole on
 void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 {
-    int itemNo = getItemNo(index);
+    (void)index;
+
+    int sel = m_selectedIndex;
+    int itemNo = getItemNo(sel);
+    const char* sourceText;
+    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     if (itemNo <= 0) {
         return;
     }
 
-    const char* sourceText;
-    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    if (CanTradeShopMenuItem(this, index, getItemNo(index))) {
+    int canSelect;
+    if (sel == -1) {
+        canSelect = 0;
+    } else {
+        canSelect = CanTradeShopMenuItem(this, sel, getItemNo(sel));
+    }
+    if (canSelect) {
         sourceText = reinterpret_cast<const char*>(GetShopMenuHelpMsgTable()[itemNo]);
     } else {
         sourceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_CRAFT_HERE);
-    }
-    if (sourceText == 0) {
-        return;
     }
 
     char* helpText = new((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,

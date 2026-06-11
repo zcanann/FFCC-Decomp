@@ -1975,16 +1975,8 @@ void CMenuPcs::CmakeTribeDraw()
 
     DrawCmakePreviewChara(this);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
+    SetCmakeBlendMatColor(alpha);
     a255 = 255.0f * alpha;
-    GXColor col;
-    col.r = 0xFF;
-    col.g = 0xFF;
-    col.b = 0xFF;
-    col.a = static_cast<unsigned char>(a255);
-    GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     float boxW = 416.0f;
     float boxH = 240.0f;
@@ -1998,15 +1990,7 @@ void CMenuPcs::CmakeTribeDraw()
     DrawCmakeTitle(3, alpha, 1.0f);
     {
         int tribe = CmakeState(this)->m_select;
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        GXColor crestCol;
-        crestCol.r = 0xFF;
-        crestCol.g = 0xFF;
-        crestCol.b = 0xFF;
-        crestCol.a = static_cast<unsigned char>(a255);
-        GXSetChanMatColor(GX_COLOR0A0, crestCol);
+        SetCmakeBlendMatColor(alpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
         MenuPcs.DrawRect(
             0,

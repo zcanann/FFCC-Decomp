@@ -4184,6 +4184,7 @@ void CMenuPcs::DrawMainMenu()
 
 	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
 		const int helpState = m_wmWorldState->m_mainState;
+		double helpColorAlpha;
 		float helpAlpha;
 		if (helpState == 1) {
 			helpAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
@@ -4194,7 +4195,7 @@ void CMenuPcs::DrawMainMenu()
 		}
 		if (static_cast<double>(helpAlpha) > DOUBLE_803314F0) {
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-			const double helpColorAlpha = static_cast<double>(FLOAT_80331458 * helpAlpha);
+			helpColorAlpha = static_cast<double>(FLOAT_80331458 * helpAlpha);
 			GXColor helpColor;
 			helpColor.r = 0xFF;
 			helpColor.g = 0xFF;

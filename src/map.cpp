@@ -2998,6 +2998,7 @@ void CMapMng::DrawAfter()
 int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
     extern const float kMapZero;
+    extern const float kMapHitTInitial;
     if ((kMapZero == move->x) && (kMapZero == move->z) && (kMapZero == move->y)) {
         return 0;
     }
@@ -3018,7 +3019,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     }
 
     g_hit_edge_idx_min = -2;
-    g_hit_t_min = 10.0f;
+    g_hit_t_min = kMapHitTInitial;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
@@ -3050,6 +3051,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
 int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
     extern const float kMapZero;
+    extern const float kMapHitTInitial;
     if ((kMapZero == move->x) && (kMapZero == move->z) && (kMapZero == move->y)) {
         return 0;
     }
@@ -3070,7 +3072,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     }
 
     g_hit_edge_idx_min = -2;
-    g_hit_t_min = 10.0f;
+    g_hit_t_min = kMapHitTInitial;
     int hit = 0;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 

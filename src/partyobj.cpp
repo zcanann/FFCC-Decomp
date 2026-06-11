@@ -5362,8 +5362,7 @@ void CGPartyObj::gpmMove()
 			}
 		} else {
 			moveKind = 0;
-			if (chalice != nullptr &&
-			    PartyData(this).carryObject == nullptr &&
+			if (PartyData(this).carryObject == nullptr &&
 			    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) << 24) & 0xC0000000) >> 31) != 0) &&
 			    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
 				float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A84;
@@ -5383,7 +5382,7 @@ void CGPartyObj::gpmMove()
 					return;
 				}
 			}
-			if (moveKind == 1 && chalice != nullptr) {
+			if (moveKind == 1) {
 				float keepDist = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A58;
 				if (clampedDist < keepDist) {
 					return;

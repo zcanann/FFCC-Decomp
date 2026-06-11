@@ -4010,21 +4010,33 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
                 dataBase = baseB;
                 totalSize = static_cast<unsigned short>(m_fileBaseB_dup);
             }
-            else if (st == 3 || st == 2 || st == 6 || st == 7 || st == 8 || st == 9)
-            {
-                unsigned char* letter = reinterpret_cast<unsigned char*>(m_letterBuffer[threadParam->m_portIndex]);
-                dataPtr = letter;
-                dataBase = letter;
-                totalSize = static_cast<unsigned short>(m_letterSizeArr[threadParam->m_portIndex]);
-            }
             else
             {
+                if (st == 3) goto letter_data;
+                if (st == 2) goto letter_data;
+                if (st == 6) goto letter_data;
+                if (st == 7) goto letter_data;
+                if (st == 8) goto letter_data;
+                if (st != 9) goto type_error;
+
+            letter_data:
+                {
+                    unsigned char* letter = reinterpret_cast<unsigned char*>(m_letterBuffer[threadParam->m_portIndex]);
+                    dataPtr = letter;
+                    dataBase = letter;
+                    totalSize = static_cast<unsigned short>(m_letterSizeArr[threadParam->m_portIndex]);
+                }
+                goto have_data;
+
+            type_error:
                 if ((unsigned int)System.m_execParam >= 1)
                 {
                     System.Printf(const_cast<char*>(s_send_type_error_fmt), threadParam->m_portIndex);
                 }
                 return -1;
             }
+
+        have_data:
 
             int blocks = totalSize / 0x2FD;
 

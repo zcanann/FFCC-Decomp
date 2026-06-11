@@ -1330,19 +1330,12 @@ void CMemoryCardMan::SetLoadData()
         u8* src = save + 0x14D0 + c * 0x9C0;
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
 
-        count = 0;
-        i = count;
-        if (i < 64)
+        for (i = count = 0; i < 64; i++)
         {
-            int trip = 64 - i;
-            do
+            if (*reinterpret_cast<s16*>(src + 0x3C + i * 2) != -1)
             {
-                if (*reinterpret_cast<s16*>(src + 0x3C + i * 2) != -1)
-                {
-                    count++;
-                }
-                i++;
-            } while (--trip != 0);
+                count++;
+            }
         }
         if (count != *reinterpret_cast<u16*>(src + 0x28))
         {

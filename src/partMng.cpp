@@ -4340,11 +4340,12 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     };
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    PppPdtSlot* slot = &m_pdtSlots[pdtSlotIndex];
-    _pppDataHead* pdt = slot->m_pppDataHead;
-    if (pdt == 0) {
+    unsigned char* kindBase = self + pdtSlotIndex * 0x38;
+    PppPdtSlot* slot = reinterpret_cast<PppPdtSlot*>(kindBase + 0x22E18);
+    if (slot == 0 || slot->m_pppDataHead == 0) {
         return -1;
     }
+    _pppDataHead* pdt = slot->m_pppDataHead;
 
     unsigned char* fpData = reinterpret_cast<unsigned char*>(pdt) + 0x20 + fpNo * 0x60;
 
@@ -4364,7 +4365,7 @@ foundMng:
     if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
         System.Printf(const_cast<char*>(sPppCreateLogFmt), pdtSlotIndex, fpNo,
                       mng - reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18),
-                      slot->m_name);
+                      *reinterpret_cast<char**>(kindBase + 0x22E30));
     }
 
     unsigned char* fpData1 = fpData + 0x20;

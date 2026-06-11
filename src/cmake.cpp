@@ -3743,7 +3743,7 @@ void CMenuPcs::CalcSingCMake()
                 CmakeState(this)->m_subSelect = 0;
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3755,7 +3755,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3767,7 +3767,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3781,7 +3781,7 @@ void CMenuPcs::CalcSingCMake()
                 }
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3797,7 +3797,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3837,7 +3837,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3856,7 +3856,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3867,7 +3867,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3883,7 +3883,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3894,7 +3894,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3910,7 +3910,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3986,7 +3986,7 @@ void CMenuPcs::CalcSingCMake()
                 if (CmakeState(this)->m_frame >= 10) {
                     done = 1;
                 } else {
-                    CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                    CmakeState(this)->m_frame++;
                     done = 0;
                 }
                 result = done;
@@ -4007,7 +4007,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -4060,7 +4060,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;

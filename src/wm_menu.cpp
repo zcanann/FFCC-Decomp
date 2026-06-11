@@ -7791,7 +7791,7 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(psVar1 + 0xC), static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
 			         static_cast<float>(static_cast<int>(psVar1[2])), static_cast<float>(static_cast<int>(psVar1[3])),
 			         *reinterpret_cast<float*>(psVar1 + 4), *reinterpret_cast<float*>(psVar1 + 6),
-			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			         1.0f, 1.0f, 0.0f);
 		}
 		i = i + 1;
 		offset = offset + 0x1C;

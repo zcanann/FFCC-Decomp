@@ -808,12 +808,17 @@ int CMemoryCardMan::DummyLoad()
     }
 
     memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
+    char* readBuf = m_saveBuffer;
+    if (readBuf == nullptr)
+    {
+        readBuf = m_saveBuffer;
+    }
     m_opDoneFlag = 0;
     m_state = 8;
 
     result = CARDReadAsync(
         &m_fileInfo,
-        m_saveBuffer,
+        readBuf,
         kMemoryCardSaveBufferSize,
         0x4000,
         &Attach
@@ -1063,12 +1068,17 @@ int CMemoryCardMan::DummySave()
 
         SetMcIconImage();
 
+        char* writeBuf = m_saveBuffer;
+        if (writeBuf == nullptr)
+        {
+            writeBuf = m_saveBuffer;
+        }
         m_opDoneFlag = 0;
         m_state = 9;
 
         result = CARDWriteAsync(
             &m_fileInfo,
-            m_saveBuffer,
+            writeBuf,
             0x4000,
             0,
             &Attach
@@ -1151,12 +1161,17 @@ int CMemoryCardMan::DummySave()
 
     MakeSaveData();
 
+    char* writeBuf2 = m_saveBuffer;
+    if (writeBuf2 == nullptr)
+    {
+        writeBuf2 = m_saveBuffer;
+    }
     m_opDoneFlag = 0;
     m_state = 9;
 
     result = CARDWriteAsync(
         &m_fileInfo,
-        m_saveBuffer,
+        writeBuf2,
         kMemoryCardSaveBufferSize,
         0x4000,
         &Attach

@@ -2675,11 +2675,12 @@ int CMaterialMan::GetCharaShadow(
     int outputOffset = outputCount * 4;
 
     ShadowCandidate* candidateRead = shadowCandidates;
+    float candidateDist;
     float maxDist = kMaterialMaxDistance;
     ShadowCandidate* nearest = 0;
     float nearestDist = kMaterialNearestDistanceInit;
     for (int i = 0; i < candidateCount; i++) {
-        float candidateDist = candidateRead->distance;
+        candidateDist = candidateRead->distance;
         if (nearestDist > candidateDist) {
             nearestDist = candidateDist;
             nearest = candidateRead;

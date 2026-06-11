@@ -1501,10 +1501,10 @@ void CMemoryCardMan::MakeSaveData()
     u32 soundModeBit = static_cast<u32>(__cntlzw(Sound.GetSoundMode())) >> 5;
     save[0x13DF] = static_cast<u8>((static_cast<u32>(-static_cast<s32>(soundModeBit)) | soundModeBit) >> 31);
     save[0x13E0] = MakeSaveBool(Game.m_gameWork.m_gameInitFlag);
-    save[0x13E1] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[0]);
-    save[0x13E2] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[1]);
-    save[0x13E3] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[2]);
-    save[0x13E4] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[3]);
+    save[0x13E1] = MakeSaveBool(g->m_gameWork.m_spModeFlags[0]);
+    save[0x13E2] = MakeSaveBool(g->m_gameWork.m_spModeFlags[1]);
+    save[0x13E3] = MakeSaveBool(g->m_gameWork.m_spModeFlags[2]);
+    save[0x13E4] = MakeSaveBool(g->m_gameWork.m_spModeFlags[3]);
 
     for (int c = 0; c < 8; c++)
     {

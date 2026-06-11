@@ -10870,7 +10870,10 @@ LAB_next:
 		const double rowBaseD = DOUBLE_80331490;
 		for (slot = 0, slotOff = slot; slot < kMcListCount; slot++, slotOff += kMcListEntrySize) {
 			unsigned char* const slotData = m_wmCharaState + slotOff;
-			const float slotY = static_cast<float>(rowSlopeD * static_cast<double>(slot) + rowBaseD);
+			double rawRow;
+			reinterpret_cast<int*>(&rawRow)[0] = 0x43300000;
+			reinterpret_cast<int*>(&rawRow)[1] = slot ^ 0x80000000;
+			const float slotY = static_cast<float>(rowSlopeD * (rawRow - rowBias) + rowBaseD);
 			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<char*>(slotData + 0x41) != 0) {
 				float rowY = FLOAT_80331440 + slotY;
 				float capX = FLOAT_80331468;
@@ -11103,7 +11106,10 @@ LAB_next:
 			char line1[64];
 			char line2[64];
 			unsigned char* const slotData = m_wmCharaState + slotOff;
-			const float slotY = static_cast<float>(tSlope * static_cast<double>(slot) + tBase);
+			double rawT;
+			reinterpret_cast<int*>(&rawT)[0] = 0x43300000;
+			reinterpret_cast<int*>(&rawT)[1] = slot ^ 0x80000000;
+			const float slotY = static_cast<float>(tSlope * (rawT - tBias) + tBase);
 			if (*reinterpret_cast<char*>(slotData + 0x42) != 0 || *reinterpret_cast<int*>(slotData + 8) <= 0) {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(1);

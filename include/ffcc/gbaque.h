@@ -184,7 +184,7 @@ public:
     void ClrArtiDatFlg(int);
     int MakeArtiData(int, char*);
     int GetTmpArtifactData(int, unsigned char*);
-    char GetRadarType(int);
+    int GetRadarType(int);
     void ClrRadarTypeFlg();
     unsigned int GetRadarMode(int);
     void SetRadarMode(int, int);

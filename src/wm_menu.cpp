@@ -1991,18 +1991,19 @@ void CMenuPcs::CalcMCardMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	bool bVar1 = false;
+	int bVar1 = 0;
 	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
-	unsigned short uVar3;
+	unsigned int uVar3;
 	if (bVar1) {
 		uVar3 = 0;
 	} else {
 		unsigned int padIndex = 0;
 		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
 		int __p11 =  (0 + padIndex);
-		uVar3 = Pad.GetPadInputs()[__p11].buttonDown[0];
+		unsigned short down = Pad.GetPadInputs()[__p11].buttonDown[0];
+		uVar3 = down;
 	}
 	unsigned short uVar6 = GetButtonRepeat(0);
 
@@ -2050,26 +2051,21 @@ void CMenuPcs::CalcMCardMenu()
 	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = (short)iVar14;
 
 	if ((int)uVar15 < 0) {
-		double dVar22;
-		float baseWidth = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
+		float wave = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
 		if ((int)uVar15 >= -10) {
 			int absSign = (int)uVar15 >> 0x1F;
-			int __p10 = absSign;
-			int absRaw = ((int)uVar15 ^ absSign) - __p10;
-			float dVar23 = (float)(baseWidth * (DOUBLE_803314E8 * (double)absRaw));
-			int __p15 = absRaw;
-			unsigned int absOff = (unsigned int)__p15;
-			if ((int)absOff < 0) absOff = 0;
-			if ((int)absOff > 10) absOff = 10;
-			float dVar28 = (float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4));
-			dVar22 = (double)(dVar23 * dVar28);
-		} else {
-			dVar22 = (double)baseWidth;
+			int absRaw = ((int)uVar15 ^ absSign) - absSign;
+			wave = (float)(wave * (DOUBLE_803314E8 * (double)absRaw));
+			int s16 = (int)uVar15 >> 0x1F;
+			int absOff = ((int)uVar15 ^ s16) - s16;
+			if (absOff < 0) absOff = 0;
+			if (absOff > 10) absOff = 10;
+			wave = wave * (float)sin((double)(FLOAT_803314bc * ((float)absOff * FLOAT_803316d4)));
 		}
 
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) - (float)dVar22);
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) - wave);
 		*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = (short)iVar14;
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) + (float)dVar22);
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) + wave);
 		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = (short)iVar14;
 	}
 

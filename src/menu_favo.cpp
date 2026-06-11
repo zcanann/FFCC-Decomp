@@ -152,36 +152,34 @@ void CMenuPcs::FavoDraw()
 		entry++;
 	}
 
-	FavoEntry* rankEntry = m_favoList->entries;
 	int count = m_favoList->count;
-	int remaining = count;
-	while (0 < remaining) {
-		if (rankEntry->tex == 0x37) {
+	for (int k = 0; k < count; k++) {
+		entry = &m_favoList->entries[k];
+		if (entry->tex == 0x37) {
 			break;
 		}
-		rankEntry++;
-		remaining--;
 	}
 
-	FavoEntry* drawEntry = rankEntry;
-	FoodRank* rank = s_rank;
+	FoodRank* rankBase = s_rank;
+	FavoEntry* drawEntry = entry;
+	FoodRank* rank = rankBase;
 	for (int i = 0; i < 8; i++) {
 		int barX = static_cast<int>(static_cast<float>(drawEntry->x + drawEntry->w + 0x18));
 		float barHalfH = static_cast<float>(drawEntry->h) - 24.0f;
 		float barYf = static_cast<float>(drawEntry->y);
-		int barY = static_cast<int>(static_cast<float>(barHalfH * 0.5 + barYf));
+		int barY = static_cast<int>(static_cast<float>(barHalfH / 2.0 + barYf));
 		DrawSingBar(barX, barY, rank->score, drawEntry->alpha);
 		rank++;
 		drawEntry++;
 	}
 
-	rank = s_rank;
-	drawEntry = rankEntry;
+	rank = rankBase;
+	drawEntry = entry;
 	for (unsigned int i = 0; i < 8; i++) {
 		int iconX = static_cast<int>(static_cast<float>(drawEntry->x + drawEntry->w - 0x10));
 		float iconHalfH = static_cast<float>(drawEntry->h) - 32.0f;
 		float iconYf = static_cast<float>(drawEntry->y);
-		int iconY = static_cast<int>(iconHalfH * 0.5 + iconYf);
+		int iconY = static_cast<int>(iconHalfH / 2.0 + iconYf);
 		DrawSingleIcon(static_cast<char>(rank->foodId) + 0x14, iconX, iconY, drawEntry->alpha, 1, 1.0f);
 		rank++;
 		drawEntry++;
@@ -194,8 +192,8 @@ void CMenuPcs::FavoDraw()
 
 	char textBuf[0x10];
 	memset(textBuf, 0, sizeof(textBuf));
-	rank = s_rank;
-	drawEntry = rankEntry;
+	rank = rankBase;
+	drawEntry = entry;
 	for (unsigned int i = 0; i < 8; i++) {
 		rankFont->SetTlut(6);
 		rankFont->SetColor(
@@ -220,8 +218,8 @@ void CMenuPcs::FavoDraw()
 	nameFont->DrawInit();
 	memset(textBuf, 0, sizeof(textBuf));
 
-	rank = s_rank;
-	drawEntry = rankEntry;
+	rank = rankBase;
+	drawEntry = entry;
 	for (int i = 0; i < 8; i++) {
 		nameFont->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);

@@ -24,8 +24,8 @@ int CMes::m_tempVar[0x14];
 
 extern char lbl_801D9E58[];
 
-static const char s_Not_corresponding_TAG_is_used_pct02x_801D9E30[] = "Not corresponding TAG is used. %02x\n";
-static const char s_This_TAG_is_not_created_pct02x_801D9E10[] = "This TAG is not created. %02x\n";
+static const char s_Not_corresponding_TAG_is_used_pct02x_801D9E30[] = "Not corresponding TAG is used.[%02x]\n";
+static const char s_This_TAG_is_not_created_pct02x_801D9E10[] = "This TAG is not created.[%02x]\n";
 static const char s_mesNumFmt[] = "%d";
 static const char s_mesFallback[] = "---";
 static const char s_mesEmpty[] = "";

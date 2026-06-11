@@ -520,10 +520,11 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&srcSave) + 0x13D8);
 
         u8* dstWork = reinterpret_cast<u8*>(&dstSave) + dstChar * 0x200;
+        u8* item;
         int i = 0;
         do
         {
-            u8* item = dstWork + dstChar * 8;
+            item = dstWork + dstChar * 8;
             for (int j = 0; j < 8; j++)
             {
                 u8 flag = 0;
@@ -807,23 +808,7 @@ int CMemoryCardMan::DummyLoad()
     }
 
     memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
-    m_opDoneFlag = 0;
-    m_state = 8;
-
-    result = CARDReadAsync(
-        &m_fileInfo,
-        m_saveBuffer,
-        kMemoryCardSaveBufferSize,
-        0x4000,
-        &Attach
-    );
-
-    if (result < 0)
-    {
-        m_opDoneFlag = 1;
-    }
-
-    m_result = result;
+    McRead(m_saveBuffer, kMemoryCardSaveBufferSize, 0x4000);
 
     // Wait for read to finish
     while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
@@ -1062,22 +1047,7 @@ int CMemoryCardMan::DummySave()
 
         SetMcIconImage();
 
-        m_opDoneFlag = 0;
-        m_state = 9;
-
-        result = CARDWriteAsync(
-            &m_fileInfo,
-            m_saveBuffer,
-            0x4000,
-            0,
-            &Attach
-        );
-
-        if (result < 0)
-        {
-            m_opDoneFlag = 1;
-        }
-        m_result = result;
+        McWrite(m_saveBuffer, 0x4000, 0);
 
         while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
         {
@@ -1150,22 +1120,7 @@ int CMemoryCardMan::DummySave()
 
     MakeSaveData();
 
-    m_opDoneFlag = 0;
-    m_state = 9;
-
-    result = CARDWriteAsync(
-        &m_fileInfo,
-        m_saveBuffer,
-        kMemoryCardSaveBufferSize,
-        0x4000,
-        &Attach
-    );
-
-    if (result < 0)
-    {
-        m_opDoneFlag = 1;
-    }
-    m_result = result;
+    McWrite(m_saveBuffer, kMemoryCardSaveBufferSize, 0x4000);
 
     while ((((u32)(-((unsigned int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
     {
@@ -1249,9 +1204,8 @@ int CMemoryCardMan::DummySave()
 void CMemoryCardMan::SetLoadData()
 {
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
-    Mc::SaveDat* saveDat = GetSaveDat(save);
 
-    if (memcmp(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
+    if (memcmp(GetSaveDat(save)->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1259,7 +1213,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(saveDat->m_title, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE)) != 0)
+    if (memcmp(GetSaveDat(save)->m_title, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1267,7 +1221,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(saveDat->m_machine, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE)) != 0)
+    if (memcmp(GetSaveDat(save)->m_machine, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1275,7 +1229,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(saveDat->m_version, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION)) != 0)
+    if (memcmp(GetSaveDat(save)->m_version, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1283,7 +1237,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (saveDat->m_region != 'E')
+    if (GetSaveDat(save)->m_region != 'E')
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1330,19 +1284,12 @@ void CMemoryCardMan::SetLoadData()
         u8* src = save + 0x14D0 + c * 0x9C0;
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
 
-        count = 0;
-        i = count;
-        if (i < 64)
+        for (i = count = 0; i < 64; i++)
         {
-            int trip = 64 - i;
-            do
+            if (*reinterpret_cast<s16*>(src + 0x3C + i * 2) != -1)
             {
-                if (*reinterpret_cast<s16*>(src + 0x3C + i * 2) != -1)
-                {
-                    count++;
-                }
-                i++;
-            } while (--trip != 0);
+                count++;
+            }
         }
         if (count != *reinterpret_cast<u16*>(src + 0x28))
         {
@@ -2194,6 +2141,23 @@ void Detach(long currentSlot, long result)
  * Address:	TODO
  * Size:	TODO
  */
+static inline int FindCardFile(char* filename, CARDStat* stat)
+{
+    int fileNo = 0;
+    while (fileNo < 0x7F)
+    {
+        if (CARDGetStatus(1, fileNo, stat) >= 0)
+        {
+            if (strcmp(filename, reinterpret_cast<char*>(stat)) == 0)
+            {
+                return fileNo;
+            }
+        }
+        fileNo++;
+    }
+    return -1;
+}
+
 void CMemoryCardMan::DebugReadWrite(int isWrite, char* filename, void* buffer, int length)
 {
     int success = 0;
@@ -2235,26 +2199,8 @@ checkResult:
                     goto readFile;
                 }
 
-                result = 0;
-                while (result < 0x7F)
-                {
-                    if (CARDGetStatus(1, result, &stat) < 0)
-                    {
-                        goto nextFile;
-                    }
-                    if (strcmp(filename, reinterpret_cast<char*>(&stat)) != 0)
-                    {
-                        goto nextFile;
-                    }
-                    goto foundFile;
+                result = FindCardFile(filename, &stat);
 
-nextFile:
-                    result++;
-                }
-
-                result = -1;
-
-foundFile:
                 if ((result >= 0) && (CARDFastOpen(1, result, &fileInfo) >= 0))
                 {
 readFile:

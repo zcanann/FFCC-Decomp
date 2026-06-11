@@ -4926,8 +4926,12 @@ void CMenuPcs::DrawCMakeMenu()
 		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		if (m_wmWorldState->m_menuMode == 3) {
 			if (m_wmWorldState->m_menuMode == 3) {
+			extern char* DAT_801DC244[3];
 			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
-			char* textList[3] = { 0, 0, 0 };
+			char* textList[3];
+			textList[0] = DAT_801DC244[0];
+			textList[1] = DAT_801DC244[1];
+			textList[2] = DAT_801DC244[2];
 			char** const langText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
 			unsigned int ti = 5;
 			textList[0] = langText[ti];

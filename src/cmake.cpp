@@ -1240,9 +1240,6 @@ void CMenuPcs::CmakeResultDraw1()
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
         const char* txt = GetMenuStr(0x2A + i);
-        if (txt == 0) {
-            txt = "";
-        }
 
         labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(txt));
         labelFont->SetPosX(232.0f);

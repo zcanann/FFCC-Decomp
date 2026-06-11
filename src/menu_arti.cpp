@@ -380,7 +380,7 @@ void CMenuPcs::ArtiDraw()
 		ArtiOpenAnimList* cursorList = GetArtiOpenAnimList(this);
 		for (int i = 0; i < cursorList->count; i++) {
 			entry = &cursorList->entries[i];
-			if (entry->tex == 0x37) {
+			if (cursorList->entries[i].tex == 0x37) {
 				break;
 			}
 		}

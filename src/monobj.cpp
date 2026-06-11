@@ -3890,14 +3890,17 @@ void CGMonObj::statWatch()
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
 		} else {
-			unsigned char* scriptBase = script;
+			void** handle = object->m_scriptHandle;
+			unsigned char* scriptBase = reinterpret_cast<unsigned char*>(handle[9]);
 			if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
 				if (attackResult >= 100) {
 					actionState = attackResult;
 				} else {
 					short aiState = monObj->m_aiState;
-					unsigned char* aiData = scriptBase;
-					if (aiState != 0) {
+					unsigned char* aiData;
+					if (aiState == 0) {
+						aiData = scriptBase;
+					} else {
 						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 							(aiState + *reinterpret_cast<unsigned short*>(scriptBase + 0x100)) * 0x1D0 + 0x10;
 					}
@@ -3937,21 +3940,21 @@ void CGMonObj::statWatch()
 					}
 					unsigned char* aiData3;
 					if (aiState == 0) {
-						aiData3 = script;
+						aiData3 = reinterpret_cast<unsigned char*>(handle[9]);
 					} else {
 						aiData3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0x100)) * 0x1D0 + 0x10;
 					}
 					float range = static_cast<float>(
 						*reinterpret_cast<unsigned short*>(aiData3 + actionOff + 0x11C));
 					unsigned char* aiData4;
 					if (aiState == 0) {
-						aiData4 = script;
+						aiData4 = reinterpret_cast<unsigned char*>(handle[9]);
 					} else {
 						aiData4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0x100)) * 0x1D0 + 0x10;
 					}
-					short changeStat = *reinterpret_cast<unsigned short*>(aiData4 + actionOff + 0x11E);
+					short changeStat = static_cast<short>(*reinterpret_cast<unsigned short*>(aiData4 + actionOff + 0x11E));
 					actionState = 0x21;
 					CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
 					if (monObj->m_moveWork.m_mode != 2) {

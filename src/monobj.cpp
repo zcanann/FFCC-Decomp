@@ -548,13 +548,13 @@ int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float ma
 			(((flags & 0x40) == 0) ||
 				((party->m_partyData.unk6C0 >= 0) &&
 					(reinterpret_cast<int>(partyObj->m_scriptHandle[4]) == classId))) &&
-			(((flags & 2) != 0) || !(*reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4) < minDist)) &&
-			(((flags & 4) != 0) || !(maxDist < *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4)))) {
-			if (((flags & 8) != 0) && (0.0f < *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4))) {
+			(((flags & 2) != 0) || !(m_partyDistance[partyIndex] < minDist)) &&
+			(((flags & 4) != 0) || !(maxDist < m_partyDistance[partyIndex]))) {
+			if (((flags & 8) != 0) && (0.0f < m_partyDistance[partyIndex])) {
 				Vec toParty;
 				Vec facing;
 				PSVECSubtract(&partyObj->m_worldPosition, &monObject->m_worldPosition, &toParty);
-				PSVECScale(&toParty, &toParty, kMonObjDefaultScale / *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4));
+				PSVECScale(&toParty, &toParty, kMonObjDefaultScale / m_partyDistance[partyIndex]);
 				facing.x = sin(monObject->m_rotTargetY);
 				facing.y = 0.0f;
 				facing.z = cos(monObject->m_rotTargetY);
@@ -1093,7 +1093,7 @@ void CGMonObj::onFrameStat()
 				}
 			} else {
 				if ((prgObj->m_stateFrame == 0) &&
-					(reinterpret_cast<float*>(mon + 0x5D0)[m_targetPartyIndex] < range)) {
+					(m_partyDistance[m_targetPartyIndex] < range)) {
 					prgObj->m_subState = 1;
 				}
 				if (prgObj->m_subState == 1) {
@@ -1102,7 +1102,7 @@ void CGMonObj::onFrameStat()
 					if (static_cast<int>(prgObj->m_stateFrame) <= static_cast<int>(limit)) {
 						if ((object->m_stateFlags0Bits.unk1 != 0) ||
 							(prgObj->m_stateFrame == static_cast<int>(limit)) ||
-							(reinterpret_cast<float*>(mon + 0x5D0)[m_targetPartyIndex] >= range)) {
+							(m_partyDistance[m_targetPartyIndex] >= range)) {
 							prgObj->m_subState = 0;
 							object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 						} else {
@@ -1188,7 +1188,7 @@ void CGMonObj::onFrameStat()
 		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		float reachDist = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE));
 		if ((static_cast<int>(prgObj->m_stateFrame) == *reinterpret_cast<unsigned short*>(script9 + 0x1B6)) ||
-			(reachDist <= reinterpret_cast<float*>(mon + 0x5D0)[m_targetPartyIndex]) ||
+			(reachDist <= m_partyDistance[m_targetPartyIndex]) ||
 			(object->m_stateFlags0Bits.unk1 != 0)) {
 			prgObj->changeStat(0, 0, 0);
 			if (m_targetPartyIndex >= 0) {
@@ -1837,17 +1837,16 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 			(static_cast<int>(CFlatCenterState()) == 0) &&
 		((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x4) & 0x80) != 0)) {
 		char text[0x100];
-		unsigned short aiState = m_groupTag;
 		int targetIndex = m_targetPartyIndex;
 		int targetChar = '-';
+		unsigned short aiState = m_groupTag;
 		int aiChar = '-';
 
 		if (targetIndex >= 0) {
 			targetChar = targetIndex + '0';
 		}
-		int aiMasked = aiState & 0x7FFF;
-		if (aiMasked != 0) {
-			aiChar = aiMasked + 0x40;
+		if ((aiState & 0x7FFF) != 0) {
+			aiChar = (aiState & 0x7FFF) + 0x40;
 		}
 
 		sprintf(text, s_pctd_pctc_pctd_pctc_801DCA2C, (int)object->m_scriptHandle[2], aiChar,
@@ -1862,7 +1861,7 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 
 		int targetDist;
 		if (m_targetPartyIndex >= 0) {
-			targetDist = static_cast<int>(*reinterpret_cast<float*>(mon + m_targetPartyIndex * 4 + 0x5D0));
+			targetDist = static_cast<int>(m_partyDistance[m_targetPartyIndex]);
 		} else {
 			targetDist = 0;
 		}
@@ -2218,8 +2217,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
 				 ((static_cast<unsigned short>(partyObj->GetCID()) & 0x6D) == 0x6D) &&
 				 (reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) != 0)) ||
-				!(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0) <
-				 (coneLength - sideDist))) {
+				!(m_partyDistance[partyIndex] < (coneLength - sideDist))) {
 				continue;
 			}
 

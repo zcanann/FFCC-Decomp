@@ -3363,19 +3363,17 @@ void CMenuPcs::CalcResultOpenAnim()
 			spr->alpha = kBonusZClearOrigin;
 		}
 
-		if (0 < activePartyCount) {
-			for (int i = 0; i < activePartyCount; i++) {
-				BonusAnimSprite* spr = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i + 1];
-				spr->kind = 0x17;
-				spr->x = 0x80;
-				spr->y = (short)(i * 0x60 + 0x38);
-				spr->w = 0x1a0;
-				spr->h = 0x40;
-				spr->mulX = kBonusZClearOrigin;
-				spr->mulY = kBonusZClearOrigin;
-				spr->duration = 8;
-				spr->depth = FLOAT_80331EB0;
-			}
+		for (int i = 0; i < activePartyCount; i++) {
+			BonusAnimSprite* spr = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i + 1];
+			spr->kind = 0x17;
+			spr->x = 0x80;
+			spr->y = (short)(i * 0x60 + 0x38);
+			spr->w = 0x1a0;
+			spr->h = 0x40;
+			spr->mulX = kBonusZClearOrigin;
+			spr->mulY = kBonusZClearOrigin;
+			spr->duration = 8;
+			spr->depth = FLOAT_80331EB0;
 		}
 		int base = activePartyCount + 1;
 		{
@@ -3507,14 +3505,12 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// zeroed model sprites follow the frame rows
-		if (0 < activePartyCount) {
-			for (int i = 0; i < activePartyCount; i++) {
-				int delta = (zeroBase - 1) << 6;
-				int off = ((zeroBase + i) << 6) + 8;
-				int spr = this->m_bonusAnimPtr + off;
-				int src = spr - delta;
-				*(int*)(spr + 0x24) = *(int*)(src + 0x24) + *(int*)(src + 0x28);
-			}
+		for (int i = 0; i < activePartyCount; i++) {
+			int delta = (zeroBase - 1) << 6;
+			int off = ((zeroBase + i) << 6) + 8;
+			int spr = this->m_bonusAnimPtr + off;
+			int src = spr - delta;
+			*(int*)(spr + 0x24) = *(int*)(src + 0x24) + *(int*)(src + 0x28);
 		}
 
 		{
@@ -3643,7 +3639,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		if (0 < activePartyCount) {
+		{
 			int i = 0;
 			int total2 = activePartyCount * 2;
 			int boardBase = total2 * 0x50;

@@ -1068,7 +1068,7 @@ void CMenuPcs::CmdDraw()
 								canUse = static_cast<u32>(
 								    caravan2->m_commandListInventorySlotRef[GetCmdStateView(this)->selected] >= 0);
 							} else if (sel == 1) {
-								int combo[2][2];
+								int combo[5][2];
 								canUse = static_cast<u32>(
 								    ChkUnite(GetCmdStateView(this)->selected, combo) != 0);
 							} else {

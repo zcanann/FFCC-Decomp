@@ -2528,6 +2528,7 @@ void CMenuPcs::CmakeNameDraw()
     }
 
     short table = CmakeState(this)->m_table;
+    int i;
     CFont* font = GetCmakeKeyboardFont(this);
     font->SetShadow(0);
     font->SetScale(1.0f);
@@ -2537,7 +2538,7 @@ void CMenuPcs::CmakeNameDraw()
     SetCmakeFontColor(font, alpha);
 
     int tableBase = table * 5;
-    for (int i = 0; i < 5; i++) {
+    for (i = 0; i < 5; i++) {
         const char* rowText = s_NameEntryStr[tableBase + i];
         font->SetPosX(240.0f);
         font->SetPosY(static_cast<float>(0x6C + i * 0x20));

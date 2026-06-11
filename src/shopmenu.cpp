@@ -627,6 +627,16 @@ static void SetupShopMenuMakeFont(CFont* font, float margin)
     font->SetMargin(margin);
 }
 
+static inline void SetupShopMenuValueFont(CFont* font)
+{
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
+    SetShopMenuFontRenderBit(font);
+    font->SetMargin(FLOAT_80332d34);
+}
+
 static void DrawShopMenuAmount(CFont* font, int value, float rightEdge, float y, int tlut)
 {
     char amountBuffer[64];
@@ -1214,7 +1224,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         return;
     }
 
-    CFont* font = GetShopMenuInfoPanelFont();
+    CFont* font = MenuPcs.m_fonts[0];
     font->SetMargin(FLOAT_80332d28);
     font->SetShadow(1);
     font->SetScaleX(FLOAT_80332d2c);
@@ -1254,21 +1264,15 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     MenuPcs.DrawNoShadowFont(font, textBuffer, labelX, static_cast<float>(y), 0x18, 0x12);
     MenuPcs.DrawInit();
 
+    CFont* font2 = MenuPcs.m_fonts[0];
     int valueRightX = static_cast<int>(static_cast<float>(x + 0x108));
-    CFont* font2 = GetShopMenuInfoPanelFont();
-    font2->SetShadow(1);
-    font2->SetScale(FLOAT_80332d28);
-    {
-        font2->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-    }
-    font2->DrawInit();
-    SetShopMenuFontRenderBit(font2);
-    font2->SetMargin(FLOAT_80332d34);
+    SetupShopMenuValueFont(font2);
 
     char valueBuffer[64];
     sprintf(valueBuffer, s_DecimalFormat_80332d14, statValue);
     float valueWidth = font2->GetWidth(valueBuffer);
-    MenuPcs.DrawNoShadowFont(font2, valueBuffer, static_cast<float>(static_cast<int>(static_cast<float>(valueRightX) - valueWidth)), static_cast<float>(y), 0x1A, 0x12);
+    valueRightX = static_cast<int>(static_cast<float>(valueRightX) - valueWidth);
+    MenuPcs.DrawNoShadowFont(font2, valueBuffer, static_cast<float>(valueRightX), static_cast<float>(y), 0x1A, 0x12);
     MenuPcs.DrawInit();
 
     font->DrawInit();
@@ -1284,8 +1288,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         MenuPcs.DrawInit();
 
         font->SetScaleX(FLOAT_80332d28);
-        char* attrStr2 = MenuPcs.GetAttrStr(attr);
-        font->GetWidth(attrStr2);
+        font->GetWidth(MenuPcs.GetAttrStr(attr));
         if ((attr >= 1) && (attr <= 8)) {
             strcpy(textBuffer, s_PlusOne_80332d38);
             valueWidth = font->GetWidth(textBuffer);
@@ -2001,15 +2004,17 @@ void CShopMenu::Draw()
         break;
     }
 
-    float fade = m_fade;
-    if (FLOAT_80332d28 != fade) {
-        int fadeStep = static_cast<int>(FLOAT_80332DE0 * fade);
-        unsigned char alpha = static_cast<unsigned char>(0xFF - fadeStep);
+    if (FLOAT_80332d28 != m_fade) {
+        _GXColor fadeColor;
+        fadeColor.r = 0;
+        fadeColor.g = 0;
+        fadeColor.b = 0;
+        fadeColor.a = 0xFF - static_cast<int>(FLOAT_80332DE0 * m_fade);
 
         Graphic.SetDrawDoneDebugData(0x32);
 
-        Mtx screenMtx;
         Mtx44 projectionMtx;
+        Mtx screenMtx;
         PSMTXIdentity(screenMtx);
         screenMtx[0][0] = FLOAT_80332d78;
         screenMtx[1][1] = FLOAT_80332DD0;
@@ -2023,9 +2028,10 @@ void CShopMenu::Draw()
         projectionMtx[2][3] += FLOAT_80332D9C;
         GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-        _GXColor fadeColor = {0, 0, 0, alpha};
-        GXSetChanAmbColor(GX_COLOR0A0, fadeColor);
-        GXSetChanMatColor(GX_COLOR0A0, fadeColor);
+        _GXColor mat = {0xFF, 0xFF, 0xFF, 0xFF};
+        _GXColor amb = {0xFF, 0xFF, 0xFF, 0xFF};
+        GXSetChanAmbColor(GX_COLOR0A0, amb);
+        GXSetChanMatColor(GX_COLOR0A0, mat);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
         _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
         GXSetZCompLoc(GX_TRUE);
@@ -3403,8 +3409,8 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     maxPos.z = FLOAT_80332D9C;
 
     GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     Graphic.RenderTexQuadGrouad(minPos, maxPos, colorA, colorB, colorC, colorD);
 }
 /*

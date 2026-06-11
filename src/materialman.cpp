@@ -2025,7 +2025,8 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                 _GXSetTevSwapMode(0, 0, 0);
                 m_numTevStage = 1;
 
-                if ((tevBit != 0) && ((tevBit & 2) != 0)) {
+                if (tevBit != 0) {
+                if ((tevBit & 2) != 0) {
                     if ((m_vtxDescMode != 2) && (setVtxDesc != 0)) {
                         GXClearVtxDesc();
                         GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -2080,6 +2081,16 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                         m_numTevStage, 0, 0);
                     m_numTevStage =
                         ((m_numTevStage & 0xFF) + 1) & 0xFF;
+                } else {
+                    if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
+                        GXClearVtxDesc();
+                        GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
+                        GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
+                        GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+                        GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
+                        m_vtxDescMode = 0;
+                    }
+                }
                 } else {
                     if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
                         GXClearVtxDesc();

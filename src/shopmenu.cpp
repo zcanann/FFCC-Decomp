@@ -2476,9 +2476,6 @@ void CShopMenu::DrawShop0()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
-#pragma opt_strength_reduction off
 void CShopMenu::SelectMake()
 {
     int canSelect = static_cast<unsigned char>(MenuPcs.ChkEquipPossible(m_resultItem)) &&
@@ -2497,30 +2494,8 @@ void CShopMenu::SelectMake()
 
         if (canSelect) {
             int total = 0;
-            int base = 0;
-            for (int j = 0; j < 8; j++, base += 8) {
-                if (m_caravanWork->m_inventoryItems[base + 0] == itemNo) {
-                    ++total;
-                }
-                if (m_caravanWork->m_inventoryItems[base + 1] == itemNo) {
-                    ++total;
-                }
-                if (m_caravanWork->m_inventoryItems[base + 2] == itemNo) {
-                    ++total;
-                }
-                if (m_caravanWork->m_inventoryItems[base + 3] == itemNo) {
-                    ++total;
-                }
-                if (m_caravanWork->m_inventoryItems[base + 4] == itemNo) {
-                    ++total;
-                }
-                if (m_caravanWork->m_inventoryItems[base + 5] == itemNo) {
-                    ++total;
-                }
-                if (m_caravanWork->m_inventoryItems[base + 6] == itemNo) {
-                    ++total;
-                }
-                if (m_caravanWork->m_inventoryItems[base + 7] == itemNo) {
+            for (int slot = 0; slot < 0x40; slot++) {
+                if (ShopMenuCaravanWork(this)->m_inventoryItems[slot] == itemNo) {
                     ++total;
                 }
             }
@@ -2572,7 +2547,6 @@ void CShopMenu::SelectMake()
         SetMode(0xE);
     }
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80155934

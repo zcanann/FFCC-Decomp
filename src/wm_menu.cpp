@@ -10711,8 +10711,8 @@ void CMenuPcs::DrawMCList()
 	short state = worldState->m_mainState;
 
 	if ((state == 2 || state == 3) && worldState->m_subState != 0) {
-		slot = 0;
 		slotOff = 0;
+		slot = 0;
 		do {
 			float yPos;
 			float alpha;

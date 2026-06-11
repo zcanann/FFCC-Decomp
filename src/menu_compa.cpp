@@ -204,8 +204,8 @@ void CMenuPcs::CompaDraw()
 	int shown = 0;
 	yOffset = drawIndex * 0x28;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
-		float iconY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(yOffset);
 		float iconX = static_cast<float>(compaList->entries[0].x + 0x128);
+		float iconY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(yOffset);
 
 		if (i >= 2) {
 			int scan = drawIndex;
@@ -283,8 +283,9 @@ void CMenuPcs::CompaDraw()
 		}
 
 		const char* name = GetMenuStr(drawIndex + 0x16);
+		float x = static_cast<float>(compaList->entries[0].x + 0x18);
 		float y = static_cast<float>(compaList->entries[0].y + 0x45) + static_cast<float>(yOffset);
-		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
+		font->SetPosX(x);
 		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(name);
 

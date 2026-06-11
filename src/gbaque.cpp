@@ -1369,7 +1369,7 @@ void GbaQueue::LoadPlayerStat()
 					entry[0] = static_cast<unsigned char>(saveSlot);
 					entry[4] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x12]);
 					signed char l0 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][0];
-					unsigned char l1 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][1];
+					signed char l1 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][1];
 					entry[5] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x13]);
 					unsigned char l2 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][2];
 					unsigned char l3 = Game.m_gameWork.m_linkTable[saveSlot][0][saveSlot][3];
@@ -1508,7 +1508,7 @@ void GbaQueue::LoadPlayerStat()
 			char* newMask = base + 0x454 + 4;
 			for (j = 0; j < 8; j++) {
 				if (memcmp(oldMask, newMask, 8) != 0) {
-					m_compatibilityFlg[i] = static_cast<unsigned char>(m_compatibilityFlg[i] | (1 << j));
+					m_compatibilityFlg[i] = static_cast<char>(m_compatibilityFlg[i] | (1 << j));
 				}
 			}
 		}

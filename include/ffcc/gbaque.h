@@ -16,7 +16,7 @@ struct GbaCMakeInfo
 {
     unsigned char m_active;
     unsigned char m_resultCode;
-    unsigned short m_packetCount;
+    short m_packetCount;
     unsigned short m_crc;
     unsigned char m_playerSlot;
     char m_name[0x11];

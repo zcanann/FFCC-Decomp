@@ -4105,6 +4105,8 @@ void CMenuPcs::DrawMainMenu()
 	extern float FLOAT_803316D0;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
+	float x;
+	float y;
 	short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
@@ -4156,8 +4158,8 @@ void CMenuPcs::DrawMainMenu()
 		tileColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(tileAlpha)));
 		GXSetChanMatColor(static_cast<GXChannelID>(4), tileColor);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x33));
-		float x = FLOAT_80331410;
-		float y = FLOAT_80331440;
+		x = FLOAT_80331410;
+		y = FLOAT_80331440;
 		y = y - x;
 		MenuPcs.DrawRect(0, x, y, FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
 		                 FLOAT_803313e8, FLOAT_803313dc);

@@ -2153,11 +2153,13 @@ renderedDone:
             *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
             *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
         } else {
-            if ((mode & 3) == 3) {
-                t = kCFlatOneF - kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * t + kCFlatHalfPi));
-            } else if ((mode & 3) == 1) {
+            int easeMode = mode & 3;
+            if (easeMode == 3) {
+                float s = std::sinf(kCFlatPi * t + kCFlatHalfPi);
+                t = kCFlatOneF - kCFlatHalfF * (kCFlatOneF + s);
+            } else if (easeMode == 1) {
                 t = kCFlatOneF + std::sinf(kCFlatHalfPi * t + kCFlatThreeHalfPi);
-            } else if ((mode & 3) == 2) {
+            } else if (easeMode == 2) {
                 t = std::sinf(kCFlatHalfPi * t);
             }
 
@@ -2773,7 +2775,8 @@ renderedDone:
         end.w = localFloats[10];
 
         if (mode == 3) {
-            alpha = kCFlatOneF - kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * alpha + kCFlatHalfPi));
+            float s = std::sinf(kCFlatPi * alpha + kCFlatHalfPi);
+            alpha = kCFlatOneF - kCFlatHalfF * (kCFlatOneF + s);
         } else if (mode == 1) {
             alpha = kCFlatOneF + std::sinf(kCFlatHalfPi * alpha + kCFlatThreeHalfPi);
         } else if (mode == 2) {

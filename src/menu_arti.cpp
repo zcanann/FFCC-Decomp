@@ -667,8 +667,8 @@ void CMenuPcs::ArtiInit1()
  */
 void CMenuPcs::ArtiInit()
 {
-	int index;
 	int yOffset;
+	int index;
 	ArtiOpenAnim* entry;
 
 	memset(GetArtiOpenAnimList(this), 0, sizeof(*GetArtiOpenAnimList(this)));

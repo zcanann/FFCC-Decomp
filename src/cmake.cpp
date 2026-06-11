@@ -1409,36 +1409,7 @@ void CMenuPcs::CmakeResultDraw()
         tileX += tileW;
     }
 
-    int handleIndex = static_cast<int>(CmakeSlot(this)) + 0x20;
-    int modelBlock = MenuS32(this, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + handleIndex * 0x50) != 0) {
-        *reinterpret_cast<short*>(modelBlock + 0x6E8) = 0xFF24;
-        *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
-        DrawInit();
-
-        if (m_wm.m_handles[handleIndex]->m_charaKind != 3) {
-            SetProjection(0x16);
-            SetLight(2);
-            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIndex]->m_model) + 0x9C) = 1.0f;
-            m_wm.m_handles[handleIndex]->Draw(5);
-            RestoreProjection();
-        } else {
-            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
-            MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-            GXColor charaColor;
-            charaColor.r = 0xFF;
-            charaColor.g = 0xFF;
-            charaColor.b = 0xFF;
-            charaColor.a = 0xFF;
-            GXSetChanMatColor(GX_COLOR0A0, charaColor);
-            MenuPcs.DrawRect(
-                0,
-                33.0f, 132.0f, 128.0f, 104.0f,
-                0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        }
-
-        DrawInit();
-    }
+    DrawCmakePreviewCharaAlpha(this, 1.0f);
 
     if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
         SetCmakeBlendMatColor(1.0f);

@@ -1120,11 +1120,14 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     int freeCount = 0;
 
     if (stageGetAllocationMode(this) == 2) {
+        int i;
+        int blockTail;
+        int size;
         int top = m_heapTop;
 
-        for (int i = 0; i <= m_blockCount; i++) {
-            int blockTail = (m_blockCount == i) ? m_heapBottom : reinterpret_cast<int>(node->m_prev);
-            int size = blockTail - top;
+        for (i = 0; i <= m_blockCount; i++) {
+            blockTail = (m_blockCount == i) ? m_heapBottom : reinterpret_cast<int>(node->m_prev);
+            size = blockTail - top;
             if (size != 0) {
                 if ((flag & 1) != 0) {
                     System.Printf(

@@ -2789,12 +2789,13 @@ void CMenuPcs::CalcLoadMenu()
 	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
-	unsigned short uVar4;
+	unsigned int uVar4;
 	if (bVar1) {
 		uVar4 = 0;
 	} else {
 		unsigned int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-		uVar4 = Pad.GetPadInputs()[padIndex].buttonDown[0];
+		unsigned short down = Pad.GetPadInputs()[padIndex].buttonDown[0];
+		uVar4 = down;
 	}
 	unsigned short uVar7 = GetButtonRepeat(0);
 

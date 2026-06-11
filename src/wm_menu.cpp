@@ -4168,7 +4168,8 @@ void CMenuPcs::DrawMainMenu()
 		y = y + FLOAT_80331500;
 		MenuPcs.DrawRect(4, x, y, FLOAT_803316D0, FLOAT_80331500, 0.0f, 0.0f, 1.0f,
 		                 1.0f, 0.0f);
-		MenuPcs.DrawRect(0xC, x + FLOAT_803316D0, y,
+		x += FLOAT_803316D0;
+		MenuPcs.DrawRect(0xC, x, y,
 		                 FLOAT_803316D0, FLOAT_80331500, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 

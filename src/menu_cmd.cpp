@@ -1861,12 +1861,15 @@ void CMenuPcs::GetCmdItem()
 	for (s32 i = 0; i < 0x40; i++) {
 		s32 itemType = GetItemType(i, 0);
 		if ((itemType != 0) && (itemType != 5) && (itemType != 6) && (itemType != 8) && (itemType != 9)) {
-			if ((itemType != 1) ||
-			    ((caravanWork->m_tribeId & 3) == GetItemIcon(caravanWork->m_inventoryItems[i]))) {
-				write++;
-				*write = static_cast<s16>(i);
-				count++;
+			if (itemType == 1) {
+				const u32 tribe = caravanWork->m_tribeId & 3;
+				if (GetItemIcon(caravanWork->m_inventoryItems[i]) != tribe) {
+					continue;
+				}
 			}
+			write++;
+			*write = static_cast<s16>(i);
+			count++;
 		}
 	}
 
@@ -1903,7 +1906,7 @@ void CMenuPcs::GetCmdItem()
 		write3[1] = 0xa3;
 	}
 
-	*reinterpret_cast<u16*>(Joybus.GetLetterBuffer(0)) = static_cast<s16>(count + 2);
+	*reinterpret_cast<u16*>(Joybus.GetLetterBuffer(0)) = static_cast<u16>(count + 2);
 }
 
 /*

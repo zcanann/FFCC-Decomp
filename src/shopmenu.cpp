@@ -2400,8 +2400,6 @@ void CShopMenu::DrawSmith0()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_lifetimes on
 void CShopMenu::DrawShop0()
 {
     int textId = SHOP_MENU_TEXT_BUY;
@@ -2469,7 +2467,6 @@ void CShopMenu::DrawShop0()
     MenuPcs.DrawInit();
     Graphic.SetDrawDoneDebugData(0x28);
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801553a8
@@ -3081,8 +3078,6 @@ inline void CShopMenu::SelectSOUBI()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_dead_assignments off
 void CShopMenu::Calc()
 {
     int mode = m_mode;
@@ -3306,7 +3301,6 @@ void CShopMenu::Calc()
 
     ++timer;
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801588ac

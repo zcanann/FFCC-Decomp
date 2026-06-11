@@ -2852,8 +2852,6 @@ void CMenuPcs::CmdOpen2()
 	}
 }
 
-#pragma push
-#pragma opt_strength_reduction off
 /*
  * --INFO--
  * PAL Address: 0x8014a9dc
@@ -2886,8 +2884,8 @@ unsigned int CMenuPcs::CmdClose2()
 		return 0;
 	} else if (GetCmdStateView(this)->uniteState == 1) {
 		s32 uniteIdx = 0;
-		for (s32* p = s_UniteTop; uniteIdx < s_unitePanelCount; p++, uniteIdx++) {
-			if (selected == *p) {
+		for (uniteIdx = 0; uniteIdx < s_unitePanelCount; uniteIdx++) {
+			if (selected == s_UniteTop[uniteIdx]) {
 				break;
 			}
 		}
@@ -2961,7 +2959,6 @@ unsigned int CMenuPcs::CmdClose2()
 	}
 	return 0;
 }
-#pragma pop
 
 /*
  * --INFO--

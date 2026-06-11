@@ -70,6 +70,8 @@ extern const float FLOAT_80330B44;
 extern const float FLOAT_80330B48;
 extern const float FLOAT_80330B4C;
 extern const float FLOAT_80330B5C;
+extern const float FLOAT_80330B88;
+extern const float FLOAT_80330B8C;
 extern const float FLOAT_80330B90;
 extern const float FLOAT_80330BC0;
 extern const float kCFlatHalfPi;
@@ -879,12 +881,13 @@ done_check:
  */
 void CCharaPcs::SetMapShadeColor(int shadeIndex, CColor color)
 {
-    char r = color.color.r;
-    char g = color.color.g;
+    const unsigned char* src = &color.color.r;
+    unsigned char r = *src++;
+    unsigned char g = *src++;
     m_viewerChoiceColor[shadeIndex].color.r = r;
-    char b = color.color.b;
+    unsigned char b = *src++;
     m_viewerChoiceColor[shadeIndex].color.g = g;
-    char a = color.color.a;
+    unsigned char a = *src;
     m_viewerChoiceColor[shadeIndex].color.b = b;
     m_viewerChoiceColor[shadeIndex].color.a = a;
 }
@@ -1768,10 +1771,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -5: {
         short buttons;
-        if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
-            buttons = Pad.GetButton(*object->m_localBase);
-        } else {
+        if (((1 << *object->m_localBase) & m_padInputDisableMask) != 0) {
             buttons = 0;
+        } else {
+            buttons = Pad.GetButton(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= ~0xC00;
@@ -2152,19 +2155,14 @@ renderedDone:
             *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
             *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
         } else {
-            switch (mode & 3) {
-            case 3:
-                t = -((kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * t + kCFlatHalfPi))) -
-                      kCFlatOneF);
-                break;
-            case 1:
+            int easeMode = mode & 3;
+            if (easeMode == 3) {
+                float s = std::sinf(kCFlatPi * t + kCFlatHalfPi);
+                t = kCFlatOneF - kCFlatHalfF * (kCFlatOneF + s);
+            } else if (easeMode == 1) {
                 t = kCFlatOneF + std::sinf(kCFlatHalfPi * t + kCFlatThreeHalfPi);
-                break;
-            case 2:
+            } else if (easeMode == 2) {
                 t = std::sinf(kCFlatHalfPi * t);
-                break;
-            default:
-                break;
             }
 
             const float pathDistance = m_pathTotalDistance * t;
@@ -2203,7 +2201,7 @@ renderedDone:
         break;
     }
     case -0x1C:
-        RuntimeDebugFlags(this) = *object->m_localBase;
+        m_debugFlags = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2253,15 +2251,18 @@ renderedDone:
         const float pitch = localFloats[6];
         const float sinYaw = std::sinf(yaw);
         const float cosYaw = std::cosf(yaw);
-        CVector direction(
-            -(sinYaw * std::cosf(pitch)), -std::sinf(pitch), -(cosYaw * std::cosf(pitch)));
+        const float x = sinYaw * std::cosf(pitch);
+        const float y = std::sinf(pitch);
+        const float z = cosYaw * std::cosf(pitch);
+        CVector direction(-x, -y, -z);
+        Vec* directionPtr = direction;
         CColor color(
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
             static_cast<u8>(object->m_localBase[4]),
             0xFF);
 
-        CharaPcs.SetDiffuse(*object->m_localBase, object->m_localBase[1], color, direction);
+        CharaPcs.SetDiffuse(*object->m_localBase, object->m_localBase[1], color, directionPtr);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2370,14 +2371,14 @@ renderedDone:
     }
     case -0x25: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+        CLine<64>* line = &m_debugLines[*object->m_localBase];
         Vec target;
         target.x = localFloats[1];
         target.y = localFloats[2];
         target.z = localFloats[3];
-        CLine<64>* line = &m_debugLines[*object->m_localBase];
         unsigned long segment;
         float segmentRatio;
-        float distance = kCFlatPadStickZero;
+        float distance;
 
         if (line->Calc((Vec*)0, (float*)0, &segment, &segmentRatio, &target, kCFlatPadStickZero) != 0) {
             distance = line->segments[segment].length * segmentRatio + line->segments[segment].startLength;
@@ -2394,8 +2395,8 @@ renderedDone:
         break;
     case -0x27: {
         if ((RuntimeDebugFlags(this) & CFlatRuntimeDebugFlag_ClassCollision) != 0) {
-            Mtx viewMtx;
             Mtx drawMtx;
+            Mtx viewMtx;
             CameraPcs.GetViewMatrix(viewMtx);
 
             _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -2416,18 +2417,20 @@ renderedDone:
             const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
             const float radius = localFloats[3];
             PSMTXScale(drawMtx, radius, radius, radius);
-            drawMtx[0][3] = localFloats[0];
-            drawMtx[1][3] = localFloats[1];
-            drawMtx[2][3] = localFloats[2];
+            const float* trans = reinterpret_cast<float*>(object->m_localBase);
+            const float y = trans[1];
+            const float z = trans[2];
+            drawMtx[0][3] = trans[0];
+            drawMtx[1][3] = y;
+            drawMtx[2][3] = z;
             PSMTXConcat(viewMtx, drawMtx, drawMtx);
             GXLoadPosMtxImm(drawMtx, GX_PNMTX0);
 
-            GXColor color = {
-                static_cast<u8>(object->m_localBase[4]),
-                static_cast<u8>(object->m_localBase[5]),
-                static_cast<u8>(object->m_localBase[6]),
-                0xFF,
-            };
+            GXColor color;
+            color.a = 0xFF;
+            color.r = static_cast<u8>(object->m_localBase[4]);
+            color.g = static_cast<u8>(object->m_localBase[5]);
+            color.b = static_cast<u8>(object->m_localBase[6]);
             GXSetChanMatColor(GX_COLOR0A0, color);
             Graphic.DrawSphere();
         }
@@ -2530,7 +2533,7 @@ renderedDone:
         Mtx rotation;
 
         CameraPcs.GetWorldMapMatrix(matrix);
-        if (*object->m_localBase != 0) {
+        if (static_cast<int>(*object->m_localBase) != 0) {
             PSMTXIdentity(matrix);
         }
 
@@ -2611,7 +2614,7 @@ renderedDone:
         outResult = 0;
         break;
     case -99: {
-        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
+        CFlatRuntime::CObject* targetObject = static_cast<CFlatRuntime::CObject*>(this->intToClass(*object->m_localBase));
         this->SetParticleWorkTrace(targetObject);
         this->push(object, 0);
         outResult = 0;
@@ -2623,14 +2626,14 @@ renderedDone:
         outResult = 0;
         break;
     case -0x4E: {
-        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
+        CFlatRuntime::CObject* targetObject = static_cast<CFlatRuntime::CObject*>(this->intToClass(*object->m_localBase));
         this->SetParticleWorkBind(targetObject);
         this->push(object, 0);
         outResult = 0;
         break;
     }
     case -0x5B: {
-        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
+        CFlatRuntime::CObject* targetObject = static_cast<CFlatRuntime::CObject*>(this->intToClass(object->m_localBase[1]));
         this->SetParticleWorkParam(*object->m_localBase, targetObject);
         this->push(object, 0);
         outResult = 0;
@@ -2661,7 +2664,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x5C: {
-        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
+        CFlatRuntime::CObject* targetObject = static_cast<CFlatRuntime::CObject*>(this->intToClass(object->m_localBase[1]));
         this->IgnoreParticle(static_cast<short>(*object->m_localBase), targetObject);
         this->push(object, 0);
         outResult = 0;
@@ -2779,8 +2782,8 @@ renderedDone:
         end.w = localFloats[10];
 
         if (mode == 3) {
-            alpha = -((kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * alpha + kCFlatHalfPi))) -
-                      kCFlatOneF);
+            float s = std::sinf(kCFlatPi * alpha + kCFlatHalfPi);
+            alpha = kCFlatOneF - kCFlatHalfF * (kCFlatOneF + s);
         } else if (mode == 1) {
             alpha = kCFlatOneF + std::sinf(kCFlatHalfPi * alpha + kCFlatThreeHalfPi);
         } else if (mode == 2) {
@@ -2944,10 +2947,9 @@ renderedDone:
         break;
     }
     case -0x52: {
-        const int enabled = (((-*object->m_localBase) | *object->m_localBase) >> 31);
-        GraphicPcs.m_dofFlag = enabled;
+        GraphicPcs.SetUseDOF(*object->m_localBase != 0);
         GraphicPcs.SetDOFParameter(
-            static_cast<signed char>(static_cast<char>(*object->m_localBase) - 1),
+            static_cast<signed char>(*object->m_localBase - 1),
             static_cast<signed char>(object->m_localBase[1]),
             *reinterpret_cast<float*>(object->m_localBase + 2),
             *reinterpret_cast<float*>(object->m_localBase + 3),
@@ -3026,12 +3028,14 @@ renderedDone:
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x5F:
-        this->push(object, static_cast<int>(Math.DstRot(
-                                  *reinterpret_cast<float*>(object->m_localBase),
-                                  *reinterpret_cast<float*>(object->m_localBase + 1))));
+    case -0x5F: {
+        float dstRot = Math.DstRot(
+            *reinterpret_cast<float*>(object->m_localBase),
+            *reinterpret_cast<float*>(object->m_localBase + 1));
+        this->push(object, *reinterpret_cast<int*>(&dstRot));
         outResult = 0;
         break;
+    }
     case -0x60: {
         const int alpha = static_cast<int>(kCFlatAlphaMax * *reinterpret_cast<float*>(object->m_localBase + 3)) & 0xFF;
         const unsigned int blurA = (static_cast<unsigned int>(__cntlzw(object->m_localBase[4])) >> 5) & 0xFF;
@@ -3174,11 +3178,11 @@ renderedDone:
         outResult = 0;
         break;
     case -0x74: {
-        unsigned short buttonDown = Pad.GetGbaButtonDown(*object->m_localBase);
+        short buttonDown = Pad.GetGbaButtonDown(*object->m_localBase);
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttonDown &= ~0xC00;
         }
-        this->push(object, static_cast<int>(static_cast<short>(buttonDown)));
+        this->push(object, buttonDown);
         outResult = 0;
         break;
     }
@@ -3427,8 +3431,8 @@ renderedDone:
         break;
     }
     case -0xF2:
-        MapMng.SetMapAnimID(static_cast<char>(object->m_localBase[0]), object->m_localBase[1],
-            object->m_localBase[2], static_cast<char>(object->m_localBase[3]));
+        MapMng.SetMapAnimID(object->m_localBase[0], object->m_localBase[1],
+            object->m_localBase[2], object->m_localBase[3]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3481,13 +3485,13 @@ renderedDone:
         break;
     }
     case -0x9F:
-        if (object->m_localBase[1] < 0) {
-            Game.m_caravanWorkArr[*object->m_localBase].m_shopState = 0;
-        } else {
+        if (static_cast<int>(object->m_localBase[1]) >= 0) {
             Game.m_caravanWorkArr[*object->m_localBase].Init(
                 object->m_localBase[1],
                 reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + object->m_localBase[1] * 0x1D0),
                 object->m_localBase[2]);
+        } else {
+            Game.m_caravanWorkArr[*object->m_localBase].m_shopState = 0;
         }
         this->push(object, 0);
         outResult = 0;
@@ -3504,7 +3508,7 @@ renderedDone:
         break;
     case -0xA6:
         this->push(
-            object, Game.m_caravanWorkArr[*object->m_localBase].GetEvtWord(object->m_localBase[1]));
+            object, static_cast<short>(Game.m_caravanWorkArr[*object->m_localBase].GetEvtWord(object->m_localBase[1])));
         outResult = 0;
         break;
     case -0xA7:
@@ -3523,7 +3527,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0xAB:
-        this->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_letterMeta[object->m_localBase[1]]);
+        this->push(object, static_cast<signed char>(Game.m_caravanWorkArr[*object->m_localBase].m_letterMeta[object->m_localBase[1]]));
         outResult = 0;
         break;
     case -0xAA:
@@ -3689,12 +3693,14 @@ renderedDone:
             localFloats[4],
             localFloats[5],
             localFloats[6]);
-        CColor color(
-            static_cast<u8>(object->m_localBase[1]),
-            static_cast<u8>(object->m_localBase[2]),
-            static_cast<u8>(object->m_localBase[3]),
-            0xFF);
-        MapMng.SetMapObjWorldMapLightID(*object->m_localBase, color, position);
+        MapMng.SetMapObjWorldMapLightID(
+            *object->m_localBase,
+            CColor(
+                static_cast<u8>(object->m_localBase[1]),
+                static_cast<u8>(object->m_localBase[2]),
+                static_cast<u8>(object->m_localBase[3]),
+                0xFF),
+            position);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3703,9 +3709,8 @@ renderedDone:
         MenuPcs.m_battleHud.m_visible = *object->m_localBase;
         MenuPcs.m_battleHud.m_fadeCounter = 0x40;
         MenuPcs.m_battleHud.m_width = object->m_localBase[1];
-        MenuPcs.m_battleHud.m_gaugeMax = object->m_localBase[2];
-        MenuPcs.m_battleHud.m_gaugeTarget = MenuPcs.m_battleHud.m_gaugeMax;
-        MenuPcs.m_battleHud.m_gaugeValue = MenuPcs.m_battleHud.m_gaugeMax;
+        MenuPcs.m_battleHud.m_gaugeMax = MenuPcs.m_battleHud.m_gaugeTarget =
+            MenuPcs.m_battleHud.m_gaugeValue = object->m_localBase[2];
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3714,7 +3719,7 @@ renderedDone:
         MenuPcs.m_battleHud.m_worldPos[0] = localFloats[0];
         MenuPcs.m_battleHud.m_worldPos[1] = localFloats[1];
         MenuPcs.m_battleHud.m_worldPos[2] = localFloats[2];
-        if (object->m_localBase[3] < MenuPcs.m_battleHud.m_gaugeTarget) {
+        if (static_cast<int>(object->m_localBase[3]) < MenuPcs.m_battleHud.m_gaugeTarget) {
             MenuPcs.m_battleHud.m_gaugeCounter = 0x10;
         }
         MenuPcs.m_battleHud.m_gaugeTarget = object->m_localBase[3];
@@ -3847,7 +3852,11 @@ renderedDone:
         unsigned char value = static_cast<u8>(kCFlatAlphaMax * localFloats[10]);
         unsigned char alpha = static_cast<u8>(kCFlatAlphaMax * localFloats[11]);
         char* layerName = this->m_strBlob + this->m_strOffsets[localBase[1]];
-        _GXColor color = {value, value, value, alpha};
+        _GXColor color;
+        color.r = value;
+        color.g = value;
+        color.b = value;
+        color.a = alpha;
         this->drawLayer(
             *object->m_localBase, layerName, localBase[2],
             localBase[3], localBase[4], localBase[5], localBase[6], localBase[7],
@@ -3929,22 +3938,25 @@ renderedDone:
         outResult = 0;
         break;
     case -0xE3: {
+        CCaravanWork* work = &Game.m_caravanWorkArr[object->m_localBase[0]];
         unsigned int flags = 0;
         if ((object->m_localBase[1] & 2) != 0) {
-            const int itemIndex = Game.m_caravanWorkArr[object->m_localBase[0]].FindItem(object->m_localBase[2]);
-            flags = (0xffffffffU - (itemIndex >> 31)) & 2;
+            const int itemIndex = work->FindItem(object->m_localBase[2]);
+            flags = ((static_cast<unsigned int>(itemIndex) >> 31) - 1) & 2;
         }
         this->push(object, flags);
         outResult = 0;
         break;
     }
-    case -0xE4:
-        if (object->m_localBase[1] == 1) {
-            Game.m_caravanWorkArr[object->m_localBase[0]].DeleteItem(object->m_localBase[2], 1);
+    case -0xE4: {
+        CCaravanWork* work = &Game.m_caravanWorkArr[object->m_localBase[0]];
+        if (static_cast<int>(object->m_localBase[1]) == 1) {
+            work->DeleteItem(object->m_localBase[2], 1);
         }
         this->push(object, 0);
         outResult = 0;
         break;
+    }
     case -0xE5:
         this->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_gil);
         outResult = 0;
@@ -3954,9 +3966,9 @@ renderedDone:
         outResult = 0;
         break;
     case -0xE7:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0x68) = *object->m_localBase;
-        *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CharaPcs) + 0x72) =
-            *reinterpret_cast<float*>(object->m_localBase + 1);
+        CharaPcs.m_texShadowSize = *object->m_localBase;
+        CharaPcs.m_texShadowDistance =
+            static_cast<int>(*reinterpret_cast<float*>(object->m_localBase + 1));
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3977,14 +3989,15 @@ renderedDone:
             Graphic.GetBackBufferRect2(
                 Graphic.GetTmpFrameBuffer(), 0, 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGB565, 0);
         } else {
-            CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(object->m_localBase[1]));
-
             GXInitTexObj(
-                &backTexObj, Graphic.GetTmpFrameBuffer(), 0x280, 0x1C0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP,
+                &backTexObj, Graphic.GetTmpFrameBuffer(), 0x280, 0x1C0, GX_TF_RGB565, GX_CLAMP, GX_CLAMP,
                 GX_FALSE);
-            GXInitTexObjLOD(&backTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+            GXInitTexObjLOD(&backTexObj, GX_NEAR, GX_NEAR, kCFlatPadStickZero, kCFlatPadStickZero,
+                kCFlatPadStickZero, GX_FALSE, GX_FALSE, GX_ANISO_1);
             gUtil.RenderTextureQuad(
-                0.0f, 0.0f, 640.0f, 448.0f, &backTexObj, 0, 0, color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+                kCFlatPadStickZero, kCFlatPadStickZero, FLOAT_80330B88, FLOAT_80330B8C, &backTexObj, 0, 0,
+                CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(object->m_localBase[1])),
+                GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
         }
         this->push(object, 0);
         outResult = 0;
@@ -4018,12 +4031,12 @@ renderedDone:
         hitPosition.x = reinterpret_cast<float*>(object->m_localBase)[0];
         hitPosition.y = reinterpret_cast<float*>(object->m_localBase)[1];
         hitPosition.z = reinterpret_cast<float*>(object->m_localBase)[2];
-        if (MapPcs.CheckHitCylinderNear(hitPosition, CVector(kCFlatPadStickZero, FLOAT_80330B90, kCFlatPadStickZero), kCFlatPadStickZero, object->m_localBase[3]) == 0) {
-            this->push(object, 0);
-        } else {
+        if (MapPcs.CheckHitCylinderNear(hitPosition, CVector(kCFlatPadStickZero, FLOAT_80330B90, kCFlatPadStickZero), kCFlatPadStickZero, object->m_localBase[3]) != 0) {
             MapPcs.CalcHitPosition(hitPosition);
             *reinterpret_cast<float*>(object->m_localBase[4]) = hitPosition.y;
             this->push(object, 1);
+        } else {
+            this->push(object, 0);
         }
         outResult = 0;
         break;
@@ -4094,7 +4107,7 @@ renderedDone:
         if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347addNoFreeSeGroup\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
-        Sound.AddNoFreeSeGroup(static_cast<short>(*object->m_localBase));
+        Sound.AddNoFreeSeGroup(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
         break;

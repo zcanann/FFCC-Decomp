@@ -517,10 +517,9 @@ void CGObject::onCreate()
 
     int animStateOffset = 0;
     for (int i = 0; i < 2; i++) {
-        int groupOffset;
         s8* animState;
-        groupOffset = animStateOffset + 0x9d;
-        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState = reinterpret_cast<s8*>(animStateOffset + 0x9d);
+        animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
         animState[0] = -1;
         animState[1] = -1;
         animState[2] = -1;
@@ -529,8 +528,8 @@ void CGObject::onCreate()
         animState[5] = -1;
         animState[6] = -1;
         animState[7] = -1;
-        groupOffset = animStateOffset + 0xa5;
-        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState = reinterpret_cast<s8*>(animStateOffset + 0xa5);
+        animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
         animState[0] = -1;
         animState[1] = -1;
         animState[2] = -1;
@@ -539,8 +538,8 @@ void CGObject::onCreate()
         animState[5] = -1;
         animState[6] = -1;
         animState[7] = -1;
-        groupOffset = animStateOffset + 0xad;
-        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState = reinterpret_cast<s8*>(animStateOffset + 0xad);
+        animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
         animState[0] = -1;
         animState[1] = -1;
         animState[2] = -1;
@@ -549,8 +548,8 @@ void CGObject::onCreate()
         animState[5] = -1;
         animState[6] = -1;
         animState[7] = -1;
-        groupOffset = animStateOffset + 0xb5;
-        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState = reinterpret_cast<s8*>(animStateOffset + 0xb5);
+        animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
         animStateOffset += 0x20;
         animState[0] = -1;
         animState[1] = -1;
@@ -735,8 +734,8 @@ void CGObject::move()
                 Mtx cameraWorldMtx;
                 PSMTXCopy(CameraPcs.m_cameraWorldMtx, cameraWorldMtx);
                 moveVec.x = -moveVec.x;
-                moveVec.z = -moveVec.z;
                 moveVec.y = sZeroFloat;
+                moveVec.z = -moveVec.z;
                 PSMTXMultVec(cameraWorldMtx, &moveVec, &moveVec);
             }
         }
@@ -793,11 +792,8 @@ void CGObject::move()
                     const float dirDot = PSVECDotProduct(&moveVec, &centerDelta);
                     if (sZeroFloat < dirDot) {
                         centerDist /= CFlatCenterDistanceScale();
-                        float clampDist = centerDist;
-                        if (!(clampDist < sZeroFloat)) {
-                            if (sAnimFrameOffset < clampDist) {
-                                clampDist = sAnimFrameOffset;
-                            }
+                        if (!(centerDist < sZeroFloat)) {
+                            float clampDist = (sAnimFrameOffset < centerDist) ? sAnimFrameOffset : centerDist;
                             speed *= -((clampDist * clampDist) - sAnimFrameOffset);
                         }
                     }
@@ -1316,8 +1312,7 @@ static inline int checkProbeHit(CMapCylinder* cylinder, CVector* base, CVector* 
 }
 
 #pragma push
-#pragma optimization_level 1
-#pragma opt_common_subs off
+#pragma optimization_level 3
 #pragma global_optimizer off
 void CGObject::bgAttribCollision()
 {
@@ -1653,9 +1648,9 @@ void CGObject::update()
             m_radiusCtrlVel.y += sBgAttrNormal * swayDz;
             m_groundFriction += sBgAttrNormal * swayDx;
 
-            float mtx2;
-            float mtx1;
             float mtx0;
+            float mtx1;
+            float mtx2;
             Vec swayDir;
             PSVECNormalize(reinterpret_cast<Vec*>(&m_radiusCtrlVel.y), &swayDir);
             const float swayDot = PSVECDotProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat));
@@ -1665,9 +1660,9 @@ void CGObject::update()
                 PSVECCrossProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &swayAxis);
                 PSMTXRotAxisRad(rotScratch, &swayAxis, negSwayAngle);
 
-                mtx2 = modelMtx[2][3];
-                mtx1 = modelMtx[1][3];
                 mtx0 = modelMtx[0][3];
+                mtx1 = modelMtx[1][3];
+                mtx2 = modelMtx[2][3];
                 modelMtx[0][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).x;
                 modelMtx[1][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).y;
                 modelMtx[2][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).z;
@@ -1676,7 +1671,8 @@ void CGObject::update()
                 const float swayTanScaled = sDefaultMoveBaseSpeed * swayTan;
                 modelMtx[0][3] = mtx0;
                 modelMtx[2][3] = mtx2;
-                modelMtx[1][3] = mtx1 - swayTanScaled;
+                mtx1 -= swayTanScaled;
+                modelMtx[1][3] = mtx1;
             }
 
             const float swayRy = m_radiusCtrl.y;
@@ -1818,9 +1814,9 @@ void CGObject::update()
             }
 
             ModelLightAlpha(m_charaModelHandle->m_model) = m_lookAtTimer;
-            m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
-                static_cast<s32>(static_cast<s32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0;
-            m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
+            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_charaModelHandle->m_model))->m_bit20 =
+                m_weaponNodeFlagBits.m_unk20;
+            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_charaModelHandle->m_model))->m_bit80 = (m_displayFlags & 0x20) != 0;
         }
 
         m_charaModelHandle->m_model->CalcFurColor();
@@ -1911,7 +1907,7 @@ void CGObject::update()
 
             if (animFinished) {
                 if (m_shieldNodeFlagBits.m_bit80) {
-                    const unsigned char queuePos = m_animQueuePos++;
+                    const char queuePos = m_animQueuePos++;
                     const char queuedAnim = m_animQueue[queuePos];
                     if (queuedAnim != -1) {
                         m_currentAnimSlot = m_animQueue[queuedAnim - 'A'];
@@ -1953,9 +1949,9 @@ void CGObject::update()
             }
 
             ModelLightAlpha(m_weaponModelHandle->m_model) = m_lookAtTimer;
-            m_weaponModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
-                static_cast<s32>(static_cast<s32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0;
-            m_weaponModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
+            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_weaponModelHandle->m_model))->m_bit20 =
+                m_weaponNodeFlagBits.m_unk20;
+            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_weaponModelHandle->m_model))->m_bit80 = (m_displayFlags & 0x20) != 0;
         }
 
         if (HasLoadedModel(m_shieldModelHandle) && (m_displayFlags & 1) != 0 && m_shieldAttachNodeIndex >= 0) {
@@ -1965,9 +1961,9 @@ void CGObject::update()
             m_shieldModelHandle->m_model->CalcMatrix();
 
             ModelLightAlpha(m_shieldModelHandle->m_model) = m_lookAtTimer;
-            m_shieldModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
-                static_cast<s32>(static_cast<s32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0;
-            m_shieldModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
+            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_shieldModelHandle->m_model))->m_bit20 =
+                m_weaponNodeFlagBits.m_unk20;
+            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_shieldModelHandle->m_model))->m_bit80 = (m_displayFlags & 0x20) != 0;
             if (m_weaponNodeFlagBits.m_unk20) {
                 m_shieldModelHandle->m_model->CalcSkin();
             }
@@ -2018,11 +2014,11 @@ void CGObject::copy()
         return;
     }
 
-    hasModel = false;
     m_charaModelHandle->m_flags = m_displayFlags;
     m_charaModelHandle->m_colorPhase = m_animBlend;
     m_charaModelHandle->m_sortZ = m_screenDepth;
     m_charaModelHandle->m_fogBlend = m_worldParam;
+    hasModel = false;
 
     if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
         hasModel = true;
@@ -2046,8 +2042,8 @@ void CGObject::copy()
     }
 
     if (m_weaponNodeFlagBits.m_unk20 == 0) {
-        hasModel = false;
         m_charaModelHandle->m_flags &= 0xFFFFFFFE;
+        hasModel = false;
 
         if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
             hasModel = true;
@@ -2066,8 +2062,8 @@ void CGObject::copy()
     }
 
     if (m_shieldNodeFlagBits.m_bit20 == 0) {
-        hasModel = false;
         m_charaModelHandle->m_flags &= 0xFFFFFFFB;
+        hasModel = false;
 
         if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
             hasModel = true;
@@ -2088,9 +2084,9 @@ void CGObject::copy()
         return;
     }
 
-    hasModel = false;
     m_charaModelHandle->m_bgCharmPlaneY = m_bgCharmFactor;
     m_charaModelHandle->m_worldPosY = m_worldPosition.y;
+    hasModel = false;
 
     if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
         hasModel = true;

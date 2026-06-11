@@ -522,11 +522,10 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&srcSave) + 0x13D8);
 
         u8* dstWork = reinterpret_cast<u8*>(&dstSave) + dstChar * 0x200;
-        u8* item;
+        int itemOfs = dstChar * 8;
         int i = 0;
         do
         {
-            item = dstWork + dstChar * 8;
             for (int j = 0; j < 8; j++)
             {
                 u8 flag = 0;
@@ -534,8 +533,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
                 {
                     flag = 1;
                 }
-                item[0xC0] = flag != 0 ? 0x32 : 0;
-                item++;
+                dstWork[itemOfs + 0xC0 + j] = flag != 0 ? 0x32 : 0;
             }
             i++;
             dstWork += 0x40;

@@ -548,7 +548,7 @@ void CMenuPcs::ItemDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::ItemClose()
+int CMenuPcs::ItemClose()
 {
     this->m_itemMenuState->frame++;
 
@@ -584,9 +584,9 @@ bool CMenuPcs::ItemClose()
         }
     }
 
-    bool closed = false;
+    int closed = 0;
     if (count == finished) {
-        closed = true;
+        closed = 1;
     }
     return closed;
 }
@@ -640,7 +640,7 @@ int CMenuPcs::ItemCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::ItemOpen()
+int CMenuPcs::ItemOpen()
 {
     if (this->m_itemMenuState->initialized == '\0') {
         SingLifeInit(-1);
@@ -676,9 +676,9 @@ bool CMenuPcs::ItemOpen()
         }
     }
 
-    bool opened = false;
+    int opened = 0;
     if (count == finished) {
-        opened = true;
+        opened = 1;
     }
     return opened;
 }

@@ -66,21 +66,22 @@ struct CMesCharCell
 	char m_flagCount;              // 0x13
 };
 
-static inline int GetMesNibbleValue(const char* data)
+static inline char GetMesNibbleValue(const char* data)
 {
-	signed char high = (signed char)(((unsigned char)data[0] & 0x0F) << 4);
-	int low = (unsigned char)data[1] & 0x0F;
-	return (int)high | low;
+	signed char val = (signed char)(((unsigned char)data[0] & 0x0F) << 4);
+	val = (signed char)(val | ((unsigned char)data[1] & 0x0F));
+	return val;
 }
 
 static inline char ReadTagByte(char** text)
 {
 	char* p0 = *text;
 	*text = p0 + 1;
-	signed char hi = (signed char)((*p0 & 0x0F) << 4);
+	signed char val = (signed char)((*p0 & 0x0F) << 4);
 	char* p1 = *text;
 	*text = p1 + 1;
-	return (char)(hi | (*p1 & 0x0F));
+	val = (signed char)(val | (*p1 & 0x0F));
+	return val;
 }
 
 static inline int ReadTagU8(char** text)
@@ -609,7 +610,7 @@ void CMes::Draw()
 		int activeTlut = 0xFFFFFFFF;
 		int activeFontId = 0xFFFFFFFF;
 
-		for (int i = 0; i < *(int*)((char*)this + 8); i++)
+		for (int i = 0; i < *(int*)((char*)this + 8); i++, glyph += 5)
 		{
 			if (*(int*)((char*)this + 0x3C80) >= (int)(unsigned int)*(unsigned short*)((char*)glyph + 0x0C))
 			{
@@ -702,7 +703,7 @@ void CMes::Draw()
 					}
 					}
 
-					MenuPcs.SetColor(MesColorRef(CColor(0xFF, 0xFF, 0xFF, 0xFF)));
+					MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF));
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x15));
 
 					MenuPcs.DrawRect(
@@ -780,8 +781,6 @@ void CMes::Draw()
 					GetRenderFlagBits(font->renderFlags).snapPosition = 0;
 				}
 			}
-
-			glyph += 5;
 		}
 
 		font->DrawQuit();
@@ -1650,9 +1649,11 @@ void CMes::Next()
  */
 void CMes::Set(char* text, int param)
 {
-	float one = kMesOne;
-	float zero = kMesZero;
+	float one;
+	float zero;
 	mText = text;
+	zero = kMesZero;
+	one = kMesOne;
 	mWaitActive = 0;
 	mMaxHeight = zero;
 	mMaxWidth = zero;

@@ -1441,29 +1441,13 @@ void CMenuPcs::CmakeResultDraw()
     }
 
     if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        GXColor panelColor;
-        panelColor.r = 0xFF;
-        panelColor.g = 0xFF;
-        panelColor.b = 0xFF;
-        panelColor.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, panelColor);
+        SetCmakeBlendMatColor(1.0f);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
         MenuPcs.DrawRect(
             0, 192.0f, 56.0f, 416.0f, 264.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     } else {
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        GXColor panelColor;
-        panelColor.r = 0xFF;
-        panelColor.g = 0xFF;
-        panelColor.b = 0xFF;
-        panelColor.a = static_cast<unsigned char>(255.0f * alpha);
-        GXSetChanMatColor(GX_COLOR0A0, panelColor);
+        SetCmakeBlendMatColor(alpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
         MenuPcs.DrawRect(
             0, 192.0f, 56.0f, 416.0f, 264.0f,
@@ -1478,15 +1462,7 @@ void CMenuPcs::CmakeResultDraw()
 
     if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        GXColor crestCol;
-        crestCol.r = 0xFF;
-        crestCol.g = 0xFF;
-        crestCol.b = 0xFF;
-        crestCol.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, crestCol);
+        SetCmakeBlendMatColor(1.0f);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
         MenuPcs.DrawRect(
             0,
@@ -1496,16 +1472,7 @@ void CMenuPcs::CmakeResultDraw()
             1.0f, 1.0f, 0.0f);
     } else {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        int crestA = static_cast<int>(255.0f * alpha);
-        GXColor crestCol;
-        crestCol.r = 0xFF;
-        crestCol.g = 0xFF;
-        crestCol.b = 0xFF;
-        crestCol.a = static_cast<unsigned char>(crestA);
-        GXSetChanMatColor(GX_COLOR0A0, crestCol);
+        SetCmakeBlendMatColor(alpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
         MenuPcs.DrawRect(
             0,

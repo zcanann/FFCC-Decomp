@@ -881,7 +881,7 @@ void CMenuPcs::CmakeVillageDraw()
         showNameCursor = 0;
     }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);
-    DrawCmakeDecision(villageWork->m_row >= 5, alpha);
+    DrawCmakeDecision((villageWork->m_row >= 5) ? 1 : 0, alpha);
 }
 
 /*

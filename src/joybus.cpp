@@ -6904,7 +6904,6 @@ int JoyBus::SendUseItem(int portIndex, char itemId)
  */
 int JoyBus::SendHitEnemy(int portIndex, char enemyId, short hitValue)
 {
-    unsigned int result = 0;
     unsigned short hit = hitValue;
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
@@ -6912,27 +6911,8 @@ int JoyBus::SendHitEnemy(int portIndex, char enemyId, short hitValue)
     cmdBytes[0] = 0x22;
     cmdBytes[1] = enemyId;
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&hit, 0);
-    unsigned int word = cmd;
 
-    if (static_cast<signed char>(m_threadRunningMask) == 0) {
-        return result;
-    }
-
-    OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
-
-    unsigned int port = m_threadParams[portIndex].m_portIndex;
-    if (static_cast<int>(m_cmdCount[port]) >= 0x40) {
-        OSSignalSemaphore(&m_accessSemaphores[port]);
-        result = 0xFFFFFFFF;
-    } else {
-        m_cmdQueueData[port][m_cmdCount[port]] = word;
-        port = m_threadParams[portIndex].m_portIndex;
-        m_cmdCount[port]++;
-        OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
-        result = 0;
-    }
-
-    return result;
+    return SetSendQueue(&m_threadParams[portIndex], cmd);
 }
 
 /*

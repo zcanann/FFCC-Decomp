@@ -3769,10 +3769,10 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		}
 	}
 
-	WmCharaSelectEntry& entry = *reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
 	if (loadedCount != validCount) {
 		return;
 	}
+	WmCharaSelectEntry& entry = *reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
 	if (entry.m_confirmed != 0) {
 		return;
 	}
@@ -3829,7 +3829,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		down = static_cast<unsigned short>(downTmp);
 	} else {
 		repeat = 0;
-		down = 0;
+		down = repeat;
 	}
 
 	if (m_wmWorldState->m_mainState != 2 || m_wmWorldState->m_nextMenuMode != 0) {
@@ -3849,7 +3849,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 
 	if ((repeat & 1) != 0) {
 		const int row = static_cast<int>(cursor) >> 2;
-		if (cursor > static_cast<int>(((-row | row) >> 31) & 4)) {
+		if (cursor > ((row != 0) ? 4 : 0)) {
 			cursor--;
 		} else {
 			cursor += 3;
@@ -3874,17 +3874,20 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	}
 
 	if ((down & 0x100) != 0) {
-		int shopState;
 		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
-			unsigned char* const cmakeSlot = m_cmakeWork + curEntry.m_currentSlot * 0x9C0;
-			shopState = *reinterpret_cast<int*>(cmakeSlot + 0x1A84);
-		} else {
-			shopState = Game.m_caravanWorkArr[curEntry.m_currentSlot].m_shopState;
+				unsigned char* cmakeSlot = m_cmakeWork;
+			cmakeSlot += curEntry.m_currentSlot * 0x9C0;
+			if (*reinterpret_cast<int*>(cmakeSlot + 0x1A84) == 0) {
+				goto se_empty;
+			}
+			goto se_full;
 		}
 
-		if (shopState == 0) {
+		if (Game.m_caravanWorkArr[curEntry.m_currentSlot].m_shopState == 0) {
+		se_empty:
 			Sound.PlaySe(4, 0x40, 0x7F, 0);
 		} else {
+		se_full:
 			curEntry.m_confirmed = 1;
 			Sound.PlaySe(0x33, 0x40, 0x7F, 0);
 			if (state != 0) {

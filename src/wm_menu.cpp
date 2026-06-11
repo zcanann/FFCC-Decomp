@@ -9279,12 +9279,16 @@ void CMenuPcs::DrawCMLife()
 
 	float fade;
 	if (worldState->m_mainState == 1) {
-		fade = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(worldState->m_frameCounter));
+		const double* pRate = &DOUBLE_803314E8;
+		fade = static_cast<float>(*pRate * static_cast<double>(worldState->m_frameCounter));
 	} else if (worldState->m_mainState == 2) {
-		fade = FLOAT_803313e8;
+		const float* pOne = &FLOAT_803313e8;
+		fade = *pOne;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(worldState->m_frameCounter) -
-		                            DOUBLE_80331420));
+		const double* pRate = &DOUBLE_803314E8;
+		const double* pOne = &DOUBLE_80331420;
+		fade = static_cast<float>(-(*pRate * static_cast<double>(worldState->m_frameCounter) -
+		                            *pOne));
 	}
 	unsigned int readyMask = 0;
 	for (int i = 0; i < 4; i++) {
@@ -9293,9 +9297,13 @@ void CMenuPcs::DrawCMLife()
 			readyMask |= 1u << entry.m_currentSlot;
 		}
 	}
-	const double alphaF = FLOAT_80331458 * fade;
+	const float* p255A = &FLOAT_80331458;
+	const double alphaF = *p255A * fade;
 
 	for (int slot = 0; slot < 8; slot++) {
+		int i;
+		int row;
+		int col;
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x27));
 
 		int count;
@@ -9311,41 +9319,55 @@ void CMenuPcs::DrawCMLife()
 		float green;
 		float blue;
 		if ((readyMask & (1u << slot)) != 0) {
-			red = FLOAT_803313e8;
+			const float* pOneC = &FLOAT_803313e8;
+			red = *pOneC;
 			green = red;
 			blue = red;
 		} else {
-			red = FLOAT_80331434;
-			green = FLOAT_80331668;
+			const float* pHalfC = &FLOAT_80331434;
+			const float* pDimC = &FLOAT_80331668;
+			red = *pHalfC;
+			green = *pDimC;
 			blue = green;
 		}
 
+		const float* p255C = &FLOAT_80331458;
 		GXColor color;
-		color.r = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * red));
-		color.g = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * green));
-		color.b = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blue));
+		color.r = static_cast<unsigned char>(static_cast<int>(*p255C * red));
+		color.g = static_cast<unsigned char>(static_cast<int>(*p255C * green));
+		color.b = static_cast<unsigned char>(static_cast<int>(*p255C * blue));
 		color.a = static_cast<unsigned char>(static_cast<int>(alphaF));
 		GXSetChanMatColor(GX_COLOR0A0, color);
 
-		const int row = slot / 4;
-		const int col = slot % 4;
-		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8);
-		const float xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
+		row = slot / 4;
+		col = slot % 4;
+		const float* pYOrg = &FLOAT_80331478;
+		const float* pXOrg = &FLOAT_80331410;
+		float y = *pYOrg + static_cast<float>(row * 0xB8);
+		const float xBase = *pXOrg + static_cast<float>(col * 0x90);
 		float yTmp = y;
 		if (row != 0) {
-			yTmp = y + FLOAT_80331548;
+			const float* pRowAdd = &FLOAT_80331548;
+			yTmp = y + *pRowAdd;
 		}
-		const float yBase = yTmp + FLOAT_8033166C;
-		float x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * DOUBLE_803313F8 + static_cast<double>(xBase));
-		float step = static_cast<float>(static_cast<double>(8 - count) * DOUBLE_803313F8);
+		const float* pYAdj = &FLOAT_8033166C;
+		const float yBase = yTmp + *pYAdj;
+		const double* pHalfD = &DOUBLE_803313F8;
+		float x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * *pHalfD + static_cast<double>(xBase));
+		float step = static_cast<float>(static_cast<double>(8 - count) * *pHalfD);
 
-		const float kSplineDiv = FLOAT_803314c0;
-		const float kZero = FLOAT_803313dc;
-		const float kRectSize = FLOAT_80331558;
-		const double kStepDelta = DOUBLE_80331420;
+		const float* pSplineDiv = &FLOAT_803314c0;
+		const float* pZeroK = &FLOAT_803313dc;
+		const float* pRectSize = &FLOAT_80331558;
+		const double* pStepDelta = &DOUBLE_80331420;
+		const float kSplineDiv = *pSplineDiv;
+		const float kZero = *pZeroK;
+		const float kRectSize = *pRectSize;
+		const double kStepDelta = *pStepDelta;
 
-		for (int i = 0; i < count; i++) {
-			float yAdd = FLOAT_803313dc;
+		for (i = 0; i < count; i++) {
+			const float* pZeroY = &FLOAT_803313dc;
+			float yAdd = *pZeroY;
 			const float t = step / kSplineDiv;
 			if (t >= gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 4]) {
 				yAdd = gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 3];
@@ -9355,16 +9377,20 @@ void CMenuPcs::DrawCMLife()
 						if (j == 0) {
 							yAdd = gWmLifeYOffsetSpline[j * 4 + 1];
 						} else {
+							const float* pC8s = &FLOAT_803314c8;
+							const float* pC4s = &FLOAT_803314c4;
+							const float* pCCs = &FLOAT_803314cc;
+							const float* pOneS = &FLOAT_803313e8;
 							float* const cur = gWmLifeYOffsetSpline + j * 4;
 							float* const prev = gWmLifeYOffsetSpline + (j - 1) * 4;
 							const float width = cur[0] - prev[0];
 							const float u = (t - prev[0]) / width;
 							const float u2 = u * u;
 							const float u3 = u2 * u;
-							yAdd = width * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) +
+							yAdd = width * (prev[3] * (u + (u3 - *pC8s * u2)) +
 							                cur[2] * (u3 - u2)) +
-							       (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-							        cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
+							       (prev[1] * (*pOneS + (*pC8s * u3 - *pC4s * u2)) +
+							        cur[1] * (*pCCs * u3 + *pC4s * u2));
 						}
 						break;
 					}

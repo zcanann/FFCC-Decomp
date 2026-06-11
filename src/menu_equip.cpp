@@ -14,6 +14,26 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
+extern const float kEquipZero = 0.0f;
+extern const double kEquipOneDouble = 1.0;
+extern const double kEquipWindowCenterX = 216.0;
+extern const double kEquipHalfDouble = 0.5;
+extern const double kEquipIntToDoubleBias = 4503601774854144.0;
+extern const float kEquipOne = 1.0f;
+extern const float kEquipColorMax = 255.0f;
+extern const float kEquipListFontScale = 0.9f;
+extern const float kEquipTextYOffset = 4.0f;
+extern const float kEquipMarkXOffset = 12.0f;
+extern const float kEquipMarkHeight = 24.0f;
+extern const float kEquipHelpCenterX = 320.0f;
+extern const float kEquipHalf = 0.5f;
+extern const float kEquipHelpY = 352.0f;
+extern const float kEquipHelpScale = 3.0f;
+extern const double kEquipZeroDouble = 0.0;
+extern const float kEquipInitU = 128.0f;
+extern const float kEquipInitV = 8.0f;
+extern const float kEquipSmallScale = 0.75f;
+
 #define kEquipZero 0.0f
 #define kEquipOneDouble 1.0
 #define kEquipWindowCenterX 216.0

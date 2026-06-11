@@ -10876,20 +10876,20 @@ LAB_next:
 				MenuPcs.DrawRect(0, FLOAT_80331468, rowY, FLOAT_803314D8, FLOAT_80331440,
 				         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
-				int memberCount = 0;
+				int totalWidth = 0;
 				if (*reinterpret_cast<int*>(slotData + 0x18) >= 0) {
-					memberCount = 1;
+					totalWidth = 1;
 				}
 				if (*reinterpret_cast<int*>(slotData + 0x1C) >= 0) {
-					memberCount++;
+					totalWidth++;
 				}
 				if (*reinterpret_cast<int*>(slotData + 0x20) >= 0) {
-					memberCount++;
+					totalWidth++;
 				}
 				if (*reinterpret_cast<int*>(slotData + 0x24) >= 0) {
-					memberCount++;
+					totalWidth++;
 				}
-				const int panelWidth = memberCount * 0x30 + 0x40;
+				const int panelWidth = totalWidth * 0x30 + 0x40;
 				capX += FLOAT_803314D8 + static_cast<float>(panelWidth);
 				MenuPcs.DrawRect(8, capX, rowY, FLOAT_803314D8, FLOAT_80331440,
 				         FLOAT_803313dc, FLOAT_803313dc,
@@ -10911,7 +10911,6 @@ LAB_next:
 					MenuPcs.DrawRect(0, FLOAT_80331520, rowY, static_cast<float>(digitWidths[10]), FLOAT_80331410,
 					         FLOAT_80331524, FLOAT_80331528, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 				} else {
-					int totalWidth;
 					for (int di = 0; di < digitCount; di++) {
 						if (digitCount == 1) {
 							totalWidth = digitWidths[*reinterpret_cast<int*>(slotData + 8) % 10];
@@ -10934,6 +10933,7 @@ LAB_next:
 					const double colSlope = DOUBLE_80331490;
 					const double rowSlope = DOUBLE_80331540;
 					const double rowBase = DOUBLE_80331538;
+					int* const dw = reinterpret_cast<int*>(rodataBase + 0x920);
 					for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 						int digit;
 						if (digitCount == 1) {
@@ -10943,7 +10943,7 @@ LAB_next:
 						} else {
 							digit = *reinterpret_cast<int*>(slotData + 8) % 10;
 						}
-						const int digitWidth = digitWidths[digit];
+						const int digitWidth = dw[digit];
 						const float digitWidthF = static_cast<float>(digitWidth);
 						MenuPcs.DrawRect(0, digitX, rowY, digitWidthF, FLOAT_80331410,
 						         static_cast<float>(colSlope * static_cast<float>(digit % 5)),
@@ -11068,8 +11068,8 @@ LAB_next:
 					}
 				}
 
-				unsigned char* const mapInfo = reinterpret_cast<unsigned char*>(rodataBase + 0xadc) +
-				                               *reinterpret_cast<int*>(slotData + 0x10) * 4;
+				unsigned char* mapInfo = reinterpret_cast<unsigned char*>(rodataBase + 0xadc);
+				mapInfo += *reinterpret_cast<int*>(slotData + 0x10) * 4;
 				CMaterial* material = MapMng.GetMaterialID(mapInfo[0]);
 				CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
 				TextureMan.SetTexture(static_cast<_GXTexMapID>(0), texture);

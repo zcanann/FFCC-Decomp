@@ -581,6 +581,7 @@ void JoyBus::ThreadMain(void* arg)
     unsigned int localBuf;
     unsigned int localWord;
     unsigned int localCmd;
+    unsigned int hitInfo;
     unsigned short localCrc[2];
 
     threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
@@ -1076,7 +1077,7 @@ timeout_expiry:
 
                 if ((int)GbaQue.GetChgHitFlg(threadParam->m_portIndex) != 0)
                 {
-                    unsigned int hitInfo = GbaQue.GetHitEInfo(threadParam->m_portIndex);
+                    hitInfo = GbaQue.GetHitEInfo(threadParam->m_portIndex);
                     if (SendHitEnemy(threadParam->m_portIndex, (char)reinterpret_cast<short*>(&hitInfo)[0],
                                      reinterpret_cast<short*>(&hitInfo)[1]) < 0)
                     {
@@ -1216,8 +1217,8 @@ timeout_expiry:
 
             if ((int)GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
             {
-                localBuf = GbaQue.GetMoney(threadParam->m_portIndex);
-                if (SetMoney(threadParam->m_portIndex, localBuf) == 0)
+                localWord = GbaQue.GetMoney(threadParam->m_portIndex);
+                if (SetMoney(threadParam->m_portIndex, localWord) == 0)
                 {
                     GbaQue.ClrMoneyFlg(threadParam->m_portIndex);
                 }
@@ -1287,8 +1288,8 @@ timeout_expiry:
 
             if ((int)GbaQue.GetMoneyFlg(threadParam->m_portIndex) == 1)
             {
-                localBuf = GbaQue.GetMoney(threadParam->m_portIndex);
-                if (SetMoney(threadParam->m_portIndex, localBuf) == 0)
+                localWord = GbaQue.GetMoney(threadParam->m_portIndex);
+                if (SetMoney(threadParam->m_portIndex, localWord) == 0)
                 {
                     GbaQue.ClrMoneyFlg(threadParam->m_portIndex);
                 }

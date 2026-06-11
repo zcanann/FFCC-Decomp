@@ -1687,9 +1687,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				newObject->m_sp = newObject->m_localBase + func->m_localCount;
 			}
 
-			*reinterpret_cast<s16*>(&newObject->m_codePos) =
-			    static_cast<s16>((*reinterpret_cast<s16*>(&newObject->m_codePos) & 0xF)
-			                     | (static_cast<s16>(func->m_index) << 4));
+			newObject->m_codeIndex.m_codeFunc = static_cast<s16>(func->m_index);
 			newObject->m_codeIndex.m_codeOffset = 0;
 			newObject->m_flagBits.m_callFlag = 1;
 			newObject->m_waitCounter = 0;
@@ -1701,9 +1699,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			newObject->m_sp++;
 			*newObject->m_sp = prevActive;
 			newObject->m_sp++;
-			*newObject->m_sp = static_cast<unsigned int>(prevArgCount)
-			                  | ((static_cast<unsigned int>(prevWaitCounter) << 16)
-			                     | (static_cast<unsigned int>(prevReqFlags) << 15));
+			*newObject->m_sp =
+			    static_cast<u32>(prevArgCount | ((prevWaitCounter << 16) | (prevReqFlags << 15)));
 			newObject->m_sp++;
 
 			int clearCount = func->m_localCount - func->m_argCount;
@@ -1718,7 +1715,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			objectFrame(newObject);
 			--newObject->m_sp;
 			object->m_sp -= func->m_argCount;
-			*object->m_sp++ = static_cast<int>(newObject->m_particleId);
+			*object->m_sp = static_cast<int>(newObject->m_particleId);
+			object->m_sp++;
 			request(newObject, 2, 3, 0, 0);
 			request(newObject, 2, 2, 0, 0);
 			newObject->onNewFinished();

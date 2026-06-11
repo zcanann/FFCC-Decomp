@@ -2669,45 +2669,42 @@ void CGMonObj::teleport(
 	Vec* teleportPoints, int& teleportIndex, Vec& startPos
 )
 {
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	const int blendStartFrame = startFrame + 8;
 	const int blendEndPlusFrame = blendEndFrame + 8;
 	const int blendFrameCount = blendEndFrame - blendStartFrame;
 
-	if (prgObj->m_stateFrame == 0) {
+	if (m_stateFrame == 0) {
 		int pdtNo;
-		object->m_bgColMask &= 0xFFF3FFFC;
-		object->m_weaponNodeFlagBits.m_unk10 = 0;
-		object->m_groundHitOffset.z = kMonObjBossZero;
-		object->m_groundHitOffset.y = kMonObjBossZero;
-		object->m_groundHitOffset.x = kMonObjBossZero;
+		m_bgColMask &= 0xFFF3FFFC;
+		m_weaponNodeFlagBits.m_unk10 = 0;
+		m_groundHitOffset.z = kMonObjBossZero;
+		m_groundHitOffset.y = kMonObjBossZero;
+		m_groundHitOffset.x = kMonObjBossZero;
 
-		prgObj->reqAnim(animId, 0, 0);
-		prgObj->playSe3D(seStart, 0x32, 0x1C2, 0, 0);
+		reqAnim(animId, 0, 0);
+		playSe3D(seStart, 0x32, 0x1C2, 0, 0);
 
-			pdtNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticle(particleStart | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), object, kMonObjBossOne, 0);
+			pdtNo = m_charaModelHandle->GetPdtSlot();
+		putParticle(particleStart | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), this, kMonObjBossOne, 0);
 
 		if (mode == 0) {
-			pdtNo = object->m_charaModelHandle->GetPdtSlot();
-			prgObj->putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), &object->m_worldPosition, kMonObjBossOne, 0);
+			pdtNo = m_charaModelHandle->GetPdtSlot();
+			putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &m_worldPosition, kMonObjBossOne, 0);
 		} else {
-			pdtNo = object->m_charaModelHandle->GetPdtSlot();
-			prgObj->putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), object, kMonObjBossOne, 0);
+			pdtNo = m_charaModelHandle->GetPdtSlot();
+			putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), this, kMonObjBossOne, 0);
 		}
 	}
 
-	const int stateFrame = prgObj->m_stateFrame;
+	const int stateFrame = m_stateFrame;
 
 	if (stateFrame <= blendStartFrame) {
 		if (startFrame <= stateFrame) {
 			const float angle = kMonObjBossHalfPi * static_cast<float>(stateFrame - startFrame) * kMonObjBossOneEighth;
 			const float wave = static_cast<float>(cos(angle));
-			object->m_rotationZ = wave;
-			object->m_rotationX = wave;
-			object->m_rotationY = kMonObjBossOne + static_cast<float>(sin(angle));
+			m_rotationZ = wave;
+			m_rotationX = wave;
+			m_rotationY = kMonObjBossOne + static_cast<float>(sin(angle));
 		}
 	} else {
 		if (stateFrame <= blendEndFrame) {
@@ -2718,10 +2715,10 @@ void CGMonObj::teleport(
 				} while (nextIndex == teleportIndex);
 
 				teleportIndex = nextIndex;
-				startPos = object->m_worldPosition;
+				startPos = m_worldPosition;
 
 				if (mode == 1) {
-					object->m_displayFlags &= 0xFFFFFFFE;
+					m_displayFlags &= 0xFFFFFFFE;
 				}
 			}
 
@@ -2736,7 +2733,7 @@ void CGMonObj::teleport(
 			scaledPointCopy.y = scaledPoint.y;
 			scaledPointCopy.z = scaledPoint.z;
 
-			const CVector& current = CVector(object->m_worldPosition);
+			const CVector& current = CVector(m_worldPosition);
 			CVector scaledCurrent;
 			PSVECScale(reinterpret_cast<Vec*>(const_cast<CVector*>(&current)), reinterpret_cast<Vec*>(&scaledCurrent), blend);
 
@@ -2751,43 +2748,43 @@ void CGMonObj::teleport(
 			blendedCopy.x = blended.x;
 			blendedCopy.y = blended.y;
 			blendedCopy.z = blended.z;
-			object->m_worldPosition.x = blendedCopy.x;
-			object->m_worldPosition.y = blendedCopy.y;
-			object->m_worldPosition.z = blendedCopy.z;
+			m_worldPosition.x = blendedCopy.x;
+			m_worldPosition.y = blendedCopy.y;
+			m_worldPosition.z = blendedCopy.z;
 
 			if (mode == 1 && stateFrame == blendEndFrame - 0x2A) {
-				int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-				prgObj->putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), &teleportPoints[teleportIndex], kMonObjBossOne, 0);
-				prgObj->playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
+				int pdtNo = m_charaModelHandle->GetPdtSlot();
+				putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &teleportPoints[teleportIndex], kMonObjBossOne, 0);
+				playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
 			}
 		} else if (stateFrame <= blendEndPlusFrame) {
 			if (stateFrame == blendEndFrame + 1) {
 				if (mode == 0) {
-					int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-					prgObj->putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), &object->m_worldPosition, kMonObjBossOne, 0);
-					prgObj->playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
+					int pdtNo = m_charaModelHandle->GetPdtSlot();
+					putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &m_worldPosition, kMonObjBossOne, 0);
+					playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
 				}
 
-				object->m_bgColMask |= 3;
-				object->m_weaponNodeFlagBits.m_unk10 = 1;
-				object->m_groundHitOffset.z = kMonObjBossZero;
-				object->m_groundHitOffset.y = kMonObjBossZero;
-				object->m_groundHitOffset.x = kMonObjBossZero;
+				m_bgColMask |= 3;
+				m_weaponNodeFlagBits.m_unk10 = 1;
+				m_groundHitOffset.z = kMonObjBossZero;
+				m_groundHitOffset.y = kMonObjBossZero;
+				m_groundHitOffset.x = kMonObjBossZero;
 
 				if (mode == 1) {
-					object->m_displayFlags |= 1;
+					m_displayFlags |= 1;
 				}
 			}
 
 			const float angle = kMonObjBossHalfPi * (kMonObjBossOne - static_cast<float>(stateFrame - blendEndFrame) * kMonObjBossOneEighth);
 			const float wave = static_cast<float>(cos(angle));
-			object->m_rotationZ = wave;
-			object->m_rotationX = wave;
-			object->m_rotationY = kMonObjBossOne + static_cast<float>(sin(angle));
+			m_rotationZ = wave;
+			m_rotationX = wave;
+			m_rotationY = kMonObjBossOne + static_cast<float>(sin(angle));
 
 			if (stateFrame == blendEndPlusFrame) {
-				object->m_bgColMask |= 0xC0000;
-				setAttackAfter(*reinterpret_cast<int*>(mon + 0x560));
+				m_bgColMask |= 0xC0000;
+				setAttackAfter(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560));
 			}
 		}
 	}

@@ -14,6 +14,8 @@ extern f32 gPppDefaultValueBuffer[];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+#pragma exceptions on
+
 extern const float kYmTracer2UvMin;
 extern const float kYmTracer2UvMax;
 

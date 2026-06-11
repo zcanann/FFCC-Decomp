@@ -13,6 +13,8 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
+#pragma exceptions on
+
 static const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
 
 struct PARTICLE_DATA {
@@ -266,6 +268,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma exceptions off
 void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
 {
     VYmMiasma* work = YmMiasmaWork(pppYmMiasma_, param_2);
@@ -275,6 +278,7 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
         pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(heap));
     }
 }
+#pragma exceptions on
 
 /*
  * --INFO--

@@ -59,7 +59,6 @@ inline void CMenuPcs::MoneySetPlace(int row)
 			*place = static_cast<signed char>(digit);
 			gil = gil % digitPlace;
 		}
-		place++;
 		digitIndex++;
 		place++;
 		digitPlace /= 10;

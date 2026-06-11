@@ -3438,7 +3438,7 @@ int CGCharaObj::calcCastTime(int itemId)
 		castScale = kOneF32;
 	}
 
-	SCharaItemRow* typeRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+	SCharaItemRow* typeRows = castRows;
 	int itemNo = typeRows[itemId].m_effect;
 	int itemType = typeRows[itemId].m_particleLife;
 	int result;

@@ -6576,84 +6576,33 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
 
-	// TODO: This 3E check feels like a < 40 check in shorts (ie size 20, cmp < 20). Might need to unfuck some of this.
-
     // Need room for *two* commands (this early check is against the caller's portIndex)
     if ((int)m_cmdCount[portIndex] >= 0x3E)
 	{
         return -1;
     }
 
-	{
-		cmdBytes[0] = 0x1A;
-		cmdBytes[1] = 0;
-		cmdBytes[2] = money >> 24;
-		cmdBytes[3] = money >> 16;
-		unsigned int word = cmd;
+    cmdBytes[0] = 0x1A;
+    cmdBytes[1] = 0;
+    cmdBytes[2] = money >> 24;
+    cmdBytes[3] = money >> 16;
 
-		if (static_cast<signed char>(m_threadRunningMask) == 0)
-		{
-			result = 0;
-		}
-		else
-		{
+    result = SetSendQueue(&m_threadParams[portIndex], cmd);
 
-			OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+    if (result != 0)
+    {
+        return result;
+    }
 
-			if ((int)m_cmdCount[m_threadParams[portIndex].m_portIndex] >= 0x40)
-			{
-				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
-				result = -1;
-			}
-			else
-			{
-				m_cmdQueueData[m_threadParams[portIndex].m_portIndex][m_cmdCount[m_threadParams[portIndex].m_portIndex]] = word;
-				m_cmdCount[m_threadParams[portIndex].m_portIndex]++;
-				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
-				result = 0;
-			}
-		}
+    cmd = 0;
+    cmdBytes[0] = 0x5A;
+    cmdBytes[1] = money >> 8;
+    cmdBytes[2] = money;
 
-		if (result != 0)
-		{
-			return result;
-		}
-	}
+    result = SetSendQueue(&m_threadParams[portIndex], cmd);
 
-	{
-		cmd = 0;
-		cmdBytes[0] = 0x5A;
-		cmdBytes[1] = money >> 8;
-		cmdBytes[2] = money;
-		unsigned int word = cmd;
-
-		if (static_cast<signed char>(m_threadRunningMask) == 0)
-		{
-			result = 0;
-		}
-		else
-		{
-
-			OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
-
-			if ((int)m_cmdCount[m_threadParams[portIndex].m_portIndex] >= 0x40)
-			{
-				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
-				result = -1;
-			}
-			else
-			{
-				m_cmdQueueData[m_threadParams[portIndex].m_portIndex][m_cmdCount[m_threadParams[portIndex].m_portIndex]] = word;
-				m_cmdCount[m_threadParams[portIndex].m_portIndex]++;
-				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
-				result = 0;
-			}
-		}
-	}
-
-		return result;
+    return result;
 }
-
 
 /*
  * --INFO--

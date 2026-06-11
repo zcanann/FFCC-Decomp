@@ -2277,7 +2277,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				putParticleBindTrace(0x10D, m_particleSlots[18], this, FLOAT_803319AC * m_attackColRadius, 0);
 				break;
 			case 2:
-				m_castTimeTick = 0;
+				m_stateTick = 0;
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80000U) != 0) {
 						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);

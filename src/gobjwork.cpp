@@ -2533,6 +2533,8 @@ void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
 void CCaravanWork::SortBeforeReturnWorldMap()
 {
 	char* fmtBase = sWorldMapSortFormatBlock;
+	short lhs;
+	short rhs;
 
 	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
 
@@ -2550,7 +2552,7 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 
 	for (int i = 0; i < 0x3F; i++) {
 		for (int j = i + 1; j < 0x40; j++) {
-			short lhs = m_inventoryItems[i];
+			lhs = m_inventoryItems[i];
 
 			if (lhs <= 0) {
 				if (m_inventoryItems[j] <= 0) {
@@ -2574,7 +2576,7 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 					}
 				}
 			} else {
-				short rhs = m_inventoryItems[j];
+				rhs = m_inventoryItems[j];
 				if ((rhs > 0) && (lhs > rhs)) {
 					m_inventoryItems[i] = rhs;
 					m_inventoryItems[j] = lhs;

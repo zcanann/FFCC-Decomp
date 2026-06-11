@@ -982,7 +982,7 @@ int gSingMenuForcedSelection;
 extern "C" SingMenuTextureRef s_singleMenuModelTextureTable[];
 extern float gSingMenuRaceModelScales[];
 extern float gSingMenuRaceModelYOffset[];
-float FLOAT_8032ea78 = 1.0f;
+float FLOAT_8032ea78 = 0.8999999761581421f;
 
 static inline const char* GetSingWinMessage(int staticText, const char* dynamicText, int useDynamic)
 {

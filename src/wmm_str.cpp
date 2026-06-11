@@ -2,16 +2,23 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 
-extern const char sWmmNo[];
-extern const char sWmmNein[];
-extern const char sWmmNon[];
-extern const char sWmmSlotB[];
+const char sWmmEmptyEn[7] = "Empty.";
+const char sWmmEmptyIt[7] = "Vuoto.";
+const char sWmmEmptyFr[5] = "Vide";
+const char sWmmEmptyEs[8] = { 'V', 'a', 'c', '\xED', 'o', '.', '\0', '\0' };
+const char sWmmBlankText[4] = "";
+const char sWmmWerdenText[8] = "werden.";
+const char sWmmAuswahlText[8] = "Auswahl";
+const char sWmmNo[3] = "No";
+const char sWmmNein[5] = "Nein";
+const char sWmmNon[4] = "Non";
+const char sWmmSlotB[7] = "Slot B";
 extern const char sWmmSteckplatzB[];
 extern const char sWmmRanuraB[];
 
-extern const float kWmmWindowTextScale = 1.0f;
-extern const double kWmmCenteringHalf = 0.5;
-extern const double kWmmUnsignedToDoubleBias = 4503601774854144.0;
+const float kWmmWindowTextScale = 1.0f;
+const double kWmmCenteringHalf = 0.5;
+const double kWmmUnsignedToDoubleBias = 4503601774854144.0;
 
 extern const char* s_McStr_en[];
 extern const char* s_McStr_de[];

@@ -11451,23 +11451,30 @@ void CMenuPcs::CalcMcObj()
 			Mtx rotXMtx;
 			Mtx rotYMtx;
 
+			const float* pB0 = &FLOAT_803314B0;
+			const float* pB4 = &FLOAT_803314B4;
+			const float* pZeroB = &FLOAT_803313dc;
+			const float* pHalfB = &FLOAT_80331434;
+			const float* pB8 = &FLOAT_803314B8;
+			const float* pBC = &FLOAT_803314bc;
 			panelState[0] = 1;
-			reinterpret_cast<float*>(panelState)[7] = FLOAT_803314B0;
-			reinterpret_cast<float*>(panelState)[8] = FLOAT_803314B4;
-			reinterpret_cast<float*>(panelState)[9] = FLOAT_803313dc;
-			reinterpret_cast<float*>(panelState)[0xD] = FLOAT_80331434;
-			reinterpret_cast<float*>(panelState)[0xE] = FLOAT_80331434;
-			reinterpret_cast<float*>(panelState)[0xF] = FLOAT_80331434;
-			reinterpret_cast<float*>(panelState)[10] = FLOAT_803314B8;
-			reinterpret_cast<float*>(panelState)[0xB] = reinterpret_cast<float*>(panelState)[0xB] + FLOAT_803314bc;
+			reinterpret_cast<float*>(panelState)[7] = *pB0;
+			reinterpret_cast<float*>(panelState)[8] = *pB4;
+			reinterpret_cast<float*>(panelState)[9] = *pZeroB;
+			reinterpret_cast<float*>(panelState)[0xD] = *pHalfB;
+			reinterpret_cast<float*>(panelState)[0xE] = *pHalfB;
+			reinterpret_cast<float*>(panelState)[0xF] = *pHalfB;
+			reinterpret_cast<float*>(panelState)[10] = *pB8;
+			reinterpret_cast<float*>(panelState)[0xB] = reinterpret_cast<float*>(panelState)[0xB] + *pBC;
 
 			reinterpret_cast<float*>(panelState)[8] =
 			    reinterpret_cast<float*>(panelState)[8] +
 			    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelYOffsetSplineCount),
 			                                   static_cast<float>(static_cast<int>(panelState[1]))));
 
+			const float* pBC2 = &FLOAT_803314bc;
 			reinterpret_cast<float*>(panelState)[0xB] =
-			    FLOAT_803314bc *
+			    *pBC2 *
 			    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelRotationSplineCount),
 			                                   static_cast<float>(static_cast<int>(panelState[1]))));
 			PSMTXScale(scaleMtx, reinterpret_cast<float*>(panelState)[0xD], reinterpret_cast<float*>(panelState)[0xE],

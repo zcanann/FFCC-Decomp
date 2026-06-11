@@ -10502,8 +10502,8 @@ void CMenuPcs::DrawMainMenuSub()
 		}
 
 		int view = reinterpret_cast<int>(m_wm.m_worldObjData) + drawOrder[orderIndex] * 0x50;
-		Mtx44 projectionMtx0;
 		Mtx lookAtMtx0;
+		Mtx44 projectionMtx0;
 		C_MTXPerspective(projectionMtx0, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx0, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx0, CameraPcs.m_screenMatrix);
@@ -10540,8 +10540,8 @@ void CMenuPcs::DrawMainMenuSub()
 
 		GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
 		view = reinterpret_cast<int>(m_wm.m_worldObjData) + drawOrder[orderIndex] * 0x50;
-		Mtx44 projectionMtx1;
 		Mtx lookAtMtx1;
+		Mtx44 projectionMtx1;
 		C_MTXPerspective(projectionMtx1, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx1, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx1, CameraPcs.m_screenMatrix);

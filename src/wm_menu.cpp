@@ -10395,9 +10395,9 @@ void CMenuPcs::DrawMainMenuSub()
 	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-	CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-	CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
-	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x740), reinterpret_cast<Vec*>(&up), reinterpret_cast<Point3d*>(&target));
+	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x740),
+	            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
+	            reinterpret_cast<Point3d*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
 	PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(this) + 0x744));
 	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 	CharaPcs.InitEnv(5);

@@ -3502,10 +3502,8 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 
     baseX = static_cast<int>(baseX + 20.0);
     offsU = static_cast<int>(static_cast<double>(offsU) + 8.0);
-    float titleX = static_cast<float>(baseX);
-    float titleY = static_cast<float>(offsU);
     MenuPcs.DrawRect(
-        0, titleX, titleY, 208.0f, 24.0f,
+        0, static_cast<float>(baseX), static_cast<float>(offsU), 208.0f, 24.0f,
         0.0f, static_cast<float>(page * 0x18), 1.0f, 1.0f, 0.0f);
 }
 #pragma opt_propagation on

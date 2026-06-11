@@ -1391,8 +1391,8 @@ void CMenuPcs::CmdDraw()
  */
 unsigned int CMenuPcs::CmdCtrlCur()
 {
-	unsigned int press;
-	s16 hold;
+	int press;
+	int hold;
 	s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	const int padLock = Pad.m_debugPadLock;
@@ -1409,7 +1409,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		int __p20 = padIndex;
 		int __p18 = __p20;
-		press = Pad.GetPadInputs()[__p18].buttonDown[0];
+		const int pressRaw = Pad.GetPadInputs()[__p18].buttonDown[0];
+		press = static_cast<s16>(static_cast<u16>(pressRaw));
 	}
 
 	blocked = false;
@@ -1423,7 +1424,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		int __p14 = padIndex;
-		hold = static_cast<s16>(Pad.GetPadInputs()[__p14].repeatButton);
+		const int holdRaw = Pad.GetPadInputs()[__p14].repeatButton;
+		hold = static_cast<s16>(static_cast<u16>(holdRaw));
 	}
 
 	if (hold == 0) {

@@ -2533,7 +2533,7 @@ renderedDone:
         Mtx rotation;
 
         CameraPcs.GetWorldMapMatrix(matrix);
-        if (*object->m_localBase != 0) {
+        if (static_cast<int>(*object->m_localBase) != 0) {
             PSMTXIdentity(matrix);
         }
 
@@ -3179,11 +3179,11 @@ renderedDone:
         outResult = 0;
         break;
     case -0x74: {
-        unsigned short buttonDown = Pad.GetGbaButtonDown(*object->m_localBase);
+        short buttonDown = Pad.GetGbaButtonDown(*object->m_localBase);
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttonDown &= ~0xC00;
         }
-        this->push(object, static_cast<int>(static_cast<short>(buttonDown)));
+        this->push(object, buttonDown);
         outResult = 0;
         break;
     }
@@ -3509,7 +3509,7 @@ renderedDone:
         break;
     case -0xA6:
         this->push(
-            object, Game.m_caravanWorkArr[*object->m_localBase].GetEvtWord(object->m_localBase[1]));
+            object, static_cast<short>(Game.m_caravanWorkArr[*object->m_localBase].GetEvtWord(object->m_localBase[1])));
         outResult = 0;
         break;
     case -0xA7:
@@ -3528,7 +3528,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0xAB:
-        this->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_letterMeta[object->m_localBase[1]]);
+        this->push(object, static_cast<signed char>(Game.m_caravanWorkArr[*object->m_localBase].m_letterMeta[object->m_localBase[1]]));
         outResult = 0;
         break;
     case -0xAA:
@@ -3720,7 +3720,7 @@ renderedDone:
         MenuPcs.m_battleHud.m_worldPos[0] = localFloats[0];
         MenuPcs.m_battleHud.m_worldPos[1] = localFloats[1];
         MenuPcs.m_battleHud.m_worldPos[2] = localFloats[2];
-        if (object->m_localBase[3] < MenuPcs.m_battleHud.m_gaugeTarget) {
+        if (static_cast<int>(object->m_localBase[3]) < MenuPcs.m_battleHud.m_gaugeTarget) {
             MenuPcs.m_battleHud.m_gaugeCounter = 0x10;
         }
         MenuPcs.m_battleHud.m_gaugeTarget = object->m_localBase[3];

@@ -10398,7 +10398,7 @@ void CMenuPcs::DrawMainMenuSub()
 	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x740),
 	            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
 	            reinterpret_cast<Point3d*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
-	PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(this) + 0x744));
+	PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(&m_wm));
 	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 	CharaPcs.InitEnv(5);
 	GXSetColorUpdate(0);
@@ -10507,10 +10507,10 @@ void CMenuPcs::DrawMainMenuSub()
 		C_MTXPerspective(projectionMtx0, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx0, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx0, CameraPcs.m_screenMatrix);
-		CVector target0(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-		CVector up0(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
-		C_MTXLookAt(lookAtMtx0, reinterpret_cast<Point3d*>(view + 0x10), reinterpret_cast<Vec*>(&up0), reinterpret_cast<Point3d*>(&target0));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(this) + 0x744));
+		C_MTXLookAt(lookAtMtx0, reinterpret_cast<Point3d*>(view + 0x10),
+		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
+		            reinterpret_cast<Point3d*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(&m_wm));
 		PSMTXCopy(lookAtMtx0, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
@@ -10548,7 +10548,7 @@ void CMenuPcs::DrawMainMenuSub()
 		CVector target1(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
 		CVector up1(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 		C_MTXLookAt(lookAtMtx1, reinterpret_cast<Point3d*>(view + 0x10), reinterpret_cast<Vec*>(&up1), reinterpret_cast<Point3d*>(&target1));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(this) + 0x744));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(&m_wm));
 		PSMTXCopy(lookAtMtx1, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);

@@ -385,11 +385,11 @@ void CMaterialEditorPcs::SetUSBData()
 
             u8* tlutSrc;
             if (headerBuffer[1] == 4) {
-                tlutSrc = reinterpret_cast<u8*>(headerBuffer) + (headerBuffer[2] * headerBuffer[3]) / 2;
+                tlutSrc = reinterpret_cast<u8*>(headerBuffer + 8) + (headerBuffer[2] * headerBuffer[3]) / 2;
             } else {
-                tlutSrc = reinterpret_cast<u8*>(headerBuffer) + headerBuffer[2] * headerBuffer[3];
+                tlutSrc = reinterpret_cast<u8*>(headerBuffer + 8) + headerBuffer[2] * headerBuffer[3];
             }
-            memcpy(this->m_tlutData[this->m_loadedTextureCount], tlutSrc + 0x10, tlutDataSize);
+            memcpy(this->m_tlutData[this->m_loadedTextureCount], tlutSrc, tlutDataSize);
             DCFlushRange(this->m_tlutData[this->m_loadedTextureCount], tlutDataSize);
         }
 

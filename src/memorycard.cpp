@@ -195,18 +195,16 @@ static inline u32 CalcSaveCrc(u8* data)
     u8* ptr = data;
     while (--count >= 0)
     {
-        u8 byte = *ptr;
+        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr];
         ptr++;
-        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ byte];
     }
 
     ptr = data + 0x20;
     count = 0x8BB0;
     while (--count >= 0)
     {
-        u8 byte = *ptr;
+        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr];
         ptr++;
-        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ byte];
     }
 
     return ~crc;
@@ -381,9 +379,9 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
  */
 unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
 {
-    int count;
     unsigned char* ptr;
     unsigned char* ptr2;
+    int count;
     unsigned int crc;
     unsigned char* crcData;
 

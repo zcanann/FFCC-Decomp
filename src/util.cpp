@@ -1333,8 +1333,9 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	PSVECScale(&tan1, &tan1, scale);
 
 	UtilHermiteBasis hermite = kUtilHermiteBasis;
-	float t3;
+	float pos;
 	float t2;
+	float t3;
 
 	t2 = t * t;
 	t3 = t2 * t;
@@ -1348,7 +1349,7 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	hermite.m_value[2] = t + (t3 - (coeff2 * t2));
 	hermite.m_value[3] = t3 - t2;
 
-	float pos = hermite.m_value[1] * p2.x;
+	pos = hermite.m_value[1] * p2.x;
 	pos += hermite.m_value[0] * p1.x;
 	pos += hermite.m_value[2] * tan0.x;
 	pos += hermite.m_value[3] * tan1.x;

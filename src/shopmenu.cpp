@@ -2449,8 +2449,8 @@ void CShopMenu::DrawShop0()
     ShopMenuTopMenuEntry* entry2 = s_shopMenuTopMenuEntries;
     ShopMenuTopMenuEntry* entry = entry2;
     for (int i = 0; i < 3; i++, entry++) {
-        int highlight = (i == m_topChoice) ? 1 : 0;
         s_currentShopMenuTopMenuEntry = entry;
+        int highlight = (m_topChoice == i) ? 1 : 0;
 
         Graphic.SetDrawDoneDebugData(0x1E);
         int x = s_currentShopMenuTopMenuEntry->x;

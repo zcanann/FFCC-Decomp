@@ -221,7 +221,8 @@ struct CmdState {
 	unsigned char pad_0009[0x0B - 0x09];
 	s8 initialized;
 	u8 unitePanelInitialized;
-	unsigned char pad_000D[0x10 - 0x0D];
+	u8 uniteOpenFlag;
+	unsigned char pad_000E[0x10 - 0x0E];
 	s16 animState;
 	s16 phase;
 	s16 uniteState;
@@ -1422,46 +1423,54 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	s32 mode = GetCmdStateView(this)->mode;
 
 	if (mode == 0) {
-		u16 cmdCount = caravanWork->m_numCmdListSlots;
+		const s32 cmdCount = caravanWork->m_numCmdListSlots;
 
 		if ((hold & 8) != 0) {
-			if (!(GetCmdStateView(this)->selected < 3)) {
-				GetCmdStateView(this)->selected--;
+			s16* cur = GetCmdStateSelections(GetCmdStateView(this)) + mode;
+			if (*cur > 2) {
+				(*cur)--;
 			} else {
-				GetCmdStateView(this)->selected = static_cast<s16>(cmdCount - 1);
+				*cur = static_cast<s16>(cmdCount - 1);
 			}
 
-			int cursor = GetCmdStateView(this)->selected;
+			s16* cur2 = GetCmdStateSelections(GetCmdStateView(this)) + mode;
+			const int cursor = *cur2;
 			if (caravanWork->m_commandListExtra[cursor] < 0) {
-				if (!(!(caravanWork->m_commandListExtra[cursor - 1] < 0))) {
-					if (caravanWork->m_commandListExtra[cursor - 2] >= 0) {
-						GetCmdStateView(this)->selected = static_cast<s16>(cursor - 2);
-					}
+				const int m1 = cursor - 1;
+				if (caravanWork->m_commandListExtra[m1] >= 0) {
+					*cur2 = static_cast<s16>(m1);
 				} else {
-					GetCmdStateView(this)->selected = static_cast<s16>(cursor - 1);
+					const int m2 = cursor - 2;
+					if (caravanWork->m_commandListExtra[m2] >= 0) {
+						*cur2 = static_cast<s16>(m2);
+					}
 				}
 			}
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		} else {
 			if ((hold & 4) != 0) {
-				if (GetCmdStateView(this)->selected < cmdCount - 1) {
-					GetCmdStateView(this)->selected++;
+				s16* cur = GetCmdStateSelections(GetCmdStateView(this)) + mode;
+				if (*cur < cmdCount - 1) {
+					(*cur)++;
 				} else {
-					GetCmdStateView(this)->selected = 2;
+					*cur = 2;
 				}
 
-				int cursor = GetCmdStateView(this)->selected;
-				int __p14 = cursor;
-				if (caravanWork->m_commandListExtra[__p14] < 0) {
-					if (!(caravanWork->m_commandListExtra[cursor + 1] < 0)) {
-						GetCmdStateView(this)->selected = static_cast<s16>(cursor + 1);
+				s16* cur2 = GetCmdStateSelections(GetCmdStateView(this)) + mode;
+				const int cursor = *cur2;
+				if (caravanWork->m_commandListExtra[cursor] < 0) {
+					const int p1 = cursor + 1;
+					if (caravanWork->m_commandListExtra[p1] >= 0) {
+						*cur2 = static_cast<s16>(p1);
 					} else {
-						if (caravanWork->m_commandListExtra[cursor + 2] >= 0) {
-							GetCmdStateView(this)->selected = static_cast<s16>(cursor + 2);
+						const int p2 = cursor + 2;
+						if (caravanWork->m_commandListExtra[p2] >= 0) {
+							*cur2 = static_cast<s16>(p2);
 						}
 					}
-					if (GetCmdStateView(this)->selected > cmdCount - 1) {
-						GetCmdStateView(this)->selected = 2;
+					s16* cur3 = GetCmdStateSelections(GetCmdStateView(this)) + mode;
+					if (*cur3 > cmdCount - 1) {
+						*cur3 = 2;
 					}
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -1480,8 +1489,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				return 1;
 			}
 			if ((press & 0x100) != 0) {
-				if (!(caravanWork->m_commandListExtra[GetCmdStateView(this)->selected] == 0)) {
-					GetCmdStateView(this)->submenuFlag = 0;
+				if (!(caravanWork->m_commandListExtra[GetCmdStateSelections(GetCmdStateView(this))[mode]] == 0)) {
+					GetCmdStateView(this)->unitePanelInitialized = 0;
 					GetCmdStateView(this)->mode = 2;
 				} else {
 					GetCmdStateView(this)->mode = 1;
@@ -1491,14 +1500,14 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			} else {
 				if ((press & 0x200) != 0) {
-					GetCmdStateView(this)->submenuFlag = 1;
+					GetCmdStateView(this)->uniteOpenFlag = 1;
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
 					return 1;
 				}
 			}
 		}
 	} else if (mode == 1) {
-		int itemCount = static_cast<int>(list[0]);
+		int itemCount = static_cast<int>(reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0))[0]);
 
 		if (!((hold & 8) == 0)) {
 			if (!(GetCmdStateView(this)->itemSelected == 0)) {

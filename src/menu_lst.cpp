@@ -56,7 +56,7 @@ void CMenuPcs::MLstDraw()
 
 	short menuMode = this->m_menuLstState->mode;
 	MenuLstEntry* item = this->m_menuLstList->entries;
-	float rowHeight = kMLstRowHeight;
+	float rowHeight;
 
 	for (int i = 0; i < this->m_menuLstList->count; i++, item++) {
 		int tex = item->tex;
@@ -85,6 +85,7 @@ void CMenuPcs::MLstDraw()
 			MenuPcs.DrawRect(0, x, y, w, h, zero, v, item->z, item->z, zero);
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5c));
+			rowHeight = kMLstRowHeight;
 			float iconX = (float)((double)item->x - kMLstRowHeight * kMLstHalfDouble);
 			float iconY = (float)(item->y - 6);
 			v = zero;

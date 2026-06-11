@@ -202,7 +202,7 @@ static inline void freeStageBlockBase(void* ptr, const char* strBase)
             block->m_next->m_prev = block->m_prev;
         }
 
-        block->m_stage->m_allocCount -= 1;
+        blockFromPayload(ptr)->m_stage->m_allocCount -= 1;
     }
 }
 

@@ -1296,8 +1296,8 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	}
 	clone->m_texAnimSet = (ModelTexAnimSet(this) != 0) ? ModelTexAnimSet(this)->Duplicate(stage) : 0;
 
-	clone->m_curFrame = 0.0f;
 	clone->m_time = 0.0f;
+	clone->m_curFrame = 0.0f;
 	clone->m_dynJitter.x = 0.0f;
 	clone->m_dynJitter.y = 0.0f;
 	clone->m_dynJitter.z = 0.0f;

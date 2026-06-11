@@ -3638,7 +3638,7 @@ void CGCharaObj::combi2()
 	for (int i = 1; i < candidateCount; i++) {
 		CGPartyObj** slot = &candidates[i];
 		if (kQuadObjDebugHeight < PSVECDistance(&CharaObjComboCenter(candidates[0]), &CharaObjComboCenter(*slot))) {
-			for (int remaining = (candidateCount - 1) - i; remaining != 0; remaining--) {
+			for (int k = i; k < candidateCount - 1; k++) {
 				slot[0] = slot[1];
 				slot++;
 			}

@@ -4833,7 +4833,6 @@ void CMenuPcs::DrawCMakeMenu()
 	extern double DOUBLE_803314E8;
 	extern double DOUBLE_803313F8;
 	extern double DOUBLE_803314D0;
-	unsigned int ti;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	short state = m_wmWorldState->m_mainState;
@@ -4930,7 +4929,7 @@ void CMenuPcs::DrawCMakeMenu()
 			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
 			char* textList[3] = { 0, 0, 0 };
 			char** const langText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
-			ti = 5;
+			unsigned int ti = 5;
 			textList[0] = langText[ti];
 			ti = 6;
 			textList[1] = langText[ti];

@@ -2068,7 +2068,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			k = 0;
 			for (const s16* q = &pat[3 + ok]; k < len1 - 1; k++, q++) {
 				const int slot = selected - (len1 - 1 - k);
-				if (candidates[slot] != 0) {
+				int __p5 = slot;
+				if (candidates[__p5] != 0) {
 					break;
 				}
 				if (*q == itemKinds[slot]) {

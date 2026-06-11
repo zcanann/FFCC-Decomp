@@ -1293,7 +1293,7 @@ void CMenuPcs::CalcSelectWait()
 
 	int idx;
 	for (idx = 0; idx < activePartyCount; idx++) {
-		if (currentPartyIndex == s_Rinfo->m_party[idx].m_rank) {
+		if (s_Rinfo->m_party[idx].m_rank == currentPartyIndex) {
 			break;
 		}
 	}

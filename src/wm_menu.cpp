@@ -3031,29 +3031,29 @@ void CMenuPcs::CalcLoadMenu()
 		}
 		if (m_menuWindowInfo->state == 1
 		    && m_wmWorldState->m_counter1A == 0) {
-			sVar8 = m_wmWorldState->m_subState;
-			if (sVar8 == 0xE || sVar8 == 5) {
-				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
-				m_wmWorldState->m_mcResult = (short)chkRes;
-				if (m_wmWorldState->m_mcResult < 0) {
-					sVar8 = m_wmWorldState->m_subState;
-					short sVar18;
-					if (sVar8 == 5) { sVar18 = -1; }
-					else if (sVar8 == 6) { sVar18 = -3; }
-					else if (sVar8 == 7) { sVar18 = -4; }
-					else { sVar18 = 0; }
-					if (sVar8 == 7) {
-						short chk = m_wmWorldState->m_mcResult;
-						if (chk != 0 && chk != sVar18 && chk != 1) {
-							m_wmWorldState->m_state0E = -1;
-							m_wmWorldState->m_counter1A = 1;
-							break;
-						}
-					} else if (m_wmWorldState->m_mcResult != sVar18 && m_wmWorldState->m_mcResult != 1) {
+			if (m_wmWorldState->m_subState == 0xE) {
+				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				if (m_wmWorldState->m_mcResult < 0) goto LAB_chkLoad;
+			} else if (m_wmWorldState->m_subState == 5) {
+				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+			LAB_chkLoad:
+				sVar8 = m_wmWorldState->m_subState;
+				short sVar18;
+				if (sVar8 == 5) { sVar18 = -1; }
+				else if (sVar8 == 6) { sVar18 = -3; }
+				else if (sVar8 == 7) { sVar18 = -4; }
+				else { sVar18 = 0; }
+				if (sVar8 == 7) {
+					short chk = m_wmWorldState->m_mcResult;
+					if (chk != 0 && chk != sVar18 && chk != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
 					}
+				} else if (m_wmWorldState->m_mcResult != sVar18 && m_wmWorldState->m_mcResult != 1) {
+					m_wmWorldState->m_state0E = -1;
+					m_wmWorldState->m_counter1A = 1;
+					break;
 				}
 			}
 			if ((uVar4 & 0x300) != 0) {

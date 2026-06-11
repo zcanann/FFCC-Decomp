@@ -1294,7 +1294,7 @@ void CMenuPcs::CalcSelectWait()
 
 	int idx;
 	for (idx = 0; idx < activePartyCount; idx++) {
-		if (currentPartyIndex == s_Rinfo->m_party[idx].m_rank) {
+		if (s_Rinfo->m_party[idx].m_rank == currentPartyIndex) {
 			break;
 		}
 	}
@@ -1550,7 +1550,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	int kind;
 	doubleCount = activePartyCount * 2;
 	off = modelIndex << 6;
-	int lastKind = 0;
+	int lastKind =  (int)(unsigned int)(0);
 	BonusAnimSprite* artiSprite = 0;
 	for (i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; off += 0x40, i++) {
 		sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
@@ -1647,7 +1647,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 		{
 			int i = 0;
 			int markOff = i;
-			for (; i < 8; i++, markOff += 8) {
+			int __p3 = i;
+			for (; __p3 < 8; i++, markOff += 8) {
 				if ((activeMask & (1 << i)) == 0) {
 					continue;
 				}
@@ -1671,7 +1672,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 	{
 		int i = 0;
 		int off2 = textIndex << 6;
-		for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count && textIndex < activePartyCount; off2 += 0x40, i++) {
+		int __p21 = textIndex;
+		for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count && __p21 < activePartyCount; off2 += 0x40, i++) {
 			sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off2 + 8);
 			if (sprite->kind != -1) {
 				continue;
@@ -1708,7 +1710,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 		{
 			int off3 = 0;
 			for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; off3 += 0x40, i++) {
-				sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off3 + 8);
+				int __p2 = off3;
+				sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + __p2 + 8);
 				if (sprite->kind == -3) {
 					break;
 				}
@@ -3223,13 +3226,13 @@ void CMenuPcs::DrawResultOpenAnim()
 						float x = (float)sprite->x;
 						float y = (float)sprite->y;
 						float fillWidth;
-						if (sprite->duration > sprite->timer) {
+						if (!(sprite->duration > sprite->timer)) {
+							fillWidth = FLOAT_80331EB0;
+						} else {
 							fillWidth = (float)((DOUBLE_80331ED8 / (double)sprite->duration) * (double)(sprite->timer - 1));
 							if (fillWidth < kBonusZClearOrigin) {
 								fillWidth = kBonusZClearOrigin;
 							}
-						} else {
-							fillWidth = FLOAT_80331EB0;
 						}
 						fillWidth *= (float)sprite->w;
 						if (fillWidth > kBonusZClearOrigin) {

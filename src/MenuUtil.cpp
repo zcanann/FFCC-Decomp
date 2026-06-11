@@ -204,10 +204,9 @@ static const MenuOptionEstandarData s_MenuOptionEstandarEs = {
 static const char s_MenuUtil_cpp_801e37fc[] = "MenuUtil.cpp";
 static const char s_MenuUtilAllocErrorFmt[] = "%s(%d): Error: memory allocation error\n";
 
-// DrawHelpMessageUS and DrawOptionMenu anchor on the start of this TU's
-// .rodata island (lbl_801E3058) and reach the help-line table / option
-// layout data via fixed offsets, matching the target's pooled-base
-// addressing.
+// DrawHelpMessageUS anchors on the start of this TU's .rodata island
+// (lbl_801E3058) and reaches the help-line table and the alloc-error strings
+// via fixed offsets, matching the target's pooled-base addressing.
 extern "C" char lbl_801E3058[];
 
 extern const char s_MenuOptionMusic[];
@@ -427,7 +426,7 @@ struct MenuOptLayoutPairs {
 
 void CMenuPcs::DrawOptionMenu()
 {
-	char* anchor = lbl_801E3058;
+	const f32* layoutBase = s_MenuOptionEstandarEs.m_layout;
 	CFont* font = m_fonts[0];
 	int langRow = Game.m_gameWork.m_languageId - 1;
 	f32 rowWidth;
@@ -443,31 +442,20 @@ void CMenuPcs::DrawOptionMenu()
 	color.b = 0xFF;
 	color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionOpenAnim));
 
-	char** mesDef = reinterpret_cast<char**>(anchor + 0x694);
-	int mesOfs = langRow * 20;
-	char** mesRow = &g_strMenuUtilMes[mesOfs];
-	char* optionText[5];
-	char* helpText[5];
-	optionText[0] = mesDef[0];
-	optionText[1] = mesDef[1];
-	optionText[2] = mesDef[2];
-	optionText[3] = mesDef[3];
-	optionText[4] = mesDef[4];
-	helpText[0] = mesDef[5];
-	helpText[1] = mesDef[6];
-	helpText[2] = mesDef[7];
-	helpText[3] = mesDef[8];
-	helpText[4] = mesDef[9];
-	optionText[0] = *reinterpret_cast<char**>(reinterpret_cast<char*>(mesRow) + __rlwinm(2, 2, 0, 29));
-	optionText[1] = *reinterpret_cast<char**>(reinterpret_cast<char*>(mesRow) + __rlwinm(3, 2, 0, 29));
-	optionText[2] = *reinterpret_cast<char**>(reinterpret_cast<char*>(mesRow) + __rlwinm(4, 2, 0, 29));
-	optionText[3] = *reinterpret_cast<char**>(reinterpret_cast<char*>(mesRow) + __rlwinm(5, 2, 0, 29));
-	optionText[4] = *reinterpret_cast<char**>(reinterpret_cast<char*>(mesRow) + __rlwinm(6, 2, 0, 29));
-	helpText[0] = *reinterpret_cast<char**>(reinterpret_cast<char*>(mesRow) + __rlwinm(7, 2, 0, 29));
-	helpText[1] = *reinterpret_cast<char**>(reinterpret_cast<char*>(mesRow) + __rlwinm(8, 2, 0, 29));
-	helpText[2] = *reinterpret_cast<char**>(reinterpret_cast<char*>(mesRow) + __rlwinm(9, 2, 0, 29));
-	helpText[3] = *reinterpret_cast<char**>(reinterpret_cast<char*>(mesRow) + __rlwinm(10, 2, 0, 29));
-	helpText[4] = *reinterpret_cast<char**>(reinterpret_cast<char*>(mesRow) + __rlwinm(11, 2, 0, 29));
+	char* optionText[5] = {
+	    OPT_MES(2),
+	    OPT_MES(3),
+	    OPT_MES(4),
+	    OPT_MES(5),
+	    OPT_MES(6),
+	};
+	char* helpText[5] = {
+	    OPT_MES(7),
+	    OPT_MES(8),
+	    OPT_MES(9),
+	    OPT_MES(10),
+	    OPT_MES(11),
+	};
 
 	CTexture* banner = GetMenuTexture(this, 0xD4);
 	float bannerWidth = static_cast<float>(banner->m_width);
@@ -587,7 +575,7 @@ void CMenuPcs::DrawOptionMenu()
 
 	switch (m_optionIndex) {
 	case 0: {
-		MenuOptLayout10 row = *reinterpret_cast<const MenuOptLayout10*>(anchor + 0x6BC);
+		MenuOptLayout10 row = *reinterpret_cast<const MenuOptLayout10*>(&layoutBase[10]);
 		int leftXi = static_cast<int>(kOptionIconWaveTargetX - row.f0);
 		int rightXi = static_cast<int>(rowWidth * kMenuCenteringHalfWidth + row.f2 - kOptionIconWaveTargetX);
 		row.f7 = kOptionSelectorTextY;
@@ -676,7 +664,7 @@ void CMenuPcs::DrawOptionMenu()
 		break;
 	}
 	case 1: {
-		MenuOptLayout10 row = *reinterpret_cast<const MenuOptLayout10*>(anchor + 0x6E4);
+		MenuOptLayout10 row = *reinterpret_cast<const MenuOptLayout10*>(&layoutBase[20]);
 		int leftXi = static_cast<int>(kOptionIconWaveTargetX - row.f0);
 		int rightXi = static_cast<int>(rowWidth * kMenuCenteringHalfWidth + row.f2 - kOptionIconWaveTargetX);
 		row.f7 = kOptionSelectorTextY;
@@ -761,7 +749,7 @@ void CMenuPcs::DrawOptionMenu()
 		break;
 	}
 	case 2: {
-		MenuOptLayout14 pos = *reinterpret_cast<const MenuOptLayout14*>(anchor + 0x70C);
+		MenuOptLayout14 pos = *reinterpret_cast<const MenuOptLayout14*>(&layoutBase[30]);
 		f32* posp = &pos.f0;
 		posp[0] = kOptionIconWaveOriginX;
 		posp[1] = kOptionLeftIconBaseY;
@@ -836,7 +824,7 @@ void CMenuPcs::DrawOptionMenu()
 		break;
 	}
 	case 3: {
-		MenuOptLayout14 pos = *reinterpret_cast<const MenuOptLayout14*>(anchor + 0x744);
+		MenuOptLayout14 pos = *reinterpret_cast<const MenuOptLayout14*>(&layoutBase[44]);
 		f32* posp = &pos.f0;
 		posp[0] = kOptionIconWaveOriginX;
 		posp[1] = kOptionLeftIconBaseY;
@@ -911,7 +899,7 @@ void CMenuPcs::DrawOptionMenu()
 		break;
 	}
 	case 4: {
-		MenuOptLayoutPairs pts = *reinterpret_cast<const MenuOptLayoutPairs*>(anchor + 0x77C);
+		MenuOptLayoutPairs pts = *reinterpret_cast<const MenuOptLayoutPairs*>(&layoutBase[58]);
 		int rowAnimFrame;
 		if (static_cast<double>(m_optionRowAnim) < kOptionDefaultTextScale) {
 			rowAnimFrame = static_cast<int>(m_optionRowAnim / kOptionSpecialRowFrameStep);

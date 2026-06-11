@@ -45,7 +45,6 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	digitIndex = 0;
 	place = &s_place[row * 8];
 
-	signed char* place = &s_place[row * 8];
 	do {
 		if ((!started) && (gil >= digitPlace)) {
 			started = 1;

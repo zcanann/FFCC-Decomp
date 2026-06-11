@@ -817,14 +817,13 @@ int CShopMenu::calcGilRatio(int baseGil)
  */
 int CShopMenu::getItemNo(int index)
 {
-    int listType = m_listType;
-    if (listType == 0) {
+    if (m_listType == 0) {
         return m_caravanWork->m_shopList[index];
     }
-    if (listType == 1) {
+    if (m_listType == 1) {
         return m_caravanWork->m_inventoryItems[index];
     }
-    if (listType == 2) {
+    if (m_listType == 2) {
         int mapped = m_itemTable[index];
         if (mapped == -1) {
             return -1;

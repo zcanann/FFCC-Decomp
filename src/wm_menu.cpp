@@ -8552,7 +8552,7 @@ void CMenuPcs::CalcCharaSelect()
 					GetWmCharaModelData(this)[loadSlot * 0x34 + 0x0C] = 0;
 					GetWmCharaHandles(this)[loadSlot]->LoadModelASync(3, 0x43, 0);
 				}
-			} else if (entry.m_cmakePending == 0 && Joybus.GetMType(i) == 1) {
+			} else if (entry.m_cmakePending == 0 && static_cast<int>(Joybus.GetMType(i)) == 1) {
 				Joybus.SetMType(i, 4);
 			}
 		}

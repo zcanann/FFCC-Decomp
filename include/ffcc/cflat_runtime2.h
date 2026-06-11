@@ -7,6 +7,7 @@
 #include "ffcc/line.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara.h"
+#include "ffcc/partMng.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -71,19 +72,26 @@ public:
 	class CParticleWork
 	{
 	public:
+		struct CHitParam
+		{
+			int m_paramNo;
+			short m_paramId;
+			u8 m_pad[2];
+		};
+
 		CParticleWork()
 		{
-			m_seFrame = -1;
-			m_seNo = -1;
-			m_seUnk0 = 0;
-			m_seKind = 1;
-			m_seParam = 0;
-			m_seUnk2 = 0;
-			m_seDelay = 0x1E;
-			m_paramNo = 0;
-			m_paramId = 0;
-			m_pad4A[0] = 0;
-			m_pad4A[1] = 0;
+			m_soundEffectParams.m_soundEffectHandle = -1;
+			m_soundEffectParams.m_soundEffectSlot = -1;
+			m_soundEffectParams.m_soundEffectStopFlag = 0;
+			m_soundEffectParams.m_soundEffectKind = 1;
+			m_soundEffectParams.m_soundEffectStartFrame = 0;
+			m_soundEffectParams.m_soundEffectStartedOnce = 0;
+			m_soundEffectParams.m_soundEffectFadeFrames = 0x1E;
+			m_hitParam.m_paramNo = 0;
+			m_hitParam.m_paramId = 0;
+			m_hitParam.m_pad[0] = 0;
+			m_hitParam.m_pad[1] = 0;
 			m_pos = 0;
 			m_posVec = 0;
 			m_scale = 0;
@@ -111,17 +119,8 @@ public:
 		float m_colorLerp;
 		u8 m_enable;
 		u8 m_pad2D[3];
-		int m_seNo;
-		u8 m_seUnk0;
-		u8 m_seKind;
-		u8 m_seUnk2;
-		u8 m_seUnk3;
-		int m_seParam;
-		int m_seDelay;
-		int m_seFrame;
-		int m_paramNo;
-		short m_paramId;
-		u8 m_pad4A[2];
+		PPPSEST m_soundEffectParams;
+		CHitParam m_hitParam;
 		int m_extra[8];
 	};
 	

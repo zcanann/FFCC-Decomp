@@ -392,27 +392,27 @@ static inline float& ParticleWorkColorLerp(CFlatRuntime2* runtime)
 
 static inline int& ParticleWorkSeNo(CFlatRuntime2* runtime)
 {
-	return ParticleWork(runtime).m_seNo;
+	return ParticleWork(runtime).m_soundEffectParams.m_soundEffectSlot;
 }
 
 static inline u8& ParticleWorkSeKind(CFlatRuntime2* runtime)
 {
-	return ParticleWork(runtime).m_seKind;
+	return ParticleWork(runtime).m_soundEffectParams.m_soundEffectKind;
 }
 
 static inline int& ParticleWorkSeParam(CFlatRuntime2* runtime)
 {
-	return ParticleWork(runtime).m_seParam;
+	return ParticleWork(runtime).m_soundEffectParams.m_soundEffectStartFrame;
 }
 
 static inline int& ParticleWorkParamNo(CFlatRuntime2* runtime)
 {
-	return ParticleWork(runtime).m_paramNo;
+	return ParticleWork(runtime).m_hitParam.m_paramNo;
 }
 
 static inline short& ParticleWorkParamId(CFlatRuntime2* runtime)
 {
-	return ParticleWork(runtime).m_paramId;
+	return ParticleWork(runtime).m_hitParam.m_paramId;
 }
 
 static inline int& ParticleWorkNoHi(CFlatRuntime2* runtime)
@@ -2040,7 +2040,7 @@ void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
 	m_particleWorkPos.x = pos.x;
 	m_particleWorkPos.y = pos.y;
 	m_particleWorkPos.z = pos.z;
-	m_particleWorkPosAngle = 0.0f;
+	m_particleWorkPosAngle = FLOAT_80330144;
 	ParticleWorkPosPtr(this) = ParticleWorkPosValues(this);
 	ParticleWorkPosVecPtr(this) = ParticleWorkPosVecValues(this);
 	m_particleWorkScale.z = scale;

@@ -1862,7 +1862,7 @@ void CMenuPcs::GetCmdItem()
 		s32 itemType = GetItemType(i, 0);
 		if ((itemType != 0) && (itemType != 5) && (itemType != 6) && (itemType != 8) && (itemType != 9)) {
 			if (itemType == 1) {
-				const u32 tribe = caravanWork->m_tribeId & 3;
+				const s32 tribe = caravanWork->m_tribeId & 3;
 				if (GetItemIcon(caravanWork->m_inventoryItems[i]) != tribe) {
 					continue;
 				}

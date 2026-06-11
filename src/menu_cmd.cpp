@@ -2224,6 +2224,7 @@ void CMenuPcs::DrawUniteList()
 	s32 groupStart;
 	float drawY;
 	float drawW;
+	float drawH;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -2388,6 +2389,7 @@ void CMenuPcs::DrawUniteList()
 		const float panelX =
 		    static_cast<float>(topX - (GetCmdListStorage(this)->entries[labelAnchor].x - topX));
 		drawW = kCmdMenuUnitePanelWidth;
+		drawH = kCmdMenuPanelSize64;
 		const float panelTone = active ? kCmdMenuPanelSize64 : kCmdMenuZero;
 		CmdListEntry* const startEntry = &GetCmdListStorage(this)->entries[groupStart];
 		drawY = static_cast<float>(
@@ -2411,8 +2413,8 @@ void CMenuPcs::DrawUniteList()
 
 		unitePanels[s_unitePanelCount].x = static_cast<u16>(panelX);
 		unitePanels[s_unitePanelCount].y = static_cast<s16>(drawY);
-		unitePanels[s_unitePanelCount].width = static_cast<s16>(kCmdMenuUnitePanelWidth);
-		unitePanels[s_unitePanelCount].height = static_cast<s16>(kCmdMenuPanelSize64);
+		unitePanels[s_unitePanelCount].width = static_cast<s16>(drawW);
+		unitePanels[s_unitePanelCount].height = static_cast<s16>(drawH);
 		unitePanels[s_unitePanelCount].u = kCmdMenuZero;
 		unitePanels[s_unitePanelCount].v = panelTone;
 		unitePanels[s_unitePanelCount].alpha = panelAlpha;

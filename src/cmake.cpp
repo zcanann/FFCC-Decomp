@@ -1655,7 +1655,20 @@ void CMenuPcs::CmakeResultOpen()
  */
 void CMenuPcs::CmakeJobDraw()
 {
-    float alpha = CalcCmakeFadeAlpha(this);
+    CmakeMenuState* state = CmakeState(this);
+    int frame = static_cast<int>(state->m_frame) - 1;
+    float alpha;
+    if (frame < 0) {
+        frame = 0;
+    }
+
+    if (state->m_mode == 0) {
+        alpha = static_cast<float>(0.1 * static_cast<double>(frame));
+    } else if (state->m_mode == 1) {
+        alpha = 1.0f;
+    } else {
+        alpha = static_cast<float>(-(0.1 * static_cast<double>(frame) - 1.0));
+    }
 
     DrawWMFrame0(1, 1.0f);
 

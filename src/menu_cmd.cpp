@@ -1677,24 +1677,20 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			CmdState* const sv0 = GetCmdStateView(this);
 			const int selected = sv0->selected;
 			int prev = selected - 1;
-			if (prev > 2) {
-				for (int rem = prev - 2; rem != 0; rem--) {
-					if (caravanWork->m_commandListExtra[prev] >= 0) {
-						break;
-					}
-					prev--;
+			while (prev > 2) {
+				if (caravanWork->m_commandListExtra[prev] >= 0) {
+					break;
 				}
+				prev--;
 			}
 
 			const int cmdCount = caravanWork->m_numCmdListSlots;
 			int next = selected + 1;
-			if (next < cmdCount) {
-				for (int rem = cmdCount - next; rem != 0; rem--) {
-					if (caravanWork->m_commandListExtra[next] >= 0) {
-						break;
-					}
-					next++;
+			while (next < cmdCount) {
+				if (caravanWork->m_commandListExtra[next] >= 0) {
+					break;
 				}
+				next++;
 			}
 
 			CmdState* row = ModeRow(sv0, mode);

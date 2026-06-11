@@ -602,28 +602,15 @@ void CMenuPcs::FavoInit()
 
 	FavoEntry* firstEntry = &this->m_favoList->entries[0];
 	int byteOff = 0x180;
-	for (iVar17 = 4; iVar17 > 0; iVar17--) {
+	for (iVar17 = 8; iVar17 > 0; iVar17--) {
 		setupEntry = reinterpret_cast<FavoEntry*>(reinterpret_cast<char*>(this->m_favoList->entries) + byteOff);
+		byteOff = byteOff + 0x40;
 		setupEntry->flags = 2;
 		setupEntry->tex = 0x37;
-		sVar11 = sVar11 + 2;
+		sVar11 = sVar11 + 1;
 		setupEntry->x = firstEntry->x + 0x28;
 		setupEntry->y = firstEntry->y + sVar9;
-		sVar10 = sVar9 + 0x20;
-		setupEntry->w = 200;
-		setupEntry->h = 0x28;
-		setupEntry->u = fVar4;
-		setupEntry->v = fVar4;
-		setupEntry->startFrame = 7;
-		setupEntry->duration = 5;
-
-		setupEntry = reinterpret_cast<FavoEntry*>(reinterpret_cast<char*>(this->m_favoList->entries) + (byteOff + 0x40));
-		byteOff = byteOff + 0x80;
-		setupEntry->flags = 2;
-		setupEntry->tex = 0x37;
-		setupEntry->x = firstEntry->x + 0x28;
-		setupEntry->y = firstEntry->y + sVar10;
-		sVar9 = sVar10 + 0x20;
+		sVar9 = sVar9 + 0x20;
 		setupEntry->w = 200;
 		setupEntry->h = 0x28;
 		setupEntry->u = fVar4;

@@ -1403,8 +1403,8 @@ void CMenuPcs::CalcSelectWait()
 	short count2;
 	{
 		BonusAnimSprite* spr2 = (BonusAnimSprite*)(this->m_bonusAnimPtr + 0x88);
-		spr2->x = (short)(int)s_Base[0][selection * 2 + 2];
 		count2 = *(short*)this->m_bonusAnimPtr;
+		spr2->x = (short)(int)s_Base[0][selection * 2 + 2];
 		spr2 = (BonusAnimSprite*)(this->m_bonusAnimPtr + 0x88);
 		spr2->y = (short)(int)s_Base[0][selection * 2 + 3];
 		if (spr2->timer < spr2->duration) {

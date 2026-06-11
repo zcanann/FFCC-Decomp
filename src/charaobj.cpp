@@ -3652,17 +3652,8 @@ void CGCharaObj::combi2()
 	}
 
 	int fallback;
-	unsigned int comboIndex = searchCombi(candidateCount, candidates, fallback);
-	if (comboIndex < 0) {
-		if (fallback == 0 || candidates[0]->m_comboFrame >= 0x42) {
-			candidates[0]->m_comboState = 0;
-			candidates[0]->m_comboFrame = 0;
-			candidates[0]->addSubStat();
-			combi2();
-		}
-		return;
-	}
-
+	int comboIndex = searchCombi(candidateCount, candidates, fallback);
+	if (comboIndex >= 0) {
 	if (fallback != 0 && candidates[0]->m_comboFrame < 0x42) {
 		return;
 	}
@@ -3756,6 +3747,15 @@ void CGCharaObj::combi2()
 #undef comboCmd
 
 	combi2();
+	return;
+	}
+
+	if (fallback == 0 || candidates[0]->m_comboFrame >= 0x42) {
+		candidates[0]->m_comboState = 0;
+		candidates[0]->m_comboFrame = 0;
+		candidates[0]->addSubStat();
+		combi2();
+	}
 }
 
 /*

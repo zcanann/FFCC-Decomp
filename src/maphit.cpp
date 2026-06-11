@@ -648,7 +648,7 @@ edge_loop:
                 PSVECSubtract(&current, &previous, &edge);
 
                 Vec rayDirection = *hitDirection;
-                Vec rayStart = g_hit_cyl.m_bottom;
+                Vec rayStart = cyl.m_bottom;
 
                 CMapCylinder edgeCylinder;
                 edgeCylinder.m_bottom = previous;

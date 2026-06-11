@@ -2187,6 +2187,23 @@ void Detach(long currentSlot, long result)
  * Address:	TODO
  * Size:	TODO
  */
+static inline int FindCardFile(char* filename, CARDStat* stat)
+{
+    int fileNo = 0;
+    while (fileNo < 0x7F)
+    {
+        if (CARDGetStatus(1, fileNo, stat) >= 0)
+        {
+            if (strcmp(filename, reinterpret_cast<char*>(stat)) == 0)
+            {
+                return fileNo;
+            }
+        }
+        fileNo++;
+    }
+    return -1;
+}
+
 void CMemoryCardMan::DebugReadWrite(int isWrite, char* filename, void* buffer, int length)
 {
     int success = 0;
@@ -2228,26 +2245,8 @@ checkResult:
                     goto readFile;
                 }
 
-                result = 0;
-                while (result < 0x7F)
-                {
-                    if (CARDGetStatus(1, result, &stat) < 0)
-                    {
-                        goto nextFile;
-                    }
-                    if (strcmp(filename, reinterpret_cast<char*>(&stat)) != 0)
-                    {
-                        goto nextFile;
-                    }
-                    goto foundFile;
+                result = FindCardFile(filename, &stat);
 
-nextFile:
-                    result++;
-                }
-
-                result = -1;
-
-foundFile:
                 if ((result >= 0) && (CARDFastOpen(1, result, &fileInfo) >= 0))
                 {
 readFile:

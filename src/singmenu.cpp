@@ -2301,6 +2301,16 @@ void CMenuPcs::SingleCalcCtrl()
     }
 }
 
+static inline _GXColor SingMenuWhite()
+{
+    _GXColor c;
+    c.r = 0xFF;
+    c.g = 0xFF;
+    c.b = 0xFF;
+    c.a = 0xFF;
+    return c;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x801478cc
@@ -2343,12 +2353,7 @@ void CMenuPcs::SingleDrawCtrl()
         DrawInit();
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        _GXColor white2;
-        white2.r = 0xFF;
-        white2.g = 0xFF;
-        white2.b = 0xFF;
-        white2.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, white2);
+        GXSetChanMatColor(GX_COLOR0A0, SingMenuWhite());
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
         MenuPcs.DrawRect(0, 32.0f, 24.0f, 176.0f, 288.0f,
                                          0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -2402,9 +2407,9 @@ void CMenuPcs::SingleDrawCtrl()
 
     if (state->stepState < 2) {
         ++state->stepState;
-        state->frame = 0;
-        state->initialized = 0;
-        state->result = 0;
+        m_singMenuState->frame = 0;
+        m_singMenuState->initialized = 0;
+        m_singMenuState->result = 0;
         return;
     }
 
@@ -2418,31 +2423,30 @@ void CMenuPcs::SingleDrawCtrl()
             previousMode = mode;
         }
     } else {
-        s16 mode = m_singleMenuMode;
-        if (mode == 9) {
+        if (m_singleMenuMode == 9) {
             m_singleMenuMode = state->selectedIndex;
-        } else if ((mode == 8) && (gSingMenuForcedSelection >= 0)) {
+        } else if ((m_singleMenuMode == 8) && (gSingMenuForcedSelection >= 0)) {
             m_singleMenuMode = static_cast<s16>(gSingMenuForcedSelection);
-        } else if ((mode == 8) || (gSingMenuForcedSelection < 0)) {
-            if (state->cursorMove < 1) {
-                --m_singleMenuMode;
-                if (m_singleMenuMode < 0) {
-                    m_singleMenuMode = 8;
-                }
-            } else {
+        } else if ((m_singleMenuMode != 8) && (gSingMenuForcedSelection >= 0)) {
+            m_singleMenuMode = 8;
+        } else {
+            if (state->cursorMove > 0) {
                 ++m_singleMenuMode;
                 if (m_singleMenuMode > 8) {
                     m_singleMenuMode = 0;
                 }
+            } else {
+                --m_singleMenuMode;
+                if (m_singleMenuMode < 0) {
+                    m_singleMenuMode = 8;
+                }
             }
-        } else {
-            m_singleMenuMode = 8;
         }
     }
 
-    memset(state, 0, sizeof(SingMenuState));
+    memset(m_singMenuState, 0, sizeof(SingMenuState));
+    m_singMenuState->selectedIndex = previousMode;
     FLOAT_8032ea78 = 0.8999999761581421f;
-    state->selectedIndex = previousMode;
 }
 
 /*

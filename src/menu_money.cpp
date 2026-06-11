@@ -559,11 +559,9 @@ bool CMenuPcs::MoneyOpen()
 		this->m_moneyPanel->count = entryIndex;
 
 		s_Money = 0;
-		int row = 0;
-		do {
+		for (int row = 0; row < 2; row++) {
 			MoneySetPlace(row);
-			row = row + 1;
-		} while (row < 2);
+		}
 
 		this->m_moneyState->selections[0] = 0;
 		this->m_moneyState->initialized = 1;

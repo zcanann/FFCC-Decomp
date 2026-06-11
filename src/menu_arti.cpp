@@ -620,11 +620,10 @@ void CMenuPcs::ArtiInit1()
 	entry->startFrame = 0;
 	entry->duration = 5;
 	list = GetArtiOpenAnimList(this);
-	entry = list->entries;
-	int count = list->count;
-	for (; count > 0; count--, entry++) {
-		entry->step = 0;
-		entry->alpha = fVar1;
+	ArtiOpenAnim* p = list->entries;
+	for (index = list->count; index > 0; index--, p++) {
+		p->step = 0;
+		p->alpha = fVar1;
 	}
 }
 

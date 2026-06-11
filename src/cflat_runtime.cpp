@@ -799,9 +799,31 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::searchFunc(int, int, int)
+inline CFlatRuntime::CFunc* CFlatRuntime::searchFunc(int classIndex, int systemKind, int systemIndex)
 {
-	// TODO
+	if ((classIndex >= 0)
+	    && (((systemKind == 2) || (systemKind == 3)) && (systemIndex >= 0))) {
+		u8* const classes = reinterpret_cast<u8*>(m_classes) + (classIndex * 0x22C) + 0x24;
+		const int funcIndex = *reinterpret_cast<int*>(classes + (systemIndex * 4));
+		if (funcIndex >= 0) {
+			return reinterpret_cast<CFunc*>(m_funcs) + funcIndex;
+		}
+	} else {
+		const int funcCount = m_funcCount;
+		CFunc* func = reinterpret_cast<CFunc*>(m_funcs);
+
+		for (int i = 0; i < funcCount; i++, func++) {
+			if (func->m_systemKind != systemKind) {
+				continue;
+			}
+			if (func->m_systemIndex != systemIndex) {
+				continue;
+			}
+			return func;
+		}
+	}
+
+	return 0;
 }
 
 /*
@@ -858,9 +880,13 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 		func = reinterpret_cast<CFunc*>(m_funcs);
 
 		for (int i = 0; i < funcCount; i++, func++) {
-			if ((func->m_systemKind == systemKind) && (func->m_systemIndex == systemIndex)) {
-				goto haveFunc;
+			if (func->m_systemKind != systemKind) {
+				continue;
 			}
+			if (func->m_systemIndex != systemIndex) {
+				continue;
+			}
+			goto haveFunc;
 		}
 	}
 	func = 0;
@@ -870,50 +896,9 @@ haveFunc:
 		return 0;
 	}
 
-	int copiedArgs = 0;
-	if (argCount > 0) {
-		if (argCount > 8) {
-			CStack* batchArgs = args;
-			int byteOffset = 0;
-
-			for (; argCount - copiedArgs > 8; copiedArgs += 8) {
-				const int offset1 = byteOffset + 4;
-				const int offset2 = byteOffset + 8;
-				const int offset3 = byteOffset + 0xC;
-				const int offset4 = byteOffset + 0x10;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + byteOffset) =
-				    batchArgs[0].m_word;
-				const int offset5 = byteOffset + 0x14;
-				const int offset6 = byteOffset + 0x18;
-				const int offset7 = byteOffset + 0x1C;
-				byteOffset += 0x20;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset1) =
-				    batchArgs[1].m_word;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset2) =
-				    batchArgs[2].m_word;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset3) =
-				    batchArgs[3].m_word;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset4) =
-				    batchArgs[4].m_word;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset5) =
-				    batchArgs[5].m_word;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset6) =
-				    batchArgs[6].m_word;
-				CStack* finalArg = batchArgs + 7;
-				batchArgs += 8;
-				*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + offset7) =
-				    finalArg->m_word;
-			}
-		}
-
-		int byteOffset = copiedArgs * 4;
-		CStack* tailArgs = args + copiedArgs;
-		for (; argCount - copiedArgs > 0; copiedArgs++) {
-			*reinterpret_cast<u32*>(reinterpret_cast<u32>(object->m_sp) + byteOffset) =
-			    tailArgs->m_word;
-			tailArgs++;
-			byteOffset += 4;
-		}
+	int copiedArgs;
+	for (copiedArgs = 0; copiedArgs < argCount; copiedArgs++) {
+		object->m_sp[copiedArgs] = args[copiedArgs].m_word;
 	}
 	object->m_sp += copiedArgs;
 
@@ -991,33 +976,12 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
                           CFlatRuntime::CStack* args)
 {
 	CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
-	CFunc* func;
 
 	if (engineObject->m_flagBits.m_deleteFlag != 0) {
 		return 1;
 	}
 
-	const int classIndex = engineObject->m_activeClassIndex;
-	if ((classIndex >= 0)
-	    && (((systemKind == 2) || (systemKind == 3)) && (systemIndex >= 0))) {
-		u8* const classes = reinterpret_cast<u8*>(m_classes) + (classIndex * 0x22C) + 0x24;
-		const int funcIndex = *reinterpret_cast<int*>(classes + (systemIndex * 4));
-		if (funcIndex >= 0) {
-			func = reinterpret_cast<CFunc*>(m_funcs) + funcIndex;
-			goto haveFunc;
-		}
-	} else {
-		const int funcCount = m_funcCount;
-		func = reinterpret_cast<CFunc*>(m_funcs);
-
-		for (int i = 0; i < funcCount; i++, func++) {
-			if ((func->m_systemKind == systemKind) && (func->m_systemIndex == systemIndex)) {
-				goto haveFunc;
-			}
-		}
-	}
-	func = 0;
-haveFunc:
+	CFunc* const func = searchFunc(engineObject->m_activeClassIndex, systemKind, systemIndex);
 
 	if (func == 0) {
 		return 0;

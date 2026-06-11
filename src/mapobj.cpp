@@ -915,11 +915,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     while (chunkFile.GetNextChunk(vtxChunk) != 0) {
                         switch (vtxChunk.m_id) {
                         case CHUNK_VTX: {
-                            float* vtx = reinterpret_cast<float*>(operator new[](
+                            float* vtx;
+                            mime->m_vertexLists[vtxTableIndex++] = vtx = reinterpret_cast<float*>(operator new[](
                                 static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
                                 MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x353));
-                            mime->m_vertexLists[vtxTableIndex] = vtx;
-                            vtxTableIndex++;
                             mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
 
                             for (int i = 0; i < mime->m_vertexCount; i++) {

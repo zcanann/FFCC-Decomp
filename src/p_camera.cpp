@@ -1413,10 +1413,10 @@ void CCameraPcs::createFullShadow()
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {
-        u32 v6 = i + 6;
-        u32 v7 = i + 7;
         u32 v3 = i + 3;
         u32 v4 = i + 4;
+        u32 v6 = i + 6;
+        u32 v7 = i + 7;
         u32 v5 = i + 5;
         u32 v2 = i + 2;
         u32 v1 = i + 1;

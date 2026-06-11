@@ -1224,13 +1224,12 @@ void CMenuPcs::CmakeResultDraw1()
     }
     DrawCmakeTitle(7, alpha, 1.0f);
 
-    float textAlpha = alpha;
     if (CmakeState(this)->m_mode == 0) {
-        textAlpha = 1.0f;
+        alpha = 1.0f;
     }
     {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
-        SetCmakeBlendMatColor(textAlpha);
+        SetCmakeBlendMatColor(alpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
         MenuPcs.DrawRect(
             0,
@@ -1246,7 +1245,7 @@ void CMenuPcs::CmakeResultDraw1()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     labelFont->SetColor(color.color);
 
     float labelWidths[4];
@@ -1264,7 +1263,7 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
+    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 
@@ -1486,9 +1485,8 @@ void CMenuPcs::CmakeResultDraw()
     }
     DrawCmakeYesNo(yesNoSel, alpha);
 
-    float textAlpha = alpha;
     if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
-        textAlpha = 1.0f;
+        alpha = 1.0f;
     }
 
     CFont* labelFont = m_fonts[CMAKE_FONT_LABEL];
@@ -1497,7 +1495,7 @@ void CMenuPcs::CmakeResultDraw()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     labelFont->SetColor(color.color);
 
     float labelWidths[4];
@@ -1517,7 +1515,7 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
+    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 

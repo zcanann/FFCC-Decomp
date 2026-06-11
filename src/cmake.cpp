@@ -3958,8 +3958,10 @@ void CMenuPcs::CalcSingCMake()
                                 static_cast<int>(caravanWork->m_appearanceVariant));
                             caravanWork->LoadFinished();
                             CallWorldParam(0, slot, 0);
-                            CmakeState(this)->m_stepTimer =
-                                static_cast<short>(static_cast<int>(GetMaxAnimWait()));
+                            {
+                                short animWait = static_cast<short>(static_cast<int>(GetMaxAnimWait()));
+                                CmakeState(this)->m_stepTimer = animWait;
+                            }
                         } else {
                             CmakeState(this)->m_resultDir = -1;
                         }

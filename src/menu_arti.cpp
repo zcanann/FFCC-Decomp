@@ -556,8 +556,6 @@ int CMenuPcs::ArtiOpen()
 void CMenuPcs::ArtiInit1()
 {
 	float fVar1;
-	unsigned int uVar4;
-	unsigned int uVar5;
 	int index;
 	ArtiOpenAnim* entry;
 	ArtiOpenAnimList* list;
@@ -622,42 +620,11 @@ void CMenuPcs::ArtiInit1()
 	entry->startFrame = 0;
 	entry->duration = 5;
 	list = GetArtiOpenAnimList(this);
-	uVar4 = (unsigned int)list->count;
 	entry = list->entries;
-	if (0 < (int)uVar4) {
-		uVar5 = uVar4 >> 3;
-		if (uVar5 != 0) {
-			do {
-				entry[0].step = 0;
-				entry[0].alpha = fVar1;
-				entry[1].step = 0;
-				entry[1].alpha = fVar1;
-				entry[2].step = 0;
-				entry[2].alpha = fVar1;
-				entry[3].step = 0;
-				entry[3].alpha = fVar1;
-				entry[4].step = 0;
-				entry[4].alpha = fVar1;
-				entry[5].step = 0;
-				entry[5].alpha = fVar1;
-				entry[6].step = 0;
-				entry[6].alpha = fVar1;
-				entry[7].step = 0;
-				entry[7].alpha = fVar1;
-				entry += 8;
-				uVar5 = uVar5 - 1;
-			} while (uVar5 != 0);
-			uVar4 = uVar4 & 7;
-			if (uVar4 == 0) {
-				return;
-			}
-		}
-		do {
-			entry->step = 0;
-			entry->alpha = fVar1;
-			entry++;
-			uVar4 = uVar4 - 1;
-		} while (uVar4 != 0);
+	int count = list->count;
+	for (; count > 0; count--, entry++) {
+		entry->step = 0;
+		entry->alpha = fVar1;
 	}
 }
 

@@ -495,7 +495,8 @@ void CChara::TimeMogFur()
 			int baseLight = 7 - static_cast<int>(a);
 			int r = ((packed >> 8) & 0xF) + 4 + baseLight;
 			int b = (packed & 0xF) + 4 + baseLight;
-			int g = ((packed >> 4) & 0xF) + 4 + baseLight;
+			int gNibble = (packed >> 4) & 0xF;
+			int g = gNibble + 4 + baseLight;
 
 			int light = 0xF;
 			if (r < 0xF) {
@@ -601,6 +602,7 @@ void CChara::CalcMogScore()
 
 			const int ring = dist % 12;
 			int angle = static_cast<int>(kYmEnvRadToDeg * atan2(static_cast<double>(dx), static_cast<double>(dy))) + 0x168;
+			angle = static_cast<unsigned int>(angle);
 			angle %= 0x2D;
 
 			for (int i = 0; i < 3; i++) {

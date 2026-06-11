@@ -4532,23 +4532,24 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             body[0x8B] = playerData[0x2AB];
             body[0x8C] = playerData[threadParam->m_portIndex * 0xDC + 2];
 
-            body += 0x8D;
-            memcpy(body, (unsigned char*)&playerInfo + (threadParam->m_portIndex * 0xDC + 0x20), 3);
+            unsigned char* q = body + 0x8D;
+            memcpy(q, (unsigned char*)&playerInfo + (threadParam->m_portIndex * 0xDC + 0x20), 3);
 
             unsigned short statHalf = __lhbrx(&playerInfo, threadParam->m_portIndex * 0xDC + 0x14);
-            memcpy(body + 3, &statHalf, 2);
+            memcpy(q + 3, &statHalf, 2);
 
-            body += 5;
+            q += 5;
 
-            int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, body);
+            int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, q);
+
+            q += compatLen;
+
             const int byteLen = compatLen + 0x97;
 
-            body += compatLen;
-
-            memcpy(body, (unsigned char*)&playerInfo + (threadParam->m_portIndex * 0xDC + 0x18), 8);
+            memcpy(q, (unsigned char*)&playerInfo + (threadParam->m_portIndex * 0xDC + 0x18), 8);
 
             unsigned int statWord = __lwbrx(&playerInfo, threadParam->m_portIndex * 0xDC + 0x24);
-            memcpy(body + 8, &statWord, sizeof(statWord));
+            memcpy(q + 8, &statWord, sizeof(statWord));
 
             int wordCount = MakeJoyData((char*)payload, byteLen + 0xC, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 

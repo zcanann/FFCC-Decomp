@@ -11293,7 +11293,7 @@ void CMenuPcs::CalcMcObj()
 			} else {
 				int idx = 0;
 				float* spline = gWmModelYOffsetSpline;
-				for (int n = gWmModelYOffsetSplineCount; n > 0; n--) {
+				for (int n =  (gWmModelYOffsetSplineCount - 0); n > 0; n--) {
 					if (t <= *spline) {
 						if (idx == 0) {
 							yResult = gWmModelYOffsetSpline[idx * 4 + 1];
@@ -11319,9 +11319,7 @@ void CMenuPcs::CalcMcObj()
 
 			float rotResult = FLOAT_803313dc;
 			t = static_cast<float>(static_cast<int>(panelState[1])) / FLOAT_803314c0;
-			if (t >= gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
-				rotResult = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
-			} else {
+			if (!(t >= gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4])) {
 				int idx = 0;
 				float* spline = gWmModelRotationSpline;
 				for (int n = gWmModelRotationSplineCount; n > 0; n--) {
@@ -11345,6 +11343,8 @@ void CMenuPcs::CalcMcObj()
 					spline += 4;
 					idx++;
 				}
+			} else {
+				rotResult = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
 			}
 			reinterpret_cast<float*>(panelState)[0xB] = FLOAT_803314bc * rotResult;
 

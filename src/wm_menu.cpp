@@ -6960,7 +6960,6 @@ void CMenuPcs::CalcFukidashi()
 void CMenuPcs::DrawFukidashi()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	Mtx& cameraBackup = *reinterpret_cast<Mtx*>(bytes + 0x744);
 	CFont* const fontFC = m_fonts[1];
 	if (static_cast<signed char>(bytes[0x09]) != 1) {
 		return;
@@ -6992,7 +6991,7 @@ void CMenuPcs::DrawFukidashi()
 	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
 		int bd = reinterpret_cast<int>(m_wm.m_bubbleData);
 		MenuPcs.DrawRect(0,
-			(float)*reinterpret_cast<unsigned short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
+			(float)*reinterpret_cast<short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
 			(float)*reinterpret_cast<short*>(bd + 0x20), (float)*reinterpret_cast<short*>(bd + 0x22),
 			*reinterpret_cast<float*>(bd + 0x24), *reinterpret_cast<float*>(bd + 0x28),
 			FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
@@ -7127,11 +7126,11 @@ void CMenuPcs::DrawFukidashi()
 					GXSetProjection(projMtx, GX_PERSPECTIVE);
 					PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
 
-					CVector eye(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-					CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 					Mtx lookAtMtx;
-					C_MTXLookAt(lookAtMtx, (Vec*)(piVar10 + 4), (Vec*)&up, (Vec*)&eye);
-					PSMTXCopy(CameraPcs.m_cameraMatrix, cameraBackup);
+					C_MTXLookAt(lookAtMtx, (Vec*)(piVar10 + 4),
+					            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+					            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
+					PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
 					PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 					CharaPcs.InitEnv(5);
 					GXSetColorUpdate(0);
@@ -7174,7 +7173,7 @@ void CMenuPcs::DrawFukidashi()
 	}
 
 	if (viewportSetup != 0) {
-		PSMTXCopy(cameraBackup, CameraPcs.m_cameraMatrix);
+		PSMTXCopy(reinterpret_cast<MtxPtr>(bytes + 0x744), CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 		Mtx44 screenCopy;
 		PSMTX44Copy(CameraPcs.m_screenMatrix, screenCopy);

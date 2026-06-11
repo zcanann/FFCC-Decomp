@@ -2301,9 +2301,10 @@ void CFlatRuntime2::DeleteParticleSlot(int slotNo, int forceDelete)
 void CFlatRuntime2::IgnoreParticle(int slotNo, CFlatRuntime::CObject* object)
 {
 	u8* ifDt = reinterpret_cast<u8*>(PartMng.pppGetIfDt(static_cast<short>(slotNo)));
+	short particleId;
 	u8 count = ifDt[6];
 	if (count < 0x10) {
-		short particleId = object->m_particleId;
+		particleId = object->m_particleId;
 		ifDt[6] = static_cast<u8>(count + 1);
 		ifDt += count * 2;
 		*reinterpret_cast<short*>(ifDt + 8) = particleId;

@@ -2155,8 +2155,8 @@ int CMenuPcs::CmakeTribeCtrl()
                 if (fieldSelect == 0) {
                     CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect + 1);
                 } else {
-                    int slot;
                     unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
+                    int slot;
                     for (slot = 0; slot < 8; ++slot) {
                         if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
                             (*(entry + 0x1F96) != 1) &&

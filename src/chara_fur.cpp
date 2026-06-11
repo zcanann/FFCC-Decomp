@@ -62,7 +62,7 @@ STATIC_ASSERT(offsetof(CChara::MogFurState, m_alphaScore) == 0x2050);
 
 class CMaterial;
 
-inline void* operator new(unsigned long, void* ptr) { return ptr; }
+extern "C" void __ct__7CVectorFv(CVector*);
 
 struct FurPickPointerTable {
 	CVector* volatile m_areaCA2;
@@ -1556,7 +1556,7 @@ int CChara::CModel::PickFur(
 						C_MTX44Inverse(invScreenMtx, invScreenMtx);
 
 						CVector rayStart;
-						new (workPtrs.m_rayEndc) CVector;
+						__ct__7CVectorFv(workPtrs.m_rayEndc);
 						CVector rayStartInit(
 						    (static_cast<float>(cursorXd) - kCharaFurScreenCenterX) / kCharaFurScreenCenterX,
 						    static_cast<float>(negCursorY) / kCharaFurScreenCenterY, kCharaFurDepthZero);
@@ -1605,11 +1605,11 @@ int CChara::CModel::PickFur(
 						PSVECAdd(rayStart, &scaledRay, hitViewPos);
 
 						CVector hitToA;
-						new (workPtrs.m_hitToBc) CVector;
-						new (workPtrs.m_hitToCc) CVector;
+						__ct__7CVectorFv(workPtrs.m_hitToBc);
+						__ct__7CVectorFv(workPtrs.m_hitToCc);
 						CVector areaAB;
-						new (workPtrs.m_areaBCc) CVector;
-						new (workPtrs.m_areaCAc) CVector;
+						__ct__7CVectorFv(workPtrs.m_areaBCc);
+						__ct__7CVectorFv(workPtrs.m_areaCAc);
 						const CVector& vertA1 = CVector(verts[0].m_viewPos);
 						CVector hitToASub;
 						PSVECSubtract(const_cast<CVector&>(vertA1), hitViewPos, hitToASub);

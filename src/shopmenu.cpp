@@ -394,7 +394,7 @@ static inline unsigned short GetPadButtons()
     return buttons;
 }
 
-static unsigned short GetShopMenuListButtons()
+static unsigned short GetShopMenuListButtons(unsigned short mask)
 {
     unsigned short buttons;
     unsigned short latch = gShopMenuInputLatch;
@@ -405,7 +405,7 @@ static unsigned short GetShopMenuListButtons()
         } else {
             int padIndex = 0;
             padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-            buttons = Pad.GetPadInputs()[padIndex].repeatButton;
+            buttons = Pad.GetPadInputs()[padIndex].repeatButton & mask;
         }
         return buttons;
     }
@@ -430,7 +430,7 @@ static unsigned short GetShopMenuListButtons()
     } else {
         int padIndex = 0;
         padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        buttons = Pad.GetPadInputs()[padIndex].buttonDown[0];
+        buttons = Pad.GetPadInputs()[padIndex].buttonDown[0] & mask;
     }
     return buttons;
 }
@@ -2762,7 +2762,7 @@ void CShopMenu::SelectFigure()
         m_subMode = 2;
     }
 
-    if ((GetShopMenuListButtons() & 8) != 0) {
+    if (GetShopMenuListButtons(8) != 0) {
         switch (m_figureMode) {
         case 0: {
             ++m_quantity;
@@ -2859,7 +2859,7 @@ void CShopMenu::SelectFigure()
         return;
     }
 
-    if ((GetShopMenuListButtons() & 4) == 0) {
+    if (GetShopMenuListButtons(4) == 0) {
         return;
     }
 
@@ -2902,7 +2902,7 @@ void CShopMenu::SelectItemIdx()
         m_selectedIndex = getItemCnt() - 1;
     }
 
-    if ((GetShopMenuListButtons() & 8) != 0) {
+    if (GetShopMenuListButtons(8) != 0) {
         --m_selectedIndex;
         if (m_selectedIndex < 0) {
             gShopMenuInputLatch = 8;
@@ -2911,7 +2911,7 @@ void CShopMenu::SelectItemIdx()
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if ((GetShopMenuListButtons() & 4) != 0) {
+    } else if (GetShopMenuListButtons(4) != 0) {
         ++m_selectedIndex;
         if (m_selectedIndex >= getItemCnt()) {
             gShopMenuInputLatch = 4;

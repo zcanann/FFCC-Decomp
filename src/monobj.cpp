@@ -24,6 +24,8 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" int Rand__5CMathFUl(CMath* math);
+extern "C" CVector* __ct__7CVectorFv(void* self);
+extern "C" CVector* __ct__7CVectorFRC3Vec(void* self, const Vec* src);
 
 u8 CGMonObj::m_aiWork[0xC];
 u8 CGMonObj::m_boss[0x8C];
@@ -3055,7 +3057,7 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 					nextGroup = escapePos->m_groupB;
 				}
 				unsigned char* routeStep = reinterpret_cast<unsigned char*>(&AStar) +
-					routeFrom * 0x80 + static_cast<unsigned char>(nextGroup + 0x36) * 2 + 0x40c;
+					routeFrom * 0x80 + static_cast<unsigned char>(nextGroup) * 2 + 0x40c;
 				float portalDist = PSVECDistance(&object->m_worldPosition, &escapePos->m_position);
 				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 					routePrev = routeFrom;
@@ -3064,29 +3066,35 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 						routeStep[0] * 0x80 + forbiddenGroup * 2 + 0x40d)];
 				}
 
-				float targetDist = PSVECDistance(&targetPos, &object->m_worldPosition);
-				CVector portalVec(escapePos->m_position);
-				CVector myVec(object->m_worldPosition);
-				CVector dirRaw;
-				PSVECSubtract(myVec, portalVec, dirRaw);
 				Vec dir;
+				Vec myVec;
+				Vec portalVec;
+				volatile Vec finalVec;
+				Vec myVec2;
+				Vec dirScaled;
+				Vec dirRaw;
+				Vec scaled;
+				Vec result;
+				float targetDist = PSVECDistance(&targetPos, &object->m_worldPosition);
+				__ct__7CVectorFRC3Vec(&portalVec, &escapePos->m_position);
+				CVector* myVecPtr = __ct__7CVectorFRC3Vec(&myVec, &object->m_worldPosition);
+				__ct__7CVectorFv(&dirRaw);
+				PSVECSubtract(reinterpret_cast<Vec*>(myVecPtr), &portalVec, &dirRaw);
 				dir.x = dirRaw.x;
 				dir.y = dirRaw.y;
 				dir.z = dirRaw.z;
 				reinterpret_cast<CVector*>(&dir)->Normalize();
-				CVector scaled;
-				PSVECScale(reinterpret_cast<CVector&>(dir), scaled, targetDist);
-				Vec dirScaled;
+				__ct__7CVectorFv(&scaled);
+				PSVECScale(&dir, &scaled, targetDist);
 				dirScaled.x = scaled.x;
 				dirScaled.y = scaled.y;
 				dirScaled.z = scaled.z;
-				CVector myVec2(object->m_worldPosition);
-				CVector result;
-				PSVECAdd(myVec2, &dirScaled, result);
+				CVector* myVec2Ptr = __ct__7CVectorFRC3Vec(&myVec2, &object->m_worldPosition);
+				__ct__7CVectorFv(&result);
+				PSVECAdd(reinterpret_cast<Vec*>(myVec2Ptr), &dirScaled, &result);
 				float rx = result.x;
 				float ry = result.y;
 				float rz = result.z;
-				volatile Vec finalVec;
 				finalVec.x = rx;
 				targetPos.x = rx;
 				targetPos.y = ry;

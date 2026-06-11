@@ -3448,7 +3448,8 @@ void CMenuPcs::CalcResultOpenAnim()
 			int i = 0;
 			int bump = i;
 			int delta = base << 6;
-			for (; i < activePartyCount; i++) {
+			int __p3 = i;
+			for (; __p3 < activePartyCount; i++) {
 				int off = ((base + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				spr->kind = -2;
@@ -3616,7 +3617,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		{
-			int i = 0;
+			int i =  (int)(long)(0);
 			int boardOff = i;
 			int half = activePartyCount * 0x50;
 			for (; i < activePartyCount; i++) {
@@ -3667,7 +3668,7 @@ void CMenuPcs::CalcResultOpenAnim()
 	*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
 	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
 	int i0 = 0;
-	int off = i0;
+	int off =  (0 + i0);
 	int doneCount = 0;
 
 	for (; i0 < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i0++, off += 0x40) {

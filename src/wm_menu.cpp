@@ -1995,18 +1995,19 @@ void CMenuPcs::CalcMCardMenu()
 	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
-	unsigned short uVar3;
+	unsigned short uVar3s;
 	if (bVar1) {
-		uVar3 = 0;
+		uVar3s = 0;
 	} else {
 		unsigned int padIndex = 0;
 		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
 		int __p11 =  (0 + padIndex);
-		uVar3 = Pad.GetPadInputs()[__p11].buttonDown[0];
+		uVar3s = Pad.GetPadInputs()[__p11].buttonDown[0];
 	}
+	unsigned int uVar3 = uVar3s;
 	unsigned short uVar6 = GetButtonRepeat(0);
 
-	if ((unsigned char)m_wmWorldState->m_worldReady == 0) {
+	if ((signed char)m_wmWorldState->m_worldReady == 0) {
 		m_mcCtrl.m_previousState = 0;
 		m_mcCtrl.m_state = 0;
 		m_mcCtrl.m_lastResult = 0;
@@ -2050,26 +2051,21 @@ void CMenuPcs::CalcMCardMenu()
 	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = (short)iVar14;
 
 	if ((int)uVar15 < 0) {
-		double dVar22;
-		float baseWidth = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
+		float wave = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
 		if ((int)uVar15 >= -10) {
 			int absSign = (int)uVar15 >> 0x1F;
-			int __p10 = absSign;
-			int absRaw = ((int)uVar15 ^ absSign) - __p10;
-			float dVar23 = (float)(baseWidth * (DOUBLE_803314E8 * (double)absRaw));
-			int __p15 = absRaw;
-			unsigned int absOff = (unsigned int)__p15;
-			if ((int)absOff < 0) absOff = 0;
-			if ((int)absOff > 10) absOff = 10;
-			float dVar28 = (float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4));
-			dVar22 = (double)(dVar23 * dVar28);
-		} else {
-			dVar22 = (double)baseWidth;
+			int absRaw = ((int)uVar15 ^ absSign) - absSign;
+			wave = (float)(wave * (DOUBLE_803314E8 * (double)absRaw));
+			int s16 = (int)uVar15 >> 0x1F;
+			int absOff = ((int)uVar15 ^ s16) - s16;
+			if (absOff < 0) absOff = 0;
+			if (absOff > 10) absOff = 10;
+			wave = wave * (float)sin((double)(FLOAT_803314bc * ((float)absOff * FLOAT_803316d4)));
 		}
 
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) - (float)dVar22);
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) - wave);
 		*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = (short)iVar14;
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) + (float)dVar22);
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) + wave);
 		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = (short)iVar14;
 	}
 
@@ -2785,17 +2781,18 @@ void CMenuPcs::CalcLoadMenu()
 	WmWorldState* const worldState = m_wmWorldState;
 	m_textureLocIndex = 0;
 
-	bool bVar1 = false;
+	int bVar1 = 0;
 	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
-	unsigned short uVar4;
+	unsigned short uVar4s;
 	if (bVar1) {
-		uVar4 = 0;
+		uVar4s = 0;
 	} else {
 		unsigned int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-		uVar4 = Pad.GetPadInputs()[padIndex].buttonDown[0];
+		uVar4s = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
+	unsigned int uVar4 = uVar4s;
 	unsigned short uVar7 = GetButtonRepeat(0);
 
 	if (m_wmWorldState->m_worldReady == 0) {
@@ -2867,27 +2864,22 @@ void CMenuPcs::CalcLoadMenu()
 	*reinterpret_cast<short*>(iVar10 + 0x20) = (short)iVar14;
 
 	if ((int)uVar15 < 0) {
-		unsigned char* const frame = m_wm.m_frameInfo;
-		double dVar26;
-		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
+		float wave = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
 		if ((int)uVar15 >= -10) {
 			int s15 = (int)uVar15 >> 31;
-			int __p12 = s15;
-			int absRaw = ((int)uVar15 ^ s15) - __p12;
-			float dVar27 = (float)(baseWidth * (DOUBLE_803314E8 * (double)absRaw));
-			unsigned int absOff = (unsigned int)absRaw;
-			if ((int)absOff < 0) absOff = 0;
-			if ((int)absOff > 10) absOff = 10;
-			float dVar28 = (float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4));
-			dVar26 = (double)(dVar27 * dVar28);
-		} else {
-			dVar26 = (double)baseWidth;
+			int absRaw = ((int)uVar15 ^ s15) - s15;
+			wave = (float)(wave * (DOUBLE_803314E8 * (double)absRaw));
+			int s16 = (int)uVar15 >> 31;
+			int absOff = ((int)uVar15 ^ s16) - s16;
+			if (absOff < 0) absOff = 0;
+			if (absOff > 10) absOff = 10;
+			wave = wave * (float)sin((double)(FLOAT_803314bc * ((float)absOff * FLOAT_803316d4)));
 		}
 
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(frame + 4) - (float)dVar26);
-		*reinterpret_cast<short*>(frame + 4) = (short)iVar14;
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(frame + 0x20) + (float)dVar26);
-		*reinterpret_cast<short*>(frame + 0x20) = (short)iVar14;
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) - wave);
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = (short)iVar14;
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) + wave);
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = (short)iVar14;
 	}
 
 	float fVar2 = FLOAT_803313e8;
@@ -2968,7 +2960,6 @@ void CMenuPcs::CalcLoadMenu()
 		}
 		break;
 	case 3:
-		MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
 		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
 		break;
 	case 5:
@@ -3036,29 +3027,29 @@ void CMenuPcs::CalcLoadMenu()
 		}
 		if (m_menuWindowInfo->state == 1
 		    && m_wmWorldState->m_counter1A == 0) {
-			sVar8 = m_wmWorldState->m_subState;
-			if (sVar8 == 0xE || sVar8 == 5) {
-				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
-				m_wmWorldState->m_mcResult = (short)chkRes;
-				if (m_wmWorldState->m_mcResult < 0) {
-					sVar8 = m_wmWorldState->m_subState;
-					short sVar18;
-					if (sVar8 == 5) { sVar18 = -1; }
-					else if (sVar8 == 6) { sVar18 = -3; }
-					else if (sVar8 == 7) { sVar18 = -4; }
-					else { sVar18 = 0; }
-					if (sVar8 == 7) {
-						short chk = m_wmWorldState->m_mcResult;
-						if (chk != 0 && chk != sVar18 && chk != 1) {
-							m_wmWorldState->m_state0E = -1;
-							m_wmWorldState->m_counter1A = 1;
-							break;
-						}
-					} else if (m_wmWorldState->m_mcResult != sVar18 && m_wmWorldState->m_mcResult != 1) {
+			if (m_wmWorldState->m_subState == 0xE) {
+				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				if (m_wmWorldState->m_mcResult < 0) goto LAB_chkLoad;
+			} else if (m_wmWorldState->m_subState == 5) {
+				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+			LAB_chkLoad:
+				sVar8 = m_wmWorldState->m_subState;
+				short sVar18;
+				if (sVar8 == 5) { sVar18 = -1; }
+				else if (sVar8 == 6) { sVar18 = -3; }
+				else if (sVar8 == 7) { sVar18 = -4; }
+				else { sVar18 = 0; }
+				if (sVar8 == 7) {
+					short chk = m_wmWorldState->m_mcResult;
+					if (chk != 0 && chk != sVar18 && chk != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
 					}
+				} else if (m_wmWorldState->m_mcResult != sVar18 && m_wmWorldState->m_mcResult != 1) {
+					m_wmWorldState->m_state0E = -1;
+					m_wmWorldState->m_counter1A = 1;
+					break;
 				}
 			}
 			if ((uVar4 & 0x300) != 0) {
@@ -5032,7 +5023,7 @@ void CMenuPcs::DrawMoveMenu()
 #define worldState m_wmWorldState
 
 	{
-		const short state = worldState->m_mainState;
+		short state = worldState->m_mainState;
 		if ((state == 0) && bytes[0x12] == 0) {
 			return;
 		}
@@ -5042,14 +5033,14 @@ void CMenuPcs::DrawMoveMenu()
 	}
 
 	DrawFukidashi();
-	const short state = worldState->m_mainState;
+	short state = worldState->m_mainState;
 	float moveAlpha;
 	int __p16 = state;
 	if (__p16 == 1) {
-		moveAlpha = static_cast<float>((static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
+		moveAlpha = static_cast<float>(static_cast<double>(worldState->m_frameCounter) / DOUBLE_803316e8);
 	int __p16 = state;
 	} else if (__p16 == 2 && bytes[0x13] != 0) {
-		moveAlpha = static_cast<float>(DOUBLE_80331420 - (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
+		moveAlpha = static_cast<float>(DOUBLE_80331420 - static_cast<double>(worldState->m_frameCounter) / DOUBLE_803316e8);
 	} else {
 		moveAlpha = FLOAT_803313e8;
 	}
@@ -5063,27 +5054,24 @@ void CMenuPcs::DrawMoveMenu()
 		helpColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * moveAlpha));
 		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
-		MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
-		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+		MenuPcs.DrawRect(0, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
+		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 	DrawWMFrame();
 
 	if (worldState->m_mainState > 0 && worldState->m_mainState < 3) {
 		unsigned char* const worldObj = m_wm.m_worldObjData;
 #define handle (reinterpret_cast<CCharaPcs::CHandle*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]))
-		Mtx savedCamera;
 		Mtx lookAtMtx;
 		Mtx44 projectionMtx;
-
-		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 
 		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x1A0), reinterpret_cast<Vec*>(&up),
-		    reinterpret_cast<Point3d*>(&target));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, savedCamera);
+		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x1A0),
+		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
+		            reinterpret_cast<Point3d*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
@@ -5104,32 +5092,33 @@ void CMenuPcs::DrawMoveMenu()
 		WmMenuLightTable& lightTable = gWmMenuLightTables[0];
 		LightPcs.SetAmbient(lightTable.m_ambient);
 		LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
-		for (unsigned int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
+		for (int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
 			LightPcs.SetDiffuse(
 				lightIndex, lightTable.m_diffuseColors[lightIndex],
 				&lightTable.m_diffuseDirs[lightIndex], 0);
 		}
 		LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
-		if (handle != 0 && handle->m_model != 0) {
+		{
 			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_effectWork) + 0x1E70) = handle->m_model->m_lightAlpha;
 			handle->Draw(5);
 			pppFVECTOR4 color;
-			const unsigned short partColorIndex = m_crystalPart;
+			const short partColorIndex = m_crystalPart;
 			PartPcs.GetParColIdx(partColorIndex, color);
 			color.w = handle->m_model->m_lightAlpha;
 			PartPcs.SetParColIdx(partColorIndex, color);
-			if (!(!(m_effectTimer == 0))) {
-				m_effectTimer = 1;
+			if (*reinterpret_cast<char*>(bytes + 0x80) == 0) {
+				*reinterpret_cast<char*>(bytes + 0x80) = 1;
 			} else {
 				PartPcs.DrawMenu(m_crystalAttr);
 			}
 		}
 
-		PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
+		PSMTXCopy(reinterpret_cast<MtxPtr>(bytes + 0x744), CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0x00FFFFFF);
-		PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
-		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+		Mtx44 restoreMtx;
+		PSMTX44Copy(CameraPcs.m_screenMatrix, restoreMtx);
+		GXSetProjection(restoreMtx, GX_PERSPECTIVE);
 		Graphic.SetViewport();
 		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();
@@ -5190,6 +5179,7 @@ void CMenuPcs::DrawLoadMenu()
 	}
 
 	short state = m_wmWorldState->m_mainState;
+	float cursorXbase;
 	float alpha;
 	if (state > 0 && state < 4) {
 		double raw;
@@ -5243,8 +5233,11 @@ void CMenuPcs::DrawLoadMenu()
 	// Cursor / selection rendering
 	state = m_wmWorldState->m_mainState;
 	if (state == 2 && m_wmWorldState->m_subState >= 0x11) {
-		float cursorY0 = static_cast<float>(static_cast<double>(FLOAT_803314d8) - DOUBLE_803317D8);
-		float cursorXbase = FLOAT_803314d8 + FLOAT_80331410;
+		float cursorY0;
+		cursorY0 = FLOAT_803314d8;
+		cursorXbase = cursorY0;
+		cursorY0 = static_cast<float>(static_cast<double>(cursorY0) - DOUBLE_803317D8);
+		cursorXbase = cursorXbase + FLOAT_80331410;
 		unsigned int saveIdx;
 		if (m_wmWorldState->m_subState == 0x11) {
 			saveIdx = static_cast<unsigned int>(m_wmWorldState->m_cardChannel);
@@ -5254,7 +5247,7 @@ void CMenuPcs::DrawLoadMenu()
 		double rawIdx;
 		reinterpret_cast<int*>(&rawIdx)[0] = 0x43300000;
 		reinterpret_cast<int*>(&rawIdx)[1] = saveIdx ^ 0x80000000;
-		float cursorY1 = static_cast<float>(DOUBLE_80331498 * (rawIdx - DOUBLE_80331408) + static_cast<double>(cursorXbase));
+		cursorXbase = static_cast<float>(DOUBLE_80331498 * (rawIdx - DOUBLE_80331408) + static_cast<double>(cursorXbase));
 		MenuPcs.SetAttrFmt((FMT)0);
 		_GXColor cursorColor;
 		cursorColor.r = 0xFF;
@@ -5263,7 +5256,7 @@ void CMenuPcs::DrawLoadMenu()
 		cursorColor.a = 0xFF;
 		GXSetChanMatColor(GX_COLOR0A0, cursorColor);
 		MenuPcs.SetTexture((TEX)0);
-		MenuPcs.DrawRect(0, (float)(int)cursorY0, (float)(int)cursorY1,
+		MenuPcs.DrawRect(0, (float)(int)cursorY0, (float)(int)cursorXbase,
 		         FLOAT_80331410, FLOAT_80331410,
 		         FLOAT_803313dc, FLOAT_803313dc,
 		         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
@@ -5280,10 +5273,10 @@ void CMenuPcs::DrawLoadMenu()
 				GXSetProjection(projMtx, GX_PERSPECTIVE);
 				PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
 
-				CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-				CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 				Mtx lookAtMtx;
-				C_MTXLookAt(lookAtMtx, (Vec*)(slot + 0x10), (Vec*)&up, (Vec*)&target);
+				C_MTXLookAt(lookAtMtx, (Vec*)(slot + 0x10),
+				            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+				            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
 				PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(m_wm.m_pad744));
 				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 				CharaPcs.InitEnv(5);
@@ -5335,8 +5328,8 @@ void CMenuPcs::DrawLoadMenu()
 
 	// State machine for MC operations
 	state = m_wmWorldState->m_mainState;
-	short subState = m_wmWorldState->m_subState;
 	if (state == 2 && m_wmWorldState->m_delay == 0) {
+		short subState = m_wmWorldState->m_subState;
 		short winState;
 		switch ((int)subState) {
 		case 0:
@@ -5497,6 +5490,14 @@ void CMenuPcs::DrawLoadMenu()
 					         FLOAT_80331410, FLOAT_80331410,
 					         FLOAT_803313dc, FLOAT_803313dc,
 					         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				} else {
+					short ynResult0 = m_wmWorldState->m_mcResult;
+					if (ynResult0 < 0) {
+						if (ynResult0 == -1) m_wmWorldState->m_subState = 5;
+						else if (ynResult0 == -2) m_wmWorldState->m_subState = 8;
+						else if (ynResult0 == -3) m_wmWorldState->m_subState = 6;
+						else m_wmWorldState->m_subState = 7;
+					}
 				}
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
@@ -5541,16 +5542,18 @@ void CMenuPcs::DrawLoadMenu()
 				else dmsgId = 9;
 				DrawMcWinMess(dmsgId, dmsgParam);
 			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short dRes = m_wmWorldState->m_mcResult;
-				if (subState == 0x0D) {
+				if (m_wmWorldState->m_subState == 0x0D) {
+					short dRes = m_wmWorldState->m_mcResult;
 					if (dRes == 1) m_wmWorldState->m_subState = 0x0E;
 					else if (dRes == -2) m_wmWorldState->m_subState = 7;
 					else m_wmWorldState->m_subState = 0x0F;
 				} else if (subState == 0x1A) {
+					short dRes = m_wmWorldState->m_mcResult;
 					if (dRes == 1) m_wmWorldState->m_subState = 0x1C;
 					else if (dRes == -2) m_wmWorldState->m_subState = 7;
 					else m_wmWorldState->m_subState = 0x1B;
 				} else {
+					short dRes = m_wmWorldState->m_mcResult;
 					if (dRes == 1) {
 						m_wmWorldState->m_subState = 0x18;
 						Sound.PlaySe(0x42, 0x40, 0x7F, 0);
@@ -5564,6 +5567,9 @@ void CMenuPcs::DrawLoadMenu()
 			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(6, 0);
+				if (m_wmWorldState->m_mcResult == 0) {
+					break;
+				}
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
 				short cRes = m_wmWorldState->m_mcResult;
@@ -5634,7 +5640,7 @@ void CMenuPcs::DrawLoadMenu()
 				m_wmWorldState->m_nextMenuMode = 0;
 			}
 		}
-	} else if (m_wmWorldState->m_delay != 0) {
+	} else if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_delay != 0) {
 		m_wmWorldState->m_delay--;
 		if (m_wmWorldState->m_delay <= 0) {
 			m_wmWorldState->m_mainState++;
@@ -5699,10 +5705,10 @@ void CMenuPcs::DrawTitleMenu()
 		eye.x = FLOAT_803313dc;
 		eye.y = FLOAT_803313dc;
 		eye.z = FLOAT_80331768;
-		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 		Mtx lookAtMtx;
-		C_MTXLookAt(lookAtMtx, &eye, (Vec*)&up, (Vec*)&target);
+		C_MTXLookAt(lookAtMtx, &eye,
+		            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+		            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
 		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(m_wm.m_pad744));
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
@@ -5728,7 +5734,7 @@ void CMenuPcs::DrawTitleMenu()
 
 		// Fade-in overlay (state 1)
 			state = m_wmWorldState->m_mainState;
-			if (state == 1 && lbl_8032E8AC == 0) {
+			if (state == 1 && static_cast<signed char>(lbl_8032E8AC) == 0) {
 				float fadeAlpha = static_cast<float>(-(DOUBLE_80331770 *
 				                                        static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                                        DOUBLE_80331420));
@@ -5759,13 +5765,15 @@ void CMenuPcs::DrawTitleMenu()
 				fY = FLOAT_8033177c + (float)(m_wmWorldState->m_cardChannel * 0x28 - 8);
 			}
 			float fYRect = fY - FLOAT_80331780;
-			float alpha = FLOAT_803313e8;
+			float alpha;
 			if (state == 2 && m_wmWorldState->m_state12 == 0) {
 				int timer = (int)m_wmWorldState->m_titleState;
 				fX = static_cast<float>(-(DOUBLE_80331790 *
 				                           (static_cast<double>(5 - timer) / DOUBLE_80331798) -
 				                           static_cast<double>(fX)));
 				alpha = static_cast<float>(DOUBLE_80331788 * static_cast<double>(timer) + DOUBLE_803314e8);
+			} else {
+				alpha = FLOAT_803313e8;
 			}
 			matColor.r = 0xFF;
 			matColor.g = 0xFF;
@@ -5815,9 +5823,11 @@ void CMenuPcs::DrawTitleMenu()
 		unsigned int uVar7 = 0xFFFFFFF8;
 		unsigned int uVar6 = 0x70;
 		for (int i = 0; i < 2; i++) {
-			float labelAlpha = FLOAT_803313e8;
+			float labelAlpha;
 			if (m_wmWorldState->m_mainState == 1) {
 				labelAlpha = static_cast<float>(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter));
+			} else {
+				labelAlpha = FLOAT_803313e8;
 			}
 			matColor.r = 0xFF;
 			matColor.g = 0xFF;
@@ -5876,9 +5886,11 @@ void CMenuPcs::DrawTitleMenu()
 		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 		MenuPcs.SetTexture((TEX)0x44);
-		float copyrightAlpha = FLOAT_803313e8;
+		float copyrightAlpha;
 		if (m_wmWorldState->m_mainState == 1) {
 			copyrightAlpha = static_cast<float>(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter));
+		} else {
+			copyrightAlpha = FLOAT_803313e8;
 		}
 		matColor.r = 0xFF;
 		matColor.g = 0xFF;
@@ -5902,7 +5914,7 @@ void CMenuPcs::DrawTitleMenu()
 
 		// Fade out / transition to next state
 		state = m_wmWorldState->m_mainState;
-		if (state == 3 || (state == 1 && lbl_8032E8AC != 0)) {
+		if (state == 3 || (state == 1 && static_cast<signed char>(lbl_8032E8AC) != 0)) {
 			float fadeAlpha2;
 			if (state == 3) {
 				fadeAlpha2 = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter + 1));
@@ -6948,7 +6960,6 @@ void CMenuPcs::CalcFukidashi()
 void CMenuPcs::DrawFukidashi()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	Mtx& cameraBackup = *reinterpret_cast<Mtx*>(bytes + 0x744);
 	CFont* const fontFC = m_fonts[1];
 	if (static_cast<signed char>(bytes[0x09]) != 1) {
 		return;
@@ -6980,7 +6991,7 @@ void CMenuPcs::DrawFukidashi()
 	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
 		int bd = reinterpret_cast<int>(m_wm.m_bubbleData);
 		MenuPcs.DrawRect(0,
-			(float)*reinterpret_cast<unsigned short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
+			(float)*reinterpret_cast<short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
 			(float)*reinterpret_cast<short*>(bd + 0x20), (float)*reinterpret_cast<short*>(bd + 0x22),
 			*reinterpret_cast<float*>(bd + 0x24), *reinterpret_cast<float*>(bd + 0x28),
 			FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
@@ -7010,9 +7021,7 @@ void CMenuPcs::DrawFukidashi()
 				iVar5++;
 			}
 		} else {
-			int idx = 0;
-			int cnt = 5;
-			do {
+			for (int idx = 0; idx < 5; idx++) {
 				if ((uVar3 & (0x10 << idx)) != 0) {
 					MenuPcs.SetTexture((TEX)(idx + 0x19));
 					int bd = *reinterpret_cast<int*>(bytes + 0x818);
@@ -7023,9 +7032,7 @@ void CMenuPcs::DrawFukidashi()
 						FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 					break;
 				}
-				idx++;
-				cnt--;
-			} while (cnt != 0);
+			}
 		}
 	}
 
@@ -7039,10 +7046,10 @@ void CMenuPcs::DrawFukidashi()
 		const int language = Game.m_gameWork.m_languageId;
 		if (language == 2) {
 			strcpy(nameBuffer, Game.m_gameWork.m_townName);
-			strcat(nameBuffer, lbl_80210D10[language - 1], sizeof(nameBuffer));
+			strcat(nameBuffer, lbl_80210D10[language - 1]);
 		} else {
 			strcpy(nameBuffer, lbl_80210D10[language - 1]);
-			strcat(nameBuffer, Game.m_gameWork.m_townName, sizeof(nameBuffer));
+			strcat(nameBuffer, Game.m_gameWork.m_townName);
 		}
 	} else {
 		strcpy(nameBuffer, Game.m_cFlatDataArr[1].TableStrings(3)[fieldVal]);
@@ -7115,11 +7122,11 @@ void CMenuPcs::DrawFukidashi()
 					GXSetProjection(projMtx, GX_PERSPECTIVE);
 					PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
 
-					CVector eye(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-					CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 					Mtx lookAtMtx;
-					C_MTXLookAt(lookAtMtx, (Vec*)(piVar10 + 4), (Vec*)&up, (Vec*)&eye);
-					PSMTXCopy(CameraPcs.m_cameraMatrix, cameraBackup);
+					C_MTXLookAt(lookAtMtx, (Vec*)(piVar10 + 4),
+					            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+					            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
+					PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
 					PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 					CharaPcs.InitEnv(5);
 					GXSetColorUpdate(0);
@@ -7162,7 +7169,7 @@ void CMenuPcs::DrawFukidashi()
 	}
 
 	if (viewportSetup != 0) {
-		PSMTXCopy(cameraBackup, CameraPcs.m_cameraMatrix);
+		PSMTXCopy(reinterpret_cast<MtxPtr>(bytes + 0x744), CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 		Mtx44 screenCopy;
 		PSMTX44Copy(CameraPcs.m_screenMatrix, screenCopy);
@@ -10116,10 +10123,12 @@ input_check_done:
 	if (((state > 0) && (state < 4)) || m_wmWorldState->m_cardChannel == 1) {
 		if (state == 2 && m_wmWorldState->m_delay == 0) {
 			if ((btn & 1) != 0) {
+				float zero = FLOAT_803313dc;
 				*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_8033151c;
-				if (*reinterpret_cast<float*>(bytes + 0x78) < FLOAT_803313dc) {
-					*reinterpret_cast<float*>(bytes + 0x78) += FLOAT_80331528;
-					*reinterpret_cast<float*>(bytes + 0x7C) += FLOAT_80331528;
+				if (*reinterpret_cast<float*>(bytes + 0x78) < zero) {
+					float wrap = FLOAT_80331528;
+					*reinterpret_cast<float*>(bytes + 0x78) += wrap;
+					*reinterpret_cast<float*>(bytes + 0x7C) += wrap;
 				}
 				m_wmWorldState->m_frameCounter = 0xE;
 				if (m_wmWorldState->m_cardChannel >= 4) {
@@ -10129,10 +10138,11 @@ input_check_done:
 				}
 				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			} else if ((btn & 2) != 0) {
+				float wrap2 = FLOAT_80331528;
 				*reinterpret_cast<float*>(bytes + 0x78) += FLOAT_8033151c;
-				if (*reinterpret_cast<float*>(bytes + 0x78) > FLOAT_80331528) {
-					*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_80331528;
-					*reinterpret_cast<float*>(bytes + 0x7C) -= FLOAT_80331528;
+				if (*reinterpret_cast<float*>(bytes + 0x78) > wrap2) {
+					*reinterpret_cast<float*>(bytes + 0x78) -= wrap2;
+					*reinterpret_cast<float*>(bytes + 0x7C) -= wrap2;
 				}
 				m_wmWorldState->m_frameCounter = 0xE;
 				if (m_wmWorldState->m_cardChannel <= 0) {
@@ -10210,13 +10220,15 @@ input_check_done:
 		WM_MENU_EVAL_SPLINE(selectedRotZ, DAT_8032E8DC, DAT_8032E8D8, t);
 		WM_MENU_EVAL_SPLINE(selectedYOffset, DAT_8032E8E4, DAT_8032E8E0, t);
 
-		float openScale = FLOAT_803313dc;
+		float openScale;
 		if (m_wmWorldState->m_nextMenuMode != -1) {
 			t = static_cast<float>(0x14 - m_wmWorldState->m_delay) / FLOAT_803314c0;
 			WM_MENU_EVAL_SPLINE(openScale, DAT_8032E8EC, DAT_8032E8E8, t);
+		} else {
+			openScale = FLOAT_803313dc;
 		}
 
-		if (state == 2 && m_wmWorldState->m_delay == 0) {
+		if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_delay == 0) {
 			m_wmWorldState->m_titleState++;
 			if (m_wmWorldState->m_titleState >= 100) {
 				m_wmWorldState->m_titleState = 0;

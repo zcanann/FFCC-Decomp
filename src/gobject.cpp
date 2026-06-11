@@ -1817,9 +1817,9 @@ void CGObject::update()
             }
 
             ModelLightAlpha(m_charaModelHandle->m_model) = m_lookAtTimer;
-            m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
-                static_cast<s32>(static_cast<s32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0;
-            m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
+            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_charaModelHandle->m_model))->m_bit20 =
+                m_weaponNodeFlagBits.m_unk20;
+            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_charaModelHandle->m_model))->m_bit80 = (m_displayFlags & 0x20) != 0;
         }
 
         m_charaModelHandle->m_model->CalcFurColor();

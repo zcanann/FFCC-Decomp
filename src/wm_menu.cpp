@@ -3413,15 +3413,15 @@ void CMenuPcs::CalcLoadMenu()
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 			} else {
+				int countEmpty = 0;
 				if (m_wmWorldState->m_menuMode == 8) {
-					int iVar23 = 0;
-					for (int i = iVar23; i < 4; i++) {
+					for (int i = countEmpty; i < 4; i++) {
 						if (*reinterpret_cast<char*>(m_wmCharaState + i * 0x48 + 0x42) == 0
 						    && *reinterpret_cast<int*>(m_wmCharaState + i * 0x48 + 8) > 0) {
-							iVar23++;
+							countEmpty++;
 						}
 					}
-					if (iVar23 == 0) {
+					if (countEmpty == 0) {
 						m_wmWorldState->m_mcResult = (short)0xFC19;
 					}
 				}

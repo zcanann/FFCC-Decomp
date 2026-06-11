@@ -60,6 +60,7 @@ void CMenuPcs::CompaDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	GXColor colors[4];
 	CompaOpenAnim* entry = this->m_compaList->entries;
 	for (int i = 0; i < this->m_compaList->count; i++) {
 		int tex = entry->tex;
@@ -75,7 +76,6 @@ void CMenuPcs::CompaDraw()
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
-				GXColor colors[4];
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
 				colors[0].b = 0xFF;
@@ -151,12 +151,11 @@ void CMenuPcs::CompaDraw()
 			} else {
 				float alpha = entry->alpha;
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
-				GXColor color;
-				color.r = 0xFF;
-				color.g = 0xFF;
-				color.b = 0xFF;
-				color.a = static_cast<unsigned char>(alpha * kCompaColorMax);
-				GXSetChanMatColor(GX_COLOR0A0, color);
+				colors[0].r = 0xFF;
+				colors[0].g = 0xFF;
+				colors[0].b = 0xFF;
+				colors[0].a = static_cast<unsigned char>(alpha * kCompaColorMax);
+				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, kCompaZero);
 			}
 		}
@@ -166,12 +165,11 @@ void CMenuPcs::CompaDraw()
 
 	CompaOpenAnimList* compaList = this->m_compaList;
 
-	GXColor color;
-	color.r = 0xFF;
-	color.g = 0xFF;
-	color.b = 0xFF;
-	color.a = static_cast<signed char>(compaList->entries[0].alpha * kCompaColorMax);
-	GXSetChanMatColor(GX_COLOR0A0, color);
+	colors[0].r = 0xFF;
+	colors[0].g = 0xFF;
+	colors[0].b = 0xFF;
+	colors[0].a = static_cast<signed char>(compaList->entries[0].alpha * kCompaColorMax);
+	GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
 	int familyCount = 2;
@@ -200,23 +198,25 @@ void CMenuPcs::CompaDraw()
 			kCompaOne, kCompaZero);
 	}
 
-	int memberIndex = 0;
+	int drawIndex = 0;
 	int shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		float iconX = static_cast<float>(compaList->entries[0].x + 0x128);
 		float iconY = static_cast<float>(compaList->entries[0].y + 0x40);
 
-		int drawIndex = shown;
-		if (shown >= 2) {
-			drawIndex = memberIndex;
-			for (; drawIndex < 7; drawIndex++) {
-				if (caravanWork->m_evtWordArr[19 + drawIndex] != 0) {
+		if (i >= 2) {
+			int scan = drawIndex;
+			for (; scan < 7; scan++) {
+				if (caravanWork->m_evtWordArr[19 + scan] != 0) {
+					drawIndex = scan;
 					break;
 				}
 			}
-			if (drawIndex >= 8) {
+			if (scan >= 8) {
 				break;
 			}
+		} else {
+			drawIndex = i;
 		}
 
 		const u8* foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][drawIndex + 1];
@@ -245,7 +245,7 @@ void CMenuPcs::CompaDraw()
 			compaList->entries[0].alpha, 1, kCompaOne);
 
 		shown++;
-		memberIndex = drawIndex + 1;
+		drawIndex++;
 	}
 
 	CFont* font = m_fonts[4];
@@ -258,20 +258,22 @@ void CMenuPcs::CompaDraw()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
 
 	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	memberIndex = 0;
+	drawIndex = 0;
 	shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
-		int drawIndex = shown;
-		if (shown >= 2) {
-			drawIndex = memberIndex;
-			for (; drawIndex < 7; drawIndex++) {
-				if (nameWork->m_evtWordArr[19 + drawIndex] > 0) {
+		if (i >= 2) {
+			int scan = drawIndex;
+			for (; scan < 7; scan++) {
+				if (nameWork->m_evtWordArr[19 + scan] > 0) {
+					drawIndex = scan;
 					break;
 				}
 			}
-			if (drawIndex >= 8) {
+			if (scan >= 8) {
 				break;
 			}
+		} else {
+			drawIndex = i;
 		}
 
 		const char* name = GetMenuStr(drawIndex + 0x16);
@@ -287,7 +289,7 @@ void CMenuPcs::CompaDraw()
 		font->Draw(value);
 
 		shown++;
-		memberIndex = drawIndex + 1;
+		drawIndex++;
 	}
 
 	font = m_fonts[4];
@@ -295,8 +297,7 @@ void CMenuPcs::CompaDraw()
 	font->SetShadow(0);
 	font->SetScale(kCompaJobFontScale);
 	font->DrawInit();
-	GXColor jobColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * this->m_compaList->entries[0].alpha)).color;
-	font->SetColor(jobColor);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * this->m_compaList->entries[0].alpha)).color);
 
 	const char* job = GetJobStr(nameWork->unk_0x3ac);
 	font->GetWidth(job);
@@ -368,7 +369,7 @@ bool CMenuPcs::CompaClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CompaCtrl()
+unsigned int CMenuPcs::CompaCtrl()
 {
 	bool activeInput = false;
 	int padState = Pad.m_debugPadLock;
@@ -469,13 +470,17 @@ noReset:
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
 
-		CompaOpenAnim* entry = this->m_compaList->entries;
-		for (int entryCount = this->m_compaList->count; entryCount > 0; entryCount--) {
+		CompaOpenAnimList* animList = this->m_compaList;
+		int entryCount = animList->count;
+		CompaOpenAnim* entry = animList->entries;
+		for (; entryCount > 0; entryCount--) {
 			entry->frame = 0;
 			entry->alpha = LoadFloat(kCompaOne);
 			entry++;
 		}
 	}
+
+	return doReset;
 }
 
 /*
@@ -594,18 +599,10 @@ void CMenuPcs::CompaInit()
 
 	CompaOpenAnim* entry = this->m_compaList->entries;
 	float one = LoadFloatRef(kCompaOne);
-	int count = 8;
-	do {
-		entry[0].uvScale = one;
-		entry[1].uvScale = one;
-		entry[2].uvScale = one;
-		entry[3].uvScale = one;
-		entry[4].uvScale = one;
-		entry[5].uvScale = one;
-		entry[6].uvScale = one;
-		entry[7].uvScale = one;
-		entry += 8;
-	} while (--count != 0);
+	for (int count = 64; count != 0; count--) {
+		entry->uvScale = one;
+		entry++;
+	}
 
 	CompaOpenAnimList* compaList = this->m_compaList;
 	int entryIndex = 0;

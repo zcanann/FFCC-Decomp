@@ -1088,7 +1088,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
                 if (nameLen == 0) {
                     strcat(s_CmakeInfo.m_name, picked);
                     ret = 0;
-                } else if ((__cntlzw(static_cast<unsigned int>(strlen(rowText))) >> 5 & 1) == 0 && nameLen >= 7) {
+                } else if (-((__cntlzw(strlen(rowText)) & 0x20) >> 5) == 0 && nameLen >= 7) {
                     ret = -1;
                 } else {
                     strcat(s_CmakeInfo.m_name, picked);

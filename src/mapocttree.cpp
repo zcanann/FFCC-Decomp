@@ -57,14 +57,12 @@ static inline CMapObj* GetMapObjByIndex(unsigned short index)
  */
 void setbit32(unsigned long* arg0, unsigned long arg1)
 {
-	unsigned long* bits;
 	unsigned long offset;
 	unsigned long mask;
 
-	bits = (unsigned long*)((unsigned char*)arg0 + ((arg1 >> 3) & 0x1ffffffc));
 	offset = arg1 & 0x1f;
 	mask = 1UL << offset;
-	*bits |= mask;
+	arg0[arg1 >> 5] |= mask;
 }
 
 /*

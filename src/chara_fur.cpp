@@ -495,7 +495,8 @@ void CChara::TimeMogFur()
 			int baseLight = 7 - static_cast<int>(a);
 			int r = ((packed >> 8) & 0xF) + 4 + baseLight;
 			int b = (packed & 0xF) + 4 + baseLight;
-			int g = ((packed >> 4) & 0xF) + 4 + baseLight;
+			int gNibble = (packed >> 4) & 0xF;
+			int g = gNibble + 4 + baseLight;
 
 			int light = 0xF;
 			if (r < 0xF) {

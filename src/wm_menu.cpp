@@ -5071,7 +5071,6 @@ void CMenuPcs::DrawMoveMenu()
 	if (worldState->m_mainState > 0 && worldState->m_mainState < 3) {
 		unsigned char* const worldObj = m_wm.m_worldObjData;
 #define handle (reinterpret_cast<CCharaPcs::CHandle*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]))
-		Mtx savedCamera;
 		Mtx lookAtMtx;
 		Mtx44 projectionMtx;
 

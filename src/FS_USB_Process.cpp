@@ -284,10 +284,10 @@ void CFunnyShapePcs::SetUSBData()
         mesh->flags = LoadSwap16(mesh->flags);
         mesh->count = LoadSwap16(mesh->count);
 
-        int dst2c = 0;
-        int dst24 = 0;
-        int i = 0;
-        for (; i < m_funnyShape.m_shape.count;
+        int dst2c;
+        int dst24;
+        int i;
+        for (i = 0, dst24 = 0, dst2c = 0; i < m_funnyShape.m_shape.count;
              i++, dst24 += 0x24, dst2c += 0x2C) {
             if ((m_funnyShape.m_shape.flags & 8) != 0) {
                 u8* src = meshData + 0x10;

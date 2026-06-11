@@ -5156,10 +5156,7 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
 
     result = SetSendQueue(threadParam, word);
 
-    if (result != 0)
-	{
-        return result;
-	}
+    if (result != 0) goto out;
 
     m_modeXArr[threadParam->m_portIndex] = m_nextModeTypeArr[threadParam->m_portIndex];
     m_nextModeTypeArr[threadParam->m_portIndex] = (unsigned char)modeType;
@@ -5173,6 +5170,7 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
         m_ctrlModeArr[threadParam->m_portIndex] = 1;
 	}
 
+out:
     return result;
 }
 

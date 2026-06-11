@@ -3270,8 +3270,11 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                                 material->GetTexScroll(slot)->m_type0 = 2;
                             } else {
                                 material->GetTexScroll(slot)->m_u1 = chunkFile.GetF4();
-                                material->GetTexScroll(slot)->m_type0 =
-                                    (material->GetTexScroll(slot)->m_u1 == kTextureZero) ? 0 : 1;
+                                if (material->GetTexScroll(slot)->m_u1 == kTextureZero) {
+                                    material->GetTexScroll(slot)->m_type0 = 0;
+                                } else {
+                                    material->GetTexScroll(slot)->m_type0 = 1;
+                                }
                             }
 
                             if (keyFrameV != 0) {
@@ -3280,8 +3283,11 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                                 material->GetTexScroll(slot)->m_type1 = 2;
                             } else {
                                 material->GetTexScroll(slot)->m_v1 = chunkFile.GetF4();
-                                material->GetTexScroll(slot)->m_type1 =
-                                    (material->GetTexScroll(slot)->m_v1 == kTextureZero) ? 0 : 1;
+                                if (material->GetTexScroll(slot)->m_v1 == kTextureZero) {
+                                    material->GetTexScroll(slot)->m_type1 = 0;
+                                } else {
+                                    material->GetTexScroll(slot)->m_type1 = 1;
+                                }
                             }
                         } break;
                         case CHUNK_UFRM:
@@ -3308,13 +3314,9 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     material->GetTexScroll(slot)->m_v1 = chunkFile.GetF4();
                     if (kTextureZero != material->GetTexScroll(slot)->m_u1) {
                         material->GetTexScroll(slot)->m_type0 = 1;
-                    } else {
-                        material->GetTexScroll(slot)->m_type0 = 0;
                     }
                     if (kTextureZero != material->GetTexScroll(slot)->m_v1) {
                         material->GetTexScroll(slot)->m_type1 = 1;
-                    } else {
-                        material->GetTexScroll(slot)->m_type1 = 0;
                     }
                 }
             } break;

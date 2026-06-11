@@ -50,11 +50,11 @@ static const char sDbgMenuChara[] = "CHARA";
 extern const u32 kDbgMenuHighlightAlpha = 0x00000080;
 extern const u32 kDbgMenuFontColor = 0xFFFFFFFF;
 static const char sDbgMenuDebug[] = "Debug";
-extern const float kDbgMenuViewportNear = 0.0f;
-extern const double kDbgMenuSignedIntBias = 4503601774854144.0;
-extern const float kDbgMenuViewportWidth = 640.0f;
-extern const float kDbgMenuViewportHeight = 448.0f;
-extern const float kDbgMenuViewportFar = 1.0f;
+extern const float kDbgMenuViewportNear;
+extern const double kDbgMenuSignedIntBias;
+extern const float kDbgMenuViewportWidth;
+extern const float kDbgMenuViewportHeight;
+extern const float kDbgMenuViewportFar;
 static const char sDbgMenuOn[] = "ON";
 static const char sDbgMenuOff[] = "OFF";
 static const char sDbgMenuUnknown[] = "?";
@@ -535,6 +535,12 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 		menu = menu->m_next;
 	} while (menu != head);
 }
+
+extern const float kDbgMenuViewportNear = 0.0f;
+extern const double kDbgMenuSignedIntBias = 4503601774854144.0;
+extern const float kDbgMenuViewportWidth = 640.0f;
+extern const float kDbgMenuViewportHeight = 448.0f;
+extern const float kDbgMenuViewportFar = 1.0f;
 
 /*
  * --INFO--

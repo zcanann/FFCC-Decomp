@@ -1120,10 +1120,10 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     int freeCount = 0;
 
     if (stageGetAllocationMode(this) == 2) {
-        int i;
-        int blockTail;
         int showFree = flag & 1;
         int showUsed = flag & 2;
+        int i;
+        int blockTail;
         int size;
         int top = m_heapTop;
 

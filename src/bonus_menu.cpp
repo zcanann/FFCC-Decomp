@@ -1246,8 +1246,9 @@ void CMenuPcs::CalcSelectWait()
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		this->m_menuWindowInfo->state = 3;
 		{
-			int walkOff = 0;
+			int walkOff;
 			int i = 0;
+			walkOff = 0;
 			while (i < (int)*(short*)this->m_bonusAnimPtr) {
 				int animBase = this->m_bonusAnimPtr + walkOff + 8;
 				*(float*)(animBase + 0x10) = FLOAT_80331EB0;
@@ -1430,7 +1431,8 @@ void CMenuPcs::CalcSelectWait()
 	{
 		int i = 0;
 		int doubleCount = activePartyCount * 2;
-		for (; i < activePartyCount + 8; i++) {
+		int __p14 = i;
+		for (; activePartyCount > __p14 + 8; i++) {
 			BonusAnimSprite* alphaSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (((int)(signed char)s_PlayerTop + i) << 6) + 8);
 			CCharaPcs::CHandle* handle;
 			int tribeOrSlot;

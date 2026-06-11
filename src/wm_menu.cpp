@@ -5714,10 +5714,10 @@ void CMenuPcs::DrawTitleMenu()
 		eye.x = FLOAT_803313dc;
 		eye.y = FLOAT_803313dc;
 		eye.z = FLOAT_80331768;
-		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 		Mtx lookAtMtx;
-		C_MTXLookAt(lookAtMtx, &eye, (Vec*)&up, (Vec*)&target);
+		C_MTXLookAt(lookAtMtx, &eye,
+		            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+		            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
 		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(m_wm.m_pad744));
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
@@ -5743,7 +5743,7 @@ void CMenuPcs::DrawTitleMenu()
 
 		// Fade-in overlay (state 1)
 			state = m_wmWorldState->m_mainState;
-			if (state == 1 && lbl_8032E8AC == 0) {
+			if (state == 1 && static_cast<signed char>(lbl_8032E8AC) == 0) {
 				float fadeAlpha = static_cast<float>(-(DOUBLE_80331770 *
 				                                        static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                                        DOUBLE_80331420));
@@ -5917,7 +5917,7 @@ void CMenuPcs::DrawTitleMenu()
 
 		// Fade out / transition to next state
 		state = m_wmWorldState->m_mainState;
-		if (state == 3 || (state == 1 && lbl_8032E8AC != 0)) {
+		if (state == 3 || (state == 1 && static_cast<signed char>(lbl_8032E8AC) != 0)) {
 			float fadeAlpha2;
 			if (state == 3) {
 				fadeAlpha2 = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter + 1));

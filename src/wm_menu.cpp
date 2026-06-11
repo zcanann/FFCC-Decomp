@@ -10240,8 +10240,10 @@ input_check_done:
 			m_wmWorldState->m_titleState = 0;
 		}
 
+		const float rotZSel = FLOAT_803314bc * selectedRotZ;
+		const float rotYSel = FLOAT_803314bc * selectedRotY;
 		for (int i = 0; i < 5; i++) {
-			const unsigned short curState = m_wmWorldState->m_mainState;
+			const short curState = m_wmWorldState->m_mainState;
 			if (!(((curState > 0) && (curState < 4)) || i == 1)) {
 				continue;
 			}
@@ -10302,13 +10304,13 @@ input_check_done:
 				} else {
 					PSMTXRotRad(modelMtx, 'x', FLOAT_80331610);
 				}
-			} else {
+			} else if (i == 2 || i == 3 || i == 4) {
 				PSMTXRotRad(modelMtx, 'x', FLOAT_80331614);
 			}
 
 			if (m_wmWorldState->m_cardChannel == i) {
-				PSMTXRotRad(rotMtx, 'z', FLOAT_803314bc * selectedRotZ);
-				PSMTXRotRad(scaleMtx, 'y', FLOAT_803314bc * selectedRotY);
+				PSMTXRotRad(rotMtx, 'z', rotZSel);
+				PSMTXRotRad(scaleMtx, 'y', rotYSel);
 				PSMTXConcat(rotMtx, scaleMtx, rotMtx);
 				PSMTXConcat(rotMtx, modelMtx, modelMtx);
 			}

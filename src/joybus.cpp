@@ -6862,12 +6862,11 @@ void JoyBus::RestartThread()
 
         OSResumeThread(threadCursor->m_threads);
 
-        int bit = 1 << i;
+        Joybus.m_threadRunningMask |= (1 << i);
         i = i + 1;
-        Joybus.m_threadRunningMask |= bit;
 
-        threadCursor = (JoyBus*)((char*)threadCursor + sizeof(Joybus.m_threads[0]));
         paramCursor = (JoyBus*)((char*)paramCursor + sizeof(Joybus.m_threadParams[0]));
+        threadCursor = (JoyBus*)((char*)threadCursor + sizeof(Joybus.m_threads[0]));
     } while ((int)i < 4);
 
     if ((unsigned int)System.m_execParam >= 2)

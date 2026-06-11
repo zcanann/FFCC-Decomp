@@ -685,7 +685,7 @@ void CGObject::move()
             && (static_cast<s8>(animMiscRaw) < 4)
             && m_weaponNodeFlagAll.m_bits1.m_shield
             && m_weaponNodeFlagAll.m_bits1.m_menuReady
-            && ((Game.m_gameWork.m_menuStageMode == 0) || (static_cast<s8>(animMiscRaw) == 0))) {
+            && ((Game.m_gameWork.m_menuStageMode == 0) || (Game.m_gameWork.m_menuStageMode == 0) || (static_cast<s8>(animMiscRaw) == 0))) {
             u16 buttons = GetMovePadButton(player);
             const u16 buttonsDown = GetMovePadButtonDown(player);
             const u16 buttonsRepeat = GetMovePadButtonUp(player);

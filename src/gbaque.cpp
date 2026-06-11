@@ -4147,11 +4147,11 @@ void GbaQueue::SetResetFlg(int channel)
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned char GbaQueue::GetBonus(int channel)
+int GbaQueue::GetBonus(int channel)
 {
 	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned char value = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0xCE]);
+	int value = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0xCE]);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value;
 }

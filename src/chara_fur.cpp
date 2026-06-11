@@ -2479,8 +2479,6 @@ void CChara::makeFurTex()
 #pragma opt_loop_invariants off
 void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
 {
-	int dy;
-
 	_GXColor defaultColor = CColor(0x0f, 0x0f, 0x0f, 0).color;
 	*centerAfter = defaultColor;
 	*centerBefore = *centerAfter;
@@ -2492,7 +2490,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 	DCInvalidateRange(pixels, texelCountBytes);
 
 	const int rowStride = width * 4;
-	for (dy = -2; dy <= 2; dy++) {
+	for (int dy = -2; dy <= 2; dy++) {
 		int dx;
 		int py = centerY + dy;
 		for (dx = -2; dx <= 2; dx++) {

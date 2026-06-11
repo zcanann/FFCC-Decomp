@@ -2807,7 +2807,6 @@ int CMenuPcs::CmakeNameCtrl()
                     } else {
                         Sound.PlaySe(3, 0x40, 0x7F, 0);
                     }
-                    return 0;
                 } else {
                     Sound.PlaySe(0x34, 0x40, 0x7F, 0);
                     ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);

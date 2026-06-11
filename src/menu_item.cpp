@@ -112,33 +112,41 @@ static inline double LoadDouble(const double& value)
  */
 int CMenuPcs::ItemCtrlCur()
 {
-    bool blocked = false;
-    unsigned int press;
-    int hold;
     CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+    bool blocked = false;
+    s16 hold;
+    s16 press;
     int padLock = Pad.m_debugPadLock;
 
     if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         blocked = true;
     }
-    if (blocked) {
-        press = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-        press = Pad.GetPadInputs()[padIndex].buttonDown[0];
+    {
+        int pressBits;
+        if (blocked) {
+            pressBits = 0;
+        } else {
+            int padIndex = 0;
+            padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
+            pressBits = Pad.GetPadInputs()[padIndex].buttonDown[0];
+        }
+        press = (u16)pressBits;
     }
 
     blocked = false;
     if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         blocked = true;
     }
-    if (blocked) {
-        hold = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-        hold = Pad.GetPadInputs()[padIndex].repeatButton;
+    {
+        int holdBits;
+        if (blocked) {
+            holdBits = 0;
+        } else {
+            int padIndex = 0;
+            padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
+            holdBits = Pad.GetPadInputs()[padIndex].repeatButton;
+        }
+        hold = (u16)holdBits;
     }
 
     if (hold == 0) {
@@ -151,12 +159,18 @@ int CMenuPcs::ItemCtrlCur()
 
     if (mode == 0) {
         if ((hold & 8) != 0) {
-            if (this->m_itemMenuState->cursorIndex[mode] != 0) {
-                this->m_itemMenuState->cursorIndex[mode] = this->m_itemMenuState->cursorIndex[mode] - 1;
+            int cursor = this->m_itemMenuState->cursorIndex[mode];
+            if (cursor != 0) {
+                this->m_itemMenuState->cursorIndex[mode] = cursor - 1;
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
             } else {
-                if (this->m_itemMenuState->scroll != 0) {
-                    this->m_itemMenuState->scroll = this->m_itemMenuState->scroll - 1;
+                s16 scroll = this->m_itemMenuState->scroll;
+                // The retail binary contains this redundant duplicate branch.
+                if (scroll != 0) {
+                    this->m_itemMenuState->scroll = scroll - 1;
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
+                } else if (scroll != 0) {
+                    this->m_itemMenuState->scroll = scroll - 1;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 } else {
                     this->m_itemMenuState->scroll = 0x3F;
@@ -164,12 +178,17 @@ int CMenuPcs::ItemCtrlCur()
                 }
             }
         } else if ((hold & 4) != 0) {
-            if (this->m_itemMenuState->cursorIndex[mode] < 7) {
-                this->m_itemMenuState->cursorIndex[mode] = this->m_itemMenuState->cursorIndex[mode] + 1;
+            int cursor = this->m_itemMenuState->cursorIndex[mode];
+            if (cursor < 7) {
+                this->m_itemMenuState->cursorIndex[mode] = cursor + 1;
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
             } else {
                 s16 scroll = this->m_itemMenuState->scroll;
+                // The retail binary contains this redundant duplicate branch.
                 if (scroll < 0x3F) {
+                    this->m_itemMenuState->scroll = scroll + 1;
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
+                } else if (scroll < 0x3F) {
                     this->m_itemMenuState->scroll = scroll + 1;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 } else {
@@ -241,15 +260,17 @@ int CMenuPcs::ItemCtrlCur()
         }
     } else {
         if ((hold & 8) != 0) {
-            if (this->m_itemMenuState->cursorIndex[mode] != 0) {
-                this->m_itemMenuState->cursorIndex[mode] = this->m_itemMenuState->cursorIndex[mode] - 1;
+            int cursor = this->m_itemMenuState->cursorIndex[mode];
+            if (cursor != 0) {
+                this->m_itemMenuState->cursorIndex[mode] = cursor - 1;
             } else {
                 this->m_itemMenuState->cursorIndex[mode] = 3;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((hold & 4) != 0) {
-            if (this->m_itemMenuState->cursorIndex[mode] < 3) {
-                this->m_itemMenuState->cursorIndex[mode] = this->m_itemMenuState->cursorIndex[mode] + 1;
+            int cursor = this->m_itemMenuState->cursorIndex[mode];
+            if (cursor < 3) {
+                this->m_itemMenuState->cursorIndex[mode] = cursor + 1;
             } else {
                 this->m_itemMenuState->cursorIndex[mode] = 0;
             }

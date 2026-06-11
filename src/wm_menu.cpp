@@ -4429,54 +4429,62 @@ void CMenuPcs::DrawMCardMenu()
 	Mtx44 projMtx;
 	Mtx44 screenMtx;
 
+	float cursorX;
+	float cursorY;
 	short state = m_wmWorldState->m_mainState;
 	if (state > 0 && state < 4) {
-		double alpha;
+		float alpha;
 		if (state == 1) {
-			double raw;
-			reinterpret_cast<int*>(&raw)[0] = 0x43300000;
-			reinterpret_cast<int*>(&raw)[1] = (int)m_wmWorldState->m_frameCounter ^ 0x80000000;
-			alpha = (double)(float)(DOUBLE_803314E8 * (raw - DOUBLE_80331408));
+			const double* pRate = &DOUBLE_803314E8;
+			alpha = (float)(*pRate * (double)(int)m_wmWorldState->m_frameCounter);
 		} else if (state == 2) {
-			alpha = (double)FLOAT_803313e8;
+			const float* pOne = &FLOAT_803313e8;
+			alpha = *pOne;
 		} else {
-			double raw;
-			reinterpret_cast<int*>(&raw)[0] = 0x43300000;
-			reinterpret_cast<int*>(&raw)[1] = (int)m_wmWorldState->m_frameCounter ^ 0x80000000;
-			alpha = (double)(float)-(DOUBLE_803314E8 * (raw - DOUBLE_80331408) - DOUBLE_80331420);
+			const double* pRate = &DOUBLE_803314E8;
+			const double* pFull = &DOUBLE_80331420;
+			alpha = (float)-(*pRate * (double)(int)m_wmWorldState->m_frameCounter - *pFull);
 		}
-		if (alpha > DOUBLE_803314F0) {
+		const double* pThresh = &DOUBLE_803314F0;
+		if (alpha > *pThresh) {
+			const float* p255 = &FLOAT_80331458;
 			MenuPcs.SetAttrFmt((FMT)0);
 			_GXColor bgColor;
 			bgColor.r = 0xFF;
 			bgColor.g = 0xFF;
 			bgColor.b = 0xFF;
-			bgColor.a = (unsigned char)(int)((double)FLOAT_80331458 * alpha);
+			bgColor.a = (unsigned char)(int)(*p255 * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, bgColor);
 			MenuPcs.SetTexture((TEX)0x1F);
-			MenuPcs.DrawRect(0, FLOAT_803313dc,
-			         (float)(DOUBLE_803314D0 - (double)FLOAT_80331440),
-			         FLOAT_803313e0, FLOAT_80331440,
-			         FLOAT_803313dc, FLOAT_803313dc,
-			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			const float* pZeroBg = &FLOAT_803313dc;
+			const float* pOneBg = &FLOAT_803313e8;
+			const float* pWideBg = &FLOAT_803313e0;
+			const float* p40Bg = &FLOAT_80331440;
+			const double* pBottomBg = &DOUBLE_803314D0;
+			MenuPcs.DrawRect(0, *pZeroBg,
+			         (float)(*pBottomBg - (double)*p40Bg),
+			         *pWideBg, *p40Bg,
+			         *pZeroBg, *pZeroBg,
+			         *pOneBg, *pOneBg, *pZeroBg);
 		}
 	}
 
 	DrawMCList();
 
 	if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_subState >= 0x11) {
-		float cursorY = (float)((double)FLOAT_803314D8 - DOUBLE_803317D8);
-		float cursorXbase = FLOAT_803314D8 + FLOAT_80331410;
+		const float* pD8 = &FLOAT_803314D8;
+		const double* pCursOff = &DOUBLE_803317D8;
+		const float* p32c = &FLOAT_80331410;
+		cursorY = (float)((double)*pD8 - *pCursOff);
+		float cursorXbase = *pD8 + *p32c;
 		unsigned int saveIdx;
 		if (m_wmWorldState->m_subState == 0x11) {
 			saveIdx = (unsigned int)m_wmWorldState->m_cardChannel;
 		} else {
 			saveIdx = (unsigned int)m_mcCtrl.m_saveIndex;
 		}
-		double rawIdx;
-		reinterpret_cast<int*>(&rawIdx)[0] = 0x43300000;
-		reinterpret_cast<int*>(&rawIdx)[1] = saveIdx ^ 0x80000000;
-		float cursorX = (float)(DOUBLE_80331498 * (rawIdx - DOUBLE_80331408) + (double)cursorXbase);
+		const double* pStride = &DOUBLE_80331498;
+		cursorX = (float)(*pStride * (double)(int)saveIdx + (double)cursorXbase);
 		MenuPcs.SetAttrFmt((FMT)0);
 		_GXColor cursorColor;
 		cursorColor.r = 0xFF;
@@ -4485,10 +4493,13 @@ void CMenuPcs::DrawMCardMenu()
 		cursorColor.a = 0xFF;
 		GXSetChanMatColor(GX_COLOR0A0, cursorColor);
 		MenuPcs.SetTexture((TEX)0);
+		const float* pSz = &FLOAT_80331410;
+		const float* pZc = &FLOAT_803313dc;
+		const float* pOc = &FLOAT_803313e8;
 		MenuPcs.DrawRect(0, (float)(int)cursorY, (float)(int)cursorX,
-		         FLOAT_80331410, FLOAT_80331410,
-		         FLOAT_803313dc, FLOAT_803313dc,
-		         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+		         *pSz, *pSz,
+		         *pZc, *pZc,
+		         *pOc, *pOc, *pZc);
 
 		// 3D character viewports (4 slots)
 		int* piVar12 = reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_worldObjData) + 0x550);
@@ -4499,11 +4510,17 @@ void CMenuPcs::DrawMCardMenu()
 		do {
 			if (*piVar12 != 0) {
 				int slot = reinterpret_cast<int>(m_wm.m_worldObjData) + viewBase;
-				C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+				const float* pFov = &FLOAT_80331470;
+				const float* pAsp = &FLOAT_80331474;
+				const float* pNear = &FLOAT_80331478;
+				const float* pFar = &FLOAT_8033147c;
+				C_MTXPerspective(projMtx, *pFov, *pAsp, *pNear, *pFar);
 				GXSetProjection(projMtx, GX_PERSPECTIVE);
 				PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
-				CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-				CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
+				const float* pZt = &FLOAT_803313dc;
+				const float* pOt = &FLOAT_803313e8;
+				CVector target(*pZt, *pZt, *pZt);
+				CVector up(*pZt, *pOt, *pZt);
 				C_MTXLookAt(savedCamera, (Vec*)(slot + 0x10), (Vec*)&up, (Vec*)&target);
 				PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
 				PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
@@ -4515,12 +4532,14 @@ void CMenuPcs::DrawMCardMenu()
 				GXSetCopyClear(clearColor, 0xFFFFFF);
 				GXSetColorUpdate(1);
 				GXSetAlphaUpdate(1);
+				const float* pZv = &FLOAT_803313dc;
+				const float* pOv = &FLOAT_803313e8;
 				GXSetViewport(
 					(float)*reinterpret_cast<short*>(slot + 8),
 					(float)*reinterpret_cast<short*>(slot + 0xa),
 					(float)*reinterpret_cast<short*>(slot + 0xc),
 					(float)*reinterpret_cast<short*>(slot + 0xe),
-					FLOAT_803313dc, FLOAT_803313e8);
+					*pZv, *pOv);
 				GXSetScissor(*reinterpret_cast<int*>(slot + 0x40), *reinterpret_cast<int*>(slot + 0x44),
 				             *reinterpret_cast<int*>(slot + 0x48), *reinterpret_cast<int*>(slot + 0x4c));
 				Graphic.SetFog(1, 0);

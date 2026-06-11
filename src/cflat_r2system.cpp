@@ -3690,12 +3690,14 @@ renderedDone:
             localFloats[4],
             localFloats[5],
             localFloats[6]);
-        CColor color(
-            static_cast<u8>(object->m_localBase[1]),
-            static_cast<u8>(object->m_localBase[2]),
-            static_cast<u8>(object->m_localBase[3]),
-            0xFF);
-        MapMng.SetMapObjWorldMapLightID(*object->m_localBase, color, position);
+        MapMng.SetMapObjWorldMapLightID(
+            *object->m_localBase,
+            CColor(
+                static_cast<u8>(object->m_localBase[1]),
+                static_cast<u8>(object->m_localBase[2]),
+                static_cast<u8>(object->m_localBase[3]),
+                0xFF),
+            position);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3704,9 +3706,8 @@ renderedDone:
         MenuPcs.m_battleHud.m_visible = *object->m_localBase;
         MenuPcs.m_battleHud.m_fadeCounter = 0x40;
         MenuPcs.m_battleHud.m_width = object->m_localBase[1];
-        MenuPcs.m_battleHud.m_gaugeMax = object->m_localBase[2];
-        MenuPcs.m_battleHud.m_gaugeTarget = MenuPcs.m_battleHud.m_gaugeMax;
-        MenuPcs.m_battleHud.m_gaugeValue = MenuPcs.m_battleHud.m_gaugeMax;
+        MenuPcs.m_battleHud.m_gaugeMax = MenuPcs.m_battleHud.m_gaugeTarget =
+            MenuPcs.m_battleHud.m_gaugeValue = object->m_localBase[2];
         this->push(object, 0);
         outResult = 0;
         break;

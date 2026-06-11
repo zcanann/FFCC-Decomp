@@ -8996,9 +8996,10 @@ void CMenuPcs::DrawCharaName()
 	const double xOffsetDefault =
 	    -(DOUBLE_80331418 * static_cast<double>(FLOAT_80331680) - DOUBLE_80331678);
 	const float yExtra1 = FLOAT_80331684;
-	int yCounter = 0;
-	int slotBase = 0;
-	for (int row = 0; row < 2; row++) {
+	int row = 0;
+	int yCounter = row;
+	int slotBase = row;
+	for (; row < 2; row++) {
 		float y = yBase1 + static_cast<float>(yCounter);
 		y += yExtra1;
 		int __p2 = row;
@@ -9044,7 +9045,7 @@ void CMenuPcs::DrawCharaName()
 	font->SetShadow(1);
 	font->SetScale(FLOAT_8033158C);
 	font->DrawInit();
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<long>(alphaF))).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<long>(alphaF)).color);
 
 	CSystem* const sys = &System;
 	const float xBase2 = FLOAT_80331410;
@@ -9053,25 +9054,28 @@ void CMenuPcs::DrawCharaName()
 	const float yExtra2 = FLOAT_80331688;
 	const float ySub2 = FLOAT_80331550;
 	const double k3f8_2 = DOUBLE_803313F8;
-	int yCounter2 = 0;
-	for (int row = 0; row < 2; row++) {
-		const int slotBase2 = row * 4;
+	int row2 = 0;
+	int slotBase2;
+	int yCounter2 = row2;
+	slotBase2 = row2;
+	for (; row2 < 2; row2++) {
 		float y = yBase2 + static_cast<float>(yCounter2);
 		y += yExtra2;
-		if (row != 0) {
+		if (row2 != 0) {
 			y += FLOAT_80331548;
 		}
 		y = static_cast<float>(y - ySub2);
 		int cmakeOffset = slotBase2 * 0x9C0;
-		int caravanOffset = slotBase2 * 0xC30;
-		int xCounter2 = 0;
+		int col = 0;
 		int slot = slotBase2;
-		for (int col = 0; col < 4; col++) {
+		int caravanOffset = slotBase2 * 0xC30;
+		int xCounter2 = col;
+		for (; col < 4; col++) {
 			int restoreColor;
 			restoreColor = 0;
 			const char* text;
 
-			const float xBase = xBase2 + static_cast<float>(xCounter2);
+			float xBase = xBase2 + static_cast<float>(xCounter2);
 
 			const int menuMode = this->m_wmWorldState->m_menuMode;
 			bool hasName;
@@ -9099,13 +9103,12 @@ void CMenuPcs::DrawCharaName()
 				font->SetTlut(0x10);
 				text = emptyText[1];
 				const int phase = static_cast<int>(sys->m_frameCounter) % 20 - 10;
-				float blinkFade = fade;
 				if (this->m_wmWorldState->m_mainState == 2) {
 					const int absPhase = phase < 0 ? -phase : phase;
-					blinkFade = static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(absPhase) - DOUBLE_80331420));
+					fade = static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(absPhase) - DOUBLE_80331420));
 					restoreColor = 1;
 				}
-				font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blinkFade))).color);
+				font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<int>(FLOAT_80331458 * fade)).color);
 			} else {
 				if ((activeMask & (1u << slot)) != 0) {
 					font->SetTlut(7);
@@ -9116,18 +9119,19 @@ void CMenuPcs::DrawCharaName()
 			}
 
 			const float widthDiff = xMax2 - font->GetWidth(text);
-			const float x = static_cast<float>(widthDiff * k3f8_2 + xBase);
-			font->SetPosX(x);
+			xBase = static_cast<float>(widthDiff * k3f8_2 + xBase);
+			font->SetPosX(xBase);
 			font->SetPosY(y);
 			font->Draw(text);
 			if (restoreColor) {
 				font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 			}
-			cmakeOffset += 0x9C0;
 			caravanOffset += 0xC30;
+			cmakeOffset += 0x9C0;
 			xCounter2 += 0x90;
 			slot++;
 		}
+		slotBase2 += 4;
 		yCounter2 += 0xB8;
 	}
 

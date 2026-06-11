@@ -1014,7 +1014,6 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             select = 0xB;
             row = 5;
             Sound.PlaySe(2, 0x40, 0x7f, 0);
-            return 0;
         } else if ((down & 0x100) != 0) {
             short curRow = row;
             if (curRow >= 5) {
@@ -1108,27 +1107,28 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             }
         } else if ((down & 0x200) != 0) {
             unsigned int bsLen0 = strlen(s_CmakeInfo.m_name);
-            if ((bsLen0 & (static_cast<int>(-bsLen0 | bsLen0) >> 31)) == 0) {
-                Sound.PlaySe(4, 0x40, 0x7f, 0);
-                return 0;
-            }
-            int bsRet;
-            unsigned int bsLen1 = strlen(s_CmakeInfo.m_name);
-            if ((bsLen1 & (static_cast<int>(-bsLen1 | bsLen1) >> 31)) == 0) {
-                bsRet = -1;
-            } else {
-                int bsPos = strlen(s_CmakeInfo.m_name);
-                if ((__cntlzw(static_cast<unsigned int>(strlen(s_CmakeInfo.m_name))) >> 5 & 1) == 0) {
-                    s_CmakeInfo.m_name[bsPos - 1] = '\0';
+            if ((bsLen0 & (static_cast<int>(-bsLen0 | bsLen0) >> 31)) != 0) {
+                const char* name = s_CmakeInfo.m_name;
+                int bsRet;
+                unsigned int bsLen1 = strlen(name);
+                if ((bsLen1 & (static_cast<int>(-bsLen1 | bsLen1) >> 31)) == 0) {
+                    bsRet = -1;
                 } else {
-                    s_CmakeInfo.m_name[bsPos - 2] = '\0';
+                    int bsPos = strlen(s_CmakeInfo.m_name);
+                    if (-((__cntlzw(strlen(name)) & 0x20) >> 5) == 0) {
+                        s_CmakeInfo.m_name[bsPos - 1] = '\0';
+                    } else {
+                        s_CmakeInfo.m_name[bsPos - 2] = '\0';
+                    }
+                    bsRet = 0;
                 }
-                bsRet = 0;
-            }
-            if (bsRet != 0) {
-                Sound.PlaySe(4, 0x40, 0x7f, 0);
+                if (bsRet != 0) {
+                    Sound.PlaySe(4, 0x40, 0x7f, 0);
+                } else {
+                    Sound.PlaySe(3, 0x40, 0x7f, 0);
+                }
             } else {
-                Sound.PlaySe(3, 0x40, 0x7f, 0);
+                Sound.PlaySe(4, 0x40, 0x7f, 0);
             }
             return 0;
         }

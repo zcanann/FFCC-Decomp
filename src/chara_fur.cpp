@@ -583,7 +583,7 @@ void CChara::CalcMogScore()
 				continue;
 			}
 
-			const int tileIndex = ((x % 4) + ((y % 4) * 4) + (x / 4) * 0x10 + (y / 4) * 0x100) * 2;
+			const int tileIndex = (((y % 4) * 4 + (x / 4) * 0x10 + (y / 4) * 0x100) + (x % 4)) * 2;
 
 			const unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 			const int a = (packed >> 12) & 7;

@@ -1419,7 +1419,6 @@ void CMemoryCardMan::MakeSaveData()
     saveDat->m_rotateKey = static_cast<u8>(Math.Rand(0xFF));
     saveDat->m_flags = 0;
 
-    CGame::CGameWork* gameWork = &Game.m_gameWork;
     CGame* g = &Game;
     for (int i = 0; i < 4; i++)
     {
@@ -1465,7 +1464,7 @@ void CMemoryCardMan::MakeSaveData()
     {
         int letter;
         u8* dst = save + 0x14D0 + c * 0x9C0;
-        CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
+        CCaravanWork* caravanWork = &g->m_caravanWorkArr[c];
 
         int shopState = caravanWork->m_shopState;
         if (shopState != 0 && static_cast<s8>(caravanWork->unk_0xc1e) == 0)

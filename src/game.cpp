@@ -167,20 +167,8 @@ inline int CGBaseObj::GetCID()
     return 1;
 }
 
-/*
- * --INFO--
- * PAL Address: 0x800161f0
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
 template <>
-CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index)
-{
-    return GetAt(index);
-}
+CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index);
 
 /*
  * --INFO--
@@ -1748,4 +1736,19 @@ inline CGame::CGameWork::CGameWork()
     m_chaliceElement = 1;
     strcpy(m_townName, m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
     m_gameInitFlag = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800161f0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index)
+{
+    return GetAt(index);
 }

@@ -6825,16 +6825,16 @@ void CMenuPcs::CalcFukidashi()
 		}
 
 		// Spline evaluation for Y position
-		float t = static_cast<float>(puVar20[1]) / FLOAT_803314c0;
-		float yResult;
-		WM_MENU_EVAL_SPLINE(yResult, gWmModelYOffsetSpline, gWmModelYOffsetSplineCount, t);
-		*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) + yResult;
+		*reinterpret_cast<float*>(puVar20 + 8) =
+		    *reinterpret_cast<float*>(puVar20 + 8) +
+		    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelYOffsetSplineCount),
+		                                   static_cast<float>(puVar20[1])));
 
 		// Spline evaluation for rotation
-		float rotResult;
-		t = static_cast<float>(puVar20[1]) / FLOAT_803314c0;
-		WM_MENU_EVAL_SPLINE(rotResult, gWmModelRotationSpline, gWmModelRotationSplineCount, t);
-		*reinterpret_cast<float*>(puVar20 + 0xB) = FLOAT_803314bc * rotResult;
+		*reinterpret_cast<float*>(puVar20 + 0xB) =
+		    FLOAT_803314bc *
+		    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelRotationSplineCount),
+		                                   static_cast<float>(puVar20[1])));
 		*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_803315d0;
 
 		// Matrix setup
@@ -6904,16 +6904,16 @@ void CMenuPcs::CalcFukidashi()
 				*reinterpret_cast<float*>(puVar20 + 0xF) = f740;
 
 				// Spline Y for player models
-				float t2 = static_cast<float>(puVar20[1]) / FLOAT_803314c0;
-				float yRes2;
-				WM_MENU_EVAL_SPLINE(yRes2, gWmModelYOffsetSpline, gWmModelYOffsetSplineCount, t2);
-				*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) + yRes2;
+				*reinterpret_cast<float*>(puVar20 + 8) =
+				    *reinterpret_cast<float*>(puVar20 + 8) +
+				    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelYOffsetSplineCount),
+				                                   static_cast<float>(puVar20[1])));
 
 				// Spline rotation for player models
-				float rotRes2;
-				t2 = static_cast<float>(puVar20[1]) / FLOAT_803314c0;
-				WM_MENU_EVAL_SPLINE(rotRes2, gWmModelRotationSpline, gWmModelRotationSplineCount, t2);
-				*reinterpret_cast<float*>(puVar20 + 0xB) = FLOAT_803314bc * rotRes2;
+				*reinterpret_cast<float*>(puVar20 + 0xB) =
+				    FLOAT_803314bc *
+				    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelRotationSplineCount),
+				                                   static_cast<float>(puVar20[1])));
 				if (playerCount == 1) {
 					*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_80331744;
 				} else {

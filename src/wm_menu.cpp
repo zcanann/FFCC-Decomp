@@ -4100,6 +4100,8 @@ void CMenuPcs::drawWorld()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
+#pragma opt_lifetimes off
 void CMenuPcs::DrawMainMenu()
 {
 	extern double DOUBLE_803314E8;
@@ -4128,7 +4130,7 @@ void CMenuPcs::DrawMainMenu()
 	GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	int bit = 0;
-	int offset = bit;
+	int offset = 0;
 	do {
 		if (((1 << bit) & 1) != 0) {
 			short* const entry = reinterpret_cast<short*>(m_wm.m_frameInfo + offset + 4);
@@ -4160,15 +4162,17 @@ void CMenuPcs::DrawMainMenu()
 		tileColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(tileAlpha)));
 		GXSetChanMatColor(static_cast<GXChannelID>(4), tileColor);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x33));
-		float y = FLOAT_80331440 - FLOAT_80331410;
-		MenuPcs.DrawRect(0, FLOAT_80331410, y, FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
+		float x = FLOAT_80331410;
+		float y = FLOAT_80331440;
+		y = y - x;
+		MenuPcs.DrawRect(0, x, y, FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
 		                 FLOAT_803313e8, FLOAT_803313dc);
-		MenuPcs.DrawRect(8, FLOAT_80331410 + FLOAT_803316D0, y,
+		MenuPcs.DrawRect(8, x + FLOAT_803316D0, y,
 		                 FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		y = y + FLOAT_80331500;
-		MenuPcs.DrawRect(4, FLOAT_80331410, y, FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
+		MenuPcs.DrawRect(4, x, y, FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
 		                 FLOAT_803313e8, FLOAT_803313dc);
-		MenuPcs.DrawRect(0xC, FLOAT_80331410 + FLOAT_803316D0, y,
+		MenuPcs.DrawRect(0xC, x + FLOAT_803316D0, y,
 		                 FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
@@ -4206,12 +4210,19 @@ void CMenuPcs::DrawMainMenu()
 			                 FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 			char* textList[5] = { 0, 0, 0, 0, 0 };
-			const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
+			const int languageIndex = Game.m_gameWork.m_languageId - 1;
 			unsigned int ti;
-			char** const langText = &lbl_80210750[languageIndex];
-			for (ti = 0; ti < 5; ti++) {
-				textList[ti] = langText[ti];
-			}
+			char** const langText = &lbl_80210750[languageIndex * 0x0B];
+			ti = 0;
+			textList[0] = langText[ti];
+			ti = 1;
+			textList[1] = langText[ti];
+			ti = 2;
+			textList[2] = langText[ti];
+			ti = 3;
+			textList[3] = langText[ti];
+			ti = 4;
+			textList[4] = langText[ti];
 			unsigned int textAlpha;
 			if (helpAlpha > FLOAT_803313e8) {
 				textAlpha = 0xFF;
@@ -4247,6 +4258,8 @@ void CMenuPcs::DrawMainMenu()
 		}
 	}
 }
+#pragma opt_lifetimes on
+#pragma opt_propagation on
 
 /*
  * --INFO--

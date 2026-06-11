@@ -2947,10 +2947,9 @@ renderedDone:
         break;
     }
     case -0x52: {
-        const int enabled = (((-*object->m_localBase) | *object->m_localBase) >> 31);
-        GraphicPcs.m_dofFlag = enabled;
+        GraphicPcs.SetUseDOF(*object->m_localBase != 0);
         GraphicPcs.SetDOFParameter(
-            static_cast<signed char>(static_cast<char>(*object->m_localBase) - 1),
+            static_cast<signed char>(*object->m_localBase - 1),
             static_cast<signed char>(object->m_localBase[1]),
             *reinterpret_cast<float*>(object->m_localBase + 2),
             *reinterpret_cast<float*>(object->m_localBase + 3),

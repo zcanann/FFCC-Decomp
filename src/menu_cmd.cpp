@@ -1992,7 +1992,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		}
 
 		const int itemId = caravan->m_inventoryItems[itemRef];
-		const u8 icon = GetItemIcon(itemId);
+		const int icon = GetItemIcon(itemId);
 
 		if (IsMagicArti(itemId)) {
 			if (itemId == 0xdf) {
@@ -2102,13 +2102,14 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		}
 	}
 
+	int (*out)[2] = comboOut;
 	for (int rank = 0; rank < 2; rank++) {
 		for (int i = 0; i < matchCount; i++) {
 			const int* m = &matches[i * 2];
 			if (rank + 2 == s_uniteRecipePatterns[2 + m[0] * 6]) {
-				comboOut[0][0] = m[0];
-				comboOut++;
-				comboOut[-1][1] = m[1];
+				out[0][0] = m[0];
+				out++;
+				out[-1][1] = m[1];
 			}
 		}
 	}

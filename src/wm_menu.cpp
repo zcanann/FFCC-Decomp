@@ -106,8 +106,8 @@ inline CGObject::CGObject()
 
 extern float FLOAT_8032ee18;
 unsigned char lbl_8032EE1C;
-char gWmMenuCursorX[1];
-char gWmMenuCursorY[1];
+char gWmMenuCursorX[2];
+char gWmMenuCursorY[2];
 int gWmMenuWorkA;
 int gWmMenuWorkB;
 unsigned char gWmMenuScriptValueCache;

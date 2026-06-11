@@ -3431,8 +3431,8 @@ renderedDone:
         break;
     }
     case -0xF2:
-        MapMng.SetMapAnimID(static_cast<char>(object->m_localBase[0]), object->m_localBase[1],
-            object->m_localBase[2], static_cast<char>(object->m_localBase[3]));
+        MapMng.SetMapAnimID(object->m_localBase[0], object->m_localBase[1],
+            object->m_localBase[2], object->m_localBase[3]);
         this->push(object, 0);
         outResult = 0;
         break;

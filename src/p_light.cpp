@@ -998,8 +998,8 @@ void CLightPcs::CBumpLight::MakeLightMap()
 
         GXLoadLightObjImm(&lightObj, (GXLightID)1);
 
-        float dW = kBumpLightMapVertexZ;
         float dInv = kBumpLightNormalDivisor;
+        float dW = kBumpLightMapVertexZ;
         u32 y = 0;
         do {
             GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);

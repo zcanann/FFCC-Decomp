@@ -270,28 +270,30 @@ CFunnyShapePcs::~CFunnyShapePcs()
 {
 }
 
-static CProcessTableCallback s_tableDesc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
-static CProcessTableCallback s_tableDesc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
-static CProcessTableCallback s_tableDesc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
-static CProcessTableCallback s_tableDesc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
+static CProcessTableCallback s_tableDesc[4] = {
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)},
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)},
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)},
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)},
+};
 CFunnyShapePcs FunnyShapePcs;
 CProcessTable CFunnyShapePcs::m_table = {
     const_cast<char*>(s_CFunnyShapePcsViewer),
     {
-        s_tableDesc0.m_thisOffset,
-        s_tableDesc0.m_virtualOffset,
-        s_tableDesc0.m_function,
-        s_tableDesc1.m_thisOffset,
-        s_tableDesc1.m_virtualOffset,
-        s_tableDesc1.m_function,
-        s_tableDesc2.m_thisOffset,
-        s_tableDesc2.m_virtualOffset,
-        s_tableDesc2.m_function,
+        s_tableDesc[0].m_thisOffset,
+        s_tableDesc[0].m_virtualOffset,
+        s_tableDesc[0].m_function,
+        s_tableDesc[1].m_thisOffset,
+        s_tableDesc[1].m_virtualOffset,
+        s_tableDesc[1].m_function,
+        s_tableDesc[2].m_thisOffset,
+        s_tableDesc[2].m_virtualOffset,
+        s_tableDesc[2].m_function,
         0x21,
         0,
-        s_tableDesc3.m_thisOffset,
-        s_tableDesc3.m_virtualOffset,
-        s_tableDesc3.m_function,
+        s_tableDesc[3].m_thisOffset,
+        s_tableDesc[3].m_virtualOffset,
+        s_tableDesc[3].m_function,
         0x42,
         1,
     },

@@ -6438,34 +6438,18 @@ float CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 			if (idx == 0) {
 				result = (keys + idx * 4)[1];
 			} else {
-				const float* pC4 = &FLOAT_803314c4;
-				const float* pC8 = &FLOAT_803314c8;
-				const float* pCC = &FLOAT_803314cc;
-				const float* pOne = &FLOAT_803313e8;
-				float* prev;
-				float* next;
-				float u2;
-				float negTerm;
-				float prev3;
-				float c8;
-				float u3;
-				float u;
-				float span;
-				float c4u2;
-				next = keys + idx * 4;
-				prev = keys + (idx - 1) * 4;
-				span = *next - *prev;
-				u = (t - *prev) / span;
-				u2 = u * u;
-				u3 = u2 * u;
-				prev3 = prev[3];
-				c8 = *pC8;
-				c4u2 = *pC4 * u2;
-				negTerm = -(c8 * u2 - u3);
+				float* next = keys + idx * 4;
+				float* prev = keys + (idx - 1) * 4;
+				float span = *next - *prev;
+				float u = (t - *prev) / span;
+				float u2 = u * u;
+				float u3 = u2 * u;
+				float c4u2 = FLOAT_803314c4 * u2;
+				float negTerm = -(FLOAT_803314c8 * u2 - u3);
 
-				result = span * (prev3 * (u + negTerm) + next[2] * (u3 - u2)) +
-				         (prev[1] * (*pOne + (c8 * u3 - c4u2)) +
-				             next[1] * (*pCC * u3 + c4u2));
+				result = span * (prev[3] * (u + negTerm) + next[2] * (u3 - u2)) +
+				         (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - c4u2)) +
+				             next[1] * (FLOAT_803314cc * u3 + c4u2));
 			}
 			break;
 		}
@@ -11425,9 +11409,18 @@ void CMenuPcs::CalcMcObj()
 	unsigned char* const charaBase = bytes + 0x44;
 	unsigned char* const worldObj = m_wm.m_worldObjData;
 
-	const float panelStateFloat = FLOAT_80331480;
+	const float* pPanelF = &FLOAT_80331480;
+	const float panelStateFloat = *pPanelF;
 
 	SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
+
+	const double* pY48 = &DOUBLE_80331488;
+	const double* pY88 = &DOUBLE_80331498;
+	const double* pY24 = &DOUBLE_80331490;
+	const float* pY112 = &FLOAT_803314A0;
+	const float* pZeroP = &FLOAT_803313dc;
+	const float* p50 = &FLOAT_803314A4;
+	const double* p25 = &DOUBLE_803314A8;
 
 	int i;
 	unsigned int* panelState = reinterpret_cast<unsigned int*>(worldObj + 0x550);
@@ -11435,19 +11428,19 @@ void CMenuPcs::CalcMcObj()
 		*reinterpret_cast<short*>(panelState + 2) = static_cast<short>(panelStateFloat);
 
 		const int y = static_cast<int>(
-		    static_cast<float>(48.0 + (88.0 * static_cast<double>(i) + 24.0)) -
-		    112.0f);
+		    static_cast<float>(*pY48 + (*pY88 * static_cast<double>(i) + *pY24)) -
+		    *pY112);
 		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(panelState) + 0xA) = static_cast<short>(y);
 		*reinterpret_cast<unsigned short*>(panelState + 3) = 0x140;
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(panelState) + 0xE) = 0xE0;
-		reinterpret_cast<float*>(panelState)[4] = 0.0f;
-		reinterpret_cast<float*>(panelState)[5] = 0.0f;
-		reinterpret_cast<float*>(panelState)[6] = 50.0f;
+		reinterpret_cast<float*>(panelState)[4] = *pZeroP;
+		reinterpret_cast<float*>(panelState)[5] = *pZeroP;
+		reinterpret_cast<float*>(panelState)[6] = *p50;
 
 		unsigned char* const charaState = m_wmCharaState + i * 0x48;
 		panelState[1]++;
 		if (static_cast<float>(static_cast<int>(panelState[1])) >=
-		    25.0 * static_cast<double>(yTbl->data[gWmModelYOffsetSplineCount * 4 - 4])) {
+		    *p25 * static_cast<double>(yTbl->data[gWmModelYOffsetSplineCount * 4 - 4])) {
 			panelState[1] = 0;
 		}
 

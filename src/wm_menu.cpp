@@ -6326,9 +6326,10 @@ void CMenuPcs::CalcSpl(CMenuPcs::SPL* out, CMenuPcs::SPL* in, float t)
 float CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 {
 	int keyCount = fcv.keyCount;
+	float result;
 	float t = value / FLOAT_803314c0;
 	float* keys = fcv.keys;
-	float result = FLOAT_803313dc;
+	result = FLOAT_803313dc;
 
 	if (t >= keys[keyCount * 4 - 4]) {
 		return keys[keyCount * 4 - 3];

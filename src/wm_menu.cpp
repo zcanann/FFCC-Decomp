@@ -11086,14 +11086,18 @@ LAB_next:
 
 		// Draw text info for each save slot
 		const double tSlope = DOUBLE_80331498;
+		const double tBias = DOUBLE_80331408;
 		const double tBase = DOUBLE_80331490;
 		for (int slot = 0, slotOff = slot; slot < 4; slot++, slotOff += 0x48) {
 			char part[64];
 			char locationStr[64];
 			char line1[64];
 			char line2[64];
+			double rawT;
 			unsigned char* const slotData = m_wmCharaState + slotOff;
-			const float slotY = (float)(tSlope * static_cast<double>(slot) + tBase);
+			reinterpret_cast<int*>(&rawT)[1] = slot ^ 0x80000000;
+			reinterpret_cast<int*>(&rawT)[0] = 0x43300000;
+			const float slotY = (float)(tSlope * (rawT - tBias) + tBase);
 			if (*reinterpret_cast<char*>(slotData + 0x42) != 0 || *reinterpret_cast<int*>(slotData + 8) <= 0) {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(1);

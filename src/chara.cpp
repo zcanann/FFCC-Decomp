@@ -1077,7 +1077,6 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			}
 		}
 		chunkFile.PopChunk();
-		break;
 	}
 
 	setup();
@@ -1188,7 +1187,6 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 			}
 		}
 		chunkFile.PopChunk();
-		break;
 	}
 }
 

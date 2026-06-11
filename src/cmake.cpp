@@ -851,8 +851,8 @@ void CMenuPcs::CmakeVillageDraw()
     font->SetMargin(4.9f);
     SetCmakeFontColor(font, alpha);
 
-    int tableBase = table * 5;
     const char* rowText;
+    int tableBase = table * 5;
     int i;
     int y;
     for (i = 0, y = 0x6C; i < 5; i++, y += 0x20) {

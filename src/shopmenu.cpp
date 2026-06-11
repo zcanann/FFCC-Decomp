@@ -2420,7 +2420,8 @@ void CShopMenu::DrawShop0()
     }
 
     CFont* font;
-    ShopMenuTopMenuEntry* entry = s_shopMenuTopMenuEntries;
+    ShopMenuTopMenuEntry* entry2 = s_shopMenuTopMenuEntries;
+    ShopMenuTopMenuEntry* entry = entry2;
     for (int i = 0; i < 3; i++, entry++) {
         int highlight = (i == m_topChoice) ? 1 : 0;
         s_currentShopMenuTopMenuEntry = entry;
@@ -2455,9 +2456,8 @@ void CShopMenu::DrawShop0()
     font->SetMargin(FLOAT_80332d28);
     font->SetScale(FLOAT_80332d28);
 
-    entry = s_shopMenuTopMenuEntries;
-    for (int i = 0; i < 3; i++, entry++) {
-        s_currentShopMenuTopMenuEntry = entry;
+    for (int i = 0; i < 3; i++, entry2++) {
+        s_currentShopMenuTopMenuEntry = entry2;
         Graphic.SetDrawDoneDebugData(0x23);
         float entryY = static_cast<float>(s_currentShopMenuTopMenuEntry->y - 0x0B);
         float entryX = static_cast<float>(s_currentShopMenuTopMenuEntry->x - 0x10);

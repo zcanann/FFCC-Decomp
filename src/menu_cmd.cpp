@@ -2904,7 +2904,7 @@ unsigned int CMenuPcs::CmdClose2()
 
 			const s32 closeSel = GetCmdStateView(this)->selected;
 			s32 ununiteCount = 0;
-			for (ununiteCount = 1; ununiteCount < 3; ununiteCount++) {
+			for (ununiteCount = 0; ununiteCount < 3; ununiteCount++) {
 				if ((ununiteCount != 0) &&
 				    (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])
 				         ->m_commandListExtra[closeSel + ununiteCount] != -1)) {

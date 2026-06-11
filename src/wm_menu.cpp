@@ -5649,7 +5649,7 @@ void CMenuPcs::DrawLoadMenu()
 				m_wmWorldState->m_nextMenuMode = 0;
 			}
 		}
-	} else if (m_wmWorldState->m_delay != 0) {
+	} else if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_delay != 0) {
 		m_wmWorldState->m_delay--;
 		if (m_wmWorldState->m_delay <= 0) {
 			m_wmWorldState->m_mainState++;

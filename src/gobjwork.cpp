@@ -466,7 +466,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 
 	int gil;
 	if (letter->AttachmentIsGil()) {
-		gil = letter->AttachmentValue() * 100;
+		gil = m_letters[letterIdx].AttachmentValue() * 100;
 	} else {
 		gil = 0;
 	}

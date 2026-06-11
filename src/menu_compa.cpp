@@ -45,6 +45,40 @@ static inline float LoadFloatRef(const float& value)
 	return value;
 }
 
+static inline unsigned int GetMenuPressLock(int lock)
+{
+	bool activeInput = false;
+
+	if ((lock != 0) || (Pad.m_debugPadPort != -1)) {
+		activeInput = true;
+	}
+
+	if (activeInput) {
+		return 0;
+	}
+
+	int padIndex = 0;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	return Pad.GetPadInputs()[padIndex].buttonDown[0];
+}
+
+static inline unsigned int GetMenuRepeatLock(int lock)
+{
+	bool activeInput = false;
+
+	if ((lock != 0) || (Pad.m_debugPadPort != -1)) {
+		activeInput = true;
+	}
+
+	if (activeInput) {
+		return 0;
+	}
+
+	int padIndex = 0;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	return Pad.GetPadInputs()[padIndex].repeatButton;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80160edc
@@ -61,6 +95,8 @@ void CMenuPcs::CompaDraw()
 
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	GXColor colors[4];
+	int yStep;
+	float end;
 	CompaOpenAnim* entry = this->m_compaList->entries;
 	for (int i = 0; i < this->m_compaList->count; i++) {
 		int tex = entry->tex;
@@ -97,8 +133,8 @@ void CMenuPcs::CompaDraw()
 				float fillW = entry->alpha * w;
 				if (fillW > kCompaZero) {
 					if (entry->tex == 0x51) {
-						int yStep = static_cast<int>(y);
-						float end = y + h;
+						yStep = static_cast<int>(y);
+						end = y + h;
 						while (static_cast<float>(yStep) < end) {
 							float diff = end - static_cast<float>(yStep);
 							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<unsigned int>(diff);
@@ -129,8 +165,8 @@ void CMenuPcs::CompaDraw()
 					colors[3].a = 0;
 					float remainW = static_cast<float>(1.0 / (double)entry->duration) * static_cast<float>(entry->w);
 					if (entry->tex == 0x51) {
-						int yStep = static_cast<int>(y);
-						float end = y + h;
+						yStep = static_cast<int>(y);
+						end = y + h;
 						while (static_cast<float>(yStep) < end) {
 							float diff = end - static_cast<float>(yStep);
 							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<unsigned int>(diff);
@@ -191,9 +227,10 @@ void CMenuPcs::CompaDraw()
 	int yOffset = 0;
 	for (int i = 0; i < familyCount; i++) {
 		float rowY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(yOffset);
+		float rowX = static_cast<float>(compaList->entries[0].x + 0x10);
 		MenuPcs.DrawRect(
 			0,
-			static_cast<float>(compaList->entries[0].x + 0x10),
+			rowX,
 			rowY,
 			kCompaFoodIconWidth, kCompaFoodIconHeight, kCompaZero, kCompaZero, kCompaOne,
 			kCompaOne, kCompaZero);
@@ -380,52 +417,13 @@ bool CMenuPcs::CompaClose()
  */
 unsigned int CMenuPcs::CompaCtrl()
 {
-	bool activeInput = false;
 	int padState = Pad.m_debugPadLock;
-	unsigned int rawPress;
-	unsigned int rawHold;
 	short press;
 	short hold;
 	int doReset;
 
-	if (padState == 0) {
-		if (Pad.m_debugPadPort != -1) {
-			goto activePress;
-		}
-	} else {
-activePress:
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		rawPress = 0;
-	} else {
-		unsigned int port = 0;
-		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
-		port &= ~mask;
-		rawPress = Pad.GetPadInputs()[port].buttonDown[0];
-	}
-	press = rawPress & 0xffff;
-
-	activeInput = false;
-	if (padState == 0) {
-		if (Pad.m_debugPadPort != -1) {
-			goto activeHold;
-		}
-	} else {
-activeHold:
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		rawHold = 0;
-	} else {
-		unsigned int port = 0;
-		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
-		port &= ~mask;
-		rawHold = Pad.GetPadInputs()[port].repeatButton;
-	}
-	hold = rawHold & 0xffff;
+	press = GetMenuPressLock(padState) & 0xffff;
+	hold = GetMenuRepeatLock(padState) & 0xffff;
 
 	if (hold == 0) {
 		doReset = 0;

@@ -1484,7 +1484,9 @@ int CChara::CModel::PickFur(
 					Vec curViewPos;
 					PSMTXMultVec(modelViewMtx, &localPos, &curViewPos);
 
-					if (static_cast<double>(curViewPos.z) < static_cast<double>(kCharaFurDepthZero)) {
+					if (static_cast<double>(curViewPos.z) >= static_cast<double>(kCharaFurDepthZero)) {
+						incoming.m_flagBits.m_projValid = 0;
+					} else {
 						Vec4d curClip;
 						incoming.m_flagBits.m_projValid = 1;
 						Math.MTX44MultVec4(screenMtx, &curViewPos, &curClip);
@@ -1495,8 +1497,6 @@ int CChara::CModel::PickFur(
 						incoming.m_clipW = curClip.w;
 						incoming.m_screenX = kCharaFurScreenCenterX * curClip.x * invW + kCharaFurScreenCenterX;
 						incoming.m_screenY = kCharaFurScreenCenterY - kCharaFurScreenCenterY * curClip.y * invW;
-					} else {
-						incoming.m_flagBits.m_projValid = 0;
 					}
 					incoming.m_viewPos = curViewPos;
 					incoming.m_u = curU;

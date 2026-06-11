@@ -126,7 +126,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             const s32 trailMaxIndex = *(u8*)(particle + 0x37) - 1;
             s32 trailNextIndex;
             const float stepDivisor = (float)((s32)frameCountRaw - 1);
-            const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / kPppYmMegaBirthShpTail2AlphaDivisor;
+            const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / LoadFloat(kPppYmMegaBirthShpTail2AlphaDivisor);
             float fadeA = (float)step[0x7B] * alphaScale;
             const float fadeANum = fadeA - (float)step[0x7F] * alphaScale;
             float fadeRGB[3];
@@ -140,23 +140,23 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             float fadeGStep;
             float fadeBStep;
             float fadeAStep;
-            if (stepDivisor != kPppYmMegaBirthShpTail2Zero) {
+            if (stepDivisor != LoadFloat(kPppYmMegaBirthShpTail2Zero)) {
                 fadeGStep = fadeGNum / stepDivisor;
                 fadeBStep = fadeBNum / stepDivisor;
                 fadeAStep = fadeANum / stepDivisor;
                 fadeRStep = fadeRNum / stepDivisor;
             } else {
-                fadeRStep = kPppYmMegaBirthShpTail2Half;
-                fadeGStep = kPppYmMegaBirthShpTail2Half;
-                fadeBStep = kPppYmMegaBirthShpTail2Half;
-                fadeAStep = kPppYmMegaBirthShpTail2Half;
+                fadeRStep = LoadFloat(kPppYmMegaBirthShpTail2Half);
+                fadeGStep = LoadFloat(kPppYmMegaBirthShpTail2Half);
+                fadeBStep = LoadFloat(kPppYmMegaBirthShpTail2Half);
+                fadeAStep = LoadFloat(kPppYmMegaBirthShpTail2Half);
             }
             Vec* history;
             float drawScale;
             float drawScaleStep;
             s32 trailStartIndex;
             float segLen;
-            float segProgress = 0.0f;
+            float segProgress = LoadFloat(kPppYmMegaBirthShpTail2Zero);
             float segRemaining;
             float trailX, trailY, trailZ;
             float drawX, drawY, drawZ;
@@ -190,9 +190,9 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             segX = camX - trailX;
             segY = camY - trailY;
             segZ = camZ - trailZ;
-            zeroVec.z = 0.0f;
-            zeroVec.y = 0.0f;
-            zeroVec.x = 0.0f;
+            zeroVec.z = LoadFloat(kPppYmMegaBirthShpTail2Zero);
+            zeroVec.y = LoadFloat(kPppYmMegaBirthShpTail2Zero);
+            zeroVec.x = LoadFloat(kPppYmMegaBirthShpTail2Zero);
             segVec.x = segX;
             segVec.y = segY;
             segVec.z = segZ;
@@ -231,7 +231,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     amb.r = (u8)fadeRGB[2];
                     amb.g = (u8)fadeRGB[1];
                     amb.b = (u8)fadeRGB[0];
-                    amb.a = (u8)(fadeA * (kPppYmMegaBirthShpTail2DepthAlphaScale * (kPppYmMegaBirthShpTail2ColorComponentMax - *(float*)(particle + 0x30))));
+                    amb.a = (u8)(fadeA * (LoadFloat(kPppYmMegaBirthShpTail2DepthAlphaScale) * (LoadFloat(kPppYmMegaBirthShpTail2ColorComponentMax) - *(float*)(particle + 0x30))));
                     GXSetChanAmbColor(GX_COLOR0A0, amb);
                     pppDrawShp(shape, ppvEnv->m_materialSetPtr, step[0x6E]);
                 }
@@ -242,7 +242,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                 fadeA -= fadeAStep;
                 drawScale -= drawScaleStep;
 
-                if (*(float*)(step + 0x80) <= 0.0f) {
+                if (*(float*)(step + 0x80) <= LoadFloat(kPppYmMegaBirthShpTail2Zero)) {
                     break;
                 }
 
@@ -282,9 +282,9 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     segY = camY - drawY;
                     segZ = camZ - drawZ;
                     segX = camX - drawX;
-                    innerZero.z = 0.0f;
-                    innerZero.y = 0.0f;
-                    innerZero.x = 0.0f;
+                    innerZero.z = LoadFloat(kPppYmMegaBirthShpTail2Zero);
+                    innerZero.y = LoadFloat(kPppYmMegaBirthShpTail2Zero);
+                    innerZero.x = LoadFloat(kPppYmMegaBirthShpTail2Zero);
                     innerSeg.x = segX;
                     innerSeg.y = segY;
                     innerSeg.z = segZ;

@@ -167,20 +167,8 @@ inline int CGBaseObj::GetCID()
     return 1;
 }
 
-/*
- * --INFO--
- * PAL Address: 0x800161f0
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
 template <>
-CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index)
-{
-    return GetAt(index);
-}
+CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index);
 
 /*
  * --INFO--
@@ -1029,18 +1017,15 @@ void CGame::LoadInit()
  */
 static inline void loadPermanentScriptVars(char* scriptData)
 {
-    int scriptOffset = 0;
-    int entryOffset = 0;
+    int n = 0;
     int i = 0;
 
     while (i < CFlatPermanentVarCount()) {
-        int flagIndex = entryOffset + 1;
-        if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
-            CFlatPermanentVarWord(entryOffset) = *reinterpret_cast<u32*>(scriptData + scriptOffset);
-            scriptOffset += 4;
+        if ((CFlatPermanentVarDefs()[i * 4 + 1] & 0x20) != 0) {
+            CFlatPermanentVarWord(i * 4) = reinterpret_cast<u32*>(scriptData)[n];
+            n++;
         }
 
-        entryOffset += 4;
         i++;
     }
 }
@@ -1751,4 +1736,19 @@ inline CGame::CGameWork::CGameWork()
     m_chaliceElement = 1;
     strcpy(m_townName, m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
     m_gameInitFlag = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800161f0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index)
+{
+    return GetAt(index);
 }

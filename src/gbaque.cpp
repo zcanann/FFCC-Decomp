@@ -3348,14 +3348,17 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	unsigned char* writePtr;
 	int outSize;
 	int selectedCount;
+	int playerOffset;
+	OSSemaphore* semaphore;
 
-	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x458, sizeof(compatibilityData));
-	OSSignalSemaphore(accessSemaphores + channel);
+	semaphore = accessSemaphores + channel;
+	OSWaitSemaphore(semaphore);
+	playerOffset = channel * 0xDC;
+	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + playerOffset + 0x458, sizeof(compatibilityData));
+	OSSignalSemaphore(semaphore);
 
-	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[channel * 0xDC + 0x529];
+	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[playerOffset + 0x529];
 	count = 2;
-	outSize = 2;
 	if (compatibilityData[3] != 0) {
 		count++;
 	}
@@ -3379,9 +3382,9 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	outCompatibility[1] = count;
 	writePtr = outCompatibility + 2;
 	selectedCount = 0;
+	outSize = 2;
 	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
-		unsigned char slotValue = compatibilityData[slot];
-		if ((selectedCount < 2) || (slotValue != 0)) {
+		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
 			writePtr[0] = static_cast<unsigned char>(slot);
 			writePtr[1] = compatibilityData[slot + 8];
 			writePtr += 2;
@@ -3392,7 +3395,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	selectedCount = 0;
 	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
-		if ((selectedCount < 2) || (compatibilityData[slot] != 0)) {
+		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
 			char* src = Game.m_cFlatDataArr[1].TableStrings(2)[compatibilityData[slot]];
 			int len = strlen(src);
 			memcpy(writePtr, src, len + 1);
@@ -4147,11 +4150,11 @@ void GbaQueue::SetResetFlg(int channel)
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned char GbaQueue::GetBonus(int channel)
+int GbaQueue::GetBonus(int channel)
 {
 	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned char value = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0xCE]);
+	int value = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0xCE]);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value;
 }

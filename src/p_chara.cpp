@@ -1824,15 +1824,16 @@ checkLoaded:
 
                         switch (dataType) {
                         case 0: {
-                            CLoadModel* loadModel = 0;
+                            CLoadModel* loadModel;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadModelArray(&CharaPcs)->GetSize()); i++) {
-                                CLoadModel* it = (*LoadModelArray(&CharaPcs))[i];
-                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
-                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId)) {
-                                    loadModel = it;
-                                    break;
+                                loadModel = (*LoadModelArray(&CharaPcs))[i];
+                                if (reinterpret_cast<int>(loadModel->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(loadModel->m_keyId) == static_cast<unsigned int>(keyId)) {
+                                    goto modelFound;
                                 }
                             }
+                            loadModel = 0;
+                        modelFound:
 
                             if (loadModel == 0) {
                                 void* rawAddr = chunkFile.GetAddress();
@@ -1867,16 +1868,17 @@ checkLoaded:
                             break;
                         }
                         case 1: {
-                            CLoadTexture* loadTexture = 0;
+                            CLoadTexture* loadTexture;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(&CharaPcs)->GetSize()); i++) {
-                                CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[i];
-                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
-                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId) &&
-                                    it->m_variantTag == variantTag) {
-                                    loadTexture = it;
-                                    break;
+                                loadTexture = (*LoadTextureArray(&CharaPcs))[i];
+                                if (reinterpret_cast<int>(loadTexture->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(loadTexture->m_keyId) == static_cast<unsigned int>(keyId) &&
+                                    loadTexture->m_variantTag == variantTag) {
+                                    goto textureFound;
                                 }
                             }
+                            loadTexture = 0;
+                        textureFound:
 
                             if (loadTexture == 0) {
                                 void* rawAddr = chunkFile.GetAddress();
@@ -1911,16 +1913,17 @@ checkLoaded:
                             break;
                         }
                         case 2: {
-                            CLoadAnim* loadAnim = 0;
+                            CLoadAnim* loadAnim;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadAnimArray(&CharaPcs)->GetSize()); i++) {
-                                CLoadAnim* it = (*LoadAnimArray(&CharaPcs))[i];
-                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
-                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId) &&
-                                    strcmp(animName, it->m_name) == 0) {
-                                    loadAnim = it;
-                                    break;
+                                loadAnim = (*LoadAnimArray(&CharaPcs))[i];
+                                if (reinterpret_cast<int>(loadAnim->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(loadAnim->m_keyId) == static_cast<unsigned int>(keyId) &&
+                                    strcmp(animName, loadAnim->m_name) == 0) {
+                                    goto animFound;
                                 }
                             }
+                            loadAnim = 0;
+                        animFound:
 
                             if (loadAnim == 0) {
                                 void* rawAddr = chunkFile.GetAddress();
@@ -1948,16 +1951,17 @@ checkLoaded:
                             break;
                         }
                         case 5: {
-                            CLoadPdt* loadPdt = 0;
+                            CLoadPdt* loadPdt;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(&CharaPcs)->GetSize()); i++) {
-                                CLoadPdt* it = (*LoadPdtArray(&CharaPcs))[i];
-                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
-                                    it->m_keyId == keyId &&
-                                    reinterpret_cast<int>(it->m_variantTag) == reinterpret_cast<int>(variantTag)) {
-                                    loadPdt = it;
-                                    break;
+                                loadPdt = (*LoadPdtArray(&CharaPcs))[i];
+                                if (reinterpret_cast<int>(loadPdt->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    loadPdt->m_keyId == keyId &&
+                                    reinterpret_cast<int>(loadPdt->m_variantTag) == reinterpret_cast<int>(variantTag)) {
+                                    goto pdtFound;
                                 }
                             }
+                            loadPdt = 0;
+                        pdtFound:
 
                             void* primaryData = chunkFile.GetAddress();
                             const int primarySize = rawSize;

@@ -2292,8 +2292,9 @@ void CMenuPcs::SingleCalcCtrl()
     if (hasInput) {
         press = 0;
     } else {
-        __cntlzw((unsigned int)Pad.m_debugPadPort);
-        press = Pad.GetPadInputs()[0].buttonDown[0];
+        int padIndex = 0;
+        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+        press = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
 
     if ((press & 0x800) != 0) {

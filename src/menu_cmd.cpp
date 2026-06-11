@@ -1427,7 +1427,6 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		return 0;
 	}
 
-	CmdListStorage* cmdList = GetCmdListStorage(this);
 	s32 mode = GetCmdStateView(this)->mode;
 
 	if (mode == 0) {
@@ -1445,11 +1444,11 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			const int cursor = row2->selected;
 			if (caravanWork->m_commandListExtra[cursor] < 0) {
 				const int m1 = cursor - 1;
-				if (caravanWork->m_commandListExtra[m1] >= 0) {
+				if (*reinterpret_cast<const s16*>(reinterpret_cast<const u8*>(caravanWork) + m1 * 2 + 0x214) >= 0) {
 					row2->selected = static_cast<s16>(m1);
 				} else {
 					const int m2 = cursor - 2;
-					if (caravanWork->m_commandListExtra[m2] >= 0) {
+					if (*reinterpret_cast<const s16*>(reinterpret_cast<const u8*>(caravanWork) + m2 * 2 + 0x214) >= 0) {
 						row2->selected = static_cast<s16>(m2);
 					}
 				}
@@ -1468,11 +1467,11 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				const int cursor = row2->selected;
 				if (caravanWork->m_commandListExtra[cursor] < 0) {
 					const int p1 = cursor + 1;
-					if (caravanWork->m_commandListExtra[p1] >= 0) {
+					if (*reinterpret_cast<const s16*>(reinterpret_cast<const u8*>(caravanWork) + p1 * 2 + 0x214) >= 0) {
 						row2->selected = static_cast<s16>(p1);
 					} else {
 						const int p2 = cursor + 2;
-						if (caravanWork->m_commandListExtra[p2] >= 0) {
+						if (*reinterpret_cast<const s16*>(reinterpret_cast<const u8*>(caravanWork) + p2 * 2 + 0x214) >= 0) {
 							row2->selected = static_cast<s16>(p2);
 						}
 					}
@@ -1570,16 +1569,16 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				s16* const items = list2 + 1;
 
 				int canUse;
-				if (selected < 0) {
-					canUse = 0;
-				} else if (selected >= itemCount2) {
+				if ((selected < 0) || (selected >= itemCount2)) {
 					canUse = 0;
 				} else if (selected == 0) {
-					canUse = (cw->m_commandListInventorySlotRef[GetCmdStateView(this)->selected] >= 0);
+					canUse = static_cast<int>(
+					    (static_cast<u32>(cw->m_commandListInventorySlotRef[GetCmdStateView(this)->selected]) >> 31) ^ 1);
 				} else if (selected == 1) {
 					canUse = (ChkUnite(GetCmdStateView(this)->selected, combo) != 0);
 				} else {
-					canUse = (static_cast<u8>(EquipChk(static_cast<int>(items[selected - 2]))) == 0);
+					canUse = static_cast<int>(
+					    __cntlzw(static_cast<u8>(EquipChk(static_cast<int>(items[selected - 2])))) >> 5);
 				}
 
 				if (!((canUse & 0xFF) == 0)) {
@@ -1627,6 +1626,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		}
 	int __p13 = mode;
 	} else if (__p13 == 2) {
+		CmdListStorage* cmdList = GetCmdListStorage(this);
 		int maxPos;
 		if (kCmdMenuOneD == static_cast<double>(cmdList->entries[cmdList->listEnd + 3].scale)) {
 			maxPos = 2;
@@ -1635,18 +1635,20 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		}
 
 		if (!((hold & 8) == 0)) {
-			if (!(GetCmdStateView(this)->choice == 0)) {
-				GetCmdStateView(this)->choice--;
+			CmdState* row = ModeRow(GetCmdStateView(this), mode);
+			if (!(row->selected == 0)) {
+				row->selected--;
 			} else {
-				GetCmdStateView(this)->choice = static_cast<s16>(maxPos - 1);
+				row->selected = static_cast<s16>(maxPos - 1);
 			}
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		} else {
 			if ((hold & 4) != 0) {
-				if (GetCmdStateView(this)->choice < maxPos - 1) {
-					GetCmdStateView(this)->choice++;
+				CmdState* row = ModeRow(GetCmdStateView(this), mode);
+				if (row->selected < maxPos - 1) {
+					row->selected++;
 				} else {
-					GetCmdStateView(this)->choice = 0;
+					row->selected = 0;
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
@@ -1696,12 +1698,12 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				}
 			}
 
-			s16* modeCursor = GetCmdStateSelections(GetCmdStateView(this)) + mode;
+			CmdState* row = ModeRow(GetCmdStateView(this), mode);
 			int __p3 =  (prev | 0);
-			if (*modeCursor == __p3) {
-				*modeCursor = static_cast<s16>(next);
+			if (row->selected == __p3) {
+				row->selected = static_cast<s16>(next);
 			} else {
-				*modeCursor = static_cast<s16>(prev);
+				row->selected = static_cast<s16>(prev);
 			}
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}

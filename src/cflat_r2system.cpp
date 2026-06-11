@@ -879,12 +879,13 @@ done_check:
  */
 void CCharaPcs::SetMapShadeColor(int shadeIndex, CColor color)
 {
-    char r = color.color.r;
-    char g = color.color.g;
+    const unsigned char* src = &color.color.r;
+    unsigned char r = *src++;
+    unsigned char g = *src++;
     m_viewerChoiceColor[shadeIndex].color.r = r;
-    char b = color.color.b;
+    unsigned char b = *src++;
     m_viewerChoiceColor[shadeIndex].color.g = g;
-    char a = color.color.a;
+    unsigned char a = *src;
     m_viewerChoiceColor[shadeIndex].color.b = b;
     m_viewerChoiceColor[shadeIndex].color.a = a;
 }

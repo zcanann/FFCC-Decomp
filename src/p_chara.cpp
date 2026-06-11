@@ -2355,8 +2355,9 @@ foundTexture:
             File.LockBuffer();
             Memory.CopyFromAMemorySync(
                 File.m_readBuffer,
-                reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
-                    reinterpret_cast<unsigned int>(loadTexture->m_streamOffset),
+                reinterpret_cast<void*>(
+                    reinterpret_cast<unsigned int>(loadTexture->m_streamOffset) +
+                    reinterpret_cast<unsigned int>(StageBase(CharaPcs.m_amemWorkStage))),
                 static_cast<unsigned long>(loadTexture->m_streamSize));
             void* readBuffer = File.m_readBuffer;
             CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
@@ -2485,8 +2486,9 @@ foundModel:
                 File.LockBuffer();
                 Memory.CopyFromAMemorySync(
                     File.m_readBuffer,
-                    reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
-                        reinterpret_cast<unsigned int>(loadModel->m_streamOffset),
+                    reinterpret_cast<void*>(
+                        reinterpret_cast<unsigned int>(loadModel->m_streamOffset) +
+                        reinterpret_cast<unsigned int>(StageBase(CharaPcs.m_amemWorkStage))),
                     static_cast<unsigned long>(loadModel->m_streamSize));
                 CChara::CModel* model =
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;

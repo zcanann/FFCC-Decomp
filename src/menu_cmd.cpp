@@ -1963,7 +1963,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	const s16 selectedState = caravan->m_commandListExtra[selected];
 	const s32 selectedFlag =
-	    (static_cast<u32>(-selectedState) & ~static_cast<s32>(selectedState)) >> 31;
+	    (static_cast<u32>(-selectedState) & ~static_cast<u32>(selectedState)) >> 31;
 
 	if ((GetCmdStateView(this)->mode == 1) && (GetCmdStateView(this)->phase == 2)) {
 		if (selectedState < 0) {

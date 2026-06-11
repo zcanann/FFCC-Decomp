@@ -11860,23 +11860,24 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	color.a = 0xFF;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
+	int rectIdx;
 	unsigned long flags;
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x24 : 0x2C));
 	const float right = (sx + sw) - FLOAT_80331410;
 	const float bottom = (sy + sh) - FLOAT_80331410;
 	const float uv0 = FLOAT_803313dc;
-	for (int i = 0; i < 4; i++) {
+	for (rectIdx = 0; rectIdx < 4; rectIdx++) {
 		float x;
 		float y;
 		flags = 0;
-		if (i & 1) {
+		if (rectIdx & 1) {
 			x = right;
 			flags |= 8;
 		} else {
 			x = sx;
 		}
-		if (i & 2) {
+		if (rectIdx & 2) {
 			y = bottom;
 			flags |= 4;
 		} else {
@@ -11891,9 +11892,9 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	const float uv1 = FLOAT_803313dc;
 	const float innerWidthF = static_cast<float>(innerWidthD);
 	float y = sy;
-	for (int i = 0; i < 2; i++) {
+	for (rectIdx = 0; rectIdx < 2; rectIdx++) {
 		flags = 0;
-		if (i != 0) {
+		if (rectIdx != 0) {
 			y = bottom;
 			flags |= 4;
 		}
@@ -11906,9 +11907,9 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	const float uv2 = FLOAT_803313dc;
 	const float innerHeightF = static_cast<float>(innerHeightD);
 	float x = sx;
-	for (int i = 0; i < 2; i++) {
+	for (rectIdx = 0; rectIdx < 2; rectIdx++) {
 		flags = 0;
-		if (i != 0) {
+		if (rectIdx != 0) {
 			x = right;
 			flags |= 8;
 		}

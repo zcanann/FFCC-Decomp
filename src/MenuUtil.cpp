@@ -1410,6 +1410,7 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
  */
 #pragma push
 #pragma optimization_level 4
+#pragma opt_propagation off
 void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor color, int tlut, float margin, float scale)
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
@@ -1546,8 +1547,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		strcpy(scratch, sMenuUtilEmptyText);
 	}
 
-	font->SetPosX(kOptionRowLeft);
 	int x = 0x38;
+	font->SetPosX(kOptionRowLeft);
 	int detailY = static_cast<int>(lineStep + static_cast<float>(static_cast<int>(baseY)));
 	font->SetPosY(static_cast<float>(detailY));
 
@@ -1589,7 +1590,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			font->Draw(scratch);
 
 			int sel = m_artiState->currentSelection;
-			if ((m_battleStateFlag == 2) && (sel == 1)) {
+			if ((static_cast<int>(m_battleStateFlag) == 2) && (sel == 1)) {
 				u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
 
 				if ((effectFlags & 0x1000) == 0) {
@@ -1678,8 +1679,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 		delete[] temp;
 
-		const u32* lb = lineBaseY;
-		int y = lb[lineCount + drawPrefix - 1];
+		int y = lineBaseY[lineCount + drawPrefix - 1];
 		if (drawPrefix != 0) {
 			font->SetPosX(kOptionRowLeft);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));

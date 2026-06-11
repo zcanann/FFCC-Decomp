@@ -1038,94 +1038,17 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
  */
 void ClearShadow_r(COctNode* node)
 {
-	COctNode* nodeIter;
-	int iVar1;
-	int iVar2;
-	COctNode* pCVar3;
-	COctNode* pCVar4;
-	COctNode* pCVar5;
-	COctNode* pCVar6;
-	COctNode* pCVar7;
-	COctNode* pCVar8;
-	int iVar9;
-	int iVar10;
-	int iVar11;
-	int iVar12;
-	int iVar13;
+	int i;
 
 	if (node->m_meshCount != 0) {
 		node->m_shadowFlags = 0;
 	}
-	iVar1 = 0;
-	nodeIter = node;
-	do {
-		pCVar8 = nodeIter->m_children[0];
-		if (pCVar8 == 0) {
+	for (i = 0; i < 8; i++) {
+		if (node->m_children[i] == 0) {
 			return;
 		}
-		if (pCVar8->m_meshCount != 0) {
-			pCVar8->m_shadowFlags = 0;
-		}
-		iVar2 = 0;
-		do {
-			pCVar7 = pCVar8->m_children[0];
-			if (pCVar7 == 0) break;
-			if (pCVar7->m_meshCount != 0) {
-				pCVar7->m_shadowFlags = 0;
-			}
-			iVar13 = 0;
-			do {
-				pCVar6 = pCVar7->m_children[0];
-				if (pCVar6 == 0) break;
-				if (pCVar6->m_meshCount != 0) {
-					pCVar6->m_shadowFlags = 0;
-				}
-				iVar12 = 0;
-				do {
-					pCVar5 = pCVar6->m_children[0];
-					if (pCVar5 == 0) break;
-					if (pCVar5->m_meshCount != 0) {
-						pCVar5->m_shadowFlags = 0;
-					}
-					iVar11 = 0;
-					do {
-						pCVar4 = pCVar5->m_children[0];
-						if (pCVar4 == 0) break;
-						if (pCVar4->m_meshCount != 0) {
-							pCVar4->m_shadowFlags = 0;
-						}
-						iVar10 = 0;
-						do {
-							pCVar3 = pCVar4->m_children[0];
-							if (pCVar3 == 0) break;
-							if (pCVar3->m_meshCount != 0) {
-								pCVar3->m_shadowFlags = 0;
-							}
-							iVar9 = 0;
-							do {
-								if (pCVar3->m_children[0] == 0) break;
-								ClearShadow_r(pCVar3->m_children[0]);
-								iVar9 = iVar9 + 1;
-								pCVar3 = reinterpret_cast<COctNode*>(Ptr(pCVar3, 4));
-							} while (iVar9 < 8);
-							iVar10 = iVar10 + 1;
-							pCVar4 = reinterpret_cast<COctNode*>(Ptr(pCVar4, 4));
-						} while (iVar10 < 8);
-						iVar11 = iVar11 + 1;
-						pCVar5 = reinterpret_cast<COctNode*>(Ptr(pCVar5, 4));
-					} while (iVar11 < 8);
-					iVar12 = iVar12 + 1;
-					pCVar6 = reinterpret_cast<COctNode*>(Ptr(pCVar6, 4));
-				} while (iVar12 < 8);
-				iVar13 = iVar13 + 1;
-				pCVar7 = reinterpret_cast<COctNode*>(Ptr(pCVar7, 4));
-			} while (iVar13 < 8);
-			iVar2 = iVar2 + 1;
-			pCVar8 = reinterpret_cast<COctNode*>(Ptr(pCVar8, 4));
-		} while (iVar2 < 8);
-		iVar1 = iVar1 + 1;
-		nodeIter = reinterpret_cast<COctNode*>(Ptr(nodeIter, 4));
-	} while (iVar1 < 8);
+		ClearShadow_r(node->m_children[i]);
+	}
 }
 
 /*

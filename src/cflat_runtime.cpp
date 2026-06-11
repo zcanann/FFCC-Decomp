@@ -1046,9 +1046,49 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::callSetup(CFlatRuntime::CObject*, CFlatRuntime::CFunc*, int)
+inline void CFlatRuntime::callSetup(CFlatRuntime::CObject* object, CFlatRuntime::CFunc* func, int callFlag)
 {
-	// TODO
+	const u32 prevCodePos = object->m_codePos;
+	const int prevCallFlag = object->m_flagBits.m_callFlag;
+	unsigned int* const prevLocalBase = object->m_localBase;
+	const int prevWaitCounter = object->m_waitCounter;
+	const int prevReqFlag0 = *reinterpret_cast<int*>(&object->m_reqFlag0);
+	const int prevArgCount = object->m_argCount;
+
+	if (func->m_useCallerArgs != 0) {
+		object->m_argCount = static_cast<s16>(pop(object));
+		object->m_localBase = object->m_sp - object->m_argCount;
+		object->m_sp = object->m_localBase + object->m_argCount;
+	} else {
+		object->m_localBase = object->m_sp - func->m_argCount;
+		object->m_sp = object->m_localBase + func->m_localCount;
+	}
+
+	object->m_codeIndex.m_codeFunc = static_cast<s16>(func->m_index);
+	object->m_codeIndex.m_codeOffset = 0;
+
+	object->m_flagBits.m_callFlag = callFlag;
+	object->m_waitCounter = 0;
+	*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
+
+	*object->m_sp = reinterpret_cast<u32>(prevLocalBase);
+	object->m_sp++;
+	*object->m_sp = prevCodePos;
+	object->m_sp++;
+	*object->m_sp = static_cast<u32>(prevCallFlag);
+	object->m_sp++;
+	*object->m_sp =
+	    static_cast<u32>(prevArgCount | ((prevWaitCounter << 16) | (prevReqFlag0 << 15)));
+	object->m_sp++;
+
+	int clearCount = func->m_localCount - func->m_argCount;
+	if (clearCount != 0) {
+		unsigned int* clearPtr = object->m_localBase + func->m_argCount;
+		while (clearCount > 0) {
+			*clearPtr++ = 0;
+			clearCount--;
+		}
+	}
 }
 
 /*
@@ -1584,53 +1624,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20)) + funcIndex;
 			}
 
-			CodeWord argCount;
-			CodeWord prevCodePos;
-			prevCodePos.u = object->m_codePos;
-			unsigned int* const prevLocalBase = object->m_localBase;
-			const int prevWaitCounter = object->m_waitCounter;
-			const int prevActive = object->m_flagBits.m_callFlag;
-			const int prevReqFlags = *reinterpret_cast<int*>(&object->m_reqFlag0);
-			const int prevArgCount = object->m_argCount;
-
-			if (func->m_useCallerArgs != 0) {
-				object->m_sp--;
-				argCount.u = *object->m_sp;
-				object->m_argCount = static_cast<s16>(argCount.s);
-				object->m_localBase = object->m_sp - object->m_argCount;
-				object->m_sp = object->m_localBase + object->m_argCount;
-			} else {
-				object->m_localBase = object->m_sp - func->m_argCount;
-				object->m_sp = object->m_localBase + func->m_localCount;
-			}
-
-			*reinterpret_cast<s16*>(&object->m_codePos) =
-			    static_cast<s16>((*reinterpret_cast<s16*>(&object->m_codePos) & 0xF)
-			                     | (static_cast<s16>(func->m_index) << 4));
-			object->m_codeIndex.m_codeOffset = 0;
-			object->m_flagBits.m_callFlag = 0;
-			object->m_waitCounter = 0;
-			*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
-
-			*object->m_sp = reinterpret_cast<unsigned int>(prevLocalBase);
-			object->m_sp++;
-			*object->m_sp = static_cast<u32>(prevCodePos.s);
-			object->m_sp++;
-			*object->m_sp = prevActive;
-			object->m_sp++;
-			*object->m_sp = static_cast<unsigned int>(prevArgCount)
-			               | ((static_cast<unsigned int>(prevWaitCounter) << 16)
-			                  | (static_cast<unsigned int>(prevReqFlags) << 15));
-			object->m_sp++;
-
-			int clearCount = func->m_localCount - func->m_argCount;
-			if (clearCount != 0) {
-				unsigned int* clear = object->m_localBase + func->m_argCount;
-				while (clearCount > 0) {
-					*clear++ = 0;
-					clearCount--;
-				}
-			}
+			callSetup(object, func, 0);
 
 			if (((func->m_systemKind != 1) && (func->m_systemKind != 2)) || (func->m_systemIndex >= 0)) {
 				goto recomputeCode;

@@ -139,11 +139,12 @@ void CMenuPcs::FavoDraw()
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			} else {
+				float entryAlpha = entry->alpha;
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
 				colors[0].b = 0xFF;
-				colors[0].a = static_cast<unsigned char>(entry->alpha * 255.0f);
+				colors[0].a = static_cast<unsigned char>(255.0f * entryAlpha);
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, 0.0f);
 			}
@@ -175,7 +176,7 @@ void CMenuPcs::FavoDraw()
 
 	rank = rankBase;
 	drawEntry = entry;
-	for (unsigned int i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) {
 		int iconX = static_cast<int>(static_cast<float>(drawEntry->x + drawEntry->w - 0x10));
 		float iconHalfH = static_cast<float>(drawEntry->h) - 32.0f;
 		float iconYf = static_cast<float>(drawEntry->y);
@@ -194,7 +195,7 @@ void CMenuPcs::FavoDraw()
 	memset(textBuf, 0, sizeof(textBuf));
 	rank = rankBase;
 	drawEntry = entry;
-	for (unsigned int i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) {
 		rankFont->SetTlut(6);
 		rankFont->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);

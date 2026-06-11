@@ -2023,11 +2023,11 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
                                static_cast<unsigned long>(m_blurBufferIndex) * 0x46000);
         m_blurDelayCounter = 0;
         m_blurTextureCount += 1;
-        if (m_blurTextureCount > 2) {
+        if (static_cast<int>(m_blurTextureCount) > 2) {
             m_blurTextureCount = 2;
         }
         m_blurBufferIndex += 1;
-        if (m_blurBufferIndex > 1) {
+        if (static_cast<int>(m_blurBufferIndex) > 1) {
             m_blurBufferIndex = 0;
         }
     }

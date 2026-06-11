@@ -1769,10 +1769,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -5: {
         short buttons;
-        if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
-            buttons = Pad.GetButton(*object->m_localBase);
-        } else {
+        if (((1 << *object->m_localBase) & m_padInputDisableMask) != 0) {
             buttons = 0;
+        } else {
+            buttons = Pad.GetButton(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= ~0xC00;
@@ -2153,19 +2153,12 @@ renderedDone:
             *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
             *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
         } else {
-            switch (mode & 3) {
-            case 3:
-                t = -((kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * t + kCFlatHalfPi))) -
-                      kCFlatOneF);
-                break;
-            case 1:
+            if ((mode & 3) == 3) {
+                t = kCFlatOneF - kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * t + kCFlatHalfPi));
+            } else if ((mode & 3) == 1) {
                 t = kCFlatOneF + std::sinf(kCFlatHalfPi * t + kCFlatThreeHalfPi);
-                break;
-            case 2:
+            } else if ((mode & 3) == 2) {
                 t = std::sinf(kCFlatHalfPi * t);
-                break;
-            default:
-                break;
             }
 
             const float pathDistance = m_pathTotalDistance * t;
@@ -2780,8 +2773,7 @@ renderedDone:
         end.w = localFloats[10];
 
         if (mode == 3) {
-            alpha = -((kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * alpha + kCFlatHalfPi))) -
-                      kCFlatOneF);
+            alpha = kCFlatOneF - kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * alpha + kCFlatHalfPi));
         } else if (mode == 1) {
             alpha = kCFlatOneF + std::sinf(kCFlatHalfPi * alpha + kCFlatThreeHalfPi);
         } else if (mode == 2) {

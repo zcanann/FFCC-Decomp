@@ -2867,27 +2867,22 @@ void CMenuPcs::CalcLoadMenu()
 	*reinterpret_cast<short*>(iVar10 + 0x20) = (short)iVar14;
 
 	if ((int)uVar15 < 0) {
-		unsigned char* const frame = m_wm.m_frameInfo;
-		double dVar26;
-		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
+		float wave = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
 		if ((int)uVar15 >= -10) {
 			int s15 = (int)uVar15 >> 31;
-			int __p12 = s15;
-			int absRaw = ((int)uVar15 ^ s15) - __p12;
-			float dVar27 = (float)(baseWidth * (DOUBLE_803314E8 * (double)absRaw));
-			unsigned int absOff = (unsigned int)absRaw;
-			if ((int)absOff < 0) absOff = 0;
-			if ((int)absOff > 10) absOff = 10;
-			float dVar28 = (float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4));
-			dVar26 = (double)(dVar27 * dVar28);
-		} else {
-			dVar26 = (double)baseWidth;
+			int absRaw = ((int)uVar15 ^ s15) - s15;
+			wave = (float)(wave * (DOUBLE_803314E8 * (double)absRaw));
+			int s16 = (int)uVar15 >> 31;
+			int absOff = ((int)uVar15 ^ s16) - s16;
+			if (absOff < 0) absOff = 0;
+			if (absOff > 10) absOff = 10;
+			wave = wave * (float)sin((double)(FLOAT_803314bc * (float)absOff * FLOAT_803316d4));
 		}
 
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(frame + 4) - (float)dVar26);
-		*reinterpret_cast<short*>(frame + 4) = (short)iVar14;
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(frame + 0x20) + (float)dVar26);
-		*reinterpret_cast<short*>(frame + 0x20) = (short)iVar14;
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) - wave);
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = (short)iVar14;
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) + wave);
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = (short)iVar14;
 	}
 
 	float fVar2 = FLOAT_803313e8;

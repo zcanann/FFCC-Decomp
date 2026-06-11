@@ -400,17 +400,13 @@ void CMenuPcs::MoneyDraw()
 	font->SetScale(0.9f);
 	font->DrawInit();
 
-	{
-		CColor color(0xFF, 0xFF, 0xFF, (u8)(255.0f * drawBase->alpha));
-		font->SetColor(color.color);
-	}
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(255.0f * drawBase->alpha)).color);
 
 	const char* label = GetMenuStr(0x15);
 	for (i = 0; i < 2; i++) {
-		float labelY = (32.0f + ((float)(drawBase->y + 0x18) + 32.0f * (float)i)) -
-		               19.8f;
+		y = (32.0f + ((float)(drawBase->y + 0x18) + 32.0f * (float)i)) - 19.8f;
 		font->SetPosX((float)(drawBase->x + 0xB6));
-		font->SetPosY(labelY - 4.0f);
+		font->SetPosY(y - 4.0f);
 		font->Draw(label);
 	}
 

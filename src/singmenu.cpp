@@ -3236,6 +3236,12 @@ int CMenuPcs::GetEquipType(int itemNo)
     return equipType;
 }
 
+struct SingItemRecord {
+    u8 _pad0[0x38];
+    u16 raceItems[4];
+    u8 _pad1[0x8];
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80145ff4
@@ -3252,36 +3258,30 @@ int CMenuPcs::GetSmithItem(int itemNo)
     GetItemType(itemNo, 1);
     u16 race = *reinterpret_cast<u16*>(caravanWork + 0x3e0);
     int raceType = race & 3;
-    int itemBase = Game.unkCFlatData0[2] + itemNo * 0x48;
-
-    int smithItem = *reinterpret_cast<u16*>(itemBase + (race & 3) * 2 + 0x38);
+    SingItemRecord* rec = &reinterpret_cast<SingItemRecord*>(Game.unkCFlatData0[2])[itemNo];
+    int smithItem = rec->raceItems[race & 3];
     if (smithItem > 0) {
         unsigned int genderMask = 0x10;
-        s16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
+        int flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
         unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e0) & 3);
+        int raceFlags = flags & 0xF;
+        int genderFlags = flags & 0x30;
         if (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e2) != 0) {
             genderMask = 0x20;
         }
 
-        int raceFlags = flags & 0xF;
-        int genderFlags = flags & 0x30;
         int valid;
-        if (raceFlags != 0) {
-            if (genderFlags != 0) {
-                if (((raceFlags & raceMask) == 0) || ((genderFlags & genderMask) == 0)) {
-                    valid = 0;
-                } else {
-                    valid = 1;
-                }
-                goto checked;
+        if ((raceFlags != 0) && (genderFlags != 0)) {
+            if (((raceFlags & raceMask) != 0) && ((genderFlags & genderMask) != 0)) {
+                valid = 1;
+            } else {
+                valid = 0;
             }
-        }
-        if (raceFlags == 0) {
-            valid = (genderFlags & genderMask) != 0;
-        } else {
+        } else if (raceFlags != 0) {
             valid = (raceFlags & raceMask) != 0;
+        } else {
+            valid = (genderFlags & genderMask) != 0;
         }
-checked:
         if (valid != 0) {
             return smithItem;
         }
@@ -3289,7 +3289,7 @@ checked:
 
     for (int i = 0; i < 4; i++) {
         if (raceType != i) {
-            smithItem = *reinterpret_cast<u16*>(itemBase + 0x38 + i * 2);
+            smithItem = rec->raceItems[i];
             if (smithItem > 0) {
                 return smithItem;
             }

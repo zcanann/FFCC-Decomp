@@ -3338,7 +3338,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		}
 	}
 
-	float targetDist = *reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0);
+	float targetDist = monObj->m_partyDistance[partyIndex];
 
 	int selectorType = *reinterpret_cast<unsigned short*>(aiScript + 0x108);
 	if (selectorType == 0xFFFF) {
@@ -3363,7 +3363,6 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	groupCount[5] = static_cast<int>(mlPool->groupCountInit.w[5]);
 	groupCount[6] = static_cast<int>(mlPool->groupCountInit.w[6]);
 	groupCount[7] = static_cast<int>(mlPool->groupCountInit.w[7]);
-	int rotOffset = partyIndex * 4 + 0x610;
 	int* groupPtr = reinterpret_cast<int*>(groupTable);
 
 	for (int actionIndex = 0; actionIndex < 8; actionIndex++) {
@@ -3402,7 +3401,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		}
 
 		if ((actionFlags & 0x40) != 0) {
-			float targetRot = *reinterpret_cast<float*>(mon + rotOffset);
+			float targetRot = monObj->m_partyAngle[partyIndex];
 			float baseRot =
 				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
 				object->m_rotBaseY;
@@ -3833,7 +3832,7 @@ void CGMonObj::statWatch()
 					 (0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
 					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
 					 (reinterpret_cast<int>(reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED]) == 0))) {
-					if (*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0) < homeRange2) {
+					if (monObj->m_partyDistance[partyIndex] < homeRange2) {
 						result = partyIndex;
 						if (targetMode == 0) {
 							break;
@@ -3885,7 +3884,7 @@ void CGMonObj::statWatch()
 		if (static_cast<int>(*reinterpret_cast<unsigned short*>(aiScript + 0x10A)) == 1) {
 			if (monObj->m_unk6BC == 0) {
 				unsigned char* scriptBase = script;
-				if (*reinterpret_cast<float*>(mon + targetPartyIndex * 4 + 0x5D0) <
+				if (monObj->m_partyDistance[targetPartyIndex] <
 					static_cast<float>(*reinterpret_cast<unsigned short*>(scriptBase + 0xCE))) {
 					if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
 						chaseState = 5;

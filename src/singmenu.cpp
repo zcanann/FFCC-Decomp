@@ -1941,23 +1941,14 @@ void CMenuPcs::SingleCalcFadeIn()
         Sound.PlaySe(0xE, 0x40, 0x7F, 0);
         memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
-        int idx = 0;
-        SingleFadeEntry* e = &m_singleFadeState->entries[idx];
-        e->startFrame = 0;
-        e->duration = 10;
-        idx++;
-        e = &m_singleFadeState->entries[idx];
-        e->startFrame = (m_singleMenuMode == 8) ? 0 : 10;
-        e->duration = 10;
-        idx++;
-        e = &m_singleFadeState->entries[idx];
-        e->startFrame = (m_singleMenuMode == 8) ? 0 : 10;
-        e->duration = 10;
-        idx++;
-        e = &m_singleFadeState->entries[idx];
-        e->startFrame = (m_singleMenuMode == 8) ? 0 : 10;
-        e->duration = 10;
-        idx++;
+        int idx;
+        int start = 0;
+        for (idx = 0; idx < 4; idx++) {
+            SingleFadeEntry* e = &m_singleFadeState->entries[idx];
+            e->startFrame = start;
+            e->duration = 10;
+            start = (m_singleMenuMode == 8) ? 0 : 10;
+        }
 
         m_singleFadeState->count = static_cast<s16>(idx);
         m_singleFadeState->done = 0;

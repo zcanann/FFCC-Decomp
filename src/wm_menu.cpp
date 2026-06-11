@@ -1991,23 +1991,23 @@ void CMenuPcs::CalcMCardMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	int bVar1 = 0;
+	bool bVar1 = false;
 	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
-	unsigned int uVar3;
+	unsigned short uVar3s;
 	if (bVar1) {
-		uVar3 = 0;
+		uVar3s = 0;
 	} else {
 		unsigned int padIndex = 0;
 		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
 		int __p11 =  (0 + padIndex);
-		unsigned short down = Pad.GetPadInputs()[__p11].buttonDown[0];
-		uVar3 = down;
+		uVar3s = Pad.GetPadInputs()[__p11].buttonDown[0];
 	}
+	unsigned int uVar3 = uVar3s;
 	unsigned short uVar6 = GetButtonRepeat(0);
 
-	if ((unsigned char)m_wmWorldState->m_worldReady == 0) {
+	if ((signed char)m_wmWorldState->m_worldReady == 0) {
 		m_mcCtrl.m_previousState = 0;
 		m_mcCtrl.m_state = 0;
 		m_mcCtrl.m_lastResult = 0;

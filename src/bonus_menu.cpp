@@ -2532,7 +2532,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		// iconBase block: src = frameBase (back = activePartyCount sprites); dance
 		int base = activePartyCount + 1;
 		int __p13 = activePartyCount;
-		int delta = (base - 1) * 0x40;
+		int delta;
+		delta = (base - 1) * 0x40;
 		for (int i = 0; i < __p13; i++) {
 			int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
 			int src = spr - delta;
@@ -2570,7 +2571,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		// digitEchoBase block: src = iconBase (back = base - iconBase = base - (pc+1)); dance
 		base += activePartyCount;
 		{
-			int delta = (base - activePartyCount - 1) * 0x40;
+			delta = (base - activePartyCount - 1) * 0x40;
 			for (int i = 0; i < activePartyCount; i++) {
 				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
 				int src = spr - delta;
@@ -2601,7 +2602,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		// extraBase block: src = iconBase (back = base - (pc+1)); dance
 		base += activePartyCount;
 		{
-			int delta = (base - activePartyCount - 1) * 0x40;
+			delta = (base - activePartyCount - 1) * 0x40;
 			for (int i = 0; i < activePartyCount; i++) {
 				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
 				int src = spr - delta;
@@ -2623,7 +2624,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		// extraBase + 2*pc block: src = extraBase + pc (back = activePartyCount sprites); dance
 		base += activePartyCount;
 		{
-			int delta = activePartyCount * 0x40;
+			delta = activePartyCount * 0x40;
 			for (int i = 0; i < activePartyCount; i++) {
 				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
 				int src = spr - delta;

@@ -2,10 +2,17 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 
-extern const char sWmmNo[];
-extern const char sWmmNein[];
-extern const char sWmmNon[];
-extern const char sWmmSlotB[];
+extern const char sWmmEmptyEn[] = "Empty.";
+extern const char sWmmEmptyIt[] = "Vuoto.";
+extern const char sWmmEmptyFr[] = "Vide";
+extern const char sWmmEmptyEs[8] = "Vac\xedo.";
+extern const char sWmmBlankText[4] = "";
+extern const char sWmmWerdenText[] = "werden.";
+extern const char sWmmAuswahlText[] = "Auswahl";
+extern const char sWmmNo[] = "No";
+extern const char sWmmNein[] = "Nein";
+extern const char sWmmNon[] = "Non";
+extern const char sWmmSlotB[] = "Slot B";
 extern const char sWmmSteckplatzB[];
 extern const char sWmmRanuraB[];
 
@@ -86,7 +93,8 @@ int CMenuPcs::GetSlotABXPos(int right)
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - slotAWidth);
     double windowLeft = (double)windowInfo->x;
-    int x = (int)(centeredWidth * kWmmCenteringHalf + windowLeft);
+    double half = kWmmCenteringHalf;
+    int x = (int)(centeredWidth * half + windowLeft);
     if (right != 0) {
         const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
         x += slotAWidth - slotBWidth;
@@ -137,7 +145,8 @@ int CMenuPcs::GetYesNoXPos(int right)
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - yesWidth);
     double windowLeft = (double)windowInfo->x;
-    int x = (int)(centeredWidth * kWmmCenteringHalf + windowLeft);
+    double half = kWmmCenteringHalf;
+    int x = (int)(centeredWidth * half + windowLeft);
     if (right != 0) {
         const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
         x += yesWidth - noWidth;

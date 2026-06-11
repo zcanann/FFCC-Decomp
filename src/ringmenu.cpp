@@ -226,7 +226,7 @@ void CRingMenu::DrawIcon()
 	float u = static_cast<float>(uInt);
 	float v = static_cast<float>(vInt);
 	MenuPcs.DrawRect(3, static_cast<float>(posX), static_cast<float>(posY), kRingMenuMarkerSize,
-	                                 kRingMenuMarkerSize, u, v, kRingMenuMarkerUvScale, kRingMenuMarkerUvScale, angle);
+	                                 kRingMenuMarkerSize, u, v, kRingMenuMarkerUvScale, kRingMenuMarkerUvScale, kRingMenuZero);
 }
 
 /*
@@ -886,6 +886,11 @@ void CRingMenu::onCalc()
 			m_displayCounter = 0x10 - m_displayCounter;
 		}
 
+		float* anim = m_animFloat[0];
+		const float animStep = kRingMenuBlinkPhaseStep;
+		int count = 9;
+		const float animMin = kRingMenuZero;
+
 		m_displayCounter = clampDecToZero(m_displayCounter);
 		m_transitionCounter = clampDecToZero(m_transitionCounter);
 		m_commonFrameCounter = m_commonFrameCounter + 1;
@@ -898,28 +903,25 @@ void CRingMenu::onCalc()
 		m_buttonTimers[4] = clampDecToZero(m_buttonTimers[4]);
 		m_buttonTimers[5] = clampDecToZero(m_buttonTimers[5]);
 
-		const float animStep = kRingMenuBlinkPhaseStep;
-		const float animMin = kRingMenuZero;
 		m_buttonTimers[6] = clampDecToZero(m_buttonTimers[6]);
 		m_buttonTimers[7] = clampDecToZero(m_buttonTimers[7]);
 		m_buttonTimers[8] = clampDecToZero(m_buttonTimers[8]);
-		int row = 0;
-		int count = 9;
 		do {
-			m_animFloat[row][0] = m_animFloat[row][0] - animStep;
-			if (m_animFloat[row][0] < animMin) {
-				m_animFloat[row][0] = animMin;
+			anim[0] = anim[0] - animStep;
+			if (anim[0] < animMin) {
+				anim[0] = animMin;
 			}
-			m_animFloat[row][1] = m_animFloat[row][1] - animStep;
-			if (m_animFloat[row][1] < animMin) {
-				m_animFloat[row][1] = animMin;
+			anim[1] = anim[1] - animStep;
+			if (anim[1] < animMin) {
+				anim[1] = animMin;
 			}
-			m_animFloat[row][2] = m_animFloat[row][2] - animStep;
-			if (m_animFloat[row][2] < animMin) {
-				m_animFloat[row][2] = animMin;
+			anim[2] = anim[2] - animStep;
+			if (anim[2] < animMin) {
+				anim[2] = animMin;
 			}
-			row++;
-		} while (--count != 0);
+			anim += 3;
+			count--;
+		} while (count != 0);
 
 		fmod(static_cast<double>(m_spinPhase), kRingMenuOneD);
 		int i = 0x1B;

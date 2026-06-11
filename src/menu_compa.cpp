@@ -40,11 +40,6 @@ static inline float LoadFloat(float value)
 	return value;
 }
 
-static inline float LoadFloatRef(const float& value)
-{
-	return value;
-}
-
 static inline unsigned int GetMenuPressLock(int lock)
 {
 	bool activeInput = false;
@@ -611,7 +606,7 @@ void CMenuPcs::CompaInit()
 	memset(this->m_compaList, 0, sizeof(*this->m_compaList));
 
 	CompaOpenAnim* entry = this->m_compaList->entries;
-	float one = LoadFloatRef(kCompaOne);
+	float one = kCompaOne;
 	for (int count = 64; count != 0; count--) {
 		entry->uvScale = one;
 		entry++;

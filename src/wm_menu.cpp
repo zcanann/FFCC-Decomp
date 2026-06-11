@@ -5576,6 +5576,9 @@ void CMenuPcs::DrawLoadMenu()
 			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(6, 0);
+				if (m_wmWorldState->m_mcResult == 0) {
+					break;
+				}
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
 				short cRes = m_wmWorldState->m_mcResult;

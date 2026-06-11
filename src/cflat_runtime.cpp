@@ -242,13 +242,13 @@ void CFlatRuntime::Create(void* filePtr)
 				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x96)
 				        u8[m_permanentVarCount << 2];
 
-				u8* variableDef = m_permanentVarDefs;
+				int i = 0;
 				const int variableCount = m_permanentVarCount;
-				for (int i = 0; i < variableCount; i++) {
+				u8* variableDef = m_permanentVarDefs;
+				for (; i < variableCount; i++, variableDef += 4) {
 					variableDef[0] = chunkFile.Get1();
 					variableDef[1] = chunkFile.Get1();
 					*reinterpret_cast<u16*>(variableDef + 2) = chunkFile.Get2();
-					variableDef += 4;
 				}
 				break;
 			}
@@ -376,8 +376,9 @@ void CFlatRuntime::Create(void* filePtr)
 
 				memcpy(m_strBlob, chunkFile.GetAddress(), chunk.m_size);
 				u8* const base = chunkFile.GetAddress();
+				int i = 0;
 				int offset = 0;
-				for (int i = 0; i < m_strCount; i++) {
+				for (; i < m_strCount; i++) {
 					*reinterpret_cast<short*>(reinterpret_cast<u8*>(m_strOffsets) + offset) =
 					    chunkFile.GetAddress() - base;
 					chunkFile.GetString();
@@ -397,8 +398,9 @@ void CFlatRuntime::Create(void* filePtr)
 
 				memcpy(m_fstrBlob, chunkFile.GetAddress(), chunk.m_size);
 				u8* const base = chunkFile.GetAddress();
+				int i = 0;
 				int offset = 0;
-				for (int i = 0; i < m_fstrCount; i++) {
+				for (; i < m_fstrCount; i++) {
 					*reinterpret_cast<short*>(reinterpret_cast<u8*>(m_fstrOffsets) + offset) =
 					    chunkFile.GetAddress() - base;
 					chunkFile.GetString();
@@ -418,8 +420,9 @@ void CFlatRuntime::Create(void* filePtr)
 
 				memcpy(m_vstrBlob, chunkFile.GetAddress(), chunk.m_size);
 				u8* const base = chunkFile.GetAddress();
+				int i = 0;
 				int offset = 0;
-				for (int i = 0; i < m_vstrCount; i++) {
+				for (; i < m_vstrCount; i++) {
 					*reinterpret_cast<short*>(reinterpret_cast<u8*>(m_vstrOffsets) + offset) =
 					    chunkFile.GetAddress() - base;
 					chunkFile.GetString();

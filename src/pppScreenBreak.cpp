@@ -390,7 +390,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         meshMin.y = 0x7FFF;
         meshMin.z = 0x7FFF;
 
-        for (; vertexCount != 0; vertexCount--) {
+        for (u32 j = 0; j < vertexCount; j++) {
             s16 x = *(s16*)((u8*)meshData->m_vertices + iVar6);
             s16 globalX = globalMax.x;
             if (globalX < x) {

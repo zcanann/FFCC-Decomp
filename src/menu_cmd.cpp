@@ -299,10 +299,21 @@ static inline CmdState* GetCmdStateView(CMenuPcs* menu)
 	return reinterpret_cast<CmdState*>(GetCmdState(menu));
 }
 
+struct CmdStateSel {
+	unsigned char pad_0000[0x26];
+	s16 selections[4];
+};
+
+static inline s16& ModeCursor(CmdState* cmd, int m)
+{
+	return reinterpret_cast<CmdStateSel*>(cmd)->selections[m];
+}
+
 static inline s16* GetCmdStateSelections(CmdState* cmd)
 {
 	return &cmd->selected;
 }
+
 
 static inline s16 GetCmdLayoutFlag(CMenuPcs* menu)
 {
@@ -1571,7 +1582,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 					if (selected == 0) {
 						caravanWork->ChgCmdLst(GetCmdStateView(this)->selected, -1);
 					} else if (selected != 1) {
-						caravanWork->ChgCmdLst(GetCmdStateView(this)->selected, items[selected - 2]);
+						caravanWork->ChgCmdLst(GetCmdStateView(this)->selected, list[selected - 1]);
 					}
 
 					GetCmdStateView(this)->commandResult = 0;

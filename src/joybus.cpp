@@ -4536,7 +4536,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             memcpy(&body[0x8D], &playerData[threadParam->m_portIndex * 0xDC + 0x20], 3);
 
-            unsigned short statHalf = __lhbrx(&playerData[threadParam->m_portIndex * 0xDC + 0x14], 0);
+            unsigned short statHalf = __lhbrx(&playerInfo, threadParam->m_portIndex * 0xDC + 0x14);
             memcpy(&body[0x90], &statHalf, 2);
 
             unsigned char* compatBody = &body[0x92];
@@ -4545,7 +4545,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             memcpy(compatBody + compatLen, &playerData[threadParam->m_portIndex * 0xDC + 0x18], 8);
 
-            unsigned int statWord = __lwbrx(&playerData[threadParam->m_portIndex * 0xDC + 0x24], 0);
+            unsigned int statWord = __lwbrx(&playerInfo, threadParam->m_portIndex * 0xDC + 0x24);
             memcpy(compatBody + compatLen + 8, &statWord, sizeof(statWord));
 
             const int byteLen = compatLen + 0xA3;
@@ -4608,7 +4608,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
     {
         m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             GbaQue.ClrCompatibilityFlg(threadParam->m_portIndex);
 

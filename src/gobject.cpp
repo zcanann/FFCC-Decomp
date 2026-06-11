@@ -678,13 +678,13 @@ void CGObject::move()
 
         movingWithScript = 1;
     } else {
-        const signed char animMisc = static_cast<s8>(m_animStateMisc);
-        const int player = animMisc;
-        if ((animMisc >= 0)
-            && (animMisc < 4)
+        const unsigned char animMiscRaw = m_animStateMisc;
+        const int player = static_cast<s8>(animMiscRaw);
+        if ((static_cast<s8>(animMiscRaw) >= 0)
+            && (static_cast<s8>(animMiscRaw) < 4)
             && m_weaponNodeFlagAll.m_bits1.m_shield
             && m_weaponNodeFlagAll.m_bits1.m_menuReady
-            && ((Game.m_gameWork.m_menuStageMode == 0) || (animMisc == 0))) {
+            && ((Game.m_gameWork.m_menuStageMode == 0) || (static_cast<s8>(animMiscRaw) == 0))) {
             u16 buttons = GetMovePadButton(player);
             const u16 buttonsDown = GetMovePadButtonDown(player);
             const u16 buttonsRepeat = GetMovePadButtonUp(player);

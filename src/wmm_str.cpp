@@ -41,6 +41,9 @@ extern const char* s_McWinMessGroup2_it[];
 extern const char* s_McWinMessGroup2_es[];
 extern const char* s_McWinMessGroup2_fr[];
 
+extern const float kWmmWindowTextScale = 1.0f;
+extern const double kWmmCenteringHalf = 0.5;
+
 struct WinMessEntry
 {
     unsigned int words[5];
@@ -276,8 +279,6 @@ const char* CMenuPcs::GetMcStr(int index)
         return s_McStr_en[index];
     }
 }
-
-extern const double kWmmUnsignedToDoubleBias = 4503601774854144.0;
 
 #include "src/wmm_str_data.inc"
 

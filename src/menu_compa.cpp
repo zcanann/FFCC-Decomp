@@ -602,6 +602,10 @@ bool CMenuPcs::CompaOpen()
  */
 void CMenuPcs::CompaInit()
 {
+	CompaOpenAnimList* compaList;
+	CompaOpenAnim* setupEntry;
+	int entryIndex;
+
 	memset(this->m_compaList, 0, sizeof(*this->m_compaList));
 
 	CompaOpenAnim* entry = this->m_compaList->entries;
@@ -611,9 +615,9 @@ void CMenuPcs::CompaInit()
 		entry++;
 	}
 
-	CompaOpenAnimList* compaList = this->m_compaList;
-	int entryIndex = 0;
-	CompaOpenAnim* setupEntry = &compaList->entries[entryIndex++];
+	compaList = this->m_compaList;
+	entryIndex = 0;
+	setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->tex = 0x52;
 	setupEntry->drawFlags = 4;
 	setupEntry->x = 0x28;

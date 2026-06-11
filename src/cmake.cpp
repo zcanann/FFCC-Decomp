@@ -3419,6 +3419,7 @@ void CMenuPcs::DrawCrystal(int type, int frame, float alpha)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -3441,7 +3442,7 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
-    int baseX = ((page == 0) ? 0x116 : 0x116);
+    int baseX = 0x116;
     double offsCalc = -(static_cast<double>(40.0f * x - 40.0f) / 2.0) + 32.0;
     float offs = static_cast<float>(static_cast<int>(offsCalc));
     int offsU = static_cast<int>(offsCalc);
@@ -3463,6 +3464,7 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
         0, titleX, titleY, 208.0f, 24.0f,
         0.0f, static_cast<float>(page * 0x18), 1.0f, 1.0f, 0.0f);
 }
+#pragma opt_propagation on
 
 /*
  * --INFO--

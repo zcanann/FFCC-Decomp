@@ -437,6 +437,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
+    CMapCylinder& cyl = g_hit_cyl;
     unsigned char boundsOverlap = 0;
     unsigned char partialOverlap = 0;
     int axisOverlap;
@@ -480,7 +481,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    Vec* hitDirection = &g_hit_cyl.m_axis;
+    Vec* hitDirection = &cyl.m_axis;
     float dot = PSVECDotProduct(hitDirection, &g_hit_lpface->m_normal);
     if (dot >= kMapHitZero) {
         return 0;

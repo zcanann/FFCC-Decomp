@@ -2246,14 +2246,12 @@ int CMapMng::ReadOtm(char* mapName)
         if (attr == 0) {
             continue;
         }
-        if (attr->m_type != CMapObjAtr::SPOT_LIGHT) {
-            continue;
-        }
-
-        CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
-        if (*reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor) == 0) {
-            continue;
-        }
+        switch (attr->m_type) {
+        case CMapObjAtr::SPOT_LIGHT: {
+            CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
+            if (*reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor) == 0) {
+                break;
+            }
 
         CLightPcs::CBumpLight light;
         light.m_type = 1;
@@ -2295,7 +2293,9 @@ int CMapMng::ReadOtm(char* mapName)
                 m_mapObjArray[j].m_bumpLight = spotAttr->m_light;
             }
         }
-
+            break;
+        }
+        }
     }
     return 1;
 }

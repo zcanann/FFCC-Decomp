@@ -1734,15 +1734,15 @@ unsigned int CMenuPcs::CmdOpen0()
 {
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 	const s32 timer = static_cast<s32>(GetCmdStateView(this)->transitionTimer);
-	CmdListEntry* entries = GetCmdListStorage(this)->entries;
 	const s32 sel = GetCmdStateView(this)->selected;
+	CmdListEntry* selEntry = &GetCmdListStorage(this)->entries[sel];
 	if (timer < 5) {
-		entries[sel].x = static_cast<s16>(entries[sel].x - 0x13);
+		selEntry->x = static_cast<s16>(selEntry->x - 0x13);
 	}
 
+	CmdListEntry* entry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
 	s32 doneCount = 0;
 	s32 entryCount = static_cast<s32>(GetCmdListStorage(this)->listEnd) - static_cast<s32>(GetCmdListStorage(this)->count);
-	CmdListEntry* entry = &entries[GetCmdListStorage(this)->count];
 	const float fVar1 = kCmdMenuZero;
 
 	for (s32 i = 0; i < entryCount; i++) {
@@ -1754,9 +1754,8 @@ unsigned int CMenuPcs::CmdOpen0()
 				entry->dy = fVar1;
 			} else {
 				entry->timer++;
-				entry->alpha = static_cast<float>(
-					(kCmdMenuOneD / static_cast<double>(entry->duration)) *
-					static_cast<double>(entry->timer));
+				const double step = kCmdMenuOneD / static_cast<double>(entry->duration);
+				entry->alpha = static_cast<float>(step * static_cast<double>(entry->timer));
 				if ((entry->flags & 2) == 0) {
 					const float t = static_cast<float>(
 						(kCmdMenuOneD / static_cast<double>(entry->duration)) *

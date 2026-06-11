@@ -3025,12 +3025,14 @@ renderedDone:
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x5F:
-        this->push(object, static_cast<int>(Math.DstRot(
-                                  *reinterpret_cast<float*>(object->m_localBase),
-                                  *reinterpret_cast<float*>(object->m_localBase + 1))));
+    case -0x5F: {
+        float dstRot = Math.DstRot(
+            *reinterpret_cast<float*>(object->m_localBase),
+            *reinterpret_cast<float*>(object->m_localBase + 1));
+        this->push(object, *reinterpret_cast<int*>(&dstRot));
         outResult = 0;
         break;
+    }
     case -0x60: {
         const int alpha = static_cast<int>(kCFlatAlphaMax * *reinterpret_cast<float*>(object->m_localBase + 3)) & 0xFF;
         const unsigned int blurA = (static_cast<unsigned int>(__cntlzw(object->m_localBase[4])) >> 5) & 0xFF;

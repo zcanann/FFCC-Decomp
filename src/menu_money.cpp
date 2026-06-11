@@ -31,20 +31,19 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	int digitPlace = 1;
 	int digitIndex;
-	int started = 0;
+	int started;
 	int gil;
 
 	if (row != 0) {
 		gil = s_Money;
-		digitIndex = 0;
 	} else {
 		gil = caravanWork->m_gil;
-		digitIndex = 0;
 	}
+	digitIndex = started = 0;
 
 	digitPlace *= 10000000;
 
-	do {
+	while (digitIndex < 8) {
 		if ((!started) && (gil >= digitPlace)) {
 			started = 1;
 		}
@@ -60,7 +59,7 @@ inline void CMenuPcs::MoneySetPlace(int row)
 		}
 		digitIndex++;
 		digitPlace /= 10;
-	} while (digitIndex < 8);
+	}
 }
 
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
@@ -543,20 +542,10 @@ bool CMenuPcs::MoneyOpen()
 	if (this->m_moneyState->initialized == '\0') {
 		memset(this->m_moneyPanel, 0, sizeof(*this->m_moneyPanel));
 
-		float one = 1.0f;
 		MoneyMenuAnim* initAnim = this->m_moneyPanel->anims;
-		int initCount = 8;
-		do {
-			initAnim[0].uvScale = one;
-			initAnim[1].uvScale = one;
-			initAnim[2].uvScale = one;
-			initAnim[3].uvScale = one;
-			initAnim[4].uvScale = one;
-			initAnim[5].uvScale = one;
-			initAnim[6].uvScale = one;
-			initAnim[7].uvScale = one;
-			initAnim += 8;
-		} while (--initCount != 0);
+		for (int i = 0; i < 64; i++, initAnim++) {
+			initAnim->uvScale = 1.0f;
+		}
 
 		int entryIndex = 0;
 		MoneyMenuAnim* firstAnim = &this->m_moneyPanel->anims[entryIndex++];

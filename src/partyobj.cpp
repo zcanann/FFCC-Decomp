@@ -1667,8 +1667,8 @@ targetJoin: ;
 		}
 	}
 
-	party.flags.commandActive = 1;
 	CGObject* tgt = party.target;
+	party.flags.commandActive = 1;
 	CFlatRuntime::CStack stack[2];
 	stack[0].m_word = secondaryCommand;
 	stack[1].m_word = tgt != nullptr ? *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(tgt) + 0x30) : 0;

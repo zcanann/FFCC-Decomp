@@ -2995,7 +2995,7 @@ void CGPartyObj::checkTargetParticle()
 			    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
 				loopBossStage = true;
 			}
-			if (loopBossStage && ((__cntlzw(0x6D - (static_cast<short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0)) {
+			if (loopBossStage && ((__cntlzw(0x6D - (static_cast<unsigned short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0)) {
 				loopBossCid = true;
 			}
 			if (loopBossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {
@@ -3055,12 +3055,11 @@ void CGPartyObj::checkTargetParticle()
 
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, (Vec*)&down, 0x30) != 0) {
 			getMapHitObject()->CalcHitPosition(targetPos);
-			if (m_scriptHandle != nullptr) {
-				CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+			{
 				Vec faceNormal;
-				work->m_targetCursorPosA = *targetPos;
+				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosA = *targetPos;
 				getMapHitObject()->GetHitFaceNormal(&faceNormal);
-				work->m_targetCursorPosB = faceNormal;
+				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosB = faceNormal;
 			}
 		}
 

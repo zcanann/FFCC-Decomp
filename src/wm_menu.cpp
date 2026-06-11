@@ -9392,15 +9392,15 @@ void CMenuPcs::WMChgMenu()
 
 	float fVar6 = FLOAT_803315b0;
 	m_wmWorldState->m_frameCounter = 0;
-	float fVar5 = FLOAT_803313e8;
-	float fVar4 = FLOAT_803313dc;
-	double local_40 = (double)(long long)(int)fVar6;
-	m_wmWorldState->m_titleState = 0;
-	double dVar16 = DOUBLE_803313f8;
 	double dVar15 = (double)FLOAT_80331430;
+	int xInt = (int)fVar6;
+	m_wmWorldState->m_titleState = 0;
+	float fVar4 = FLOAT_803313dc;
+	float fVar5 = FLOAT_803313e8;
+	double dVar16 = DOUBLE_803313f8;
 	m_wmWorldState->m_worldReady = 0;
 	m_wmWorldState->m_flag09 = 0;
-	double local_38 = (double)(long long)(int)(float)(dVar15 * dVar16);
+	int yInt = (int)(float)(dVar15 * dVar16);
 	m_wmWorldState->m_flag0A = 0;
 	m_wmWorldState->m_state0E = 0;
 	m_wmWorldState->m_mainState = 0;
@@ -9414,8 +9414,8 @@ void CMenuPcs::WMChgMenu()
 	m_wmWorldState->m_flag0B = 0;
 	m_wmWorldState->m_modelFlagsInitialized = 0;
 
-	m_menuWindowInfo->x = (short)(int)fVar6;
-	m_menuWindowInfo->y = (short)(int)(float)(dVar15 * dVar16);
+	m_menuWindowInfo->x = (short)xInt;
+	m_menuWindowInfo->y = (short)yInt;
 	m_menuWindowInfo->width = 0;
 	m_menuWindowInfo->height = 0;
 	m_menuWindowInfo->frame = 0;
@@ -9467,7 +9467,7 @@ void CMenuPcs::WMChgMenu()
 	sVar2 = m_wmWorldState->m_menuMode;
 	switch (sVar2) {
 	case 0: {
-			int iVar11 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0xA00;
+			unsigned char* gameBytes = reinterpret_cast<unsigned char*>(&Game);
 			for (int count = 0; count < 4; count++) {
 				const int paramIndex = iVar8 / 2;
 				if (Game.m_caravanWorkArr[m_wmWorldState->m_originalBackupParams[paramIndex]].m_shopState == 0) {
@@ -9476,40 +9476,45 @@ void CMenuPcs::WMChgMenu()
 				if (Game.m_caravanWorkArr[m_wmWorldState->m_backupParams[paramIndex]].m_shopState == 0) {
 					m_wmWorldState->m_backupParams[paramIndex] = (short)0xFFFF;
 				}
-				int iVar13 = *reinterpret_cast<int*>(iVar11 + 0x20);
+				int iVar13 = *reinterpret_cast<int*>(gameBytes + 0x20);
 				if (Game.m_caravanWorkArr[iVar13].m_shopState == 0) {
-					*reinterpret_cast<int*>(iVar11 + 0x20) = -1;
+					*reinterpret_cast<int*>(gameBytes + 0x20) = -1;
 				}
 				if (Game.m_caravanWorkArr[iVar13].m_shopBusyFlag != 0) {
-					*reinterpret_cast<int*>(iVar11 + 0x20) = -1;
+					*reinterpret_cast<int*>(gameBytes + 0x20) = -1;
 				}
-				fVar4 = FLOAT_8033151c;
-				dVar16 = DOUBLE_803313f8;
 				iVar8 = iVar8 + 2;
-				iVar11 = iVar11 + 4;
+				gameBytes += 4;
 			}
 
-			*reinterpret_cast<float*>(bytes + 0x78) = -(FLOAT_8033151c * (float)((double)(int)m_wmWorldState->m_cardChannel));
-			*reinterpret_cast<float*>(bytes + 0x7C) = -(fVar4 * (float)((double)(int)m_wmWorldState->m_cardChannel));
+			double raw1;
+			reinterpret_cast<int*>(&raw1)[0] = 0x43300000;
+			reinterpret_cast<int*>(&raw1)[1] = (int)m_wmWorldState->m_cardChannel ^ 0x80000000;
+			*reinterpret_cast<float*>(bytes + 0x78) = -(FLOAT_8033151c * (float)(raw1 - DOUBLE_80331408));
+			double raw2;
+			reinterpret_cast<int*>(&raw2)[0] = 0x43300000;
+			reinterpret_cast<int*>(&raw2)[1] = (int)m_wmWorldState->m_cardChannel ^ 0x80000000;
+			*reinterpret_cast<float*>(bytes + 0x7C) = -(FLOAT_8033151c * (float)(raw2 - DOUBLE_80331408));
 			m_effectTimer = 0;
 		break;
 	}
 	case 3: {
-			int iVar11 = 0;
+			int iVar11 = iVar8;
 			double dVar16b = (double)FLOAT_80331664;
 			int iVar12 = 0;
 			int iVar13 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0xA00;
 			do {
+				const int handleIdx = iVar12 + 0x20;
 				*reinterpret_cast<unsigned char*>(m_wm.m_charaModelData + iVar8 + 0xC) = 1;
 				*reinterpret_cast<float*>(iVar13 + 0x2C) = (float)dVar16b;
 				int selectData = reinterpret_cast<int>(m_wm.m_charaSelectData) + iVar11;
 				*reinterpret_cast<short*>(selectData + 6) = *reinterpret_cast<short*>(selectData + 4);
-				if (GetWmCharaHandles(this)[iVar12]->IsModelLoaded(1)) {
+				if (m_wm.m_handles[handleIdx]->IsModelLoaded(1)) {
 					Mtx mtx;
 					PSMTXIdentity(mtx);
-					GetWmCharaHandles(this)[iVar12]->m_model->SetMatrix(mtx);
-					GetWmCharaHandles(this)[iVar12]->m_model->CalcMatrix();
-					GetWmCharaHandles(this)[iVar12]->m_model->CalcSkin();
+					m_wm.m_handles[handleIdx]->m_model->SetMatrix(mtx);
+					m_wm.m_handles[handleIdx]->m_model->CalcMatrix();
+					m_wm.m_handles[handleIdx]->m_model->CalcSkin();
 				}
 				iVar12 = iVar12 + 1;
 				iVar11 = iVar11 + 0x10;
@@ -9545,8 +9550,8 @@ void CMenuPcs::WMChgMenu()
 		} else {
 			memset(GetWmCharaSelectEntries(this), 0, kWmCharaSelectBytes);
 			char bVar7 = 0;
-			iVar8 = 0;
-			int iVar11 = 0;
+			iVar8 = bVar7;
+			int iVar11 = iVar8;
 			for (int iVar12 = 0; iVar12 < 2; iVar12++) {
 				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xC) = 0;
 				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xB) = 0;
@@ -9633,8 +9638,8 @@ void CMenuPcs::WMChgMenu()
 		bytes[0x10] = 0;
 		memset(GetWmCharaSelectEntries(this), 0, kWmCharaSelectBytes);
 		char bVar7 = 0;
-		iVar8 = 0;
-		int iVar11 = 0;
+		iVar8 = bVar7;
+		int iVar11 = iVar8;
 		int iVar12 = 2;
 		do {
 			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xC) = 0;

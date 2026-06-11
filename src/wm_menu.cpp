@@ -2904,15 +2904,16 @@ void CMenuPcs::CalcLoadMenu()
 			const char* const* msgBuf = GetMcWinMessBuff(0);
 			iVar14 = 0;
 			int* piVar5 = reinterpret_cast<int*>(GetWinMess(0));
-			int* piVar20 = piVar5;
-			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4)];
+			int iVar23 = 0;
+			short* psVar20 = reinterpret_cast<short*>(piVar5);
+			for (; iVar23 < *piVar5; iVar23++) {
+				const char* pcVar12 = msgBuf[psVar20[2]];
 				if (pcVar12 != 0) {
 					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
 					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
 					if (iVar25 > iVar14) iVar14 = iVar25;
 				}
-				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+				psVar20++;
 			}
 			iVar10 = iVar14 / 0x16;
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
@@ -3001,15 +3002,16 @@ void CMenuPcs::CalcLoadMenu()
 			const char* const* msgBuf = GetMcWinMessBuff(uVar22);
 			iVar14 = 0;
 			int* piVar5 = reinterpret_cast<int*>(GetWinMess(uVar19));
-			int* piVar20 = piVar5;
-			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4)];
+			int iVar23 = 0;
+			short* psVar20 = reinterpret_cast<short*>(piVar5);
+			for (; iVar23 < *piVar5; iVar23++) {
+				const char* pcVar12 = msgBuf[psVar20[2]];
 				if (pcVar12 != 0) {
 					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
 					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
 					if (iVar25 > iVar14) iVar14 = iVar25;
 				}
-				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+				psVar20++;
 			}
 			iVar10 = iVar14 / 0x16;
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
@@ -3081,15 +3083,16 @@ void CMenuPcs::CalcLoadMenu()
 			const char* const* msgBuf = GetMcWinMessBuff(0);
 			iVar14 = 0;
 			int* piVar5 = reinterpret_cast<int*>(GetWinMess(6));
-			int* piVar20 = piVar5;
-			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4)];
+			int iVar23 = 0;
+			short* psVar20 = reinterpret_cast<short*>(piVar5);
+			for (; iVar23 < *piVar5; iVar23++) {
+				const char* pcVar12 = msgBuf[psVar20[2]];
 				if (pcVar12 != 0) {
 					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
 					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
 					if (iVar25 > iVar14) iVar14 = iVar25;
 				}
-				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+				psVar20++;
 			}
 			iVar10 = iVar14 / 0x16;
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
@@ -3157,15 +3160,16 @@ void CMenuPcs::CalcLoadMenu()
 			const char* const* msgBuf = GetMcWinMessBuff(uVar22);
 			iVar14 = 0;
 			int* piVar5 = reinterpret_cast<int*>(GetWinMess(uVar19));
-			int* piVar20 = piVar5;
-			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4)];
+			int iVar23 = 0;
+			short* psVar20 = reinterpret_cast<short*>(piVar5);
+			for (; iVar23 < *piVar5; iVar23++) {
+				const char* pcVar12 = msgBuf[psVar20[2]];
 				if (pcVar12 != 0) {
 					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
 					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
 					if (iVar25 > iVar14) iVar14 = iVar25;
 				}
-				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+				psVar20++;
 			}
 			iVar10 = iVar14 / 0x16;
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
@@ -3248,15 +3252,16 @@ void CMenuPcs::CalcLoadMenu()
 			const char* const* msgBuf = GetMcWinMessBuff(uVar22);
 			iVar14 = 0;
 			int* piVar5 = reinterpret_cast<int*>(GetWinMess(uVar19));
-			int* piVar20 = piVar5;
-			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4)];
+			int iVar23 = 0;
+			short* psVar20 = reinterpret_cast<short*>(piVar5);
+			for (; iVar23 < *piVar5; iVar23++) {
+				const char* pcVar12 = msgBuf[psVar20[2]];
 				if (pcVar12 != 0) {
 					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
 					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
 					if (iVar25 > iVar14) iVar14 = iVar25;
 				}
-				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+				psVar20++;
 			}
 			iVar10 = iVar14 / 0x16;
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;

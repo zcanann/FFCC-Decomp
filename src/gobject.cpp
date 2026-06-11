@@ -364,8 +364,20 @@ void CGBaseObj::onFrame()
  * JP Address: TODO
  * JP Size: TODO
  */
+struct SAnimFillGroup {
+    s8 b0;
+    s8 b1;
+    s8 b2;
+    s8 b3;
+    s8 b4;
+    s8 b5;
+    s8 b6;
+    s8 b7;
+};
+
 #pragma push
 #pragma optimization_level 3
+#pragma opt_lifetimes off
 void CGObject::onCreate()
 {
     m_worldPosition.z = sZeroFloat;
@@ -504,20 +516,50 @@ void CGObject::onCreate()
     *reinterpret_cast<float*>(m_worldMode) = sZeroFloat;
 
     int animStateOffset = 0;
-    s8* animState;
     for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 4; j++) {
-            animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x41;
-            animStateOffset += 8;
-            animState[0] = -1;
-            animState[1] = -1;
-            animState[2] = -1;
-            animState[3] = -1;
-            animState[4] = 0xFF;
-            animState[5] = -1;
-            animState[6] = -1;
-            animState[7] = 0xFF;
-        }
+        int groupOffset;
+        s8* animState;
+        groupOffset = animStateOffset + 0x9d;
+        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState[0] = -1;
+        animState[1] = -1;
+        animState[2] = -1;
+        animState[3] = -1;
+        animState[4] = -1;
+        animState[5] = -1;
+        animState[6] = -1;
+        animState[7] = -1;
+        groupOffset = animStateOffset + 0xa5;
+        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState[0] = -1;
+        animState[1] = -1;
+        animState[2] = -1;
+        animState[3] = -1;
+        animState[4] = -1;
+        animState[5] = -1;
+        animState[6] = -1;
+        animState[7] = -1;
+        groupOffset = animStateOffset + 0xad;
+        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState[0] = -1;
+        animState[1] = -1;
+        animState[2] = -1;
+        animState[3] = -1;
+        animState[4] = -1;
+        animState[5] = -1;
+        animState[6] = -1;
+        animState[7] = -1;
+        groupOffset = animStateOffset + 0xb5;
+        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animStateOffset += 0x20;
+        animState[0] = -1;
+        animState[1] = -1;
+        animState[2] = -1;
+        animState[3] = -1;
+        animState[4] = -1;
+        animState[5] = -1;
+        animState[6] = -1;
+        animState[7] = -1;
     }
 
     memset(&m_attackColliders[0].m_localStart.y, 0, 0x180);
@@ -636,13 +678,13 @@ void CGObject::move()
 
         movingWithScript = 1;
     } else {
-        const signed char animMisc = static_cast<s8>(m_animStateMisc);
-        const int player = animMisc;
-        if ((animMisc >= 0)
-            && (animMisc < 4)
+        const unsigned char animMiscRaw = m_animStateMisc;
+        const int player = static_cast<s8>(animMiscRaw);
+        if ((static_cast<s8>(animMiscRaw) >= 0)
+            && (static_cast<s8>(animMiscRaw) < 4)
             && m_weaponNodeFlagAll.m_bits1.m_shield
             && m_weaponNodeFlagAll.m_bits1.m_menuReady
-            && ((Game.m_gameWork.m_menuStageMode == 0) || (animMisc == 0))) {
+            && ((Game.m_gameWork.m_menuStageMode == 0) || (static_cast<s8>(animMiscRaw) == 0))) {
             u16 buttons = GetMovePadButton(player);
             const u16 buttonsDown = GetMovePadButtonDown(player);
             const u16 buttonsRepeat = GetMovePadButtonUp(player);
@@ -777,8 +819,8 @@ void CGObject::move()
                 if (sSlideThreshold < slideSq) {
                     Mtx yawMtx;
                     Mtx pitchMtx;
-                    Vec worldPosNorm;
                     Vec worldUp;
+                    Vec worldPosNorm;
                     Vec tangent;
                     Vec moveNorm;
                     Vec cross;
@@ -1303,7 +1345,8 @@ void CGObject::bgAttribCollision()
     }
 
     {
-        if ((sZeroFloat != m_groundHitOffset.x) || (sZeroFloat != m_groundHitOffset.z)) {
+        const float cmpZero = sZeroFloat;
+        if ((cmpZero != m_groundHitOffset.x) || (cmpZero != m_groundHitOffset.z)) {
             if (HasLoadedModel(m_charaModelHandle)) {
                 CVector* probeMove = &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat);
 
@@ -1833,9 +1876,9 @@ void CGObject::update()
                         if (prevWrapped < eventFrame && (eventFrame <= nextWrapped || nextWrapped < prevWrapped)) {
                             CFlatRuntime::CStack stackIn[2];
                             stackIn[0].m_word = static_cast<unsigned int>(m_animSlotSel);
-                            stackIn[1].m_word = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(animRefBytes + 0x32 + i * 4));
+                            stackIn[1].m_word = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(animRefBytes + 0x2E + i * 4));
                             gCFlatRuntime().SystemCall(this, 2, 9, 2, stackIn, 0);
-                            onAnimPoint(m_animSlotSel, *reinterpret_cast<unsigned short*>(animRefBytes + 0x32 + i * 4));
+                            onAnimPoint(m_animSlotSel, *reinterpret_cast<unsigned short*>(animRefBytes + 0x2E + i * 4));
                         }
                     }
                 }
@@ -1845,25 +1888,25 @@ void CGObject::update()
         }
 
         if (m_currentAnimSlot != -1 && !m_weaponNodeFlagAll.m_bits1.m_bit01) {
-            bool animFinished = HasLoadedModel(m_charaModelHandle);
-            if (animFinished && m_currentAnimSlot != -1) {
-                if (ModelAnim(m_charaModelHandle->m_model) == 0) {
-                    animFinished = true;
+            const char animSlotNow = m_currentAnimSlot;
+            bool hasAnimModel = HasLoadedModel(m_charaModelHandle);
+            int animFinished;
+            if (!hasAnimModel || animSlotNow == -1) {
+                animFinished = 1;
+            } else if (ModelAnim(m_charaModelHandle->m_model) != 0) {
+                const float animSpan = sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
+                if (sAnimFrameOffset == animSpan) {
+                    animFinished = 1;
                 } else {
-                    const float animSpan = sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
-                    if (animSpan == sAnimFrameOffset) {
-                        animFinished = true;
+                    const float modelTime = m_charaModelHandle->m_model->m_time;
+                    if (m_lastBgAttr < sZeroFloat) {
+                        animFinished = sZeroFloat >= modelTime;
                     } else {
-                        const float modelTime = m_charaModelHandle->m_model->m_time;
-                        if (m_lastBgAttr < sZeroFloat) {
-                            animFinished = sZeroFloat >= modelTime;
-                        } else {
-                            animFinished = animSpan - sAnimFrameOffset < modelTime;
-                        }
+                        animFinished = animSpan - sAnimFrameOffset < modelTime;
                     }
                 }
             } else {
-                animFinished = true;
+                animFinished = 1;
             }
 
             if (animFinished) {
@@ -1871,8 +1914,7 @@ void CGObject::update()
                     const unsigned char queuePos = m_animQueuePos++;
                     const char queuedAnim = m_animQueue[queuePos];
                     if (queuedAnim != -1) {
-                        m_currentAnimSlot =
-                            (queuedAnim >= 'A' && queuedAnim < 'A' + 4) ? m_animQueue[queuedAnim - 'A'] : queuedAnim;
+                        m_currentAnimSlot = m_animQueue[queuedAnim - 'A'];
                         m_weaponNodeFlagAll.m_bits1.m_bit01 = 0;
                         m_animExtraIndex = -1;
                         m_collisionPushTimer = -1;
@@ -1906,7 +1948,7 @@ void CGObject::update()
             PSMTXTransApply(modelMtx, ecScratch, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
             m_weaponModelHandle->m_model->SetMatrix(ecScratch);
             m_weaponModelHandle->m_model->CalcMatrix();
-            if (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0) {
+            if (m_weaponNodeFlagBits.m_unk20) {
                 m_weaponModelHandle->m_model->CalcSkin();
             }
 
@@ -1926,7 +1968,7 @@ void CGObject::update()
             m_shieldModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
                 static_cast<s32>(static_cast<s32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0;
             m_shieldModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
-            if (static_cast<s32>(static_cast<u32>(weaponFlagsLo) << 26 | static_cast<u32>(weaponFlagsLo) >> 6) < 0) {
+            if (m_weaponNodeFlagBits.m_unk20) {
                 m_shieldModelHandle->m_model->CalcSkin();
             }
         }
@@ -1945,7 +1987,7 @@ void CGObject::update()
         m_groundHitOffset.z = sZeroFloat;
     }
 
-    if ((m_stateFlags0 & 0x80) != 0) {
+    if (m_stateFlags0Bits.unk0) {
         m_groundHitOffset.x *= m_bounceFactor;
         m_groundHitOffset.z *= m_bounceFactor;
     }
@@ -2329,8 +2371,8 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
             PSVECScale(&toOther, &toOther, sAnimFrameOffset / dist);
             const float angle = static_cast<float>(acos(static_cast<double>(PSVECDotProduct(&toOther, &targetDir))));
             if ((static_cast<double>(angle) < static_cast<double>(maxAngle + extraAngle)) && (dist < bestDist)) {
-                best = other;
                 bestDist = dist;
+                best = other;
             }
         }
     }

@@ -546,7 +546,8 @@ void CPartMng::pppDumpMngSt()
 
     unsigned char* base = self;
     PppMngStDumpRaw* mngBase = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x2A18);
-    for (int i = 0; i < 0x180; i++) {
+    int i = 0;
+    do {
         PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(base + 0x2A18);
         if (mng->m_baseTime != -0x1000 && static_cast<unsigned int>(System.m_execParam) >= 1U) {
             int kind = static_cast<int>(mng->m_kind);
@@ -560,7 +561,8 @@ void CPartMng::pppDumpMngSt()
         }
 
         base += 0x158;
-    }
+        i++;
+    } while (i < 0x180);
 
     ppvEnv->m_stagePtr->heapInfo(heapTotal, heapUse, heapFree);
 

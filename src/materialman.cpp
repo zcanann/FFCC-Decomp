@@ -538,7 +538,7 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
     _GXSetTevOrder(
         m_numTevStage, m_bumpTexCoordIds[3], m_bumpTexMapIds[1], 0xFF);
     _GXSetTevColorIn(
-        m_numTevStage, 0xF, 4, 9, hasProjTex ? 0xF : 0);
+        m_numTevStage, 0xF, 4, 9, hasProjTex ? (_GXTevColorArg)0xF : (_GXTevColorArg)0);
     _GXSetTevAlphaIn(m_numTevStage, 7,
                                                                                                            7, 7, 0);
     _GXSetTevColorOp(

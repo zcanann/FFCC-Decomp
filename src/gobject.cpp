@@ -2014,11 +2014,11 @@ void CGObject::copy()
         return;
     }
 
-    hasModel = false;
     m_charaModelHandle->m_flags = m_displayFlags;
     m_charaModelHandle->m_colorPhase = m_animBlend;
     m_charaModelHandle->m_sortZ = m_screenDepth;
     m_charaModelHandle->m_fogBlend = m_worldParam;
+    hasModel = false;
 
     if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
         hasModel = true;

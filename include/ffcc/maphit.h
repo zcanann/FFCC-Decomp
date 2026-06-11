@@ -2,6 +2,7 @@
 #define _FFCC_MAPHIT_H_
 
 #include <dolphin/mtx.h>
+#include "ffcc/mapocttree.h"
 
 class CChunkFile;
 class CMapCylinder;
@@ -36,33 +37,16 @@ class CMapCylinder
 {
 public:
     CMapCylinder()
+        : m_bound(kMapHitBoundsMinInit, kMapHitBoundsMaxInit)
     {
-        float min = kMapHitBoundsMinInit;
-
-        m_bound.m_min.z = min;
-        m_bound.m_min.y = min;
-        m_bound.m_min.x = min;
-
-        m_bound.m_max.z = kMapHitBoundsMaxInit;
-        m_bound.m_max.y = kMapHitBoundsMaxInit;
-        m_bound.m_max.x = kMapHitBoundsMaxInit;
     }
 
     CMapCylinder(float min, float max)
+        : m_bound(min, max)
     {
-        float minBound = min;
-        float maxBound = max;
-
-        m_bound.m_min.z = minBound;
-        m_bound.m_min.y = minBound;
-        m_bound.m_min.x = minBound;
-
-        m_bound.m_max.z = maxBound;
-        m_bound.m_max.y = maxBound;
-        m_bound.m_max.x = maxBound;
     }
 
-    CBound* GetBound() { return reinterpret_cast<CBound*>(&m_bound); }
+    CBound* GetBound() { return &m_bound; }
     CMapCylinderProbeView& Probe() { return *reinterpret_cast<CMapCylinderProbeView*>(&m_top); }
     const CMapCylinderProbeView& Probe() const { return *reinterpret_cast<const CMapCylinderProbeView*>(&m_top); }
 
@@ -70,7 +54,7 @@ public:
     Vec m_top;       // 0x0c
     Vec m_axis;      // 0x18
     float m_radius;  // 0x24
-    CMapCylinderBound m_bound; // 0x28
+    CBound m_bound; // 0x28
 };
 typedef char CMapCylinder_size_check[(sizeof(CMapCylinder) == 0x40) ? 1 : -1];
 

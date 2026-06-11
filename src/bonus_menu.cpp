@@ -2640,11 +2640,11 @@ void CMenuPcs::CalcResultCloseAnim()
 			int i = 0;
 			off = i;
 			for (; i < *(short*)this->m_bonusAnimPtr; i++) {
-				if (0.0f == *(float*)(this->m_bonusAnimPtr + off + 0x38)) {
+				if (kBonusZClearOrigin == *(float*)(this->m_bonusAnimPtr + off + 0x38)) {
 					*(float*)(this->m_bonusAnimPtr + off + 0x40) = (float)(int)*(short*)(this->m_bonusAnimPtr + off + 8);
 				}
 				int s = this->m_bonusAnimPtr + off;
-				if (0.0f == *(float*)(s + 0x3c)) {
+				if (kBonusZClearOrigin == *(float*)(s + 0x3c)) {
 					*(float*)(s + 0x44) = (float)(int)*(short*)(s + 10);
 				}
 				off += 0x40;
@@ -2671,10 +2671,10 @@ void CMenuPcs::CalcResultCloseAnim()
 			if (sprite->startFrame > frame) {
 				sprite->alpha = FLOAT_80331EB0;
 			}
-			if (!(sprite->startFrame + sprite->duration <= frame)) {
-				sprite->alpha = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
-			} else {
+			if (sprite->startFrame + sprite->duration <= frame) {
 				sprite->alpha = kBonusZClearOrigin;
+			} else {
+				sprite->alpha = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			}
 		}
 

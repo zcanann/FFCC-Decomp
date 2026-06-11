@@ -1400,7 +1400,7 @@ void CMapMng::DestroyMap()
     }
     GetMapShadowArray().RemoveAll();
 
-    for (int i = 0; i < 2; i++) {
+    for (i = 0; i < 2; i++) {
         for (unsigned int j = 0; j < static_cast<unsigned int>(GetMapLightHolderArray(i).GetSize()); j++) {
             if (GetMapLightHolderArray(i)[j] != 0) {
                 operator delete(GetMapLightHolderArray(i)[j]);
@@ -1697,6 +1697,7 @@ void CMapMng::SetLightSource()
                     *(u32*)light.m_bumpShade = 0;
 
                     light.m_spotFn = spotAttr->m_colorMode;
+                    light.m_unk4D = spotAttr->m_useAltColor;
                     if (spotAttr->m_useAltColor == 0) {
                         light.m_unk4D = 4;
                     } else {
@@ -1846,7 +1847,7 @@ int CMapMng::ReadMtx(char* mapName)
                 while (chunkFile.GetNextChunk(chunk)) {
                     switch (chunk.m_id) {
                     case 0x54534554:
-                        m_textureSet->Create(chunkFile, MapMng.m_stage, append, 0, 0, 0);
+                        m_textureSet->Create(chunkFile, m_stage, append, 0, 0, 0);
                         append = 1;
                         if (chunk.m_arg0 == 1) {
                             return 1;
@@ -2246,14 +2247,12 @@ int CMapMng::ReadOtm(char* mapName)
         if (attr == 0) {
             continue;
         }
-        if (attr->m_type != CMapObjAtr::SPOT_LIGHT) {
-            continue;
-        }
-
-        CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
-        if (*reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor) == 0) {
-            continue;
-        }
+        switch (attr->m_type) {
+        case CMapObjAtr::SPOT_LIGHT: {
+            CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
+            if (*reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor) == 0) {
+                break;
+            }
 
         CLightPcs::CBumpLight light;
         light.m_type = 1;
@@ -2295,7 +2294,9 @@ int CMapMng::ReadOtm(char* mapName)
                 m_mapObjArray[j].m_bumpLight = spotAttr->m_light;
             }
         }
-
+            break;
+        }
+        }
     }
     return 1;
 }
@@ -2532,7 +2533,7 @@ void CMapMng::Calc()
     int& mapLightId = m_mapAnimFrame;
     mapLightId += 1;
     int v = (mapLightId += 1);
-    if (static_cast<unsigned char>(static_cast<long long>(v) - 2) != 0x1E) {
+    if ((static_cast<unsigned char>((static_cast<long long>(v) + 0xFFFFFFFEu) >> 32) ^ 0x1E) != 0) {
         mapLightId = 0x1C;
     }
 
@@ -2998,6 +2999,7 @@ void CMapMng::DrawAfter()
 int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
     extern const float kMapZero;
+    extern const float kMapHitTInitial;
     if ((kMapZero == move->x) && (kMapZero == move->z) && (kMapZero == move->y)) {
         return 0;
     }
@@ -3018,7 +3020,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     }
 
     g_hit_edge_idx_min = -2;
-    g_hit_t_min = 10.0f;
+    g_hit_t_min = kMapHitTInitial;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
@@ -3050,6 +3052,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
 int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
     extern const float kMapZero;
+    extern const float kMapHitTInitial;
     if ((kMapZero == move->x) && (kMapZero == move->z) && (kMapZero == move->y)) {
         return 0;
     }
@@ -3070,7 +3073,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     }
 
     g_hit_edge_idx_min = -2;
-    g_hit_t_min = 10.0f;
+    g_hit_t_min = kMapHitTInitial;
     int hit = 0;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
@@ -3169,46 +3172,38 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
     switch (channelIndex) {
     case 0:
     {
-        u8 g = color.g;
         u8 b = color.b;
         m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.r = color.r;
-        u8 a = color.a;
-        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.g = g;
+        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.g = color.g;
         m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.b = b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.a = a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.a = color.a;
         return;
     }
     case 1:
     {
-        u8 g = color.g;
         u8 b = color.b;
         m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.r = color.r;
-        u8 a = color.a;
-        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.g = g;
+        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.g = color.g;
         m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.b = b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.a = a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.a = color.a;
         return;
     }
     case 2:
     {
-        u8 g = color.g;
         u8 b = color.b;
         m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.r = color.r;
-        u8 a = color.a;
-        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.g = g;
+        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.g = color.g;
         m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.b = b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.a = a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.a = color.a;
         return;
     }
     case 3:
     {
-        u8 g = color.g;
         u8 b = color.b;
         m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.r = color.r;
-        u8 a = color.a;
-        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.g = g;
+        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.g = color.g;
         m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.b = b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.a = a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.a = color.a;
         return;
     }
     }
@@ -3409,17 +3404,21 @@ void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
 #pragma dont_inline on
 void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int loop)
 {
+    int mapAnimNodeIndex;
+    CPtrArray<CMapAnimNode*>* mapAnimNodeArray;
     CMapAnimRun* mapAnimRun;
+    int mapAnimRunIndex;
     CMapObj* mapObj = m_mapObjArray + mapObjIndex;
     int mapAnimRunCount = m_mapAnimRunArray.GetSize();
+    int mapAnimNodeCount;
 
-    for (int mapAnimRunIndex = 0; mapAnimRunIndex < mapAnimRunCount; mapAnimRunIndex++) {
+    for (mapAnimRunIndex = 0; mapAnimRunIndex < mapAnimRunCount; mapAnimRunIndex++) {
         mapAnimRun = m_mapAnimRunArray[mapAnimRunIndex];
-        CPtrArray<CMapAnimNode*>* mapAnimNodeArray =
+        mapAnimNodeArray =
             reinterpret_cast<CPtrArray<CMapAnimNode*>*>(m_mapAnimArray[mapAnimRun->m_mapAnimIndex]);
-        int mapAnimNodeCount = mapAnimNodeArray->GetSize();
+        mapAnimNodeCount = mapAnimNodeArray->GetSize();
 
-        for (int mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
+        for (mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
             CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[mapAnimNodeIndex];
             if (mapAnimNode->m_node == reinterpret_cast<CMapAnimTargetNode*>(mapObj)) {
                 goto startMapObjAnim;
@@ -3612,7 +3611,9 @@ void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
     CMapObj* mapObj = m_mapObjArray + objIndex;
     CMapObjAtr* attr = mapObj->m_attribute;
 
-    if (attr->m_type == CMapObjAtr::SPOT_LIGHT) {
+    switch (attr->m_type) {
+    case CMapObjAtr::SPOT_LIGHT:
+    {
         CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
         spotAttr->m_color = spotColor;
         mapObj->m_localRotationX = spotPosition.x;
@@ -3620,6 +3621,8 @@ void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
         mapObj->m_localRotationZ = spotPosition.z;
         mapObj->m_localMtxDirty = 1;
         mapObj->m_calcMtxPending = 1;
+        break;
+    }
     }
 }
 

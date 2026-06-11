@@ -208,7 +208,7 @@ public:
     unsigned char m_nextModeTypeArr[4];
     unsigned char m_modeXArr[4];
     unsigned char m_stateCodeArr[4];
-    unsigned char m_stateFlagArr[4];
+    char m_stateFlagArr[4];
 
     uchar m_threadInitFlag;
     bool m_binLoaded;

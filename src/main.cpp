@@ -61,10 +61,9 @@ void main(int argc, char** argv)
  */
 void game(int argc, char** argv)
 {
-    int i;
     int copyScriptName;
     int parseLanguage;
-    char** argument;
+    int i;
 
     Game.Init();
     strcpy(Game.m_startScriptName, kDefaultScriptName);
@@ -72,32 +71,32 @@ void game(int argc, char** argv)
     if (argc != 0) {
         copyScriptName = 0;
         parseLanguage = 0;
-        for (i = 1, argument = argv + 1; i < argc; i++, argument++) {
+        for (i = 1; i < argc; i++) {
             if (copyScriptName) {
-                strcpy(Game.m_startScriptName, *argument);
+                strcpy(Game.m_startScriptName, argv[i]);
                 copyScriptName = 0;
             } else if (parseLanguage) {
-                int cmp = strcmp(*argument, kLanguageArgUs);
+                int cmp = strcmp(argv[i], kLanguageArgUs);
                 if (cmp == 0) {
                     Game.m_gameWork.m_languageId = 1;
                 } else {
-                    cmp = strcmp(*argument, kLanguageArgUk);
+                    cmp = strcmp(argv[i], kLanguageArgUk);
                     if (cmp == 0) {
                         Game.m_gameWork.m_languageId = 1;
                     } else {
-                        cmp = strcmp(*argument, kLanguageArgGr);
+                        cmp = strcmp(argv[i], kLanguageArgGr);
                         if (cmp == 0) {
                             Game.m_gameWork.m_languageId = 2;
                         } else {
-                            cmp = strcmp(*argument, kLanguageArgIt);
+                            cmp = strcmp(argv[i], kLanguageArgIt);
                             if (cmp == 0) {
                                 Game.m_gameWork.m_languageId = 3;
                             } else {
-                                cmp = strcmp(*argument, kLanguageArgFr);
+                                cmp = strcmp(argv[i], kLanguageArgFr);
                                 if (cmp == 0) {
                                     Game.m_gameWork.m_languageId = 4;
                                 } else {
-                                    cmp = strcmp(*argument, kLanguageArgSp);
+                                    cmp = strcmp(argv[i], kLanguageArgSp);
                                     if (cmp == 0) {
                                         Game.m_gameWork.m_languageId = 5;
                                     } else {
@@ -110,9 +109,9 @@ void game(int argc, char** argv)
                 }
                 parseLanguage = 0;
             } else {
-                char c = (*argument)[0];
+                char c = (argv[i])[0];
                 if ((c == '-') || (c == '/')) {
-                    c = (*argument)[1];
+                    c = (argv[i])[1];
                     switch (c) {
                     case 'f':
                         copyScriptName = 1;

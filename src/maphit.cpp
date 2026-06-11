@@ -160,7 +160,7 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
     face = m_faces;
-    for (faceIndex = 0; faceIndex < static_cast<int>(m_faceCount); faceIndex++, face++) {
+    for (faceIndex = 0; faceIndex < static_cast<int>(m_faceCount); face++, faceIndex++) {
         if ((face->m_drawFlags & 1) != 0) {
             face->m_drawFlags = 0;
         } else {

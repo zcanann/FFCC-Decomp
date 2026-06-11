@@ -220,9 +220,9 @@ void CMenuPcs::ArtiDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	short artiState = m_artiState->state;
 	ArtiOpenAnim* entry = GetArtiOpenAnimList(this)->entries;
+	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	int drawIndex = 0;
 	float w;
 

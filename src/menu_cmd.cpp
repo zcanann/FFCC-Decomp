@@ -2074,7 +2074,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 					ok++;
 				}
 			}
-			if (ok == len1 - 1) {
+			if (len1 == ok - 1) {
 				mp[0] = patIdx;
 				matchCount++;
 				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = selected - (len1 - 1);

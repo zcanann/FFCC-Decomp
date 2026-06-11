@@ -1473,11 +1473,12 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 			for (int i = 0; i < 8; i++) {
 				const unsigned short evtRule = curLetter->m_eventRules[i];
 				const int sourceType = (evtRule >> 11) & 3;
-				const int sourceIdx = evtRule & 0x7FF;
 
 				if (sourceType == 3) {
 					continue;
 				}
+
+				const int sourceIdx = evtRule & 0x7FF;
 
 				switch (sourceType) {
 				case 1:

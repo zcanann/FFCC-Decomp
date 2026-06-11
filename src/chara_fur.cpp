@@ -1521,9 +1521,8 @@ int CChara::CModel::PickFur(
 					    (primitive == 0x98 && static_cast<int>(vertexIndex) >= 2)) {
 						FurProjectedVertex* vp = &verts[0];
 						int passed = 0;
-						int remainEdges = 3;
 						float depthAccum = kCharaFurDepthZero;
-						do {
+						for (int remainEdges = 3; remainEdges != 0; remainEdges--) {
 							if (vp->m_flagBits.m_projValid == 0) {
 								break;
 							}
@@ -1545,8 +1544,7 @@ int CChara::CModel::PickFur(
 							depthAccum = depthAccum + vp->m_clipW;
 							vp++;
 							passed++;
-							remainEdges--;
-						} while (remainEdges != 0);
+						}
 
 						float depth;
 						if (passed != 3 || nearestDepth <= (depth = depthAccum / kCharaFurTriangleVertexCount)) {

@@ -129,13 +129,15 @@ void CMapHit::Draw()
             GXColor colorBBytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+            unsigned char* index = reinterpret_cast<unsigned char*>(face);
             int i = 0;
             while (i < static_cast<int>(face->m_vertexCount)) {
-                Vec* vertex = m_vertices + face->m_vertexIndices[i];
+                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index + 0x48);
                 GXPosition3f32(vertex->x, vertex->y, vertex->z);
                 GXNormal3f32(face->m_normal.x, face->m_normal.y, face->m_normal.z);
                 GXColor4u8(colorABytes.r, colorABytes.g, colorABytes.b, colorABytes.a);
                 i++;
+                index += sizeof(unsigned short);
             }
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
@@ -202,17 +204,15 @@ void CMapHit::Draw()
 void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
 {
     unsigned int faceIndex = startFace;
-    unsigned int faceOffset = faceIndex * sizeof(CMapHitFace);
     int endFace = static_cast<unsigned short>(faceCount + startFace);
 
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
 
     while (static_cast<int>(faceIndex) < endFace) {
-        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
+        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceIndex * sizeof(CMapHitFace)));
         CheckHitFaceCylinder(mask);
         faceIndex++;
-        faceOffset += sizeof(CMapHitFace);
     }
 }
 
@@ -249,7 +249,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     g_hit_mvec = *position;
 
     while (static_cast<int>(faceIndex) < endFace) {
-        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
+        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceIndex * sizeof(CMapHitFace)));
         g_hit_t_min = kMapHitInitialTMin;
 
         if (CheckHitFaceCylinder(mask) != 0) {
@@ -257,7 +257,6 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
         }
 
         faceIndex++;
-        faceOffset += sizeof(CMapHitFace);
     }
 
     return 0;
@@ -650,8 +649,8 @@ edge_loop:
                 Vec edge;
                 PSVECSubtract(&current, &previous, &edge);
 
-                Vec rayStart = g_hit_cyl.m_bottom;
                 Vec rayDirection = *hitDirection;
+                Vec rayStart = cyl.m_bottom;
 
                 CMapCylinder edgeCylinder;
                 edgeCylinder.m_bottom = previous;
@@ -947,11 +946,10 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
 
 cylinder_body:
     {
-        const f32 vx = localDirection.x;
         const f32 vy = localDirection.y;
         const f32 radialC = (px * px + py * py) - radiusSq;
-        const f32 radialB = px * vx + py * vy;
-        const f32 vxSq = vx * vx;
+        const f32 radialB = px * localDirection.x + py * vy;
+        const f32 vxSq = localDirection.x * localDirection.x;
         const f32 vySq = vy * vy;
         const f32 radialA = vxSq + vySq;
         f32 disc = radialB * radialB - radialA * radialC;
@@ -992,7 +990,9 @@ cylinder_body:
         disc = capB * capB - capC;
         if (disc > 0.0) {
             disc = sqrtf(disc);
-            f32 t = -capB - disc;
+            f32 t;
+            f32 negB = -capB;
+            t = negB - disc;
             if ((t * localDirection.z) + pz <= 0.0) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
@@ -1001,7 +1001,7 @@ cylinder_body:
                 return 0;
             }
 
-            t = -capB + disc;
+            t = negB + disc;
             if ((t * localDirection.z) + pz <= 0.0) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
@@ -1020,11 +1020,13 @@ cylinder_body:
             }
         }
 
-        capB = -((localDirection.z * axisLen) - capB);
+        capB = capB - (localDirection.z * axisLen);
         disc = capB * capB - (f32)(axisLen * -((2.0 * pz) - axisLen) + capC);
         if (disc > 0.0) {
             disc = sqrtf(disc);
-            f32 t = -capB - disc;
+            f32 t;
+            f32 negB = -capB;
+            t = negB - disc;
             if ((t * localDirection.z) + pz >= axisLen) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
@@ -1033,7 +1035,7 @@ cylinder_body:
                 return 0;
             }
 
-            t = -capB + disc;
+            t = negB + disc;
             if ((t * localDirection.z) + pz >= axisLen) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {

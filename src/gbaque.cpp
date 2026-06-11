@@ -3348,14 +3348,17 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	unsigned char* writePtr;
 	int outSize;
 	int selectedCount;
+	int playerOffset;
+	OSSemaphore* semaphore;
 
-	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x458, sizeof(compatibilityData));
-	OSSignalSemaphore(accessSemaphores + channel);
+	semaphore = accessSemaphores + channel;
+	OSWaitSemaphore(semaphore);
+	playerOffset = channel * 0xDC;
+	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + playerOffset + 0x458, sizeof(compatibilityData));
+	OSSignalSemaphore(semaphore);
 
-	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[channel * 0xDC + 0x529];
+	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[playerOffset + 0x529];
 	count = 2;
-	outSize = 2;
 	if (compatibilityData[3] != 0) {
 		count++;
 	}
@@ -3379,9 +3382,9 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	outCompatibility[1] = count;
 	writePtr = outCompatibility + 2;
 	selectedCount = 0;
+	outSize = 2;
 	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
-		unsigned char slotValue = compatibilityData[slot];
-		if ((selectedCount < 2) || (slotValue != 0)) {
+		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
 			writePtr[0] = static_cast<unsigned char>(slot);
 			writePtr[1] = compatibilityData[slot + 8];
 			writePtr += 2;
@@ -3392,7 +3395,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	selectedCount = 0;
 	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
-		if ((selectedCount < 2) || (compatibilityData[slot] != 0)) {
+		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
 			char* src = Game.m_cFlatDataArr[1].TableStrings(2)[compatibilityData[slot]];
 			int len = strlen(src);
 			memcpy(writePtr, src, len + 1);
@@ -3435,12 +3438,13 @@ void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
 int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 {
 	unsigned char localPlayerData[0xDC];
+	unsigned char* itemPtr;
+	CGame* game;
+	unsigned short cmdData[4];
+	int i;
+	int size;
 	unsigned char count;
 	unsigned char* writePtr;
-	unsigned char* itemPtr;
-	unsigned short cmdData[4];
-	int size;
-	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x454, sizeof(localPlayerData));
@@ -3449,19 +3453,21 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	count = 0;
 	outData[0] = 0;
 	outData[1] = 0;
-	itemPtr = localPlayerData;
+	i = 0;
+	itemPtr = localPlayerData + i * 2;
+	game = &Game;
 	outData[2] = 0;
 	writePtr = outData + 4;
 	outData[3] = 0;
 	size = 4;
 
-	for (i = 0; i < 0x40; i++) {
+	for (; i < 0x40; i++) {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
 		if (MenuPcs.GetItemType(itemId, 1) == 1) {
 		const int iconMask = localPlayerData[2] & 3;
 		const int icon = MenuPcs.GetItemIcon(itemId);
 		if (icon == iconMask) {
-			int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
+			int itemBase = game->unkCFlatData0[2] + itemId * 0x48;
 
 			cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
 			cmdData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
@@ -4147,11 +4153,11 @@ void GbaQueue::SetResetFlg(int channel)
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned char GbaQueue::GetBonus(int channel)
+int GbaQueue::GetBonus(int channel)
 {
 	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 	OSWaitSemaphore(accessSemaphores + channel);
-	unsigned char value = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0xCE]);
+	int value = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0xCE]);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value;
 }

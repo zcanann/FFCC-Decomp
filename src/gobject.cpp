@@ -2062,8 +2062,8 @@ void CGObject::copy()
     }
 
     if (m_shieldNodeFlagBits.m_bit20 == 0) {
-        hasModel = false;
         m_charaModelHandle->m_flags &= 0xFFFFFFFB;
+        hasModel = false;
 
         if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
             hasModel = true;
@@ -2084,9 +2084,9 @@ void CGObject::copy()
         return;
     }
 
-    hasModel = false;
     m_charaModelHandle->m_bgCharmPlaneY = m_bgCharmFactor;
     m_charaModelHandle->m_worldPosY = m_worldPosition.y;
+    hasModel = false;
 
     if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
         hasModel = true;

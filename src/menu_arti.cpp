@@ -510,8 +510,9 @@ int CMenuPcs::ArtiCtrl()
  */
 int CMenuPcs::ArtiOpen()
 {
-	int count;
+	ArtiOpenAnim* entry;
 	int finished;
+	int count;
 	int frame;
 
 	if (GetArtiState(this)->initialized == '\0') {
@@ -520,22 +521,22 @@ int CMenuPcs::ArtiOpen()
 
 	GetArtiState(this)->frame = GetArtiState(this)->frame + 1;
 	finished = 0;
+	entry = GetArtiOpenAnimList(this)->entries;
 	count = GetArtiOpenAnimList(this)->count;
-	ArtiOpenAnim* entry = GetArtiOpenAnimList(this)->entries;
 	frame = (int)GetArtiState(this)->frame;
 
 	for (int i = 0; i < count; i++, entry++) {
-		float zero = kArtiZero;
 		if (frame >= entry->startFrame) {
 			if (entry->startFrame + entry->duration <= frame) {
+				float zero = LoadFloat(kArtiZero);
 				finished++;
-				entry->alpha = kArtiOne;
+				entry->alpha = LoadFloat(kArtiOne);
 				entry->dx = zero;
 				entry->dy = zero;
 			} else {
 				entry->step++;
-				double one = kArtiOneDouble;
-				entry->alpha = (float)((kArtiOneDouble / (double)entry->duration) * (double)entry->step);
+				double one = LoadDouble(kArtiOneDouble);
+				entry->alpha = (float)((one / (double)entry->duration) * (double)entry->step);
 				if ((entry->flags & 2) == 0) {
 					float ratio = (float)((one / (double)entry->duration) * (double)entry->step);
 					float dx = entry->targetX - (float)entry->x;

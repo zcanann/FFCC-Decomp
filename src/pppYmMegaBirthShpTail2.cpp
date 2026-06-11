@@ -109,7 +109,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
     for (u32 i = 0; i < work->m_maxParticles; i++) {
         u8* particle = (u8*)particles + i * 0x1B8;
         if (*(u16*)(particle + 0x22) != 0) {
-            const s32 frameCountRaw = *(u16*)(step + 0x84);
+            const s32 frameCountRaw = *(s16*)(step + 0x84);
             s32 frameCount = frameCountRaw;
             pppFMATRIX drawMtx;
             Vec zeroVec;

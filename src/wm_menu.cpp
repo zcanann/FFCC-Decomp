@@ -2918,8 +2918,8 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
 			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
 			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313F8);
-			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313F8);
+			iVar14 = (int)(float)((float)(0x280 - sVar8) * DOUBLE_803313F8);
+			{ float yDiff = FLOAT_80331430 - (float)sVar18; iVar10 = (int)(float)(yDiff * DOUBLE_803313F8); }
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
 			m_menuWindowInfo->width = sVar8;
@@ -2953,9 +2953,9 @@ void CMenuPcs::CalcLoadMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = m_wmWorldState->m_counter1A;
-			if (sVar8 != 0) {
-				m_wmWorldState->m_counter1A = sVar8 - 1;
+			int cnt1A = m_wmWorldState->m_counter1A;
+			if (cnt1A != 0) {
+				m_wmWorldState->m_counter1A = cnt1A - 1;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -3015,8 +3015,8 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
 			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
 			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313F8);
-			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313F8);
+			iVar14 = (int)(float)((float)(0x280 - sVar8) * DOUBLE_803313F8);
+			{ float yDiff = FLOAT_80331430 - (float)sVar18; iVar10 = (int)(float)(yDiff * DOUBLE_803313F8); }
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
 			int __p14 =  (sVar8 - 0);
@@ -3062,9 +3062,9 @@ void CMenuPcs::CalcLoadMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = m_wmWorldState->m_counter1A;
-			if (sVar8 != 0) {
-				m_wmWorldState->m_counter1A = sVar8 - 1;
+			int cnt1A = m_wmWorldState->m_counter1A;
+			if (cnt1A != 0) {
+				m_wmWorldState->m_counter1A = cnt1A - 1;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -3095,8 +3095,8 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
 			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
 			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313F8);
-			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313F8);
+			iVar14 = (int)(float)((float)(0x280 - sVar8) * DOUBLE_803313F8);
+			{ float yDiff = FLOAT_80331430 - (float)sVar18; iVar10 = (int)(float)(yDiff * DOUBLE_803313F8); }
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
 			int __p13 = sVar8;
@@ -3124,9 +3124,9 @@ void CMenuPcs::CalcLoadMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = m_wmWorldState->m_counter1A;
-			if (sVar8 != 0) {
-				m_wmWorldState->m_counter1A = sVar8 - 1;
+			int cnt1A = m_wmWorldState->m_counter1A;
+			if (cnt1A != 0) {
+				m_wmWorldState->m_counter1A = cnt1A - 1;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -3171,8 +3171,8 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
 			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
 			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313F8);
-			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313F8);
+			iVar14 = (int)(float)((float)(0x280 - sVar8) * DOUBLE_803313F8);
+			{ float yDiff = FLOAT_80331430 - (float)sVar18; iVar10 = (int)(float)(yDiff * DOUBLE_803313F8); }
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
 			m_menuWindowInfo->width = sVar8;
@@ -3262,8 +3262,8 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
 			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
 			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313F8);
-			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313F8);
+			iVar14 = (int)(float)((float)(0x280 - sVar8) * DOUBLE_803313F8);
+			{ float yDiff = FLOAT_80331430 - (float)sVar18; iVar10 = (int)(float)(yDiff * DOUBLE_803313F8); }
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
 			m_menuWindowInfo->width = sVar8;
@@ -3381,9 +3381,9 @@ void CMenuPcs::CalcLoadMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = m_wmWorldState->m_counter1A;
-			if (sVar8 != 0) {
-				m_wmWorldState->m_counter1A = sVar8 - 1;
+			int cnt1A = m_wmWorldState->m_counter1A;
+			if (cnt1A != 0) {
+				m_wmWorldState->m_counter1A = cnt1A - 1;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
@@ -3406,88 +3406,77 @@ void CMenuPcs::CalcLoadMenu()
 		    && m_wmWorldState->m_counter1A == 0) {
 			short listRes = (short)GetMcCtrl()->LoadMcList();
 			m_wmWorldState->m_mcResult = listRes;
-			if (m_wmWorldState->m_mcResult != 0) {
+			sVar8 = m_wmWorldState->m_mcResult;
+			if (sVar8 == 0) {
+				if (sVar8 < 0) {
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+				}
+			} else {
 				if (m_wmWorldState->m_menuMode == 8) {
-					int unk838 = reinterpret_cast<int>(m_wmCharaState);
 					int iVar23 = 0;
-					int off = 0;
-					for (int i = 0; i < 4; i++) {
-						if (*reinterpret_cast<char*>(unk838 + off + 0x42) == 0
-						    && *reinterpret_cast<int*>(unk838 + off + 8) > 0) {
+					for (int i = iVar23; i < 4; i++) {
+						if (*reinterpret_cast<char*>(m_wmCharaState + i * 0x48 + 0x42) == 0
+						    && *reinterpret_cast<int*>(m_wmCharaState + i * 0x48 + 8) > 0) {
 							iVar23++;
 						}
-						off += 0x48;
 					}
 					if (iVar23 == 0) {
 						m_wmWorldState->m_mcResult = (short)0xFC19;
 					}
 				}
 				int calTimes[40];
-				int unk838 = reinterpret_cast<int>(m_wmCharaState);
-				iVar10 = 0;
-				iVar14 = 0;
 				int* piVar20 = calTimes;
+				iVar10 = 0;
 				do {
-					int* pSrc = reinterpret_cast<int*>(unk838 + iVar14);
-					OSTicksToCalendarTime(*reinterpret_cast<long long*>(pSrc), reinterpret_cast<OSCalendarTime*>(piVar20));
+					OSTicksToCalendarTime(*reinterpret_cast<long long*>(m_wmCharaState + iVar10 * 0x48),
+					                      reinterpret_cast<OSCalendarTime*>(piVar20 + iVar10 * 10));
 					iVar10++;
-					piVar20 += 10;
-					iVar14 += 0x48;
 				} while (iVar10 < 4);
 
 				int iVar23 = 0;
-				iVar10 = 0;
 				int bestIdx = -1;
-				int* piVar5 = calTimes;
 				for (; iVar23 < 4; iVar23++) {
-					int iVar17 = bestIdx;
-					if (*reinterpret_cast<char*>(unk838 + iVar10 + 0x42) == 0
-					    && *reinterpret_cast<int*>(unk838 + iVar10 + 8) > 0) {
-						iVar17 = iVar23;
-						if (bestIdx >= 0) {
-							iVar17 = bestIdx;
-							if (calTimes[bestIdx * 10 + 5] <= piVar5[5]
-							    && (calTimes[bestIdx * 10 + 5] < piVar5[5]
-							        || (calTimes[bestIdx * 10 + 7] <= piVar5[7]
-							            && (calTimes[bestIdx * 10 + 7] < piVar5[7]
-							                || (calTimes[bestIdx * 10 + 2] <= piVar5[2]
-							                    && (calTimes[bestIdx * 10 + 2] < piVar5[2]
-							                        || (calTimes[bestIdx * 10 + 1] <= piVar5[1]
-							                            && (calTimes[bestIdx * 10 + 1] < piVar5[1]
-							                                || (calTimes[bestIdx * 10] <= *piVar5
-							                                    && (calTimes[bestIdx * 10] < *piVar5
-							                                        || (calTimes[bestIdx * 10 + 8] <= piVar5[8]
-							                                            && (calTimes[bestIdx * 10 + 8] < piVar5[8]
-							                                                || calTimes[bestIdx * 10 + 9] < piVar5[9])))))))))))) {
-								iVar17 = iVar23;
-							}
+					if (*reinterpret_cast<char*>(m_wmCharaState + iVar23 * 0x48 + 0x42) == 0
+					    && *reinterpret_cast<int*>(m_wmCharaState + iVar23 * 0x48 + 8) > 0) {
+						if (bestIdx < 0) {
+							bestIdx = iVar23;
+						} else if (calTimes[bestIdx * 10 + 5] <= piVar20[5]
+						           && (calTimes[bestIdx * 10 + 5] < piVar20[5]
+						               || (calTimes[bestIdx * 10 + 7] <= piVar20[7]
+						                   && (calTimes[bestIdx * 10 + 7] < piVar20[7]
+						                       || (calTimes[bestIdx * 10 + 2] <= piVar20[2]
+						                           && (calTimes[bestIdx * 10 + 2] < piVar20[2]
+						                               || (calTimes[bestIdx * 10 + 1] <= piVar20[1]
+						                                   && (calTimes[bestIdx * 10 + 1] < piVar20[1]
+						                                       || (calTimes[bestIdx * 10] <= *piVar20
+						                                           && (calTimes[bestIdx * 10] < *piVar20
+						                                               || (calTimes[bestIdx * 10 + 8] <= piVar20[8]
+						                                                   && (calTimes[bestIdx * 10 + 8] < piVar20[8]
+						                                                       || calTimes[bestIdx * 10 + 9] < piVar20[9])))))))))))) {
+							bestIdx = iVar23;
 						}
 					}
-					iVar10 += 0x48;
-					piVar5 += 10;
-					bestIdx = iVar17;
+					piVar20 += 10;
 				}
 				if (bestIdx < 0) bestIdx = 0;
 
 				m_wmWorldState->m_cardChannel = (short)bestIdx;
-				iVar10 = 0;
-				iVar14 = 0;
-				for (; iVar10 < 4; iVar10++) {
-					if (*reinterpret_cast<char*>(unk838 + iVar14 + 0x42) != 0) {
+				for (iVar10 = 0; iVar10 < 4; iVar10++) {
+					if (*reinterpret_cast<char*>(m_wmCharaState + iVar10 * 0x48 + 0x42) != 0) {
 						m_mcCtrl.m_saveIndex = iVar10;
 						m_wmWorldState->m_cardChannel = (short)iVar10;
 						break;
 					}
-					iVar14 += 0x48;
 				}
 				m_wmWorldState->m_state0E = 1;
 				m_wmWorldState->m_counter1A = 10;
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = m_wmWorldState->m_counter1A;
-			if (sVar8 != 0) {
-				m_wmWorldState->m_counter1A = sVar8 - 1;
+			int cnt1A = m_wmWorldState->m_counter1A;
+			if (cnt1A != 0) {
+				m_wmWorldState->m_counter1A = cnt1A - 1;
 				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}

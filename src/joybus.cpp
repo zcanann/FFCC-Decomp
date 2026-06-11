@@ -2073,6 +2073,7 @@ timeout_expiry:
 
         case 0x3B:
         {
+            m_stateFlagArr[threadParam->m_portIndex] = 0;
             int res = GBARecvSend(threadParam, &localBuf);
             if (res >= 0)
             {

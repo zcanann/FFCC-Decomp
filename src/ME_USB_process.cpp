@@ -480,3 +480,4 @@ void CMaterialEditorPcs::MemFree(void* ptr)
 
 extern const float kMapEditorZero = 0.0f;
 extern const float kMapEditorOne = 1.0f;
+extern const double kMapEditorS32ToDoubleBias = 4503601774854144.0;

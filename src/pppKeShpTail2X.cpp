@@ -41,6 +41,14 @@ STATIC_ASSERT(sizeof(KeShpTail2XDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(KeShpTail2XDataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(KeShpTail2XDataOffsets, m_alphaWorkOffset) == 0x4);
 
+inline void U8ToF32(pppFVECTOR4* dest, u8* src)
+{
+    dest->x = src[0];
+    dest->y = src[1];
+    dest->z = src[2];
+    dest->w = src[3];
+}
+
 static inline KeShpTail2XDataOffsets* GetKeShpTail2XDataOffsets(_pppCtrlTable* ctrl)
 {
     return reinterpret_cast<KeShpTail2XDataOffsets*>(ctrl->m_serializedDataOffsets);
@@ -117,14 +125,8 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     tagOAN3_SHAPE* shapeEntry;
     s32 count;
     float alphaMul;
-    float colorStartR;
-    float colorStartG;
-    float colorStartB;
-    float colorStartA;
-    float colorEndR;
-    float colorEndG;
-    float colorEndB;
-    float colorEndA;
+    pppFVECTOR4 colorStart;
+    pppFVECTOR4 colorEnd;
     float colorStepR;
     float colorStepG;
     float colorStepB;
@@ -171,22 +173,16 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
 
     count = step->m_drawCount;
     alphaMul = (float)GetKeShpTail2XAlphaWork(&obj->m_object, param_3)->m_alpha / kPppKeShpTail2XAlphaScale;
-    colorStartR = step->m_colorStartR;
-    colorStartG = step->m_colorStartG;
-    colorStartB = step->m_colorStartB;
-    colorStartA = step->m_colorStartA;
-    colorEndA = step->m_colorEndA;
-    colorStartA *= alphaMul;
-    colorEndA *= alphaMul;
-    diffA = colorStartA - colorEndA;
-    colorEndR = step->m_colorEndR;
-    colorEndG = step->m_colorEndG;
-    colorEndB = step->m_colorEndB;
+    U8ToF32(&colorStart, &step->m_colorStartR);
+    U8ToF32(&colorEnd, &step->m_colorEndR);
+    colorStart.w *= alphaMul;
+    colorEnd.w *= alphaMul;
+    diffA = colorStart.w - colorEnd.w;
     invCountMinusOne = (float)(step->m_drawCount - 1);
     if (invCountMinusOne != segCursor) {
-        colorStepR = (colorStartR - colorEndR) / invCountMinusOne;
-        colorStepG = (colorStartG - colorEndG) / invCountMinusOne;
-        colorStepB = (colorStartB - colorEndB) / invCountMinusOne;
+        colorStepR = (colorStart.x - colorEnd.x) / invCountMinusOne;
+        colorStepG = (colorStart.y - colorEnd.y) / invCountMinusOne;
+        colorStepB = (colorStart.z - colorEnd.z) / invCountMinusOne;
         colorStepA = diffA / invCountMinusOne;
     } else {
         colorStepR = *(const volatile float*)&kPppKeShpTail2XHalf;
@@ -276,10 +272,10 @@ draw_loop:
 
     {
         GXColor amb;
-        amb.r = (u8)colorStartR;
-        amb.g = (u8)colorStartG;
-        amb.b = (u8)colorStartB;
-        amb.a = (u8)colorStartA;
+        amb.r = (u8)colorStart.x;
+        amb.g = (u8)colorStart.y;
+        amb.b = (u8)colorStart.z;
+        amb.a = (u8)colorStart.w;
         GXSetChanAmbColor(GX_COLOR0A0, amb);
     }
 
@@ -292,10 +288,10 @@ update_step:
         return;
     }
 
-    colorStartR -= colorStepR;
-    colorStartG -= colorStepG;
-    colorStartB -= colorStepB;
-    colorStartA -= colorStepA;
+    colorStart.x -= colorStepR;
+    colorStart.y -= colorStepG;
+    colorStart.z -= colorStepB;
+    colorStart.w -= colorStepA;
     drawScale -= scaleStepDelta;
     if (trailStep <= kPppKeShpTail2XZero) {
         return;

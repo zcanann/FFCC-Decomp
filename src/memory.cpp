@@ -448,9 +448,7 @@ void CMemory::Init()
 void CMemory::Quit()
 {
     const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
-    CStage* mainStage = m_mainMemoryStage;
-
-    stageDestroyAndPool(this, mainStage, strBase);
+    stageDestroyAndPool(this, m_mainMemoryStage, strBase);
 
     CMode* modeData = m_modes;
     for (int pass = 0; pass < 3; pass++, modeData++) {

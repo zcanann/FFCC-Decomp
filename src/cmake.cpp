@@ -1286,10 +1286,10 @@ void CMenuPcs::CmakeResultDraw1()
         }
 
         float x = 8.0f + labelWidths[i];
-        float y = static_cast<float>(0x70 + i * 0x28) - 4.0f;
+        float y = static_cast<float>(0x70 + i * 0x28);
         float valueWidth = static_cast<float>(valueFont->GetWidth(txt));
         valueFont->SetPosX(x);
-        valueFont->SetPosY(y);
+        valueFont->SetPosY(y - 4.0f);
         valueFont->Draw(txt);
 
         if (i == 2) {
@@ -1300,8 +1300,8 @@ void CMenuPcs::CmakeResultDraw1()
 
             const char* hairTxt = GetHairStr(hairIndex + s_CmakeInfo.m_hair);
 
-            valueFont->SetPosX(16.0f + x + valueWidth);
-            valueFont->SetPosY(y);
+            valueFont->SetPosX(16.0f + (x + valueWidth));
+            valueFont->SetPosY(y - 4.0f);
             valueFont->Draw(hairTxt);
         }
     }
@@ -1539,10 +1539,10 @@ void CMenuPcs::CmakeResultDraw()
         }
 
         float x = 8.0f + labelWidths[i];
-        float y = static_cast<float>(0x70 + i * 0x28) - 4.0f;
+        float y = static_cast<float>(0x70 + i * 0x28);
         float valueWidth = valueFont->GetWidth(value);
         valueFont->SetPosX(x);
-        valueFont->SetPosY(y);
+        valueFont->SetPosY(y - 4.0f);
         valueFont->Draw(value);
 
         if (i == 2) {
@@ -1553,8 +1553,8 @@ void CMenuPcs::CmakeResultDraw()
 
             const char* hair = GetHairStr(hairIndex + static_cast<int>(s_CmakeInfo.m_hair));
 
-            valueFont->SetPosX(16.0f + x + valueWidth);
-            valueFont->SetPosY(y);
+            valueFont->SetPosX(16.0f + (x + valueWidth));
+            valueFont->SetPosY(y - 4.0f);
             valueFont->Draw(hair);
         }
     }

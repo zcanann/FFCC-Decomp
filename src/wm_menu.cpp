@@ -11235,15 +11235,13 @@ void CMenuPcs::CalcMcObj()
 		reinterpret_cast<float*>(panelState)[6] = six;
 
 		panelState[1]++;
-		I2D pConv;
-		pConv.u.hi = 0x43300000;
-		pConv.u.lo = panelState[1] ^ 0x80000000;
-		if (static_cast<float>(pConv.d - bias) >=
+		if (static_cast<float>(static_cast<int>(panelState[1])) >=
 		    doubleD * static_cast<double>(yTbl->data[gWmModelYOffsetSplineCount * 4 - 4])) {
 			panelState[1] = 0;
 		}
 
-		if (static_cast<int>(reinterpret_cast<unsigned int*>(m_wmCharaState)[i * 0x12 + 2]) <= 0) {
+		unsigned char* const charaState = m_wmCharaState + i * 0x48;
+		if (*reinterpret_cast<int*>(charaState + 8) <= 0) {
 			panelState[0] = 0;
 		} else {
 			panelState[0] = 1;

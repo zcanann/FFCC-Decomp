@@ -2154,38 +2154,37 @@ int CMenuPcs::CmakeTribeCtrl()
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
                 if (fieldSelect == 0) {
                     CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect + 1);
-                    return 0;
-                }
-
-                int slot;
-                unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
-                for (slot = 0; slot < 8; ++slot) {
-                    if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
-                        (*(entry + 0x1F96) != 1) &&
-                        (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
-                        (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&
-                        (*reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
-                        break;
-                    }
-                    entry += 0xC30;
-                }
-
-                if (slot < 8) {
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    short winX;
-                    short winY;
-                    GetWinSize(0x15, &winX, &winY, 0);
-                    SetMcWinInfo(static_cast<int>(winX), static_cast<int>(winY));
-                    CmakeMcState(this) = 0;
                 } else {
-                    s_CmakeInfo.m_tribe = static_cast<signed char>(CmakeState(this)->m_select);
-                    s_CmakeInfo.m_hair = static_cast<signed char>(CmakeState(this)->m_row);
-                    ChgModel(static_cast<int>(CmakeSlot(this)),
-                             static_cast<int>(s_CmakeInfo.m_tribe),
-                             static_cast<int>(s_CmakeInfo.m_hair),
-                             static_cast<int>(s_CmakeInfo.m_gender));
-                    CmakeState(this)->m_resultDir = 1;
-                    return 1;
+                    int slot;
+                    unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
+                    for (slot = 0; slot < 8; ++slot) {
+                        if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
+                            (*(entry + 0x1F96) != 1) &&
+                            (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
+                            (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&
+                            (*reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
+                            break;
+                        }
+                        entry += 0xC30;
+                    }
+
+                    if (slot < 8) {
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
+                        short winX;
+                        short winY;
+                        GetWinSize(0x15, &winX, &winY, 0);
+                        SetMcWinInfo(static_cast<int>(winX), static_cast<int>(winY));
+                        CmakeMcState(this) = 0;
+                    } else {
+                        s_CmakeInfo.m_tribe = static_cast<signed char>(CmakeState(this)->m_select);
+                        s_CmakeInfo.m_hair = static_cast<signed char>(CmakeState(this)->m_row);
+                        ChgModel(static_cast<int>(CmakeSlot(this)),
+                                 static_cast<int>(s_CmakeInfo.m_tribe),
+                                 static_cast<int>(s_CmakeInfo.m_hair),
+                                 static_cast<int>(s_CmakeInfo.m_gender));
+                        CmakeState(this)->m_resultDir = 1;
+                        return 1;
+                    }
                 }
             } else if ((down & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);

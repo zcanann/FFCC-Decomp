@@ -550,7 +550,7 @@ void CAStar::calcAStar()
 {
 	memset(m_routeTable, 0, sizeof(m_routeTable));
 
-	for (unsigned int to = 0; to < 64; ++to)
+	for (int to = 0; to < 64; ++to)
 	{
 		for (int from = 0; from < 64; ++from)
 		{
@@ -565,7 +565,7 @@ void CAStar::calcAStar()
 
 			memset(&temp, 0, sizeof(temp));
 
-			check(from, to, temp);
+			check(from, (int)(unsigned int)to, temp);
 
 			if (m_bestPath.m_cost < LoadFloat(kInfiniteCost))
 			{

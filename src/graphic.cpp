@@ -494,7 +494,7 @@ void wakeup(OSAlarm* alarm, OSContext*)
  * Address:	TODO
  * Size:	TODO
  */
-void sleep()
+inline void sleep()
 {
 	// TODO
 }
@@ -874,7 +874,7 @@ void CGraphic::InitDebugString()
  * Address:	TODO
  * Size:	TODO
  */
-void GXSetTexCoordGen(void)
+inline void GXSetTexCoordGen(void)
 {
 	// TODO
 }
@@ -961,7 +961,7 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::SaveFrameBuffer(char*)
+inline void CGraphic::SaveFrameBuffer(char*)
 {
 	// TODO
 }

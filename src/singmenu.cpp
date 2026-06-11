@@ -50,7 +50,7 @@ static inline CCaravanWork* SingleCaravanWork()
     return reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 }
 
-extern const double kSingHalf;
+extern const double DOUBLE_80332968;
 extern const float kSingStatBaseX;
 extern const float kSingStatPanelPad;
 extern const float kSingStatPanelW;
@@ -2707,8 +2707,8 @@ void CMenuPcs::DrawSingWin(short mode)
         return;
     }
 
-    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * kSingHalf);
-    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * kSingHalf);
+    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * DOUBLE_80332968);
+    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * DOUBLE_80332968);
     float width;
     float height;
 
@@ -3576,9 +3576,10 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
     return 9;
 }
 
-const double kSingHalf = 0.5;
+
 const float kSingStatBaseX = 440.0f;
 const float kSingStatPanelPad = 28.0f;
+const double DOUBLE_80332968 = 0.5;
 const float kSingStatPanelW = 96.0f;
 const float kSingStatPanelH = 88.0f;
 const float kSingStatScreenPadX = 12.0f;

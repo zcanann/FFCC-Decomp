@@ -6416,35 +6416,56 @@ void CMenuPcs::CalcSpl(CMenuPcs::SPL* out, CMenuPcs::SPL* in, float t)
  */
 float CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 {
-	int keyCount = fcv.keyCount;
+	const float* pScale = &FLOAT_803314c0;
+	const float* pZero = &FLOAT_803313dc;
+	float* cur;
+	int idx;
+	float* keys;
 	float result;
-	float t = value / FLOAT_803314c0;
-	float* keys = fcv.keys;
-	result = FLOAT_803313dc;
+	int keyCount;
+	keyCount = fcv.keyCount;
+	float t = value / *pScale;
+	keys = fcv.keys;
+	result = *pZero;
 
 	if (t >= keys[keyCount * 4 - 4]) {
 		return keys[keyCount * 4 - 3];
 	}
 
-	float* cur = keys;
-	int idx;
+	cur = keys;
 	for (idx = 0; idx < keyCount; cur += 4, idx++) {
 		if (t <= *cur) {
 			if (idx == 0) {
 				result = (keys + idx * 4)[1];
 			} else {
-				float* next = keys + idx * 4;
-				float* prev = keys + (idx - 1) * 4;
-				float u = (t - *prev) / (*next - *prev);
-				float span = *next - *prev;
-				float u2 = u * u;
-				float u3 = u2 * u;
-				float c4u2 = FLOAT_803314c4 * u2;
-				float negTerm = -(FLOAT_803314c8 * u2 - u3);
+				const float* pC4 = &FLOAT_803314c4;
+				const float* pC8 = &FLOAT_803314c8;
+				const float* pCC = &FLOAT_803314cc;
+				const float* pOne = &FLOAT_803313e8;
+				float* prev;
+				float* next;
+				float u2;
+				float negTerm;
+				float prev3;
+				float c8;
+				float u3;
+				float u;
+				float span;
+				float c4u2;
+				next = keys + idx * 4;
+				prev = keys + (idx - 1) * 4;
+				span = *next - *prev;
+				u = (t - *prev) / span;
+				u2 = u * u;
+				u3 = u2 * u;
+				prev3 = prev[3];
+				c8 = *pC8;
+				c4u2 = *pC4 * u2;
+				negTerm = -(c8 * u2 - u3);
 
-				result = span * (prev[3] * (u + negTerm) + next[2] * (u3 - u2)) +
-				         (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - c4u2)) +
-				             next[1] * (FLOAT_803314cc * u3 + c4u2));
+				result = span * (prev3 * (u + negTerm) + next[2] * (u3 - u2)) +
+				         (prev[1] * (*pOne + (c8 * u3 - c4u2)) +
+				             next[1] * (*pCC * u3 + c4u2));
 			}
 			break;
 		}

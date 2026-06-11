@@ -3742,29 +3742,10 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 
 	int validCount = 0;
 	if (m_cmakeWorkActive == 1) {
-		if (*reinterpret_cast<int*>(m_cmakeWork + 0x1A84) != 0) {
-			validCount = 1;
-		}
-		if (*reinterpret_cast<int*>(m_cmakeWork + 0x2444) != 0) {
-			validCount++;
-		}
-		if (*reinterpret_cast<int*>(m_cmakeWork + 0x2E04) != 0) {
-			validCount++;
-		}
-		if (*reinterpret_cast<int*>(m_cmakeWork + 0x37C4) != 0) {
-			validCount++;
-		}
-		if (*reinterpret_cast<int*>(m_cmakeWork + 0x4184) != 0) {
-			validCount++;
-		}
-		if (*reinterpret_cast<int*>(m_cmakeWork + 0x4B44) != 0) {
-			validCount++;
-		}
-		if (*reinterpret_cast<int*>(m_cmakeWork + 0x5504) != 0) {
-			validCount++;
-		}
-		if (*reinterpret_cast<int*>(m_cmakeWork + 0x5EC4) != 0) {
-			validCount++;
+		for (int ci = 0; ci < 8; ci++) {
+			if (*reinterpret_cast<int*>(m_cmakeWork + 0x1A84 + ci * 0x9C0) != 0) {
+				validCount++;
+			}
 		}
 	} else {
 		unsigned char* caravan = reinterpret_cast<unsigned char*>(&Game);
@@ -3780,7 +3761,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	}
 
 	int loadedCount = 0;
-	for (int i = 0; i < 8; i++) {
+	for (int i = loadedCount; i < 8; i++) {
 		const int handleIdx = i + 0x20;
 		CCharaPcs::CHandle* const handle = m_wm.m_handles[handleIdx];
 		if (handle->m_charaKind != 3 && handle->IsLoadModelASyncCompleted() != 0) {
@@ -3789,7 +3770,10 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	}
 
 	WmCharaSelectEntry& entry = *reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
-	if (loadedCount != validCount || entry.m_confirmed != 0) {
+	if (loadedCount != validCount) {
+		return;
+	}
+	if (entry.m_confirmed != 0) {
 		return;
 	}
 
@@ -3802,52 +3786,58 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		entry.m_connected = 0;
 	}
 
-	unsigned short repeat = 0;
-	unsigned short down = 0;
+	unsigned short repeat;
+	unsigned short down;
 	if (entry.m_connected == 1 && entry.m_cmakePending == 0) {
 		const int port = 0;
-		bool noRepeatInput = false;
+		bool noRepeatInput = true;
 		if (Pad.m_debugPadLock == 0) {
-			if (port != 0) {
-				goto repeat_check_done;
+			bool hasPort = false;
+			if (port == 0 && Pad.m_debugPadPort != -1) {
+				hasPort = noRepeatInput;
 			}
-			if (Pad.m_debugPadPort == -1) {
-				goto repeat_check_done;
+			if (!hasPort) {
+				noRepeatInput = false;
 			}
 		}
-		noRepeatInput = true;
-	repeat_check_done:
+		int repeatTmp;
 		if (noRepeatInput) {
-			repeat = 0;
+			repeatTmp = 0;
 		} else {
 			u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
-			repeat = static_cast<unsigned short>(Pad.GetPadInputs()[clamped].repeatButton);
+			repeatTmp = Pad.GetPadInputs()[clamped].repeatButton;
 		}
+		repeat = static_cast<unsigned short>(repeatTmp);
 
-		bool noDownInput = false;
+		bool noDownInput = true;
 		if (Pad.m_debugPadLock == 0) {
-			if (port != 0) {
-				goto down_check_done;
+			bool hasPort = false;
+			if (port == 0 && Pad.m_debugPadPort != -1) {
+				hasPort = noDownInput;
 			}
-			if (Pad.m_debugPadPort == -1) {
-				goto down_check_done;
+			if (!hasPort) {
+				noDownInput = false;
 			}
 		}
-		noDownInput = true;
-	down_check_done:
+		int downTmp;
 		if (noDownInput) {
-			down = 0;
+			downTmp = 0;
 		} else {
 			u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
-			down = static_cast<unsigned short>(Pad.GetPadInputs()[clamped].buttonDown[0]);
+			downTmp = Pad.GetPadInputs()[clamped].buttonDown[0];
 		}
+		down = static_cast<unsigned short>(downTmp);
+	} else {
+		repeat = 0;
+		down = 0;
 	}
 
 	if (m_wmWorldState->m_mainState != 2 || m_wmWorldState->m_nextMenuMode != 0) {
 		return;
 	}
 
-	int cursor = static_cast<int>(entry.m_currentSlot);
+	WmCharaSelectEntry& curEntry = *reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
+	int cursor = static_cast<int>(curEntry.m_currentSlot);
 	if ((repeat & 0x0C) != 0) {
 		if (cursor < 4) {
 			cursor += 4;
@@ -3857,8 +3847,8 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
 	}
 
-	const int row = static_cast<int>(cursor) >> 2;
 	if ((repeat & 1) != 0) {
+		const int row = static_cast<int>(cursor) >> 2;
 		if (cursor > static_cast<int>(((-row | row) >> 31) & 4)) {
 			cursor--;
 		} else {
@@ -3867,7 +3857,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
 	} else if ((repeat & 2) != 0) {
 		int rowEnd = 3;
-		if (row != 0) {
+		if ((cursor >> 2) != 0) {
 			rowEnd = 7;
 		}
 		if (cursor < rowEnd) {
@@ -3878,7 +3868,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
 	}
 
-	entry.m_currentSlot = static_cast<short>(cursor);
+	curEntry.m_currentSlot = static_cast<short>(cursor);
 	if ((repeat & 0x6F) != 0) {
 		return;
 	}
@@ -3886,22 +3876,23 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	if ((down & 0x100) != 0) {
 		int shopState;
 		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
-			shopState = *reinterpret_cast<int*>(m_cmakeWork + entry.m_currentSlot * 0x9C0 + 0x1A84);
+			unsigned char* const cmakeSlot = m_cmakeWork + curEntry.m_currentSlot * 0x9C0;
+			shopState = *reinterpret_cast<int*>(cmakeSlot + 0x1A84);
 		} else {
-			shopState = Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState;
+			shopState = Game.m_caravanWorkArr[curEntry.m_currentSlot].m_shopState;
 		}
 
 		if (shopState == 0) {
 			Sound.PlaySe(4, 0x40, 0x7F, 0);
 		} else {
-			entry.m_confirmed = 1;
+			curEntry.m_confirmed = 1;
 			Sound.PlaySe(0x33, 0x40, 0x7F, 0);
 			if (state != 0) {
 				GetWmCharaAnimState(this)[cursor * 5 + 1] = 3;
 			}
 		}
 	} else if ((down & 0x200) != 0) {
-		entry._pad0E = 1;
+		*reinterpret_cast<unsigned char*>(&curEntry._pad0E) = 1;
 		Sound.PlaySe(0x34, 0x40, 0x7F, 0);
 	}
 }

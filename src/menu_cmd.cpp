@@ -1578,7 +1578,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 					canUse = (ChkUnite(GetCmdStateView(this)->selected, combo) != 0);
 				} else {
 					canUse = static_cast<int>(
-					    __cntlzw(static_cast<u8>(EquipChk(static_cast<int>(items[selected - 2])))) >> 5);
+					    static_cast<u32>(__cntlzw(static_cast<u8>(EquipChk(static_cast<int>(items[selected - 2]))))) >> 5);
 				}
 
 				if (!((canUse & 0xFF) == 0)) {
@@ -1627,8 +1627,10 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	int __p13 = mode;
 	} else if (__p13 == 2) {
 		CmdListStorage* cmdList = GetCmdListStorage(this);
+		const int animSlot = cmdList->listEnd + 3;
 		int maxPos;
-		if (kCmdMenuOneD == static_cast<double>(cmdList->entries[cmdList->listEnd + 3].scale)) {
+		if (kCmdMenuOneD ==
+		    static_cast<double>(*reinterpret_cast<f32*>(reinterpret_cast<u8*>(cmdList) + animSlot * 0x40 + 0x1c))) {
 			maxPos = 2;
 		} else {
 			maxPos = 3;
@@ -1672,11 +1674,11 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		}
 	} else {
 		if ((hold & 0xC) != 0) {
-			int selected = GetCmdStateView(this)->selected;
+			CmdState* const sv0 = GetCmdStateView(this);
+			const int selected = sv0->selected;
 			int prev = selected - 1;
-			int remaining = selected - 3;
 			if (prev > 2) {
-				for (; remaining != 0; remaining--) {
+				for (int rem = prev - 2; rem != 0; rem--) {
 					if (caravanWork->m_commandListExtra[prev] >= 0) {
 						break;
 					}
@@ -1684,23 +1686,19 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				}
 			}
 
-			unsigned int next = selected + 1;
-			remaining = caravanWork->m_numCmdListSlots - next;
-			int __p19 = next;
-			if (__p19 < caravanWork->m_numCmdListSlots) {
-				int __p9 = remaining;
-				for (; __p9 != 0; remaining--) {
-					int __p15 = next;
-					if (caravanWork->m_commandListExtra[__p15] >= 0) {
+			const int cmdCount = caravanWork->m_numCmdListSlots;
+			int next = selected + 1;
+			if (next < cmdCount) {
+				for (int rem = cmdCount - next; rem != 0; rem--) {
+					if (caravanWork->m_commandListExtra[next] >= 0) {
 						break;
 					}
 					next++;
 				}
 			}
 
-			CmdState* row = ModeRow(GetCmdStateView(this), mode);
-			int __p3 =  (prev | 0);
-			if (row->selected == __p3) {
+			CmdState* row = ModeRow(sv0, mode);
+			if (row->selected == prev) {
 				row->selected = static_cast<s16>(next);
 			} else {
 				row->selected = static_cast<s16>(prev);

@@ -590,41 +590,13 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
 
         u8* srcWork = reinterpret_cast<u8*>(&srcSave) + (srcChar << 9) + (srcChar << 3);
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 8; i++)
         {
-            srcWork[0xC0] = 0;
-            srcWork[0xC1] = 0;
-            srcWork[0xC2] = 0;
-            srcWork[0xC3] = 0;
-            srcWork[0xC4] = 0;
-            srcWork[0xC5] = 0;
-            srcWork[0xC6] = 0;
-            srcWork[0xC7] = 0;
-            srcWork[0x100] = 0;
-            srcWork[0x101] = 0;
-            srcWork[0x102] = 0;
-            srcWork[0x103] = 0;
-            srcWork[0x104] = 0;
-            srcWork[0x105] = 0;
-            srcWork[0x106] = 0;
-            srcWork[0x107] = 0;
-            srcWork[0x140] = 0;
-            srcWork[0x141] = 0;
-            srcWork[0x142] = 0;
-            srcWork[0x143] = 0;
-            srcWork[0x144] = 0;
-            srcWork[0x145] = 0;
-            srcWork[0x146] = 0;
-            srcWork[0x147] = 0;
-            srcWork[0x180] = 0;
-            srcWork[0x181] = 0;
-            srcWork[0x182] = 0;
-            srcWork[0x183] = 0;
-            srcWork[0x184] = 0;
-            srcWork[0x185] = 0;
-            srcWork[0x186] = 0;
-            srcWork[0x187] = 0;
-            srcWork += 0x100;
+            for (int j = 0; j < 8; j++)
+            {
+                srcWork[0xC0 + j] = 0;
+            }
+            srcWork += 0x40;
         }
 
         dstCharData[0x8C0] = 0;

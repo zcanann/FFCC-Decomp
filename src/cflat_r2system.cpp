@@ -2395,8 +2395,8 @@ renderedDone:
         break;
     case -0x27: {
         if ((RuntimeDebugFlags(this) & CFlatRuntimeDebugFlag_ClassCollision) != 0) {
-            Mtx viewMtx;
             Mtx drawMtx;
+            Mtx viewMtx;
             CameraPcs.GetViewMatrix(viewMtx);
 
             _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -2417,9 +2417,12 @@ renderedDone:
             const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
             const float radius = localFloats[3];
             PSMTXScale(drawMtx, radius, radius, radius);
-            drawMtx[0][3] = localFloats[0];
-            drawMtx[1][3] = localFloats[1];
-            drawMtx[2][3] = localFloats[2];
+            const float* trans = reinterpret_cast<float*>(object->m_localBase);
+            const float y = trans[1];
+            const float z = trans[2];
+            drawMtx[0][3] = trans[0];
+            drawMtx[1][3] = y;
+            drawMtx[2][3] = z;
             PSMTXConcat(viewMtx, drawMtx, drawMtx);
             GXLoadPosMtxImm(drawMtx, GX_PNMTX0);
 

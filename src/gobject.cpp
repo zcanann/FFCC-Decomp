@@ -517,10 +517,9 @@ void CGObject::onCreate()
 
     int animStateOffset = 0;
     for (int i = 0; i < 2; i++) {
-        int groupOffset;
         s8* animState;
-        groupOffset = animStateOffset + 0x9d;
-        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState = reinterpret_cast<s8*>(animStateOffset + 0x9d);
+        animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
         animState[0] = -1;
         animState[1] = -1;
         animState[2] = -1;
@@ -529,8 +528,8 @@ void CGObject::onCreate()
         animState[5] = -1;
         animState[6] = -1;
         animState[7] = -1;
-        groupOffset = animStateOffset + 0xa5;
-        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState = reinterpret_cast<s8*>(animStateOffset + 0xa5);
+        animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
         animState[0] = -1;
         animState[1] = -1;
         animState[2] = -1;
@@ -539,8 +538,8 @@ void CGObject::onCreate()
         animState[5] = -1;
         animState[6] = -1;
         animState[7] = -1;
-        groupOffset = animStateOffset + 0xad;
-        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState = reinterpret_cast<s8*>(animStateOffset + 0xad);
+        animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
         animState[0] = -1;
         animState[1] = -1;
         animState[2] = -1;
@@ -549,8 +548,8 @@ void CGObject::onCreate()
         animState[5] = -1;
         animState[6] = -1;
         animState[7] = -1;
-        groupOffset = animStateOffset + 0xb5;
-        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState = reinterpret_cast<s8*>(animStateOffset + 0xb5);
+        animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
         animStateOffset += 0x20;
         animState[0] = -1;
         animState[1] = -1;

@@ -10903,24 +10903,32 @@ void CMenuPcs::DrawMCList()
 					goto LAB_next;
 				}
 				if (animFrames > 10) {
-					yPos = FLOAT_803314D8;
-					alpha = FLOAT_803313e8;
+					const float* pD8a = &FLOAT_803314D8;
+					yPos = *pD8a;
+					const float* pOneA = &FLOAT_803313e8;
+					alpha = *pOneA;
 				} else {
-					alpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(animFrames));
-					yPos = FLOAT_803314DC;
-					yPos += static_cast<float>(animFrames) * FLOAT_803314E0;
+					const double* pRateA = &DOUBLE_803314E8;
+					alpha = static_cast<float>(*pRateA * static_cast<double>(animFrames));
+					const float* pDCa = &FLOAT_803314DC;
+					yPos = *pDCa;
+					const float* pE0a = &FLOAT_803314E0;
+					yPos += static_cast<float>(animFrames) * *pE0a;
 				}
 			} else {
-				yPos = FLOAT_803314D8;
-				alpha = FLOAT_803313e8;
+				const float* pD8b = &FLOAT_803314D8;
+				yPos = *pD8b;
+				const float* pOneB = &FLOAT_803313e8;
+				alpha = *pOneB;
 			}
-			if (!(alpha <= DOUBLE_803314F0)) {
-				double rawSlot1;
-				reinterpret_cast<int*>(&rawSlot1)[0] = 0x43300000;
-				reinterpret_cast<int*>(&rawSlot1)[1] = slot ^ 0x80000000;
-				float slotY = static_cast<float>(DOUBLE_80331498 * (rawSlot1 - DOUBLE_80331408) + DOUBLE_80331490);
+			const double* pHalfA = &DOUBLE_803314F0;
+			if (!(alpha <= *pHalfA)) {
+				const double* pSlopeA = &DOUBLE_80331498;
+				const double* pBaseA = &DOUBLE_80331490;
+				float slotY = static_cast<float>(*pSlopeA * static_cast<double>(slot) + *pBaseA);
 				MenuPcs.SetAttrFmt((FMT)0);
-				alpha = FLOAT_80331458 * alpha;
+				const float* p255A = &FLOAT_80331458;
+				alpha = *p255A * alpha;
 				GXColor slotColor;
 				slotColor.r = 0xFF;
 				slotColor.g = 0xFF;
@@ -10930,15 +10938,25 @@ void CMenuPcs::DrawMCList()
 
 				// Draw slot background
 				MenuPcs.SetTexture((TEX)0x24);
-				MenuPcs.DrawRect(0, yPos, slotY, FLOAT_80331468, FLOAT_803314F8,
-				         FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
-				yPos += FLOAT_80331468;
+				const float* pZb1 = &FLOAT_803313dc;
+				const float* pOb1 = &FLOAT_803313e8;
+				const float* pW68a = &FLOAT_80331468;
+				const float* pHF8a = &FLOAT_803314F8;
+				MenuPcs.DrawRect(0, yPos, slotY, *pW68a, *pHF8a,
+				         *pZb1, *pZb1,
+				         *pOb1, *pOb1, *pZb1);
 				MenuPcs.SetTexture((TEX)0x25);
-				MenuPcs.DrawRect(0, yPos, slotY, FLOAT_803314FC, FLOAT_803314F8,
-				         FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
-				yPos += FLOAT_803314FC;
+				const float* pW68b = &FLOAT_80331468;
+				yPos += *pW68b;
+				const float* pZb2 = &FLOAT_803313dc;
+				const float* pOb2 = &FLOAT_803313e8;
+				const float* pWFCa = &FLOAT_803314FC;
+				const float* pHF8b = &FLOAT_803314F8;
+				MenuPcs.DrawRect(0, yPos, slotY, *pWFCa, *pHF8b,
+				         *pZb2, *pZb2,
+				         *pOb2, *pOb2, *pZb2);
+				const float* pWFCb = &FLOAT_803314FC;
+				yPos += *pWFCb;
 
 				// Draw slot content area
 				MenuPcs.SetAttrFmt((FMT)1);
@@ -10961,9 +10979,13 @@ void CMenuPcs::DrawMCList()
 				contentColors[3].g = 0xFF;
 				contentColors[3].b = 0xFF;
 				contentColors[3].a = 0;
-				MenuPcs.DrawRect(0, yPos, slotY, FLOAT_80331500, FLOAT_803314F8,
-				         FLOAT_803313dc, FLOAT_803313dc, contentColors,
-				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				const float* pOb3 = &FLOAT_803313e8;
+				const float* pZb3 = &FLOAT_803313dc;
+				const float* pW500 = &FLOAT_80331500;
+				const float* pHF8c = &FLOAT_803314F8;
+				MenuPcs.DrawRect(0, yPos, slotY, *pW500, *pHF8c,
+				         *pZb3, *pZb3, contentColors,
+				         *pOb3, *pOb3, *pZb3);
 			}
 LAB_next:
 			slot++;

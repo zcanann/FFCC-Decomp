@@ -3149,14 +3149,12 @@ void CMenuPcs::DrawResultOpenAnim()
 		DrawInit();
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-		int off;
 		int modelIndex = 0;
 		int lastKind = 0;
-		int i;
-		int partyOff;
-		off = modelIndex << 6;
-		partyOff = 0;
-		for (i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; off += 0x40, i++) {
+		int i = 0;
+		int off = i << 6;
+		int partyOff = 0;
+		for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; off += 0x40, i++) {
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 
 			if (sprite->kind >= 0 || sprite->kind == -2) {
@@ -3226,13 +3224,13 @@ void CMenuPcs::DrawResultOpenAnim()
 						float x = (float)sprite->x;
 						float y = (float)sprite->y;
 						float fillWidth;
-						if (!(sprite->duration > sprite->timer)) {
-							fillWidth = FLOAT_80331EB0;
-						} else {
+						if (sprite->duration > sprite->timer) {
 							fillWidth = (float)((DOUBLE_80331ED8 / (double)sprite->duration) * (double)(sprite->timer - 1));
 							if (fillWidth < kBonusZClearOrigin) {
 								fillWidth = kBonusZClearOrigin;
 							}
+						} else {
+							fillWidth = FLOAT_80331EB0;
 						}
 						fillWidth *= (float)sprite->w;
 						if (fillWidth > kBonusZClearOrigin) {
@@ -3255,8 +3253,9 @@ void CMenuPcs::DrawResultOpenAnim()
 					} else {
 						if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
 							int value = 0;
+							float digitW = (float)sprite->w;
 							float digitX = (float)((DOUBLE_80331EC8 * (double)sprite->w - (float)sprite->w) * DOUBLE_80331E78 + (double)sprite->x);
-							MenuPcs.DrawRect(0, digitX, (float)sprite->y, (float)sprite->w, (float)sprite->h,
+							MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
 							    (float)(sprite->w * value), sprite->mulY,
 							    sprite->depth, sprite->depth, kBonusZClearOrigin);
 						} else {
@@ -3297,7 +3296,8 @@ void CMenuPcs::DrawResultOpenAnim()
 						strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 					} else {
 						CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
-						strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[(int)caravanWork->m_bonusCondition * 2 + 1]);
+						int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
+						strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[strIdx]);
 					}
 
 					float x = (float)sprite->x + sprite->motionX;
@@ -3311,13 +3311,12 @@ void CMenuPcs::DrawResultOpenAnim()
 
 					textIndex++;
 					if (textIndex == activePartyCount) {
-						CFont* font1 = this->m_fonts[1];
-						font = font1;
-						font1->SetMargin(FLOAT_80331EB0);
-						font1->SetShadow(0);
-						font1->SetScaleX(FLOAT_80331F90);
-						font1->SetScaleY(FLOAT_80331EB0);
-						font1->DrawInit();
+						font = this->m_fonts[1];
+						font->SetMargin(FLOAT_80331EB0);
+						font->SetShadow(0);
+						font->SetScaleX(FLOAT_80331F90);
+						font->SetScaleY(FLOAT_80331EB0);
+						font->DrawInit();
 					}
 				}
 			}

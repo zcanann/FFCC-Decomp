@@ -6454,7 +6454,7 @@ int JoyBus::SendResult(int portIndex, int param3, int param4, int param5)
 {
     unsigned char a = static_cast<signed char>(param4);
     unsigned char b = static_cast<unsigned char>(param5);
-    signed char firstByte = static_cast<unsigned char>(7 - (unsigned char)(param3 == 0));
+    signed char firstByte = (param3 == 0) ? 6 : 7;
 
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);

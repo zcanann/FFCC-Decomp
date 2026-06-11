@@ -66,21 +66,22 @@ struct CMesCharCell
 	char m_flagCount;              // 0x13
 };
 
-static inline int GetMesNibbleValue(const char* data)
+static inline char GetMesNibbleValue(const char* data)
 {
-	signed char high = (signed char)(((unsigned char)data[0] & 0x0F) << 4);
-	int low = (unsigned char)data[1] & 0x0F;
-	return (int)high | low;
+	signed char val = (signed char)(((unsigned char)data[0] & 0x0F) << 4);
+	val = (signed char)(val | ((unsigned char)data[1] & 0x0F));
+	return val;
 }
 
 static inline char ReadTagByte(char** text)
 {
 	char* p0 = *text;
 	*text = p0 + 1;
-	signed char hi = (signed char)((*p0 & 0x0F) << 4);
+	signed char val = (signed char)((*p0 & 0x0F) << 4);
 	char* p1 = *text;
 	*text = p1 + 1;
-	return (char)(hi | (*p1 & 0x0F));
+	val = (signed char)(val | (*p1 & 0x0F));
+	return val;
 }
 
 static inline int ReadTagU8(char** text)

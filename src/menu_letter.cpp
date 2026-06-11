@@ -19,8 +19,8 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern "C" const float kFavoWideTextureWidth = 384.0f;
-extern "C" const float kFavoIconUvScale = 0.75f;
+extern "C" const float kFavoWideTextureWidth;
+extern "C" const float kFavoIconUvScale;
 extern "C" const float FLOAT_80333088 = 592.0f;
 extern "C" const float FLOAT_8033308c = 160.0f;
 extern "C" const double DOUBLE_80333090 = 0.7;

@@ -1066,7 +1066,7 @@ timeout_expiry:
             int radarType = GbaQue.GetRadarType(threadParam->m_portIndex);
             if ((int)GbaQue.GetStageFlg(threadParam->m_portIndex) == 0 && radarType == 2)
             {
-                if ((char)GbaQue.GetChgScouFlg(threadParam->m_portIndex) != 0 ||
+                if ((int)GbaQue.GetChgScouFlg(threadParam->m_portIndex) != 0 ||
                     (m_stateFlagArr[threadParam->m_portIndex] != 0 &&
                      m_stateCodeArr[threadParam->m_portIndex] == 0))
                 {
@@ -1147,7 +1147,7 @@ timeout_expiry:
             if ((int)GbaQue.GetStageFlg(threadParam->m_portIndex) != 0 && (int)GbaQue.GetScrFlg() != 0)
             {
                 ResetQueue(threadParam);
-                threadParam->m_subState = 0;
+                threadParam->m_pposCounter = 0;
                 if (SendMapNo(threadParam) < 0)
                 {
                     goto sleep_retry;

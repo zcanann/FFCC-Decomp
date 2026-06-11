@@ -855,8 +855,11 @@ void CMenuPcs::CalcOptionMenu()
 		if (m_optionColumnAnim <= kOptionAnimMin) {
 			m_optionColumnAnim = kOptionAnimMin;
 		}
-		if (static_cast<int>(m_optionOpenAnim / kOptionOpenAnimStep) == 5) {
-			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
+		{
+			const float& divStep = kOptionOpenAnimStep;
+			if (static_cast<int>(m_optionOpenAnim / divStep) == 5) {
+				Sound.PlaySe(0x32, 0x40, 0x7F, 0);
+			}
 		}
 		if (!(m_optionOpenAnim <= kOptionAnimMin)) {
 			return;
@@ -906,8 +909,11 @@ void CMenuPcs::CalcOptionMenu()
 		if (m_optionIndex < 0) {
 			m_optionIndex = 4;
 		}
-		m_optionRowAnim = kOptionAnimMin;
-		m_optionColumnAnim = kOptionAnimMin;
+		{
+			const float& leftMin = kOptionAnimMin;
+			m_optionRowAnim = leftMin;
+			m_optionColumnAnim = leftMin;
+		}
 		m_optionAnimCounter = 0;
 		m_optionAnimPhase = 0;
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -918,8 +924,11 @@ void CMenuPcs::CalcOptionMenu()
 		if (m_optionIndex > 4) {
 			m_optionIndex = 0;
 		}
-		m_optionRowAnim = kOptionAnimMin;
-		m_optionColumnAnim = kOptionAnimMin;
+		{
+			const float& rightMin = kOptionAnimMin;
+			m_optionRowAnim = rightMin;
+			m_optionColumnAnim = rightMin;
+		}
 		m_optionAnimCounter = 0;
 		m_optionAnimPhase = 0;
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -1074,8 +1083,14 @@ void CMenuPcs::CalcOptionMenu()
 		Game.m_gameWork.m_gameInitFlag =
 		    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(static_cast<int>(m_gameInitMode))) >> 5);
 		Sound.SetStereo(static_cast<unsigned int>(__cntlzw(static_cast<int>(m_stereoMode))) >> 5);
-		Sound.SetSeMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(m_seVolume)));
-		Sound.SetBgmMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(m_bgmVolume)));
+		{
+			const float& seScale = kOptionVolumeScale;
+			Sound.SetSeMasterVolume(static_cast<int>(seScale * static_cast<float>(m_seVolume)));
+		}
+		{
+			const float& bgmScale = kOptionVolumeScale;
+			Sound.SetBgmMasterVolume(static_cast<int>(bgmScale * static_cast<float>(m_bgmVolume)));
+		}
 	}
 }
 

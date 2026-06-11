@@ -2527,13 +2527,10 @@ void CMenuPcs::CalcResultCloseAnim()
 	const int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
-		int off = 0;
-		short* count;
-		for (int i = 0; i < *(count = (short*)this->m_bonusAnimPtr); i++) {
-			*(int*)((int)count + off + 0x28) = 0;
-			*(float*)(this->m_bonusAnimPtr + off + 0x38) = kBonusZClearOrigin;
-			*(float*)(this->m_bonusAnimPtr + off + 0x3c) = kBonusZClearOrigin;
-			off += 0x40;
+		for (int i = 0; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
+			((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i].timer = 0;
+			((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i].motionX = kBonusZClearOrigin;
+			((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i].motionY = kBonusZClearOrigin;
 		}
 
 		{
@@ -2663,7 +2660,7 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		{
 			int i = 0;
-			off = i;
+			int off = i;
 			for (; i < *(short*)this->m_bonusAnimPtr; i++) {
 				if (kBonusZClearOrigin == *(float*)(this->m_bonusAnimPtr + off + 0x38)) {
 					*(float*)(this->m_bonusAnimPtr + off + 0x40) = (float)(int)*(short*)(this->m_bonusAnimPtr + off + 8);
@@ -2726,44 +2723,23 @@ void CMenuPcs::CalcResultCloseAnim()
 	{
 		int base2 = activePartyCount + 1;
 		int i = 0;
-		int boardOff =  (i - 0);
 		for (; i < activePartyCount; i++) {
 			int sprOff2 = ((base2 + i) << 6) + 8;
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff2);
-			int o08 = boardOff + 0x8;
-			int o0a = boardOff + 0xa;
-			int o40 =  (int)(long)(boardOff + 0x40);
-			int o44 =  (int)(unsigned int)(boardOff + 0x44);
 			int centerX = (int)(float)((double)(float)(DOUBLE_80331EE0 + ((double)sprite->w * DOUBLE_80331E78 + (double)((float)sprite->x + sprite->motionX))) - DOUBLE_80331EE8);
 			int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)((float)sprite->y + sprite->motionY)) - DOUBLE_80331EF0);
-			int __p18 = o08;
-			int __p3 =  (__p18 - 0);
-			*(short*)(this->m_bonus.m_bonusBoardPtr + __p3) = (short)centerX;
-			int __p5 = o0a;
-			*(short*)(this->m_bonus.m_bonusBoardPtr + __p5) = (short)centerY;
-			*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = (int)(FLOAT_80331EF8 + ((float)sprite->x + sprite->motionX));
-			int __p9 = o44;
-			*(int*)(this->m_bonus.m_bonusBoardPtr + __p9) = (int)(((float)sprite->y + sprite->motionY) - FLOAT_80331EFC);
-			if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o40) < DOUBLE_80331E90) {
-				*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = 0;
+			((MenuBoardEntry*)this->m_bonus.m_bonusBoardPtr)[i].m_centerX = (short)centerX;
+			((MenuBoardEntry*)this->m_bonus.m_bonusBoardPtr)[i].m_centerY = (short)centerY;
+			((MenuBoardEntry*)this->m_bonus.m_bonusBoardPtr)[i].m_screenX = (int)(FLOAT_80331EF8 + ((float)sprite->x + sprite->motionX));
+			((MenuBoardEntry*)this->m_bonus.m_bonusBoardPtr)[i].m_screenY = (int)(((float)sprite->y + sprite->motionY) - FLOAT_80331EFC);
+			if ((double)((MenuBoardEntry*)this->m_bonus.m_bonusBoardPtr)[i].m_screenX < DOUBLE_80331E90) {
+				((MenuBoardEntry*)this->m_bonus.m_bonusBoardPtr)[i].m_screenX = 0;
 			}
-			{
-				int o44b = boardOff + 0x44;
-				int __p7 = o44b;
-				if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + __p7) < DOUBLE_80331E90) {
-					*(int*)(this->m_bonus.m_bonusBoardPtr + o44b) = 0;
-				}
+			if ((double)((MenuBoardEntry*)this->m_bonus.m_bonusBoardPtr)[i].m_screenY < DOUBLE_80331E90) {
+				((MenuBoardEntry*)this->m_bonus.m_bonusBoardPtr)[i].m_screenY = 0;
 			}
-			{
-				int o48 = boardOff + 0x48;
-				int o4c = boardOff + 0x4c;
-				int __p12 = o48;
-				*(int*)(this->m_bonus.m_bonusBoardPtr + __p12) = 0x48;
-				int __p19 = o4c;
-				int __p1 = __p19;
-				*(int*)(this->m_bonus.m_bonusBoardPtr + __p1) = 0x58;
-			}
-			boardOff += 0x50;
+			((MenuBoardEntry*)this->m_bonus.m_bonusBoardPtr)[i].m_screenWidth = 0x48;
+			((MenuBoardEntry*)this->m_bonus.m_bonusBoardPtr)[i].m_screenHeight = 0x58;
 		}
 	}
 	Mtx scaleMtx;

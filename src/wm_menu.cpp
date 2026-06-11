@@ -9551,11 +9551,11 @@ void CMenuPcs::WMChgMenu()
 				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xC) = 0;
 				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xB) = 0;
 				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 10) = 0;
-				short sv = m_wmWorldState->m_backupParams[iVar11 / 2];
+				int sv = m_wmWorldState->m_backupParams[iVar11 / 2];
 				if (sv < 0) {
 					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)0xFFFF;
 				} else {
-					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = sv;
+					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)sv;
 					bVar7 = bVar7 | (1 << (int)sv);
 				}
 				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1C) = 0;
@@ -9565,7 +9565,7 @@ void CMenuPcs::WMChgMenu()
 				if (sv < 0) {
 					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = (short)0xFFFF;
 				} else {
-					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = sv;
+					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = (short)sv;
 					bVar7 = bVar7 | (1 << (int)sv);
 				}
 				iVar8 = iVar8 + 0x20;
@@ -9640,11 +9640,11 @@ void CMenuPcs::WMChgMenu()
 			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xC) = 0;
 			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xB) = 0;
 			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 10) = 0;
-			short sv = m_wmWorldState->m_backupParams[iVar11 / 2];
+			int sv = m_wmWorldState->m_backupParams[iVar11 / 2];
 			if (sv < 0) {
 				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)0xFFFF;
 			} else {
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = sv;
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)sv;
 				bVar7 = bVar7 | (1 << (int)sv);
 			}
 			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1C) = 0;
@@ -9654,7 +9654,7 @@ void CMenuPcs::WMChgMenu()
 			if (sv < 0) {
 				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = (short)0xFFFF;
 			} else {
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = sv;
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = (short)sv;
 				bVar7 = bVar7 | (1 << (int)sv);
 			}
 			iVar8 = iVar8 + 0x20;

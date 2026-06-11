@@ -487,6 +487,7 @@ static bool IsCmakeNameBlank(const char* name)
 
 static int IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
 {
+    const char* nm = name;
     int found = false;
     unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
     for (int slot = 0; slot < 8; ++slot, entry += 0xC30) {
@@ -499,7 +500,7 @@ static int IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
         if (*(entry + 0x1F96) == 1) {
             continue;
         }
-        if (strcmp(name, reinterpret_cast<char*>(entry + 0x17BA)) == 0) {
+        if (strcmp(nm, reinterpret_cast<char*>(entry + 0x17BA)) == 0) {
             found = true;
             break;
         }

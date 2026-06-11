@@ -53,7 +53,7 @@ static inline LocationTitleColorBlock* GetLocationTitleColorBlock(
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline void copyPolygonData(LocationTitleParticle* dst, LocationTitleParticle* src)
+void copyPolygonData(LOCATION_POLYGON* dst, LOCATION_POLYGON* src)
 {
     pppCopyVector(dst->m_pos, src->m_pos);
     memcpy(&dst->m_color, &src->m_color, sizeof(GXColor));

@@ -16,7 +16,7 @@ struct LocationTitleDataOffsets {
     s32 m_colorOffset;
 };
 
-struct LocationTitleParticle {
+struct LOCATION_POLYGON {
     Vec m_pos;
     GXColor m_color;
     float m_frame;
@@ -25,6 +25,7 @@ struct LocationTitleParticle {
     s16 m_shapeB;
     s16 m_pad;
 };
+typedef LOCATION_POLYGON LocationTitleParticle;
 
 struct LocationTitleWork {
     LocationTitleParticle* m_particles;

@@ -1112,127 +1112,26 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma inline_depth(8)
+#pragma inline_max_size(10000)
+#pragma inline_max_total_size(10000)
 void CMapObj::SetShow_r(int show)
 {
-    CMapObj* root = this;
+    CMapObj* obj = this;
 
     do {
         if (show != 0) {
-            root->m_showFlags |= 1;
+            obj->m_showFlags |= 1;
         } else {
-            root->m_showFlags &= 0xFE;
+            obj->m_showFlags &= 0xFE;
         }
 
-        CMapObj* c0 = root->m_child;
-        if (c0 != 0) {
-            do {
-                if (show != 0) {
-                    c0->m_showFlags |= 1;
-                } else {
-                    c0->m_showFlags &= 0xFE;
-                }
-
-                CMapObj* c1 = c0->m_child;
-                if (c1 != 0) {
-                    do {
-                        if (show != 0) {
-                            c1->m_showFlags |= 1;
-                        } else {
-                            c1->m_showFlags &= 0xFE;
-                        }
-
-                        CMapObj* c2 = c1->m_child;
-                        if (c2 != 0) {
-                            do {
-                                if (show != 0) {
-                                    c2->m_showFlags |= 1;
-                                } else {
-                                    c2->m_showFlags &= 0xFE;
-                                }
-
-                                CMapObj* c3 = c2->m_child;
-                                if (c3 != 0) {
-                                    do {
-                                        if (show != 0) {
-                                            c3->m_showFlags |= 1;
-                                        } else {
-                                            c3->m_showFlags &= 0xFE;
-                                        }
-
-                                        CMapObj* c4 = c3->m_child;
-                                        if (c4 != 0) {
-                                            do {
-                                                if (show != 0) {
-                                                    c4->m_showFlags |= 1;
-                                                } else {
-                                                    c4->m_showFlags &= 0xFE;
-                                                }
-
-                                                CMapObj* c5 = c4->m_child;
-                                                if (c5 != 0) {
-                                                    do {
-                                                        if (show != 0) {
-                                                            c5->m_showFlags |= 1;
-                                                        } else {
-                                                            c5->m_showFlags &= 0xFE;
-                                                        }
-
-                                                        CMapObj* c6 = c5->m_child;
-                                                        if (c6 != 0) {
-                                                            do {
-                                                                if (show != 0) {
-                                                                    c6->m_showFlags |= 1;
-                                                                } else {
-                                                                    c6->m_showFlags &= 0xFE;
-                                                                }
-
-                                                                CMapObj* c7 = c6->m_child;
-                                                                if (c7 != 0) {
-                                                                    do {
-                                                                        if (show != 0) {
-                                                                            c7->m_showFlags |= 1;
-                                                                        } else {
-                                                                            c7->m_showFlags &= 0xFE;
-                                                                        }
-
-                                                                        if (c7->m_child != 0) {
-                                                                            c7->m_child->SetShow_r(show);
-                                                                        }
-
-                                                                        c7 = c7->m_next;
-                                                                    } while (c7 != 0);
-                                                                }
-
-                                                                c6 = c6->m_next;
-                                                            } while (c6 != 0);
-                                                        }
-
-                                                        c5 = c5->m_next;
-                                                    } while (c5 != 0);
-                                                }
-
-                                                c4 = c4->m_next;
-                                            } while (c4 != 0);
-                                        }
-
-                                        c3 = c3->m_next;
-                                    } while (c3 != 0);
-                                }
-
-                                c2 = c2->m_next;
-                            } while (c2 != 0);
-                        }
-
-                        c1 = c1->m_next;
-                    } while (c1 != 0);
-                }
-
-                c0 = c0->m_next;
-            } while (c0 != 0);
+        if (obj->m_child != 0) {
+            obj->m_child->SetShow_r(show);
         }
 
-        root = root->m_next;
-    } while (root != 0);
+        obj = obj->m_next;
+    } while (obj != 0);
 }
 
 /*

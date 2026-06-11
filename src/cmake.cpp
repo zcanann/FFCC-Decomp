@@ -3704,10 +3704,10 @@ void CMenuPcs::DrawSingCMake()
         CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_select + 1);
     } else if (CmakeState(this)->m_resultDir < 0) {
         if (CmakeState(this)->m_step != 0) {
-            if (CmakeState(this)->m_step == 5) {
-                CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step + 1);
-            } else {
+            if (CmakeState(this)->m_step != 5) {
                 CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step - 1);
+            } else {
+                CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step + 1);
             }
         }
     } else if (CmakeState(this)->m_step != 5) {

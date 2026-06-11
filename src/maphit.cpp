@@ -990,8 +990,9 @@ cylinder_body:
         disc = capB * capB - capC;
         if (disc > 0.0) {
             disc = sqrtf(disc);
+            f32 t;
             f32 negB = -capB;
-            f32 t = negB - disc;
+            t = negB - disc;
             if ((t * localDirection.z) + pz <= 0.0) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {
@@ -1023,8 +1024,9 @@ cylinder_body:
         disc = capB * capB - (f32)(axisLen * -((2.0 * pz) - axisLen) + capC);
         if (disc > 0.0) {
             disc = sqrtf(disc);
+            f32 t;
             f32 negB = -capB;
-            f32 t = negB - disc;
+            t = negB - disc;
             if ((t * localDirection.z) + pz >= axisLen) {
                 outT = t * tScale;
                 if (outT >= kMapHitZero && outT <= kMapHitUnitScale) {

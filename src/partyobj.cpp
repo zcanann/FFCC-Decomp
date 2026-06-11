@@ -2766,7 +2766,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 	endPSlotBit(0x10);
 	CFlat.ResetParticleWork(((targetSide != 0) ? 4 : 0) +
 	                                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) +
-	                                     0x147 | 0x100,
+	                                     0x47 | 0x100,
 	                                 m_particleSlots[4]);
 	CFlat.SetParticleWorkPos(m_comboCenter, FLOAT_80331a78);
 	CFlat.SetParticleWorkParam(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4), 0);

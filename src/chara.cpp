@@ -840,10 +840,10 @@ CChara::CModel::CModel()
 
 	PSMTXIdentity(m_matrix);
 
-	m_furStep = 0.2f;
-	m_furLenScale = 3.0f;
-	m_curFrame = 0.0f;
+	m_furLenScale = 0.2f;
+	m_furStep = 3.0f;
 	m_time = 0.0f;
+	m_curFrame = 0.0f;
 	m_dynJitter.x = 0.0f;
 	m_dynJitter.y = 0.0f;
 	m_dynJitter.z = 0.0f;
@@ -937,8 +937,8 @@ CChara::CModel::~CModel()
  */
 void CChara::CModel::Init()
 {
-	m_curFrame = 0.0f;
 	m_time = 0.0f;
+	m_curFrame = 0.0f;
 	m_dynJitter.x = 0.0f;
 	m_dynJitter.y = 0.0f;
 	m_dynJitter.z = 0.0f;
@@ -1077,7 +1077,6 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			}
 		}
 		chunkFile.PopChunk();
-		break;
 	}
 
 	setup();
@@ -1188,7 +1187,6 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 			}
 		}
 		chunkFile.PopChunk();
-		break;
 	}
 }
 
@@ -1216,8 +1214,10 @@ void CChara::CModel::setup()
 
 	CCharaMeshRaw* meshRaw = ModelMeshes(this);
 	for (u32 i = 0; i < ModelRef(this)->m_meshCount; i++, meshRaw++) {
-		int skinOffset = 0;
-		for (u32 j = 0; j < meshRaw->m_data->m_skinCount; j++) {
+		int skinOffset;
+		u32 j = 0;
+		skinOffset = 0;
+		for (; j < meshRaw->m_data->m_skinCount; j++) {
 			u8* skin = reinterpret_cast<u8*>(meshRaw->m_data->m_skins) + skinOffset;
 			u32 skinNodeIndex = *reinterpret_cast<u32*>(skin + 0x60);
 			PSMTXInverse(NodeRefBindMtx(&ModelNodes(this)[skinNodeIndex]), reinterpret_cast<MtxPtr>(skin + 0x30));
@@ -1298,8 +1298,8 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	}
 	clone->m_texAnimSet = (ModelTexAnimSet(this) != 0) ? ModelTexAnimSet(this)->Duplicate(stage) : 0;
 
-	clone->m_curFrame = 0.0f;
 	clone->m_time = 0.0f;
+	clone->m_curFrame = 0.0f;
 	clone->m_dynJitter.x = 0.0f;
 	clone->m_dynJitter.y = 0.0f;
 	clone->m_dynJitter.z = 0.0f;
@@ -1428,8 +1428,9 @@ void CChara::CModel::CalcMatrix()
  */
 void CChara::CModel::CalcSkin()
 {
+	u32 normQuant;
 	u32 posQuant = ModelPosQuant(this);
-	u32 normQuant = ModelNormQuant(this);
+	normQuant = ModelNormQuant(this);
 
 	u32 posGqr = (posQuant << 24) | 0x70000 | (posQuant << 8) | 7;
 	u32 normGqr = (normQuant << 24) | 0x70000 | (normQuant << 8) | 7;
@@ -1497,16 +1498,12 @@ void CChara::CModel::calcMatrix()
 		if (((AnimFlags(m_anim) >> 6) & 1) != 0) {
 			if (m_time < FLOAT_803301b0) {
 				float negTime = -m_time;
-				float clamped = total - FLOAT_803301BC;
-				if (negTime < clamped) {
-					clamped = negTime;
-				}
+				float limit = total - FLOAT_803301BC;
+				float clamped = (negTime < limit) ? negTime : limit;
 				frame = ((m_animStart + total) - *(volatile float*)&FLOAT_803301BC) - clamped;
 			} else {
-				float clamped = total - FLOAT_803301BC;
-				if (m_time < clamped) {
-					clamped = m_time;
-				}
+				float limit = total - FLOAT_803301BC;
+				float clamped = (m_time < limit) ? m_time : limit;
 				frame = m_animStart + clamped;
 			}
 		} else if (m_time < FLOAT_803301b0) {
@@ -1619,6 +1616,7 @@ void CChara::CModel::calcMatrix()
 		if (blendCur != 0) {
 			u16 blendMax = ModelBlendMax(this);
 			float alpha = FLOAT_803301BC - (static_cast<float>(blendCur) * (FLOAT_803301BC / static_cast<float>(blendMax)));
+			Vec targetPos;
 			Vec targetScale;
 			Quaternion targetQuat;
 			Vec positionScaleA;
@@ -1626,12 +1624,9 @@ void CChara::CModel::calcMatrix()
 			Vec blendedPos;
 			Mtx quatMtx;
 			Mtx scaleMtx;
-			float tpY = NodeLocalRuntimeMtx(node)[1][3];
-			float tpZ = NodeLocalRuntimeMtx(node)[2][3];
-			Vec targetPos;
 			targetPos.x = NodeLocalRuntimeMtx(node)[0][3];
-			targetPos.y = tpY;
-			targetPos.z = tpZ;
+			targetPos.y = NodeLocalRuntimeMtx(node)[1][3];
+			targetPos.z = NodeLocalRuntimeMtx(node)[2][3];
 
 			Math.MTXGetScale(NodeLocalRuntimeMtx(node), &targetScale);
 			if (targetScale.x < FLOAT_803301E4) {
@@ -1728,7 +1723,8 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			parentNode = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(ModelNodes(this)) + parent * 0xC0);
 		}
 
-		int nextReuseAnimNode0Srt = 0;
+		int curReuseAnimNode0Srt = reuseAnimNode0Srt;
+		reuseAnimNode0Srt = 0;
 		SRTView cachedParentScaleSrt = parentScaleSrt;
 		SRTView srt;
 		Mtx animMtx;
@@ -1738,7 +1734,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 &&
 			    AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
 				NodeAnimNode0(parentNode)->Interp(m_anim, reinterpret_cast<SRT*>(&parentScaleSrt), frame);
-				nextReuseAnimNode0Srt = 1;
+				reuseAnimNode0Srt = 1;
 				PSMTXScale(localMtx,
 				           FLOAT_803301BC / parentScaleSrt.m_scale.x,
 				           FLOAT_803301BC / parentScaleSrt.m_scale.y,
@@ -1773,7 +1769,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			}
 
 			if (NodeAnimNode0(node) != 0) {
-				if (reuseAnimNode0Srt) {
+				if (curReuseAnimNode0Srt) {
 					srt = cachedParentScaleSrt;
 				} else {
 					NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
@@ -1788,7 +1784,6 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 		} else {
 			PSMTXCopy(ref->m_localMtx, localMtx);
 		}
-		reuseAnimNode0Srt = nextReuseAnimNode0Srt;
 
 		u16 blendCur = ModelBlendCur(this);
 		if (blendCur != 0) {
@@ -1800,12 +1795,10 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			Vec positionScaleB;
 			Vec blendedPos;
 			Mtx scaleMtx;
-			float tpY = localMtx[1][3];
-			float tpZ = localMtx[2][3];
 			Vec targetPos;
 			targetPos.x = localMtx[0][3];
-			targetPos.y = tpY;
-			targetPos.z = tpZ;
+			targetPos.y = localMtx[1][3];
+			targetPos.z = localMtx[2][3];
 
 			Math.MTXGetScale(localMtx, &targetScale);
 			if (targetScale.x < FLOAT_803301E4) {
@@ -1832,9 +1825,6 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 		PSMTXConcat(localMtx, out, out);
 
-		if (parentNode == 0) {
-			break;
-		}
 		node = parentNode;
 	}
 
@@ -2128,28 +2118,31 @@ int CChara::CModel::SearchNodeSk(char* name)
 			CNode* node = ModelNodes(this);
 			for (; i < ModelNodeCount(this); i++, node++) {
 				int tail = strlen(NodeRefName(node)) - 3;
-				if (tail > 0 && strcmp(NodeRefName(node) + tail, name) == 0) {
+				if (tail > 0 && strcmp(&node->m_refData->m_name[tail], name) == 0) {
 					return (int)i;
 				}
 			}
 		} else if (name[1] == 'r' && name[2] == 'o' && name[3] == 'o' && name[4] == 't') {
-			u32 i = 0;
 			CNode* node = ModelNodes(this);
+			u32 i = 0;
 			for (; i < ModelNodeCount(this); i++, node++) {
 				int tail = strlen(NodeRefName(node)) - 5;
-				if (tail > 0 && strcmp(NodeRefName(node) + tail, name) == 0) {
+				if (tail > 0 && strcmp(&node->m_refData->m_name[tail], name) == 0) {
 					return (int)i;
 				}
 			}
 		}
 	} else {
 		CNode* node = ModelNodes(this);
-		for (u32 i = 0; i < ModelNodeCount(this); i++, node++) {
+		u32 i = 0;
+		for (; i < ModelNodeCount(this); i++, node++) {
 			if (strcmp(NodeRefName(node), name) == 0) {
-				return (int)i;
+				goto foundPlain;
 			}
 		}
-		return -1;
+		i = (u32)-1;
+foundPlain:
+		return (int)i;
 	}
 
 	return -1;
@@ -2188,7 +2181,9 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		texAnimSet->SetTexGen();
 	}
 
-	MaterialMan.InitVtxFmt(-1, (_GXCompType)3, ModelPosQuant(this), (_GXCompType)3, ModelNormQuant(this), (_GXCompType)3, 0xC);
+	const int posQuant = ModelPosQuant(this);
+	const int normQuant = ModelNormQuant(this);
+	MaterialMan.InitVtxFmt(-1, (_GXCompType)3, posQuant, (_GXCompType)3, normQuant, (_GXCompType)3, 0xC);
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetZCompLoc((u8)0);
 	_GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
@@ -2243,7 +2238,8 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		const int zWriteEnable = static_cast<int>(static_cast<u32>(mesh->m_data->m_flags & 0x60) << 25) >> 31;
 		if (lastZWrite != zWriteEnable) {
 			lastZWrite = zWriteEnable;
-			GXSetZMode((u8)1, (GXCompare)3, zWriteEnable == 0);
+			int zOff = zWriteEnable == 0;
+			GXSetZMode((u8)1, (GXCompare)3, (GXBool)zOff);
 		}
 
 		if (ModelBeforeMeshCallback(this) != 0) {
@@ -2478,8 +2474,9 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 		int frameStart = (startFrame == -1) ? 0 : startFrame;
 
 		m_animStart = static_cast<float>(frameStart);
-		m_curFrame = m_animStart;
-		m_time = m_curFrame;
+		float startF = m_animStart;
+		m_curFrame = startF;
+		m_time = startF;
 
 		int frameEnd;
 		if (endFrame == -1) {
@@ -2881,8 +2878,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			m_data->m_skins =
 			    new (stage, const_cast<char*>(s_chara_cpp), 0x7F8) CChara::CSkin[m_data->m_skinCount];
 
-			unsigned int skinOffset = 0;
 			chunk.PushChunk();
+			unsigned int skinOffset = 0;
 			while (chunk.GetNextChunk(chunkInfo)) {
 				if (chunkInfo.m_id == 0x4E4F4445) {
 					u8* skinEntry = reinterpret_cast<u8*>(m_data->m_skins) + skinOffset;

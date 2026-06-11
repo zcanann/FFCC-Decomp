@@ -4868,7 +4868,7 @@ void CMenuPcs::DrawCMakeMenu()
 			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(entry + 0xC), static_cast<float>(entry[0]),
 			                 static_cast<float>(entry[1]), static_cast<float>(entry[2]), static_cast<float>(entry[3]),
 			                 *reinterpret_cast<float*>(entry + 4), *reinterpret_cast<float*>(entry + 6),
-			                 FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			                 1.0f, 1.0f, 0.0f);
 		}
 		bit++;
 		byteOffset += 0x1C;

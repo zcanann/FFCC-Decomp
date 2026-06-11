@@ -1792,6 +1792,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 #pragma push
 #pragma opt_strength_reduction off
 #pragma opt_propagation off
+#pragma push
+#pragma opt_lifetimes off
 void CMenuPcs::CalcSelectOpenAnim()
 {
 	int activePartyCount = s_Rinfo->m_partyCount;
@@ -2034,16 +2036,16 @@ void CMenuPcs::CalcSelectOpenAnim()
 				int o44 = boardOff + 0x44;
 				int o48 = boardOff + 0x48;
 				int o4c = boardOff + 0x4c;
-				int b = this->m_bonus.m_bonusBoardPtr;
-				*(float*)(b + (boardOff + 0x24)) = kBonusZClearOrigin;
-				*(float*)(b + (boardOff + 0x20)) = kBonusZClearOrigin;
-				*(float*)(b + (boardOff + 0x1c)) = kBonusZClearOrigin;
-				*(float*)(b + (boardOff + 0x30)) = kBonusZClearOrigin;
-				*(float*)(b + (boardOff + 0x2c)) = kBonusZClearOrigin;
-				*(float*)(b + (boardOff + 0x28)) = kBonusZClearOrigin;
-				*(float*)(b + (boardOff + 0x3c)) = FLOAT_80331EB0;
-				*(float*)(b + (boardOff + 0x38)) = FLOAT_80331EB0;
-				*(float*)(b + (boardOff + 0x34)) = FLOAT_80331EB0;
+				float* fl = (float*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x1c);
+				fl[2] = kBonusZClearOrigin;
+				fl[1] = kBonusZClearOrigin;
+				fl[0] = kBonusZClearOrigin;
+				fl[5] = kBonusZClearOrigin;
+				fl[4] = kBonusZClearOrigin;
+				fl[3] = kBonusZClearOrigin;
+				fl[8] = FLOAT_80331EB0;
+				fl[7] = FLOAT_80331EB0;
+				fl[6] = FLOAT_80331EB0;
 				*(int*)(this->m_bonus.m_bonusBoardPtr + boardOff) = 0;
 				*(int*)(this->m_bonus.m_bonusBoardPtr + o04) = 0;
 				int centerX = (int)((double)(float)((double)*(short*)(anim + 0x4c) * DOUBLE_80331E78 + (double)*(short*)(anim + 0x48)) - DOUBLE_80331EE8);
@@ -2152,7 +2154,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 	{
 		int i = 0;
 		int partyByteOff = i;
-		const float* scale4 = (const float*)(anchor + 0x6c);
+		float* scale4 = (float*)(anchor + 0x6c);
 		int total = activePartyCount + 8;
 		for (; i < total; i++, partyByteOff += sizeof(BonusPartySummary)) {
 			int sprOff2 = (((int)(signed char)s_PlayerTop + i) << 6) + 8;
@@ -2248,6 +2250,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 1;
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

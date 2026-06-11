@@ -5629,7 +5629,7 @@ int JoyBus::SendStrength(ThreadParam* threadParam)
 {
     unsigned int cmd = 0;
     unsigned char* cmdBytes = (unsigned char*)&cmd;
-    unsigned char strength[3];
+    unsigned char strength[0x10];
 
     GbaQue.GetStrengthData(threadParam->m_portIndex, strength);
 

@@ -11266,8 +11266,8 @@ void CMenuPcs::CalcMcObj()
 		reinterpret_cast<float*>(panelState)[5] = 0.0f;
 		reinterpret_cast<float*>(panelState)[6] = 50.0f;
 
-		panelState[1]++;
 		unsigned char* const charaState = m_wmCharaState + i * 0x48;
+		panelState[1]++;
 		if (static_cast<float>(static_cast<int>(panelState[1])) >=
 		    25.0 * static_cast<double>(yTbl->data[gWmModelYOffsetSplineCount * 4 - 4])) {
 			panelState[1] = 0;

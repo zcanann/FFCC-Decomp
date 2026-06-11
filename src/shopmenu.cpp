@@ -1506,7 +1506,10 @@ void CShopMenu::DrawBuySellInfo()
     MenuPcs.DrawNoShadowFont(font, moneyText, static_cast<float>(static_cast<int>(FLOAT_80332d7c + separatorWidth)), FLOAT_80332d80, 0x14, 0x12);
     MenuPcs.DrawInit();
 
-    SetupShopMenuUnitFont(font);
+    font->DrawInit();
+    font->SetScaleX(FLOAT_80332d2c);
+    font->SetScaleY(FLOAT_80332d28);
+    font->SetMargin(FLOAT_80332d28);
     char* unitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
     float unitWidth = font->GetWidth(unitText);
 
@@ -1529,7 +1532,7 @@ void CShopMenu::DrawBuySellInfo()
                 if (gilItemNo <= 0) {
                     gil = 0;
                 } else {
-                    int value = ShopMenuCaravanWork(this)->m_shopParam *
+                    int value = static_cast<int>(ShopMenuCaravanWork(this)->m_shopParam) *
                                 *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + gilItemNo * 0x48);
                     gil = value / 100;
                 }
@@ -1537,7 +1540,7 @@ void CShopMenu::DrawBuySellInfo()
                 if (gilItemNo <= 0) {
                     gil = 0;
                 } else {
-                    int value = ShopMenuCaravanWork(this)->m_shopParam *
+                    int value = static_cast<int>(ShopMenuCaravanWork(this)->m_shopParam) *
                                 *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + gilItemNo * 0x48);
                     gil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(value / 100));
                 }
@@ -1564,7 +1567,10 @@ void CShopMenu::DrawBuySellInfo()
     SetupShopMenuAmountFont(amountFont2);
     DrawShopMenuAmountTrunc(amountFont2, currentMoney, amountRightMoney, FLOAT_80332d90, 0x14);
 
-    SetupShopMenuUnitFont(font);
+    font->DrawInit();
+    font->SetScaleX(FLOAT_80332d2c);
+    font->SetScaleY(FLOAT_80332d28);
+    font->SetMargin(FLOAT_80332d28);
     font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(static_cast<unsigned int>(rightPrice)), FLOAT_80332d98, 0x19, 0x12);
     MenuPcs.DrawInit();

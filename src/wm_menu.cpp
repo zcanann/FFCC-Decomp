@@ -6791,13 +6791,13 @@ void CMenuPcs::CalcFukidashi()
 				modelIdx = 6;
 			}
 		} else {
-			modelIdx = 0;
-			if ((sFlags & 0x10) == 0) { modelIdx = 1;
-			if ((sFlags & 0x20) == 0) { modelIdx = 2;
-			if ((sFlags & 0x40) == 0) { modelIdx = 3;
-			if ((sFlags & 0x80) == 0) { modelIdx = 4;
-			if ((sFlags & 0x100) == 0) { modelIdx = 5; }}}}}
-			modelIdx = modelIdx + 0x0C;
+			bitIdx = 0;
+			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx = 1;
+			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx = 2;
+			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx = 3;
+			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx = 4;
+			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx = 5; }}}}}
+			modelIdx = bitIdx + 0x0C;
 		}
 
 		int* puVar20 = reinterpret_cast<int*>(WOBJ() + modelIdx * 0x50);
@@ -6873,7 +6873,8 @@ void CMenuPcs::CalcFukidashi()
 		int slotIdx = 0;
 		for (int padIdx = 0; padIdx < 4; padIdx++) {
 			if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << padIdx)) != 0) {
-				int* puVar20 = reinterpret_cast<int*>(WOBJ() + (padIdx + 8) * 0x50);
+				int slot8 = padIdx + 8;
+				int* puVar20 = reinterpret_cast<int*>(WOBJ() + slot8 * 0x50);
 				puVar20[0] = 1;
 				*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331728;
 				if (slotIdx == 0) {
@@ -6927,7 +6928,7 @@ void CMenuPcs::CalcFukidashi()
 				rxMtx[2][3] = *reinterpret_cast<float*>(puVar20 + 9);
 				PSMTXConcat(rxMtx, sMtx, sMtx);
 
-#define mdl (*reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + (padIdx + 8) * 4) + 0x168))
+#define mdl (*reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + slot8 * 4) + 0x168))
 				mdl->SetMatrix(sMtx);
 				mdl->CalcMatrix();
 				mdl->CalcSkin();

@@ -241,8 +241,6 @@ JoyBus::~JoyBus()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_propagation off
 void JoyBus::CreateInit()
 {
     memset(m_sendBuffer, 0, sizeof(m_sendBuffer));
@@ -335,7 +333,11 @@ void JoyBus::CreateInit()
 
     m_fileBaseB_dup = 0;
 
-    memset(m_cmdBuffer, 0, 8);
+    for (int j = 0; j < 4; j++)
+    {
+        m_cmdBuffer[j] = 0;
+        m_cmdBuffer[j + 4] = 0;
+    }
 
     for (int i = 0; i < 4; i++)
     {
@@ -352,7 +354,6 @@ void JoyBus::CreateInit()
         }
     }
 }
-#pragma pop
 
 
 /*

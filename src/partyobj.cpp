@@ -2733,8 +2733,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		hitCylinder.m_radius = radius;
 
 		if (MapMng.CheckHitCylinderNear(&hitCylinder, &rayDir, 0x30) != 0) {
-			CMapObj* hitObj = getMapHitObject();
-			hitObj->CalcHitPosition(&m_comboCenter);
+			getMapHitObject()->CalcHitPosition(&m_comboCenter);
 		} else {
 			CVector startOffset2(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
 			const CVector& worldPos2 = CVector(m_worldPosition);
@@ -2752,12 +2751,11 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		floorCylinder.m_axis = *(Vec*)&down;
 		floorCylinder.m_radius = FLOAT_80331a78;
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, (Vec*)&down, 0x30) != 0) {
-			CMapObj* hitObj = getMapHitObject();
-			hitObj->CalcHitPosition(&m_comboCenter);
+			getMapHitObject()->CalcHitPosition(&m_comboCenter);
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 			Vec faceNormal;
 			caravanWork->m_targetCursorPosA = m_comboCenter;
-			hitObj->GetHitFaceNormal(&faceNormal);
+			getMapHitObject()->GetHitFaceNormal(&faceNormal);
 			caravanWork->m_targetCursorPosB = faceNormal;
 		}
 		m_comboTarget = m_comboCenter;

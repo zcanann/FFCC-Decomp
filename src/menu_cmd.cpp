@@ -1849,19 +1849,25 @@ unsigned int CMenuPcs::CmdClose0()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CMenuPcs::GetCmdItem()
 {
+	s32 count;
+	s16* list;
 	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+	list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	s16* write = list;
-	s32 count = 0;
+	count = 0;
+	s32 i = count;
 
-	for (s32 i = 0; i < 0x40; i++) {
+	for (; i < 0x40; i++) {
 		s32 itemType = GetItemType(i, 0);
 		if ((itemType != 0) && (itemType != 5) && (itemType != 6) && (itemType != 8) && (itemType != 9)) {
 			if (itemType == 1) {
 				const s32 tribe = caravanWork->m_tribeId & 3;
-				if (GetItemIcon(caravanWork->m_inventoryItems[i]) != tribe) {
+				const s32 icon = GetItemIcon(caravanWork->m_inventoryItems[i]);
+				if (icon != tribe) {
 					continue;
 				}
 			}
@@ -1872,9 +1878,10 @@ void CMenuPcs::GetCmdItem()
 	}
 
 	s16* write2 = list + count;
-	for (s32 i = 0; i < 0x49; i++) {
+	const u8* artrow = reinterpret_cast<const u8*>(caravanWork);
+	for (s32 i = 0; i < 0x49; artrow += 2, i++) {
 		s32 arti = i + 0x9f;
-		if (caravanWork->m_artifacts[i] == arti) {
+		if (reinterpret_cast<const CCaravanWork*>(artrow)->m_artifacts[0] == arti) {
 			if (IsMagicArti(arti)) {
 				count++;
 				write2++;
@@ -1883,30 +1890,31 @@ void CMenuPcs::GetCmdItem()
 		}
 	}
 
-	s16* write3 = list + count;
+	write2 = list + count;
 	if (IsMagicArti(caravanWork->m_treasures[0])) {
 		count++;
-		write3++;
-		*write3 = 0xa0;
+		write2++;
+		*write2 = 0xa0;
 	}
 	if (IsMagicArti(caravanWork->m_treasures[1])) {
 		count++;
-		write3++;
-		*write3 = 0xa1;
+		write2++;
+		*write2 = 0xa1;
 	}
 	if (IsMagicArti(caravanWork->m_treasures[2])) {
 		count++;
-		write3++;
-		*write3 = 0xa2;
+		write2++;
+		*write2 = 0xa2;
 	}
 	if (IsMagicArti(caravanWork->m_treasures[3])) {
 		count++;
-		write3[1] = 0xa3;
+		write2[1] = 0xa3;
 	}
 
 	s16* out = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	*out = count + 2;
 }
+#pragma pop
 
 /*
  * --INFO--

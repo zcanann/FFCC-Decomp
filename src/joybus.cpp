@@ -4498,9 +4498,8 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             signed char* p = (signed char*)&playerInfo;
             unsigned char* cf = classFlags;
             unsigned char lowBits = 0;
-            unsigned char highBits = 0;
 
-            for (int count = 0; count < 4; count++)
+            for (int highBits = 0; highBits < 4; highBits++)
             {
                 if (p[0x16] != 0)
                 {
@@ -4517,7 +4516,6 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
                 p        += 0xDC;
                 lowBits  += 0x10;
-                highBits += 1;
             }
 
             memcpy(&body[0x80], classFlags, sizeof(classFlags));

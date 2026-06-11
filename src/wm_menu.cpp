@@ -10703,12 +10703,14 @@ void CMenuPcs::DrawMCList()
 	char* const rodataBase = lbl_801DB7F8;
 	CFont* fontF8 = m_fonts[0];
 	double rawA;
+	int slot;
+	int slotOff;
 #define worldState GetWmWorldState(this)
 	short state = worldState->m_mainState;
 
 	if ((state == 2 || state == 3) && worldState->m_subState != 0) {
-		int slotIdx = 0;
-		int iVar16 = 0;
+		slot = 0;
+		slotOff = 0;
 		do {
 			float yPos;
 			float alpha;
@@ -10716,9 +10718,9 @@ void CMenuPcs::DrawMCList()
 			if (sub == 1 || worldState->m_mainState == 3) {
 				int animFrames;
 				if (worldState->m_mainState == 2) {
-					animFrames = (int)worldState->m_frameCounter - iVar16;
+					animFrames = (int)worldState->m_frameCounter - slotOff;
 				} else {
-					animFrames = 10 - ((int)worldState->m_frameCounter - (3 - slotIdx) * 3);
+					animFrames = 10 - ((int)worldState->m_frameCounter - (3 - slot) * 3);
 				}
 				if (animFrames < 0) {
 					goto LAB_next;
@@ -10736,7 +10738,7 @@ void CMenuPcs::DrawMCList()
 				alpha = FLOAT_803313e8;
 			}
 			if (!(alpha <= DOUBLE_803314F0)) {
-				reinterpret_cast<int*>(&rawA)[1] = slotIdx ^ 0x80000000;
+				reinterpret_cast<int*>(&rawA)[1] = slot ^ 0x80000000;
 				reinterpret_cast<int*>(&rawA)[0] = 0x43300000;
 				float slotY = (float)(DOUBLE_80331498 * (rawA - DOUBLE_80331408) + DOUBLE_80331490);
 				MenuPcs.SetAttrFmt((FMT)0);
@@ -10784,9 +10786,9 @@ void CMenuPcs::DrawMCList()
 				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 			}
 LAB_next:
-			slotIdx++;
-			iVar16 += 3;
-		} while (slotIdx < 4);
+			slot++;
+			slotOff += 3;
+		} while (slot < 4);
 	}
 
 	float frameAlpha;
@@ -10810,9 +10812,9 @@ LAB_next:
 	frameColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	for (int i = 0, offset = i; i < 2; i++, offset += 0x1C) {
-		if (((1 << i) & 2) != 0) {
-			unsigned char* const frameEntry = m_wm.m_frameInfo + offset + 4;
+	for (slot = 0, slotOff = slot; slot < 2; slot++, slotOff += 0x1C) {
+		if (((1 << slot) & 2) != 0) {
+			unsigned char* const frameEntry = m_wm.m_frameInfo + slotOff + 4;
 			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(frameEntry + 0x18),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 2)),
@@ -10863,7 +10865,7 @@ LAB_next:
 		const double rowSlopeD = DOUBLE_80331498;
 		const double rowBias = DOUBLE_80331408;
 		const double rowBaseD = DOUBLE_80331490;
-		for (int slot = 0, slotOff = slot; slot < kMcListCount; slot++, slotOff += kMcListEntrySize) {
+		for (slot = 0, slotOff = slot; slot < kMcListCount; slot++, slotOff += kMcListEntrySize) {
 			double rawR;
 			unsigned char* const slotData = m_wmCharaState + slotOff;
 			reinterpret_cast<int*>(&rawR)[1] = slot ^ 0x80000000;
@@ -11095,7 +11097,7 @@ LAB_next:
 		const double tSlope = DOUBLE_80331498;
 		const double tBias = DOUBLE_80331408;
 		const double tBase = DOUBLE_80331490;
-		for (int slot = 0, slotOff = slot; slot < 4; slot++, slotOff += 0x48) {
+		for (slot = 0, slotOff = slot; slot < 4; slot++, slotOff += 0x48) {
 			char part[64];
 			char locationStr[64];
 			char line1[64];

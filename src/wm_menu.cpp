@@ -10259,14 +10259,15 @@ input_check_done:
 			}
 
 			*reinterpret_cast<float*>(panel + 0x34) = modelScale;
+			float zero = FLOAT_803313dc;
 			*reinterpret_cast<float*>(panel + 0x38) = modelScale;
 			*reinterpret_cast<float*>(panel + 0x3C) = modelScale;
-			*reinterpret_cast<float*>(panel + 0x1C) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(panel + 0x20) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(panel + 0x1C) = zero;
+			*reinterpret_cast<float*>(panel + 0x20) = zero;
 			*reinterpret_cast<float*>(panel + 0x24) = FLOAT_803315E0;
-			*reinterpret_cast<float*>(panel + 0x28) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(panel + 0x28) = zero;
 			*reinterpret_cast<float*>(panel + 0x2C) = FLOAT_803315E4 * static_cast<float>(i);
-			*reinterpret_cast<float*>(panel + 0x30) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(panel + 0x30) = zero;
 
 			PSMTXRotRad(workMtx, 'y', FLOAT_803314bc * *reinterpret_cast<float*>(panel + 0x2C));
 			PSMTXMultVecSR(workMtx, reinterpret_cast<Vec*>(panel + 0x1C), &modelPos);
@@ -10278,7 +10279,7 @@ input_check_done:
 				mpp->y = workMtx[1][3];
 				mpp->z = workMtx[2][3];
 			}
-			PSMTXIdentity(modelMtx);
+			PSMTXIdentity(workMtx);
 
 			if (i == 1) {
 				const int ms = m_wmWorldState->m_mainState;
@@ -10295,9 +10296,9 @@ input_check_done:
 			}
 
 			if (i == 0) {
-				PSMTXRotRad(rotMtx, 'y', FLOAT_803315E8);
+				PSMTXRotRad(modelMtx, 'y', FLOAT_803315E8);
 				PSMTXRotRad(scaleMtx, 'x', FLOAT_803315d0);
-				PSMTXConcat(rotMtx, scaleMtx, modelMtx);
+				PSMTXConcat(modelMtx, scaleMtx, modelMtx);
 			} else if (i == 1) {
 				if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == 1 &&
 				    m_wmWorldState->m_mainState != 2) {
@@ -10314,10 +10315,10 @@ input_check_done:
 			}
 
 			if (m_wmWorldState->m_cardChannel == i) {
-				PSMTXRotRad(rotMtx, 'z', rotZSel);
+				PSMTXRotRad(workMtx, 'z', rotZSel);
 				PSMTXRotRad(selScaleMtx, 'y', rotYSel);
-				PSMTXConcat(rotMtx, selScaleMtx, rotMtx);
-				PSMTXConcat(rotMtx, modelMtx, modelMtx);
+				PSMTXConcat(workMtx, selScaleMtx, workMtx);
+				PSMTXConcat(workMtx, modelMtx, modelMtx);
 			}
 
 			s_MMenuPos[i].x = modelPos.x;

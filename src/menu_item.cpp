@@ -113,33 +113,37 @@ static inline double LoadDouble(const double& value)
 int CMenuPcs::ItemCtrlCur()
 {
     bool blocked = false;
-    unsigned int press;
-    int hold;
     CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+    unsigned int rawPress;
+    unsigned int rawHold;
+    short hold;
+    short press;
     int padLock = Pad.m_debugPadLock;
 
     if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         blocked = true;
     }
     if (blocked) {
-        press = 0;
+        rawPress = 0;
     } else {
         int padIndex = 0;
         padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-        press = Pad.GetPadInputs()[padIndex].buttonDown[0];
+        rawPress = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
+    press = rawPress & 0xffff;
 
     blocked = false;
     if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
         blocked = true;
     }
     if (blocked) {
-        hold = 0;
+        rawHold = 0;
     } else {
         int padIndex = 0;
         padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-        hold = Pad.GetPadInputs()[padIndex].repeatButton;
+        rawHold = Pad.GetPadInputs()[padIndex].repeatButton;
     }
+    hold = rawHold & 0xffff;
 
     if (hold == 0) {
         return 0;

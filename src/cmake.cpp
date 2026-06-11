@@ -4005,7 +4005,11 @@ void CMenuPcs::CalcSingCMake()
         case5_out:
             result = done;
         } else {
-            if (CmakeState(this)->m_stepTimer == 0) {
+            if (static_cast<int>(CmakeState(this)->m_stepTimer) != 0) {
+                CmakeState(this)->m_stepTimer =
+                    static_cast<short>(CmakeState(this)->m_stepTimer - 1);
+                result = 0;
+            } else {
                 int done;
                 if (CmakeState(this)->m_frame >= 10) {
                     done = 1;
@@ -4014,9 +4018,6 @@ void CMenuPcs::CalcSingCMake()
                     done = 0;
                 }
                 result = done;
-            } else {
-                CmakeState(this)->m_stepTimer =
-                    static_cast<short>(CmakeState(this)->m_stepTimer - 1);
             }
         }
         break;
@@ -4044,11 +4045,11 @@ void CMenuPcs::CalcSingCMake()
                 done = 0;
             } else {
                 if ((repeat & 0x8) != 0) {
-                    if (CmakeState(this)->m_select == 0) {
-                        CmakeState(this)->m_select = 3;
-                    } else {
+                    if (static_cast<int>(CmakeState(this)->m_select) != 0) {
                         CmakeState(this)->m_select =
                             static_cast<short>(CmakeState(this)->m_select - 1);
+                    } else {
+                        CmakeState(this)->m_select = 3;
                     }
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 } else if ((repeat & 0x4) != 0) {

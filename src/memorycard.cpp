@@ -518,9 +518,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         *reinterpret_cast<u32*>(dstCharData + 0x8BC) = *reinterpret_cast<u32*>(srcCharData + 0x8BC);
         dstCharData[0x8C2] = srcCharData[0x8C2];
         *reinterpret_cast<u32*>(dstCharData + 0x8C4) = *reinterpret_cast<u32*>(srcCharData + 0x8C4);
-        u32 serial0 = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&srcSave) + 0x13D0);
-        *reinterpret_cast<u32*>(dstCharData + 0x8CC) = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&srcSave) + 0x13D4);
-        *reinterpret_cast<u32*>(dstCharData + 0x8C8) = serial0;
+        *reinterpret_cast<u64*>(dstCharData + 0x8C8) = *reinterpret_cast<u64*>(reinterpret_cast<u8*>(&srcSave) + 0x13D0);
         *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&srcSave) + 0x13D8);
 
         u8* dstWork = reinterpret_cast<u8*>(&dstSave) + dstChar * 0x200;
@@ -1234,9 +1232,7 @@ void CMemoryCardMan::SetLoadData()
     memcpy(Game.m_gameWork.m_townName, save + 0x10C0, 0x10);
     memcpy(Game.m_gameWork.m_eventFlags, save + 0x10D0, 0x100);
     memcpy(Game.m_gameWork.m_eventWork, save + 0x11D0, 0x200);
-    u32 serial0 = *reinterpret_cast<u32*>(save + 0x13D0);
-    Game.m_gameWork.m_mcSerial1 = *reinterpret_cast<u32*>(save + 0x13D4);
-    Game.m_gameWork.m_mcSerial0 = serial0;
+    *reinterpret_cast<u64*>(&Game.m_gameWork.m_mcSerial0) = *reinterpret_cast<u64*>(save + 0x13D0);
     Game.m_gameWork.m_mcRandom = *reinterpret_cast<u32*>(save + 0x13D8);
     Game.m_gameWork.m_mcHasSerial = save[0x13DC];
     Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));
@@ -1361,9 +1357,7 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->unk_0xc1e = src[0x8C2];
         caravanWork->m_shopRandSeed = *reinterpret_cast<int*>(src + 0x8C4);
         caravanWork->m_shopData0 = *reinterpret_cast<int*>(src + 0x8D0);
-        int shopData1 = *reinterpret_cast<int*>(src + 0x8C8);
-        caravanWork->m_shopData2 = *reinterpret_cast<int*>(src + 0x8CC);
-        caravanWork->m_shopData1 = shopData1;
+        *reinterpret_cast<u64*>(&caravanWork->m_shopData1) = *reinterpret_cast<u64*>(src + 0x8C8);
         caravanWork->m_baseDataIndex = *reinterpret_cast<int*>(src + 0x8D4);
         caravanWork->m_maxHp = caravanWork->GetArtifactIncludeHpMax();
 
@@ -1461,9 +1455,7 @@ void CMemoryCardMan::MakeSaveData()
     memcpy(save + 0x10D0, Game.m_gameWork.m_eventFlags, 0x100);
     memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
     memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
-    u32 mcSerial0 = Game.m_gameWork.m_mcSerial0;
-    *reinterpret_cast<u32*>(save + 0x13D4) = Game.m_gameWork.m_mcSerial1;
-    *reinterpret_cast<u32*>(save + 0x13D0) = mcSerial0;
+    *reinterpret_cast<u64*>(save + 0x13D0) = *reinterpret_cast<u64*>(&Game.m_gameWork.m_mcSerial0);
     *reinterpret_cast<u32*>(save + 0x13D8) = Game.m_gameWork.m_mcRandom;
     save[0x13DC] = Game.m_gameWork.m_mcHasSerial;
     save[0x13DD] = static_cast<u8>(Sound.GetBgmMasterVolume());
@@ -1576,9 +1568,7 @@ void CMemoryCardMan::MakeSaveData()
         dst[0x8C2] = caravanWork->unk_0xc1e;
         *reinterpret_cast<int*>(dst + 0x8C4) = caravanWork->m_shopRandSeed;
         *reinterpret_cast<int*>(dst + 0x8D0) = caravanWork->m_shopData0;
-        int shopData1 = caravanWork->m_shopData1;
-        *reinterpret_cast<int*>(dst + 0x8CC) = caravanWork->m_shopData2;
-        *reinterpret_cast<int*>(dst + 0x8C8) = shopData1;
+        *reinterpret_cast<u64*>(dst + 0x8C8) = *reinterpret_cast<u64*>(&caravanWork->m_shopData1);
         *reinterpret_cast<int*>(dst + 0x8D4) = caravanWork->m_baseDataIndex;
     }
 

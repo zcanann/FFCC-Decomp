@@ -7021,9 +7021,7 @@ void CMenuPcs::DrawFukidashi()
 				iVar5++;
 			}
 		} else {
-			int idx = 0;
-			int cnt = 5;
-			do {
+			for (int idx = 0; idx < 5; idx++) {
 				if ((uVar3 & (0x10 << idx)) != 0) {
 					MenuPcs.SetTexture((TEX)(idx + 0x19));
 					int bd = *reinterpret_cast<int*>(bytes + 0x818);
@@ -7034,9 +7032,7 @@ void CMenuPcs::DrawFukidashi()
 						FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 					break;
 				}
-				idx++;
-				cnt--;
-			} while (cnt != 0);
+			}
 		}
 	}
 

@@ -53,15 +53,15 @@ extern const float kGraphicSphereNegativeX = -1.0f;
 extern const double kGraphicHalfF64 = 4503599627370496.0;
 extern const float kGraphicSpherePi = 3.1415927410125732f;
 extern const double DOUBLE_8032F6E8 = 4503601774854144.0;
-extern const float kGraphicSmallBackTextureWidth = 320.0f;
-extern const float kGraphicSmallBackTextureHeight = 224.0f;
+extern const float kGraphicSmallBackTextureWidth;
+extern const float kGraphicSmallBackTextureHeight;
 extern const float FLOAT_8032F6F8 = 16777215.0f;
 extern const float FLOAT_8032F6FC = 0.7f;
 extern const float kGraphicSphereRingDivisor = 6.0f;
 extern const float kGraphicSphereSegmentAngle = 0.7853981852531433f;
-extern const float kGraphicBlurAlphaScale = -100.0f;
-extern const float kGraphicNoiseTexScaleU = 0.015625f;
-extern const float kGraphicNoiseTexScaleV = 0.010416667163372f;
+extern const float kGraphicBlurAlphaScale;
+extern const float kGraphicNoiseTexScaleU;
+extern const float kGraphicNoiseTexScaleV;
 extern const char sGraphicUnknownOrderName[4] = "---";
 
 static inline float CameraNearZ()
@@ -183,7 +183,7 @@ void CGraphic::Init()
 
     GXRenderModeObj* renderMode = m_renderMode;
     u32 alignedWidth = (renderMode->fbWidth + 0xF) & 0xFFF0;
-    s16 efbHeight = renderMode->efbHeight;
+    u16 efbHeight = renderMode->efbHeight;
     u16 xfbHeight = renderMode->xfbHeight;
     u32 efbBufferSize = alignedWidth * efbHeight * 2;
     u32 xfbBufferSize = alignedWidth * xfbHeight * 2;
@@ -194,8 +194,7 @@ void CGraphic::Init()
     m_savedFrameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x88) u8[efbBufferSize];
     memset(m_savedFrameBuffer, 0, 4);
 
-    renderMode = m_renderMode;
-    u32 scratchBufferSize = (((renderMode->fbWidth + 0xF) & 0xFFF0) * renderMode->efbHeight * 2) + 0x46000;
+    u32 scratchBufferSize = (((m_renderMode->fbWidth + 0xF) & 0xFFF0) * m_renderMode->efbHeight * 2) + 0x46000;
     m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, graphicInitData + kGraphicInitSource, 0xB53, 0);
     memset(m_scratchTextureBuffer, 0, 0x46004);
 
@@ -212,10 +211,10 @@ void CGraphic::Init()
     GXSetDispCopyDst(m_renderMode->fbWidth, m_renderMode->efbHeight);
     GXSetCopyFilter(m_renderMode->aa, m_renderMode->sample_pattern, GX_TRUE, GXNtsc480IntDf.vfilter);
 
-    if (m_renderMode->aa == 0) {
-        GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
-    } else {
+    if (m_renderMode->aa != 0) {
         GXSetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
+    } else {
+        GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
     }
 
     GXSetDispCopySrc(0, 0, m_renderMode->fbWidth, m_renderMode->efbHeight);
@@ -225,7 +224,7 @@ void CGraphic::Init()
     VISetNextFrameBuffer(m_frameBuffer);
     VIFlush();
     VIWaitForRetrace();
-    if ((*reinterpret_cast<u32*>(renderMode) & 1) != 0) {
+    if ((*reinterpret_cast<u32*>(m_renderMode) & 1) != 0) {
         VIWaitForRetrace();
     }
 
@@ -494,7 +493,7 @@ void wakeup(OSAlarm* alarm, OSContext*)
  * Address:	TODO
  * Size:	TODO
  */
-void sleep()
+inline void sleep()
 {
 	// TODO
 }
@@ -874,7 +873,7 @@ void CGraphic::InitDebugString()
  * Address:	TODO
  * Size:	TODO
  */
-void GXSetTexCoordGen(void)
+inline void GXSetTexCoordGen(void)
 {
 	// TODO
 }
@@ -894,7 +893,7 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
         return;
     }
 
-    char* lineStart = text;
+    char* cursor = text;
 
     GXClearVtxDesc();
     GXSetVtxDesc((GXAttr)9, (GXAttrType)1);
@@ -906,7 +905,7 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
     while (true) {
         int ch;
         while (true) {
-            ch = *text++;
+            ch = *cursor++;
             if (ch < ' ' || ch > 0x7F) {
                 break;
             }
@@ -916,8 +915,8 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
         if (count > 0) {
             GXBegin((GXPrimitive)0x80, (GXVtxFmt)0, (u16)((count & 0x3FFF) << 2));
             for (int i = 0; i < count; i++) {
+                int glyph = text[i] - 0x20;
                 int px = x + i * charSize;
-                int glyph = lineStart[i] - 0x20;
                 int tx = (glyph % 8) * 16;
                 int ty = (glyph / 8) * 16;
 
@@ -927,13 +926,13 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
                 GXWGFifo.s16 = tx;
                 GXWGFifo.s16 = ty;
 
-                GXWGFifo.s16 = (s16)(px + charSize);
+                GXWGFifo.s16 = (s16)(charSize + px);
                 GXWGFifo.s16 = (s16)y;
                 GXWGFifo.s16 = 0;
                 GXWGFifo.s16 = (s16)(tx + 0x10);
                 GXWGFifo.s16 = ty;
 
-                GXWGFifo.s16 = (s16)(px + charSize);
+                GXWGFifo.s16 = (s16)(charSize + px);
                 GXWGFifo.s16 = (s16)(y + charSize);
                 GXWGFifo.s16 = 0;
                 GXWGFifo.s16 = (s16)(tx + 0x10);
@@ -948,7 +947,7 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
             count = 0;
         }
 
-        lineStart = text;
+        text = cursor;
         if (ch != '\n') {
             break;
         }
@@ -961,7 +960,7 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::SaveFrameBuffer(char*)
+inline void CGraphic::SaveFrameBuffer(char*)
 {
 	// TODO
 }
@@ -1068,6 +1067,9 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
+#pragma opt_strength_reduction off
 void CGraphic::makeSphere()
 {
     float vertices[126];
@@ -1075,21 +1077,23 @@ void CGraphic::makeSphere()
     int vertexCount = 0;
     vertices[0] = kGraphicSphereNegativeX;
     vertices[1] = kGraphicZeroF;
-    vertices[2] = kGraphicZeroF;
+    vertices[vertexCount * 3 + 2] = kGraphicZeroF;
 
     vertexCount++;
     float* vertex = &vertices[vertexCount * 3];
+    float* rowVertex;
 
     for (int ring = 0; ring < 5; ring++) {
         float pitch = (kGraphicSpherePi * (float)(ring + 1)) / kGraphicSphereRingDivisor;
         float x = kGraphicSphereNegativeX * (float)cos(pitch);
         float radius = kGraphicSphereNegativeX * (float)sin(pitch);
 
+        rowVertex = vertex;
         for (int seg = 0; seg < 8; seg++) {
-            int vertexIndex = vertexCount * 3;
-            vertex[0] = x;
-            vertex[1] = radius * (float)sin(kGraphicSphereSegmentAngle * (float)seg);
-            vertices[vertexIndex + 2] = radius * (float)cos(kGraphicSphereSegmentAngle * (float)seg);
+            rowVertex[0] = x;
+            rowVertex[1] = radius * (float)sin(kGraphicSphereSegmentAngle * (float)seg);
+            vertices[vertexCount * 3 + 2] = radius * (float)cos(kGraphicSphereSegmentAngle * (float)seg);
+            rowVertex += 3;
             vertex += 3;
             vertexCount++;
         }
@@ -1110,18 +1114,17 @@ void CGraphic::makeSphere()
     for (int ring = 0; ring < 5; ring++) {
         int current = ringStart;
         for (int seg = 0; seg < 8; seg += 2) {
-            int next0 = ringStart + ((seg + 1) % 8);
-            int next1 = ringStart + ((seg + 2) % 8);
-
             GXWGFifo.f32 = vertices[current * 3 + 1];
             GXWGFifo.f32 = vertices[current * 3 + 0];
             GXWGFifo.f32 = vertices[current * 3 + 2];
 
+            int next0 = ringStart + ((seg + 1) % 8);
             GXWGFifo.f32 = vertices[next0 * 3 + 1];
             GXWGFifo.f32 = vertices[next0 * 3 + 0];
             GXWGFifo.f32 = vertices[next0 * 3 + 2];
 
             current++;
+            int next1 = ringStart + ((seg + 2) % 8);
             GXWGFifo.f32 = vertices[current * 3 + 1];
             GXWGFifo.f32 = vertices[current * 3 + 0];
             GXWGFifo.f32 = vertices[current * 3 + 2];
@@ -1152,6 +1155,7 @@ void CGraphic::makeSphere()
             GXWGFifo.f32 = vertices[idx2 * 3 + 0];
             GXWGFifo.f32 = vertices[idx2 * 3 + 2];
 
+            ringPairBase += 8;
             ring++;
             int idx1 = ring == 0 ? 0 : (ring - 1) * 8 + seg + 1;
             GXWGFifo.f32 = vertices[idx1 * 3 + 1];
@@ -1160,20 +1164,20 @@ void CGraphic::makeSphere()
 
             int idx3 = 0x29;
             if (ring + 1 != 6) {
-                idx3 = seg + ringPairBase + 8;
+                idx3 = seg + ringPairBase;
             }
+            ringPairBase += 8;
+            ring++;
             GXWGFifo.f32 = vertices[idx3 * 3 + 1];
             GXWGFifo.f32 = vertices[idx3 * 3 + 0];
             GXWGFifo.f32 = vertices[idx3 * 3 + 2];
-
-            ringPairBase += 0x10;
-            ring++;
         }
     }
 
     m_sphereDisplayListSize = GXEndDisplayList();
     DCFlushRange(m_sphereDisplayList, m_sphereDisplayListSize);
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -2051,3 +2055,9 @@ void CGraphic::DestroyTempBuffer()
 		m_scratchTextureBuffer = nullptr;
 	}
 }
+
+extern const float kGraphicSmallBackTextureWidth = 320.0f;
+extern const float kGraphicSmallBackTextureHeight = 224.0f;
+extern const float kGraphicBlurAlphaScale = -100.0f;
+extern const float kGraphicNoiseTexScaleU = 0.015625f;
+extern const float kGraphicNoiseTexScaleV = 0.010416667163372f;

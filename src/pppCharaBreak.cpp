@@ -402,10 +402,10 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    float fVar1 = kPppCharaBreakZero;
+    const float& fVar1 = kPppCharaBreakZero;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
-    work->m_value2 = kPppCharaBreakZero;
+    work->m_value2 = fVar1;
     work->m_value1 = fVar1;
     work->m_value0 = fVar1;
     work->m_value5 = fVar1;
@@ -424,7 +424,7 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    float fVar1 = kPppCharaBreakZero;
+    const float& fVar1 = kPppCharaBreakZero;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
     work->m_meshBuffers = 0;

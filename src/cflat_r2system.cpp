@@ -2249,15 +2249,18 @@ renderedDone:
         const float pitch = localFloats[6];
         const float sinYaw = std::sinf(yaw);
         const float cosYaw = std::cosf(yaw);
-        CVector direction(
-            -(sinYaw * std::cosf(pitch)), -std::sinf(pitch), -(cosYaw * std::cosf(pitch)));
+        const float x = sinYaw * std::cosf(pitch);
+        const float y = std::sinf(pitch);
+        const float z = cosYaw * std::cosf(pitch);
+        CVector direction(-x, -y, -z);
+        Vec* directionPtr = direction;
         CColor color(
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
             static_cast<u8>(object->m_localBase[4]),
             0xFF);
 
-        CharaPcs.SetDiffuse(*object->m_localBase, object->m_localBase[1], color, direction);
+        CharaPcs.SetDiffuse(*object->m_localBase, object->m_localBase[1], color, directionPtr);
         this->push(object, 0);
         outResult = 0;
         break;

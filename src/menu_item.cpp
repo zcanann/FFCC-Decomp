@@ -195,7 +195,7 @@ int CMenuPcs::ItemCtrlCur()
                 }
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
             } else if ((press & 0x100) != 0) {
-                int idx = this->m_itemMenuState->scroll + this->m_itemMenuState->cursorIndex[mode];
+                unsigned int idx = this->m_itemMenuState->scroll + this->m_itemMenuState->cursorIndex[mode];
                 if (idx >= 0x40) {
                     idx -= 0x40;
                 }
@@ -314,7 +314,7 @@ void CMenuPcs::ItemDraw()
     s16 mode = this->m_itemMenuState->mode;
     ItemMenuAnimList* itemList = this->m_itemList;
     MenuItemOpenAnim* entry = itemList->anims;
-    int drawIndex = 0;
+    unsigned int drawIndex = 0;
     bool hasLetterAttach = SingGetLetterAttachflg() >= 0;
 
     for (int i = 0; i < this->m_itemList->count; i++, entry++) {

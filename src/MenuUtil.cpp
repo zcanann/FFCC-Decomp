@@ -319,6 +319,23 @@ static inline unsigned short GetMenuPress()
 	return Pad.GetPadInputs()[padIndex].buttonDown[0];
 }
 
+static inline unsigned short GetMenuPressLock(int lock)
+{
+	bool activeInput = false;
+
+	if ((lock != 0) || (Pad.m_debugPadPort != -1)) {
+		activeInput = true;
+	}
+
+	if (activeInput) {
+		return 0;
+	}
+
+	int padIndex = 0;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	return Pad.GetPadInputs()[padIndex].buttonDown[0];
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -1015,8 +1032,9 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (m_optionIndex == 4) {
+		int lock = Pad.m_debugPadLock;
 		unsigned short press3;
-		press3 = GetMenuPress();
+		press3 = GetMenuPressLock(lock);
 
 		if ((press3 & 0x100) != 0) {
 			if (m_specialModeEdit == 0) {
@@ -1024,36 +1042,31 @@ void CMenuPcs::CalcOptionMenu()
 				m_specialModeEdit = 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			}
-		} else if (m_specialModeEdit != 0) {
-			unsigned short press4;
-			press4 = GetMenuPress();
+		} else if ((m_specialModeEdit != 0) && ((GetMenuPressLock(lock) & 0x200) != 0)) {
+			m_specialModeCursor = 0;
+			m_specialModeEdit = 0;
+			Sound.PlaySe(3, 0x40, 0x7F, 0);
 
-			if ((press4 & 0x200) != 0) {
-				m_specialModeCursor = 0;
-				m_specialModeEdit = 0;
-				Sound.PlaySe(3, 0x40, 0x7F, 0);
-
-				Game.m_gameWork.m_spModeFlags[0] =
-				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[0])) >> 5);
-				Game.m_gameWork.m_spModeFlags[1] =
-				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[1])) >> 5);
-				Game.m_gameWork.m_spModeFlags[2] =
-				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[2])) >> 5);
-				Game.m_gameWork.m_spModeFlags[3] =
-				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[3])) >> 5);
-			} else if ((m_specialModeEdit != 0) && ((press & 8) != 0)) {
-				m_specialModeCursor--;
-				if (m_specialModeCursor < 0) {
-					m_specialModeCursor = 3;
-				}
-				Sound.PlaySe(1, 0x40, 0x7F, 0);
-			} else if ((m_specialModeEdit != 0) && ((press & 4) != 0)) {
-				m_specialModeCursor++;
-				if (m_specialModeCursor > 3) {
-					m_specialModeCursor = 0;
-				}
-				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			Game.m_gameWork.m_spModeFlags[0] =
+			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[0])) >> 5);
+			Game.m_gameWork.m_spModeFlags[1] =
+			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[1])) >> 5);
+			Game.m_gameWork.m_spModeFlags[2] =
+			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[2])) >> 5);
+			Game.m_gameWork.m_spModeFlags[3] =
+			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[3])) >> 5);
+		} else if ((m_specialModeEdit != 0) && ((press & 8) != 0)) {
+			m_specialModeCursor--;
+			if (m_specialModeCursor < 0) {
+				m_specialModeCursor = 3;
 			}
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
+		} else if ((m_specialModeEdit != 0) && ((press & 4) != 0)) {
+			m_specialModeCursor++;
+			if (m_specialModeCursor > 3) {
+				m_specialModeCursor = 0;
+			}
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}
 	}
 

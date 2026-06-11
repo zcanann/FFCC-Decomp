@@ -5188,6 +5188,7 @@ void CMenuPcs::DrawLoadMenu()
 	}
 
 	short state = m_wmWorldState->m_mainState;
+	float cursorXbase;
 	float alpha;
 	if (state > 0 && state < 4) {
 		double raw;
@@ -5241,8 +5242,11 @@ void CMenuPcs::DrawLoadMenu()
 	// Cursor / selection rendering
 	state = m_wmWorldState->m_mainState;
 	if (state == 2 && m_wmWorldState->m_subState >= 0x11) {
-		float cursorY0 = static_cast<float>(static_cast<double>(FLOAT_803314d8) - DOUBLE_803317D8);
-		float cursorXbase = FLOAT_803314d8 + FLOAT_80331410;
+		float cursorY0;
+		cursorY0 = FLOAT_803314d8;
+		cursorXbase = cursorY0;
+		cursorY0 = static_cast<float>(static_cast<double>(cursorY0) - DOUBLE_803317D8);
+		cursorXbase = cursorXbase + FLOAT_80331410;
 		unsigned int saveIdx;
 		if (m_wmWorldState->m_subState == 0x11) {
 			saveIdx = static_cast<unsigned int>(m_wmWorldState->m_cardChannel);
@@ -5252,7 +5256,7 @@ void CMenuPcs::DrawLoadMenu()
 		double rawIdx;
 		reinterpret_cast<int*>(&rawIdx)[0] = 0x43300000;
 		reinterpret_cast<int*>(&rawIdx)[1] = saveIdx ^ 0x80000000;
-		float cursorY1 = static_cast<float>(DOUBLE_80331498 * (rawIdx - DOUBLE_80331408) + static_cast<double>(cursorXbase));
+		cursorXbase = static_cast<float>(DOUBLE_80331498 * (rawIdx - DOUBLE_80331408) + static_cast<double>(cursorXbase));
 		MenuPcs.SetAttrFmt((FMT)0);
 		_GXColor cursorColor;
 		cursorColor.r = 0xFF;
@@ -5261,7 +5265,7 @@ void CMenuPcs::DrawLoadMenu()
 		cursorColor.a = 0xFF;
 		GXSetChanMatColor(GX_COLOR0A0, cursorColor);
 		MenuPcs.SetTexture((TEX)0);
-		MenuPcs.DrawRect(0, (float)(int)cursorY0, (float)(int)cursorY1,
+		MenuPcs.DrawRect(0, (float)(int)cursorY0, (float)(int)cursorXbase,
 		         FLOAT_80331410, FLOAT_80331410,
 		         FLOAT_803313dc, FLOAT_803313dc,
 		         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
@@ -5278,10 +5282,10 @@ void CMenuPcs::DrawLoadMenu()
 				GXSetProjection(projMtx, GX_PERSPECTIVE);
 				PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
 
-				CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-				CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 				Mtx lookAtMtx;
-				C_MTXLookAt(lookAtMtx, (Vec*)(slot + 0x10), (Vec*)&up, (Vec*)&target);
+				C_MTXLookAt(lookAtMtx, (Vec*)(slot + 0x10),
+				            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+				            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
 				PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(m_wm.m_pad744));
 				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 				CharaPcs.InitEnv(5);
@@ -5333,8 +5337,8 @@ void CMenuPcs::DrawLoadMenu()
 
 	// State machine for MC operations
 	state = m_wmWorldState->m_mainState;
-	short subState = m_wmWorldState->m_subState;
 	if (state == 2 && m_wmWorldState->m_delay == 0) {
+		short subState = m_wmWorldState->m_subState;
 		short winState;
 		switch ((int)subState) {
 		case 0:

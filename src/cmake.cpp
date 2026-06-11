@@ -2556,17 +2556,16 @@ void CMenuPcs::CmakeNameDraw()
         DrawCursor(cursorLeft, CmakeState(this)->m_row * 0x20 + 0x70, 1.0f);
     }
 
-    char* name = GetCmakeNameBuffer();
     int nameCursor = static_cast<int>(
         static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(1 - CmakeState(this)->m_mode))) >> 5);
     if (CmakeState(this)->m_row >= 5) {
         nameCursor = 0;
     }
-    unsigned int nameLen = strlen(name);
+    unsigned int nameLen = strlen(s_CmakeInfo.m_name);
     if (static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31)) >= 7) {
         nameCursor = 0;
     }
-    DrawCmakeName(0, nameCursor, name, alpha);
+    DrawCmakeName(0, nameCursor, s_CmakeInfo.m_name, alpha);
     DrawCmakeDecision((CmakeState(this)->m_row >= 5) ? 1 : 0, alpha);
 
     if (CmakeMcState(this) != 3) {

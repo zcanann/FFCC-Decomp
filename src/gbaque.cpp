@@ -2125,26 +2125,20 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 unsigned int GbaQueue::GetScrFlg()
 {
 	int i;
-	OSSemaphore* semaphoreIter;
 	unsigned int flag;
 
 	i = 0;
-	semaphoreIter = accessSemaphores;
 	do {
-		OSWaitSemaphore(semaphoreIter);
+		OSWaitSemaphore(accessSemaphores + i);
 		i++;
-		semaphoreIter++;
 	} while (i < 4);
 
 	flag = m_scrInitEnd;
-	flag = (-flag | flag) >> 31;
-
 	i = 0;
-	semaphoreIter = accessSemaphores;
+	flag = (-flag | flag) >> 31;
 	do {
-		OSSignalSemaphore(semaphoreIter);
+		OSSignalSemaphore(accessSemaphores + i);
 		i++;
-		semaphoreIter++;
 	} while (i < 4);
 
 	return flag;
@@ -3034,7 +3028,8 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 	}
 
 	crc[0] = 0xFFFF;
-	if (Joybus.Crc16(0x10, reinterpret_cast<unsigned char*>(localInfo.m_name), crc) != localInfo.m_crc) {
+	const unsigned short crcValue = Joybus.Crc16(0x10, reinterpret_cast<unsigned char*>(localInfo.m_name), crc);
+	if (crcValue != localInfo.m_crc) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(s_cmake_name_crc_error), const_cast<char*>(s_gbaque_cpp), 0xAD3);
 		}
@@ -3289,7 +3284,8 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 	}
 
 	unsigned short crc = 0xFFFF;
-	if (Joybus.Crc16(4, localInfo.m_favorite, &crc) != localInfo.m_crc) {
+	const unsigned short crcValue = Joybus.Crc16(4, localInfo.m_favorite, &crc);
+	if (crcValue != localInfo.m_crc) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 System.Printf(const_cast<char*>(s_cmake_favorite_crc_error), const_cast<char*>(s_gbaque_cpp), 0xBDC);
 		}
@@ -3463,7 +3459,8 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
 		if (MenuPcs.GetItemType(itemId, 1) == 1) {
 		const int iconMask = localPlayerData[2] & 3;
-		if (MenuPcs.GetItemIcon(itemId) == iconMask) {
+		const int icon = MenuPcs.GetItemIcon(itemId);
+		if (icon == iconMask) {
 			int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 
 			cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);

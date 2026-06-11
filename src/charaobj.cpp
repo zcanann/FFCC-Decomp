@@ -2750,10 +2750,11 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 {
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (itemId * 0x48);
 
-	int isNormal = 0;
+	int normFlag = 0;
 	if ((*reinterpret_cast<unsigned short*>(itemData + 0x32) & 1) != 0 || forceNormal != 0) {
-		isNormal = 1;
+		normFlag = 1;
 	}
+	unsigned char isNormal = normFlag;
 
 	outA = 3;
 	switch (staIndex) {

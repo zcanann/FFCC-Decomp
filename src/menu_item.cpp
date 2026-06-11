@@ -323,8 +323,8 @@ void CMenuPcs::ItemDraw()
     int hasLetterAttach = (SingGetLetterAttachflg() >= 0) ? 1 : 0;
 
     for (int i = 0; i < this->m_itemList->count; i++, entry++) {
-        int tex = entry->tex;
-        if (tex < 0) {
+        int texCheck = entry->tex;
+        if (texCheck < 0) {
             continue;
         }
 
@@ -383,6 +383,7 @@ void CMenuPcs::ItemDraw()
 
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         } else {
+            int tex = texCheck;
             float itemAlpha = entry->alpha;
             if (tex == 0x37) {
                 int menuIndex = drawIndex + this->m_itemMenuState->scroll;
@@ -443,8 +444,7 @@ void CMenuPcs::ItemDraw()
             menuIndex -= 0x40;
         }
 
-        CColor textColor(0xFF, 0xFF, 0xFF, (u8)(colorMax * entry->alpha));
-        listFont->SetColor(textColor.color);
+        listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(colorMax * entry->alpha)).color);
 
         s16 itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
@@ -533,11 +533,11 @@ void CMenuPcs::ItemDraw()
     DrawSingLife();
 
     CFont* helpFont = this->m_fonts[0];
-    s8 helpAlpha = (s8)(LoadFloat(kItemColorMax) * entry->alpha);
+    s8 helpAlpha = (s8)(entry->alpha * LoadFloat(kItemColorMax));
     if (!foundSelected) {
         selectedItemId = -1;
     }
-    CColor helpColor(0xFF, 0xFF, 0xFF, helpAlpha);
+    GXColor helpColor = CColor(0xFF, 0xFF, 0xFF, helpAlpha).color;
     int helpX = (int)(LoadFloat(kItemHelpCenterX) - LoadFloat(kItemHalf) * w);
     int helpY = (int)LoadFloat(kItemHelpY);
     DrawHelpMessage(
@@ -545,7 +545,7 @@ void CMenuPcs::ItemDraw()
         helpFont,
         helpX,
         helpY,
-        helpColor.color,
+        helpColor,
         10,
         LoadFloat(kItemOne),
         LoadFloat(kItemHelpScale));

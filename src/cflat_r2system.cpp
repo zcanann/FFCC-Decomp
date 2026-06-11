@@ -70,6 +70,8 @@ extern const float FLOAT_80330B44;
 extern const float FLOAT_80330B48;
 extern const float FLOAT_80330B4C;
 extern const float FLOAT_80330B5C;
+extern const float FLOAT_80330B88;
+extern const float FLOAT_80330B8C;
 extern const float FLOAT_80330B90;
 extern const float FLOAT_80330BC0;
 extern const float kCFlatHalfPi;
@@ -3982,14 +3984,15 @@ renderedDone:
             Graphic.GetBackBufferRect2(
                 Graphic.GetTmpFrameBuffer(), 0, 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGB565, 0);
         } else {
-            CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(object->m_localBase[1]));
-
             GXInitTexObj(
-                &backTexObj, Graphic.GetTmpFrameBuffer(), 0x280, 0x1C0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP,
+                &backTexObj, Graphic.GetTmpFrameBuffer(), 0x280, 0x1C0, GX_TF_RGB565, GX_CLAMP, GX_CLAMP,
                 GX_FALSE);
-            GXInitTexObjLOD(&backTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+            GXInitTexObjLOD(&backTexObj, GX_NEAR, GX_NEAR, kCFlatPadStickZero, kCFlatPadStickZero,
+                kCFlatPadStickZero, GX_FALSE, GX_FALSE, GX_ANISO_1);
             gUtil.RenderTextureQuad(
-                0.0f, 0.0f, 640.0f, 448.0f, &backTexObj, 0, 0, color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+                kCFlatPadStickZero, kCFlatPadStickZero, FLOAT_80330B88, FLOAT_80330B8C, &backTexObj, 0, 0,
+                CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(object->m_localBase[1])),
+                GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
         }
         this->push(object, 0);
         outResult = 0;

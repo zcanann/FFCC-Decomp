@@ -2915,10 +2915,9 @@ unsigned int CMenuPcs::CmdClose2()
 
 			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])
 			    ->UnuniteComList(closeSel, ununiteCount);
-			const s16 uniteCount = GetUniteRecipeCount(combo[comboIdx][0]);
-			const s16 uniteCmd = GetUniteRecipeCmd(combo[comboIdx][0]);
+			const int recipe = combo[comboIdx][0];
 			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->UniteComList(
-			    comboSel[comboIdx * 2], uniteCount, uniteCmd);
+			    comboSel[comboIdx * 2], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
 			GetCmdStateView(this)->selected = static_cast<s16>(comboSel[comboIdx * 2]);
 			GetCmdStateView(this)->uniteState = 2;
 		}
@@ -2935,11 +2934,9 @@ unsigned int CMenuPcs::CmdClose2()
 				comboIdx = (!(modeSel == static_cast<u32>(comboSel[2]))) ? 0 : 1;
 			}
 
-			const s16 uniteCount = GetUniteRecipeCount(combo[comboIdx][0]);
-			int __p6 = comboIdx;
-			const s16 uniteCmd = GetUniteRecipeCmd(combo[__p6][0]);
+			const int recipe = combo[comboIdx][0];
 			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->UniteComList(
-				comboSel[comboIdx * 2], uniteCount, uniteCmd);
+				comboSel[comboIdx * 2], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
 			GetCmdStateView(this)->selected = static_cast<s16>(comboSel[comboIdx * 2]);
 		} else if (UniteOpenAnim(-1) != 0) {
 			GetCmdStateView(this)->uniteState = 3;

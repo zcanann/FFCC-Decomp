@@ -63,7 +63,7 @@ struct YmMiasmaRenderParticleState {
 
 void InitParticleData(VYmMiasma*, _pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 void UpdateParticleData(_pppPObject*, _pppCtrlTable*, PYmMiasma*, PARTICLE_DATA*);
-inline void RenderParticle(_pppPObject*, PYmMiasma*, PARTICLE_DATA*);
+void RenderParticle(_pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 
 STATIC_ASSERT(sizeof(YmMiasmaDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(YmMiasmaDataOffsets, m_workOffset) == 0x8);
@@ -78,16 +78,7 @@ static inline VYmMiasma* YmMiasmaWork(_pppPObject* object, _pppCtrlTable* ctrl)
     return reinterpret_cast<VYmMiasma*>(object->m_workArea + GetYmMiasmaDataOffsets(ctrl)->m_workOffset);
 }
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 656b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
+static inline void RenderParticleInline(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
     YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
     YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)pYmMiasma;
@@ -159,7 +150,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _ppp
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     for (i = 0; i < (int)step->m_particleCount; i++) {
-        RenderParticle(pppYmMiasma_, (PYmMiasma*)step, particleData);
+        RenderParticleInline(pppYmMiasma_, (PYmMiasma*)step, particleData);
         particleData++;
     }
 }
@@ -332,6 +323,21 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
     work->m_prevPosition.x = fVar2;
     work->m_prevPositionChanged = 0;
 }
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 656b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
+{
+    RenderParticleInline(pppPObject, pYmMiasma, particleData);
+}
+#pragma force_active RenderParticle
 
 /*
  * --INFO--

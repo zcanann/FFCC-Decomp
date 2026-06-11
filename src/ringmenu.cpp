@@ -226,7 +226,7 @@ void CRingMenu::DrawIcon()
 	float u = static_cast<float>(uInt);
 	float v = static_cast<float>(vInt);
 	MenuPcs.DrawRect(3, static_cast<float>(posX), static_cast<float>(posY), kRingMenuMarkerSize,
-	                                 kRingMenuMarkerSize, u, v, kRingMenuMarkerUvScale, kRingMenuMarkerUvScale, angle);
+	                                 kRingMenuMarkerSize, u, v, kRingMenuMarkerUvScale, kRingMenuMarkerUvScale, kRingMenuZero);
 }
 
 /*

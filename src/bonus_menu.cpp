@@ -2927,21 +2927,22 @@ void CMenuPcs::DrawResultCountAnim()
 			font->SetColor(color.color);
 
 			int partyIndex = textIndex % activePartyCount;
-			CCaravanWork* caravanWork =
-			    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[s_Rinfo->m_party[partyIndex].m_partySlot]);
+			int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;
 			if (textIndex < activePartyCount) {
+				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
 				strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 			} else {
+				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
 				strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[(int)caravanWork->m_bonusCondition * 2 + 1]);
 			}
 
-			float y = (float)sprite->y + sprite->motionY;
 			float x = (float)sprite->x + sprite->motionX;
+			float y = (float)sprite->y + sprite->motionY;
 			if (textIndex < activePartyCount) {
-				y -= 6.0f;
+				y -= FLOAT_80331F3C;
 			}
 			font->SetPosX(x);
-			font->SetPosY(y - 6.0f);
+			font->SetPosY(y - FLOAT_80331F3C);
 			font->Draw(text);
 
 			textIndex++;

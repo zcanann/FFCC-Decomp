@@ -1249,9 +1249,8 @@ int CMemoryCardMan::DummySave()
 void CMemoryCardMan::SetLoadData()
 {
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
-    Mc::SaveDat* saveDat = GetSaveDat(save);
 
-    if (memcmp(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
+    if (memcmp(GetSaveDat(save)->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1259,7 +1258,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(saveDat->m_title, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE)) != 0)
+    if (memcmp(GetSaveDat(save)->m_title, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1267,7 +1266,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(saveDat->m_machine, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE)) != 0)
+    if (memcmp(GetSaveDat(save)->m_machine, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1275,7 +1274,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(saveDat->m_version, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION)) != 0)
+    if (memcmp(GetSaveDat(save)->m_version, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1283,7 +1282,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (saveDat->m_region != 'E')
+    if (GetSaveDat(save)->m_region != 'E')
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {

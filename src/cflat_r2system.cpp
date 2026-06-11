@@ -2201,7 +2201,7 @@ renderedDone:
         break;
     }
     case -0x1C:
-        RuntimeDebugFlags(this) = *object->m_localBase;
+        m_debugFlags = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
         break;

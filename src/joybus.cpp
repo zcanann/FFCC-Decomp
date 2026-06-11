@@ -3145,8 +3145,9 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
             extern const unsigned int kJoyBusCmdOpMask;
             int newCount = 0;
+            int i;
 
-            for (int i = 0; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
+            for (i = newCount; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
             {
                 unsigned char op = (unsigned char)(*(unsigned char*)&m_cmdQueueData[threadParam->m_portIndex][i] & kJoyBusCmdOpMask);
 
@@ -3157,7 +3158,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                 }
             }
 
-            for (int i = 0; i < 0x20; ++i)
+            for (i = 0; i < 0x20; ++i)
             {
                 if (i < newCount)
                 {
@@ -3188,8 +3189,9 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
             extern const unsigned int kJoyBusCmdOpMask;
             int newCount = 0;
+            int i;
 
-            for (int i = 0; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
+            for (i = newCount; i < (int)m_cmdCount[threadParam->m_portIndex]; ++i)
             {
                 unsigned char op = (unsigned char)(*(unsigned char*)&m_cmdQueueData[threadParam->m_portIndex][i] & kJoyBusCmdOpMask);
 
@@ -3200,7 +3202,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                 }
             }
 
-            for (int i = 0; i < 0x20; ++i)
+            for (i = 0; i < 0x20; ++i)
             {
                 if (i < newCount)
                 {

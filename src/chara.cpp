@@ -1214,8 +1214,10 @@ void CChara::CModel::setup()
 
 	CCharaMeshRaw* meshRaw = ModelMeshes(this);
 	for (u32 i = 0; i < ModelRef(this)->m_meshCount; i++, meshRaw++) {
-		int skinOffset = 0;
-		for (u32 j = 0; j < meshRaw->m_data->m_skinCount; j++) {
+		int skinOffset;
+		u32 j = 0;
+		skinOffset = 0;
+		for (; j < meshRaw->m_data->m_skinCount; j++) {
 			u8* skin = reinterpret_cast<u8*>(meshRaw->m_data->m_skins) + skinOffset;
 			u32 skinNodeIndex = *reinterpret_cast<u32*>(skin + 0x60);
 			PSMTXInverse(NodeRefBindMtx(&ModelNodes(this)[skinNodeIndex]), reinterpret_cast<MtxPtr>(skin + 0x30));

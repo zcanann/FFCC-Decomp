@@ -2344,11 +2344,11 @@ void CGPartyObj::statCharge()
 			if (item == 0x1FC || item == 0x23D) {
 				int base;
 				switch (item) {
-				case 0x23D:
-					base = 0x6F;
-					break;
 				case 0x1FC:
 					base = 0x1B;
+					break;
+				case 0x23D:
+					base = 0x6F;
 					break;
 				}
 				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) > 1) {

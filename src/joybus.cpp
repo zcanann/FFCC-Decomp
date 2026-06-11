@@ -5133,9 +5133,10 @@ void JoyBus::GetRecvBuffer(int playerIndex, unsigned char* outBuffer)
  */
 int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
 {
+    unsigned int cmd = 0;
+
     ResetQueue(threadParam);
 
-    unsigned int cmd = 0;
     unsigned int cmd0 = 0;
     unsigned char* cmd0Bytes = reinterpret_cast<unsigned char*>(&cmd0);
     cmd0Bytes[0] = 0x10;

@@ -1386,8 +1386,9 @@ void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt& src)
 #pragma opt_propagation off
 void CMenuPcs::InitCharaInfo()
 {
-	float z = FLOAT_803314a4;
-	float zero = FLOAT_803313dc;
+	float z;
+	float zero;
+	int slot;
 	int baseX;
 	int baseSlot;
 	int baseY;
@@ -1395,14 +1396,16 @@ void CMenuPcs::InitCharaInfo()
 	int col;
 	int y;
 
+	zero = FLOAT_803313dc;
+	z = FLOAT_803314a4;
 	row = 0;
 	baseSlot = 0x20;
 	baseY = 0x66;
 	while (row < 2) {
-		int slot =  (baseSlot + 0);
+		slot = (baseSlot + 0);
 		col = 0;
 		baseX = 0x68;
-		for (; col < 2; col++) {
+		for (; col < 4; col++) {
 			int __p15 = slot;
 			int slotOffset = __p15 * 0x50;
 			y = baseY;
@@ -1418,21 +1421,8 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x14) = zero;
 			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x18) = z;
 
-			y = baseY;
-			if (row != 0) {
-				y = baseY + 8;
-			}
-
-			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0x58) = static_cast<short>(baseX - 0x10);
-			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0x5A) = static_cast<short>(y - 0x70);
-			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0x5C) = 0x140;
-			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0x5E) = 0xE0;
-			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x60) = zero;
-			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x64) = zero;
-			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x68) = z;
-
-			slot += 2;
-			baseX = baseX + 0x120;
+			slot += 1;
+			baseX = baseX + 0x90;
 		}
 		row++;
 		baseSlot += 4;
@@ -1443,7 +1433,7 @@ void CMenuPcs::InitCharaInfo()
 	int i = 0;
 	int modelOffset = 0;
 	unsigned int invalidModel = 0xFFFFFFFF;
-	for (; i < 4; i++) {
+	for (; i < 8; i++) {
 		unsigned char* src0 = gameData + 0x13F0;
 		unsigned char* entry0 = m_wm.m_charaModelData + modelOffset;
 		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
@@ -1456,22 +1446,6 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<unsigned int*>(entry0 + 8) = modelNo + add0;
 		} else {
 			*reinterpret_cast<unsigned int*>(entry0 + 8) = invalidModel;
-		}
-
-		gameData += 0xC30;
-		modelOffset += 0x34;
-		unsigned char* src1 = gameData + 0x13F0;
-		unsigned char* entry1 = m_wm.m_charaModelData + modelOffset;
-		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
-			int modelNo = *reinterpret_cast<unsigned short*>(src1 + 0x3E0) * 200 + 100;
-			int flag1 = *reinterpret_cast<unsigned short*>(src1 + 0x3E2);
-			unsigned short add1  = *reinterpret_cast<unsigned short*>(src1 + 0x3E4);
-			if (flag1 != 0) {
-				modelNo += 100;
-			}
-			*reinterpret_cast<unsigned int*>(entry1 + 8) = modelNo + add1;
-		} else {
-			*reinterpret_cast<unsigned int*>(entry1 + 8) = invalidModel;
 		}
 
 		gameData += 0xC30;
@@ -4126,6 +4100,8 @@ void CMenuPcs::drawWorld()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
+#pragma opt_lifetimes off
 void CMenuPcs::DrawMainMenu()
 {
 	extern double DOUBLE_803314E8;
@@ -4135,7 +4111,7 @@ void CMenuPcs::DrawMainMenu()
 	extern float FLOAT_803316D0;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	const short state = m_wmWorldState->m_mainState;
+	short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
 		frameAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
@@ -4154,7 +4130,7 @@ void CMenuPcs::DrawMainMenu()
 	GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	int bit = 0;
-	int offset = bit;
+	int offset = 0;
 	do {
 		if (((1 << bit) & 1) != 0) {
 			short* const entry = reinterpret_cast<short*>(m_wm.m_frameInfo + offset + 4);
@@ -4186,15 +4162,17 @@ void CMenuPcs::DrawMainMenu()
 		tileColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(tileAlpha)));
 		GXSetChanMatColor(static_cast<GXChannelID>(4), tileColor);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x33));
-		float y = FLOAT_80331440 - FLOAT_80331410;
-		MenuPcs.DrawRect(0, FLOAT_80331410, y, FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
+		float x = FLOAT_80331410;
+		float y = FLOAT_80331440;
+		y = y - x;
+		MenuPcs.DrawRect(0, x, y, FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
 		                 FLOAT_803313e8, FLOAT_803313dc);
-		MenuPcs.DrawRect(8, FLOAT_80331410 + FLOAT_803316D0, y,
+		MenuPcs.DrawRect(8, x + FLOAT_803316D0, y,
 		                 FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		y = y + FLOAT_80331500;
-		MenuPcs.DrawRect(4, FLOAT_80331410, y, FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
+		MenuPcs.DrawRect(4, x, y, FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
 		                 FLOAT_803313e8, FLOAT_803313dc);
-		MenuPcs.DrawRect(0xC, FLOAT_80331410 + FLOAT_803316D0, y,
+		MenuPcs.DrawRect(0xC, x + FLOAT_803316D0, y,
 		                 FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
@@ -4232,12 +4210,19 @@ void CMenuPcs::DrawMainMenu()
 			                 FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 			char* textList[5] = { 0, 0, 0, 0, 0 };
-			const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
+			const int languageIndex = Game.m_gameWork.m_languageId - 1;
 			unsigned int ti;
-			char** const langText = &lbl_80210750[languageIndex];
-			for (ti = 0; ti < 5; ti++) {
-				textList[ti] = langText[ti];
-			}
+			char** const langText = &lbl_80210750[languageIndex * 0x0B];
+			ti = 0;
+			textList[0] = langText[ti];
+			ti = 1;
+			textList[1] = langText[ti];
+			ti = 2;
+			textList[2] = langText[ti];
+			ti = 3;
+			textList[3] = langText[ti];
+			ti = 4;
+			textList[4] = langText[ti];
 			unsigned int textAlpha;
 			if (helpAlpha > FLOAT_803313e8) {
 				textAlpha = 0xFF;
@@ -4273,6 +4258,8 @@ void CMenuPcs::DrawMainMenu()
 		}
 	}
 }
+#pragma opt_lifetimes on
+#pragma opt_propagation on
 
 /*
  * --INFO--
@@ -4845,16 +4832,17 @@ void CMenuPcs::DrawMCardMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_loop_invariants off
-#pragma opt_strength_reduction off
+#pragma opt_propagation off
+#pragma opt_lifetimes off
 void CMenuPcs::DrawCMakeMenu()
 {
 	extern double DOUBLE_803314E8;
 	extern double DOUBLE_803313F8;
 	extern double DOUBLE_803314D0;
+	unsigned int ti;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	const short state = m_wmWorldState->m_mainState;
+	short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
 		frameAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
@@ -4890,7 +4878,7 @@ void CMenuPcs::DrawCMakeMenu()
 		byteOffset += 0x1C;
 	} while (bit < 2);
 
-	const short contentState = m_wmWorldState->m_mainState;
+	short contentState = m_wmWorldState->m_mainState;
 	if (contentState > 0 && contentState < 4) {
 		float contentAlpha;
 		if (contentState == 1) {
@@ -4948,9 +4936,12 @@ void CMenuPcs::DrawCMakeMenu()
 			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
 			char* textList[3] = { 0, 0, 0 };
 			char** const langText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
-			textList[0] = langText[5];
-			textList[1] = langText[6];
-			textList[2] = langText[7];
+			ti = 5;
+			textList[0] = langText[ti];
+			ti = 6;
+			textList[1] = langText[ti];
+			ti = 7;
+			textList[2] = langText[ti];
 			const _GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 			char* const text = textList[textIndex];
 			const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
@@ -4963,7 +4954,9 @@ void CMenuPcs::DrawCMakeMenu()
 			case 2:
 				switch (*(reinterpret_cast<char*>(g_pGoOutMenu) + 0x18)) {
 				case 0x0E: {
-					char* const text = lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B + 8];
+					char** const caseText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
+				unsigned int ci = 8;
+				char* const text = caseText[ci];
 					const _GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
 					MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
@@ -4971,7 +4964,9 @@ void CMenuPcs::DrawCMakeMenu()
 					break;
 				}
 				case 0x0F: {
-					char* const text = lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B + 9];
+					char** const caseText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
+				unsigned int ci = 9;
+				char* const text = caseText[ci];
 					const _GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
 					MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
@@ -4983,7 +4978,9 @@ void CMenuPcs::DrawCMakeMenu()
 			case 3:
 				switch (*(reinterpret_cast<char*>(g_pGoOutMenu) + 0x24)) {
 				case 2: {
-					char* const text = lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B + 10];
+					char** const caseText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
+				unsigned int ci = 10;
+				char* const text = caseText[ci];
 					const _GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
 					MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
@@ -5018,8 +5015,8 @@ void CMenuPcs::DrawCMakeMenu()
 	}
 }
 
-#pragma opt_strength_reduction on
-#pragma opt_loop_invariants on
+#pragma opt_lifetimes on
+#pragma opt_propagation on
 /*
  * --INFO--
  * PAL Address: 0x800f9248

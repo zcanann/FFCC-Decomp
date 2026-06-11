@@ -579,15 +579,14 @@ void CMenuPcs::CmdInit2()
 		entry->duration = 5;
 	}
 
-	CmdListStorage* list = GetCmdListStorage(this);
-	CmdListEntry* entries = list->entries;
-	const s16 start = list->count;
-	list->listEnd = start + 0xc;
+	GetCmdListStorage(this)->listEnd = static_cast<s16>(i);
 
-	const u32 count = static_cast<u32>(static_cast<s32>(list->listEnd) - static_cast<s32>(list->count));
-	CmdListEntry* fillEntry = &entries[list->count];
+	CmdListStorage* list = GetCmdListStorage(this);
+	s32 k = list->count;
+	CmdListEntry* fillEntry = &list->entries[k];
 	const float alpha = kCmdMenuOne;
-	for (u32 k = count; k != 0; k--) {
+	k = static_cast<s32>(list->listEnd) - k;
+	for (; k > 0; k--) {
 		fillEntry->timer = 0;
 		fillEntry->alpha = alpha;
 		fillEntry++;
@@ -1735,15 +1734,15 @@ unsigned int CMenuPcs::CmdOpen0()
 {
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 	const s32 timer = static_cast<s32>(GetCmdStateView(this)->transitionTimer);
-	CmdListEntry* entries = GetCmdListStorage(this)->entries;
 	const s32 sel = GetCmdStateView(this)->selected;
+	CmdListEntry* selEntry = &GetCmdListStorage(this)->entries[sel];
 	if (timer < 5) {
-		entries[sel].x = static_cast<s16>(entries[sel].x - 0x13);
+		selEntry->x = static_cast<s16>(selEntry->x - 0x13);
 	}
 
+	CmdListEntry* entry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
 	s32 doneCount = 0;
 	s32 entryCount = static_cast<s32>(GetCmdListStorage(this)->listEnd) - static_cast<s32>(GetCmdListStorage(this)->count);
-	CmdListEntry* entry = &entries[GetCmdListStorage(this)->count];
 	const float fVar1 = kCmdMenuZero;
 
 	for (s32 i = 0; i < entryCount; i++) {
@@ -1755,9 +1754,8 @@ unsigned int CMenuPcs::CmdOpen0()
 				entry->dy = fVar1;
 			} else {
 				entry->timer++;
-				entry->alpha = static_cast<float>(
-					(kCmdMenuOneD / static_cast<double>(entry->duration)) *
-					static_cast<double>(entry->timer));
+				const double step = kCmdMenuOneD / static_cast<double>(entry->duration);
+				entry->alpha = static_cast<float>(step * static_cast<double>(entry->timer));
 				if ((entry->flags & 2) == 0) {
 					const float t = static_cast<float>(
 						(kCmdMenuOneD / static_cast<double>(entry->duration)) *
@@ -1849,19 +1847,25 @@ unsigned int CMenuPcs::CmdClose0()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CMenuPcs::GetCmdItem()
 {
+	s32 count;
+	s16* list;
 	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+	list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	s16* write = list;
-	s32 count = 0;
+	count = 0;
+	s32 i = count;
 
-	for (s32 i = 0; i < 0x40; i++) {
+	for (; i < 0x40; i++) {
 		s32 itemType = GetItemType(i, 0);
 		if ((itemType != 0) && (itemType != 5) && (itemType != 6) && (itemType != 8) && (itemType != 9)) {
 			if (itemType == 1) {
 				const s32 tribe = caravanWork->m_tribeId & 3;
-				if (GetItemIcon(caravanWork->m_inventoryItems[i]) != tribe) {
+				const s32 icon = GetItemIcon(caravanWork->m_inventoryItems[i]);
+				if (icon != tribe) {
 					continue;
 				}
 			}
@@ -1872,9 +1876,10 @@ void CMenuPcs::GetCmdItem()
 	}
 
 	s16* write2 = list + count;
-	for (s32 i = 0; i < 0x49; i++) {
+	const u8* artrow = reinterpret_cast<const u8*>(caravanWork);
+	for (s32 i = 0; i < 0x49; artrow += 2, i++) {
 		s32 arti = i + 0x9f;
-		if (caravanWork->m_artifacts[i] == arti) {
+		if (reinterpret_cast<const CCaravanWork*>(artrow)->m_artifacts[0] == arti) {
 			if (IsMagicArti(arti)) {
 				count++;
 				write2++;
@@ -1883,30 +1888,31 @@ void CMenuPcs::GetCmdItem()
 		}
 	}
 
-	s16* write3 = list + count;
+	write2 = list + count;
 	if (IsMagicArti(caravanWork->m_treasures[0])) {
 		count++;
-		write3++;
-		*write3 = 0xa0;
+		write2++;
+		*write2 = 0xa0;
 	}
 	if (IsMagicArti(caravanWork->m_treasures[1])) {
 		count++;
-		write3++;
-		*write3 = 0xa1;
+		write2++;
+		*write2 = 0xa1;
 	}
 	if (IsMagicArti(caravanWork->m_treasures[2])) {
 		count++;
-		write3++;
-		*write3 = 0xa2;
+		write2++;
+		*write2 = 0xa2;
 	}
 	if (IsMagicArti(caravanWork->m_treasures[3])) {
 		count++;
-		write3[1] = 0xa3;
+		write2[1] = 0xa3;
 	}
 
 	s16* out = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	*out = count + 2;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -1943,6 +1949,9 @@ void CMenuPcs::ChkCmdActive(int itemIndex)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_propagation off
+#pragma opt_lifetimes off
 int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 {
 	u8* self = reinterpret_cast<u8*>(this);
@@ -1955,10 +1964,16 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	int k;
 
 	if (comboOut != nullptr) {
-		for (int i = 0; i < 5; i++) {
-			comboOut[i][0] = -1;
-			comboOut[i][1] = -1;
-		}
+		comboOut[0][0] = -1;
+		comboOut[0][1] = -1;
+		comboOut[1][0] = -1;
+		comboOut[1][1] = -1;
+		comboOut[2][0] = -1;
+		comboOut[2][1] = -1;
+		comboOut[3][0] = -1;
+		comboOut[3][1] = -1;
+		comboOut[4][0] = -1;
+		comboOut[4][1] = -1;
 	}
 
 	const s16 selectedState = caravan->m_commandListExtra[selected];
@@ -2066,21 +2081,23 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			}
 			ok = 0;
 			k = 0;
-			for (const s16* q = &pat[3 + ok]; k < len1 - 1; k++, q++) {
+			const s16* q = &pat[ok];
+			while (k < len1 - 1) {
 				const int slot = selected - (len1 - 1 - k);
-				int __p5 = slot;
-				if (candidates[__p5] != 0) {
+				if (candidates[slot] != 0) {
 					break;
 				}
-				if (*q == itemKinds[slot]) {
+				if (q[3] == itemKinds[slot]) {
 					ok++;
 				}
+				q++;
+				k++;
 			}
-			if (len1 == ok - 1) {
+			if (ok == len1 - 1) {
 				mp[0] = patIdx;
-				matchCount++;
 				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = selected - (len1 - 1);
 				mp += 2;
+				matchCount++;
 				w += 8;
 			}
 		}
@@ -2089,21 +2106,21 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		int start = selected - (baseLen - 1);
 		for (int i = 0; i < baseLen; i++, start++) {
 			ok = 0;
-			k = 0;
-			for (const s16* q = &s_uniteRecipePatterns[3 + ok]; k < baseLen; k++, q++) {
+			const s16* q = &s_uniteRecipePatterns[ok];
+			for (k = 0; k < baseLen; q++, k++) {
 				const int slot = i + (selected - ((baseLen - 1) - k));
 				if (candidates[slot] != 0) {
 					break;
 				}
-				if (*q == itemKinds[slot]) {
+				if (q[3] == itemKinds[slot]) {
 					ok++;
 				}
 			}
 			if (ok == baseLen) {
 				mp[0] = 0;
-				matchCount++;
 				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = start;
 				mp += 2;
+				matchCount++;
 				w += 8;
 			}
 		}
@@ -2125,22 +2142,22 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			}
 
 			ok = 0;
-			k = 0;
-			for (const s16* q = &pat[3 + ok]; k < len; k++, q++) {
+			const s16* q = &pat[ok];
+			for (k = 0; k < len; q++, k++) {
 				const int slot = start + (selected - ((len - 1) - k));
 				if (candidates[slot] != 0) {
 					break;
 				}
-				if (*q == itemKinds[slot]) {
+				if (q[3] == itemKinds[slot]) {
 					ok++;
 				}
 			}
 
 			if (ok == len) {
 				mp[0] = group;
-				matchCount++;
 				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = start + (selected - (len - 1));
 				mp += 2;
+				matchCount++;
 				w += 8;
 			}
 		}
@@ -2160,6 +2177,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	return matchCount;
 }
+#pragma pop
 
 /*
  * --INFO--

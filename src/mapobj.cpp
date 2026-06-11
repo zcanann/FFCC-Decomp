@@ -571,22 +571,22 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         pointLight->m_altColor = pointLight->m_altColors[0];
                         break;
                     }
-                    case CHUNK_CJUN:
+                    case CHUNK_MJUN:
                         pointLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_CFRM:
+                    case CHUNK_MFRM:
                         pointLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_CKEY:
+                    case CHUNK_MKEY:
                         pointLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MJUN:
+                    case CHUNK_CJUN:
                         pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MFRM:
+                    case CHUNK_CFRM:
                         pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MKEY:
+                    case CHUNK_CKEY:
                         pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     }
@@ -664,22 +664,22 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         spotLight->m_altColor = spotLight->m_altColors[0];
                         break;
                     }
-                    case CHUNK_CJUN:
+                    case CHUNK_MJUN:
                         spotLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_CFRM:
+                    case CHUNK_MFRM:
                         spotLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_CKEY:
+                    case CHUNK_MKEY:
                         spotLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MJUN:
+                    case CHUNK_CJUN:
                         spotLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MFRM:
+                    case CHUNK_CFRM:
                         spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
-                    case CHUNK_MKEY:
+                    case CHUNK_CKEY:
                         spotLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     }
@@ -915,11 +915,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     while (chunkFile.GetNextChunk(vtxChunk) != 0) {
                         switch (vtxChunk.m_id) {
                         case CHUNK_VTX: {
-                            float* vtx = reinterpret_cast<float*>(operator new[](
+                            float* vtx;
+                            mime->m_vertexLists[vtxTableIndex++] = vtx = reinterpret_cast<float*>(operator new[](
                                 static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
                                 MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x353));
-                            mime->m_vertexLists[vtxTableIndex] = vtx;
-                            vtxTableIndex++;
                             mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
 
                             for (int i = 0; i < mime->m_vertexCount; i++) {
@@ -1001,12 +1000,11 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma inline_depth(2)
 void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
 {
     extern const float kMapObjDegToRad;
-    Mtx mtx2;
-    Mtx mtx1;
-    Mtx mtx0;
+    Mtx mtx;
     CMapObj* obj = this;
 
     do {
@@ -1016,14 +1014,14 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
             obj->m_calcMtxPending = 0;
             if (obj->m_localMtxDirty != 0) {
                 PSMTXScale(obj->m_localMtx, obj->m_localScaleX, obj->m_localScaleY, obj->m_localScaleZ);
-                PSMTXRotRad(mtx2, 'x', kMapObjDegToRad * obj->m_localRotationX);
-                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
-                PSMTXRotRad(mtx2, 'y', kMapObjDegToRad * obj->m_localRotationY);
-                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
-                PSMTXRotRad(mtx2, 'z', kMapObjDegToRad * obj->m_localRotationZ);
-                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
-                PSMTXTrans(mtx2, obj->m_localTranslateX, obj->m_localTranslateY, obj->m_localTranslateZ);
-                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
+                PSMTXRotRad(mtx, 'x', kMapObjDegToRad * obj->m_localRotationX);
+                PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
+                PSMTXRotRad(mtx, 'y', kMapObjDegToRad * obj->m_localRotationY);
+                PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
+                PSMTXRotRad(mtx, 'z', kMapObjDegToRad * obj->m_localRotationZ);
+                PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
+                PSMTXTrans(mtx, obj->m_localTranslateX, obj->m_localTranslateY, obj->m_localTranslateZ);
+                PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
             }
 
             dirty = 1;
@@ -1033,70 +1031,8 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
             PSMTXConcat(*reinterpret_cast<Mtx*>(parentMtx), obj->m_localMtx, obj->m_worldMtx);
         }
 
-        CMapObj* child = obj->m_child;
-        if (child != 0) {
-            do {
-                unsigned char childDirty = dirty;
-
-                if (child->m_calcMtxPending != 0) {
-                    child->m_calcMtxPending = 0;
-                    if (child->m_localMtxDirty != 0) {
-                        PSMTXScale(child->m_localMtx, child->m_localScaleX, child->m_localScaleY, child->m_localScaleZ);
-                        PSMTXRotRad(mtx1, 'x', kMapObjDegToRad * child->m_localRotationX);
-                        PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                        PSMTXRotRad(mtx1, 'y', kMapObjDegToRad * child->m_localRotationY);
-                        PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                        PSMTXRotRad(mtx1, 'z', kMapObjDegToRad * child->m_localRotationZ);
-                        PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                        PSMTXTrans(mtx1, child->m_localTranslateX, child->m_localTranslateY, child->m_localTranslateZ);
-                        PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                    }
-
-                    childDirty = 1;
-                }
-
-                if (childDirty != 0) {
-                    PSMTXConcat(obj->m_worldMtx, child->m_localMtx, child->m_worldMtx);
-                }
-
-                CMapObj* grandChild = child->m_child;
-                if (grandChild != 0) {
-                    float (*childWorldMtx)[4] = child->m_worldMtx;
-                    do {
-                        unsigned char grandChildDirty = childDirty;
-
-                        if (grandChild->m_calcMtxPending != 0) {
-                            grandChild->m_calcMtxPending = 0;
-                            if (grandChild->m_localMtxDirty != 0) {
-                                PSMTXScale(
-                                    grandChild->m_localMtx, grandChild->m_localScaleX, grandChild->m_localScaleY, grandChild->m_localScaleZ);
-                                PSMTXRotRad(mtx0, 'x', kMapObjDegToRad * grandChild->m_localRotationX);
-                                PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                                PSMTXRotRad(mtx0, 'y', kMapObjDegToRad * grandChild->m_localRotationY);
-                                PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                                PSMTXRotRad(mtx0, 'z', kMapObjDegToRad * grandChild->m_localRotationZ);
-                                PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                                PSMTXTrans(mtx0, grandChild->m_localTranslateX, grandChild->m_localTranslateY, grandChild->m_localTranslateZ);
-                                PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                            }
-
-                            grandChildDirty = 1;
-                        }
-
-                        if (grandChildDirty != 0) {
-                            PSMTXConcat(childWorldMtx, grandChild->m_localMtx, grandChild->m_worldMtx);
-                        }
-
-                        if (grandChild->m_child != 0) {
-                            grandChild->m_child->CalcMtx(grandChild->m_worldMtx, grandChildDirty);
-                        }
-
-                        grandChild = grandChild->m_next;
-                    } while (grandChild != 0);
-                }
-
-                child = child->m_next;
-            } while (child != 0);
+        if (obj->m_child != 0) {
+            obj->m_child->CalcMtx(obj->m_worldMtx, dirty);
         }
 
         obj = obj->m_next;
@@ -1112,127 +1048,26 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma inline_depth(8)
+#pragma inline_max_size(10000)
+#pragma inline_max_total_size(10000)
 void CMapObj::SetShow_r(int show)
 {
-    CMapObj* root = this;
+    CMapObj* obj = this;
 
     do {
         if (show != 0) {
-            root->m_showFlags |= 1;
+            obj->m_showFlags |= 1;
         } else {
-            root->m_showFlags &= 0xFE;
+            obj->m_showFlags &= 0xFE;
         }
 
-        CMapObj* c0 = root->m_child;
-        if (c0 != 0) {
-            do {
-                if (show != 0) {
-                    c0->m_showFlags |= 1;
-                } else {
-                    c0->m_showFlags &= 0xFE;
-                }
-
-                CMapObj* c1 = c0->m_child;
-                if (c1 != 0) {
-                    do {
-                        if (show != 0) {
-                            c1->m_showFlags |= 1;
-                        } else {
-                            c1->m_showFlags &= 0xFE;
-                        }
-
-                        CMapObj* c2 = c1->m_child;
-                        if (c2 != 0) {
-                            do {
-                                if (show != 0) {
-                                    c2->m_showFlags |= 1;
-                                } else {
-                                    c2->m_showFlags &= 0xFE;
-                                }
-
-                                CMapObj* c3 = c2->m_child;
-                                if (c3 != 0) {
-                                    do {
-                                        if (show != 0) {
-                                            c3->m_showFlags |= 1;
-                                        } else {
-                                            c3->m_showFlags &= 0xFE;
-                                        }
-
-                                        CMapObj* c4 = c3->m_child;
-                                        if (c4 != 0) {
-                                            do {
-                                                if (show != 0) {
-                                                    c4->m_showFlags |= 1;
-                                                } else {
-                                                    c4->m_showFlags &= 0xFE;
-                                                }
-
-                                                CMapObj* c5 = c4->m_child;
-                                                if (c5 != 0) {
-                                                    do {
-                                                        if (show != 0) {
-                                                            c5->m_showFlags |= 1;
-                                                        } else {
-                                                            c5->m_showFlags &= 0xFE;
-                                                        }
-
-                                                        CMapObj* c6 = c5->m_child;
-                                                        if (c6 != 0) {
-                                                            do {
-                                                                if (show != 0) {
-                                                                    c6->m_showFlags |= 1;
-                                                                } else {
-                                                                    c6->m_showFlags &= 0xFE;
-                                                                }
-
-                                                                CMapObj* c7 = c6->m_child;
-                                                                if (c7 != 0) {
-                                                                    do {
-                                                                        if (show != 0) {
-                                                                            c7->m_showFlags |= 1;
-                                                                        } else {
-                                                                            c7->m_showFlags &= 0xFE;
-                                                                        }
-
-                                                                        if (c7->m_child != 0) {
-                                                                            c7->m_child->SetShow_r(show);
-                                                                        }
-
-                                                                        c7 = c7->m_next;
-                                                                    } while (c7 != 0);
-                                                                }
-
-                                                                c6 = c6->m_next;
-                                                            } while (c6 != 0);
-                                                        }
-
-                                                        c5 = c5->m_next;
-                                                    } while (c5 != 0);
-                                                }
-
-                                                c4 = c4->m_next;
-                                            } while (c4 != 0);
-                                        }
-
-                                        c3 = c3->m_next;
-                                    } while (c3 != 0);
-                                }
-
-                                c2 = c2->m_next;
-                            } while (c2 != 0);
-                        }
-
-                        c1 = c1->m_next;
-                    } while (c1 != 0);
-                }
-
-                c0 = c0->m_next;
-            } while (c0 != 0);
+        if (obj->m_child != 0) {
+            obj->m_child->SetShow_r(show);
         }
 
-        root = root->m_next;
-    } while (root != 0);
+        obj = obj->m_next;
+    } while (obj != 0);
 }
 
 /*
@@ -1266,110 +1101,22 @@ void CMapObj::SetShow(int show)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma inline_depth(8)
 void CMapObj::SetLink()
 {
-    CMapObj* head0 = 0;
-    CMapObj* head1;
-    CMapObj* head2;
-    CMapObj* head3;
-    CMapObj* head4;
-    CMapObj* head5;
-    CMapObj* head6;
-    CMapObj* head7;
-    CMapObj* head8;
-    CMapObj* search0 = MapObjArrayStart();
+    CMapObj* cursor = MapMng.m_mapObjArray;
+    CMapObj* head = 0;
 
-    while ((search0 = MapMng.SearchChildMapObj(search0, this)) != 0) {
-        CMapObj* child0 = search0;
+    while ((cursor = MapMng.SearchChildMapObj(cursor, this)) != 0) {
+        CMapObj* child = cursor;
 
-        child0->m_next = head0;
-        head0 = child0;
-        CMapObj* search1 = MapObjArrayStart();
-        head1 = 0;
-        while ((search1 = MapMng.SearchChildMapObj(search1, child0)) != 0) {
-            CMapObj* child1 = search1;
-            head2 = 0;
-
-            child1->m_next = head1;
-            head1 = child1;
-            CMapObj* cursor2 = MapObjArrayStart();
-            while ((cursor2 = MapMng.SearchChildMapObj(cursor2, child1)) != 0) {
-                CMapObj* child2 = cursor2;
-                child2->m_next = head2;
-                head2 = child2;
-                CMapObj* cursor3 = MapObjArrayStart();
-                head3 = 0;
-                while ((cursor3 = MapMng.SearchChildMapObj(cursor3, child2)) != 0) {
-                    CMapObj* child3 = cursor3;
-                    child3->m_next = head3;
-                    head3 = child3;
-                    CMapObj* cursor4 = MapObjArrayStart();
-                    head4 = 0;
-                    while ((cursor4 = MapMng.SearchChildMapObj(cursor4, child3)) != 0) {
-                        CMapObj* child4 = cursor4;
-                        child4->m_next = head4;
-                        head4 = child4;
-                        CMapObj* cursor5 = MapObjArrayStart();
-                        head5 = 0;
-                        while ((cursor5 = MapMng.SearchChildMapObj(cursor5, child4)) != 0) {
-                            CMapObj* child5 = cursor5;
-                            child5->m_next = head5;
-                            head5 = child5;
-                            CMapObj* cursor6 = MapObjArrayStart();
-                            head6 = 0;
-                            while ((cursor6 = MapMng.SearchChildMapObj(cursor6, child5)) != 0) {
-                                CMapObj* child6 = cursor6;
-                                child6->m_next = head6;
-                                head6 = child6;
-                                CMapObj* cursor7 = MapObjArrayStart();
-                                head7 = 0;
-                                while ((cursor7 = MapMng.SearchChildMapObj(cursor7, child6)) != 0) {
-                                    CMapObj* child7 = cursor7;
-                                    child7->m_next = head7;
-                                    head7 = child7;
-                                    CMapObj* cursor8 = MapObjArrayStart();
-                                    head8 = 0;
-                                    while ((cursor8 = MapMng.SearchChildMapObj(cursor8, child7)) != 0) {
-                                        CMapObj* child8 = cursor8;
-                                        child8->m_next = head8;
-                                        head8 = child8;
-                                        child8->SetLink();
-                                        cursor8 = NextSlot(cursor8);
-                                    }
-
-                                    child7->m_child = head8;
-                                    cursor7 = NextSlot(cursor7);
-                                }
-
-                                child6->m_child = head7;
-                                cursor6 = NextSlot(cursor6);
-                            }
-
-                            child5->m_child = head6;
-                            cursor5 = NextSlot(cursor5);
-                        }
-
-                        child4->m_child = head5;
-                        cursor4 = NextSlot(cursor4);
-                    }
-
-                    child3->m_child = head4;
-                    cursor3 = NextSlot(cursor3);
-                }
-
-                child2->m_child = head3;
-                cursor2 = NextSlot(cursor2);
-            }
-
-            child1->m_child = head2;
-            search1 = NextSlot(search1);
-        }
-
-        child0->m_child = head1;
-        search0 = NextSlot(search0);
+        child->m_next = head;
+        head = child;
+        child->SetLink();
+        cursor = cursor + 1;
     }
 
-    m_child = head0;
+    m_child = head;
 }
 
 static inline void calcRunningColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
@@ -1611,6 +1358,36 @@ void CMapObj::SetDrawEnv()
  * JP Address: TODO
  * JP Size: TODO
  */
+static inline void drawMapColorAlpha(CMapObj* obj)
+{
+    _GXColor mapColor;
+
+    if (obj->m_useAmbientColor != 0) {
+        mapColor = obj->m_ambientColor;
+    } else {
+        mapColor = MapMng.m_mapColor;
+    }
+
+    if (MapMng.m_colorScaleEnable != 0) {
+        mapColor.r = static_cast<unsigned char>((mapColor.r * MapMng.m_colorScale.r) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * MapMng.m_colorScale.g) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * MapMng.m_colorScale.b) >> 8);
+        mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
+    }
+
+    if (obj->m_colorAlphaRate != 0xFF) {
+        unsigned char alphaRate = obj->m_colorAlphaRate;
+        mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
+    }
+
+    _GXColor lightColor = s_mapObjLightColor;
+    LightPcs.SetMapColorAlpha(obj->m_worldMtx, mapColor, lightColor, obj->m_cameraSemiTransActive,
+                              obj->m_cameraSemiTransNear, obj->m_cameraSemiTransFar, obj->m_cameraSemiTransFadeRange,
+                              static_cast<unsigned char>(obj->m_cameraSemiTransAlpha >> 7));
+}
+
 void CMapObj::Draw(unsigned char priority)
 {
     extern const float kMapObjOne;
@@ -1627,8 +1404,6 @@ void CMapObj::Draw(unsigned char priority)
     lightPos.z = m_worldMtx[2][3];
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(1), &lightPos, m_lightSetIndex);
 
-    _GXColor mapColor;
-
     MaterialMan.SetDefaultDrawEnv(0xACE0F);
 
     if (m_enableFullScreenShadow != 0) {
@@ -1643,30 +1418,7 @@ void CMapObj::Draw(unsigned char priority)
     MaterialMan.SaveCurrentEnvAsStd();
 
     s_mapObjLightColor.a = m_lightAlpha;
-    if (m_useAmbientColor != 0) {
-        mapColor = m_ambientColor;
-    } else {
-        mapColor = MapMng.m_mapColor;
-    }
-
-    if (MapMng.m_colorScaleEnable != 0) {
-        mapColor.r = static_cast<unsigned char>((mapColor.r * MapMng.m_colorScale.r) >> 8);
-        mapColor.g = static_cast<unsigned char>((mapColor.g * MapMng.m_colorScale.g) >> 8);
-        mapColor.b = static_cast<unsigned char>((mapColor.b * MapMng.m_colorScale.b) >> 8);
-        mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
-    }
-
-    if (m_colorAlphaRate != 0xFF) {
-        unsigned char alphaRate = m_colorAlphaRate;
-        mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
-        mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
-        mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
-    }
-
-    _GXColor lightColor = s_mapObjLightColor;
-    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, m_cameraSemiTransActive, m_cameraSemiTransNear,
-                              m_cameraSemiTransFar, m_cameraSemiTransFadeRange,
-                              static_cast<unsigned char>(m_cameraSemiTransAlpha >> 7));
+    drawMapColorAlpha(this);
     LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(m_bumpLight),
                               reinterpret_cast<Vec*>(&m_transRateX), m_bumpTexMatrixMode);
 
@@ -1783,7 +1535,8 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         Mtx inverseMtx;
 
         PSMTXInverse(m_worldMtx, inverseMtx);
-        CMapCylinder localCylinder(kMapObjBoundMinInit, kMapObjBoundMaxInit);
+        float boundMinInit = kMapObjBoundMinInit;
+        CMapCylinder localCylinder(boundMinInit, kMapObjBoundMaxInit);
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
@@ -1895,7 +1648,8 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         Vec localMove;
 
         PSMTXInverse(m_worldMtx, inverseMtx);
-        CMapCylinder localCylinder(kMapObjBoundMinInit, kMapObjBoundMaxInit);
+        float boundMinInit = kMapObjBoundMinInit;
+        CMapCylinder localCylinder(boundMinInit, kMapObjBoundMaxInit);
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 

@@ -395,7 +395,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
     int offset = 0xA0;
     signed char* managerBase = *reinterpret_cast<signed char**>(self + 0x1354);
-    int checksum = 0xE7;
+    char checksum = 0xE7;
 
     managerBase[0xAC] = self[0x1344];
     managerBase[0xAD] = self[0x1345];

@@ -244,8 +244,9 @@ void CTexAnimSet::SetTexGen()
  */
 inline int CTexAnim::Find(char* name)
 {
-    for (unsigned int i = 0; i < static_cast<unsigned int>(m_refData->m_texAnimSeqs.GetSize()); i++) {
-        CTexAnimSeq* seq = m_refData->m_texAnimSeqs[i];
+    unsigned long idx;
+    for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(m_refData->m_texAnimSeqs.GetSize()); i++) {
+        CTexAnimSeq* seq = m_refData->m_texAnimSeqs[idx];
         if (strcmp(name, seq->m_name) == 0) {
             return static_cast<int>(i);
         }

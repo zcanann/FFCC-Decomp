@@ -202,7 +202,7 @@ static inline void freeStageBlockBase(void* ptr, const char* strBase)
             block->m_next->m_prev = block->m_prev;
         }
 
-        block->m_stage->m_allocCount -= 1;
+        blockFromPayload(ptr)->m_stage->m_allocCount -= 1;
     }
 }
 
@@ -255,6 +255,22 @@ static inline void stageReleaseMode2Buffer(CMemory::CStage* stage)
     }
 }
 
+static inline void releaseStageBufferBase(unsigned int ptr, const char* strBase) throw()
+{
+    if (ptr != 0) {
+        freeStageBlockBase(reinterpret_cast<void*>(ptr - 0x10), strBase);
+    }
+}
+
+static inline void stageReleaseMode2BufferBase(CMemory::CStage* stage, const char* strBase)
+{
+    unsigned int ptr = static_cast<unsigned int>(stageGetHeapHead(stage));
+    if (ptr != 0) {
+        releaseStageBufferBase(ptr, strBase);
+        stageSetHeapHead(stage, 0);
+    }
+}
+
 static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage, const char* strBase)
 {
     int mode = stageGetAllocationMode(stage);
@@ -266,7 +282,7 @@ static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage, 
             stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
         }
     } else {
-        stageReleaseMode2Buffer(stage);
+        stageReleaseMode2BufferBase(stage, strBase);
     }
 
     stage->m_prev->m_next = stage->m_next;
@@ -432,9 +448,7 @@ void CMemory::Init()
 void CMemory::Quit()
 {
     const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
-    CStage* mainStage = m_mainMemoryStage;
-
-    stageDestroyAndPool(this, mainStage, strBase);
+    stageDestroyAndPool(this, m_mainMemoryStage, strBase);
 
     CMode* modeData = m_modes;
     for (int pass = 0; pass < 3; pass++, modeData++) {
@@ -489,8 +503,7 @@ frame_input_done:
         trigger = 0;
     } else {
         int port = 0;
-        port &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        trigger = Pad.GetPadInputs()[port].lockedButton[1];
+        trigger = Pad.GetPadInputs()[(Pad.m_debugPadPort == 0) ? 0 : port].lockedButton[1];
     }
 
     if ((trigger & 0x200) != 0) {
@@ -551,8 +564,8 @@ void CMemory::Draw()
         }
 
         int y = 0x20;
-        int useTotalKB = 0;
         int unuseTotalKB = 0;
+        int useTotalKB = 0;
 
         CMode* modeData = m_modes;
         for (int mode = 0; mode < 3; mode++, modeData++) {
@@ -1107,13 +1120,18 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     int freeCount = 0;
 
     if (stageGetAllocationMode(this) == 2) {
+        int showFree = flag & 1;
+        int showUsed = flag & 2;
+        int i;
+        int blockTail;
+        int size;
         int top = m_heapTop;
 
-        for (int i = 0; i <= m_blockCount; i++) {
-            int blockTail = (m_blockCount == i) ? m_heapBottom : reinterpret_cast<int>(node->m_prev);
-            int size = blockTail - top;
+        for (i = 0; i <= m_blockCount; i++, node++) {
+            blockTail = (m_blockCount == i) ? m_heapBottom : reinterpret_cast<int>(node->m_prev);
+            size = blockTail - top;
             if (size != 0) {
-                if ((flag & 1) != 0) {
+                if (showFree != 0) {
                     System.Printf(
                         const_cast<char*>(strBase + 0x430), freeCount, sHeapWalkerFree, 0, top - blockTail, totalSize, 0, 0, 0,
                         sEmptyAllocSourceName, 0);
@@ -1125,7 +1143,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
 
             if (i < m_blockCount) {
                 int used = reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node->m_prev);
-                if ((flag & 2) != 0) {
+                if (showUsed != 0) {
                     System.Printf(
                         const_cast<char*>(strBase + 0x430), usedCount, sHeapWalkerUsed,
                         node->m_level, used, totalSize, node->m_prev, 0, 0, node->m_source,
@@ -1136,8 +1154,6 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                 top = blockTail + used;
                 usedCount++;
             }
-
-            node++;
         }
     } else {
         while ((node->m_flags & 2) == 0) {
@@ -1931,9 +1947,10 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
                 System.Printf(const_cast<char*>(strBase + 0x4c));
             }
 
-            int offset2;
             int i;
-            offset2 = i = 0;
+            int offset2;
+            i = 0;
+            offset2 = i;
             for (; i < m_cacheCount; i++) {
                 CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset2);
                 if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
@@ -2057,7 +2074,7 @@ void CAmemCacheSet::RefCnt0Compare()
     }
 
     for (int i = 0; i < m_cacheCount; i++) {
-        CAmemCache& entry = cacheEntryAt(this, i);
+        CAmemCache& entry = m_cacheTable[i];
         if ((entry.m_inUse != 0 && entry.m_refCount != 0) &&
             static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(

@@ -143,9 +143,9 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16*& puVar18, u16* p
 				if (iVar14 == 0)
 				{
 					*reinterpret_cast<u16*>(p12 + 0x08) = *reinterpret_cast<u16*>(p12 + 0x0A);
-					uVar16 = (__cntlzw(1 - (*puVar18 & 0x3FFF)) >> 5) & 0xFF;
-					*reinterpret_cast<s8*>(p12 + 0x40) = *reinterpret_cast<s8*>(puVar13 + 5);
-					*reinterpret_cast<u32*>(p12 + 0x50) = uVar16;
+					cVar9 = *reinterpret_cast<s8*>(puVar13 + 5);
+					*reinterpret_cast<s8*>(p12 + 0x40) = cVar9;
+					*reinterpret_cast<u32*>(p12 + 0x50) = (__cntlzw(1 - (*puVar18 & 0x3FFF)) >> 5) & 0xFF;
 					*reinterpret_cast<u32*>(p12 + 0x44) = 0;
 					*reinterpret_cast<u32*>(p12 + 0x38) = 0;
 					*reinterpret_cast<u32*>(p12 + 0x3C) = 0;
@@ -170,7 +170,7 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16*& puVar18, u16* p
 						if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0)
 						{
 							uVar16 = static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x14)) >> 0x1F;
-							if ((static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<u8*>(p12 + 0x14))) - uVar16) >= pad->m_stickDigitalThreshold) ||
+							if ((static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x14))) - uVar16) >= pad->m_stickDigitalThreshold) ||
 								((uVar16 = static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x15)) >> 0x1F),
 								 (static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x15))) - uVar16) >= pad->m_stickDigitalThreshold)))
 							{
@@ -378,8 +378,8 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16*& puVar18, u16* p
 		}
 		uVar17 = uVar17 + 1;
 		puVar13 = puVar13 + 6;
-		puVar18 = puVar18 + 2;
 		iVar6 = iVar6 + 0x54;
+		puVar18 = puVar18 + 2;
 	} while (uVar17 < 4);
 }
 
@@ -410,6 +410,7 @@ void CPad::Frame()
 	u32 uVar15;
 	u16* puVar18;
 	int iVar19;
+	u16 uVar2;
 	CPad::Gba local_98[4];
 	PADStatus local_88[4];
 	u8* self = reinterpret_cast<u8*>(this);
@@ -447,33 +448,37 @@ void CPad::Frame()
 				puVar13 = reinterpret_cast<u16*>(local_98);
 				for (iVar19 = 0; iVar19 < 4; iVar19++)
 				{
-					uVar8 = *puVar13;
-					uVar1 = puVar13[1];
 					iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar6;
 					iVar6 = iVar6 + 0x0C;
-					puVar13 = puVar13 + 2;
 					puVar12 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar11 + 0x0C);
-					*puVar12 = *puVar7;
-					*reinterpret_cast<u8*>(puVar12 + 1) = *reinterpret_cast<u8*>(puVar7 + 1);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 3) =
-						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3);
-					*reinterpret_cast<u8*>(puVar12 + 2) = *reinterpret_cast<u8*>(puVar7 + 2);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 5) =
-						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5);
-					*reinterpret_cast<u8*>(puVar12 + 3) = *reinterpret_cast<u8*>(puVar7 + 3);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 7) =
-						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7);
-					*reinterpret_cast<u8*>(puVar12 + 4) = *reinterpret_cast<u8*>(puVar7 + 4);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 9) =
-						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9);
+					uVar2 = *puVar7;
+					*puVar12 = uVar2;
+					uVar2 = *reinterpret_cast<u8*>(puVar7 + 1);
+					*reinterpret_cast<u8*>(puVar12 + 1) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 3) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(puVar7 + 2);
+					*reinterpret_cast<u8*>(puVar12 + 2) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 5) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(puVar7 + 3);
+					*reinterpret_cast<u8*>(puVar12 + 3) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 7) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(puVar7 + 4);
+					*reinterpret_cast<u8*>(puVar12 + 4) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 9) = static_cast<u8>(uVar2);
 					puVar10 = puVar7 + 5;
 					puVar7 = puVar7 + 6;
-					*reinterpret_cast<u8*>(puVar12 + 5) = *reinterpret_cast<u8*>(puVar10);
+					uVar2 = *reinterpret_cast<u8*>(puVar10);
+					*reinterpret_cast<u8*>(puVar12 + 5) = static_cast<u8>(uVar2);
 					iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar14;
 					iVar14 = iVar14 + 4;
 					puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar11 + 0x3C);
-					*puVar10 = uVar8;
-					puVar10[1] = uVar1;
+					*puVar10 = *puVar13;
+					puVar10[1] = puVar13[1];
+					puVar13 = puVar13 + 2;
 				}
 				*reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) =
 					*reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) + 1;
@@ -490,20 +495,26 @@ void CPad::Frame()
 			{
 				uVar8 = *puVar7;
 				puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar14 * 0x40 + iVar6 + 0x0C);
-				*puVar7 = *puVar10;
-				*reinterpret_cast<u8*>(puVar7 + 1) = *reinterpret_cast<u8*>(puVar10 + 1);
-				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3) =
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 3);
-				*reinterpret_cast<u8*>(puVar7 + 2) = *reinterpret_cast<u8*>(puVar10 + 2);
-				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5) =
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 5);
-				*reinterpret_cast<u8*>(puVar7 + 3) = *reinterpret_cast<u8*>(puVar10 + 3);
-				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7) =
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 7);
-				*reinterpret_cast<u8*>(puVar7 + 4) = *reinterpret_cast<u8*>(puVar10 + 4);
-				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9) =
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 9);
-				*reinterpret_cast<u8*>(puVar7 + 5) = *reinterpret_cast<u8*>(puVar10 + 5);
+				uVar2 = *puVar10;
+				*puVar7 = uVar2;
+				uVar2 = *reinterpret_cast<u8*>(puVar10 + 1);
+				*reinterpret_cast<u8*>(puVar7 + 1) = static_cast<u8>(uVar2);
+				uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 3);
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3) = static_cast<u8>(uVar2);
+				uVar2 = *reinterpret_cast<u8*>(puVar10 + 2);
+				*reinterpret_cast<u8*>(puVar7 + 2) = static_cast<u8>(uVar2);
+				uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 5);
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5) = static_cast<u8>(uVar2);
+				uVar2 = *reinterpret_cast<u8*>(puVar10 + 3);
+				*reinterpret_cast<u8*>(puVar7 + 3) = static_cast<u8>(uVar2);
+				uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 7);
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7) = static_cast<u8>(uVar2);
+				uVar2 = *reinterpret_cast<u8*>(puVar10 + 4);
+				*reinterpret_cast<u8*>(puVar7 + 4) = static_cast<u8>(uVar2);
+				uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 9);
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9) = static_cast<u8>(uVar2);
+				uVar2 = *reinterpret_cast<u8*>(puVar10 + 5);
+				*reinterpret_cast<u8*>(puVar7 + 5) = static_cast<u8>(uVar2);
 				puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar14 * 0x40 + iVar19 + 0x3C);
 				uVar1 = puVar10[1];
 				*puVar13 = *puVar10;

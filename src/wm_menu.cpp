@@ -4133,14 +4133,14 @@ void CMenuPcs::DrawMainMenu()
 			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(entry + 0xC), static_cast<float>(entry[0]),
 			                 static_cast<float>(entry[1]), static_cast<float>(entry[2]), static_cast<float>(entry[3]),
 			                 *reinterpret_cast<float*>(entry + 4), *reinterpret_cast<float*>(entry + 6),
-			                 FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			                 1.0f, 1.0f, 0.0f);
 		}
 		bit++;
 		offset += 0x1C;
 	} while (bit < 2);
 
 	if (m_wmWorldState->m_mainState >= 1 && m_wmWorldState->m_mainState <= 3) {
-		const short tileState = m_wmWorldState->m_mainState;
+		const int tileState = m_wmWorldState->m_mainState;
 		float tileAlpha;
 		if (tileState == 1) {
 			tileAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
@@ -4161,15 +4161,15 @@ void CMenuPcs::DrawMainMenu()
 		x = FLOAT_80331410;
 		y = FLOAT_80331440;
 		y = y - x;
-		MenuPcs.DrawRect(0, x, y, FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
-		                 FLOAT_803313e8, FLOAT_803313dc);
+		MenuPcs.DrawRect(0, x, y, FLOAT_803316D0, FLOAT_80331500, 0.0f, 0.0f, 1.0f,
+		                 1.0f, 0.0f);
 		MenuPcs.DrawRect(8, x + FLOAT_803316D0, y,
-		                 FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+		                 FLOAT_803316D0, FLOAT_80331500, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 		y = y + FLOAT_80331500;
-		MenuPcs.DrawRect(4, x, y, FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
-		                 FLOAT_803313e8, FLOAT_803313dc);
+		MenuPcs.DrawRect(4, x, y, FLOAT_803316D0, FLOAT_80331500, 0.0f, 0.0f, 1.0f,
+		                 1.0f, 0.0f);
 		MenuPcs.DrawRect(0xC, x + FLOAT_803316D0, y,
-		                 FLOAT_803316D0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+		                 FLOAT_803316D0, FLOAT_80331500, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 
 	DrawMainMenuSub();

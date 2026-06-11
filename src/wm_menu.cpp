@@ -11856,9 +11856,10 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x26 : 0x2D));
-	const float innerWidth = static_cast<float>(static_cast<double>(sw) - DOUBLE_80331428);
+	const double innerWidthD = static_cast<double>(sw) - DOUBLE_80331428;
 	const float innerX = FLOAT_80331410 + sx;
 	const float uv1 = FLOAT_803313dc;
+	const float innerWidthF = static_cast<float>(innerWidthD);
 	float y = sy;
 	for (int i = 0; i < 2; i++) {
 		flags = 0;
@@ -11866,13 +11867,14 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 			y = bottom;
 			flags |= 4;
 		}
-		MenuPcs.DrawRect(flags, innerX, y, innerWidth, FLOAT_80331410, uv1, uv1, FLOAT_803313e8, FLOAT_803313e8, uv1);
+		MenuPcs.DrawRect(flags, innerX, y, innerWidthF, FLOAT_80331410, uv1, uv1, FLOAT_803313e8, FLOAT_803313e8, uv1);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x25 : 0x2E));
-	const float innerHeight = static_cast<float>(static_cast<double>(sh) - DOUBLE_80331428);
+	const double innerHeightD = static_cast<double>(sh) - DOUBLE_80331428;
 	const float innerY = FLOAT_80331410 + sy;
 	const float uv2 = FLOAT_803313dc;
+	const float innerHeightF = static_cast<float>(innerHeightD);
 	float x = sx;
 	for (int i = 0; i < 2; i++) {
 		flags = 0;
@@ -11880,12 +11882,12 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 			x = right;
 			flags |= 8;
 		}
-		MenuPcs.DrawRect(flags, x, innerY, FLOAT_80331410, innerHeight, uv2, uv2, FLOAT_803313e8, FLOAT_803313e8, uv2);
+		MenuPcs.DrawRect(flags, x, innerY, FLOAT_80331410, innerHeightF, uv2, uv2, FLOAT_803313e8, FLOAT_803313e8, uv2);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x27 : 0x2F));
 	const float uv3 = FLOAT_803313dc;
-	MenuPcs.DrawRect(flags, innerX, innerY, innerWidth, innerHeight, uv3, uv3, FLOAT_803313e8, FLOAT_803313e8, uv3);
+	MenuPcs.DrawRect(flags, innerX, innerY, static_cast<float>(innerWidthD), static_cast<float>(innerHeightD), uv3, uv3, FLOAT_803313e8, FLOAT_803313e8, uv3);
 
 	if (m_menuWindowInfo->state == 0) {
 		m_menuWindowInfo->frame++;

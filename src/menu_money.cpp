@@ -388,7 +388,7 @@ void CMenuPcs::MoneyDraw()
 			GXSetChanMatColor(GX_COLOR0A0, cursorColor);
 		}
 
-		MenuPcs.DrawRect(0, (float)(drawBase->x + (7 - this->m_moneyState->selections[0]) * 0x12 + 0x24),
+			MenuPcs.DrawRect(0, (float)(drawBase->x + (7 - this->m_moneyState->selections[0]) * 0x12 + 0x24),
 		                 (float)(drawBase->y + 0x5C), 16.0f, 24.0f,
 		                 0.0f, 0.0f, 1.0f,
 		                 1.0f, 0.0f);
@@ -420,12 +420,10 @@ void CMenuPcs::MoneyDraw()
 
 	if ((mode != 0) && (this->m_moneyState->optionState == 1)) {
 		MenuWindowInfo* window = this->m_menuWindowInfo;
-		x = (float)window->x;
 		y = (float)(window->y + 0x20);
+		x = (float)window->x;
 		y += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
-
-		int anim = (int)System.m_frameCounter % 8;
-		x += (float)anim;
+		x += (float)((int)System.m_frameCounter % 8);
 		DrawCursor((int)x, (int)y, 1.0f);
 	}
 }

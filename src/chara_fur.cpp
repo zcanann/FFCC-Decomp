@@ -1446,9 +1446,6 @@ int CChara::CModel::PickFur(
 					break;
 				}
 
-				verts[0].m_valid = 0;
-				verts[1].m_valid = 0;
-
 				workPtrs.m_rayEndc = ptrTable.m_rayEndA;
 				CVector* rayEndP = ptrTable.m_rayEndB;
 				workPtrs.m_hitToBc = ptrTable.m_hitToB1;

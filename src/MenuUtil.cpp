@@ -1655,12 +1655,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		} else {
 		int lineCount = 3;
 		int firstNonEmptyLine = firstLine;
-		stage = MenuPcs.m_menuStage;
-		if (Game.m_gameWork.m_menuStageMode != 0) {
-			stage = MenuPcs.m_stageF4;
-		}
-
-		temp = new (stage, anchor + 0x7A4, 0x23D) char[0x200];
+		temp = new ((Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
+		            anchor + 0x7A4, 0x23D) char[0x200];
 		if ((temp == nullptr) && (static_cast<int>(System.m_execParam) >= 1)) {
 			System.Printf(anchor + 0x7B4, anchor + 0x7A4, 0x23F);
 		}

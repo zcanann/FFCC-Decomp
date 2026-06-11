@@ -5015,7 +5015,7 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
  */
 int JoyBus::SendFavorite(ThreadParam* threadParam)
 {
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)

@@ -2886,25 +2886,23 @@ int CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, 
 void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg1, Vec* pos)
 {
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
-	unsigned int particleClass = *reinterpret_cast<unsigned short*>(itemData + 0x12);
-	int particleBank;
-	unsigned short particleEntry;
+	int particleBank = *reinterpret_cast<unsigned short*>(itemData + 0x12);
+	int particleEntry;
 	int particleNo;
 	int seNo;
 	int emittedCustom;
 	int hasParticle;
 
-	switch (particleClass) {
+	switch (particleBank) {
 	default:
-		particleBank = particleClass;
 		break;
 	case 0xFE:
 		particleBank = CharaObjGetModelPdtNo(this);
 		break;
 	case 0xFD:
 	case 0xFF:
-		hasParticle = 0;
-		goto checkParticle;
+		particleBank = -1;
+		break;
 	}
 
 	if (particleBank == -1) {

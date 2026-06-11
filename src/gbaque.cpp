@@ -3943,18 +3943,10 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			work = price;
 			itemBuf[0] = __lwbrx(&work, 0);
 
-			k = 3;
-			reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
-			k++;
-			reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
-			k++;
-			reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
-			k++;
-			reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
-			k++;
-			reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
-			k++;
-			reinterpret_cast<unsigned short*>(itemBuf)[k - 1] = __lhbrx(itemBase, k * 2 + 0x20);
+			for (k = 3; k < 9; k++) {
+				reinterpret_cast<unsigned short*>(itemBuf)[k - 1] =
+				    __lhbrx(itemBase, static_cast<short>(k) * 2 + 0x20);
+			}
 
 			int pos = 0;
 			for (int j = 0; j < 2; j++) {

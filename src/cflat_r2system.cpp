@@ -3853,7 +3853,11 @@ renderedDone:
         unsigned char value = static_cast<u8>(kCFlatAlphaMax * localFloats[10]);
         unsigned char alpha = static_cast<u8>(kCFlatAlphaMax * localFloats[11]);
         char* layerName = this->m_strBlob + this->m_strOffsets[localBase[1]];
-        _GXColor color = {value, value, value, alpha};
+        _GXColor color;
+        color.r = value;
+        color.g = value;
+        color.b = value;
+        color.a = alpha;
         this->drawLayer(
             *object->m_localBase, layerName, localBase[2],
             localBase[3], localBase[4], localBase[5], localBase[6], localBase[7],

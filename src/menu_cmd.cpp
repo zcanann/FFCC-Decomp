@@ -2509,8 +2509,8 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 
 	if (topIdx > 0) {
 		for (int i = 0; i < 3; i++) {
+			CmdListEntry* entry = &GetCmdListStorage(this)->entries[i + s_UniteTop[topIdx]];
 			int idx = i + s_UniteTop[topIdx];
-			CmdListEntry* entry = &GetCmdListStorage(this)->entries[idx];
 			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 				break;
 			}
@@ -2528,8 +2528,8 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		s32* top = &s_UniteTop[finished];
 		for (int i = 0; i < s_unitePanelCount; i++) {
 			for (int j = 0; j < 3; j++) {
+				CmdListEntry* entry = &GetCmdListStorage(this)->entries[j + *top];
 				int idx = j + *top;
-				CmdListEntry* entry = &GetCmdListStorage(this)->entries[idx];
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 					break;
 				}

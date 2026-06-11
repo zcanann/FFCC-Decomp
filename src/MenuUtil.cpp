@@ -1679,13 +1679,14 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 		delete[] temp;
 
-		int y = lineBaseY[lineCount + drawPrefix - 1];
+		int idx = lineCount + drawPrefix - 1;
+		int y = lineBaseY[idx];
 		if (drawPrefix != 0) {
 			font->SetPosX(kOptionRowLeft);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
-			y = static_cast<int>(static_cast<float>(static_cast<unsigned int>(y)) + lineStep);
+			y = static_cast<int>(static_cast<float>(y) + lineStep);
 		}
 
 		for (int i = 0; i < lineCount; i++) {

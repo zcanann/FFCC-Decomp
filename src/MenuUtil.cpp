@@ -1503,7 +1503,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	if (rangeKind != 0) {
 		int baseIndex = drawPrefix + 2;
 		u32 baseY = lineBaseY[baseIndex];
-		unsigned int y = baseY;
+		int y = baseY;
 		if (drawPrefix != 0) {
 			font->SetPosX(kOptionRowLeft);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
@@ -1651,7 +1651,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 
 		temp = new (stage, anchor + 0x7A4, 0x23D) char[0x200];
-		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+		if ((temp == nullptr) && (static_cast<int>(System.m_execParam) >= 1)) {
 			System.Printf(anchor + 0x7B4, anchor + 0x7A4, 0x23F);
 		}
 		for (int i = 0; i < lineMax; i++) {

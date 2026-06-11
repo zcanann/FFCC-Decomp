@@ -10037,8 +10037,9 @@ void CMenuPcs::SetAnim(int anim)
 	}
 
 	const unsigned int charaNo = m_wm.m_handles[handleIdx]->m_charaNo;
+	int animBase = static_cast<int>(charaNo / 100) - 1;
+	animBase *= 6;
 	const int modelBase =  (s32)(static_cast<int>(charaNo / 100) * 100);
-	int animBase = (static_cast<int>(charaNo / 100) - 1) * 6;
 
 	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimStand, animBase++, 1, 0, modelBase, -1, 0);
 	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimWalk, animBase++, 1, 0, modelBase, -1, 0);
@@ -10052,12 +10053,8 @@ void CMenuPcs::SetAnim(int anim)
 	animState[1] = -1;
 	animState[2] = rand() % 250;
 
-	int __p22 = handleIdx;
-	const int currentAnimIndex = m_wm.m_handles[__p22]->m_currentAnimIndex;
-	int __p23 =  (currentAnimIndex + 0);
-	const int blendMode = (static_cast<unsigned int>(__p23) >> 31) - 1;
-	int __p26 = handleIdx;
-	m_wm.m_handles[__p26]->SetAnim((animBase - 5) + animState[0], -1, -1, blendMode, 1);
+	m_wm.m_handles[handleIdx]->SetAnim(animBase - 5, -1, -1,
+	    static_cast<int>(static_cast<unsigned int>(m_wm.m_handles[handleIdx]->m_currentAnimIndex) >> 31) - 1, 1);
 
 	reinterpret_cast<float*>(animState)[3] =
 	    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model) + 0xB4)[0];

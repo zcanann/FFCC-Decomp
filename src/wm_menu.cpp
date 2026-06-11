@@ -11975,7 +11975,10 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	const int languageIndex = Game.m_gameWork.m_languageId - 1;
 	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
 
+	float lineHeight;
 	float posX;
+	double rawDiff;
+	double rawX;
 	if (winType != 0) {
 		int maxWidth = 0;
 		const unsigned char* entry = winMess;
@@ -11993,47 +11996,56 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			}
 			entry += 2;
 		}
-		posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->x) + static_cast<double>(m_menuWindowInfo->width - maxWidth) * DOUBLE_803313f8);
+		reinterpret_cast<int*>(&rawDiff)[0] = 0x43300000;
+		reinterpret_cast<int*>(&rawDiff)[1] = (m_menuWindowInfo->width - maxWidth) ^ 0x80000000;
+		reinterpret_cast<int*>(&rawX)[0] = 0x43300000;
+		reinterpret_cast<int*>(&rawX)[1] = m_menuWindowInfo->x ^ 0x80000000;
+		posX = static_cast<float>((rawDiff - DOUBLE_80331408) * DOUBLE_803313f8 + (rawX - DOUBLE_80331408));
 	}
 
 	float y = static_cast<float>(m_menuWindowInfo->y + 0x20);
-	const float lineHeight = FLOAT_80331404;
+	lineHeight = FLOAT_80331404;
 
 	char textBuf[128];
-	const unsigned char* entry = winMess + 4;
+	const unsigned char* entry = winMess;
 	for (int i = 0; i < *reinterpret_cast<const int*>(winMess); i++) {
-		const short msgId = *reinterpret_cast<const short*>(entry);
-		const char* text = msgTable[msgId];
-		if (strlen(text) != 0) {
-			int isDollar;
-			if (text[0] == '$') {
-				strcpy(textBuf, text + 1);
+		const short msgId = *reinterpret_cast<const short*>(entry + 4);
+		int isDollar = 0;
+		if ((int)strlen(msgTable[msgId]) != 0) {
+			if (msgTable[msgId][0] == '$') {
+				strcpy(textBuf, msgTable[msgId] + 1);
 				isDollar = 1;
 			} else {
-				strcpy(textBuf, text);
-				isDollar = 0;
+				strcpy(textBuf, msgTable[msgId]);
 			}
 
 			if (winType == 0 || isDollar != 0) {
 				const int textWidth = font->GetWidth(textBuf);
-				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->x) + static_cast<double>(m_menuWindowInfo->width - textWidth) * DOUBLE_803313f8);
+				reinterpret_cast<int*>(&rawDiff)[0] = 0x43300000;
+				reinterpret_cast<int*>(&rawDiff)[1] = (m_menuWindowInfo->width - textWidth) ^ 0x80000000;
+				reinterpret_cast<int*>(&rawX)[0] = 0x43300000;
+				reinterpret_cast<int*>(&rawX)[1] = m_menuWindowInfo->x ^ 0x80000000;
+				posX = static_cast<float>((rawDiff - DOUBLE_80331408) * DOUBLE_803313f8 + (rawX - DOUBLE_80331408));
 			}
 			font->SetPosX(posX);
 			font->SetPosY(y);
 			if (messType == 0) {
-				char* slotText = 0;
 				if (winType != 0) {
-					slotText = strstr(textBuf, lbl_80210D54[languageIndex]);
-				}
-				if (!(winType == 0 || slotText == 0)) {
-					int len = strlen(lbl_80210D54[languageIndex]);
-					slotText[len - 1] += GetMcCtrl()->m_cardChannel;
+					char* slotText = strstr(textBuf, lbl_80210D54[languageIndex]);
+					if (slotText != 0) {
+						int len = strlen(lbl_80210D54[languageIndex]);
+						slotText[len - 1] += GetMcCtrl()->m_cardChannel;
+					} else {
+						goto markerBranch;
+					}
 				} else {
+				markerBranch: {
 					char* marker = strstr(textBuf, lbl_80331400);
 					if (marker != 0) {
 						marker[0] += 2;
 						marker[1] += 2;
 					}
+				}
 				}
 			} else {
 				char* dataText = strstr(textBuf, lbl_80210D68[languageIndex]);

@@ -7923,17 +7923,17 @@ void CMenuPcs::DrawCharaBase()
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
 
-	const float kZero = FLOAT_803313dc;
+	alpha = FLOAT_803313dc;
 	int yBase = 0x22;
 	for (int row = 0; row < 2; row++) {
 		for (int col = 0; col < 4; col++) {
-			const float x = static_cast<float>(0x1C + col * 0x90);
 			int yInt = yBase;
 			if (row != 0) {
 				yInt = yBase + 8;
 			}
 			const float y = static_cast<float>(yInt);
-			MenuPcs.DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, kZero, kZero, FLOAT_803313e8, FLOAT_803313e8, kZero);
+			const float x = static_cast<float>(0x1C + col * 0x90);
+			MenuPcs.DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, alpha, alpha, FLOAT_803313e8, FLOAT_803313e8, alpha);
 		}
 		yBase += 0xB8;
 	}

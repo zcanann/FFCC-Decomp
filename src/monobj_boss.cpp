@@ -2721,7 +2721,7 @@ void CGMonObj::teleport(
 		}
 	}
 
-	const int stateFrame = m_stateFrame;
+#define stateFrame (prgObj->m_stateFrame)
 
 	if (stateFrame <= blendStartFrame) {
 		if (startFrame <= stateFrame) {
@@ -2816,6 +2816,7 @@ void CGMonObj::teleport(
 }
 #undef object
 #undef mon
+#undef stateFrame
 #pragma global_optimizer on
 
 /*

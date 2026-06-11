@@ -5046,10 +5046,10 @@ void CMenuPcs::DrawMoveMenu()
 	float moveAlpha;
 	int __p16 = state;
 	if (__p16 == 1) {
-		moveAlpha = static_cast<float>((static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
+		moveAlpha = static_cast<float>(static_cast<double>(worldState->m_frameCounter) / DOUBLE_803316e8);
 	int __p16 = state;
 	} else if (__p16 == 2 && bytes[0x13] != 0) {
-		moveAlpha = static_cast<float>(DOUBLE_80331420 - (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
+		moveAlpha = static_cast<float>(DOUBLE_80331420 - static_cast<double>(worldState->m_frameCounter) / DOUBLE_803316e8);
 	} else {
 		moveAlpha = FLOAT_803313e8;
 	}
@@ -5071,19 +5071,16 @@ void CMenuPcs::DrawMoveMenu()
 	if (worldState->m_mainState > 0 && worldState->m_mainState < 3) {
 		unsigned char* const worldObj = m_wm.m_worldObjData;
 #define handle (reinterpret_cast<CCharaPcs::CHandle*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]))
-		Mtx savedCamera;
 		Mtx lookAtMtx;
 		Mtx44 projectionMtx;
-
-		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 
 		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x1A0), reinterpret_cast<Vec*>(&up),
-		    reinterpret_cast<Point3d*>(&target));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, savedCamera);
+		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x1A0),
+		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
+		            reinterpret_cast<Point3d*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
@@ -5126,7 +5123,7 @@ void CMenuPcs::DrawMoveMenu()
 			}
 		}
 
-		PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
+		PSMTXCopy(reinterpret_cast<MtxPtr>(bytes + 0x744), CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0x00FFFFFF);
 		PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);

@@ -364,8 +364,20 @@ void CGBaseObj::onFrame()
  * JP Address: TODO
  * JP Size: TODO
  */
+struct SAnimFillGroup {
+    s8 b0;
+    s8 b1;
+    s8 b2;
+    s8 b3;
+    s8 b4;
+    s8 b5;
+    s8 b6;
+    s8 b7;
+};
+
 #pragma push
 #pragma optimization_level 3
+#pragma opt_lifetimes off
 void CGObject::onCreate()
 {
     m_worldPosition.z = sZeroFloat;
@@ -504,20 +516,50 @@ void CGObject::onCreate()
     *reinterpret_cast<float*>(m_worldMode) = sZeroFloat;
 
     int animStateOffset = 0;
-    s8* animState;
     for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 4; j++) {
-            animState = reinterpret_cast<s8*>(m_animQueue) + animStateOffset - 0x41;
-            animStateOffset += 8;
-            animState[0] = -1;
-            animState[1] = -1;
-            animState[2] = -1;
-            animState[3] = -1;
-            animState[4] = 0xFF;
-            animState[5] = -1;
-            animState[6] = -1;
-            animState[7] = 0xFF;
-        }
+        int groupOffset;
+        s8* animState;
+        groupOffset = animStateOffset + 0x9d;
+        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState[0] = -1;
+        animState[1] = -1;
+        animState[2] = -1;
+        animState[3] = -1;
+        animState[4] = -1;
+        animState[5] = -1;
+        animState[6] = -1;
+        animState[7] = -1;
+        groupOffset = animStateOffset + 0xa5;
+        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState[0] = -1;
+        animState[1] = -1;
+        animState[2] = -1;
+        animState[3] = -1;
+        animState[4] = -1;
+        animState[5] = -1;
+        animState[6] = -1;
+        animState[7] = -1;
+        groupOffset = animStateOffset + 0xad;
+        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animState[0] = -1;
+        animState[1] = -1;
+        animState[2] = -1;
+        animState[3] = -1;
+        animState[4] = -1;
+        animState[5] = -1;
+        animState[6] = -1;
+        animState[7] = -1;
+        groupOffset = animStateOffset + 0xb5;
+        animState = reinterpret_cast<s8*>(reinterpret_cast<int>(this) + groupOffset);
+        animStateOffset += 0x20;
+        animState[0] = -1;
+        animState[1] = -1;
+        animState[2] = -1;
+        animState[3] = -1;
+        animState[4] = -1;
+        animState[5] = -1;
+        animState[6] = -1;
+        animState[7] = -1;
     }
 
     memset(&m_attackColliders[0].m_localStart.y, 0, 0x180);

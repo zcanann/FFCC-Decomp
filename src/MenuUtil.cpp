@@ -204,6 +204,11 @@ static const MenuOptionEstandarData s_MenuOptionEstandarEs = {
 static const char s_MenuUtil_cpp_801e37fc[] = "MenuUtil.cpp";
 static const char s_MenuUtilAllocErrorFmt[] = "%s(%d): Error: memory allocation error\n";
 
+// DrawHelpMessageUS anchors on the start of this TU's .rodata island
+// (lbl_801E3058) and reaches the help-line table and the alloc-error strings
+// via fixed offsets, matching the target's pooled-base addressing.
+extern "C" char lbl_801E3058[];
+
 extern const char s_MenuOptionMusic[];
 extern const char s_MenuOptionOn[];
 extern const char s_MenuOptionOff[];
@@ -429,9 +434,10 @@ void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* tex
 void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor color, int tlut, float margin, float scale)
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
+	char* anchor = lbl_801E3058;
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	u32 lineBaseY[4];
-	const int* lineBaseData = s_MenuOptionEstandarEs.m_helpLineBaseY;
+	const int* lineBaseData = reinterpret_cast<const int*>(anchor + 0x678);
 	lineBaseY[0] = lineBaseData[0];
 	lineBaseY[1] = lineBaseData[1];
 	lineBaseY[2] = lineBaseData[2];
@@ -439,8 +445,6 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 	int languageIndex = Game.m_gameWork.m_languageId - 1;
 	int drawPrefix = 1;
-	int firstLine = 500;
-	int maxWidth = -1;
 	float lineStep = kHelpMessageLineStep;
 	const char* suffix = 0;
 	char itemName[260];
@@ -454,18 +458,25 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	font->SetColor(color);
 	font->SetScale(kOptionMenuFontScale);
 
+	int maxWidth;
+	int firstLine = 500;
+	int lineMax;
 	if ((0 <= msgNo) && (msgNo <= 0x268)) {
 		firstLine = msgNo * 3 + 0x1F5;
+		lineMax = 3;
 	}
+	maxWidth = -1;
 
-	CMemory::CStage* stage = MenuPcs.m_menuStage;
+	CMemory::CStage* stage;
 	if (Game.m_gameWork.m_menuStageMode != 0) {
 		stage = MenuPcs.m_stageF4;
+	} else {
+		stage = MenuPcs.m_menuStage;
 	}
 
-	char* temp = new (stage, const_cast<char*>(s_MenuUtil_cpp_801e37fc), 0x8C) char[0x200];
+	char* temp = new (stage, anchor + 0x7A4, 0x8C) char[0x200];
 	if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-		System.Printf(const_cast<char*>(s_MenuUtilAllocErrorFmt), const_cast<char*>(s_MenuUtil_cpp_801e37fc), 0x8E);
+		System.Printf(anchor + 0x7B4, anchor + 0x7A4, 0x8E);
 	}
 	for (int line = firstLine; line < firstLine + 3; line++) {
 		char* msg = GetMenuHelpMsgTable()[line];
@@ -498,13 +509,15 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			itemName[0] = '\0';
 		} else {
 			Game.MakeArtItemName(itemName, msgNo, 1);
-			if ((strlen(itemName) != 0) && (itemName[0] != '\0')) {
+			if ((strlen(itemName) != 0) && (static_cast<signed char>(itemName[0]) != 0)) {
 				itemName[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(itemName[0])));
 			}
 		}
-	}
-	if (drawPrefix + 3 == 4) {
-		lineStep = kOptionUiTwenty;
+
+		int four = drawPrefix + 3;
+		if (four == 4) {
+			lineStep = kOptionUiTwenty;
+		}
 	}
 
 	int rangeKind;
@@ -530,7 +543,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < lineMax; i++) {
 			char* msg = GetMenuHelpMsgTable()[firstLine + i];
 			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
@@ -668,11 +681,11 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			stage = MenuPcs.m_stageF4;
 		}
 
-		temp = new (stage, const_cast<char*>(s_MenuUtil_cpp_801e37fc), 0x23D) char[0x200];
+		temp = new (stage, anchor + 0x7A4, 0x23D) char[0x200];
 		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-			System.Printf(const_cast<char*>(s_MenuUtilAllocErrorFmt), const_cast<char*>(s_MenuUtil_cpp_801e37fc), 0x23F);
+			System.Printf(anchor + 0x7B4, anchor + 0x7A4, 0x23F);
 		}
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < lineMax; i++) {
 			char* msg = GetMenuHelpMsgTable()[firstLine + i];
 			memset(temp, 0, 0x200);
 			CMes::MakeAgbString(temp, msg, 0, 1);

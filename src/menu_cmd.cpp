@@ -579,15 +579,14 @@ void CMenuPcs::CmdInit2()
 		entry->duration = 5;
 	}
 
-	CmdListStorage* list = GetCmdListStorage(this);
-	CmdListEntry* entries = list->entries;
-	const s16 start = list->count;
-	list->listEnd = start + 0xc;
+	GetCmdListStorage(this)->listEnd = static_cast<s16>(i);
 
-	const u32 count = static_cast<u32>(static_cast<s32>(list->listEnd) - static_cast<s32>(list->count));
-	CmdListEntry* fillEntry = &entries[list->count];
+	CmdListStorage* list = GetCmdListStorage(this);
+	s32 k = list->count;
+	CmdListEntry* fillEntry = &list->entries[k];
 	const float alpha = kCmdMenuOne;
-	for (u32 k = count; k != 0; k--) {
+	k = static_cast<s32>(list->listEnd) - k;
+	for (; k > 0; k--) {
 		fillEntry->timer = 0;
 		fillEntry->alpha = alpha;
 		fillEntry++;

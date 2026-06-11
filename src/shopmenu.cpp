@@ -637,6 +637,16 @@ static inline void SetupShopMenuValueFont(CFont* font)
     font->SetMargin(FLOAT_80332d34);
 }
 
+static inline void SetupShopMenuGilFont(CFont* font)
+{
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+    font->DrawInit();
+    SetShopMenuFontRenderBit(font);
+    font->SetMargin(FLOAT_80332d64);
+}
+
 static void DrawShopMenuAmount(CFont* font, int value, float rightEdge, float y, int tlut)
 {
     char amountBuffer[64];
@@ -1355,7 +1365,7 @@ void CShopMenu::DrawItemInfo0()
         MenuPcs.DrawSingleIcon(itemNo, 0x40, 100, FLOAT_80332d28, 0, FLOAT_80332d28);
     }
 
-    CFont* font = GetShopMenuInfoPanelFont();
+    CFont* font = MenuPcs.m_fonts[0];
     font->SetMargin(FLOAT_80332d28);
     font->SetShadow(1);
     font->SetScaleX(FLOAT_80332d2c);
@@ -1408,8 +1418,9 @@ void CShopMenu::DrawItemInfo0()
             totalGil = -1;
         }
 
-        SetupShopMenuAmountFont(font);
-        DrawShopMenuAmountTrunc(font, totalGil, amountRightX, FLOAT_80332d68, 0x1B);
+        CFont* amountFont = MenuPcs.m_fonts[0];
+        SetupShopMenuGilFont(amountFont);
+        DrawShopMenuAmountTrunc(amountFont, totalGil, amountRightX, FLOAT_80332d68, 0x1B);
 
         font->SetMargin(FLOAT_80332d28);
         font->DrawInit();
@@ -1435,12 +1446,7 @@ void CShopMenu::DrawItemInfo0()
         CFont* countFont = MenuPcs.m_fonts[0];
         int countEdge = 0x108;
         int amount = m_quantity;
-        countFont->SetShadow(1);
-        countFont->SetScale(FLOAT_80332d28);
-        countFont->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-        countFont->DrawInit();
-        SetShopMenuFontRenderBit(countFont);
-        countFont->SetMargin(FLOAT_80332d34);
+        SetupShopMenuValueFont(countFont);
         char countBuffer[64];
         sprintf(countBuffer, s_TwoDigitFormat_80332d18, amount);
         int countRightX = static_cast<int>(countEdge - countFont->GetWidth(countBuffer));

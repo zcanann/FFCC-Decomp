@@ -1122,14 +1122,16 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     if (stageGetAllocationMode(this) == 2) {
         int i;
         int blockTail;
+        int showFree = flag & 1;
+        int showUsed = flag & 2;
         int size;
         int top = m_heapTop;
 
-        for (i = 0; i <= m_blockCount; i++) {
+        for (i = 0; i <= m_blockCount; i++, node++) {
             blockTail = (m_blockCount == i) ? m_heapBottom : reinterpret_cast<int>(node->m_prev);
             size = blockTail - top;
             if (size != 0) {
-                if ((flag & 1) != 0) {
+                if (showFree != 0) {
                     System.Printf(
                         const_cast<char*>(strBase + 0x430), freeCount, sHeapWalkerFree, 0, top - blockTail, totalSize, 0, 0, 0,
                         sEmptyAllocSourceName, 0);
@@ -1141,7 +1143,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
 
             if (i < m_blockCount) {
                 int used = reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node->m_prev);
-                if ((flag & 2) != 0) {
+                if (showUsed != 0) {
                     System.Printf(
                         const_cast<char*>(strBase + 0x430), usedCount, sHeapWalkerUsed,
                         node->m_level, used, totalSize, node->m_prev, 0, 0, node->m_source,
@@ -1152,8 +1154,6 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                 top = blockTail + used;
                 usedCount++;
             }
-
-            node++;
         }
     } else {
         while ((node->m_flags & 2) == 0) {

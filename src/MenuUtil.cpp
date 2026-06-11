@@ -442,20 +442,16 @@ void CMenuPcs::DrawOptionMenu()
 	color.b = 0xFF;
 	color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionOpenAnim));
 
-	char* optionText[5] = {
-	    OPT_MES(2),
-	    OPT_MES(3),
-	    OPT_MES(4),
-	    OPT_MES(5),
-	    OPT_MES(6),
-	};
-	char* helpText[5] = {
-	    OPT_MES(7),
-	    OPT_MES(8),
-	    OPT_MES(9),
-	    OPT_MES(10),
-	    OPT_MES(11),
-	};
+	char* optionText[5] = {};
+	char* helpText[5] = {};
+	char** mes = &g_strMenuUtilMes[langRow * 20];
+	int idx = 2;
+	for (int n = 0; n < 5; n++) {
+		optionText[n] = mes[idx++];
+	}
+	for (int n = 0; n < 5; n++) {
+		helpText[n] = mes[idx++];
+	}
 
 	CTexture* banner = GetMenuTexture(this, 0xD4);
 	float bannerWidth = static_cast<float>(banner->m_width);

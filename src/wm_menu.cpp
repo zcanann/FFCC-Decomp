@@ -684,11 +684,10 @@ CMenuPcs::EffectInfo::EffectInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma peephole off
 void CMenuPcs::WmInit()
 {
-	float initValue = FLOAT_803313dc;
+	const float* pInit = &FLOAT_803313dc;
+	float initValue = *pInit;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	m_wm.m_worldObjData = 0;
@@ -724,7 +723,6 @@ void CMenuPcs::WmInit()
 		gWmMenuScriptValueCache = 100;
 	}
 }
-#pragma pop
 
 /*
  * --INFO--

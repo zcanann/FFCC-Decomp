@@ -2507,8 +2507,8 @@ void CMenuPcs::CalcResultCloseAnim()
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int off = 0;
-		short* count = (short*)this->m_bonusAnimPtr;
-		for (int i = 0; i < *count; i++, count = (short*)this->m_bonusAnimPtr) {
+		short* count;
+		for (int i = 0; i < *(count = (short*)this->m_bonusAnimPtr); i++) {
 			*(int*)((int)count + off + 0x28) = 0;
 			*(float*)(this->m_bonusAnimPtr + off + 0x38) = kBonusZClearOrigin;
 			*(float*)(this->m_bonusAnimPtr + off + 0x3c) = kBonusZClearOrigin;

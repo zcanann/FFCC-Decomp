@@ -550,18 +550,10 @@ bool CMenuPcs::MoneyOpen()
 
 		float one = 1.0f;
 		MoneyMenuAnim* initAnim = this->m_moneyPanel->anims;
-		int initCount = 8;
-		do {
-			initAnim[0].uvScale = one;
-			initAnim[1].uvScale = one;
-			initAnim[2].uvScale = one;
-			initAnim[3].uvScale = one;
-			initAnim[4].uvScale = one;
-			initAnim[5].uvScale = one;
-			initAnim[6].uvScale = one;
-			initAnim[7].uvScale = one;
-			initAnim += 8;
-		} while (--initCount != 0);
+		int initCount;
+		for (initCount = 0; initCount < 64; initCount++, initAnim++) {
+			initAnim->uvScale = one;
+		}
 
 		int entryIndex = 0;
 		MoneyMenuAnim* firstAnim = &this->m_moneyPanel->anims[entryIndex++];

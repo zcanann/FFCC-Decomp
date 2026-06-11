@@ -2308,7 +2308,7 @@ void CMenuPcs::CmakeSexDraw()
         static_cast<float>(static_cast<int>(-(sexH / 2.0 - 188.0))),
         416.0f, 264.0f,
         0.0f, 0.0f, 0.6153846383094788f, 0.6153846383094788f, 0.0f);
-    DrawCmakeTitle(2, 1.0f, alpha);
+    DrawCmakeTitle(2, alpha, 1.0f);
 
     CFont* font = m_fonts[CMAKE_FONT_LABEL];
     font->SetMargin(1.0f);

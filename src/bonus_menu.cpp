@@ -2821,8 +2821,9 @@ void CMenuPcs::DrawResultCountAnim()
 
 	int modelIndex = 0;
 	int lastKind = 0;
-	int off = 0;
-	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
+	int i = 0;
+	int off = i << 6;
+	for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
 		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 
 		if (sprite->kind >= 0 || sprite->kind == -2) {
@@ -2933,7 +2934,8 @@ void CMenuPcs::DrawResultCountAnim()
 				strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 			} else {
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
-				strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[(int)caravanWork->m_bonusCondition * 2 + 1]);
+				int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
+				strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[strIdx]);
 			}
 
 			float x = (float)sprite->x + sprite->motionX;

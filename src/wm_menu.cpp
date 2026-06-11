@@ -6435,17 +6435,15 @@ void CMenuPcs::CalcSpl(CMenuPcs::SPL* out, CMenuPcs::SPL* in, float t)
  */
 float CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 {
-	const float* pScale = &FLOAT_803314c0;
-	const float* pZero = &FLOAT_803313dc;
 	float* cur;
 	int idx;
 	float* keys;
 	float result;
 	int keyCount;
 	keyCount = fcv.keyCount;
-	float t = value / *pScale;
+	float t = value / FLOAT_803314c0;
 	keys = fcv.keys;
-	result = *pZero;
+	result = FLOAT_803313dc;
 
 	if (t >= keys[keyCount * 4 - 4]) {
 		return keys[keyCount * 4 - 3];

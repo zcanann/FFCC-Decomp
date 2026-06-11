@@ -176,7 +176,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float shapeScaleStep;
     pppFMATRIX localBase;
     pppFMATRIX unitScratch;
-    pppFMATRIX drawMtx;
+    pppFMATRIX drawMtx ATTRIBUTE_ALIGN(8);
     pppFMATRIX rotMtxA;
     pppFMATRIX rotMtxB;
     Vec zeroVecA;
@@ -291,8 +291,10 @@ draw_loop:
         drawScale *= -(((float)rng / kPppKeShpTail3XRandomMax) * step->m_randomScale - kPppKeShpTail3XOne);
         {
             u32 shapeIdx = (u32)(life + rng) / shapeFrameDuration;
-            pppShapeAnimFrame* frame = &shapeAnim->m_frames[shapeIdx % (u32)shapeFrameCount];
-            shapeEntry = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + frame->m_shapeOffset);
+            u32 frameIndex = shapeIdx % (u32)shapeFrameCount;
+            u32 frameOffset = frameIndex * sizeof(pppShapeAnimFrame) + offsetof(pppShapeAnimData, m_frames);
+            short shapeOffset = *reinterpret_cast<short*>(reinterpret_cast<u8*>(shapeAnim) + frameOffset);
+            shapeEntry = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + shapeOffset);
         }
     }
 

@@ -895,10 +895,11 @@ static void CopyMogTextureToChara(CChara::CModel* model)
 	}
 
 	void* srcBuffer = texture->m_imageData;
-	const int texelCountBytes = texture->m_width * texture->m_height * 2;
+	const int texWidth = texture->m_width;
+	const int texHeight = texture->m_height;
 
 	memcpy(Chara.MogFur().m_texels, srcBuffer, 0x2000);
-	DCFlushRange(srcBuffer, texelCountBytes);
+	DCFlushRange(srcBuffer, texWidth * texHeight * 2);
 	GXInvalidateTexAll();
 }
 

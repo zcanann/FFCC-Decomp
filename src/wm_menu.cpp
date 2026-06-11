@@ -8493,7 +8493,7 @@ void CMenuPcs::CalcCharaSelect()
 
 	const short winState = m_menuWindowInfo->state;
 	if (winState != 3) {
-		unsigned short anyTrig = 0;
+		unsigned short anyTrig = static_cast<unsigned short>(requestCancel);
 		for (int i = anyTrig; i < 4; i++) {
 			anyTrig |= padTrig[i];
 		}

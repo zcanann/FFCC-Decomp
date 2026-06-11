@@ -3253,8 +3253,8 @@ void CMenuPcs::DrawResultOpenAnim()
 					} else {
 						if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
 							int value = 0;
-							float digitW = (float)sprite->w;
 							float digitX = (float)((DOUBLE_80331EC8 * (double)sprite->w - (float)sprite->w) * DOUBLE_80331E78 + (double)sprite->x);
+							float digitW = (float)sprite->w;
 							MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
 							    (float)(sprite->w * value), sprite->mulY,
 							    sprite->depth, sprite->depth, kBonusZClearOrigin);

@@ -10744,7 +10744,10 @@ void CMenuPcs::DrawMCList()
 				alpha = FLOAT_803313e8;
 			}
 			if (!(alpha <= DOUBLE_803314F0)) {
-				float slotY = static_cast<float>(DOUBLE_80331498 * static_cast<double>(slot) + DOUBLE_80331490);
+				double rawSlot1;
+				reinterpret_cast<int*>(&rawSlot1)[0] = 0x43300000;
+				reinterpret_cast<int*>(&rawSlot1)[1] = slot ^ 0x80000000;
+				float slotY = static_cast<float>(DOUBLE_80331498 * (rawSlot1 - DOUBLE_80331408) + DOUBLE_80331490);
 				MenuPcs.SetAttrFmt((FMT)0);
 				alpha = FLOAT_80331458 * alpha;
 				GXColor slotColor;

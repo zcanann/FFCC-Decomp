@@ -1358,6 +1358,36 @@ void CMapObj::SetDrawEnv()
  * JP Address: TODO
  * JP Size: TODO
  */
+static inline void drawMapColorAlpha(CMapObj* obj)
+{
+    _GXColor mapColor;
+
+    if (obj->m_useAmbientColor != 0) {
+        mapColor = obj->m_ambientColor;
+    } else {
+        mapColor = MapMng.m_mapColor;
+    }
+
+    if (MapMng.m_colorScaleEnable != 0) {
+        mapColor.r = static_cast<unsigned char>((mapColor.r * MapMng.m_colorScale.r) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * MapMng.m_colorScale.g) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * MapMng.m_colorScale.b) >> 8);
+        mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
+    }
+
+    if (obj->m_colorAlphaRate != 0xFF) {
+        unsigned char alphaRate = obj->m_colorAlphaRate;
+        mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
+    }
+
+    _GXColor lightColor = s_mapObjLightColor;
+    LightPcs.SetMapColorAlpha(obj->m_worldMtx, mapColor, lightColor, obj->m_cameraSemiTransActive,
+                              obj->m_cameraSemiTransNear, obj->m_cameraSemiTransFar, obj->m_cameraSemiTransFadeRange,
+                              static_cast<unsigned char>(obj->m_cameraSemiTransAlpha >> 7));
+}
+
 void CMapObj::Draw(unsigned char priority)
 {
     extern const float kMapObjOne;
@@ -1374,8 +1404,6 @@ void CMapObj::Draw(unsigned char priority)
     lightPos.z = m_worldMtx[2][3];
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(1), &lightPos, m_lightSetIndex);
 
-    _GXColor mapColor;
-
     MaterialMan.SetDefaultDrawEnv(0xACE0F);
 
     if (m_enableFullScreenShadow != 0) {
@@ -1390,30 +1418,7 @@ void CMapObj::Draw(unsigned char priority)
     MaterialMan.SaveCurrentEnvAsStd();
 
     s_mapObjLightColor.a = m_lightAlpha;
-    if (m_useAmbientColor != 0) {
-        mapColor = m_ambientColor;
-    } else {
-        mapColor = MapMng.m_mapColor;
-    }
-
-    if (MapMng.m_colorScaleEnable != 0) {
-        mapColor.r = static_cast<unsigned char>((mapColor.r * MapMng.m_colorScale.r) >> 8);
-        mapColor.g = static_cast<unsigned char>((mapColor.g * MapMng.m_colorScale.g) >> 8);
-        mapColor.b = static_cast<unsigned char>((mapColor.b * MapMng.m_colorScale.b) >> 8);
-        mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
-    }
-
-    if (m_colorAlphaRate != 0xFF) {
-        unsigned char alphaRate = m_colorAlphaRate;
-        mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
-        mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
-        mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
-    }
-
-    _GXColor lightColor = s_mapObjLightColor;
-    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, m_cameraSemiTransActive, m_cameraSemiTransNear,
-                              m_cameraSemiTransFar, m_cameraSemiTransFadeRange,
-                              static_cast<unsigned char>(m_cameraSemiTransAlpha >> 7));
+    drawMapColorAlpha(this);
     LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(m_bumpLight),
                               reinterpret_cast<Vec*>(&m_transRateX), m_bumpTexMatrixMode);
 

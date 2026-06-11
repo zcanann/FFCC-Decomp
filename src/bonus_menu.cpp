@@ -938,6 +938,14 @@ void CMenuPcs::CalcSelectCloseAnim()
 {
 	int activePartyCount = s_Rinfo->m_partyCount;
 	char* anchor = lbl_801DD510;
+	int partyByteOff;
+	int twice;
+	int i;
+	BonusAnimSprite* alphaSprite;
+	int doneCount;
+	CCharaPcs::CHandle* handle;
+	int total;
+	int tribeId;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int idx;
@@ -967,35 +975,36 @@ void CMenuPcs::CalcSelectCloseAnim()
 			spr->kind = 0x16;
 			spr->startFrame = 8;
 			spr->duration = 8;
-			idx = 1;
+			idx++;
 		}
+		int i1 = 0;
 		{
 			int off = (idx << 6) + 8;
 			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
-			spr->startFrame = 0;
+			spr->startFrame = i1;
 			spr->duration = 8;
 			BonusSpriteFlags(spr) = 2;
-			idx = 2;
+			idx++;
 		}
 		{
 			int off = (idx << 6) + 8;
 			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 			spr->kind = 0x1f;
-			spr->startFrame = 0;
-			spr->duration = 0;
+			spr->startFrame = i1;
+			spr->duration = i1;
 			BonusSpriteFlags(spr) = 2;
-			idx = 3;
+			idx++;
 		}
 		{
 			int off = (idx << 6) + 8;
 			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 			spr->kind = -4;
-			spr->startFrame = 0;
+			spr->startFrame = i1;
 			spr->duration = 8;
 		}
 
-		for (int i = 0; i < activePartyCount; i++) {
-			int off = ((i + 4) << 6) + 8;
+		for (; i1 < activePartyCount; i1++) {
+			int off = ((i1 + 4) << 6) + 8;
 			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 			spr->startFrame = 0;
 			spr->duration = 8;
@@ -1066,7 +1075,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 	int i0 = 0;
 	int off = i0;
-	int doneCount = 0;
+	doneCount = 0;
 	*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
 	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
 
@@ -1092,9 +1101,9 @@ void CMenuPcs::CalcSelectCloseAnim()
 		}
 
 		if ((BonusSpriteFlags(sprite) & 2) == 0 && (sprite->motionX != kBonusZClearOrigin || sprite->motionY != kBonusZClearOrigin)) {
+			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			float fy = (float)sprite->y;
 			float ty = sprite->targetY;
-			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
 			sprite->motionY = (ty - fy) * progress;
 		}
@@ -1146,15 +1155,13 @@ void CMenuPcs::CalcSelectCloseAnim()
 	Vec srcVec;
 	Vec dstVec;
 	{
-		int i = 0;
-		int twice = activePartyCount * 2;
-		int partyByteOff = i;
-		int total = activePartyCount + 8;
+		i = 0;
+		twice = activePartyCount * 2;
+		partyByteOff = i;
+		total = activePartyCount + 8;
 		for (; i < total; i++, partyByteOff += sizeof(BonusPartySummary)) {
 			int sprOff2 = (((int)(signed char)s_PlayerTop + i) << 6) + 8;
-			BonusAnimSprite* alphaSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff2);
-			CCharaPcs::CHandle* handle;
-			int tribeId;
+			alphaSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff2);
 			if (i < activePartyCount) {
 				int p = (int)s_Rinfo + partyByteOff;
 				tribeId = *(int*)(p + 0x44);
@@ -1163,8 +1170,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 				float modelScale = scaleTbl[tribeId];
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else {
-				int artifactIndex = twice + (i - activePartyCount);
-				int slotOff = artifactIndex * 4 + 0x774;
+				tribeId = twice + (i - activePartyCount);
+				int slotOff = tribeId * 4 + 0x774;
 				handle = *(CCharaPcs::CHandle**)((int)this + slotOff);
 				if (handle == 0) {
 					continue;
@@ -1396,8 +1403,8 @@ void CMenuPcs::CalcSelectWait()
 	short count2;
 	{
 		BonusAnimSprite* spr2 = (BonusAnimSprite*)(this->m_bonusAnimPtr + 0x88);
-		spr2->x = (short)(int)s_Base[0][selection * 2 + 2];
 		count2 = *(short*)this->m_bonusAnimPtr;
+		spr2->x = (short)(int)s_Base[0][selection * 2 + 2];
 		spr2 = (BonusAnimSprite*)(this->m_bonusAnimPtr + 0x88);
 		spr2->y = (short)(int)s_Base[0][selection * 2 + 3];
 		if (spr2->timer < spr2->duration) {
@@ -1796,8 +1803,18 @@ void CMenuPcs::DrawSelectOpenAnim()
 #pragma opt_lifetimes off
 void CMenuPcs::CalcSelectOpenAnim()
 {
-	char* anchor = lbl_801DD510;
 	int activePartyCount = s_Rinfo->m_partyCount;
+	int frame;
+	int doneCount;
+	char* anchor = lbl_801DD510;
+	int partyByteOff;
+	int twice;
+	float* scale4;
+	BonusAnimSprite* iconSprite;
+	int i;
+	int tribeId;
+	CCharaPcs::CHandle* handle;
+	int total;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int idx;
@@ -2071,10 +2088,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 	}
 
 	*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
-	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
+	frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
 	int i0 = 0;
 	int off = i0;
-	int doneCount = 0;
+	doneCount = 0;
 
 	for (; i0 < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i0++, off += 0x40) {
 		int sprOff = off + 8;
@@ -2098,9 +2115,9 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 
 		if ((BonusSpriteFlags(sprite) & 2) == 0 && (sprite->motionX != kBonusZClearOrigin || sprite->motionY != kBonusZClearOrigin)) {
+			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			float fy = (float)sprite->y;
 			float ty = sprite->targetY;
-			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
 			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
 			sprite->motionY = (ty - fy) * progress;
 		}
@@ -2152,15 +2169,14 @@ void CMenuPcs::CalcSelectOpenAnim()
 	Vec srcVec;
 	Vec dstVec;
 	{
-		int i = 0;
-		int partyByteOff = i;
-		float* scale4 = (float*)(anchor + 0x6c);
-		int total = activePartyCount + 8;
+		i = 0;
+		twice = activePartyCount * 2;
+		partyByteOff = i;
+		scale4 = (float*)(anchor + 0x6c);
+		total = activePartyCount + 8;
 		for (; i < total; i++, partyByteOff += sizeof(BonusPartySummary)) {
 			int sprOff2 = (((int)(signed char)s_PlayerTop + i) << 6) + 8;
-			BonusAnimSprite* iconSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff2);
-			CCharaPcs::CHandle* handle;
-			int tribeId;
+			iconSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff2);
 			if (i < activePartyCount) {
 				int p = (int)s_Rinfo + partyByteOff;
 				tribeId = *(int*)(p + 0x44);
@@ -2169,8 +2185,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 				float modelScale = scaleTbl[tribeId];
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else {
-				int artifactIndex = i - activePartyCount;
-				int slotOff = (activePartyCount * 2 + artifactIndex) * 4 + 0x774;
+				tribeId = twice + (i - activePartyCount);
+				int slotOff = tribeId * 4 + 0x774;
 				handle = *(CCharaPcs::CHandle**)((int)this + slotOff);
 				if (handle == 0) {
 					continue;

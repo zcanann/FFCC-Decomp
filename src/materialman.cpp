@@ -1027,14 +1027,14 @@ void CMaterialMan::SetUnderWaterTex()
     PSMTXCopy(CameraPcs.m_cameraMatrix, matrixB);
 
     matrixA[0][0] = screenMtx[0][0];
-    matrixA[1][1] = screenMtx[1][1];
-    matrixA[0][2] = screenMtx[0][2];
-    matrixA[1][2] = screenMtx[1][2];
-    matrixA[2][2] = screenMtx[2][2];
     matrixA[1][0] = screenMtx[1][0];
     matrixA[2][0] = screenMtx[2][0];
     matrixA[0][1] = screenMtx[0][1];
+    matrixA[1][1] = screenMtx[1][1];
     matrixA[2][1] = screenMtx[2][1];
+    matrixA[0][2] = screenMtx[0][2];
+    matrixA[1][2] = screenMtx[1][2];
+    matrixA[2][2] = screenMtx[2][2];
     matrixA[0][0] *= (kMaterialProjectionWidthScale / static_cast<float>(width));
     matrixA[1][1] *= -(kMaterialProjectionHeightScale / static_cast<float>(height));
     matrixA[0][2] = kMaterialProjectionCenter;

@@ -131,8 +131,10 @@ int CMenuPcs::ArtiCtrlCur()
 {
 	int sVar1;
 	bool bVar2;
-	u16 uVar4;
-	int uVar3;
+	u16 holdRaw;
+	u16 pressRaw;
+	s16 hold;
+	s16 press;
 	int padLock;
 	int selection;
 
@@ -142,68 +144,76 @@ int CMenuPcs::ArtiCtrlCur()
 		bVar2 = true;
 	}
 	if (bVar2) {
-		uVar3 = 0;
+		pressRaw = 0;
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		uVar3 = Pad.GetPadInputs()[padIndex].buttonDown[0];
+		pressRaw = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
+	press = (s16)(u16)pressRaw;
 
 	bVar2 = false;
 	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		bVar2 = true;
 	}
 	if (bVar2) {
-		uVar4 = 0;
+		holdRaw = 0;
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		uVar4 = Pad.GetPadInputs()[padIndex].repeatButton;
+		holdRaw = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
+	hold = (s16)(u16)holdRaw;
 
-	if (uVar4 == 0) {
+	if (hold == 0) {
 		return 0;
 	}
 
 	selection = GetArtiState(this)->currentSelection;
-	if ((uVar4 & 8) != 0) {
+	if ((hold & 8) != 0) {
 		sVar1 = GetArtiState(this)->selections[selection];
 		if (sVar1 != 0) {
 			GetArtiState(this)->selections[selection] = sVar1 + -1;
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
-		} else if (GetArtiState(this)->scrollOffset != 0) {
-			GetArtiState(this)->scrollOffset = GetArtiState(this)->scrollOffset + -1;
-			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else {
-			Sound.PlaySe(4, 0x40, 0x7f, 0);
+			int scrollOffset = GetArtiState(this)->scrollOffset;
+			if (scrollOffset != 0) {
+				GetArtiState(this)->scrollOffset = scrollOffset + -1;
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
+			} else {
+				Sound.PlaySe(4, 0x40, 0x7f, 0);
+			}
 		}
-	} else if ((uVar4 & 4) != 0) {
+	} else if ((hold & 4) != 0) {
 		sVar1 = GetArtiState(this)->selections[selection];
 		if (sVar1 < 7) {
 			GetArtiState(this)->selections[selection] = sVar1 + 1;
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
-		} else if ((int)GetArtiState(this)->scrollOffset + (int)sVar1 < 0x48) {
-			GetArtiState(this)->scrollOffset = GetArtiState(this)->scrollOffset + 1;
-			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else {
-			Sound.PlaySe(4, 0x40, 0x7f, 0);
+			int scrollOffset = GetArtiState(this)->scrollOffset;
+			if (scrollOffset + (int)sVar1 < 0x48) {
+				GetArtiState(this)->scrollOffset = scrollOffset + 1;
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
+			} else {
+				Sound.PlaySe(4, 0x40, 0x7f, 0);
+			}
 		}
 	}
 
-	if ((uVar4 & 0xc) == 0) {
-		if ((uVar3 & 0x20) != 0) {
+	if ((hold & 0xc) == 0) {
+		if ((press & 0x20) != 0) {
 			GetArtiState(this)->moveDirection = 1;
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 			return 1;
 		}
-		if ((uVar3 & 0x40) != 0) {
+		if ((press & 0x40) != 0) {
 			GetArtiState(this)->moveDirection = -1;
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 			return 1;
 		}
-		if ((uVar3 & 0x100) != 0) {
+		if ((press & 0x100) != 0) {
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
-		} else if ((uVar3 & 0x200) != 0) {
+		} else if ((press & 0x200) != 0) {
 			GetArtiState(this)->closeRequested = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
 			return 1;

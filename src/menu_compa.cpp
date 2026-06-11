@@ -412,7 +412,7 @@ bool CMenuPcs::CompaClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CMenuPcs::CompaCtrl()
+void CMenuPcs::CompaCtrl()
 {
 	int padState = Pad.m_debugPadLock;
 	short press;
@@ -484,7 +484,7 @@ noReset:
 		}
 	}
 
-	return doReset;
+	return;
 }
 
 /*

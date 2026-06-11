@@ -3140,9 +3140,8 @@ void CGPartyObj::moveCenterTargetParticle()
 	hitCylinder.m_radius = FLOAT_80331a78;
 
 	if (MapMng.CheckHitCylinderNear(&hitCylinder, (Vec*)&moveVec, 0x30) != 0) {
-		CMapObj* hitObj = getMapHitObject();
-		hitObj->CalcHitPosition(&hitPos);
-		hitObj->GetHitFaceNormal(&hitNormal);
+		getMapHitObject()->CalcHitPosition(&hitPos);
+		getMapHitObject()->GetHitFaceNormal(&hitNormal);
 
 		CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 		work->m_targetCursorPosB = hitNormal;
@@ -5285,7 +5284,7 @@ void CGPartyObj::gpmMove()
 
 	if (m_lastStateId == 0 &&
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
-		int moveKind;
+		int moveKind = 0;
 		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) != 0) {
 			moveKind = 0;
 			if (PartyData(this).carryObject != nullptr) {
@@ -5411,10 +5410,15 @@ void CGPartyObj::gpmMove()
 		sGhostPartyWork.carryDir = *reinterpret_cast<Vec*>(&moveDir);
 		sGhostPartyWork.carrySpeed += FLOAT_80331A70;
 		float speedScale = (sGhostPartyWork.pressure >= pressureLimit) ? kMonObjOne : FLOAT_80331A88;
-		if (sGhostPartyWork.carrySpeed >= 0.0f) {
+		float newSpeed = FLOAT_80331a78;
+		if (sGhostPartyWork.carrySpeed >= newSpeed) {
 			float speedLimit = speedScale * (m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[0]) + 0x690));
-			sGhostPartyWork.carrySpeed = (speedLimit < sGhostPartyWork.carrySpeed) ? speedLimit : sGhostPartyWork.carrySpeed;
+			newSpeed = speedLimit;
+			if (speedLimit >= sGhostPartyWork.carrySpeed) {
+				newSpeed = sGhostPartyWork.carrySpeed;
+			}
 		}
+		sGhostPartyWork.carrySpeed = newSpeed;
 
 		sGhostPartyWork.field08++;
 		if (sGhostPartyWork.field08 == 4) {

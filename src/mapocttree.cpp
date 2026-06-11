@@ -1104,8 +1104,8 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
  */
 int CBound::CheckCross(CBound& other)
 {
-	bool overlap;
 	bool xyOverlap;
+	bool overlap;
 	int xOverlap;
 
 	overlap = false;

@@ -2071,7 +2071,7 @@ void CAmemCacheSet::RefCnt0Compare()
     }
 
     for (int i = 0; i < m_cacheCount; i++) {
-        CAmemCache& entry = cacheEntryAt(this, i);
+        CAmemCache& entry = m_cacheTable[i];
         if ((entry.m_inUse != 0 && entry.m_refCount != 0) &&
             static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(

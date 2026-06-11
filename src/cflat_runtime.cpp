@@ -375,11 +375,11 @@ void CFlatRuntime::Create(void* filePtr)
 				        char[chunk.m_size];
 
 				memcpy(m_strBlob, chunkFile.GetAddress(), chunk.m_size);
-				const unsigned short base = *reinterpret_cast<short*>(chunkFile.GetAddress());
+				u8* const base = chunkFile.GetAddress();
 				int offset = 0;
 				for (int i = 0; i < m_strCount; i++) {
-					const short cur = *reinterpret_cast<short*>(chunkFile.GetAddress());
-					*reinterpret_cast<short*>(reinterpret_cast<u8*>(m_strOffsets) + offset) = cur - base;
+					*reinterpret_cast<short*>(reinterpret_cast<u8*>(m_strOffsets) + offset) =
+					    chunkFile.GetAddress() - base;
 					chunkFile.GetString();
 					offset += 2;
 				}
@@ -396,11 +396,11 @@ void CFlatRuntime::Create(void* filePtr)
 				        char[chunk.m_size];
 
 				memcpy(m_fstrBlob, chunkFile.GetAddress(), chunk.m_size);
-				const short base = *reinterpret_cast<short*>(chunkFile.GetAddress());
+				u8* const base = chunkFile.GetAddress();
 				int offset = 0;
 				for (int i = 0; i < m_fstrCount; i++) {
-					const short cur = *reinterpret_cast<short*>(chunkFile.GetAddress());
-					*reinterpret_cast<short*>(reinterpret_cast<u8*>(m_fstrOffsets) + offset) = cur - base;
+					*reinterpret_cast<short*>(reinterpret_cast<u8*>(m_fstrOffsets) + offset) =
+					    chunkFile.GetAddress() - base;
 					chunkFile.GetString();
 					offset += 2;
 				}
@@ -417,11 +417,11 @@ void CFlatRuntime::Create(void* filePtr)
 				        char[chunk.m_size];
 
 				memcpy(m_vstrBlob, chunkFile.GetAddress(), chunk.m_size);
-				const short base = *reinterpret_cast<short*>(chunkFile.GetAddress());
+				u8* const base = chunkFile.GetAddress();
 				int offset = 0;
 				for (int i = 0; i < m_vstrCount; i++) {
-					const short cur = *reinterpret_cast<short*>(chunkFile.GetAddress());
-					*reinterpret_cast<short*>(reinterpret_cast<u8*>(m_vstrOffsets) + offset) = cur - base;
+					*reinterpret_cast<short*>(reinterpret_cast<u8*>(m_vstrOffsets) + offset) =
+					    chunkFile.GetAddress() - base;
 					chunkFile.GetString();
 					offset += 2;
 				}

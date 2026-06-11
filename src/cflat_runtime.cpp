@@ -13,6 +13,8 @@ void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CS
 }
 
 static const char s_cflat_runtime_newline[] = "\n";
+extern const char lbl_8033011C[8] = "no name";
+extern const char s_CFlatRuntime_801D8EE8[] = "CFlatRuntime";
 static const char s_cflat_runtime_cpp[] = "cflat_runtime.cpp";
 
 
@@ -1366,7 +1368,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		int m_codeOffset : 20;
 	};
 
-	CStopWatch watch("no name");
+	CStopWatch watch(const_cast<char*>(lbl_8033011C));
 	watch.Reset();
 	watch.Start();
 
@@ -2134,7 +2136,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			result = 0;
 			break;
 		default: {
-			CStopWatch watch("no name");
+			CStopWatch watch(const_cast<char*>(lbl_8033011C));
 			watch.Reset();
 			watch.Start();
 			ret = onClassSystemFunc(object, systemKind, systemIndex, result);
@@ -2247,7 +2249,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			goto done;
 		}
 
-		CStopWatch watch("no name");
+		CStopWatch watch(const_cast<char*>(lbl_8033011C));
 		watch.Reset();
 		watch.Start();
 		ret = onSystemFunc(object, systemKind, systemIndex, result);

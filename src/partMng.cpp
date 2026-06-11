@@ -1022,7 +1022,7 @@ void CPartMng::pppGet2Dpos()
     int zAtPixel;
     Vec worldPos;
     Vec viewPos;
-    Mtx invCamera;
+    Mtx invCamera ATTRIBUTE_ALIGN(8);
     PartMngMouseRaw* raw = reinterpret_cast<PartMngMouseRaw*>(this);
 
     if (raw->requestFlag != 0) {

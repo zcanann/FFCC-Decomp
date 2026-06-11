@@ -1324,7 +1324,8 @@ void CMenuPcs::CmdDraw()
 		}
 
 		const s32 frame = static_cast<s32>(System.m_frameCounter) % 8;
-		DrawCursor(static_cast<s32>(x + static_cast<float>(frame)), static_cast<s32>(y), kCmdMenuOne);
+		x += static_cast<float>(frame);
+		DrawCursor(static_cast<s32>(x), static_cast<s32>(y), kCmdMenuOne);
 	}
 
 	const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));

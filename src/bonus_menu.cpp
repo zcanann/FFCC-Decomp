@@ -3683,12 +3683,11 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 
 			if (sprite->kind == 0x17) {
-				BonusAnimSprite* sound = sprite;
 				for (int j = 0; j < s_Rinfo->m_partyCount; j++) {
-					if (sound->timer - 1 == 0) {
+					if (sprite->timer - 1 == 0) {
 						Sound.PlaySe(0x49, 0x40, 0x7f, 0);
 					}
-					sound++;
+					sprite++;
 				}
 			}
 		}

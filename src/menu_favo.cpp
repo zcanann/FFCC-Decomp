@@ -504,26 +504,17 @@ void CMenuPcs::FavoInit()
 	float fVar5;
 	int sVar9;
 	int sVar10;
-	unsigned short sVar11;
-	unsigned int iVar16;
+	int sVar11;
+	int iVar16;
 	int iVar17;
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	memset(m_favoList, 0, sizeof(*m_favoList));
 	FavoEntry* entry = m_favoList->entries;
-	iVar16 = 8;
-	do {
-		entry[0].uvScale = 1.0f;
-		entry[1].uvScale = 1.0f;
-		entry[2].uvScale = 1.0f;
-		entry[3].uvScale = 1.0f;
-		entry[4].uvScale = 1.0f;
-		entry[5].uvScale = 1.0f;
-		entry[6].uvScale = 1.0f;
-		entry[7].uvScale = 1.0f;
-		entry += 8;
-		iVar16 = iVar16 - 1;
-	} while (iVar16 != 0);
+	for (iVar16 = 64; iVar16 > 0; iVar16--) {
+		entry->uvScale = 1.0f;
+		entry++;
+	}
 
 	FavoListStorage* list = this->m_favoList;
 	int entryIndex = 0;
@@ -609,17 +600,16 @@ void CMenuPcs::FavoInit()
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	FavoEntry* firstEntry = &list->entries[0];
+	FavoEntry* firstEntry = &this->m_favoList->entries[0];
 	int byteOff = 0x180;
-	iVar17 = 4;
-	do {
+	for (iVar17 = 4; iVar17 > 0; iVar17--) {
 		setupEntry = reinterpret_cast<FavoEntry*>(reinterpret_cast<char*>(this->m_favoList->entries) + byteOff);
 		setupEntry->flags = 2;
 		setupEntry->tex = 0x37;
 		sVar11 = sVar11 + 2;
 		setupEntry->x = firstEntry->x + 0x28;
-		sVar10 = sVar9 + 0x20;
 		setupEntry->y = firstEntry->y + sVar9;
+		sVar10 = sVar9 + 0x20;
 		setupEntry->w = 200;
 		setupEntry->h = 0x28;
 		setupEntry->u = fVar4;
@@ -632,15 +622,15 @@ void CMenuPcs::FavoInit()
 		setupEntry->flags = 2;
 		setupEntry->tex = 0x37;
 		setupEntry->x = firstEntry->x + 0x28;
-		sVar9 = sVar9 + 0x40;
 		setupEntry->y = firstEntry->y + sVar10;
+		sVar9 = sVar10 + 0x20;
 		setupEntry->w = 200;
 		setupEntry->h = 0x28;
 		setupEntry->u = fVar4;
 		setupEntry->v = fVar4;
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
-	} while (--iVar17 != 0);
+	}
 
 	m_favoList->count = sVar11;
 

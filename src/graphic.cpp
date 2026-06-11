@@ -53,15 +53,15 @@ extern const float kGraphicSphereNegativeX = -1.0f;
 extern const double kGraphicHalfF64 = 4503599627370496.0;
 extern const float kGraphicSpherePi = 3.1415927410125732f;
 extern const double DOUBLE_8032F6E8 = 4503601774854144.0;
-extern const float kGraphicSmallBackTextureWidth = 320.0f;
-extern const float kGraphicSmallBackTextureHeight = 224.0f;
+extern const float kGraphicSmallBackTextureWidth;
+extern const float kGraphicSmallBackTextureHeight;
 extern const float FLOAT_8032F6F8 = 16777215.0f;
 extern const float FLOAT_8032F6FC = 0.7f;
 extern const float kGraphicSphereRingDivisor = 6.0f;
 extern const float kGraphicSphereSegmentAngle = 0.7853981852531433f;
-extern const float kGraphicBlurAlphaScale = -100.0f;
-extern const float kGraphicNoiseTexScaleU = 0.015625f;
-extern const float kGraphicNoiseTexScaleV = 0.010416667163372f;
+extern const float kGraphicBlurAlphaScale;
+extern const float kGraphicNoiseTexScaleU;
+extern const float kGraphicNoiseTexScaleV;
 extern const char sGraphicUnknownOrderName[4] = "---";
 
 static inline float CameraNearZ()
@@ -2055,3 +2055,9 @@ void CGraphic::DestroyTempBuffer()
 		m_scratchTextureBuffer = nullptr;
 	}
 }
+
+extern const float kGraphicSmallBackTextureWidth = 320.0f;
+extern const float kGraphicSmallBackTextureHeight = 224.0f;
+extern const float kGraphicBlurAlphaScale = -100.0f;
+extern const float kGraphicNoiseTexScaleU = 0.015625f;
+extern const float kGraphicNoiseTexScaleV = 0.010416667163372f;

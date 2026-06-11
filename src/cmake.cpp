@@ -2374,17 +2374,17 @@ void CMenuPcs::CmakeSexOpen()
  */
 void CMenuPcs::CmakeNameDraw()
 {
-    int frame = static_cast<int>(CmakeState(this)->m_frame) - 1;
+    CmakeMenuState* state = CmakeState(this);
+    int frame = static_cast<int>(state->m_frame) - 1;
+    float a255;
+    float alpha;
     if (frame < 0) {
         frame = 0;
     }
 
-    short mode = CmakeState(this)->m_mode;
-    float a255;
-    float alpha;
-    if (mode == 0) {
+    if (state->m_mode == 0) {
         alpha = static_cast<float>(0.1 * static_cast<double>(frame));
-    } else if (mode == 1) {
+    } else if (state->m_mode == 1) {
         alpha = 1.0f;
     } else {
         alpha = static_cast<float>(-(0.1 * static_cast<double>(frame) - 1.0));

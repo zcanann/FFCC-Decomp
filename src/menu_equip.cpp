@@ -190,7 +190,7 @@ int CMenuPcs::EquipClose0()
 	int result = 0;
 	if (itemCount == doneCount) {
 		EquipOpenAnim* selected = &GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selected[0]];
-		selected->x = (s16)(int)-((double)selected->w * kEquipHalfDouble - kEquipWindowCenterX);
+		selected->x = (s16)(int)(kEquipWindowCenterX - (double)selected->w * kEquipHalfDouble);
 		result = 1;
 	}
 
@@ -728,7 +728,7 @@ void CMenuPcs::EquipDraw()
 	}
 
 	CColor helpColor(0xff, 0xff, 0xff, (u8)helpAlpha);
-	int helpX = (int)-(w * kEquipHalf - kEquipHelpCenterX);
+	int helpX = (int)(kEquipHelpCenterX - w * kEquipHalf);
 	float helpYf = kEquipHelpY;
 	int helpY = (int)helpYf;
 	DrawHelpMessage(helpItem, helpFont, helpX, helpY, helpColor.color, 10,

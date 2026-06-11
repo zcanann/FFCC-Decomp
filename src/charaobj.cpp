@@ -3832,10 +3832,11 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 {
 	int found = -1;
 	int lastSlot = count - 1;
+	int combiIndex = 0;
 	outFallback = 0;
 
 	unsigned short* combiCursor = reinterpret_cast<unsigned short*>(Game.unk_flat3_field_1C_0xc7d8);
-	for (int combiIndex = 0; combiIndex < static_cast<int>(Game.unk_flat3_count_0xc7d4); combiIndex++, combiCursor += 0xD) {
+	for (; combiIndex < static_cast<int>(Game.unk_flat3_count_0xc7d4); combiIndex++, combiCursor += 0xD) {
 		int reqCount = 0;
 		if (combiCursor[0] != 0) {
 			reqCount = 1;
@@ -3851,7 +3852,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 		}
 
 		if (count < reqCount) {
-			return found;
+			break;
 		}
 
 		int reqLast = reqCount - 1;

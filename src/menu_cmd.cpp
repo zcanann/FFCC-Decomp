@@ -2360,7 +2360,8 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		const s16 slotType = caravan->m_commandListExtra[i];
-		if (slotType == 0) {
+		const int slotCheck = slotType;
+		if (slotCheck == 0) {
 			continue;
 		}
 
@@ -2389,7 +2390,7 @@ void CMenuPcs::DrawUniteList()
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
 
 		const s32 labelAnchor =
-		    (!(groupStart == GetCmdStateView(this)->selected)) ? groupStart : groupStart + 1;
+		    (groupStart == GetCmdStateView(this)->selected) ? groupStart + 1 : groupStart;
 		const float panelX =
 		    static_cast<float>(topX - (GetCmdListStorage(this)->entries[labelAnchor].x - topX));
 		drawW = kCmdMenuUnitePanelWidth;

@@ -382,6 +382,7 @@ unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
     unsigned char* ptr;
     unsigned char* ptr2;
     int count;
+    int count2;
     unsigned int crc;
     unsigned char* crcData;
 
@@ -404,8 +405,8 @@ unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
     }
 
     ptr2 = crcData + 0x20;
-    count = 0x8BB0;
-    while (--count >= 0)
+    count2 = 0x8BB0;
+    while (--count2 >= 0)
     {
         crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr2];
         ptr2 += 1;

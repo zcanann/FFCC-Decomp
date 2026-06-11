@@ -2716,7 +2716,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			int o08 = boardOff + 0x8;
 			int o0a = boardOff + 0xa;
 			int o40 =  (int)(long)(boardOff + 0x40);
-			int o44 = boardOff + 0x44;
+			int o44 =  (int)(unsigned int)(boardOff + 0x44);
 			int centerX = (int)(float)((double)(float)(DOUBLE_80331EE0 + ((double)sprite->w * DOUBLE_80331E78 + (double)((float)sprite->x + sprite->motionX))) - DOUBLE_80331EE8);
 			int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)((float)sprite->y + sprite->motionY)) - DOUBLE_80331EF0);
 			int __p18 = o08;
@@ -2725,7 +2725,8 @@ void CMenuPcs::CalcResultCloseAnim()
 			int __p5 = o0a;
 			*(short*)(this->m_bonus.m_bonusBoardPtr + __p5) = (short)centerY;
 			*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = (int)(FLOAT_80331EF8 + ((float)sprite->x + sprite->motionX));
-			*(int*)(this->m_bonus.m_bonusBoardPtr + o44) = (int)(((float)sprite->y + sprite->motionY) - FLOAT_80331EFC);
+			int __p9 = o44;
+			*(int*)(this->m_bonus.m_bonusBoardPtr + __p9) = (int)(((float)sprite->y + sprite->motionY) - FLOAT_80331EFC);
 			if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o40) < DOUBLE_80331E90) {
 				*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = 0;
 			}

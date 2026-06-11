@@ -400,7 +400,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 							 int itemA, int itemB, int itemC, int itemD)
 {
 	for (int i = 99; i > 0; i--) {
-		m_letters[i] = m_letters[i - 1];
+		m_letters[i].m_split = m_letters[i - 1].m_split;
 	}
 
 	memset(&m_letters[0], 0, sizeof(m_letters[0]));

@@ -404,7 +404,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		CAPos& p = m_portals[i];
 
 		bool used = false;
-		if (p.m_groupA != 0 && p.m_groupB != 0)
+		if (m_portals[i].m_groupA != 0 && m_portals[i].m_groupB != 0)
 		{
 			used = true;
 		}

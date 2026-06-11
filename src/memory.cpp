@@ -564,8 +564,8 @@ void CMemory::Draw()
         }
 
         int y = 0x20;
-        int useTotalKB = 0;
         int unuseTotalKB = 0;
+        int useTotalKB = 0;
 
         CMode* modeData = m_modes;
         for (int mode = 0; mode < 3; mode++, modeData++) {

@@ -10768,7 +10768,9 @@ void CMenuPcs::DrawMCList()
 				contentColors[0].r = 0xFF;
 				contentColors[0].g = 0xFF;
 				contentColors[0].b = 0xFF;
-				contentColors[0].a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(alpha)));
+				const float alpha2 = alpha;
+				const float alpha3 = alpha;
+				contentColors[0].a = static_cast<unsigned char>(static_cast<int>(alpha3));
 				contentColors[1].r = 0xFF;
 				contentColors[1].g = 0xFF;
 				contentColors[1].b = 0xFF;
@@ -10776,7 +10778,7 @@ void CMenuPcs::DrawMCList()
 				contentColors[2].r = 0xFF;
 				contentColors[2].g = 0xFF;
 				contentColors[2].b = 0xFF;
-				contentColors[2].a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(alpha)));
+				contentColors[2].a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(alpha2)));
 				contentColors[3].r = 0xFF;
 				contentColors[3].g = 0xFF;
 				contentColors[3].b = 0xFF;

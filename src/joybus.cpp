@@ -3108,7 +3108,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                 }
                 else
                 {
-                    ThreadParam* tp = &m_threadParams[threadParam->m_portIndex];
+                    JoyBus* jb = (JoyBus*)((char*)this + threadParam->m_portIndex * sizeof(ThreadParam));
 
                     unsigned int resendCmd = 0;
                     unsigned char* resendBytes = reinterpret_cast<unsigned char*>(&resendCmd);
@@ -3116,7 +3116,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                     resendBytes[1] = 0x15;
                     resendBytes[2] = 0;
 
-                    SetSendQueue(tp, resendCmd);
+                    SetSendQueue(jb->m_threadParams, resendCmd);
 
                     {
                         OSSemaphore* sem;

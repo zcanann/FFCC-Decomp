@@ -108,6 +108,16 @@ static inline double IntToF64(unsigned int value)
 	return (double)bits - kArtiIntToDoubleBias;
 }
 
+static inline float IntToF32(int value)
+{
+	return (float)IntToF64((unsigned int)value);
+}
+
+static inline double LoadDouble(const double& value)
+{
+	return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8015fa28
@@ -437,17 +447,17 @@ int CMenuPcs::ArtiClose()
 	frame = GetArtiState(this)->frame;
 
 	for (int i = 0; i < count; i++, anim++) {
-		float zeroF = kArtiZero;
 		if (frame >= anim->startFrame) {
 			if (anim->startFrame + anim->duration <= frame) {
+				float zeroF = LoadFloat(kArtiZero);
 				finished++;
-				anim->alpha = kArtiZero;
+				anim->alpha = zeroF;
 				anim->dx = zeroF;
 				anim->dy = zeroF;
 			} else {
 				anim->step++;
-				double oneD = kArtiOneDouble;
-				anim->alpha = (float)-((kArtiOneDouble / (double)anim->duration) * (double)anim->step - kArtiOneDouble);
+				double oneD = LoadDouble(kArtiOneDouble);
+				anim->alpha = (float)-((oneD / (double)anim->duration) * (double)anim->step - oneD);
 				if ((anim->flags & 2) == 0) {
 					float ratio = (float)-((oneD / (double)anim->duration) * (double)anim->step - oneD);
 					float dx = anim->targetX - (float)anim->x;

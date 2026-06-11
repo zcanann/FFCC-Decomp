@@ -5070,29 +5070,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
             unsigned int port = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-            if (static_cast<signed char>(m_threadRunningMask) == 0)
-            {
-                result = 0;
-            }
-            else
-            {
-                OSWaitSemaphore(&m_accessSemaphores[port]);
-
-                port = threadParam->m_portIndex;
-                if ((int)m_cmdCount[port] >= 0x40)
-                {
-                    OSSignalSemaphore(&m_accessSemaphores[port]);
-                    result = -1;
-                }
-                else
-                {
-                    m_cmdQueueData[port][m_cmdCount[port]] = word;
-                    m_cmdCount[threadParam->m_portIndex]++;
-
-                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                    result = 0;
-                }
-            }
+                result = SetSendQueue(threadParam, word);
 
             threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
@@ -5103,29 +5081,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
         unsigned int port = threadParam->m_portIndex;
         unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[port][2 + m_txWordIndex[port] * 4];
 
-        if (static_cast<signed char>(m_threadRunningMask) == 0)
-        {
-            result = 0;
-        }
-        else
-        {
-            OSWaitSemaphore(&m_accessSemaphores[port]);
-
-            port = threadParam->m_portIndex;
-            if ((int)m_cmdCount[port] >= 0x40)
-            {
-                OSSignalSemaphore(&m_accessSemaphores[port]);
-                result = -1;
-            }
-            else
-            {
-                m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[threadParam->m_portIndex]++;
-
-                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                result = 0;
-            }
-        }
+        result = SetSendQueue(threadParam, word);
 
         break;
     }

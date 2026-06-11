@@ -1314,6 +1314,10 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		u32 u;
 		s32 s;
 	};
+	struct CodeIndexView {
+		short m_codeFunc : 12;
+		int m_codeOffset : 20;
+	};
 
 	CStopWatch watch("no name");
 	watch.Reset();
@@ -1478,8 +1482,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			const int index = static_cast<int>(arg) >> 8;
 			const u32 classId = object->m_engineObject != 0 ? static_cast<u32>(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(object->m_engineObject) + 0x30)) : 1U;
 			if ((arg & 1) != 0) {
-				const u32 sign = (arg >> 4 & 1) != 0 ? 0x1000 : 0;
-				*object->m_sp = ((static_cast<u32>(index) << 13) | (classId & 0xFFF)) | sign;
+				*object->m_sp = ((static_cast<u32>(index) << 13) | (classId & 0xFFF))
+				              | ((arg >> 4 & 1) != 0 ? 0x1000 : 0);
 				object->m_sp++;
 			} else if ((arg & 2) != 0) {
 				CodeWord offset;
@@ -1528,7 +1532,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			break;
 		}
 		case 7: {
-			const int delta = static_cast<int>(*reinterpret_cast<u32*>(code + 1) & 0x00FFFFFF) - object->m_codeIndex.m_codeOffset;
+			CodeIndexView* const view = reinterpret_cast<CodeIndexView*>(&object->m_codePos);
+			const int delta = static_cast<int>(*reinterpret_cast<u32*>(code + 1) & 0x00FFFFFF) - view->m_codeOffset;
 			code += delta;
 			object->m_codeIndex.m_codeOffset = object->m_codeIndex.m_codeOffset + delta;
 			continue;
@@ -1542,7 +1547,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 					*object->m_sp = 1;
 					object->m_sp++;
 				}
-				const int delta = static_cast<int>(jumpArg & 0x00FFFFFF) - object->m_codeIndex.m_codeOffset;
+				const int delta = static_cast<int>(jumpArg & 0x00FFFFFF)
+				    - reinterpret_cast<CodeIndexView*>(&object->m_codePos)->m_codeOffset;
 				code += delta;
 				object->m_codeIndex.m_codeOffset = object->m_codeIndex.m_codeOffset + delta;
 				continue;
@@ -1558,7 +1564,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 					*object->m_sp = 0;
 					object->m_sp++;
 				}
-				const int delta = static_cast<int>(jumpArg & 0x00FFFFFF) - object->m_codeIndex.m_codeOffset;
+				const int delta = static_cast<int>(jumpArg & 0x00FFFFFF)
+				    - reinterpret_cast<CodeIndexView*>(&object->m_codePos)->m_codeOffset;
 				code += delta;
 				object->m_codeIndex.m_codeOffset = object->m_codeIndex.m_codeOffset + delta;
 				continue;
@@ -2048,12 +2055,12 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 
 					for (int i = 0; i < object->m_argCount - 1; i++) {
 						while (true) {
-							int specLen = 0;
 							char specChar;
+							int specLen = 0;
 							while (((specChar = *format) != '\0') && ((specLen == 0) || (specChar != '%'))) {
 								spec[specLen] = specChar;
-								specLen++;
 								format++;
+								specLen++;
 							}
 							spec[specLen] = '\0';
 
@@ -2065,8 +2072,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 
 						const int argIndex = i + 1;
 						unsigned int* const arg = object->m_localBase + argIndex;
-						char* scan = spec + 1;
 						if (spec[0] == '%') {
+							char* scan = spec + 1;
 							int fmtIndex = 1;
 							int width = 0;
 							s32 started = static_cast<u32>(__cntlzw(static_cast<u32>(0x30 - spec[1]))) >> 5 & 0xFF;
@@ -2091,8 +2098,9 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 									}
 								}
 								rendered[outLen] = '\0';
-								strcat(rendered, spec + fmtIndex + 1);
+								strcat(rendered, spec + 1 + fmtIndex);
 							} else {
+								scan = spec + 1;
 								while (*scan != '\0') {
 									switch (*scan) {
 									case 'd':

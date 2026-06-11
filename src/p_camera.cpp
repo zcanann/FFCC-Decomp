@@ -1413,10 +1413,10 @@ void CCameraPcs::createFullShadow()
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {
-        u32 v6 = i + 6;
-        u32 v7 = i + 7;
         u32 v3 = i + 3;
         u32 v4 = i + 4;
+        u32 v6 = i + 6;
+        u32 v7 = i + 7;
         u32 v5 = i + 5;
         u32 v2 = i + 2;
         u32 v1 = i + 1;
@@ -1642,8 +1642,10 @@ void CCameraPcs::drawShadowBegin()
             float sumX = m_shadowRectBound.m_min.x + m_shadowRectBound.m_max.x;
             float half = kCameraHalfF;
             float sumZ = m_shadowRectBound.m_min.z + m_shadowRectBound.m_max.z;
-            m_targetX = sumX * half;
-            m_targetZ = sumZ * half;
+            float tx = sumX * half;
+            float tz = sumZ * half;
+            m_targetX = tx;
+            m_targetZ = tz;
             m_targetY = m_fullScreenShadowPosition.y;
 
             depth = m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x;

@@ -4108,7 +4108,7 @@ renderedDone:
         if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347addNoFreeSeGroup\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
-        Sound.AddNoFreeSeGroup(static_cast<short>(*object->m_localBase));
+        Sound.AddNoFreeSeGroup(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
         break;

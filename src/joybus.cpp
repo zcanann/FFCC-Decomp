@@ -241,7 +241,7 @@ JoyBus::~JoyBus()
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::CreateInit()
+inline void JoyBus::Init()
 {
     memset(m_sendBuffer, 0, sizeof(m_sendBuffer));
     memset(m_stageFlags, 0, sizeof(m_stageFlags));
@@ -276,6 +276,16 @@ void JoyBus::CreateInit()
             m_stateFlagArr[i] = zeroB;
         }
     }
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void JoyBus::CreateInit()
+{
+    Init();
 
     if (m_gbaBootImage == 0)
     {
@@ -401,39 +411,7 @@ void JoyBus::Destroy()
         }
     }
 
-    memset(m_sendBuffer, 0, sizeof(m_sendBuffer));
-    memset(m_stageFlags, 0, sizeof(m_stageFlags));
-    memset(m_cmdQueueData, 0, sizeof(m_cmdQueueData));
-    memset(m_recvQueueEntriesArr, 0, sizeof(m_recvQueueEntriesArr));
-    memset(m_threadParams, 0, sizeof(m_threadParams));
-    memset(m_perThreadTemp, 0, sizeof(m_perThreadTemp));
-    memset(m_recvBuffer, 0, sizeof(m_recvBuffer));
-
-    m_mapId = 0xFF;
-    m_stageId = 0xFF;
-
-    {
-        int i = 0;
-        unsigned char zeroB = (unsigned char)i;
-        unsigned int zeroW = (unsigned int)i;
-
-        for (; i < 4; i++)
-        {
-            m_threadParams[i].m_gbaStatus = 1;
-            m_threadParams[i].m_padType = 0x40;
-
-            m_cmdCount[i] = zeroW;
-            m_secCmdCount[i] = zeroW;
-
-            OSInitSemaphore(&m_accessSemaphores[i], 1);
-
-            m_ctrlModeArr[i] = zeroB;
-            m_nextModeTypeArr[i] = zeroB;
-            m_modeXArr[i] = zeroB;
-            m_stateCodeArr[i] = 0xFF;
-            m_stateFlagArr[i] = zeroB;
-        }
-    }
+    Init();
 
     m_fileBaseA_dup = 0;
     m_fileBaseB_dup = 0;

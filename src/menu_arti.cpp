@@ -414,16 +414,16 @@ void CMenuPcs::ArtiDraw()
 
 	if (selectedArtifactId == -1) {
 		const char* text = GetMenuStr(0x14);
-		CColor color(0xFF, 0xFF, 0xFF, helpAlpha);
+		GXColor colorVal = CColor(0xFF, 0xFF, 0xFF, helpAlpha).color;
 		int x = (int)CalcCenteringPos(const_cast<char*>(text), helpFont);
 		float helpY = LoadFloat(kArtiHelpY);
-		DrawFont(x, (int)helpY, color.color, 10, const_cast<char*>(text), LoadFloat(kArtiOne),
+		DrawFont(x, (int)helpY, colorVal, 10, const_cast<char*>(text), LoadFloat(kArtiOne),
 		         LoadFloat(kArtiHelpScale));
 	} else {
-		CColor helpColor(0xFF, 0xFF, 0xFF, helpAlpha);
+		GXColor colorVal = CColor(0xFF, 0xFF, 0xFF, helpAlpha).color;
 		int x = (int)(LoadFloat(kArtiHelpCenterX) - w * LoadFloat(kArtiHalf));
 		float helpY = LoadFloat(kArtiHelpY);
-		DrawHelpMessage(selectedArtifactId, helpFont, x, (int)helpY, helpColor.color, 10,
+		DrawHelpMessage(selectedArtifactId, helpFont, x, (int)helpY, colorVal, 10,
 		                LoadFloat(kArtiOne), LoadFloat(kArtiHelpScale));
 	}
 }

@@ -2873,7 +2873,7 @@ void CMenuPcs::DrawResultCountAnim()
 					} else {
 						value = total;
 					}
-					unsigned int digits[3];
+					int digits[3];
 					int digitCount;
 
 					if (value >= 100) {
@@ -2895,7 +2895,7 @@ void CMenuPcs::DrawResultCountAnim()
 					float digitX = (float)((DOUBLE_80331EC8 * (double)sprite->w - (float)(digitCount * sprite->w)) * DOUBLE_80331E78 + (double)sprite->x);
 					for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
 						MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
-						    digitW * (float)digits[digitIndex], sprite->mulY,
+						    (float)(sprite->w * digits[digitIndex]), sprite->mulY,
 						    sprite->depth, sprite->depth, kBonusZClearOrigin);
 						digitX += digitW;
 					}

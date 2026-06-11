@@ -2674,7 +2674,6 @@ int CMenuPcs::CmakeNameCtrl()
                 CmakeState(this)->m_select = 0xB;
                 CmakeState(this)->m_row = 5;
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
-                return 0;
             } else if ((down & 0x100) != 0) {
                 short curRow = CmakeState(this)->m_row;
                 if (curRow >= 5) {

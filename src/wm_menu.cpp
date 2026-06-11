@@ -4868,7 +4868,7 @@ void CMenuPcs::DrawCMakeMenu()
 			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(entry + 0xC), static_cast<float>(entry[0]),
 			                 static_cast<float>(entry[1]), static_cast<float>(entry[2]), static_cast<float>(entry[3]),
 			                 *reinterpret_cast<float*>(entry + 4), *reinterpret_cast<float*>(entry + 6),
-			                 FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			                 1.0f, 1.0f, 0.0f);
 		}
 		bit++;
 		byteOffset += 0x1C;
@@ -7793,7 +7793,7 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(psVar1 + 0xC), static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
 			         static_cast<float>(static_cast<int>(psVar1[2])), static_cast<float>(static_cast<int>(psVar1[3])),
 			         *reinterpret_cast<float*>(psVar1 + 4), *reinterpret_cast<float*>(psVar1 + 6),
-			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			         1.0f, 1.0f, 0.0f);
 		}
 		i = i + 1;
 		offset = offset + 0x1C;
@@ -7926,8 +7926,10 @@ void CMenuPcs::DrawCharaBase()
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
 
 	alpha = FLOAT_803313dc;
-	int yBase = 0x22;
-	for (int row = 0; row < 2; row++) {
+	int yBase;
+	int row = 0;
+	yBase = 0x22;
+	for (; row < 2; row++) {
 		for (int col = 0; col < 4; col++) {
 			int yInt = yBase;
 			if (row != 0) {
@@ -7935,7 +7937,7 @@ void CMenuPcs::DrawCharaBase()
 			}
 			const float y = static_cast<float>(yInt);
 			const float x = static_cast<float>(0x1C + col * 0x90);
-			MenuPcs.DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, alpha, alpha, FLOAT_803313e8, FLOAT_803313e8, alpha);
+			MenuPcs.DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, alpha, alpha, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 		yBase += 0xB8;
 	}

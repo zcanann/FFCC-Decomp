@@ -640,6 +640,15 @@ void CGraphicPcs::drawCopy()
  * JP Address: TODO
  * JP Size: TODO
  */
+static inline void setBarColor(GXColor& dst, const u32& colorWord)
+{
+    const GXColor* src = (const GXColor*)&colorWord;
+    dst.r = src->r;
+    dst.g = src->g;
+    dst.b = src->b;
+    dst.a = src->a;
+}
+
 void CGraphicPcs::drawBar()
 {
     Mtx44 ortho;
@@ -704,13 +713,8 @@ void CGraphicPcs::drawBar()
     for (; i < orderCount; i++) {
         const int priority = order->m_priority;
         const float lastTime = order->m_lastTime;
-        GXColor colorTmp;
-        *reinterpret_cast<u32*>(&colorTmp) = Math.Hsb2Rgb(hue / orderCount, 100, 100);
+        setBarColor(barColor, Math.Hsb2Rgb(hue / orderCount, 100, 100));
         const float width = (kGraphicScreenCenterX * lastTime) / kDebugBarFrameBudget;
-        barColor.r = colorTmp.r;
-        barColor.g = colorTmp.g;
-        barColor.b = colorTmp.b;
-        barColor.a = colorTmp.a;
 
         if (priority == 0x26) {
             drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
@@ -723,12 +727,7 @@ void CGraphicPcs::drawBar()
         }
 
         if (i == orderCount - 1) {
-            GXColor soundGX;
-            *reinterpret_cast<u32*>(&soundGX) = Math.Hsb2Rgb(0, 100, 100);
-            barColor.r = soundGX.r;
-            barColor.g = soundGX.g;
-            barColor.b = soundGX.b;
-            barColor.a = soundGX.a;
+            setBarColor(barColor, Math.Hsb2Rgb(0, 100, 100));
             const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / kDebugBarFrameBudget;
 
             drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
@@ -740,20 +739,10 @@ void CGraphicPcs::drawBar()
         y += kDebugBarLineStep;
     }
 
-    GXColor frameTmp;
-    *reinterpret_cast<u32*>(&frameTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFrameRateOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color);
-    barColor.r = frameTmp.r;
-    barColor.g = frameTmp.g;
-    barColor.b = frameTmp.b;
-    barColor.a = frameTmp.a;
+    setBarColor(barColor, (u32)*reinterpret_cast<u32*>(&((Graphic.IsFrameRateOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color));
     drawSFRect(kDebugBarLeft, kDebugIndicatorTop, kDebugIndicatorFrameRight, kDebugIndicatorBottom, barColor, barColor);
 
-    GXColor fifoTmp;
-    *reinterpret_cast<u32*>(&fifoTmp) = *reinterpret_cast<u32*>(&((Graphic.IsFifoOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color);
-    barColor.r = fifoTmp.r;
-    barColor.g = fifoTmp.g;
-    barColor.b = fifoTmp.b;
-    barColor.a = fifoTmp.a;
+    setBarColor(barColor, (u32)*reinterpret_cast<u32*>(&((Graphic.IsFifoOver() != 0) ? CColor(0xFF, 0, 0, 0xFF) : CColor(0, 0xFF, 0, 0xFF)).color));
     drawSFRect(kDebugIndicatorFifoLeft, kDebugIndicatorTop, kDebugIndicatorFifoRight, kDebugIndicatorBottom, barColor, barColor);
 
     if (textFlag) {

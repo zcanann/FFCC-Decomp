@@ -3608,7 +3608,9 @@ void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
     CMapObj* mapObj = m_mapObjArray + objIndex;
     CMapObjAtr* attr = mapObj->m_attribute;
 
-    if (attr->m_type == CMapObjAtr::SPOT_LIGHT) {
+    switch (attr->m_type) {
+    case CMapObjAtr::SPOT_LIGHT:
+    {
         CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
         spotAttr->m_color = spotColor;
         mapObj->m_localRotationX = spotPosition.x;
@@ -3616,6 +3618,8 @@ void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
         mapObj->m_localRotationZ = spotPosition.z;
         mapObj->m_localMtxDirty = 1;
         mapObj->m_calcMtxPending = 1;
+        break;
+    }
     }
 }
 

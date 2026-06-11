@@ -1125,7 +1125,7 @@ void CMenuPcs::CmdDraw()
 	}
 
 	if (cmdMode == 1) {
-		CFont* listFont = m_fonts[0];
+		CFont* listFont = m_fonts[4];
 		listFont->SetMargin(kCmdMenuOne);
 		listFont->SetShadow(0);
 		listFont->SetScale(kCmdMenuTextScale);

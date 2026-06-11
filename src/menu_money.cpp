@@ -320,10 +320,12 @@ void CMenuPcs::MoneyDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	int selectionState = this->m_moneyState->listState;
-	int mode = this->m_moneyState->mode;
 	MoneyMenuAnim* entry = this->m_moneyPanel->anims;
+	int i;
+	GXColor color;
+	int mode = this->m_moneyState->mode;
 
-	for (int i = 0; i < this->m_moneyPanel->count; i++, entry++) {
+	for (i = 0; i < this->m_moneyPanel->count; i++, entry++) {
 		int tex = entry->tex;
 		if (tex < 0) {
 			continue;
@@ -336,7 +338,6 @@ void CMenuPcs::MoneyDraw()
 		float u = entry->u;
 		float v = entry->v;
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
-		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
@@ -349,7 +350,6 @@ void CMenuPcs::MoneyDraw()
 	MoneyMenuAnim* drawBase = this->m_moneyPanel->anims;
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5D));
 	{
-		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
@@ -357,7 +357,7 @@ void CMenuPcs::MoneyDraw()
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
 
-	for (int i = 0; i < 2; i++) {
+	for (i = 0; i < 2; i++) {
 		float y = (float)(drawBase->y + 0x18) + 32.0f * (float)i;
 		float x = (float)(drawBase->x + 0x20);
 		for (int j = 0; j < 8; j++) {
@@ -374,7 +374,6 @@ void CMenuPcs::MoneyDraw()
 	if ((mode == 0) && (selectionState == 1)) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x48));
 		{
-			GXColor color;
 			color.r = 0xFF;
 			color.g = 0xFF;
 			color.b = 0xFF;
@@ -400,7 +399,7 @@ void CMenuPcs::MoneyDraw()
 	}
 
 	const char* label = GetMenuStr(0x15);
-	for (int i = 0; i < 2; i++) {
+	for (i = 0; i < 2; i++) {
 		font->SetPosX((float)(drawBase->x + 0xB6));
 		font->SetPosY((32.0f + ((float)(drawBase->y + 0x18) + 32.0f * (float)i)) -
 		              19.8f - 4.0f);

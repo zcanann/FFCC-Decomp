@@ -10700,6 +10700,7 @@ void CMenuPcs::DrawMCList()
 	extern float FLOAT_803314FC;
 	extern double DOUBLE_803314F0;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	char* const rodataBase = lbl_801DB7F8;
 	CFont* fontF8 = m_fonts[0];
 	double rawA;
 #define worldState GetWmWorldState(this)
@@ -10727,7 +10728,8 @@ void CMenuPcs::DrawMCList()
 					alpha = FLOAT_803313e8;
 				} else {
 					alpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(animFrames));
-					yPos = static_cast<float>(animFrames) * FLOAT_803314E0 + FLOAT_803314DC;
+					yPos = FLOAT_803314DC;
+					yPos += static_cast<float>(animFrames) * FLOAT_803314E0;
 				}
 			} else {
 				yPos = FLOAT_803314D8;
@@ -10856,8 +10858,8 @@ LAB_next:
 	    worldState->m_mainState < 3) {
 		const double mapX = DOUBLE_80331510 + static_cast<double>(FLOAT_80331518);
 		const int language = Game.m_gameWork.m_languageId;
-		int* digitWidths = reinterpret_cast<int*>(lbl_801DB7F8 + 0x920);
-		int* playWidths = reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0);
+		int* digitWidths = reinterpret_cast<int*>(rodataBase + 0x920);
+		int* playWidths = reinterpret_cast<int*>(rodataBase + 0xab0);
 		const double rowSlopeD = DOUBLE_80331498;
 		const double rowBias = DOUBLE_80331408;
 		const double rowBaseD = DOUBLE_80331490;
@@ -10912,11 +10914,11 @@ LAB_next:
 					int totalWidth;
 					for (int di = 0; di < digitCount; di++) {
 						if (digitCount == 1) {
-							totalWidth = reinterpret_cast<int*>(lbl_801DB7F8 + 0x920)[*reinterpret_cast<int*>(slotData + 8) % 10];
+							totalWidth = digitWidths[*reinterpret_cast<int*>(slotData + 8) % 10];
 						} else if (di == 0) {
-							totalWidth = reinterpret_cast<int*>(lbl_801DB7F8 + 0x920)[*reinterpret_cast<int*>(slotData + 8) / 10];
+							totalWidth = digitWidths[*reinterpret_cast<int*>(slotData + 8) / 10];
 						} else {
-							totalWidth += reinterpret_cast<int*>(lbl_801DB7F8 + 0x920)[*reinterpret_cast<int*>(slotData + 8) % 10];
+							totalWidth += digitWidths[*reinterpret_cast<int*>(slotData + 8) % 10];
 						}
 					}
 					float digitScale = static_cast<float>((language != 5) ? DOUBLE_80331530 : DOUBLE_80331420);
@@ -10941,7 +10943,7 @@ LAB_next:
 						} else {
 							digit = *reinterpret_cast<int*>(slotData + 8) % 10;
 						}
-						const int digitWidth = reinterpret_cast<int*>(lbl_801DB7F8 + 0x920)[digit];
+						const int digitWidth = digitWidths[digit];
 						const float digitWidthF = static_cast<float>(digitWidth);
 						MenuPcs.DrawRect(0, digitX, rowY, digitWidthF, FLOAT_80331410,
 						         static_cast<float>(colSlope * static_cast<float>(digit % 5)),
@@ -11030,7 +11032,7 @@ LAB_next:
 				const int hundreds = playHours / 100;
 				if (hundreds != 0) {
 					playDigits[0] = hundreds;
-					playWidth += static_cast<float>(reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0)[hundreds]);
+					playWidth += static_cast<float>(playWidths[hundreds]);
 				} else {
 					playDigits[0] = -1;
 				}
@@ -11038,17 +11040,17 @@ LAB_next:
 				const int tens = hourRemainder / 10;
 				if (tens != 0 || playDigits[0] > 0) {
 					playDigits[1] = tens;
-					playWidth += static_cast<float>(reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0)[tens]);
+					playWidth += static_cast<float>(playWidths[tens]);
 				} else {
 					playDigits[1] = -1;
 				}
 				playDigits[2] = hourRemainder % 10;
 				playDigits[3] = playMinutes / 10;
 				playDigits[4] = playMinutes % 10;
-				playWidth += static_cast<float>(reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0)[playDigits[2]]);
+				playWidth += static_cast<float>(playWidths[playDigits[2]]);
 				playWidth += static_cast<float>(playWidths[10]);
-				playWidth += static_cast<float>(reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0)[playDigits[3]]);
-				playWidth += static_cast<float>(reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0)[playDigits[4]]);
+				playWidth += static_cast<float>(playWidths[playDigits[3]]);
+				playWidth += static_cast<float>(playWidths[playDigits[4]]);
 				float playX = FLOAT_80331518 - playWidth;
 				for (int digitIdx = 0; digitIdx < 5; digitIdx++) {
 					if (playDigits[digitIdx] >= 0) {
@@ -11058,7 +11060,7 @@ LAB_next:
 							         FLOAT_80331568, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 							playX += colonW;
 						}
-						const float digitW = static_cast<float>(reinterpret_cast<int*>(lbl_801DB7F8 + 0xab0)[playDigits[digitIdx]]);
+						const float digitW = static_cast<float>(playWidths[playDigits[digitIdx]]);
 						MenuPcs.DrawRect(0, playX, rowY, digitW, FLOAT_803314D8,
 						         static_cast<float>(DOUBLE_80331490 * static_cast<double>(playDigits[digitIdx]) + DOUBLE_80331570),
 						         FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
@@ -11066,7 +11068,7 @@ LAB_next:
 					}
 				}
 
-				unsigned char* const mapInfo = reinterpret_cast<unsigned char*>(lbl_801DB7F8 + 0xadc) +
+				unsigned char* const mapInfo = reinterpret_cast<unsigned char*>(rodataBase + 0xadc) +
 				                               *reinterpret_cast<int*>(slotData + 0x10) * 4;
 				CMaterial* material = MapMng.GetMaterialID(mapInfo[0]);
 				CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<unsigned char*>(material) + 0x3C);

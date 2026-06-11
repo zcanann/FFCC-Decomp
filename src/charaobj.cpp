@@ -2521,7 +2521,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		SCharaStaBlock* staBlock = reinterpret_cast<SCharaStaBlock*>(m_scriptHandle);
 		if (staBlock->m_sta[staIndex] != 0) {
 			System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
-			return static_cast<int>(reinterpret_cast<SCharaStaBlock*>(m_scriptHandle)->m_sta[staIndex]);
+			return static_cast<int>(reinterpret_cast<SCharaStaBlock*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + staIndex * 2)->m_sta[0]);
 		}
 	}
 
@@ -2579,10 +2579,10 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	unsigned short powerValue;
 	if ((((static_cast<unsigned int>(__cntlzw(0x2D - (static_cast<unsigned short>(source->GetCID()) & 0x2D)))) >> 5) & 0xFFU) != 0) {
 		unsigned char usePartyLeader = 0;
-		unsigned char usePartySource = 0;
-		unsigned char stageModeActive = 0;
+		unsigned char usePartySource = usePartyLeader;
+		unsigned char stageModeActive = usePartyLeader;
 
-		if (static_cast<int>(Game.m_gameWork.m_menuStageMode) != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+		if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 			stageModeActive = 1;
 		}
 		if (stageModeActive != 0) {

@@ -2920,9 +2920,8 @@ void CMenuPcs::DrawResultCountAnim()
 
 	int textIndex = 0;
 	char text[128];
-	off = 0;
-	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
-		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
+	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++) {
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (i << 6) + 8);
 		if (sprite->kind == -1) {
 			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
 			font->SetColor(color.color);

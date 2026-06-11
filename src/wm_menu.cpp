@@ -4877,7 +4877,7 @@ void CMenuPcs::DrawCMakeMenu()
 
 	short contentState = m_wmWorldState->m_mainState;
 	int __p11 = contentState;
-	int __p12 = contentState;
+	int __p12 =  (int)(unsigned int)(contentState);
 	if (__p12 > 0 && __p11 < 4) {
 		float contentAlpha;
 		if (contentState == 1) {
@@ -4938,7 +4938,8 @@ void CMenuPcs::DrawCMakeMenu()
 			unsigned int ti = 5;
 			textList[0] = langText[ti];
 			ti = 6;
-			textList[1] = langText[ti];
+			int __p7 = ti;
+			textList[1] = langText[__p7];
 			ti = 7;
 			textList[2] = langText[ti];
 			const _GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;

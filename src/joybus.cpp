@@ -4522,8 +4522,8 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             GbaQue.GetCaravanName((char*)body);
 
             signed char* p = (signed char*)&playerInfo;
-            unsigned char* cf = classFlags;
             unsigned char lowBits = 0;
+            unsigned char* cf = classFlags;
 
             for (int highBits = 0; highBits < 4; highBits++)
             {
@@ -4559,7 +4559,8 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             body[0x8C] = playerData[threadParam->m_portIndex * 0xDC + 2];
 
             unsigned char* q = body + 0x8D;
-            memcpy(q, (unsigned char*)&playerInfo + (threadParam->m_portIndex * 0xDC + 0x20), 3);
+            int statOffset = threadParam->m_portIndex * 0xDC;
+            memcpy(q, (unsigned char*)&playerInfo + statOffset + 0x20, 3);
 
             unsigned short statHalf = __lhbrx(&playerInfo, threadParam->m_portIndex * 0xDC + 0x14);
             memcpy(q + 3, &statHalf, 2);
@@ -4572,7 +4573,8 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             const int byteLen = compatLen + 0x97;
 
-            memcpy(q, (unsigned char*)&playerInfo + (threadParam->m_portIndex * 0xDC + 0x18), 8);
+            int statOffset2 = threadParam->m_portIndex * 0xDC;
+            memcpy(q, (unsigned char*)&playerInfo + statOffset2 + 0x18, 8);
 
             unsigned int statWord = __lwbrx(&playerInfo, threadParam->m_portIndex * 0xDC + 0x24);
             memcpy(q + 8, &statWord, sizeof(statWord));

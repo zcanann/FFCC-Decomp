@@ -2408,19 +2408,18 @@ foundTexture:
             loadTexture->m_textureSet = textureSet;
 
             File.Close(fileHandle);
+
+            m_texLoadRef = loadTexture;
+            m_texLoadRef->AddRef();
+            m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
+            m_textureSet->AddRef();
         } else {
             m_textureSet = 0;
             if (charaKind != 5 && static_cast<unsigned int>(System.m_execParam) >= 2) {
                 System.Printf(const_cast<char*>(s_charaTexMissingFmt), path);
             }
-            goto attach;
         }
     }
-
-    m_texLoadRef = loadTexture;
-    m_texLoadRef->AddRef();
-    m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
-    m_textureSet->AddRef();
 attach:
     m_model->AttachTextureSet(m_textureSet);
 }

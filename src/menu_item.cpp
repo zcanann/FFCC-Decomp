@@ -101,6 +101,21 @@ static inline double LoadDouble(const double& value)
     return value;
 }
 
+static inline ItemMenuState* GetItemState(CMenuPcs* menu)
+{
+    return menu->m_itemMenuState;
+}
+
+static inline ItemMenuAnimList* GetItemOpenAnimList(CMenuPcs* menu)
+{
+    return menu->m_itemList;
+}
+
+static inline MenuItemOpenAnim* GetItemOpenAnim(CMenuPcs* menu, int index)
+{
+    return &GetItemOpenAnimList(menu)->anims[index];
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80159654
@@ -818,15 +833,17 @@ void CMenuPcs::ItemInit()
     MenuItemOpenAnim* entry;
     ItemMenuAnimList* itemList;
 
-    memset(this->m_itemList, 0, sizeof(*this->m_itemList));
-    float one = LoadFloat(kItemOne);
-    entry = this->m_itemList->anims;
-    for (int initCount = 0; initCount < 64; initCount++, entry++) {
-        entry->uvScale = one;
+    memset(GetItemOpenAnimList(this), 0, sizeof(*GetItemOpenAnimList(this)));
+    {
+        float one = LoadFloat(kItemOne);
+        entry = GetItemOpenAnimList(this)->anims;
+        for (int initCount = 0; initCount < 64; initCount++, entry++) {
+            entry->uvScale = one;
+        }
     }
 
     index = 0;
-    entry = &this->m_itemList->anims[index++];
+    entry = GetItemOpenAnim(this, index++);
     entry->tex = 0x2E;
     entry->x = 0x68;
     entry->y = 0x28;
@@ -834,15 +851,16 @@ void CMenuPcs::ItemInit()
     entry->h = 0x108;
     float titleAlpha = LoadFloat(kItemInitU);
     float titleScale = LoadFloat(kItemInitV);
+    float one = LoadFloat(kItemOne);
     float zero = LoadFloat(kItemZero);
     entry->u = titleAlpha;
     entry->v = titleScale;
-    entry->uvScale = LoadFloat(kItemOne);
+    entry->uvScale = one;
     count = 4;
     entry->startFrame = 5;
     entry->duration = 5;
 
-    entry = &this->m_itemList->anims[index++];
+    entry = GetItemOpenAnim(this, index++);
     entry->tex = 0x47;
     entry->x = 0x50;
     entry->y = 0xE;
@@ -854,7 +872,7 @@ void CMenuPcs::ItemInit()
     entry->startFrame = 0;
     entry->duration = 5;
 
-    entry = &this->m_itemList->anims[index++];
+    entry = GetItemOpenAnim(this, index++);
     entry->tex = 0x47;
     entry->x = 0x55;
     entry->w = 0x30;
@@ -867,7 +885,7 @@ void CMenuPcs::ItemInit()
     entry->startFrame = 0;
     entry->duration = 5;
 
-    entry = &this->m_itemList->anims[index++];
+    entry = GetItemOpenAnim(this, index++);
     entry->flags = 2;
     entry->tex = 0x2E;
     entry->x = 0x50;
@@ -879,10 +897,10 @@ void CMenuPcs::ItemInit()
     entry->startFrame = 0;
     entry->duration = 5;
 
-    itemList = this->m_itemList;
+    itemList = GetItemOpenAnimList(this);
     yOffset = 0;
     for (int loopCount = 0; loopCount < 4; loopCount++) {
-        entry = &this->m_itemList->anims[index++];
+        entry = GetItemOpenAnim(this, index++);
         entry->flags = 2;
         entry->tex = 0x37;
         count = count + 2;
@@ -896,7 +914,7 @@ void CMenuPcs::ItemInit()
         entry->startFrame = 7;
         entry->duration = 5;
 
-        entry = &this->m_itemList->anims[index++];
+        entry = GetItemOpenAnim(this, index++);
         entry->flags = 2;
         entry->tex = 0x37;
         entry->x = itemList->anims[0].x + 0x24;
@@ -910,7 +928,7 @@ void CMenuPcs::ItemInit()
         entry->duration = 5;
     }
 
-    this->m_itemList->count = count;
-    this->m_itemMenuState->cursorIndex[0] = 0;
-    this->m_itemMenuState->initialized = 1;
+    GetItemOpenAnimList(this)->count = count;
+    GetItemState(this)->cursorIndex[0] = 0;
+    GetItemState(this)->initialized = 1;
 }

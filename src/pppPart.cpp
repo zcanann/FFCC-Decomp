@@ -2283,29 +2283,35 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 
 	ppvMng = pppMngSt;
 	if (se->m_soundEffectSlot >= 0 &&
-		pppMngSt->m_currentFrame >= se->m_soundEffectStartFrame &&
-		(s32)se->m_soundEffectStopFlag == 0)
+		pppMngSt->m_currentFrame >= se->m_soundEffectStartFrame)
 	{
-		Vec soundPos;
-		soundPos.x = mtx->value[0][3];
-		soundPos.y = mtx->value[1][3];
-		soundPos.z = mtx->value[2][3];
+		switch ((s32)se->m_soundEffectStopFlag)
+		{
+		case 0:
+		{
+			Vec soundPos;
+			soundPos.x = mtx->value[0][3];
+			soundPos.y = mtx->value[1][3];
+			soundPos.z = mtx->value[2][3];
 
-		if (se->m_soundEffectHandle < 0)
-		{
-			if (se->m_soundEffectStartedOnce == 0)
+			if (se->m_soundEffectHandle < 0)
 			{
-				u32 soundTableKind = (u32)se->m_soundEffectKind;
-				se->m_soundEffectHandle = Sound.PlaySe3D(
-					se->m_soundEffectSlot, &soundPos,
-					(PartMng.m_pppEnvSt.m_soundVolumeTable - 3)[soundTableKind],
-					(PartMng.m_pppEnvSt.m_soundPitchTable - 3)[soundTableKind], 0);
-				se->m_soundEffectStartedOnce = 1;
+				if (se->m_soundEffectStartedOnce == 0)
+				{
+					u32 soundTableKind = (u32)se->m_soundEffectKind;
+					se->m_soundEffectHandle = Sound.PlaySe3D(
+						se->m_soundEffectSlot, &soundPos,
+						(PartMng.m_pppEnvSt.m_soundVolumeTable - 3)[soundTableKind],
+						(PartMng.m_pppEnvSt.m_soundPitchTable - 3)[soundTableKind], 0);
+					se->m_soundEffectStartedOnce = 1;
+				}
 			}
+			else
+			{
+				Sound.ChangeSe3DPos(se->m_soundEffectHandle, &soundPos);
+			}
+			break;
 		}
-		else
-		{
-			Sound.ChangeSe3DPos(se->m_soundEffectHandle, &soundPos);
 		}
 	}
 

@@ -3931,22 +3931,25 @@ renderedDone:
         outResult = 0;
         break;
     case -0xE3: {
+        CCaravanWork* work = &Game.m_caravanWorkArr[object->m_localBase[0]];
         unsigned int flags = 0;
         if ((object->m_localBase[1] & 2) != 0) {
-            const int itemIndex = Game.m_caravanWorkArr[object->m_localBase[0]].FindItem(object->m_localBase[2]);
-            flags = (0xffffffffU - (itemIndex >> 31)) & 2;
+            const int itemIndex = work->FindItem(object->m_localBase[2]);
+            flags = ((static_cast<unsigned int>(itemIndex) >> 31) - 1) & 2;
         }
         this->push(object, flags);
         outResult = 0;
         break;
     }
-    case -0xE4:
-        if (object->m_localBase[1] == 1) {
-            Game.m_caravanWorkArr[object->m_localBase[0]].DeleteItem(object->m_localBase[2], 1);
+    case -0xE4: {
+        CCaravanWork* work = &Game.m_caravanWorkArr[object->m_localBase[0]];
+        if (static_cast<int>(object->m_localBase[1]) == 1) {
+            work->DeleteItem(object->m_localBase[2], 1);
         }
         this->push(object, 0);
         outResult = 0;
         break;
+    }
     case -0xE5:
         this->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_gil);
         outResult = 0;

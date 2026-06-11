@@ -1669,7 +1669,7 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
  * JP Address: TODO
  * JP Size: TODO
  */
-int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius, float angle, int maxCount, CGObject** objects)
+int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle, float radius, int maxCount, CGObject** objects)
 {
 	const float radiusSq = radius * radius;
 	int count = 0;

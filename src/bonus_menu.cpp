@@ -3603,8 +3603,8 @@ void CMenuPcs::CalcResultOpenAnim()
 				int o48 = boardOff + 0x48;
 				int o4c = boardOff + 0x4c;
 				int centerX = (int)(float)((double)(float)(DOUBLE_80331EE0 + ((double)sprite->w * DOUBLE_80331E78 + (double)sprite->x)) - DOUBLE_80331EE8);
-				*(short*)(this->m_bonus.m_bonusBoardPtr + o08) = (short)centerX;
 				int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)sprite->y) - DOUBLE_80331EF0);
+				*(short*)(this->m_bonus.m_bonusBoardPtr + o08) = (short)centerX;
 				*(short*)(this->m_bonus.m_bonusBoardPtr + o0a) = (short)centerY;
 				*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = sprite->x + 0xC;
 				*(int*)(this->m_bonus.m_bonusBoardPtr + o44) = sprite->y - 8;

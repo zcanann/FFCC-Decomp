@@ -4870,7 +4870,6 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
         break;
     }
     default:
-        result = 0;
         break;
     }
 
@@ -5067,7 +5066,6 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
         break;
     }
     default:
-        result = 0;
         break;
     }
 

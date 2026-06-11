@@ -1853,7 +1853,9 @@ checkLoaded:
                                     loadModel->m_streamSize = rawSize;
                                     loadModel->m_streamMode = 1;
                                     Memory.CopyToAMemorySync(
-                                        rawAddr, reinterpret_cast<unsigned char*>(StageBase(m_amemWorkStage)) + LoadStreamCursor(this),
+                                        rawAddr,
+                                        reinterpret_cast<void*>(
+                                            LoadStreamCursor(this) + reinterpret_cast<unsigned int>(StageBase(m_amemWorkStage))),
                                         static_cast<unsigned long>(rawSize));
                                     LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                                 }
@@ -1905,7 +1907,9 @@ checkLoaded:
                                     loadTexture->m_streamSize = rawSize;
                                     loadTexture->m_streamMode = 1;
                                     Memory.CopyToAMemorySync(
-                                        rawAddr, reinterpret_cast<unsigned char*>(StageBase(m_amemWorkStage)) + LoadStreamCursor(this),
+                                        rawAddr,
+                                        reinterpret_cast<void*>(
+                                            LoadStreamCursor(this) + reinterpret_cast<unsigned int>(StageBase(m_amemWorkStage))),
                                         static_cast<unsigned long>(rawSize));
                                     LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                                 }

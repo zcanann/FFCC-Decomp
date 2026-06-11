@@ -1909,7 +1909,7 @@ void CGObject::update()
 
             if (animFinished) {
                 if (m_shieldNodeFlagBits.m_bit80) {
-                    const unsigned char queuePos = m_animQueuePos++;
+                    const char queuePos = m_animQueuePos++;
                     const char queuedAnim = m_animQueue[queuePos];
                     if (queuedAnim != -1) {
                         m_currentAnimSlot = m_animQueue[queuedAnim - 'A'];

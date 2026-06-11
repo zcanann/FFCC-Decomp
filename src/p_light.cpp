@@ -93,6 +93,60 @@ CProcessTable CLightPcs::m_table = {
 _GXColor s_ambientAlphaColor;
 static const char s_p_light_cpp[] = "p_light.cpp";
 
+static inline float LightSqrtF(float x)
+{
+    union {
+        float f;
+        unsigned long bits;
+    } bits;
+    int fpclass;
+
+    float result;
+
+    if (x > kLightZero) {
+        double guess = __frsqrte((double)x);
+        guess = kLightHalfD * guess * (kLightThreeD - guess * guess * x);
+        guess = kLightHalfD * guess * (kLightThreeD - guess * guess * x);
+        guess = kLightHalfD * guess * (kLightThreeD - guess * guess * x);
+        result = (float)(x * guess);
+        return result;
+    }
+
+    if ((double)x < kLightZeroD) {
+        result = NAN;
+        return result;
+    }
+
+    bits.f = x;
+    switch (bits.bits & 0x7f800000) {
+    case 0x7f800000:
+        if ((bits.bits & 0x7fffff) != 0) {
+            fpclass = 1;
+        } else {
+            fpclass = 2;
+        }
+        break;
+    case 0:
+        if ((bits.bits & 0x7fffff) != 0) {
+            fpclass = 5;
+        } else {
+            fpclass = 3;
+        }
+        break;
+    default:
+        fpclass = 4;
+        break;
+    }
+
+    if (fpclass == 1) {
+        result = NAN;
+    } else {
+        result = x;
+    }
+
+    return result;
+}
+
 static inline double U32ToDouble(unsigned int value)
 {
     union {
@@ -944,8 +998,8 @@ void CLightPcs::CBumpLight::MakeLightMap()
 
         GXLoadLightObjImm(&lightObj, (GXLightID)1);
 
-        float dW = kBumpLightMapVertexZ;
         float dInv = kBumpLightNormalDivisor;
+        float dW = kBumpLightMapVertexZ;
         u32 y = 0;
         do {
             GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);
@@ -958,15 +1012,15 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 float t0 = dFactor * fy;
                 float x0 = t0 * dScale - dHalf;
                 float xd0 = x0 / dInv;
-                float t1 = dFactor * (float)(y + 1);
-                float x1 = t1 * dScale - dHalf;
-                float xd1 = x1 / dInv;
                 float tz = dFactor * (float)x;
                 float z0 = tz * dScale - dHalf;
                 float zd = z0 / dInv;
+                float t1 = dFactor * (float)(y + 1);
+                float x1 = t1 * dScale - dHalf;
+                float xd1 = x1 / dInv;
                 float dist0 = z0 * z0 + x0 * x0;
                 if (dist0 < dHalf) {
-                    dist0 = sqrtf(dHalf - dist0);
+                    dist0 = LightSqrtF(dHalf - dist0);
                 } else {
                     dist0 = kLightZero;
                 }
@@ -980,7 +1034,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 GXWGFifo.f32 = dist0;
 
                 if (dist1 < dHalf) {
-                    dist1 = sqrtf(dHalf - dist1);
+                    dist1 = LightSqrtF(dHalf - dist1);
                 } else {
                     dist1 = kLightZero;
                 }
@@ -1196,7 +1250,6 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             PSMTXIdentity(reinterpret_cast<float(*)[4]>(m_bumpTexScratch));
             float* scratch = m_bumpTexScratch;
 
-            float mtxScale = kBumpTexMtxScale;
             float half = kLightHalf;
             float zero = kLightZero;
             float scrollScale = kBumpTexScrollScale;
@@ -1210,8 +1263,8 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             scratch[7] =
                 -(scrollScale * (camZ + bump->m_offsetZ) - half);
             scratch[11] = zero;
-            scratch[16] = mtxScale;
-            scratch[12] = mtxScale;
+            scratch[16] = kBumpTexMtxScale;
+            scratch[12] = kBumpTexMtxScale;
             scratch[17] = zero;
             scratch[15] = zero;
             scratch[14] = zero;

@@ -2371,8 +2371,8 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
             PSVECScale(&toOther, &toOther, sAnimFrameOffset / dist);
             const float angle = static_cast<float>(acos(static_cast<double>(PSVECDotProduct(&toOther, &targetDir))));
             if ((static_cast<double>(angle) < static_cast<double>(maxAngle + extraAngle)) && (dist < bestDist)) {
-                best = other;
                 bestDist = dist;
+                best = other;
             }
         }
     }

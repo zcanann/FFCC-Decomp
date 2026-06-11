@@ -4216,45 +4216,41 @@ void CMenuPcs::createBonus()
 			slotIdx++;
 		}
 
-		CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 		int handleIndex = s_Rinfo->m_partyCount * 2;
-		short* rewardItems = &s_Rinfo->m_tempArtifacts[0];
-		for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++) {
-			short itemId = rewardItems[artifactIndex];
-			if (itemId < 1) {
-				displaySlots[handleIndex] = 0;
-			} else {
+		for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++, handleIndex++) {
+			short itemId = s_Rinfo->m_tempArtifacts[artifactIndex];
+			if (itemId > 0) {
 				CCharaPcs::CHandle* itemHandle =
 				    new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0x19C) CCharaPcs::CHandle;
-				displaySlots[handleIndex] = itemHandle;
-				itemHandle->Add();
+				GetBonusDisplayHandleSlots(this)[handleIndex] = itemHandle;
+				GetBonusDisplayHandleSlots(this)[handleIndex]->Add();
 				unsigned short itemModelCode =
 				    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2);
 				int modelNo = itemModelCode & 0x0FFF;
-				itemHandle->LoadModel(3, modelNo, (itemModelCode >> 12) & 0xF, 0, -1, 0, 0);
-				itemHandle->m_flags = 0x300543;
+				GetBonusDisplayHandleSlots(this)[handleIndex]->LoadModel(3, modelNo, (itemModelCode >> 12) & 0xF, 0, -1, 0, 0);
+				GetBonusDisplayHandleSlots(this)[handleIndex]->m_flags = 0x300543;
 
 				if (modelNo == 0x79) {
-					itemId = rewardItems[artifactIndex];
-					int effectNo = -1;
-					if (itemId == 0xDF) {
+					short itemId2 = s_Rinfo->m_tempArtifacts[artifactIndex];
+					int effectNo;
+					if (itemId2 == 0xDF) {
 						effectNo = 0x75;
-					} else if (itemId == 0xE0) {
+					} else if (itemId2 == 0xE0) {
 						effectNo = 0x76;
-					} else if (itemId == 0xE1) {
+					} else if (itemId2 == 0xE1) {
 						effectNo = 0x77;
-					} else if (itemId == 0xE2) {
+					} else if (itemId2 == 0xE2) {
 						effectNo = 0x78;
-					} else if (itemId == 0xE3) {
+					} else if (itemId2 == 0xE3) {
 						effectNo = 0x79;
+					} else {
+						continue;
 					}
-					if (effectNo >= 0) {
-						BindEffect(handleIndex, effectNo, -1);
-					}
+					BindEffect(handleIndex, effectNo, -1);
 				}
+			} else {
+				GetBonusDisplayHandleSlots(this)[handleIndex] = 0;
 			}
-
-			handleIndex++;
 		}
 	}
 

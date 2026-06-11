@@ -609,7 +609,7 @@ void CMes::Draw()
 		int activeTlut = 0xFFFFFFFF;
 		int activeFontId = 0xFFFFFFFF;
 
-		for (int i = 0; i < *(int*)((char*)this + 8); i++)
+		for (int i = 0; i < *(int*)((char*)this + 8); i++, glyph += 5)
 		{
 			if (*(int*)((char*)this + 0x3C80) >= (int)(unsigned int)*(unsigned short*)((char*)glyph + 0x0C))
 			{
@@ -702,7 +702,7 @@ void CMes::Draw()
 					}
 					}
 
-					MenuPcs.SetColor(MesColorRef(CColor(0xFF, 0xFF, 0xFF, 0xFF)));
+					MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF));
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x15));
 
 					MenuPcs.DrawRect(
@@ -780,8 +780,6 @@ void CMes::Draw()
 					GetRenderFlagBits(font->renderFlags).snapPosition = 0;
 				}
 			}
-
-			glyph += 5;
 		}
 
 		font->DrawQuit();

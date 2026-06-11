@@ -1404,9 +1404,9 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		for (int i = 0; i < 4; i++) {
 			const unsigned short cmpType = curLetter->m_compareRules[i].m_rule;
 			const int sourceType = (cmpType >> 11) & 3;
-			const int sourceIdx = cmpType & 0x7FF;
 
 			if (sourceType != 3) {
+				const int sourceIdx = cmpType & 0x7FF;
 				switch (sourceType) {
 				case 0:
 					switch (sourceIdx) {

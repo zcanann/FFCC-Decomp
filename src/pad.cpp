@@ -410,6 +410,7 @@ void CPad::Frame()
 	u32 uVar15;
 	u16* puVar18;
 	int iVar19;
+	u16 uVar2;
 	CPad::Gba local_98[4];
 	PADStatus local_88[4];
 	u8* self = reinterpret_cast<u8*>(this);
@@ -447,33 +448,37 @@ void CPad::Frame()
 				puVar13 = reinterpret_cast<u16*>(local_98);
 				for (iVar19 = 0; iVar19 < 4; iVar19++)
 				{
-					uVar8 = *puVar13;
-					uVar1 = puVar13[1];
 					iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar6;
 					iVar6 = iVar6 + 0x0C;
-					puVar13 = puVar13 + 2;
 					puVar12 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar11 + 0x0C);
-					*puVar12 = *puVar7;
-					*reinterpret_cast<u8*>(puVar12 + 1) = *reinterpret_cast<u8*>(puVar7 + 1);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 3) =
-						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3);
-					*reinterpret_cast<u8*>(puVar12 + 2) = *reinterpret_cast<u8*>(puVar7 + 2);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 5) =
-						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5);
-					*reinterpret_cast<u8*>(puVar12 + 3) = *reinterpret_cast<u8*>(puVar7 + 3);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 7) =
-						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7);
-					*reinterpret_cast<u8*>(puVar12 + 4) = *reinterpret_cast<u8*>(puVar7 + 4);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 9) =
-						*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9);
+					uVar2 = *puVar7;
+					*puVar12 = uVar2;
+					uVar2 = *reinterpret_cast<u8*>(puVar7 + 1);
+					*reinterpret_cast<u8*>(puVar12 + 1) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 3) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(puVar7 + 2);
+					*reinterpret_cast<u8*>(puVar12 + 2) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 5) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(puVar7 + 3);
+					*reinterpret_cast<u8*>(puVar12 + 3) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 7) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(puVar7 + 4);
+					*reinterpret_cast<u8*>(puVar12 + 4) = static_cast<u8>(uVar2);
+					uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9);
+					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 9) = static_cast<u8>(uVar2);
 					puVar10 = puVar7 + 5;
 					puVar7 = puVar7 + 6;
-					*reinterpret_cast<u8*>(puVar12 + 5) = *reinterpret_cast<u8*>(puVar10);
+					uVar2 = *reinterpret_cast<u8*>(puVar10);
+					*reinterpret_cast<u8*>(puVar12 + 5) = static_cast<u8>(uVar2);
 					iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar14;
 					iVar14 = iVar14 + 4;
 					puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar11 + 0x3C);
-					*puVar10 = uVar8;
-					puVar10[1] = uVar1;
+					*puVar10 = *puVar13;
+					puVar10[1] = puVar13[1];
+					puVar13 = puVar13 + 2;
 				}
 				*reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) =
 					*reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) + 1;

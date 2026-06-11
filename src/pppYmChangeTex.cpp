@@ -218,7 +218,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				int level = 0;
 				float threshold = ChangeTexConst(kPppYmChangeTexRampStart);
 				for (int tries = 7; tries != 0; tries--) {
-					if ((float)delta > ChangeTexConst(kPppYmChangeTexRampScale) * threshold) {
+					if ((float)delta > threshold * ChangeTexConst(kPppYmChangeTexRampScale)) {
 						if (negativeRamp == 0xFF) {
 							vertColors->a = negativeRamp - (level << 4);
 						} else {
@@ -385,8 +385,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 				}
 
 				drawTevBits = 0xACE0F;
-				fullTevBits = drawTevBits;
-				fullTevBits |= 0x1000;
+				fullTevBits = 0xADE0F;
 				displayListIdx = meshData->m_displayListCount - 1;
 				while (displayListIdx >= 0) {
 					ChangeTexDisplayListCopy** displayListCopies = state->m_displayListArrays[meshIdx];
@@ -426,8 +425,7 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 
 	if (step->m_changeTex.m_mode == 0) {
 		unsigned int drawTevBits = 0xACE0F;
-		unsigned int fullTevBits = drawTevBits;
-		fullTevBits |= 0x1000;
+		unsigned int fullTevBits = 0xADE0F;
 		MaterialMan.SetChangeTexReflectionState(
 		    &texture->m_texObj, drawTevBits, fullTevBits);
 	}

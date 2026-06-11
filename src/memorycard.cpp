@@ -237,6 +237,11 @@ static inline u32* GetSaveEncodedWords(Mc::SaveDat* save)
     return &save->m_random;
 }
 
+static inline u32 LoadSwapped(u32* p)
+{
+    return __lwbrx(p, 0);
+}
+
 static inline void EncodeSaveData(char* saveBuffer)
 {
     Mc::SaveDat* const save = GetSaveDat(saveBuffer);
@@ -246,19 +251,19 @@ static inline void EncodeSaveData(char* saveBuffer)
     for (int count = 0; count < 0x5B6; count++)
     {
         u32 rotated = __rlwnm(ptr[0], rotAmount, 0, 31);
-        ptr[0] = __lwbrx(&rotated, 0);
+        ptr[0] = LoadSwapped(&rotated);
         rotated = __rlwnm(ptr[1], rotAmount, 0, 31);
-        ptr[1] = __lwbrx(&rotated, 0);
+        ptr[1] = LoadSwapped(&rotated);
         rotated = __rlwnm(ptr[2], rotAmount, 0, 31);
-        ptr[2] = __lwbrx(&rotated, 0);
+        ptr[2] = LoadSwapped(&rotated);
         rotated = __rlwnm(ptr[3], rotAmount, 0, 31);
-        ptr[3] = __lwbrx(&rotated, 0);
+        ptr[3] = LoadSwapped(&rotated);
         rotated = __rlwnm(ptr[4], rotAmount, 0, 31);
-        ptr[4] = __lwbrx(&rotated, 0);
+        ptr[4] = LoadSwapped(&rotated);
         rotated = __rlwnm(ptr[5], rotAmount, 0, 31);
-        ptr[5] = __lwbrx(&rotated, 0);
+        ptr[5] = LoadSwapped(&rotated);
         rotated = __rlwnm(ptr[6], rotAmount, 0, 31);
-        ptr[6] = __lwbrx(&rotated, 0);
+        ptr[6] = LoadSwapped(&rotated);
         ptr += 7;
     }
 }
@@ -272,19 +277,19 @@ static inline void DecodeSaveData(char* saveBuffer)
     for (int count = 0; count < 0x5B6; count++)
     {
         u32 word = ptr[0];
-        ptr[0] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        ptr[0] = __rlwnm(LoadSwapped(&word), rotAmount, 0, 31);
         word = ptr[1];
-        ptr[1] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        ptr[1] = __rlwnm(LoadSwapped(&word), rotAmount, 0, 31);
         word = ptr[2];
-        ptr[2] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        ptr[2] = __rlwnm(LoadSwapped(&word), rotAmount, 0, 31);
         word = ptr[3];
-        ptr[3] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        ptr[3] = __rlwnm(LoadSwapped(&word), rotAmount, 0, 31);
         word = ptr[4];
-        ptr[4] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        ptr[4] = __rlwnm(LoadSwapped(&word), rotAmount, 0, 31);
         word = ptr[5];
-        ptr[5] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        ptr[5] = __rlwnm(LoadSwapped(&word), rotAmount, 0, 31);
         word = ptr[6];
-        ptr[6] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        ptr[6] = __rlwnm(LoadSwapped(&word), rotAmount, 0, 31);
         ptr += 7;
     }
 }

@@ -852,10 +852,13 @@ void CMenuPcs::CmakeVillageDraw()
     SetCmakeFontColor(font, alpha);
 
     int tableBase = table * 5;
-    for (int i = 0; i < 5; i++) {
-        const char* rowText = s_NameEntryStr[tableBase + i];
+    const char* rowText;
+    int i;
+    int y;
+    for (i = 0, y = 0x6C; i < 5; i++, y += 0x20) {
+        rowText = s_NameEntryStr[tableBase + i];
         font->SetPosX(240.0f);
-        font->SetPosY(static_cast<float>(0x6C + i * 0x20));
+        font->SetPosY(static_cast<float>(y));
         font->Draw(rowText);
     }
 

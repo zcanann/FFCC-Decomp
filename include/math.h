@@ -44,18 +44,20 @@ extern inline float sqrtf(float x)
     } bits;
     int fpclass;
 
+    float result;
+
     if (x > 0.0f) {
         double guess = __frsqrte((double)x); // returns an approximation to
         guess = _half * guess * (_three - guess * guess * x); // now have 12 sig bits
         guess = _half * guess * (_three - guess * guess * x); // now have 24 sig bits
         guess = _half * guess * (_three - guess * guess * x); // now have 32 sig bits
-        x = (float)(x * guess);
-        return x;
+        result = (float)(x * guess);
+        return result;
     }
 
     if ((double)x < 0.0) {
-        x = NAN;
-        return x;
+        result = NAN;
+        return result;
     }
 
     bits.f = x;
@@ -80,10 +82,12 @@ extern inline float sqrtf(float x)
     }
 
     if (fpclass == 1) {
-        x = NAN;
+        result = NAN;
+    } else {
+        result = x;
     }
 
-    return x;
+    return result;
 }
 #else
 #ifdef __cplusplus

@@ -125,8 +125,8 @@ void CMapHit::Draw()
     while (faceIndex < m_faceCount) {
         if ((face->m_drawFlags & 1) == 0) {
             const CMapIdGrp* mapIdGrp = &MapMng.m_mapIdGrpArray[face->m_groupIndex];
-            const GXColor colorABytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_primaryColor);
-            const GXColor colorBBytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
+            GXColor colorABytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_primaryColor);
+            GXColor colorBBytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
             int i = 0;
@@ -160,7 +160,7 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
     face = m_faces;
-    for (faceIndex = 0; faceIndex < static_cast<int>(m_faceCount); faceIndex++, face++) {
+    for (faceIndex = 0; faceIndex < static_cast<int>(m_faceCount); face++, faceIndex++) {
         if ((face->m_drawFlags & 1) != 0) {
             face->m_drawFlags = 0;
         } else {
@@ -437,6 +437,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
+    CMapCylinder& cyl = g_hit_cyl;
     unsigned char boundsOverlap = 0;
     unsigned char partialOverlap = 0;
     int axisOverlap;
@@ -480,7 +481,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    Vec* hitDirection = &g_hit_cyl.m_axis;
+    Vec* hitDirection = &cyl.m_axis;
     float dot = PSVECDotProduct(hitDirection, &g_hit_lpface->m_normal);
     if (dot >= kMapHitZero) {
         return 0;
@@ -649,9 +650,8 @@ edge_loop:
                 Vec edge;
                 PSVECSubtract(&current, &previous, &edge);
 
-                Vec rayDirection;
                 Vec rayStart = g_hit_cyl.m_bottom;
-                rayDirection = *hitDirection;
+                Vec rayDirection = *hitDirection;
 
                 CMapCylinder edgeCylinder;
                 edgeCylinder.m_bottom = previous;

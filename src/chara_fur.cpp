@@ -1163,7 +1163,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		case 3: {
 			const _GXColor c = CColor(0xF, 0xF, 0xF, 4).color;
 			brushColor = c;
-			doPaint = ((static_cast<int>(System.m_frameCounter) % 4) == 0) ? 1 : 0;
+			doPaint = (static_cast<int>(System.m_frameCounter) % 4) == 0;
 			break;
 		}
 		case 4:
@@ -1172,7 +1172,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				brushColor = c;
 			}
 			eraseMode = 1;
-			doPaint = ((static_cast<int>(System.m_frameCounter) % 4) == 0) ? 1 : 0;
+			doPaint = (static_cast<int>(System.m_frameCounter) % 4) == 0;
 			break;
 		}
 		_GXColor centerBefore;

@@ -3858,7 +3858,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 		int slot = 0;
 		unsigned short* slotCursor = combiCursor;
 		CGPartyObj** slotPtr = partyList;
-		for (int remaining = reqCount; remaining > 0; remaining--) {
+		for (int remaining = 0; remaining < reqCount; remaining++) {
 			CGCharaObj* partyObj = reinterpret_cast<CGCharaObj*>(*slotPtr);
 			if (partyObj->m_comboFrame == 0) {
 				unsigned short* fallbackCursor = slotCursor;
@@ -3923,8 +3923,8 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			if (slot == reqLast) {
 				found = combiIndex;
 			}
-			slot++;
 			slotPtr++;
+			slot++;
 			slotCursor += 3;
 		}
 	}

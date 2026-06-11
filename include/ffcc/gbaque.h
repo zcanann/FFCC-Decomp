@@ -169,7 +169,7 @@ public:
     unsigned int GetMkSmithFlg(int);
     void ClrMkSmithFlg(int);
     void SetResetFlg(int);
-    unsigned char GetBonus(int);
+    int GetBonus(int);
     unsigned int GetArtifactFlg(int);
     void ClrArtifactFlg(int);
     int GetArtifactData(int, unsigned char*);

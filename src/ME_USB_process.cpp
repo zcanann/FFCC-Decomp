@@ -360,10 +360,11 @@ void CMaterialEditorPcs::SetUSBData()
             memcpy(this->m_textureData[this->m_loadedTextureCount], headerBuffer + 8, usb.m_sizeBytes - 0x10);
             DCFlushRange(this->m_textureData[this->m_loadedTextureCount], usb.m_sizeBytes - 0x10);
         } else if ((headerBuffer[1] == 4) || (headerBuffer[1] == 8)) {
+            CMemory& memory = Memory;
             int tlutEntries = headerBuffer[1] == 4 ? 0x10 : 0x100;
             int tlutDataSize = tlutEntries * 4;
             int imageDataSize = static_cast<int>(usb.m_sizeBytes) - 0x10 - tlutDataSize;
-            void* texData = Memory._Alloc(
+            void* texData = memory._Alloc(
                 imageDataSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
 
             if (texData == 0) {
@@ -384,11 +385,11 @@ void CMaterialEditorPcs::SetUSBData()
 
             u8* tlutSrc;
             if (headerBuffer[1] == 4) {
-                tlutSrc = reinterpret_cast<u8*>(headerBuffer) + (headerBuffer[2] * headerBuffer[3]) / 2;
+                tlutSrc = reinterpret_cast<u8*>(headerBuffer + 8) + (headerBuffer[2] * headerBuffer[3]) / 2;
             } else {
-                tlutSrc = reinterpret_cast<u8*>(headerBuffer) + headerBuffer[2] * headerBuffer[3];
+                tlutSrc = reinterpret_cast<u8*>(headerBuffer + 8) + headerBuffer[2] * headerBuffer[3];
             }
-            memcpy(this->m_tlutData[this->m_loadedTextureCount], tlutSrc + 0x10, tlutDataSize);
+            memcpy(this->m_tlutData[this->m_loadedTextureCount], tlutSrc, tlutDataSize);
             DCFlushRange(this->m_tlutData[this->m_loadedTextureCount], tlutDataSize);
         }
 

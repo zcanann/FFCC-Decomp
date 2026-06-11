@@ -404,7 +404,7 @@ public:
     unsigned int GetWorldParam(int);
     void CallWorldParam(int, int, int);
     void CalcSpl(SPL*, SPL*, float);
-    double GetFcvValue(FCV, float);
+    float GetFcvValue(FCV, float);
     void SetProjection(int);
     void RestoreProjection();
     void DrawObj(int);

@@ -353,7 +353,7 @@ void pppConstructRain(pppRain* pppRain, RAIN_DATA* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void UpdateRain(VRain* work, PRain* rain, RAIN_DATA*)
+inline void UpdateRain(VRain* work, PRain* rain, RAIN_DATA*)
 {
     work->accelY += work->accelZ;
     work->moveY += work->accelY;
@@ -370,7 +370,7 @@ void UpdateRain(VRain* work, PRain* rain, RAIN_DATA*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void InitRainData(VRain* work, PRain* rain, RAIN_DATA*)
+inline void InitRainData(VRain* work, PRain* rain, RAIN_DATA*)
 {
     RainDrop* drop;
 

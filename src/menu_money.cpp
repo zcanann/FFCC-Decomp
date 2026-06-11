@@ -203,11 +203,12 @@ int CMenuPcs::MoneyCtrlCur()
 			}
 		} else {
 			if ((hold & 2) != 0) {
-				if (this->m_moneyState->selections[mode] == 0) {
-					Sound.PlaySe(4, 0x40, 0x7F, 0);
-				} else {
-					this->m_moneyState->selections[mode] = this->m_moneyState->selections[mode] - 1;
+				int selection = this->m_moneyState->selections[mode];
+				if (selection != 0) {
+					this->m_moneyState->selections[mode] = selection - 1;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				}
 			}
 		}
@@ -281,7 +282,7 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) != 0) {
-				int sel = this->m_moneyState->selections[mode];
+				unsigned int sel = this->m_moneyState->selections[mode];
 				if (((int)this->m_moneyState->messageMask & (1 << sel)) == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {

@@ -252,7 +252,10 @@ void CMaterialEditorPcs::drawViewer()
 
                 int flags = polygon->flags & 0xf;
                 int vertexCount = 3;
-                switch (polygon->textureMarker) {
+                switch (static_cast<unsigned char>(polygon->textureMarker)) {
+                case 'G':
+                default:
+                    break;
                 case 'H':
                 if (static_cast<s16>(m_loadedTextureCount) > polygon->textureIndex) {
                     s16* textureHeader = m_textureHeader[polygon->textureIndex];

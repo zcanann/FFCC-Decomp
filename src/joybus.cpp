@@ -4273,7 +4273,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         m_pposWordIndex[threadParam->m_portIndex] += sent;
 
         // Done with all player-pos words?
-        if (m_pposWordIndex[threadParam->m_portIndex] >= (int)(signed char)m_cmdBuffer[threadParam->m_portIndex])
+        if ((int)(signed char)m_cmdBuffer[threadParam->m_portIndex] <= m_pposWordIndex[threadParam->m_portIndex])
         {
             m_cmdBuffer[threadParam->m_portIndex] = 0;
             m_pposWordIndex[threadParam->m_portIndex] = 0;
@@ -4326,7 +4326,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         m_pposWordIndex[threadParam->m_portIndex] += sent;
 
-        if (m_pposWordIndex[threadParam->m_portIndex] >= (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
+        if ((int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex] <= m_pposWordIndex[threadParam->m_portIndex])
         {
             state += 1;
             m_cmdBuffer[4 + threadParam->m_portIndex] = 0;
@@ -4382,7 +4382,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         m_pposWordIndex[threadParam->m_portIndex] += sent;
 
-        if (m_pposWordIndex[threadParam->m_portIndex] >= (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
+        if ((int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex] <= m_pposWordIndex[threadParam->m_portIndex])
         {
             state = 0;
             m_cmdBuffer[4 + threadParam->m_portIndex] = 0;

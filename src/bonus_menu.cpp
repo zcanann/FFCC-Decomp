@@ -2583,20 +2583,23 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		// sprites[digitEchoBase + pc].startFrame = sprites[1].startFrame
-		int countTop =  (int)(long)(base + activePartyCount + 1);
-		*(int*)(this->m_bonusAnimPtr + (base + activePartyCount) * 0x40 + 0x2c) =
-		    *(int*)(this->m_bonusAnimPtr + 0x6c);
-		s_CntTop = (unsigned char)countTop;
+		base += activePartyCount;
+		{
+			int sprite = this->m_bonusAnimPtr + base * 0x40 + 8;
+			*(int*)(sprite + 0x24) = *(int*)(this->m_bonusAnimPtr + 0x6c);
+		}
+		base += 1;
+		s_CntTop = (unsigned char)base;
 
 		// countTop block: startFrame = 8, duration = 8
 		for (int i = 0; i < activePartyCount; i++) {
-			int sprite = this->m_bonusAnimPtr + (countTop + i) * 0x40 + 8;
+			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
 			*(int*)(sprite + 0x24) = 8;
 			*(int*)(sprite + 0x28) = 8;
 		}
 
 		// extraBase block: src = iconBase (back = base - (pc+1)); dance
-		base = countTop + activePartyCount;
+		base += activePartyCount;
 		{
 			int delta = (base - activePartyCount - 1) * 0x40;
 			for (int i = 0; i < activePartyCount; i++) {

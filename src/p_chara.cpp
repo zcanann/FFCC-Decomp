@@ -1694,7 +1694,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
  */
 void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 {
-    unsigned int hasLoaded;
+    int hasLoaded;
     unsigned int i;
 
     for (i = 0; i < LoadModelArray(this)->GetSize(); i++) {
@@ -1796,7 +1796,7 @@ checkLoaded:
                             continue;
                         }
 
-                        const unsigned int rawSize = static_cast<int>(chunk.m_size);
+                        const int rawSize = static_cast<int>(chunk.m_size);
 
                         switch (dataType) {
                         case 0: {

@@ -681,8 +681,9 @@ void CGraphicPcs::drawBar()
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
-    int drawText = 0;
-    bool useDebugPad = false;
+    int drawText;
+    bool useDebugPad;
+    useDebugPad = drawText = 0;
     if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
         useDebugPad = true;
     }

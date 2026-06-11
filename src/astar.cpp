@@ -404,7 +404,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		CAPos& p = m_portals[i];
 
 		bool used = false;
-		if (p.m_groupA != 0 && p.m_groupB != 0)
+		if (m_portals[i].m_groupA != 0 && m_portals[i].m_groupB != 0)
 		{
 			used = true;
 		}
@@ -550,7 +550,7 @@ void CAStar::calcAStar()
 {
 	memset(m_routeTable, 0, sizeof(m_routeTable));
 
-	for (unsigned int to = 0; to < 64; ++to)
+	for (int to = 0; to < 64; ++to)
 	{
 		for (int from = 0; from < 64; ++from)
 		{
@@ -565,7 +565,7 @@ void CAStar::calcAStar()
 
 			memset(&temp, 0, sizeof(temp));
 
-			check(from, to, temp);
+			check(from, (int)(unsigned int)to, temp);
 
 			if (m_bestPath.m_cost < LoadFloat(kInfiniteCost))
 			{
@@ -657,7 +657,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 						*reinterpret_cast<CABlock*>(m_bestPath.m_visited) = *reinterpret_cast<CABlock*>(level1.m_visited);
 						*reinterpret_cast<CABlock*>(m_bestPath.m_path) = *reinterpret_cast<CABlock*>(level1.m_path);
 						m_bestPath.m_pathLength = level1.m_pathLength;
-						m_bestPath.m_cost = level1.m_cost;
+						m_bestPath.m_cost = LoadFloat(level1.m_cost);
 					}
 				}
 				else

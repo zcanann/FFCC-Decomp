@@ -913,12 +913,16 @@ void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* tex
         }
 
         if (count > 0) {
+            int glyph;
+            int px;
+            int tx;
+            int ty;
             GXBegin((GXPrimitive)0x80, (GXVtxFmt)0, (u16)((count & 0x3FFF) << 2));
             for (int i = 0; i < count; i++) {
-                int glyph = text[i] - 0x20;
-                int px = x + i * charSize;
-                int tx = (glyph % 8) * 16;
-                int ty = (glyph / 8) * 16;
+                glyph = text[i] - 0x20;
+                px = x + i * charSize;
+                tx = (glyph % 8) * 16;
+                ty = (glyph / 8) * 16;
 
                 GXWGFifo.s16 = px;
                 GXWGFifo.u16 = y;
@@ -1597,10 +1601,6 @@ void CGraphic::RenderNoTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXCol
  */
 void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist, float farDist, Vec targetPos, int blurPasses)
 {
-	_GXTexObj smallBackTex;
-	_GXTexObj backBufferTex;
-	_GXColor dofColor;
-	_GXColor chanColor;
 	Vec cameraPos;
 	Vec cameraToTarget;
 	Vec scaledDir;
@@ -1608,10 +1608,14 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	Vec quadMax;
 	float gxProjection[7];
 	float gxViewport[6];
+	_GXTexObj smallBackTex;
+	_GXTexObj backBufferTex;
 	Mtx cameraMtx;
 	float projX;
 	float projY;
 	float projZ;
+	_GXColor chanColor;
+	_GXColor dofColor;
 	int nearAlpha;
 	int farAlpha;
 	unsigned int texBufferSize;
@@ -1977,10 +1981,9 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     GXSetNumTexGens(1);
 
     int blurOffsetInt = offset;
-    int textureOffset = 0;
     for (int i = 0; i < static_cast<int>(m_blurTextureCount); i++) {
         int negativeBlurOffset = -blurOffsetInt;
-        u8* textureBase = reinterpret_cast<u8*>(m_savedFrameBuffer) + textureOffset;
+        u8* textureBase = reinterpret_cast<u8*>(m_savedFrameBuffer) + i * 0x46000;
         GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF, kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
@@ -2002,7 +2005,6 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
             quadMax.z = kGraphicZeroF;
             gUtil.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
         }
-        textureOffset += 0x46000;
     }
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
@@ -2019,11 +2021,11 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
                                static_cast<unsigned long>(m_blurBufferIndex) * 0x46000);
         m_blurDelayCounter = 0;
         m_blurTextureCount += 1;
-        if (m_blurTextureCount > 2) {
+        if (static_cast<int>(m_blurTextureCount) > 2) {
             m_blurTextureCount = 2;
         }
         m_blurBufferIndex += 1;
-        if (m_blurBufferIndex > 1) {
+        if (static_cast<int>(m_blurBufferIndex) > 1) {
             m_blurBufferIndex = 0;
         }
     }

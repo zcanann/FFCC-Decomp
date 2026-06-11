@@ -237,7 +237,7 @@ struct CmdState {
 	s16 uniteSelected;
 	unsigned char pad_002E[0x30 - 0x2E];
 	s16 mode;
-	u16 prevMode;
+	s16 prevMode;
 	s16 scrollTop;
 };
 
@@ -877,6 +877,8 @@ void CMenuPcs::CmdDraw()
 {
 	bool hasItemHelp = false;
 	s32 helpId;
+	float rowU;
+	float rowH;
 	float t;
 	float x;
 	float y;
@@ -994,11 +996,11 @@ void CMenuPcs::CmdDraw()
 		for (s32 idx = GetCmdListStorage(this)->count; idx < GetCmdListStorage(this)->listEnd; idx++, row++) {
 			const s32 tex = row->tex;
 			if (tex >= 0) {
-				const float rowH = static_cast<float>(row->height);
-				float rowU = row->u;
 				x = static_cast<float>(row->x);
 				y = static_cast<float>(row->y);
 				w = static_cast<float>(row->width);
+				rowH = static_cast<float>(row->height);
+				rowU = row->u;
 				t = row->v;
 
 				if (idx == GetCmdListStorage(this)->count) {
@@ -1060,6 +1062,7 @@ void CMenuPcs::CmdDraw()
 							const CCaravanWork* const caravan2 =
 							    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 							const s16* canBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+							const s16* canItems = canBuf + 1;
 							u8 canUse;
 							if ((sel < 0) || (sel >= canBuf[0])) {
 								canUse = 0;
@@ -1071,7 +1074,7 @@ void CMenuPcs::CmdDraw()
 								canUse = static_cast<u32>(
 								    ChkUnite(GetCmdStateView(this)->selected, combo) != 0);
 							} else {
-								canUse = static_cast<u32>(static_cast<u8>(EquipChk(static_cast<int>(canBuf[sel - 1]))) == 0);
+								canUse = static_cast<u32>(static_cast<u8>(EquipChk(static_cast<int>(canItems[sel - 2]))) == 0);
 							}
 
 							if (canUse == 0) {
@@ -1125,7 +1128,7 @@ void CMenuPcs::CmdDraw()
 	}
 
 	if (cmdMode == 1) {
-		CFont* listFont = m_fonts[0];
+		CFont* listFont = m_fonts[4];
 		listFont->SetMargin(kCmdMenuOne);
 		listFont->SetShadow(0);
 		listFont->SetScale(kCmdMenuTextScale);
@@ -1189,7 +1192,7 @@ void CMenuPcs::CmdDraw()
 		DrawInit();
 
 		CmdListEntry* iconRow = scan;
-		for (s32 row =  (int)(unsigned int)(0); row < 8; row++, iconRow++) {
+		for (s32 row = 0; row < 8; row++, iconRow++) {
 			if ((itemCount <= 8) && (row + GetCmdStateView(this)->scrollTop >= itemCount)) {
 				break;
 			}
@@ -1321,7 +1324,8 @@ void CMenuPcs::CmdDraw()
 		}
 
 		const s32 frame = static_cast<s32>(System.m_frameCounter) % 8;
-		DrawCursor(static_cast<s32>(x + static_cast<float>(frame)), static_cast<s32>(y), kCmdMenuOne);
+		x += static_cast<float>(frame);
+		DrawCursor(static_cast<s32>(x), static_cast<s32>(y), kCmdMenuOne);
 	}
 
 	const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
@@ -2224,6 +2228,7 @@ void CMenuPcs::DrawUniteList()
 	s32 groupStart;
 	float drawY;
 	float drawW;
+	float drawH;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -2250,8 +2255,8 @@ void CMenuPcs::DrawUniteList()
 
 		CmdListEntry* const entry = &GetCmdListStorage(this)->entries[i];
 		const float rectX = static_cast<float>(entry->x + 4);
-		drawY = static_cast<float>(entry->y);
 		drawW = static_cast<float>(entry->width - 8);
+		drawY = static_cast<float>(entry->y);
 		const float rectU = static_cast<float>(entry->u);
 		GXColor color;
 		color.r = 0xFF;
@@ -2355,7 +2360,8 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		const s16 slotType = caravan->m_commandListExtra[i];
-		if (slotType == 0) {
+		const int slotCheck = slotType;
+		if (slotCheck == 0) {
 			continue;
 		}
 
@@ -2384,10 +2390,11 @@ void CMenuPcs::DrawUniteList()
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
 
 		const s32 labelAnchor =
-		    (!(groupStart == GetCmdStateView(this)->selected)) ? groupStart : groupStart + 1;
+		    (groupStart == GetCmdStateView(this)->selected) ? groupStart + 1 : groupStart;
 		const float panelX =
 		    static_cast<float>(topX - (GetCmdListStorage(this)->entries[labelAnchor].x - topX));
 		drawW = kCmdMenuUnitePanelWidth;
+		drawH = kCmdMenuPanelSize64;
 		const float panelTone = active ? kCmdMenuPanelSize64 : kCmdMenuZero;
 		CmdListEntry* const startEntry = &GetCmdListStorage(this)->entries[groupStart];
 		drawY = static_cast<float>(
@@ -2411,8 +2418,8 @@ void CMenuPcs::DrawUniteList()
 
 		unitePanels[s_unitePanelCount].x = static_cast<u16>(panelX);
 		unitePanels[s_unitePanelCount].y = static_cast<s16>(drawY);
-		unitePanels[s_unitePanelCount].width = static_cast<s16>(kCmdMenuUnitePanelWidth);
-		unitePanels[s_unitePanelCount].height = static_cast<s16>(kCmdMenuPanelSize64);
+		unitePanels[s_unitePanelCount].width = static_cast<s16>(drawW);
+		unitePanels[s_unitePanelCount].height = static_cast<s16>(drawH);
 		unitePanels[s_unitePanelCount].u = kCmdMenuZero;
 		unitePanels[s_unitePanelCount].v = panelTone;
 		unitePanels[s_unitePanelCount].alpha = panelAlpha;
@@ -2479,6 +2486,7 @@ void CMenuPcs::DrawUniteList()
 #pragma push
 #pragma peephole off
 #pragma opt_loop_invariants off
+#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8014b7ec
@@ -2490,17 +2498,20 @@ void CMenuPcs::DrawUniteList()
  */
 int CMenuPcs::UniteOpenAnim(int topIdx)
 {
+	int finished;
+	float targetX;
+
 	if (s_unitePanelCount == 0) {
 		return 1;
 	}
 
-	float baseX = static_cast<float>(GetCmdListEntries(this)[0].x);
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	float baseX = static_cast<float>(GetCmdListEntries(this)[0].x);
 
 	if (topIdx > 0) {
 		for (int i = 0; i < 3; i++) {
+			CmdListEntry* entry = &GetCmdListStorage(this)->entries[i + s_UniteTop[topIdx]];
 			int idx = i + s_UniteTop[topIdx];
-			CmdListEntry* entry = &GetCmdListStorage(this)->entries[idx];
 			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 				break;
 			}
@@ -2513,13 +2524,13 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 			}
 		}
 	} else {
-		int finished = 0;
-		float targetX = kCmdMenuPanelSize64 + baseX;
+		finished = 0;
+		targetX = kCmdMenuPanelSize64 + baseX;
 		s32* top = &s_UniteTop[finished];
 		for (int i = 0; i < s_unitePanelCount; i++) {
 			for (int j = 0; j < 3; j++) {
+				CmdListEntry* entry = &GetCmdListStorage(this)->entries[j + *top];
 				int idx = j + *top;
-				CmdListEntry* entry = &GetCmdListStorage(this)->entries[idx];
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 					break;
 				}
@@ -2848,8 +2859,6 @@ void CMenuPcs::CmdOpen2()
 	}
 }
 
-#pragma push
-#pragma opt_strength_reduction off
 /*
  * --INFO--
  * PAL Address: 0x8014a9dc
@@ -2882,25 +2891,26 @@ unsigned int CMenuPcs::CmdClose2()
 		return 0;
 	} else if (GetCmdStateView(this)->uniteState == 1) {
 		s32 uniteIdx = 0;
-		for (s32* p = s_UniteTop; uniteIdx < s_unitePanelCount; p++, uniteIdx++) {
-			if (selected == *p) {
+		for (uniteIdx = 0; uniteIdx < s_unitePanelCount; uniteIdx++) {
+			if (selected == s_UniteTop[uniteIdx]) {
 				break;
 			}
 		}
 
 		if (UniteCloseAnim(uniteIdx) != 0) {
 			ChkUnite(selected, combo);
+			int* comboSel = &combo[0][1];
 
 			s32 comboIdx = 0;
-			if (combo[0][1] < combo[1][1]) {
-				comboIdx = (modeSel == static_cast<u32>(combo[0][1])) ? 0 : 1;
+			if (comboSel[0] < comboSel[2]) {
+				comboIdx = (modeSel == static_cast<u32>(comboSel[0])) ? 0 : 1;
 			} else {
-				comboIdx = (modeSel == static_cast<u32>(combo[1][1])) ? 1 : 0;
+				comboIdx = (modeSel == static_cast<u32>(comboSel[2])) ? 1 : 0;
 			}
 
 			const s32 closeSel = GetCmdStateView(this)->selected;
 			s32 ununiteCount = 0;
-			for (ununiteCount = 1; ununiteCount < 3; ununiteCount++) {
+			for (ununiteCount = 0; ununiteCount < 3; ununiteCount++) {
 				if ((ununiteCount != 0) &&
 				    (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])
 				         ->m_commandListExtra[closeSel + ununiteCount] != -1)) {
@@ -2910,40 +2920,36 @@ unsigned int CMenuPcs::CmdClose2()
 
 			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])
 			    ->UnuniteComList(closeSel, ununiteCount);
-			const s16 uniteCount = GetUniteRecipeCount(combo[comboIdx][0]);
-			const s16 uniteCmd = GetUniteRecipeCmd(combo[comboIdx][0]);
+			const int recipe = combo[comboIdx][0];
 			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->UniteComList(
-			    combo[comboIdx][1], uniteCount, uniteCmd);
-			GetCmdStateView(this)->selected = static_cast<s16>(combo[comboIdx][1]);
+			    comboSel[comboIdx * 2], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
+			GetCmdStateView(this)->selected = static_cast<s16>(comboSel[comboIdx * 2]);
 			GetCmdStateView(this)->uniteState = 2;
 		}
 		return 0;
 	} else if (GetCmdStateView(this)->uniteState == 2) {
 		if (caravanWork->m_commandListExtra[selected] == 0) {
 			ChkUnite(selected, combo);
+			int* comboSel = &combo[0][1];
 
 			s32 comboIdx = 0;
-			if (combo[0][1] < combo[1][1]) {
-				comboIdx = (modeSel == static_cast<u32>(combo[0][1])) ? 0 : 1;
+			if (comboSel[0] < comboSel[2]) {
+				comboIdx = (modeSel == static_cast<u32>(comboSel[0])) ? 0 : 1;
 			} else {
-				comboIdx = (!(modeSel == static_cast<u32>(combo[1][1]))) ? 0 : 1;
+				comboIdx = (!(modeSel == static_cast<u32>(comboSel[2]))) ? 0 : 1;
 			}
 
-			const s16 uniteCount = GetUniteRecipeCount(combo[comboIdx][0]);
-			int __p6 = comboIdx;
-			const s16 uniteCmd = GetUniteRecipeCmd(combo[__p6][0]);
+			const int recipe = combo[comboIdx][0];
 			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->UniteComList(
-				combo[comboIdx][1], uniteCount, uniteCmd);
-			int __p5 = comboIdx;
-			GetCmdStateView(this)->selected = static_cast<s16>(combo[__p5][1]);
+				comboSel[comboIdx * 2], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
+			GetCmdStateView(this)->selected = static_cast<s16>(comboSel[comboIdx * 2]);
 		} else if (UniteOpenAnim(-1) != 0) {
 			GetCmdStateView(this)->uniteState = 3;
 		}
 		return 0;
 	} else if (GetCmdStateView(this)->uniteState == 3) {
 		for (s32 i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++) {
-			int __p7 = i;
-			CmdListEntry* entry = &GetCmdListStorage(this)->entries[__p7];
+			CmdListEntry* entry = &GetCmdListStorage(this)->entries[i];
 			if (static_cast<f64>(entry->alpha) >= kCmdMenuOneD) {
 				continue;
 			}
@@ -2952,14 +2958,9 @@ unsigned int CMenuPcs::CmdClose2()
 				entry->alpha = kCmdMenuOne;
 			}
 		}
-		if (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= kCmdMenuTransitionFramesD) {
-			return 1;
-		}
-		return 0;
+		return (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= kCmdMenuTransitionFramesD) ? 1 : 0;
 	}
-	return 0;
 }
-#pragma pop
 
 /*
  * --INFO--

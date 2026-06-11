@@ -765,6 +765,29 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
     }
 }
 
+#pragma always_inline on
+#pragma inline_max_size(10000)
+static inline void RenderColorQuadVtx(Vec v1, Vec v0, GXColor quadColor)
+{
+    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80023b4c
@@ -839,27 +862,7 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     pos1.x = x2;
     pos1.y = y2;
     pos1.z = kUtilZero;
-    GXColor quadColor = color;
-    Vec v0 = pos1;
-    Vec v1 = pos0;
-
-    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    GXWGFifo.f32 = v1.x;
-    GXWGFifo.f32 = v1.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = v0.x;
-    GXWGFifo.f32 = v1.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = v0.x;
-    GXWGFifo.f32 = v0.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = v1.x;
-    GXWGFifo.f32 = v0.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    RenderColorQuadVtx(pos0, pos1, color);
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);
     PSMTX44Copy(GetScreenMatrix(), screenMtx);
@@ -946,27 +949,7 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     GXSetColorUpdate(GX_FALSE);
     GXSetAlphaUpdate(GX_FALSE);
 
-    GXColor quadColor = white;
-    Vec v0 = pos1;
-    Vec v1 = pos0;
-
-    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    GXWGFifo.f32 = v1.x;
-    GXWGFifo.f32 = v1.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = v0.x;
-    GXWGFifo.f32 = v1.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = v0.x;
-    GXWGFifo.f32 = v0.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = v1.x;
-    GXWGFifo.f32 = v0.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    RenderColorQuadVtx(pos0, pos1, white);
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);
     PSMTX44Copy(GetScreenMatrix(), screenMtx);
@@ -1250,6 +1233,8 @@ void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
     GXWGFifo.u32 = rgba;
 }
 
+#pragma always_inline off
+
 /*
  * --INFO--
  * PAL Address: 0x800247f4
@@ -1333,8 +1318,9 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	PSVECScale(&tan1, &tan1, scale);
 
 	UtilHermiteBasis hermite = kUtilHermiteBasis;
-	float t3;
+	float pos;
 	float t2;
+	float t3;
 
 	t2 = t * t;
 	t3 = t2 * t;
@@ -1348,7 +1334,7 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	hermite.m_value[2] = t + (t3 - (coeff2 * t2));
 	hermite.m_value[3] = t3 - t2;
 
-	float pos = hermite.m_value[1] * p2.x;
+	pos = hermite.m_value[1] * p2.x;
 	pos += hermite.m_value[0] * p1.x;
 	pos += hermite.m_value[2] * tan0.x;
 	pos += hermite.m_value[3] * tan1.x;

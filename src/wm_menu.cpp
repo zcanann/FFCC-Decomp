@@ -6726,7 +6726,7 @@ void CMenuPcs::CalcFukidashi()
 		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
 		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
 		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
-		iVar19 = WOBJ() + iVar19;
+		iVar19 += WOBJ();
 		*reinterpret_cast<int*>(iVar19) = 0;
 		*reinterpret_cast<short*>(iVar19 + 8) = sVar15b;
 		*reinterpret_cast<short*>(iVar19 + 0xA) = sVar22;
@@ -6735,7 +6735,7 @@ void CMenuPcs::CalcFukidashi()
 		*reinterpret_cast<float*>(iVar19 + 0x10) = fVar1;
 		*reinterpret_cast<float*>(iVar19 + 0x14) = fVar1;
 		*reinterpret_cast<float*>(iVar19 + 0x18) = fVar2;
-		iVar18 = WOBJ() + iVar18;
+		iVar18 += WOBJ();
 		*reinterpret_cast<int*>(iVar18) = 0;
 		*reinterpret_cast<short*>(iVar18 + 8) = sVar15b;
 		*reinterpret_cast<short*>(iVar18 + 0xA) = sVar22;
@@ -6744,7 +6744,7 @@ void CMenuPcs::CalcFukidashi()
 		*reinterpret_cast<float*>(iVar18 + 0x10) = fVar1;
 		*reinterpret_cast<float*>(iVar18 + 0x14) = fVar1;
 		*reinterpret_cast<float*>(iVar18 + 0x18) = fVar2;
-		iVar17 = WOBJ() + iVar17;
+		iVar17 += WOBJ();
 		*reinterpret_cast<int*>(iVar17) = 0;
 		*reinterpret_cast<short*>(iVar17 + 8) = sVar15b;
 		*reinterpret_cast<short*>(iVar17 + 0xA) = sVar22;
@@ -6753,7 +6753,7 @@ void CMenuPcs::CalcFukidashi()
 		*reinterpret_cast<float*>(iVar17 + 0x10) = fVar1;
 		*reinterpret_cast<float*>(iVar17 + 0x14) = fVar1;
 		*reinterpret_cast<float*>(iVar17 + 0x18) = fVar2;
-		iVar16 = WOBJ() + iVar16;
+		iVar16 += WOBJ();
 		*reinterpret_cast<int*>(iVar16) = 0;
 		*reinterpret_cast<short*>(iVar16 + 8) = sVar15b;
 		*reinterpret_cast<short*>(iVar16 + 0xA) = sVar22;

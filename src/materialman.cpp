@@ -2122,7 +2122,8 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
     CMaterial* material = (*materials)[materialIndex];
     material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
 
-    unsigned int tevBit = m_curEnvTevBit & material->m_tevBit;
+    unsigned int tevBit = m_curEnvTevBit;
+    tevBit &= material->m_tevBit;
     if (m_activeEnvTevBit != tevBit) {
         m_activeEnvTevBit = tevBit;
         GXSetArray(GX_VA_NRM, m_geometryArraySource, 6);

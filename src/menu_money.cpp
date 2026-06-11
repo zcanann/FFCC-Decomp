@@ -123,7 +123,7 @@ int CMenuPcs::MoneyCtrlCur()
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		pressRaw = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
-	press = pressRaw;
+	press = (s16)(u16)pressRaw;
 
 	blocked = false;
 	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
@@ -136,7 +136,7 @@ int CMenuPcs::MoneyCtrlCur()
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		holdRaw = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
-	hold = holdRaw;
+	hold = (s16)(u16)holdRaw;
 
 	if (hold == 0) {
 		return 0;

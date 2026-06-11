@@ -2161,17 +2161,16 @@ int CMenuPcs::CmakeTribeCtrl()
                 if (fieldSelect == 0) {
                     CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect + 1);
                 } else {
-                    unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
+                    unsigned char* base = reinterpret_cast<unsigned char*>(&Game);
                     int slot;
                     for (slot = 0; slot < 8; ++slot) {
-                        if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
-                            (*(entry + 0x1F96) != 1) &&
-                            (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
-                            (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&
-                            (*reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
+                        if ((*reinterpret_cast<int*>(base + slot * 0xC30 + 0x1794) != 0) &&
+                            (*(base + slot * 0xC30 + 0x1F96) != 1) &&
+                            (*reinterpret_cast<unsigned short*>(base + slot * 0xC30 + 0x17D0) == CmakeState(this)->m_select) &&
+                            (*reinterpret_cast<unsigned short*>(base + slot * 0xC30 + 0x17D4) == CmakeState(this)->m_row) &&
+                            (*reinterpret_cast<unsigned short*>(base + slot * 0xC30 + 0x17D2) == s_CmakeInfo.m_gender)) {
                             break;
                         }
-                        entry += 0xC30;
                     }
 
                     if (slot < 8) {

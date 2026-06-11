@@ -5303,44 +5303,40 @@ void CGPartyObj::gpmMove()
 					return;
 				}
 
-				if (sGhostPartyWork.thresholdA < CharaGhostValue(0x2048) &&
-				    sGhostPartyWork.thresholdB < CharaGhostValue(0x204C) &&
-				    sGhostPartyWork.thresholdC < CharaGhostValue(0x2050)) {
+				int anyReady;
+				if (sGhostPartyWork.thresholdA >= CharaGhostValue(0x2048) ||
+				    sGhostPartyWork.thresholdB >= CharaGhostValue(0x204C) ||
+				    sGhostPartyWork.thresholdC >= CharaGhostValue(0x2050)) {
+					anyReady = 1;
+				} else {
+					anyReady = 0;
+				}
+				if (anyReady == 0) {
 					return;
 				}
 
+				unsigned char* chCounters = reinterpret_cast<unsigned char*>(&Chara);
+				unsigned char* gwCounters = CGPartyObj::m_ghostWork;
 				int choices = 0;
-				if (sGhostPartyWork.thresholdA >= CharaGhostValue(0x2048)) {
-					choices++;
-				}
-				if (sGhostPartyWork.thresholdB >= CharaGhostValue(0x204C)) {
-					choices++;
-				}
-				if (sGhostPartyWork.thresholdC >= CharaGhostValue(0x2050)) {
-					choices++;
+				int i;
+				for (i = 0; i < 3; i++) {
+					if (*reinterpret_cast<int*>(gwCounters + 0x24 + i * 4) >=
+					    *reinterpret_cast<int*>(chCounters + 0x2048 + i * 4)) {
+						choices++;
+					}
 				}
 
 				int pick = Math.Rand(choices);
 				int cursor = 0;
 				int newSlotSel;
-				if (sGhostPartyWork.thresholdA >= CharaGhostValue(0x2048)) {
-					if (cursor == pick) {
-						newSlotSel = 0;
-						goto slotPicked;
-					}
-					cursor++;
-				}
-				if (sGhostPartyWork.thresholdB >= CharaGhostValue(0x204C)) {
-					if (cursor == pick) {
-						newSlotSel = 1;
-						goto slotPicked;
-					}
-					cursor++;
-				}
-				if (sGhostPartyWork.thresholdC >= CharaGhostValue(0x2050)) {
-					if (cursor == pick) {
-						newSlotSel = 2;
-						goto slotPicked;
+				for (i = 0; i < 3; i++) {
+					if (*reinterpret_cast<int*>(gwCounters + 0x24 + i * 4) >=
+					    *reinterpret_cast<int*>(chCounters + 0x2048 + i * 4)) {
+						if (cursor == pick) {
+							newSlotSel = i;
+							goto slotPicked;
+						}
+						cursor++;
 					}
 				}
 				newSlotSel = 0;

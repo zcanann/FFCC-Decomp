@@ -3183,7 +3183,8 @@ void CMenuPcs::DrawResultOpenAnim()
 						partyOff += 0x2c;
 						continue;
 					}
-					SetProjection(modelIndex);
+					int __p15 = modelIndex;
+					SetProjection(__p15);
 					SetLight(1);
 					handle->m_flags = 0x300543;
 					handle->Draw(5);
@@ -3261,7 +3262,7 @@ void CMenuPcs::DrawResultOpenAnim()
 							    fillWidth, sprite->mulY, colors, FLOAT_80331EB0, FLOAT_80331EB0, kBonusZClearOrigin);
 						}
 					} else {
-						if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
+						if ((signed char)i >= s_CntTop && i < (signed char)s_CntTop + activePartyCount) {
 							int value = 0;
 							float digitX = (float)((DOUBLE_80331EC8 * (double)sprite->w - (float)sprite->w) * DOUBLE_80331E78 + (double)sprite->x);
 							float digitW = (float)sprite->w;

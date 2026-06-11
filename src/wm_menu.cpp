@@ -5032,7 +5032,7 @@ void CMenuPcs::DrawMoveMenu()
 #define worldState m_wmWorldState
 
 	{
-		const short state = worldState->m_mainState;
+		short state = worldState->m_mainState;
 		if ((state == 0) && bytes[0x12] == 0) {
 			return;
 		}
@@ -5042,7 +5042,7 @@ void CMenuPcs::DrawMoveMenu()
 	}
 
 	DrawFukidashi();
-	const short state = worldState->m_mainState;
+	short state = worldState->m_mainState;
 	float moveAlpha;
 	int __p16 = state;
 	if (__p16 == 1) {
@@ -5063,14 +5063,15 @@ void CMenuPcs::DrawMoveMenu()
 		helpColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * moveAlpha));
 		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
-		MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
-		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+		MenuPcs.DrawRect(0, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
+		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 	DrawWMFrame();
 
 	if (worldState->m_mainState > 0 && worldState->m_mainState < 3) {
 		unsigned char* const worldObj = m_wm.m_worldObjData;
 #define handle (reinterpret_cast<CCharaPcs::CHandle*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]))
+		Mtx savedCamera;
 		Mtx lookAtMtx;
 		Mtx44 projectionMtx;
 
@@ -5101,23 +5102,23 @@ void CMenuPcs::DrawMoveMenu()
 		WmMenuLightTable& lightTable = gWmMenuLightTables[0];
 		LightPcs.SetAmbient(lightTable.m_ambient);
 		LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
-		for (unsigned int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
+		for (int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
 			LightPcs.SetDiffuse(
 				lightIndex, lightTable.m_diffuseColors[lightIndex],
 				&lightTable.m_diffuseDirs[lightIndex], 0);
 		}
 		LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
-		if (handle != 0 && handle->m_model != 0) {
+		{
 			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_effectWork) + 0x1E70) = handle->m_model->m_lightAlpha;
 			handle->Draw(5);
 			pppFVECTOR4 color;
-			const unsigned short partColorIndex = m_crystalPart;
+			const short partColorIndex = m_crystalPart;
 			PartPcs.GetParColIdx(partColorIndex, color);
 			color.w = handle->m_model->m_lightAlpha;
 			PartPcs.SetParColIdx(partColorIndex, color);
-			if (!(!(m_effectTimer == 0))) {
-				m_effectTimer = 1;
+			if (*reinterpret_cast<char*>(bytes + 0x80) == 0) {
+				*reinterpret_cast<char*>(bytes + 0x80) = 1;
 			} else {
 				PartPcs.DrawMenu(m_crystalAttr);
 			}

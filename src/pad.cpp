@@ -143,9 +143,9 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16*& puVar18, u16* p
 				if (iVar14 == 0)
 				{
 					*reinterpret_cast<u16*>(p12 + 0x08) = *reinterpret_cast<u16*>(p12 + 0x0A);
-					uVar16 = (__cntlzw(1 - (*puVar18 & 0x3FFF)) >> 5) & 0xFF;
-					*reinterpret_cast<s8*>(p12 + 0x40) = *reinterpret_cast<s8*>(puVar13 + 5);
-					*reinterpret_cast<u32*>(p12 + 0x50) = uVar16;
+					cVar9 = *reinterpret_cast<s8*>(puVar13 + 5);
+					*reinterpret_cast<s8*>(p12 + 0x40) = cVar9;
+					*reinterpret_cast<u32*>(p12 + 0x50) = (__cntlzw(1 - (*puVar18 & 0x3FFF)) >> 5) & 0xFF;
 					*reinterpret_cast<u32*>(p12 + 0x44) = 0;
 					*reinterpret_cast<u32*>(p12 + 0x38) = 0;
 					*reinterpret_cast<u32*>(p12 + 0x3C) = 0;
@@ -378,8 +378,8 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16*& puVar18, u16* p
 		}
 		uVar17 = uVar17 + 1;
 		puVar13 = puVar13 + 6;
-		puVar18 = puVar18 + 2;
 		iVar6 = iVar6 + 0x54;
+		puVar18 = puVar18 + 2;
 	} while (uVar17 < 4);
 }
 

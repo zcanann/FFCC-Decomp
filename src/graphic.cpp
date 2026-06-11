@@ -1069,6 +1069,7 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
  */
 #pragma push
 #pragma opt_propagation off
+#pragma opt_strength_reduction off
 void CGraphic::makeSphere()
 {
     float vertices[126];
@@ -1086,11 +1087,12 @@ void CGraphic::makeSphere()
         float x = kGraphicSphereNegativeX * (float)cos(pitch);
         float radius = kGraphicSphereNegativeX * (float)sin(pitch);
 
+        float* rowVertex = vertex;
         for (int seg = 0; seg < 8; seg++) {
-            int vertexIndex = vertexCount * 3;
-            vertex[0] = x;
-            vertex[1] = radius * (float)sin(kGraphicSphereSegmentAngle * (float)seg);
-            vertices[vertexIndex + 2] = radius * (float)cos(kGraphicSphereSegmentAngle * (float)seg);
+            rowVertex[0] = x;
+            rowVertex[1] = radius * (float)sin(kGraphicSphereSegmentAngle * (float)seg);
+            vertices[vertexCount * 3 + 2] = radius * (float)cos(kGraphicSphereSegmentAngle * (float)seg);
+            rowVertex += 3;
             vertex += 3;
             vertexCount++;
         }

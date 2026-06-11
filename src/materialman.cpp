@@ -135,7 +135,7 @@ struct ShadowCandidate
 
 static inline CLightPcs::CBumpLight* GetMapBumpLight(int bumpIndex)
 {
-    return LightPcs.GetBumpLight(static_cast<CLightPcs::TARGET>(1), 0) + bumpIndex;
+    return LightPcs.GetBumpLight(static_cast<CLightPcs::TARGET>(1), bumpIndex);
 }
 
 static void ReleaseRefNonNull(CRef* object)
@@ -3091,9 +3091,11 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     unsigned long i;
                     for (i = 0; i < static_cast<unsigned long>(m_materials.GetSize()); i++) {
                         if (m_materials[i] == 0) {
-                            break;
+                            goto slotFound;
                         }
                     }
+                    i = m_materials.GetSize();
+                slotFound:
                     materialIndex = i;
                 }
 

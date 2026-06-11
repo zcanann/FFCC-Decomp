@@ -1495,16 +1495,12 @@ void CChara::CModel::calcMatrix()
 		if (((AnimFlags(m_anim) >> 6) & 1) != 0) {
 			if (m_time < FLOAT_803301b0) {
 				float negTime = -m_time;
-				float clamped = total - FLOAT_803301BC;
-				if (negTime < clamped) {
-					clamped = negTime;
-				}
+				float limit = total - FLOAT_803301BC;
+				float clamped = (negTime < limit) ? negTime : limit;
 				frame = ((m_animStart + total) - *(volatile float*)&FLOAT_803301BC) - clamped;
 			} else {
-				float clamped = total - FLOAT_803301BC;
-				if (m_time < clamped) {
-					clamped = m_time;
-				}
+				float limit = total - FLOAT_803301BC;
+				float clamped = (m_time < limit) ? m_time : limit;
 				frame = m_animStart + clamped;
 			}
 		} else if (m_time < FLOAT_803301b0) {

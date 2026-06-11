@@ -4026,12 +4026,12 @@ renderedDone:
         hitPosition.x = reinterpret_cast<float*>(object->m_localBase)[0];
         hitPosition.y = reinterpret_cast<float*>(object->m_localBase)[1];
         hitPosition.z = reinterpret_cast<float*>(object->m_localBase)[2];
-        if (MapPcs.CheckHitCylinderNear(hitPosition, CVector(kCFlatPadStickZero, FLOAT_80330B90, kCFlatPadStickZero), kCFlatPadStickZero, object->m_localBase[3]) == 0) {
-            this->push(object, 0);
-        } else {
+        if (MapPcs.CheckHitCylinderNear(hitPosition, CVector(kCFlatPadStickZero, FLOAT_80330B90, kCFlatPadStickZero), kCFlatPadStickZero, object->m_localBase[3]) != 0) {
             MapPcs.CalcHitPosition(hitPosition);
             *reinterpret_cast<float*>(object->m_localBase[4]) = hitPosition.y;
             this->push(object, 1);
+        } else {
+            this->push(object, 0);
         }
         outResult = 0;
         break;

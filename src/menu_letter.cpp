@@ -1900,6 +1900,9 @@ void CMenuPcs::LetterMessDraw()
 
 	CCaravanWork* const caravanWork = GetLetterCaravanWork();
 	s16 mode = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x32);
+	float x1, x0;
+	float y0, y1;
+	float u, v;
 
 	s16* panel = reinterpret_cast<s16*>(m_singleFadeState) + 4;
 	for (int i = 0; i < reinterpret_cast<s16*>(m_singleFadeState)[0]; ++i, panel += 0x20) {
@@ -1908,12 +1911,12 @@ void CMenuPcs::LetterMessDraw()
 			continue;
 		}
 
-		float x0 = static_cast<float>(panel[0]);
-		float y0 = static_cast<float>(panel[1]);
-		float x1 = static_cast<float>(panel[2]);
-		float y1 = static_cast<float>(panel[3]);
-		float u = *reinterpret_cast<float*>(panel + 4);
-		float v = *reinterpret_cast<float*>(panel + 6);
+		x0 = static_cast<float>(panel[0]);
+		y0 = static_cast<float>(panel[1]);
+		x1 = static_cast<float>(panel[2]);
+		y1 = static_cast<float>(panel[3]);
+		u = *reinterpret_cast<float*>(panel + 4);
+		v = *reinterpret_cast<float*>(panel + 6);
 		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(panel + 8));
 		GXColor color;
 		color.r = 0xFF;
@@ -1950,19 +1953,19 @@ void CMenuPcs::LetterMessDraw()
 	strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
 	CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
 
-	int y = 0x58;
-	int i = 0;
 	char* curLine = workText;
+	int i = 0;
+	int y = 0x58;
 	for (; i < 7; ++i) {
 		char* newline = strchr(curLine, '\n');
-		const float yf = static_cast<float>(y);
+		y0 = static_cast<float>(y);
 		if (newline != 0) {
 			*newline = '\0';
 		}
 
 		if (strlen(curLine) != 0) {
-			font->SetPosX(FLOAT_80333144);
-			font->SetPosY(yf - FLOAT_80333148);
+			font->SetPosX(x0);
+			font->SetPosY(y0 - FLOAT_80333148);
 			font->Draw(curLine);
 		}
 
@@ -1979,16 +1982,14 @@ void CMenuPcs::LetterMessDraw()
 
 	DrawInit();
 
-	float cursorX;
-	float cursorY;
 	char* letterBytes = reinterpret_cast<char*>(caravanWork) + s_SelLetter * 0xC;
 	if ((*reinterpret_cast<u16*>(letterBytes + 0x3EE) & 0x1FF) != 0) {
-		cursorX = FLOAT_8033314c;
-		cursorY = FLOAT_80333150;
+		x0 = FLOAT_8033314c;
+		y0 = FLOAT_80333150;
 		int icon = 0x26 +
 		           (reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->IsAttachmentClaimed() ? 1 : 0);
 		DrawSingleIcon(
-		    icon, static_cast<int>(cursorX), static_cast<int>(cursorY),
+		    icon, static_cast<int>(x0), static_cast<int>(y0),
 		    *reinterpret_cast<float*>(animBase + 0xC), 1, FLOAT_80333154);
 	}
 
@@ -2007,25 +2008,28 @@ void CMenuPcs::LetterMessDraw()
 		}
 
 		if ((mode == 2) || (mode == 5)) {
-			cursorX = static_cast<float>(m_menuWindowInfo->x + 0x14);
+			x0 = static_cast<float>(m_menuWindowInfo->x + 0x14);
 			int itemSel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
 			if (mode == 2) {
 				itemSel += 1;
 			} else {
-				int attach = static_cast<int>(s_Attach);
-				itemSel += (~((attach - 2) | (2 - attach)) >> 31) + 4;
+				itemSel += (~((s_Attach - 2) | (2 - s_Attach)) >> 31) + 4;
 			}
-			cursorY = static_cast<float>(m_menuWindowInfo->y + itemSel * SingWinMessHeight() + 0x20);
+			itemSel *= SingWinMessHeight();
+			y0 = static_cast<float>(m_menuWindowInfo->y + itemSel + 0x20);
 		} else if ((mode == 3) || (mode == 4)) {
-			cursorX = static_cast<float>(m_menuWindowInfo->x - 8);
+			x0 = static_cast<float>(m_menuWindowInfo->x - 8);
 			if (mode == 4) {
-				cursorX += FLOAT_80333110;
+				x0 += FLOAT_80333110;
 			}
-			cursorY = static_cast<float>(m_menuWindowInfo->y + *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) * SingWinMessHeight() + 0x20);
+			int itemSel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
+			itemSel *= SingWinMessHeight();
+			y0 = static_cast<float>(m_menuWindowInfo->y + itemSel + 0x20);
 		}
 
 		int frameAnim = static_cast<int>(System.m_frameCounter) % 8;
-		DrawCursor(static_cast<int>(cursorX + static_cast<float>(frameAnim)), static_cast<int>(cursorY), FLOAT_803330f8);
+		x0 += static_cast<float>(frameAnim);
+		DrawCursor(static_cast<int>(x0), static_cast<int>(y0), FLOAT_803330f8);
 	}
 }
 

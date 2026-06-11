@@ -204,6 +204,11 @@ static const MenuOptionEstandarData s_MenuOptionEstandarEs = {
 static const char s_MenuUtil_cpp_801e37fc[] = "MenuUtil.cpp";
 static const char s_MenuUtilAllocErrorFmt[] = "%s(%d): Error: memory allocation error\n";
 
+// DrawHelpMessageUS anchors on the start of this TU's .rodata island
+// (lbl_801E3058) and reaches the help-line table and the alloc-error strings
+// via fixed offsets, matching the target's pooled-base addressing.
+extern "C" char lbl_801E3058[];
+
 extern const char s_MenuOptionMusic[];
 extern const char s_MenuOptionOn[];
 extern const char s_MenuOptionOff[];
@@ -319,6 +324,23 @@ static inline unsigned short GetMenuPress()
 	return Pad.GetPadInputs()[padIndex].buttonDown[0];
 }
 
+static inline unsigned short GetMenuPressLock(int lock)
+{
+	bool activeInput = false;
+
+	if ((lock != 0) || (Pad.m_debugPadPort != -1)) {
+		activeInput = true;
+	}
+
+	if (activeInput) {
+		return 0;
+	}
+
+	int padIndex = 0;
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	return Pad.GetPadInputs()[padIndex].buttonDown[0];
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -412,9 +434,10 @@ void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* tex
 void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor color, int tlut, float margin, float scale)
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
+	char* anchor = lbl_801E3058;
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	u32 lineBaseY[4];
-	const int* lineBaseData = s_MenuOptionEstandarEs.m_helpLineBaseY;
+	const int* lineBaseData = reinterpret_cast<const int*>(anchor + 0x678);
 	lineBaseY[0] = lineBaseData[0];
 	lineBaseY[1] = lineBaseData[1];
 	lineBaseY[2] = lineBaseData[2];
@@ -422,8 +445,6 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 	int languageIndex = Game.m_gameWork.m_languageId - 1;
 	int drawPrefix = 1;
-	int firstLine = 500;
-	int maxWidth = -1;
 	float lineStep = kHelpMessageLineStep;
 	const char* suffix = 0;
 	char itemName[260];
@@ -437,18 +458,25 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	font->SetColor(color);
 	font->SetScale(kOptionMenuFontScale);
 
+	int maxWidth;
+	int firstLine = 500;
+	int lineMax;
 	if ((0 <= msgNo) && (msgNo <= 0x268)) {
 		firstLine = msgNo * 3 + 0x1F5;
+		lineMax = 3;
 	}
+	maxWidth = -1;
 
-	CMemory::CStage* stage = MenuPcs.m_menuStage;
+	CMemory::CStage* stage;
 	if (Game.m_gameWork.m_menuStageMode != 0) {
 		stage = MenuPcs.m_stageF4;
+	} else {
+		stage = MenuPcs.m_menuStage;
 	}
 
-	char* temp = new (stage, const_cast<char*>(s_MenuUtil_cpp_801e37fc), 0x8C) char[0x200];
+	char* temp = new (stage, anchor + 0x7A4, 0x8C) char[0x200];
 	if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-		System.Printf(const_cast<char*>(s_MenuUtilAllocErrorFmt), const_cast<char*>(s_MenuUtil_cpp_801e37fc), 0x8E);
+		System.Printf(anchor + 0x7B4, anchor + 0x7A4, 0x8E);
 	}
 	for (int line = firstLine; line < firstLine + 3; line++) {
 		char* msg = GetMenuHelpMsgTable()[line];
@@ -481,13 +509,15 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			itemName[0] = '\0';
 		} else {
 			Game.MakeArtItemName(itemName, msgNo, 1);
-			if ((strlen(itemName) != 0) && (itemName[0] != '\0')) {
+			if ((strlen(itemName) != 0) && (static_cast<signed char>(itemName[0]) != 0)) {
 				itemName[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(itemName[0])));
 			}
 		}
-	}
-	if (drawPrefix + 3 == 4) {
-		lineStep = kOptionUiTwenty;
+
+		int four = drawPrefix + 3;
+		if (four == 4) {
+			lineStep = kOptionUiTwenty;
+		}
 	}
 
 	int rangeKind;
@@ -513,7 +543,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < lineMax; i++) {
 			char* msg = GetMenuHelpMsgTable()[firstLine + i];
 			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
@@ -651,11 +681,11 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			stage = MenuPcs.m_stageF4;
 		}
 
-		temp = new (stage, const_cast<char*>(s_MenuUtil_cpp_801e37fc), 0x23D) char[0x200];
+		temp = new (stage, anchor + 0x7A4, 0x23D) char[0x200];
 		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-			System.Printf(const_cast<char*>(s_MenuUtilAllocErrorFmt), const_cast<char*>(s_MenuUtil_cpp_801e37fc), 0x23F);
+			System.Printf(anchor + 0x7B4, anchor + 0x7A4, 0x23F);
 		}
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < lineMax; i++) {
 			char* msg = GetMenuHelpMsgTable()[firstLine + i];
 			memset(temp, 0, 0x200);
 			CMes::MakeAgbString(temp, msg, 0, 1);
@@ -838,8 +868,11 @@ void CMenuPcs::CalcOptionMenu()
 		if (m_optionColumnAnim <= kOptionAnimMin) {
 			m_optionColumnAnim = kOptionAnimMin;
 		}
-		if (static_cast<int>(m_optionOpenAnim / kOptionOpenAnimStep) == 5) {
-			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
+		{
+			const float& divStep = kOptionOpenAnimStep;
+			if (static_cast<int>(m_optionOpenAnim / divStep) == 5) {
+				Sound.PlaySe(0x32, 0x40, 0x7F, 0);
+			}
 		}
 		if (!(m_optionOpenAnim <= kOptionAnimMin)) {
 			return;
@@ -889,8 +922,11 @@ void CMenuPcs::CalcOptionMenu()
 		if (m_optionIndex < 0) {
 			m_optionIndex = 4;
 		}
-		m_optionRowAnim = kOptionAnimMin;
-		m_optionColumnAnim = kOptionAnimMin;
+		{
+			const float& leftMin = kOptionAnimMin;
+			m_optionRowAnim = leftMin;
+			m_optionColumnAnim = leftMin;
+		}
 		m_optionAnimCounter = 0;
 		m_optionAnimPhase = 0;
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -901,8 +937,11 @@ void CMenuPcs::CalcOptionMenu()
 		if (m_optionIndex > 4) {
 			m_optionIndex = 0;
 		}
-		m_optionRowAnim = kOptionAnimMin;
-		m_optionColumnAnim = kOptionAnimMin;
+		{
+			const float& rightMin = kOptionAnimMin;
+			m_optionRowAnim = rightMin;
+			m_optionColumnAnim = rightMin;
+		}
 		m_optionAnimCounter = 0;
 		m_optionAnimPhase = 0;
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -1015,8 +1054,9 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (m_optionIndex == 4) {
+		int lock = Pad.m_debugPadLock;
 		unsigned short press3;
-		press3 = GetMenuPress();
+		press3 = GetMenuPressLock(lock);
 
 		if ((press3 & 0x100) != 0) {
 			if (m_specialModeEdit == 0) {
@@ -1024,36 +1064,31 @@ void CMenuPcs::CalcOptionMenu()
 				m_specialModeEdit = 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			}
-		} else if (m_specialModeEdit != 0) {
-			unsigned short press4;
-			press4 = GetMenuPress();
+		} else if ((m_specialModeEdit != 0) && ((GetMenuPressLock(lock) & 0x200) != 0)) {
+			m_specialModeCursor = 0;
+			m_specialModeEdit = 0;
+			Sound.PlaySe(3, 0x40, 0x7F, 0);
 
-			if ((press4 & 0x200) != 0) {
-				m_specialModeCursor = 0;
-				m_specialModeEdit = 0;
-				Sound.PlaySe(3, 0x40, 0x7F, 0);
-
-				Game.m_gameWork.m_spModeFlags[0] =
-				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[0])) >> 5);
-				Game.m_gameWork.m_spModeFlags[1] =
-				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[1])) >> 5);
-				Game.m_gameWork.m_spModeFlags[2] =
-				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[2])) >> 5);
-				Game.m_gameWork.m_spModeFlags[3] =
-				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[3])) >> 5);
-			} else if ((m_specialModeEdit != 0) && ((press & 8) != 0)) {
-				m_specialModeCursor--;
-				if (m_specialModeCursor < 0) {
-					m_specialModeCursor = 3;
-				}
-				Sound.PlaySe(1, 0x40, 0x7F, 0);
-			} else if ((m_specialModeEdit != 0) && ((press & 4) != 0)) {
-				m_specialModeCursor++;
-				if (m_specialModeCursor > 3) {
-					m_specialModeCursor = 0;
-				}
-				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			Game.m_gameWork.m_spModeFlags[0] =
+			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[0])) >> 5);
+			Game.m_gameWork.m_spModeFlags[1] =
+			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[1])) >> 5);
+			Game.m_gameWork.m_spModeFlags[2] =
+			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[2])) >> 5);
+			Game.m_gameWork.m_spModeFlags[3] =
+			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[3])) >> 5);
+		} else if ((m_specialModeEdit != 0) && ((press & 8) != 0)) {
+			m_specialModeCursor--;
+			if (m_specialModeCursor < 0) {
+				m_specialModeCursor = 3;
 			}
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
+		} else if ((m_specialModeEdit != 0) && ((press & 4) != 0)) {
+			m_specialModeCursor++;
+			if (m_specialModeCursor > 3) {
+				m_specialModeCursor = 0;
+			}
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}
 	}
 
@@ -1061,8 +1096,14 @@ void CMenuPcs::CalcOptionMenu()
 		Game.m_gameWork.m_gameInitFlag =
 		    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(static_cast<int>(m_gameInitMode))) >> 5);
 		Sound.SetStereo(static_cast<unsigned int>(__cntlzw(static_cast<int>(m_stereoMode))) >> 5);
-		Sound.SetSeMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(m_seVolume)));
-		Sound.SetBgmMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(m_bgmVolume)));
+		{
+			const float& seScale = kOptionVolumeScale;
+			Sound.SetSeMasterVolume(static_cast<int>(seScale * static_cast<float>(m_seVolume)));
+		}
+		{
+			const float& bgmScale = kOptionVolumeScale;
+			Sound.SetBgmMasterVolume(static_cast<int>(bgmScale * static_cast<float>(m_bgmVolume)));
+		}
 	}
 }
 

@@ -1674,7 +1674,8 @@ void CGObject::update()
                 const float swayTanScaled = sDefaultMoveBaseSpeed * swayTan;
                 modelMtx[0][3] = mtx0;
                 modelMtx[2][3] = mtx2;
-                modelMtx[1][3] = mtx1 - swayTanScaled;
+                mtx1 -= swayTanScaled;
+                modelMtx[1][3] = mtx1;
             }
 
             const float swayRy = m_radiusCtrl.y;

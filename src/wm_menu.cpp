@@ -7046,10 +7046,10 @@ void CMenuPcs::DrawFukidashi()
 		const int language = Game.m_gameWork.m_languageId;
 		if (language == 2) {
 			strcpy(nameBuffer, Game.m_gameWork.m_townName);
-			strcat(nameBuffer, lbl_80210D10[language - 1], sizeof(nameBuffer));
+			strcat(nameBuffer, lbl_80210D10[language - 1]);
 		} else {
 			strcpy(nameBuffer, lbl_80210D10[language - 1]);
-			strcat(nameBuffer, Game.m_gameWork.m_townName, sizeof(nameBuffer));
+			strcat(nameBuffer, Game.m_gameWork.m_townName);
 		}
 	} else {
 		strcpy(nameBuffer, Game.m_cFlatDataArr[1].TableStrings(3)[fieldVal]);

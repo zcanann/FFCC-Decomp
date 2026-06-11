@@ -355,10 +355,7 @@ enum ShopMenuTextIndex {
     SHOP_MENU_TEXT_CANNOT_CRAFT_HERE = 20,
 };
 
-static inline char* ShopMenuMes(int languageIndex, int textIndex)
-{
-    return g_strShopMenuMes[languageIndex * 0x15 + textIndex];
-}
+#define ShopMenuMes(languageIndex, textIndex) (g_strShopMenuMes[(languageIndex) * 0x15 + (textIndex)])
 
 static inline void* PartPcsVoid()
 {

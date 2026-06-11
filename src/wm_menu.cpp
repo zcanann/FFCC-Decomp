@@ -41,7 +41,6 @@ extern "C" char* strstr(const char*, const char*);
 extern "C" char* strcat(char*, const char*);
 extern "C" int DAT_801dc118[];
 extern "C" int DAT_801dc140;
-extern char lbl_80331208[];
 extern float gWmModelYOffsetSplinePoints[];
 extern float gWmModelRotationSplinePoints[];
 extern float lbl_802109B4[];
@@ -50,19 +49,16 @@ extern float lbl_80210A34[];
 extern float lbl_80210A74[];
 extern float lbl_80210AB4[];
 extern float lbl_80210B04[];
-extern const char s_Empty_803313A4[];
 extern const char s_Creating_801DC250[];
-extern const char s_Frei_803313AC[];
 extern const char s_Wird_kreiert_801DC25C[];
-extern const char s_Vuoto_803313B4[];
 extern const char s_Creazione_801DC26C[];
-extern const char s_Vide_803313BC[];
 extern const char s_Creation_801DC27C[];
-extern const char s_Vacio_803313C4[];
 extern const char s_Creando_801DC288[];
 extern float gWmLifeYOffsetSplinePoints[];
 
-char* DAT_8032E8A8 = lbl_80331208;
+extern const char lbl_80331208[5];
+
+char* DAT_8032E8A8 = const_cast<char*>(lbl_80331208);
 unsigned char lbl_8032E8AC = 1;
 int gWmModelYOffsetSplineCount = 9;
 float* gWmModelYOffsetSpline = gWmModelYOffsetSplinePoints;
@@ -86,8 +82,6 @@ float* DAT_8032E8EC = lbl_80210B04;
 extern int DAT_8032ef08;
 extern int DAT_80238028;
 extern char cRam8032ee21;
-extern "C" char lbl_80331380[4];
-extern "C" char lbl_80331400[3];
 extern "C" unsigned char lbl_801DC294[];
 extern "C" const char* lbl_80210D10[];
 extern "C" const char* lbl_80210D54[];
@@ -151,208 +145,292 @@ extern const float kYmEnvPi = 3.1415927410125732f;
 extern const float kYmEnvParaboloidNormalScale = -2.0f;
 extern const float kYmEnvNegativeTwoPi = -6.2831854820251465f;
 
-extern float FLOAT_803313dc;
-extern float FLOAT_803313e0;
-extern float FLOAT_803313e4;
-extern float FLOAT_803313e8;
-extern float FLOAT_80331470;
-extern float FLOAT_80331474;
-extern float FLOAT_80331478;
-extern float FLOAT_8033147c;
-extern float FLOAT_80331480;
-extern float FLOAT_803314A0;
-extern float FLOAT_803314B0;
-extern float FLOAT_803314B4;
-extern float FLOAT_803314B8;
-extern float FLOAT_803314bc;
-extern float FLOAT_803314c0;
-extern float FLOAT_803314c4;
-extern float FLOAT_803314c8;
-extern float FLOAT_803314cc;
-extern float FLOAT_80331430;
-extern float FLOAT_8033151c;
-extern float FLOAT_80331518;
-extern float FLOAT_80331520;
-extern float FLOAT_80331528;
-extern double DOUBLE_80331530;
-extern float FLOAT_803315cc;
-extern float FLOAT_803315d0;
-extern float FLOAT_80331598;
-extern float FLOAT_803317FC;
-extern double DOUBLE_803313F0;
-extern char lbl_80331800[7];
-extern char lbl_80331808[7];
-extern char lbl_80331810[7];
-extern char lbl_80331818[7];
-extern char lbl_80331820[7];
-extern char lbl_80331828[7];
-extern char lbl_80331830[8];
-extern char lbl_80331838[7];
+// wm_menu.o also owns the .sdata2 literal pool 0x803311C0-0x80331848, claimed
+// from the previously-unowned gap after the pool above (see splits.txt).
+// Values are extracted verbatim from the DOL; definition order == target
+// address order. The anonymous literals (@364/@365/@366 int-conversion magic
+// doubles) are emitted by the compiler on demand and intentionally skipped.
+// Note: scalars referenced by code in THIS file get constant-folded by mwcc
+// into equal-valued anonymous literals (objdiff matches those relocations by
+// value), while string symbols keep their named relocations. Symbols here
+// that wm_menu itself never touches belong to code in pppYmEnv, pppEmission,
+// pppYmTracer2 and friends, which lived in the same original translation unit.
+extern const double kYmEnvCosEpsilon = 0.009999999776482582;
+extern const float kYmEnvTwoPi = 6.2831854820251465f;
+extern const char s_Exiting_803311CC[8] = "Exiting";
+// 0x803311D8: anonymous literal @366 emitted by compiler
+extern const float kPppEmissionAlphaDivisor = 255.0f;
+extern const float kPppEmissionUnitScale = 1.0f;
+// 0x803311E8: anonymous literal @364 emitted by compiler
+// 0x803311F0: anonymous literal @365 emitted by compiler
+extern const float kPppEmissionZeroScale = 0.0f;
+extern const char s_pppEmissionShapeObj2[5] = "obj2";
+extern const char lbl_80331208[5] = "1.00";
+extern const char lbl_80331210[6] = "world";
+extern const char lbl_80331218[7] = "world2";
+extern const char lbl_80331220[8] = "cc_logo";
+extern const char lbl_80331228[7] = "world1";
+extern const char lbl_80331230[7] = "world3";
+extern const char lbl_80331238[7] = "world4";
+extern const char lbl_80331240[7] = "world5";
+extern const char lbl_80331248[7] = "world6";
+extern const char lbl_80331250[7] = "world7";
+extern const char lbl_80331258[7] = "world8";
+extern const char lbl_80331260[7] = "world9";
+extern const char lbl_80331268[8] = "world10";
+extern const char lbl_80331270[8] = "world11";
+extern const char lbl_80331278[8] = "world12";
+extern const char lbl_80331280[8] = "world13";
+extern const char lbl_80331288[8] = "world14";
+extern const char lbl_80331290[8] = "world15";
+extern const char lbl_80331298[8] = "world16";
+extern const char lbl_803312A0[8] = "world17";
+extern const char lbl_803312A8[8] = "world18";
+extern const char lbl_803312B0[8] = "world19";
+extern const char lbl_803312B8[8] = "world20";
+extern const char lbl_803312C0[8] = "world21";
+extern const char lbl_803312C8[8] = "world22";
+extern const char lbl_803312D0[8] = "world23";
+extern const char lbl_803312D8[8] = "world24";
+extern const char lbl_803312E0[8] = "world25";
+extern const char lbl_803312E8[8] = "world26";
+extern const char lbl_803312F0[8] = "world30";
+extern const char lbl_803312F8[8] = "world40";
+extern const char lbl_80331300[8] = "world46";
+extern const char lbl_80331308[8] = "world47";
+extern const char lbl_80331310[8] = "world50";
+extern const char lbl_80331318[7] = "diary1";
+extern const char lbl_80331320[7] = "diary2";
+extern const char lbl_80331328[5] = "face";
+extern const char lbl_80331330[8] = "odekake";
+extern const char lbl_80331338[8] = "crystal";
+extern const char lbl_80331340[8] = "world27";
+extern const char lbl_80331348[8] = "world28";
+extern const char lbl_80331350[8] = "world29";
+extern const char lbl_80331358[8] = "world44";
+extern const char lbl_80331360[8] = "world45";
+extern const char lbl_80331368[8] = "world48";
+extern const char lbl_80331370[8] = "world49";
+extern const char lbl_80331378[8] = "world51";
+extern const char lbl_80331380[4] = {'?','?','?','?'};
+extern const char lbl_80331384[6] = "Port ";
+extern const char lbl_8033138C[7] = "-Hafen";
+extern const char lbl_80331394[7] = "Porto ";
+extern const char lbl_8033139C[8] = "Puerto ";
+extern const char s_Empty_803313A4[6] = "Empty";
+extern const char s_Frei_803313AC[5] = "Frei";
+extern const char s_Vuoto_803313B4[6] = "Vuoto";
+extern const char s_Vide_803313BC[5] = "Vide";
+extern const char s_Vacio_803313C4[8] = "Vac\355o\0\0";
+extern const char lbl_803313CC[7] = "Slot A";
+extern const char lbl_803313D4[7] = "Data 1";
+extern const float FLOAT_803313dc = 0.0f;
+extern const float FLOAT_803313e0 = 640.0f;
+extern const float FLOAT_803313e4 = 448.0f;
+extern const float FLOAT_803313e8 = 1.0f;
+extern const double DOUBLE_803313F0 = 4503599627370496.0;
+extern const double DOUBLE_803313F8 = 0.5;
+extern const char lbl_80331400[3] = "00";
+extern const float FLOAT_80331404 = 30.0f;
+extern const double DOUBLE_80331408 = 4503601774854144.0;
+extern const float FLOAT_80331410 = 32.0f;
+extern const float FLOAT_80331414 = 6.0f;
+extern const double DOUBLE_80331418 = 2.0;
+extern const double DOUBLE_80331420 = 1.0;
+extern const double DOUBLE_80331428 = 64.0;
+extern const float FLOAT_80331430 = 368.0f;
+extern const float FLOAT_80331434 = 0.5f;
+extern const double DOUBLE_80331438 = 220.0;
+extern const float FLOAT_80331440 = 40.0f;
+extern const float FLOAT_80331444 = 369.0f;
+extern const double DOUBLE_80331448 = 0.7;
+extern const double DOUBLE_80331450 = 0.03;
+extern const float FLOAT_80331458 = 255.0f;
+extern const double DOUBLE_80331460 = 0.05;
+extern const float FLOAT_80331468 = 48.0f;
+extern const float FLOAT_8033146C = 248.0f;
+extern const float FLOAT_80331470 = 20.0f;
+extern const float FLOAT_80331474 = 1.3333333730697632f;
+extern const float FLOAT_80331478 = 10.0f;
+extern const float FLOAT_8033147c = 10000.0f;
+extern const float FLOAT_80331480 = -96.0f;
+extern const double DOUBLE_80331488 = 48.0;
+extern const double DOUBLE_80331490 = 24.0;
+extern const double DOUBLE_80331498 = 88.0;
+extern const float FLOAT_803314A0 = 112.0f;
+extern const float FLOAT_803314A4 = 50.0f;
+extern const double DOUBLE_803314A8 = 25.0;
+extern const float FLOAT_803314B0 = 0.6000000238418579f;
+extern const float FLOAT_803314B4 = -1.399999976158142f;
+extern const float FLOAT_803314B8 = 0.1745329201221466f;
+extern const float FLOAT_803314bc = 0.01745329238474369f;
+extern const float FLOAT_803314c0 = 25.0f;
+extern const float FLOAT_803314c4 = 3.0f;
+extern const float FLOAT_803314c8 = 2.0f;
+extern const float FLOAT_803314cc = -2.0f;
+extern const double DOUBLE_803314D0 = 424.0;
+extern const float FLOAT_803314D8 = 24.0f;
+extern const float FLOAT_803314DC = -260.0f;
+extern const float FLOAT_803314E0 = 28.399999618530273f;
+extern const double DOUBLE_803314E8 = 0.1;
+extern const double DOUBLE_803314F0 = 0.0;
+extern const float FLOAT_803314F8 = 80.0f;
+extern const float FLOAT_803314FC = 336.0f;
+extern const float FLOAT_80331500 = 184.0f;
+extern const double DOUBLE_80331508 = 255.0;
+extern const double DOUBLE_80331510 = 8.0;
+extern const float FLOAT_80331518 = 496.0f;
+extern const float FLOAT_8033151c = 72.0f;
+extern const float FLOAT_80331520 = 104.0f;
+extern const float FLOAT_80331524 = 120.0f;
+extern const float FLOAT_80331528 = 360.0f;
+extern const double DOUBLE_80331530 = 0.68;
+extern const double DOUBLE_80331538 = 360.0;
+extern const double DOUBLE_80331540 = 32.0;
+extern const float FLOAT_80331548 = 8.0f;
+extern const float FLOAT_8033154C = 11.0f;
+extern const float FLOAT_80331550 = 4.0f;
+extern const float FLOAT_80331554 = 56.0f;
+extern const float FLOAT_80331558 = 16.0f;
+extern const float FLOAT_8033155C = 144.0f;
+extern const float FLOAT_80331560 = 192.0f;
+extern const float FLOAT_80331564 = 344.0f;
+extern const float FLOAT_80331568 = 296.0f;
+extern const double DOUBLE_80331570 = 56.0;
+extern const float FLOAT_80331578 = 128.0f;
+extern const double DOUBLE_80331580 = 29.0;
+extern const float FLOAT_80331588 = 1.100000023841858f;
+extern const float FLOAT_8033158C = 0.8999999761581421f;
+extern const float FLOAT_80331590 = 26.0f;
+extern const float FLOAT_80331594 = 0.800000011920929f;
+extern const float FLOAT_80331598 = 100.0f;
+extern const double DOUBLE_803315A0 = 320.0;
+extern const double DOUBLE_803315A8 = 224.0;
+extern const float FLOAT_803315B0 = 320.0f;
+extern const float FLOAT_803315B4 = 224.0f;
+extern const float FLOAT_803315B8 = 208.0f;
+extern const float FLOAT_803315BC = -4.949999809265137f;
+extern const double DOUBLE_803315C0 = 100.0;
+extern const float FLOAT_803315C8 = 0.057692307978868484f;
+extern const float FLOAT_803315cc = 0.1850000023841858f;
+extern const float FLOAT_803315d0 = 0.2617993950843811f;
+extern const float FLOAT_803315d4 = 1.5f;
+extern const double DOUBLE_803315D8 = 0.87;
+extern const float FLOAT_803315E0 = 15.0f;
+extern const float FLOAT_803315E4 = -72.0f;
+extern const float FLOAT_803315E8 = -0.7853981852531433f;
+extern const double DOUBLE_803315F0 = 0.01745329238474369;
+extern const double DOUBLE_803315F8 = 57.8;
+extern const double DOUBLE_80331600 = -22.0;
+extern const double DOUBLE_80331608 = 20.0;
+extern const float FLOAT_80331610 = 1.0088002681732178f;
+extern const float FLOAT_80331614 = -0.0872664600610733f;
+extern const float FLOAT_80331618 = 0.10000000149011612f;
+extern const float FLOAT_8033161C = -1.0f;
+extern const float FLOAT_80331620 = -4.0f;
+extern const double DOUBLE_80331628 = -0.2;
+extern const double DOUBLE_80331630 = 51.5;
+extern const char s_wmCharaAnimStand[6] = "stand";
+extern const char s_wmCharaAnimWalk[5] = "walk";
+extern const char s_wmCharaAnimRun[4] = "run";
+extern const char s_wmCharaAnimGlad[5] = "glad";
+extern const char s_wmCharaAnimSleep[6] = "sleep";
+extern const char s_wmCharaAnimAngry[6] = "angry";
+extern const float FLOAT_80331664 = -0.2617993950843811f;
+extern const float FLOAT_80331668 = 0.699999988079071f;
+extern const float FLOAT_8033166C = 158.0f;
+extern const double DOUBLE_80331670 = 12.0;
+extern const double DOUBLE_80331678 = 144.0;
+extern const float FLOAT_80331680 = 64.0f;
+extern const float FLOAT_80331684 = 130.0f;
+extern const float FLOAT_80331688 = 134.0f;
+extern const float FLOAT_8033168C = 3.5f;
+extern const float FLOAT_80331690 = 0.0546875f;
+extern const float FLOAT_80331694 = -50.0f;
+extern const float FLOAT_80331698 = 1.2000000476837158f;
+extern const float FLOAT_8033169C = 2.200000047683716f;
+extern const float FLOAT_803316A0 = 3.3000001907348633f;
+extern const float FLOAT_803316A4 = -0.4399999976158142f;
+extern const float FLOAT_803316A8 = 1.2999999523162842f;
+extern const float FLOAT_803316AC = 0.008377579972147942f;
+extern const float FLOAT_803316B0 = -5.639999866485596f;
+extern const float FLOAT_803316B4 = 0.6600000262260437f;
+extern const float FLOAT_803316B8 = 0.40142571926116943f;
+extern const float FLOAT_803316BC = -5.0f;
+extern const double DOUBLE_803316C0 = 0.07;
+extern const float FLOAT_803316C8 = 152.0f;
+extern const float FLOAT_803316CC = 136.0f;
+extern const float FLOAT_803316D0 = 288.0f;
+extern const float FLOAT_803316D4 = 9.0f;
+extern const double DOUBLE_803316D8 = 25.5;
+extern const double DOUBLE_803316E0 = 40.0;
+extern const double DOUBLE_803316E8 = 10.0;
+extern const float FLOAT_803316F0 = 45.0f;
+extern const float FLOAT_803316F4 = 96.0f;
+extern const float FLOAT_803316F8 = 69.0f;
+extern const char lbl_803316FC[8] = "\202\314\212\331\0\0\0";
+extern const float FLOAT_80331704 = 240.0f;
+extern const float FLOAT_80331708 = 480.0f;
+extern const float FLOAT_8033170C = 0.28999999165534973f;
+extern const float FLOAT_80331710 = -1.2000000476837158f;
+extern const float FLOAT_80331714 = -3.5f;
+extern const float FLOAT_80331718 = -1.7000000476837158f;
+extern const double DOUBLE_80331720 = 1.6;
+extern const float FLOAT_80331728 = 3.5999999046325684f;
+extern const float FLOAT_8033172C = 2.4000000953674316f;
+extern const double DOUBLE_80331730 = 1.2;
+extern const double DOUBLE_80331738 = 0.9;
+extern const float FLOAT_80331740 = 0.36000001430511475f;
+extern const float FLOAT_80331744 = 0.3490658402442932f;
+extern const float FLOAT_80331748 = 6.300000190734863f;
+extern const float FLOAT_8033174c = -6.300000190734863f;
+extern const float FLOAT_80331750 = -7.400000095367432f;
+extern const float FLOAT_80331754 = 0.008726646192371845f;
+extern const unsigned int s_wmWorldParamPrimaryDirtyMask = 0x00000001;
+extern const unsigned int s_wmWorldParamSecondaryDirtyMask = 0x00000002;
+extern const float FLOAT_80331760 = 0.30000001192092896f;
+extern const float FLOAT_80331764 = -0.10000000149011612f;
+extern const float FLOAT_80331768 = 200.0f;
+extern const double DOUBLE_80331770 = 0.025;
+extern const float FLOAT_80331778 = 172.0f;
+extern const float FLOAT_8033177C = 321.0f;
+extern const float FLOAT_80331780 = 14.0f;
+extern const double DOUBLE_80331788 = 0.18;
+extern const double DOUBLE_80331790 = 49.333333333333336;
+extern const double DOUBLE_80331798 = 5.0;
+extern const double DOUBLE_803317A0 = 0.035;
+extern const double DOUBLE_803317A8 = 0.04;
+extern const double DOUBLE_803317B0 = 0.2;
+extern const float FLOAT_803317B8 = 36.0f;
+extern const float FLOAT_803317BC = 93.0f;
+extern const float FLOAT_803317C0 = 576.0f;
+extern const float FLOAT_803317C4 = 52.0f;
+extern const float FLOAT_803317C8 = 396.0f;
+extern const float FLOAT_803317CC = 544.0f;
+extern const float FLOAT_803317D0 = 387.0f;
+extern const double DOUBLE_803317D8 = 16.0;
+extern const float FLOAT_803317e0 = -0.20000000298023224f;
+extern const float FLOAT_803317e4 = 51.5f;
+extern const float FLOAT_803317e8 = 35.79999923706055f;
+extern const char s_TRUE_803317EC[5] = "TRUE";
+extern const char s_FALSE_803317F4[6] = "FALSE";
+extern const float FLOAT_803317FC = 78.0f;
+extern const char lbl_80331800[7] = "w_open";
+extern const char lbl_80331808[7] = "idle_o";
+extern const char lbl_80331810[7] = "turn_l";
+extern const char lbl_80331818[7] = "turn_r";
+extern const char lbl_80331820[7] = "last_l";
+extern const char lbl_80331828[7] = "last_r";
+extern const char lbl_80331830[8] = "w_close";
+extern const char lbl_80331838[7] = "w_idle";
+extern const float kYmTracer2UvMin = 0.0f;
+extern const float kYmTracer2UvMax = 1.0f;
+
 extern char lbl_801DB7F8[];
-extern float FLOAT_80331588;
-extern float FLOAT_80331590;
-extern float FLOAT_803315d4;
-extern float FLOAT_80331698;
-extern float FLOAT_8033169C;
-extern float FLOAT_803316A0;
-extern float FLOAT_803316A4;
-extern float FLOAT_803316A8;
-extern float FLOAT_803316AC;
-extern float FLOAT_803316B0;
-extern float FLOAT_803316B4;
-extern float FLOAT_803316B8;
-extern float FLOAT_803316BC;
-extern float FLOAT_80331748;
-extern float FLOAT_8033174c;
-extern float FLOAT_80331750;
-extern float FLOAT_80331754;
-extern float FLOAT_80331610;
-extern float FLOAT_80331614;
-extern float FLOAT_80331618;
-extern float FLOAT_8033161C;
-extern float FLOAT_80331620;
-extern float FLOAT_8033168C;
-extern float FLOAT_80331690;
-extern float FLOAT_80331694;
-extern float FLOAT_80331410;
-extern float FLOAT_80331458;
-extern float FLOAT_803316D4;
-extern float FLOAT_803316F0;
-extern float FLOAT_803316F4;
-extern float FLOAT_803316F8;
-extern float FLOAT_80331760;
-extern float FLOAT_80331764;
-extern float FLOAT_803315B0;
-extern float FLOAT_80331440;
-extern float FLOAT_80331444;
-extern float FLOAT_8033146C;
-extern float FLOAT_80331664;
-extern float FLOAT_80331434;
-extern float FLOAT_80331524;
-extern float FLOAT_80331704;
-extern float FLOAT_80331708;
-extern float FLOAT_8033170C;
-extern float FLOAT_80331710;
-extern float FLOAT_80331714;
-extern float FLOAT_80331718;
-extern float FLOAT_80331728;
-extern float FLOAT_8033172C;
-extern float FLOAT_80331668;
-extern float FLOAT_80331740;
-extern float FLOAT_80331744;
-extern float FLOAT_80331768;
-extern float FLOAT_80331414;
-extern float FLOAT_80331468;
-extern float FLOAT_80331404;
 extern float FLOAT_80331490;
 extern float FLOAT_80331498;
-extern float FLOAT_803314D8;
-extern float FLOAT_803314DC;
-extern float FLOAT_803314E0;
 extern float FLOAT_803314e8;
 extern float FLOAT_803314f0;
-extern float FLOAT_803314F8;
-extern float FLOAT_803314FC;
-extern float FLOAT_80331500;
-extern float FLOAT_80331554;
-extern float FLOAT_80331548;
-extern float FLOAT_8033154C;
-extern float FLOAT_80331550;
-extern float FLOAT_80331558;
-extern float FLOAT_8033155C;
-extern float FLOAT_80331560;
-extern float FLOAT_80331564;
-extern float FLOAT_80331568;
-extern float FLOAT_80331578;
-extern float FLOAT_80331594;
-extern float FLOAT_803315B4;
-extern float FLOAT_803315B8;
-extern float FLOAT_803315BC;
-extern float FLOAT_803315C8;
-extern float FLOAT_8033158C;
-extern float FLOAT_803315E0;
-extern float FLOAT_803315E4;
-extern float FLOAT_803315E8;
-extern float FLOAT_80331778;
-extern float FLOAT_8033177C;
-extern float FLOAT_80331780;
-extern float FLOAT_803317B8;
-extern float FLOAT_803317BC;
-extern float FLOAT_803317C0;
-extern float FLOAT_803317C4;
-extern float FLOAT_803317C8;
-extern float FLOAT_803317CC;
-extern float FLOAT_803317D0;
-extern float FLOAT_803314A4;
-extern float FLOAT_8033166C;
-extern float FLOAT_80331680;
-extern float FLOAT_80331684;
-extern float FLOAT_80331688;
-extern double DOUBLE_803316C0;
-extern float FLOAT_803316C8;
-extern float FLOAT_803316CC;
-extern float FLOAT_803316D0;
-extern double DOUBLE_80331418;
-extern double DOUBLE_80331488;
-extern double DOUBLE_80331438;
-extern double DOUBLE_80331448;
-extern double DOUBLE_80331450;
-extern double DOUBLE_80331460;
-extern double DOUBLE_803314E8;
-extern double DOUBLE_80331498;
-extern double DOUBLE_80331510;
-extern double DOUBLE_80331580;
-extern double DOUBLE_803315A0;
-extern double DOUBLE_803315A8;
-extern double DOUBLE_803315C0;
-extern double DOUBLE_803315D8;
-extern double DOUBLE_803315F0;
-extern double DOUBLE_803315F8;
-extern double DOUBLE_80331600;
-extern double DOUBLE_80331608;
-extern double DOUBLE_80331628;
-extern double DOUBLE_80331630;
-extern double DOUBLE_80331670;
-extern double DOUBLE_80331678;
-extern double DOUBLE_80331420;
-extern double DOUBLE_80331428;
-extern double DOUBLE_803314A8;
-extern double DOUBLE_803314A8;
-extern double DOUBLE_803314D0;
-extern double DOUBLE_803314F0;
-extern double DOUBLE_80331490;
-extern double DOUBLE_80331508;
-extern double DOUBLE_80331538;
-extern double DOUBLE_80331540;
-extern double DOUBLE_80331570;
-extern double DOUBLE_803316D8;
-extern double DOUBLE_803316E0;
-extern double DOUBLE_803316E8;
-extern double DOUBLE_80331720;
-extern double DOUBLE_80331730;
-extern double DOUBLE_80331738;
-extern double DOUBLE_80331770;
-extern double DOUBLE_80331788;
-extern double DOUBLE_80331790;
-extern double DOUBLE_80331798;
-extern double DOUBLE_803317A0;
-extern double DOUBLE_803317A8;
-extern double DOUBLE_803317B0;
-extern float FLOAT_803317e0;
-extern float FLOAT_803317e4;
-extern float FLOAT_803317e8;
-extern double DOUBLE_803313F8;
-extern double DOUBLE_803313F8;
-extern double DOUBLE_80331408;
-extern double DOUBLE_803314E8;
-extern unsigned int s_wmWorldParamPrimaryDirtyMask;
-extern unsigned int s_wmWorldParamSecondaryDirtyMask;
-extern char s_wmCharaAnimStand[6];
-extern char s_wmCharaAnimWalk[5];
-extern char s_wmCharaAnimRun[4];
-extern char s_wmCharaAnimGlad[5];
-extern char s_wmCharaAnimSleep[6];
-extern char s_wmCharaAnimAngry[6];
 const char* s_wmEmptyCreatingTextEn_8032E8F0[] = {s_Empty_803313A4, s_Creating_801DC250};
 const char* s_wmEmptyCreatingTextDe_8032E8F8[] = {s_Frei_803313AC, s_Wird_kreiert_801DC25C};
 const char* s_wmEmptyCreatingTextIt_8032E900[] = {s_Vuoto_803313B4, s_Creazione_801DC26C};
@@ -368,8 +446,6 @@ static const char s__s__d___Error_WM_menu_no_error___801dc424[] = "%s(%d): Error
 static const char s__s__d___Error_function_code_not_f_801dc3ec[] = "%s(%d): Error:function code not found(%d)\n";
 static const char s_dvd_movie_ffcc_op_thp_801dc448[] = "dvd_movie/ffcc_op.thp";
 static const char s_mount____s_801dc460[] = "mount : %s";
-static const char s_TRUE_803317EC[] = "TRUE";
-static const char s_FALSE_803317F4[] = "FALSE";
 
 static const int kMcListEntrySize = 0x48;
 static const int kMcListCount = 4;
@@ -1156,11 +1232,11 @@ void CMenuPcs::loadData()
 	FLOAT_8032ee18 = FLOAT_803317FC;
 	for (int i = 0; i < 8; i++) {
 		const int modelNo = (i + 1) * 100;
-		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimStand, 1, 0, 0);
-		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimWalk, 1, 0, 0);
-		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimRun, 1, 0, 0);
-		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimGlad, 3, 0, 0);
-		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimSleep, 1, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, const_cast<char*>(s_wmCharaAnimStand), 1, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, const_cast<char*>(s_wmCharaAnimWalk), 1, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, const_cast<char*>(s_wmCharaAnimRun), 1, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, const_cast<char*>(s_wmCharaAnimGlad), 3, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, const_cast<char*>(s_wmCharaAnimSleep), 1, 0, 0);
 	}
 
 	{
@@ -1174,17 +1250,17 @@ void CMenuPcs::loadData()
 				const int modelNo = charaBase * 100;
 				int anim = (charaBase - 1) * 6;
 				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->LoadAnim(s_wmCharaAnimStand, anim++, 1, 0, modelNo, -1, 0);
+				    ->LoadAnim(const_cast<char*>(s_wmCharaAnimStand), anim++, 1, 0, modelNo, -1, 0);
 				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->LoadAnim(s_wmCharaAnimWalk, anim++, 1, 0, modelNo, -1, 0);
+				    ->LoadAnim(const_cast<char*>(s_wmCharaAnimWalk), anim++, 1, 0, modelNo, -1, 0);
 				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->LoadAnim(s_wmCharaAnimRun, anim++, 1, 0, modelNo, -1, 0);
+				    ->LoadAnim(const_cast<char*>(s_wmCharaAnimRun), anim++, 1, 0, modelNo, -1, 0);
 				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->LoadAnim(s_wmCharaAnimGlad, anim++, 3, 0, modelNo, -1, 0);
+				    ->LoadAnim(const_cast<char*>(s_wmCharaAnimGlad), anim++, 3, 0, modelNo, -1, 0);
 				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->LoadAnim(s_wmCharaAnimSleep, anim++, 1, 0, modelNo, -1, 0);
+				    ->LoadAnim(const_cast<char*>(s_wmCharaAnimSleep), anim++, 1, 0, modelNo, -1, 0);
 				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->LoadAnim(s_wmCharaAnimAngry, anim++, 1, 0, modelNo, -1, 0);
+				    ->LoadAnim(const_cast<char*>(s_wmCharaAnimAngry), anim++, 1, 0, modelNo, -1, 0);
 				(m_wmCharaAnimState + i * 5)[0] = 0;
 				(m_wmCharaAnimState + i * 5)[1] = -1;
 				(m_wmCharaAnimState + i * 5)[2] = rand() % 250;
@@ -1219,14 +1295,14 @@ void CMenuPcs::loadData()
 	}
 
 	CCharaPcs::CHandle* const windowHandle = m_wm.m_handles[1];
-	windowHandle->LoadAnim(lbl_80331800, 0, 2, -1, -1, -1, 0);
-	m_wm.m_handles[1]->LoadAnim(lbl_80331808, 1, 0, -1, -1, -1, 0);
-	m_wm.m_handles[1]->LoadAnim(lbl_80331810, 2, 2, -1, -1, -1, 0);
-	m_wm.m_handles[1]->LoadAnim(lbl_80331818, 3, 2, -1, -1, -1, 0);
-	m_wm.m_handles[1]->LoadAnim(lbl_80331820, 4, 2, -1, -1, -1, 0);
-	m_wm.m_handles[1]->LoadAnim(lbl_80331828, 5, 2, -1, -1, -1, 0);
-	m_wm.m_handles[1]->LoadAnim(lbl_80331830, 6, 2, -1, -1, -1, 0);
-	m_wm.m_handles[1]->LoadAnim(lbl_80331838, 7, 0, -1, -1, -1, 0);
+	windowHandle->LoadAnim(const_cast<char*>(lbl_80331800), 0, 2, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(const_cast<char*>(lbl_80331808), 1, 0, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(const_cast<char*>(lbl_80331810), 2, 2, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(const_cast<char*>(lbl_80331818), 3, 2, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(const_cast<char*>(lbl_80331820), 4, 2, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(const_cast<char*>(lbl_80331828), 5, 2, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(const_cast<char*>(lbl_80331830), 6, 2, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(const_cast<char*>(lbl_80331838), 7, 0, -1, -1, -1, 0);
 	m_wm.m_handles[1]->SetAnim(0, -1, -1, -1, 0);
 
 	{
@@ -4092,11 +4168,6 @@ void CMenuPcs::drawWorld()
 #pragma opt_lifetimes off
 void CMenuPcs::DrawMainMenu()
 {
-	extern double DOUBLE_803314E8;
-	extern double DOUBLE_803313F8;
-	extern double DOUBLE_803314F0;
-	extern double DOUBLE_803314D0;
-	extern float FLOAT_803316D0;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	float x;
@@ -4355,7 +4426,6 @@ void CMenuPcs::DrawDiaryMenu()
  */
 void CMenuPcs::DrawMCardMenu()
 {
-	extern double DOUBLE_803317D8;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	Mtx savedCamera;
 	Mtx44 projMtx;
@@ -4828,9 +4898,6 @@ void CMenuPcs::DrawMCardMenu()
 #pragma opt_lifetimes off
 void CMenuPcs::DrawCMakeMenu()
 {
-	extern double DOUBLE_803314E8;
-	extern double DOUBLE_803313F8;
-	extern double DOUBLE_803314D0;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	short state = m_wmWorldState->m_mainState;
@@ -5178,7 +5245,6 @@ void CMenuPcs::DrawMoveMenu()
  */
 void CMenuPcs::DrawLoadMenu()
 {
-	extern double DOUBLE_803317D8;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	McCtrl& mcCtrl = *GetMcCtrl();
 	if ((signed char)m_wmWorldState->m_worldReady == 0) {
@@ -7521,13 +7587,6 @@ LAB_calc:
  */
 void CMenuPcs::DrawWMFrame()
 {
-	extern double DOUBLE_803316D8;
-	extern double DOUBLE_803316E0;
-	extern double DOUBLE_803314F0;
-	extern double DOUBLE_803316E8;
-	extern float FLOAT_803315B0;
-	extern float FLOAT_803315B4;
-	extern float FLOAT_803314D8;
 
 	GXColor matColor;
 	short sVar = m_wmWorldState->m_mainState;
@@ -8029,12 +8088,12 @@ void CMenuPcs::CalcChara()
 				const unsigned int charaBase = static_cast<unsigned int>((*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_charaNo) / 100;
 				const int modelNo = charaBase * 100;
 				int anim = (charaBase - 1) * 6;
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(s_wmCharaAnimStand, anim++, 1, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(s_wmCharaAnimWalk, anim++, 1, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(s_wmCharaAnimRun, anim++, 1, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(s_wmCharaAnimGlad, anim++, 3, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(s_wmCharaAnimSleep, anim++, 1, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(s_wmCharaAnimAngry, anim, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(const_cast<char*>(s_wmCharaAnimStand), anim++, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(const_cast<char*>(s_wmCharaAnimWalk), anim++, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(const_cast<char*>(s_wmCharaAnimRun), anim++, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(const_cast<char*>(s_wmCharaAnimGlad), anim++, 3, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(const_cast<char*>(s_wmCharaAnimSleep), anim++, 1, 0, modelNo, -1, 0);
+				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(const_cast<char*>(s_wmCharaAnimAngry), anim, 1, 0, modelNo, -1, 0);
 				GetWmCharaAnimState(this)[i * 5 + 0] = 0;
 				GetWmCharaAnimState(this)[i * 5 + 1] = -1;
 				GetWmCharaAnimState(this)[i * 5 + 2] = rand() % 250;
@@ -8950,8 +9009,6 @@ void CMenuPcs::CalcCharaSelect()
 #pragma opt_strength_reduction off
 void CMenuPcs::DrawCharaName()
 {
-	extern double DOUBLE_803314E8;
-	extern double DOUBLE_803313F8;
 	CFont* const font = GetWmFont(this);
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 	unsigned char nameBuf[0x20];
@@ -10053,12 +10110,12 @@ void CMenuPcs::SetAnim(int anim)
 	animBase *= 6;
 	const int modelBase =  (s32)(static_cast<int>(charaNo / 100) * 100);
 
-	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimStand, animBase++, 1, 0, modelBase, -1, 0);
-	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimWalk, animBase++, 1, 0, modelBase, -1, 0);
-	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimRun, animBase++, 1, 0, modelBase, -1, 0);
-	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimGlad, animBase++, 3, 0, modelBase, -1, 0);
-	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimSleep, animBase++, 1, 0, modelBase, -1, 0);
-	m_wm.m_handles[handleIdx]->LoadAnim(s_wmCharaAnimAngry, animBase, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimStand), animBase++, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimWalk), animBase++, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimRun), animBase++, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimGlad), animBase++, 3, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimSleep), animBase++, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimAngry), animBase, 1, 0, modelBase, -1, 0);
 
 #define animState (m_wmCharaAnimState + anim * 5)
 	animState[0] = 0;
@@ -10700,12 +10757,6 @@ void CMenuPcs::ChkMcDataCnt()
  */
 void CMenuPcs::DrawMCList()
 {
-	extern float FLOAT_803314D8;
-	extern float FLOAT_803314DC;
-	extern float FLOAT_803314E0;
-	extern float FLOAT_803314F8;
-	extern float FLOAT_803314FC;
-	extern double DOUBLE_803314F0;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	char* const rodataBase = lbl_801DB7F8;
 	CFont* fontF8 = m_fonts[0];

@@ -525,7 +525,9 @@ void CChara::TimeMogFur()
 }
 #pragma pop
 
-static int FurColorMatch(CColor src, CColor ref)
+#pragma push
+#pragma bool off
+static int FurColorMatch(CColor src, CColor ref, int limit)
 {
 	int dr = static_cast<int>(src.color.r) - static_cast<int>(ref.color.r);
 	if (dr < 0) {
@@ -545,9 +547,10 @@ static int FurColorMatch(CColor src, CColor ref)
 	}
 	db += 7 - static_cast<int>(src.color.a);
 
-	int hits = (dr < 6) + (dg < 6) + (db < 6);
+	int hits = (dr <= limit) + (dg <= limit) + (db <= limit);
 	return static_cast<unsigned int>(__cntlzw(3 - hits)) >> 5;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -591,9 +594,9 @@ void CChara::CalcMogScore()
 			                static_cast<unsigned char>(a));
 
 			int colorHit[3];
-			colorHit[0] = FurColorMatch(srcColor, CColor(0xF, 4, 4, 2));
-			colorHit[1] = FurColorMatch(srcColor, CColor(4, 0xF, 4, 2));
-			colorHit[2] = FurColorMatch(srcColor, CColor(4, 8, 0xF, 2));
+			colorHit[0] = FurColorMatch(srcColor, CColor(0xF, 4, 4, 2), 5);
+			colorHit[1] = FurColorMatch(srcColor, CColor(4, 0xF, 4, 2), 5);
+			colorHit[2] = FurColorMatch(srcColor, CColor(4, 8, 0xF, 2), 5);
 			fur.m_alphaScore += a;
 
 			const int ring = dist % 12;

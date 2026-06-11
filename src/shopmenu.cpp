@@ -2174,19 +2174,21 @@ void CShopMenu::DrawMake()
 
     int gilAmountX = static_cast<int>(FLOAT_80332E1C - gilUnitWidth - FLOAT_80332d5c);
     int makeGil2 = CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex));
-    CCaravanWork* caravanWork = ShopMenuCaravanWork(this);
     int gilTlut = 2;
-    if (caravanWork->m_gil >= makeGil2) {
+    if (ShopMenuCaravanWork(this)->m_gil >= makeGil2) {
         gilTlut = 0x14;
     }
-    int caravanGil = caravanWork->m_gil;
+    int caravanGil = ShopMenuCaravanWork(this)->m_gil;
     CFont* amountFont2 = MenuPcs.m_fonts[0];
     SetupShopMenuAmountFont(amountFont2);
     DrawShopMenuAmountTrunc(amountFont2, caravanGil, gilAmountX, FLOAT_80332E18, gilTlut);
 
     font->SetScale(FLOAT_80332d28);
-    SetupShopMenuUnitFont(font);
+    font->DrawInit();
+    font->SetMargin(FLOAT_80332d28);
     char* gilUnitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
+    font->SetScaleX(FLOAT_80332d2c);
+    font->SetScaleY(FLOAT_80332d28);
     float gilUnitWidth2 = font->GetWidth(gilUnitText);
     x = 312;
     font->DrawInit();
@@ -2303,7 +2305,12 @@ void CShopMenu::DrawMake()
         }
         CFont* ownedFont = MenuPcs.m_fonts[0];
         x = 452;
-        SetupShopMenuMakeFont(ownedFont, FLOAT_80332d64);
+        ownedFont->SetShadow(1);
+        ownedFont->SetScale(FLOAT_80332d28);
+        ownedFont->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+        ownedFont->DrawInit();
+        SetShopMenuFontRenderBit(ownedFont);
+        ownedFont->SetMargin(FLOAT_80332d64);
         char ownedBuffer[64];
         sprintf(ownedBuffer, s_TwoDigitFormat_80332d18, ownedCount);
         x = static_cast<int>(x - ownedFont->GetWidth(ownedBuffer));

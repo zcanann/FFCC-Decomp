@@ -1388,20 +1388,23 @@ void CMenuPcs::InitCharaInfo()
 	float z = FLOAT_803314a4;
 	float zero = FLOAT_803313dc;
 	int baseX;
-	int baseY;
 	int baseSlot;
+	int baseY;
 	int row;
+	int col;
+	int y;
 
 	row = 0;
 	baseSlot = 0x20;
 	baseY = 0x66;
 	while (row < 2) {
 		int slot =  (baseSlot + 0);
+		col = 0;
 		baseX = 0x68;
-		for (int col = 0; col < 2; col++) {
+		for (; col < 2; col++) {
 			int __p15 = slot;
 			int slotOffset = __p15 * 0x50;
-			int y = (s32)(baseY);
+			y = baseY;
 			if (row != 0) {
 				y = baseY + 8;
 			}
@@ -1414,13 +1417,13 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x14) = zero;
 			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x18) = z;
 
-			int y2 = baseY;
+			y = baseY;
 			if (row != 0) {
-				y2 = baseY + 8;
+				y = baseY + 8;
 			}
 
 			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0x58) = static_cast<short>(baseX - 0x10);
-			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0x5A) = static_cast<short>(y2 - 0x70);
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0x5A) = static_cast<short>(y - 0x70);
 			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0x5C) = 0x140;
 			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0x5E) = 0xE0;
 			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x60) = zero;
@@ -1436,9 +1439,10 @@ void CMenuPcs::InitCharaInfo()
 	}
 
 	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
+	int i = 0;
 	int modelOffset = 0;
 	unsigned int invalidModel = 0xFFFFFFFF;
-	for (int i = 0; i < 4; i++) {
+	for (; i < 4; i++) {
 		unsigned char* src0 = gameData + 0x13F0;
 		unsigned char* entry0 = m_wm.m_charaModelData + modelOffset;
 		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {

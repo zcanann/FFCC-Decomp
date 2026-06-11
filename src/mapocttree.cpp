@@ -743,359 +743,7 @@ void COctTree::ClearLight()
 	ClearLight_r(m_nodePool);
 }
 
-/*
- * --INFO--
- * PAL Address: 0x8002c8a8
- * PAL Size: 896b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
-{
-	float boundMinX = octNode->m_bound.m_min.x;
-	bool overlap = false;
-	bool xyOverlap = false;
-	int xOverlap = false;
 
-	if (boundMinX < s_cyl.m_bound.m_min.x) {
-		xOverlap = s_cyl.m_bound.m_min.x <= octNode->m_bound.m_max.x;
-	} else {
-		if (boundMinX > s_cyl.m_bound.m_min.x) {
-			xOverlap = boundMinX <= s_cyl.m_bound.m_max.x;
-		} else {
-			xOverlap = true;
-		}
-	}
-
-	if (xOverlap) {
-		float boundMinY = octNode->m_bound.m_min.y;
-		if (boundMinY < s_cyl.m_bound.m_min.y) {
-			xOverlap = s_cyl.m_bound.m_min.y <= octNode->m_bound.m_max.y;
-		} else {
-			if (boundMinY > s_cyl.m_bound.m_min.y) {
-				xOverlap = boundMinY <= s_cyl.m_bound.m_max.y;
-			} else {
-				xOverlap = true;
-			}
-		}
-		if (xOverlap) {
-			xyOverlap = true;
-		}
-	}
-
-	if (xyOverlap) {
-		float boundMinZ = octNode->m_bound.m_min.z;
-		if (boundMinZ < s_cyl.m_bound.m_min.z) {
-			xOverlap = s_cyl.m_bound.m_min.z <= octNode->m_bound.m_max.z;
-		} else {
-			if (boundMinZ > s_cyl.m_bound.m_min.z) {
-				xOverlap = boundMinZ <= s_cyl.m_bound.m_max.z;
-			} else {
-				xOverlap = true;
-			}
-		}
-		if (xOverlap) {
-			overlap = true;
-		}
-	}
-
-	if (!overlap) {
-		return;
-	}
-
-	if (octNode->m_meshCount != 0) {
-		static_cast<CMapHit*>(m_mapObject->m_mapData)
-		    ->CheckHitCylinderNear(&s_cyl, &s_mvec,
-		                           octNode->m_meshStart,
-		                           octNode->m_meshCount,
-		                           InsertShadow_level);
-	}
-
-	CBound* cylBound = s_cyl.GetBound();
-	COctNode* nodeIter = octNode;
-	for (int i = 0; i < 8; i++) {
-		COctNode* child = nodeIter->m_children[0];
-		if (child == 0) {
-			return;
-		}
-
-		float childBoundMinX = child->m_bound.m_min.x;
-		bool childOverlap = false;
-		bool childXYOverlap = false;
-		int childXOverlap = false;
-		if (childBoundMinX < s_cyl.m_bound.m_min.x) {
-			childXOverlap = s_cyl.m_bound.m_min.x <= child->m_bound.m_max.x;
-		} else {
-			if (childBoundMinX > s_cyl.m_bound.m_min.x) {
-				childXOverlap = childBoundMinX <= s_cyl.m_bound.m_max.x;
-			} else {
-				childXOverlap = true;
-			}
-		}
-
-		if (childXOverlap) {
-			float childBoundMinY = child->m_bound.m_min.y;
-			if (childBoundMinY < s_cyl.m_bound.m_min.y) {
-				childXOverlap = s_cyl.m_bound.m_min.y <= child->m_bound.m_max.y;
-			} else {
-				if (childBoundMinY > s_cyl.m_bound.m_min.y) {
-					childXOverlap = childBoundMinY <= s_cyl.m_bound.m_max.y;
-				} else {
-					childXOverlap = true;
-				}
-			}
-			if (childXOverlap) {
-				childXYOverlap = true;
-			}
-		}
-
-		if (childXYOverlap) {
-			float childBoundMinZ = child->m_bound.m_min.z;
-			if (childBoundMinZ < s_cyl.m_bound.m_min.z) {
-				childXOverlap = s_cyl.m_bound.m_min.z <= child->m_bound.m_max.z;
-			} else {
-				if (childBoundMinZ > s_cyl.m_bound.m_min.z) {
-					childXOverlap = childBoundMinZ <= s_cyl.m_bound.m_max.z;
-				} else {
-					childXOverlap = true;
-				}
-			}
-			if (childXOverlap) {
-				childOverlap = true;
-			}
-		}
-
-		if (childOverlap) {
-			if (child->m_meshCount != 0) {
-				static_cast<CMapHit*>(m_mapObject->m_mapData)
-				    ->CheckHitCylinderNear(&s_cyl, &s_mvec,
-				                           child->m_meshStart,
-				                           child->m_meshCount,
-				                           InsertShadow_level);
-			}
-
-			for (int j = 0; j < 8; j++) {
-				COctNode* grandChild = child->m_children[0];
-				if (grandChild == 0) {
-					break;
-				}
-
-				if (grandChild->GetBound()->CheckCross(*cylBound) != 0) {
-					if (grandChild->m_meshCount != 0) {
-						static_cast<CMapHit*>(m_mapObject->m_mapData)
-						    ->CheckHitCylinderNear(&s_cyl, &s_mvec,
-						                           grandChild->m_meshStart,
-						                           grandChild->m_meshCount,
-						                           InsertShadow_level);
-					}
-
-					for (int k = 0; k < 8; k++) {
-						COctNode* greatGrandChild = grandChild->m_children[0];
-						if (greatGrandChild == 0) {
-							break;
-						}
-						CheckHitCylinderNear_r(greatGrandChild);
-						grandChild = reinterpret_cast<COctNode*>(Ptr(grandChild, 4));
-					}
-				}
-				child = reinterpret_cast<COctNode*>(Ptr(child, 4));
-			}
-		}
-		nodeIter = reinterpret_cast<COctNode*>(Ptr(nodeIter, 4));
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002cef0
- * PAL Size: 1004b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int COctTree::CheckHitCylinder_r(COctNode* node)
-{
-	float boundMinX = node->m_bound.m_min.x;
-	bool overlap;
-	bool xyOverlap;
-	int xOverlap;
-
-	xyOverlap = overlap = false;
-	if (boundMinX < s_cyl.m_bound.m_min.x) {
-		xOverlap = s_cyl.m_bound.m_min.x <= node->m_bound.m_max.x;
-	} else {
-		if (boundMinX > s_cyl.m_bound.m_min.x) {
-			xOverlap = boundMinX <= s_cyl.m_bound.m_max.x;
-		} else {
-			xOverlap = true;
-		}
-	}
-
-	if (xOverlap) {
-		float boundMinY = node->m_bound.m_min.y;
-		if (boundMinY < s_cyl.m_bound.m_min.y) {
-			xOverlap = s_cyl.m_bound.m_min.y <= node->m_bound.m_max.y;
-		} else {
-			if (boundMinY > s_cyl.m_bound.m_min.y) {
-				xOverlap = boundMinY <= s_cyl.m_bound.m_max.y;
-			} else {
-				xOverlap = true;
-			}
-		}
-		if (xOverlap) {
-			xyOverlap = true;
-		}
-	}
-
-	if (xyOverlap) {
-		float boundMinZ = node->m_bound.m_min.z;
-		if (boundMinZ < s_cyl.m_bound.m_min.z) {
-			xOverlap = s_cyl.m_bound.m_min.z <= node->m_bound.m_max.z;
-		} else {
-			if (boundMinZ > s_cyl.m_bound.m_min.z) {
-				xOverlap = boundMinZ <= s_cyl.m_bound.m_max.z;
-			} else {
-				xOverlap = true;
-			}
-		}
-		if (xOverlap) {
-			overlap = true;
-		}
-	}
-
-	if (overlap) {
-		if ((node->m_meshCount != 0) &&
-			(static_cast<CMapHit*>(m_mapObject->m_mapData)
-				 ->CheckHitCylinder(&s_cyl, &s_mvec,
-									node->m_meshStart,
-									node->m_meshCount,
-									InsertShadow_level) != 0)) {
-			return 1;
-		}
-
-		CBound* cylBound = s_cyl.GetBound();
-		COctNode* nodeIter = node;
-		for (int i = 0; i < 8; i++) {
-			COctNode* child = nodeIter->m_children[0];
-			if (child == 0) {
-				break;
-			}
-
-			float childBoundMinX = child->m_bound.m_min.x;
-			bool childOverlap;
-			bool childXYOverlap;
-			int childXOverlap;
-
-			childXYOverlap = childOverlap = false;
-			if (childBoundMinX < s_cyl.m_bound.m_min.x) {
-				childXOverlap = s_cyl.m_bound.m_min.x <= child->m_bound.m_max.x;
-			} else {
-				if (childBoundMinX > s_cyl.m_bound.m_min.x) {
-					childXOverlap = childBoundMinX <= s_cyl.m_bound.m_max.x;
-				} else {
-					childXOverlap = true;
-				}
-			}
-
-			if (childXOverlap) {
-				float childBoundMinY = child->m_bound.m_min.y;
-				if (childBoundMinY < s_cyl.m_bound.m_min.y) {
-					childXOverlap = s_cyl.m_bound.m_min.y <= child->m_bound.m_max.y;
-				} else {
-					if (childBoundMinY > s_cyl.m_bound.m_min.y) {
-						childXOverlap = childBoundMinY <= s_cyl.m_bound.m_max.y;
-					} else {
-						childXOverlap = true;
-					}
-				}
-				if (childXOverlap) {
-					childXYOverlap = true;
-				}
-			}
-
-			if (childXYOverlap) {
-				float childBoundMinZ = child->m_bound.m_min.z;
-				if (childBoundMinZ < s_cyl.m_bound.m_min.z) {
-					childXOverlap = s_cyl.m_bound.m_min.z <= child->m_bound.m_max.z;
-				} else {
-					if (childBoundMinZ > s_cyl.m_bound.m_min.z) {
-						childXOverlap = childBoundMinZ <= s_cyl.m_bound.m_max.z;
-					} else {
-						childXOverlap = true;
-					}
-				}
-				if (childXOverlap) {
-					childOverlap = true;
-				}
-			}
-
-			int childHit;
-			if (childOverlap) {
-				if ((child->m_meshCount != 0) &&
-					(static_cast<CMapHit*>(m_mapObject->m_mapData)
-						 ->CheckHitCylinder(&s_cyl, &s_mvec,
-											child->m_meshStart,
-											child->m_meshCount,
-											InsertShadow_level) != 0)) {
-					childHit = true;
-					goto childJoin;
-				}
-
-				for (int j = 0; j < 8; j++) {
-					COctNode* grandChild = child->m_children[0];
-					int grandHit;
-					if (grandChild == 0) {
-						break;
-					}
-
-					if (grandChild->GetBound()->CheckCross(*cylBound) != 0) {
-						if ((grandChild->m_meshCount != 0) &&
-							(static_cast<CMapHit*>(m_mapObject->m_mapData)
-								 ->CheckHitCylinder(&s_cyl, &s_mvec,
-													grandChild->m_meshStart,
-													grandChild->m_meshCount,
-													InsertShadow_level) != 0)) {
-							grandHit = true;
-						} else {
-							for (int k = 0; k < 8; k++) {
-								COctNode* greatGrandChild = grandChild->m_children[0];
-								if (greatGrandChild == 0) {
-									break;
-								}
-
-								if (CheckHitCylinder_r(greatGrandChild) != 0) {
-									grandHit = true;
-									goto grandJoin;
-								}
-								grandChild = reinterpret_cast<COctNode*>(Ptr(grandChild, 4));
-							}
-							grandHit = false;
-						}
-					} else {
-						grandHit = false;
-					}
-				grandJoin:
-					if (grandHit) {
-						childHit = true;
-						goto childJoin;
-					}
-					child = reinterpret_cast<COctNode*>(Ptr(child, 4));
-				}
-			}
-			childHit = false;
-		childJoin:
-			if (childHit) {
-				return 1;
-			}
-			nodeIter = reinterpret_cast<COctNode*>(Ptr(nodeIter, 4));
-		}
-	}
-
-	return 0;
-}
 
 /*
  * --INFO--
@@ -1153,6 +801,75 @@ int CBound::CheckCross(CBound& other)
 	}
 
 	return (unsigned char)overlap;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002c8a8
+ * PAL Size: 896b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma inline_depth(2)
+void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
+{
+	int i;
+
+	if (octNode->m_bound.CheckCross(s_cyl.m_bound) == 0) {
+		return;
+	}
+	if (octNode->m_meshCount != 0) {
+		static_cast<CMapHit*>(m_mapObject->m_mapData)
+			->CheckHitCylinderNear(&s_cyl, &s_mvec,
+								   octNode->m_meshStart,
+								   octNode->m_meshCount,
+								   InsertShadow_level);
+	}
+	for (i = 0; i < 8; i++) {
+		if (octNode->m_children[i] == 0) {
+			return;
+		}
+		CheckHitCylinderNear_r(octNode->m_children[i]);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002cef0
+ * PAL Size: 1004b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma inline_depth(2)
+int COctTree::CheckHitCylinder_r(COctNode* node)
+{
+	int i;
+
+	if (node->m_bound.CheckCross(s_cyl.m_bound) != 0) {
+		if ((node->m_meshCount != 0) &&
+			(static_cast<CMapHit*>(m_mapObject->m_mapData)
+				 ->CheckHitCylinder(&s_cyl, &s_mvec,
+									node->m_meshStart,
+									node->m_meshCount,
+									InsertShadow_level) != 0)) {
+			return 1;
+		}
+
+		for (i = 0; i < 8; i++) {
+			if (node->m_children[i] == 0) {
+				break;
+			}
+			if (CheckHitCylinder_r(node->m_children[i]) != 0) {
+				return 1;
+			}
+		}
+	}
+
+	return 0;
 }
 
 

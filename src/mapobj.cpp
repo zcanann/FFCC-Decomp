@@ -1001,12 +1001,11 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma inline_depth(2)
 void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
 {
     extern const float kMapObjDegToRad;
-    Mtx mtx2;
-    Mtx mtx1;
-    Mtx mtx0;
+    Mtx mtx;
     CMapObj* obj = this;
 
     do {
@@ -1016,14 +1015,14 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
             obj->m_calcMtxPending = 0;
             if (obj->m_localMtxDirty != 0) {
                 PSMTXScale(obj->m_localMtx, obj->m_localScaleX, obj->m_localScaleY, obj->m_localScaleZ);
-                PSMTXRotRad(mtx2, 'x', kMapObjDegToRad * obj->m_localRotationX);
-                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
-                PSMTXRotRad(mtx2, 'y', kMapObjDegToRad * obj->m_localRotationY);
-                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
-                PSMTXRotRad(mtx2, 'z', kMapObjDegToRad * obj->m_localRotationZ);
-                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
-                PSMTXTrans(mtx2, obj->m_localTranslateX, obj->m_localTranslateY, obj->m_localTranslateZ);
-                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
+                PSMTXRotRad(mtx, 'x', kMapObjDegToRad * obj->m_localRotationX);
+                PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
+                PSMTXRotRad(mtx, 'y', kMapObjDegToRad * obj->m_localRotationY);
+                PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
+                PSMTXRotRad(mtx, 'z', kMapObjDegToRad * obj->m_localRotationZ);
+                PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
+                PSMTXTrans(mtx, obj->m_localTranslateX, obj->m_localTranslateY, obj->m_localTranslateZ);
+                PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
             }
 
             dirty = 1;
@@ -1033,70 +1032,8 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
             PSMTXConcat(*reinterpret_cast<Mtx*>(parentMtx), obj->m_localMtx, obj->m_worldMtx);
         }
 
-        CMapObj* child = obj->m_child;
-        if (child != 0) {
-            do {
-                unsigned char childDirty = dirty;
-
-                if (child->m_calcMtxPending != 0) {
-                    child->m_calcMtxPending = 0;
-                    if (child->m_localMtxDirty != 0) {
-                        PSMTXScale(child->m_localMtx, child->m_localScaleX, child->m_localScaleY, child->m_localScaleZ);
-                        PSMTXRotRad(mtx1, 'x', kMapObjDegToRad * child->m_localRotationX);
-                        PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                        PSMTXRotRad(mtx1, 'y', kMapObjDegToRad * child->m_localRotationY);
-                        PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                        PSMTXRotRad(mtx1, 'z', kMapObjDegToRad * child->m_localRotationZ);
-                        PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                        PSMTXTrans(mtx1, child->m_localTranslateX, child->m_localTranslateY, child->m_localTranslateZ);
-                        PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                    }
-
-                    childDirty = 1;
-                }
-
-                if (childDirty != 0) {
-                    PSMTXConcat(obj->m_worldMtx, child->m_localMtx, child->m_worldMtx);
-                }
-
-                CMapObj* grandChild = child->m_child;
-                if (grandChild != 0) {
-                    float (*childWorldMtx)[4] = child->m_worldMtx;
-                    do {
-                        unsigned char grandChildDirty = childDirty;
-
-                        if (grandChild->m_calcMtxPending != 0) {
-                            grandChild->m_calcMtxPending = 0;
-                            if (grandChild->m_localMtxDirty != 0) {
-                                PSMTXScale(
-                                    grandChild->m_localMtx, grandChild->m_localScaleX, grandChild->m_localScaleY, grandChild->m_localScaleZ);
-                                PSMTXRotRad(mtx0, 'x', kMapObjDegToRad * grandChild->m_localRotationX);
-                                PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                                PSMTXRotRad(mtx0, 'y', kMapObjDegToRad * grandChild->m_localRotationY);
-                                PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                                PSMTXRotRad(mtx0, 'z', kMapObjDegToRad * grandChild->m_localRotationZ);
-                                PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                                PSMTXTrans(mtx0, grandChild->m_localTranslateX, grandChild->m_localTranslateY, grandChild->m_localTranslateZ);
-                                PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                            }
-
-                            grandChildDirty = 1;
-                        }
-
-                        if (grandChildDirty != 0) {
-                            PSMTXConcat(childWorldMtx, grandChild->m_localMtx, grandChild->m_worldMtx);
-                        }
-
-                        if (grandChild->m_child != 0) {
-                            grandChild->m_child->CalcMtx(grandChild->m_worldMtx, grandChildDirty);
-                        }
-
-                        grandChild = grandChild->m_next;
-                    } while (grandChild != 0);
-                }
-
-                child = child->m_next;
-            } while (child != 0);
+        if (obj->m_child != 0) {
+            obj->m_child->CalcMtx(obj->m_worldMtx, dirty);
         }
 
         obj = obj->m_next;

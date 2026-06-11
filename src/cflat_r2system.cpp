@@ -2369,11 +2369,11 @@ renderedDone:
     }
     case -0x25: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+        CLine<64>* line = &m_debugLines[*object->m_localBase];
         Vec target;
         target.x = localFloats[1];
         target.y = localFloats[2];
         target.z = localFloats[3];
-        CLine<64>* line = &m_debugLines[*object->m_localBase];
         unsigned long segment;
         float segmentRatio;
         float distance;

@@ -1153,6 +1153,7 @@ void CGraphic::makeSphere()
             GXWGFifo.f32 = vertices[idx2 * 3 + 0];
             GXWGFifo.f32 = vertices[idx2 * 3 + 2];
 
+            ringPairBase += 8;
             ring++;
             int idx1 = ring == 0 ? 0 : (ring - 1) * 8 + seg + 1;
             GXWGFifo.f32 = vertices[idx1 * 3 + 1];
@@ -1161,14 +1162,13 @@ void CGraphic::makeSphere()
 
             int idx3 = 0x29;
             if (ring + 1 != 6) {
-                idx3 = seg + ringPairBase + 8;
+                idx3 = seg + ringPairBase;
             }
+            ringPairBase += 8;
+            ring++;
             GXWGFifo.f32 = vertices[idx3 * 3 + 1];
             GXWGFifo.f32 = vertices[idx3 * 3 + 0];
             GXWGFifo.f32 = vertices[idx3 * 3 + 2];
-
-            ringPairBase += 0x10;
-            ring++;
         }
     }
 

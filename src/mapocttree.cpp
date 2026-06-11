@@ -1339,128 +1339,20 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma inline_depth(8)
 void ClearFlag_r(COctNode* node)
 {
 	int i;
-	COctNode* child1;
-	COctNode* child2;
-	COctNode* child3;
-	COctNode* child4;
-	COctNode* child5;
-	COctNode* child6;
-	COctNode* child7;
-	COctNode* child8;
 
 	if (node->m_meshCount != 0) {
 		node->m_drawFlags &= s_shadow_no;
 	}
-
-	i = 0;
-	COctNode* nodeIter = node;
-	do {
-		child1 = nodeIter->m_children[0];
-		if (child1 == 0) {
+	for (i = 0; i < 8; i++) {
+		if (node->m_children[i] == 0) {
 			return;
 		}
-		if (child1->m_meshCount != 0) {
-			child1->m_drawFlags &= s_shadow_no;
-		}
-
-		for (int j = 0; j < 8; j++) {
-			child2 = child1->m_children[0];
-			if (child2 == 0) {
-				break;
-			}
-			if (child2->m_meshCount != 0) {
-				child2->m_drawFlags &= s_shadow_no;
-			}
-
-			for (int k = 0; k < 8; k++) {
-				child3 = child2->m_children[0];
-				if (child3 == 0) {
-					break;
-				}
-				if (child3->m_meshCount != 0) {
-					child3->m_drawFlags &= s_shadow_no;
-				}
-
-				for (int m = 0; m < 8; m++) {
-					child4 = child3->m_children[0];
-					if (child4 == 0) {
-						break;
-					}
-					if (child4->m_meshCount != 0) {
-						child4->m_drawFlags &= s_shadow_no;
-					}
-
-					for (int n = 0; n < 8; n++) {
-						child5 = child4->m_children[0];
-						if (child5 == 0) {
-							break;
-						}
-						if (child5->m_meshCount != 0) {
-							child5->m_drawFlags &= s_shadow_no;
-						}
-
-						for (int o = 0; o < 8; o++) {
-							child6 = child5->m_children[0];
-							if (child6 == 0) {
-								break;
-							}
-							if (child6->m_meshCount != 0) {
-								child6->m_drawFlags &= s_shadow_no;
-							}
-
-							for (int p = 0; p < 8; p++) {
-								child7 = child6->m_children[0];
-								if (child7 == 0) {
-									break;
-								}
-								if (child7->m_meshCount != 0) {
-									child7->m_drawFlags &= s_shadow_no;
-								}
-
-								for (int q = 0; q < 8; q++) {
-									child8 = child7->m_children[0];
-									if (child8 == 0) {
-										break;
-									}
-									if (child8->m_meshCount != 0) {
-										child8->m_drawFlags &= s_shadow_no;
-									}
-
-									for (int r = 0; r < 8; r++) {
-										if (child8->m_children[0] == 0) {
-											break;
-										}
-										ClearFlag_r(child8->m_children[0]);
-										child8 = reinterpret_cast<COctNode*>(Ptr(child8, 4));
-									}
-
-									child7 = reinterpret_cast<COctNode*>(Ptr(child7, 4));
-								}
-
-								child6 = reinterpret_cast<COctNode*>(Ptr(child6, 4));
-							}
-
-							child5 = reinterpret_cast<COctNode*>(Ptr(child5, 4));
-						}
-
-						child4 = reinterpret_cast<COctNode*>(Ptr(child4, 4));
-					}
-
-					child3 = reinterpret_cast<COctNode*>(Ptr(child3, 4));
-				}
-
-				child2 = reinterpret_cast<COctNode*>(Ptr(child2, 4));
-			}
-
-			child1 = reinterpret_cast<COctNode*>(Ptr(child1, 4));
-		}
-
-		i++;
-		nodeIter = reinterpret_cast<COctNode*>(Ptr(nodeIter, 4));
-	} while (i < 8);
+		ClearFlag_r(node->m_children[i]);
+	}
 }
 
 /*

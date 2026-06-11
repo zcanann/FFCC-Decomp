@@ -1973,7 +1973,7 @@ void CMenuPcs::CmakeTribeDraw()
         }
     }
 
-    DrawCmakePreviewChara(this);
+    DrawCmakePreviewCharaAlpha(this, 1.0f);
 
     SetCmakeBlendMatColor(alpha);
     a255 = 255.0f * alpha;

@@ -77,6 +77,17 @@ struct FurPickPointerTable {
 	CVector* volatile m_rayEndA;
 };
 
+struct FurPickWorkPointers {
+	CVector* volatile m_areaCAw;
+	CVector* volatile m_areaBCw;
+	CVector* volatile m_hitToBw;
+	CVector* volatile m_areaCAc;
+	CVector* volatile m_areaBCc;
+	CVector* volatile m_hitToCc;
+	CVector* volatile m_hitToBc;
+	CVector* volatile m_rayEndc;
+};
+
 extern char sYmEnvSeparator[4];
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
@@ -1372,6 +1383,7 @@ int CChara::CModel::PickFur(
 	Vec areaBCMem;
 	Vec areaCAMem;
 	FurPickPointerTable ptrTable;
+	FurPickWorkPointers workPtrs;
 
 	for (unsigned int meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
@@ -1437,16 +1449,16 @@ int CChara::CModel::PickFur(
 				verts[0].m_valid = 0;
 				verts[1].m_valid = 0;
 
-				CVector* rayEndCtorP = ptrTable.m_rayEndA;
+				workPtrs.m_rayEndc = ptrTable.m_rayEndA;
 				CVector* rayEndP = ptrTable.m_rayEndB;
-				CVector* hitToBCtorP = ptrTable.m_hitToB1;
-				CVector* hitToCCtorP = ptrTable.m_hitToC1;
-				CVector* areaBCCtorP = ptrTable.m_areaBC1;
-				CVector* areaCACtorP = ptrTable.m_areaCA1;
-				CVector* hitToBP = ptrTable.m_hitToB2;
+				workPtrs.m_hitToBc = ptrTable.m_hitToB1;
+				workPtrs.m_hitToCc = ptrTable.m_hitToC1;
+				workPtrs.m_areaBCc = ptrTable.m_areaBC1;
+				workPtrs.m_areaCAc = ptrTable.m_areaCA1;
+				workPtrs.m_hitToBw = ptrTable.m_hitToB2;
 				CVector* hitToCP = ptrTable.m_hitToC2;
-				CVector* areaBCP = ptrTable.m_areaBC2;
-				CVector* areaCAP = ptrTable.m_areaCA2;
+				workPtrs.m_areaBCw = ptrTable.m_areaBC2;
+				workPtrs.m_areaCAw = ptrTable.m_areaCA2;
 
 				for (unsigned int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
@@ -1549,7 +1561,7 @@ int CChara::CModel::PickFur(
 						C_MTX44Inverse(invScreenMtx, invScreenMtx);
 
 						CVector rayStart;
-						new (rayEndCtorP) CVector;
+						new (workPtrs.m_rayEndc) CVector;
 						CVector rayStartInit(
 						    (static_cast<float>(cursorXd) - kCharaFurScreenCenterX) / kCharaFurScreenCenterX,
 						    static_cast<float>(negCursorY) / kCharaFurScreenCenterY, kCharaFurDepthZero);
@@ -1598,11 +1610,11 @@ int CChara::CModel::PickFur(
 						PSVECAdd(rayStart, &scaledRay, hitViewPos);
 
 						CVector hitToA;
-						new (hitToBCtorP) CVector;
-						new (hitToCCtorP) CVector;
+						new (workPtrs.m_hitToBc) CVector;
+						new (workPtrs.m_hitToCc) CVector;
 						CVector areaAB;
-						new (areaBCCtorP) CVector;
-						new (areaCACtorP) CVector;
+						new (workPtrs.m_areaBCc) CVector;
+						new (workPtrs.m_areaCAc) CVector;
 						const CVector& vertA1 = CVector(verts[0].m_viewPos);
 						CVector hitToASub;
 						PSVECSubtract(const_cast<CVector&>(vertA1), hitViewPos, hitToASub);
@@ -1613,7 +1625,7 @@ int CChara::CModel::PickFur(
 						CVector hitToBSub;
 						PSVECSubtract(const_cast<CVector&>(vertB), hitViewPos, hitToBSub);
 						hitToBMem.y = hitToBSub.y;
-						hitToBP->x = hitToBSub.x;
+						workPtrs.m_hitToBw->x = hitToBSub.x;
 						hitToBMem.z = hitToBSub.z;
 						const CVector& vertC = CVector(verts[2].m_viewPos);
 						CVector hitToCSub;
@@ -1622,12 +1634,12 @@ int CChara::CModel::PickFur(
 						hitToCMem.y = hitToCSub.y;
 						hitToCMem.z = hitToCSub.z;
 
-						PSVECCrossProduct(hitToA, *hitToBP, areaAB);
-						PSVECCrossProduct(*hitToBP, *hitToCP, *areaBCP);
-						PSVECCrossProduct(*hitToCP, hitToA, *areaCAP);
+						PSVECCrossProduct(hitToA, *workPtrs.m_hitToBw, areaAB);
+						PSVECCrossProduct(*workPtrs.m_hitToBw, *hitToCP, *workPtrs.m_areaBCw);
+						PSVECCrossProduct(*hitToCP, hitToA, *workPtrs.m_areaCAw);
 						const float magAB = PSVECMag(areaAB);
-						const float magCA = PSVECMag(*areaCAP);
-						const float magBC = PSVECMag(*areaBCP);
+						const float magCA = PSVECMag(*workPtrs.m_areaCAw);
+						const float magBC = PSVECMag(*workPtrs.m_areaBCw);
 						const CVector& weightsInit = CVector(magBC, magCA, magAB);
 						CVector weightsScale;
 						CVector weights;

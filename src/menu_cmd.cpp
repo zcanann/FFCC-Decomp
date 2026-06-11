@@ -2026,13 +2026,17 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	if ((itemKinds[selected] == 999) && (selected > 2)) {
 		int patIdx = 0;
 		for (const s16* pat = s_uniteRecipePatterns; pat[1] >= 0; pat += 6, patIdx++) {
-			if ((pat[0] == 0) || ((pat[2] == 2) && (selectedFlag != 0))) {
+			if (pat[0] == 0) {
+				continue;
+			}
+			const int len1 = pat[2];
+			if ((len1 == 2) && (selectedFlag != 0)) {
 				continue;
 			}
 			ok = 0;
 			k = 0;
-			for (const s16* q = &pat[3 + ok]; k < pat[2] - 1; k++, q++) {
-				const int slot = selected - (pat[2] - 1 - k);
+			for (const s16* q = &pat[3 + ok]; k < len1 - 1; k++, q++) {
+				const int slot = selected - (len1 - 1 - k);
 				if (candidates[slot] != 0) {
 					break;
 				}
@@ -2040,10 +2044,10 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 					ok++;
 				}
 			}
-			if (ok == pat[2] - 1) {
+			if (ok == len1 - 1) {
 				mp[0] = patIdx;
 				matchCount++;
-				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = selected - (pat[2] - 1);
+				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = selected - (len1 - 1);
 				mp += 2;
 				w += 8;
 			}

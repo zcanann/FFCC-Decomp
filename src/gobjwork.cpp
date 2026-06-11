@@ -400,7 +400,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 							 int itemA, int itemB, int itemC, int itemD)
 {
 	for (int i = 99; i > 0; i--) {
-		m_letters[i] = m_letters[i - 1];
+		m_letters[i].m_split = m_letters[i - 1].m_split;
 	}
 
 	memset(&m_letters[0], 0, sizeof(m_letters[0]));
@@ -1404,9 +1404,9 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		for (int i = 0; i < 4; i++) {
 			const unsigned short cmpType = curLetter->m_compareRules[i].m_rule;
 			const int sourceType = (cmpType >> 11) & 3;
-			const int sourceIdx = cmpType & 0x7FF;
 
 			if (sourceType != 3) {
+				const int sourceIdx = cmpType & 0x7FF;
 				switch (sourceType) {
 				case 0:
 					switch (sourceIdx) {
@@ -1473,11 +1473,12 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 			for (int i = 0; i < 8; i++) {
 				const unsigned short evtRule = curLetter->m_eventRules[i];
 				const int sourceType = (evtRule >> 11) & 3;
-				const int sourceIdx = evtRule & 0x7FF;
 
 				if (sourceType == 3) {
 					continue;
 				}
+
+				const int sourceIdx = evtRule & 0x7FF;
 
 				switch (sourceType) {
 				case 1:
@@ -2532,6 +2533,8 @@ void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
 void CCaravanWork::SortBeforeReturnWorldMap()
 {
 	char* fmtBase = sWorldMapSortFormatBlock;
+	short lhs;
+	short rhs;
 
 	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
 
@@ -2549,7 +2552,7 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 
 	for (int i = 0; i < 0x3F; i++) {
 		for (int j = i + 1; j < 0x40; j++) {
-			short lhs = m_inventoryItems[i];
+			lhs = m_inventoryItems[i];
 
 			if (lhs <= 0) {
 				if (m_inventoryItems[j] <= 0) {
@@ -2573,7 +2576,7 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 					}
 				}
 			} else {
-				short rhs = m_inventoryItems[j];
+				rhs = m_inventoryItems[j];
 				if ((rhs > 0) && (lhs > rhs)) {
 					m_inventoryItems[i] = rhs;
 					m_inventoryItems[j] = lhs;

@@ -173,14 +173,15 @@ void CMenuPcs::CompaDraw()
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
 	int familyCount = 2;
-	const short* evtWord = &caravanWork->m_evtWordArr[19];
-	int i = 2;
+	const short* evtWord = &caravanWork->m_evtWordArr[21];
+	int count = 5;
 	do {
-		if (evtWord[i] > 0) {
+		if (*evtWord > 0) {
 			familyCount++;
 		}
-		i++;
-	} while (i < 7);
+		evtWord++;
+		count--;
+	} while (count != 0);
 	if (familyCount > 4 && static_cast<unsigned int>(System.m_execParam) >= 1) {
 		System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1BF,
 		              familyCount);
@@ -189,20 +190,23 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
+	int rowOffset = 0;
 	for (int i = 0; i < familyCount; i++) {
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
-			static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(i * 0x28),
+			static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(rowOffset),
 			kCompaFoodIconWidth, kCompaFoodIconHeight, kCompaZero, kCompaZero, kCompaOne,
 			kCompaOne, kCompaZero);
+		rowOffset += 0x28;
 	}
 
 	int drawIndex = 0;
 	int shown = 0;
+	rowOffset = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		float iconX = static_cast<float>(compaList->entries[0].x + 0x128);
-		float iconY = static_cast<float>(compaList->entries[0].y + 0x40);
+		float iconY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(rowOffset);
 
 		if (i >= 2) {
 			int scan = drawIndex;
@@ -241,10 +245,11 @@ void CMenuPcs::CompaDraw()
 		DrawSingleIcon(
 			icon,
 			static_cast<int>(iconX),
-			static_cast<int>(iconY + static_cast<float>(shown * 0x28)),
+			static_cast<int>(iconY),
 			compaList->entries[0].alpha, 1, kCompaOne);
 
 		shown++;
+		rowOffset += 0x28;
 		drawIndex++;
 	}
 
@@ -260,6 +265,7 @@ void CMenuPcs::CompaDraw()
 	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	drawIndex = 0;
 	shown = 0;
+	rowOffset = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		if (i >= 2) {
 			int scan = drawIndex;
@@ -277,7 +283,7 @@ void CMenuPcs::CompaDraw()
 		}
 
 		const char* name = GetMenuStr(drawIndex + 0x16);
-		float y = static_cast<float>(compaList->entries[0].y + 0x45) + static_cast<float>(shown * 0x28);
+		float y = static_cast<float>(compaList->entries[0].y + 0x45) + static_cast<float>(rowOffset);
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
 		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(name);
@@ -289,6 +295,7 @@ void CMenuPcs::CompaDraw()
 		font->Draw(value);
 
 		shown++;
+		rowOffset += 0x28;
 		drawIndex++;
 	}
 
@@ -598,7 +605,7 @@ void CMenuPcs::CompaInit()
 	memset(this->m_compaList, 0, sizeof(*this->m_compaList));
 
 	CompaOpenAnim* entry = this->m_compaList->entries;
-	float one = LoadFloatRef(kCompaOne);
+	float one = LoadFloat(kCompaOne);
 	for (int count = 64; count != 0; count--) {
 		entry->uvScale = one;
 		entry++;

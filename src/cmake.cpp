@@ -2701,15 +2701,11 @@ int CMenuPcs::CmakeNameCtrl()
                     }
 
                     int nameLen = strlen(s_CmakeInfo.m_name);
-                    const char* scan = s_CmakeInfo.m_name;
                     int spaceCount = 0;
-                    int remain = nameLen;
-                    for (; 0 < remain; remain = remain - 1) {
-                        if (*scan != ' ') {
+                    for (; spaceCount < nameLen; spaceCount++) {
+                        if (s_CmakeInfo.m_name[spaceCount] != ' ') {
                             break;
                         }
-                        scan = scan + 1;
-                        spaceCount = spaceCount + 1;
                     }
                     if (spaceCount == nameLen) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);

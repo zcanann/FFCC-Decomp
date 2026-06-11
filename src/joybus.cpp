@@ -3151,11 +3151,15 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             {
                 unsigned char op = (unsigned char)(*(unsigned char*)&m_cmdQueueData[threadParam->m_portIndex][i] & kJoyBusCmdOpMask);
 
-                if (op == 0x0A || op == 0x10 || op == 0x14 ||
-                    op == 0x1B || op == 0x13 || op == 0x09)
-                {
-                    m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = m_cmdQueueData[threadParam->m_portIndex][i];
-                }
+                if (op == 0x0A) goto keep_a;
+                if (op == 0x10) goto keep_a;
+                if (op == 0x14) goto keep_a;
+                if (op == 0x1B) goto keep_a;
+                if (op == 0x13) goto keep_a;
+                if (op != 0x09) goto skip_a;
+            keep_a:
+                m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = m_cmdQueueData[threadParam->m_portIndex][i];
+            skip_a:;
             }
 
             for (i = 0; i < 0x20; ++i)
@@ -3195,11 +3199,15 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             {
                 unsigned char op = (unsigned char)(*(unsigned char*)&m_cmdQueueData[threadParam->m_portIndex][i] & kJoyBusCmdOpMask);
 
-                if (op == 0x0A || op == 0x10 || op == 0x14 ||
-                    op == 0x1B || op == 0x13 || op == 0x09)
-                {
-                    m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = m_cmdQueueData[threadParam->m_portIndex][i];
-                }
+                if (op == 0x0A) goto keep_b;
+                if (op == 0x10) goto keep_b;
+                if (op == 0x14) goto keep_b;
+                if (op == 0x1B) goto keep_b;
+                if (op == 0x13) goto keep_b;
+                if (op != 0x09) goto skip_b;
+            keep_b:
+                m_recvQueueEntriesArr[threadParam->m_portIndex][newCount++] = m_cmdQueueData[threadParam->m_portIndex][i];
+            skip_b:;
             }
 
             for (i = 0; i < 0x20; ++i)

@@ -669,26 +669,16 @@ void CMenuPcs::ArtiInit()
 {
 	int index;
 	int yOffset;
-	int count;
 	ArtiOpenAnim* entry;
-	ArtiOpenAnimList* list;
 
 	memset(GetArtiOpenAnimList(this), 0, sizeof(*GetArtiOpenAnimList(this)));
-	float one = kArtiOne;
-	entry = GetArtiOpenAnimList(this)->entries;
-	int initCount = 8;
-	do {
-		entry[0].scale = one;
-		entry[1].scale = one;
-		entry[2].scale = one;
-		entry[3].scale = one;
-		entry[4].scale = one;
-		entry[5].scale = one;
-		entry[6].scale = one;
-		entry[7].scale = one;
-		entry += 8;
-		initCount--;
-	} while (initCount != 0);
+	{
+		float one = kArtiOne;
+		ArtiOpenAnim* p = GetArtiOpenAnimList(this)->entries;
+		for (int i = 0; i < 64; i++, p++) {
+			p->scale = one;
+		}
+	}
 
 	index = 0;
 	entry = GetArtiOpenAnim(this, index++);
@@ -699,11 +689,11 @@ void CMenuPcs::ArtiInit()
 	entry->h = 0x108;
 	float titleAlpha = kArtiInitX;
 	float titleScale = kArtiInitYOffset;
+	float one = kArtiOne;
 	float zero = kArtiZero;
 	entry->u = titleAlpha;
 	entry->v = titleScale;
 	entry->scale = one;
-	count = 4;
 	entry->startFrame = 5;
 	entry->duration = 5;
 
@@ -732,7 +722,7 @@ void CMenuPcs::ArtiInit()
 	entry->startFrame = 0;
 	entry->duration = 5;
 
-	entry = GetArtiOpenAnim(this, index);
+	entry = GetArtiOpenAnim(this, index++);
 	entry->flags = 2;
 	entry->tex = 0x2e;
 	entry->x = 0x50;
@@ -746,12 +736,10 @@ void CMenuPcs::ArtiInit()
 
 	ArtiOpenAnim* entry0 = GetArtiOpenAnimList(this)->entries;
 	yOffset = 0;
-	int byteOffset = 0x100;
 	for (int loopCount = 0; loopCount < 4; loopCount++) {
-		entry = (ArtiOpenAnim*)((char*)GetArtiOpenAnimList(this)->entries + byteOffset);
+		entry = GetArtiOpenAnim(this, index++);
 		entry->flags = 2;
 		entry->tex = 0x37;
-		count = count + 2;
 		entry->x = entry0->x + 0x24;
 		entry->y = entry0->y + yOffset;
 		entry->w = 200;
@@ -762,8 +750,7 @@ void CMenuPcs::ArtiInit()
 		entry->duration = 5;
 		yOffset = yOffset + 0x20;
 
-		byteOffset = byteOffset + 0x40;
-		entry = (ArtiOpenAnim*)((char*)GetArtiOpenAnimList(this)->entries + byteOffset);
+		entry = GetArtiOpenAnim(this, index++);
 		entry->flags = 2;
 		entry->tex = 0x37;
 		entry->x = entry0->x + 0x24;
@@ -775,10 +762,9 @@ void CMenuPcs::ArtiInit()
 		entry->startFrame = 7;
 		entry->duration = 5;
 		yOffset = yOffset + 0x20;
-		byteOffset = byteOffset + 0x40;
 	}
 
-	GetArtiOpenAnimList(this)->count = count;
+	GetArtiOpenAnimList(this)->count = index;
 	GetArtiState(this)->selections[0] = 0;
 	GetArtiState(this)->initialized = 1;
 }

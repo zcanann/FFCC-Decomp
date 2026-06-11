@@ -2042,8 +2042,8 @@ void CGObject::copy()
     }
 
     if (m_weaponNodeFlagBits.m_unk20 == 0) {
-        hasModel = false;
         m_charaModelHandle->m_flags &= 0xFFFFFFFE;
+        hasModel = false;
 
         if ((m_weaponModelHandle != (CCharaPcs::CHandle*)0) && (m_weaponModelHandle->m_model != (CChara::CModel*)0)) {
             hasModel = true;

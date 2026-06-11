@@ -1440,7 +1440,7 @@ int CChara::CModel::PickFur(
 				command = cursor[0];
 				const short count = *reinterpret_cast<const unsigned short*>(cursor + 1);
 				cursor += 3;
-				const unsigned char primitive = command & 0xF8;
+				const int primitive = command & 0xF8;
 				remaining -= static_cast<int>(count) * 8 + 3;
 				if (primitive != 0x90 && primitive != 0x98) {
 					break;

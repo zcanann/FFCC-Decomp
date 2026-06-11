@@ -1165,110 +1165,22 @@ void CMapObj::SetShow(int show)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma inline_depth(8)
 void CMapObj::SetLink()
 {
-    CMapObj* head0 = 0;
-    CMapObj* head1;
-    CMapObj* head2;
-    CMapObj* head3;
-    CMapObj* head4;
-    CMapObj* head5;
-    CMapObj* head6;
-    CMapObj* head7;
-    CMapObj* head8;
-    CMapObj* search0 = MapObjArrayStart();
+    CMapObj* head = 0;
+    CMapObj* cursor = MapMng.m_mapObjArray;
 
-    while ((search0 = MapMng.SearchChildMapObj(search0, this)) != 0) {
-        CMapObj* child0 = search0;
+    while ((cursor = MapMng.SearchChildMapObj(cursor, this)) != 0) {
+        CMapObj* child = cursor;
 
-        child0->m_next = head0;
-        head0 = child0;
-        CMapObj* search1 = MapObjArrayStart();
-        head1 = 0;
-        while ((search1 = MapMng.SearchChildMapObj(search1, child0)) != 0) {
-            CMapObj* child1 = search1;
-            head2 = 0;
-
-            child1->m_next = head1;
-            head1 = child1;
-            CMapObj* cursor2 = MapObjArrayStart();
-            while ((cursor2 = MapMng.SearchChildMapObj(cursor2, child1)) != 0) {
-                CMapObj* child2 = cursor2;
-                child2->m_next = head2;
-                head2 = child2;
-                CMapObj* cursor3 = MapObjArrayStart();
-                head3 = 0;
-                while ((cursor3 = MapMng.SearchChildMapObj(cursor3, child2)) != 0) {
-                    CMapObj* child3 = cursor3;
-                    child3->m_next = head3;
-                    head3 = child3;
-                    CMapObj* cursor4 = MapObjArrayStart();
-                    head4 = 0;
-                    while ((cursor4 = MapMng.SearchChildMapObj(cursor4, child3)) != 0) {
-                        CMapObj* child4 = cursor4;
-                        child4->m_next = head4;
-                        head4 = child4;
-                        CMapObj* cursor5 = MapObjArrayStart();
-                        head5 = 0;
-                        while ((cursor5 = MapMng.SearchChildMapObj(cursor5, child4)) != 0) {
-                            CMapObj* child5 = cursor5;
-                            child5->m_next = head5;
-                            head5 = child5;
-                            CMapObj* cursor6 = MapObjArrayStart();
-                            head6 = 0;
-                            while ((cursor6 = MapMng.SearchChildMapObj(cursor6, child5)) != 0) {
-                                CMapObj* child6 = cursor6;
-                                child6->m_next = head6;
-                                head6 = child6;
-                                CMapObj* cursor7 = MapObjArrayStart();
-                                head7 = 0;
-                                while ((cursor7 = MapMng.SearchChildMapObj(cursor7, child6)) != 0) {
-                                    CMapObj* child7 = cursor7;
-                                    child7->m_next = head7;
-                                    head7 = child7;
-                                    CMapObj* cursor8 = MapObjArrayStart();
-                                    head8 = 0;
-                                    while ((cursor8 = MapMng.SearchChildMapObj(cursor8, child7)) != 0) {
-                                        CMapObj* child8 = cursor8;
-                                        child8->m_next = head8;
-                                        head8 = child8;
-                                        child8->SetLink();
-                                        cursor8 = NextSlot(cursor8);
-                                    }
-
-                                    child7->m_child = head8;
-                                    cursor7 = NextSlot(cursor7);
-                                }
-
-                                child6->m_child = head7;
-                                cursor6 = NextSlot(cursor6);
-                            }
-
-                            child5->m_child = head6;
-                            cursor5 = NextSlot(cursor5);
-                        }
-
-                        child4->m_child = head5;
-                        cursor4 = NextSlot(cursor4);
-                    }
-
-                    child3->m_child = head4;
-                    cursor3 = NextSlot(cursor3);
-                }
-
-                child2->m_child = head3;
-                cursor2 = NextSlot(cursor2);
-            }
-
-            child1->m_child = head2;
-            search1 = NextSlot(search1);
-        }
-
-        child0->m_child = head1;
-        search0 = NextSlot(search0);
+        child->m_next = head;
+        head = child;
+        child->SetLink();
+        cursor = cursor + 1;
     }
 
-    m_child = head0;
+    m_child = head;
 }
 
 static inline void calcRunningColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)

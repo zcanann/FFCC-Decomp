@@ -3425,18 +3425,20 @@ void CMenuPcs::CalcResultOpenAnim()
 		// zeroed model sprites; startFrame fixed up later
 		base += activePartyCount;
 		int zeroBase = base;
-		for (int i = 0; i < activePartyCount; i++) {
-			int off = ((base + i) << 6) + 8;
-			BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
-			spr->kind = -2;
-			spr->x = 0;
-			spr->y = 0;
-			spr->w = 0;
-			spr->h = 0;
-			spr->mulX = kBonusZClearOrigin;
-			spr->mulY = kBonusZClearOrigin;
-			spr->duration = 8;
-			spr->depth = FLOAT_80331EB0;
+		if (0 < activePartyCount) {
+			for (int i = 0; i < activePartyCount; i++) {
+				int off = ((base + i) << 6) + 8;
+				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
+				spr->kind = -2;
+				spr->x = 0;
+				spr->y = 0;
+				spr->w = 0;
+				spr->h = 0;
+				spr->mulX = kBonusZClearOrigin;
+				spr->mulY = kBonusZClearOrigin;
+				spr->duration = 8;
+				spr->depth = FLOAT_80331EB0;
+			}
 		}
 
 		// staggered model sprites
@@ -3486,7 +3488,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		base += activePartyCount;
 
 		// frame rows start after their icons
-		{
+		if (0 < activePartyCount) {
 			int fwd = activePartyCount << 6;
 			for (int i = 0; i < activePartyCount; i++) {
 				int off = ((i + 1) << 6) + 8;
@@ -3497,7 +3499,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// zeroed model sprites follow the frame rows
-		{
+		if (0 < activePartyCount) {
 			int delta = (zeroBase - 1) << 6;
 			for (int i = 0; i < activePartyCount; i++) {
 				int off = ((zeroBase + i) << 6) + 8;
@@ -3633,7 +3635,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		{
+		if (0 < activePartyCount) {
 			int i = 0;
 			int total2 = activePartyCount * 2;
 			for (; i < activePartyCount; i++) {

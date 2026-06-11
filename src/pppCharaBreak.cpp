@@ -31,7 +31,7 @@ extern const float kPppCharaBreakTriangleCenterScale = 0.3333333f;
 extern const float kPppCharaBreakDegToRad = 0.017453292f;
 extern const float kPppCharaBreakHalfTurnDegrees = 180.0f;
 extern const float kPppCharaBreakWobbleRange = 0.8f;
-extern const float kPppCharaBreakRandomSignTable[2] = {-1.0f, 0.0f};
+extern const float kPppCharaBreakRandomSign = -1.0f;
 
 static inline Mtx& CameraMatrix()
 {
@@ -689,9 +689,9 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             normal.x = Math.RandF(kPppCharaBreakOne);
             normal.y = Math.RandF(kPppCharaBreakOne);
             normal.z = Math.RandF(kPppCharaBreakOne);
-            normal.x *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSignTable[0];
-            normal.y *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSignTable[0];
-            normal.z *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSignTable[0];
+            normal.x *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
+            normal.y *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
+            normal.z *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
             PSVECNormalize(&normal, &normal);
             gUtil.ConvF2IVector(polygon->m_normalA, normal, ModelData(modelPtr)->m_normQuant);
         } else {

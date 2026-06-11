@@ -3070,9 +3070,9 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
         CHUNK_VKEY = 0x564B4559,
     };
 
-    CMaterial* material;
+    CMaterial* material = 0;
     CChunkFile::CChunk chunk;
-    unsigned long materialIndex = 0;
+    unsigned long materialIndex;
 
     chunkFile.PushChunk();
     while (chunkFile.GetNextChunk(chunk) != 0) {

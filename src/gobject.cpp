@@ -734,8 +734,8 @@ void CGObject::move()
                 Mtx cameraWorldMtx;
                 PSMTXCopy(CameraPcs.m_cameraWorldMtx, cameraWorldMtx);
                 moveVec.x = -moveVec.x;
-                moveVec.z = -moveVec.z;
                 moveVec.y = sZeroFloat;
+                moveVec.z = -moveVec.z;
                 PSMTXMultVec(cameraWorldMtx, &moveVec, &moveVec);
             }
         }

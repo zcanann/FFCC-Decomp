@@ -1386,8 +1386,9 @@ void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt& src)
 #pragma opt_propagation off
 void CMenuPcs::InitCharaInfo()
 {
-	float z = FLOAT_803314a4;
-	float zero = FLOAT_803313dc;
+	float z;
+	float zero;
+	int slot;
 	int baseX;
 	int baseSlot;
 	int baseY;
@@ -1395,14 +1396,16 @@ void CMenuPcs::InitCharaInfo()
 	int col;
 	int y;
 
+	zero = FLOAT_803313dc;
+	z = FLOAT_803314a4;
 	row = 0;
 	baseSlot = 0x20;
 	baseY = 0x66;
 	while (row < 2) {
-		int slot =  (baseSlot + 0);
+		slot = (baseSlot + 0);
 		col = 0;
 		baseX = 0x68;
-		for (; col < 2; col++) {
+		for (; col < 4; col++) {
 			int __p15 = slot;
 			int slotOffset = __p15 * 0x50;
 			y = baseY;
@@ -1418,21 +1421,8 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x14) = zero;
 			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x18) = z;
 
-			y = baseY;
-			if (row != 0) {
-				y = baseY + 8;
-			}
-
-			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0x58) = static_cast<short>(baseX - 0x10);
-			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0x5A) = static_cast<short>(y - 0x70);
-			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0x5C) = 0x140;
-			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0x5E) = 0xE0;
-			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x60) = zero;
-			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x64) = zero;
-			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x68) = z;
-
-			slot += 2;
-			baseX = baseX + 0x120;
+			slot += 1;
+			baseX = baseX + 0x90;
 		}
 		row++;
 		baseSlot += 4;
@@ -1443,7 +1433,7 @@ void CMenuPcs::InitCharaInfo()
 	int i = 0;
 	int modelOffset = 0;
 	unsigned int invalidModel = 0xFFFFFFFF;
-	for (; i < 4; i++) {
+	for (; i < 8; i++) {
 		unsigned char* src0 = gameData + 0x13F0;
 		unsigned char* entry0 = m_wm.m_charaModelData + modelOffset;
 		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
@@ -1456,22 +1446,6 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<unsigned int*>(entry0 + 8) = modelNo + add0;
 		} else {
 			*reinterpret_cast<unsigned int*>(entry0 + 8) = invalidModel;
-		}
-
-		gameData += 0xC30;
-		modelOffset += 0x34;
-		unsigned char* src1 = gameData + 0x13F0;
-		unsigned char* entry1 = m_wm.m_charaModelData + modelOffset;
-		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
-			int modelNo = *reinterpret_cast<unsigned short*>(src1 + 0x3E0) * 200 + 100;
-			int flag1 = *reinterpret_cast<unsigned short*>(src1 + 0x3E2);
-			unsigned short add1  = *reinterpret_cast<unsigned short*>(src1 + 0x3E4);
-			if (flag1 != 0) {
-				modelNo += 100;
-			}
-			*reinterpret_cast<unsigned int*>(entry1 + 8) = modelNo + add1;
-		} else {
-			*reinterpret_cast<unsigned int*>(entry1 + 8) = invalidModel;
 		}
 
 		gameData += 0xC30;

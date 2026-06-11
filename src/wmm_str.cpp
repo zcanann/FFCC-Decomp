@@ -18,6 +18,7 @@ extern const char sWmmRanuraB[];
 
 extern const float kWmmWindowTextScale;
 extern const double kWmmCenteringHalf;
+extern const double kWmmUnsignedToDoubleBias;
 
 extern const char* s_McStr_en[];
 extern const char* s_McStr_de[];
@@ -275,6 +276,8 @@ const char* CMenuPcs::GetMcStr(int index)
         return s_McStr_en[index];
     }
 }
+
+extern const double kWmmUnsignedToDoubleBias = 4503601774854144.0;
 
 #include "src/wmm_str_data.inc"
 

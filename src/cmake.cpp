@@ -3743,6 +3743,9 @@ resetFrame:
  */
 void CMenuPcs::CalcSingCMake()
 {
+    short down;
+    short repeat;
+    int result;
 
     if (CmakeState(this)->m_initialized == 0) {
         InitFrame0Info();
@@ -3752,8 +3755,6 @@ void CMenuPcs::CalcSingCMake()
         gCmakePreviousStep = -1;
         CmakeMcState(this) = 3;
     }
-
-    int result;
 
     switch (CmakeState(this)->m_step) {
     case 0:
@@ -3826,8 +3827,8 @@ void CMenuPcs::CalcSingCMake()
             }
             result = done;
         } else if (CmakeState(this)->m_mode == 1) {
-            short down = GetCmakePadDown();
-            short repeat = GetCmakePadRepeat();
+            down = GetCmakePadDown();
+            repeat = GetCmakePadRepeat();
 
             int done;
             if (repeat == 0) {
@@ -3939,8 +3940,8 @@ void CMenuPcs::CalcSingCMake()
             }
             result = done;
         } else if (CmakeState(this)->m_mode == 1) {
-            short down = GetCmakePadDown();
-            short repeat = GetCmakePadRepeat();
+            down = GetCmakePadDown();
+            repeat = GetCmakePadRepeat();
 
             int done;
             if (repeat == 0) {
@@ -3956,12 +3957,13 @@ void CMenuPcs::CalcSingCMake()
                             CmakeState(this)->m_resultDir = 1;
                             *reinterpret_cast<int*>(MenuS32(this, 0x844) + CmakeSlot(this) * 0x14 + 4) = 3;
 
+                            CCaravanWork* caravanWork;
                             int slot = static_cast<int>(CmakeSlot(this));
                             int modelNo = GetModelNo(static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
                                 static_cast<int>(s_CmakeInfo.m_gender));
                             *reinterpret_cast<int*>(MenuS32(this, 0x824) + slot * 0x34 + 8) = modelNo;
 
-                            CCaravanWork* caravanWork = &Game.m_caravanWorkArr[slot];
+                            caravanWork = &Game.m_caravanWorkArr[slot];
                             *reinterpret_cast<unsigned char*>(MenuS32(this, 0x828) + 10) = 1;
                             caravanWork->LoadInit();
                             caravanWork->m_shopState = 1;
@@ -4037,8 +4039,8 @@ void CMenuPcs::CalcSingCMake()
             }
             result = done;
         } else if (CmakeState(this)->m_mode == 1) {
-            short down = GetCmakePadDown();
-            short repeat = GetCmakePadRepeat();
+            down = GetCmakePadDown();
+            repeat = GetCmakePadRepeat();
 
             int done;
             if (repeat == 0) {

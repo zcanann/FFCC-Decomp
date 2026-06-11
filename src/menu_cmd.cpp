@@ -994,11 +994,11 @@ void CMenuPcs::CmdDraw()
 		for (s32 idx = GetCmdListStorage(this)->count; idx < GetCmdListStorage(this)->listEnd; idx++, row++) {
 			const s32 tex = row->tex;
 			if (tex >= 0) {
-				const float rowH = static_cast<float>(row->height);
-				float rowU = row->u;
 				x = static_cast<float>(row->x);
 				y = static_cast<float>(row->y);
 				w = static_cast<float>(row->width);
+				const float rowH = static_cast<float>(row->height);
+				float rowU = row->u;
 				t = row->v;
 
 				if (idx == GetCmdListStorage(this)->count) {

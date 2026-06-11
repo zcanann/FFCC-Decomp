@@ -8483,7 +8483,8 @@ void CMenuPcs::CalcCharaSelect()
 		for (int i = anyTrig; i < 4; i++) {
 			anyTrig |= padTrig[i];
 		}
-		if (winState == 1 && (anyTrig & 0x0300) != 0) {
+		int __p3 =  (anyTrig + 0);
+		if (winState == 1 && (__p3 & 0x0300) != 0) {
 			m_menuWindowInfo->state = 2;
 			for (int i = 0; i < 4; i++) {
 				WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
@@ -8610,7 +8611,8 @@ void CMenuPcs::CalcCharaSelect()
 			    static_cast<float>(0x280 - winWidth) * dF8)));
 			m_menuWindowInfo->y = static_cast<short>(static_cast<int>(static_cast<float>(
 			    (f430 - static_cast<float>(winHeight)) * dF8)));
-			m_menuWindowInfo->width = winWidth;
+			int __p4 = winWidth;
+			m_menuWindowInfo->width = __p4;
 			m_menuWindowInfo->height = winHeight;
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;

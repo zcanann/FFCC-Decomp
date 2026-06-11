@@ -4165,21 +4165,19 @@ void CMenuPcs::createBonus()
 		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
 			int leftIndex = order[i];
 			for (int j = i + 1; j < s_Rinfo->m_partyCount; j++) {
-				BonusPartySummary& a = s_Rinfo->m_party[leftIndex];
-				BonusPartySummary& b = s_Rinfo->m_party[order[j]];
-				int aTotal = a.m_totalValue;
-				int aArtifact = a.m_artifactValue;
-				int bTotal = b.m_totalValue;
-				int bArtifact = b.m_artifactValue;
-				int aFood = a.m_foodValue;
-				int bFood = b.m_foodValue;
-				unsigned int coin = rand();
+				int aTotal = s_Rinfo->m_party[leftIndex].m_totalValue;
+				int aFood = s_Rinfo->m_party[leftIndex].m_foodValue;
+				int bTotal = s_Rinfo->m_party[order[j]].m_totalValue;
+				int bFood = s_Rinfo->m_party[order[j]].m_foodValue;
+				int aArtifact = s_Rinfo->m_party[leftIndex].m_artifactValue;
+				int bArtifact = s_Rinfo->m_party[order[j]].m_artifactValue;
+				unsigned int coin = rand() & 1;
 
 				if (aTotal < bTotal ||
 				    (aTotal == bTotal && aArtifact < bArtifact) ||
 				    (aTotal == bTotal && aArtifact == bArtifact && aFood < bFood) ||
-				    (aTotal == bTotal && aArtifact == bArtifact && aFood == bFood && (coin & 1) != 0)) {
-					int temp =  (leftIndex - 0);
+				    (aTotal == bTotal && aArtifact == bArtifact && aFood == bFood && coin != 0)) {
+					int temp = order[i];
 					order[i] = order[j];
 					order[j] = temp;
 					leftIndex = order[i];
@@ -4188,10 +4186,9 @@ void CMenuPcs::createBonus()
 		}
 
 		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-			BonusPartySummary& ranked = s_Rinfo->m_party[order[i]];
-			ranked.m_rank = i;
+			s_Rinfo->m_party[order[i]].m_rank = i;
 			if (i == 0) {
-				s_Rinfo->m_winnerTotalValue = ranked.m_totalValue;
+				s_Rinfo->m_winnerTotalValue = s_Rinfo->m_party[order[i]].m_totalValue;
 			}
 		}
 

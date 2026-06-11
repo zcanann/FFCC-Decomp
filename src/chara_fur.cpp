@@ -1354,6 +1354,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma optimization_level 3
 int CChara::CModel::PickFur(
     Mtx param_2, _GXColor brushColor, int doPaint, int mode, _GXColor* centerBefore, _GXColor* centerAfter, Vec* worldPos)
 {
@@ -1709,6 +1711,7 @@ noHitReturn:
 	return -(hitAny == 0);
 }
 
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x800e25e8

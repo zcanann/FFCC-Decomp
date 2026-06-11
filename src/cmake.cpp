@@ -3581,7 +3581,11 @@ void CMenuPcs::DrawDiaryBase(int page, float alpha)
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     const bool widePage = (page == 0);
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(widePage ? 0x35 : 0x3F));
+    CMenuPcs::TEX baseTex = static_cast<CMenuPcs::TEX>(0x3F);
+    if (widePage) {
+        baseTex = static_cast<CMenuPcs::TEX>(0x35);
+    }
+    MenuPcs.SetTexture(baseTex);
 
     int y0 = widePage ? 24 : 24;
     int frameH = widePage ? 0x180 : 0x150;

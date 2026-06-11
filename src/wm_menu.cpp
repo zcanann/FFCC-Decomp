@@ -5499,6 +5499,14 @@ void CMenuPcs::DrawLoadMenu()
 					         FLOAT_80331410, FLOAT_80331410,
 					         FLOAT_803313dc, FLOAT_803313dc,
 					         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				} else {
+					short ynResult0 = m_wmWorldState->m_mcResult;
+					if (ynResult0 < 0) {
+						if (ynResult0 == -1) m_wmWorldState->m_subState = 5;
+						else if (ynResult0 == -2) m_wmWorldState->m_subState = 8;
+						else if (ynResult0 == -3) m_wmWorldState->m_subState = 6;
+						else m_wmWorldState->m_subState = 7;
+					}
 				}
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {

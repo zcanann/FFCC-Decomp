@@ -228,7 +228,7 @@ int CMenuPcs::MoneyCtrlCur()
 				}
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else if ((press & 0x100) != 0) {
-				if (s_Money < 1) {
+				if ((int)s_Money <= 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
 					if (attachFlag >= 0) {

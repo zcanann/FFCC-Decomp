@@ -877,6 +877,8 @@ void CMenuPcs::CmdDraw()
 {
 	bool hasItemHelp = false;
 	s32 helpId;
+	float rowU;
+	float rowH;
 	float t;
 	float x;
 	float y;
@@ -997,8 +999,8 @@ void CMenuPcs::CmdDraw()
 				x = static_cast<float>(row->x);
 				y = static_cast<float>(row->y);
 				w = static_cast<float>(row->width);
-				const float rowH = static_cast<float>(row->height);
-				float rowU = row->u;
+				rowH = static_cast<float>(row->height);
+				rowU = row->u;
 				t = row->v;
 
 				if (idx == GetCmdListStorage(this)->count) {

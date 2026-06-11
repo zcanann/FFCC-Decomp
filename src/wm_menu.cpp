@@ -6638,6 +6638,7 @@ void CMenuPcs::CalcFukidashi()
 	fontFC->SetShadow(0);
 	fontFC->SetScale(FLOAT_803313e8);
 
+	Mtx scaleMtx;
 	char nameBuffer[64];
 	char tempBuf[64];
 	char secondLine[64];
@@ -6839,7 +6840,7 @@ void CMenuPcs::CalcFukidashi()
 		*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_803315d0;
 
 		// Matrix setup
-		Mtx scaleMtx, rotXMtx, rotYMtx;
+		Mtx rotXMtx, rotYMtx;
 		PSMTXScale(scaleMtx, *reinterpret_cast<float*>(puVar20 + 0xD), *reinterpret_cast<float*>(puVar20 + 0xE), *reinterpret_cast<float*>(puVar20 + 0xF));
 		PSMTXRotRad(rotXMtx, 'x', *reinterpret_cast<float*>(puVar20 + 0xA));
 		PSMTXRotRad(rotYMtx, 'y', *reinterpret_cast<float*>(puVar20 + 0xB));
@@ -6918,18 +6919,18 @@ void CMenuPcs::CalcFukidashi()
 					*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_803315d0;
 				}
 
-				Mtx sMtx, rxMtx, ryMtx;
-				PSMTXScale(sMtx, *reinterpret_cast<float*>(puVar20 + 0xD), *reinterpret_cast<float*>(puVar20 + 0xE), *reinterpret_cast<float*>(puVar20 + 0xF));
+				Mtx rxMtx, ryMtx;
+				PSMTXScale(scaleMtx, *reinterpret_cast<float*>(puVar20 + 0xD), *reinterpret_cast<float*>(puVar20 + 0xE), *reinterpret_cast<float*>(puVar20 + 0xF));
 				PSMTXRotRad(rxMtx, 'x', *reinterpret_cast<float*>(puVar20 + 0xA));
 				PSMTXRotRad(ryMtx, 'y', *reinterpret_cast<float*>(puVar20 + 0xB));
 				PSMTXConcat(rxMtx, ryMtx, rxMtx);
 				rxMtx[0][3] = *reinterpret_cast<float*>(puVar20 + 7);
 				rxMtx[1][3] = *reinterpret_cast<float*>(puVar20 + 8);
 				rxMtx[2][3] = *reinterpret_cast<float*>(puVar20 + 9);
-				PSMTXConcat(rxMtx, sMtx, sMtx);
+				PSMTXConcat(rxMtx, scaleMtx, scaleMtx);
 
 #define mdl (*reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + slot8 * 4) + 0x168))
-				mdl->SetMatrix(sMtx);
+				mdl->SetMatrix(scaleMtx);
 				mdl->CalcMatrix();
 				mdl->CalcSkin();
 #undef mdl

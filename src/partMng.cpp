@@ -1637,11 +1637,27 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     static const int kMapPcsFlagOffset = 0x1BC;
     static const int kCharaVisToggleOffset = 0x1C0;
 
-    CheckSum(packet, code, packetSize);
-
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
-    char* payload = packet + 0x20;
+    char* payload;
+    {
+        int checkSum = 0x12345678;
+        char* cursor = packet + 0x20;
+        unsigned long remaining = packetSize - 0x20;
+
+        while (remaining > 0) {
+            checkSum += *cursor++;
+            remaining--;
+        }
+
+        if (static_cast<unsigned int>(checkSum) == *reinterpret_cast<unsigned int*>(packet)) {
+            payload = packet + 0x20;
+        } else {
+            Graphic.Printf(const_cast<char*>(sPartMngChecksumErrorFmt), code);
+            Graphic.DrawDebugString();
+            payload = packet + 0x20;
+        }
+    }
     float* payloadFloats = reinterpret_cast<float*>(payload);
     int* payloadWords = reinterpret_cast<int*>(payload);
     if (payload == 0) {
@@ -1660,11 +1676,12 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x554);
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
+            unsigned char* walkBase = self;
             for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
-                _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(self + i * 0x158 + 0x2A18);
-                if (mng->m_baseTime != -0x1000) {
-                    _pppAllFreePObject(mng);
+                if (*reinterpret_cast<int*>(walkBase + 0x2A2C) != -0x1000) {
+                    _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(walkBase + 0x2A18));
                 }
+                walkBase += 0x158;
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
@@ -2006,11 +2023,12 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x646);
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
+            unsigned char* walkBase = self;
             for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
-                _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(self + i * 0x158 + 0x2A18);
-                if (mng->m_baseTime != -0x1000) {
-                    _pppAllFreePObject(mng);
+                if (*reinterpret_cast<int*>(walkBase + 0x2A2C) != -0x1000) {
+                    _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(walkBase + 0x2A18));
                 }
+                walkBase += 0x158;
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
@@ -2089,11 +2107,12 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
+            unsigned char* walkBase = self;
             for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
-                _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(self + i * 0x158 + 0x2A18);
-                if (mng->m_baseTime != -0x1000) {
-                    _pppAllFreePObject(mng);
+                if (*reinterpret_cast<int*>(walkBase + 0x2A2C) != -0x1000) {
+                    _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(walkBase + 0x2A18));
                 }
+                walkBase += 0x158;
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;

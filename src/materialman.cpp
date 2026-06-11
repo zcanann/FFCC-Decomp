@@ -3088,6 +3088,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
     CMaterial* material = 0;
     CChunkFile::CChunk chunk;
     unsigned long materialIndex;
+    short bumpIndex;
+    unsigned char bumpLightDirect;
 
     chunkFile.PushChunk();
     while (chunkFile.GetNextChunk(chunk) != 0) {
@@ -3169,7 +3171,6 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 chunkFile.GetF4();
             } break;
             case CHUNK_BUMP: {
-                unsigned char bumpLightDirect;
                 if (chunk.m_version == 1) {
                     bumpLightDirect = chunkFile.Get1();
                     material->m_unkA5 = chunkFile.Get1();
@@ -3181,7 +3182,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material = m_materials[materialIndex];
                 AddTextureIndex(material, chunkFile);
                 AddTextureIndex(material, chunkFile);
-                short bumpIndex = chunkFile.Get2();
+                bumpIndex = chunkFile.Get2();
                 AddTextureIndex(material, chunkFile);
                 material->m_scaleU = kTextureOne / chunkFile.GetF4();
                 material->m_scaleV = kTextureOne / chunkFile.GetF4();
@@ -3208,7 +3209,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material = m_materials[materialIndex];
                 AddTextureIndex(material, chunkFile);
                 AddTextureIndex(material, chunkFile);
-                short bumpIndex = chunkFile.Get2();
+                bumpIndex = chunkFile.Get2();
                 unsigned char waterMode = chunkFile.Get1();
                 material->m_unkA5 = chunkFile.Get1();
                 material->m_scaleU = kTextureOne / chunkFile.GetF4();
@@ -3231,7 +3232,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material = m_materials[materialIndex];
                 AddTextureIndex(material, chunkFile);
                 AddTextureIndex(material, chunkFile);
-                short bumpIndex = chunkFile.Get2();
+                bumpIndex = chunkFile.Get2();
                 material->m_unkA5 = chunkFile.Get1();
                 if (chunkFile.Get1() != 0) {
                     material->m_tevBit |= 0x20000;

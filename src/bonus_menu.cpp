@@ -3412,8 +3412,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		// model sprites: startFrame chained from icons
 		base += activePartyCount;
 		{
-			int delta = (base - (activePartyCount + 1)) << 6;
 			for (int i = 0; i < activePartyCount; i++) {
+				int delta = (base - (activePartyCount + 1)) << 6;
 				int off = ((base + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				spr->kind = -2;
@@ -3454,8 +3454,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		{
 			int i = 0;
 			int bump = i;
-			int delta = base << 6;
 			for (; i < activePartyCount; i++) {
+				int delta = base << 6;
 				int off = ((base + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				spr->kind = -2;
@@ -3479,8 +3479,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		// icon echo sprites (copies shifted down)
 		base += activePartyCount;
 		{
-			int delta = (base - (activePartyCount + 1)) << 6;
 			for (int i = 0; i < activePartyCount; i++) {
+				int delta = (base - (activePartyCount + 1)) << 6;
 				int off = ((base + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				BonusAnimSprite* src = (BonusAnimSprite*)((int)spr - delta);
@@ -3536,8 +3536,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		s_CntTop = (unsigned char)countTop;
 
 		{
-			int delta = (base + 0) << 6;
 			for (int i = 0; i < activePartyCount; i++) {
+				int delta = (base + 0) << 6;
 				int off = ((countTop + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				spr->kind = 0x19;
@@ -3557,8 +3557,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		// name sprites
 		base = countTop + activePartyCount;
 		{
-			int delta = (base - (activePartyCount + 1)) << 6;
 			for (int i = 0; i < activePartyCount; i++) {
+				int delta = (base - (activePartyCount + 1)) << 6;
 				int off = ((base + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				spr->kind = -1;
@@ -3578,8 +3578,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		// value text sprites
 		base += activePartyCount;
 		{
-			int delta = (base - 1) << 6;
 			for (int i = 0; i < activePartyCount; i++) {
+				int delta = (base - 1) << 6;
 				int off = ((base + i) << 6) + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + off);
 				spr->kind = -1;

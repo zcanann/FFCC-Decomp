@@ -93,6 +93,60 @@ CProcessTable CLightPcs::m_table = {
 _GXColor s_ambientAlphaColor;
 static const char s_p_light_cpp[] = "p_light.cpp";
 
+static inline float LightSqrtF(float x)
+{
+    union {
+        float f;
+        unsigned long bits;
+    } bits;
+    int fpclass;
+
+    float result;
+
+    if (x > kLightZero) {
+        double guess = __frsqrte((double)x);
+        guess = kLightHalfD * guess * (kLightThreeD - guess * guess * x);
+        guess = kLightHalfD * guess * (kLightThreeD - guess * guess * x);
+        guess = kLightHalfD * guess * (kLightThreeD - guess * guess * x);
+        result = (float)(x * guess);
+        return result;
+    }
+
+    if ((double)x < kLightZeroD) {
+        result = NAN;
+        return result;
+    }
+
+    bits.f = x;
+    switch (bits.bits & 0x7f800000) {
+    case 0x7f800000:
+        if ((bits.bits & 0x7fffff) != 0) {
+            fpclass = 1;
+        } else {
+            fpclass = 2;
+        }
+        break;
+    case 0:
+        if ((bits.bits & 0x7fffff) != 0) {
+            fpclass = 5;
+        } else {
+            fpclass = 3;
+        }
+        break;
+    default:
+        fpclass = 4;
+        break;
+    }
+
+    if (fpclass == 1) {
+        result = NAN;
+    } else {
+        result = x;
+    }
+
+    return result;
+}
+
 static inline double U32ToDouble(unsigned int value)
 {
     union {
@@ -966,7 +1020,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 float xd1 = x1 / dInv;
                 float dist0 = z0 * z0 + x0 * x0;
                 if (dist0 < dHalf) {
-                    dist0 = sqrtf(dHalf - dist0);
+                    dist0 = LightSqrtF(dHalf - dist0);
                 } else {
                     dist0 = kLightZero;
                 }
@@ -980,7 +1034,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 GXWGFifo.f32 = dist0;
 
                 if (dist1 < dHalf) {
-                    dist1 = sqrtf(dHalf - dist1);
+                    dist1 = LightSqrtF(dHalf - dist1);
                 } else {
                     dist1 = kLightZero;
                 }

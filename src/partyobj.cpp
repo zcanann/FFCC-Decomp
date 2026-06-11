@@ -3226,9 +3226,9 @@ void CGPartyObj::onStatMagic()
 		return;
 	}
 
-	bool canTargetMagic = false;
 	bool ghostTargetActive = false;
-	bool menuStageGhost = false;
+	bool canTargetMagic = ghostTargetActive;
+	bool menuStageGhost = ghostTargetActive;
 	const int magicReady = static_cast<int>(static_cast<unsigned int>(__cntlzw(0x103 - m_itemId)) >> 5);
 	if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) {
 		menuStageGhost = true;

@@ -2,10 +2,17 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 
-extern const char sWmmNo[];
-extern const char sWmmNein[];
-extern const char sWmmNon[];
-extern const char sWmmSlotB[];
+extern const char sWmmEmptyEn[] = "Empty.";
+extern const char sWmmEmptyIt[] = "Vuoto.";
+extern const char sWmmEmptyFr[] = "Vide";
+extern const char sWmmEmptyEs[8] = {'V', 'a', 'c', (char)0xED, 'o', '.', 0, 0};
+extern const char sWmmBlankText[4] = {0, 0, 0, 0};
+extern const char sWmmWerdenText[] = "werden.";
+extern const char sWmmAuswahlText[] = "Auswahl";
+extern const char sWmmNo[] = "No";
+extern const char sWmmNein[] = "Nein";
+extern const char sWmmNon[] = "Non";
+extern const char sWmmSlotB[] = "Slot B";
 extern const char sWmmSteckplatzB[];
 extern const char sWmmRanuraB[];
 
@@ -38,6 +45,16 @@ struct WinMessEntry
 {
     unsigned int words[5];
 };
+
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
+static inline double LoadDouble(const double& value)
+{
+    return value;
+}
 
 extern WinMessEntry s_WinMessTable[];
 extern char* s_NoTextByLanguage[];
@@ -78,16 +95,16 @@ int CMenuPcs::GetSlotABXPos(int right)
     }
 
     font = m_fonts[0];
-    font->SetMargin(kWmmWindowTextScale);
+    font->SetMargin(LoadFloat(kWmmWindowTextScale));
     font->SetShadow(0);
-    font->SetScale(kWmmWindowTextScale);
+    font->SetScale(LoadFloat(kWmmWindowTextScale));
     font->SetTlut(0x23);
 
     const int slotAWidth = (int)font->GetWidth((char*)(slotAText + 1));
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - slotAWidth);
     double windowLeft = (double)windowInfo->x;
-    int x = (int)(centeredWidth * kWmmCenteringHalf + windowLeft);
+    int x = (int)(centeredWidth * LoadDouble(kWmmCenteringHalf) + windowLeft);
     if (right != 0) {
         const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
         x += slotAWidth - slotBWidth;
@@ -130,15 +147,15 @@ int CMenuPcs::GetYesNoXPos(int right)
     }
 
     font = m_fonts[0];
-    font->SetMargin(kWmmWindowTextScale);
+    font->SetMargin(LoadFloat(kWmmWindowTextScale));
     font->SetShadow(0);
-    font->SetScale(kWmmWindowTextScale);
+    font->SetScale(LoadFloat(kWmmWindowTextScale));
 
     const int yesWidth = (int)font->GetWidth((char*)(yesText + 1));
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - yesWidth);
     double windowLeft = (double)windowInfo->x;
-    int x = (int)(centeredWidth * kWmmCenteringHalf + windowLeft);
+    int x = (int)(centeredWidth * LoadDouble(kWmmCenteringHalf) + windowLeft);
     if (right != 0) {
         const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
         x += yesWidth - noWidth;

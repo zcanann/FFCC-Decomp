@@ -2829,7 +2829,8 @@ void CMenuPcs::DrawResultCountAnim()
 	int modelIndex = 0;
 	int lastKind = 0;
 	int i = 0;
-	int off = i << 6;
+	int off;
+	off = i << 6;
 	for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
 		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 
@@ -2839,7 +2840,8 @@ void CMenuPcs::DrawResultCountAnim()
 				if (modelIndex < activePartyCount) {
 					handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
 				} else if (modelIndex < activePartyCount * 2) {
-					handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
+					int __p11 = modelIndex;
+					handle = GetBonusDisplayHandleSlots(this)[__p11 - activePartyCount];
 				} else {
 					continue;
 				}
@@ -2927,7 +2929,8 @@ void CMenuPcs::DrawResultCountAnim()
 
 	int textIndex = 0;
 	char text[128];
-	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++) {
+	int __p13 = i;
+	for (int i = 0; __p13 < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++) {
 		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (i << 6) + 8);
 		if (sprite->kind == -1) {
 			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
@@ -2936,12 +2939,14 @@ void CMenuPcs::DrawResultCountAnim()
 			int partyIndex = textIndex % activePartyCount;
 			int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;
 			if (textIndex < activePartyCount) {
-				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
+				int __p12 = partySlot;
+				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[__p12]);
 				strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 			} else {
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
 				int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
-				strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[strIdx]);
+				int __p2 = strIdx;
+				strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[__p2]);
 			}
 
 			float x = (float)sprite->x + sprite->motionX;

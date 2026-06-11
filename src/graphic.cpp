@@ -183,7 +183,7 @@ void CGraphic::Init()
 
     GXRenderModeObj* renderMode = m_renderMode;
     u32 alignedWidth = (renderMode->fbWidth + 0xF) & 0xFFF0;
-    s16 efbHeight = renderMode->efbHeight;
+    u16 efbHeight = renderMode->efbHeight;
     u16 xfbHeight = renderMode->xfbHeight;
     u32 efbBufferSize = alignedWidth * efbHeight * 2;
     u32 xfbBufferSize = alignedWidth * xfbHeight * 2;
@@ -194,8 +194,7 @@ void CGraphic::Init()
     m_savedFrameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, 0x88) u8[efbBufferSize];
     memset(m_savedFrameBuffer, 0, 4);
 
-    renderMode = m_renderMode;
-    u32 scratchBufferSize = (((renderMode->fbWidth + 0xF) & 0xFFF0) * renderMode->efbHeight * 2) + 0x46000;
+    u32 scratchBufferSize = (((m_renderMode->fbWidth + 0xF) & 0xFFF0) * m_renderMode->efbHeight * 2) + 0x46000;
     m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, graphicInitData + kGraphicInitSource, 0xB53, 0);
     memset(m_scratchTextureBuffer, 0, 0x46004);
 
@@ -212,10 +211,10 @@ void CGraphic::Init()
     GXSetDispCopyDst(m_renderMode->fbWidth, m_renderMode->efbHeight);
     GXSetCopyFilter(m_renderMode->aa, m_renderMode->sample_pattern, GX_TRUE, GXNtsc480IntDf.vfilter);
 
-    if (m_renderMode->aa == 0) {
-        GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
-    } else {
+    if (m_renderMode->aa != 0) {
         GXSetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
+    } else {
+        GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
     }
 
     GXSetDispCopySrc(0, 0, m_renderMode->fbWidth, m_renderMode->efbHeight);
@@ -225,7 +224,7 @@ void CGraphic::Init()
     VISetNextFrameBuffer(m_frameBuffer);
     VIFlush();
     VIWaitForRetrace();
-    if ((*reinterpret_cast<u32*>(renderMode) & 1) != 0) {
+    if ((*reinterpret_cast<u32*>(m_renderMode) & 1) != 0) {
         VIWaitForRetrace();
     }
 

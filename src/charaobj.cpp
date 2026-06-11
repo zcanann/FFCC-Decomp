@@ -3467,7 +3467,8 @@ int CGCharaObj::calcCastTime(int itemId)
 		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD8)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
-		result = cast & ~(cast >> 31);
+		cast &= ~(cast >> 31);
+		result = cast;
 		System.Printf(fmt + 0x74, baseCast, castBonus, castScale);
 	} else if (itemType == 3) {
 		result = static_cast<int>(baseCast);
@@ -3481,7 +3482,8 @@ int CGCharaObj::calcCastTime(int itemId)
 		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD9)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
-		result = cast & ~(cast >> 31);
+		cast &= ~(cast >> 31);
+		result = cast;
 		System.Printf(fmt + 0xC4, baseCast, castBonus, castScale);
 	} else {
 		result = static_cast<int>(baseCast);

@@ -814,8 +814,9 @@ void InsertLight_r(COctNode* node)
 	}
 
 	COctNode* nodeIter = node;
+	COctNode* child;
 	for (int i = 0; i < 8; i++) {
-		COctNode* child = nodeIter->m_children[0];
+		child = nodeIter->m_children[0];
 		if (child == 0) {
 			return;
 		}

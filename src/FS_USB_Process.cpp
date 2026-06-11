@@ -193,11 +193,9 @@ void CFunnyShapePcs::SetUSBData()
         *reinterpret_cast<s16*>(AnmData(this) + 16) = LoadSwap16(*reinterpret_cast<s16*>(AnmData(this) + 16));
         *reinterpret_cast<s16*>(AnmData(this) + 18) = LoadSwap16(*reinterpret_cast<s16*>(AnmData(this) + 18));
 
-        int groupOffset;
         int i = 0;
-        groupOffset = 0;
         for (; i < *reinterpret_cast<s16*>(AnmData(this) + 6); i++) {
-            u8* group = AnmData(this) + groupOffset;
+            u8* group = AnmData(this) + i * 8;
             if (i != 0) {
                 *reinterpret_cast<s16*>(group + 0x10) = LoadSwap16(*reinterpret_cast<s16*>(group + 0x10));
                 *reinterpret_cast<s16*>(group + 0x12) = LoadSwap16(*reinterpret_cast<s16*>(group + 0x12));
@@ -258,7 +256,6 @@ void CFunnyShapePcs::SetUSBData()
                 }
 
             }
-            groupOffset += 8;
         }
         DCStoreRange(m_funnyShape.m_anm.anmData, usb->m_sizeBytes);
         FunnyShape(this)->InitAnmWork();

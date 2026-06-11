@@ -3646,9 +3646,10 @@ void CMenuPcs::CalcResultOpenAnim()
 		if (0 < activePartyCount) {
 			int i = 0;
 			int total2 = activePartyCount * 2;
+			int boardBase = total2 * 0x50;
 			for (; i < activePartyCount; i++) {
 				BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i + 1];
-				int boardOff = (total2 + i) * 0x50;
+				int boardOff = boardBase + i * 0x50;
 				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x8) = (short)(int)kBonusZClearOrigin;
 				int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)sprite->y) - DOUBLE_80331EF0);
 				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0xa) = (short)centerY;

@@ -223,7 +223,7 @@ void CMenuPcs::ArtiDraw()
 	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	short artiState = m_artiState->state;
 	ArtiOpenAnim* entry = GetArtiOpenAnimList(this)->entries;
-	unsigned int drawIndex = 0;
+	int drawIndex = 0;
 	float w;
 
 	for (int i = 0; i < GetArtiOpenAnimList(this)->count; i++) {
@@ -259,40 +259,48 @@ void CMenuPcs::ArtiDraw()
 				colors[3].a = 0xFF;
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
-				float fillW = entry->alpha * w;
-				if (fillW > 0.0f) {
-					MenuPcs.DrawRect(0, x, y, fillW, h, u, v, colors, kArtiOne, kArtiOne, 0.0f);
-					x += fillW;
-					u += fillW;
+				w = entry->alpha * w;
+				if (w > 0.0f) {
+					MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, kArtiOne, kArtiOne, 0.0f);
+					x += w;
+					u += w;
 				}
 
-				if (fillW > LoadFloat(kArtiZero) && fillW < (float)entry->w) {
-					colors[0].a = 0;
+				int wInt = entry->w;
+				if (w > LoadFloat(kArtiZero) && w < (float)wInt) {
+					colors[1].r = 0xFF;
+					colors[1].g = 0xFF;
+					colors[1].b = 0xFF;
 					colors[1].a = 0;
-					colors[2].a = 0;
+					colors[3].r = 0xFF;
+					colors[3].g = 0xFF;
+					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					float remainW = (float)(kArtiOneDouble / (double)entry->duration) * (float)entry->w;
-					MenuPcs.DrawRect(0, x, y, remainW, h, u, v, colors, kArtiOne, kArtiOne, 0.0f);
+					w = (float)(kArtiOneDouble / (double)entry->duration);
+					w = w * wInt;
+					MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, kArtiOne, kArtiOne, 0.0f);
 				}
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			} else {
-				float itemAlpha = entry->alpha;
+				float animAlpha = entry->alpha;
+				int texId = tex;
+				float itemAlpha = animAlpha;
 				if (tex == 0x37) {
 					int itemCount = caravanWork->m_artifacts[drawIndex + m_artiState->scrollOffset];
 					if (itemCount > 0) {
 					} else {
-						tex = 0x34;
-						itemAlpha = (float)(kArtiHalfDouble * (double)itemAlpha);
+						texId = 0x34;
+						itemAlpha = (float)(kArtiHalfDouble * (double)animAlpha);
 					}
 
-					if (tex == 0x37 && drawIndex == m_artiState->selections[0]) {
+					if (texId == 0x37 && drawIndex == m_artiState->selections[0]) {
 						v += h;
 					}
 					drawIndex++;
 				}
 
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(texId));
 				GXColor color;
 				color.r = 0xFF;
 				color.g = 0xFF;
@@ -324,20 +332,19 @@ void CMenuPcs::ArtiDraw()
 	ArtiOpenAnim* textEntry = listStart;
 	for (int i = 0; i < 8; i++) {
 		u8 alpha = (u8)(kArtiColorMax * textEntry->alpha);
-		CColor color(0xFF, 0xFF, 0xFF, alpha);
-		listFont->SetColor(color.color);
-
 		int menuIndex = i + m_artiState->scrollOffset;
+		listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, alpha).color);
+
 		short itemCount = caravanWork->m_artifacts[menuIndex];
 		const char* text;
-		if (itemCount < 1) {
-			text = GetMenuStr(0x14);
-		} else {
+		if (itemCount > 0) {
 			text = Game.m_cFlatDataArr[1].TableStrings(0)[itemCount * 5 + 4];
 			if (menuIndex == (int)m_artiState->selections[0] + (int)m_artiState->scrollOffset) {
-				hasSelectedArtifact = 1;
 				selectedArtifactId = itemCount;
+				hasSelectedArtifact = 1;
 			}
+		} else {
+			text = GetMenuStr(0x14);
 		}
 
 		listFont->GetWidth(text);

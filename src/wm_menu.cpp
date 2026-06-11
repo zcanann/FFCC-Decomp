@@ -12101,9 +12101,10 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 {
 	CFont* const font = m_fonts[0];
 
-	font->SetMargin(FLOAT_803313e8);
+	const float* pOneM = &FLOAT_803313e8;
+	font->SetMargin(*pOneM);
 	font->SetShadow(0);
-	font->SetScale(FLOAT_803313e8);
+	font->SetScale(*pOneM);
 	font->DrawInit();
 
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
@@ -12115,8 +12116,6 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 	float lineHeight;
 	float posX;
-	double rawDiff;
-	double rawX;
 	if (winType != 0) {
 		int maxWidth = 0;
 		const unsigned char* entry = winMess;
@@ -12134,15 +12133,14 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			}
 			entry += 2;
 		}
-		reinterpret_cast<int*>(&rawDiff)[0] = 0x43300000;
-		reinterpret_cast<int*>(&rawDiff)[1] = (m_menuWindowInfo->width - maxWidth) ^ 0x80000000;
-		reinterpret_cast<int*>(&rawX)[0] = 0x43300000;
-		reinterpret_cast<int*>(&rawX)[1] = m_menuWindowInfo->x ^ 0x80000000;
-		posX = static_cast<float>((rawDiff - DOUBLE_80331408) * DOUBLE_803313F8 + (rawX - DOUBLE_80331408));
+		const double* pHalfW = &DOUBLE_803313F8;
+		posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->width - maxWidth) * *pHalfW +
+		                          static_cast<double>(static_cast<int>(m_menuWindowInfo->x)));
 	}
 
 	float y = static_cast<float>(m_menuWindowInfo->y + 0x20);
-	lineHeight = FLOAT_80331404;
+	const float* pLineH = &FLOAT_80331404;
+	lineHeight = *pLineH;
 
 	char textBuf[128];
 	const unsigned char* entry = winMess;
@@ -12158,12 +12156,10 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			}
 
 			if (winType == 0 || isDollar != 0) {
+				const double* pHalfW2 = &DOUBLE_803313F8;
 				const int textWidth = font->GetWidth(textBuf);
-				reinterpret_cast<int*>(&rawDiff)[0] = 0x43300000;
-				reinterpret_cast<int*>(&rawDiff)[1] = (m_menuWindowInfo->width - textWidth) ^ 0x80000000;
-				reinterpret_cast<int*>(&rawX)[0] = 0x43300000;
-				reinterpret_cast<int*>(&rawX)[1] = m_menuWindowInfo->x ^ 0x80000000;
-				posX = static_cast<float>((rawDiff - DOUBLE_80331408) * DOUBLE_803313F8 + (rawX - DOUBLE_80331408));
+				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->width - textWidth) * *pHalfW2 +
+				                          static_cast<double>(static_cast<int>(m_menuWindowInfo->x)));
 			}
 			font->SetPosX(posX);
 			font->SetPosY(y);

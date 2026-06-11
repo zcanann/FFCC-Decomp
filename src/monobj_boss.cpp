@@ -2685,6 +2685,7 @@ void CGMonObj::logicFuncLastBoss()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma global_optimizer off
 void CGMonObj::teleport(
 	int mode, int animId, int startFrame, int blendEndFrame, int seStart, int seEnd, int particleStart, int particleBlend, int particleEnd,
 	Vec* teleportPoints, int& teleportIndex, Vec& startPos
@@ -2810,6 +2811,7 @@ void CGMonObj::teleport(
 		}
 	}
 }
+#pragma global_optimizer on
 
 /*
  * --INFO--

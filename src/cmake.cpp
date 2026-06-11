@@ -2678,12 +2678,11 @@ int CMenuPcs::CmakeNameCtrl()
                         GetWinSize(0x14, &winX, &winY, 0);
                         SetMcWinInfo((int)winX, (int)winY);
                         CmakeMcState(this) = 0;
-                        return 0;
+                    } else {
+                        Sound.PlaySe(2, 0x40, 0x7F, 0);
+                        CmakeState(this)->m_resultDir = 1;
+                        return 1;
                     }
-
-                    Sound.PlaySe(2, 0x40, 0x7F, 0);
-                    CmakeState(this)->m_resultDir = 1;
-                    return 1;
                 } else {
                     short curTable = CmakeState(this)->m_table;
                     short curSelect = CmakeState(this)->m_select;

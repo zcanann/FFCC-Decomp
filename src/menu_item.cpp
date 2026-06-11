@@ -793,7 +793,7 @@ void CMenuPcs::ItemInit1()
     entry->startFrame = 0;
     entry->duration = 5;
     itemList = this->m_itemList;
-    count = (unsigned int)itemList->count;
+    count = itemList->count;
     entry = itemList->anims;
     for (unsigned int i = 0; i < count; i++, entry++) {
         entry->frame = 0;

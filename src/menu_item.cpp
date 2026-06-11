@@ -810,6 +810,9 @@ void CMenuPcs::ItemInit1()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
+#pragma opt_lifetimes off
 void CMenuPcs::ItemInit()
 {
     int index;
@@ -914,3 +917,4 @@ void CMenuPcs::ItemInit()
     this->m_itemMenuState->cursorIndex[0] = 0;
     this->m_itemMenuState->initialized = 1;
 }
+#pragma pop

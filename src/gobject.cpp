@@ -792,11 +792,8 @@ void CGObject::move()
                     const float dirDot = PSVECDotProduct(&moveVec, &centerDelta);
                     if (sZeroFloat < dirDot) {
                         centerDist /= CFlatCenterDistanceScale();
-                        float clampDist = centerDist;
-                        if (!(clampDist < sZeroFloat)) {
-                            if (sAnimFrameOffset < clampDist) {
-                                clampDist = sAnimFrameOffset;
-                            }
+                        if (!(centerDist < sZeroFloat)) {
+                            float clampDist = (sAnimFrameOffset < centerDist) ? sAnimFrameOffset : centerDist;
                             speed *= -((clampDist * clampDist) - sAnimFrameOffset);
                         }
                     }

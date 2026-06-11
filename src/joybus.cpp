@@ -298,7 +298,7 @@ void JoyBus::CreateInit()
         }
     }
 
-    char path[140];
+    char path[128];
     strcpy(path, JoyBusConst::DVD_DIR);
 
     strcat(path, JoyBusConst::OBJ_FILE);

@@ -2556,7 +2556,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		// frameEchoBase block: startFrame = 0
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			int sprite =  (s32)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			*(int*)(sprite + 0x24) = 0;
 		}
 
@@ -2587,7 +2587,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		base += activePartyCount;
 		{
 			int sprite = this->m_bonusAnimPtr + base * 0x40 + 8;
-			*(int*)(sprite + 0x24) = *(int*)(this->m_bonusAnimPtr + 0x6c);
+			int __p6 = sprite;
+			*(int*)(__p6 + 0x24) = *(int*)(this->m_bonusAnimPtr + 0x6c);
 		}
 		base += 1;
 		s_CntTop = (unsigned char)base;
@@ -2617,7 +2618,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		// extraBase + pc block: flags = 0
 		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			int sprite =  (s32)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			int sprite;
+			sprite = (s32)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			*(int*)(sprite + 0x24) = 0;
 		}
 
@@ -2625,7 +2627,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		base += activePartyCount;
 		{
 			delta = activePartyCount * 0x40;
-			for (int i = 0; i < activePartyCount; i++) {
+			for (int i = 0; activePartyCount > i; i++) {
 				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
 				int src = spr - delta;
 				*(int*)(spr + 0x24) = *(int*)(src + 0x24);
@@ -2690,7 +2692,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->motionY = (ty - fy) * progress;
 		}
 
-		if (frame > sprite->startFrame && frame <= sprite->startFrame + sprite->duration) {
+		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
 			sprite->timer++;
 		}
 
@@ -2702,7 +2704,8 @@ void CMenuPcs::CalcResultCloseAnim()
 		int i = 0;
 		int boardOff =  (i - 0);
 		for (; i < activePartyCount; i++) {
-			int sprOff2 = ((base2 + i) << 6) + 8;
+			int __p7 = base2;
+			int sprOff2 = ((__p7 + i) << 6) + 8;
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff2);
 			int o08 = boardOff + 0x8;
 			int o0a = boardOff + 0xa;
@@ -2711,7 +2714,8 @@ void CMenuPcs::CalcResultCloseAnim()
 			int centerX = (int)(float)((double)(float)(DOUBLE_80331EE0 + ((double)sprite->w * DOUBLE_80331E78 + (double)((float)sprite->x + sprite->motionX))) - DOUBLE_80331EE8);
 			int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)((float)sprite->y + sprite->motionY)) - DOUBLE_80331EF0);
 			int __p3 =  (o08 - 0);
-			*(short*)(this->m_bonus.m_bonusBoardPtr + __p3) = (short)centerX;
+			int __p17 = centerX;
+			*(short*)(this->m_bonus.m_bonusBoardPtr + __p3) = (short)__p17;
 			int __p5 = o0a;
 			*(short*)(this->m_bonus.m_bonusBoardPtr + __p5) = (short)centerY;
 			*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = (int)(FLOAT_80331EF8 + ((float)sprite->x + sprite->motionX));

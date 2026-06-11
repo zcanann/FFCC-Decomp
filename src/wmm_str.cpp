@@ -2,16 +2,23 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 
-extern const char sWmmNo[];
-extern const char sWmmNein[];
-extern const char sWmmNon[];
-extern const char sWmmSlotB[];
+extern const char sWmmEmptyEn[] = "Empty.";
+extern const char sWmmEmptyIt[] = "Vuoto.";
+extern const char sWmmEmptyFr[] = "Vide";
+extern const char sWmmEmptyEs[8] = "Vac\xED" "o.";
+extern const char sWmmBlankText[4] = "";
+extern const char sWmmWerdenText[] = "werden.";
+extern const char sWmmAuswahlText[] = "Auswahl";
+extern const char sWmmNo[] = "No";
+extern const char sWmmNein[] = "Nein";
+extern const char sWmmNon[] = "Non";
+extern const char sWmmSlotB[] = "Slot B";
 extern const char sWmmSteckplatzB[];
 extern const char sWmmRanuraB[];
 
-extern const float kWmmWindowTextScale = 1.0f;
-extern const double kWmmCenteringHalf = 0.5;
-extern const double kWmmUnsignedToDoubleBias = 4503601774854144.0;
+extern const float kWmmWindowTextScale;
+extern const double kWmmCenteringHalf;
+extern const double kWmmUnsignedToDoubleBias;
 
 extern const char* s_McStr_en[];
 extern const char* s_McStr_de[];
@@ -267,6 +274,10 @@ const char* CMenuPcs::GetMcStr(int index)
         return s_McStr_en[index];
     }
 }
+
+extern const float kWmmWindowTextScale = 1.0f;
+extern const double kWmmCenteringHalf = 0.5;
+extern const double kWmmUnsignedToDoubleBias = 4503601774854144.0;
 
 #include "src/wmm_str_data.inc"
 

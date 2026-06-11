@@ -33,32 +33,34 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	int digitIndex;
 	int started = 0;
 	int gil;
+	signed char* place;
 
 	if (row != 0) {
 		gil = s_Money;
-		digitIndex = 0;
 	} else {
 		gil = caravanWork->m_gil;
-		digitIndex = 0;
 	}
 
 	digitPlace *= 10000000;
+	digitIndex = 0;
+	place = &s_place[row * 8];
 
 	do {
 		if ((!started) && (gil >= digitPlace)) {
 			started = 1;
 		}
 		if (((!started) && (gil < digitPlace)) && (digitIndex < 7)) {
-			s_place[row * 8 + digitIndex] = -1;
+			*place = -1;
 		} else {
 			int digit = gil / digitPlace;
 			if (9 < digit) {
 				digit = 9;
 			}
-			s_place[row * 8 + digitIndex] = static_cast<signed char>(digit);
+			*place = static_cast<signed char>(digit);
 			gil = gil % digitPlace;
 		}
 		digitIndex++;
+		place++;
 		digitPlace /= 10;
 	} while (digitIndex < 8);
 }

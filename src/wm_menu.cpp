@@ -5551,16 +5551,18 @@ void CMenuPcs::DrawLoadMenu()
 				else dmsgId = 9;
 				DrawMcWinMess(dmsgId, dmsgParam);
 			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short dRes = m_wmWorldState->m_mcResult;
-				if (subState == 0x0D) {
+				if (m_wmWorldState->m_subState == 0x0D) {
+					short dRes = m_wmWorldState->m_mcResult;
 					if (dRes == 1) m_wmWorldState->m_subState = 0x0E;
 					else if (dRes == -2) m_wmWorldState->m_subState = 7;
 					else m_wmWorldState->m_subState = 0x0F;
 				} else if (subState == 0x1A) {
+					short dRes = m_wmWorldState->m_mcResult;
 					if (dRes == 1) m_wmWorldState->m_subState = 0x1C;
 					else if (dRes == -2) m_wmWorldState->m_subState = 7;
 					else m_wmWorldState->m_subState = 0x1B;
 				} else {
+					short dRes = m_wmWorldState->m_mcResult;
 					if (dRes == 1) {
 						m_wmWorldState->m_subState = 0x18;
 						Sound.PlaySe(0x42, 0x40, 0x7F, 0);

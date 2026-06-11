@@ -761,8 +761,9 @@ void CGraphicPcs::drawBar()
 
         order = System.GetFirstOrder();
         x = kDebugBarLeft;
+        int i = 0;
         y = 0x10;
-        for (int i = 0; i < orderCount; i++) {
+        for (; i < orderCount; i++) {
             const int priority = order->m_priority;
             const float width = (kGraphicScreenCenterX * order->m_lastTime) / kDebugBarFrameBudget;
 

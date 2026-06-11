@@ -503,8 +503,7 @@ frame_input_done:
         trigger = 0;
     } else {
         int port = 0;
-        port &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        trigger = Pad.GetPadInputs()[port].lockedButton[1];
+        trigger = Pad.GetPadInputs()[(Pad.m_debugPadPort == 0) ? 0 : port].lockedButton[1];
     }
 
     if ((trigger & 0x200) != 0) {

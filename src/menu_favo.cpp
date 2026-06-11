@@ -14,8 +14,8 @@ static FoodRank s_rank[8];
 
 extern "C" const float kCompaFoodIconUvScale = 0.75f;
 extern "C" const float kCompaFrameU = 72.0f;
-extern "C" const float kFavoWideTextureWidth;
-extern "C" const float kFavoIconUvScale;
+extern "C" const float kFavoWideTextureWidth = 256.0f;
+extern "C" const float kFavoIconUvScale = 0.75f;
 
 STATIC_ASSERT(sizeof(FavoEntry) == 0x40);
 STATIC_ASSERT(sizeof(FavoListStorage) == 0x1008);

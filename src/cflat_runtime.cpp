@@ -566,25 +566,25 @@ inline int CFlatRuntime::getTopBit(unsigned int value)
  */
 int CFlatRuntime::Frame(int mode, int unused)
 {
-	CObject* const root = &m_objectSentinel;
-	CObject* object = root->m_next;
 	int hasParticle = 0;
+	CObject* object = m_objectSentinel.m_next;
 
-	while (object != root) {
+	while (object != &m_objectSentinel) {
+processObject:
 		if ((object->m_flagBits.m_deleteFlag == 0) && (mode != 0)) {
 			object->m_flagBits.m_activeFlag = 0;
 			if (objectFrame(object) != 0) {
 				if (object->m_0x34 != 0) {
 					object->m_sp--;
-					int scriptIndex = getTopBit(object->m_0x34);
+					const int scriptIndex = getTopBit(object->m_0x34);
 
-					do {
-						reqFinished(scriptIndex, object);
+					reqFinished(scriptIndex, object);
 
-						object->m_0x34 = static_cast<s16>(object->m_0x34 & ~(1U << scriptIndex));
+					object->m_0x34 = static_cast<s16>(object->m_0x34 & ~(1U << scriptIndex));
 
-						scriptIndex = getTopBit(object->m_0x34);
-					} while (scriptIndex >= 0);
+					if (getTopBit(object->m_0x34) >= 0) {
+						goto processObject;
+					}
 				}
 
 				object->m_flagBits.m_deleteFlag = 1;

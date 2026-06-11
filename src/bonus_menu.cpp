@@ -3218,13 +3218,13 @@ void CMenuPcs::DrawResultOpenAnim()
 						float x = (float)sprite->x;
 						float y = (float)sprite->y;
 						float fillWidth;
-						if (sprite->duration > sprite->timer) {
+						if (!(sprite->duration > sprite->timer)) {
+							fillWidth = FLOAT_80331EB0;
+						} else {
 							fillWidth = (float)((DOUBLE_80331ED8 / (double)sprite->duration) * (double)(sprite->timer - 1));
 							if (fillWidth < kBonusZClearOrigin) {
 								fillWidth = kBonusZClearOrigin;
 							}
-						} else {
-							fillWidth = FLOAT_80331EB0;
 						}
 						fillWidth *= (float)sprite->w;
 						if (fillWidth > kBonusZClearOrigin) {

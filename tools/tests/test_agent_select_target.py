@@ -405,6 +405,78 @@ class BlacklistLoadingTests(unittest.TestCase):
                 self.assertEqual(agent_select_target.load_blacklist(), ["unitA", "unitB"])
 
 
+class WorkSplitBucketTests(unittest.TestCase):
+    def test_load_work_split_buckets_reads_bucket_tables(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            work_split_path = Path(tmpdir) / "WORK_SPLIT.md"
+            work_split_path.write_text(
+                "\n".join([
+                    "## B3 Characters",
+                    "| unit | % |",
+                    "|---|---:|",
+                    "| `src/chara.cpp` | 84.8 |",
+                    "| `src/partMng.cpp` | 88.7 |",
+                    "",
+                    "## B4 Engine",
+                    "| unit | % |",
+                    "|---|---:|",
+                    "| `src/map.cpp` | 89.9 |",
+                ]),
+                encoding="utf-8",
+            )
+
+            buckets = agent_select_target.load_work_split_buckets(work_split_path)
+
+        self.assertEqual(sorted(buckets), ["B3", "B4"])
+        self.assertEqual(buckets["B3"]["title"], "B3 Characters")
+        self.assertEqual(buckets["B3"]["units"], {"src/chara.cpp", "src/partmng.cpp"})
+
+    def test_bucket_filter_does_not_override_recent_failure_blacklist(self):
+        report = {
+            "units": [
+                {
+                    "name": "main/chara",
+                    "metadata": {"source_path": "src/chara.cpp"},
+                    "measures": {"fuzzy_match_percent": 84.8},
+                    "functions": [],
+                },
+                {
+                    "name": "main/partMng",
+                    "metadata": {"source_path": "src/partMng.cpp"},
+                    "measures": {"fuzzy_match_percent": 88.7},
+                    "functions": [],
+                },
+                {
+                    "name": "main/map",
+                    "metadata": {"source_path": "src/map.cpp"},
+                    "measures": {"fuzzy_match_percent": 89.9},
+                    "functions": [],
+                },
+            ]
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "report.json"
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            work_split_path = Path(tmpdir) / "WORK_SPLIT.md"
+            work_split_path.write_text(
+                "\n".join([
+                    "## B3 Characters",
+                    "| unit | % |",
+                    "|---|---:|",
+                    "| `src/chara.cpp` | 84.8 |",
+                    "| `src/partMng.cpp` | 88.7 |",
+                ]),
+                encoding="utf-8",
+            )
+
+            with patch("tools.agent_select_target.load_blacklist", return_value=["main/chara"]):
+                candidates = agent_select_target.extract_candidates(report_path)
+            buckets = agent_select_target.load_work_split_buckets(work_split_path)
+            filtered = agent_select_target.filter_candidates_by_bucket(candidates, ["B3"], buckets)
+
+        self.assertEqual([candidate["name"] for candidate in filtered], ["main/partMng"])
+
+
 class SymbolSummaryTests(unittest.TestCase):
     def test_summarize_symbols_accepts_integer_size(self):
         info = {

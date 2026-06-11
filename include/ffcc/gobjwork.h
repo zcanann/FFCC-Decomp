@@ -132,6 +132,14 @@ public:
             unsigned int m_word1;
             unsigned int m_word2;
         };
+        struct WordPair {
+            unsigned int m_word1;
+            unsigned int m_word2;
+        };
+        struct SplitWords {
+            unsigned int m_word0;
+            WordPair m_pair;
+        };
         struct FlagBits {
             unsigned char m_opened : 1;
             unsigned char m_attachmentClaimed : 1;
@@ -204,6 +212,7 @@ public:
         union {
             Halfwords m_half;
             Words m_words;
+            SplitWords m_split;
         };
     };
 

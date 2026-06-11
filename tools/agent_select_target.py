@@ -10,6 +10,8 @@ import json
 import sys
 import random
 import math
+import argparse
+import re
 from pathlib import Path, PurePosixPath, PureWindowsPath
 
 try:
@@ -24,6 +26,8 @@ WARNING_BUILD_MISMATCH = (
     "WARNING: ADDRESS AND SIZES ARE FOR A DIFFERENT BUILD AND COULD BE WRONG. ALWAYS CHECK GHIDRA."
 )
 COMPLETE_THRESHOLD_PERCENT = 100
+WORK_SPLIT_BUCKET_RE = re.compile(r"^##\s+(B\d+)\b\s*(.*)$", re.IGNORECASE)
+WORK_SPLIT_UNIT_RE = re.compile(r"\|\s*`([^`]+)`\s*\|")
 
 # Units permanently excluded from target selection.
 # These units thrash between extab and code improvements, wasting PR cycles.
@@ -74,6 +78,16 @@ def _path_stem(path_str):
     """Return stem for paths that may use POSIX or Windows separators."""
     name = _path_name(path_str)
     return PurePosixPath(name).stem if name else ""
+
+
+def _normalize_path_key(path_str):
+    """Normalize a source/unit path for comparing report entries to WORK_SPLIT rows."""
+    if not isinstance(path_str, str):
+        return ""
+    normalized = path_str.strip().replace("\\", "/")
+    if normalized.startswith("./"):
+        normalized = normalized[2:]
+    return normalized.lower()
 
 
 def _has_real_source_path(source_path):
@@ -142,6 +156,73 @@ def load_blacklist():
         return [failure for failure in failures if isinstance(failure, str)]
     except (FileNotFoundError, OSError, json.JSONDecodeError):
         return []
+
+
+def load_work_split_buckets(work_split_path):
+    """Load bucket memberships from a WORK_SPLIT-style markdown file."""
+    buckets = {}
+    current_bucket = None
+
+    try:
+        lines = work_split_path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return {}
+
+    for line in lines:
+        header_match = WORK_SPLIT_BUCKET_RE.match(line)
+        if header_match:
+            bucket_id = header_match.group(1).upper()
+            title = header_match.group(2).strip()
+            current_bucket = bucket_id
+            buckets[current_bucket] = {
+                "title": f"{bucket_id} {title}".strip(),
+                "units": set(),
+            }
+            continue
+
+        if current_bucket is None:
+            continue
+
+        unit_match = WORK_SPLIT_UNIT_RE.match(line)
+        if unit_match:
+            unit_path = _normalize_path_key(unit_match.group(1))
+            if unit_path:
+                buckets[current_bucket]["units"].add(unit_path)
+
+    return {bucket_id: bucket for bucket_id, bucket in buckets.items() if bucket["units"]}
+
+
+def candidate_path_keys(candidate):
+    """Return normalized paths that may identify a candidate's source unit."""
+    keys = set()
+    for value in (candidate.get("source_path"), candidate.get("name"), candidate.get("source_file")):
+        key = _normalize_path_key(value)
+        if key and key != "unknown":
+            keys.add(key)
+
+    source_file = _normalize_path_key(candidate.get("source_file"))
+    if source_file and source_file != "unknown":
+        keys.add(f"src/{source_file}")
+
+    return keys
+
+
+def filter_candidates_by_bucket(candidates, bucket_ids, buckets):
+    """Filter already-viable candidates to the requested WORK_SPLIT bucket ids."""
+    if not bucket_ids:
+        return list(candidates)
+
+    wanted_units = set()
+    for bucket_id in bucket_ids:
+        bucket = buckets.get(bucket_id.upper())
+        if bucket:
+            wanted_units.update(bucket["units"])
+
+    return [
+        candidate
+        for candidate in candidates
+        if candidate_path_keys(candidate) & wanted_units
+    ]
 
 
 def is_redsound_unit(unit):
@@ -425,7 +506,43 @@ def print_bucket(name, targets, pal_map, en_map):
         print()
 
 
-def main():
+def parse_bucket_ids(raw_bucket_args):
+    bucket_ids = []
+    for raw_arg in raw_bucket_args:
+        for raw_bucket in raw_arg.split(","):
+            bucket_id = raw_bucket.strip().upper()
+            if bucket_id:
+                bucket_ids.append(bucket_id)
+    return bucket_ids
+
+
+def parse_args(argv):
+    parser = argparse.ArgumentParser(
+        description="Select viable FFCC-Decomp targets from report.json.",
+    )
+    parser.add_argument(
+        "--list",
+        action="store_true",
+        help="show more candidates per opportunity bucket",
+    )
+    parser.add_argument(
+        "--bucket",
+        action="append",
+        default=[],
+        metavar="BID",
+        help="limit candidates to a WORK_SPLIT bucket, e.g. B3; repeat or comma-separate for multiple buckets",
+    )
+    parser.add_argument(
+        "--bucket-file",
+        default="WORK_SPLIT.md",
+        metavar="PATH",
+        help="markdown file that defines bucket tables (default: WORK_SPLIT.md)",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(sys.argv[1:] if argv is None else argv)
     repo_root = Path(__file__).resolve().parent.parent
     report_path = repo_root / "build/GCCP01/report.json"
     pal_map = default_game_map_path(repo_root, "GCCP01")
@@ -435,18 +552,56 @@ def main():
         print(f"ERROR: {report_path} not found. Run 'ninja' first.")
         return 1
 
-    per_bucket = 6 if (len(sys.argv) > 1 and sys.argv[1] == "--list") else 3
+    per_bucket = 6 if args.list else 3
 
     candidates = extract_candidates(report_path)
+    requested_bucket_ids = parse_bucket_ids(args.bucket)
+    selected_bucket_titles = []
+
+    if requested_bucket_ids:
+        bucket_file = Path(args.bucket_file)
+        if not bucket_file.is_absolute():
+            bucket_file = repo_root / bucket_file
+        work_split_buckets = load_work_split_buckets(bucket_file)
+        unknown_bucket_ids = [
+            bucket_id for bucket_id in requested_bucket_ids
+            if bucket_id not in work_split_buckets
+        ]
+        if unknown_bucket_ids:
+            available = ", ".join(sorted(work_split_buckets)) or "none"
+            print(
+                "ERROR: unknown bucket(s) "
+                f"{', '.join(unknown_bucket_ids)} in {bucket_file}. Available: {available}"
+            )
+            return 1
+
+        candidates = filter_candidates_by_bucket(
+            candidates,
+            requested_bucket_ids,
+            work_split_buckets,
+        )
+        selected_bucket_titles = [
+            work_split_buckets[bucket_id]["title"]
+            for bucket_id in requested_bucket_ids
+        ]
 
     if not candidates:
-        print("No viable targets found.")
+        if requested_bucket_ids:
+            print(
+                "No viable targets found in bucket(s): "
+                f"{', '.join(requested_bucket_ids)}."
+            )
+        else:
+            print("No viable targets found.")
         return 1
 
     buckets = build_buckets(candidates, per_bucket=per_bucket)
 
     print("TARGET BUCKETS:")
     print("=" * 70)
+    if selected_bucket_titles:
+        print(f"WORK_SPLIT filter: {', '.join(selected_bucket_titles)}")
+        print("=" * 70)
     print_bucket(f"Code opportunities ({per_bucket})", buckets["code"], pal_map, en_map)
     print_bucket(f"Data opportunities ({per_bucket})", buckets["data"], pal_map, en_map)
 

@@ -343,766 +343,63 @@ static inline unsigned short GetMenuPressLock(int lock)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
-{
-	CFont* font = m_fonts[0];
-	float width;
-	const float& scaleY = kOptionAnimMax;
-	const float& halfWidth = kMenuCenteringHalfWidth;
-	const float& offset = kMenuCenteringOffset;
-
-	font->SetShadow(1);
-	font->SetMargin(margin);
-	font->SetScaleX(scale);
-	font->SetScaleY(scaleY);
-	width = font->GetWidth(text);
-	return offset - width * halfWidth;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
-{
-    const float& halfWidth = kMenuCenteringHalfWidth;
-    const float& offset = kMenuCenteringOffset;
-    float width = font->GetWidth(text);
-    return offset - width * halfWidth;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-#pragma dont_inline on
-void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text, float scale, float margin)
-{
-	CFont* font = m_fonts[0];
-
-	font->SetMargin(margin);
-	font->SetShadow(1);
-	font->SetScale(scale);
-	font->DrawInit();
-	font->SetTlut(tlut);
-	font->SetColor(color);
-	font->SetPosX((float)posX);
-	font->SetPosY((float)posY);
-	font->Draw(text);
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x8017ac40
- * PAL Size: 272b
+ * PAL Address: 0x8017683c
+ * PAL Size: 336b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
-void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* text, float scaleX, float scaleY, float margin)
+void CMenuPcs::BindMcObj(int slotNo)
 {
-	CFont* font = m_fonts[0];
+	int slot;
+	EffectInfo* obj;
 
-	font->SetMargin(margin);
-	font->SetShadow(1);
-	font->SetScaleX(scaleX);
-	font->SetScaleY(scaleY);
-	font->DrawInit();
-	font->SetTlut(tlut);
-	font->SetColor(color);
-	font->SetPosX((float)posX);
-	font->SetPosY((float)posY);
-	font->Draw(text);
-}
-#pragma dont_inline reset
+	for (slot = 0; slot < 4; slot++) {
+		if (slotNo == slot) {
+			obj = &m_effectWork[slot + 0x11];
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-#pragma push
-#pragma optimization_level 4
-void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor color, int tlut, float margin, float scale)
-{
-	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
-	char* anchor = lbl_801E3058;
-	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	u32 lineBaseY[4];
-	const int* lineBaseData = reinterpret_cast<const int*>(anchor + 0x678);
-	lineBaseY[0] = lineBaseData[0];
-	lineBaseY[1] = lineBaseData[1];
-	lineBaseY[2] = lineBaseData[2];
-	lineBaseY[3] = lineBaseData[3];
-
-	int languageIndex = Game.m_gameWork.m_languageId - 1;
-	int drawPrefix = 1;
-	float lineStep = kHelpMessageLineStep;
-	const char* suffix = 0;
-	char itemName[260];
-	char scratch[0x100];
-
-	font->SetMargin(kOptionTextNudge);
-	font->SetShadow(1);
-	font->SetScale(margin);
-	font->DrawInit();
-	font->SetTlut(tlut);
-	font->SetColor(color);
-	font->SetScale(kOptionMenuFontScale);
-
-	int maxWidth;
-	int firstLine = 500;
-	int lineMax;
-	if ((0 <= msgNo) && (msgNo <= 0x268)) {
-		firstLine = msgNo * 3 + 0x1F5;
-		lineMax = 3;
-	}
-	maxWidth = -1;
-
-	CMemory::CStage* stage;
-	if (Game.m_gameWork.m_menuStageMode != 0) {
-		stage = MenuPcs.m_stageF4;
-	} else {
-		stage = MenuPcs.m_menuStage;
-	}
-
-	char* temp = new (stage, anchor + 0x7A4, 0x8C) char[0x200];
-	if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-		System.Printf(anchor + 0x7B4, anchor + 0x7A4, 0x8E);
-	}
-	for (int line = firstLine; line < firstLine + 3; line++) {
-		char* msg = GetMenuHelpMsgTable()[line];
-		memset(temp, 0, 0x200);
-		CMes::MakeAgbString(temp, msg, 0, 1);
-		if (strlen(temp) != 0) {
-			int width = static_cast<int>(CMes::drawTagString(font, msg, 0, 0, 0));
-			if (width < maxWidth) {
-				width = maxWidth;
-			}
-			maxWidth = width;
-		}
-	}
-	delete[] temp;
-
-	if ((msgNo >= 0x259) && (msgNo <= 0x268)) {
-		drawPrefix = 0;
-	} else {
-		if (msgNo == 0x209) {
-			suffix = GetSkillStr(0);
-		} else if (msgNo == 0x20D) {
-			suffix = GetSkillStr(1);
-		} else if (msgNo == 0x211) {
-			suffix = GetSkillStr(2);
-		} else {
-			suffix = sMenuUtilEmptyText;
-		}
-
-		if ((msgNo == 0x209) || (msgNo == 0x20D) || (msgNo == 0x211)) {
-			itemName[0] = '\0';
-		} else {
-			Game.MakeArtItemName(itemName, msgNo, 1);
-			if ((strlen(itemName) != 0) && (static_cast<signed char>(itemName[0]) != 0)) {
-				itemName[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(itemName[0])));
-			}
-		}
-
-		int four = drawPrefix + 3;
-		if (four == 4) {
-			lineStep = kOptionUiTwenty;
-		}
-	}
-
-	int rangeKind;
-	if ((1 <= msgNo) && (msgNo < 0x45)) {
-		rangeKind = 1;
-	} else if ((0x45 <= msgNo) && (msgNo < 0x7F)) {
-		rangeKind = 0x45;
-	} else if ((0x7F <= msgNo) && (msgNo < 0x9F)) {
-		rangeKind = 0x7F;
-	} else {
-		rangeKind = 0;
-	}
-
-	if (rangeKind != 0) {
-		int baseIndex = drawPrefix + 2;
-		u32 baseY = lineBaseY[baseIndex];
-		unsigned int y = baseY;
-		if (drawPrefix != 0) {
-			font->SetPosX(kOptionRowLeft);
-			font->SetPosY(static_cast<float>(static_cast<int>(y)));
-			font->Draw(itemName);
-			font->Draw(suffix);
-			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
-		}
-
-		for (int i = 0; i < lineMax; i++) {
-			char* msg = GetMenuHelpMsgTable()[firstLine + i];
-			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
-			font->SetPosY(static_cast<float>(static_cast<int>(y)));
-			CMes::drawTagString(font, msg, 1, 0, 0);
-			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
-		}
-
-	int itemBase = Game.unkCFlatData0[2] + msgNo * 0x48;
-	u16 flags = *reinterpret_cast<u16*>(itemBase + 4);
-	if ((flags & 0x100) != 0) {
-		strcpy(scratch, PTR_s_Strength__80215a48[languageIndex * 20]);
-	} else if ((flags & 0x200) != 0) {
-		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
-	} else if ((flags & 0x400) != 0) {
-		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
-	} else if ((flags & 0x800) != 0) {
-		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
-	} else if ((flags & 0x1000) != 0) {
-		strcpy(scratch, sMenuUtilEmptyText);
-	} else if ((flags & 0x2000) != 0) {
-		strcpy(scratch, sMenuUtilEmptyText);
-	}
-
-	font->SetPosX(kOptionRowLeft);
-	int detailY = static_cast<int>(lineStep + static_cast<float>(static_cast<int>(baseY)));
-	font->SetPosY(static_cast<float>(detailY));
-
-		if ((*reinterpret_cast<u16*>(itemBase + 4) & 0x1000) != 0) {
-			if ((*reinterpret_cast<u16*>(itemBase + 8) >= 1) && (*reinterpret_cast<u16*>(itemBase + 8) <= 0x13)) {
-				strcpy(scratch, GetAttrStr(*reinterpret_cast<u16*>(itemBase + 8)));
-				font->SetTlut(4);
-				font->Draw(scratch);
-				int valueX = static_cast<int>(kOptionRowLeft + (kOptionTextNudge + font->GetWidth(scratch)));
-				font->SetPosX(static_cast<float>(valueX));
-				font->SetTlut(9);
-
-				unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
-				if ((attr >= 1) && (attr <= 8)) {
-					sprintf(scratch, sMenuUtilStringFormat, sMenuUtilPlusOneText);
-				} else {
-					if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
-						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
-					} else {
-						if ((static_cast<unsigned short>(attr - 9) > 1) && (attr != 0xC)) {
-							return;
-						}
-						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
-						font->SetTlut(3);
-					}
-				}
-
-				font->Draw(scratch);
-			}
-		} else {
-			strcat(scratch, sMenuUtilSpaceText);
-			font->Draw(scratch);
-
-			int valueX = static_cast<int>(kOptionRowLeft + (kOptionTextNudge + font->GetWidth(scratch)));
-			font->SetTlut(1);
-			font->SetPosX(static_cast<float>(valueX));
-			sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
-			font->Draw(scratch);
-
-			if ((m_battleStateFlag == 2) && (m_artiState->currentSelection == 1)) {
-				u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
-
-				if ((effectFlags & 0x1000) == 0) {
-					int currentItem = -1;
-					if ((effectFlags & 0x100) != 0) {
-						currentItem = 0;
-					} else if ((effectFlags & 0x400) != 0) {
-						currentItem = 1;
-					} else if ((effectFlags & 0x800) != 0) {
-						currentItem = 2;
-					} else if ((effectFlags & 0x200) != 0) {
-						currentItem = 2;
-					} else if ((effectFlags & 0x1000) != 0) {
-						currentItem = 3;
-					} else if ((effectFlags & 0x2000) != 0) {
-						currentItem = 3;
-					}
-
-					unsigned int equipmentSlot = caravanWork->m_equipment[currentItem];
-					currentItem = (equipmentSlot >= 0) ? caravanWork->m_inventoryItems[equipmentSlot] : -1;
-
-					if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(m_artiState->selections[1]) +
-					                                              static_cast<int>(m_artiState->scrollOffset))) != 0) {
-						int currentItemBase = Game.unkCFlatData0[2] + currentItem * 0x48;
-						unsigned int currentValue;
-						if (currentItem == -1) {
-							currentValue = 0;
-						} else {
-							currentValue = *reinterpret_cast<u16*>(currentItemBase + 6);
-						}
-
-						int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
-						int deltaX = static_cast<int>(static_cast<float>(valueX) + (kOptionTextNudge + font->GetWidth(scratch)));
-						font->SetPosX(static_cast<float>(deltaX));
-						if (delta >= 0) {
-							font->SetTlut(9);
-						} else {
-							font->SetTlut(3);
-						}
-						sprintf(scratch, sMenuUtilSignedDeltaFormat, delta);
-						if (delta != 0) {
-							font->Draw(scratch);
-						}
-					}
-				}
+			if (obj->m_partNo >= 0) {
+				PartMng.pppDeletePart(obj->m_partNo);
+				obj->m_partNo = -1;
+				obj->m_slotNo = -1;
+				obj->m_effectNo = -1;
 			}
 
-			float attrPosX = font->posX;
-			int attrX = static_cast<int>(attrPosX + font->GetWidth(sMenuUtilSpaceText));
-			font->SetPosX(static_cast<float>(attrX));
-
-			if ((*reinterpret_cast<u16*>(itemBase + 4) & 0x1000) == 0) {
-				if ((*reinterpret_cast<u16*>(itemBase + 8) >= 1) && (*reinterpret_cast<u16*>(itemBase + 8) <= 0x13)) {
-					font->SetTlut(4);
-					strcpy(scratch, GetAttrStr(*reinterpret_cast<u16*>(itemBase + 8)));
-					font->Draw(scratch);
-					font->SetTlut(9);
-					unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
-					if ((attr >= 1) && (attr <= 8)) {
-						sprintf(scratch, sMenuUtilAttrBonusFormat, sMenuUtilPlusOneText);
-						font->Draw(scratch);
-					}
-				}
+			obj += 4;
+			if (obj->m_partNo >= 0) {
+				PartMng.pppDeletePart(obj->m_partNo);
+				obj->m_partNo = -1;
+				obj->m_slotNo = -1;
+				obj->m_effectNo = -1;
 			}
-		}
-		} else {
-		int lineCount = 3;
-		int firstNonEmptyLine = firstLine;
-		stage = MenuPcs.m_menuStage;
-		if (Game.m_gameWork.m_menuStageMode != 0) {
-			stage = MenuPcs.m_stageF4;
-		}
-
-		temp = new (stage, anchor + 0x7A4, 0x23D) char[0x200];
-		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-			System.Printf(anchor + 0x7B4, anchor + 0x7A4, 0x23F);
-		}
-		for (int i = 0; i < lineMax; i++) {
-			char* msg = GetMenuHelpMsgTable()[firstLine + i];
-			memset(temp, 0, 0x200);
-			CMes::MakeAgbString(temp, msg, 0, 1);
-			if (strlen(temp) == 0) {
-				lineCount--;
-				if (firstNonEmptyLine == firstLine + i) {
-					firstNonEmptyLine++;
-				}
-			}
-		}
-		delete[] temp;
-
-		int y = lineBaseY[lineCount + drawPrefix - 1];
-		if (drawPrefix != 0) {
-			font->SetPosX(kOptionRowLeft);
-			font->SetPosY(static_cast<float>(static_cast<int>(y)));
-			font->Draw(itemName);
-			font->Draw(suffix);
-			y = static_cast<int>(static_cast<float>(static_cast<unsigned int>(y)) + lineStep);
-		}
-
-		for (int i = 0; i < lineCount; i++) {
-			char* msg = GetMenuHelpMsgTable()[firstNonEmptyLine + i];
-			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
-			font->SetPosY(static_cast<float>(static_cast<int>(y)));
-			CMes::drawTagString(font, msg, 1, 0, 0);
-			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
-		}
-	}
-}
-#pragma pop
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-#pragma dont_inline on
-void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXColor color, int tlut, float margin, float scaleY)
-{
-	if (msgNo >= 0) {
-		DrawHelpMessageUS(msgNo, font, posX, posY, color, tlut, margin, scaleY);
-	}
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80179e9c
- * PAL Size: 244b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::SetCrystalCageAttr()
-{
-	if (m_crystalPart != -1) {
-		PartMng.pppDeletePart(m_crystalPart);
-	}
-
-	unsigned int chaliceElement = Game.m_gameWork.m_chaliceElement;
-	if ((chaliceElement & 1U) != 0) {
-		m_crystalAttr = 0xE;
-		m_crystalElem = 1;
-	} else if ((chaliceElement & 2U) != 0) {
-		m_crystalAttr = 0xF;
-		m_crystalElem = 2;
-	} else if ((chaliceElement & 4U) != 0) {
-		m_crystalAttr = 0x10;
-		m_crystalElem = 4;
-	} else if ((chaliceElement & 8U) != 0) {
-		m_crystalAttr = 0x11;
-		m_crystalElem = 8;
-	} else if ((chaliceElement & 0x10U) != 0) {
-		m_crystalAttr = 0x12;
-		m_crystalElem = 0x10;
-	}
-
-	m_crystalPart = BindEffect(5, m_crystalAttr, -1);
-	m_effectTimer = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80179e28
- * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::SetManaWaterEffect()
-{
-	int partNo = m_effectWork[5].m_partNo;
-
-	if (partNo != -1) {
-		PartMng.pppDeletePart(partNo);
-	}
-
-	BindEffect(5, Game.m_gameWork.m_timerA + 0x13, -1);
-	m_manaWaterTimerA = Game.m_gameWork.m_timerA;
-}
-
-#pragma push
-#pragma optimization_level 4
-/*
- * --INFO--
- * PAL Address: 0x80179d28
- * PAL Size: 256b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::GetOptionData()
-{
-	signed char& gameInitMode = m_gameInitMode;
-	signed char& stereoMode = m_stereoMode;
-	signed char& bgmVolume = m_bgmVolume;
-	signed char& seVolume = m_seVolume;
-
-	gameInitMode =
-	    static_cast<signed char>(static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_gameInitFlag))) >> 5);
-
-	unsigned int soundMode = Sound.GetSoundMode();
-	unsigned int soundModeClz = static_cast<unsigned int>(__cntlzw(soundMode));
-	stereoMode = static_cast<signed char>(static_cast<unsigned int>(__cntlzw(soundModeClz >> 5)) >> 5);
-
-	int value = Sound.GetBgmMasterVolume();
-	bgmVolume = static_cast<signed char>(value / 10);
-
-	value = Sound.GetSeMasterVolume();
-	seVolume = static_cast<signed char>(value / 10);
-
-	unsigned int flag = Game.m_gameWork.m_spModeFlags[0];
-	m_specialModeFlags[0] = static_cast<signed char>((-flag | flag) >> 31);
-	flag = Game.m_gameWork.m_spModeFlags[1];
-	m_specialModeFlags[1] = static_cast<signed char>((-flag | flag) >> 31);
-	flag = Game.m_gameWork.m_spModeFlags[2];
-	m_specialModeFlags[2] = static_cast<signed char>((-flag | flag) >> 31);
-	flag = Game.m_gameWork.m_spModeFlags[3];
-	m_specialModeFlags[3] = static_cast<signed char>((-flag | flag) >> 31);
-}
-#pragma pop
-
-/*
- * --INFO--
- * PAL Address: 0x80179328
- * PAL Size: 2560b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::CalcOptionMenu()
-{
-	unsigned short press = static_cast<unsigned short>(GetMenuPress());
-	int optionChanged = 0;
-
-	if (m_optionMenuState == 0) {
-		m_optionOpenAnim += kOptionOpenAnimStep;
-		if (!(m_optionOpenAnim >= kOptionAnimMax)) {
-			return;
-		}
-
-		m_optionMenuState = 1;
-		m_optionOpenAnim = kOptionAnimMax;
-		return;
-	}
-
-	if (m_optionMenuState == 2) {
-		m_optionOpenAnim -= kOptionOpenAnimStep;
-		m_optionRowAnim -= kOptionRowAnimStep;
-		m_optionColumnAnim -= kOptionColumnAnimStep;
-
-		if (m_optionRowAnim <= kOptionAnimMin) {
-			m_optionRowAnim = kOptionAnimMin;
-		}
-		if (m_optionColumnAnim <= kOptionAnimMin) {
-			m_optionColumnAnim = kOptionAnimMin;
-		}
-		{
-			const float& divStep = kOptionOpenAnimStep;
-			if (static_cast<int>(m_optionOpenAnim / divStep) == 5) {
-				Sound.PlaySe(0x32, 0x40, 0x7F, 0);
-			}
-		}
-		if (!(m_optionOpenAnim <= kOptionAnimMin)) {
-			return;
-		}
-
-		m_artiState->optionCloseReady = 1;
-		m_optionIndex = 0;
-		m_optionMenuState = 0;
-		m_optionOpenAnim = kOptionAnimMin;
-		m_optionRowAnim = kOptionAnimMin;
-		m_optionColumnAnim = kOptionAnimMin;
-		m_optionAnimCounter = 0;
-		m_optionAnimPhase = 0;
-		return;
-	}
-
-	if (m_optionMenuState == 3) {
-		return;
-	}
-
-	if (m_optionAnimPhase == 0) {
-		m_optionRowAnim += kOptionRowAnimStep;
-		m_optionAnimCounter++;
-		if (m_optionRowAnim >= kOptionAnimMax) {
-			m_optionAnimPhase = 1;
-			m_optionRowAnim = kOptionAnimMax;
-		}
-	} else if (m_optionAnimPhase == 1) {
-		m_optionColumnAnim += kOptionColumnAnimStep;
-		if (m_optionColumnAnim >= kOptionAnimMax) {
-			m_optionAnimPhase = 2;
-			m_optionColumnAnim = kOptionAnimMax;
 		}
 	}
 
-	if (m_leftHintTimer > 0) {
-		m_leftHintTimer--;
-	}
-	if (m_rightHintTimer > 0) {
-		m_rightHintTimer--;
-	}
+	for (slot = 0; slot < 4; slot++) {
+		if (slotNo == slot) {
+			EffectEntry* entry = &m_effectEntries[slot];
+			int iconType = entry->m_iconType;
 
-	if ((m_specialModeEdit == 0) && ((press & 8) != 0)) {
-		m_leftHintTimer = 0;
-		m_rightHintTimer = 0;
-		m_optionIndex--;
-		if (m_optionIndex < 0) {
-			m_optionIndex = 4;
-		}
-		{
-			const float& leftMin = kOptionAnimMin;
-			m_optionRowAnim = leftMin;
-			m_optionColumnAnim = leftMin;
-		}
-		m_optionAnimCounter = 0;
-		m_optionAnimPhase = 0;
-		Sound.PlaySe(1, 0x40, 0x7F, 0);
-	} else if ((m_specialModeEdit == 0) && ((press & 4) != 0)) {
-		m_leftHintTimer = 0;
-		m_rightHintTimer = 0;
-		m_optionIndex++;
-		if (m_optionIndex > 4) {
-			m_optionIndex = 0;
-		}
-		{
-			const float& rightMin = kOptionAnimMin;
-			m_optionRowAnim = rightMin;
-			m_optionColumnAnim = rightMin;
-		}
-		m_optionAnimCounter = 0;
-		m_optionAnimPhase = 0;
-		Sound.PlaySe(1, 0x40, 0x7F, 0);
-	}
+			if (iconType != 0) {
+				BindEffect(slot + 0x11, iconType + 0x16, -1);
+			}
 
-	int specialModeEdit = m_specialModeEdit;
-	if (specialModeEdit == 0) {
-		unsigned short press2;
-		press2 = GetMenuPress();
+			unsigned int flags = entry->m_flags;
 
-		if ((press2 & 0x200) != 0) {
-			m_optionMenuState = 2;
-			Sound.PlaySe(3, 0x40, 0x7F, 0);
-			return;
-		}
-	}
+			if ((flags & 1) != 0) {
+				iconType = 0;
+			} else if ((flags & 2) != 0) {
+				iconType = 1;
+			} else if ((flags & 4) != 0) {
+				iconType = 2;
+			} else if ((flags & 8) != 0) {
+				iconType = 3;
+			} else if ((flags & 0x10) != 0) {
+				iconType = 4;
+			}
 
-	if (m_optionAnimPhase != 0) {
-		if (m_optionAnimPhase == 1) {
-			return;
-		}
-	} else {
-		return;
-	}
-
-	if ((press & 1) != 0) {
-		switch (m_optionIndex) {
-		case 0:
-			m_gameInitMode--;
-			if (m_gameInitMode < 0) {
-				m_gameInitMode = 1;
-			}
-			break;
-		case 1:
-			m_stereoMode--;
-			if (m_stereoMode < 0) {
-				m_stereoMode = 1;
-			}
-			break;
-		case 2:
-			m_leftHintTimer = 3;
-			m_rightHintTimer = 0;
-			m_bgmVolume--;
-			if (m_bgmVolume < 0) {
-				m_bgmVolume = 0;
-			}
-			break;
-		case 3:
-			m_leftHintTimer = 3;
-			m_rightHintTimer = 0;
-			m_seVolume--;
-			if (m_seVolume < 0) {
-				m_seVolume = 0;
-			}
-			break;
-		case 4:
-			if (specialModeEdit != 0) {
-				m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)]--;
-				if (m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] < 0) {
-					m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] = 1;
-				}
-			}
-			break;
-		}
-
-		Sound.PlaySe(1, 0x40, 0x7F, 0);
-		optionChanged = 1;
-	} else if ((press & 2) != 0) {
-		switch (m_optionIndex) {
-		case 0:
-			m_gameInitMode++;
-			if (m_gameInitMode > 1) {
-				m_gameInitMode = 0;
-			}
-			break;
-		case 1:
-			m_stereoMode++;
-			if (m_stereoMode > 1) {
-				m_stereoMode = 0;
-			}
-			break;
-		case 2:
-			m_rightHintTimer = 3;
-			m_leftHintTimer = 0;
-			m_bgmVolume++;
-			if (m_bgmVolume > 0xC) {
-				m_bgmVolume = 0xC;
-			}
-			break;
-		case 3:
-			m_rightHintTimer = 3;
-			m_leftHintTimer = 0;
-			m_seVolume++;
-			if (m_seVolume > 0xC) {
-				m_seVolume = 0xC;
-			}
-			break;
-		case 4:
-			if (specialModeEdit != 0) {
-				m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)]++;
-				if (m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] > 1) {
-					m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] = 0;
-				}
-			}
-			break;
-		}
-
-		Sound.PlaySe(1, 0x40, 0x7F, 0);
-		optionChanged = 1;
-	}
-
-	if (m_optionIndex == 4) {
-		int lock = Pad.m_debugPadLock;
-		unsigned short press3;
-		press3 = GetMenuPressLock(lock);
-
-		if ((press3 & 0x100) != 0) {
-			if (m_specialModeEdit == 0) {
-				m_specialModeCursor = 0;
-				m_specialModeEdit = 1;
-				Sound.PlaySe(2, 0x40, 0x7F, 0);
-			}
-		} else if ((m_specialModeEdit != 0) && ((GetMenuPressLock(lock) & 0x200) != 0)) {
-			m_specialModeCursor = 0;
-			m_specialModeEdit = 0;
-			Sound.PlaySe(3, 0x40, 0x7F, 0);
-
-			Game.m_gameWork.m_spModeFlags[0] =
-			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[0])) >> 5);
-			Game.m_gameWork.m_spModeFlags[1] =
-			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[1])) >> 5);
-			Game.m_gameWork.m_spModeFlags[2] =
-			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[2])) >> 5);
-			Game.m_gameWork.m_spModeFlags[3] =
-			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[3])) >> 5);
-		} else if ((m_specialModeEdit != 0) && ((press & 8) != 0)) {
-			m_specialModeCursor--;
-			if (m_specialModeCursor < 0) {
-				m_specialModeCursor = 3;
-			}
-			Sound.PlaySe(1, 0x40, 0x7F, 0);
-		} else if ((m_specialModeEdit != 0) && ((press & 4) != 0)) {
-			m_specialModeCursor++;
-			if (m_specialModeCursor > 3) {
-				m_specialModeCursor = 0;
-			}
-			Sound.PlaySe(1, 0x40, 0x7F, 0);
-		}
-	}
-
-	if (optionChanged) {
-		Game.m_gameWork.m_gameInitFlag =
-		    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(static_cast<int>(m_gameInitMode))) >> 5);
-		Sound.SetStereo(static_cast<unsigned int>(__cntlzw(static_cast<int>(m_stereoMode))) >> 5);
-		{
-			const float& seScale = kOptionVolumeScale;
-			Sound.SetSeMasterVolume(static_cast<int>(seScale * static_cast<float>(m_seVolume)));
-		}
-		{
-			const float& bgmScale = kOptionVolumeScale;
-			Sound.SetBgmMasterVolume(static_cast<int>(bgmScale * static_cast<float>(m_bgmVolume)));
+			BindEffect(slot + 0x11, iconType + 0x1A, -1);
 		}
 	}
 }
@@ -1709,63 +1006,766 @@ void CMenuPcs::DrawOptionMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x8017683c
- * PAL Size: 336b
+ * PAL Address: 0x80179328
+ * PAL Size: 2560b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::BindMcObj(int slotNo)
+void CMenuPcs::CalcOptionMenu()
 {
-	int slot;
-	EffectInfo* obj;
+	unsigned short press = static_cast<unsigned short>(GetMenuPress());
+	int optionChanged = 0;
 
-	for (slot = 0; slot < 4; slot++) {
-		if (slotNo == slot) {
-			obj = &m_effectWork[slot + 0x11];
+	if (m_optionMenuState == 0) {
+		m_optionOpenAnim += kOptionOpenAnimStep;
+		if (!(m_optionOpenAnim >= kOptionAnimMax)) {
+			return;
+		}
 
-			if (obj->m_partNo >= 0) {
-				PartMng.pppDeletePart(obj->m_partNo);
-				obj->m_partNo = -1;
-				obj->m_slotNo = -1;
-				obj->m_effectNo = -1;
+		m_optionMenuState = 1;
+		m_optionOpenAnim = kOptionAnimMax;
+		return;
+	}
+
+	if (m_optionMenuState == 2) {
+		m_optionOpenAnim -= kOptionOpenAnimStep;
+		m_optionRowAnim -= kOptionRowAnimStep;
+		m_optionColumnAnim -= kOptionColumnAnimStep;
+
+		if (m_optionRowAnim <= kOptionAnimMin) {
+			m_optionRowAnim = kOptionAnimMin;
+		}
+		if (m_optionColumnAnim <= kOptionAnimMin) {
+			m_optionColumnAnim = kOptionAnimMin;
+		}
+		{
+			const float& divStep = kOptionOpenAnimStep;
+			if (static_cast<int>(m_optionOpenAnim / divStep) == 5) {
+				Sound.PlaySe(0x32, 0x40, 0x7F, 0);
 			}
+		}
+		if (!(m_optionOpenAnim <= kOptionAnimMin)) {
+			return;
+		}
 
-			obj += 4;
-			if (obj->m_partNo >= 0) {
-				PartMng.pppDeletePart(obj->m_partNo);
-				obj->m_partNo = -1;
-				obj->m_slotNo = -1;
-				obj->m_effectNo = -1;
-			}
+		m_artiState->optionCloseReady = 1;
+		m_optionIndex = 0;
+		m_optionMenuState = 0;
+		m_optionOpenAnim = kOptionAnimMin;
+		m_optionRowAnim = kOptionAnimMin;
+		m_optionColumnAnim = kOptionAnimMin;
+		m_optionAnimCounter = 0;
+		m_optionAnimPhase = 0;
+		return;
+	}
+
+	if (m_optionMenuState == 3) {
+		return;
+	}
+
+	if (m_optionAnimPhase == 0) {
+		m_optionRowAnim += kOptionRowAnimStep;
+		m_optionAnimCounter++;
+		if (m_optionRowAnim >= kOptionAnimMax) {
+			m_optionAnimPhase = 1;
+			m_optionRowAnim = kOptionAnimMax;
+		}
+	} else if (m_optionAnimPhase == 1) {
+		m_optionColumnAnim += kOptionColumnAnimStep;
+		if (m_optionColumnAnim >= kOptionAnimMax) {
+			m_optionAnimPhase = 2;
+			m_optionColumnAnim = kOptionAnimMax;
 		}
 	}
 
-	for (slot = 0; slot < 4; slot++) {
-		if (slotNo == slot) {
-			EffectEntry* entry = &m_effectEntries[slot];
-			int iconType = entry->m_iconType;
+	if (m_leftHintTimer > 0) {
+		m_leftHintTimer--;
+	}
+	if (m_rightHintTimer > 0) {
+		m_rightHintTimer--;
+	}
 
-			if (iconType != 0) {
-				BindEffect(slot + 0x11, iconType + 0x16, -1);
-			}
+	if ((m_specialModeEdit == 0) && ((press & 8) != 0)) {
+		m_leftHintTimer = 0;
+		m_rightHintTimer = 0;
+		m_optionIndex--;
+		if (m_optionIndex < 0) {
+			m_optionIndex = 4;
+		}
+		{
+			const float& leftMin = kOptionAnimMin;
+			m_optionRowAnim = leftMin;
+			m_optionColumnAnim = leftMin;
+		}
+		m_optionAnimCounter = 0;
+		m_optionAnimPhase = 0;
+		Sound.PlaySe(1, 0x40, 0x7F, 0);
+	} else if ((m_specialModeEdit == 0) && ((press & 4) != 0)) {
+		m_leftHintTimer = 0;
+		m_rightHintTimer = 0;
+		m_optionIndex++;
+		if (m_optionIndex > 4) {
+			m_optionIndex = 0;
+		}
+		{
+			const float& rightMin = kOptionAnimMin;
+			m_optionRowAnim = rightMin;
+			m_optionColumnAnim = rightMin;
+		}
+		m_optionAnimCounter = 0;
+		m_optionAnimPhase = 0;
+		Sound.PlaySe(1, 0x40, 0x7F, 0);
+	}
 
-			unsigned int flags = entry->m_flags;
+	int specialModeEdit = m_specialModeEdit;
+	if (specialModeEdit == 0) {
+		unsigned short press2;
+		press2 = GetMenuPress();
 
-			if ((flags & 1) != 0) {
-				iconType = 0;
-			} else if ((flags & 2) != 0) {
-				iconType = 1;
-			} else if ((flags & 4) != 0) {
-				iconType = 2;
-			} else if ((flags & 8) != 0) {
-				iconType = 3;
-			} else if ((flags & 0x10) != 0) {
-				iconType = 4;
-			}
-
-			BindEffect(slot + 0x11, iconType + 0x1A, -1);
+		if ((press2 & 0x200) != 0) {
+			m_optionMenuState = 2;
+			Sound.PlaySe(3, 0x40, 0x7F, 0);
+			return;
 		}
 	}
+
+	if (m_optionAnimPhase != 0) {
+		if (m_optionAnimPhase == 1) {
+			return;
+		}
+	} else {
+		return;
+	}
+
+	if ((press & 1) != 0) {
+		switch (m_optionIndex) {
+		case 0:
+			m_gameInitMode--;
+			if (m_gameInitMode < 0) {
+				m_gameInitMode = 1;
+			}
+			break;
+		case 1:
+			m_stereoMode--;
+			if (m_stereoMode < 0) {
+				m_stereoMode = 1;
+			}
+			break;
+		case 2:
+			m_leftHintTimer = 3;
+			m_rightHintTimer = 0;
+			m_bgmVolume--;
+			if (m_bgmVolume < 0) {
+				m_bgmVolume = 0;
+			}
+			break;
+		case 3:
+			m_leftHintTimer = 3;
+			m_rightHintTimer = 0;
+			m_seVolume--;
+			if (m_seVolume < 0) {
+				m_seVolume = 0;
+			}
+			break;
+		case 4:
+			if (specialModeEdit != 0) {
+				m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)]--;
+				if (m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] < 0) {
+					m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] = 1;
+				}
+			}
+			break;
+		}
+
+		Sound.PlaySe(1, 0x40, 0x7F, 0);
+		optionChanged = 1;
+	} else if ((press & 2) != 0) {
+		switch (m_optionIndex) {
+		case 0:
+			m_gameInitMode++;
+			if (m_gameInitMode > 1) {
+				m_gameInitMode = 0;
+			}
+			break;
+		case 1:
+			m_stereoMode++;
+			if (m_stereoMode > 1) {
+				m_stereoMode = 0;
+			}
+			break;
+		case 2:
+			m_rightHintTimer = 3;
+			m_leftHintTimer = 0;
+			m_bgmVolume++;
+			if (m_bgmVolume > 0xC) {
+				m_bgmVolume = 0xC;
+			}
+			break;
+		case 3:
+			m_rightHintTimer = 3;
+			m_leftHintTimer = 0;
+			m_seVolume++;
+			if (m_seVolume > 0xC) {
+				m_seVolume = 0xC;
+			}
+			break;
+		case 4:
+			if (specialModeEdit != 0) {
+				m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)]++;
+				if (m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] > 1) {
+					m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] = 0;
+				}
+			}
+			break;
+		}
+
+		Sound.PlaySe(1, 0x40, 0x7F, 0);
+		optionChanged = 1;
+	}
+
+	if (m_optionIndex == 4) {
+		int lock = Pad.m_debugPadLock;
+		unsigned short press3;
+		press3 = GetMenuPressLock(lock);
+
+		if ((press3 & 0x100) != 0) {
+			if (m_specialModeEdit == 0) {
+				m_specialModeCursor = 0;
+				m_specialModeEdit = 1;
+				Sound.PlaySe(2, 0x40, 0x7F, 0);
+			}
+		} else if ((m_specialModeEdit != 0) && ((GetMenuPressLock(lock) & 0x200) != 0)) {
+			m_specialModeCursor = 0;
+			m_specialModeEdit = 0;
+			Sound.PlaySe(3, 0x40, 0x7F, 0);
+
+			Game.m_gameWork.m_spModeFlags[0] =
+			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[0])) >> 5);
+			Game.m_gameWork.m_spModeFlags[1] =
+			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[1])) >> 5);
+			Game.m_gameWork.m_spModeFlags[2] =
+			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[2])) >> 5);
+			Game.m_gameWork.m_spModeFlags[3] =
+			    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[3])) >> 5);
+		} else if ((m_specialModeEdit != 0) && ((press & 8) != 0)) {
+			m_specialModeCursor--;
+			if (m_specialModeCursor < 0) {
+				m_specialModeCursor = 3;
+			}
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
+		} else if ((m_specialModeEdit != 0) && ((press & 4) != 0)) {
+			m_specialModeCursor++;
+			if (m_specialModeCursor > 3) {
+				m_specialModeCursor = 0;
+			}
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
+		}
+	}
+
+	if (optionChanged) {
+		Game.m_gameWork.m_gameInitFlag =
+		    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(static_cast<int>(m_gameInitMode))) >> 5);
+		Sound.SetStereo(static_cast<unsigned int>(__cntlzw(static_cast<int>(m_stereoMode))) >> 5);
+		{
+			const float& seScale = kOptionVolumeScale;
+			Sound.SetSeMasterVolume(static_cast<int>(seScale * static_cast<float>(m_seVolume)));
+		}
+		{
+			const float& bgmScale = kOptionVolumeScale;
+			Sound.SetBgmMasterVolume(static_cast<int>(bgmScale * static_cast<float>(m_bgmVolume)));
+		}
+	}
+}
+
+#pragma push
+#pragma optimization_level 4
+/*
+ * --INFO--
+ * PAL Address: 0x80179d28
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::GetOptionData()
+{
+	signed char& gameInitMode = m_gameInitMode;
+	signed char& stereoMode = m_stereoMode;
+	signed char& bgmVolume = m_bgmVolume;
+	signed char& seVolume = m_seVolume;
+
+	gameInitMode =
+	    static_cast<signed char>(static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_gameInitFlag))) >> 5);
+
+	unsigned int soundMode = Sound.GetSoundMode();
+	unsigned int soundModeClz = static_cast<unsigned int>(__cntlzw(soundMode));
+	stereoMode = static_cast<signed char>(static_cast<unsigned int>(__cntlzw(soundModeClz >> 5)) >> 5);
+
+	int value = Sound.GetBgmMasterVolume();
+	bgmVolume = static_cast<signed char>(value / 10);
+
+	value = Sound.GetSeMasterVolume();
+	seVolume = static_cast<signed char>(value / 10);
+
+	unsigned int flag = Game.m_gameWork.m_spModeFlags[0];
+	m_specialModeFlags[0] = static_cast<signed char>((-flag | flag) >> 31);
+	flag = Game.m_gameWork.m_spModeFlags[1];
+	m_specialModeFlags[1] = static_cast<signed char>((-flag | flag) >> 31);
+	flag = Game.m_gameWork.m_spModeFlags[2];
+	m_specialModeFlags[2] = static_cast<signed char>((-flag | flag) >> 31);
+	flag = Game.m_gameWork.m_spModeFlags[3];
+	m_specialModeFlags[3] = static_cast<signed char>((-flag | flag) >> 31);
+}
+#pragma pop
+
+/*
+ * --INFO--
+ * PAL Address: 0x80179e28
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::SetManaWaterEffect()
+{
+	int partNo = m_effectWork[5].m_partNo;
+
+	if (partNo != -1) {
+		PartMng.pppDeletePart(partNo);
+	}
+
+	BindEffect(5, Game.m_gameWork.m_timerA + 0x13, -1);
+	m_manaWaterTimerA = Game.m_gameWork.m_timerA;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80179e9c
+ * PAL Size: 244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::SetCrystalCageAttr()
+{
+	if (m_crystalPart != -1) {
+		PartMng.pppDeletePart(m_crystalPart);
+	}
+
+	unsigned int chaliceElement = Game.m_gameWork.m_chaliceElement;
+	if ((chaliceElement & 1U) != 0) {
+		m_crystalAttr = 0xE;
+		m_crystalElem = 1;
+	} else if ((chaliceElement & 2U) != 0) {
+		m_crystalAttr = 0xF;
+		m_crystalElem = 2;
+	} else if ((chaliceElement & 4U) != 0) {
+		m_crystalAttr = 0x10;
+		m_crystalElem = 4;
+	} else if ((chaliceElement & 8U) != 0) {
+		m_crystalAttr = 0x11;
+		m_crystalElem = 8;
+	} else if ((chaliceElement & 0x10U) != 0) {
+		m_crystalAttr = 0x12;
+		m_crystalElem = 0x10;
+	}
+
+	m_crystalPart = BindEffect(5, m_crystalAttr, -1);
+	m_effectTimer = 0;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+#pragma dont_inline on
+void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXColor color, int tlut, float margin, float scaleY)
+{
+	if (msgNo >= 0) {
+		DrawHelpMessageUS(msgNo, font, posX, posY, color, tlut, margin, scaleY);
+	}
+}
+#pragma dont_inline reset
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+#pragma push
+#pragma optimization_level 4
+void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor color, int tlut, float margin, float scale)
+{
+	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
+	char* anchor = lbl_801E3058;
+	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	u32 lineBaseY[4];
+	const int* lineBaseData = reinterpret_cast<const int*>(anchor + 0x678);
+	lineBaseY[0] = lineBaseData[0];
+	lineBaseY[1] = lineBaseData[1];
+	lineBaseY[2] = lineBaseData[2];
+	lineBaseY[3] = lineBaseData[3];
+
+	int languageIndex = Game.m_gameWork.m_languageId - 1;
+	int drawPrefix = 1;
+	float lineStep = kHelpMessageLineStep;
+	const char* suffix = 0;
+	char itemName[260];
+	char scratch[0x100];
+
+	font->SetMargin(kOptionTextNudge);
+	font->SetShadow(1);
+	font->SetScale(margin);
+	font->DrawInit();
+	font->SetTlut(tlut);
+	font->SetColor(color);
+	font->SetScale(kOptionMenuFontScale);
+
+	int maxWidth;
+	int firstLine = 500;
+	int lineMax;
+	if ((0 <= msgNo) && (msgNo <= 0x268)) {
+		firstLine = msgNo * 3 + 0x1F5;
+		lineMax = 3;
+	}
+	maxWidth = -1;
+
+	CMemory::CStage* stage;
+	if (Game.m_gameWork.m_menuStageMode != 0) {
+		stage = MenuPcs.m_stageF4;
+	} else {
+		stage = MenuPcs.m_menuStage;
+	}
+
+	char* temp = new (stage, anchor + 0x7A4, 0x8C) char[0x200];
+	if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+		System.Printf(anchor + 0x7B4, anchor + 0x7A4, 0x8E);
+	}
+	for (int line = firstLine; line < firstLine + 3; line++) {
+		char* msg = GetMenuHelpMsgTable()[line];
+		memset(temp, 0, 0x200);
+		CMes::MakeAgbString(temp, msg, 0, 1);
+		if (strlen(temp) != 0) {
+			int width = static_cast<int>(CMes::drawTagString(font, msg, 0, 0, 0));
+			if (width < maxWidth) {
+				width = maxWidth;
+			}
+			maxWidth = width;
+		}
+	}
+	delete[] temp;
+
+	if ((msgNo >= 0x259) && (msgNo <= 0x268)) {
+		drawPrefix = 0;
+	} else {
+		if (msgNo == 0x209) {
+			suffix = GetSkillStr(0);
+		} else if (msgNo == 0x20D) {
+			suffix = GetSkillStr(1);
+		} else if (msgNo == 0x211) {
+			suffix = GetSkillStr(2);
+		} else {
+			suffix = sMenuUtilEmptyText;
+		}
+
+		if ((msgNo == 0x209) || (msgNo == 0x20D) || (msgNo == 0x211)) {
+			itemName[0] = '\0';
+		} else {
+			Game.MakeArtItemName(itemName, msgNo, 1);
+			if ((strlen(itemName) != 0) && (static_cast<signed char>(itemName[0]) != 0)) {
+				itemName[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(itemName[0])));
+			}
+		}
+
+		int four = drawPrefix + 3;
+		if (four == 4) {
+			lineStep = kOptionUiTwenty;
+		}
+	}
+
+	int rangeKind;
+	if ((1 <= msgNo) && (msgNo < 0x45)) {
+		rangeKind = 1;
+	} else if ((0x45 <= msgNo) && (msgNo < 0x7F)) {
+		rangeKind = 0x45;
+	} else if ((0x7F <= msgNo) && (msgNo < 0x9F)) {
+		rangeKind = 0x7F;
+	} else {
+		rangeKind = 0;
+	}
+
+	if (rangeKind != 0) {
+		int baseIndex = drawPrefix + 2;
+		u32 baseY = lineBaseY[baseIndex];
+		unsigned int y = baseY;
+		if (drawPrefix != 0) {
+			font->SetPosX(kOptionRowLeft);
+			font->SetPosY(static_cast<float>(static_cast<int>(y)));
+			font->Draw(itemName);
+			font->Draw(suffix);
+			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
+		}
+
+		for (int i = 0; i < lineMax; i++) {
+			char* msg = GetMenuHelpMsgTable()[firstLine + i];
+			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
+			font->SetPosY(static_cast<float>(static_cast<int>(y)));
+			CMes::drawTagString(font, msg, 1, 0, 0);
+			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
+		}
+
+	int itemBase = Game.unkCFlatData0[2] + msgNo * 0x48;
+	u16 flags = *reinterpret_cast<u16*>(itemBase + 4);
+	if ((flags & 0x100) != 0) {
+		strcpy(scratch, PTR_s_Strength__80215a48[languageIndex * 20]);
+	} else if ((flags & 0x200) != 0) {
+		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
+	} else if ((flags & 0x400) != 0) {
+		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
+	} else if ((flags & 0x800) != 0) {
+		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
+	} else if ((flags & 0x1000) != 0) {
+		strcpy(scratch, sMenuUtilEmptyText);
+	} else if ((flags & 0x2000) != 0) {
+		strcpy(scratch, sMenuUtilEmptyText);
+	}
+
+	font->SetPosX(kOptionRowLeft);
+	int detailY = static_cast<int>(lineStep + static_cast<float>(static_cast<int>(baseY)));
+	font->SetPosY(static_cast<float>(detailY));
+
+		if ((*reinterpret_cast<u16*>(itemBase + 4) & 0x1000) != 0) {
+			if ((*reinterpret_cast<u16*>(itemBase + 8) >= 1) && (*reinterpret_cast<u16*>(itemBase + 8) <= 0x13)) {
+				strcpy(scratch, GetAttrStr(*reinterpret_cast<u16*>(itemBase + 8)));
+				font->SetTlut(4);
+				font->Draw(scratch);
+				int valueX = static_cast<int>(kOptionRowLeft + (kOptionTextNudge + font->GetWidth(scratch)));
+				font->SetPosX(static_cast<float>(valueX));
+				font->SetTlut(9);
+
+				unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
+				if ((attr >= 1) && (attr <= 8)) {
+					sprintf(scratch, sMenuUtilStringFormat, sMenuUtilPlusOneText);
+				} else {
+					if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
+						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
+					} else {
+						if ((static_cast<unsigned short>(attr - 9) > 1) && (attr != 0xC)) {
+							return;
+						}
+						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
+						font->SetTlut(3);
+					}
+				}
+
+				font->Draw(scratch);
+			}
+		} else {
+			strcat(scratch, sMenuUtilSpaceText);
+			font->Draw(scratch);
+
+			int valueX = static_cast<int>(kOptionRowLeft + (kOptionTextNudge + font->GetWidth(scratch)));
+			font->SetTlut(1);
+			font->SetPosX(static_cast<float>(valueX));
+			sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
+			font->Draw(scratch);
+
+			if ((m_battleStateFlag == 2) && (m_artiState->currentSelection == 1)) {
+				u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
+
+				if ((effectFlags & 0x1000) == 0) {
+					int currentItem = -1;
+					if ((effectFlags & 0x100) != 0) {
+						currentItem = 0;
+					} else if ((effectFlags & 0x400) != 0) {
+						currentItem = 1;
+					} else if ((effectFlags & 0x800) != 0) {
+						currentItem = 2;
+					} else if ((effectFlags & 0x200) != 0) {
+						currentItem = 2;
+					} else if ((effectFlags & 0x1000) != 0) {
+						currentItem = 3;
+					} else if ((effectFlags & 0x2000) != 0) {
+						currentItem = 3;
+					}
+
+					unsigned int equipmentSlot = caravanWork->m_equipment[currentItem];
+					currentItem = (equipmentSlot >= 0) ? caravanWork->m_inventoryItems[equipmentSlot] : -1;
+
+					if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(m_artiState->selections[1]) +
+					                                              static_cast<int>(m_artiState->scrollOffset))) != 0) {
+						int currentItemBase = Game.unkCFlatData0[2] + currentItem * 0x48;
+						unsigned int currentValue;
+						if (currentItem == -1) {
+							currentValue = 0;
+						} else {
+							currentValue = *reinterpret_cast<u16*>(currentItemBase + 6);
+						}
+
+						int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
+						int deltaX = static_cast<int>(static_cast<float>(valueX) + (kOptionTextNudge + font->GetWidth(scratch)));
+						font->SetPosX(static_cast<float>(deltaX));
+						if (delta >= 0) {
+							font->SetTlut(9);
+						} else {
+							font->SetTlut(3);
+						}
+						sprintf(scratch, sMenuUtilSignedDeltaFormat, delta);
+						if (delta != 0) {
+							font->Draw(scratch);
+						}
+					}
+				}
+			}
+
+			float attrPosX = font->posX;
+			int attrX = static_cast<int>(attrPosX + font->GetWidth(sMenuUtilSpaceText));
+			font->SetPosX(static_cast<float>(attrX));
+
+			if ((*reinterpret_cast<u16*>(itemBase + 4) & 0x1000) == 0) {
+				if ((*reinterpret_cast<u16*>(itemBase + 8) >= 1) && (*reinterpret_cast<u16*>(itemBase + 8) <= 0x13)) {
+					font->SetTlut(4);
+					strcpy(scratch, GetAttrStr(*reinterpret_cast<u16*>(itemBase + 8)));
+					font->Draw(scratch);
+					font->SetTlut(9);
+					unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
+					if ((attr >= 1) && (attr <= 8)) {
+						sprintf(scratch, sMenuUtilAttrBonusFormat, sMenuUtilPlusOneText);
+						font->Draw(scratch);
+					}
+				}
+			}
+		}
+		} else {
+		int lineCount = 3;
+		int firstNonEmptyLine = firstLine;
+		stage = MenuPcs.m_menuStage;
+		if (Game.m_gameWork.m_menuStageMode != 0) {
+			stage = MenuPcs.m_stageF4;
+		}
+
+		temp = new (stage, anchor + 0x7A4, 0x23D) char[0x200];
+		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+			System.Printf(anchor + 0x7B4, anchor + 0x7A4, 0x23F);
+		}
+		for (int i = 0; i < lineMax; i++) {
+			char* msg = GetMenuHelpMsgTable()[firstLine + i];
+			memset(temp, 0, 0x200);
+			CMes::MakeAgbString(temp, msg, 0, 1);
+			if (strlen(temp) == 0) {
+				lineCount--;
+				if (firstNonEmptyLine == firstLine + i) {
+					firstNonEmptyLine++;
+				}
+			}
+		}
+		delete[] temp;
+
+		int y = lineBaseY[lineCount + drawPrefix - 1];
+		if (drawPrefix != 0) {
+			font->SetPosX(kOptionRowLeft);
+			font->SetPosY(static_cast<float>(static_cast<int>(y)));
+			font->Draw(itemName);
+			font->Draw(suffix);
+			y = static_cast<int>(static_cast<float>(static_cast<unsigned int>(y)) + lineStep);
+		}
+
+		for (int i = 0; i < lineCount; i++) {
+			char* msg = GetMenuHelpMsgTable()[firstNonEmptyLine + i];
+			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
+			font->SetPosY(static_cast<float>(static_cast<int>(y)));
+			CMes::drawTagString(font, msg, 1, 0, 0);
+			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
+		}
+	}
+}
+#pragma pop
+
+/*
+ * --INFO--
+ * PAL Address: 0x8017ac40
+ * PAL Size: 272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma dont_inline on
+void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* text, float scaleX, float scaleY, float margin)
+{
+	CFont* font = m_fonts[0];
+
+	font->SetMargin(margin);
+	font->SetShadow(1);
+	font->SetScaleX(scaleX);
+	font->SetScaleY(scaleY);
+	font->DrawInit();
+	font->SetTlut(tlut);
+	font->SetColor(color);
+	font->SetPosX((float)posX);
+	font->SetPosY((float)posY);
+	font->Draw(text);
+}
+#pragma dont_inline reset
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+#pragma dont_inline on
+void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text, float scale, float margin)
+{
+	CFont* font = m_fonts[0];
+
+	font->SetMargin(margin);
+	font->SetShadow(1);
+	font->SetScale(scale);
+	font->DrawInit();
+	font->SetTlut(tlut);
+	font->SetColor(color);
+	font->SetPosX((float)posX);
+	font->SetPosY((float)posY);
+	font->Draw(text);
+}
+#pragma dont_inline reset
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
+{
+    const float& halfWidth = kMenuCenteringHalfWidth;
+    const float& offset = kMenuCenteringOffset;
+    float width = font->GetWidth(text);
+    return offset - width * halfWidth;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
+{
+	CFont* font = m_fonts[0];
+	float width;
+	const float& scaleY = kOptionAnimMax;
+	const float& halfWidth = kMenuCenteringHalfWidth;
+	const float& offset = kMenuCenteringOffset;
+
+	font->SetShadow(1);
+	font->SetMargin(margin);
+	font->SetScaleX(scale);
+	font->SetScaleY(scaleY);
+	width = font->GetWidth(text);
+	return offset - width * halfWidth;
 }

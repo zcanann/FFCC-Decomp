@@ -1508,8 +1508,8 @@ void CMemoryCardMan::MakeSaveData()
 
     for (int c = 0; c < 8; c++)
     {
-        u8* dst = save + 0x14D0 + c * 0x9C0;
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
+        u8* dst = save + 0x14D0 + c * 0x9C0;
 
         int shopState = caravanWork->m_shopState;
         if (shopState != 0 && static_cast<s8>(caravanWork->unk_0xc1e) == 0)

@@ -1820,8 +1820,6 @@ checkLoaded:
                             continue;
                         }
 
-                        const int rawSize = static_cast<int>(chunk.m_size);
-
                         switch (dataType) {
                         case 0: {
                             CLoadModel* loadModel;
@@ -1836,6 +1834,7 @@ checkLoaded:
                         modelFound:
 
                             if (loadModel == 0) {
+                                const unsigned int rawSize = static_cast<int>(chunk.m_size);
                                 void* rawAddr = chunkFile.GetAddress();
                                 loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
                                 loadModel->m_keyTag = keyTag;
@@ -1881,6 +1880,7 @@ checkLoaded:
                         textureFound:
 
                             if (loadTexture == 0) {
+                                const unsigned int rawSize = static_cast<int>(chunk.m_size);
                                 void* rawAddr = chunkFile.GetAddress();
                                 loadTexture = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
                                 loadTexture->m_keyTag = keyTag;
@@ -1964,7 +1964,7 @@ checkLoaded:
                         pdtFound:
 
                             void* primaryData = chunkFile.GetAddress();
-                            const int primarySize = rawSize;
+                            const int primarySize = static_cast<int>(chunk.m_size);
                             if (loadPdt == 0) {
                                 chunkFile.GetNextChunk(chunk);
                                 void* secondaryData = chunkFile.GetAddress();

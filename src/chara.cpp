@@ -937,8 +937,8 @@ CChara::CModel::~CModel()
  */
 void CChara::CModel::Init()
 {
-	m_curFrame = 0.0f;
 	m_time = 0.0f;
+	m_curFrame = 0.0f;
 	m_dynJitter.x = 0.0f;
 	m_dynJitter.y = 0.0f;
 	m_dynJitter.z = 0.0f;

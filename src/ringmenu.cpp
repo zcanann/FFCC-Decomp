@@ -962,7 +962,7 @@ void CRingMenu::onCalc()
 		}
 		m_gbaAnimCounter = clampDecToZero(m_gbaAnimCounter);
 
-		double scrollDelta = static_cast<double>(kRingMenuZero);
+		float scrollDelta = kRingMenuZero;
 		CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 		if (partyObj != 0) {
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
@@ -974,8 +974,8 @@ void CRingMenu::onCalc()
 			                      ? &Chara.MogFur().m_trackedCommandIndex
 			                      : &m_currentCommandIndex;
 
-			int prev = currentCmd;
 			int next = currentCmd;
+			int prev = currentCmd;
 			if (*trackedCmd != currentCmd) {
 				for (int step = 1; step < 4; step++) {
 					next = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
@@ -1013,22 +1013,22 @@ void CRingMenu::onCalc()
 								if ((trigger & 0x40) != 0) {
 									nextDir = prevDir;
 								}
-								scrollDelta = static_cast<double>(static_cast<float>(nextDir));
+								scrollDelta = static_cast<float>(nextDir);
 							} else if (prevDir != 0) {
-								scrollDelta = static_cast<double>(static_cast<float>(prevDir));
+								scrollDelta = static_cast<float>(prevDir);
 							} else if (nextDir != 0) {
-								scrollDelta = static_cast<double>(static_cast<float>(nextDir));
+								scrollDelta = static_cast<float>(nextDir);
 							}
 							break;
 						}
-						scrollDelta = static_cast<double>(kRingMenuZero);
+						scrollDelta = kRingMenuZero;
 					}
 
 				}
 			}
 
 			*trackedCmd = currentCmd;
-			m_spinAccumulator = static_cast<float>(static_cast<double>(m_spinAccumulator) + scrollDelta);
+			m_spinAccumulator = m_spinAccumulator + scrollDelta;
 			m_spinAccumulator *= kRingMenuSpinDamping;
 		}
 	}

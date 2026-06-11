@@ -9433,7 +9433,7 @@ void CMenuPcs::WMChgMenu()
 	*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x1C) = 0;
 
 	int frameInfo = reinterpret_cast<int>(m_wm.m_frameInfo);
-	*reinterpret_cast<short*>(frameInfo + 0x20) = *reinterpret_cast<unsigned short*>(frameInfo + 4);
+	*reinterpret_cast<short*>(frameInfo + 0x20) = *reinterpret_cast<short*>(frameInfo + 4);
 	*reinterpret_cast<short*>(frameInfo + 0x22) = *reinterpret_cast<short*>(frameInfo + 6);
 	*reinterpret_cast<short*>(frameInfo + 0x24) = *reinterpret_cast<short*>(frameInfo + 8);
 	*reinterpret_cast<short*>(frameInfo + 0x26) = *reinterpret_cast<short*>(frameInfo + 10);
@@ -9576,17 +9576,13 @@ void CMenuPcs::WMChgMenu()
 			iVar11 = 4;
 			do {
 				if (*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) < 0) {
-					int iVar12b = 0;
+					int iVar12b;
 					unsigned int uVar10 = (unsigned int)(char)bVar7;
-					if ((uVar10 & 1) != 0) { iVar12b = 1;
-					if ((uVar10 & 2) != 0) { iVar12b = 2;
-					if ((uVar10 & 4) != 0) { iVar12b = 3;
-					if ((uVar10 & 8) != 0) { iVar12b = 4;
-					if ((uVar10 & 0x10) != 0) { iVar12b = 5;
-					if ((uVar10 & 0x20) != 0) { iVar12b = 6;
-					if ((uVar10 & 0x40) != 0) { iVar12b = 7;
-					if ((uVar10 & 0x80) != 0) { iVar12b = 8;
-					}}}}}}}}
+					for (iVar12b = 0; iVar12b < 8; iVar12b++) {
+						if ((uVar10 & (1 << iVar12b)) == 0) {
+							break;
+						}
+					}
 					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)iVar12b;
 					bVar7 = bVar7 | (1 << iVar12b);
 				}
@@ -9670,17 +9666,13 @@ void CMenuPcs::WMChgMenu()
 		iVar11 = 4;
 		do {
 			if (*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) < 0) {
-				int iVar12b = 0;
+				int iVar12b;
 				unsigned int uVar10 = (unsigned int)(char)bVar7;
-				if ((uVar10 & 1) != 0) { iVar12b = 1;
-				if ((uVar10 & 2) != 0) { iVar12b = 2;
-				if ((uVar10 & 4) != 0) { iVar12b = 3;
-				if ((uVar10 & 8) != 0) { iVar12b = 4;
-				if ((uVar10 & 0x10) != 0) { iVar12b = 5;
-				if ((uVar10 & 0x20) != 0) { iVar12b = 6;
-				if ((uVar10 & 0x40) != 0) { iVar12b = 7;
-				if ((uVar10 & 0x80) != 0) { iVar12b = 8;
-				}}}}}}}}
+				for (iVar12b = 0; iVar12b < 8; iVar12b++) {
+					if ((uVar10 & (1 << iVar12b)) == 0) {
+						break;
+					}
+				}
 				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)iVar12b;
 				bVar7 = bVar7 | (1 << iVar12b);
 			}

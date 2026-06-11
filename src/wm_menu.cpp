@@ -11194,6 +11194,7 @@ void CMenuPcs::DrawHelpBase(int kind, float baseAlpha)
 void CMenuPcs::CalcMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const charaBase = bytes + 0x44;
 	unsigned char* const worldObj = m_wm.m_worldObjData;
 
 	const float panelStateFloat = FLOAT_80331480;
@@ -11331,13 +11332,13 @@ void CMenuPcs::CalcMcObj()
 			PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
 			reinterpret_cast<CChara::CModel*>(
-			    *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x7B8 + i * 4) + 0x168))
+			    *reinterpret_cast<int*>(*reinterpret_cast<int*>(charaBase + 0x774 + i * 4) + 0x168))
 			    ->SetMatrix(scaleMtx);
 			reinterpret_cast<CChara::CModel*>(
-			    *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x7B8 + i * 4) + 0x168))
+			    *reinterpret_cast<int*>(*reinterpret_cast<int*>(charaBase + 0x774 + i * 4) + 0x168))
 			    ->CalcMatrix();
 			reinterpret_cast<CChara::CModel*>(
-			    *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x7B8 + i * 4) + 0x168))
+			    *reinterpret_cast<int*>(*reinterpret_cast<int*>(charaBase + 0x774 + i * 4) + 0x168))
 			    ->CalcSkin();
 		}
 	}

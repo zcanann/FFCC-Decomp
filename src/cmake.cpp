@@ -1825,6 +1825,7 @@ int CMenuPcs::CmakeJobCtrl()
             Sound.PlaySe(2, 0x40, 0x7F, 0);
             CmakeMcState(this) = 2;
         }
+        return 0;
     } else {
         if ((repeat & 0x8) != 0) {
             if ((CmakeState(this)->m_select % 4) != 0) {

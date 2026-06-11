@@ -2162,7 +2162,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			default:
 				break;
 		}
-	} else {
+	} else if (current == 0 && clampedValue != 0) {
 		switch (staIndex) {
 			case 0x1B:
 				for (int i = 0; i < 0x16; i++) {

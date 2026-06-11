@@ -3482,13 +3482,13 @@ renderedDone:
         break;
     }
     case -0x9F:
-        if (object->m_localBase[1] < 0) {
-            Game.m_caravanWorkArr[*object->m_localBase].m_shopState = 0;
-        } else {
+        if (static_cast<int>(object->m_localBase[1]) >= 0) {
             Game.m_caravanWorkArr[*object->m_localBase].Init(
                 object->m_localBase[1],
                 reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + object->m_localBase[1] * 0x1D0),
                 object->m_localBase[2]);
+        } else {
+            Game.m_caravanWorkArr[*object->m_localBase].m_shopState = 0;
         }
         this->push(object, 0);
         outResult = 0;

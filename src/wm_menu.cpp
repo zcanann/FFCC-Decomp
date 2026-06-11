@@ -5832,9 +5832,11 @@ void CMenuPcs::DrawTitleMenu()
 		unsigned int uVar7 = 0xFFFFFFF8;
 		unsigned int uVar6 = 0x70;
 		for (int i = 0; i < 2; i++) {
-			float labelAlpha = FLOAT_803313e8;
+			float labelAlpha;
 			if (m_wmWorldState->m_mainState == 1) {
 				labelAlpha = static_cast<float>(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter));
+			} else {
+				labelAlpha = FLOAT_803313e8;
 			}
 			matColor.r = 0xFF;
 			matColor.g = 0xFF;
@@ -5893,9 +5895,11 @@ void CMenuPcs::DrawTitleMenu()
 		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 		MenuPcs.SetTexture((TEX)0x44);
-		float copyrightAlpha = FLOAT_803313e8;
+		float copyrightAlpha;
 		if (m_wmWorldState->m_mainState == 1) {
 			copyrightAlpha = static_cast<float>(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter));
+		} else {
+			copyrightAlpha = FLOAT_803313e8;
 		}
 		matColor.r = 0xFF;
 		matColor.g = 0xFF;

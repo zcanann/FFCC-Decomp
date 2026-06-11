@@ -10839,15 +10839,22 @@ LAB_next:
 	    worldState->m_mainState == 2) {
 		const float sepZero = FLOAT_803313dc;
 		const double sepSlope = DOUBLE_80331498;
+		const double sepBias = DOUBLE_80331408;
 		const double sepBase = DOUBLE_80331490;
 		const double sepOff = DOUBLE_80331510;
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+			double rawA;
+			double rawB;
+			reinterpret_cast<int*>(&rawA)[0] = 0x43300000;
+			reinterpret_cast<int*>(&rawA)[1] = slot ^ 0x80000000;
+			reinterpret_cast<int*>(&rawB)[0] = 0x43300000;
+			reinterpret_cast<int*>(&rawB)[1] = slot ^ 0x80000000;
 			MenuPcs.DrawRect(0, FLOAT_803314D8,
-			         static_cast<float>(static_cast<float>(sepSlope * static_cast<double>(slot) + sepBase) -
+			         static_cast<float>(static_cast<float>(sepSlope * (rawA - sepBias) + sepBase) -
 			                            sepOff),
 			         FLOAT_803314D8, FLOAT_803314D8,
-			         static_cast<float>(sepBase * static_cast<double>(slot)), FLOAT_803313e0,
+			         static_cast<float>(sepBase * (rawB - sepBias)), FLOAT_803313e0,
 			         FLOAT_803313e8, FLOAT_803313e8, sepZero);
 		}
 	}

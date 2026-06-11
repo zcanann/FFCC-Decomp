@@ -137,7 +137,9 @@ void CMaterialEditorPcs::SetUSBData()
 
         memcpy(rsdItem->ptr10, usb.m_data, usb.m_sizeBytes * 0xC);
 
-        for (u32 offset = 0, i = 0; i < usb.m_sizeBytes; offset += 0xC, i++) {
+        u32 offset;
+        u32 i;
+        for (i = 0, offset = 0; i < usb.m_sizeBytes; offset += 0xC, i++) {
             StoreSwapFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x0));
             StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x4));
             StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x8));
@@ -184,7 +186,9 @@ void CMaterialEditorPcs::SetUSBData()
         memset(rsdItem->ptr18, 0, usb.m_sizeBytes * 0x70);
         memcpy(rsdItem->ptr18, usb.m_data, usb.m_sizeBytes * 0x70);
 
-        for (u32 offset = 0, i = 0; i < usb.m_sizeBytes; offset += 0x70, i++) {
+        u32 offset;
+        u32 i;
+        for (i = 0, offset = 0; i < usb.m_sizeBytes; offset += 0x70, i++) {
             StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x00));
             StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x02));
             StoreSwap32(reinterpret_cast<u32*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x04));
@@ -241,7 +245,9 @@ void CMaterialEditorPcs::SetUSBData()
 
         memcpy(rsdItem->ptr14, usb.m_data, usb.m_sizeBytes * 0xC);
 
-        for (u32 offset = 0, i = 0; i < usb.m_sizeBytes; offset += 0xC, i++) {
+        u32 offset;
+        u32 i;
+        for (i = 0, offset = 0; i < usb.m_sizeBytes; offset += 0xC, i++) {
             StoreSwapFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x0));
             StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x4));
             StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x8));
@@ -300,13 +306,14 @@ void CMaterialEditorPcs::SetUSBData()
         RSDITEM* rsdItem = this->GetRsdItem()->rsdItem;
         memcpy(dstBuffer, usb.m_data, usb.m_sizeBytes);
 
-        u32 dstOffset = 0;
-        for (u32 i = 0; i < usb.m_sizeBytes; i++) {
+        u32 i;
+        u32 dstOffset;
+        for (i = 0, dstOffset = 0; i < usb.m_sizeBytes; dstOffset += 0x70, i++) {
             u8 value = *dstBuffer;
+            u8* writeBase = static_cast<u8*>(rsdItem->ptr18);
             u32 writeOffset = dstOffset + 0x1A;
-            dstOffset += 0x70;
             dstBuffer++;
-            static_cast<u8*>(rsdItem->ptr18)[writeOffset] = value;
+            writeBase[writeOffset] = value;
         }
 
         if (src != 0) {
@@ -473,3 +480,4 @@ void CMaterialEditorPcs::MemFree(void* ptr)
 
 extern const float kMapEditorZero = 0.0f;
 extern const float kMapEditorOne = 1.0f;
+extern const double kMapEditorS32ToDoubleBias = 4503601774854144.0;

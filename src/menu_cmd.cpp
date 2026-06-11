@@ -1060,6 +1060,7 @@ void CMenuPcs::CmdDraw()
 							const CCaravanWork* const caravan2 =
 							    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 							const s16* canBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+							const s16* canItems = canBuf + 1;
 							u8 canUse;
 							if ((sel < 0) || (sel >= canBuf[0])) {
 								canUse = 0;
@@ -1071,7 +1072,7 @@ void CMenuPcs::CmdDraw()
 								canUse = static_cast<u32>(
 								    ChkUnite(GetCmdStateView(this)->selected, combo) != 0);
 							} else {
-								canUse = static_cast<u32>(static_cast<u8>(EquipChk(static_cast<int>(canBuf[sel - 1]))) == 0);
+								canUse = static_cast<u32>(static_cast<u8>(EquipChk(static_cast<int>(canItems[sel - 2]))) == 0);
 							}
 
 							if (canUse == 0) {

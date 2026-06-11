@@ -2635,46 +2635,14 @@ int CMenuPcs::EquipChk(int itemNo)
 {
     CCaravanWork* w = SingleCaravanWork();
     int item;
-    int slot = 2;
-        if (slot < w->m_numCmdListSlots) {
-        item = w->m_commandListInventorySlotRef[2];
+    int slot;
+    for (slot = 2; slot < 8; slot++) {
+        if (slot >= w->m_numCmdListSlots) {
+            break;
+        }
+        item = w->m_commandListInventorySlotRef[slot];
         if ((item >= 0) && (item == itemNo)) {
             return 1;
-        }
-        slot++;
-        if (slot < w->m_numCmdListSlots) {
-            item = w->m_commandListInventorySlotRef[3];
-            if ((item >= 0) && (item == itemNo)) {
-                return 1;
-            }
-            slot++;
-            if (slot < w->m_numCmdListSlots) {
-                item = w->m_commandListInventorySlotRef[4];
-                if ((item >= 0) && (item == itemNo)) {
-                    return 1;
-                }
-                slot++;
-                if (slot < w->m_numCmdListSlots) {
-                    item = w->m_commandListInventorySlotRef[5];
-                    if ((item >= 0) && (item == itemNo)) {
-                        return 1;
-                    }
-                    slot++;
-                    if (slot < w->m_numCmdListSlots) {
-                        item = w->m_commandListInventorySlotRef[6];
-                        if ((item >= 0) && (item == itemNo)) {
-                            return 1;
-                        }
-                        slot++;
-                        if (slot < w->m_numCmdListSlots) {
-                            item = w->m_commandListInventorySlotRef[7];
-                            if ((item >= 0) && (item == itemNo)) {
-                                return 1;
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 

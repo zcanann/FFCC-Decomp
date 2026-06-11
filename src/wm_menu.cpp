@@ -10128,10 +10128,12 @@ input_check_done:
 	if (((state > 0) && (state < 4)) || m_wmWorldState->m_cardChannel == 1) {
 		if (state == 2 && m_wmWorldState->m_delay == 0) {
 			if ((btn & 1) != 0) {
+				float zero = FLOAT_803313dc;
 				*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_8033151c;
-				if (*reinterpret_cast<float*>(bytes + 0x78) < FLOAT_803313dc) {
-					*reinterpret_cast<float*>(bytes + 0x78) += FLOAT_80331528;
-					*reinterpret_cast<float*>(bytes + 0x7C) += FLOAT_80331528;
+				if (*reinterpret_cast<float*>(bytes + 0x78) < zero) {
+					float wrap = FLOAT_80331528;
+					*reinterpret_cast<float*>(bytes + 0x78) += wrap;
+					*reinterpret_cast<float*>(bytes + 0x7C) += wrap;
 				}
 				m_wmWorldState->m_frameCounter = 0xE;
 				if (m_wmWorldState->m_cardChannel >= 4) {
@@ -10141,10 +10143,11 @@ input_check_done:
 				}
 				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			} else if ((btn & 2) != 0) {
+				float wrap2 = FLOAT_80331528;
 				*reinterpret_cast<float*>(bytes + 0x78) += FLOAT_8033151c;
-				if (*reinterpret_cast<float*>(bytes + 0x78) > FLOAT_80331528) {
-					*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_80331528;
-					*reinterpret_cast<float*>(bytes + 0x7C) -= FLOAT_80331528;
+				if (*reinterpret_cast<float*>(bytes + 0x78) > wrap2) {
+					*reinterpret_cast<float*>(bytes + 0x78) -= wrap2;
+					*reinterpret_cast<float*>(bytes + 0x7C) -= wrap2;
 				}
 				m_wmWorldState->m_frameCounter = 0xE;
 				if (m_wmWorldState->m_cardChannel <= 0) {

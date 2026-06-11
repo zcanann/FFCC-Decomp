@@ -2519,6 +2519,7 @@ void CMenuPcs::DrawResultCloseAnim()
 #pragma opt_loop_invariants off
 #pragma opt_strength_reduction off
 #pragma opt_dead_assignments off
+#pragma opt_propagation off
 void CMenuPcs::CalcResultCloseAnim()
 {
 	int doneCount;
@@ -2536,14 +2537,14 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		{
-			int headerSprite = this->m_bonusAnimPtr + 0 * 0x40 + 8;
-			*(int*)(headerSprite + 0x24) = 9999;
-			*(int*)(headerSprite + 0x2c) = 3;
+			int idx = 0;
+			BonusAnimSprite* spr = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[idx];
+			spr->startFrame = 9999;
+			spr->flags = 3;
 		}
 
-		for (int i = 0; i < activePartyCount; i++) {
-			int idx = i + 1;
-			int off2 = idx * 0x40 + 8;
+		for (int i = 1; i <= activePartyCount; i++) {
+			int off2 = i * 0x40 + 8;
 			int __p10 = off2;
 			int sprite = this->m_bonusAnimPtr + __p10;
 			*(int*)(sprite + 0x24) = 0x10;

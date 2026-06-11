@@ -735,62 +735,6 @@ void CMemoryCardMan::CnvPlayTime(unsigned int frames, int* hours, int* minutes)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McWrite(char* buffer, int length, int offset)
-{
-    if (buffer == nullptr)
-    {
-        buffer = m_saveBuffer;
-    }
-
-    m_opDoneFlag = 0;
-    m_state = 9;
-
-    int result = CARDWriteAsync(
-        &m_fileInfo,
-        buffer,
-        length,
-        offset,
-        &Attach
-    );
-
-    if (result < 0)
-    {
-        m_opDoneFlag = 1;
-    }
-
-    m_result = result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::McRead(char* buffer, int length, int offset)
-{
-    if (buffer == nullptr)
-    {
-        buffer = m_saveBuffer;
-    }
-
-    m_opDoneFlag = 0;
-    m_state = 8;
-
-    int result = CARDReadAsync(&m_fileInfo, buffer, length, offset, &Attach);
-
-    if (result < 0)
-    {
-        m_opDoneFlag = 1;
-    }
-
-    m_result = result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 int CMemoryCardMan::DummyLoad()
 {
     int result;
@@ -1762,6 +1706,62 @@ void CMemoryCardMan::McFormat(int chan)
         chan,
         &Attach
     );
+
+    if (result < 0)
+    {
+        m_opDoneFlag = 1;
+    }
+
+    m_result = result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::McWrite(char* buffer, int length, int offset)
+{
+    if (buffer == nullptr)
+    {
+        buffer = m_saveBuffer;
+    }
+
+    m_opDoneFlag = 0;
+    m_state = 9;
+
+    int result = CARDWriteAsync(
+        &m_fileInfo,
+        buffer,
+        length,
+        offset,
+        &Attach
+    );
+
+    if (result < 0)
+    {
+        m_opDoneFlag = 1;
+    }
+
+    m_result = result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::McRead(char* buffer, int length, int offset)
+{
+    if (buffer == nullptr)
+    {
+        buffer = m_saveBuffer;
+    }
+
+    m_opDoneFlag = 0;
+    m_state = 8;
+
+    int result = CARDReadAsync(&m_fileInfo, buffer, length, offset, &Attach);
 
     if (result < 0)
     {

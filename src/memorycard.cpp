@@ -1419,8 +1419,6 @@ void CMemoryCardMan::MakeSaveData()
     saveDat->m_rotateKey = static_cast<u8>(Math.Rand(0xFF));
     saveDat->m_flags = 0;
 
-    u8* letterSrc;
-    u8* letterDst;
     CGame::CGameWork* gameWork = &Game.m_gameWork;
     CGame* g = &Game;
     for (int i = 0; i < 4; i++)
@@ -1512,29 +1510,25 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<u32*>(dst + 0xEC) = caravanWork->m_gil;
         memcpy(dst + 0xF0, caravanWork->m_name, 0x10);
         *reinterpret_cast<u32*>(dst + 0x100) = caravanWork->m_letterCount;
-        letterSrc = reinterpret_cast<u8*>(caravanWork);
-        letterDst = dst;
         for (letter = 0; letter < 100; letter++)
         {
-            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_attachmentIsGil =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->FlagsBits().m_attachmentIsGil;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->HeaderBitsRef().m_messageType =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->HeaderBitsRef().m_messageType;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->WordBitsRef().m_senderId =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->WordBitsRef().m_senderId;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->AttachmentBitsRef().m_value =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->AttachmentBitsRef().m_value;
-            memcpy(letterDst + 0x108, letterSrc + 0x3F0, 8);
-            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_opened =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->FlagsBits().m_opened;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_attachmentClaimed =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->FlagsBits().m_attachmentClaimed;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_replySent =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->FlagsBits().m_replySent;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_hasReply =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->FlagsBits().m_hasReply;
-            letterSrc += sizeof(CCaravanWork::CLetterWork);
-            letterDst += 0xC;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->FlagsBits().m_attachmentIsGil =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->FlagsBits().m_attachmentIsGil;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->HeaderBitsRef().m_messageType =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->HeaderBitsRef().m_messageType;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->WordBitsRef().m_senderId =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->WordBitsRef().m_senderId;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->AttachmentBitsRef().m_value =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->AttachmentBitsRef().m_value;
+            memcpy(dst + letter * 0xC + 0x108, reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3F0, 8);
+            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->FlagsBits().m_opened =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->FlagsBits().m_opened;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->FlagsBits().m_attachmentClaimed =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->FlagsBits().m_attachmentClaimed;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->FlagsBits().m_replySent =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->FlagsBits().m_replySent;
+            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->FlagsBits().m_hasReply =
+                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->FlagsBits().m_hasReply;
         }
 
         for (int artifact = 0; artifact < 96; artifact++)

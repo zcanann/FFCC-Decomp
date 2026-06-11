@@ -12344,10 +12344,16 @@ void CMenuPcs::DrawFilter(unsigned char r, unsigned char g, unsigned char b, uns
 	_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(5), static_cast<_GXLogicOp>(1));
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-	GXPosition3f32(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-	GXPosition3f32(FLOAT_803313e0, FLOAT_803313dc, FLOAT_803313dc);
-	GXPosition3f32(FLOAT_803313e0, FLOAT_803313e4, FLOAT_803313dc);
-	GXPosition3f32(FLOAT_803313dc, FLOAT_803313e4, FLOAT_803313dc);
+	const float* pTall = &FLOAT_803313e4;
+	const float* pWide = &FLOAT_803313e0;
+	const float* pZero = &FLOAT_803313dc;
+	float tall = *pTall;
+	float wide = *pWide;
+	float zero = *pZero;
+	GXPosition3f32(zero, zero, zero);
+	GXPosition3f32(wide, zero, zero);
+	GXPosition3f32(wide, tall, zero);
+	GXPosition3f32(zero, tall, zero);
 }
 
 /*

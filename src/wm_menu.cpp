@@ -5126,8 +5126,9 @@ void CMenuPcs::DrawMoveMenu()
 
 		PSMTXCopy(reinterpret_cast<MtxPtr>(bytes + 0x744), CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0x00FFFFFF);
-		PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
-		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+		Mtx44 restoreMtx;
+		PSMTX44Copy(CameraPcs.m_screenMatrix, restoreMtx);
+		GXSetProjection(restoreMtx, GX_PERSPECTIVE);
 		Graphic.SetViewport();
 		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();

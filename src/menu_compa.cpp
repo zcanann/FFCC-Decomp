@@ -95,6 +95,8 @@ void CMenuPcs::CompaDraw()
 
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	GXColor colors[4];
+	CompaOpenAnimList* compaList;
+	int familyCount;
 	int yStep;
 	float end;
 	CompaOpenAnim* entry = this->m_compaList->entries;
@@ -206,8 +208,8 @@ void CMenuPcs::CompaDraw()
 	GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
-	int familyCount = 2;
-	CompaOpenAnimList* compaList = this->m_compaList;
+	familyCount = 2;
+	compaList = this->m_compaList;
 	const short* evtWord = &caravanWork->m_evtWordArr[19];
 	int i = 2;
 	do {
@@ -240,7 +242,7 @@ void CMenuPcs::CompaDraw()
 	int drawIndex = 0;
 	int shown = 0;
 	yOffset = drawIndex * 0x28;
-	for (int i = 0; i < 8 && shown < familyCount; i++) {
+	for (int i = shown; i < 8 && shown < familyCount; i++) {
 		float iconX = static_cast<float>(compaList->entries[0].x + 0x128);
 		float iconY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(yOffset);
 
@@ -303,7 +305,7 @@ void CMenuPcs::CompaDraw()
 	drawIndex = 0;
 	shown = 0;
 	yOffset = drawIndex * 0x28;
-	for (int i = 0; i < 8 && shown < familyCount; i++) {
+	for (int i = shown; i < 8 && shown < familyCount; i++) {
 		if (i >= 2) {
 			int scan = drawIndex;
 			for (; scan < 7; scan++) {

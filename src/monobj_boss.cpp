@@ -2691,6 +2691,9 @@ void CGMonObj::teleport(
 	Vec* teleportPoints, int& teleportIndex, Vec& startPos
 )
 {
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+#define object (reinterpret_cast<CGObject*>(prgObj))
+#define mon (reinterpret_cast<unsigned char*>(prgObj))
 	const int blendStartFrame = startFrame + 8;
 	const int blendEndPlusFrame = blendEndFrame + 8;
 	const int blendFrameCount = blendEndFrame - blendStartFrame;
@@ -2811,6 +2814,8 @@ void CGMonObj::teleport(
 		}
 	}
 }
+#undef object
+#undef mon
 #pragma global_optimizer on
 
 /*

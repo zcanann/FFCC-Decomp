@@ -2592,7 +2592,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		// digitEchoBase block: src = iconBase (back = base - iconBase = base - (pc+1)); dance
 		base += activePartyCount;
 		{
-			int back = base - activePartyCount - 1;
+			int back = base - (activePartyCount + 1);
 			int byteDelta = back * 0x40;
 			for (int i = 0; activePartyCount > i; i++) {
 				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
@@ -2625,7 +2625,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		// extraBase block: src = iconBase (back = base - (pc+1)); dance
 		base += activePartyCount;
 		{
-			int back = base - activePartyCount - 1;
+			int back = base - (activePartyCount + 1);
 			int byteDelta = back * 0x40;
 			for (int i = 0; i < activePartyCount; i++) {
 				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;

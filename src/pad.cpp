@@ -170,7 +170,7 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16*& puVar18, u16* p
 						if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0)
 						{
 							uVar16 = static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x14)) >> 0x1F;
-							if ((static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<u8*>(p12 + 0x14))) - uVar16) >= pad->m_stickDigitalThreshold) ||
+							if ((static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x14))) - uVar16) >= pad->m_stickDigitalThreshold) ||
 								((uVar16 = static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x15)) >> 0x1F),
 								 (static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x15))) - uVar16) >= pad->m_stickDigitalThreshold)))
 							{

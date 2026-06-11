@@ -4122,14 +4122,10 @@ void CMenuPcs::createBonus()
 		}
 
 		s_Rinfo->m_missingArtifactMask = 0;
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 8; i++) {
 			if (s_Rinfo->m_tempArtifacts[i] < 0) {
 				s_Rinfo->m_missingArtifactMask =
 				    (unsigned char)(s_Rinfo->m_missingArtifactMask | (1 << i));
-			}
-			if (s_Rinfo->m_bossArtifacts[i] < 0) {
-				s_Rinfo->m_missingArtifactMask =
-				    (unsigned char)(s_Rinfo->m_missingArtifactMask | (1 << (i + 4)));
 			}
 		}
 

@@ -922,6 +922,7 @@ void CRingMenu::onCalc()
 		m_buttonTimers[7] = clampDecToZero(m_buttonTimers[7]);
 		m_buttonTimers[8] = clampDecToZero(m_buttonTimers[8]);
 		int row = 0;
+		int count = 9;
 		do {
 			m_animFloat[row][0] = m_animFloat[row][0] - animStep;
 			if (m_animFloat[row][0] < animMin) {
@@ -936,7 +937,7 @@ void CRingMenu::onCalc()
 				m_animFloat[row][2] = animMin;
 			}
 			row++;
-		} while (row != 9);
+		} while (--count != 0);
 
 		fmod(static_cast<double>(m_spinPhase), kRingMenuOneD);
 		int i = 0x1B;
@@ -977,21 +978,21 @@ void CRingMenu::onCalc()
 			int next = currentCmd;
 			if (*trackedCmd != currentCmd) {
 				for (int step = 1; step < 4; step++) {
-					int nextCandidate = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
-					                        ? (currentCmd + 1) % 5
-					                        : caravanWork->GetNextCmdListIdx(next, 1);
-					int prevCandidate = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
-					                        ? (currentCmd + 4) % 5
-					                        : caravanWork->GetNextCmdListIdx(prev, -1);
+					next = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+					           ? (currentCmd + 1) % 5
+					           : caravanWork->GetNextCmdListIdx(next, 1);
+					prev = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+					           ? (currentCmd + 4) % 5
+					           : caravanWork->GetNextCmdListIdx(prev, -1);
 
 					int trackedValue = *trackedCmd;
 					if (trackedValue != currentCmd) {
 						int prevDir = 0;
 						int nextDir = 0;
-						if (trackedValue == prevCandidate) {
+						if (trackedValue == prev) {
 							prevDir = step;
 						}
-						if (trackedValue == nextCandidate) {
+						if (trackedValue == next) {
 							nextDir = -step;
 						}
 						if ((prevDir != 0) || (nextDir != 0)) {
@@ -1023,8 +1024,6 @@ void CRingMenu::onCalc()
 						scrollDelta = static_cast<double>(kRingMenuZero);
 					}
 
-					prev = prevCandidate;
-					next = nextCandidate;
 				}
 			}
 

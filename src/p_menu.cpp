@@ -631,12 +631,14 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
             } else if (stageSelect == 3) {
                 stage = MapMng.m_stage;
             } else {
-                if ((Game.m_gameWork.m_menuStageMode == 0) || (stageSelect == 0)) {
-                    stage = m_menuStage;
-                } else if (stageSelect == 1) {
-                    stage = m_stageF0;
+                if ((Game.m_gameWork.m_menuStageMode != 0) && (stageSelect != 0)) {
+                    if (stageSelect == 1) {
+                        stage = m_stageF0;
+                    } else {
+                        stage = m_stageF4;
+                    }
                 } else {
-                    stage = m_stageF4;
+                    stage = m_menuStage;
                 }
             }
 

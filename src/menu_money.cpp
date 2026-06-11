@@ -29,39 +29,38 @@ static signed char s_place[16];
 inline void CMenuPcs::MoneySetPlace(int row)
 {
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	int digitPlace = 1;
+	int digitIndex;
+	int started = 0;
 	int gil;
+
 	if (row != 0) {
 		gil = s_Money;
+		digitIndex = 0;
 	} else {
 		gil = caravanWork->m_gil;
+		digitIndex = 0;
 	}
 
-	signed char* place = s_place + row * 8;
-	int digitPlace = 10000000;
-	int digitIndex = 0;
-	int digitCount = 8;
-	int started = 0;
+	digitPlace *= 10000000;
 
 	do {
 		if ((!started) && (gil >= digitPlace)) {
 			started = 1;
 		}
 		if (((!started) && (gil < digitPlace)) && (digitIndex < 7)) {
-			*place = -1;
+			s_place[row * 8 + digitIndex] = -1;
 		} else {
-			int quotient = gil / digitPlace;
-			int digit = quotient;
+			int digit = gil / digitPlace;
 			if (9 < digit) {
 				digit = 9;
 			}
-			*place = static_cast<signed char>(digit);
-			gil = gil - quotient * digitPlace;
+			s_place[row * 8 + digitIndex] = static_cast<signed char>(digit);
+			gil = gil % digitPlace;
 		}
-		place++;
 		digitIndex++;
 		digitPlace /= 10;
-		digitCount--;
-	} while (digitCount != 0);
+	} while (digitIndex < 8);
 }
 
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
@@ -564,7 +563,7 @@ bool CMenuPcs::MoneyOpen()
 		firstAnim->uvScale = 1.0f;
 		firstAnim->startFrame = 0;
 		firstAnim->duration = 10;
-		this->m_moneyPanel->count = 1;
+		this->m_moneyPanel->count = entryIndex;
 
 		s_Money = 0;
 		int row = 0;

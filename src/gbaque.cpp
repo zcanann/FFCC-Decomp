@@ -141,18 +141,18 @@ static const char s_unknown_mapobj_type_error[] = "Error:Unknown mapobj type(%d)
 static const char s_npc_max_over[] = "%s(%d): Error: NPC max over!!\n";
 static const char s_subject_max_over[] = "%s(%d): Error: Subject max over!!\n";
 static const char s_letter_data_error[] = "%s(%d): Error: Letter data error(chan:%d  idx:%d)\n";
-extern const float kGbaQueueQuarter = 0.25f;
-extern const float kGbaQueueMapCoordScale = 3.0f;
+extern const float kGbaQueueQuarter;
+extern const float kGbaQueueMapCoordScale;
 
 namespace GbaQueConst {
-extern const unsigned int ITEM_USE = 1;
-extern const unsigned int ITEM_PUT = 2;
-extern const unsigned int MONEY_ATTACH = 4;
-extern const unsigned int OPEN_LETTER = 0x20;
-extern const unsigned int MOVE_ATTACH = 8;
-extern const unsigned int REPLY_LETTER = 0x10;
-extern const unsigned int CAN_REPLY = 1;
-extern const unsigned int ITEM_ATTACH = 2;
+extern const unsigned int ITEM_USE;
+extern const unsigned int ITEM_PUT;
+extern const unsigned int MONEY_ATTACH;
+extern const unsigned int OPEN_LETTER;
+extern const unsigned int MOVE_ATTACH;
+extern const unsigned int REPLY_LETTER;
+extern const unsigned int CAN_REPLY;
+extern const unsigned int ITEM_ATTACH;
 }
 
 /*
@@ -2324,7 +2324,7 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 
 		unsigned int flags = 0;
 		if (cur->FlagsBits().m_opened) {
-			flags = GbaQueConst::ITEM_USE;
+			flags |= GbaQueConst::ITEM_USE;
 		}
 		if (cur->FlagsBits().m_attachmentClaimed) {
 			flags |= GbaQueConst::ITEM_PUT;
@@ -2652,7 +2652,7 @@ void GbaQueue::LoadMapObj()
 		memset(&mapObjWork, 0, sizeof(mapObjWork));
 
 		CFlatRuntime2::CMapObjectInfo* mapObj = CFlat.m_mapObjectInfo;
-		i = 0;
+		int j = 0;
 		do {
 			char objType = mapObj->m_type;
 			if (objType != -1) {
@@ -2663,28 +2663,27 @@ void GbaQueue::LoadMapObj()
 					}
 				} else {
 					float x = mapObj->m_x;
-					const float scale = kGbaQueueMapCoordScale;
 					unsigned int mask = 1U << count;
 					float y = mapObj->m_y;
 					float z = mapObj->m_z;
 					float r = mapObj->m_radius;
 					int drawFlag = static_cast<int>(mapObj->m_drawFlag);
-					mapObjWork.m_entries[count].m_type = static_cast<unsigned char>(objType);
-					mapObjWork.m_entries[count].m_x = static_cast<short>((int)(x / scale));
-					mapObjWork.m_entries[count].m_y = static_cast<short>((int)(y / scale));
-					mapObjWork.m_entries[count].m_z = static_cast<short>((int)(z / scale));
-					mapObjWork.m_entries[count].m_radius = static_cast<short>((int)(r / scale));
+					unsigned int sign = mask & ((-drawFlag | drawFlag) >> 31);
+					mask = ~mask;
+					mapObjWork.m_entries[count].m_type = static_cast<unsigned char>(mapObj->m_type);
+					mapObjWork.m_entries[count].m_x = static_cast<short>((int)(x / kGbaQueueMapCoordScale));
+					mapObjWork.m_entries[count].m_y = static_cast<short>((int)(y / kGbaQueueMapCoordScale));
+					mapObjWork.m_entries[count].m_z = static_cast<short>((int)(z / kGbaQueueMapCoordScale));
+					mapObjWork.m_entries[count].m_radius = static_cast<short>((int)(r / kGbaQueueMapCoordScale));
 
-					unsigned int drawMask = mapObjWork.m_drawFlags;
-					drawMask = (drawMask & ~mask) | (mask & ((-drawFlag | drawFlag) >> 31));
-					mapObjWork.m_drawFlags = drawMask;
-					mapObjWork.m_count = static_cast<unsigned char>(count + 1);
+					mapObjWork.m_drawFlags = (mapObjWork.m_drawFlags & mask) | sign;
+					mapObjWork.m_count = static_cast<unsigned char>(mapObjWork.m_count + 1);
 				}
 			}
 
-			i++;
+			j++;
 			mapObj++;
-		} while (i < 0x20);
+		} while (j < 0x20);
 
 		i = 0;
 		do {
@@ -5319,4 +5318,18 @@ void GbaQueue::ClrStartBonusFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	m_startBonusFlags = static_cast<unsigned char>(m_startBonusFlags & ~(1 << channel));
 	OSSignalSemaphore(semaphore);
+}
+
+__declspec(section ".sdata2") extern const float kGbaQueueQuarter = 0.25f;
+__declspec(section ".sdata2") extern const float kGbaQueueMapCoordScale = 3.0f;
+
+namespace GbaQueConst {
+__declspec(section ".sdata2") extern const unsigned int ITEM_USE = 1;
+__declspec(section ".sdata2") extern const unsigned int ITEM_PUT = 2;
+__declspec(section ".sdata2") extern const unsigned int MONEY_ATTACH = 4;
+__declspec(section ".sdata2") extern const unsigned int OPEN_LETTER = 0x20;
+__declspec(section ".sdata2") extern const unsigned int MOVE_ATTACH = 8;
+__declspec(section ".sdata2") extern const unsigned int REPLY_LETTER = 0x10;
+__declspec(section ".sdata2") extern const unsigned int CAN_REPLY = 1;
+__declspec(section ".sdata2") extern const unsigned int ITEM_ATTACH = 2;
 }

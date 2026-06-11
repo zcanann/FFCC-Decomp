@@ -33,16 +33,17 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	int digitIndex;
 	int started = 0;
 	int gil;
+	signed char* place;
 
 	if (row != 0) {
 		gil = s_Money;
-		digitIndex = 0;
 	} else {
 		gil = caravanWork->m_gil;
-		digitIndex = 0;
 	}
 
 	digitPlace *= 10000000;
+	digitIndex = 0;
+	place = &s_place[row * 8];
 
 	signed char* place = &s_place[row * 8];
 	do {
@@ -61,6 +62,7 @@ inline void CMenuPcs::MoneySetPlace(int row)
 		}
 		place++;
 		digitIndex++;
+		place++;
 		digitPlace /= 10;
 	} while (digitIndex < 8);
 }

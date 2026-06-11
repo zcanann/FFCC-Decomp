@@ -2407,13 +2407,15 @@ void CShopMenu::DrawSmith0()
 #pragma opt_lifetimes on
 void CShopMenu::DrawShop0()
 {
+    int textId = SHOP_MENU_TEXT_BUY;
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     DrawShopBase();
 
     if (s_shopMenuTopMenuTextInitialized == 0) {
-        s_shopMenuTopMenuEntries[0].text = ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY);
-        s_shopMenuTopMenuEntries[1].text = ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
-        s_shopMenuTopMenuEntries[2].text = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
+        char** mesTable = g_strShopMenuMes + languageId * 0x15;
+        s_shopMenuTopMenuEntries[0].text = mesTable[textId++];
+        s_shopMenuTopMenuEntries[1].text = mesTable[textId++];
+        s_shopMenuTopMenuEntries[2].text = mesTable[textId++];
         s_shopMenuTopMenuTextInitialized = 1;
     }
 

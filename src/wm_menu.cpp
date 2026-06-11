@@ -4850,6 +4850,8 @@ void CMenuPcs::DrawMCardMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_loop_invariants off
+#pragma opt_strength_reduction off
 void CMenuPcs::DrawCMakeMenu()
 {
 	extern double DOUBLE_803314E8;
@@ -4944,9 +4946,10 @@ void CMenuPcs::DrawCMakeMenu()
 		helpColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * contentAlpha));
 		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
-		MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314D0 - static_cast<double>(FLOAT_80331440)),
+		MenuPcs.DrawRect(0, FLOAT_803313dc, static_cast<float>(DOUBLE_803314D0 - static_cast<double>(FLOAT_80331440)),
 		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		if (m_wmWorldState->m_menuMode == 3) {
+			if (m_wmWorldState->m_menuMode == 3) {
 			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
 			char* textList[3] = { 0, 0, 0 };
 			char** const langText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
@@ -4958,6 +4961,7 @@ void CMenuPcs::DrawCMakeMenu()
 			const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
 			DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
 			          FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+			}
 		} else if (m_wmWorldState->m_menuMode == 8) {
 			const int mainMode = *(reinterpret_cast<char*>(g_pGoOutMenu) + 0x2C);
 			switch (mainMode) {
@@ -4982,12 +4986,15 @@ void CMenuPcs::DrawCMakeMenu()
 				}
 				break;
 			case 3:
-				if (*(reinterpret_cast<char*>(g_pGoOutMenu) + 0x24) == 2) {
+				switch (*(reinterpret_cast<char*>(g_pGoOutMenu) + 0x24)) {
+				case 2: {
 					char* const text = lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B + 10];
 					const _GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
 					MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
 					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+					break;
+				}
 				}
 				break;
 			}
@@ -5004,7 +5011,7 @@ void CMenuPcs::DrawCMakeMenu()
 				m_wmWorldState->m_nextMenuMode = 0;
 			}
 		}
-	} else {
+	} else if (m_wmWorldState->m_mainState == 2) {
 		if (m_wmWorldState->m_delay != 0) {
 			m_wmWorldState->m_delay--;
 			if (m_wmWorldState->m_delay <= 0) {
@@ -5016,6 +5023,8 @@ void CMenuPcs::DrawCMakeMenu()
 	}
 }
 
+#pragma opt_strength_reduction on
+#pragma opt_loop_invariants on
 /*
  * --INFO--
  * PAL Address: 0x800f9248

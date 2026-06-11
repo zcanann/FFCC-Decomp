@@ -7900,9 +7900,9 @@ void CMenuPcs::CalcCharaBase()
  */
 void CMenuPcs::DrawCharaBase()
 {
+	short state;
 	WmWorldState* const worldState = m_wmWorldState;
-
-	const short state = worldState->m_mainState;
+	state = worldState->m_mainState;
 	if (state == 0) {
 		return;
 	}

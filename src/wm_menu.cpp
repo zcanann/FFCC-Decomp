@@ -10206,11 +10206,11 @@ input_check_done:
 
 		unsigned char* const worldObj = m_wm.m_worldObjData;
 		Mtx baseMtx;
-		Mtx rotMtx;
 		Mtx workMtx;
 		Mtx modelMtx;
+		Mtx rotMtx;
 		Mtx scaleMtx;
-		Vec basePos;
+		Mtx selScaleMtx;
 		Vec modelPos;
 
 		PSMTXRotRad(baseMtx, 'x', FLOAT_803315d0);
@@ -10267,12 +10267,15 @@ input_check_done:
 			*reinterpret_cast<float*>(panel + 0x30) = FLOAT_803313dc;
 
 			PSMTXRotRad(workMtx, 'y', FLOAT_803314bc * *reinterpret_cast<float*>(panel + 0x2C));
-			PSMTXMultVecSR(workMtx, reinterpret_cast<Vec*>(panel + 0x1C), &basePos);
-			PSMTXTransApply(workMtx, rotMtx, basePos.x, basePos.y, basePos.z);
-			PSMTXConcat(baseMtx, rotMtx, workMtx);
-			modelPos.x = workMtx[0][3];
-			modelPos.y = workMtx[1][3];
-			modelPos.z = workMtx[2][3];
+			PSMTXMultVecSR(workMtx, reinterpret_cast<Vec*>(panel + 0x1C), &modelPos);
+			PSMTXTransApply(workMtx, modelMtx, modelPos.x, modelPos.y, modelPos.z);
+			PSMTXConcat(baseMtx, modelMtx, workMtx);
+			{
+				Vec* const mpp = &modelPos;
+				mpp->x = workMtx[0][3];
+				mpp->y = workMtx[1][3];
+				mpp->z = workMtx[2][3];
+			}
 			PSMTXIdentity(modelMtx);
 
 			if (i == 1) {
@@ -10310,8 +10313,8 @@ input_check_done:
 
 			if (m_wmWorldState->m_cardChannel == i) {
 				PSMTXRotRad(rotMtx, 'z', rotZSel);
-				PSMTXRotRad(scaleMtx, 'y', rotYSel);
-				PSMTXConcat(rotMtx, scaleMtx, rotMtx);
+				PSMTXRotRad(selScaleMtx, 'y', rotYSel);
+				PSMTXConcat(rotMtx, selScaleMtx, rotMtx);
 				PSMTXConcat(rotMtx, modelMtx, modelMtx);
 			}
 

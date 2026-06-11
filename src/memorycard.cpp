@@ -1240,12 +1240,12 @@ void CMemoryCardMan::SetLoadData()
     u32 soundMode = static_cast<u32>(__cntlzw(Sound.GetSoundMode())) >> 5;
     Sound.SetStereo(soundMode);
 
-    CGame::CGameWork* gameWork = &Game.m_gameWork;
-    gameWork->m_gameInitFlag = MakeLoadBool(static_cast<s8>(save[0x13E0]));
-    gameWork->m_spModeFlags[0] = MakeLoadBool(static_cast<s8>(save[0x13E1]));
-    gameWork->m_spModeFlags[1] = MakeLoadBool(static_cast<s8>(save[0x13E2]));
-    gameWork->m_spModeFlags[2] = MakeLoadBool(static_cast<s8>(save[0x13E3]));
-    gameWork->m_spModeFlags[3] = MakeLoadBool(static_cast<s8>(save[0x13E4]));
+    CGame* g = &Game;
+    g->m_gameWork.m_gameInitFlag = MakeLoadBool(static_cast<s8>(save[0x13E0]));
+    g->m_gameWork.m_spModeFlags[0] = MakeLoadBool(static_cast<s8>(save[0x13E1]));
+    g->m_gameWork.m_spModeFlags[1] = MakeLoadBool(static_cast<s8>(save[0x13E2]));
+    g->m_gameWork.m_spModeFlags[2] = MakeLoadBool(static_cast<s8>(save[0x13E3]));
+    g->m_gameWork.m_spModeFlags[3] = MakeLoadBool(static_cast<s8>(save[0x13E4]));
 
     int count;
     int i;
@@ -1359,14 +1359,14 @@ void CMemoryCardMan::SetLoadData()
 
     for (unsigned int i = 0; i < 4; i++)
     {
-        int idx = gameWork->m_wmBackupParams[i];
+        int idx = g->m_gameWork.m_wmBackupParams[i];
         if (Game.m_caravanWorkArr[idx].m_shopState == 0)
         {
-            gameWork->m_wmBackupParams[i] = -1;
+            g->m_gameWork.m_wmBackupParams[i] = -1;
         }
         if (Game.m_caravanWorkArr[idx].m_shopBusyFlag != 0)
         {
-            gameWork->m_wmBackupParams[i] = -1;
+            g->m_gameWork.m_wmBackupParams[i] = -1;
         }
     }
 

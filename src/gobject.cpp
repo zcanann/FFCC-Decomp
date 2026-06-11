@@ -1876,9 +1876,9 @@ void CGObject::update()
                         if (prevWrapped < eventFrame && (eventFrame <= nextWrapped || nextWrapped < prevWrapped)) {
                             CFlatRuntime::CStack stackIn[2];
                             stackIn[0].m_word = static_cast<unsigned int>(m_animSlotSel);
-                            stackIn[1].m_word = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(animRefBytes + 0x32 + i * 4));
+                            stackIn[1].m_word = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(animRefBytes + 0x2E + i * 4));
                             gCFlatRuntime().SystemCall(this, 2, 9, 2, stackIn, 0);
-                            onAnimPoint(m_animSlotSel, *reinterpret_cast<unsigned short*>(animRefBytes + 0x32 + i * 4));
+                            onAnimPoint(m_animSlotSel, *reinterpret_cast<unsigned short*>(animRefBytes + 0x2E + i * 4));
                         }
                     }
                 }
@@ -1914,8 +1914,7 @@ void CGObject::update()
                     const unsigned char queuePos = m_animQueuePos++;
                     const char queuedAnim = m_animQueue[queuePos];
                     if (queuedAnim != -1) {
-                        m_currentAnimSlot =
-                            (queuedAnim >= 'A' && queuedAnim < 'A' + 4) ? m_animQueue[queuedAnim - 'A'] : queuedAnim;
+                        m_currentAnimSlot = m_animQueue[queuedAnim - 'A'];
                         m_weaponNodeFlagAll.m_bits1.m_bit01 = 0;
                         m_animExtraIndex = -1;
                         m_collisionPushTimer = -1;

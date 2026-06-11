@@ -3627,16 +3627,7 @@ void CMenuPcs::DrawSingCMake()
         float alpha = CalcCmakeFadeAlpha(this);
         DrawWMFrame0(1, alpha);
 
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        int a = static_cast<int>(255.0f * alpha);
-        GXColor col;
-        col.r = 0xFF;
-        col.g = 0xFF;
-        col.b = 0xFF;
-        col.a = static_cast<unsigned char>(a);
-        GXSetChanMatColor(GX_COLOR0A0, col);
+        SetCmakeBlendMatColor(alpha);
 
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
         MenuPcs.DrawRect(

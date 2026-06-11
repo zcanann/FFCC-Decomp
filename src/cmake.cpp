@@ -2157,31 +2157,17 @@ int CMenuPcs::CmakeTribeCtrl()
                     return 0;
                 }
 
-                int slot = 0;
-                int duplicateSlot;
+                int slot;
                 unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
-                for (int iter = 0; iter < 4; ++iter) {
+                for (slot = 0; slot < 8; ++slot) {
                     if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
                         (*(entry + 0x1F96) != 1) &&
                         (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
                         (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&
-                        (duplicateSlot = slot,
-                         *reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
+                        (*reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
                         break;
                     }
-                    ++slot;
                     entry += 0xC30;
-                    if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
-                        (*(entry + 0x1F96) != 1) &&
-                        (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
-                        (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&
-                        (duplicateSlot = slot,
-                         *reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
-                        break;
-                    }
-                    ++slot;
-                    entry += 0xC30;
-                    duplicateSlot = slot;
                 }
 
                 if (slot < 8) {

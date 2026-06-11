@@ -6837,11 +6837,11 @@ void JoyBus::RestartThread()
 
     memset(Joybus.m_threadParams, 0, sizeof(Joybus.m_threadParams));
 
-    unsigned int i = 0;
+    unsigned int i;
     JoyBus* paramCursor = &Joybus;
 
-    Joybus.m_threadInitFlag = 0;
-    Joybus.m_threadRunningMask = 0;
+    Joybus.m_threadInitFlag = i = 0;
+    Joybus.m_threadRunningMask = i;
 
     JoyBus* threadCursor = paramCursor;
 

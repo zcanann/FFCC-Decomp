@@ -83,7 +83,7 @@ inline void CPad::SaveReplayData()
 
 #pragma always_inline on
 #pragma inline_max_total_size(100000)
-static inline void MergePadInputs(CPad* pad, u16* puVar13, u16* puVar18, u16* puVar10)
+static inline void MergePadInputs(CPad* pad, u16* puVar13, u16*& puVar18, u16* puVar10)
 {
 	int iVar14;
 	u8* p12;
@@ -405,9 +405,9 @@ void CPad::Frame()
 	u16* puVar13;
 	int iVar14;
 	u32 port;
-	u32 uVar15;
-	u32 gbaIdx;
 	u32 uVar16;
+	u32 gbaIdx;
+	u32 uVar15;
 	u16* puVar18;
 	int iVar19;
 	CPad::Gba local_98[4];

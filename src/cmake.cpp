@@ -1530,7 +1530,7 @@ void CMenuPcs::CmakeResultDraw()
             value = GetMenuStr(static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
         } else if (i == 2) {
             strcpy(tribeWithSlash, GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe)));
-            strcat(tribeWithSlash, "/", sizeof(tribeWithSlash));
+            strcat(tribeWithSlash, "/");
             value = tribeWithSlash;
         } else {
             value = GetJobStr(static_cast<int>(s_CmakeInfo.m_job));
@@ -3240,7 +3240,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
         case 2:
             txt = GetTribeStr(s_CmakeInfo.m_tribe);
             strcpy(tribeWithSep, txt);
-            strcat(tribeWithSep, "/", sizeof(tribeWithSep));
+            strcat(tribeWithSep, "/");
             txt = tribeWithSep;
             break;
         default:

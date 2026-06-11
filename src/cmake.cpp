@@ -881,7 +881,7 @@ void CMenuPcs::CmakeVillageDraw()
         showNameCursor = 0;
     }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);
-    DrawCmakeDecision(villageWork->m_row >= 5, alpha);
+    DrawCmakeDecision((villageWork->m_row >= 5) ? 1 : 0, alpha);
 }
 
 /*
@@ -1088,7 +1088,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
                 if (nameLen == 0) {
                     strcat(s_CmakeInfo.m_name, picked);
                     ret = 0;
-                } else if ((__cntlzw(static_cast<unsigned int>(strlen(rowText))) >> 5 & 1) == 0 && nameLen >= 7) {
+                } else if (-((__cntlzw(strlen(rowText)) & 0x20) >> 5) == 0 && nameLen >= 7) {
                     ret = -1;
                 } else {
                     strcat(s_CmakeInfo.m_name, picked);
@@ -1240,9 +1240,6 @@ void CMenuPcs::CmakeResultDraw1()
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
         const char* txt = GetMenuStr(0x2A + i);
-        if (txt == 0) {
-            txt = "";
-        }
 
         labelWidths[i] = 232.0f + static_cast<float>(labelFont->GetWidth(txt));
         labelFont->SetPosX(232.0f);
@@ -1301,7 +1298,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     if (CmakeState(this)->m_mode == 1) {
         int cursorX = static_cast<int>(196.0f + static_cast<float>(static_cast<int>(System.m_frameCounter) % 8));
-        int cursorY = 0x70 + CmakeState(this)->m_select * 0x28;
+        int cursorY = static_cast<int>(static_cast<float>(0x70 + CmakeState(this)->m_select * 0x28));
         DrawCursor(cursorX, cursorY, alpha);
     }
 }
@@ -1444,29 +1441,13 @@ void CMenuPcs::CmakeResultDraw()
     }
 
     if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        GXColor panelColor;
-        panelColor.r = 0xFF;
-        panelColor.g = 0xFF;
-        panelColor.b = 0xFF;
-        panelColor.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, panelColor);
+        SetCmakeBlendMatColor(1.0f);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
         MenuPcs.DrawRect(
             0, 192.0f, 56.0f, 416.0f, 264.0f,
             0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     } else {
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        GXColor panelColor;
-        panelColor.r = 0xFF;
-        panelColor.g = 0xFF;
-        panelColor.b = 0xFF;
-        panelColor.a = static_cast<unsigned char>(255.0f * alpha);
-        GXSetChanMatColor(GX_COLOR0A0, panelColor);
+        SetCmakeBlendMatColor(alpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
         MenuPcs.DrawRect(
             0, 192.0f, 56.0f, 416.0f, 264.0f,
@@ -1481,15 +1462,7 @@ void CMenuPcs::CmakeResultDraw()
 
     if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        GXColor crestCol;
-        crestCol.r = 0xFF;
-        crestCol.g = 0xFF;
-        crestCol.b = 0xFF;
-        crestCol.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, crestCol);
+        SetCmakeBlendMatColor(1.0f);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
         MenuPcs.DrawRect(
             0,
@@ -1499,16 +1472,7 @@ void CMenuPcs::CmakeResultDraw()
             1.0f, 1.0f, 0.0f);
     } else {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        int crestA = static_cast<int>(255.0f * alpha);
-        GXColor crestCol;
-        crestCol.r = 0xFF;
-        crestCol.g = 0xFF;
-        crestCol.b = 0xFF;
-        crestCol.a = static_cast<unsigned char>(crestA);
-        GXSetChanMatColor(GX_COLOR0A0, crestCol);
+        SetCmakeBlendMatColor(alpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
         MenuPcs.DrawRect(
             0,
@@ -1559,7 +1523,7 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 
-    char tribeWithSlash[0x20];
+    char tribeWithSlash[0x10];
     for (int i = 0; i < 4; i++) {
         const char* value = "";
         if (i == 0) {
@@ -2193,31 +2157,17 @@ int CMenuPcs::CmakeTribeCtrl()
                     return 0;
                 }
 
-                int slot = 0;
-                int duplicateSlot;
+                int slot;
                 unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
-                for (int iter = 0; iter < 4; ++iter) {
+                for (slot = 0; slot < 8; ++slot) {
                     if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
                         (*(entry + 0x1F96) != 1) &&
                         (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
                         (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&
-                        (duplicateSlot = slot,
-                         *reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
+                        (*reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
                         break;
                     }
-                    ++slot;
                     entry += 0xC30;
-                    if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
-                        (*(entry + 0x1F96) != 1) &&
-                        (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
-                        (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&
-                        (duplicateSlot = slot,
-                         *reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
-                        break;
-                    }
-                    ++slot;
-                    entry += 0xC30;
-                    duplicateSlot = slot;
                 }
 
                 if (slot < 8) {
@@ -2499,7 +2449,8 @@ void CMenuPcs::CmakeNameDraw()
     if ((gCmakePreviousStep == 2) && (CmakeState(this)->m_mode == 0)) {
         DrawNamePreviewChara(this, 1.0f, 0xFF);
         DrawCmakeTitle(1, alpha, 1.0f);
-    } else if ((CmakeState(this)->m_mode != 2) || (CmakeState(this)->m_resultDir == -1)) {
+    } else if ((CmakeState(this)->m_mode != 2) ||
+               (CmakeState(this)->m_mode == 2 && CmakeState(this)->m_resultDir == -1)) {
         DrawNamePreviewChara(this, alpha, static_cast<int>(255.0f * alpha));
         DrawCmakeTitle(1, 1.0f, alpha);
     } else {
@@ -2577,7 +2528,7 @@ void CMenuPcs::CmakeNameDraw()
         nameCursor = 0;
     }
     DrawCmakeName(0, nameCursor, name, alpha);
-    DrawCmakeDecision(CmakeState(this)->m_row >= 5, alpha);
+    DrawCmakeDecision((CmakeState(this)->m_row >= 5) ? 1 : 0, alpha);
 
     if (CmakeMcState(this) != 3) {
         DrawMcWin(-1, 0);
@@ -3025,6 +2976,7 @@ void CMenuPcs::CmakeOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -3064,8 +3016,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 
     const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));
-    int packed = (yesNoSel == 0) ? 0x01D00218 : 0x01D00218;
-    int yesX = packed >> 16;
+    int yesX = 0x1D0;
     yesX = static_cast<int>(
         (48.0f - yesW) / 2.0f + static_cast<float>(yesX));
     font->SetPosX(static_cast<float>(yesX));
@@ -3074,7 +3025,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 
     const char* noStr = GetMenuStr(2);
     float noW = static_cast<float>(font->GetWidth(noStr));
-    int noX = packed & 0xFFFF;
+    int noX = 0x218;
     noX = static_cast<int>(
         (48.0f - noW) / 2.0f + static_cast<float>(noX));
     font->SetPosX(static_cast<float>(noX));
@@ -3087,10 +3038,12 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
         if (yesNoSel == 1) {
             cursorBase = yesX;
         }
+        cursorBase -= 0x24;
         int frame = static_cast<int>(System.m_frameCounter) % 8;
-        DrawCursor(cursorBase - 0x24 + frame, 0x175, alpha);
+        DrawCursor(cursorBase + frame, 0x175, alpha);
     }
 }
+#pragma opt_propagation on
 
 /*
  * --INFO--
@@ -3466,6 +3419,7 @@ void CMenuPcs::DrawCrystal(int type, int frame, float alpha)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -3488,8 +3442,8 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
-    int baseX = ((page == 0) ? 0x116 : 0x116);
-    double offsCalc = -(static_cast<double>(40.0f * x - 40.0f) / 2.0) + 32.0;
+    int baseX = 0x116;
+    double offsCalc = static_cast<double>(40.0f - 40.0f * x) / 2.0 + 32.0;
     float offs = static_cast<float>(static_cast<int>(offsCalc));
     int offsU = static_cast<int>(offsCalc);
     MenuPcs.DrawRect(
@@ -3510,6 +3464,7 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
         0, titleX, titleY, 208.0f, 24.0f,
         0.0f, static_cast<float>(page * 0x18), 1.0f, 1.0f, 0.0f);
 }
+#pragma opt_propagation on
 
 /*
  * --INFO--
@@ -3713,15 +3668,19 @@ void CMenuPcs::DrawSingCMake()
     if (CmakeState(this)->m_step == 6) {
         CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_select + 1);
     } else if (CmakeState(this)->m_resultDir < 0) {
-        if (CmakeState(this)->m_step == 5) {
-            CmakeState(this)->m_step = 6;
-        } else {
-            CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step - 1);
+        if (CmakeState(this)->m_step != 0) {
+            if (CmakeState(this)->m_step == 5) {
+                CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step + 1);
+            } else {
+                CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step - 1);
+            }
         }
     } else if (CmakeState(this)->m_step != 5) {
         CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step + 1);
     } else {
         CmakeState(this)->m_step = 0;
+        CmakeState(this)->m_mode = 2;
+        goto initSelection;
     }
 
     if (CmakeState(this)->m_step == 0) {
@@ -3730,6 +3689,7 @@ void CMenuPcs::DrawSingCMake()
         CmakeState(this)->m_mode = 0;
     }
 
+initSelection:
     CmakeState(this)->m_selectionInitialized = 0;
 resetFrame:
     CmakeState(this)->m_frame = 0;
@@ -3771,7 +3731,7 @@ void CMenuPcs::CalcSingCMake()
                 CmakeState(this)->m_subSelect = 0;
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3783,7 +3743,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3795,7 +3755,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3809,7 +3769,7 @@ void CMenuPcs::CalcSingCMake()
                 }
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3825,7 +3785,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3865,7 +3825,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3884,7 +3844,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3895,7 +3855,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3911,7 +3871,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3922,7 +3882,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3938,7 +3898,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -3986,8 +3946,10 @@ void CMenuPcs::CalcSingCMake()
                                 static_cast<int>(caravanWork->m_appearanceVariant));
                             caravanWork->LoadFinished();
                             CallWorldParam(0, slot, 0);
-                            CmakeState(this)->m_stepTimer =
-                                static_cast<short>(static_cast<int>(GetMaxAnimWait()));
+                            {
+                                short animWait = static_cast<short>(static_cast<int>(GetMaxAnimWait()));
+                                CmakeState(this)->m_stepTimer = animWait;
+                            }
                         } else {
                             CmakeState(this)->m_resultDir = -1;
                         }
@@ -4012,7 +3974,7 @@ void CMenuPcs::CalcSingCMake()
                 if (CmakeState(this)->m_frame >= 10) {
                     done = 1;
                 } else {
-                    CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                    CmakeState(this)->m_frame++;
                     done = 0;
                 }
                 result = done;
@@ -4033,7 +3995,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;
@@ -4086,7 +4048,7 @@ void CMenuPcs::CalcSingCMake()
             if (CmakeState(this)->m_frame >= 10) {
                 done = 1;
             } else {
-                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+                CmakeState(this)->m_frame++;
                 done = 0;
             }
             result = done;

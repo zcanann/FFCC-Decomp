@@ -4875,7 +4875,9 @@ void CMenuPcs::DrawCMakeMenu()
 	} while (bit < 2);
 
 	short contentState = m_wmWorldState->m_mainState;
-	if (contentState > 0 && contentState < 4) {
+	int __p11 = contentState;
+	int __p12 = contentState;
+	if (__p12 > 0 && __p11 < 4) {
 		float contentAlpha;
 		if (contentState == 1) {
 			contentAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));

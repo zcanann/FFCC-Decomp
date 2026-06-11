@@ -657,7 +657,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 						*reinterpret_cast<CABlock*>(m_bestPath.m_visited) = *reinterpret_cast<CABlock*>(level1.m_visited);
 						*reinterpret_cast<CABlock*>(m_bestPath.m_path) = *reinterpret_cast<CABlock*>(level1.m_path);
 						m_bestPath.m_pathLength = level1.m_pathLength;
-						m_bestPath.m_cost = level1.m_cost;
+						m_bestPath.m_cost = LoadFloat(level1.m_cost);
 					}
 				}
 				else

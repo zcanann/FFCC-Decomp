@@ -2499,7 +2499,8 @@ void CMenuPcs::CmakeNameDraw()
     if ((gCmakePreviousStep == 2) && (CmakeState(this)->m_mode == 0)) {
         DrawNamePreviewChara(this, 1.0f, 0xFF);
         DrawCmakeTitle(1, alpha, 1.0f);
-    } else if ((CmakeState(this)->m_mode != 2) || (CmakeState(this)->m_resultDir == -1)) {
+    } else if ((CmakeState(this)->m_mode != 2) ||
+               (CmakeState(this)->m_mode == 2 && CmakeState(this)->m_resultDir == -1)) {
         DrawNamePreviewChara(this, alpha, static_cast<int>(255.0f * alpha));
         DrawCmakeTitle(1, 1.0f, alpha);
     } else {
@@ -2577,7 +2578,7 @@ void CMenuPcs::CmakeNameDraw()
         nameCursor = 0;
     }
     DrawCmakeName(0, nameCursor, name, alpha);
-    DrawCmakeDecision(CmakeState(this)->m_row >= 5, alpha);
+    DrawCmakeDecision((CmakeState(this)->m_row >= 5) ? 1 : 0, alpha);
 
     if (CmakeMcState(this) != 3) {
         DrawMcWin(-1, 0);

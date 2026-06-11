@@ -3497,8 +3497,8 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		// frame rows start after their icons
 		if (0 < activePartyCount) {
-			int fwd = activePartyCount << 6;
 			for (int i = 0; i < activePartyCount; i++) {
+				int fwd = activePartyCount << 6;
 				int off = ((i + 1) << 6) + 8;
 				int spr = this->m_bonusAnimPtr + off;
 				int src = spr + fwd;
@@ -3508,8 +3508,8 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		// zeroed model sprites follow the frame rows
 		if (0 < activePartyCount) {
-			int delta = (zeroBase - 1) << 6;
 			for (int i = 0; i < activePartyCount; i++) {
+				int delta = (zeroBase - 1) << 6;
 				int off = ((zeroBase + i) << 6) + 8;
 				int spr = this->m_bonusAnimPtr + off;
 				int src = spr - delta;

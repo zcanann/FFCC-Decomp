@@ -31,6 +31,8 @@ extern const float kPppCharaBreakTriangleCenterScale = 0.3333333f;
 extern const float kPppCharaBreakDegToRad = 0.017453292f;
 extern const float kPppCharaBreakHalfTurnDegrees = 180.0f;
 extern const float kPppCharaBreakWobbleRange = 0.8f;
+extern const double kPppCharaBreakU32ToDoubleBias = 4503601774854144.0;
+extern const double kPppCharaBreakS32ToDoubleBias = 4503599627370496.0;
 extern const float kPppCharaBreakRandomSign = -1.0f;
 
 static inline Mtx& CameraMatrix()

@@ -527,7 +527,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			isMenuBossStage = true;
 		}
 		if (isMenuBossStage) {
-			unsigned short cid = static_cast<unsigned short>(partyObj->GetCID());
+			u16 cid = static_cast<s16>(partyObj->GetCID());
 			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
 			if (((stageCarry >> 5) & 0xFF) != 0) {
 				isStageCarry = true;

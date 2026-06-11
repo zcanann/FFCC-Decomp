@@ -8922,6 +8922,8 @@ void CMenuPcs::CalcCharaSelect()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_loop_invariants off
+#pragma opt_strength_reduction off
 void CMenuPcs::DrawCharaName()
 {
 	extern double DOUBLE_803314E8;
@@ -8961,18 +8963,19 @@ void CMenuPcs::DrawCharaName()
 	unsigned int activeMask =  (int)(long)(0);
 	unsigned int confirmedMask = 0;
 	unsigned int pendingMask = 0;
+	const WmCharaSelectEntry* entry = selectEntries;
 	for (int i = 0; i < 4; i++) {
-		const WmCharaSelectEntry& entry = selectEntries[i];
-		if (entry.m_connected != 0) {
-			const unsigned int bit = 1u << entry.m_currentSlot;
+		if (entry->m_connected != 0) {
+			const unsigned int bit = 1u << entry->m_currentSlot;
 			activeMask |= bit;
-			if (entry.m_confirmed != 0) {
+			if (entry->m_confirmed != 0) {
 				confirmedMask |= bit;
 			}
-			if (entry.m_cmakePending != 0 || entry.m_cmakeReady != 0) {
+			if (entry->m_cmakePending != 0 || entry->m_cmakeReady != 0) {
 				pendingMask |= bit;
 			}
 		}
+		entry++;
 	}
 
 	font->SetMargin(FLOAT_803313e8);
@@ -8981,7 +8984,7 @@ void CMenuPcs::DrawCharaName()
 	font->DrawInit();
 	DrawInit();
 
-	const float alphaF = static_cast<float>(FLOAT_80331458 * fade);
+	const float alphaF = FLOAT_80331458 * fade;
 	GXColor shade;
 	shade.r = 0xFF;
 	shade.g = 0xFF;
@@ -9009,21 +9012,22 @@ void CMenuPcs::DrawCharaName()
 			if ((confirmedMask & (1u << slot)) != 0) {
 				const char* const text = reinterpret_cast<const char*>(
 				    Game.m_caravanWorkArr[0].m_name + caravanOffset);
-				const float xBase = FLOAT_80331410 + static_cast<float>(xCounter);
+				float xBase = FLOAT_80331410 + static_cast<float>(xCounter);
 				const float width = font->GetWidth(text);
 				float scale = FLOAT_803313e8;
-				double xOffset = xOffsetDefault;
 				if (static_cast<double>(width) * DOUBLE_803313f8 > static_cast<double>(FLOAT_80331680)) {
 					const float widthPlus = static_cast<float>(static_cast<double>(width) + DOUBLE_80331510);
 					scale = static_cast<float>(widthPlus * DOUBLE_803313f8 / static_cast<double>(FLOAT_80331680));
-					xOffset = static_cast<float>(FLOAT_8033155C - widthPlus);
+					const double xOffsetW = FLOAT_8033155C - widthPlus;
+					xBase = static_cast<float>(xOffsetW * DOUBLE_803313f8 + xBase);
+				} else {
+					xBase = static_cast<float>(xOffsetDefault * DOUBLE_803313f8 + xBase);
 				}
-				const float x = static_cast<float>(xOffset * DOUBLE_803313f8 + xBase);
 				MenuPcs.DrawRect(
-				    0, x, y, FLOAT_80331680, FLOAT_80331410,
+				    0, xBase, y, FLOAT_80331680, FLOAT_80331410,
 				                                FLOAT_803313dc, FLOAT_803313dc, scale, FLOAT_803313e8, FLOAT_803313dc);
 				MenuPcs.DrawRect(
-				    8, FLOAT_80331680 * scale + x, y,
+				    8, FLOAT_80331680 * scale + xBase, y,
 				                                FLOAT_80331680, FLOAT_80331410, FLOAT_803313dc, FLOAT_803313dc,
 				                                scale, FLOAT_803313e8, FLOAT_803313dc);
 			}
@@ -9040,8 +9044,9 @@ void CMenuPcs::DrawCharaName()
 	font->SetShadow(1);
 	font->SetScale(FLOAT_8033158C);
 	font->DrawInit();
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fade))).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<long>(alphaF))).color);
 
+	CSystem* const sys = &System;
 	const float xBase2 = FLOAT_80331410;
 	const float xMax2 = FLOAT_8033155C;
 	const float yBase2 = FLOAT_80331478;
@@ -9093,7 +9098,7 @@ void CMenuPcs::DrawCharaName()
 			} else if ((pendingMask & (1u << slot)) != 0) {
 				font->SetTlut(0x10);
 				text = emptyText[1];
-				const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
+				const int phase = static_cast<int>(sys->m_frameCounter) % 20 - 10;
 				float blinkFade = fade;
 				if (this->m_wmWorldState->m_mainState == 2) {
 					const int absPhase = phase < 0 ? -phase : phase;
@@ -9129,6 +9134,8 @@ void CMenuPcs::DrawCharaName()
 	DrawInit();
 }
 
+#pragma opt_strength_reduction on
+#pragma opt_loop_invariants on
 /*
  * --INFO--
  * PAL Address: 0x800efc38

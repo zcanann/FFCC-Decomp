@@ -469,9 +469,9 @@ public:
     int TmpArtiCtrlCur();
     void ItemInit();
     void ItemInit1();
-    bool ItemOpen();
+    int ItemOpen();
     int ItemCtrl();
-    bool ItemClose();
+    int ItemClose();
     void ItemDraw();
     int ItemCtrlCur();
     void SingLifeInit(int);

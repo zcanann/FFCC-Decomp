@@ -8523,9 +8523,11 @@ void CMenuPcs::CalcCharaSelect()
 					continue;
 				}
 
-				if (Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState == 0 &&
-				    GetWmCharaHandles(this)[entry.m_currentSlot]->IsModelLoaded(1) &&
-				    GetWmCharaHandles(this)[entry.m_currentSlot]->m_charaKind != 3 &&
+				const int slot = entry.m_currentSlot;
+				const int hOff = (slot + 0x20) * 4 + 0x774;
+				if (Game.m_caravanWorkArr[slot].m_shopState == 0 &&
+				    (*reinterpret_cast<CCharaPcs::CHandle**>(bytes + hOff))->IsModelLoaded(1) &&
+				    (*reinterpret_cast<CCharaPcs::CHandle**>(bytes + hOff))->m_charaKind != 3 &&
 				    entry.m_cmakeReady != 1) {
 					if (static_cast<unsigned int>(System.m_execParam) >= 3) {
 						System.Printf(const_cast<char*>(s_chan_pctd_cur_pctd_801DC3D8), i,

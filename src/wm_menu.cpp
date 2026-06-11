@@ -2782,9 +2782,9 @@ void CMenuPcs::CalcLoadMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const worldState = m_wmWorldState;
+	unsigned char bVar1 = 0;
 	m_textureLocIndex = 0;
 
-	int bVar1 = 0;
 	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
@@ -2800,8 +2800,8 @@ void CMenuPcs::CalcLoadMenu()
 
 	if (m_wmWorldState->m_worldReady == 0) {
 		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 4) = 0x10;
-		float one = FLOAT_803313e8;
 		float zero = FLOAT_803313dc;
+		float one = FLOAT_803313e8;
 		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 6) = 0x10;
 		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 8) = 0xE8;
 		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 0xA) = 0x168;
@@ -2885,7 +2885,6 @@ void CMenuPcs::CalcLoadMenu()
 		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = (short)iVar14;
 	}
 
-	float fVar2 = FLOAT_803313e8;
 	if (m_wmWorldState->m_mainState != 2) {
 		return;
 	}
@@ -2895,10 +2894,10 @@ void CMenuPcs::CalcLoadMenu()
 	switch (iVar10) {
 	case 0:
 	case 2:
-		if ((unsigned char)m_wmWorldState->m_flag09 == 0) {
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_cardChannel;
 			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(fVar2);
+			pFont->SetMargin(FLOAT_803313e8);
 			pFont->SetShadow(0);
 			pFont->SetScale(FLOAT_803313e8);
 			const char* const* msgBuf = GetMcWinMessBuff(0);

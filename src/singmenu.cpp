@@ -3222,7 +3222,7 @@ int CMenuPcs::GetEquipType(int itemNo)
     } else if (flags & 0x3000) {
         equipType = 3;
     } else {
-        equipType = 0;
+        // BUG (original): equipType is returned uninitialized on this path.
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(s_pcts_pctd_item_pctd_m_equip_pct08x_801DE8B0, s_singmenu_cpp, 0xD3D, itemNo, flags);
         }

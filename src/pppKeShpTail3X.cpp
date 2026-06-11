@@ -291,7 +291,10 @@ draw_loop:
         drawScale *= -(((float)rng / kPppKeShpTail3XRandomMax) * step->m_randomScale - kPppKeShpTail3XOne);
         {
             u32 shapeIdx = (u32)(life + rng) / shapeFrameDuration;
-            pppShapeAnimFrame* frame = &shapeAnim->m_frames[shapeIdx % (u32)shapeFrameCount];
+            u32 shapeOffset = (shapeIdx % (u32)shapeFrameCount) * sizeof(pppShapeAnimFrame) +
+                              offsetof(pppShapeAnimData, m_frames);
+            pppShapeAnimFrame* frame = reinterpret_cast<pppShapeAnimFrame*>(
+                reinterpret_cast<u8*>(shapeAnim) + shapeOffset);
             shapeEntry = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + frame->m_shapeOffset);
         }
     }

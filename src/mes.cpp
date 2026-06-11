@@ -361,7 +361,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2B:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
+			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(out, FlatNameDirect(2, CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 4;
@@ -369,7 +369,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2C:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
+			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(out, FlatNameDirect(3, CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 4;
@@ -377,7 +377,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2D:
 		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
+			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(out, FlatNameDirect(3, CMes::m_tempVar[varIndex] + 0x3C));
 			out += strlen(out);
 			src += 4;
@@ -708,7 +708,7 @@ void CMes::Draw()
 
 					MenuPcs.DrawRect(
 					    0, *(float*)((char*)this + 0x3C9C) + *glyph,
-					    kMesIconDrawYOffset + (*(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2)),
+					    kMesIconDrawYOffset + (*(float*)((char*)this + 0x3CA0) + (float)*(unsigned short*)(glyph + 2)),
 					    kMesIconDefaultWidth, kMesIconDefaultWidth, (float)((iconId % 5) * 0x16),
 					    (float)((iconId / 5) * 0x16), kMesOne, kMesOne, kMesZero);
 
@@ -746,7 +746,7 @@ void CMes::Draw()
 					}
 
 					unsigned int fadeCur = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) & 0x0F;
-					unsigned int fadeMax = (*(unsigned char*)((char*)glyph + 0x0F) >> 4) & 0xF;
+					unsigned int fadeMax = (*(signed char*)((char*)glyph + 0x0F) >> 4) & 0xF;
 					float ratio = (float)fadeCur / (float)fadeMax;
 					_GXColor color;
 					color.r = 0xFF;

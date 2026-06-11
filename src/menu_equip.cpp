@@ -432,7 +432,7 @@ void CMenuPcs::EquipDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	int mode = static_cast<int>(GetEquipMenuState(this)->mode);
-	int listState = static_cast<int>(GetEquipMenuState(this)->listState);
+	unsigned int listState = static_cast<int>(GetEquipMenuState(this)->listState);
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	EquipOpenAnim* item = GetEquipListStorage(this)->entries;
 
@@ -483,7 +483,7 @@ void CMenuPcs::EquipDraw()
 	font->DrawInit();
 
 	item = GetEquipListStorage(this)->entries;
-	for (int i = 0; i < 4; i++) {
+	for (unsigned int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
 			CColor color(0xff, 0xff, 0xff, (u8)(kEquipColorMax * item->alpha));
 			font->SetColor(color.color);
@@ -570,7 +570,7 @@ void CMenuPcs::EquipDraw()
 								alpha = (float)(kEquipHalfDouble * (double)listItem->alpha);
 							}
 						} else {
-							int chk = idx - 1;
+							unsigned int chk = idx - 1;
 							int equipped = EquipChk((int)letter[chk + 1]);
 							if (((chk + 1) >= letterCount) || ((equipped & 0xff) != 0) || ((ChkEquipActive(chk + 1) & 0xff) == 0)) {
 								if ((equipped & 0xff) != 0) {
@@ -708,7 +708,7 @@ void CMenuPcs::EquipDraw()
 
 	EquipMenuState* state = GetEquipMenuState(this);
 	s16 endMode = state->mode;
-	int listIndex = static_cast<int>((&state->selected[0])[endMode]) + static_cast<int>(state->scroll);
+	unsigned int listIndex = static_cast<int>((&state->selected[0])[endMode]) + static_cast<int>(state->scroll);
 	int helpEntryIndex;
 	if (endMode == 1) {
 		helpEntryIndex = GetEquipListStorage(this)->count;

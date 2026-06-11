@@ -3350,11 +3350,13 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	int selectedCount;
 	int slot;
 
-	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x458, sizeof(compatibilityData));
-	OSSignalSemaphore(accessSemaphores + channel);
+	semaphore = accessSemaphores + channel;
+	OSWaitSemaphore(semaphore);
+	playerOffset = channel * 0xDC;
+	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + playerOffset + 0x458, sizeof(compatibilityData));
+	OSSignalSemaphore(semaphore);
 
-	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[channel * 0xDC + 0x529];
+	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[playerOffset + 0x529];
 	count = 2;
 	if (compatibilityData[3] != 0) {
 		count++;
@@ -3437,12 +3439,13 @@ void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
 int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 {
 	unsigned char localPlayerData[0xDC];
+	unsigned char* itemPtr;
+	CGame* game;
+	unsigned short cmdData[4];
+	int i;
+	int size;
 	unsigned char count;
 	unsigned char* writePtr;
-	unsigned char* itemPtr;
-	unsigned short cmdData[4];
-	int size;
-	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x454, sizeof(localPlayerData));
@@ -3451,19 +3454,21 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	count = 0;
 	outData[0] = 0;
 	outData[1] = 0;
-	itemPtr = localPlayerData;
+	i = 0;
+	itemPtr = localPlayerData + i * 2;
+	game = &Game;
 	outData[2] = 0;
 	writePtr = outData + 4;
 	outData[3] = 0;
 	size = 4;
 
-	for (i = 0; i < 0x40; i++) {
+	for (; i < 0x40; i++) {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
 		if (MenuPcs.GetItemType(itemId, 1) == 1) {
 		const int iconMask = localPlayerData[2] & 3;
 		const int icon = MenuPcs.GetItemIcon(itemId);
 		if (icon == iconMask) {
-			int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
+			int itemBase = game->unkCFlatData0[2] + itemId * 0x48;
 
 			cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
 			cmdData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);

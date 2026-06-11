@@ -426,9 +426,10 @@ void CMenuPcs::destroy()
         i++;
     } while (i < 2);
 
-    if (m_fonts[0] != nullptr) {
-        if (m_fonts[0]->DecRef() == 0) {
-            delete m_fonts[0];
+    CFont* font = m_fonts[0];
+    if (font != nullptr) {
+        if (font->DecRef() == 0) {
+            delete font;
         }
         m_fonts[0] = 0;
     }
@@ -631,12 +632,14 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
             } else if (stageSelect == 3) {
                 stage = MapMng.m_stage;
             } else {
-                if ((Game.m_gameWork.m_menuStageMode == 0) || (stageSelect == 0)) {
-                    stage = m_menuStage;
-                } else if (stageSelect == 1) {
-                    stage = m_stageF0;
+                if ((Game.m_gameWork.m_menuStageMode != 0) && (stageSelect != 0)) {
+                    if (stageSelect == 1) {
+                        stage = m_stageF0;
+                    } else {
+                        stage = m_stageF4;
+                    }
                 } else {
-                    stage = m_stageF4;
+                    stage = m_menuStage;
                 }
             }
 
@@ -808,7 +811,8 @@ void CMenuPcs::calc()
 
             int current = m_battleHud.m_gaugeValue;
             int value = current - 1;
-            int limit = current + (m_battleHud.m_gaugeTarget - current);
+            int limit = m_battleHud.m_gaugeTarget - current;
+            limit = current + limit;
             if (limit >= value) {
                 current++;
                 if (current < limit) {

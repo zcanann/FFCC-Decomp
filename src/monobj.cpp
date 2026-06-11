@@ -1840,13 +1840,15 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		unsigned short aiState = m_groupTag;
 		int targetIndex = m_targetPartyIndex;
 		int targetChar = '-';
-		int aiChar = '-';
+		int aiMasked = aiState & 0x7FFF;
 
 		if (targetIndex >= 0) {
 			targetChar = targetIndex + '0';
 		}
-		int aiMasked = aiState & 0x7FFF;
-		if (aiMasked != 0) {
+		int aiChar;
+		if (aiMasked == 0) {
+			aiChar = '-';
+		} else {
 			aiChar = aiMasked + 0x40;
 		}
 

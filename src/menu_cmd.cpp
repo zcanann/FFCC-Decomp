@@ -2952,12 +2952,8 @@ unsigned int CMenuPcs::CmdClose2()
 				entry->alpha = kCmdMenuOne;
 			}
 		}
-		if (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= kCmdMenuTransitionFramesD) {
-			return 1;
-		}
-		return 0;
+		return (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= kCmdMenuTransitionFramesD) ? 1 : 0;
 	}
-	return 0;
 }
 
 /*

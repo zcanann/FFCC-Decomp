@@ -1068,7 +1068,7 @@ void CMenuPcs::CmdDraw()
 								canUse = static_cast<u32>(
 								    caravan2->m_commandListInventorySlotRef[GetCmdStateView(this)->selected] >= 0);
 							} else if (sel == 1) {
-								int combo[2][2];
+								int combo[5][2];
 								canUse = static_cast<u32>(
 								    ChkUnite(GetCmdStateView(this)->selected, combo) != 0);
 							} else {
@@ -1553,7 +1553,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 
 		if ((hold & 0xC) == 0) {
 			if (!((press & 0x100) == 0)) {
-				int comboChoice[2][2];
+				int comboChoice[5][2];
 				int combo[5][2];
 				int selected = static_cast<int>(GetCmdStateView(this)->scrollTop) +
 				               static_cast<int>(ModeRow(GetCmdStateView(this), mode)->selected);

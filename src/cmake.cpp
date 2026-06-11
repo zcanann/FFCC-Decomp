@@ -2221,8 +2221,7 @@ int CMenuPcs::CmakeTribeCtrl()
                     return 1;
                 }
 
-                CmakeState(this)->m_fieldSelect = static_cast<short>(fieldSelect - 1);
-                return 0;
+                CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect - 1);
             }
         }
 

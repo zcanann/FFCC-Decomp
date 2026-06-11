@@ -487,6 +487,7 @@ static bool IsCmakeNameBlank(const char* name)
 
 static int IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
 {
+    const char* nm = name;
     int found = false;
     unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
     for (int slot = 0; slot < 8; ++slot, entry += 0xC30) {
@@ -499,7 +500,7 @@ static int IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
         if (*(entry + 0x1F96) == 1) {
             continue;
         }
-        if (strcmp(name, reinterpret_cast<char*>(entry + 0x17BA)) == 0) {
+        if (strcmp(nm, reinterpret_cast<char*>(entry + 0x17BA)) == 0) {
             found = true;
             break;
         }
@@ -851,11 +852,14 @@ void CMenuPcs::CmakeVillageDraw()
     font->SetMargin(4.9f);
     SetCmakeFontColor(font, alpha);
 
+    const char* rowText;
     int tableBase = table * 5;
-    for (int i = 0; i < 5; i++) {
-        const char* rowText = s_NameEntryStr[tableBase + i];
+    int i;
+    int y;
+    for (i = 0, y = 0x6C; i < 5; i++, y += 0x20) {
+        rowText = s_NameEntryStr[tableBase + i];
         font->SetPosX(240.0f);
-        font->SetPosY(static_cast<float>(0x6C + i * 0x20));
+        font->SetPosY(static_cast<float>(y));
         font->Draw(rowText);
     }
 
@@ -1529,9 +1533,7 @@ void CMenuPcs::CmakeResultDraw()
         } else if (i == 1) {
             value = GetMenuStr(static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
         } else if (i == 2) {
-            value = GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe));
-
-            strcpy(tribeWithSlash, value);
+            strcpy(tribeWithSlash, GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe)));
             strcat(tribeWithSlash, "/", sizeof(tribeWithSlash));
             value = tribeWithSlash;
         } else {
@@ -1699,7 +1701,7 @@ void CMenuPcs::CmakeJobDraw()
         }
     }
 
-    DrawCmakePreviewChara(this);
+    DrawCmakePreviewCharaAlpha(this, 1.0f);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -1969,18 +1971,10 @@ void CMenuPcs::CmakeTribeDraw()
         }
     }
 
-    DrawCmakePreviewChara(this);
+    DrawCmakePreviewCharaAlpha(this, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
+    SetCmakeBlendMatColor(alpha);
     a255 = 255.0f * alpha;
-    GXColor col;
-    col.r = 0xFF;
-    col.g = 0xFF;
-    col.b = 0xFF;
-    col.a = static_cast<unsigned char>(a255);
-    GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     float boxW = 416.0f;
     float boxH = 240.0f;
@@ -1994,15 +1988,7 @@ void CMenuPcs::CmakeTribeDraw()
     DrawCmakeTitle(3, alpha, 1.0f);
     {
         int tribe = CmakeState(this)->m_select;
-        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-        GXColor crestCol;
-        crestCol.r = 0xFF;
-        crestCol.g = 0xFF;
-        crestCol.b = 0xFF;
-        crestCol.a = static_cast<unsigned char>(a255);
-        GXSetChanMatColor(GX_COLOR0A0, crestCol);
+        SetCmakeBlendMatColor(alpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
         MenuPcs.DrawRect(
             0,
@@ -2217,8 +2203,7 @@ int CMenuPcs::CmakeTribeCtrl()
                     return 1;
                 }
 
-                CmakeState(this)->m_fieldSelect = static_cast<short>(fieldSelect - 1);
-                return 0;
+                CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect - 1);
             }
         }
 
@@ -2525,6 +2510,7 @@ void CMenuPcs::CmakeNameDraw()
     }
 
     short table = CmakeState(this)->m_table;
+    int i;
     CFont* font = GetCmakeKeyboardFont(this);
     font->SetShadow(0);
     font->SetScale(1.0f);
@@ -2534,7 +2520,7 @@ void CMenuPcs::CmakeNameDraw()
     SetCmakeFontColor(font, alpha);
 
     int tableBase = table * 5;
-    for (int i = 0; i < 5; i++) {
+    for (i = 0; i < 5; i++) {
         const char* rowText = s_NameEntryStr[tableBase + i];
         font->SetPosX(240.0f);
         font->SetPosY(static_cast<float>(0x6C + i * 0x20));
@@ -2552,17 +2538,16 @@ void CMenuPcs::CmakeNameDraw()
         DrawCursor(cursorLeft, CmakeState(this)->m_row * 0x20 + 0x70, 1.0f);
     }
 
-    char* name = GetCmakeNameBuffer();
     int nameCursor = static_cast<int>(
         static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(1 - CmakeState(this)->m_mode))) >> 5);
     if (CmakeState(this)->m_row >= 5) {
         nameCursor = 0;
     }
-    unsigned int nameLen = strlen(name);
+    unsigned int nameLen = strlen(s_CmakeInfo.m_name);
     if (static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31)) >= 7) {
         nameCursor = 0;
     }
-    DrawCmakeName(0, nameCursor, name, alpha);
+    DrawCmakeName(0, nameCursor, s_CmakeInfo.m_name, alpha);
     DrawCmakeDecision((CmakeState(this)->m_row >= 5) ? 1 : 0, alpha);
 
     if (CmakeMcState(this) != 3) {
@@ -2658,7 +2643,8 @@ int CMenuPcs::CmakeNameCtrl()
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
-            if (CmakeState(this)->m_row < (CmakeState(this)->m_select >= 10 ? 5 : 4)) {
+            short sel = CmakeState(this)->m_select;
+            if (CmakeState(this)->m_row < (sel >= 10 ? 5 : 4)) {
                 CmakeState(this)->m_row = static_cast<short>(CmakeState(this)->m_row + 1);
             } else {
                 CmakeState(this)->m_row = 0;
@@ -3047,6 +3033,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)).color);
 
+    const char* noStr;
     const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));
     int yesX = 0x1D0;
@@ -3056,7 +3043,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     font->SetPosY(369.0f);
     font->Draw(yesStr);
 
-    const char* noStr = GetMenuStr(2);
+    noStr = GetMenuStr(2);
     float noW = static_cast<float>(font->GetWidth(noStr));
     int noX = 0x218;
     noX = static_cast<int>(

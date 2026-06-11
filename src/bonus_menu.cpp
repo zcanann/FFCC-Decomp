@@ -4133,24 +4133,26 @@ void CMenuPcs::createBonus()
 			}
 		}
 
-		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-			CCaravanWork* caravanWork =
-			    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[s_Rinfo->m_party[i].m_partySlot]);
+		{
+			int i = 0;
+			int partyOff = i;
+			for (; i < s_Rinfo->m_partyCount; i++) {
+				unsigned int* slot = &Game.m_scriptFoodBase[s_Rinfo->m_party[i].m_partySlot];
 
-			short* rewardItems = &s_Rinfo->m_tempArtifacts[0];
-			for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++) {
-				short itemId = rewardItems[artifactIndex];
-				if (itemId <= 0) {
-					continue;
-				}
+				for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++) {
+					short itemId = s_Rinfo->m_tempArtifacts[artifactIndex];
+					if (itemId <= 0) {
+						continue;
+					}
 
-				if (GetItemType(itemId, 1) == 2) {
-					int artifactSlot = itemId - 0x9F;
-					if (caravanWork->m_artifacts[artifactSlot] == itemId) {
+					if (GetItemType(itemId, 1) == 2) {
+						int artifactSlot = s_Rinfo->m_tempArtifacts[artifactIndex] - 0x9F;
+						if (reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[artifactSlot] == s_Rinfo->m_tempArtifacts[artifactIndex]) {
+							s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
+						}
+					} else if (reinterpret_cast<CCaravanWork*>(*slot)->m_inventoryItemCount + 1 > 0x40) {
 						s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 					}
-				} else if (caravanWork->m_inventoryItemCount + 1 > 0x40) {
-					s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 				}
 			}
 		}

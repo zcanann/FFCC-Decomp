@@ -1716,7 +1716,7 @@ void CMenuPcs::CmakeJobDraw()
         192.0f, 56.0f, 416.0f, 264.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    DrawCmakeTitle(5, 1.0f, alpha);
+    DrawCmakeTitle(5, alpha, 1.0f);
 
     CFont* font = m_fonts[CMAKE_FONT_LABEL];
     font->SetMargin(1.0f);
@@ -1992,7 +1992,7 @@ void CMenuPcs::CmakeTribeDraw()
         boxW, 264.0f,
         0.0f, 0.0f, 1.0f, 0.90909094f, 0.0f);
 
-    DrawCmakeTitle(3, 1.0f, alpha);
+    DrawCmakeTitle(3, alpha, 1.0f);
     {
         int tribe = CmakeState(this)->m_select;
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);

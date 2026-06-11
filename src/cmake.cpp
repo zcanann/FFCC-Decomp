@@ -489,18 +489,18 @@ static int IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
 {
     const char* nm = name;
     int found = false;
-    unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
-    for (int slot = 0; slot < 8; ++slot, entry += 0xC30) {
+    unsigned char* base = reinterpret_cast<unsigned char*>(&Game);
+    for (int slot = 0; slot < 8; ++slot) {
         if (slot == CmakeSlot(menu)) {
             continue;
         }
-        if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
+        if (*reinterpret_cast<int*>(base + slot * 0xC30 + 0x1794) == 0) {
             continue;
         }
-        if (*(entry + 0x1F96) == 1) {
+        if (*(base + slot * 0xC30 + 0x1F96) == 1) {
             continue;
         }
-        if (strcmp(nm, reinterpret_cast<char*>(entry + 0x17BA)) == 0) {
+        if (strcmp(nm, reinterpret_cast<char*>(base + slot * 0xC30 + 0x17BA)) == 0) {
             found = true;
             break;
         }

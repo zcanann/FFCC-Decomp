@@ -1060,11 +1060,11 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
     static int bTest2;
     static char init2;
 
-    int isStd1000 = 0;
     SetStdEnv();
 
     CMaterial* material = materialSet->m_materials[materialIndex];
     g_drawMaterial = material;
+    int isStd1000 = 0;
 
     if (material->m_bumpLight != 0) {
         if (material->m_materialType == 3) {

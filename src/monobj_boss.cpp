@@ -2328,7 +2328,7 @@ void CGMonObj::logicFuncRamoe()
 	int activeCount = 0;
 	int nextState = -1;
 
-	for (int i = 0; i < 0x3F; scriptWork++, i++) {
+	for (int i = 1; i < 0x40; scriptWork++, i++) {
 		CGPrgObj* monObj = reinterpret_cast<CGPrgObj*>(scriptWork[0xC5D0 / 4]);
 		if (monObj != 0 && (monObj->m_lastStateId != 9 || monObj->m_subState != 2)) {
 			activeCount++;

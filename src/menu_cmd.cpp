@@ -1943,7 +1943,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	}
 
 	const s16 selectedState = caravan->m_commandListExtra[selected];
-	const u32 selectedFlag =
+	const s32 selectedFlag =
 	    (static_cast<u32>(-selectedState) & ~static_cast<s32>(selectedState)) >> 31;
 
 	if ((GetCmdStateView(this)->mode == 1) && (GetCmdStateView(this)->phase == 2)) {
@@ -2022,6 +2022,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	matchCount = 0;
 	memset(matches, 0xff, sizeof(matches));
+	int* mp = matches;
+	int w = 0;
 
 	if ((itemKinds[selected] == 999) && (selected > 2)) {
 		int patIdx = 0;
@@ -2041,9 +2043,11 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				}
 			}
 			if (ok == pat[2] - 1) {
-				matches[matchCount * 2] = patIdx;
+				mp[0] = patIdx;
 				matchCount++;
-				matches[matchCount * 2 - 1] = selected - (pat[2] - 1);
+				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = selected - (pat[2] - 1);
+				mp += 2;
+				w += 8;
 			}
 		}
 	} else if (selectedFlag == 0) {
@@ -2062,13 +2066,17 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				}
 			}
 			if (ok == baseLen) {
-				matches[matchCount * 2] = 0;
+				mp[0] = 0;
 				matchCount++;
-				matches[matchCount * 2 - 1] = start;
+				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = start;
+				mp += 2;
+				w += 8;
 			}
 		}
 	}
 
+	mp = &matches[matchCount * 2];
+	w = matchCount * 8;
 	int group = 1;
 	for (const s16* pat = s_uniteRecipePatterns + 6; pat[1] >= 0; pat += 6, group++) {
 		if (((pat[0] != 0) && (itemKinds[selected] == 999) && (selected > 2)) ||
@@ -2095,9 +2103,11 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			}
 
 			if (ok == len) {
-				matches[matchCount * 2] = group;
+				mp[0] = group;
 				matchCount++;
-				matches[matchCount * 2 - 1] = start + (selected - (len - 1));
+				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = start + (selected - (len - 1));
+				mp += 2;
+				w += 8;
 			}
 		}
 	}

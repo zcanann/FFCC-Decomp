@@ -1508,8 +1508,9 @@ void CMemoryCardMan::MakeSaveData()
 
     for (int c = 0; c < 8; c++)
     {
-        CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
+        int letter;
         u8* dst = save + 0x14D0 + c * 0x9C0;
+        CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
 
         int shopState = caravanWork->m_shopState;
         if (shopState != 0 && static_cast<s8>(caravanWork->unk_0xc1e) == 0)
@@ -1556,7 +1557,7 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<u32*>(dst + 0x100) = caravanWork->m_letterCount;
         letterSrc = reinterpret_cast<u8*>(caravanWork);
         letterDst = dst;
-        for (int letter = 0; letter < 100; letter++)
+        for (letter = 0; letter < 100; letter++)
         {
             reinterpret_cast<CCaravanWork::CLetterWork*>(letterDst + 0x104)->FlagsBits().m_attachmentIsGil =
                 reinterpret_cast<CCaravanWork::CLetterWork*>(letterSrc + 0x3EC)->FlagsBits().m_attachmentIsGil;

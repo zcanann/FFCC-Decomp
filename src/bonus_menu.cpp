@@ -4214,8 +4214,10 @@ void CMenuPcs::createBonus()
 
 		int handleIndex = i;
 		for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++, handleIndex++) {
-			short itemId = s_Rinfo->m_tempArtifacts[artifactIndex];
-			if (itemId > 0) {
+			int itemId = s_Rinfo->m_tempArtifacts[artifactIndex];
+			if (itemId <= 0) {
+				GetBonusDisplayHandleSlots(this)[handleIndex] = 0;
+			} else {
 				CCharaPcs::CHandle* itemHandle =
 				    new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0x19C) CCharaPcs::CHandle;
 				GetBonusDisplayHandleSlots(this)[handleIndex] = itemHandle;
@@ -4244,8 +4246,6 @@ void CMenuPcs::createBonus()
 					}
 					BindEffect(handleIndex, effectNo, -1);
 				}
-			} else {
-				GetBonusDisplayHandleSlots(this)[handleIndex] = 0;
 			}
 		}
 	}

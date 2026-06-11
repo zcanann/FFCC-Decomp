@@ -2424,7 +2424,8 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
     }
     memset(workText, 0, kGbaQueueScratchTextSize);
 
-    unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
+    unsigned int* foodBaseArr = Game.m_scriptFoodBase;
+    unsigned int* foodBasePtr = foodBaseArr + channel;
     CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*foodBasePtr);
     CMes::m_tempVar[0] = caravanWork->m_letters[letterIndex].TempVar(0);
     CMes::m_tempVar[1] = caravanWork->m_letters[letterIndex].TempVar(1);
@@ -2535,7 +2536,8 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 {
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
-	unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
+	unsigned int* foodBaseArr = Game.m_scriptFoodBase;
+	unsigned int* foodBasePtr = foodBaseArr + channel;
 	int letterOffset = valueBytes[2] * 0xC;
 	char* letter = reinterpret_cast<char*>(*foodBasePtr) + letterOffset;
 	int hasGil = reinterpret_cast<CCaravanWork::CLetterWork*>(letter + 0x3EC)->FlagsBits().m_attachmentIsGil;

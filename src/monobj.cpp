@@ -3478,54 +3478,18 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		int seen = 0;
 		int i = 0;
 		for (int pass = 0; pass < 2; pass++) {
-			{
-				int cursor0 = groupCursor;
-				if (cursor0 == groupPtr[0]) {
+			for (int j = 0; j < 4; j++) {
+				int cursor = groupCursor;
+				if (cursor == groupPtr[j]) {
 					if (seen == pick) {
 						selectedAction = i;
-						groupCursor = cursor0 + 1;
+						groupCursor = cursor + 1;
 						goto mlDone;
 					}
 					seen += 1;
 				}
+				i += 1;
 			}
-			i += 1;
-			{
-				int cursor1 = groupCursor;
-				if (cursor1 == groupPtr[1]) {
-					if (seen == pick) {
-						selectedAction = i;
-						groupCursor = cursor1 + 1;
-						goto mlDone;
-					}
-					seen += 1;
-				}
-			}
-			i += 1;
-			{
-				int cursor2 = groupCursor;
-				if (cursor2 == groupPtr[2]) {
-					if (seen == pick) {
-						selectedAction = i;
-						groupCursor = cursor2 + 1;
-						goto mlDone;
-					}
-					seen += 1;
-				}
-			}
-			i += 1;
-			{
-				int cursor3 = groupCursor;
-				if (cursor3 == groupPtr[3]) {
-					if (seen == pick) {
-						selectedAction = i;
-						groupCursor = cursor3 + 1;
-						goto mlDone;
-					}
-					seen += 1;
-				}
-			}
-			i += 1;
 			groupPtr += 4;
 		}
 #undef groupCursor

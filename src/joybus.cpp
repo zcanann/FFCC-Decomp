@@ -4992,10 +4992,14 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
         unsigned int cmd0 = cmds[0];
         result = SetSendQueue(threadParam, cmd0);
 
-        if (result == 0)
+        switch (result)
+        {
+        case 0:
         {
             unsigned int cmd1 = cmds[1];
             result = SetSendQueue(threadParam, cmd1);
+            break;
+        }
         }
     }
 

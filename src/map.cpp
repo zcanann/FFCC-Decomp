@@ -2610,8 +2610,9 @@ inline void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
     v.x = kMapLargeDistance * -lightDir.x;
+    float dirZ;
     float dirY = lightDir.y;
-    float dirZ = lightDir.z;
+    dirZ = lightDir.z;
     v.y = kMapLargeDistance * -dirY;
     v.z = kMapLargeDistance * -dirZ;
 

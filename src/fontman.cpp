@@ -74,7 +74,7 @@ inline CFontGlyphEntry* CFont::searchChar(unsigned short ch)
 	int count = static_cast<int>(*glyphBucket);
 	unsigned int code = (ch >> 8) & 0xFF;
 
-	for (; count > 0; count--) {
+	for (int i = 0; i < count; i++) {
 		if (static_cast<unsigned int>(glyph->m_codeHigh) == code) {
 			return glyph;
 		}

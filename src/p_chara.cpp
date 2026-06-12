@@ -26,25 +26,27 @@ static const char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
 #include "ffcc/util.h"
 #include "ffcc/vector.h"
 
-extern const float kCharaZero;
-extern const float kCharaOne;
-extern const float FLOAT_80330290;
-extern const double DOUBLE_80330298;
-extern const float FLOAT_803302A4;
-extern const float FLOAT_803302A8;
-extern const float FLOAT_803302C8;
-extern const float FLOAT_803302CC;
-extern const float FLOAT_803302D0;
-extern const float FLOAT_803302D4;
-extern const float FLOAT_803302D8;
-extern const float FLOAT_803302DC;
-extern const float FLOAT_803302E0;
 extern const float kCharaBumpLightPosX;
 extern const float kCharaBumpLightPosY;
 extern const float kCharaBumpLightPosZ;
 extern const float kCharaBumpLightTargetX;
 extern const float kCharaBumpLightTargetY;
 extern const float kCharaBumpLightTargetZ;
+extern const char lbl_80330228[];
+extern const char lbl_8033022C[];
+extern const char lbl_80330230[];
+extern const char lbl_80330238[];
+extern const char lbl_8033023C[];
+
+static const char lbl_80330240[] = "npc";
+static const char lbl_80330244[] = "n";
+static const char lbl_80330248[] = "fa";
+static const char lbl_8033024C[] = "f";
+static const char lbl_80330250[] = "wep";
+static const char lbl_80330254[] = "w";
+static const char lbl_80330258[] = "loc";
+static const char lbl_8033025C[] = "l";
+static const char lbl_80330260[] = "CRef";
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <PowerPC_EABI_Support/Runtime/New.h>
@@ -221,9 +223,26 @@ static const char s_charaBasePathFmt[] = "dvd/char/%s/%s%03d/%s%03d%s";
 static const char s_charaAnimPathFmt[] = "dvd/char/%s/%s%03d/%s.cha";
 static const char s_charaModelSuffix[] = ".chm";
 static const char s_charaDynamicsSuffix[] = ".chd";
-static const char s_charaTextureSuffix[] = ".tex";
 static const char s_charaTextureVariantFmt[] = "%s_%c";
+static const char s_charaTextureSuffix[] = ".tex";
+extern const float kCharaZero = 0.0f;
+extern const float kCharaOne = 1.0f;
+extern const float FLOAT_80330290 = 4.0f;
+extern const double DOUBLE_80330298 = 1.0;
+extern const float FLOAT_803302A0 = 2.0f;
+extern const float FLOAT_803302A4 = -1.0f;
+extern const float FLOAT_803302A8 = 10.0f;
+extern const float FLOAT_803302AC = 255.0f;
+extern const double DOUBLE_803302B0 = 4503599627370496.0;
+extern const double DOUBLE_803302B8 = 4503601774854144.0;
 static const char s_mogFurTextureName[] = "n915m_2";
+extern const float FLOAT_803302C8 = 448.0f;
+extern const float FLOAT_803302CC = 640.0f;
+extern const float FLOAT_803302D0 = 100010.0f;
+extern const float FLOAT_803302D4 = -100000.0f;
+extern const float FLOAT_803302D8 = -100.0f;
+extern const float FLOAT_803302DC = 0.0015625f;
+extern const float FLOAT_803302E0 = 0.0022321429569274187f;
 static const char s_charaSetAnimMissingFmt[] =
     "\x83\x41\x83\x6a\x83\x81\x81\x5b\x83\x56\x83\x87\x83\x93\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42"
     "\x74\x79\x70\x65\x3d\x25\x64\x20\x6e\x75\x6d\x62\x65\x72\x3d\x25\x64\x20\x61\x6e\x69\x6d\x6e\x6f\x3d\x25\x64\x0a";
@@ -247,7 +266,6 @@ static const char s_charaAsyncCompleteFmt[] =
 static const char s_charaAsyncEntryFmt[] =
     "\x94\xf1\x93\xaf\x8a\xfa\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x83\x47"
     "\x83\x93\x83\x67\x83\x8a\x81\x5b\n";
-static const char s_charaDumpModelHdr1[] = "model\n";
 static const char s_charaDumpModelHdr2[] = "no  t num lv  mask     addr     a a-addr   a-size\n";
 static const char s_charaDumpModelSep[] = "--- - --- --- -------- -------- - -------- --------\n";
 static const char s_charaDumpModelFmt[] = "%3d %1d %3d %3d %08x %08x %d %08x %8d\n";
@@ -255,27 +273,32 @@ static const char s_charaDumpTextureHdr1[] = "texture\n";
 static const char s_charaDumpTextureHdr2[] = "no  t num t lv  mask     addr     a a-addr   a-size\n";
 static const char s_charaDumpTextureSep[] = "--- - --- - --- -------- -------- - -------- --------\n";
 static const char s_charaDumpTextureFmt[] = "%3d %1d %3d %1d %3d %08x %08x %d %08x %8d\n";
-static const char s_charaDumpPdtHdr1[] = "pdt\n";
 static const char s_charaDumpPdtHdr2[] = "no  t num t pdt hdl  lv  mask    \n";
 static const char s_charaDumpPdtSep[] = "--- - --- - -------- --- --------\n";
 static const char s_charaDumpPdtFmt[] = "%3d %1d %3d %1d %8d %3d %08x\n";
+static const char s_charaDumpModelHdr1[] = "model\n";
+static const char s_charaDumpPdtHdr1[] = "pdt\n";
 static const char s_charaDumpAnimHdr1[] = "anim\n";
+extern const float FLOAT_803302FC = 1.3333333730697632f;
+extern const float FLOAT_80330300 = 0.5f;
+extern const float FLOAT_80330304 = -0.5f;
+extern const float FLOAT_80330308 = 0.25f;
+extern const float kCharaBumpLightPosX = -533.0f;
+extern const float kCharaBumpLightPosY = -131.0f;
+extern const float kCharaBumpLightPosZ = -117.0f;
+extern const float kCharaBumpLightTargetX = 4391.0f;
+extern const float kCharaBumpLightTargetY = -1864.0f;
+extern const float kCharaBumpLightTargetZ = 7194.0f;
+extern const float FLOAT_80330324 = 100.0f;
+extern const float FLOAT_80330328[2] = {500.0f, 0.0f};
+extern const float FLOAT_80330330 = 0.05119999870657921f;
+extern const float FLOAT_80330334 = 0.5120000243186951f;
+extern const float FLOAT_80330338 = 1.0f;
+extern const float FLOAT_8033033C = 10000000000.0f;
+extern const float FLOAT_80330340 = -10000000000.0f;
 static const char s_charaDumpAnimHdr2[] = "no  t num name           lv  mask     addr     banksize banksum  histroy\n";
 static const char s_charaDumpAnimSep[] = "--- - --- -------------- --- -------- -------- -------- -------- --------\n";
 static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %14s %3d %08x %08x %8d %8d %8d\n";
-static const char lbl_80330228[] = "pc";
-static const char lbl_8033022C[] = "c";
-static const char lbl_80330230[] = "_root";
-static const char lbl_80330238[] = "mon";
-static const char lbl_8033023C[] = "m";
-static const char lbl_80330240[] = "npc";
-static const char lbl_80330244[] = "n";
-static const char lbl_80330248[] = "fa";
-static const char lbl_8033024C[] = "f";
-static const char lbl_80330250[] = "wep";
-static const char lbl_80330254[] = "w";
-static const char lbl_80330258[] = "loc";
-static const char lbl_8033025C[] = "l";
 static const char* s_charaKindPathParts[][3] = {
     {lbl_80330228, lbl_8033022C, lbl_80330230},
     {lbl_80330238, lbl_8033023C, lbl_80330230},
@@ -639,9 +662,9 @@ void CCharaPcs::Init()
             lightColor.b = intensity;
             lightColor.a = 0xFF;
             if (i == 0) {
-                m_viewerDiffusePos[lightIndex].x = 0.0f;
-                m_viewerDiffusePos[lightIndex].y = 0.0f;
-                m_viewerDiffusePos[lightIndex].z = -1.0f;
+                m_viewerDiffusePos[lightIndex].x = kCharaZero;
+                m_viewerDiffusePos[lightIndex].y = kCharaZero;
+                m_viewerDiffusePos[lightIndex].z = FLOAT_803302A4;
             }
         }
     }
@@ -650,7 +673,7 @@ void CCharaPcs::Init()
         const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         CColor shade;
 
-        float scale = static_cast<float>(i) * 0.25f;
+        float scale = static_cast<float>(i) * FLOAT_80330308;
         shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
         shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
         shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
@@ -668,12 +691,12 @@ void CCharaPcs::Init()
     CColor baseColor(0x00, 0x00, 0x40, 0x40);
     m_texShadowColor = baseColor.color;
 
-    CVector baseVec(0.0f, 100.0f, 0.0f);
+    CVector baseVec(kCharaZero, FLOAT_80330324, kCharaZero);
     Vec* constructedVec = reinterpret_cast<Vec*>(&baseVec);
     m_texShadowPos.x = constructedVec->x;
     m_texShadowPos.y = constructedVec->y;
     m_texShadowPos.z = constructedVec->z;
-    m_texShadowRadius = 500.0f;
+    m_texShadowRadius = FLOAT_80330328[0];
     m_texShadowSize = 0x80;
     m_texShadowDistance = 100;
 }
@@ -1022,7 +1045,7 @@ void CCharaPcs::onScriptChanging(char*)
         CColor shade;
 
         float scale = static_cast<float>(i);
-        scale *= 0.25f;
+        scale *= FLOAT_80330308;
         shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
         shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
         shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
@@ -1357,7 +1380,8 @@ void CCharaPcs::drawMakeTexShadow()
     m_texShadowTextureBase = Graphic.m_scratchTextureBuffer;
     m_texShadowTextureSize = 0xD2000;
     m_texShadowTextureOffset += m_texShadowSize * m_texShadowSize * 4;
-    C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, 1.3333334f, 0.5f, -0.5f, 0.5f, 0.5f);
+    C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, FLOAT_803302FC, FLOAT_80330300,
+                          FLOAT_80330304, FLOAT_80330300, FLOAT_80330300);
 
     handle = m_handleList->m_next;
     while (m_handleList != handle) {
@@ -1371,7 +1395,7 @@ void CCharaPcs::drawMakeTexShadow()
     Graphic.SetStdPixelFmt();
     Graphic.SetCopyClear(savedCopyClearColor, 0xFFFFFF);
     gUtil.RenderTextureQuad(
-        0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), &backBufferTexObj, 0, 0, 0,
+        kCharaZero, kCharaZero, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), &backBufferTexObj, 0, 0, 0,
         GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
 
@@ -2897,13 +2921,13 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     if (drawPass == 3) {
         if ((m_flags & 4) != 0) {
-            const float offsetY = 2.0f * (m_worldPosY - m_bgCharmPlaneY);
+            const float offsetY = FLOAT_803302A0 * (m_worldPosY - m_bgCharmPlaneY);
             viewMtx[0][3] += viewMtx[0][1] * offsetY;
             viewMtx[1][3] += viewMtx[1][1] * offsetY;
             viewMtx[2][3] += viewMtx[2][1] * offsetY;
-            viewMtx[1][1] *= -1.0f;
-            viewMtx[0][1] *= -1.0f;
-            viewMtx[2][1] *= -1.0f;
+            viewMtx[1][1] *= FLOAT_803302A4;
+            viewMtx[0][1] *= FLOAT_803302A4;
+            viewMtx[2][1] *= FLOAT_803302A4;
         } else if ((m_flags & 8) != 0) {
             PSMTXConcat(viewMtx, CFlatCenterMatrix(), viewMtx);
         }
@@ -2939,7 +2963,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         reinterpret_cast<CVector*>(&delta)->Normalize();
 
         {
-            CVector up(kCharaZero, 10.0f, kCharaZero);
+            CVector up(kCharaZero, FLOAT_803302A8, kCharaZero);
             CVector eyeTmp;
             PSVECAdd(modelPos, up, eyeTmp);
             eye.x = eyeTmp.x;
@@ -2948,7 +2972,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         }
 
         CVector lookAtUp(kCharaZero, kCharaOne, kCharaZero);
-        CVector shadowUp(kCharaZero, 10.0f, kCharaZero);
+        CVector shadowUp(kCharaZero, FLOAT_803302A8, kCharaZero);
 
         const float shadowDistance = static_cast<float>(CharaPcs.m_texShadowDistance);
         CVector scaledDelta;
@@ -2982,7 +3006,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         GetCameraClipPlanes(&nearZ, &farZ);
         CColor shadowFog;
         shadowFog.color.a = 0xFF;
-        shadowFog.color.b = static_cast<unsigned char>(static_cast<int>(255.0f * shadowFade));
+        shadowFog.color.b = static_cast<unsigned char>(static_cast<int>(FLOAT_803302AC * shadowFade));
         shadowFog.color.g = shadowFog.color.b;
         shadowFog.color.r = shadowFog.color.b;
         _GXColor shadowFogGX = shadowFog.color;

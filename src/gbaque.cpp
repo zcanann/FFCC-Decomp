@@ -2731,6 +2731,7 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 	} while (i < 4);
 
 	workEntry = mapObjWork.m_entries;
+	i = 0;
 	outSize = 5;
 	outData[0] = mapObjWork.m_count;
 	outData[1] = static_cast<unsigned char>(mapObjWork.m_drawFlags);
@@ -2738,7 +2739,7 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 	outData[3] = static_cast<unsigned char>(mapObjWork.m_drawFlags >> 16);
 	outData[4] = static_cast<unsigned char>(mapObjWork.m_drawFlags >> 24);
 
-	for (i = 0; i < mapObjWork.m_count; i++) {
+	for (; i < mapObjWork.m_count; i++) {
 		workEntry = &mapObjWork.m_entries[i];
 		outData[outSize++] = workEntry->m_type;
 		outData[outSize++] = static_cast<unsigned char>(workEntry->m_x);

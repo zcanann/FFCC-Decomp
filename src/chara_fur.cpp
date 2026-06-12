@@ -750,10 +750,6 @@ void CChara::ChangeMogMode(int mogMode)
 
 extern "C" const char s_chara_fur_cpp[] = "chara_fur.cpp";
 
-extern "C" {
-unsigned char m_mogWork[0x2C];
-}
-
 static inline unsigned int FurRandNext()
 {
 	m_seed = m_seed * 0x41C64E6D + 0x3039;
@@ -2469,6 +2465,10 @@ void CChara::makeFurTex()
 #undef furNoiseBase
 #undef furNoiseRange
 #pragma pop
+
+extern "C" {
+unsigned char m_mogWork[0x2C];
+}
 
 /*
  * --INFO--

@@ -42,7 +42,7 @@ extern const char sMiniGameObjDataScriptName[] = "objdat.spt";
 extern const char sMiniGamePcsGameProcessName[] = "CMiniGamePcs(GAME)";
 extern const char sMiniGamePcsProcessName[] = "CMiniGamePcs";
 extern const char sMiniGameManagerClassName[] = "CManager";
-extern const char sMiniGameProcessClassName[] = "CProcess";
+extern const char sMiniGameProcessClassName[12] = "CProcess";
 CProcessTable CMiniGamePcs::m_table = {
     const_cast<char*>(sMiniGamePcsGameProcessName),
     {
@@ -290,22 +290,22 @@ void CMiniGamePcs::Quit()
  */
 void CMiniGamePcs::create()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    int playerBit = 0;
 
-    m_managerState = 0;
-    m_managerIndex = 0;
-    *reinterpret_cast<unsigned int*>(self + 0x1354) = 0;
-    *reinterpret_cast<unsigned int*>(self + 0x135C) = 0;
-    self[0x134A] = 0;
+    m_managerState = playerBit;
+    m_managerIndex = playerBit;
+    m_managerImage = 0;
+    m_managerSpImage = 0;
+    m_managerMode = playerBit;
     m_playerMask = 0xF;
-    self[0x649C] = 0;
-    self[0x134C] = 0;
+    m_managerThreadStop = playerBit;
+    m_playerCount = playerBit;
 
-    for (int playerBit = 0; playerBit < 4; playerBit++)
+    for (; playerBit < 4; playerBit++)
     {
         if ((m_playerMask & (1 << playerBit)) != 0)
         {
-            self[0x134C] += 1;
+            m_playerCount += 1;
         }
     }
 }
@@ -337,11 +337,11 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (*reinterpret_cast<void**>(self + 0x1354) != 0)
+    if (m_managerImage != 0)
     {
-        self[0x649C] = 1;
+        m_managerThreadStop = 1;
 
-        while (self[0x649C] != 0)
+        while (m_managerThreadStop != 0)
         {
             MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
         }
@@ -351,16 +351,16 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
             MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
         }
 
-        if (*reinterpret_cast<void**>(self + 0x1354) != 0)
+        if (m_managerImage != 0)
         {
-            delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x1354));
-            *reinterpret_cast<void**>(self + 0x1354) = 0;
+            delete m_managerImage;
+            m_managerImage = 0;
         }
 
-        if (*reinterpret_cast<void**>(self + 0x135C) != 0)
+        if (m_managerSpImage != 0)
         {
-            delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x135C));
-            *reinterpret_cast<void**>(self + 0x135C) = 0;
+            delete m_managerSpImage;
+            m_managerSpImage = 0;
         }
     }
 
@@ -368,45 +368,43 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     m_miniGameParams[1] = -1;
     m_miniGameParams[2] = -1;
     m_miniGameParams[3] = -1;
-    self[0x6495] = 0;
+    m_miniGameFailed = 0;
     self[0x6496] = 0;
     self[0x6497] = 0;
-    *reinterpret_cast<unsigned short*>(self + 0x134E) = 0;
-    self[0x6494] = 0;
+    m_statusCode = 0;
+    m_miniGameReady = 0;
 
-    *reinterpret_cast<void**>(self + 0x1354) =
-        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1) u8[0x40000];
-    *reinterpret_cast<void**>(self + 0x135C) =
-        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2) u8[0x40000];
+    m_managerImage =
+        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1) unsigned char[0x40000];
+    m_managerSpImage =
+        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2) unsigned char[0x40000];
 
     *reinterpret_cast<unsigned int*>(self + 0x1364) = OSGetTick();
-    *reinterpret_cast<unsigned int*>(*reinterpret_cast<unsigned int*>(self + 0x1354) + 200) =
-        *reinterpret_cast<unsigned int*>(self + 0x1364);
-    *reinterpret_cast<unsigned int*>(*reinterpret_cast<unsigned int*>(self + 0x135C) + 200) =
-        *reinterpret_cast<unsigned int*>(self + 0x1364);
+    *reinterpret_cast<unsigned int*>(m_managerImage + 200) = *reinterpret_cast<unsigned int*>(self + 0x1364);
+    *reinterpret_cast<unsigned int*>(m_managerSpImage + 200) = *reinterpret_cast<unsigned int*>(self + 0x1364);
 
-    strncpy(reinterpret_cast<char*>(self + 0x1344), s_miniGameManagerTag, 4);
+    strncpy(m_managerTag, s_miniGameManagerTag, 4);
 
-    void* managerImage = *reinterpret_cast<void**>(self + 0x1354);
+    void* managerImage = m_managerImage;
     CFile::CHandle* fileHandle = File.Open(managerFilePath, 0, CFile::PRI_LOW);
     if (fileHandle != 0)
     {
-        *reinterpret_cast<unsigned int*>(self + 0x1358) = File.GetLength(fileHandle);
+        m_managerImageSize = File.GetLength(fileHandle);
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
         void* readBuffer = File.m_readBuffer;
         File.Close(fileHandle);
-        memcpy(managerImage, readBuffer, *reinterpret_cast<unsigned int*>(self + 0x1358));
+        memcpy(managerImage, readBuffer, m_managerImageSize);
     }
 
     int offset = 0xA0;
-    signed char* managerBase = *reinterpret_cast<signed char**>(self + 0x1354);
+    signed char* managerBase = reinterpret_cast<signed char*>(m_managerImage);
     char checksum = 0xE7;
 
-    managerBase[0xAC] = self[0x1344];
-    managerBase[0xAD] = self[0x1345];
-    managerBase[0xAE] = self[0x1346];
-    managerBase[0xAF] = self[0x1347];
+    managerBase[0xAC] = m_managerTag[0];
+    managerBase[0xAD] = m_managerTag[1];
+    managerBase[0xAE] = m_managerTag[2];
+    managerBase[0xAF] = m_managerTag[3];
 
     while (offset < 0xBD)
     {
@@ -415,26 +413,26 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     }
     managerBase[offset] = checksum;
 
-    void* managerSpImage = *reinterpret_cast<void**>(self + 0x135C);
+    void* managerSpImage = m_managerSpImage;
     fileHandle = File.Open(managerSpFilePath, 0, CFile::PRI_LOW);
     if (fileHandle != 0)
     {
-        *reinterpret_cast<unsigned int*>(self + 0x1360) = File.GetLength(fileHandle);
+        m_managerSpImageSize = File.GetLength(fileHandle);
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
         void* readBuffer = File.m_readBuffer;
         File.Close(fileHandle);
-        memcpy(managerSpImage, readBuffer, *reinterpret_cast<unsigned int*>(self + 0x1360));
+        memcpy(managerSpImage, readBuffer, m_managerSpImageSize);
     }
 
     offset = 0xA0;
-    managerBase = *reinterpret_cast<signed char**>(self + 0x135C);
+    managerBase = reinterpret_cast<signed char*>(m_managerSpImage);
     checksum = 0xE7;
 
-    managerBase[0xAC] = self[0x1344];
-    managerBase[0xAD] = self[0x1345];
-    managerBase[0xAE] = self[0x1346];
-    managerBase[0xAF] = self[0x1347];
+    managerBase[0xAC] = m_managerTag[0];
+    managerBase[0xAD] = m_managerTag[1];
+    managerBase[0xAE] = m_managerTag[2];
+    managerBase[0xAF] = m_managerTag[3];
 
     while (offset < 0xBD)
     {
@@ -452,7 +450,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     OSInitMessageQueue(reinterpret_cast<OSMessageQueue*>(self + 800),
                        reinterpret_cast<OSMessage*>(self + 0x340), 1);
     OSCreateThread(reinterpret_cast<OSThread*>(self + 8),
-                   reinterpret_cast<void* (*)(void*)>(_MngThreadMain), 0, self + 0x1344, 0x1000,
+                   reinterpret_cast<void* (*)(void*)>(_MngThreadMain), 0, m_managerTag, 0x1000,
                    8, 1);
     OSResumeThread(reinterpret_cast<OSThread*>(self + 8));
 }

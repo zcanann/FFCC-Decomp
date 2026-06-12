@@ -2716,10 +2716,8 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 	unsigned short* artifactDataBase = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2]);
 	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
 	int hpMax = 0;
-	int artifactIndex = 0;
-	int count = 0x32;
 
-	while (count != 0) {
+	for (int artifactIndex = 0; artifactIndex < 100; artifactIndex++) {
 		if (artifactIndex < 0x60) {
 			int artifactId = m_artifacts[artifactIndex];
 			if (artifactId > 0) {
@@ -2740,30 +2738,6 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 				}
 			}
 		}
-
-		if ((artifactIndex + 1) < 0x60) {
-			int artifactId = m_artifacts[artifactIndex + 1];
-			if (artifactId > 0) {
-				unsigned short* artifactData = artifactDataBase + (artifactId * 0x24);
-				unsigned short artifactType = artifactData[0];
-				unsigned short artifactValue = artifactData[3];
-
-				switch (artifactType) {
-				case 0x9F:
-				case 0xB6:
-				case 0xCC:
-				case 0xDB:
-				case 0xDF:
-					break;
-				case 0xE4:
-					hpMax += artifactValue;
-					break;
-				}
-			}
-		}
-
-		artifactIndex += 2;
-		count--;
 	}
 
 	hpMax += baseData->m_maxHp;

@@ -3158,18 +3158,25 @@ void CMenuPcs::CalcResultCountAnim()
  */
 void CMenuPcs::DrawResultOpenAnim()
 {
+	int activePartyCount;
+	BonusAnimSprite* sprite;
+	int modelIndex;
+	int lastKind;
+	int i;
+	int partyOff;
+
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) != 0) {
-		const int activePartyCount = s_Rinfo->m_partyCount;
+		activePartyCount = s_Rinfo->m_partyCount;
 
 		DrawInit();
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-		int i = 0;
-		int modelIndex = 0;
-		int lastKind = 0;
-		int partyOff = 0;
+		modelIndex = 0;
+		lastKind = 0;
+		partyOff = 0;
+		i = 0;
 		for (; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
-			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
+			sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
 
 			if (sprite->kind >= 0 || sprite->kind == -2) {
 				if (sprite->kind == -2) {
@@ -3267,9 +3274,11 @@ void CMenuPcs::DrawResultOpenAnim()
 						}
 					} else {
 						if ((signed char)i >= s_CntTop && i < (signed char)s_CntTop + activePartyCount) {
+							float digitX;
+							float digitW;
 							int value = 0;
-							float digitX = (float)((DOUBLE_80331EC8 * (double)sprite->w - (float)sprite->w) * DOUBLE_80331E78 + (double)sprite->x);
-							float digitW = (float)sprite->w;
+							digitX = (float)((DOUBLE_80331EC8 * (double)sprite->w - (float)sprite->w) * DOUBLE_80331E78 + (double)sprite->x);
+							digitW = (float)sprite->w;
 							MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
 							    (float)(sprite->w * value), sprite->mulY,
 							    sprite->depth, sprite->depth, kBonusZClearOrigin);

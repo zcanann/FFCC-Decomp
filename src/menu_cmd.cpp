@@ -2529,7 +2529,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		targetX = kCmdMenuPanelSize64 + baseX;
 		s32* top = &s_UniteTop[finished];
 		for (int i = 0; i < s_unitePanelCount; i++) {
-			for (int j = 0; j < 3; j++) {
+			for (unsigned int j = 0; j < 3; j++) {
 				CmdListEntry* entry = &GetCmdListStorage(this)->entries[j + *top];
 				int idx = j + *top;
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {

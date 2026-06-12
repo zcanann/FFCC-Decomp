@@ -1934,8 +1934,6 @@ void CFlatRuntime2::drawLayer(
 		_GXSetTevAlphaIn((_GXTevStageID)tevStage, (_GXTevAlphaArg)7, (_GXTevAlphaArg)4, (_GXTevAlphaArg)0, (_GXTevAlphaArg)7);
 		_GXSetTevAlphaOp((_GXTevStageID)tevStage, (_GXTevOp)0, (_GXTevBias)0, (_GXTevScale)0, 1, (_GXTevRegID)0);
 
-		CColor texCol0, texCol1;
-
 		for (int quad = 0; quad < 4; quad++) {
 			int rectW = static_cast<int>(scaleX * FLOAT_80330154);
 			int rectH = static_cast<int>(scaleY * FLOAT_80330154);

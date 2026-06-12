@@ -1452,8 +1452,7 @@ int CMenuPcs::LetterReplyWinOpen()
 		delete[] workText;
 
 		const char* closeText = GetMenuStr(3);
-		int lineIndex = static_cast<signed char>(s_ReplyMax);
-		s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
+		int lineIndex = static_cast<signed char>(s_ReplyMax++);
 		strcat(lines[lineIndex], closeText);
 
 		SetSingDynamicWinMessInfo(static_cast<signed char>(s_ReplyMax),

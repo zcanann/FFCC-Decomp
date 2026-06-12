@@ -714,66 +714,66 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
     if (m_mode != static_cast<int>(mode)) {
         Graphic._WaitDrawDone(const_cast<char*>(s_p_menu_cpp), 0x1B0);
         currentMode = m_mode;
-        if (currentMode != 1) {
-            if (currentMode < 1) {
-                if ((currentMode != -1) && (-2 < currentMode)) {
-                    ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[1]));
+        switch (currentMode) {
+        case 0:
+            ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[1]));
 
-                    i = 0;
-                    menu = this;
-                    do {
-                        ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_textures[0x16]));
-                        i++;
-                        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-                    } while (i < 10);
+            i = 0;
+            menu = this;
+            do {
+                ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_textures[0x16]));
+                i++;
+                menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
+            } while (i < 10);
 
-                    i = 0;
-                    menu = this;
-                    do {
-                        ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_textureSets[2]));
-                        i++;
-                        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-                    } while (i < 2);
+            i = 0;
+            menu = this;
+            do {
+                ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_textureSets[2]));
+                i++;
+                menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
+            } while (i < 2);
 
-                    i = 0;
-                    menu = this;
-                    do {
-                        ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_battleRingMenus[0]));
-                        i++;
-                        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-                    } while (i < 4);
+            i = 0;
+            menu = this;
+            do {
+                ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_battleRingMenus[0]));
+                i++;
+                menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
+            } while (i < 4);
 
-                    i = 0;
-                    menu = this;
-                    do {
-                        ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_battleMesMenus[0]));
-                        i++;
-                        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-                    } while (i < 12);
+            i = 0;
+            menu = this;
+            do {
+                ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_battleMesMenus[0]));
+                i++;
+                menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
+            } while (i < 12);
 
-                    destroySingleMenu();
-                    destroyVillageMenu();
-                }
-            } else if (currentMode < 3) {
-                destroyBonus();
-            }
-        } else {
+            destroySingleMenu();
+            destroyVillageMenu();
+            break;
+        case 1:
             destroyWorld();
+            break;
+        case 2:
+            destroyBonus();
+            break;
         }
 
         m_mode = static_cast<int>(mode);
         currentMode = m_mode;
-        if (currentMode != 1) {
-            if (currentMode < 1) {
-                if ((currentMode != -1) && (-2 < currentMode)) {
-                    createBattle();
-                    createSingleMenu();
-                }
-            } else if (currentMode < 3) {
-                createBonus();
-            }
-        } else {
+        switch (currentMode) {
+        case 0:
+            createBattle();
+            createSingleMenu();
+            break;
+        case 1:
             createWorld();
+            break;
+        case 2:
+            createBonus();
+            break;
         }
     }
 }

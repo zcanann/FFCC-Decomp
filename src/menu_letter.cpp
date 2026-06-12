@@ -290,8 +290,9 @@ void CMenuPcs::LetterInit1()
 		*reinterpret_cast<float*>(iVar4 + 0x14) = FLOAT_803330f8;
 	}
 
+	s16* p;
 	int n = 0;
-	s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+	p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
 	*reinterpret_cast<int*>(p + 0xE) = 0x5F;
 	p[2] = 0x238;
 	p[3] = 0x178;
@@ -1451,8 +1452,7 @@ int CMenuPcs::LetterReplyWinOpen()
 		delete[] workText;
 
 		const char* closeText = GetMenuStr(3);
-		int lineIndex = static_cast<signed char>(s_ReplyMax);
-		s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
+		int lineIndex = static_cast<signed char>(s_ReplyMax++);
 		strcat(lines[lineIndex], closeText);
 
 		SetSingDynamicWinMessInfo(static_cast<signed char>(s_ReplyMax),

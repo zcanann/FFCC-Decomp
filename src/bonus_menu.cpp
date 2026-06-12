@@ -1125,18 +1125,18 @@ void CMenuPcs::CalcSelectCloseAnim()
 			int o0a = boardOff + 0xa;
 			int o40 = boardOff + 0x40;
 			int o44 = boardOff + 0x44;
-			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w * DOUBLE_80331E78 + (double)((float)sprite->x + sprite->motionX))) - DOUBLE_80331EE8);
+			int centerX = (int)(float)((double)(float)(DOUBLE_80331EE0 + ((double)sprite->w * DOUBLE_80331E78 + (double)((float)sprite->x + sprite->motionX))) - DOUBLE_80331EE8);
 			int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)((float)sprite->y + sprite->motionY)) - DOUBLE_80331EF0);
 			*(short*)(this->m_bonus.m_bonusBoardPtr + o08) = (short)centerX;
 			*(short*)(this->m_bonus.m_bonusBoardPtr + o0a) = (short)centerY;
 			*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = (int)(FLOAT_80331EF8 + ((float)sprite->x + sprite->motionX));
 			*(int*)(this->m_bonus.m_bonusBoardPtr + o44) = (int)(((float)sprite->y + sprite->motionY) - FLOAT_80331EFC);
-			if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o40) < 0.0) {
+			if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o40) < DOUBLE_80331E90) {
 				*(int*)(this->m_bonus.m_bonusBoardPtr + o40) = 0;
 			}
 			{
 				int o44b = boardOff + 0x44;
-				if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o44b) < 0.0) {
+				if ((double)*(int*)(this->m_bonus.m_bonusBoardPtr + o44b) < DOUBLE_80331E90) {
 					*(int*)(this->m_bonus.m_bonusBoardPtr + o44b) = 0;
 				}
 			}

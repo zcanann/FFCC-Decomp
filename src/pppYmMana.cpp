@@ -1184,9 +1184,13 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     targetTexObj = mana->m_envTexture0;
     if (stepData->m_map21Flag != 0) {
         GXInitTexObj(mana->m_generatedTexObj0, mana->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(mana->m_generatedTexObj0, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObjLOD(mana->m_generatedTexObj0, GX_LINEAR, GX_LINEAR, LoadFloat(kPppYmMoveParabolaZero),
+                        LoadFloat(kPppYmMoveParabolaZero), LoadFloat(kPppYmMoveParabolaZero), GX_FALSE, GX_FALSE,
+                        GX_ANISO_1);
         GXInitTexObj(mana->m_generatedTexObj1, mana->m_generatedTexture1, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(mana->m_generatedTexObj1, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObjLOD(mana->m_generatedTexObj1, GX_LINEAR, GX_LINEAR, LoadFloat(kPppYmMoveParabolaZero),
+                        LoadFloat(kPppYmMoveParabolaZero), LoadFloat(kPppYmMoveParabolaZero), GX_FALSE, GX_FALSE,
+                        GX_ANISO_1);
         drawParaboloidMap(captureTexObjs, mana->m_generatedTexObj1, mana->m_paraboloidMap, mana->m_paraboloidMapSize,
                           &targetTexObj->m_texObj, 1);
         drawParaboloidMap(captureTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap, mana->m_paraboloidMapSize,

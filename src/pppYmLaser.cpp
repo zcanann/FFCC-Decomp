@@ -22,7 +22,7 @@ static const f32 kPppYmLaserDebugPointScale = 2.0f;
 
 static inline f32 LoadLaserFloat(const f32& value)
 {
-	return value;
+	return *reinterpret_cast<const f32*>(&value);
 }
 
 static const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";

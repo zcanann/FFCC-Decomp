@@ -1541,7 +1541,7 @@ partyobj.cpp:
 	.data       start:0x802116A4 end:0x80211D88
 	.bss        start:0x803001D8 end:0x80300268
 	.sdata      start:0x8032E9A0 end:0x8032E9D0
-	.sbss       start:0x8032EE7C end:0x8032EE80
+	.sbss       start:0x8032EE78 end:0x8032EE90
 	.sdata2     start:0x80331A58 end:0x80331B18
 
 p_mc.cpp:
@@ -1551,7 +1551,7 @@ p_mc.cpp:
 	.ctors      start:0x801D5438 end:0x801D543C
 	.data       start:0x80211D88 end:0x80211F4C
 	.sdata      start:0x8032E9D0 end:0x8032E9E8
-	.sbss       start:0x8032EE88 end:0x8032EE8D
+	.sbss       start:0x8032EE90 end:0x8032EE94
 	.sdata2     start:0x80331B18 end:0x80331B20
 
 itemobj.cpp:
@@ -1560,7 +1560,7 @@ itemobj.cpp:
 	.text       start:0x80124B78 end:0x80127008
 	.data       start:0x80211F50 end:0x802120D0
 	.sdata      start:0x8032E9E8 end:0x8032EA10
-	.sbss       start:0x8032EE90 end:0x8032EE94
+	.sbss       start:0x8032EE98 end:0x8032EE9C
 	.sdata2     start:0x80331B20 end:0x80331BD0
 
 prgobj.cpp:

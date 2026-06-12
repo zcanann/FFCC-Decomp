@@ -1144,7 +1144,7 @@ cflat_r2class.cpp:
 	extab       start:0x80008338 end:0x80008350
 	extabindex  start:0x8000E9EC end:0x8000EA10
 	.text       start:0x800BA2FC end:0x800BD848
-	.data       start:0x80210378 end:0x80210534
+	.data       start:0x80210378 end:0x80210528
 	.sdata2     start:0x80330BE0 end:0x80330BF8
 
 p_chara_viewer.cpp:
@@ -1161,7 +1161,7 @@ chara_anim.cpp:
 	extabindex  start:0x8000EA40 end:0x8000EA88
 	.text       start:0x800BF620 end:0x800BFE78
 	.rodata     start:0x801DA970 end:0x801DA9B0
-	.data       start:0x80210534 end:0x8021054C
+	.data       start:0x80210528 end:0x80210540
 	.sdata      start:0x8032E840 end:0x8032E850
 	.sdata2     start:0x80330C78 end:0x80330C98
 
@@ -1178,7 +1178,7 @@ memorycard.cpp:
 	.text       start:0x800C17B8 end:0x800C4DD8
 	.ctors      start:0x801D5428 end:0x801D542C
 	.rodata     start:0x801DA9C0 end:0x801DB0B0
-	.data       start:0x8021054C end:0x8021056C
+	.data       start:0x80210540 end:0x8021056C
 	.bss        start:0x802F2628 end:0x802F26C4
 	.sdata      start:0x8032E850 end:0x8032E880
 	.sdata2     start:0x80330CD0 end:0x80330CF0

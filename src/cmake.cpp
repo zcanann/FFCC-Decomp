@@ -2187,6 +2187,7 @@ int CMenuPcs::CmakeTribeCtrl()
                         GetWinSize(0x15, &winX, &winY, 0);
                         SetMcWinInfo(static_cast<int>(winX), static_cast<int>(winY));
                         CmakeMcState(this) = 0;
+                        return 0;
                     } else {
                         s_CmakeInfo.m_tribe = static_cast<signed char>(CmakeState(this)->m_select);
                         s_CmakeInfo.m_hair = static_cast<signed char>(CmakeState(this)->m_row);

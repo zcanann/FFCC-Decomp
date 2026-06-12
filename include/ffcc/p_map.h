@@ -8,6 +8,15 @@
 
 struct Vec;
 
+class CRelProfile
+{
+public:
+    ~CRelProfile();
+
+private:
+    unsigned int m_data;
+};
+
 class CMapPcs : public CProcess
 {
 public:
@@ -50,7 +59,7 @@ private:
 };
 
 extern CMapPcs MapPcs;
-extern unsigned char g_hit_prof;
+extern CRelProfile g_hit_prof;
 extern unsigned char g_map_calc_prof;
 extern unsigned char g_map_draw_prof;
 

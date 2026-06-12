@@ -17,15 +17,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-class CRelProfile
-{
-public:
-    ~CRelProfile();
-
-private:
-    unsigned int m_data;
-};
-
 extern "C" {
 void create__7CMapPcsFv(CMapPcs*);
 void destroy__7CMapPcsFv(CMapPcs*);
@@ -184,7 +175,7 @@ extern unsigned int s_loadedStageNo__7CMapPcs;
 extern unsigned int s_loadedMapNo__7CMapPcs;
 CRelProfile g_mapStage;
 CRelProfile g_mapSection;
-unsigned char g_hit_prof ATTRIBUTE_ALIGN(4);
+CRelProfile g_hit_prof;
 unsigned char g_map_calc_prof ATTRIBUTE_ALIGN(4);
 unsigned char g_map_draw_prof ATTRIBUTE_ALIGN(4);
 static const float kPMapBoundMinInit = 10000000000.0f;

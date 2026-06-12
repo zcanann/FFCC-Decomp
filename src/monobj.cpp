@@ -3888,7 +3888,7 @@ void CGMonObj::statWatch()
 				unsigned char* scriptBase = script;
 				if (monObj->m_partyDistance[targetPartyIndex] <
 					static_cast<float>(*reinterpret_cast<unsigned short*>(scriptBase + 0xCE))) {
-					if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
+					if (*reinterpret_cast<short*>(scriptBase + 0x10C) == 1) {
 						chaseState = 5;
 						chaseTimer = 0;
 						monObj->m_chaseDirty = 1;
@@ -3978,7 +3978,7 @@ void CGMonObj::statWatch()
 						aiData4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 					}
-					short changeStat = *reinterpret_cast<short*>(aiData4 + actionOff + 0x11E);
+					short changeStat = *reinterpret_cast<unsigned short*>(aiData4 + actionOff + 0x11E);
 					actionState = 0x21;
 					CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
 					if (monObj->m_moveWork.m_mode != 2) {

@@ -205,11 +205,11 @@ static unsigned short GetCmakePadRepeat()
 
 static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
 {
-    int handleIndex = static_cast<int>(CmakeSlot(menu)) + 0x20;
     int modelBlock = MenuS32(menu, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + handleIndex * 0x50) == 0) {
+    if (*reinterpret_cast<int*>(modelBlock + (static_cast<int>(CmakeSlot(menu)) + 0x20) * 0x50) == 0) {
         return;
     }
+    int handleIndex = static_cast<int>(CmakeSlot(menu)) + 0x20;
 
     *reinterpret_cast<short*>(modelBlock + 0x6E8) = 0xFF24;
     *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
@@ -246,11 +246,11 @@ static inline void DrawCmakePreviewChara(CMenuPcs* menu)
 
 static inline void DrawNamePreviewChara(CMenuPcs* menu, float modelAlpha, int gxAlpha)
 {
-    int handleIndex = static_cast<int>(CmakeSlot(menu)) + 0x20;
     int modelBlock = MenuS32(menu, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + handleIndex * 0x50) == 0) {
+    if (*reinterpret_cast<int*>(modelBlock + (static_cast<int>(CmakeSlot(menu)) + 0x20) * 0x50) == 0) {
         return;
     }
+    int handleIndex = static_cast<int>(CmakeSlot(menu)) + 0x20;
 
     *reinterpret_cast<short*>(modelBlock + 0x6E8) = 0xFF24;
     *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
@@ -1701,15 +1701,7 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawCmakePreviewCharaAlpha(this, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor panelColor;
-    panelColor.r = 0xFF;
-    panelColor.g = 0xFF;
-    panelColor.b = 0xFF;
-    panelColor.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
-    GXSetChanMatColor(GX_COLOR0A0, panelColor);
+    SetCmakeBlendMatColor(alpha);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
         0,
@@ -1724,7 +1716,7 @@ void CMenuPcs::CmakeJobDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    SetCmakeFontColor(font, alpha);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
     for (int i = 0; i < 8; ++i) {
         const char* txt = GetJobStr(i);
@@ -1737,9 +1729,14 @@ void CMenuPcs::CmakeJobDraw()
 
     if (CmakeState(this)->m_mode == 1) {
         int sel = CmakeState(this)->m_select;
-        int cursorX = (sel < 4) ? 0x110 : 0x1A8;
-        int cursorFrame = static_cast<int>(System.m_frameCounter) % 8;
-        DrawCursor(static_cast<int>((static_cast<float>(cursorX) - 36.0f) + static_cast<float>(cursorFrame)),
+        int cursorX = 0x1A8;
+        if (sel < 4) {
+            cursorX = 0x110;
+        }
+        float jx = static_cast<float>(cursorX);
+        jx -= 36.0f;
+        jx += static_cast<float>(static_cast<int>(System.m_frameCounter) % 8);
+        DrawCursor(static_cast<int>(jx),
             static_cast<int>(static_cast<float>(sel % 4 * 0x28 + 0x70)), alpha);
     }
 
@@ -2004,13 +2001,13 @@ void CMenuPcs::CmakeTribeDraw()
     tribeFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
     const char* txt;
-    int y = 0x88;
-    for (int i = 0; i < 4; i++) {
+    int y;
+    int i;
+    for (i = 0, y = 0x88; i < 4; i++, y += 0x1C) {
         txt = GetTribeStr(i);
         tribeFont->SetPosX(264.0f);
         tribeFont->SetPosY(static_cast<float>(y) - 4.0f);
         tribeFont->Draw(txt);
-        y += 0x1C;
     }
 
     CFont* hairFont = m_fonts[CMAKE_FONT_VALUE];
@@ -2026,13 +2023,11 @@ void CMenuPcs::CmakeTribeDraw()
         hairBase += 4;
     }
 
-    y = 0x88;
-    for (int i = 0; i < 4; i++) {
+    for (i = 0, y = 0x88; i < 4; i++, y += 0x1C) {
         const char* txt = GetHairStr(hairBase + i);
         hairFont->SetPosX(384.0f);
         hairFont->SetPosY(static_cast<float>(y) - 4.0f);
         hairFont->Draw(txt);
-        y += 0x1C;
     }
 
     DrawInit();
@@ -2042,9 +2037,8 @@ void CMenuPcs::CmakeTribeDraw()
         float cursorY = static_cast<float>(0x88 + CmakeState(this)->m_select * 0x1C);
 
         if (CmakeState(this)->m_fieldSelect == 0) {
-            DrawCursor(
-                static_cast<int>(tribeX + static_cast<float>(static_cast<int>(System.m_frameCounter) % 8)),
-                static_cast<int>(cursorY), alpha);
+            tribeX += static_cast<float>(static_cast<int>(System.m_frameCounter) % 8);
+            DrawCursor(static_cast<int>(tribeX), static_cast<int>(cursorY), alpha);
         } else {
             if ((System.m_frameCounter & 1) != 0) {
                 DrawCursor(static_cast<int>(tribeX), static_cast<int>(cursorY), alpha);
@@ -2329,7 +2323,9 @@ void CMenuPcs::CmakeSexDraw()
             static_cast<double>(static_cast<float>(400.0 - maxWidth / 2.0) +
                                 static_cast<float>(wobble)) -
             maxWidth / 2.0);
-        int cursorY = static_cast<int>(156.0f + static_cast<float>(sel * 0x28));
+        float cy = 156.0f;
+        cy += static_cast<float>(sel * 0x28);
+        int cursorY = static_cast<int>(cy);
         DrawCursor(cursorX, cursorY, 1.0f);
     }
 

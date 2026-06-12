@@ -1255,6 +1255,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
+    char tribeWithSlash[0x10];
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
         const char* txt = GetMenuStr(0x2A + i);
@@ -1273,7 +1274,6 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
     valueFont->SetTlut(6);
 
-    char tribeWithSlash[0x10];
     for (int i = 0; i < 4; i++) {
         const char* txt = "";
 
@@ -1503,6 +1503,7 @@ void CMenuPcs::CmakeResultDraw()
 
     labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
+    char tribeWithSlash[0x10];
     float labelWidths[4];
     int labelY = 0x70;
     for (int i = 0; i < 4; i++) {
@@ -1523,7 +1524,6 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
     valueFont->SetTlut(6);
 
-    char tribeWithSlash[0x10];
     for (int i = 0; i < 4; i++) {
         const char* value = "";
         if (i == 0) {

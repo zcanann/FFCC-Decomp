@@ -35,14 +35,13 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	int gil;
 	signed char* place;
 
+	digitPlace *= 10000000;
 	if (row != 0) {
 		gil = s_Money;
 	} else {
 		gil = caravanWork->m_gil;
 	}
 	digitIndex = started = 0;
-
-	digitPlace *= 10000000;
 	place = &s_place[row * 8];
 
 	while (digitIndex < 8) {
@@ -563,10 +562,12 @@ bool CMenuPcs::MoneyOpen()
 		firstAnim->duration = 10;
 		this->m_moneyPanel->count = entryIndex;
 
-		s_Money = 0;
-		for (int row = 0; row < 2; row++) {
-			MoneySetPlace(row);
-		}
+		entryIndex = 0;
+		s_Money = entryIndex;
+		do {
+			MoneySetPlace(entryIndex);
+			entryIndex++;
+		} while (entryIndex < 2);
 
 		this->m_moneyState->selections[0] = 0;
 		this->m_moneyState->initialized = 1;

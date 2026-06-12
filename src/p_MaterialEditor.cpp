@@ -704,15 +704,3 @@ void CMaterialEditorPcs::Init()
 
     m_loadedTextureCount = 0;
 }
-/*
- * --INFO--
- * PAL Address: 0x8004c6a0
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMaterialEditorPcs::~CMaterialEditorPcs()
-{
-}

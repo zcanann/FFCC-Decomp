@@ -46,11 +46,11 @@ struct CABlock
 	unsigned int m_words[16];
 };
 
-static inline CVector& SubVector(Vec* a, Vec* b)
+static inline CVector& SubVector(Vec* a, const CVector& b)
 {
 	CVector result;
 
-	PSVECSubtract(a, b, reinterpret_cast<Vec*>(&result));
+	PSVECSubtract(a, reinterpret_cast<Vec*>(const_cast<CVector*>(&b)), reinterpret_cast<Vec*>(&result));
 
 	return result;
 }
@@ -182,8 +182,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 {
 	Vec escapeDir;
 	Vec portalVec;
-	CVector baseVec(base);
-	const CVector& escapeDirSource = SubVector(CVector(from), baseVec);
+	const CVector& escapeDirSource = SubVector(CVector(from), CVector(base));
 
 	escapeDir.x = escapeDirSource.x;
 	escapeDir.y = escapeDirSource.y;
@@ -224,8 +223,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 				if (forbiddenGroup != otherGroup)
 				{
-					CVector portalDirBase(base);
-					const CVector& dirToPortalSource = SubVector(CVector(m_portals[i].m_position), portalDirBase);
+					const CVector& dirToPortalSource = SubVector(CVector(m_portals[i].m_position), CVector(base));
 
 					portalVec.x = dirToPortalSource.x;
 					portalVec.y = dirToPortalSource.y;
@@ -235,8 +233,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&escapeDir),
 					                            reinterpret_cast<Vec*>(&portalVec));
 
-					CVector distBase(base);
-					const CVector& distVecSource = SubVector(CVector(m_portals[i].m_position), distBase);
+					const CVector& distVecSource = SubVector(CVector(m_portals[i].m_position), CVector(base));
 
 					portalVec.x = distVecSource.x;
 					portalVec.y = distVecSource.y;

@@ -553,7 +553,9 @@ void CMenuPcs::DrawSingleCMakeChara(float alpha)
 void CMenuPcs::CalcSingleCMakeChara()
 {
     int slot = static_cast<int>(CmakeSlot(this));
-    unsigned char* modelWork = reinterpret_cast<unsigned char*>(MenuS32(this, 0x814) + slot * 0x50 + 0xA00);
+    int workOff = slot * 0x50 + 0xA00;
+    workOff += MenuS32(this, 0x814);
+    unsigned char* modelWork = reinterpret_cast<unsigned char*>(workOff);
 
     if (GetCmakeCharaHandle(this, slot)->m_model == nullptr ||
         *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(GetCmakeCharaHandle(this, slot)->m_model) + 0xB0) == 0) {

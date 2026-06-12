@@ -1998,13 +1998,13 @@ void CMenuPcs::CmakeTribeDraw()
     tribeFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
     const char* txt;
-    int y = 0x88;
-    for (int i = 0; i < 4; i++) {
+    int y;
+    int i;
+    for (i = 0, y = 0x88; i < 4; i++, y += 0x1C) {
         txt = GetTribeStr(i);
         tribeFont->SetPosX(264.0f);
         tribeFont->SetPosY(static_cast<float>(y) - 4.0f);
         tribeFont->Draw(txt);
-        y += 0x1C;
     }
 
     CFont* hairFont = m_fonts[CMAKE_FONT_VALUE];
@@ -2020,13 +2020,11 @@ void CMenuPcs::CmakeTribeDraw()
         hairBase += 4;
     }
 
-    y = 0x88;
-    for (int i = 0; i < 4; i++) {
+    for (i = 0, y = 0x88; i < 4; i++, y += 0x1C) {
         const char* txt = GetHairStr(hairBase + i);
         hairFont->SetPosX(384.0f);
         hairFont->SetPosY(static_cast<float>(y) - 4.0f);
         hairFont->Draw(txt);
-        y += 0x1C;
     }
 
     DrawInit();

@@ -530,25 +530,29 @@ void CChara::TimeMogFur()
 #pragma bool off
 static int FurColorMatch(CColor src, CColor ref, int limit)
 {
+	int hits = 0;
+
 	int dr = static_cast<int>(src.color.r) - static_cast<int>(ref.color.r);
 	if (dr < 0) {
 		dr = -dr;
 	}
 	dr += 7 - static_cast<int>(src.color.a);
+	hits += (dr <= limit);
 
 	int dg = static_cast<int>(src.color.g) - static_cast<int>(ref.color.g);
 	if (dg < 0) {
 		dg = -dg;
 	}
 	dg += 7 - static_cast<int>(src.color.a);
+	hits += (dg <= limit);
 
 	int db = static_cast<int>(src.color.b) - static_cast<int>(ref.color.b);
 	if (db < 0) {
 		db = -db;
 	}
 	db += 7 - static_cast<int>(src.color.a);
+	hits += (db <= limit);
 
-	int hits = (dr <= limit) + (dg <= limit) + (db <= limit);
 	return static_cast<unsigned int>(__cntlzw(3 - hits)) >> 5;
 }
 #pragma pop

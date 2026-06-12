@@ -1314,14 +1314,10 @@ void CLightPcs::CBumpLight::SetTexture(_GXTexMapID texMapID, int textureIdx)
  */
 CLightPcs::CLight::CLight()
 {
-    float f1 = kLightDefaultAttenFalloff;
-    float f2 = kLightZero;
-    float radius = kLightOne;
-
-    m_radius = radius;
-    m_offsetZ = f2;
-    m_offsetX = f2;
-    m_attenFalloff = f1;
+    m_radius = kLightOne;
+    m_offsetZ = kLightZero;
+    m_offsetX = kLightZero;
+    m_attenFalloff = kLightDefaultAttenFalloff;
     m_directionMode = 0;
     m_spotFn = 0;
     m_unk4D = 4;

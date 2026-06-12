@@ -10049,10 +10049,9 @@ void CMenuPcs::ClrCMakeFlg(int channel)
  */
 void CMenuPcs::ChgAllModel2()
 {
-	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* handleData = bytes;
 	int modelOffset = 0;
 	int pdtOffset = 0;
+	unsigned char* handleData = reinterpret_cast<unsigned char*>(this);
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* pdtData =
@@ -10077,12 +10076,12 @@ void CMenuPcs::ChgAllModel2()
 
 		modelData = m_wm.m_charaModelData + modelOffset;
 		if ((int)race >= 0) {
+			loadMode = 0;
 			modelId = race * 200 + 100;
 			if (variant != 0) {
 				modelId += 100;
 			}
 			modelData[0xC] = 1;
-			loadMode = 0;
 			modelId += index;
 		} else {
 			modelData[0xC] = 0;
@@ -10091,9 +10090,9 @@ void CMenuPcs::ChgAllModel2()
 		}
 
 		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
-		handleData += 4;
 		modelOffset += 0x34;
 		pdtOffset += 0x9C0;
+		handleData += 4;
 	}
 }
 
@@ -10108,12 +10107,12 @@ void CMenuPcs::ChgAllModel2()
  */
 void CMenuPcs::ChgAllModel()
 {
-	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
-	unsigned char* handleData = bytes;
+	int i = 0;
 	int modelOffset = 0;
+	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
+	unsigned char* handleData = reinterpret_cast<unsigned char*>(this);
 
-	for (int i = 0; i < kWmMenuPlayerCount; i++) {
+	for (; i < kWmMenuPlayerCount; i++) {
 		unsigned char* caravanData = gameData + 0x13F0;
 		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
 		unsigned int race;
@@ -10123,7 +10122,7 @@ void CMenuPcs::ChgAllModel()
 
 		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
 			race = *reinterpret_cast<unsigned short*>(caravanData + 0x3E0);
-			variant = *reinterpret_cast<short*>(caravanData + 0x3E2);
+			variant = *reinterpret_cast<unsigned short*>(caravanData + 0x3E2);
 			index = *reinterpret_cast<unsigned short*>(caravanData + 0x3E4);
 			modelId = race * 200 + 100;
 			if (variant != 0) {
@@ -10140,12 +10139,12 @@ void CMenuPcs::ChgAllModel()
 		modelData = m_wm.m_charaModelData + modelOffset;
 		int loadMode;
 		if ((int)race >= 0) {
+			loadMode = 0;
 			modelId = race * 200 + 100;
 			if (variant != 0) {
 				modelId += 100;
 			}
 			modelData[0xC] = 1;
-			loadMode = 0;
 			modelId += index;
 		} else {
 			modelData[0xC] = 0;
@@ -10154,9 +10153,9 @@ void CMenuPcs::ChgAllModel()
 		}
 		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
 
+		modelOffset += 0x34;
 		gameData += 0xC30;
 		handleData += 4;
-		modelOffset += 0x34;
 	}
 }
 

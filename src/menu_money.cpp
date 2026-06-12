@@ -284,7 +284,7 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) != 0) {
-				unsigned int sel = this->m_moneyState->selections[mode];
+				int sel = this->m_moneyState->selections[mode];
 				if (((int)this->m_moneyState->messageMask & (1 << sel)) == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {

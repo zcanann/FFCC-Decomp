@@ -1733,7 +1733,10 @@ void CMenuPcs::CmakeJobDraw()
         if (sel < 4) {
             cursorX = 0x110;
         }
-        DrawCursor(static_cast<int>((static_cast<float>(cursorX) - 36.0f) + static_cast<float>(static_cast<int>(System.m_frameCounter) % 8)),
+        float jx = static_cast<float>(cursorX);
+        jx -= 36.0f;
+        jx += static_cast<float>(static_cast<int>(System.m_frameCounter) % 8);
+        DrawCursor(static_cast<int>(jx),
             static_cast<int>(static_cast<float>(sel % 4 * 0x28 + 0x70)), alpha);
     }
 
@@ -2320,7 +2323,9 @@ void CMenuPcs::CmakeSexDraw()
             static_cast<double>(static_cast<float>(400.0 - maxWidth / 2.0) +
                                 static_cast<float>(wobble)) -
             maxWidth / 2.0);
-        int cursorY = static_cast<int>(156.0f + static_cast<float>(sel * 0x28));
+        float cy = 156.0f;
+        cy += static_cast<float>(sel * 0x28);
+        int cursorY = static_cast<int>(cy);
         DrawCursor(cursorX, cursorY, 1.0f);
     }
 

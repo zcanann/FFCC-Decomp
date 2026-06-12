@@ -12458,9 +12458,9 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 	font->SetScale(FLOAT_803313e8);
 
 	const char* const* msgTable = GetMcWinMessBuff(messType);
+	int maxWidth = 0;
 	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
 #define count (*reinterpret_cast<const int*>(winMess))
-	int maxWidth = 0;
 
 	const unsigned char* entry = winMess;
 	for (int i = 0; i < count; i++) {

@@ -496,20 +496,7 @@ void CMenuPcs::CmdInit1()
 
 	CmdListEntry* basePanel = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
 	s16 y = 0;
-	for (s32 i = 0; i < 4; i++) {
-		entry = &GetCmdListStorage(this)->entries[idx++];
-		entry->flags = 2;
-		entry->tex = 0x37;
-		entry->x = static_cast<s16>(basePanel->x + 0x24);
-		entry->y = static_cast<s16>(basePanel->y + y);
-		entry->width = 200;
-		entry->height = 0x28;
-		entry->u = kCmdMenuZero;
-		entry->v = kCmdMenuZero;
-		entry->startFrame = 7;
-		entry->duration = 5;
-		y += 0x20;
-
+	for (s32 i = 0; i < 8; i++) {
 		entry = &GetCmdListStorage(this)->entries[idx++];
 		entry->flags = 2;
 		entry->tex = 0x37;

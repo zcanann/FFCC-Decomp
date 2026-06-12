@@ -1812,7 +1812,7 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 		LayerResources(this)[layerNo].m_textureSet = 0;
 	}
 
-	char path[0x104];
+	char path[0xF4];
 	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
 
 	LayerResources(this)[layerNo].m_fileHandle = File.Open(path, 0, CFile::PRI_LOW);

@@ -137,7 +137,7 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     float fVar1;
     unsigned int uVar2;
     bool bVar3;
-    double dVar4;
+    float yPos;
 
     fVar1 = FLOAT_803308d8;
     m_offsetY = FLOAT_803308d8;
@@ -192,17 +192,15 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     uVar2 = (unsigned int)m_menuIndex;
     if ((int)uVar2 < 4) {
         if ((uVar2 & 2) != 0) {
-            dVar4 = (double)(((m_baseY - FLOAT_803308f4) +
-                              m_offsetY + m_marginY) -
-                             m_windowHeight);
+            yPos = ((m_baseY - FLOAT_803308f4) +
+                    m_offsetY + m_marginY) -
+                   m_windowHeight;
         } else {
-            dVar4 = (double)((m_baseY + m_offsetY +
-                              m_marginY) +
-                             FLOAT_803308f8);
+            yPos = (m_baseY + m_offsetY + m_marginY) +
+                   FLOAT_803308f8;
         }
     } else {
-        dVar4 = (double)((m_baseY + m_offsetY) +
-                         m_marginY);
+        yPos = (m_baseY + m_offsetY) + m_marginY;
     }
 
     bVar3 = false;
@@ -217,7 +215,7 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
         fVar1 = (m_baseX + m_offsetX) +
                 m_marginX;
     }
-    m_mes.SetPosition(fVar1, (float)dVar4);
+    m_mes.SetPosition(fVar1, yPos);
 
     unsigned int state;
     if (m_menuIndex < 4) {

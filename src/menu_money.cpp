@@ -31,6 +31,7 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	int digitPlace = 1;
 	int digitIndex;
+	int digitCount;
 	int started = 0;
 	int gil;
 	signed char* place;
@@ -43,6 +44,7 @@ inline void CMenuPcs::MoneySetPlace(int row)
 
 	digitPlace *= 10000000;
 	digitIndex = 0;
+	digitCount = 8;
 	place = &s_place[row * 8];
 
 	do {
@@ -61,7 +63,8 @@ inline void CMenuPcs::MoneySetPlace(int row)
 		}
 		digitIndex++;
 		digitPlace /= 10;
-	} while (digitIndex < 8);
+		digitCount--;
+	} while (digitCount != 0);
 }
 
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
@@ -324,7 +327,9 @@ void CMenuPcs::MoneyDraw()
 	int selectionState = this->m_moneyState->listState;
 	MoneyMenuAnim* entry = this->m_moneyPanel->anims;
 	int i;
-	GXColor color;
+	GXColor animColor;
+	GXColor baseColor;
+	GXColor cursorColor;
 	float x;
 	float y;
 	int mode = this->m_moneyState->mode;
@@ -342,11 +347,11 @@ void CMenuPcs::MoneyDraw()
 		float u = entry->u;
 		float v = entry->v;
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
-		color.r = 0xFF;
-		color.g = 0xFF;
-		color.b = 0xFF;
-		color.a = (u8)(255.0f * entry->alpha);
-		GXSetChanMatColor(GX_COLOR0A0, color);
+		animColor.r = 0xFF;
+		animColor.g = 0xFF;
+		animColor.b = 0xFF;
+		animColor.a = (u8)(255.0f * entry->alpha);
+		GXSetChanMatColor(GX_COLOR0A0, animColor);
 		float uvScale = entry->uvScale;
 		MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
 	}
@@ -354,11 +359,11 @@ void CMenuPcs::MoneyDraw()
 	MoneyMenuAnim* drawBase = this->m_moneyPanel->anims;
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5D));
 	{
-		color.r = 0xFF;
-		color.g = 0xFF;
-		color.b = 0xFF;
-		color.a = (u8)(255.0f * drawBase->alpha);
-		GXSetChanMatColor(GX_COLOR0A0, color);
+		baseColor.r = 0xFF;
+		baseColor.g = 0xFF;
+		baseColor.b = 0xFF;
+		baseColor.a = (u8)(255.0f * drawBase->alpha);
+		GXSetChanMatColor(GX_COLOR0A0, baseColor);
 	}
 
 	for (i = 0; i < 2; i++) {
@@ -378,11 +383,11 @@ void CMenuPcs::MoneyDraw()
 	if ((mode == 0) && (selectionState == 1)) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x48));
 		{
-			color.r = 0xFF;
-			color.g = 0xFF;
-			color.b = 0xFF;
-			color.a = (u8)(255.0f * drawBase->alpha);
-			GXSetChanMatColor(GX_COLOR0A0, color);
+			cursorColor.r = 0xFF;
+			cursorColor.g = 0xFF;
+			cursorColor.b = 0xFF;
+			cursorColor.a = (u8)(255.0f * drawBase->alpha);
+			GXSetChanMatColor(GX_COLOR0A0, cursorColor);
 		}
 
 		MenuPcs.DrawRect(0, (float)(drawBase->x + (7 - this->m_moneyState->selections[0]) * 0x12 + 0x24),

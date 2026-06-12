@@ -906,11 +906,11 @@ void CRingMenu::onCalc()
 		m_buttonTimers[8] = clampDecToZero(m_buttonTimers[8]);
 		do {
 			anim[0] = anim[0] - animStep;
-			if (anim[0] < animMin) {
+			if (animMin > anim[0]) {
 				anim[0] = animMin;
 			}
 			anim[1] = anim[1] - animStep;
-			if (anim[1] < animMin) {
+			if (animMin > anim[1]) {
 				anim[1] = animMin;
 			}
 			anim[2] = anim[2] - animStep;

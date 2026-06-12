@@ -3455,7 +3455,6 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	outData[0] = 0;
 	outData[1] = 0;
 	i = 0;
-	itemPtr = localPlayerData + i * 2;
 	game = &Game;
 	outData[2] = 0;
 	writePtr = outData + 4;
@@ -3463,6 +3462,7 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	size = 4;
 
 	for (; i < 0x40; i++) {
+		itemPtr = localPlayerData + i * 2;
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
 		if (MenuPcs.GetItemType(itemId, 1) == 1) {
 		const int iconMask = localPlayerData[2] & 3;
@@ -3480,7 +3480,6 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 			count++;
 		}
 		}
-		itemPtr += 2;
 	}
 
 	outData[0] = count;

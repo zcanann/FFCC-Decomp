@@ -324,9 +324,9 @@ void CMenuPcs::MoneyDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
+	int i;
 	int selectionState = this->m_moneyState->listState;
 	MoneyMenuAnim* entry = this->m_moneyPanel->anims;
-	int i;
 	GXColor entryColor;
 	GXColor panelColor;
 	GXColor cursorColor;

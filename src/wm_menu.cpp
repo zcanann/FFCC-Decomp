@@ -2866,7 +2866,7 @@ void CMenuPcs::CalcLoadMenu()
 	if (bVar1) {
 		uVar4s = 0;
 	} else {
-		unsigned int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
+		unsigned int padIndex = (!(!(Pad.m_debugPadPort == 0))) ? 0 : 0;
 		uVar4s = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 	unsigned int uVar4 = uVar4s;
@@ -2945,7 +2945,8 @@ void CMenuPcs::CalcLoadMenu()
 		float wave = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
 		if ((int)uVar15 >= -10) {
 			int s15 = (int)uVar15 >> 31;
-			int absRaw = ((int)uVar15 ^ s15) - s15;
+			int __p5 = s15;
+			int absRaw = ((int)uVar15 ^ s15) - __p5;
 			wave = (float)(wave * (DOUBLE_803314E8 * (double)absRaw));
 			int s16 = (int)uVar15 >> 31;
 			int absOff = ((int)uVar15 ^ s16) - s16;
@@ -2997,7 +2998,8 @@ void CMenuPcs::CalcLoadMenu()
 			{ float yDiff = FLOAT_80331430 - (float)sVar18; iVar10 = (int)(float)(yDiff * DOUBLE_803313F8); }
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
-			m_menuWindowInfo->width = sVar8;
+			int __p4 = sVar8;
+			m_menuWindowInfo->width = __p4;
 			m_menuWindowInfo->height = sVar18;
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;
@@ -3116,8 +3118,7 @@ void CMenuPcs::CalcLoadMenu()
 				short sVar18;
 				if (sVar8 == 5) { sVar18 = -1; }
 				else if (sVar8 == 6) { sVar18 = -3; }
-				else if (sVar8 == 7) { sVar18 = -4; }
-				else { sVar18 = 0; }
+				else if (!(sVar8 == 7)) { sVar18 = 0; } else { sVar18 = -4; }
 				if (sVar8 == 7) {
 					short chk = m_wmWorldState->m_mcResult;
 					if (chk != 0 && chk != sVar18 && chk != 1) {
@@ -3514,7 +3515,7 @@ void CMenuPcs::CalcLoadMenu()
 				} while (iVar10 < 4);
 
 				iVar23 = 0;
-				int bestIdx = -1;
+				int bestIdx =  (int)(long)(-1);
 				for (; iVar23 < 4; iVar23++) {
 					if (*reinterpret_cast<char*>(m_wmCharaState + iVar23 * 0x48 + 0x42) == 0
 					    && *reinterpret_cast<int*>(m_wmCharaState + iVar23 * 0x48 + 8) > 0) {

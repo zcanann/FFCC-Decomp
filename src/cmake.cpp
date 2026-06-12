@@ -488,19 +488,20 @@ static bool IsCmakeNameBlank(const char* name)
 static int IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
 {
     const char* nm = name;
+    int slot = 0;
     int found = false;
-    unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
-    for (int slot = 0; slot < 8; ++slot, entry += 0xC30) {
+    unsigned char* base = reinterpret_cast<unsigned char*>(&Game);
+    for (; slot < 8; ++slot) {
         if (slot == CmakeSlot(menu)) {
             continue;
         }
-        if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
+        if (*reinterpret_cast<int*>(base + slot * 0xC30 + 0x1794) == 0) {
             continue;
         }
-        if (*(entry + 0x1F96) == 1) {
+        if (*(base + slot * 0xC30 + 0x1F96) == 1) {
             continue;
         }
-        if (strcmp(nm, reinterpret_cast<char*>(entry + 0x17BA)) == 0) {
+        if (strcmp(nm, reinterpret_cast<char*>(base + slot * 0xC30 + 0x17BA)) == 0) {
             found = true;
             break;
         }
@@ -1027,15 +1028,11 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             }
 
             int nameLen = strlen(s_CmakeInfo.m_name);
-            const char* scan = s_CmakeInfo.m_name;
             int spaceCount = 0;
-            int remain = nameLen;
-            for (; 0 < remain; remain = remain - 1) {
-                if (*scan != ' ') {
+            for (; spaceCount < nameLen; spaceCount++) {
+                if (s_CmakeInfo.m_name[spaceCount] != ' ') {
                     break;
                 }
-                scan = scan + 1;
-                spaceCount = spaceCount + 1;
             }
             if (spaceCount == nameLen) {
                 Sound.PlaySe(4, 0x40, 0x7f, 0);
@@ -1133,7 +1130,6 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             } else {
                 Sound.PlaySe(4, 0x40, 0x7f, 0);
             }
-            return 0;
         }
     }
     return 0;
@@ -1228,13 +1224,12 @@ void CMenuPcs::CmakeResultDraw1()
     }
     DrawCmakeTitle(7, alpha, 1.0f);
 
-    float textAlpha = alpha;
     if (CmakeState(this)->m_mode == 0) {
-        textAlpha = 1.0f;
+        alpha = 1.0f;
     }
     {
         int tribe = static_cast<int>(s_CmakeInfo.m_tribe);
-        SetCmakeBlendMatColor(textAlpha);
+        SetCmakeBlendMatColor(alpha);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
         MenuPcs.DrawRect(
             0,
@@ -1250,7 +1245,7 @@ void CMenuPcs::CmakeResultDraw1()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     labelFont->SetColor(color.color);
 
     float labelWidths[4];
@@ -1268,7 +1263,7 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
+    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 
@@ -1490,9 +1485,8 @@ void CMenuPcs::CmakeResultDraw()
     }
     DrawCmakeYesNo(yesNoSel, alpha);
 
-    float textAlpha = alpha;
     if ((CmakeState(this)->m_mode == 2) && (CmakeState(this)->m_resultDir < 0)) {
-        textAlpha = 1.0f;
+        alpha = 1.0f;
     }
 
     CFont* labelFont = m_fonts[CMAKE_FONT_LABEL];
@@ -1501,7 +1495,7 @@ void CMenuPcs::CmakeResultDraw()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     labelFont->SetColor(color.color);
 
     float labelWidths[4];
@@ -1521,7 +1515,7 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * textAlpha));
+    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
     valueFont->SetColor(valueColor.color);
     valueFont->SetTlut(6);
 
@@ -1534,7 +1528,7 @@ void CMenuPcs::CmakeResultDraw()
             value = GetMenuStr(static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
         } else if (i == 2) {
             strcpy(tribeWithSlash, GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe)));
-            strcat(tribeWithSlash, "/", sizeof(tribeWithSlash));
+            strcat(tribeWithSlash, "/");
             value = tribeWithSlash;
         } else {
             value = GetJobStr(static_cast<int>(s_CmakeInfo.m_job));
@@ -2165,17 +2159,16 @@ int CMenuPcs::CmakeTribeCtrl()
                 if (fieldSelect == 0) {
                     CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect + 1);
                 } else {
-                    unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
+                    unsigned char* base = reinterpret_cast<unsigned char*>(&Game);
                     int slot;
                     for (slot = 0; slot < 8; ++slot) {
-                        if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
-                            (*(entry + 0x1F96) != 1) &&
-                            (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == CmakeState(this)->m_select) &&
-                            (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == CmakeState(this)->m_row) &&
-                            (*reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) {
+                        if ((*reinterpret_cast<int*>(base + slot * 0xC30 + 0x1794) != 0) &&
+                            (*(base + slot * 0xC30 + 0x1F96) != 1) &&
+                            (*reinterpret_cast<unsigned short*>(base + slot * 0xC30 + 0x17D0) == CmakeState(this)->m_select) &&
+                            (*reinterpret_cast<unsigned short*>(base + slot * 0xC30 + 0x17D4) == CmakeState(this)->m_row) &&
+                            (*reinterpret_cast<unsigned short*>(base + slot * 0xC30 + 0x17D2) == s_CmakeInfo.m_gender)) {
                             break;
                         }
-                        entry += 0xC30;
                     }
 
                     if (slot < 8) {
@@ -2303,8 +2296,9 @@ void CMenuPcs::CmakeSexDraw()
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
     float maxWidth = 0.0f;
-    int y = 0x9C;
-    for (int i = 0; i < 2; ++i) {
+    int y;
+    int i;
+    for (i = 0, y = 0x9C; i < 2; ++i) {
         const char* txt = GetMenuStr(0x11 + i);
         float width = static_cast<float>(font->GetWidth(txt));
         if (maxWidth < width) {
@@ -2705,15 +2699,11 @@ int CMenuPcs::CmakeNameCtrl()
                     }
 
                     int nameLen = strlen(s_CmakeInfo.m_name);
-                    const char* scan = s_CmakeInfo.m_name;
                     int spaceCount = 0;
-                    int remain = nameLen;
-                    for (; 0 < remain; remain = remain - 1) {
-                        if (*scan != ' ') {
+                    for (; spaceCount < nameLen; spaceCount++) {
+                        if (s_CmakeInfo.m_name[spaceCount] != ' ') {
                             break;
                         }
-                        scan = scan + 1;
-                        spaceCount = spaceCount + 1;
                     }
                     if (spaceCount == nameLen) {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
@@ -2817,7 +2807,6 @@ int CMenuPcs::CmakeNameCtrl()
                     } else {
                         Sound.PlaySe(3, 0x40, 0x7F, 0);
                     }
-                    return 0;
                 } else {
                     Sound.PlaySe(0x34, 0x40, 0x7F, 0);
                     ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);
@@ -3248,7 +3237,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
         case 2:
             txt = GetTribeStr(s_CmakeInfo.m_tribe);
             strcpy(tribeWithSep, txt);
-            strcat(tribeWithSep, "/", sizeof(tribeWithSep));
+            strcat(tribeWithSep, "/");
             txt = tribeWithSep;
             break;
         default:

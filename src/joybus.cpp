@@ -424,6 +424,8 @@ void JoyBus::Destroy()
  */
 #pragma push
 #pragma opt_common_subs off
+#pragma optimize_for_size on
+#pragma use_lmw_stmw off
 int JoyBus::LoadBin()
 {
     if (static_cast<signed char>(m_binLoaded) != 0)
@@ -460,18 +462,14 @@ int JoyBus::LoadBin()
             m_gbaBootImage[0xAE] = (unsigned char)m_diskId[2];
             m_gbaBootImage[0xAF] = (unsigned char)m_diskId[3];
 
-            int idx = 0xBC;
-
             unsigned char* buf = (unsigned char*)m_gbaBootImage;
             int sum = 0xE7 - buf[0xA0] - buf[0xA1] - buf[0xA2] - buf[0xA3] - buf[0xA4] - buf[0xA5] - buf[0xA6] - buf[0xA7] - buf[0xA8] - buf[0xA9] - buf[0xAA] - buf[0xAB] - buf[0xAC] - buf[0xAD] - buf[0xAE] - buf[0xAF] - buf[0xB0] - buf[0xB1] - buf[0xB2] - buf[0xB3] - buf[0xB4] - buf[0xB5] - buf[0xB6] - buf[0xB7] - buf[0xB8] - buf[0xB9] - buf[0xBA] - buf[0xBB];
 
-            if (idx < 0xBD)
+            int idx = (sum != 0) ? 0xBC : 0xBC;
+
+            for (; idx < 0xBD; idx++)
             {
-                do
-                {
-                    sum -= (unsigned char)m_gbaBootImage[idx];
-                    idx++;
-                } while (idx < 0xBD);
+                sum -= (unsigned char)m_gbaBootImage[idx];
             }
 
             m_gbaBootImage[idx] = (unsigned char)sum;

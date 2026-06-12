@@ -1235,7 +1235,7 @@ void CMemoryCardMan::SetLoadData()
     Game.m_gameWork.m_mcHasSerial = save[0x13DC];
     Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));
     Sound.SetSeMasterVolume(static_cast<s8>(save[0x13DE]));
-    u32 soundMode = static_cast<u32>(__cntlzw(Sound.GetSoundMode())) >> 5;
+    int soundMode = static_cast<s32>(__cntlzw(Sound.GetSoundMode())) >> 5;
     Sound.SetStereo(soundMode);
 
     CGame* g = &Game;

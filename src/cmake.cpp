@@ -834,10 +834,10 @@ void CMenuPcs::CmakeVillageDraw()
 
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
         short sel = villageWork->m_select;
-        int cursorBase = (villageWork->m_row < 5) ? 0xE5 : 0xE5;
+        int cursorX = (villageWork->m_row < 5) ? 0xE5 : 0xE5;
         int cursorY = villageWork->m_row * 0x20 + 0x63;
-        int cursorX = static_cast<int>(
-            26.9f * static_cast<float>(sel) + static_cast<float>(cursorBase));
+        cursorX = static_cast<int>(
+            26.9f * static_cast<float>(sel) + static_cast<float>(cursorX));
         SetCmakeBlendMatColor(1.0f);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 100 : 0x3D));
         MenuPcs.DrawRect(
@@ -2647,7 +2647,7 @@ int CMenuPcs::CmakeNameCtrl()
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
             short sel = CmakeState(this)->m_select;
-            if (CmakeState(this)->m_row < (sel >= 10 ? 5 : 4)) {
+            if ((sel >= 10 ? 5 : 4) > CmakeState(this)->m_row) {
                 CmakeState(this)->m_row = static_cast<short>(CmakeState(this)->m_row + 1);
             } else {
                 CmakeState(this)->m_row = 0;

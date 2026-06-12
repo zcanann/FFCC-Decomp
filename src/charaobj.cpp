@@ -1482,13 +1482,13 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		System.Printf(dbg + 0x138);
 		return;
 	}
-	if (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24 >> 30) << 30 >> 31) == 0) {
+	if (static_cast<unsigned char>(static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24 >> 30) << 30 >> 31) == 0) {
 		System.Printf(dbg + 0x160);
 		return;
 	}
 
 	staType = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + resolvedItemId * 0x48 + 8);
-	if (static_cast<int>(staType) != 0x67 && static_cast<int>(staType) != 0x65 && static_cast<int>(staType) != 0x66 && CharaObjGameFlagBit5Set()) {
+	if (static_cast<unsigned int>(staType) != 0x67 && static_cast<int>(staType) != 0x65 && static_cast<int>(staType) != 0x66 && CharaObjGameFlagBit5Set()) {
 		System.Printf(dbg + 0x17C);
 		return;
 	}
@@ -1667,7 +1667,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if ((((static_cast<unsigned int>(__cntlzw(0x6D - (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D))) >> 5) & 0xFFU) != 0) && itemEffect == 0x1F8) {
 					hasBonus = 1;
 				}
-				int bonus = hasBonus ? static_cast<int>(*reinterpret_cast<unsigned char*>(
+				unsigned int bonus = hasBonus ? static_cast<int>(*reinterpret_cast<unsigned char*>(
 					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDD)) : 0;
 				damageAmount = clampedDamage + bonus;
 				if (scriptDefense != 0) {
@@ -1928,7 +1928,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			putHitParticleFromItem(sourceObj, resolvedItemId);
 			if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 				unsigned char* script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
-				int seNo = *reinterpret_cast<unsigned short*>(script9 + 0x192) +
+				int seNo = *reinterpret_cast<short*>(script9 + 0x192) +
 					(*reinterpret_cast<unsigned short*>(script9 + 0x190) * 1000) + 6 +
 					Math.Rand(3);
 				playSe3D(seNo, 0x32, 0x96, 0, 0);

@@ -723,7 +723,7 @@ void DrawGoOutMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-int getFreeCaravanIdx(Mc::SaveDat* saveData)
+inline int getFreeCaravanIdx(Mc::SaveDat* saveData)
 {
     g_freeCaravanIdx = FindFreeCaravanIdx(saveData);
     return g_freeCaravanIdx;

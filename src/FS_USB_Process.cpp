@@ -351,7 +351,7 @@ void CFunnyShapePcs::SetUSBData()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFunnyShapePcs::USBDataCallback(CUSBPcs::CDataHeader* header)
+inline void CFunnyShapePcs::USBDataCallback(CUSBPcs::CDataHeader* header)
 {
     CUSBStreamData* usb = UsbStream(this);
 

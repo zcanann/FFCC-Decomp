@@ -5007,19 +5007,17 @@ void CMenuPcs::DrawCMakeMenu()
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	int bit = 0;
-	int byteOffset = bit;
 	do {
 		if (((1 << bit) & 3) != 0) {
 			const float* pZeroF = &FLOAT_803313dc;
 			const float* pOneF = &FLOAT_803313e8;
-			short* const entry = reinterpret_cast<short*>(m_wm.m_frameInfo + byteOffset + 4);
+			short* const entry = reinterpret_cast<short*>(reinterpret_cast<unsigned char(*)[0x1C]>(m_wm.m_frameInfo)[bit] + 4);
 			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(entry + 0xC), static_cast<float>(entry[0]),
 			                 static_cast<float>(entry[1]), static_cast<float>(entry[2]), static_cast<float>(entry[3]),
 			                 *reinterpret_cast<float*>(entry + 4), *reinterpret_cast<float*>(entry + 6),
 			                 *pOneF, *pOneF, *pZeroF);
 		}
 		bit++;
-		byteOffset += 0x1C;
 	} while (bit < 2);
 
 	short contentState;
@@ -5104,7 +5102,7 @@ void CMenuPcs::DrawCMakeMenu()
 			textList[1] = langText[ti];
 			ti = 7;
 			textList[2] = langText[ti];
-			_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
+			const _GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 			char* const text = textList[textIndex];
 			const float* pW1 = &FLOAT_80331594;
 			const float* pH1 = &FLOAT_803313e8;
@@ -8455,11 +8453,10 @@ void CMenuPcs::GetAnimNo(int animNo, int)
 void CMenuPcs::DrawChara()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = m_wm.m_worldObjData;
 	WmWorldState* const worldState = GetWmWorldState(this);
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		unsigned char* const view = worldObj + 0xA00 + i * 0x50;
+		unsigned char* const view = m_wm.m_worldObjData + (0xA00 + i * 0x50);
 		if (*reinterpret_cast<int*>(view) == 0) {
 			continue;
 		}
@@ -8479,6 +8476,7 @@ void CMenuPcs::DrawChara()
 		}
 
 		{
+			Mtx lookAtMtx;
 			Mtx44 projectionMtx;
 			const float* pFovA = &FLOAT_80331470;
 			const float* pAspectA = &FLOAT_80331474;
@@ -8487,7 +8485,6 @@ void CMenuPcs::DrawChara()
 			C_MTXPerspective(projectionMtx, *pFovA, *pAspectA, *pNearA, *pFarA);
 			GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 			PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-			Mtx lookAtMtx;
 			const float* pZeroA1 = &FLOAT_803313dc;
 			const float* pOneA = &FLOAT_803313e8;
 			const float* pZeroA2 = &FLOAT_803313dc;
@@ -9448,72 +9445,46 @@ void CMenuPcs::DrawCMLife()
 
 		const float* p255C = &FLOAT_80331458;
 		GXColor color;
+		color.a = static_cast<unsigned char>(static_cast<int>(alphaF));
+		color.b = static_cast<unsigned char>(static_cast<int>(*p255C * blue));
 		color.r = static_cast<unsigned char>(static_cast<int>(*p255C * red));
 		color.g = static_cast<unsigned char>(static_cast<int>(*p255C * green));
-		color.b = static_cast<unsigned char>(static_cast<int>(*p255C * blue));
-		color.a = static_cast<unsigned char>(static_cast<int>(alphaF));
 		GXSetChanMatColor(GX_COLOR0A0, color);
 
 		row = slot / 4;
 		col = slot % 4;
 		const float* pYOrg = &FLOAT_80331478;
 		const float* pXOrg = &FLOAT_80331410;
-		float y = *pYOrg + static_cast<float>(row * 0xB8);
-		const float xBase = *pXOrg + static_cast<float>(col * 0x90);
+		float xBase;
+		float y;
+		float x;
+		xBase = *pXOrg + static_cast<float>(col * 0x90);
+		y = *pYOrg + static_cast<float>(row * 0xB8);
 		float yTmp = y;
 		if (row != 0) {
 			const float* pRowAdd = &FLOAT_80331548;
 			yTmp = y + *pRowAdd;
 		}
 		const float* pYAdj = &FLOAT_8033166C;
-		const float yBase = yTmp + *pYAdj;
+		yTmp = yTmp + *pYAdj;
 		const double* pHalfD = &DOUBLE_803313F8;
-		float x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * *pHalfD + static_cast<double>(xBase));
+		x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * *pHalfD + static_cast<double>(xBase));
 		float step = static_cast<float>(static_cast<double>(8 - count) * *pHalfD);
 
-		const float* pSplineDiv = &FLOAT_803314c0;
 		const float* pZeroK = &FLOAT_803313dc;
 		const float* pRectSize = &FLOAT_80331558;
 		const double* pStepDelta = &DOUBLE_80331420;
-		const float kSplineDiv = *pSplineDiv;
+		double kStepDelta;
+		float kRectSize;
 		const float kZero = *pZeroK;
-		const float kRectSize = *pRectSize;
-		const double kStepDelta = *pStepDelta;
+		kStepDelta = *pStepDelta;
+		kRectSize = *pRectSize;
 
 		for (i = 0; i < count; i++) {
-			const float* pZeroY = &FLOAT_803313dc;
-			float yAdd = *pZeroY;
-			const float t = step / kSplineDiv;
-			if (t >= gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 4]) {
-				yAdd = gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 3];
-			} else {
-				for (int j = 0; j < gWmLifeYOffsetSplineCount; j++) {
-					if (t <= gWmLifeYOffsetSpline[j * 4]) {
-						if (j == 0) {
-							yAdd = gWmLifeYOffsetSpline[j * 4 + 1];
-						} else {
-							const float* pC8s = &FLOAT_803314c8;
-							const float* pC4s = &FLOAT_803314c4;
-							const float* pCCs = &FLOAT_803314cc;
-							const float* pOneS = &FLOAT_803313e8;
-							float* const cur = gWmLifeYOffsetSpline + j * 4;
-							float* const prev = gWmLifeYOffsetSpline + (j - 1) * 4;
-							const float width = cur[0] - prev[0];
-							const float u = (t - prev[0]) / width;
-							const float u2 = u * u;
-							const float u3 = u2 * u;
-							yAdd = width * (prev[3] * (u + (u3 - *pC8s * u2)) +
-							                cur[2] * (u3 - u2)) +
-							       (prev[1] * (*pOneS + (*pC8s * u3 - *pC4s * u2)) +
-							        cur[1] * (*pCCs * u3 + *pC4s * u2));
-						}
-						break;
-					}
-				}
-			}
+			float yAdd = GetFcvValue(*reinterpret_cast<FCV*>(&gWmLifeYOffsetSplineCount), step);
 
 			MenuPcs.DrawRect(
-			    0, x, yBase + yAdd, FLOAT_80331558, FLOAT_80331558,
+			    0, x, yTmp + yAdd, FLOAT_80331558, FLOAT_80331558,
 			                                kZero, kZero, FLOAT_803313e8, FLOAT_803313e8, kZero);
 			step = static_cast<float>(step + kStepDelta);
 			x += kRectSize;
@@ -10971,12 +10942,11 @@ void CMenuPcs::DrawMCList()
 					const float* pOneA = &FLOAT_803313e8;
 					alpha = *pOneA;
 				} else {
+					const float* pDCa = &FLOAT_803314DC;
+					const float* pE0a = &FLOAT_803314E0;
+					yPos = *pDCa + static_cast<float>(animFrames) * *pE0a;
 					const double* pRateA = &DOUBLE_803314E8;
 					alpha = static_cast<float>(*pRateA * static_cast<double>(animFrames));
-					const float* pDCa = &FLOAT_803314DC;
-					yPos = *pDCa;
-					const float* pE0a = &FLOAT_803314E0;
-					yPos += static_cast<float>(animFrames) * *pE0a;
 				}
 			} else {
 				const float* pD8b = &FLOAT_803314D8;
@@ -11104,15 +11074,20 @@ LAB_next:
 	if (separatorSub != 0 && separatorSub > 1 &&
 	    worldState->m_mainState == 2) {
 		const float* psZ = &FLOAT_803313dc;
-		const float sepZero = *psZ;
 		const double* psSl = &DOUBLE_80331498;
-		const double sepSlope = *psSl;
 		const double* psBi = &DOUBLE_80331408;
-		const double sepBias = *psBi;
 		const double* psBa = &DOUBLE_80331490;
-		const double sepBase = *psBa;
 		const double* psOf = &DOUBLE_80331510;
-		const double sepOff = *psOf;
+		double sepOff;
+		double sepBase;
+		double sepBias;
+		double sepSlope;
+		float sepZero;
+		sepZero = *psZ;
+		sepSlope = *psSl;
+		sepBias = *psBi;
+		sepBase = *psBa;
+		sepOff = *psOf;
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 			double rawA;
@@ -11132,26 +11107,32 @@ LAB_next:
 
 	if (worldState->m_subState >= 0x11 &&
 	    worldState->m_mainState < 3) {
+		const double* pBi2 = &DOUBLE_80331408;
+		const double* pSl2 = &DOUBLE_80331498;
+		const double* pBa2 = &DOUBLE_80331490;
 		const double* pOff2 = &DOUBLE_80331510;
 		const float* p518a = &FLOAT_80331518;
-		const double mapX = *pOff2 + static_cast<double>(*p518a);
+		double rowBaseD;
+		float slotY;
+		double mapX;
+		double rowSlopeD;
+		double rowBias;
+		mapX = *pOff2 + static_cast<double>(*p518a);
 		const int language = Game.m_gameWork.m_languageId;
 		int* digitWidths = reinterpret_cast<int*>(rodataBase + 0x920);
 		int* playWidths = reinterpret_cast<int*>(rodataBase + 0xab0);
-		const double* pSl2 = &DOUBLE_80331498;
-		const double rowSlopeD = *pSl2;
-		const double* pBi2 = &DOUBLE_80331408;
-		const double rowBias = *pBi2;
-		const double* pBa2 = &DOUBLE_80331490;
-		const double rowBaseD = *pBa2;
+		rowSlopeD = *pSl2;
+		rowBias = *pBi2;
+		rowBaseD = *pBa2;
 		for (slot = 0, slotOff = slot; slot < kMcListCount; slot++, slotOff += kMcListEntrySize) {
 			unsigned char* const slotData = m_wmCharaState + slotOff;
 			double rawRow;
 			reinterpret_cast<int*>(&rawRow)[1] = slot ^ 0x80000000;
 			reinterpret_cast<int*>(&rawRow)[0] = 0x43300000;
-			const float slotY = static_cast<float>(rowSlopeD * (rawRow - rowBias) + rowBaseD);
+			slotY = static_cast<float>(rowSlopeD * (rawRow - rowBias) + rowBaseD);
 			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<char*>(slotData + 0x41) != 0) {
 				const float* pH40a = &FLOAT_80331440;
+				float digitX;
 				float rowY = *pH40a + slotY;
 				const float* pW68c = &FLOAT_80331468;
 				float capX = *pW68c;
@@ -11196,7 +11177,7 @@ LAB_next:
 				         *pZc3, *pZc3, *pOc3, *pOc3, *pZc3);
 
 				const float* p520a = &FLOAT_80331520;
-				float digitX = *p520a;
+				digitX = *p520a;
 				if (language != 5) {
 					const float* pD8c4 = &FLOAT_803314D8;
 					rowY = *pD8c4 + slotY;
@@ -11244,13 +11225,17 @@ LAB_next:
 					}
 					digitX += static_cast<float>((0x20 - static_cast<int>(static_cast<float>(totalWidth) * digitScale)) / 2);
 					const float* pZd1 = &FLOAT_803313dc;
-					const float zeroF = *pZd1;
 					const double* pCs1 = &DOUBLE_80331490;
-					const double colSlope = *pCs1;
 					const double* pRs1 = &DOUBLE_80331540;
-					const double rowSlope = *pRs1;
 					const double* pRb1 = &DOUBLE_80331538;
-					const double rowBase = *pRb1;
+					double rowBase;
+					double rowSlope;
+					double colSlope;
+					float zeroF;
+					zeroF = *pZd1;
+					colSlope = *pCs1;
+					rowSlope = *pRs1;
+					rowBase = *pRb1;
 					int* const dw = reinterpret_cast<int*>(rodataBase + 0x920);
 					for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 						int digit;
@@ -11271,6 +11256,7 @@ LAB_next:
 						         digitScale, *pOd1, zeroF);
 						digitX += digitWidthF * digitScale;
 					}
+					float suffixU;
 					float suffixWidth;
 					if (language == 2) {
 						const float* pSw548 = &FLOAT_80331548;
@@ -11283,7 +11269,7 @@ LAB_next:
 						suffixWidth = *pSw410;
 					}
 					const float* pZd2 = &FLOAT_803313dc;
-					float suffixU = *pZd2;
+					suffixU = *pZd2;
 					unsigned char wideLang = (language == 1 || language == 4);
 					double suffixScaleD;
 					if (wideLang) {
@@ -11323,7 +11309,7 @@ LAB_next:
 						const float* pOd2 = &FLOAT_803313e8;
 						const float* pD8d1 = &FLOAT_803314D8;
 						MenuPcs.DrawRect(0, digitX, rowY, suffixWidth, *pD8d1,
-						         suffixU, *pZd3, suffixScale, *pOd2, *pZd3);
+						         *pZd3, suffixU, suffixScale, *pOd2, *pZd3);
 					}
 				}
 

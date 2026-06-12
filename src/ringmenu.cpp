@@ -206,7 +206,6 @@ void CRingMenu::DrawIcon()
 	    static_cast<float>(iconRow * 0x38), kRingMenuOne, kRingMenuOne,
 	    angle);
 
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
 	int uInt = iconCol % 8 * 0x30;
 	int vInt = iconCol / 8 * 0x30;
 	void* tlut = MenuPcs.m_externalFontTlut;

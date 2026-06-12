@@ -290,8 +290,9 @@ void CMenuPcs::LetterInit1()
 		*reinterpret_cast<float*>(iVar4 + 0x14) = FLOAT_803330f8;
 	}
 
+	s16* p;
 	int n = 0;
-	s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+	p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
 	*reinterpret_cast<int*>(p + 0xE) = 0x5F;
 	p[2] = 0x238;
 	p[3] = 0x178;

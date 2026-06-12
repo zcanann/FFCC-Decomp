@@ -3564,8 +3564,9 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
     unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
+    int i = 0;
     unsigned char* displayList = shapeBytes;
-    for (int i = 0; i < *reinterpret_cast<short*>(shapeBytes + 2); i++) {
+    for (; i < *reinterpret_cast<short*>(shapeBytes + 2); i++) {
         GXCallDisplayList(*reinterpret_cast<void**>(displayList + 0xC), 0x60);
         displayList += 8;
     }
@@ -3641,8 +3642,9 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
     unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
+    int i = 0;
     unsigned char* displayList = shapeBytes;
-    for (int i = 0; i < *reinterpret_cast<short*>(shapeBytes + 2); i++) {
+    for (; i < *reinterpret_cast<short*>(shapeBytes + 2); i++) {
         GXCallDisplayList(*reinterpret_cast<void**>(displayList + 0xC), 0x60);
         displayList += 8;
     }

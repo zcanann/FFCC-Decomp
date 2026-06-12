@@ -11,6 +11,9 @@ struct UtilHermiteBasis {
 extern const UtilHermiteBasis kUtilHermiteBasis;
 extern Vec gUtilUpVector;
 
+extern const float kUtilZero = 0.0f;
+extern const float kUtilOne = 1.0f;
+
 static inline MtxPtr GetCameraMatrix()
 {
     return CameraPcs.m_cameraMatrix;
@@ -1360,8 +1363,6 @@ void CUtil::Quit()
 	// TODO
 }
 
-extern const float kUtilZero = 0.0f;
-extern const float kUtilOne = 1.0f;
 extern const float kUtilOrthoBottom = 448.0f;
 extern const float kUtilOrthoRight = 640.0f;
 extern const float kUtilQuadDepth = -0.9999999f;

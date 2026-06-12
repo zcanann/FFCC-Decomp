@@ -52,6 +52,14 @@ static inline CCaravanWork* SingleCaravanWork()
 
 extern const double DOUBLE_80332968;
 extern const double DOUBLE_80332938;
+extern const float FLOAT_80332918;
+extern const float FLOAT_8033291c;
+extern const float FLOAT_80332920;
+extern const float FLOAT_80332924;
+extern const float FLOAT_80332928;
+extern const float FLOAT_8033292c;
+extern const float FLOAT_80332930;
+extern const float FLOAT_80332934;
 extern const float FLOAT_8033294c;
 extern const float FLOAT_80332960;
 extern const float kSingStatBaseX;
@@ -3439,14 +3447,16 @@ inline void CMenuPcs::CalcSingLife()
 void CMenuPcs::DrawSingLife()
 {
     int lifeTimer = m_singleLifeTimer;
-    float xBase = 366.0f;
-    float y = -32.0f;
+    float xBase = FLOAT_80332918;
+    float y = FLOAT_8033291c;
     const CCaravanWork* const caravanWork = SingleCaravanWork();
     if (lifeTimer < 0) {
         return;
     }
 
     if (lifeTimer < 10) {
+        float phaseScale = FLOAT_80332924;
+        float angleScale = FLOAT_80332920;
         int phase;
         if (lifeTimer < 0) {
             phase = 0;
@@ -3456,10 +3466,12 @@ void CMenuPcs::DrawSingLife()
                 phase = lifeTimer;
             }
         }
-        y += 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase))));
+        y += FLOAT_80332928 * static_cast<float>(sin(angleScale * (phaseScale * static_cast<float>(phase))));
     } else if (lifeTimer < 0x28) {
-        y = 32.0f;
+        y = FLOAT_8033292c;
     } else {
+        float phaseScale = FLOAT_80332924;
+        float angleScale = FLOAT_80332920;
         int phase;
         int t = 10 - (lifeTimer - 0x28);
         if (t < 0) {
@@ -3470,12 +3482,12 @@ void CMenuPcs::DrawSingLife()
                 phase = t;
             }
         }
-        y += 64.0f * static_cast<float>(sin(0.01745329238474369f * (9.0f * static_cast<float>(phase))));
+        y += FLOAT_80332928 * static_cast<float>(sin(angleScale * (phaseScale * static_cast<float>(phase))));
     }
 
     int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp) >> 1;
     xBase += static_cast<float>(((8 - halfHearts) * 0x18) / 2);
-    MenuPcs.m_battleMesMenus[0]->DrawHeart(xBase, y - 8.0f, 1.0f, 1.0f);
+    MenuPcs.m_battleMesMenus[0]->DrawHeart(xBase, y - FLOAT_80332930, FLOAT_80332934, FLOAT_80332934);
 }
 
 /*
@@ -3577,6 +3589,14 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
 }
 
 
+const float FLOAT_80332918 = 366.0f;
+const float FLOAT_8033291c = -32.0f;
+const float FLOAT_80332920 = 0.01745329238474369f;
+const float FLOAT_80332924 = 9.0f;
+const float FLOAT_80332928 = 64.0f;
+const float FLOAT_8033292c = 32.0f;
+const float FLOAT_80332930 = 8.0f;
+const float FLOAT_80332934 = 1.0f;
 const double DOUBLE_80332938 = 4503601774854144.0;
 const float FLOAT_8033294c = 0.0f;
 const float FLOAT_80332960 = 22.0f;

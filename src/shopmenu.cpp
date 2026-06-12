@@ -1852,7 +1852,7 @@ void CShopMenu::DrawShopBase()
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     GXSetColorUpdate(GX_TRUE);
 
-    int panelY = 0xEA;
+    int panelY;
     if (m_mode <= 2) {
         panelY = 0xE6;
     } else if (m_mode <= 8) {
@@ -1911,52 +1911,52 @@ void CShopMenu::DrawShopBase()
         Graphic.SetDrawDoneDebugData(9);
         drawShapeSeq(8, 0, barX, listY + 0x74, 0xFF, 0, 0, FLOAT_80332D9C, 0);
         Graphic.SetDrawDoneDebugData(10);
-    }
 
-    if (m_mode <= 8) {
-        int sideX;
-        for (sideX = 0x4E; sideX > 0x32; sideX -= 0x10) {
-            Graphic.SetDrawDoneDebugData(0xB);
-            drawShapeSeq(0xC, 0, sideX, 0x174, 0xFF, 0, 0, FLOAT_80332D9C, 0);
-            Graphic.SetDrawDoneDebugData(0xC);
-        }
-        Graphic.SetDrawDoneDebugData(0xD);
-        drawShapeSeq(0xB, 0, 0x7E, 0x150, 0xFF, 0, 0, FLOAT_80332D9C, 0);
-        Graphic.SetDrawDoneDebugData(0xE);
-        drawShapeSeq(8, 0, sideX, 0x170, 0xFF, 0, 0, FLOAT_80332D9C, 0);
-        Graphic.SetDrawDoneDebugData(0xF);
-        CFont* font = MenuPcs.m_fonts[4];
-        font->SetMargin(FLOAT_80332d28);
-        font->SetShadow(0);
-        font->SetScaleX(FLOAT_80332d2c);
-        font->SetScaleY(FLOAT_80332d28);
-        font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
+        if (m_mode <= 8) {
+            int sideX;
+            for (sideX = 0x4E; sideX > 0x32; sideX -= 0x10) {
+                Graphic.SetDrawDoneDebugData(0xB);
+                drawShapeSeq(0xC, 0, sideX, 0x174, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+                Graphic.SetDrawDoneDebugData(0xC);
+            }
+            Graphic.SetDrawDoneDebugData(0xD);
+            drawShapeSeq(0xB, 0, 0x7E, 0x150, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+            Graphic.SetDrawDoneDebugData(0xE);
+            drawShapeSeq(8, 0, sideX, 0x170, 0xFF, 0, 0, FLOAT_80332D9C, 0);
+            Graphic.SetDrawDoneDebugData(0xF);
+            CFont* font = MenuPcs.m_fonts[4];
+            font->SetMargin(FLOAT_80332d28);
+            font->SetShadow(0);
+            font->SetScaleX(FLOAT_80332d2c);
+            font->SetScaleY(FLOAT_80332d28);
+            font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
-        font->DrawInit();
-        Graphic.SetDrawDoneDebugData(0x10);
-        char* confirmText = (m_listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
-                                                ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
-        int confirmCenterX = 0x50;
-        float confirmTextX = CalcCenteredShopMenuX(font, confirmText, confirmCenterX);
-        font->SetPosX(confirmTextX);
-        font->SetPosY(FLOAT_80332DD8);
-        font->Draw(confirmText);
-        Graphic.SetDrawDoneDebugData(0x11);
+            font->DrawInit();
+            Graphic.SetDrawDoneDebugData(0x10);
+            char* confirmText = (m_listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
+                                                    ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
+            int confirmCenterX = 0x50;
+            float confirmTextX = CalcCenteredShopMenuX(font, confirmText, confirmCenterX);
+            font->SetPosX(confirmTextX);
+            font->SetPosY(FLOAT_80332DD8);
+            font->Draw(confirmText);
+            Graphic.SetDrawDoneDebugData(0x11);
 
-        char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
-        int cancelCenterX = 0x50;
-        float cancelTextX = CalcCenteredShopMenuX(font, cancelText, cancelCenterX);
-        font->SetPosX(cancelTextX);
-        font->SetPosY(FLOAT_80332DDC);
-        font->Draw(cancelText);
-        Graphic.SetDrawDoneDebugData(0x12);
-        MenuPcs.DrawInit();
-        Graphic.SetDrawDoneDebugData(0x13);
+            char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
+            int cancelCenterX = 0x50;
+            float cancelTextX = CalcCenteredShopMenuX(font, cancelText, cancelCenterX);
+            font->SetPosX(cancelTextX);
+            font->SetPosY(FLOAT_80332DDC);
+            font->Draw(cancelText);
+            Graphic.SetDrawDoneDebugData(0x12);
+            MenuPcs.DrawInit();
+            Graphic.SetDrawDoneDebugData(0x13);
 
-        if (m_subMode == 2) {
-            Graphic.SetDrawDoneDebugData(0x14);
-            MenuPcs.DrawCursor(0x2C, m_yesNo * 0x18 + 0x134, FLOAT_80332d28);
-            Graphic.SetDrawDoneDebugData(0x15);
+            if (m_subMode == 2) {
+                Graphic.SetDrawDoneDebugData(0x14);
+                MenuPcs.DrawCursor(0x2C, m_yesNo * 0x18 + 0x134, FLOAT_80332d28);
+                Graphic.SetDrawDoneDebugData(0x15);
+            }
         }
     }
 }

@@ -22,10 +22,12 @@ extern float kMesHalf;
 // PAL map: CMes::m_tempVar in mes.o, .bss size 0x50.
 int CMes::m_tempVar[0x14];
 
-extern char lbl_801D9E58[];
-
 static const char s_Not_corresponding_TAG_is_used_pct02x_801D9E30[] = "Not corresponding TAG is used.[%02x]\n";
 static const char s_This_TAG_is_not_created_pct02x_801D9E10[] = "This TAG is not created.[%02x]\n";
+static char s_MessageSpeedTagUsed[] =
+	"\x83\x81\x83\x62\x83\x5A\x81\x5B\x83\x57\x88\xEA\x8F\x9F\x95\x5C\x8E\xA6"
+	"\x83\x82\x81\x5B\x83\x68\x82\xC5<speed>\x83\x5E\x83\x4F\x82\xAA\x8E\x67"
+	"\x97\x70\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD\x81\x42\n";
 static const char s_mesNumFmt[] = "%d";
 static const char s_mesFallback[] = "---";
 static const char s_mesEmpty[] = "";
@@ -1258,7 +1260,7 @@ void CMes::addString(char** text, int branchMode)
 			{
 				if ((unsigned int)System.m_execParam >= 1U)
 				{
-					System.Printf(lbl_801D9E58);
+					System.Printf(s_MessageSpeedTagUsed);
 				}
 			}
 			else if (value == 0x7F)

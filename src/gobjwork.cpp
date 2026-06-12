@@ -440,7 +440,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
  */
 void CCaravanWork::FGLetterOpen(int letterIdx)
 {
-	CCaravanWork* shifted = reinterpret_cast<CCaravanWork*>(reinterpret_cast<char*>(this) + letterIdx * sizeof(CLetterWork));
+	CCaravanWork* shifted = reinterpret_cast<CCaravanWork*>(reinterpret_cast<char*>(this) + letterIdx * 12);
 #define letter (&shifted->m_letters[0])
 	CFlatRuntime::CStack stack[2];
 
@@ -449,10 +449,9 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	gCFlatRuntime().SystemCall(
 		Game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
-	CMes::m_tempVar[0] = letter->TempVar(0);
-	CMes::m_tempVar[1] = letter->TempVar(1);
-	CMes::m_tempVar[2] = letter->TempVar(2);
-	CMes::m_tempVar[3] = letter->TempVar(3);
+	for (int i = 0; i < 4; i++) {
+		CMes::m_tempVar[i] = m_letters[letterIdx].m_half.m_tempVars[i];
+	}
 	CMes::m_tempVar[4] = letter->MessageType();
 	CMes::m_tempVar[5] = letter->SenderId();
 
@@ -466,7 +465,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 
 	int gil;
 	if (letter->AttachmentIsGil()) {
-		gil = m_letters[letterIdx].AttachmentValue() * 100;
+		gil = letter->AttachmentValue() * 100;
 	} else {
 		gil = 0;
 	}
@@ -2092,6 +2091,35 @@ int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 	return ((unsigned int)__cntlzw((unsigned char)isInvalid)) >> 5;
 }
 
+static inline int GetNumGroupedCmdList(CCaravanWork* work, int cmdListIdx)
+{
+	int numGrouped;
+	if (Game.m_gameWork.m_menuStageMode == 0) {
+		numGrouped = 1;
+	} else if (work->m_commandListExtra[cmdListIdx] == 0) {
+		numGrouped = 1;
+	} else {
+		int topIdx;
+		for (topIdx = cmdListIdx; topIdx >= 0; topIdx--) {
+			if (work->m_commandListExtra[topIdx] != -1) {
+				break;
+			}
+		}
+
+		numGrouped = 1;
+		int nextIdx = topIdx + 1;
+		short numSlots = work->m_numCmdListSlots;
+		for (int n = topIdx + 1; n < numSlots; n++) {
+			if (work->m_commandListExtra[nextIdx] != -1) {
+				break;
+			}
+			numGrouped++;
+			nextIdx++;
+		}
+	}
+	return numGrouped;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8009f890
@@ -2113,33 +2141,7 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 		return 0;
 	}
 
-	int groupedCountLocal = 1;
-	if (Game.m_gameWork.m_menuStageMode == 0) {
-		groupedCountLocal = 1;
-	} else {
-		if (m_commandListExtra[cmdListIdx] == 0) {
-			groupedCountLocal = 1;
-		} else {
-			int topIdx = cmdListIdx;
-			for (int n = cmdListIdx; n >= 0; n--) {
-				if (m_commandListExtra[topIdx] != -1) {
-					break;
-				}
-				topIdx--;
-			}
-
-			groupedCountLocal = 1;
-			int nextIdx = topIdx + 1;
-			int numSlots = static_cast<short>(m_numCmdListSlots);
-			for (int n = topIdx + 1; n < numSlots; n++) {
-				if (m_commandListExtra[nextIdx] != -1) {
-					break;
-				}
-				groupedCountLocal++;
-				nextIdx++;
-			}
-		}
-	}
+	int groupedCountLocal = GetNumGroupedCmdList(this, cmdListIdx);
 
 	if (groupedCountLocal == 1) {
 		return (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
@@ -2160,81 +2162,6 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 	}
 }
 
-/*
- * --INFO--
- * PAL Address: 0x800a7e18
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma push
-#pragma opt_common_subs off
-int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
-{
-	short numSlots;
-	int groupedCount;
-	int topIdx;
-	int extraOff = cmdListIdx * 2;
-
-	if (Game.m_gameWork.m_menuStageMode == 0) {
-		groupedCount = 1;
-	} else {
-		short* cur = (short*)((char*)this + extraOff);
-		if (*(short*)((char*)cur + 0x214) == 0) {
-			groupedCount = 1;
-		} else {
-			for (topIdx = cmdListIdx; topIdx >= 0; topIdx--) {
-				if (*(short*)((char*)cur + 0x214) != -1) {
-					break;
-				}
-				cur--;
-			}
-
-			groupedCount = 1;
-			int nextIdx = topIdx + 1;
-			numSlots = m_numCmdListSlots;
-			for (int n = topIdx + 1; n < numSlots; n++) {
-				if (m_commandListExtra[nextIdx] != -1) {
-					break;
-				}
-				groupedCount++;
-				nextIdx++;
-			}
-		}
-	}
-
-	if (groupedCount > 1) {
-		short* cur2 = (short*)((char*)this + extraOff);
-		for (int n = cmdListIdx; n >= 0; n--) {
-			if (*(short*)((char*)cur2 + 0x214) != -1) {
-				break;
-			}
-			cur2--;
-			cmdListIdx--;
-		}
-
-		short cmdId = m_commandListExtra[cmdListIdx];
-		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
-			*firstCmdIdx = cmdListIdx;
-			int i = 0;
-			for (; groupedCount > 0; groupedCount--) {
-				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
-				short itemId = (short)m_inventoryItems[invSlot];
-				int itemType = GetItemDataPtr(itemId)[0];
-				if (itemType == 1) {
-					*itemCmdListIdx = cmdListIdx + i;
-					return 1;
-				}
-				i++;
-			}
-		}
-	}
-
-	return 0;
-}
-#pragma pop
 
 /*
  * --INFO--
@@ -2318,30 +2245,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 			result = (short)m_inventoryItems[equipmentSlot];
 		}
 	} else {
-		int numGrouped;
-		if (Game.m_gameWork.m_menuStageMode == 0) {
-			numGrouped = 1;
-		} else if (m_commandListExtra[cmdListIdx] == 0) {
-			numGrouped = 1;
-		} else {
-			int topIdx;
-			for (topIdx = cmdListIdx; topIdx >= 0; topIdx--) {
-				if (m_commandListExtra[topIdx] != -1) {
-					break;
-				}
-			}
-
-			numGrouped = 1;
-			int nextIdx = topIdx + 1;
-			short numSlots = m_numCmdListSlots;
-			for (int n = topIdx + 1; n < numSlots; n++) {
-				if (m_commandListExtra[nextIdx] != -1) {
-					break;
-				}
-				numGrouped++;
-				nextIdx++;
-			}
-		}
+		int numGrouped = GetNumGroupedCmdList(this, cmdListIdx);
 
 		if (numGrouped > 1) {
 			for (int n = cmdListIdx; n >= 0; n--) {
@@ -2705,6 +2609,53 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
 
 /*
  * --INFO--
+ * PAL Address: 0x800a7e18
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma push
+#pragma opt_common_subs off
+int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
+{
+	int extraOff = cmdListIdx * 2;
+	int groupedCount = GetNumGroupedCmdList(this, cmdListIdx);
+
+	if (groupedCount > 1) {
+		short* cur2 = (short*)((char*)this + extraOff);
+		for (int n = cmdListIdx; n >= 0; n--) {
+			if (*(short*)((char*)cur2 + 0x214) != -1) {
+				break;
+			}
+			cur2--;
+			cmdListIdx--;
+		}
+
+		short cmdId = m_commandListExtra[cmdListIdx];
+		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
+			*firstCmdIdx = cmdListIdx;
+			int i = 0;
+			for (; groupedCount > 0; groupedCount--) {
+				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
+				short itemId = (short)m_inventoryItems[invSlot];
+				int itemType = GetItemDataPtr(itemId)[0];
+				if (itemType == 1) {
+					*itemCmdListIdx = cmdListIdx + i;
+					return 1;
+				}
+				i++;
+			}
+		}
+	}
+
+	return 0;
+}
+#pragma pop
+
+/*
+ * --INFO--
  * PAL Address: 0x8009e1c0
  * PAL Size: 316b
  * EN Address: TODO
@@ -2717,10 +2668,8 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 	unsigned short* artifactDataBase = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2]);
 	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
 	int hpMax = 0;
-	int artifactIndex = 0;
-	int count = 0x32;
 
-	while (count != 0) {
+	for (int artifactIndex = 0; artifactIndex < 100; artifactIndex++) {
 		if (artifactIndex < 0x60) {
 			int artifactId = m_artifacts[artifactIndex];
 			if (artifactId > 0) {
@@ -2741,30 +2690,6 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 				}
 			}
 		}
-
-		if ((artifactIndex + 1) < 0x60) {
-			int artifactId = m_artifacts[artifactIndex + 1];
-			if (artifactId > 0) {
-				unsigned short* artifactData = artifactDataBase + (artifactId * 0x24);
-				unsigned short artifactType = artifactData[0];
-				unsigned short artifactValue = artifactData[3];
-
-				switch (artifactType) {
-				case 0x9F:
-				case 0xB6:
-				case 0xCC:
-				case 0xDB:
-				case 0xDF:
-					break;
-				case 0xE4:
-					hpMax += artifactValue;
-					break;
-				}
-			}
-		}
-
-		artifactIndex += 2;
-		count--;
 	}
 
 	hpMax += baseData->m_maxHp;

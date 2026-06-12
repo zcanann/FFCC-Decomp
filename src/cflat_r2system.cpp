@@ -1365,6 +1365,17 @@ void CVector::operator=(const CVector& other)
  * JP Address: TODO
  * JP Size: TODO
  */
+CVector::CVector(const CVector& other)
+{
+    const float* src = &other.x;
+    float x = *src++;
+    float y = *src++;
+    this->x = x;
+    float z = *src;
+    this->y = y;
+    this->z = z;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800B9884

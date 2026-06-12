@@ -2315,6 +2315,8 @@ int CMapMng::ReadOtm(char* mapName)
  */
 int CMapMng::ReadMid(char* mapName)
 {
+    CFile::CHandle* handle;
+    int size;
     char* strTmp = g_StrTmp;
     sprintf(strTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
     int ok = 1;
@@ -2325,7 +2327,7 @@ int CMapMng::ReadMid(char* mapName)
 
     void* filePtr;
     if (m_asyncLoadState.m_mapReadMode == 1) {
-        const int size = m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex];
+        size = m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex];
         filePtr = File.m_readBuffer;
 
         Memory.CopyFromAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
@@ -2333,19 +2335,19 @@ int CMapMng::ReadMid(char* mapName)
         CheckSum(filePtr, size);
         m_asyncLoadState.m_asyncReadIndex += 1;
     } else {
-        CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
-        if (fileHandle != 0) {
-            const int size = File.GetLength(fileHandle);
+        handle = File.Open(strTmp, 0, CFile::PRI_LOW);
+        if (handle != 0) {
+            size = File.GetLength(handle);
             if (m_asyncLoadState.m_mapReadMode == 3) {
-                File.ReadASync(fileHandle);
+                File.ReadASync(handle);
                 filePtr = reinterpret_cast<void*>(1);
-                m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = fileHandle;
+                m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = handle;
                 m_asyncLoadState.m_asyncOpenIndex += 1;
             } else {
-                File.Read(fileHandle);
-                File.SyncCompleted(fileHandle);
+                File.Read(handle);
+                File.SyncCompleted(handle);
                 filePtr = File.m_readBuffer;
-                File.Close(fileHandle);
+                File.Close(handle);
 
                 if (m_asyncLoadState.m_mapReadMode == 2) {
                     Memory.CopyToAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>(size));

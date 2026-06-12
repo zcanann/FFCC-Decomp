@@ -309,8 +309,8 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlTa
 		stepX = 2.0f / (float)(textureInfo->m_width - 1U);
 		stepY = 2.0f / (float)(textureInfo->m_height - 1U);
 		yCoord = kPppCrystalCoordMin;
-		maxMagnitude = kPppLensFlareOne;
 		coordOffset = kPppCrystalCoordOffset;
+		maxMagnitude = kPppLensFlareOne;
 		modulationScale = kPppCrystalModulationScale;
 		coordScale = kPppCrystalCoordScaleAndZero[0];
 

@@ -3941,13 +3941,17 @@ void CMenuPcs::CalcSingCMake()
                     if ((down & 0x100) != 0) {
                         if (CmakeState(this)->m_select == 0) {
                             CmakeState(this)->m_resultDir = 1;
-                            *reinterpret_cast<int*>(MenuS32(this, 0x844) + CmakeSlot(this) * 0x14 + 4) = 3;
+                            int chgWork = CmakeSlot(this) * 0x14;
+                            chgWork += MenuS32(this, 0x844);
+                            *reinterpret_cast<int*>(chgWork + 4) = 3;
 
                             CCaravanWork* caravanWork;
                             int slot = static_cast<int>(CmakeSlot(this));
                             int modelNo = GetModelNo(static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
                                 static_cast<int>(s_CmakeInfo.m_gender));
-                            *reinterpret_cast<int*>(MenuS32(this, 0x824) + slot * 0x34 + 8) = modelNo;
+                            int animWork = slot * 0x34;
+                            animWork += MenuS32(this, 0x824);
+                            *reinterpret_cast<int*>(animWork + 8) = modelNo;
 
                             caravanWork = &Game.m_caravanWorkArr[slot];
                             *reinterpret_cast<unsigned char*>(MenuS32(this, 0x828) + 10) = 1;

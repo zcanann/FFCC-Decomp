@@ -3452,38 +3452,34 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	count = 0;
-	i = count;
 	outData[0] = 0;
-	game = &Game;
 	outData[1] = 0;
-	itemPtr = localPlayerData + i * 2;
+	itemPtr = localPlayerData;
 	outData[2] = 0;
 	writePtr = outData + 4;
 	outData[3] = 0;
 	size = 4;
+	game = &Game;
 
-	if (i < 0x40) {
-		do {
-			int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
-			if (MenuPcs.GetItemType(itemId, 1) == 1) {
-				const int iconMask = localPlayerData[2] & 3;
-				const int icon = MenuPcs.GetItemIcon(itemId);
-				if (icon == iconMask) {
-					int itemBase = game->unkCFlatData0[2] + itemId * 0x48;
+	for (i = 0; i < 0x40; i++) {
+		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
+		if (MenuPcs.GetItemType(itemId, 1) == 1) {
+			const int iconMask = localPlayerData[2] & 3;
+			const int icon = MenuPcs.GetItemIcon(itemId);
+			if (icon == iconMask) {
+				int itemBase = game->unkCFlatData0[2] + itemId * 0x48;
 
-					cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
-					cmdData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
-					cmdData[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
-					memcpy(writePtr, cmdData, sizeof(cmdData));
+				cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
+				cmdData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
+				cmdData[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
+				memcpy(writePtr, cmdData, sizeof(cmdData));
 
-					writePtr += 8;
-					size += 8;
-					count++;
-				}
+				writePtr += 8;
+				size += 8;
+				count++;
 			}
-			itemPtr += 2;
-			i++;
-		} while (i < 0x40);
+		}
+		itemPtr += 2;
 	}
 
 	outData[0] = count;

@@ -10028,13 +10028,15 @@ void CMenuPcs::SetCMakeEnd(int channel)
  */
 void CMenuPcs::ClrCMakeFlg(int channel)
 {
+	CMenuPcs* const self = this;
 	m_wm.m_charaSelectData[channel * 0x10 + 0xB] = 0;
 	const int current = *reinterpret_cast<short*>(&m_wm.m_charaSelectData[channel * 0x10 + 4]);
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390), channel, current);
 	}
-	m_wm.m_charaModelData[current * 0x34 + 0xC] = 0;
-	GetWmCharaHandles(this)[current]->LoadModelASync(3, 0x43, 0);
+	unsigned char* modelData = self->m_wm.m_charaModelData + current * 0x34;
+	modelData[0xC] = 0;
+	GetWmCharaHandles(self)[current]->LoadModelASync(3, 0x43, 0);
 }
 
 /*

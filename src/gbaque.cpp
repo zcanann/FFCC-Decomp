@@ -3453,13 +3453,13 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 
 	count = 0;
 	outData[0] = 0;
-	game = &Game;
 	outData[1] = 0;
 	itemPtr = localPlayerData;
 	outData[2] = 0;
 	writePtr = outData + 4;
 	outData[3] = 0;
 	size = 4;
+	game = &Game;
 
 	for (i = 0; i < 0x40; i++) {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);

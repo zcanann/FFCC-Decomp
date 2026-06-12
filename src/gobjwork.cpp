@@ -2091,6 +2091,35 @@ int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 	return ((unsigned int)__cntlzw((unsigned char)isInvalid)) >> 5;
 }
 
+static inline int GetNumGroupedCmdList(CCaravanWork* work, int cmdListIdx)
+{
+	int numGrouped;
+	if (Game.m_gameWork.m_menuStageMode == 0) {
+		numGrouped = 1;
+	} else if (work->m_commandListExtra[cmdListIdx] == 0) {
+		numGrouped = 1;
+	} else {
+		int topIdx;
+		for (topIdx = cmdListIdx; topIdx >= 0; topIdx--) {
+			if (work->m_commandListExtra[topIdx] != -1) {
+				break;
+			}
+		}
+
+		numGrouped = 1;
+		int nextIdx = topIdx + 1;
+		short numSlots = work->m_numCmdListSlots;
+		for (int n = topIdx + 1; n < numSlots; n++) {
+			if (work->m_commandListExtra[nextIdx] != -1) {
+				break;
+			}
+			numGrouped++;
+			nextIdx++;
+		}
+	}
+	return numGrouped;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8009f890
@@ -2112,33 +2141,7 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 		return 0;
 	}
 
-	int groupedCountLocal = 1;
-	if (Game.m_gameWork.m_menuStageMode == 0) {
-		groupedCountLocal = 1;
-	} else {
-		if (m_commandListExtra[cmdListIdx] == 0) {
-			groupedCountLocal = 1;
-		} else {
-			int topIdx = cmdListIdx;
-			for (int n = cmdListIdx; n >= 0; n--) {
-				if (m_commandListExtra[topIdx] != -1) {
-					break;
-				}
-				topIdx--;
-			}
-
-			groupedCountLocal = 1;
-			int nextIdx = topIdx + 1;
-			int numSlots = static_cast<short>(m_numCmdListSlots);
-			for (int n = topIdx + 1; n < numSlots; n++) {
-				if (m_commandListExtra[nextIdx] != -1) {
-					break;
-				}
-				groupedCountLocal++;
-				nextIdx++;
-			}
-		}
-	}
+	int groupedCountLocal = GetNumGroupedCmdList(this, cmdListIdx);
 
 	if (groupedCountLocal == 1) {
 		return (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
@@ -2317,30 +2320,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 			result = (short)m_inventoryItems[equipmentSlot];
 		}
 	} else {
-		int numGrouped;
-		if (Game.m_gameWork.m_menuStageMode == 0) {
-			numGrouped = 1;
-		} else if (m_commandListExtra[cmdListIdx] == 0) {
-			numGrouped = 1;
-		} else {
-			int topIdx;
-			for (topIdx = cmdListIdx; topIdx >= 0; topIdx--) {
-				if (m_commandListExtra[topIdx] != -1) {
-					break;
-				}
-			}
-
-			numGrouped = 1;
-			int nextIdx = topIdx + 1;
-			short numSlots = m_numCmdListSlots;
-			for (int n = topIdx + 1; n < numSlots; n++) {
-				if (m_commandListExtra[nextIdx] != -1) {
-					break;
-				}
-				numGrouped++;
-				nextIdx++;
-			}
-		}
+		int numGrouped = GetNumGroupedCmdList(this, cmdListIdx);
 
 		if (numGrouped > 1) {
 			for (int n = cmdListIdx; n >= 0; n--) {

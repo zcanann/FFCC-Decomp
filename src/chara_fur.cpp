@@ -747,10 +747,6 @@ void CChara::ChangeMogMode(int mogMode)
 }
 
 extern "C" const char s_chara_fur_cpp[] = "chara_fur.cpp";
-
-extern "C" {
-unsigned char m_mogWork[0x2C];
-}
 static unsigned int s_mogFurRand;
 static float s_mogFurMaxY;
 
@@ -2560,6 +2556,10 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 	GXInvalidateTexAll();
 }
 #pragma pop
+
+extern "C" {
+unsigned char m_mogWork[0x2C];
+}
 
 /*
  * --INFO--

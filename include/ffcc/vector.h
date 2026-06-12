@@ -9,6 +9,7 @@ public:
 	CVector();
 	CVector(float, float, float);
 	CVector(const Vec&);
+	CVector(const CVector&);
 	CVector operator+(const CVector&) const;
 	CVector operator-(const CVector&) const;
 	operator Vec&() { return *reinterpret_cast<Vec*>(this); }

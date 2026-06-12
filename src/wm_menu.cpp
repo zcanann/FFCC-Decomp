@@ -8453,11 +8453,10 @@ void CMenuPcs::GetAnimNo(int animNo, int)
 void CMenuPcs::DrawChara()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = m_wm.m_worldObjData;
 	WmWorldState* const worldState = GetWmWorldState(this);
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		unsigned char* const view = worldObj + 0xA00 + i * 0x50;
+		unsigned char* const view = m_wm.m_worldObjData + 0xA00 + i * 0x50;
 		if (*reinterpret_cast<int*>(view) == 0) {
 			continue;
 		}

@@ -2034,9 +2034,8 @@ void CMenuPcs::CmakeTribeDraw()
         float cursorY = static_cast<float>(0x88 + CmakeState(this)->m_select * 0x1C);
 
         if (CmakeState(this)->m_fieldSelect == 0) {
-            DrawCursor(
-                static_cast<int>(tribeX + static_cast<float>(static_cast<int>(System.m_frameCounter) % 8)),
-                static_cast<int>(cursorY), alpha);
+            tribeX += static_cast<float>(static_cast<int>(System.m_frameCounter) % 8);
+            DrawCursor(static_cast<int>(tribeX), static_cast<int>(cursorY), alpha);
         } else {
             if ((System.m_frameCounter & 1) != 0) {
                 DrawCursor(static_cast<int>(tribeX), static_cast<int>(cursorY), alpha);

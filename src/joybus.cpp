@@ -6429,10 +6429,9 @@ int JoyBus::SendAddLetter(int portIndex)
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 1;
-    unsigned int cmdWord = cmd;
     unsigned int port;
 
-    return SetSendQueue(&m_threadParams[portIndex], cmdWord);
+    return SetSendQueue(&m_threadParams[portIndex], cmd);
 }
 
 
@@ -6454,11 +6453,10 @@ int JoyBus::SetItem(int portIndex, unsigned char itemId, short amount)
     cmdBytes[0] = 0x17;
     cmdBytes[1] = itemId;
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&amountBytes, 0);
-    unsigned int cmd = *reinterpret_cast<unsigned int*>(cmdBytes);
     unsigned int port;
     unsigned int result;
 
-    result = SetSendQueue(&m_threadParams[portIndex], cmd);
+    result = SetSendQueue(&m_threadParams[portIndex], *reinterpret_cast<unsigned int*>(cmdBytes));
 
     return result;
 }
@@ -6479,11 +6477,10 @@ int JoyBus::DelItem(int portIndex, unsigned char itemId)
     cmdBytes[0] = 0x17;
     cmdBytes[1] = itemId & 0x3F;
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(reinterpret_cast<unsigned short*>(&tail), 0);
-    unsigned int cmd = *reinterpret_cast<unsigned int*>(cmdBytes);
     unsigned int port;
     int result;
 
-    result = SetSendQueue(&m_threadParams[portIndex], cmd);
+    result = SetSendQueue(&m_threadParams[portIndex], *reinterpret_cast<unsigned int*>(cmdBytes));
 
     return result;
 }
@@ -6782,10 +6779,9 @@ int JoyBus::SetCmdLst(int portIndex, int param_3, short param_4)
     cmdBytes[0] = 0x1F;
     cmdBytes[1] = static_cast<unsigned char>(param_3);
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&param, 0);
-    unsigned int cmdWord = cmd;
     unsigned int result;
 
-    result = SetSendQueue(&m_threadParams[portIndex], cmdWord);
+    result = SetSendQueue(&m_threadParams[portIndex], cmd);
 
     return result;
 }
@@ -6802,10 +6798,9 @@ int JoyBus::SetTmpArti(int portIndex, int param3, int param4)
     cmdBytes[0] = 0x20;
     cmdBytes[1] = static_cast<unsigned char>(param3);
     cmdBytes[2] = static_cast<unsigned char>(param4 - 0x9f);
-    unsigned int word = cmd;
     unsigned int port;
 
-    return SetSendQueue(&m_threadParams[portIndex], word);
+    return SetSendQueue(&m_threadParams[portIndex], cmd);
 }
 
 /*
@@ -6820,10 +6815,9 @@ int JoyBus::SendUseItem(int portIndex, char itemId)
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x0C;
     cmdBytes[2] = itemId;
-    unsigned int word = cmd;
     unsigned int port;
 
-    return SetSendQueue(&m_threadParams[portIndex], word);
+    return SetSendQueue(&m_threadParams[portIndex], cmd);
 }
 
 

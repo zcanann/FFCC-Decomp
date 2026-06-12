@@ -1513,13 +1513,15 @@ void CGraphic::RenderTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor
 	GXWGFifo.f32 = y1;
 	rgba1 = *(u32*)&color1;
 	GXWGFifo.f32 = z1;
-	tex0 = kGraphicZeroF;
+	const float* tex0Ptr = &kGraphicZeroF;
+	tex0 = *tex0Ptr;
 	GXWGFifo.u32 = rgba1;
 	x2 = pos2.x;
 	GXWGFifo.f32 = tex0;
 	rgba2 = *(u32*)&color2;
 	GXWGFifo.f32 = tex0;
-	tex1 = kGraphicOneF;
+	const float* tex1Ptr = &kGraphicOneF;
+	tex1 = *tex1Ptr;
 
 	GXWGFifo.f32 = x2;
 	y2 = pos2.y;

@@ -245,7 +245,7 @@ void CMenuPcs::TmpArtiDraw()
 	}
 
 	entry = GetTmpArtiEntries(this);
-	for (unsigned int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		short icon = caravanWork->m_treasures[i];
 		if (icon >= 0) {
 			int posX = (int)TmpArtiIntToFloat(entry->x + entry->width - 0x10);

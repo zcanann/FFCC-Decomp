@@ -343,7 +343,7 @@ extern "C" const double sPitchLookCutoff = 0.7853981852531433; // DOUBLE_803303e
 extern "C" const float sLookBlendScale;            // FLOAT_803303f0 (0.001)
 extern "C" const float sFarVisibleDepth;           // FLOAT_803303f4 (10000)
 extern "C" const float sNearVisibleDepth;          // FLOAT_803303f8 (750)
-extern const double DOUBLE_80330400 = 0.0010000000474974513;   // 3f50624de0000000 = (double)0.001f
+// DOUBLE_80330400 defined at end of file
 
 /*
  * --INFO--
@@ -699,7 +699,7 @@ void CGObject::move()
             moveVec.x = sZeroFloat;
 
             u32 miniGameFlags = DbgMenuPcs.GetDbgFlagsRaw();
-            if ((miniGameFlags & 0x100) != 0 && moveVec.x == sZeroFloat) {
+            if ((miniGameFlags & 0x100) != 0 && moveVec.x == sZeroFloat && moveVec.x == sZeroFloat) {
                 const float stickX = GetMovePadStickX(static_cast<s8>(m_animStateMisc));
                 moveVec.x = moveVec.x - stickX;
                 const float stickY = GetMovePadStickY(static_cast<s8>(m_animStateMisc));
@@ -1060,6 +1060,7 @@ void CGObject::bgCollision()
  */
 void CGObject::bgNormalCollision()
 {
+    extern const double DOUBLE_80330400;
     if (fabs(static_cast<double>(m_groundHitOffset.x)) < DOUBLE_80330400) {
         m_groundHitOffset.x = sZeroFloat;
     }
@@ -1075,16 +1076,21 @@ void CGObject::bgNormalCollision()
     }
 
     Vec move = m_groundHitOffset;
-    move.y = sZeroFloat;
+    move.y = 0.0f;
     Vec pos = m_worldPosition;
     pos.y += sStepProbeHeight + m_capsuleHalfHeight;
 
     unsigned int retry = 4;
-    const double epsilon = DOUBLE_80330400;
+    double epsilon;
+    float boundMax;
+    float boundMin;
+    boundMin = sHugeCylinderExtent;
+    boundMax = sNegHugeCylinderExtent;
+    epsilon = DOUBLE_80330400;
     do {
         const unsigned long hitMask = m_bgHitMask;
         const float radius = m_capsuleHalfHeight;
-        CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
+        CMapCylinder bodyCylinder(boundMin, boundMax);
         bodyCylinder.m_bottom = pos;
         bodyCylinder.m_axis = move;
         bodyCylinder.m_radius = radius;
@@ -1273,8 +1279,7 @@ void CGObject::bgWorldCollision()
         Vec delta;
 
         MapMng.m_hitMapObj->CalcHitPosition(&radial);
-        const Vec& newOffset = vecSub(reinterpret_cast<CVector&>(radial), CVector(m_worldPosition));
-        m_groundHitOffset = delta = newOffset;
+        m_groundHitOffset = delta = vecSub(reinterpret_cast<CVector&>(radial), CVector(m_worldPosition));
 
         if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
             m_stateFlags0Bits.unk0 = 1;
@@ -1972,6 +1977,7 @@ void CGObject::update()
         }
     }
 
+    extern const double DOUBLE_80330400;
     m_groundHitOffset.x *= m_moveOffset.x;
     m_groundHitOffset.y *= m_moveOffset.y;
     m_groundHitOffset.z *= m_moveOffset.z;
@@ -2670,9 +2676,12 @@ void CGObject::boundCheck()
     PSMTX44Concat(screenMtx, clipMtx, screenMtx);
 
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
-        const float zero = sZeroFloat;
-        const float oneF = sAnimFrameOffset;
-        const float clipLimit = sNegativeOne;
+        float clipLimit;
+        float oneF;
+        float zero;
+        zero = sZeroFloat;
+        oneF = sAnimFrameOffset;
+        clipLimit = sNegativeOne;
 
         clipMask = 0x1F;
         s32 i = 0;
@@ -3064,9 +3073,13 @@ int CGObject::IsAnimFinished(int mode)
         hasModel = true;
     }
 
-    if (hasModel) {
+    if (!hasModel) {
+        goto returnOne;
+    }
+    {
         slot = m_currentAnimSlot;
         if (slot == -1) {
+        returnOne:
             return 1;
         }
         {
@@ -3119,8 +3132,6 @@ int CGObject::IsAnimFinished(int mode)
             return result & 0xFF;
         }
     }
-
-    return 1;
 }
 #pragma pop
 
@@ -3652,3 +3663,5 @@ int CGObject::GetCID()
 {
 	return 5;
 }
+
+extern const double DOUBLE_80330400 = 0.0010000000474974513;

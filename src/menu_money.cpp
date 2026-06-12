@@ -32,7 +32,6 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	int digitPlace = 1;
 	int digitCount;
 	int digitIndex;
-	int digitCount;
 	int started = 0;
 	int gil;
 	signed char* place;

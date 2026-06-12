@@ -2773,8 +2773,8 @@ void CMapMng::Draw()
 
                     CharaPcs.GetTexShadow(startIndex, batchCount, texObjs, shadowPositions, shadowMatrices);
 
-                    texMtx = 0x1E;
                     int stage = 0;
+                    texMtx = 0x1E;
                     for (int i = 0; i < batchCount; i++) {
                         GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX3x4);
                         GXLoadTexObj(&texObjs[i], static_cast<GXTexMapID>(i));

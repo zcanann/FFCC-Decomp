@@ -2007,9 +2007,10 @@ void CMenuPcs::CmakeTribeDraw()
     tribeFont->DrawInit();
     tribeFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
+    const char* txt;
     int y = 0x88;
     for (int i = 0; i < 4; i++) {
-        const char* txt = GetTribeStr(i);
+        txt = GetTribeStr(i);
         tribeFont->SetPosX(264.0f);
         tribeFont->SetPosY(static_cast<float>(y) - 4.0f);
         tribeFont->Draw(txt);

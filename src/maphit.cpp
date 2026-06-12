@@ -655,7 +655,7 @@ edge_loop:
                 CMapCylinder edgeCylinder;
                 edgeCylinder.m_bottom = previous;
                 edgeCylinder.m_axis = edge;
-                edgeCylinder.m_radius = g_hit_cyl.m_radius;
+                edgeCylinder.m_radius = cyl.m_radius;
 
                 float edgeT;
                 if (FindIntersection(rayStart, rayDirection, edgeCylinder, edgeT) != 0 &&

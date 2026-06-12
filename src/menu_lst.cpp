@@ -8,21 +8,21 @@
 #include "ffcc/system.h"
 #include <string.h>
 
-extern const float kMLstZero = 0.0f;
-extern const float kMLstColorMax = 255.0f;
-extern const double kMLstSelectedOffsetX = 20.0;
-extern const float kMLstRowHeight = 40.0f;
-extern const double kMLstHalfDouble = 0.5;
-extern const float kMLstOne = 1.0f;
-extern const float kMLstTextYOffset = 4.0f;
-extern const float kMLstHelpCenterX = 320.0f;
-extern const float kMLstHalf = 0.5f;
-extern const float kMLstHelpY = 352.0f;
-extern const float kMLstHelpScale = 3.0f;
-extern const double kMLstIntToDoubleBias = 4503601774854144.0;
-extern const double kMLstOneDouble = 1.0;
-extern const double kMLstZeroDouble = 0.0;
-extern const double kMLstWindowCenterX = 216.0;
+static const float kMLstZero = 0.0f;
+static const float kMLstColorMax = 255.0f;
+static const double kMLstSelectedOffsetX = 20.0;
+static const float kMLstRowHeight = 40.0f;
+static const double kMLstHalfDouble = 0.5;
+static const float kMLstOne = 1.0f;
+static const float kMLstTextYOffset = 4.0f;
+static const float kMLstHelpCenterX = 320.0f;
+static const float kMLstHalf = 0.5f;
+static const float kMLstHelpY = 352.0f;
+static const float kMLstHelpScale = 3.0f;
+static const double kMLstIntToDoubleBias = 4503601774854144.0;
+static const double kMLstOneDouble = 1.0;
+static const double kMLstZeroDouble = 0.0;
+static const double kMLstWindowCenterX = 216.0;
 
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
@@ -74,11 +74,11 @@ void CMenuPcs::MLstDraw()
 			color.r = 0xff;
 			color.g = 0xff;
 			color.b = 0xff;
-			color.a = (unsigned char)(255.0f * alpha);
+			color.a = (unsigned char)(kMLstColorMax * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
 			if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
-				x = (float)(x + 20.0);
+				x = (float)(x + kMLstSelectedOffsetX);
 				v += (float)item->height;
 			}
 
@@ -114,7 +114,7 @@ void CMenuPcs::MLstDraw()
 
 	item = this->m_menuLstList->entries;
 	for (int i = 0; i < this->m_menuLstList->count; i++) {
-		font->SetColor(CColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * item->alpha)).color);
+		font->SetColor(CColor(0xff, 0xff, 0xff, (unsigned char)(kMLstColorMax * item->alpha)).color);
 
 		const char* text = GetMenuStr(i + 0x2e);
 		font->GetWidth(text);
@@ -122,11 +122,11 @@ void CMenuPcs::MLstDraw()
 		float textX = (float)(item->x + 0x28);
 		float textY = (float)(item->y + 3);
 		if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
-			textX = (float)(textX + 20.0);
+			textX = (float)(textX + kMLstSelectedOffsetX);
 		}
 
 		font->SetPosX(textX);
-		font->SetPosY(textY - 4.0f);
+		font->SetPosY(textY - kMLstTextYOffset);
 		font->Draw(text);
 
 		item++;
@@ -151,10 +151,10 @@ void CMenuPcs::MLstDraw()
 		helpFont,
 		(int)helpX,
 		(int)helpY,
-		CColor(0xff, 0xff, 0xff, (signed char)(255.0f * this->m_menuLstList->entries[0].alpha)).color,
+		CColor(0xff, 0xff, 0xff, (signed char)(kMLstColorMax * this->m_menuLstList->entries[0].alpha)).color,
 		0x0a,
 		kMLstOne,
-		3.0f);
+		kMLstHelpScale);
 }
 
 /*

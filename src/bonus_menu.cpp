@@ -3193,7 +3193,7 @@ void CMenuPcs::CalcResultCountAnim()
 				unsigned int resolvedIndex = (padRemap == (int)padIndex) ? 0 : padIndex;
 				down = Pad.m_padInputs[resolvedIndex].buttonDown[0];
 			}
-			int __p28 = buttons;
+			unsigned int __p28 = buttons;
 			buttons = (unsigned short)(__p28 | down);
 		}
 		if ((buttons & 0x300) != 0) {

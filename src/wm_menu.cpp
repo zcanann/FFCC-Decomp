@@ -10108,12 +10108,13 @@ void CMenuPcs::ChgAllModel2()
  */
 void CMenuPcs::ChgAllModel()
 {
+	int i = 0;
 	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
 	unsigned char* handleData = bytes;
 	int modelOffset = 0;
 
-	for (int i = 0; i < kWmMenuPlayerCount; i++) {
+	for (; i < kWmMenuPlayerCount; i++) {
 		unsigned char* caravanData = gameData + 0x13F0;
 		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
 		unsigned int race;

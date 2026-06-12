@@ -31,29 +31,29 @@ void preDrawEnvInit__11CGraphicPcsFv(CGraphicPcs*);
 void stdDrawEnvInit__11CGraphicPcsFv(CGraphicPcs*);
 }
 
-static CProcessTableCallback s_graphicTableDescCreate = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__11CGraphicPcsFv)};
-static CProcessTableCallback s_graphicTableDescDestroy = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__11CGraphicPcsFv)};
-static CProcessTableCallback s_graphicTableDescCalc = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__11CGraphicPcsFv)};
-static CProcessTableCallback s_graphicTableDescDrawWait = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawWait__11CGraphicPcsFv)};
-static CProcessTableCallback s_graphicTableDescDrawFlip = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawFlip__11CGraphicPcsFv)};
-static CProcessTableCallback s_graphicTableDescDrawBegin = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBegin__11CGraphicPcsFv)};
-static CProcessTableCallback s_graphicTableDescDrawCopy = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCopy__11CGraphicPcsFv)};
-static CProcessTableCallback s_graphicTableDescDrawEnd = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawEnd__11CGraphicPcsFv)};
-static CProcessTableCallback s_graphicTableDescPreDrawEnvInit = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(preDrawEnvInit__11CGraphicPcsFv)};
-static CProcessTableCallback s_graphicTableDescStdDrawEnvInit = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(stdDrawEnvInit__11CGraphicPcsFv)};
-
 inline CGraphicPcs::CGraphicPcs()
 {
+    static CProcessTableCallback s_graphicTableDescCreate = {
+        0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__11CGraphicPcsFv)};
+    static CProcessTableCallback s_graphicTableDescDestroy = {
+        0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__11CGraphicPcsFv)};
+    static CProcessTableCallback s_graphicTableDescCalc = {
+        0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__11CGraphicPcsFv)};
+    static CProcessTableCallback s_graphicTableDescDrawWait = {
+        0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawWait__11CGraphicPcsFv)};
+    static CProcessTableCallback s_graphicTableDescDrawFlip = {
+        0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawFlip__11CGraphicPcsFv)};
+    static CProcessTableCallback s_graphicTableDescDrawBegin = {
+        0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBegin__11CGraphicPcsFv)};
+    static CProcessTableCallback s_graphicTableDescDrawCopy = {
+        0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCopy__11CGraphicPcsFv)};
+    static CProcessTableCallback s_graphicTableDescDrawEnd = {
+        0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawEnd__11CGraphicPcsFv)};
+    static CProcessTableCallback s_graphicTableDescPreDrawEnvInit = {
+        0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(preDrawEnvInit__11CGraphicPcsFv)};
+    static CProcessTableCallback s_graphicTableDescStdDrawEnvInit = {
+        0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(stdDrawEnvInit__11CGraphicPcsFv)};
+
     CProcessTable* table = &m_table;
 
     table->m_fields.m_create = s_graphicTableDescCreate;

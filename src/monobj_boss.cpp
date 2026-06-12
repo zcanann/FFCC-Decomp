@@ -1992,14 +1992,16 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 	initFinishedFuncDefault();
 
 	const int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
-	if (scriptKind == 0x85) {
+	switch (scriptKind) {
+	case 0x85: {
 		CGObject* object = reinterpret_cast<CGObject*>(this);
-		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
 		int nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sLichTeleportNodeA));
-		nodes[0] = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
-		nodes[0]->m_flagsBits.m_flag_80 = 0;
+		CChara::CNode* node = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
+		reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[0] = node;
+		node->m_flagsBits.m_flag_80 = 0;
 
 		nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sLichTeleportNodeB));
+		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
 		nodes[1] = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
 		nodes[1]->m_flagsBits.m_flag_80 = 0;
 
@@ -2013,12 +2015,15 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 				object->m_charaModelHandle->m_model->m_meshVisibleMask &= ~(1 << dispIndex);
 			}
 		}
+		break;
+	}
 	}
 
-	CGMonObj** bossObjArr = reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x48);
-	bossObjArr[scriptKind - 0x85] = this;
+	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
+	int objIndex = scriptKind - 0x85;
+	work->m_objs[objIndex] = reinterpret_cast<CGPrgObj*>(this);
 
-	if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 != 0) {
+	if (work->bits.m_meteo3 != 0) {
 		reinterpret_cast<CGObject*>(this)->SetAnimSlot(scriptKind == 0x87 ? 0x0D : 0x0E, 0);
 		reinterpret_cast<CGPrgObj*>(this)->reqAnim(0, 1, 0);
 	}
@@ -2068,25 +2073,29 @@ void CGMonObj::alwaysFuncMeteoParasite()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	const int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
 
-	if (scriptKind == 0x85 && reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 == 0) {
-		if (g_errCt == 0) {
-			g_errCt = 1;
-			MG_GBA_THREAD_MSG_SETPORT_ct = kMonObjBossZero;
+	switch (scriptKind) {
+	case 0x85:
+		if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 == 0) {
+			if (g_errCt == 0) {
+				g_errCt = 1;
+				MG_GBA_THREAD_MSG_SETPORT_ct = kMonObjBossZero;
+			}
+
+			PSMTXRotRad(reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[0]->m_localRuntimeMtx, 'x',
+			            MG_GBA_THREAD_MSG_SETPORT_ct);
+			PSMTXRotRad(reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[1]->m_localRuntimeMtx, 'x',
+			            -MG_GBA_THREAD_MSG_SETPORT_ct);
+
+			CGObject** rotObjects = reinterpret_cast<CGObject**>(CGMonObj::m_boss);
+			for (int i = 0; i < 12; i++) {
+				rotObjects[i + 14]->m_rotTargetY =
+				    kMonObjBossTwo * (kMonObjBossPi * static_cast<float>(i + 3)) / kMonObjBossTwelve +
+				    MG_GBA_THREAD_MSG_SETPORT_ct;
+			}
+
+			MG_GBA_THREAD_MSG_SETPORT_ct += kMonObjBossScaleStep;
 		}
-
-		PSMTXRotRad(reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[0]->m_localRuntimeMtx, 'x',
-		            MG_GBA_THREAD_MSG_SETPORT_ct);
-		PSMTXRotRad(reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[1]->m_localRuntimeMtx, 'x',
-		            -MG_GBA_THREAD_MSG_SETPORT_ct);
-
-		CGObject** rotObjects = reinterpret_cast<CGObject**>(CGMonObj::m_boss);
-		for (int i = 0; i < 12; i++) {
-			rotObjects[i + 14]->m_rotTargetY =
-			    kMonObjBossTwo * (kMonObjBossPi * static_cast<float>(i + 3)) / kMonObjBossTwelve +
-			    MG_GBA_THREAD_MSG_SETPORT_ct;
-		}
-
-		MG_GBA_THREAD_MSG_SETPORT_ct += kMonObjBossScaleStep;
+		break;
 	}
 
 	switch (scriptKind) {
@@ -2095,24 +2104,22 @@ void CGMonObj::alwaysFuncMeteoParasite()
 	case 0x87:
 		if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == scriptKind - 0x85 &&
 		    reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) {
-		int effect;
-		int arg0;
-		int arg1;
-		if (reinterpret_cast<CGCharaObj*>(this)->getItemPdt(0, 0, effect, arg0, arg1) != 0) {
-			if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 0) {
-				reinterpret_cast<CGPrgObj*>(this)->changeStat(100, 0, 0);
-				m_actionBranch = 0;
+			int dummy;
+			if (reinterpret_cast<CGCharaObj*>(this)->getItemPdt(0, 0, dummy, dummy, dummy) != 0) {
+				if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 0) {
+					reinterpret_cast<CGPrgObj*>(this)->changeStat(100, 0, 0);
+					m_actionBranch = 0;
+				}
+				if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 2) {
+					reinterpret_cast<CGPrgObj*>(this)->changeStat(0x65, 0, 0);
+					m_actionBranch = 2;
+				}
+				if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 1) {
+					reinterpret_cast<CGPrgObj*>(this)->changeStat(0x66, 0, 0);
+					m_actionBranch = 1;
+				}
+				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 0;
 			}
-			if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 2) {
-				reinterpret_cast<CGPrgObj*>(this)->changeStat(0x65, 0, 0);
-				m_actionBranch = 2;
-			}
-			if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 1) {
-				reinterpret_cast<CGPrgObj*>(this)->changeStat(0x66, 0, 0);
-				m_actionBranch = 1;
-			}
-			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 0;
-		}
 		}
 		break;
 	}
@@ -2131,9 +2138,9 @@ void CGMonObj::alwaysFuncMeteoParasite()
 #pragma peephole off
 void CGMonObj::frameStatFuncMeteoParasite()
 {
+	int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	int state = prgObj->m_lastStateId;
-	int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
 
 	switch (state) {
 	case 100:
@@ -2146,17 +2153,17 @@ void CGMonObj::frameStatFuncMeteoParasite()
 		break;
 	case 0x65:
 		if (prgObj->m_stateFrame == 0) {
-			prgObj->reqAnim(0xD, 0, 0);
+			prgObj->reqAnim(0xC, 0, 0);
 		} else if (prgObj->isLoopAnim() != 0) {
-			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0xE, 0);
+			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);
 			prgObj->changeStat(0, 0, 0);
 		}
 		break;
 	case 0x66:
 		if (prgObj->m_stateFrame == 0) {
-			prgObj->reqAnim(0xC, 0, 0);
+			prgObj->reqAnim(0xD, 0, 0);
 		} else if (prgObj->isLoopAnim() != 0) {
-			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);
+			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0xE, 0);
 			prgObj->changeStat(0, 0, 0);
 		}
 		break;
@@ -2164,18 +2171,25 @@ void CGMonObj::frameStatFuncMeteoParasite()
 		break;
 	}
 
-	if (scriptKind == 0x87 && prgObj->m_lastStateId == 0x67) {
-		int frame = prgObj->m_stateFrame;
-		if (frame >= 0x19 && frame < 0x32) {
-			if (frame == 0x19) {
-				prgObj->playSe3D(0x11D5B, 0x32, 0x96, 0, 0);
+	switch (scriptKind) {
+	case 0x87:
+		switch (prgObj->m_lastStateId) {
+		case 0x67: {
+			int frame = prgObj->m_stateFrame;
+			if (frame >= 0x19 && frame < 0x32) {
+				if (frame == 0x19) {
+					prgObj->playSe3D(0x11D5B, 0x32, 0x96, 0, 0);
+				}
+				if (prgObj->m_stateFrame % 3 == 0) {
+					CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
+					chara->putParticleFromItem(chara->m_itemId, 2, chara->m_particleSlots[0], 0);
+				}
 			}
-			if (prgObj->m_stateFrame % 3 == 0) {
-				CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
-				chara->putParticleFromItem(chara->m_itemId, 2, chara->m_particleSlots[0], 0);
-			}
+			reinterpret_cast<CGCharaObj*>(this)->statAttack();
+			break;
 		}
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		}
+		break;
 	}
 }
 #pragma pop
@@ -2197,14 +2211,18 @@ void CGMonObj::logicFuncMeteoParasite()
 
 	if (work->bits.m_meteo3) {
 		nextState = 0x68;
-	} else if (reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x87) {
-		if (work->m_coreIndex == 2 && m_actionBranch < 2) {
-			if (work->m_objs[3]->m_lastStateId >= 100) {
-				return;
+	} else {
+		switch (reinterpret_cast<int>(object->m_scriptHandle[4])) {
+		case 0x87:
+			if (work->m_coreIndex == 2 && m_actionBranch < 2) {
+				if (work->m_objs[3]->m_lastStateId >= 100) {
+					return;
+				}
+				if (work->bits.m_bit80) {
+					return;
+				}
 			}
-			if (work->bits.m_bit80) {
-				return;
-			}
+			break;
 		}
 	}
 

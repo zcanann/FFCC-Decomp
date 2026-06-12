@@ -1258,7 +1258,8 @@ void CChara::CModel::setup()
  */
 CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 {
-	CModel* clone = new (stage, const_cast<char*>(s_chara_cpp), 0x25A) CModel();
+	void* cloneMem = operator new(sizeof(CModel), stage, const_cast<char*>(s_chara_cpp), 0x25A);
+	CModel* clone = cloneMem != 0 ? new (cloneMem) CModel() : 0;
 
 	clone->m_data = ModelRef(this);
 	RetainRefCounted(ModelRef(clone));

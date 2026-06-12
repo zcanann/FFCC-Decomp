@@ -2162,81 +2162,6 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 	}
 }
 
-/*
- * --INFO--
- * PAL Address: 0x800a7e18
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma push
-#pragma opt_common_subs off
-int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
-{
-	short numSlots;
-	int groupedCount;
-	int topIdx;
-	int extraOff = cmdListIdx * 2;
-
-	if (Game.m_gameWork.m_menuStageMode == 0) {
-		groupedCount = 1;
-	} else {
-		short* cur = (short*)((char*)this + extraOff);
-		if (*(short*)((char*)cur + 0x214) == 0) {
-			groupedCount = 1;
-		} else {
-			for (topIdx = cmdListIdx; topIdx >= 0; topIdx--) {
-				if (*(short*)((char*)cur + 0x214) != -1) {
-					break;
-				}
-				cur--;
-			}
-
-			groupedCount = 1;
-			int nextIdx = topIdx + 1;
-			numSlots = m_numCmdListSlots;
-			for (int n = topIdx + 1; n < numSlots; n++) {
-				if (m_commandListExtra[nextIdx] != -1) {
-					break;
-				}
-				groupedCount++;
-				nextIdx++;
-			}
-		}
-	}
-
-	if (groupedCount > 1) {
-		short* cur2 = (short*)((char*)this + extraOff);
-		for (int n = cmdListIdx; n >= 0; n--) {
-			if (*(short*)((char*)cur2 + 0x214) != -1) {
-				break;
-			}
-			cur2--;
-			cmdListIdx--;
-		}
-
-		short cmdId = m_commandListExtra[cmdListIdx];
-		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
-			*firstCmdIdx = cmdListIdx;
-			int i = 0;
-			for (; groupedCount > 0; groupedCount--) {
-				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
-				short itemId = (short)m_inventoryItems[invSlot];
-				int itemType = GetItemDataPtr(itemId)[0];
-				if (itemType == 1) {
-					*itemCmdListIdx = cmdListIdx + i;
-					return 1;
-				}
-				i++;
-			}
-		}
-	}
-
-	return 0;
-}
-#pragma pop
 
 /*
  * --INFO--
@@ -2681,6 +2606,53 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
 		m_commandListExtra[startIdx + i] = 0;
 	}
 }
+
+/*
+ * --INFO--
+ * PAL Address: 0x800a7e18
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma push
+#pragma opt_common_subs off
+int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
+{
+	int extraOff = cmdListIdx * 2;
+	int groupedCount = GetNumGroupedCmdList(this, cmdListIdx);
+
+	if (groupedCount > 1) {
+		short* cur2 = (short*)((char*)this + extraOff);
+		for (int n = cmdListIdx; n >= 0; n--) {
+			if (*(short*)((char*)cur2 + 0x214) != -1) {
+				break;
+			}
+			cur2--;
+			cmdListIdx--;
+		}
+
+		short cmdId = m_commandListExtra[cmdListIdx];
+		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
+			*firstCmdIdx = cmdListIdx;
+			int i = 0;
+			for (; groupedCount > 0; groupedCount--) {
+				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
+				short itemId = (short)m_inventoryItems[invSlot];
+				int itemType = GetItemDataPtr(itemId)[0];
+				if (itemType == 1) {
+					*itemCmdListIdx = cmdListIdx + i;
+					return 1;
+				}
+				i++;
+			}
+		}
+	}
+
+	return 0;
+}
+#pragma pop
 
 /*
  * --INFO--

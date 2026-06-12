@@ -959,16 +959,14 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 		{
 			int off = 0;
-			int t0 = off;
-			int t1 = off;
 			int i = 0;
 			int __p3 = i;
 			for (; __p3 < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
 				int sprOff = off + 8;
 				BonusAnimSprite* spr = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff);
 				spr->alpha = FLOAT_80331EB0;
-				spr->timer = t0;
-				BonusSpriteFlags(spr) = t1;
+				spr->timer = 0;
+				BonusSpriteFlags(spr) = 0;
 			}
 		}
 

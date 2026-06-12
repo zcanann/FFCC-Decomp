@@ -829,7 +829,6 @@ void CMenuPcs::ItemInit()
 {
     int index;
     int yOffset;
-    int count;
     MenuItemOpenAnim* entry;
     ItemMenuAnimList* itemList;
 
@@ -856,7 +855,6 @@ void CMenuPcs::ItemInit()
     entry->u = titleAlpha;
     entry->v = titleScale;
     entry->uvScale = one;
-    count = 4;
     entry->startFrame = 5;
     entry->duration = 5;
 
@@ -903,7 +901,6 @@ void CMenuPcs::ItemInit()
         entry = GetItemOpenAnim(this, index++);
         entry->flags = 2;
         entry->tex = 0x37;
-        count = count + 2;
         entry->x = itemList->anims[0].x + 0x24;
         entry->y = itemList->anims[0].y + yOffset;
         yOffset += 0x20;
@@ -928,7 +925,7 @@ void CMenuPcs::ItemInit()
         entry->duration = 5;
     }
 
-    GetItemOpenAnimList(this)->count = count;
+    GetItemOpenAnimList(this)->count = index;
     GetItemState(this)->cursorIndex[0] = 0;
     GetItemState(this)->initialized = 1;
 }

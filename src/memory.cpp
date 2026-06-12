@@ -1369,9 +1369,7 @@ void CMemory::CStage::drawHeapTitle(int y)
     }
 
     int srcLen = strlen(m_allocationSourceStr);
-    int sourceOffset = srcLen - 12;
-    sourceOffset &= ~(sourceOffset >> 31);
-    strcpy(line, m_allocationSourceStr + sourceOffset);
+    strcpy(line, m_allocationSourceStr + ((srcLen - 12) & ~((srcLen - 12) >> 31)));
     Graphic.DrawDebugStringDirect(0x10, y, line, 8);
 
     sprintf(line, s_drawHeapTitleFmt, m_allocCount,

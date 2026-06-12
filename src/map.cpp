@@ -2928,16 +2928,12 @@ void CMapMng::Draw()
 
         CameraPcs.SetOffsetZBuff(kMapHitWireZOffset);
 
-        CMapObj* mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < m_mapObjCount; i++) {
-            mapObj->DrawHitWire();
-            mapObj++;
+            MapMng.m_mapObjArray[i].DrawHitWire();
         }
 
-        mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < m_mapObjCount; i++) {
-            mapObj->DrawHitNormal();
-            mapObj++;
+            MapMng.m_mapObjArray[i].DrawHitNormal();
         }
 
         CameraPcs.SetOffsetZBuff(kMapZero);

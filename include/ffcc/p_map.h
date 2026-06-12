@@ -50,7 +50,6 @@ private:
 };
 
 extern CMapPcs MapPcs;
-extern unsigned char g_hit_prof;
 extern unsigned char g_map_calc_prof;
 extern unsigned char g_map_draw_prof;
 

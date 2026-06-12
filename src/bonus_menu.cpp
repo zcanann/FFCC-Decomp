@@ -74,6 +74,10 @@ extern const float FLOAT_80331F58;
 extern const char lbl_80331F54[2];
 extern "C" const char s_pcts_pctd_Error_memory_allocation_error_801DD598[];
 extern const double DOUBLE_80331F30;
+extern const double DOUBLE_80331F70;
+extern const float FLOAT_80331F78;
+extern const double DOUBLE_80331F80;
+extern const double DOUBLE_80331F88;
 
 static float s_BallTrnsXspl[] = {
     0.03333299979567528f, 27.700000762939453f, 0.0f, 0.0f,
@@ -2191,7 +2195,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 				if (handle == 0) {
 					continue;
 				}
-				PSMTXScale(scaleMtx, 0.5799999833106995f, 0.5799999833106995f, 0.5799999833106995f);
+				PSMTXScale(scaleMtx, FLOAT_80331F00, FLOAT_80331F00, FLOAT_80331F00);
 			}
 			if (i < activePartyCount) {
 				scaleMtx[0][3] = kBonusZClearOrigin;
@@ -2214,10 +2218,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 				float angle;
 				if (frame < iconSprite->startFrame) {
 					srcVec.x = scale4[2];
-					angle = -90.0f;
+					angle = FLOAT_80331F78;
 				} else if (iconSprite->timer >= phase) {
 					srcVec.x = ((const float*)(anchor + 0x5c))[4];
-					angle = (float)(45.0 * (double)rem);
+					angle = (float)(DOUBLE_80331F80 * (double)rem);
 				} else {
 					int last = iconSprite->timer - 1;
 					if (last <= fcvIndex) {
@@ -2229,26 +2233,26 @@ void CMenuPcs::CalcSelectOpenAnim()
 						    ((float)phase - (float)fcvIndex)) *
 						    (float)(last - fcvIndex);
 					}
-					angle = (float)(-90.0 + (double)(rate * (float)last));
+					angle = (float)(DOUBLE_80331F88 + (double)(rate * (float)last));
 				}
 				srcVec.y = kBonusZClearOrigin;
 				srcVec.z = kBonusZClearOrigin;
-				PSMTXRotRad(rotZMtx, 'z', 0.01745329238474369f * angle);
+				PSMTXRotRad(rotZMtx, 'z', FLOAT_80331F04 * angle);
 				PSMTXMultVecSR(rotZMtx, &srcVec, &dstVec);
 
 				if ((unsigned int)handle->m_charaNo == 0x44) {
-					PSMTXRotRad(rotYMtx, 'y', 3.1415927410125732f);
+					PSMTXRotRad(rotYMtx, 'y', FLOAT_80331F10);
 					PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
-					PSMTXRotRad(rotXMtx, 'x', -1.1693705320358276f);
+					PSMTXRotRad(rotXMtx, 'x', FLOAT_80331F14);
 					PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
 				}
 
 				scaleMtx[0][3] = dstVec.x;
-				float modelY = (float)((double)(0.9670329689979553f * dstVec.y) - 5.0);
+				float modelY = (float)((double)(FLOAT_80331F18 * dstVec.y) - DOUBLE_80331F20);
 				if ((unsigned int)handle->m_charaNo == 0x41 || (unsigned int)handle->m_charaNo == 0x37) {
-					modelY += 3.4000000953674316f;
+					modelY += FLOAT_80331F28;
 				} else if ((unsigned int)handle->m_charaNo == 0x44) {
-					modelY += 5.0f;
+					modelY += FLOAT_80331F2C;
 				}
 				scaleMtx[1][3] = modelY;
 				scaleMtx[2][3] = kBonusZClearOrigin;

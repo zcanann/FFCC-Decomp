@@ -580,7 +580,7 @@ void CChara::CalcMogScore()
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
-			const int dx = x - 0x20;
+			const unsigned int dx = x - 0x20;
 			const int dy = y - 0x20;
 			const int dist = static_cast<int>(sqrt(static_cast<double>(dx * dx + dy * dy)));
 

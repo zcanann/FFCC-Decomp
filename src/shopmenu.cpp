@@ -3463,7 +3463,8 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
 
     C_MTXOrtho(projectionMtx, FLOAT_80332D9C, FLOAT_80332DEC, FLOAT_80332D9C, FLOAT_80332DF0, FLOAT_80332D9C,
                FLOAT_80332d28);
-    projectionMtx[2][3] += FLOAT_80332D9C;
+    const float* zOffset = &FLOAT_80332D9C;
+    projectionMtx[2][3] += *zOffset;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
     _GXColor matColor;
@@ -3530,7 +3531,8 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
 
     C_MTXOrtho(projectionMtx, FLOAT_80332D9C, FLOAT_80332DEC, FLOAT_80332D9C, FLOAT_80332DF0, FLOAT_80332D9C,
                FLOAT_80332d28);
-    projectionMtx[2][3] += FLOAT_80332D9C;
+    const float* zOffset = &FLOAT_80332D9C;
+    projectionMtx[2][3] += *zOffset;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
     _GXColor mat;

@@ -8476,6 +8476,7 @@ void CMenuPcs::DrawChara()
 		}
 
 		{
+			Mtx lookAtMtx;
 			Mtx44 projectionMtx;
 			const float* pFovA = &FLOAT_80331470;
 			const float* pAspectA = &FLOAT_80331474;
@@ -8484,7 +8485,6 @@ void CMenuPcs::DrawChara()
 			C_MTXPerspective(projectionMtx, *pFovA, *pAspectA, *pNearA, *pFarA);
 			GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 			PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-			Mtx lookAtMtx;
 			const float* pZeroA1 = &FLOAT_803313dc;
 			const float* pOneA = &FLOAT_803313e8;
 			const float* pZeroA2 = &FLOAT_803313dc;

@@ -4316,7 +4316,13 @@ void CMenuPcs::DrawMainMenu()
 			MenuPcs.DrawRect(0, *pZmm6, static_cast<float>(*pBmm1 - static_cast<double>(*p440mm)),
 			                 *pWmm6, *p440mm, *pZmm6, *pZmm6, *pOmm9, *pOmm9, *pZmm6);
 
-			char* textList[5] = { 0, 0, 0, 0, 0 };
+			extern char* DAT_801DC230[5];
+			char* textList[5];
+			textList[0] = DAT_801DC230[0];
+			textList[1] = DAT_801DC230[1];
+			textList[2] = DAT_801DC230[2];
+			textList[3] = DAT_801DC230[3];
+			textList[4] = DAT_801DC230[4];
 			const int languageIndex = Game.m_gameWork.m_languageId - 1;
 			unsigned int ti;
 			char** const langText = &lbl_80210750[languageIndex * 0x0B];

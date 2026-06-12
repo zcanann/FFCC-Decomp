@@ -403,8 +403,7 @@ void CRingMenu::drawGBA()
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 
 	const float alphaBase = kRingMenuAlphaMax * gbaAnim;
-	CColor shadowColor(0, 0, 0, static_cast<unsigned char>(kRingMenuHalf * alphaBase * showScale));
-	MenuPcs.SetColor(shadowColor);
+	MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>(kRingMenuHalf * alphaBase * showScale)));
 
 	const float drawAngle = kRingMenuDrawAngleScale * (kRingMenuTwo * (cycle - kRingMenuHalf));
 	const float invSize = kRingMenuOne - sizePulse;
@@ -417,30 +416,28 @@ void CRingMenu::drawGBA()
 	                                 kRingMenuThreeQuarter * (sizePulse + invSize), drawAngle);
 
 	const float alphaLit = alphaBase * showScale;
-	CColor iconColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaLit));
-	MenuPcs.SetColor(iconColor);
+	MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaLit)));
 	MenuPcs.DrawRect(3, drawX, drawY, kRingMenuPanelWidth80, kRingMenuGbaIconSize, kRingMenuZero, static_cast<float>(m_menuIndex * 0x30),
 	                                 kRingMenuThreeQuarter * sizePulse, kRingMenuThreeQuarter * sizePulse, drawAngle);
 
 	const unsigned int flatFlags = CFlatEnabledEventFlags();
 	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(m_menuIndex) == 0)) {
-		if (Joybus.IsInitSend(m_menuIndex) == 0) {
+		if (static_cast<unsigned char>(Joybus.IsInitSend(m_menuIndex)) == 0) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
 			const float blink = static_cast<float>(sin(static_cast<double>(kRingMenuBlinkPhaseStep * static_cast<float>(m_commonFrameCounter))));
 			const unsigned int sendAlpha = static_cast<unsigned int>(
 			    static_cast<int>(kRingMenuHalf * (alphaLit * (kRingMenuOne + blink))));
-			CColor sendColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha));
-			MenuPcs.SetColor(sendColor);
+			MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha)));
 			MenuPcs.DrawRect(3, drawX, drawY, kRingMenuGbaIconSize, kRingMenuGbaIconSize, kRingMenuZero, kRingMenuCommandIconV,
-			                                 kRingMenuOne, kRingMenuOne, 0.0f);
+			                                 kRingMenuOne, kRingMenuOne, kRingMenuZero);
 		} else {
 			int frameTex = (static_cast<int>(System.m_frameCounter) >> 1) % 16;
-			if (frameTex > 3) {
+			if (frameTex >= 4) {
 				frameTex &= 1;
 			}
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
 			MenuPcs.DrawRect(3, drawX, drawY, kRingMenuGbaIconSize, kRingMenuGbaIconSize, kRingMenuZero,
-			                                 static_cast<float>(frameTex * 0x30), kRingMenuOne, kRingMenuOne, 0.0f);
+			                                 static_cast<float>(frameTex * 0x30), kRingMenuOne, kRingMenuOne, kRingMenuZero);
 		}
 	}
 

@@ -1574,8 +1574,7 @@ void CShopMenu::DrawBuySellInfo()
     SetupShopMenuInfoFont(font);
 
     char* priceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_PRICE);
-    float priceWidth = font->GetWidth(priceText);
-    int priceX = static_cast<int>(FLOAT_80332d7c - priceWidth);
+    int priceX = static_cast<int>(FLOAT_80332d7c - font->GetWidth(priceText));
     font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, priceText, static_cast<float>(priceX), FLOAT_80332d80, 0x13, 0x12);
     MenuPcs.DrawInit();

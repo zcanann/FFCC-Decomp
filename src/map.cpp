@@ -2539,8 +2539,9 @@ void CMapMng::Calc()
 
     SetLightSource();
 
-    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
-        CMapShadow* mapShadow = GetMapShadowArray()[i];
+    unsigned long shadowIdx;
+    for (unsigned int i = 0; (shadowIdx = i) < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
+        CMapShadow* mapShadow = GetMapShadowArray()[shadowIdx];
         mapShadow->Calc();
     }
 
@@ -2582,8 +2583,9 @@ void CMapMng::Calc()
 void CMapMng::DrawMapShadow()
 {
     if (m_mapObjCount != 0) {
-        for (unsigned int i = 0; i < static_cast<unsigned int>(m_mapShadowArray.GetSize()); i++) {
-            CMapShadow* mapShadow = m_mapShadowArray[i];
+        unsigned long idx;
+        for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(m_mapShadowArray.GetSize()); i++) {
+            CMapShadow* mapShadow = m_mapShadowArray[idx];
             mapShadow->Draw();
         }
     }

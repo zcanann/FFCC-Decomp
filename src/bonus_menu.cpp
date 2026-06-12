@@ -3643,7 +3643,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		{
-			int i = 0;
+			unsigned int i = 0;
 			int boardOff = i;
 			int half = activePartyCount * 0x50;
 			for (; i < activePartyCount; i++) {
@@ -3692,7 +3692,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		return;
 	}
 
-	*(short*)(this->m_bonusStatePtr + 0x22) = *(unsigned short*)(this->m_bonusStatePtr + 0x22) + 1;
+	*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
 	unsigned int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
 	int i0 = 0;
 	int off = i0;

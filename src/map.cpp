@@ -1889,7 +1889,7 @@ int CMapMng::ReadMpl(char* mapName)
     CFile::CHandle* handle;
     char* strTmp = g_StrTmp;
     int loadIndex = 0;
-    int size;
+    int size = 0;
 
     MapMng.m_mapReadReady = 1;
 

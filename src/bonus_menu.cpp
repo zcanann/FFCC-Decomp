@@ -2544,10 +2544,8 @@ void CMenuPcs::CalcResultCloseAnim()
 			spr->flags = 3;
 		}
 
-		for (int i = 1; i <= activePartyCount; i++) {
-			int off2 = i * 0x40 + 8;
-			int __p10 = off2;
-			int sprite = this->m_bonusAnimPtr + __p10;
+		for (int i = 0; activePartyCount > i; i++) {
+			int sprite = this->m_bonusAnimPtr + (i + 1) * 0x40 + 8;
 			*(int*)(sprite + 0x24) = 0x10;
 		}
 

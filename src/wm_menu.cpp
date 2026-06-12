@@ -10050,8 +10050,8 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 void CMenuPcs::ChgAllModel2()
 {
 	int modelOffset = 0;
-	int pdtOffset = modelOffset;
 	unsigned char* handleData = reinterpret_cast<unsigned char*>(this);
+	int pdtOffset = modelOffset;
 	int i = 0;
 
 	do {
@@ -10092,9 +10092,9 @@ void CMenuPcs::ChgAllModel2()
 
 		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
 		i++;
-		pdtOffset += 0x9C0;
-		handleData += 4;
 		modelOffset += 0x34;
+		handleData += 4;
+		pdtOffset += 0x9C0;
 	} while (i < kWmMenuPlayerCount);
 }
 

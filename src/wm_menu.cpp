@@ -11075,15 +11075,20 @@ LAB_next:
 	if (separatorSub != 0 && separatorSub > 1 &&
 	    worldState->m_mainState == 2) {
 		const float* psZ = &FLOAT_803313dc;
-		const float sepZero = *psZ;
 		const double* psSl = &DOUBLE_80331498;
-		const double sepSlope = *psSl;
 		const double* psBi = &DOUBLE_80331408;
-		const double sepBias = *psBi;
 		const double* psBa = &DOUBLE_80331490;
-		const double sepBase = *psBa;
 		const double* psOf = &DOUBLE_80331510;
-		const double sepOff = *psOf;
+		double sepOff;
+		double sepBase;
+		double sepBias;
+		double sepSlope;
+		float sepZero;
+		sepZero = *psZ;
+		sepSlope = *psSl;
+		sepBias = *psBi;
+		sepBase = *psBa;
+		sepOff = *psOf;
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 			double rawA;
@@ -11103,24 +11108,29 @@ LAB_next:
 
 	if (worldState->m_subState >= 0x11 &&
 	    worldState->m_mainState < 3) {
+		const double* pBi2 = &DOUBLE_80331408;
+		const double* pSl2 = &DOUBLE_80331498;
+		const double* pBa2 = &DOUBLE_80331490;
 		const double* pOff2 = &DOUBLE_80331510;
 		const float* p518a = &FLOAT_80331518;
-		const double mapX = *pOff2 + static_cast<double>(*p518a);
+		double rowBaseD;
+		float slotY;
+		double mapX;
+		double rowSlopeD;
+		double rowBias;
+		mapX = *pOff2 + static_cast<double>(*p518a);
 		const int language = Game.m_gameWork.m_languageId;
 		int* digitWidths = reinterpret_cast<int*>(rodataBase + 0x920);
 		int* playWidths = reinterpret_cast<int*>(rodataBase + 0xab0);
-		const double* pSl2 = &DOUBLE_80331498;
-		const double rowSlopeD = *pSl2;
-		const double* pBi2 = &DOUBLE_80331408;
-		const double rowBias = *pBi2;
-		const double* pBa2 = &DOUBLE_80331490;
-		const double rowBaseD = *pBa2;
+		rowSlopeD = *pSl2;
+		rowBias = *pBi2;
+		rowBaseD = *pBa2;
 		for (slot = 0, slotOff = slot; slot < kMcListCount; slot++, slotOff += kMcListEntrySize) {
 			unsigned char* const slotData = m_wmCharaState + slotOff;
 			double rawRow;
 			reinterpret_cast<int*>(&rawRow)[1] = slot ^ 0x80000000;
 			reinterpret_cast<int*>(&rawRow)[0] = 0x43300000;
-			const float slotY = static_cast<float>(rowSlopeD * (rawRow - rowBias) + rowBaseD);
+			slotY = static_cast<float>(rowSlopeD * (rawRow - rowBias) + rowBaseD);
 			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<char*>(slotData + 0x41) != 0) {
 				const float* pH40a = &FLOAT_80331440;
 				float rowY = *pH40a + slotY;
@@ -11215,13 +11225,17 @@ LAB_next:
 					}
 					digitX += static_cast<float>((0x20 - static_cast<int>(static_cast<float>(totalWidth) * digitScale)) / 2);
 					const float* pZd1 = &FLOAT_803313dc;
-					const float zeroF = *pZd1;
 					const double* pCs1 = &DOUBLE_80331490;
-					const double colSlope = *pCs1;
 					const double* pRs1 = &DOUBLE_80331540;
-					const double rowSlope = *pRs1;
 					const double* pRb1 = &DOUBLE_80331538;
-					const double rowBase = *pRb1;
+					double rowBase;
+					double rowSlope;
+					double colSlope;
+					float zeroF;
+					zeroF = *pZd1;
+					colSlope = *pCs1;
+					rowSlope = *pRs1;
+					rowBase = *pRb1;
 					int* const dw = reinterpret_cast<int*>(rodataBase + 0x920);
 					for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 						int digit;

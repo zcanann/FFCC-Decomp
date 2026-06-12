@@ -6621,6 +6621,8 @@ bool JoyBus::IsThreadRunning()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma optimize_for_size on
 void JoyBus::RestartThread()
 {
     m_threadInitFlag = 0;
@@ -6658,7 +6660,7 @@ void JoyBus::RestartThread()
 
             unsigned char* img;
             unsigned char* p;
-            int idx = 0xBC;
+            int idx;
             int sum;
 
             Joybus.m_gbaBootImage[0xAC] = Joybus.m_diskId[0];
@@ -6702,13 +6704,11 @@ void JoyBus::RestartThread()
                     - img[0xBB])
                 );
 
-            if (idx < 0xBD)
+            idx = (sum != 0) ? 0xBC : 0xBC;
+
+            for (; idx < 0xBD; idx++)
             {
-                do
-                {
-                    sum -= *p++;
-                    idx++;
-                } while (idx < 0xBD);
+                sum -= *p++;
             }
 
             img[idx] = (unsigned char)sum;
@@ -6762,6 +6762,7 @@ void JoyBus::RestartThread()
     if ((unsigned int)System.m_execParam >= 2)
         System.Printf(const_cast<char*>(s_thread_init_end));
 }
+#pragma pop
 
 /*
  * --INFO--

@@ -736,7 +736,7 @@ void CRingMenu::onDraw()
 						const float fullAlpha = showScale * (kRingMenuAlphaMax * fade * transitionScale);
 						const float dimAlpha = showScale * (kRingMenuCommandPanelWidth * fade * transitionScale);
 
-						for (int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
+						for (unsigned int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
 							int maxCharge;
 							int curCharge;
 							int charge = caravanWork->GetMagicCharge(i, maxCharge, curCharge);

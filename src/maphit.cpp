@@ -6,20 +6,25 @@
 
 #include <math.h>
 
-extern "C" const float kMapHitBoundsMinInit;
-extern "C" const float kMapHitBoundsMaxInit;
-extern "C" const float kMapHitInitialTMin;
-extern "C" const float kMapHitEdgeBackoff;
-extern "C" const float kMapHitFaceBackoff;
-extern "C" const float kMapHitUnitScale;
-extern "C" const float kMapHitZero;
-extern "C" const float kMapHitRadiusSlideScale;
-extern "C" const float kMapHitSlideTLimit;
-extern "C" const double kMapHitEdgeMaxT;
-extern "C" const float kMapHitEdgeMinT;
-extern "C" const float kMapHitVertexOffsetScale;
-extern "C" const float kMapHitRadiusScale;
-extern "C" const double kMapHitRadiusBase;
+extern "C" const float kMapHitInitialTMin = 10.0f;
+extern "C" const float kMapHitEdgeBackoff = 0.5f;
+extern "C" const float kMapHitFaceBackoff = 0.30000001192092896f;
+extern "C" const float kMapHitUnitScale = 1.0f;
+extern "C" const float kMapHitZero = 0.0f;
+extern "C" const float kMapHitRadiusSlideScale = 1.0499999523162842f;
+extern "C" const float kMapHitSlideTLimit = -3.0f;
+extern "C" const double kMapHitEdgeMaxT = 1.0;
+extern "C" const float kMapHitEdgeMinT = -0.009999999776482582f;
+extern "C" const float kMapHitBoundsMinInit = 10000000000.0f;
+extern "C" const float kMapHitBoundsMaxInit = -10000000000.0f;
+extern "C" const float kMapHitVertexOffsetScale = 0.10000000149011612f;
+extern "C" const float kMapHitRadiusScale = 4.0f;
+extern "C" const double kMapHitRadiusBase = -1.0;
+extern "C" const double DOUBLE_8032F908 = 0.999999999999;
+extern "C" const double DOUBLE_8032F910 = 0.0;
+extern "C" const double DOUBLE_8032F918 = 0.5;
+extern "C" const double DOUBLE_8032F920 = 3.0;
+extern "C" const double DOUBLE_8032F928 = 2.0;
 static const char s_maphit_cpp[] = "maphit.cpp";
 extern "C" const char sOldMidFormat[] = {
     (char)0x8C, (char)0xC3, (char)0x82, (char)0xA2, (char)0x20, (char)0x4D, (char)0x49, (char)0x44,

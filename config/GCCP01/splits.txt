@@ -151,6 +151,7 @@ util.cpp:
 	.data       start:0x801E88B8 end:0x801E88D4
 	.sdata      start:0x8032E488 end:0x8032E498
 	.sbss       start:0x8032EC70 end:0x8032EC74
+	.sdata2     start:0x8032F888 end:0x8032F8C0
 
 maphit.cpp:
 	extab       start:0x80005E00 end:0x80005E60
@@ -160,7 +161,7 @@ maphit.cpp:
 	.rodata     start:0x801D7088 end:0x801D70B0
 	.bss        start:0x80245640 end:0x802456F0
 	.sbss       start:0x8032EC78 end:0x8032EC9C
-	.sdata2     start:0x8032F888 end:0x8032F8B4
+	.sdata2     start:0x8032F8C0 end:0x8032F930
 
 mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8

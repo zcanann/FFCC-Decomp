@@ -4173,11 +4173,15 @@ void CMenuPcs::DrawMainMenu()
 	short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
-		frameAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+		const double* pRmm1 = &DOUBLE_803314E8;
+		frameAlpha = static_cast<float>(*pRmm1 * static_cast<double>(m_wmWorldState->m_frameCounter));
 	} else if (state > 0 && state < 4) {
-		frameAlpha = FLOAT_803313e8;
+		const float* pOmm1 = &FLOAT_803313e8;
+		frameAlpha = *pOmm1;
 	} else {
-		frameAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
+		const double* pRmm2 = &DOUBLE_803314E8;
+		const double* pUmm1 = &DOUBLE_80331420;
+		frameAlpha = static_cast<float>(-(*pRmm2 * static_cast<double>(m_wmWorldState->m_frameCounter) - *pUmm1));
 	}
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -4185,18 +4189,21 @@ void CMenuPcs::DrawMainMenu()
 	matColor.r = 0xFF;
 	matColor.g = 0xFF;
 	matColor.b = 0xFF;
-	matColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)));
+	const double* pAmm1 = &DOUBLE_80331508;
+	matColor.a = static_cast<unsigned char>(static_cast<int>(*pAmm1 * static_cast<double>(frameAlpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	int bit = 0;
 	int offset = 0;
 	do {
 		if (((1 << bit) & 1) != 0) {
+			const float* pZmm1 = &FLOAT_803313dc;
+			const float* pOmm2 = &FLOAT_803313e8;
 			short* const entry = reinterpret_cast<short*>(m_wm.m_frameInfo + offset + 4);
 			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(entry + 0xC), static_cast<float>(entry[0]),
 			                 static_cast<float>(entry[1]), static_cast<float>(entry[2]), static_cast<float>(entry[3]),
 			                 *reinterpret_cast<float*>(entry + 4), *reinterpret_cast<float*>(entry + 6),
-			                 1.0f, 1.0f, 0.0f);
+			                 *pOmm2, *pOmm2, *pZmm1);
 		}
 		bit++;
 		offset += 0x1C;
@@ -4206,34 +4213,60 @@ void CMenuPcs::DrawMainMenu()
 		const int tileState = m_wmWorldState->m_mainState;
 		float tileAlpha;
 		if (tileState == 1) {
-			tileAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+			const double* pRmm3 = &DOUBLE_803314E8;
+			tileAlpha = static_cast<float>(*pRmm3 * static_cast<double>(m_wmWorldState->m_frameCounter));
 		} else if (tileState == 2) {
-			tileAlpha = FLOAT_803313e8;
+			const float* pOmm3 = &FLOAT_803313e8;
+			tileAlpha = *pOmm3;
 		} else {
-			tileAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
+			const double* pRmm4 = &DOUBLE_803314E8;
+			const double* pUmm2 = &DOUBLE_80331420;
+			tileAlpha = static_cast<float>(-(*pRmm4 * static_cast<double>(m_wmWorldState->m_frameCounter) - *pUmm2));
 		}
-		tileAlpha = static_cast<float>(static_cast<double>(tileAlpha) * DOUBLE_803313F8);
+		const double* pHmm1 = &DOUBLE_803313F8;
+		tileAlpha = static_cast<float>(static_cast<double>(tileAlpha) * *pHmm1);
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 		GXColor tileColor;
 		tileColor.r = 0xFF;
 		tileColor.g = 0xFF;
 		tileColor.b = 0xFF;
-		tileColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(tileAlpha)));
+		const double* pAmm2 = &DOUBLE_80331508;
+		tileColor.a = static_cast<unsigned char>(static_cast<int>(*pAmm2 * static_cast<double>(tileAlpha)));
 		GXSetChanMatColor(static_cast<GXChannelID>(4), tileColor);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x33));
-		x = FLOAT_80331410;
-		y = FLOAT_80331440;
+		const float* pXmm1 = &FLOAT_80331410;
+		x = *pXmm1;
+		const float* pYmm1 = &FLOAT_80331440;
+		y = *pYmm1;
 		y = y - x;
-		MenuPcs.DrawRect(0, x, y, FLOAT_803316D0, FLOAT_80331500, 0.0f, 0.0f, 1.0f,
-		                 1.0f, 0.0f);
-		MenuPcs.DrawRect(8, x + FLOAT_803316D0, y,
-		                 FLOAT_803316D0, FLOAT_80331500, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-		y = y + FLOAT_80331500;
-		MenuPcs.DrawRect(4, x, y, FLOAT_803316D0, FLOAT_80331500, 0.0f, 0.0f, 1.0f,
-		                 1.0f, 0.0f);
-		x += FLOAT_803316D0;
+		const float* pZmm2 = &FLOAT_803313dc;
+		const float* pOmm4 = &FLOAT_803313e8;
+		const float* pWmm1 = &FLOAT_803316D0;
+		const float* pHmm2 = &FLOAT_80331500;
+		MenuPcs.DrawRect(0, x, y, *pWmm1, *pHmm2, *pZmm2, *pZmm2, *pOmm4,
+		                 *pOmm4, *pZmm2);
+		const float* pZmm3 = &FLOAT_803313dc;
+		const float* pOmm5 = &FLOAT_803313e8;
+		const float* pWmm2 = &FLOAT_803316D0;
+		const float* pHmm3 = &FLOAT_80331500;
+		MenuPcs.DrawRect(8, x + *pWmm2, y,
+		                 *pWmm2, *pHmm3, *pZmm3, *pZmm3, *pOmm5, *pOmm5, *pZmm3);
+		const float* pHmm4 = &FLOAT_80331500;
+		y = y + *pHmm4;
+		const float* pZmm4 = &FLOAT_803313dc;
+		const float* pOmm6 = &FLOAT_803313e8;
+		const float* pWmm3 = &FLOAT_803316D0;
+		const float* pHmm5 = &FLOAT_80331500;
+		MenuPcs.DrawRect(4, x, y, *pWmm3, *pHmm5, *pZmm4, *pZmm4, *pOmm6,
+		                 *pOmm6, *pZmm4);
+		const float* pWmm4 = &FLOAT_803316D0;
+		x += *pWmm4;
+		const float* pZmm5 = &FLOAT_803313dc;
+		const float* pOmm7 = &FLOAT_803313e8;
+		const float* pWmm5 = &FLOAT_803316D0;
+		const float* pHmm6 = &FLOAT_80331500;
 		MenuPcs.DrawRect(0xC, x, y,
-		                 FLOAT_803316D0, FLOAT_80331500, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+		                 *pWmm5, *pHmm6, *pZmm5, *pZmm5, *pOmm7, *pOmm7, *pZmm5);
 	}
 
 	DrawMainMenuSub();
@@ -4251,15 +4284,21 @@ void CMenuPcs::DrawMainMenu()
 		double helpColorAlpha;
 		float helpAlpha;
 		if (helpState == 1) {
-			helpAlpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+			const double* pRmm5 = &DOUBLE_803314E8;
+			helpAlpha = static_cast<float>(*pRmm5 * static_cast<double>(m_wmWorldState->m_frameCounter));
 		} else if (helpState == 2) {
-			helpAlpha = FLOAT_803313e8;
+			const float* pOmm8 = &FLOAT_803313e8;
+			helpAlpha = *pOmm8;
 		} else {
-			helpAlpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
+			const double* pRmm6 = &DOUBLE_803314E8;
+			const double* pUmm3 = &DOUBLE_80331420;
+			helpAlpha = static_cast<float>(-(*pRmm6 * static_cast<double>(m_wmWorldState->m_frameCounter) - *pUmm3));
 		}
-		if (static_cast<double>(helpAlpha) > DOUBLE_803314F0) {
+		const double* pFmm1 = &DOUBLE_803314F0;
+		if (static_cast<double>(helpAlpha) > *pFmm1) {
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-			helpColorAlpha = static_cast<double>(FLOAT_80331458 * helpAlpha);
+			const float* p255mm = &FLOAT_80331458;
+			helpColorAlpha = static_cast<double>(*p255mm * helpAlpha);
 			GXColor helpColor;
 			helpColor.r = 0xFF;
 			helpColor.g = 0xFF;
@@ -4267,8 +4306,13 @@ void CMenuPcs::DrawMainMenu()
 			helpColor.a = static_cast<unsigned char>(static_cast<int>(helpColorAlpha));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
-			MenuPcs.DrawRect(0, FLOAT_803313dc, static_cast<float>(DOUBLE_803314D0 - static_cast<double>(FLOAT_80331440)),
-			                 FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			const float* pZmm6 = &FLOAT_803313dc;
+			const float* pOmm9 = &FLOAT_803313e8;
+			const float* pWmm6 = &FLOAT_803313e0;
+			const float* p440mm = &FLOAT_80331440;
+			const double* pBmm1 = &DOUBLE_803314D0;
+			MenuPcs.DrawRect(0, *pZmm6, static_cast<float>(*pBmm1 - static_cast<double>(*p440mm)),
+			                 *pWmm6, *p440mm, *pZmm6, *pZmm6, *pOmm9, *pOmm9, *pZmm6);
 
 			char* textList[5] = { 0, 0, 0, 0, 0 };
 			const int languageIndex = Game.m_gameWork.m_languageId - 1;
@@ -4292,9 +4336,14 @@ void CMenuPcs::DrawMainMenu()
 			}
 			CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF));
 			char* const text = textList[m_wmWorldState->m_cardChannel];
-			const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
-			DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor.color, 7, text,
-			          FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+			const float* pWt1 = &FLOAT_80331594;
+			const float* pHt1 = &FLOAT_803313e8;
+			const int x = static_cast<int>(CalcCenteringPos2(text, *pWt1, *pHt1));
+			const float* pYt1 = &FLOAT_803317D0;
+			const float* pWt2 = &FLOAT_80331594;
+			const float* pHt2 = &FLOAT_803313e8;
+			DrawFont2(x, static_cast<int>(*pYt1), textColor.color, 7, text,
+			          *pWt2, *pHt2, *pHt2);
 		}
 	}
 

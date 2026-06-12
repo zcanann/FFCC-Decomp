@@ -8456,7 +8456,7 @@ void CMenuPcs::DrawChara()
 	WmWorldState* const worldState = GetWmWorldState(this);
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		unsigned char* const view = m_wm.m_worldObjData + 0xA00 + i * 0x50;
+		unsigned char* const view = m_wm.m_worldObjData + (0xA00 + i * 0x50);
 		if (*reinterpret_cast<int*>(view) == 0) {
 			continue;
 		}

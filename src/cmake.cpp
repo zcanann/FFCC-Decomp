@@ -1046,11 +1046,11 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             villageWork->m_resultDir = 1;
             return 1;
         } else {
-            curSelect = select;
             curTable = table;
+            curSelect = select;
             memset(picked, 0, 3);
-            picked[0] = '\0';
             const char* rowText = s_NameEntryStr[curRow + curTable * 5];
+            picked[0] = '\0';
             int rowLen = strlen(rowText);
             if (rowLen != 0) {
                 int i = 0;
@@ -2731,8 +2731,8 @@ int CMenuPcs::CmakeNameCtrl()
                     curSelect = CmakeState(this)->m_select;
                     char picked[12];
                     memset(picked, 0, 3);
-                    picked[0] = '\0';
                     const char* rowText = s_NameEntryStr[curRow + curTable * 5];
+                    picked[0] = '\0';
                     int rowLen = strlen(rowText);
                     if (rowLen != 0) {
                         int i = 0;

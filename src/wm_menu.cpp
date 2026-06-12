@@ -11054,10 +11054,10 @@ LAB_next:
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 			double rawA;
 			double rawB;
-			reinterpret_cast<int*>(&rawA)[0] = 0x43300000;
 			reinterpret_cast<int*>(&rawA)[1] = slot ^ 0x80000000;
-			reinterpret_cast<int*>(&rawB)[0] = 0x43300000;
+			reinterpret_cast<int*>(&rawA)[0] = 0x43300000;
 			reinterpret_cast<int*>(&rawB)[1] = slot ^ 0x80000000;
+			reinterpret_cast<int*>(&rawB)[0] = 0x43300000;
 			MenuPcs.DrawRect(0, FLOAT_803314D8,
 			         static_cast<float>(static_cast<float>(sepSlope * (rawA - sepBias) + sepBase) -
 			                            sepOff),
@@ -11069,18 +11069,23 @@ LAB_next:
 
 	if (worldState->m_subState >= 0x11 &&
 	    worldState->m_mainState < 3) {
-		const double mapX = DOUBLE_80331510 + static_cast<double>(FLOAT_80331518);
+		const double* pOff2 = &DOUBLE_80331510;
+		const float* p518a = &FLOAT_80331518;
+		const double mapX = *pOff2 + static_cast<double>(*p518a);
 		const int language = Game.m_gameWork.m_languageId;
 		int* digitWidths = reinterpret_cast<int*>(rodataBase + 0x920);
 		int* playWidths = reinterpret_cast<int*>(rodataBase + 0xab0);
-		const double rowSlopeD = DOUBLE_80331498;
-		const double rowBias = DOUBLE_80331408;
-		const double rowBaseD = DOUBLE_80331490;
+		const double* pSl2 = &DOUBLE_80331498;
+		const double rowSlopeD = *pSl2;
+		const double* pBi2 = &DOUBLE_80331408;
+		const double rowBias = *pBi2;
+		const double* pBa2 = &DOUBLE_80331490;
+		const double rowBaseD = *pBa2;
 		for (slot = 0, slotOff = slot; slot < kMcListCount; slot++, slotOff += kMcListEntrySize) {
 			unsigned char* const slotData = m_wmCharaState + slotOff;
 			double rawRow;
-			reinterpret_cast<int*>(&rawRow)[0] = 0x43300000;
 			reinterpret_cast<int*>(&rawRow)[1] = slot ^ 0x80000000;
+			reinterpret_cast<int*>(&rawRow)[0] = 0x43300000;
 			const float slotY = static_cast<float>(rowSlopeD * (rawRow - rowBias) + rowBaseD);
 			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<char*>(slotData + 0x41) != 0) {
 				float rowY = FLOAT_80331440 + slotY;
@@ -11315,8 +11320,8 @@ LAB_next:
 			char line2[64];
 			unsigned char* const slotData = m_wmCharaState + slotOff;
 			double rawT;
-			reinterpret_cast<int*>(&rawT)[0] = 0x43300000;
 			reinterpret_cast<int*>(&rawT)[1] = slot ^ 0x80000000;
+			reinterpret_cast<int*>(&rawT)[0] = 0x43300000;
 			const float slotY = static_cast<float>(tSlope * (rawT - tBias) + tBase);
 			if (*reinterpret_cast<char*>(slotData + 0x42) != 0 || *reinterpret_cast<int*>(slotData + 8) <= 0) {
 				fontF8->SetMargin(FLOAT_803313e8);

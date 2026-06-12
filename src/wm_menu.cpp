@@ -11686,8 +11686,6 @@ void CMenuPcs::CalcMcObj()
 	const float* pPanelF = &FLOAT_80331480;
 	const float panelStateFloat = *pPanelF;
 
-	SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
-
 	const double* pY48 = &DOUBLE_80331488;
 	const double* pY88 = &DOUBLE_80331498;
 	const double* pY24 = &DOUBLE_80331490;
@@ -11696,6 +11694,7 @@ void CMenuPcs::CalcMcObj()
 	const float* p50 = &FLOAT_803314A4;
 	const double* p25 = &DOUBLE_803314A8;
 
+	SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
 	int i;
 	unsigned int* panelState = reinterpret_cast<unsigned int*>(worldObj + 0x550);
 	for (i = 0; i < 4; i++, panelState = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(panelState) + 0x50)) {
@@ -11746,11 +11745,11 @@ void CMenuPcs::CalcMcObj()
 			    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelYOffsetSplineCount),
 			                                   static_cast<float>(static_cast<int>(panelState[1]))));
 
-			const float* pBC2 = &FLOAT_803314bc;
-			reinterpret_cast<float*>(panelState)[0xB] =
-			    *pBC2 *
+			const float rotVal =
 			    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelRotationSplineCount),
 			                                   static_cast<float>(static_cast<int>(panelState[1]))));
+			const float* pBC2 = &FLOAT_803314bc;
+			reinterpret_cast<float*>(panelState)[0xB] = *pBC2 * rotVal;
 			PSMTXScale(scaleMtx, reinterpret_cast<float*>(panelState)[0xD], reinterpret_cast<float*>(panelState)[0xE],
 			           reinterpret_cast<float*>(panelState)[0xF]);
 			PSMTXRotRad(rotXMtx, 'x', reinterpret_cast<float*>(panelState)[10]);

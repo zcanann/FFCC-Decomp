@@ -1908,16 +1908,14 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
     while (true) {
         CAmemCache* bestEntry = 0;
 
-        int offset = 0;
         for (int i = 0; i < m_cacheCount; i++) {
-            CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
+            CAmemCache& entry = cacheEntryAt(this, i);
             if (entry.m_inUse != 0 && entry.m_refCount == 0 && entry.m_dmaCopy != 0 &&
                 entry.m_cacheData != 0 && entry.m_size >= currentSize &&
                 static_cast<unsigned int>(entry.m_priority) < bestPriority) {
                 bestEntry = &entry;
                 bestPriority = static_cast<unsigned int>(entry.m_priority);
             }
-            offset += sizeof(CAmemCache);
         }
 
         if (bestEntry != 0) {
@@ -1945,19 +1943,14 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
                 System.Printf(const_cast<char*>(strBase + 0x4c));
             }
 
-            int i;
-            int offset2;
-            i = 0;
-            offset2 = i;
-            for (; i < m_cacheCount; i++) {
-                CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset2);
+            for (int i = 0; i < m_cacheCount; i++) {
+                CAmemCache& entry = cacheEntryAt(this, i);
                 if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                     System.Printf(
                         const_cast<char*>(strBase + 0xd8), i, cacheStateName(entry),
                         cacheTypeName(entry), entry.m_refCount, entry.m_priority,
                         reinterpret_cast<int>(entry.m_cacheData));
                 }
-                offset2 += sizeof(CAmemCache);
             }
 
             if (static_cast<unsigned int>(System.m_execParam) >= 3) {

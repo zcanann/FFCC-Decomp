@@ -265,7 +265,7 @@ void CMenuPcs::TmpArtiDraw()
 	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_treasures[i] >= 0) {
 			float alpha = entry->alpha;
-			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(kTmpArtiColorMax * alpha));
+			CColor textColor(0xFF, 0xFF, 0xFF, kTmpArtiColorMax * alpha);
 			font->SetColor(textColor.color);
 
 			const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[caravanWork->m_treasures[i] * 5 + 4];

@@ -24,12 +24,13 @@ public:
 	CBound(float min, float max)
 	{
 		float lo = min;
+		float hi = max;
 		m_min.z = lo;
 		m_min.y = lo;
 		m_min.x = lo;
-		m_max.z = max;
-		m_max.y = max;
-		m_max.x = max;
+		m_max.z = hi;
+		m_max.y = hi;
+		m_max.x = hi;
 	}
 	static void SetFrustum(Vec&, float(*)[4]);
 	int CheckFrustum0(CBound&);

@@ -250,6 +250,7 @@ void CMenuPcs::ArtiDraw()
 	float h;
 	float u;
 	float v;
+	GXColor colors[4];
 
 	for (int i = 0; i < GetArtiOpenAnimList(this)->count; i++) {
 		int tex = entry->tex;
@@ -265,7 +266,6 @@ void CMenuPcs::ArtiDraw()
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
-				GXColor colors[4];
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
 				colors[0].b = 0xFF;
@@ -326,12 +326,11 @@ void CMenuPcs::ArtiDraw()
 				}
 
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(texId));
-				GXColor color;
-				color.r = 0xFF;
-				color.g = 0xFF;
-				color.b = 0xFF;
-				color.a = (u8)(LoadFloat(kArtiColorMax) * itemAlpha);
-				GXSetChanMatColor(GX_COLOR0A0, color);
+				colors[0].r = 0xFF;
+				colors[0].g = 0xFF;
+				colors[0].b = 0xFF;
+				colors[0].a = (u8)(LoadFloat(kArtiColorMax) * itemAlpha);
+				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				float uvScale = entry->scale;
 				MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, LoadFloat(kArtiZero));
 			}

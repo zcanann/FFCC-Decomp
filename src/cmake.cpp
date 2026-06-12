@@ -1021,6 +1021,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         } else if ((down & 0x100) != 0) {
             short curTable;
             short curSelect;
+            const char* rowText;
             short curRow = row;
             if (curRow >= 5) {
             unsigned int emptyLen = strlen(s_CmakeInfo.m_name);
@@ -1049,7 +1050,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
             curTable = table;
             curSelect = select;
             memset(picked, 0, 3);
-            const char* rowText = s_NameEntryStr[curRow + curTable * 5];
+            rowText = s_NameEntryStr[curRow + curTable * 5];
             picked[0] = '\0';
             int rowLen = strlen(rowText);
             if (rowLen != 0) {
@@ -2694,6 +2695,7 @@ int CMenuPcs::CmakeNameCtrl()
             } else if ((down & 0x100) != 0) {
                 short curTable;
                 short curSelect;
+                const char* rowText;
                 short curRow = CmakeState(this)->m_row;
                 if (curRow >= 5) {
                     int emptyLen = strlen(s_CmakeInfo.m_name);
@@ -2731,7 +2733,7 @@ int CMenuPcs::CmakeNameCtrl()
                     curSelect = CmakeState(this)->m_select;
                     char picked[12];
                     memset(picked, 0, 3);
-                    const char* rowText = s_NameEntryStr[curRow + curTable * 5];
+                    rowText = s_NameEntryStr[curRow + curTable * 5];
                     picked[0] = '\0';
                     int rowLen = strlen(rowText);
                     if (rowLen != 0) {

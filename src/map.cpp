@@ -2222,9 +2222,8 @@ int CMapMng::ReadOtm(char* mapName)
     }
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        CMapObj* mapObj = m_octTreeArray[i].GetMapObject();
-        if (mapObj != 0) {
-            mapObj->m_octTreeIndex = static_cast<signed char>(i);
+        if (m_octTreeArray[i].GetMapObject() != 0) {
+            m_octTreeArray[i].GetMapObject()->m_octTreeIndex = static_cast<signed char>(i);
         }
     }
 

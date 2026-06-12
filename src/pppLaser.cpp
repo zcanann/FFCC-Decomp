@@ -255,7 +255,9 @@ extern "C" void pppFrameLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCtr
         pppSubVector(localA, work->m_points[i], work->m_origin);
         PSVECScale(&localA, &localA, LaserConst(kPppLaserAxisScale));
 
-        CMapCylinder cyl(LaserConst(kPppLaserBoundsMin), LaserConst(kPppLaserBoundsMax));
+        f32 boundsMax = LaserConst(kPppLaserBoundsMax);
+        f32 boundsMin = LaserConst(kPppLaserBoundsMin);
+        CMapCylinder cyl(boundsMax, boundsMin);
         cyl.m_bottom = work->m_origin;
         cyl.m_axis = localA;
         cyl.m_radius = LaserConst(kPppLaserZero);

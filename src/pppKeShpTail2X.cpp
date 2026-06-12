@@ -3,13 +3,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
-extern "C" {
-extern const float kPppKeShpTail2XZero = 0.0f;
-extern const float kPppKeShpTail2XAlphaScale = 16384.0f;
-extern const float kPppKeShpTail2XHalf = 0.5f;
-extern const double kPppKeShpTail2XSignedIntBias = 4503601774854144.0;
-extern const double kPppKeShpTail2XUnsignedIntBias = 4503599627370496.0;
-}
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
@@ -163,7 +156,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     s32 nextIndex;
     s32 lastIndex;
     int zEnable;
-    float segCursor = kPppKeShpTail2XZero;
+    float segCursor = 0.0f;
     s32 dataValIndex;
 
     dataValIndex = step->m_dataValIndex;
@@ -172,7 +165,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     }
 
     count = step->m_drawCount;
-    alphaMul = (float)GetKeShpTail2XAlphaWork(&obj->m_object, param_3)->m_alpha / kPppKeShpTail2XAlphaScale;
+    alphaMul = (float)GetKeShpTail2XAlphaWork(&obj->m_object, param_3)->m_alpha / 16384.0f;
     U8ToF32(&colorStart, &step->m_colorStartR);
     U8ToF32(&colorEnd, &step->m_colorEndR);
     colorStart.w *= alphaMul;
@@ -185,8 +178,8 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
         colorStepB = (colorStart.z - colorEnd.z) / invCountMinusOne;
         colorStepA = diffA / invCountMinusOne;
     } else {
-        colorStepR = *(const volatile float*)&kPppKeShpTail2XHalf;
-        colorStepG = LoadFloat(kPppKeShpTail2XHalf);
+        colorStepR = 0.5f;
+        colorStepG = LoadFloat(0.5f);
         colorStepB = colorStepR;
         colorStepA = colorStepR;
     }
@@ -229,9 +222,9 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     segDx = nextBaseX - curX;
     segDy = nextBaseY - curY;
     segDz = nextBaseZ - curZ;
-    zeroVec.x = kPppKeShpTail2XZero;
-    zeroVec.y = kPppKeShpTail2XZero;
-    zeroVec.z = kPppKeShpTail2XZero;
+    zeroVec.x = 0.0f;
+    zeroVec.y = 0.0f;
+    zeroVec.z = 0.0f;
     initialSeg.x = segDx;
     initialSeg.y = segDy;
     initialSeg.z = segDz;
@@ -267,7 +260,7 @@ draw_loop:
     drawMtx.value[2][3] = pos.z;
 
     zEnable = (step->m_zDisable == 0);
-    pppSetDrawEnv(0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : kPppKeShpTail2XZero, 0,
+    pppSetDrawEnv(0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : 0.0f, 0,
                   step->m_drawA, step->m_blendMode, 0, zEnable, 1, 0);
 
     {
@@ -293,7 +286,7 @@ update_step:
     colorStart.z -= colorStepB;
     colorStart.w -= colorStepA;
     drawScale -= scaleStepDelta;
-    if (trailStep <= kPppKeShpTail2XZero) {
+    if (trailStep <= 0.0f) {
         return;
     }
 
@@ -325,9 +318,9 @@ move_next_segment:
     segDx = nextBaseX - segBaseX;
     segDy = nextBaseY - segBaseY;
     segDz = nextBaseZ - segBaseZ;
-    zeroVecB.x = kPppKeShpTail2XZero;
-    zeroVecB.y = kPppKeShpTail2XZero;
-    zeroVecB.z = kPppKeShpTail2XZero;
+    zeroVecB.x = 0.0f;
+    zeroVecB.y = 0.0f;
+    zeroVecB.z = 0.0f;
     seg.x = segDx;
     seg.y = segDy;
     seg.z = segDz;

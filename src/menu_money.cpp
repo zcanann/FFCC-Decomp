@@ -36,10 +36,10 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	int gil;
 	signed char* place;
 
-	if (row != 0) {
-		gil = s_Money;
-	} else {
+	if (row == 0) {
 		gil = caravanWork->m_gil;
+	} else {
+		gil = s_Money;
 	}
 
 	digitPlace *= 10000000;
@@ -410,9 +410,10 @@ void CMenuPcs::MoneyDraw()
 
 	const char* label = GetMenuStr(0x15);
 	for (i = 0; i < 2; i++) {
+		float labelY = (32.0f + ((float)(drawBase->y + 0x18) + 32.0f * (float)i)) -
+		               19.8f;
 		font->SetPosX((float)(drawBase->x + 0xB6));
-		font->SetPosY((32.0f + ((float)(drawBase->y + 0x18) + 32.0f * (float)i)) -
-		              19.8f - 4.0f);
+		font->SetPosY(labelY - 4.0f);
 		font->Draw(label);
 	}
 
@@ -426,11 +427,11 @@ void CMenuPcs::MoneyDraw()
 
 	if ((mode != 0) && (this->m_moneyState->optionState == 1)) {
 		MenuWindowInfo* window = this->m_menuWindowInfo;
+		x = (float)window->x;
 		y = (float)(window->y + 0x20);
 		y += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
 
 		int anim = (int)System.m_frameCounter % 8;
-		x = (float)window->x;
 		x += (float)anim;
 		DrawCursor((int)x, (int)y, 1.0f);
 	}

@@ -68,24 +68,34 @@ void draw__9CLightPcsFv(CLightPcs*);
 void MakeLightMap__9CLightPcsFv(CLightPcs*);
 }
 
+inline CLightPcs::CLightPcs()
+{
+    static CProcessTableCallback s_lightTableDescCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
+    static CProcessTableCallback s_lightTableDescDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};
+    static CProcessTableCallback s_lightTableDescCalc = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CLightPcsFv)};
+    static CProcessTableCallback s_lightTableDescDraw = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
+    static CProcessTableCallback s_lightTableDescMakeLightMap = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
+    CProcessTable* table = &m_table;
+
+    table->m_fields.m_create = s_lightTableDescCreate;
+    table->m_fields.m_destroy = s_lightTableDescDestroy;
+    table->m_fields.m_entries[0].m_callback = s_lightTableDescCalc;
+    table->m_fields.m_entries[1].m_callback = s_lightTableDescDraw;
+    table->m_fields.m_entries[2].m_callback = s_lightTableDescMakeLightMap;
+}
+
 CLightPcs LightPcs;
 
-static CProcessTableCallback s_lightTableDescCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
-static CProcessTableCallback s_lightTableDescDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};
-static CProcessTableCallback s_lightTableDescCalc = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CLightPcsFv)};
-static CProcessTableCallback s_lightTableDescDraw = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
-static CProcessTableCallback s_lightTableDescMakeLightMap = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
 CProcessTable CLightPcs::m_table = {
     const_cast<char*>(sLightPcsClassName),
     {
-        s_lightTableDescCreate.m_thisOffset, s_lightTableDescCreate.m_virtualOffset, s_lightTableDescCreate.m_function,
-        s_lightTableDescDestroy.m_thisOffset, s_lightTableDescDestroy.m_virtualOffset, s_lightTableDescDestroy.m_function,
-        s_lightTableDescCalc.m_thisOffset, s_lightTableDescCalc.m_virtualOffset, s_lightTableDescCalc.m_function,
+        0, 0, 0,
+        0, 0, 0,
+        0, 0, 0,
         0x1C, 0,
-        s_lightTableDescDraw.m_thisOffset, s_lightTableDescDraw.m_virtualOffset, s_lightTableDescDraw.m_function,
+        0, 0, 0,
         0x2A, 0,
-        s_lightTableDescMakeLightMap.m_thisOffset, s_lightTableDescMakeLightMap.m_virtualOffset,
-        s_lightTableDescMakeLightMap.m_function,
+        0, 0, 0,
         0x2D, 1,
     },
 };

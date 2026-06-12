@@ -10108,12 +10108,19 @@ void CMenuPcs::ChgAllModel2()
  */
 void CMenuPcs::ChgAllModel()
 {
-	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
-	unsigned char* handleData = bytes;
-	int modelOffset = 0;
+	int i;
+	unsigned char* bytes;
+	int modelOffset;
+	unsigned char* gameData;
+	unsigned char* handleData;
 
-	for (int i = 0; i < kWmMenuPlayerCount; i++) {
+	bytes = reinterpret_cast<unsigned char*>(this);
+	gameData = reinterpret_cast<unsigned char*>(&Game);
+	i = 0;
+	handleData = bytes;
+	modelOffset = 0;
+
+	for (; i < kWmMenuPlayerCount; i++) {
 		unsigned char* caravanData = gameData + 0x13F0;
 		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
 		unsigned int race;
@@ -10123,7 +10130,7 @@ void CMenuPcs::ChgAllModel()
 
 		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
 			race = *reinterpret_cast<unsigned short*>(caravanData + 0x3E0);
-			variant = *reinterpret_cast<short*>(caravanData + 0x3E2);
+			variant = *reinterpret_cast<unsigned short*>(caravanData + 0x3E2);
 			index = *reinterpret_cast<unsigned short*>(caravanData + 0x3E4);
 			modelId = race * 200 + 100;
 			if (variant != 0) {

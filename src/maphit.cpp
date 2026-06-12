@@ -480,7 +480,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    Vec* hitDirection = &cyl.m_axis;
+    Vec* hitDirection = reinterpret_cast<Vec*>(Ptr(&g_hit_cyl, 0x18));
     float dot = PSVECDotProduct(hitDirection, &g_hit_lpface->m_normal);
     if (dot >= kMapHitZero) {
         return 0;
@@ -502,13 +502,13 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 
     {
         PSVECScale(hitDirection, &g_hit_hpv, hitT);
-        PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
+        PSVECAdd(&cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
         Vec pushedHit;
         Vec scaledNormal;
         Vec edgeStart;
         Vec edgeEnd;
-        PSVECScale(&g_hit_lpface->m_normal, &scaledNormal, g_hit_cyl.m_radius);
+        PSVECScale(&g_hit_lpface->m_normal, &scaledNormal, cyl.m_radius);
         PSVECSubtract(&g_hit_hpv, &scaledNormal, &pushedHit);
 
         unsigned int sideMask = 3;
@@ -649,13 +649,13 @@ edge_loop:
                 Vec edge;
                 PSVECSubtract(&current, &previous, &edge);
 
-                Vec rayDirection = *hitDirection;
+                Vec rayDirection = *reinterpret_cast<Vec*>(Ptr(&g_hit_cyl, 0x18));
                 Vec rayStart = cyl.m_bottom;
 
                 CMapCylinder edgeCylinder;
                 edgeCylinder.m_bottom = previous;
                 edgeCylinder.m_axis = edge;
-                edgeCylinder.m_radius = g_hit_cyl.m_radius;
+                edgeCylinder.m_radius = cyl.m_radius;
 
                 float edgeT;
                 if (FindIntersection(rayStart, rayDirection, edgeCylinder, edgeT) != 0 &&

@@ -31,21 +31,21 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	int digitPlace = 1;
 	int digitIndex;
-	int started = 0;
+	int started;
 	int gil;
 	signed char* place;
 
-	if (row == 0) {
-		gil = caravanWork->m_gil;
-	} else {
+	if (row != 0) {
 		gil = s_Money;
+	} else {
+		gil = caravanWork->m_gil;
 	}
+	digitIndex = started = 0;
 
 	digitPlace *= 10000000;
-	digitIndex = 0;
 	place = &s_place[row * 8];
 
-	do {
+	while (digitIndex < 8) {
 		if ((!started) && (gil >= digitPlace)) {
 			started = 1;
 		}
@@ -62,7 +62,7 @@ inline void CMenuPcs::MoneySetPlace(int row)
 		place++;
 		digitIndex++;
 		digitPlace /= 10;
-	} while (digitIndex < 8);
+	}
 }
 
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
@@ -388,7 +388,7 @@ void CMenuPcs::MoneyDraw()
 			GXSetChanMatColor(GX_COLOR0A0, cursorColor);
 		}
 
-		MenuPcs.DrawRect(0, (float)(drawBase->x + (7 - this->m_moneyState->selections[0]) * 0x12 + 0x24),
+			MenuPcs.DrawRect(0, (float)(drawBase->x + (7 - this->m_moneyState->selections[0]) * 0x12 + 0x24),
 		                 (float)(drawBase->y + 0x5C), 16.0f, 24.0f,
 		                 0.0f, 0.0f, 1.0f,
 		                 1.0f, 0.0f);
@@ -400,17 +400,13 @@ void CMenuPcs::MoneyDraw()
 	font->SetScale(0.9f);
 	font->DrawInit();
 
-	{
-		CColor color(0xFF, 0xFF, 0xFF, (u8)(255.0f * drawBase->alpha));
-		font->SetColor(color.color);
-	}
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(255.0f * drawBase->alpha)).color);
 
 	const char* label = GetMenuStr(0x15);
 	for (i = 0; i < 2; i++) {
-		float labelY = (32.0f + ((float)(drawBase->y + 0x18) + 32.0f * (float)i)) -
-		               19.8f;
+		y = (32.0f + ((float)(drawBase->y + 0x18) + 32.0f * (float)i)) - 19.8f;
 		font->SetPosX((float)(drawBase->x + 0xB6));
-		font->SetPosY(labelY - 4.0f);
+		font->SetPosY(y - 4.0f);
 		font->Draw(label);
 	}
 
@@ -424,12 +420,10 @@ void CMenuPcs::MoneyDraw()
 
 	if ((mode != 0) && (this->m_moneyState->optionState == 1)) {
 		MenuWindowInfo* window = this->m_menuWindowInfo;
-		x = (float)window->x;
 		y = (float)(window->y + 0x20);
+		x = (float)window->x;
 		y += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
-
-		int anim = (int)System.m_frameCounter % 8;
-		x += (float)anim;
+		x += (float)((int)System.m_frameCounter % 8);
 		DrawCursor((int)x, (int)y, 1.0f);
 	}
 }
@@ -549,11 +543,9 @@ bool CMenuPcs::MoneyOpen()
 	if (this->m_moneyState->initialized == '\0') {
 		memset(this->m_moneyPanel, 0, sizeof(*this->m_moneyPanel));
 
-		float one = 1.0f;
 		MoneyMenuAnim* initAnim = this->m_moneyPanel->anims;
-		int initCount;
-		for (initCount = 0; initCount < 64; initCount++, initAnim++) {
-			initAnim->uvScale = one;
+		for (int i = 0; i < 64; i++, initAnim++) {
+			initAnim->uvScale = 1.0f;
 		}
 
 		int entryIndex = 0;
@@ -572,11 +564,9 @@ bool CMenuPcs::MoneyOpen()
 		this->m_moneyPanel->count = entryIndex;
 
 		s_Money = 0;
-		int row = 0;
-		do {
+		for (int row = 0; row < 2; row++) {
 			MoneySetPlace(row);
-			row = row + 1;
-		} while (row < 2);
+		}
 
 		this->m_moneyState->selections[0] = 0;
 		this->m_moneyState->initialized = 1;

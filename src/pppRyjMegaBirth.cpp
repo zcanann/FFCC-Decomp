@@ -28,7 +28,7 @@ static inline RyjMegaBirthDataOffsets* GetRyjMegaBirthDataOffsets(_pppCtrlTable*
 	return reinterpret_cast<RyjMegaBirthDataOffsets*>(ctrlTable->m_serializedDataOffsets);
 }
 
-extern const float kPppRyjMegaBirthDegToRad = 0.017453292f;
+extern const float kPppRyjMegaBirthDegToRad;
 extern const float kPppRyjMegaBirthAngleWrapDegrees = 360.0f;
 extern const float kPppRyjMegaBirthHalfTurnDegrees = 180.0f;
 extern const float kPppRyjMegaBirthNegativeHalfTurnDegrees = -180.0f;
@@ -42,7 +42,6 @@ extern const float kPppRyjMegaBirthSignFlipTable[2] = { -1.0f, 0.0f };
 extern const float kPppRyjMegaBirthSharedZero = 0.0f;
 extern const float kPppRyjMegaBirthModelInitialY = 30.0f;
 extern const float kPppRyjMegaBirthPi = 3.1415927f;
-extern const float kPppRyjMegaBirthAngleIndexScale = 32768.0f;
 
 static inline float RyjZero()
 {

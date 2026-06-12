@@ -5007,19 +5007,17 @@ void CMenuPcs::DrawCMakeMenu()
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	int bit = 0;
-	int byteOffset = bit;
 	do {
 		if (((1 << bit) & 3) != 0) {
 			const float* pZeroF = &FLOAT_803313dc;
 			const float* pOneF = &FLOAT_803313e8;
-			short* const entry = reinterpret_cast<short*>(m_wm.m_frameInfo + byteOffset + 4);
+			short* const entry = reinterpret_cast<short*>(reinterpret_cast<unsigned char(*)[0x1C]>(m_wm.m_frameInfo)[bit] + 4);
 			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(entry + 0xC), static_cast<float>(entry[0]),
 			                 static_cast<float>(entry[1]), static_cast<float>(entry[2]), static_cast<float>(entry[3]),
 			                 *reinterpret_cast<float*>(entry + 4), *reinterpret_cast<float*>(entry + 6),
 			                 *pOneF, *pOneF, *pZeroF);
 		}
 		bit++;
-		byteOffset += 0x1C;
 	} while (bit < 2);
 
 	short contentState;
@@ -5104,7 +5102,7 @@ void CMenuPcs::DrawCMakeMenu()
 			textList[1] = langText[ti];
 			ti = 7;
 			textList[2] = langText[ti];
-			_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
+			const _GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 			char* const text = textList[textIndex];
 			const float* pW1 = &FLOAT_80331594;
 			const float* pH1 = &FLOAT_803313e8;

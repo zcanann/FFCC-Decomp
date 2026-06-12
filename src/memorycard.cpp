@@ -379,10 +379,10 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
  */
 unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
 {
-    unsigned char* ptr;
-    unsigned char* ptr2;
     int count;
+    unsigned char* ptr;
     int count2;
+    unsigned char* ptr2;
     unsigned int crc;
     unsigned char* crcData;
 

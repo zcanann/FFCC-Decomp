@@ -2604,14 +2604,14 @@ inline void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
     extern const float kMapZero;
     extern const float kMapTinyEpsilon;
 
+    GXLightObj lightObj;
+    Vec v;
     Mtx cameraMtx;
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
     float dirY = lightDir.y;
     float dirZ = lightDir.z;
 
-    GXLightObj lightObj;
-    Vec v;
     v.x = kMapLargeDistance * -lightDir.x;
     v.y = kMapLargeDistance * -dirY;
     v.z = kMapLargeDistance * -dirZ;

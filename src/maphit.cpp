@@ -480,7 +480,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    Vec* hitDirection = &cyl.m_axis;
+    Vec* hitDirection = reinterpret_cast<Vec*>(Ptr(&g_hit_cyl, 0x18));
     float dot = PSVECDotProduct(hitDirection, &g_hit_lpface->m_normal);
     if (dot >= kMapHitZero) {
         return 0;

@@ -2671,9 +2671,12 @@ void CGObject::boundCheck()
     PSMTX44Concat(screenMtx, clipMtx, screenMtx);
 
     if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
-        const float zero = sZeroFloat;
-        const float oneF = sAnimFrameOffset;
-        const float clipLimit = sNegativeOne;
+        float clipLimit;
+        float oneF;
+        float zero;
+        zero = sZeroFloat;
+        oneF = sAnimFrameOffset;
+        clipLimit = sNegativeOne;
 
         clipMask = 0x1F;
         s32 i = 0;

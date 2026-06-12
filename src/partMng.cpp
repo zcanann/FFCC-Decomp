@@ -1032,10 +1032,13 @@ void CPartMng::pppGet2Dpos()
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x2A2);
             GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), reinterpret_cast<u32*>(&zAtPixel));
 
-            float normY = -(float)(int)raw->cursorY / kPartMngScreenHalfHeight / ppvScreenMatrix0[1][1];
+            const float* screenHalfHeight = &kPartMngScreenHalfHeight;
+            const float* depthUnit = &kPartMngDepthUnit;
+            const float* screenHalfWidth = &kPartMngScreenHalfWidth;
+            float normY = -(float)(int)raw->cursorY / *screenHalfHeight / ppvScreenMatrix0[1][1];
             float viewZ = ppvScreenMatrix0[2][3]
-                          / ((float)(zAtPixel - 0xFFFFFF) / kPartMngDepthUnit + ppvScreenMatrix0[2][2]);
-            float normX = (float)(int)raw->cursorX / kPartMngScreenHalfWidth / ppvScreenMatrix0[0][0];
+                          / ((float)(zAtPixel - 0xFFFFFF) / *depthUnit + ppvScreenMatrix0[2][2]);
+            float normX = (float)(int)raw->cursorX / *screenHalfWidth / ppvScreenMatrix0[0][0];
             viewPos.x = viewZ * normX;
             viewPos.y = viewZ * normY;
             viewPos.z = -viewZ;

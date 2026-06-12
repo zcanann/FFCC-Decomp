@@ -2796,8 +2796,7 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
 
     *recvBuffer = data;
 
-    unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
-    unsigned char op = dataBytes[0] & 0x3F;
+    unsigned char op = *reinterpret_cast<unsigned char*>(&data) & 0x3F;
 
     if ((int)op == 4)
     {
@@ -2806,11 +2805,11 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
     }
     else if ((int)op == 0x0E)
     {
-        unsigned char b1 = dataBytes[1];
+        unsigned char b1 = reinterpret_cast<unsigned char*>(&data)[1];
 
         if (b1 == 0)
         {
-            m_stateCodeArr[threadParam->m_portIndex] = dataBytes[2];
+            m_stateCodeArr[threadParam->m_portIndex] = reinterpret_cast<unsigned char*>(&data)[2];
             m_stateFlagArr[threadParam->m_portIndex] = 1;
         }
         else

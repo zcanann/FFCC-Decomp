@@ -30,9 +30,7 @@ inline void CMenuPcs::MoneySetPlace(int row)
 {
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	int digitPlace = 1;
-	int digitCount;
 	int digitIndex;
-	int digitCount;
 	int started = 0;
 	int gil;
 	signed char* place;
@@ -45,7 +43,6 @@ inline void CMenuPcs::MoneySetPlace(int row)
 
 	digitPlace *= 10000000;
 	digitIndex = 0;
-	digitCount = 8;
 	place = &s_place[row * 8];
 
 	do {
@@ -65,8 +62,7 @@ inline void CMenuPcs::MoneySetPlace(int row)
 		place++;
 		digitIndex++;
 		digitPlace /= 10;
-		digitCount--;
-	} while (digitCount != 0);
+	} while (digitIndex < 8);
 }
 
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);

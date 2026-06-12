@@ -1406,6 +1406,7 @@ chara_fur.cpp:
 	.text       start:0x800DF618 end:0x800E46DC
 	.rodata     start:0x801DB72C end:0x801DB740
 	.bss        start:0x802FF3D8 end:0x802FF408
+	.sbss       start:0x8032EDF0 end:0x8032EE1C
 	.sdata2     start:0x80331060 end:0x803310C0
 	.sbss2      start:0x80333DE8 end:0x80333DF8
 

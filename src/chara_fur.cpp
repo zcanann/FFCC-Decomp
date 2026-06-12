@@ -95,8 +95,10 @@ extern "C" char lbl_801DB648[];
 extern "C" char sMogFurTextureName[8];
 extern "C" {
 extern unsigned char m_mogWork[0x2C];
-void* DAT_8032EDEC;
-void* gMogFurTexBuffer;
+float m_height;
+void* m_pDisplayList;
+void* m_pTexBuf;
+unsigned int m_seed;
 }
 extern float kCharaFurDepthZero;
 extern float kCharaFurDepthScaleBase;
@@ -751,13 +753,11 @@ extern "C" const char s_chara_fur_cpp[] = "chara_fur.cpp";
 extern "C" {
 unsigned char m_mogWork[0x2C];
 }
-static unsigned int s_mogFurRand;
-static float s_mogFurMaxY;
 
 static inline unsigned int FurRandNext()
 {
-	s_mogFurRand = s_mogFurRand * 0x41C64E6D + 0x3039;
-	return (s_mogFurRand >> 16) % 32767;
+	m_seed = m_seed * 0x41C64E6D + 0x3039;
+	return (m_seed >> 16) % 32767;
 }
 
 static inline float FurRandScale()
@@ -1974,7 +1974,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 
 			for (unsigned int layer = 0; layer < 8; layer++) {
 				GXTexObj texObj;
-				void* texData = reinterpret_cast<unsigned char*>(gMogFurTexBuffer) + (layer * 0x4000);
+				void* texData = reinterpret_cast<unsigned char*>(m_pTexBuf) + (layer * 0x4000);
 				GXInitTexObj(&texObj, texData, 0x80, 0x80, GX_TF_IA4, GX_REPEAT, GX_REPEAT, GX_FALSE);
 				GXLoadTexObj(&texObj, GX_TEXMAP1);
 
@@ -2136,9 +2136,9 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
  */
 void CChara::freeFurTex()
 {
-	if (gMogFurTexBuffer != 0) {
-		Memory.Free(gMogFurTexBuffer);
-		gMogFurTexBuffer = 0;
+	if (m_pTexBuf != 0) {
+		Memory.Free(m_pTexBuf);
+		m_pTexBuf = 0;
 	}
 }
 
@@ -2174,7 +2174,7 @@ void CChara::makeFurTex()
 	static CVector accelBase = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
 	static CVector accelRand = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
 
-	s_mogFurRand = 0;
+	m_seed = 0;
 
 	float scaleBase = kCharaFurDepthScaleBase;
 	float randScale = FLOAT_80331164;
@@ -2220,8 +2220,8 @@ void CChara::makeFurTex()
 		hairSet[i].m_colors[1].color.a = noise1.color.a;
 
 		float endY = hairSet[i].m_vec0.y + weightScale * hairSet[i].m_vec1.y;
-		if (s_mogFurMaxY < endY) {
-			s_mogFurMaxY = endY;
+		if (m_height < endY) {
+			m_height = endY;
 		}
 	}
 
@@ -2257,7 +2257,7 @@ void CChara::makeFurTex()
 	posMtx[1][1] = kCharaFurDepthZero;
 	posMtx[2][1] = kCharaFurDepthScaleBase;
 	posMtx[0][2] = kCharaFurDepthZero;
-	posMtx[1][2] = FLOAT_8033116C * (kCharaFurViewDepthThreshold / s_mogFurMaxY);
+	posMtx[1][2] = FLOAT_8033116C * (kCharaFurViewDepthThreshold / m_height);
 	posMtx[2][2] = kCharaFurDepthZero;
 	posMtx[0][3] = kCharaFurDepthZero;
 	posMtx[1][3] = kCharaFurDepthZero;
@@ -2267,8 +2267,8 @@ void CChara::makeFurTex()
 	PSMTX44Identity(projection);
 	GXSetProjection(projection, GX_ORTHOGRAPHIC);
 
-	gMogFurTexBuffer = Memory._Alloc(0x20000, CharaPcs.m_viewerAnimStage, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
-	DCInvalidateRange(gMogFurTexBuffer, 0x20000);
+	m_pTexBuf = Memory._Alloc(0x20000, CharaPcs.m_viewerAnimStage, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
+	DCInvalidateRange(m_pTexBuf, 0x20000);
 
 	float weightScale2 = kCharaFurWeightScale;
 	float scaleBase2 = kCharaFurDepthScaleBase;
@@ -2278,7 +2278,7 @@ void CChara::makeFurTex()
 	float layerStep = FLOAT_8033115C;
 
 	for (int layer = 0; layer < 8; layer++) {
-		posMtx[2][3] -= s_mogFurMaxY * layerStep;
+		posMtx[2][3] -= m_height * layerStep;
 		GXLoadPosMtxImm(posMtx, GX_PNMTX0);
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
@@ -2312,10 +2312,10 @@ void CChara::makeFurTex()
 		CColor clearColor(layerColor);
 		clearColor.color.a = 0;
 		Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
-		GXCopyTex(static_cast<unsigned char*>(gMogFurTexBuffer) + layer * 0x4000, GX_TRUE);
+		GXCopyTex(static_cast<unsigned char*>(m_pTexBuf) + layer * 0x4000, GX_TRUE);
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-		s_mogFurRand = 0;
+		m_seed = 0;
 		for (int hair = 0; hair < 0x4000; hair++) {
 			GXBegin(GX_LINESTRIP, GX_VTXFMT0, 5);
 
@@ -2324,8 +2324,8 @@ void CChara::makeFurTex()
 			CVector rootTmp(rootX, kCharaFurDepthZero, rootZ);
 			CVector root = rootTmp;
 
-			s_mogFurRand = s_mogFurRand * 0x41C64E6D + 0x3039;
-			CHairSet& src = hairSet[(s_mogFurRand >> 16) & 0x1F];
+			m_seed = m_seed * 0x41C64E6D + 0x3039;
+			CHairSet& src = hairSet[(m_seed >> 16) & 0x1F];
 
 			float t = kCharaFurDepthZero;
 			for (int v = 0; v < 5; v++) {
@@ -2447,7 +2447,7 @@ void CChara::makeFurTex()
 			}
 		}
 
-		GXCopyTex(static_cast<unsigned char*>(gMogFurTexBuffer) + layer * 0x4000, GX_TRUE);
+		GXCopyTex(static_cast<unsigned char*>(m_pTexBuf) + layer * 0x4000, GX_TRUE);
 	}
 
 	GXPixModeSync();
@@ -2456,9 +2456,9 @@ void CChara::makeFurTex()
 	GXSetTexCopySrc(0, 0, 0x280, 0x1C0);
 	GXCopyTex(Graphic.m_scratchTextureBuffer, GX_TRUE);
 	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x138);
-	if (DAT_8032EDEC != 0) {
-		Memory.Free(DAT_8032EDEC);
-		DAT_8032EDEC = 0;
+	if (m_pDisplayList != 0) {
+		Memory.Free(m_pDisplayList);
+		m_pDisplayList = 0;
 	}
 	Graphic.SetViewport();
 	Graphic.SetStdPixelFmt();

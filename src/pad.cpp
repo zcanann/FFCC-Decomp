@@ -97,7 +97,8 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16*& puVar18, u16* p
 	float fVar2;
 	float fVar3;
 
-	fVar2 = kPadAnalogZero;
+	const float* analogZero = &kPadAnalogZero;
+	fVar2 = *analogZero;
 	CPad::PadInput* merged = reinterpret_cast<CPad::PadInput*>(puVar10);
 	merged->buttonPrev[0] = merged->button[0];
 	uVar17 = 0;
@@ -236,7 +237,8 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16*& puVar18, u16* p
 					else
 					{
 						*puVar12 = 0;
-						fVar2 = kPadAnalogZero;
+						const float* fallbackZero = &kPadAnalogZero;
+						fVar2 = *fallbackZero;
 						*reinterpret_cast<u8*>(p12 + 0x14) = 0;
 						*reinterpret_cast<u8*>(p12 + 0x15) = 0;
 						*reinterpret_cast<u8*>(p12 + 0x16) = 0;

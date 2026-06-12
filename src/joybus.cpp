@@ -3962,7 +3962,6 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         return -1;
     }
 
-    result = 0;
     localWord = 0;
     localBytes[0] = 0x0B;
 

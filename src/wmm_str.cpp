@@ -19,6 +19,16 @@ extern const char sWmmRanuraB[];
 extern const float kWmmWindowTextScale = 1.0f;
 extern const double kWmmCenteringHalf = 0.5;
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
+static inline double LoadDouble(const double& value)
+{
+    return value;
+}
+
 extern const char* s_McStr_en[];
 extern const char* s_McStr_de[];
 extern const char* s_McStr_it[];
@@ -84,16 +94,16 @@ int CMenuPcs::GetSlotABXPos(int right)
     }
 
     font = m_fonts[0];
-    font->SetMargin(kWmmWindowTextScale);
+    font->SetMargin(LoadFloat(kWmmWindowTextScale));
     font->SetShadow(0);
-    font->SetScale(kWmmWindowTextScale);
+    font->SetScale(LoadFloat(kWmmWindowTextScale));
     font->SetTlut(0x23);
 
     const int slotAWidth = (int)font->GetWidth((char*)(slotAText + 1));
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - slotAWidth);
     double windowLeft = (double)windowInfo->x;
-    double half = kWmmCenteringHalf;
+    double half = LoadDouble(kWmmCenteringHalf);
     int x = (int)(centeredWidth * half + windowLeft);
     if (right != 0) {
         const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
@@ -137,15 +147,15 @@ int CMenuPcs::GetYesNoXPos(int right)
     }
 
     font = m_fonts[0];
-    font->SetMargin(kWmmWindowTextScale);
+    font->SetMargin(LoadFloat(kWmmWindowTextScale));
     font->SetShadow(0);
-    font->SetScale(kWmmWindowTextScale);
+    font->SetScale(LoadFloat(kWmmWindowTextScale));
 
     const int yesWidth = (int)font->GetWidth((char*)(yesText + 1));
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - yesWidth);
     double windowLeft = (double)windowInfo->x;
-    double half = kWmmCenteringHalf;
+    double half = LoadDouble(kWmmCenteringHalf);
     int x = (int)(centeredWidth * half + windowLeft);
     if (right != 0) {
         const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);

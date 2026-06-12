@@ -84,16 +84,19 @@ int CMenuPcs::GetSlotABXPos(int right)
     }
 
     font = m_fonts[0];
-    font->SetMargin(kWmmWindowTextScale);
+    const float* textScale = &kWmmWindowTextScale;
+    font->SetMargin(*textScale);
     font->SetShadow(0);
-    font->SetScale(kWmmWindowTextScale);
+    textScale = &kWmmWindowTextScale;
+    font->SetScale(*textScale);
     font->SetTlut(0x23);
 
     const int slotAWidth = (int)font->GetWidth((char*)(slotAText + 1));
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - slotAWidth);
     double windowLeft = (double)windowInfo->x;
-    double half = kWmmCenteringHalf;
+    const double* halfPtr = &kWmmCenteringHalf;
+    double half = *halfPtr;
     int x = (int)(centeredWidth * half + windowLeft);
     if (right != 0) {
         const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
@@ -137,15 +140,18 @@ int CMenuPcs::GetYesNoXPos(int right)
     }
 
     font = m_fonts[0];
-    font->SetMargin(kWmmWindowTextScale);
+    const float* textScale = &kWmmWindowTextScale;
+    font->SetMargin(*textScale);
     font->SetShadow(0);
-    font->SetScale(kWmmWindowTextScale);
+    textScale = &kWmmWindowTextScale;
+    font->SetScale(*textScale);
 
     const int yesWidth = (int)font->GetWidth((char*)(yesText + 1));
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - yesWidth);
     double windowLeft = (double)windowInfo->x;
-    double half = kWmmCenteringHalf;
+    const double* halfPtr = &kWmmCenteringHalf;
+    double half = *halfPtr;
     int x = (int)(centeredWidth * half + windowLeft);
     if (right != 0) {
         const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);

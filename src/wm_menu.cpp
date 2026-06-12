@@ -11133,6 +11133,7 @@ LAB_next:
 			slotY = static_cast<float>(rowSlopeD * (rawRow - rowBias) + rowBaseD);
 			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<char*>(slotData + 0x41) != 0) {
 				const float* pH40a = &FLOAT_80331440;
+				float digitX;
 				float rowY = *pH40a + slotY;
 				const float* pW68c = &FLOAT_80331468;
 				float capX = *pW68c;
@@ -11177,7 +11178,7 @@ LAB_next:
 				         *pZc3, *pZc3, *pOc3, *pOc3, *pZc3);
 
 				const float* p520a = &FLOAT_80331520;
-				float digitX = *p520a;
+				digitX = *p520a;
 				if (language != 5) {
 					const float* pD8c4 = &FLOAT_803314D8;
 					rowY = *pD8c4 + slotY;

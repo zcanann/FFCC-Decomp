@@ -1493,10 +1493,11 @@ void CMapMng::LoadMapNoSyncCalc()
  */
 CMapObj* CMapMng::SearchChildMapObj(CMapObj* searchStart, CMapObj* parentObj)
 {
+    CMapObj* obj = searchStart;
     const int objCount = m_mapObjCount;
     CMapObj* mapObjEnd = m_mapObjArray + objCount;
 
-    for (CMapObj* obj = searchStart; obj < mapObjEnd; obj++) {
+    for (; obj < mapObjEnd; obj++) {
         if (obj->m_parent == parentObj) {
             return obj;
         }
@@ -1885,8 +1886,10 @@ int CMapMng::ReadMtx(char* mapName)
  */
 int CMapMng::ReadMpl(char* mapName)
 {
+    CFile::CHandle* handle;
     char* strTmp = g_StrTmp;
     int loadIndex = 0;
+    int size = 0;
 
     MapMng.m_mapReadReady = 1;
 
@@ -1897,9 +1900,9 @@ int CMapMng::ReadMpl(char* mapName)
         if (m_asyncLoadState.m_mapReadMode == 1) {
             canRead = 1;
         } else {
-            CFile::CHandle* existsHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
-            if (existsHandle != 0) {
-                File.Close(existsHandle);
+            handle = File.Open(strTmp, 0, CFile::PRI_LOW);
+            if (handle != 0) {
+                File.Close(handle);
                 canRead = 1;
             } else {
                 canRead = 0;
@@ -1925,7 +1928,7 @@ int CMapMng::ReadMpl(char* mapName)
 
         void* filePtr;
         if (m_asyncLoadState.m_mapReadMode == 1) {
-            const int size = m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex];
+            size = m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex];
             filePtr = File.m_readBuffer;
 
             Memory.CopyFromAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, (size + 0x1F) & ~0x1F);
@@ -1933,19 +1936,19 @@ int CMapMng::ReadMpl(char* mapName)
             CheckSum(filePtr, size);
             m_asyncLoadState.m_asyncReadIndex += 1;
         } else {
-            CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
-            if (fileHandle != 0) {
-                const int size = File.GetLength(fileHandle);
+            handle = File.Open(strTmp, 0, CFile::PRI_LOW);
+            if (handle != 0) {
+                size = File.GetLength(handle);
                 if (m_asyncLoadState.m_mapReadMode == 3) {
-                    File.ReadASync(fileHandle);
+                    File.ReadASync(handle);
                     filePtr = reinterpret_cast<void*>(1);
-                    m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = fileHandle;
+                    m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = handle;
                     m_asyncLoadState.m_asyncOpenIndex += 1;
                 } else {
-                    File.Read(fileHandle);
-                    File.SyncCompleted(fileHandle);
+                    File.Read(handle);
+                    File.SyncCompleted(handle);
                     filePtr = File.m_readBuffer;
-                    File.Close(fileHandle);
+                    File.Close(handle);
                     if (m_asyncLoadState.m_mapReadMode == 2) {
                         Memory.CopyToAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>(size));
                         m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex] = size;
@@ -2220,9 +2223,8 @@ int CMapMng::ReadOtm(char* mapName)
     }
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        CMapObj* mapObj = m_octTreeArray[i].GetMapObject();
-        if (mapObj != 0) {
-            mapObj->m_octTreeIndex = static_cast<signed char>(i);
+        if (m_octTreeArray[i].GetMapObject() != 0) {
+            m_octTreeArray[i].GetMapObject()->m_octTreeIndex = static_cast<signed char>(i);
         }
     }
 
@@ -2242,8 +2244,9 @@ int CMapMng::ReadOtm(char* mapName)
     PSMTXIdentity(identity);
     m_rootMapObj->CalcMtx(identity, 1);
 
+    CMapObjAtr* attr;
     for (int i = 0; i < m_mapObjCount; i++) {
-        CMapObjAtr* attr = m_mapObjArray[i].m_attribute;
+        attr = m_mapObjArray[i].m_attribute;
         if (attr == 0) {
             continue;
         }
@@ -2312,6 +2315,8 @@ int CMapMng::ReadOtm(char* mapName)
  */
 int CMapMng::ReadMid(char* mapName)
 {
+    CFile::CHandle* handle;
+    int size;
     char* strTmp = g_StrTmp;
     sprintf(strTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
     int ok = 1;
@@ -2322,7 +2327,7 @@ int CMapMng::ReadMid(char* mapName)
 
     void* filePtr;
     if (m_asyncLoadState.m_mapReadMode == 1) {
-        const int size = m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex];
+        size = m_asyncLoadState.m_fileSizes[m_asyncLoadState.m_asyncReadIndex];
         filePtr = File.m_readBuffer;
 
         Memory.CopyFromAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
@@ -2330,19 +2335,19 @@ int CMapMng::ReadMid(char* mapName)
         CheckSum(filePtr, size);
         m_asyncLoadState.m_asyncReadIndex += 1;
     } else {
-        CFile::CHandle* fileHandle = File.Open(strTmp, 0, CFile::PRI_LOW);
-        if (fileHandle != 0) {
-            const int size = File.GetLength(fileHandle);
+        handle = File.Open(strTmp, 0, CFile::PRI_LOW);
+        if (handle != 0) {
+            size = File.GetLength(handle);
             if (m_asyncLoadState.m_mapReadMode == 3) {
-                File.ReadASync(fileHandle);
+                File.ReadASync(handle);
                 filePtr = reinterpret_cast<void*>(1);
-                m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = fileHandle;
+                m_asyncLoadState.m_asyncHandles[m_asyncLoadState.m_asyncOpenIndex] = handle;
                 m_asyncLoadState.m_asyncOpenIndex += 1;
             } else {
-                File.Read(fileHandle);
-                File.SyncCompleted(fileHandle);
+                File.Read(handle);
+                File.SyncCompleted(handle);
                 filePtr = File.m_readBuffer;
-                File.Close(fileHandle);
+                File.Close(handle);
 
                 if (m_asyncLoadState.m_mapReadMode == 2) {
                     Memory.CopyToAMemorySync(filePtr, m_asyncLoadState.m_mapLoadCursor, static_cast<unsigned long>(size));
@@ -2604,15 +2609,15 @@ inline void setDbgLight(int lightId, Vec& lightDir, _GXColor& lightColor)
     extern const float kMapZero;
     extern const float kMapTinyEpsilon;
 
+    GXLightObj lightObj;
+    Vec v;
     Mtx cameraMtx;
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
-    float dirY = lightDir.y;
-    float dirZ = lightDir.z;
-
-    GXLightObj lightObj;
-    Vec v;
     v.x = kMapLargeDistance * -lightDir.x;
+    float dirZ;
+    float dirY = lightDir.y;
+    dirZ = lightDir.z;
     v.y = kMapLargeDistance * -dirY;
     v.z = kMapLargeDistance * -dirZ;
 
@@ -2744,6 +2749,7 @@ void CMapMng::Draw()
             GXSetZMode(1, GX_LEQUAL, 1);
             LightPcs.SetNumDiffuse(0);
 
+            int texMtx;
             int shadowCount = CharaPcs.GetNumTexShadow();
             if (shadowCount != 0) {
                 _GXTexObj texObjs[8];
@@ -2772,8 +2778,8 @@ void CMapMng::Draw()
 
                     CharaPcs.GetTexShadow(startIndex, batchCount, texObjs, shadowPositions, shadowMatrices);
 
-                    int texMtx = 0x1E;
                     int stage = 0;
+                    texMtx = 0x1E;
                     for (int i = 0; i < batchCount; i++) {
                         GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX3x4);
                         GXLoadTexObj(&texObjs[i], static_cast<GXTexMapID>(i));
@@ -2928,16 +2934,12 @@ void CMapMng::Draw()
 
         CameraPcs.SetOffsetZBuff(kMapHitWireZOffset);
 
-        CMapObj* mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < m_mapObjCount; i++) {
-            mapObj->DrawHitWire();
-            mapObj++;
+            MapMng.m_mapObjArray[i].DrawHitWire();
         }
 
-        mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < m_mapObjCount; i++) {
-            mapObj->DrawHitNormal();
-            mapObj++;
+            MapMng.m_mapObjArray[i].DrawHitNormal();
         }
 
         CameraPcs.SetOffsetZBuff(kMapZero);

@@ -2610,7 +2610,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			*(int*)(__p9 + 0x24) = *(int*)(this->m_bonusAnimPtr + 0x6c);
 		}
 		base += 1;
-		s_CntTop = (unsigned char)base;
+		s_CntTop = (signed char)base;
 
 		// countTop block: startFrame = 8, duration = 8
 		for (int i = 0; i < activePartyCount; i++) {
@@ -3553,7 +3553,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			count->depth = FLOAT_80331EB0;
 		}
 		int countTop = base + 1;
-		s_CntTop = (unsigned char)countTop;
+		s_CntTop = (signed char)countTop;
 
 		{
 			for (int i = 0; i < activePartyCount; i++) {
@@ -3647,7 +3647,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			int boardOff = i;
 			int half = activePartyCount * 0x50;
 			for (; i < activePartyCount; i++) {
-				int sprOff = (((signed char)s_CntTop + i) << 6) + 8;
+				int sprOff = (((unsigned char)s_CntTop + i) << 6) + 8;
 				BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff);
 				int w3 = sprite->w * 3;
 				int extent = w3 + 0x20;
@@ -3692,8 +3692,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		return;
 	}
 
-	*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
-	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
+	*(short*)(this->m_bonusStatePtr + 0x22) = *(unsigned short*)(this->m_bonusStatePtr + 0x22) + 1;
+	unsigned int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
 	int i0 = 0;
 	int off = i0;
 	int doneCount = 0;

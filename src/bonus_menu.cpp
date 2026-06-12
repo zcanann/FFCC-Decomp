@@ -2467,8 +2467,7 @@ void CMenuPcs::DrawResultCloseAnim()
 			int sprOff = off2 + 8;
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + sprOff);
 			if (sprite->kind == -1) {
-				CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(FLOAT_80331E98 * sprite->alpha));
-				font->SetColor(color.color);
+				font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(FLOAT_80331E98 * sprite->alpha)).color);
 
 				int partyIndex = textIndex % activePartyCount;
 				int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;

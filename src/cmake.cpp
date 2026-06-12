@@ -1701,15 +1701,7 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawCmakePreviewCharaAlpha(this, 1.0f);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    GXColor panelColor;
-    panelColor.r = 0xFF;
-    panelColor.g = 0xFF;
-    panelColor.b = 0xFF;
-    panelColor.a = static_cast<unsigned char>(static_cast<int>(255.0f * alpha));
-    GXSetChanMatColor(GX_COLOR0A0, panelColor);
+    SetCmakeBlendMatColor(alpha);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
         0,
@@ -1724,7 +1716,7 @@ void CMenuPcs::CmakeJobDraw()
     font->SetScale(1.0f);
     font->DrawInit();
 
-    SetCmakeFontColor(font, alpha);
+    font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
     for (int i = 0; i < 8; ++i) {
         const char* txt = GetJobStr(i);

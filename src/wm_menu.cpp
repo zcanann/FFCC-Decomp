@@ -11088,11 +11088,18 @@ LAB_next:
 			reinterpret_cast<int*>(&rawRow)[0] = 0x43300000;
 			const float slotY = static_cast<float>(rowSlopeD * (rawRow - rowBias) + rowBaseD);
 			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<char*>(slotData + 0x41) != 0) {
-				float rowY = FLOAT_80331440 + slotY;
-				float capX = FLOAT_80331468;
+				const float* pH40a = &FLOAT_80331440;
+				float rowY = *pH40a + slotY;
+				const float* pW68c = &FLOAT_80331468;
+				float capX = *pW68c;
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x26));
-				MenuPcs.DrawRect(0, FLOAT_80331468, rowY, FLOAT_803314D8, FLOAT_80331440,
-				         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				const float* pZc1 = &FLOAT_803313dc;
+				const float* pOc1 = &FLOAT_803313e8;
+				const float* pW68d = &FLOAT_80331468;
+				const float* pD8c1 = &FLOAT_803314D8;
+				const float* pH40b = &FLOAT_80331440;
+				MenuPcs.DrawRect(0, *pW68d, rowY, *pD8c1, *pH40b,
+				         *pZc1, *pZc1, *pOc1, *pOc1, *pZc1);
 
 				int totalWidth = 0;
 				if (*reinterpret_cast<int*>(slotData + 0x18) >= 0) {
@@ -11108,17 +11115,28 @@ LAB_next:
 					totalWidth++;
 				}
 				const int panelWidth = totalWidth * 0x30 + 0x40;
-				capX += FLOAT_803314D8 + static_cast<float>(panelWidth);
-				MenuPcs.DrawRect(8, capX, rowY, FLOAT_803314D8, FLOAT_80331440,
-				         FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				const float* pD8c2 = &FLOAT_803314D8;
+				capX += *pD8c2 + static_cast<float>(panelWidth);
+				const float* pZc2 = &FLOAT_803313dc;
+				const float* pOc2 = &FLOAT_803313e8;
+				const float* pD8c3 = &FLOAT_803314D8;
+				const float* pH40c = &FLOAT_80331440;
+				MenuPcs.DrawRect(8, capX, rowY, *pD8c3, *pH40c,
+				         *pZc2, *pZc2,
+				         *pOc2, *pOc2, *pZc2);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-				MenuPcs.DrawRect(0, FLOAT_8033151c, rowY, static_cast<float>(panelWidth), FLOAT_80331440,
-				         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				const float* pZc3 = &FLOAT_803313dc;
+				const float* pOc3 = &FLOAT_803313e8;
+				const float* p51ca = &FLOAT_8033151c;
+				const float* pH40d = &FLOAT_80331440;
+				MenuPcs.DrawRect(0, *p51ca, rowY, static_cast<float>(panelWidth), *pH40d,
+				         *pZc3, *pZc3, *pOc3, *pOc3, *pZc3);
 
-				float digitX = FLOAT_80331520;
+				const float* p520a = &FLOAT_80331520;
+				float digitX = *p520a;
 				if (language != 5) {
-					rowY = FLOAT_803314D8 + slotY;
+					const float* pD8c4 = &FLOAT_803314D8;
+					rowY = *pD8c4 + slotY;
 				}
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
 				int digitCount = (*reinterpret_cast<int*>(slotData + 8) > 9) + 1;
@@ -11126,8 +11144,15 @@ LAB_next:
 					digitCount = 3;
 				}
 				if (digitCount == 3) {
-					MenuPcs.DrawRect(0, FLOAT_80331520, rowY, static_cast<float>(digitWidths[10]), FLOAT_80331410,
-					         FLOAT_80331524, FLOAT_80331528, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+					const int dw10 = digitWidths[10];
+					const float* pZc4 = &FLOAT_803313dc;
+					const float* pOc4 = &FLOAT_803313e8;
+					const float* p520b = &FLOAT_80331520;
+					const float* p410a = &FLOAT_80331410;
+					const float* p524a = &FLOAT_80331524;
+					const float* p528a = &FLOAT_80331528;
+					MenuPcs.DrawRect(0, *p520b, rowY, static_cast<float>(dw10), *p410a,
+					         *p524a, *p528a, *pOc4, *pOc4, *pZc4);
 				} else {
 					for (int di = 0; di < digitCount; di++) {
 						if (digitCount == 1) {
@@ -11138,7 +11163,15 @@ LAB_next:
 							totalWidth += digitWidths[*reinterpret_cast<int*>(slotData + 8) % 10];
 						}
 					}
-					float digitScale = static_cast<float>((language != 5) ? DOUBLE_80331530 : DOUBLE_80331420);
+					double digitScaleD;
+					if (language != 5) {
+						const double* pSc530a = &DOUBLE_80331530;
+						digitScaleD = *pSc530a;
+					} else {
+						const double* pSc420a = &DOUBLE_80331420;
+						digitScaleD = *pSc420a;
+					}
+					float digitScale = static_cast<float>(digitScaleD);
 					if (language == 2) {
 						totalWidth += 8;
 					} else if (language == 3) {
@@ -11147,10 +11180,14 @@ LAB_next:
 						totalWidth += 0x20;
 					}
 					digitX += static_cast<float>((0x20 - static_cast<int>(static_cast<float>(totalWidth) * digitScale)) / 2);
-					const float zeroF = FLOAT_803313dc;
-					const double colSlope = DOUBLE_80331490;
-					const double rowSlope = DOUBLE_80331540;
-					const double rowBase = DOUBLE_80331538;
+					const float* pZd1 = &FLOAT_803313dc;
+					const float zeroF = *pZd1;
+					const double* pCs1 = &DOUBLE_80331490;
+					const double colSlope = *pCs1;
+					const double* pRs1 = &DOUBLE_80331540;
+					const double rowSlope = *pRs1;
+					const double* pRb1 = &DOUBLE_80331538;
+					const double rowBase = *pRb1;
 					int* const dw = reinterpret_cast<int*>(rodataBase + 0x920);
 					for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 						int digit;
@@ -11163,90 +11200,142 @@ LAB_next:
 						}
 						const int digitWidth = dw[digit];
 						const float digitWidthF = static_cast<float>(digitWidth);
-						MenuPcs.DrawRect(0, digitX, rowY, digitWidthF, FLOAT_80331410,
+						const float* p410b = &FLOAT_80331410;
+						const float* pOd1 = &FLOAT_803313e8;
+						MenuPcs.DrawRect(0, digitX, rowY, digitWidthF, *p410b,
 						         static_cast<float>(colSlope * static_cast<float>(digit % 5)),
 						         static_cast<float>(rowSlope * static_cast<float>(digit / 5) + rowBase),
-						         digitScale, FLOAT_803313e8, zeroF);
+						         digitScale, *pOd1, zeroF);
 						digitX += digitWidthF * digitScale;
 					}
 					float suffixWidth;
 					if (language == 2) {
-						suffixWidth = FLOAT_80331548;
+						const float* pSw548 = &FLOAT_80331548;
+						suffixWidth = *pSw548;
 					} else if (language == 3) {
-						suffixWidth = FLOAT_8033154C;
+						const float* pSw54C = &FLOAT_8033154C;
+						suffixWidth = *pSw54C;
 					} else {
-						suffixWidth = FLOAT_80331410;
+						const float* pSw410 = &FLOAT_80331410;
+						suffixWidth = *pSw410;
 					}
-					float suffixU = FLOAT_803313dc;
+					const float* pZd2 = &FLOAT_803313dc;
+					float suffixU = *pZd2;
 					unsigned char wideLang = (language == 1 || language == 4);
-					float suffixScale = static_cast<float>(wideLang ? DOUBLE_80331530 : DOUBLE_80331420);
+					double suffixScaleD;
+					if (wideLang) {
+						const double* pSc530b = &DOUBLE_80331530;
+						suffixScaleD = *pSc530b;
+					} else {
+						const double* pSc420b = &DOUBLE_80331420;
+						suffixScaleD = *pSc420b;
+					}
+					float suffixScale = static_cast<float>(suffixScaleD);
 					if (language == 1) {
 						if (*reinterpret_cast<int*>(slotData + 8) / 10 == 1) {
-							suffixU = FLOAT_8033151c;
+							const float* pSu51c1 = &FLOAT_8033151c;
+							suffixU = *pSu51c1;
 						} else {
 							const int ones = *reinterpret_cast<int*>(slotData + 8) % 10;
 							if (ones >= 1 && ones <= 3) {
-								suffixU = FLOAT_803314D8 * static_cast<float>(ones - 1);
+								const float* pSuD8 = &FLOAT_803314D8;
+								suffixU = *pSuD8 * static_cast<float>(ones - 1);
 							} else {
-								suffixU = FLOAT_8033151c;
+								const float* pSu51c2 = &FLOAT_8033151c;
+								suffixU = *pSu51c2;
 							}
 						}
 					} else if (language == 4) {
 						if (*reinterpret_cast<int*>(slotData + 8) != 1) {
-							suffixU = FLOAT_803314D8;
+							const float* pSuD8b = &FLOAT_803314D8;
+							suffixU = *pSuD8b;
 						}
 					} else if (language == 2) {
-						rowY += FLOAT_80331550;
+						const float* pRy550 = &FLOAT_80331550;
+						rowY += *pRy550;
 					}
 					if (language != 5) {
 						MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x34));
-						MenuPcs.DrawRect(0, digitX, rowY, suffixWidth, FLOAT_803314D8,
-						         suffixU, FLOAT_803313dc, suffixScale, FLOAT_803313e8, FLOAT_803313dc);
+						const float* pZd3 = &FLOAT_803313dc;
+						const float* pOd2 = &FLOAT_803313e8;
+						const float* pD8d1 = &FLOAT_803314D8;
+						MenuPcs.DrawRect(0, digitX, rowY, suffixWidth, *pD8d1,
+						         suffixU, *pZd3, suffixScale, *pOd2, *pZd3);
 					}
 				}
 
-				float labelX = FLOAT_80331520;
+				const float* pLx520 = &FLOAT_80331520;
+				float labelX = *pLx520;
 				float dateLabelY;
 				if (language != 5) {
-					dateLabelY = FLOAT_80331554 + slotY;
+					const float* pDl554 = &FLOAT_80331554;
+					dateLabelY = *pDl554 + slotY;
 				} else {
-					dateLabelY = FLOAT_803314c8 + (FLOAT_803314D8 + slotY);
+					const float* pDlc8 = &FLOAT_803314c8;
+					const float* pDlD8 = &FLOAT_803314D8;
+					dateLabelY = *pDlc8 + (*pDlD8 + slotY);
 				}
-				labelX -= FLOAT_80331550;
+				const float* pLx550 = &FLOAT_80331550;
+				labelX -= *pLx550;
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+				const float* pZe1 = &FLOAT_803313dc;
+				const float* pOe1 = &FLOAT_803313e8;
+				const float* pH40e = &FLOAT_80331440;
+				const float* p558a = &FLOAT_80331558;
 				MenuPcs.DrawRect(0, labelX, dateLabelY,
-				         FLOAT_80331440, FLOAT_80331558, FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				         *pH40e, *p558a, *pZe1, *pZe1,
+				         *pOe1, *pOe1, *pZe1);
 
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x37));
-				float iconX = FLOAT_8033155C;
-				const float iconY = FLOAT_803314D8 + slotY;
+				const float* p55Ca = &FLOAT_8033155C;
+				float iconX = *p55Ca;
+				const float* pD8e1 = &FLOAT_803314D8;
+				const float iconY = *pD8e1 + slotY;
 				unsigned char* memberPtr = slotData;
 				for (int member = 0; member < 4; member++, memberPtr += 4) {
 					const int modelNo = *reinterpret_cast<int*>(memberPtr + 0x18);
 					if (modelNo >= 0) {
 						const int faceNo = modelNo - 100;
-						float texU = ((faceNo / 100 & 1) != 0) ? FLOAT_80331560 : DOUBLE_803314F0;
-						const float du = static_cast<float>(faceNo % 100) * FLOAT_80331468;
+						float texU;
+						if ((faceNo / 100 & 1) != 0) {
+							const float* p560a = &FLOAT_80331560;
+							texU = *p560a;
+						} else {
+							const double* pHf1 = &DOUBLE_803314F0;
+							texU = static_cast<float>(*pHf1);
+						}
+						const float* pW68e = &FLOAT_80331468;
+						const float du = static_cast<float>(faceNo % 100) * *pW68e;
 						texU += du;
-						MenuPcs.DrawRect(0, iconX, iconY, FLOAT_80331468, FLOAT_80331468,
+						const float* pZe2 = &FLOAT_803313dc;
+						const float* pOe2 = &FLOAT_803313e8;
+						const float* pW68f = &FLOAT_80331468;
+						MenuPcs.DrawRect(0, iconX, iconY, *pW68f, *pW68f,
 						         texU,
-						         static_cast<float>(faceNo / 100 / 2) * FLOAT_80331468,
-						         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
-						iconX += FLOAT_80331468;
+						         static_cast<float>(faceNo / 100 / 2) * *pW68f,
+						         *pOe2, *pOe2, *pZe2);
+						const float* pW68g = &FLOAT_80331468;
+						iconX += *pW68g;
 					}
 				}
-				rowY = FLOAT_80331468 + slotY;
+				const float* pW68h = &FLOAT_80331468;
+				rowY = *pW68h + slotY;
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
-				MenuPcs.DrawRect(0, FLOAT_80331564, rowY,
-				         FLOAT_80331554, FLOAT_803314D8, FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				const float* pZe3 = &FLOAT_803313dc;
+				const float* pOe3 = &FLOAT_803313e8;
+				const float* p564a = &FLOAT_80331564;
+				const float* p554a = &FLOAT_80331554;
+				const float* pD8e2 = &FLOAT_803314D8;
+				MenuPcs.DrawRect(0, *p564a, rowY,
+				         *p554a, *pD8e2, *pZe3, *pZe3,
+				         *pOe3, *pOe3, *pZe3);
 
 				int playHours;
 				int playMinutes;
 				MemoryCardMan.CnvPlayTime(*reinterpret_cast<unsigned int*>(slotData + 0x14), &playHours, &playMinutes);
 				int playDigits[5];
-				float playWidth = FLOAT_803313dc;
+				const float* pZe4 = &FLOAT_803313dc;
+				float playWidth = *pZe4;
 				const int hundreds = playHours / 100;
 				if (hundreds != 0) {
 					playDigits[0] = hundreds;
@@ -11269,19 +11358,29 @@ LAB_next:
 				playWidth += static_cast<float>(playWidths[10]);
 				playWidth += static_cast<float>(playWidths[playDigits[3]]);
 				playWidth += static_cast<float>(playWidths[playDigits[4]]);
-				float playX = FLOAT_80331518 - playWidth;
+				const float* p518b = &FLOAT_80331518;
+				float playX = *p518b - playWidth;
 				for (int digitIdx = 0; digitIdx < 5; digitIdx++) {
 					if (playDigits[digitIdx] >= 0) {
 						if (digitIdx == 3) {
 							const float colonW = static_cast<float>(playWidths[10]);
-							MenuPcs.DrawRect(0, playX, rowY, colonW, FLOAT_803314D8,
-							         FLOAT_80331568, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+							const float* pZe5 = &FLOAT_803313dc;
+							const float* pOe5 = &FLOAT_803313e8;
+							const float* p568a = &FLOAT_80331568;
+							const float* pD8e3 = &FLOAT_803314D8;
+							MenuPcs.DrawRect(0, playX, rowY, colonW, *pD8e3,
+							         *p568a, *pZe5, *pOe5, *pOe5, *pZe5);
 							playX += colonW;
 						}
 						const float digitW = static_cast<float>(playWidths[playDigits[digitIdx]]);
-						MenuPcs.DrawRect(0, playX, rowY, digitW, FLOAT_803314D8,
-						         static_cast<float>(DOUBLE_80331490 * static_cast<double>(playDigits[digitIdx]) + DOUBLE_80331570),
-						         FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+						const float* pZe6 = &FLOAT_803313dc;
+						const float* pOe6 = &FLOAT_803313e8;
+						const float* pD8e4 = &FLOAT_803314D8;
+						const double* pCs2 = &DOUBLE_80331490;
+						const double* p570a = &DOUBLE_80331570;
+						MenuPcs.DrawRect(0, playX, rowY, digitW, *pD8e4,
+						         static_cast<float>(*pCs2 * static_cast<double>(playDigits[digitIdx]) + *p570a),
+						         *pZe6, *pOe6, *pOe6, *pZe6);
 						playX += digitW;
 					}
 				}
@@ -11292,8 +11391,9 @@ LAB_next:
 				CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
 				TextureMan.SetTexture(static_cast<_GXTexMapID>(0), texture);
 				Mtx texMtx;
-				PSMTXScale(texMtx, FLOAT_803313e8 / static_cast<float>(texture->m_width),
-				           FLOAT_803313e8 / static_cast<float>(texture->m_height), FLOAT_803313e8);
+				const float* pOe7 = &FLOAT_803313e8;
+				PSMTXScale(texMtx, *pOe7 / static_cast<float>(texture->m_width),
+				           *pOe7 / static_cast<float>(texture->m_height), *pOe7);
 				GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
 				GXSetNumTexGens(1);
 				GXSetTexCoordGen2(static_cast<GXTexCoordID>(0), static_cast<GXTexGenType>(1),
@@ -11310,9 +11410,12 @@ LAB_next:
 		}
 
 		// Draw text info for each save slot
-		const double tSlope = DOUBLE_80331498;
-		const double tBias = DOUBLE_80331408;
-		const double tBase = DOUBLE_80331490;
+		const double* pSl3 = &DOUBLE_80331498;
+		const double tSlope = *pSl3;
+		const double* pBi3 = &DOUBLE_80331408;
+		const double tBias = *pBi3;
+		const double* pBa3 = &DOUBLE_80331490;
+		const double tBase = *pBa3;
 		for (slot = 0, slotOff = slot; slot < 4; slot++, slotOff += 0x48) {
 			char part[64];
 			char locationStr[64];
@@ -11324,36 +11427,47 @@ LAB_next:
 			reinterpret_cast<int*>(&rawT)[0] = 0x43300000;
 			const float slotY = static_cast<float>(tSlope * (rawT - tBias) + tBase);
 			if (*reinterpret_cast<char*>(slotData + 0x42) != 0 || *reinterpret_cast<int*>(slotData + 8) <= 0) {
-				fontF8->SetMargin(FLOAT_803313e8);
+				const float* pMa1 = &FLOAT_803313e8;
+				fontF8->SetMargin(*pMa1);
 				fontF8->SetShadow(1);
-				fontF8->SetScale(FLOAT_803313e8);
+				const float* pSa1 = &FLOAT_803313e8;
+				fontF8->SetScale(*pSa1);
 				fontF8->DrawInit();
 				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(0x19);
 				const unsigned int msgId =
 					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42)))) >> 5;
 				const int width = static_cast<int>(fontF8->GetWidth(const_cast<char*>(GetMcStr(msgId))));
-				fontF8->SetPosX(static_cast<float>(static_cast<float>(0x238 - width) * DOUBLE_803313F8 + FLOAT_803314D8));
-				fontF8->SetPosY(static_cast<float>(DOUBLE_80331580 + static_cast<double>(slotY)));
+				const double* pHd1 = &DOUBLE_803313F8;
+				const float* pD8f1 = &FLOAT_803314D8;
+				fontF8->SetPosX(static_cast<float>(static_cast<float>(0x238 - width) * *pHd1 + *pD8f1));
+				const double* p580a = &DOUBLE_80331580;
+				fontF8->SetPosY(static_cast<float>(*p580a + static_cast<double>(slotY)));
 				fontF8->Draw(const_cast<char*>(GetMcStr(msgId)));
 			} else {
-				fontF8->SetMargin(FLOAT_803313e8);
+				const float* pMa2 = &FLOAT_803313e8;
+				fontF8->SetMargin(*pMa2);
 				fontF8->SetShadow(0);
-				fontF8->SetScale(FLOAT_80331588);
+				const float* pSa2 = &FLOAT_80331588;
+				fontF8->SetScale(*pSa2);
 				fontF8->DrawInit();
 				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(0x2C);
-				fontF8->SetPosX(FLOAT_80331520);
-				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) - DOUBLE_80331510));
+				const float* pPx520 = &FLOAT_80331520;
+				fontF8->SetPosX(*pPx520);
+				const double* pOff4 = &DOUBLE_80331510;
+				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) - *pOff4));
 				strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
 				if (locationStr[0] != 0) {
 					locationStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(locationStr[0])));
 				}
 				fontF8->Draw(locationStr);
 
-				fontF8->SetMargin(FLOAT_803313e8);
+				const float* pMa3 = &FLOAT_803313e8;
+				fontF8->SetMargin(*pMa3);
 				fontF8->SetShadow(1);
-				fontF8->SetScale(FLOAT_8033158C);
+				const float* pSa3 = &FLOAT_8033158C;
+				fontF8->SetScale(*pSa3);
 				fontF8->DrawInit();
 				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(7);
@@ -11376,13 +11490,17 @@ LAB_next:
 					locationStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(locationStr[0])));
 				}
 				const float locationWidth = fontF8->GetWidth(locationStr);
-				float locationY = FLOAT_80331558 + slotY;
-				if (locationWidth <= FLOAT_8033155C) {
-					fontF8->SetPosX(FLOAT_80331518 - locationWidth);
+				const float* p558b = &FLOAT_80331558;
+				float locationY = *p558b + slotY;
+				const float* p55Cb = &FLOAT_8033155C;
+				if (locationWidth <= *p55Cb) {
+					const float* p518c = &FLOAT_80331518;
+					fontF8->SetPosX(*p518c - locationWidth);
 					fontF8->SetPosY(locationY);
 					fontF8->Draw(locationStr);
 				} else {
-					locationY = locationY + FLOAT_80331550;
+					const float* p550a = &FLOAT_80331550;
+					locationY = locationY + *p550a;
 					strcpy(line1, locationStr);
 					line2[0] = 0;
 					char* searchPos = locationStr;
@@ -11401,10 +11519,15 @@ LAB_next:
 						strcpy(line2, space + 1);
 						searchPos = space + 1;
 					}
-					fontF8->SetPosX(FLOAT_80331518 - fontF8->GetWidth(line1));
-					fontF8->SetPosY(locationY - FLOAT_80331590);
+					const float w1 = fontF8->GetWidth(line1);
+					const float* p518d = &FLOAT_80331518;
+					fontF8->SetPosX(*p518d - w1);
+					const float* p590a = &FLOAT_80331590;
+					fontF8->SetPosY(locationY - *p590a);
 					fontF8->Draw(line1);
-					fontF8->SetPosX(FLOAT_80331518 - fontF8->GetWidth(line2));
+					const float w2 = fontF8->GetWidth(line2);
+					const float* p518e = &FLOAT_80331518;
+					fontF8->SetPosX(*p518e - w2);
 					fontF8->SetPosY(locationY);
 					fontF8->Draw(line2);
 				}
@@ -11416,13 +11539,23 @@ LAB_next:
 		if (mode == 5) {
 			GXColor color = CColor(0xFF, 0xFF, 0xFF, 0xFF).color;
 			char* text = const_cast<char*>(GetMcStr(2));
-			const int x = static_cast<int>(CalcCenteringPos2(const_cast<char*>(GetMcStr(2)), FLOAT_80331594, FLOAT_803313e8));
-			DrawFont2(x, 0x187, color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+			char* text2 = const_cast<char*>(GetMcStr(2));
+			const float* pWf1 = &FLOAT_80331594;
+			const float* pHf3 = &FLOAT_803313e8;
+			const int x = static_cast<int>(CalcCenteringPos2(text2, *pWf1, *pHf3));
+			const float* pWf2 = &FLOAT_80331594;
+			const float* pHf4 = &FLOAT_803313e8;
+			DrawFont2(x, 0x187, color, 7, text, *pWf2, *pHf4, *pHf4);
 		} else if (mode == 2) {
 			GXColor color = CColor(0xFF, 0xFF, 0xFF, 0xFF).color;
 			char* text = const_cast<char*>(GetMcStr(3));
-			const int x = static_cast<int>(CalcCenteringPos2(const_cast<char*>(GetMcStr(3)), FLOAT_80331594, FLOAT_803313e8));
-			DrawFont2(x, 0x187, color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+			char* text2 = const_cast<char*>(GetMcStr(3));
+			const float* pWf3 = &FLOAT_80331594;
+			const float* pHf5 = &FLOAT_803313e8;
+			const int x = static_cast<int>(CalcCenteringPos2(text2, *pWf3, *pHf5));
+			const float* pWf4 = &FLOAT_80331594;
+			const float* pHf6 = &FLOAT_803313e8;
+			DrawFont2(x, 0x187, color, 7, text, *pWf4, *pHf6, *pHf6);
 		}
 	}
 	DrawInit();

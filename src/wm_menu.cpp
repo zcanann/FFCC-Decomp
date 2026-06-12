@@ -11310,7 +11310,7 @@ LAB_next:
 						const float* pOd2 = &FLOAT_803313e8;
 						const float* pD8d1 = &FLOAT_803314D8;
 						MenuPcs.DrawRect(0, digitX, rowY, suffixWidth, *pD8d1,
-						         suffixU, *pZd3, suffixScale, *pOd2, *pZd3);
+						         *pZd3, suffixU, suffixScale, *pOd2, *pZd3);
 					}
 				}
 

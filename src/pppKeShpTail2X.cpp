@@ -310,7 +310,7 @@ advance_segment:
     if (nextIndex++ == lastIndex) {
         nextIndex = 0;
     }
-    if (nextIndex == curIndex) {
+    if (curIndex == nextIndex) {
         return;
     }
 

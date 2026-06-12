@@ -263,8 +263,8 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
 
             const float padScale = kFunnyShapePaddingScale;
             const float padW = viewportW * padScale * padScale;
-            const float padH = viewportH * padScale * padScale;
             const float viewMaxX = maxX - padW;
+            const float padH = viewportH * padScale * padScale;
             const float viewMaxY = maxY - padH;
             const float invPadH = kFunnyShapeOne / padH;
             const float invPadW = -(kFunnyShapeOne / padW);

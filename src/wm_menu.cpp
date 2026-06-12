@@ -7927,9 +7927,9 @@ void CMenuPcs::CalcWMFrame0(int param)
 		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8)) + static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)));
 		if (param >= -10) {
 			int sign = param >> 31;
-			int absParam = (sign ^ param) - sign;
-			float t_unclamped = static_cast<float>(absParam);
-			float dVar4 = offset * (DOUBLE_803314E8 * t_unclamped);
+			float t_unclamped = static_cast<float>((sign ^ param) - sign);
+			offset *= DOUBLE_803314E8 * t_unclamped;
+			int absParam = ((param >> 31) ^ param) - (param >> 31);
 			if (absParam < 0) {
 				absParam = 0;
 			}
@@ -7937,7 +7937,7 @@ void CMenuPcs::CalcWMFrame0(int param)
 				absParam = 10;
 			}
 			float t_clamped = static_cast<float>(absParam);
-			offset = dVar4 * static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * t_clamped * FLOAT_803316D4)));
+			offset *= static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * t_clamped * FLOAT_803316D4)));
 		}
 		reinterpret_cast<short*>(m_wm.m_frameInfo + 4)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4))) - offset));
 		reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20))) + offset));

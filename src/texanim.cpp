@@ -15,6 +15,11 @@ extern const double kTexAnimIntToDoubleBias = 4503599627370496.0;
 static const char s_texAnimSeqE1[] = "e1";
 extern const float kTexAnimChinFrameStep = 1.25f;
 
+static const char s_CTexAnimSeq[] = "CTexAnimSeq";
+static const char s_texanim_cpp[] = "texanim.cpp";
+static const char s_CTexAnim_CRefData[] = "CTexAnim::CRefData";
+static const char s_CTexAnim[] = "CTexAnim";
+static const char s_CTexAnimSet[] = "CTexAnimSet";
 static const char sTexAnimPtrArrayGrowError[] = {
     0x83, 0x6f, 0x83, 0x62, 0x83, 0x74, 0x83, 0x40, 0x90, 0xac, 0x92, 0xb7, 0x82, 0xaa,
     0x95, 0x73, 0x8b, 0x96, 0x89, 0xc2, 0x82, 0xc5, 0x82, 0xb7, 0x81, 0x42, 0x0a, 0x00,
@@ -537,7 +542,7 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
  */
 inline CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
 {
-    CTexAnim* copy = new (stage, const_cast<char*>("texanim.cpp"), 0xF4) CTexAnim;
+    CTexAnim* copy = new (stage, const_cast<char*>(s_texanim_cpp), 0xF4) CTexAnim;
 
     copy->m_refData = m_refData;
     copy->m_refData->AddRef();
@@ -581,7 +586,7 @@ inline void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
         case 'KEY ':
             m_keyCount = chunk.m_size / 0x30;
             m_keys = static_cast<CTexAnimKey*>(
-                Memory._Alloc(chunk.m_size, stage, const_cast<char*>("texanim.cpp"), 0x1D4, 0));
+                Memory._Alloc(chunk.m_size, stage, const_cast<char*>(s_texanim_cpp), 0x1D4, 0));
             memcpy(m_keys, chunkFile.GetAddress(), chunk.m_size);
             continue;
         default:
@@ -610,7 +615,7 @@ inline void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
         }
         m_refData = 0;
     }
-    CTexAnim::CRefData* refData = new (stage, const_cast<char*>("texanim.cpp"), 0xD3) CTexAnim::CRefData;
+    CTexAnim::CRefData* refData = new (stage, const_cast<char*>(s_texanim_cpp), 0xD3) CTexAnim::CRefData;
     m_refData = refData;
     m_refData->m_texAnimSeqs.SetStage(stage);
 
@@ -622,7 +627,7 @@ inline void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             strcpy(m_refData->m_name, chunkFile.GetString());
             break;
         case 'SEQ ': {
-            CTexAnimSeq* seq = new (stage, const_cast<char*>("texanim.cpp"), 0xE2) CTexAnimSeq;
+            CTexAnimSeq* seq = new (stage, const_cast<char*>(s_texanim_cpp), 0xE2) CTexAnimSeq;
             seq->Create(chunkFile, stage);
             m_refData->m_texAnimSeqs.Add(seq);
             break;
@@ -645,7 +650,7 @@ inline void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
  */
 CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 {
-    CTexAnimSet* dup = new (stage, const_cast<char*>("texanim.cpp"), 0x54) CTexAnimSet;
+    CTexAnimSet* dup = new (stage, const_cast<char*>(s_texanim_cpp), 0x54) CTexAnimSet;
 
     dup->m_texAnims.SetStage(stage);
     for (unsigned int i = 0; i < static_cast<unsigned int>(m_texAnims.GetSize()); i++) {
@@ -680,7 +685,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             continue;
         }
 
-        CTexAnim* texAnim = new (stage, const_cast<char*>("texanim.cpp"), 0x3F) CTexAnim;
+        CTexAnim* texAnim = new (stage, const_cast<char*>(s_texanim_cpp), 0x3F) CTexAnim;
         texAnim->Create(chunkFile, stage);
         m_texAnims.Add(texAnim);
     }

@@ -11882,7 +11882,6 @@ void CMenuPcs::ClrMcList()
 #pragma opt_propagation off
 unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	PPPCREATEPARAM createParam;
 
 	if (cameraSlot < 0) {
@@ -11897,14 +11896,15 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	}
 
 	effect->m_effectNo = effectNo;
-	const int group = (((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31;
+	const int effectNoXor = effectNo ^ 100;
+	const int group = static_cast<unsigned int>((effectNoXor >> 1) - (effectNoXor & effectNo)) >> 31;
 	CGObject* const object = &effect->m_object;
 	effect->m_slotNo = slot;
 	object->Create();
-	object->m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8)[cameraSlot];
+	object->m_charaModelHandle = m_wm.m_handles[cameraSlot];
 
-	createParam.m_paramB = reinterpret_cast<unsigned int>(object);
 	createParam.m_lookTargetPtr = object;
+	createParam.m_paramB = reinterpret_cast<unsigned int>(object);
 
 	const unsigned int partId = PartMng.pppCreate(group, effectNo, &createParam, 1);
 	effect->m_partNo = partId;

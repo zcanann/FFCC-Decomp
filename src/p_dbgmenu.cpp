@@ -619,19 +619,21 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 	int fillColorIndex = (flags >> 1) & 1;
 
 	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
-	GXPosition3f32((float)(x + width), (float)y, z);
+	width += x;
+	height += y;
+	GXPosition3f32((float)width, (float)y, z);
 	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[fillColorIndex]));
 	GXPosition3f32((float)x, (float)y, z);
 	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[fillColorIndex]));
-	GXPosition3f32((float)x, (float)(y + height), z);
+	GXPosition3f32((float)x, (float)height, z);
 	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[fillColorIndex]));
 
 	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
-	GXPosition3f32((float)(x + width), (float)y, z);
+	GXPosition3f32((float)width, (float)y, z);
 	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[1 - fillColorIndex]));
-	GXPosition3f32((float)(x + width), (float)(y + height), z);
+	GXPosition3f32((float)width, (float)height, z);
 	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[1 - fillColorIndex]));
-	GXPosition3f32((float)x, (float)(y + height), z);
+	GXPosition3f32((float)x, (float)height, z);
 	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[1 - fillColorIndex]));
 
 	s8 selected = static_cast<s32>((static_cast<u32>(m_currentMenu->m_status) << 25) & 0xC0000000) >> 31;
@@ -648,15 +650,15 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 		highlightColor.b = alpha;
 
 		GXBegin(GX_LINESTRIP, GX_VTXFMT1, 5);
-		GXPosition3f32((float)(x + width + 1), (float)(y - 1), z);
+		GXPosition3f32((float)(width + 1), (float)(y - 1), z);
 		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
 		GXPosition3f32((float)(x - 1), (float)(y - 1), z);
 		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
-		GXPosition3f32((float)(x - 1), (float)(y + height + 1), z);
+		GXPosition3f32((float)(x - 1), (float)(height + 1), z);
 		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
-		GXPosition3f32((float)(x + width + 1), (float)(y + height + 1), z);
+		GXPosition3f32((float)(width + 1), (float)(height + 1), z);
 		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
-		GXPosition3f32((float)(x + width + 1), (float)(y - 1), z);
+		GXPosition3f32((float)(width + 1), (float)(y - 1), z);
 		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
 	}
 

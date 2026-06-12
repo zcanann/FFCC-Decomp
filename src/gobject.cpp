@@ -699,7 +699,7 @@ void CGObject::move()
             moveVec.x = sZeroFloat;
 
             u32 miniGameFlags = DbgMenuPcs.GetDbgFlagsRaw();
-            if ((miniGameFlags & 0x100) != 0 && moveVec.x == sZeroFloat) {
+            if ((miniGameFlags & 0x100) != 0 && moveVec.x == sZeroFloat && moveVec.x == sZeroFloat) {
                 const float stickX = GetMovePadStickX(static_cast<s8>(m_animStateMisc));
                 moveVec.x = moveVec.x - stickX;
                 const float stickY = GetMovePadStickY(static_cast<s8>(m_animStateMisc));

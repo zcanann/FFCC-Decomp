@@ -15280,6 +15280,7 @@ kRingMenuShadowOffset = .sdata2:0x803309EC; // type:object size:0x4 align:4 data
 kRingMenuCommandCellSize = .sdata2:0x803309F0; // type:object size:0x4 align:4 data:float
 kRingMenuMarkerSize = .sdata2:0x803309F4; // type:object size:0x4 align:4 data:float
 kRingMenuMarkerUvScale = .sdata2:0x803309F8; // type:object size:0x4 align:4 data:float
+kRingMenuS32DoubleBias = .sdata2:0x80330A00; // type:object size:0x8 align:8 data:double
 kRingMenuAnimStep = .sdata2:0x80330A08; // type:object size:0x4 align:4 data:float
 kRingMenuHalfPi = .sdata2:0x80330A0C; // type:object size:0x4 align:4 data:float
 kRingMenuWobbleDivisor = .sdata2:0x80330A10; // type:object size:0x4 align:4 data:float

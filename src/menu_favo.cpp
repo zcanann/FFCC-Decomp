@@ -29,8 +29,8 @@ static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
 
 extern "C" const float kCompaFoodIconUvScale = 0.75f;
 extern "C" const float kCompaFrameU = 72.0f;
-extern "C" const float kFavoWideTextureWidth;
-extern "C" const float kFavoIconUvScale;
+static const float kFavoWideTextureWidth = 384.0f;
+static const float kFavoIconUvScale = 0.75f;
 
 STATIC_ASSERT(sizeof(FavoEntry) == 0x40);
 STATIC_ASSERT(sizeof(FavoListStorage) == 0x1008);

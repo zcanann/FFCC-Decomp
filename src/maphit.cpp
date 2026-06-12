@@ -502,7 +502,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 
     {
         PSVECScale(hitDirection, &g_hit_hpv, hitT);
-        PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
+        PSVECAdd(&cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
         Vec pushedHit;
         Vec scaledNormal;

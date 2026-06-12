@@ -5104,7 +5104,7 @@ void CMenuPcs::DrawCMakeMenu()
 			textList[1] = langText[ti];
 			ti = 7;
 			textList[2] = langText[ti];
-			const _GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
+			const _GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(textAlpha & 0xFF)).color;
 			char* const text = textList[textIndex];
 			const float* pW1 = &FLOAT_80331594;
 			const float* pH1 = &FLOAT_803313e8;
@@ -5191,7 +5191,7 @@ void CMenuPcs::DrawCMakeMenu()
 			if (m_wmWorldState->m_delay <= 0) {
 				m_wmWorldState->m_mainState++;
 				m_wmWorldState->m_frameCounter = 0;
-				Sound.PlaySe(0x31 + static_cast<int>(static_cast<unsigned int>(static_cast<int>(m_wmWorldState->m_nextMenuMode)) >> 31), 0x40, 0x7F, 0);
+				Sound.PlaySe(0x31 + (static_cast<int>(m_wmWorldState->m_nextMenuMode) >> 31), 0x40, 0x7F, 0);
 			}
 		}
 	}
@@ -7926,7 +7926,7 @@ void CMenuPcs::CalcWMFrame0(int param)
 	if (param < 0) {
 		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8)) + static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)));
 		if (param >= -10) {
-			int sign = param >> 31;
+			unsigned int sign = param >> 31;
 			float t_unclamped = static_cast<float>((sign ^ param) - sign);
 			offset *= DOUBLE_803314E8 * t_unclamped;
 			int absParam = ((param >> 31) ^ param) - (param >> 31);

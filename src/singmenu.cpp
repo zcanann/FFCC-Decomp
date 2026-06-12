@@ -3528,15 +3528,17 @@ int CMenuPcs::GetItemIcon(int index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801474F0
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CMenuPcs::GetItemType(int itemId, int useRawItemId)
 {
     const CCaravanWork* caravanWork = SingleCaravanWork();
-    if (useRawItemId == 0) {
-        itemId = static_cast<int>(caravanWork->m_inventoryItems[itemId]);
-    }
+    itemId = useRawItemId != 0 ? itemId : static_cast<int>(caravanWork->m_inventoryItems[itemId]);
 
     if (itemId <= 0) {
         return 0;

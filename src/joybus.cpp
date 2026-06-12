@@ -3627,7 +3627,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 {
     int result;
     int status;
-    unsigned int readBuf[4];
+    unsigned int readBuf;
 
     switch ((unsigned char)threadParam->m_subState)
     {
@@ -3650,11 +3650,11 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
         if ((int)threadParam->m_gbaStatus == 0 && threadParam->m_unk3 == 0x28)
         {
-            threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(readBuf), &threadParam->m_unk3);
+            threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&readBuf), &threadParam->m_unk3);
 
             if ((int)threadParam->m_gbaStatus == 0)
             {
-                threadParam->m_recvReadIdx = readBuf[0];
+                threadParam->m_recvReadIdx = readBuf;
 
                 *reinterpret_cast<unsigned int*>(&threadParam->m_deviceType) = 1;
             }

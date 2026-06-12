@@ -51,6 +51,9 @@ static inline CCaravanWork* SingleCaravanWork()
 }
 
 extern const double DOUBLE_80332968;
+extern const double DOUBLE_80332938;
+extern const float FLOAT_8033294c;
+extern const float FLOAT_80332960;
 extern const float kSingStatBaseX;
 extern const float kSingStatPanelPad;
 extern const float kSingStatPanelW;
@@ -2863,11 +2866,11 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     }
 
     MenuWindowInfo* win = m_menuWindowInfo;
-    int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
+    int lineHeight = static_cast<int>(FLOAT_80332960 * FLOAT_8032ea78);
     float x = static_cast<float>(static_cast<double>(win->width - maxWidth) * 0.5
             + static_cast<double>(win->x));
     float y = static_cast<float>(win->y + 0x20);
-    if (22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight) > 0.0f) {
+    if (FLOAT_80332960 * FLOAT_8032ea78 - static_cast<float>(lineHeight) > FLOAT_8033294c) {
         lineHeight++;
     }
     int lineStep = lineHeight + 3;
@@ -2943,8 +2946,8 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
         maxWidth -= 0x18;
     }
 
-    int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
-    if (22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight) > 0.0f) {
+    int lineHeight = static_cast<int>(FLOAT_80332960 * FLOAT_8032ea78);
+    if (FLOAT_80332960 * FLOAT_8032ea78 - static_cast<float>(lineHeight) > FLOAT_8033294c) {
         lineHeight++;
     }
 
@@ -3154,10 +3157,10 @@ inline float CMenuPcs::GetSingWinScl()
  */
 int CMenuPcs::SingWinMessHeight()
 {
-    float scaled = 22.0f * FLOAT_8032ea78;
+    float scaled = FLOAT_80332960 * FLOAT_8032ea78;
     int lineHeight = static_cast<int>(scaled);
 
-    if (scaled - static_cast<float>(lineHeight) > 0.0f) {
+    if (scaled - static_cast<float>(lineHeight) > FLOAT_8033294c) {
         lineHeight += 1;
     }
     return lineHeight + 3;
@@ -3574,9 +3577,12 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
 }
 
 
+const double DOUBLE_80332938 = 4503601774854144.0;
+const float FLOAT_8033294c = 0.0f;
+const float FLOAT_80332960 = 22.0f;
+const double DOUBLE_80332968 = 0.5;
 const float kSingStatBaseX = 440.0f;
 const float kSingStatPanelPad = 28.0f;
-const double DOUBLE_80332968 = 0.5;
 const float kSingStatPanelW = 96.0f;
 const float kSingStatPanelH = 88.0f;
 const float kSingStatScreenPadX = 12.0f;

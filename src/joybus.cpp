@@ -117,7 +117,7 @@ static const char s_thread_init_end[] = "JoyBus::ThreadInit end\n";
 static const char s_recv_type_differ_warn_fmt[] = "(%d):%s(%d): Warning: Recv data type differ!!\n";
 static const char s_joybus_cpp[] = "joybus.cpp";
 static const char s_ppos_cnt_error_fmt[] = "(%d) Error: m_PposCnt error(%d)\n";
-static const char s_send_type_error_fmt[] = "(%d): Error: send type error(%02x)\n";
+static const char s_send_type_error_fmt[] = "(%d): Error:send type error(%02x)\n";
 static const char s_map_filename_fmt[] = "m%02d_%d.mcd";
 static const char s_mem_alloc_error_fmt[] = "%s(%d): Error: memory allocation error\n";
 

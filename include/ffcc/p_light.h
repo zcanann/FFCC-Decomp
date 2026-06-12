@@ -122,8 +122,4 @@ void setchanctrl(CLightPcs::TARGET, unsigned long);
 extern CLightPcs LightPcs;
 extern CLightPcs::CBumpLight* gCharaPartWorkPtr;
 
-inline CLightPcs::CLightPcs()
-{
-}
-
 #endif // _FFCC_P_LIGHT_H_

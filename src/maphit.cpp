@@ -32,8 +32,8 @@ extern "C" const char sOldMidFormat[] = {
     (char)0xC5, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
 };
 
-CMapCylinder g_hit_cyl;
-CMapCylinder g_hit_cyl_min;
+CMapCylinder g_hit_cyl(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
+CMapCylinder g_hit_cyl_min(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
 Vec g_hit_mvec;
 Vec g_hit_mvec_min;
 Vec g_hit_hpv;

@@ -2243,8 +2243,9 @@ int CMapMng::ReadOtm(char* mapName)
     PSMTXIdentity(identity);
     m_rootMapObj->CalcMtx(identity, 1);
 
+    CMapObjAtr* attr;
     for (int i = 0; i < m_mapObjCount; i++) {
-        CMapObjAtr* attr = m_mapObjArray[i].m_attribute;
+        attr = m_mapObjArray[i].m_attribute;
         if (attr == 0) {
             continue;
         }

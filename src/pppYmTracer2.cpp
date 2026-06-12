@@ -138,6 +138,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
                 GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
 
                 YmTracer2Polygon* current = poly;
+                const f32& uvMin = kYmTracer2UvMin;
+                const f32& uvMax = kYmTracer2UvMax;
 
                 i = 0;
                 while (i < (s32)(work->visibleCount - 1)) {
@@ -146,11 +148,11 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
 
-                    if (alphaScale < kYmTracer2UvMin) {
-                        alphaScale = kYmTracer2UvMin;
+                    if (alphaScale < uvMin) {
+                        alphaScale = uvMin;
                     }
-                    if (alphaScale > kYmTracer2UvMax) {
-                        alphaScale = kYmTracer2UvMax;
+                    if (alphaScale > uvMax) {
+                        alphaScale = uvMax;
                     }
 
                     colorTop = g_pppYmTracer2_1;
@@ -166,19 +168,19 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
 
                     GXPosition3f32(current->targetPos.x, current->targetPos.y, current->targetPos.z);
                     GXColor1u32(*(u32*)&colorTop);
-                    GXTexCoord2f32(uTop, kYmTracer2UvMax);
+                    GXTexCoord2f32(uTop, uvMax);
 
                     GXPosition3f32(current->pos.x, current->pos.y, current->pos.z);
                     GXColor1u32(*(u32*)&colorTop);
-                    GXTexCoord2f32(uTop, kYmTracer2UvMin);
+                    GXTexCoord2f32(uTop, uvMin);
 
                     GXPosition3f32(next->targetPos.x, next->targetPos.y, next->targetPos.z);
                     GXColor1u32(*(u32*)&colorBottom);
-                    GXTexCoord2f32(uBottom, kYmTracer2UvMax);
+                    GXTexCoord2f32(uBottom, uvMax);
 
                     GXPosition3f32(next->pos.x, next->pos.y, next->pos.z);
                     GXColor1u32(*(u32*)&colorBottom);
-                    GXTexCoord2f32(uBottom, kYmTracer2UvMin);
+                    GXTexCoord2f32(uBottom, uvMin);
                     i++;
                     current++;
                 }

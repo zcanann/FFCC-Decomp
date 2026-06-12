@@ -3064,9 +3064,13 @@ int CGObject::IsAnimFinished(int mode)
         hasModel = true;
     }
 
-    if (hasModel) {
+    if (!hasModel) {
+        goto returnOne;
+    }
+    {
         slot = m_currentAnimSlot;
         if (slot == -1) {
+        returnOne:
             return 1;
         }
         {
@@ -3119,8 +3123,6 @@ int CGObject::IsAnimFinished(int mode)
             return result & 0xFF;
         }
     }
-
-    return 1;
 }
 #pragma pop
 

@@ -80,6 +80,19 @@ STATIC_ASSERT(sizeof(m_objMon) == sizeof(CGMonObj) * kFlatMonObjCount);
 
 int gCFlatRuntime2DebugDrawOverflowFrame = 0;
 char gCFlatRuntime2DebugDrawOverflowInit = 0;
+static const char sCFlatRuntime2GbaStringBlock[] =
+	"dvd/gba/\0\0\0\0"
+	"ffcc_cli.bin\0\0\0\0"
+	"objdat.spt\0\0"
+	"icon.dat\0\0\0\0"
+	"FF Crystal Chronicles\0\0";
+static const float sCFlatRuntime2ForwardVec[] = { 0.0f, 0.0f, 1.0f };
+static const char sCFlatRuntime2ClassName[] = "CFlatRuntime2";
+static const char sCFlatRuntimeClassName[] = "CFlatRuntime";
+static const char sCFlatRuntime2LayerMissingMsg[] =
+	"layer\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42%s\n";
+static const char sCFlatRuntime2TexturePathFmt[] = "dvd/%s%s.tex";
+static const char sCFlatRuntime2FileTag[] = "cflat_runtime2.cpp";
 const char sCFlatRuntime2DebugDrawOverflowMsg[] =
 	"CFlatRuntime2.AddDebugDrawCC: "
 	"\x8e\x8b\x90\xfc\x83\x60\x83\x46\x83\x62\x83\x4e\x83\x66\x83\x6f\x83\x62\x83\x4f"
@@ -88,11 +101,10 @@ const char sCFlatRuntime2DebugDrawOverflowMsg[] =
 static const char sCFlatRuntime2SaveSceneMsg[] = "SAVE SCENE";
 static const char sCFlatRuntime2FileNameFmt[] = "dvd/cft/%s.cft";
 static const char sCFlatRuntime2DebugFileNameFmt[] = "dvd/cft/%s.cft.dbg";
-static const char sCFlatRuntime2LoadMsg[] = "CFlatRuntime2::Load\n";
-static const char sCFlatRuntime2FileTag[] = "cflat_runtime2.cpp";
-static const char sCFlatRuntime2LayerMissingMsg[] =
-	"layer\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42%s\n";
-static const char sCFlatRuntime2TexturePathFmt[] = "dvd/%s%s.tex";
+static const char sCFlatRuntime2LoadMsg[] =
+	"\x83\x58\x83\x4e\x83\x8a\x83\x76\x83\x67\x93\xc7\x82\xdd\x8d\x9e"
+	"\x82\xdd\x8f\x49\x97\xb9\n";
+static const char sCFlatRuntimeObjectClassName[] = "CFlatRuntime::CObject";
 
 struct CFlatLayerResource {
 	int m_allocStage;

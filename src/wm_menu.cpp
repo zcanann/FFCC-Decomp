@@ -10033,7 +10033,8 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390), channel, current);
 	}
-	m_wm.m_charaModelData[current * 0x34 + 0xC] = 0;
+	unsigned char* modelData = m_wm.m_charaModelData + current * 0x34;
+	modelData[0xC] = 0;
 	GetWmCharaHandles(this)[current]->LoadModelASync(3, 0x43, 0);
 }
 

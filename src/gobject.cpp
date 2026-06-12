@@ -1081,11 +1081,12 @@ void CGObject::bgNormalCollision()
     pos.y += sStepProbeHeight + m_capsuleHalfHeight;
 
     unsigned int retry = 4;
-    const double epsilon = DOUBLE_80330400;
+    double epsilon;
     float boundMax;
     float boundMin;
     boundMin = sHugeCylinderExtent;
     boundMax = sNegHugeCylinderExtent;
+    epsilon = DOUBLE_80330400;
     do {
         const unsigned long hitMask = m_bgHitMask;
         const float radius = m_capsuleHalfHeight;

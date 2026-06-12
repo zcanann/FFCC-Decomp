@@ -1292,12 +1292,25 @@ void CGItemObj::onFrame()
 			}
 
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
-			float particleValue = static_cast<float>(itemRows[m_worldParamB].m_fineValue);
-			float particleScale = kItemObjFineStep * (float)particleValue + kItemObjParticleScaleBase;
+			union {
+				double d;
+				struct {
+					unsigned int hi;
+					unsigned int lo;
+				} words;
+			} particleValue;
+			const double* u32Bias = &kItemObjU32ToDoubleBias;
+			const float* fineStep = &kItemObjFineStep;
+			const float* particleScaleBase = &kItemObjParticleScaleBase;
+			particleValue.words.hi = 0x43300000;
+			particleValue.words.lo = itemRows[m_worldParamB].m_fineValue;
+			float particleScale = *fineStep * (float)(particleValue.d - *u32Bias) + *particleScaleBase;
 			putParticle((soundEntry << 8) | *(int*)(ownerData + 0x3B4), m_particleSlot, this, particleScale, 0x12909);
 
-			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), kItemObjMemoryRadius, kItemObjMemoryRadius,
-			             CVector(kItemObjZero, kItemObjZero, kItemObjZero));
+			const float* zero = &kItemObjZero;
+			const float* memoryRadius = &kItemObjMemoryRadius;
+			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), *memoryRadius, *memoryRadius,
+			             CVector(*zero, *zero, *zero));
 			*reinterpret_cast<unsigned int*>(&m_damageColliders[1].m_localPosition.x) = 8;
 			addSubStat();
 		}

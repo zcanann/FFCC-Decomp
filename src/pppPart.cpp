@@ -1792,12 +1792,17 @@ DataValsAllocated:
 void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 {
 	int* table = (int*)(progOffsetReconstructionTable + 6);
-	int pppProgRelocCount = *(int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]);
-	int pdtRelocCount = *(int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]);
-	int* pppProgRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]) + 1;
-	int* pdtRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]) + 1;
+	int pppProgRelocOffset = progOffsetReconstructionTable[2];
+	int pdtRelocOffset = progOffsetReconstructionTable[3];
+	int tableHead = table[0];
+	int* pppProgRelocHead = (int*)((int)progOffsetReconstructionTable + pppProgRelocOffset);
+	int* pdtRelocHead = (int*)((int)progOffsetReconstructionTable + pdtRelocOffset);
+	int pppProgRelocCount = pppProgRelocHead[0];
+	int pdtRelocCount = pdtRelocHead[0];
+	int* pppProgRelocs = pppProgRelocHead + 1;
+	int* pdtRelocs = pdtRelocHead + 1;
 
-	if ((u32)table[0] == 0) {
+	if ((u32)tableHead == 0) {
 		return;
 	}
 

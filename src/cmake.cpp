@@ -1042,7 +1042,9 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
                 return 0;
             }
 
-            StoreCmakeVillageName();
+            char* townName = Game.m_gameWork.m_townName;
+            memset(townName, 0, 17);
+            strcpy(townName, s_CmakeInfo.m_name);
             Sound.PlaySe(2, 0x40, 0x7f, 0);
             villageWork->m_resultDir = 1;
             return 1;

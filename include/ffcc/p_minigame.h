@@ -27,7 +27,7 @@ class CMiniGamePcs : public CProcess
 public:
     static CProcessTable m_table;
 
-    CMiniGamePcs() {}
+    CMiniGamePcs();
 
     int GetTable(unsigned long);
 

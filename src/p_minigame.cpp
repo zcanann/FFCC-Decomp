@@ -13,7 +13,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-CMiniGamePcs MiniGamePcs;
 extern "C" {
 int MG_GBA_THREAD_MSG_SETPORT_ct = 0;
 int g_errCt = 0;
@@ -25,12 +24,18 @@ void destroy__12CMiniGamePcsFv(CMiniGamePcs*);
 void calc__12CMiniGamePcsFv(CMiniGamePcs*);
 }
 
-static CProcessTableCallback s_miniGameTableDescCreate = {0, 0xFFFFFFFF,
-                                                          reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
-static CProcessTableCallback s_miniGameTableDescDestroy = {0, 0xFFFFFFFF,
-                                                           reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
-static CProcessTableCallback s_miniGameTableDescCalc = {0, 0xFFFFFFFF,
-                                                        reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
+inline CMiniGamePcs::CMiniGamePcs()
+{
+    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
+    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
+    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
+    CProcessTable* table = &m_table;
+
+    table->m_fields.m_create = desc0;
+    table->m_fields.m_destroy = desc1;
+    table->m_fields.m_entries[0].m_callback = desc2;
+}
+
 extern const char sMiniGameGbaDvdDir[] = "dvd/gba/";
 extern const char sMiniGameClientBinaryName[] = "ffcc_cli.bin";
 extern const char sMiniGameObjDataScriptName[] = "objdat.spt";
@@ -41,18 +46,19 @@ extern const char sMiniGameProcessClassName[] = "CProcess";
 CProcessTable CMiniGamePcs::m_table = {
     const_cast<char*>(sMiniGamePcsGameProcessName),
     {
-        s_miniGameTableDescCreate.m_thisOffset,
-        s_miniGameTableDescCreate.m_virtualOffset,
-        s_miniGameTableDescCreate.m_function,
-        s_miniGameTableDescDestroy.m_thisOffset,
-        s_miniGameTableDescDestroy.m_virtualOffset,
-        s_miniGameTableDescDestroy.m_function,
-        s_miniGameTableDescCalc.m_thisOffset,
-        s_miniGameTableDescCalc.m_virtualOffset,
-        s_miniGameTableDescCalc.m_function,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0x24,
     },
 };
+CMiniGamePcs MiniGamePcs;
 static const char s_miniGameManagerTag[] = "GMGR";
 static const char s_miniGameEnd0000Text[] = "MiniGameEnd 0000\n";
 static const char s_miniGameEnd1111Text[] = "MiniGameEnd 1111\n";

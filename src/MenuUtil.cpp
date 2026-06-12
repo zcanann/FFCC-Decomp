@@ -1425,7 +1425,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 	int languageIndex = Game.m_gameWork.m_languageId - 1;
 	int drawPrefix = 1;
-	float lineStep = kHelpMessageLineStep;
+	float lineStep = *(const volatile float*)&kHelpMessageLineStep;
 	const char* suffix = 0;
 	char itemName[260];
 	char scratch[0x100];
@@ -1436,7 +1436,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	font->DrawInit();
 	font->SetTlut(tlut);
 	font->SetColor(color);
-	font->SetScale(kOptionMenuFontScale);
+	font->SetScale(*(const volatile float*)&kOptionMenuFontScale);
 
 	int maxWidth;
 	int firstLine = 500;
@@ -1496,7 +1496,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 		int four = drawPrefix + 3;
 		if (four == 4) {
-			lineStep = kOptionUiTwenty;
+			lineStep = *(const volatile float*)&kOptionUiTwenty;
 		}
 	}
 
@@ -1516,7 +1516,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		u32 baseY = lineBaseY[baseIndex];
 		int y = baseY;
 		if (drawPrefix != 0) {
-			font->SetPosX(kOptionRowLeft);
+			font->SetPosX(*(const volatile float*)&kOptionRowLeft);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
@@ -1548,7 +1548,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 
 	int x = 0x38;
-	font->SetPosX(kOptionRowLeft);
+	font->SetPosX(*(const volatile float*)&kOptionRowLeft);
 	int detailY = static_cast<int>(lineStep + static_cast<float>(static_cast<int>(baseY)));
 	font->SetPosY(static_cast<float>(detailY));
 
@@ -1560,7 +1560,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					strcpy(scratch, GetAttrStr(*reinterpret_cast<u16*>(itemBase + 8)));
 					font->SetTlut(4);
 					font->Draw(scratch);
-					x = static_cast<int>(static_cast<float>(x) + (kOptionTextNudge + font->GetWidth(scratch)));
+					x = static_cast<int>(static_cast<float>(x) + (*(const volatile float*)&kOptionTextNudge + font->GetWidth(scratch)));
 					font->SetPosX(static_cast<float>(x));
 					font->SetTlut(9);
 
@@ -1583,7 +1583,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			strcat(scratch, sMenuUtilSpaceText);
 			font->Draw(scratch);
 
-			x = static_cast<int>(static_cast<float>(x) + (kOptionTextNudge + font->GetWidth(scratch)));
+			x = static_cast<int>(static_cast<float>(x) + (*(const volatile float*)&kOptionTextNudge + font->GetWidth(scratch)));
 			font->SetTlut(1);
 			font->SetPosX(static_cast<float>(x));
 			sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
@@ -1623,7 +1623,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 						}
 
 						int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
-						int deltaX = static_cast<int>(static_cast<float>(x) + (kOptionTextNudge + font->GetWidth(scratch)));
+						int deltaX = static_cast<int>(static_cast<float>(x) + (*(const volatile float*)&kOptionTextNudge + font->GetWidth(scratch)));
 						font->SetPosX(static_cast<float>(deltaX));
 						if (delta >= 0) {
 							font->SetTlut(9);
@@ -1682,7 +1682,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		int idx = lineCount + drawPrefix - 1;
 		int y = lineBaseY[idx];
 		if (drawPrefix != 0) {
-			font->SetPosX(kOptionRowLeft);
+			font->SetPosX(*(const volatile float*)&kOptionRowLeft);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);

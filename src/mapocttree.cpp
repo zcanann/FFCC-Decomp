@@ -750,8 +750,8 @@ void COctTree::ClearLight()
  */
 int CBound::CheckCross(CBound& other)
 {
-	bool xyOverlap;
 	bool overlap;
+	bool xyOverlap;
 	int xOverlap;
 
 	overlap = false;

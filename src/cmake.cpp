@@ -1253,8 +1253,7 @@ void CMenuPcs::CmakeResultDraw1()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
-    labelFont->SetColor(color.color);
+    labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
@@ -1271,8 +1270,7 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
-    valueFont->SetColor(valueColor.color);
+    valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
     valueFont->SetTlut(6);
 
     char tribeWithSlash[0x10];
@@ -1503,8 +1501,7 @@ void CMenuPcs::CmakeResultDraw()
     labelFont->SetScale(1.0f);
     labelFont->DrawInit();
 
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
-    labelFont->SetColor(color.color);
+    labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
     float labelWidths[4];
     int labelY = 0x70;
@@ -1523,8 +1520,7 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    CColor valueColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha));
-    valueFont->SetColor(valueColor.color);
+    valueFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
     valueFont->SetTlut(6);
 
     char tribeWithSlash[0x10];

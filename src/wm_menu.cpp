@@ -9477,8 +9477,8 @@ void CMenuPcs::DrawCMLife()
 		double kStepDelta;
 		float kRectSize;
 		const float kZero = *pZeroK;
-		kRectSize = *pRectSize;
 		kStepDelta = *pStepDelta;
+		kRectSize = *pRectSize;
 
 		for (i = 0; i < count; i++) {
 			float yAdd = GetFcvValue(*reinterpret_cast<FCV*>(&gWmLifeYOffsetSplineCount), step);

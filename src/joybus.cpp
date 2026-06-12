@@ -424,6 +424,8 @@ void JoyBus::Destroy()
  */
 #pragma push
 #pragma opt_common_subs off
+#pragma optimize_for_size on
+#pragma use_lmw_stmw off
 int JoyBus::LoadBin()
 {
     if (static_cast<signed char>(m_binLoaded) != 0)
@@ -460,18 +462,14 @@ int JoyBus::LoadBin()
             m_gbaBootImage[0xAE] = (unsigned char)m_diskId[2];
             m_gbaBootImage[0xAF] = (unsigned char)m_diskId[3];
 
-            int idx = 0xBC;
-
             unsigned char* buf = (unsigned char*)m_gbaBootImage;
             int sum = 0xE7 - buf[0xA0] - buf[0xA1] - buf[0xA2] - buf[0xA3] - buf[0xA4] - buf[0xA5] - buf[0xA6] - buf[0xA7] - buf[0xA8] - buf[0xA9] - buf[0xAA] - buf[0xAB] - buf[0xAC] - buf[0xAD] - buf[0xAE] - buf[0xAF] - buf[0xB0] - buf[0xB1] - buf[0xB2] - buf[0xB3] - buf[0xB4] - buf[0xB5] - buf[0xB6] - buf[0xB7] - buf[0xB8] - buf[0xB9] - buf[0xBA] - buf[0xBB];
 
-            if (idx < 0xBD)
+            int idx = (sum != 0) ? 0xBC : 0xBC;
+
+            for (; idx < 0xBD; idx++)
             {
-                do
-                {
-                    sum -= (unsigned char)m_gbaBootImage[idx];
-                    idx++;
-                } while (idx < 0xBD);
+                sum -= (unsigned char)m_gbaBootImage[idx];
             }
 
             m_gbaBootImage[idx] = (unsigned char)sum;
@@ -1545,8 +1543,7 @@ timeout_expiry:
                     {
                         threadParam->m_state = 0x1E;
                         localCrc[0] = 0xFFFF;
-                        unsigned short crcB = Crc16(m_fileBaseB_dup, reinterpret_cast<unsigned char*>(m_fileBaseB), localCrc);
-                        int chkB = SendChkCrc(threadParam, 1, crcB, &localWord);
+                        int chkB = SendChkCrc(threadParam, 1, Crc16(m_fileBaseB_dup, reinterpret_cast<unsigned char*>(m_fileBaseB), localCrc), &localWord);
                         if (chkB != 0)
                         {
                             threadParam->m_altState = threadParam->m_state;
@@ -2798,8 +2795,7 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
 
     *recvBuffer = data;
 
-    unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
-    unsigned char op = dataBytes[0] & 0x3F;
+    unsigned char op = *reinterpret_cast<unsigned char*>(&data) & 0x3F;
 
     if ((int)op == 4)
     {
@@ -2808,11 +2804,11 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
     }
     else if ((int)op == 0x0E)
     {
-        unsigned char b1 = dataBytes[1];
+        unsigned char b1 = reinterpret_cast<unsigned char*>(&data)[1];
 
         if (b1 == 0)
         {
-            m_stateCodeArr[threadParam->m_portIndex] = dataBytes[2];
+            m_stateCodeArr[threadParam->m_portIndex] = reinterpret_cast<unsigned char*>(&data)[2];
             m_stateFlagArr[threadParam->m_portIndex] = 1;
         }
         else
@@ -3631,7 +3627,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 {
     int result;
     int status;
-    unsigned int readBuf[4];
+    unsigned int readBuf;
 
     switch ((unsigned char)threadParam->m_subState)
     {
@@ -3654,11 +3650,11 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
         if ((int)threadParam->m_gbaStatus == 0 && threadParam->m_unk3 == 0x28)
         {
-            threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(readBuf), &threadParam->m_unk3);
+            threadParam->m_gbaStatus = GBARead(threadParam->m_portIndex, reinterpret_cast<unsigned char*>(&readBuf), &threadParam->m_unk3);
 
             if ((int)threadParam->m_gbaStatus == 0)
             {
-                threadParam->m_recvReadIdx = readBuf[0];
+                threadParam->m_recvReadIdx = readBuf;
 
                 *reinterpret_cast<unsigned int*>(&threadParam->m_deviceType) = 1;
             }
@@ -3964,7 +3960,6 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         return -1;
     }
 
-    result = 0;
     localWord = 0;
     localBytes[0] = 0x0B;
 
@@ -4758,7 +4753,7 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
 int JoyBus::SendMapObj(ThreadParam* threadParam)
 {
     int port;
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)
@@ -4994,10 +4989,14 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
         unsigned int cmd0 = cmds[0];
         result = SetSendQueue(threadParam, cmd0);
 
-        if (result == 0)
+        switch (result)
+        {
+        case 0:
         {
             unsigned int cmd1 = cmds[1];
             result = SetSendQueue(threadParam, cmd1);
+            break;
+        }
         }
     }
 
@@ -6430,10 +6429,9 @@ int JoyBus::SendAddLetter(int portIndex)
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 1;
-    unsigned int cmdWord = cmd;
     unsigned int port;
 
-    return SetSendQueue(&m_threadParams[portIndex], cmdWord);
+    return SetSendQueue(&m_threadParams[portIndex], cmd);
 }
 
 
@@ -6455,11 +6453,10 @@ int JoyBus::SetItem(int portIndex, unsigned char itemId, short amount)
     cmdBytes[0] = 0x17;
     cmdBytes[1] = itemId;
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&amountBytes, 0);
-    unsigned int cmd = *reinterpret_cast<unsigned int*>(cmdBytes);
     unsigned int port;
     unsigned int result;
 
-    result = SetSendQueue(&m_threadParams[portIndex], cmd);
+    result = SetSendQueue(&m_threadParams[portIndex], *reinterpret_cast<unsigned int*>(cmdBytes));
 
     return result;
 }
@@ -6480,11 +6477,10 @@ int JoyBus::DelItem(int portIndex, unsigned char itemId)
     cmdBytes[0] = 0x17;
     cmdBytes[1] = itemId & 0x3F;
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(reinterpret_cast<unsigned short*>(&tail), 0);
-    unsigned int cmd = *reinterpret_cast<unsigned int*>(cmdBytes);
     unsigned int port;
     int result;
 
-    result = SetSendQueue(&m_threadParams[portIndex], cmd);
+    result = SetSendQueue(&m_threadParams[portIndex], *reinterpret_cast<unsigned int*>(cmdBytes));
 
     return result;
 }
@@ -6623,6 +6619,8 @@ bool JoyBus::IsThreadRunning()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma optimize_for_size on
 void JoyBus::RestartThread()
 {
     m_threadInitFlag = 0;
@@ -6660,7 +6658,7 @@ void JoyBus::RestartThread()
 
             unsigned char* img;
             unsigned char* p;
-            int idx = 0xBC;
+            int idx;
             int sum;
 
             Joybus.m_gbaBootImage[0xAC] = Joybus.m_diskId[0];
@@ -6704,13 +6702,11 @@ void JoyBus::RestartThread()
                     - img[0xBB])
                 );
 
-            if (idx < 0xBD)
+            idx = (sum != 0) ? 0xBC : 0xBC;
+
+            for (; idx < 0xBD; idx++)
             {
-                do
-                {
-                    sum -= *p++;
-                    idx++;
-                } while (idx < 0xBD);
+                sum -= *p++;
             }
 
             img[idx] = (unsigned char)sum;
@@ -6764,6 +6760,7 @@ void JoyBus::RestartThread()
     if ((unsigned int)System.m_execParam >= 2)
         System.Printf(const_cast<char*>(s_thread_init_end));
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -6782,10 +6779,9 @@ int JoyBus::SetCmdLst(int portIndex, int param_3, short param_4)
     cmdBytes[0] = 0x1F;
     cmdBytes[1] = static_cast<unsigned char>(param_3);
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&param, 0);
-    unsigned int cmdWord = cmd;
     unsigned int result;
 
-    result = SetSendQueue(&m_threadParams[portIndex], cmdWord);
+    result = SetSendQueue(&m_threadParams[portIndex], cmd);
 
     return result;
 }
@@ -6802,10 +6798,9 @@ int JoyBus::SetTmpArti(int portIndex, int param3, int param4)
     cmdBytes[0] = 0x20;
     cmdBytes[1] = static_cast<unsigned char>(param3);
     cmdBytes[2] = static_cast<unsigned char>(param4 - 0x9f);
-    unsigned int word = cmd;
     unsigned int port;
 
-    return SetSendQueue(&m_threadParams[portIndex], word);
+    return SetSendQueue(&m_threadParams[portIndex], cmd);
 }
 
 /*
@@ -6820,10 +6815,9 @@ int JoyBus::SendUseItem(int portIndex, char itemId)
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x0C;
     cmdBytes[2] = itemId;
-    unsigned int word = cmd;
     unsigned int port;
 
-    return SetSendQueue(&m_threadParams[portIndex], word);
+    return SetSendQueue(&m_threadParams[portIndex], cmd);
 }
 
 

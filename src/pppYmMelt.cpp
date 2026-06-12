@@ -22,11 +22,9 @@ extern const float kPppYmMeltHalf = 0.5f;
 extern const float kPppYmMeltDegToRad = 0.017453292f;
 extern const float kPppYmMeltRayLength = -2000.0f;
 extern const float kPppYmMeltCylinderRadius = 10000000000.0f;
-extern const float kPppYmMeltCylinderBoundAndZero[2] = {-10000000000.0f, 0.0f};
+extern const float kPppYmMeltCylinderBound = -10000000000.0f;
 extern const u32 kPppYmMeltMaskBit0 = 0x00000001;
 extern const u32 kPppYmMeltMaskBit4 = 0x00000010;
-extern const u32 kPppYmMeltMask6Bits = 0x0000003f;
-extern const float kPppYmMeltLocalZero = 0.0f;
 extern const float kCFlatPadStickZero = 0.0f;
 u32 g_ymMelt;
 }
@@ -447,7 +445,7 @@ extern "C" void CalcPolygonHeight(
         rayDirection.z = zero;
         pppAddVector(vertex->m_position, vertex->m_position, worldBase);
 
-        CMapCylinder cylinder(LoadFloat(kPppYmMeltCylinderRadius), kPppYmMeltCylinderBoundAndZero[0]);
+        CMapCylinder cylinder(LoadFloat(kPppYmMeltCylinderRadius), kPppYmMeltCylinderBound);
         cylinder.m_bottom = vertex->m_position;
         cylinder.m_axis.x = rayDirection.x;
         cylinder.m_axis.y = rayDirection.y;

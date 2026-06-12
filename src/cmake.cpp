@@ -2500,10 +2500,10 @@ void CMenuPcs::CmakeNameDraw()
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
         short sel = CmakeState(this)->m_select;
-        int cursorBase = (CmakeState(this)->m_row < 5) ? 0xE5 : 0xE5;
+        int cellX = (CmakeState(this)->m_row < 5) ? 0xE5 : 0xE5;
         int cursorY = CmakeState(this)->m_row * 0x20 + 0x63;
-        int cellX = static_cast<int>(
-            26.9f * static_cast<float>(sel) + static_cast<float>(cursorBase));
+        cellX = static_cast<int>(
+            26.9f * static_cast<float>(sel) + static_cast<float>(cellX));
         SetCmakeBlendMatColor(1.0f);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x64 : 0x3D));
         MenuPcs.DrawRect(

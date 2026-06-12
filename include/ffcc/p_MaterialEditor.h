@@ -81,8 +81,6 @@ public:
     static CProcessTable m_table;
 
     CMaterialEditorPcs() {}
-    ~CMaterialEditorPcs();
-
     void Init();
     void Quit();
     int GetTable(unsigned long);

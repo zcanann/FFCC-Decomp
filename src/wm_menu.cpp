@@ -12269,7 +12269,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x24 : 0x2C));
 	right = (sx + sw) - FLOAT_80331410;
 	bottom = (sy + sh) - FLOAT_80331410;
-	const float uv0 = FLOAT_803313dc;
+	const float* pZw1 = &FLOAT_803313dc;
+	const float uv0 = *pZw1;
 	for (rectIdx = 0; rectIdx < 4; rectIdx++) {
 		float x;
 		float y;
@@ -12292,7 +12293,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x26 : 0x2D));
 	const double innerWidthD = static_cast<double>(sw) - DOUBLE_80331428;
 	const float innerX = FLOAT_80331410 + sx;
-	const float uv1 = FLOAT_803313dc;
+	const float* pZw2 = &FLOAT_803313dc;
+	const float uv1 = *pZw2;
 	const float innerWidthF = static_cast<float>(innerWidthD);
 	float y = sy;
 	for (rectIdx = 0; rectIdx < 2; rectIdx++) {
@@ -12307,7 +12309,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x25 : 0x2E));
 	const double innerHeightD = static_cast<double>(sh) - DOUBLE_80331428;
 	const float innerY = FLOAT_80331410 + sy;
-	const float uv2 = FLOAT_803313dc;
+	const float* pZw3 = &FLOAT_803313dc;
+	const float uv2 = *pZw3;
 	const float innerHeightF = static_cast<float>(innerHeightD);
 	float x = sx;
 	for (rectIdx = 0; rectIdx < 2; rectIdx++) {
@@ -12320,7 +12323,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x27 : 0x2F));
-	const float uv3 = FLOAT_803313dc;
+	const float* pZw4 = &FLOAT_803313dc;
+	const float uv3 = *pZw4;
 	MenuPcs.DrawRect(flags, innerX, innerY, static_cast<float>(innerWidthD), static_cast<float>(innerHeightD), uv3, uv3, FLOAT_803313e8, FLOAT_803313e8, uv3);
 
 	if (m_menuWindowInfo->state == 0) {

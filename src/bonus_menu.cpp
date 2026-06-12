@@ -2428,8 +2428,8 @@ void CMenuPcs::DrawResultCloseAnim()
 							digits[0] = value;
 						}
 
-						float digitW = (float)sprite->w;
 						float digitX = (float)((DOUBLE_80331EC8 * (double)sprite->w - (float)(digitCount * sprite->w)) * DOUBLE_80331E78 + (double)sprite->x);
+						float digitW = (float)sprite->w;
 						int* dp = digits;
 						for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
 							MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,

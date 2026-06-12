@@ -1574,8 +1574,7 @@ void CShopMenu::DrawBuySellInfo()
     SetupShopMenuInfoFont(font);
 
     char* priceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_PRICE);
-    float priceWidth = font->GetWidth(priceText);
-    int priceX = static_cast<int>(FLOAT_80332d7c - priceWidth);
+    int priceX = static_cast<int>(FLOAT_80332d7c - font->GetWidth(priceText));
     font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, priceText, static_cast<float>(priceX), FLOAT_80332d80, 0x13, 0x12);
     MenuPcs.DrawInit();
@@ -3564,8 +3563,9 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
     unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
+    int i = 0;
     unsigned char* displayList = shapeBytes;
-    for (int i = 0; i < *reinterpret_cast<short*>(shapeBytes + 2); i++) {
+    for (; i < *reinterpret_cast<short*>(shapeBytes + 2); i++) {
         GXCallDisplayList(*reinterpret_cast<void**>(displayList + 0xC), 0x60);
         displayList += 8;
     }
@@ -3641,8 +3641,9 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
     unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
+    int i = 0;
     unsigned char* displayList = shapeBytes;
-    for (int i = 0; i < *reinterpret_cast<short*>(shapeBytes + 2); i++) {
+    for (; i < *reinterpret_cast<short*>(shapeBytes + 2); i++) {
         GXCallDisplayList(*reinterpret_cast<void**>(displayList + 0xC), 0x60);
         displayList += 8;
     }

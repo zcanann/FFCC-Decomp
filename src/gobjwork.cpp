@@ -440,7 +440,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
  */
 void CCaravanWork::FGLetterOpen(int letterIdx)
 {
-	CCaravanWork* shifted = reinterpret_cast<CCaravanWork*>(reinterpret_cast<char*>(this) + letterIdx * sizeof(CLetterWork));
+	CCaravanWork* shifted = reinterpret_cast<CCaravanWork*>(reinterpret_cast<char*>(this) + letterIdx * 12);
 #define letter (&shifted->m_letters[0])
 	CFlatRuntime::CStack stack[2];
 
@@ -449,10 +449,9 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	gCFlatRuntime().SystemCall(
 		Game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
-	CMes::m_tempVar[0] = letter->TempVar(0);
-	CMes::m_tempVar[1] = letter->TempVar(1);
-	CMes::m_tempVar[2] = letter->TempVar(2);
-	CMes::m_tempVar[3] = letter->TempVar(3);
+	for (int i = 0; i < 4; i++) {
+		CMes::m_tempVar[i] = m_letters[letterIdx].m_half.m_tempVars[i];
+	}
 	CMes::m_tempVar[4] = letter->MessageType();
 	CMes::m_tempVar[5] = letter->SenderId();
 
@@ -466,7 +465,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 
 	int gil;
 	if (letter->AttachmentIsGil()) {
-		gil = m_letters[letterIdx].AttachmentValue() * 100;
+		gil = letter->AttachmentValue() * 100;
 	} else {
 		gil = 0;
 	}

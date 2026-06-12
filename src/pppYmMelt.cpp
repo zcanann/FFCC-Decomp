@@ -14,10 +14,10 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #pragma exceptions on
 extern "C" {
-extern const float kPppYmMeltZero = 0.0f;
-extern const float kPppYmMeltPhaseOne = 1.0f;
-extern const double kPppYmMeltUnsignedToDoubleBias = 4503599627370496.0;
-extern const double kPppYmMeltUnsignedToDoubleAdjust = 4503601774854144.0;
+extern const float kPppYmMeltZero;
+extern const float kPppYmMeltPhaseOne;
+extern const double kPppYmMeltUnsignedToDoubleBias;
+extern const double kPppYmMeltUnsignedToDoubleAdjust;
 extern const float kPppYmMeltHalf = 0.5f;
 extern const float kPppYmMeltDegToRad = 0.017453292f;
 extern const float kPppYmMeltRayLength = -2000.0f;

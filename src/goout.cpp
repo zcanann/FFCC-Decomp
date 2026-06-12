@@ -102,7 +102,11 @@ static const char s_deleted_from_the_current_data_801DF8F8[] = "deleted from the
 static const char s_In_der_Memory_Card_in_Steckplatz_A_801DF918[] = "In der Memory Card in Steckplatz A";
 static const char lbl_801DF93C[] = "befinden sich keine Spielst\xe4nde der";
 static const char s_aktuellen_Spielsitzung_Bitte_stecken_801DF960[] = "aktuellen Spielsitzung. Bitte stecken";
-static const char lbl_801DF988[] = "Sie eine Memory Card mit Spielst\xe4nden";
+static const char lbl_801DF988[0x25] = {
+    'S', 'i', 'e', ' ', 'e', 'i', 'n', 'e', ' ', 'M', 'e', 'm', 'o', 'r', 'y', ' ',
+    'C', 'a', 'r', 'd', ' ', 'm', 'i', 't', ' ', 'S', 'p', 'i', 'e', 'l', 's', 't',
+    '\xe4', 'n', 'd', 'e', 'n',
+};
 extern char s_der_aktuellen_Spielsitzung_in_Steckplatz_A_ein_801DF9B0[];
 extern char s_Auf_die_Memory_Card_wurde_noch_nicht_801DF9E0[];
 extern char s_gespeichert_Bitte_speichern_Sie_vorerst_801DFA08[];

@@ -9445,10 +9445,10 @@ void CMenuPcs::DrawCMLife()
 
 		const float* p255C = &FLOAT_80331458;
 		GXColor color;
-		color.r = static_cast<unsigned char>(static_cast<int>(*p255C * red));
-		color.g = static_cast<unsigned char>(static_cast<int>(*p255C * green));
-		color.b = static_cast<unsigned char>(static_cast<int>(*p255C * blue));
 		color.a = static_cast<unsigned char>(static_cast<int>(alphaF));
+		color.g = static_cast<unsigned char>(static_cast<int>(*p255C * green));
+		color.r = static_cast<unsigned char>(static_cast<int>(*p255C * red));
+		color.b = static_cast<unsigned char>(static_cast<int>(*p255C * blue));
 		GXSetChanMatColor(GX_COLOR0A0, color);
 
 		row = slot / 4;

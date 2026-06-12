@@ -343,7 +343,7 @@ extern "C" const double sPitchLookCutoff = 0.7853981852531433; // DOUBLE_803303e
 extern "C" const float sLookBlendScale;            // FLOAT_803303f0 (0.001)
 extern "C" const float sFarVisibleDepth;           // FLOAT_803303f4 (10000)
 extern "C" const float sNearVisibleDepth;          // FLOAT_803303f8 (750)
-extern const double DOUBLE_80330400 = 0.0010000000474974513;   // 3f50624de0000000 = (double)0.001f
+// DOUBLE_80330400 defined at end of file
 
 /*
  * --INFO--
@@ -1060,6 +1060,7 @@ void CGObject::bgCollision()
  */
 void CGObject::bgNormalCollision()
 {
+    extern const double DOUBLE_80330400;
     if (fabs(static_cast<double>(m_groundHitOffset.x)) < DOUBLE_80330400) {
         m_groundHitOffset.x = sZeroFloat;
     }
@@ -1273,8 +1274,7 @@ void CGObject::bgWorldCollision()
         Vec delta;
 
         MapMng.m_hitMapObj->CalcHitPosition(&radial);
-        const Vec& newOffset = vecSub(reinterpret_cast<CVector&>(radial), CVector(m_worldPosition));
-        m_groundHitOffset = delta = newOffset;
+        m_groundHitOffset = delta = vecSub(reinterpret_cast<CVector&>(radial), CVector(m_worldPosition));
 
         if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
             m_stateFlags0Bits.unk0 = 1;
@@ -1972,6 +1972,7 @@ void CGObject::update()
         }
     }
 
+    extern const double DOUBLE_80330400;
     m_groundHitOffset.x *= m_moveOffset.x;
     m_groundHitOffset.y *= m_moveOffset.y;
     m_groundHitOffset.z *= m_moveOffset.z;
@@ -3654,3 +3655,5 @@ int CGObject::GetCID()
 {
 	return 5;
 }
+
+extern const double DOUBLE_80330400 = 0.0010000000474974513;

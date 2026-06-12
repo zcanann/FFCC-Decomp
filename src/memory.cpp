@@ -83,7 +83,7 @@ extern const char* amem_stateName[2] = {
 };
 extern const char sHeapWalkerNewline[] = "\n";
 static const char sHeapWalkerFree[] = "FREE";
-static const char sHeapWalkerUsed[] = "USED";
+static const char sHeapWalkerUsed[] = "USE ";
 extern const float kMemoryDrawOrthoBottom = 448.0f;
 extern const float kMemoryDrawOrthoRight = 640.0f;
 extern const float kMemoryDrawOrthoFar = -100.0f;

@@ -10942,12 +10942,11 @@ void CMenuPcs::DrawMCList()
 					const float* pOneA = &FLOAT_803313e8;
 					alpha = *pOneA;
 				} else {
+					const float* pDCa = &FLOAT_803314DC;
+					const float* pE0a = &FLOAT_803314E0;
+					yPos = *pDCa + static_cast<float>(animFrames) * *pE0a;
 					const double* pRateA = &DOUBLE_803314E8;
 					alpha = static_cast<float>(*pRateA * static_cast<double>(animFrames));
-					const float* pDCa = &FLOAT_803314DC;
-					yPos = *pDCa;
-					const float* pE0a = &FLOAT_803314E0;
-					yPos += static_cast<float>(animFrames) * *pE0a;
 				}
 			} else {
 				const float* pD8b = &FLOAT_803314D8;

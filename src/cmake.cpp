@@ -205,11 +205,11 @@ static unsigned short GetCmakePadRepeat()
 
 static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
 {
-    int handleIndex = static_cast<int>(CmakeSlot(menu)) + 0x20;
     int modelBlock = MenuS32(menu, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + handleIndex * 0x50) == 0) {
+    if (*reinterpret_cast<int*>(modelBlock + (static_cast<int>(CmakeSlot(menu)) + 0x20) * 0x50) == 0) {
         return;
     }
+    int handleIndex = static_cast<int>(CmakeSlot(menu)) + 0x20;
 
     *reinterpret_cast<short*>(modelBlock + 0x6E8) = 0xFF24;
     *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
@@ -246,11 +246,11 @@ static inline void DrawCmakePreviewChara(CMenuPcs* menu)
 
 static inline void DrawNamePreviewChara(CMenuPcs* menu, float modelAlpha, int gxAlpha)
 {
-    int handleIndex = static_cast<int>(CmakeSlot(menu)) + 0x20;
     int modelBlock = MenuS32(menu, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + handleIndex * 0x50) == 0) {
+    if (*reinterpret_cast<int*>(modelBlock + (static_cast<int>(CmakeSlot(menu)) + 0x20) * 0x50) == 0) {
         return;
     }
+    int handleIndex = static_cast<int>(CmakeSlot(menu)) + 0x20;
 
     *reinterpret_cast<short*>(modelBlock + 0x6E8) = 0xFF24;
     *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;

@@ -14,20 +14,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #pragma exceptions on
 extern "C" {
-extern const float kPppYmMeltZero = 0.0f;
-extern const float kPppYmMeltPhaseOne = 1.0f;
-extern const double kPppYmMeltUnsignedToDoubleBias = 4503599627370496.0;
-extern const double kPppYmMeltUnsignedToDoubleAdjust = 4503601774854144.0;
-extern const float kPppYmMeltHalf = 0.5f;
-extern const float kPppYmMeltDegToRad = 0.017453292f;
-extern const float kPppYmMeltRayLength = -2000.0f;
-extern const float kPppYmMeltCylinderRadius = 10000000000.0f;
-extern const float kPppYmMeltCylinderBoundAndZero[2] = {-10000000000.0f, 0.0f};
-extern const u32 kPppYmMeltMaskBit0 = 0x00000001;
-extern const u32 kPppYmMeltMaskBit4 = 0x00000010;
-extern const u32 kPppYmMeltMask6Bits = 0x0000003f;
-extern const float kPppYmMeltLocalZero = 0.0f;
-extern const float kCFlatPadStickZero = 0.0f;
 u32 g_ymMelt;
 }
 
@@ -122,7 +108,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
     shape = ppvEnv->m_resourceTables.m_shapeTablePtr[ctrl->m_dataValIndex];
 
-    pppSetDrawEnv(&colorWork->m_color, (pppFMATRIX*)&ppvCameraMatrix, LoadFloat(kPppYmMeltZero),
+    pppSetDrawEnv(&colorWork->m_color, (pppFMATRIX*)&ppvCameraMatrix, 0.0f,
                   ctrl->m_melt.m_drawEnvColor1, ctrl->m_melt.m_drawEnvColor0, ctrl->m_blendMode, 2, 1, 1, 0);
     pppSetBlendMode(ctrl->m_blendMode);
 
@@ -153,7 +139,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
         SetUpPaletteEnv(texture);
     }
 
-    phaseLerp = LoadFloat(kPppYmMeltPhaseOne) - work->m_phase;
+    phaseLerp = 1.0f - work->m_phase;
     drawColor = g_ymMelt;
     drawColorBytes = reinterpret_cast<u8*>(&drawColor);
     drawColorBytes[0] = colorWork->m_color.rgba[0];
@@ -200,7 +186,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             vtx3.y += worldY;
             vtx2.y += worldY;
 
-            if (kPppYmMeltPhaseOne != work->m_phase) {
+            if (1.0f != work->m_phase) {
                 vtx0.x += (worldX - vtx0.x) * phaseLerp;
                 vtx0.z += (worldZ - vtx0.z) * phaseLerp;
                 vtx1.x += (worldX - vtx1.x) * phaseLerp;
@@ -254,6 +240,10 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     }
 }
 
+extern "C" {
+extern const float kPppYmMeltHalf = 0.5f;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800A5A40
@@ -287,14 +277,14 @@ inline void InitPolygonData(VERTEX_DATA* ctrl, YmMeltVertex* vertexData, s16 pha
 
     halfWidth = ctrl->m_stepValue * LoadFloat(kPppYmMeltHalf);
     step = ctrl->m_stepValue / (f32)ctrl->m_gridSize;
-    rot = kPppYmMeltDegToRad * (f32)phaseOffset;
+    rot = 0.017453292f * (f32)phaseOffset;
     vertex = vertexData;
 
     for (z = -halfWidth; z <= halfWidth; z += step) {
         rowVertex = vertex;
         for (x = -halfWidth; x <= halfWidth; x += step) {
             rowVertex->m_position.x = x;
-            rowVertex->m_position.y = kPppYmMeltZero;
+            rowVertex->m_position.y = 0.0f;
             rowVertex->m_position.z = z;
 
             if (phaseOffset != 0) {
@@ -362,6 +352,17 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     }
 }
 
+extern "C" {
+extern const float kPppYmMeltRayLength = -2000.0f;
+extern const float kPppYmMeltCylinderRadius = 10000000000.0f;
+extern const float kPppYmMeltCylinderBoundAndZero[2] = {-10000000000.0f, 0.0f};
+extern const u32 kPppYmMeltMaskBit0 = 0x00000001;
+extern const u32 kPppYmMeltMaskBit4 = 0x00000010;
+extern const u32 kPppYmMeltMask6Bits = 0x0000003f;
+extern const float kPppYmMeltLocalZero = 0.0f;
+extern const float kCFlatPadStickZero = 0.0f;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800A5CE8
@@ -391,7 +392,7 @@ void pppDestructYmMelt(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
  */
 void pppConstructYmMelt(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
-    f32 value = kPppYmMeltZero;
+    f32 value = 0.0f;
     YmMeltWork* work = GetYmMeltWork(ymMelt, offsets);
 
     work->m_vertexData = 0;
@@ -429,7 +430,7 @@ extern "C" void CalcPolygonHeight(
     pointCount = vertexData->m_gridSize + 1;
     pointCount *= pointCount;
     previousY = ppvMng->m_previousPosition.x;
-    zero = LoadFloat(kPppYmMeltZero);
+    zero = 0.0f;
     for (i = 0; i < pointCount; i++) {
         vertex = &vertexBuffer[i];
 

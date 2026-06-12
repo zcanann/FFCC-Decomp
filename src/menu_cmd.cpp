@@ -1407,7 +1407,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		int __p20 = padIndex;
 		int __p18 = __p20;
 		const int pressRaw = Pad.GetPadInputs()[__p18].buttonDown[0];
-		press = static_cast<s16>(static_cast<u16>(pressRaw));
+		press = static_cast<u16>(static_cast<u16>(pressRaw));
 	}
 
 	blocked = false;
@@ -1422,7 +1422,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		int __p14 = padIndex;
 		const int holdRaw = Pad.GetPadInputs()[__p14].repeatButton;
-		hold = static_cast<s16>(static_cast<u16>(holdRaw));
+		hold = static_cast<u16>(static_cast<s16>(holdRaw));
 	}
 
 	if (hold == 0) {
@@ -2264,7 +2264,7 @@ void CMenuPcs::DrawUniteList()
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = static_cast<s8>(kCmdMenuAlphaMax * entry->alpha);
+		color.a = static_cast<u8>(kCmdMenuAlphaMax * entry->alpha);
 		GXSetChanMatColor((_GXChannelID)4, color);
 
 		if (caravan->m_commandListExtra[i] > 0) {
@@ -2530,7 +2530,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		targetX = kCmdMenuPanelSize64 + baseX;
 		s32* top = &s_UniteTop[finished];
 		for (int i = 0; i < s_unitePanelCount; i++) {
-			for (int j = 0; j < 3; j++) {
+			for (unsigned int j = 0; j < 3; j++) {
 				CmdListEntry* entry = &GetCmdListStorage(this)->entries[j + *top];
 				int idx = j + *top;
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {

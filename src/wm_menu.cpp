@@ -8516,17 +8516,22 @@ void CMenuPcs::DrawChara()
 				alpha = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C);
 			}
 			const float* pRgbMul = &FLOAT_80331458;
-			const double* pFull = &DOUBLE_80331420;
-			const double* pDim = &DOUBLE_80331448;
-			const double* pAScale = &DOUBLE_80331508;
 			const float rgbMul = *pRgbMul;
-			const float colorScale = static_cast<float>(selectedMask != 0 ? *pFull : *pDim);
-			const unsigned char rgb = static_cast<unsigned char>(static_cast<int>(rgbMul * colorScale));
-			GXColor color = {
-			    rgb,
-			    rgb,
-			    rgb,
-			    static_cast<unsigned char>(static_cast<int>(*pAScale * static_cast<double>(alpha)))};
+			double colorScaleD;
+			if (selectedMask != 0) {
+				const double* pFull = &DOUBLE_80331420;
+				colorScaleD = *pFull;
+			} else {
+				const double* pDim = &DOUBLE_80331448;
+				colorScaleD = *pDim;
+			}
+			const float colorScale = static_cast<float>(colorScaleD);
+			const double* pAScale = &DOUBLE_80331508;
+			GXColor color;
+			color.r = static_cast<unsigned char>(static_cast<int>(rgbMul * colorScale));
+			color.g = static_cast<unsigned char>(static_cast<int>(rgbMul * colorScale));
+			color.b = static_cast<unsigned char>(static_cast<int>(rgbMul * colorScale));
+			color.a = static_cast<unsigned char>(static_cast<int>(*pAScale * static_cast<double>(alpha)));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 			const float* pX1 = &FLOAT_8033161C;
 			const float* pX2 = &FLOAT_8033168C;

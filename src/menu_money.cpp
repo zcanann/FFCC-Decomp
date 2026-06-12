@@ -327,7 +327,9 @@ void CMenuPcs::MoneyDraw()
 	int selectionState = this->m_moneyState->listState;
 	MoneyMenuAnim* entry = this->m_moneyPanel->anims;
 	int i;
-	GXColor color;
+	GXColor entryColor;
+	GXColor panelColor;
+	GXColor cursorColor;
 	float x;
 	float y;
 	int mode = this->m_moneyState->mode;
@@ -345,11 +347,11 @@ void CMenuPcs::MoneyDraw()
 		float u = entry->u;
 		float v = entry->v;
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
-		color.r = 0xFF;
-		color.g = 0xFF;
-		color.b = 0xFF;
-		color.a = (u8)(255.0f * entry->alpha);
-		GXSetChanMatColor(GX_COLOR0A0, color);
+		entryColor.r = 0xFF;
+		entryColor.g = 0xFF;
+		entryColor.b = 0xFF;
+		entryColor.a = (u8)(255.0f * entry->alpha);
+		GXSetChanMatColor(GX_COLOR0A0, entryColor);
 		float uvScale = entry->uvScale;
 		MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
 	}
@@ -357,11 +359,11 @@ void CMenuPcs::MoneyDraw()
 	MoneyMenuAnim* drawBase = this->m_moneyPanel->anims;
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5D));
 	{
-		color.r = 0xFF;
-		color.g = 0xFF;
-		color.b = 0xFF;
-		color.a = (u8)(255.0f * drawBase->alpha);
-		GXSetChanMatColor(GX_COLOR0A0, color);
+		panelColor.r = 0xFF;
+		panelColor.g = 0xFF;
+		panelColor.b = 0xFF;
+		panelColor.a = (u8)(255.0f * drawBase->alpha);
+		GXSetChanMatColor(GX_COLOR0A0, panelColor);
 	}
 
 	for (i = 0; i < 2; i++) {
@@ -381,11 +383,11 @@ void CMenuPcs::MoneyDraw()
 	if ((mode == 0) && (selectionState == 1)) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x48));
 		{
-			color.r = 0xFF;
-			color.g = 0xFF;
-			color.b = 0xFF;
-			color.a = (u8)(255.0f * drawBase->alpha);
-			GXSetChanMatColor(GX_COLOR0A0, color);
+			cursorColor.r = 0xFF;
+			cursorColor.g = 0xFF;
+			cursorColor.b = 0xFF;
+			cursorColor.a = (u8)(255.0f * drawBase->alpha);
+			GXSetChanMatColor(GX_COLOR0A0, cursorColor);
 		}
 
 		MenuPcs.DrawRect(0, (float)(drawBase->x + (7 - this->m_moneyState->selections[0]) * 0x12 + 0x24),

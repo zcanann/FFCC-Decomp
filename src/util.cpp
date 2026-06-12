@@ -368,6 +368,58 @@ void CUtil::SetPaletteEnv(CTexture* texture)
     GXLoadTlut(&texture->m_tlutObj1, GX_TLUT1);
 }
 
+#pragma always_inline on
+#pragma inline_max_size(10000)
+static inline void SendTexQuadVerts(Vec v1, Vec v0, GXColor quadColor, Vec2d* uv1, Vec2d* uv2)
+{
+    float v2;
+    float u2;
+    float v;
+    float u1;
+
+    if (uv1 == 0 || uv2 == 0) {
+        u1 = 0.0f;
+        v = 0.0f;
+        u2 = 1.0f;
+        v2 = 1.0f;
+    } else {
+        u1 = uv1->x;
+        v = uv1->y;
+        u2 = uv2->x;
+        v2 = uv2->y;
+    }
+
+    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v;
+
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = v;
+
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = v2;
+
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v2;
+}
+#pragma always_inline off
+
 /*
  * --INFO--
  * PAL Address: 0x80023014
@@ -459,103 +511,9 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, CText
     pos1.z = kUtilZero;
 
     if (color != 0) {
-        GXColor quadColor = *color;
-        Vec v0 = pos1;
-        Vec v1 = pos0;
-        float u1;
-        float v;
-        float u2;
-        float v2;
-
-        if (uv1 == 0 || uv2 == 0) {
-            u1 = 0.0f;
-            v = 0.0f;
-            u2 = 1.0f;
-            v2 = 1.0f;
-        } else {
-            u1 = uv1->x;
-            v = uv1->y;
-            u2 = uv2->x;
-            v2 = uv2->y;
-        }
-
-        GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-        GXWGFifo.f32 = v1.x;
-        GXWGFifo.f32 = v1.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u1;
-        GXWGFifo.f32 = v;
-
-        GXWGFifo.f32 = v0.x;
-        GXWGFifo.f32 = v1.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u2;
-        GXWGFifo.f32 = v;
-
-        GXWGFifo.f32 = v0.x;
-        GXWGFifo.f32 = v0.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u2;
-        GXWGFifo.f32 = v2;
-
-        GXWGFifo.f32 = v1.x;
-        GXWGFifo.f32 = v0.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u1;
-        GXWGFifo.f32 = v2;
+        SendTexQuadVerts(pos0, pos1, *color, uv1, uv2);
     } else {
-        GXColor quadColor = white;
-        Vec v0 = pos1;
-        Vec v1 = pos0;
-        float u1;
-        float v;
-        float u2;
-        float v2;
-
-        if (uv1 == 0 || uv2 == 0) {
-            u1 = 0.0f;
-            v = 0.0f;
-            u2 = 1.0f;
-            v2 = 1.0f;
-        } else {
-            u1 = uv1->x;
-            v = uv1->y;
-            u2 = uv2->x;
-            v2 = uv2->y;
-        }
-
-        GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-        GXWGFifo.f32 = v1.x;
-        GXWGFifo.f32 = v1.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u1;
-        GXWGFifo.f32 = v;
-
-        GXWGFifo.f32 = v0.x;
-        GXWGFifo.f32 = v1.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u2;
-        GXWGFifo.f32 = v;
-
-        GXWGFifo.f32 = v0.x;
-        GXWGFifo.f32 = v0.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u2;
-        GXWGFifo.f32 = v2;
-
-        GXWGFifo.f32 = v1.x;
-        GXWGFifo.f32 = v0.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u1;
-        GXWGFifo.f32 = v2;
+        SendTexQuadVerts(pos0, pos1, white, uv1, uv2);
     }
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);
@@ -656,103 +614,9 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
     pos1.z = kUtilZero;
 
     if (color != 0) {
-        GXColor quadColor = *color;
-        Vec v0 = pos1;
-        Vec v1 = pos0;
-        float u1;
-        float v;
-        float u2;
-        float v2;
-
-        if (uv1 == 0 || uv2 == 0) {
-            u1 = 0.0f;
-            v = 0.0f;
-            u2 = 1.0f;
-            v2 = 1.0f;
-        } else {
-            u1 = uv1->x;
-            v = uv1->y;
-            u2 = uv2->x;
-            v2 = uv2->y;
-        }
-
-        GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-        GXWGFifo.f32 = v1.x;
-        GXWGFifo.f32 = v1.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u1;
-        GXWGFifo.f32 = v;
-
-        GXWGFifo.f32 = v0.x;
-        GXWGFifo.f32 = v1.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u2;
-        GXWGFifo.f32 = v;
-
-        GXWGFifo.f32 = v0.x;
-        GXWGFifo.f32 = v0.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u2;
-        GXWGFifo.f32 = v2;
-
-        GXWGFifo.f32 = v1.x;
-        GXWGFifo.f32 = v0.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u1;
-        GXWGFifo.f32 = v2;
+        SendTexQuadVerts(pos0, pos1, *color, uv1, uv2);
     } else {
-        GXColor quadColor = white;
-        Vec v0 = pos1;
-        Vec v1 = pos0;
-        float u1;
-        float v;
-        float u2;
-        float v2;
-
-        if (uv1 == 0 || uv2 == 0) {
-            u1 = 0.0f;
-            v = 0.0f;
-            u2 = 1.0f;
-            v2 = 1.0f;
-        } else {
-            u1 = uv1->x;
-            v = uv1->y;
-            u2 = uv2->x;
-            v2 = uv2->y;
-        }
-
-        GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-        GXWGFifo.f32 = v1.x;
-        GXWGFifo.f32 = v1.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u1;
-        GXWGFifo.f32 = v;
-
-        GXWGFifo.f32 = v0.x;
-        GXWGFifo.f32 = v1.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u2;
-        GXWGFifo.f32 = v;
-
-        GXWGFifo.f32 = v0.x;
-        GXWGFifo.f32 = v0.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u2;
-        GXWGFifo.f32 = v2;
-
-        GXWGFifo.f32 = v1.x;
-        GXWGFifo.f32 = v0.y;
-        GXWGFifo.f32 = v1.z;
-        GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-        GXWGFifo.f32 = u1;
-        GXWGFifo.f32 = v2;
+        SendTexQuadVerts(pos0, pos1, white, uv1, uv2);
     }
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);

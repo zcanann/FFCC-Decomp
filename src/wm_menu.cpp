@@ -1685,7 +1685,9 @@ void CMenuPcs::destroyWorld()
 	{
 		EffectInfo* const effectWork = m_effectWork;
 		if (effectWork != 0) {
-			operator delete[](reinterpret_cast<unsigned char*>(effectWork) - 0x10);
+			if (effectWork != 0) {
+				operator delete[](reinterpret_cast<unsigned char*>(effectWork) - 0x10);
+			}
 			m_effectWork = 0;
 		}
 	}

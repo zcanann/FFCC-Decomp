@@ -1446,7 +1446,7 @@ int CChara::CModel::PickFur(
 					goto displayDone;
 				}
 				command = cursor[0];
-				const short count = *reinterpret_cast<const unsigned short*>(cursor + 1);
+				const unsigned short count = *reinterpret_cast<const short*>(cursor + 1);
 				cursor += 3;
 				const int primitive = command & 0xF8;
 				remaining -= static_cast<int>(static_cast<unsigned short>(count)) * 8 + 3;
@@ -1838,7 +1838,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			CMaterial** shadowMatP = shadowMaterials;
 			MtxPtr* shadowMtxP = shadowMatrices;
 			int shadowTexMtxBase = 0;
-			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
+			for (unsigned int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
 				const int shadowTexMap = shadowIndex + 3;
 				const int shadowTexMtxId = shadowTexMtxBase + 0x21;
 				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowTexMap), (*shadowMatP)->GetTexture(0));
@@ -1882,7 +1882,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			TextureMan.SetTexture(GX_TEXMAP0, material->GetTexture(0));
 			int hasExtraTexture;
 			int extraTextureFormat;
-			if (static_cast<short>(material->GetTextureIndex(1)) != -1) {
+			if (static_cast<unsigned short>(material->GetTextureIndex(1)) != -1) {
 				CTexture* extraTexture = material->GetTexture(1);
 				hasExtraTexture = 1;
 				TextureMan.SetTexture(GX_TEXMAP2, extraTexture);
@@ -2494,7 +2494,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 		int dx;
 		int py = centerY + dy;
 		for (dx = -2; dx <= 2; dx++) {
-			int px = centerX + dx;
+			unsigned int px = centerX + dx;
 			int distance;
 			int tileIndex;
 			unsigned short packed;

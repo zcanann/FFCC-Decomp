@@ -3193,7 +3193,7 @@ void CMenuPcs::CalcResultCountAnim()
 				unsigned int resolvedIndex = (padRemap == (int)padIndex) ? 0 : padIndex;
 				down = Pad.m_padInputs[resolvedIndex].buttonDown[0];
 			}
-			int __p28 = buttons;
+			unsigned int __p28 = buttons;
 			buttons = (unsigned short)(__p28 | down);
 		}
 		if ((buttons & 0x300) != 0) {
@@ -3732,7 +3732,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				int boardOff = boardBase + i * 0x50;
 				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x8) = (short)(int)kBonusZClearOrigin;
 				int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)sprite->y) - DOUBLE_80331EF0);
-				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0xa) = (short)centerY;
+				*(unsigned short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0xa) = (short)centerY;
 			}
 		}
 
@@ -3753,7 +3753,7 @@ void CMenuPcs::CalcResultOpenAnim()
 	}
 
 	*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
-	unsigned int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
+	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
 	int i0 = 0;
 	int off = i0;
 	int doneCount = 0;

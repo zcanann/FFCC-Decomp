@@ -23,8 +23,8 @@ public:
 	CBound();
 	CBound(float min, float max)
 	{
-		float lo = min;
 		float hi = max;
+		float lo = min;
 		m_min.z = lo;
 		m_min.y = lo;
 		m_min.x = lo;

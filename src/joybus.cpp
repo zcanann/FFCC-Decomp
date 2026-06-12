@@ -1543,8 +1543,7 @@ timeout_expiry:
                     {
                         threadParam->m_state = 0x1E;
                         localCrc[0] = 0xFFFF;
-                        unsigned short crcB = Crc16(m_fileBaseB_dup, reinterpret_cast<unsigned char*>(m_fileBaseB), localCrc);
-                        int chkB = SendChkCrc(threadParam, 1, crcB, &localWord);
+                        int chkB = SendChkCrc(threadParam, 1, Crc16(m_fileBaseB_dup, reinterpret_cast<unsigned char*>(m_fileBaseB), localCrc), &localWord);
                         if (chkB != 0)
                         {
                             threadParam->m_altState = threadParam->m_state;

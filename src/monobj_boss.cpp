@@ -2138,9 +2138,9 @@ void CGMonObj::alwaysFuncMeteoParasite()
 #pragma peephole off
 void CGMonObj::frameStatFuncMeteoParasite()
 {
+	int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	int state = prgObj->m_lastStateId;
-	int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
 
 	switch (state) {
 	case 100:
@@ -2171,18 +2171,25 @@ void CGMonObj::frameStatFuncMeteoParasite()
 		break;
 	}
 
-	if (scriptKind == 0x87 && prgObj->m_lastStateId == 0x67) {
-		int frame = prgObj->m_stateFrame;
-		if (frame >= 0x19 && frame < 0x32) {
-			if (frame == 0x19) {
-				prgObj->playSe3D(0x11D5B, 0x32, 0x96, 0, 0);
+	switch (scriptKind) {
+	case 0x87:
+		switch (prgObj->m_lastStateId) {
+		case 0x67: {
+			int frame = prgObj->m_stateFrame;
+			if (frame >= 0x19 && frame < 0x32) {
+				if (frame == 0x19) {
+					prgObj->playSe3D(0x11D5B, 0x32, 0x96, 0, 0);
+				}
+				if (prgObj->m_stateFrame % 3 == 0) {
+					CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
+					chara->putParticleFromItem(chara->m_itemId, 2, chara->m_particleSlots[0], 0);
+				}
 			}
-			if (prgObj->m_stateFrame % 3 == 0) {
-				CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
-				chara->putParticleFromItem(chara->m_itemId, 2, chara->m_particleSlots[0], 0);
-			}
+			reinterpret_cast<CGCharaObj*>(this)->statAttack();
+			break;
 		}
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		}
+		break;
 	}
 }
 #pragma pop

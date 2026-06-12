@@ -1796,15 +1796,16 @@ unsigned int CMenuPcs::CmdClose0()
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 	s32 time = static_cast<s32>(GetCmdStateView(this)->transitionTimer);
 	const s32 sel = GetCmdStateView(this)->selected;
+	CmdListEntry* selEntry = &GetCmdListStorage(this)->entries[sel];
 
 	if (time > 7) {
-		CmdListEntry* e = &GetCmdListStorage(this)->entries[sel];
-		e->x = static_cast<s16>(e->x + 0x13);
+		selEntry->x = static_cast<s16>(selEntry->x + 0x13);
 	}
 
 	s32 doneCount = 0;
-	s32 entryCount = static_cast<s32>(GetCmdListStorage(this)->listEnd) - static_cast<s32>(GetCmdListStorage(this)->count);
-	CmdListEntry* entry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
+	s32 count = static_cast<s32>(GetCmdListStorage(this)->count);
+	s32 entryCount = static_cast<s32>(GetCmdListStorage(this)->listEnd) - count;
+	CmdListEntry* entry = &GetCmdListStorage(this)->entries[count];
 
 	for (s32 i = 0; i < entryCount; i++) {
 		if (time >= entry->startFrame) {

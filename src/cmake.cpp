@@ -922,6 +922,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     short& table = villageWork->m_table;
     short repeat;
     short down;
+    const char* name;
     char picked[8];
 
     bool padBusy = false;
@@ -1113,8 +1114,8 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         } else if ((down & 0x200) != 0) {
             unsigned int bsLen0 = strlen(s_CmakeInfo.m_name);
             if ((bsLen0 & (static_cast<int>(-bsLen0 | bsLen0) >> 31)) != 0) {
-                const char* name = s_CmakeInfo.m_name;
                 int bsRet;
+                name = s_CmakeInfo.m_name;
                 unsigned int bsLen1 = strlen(name);
                 if ((bsLen1 & (static_cast<int>(-bsLen1 | bsLen1) >> 31)) == 0) {
                     bsRet = -1;
@@ -2588,6 +2589,7 @@ int CMenuPcs::CmakeNameCtrl()
 {
     short repeat;
     short down;
+    const char* name;
 
     bool padBusy = false;
     int padLock = Pad.m_debugPadLock;
@@ -2797,8 +2799,8 @@ int CMenuPcs::CmakeNameCtrl()
             } else if ((down & 0x200) != 0) {
                 unsigned int bsLen0 = strlen(s_CmakeInfo.m_name);
                 if ((bsLen0 & (static_cast<int>(-bsLen0 | bsLen0) >> 31)) != 0) {
-                    const char* name = s_CmakeInfo.m_name;
                     int bsRet;
+                    name = s_CmakeInfo.m_name;
                     unsigned int bsLen1 = strlen(name);
                     if ((bsLen1 & (static_cast<int>(-bsLen1 | bsLen1) >> 31)) == 0) {
                         bsRet = -1;

@@ -32,7 +32,6 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	int digitPlace = 1;
 	int digitCount;
 	int digitIndex;
-	int digitCount;
 	int started = 0;
 	int gil;
 	signed char* place;
@@ -149,7 +148,7 @@ int CMenuPcs::MoneyCtrlCur()
 	}
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	int maxDigits = 1;
+	unsigned int maxDigits = 1;
 	int mode = this->m_moneyState->mode;
 	int maxGil = caravanWork->m_gil;
 	int digitPlace = 10;
@@ -567,7 +566,7 @@ bool CMenuPcs::MoneyOpen()
 		firstAnim->w = 0xf8;
 		firstAnim->h = 0x88;
 		firstAnim->x =
-			static_cast<short>(static_cast<int>(216.0 - ((double)firstAnim->w * 0.5)));
+			static_cast<short>(static_cast<int>(-(((double)firstAnim->w * 0.5) - 216.0)));
 		firstAnim->u = 0.0f;
 		firstAnim->v = 0.0f;
 		firstAnim->uvScale = 1.0f;

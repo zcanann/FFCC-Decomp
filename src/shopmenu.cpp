@@ -644,8 +644,7 @@ static inline int CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemN
     } else if (listType == 2) {
         canTrade = 1;
         if ((shopMenu->m_caravanWork->m_shopArgs[((int)(itemNo - 0x191U) >> 5)] &
-             (1 << ((itemNo - 0x191U) & 0x1F))) != 0) {
-        } else {
+             (1 << ((itemNo - 0x191U) & 0x1F))) == 0) {
             canTrade = 0;
         }
     } else if (static_cast<unsigned char>(MenuPcs.EquipChk(index)) != 0) {
@@ -809,7 +808,7 @@ static inline int GetShopMenuFigureStep(CShopMenu* shopMenu)
  * Address:	TODO
  * Size:	TODO
  */
-void _drawNoShadowFont(CFont* font, char* text, float x, float y, int tlut, int flags)
+inline void _drawNoShadowFont(CFont* font, char* text, float x, float y, int tlut, int flags)
 {
 	MenuPcs.DrawNoShadowFont(font, text, x, y, tlut, flags);
 }
@@ -819,7 +818,7 @@ void _drawNoShadowFont(CFont* font, char* text, float x, float y, int tlut, int 
  * Address:	TODO
  * Size:	TODO
  */
-void _drawShadowFont(CFont* font, char* text, float x, float y, int tlut, int flags)
+inline void _drawShadowFont(CFont* font, char* text, float x, float y, int tlut, int flags)
 {
 	MenuPcs.DrawShadowFont(font, text, x, y, tlut, flags);
 }
@@ -829,7 +828,7 @@ void _drawShadowFont(CFont* font, char* text, float x, float y, int tlut, int fl
  * Address:	TODO
  * Size:	TODO
  */
-unsigned short getButtonRepeat(int, unsigned short noRepeatMask)
+inline unsigned short getButtonRepeat(int, unsigned short noRepeatMask)
 {
     unsigned short buttons;
 
@@ -875,7 +874,7 @@ unsigned short getButtonRepeat(int, unsigned short noRepeatMask)
  * Address:	TODO
  * Size:	TODO
  */
-void bButtonNoRepeat(unsigned short button)
+inline void bButtonNoRepeat(unsigned short button)
 {
     gShopMenuInputLatch = button;
 }
@@ -886,7 +885,7 @@ void bButtonNoRepeat(unsigned short button)
  * Address:	TODO
  * Size:	TODO
  */
-int CShopMenu::getItemCnt()
+inline int CShopMenu::getItemCnt()
 {
     int listType = m_listType;
     if (listType == 0) {
@@ -906,7 +905,7 @@ int CShopMenu::getItemCnt()
  * Address:	TODO
  * Size:	TODO
  */
-int CShopMenu::calcGilRatio(int baseGil)
+inline int CShopMenu::calcGilRatio(int baseGil)
 {
     return CalcShopMenuGilRatio(this, baseGil);
 }
@@ -916,7 +915,7 @@ int CShopMenu::calcGilRatio(int baseGil)
  * Address:	TODO
  * Size:	TODO
  */
-int CShopMenu::getItemNo(int index)
+inline int CShopMenu::getItemNo(int index)
 {
     if (m_listType == 0) {
         return m_caravanWork->m_shopList[index];
@@ -939,7 +938,7 @@ int CShopMenu::getItemNo(int index)
  * Address:	TODO
  * Size:	TODO
  */
-int CShopMenu::getBuyGil(int itemNo)
+inline int CShopMenu::getBuyGil(int itemNo)
 {
     return calcGilRatio(GetShopMenuItemBaseGil(itemNo, 0x20));
 }
@@ -949,7 +948,7 @@ int CShopMenu::getBuyGil(int itemNo)
  * Address:	TODO
  * Size:	TODO
  */
-int CShopMenu::getSellGil(int itemNo)
+inline int CShopMenu::getSellGil(int itemNo)
 {
     return static_cast<int>(FLOAT_80332d60 * static_cast<float>(getBuyGil(itemNo)));
 }
@@ -959,7 +958,7 @@ int CShopMenu::getSellGil(int itemNo)
  * Address:	TODO
  * Size:	TODO
  */
-int CShopMenu::getMakeGil(int itemNo)
+inline int CShopMenu::getMakeGil(int itemNo)
 {
     return calcGilRatio(GetShopMenuItemBaseGil(itemNo, 0x24));
 }
@@ -969,7 +968,7 @@ int CShopMenu::getMakeGil(int itemNo)
  * Address:	TODO
  * Size:	TODO
  */
-int CShopMenu::getBuySellGil(int itemNo)
+inline int CShopMenu::getBuySellGil(int itemNo)
 {
     int listType = m_listType;
     if (listType == 0) {
@@ -989,7 +988,7 @@ int CShopMenu::getBuySellGil(int itemNo)
  * Address:	TODO
  * Size:	TODO
  */
-char* CShopMenu::GetItemName(int itemNo)
+inline char* CShopMenu::GetItemName(int itemNo)
 {
     if (itemNo <= 0) {
         return 0;
@@ -1004,7 +1003,7 @@ char* CShopMenu::GetItemName(int itemNo)
  * Address:	TODO
  * Size:	TODO
  */
-int CShopMenu::GetMaxExchange()
+inline int CShopMenu::GetMaxExchange()
 {
     int itemNo = getItemNo(m_selectedIndex);
     if (itemNo < 1) {
@@ -1038,7 +1037,7 @@ int CShopMenu::GetMaxExchange()
  * Address:	TODO
  * Size:	TODO
  */
-int CShopMenu::GetTotalGil()
+inline int CShopMenu::GetTotalGil()
 {
     int unitGil = getBuySellGil(getItemNo(m_selectedIndex));
     if (unitGil < 0) {
@@ -1053,7 +1052,7 @@ int CShopMenu::GetTotalGil()
  * Address:	TODO
  * Size:	TODO
  */
-int CShopMenu::CanAddGil()
+inline int CShopMenu::CanAddGil()
 {
     int totalGil = GetTotalGil();
     if (totalGil < 0) {
@@ -1071,7 +1070,7 @@ int CShopMenu::CanAddGil()
  * Address:	TODO
  * Size:	TODO
  */
-int CShopMenu::CheckSell(int index)
+inline int CShopMenu::CheckSell(int index)
 {
     return CanTradeShopMenuItem(this, index, getItemNo(index)) ? 1 : 0;
 }
@@ -1081,7 +1080,7 @@ int CShopMenu::CheckSell(int index)
  * Address:	TODO
  * Size:	TODO
  */
-int CShopMenu::getItemHaveCnt(int itemNo)
+inline int CShopMenu::getItemHaveCnt(int itemNo)
 {
     return CountShopMenuOwnedItems(ShopMenuCaravanWork(this), itemNo);
 }
@@ -1134,7 +1133,7 @@ static inline void SetupShopMenuShapeDrawColor(unsigned char alpha)
  * Address:	TODO
  * Size:	TODO
  */
-void setOrtho(int x, int y, float scaleX, float scaleY, float zOffset)
+inline void setOrtho(int x, int y, float scaleX, float scaleY, float zOffset)
 {
     Mtx screenMtx;
     Mtx44 projectionMtx;
@@ -1163,7 +1162,7 @@ void setOrtho(int x, int y, float scaleX, float scaleY, float zOffset)
  * Address:	TODO
  * Size:	TODO
  */
-void drawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char alpha)
+inline void drawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char alpha)
 {
     if ((shape == 0) || (materialSet == 0)) {
         return;
@@ -1191,7 +1190,7 @@ void drawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char alph
  * Address:	TODO
  * Size:	TODO
  */
-void drawShapeSeq0(int shapeNo, int groupNo, unsigned char alpha, unsigned char tlut)
+inline void drawShapeSeq0(int shapeNo, int groupNo, unsigned char alpha, unsigned char tlut)
 {
     drawShapeSeq(shapeNo, groupNo, 0, 0, alpha, 0, 0, FLOAT_80332D9C, tlut);
 }
@@ -1204,7 +1203,7 @@ void drawShapeSeq0(int shapeNo, int groupNo, unsigned char alpha, unsigned char 
  * Address:	TODO
  * Size:	TODO
  */
-void drawGrouadQuad(int x, int y, int width, int height, _GXColor colorA, _GXColor colorB, _GXColor colorC, _GXColor colorD)
+inline void drawGrouadQuad(int x, int y, int width, int height, _GXColor colorA, _GXColor colorB, _GXColor colorC, _GXColor colorD)
 {
     setOrtho(x, y, FLOAT_80332d78, FLOAT_80332d78, 0.0f);
     SetupShopMenuShapeDrawColor(0xFF);
@@ -1221,7 +1220,7 @@ void drawGrouadQuad(int x, int y, int width, int height, _GXColor colorA, _GXCol
  * Address:	TODO
  * Size:	TODO
  */
-void CShopMenu::Init(int mode)
+inline void CShopMenu::Init(int mode)
 {
     gShopMenuInputLatch = 0;
     SetMode(mode);
@@ -1232,7 +1231,7 @@ void CShopMenu::Init(int mode)
  * Address:	TODO
  * Size:	TODO
  */
-void CShopMenu::Destroy()
+inline void CShopMenu::Destroy()
 {
     PartPcs.ReleasePdt(m_pdtSlot);
     if (MenuPcs.m_shopMenu == this) {
@@ -3751,7 +3750,7 @@ mode_3_6_common:
  * Address:	TODO
  * Size:	TODO
  */
-void CShopMenu::DrawBuy()
+inline void CShopMenu::DrawBuy()
 {
     DrawShopBase();
     DrawItemList();
@@ -3764,7 +3763,7 @@ void CShopMenu::DrawBuy()
  * Address:	TODO
  * Size:	TODO
  */
-void CShopMenu::DrawSell()
+inline void CShopMenu::DrawSell()
 {
     DrawShopBase();
     DrawItemList();
@@ -3781,7 +3780,7 @@ void CShopMenu::DrawSell()
  * Address:	TODO
  * Size:	TODO
  */
-void CShopMenu::InitDrawEnvShape()
+inline void CShopMenu::InitDrawEnvShape()
 {
     pppInitDrawEnv(0);
 }
@@ -3796,7 +3795,7 @@ void CShopMenu::InitDrawEnvShape()
  * Address:	TODO
  * Size:	TODO
  */
-void CShopMenu::DrawDec(int shapeNo, int groupNo, int x, float y, float alpha, int flipX, int flipY, int tlut)
+inline void CShopMenu::DrawDec(int shapeNo, int groupNo, int x, float y, float alpha, int flipX, int flipY, int tlut)
 {
     drawShapeSeq(shapeNo, groupNo, x, static_cast<int>(y), static_cast<unsigned char>(alpha), static_cast<unsigned char>(flipX),
         static_cast<unsigned char>(flipY), 0.0f, static_cast<unsigned char>(tlut));
@@ -3807,7 +3806,7 @@ void CShopMenu::DrawDec(int shapeNo, int groupNo, int x, float y, float alpha, i
  * Address:	TODO
  * Size:	TODO
  */
-void CShopMenu::DrawDecScale(int shapeNo, int groupNo, int x, float y, float scaleX, float scaleY, int alpha, int, int)
+inline void CShopMenu::DrawDecScale(int shapeNo, int groupNo, int x, float y, float scaleX, float scaleY, int alpha, int, int)
 {
     drawShapeSeqScale(shapeNo, groupNo, x, static_cast<int>(y), scaleX, scaleY, static_cast<unsigned char>(alpha));
 }
@@ -3817,7 +3816,7 @@ void CShopMenu::DrawDecScale(int shapeNo, int groupNo, int x, float y, float sca
  * Address:	TODO
  * Size:	TODO
  */
-void CShopMenu::setFaceAlpha(int, int alpha)
+inline void CShopMenu::setFaceAlpha(int, int alpha)
 {
     m_faceAlpha = alpha;
 }

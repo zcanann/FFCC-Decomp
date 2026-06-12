@@ -4194,7 +4194,7 @@ void CMenuPcs::DrawMainMenu()
 	GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	int bit = 0;
-	int offset = 0;
+	int offset = bit;
 	do {
 		if (((1 << bit) & 1) != 0) {
 			const float* pZmm1 = &FLOAT_803313dc;
@@ -4253,6 +4253,8 @@ void CMenuPcs::DrawMainMenu()
 		                 *pWmm2, *pHmm3, *pZmm3, *pZmm3, *pOmm5, *pOmm5, *pZmm3);
 		const float* pHmm4 = &FLOAT_80331500;
 		y = y + *pHmm4;
+		const float* pXmm2 = &FLOAT_80331410;
+		x = *pXmm2;
 		const float* pZmm4 = &FLOAT_803313dc;
 		const float* pOmm6 = &FLOAT_803313e8;
 		const float* pWmm3 = &FLOAT_803316D0;

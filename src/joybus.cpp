@@ -125,10 +125,10 @@ extern const u32 kPppYmMeltMaskBit0;
 extern const u32 kPppYmMeltMaskBit4;
 
 namespace JoyBusConst {
-static char* DVD_DIR = const_cast<char*>("dvd/gba/");
-static char* CLIENT_FILE = const_cast<char*>("ffcc_cli.bin");
-static char* OBJ_FILE = const_cast<char*>("objdat.spt");
-static char* ICON_FILE = const_cast<char*>("icon.dat");
+static char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
+static char* CLIENT_FILE = const_cast<char*>(s_ffcc_cli_bin);
+static char* OBJ_FILE = const_cast<char*>(s_objdat_spt);
+static char* ICON_FILE = const_cast<char*>(s_icon_dat);
 const unsigned int CTRL_GBA = 0x10;
 const unsigned int JOY_CODE_MASK = 0x1;
 }

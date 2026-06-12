@@ -10028,12 +10028,14 @@ void CMenuPcs::SetCMakeEnd(int channel)
  */
 void CMenuPcs::ClrCMakeFlg(int channel)
 {
-	m_wm.m_charaSelectData[channel * 0x10 + 0xB] = 0;
-	const int current = *reinterpret_cast<short*>(&m_wm.m_charaSelectData[channel * 0x10 + 4]);
+	unsigned char* const selectEntry = m_wm.m_charaSelectData + channel * 0x10;
+	selectEntry[0xB] = 0;
+	const int current = *reinterpret_cast<short*>(selectEntry + 4);
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390), channel, current);
 	}
-	m_wm.m_charaModelData[current * 0x34 + 0xC] = 0;
+	unsigned char* const modelData = m_wm.m_charaModelData + current * 0x34;
+	modelData[0xC] = 0;
 	GetWmCharaHandles(this)[current]->LoadModelASync(3, 0x43, 0);
 }
 
@@ -10107,9 +10109,8 @@ void CMenuPcs::ChgAllModel2()
  */
 void CMenuPcs::ChgAllModel()
 {
-	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
-	unsigned char* handleData = bytes;
+	unsigned char* handleData = reinterpret_cast<unsigned char*>(this);
 	int modelOffset = 0;
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
@@ -10122,7 +10123,7 @@ void CMenuPcs::ChgAllModel()
 
 		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
 			race = *reinterpret_cast<unsigned short*>(caravanData + 0x3E0);
-			variant = *reinterpret_cast<short*>(caravanData + 0x3E2);
+			variant = *reinterpret_cast<signed short*>(caravanData + 0x3E2);
 			index = *reinterpret_cast<unsigned short*>(caravanData + 0x3E4);
 			modelId = race * 200 + 100;
 			if (variant != 0) {
@@ -10153,9 +10154,9 @@ void CMenuPcs::ChgAllModel()
 		}
 		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
 
-		gameData += 0xC30;
 		handleData += 4;
 		modelOffset += 0x34;
+		gameData += 0xC30;
 	}
 }
 

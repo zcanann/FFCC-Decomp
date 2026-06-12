@@ -181,7 +181,7 @@ int CMenuPcs::MoneyCtrlCur()
 			}
 		} else {
 			if ((hold & 4) != 0) {
-				int gil = caravanWork->m_gil;
+				unsigned int gil = caravanWork->m_gil;
 				if (gil == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {

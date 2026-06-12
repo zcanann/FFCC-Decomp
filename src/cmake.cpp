@@ -2797,7 +2797,6 @@ int CMenuPcs::CmakeNameCtrl()
                         }
                         Sound.PlaySe(2, 0x40, 0x7F, 0);
                     }
-                    return 0;
                 }
             } else if ((down & 0x200) != 0) {
                 unsigned int bsLen0 = strlen(s_CmakeInfo.m_name);

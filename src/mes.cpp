@@ -94,7 +94,7 @@ static inline int ReadTagS8(char** text)
 	return (int)ReadTagByte(text);
 }
 
-static inline int ReadMesChar(char** text)
+static inline unsigned short ReadMesChar(char** text)
 {
 	unsigned char* p = (unsigned char*)*text;
 	*text = (char*)(p + 1);
@@ -377,8 +377,8 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2D:
 		{
-			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
-			strcpy(out, FlatNameDirect(3, CMes::m_tempVar[varIndex] + 0x3C));
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
+			strcpy(out, (Game.m_cFlatDataArr[1].TableStrings(3) + 0x3C)[CMes::m_tempVar[varIndex]]);
 			out += strlen(out);
 			src += 4;
 			break;

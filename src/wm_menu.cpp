@@ -8810,11 +8810,9 @@ void CMenuPcs::CalcCharaSelect()
 
 		if (connectedCount != 0 && connectedCount == locallyConfirmedCount) {
 			CFont* const font = GetWmFont(this);
-			const float* pMn1 = &FLOAT_803313e8;
-			font->SetMargin(*pMn1);
+			font->SetMargin(FLOAT_803313e8);
 			font->SetShadow(0);
-			const float* pSn1 = &FLOAT_803313e8;
-			font->SetScale(*pSn1);
+			font->SetScale(FLOAT_803313e8);
 			const char* const* msgBuf = GetMcWinMessBuff(1);
 			int maxWidth = 0;
 			int* winMess = reinterpret_cast<int*>(GetWinMess(0x17));
@@ -8837,10 +8835,8 @@ void CMenuPcs::CalcCharaSelect()
 			if ((maxWidth % 0x16) != 0) {
 				widthCells++;
 			}
-			const double* pHn1 = &DOUBLE_803313F8;
-			const double dF8 = *pHn1;
-			const float* p430n = &FLOAT_80331430;
-			const float f430 = *p430n;
+			const double dF8 = DOUBLE_803313F8;
+			const float f430 = FLOAT_80331430;
 			const short winWidth = (widthCells + 2) * 0x16 + 0x40;
 			const short winHeight = *winMess * 0x1E + 0x40;
 			m_menuWindowInfo->x = static_cast<short>(static_cast<int>(static_cast<float>(

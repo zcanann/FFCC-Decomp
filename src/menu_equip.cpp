@@ -750,7 +750,7 @@ void CMenuPcs::EquipDraw()
 	CColor helpColor(0xff, 0xff, 0xff, (u8)helpAlpha);
 	int helpX = (int)(kEquipHelpCenterX - w * kEquipHalf);
 	float helpYf = kEquipHelpY;
-	int helpY = (int)helpYf;
+	unsigned int helpY = (int)helpYf;
 	DrawHelpMessage(helpItem, helpFont, helpX, helpY, helpColor.color, 10,
 	                kEquipOne, kEquipHelpScale);
 	if (GetEquipMenuState(this)->mode == 1) {

@@ -9471,46 +9471,15 @@ void CMenuPcs::DrawCMLife()
 		float x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * *pHalfD + static_cast<double>(xBase));
 		float step = static_cast<float>(static_cast<double>(8 - count) * *pHalfD);
 
-		const float* pSplineDiv = &FLOAT_803314c0;
 		const float* pZeroK = &FLOAT_803313dc;
 		const float* pRectSize = &FLOAT_80331558;
 		const double* pStepDelta = &DOUBLE_80331420;
-		const float kSplineDiv = *pSplineDiv;
 		const float kZero = *pZeroK;
 		const float kRectSize = *pRectSize;
 		const double kStepDelta = *pStepDelta;
 
 		for (i = 0; i < count; i++) {
-			const float* pZeroY = &FLOAT_803313dc;
-			float yAdd = *pZeroY;
-			const float t = step / kSplineDiv;
-			if (t >= gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 4]) {
-				yAdd = gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 3];
-			} else {
-				for (int j = 0; j < gWmLifeYOffsetSplineCount; j++) {
-					if (t <= gWmLifeYOffsetSpline[j * 4]) {
-						if (j == 0) {
-							yAdd = gWmLifeYOffsetSpline[j * 4 + 1];
-						} else {
-							const float* pC8s = &FLOAT_803314c8;
-							const float* pC4s = &FLOAT_803314c4;
-							const float* pCCs = &FLOAT_803314cc;
-							const float* pOneS = &FLOAT_803313e8;
-							float* const cur = gWmLifeYOffsetSpline + j * 4;
-							float* const prev = gWmLifeYOffsetSpline + (j - 1) * 4;
-							const float width = cur[0] - prev[0];
-							const float u = (t - prev[0]) / width;
-							const float u2 = u * u;
-							const float u3 = u2 * u;
-							yAdd = width * (prev[3] * (u + (u3 - *pC8s * u2)) +
-							                cur[2] * (u3 - u2)) +
-							       (prev[1] * (*pOneS + (*pC8s * u3 - *pC4s * u2)) +
-							        cur[1] * (*pCCs * u3 + *pC4s * u2));
-						}
-						break;
-					}
-				}
-			}
+			float yAdd = GetFcvValue(*reinterpret_cast<FCV*>(&gWmLifeYOffsetSplineCount), step);
 
 			MenuPcs.DrawRect(
 			    0, x, yBase + yAdd, FLOAT_80331558, FLOAT_80331558,

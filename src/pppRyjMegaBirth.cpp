@@ -787,7 +787,6 @@ void birth(
 	float vz;
 
 	payload = (u8*)param;
-	particlePayload = (u8*)particle;
 	float spread = (float)payload[0x2B];
 	float range = kPppRyjMegaBirthDouble * spread;
 
@@ -798,6 +797,7 @@ void birth(
 	if (colorData != NULL) {
 		memset(colorData, 0, sizeof(_PARTICLE_COLOR));
 	}
+	particlePayload = (u8*)particle;
 
 	if ((s32)payload[0x2A] < 8 && (s32)payload[0x2A] >= 0) {
 		Vec baseDirection;

@@ -1715,7 +1715,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 									}
 								}
 
-								const int endIndex = (count < (maxCount - 1)) ? count : (maxCount - 1);
+								const int endIndex = (count < (maxCount - 1)) ? (maxCount - 1) : count;
 								for (int i = endIndex; i > insertIndex; i--) {
 									objects[i] = objects[i - 1];
 								}
@@ -1947,6 +1947,9 @@ void CFlatRuntime2::drawLayer(
 		_GXSetTevAlphaOp((_GXTevStageID)tevStage, (_GXTevOp)0, (_GXTevBias)0, (_GXTevScale)0, 1, (_GXTevRegID)0);
 
 		for (int quad = 0; quad < 4; quad++) {
+			CColor backColor;
+			CColor rectColor;
+
 			int rectW = static_cast<int>(scaleX * FLOAT_80330154);
 			int rectH = static_cast<int>(scaleY * FLOAT_80330154);
 

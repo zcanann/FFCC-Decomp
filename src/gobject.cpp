@@ -1076,16 +1076,20 @@ void CGObject::bgNormalCollision()
     }
 
     Vec move = m_groundHitOffset;
-    move.y = sZeroFloat;
+    move.y = 0.0f;
     Vec pos = m_worldPosition;
     pos.y += sStepProbeHeight + m_capsuleHalfHeight;
 
     unsigned int retry = 4;
     const double epsilon = DOUBLE_80330400;
+    float boundMax;
+    float boundMin;
+    boundMin = sHugeCylinderExtent;
+    boundMax = sNegHugeCylinderExtent;
     do {
         const unsigned long hitMask = m_bgHitMask;
         const float radius = m_capsuleHalfHeight;
-        CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
+        CMapCylinder bodyCylinder(boundMin, boundMax);
         bodyCylinder.m_bottom = pos;
         bodyCylinder.m_axis = move;
         bodyCylinder.m_radius = radius;

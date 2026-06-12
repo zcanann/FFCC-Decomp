@@ -118,18 +118,19 @@ inline void DisableIndWarp()
 {
     Mtx rotMtx;
     float indMtx[2][3];
+    const float& zero = kYmDeformationMdlZero;
 
     GXSetTevDirect((GXTevStageID)1);
     GXSetNumIndStages(0);
     GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 
-    PSMTXRotRad(rotMtx, 'z', DeformationMdlZero());
-    indMtx[0][0] = DeformationMdlZero();
-    indMtx[0][1] = DeformationMdlZero();
-    indMtx[0][2] = DeformationMdlZero();
-    indMtx[1][0] = DeformationMdlZero();
-    indMtx[1][1] = DeformationMdlZero();
-    indMtx[1][2] = DeformationMdlZero();
+    PSMTXRotRad(rotMtx, 'z', zero);
+    indMtx[0][0] = zero;
+    indMtx[0][1] = zero;
+    indMtx[0][2] = zero;
+    indMtx[1][0] = zero;
+    indMtx[1][1] = zero;
+    indMtx[1][2] = zero;
     GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 }
 

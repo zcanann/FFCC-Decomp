@@ -9456,9 +9456,10 @@ void CMenuPcs::DrawCMLife()
 		const float* pYOrg = &FLOAT_80331478;
 		const float* pXOrg = &FLOAT_80331410;
 		float xBase;
-		float y = *pYOrg + static_cast<float>(row * 0xB8);
+		float y;
 		float x;
 		xBase = *pXOrg + static_cast<float>(col * 0x90);
+		y = *pYOrg + static_cast<float>(row * 0xB8);
 		float yTmp = y;
 		if (row != 0) {
 			const float* pRowAdd = &FLOAT_80331548;

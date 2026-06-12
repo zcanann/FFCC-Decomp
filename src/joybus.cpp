@@ -4753,7 +4753,7 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
 int JoyBus::SendMapObj(ThreadParam* threadParam)
 {
     int port;
-    int result = 0;
+    int result;
     unsigned char subState = threadParam->m_subState;
 
     switch (subState)

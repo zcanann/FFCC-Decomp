@@ -7,6 +7,7 @@
 #include "ffcc/system.h"
 
 struct Vec;
+class CRelProfile;
 
 class CMapPcs : public CProcess
 {
@@ -50,7 +51,7 @@ private:
 };
 
 extern CMapPcs MapPcs;
-extern unsigned char g_hit_prof;
+extern CRelProfile g_hit_prof;
 extern unsigned char g_map_calc_prof;
 extern unsigned char g_map_draw_prof;
 

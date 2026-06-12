@@ -508,7 +508,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         Vec scaledNormal;
         Vec edgeStart;
         Vec edgeEnd;
-        PSVECScale(&g_hit_lpface->m_normal, &scaledNormal, g_hit_cyl.m_radius);
+        PSVECScale(&g_hit_lpface->m_normal, &scaledNormal, cyl.m_radius);
         PSVECSubtract(&g_hit_hpv, &scaledNormal, &pushedHit);
 
         unsigned int sideMask = 3;

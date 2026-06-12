@@ -9468,7 +9468,7 @@ void CMenuPcs::DrawCMLife()
 			yTmp = y + *pRowAdd;
 		}
 		const float* pYAdj = &FLOAT_8033166C;
-		const float yBase = yTmp + *pYAdj;
+		yTmp = yTmp + *pYAdj;
 		const double* pHalfD = &DOUBLE_803313F8;
 		x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * *pHalfD + static_cast<double>(xBase));
 		float step = static_cast<float>(static_cast<double>(8 - count) * *pHalfD);
@@ -9476,15 +9476,17 @@ void CMenuPcs::DrawCMLife()
 		const float* pZeroK = &FLOAT_803313dc;
 		const float* pRectSize = &FLOAT_80331558;
 		const double* pStepDelta = &DOUBLE_80331420;
+		double kStepDelta;
+		float kRectSize;
 		const float kZero = *pZeroK;
-		const float kRectSize = *pRectSize;
-		const double kStepDelta = *pStepDelta;
+		kRectSize = *pRectSize;
+		kStepDelta = *pStepDelta;
 
 		for (i = 0; i < count; i++) {
 			float yAdd = GetFcvValue(*reinterpret_cast<FCV*>(&gWmLifeYOffsetSplineCount), step);
 
 			MenuPcs.DrawRect(
-			    0, x, yBase + yAdd, FLOAT_80331558, FLOAT_80331558,
+			    0, x, yTmp + yAdd, FLOAT_80331558, FLOAT_80331558,
 			                                kZero, kZero, FLOAT_803313e8, FLOAT_803313e8, kZero);
 			step = static_cast<float>(step + kStepDelta);
 			x += kRectSize;

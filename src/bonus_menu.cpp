@@ -2378,17 +2378,17 @@ void CMenuPcs::DrawResultCloseAnim()
 					{
 						float x = (float)sprite->x;
 						float y = (float)sprite->y;
-						float progress;
+						float fillWidth;
 						if (sprite->duration > sprite->timer) {
-							progress = (float)(DOUBLE_80331ED8 - (DOUBLE_80331ED8 / (double)sprite->duration) * (double)(sprite->timer - 1));
-							if (progress < kBonusZClearOrigin) {
-								progress = kBonusZClearOrigin;
+							fillWidth = (float)(DOUBLE_80331ED8 - (DOUBLE_80331ED8 / (double)sprite->duration) * (double)(sprite->timer - 1));
+							if (fillWidth < kBonusZClearOrigin) {
+								fillWidth = kBonusZClearOrigin;
 							}
 						} else {
-							progress = kBonusZClearOrigin;
+							fillWidth = kBonusZClearOrigin;
 						}
 						float mulX = sprite->mulX;
-						float fillWidth = progress * (float)sprite->w;
+						fillWidth *= (float)sprite->w;
 						if (fillWidth > kBonusZClearOrigin) {
 							MenuPcs.DrawRect(0, x, y, fillWidth, (float)sprite->h,
 							    mulX, sprite->mulY, colors, FLOAT_80331EB0, FLOAT_80331EB0, kBonusZClearOrigin);

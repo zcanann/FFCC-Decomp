@@ -378,8 +378,9 @@ void CMenuPcs::BindMcObj(int slotNo)
 
 	for (slot = 0; slot < 4; slot++) {
 		if (slotNo == slot) {
+			int iconType;
 			EffectEntry* entry = &m_effectEntries[slot];
-			int iconType = entry->m_iconType;
+			iconType = entry->m_iconType;
 
 			if (iconType != 0) {
 				BindEffect(slot + 0x11, iconType + 0x16, -1);

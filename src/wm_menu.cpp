@@ -9458,8 +9458,10 @@ void CMenuPcs::DrawCMLife()
 		col = slot % 4;
 		const float* pYOrg = &FLOAT_80331478;
 		const float* pXOrg = &FLOAT_80331410;
+		float xBase;
 		float y = *pYOrg + static_cast<float>(row * 0xB8);
-		const float xBase = *pXOrg + static_cast<float>(col * 0x90);
+		float x;
+		xBase = *pXOrg + static_cast<float>(col * 0x90);
 		float yTmp = y;
 		if (row != 0) {
 			const float* pRowAdd = &FLOAT_80331548;
@@ -9468,7 +9470,7 @@ void CMenuPcs::DrawCMLife()
 		const float* pYAdj = &FLOAT_8033166C;
 		const float yBase = yTmp + *pYAdj;
 		const double* pHalfD = &DOUBLE_803313F8;
-		float x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * *pHalfD + static_cast<double>(xBase));
+		x = static_cast<float>(static_cast<double>(0x90 - count * 0x10) * *pHalfD + static_cast<double>(xBase));
 		float step = static_cast<float>(static_cast<double>(8 - count) * *pHalfD);
 
 		const float* pZeroK = &FLOAT_803313dc;

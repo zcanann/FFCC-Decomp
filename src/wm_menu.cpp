@@ -11256,6 +11256,7 @@ LAB_next:
 						         digitScale, *pOd1, zeroF);
 						digitX += digitWidthF * digitScale;
 					}
+					float suffixU;
 					float suffixWidth;
 					if (language == 2) {
 						const float* pSw548 = &FLOAT_80331548;
@@ -11268,7 +11269,7 @@ LAB_next:
 						suffixWidth = *pSw410;
 					}
 					const float* pZd2 = &FLOAT_803313dc;
-					float suffixU = *pZd2;
+					suffixU = *pZd2;
 					unsigned char wideLang = (language == 1 || language == 4);
 					double suffixScaleD;
 					if (wideLang) {

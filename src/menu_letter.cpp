@@ -40,6 +40,25 @@ extern "C" const double DOUBLE_803330e8 = 1.0;
 extern "C" const float FLOAT_803330f0 = 336.0f;
 extern "C" const float FLOAT_803330f4 = 32.0f;
 extern "C" const float FLOAT_803330f8 = 1.0f;
+#define FLOAT_80333088 592.0f
+#define FLOAT_8033308c 160.0f
+#define DOUBLE_80333090 0.7
+#define DOUBLE_80333098 0.03
+#define FLOAT_803330a0 255.0f
+#define DOUBLE_803330a8 0.5
+#define DOUBLE_803330b0 0.05
+#define FLOAT_803330b8 48.0f
+#define FLOAT_803330bc 0.0f
+#define FLOAT_803330c0 112.0f
+#define DOUBLE_803330c8 4503601774854144.0
+#define FLOAT_803330d0 480.0f
+#define FLOAT_803330d4 288.0f
+#define DOUBLE_803330d8 64.0
+#define FLOAT_803330e0 72.0f
+#define DOUBLE_803330e8 1.0
+#define FLOAT_803330f0 336.0f
+#define FLOAT_803330f4 32.0f
+#define FLOAT_803330f8 1.0f
 extern "C" const double DOUBLE_80333100 = 8.0;
 extern "C" const float FLOAT_80333108 = 16.0f;
 extern "C" const float FLOAT_8033310c = 24.0f;

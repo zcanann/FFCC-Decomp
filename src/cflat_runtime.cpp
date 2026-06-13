@@ -1550,9 +1550,9 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 			break;
 		}
 		scanNode = *reinterpret_cast<u8**>(selectedNode + 4);
-	} while (*reinterpret_cast<int*>(scanNode + 8) <
-	         (*reinterpret_cast<int*>(selectedNode + 8) + requiredWords) +
-	             *reinterpret_cast<int*>(selectedNode + 0xC));
+	} while ((*reinterpret_cast<int*>(selectedNode + 8) + requiredWords) +
+	             *reinterpret_cast<int*>(selectedNode + 0xC) >
+	         *reinterpret_cast<int*>(scanNode + 8));
 
 	void** const freeNode = m_objectFreeListHead;
 	m_objectFreeListHead = reinterpret_cast<void**>(freeNode[1]);

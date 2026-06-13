@@ -1606,6 +1606,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	int resolvedItemId = itemId;
 	int staType;
+	int counterAllow;
 	int resistType;
 	int allowEffect;
 	int damageClamp;
@@ -2101,25 +2102,19 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					counterSe = 0x7E3;
 					break;
 				}
-				int counterResist;
-				int counterAllow;
-				int counterEffect;
-				calcRegist(counterType, counterItem, counterResist, counterAllow, counterEffect, 1);
+				calcRegist(counterType, counterItem, resistType, counterAllow, effectResult, 1);
 				if (counterAllow != 0) {
 					if ((m_bgColMask & 0x80000) != 0) {
-						effective(counterType, counterItem, sourceObj, counterEffect);
+						effective(counterType, counterItem, sourceObj, effectResult);
 						playSe3D(counterSe, 0x32, 0x96, 0, 0);
 					} else {
 						System.Printf(dbg + 0x310);
 					}
 				}
 			} else {
-				int counterResist;
-				int counterAllow;
-				int counterEffect;
 				if (((DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0 ||
 				     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x6CC) == 2) &&
-				    (calcRegist(0x69, resolvedItemId, counterResist, counterAllow, counterEffect, 0), counterAllow != 0)) {
+				    (calcRegist(0x69, resolvedItemId, resistType, counterAllow, effectResult, 0), counterAllow != 0)) {
 					int chance;
 					if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 						chance = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x19A);
@@ -2131,7 +2126,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					}
 					if (chance != 0 && static_cast<unsigned int>(Math.Rand(100)) <= static_cast<unsigned int>(chance)) {
 						if ((m_bgColMask & 0x80000) != 0) {
-							effective(0x69, resolvedItemId, sourceObj, counterEffect);
+							effective(0x69, resolvedItemId, sourceObj, effectResult);
 						} else {
 							System.Printf(dbg + 0x348);
 						}
@@ -2366,6 +2361,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		}
 	}
 
+	int itemType;
 	unsigned int base = 0;
 	switch (staIndex) {
 		case 1:
@@ -2408,7 +2404,6 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 			break;
 	}
 
-	int itemType;
 	if (amount >= 0x1F5) {
 		SCharaItemRow* kindRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 		itemType = kindRows[amount].m_kind;

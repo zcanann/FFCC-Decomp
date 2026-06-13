@@ -3109,8 +3109,9 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
             case CHUNK_TIDX: {
                 {
                     unsigned long i;
-                    for (i = 0; i < static_cast<unsigned long>(m_materials.GetSize()); i++) {
-                        if (m_materials[i] == 0) {
+                    int idx;
+                    for (i = 0; (idx = i) < static_cast<unsigned long>(m_materials.GetSize()); i++) {
+                        if (m_materials[idx] == 0) {
                             goto slotFound;
                         }
                     }

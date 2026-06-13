@@ -3183,6 +3183,7 @@ int CMenuPcs::SingWinMessHeight()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs off
 int CMenuPcs::ChkEquipPossible(int itemNo)
 {
     unsigned int genderMask = 0x10;
@@ -3209,6 +3210,7 @@ int CMenuPcs::ChkEquipPossible(int itemNo)
     }
     return result != 0;
 }
+#pragma opt_common_subs reset
 
 /*
  * --INFO--

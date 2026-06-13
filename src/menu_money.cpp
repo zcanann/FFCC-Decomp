@@ -316,6 +316,7 @@ int CMenuPcs::MoneyCtrlCur()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_loop_invariants off
 void CMenuPcs::MoneyDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -426,6 +427,7 @@ void CMenuPcs::MoneyDraw()
 		DrawCursor((int)x, (int)y, 1.0f);
 	}
 }
+#pragma opt_loop_invariants reset
 
 /*
  * --INFO--

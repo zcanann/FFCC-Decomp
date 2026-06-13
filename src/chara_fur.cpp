@@ -724,34 +724,6 @@ void CChara::CalcMogScore()
 }
 #pragma pop
 
-/*
- * --INFO--
- * PAL Address: 0x800e10c0
- * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#undef fur
-
-void CChara::ChangeMogMode(int mogMode)
-{
-	if (mogMode != 0) {
-		memset(m_mogWork, 0, sizeof(MogWorkRaw));
-		MogFur().m_cursorX = 0x140;
-		MogFur().m_cursorY = 0xE0;
-		MogFur().m_dirty = 0;
-		return;
-	}
-
-	int& mogSoundHandle = MogWork().m_loopSeHandle;
-	if (mogSoundHandle != 0) {
-		Sound.StopSe(mogSoundHandle);
-		mogSoundHandle = 0;
-	}
-}
-
 extern "C" const char s_chara_fur_cpp[] = "chara_fur.cpp";
 
 static inline unsigned int FurRandNext()
@@ -925,121 +897,6 @@ static inline void OpenMogHintMessage(int messageId)
 }
 
 } // namespace
-
-/*
- * --INFO--
- * PAL Address: 0x800e1148
- * PAL Size: 292b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma push
-#pragma opt_propagation off
-#pragma global_optimizer off
-void CChara::InitFurTexBuffer()
-{
-	MogFurState& fur = MogFur();
-	int rowCount = 0;
-	int row = 0;
-	do {
-		unsigned int inner = 0;
-		int byteOffset = row << 1;
-		int idx;
-		for (idx = row; idx < row + 0x40; idx += 8) {
-			int idxBase = inner + row;
-			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Chara.MogFur().m_texels) + byteOffset) = 0x7FFF;
-			byteOffset += 0x10;
-			Chara.MogFur().m_texels[idxBase + 1] = 0x7FFF;
-			Chara.MogFur().m_texels[idxBase + 2] = 0x7FFF;
-			Chara.MogFur().m_texels[idxBase + 3] = 0x7FFF;
-			Chara.MogFur().m_texels[idxBase + 4] = 0x7FFF;
-			Chara.MogFur().m_texels[idxBase + 5] = 0x7FFF;
-			Chara.MogFur().m_texels[idxBase + 6] = 0x7FFF;
-			Chara.MogFur().m_texels[idxBase + 7] = 0x7FFF;
-			inner += 8;
-		}
-		rowCount++;
-		row += 0x40;
-	} while (rowCount < 0x40);
-
-	fur.m_dirty = 0;
-	Chara.MogFur().m_timestamp = System.m_frameCounter;
-	memset(fur.m_score, 0, 0x40);
-	CalcMogScore();
-}
-#pragma pop
-
-/*
- * --INFO--
- * PAL Address: 0x800e126c
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CChara::SaveFurTexBuffer(unsigned short* outTexels)
-{
-	memcpy(outTexels, Chara.MogFur().m_texels, 0x2000);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800e12a0
- * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CChara::LoadFurTexBuffer(unsigned short* inTexels)
-{
-	memcpy(Chara.MogFur().m_texels, inTexels, 0x2000);
-	CalcMogScore();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800e12e4
- * PAL Size: 280b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma push
-#pragma opt_common_subs off
-#pragma opt_propagation off
-void CChara::CModel::InitMogFurTex()
-{
-	CTextureSet* textureSet = m_texSet;
-	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
-	CTexture* texture = textureSet->GetTexture(textureIdx);
-
-	if ((texture != 0) && (texture->m_format == 4)) {
-		texture->m_format = 5;
-		Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
-
-		textureSet = m_texSet;
-		textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
-		CTexture* textureData = textureSet->GetTexture(textureIdx);
-		if (textureData != 0) {
-			void* dstBuffer = textureData->m_imageData;
-			int texelCountBytes = textureData->m_width * textureData->m_height * 2;
-
-			DCInvalidateRange(dstBuffer, texelCountBytes);
-			memcpy(dstBuffer, Chara.MogFur().m_texels, 0x2000);
-			DCFlushRange(dstBuffer, texelCountBytes);
-			GXInvalidateTexAll();
-		}
-
-		texture->InitTexObj();
-		m_flagsA0 = static_cast<unsigned char>(__rlwimi(m_flagsA0, 1, 6, 25, 25));
-	}
-}
-#pragma pop
 
 /*
  * --INFO--
@@ -1349,6 +1206,149 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 
 	OpenMogHintMessage(messageId);
 	MogWork().m_frameCount++;
+}
+#pragma pop
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e10c0
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#undef fur
+
+void CChara::ChangeMogMode(int mogMode)
+{
+	if (mogMode != 0) {
+		memset(m_mogWork, 0, sizeof(MogWorkRaw));
+		MogFur().m_cursorX = 0x140;
+		MogFur().m_cursorY = 0xE0;
+		MogFur().m_dirty = 0;
+		return;
+	}
+
+	int& mogSoundHandle = MogWork().m_loopSeHandle;
+	if (mogSoundHandle != 0) {
+		Sound.StopSe(mogSoundHandle);
+		mogSoundHandle = 0;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e1148
+ * PAL Size: 292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma push
+#pragma opt_propagation off
+#pragma global_optimizer off
+void CChara::InitFurTexBuffer()
+{
+	MogFurState& fur = MogFur();
+	int rowCount = 0;
+	int row = 0;
+	do {
+		unsigned int inner = 0;
+		int byteOffset = row << 1;
+		int idx;
+		for (idx = row; idx < row + 0x40; idx += 8) {
+			int idxBase = inner + row;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Chara.MogFur().m_texels) + byteOffset) = 0x7FFF;
+			byteOffset += 0x10;
+			Chara.MogFur().m_texels[idxBase + 1] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 2] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 3] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 4] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 5] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 6] = 0x7FFF;
+			Chara.MogFur().m_texels[idxBase + 7] = 0x7FFF;
+			inner += 8;
+		}
+		rowCount++;
+		row += 0x40;
+	} while (rowCount < 0x40);
+
+	fur.m_dirty = 0;
+	Chara.MogFur().m_timestamp = System.m_frameCounter;
+	memset(fur.m_score, 0, 0x40);
+	CalcMogScore();
+}
+#pragma pop
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e126c
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CChara::SaveFurTexBuffer(unsigned short* outTexels)
+{
+	memcpy(outTexels, Chara.MogFur().m_texels, 0x2000);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e12a0
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CChara::LoadFurTexBuffer(unsigned short* inTexels)
+{
+	memcpy(Chara.MogFur().m_texels, inTexels, 0x2000);
+	CalcMogScore();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e12e4
+ * PAL Size: 280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma push
+#pragma opt_common_subs off
+#pragma opt_propagation off
+void CChara::CModel::InitMogFurTex()
+{
+	CTextureSet* textureSet = m_texSet;
+	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
+	CTexture* texture = textureSet->GetTexture(textureIdx);
+
+	if ((texture != 0) && (texture->m_format == 4)) {
+		texture->m_format = 5;
+		Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
+
+		textureSet = m_texSet;
+		textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
+		CTexture* textureData = textureSet->GetTexture(textureIdx);
+		if (textureData != 0) {
+			void* dstBuffer = textureData->m_imageData;
+			int texelCountBytes = textureData->m_width * textureData->m_height * 2;
+
+			DCInvalidateRange(dstBuffer, texelCountBytes);
+			memcpy(dstBuffer, Chara.MogFur().m_texels, 0x2000);
+			DCFlushRange(dstBuffer, texelCountBytes);
+			GXInvalidateTexAll();
+		}
+
+		texture->InitTexObj();
+		m_flagsA0 = static_cast<unsigned char>(__rlwimi(m_flagsA0, 1, 6, 25, 25));
+	}
 }
 #pragma pop
 
@@ -1719,6 +1719,101 @@ noHitReturn:
 }
 
 #pragma pop
+extern "C" {
+unsigned char m_mogWork[0x2C];
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e2174
+ * PAL Size: 1140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma push
+#pragma opt_loop_invariants off
+void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
+{
+	_GXColor defaultColor = CColor(0x0f, 0x0f, 0x0f, 0).color;
+	*centerAfter = defaultColor;
+	*centerBefore = *centerAfter;
+
+	int texelCountBytes = width * height * 2;
+	int centerX = (int)((float)width * fx);
+	int centerY = (int)((float)height * fy);
+
+	DCInvalidateRange(pixels, texelCountBytes);
+
+	const int rowStride = width * 4;
+	for (int dy = -2; dy <= 2; dy++) {
+		int dx;
+		int py = centerY + dy;
+		for (dx = -2; dx <= 2; dx++) {
+			unsigned int px = centerX + dx;
+			int distance;
+			int tileIndex;
+			unsigned short packed;
+			int r;
+			int g;
+			int b;
+			int a;
+
+			if (px < 0 || width <= px || py < 0 || height <= py) {
+				continue;
+			}
+
+			const int sdx = dx >> 31;
+			const int adx = (dx ^ sdx) - sdx;
+			const int sdy = dy >> 31;
+			const int ady = (dy ^ sdy) - sdy;
+			distance = adx + ady;
+			tileIndex = (px % 4 + ((py % 4) * 4 + ((px / 4) * 0x10 + (py / 4) * rowStride))) * 2;
+			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
+
+			b = packed & 0x0f;
+			g = (packed >> 4) & 0x0f;
+			r = (packed >> 8) & 0x0f;
+			a = (packed >> 12) & 0x07;
+
+			if (distance == 0) {
+				_GXColor beforeColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
+				*centerBefore = beforeColor;
+			}
+
+			if (mode != 0) {
+				unsigned int reduce = (targetColor.a * (4 - distance)) / 4;
+				a = a - reduce;
+				a = a < 0 ? 0 : a;
+			} else {
+				float k = (float)(7 - targetColor.a) / kCharaFurAlphaComponentScale + (float)(distance / 4);
+				k = (1.0f < k) ? 1.0f : k;
+				{
+					float inv = 1.0f - k;
+					r = (int)((float)r * k + (float)targetColor.r * inv);
+					g = (int)((float)g * k + (float)targetColor.g * inv);
+					b = (int)((float)b * k + (float)targetColor.b * inv);
+				}
+				r = (r < 0) ? 0 : (r > 0x0f ? 0x0f : r);
+				g = (g < 0) ? 0 : (g > 0x0f ? 0x0f : g);
+				b = (b < 0) ? 0 : (b > 0x0f ? 0x0f : b);
+			}
+
+			*(unsigned short*)(((char*)pixels) + tileIndex) = (unsigned short)((a << 12) | (r << 8) | (g << 4) | b);
+
+			if (distance == 0) {
+				_GXColor afterColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
+				*centerAfter = afterColor;
+			}
+		}
+	}
+
+	DCFlushRange(pixels, texelCountBytes);
+	GXInvalidateTexAll();
+}
+#pragma pop
+
 /*
  * --INFO--
  * PAL Address: 0x800e25e8
@@ -2473,100 +2568,6 @@ void CChara::makeFurTex()
 #undef furNoiseRange
 #pragma pop
 
-extern "C" {
-unsigned char m_mogWork[0x2C];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800e2174
- * PAL Size: 1140b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma push
-#pragma opt_loop_invariants off
-void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
-{
-	_GXColor defaultColor = CColor(0x0f, 0x0f, 0x0f, 0).color;
-	*centerAfter = defaultColor;
-	*centerBefore = *centerAfter;
-
-	int texelCountBytes = width * height * 2;
-	int centerX = (int)((float)width * fx);
-	int centerY = (int)((float)height * fy);
-
-	DCInvalidateRange(pixels, texelCountBytes);
-
-	const int rowStride = width * 4;
-	for (int dy = -2; dy <= 2; dy++) {
-		int dx;
-		int py = centerY + dy;
-		for (dx = -2; dx <= 2; dx++) {
-			unsigned int px = centerX + dx;
-			int distance;
-			int tileIndex;
-			unsigned short packed;
-			int r;
-			int g;
-			int b;
-			int a;
-
-			if (px < 0 || width <= px || py < 0 || height <= py) {
-				continue;
-			}
-
-			const int sdx = dx >> 31;
-			const int adx = (dx ^ sdx) - sdx;
-			const int sdy = dy >> 31;
-			const int ady = (dy ^ sdy) - sdy;
-			distance = adx + ady;
-			tileIndex = (px % 4 + ((py % 4) * 4 + ((px / 4) * 0x10 + (py / 4) * rowStride))) * 2;
-			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
-
-			b = packed & 0x0f;
-			g = (packed >> 4) & 0x0f;
-			r = (packed >> 8) & 0x0f;
-			a = (packed >> 12) & 0x07;
-
-			if (distance == 0) {
-				_GXColor beforeColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
-				*centerBefore = beforeColor;
-			}
-
-			if (mode != 0) {
-				unsigned int reduce = (targetColor.a * (4 - distance)) / 4;
-				a = a - reduce;
-				a = a < 0 ? 0 : a;
-			} else {
-				float k = (float)(7 - targetColor.a) / kCharaFurAlphaComponentScale + (float)(distance / 4);
-				k = (1.0f < k) ? 1.0f : k;
-				{
-					float inv = 1.0f - k;
-					r = (int)((float)r * k + (float)targetColor.r * inv);
-					g = (int)((float)g * k + (float)targetColor.g * inv);
-					b = (int)((float)b * k + (float)targetColor.b * inv);
-				}
-				r = (r < 0) ? 0 : (r > 0x0f ? 0x0f : r);
-				g = (g < 0) ? 0 : (g > 0x0f ? 0x0f : g);
-				b = (b < 0) ? 0 : (b > 0x0f ? 0x0f : b);
-			}
-
-			*(unsigned short*)(((char*)pixels) + tileIndex) = (unsigned short)((a << 12) | (r << 8) | (g << 4) | b);
-
-			if (distance == 0) {
-				_GXColor afterColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;
-				*centerAfter = afterColor;
-			}
-		}
-	}
-
-	DCFlushRange(pixels, texelCountBytes);
-	GXInvalidateTexAll();
-}
-#pragma pop
 
 /*
  * --INFO--

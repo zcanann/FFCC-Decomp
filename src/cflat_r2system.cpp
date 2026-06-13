@@ -1880,17 +1880,18 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 formatScan:
                     scan = spec + 1;
                     while (*scan != '\0') {
+                        unsigned int* slot = &localArgs[argIndex];
                         switch (*scan) {
                         case 'd':
                         case 'x':
-                            sprintf(rendered, spec, localArgs[argIndex]);
+                            sprintf(rendered, spec, *slot);
                             goto renderedDone;
                         case 'f':
                             sprintf(rendered, spec,
-                                    static_cast<double>(reinterpret_cast<float*>(localArgs)[argIndex]));
+                                    static_cast<double>(*reinterpret_cast<float*>(slot)));
                             goto renderedDone;
                         case 's':
-                            sprintf(rendered, spec, this->m_strBlob + this->m_strOffsets[localArgs[argIndex]]);
+                            sprintf(rendered, spec, this->m_strBlob + this->m_strOffsets[*slot]);
                             goto renderedDone;
                         default:
                             scan++;

@@ -542,10 +542,9 @@ void CGraphic::Thread()
             debugCountdown--;
 
             if (debugCountdown == 0) {
-                u32 drawSyncRaw = GXReadDrawSync();
-                drawSyncRaw &= 0xFFFF;
-                int drawSyncPart = drawSyncRaw;
-                if ((drawSyncRaw & 0x8000) != 0) {
+                int drawSyncPart = GXReadDrawSync();
+                if ((drawSyncPart & 0x8000) != 0) {
+                    drawSyncPart &= 0xFFFF;
                     drawSyncPart &= 0x7FFF;
                     if (drawSyncPart == 0x7FFF) {
                         System.Printf(debugFmtBase + kGraphicCppPartControlDoneFmt, m_drawDoneFile, m_drawDoneLine);
@@ -559,18 +558,8 @@ void CGraphic::Thread()
 
                 CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
                 int drawSyncByte = static_cast<int>(static_cast<char>(drawSyncPart));
-                int orderIndex;
-                if (order != nullptr) {
-                    orderIndex = order->m_insertIndex;
-                } else {
-                    orderIndex = -1;
-                }
-                const char* orderName;
-                if (order != nullptr) {
-                    orderName = order->m_debugName;
-                } else {
-                    orderName = sGraphicUnknownOrderName;
-                }
+                int orderIndex = (order != nullptr) ? order->m_insertIndex : -1;
+                const char* orderName = (order != nullptr) ? order->m_debugName : sGraphicUnknownOrderName;
                 System.Printf(debugFmtBase + kGraphicCppDrawDoneFmt, m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
                               drawSyncByte);
             }

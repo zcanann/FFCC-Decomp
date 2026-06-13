@@ -2602,7 +2602,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			spr->flags = 3;
 		}
 
-		for (int i = 0; activePartyCount > i; i++) {
+		for (int i = 0; i < activePartyCount; i++) {
 			int sprite = this->m_bonusAnimPtr + (i + 1) * 0x40 + 8;
 			*(int*)(sprite + 0x24) = 0x10;
 		}
@@ -2646,12 +2646,12 @@ void CMenuPcs::CalcResultCloseAnim()
 			*(int*)(sprite + 0x2c) = 3;
 		}
 
-		// digitEchoBase block: src = iconBase (back = base - iconBase = base - (pc+1)); dance
+		// digitEchoBase block: src = iconEchoBase (back = activePartyCount sprites); dance
 		base += activePartyCount;
 		{
-			int back = base - (activePartyCount + 1);
+			int back = activePartyCount;
 			int byteDelta = back * 0x40;
-			for (int i = 0; activePartyCount > i; i++) {
+			for (int i = 0; i < activePartyCount; i++) {
 				int spr = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
 				int src = spr - byteDelta;
 				*(int*)(spr + 0x24) = *(int*)(src + 0x24);
@@ -3727,12 +3727,13 @@ void CMenuPcs::CalcResultOpenAnim()
 			int i = 0;
 			int total2 = activePartyCount * 2;
 			int boardBase = total2 * 0x50;
+			int boardOff = boardBase;
 			for (; i < activePartyCount; i++) {
 				BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i + 1];
-				int boardOff = boardBase + i * 0x50;
-				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x8) = (short)(int)kBonusZClearOrigin;
+				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x8) = (short)0;
 				int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)sprite->y) - DOUBLE_80331EF0);
 				*(unsigned short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0xa) = (short)centerY;
+				boardOff += 0x50;
 			}
 		}
 

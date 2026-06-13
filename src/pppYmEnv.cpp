@@ -115,8 +115,8 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
 
     gUtil.RenderColorQuad(kYmEnvRenderZero, kYmEnvRenderZero, texWidth, texHeight, color);
 
-    const unsigned short rtWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned short rtHeight = GXGetTexObjHeight(targetTexObj);
+    const unsigned short rtWidth = GXGetTexObjWidth(targetTexObj);
     const GXTexFmt targetFmt = GXGetTexObjFmt(targetTexObj);
     void* targetData = GXGetTexObjData(targetTexObj);
 

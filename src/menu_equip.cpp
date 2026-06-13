@@ -418,7 +418,7 @@ int CMenuPcs::EquipCtrlCur()
 					Sound.PlaySe(4, 0x40, 0x7f, 0);
 				} else {
 					caravanWork->ChgEquipPos(GetEquipMenuState(this)->selected[0],
-					                         (index == 0) ? -1 : entries[index]);
+					                         (index != 0) ? entries[index] : -1);
 					caravanWork->CalcStatus();
 					GetEquipMenuState(this)->step = GetEquipMenuState(this)->step + 1;
 					GetEquipMenuState(this)->frame = 0;

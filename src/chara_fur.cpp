@@ -467,6 +467,7 @@ static inline void DrawFurDisplayListShell(const FurMeshRaw* mesh, const FurDisp
  * JP Size: TODO
  */
 #pragma push
+#pragma optimization_level 3
 #pragma opt_dead_assignments off
 void CChara::TimeMogFur()
 {
@@ -1055,8 +1056,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	int messageId = -1;
 	const int debugPadLock = Pad.m_debugPadLock;
-	const short heldButtons = MogHeldButtons(debugPadLock);
-	const short triggerButtons = MogTriggerButtons(debugPadLock);
+	const int heldButtons = (short)MogHeldButtons(debugPadLock);
+	const int triggerButtons = (short)MogTriggerButtons(debugPadLock);
 	const unsigned short rotateButtons = static_cast<unsigned short>((MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : static_cast<short>(0));
 
 	if (MogWork().m_started == 0) {
@@ -2137,9 +2138,9 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
  */
 void CChara::freeFurTex()
 {
-	if (m_pTexBuf != 0) {
-		Memory.Free(m_pTexBuf);
-		m_pTexBuf = 0;
+	if (*reinterpret_cast<void**>(&m_height) != 0) {
+		Memory.Free(*reinterpret_cast<void**>(&m_height));
+		*reinterpret_cast<void**>(&m_height) = 0;
 	}
 }
 
@@ -2159,6 +2160,7 @@ static inline CColor& FurColorLval(const CColor& c)
 
 #pragma push
 #pragma opt_common_subs off
+#pragma opt_lifetimes off
 void CChara::makeFurTex()
 {
 	CHairSet hairSet[0x20];

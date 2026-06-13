@@ -2587,6 +2587,7 @@ void CMenuPcs::CmakeNameClose()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs off
 int CMenuPcs::CmakeNameCtrl()
 {
     short repeat;
@@ -2831,6 +2832,7 @@ int CMenuPcs::CmakeNameCtrl()
 
     return 0;
 }
+#pragma opt_common_subs on
 
 /*
  * --INFO--
@@ -2997,6 +2999,7 @@ void CMenuPcs::CmakeOpen()
  * JP Size: TODO
  */
 #pragma opt_propagation off
+#pragma opt_lifetimes off
 void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -3064,6 +3067,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
         DrawCursor(cursorBase, 0x175, alpha);
     }
 }
+#pragma opt_lifetimes on
 #pragma opt_propagation on
 
 /*

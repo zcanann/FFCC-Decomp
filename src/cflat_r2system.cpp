@@ -2909,15 +2909,16 @@ renderedDone:
         break;
     }
     case -0x4D: {
-        if (MenuPcs.GetMesMenu(*object->m_localBase) == 0) {
+        const int a0 = *object->m_localBase;
+        if (MenuPcs.GetMesMenu(a0) == 0) {
             if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
-                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), *object->m_localBase);
+                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);
             }
             this->push(object, 0);
             outResult = 0;
             break;
         }
-        if (MenuPcs.GetMesMenu(*object->m_localBase)->IsUse() == 0) {
+        if (MenuPcs.GetMesMenu(a0)->IsUse() == 0) {
             this->push(object, 0);
             outResult = 0;
             break;

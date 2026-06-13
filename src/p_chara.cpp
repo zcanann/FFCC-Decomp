@@ -2071,9 +2071,9 @@ void CCharaPcs::drawOverlap()
 
     Mtx savedCameraMtx;
     Mtx lookAtMtx;
-    Mtx identityMtx;
     Mtx texMtx;
     Mtx44 projectionMtx;
+    Mtx identityMtx;
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
 
@@ -2084,7 +2084,7 @@ void CCharaPcs::drawOverlap()
     GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
-    CColor black(0x00, 0x00, 0x00, 0xFF);
+    const CColor& black = CColor(0x00, 0x00, 0x00, 0xFF);
     GXSetChanMatColor(GX_COLOR0A0, black.color);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -2101,11 +2101,17 @@ void CCharaPcs::drawOverlap()
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
     GXSetCullMode(GX_CULL_NONE);
 
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
-    GXPosition3f32(kCharaZero, kCharaZero, FLOAT_803302D4);
-    GXPosition3f32(FLOAT_803302CC, kCharaZero, FLOAT_803302D4);
-    GXPosition3f32(kCharaZero, FLOAT_803302C8, FLOAT_803302D4);
-    GXPosition3f32(FLOAT_803302CC, FLOAT_803302C8, FLOAT_803302D4);
+    {
+        float zero = kCharaZero;
+        float depth = FLOAT_803302D4;
+        float width = FLOAT_803302CC;
+        float height = FLOAT_803302C8;
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
+        GXPosition3f32(zero, zero, depth);
+        GXPosition3f32(width, zero, depth);
+        GXPosition3f32(zero, height, depth);
+        GXPosition3f32(width, height, depth);
+    }
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
     GXSetProjection(projectionMtx, GX_PERSPECTIVE);
@@ -2132,7 +2138,7 @@ void CCharaPcs::drawOverlap()
     GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
     GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
-    CColor blendBlack(0x00, 0x00, 0x00, static_cast<unsigned char>(m_overlapAlpha & 0xFF));
+    const CColor& blendBlack = CColor(0x00, 0x00, 0x00, static_cast<unsigned char>(m_overlapAlpha & 0xFF));
     GXSetChanMatColor(GX_COLOR0A0, blendBlack.color);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
@@ -2154,14 +2160,19 @@ void CCharaPcs::drawOverlap()
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
-    GXPosition3f32(kCharaZero, kCharaZero, kCharaZero);
-    GXPosition3f32(FLOAT_803302CC, kCharaZero, kCharaZero);
-    GXPosition3f32(kCharaZero, FLOAT_803302C8, kCharaZero);
-    GXPosition3f32(FLOAT_803302CC, FLOAT_803302C8, kCharaZero);
+    {
+        float zero = kCharaZero;
+        float width = FLOAT_803302CC;
+        float height = FLOAT_803302C8;
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
+        GXPosition3f32(zero, zero, zero);
+        GXPosition3f32(width, zero, zero);
+        GXPosition3f32(zero, height, zero);
+        GXPosition3f32(width, height, zero);
+    }
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
-    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
     GXSetChanMatColor(GX_COLOR0A0, white.color);
     GXLoadTexObj(backBufferTex, GX_TEXMAP0);
     PSMTXScale(texMtx, FLOAT_803302DC, FLOAT_803302E0, kCharaOne);
@@ -2175,15 +2186,20 @@ void CCharaPcs::drawOverlap()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
-    GXPosition3f32(kCharaZero, kCharaZero, kCharaZero);
-    GXTexCoord2u16(0, 0);
-    GXPosition3f32(FLOAT_803302CC, kCharaZero, kCharaZero);
-    GXTexCoord2u16(0x280, 0);
-    GXPosition3f32(kCharaZero, FLOAT_803302C8, kCharaZero);
-    GXTexCoord2u16(0, 0x1C0);
-    GXPosition3f32(FLOAT_803302CC, FLOAT_803302C8, kCharaZero);
-    GXTexCoord2u16(0x280, 0x1C0);
+    {
+        float zero = kCharaZero;
+        float width = FLOAT_803302CC;
+        float height = FLOAT_803302C8;
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
+        GXPosition3f32(zero, zero, zero);
+        GXTexCoord2u16(0, 0);
+        GXPosition3f32(width, zero, zero);
+        GXTexCoord2u16(0x280, 0);
+        GXPosition3f32(zero, height, zero);
+        GXTexCoord2u16(0, 0x1C0);
+        GXPosition3f32(width, height, zero);
+        GXTexCoord2u16(0x280, 0x1C0);
+    }
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
     GXSetProjection(projectionMtx, GX_PERSPECTIVE);

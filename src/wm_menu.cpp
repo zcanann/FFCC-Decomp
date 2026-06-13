@@ -11701,7 +11701,6 @@ void CMenuPcs::CalcMcObj()
 	const float* p50 = &FLOAT_803314A4;
 	const double* p25 = &DOUBLE_803314A8;
 
-	SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
 	int i;
 	unsigned int* panelState = reinterpret_cast<unsigned int*>(worldObj + 0x550);
 	for (i = 0; i < 4; i++, panelState = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(panelState) + 0x50)) {
@@ -11718,6 +11717,7 @@ void CMenuPcs::CalcMcObj()
 		reinterpret_cast<float*>(panelState)[6] = *p50;
 
 		unsigned char* const charaState = m_wmCharaState + i * 0x48;
+		SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
 		panelState[1]++;
 		if (static_cast<float>(static_cast<int>(panelState[1])) >=
 		    *p25 * static_cast<double>(yTbl->data[gWmModelYOffsetSplineCount * 4 - 4])) {

@@ -436,7 +436,7 @@ void CMenuPcs::MoneyDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::MoneyClose()
+int CMenuPcs::MoneyClose()
 {
 	this->m_moneyState->frame++;
 
@@ -477,9 +477,9 @@ bool CMenuPcs::MoneyClose()
 		}
 	}
 
-	bool result = false;
+	int result = 0;
 	if (count == finished) {
-		result = true;
+		result = 1;
 	}
 	return result;
 }
@@ -537,7 +537,7 @@ int CMenuPcs::MoneyCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::MoneyOpen()
+int CMenuPcs::MoneyOpen()
 {
 	if (this->m_moneyState->initialized == '\0') {
 		memset(this->m_moneyPanel, 0, sizeof(*this->m_moneyPanel));
@@ -609,9 +609,9 @@ bool CMenuPcs::MoneyOpen()
 		}
 	}
 
-	bool opened = false;
+	int opened = 0;
 	if (count == finished) {
-		opened = true;
+		opened = 1;
 	}
 	return opened;
 }

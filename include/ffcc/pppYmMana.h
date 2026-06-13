@@ -32,7 +32,7 @@ struct pppYmManaStep {
     s32 m_envTextureId1;
     float m_waterScale;
     float m_waterOffset;
-    u32 m_rippleLevel;
+    float m_rippleLevel;
     u8 m_map21Flag;
     u8 m_pad39[3];
     GXColor m_baseColor;

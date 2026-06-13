@@ -218,8 +218,6 @@ void CalcReflectionVector2(
         for (i = 0; i < itemCount; i++) {
             u16 posIndex = dl[0];
             u16 normalIndex = dl[1];
-            float denom;
-
             dl += 4;
             if (fmt == 2) {
                 dl++;
@@ -249,9 +247,8 @@ void CalcReflectionVector2(
                 ((u8*)&color[posIndex])[3] = 0;
             }
 
-            denom = denomBias + reflectionVec[posIndex].z;
-            uv.x = -reflectionVec[posIndex].x / denom;
-            uv.y = -reflectionVec[posIndex].y / denom;
+            uv.x = -reflectionVec[posIndex].x / (denomBias + reflectionVec[posIndex].z);
+            uv.y = -reflectionVec[posIndex].y / (denomBias + reflectionVec[posIndex].z);
             uv.x *= half;
             uv.y *= half;
             uv.x += half;
@@ -260,9 +257,8 @@ void CalcReflectionVector2(
             uv.y = uv.y - scale * (warp * (uv.y - half));
             gUtil.ConvF2IVector2d(texCoordA[posIndex], uv, 12);
 
-            denom = denomBias - reflectionVec[posIndex].z;
-            uv.x = -reflectionVec[posIndex].x / denom;
-            uv.y = -reflectionVec[posIndex].y / denom;
+            uv.x = -reflectionVec[posIndex].x / (denomBias - reflectionVec[posIndex].z);
+            uv.y = -reflectionVec[posIndex].y / (denomBias - reflectionVec[posIndex].z);
             uv.x *= half;
             uv.y *= half;
             uv.x += half;
@@ -1264,8 +1260,12 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
         }
     }
 
-    if ((param_2->m_type == 1 || param_2->m_type == 2) && mana->m_waterHeightA != 0) {
-        *reinterpret_cast<float*>(reinterpret_cast<u8*>(mana->m_waterHeightA) + 0x240) = *reinterpret_cast<const float*>(&param_2->m_rippleLevel);
+    if (param_2->m_type == 1 || param_2->m_type == 2) {
+        float* heightA = mana->m_waterHeightA;
+        float rippleLevel = param_2->m_rippleLevel;
+        if (heightA != 0) {
+            heightA[144] = rippleLevel;
+        }
     }
 
     } // end if (m_graphId == 0)

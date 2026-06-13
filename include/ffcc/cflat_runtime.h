@@ -121,10 +121,10 @@ public:
 	virtual int Frame(int, int);
 	virtual void onNewObject(CFlatRuntime::CObject*);
 	virtual void onDeleteObject(CFlatRuntime::CObject*);
-	virtual int onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 	virtual int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
-	virtual CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
+	virtual int onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 	virtual CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);
+	virtual CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
 	virtual void onSetSystemVal(int, CFlatRuntime::CStack*, int);
 	virtual void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);
 	virtual CFlatRuntime::CObject* getFreeObject(int);

@@ -5310,6 +5310,8 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
     return result;
 }
 
+#pragma push
+#pragma opt_propagation off
 /*
  * --INFO--
  * Address:	TODO
@@ -5411,6 +5413,7 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
 
     return result;
 }
+#pragma pop
 
 /*
  * --INFO--

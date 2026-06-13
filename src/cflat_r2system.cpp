@@ -358,7 +358,7 @@ void CMapPcs::CalcHitPosition(Vec* hitPosition)
  */
 int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
 {
-    CMapCylinder cylinder(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
+    CMapCylinder cylinder(1e10f, -1e10f);
 
     cylinder.m_bottom = *cylinderBottom;
     cylinder.m_axis = *direction;

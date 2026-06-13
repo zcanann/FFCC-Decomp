@@ -1018,8 +1018,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 		    (short)(((BonusAnimHeader*)this->m_bonusAnimPtr)->count - 1);
 
 		{
-			int off = 0;
 			int i = 0;
+			int off = i;
 			int __p3 = i;
 			for (; __p3 < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
 				int sprOff = off + 8;

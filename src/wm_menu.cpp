@@ -4979,6 +4979,7 @@ void CMenuPcs::DrawMCardMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 void CMenuPcs::DrawCMakeMenu()
@@ -5204,9 +5205,8 @@ void CMenuPcs::DrawCMakeMenu()
 		}
 	}
 }
+#pragma pop
 
-#pragma opt_lifetimes on
-#pragma opt_propagation on
 /*
  * --INFO--
  * PAL Address: 0x800f9248
@@ -9560,6 +9560,9 @@ void CMenuPcs::WMSubMenuInit()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
+#pragma opt_lifetimes off
 void CMenuPcs::WMChgMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
@@ -9979,6 +9982,7 @@ void CMenuPcs::WMChgMenu()
 		MapMng.GetMapIdGrpArray()[0xF7].m_primaryColor.a = 1;
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

@@ -5103,7 +5103,7 @@ void CGPartyObj::ghostPartyMog()
 			}
 			sGhostPartyWork.flagBits.flag08 = 1;
 		} else {
-			if (sGhostPartyWork.flagBits.flag10 == 0) {
+			if (sGhostPartyWork.flagBits.flag04 == 0) {
 				int innerMode;
 				switch (Game.m_gameWork.m_bossArtifactStageIndex) {
 				default:
@@ -5144,7 +5144,7 @@ void CGPartyObj::ghostPartyMog()
 					goto messageMenu;
 				}
 			}
-			if (sGhostPartyWork.flagBits.flag10 == 0 && static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C)) > 0x96) {
+			if (sGhostPartyWork.flagBits.flag04 == 0 && static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C)) > 0x96) {
 				bossState = 8;
 			} else {
 				bossState = 0;

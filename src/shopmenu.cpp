@@ -1458,7 +1458,7 @@ void CShopMenu::DrawItemInfo0()
     }
 
     if (m_subMode == 0) {
-        DrawItemInfo(itemNo, 0, 0xA8, 0, 0xC6, 0, 0, 0);
+        DrawItemInfo(itemNo, 0, 0xA8, 0, 0xC6, 0, 0xE4, 0x64);
     }
 
     if ((m_subMode == 1) && (m_listType == 0)) {

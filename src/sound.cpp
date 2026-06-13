@@ -264,48 +264,54 @@ void CLine<10>::Draw()
 
 void CLine<10>::CalcBound()
 {
-    min.x = kLineBoundsInitMin;
-    min.y = kLineBoundsInitMin;
-    min.z = kLineBoundsInitMin;
-    max.x = kLineBoundsInitMax;
-    max.y = kLineBoundsInitMax;
-    max.z = kLineBoundsInitMax;
-    totalLength = kLineSegmentMinT;
+    float* base = reinterpret_cast<float*>(this);
+    float* ptWalk = base;
+    float* segWalk = base;
 
-    u32 i = 0;
-    while (i < pointCount) {
-        if (points[i].x < min.x) {
-            min.x = points[i].x;
+    base[0] = kLineBoundsInitMin;
+    base[1] = kLineBoundsInitMin;
+    base[2] = kLineBoundsInitMin;
+    base[3] = kLineBoundsInitMax;
+    base[4] = kLineBoundsInitMax;
+    base[5] = kLineBoundsInitMax;
+    base[0x72] = kLineSegmentMinT;
+
+    for (u32 i = 0; i < pointCount; i++) {
+        if (ptWalk[0xC] < base[0]) {
+            base[0] = ptWalk[0xC];
         }
-        if (points[i].y < min.y) {
-            min.y = points[i].y;
+        if (ptWalk[0xD] < base[1]) {
+            base[1] = ptWalk[0xD];
         }
-        if (points[i].z < min.z) {
-            min.z = points[i].z;
+        if (ptWalk[0xE] < base[2]) {
+            base[2] = ptWalk[0xE];
         }
 
-        if (points[i].x > max.x) {
-            max.x = points[i].x;
+        if (ptWalk[0xC] > base[3]) {
+            base[3] = ptWalk[0xC];
         }
-        if (points[i].y > max.y) {
-            max.y = points[i].y;
+        if (ptWalk[0xD] > base[4]) {
+            base[4] = ptWalk[0xD];
         }
-        if (points[i].z > max.z) {
-            max.z = points[i].z;
+        if (ptWalk[0xE] > base[5]) {
+            base[5] = ptWalk[0xE];
         }
 
         if (i != 0) {
             u32 prevIndex = i - 1;
-            PSVECSubtract(&points[i], &points[prevIndex], &segments[prevIndex].delta);
-            segments[prevIndex].length = PSVECMag(&segments[prevIndex].delta);
-            segments[prevIndex].startLength = totalLength;
-            totalLength += segments[prevIndex].length;
-            if (segments[prevIndex].length != kLineSegmentMinT) {
-                PSVECNormalize(&segments[prevIndex].delta, &segments[prevIndex].normal);
+            Vec* delta = reinterpret_cast<Vec*>(base + prevIndex * 8 + 0x2A);
+            PSVECSubtract(reinterpret_cast<Vec*>(ptWalk + 0xC),
+                          reinterpret_cast<Vec*>(base + prevIndex * 3 + 0xC), delta);
+            segWalk[0x28] = PSVECMag(delta);
+            segWalk[0x29] = base[0x72];
+            base[0x72] += segWalk[0x28];
+            if (kLineSegmentMinT != segWalk[0x28]) {
+                PSVECNormalize(delta, reinterpret_cast<Vec*>(base + prevIndex * 8 + 0x2D));
             }
         }
 
-        i++;
+        ptWalk += 3;
+        segWalk += 8;
     }
 }
 

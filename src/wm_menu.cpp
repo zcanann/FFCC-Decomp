@@ -4398,11 +4398,12 @@ void CMenuPcs::DrawDiaryMenu()
 	GetWmWorldHandles(this)[1]->m_model->m_lightAlpha = FLOAT_803313e8;
 	{
 		unsigned char* const worldObj = m_wm.m_worldObjData;
+		Mtx lookAtMtx;
 		Mtx44 projectionMtx;
+		Mtx44 restoreMtx;
 		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		Mtx lookAtMtx;
 		C_MTXLookAt(lookAtMtx, reinterpret_cast<Vec*>(worldObj + 0x60),
 		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
 		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
@@ -4423,8 +4424,8 @@ void CMenuPcs::DrawDiaryMenu()
 		GetWmWorldHandles(this)[1]->Draw(5);
 		PSMTXCopy(reinterpret_cast<MtxPtr>(m_wm.m_pad744), CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
-		PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
-		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+		PSMTX44Copy(CameraPcs.m_screenMatrix, restoreMtx);
+		GXSetProjection(restoreMtx, GX_PERSPECTIVE);
 		Graphic.SetViewport();
 		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();
@@ -12032,8 +12033,8 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 
 #define halfTexel FLOAT_80331434
 	float u0;
-	float u1;
 	float v0;
+	float u1;
 	float v1;
 
 	if ((flags & 8) != 0) {
@@ -12046,17 +12047,20 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 
 	if ((flags & 4) != 0) {
 		v1 = ty + halfTexel;
-		v0 = (ty + h) - halfTexel;
+		v0 = (v1 + h) - halfTexel;
 	} else {
 		v0 = ty + halfTexel;
 		v1 = (ty + h) - halfTexel;
 	}
 
+	float wS = w * scaleX;
+	float hS = h * scaleY;
+
 	if ((flags & 1) != 0) {
-		x = x - halfTexel * (w * scaleX);
+		x = x - halfTexel * wS;
 	}
 	if ((flags & 2) != 0) {
-		y = y - halfTexel * (h * scaleY);
+		y = y - halfTexel * hS;
 	}
 #undef halfTexel
 
@@ -12067,16 +12071,16 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 	in[0].y = y;
 	in[0].z = 0.0f;
 
-	in[1].x = x + (w * scaleX);
+	in[1].x = x + wS;
 	in[1].y = y;
 	in[1].z = 0.0f;
 
 	in[2].x = x;
-	in[2].y = y + (h * scaleY);
+	in[2].y = y + hS;
 	in[2].z = 0.0f;
 
-	in[3].x = x + (w * scaleX);
-	in[3].y = y + (h * scaleY);
+	in[3].x = x + wS;
+	in[3].y = y + hS;
 	in[3].z = 0.0f;
 
 	PSMTXMultVecArray(reinterpret_cast<MtxPtr>(mtx), in, out, 4);
@@ -14117,12 +14121,17 @@ int McCtrl::ChkNowData()
 				MemoryCardMan.DecodeData();
 
 				int r = MemoryCardMan.McClose();
-				if (r == 0)
+				if (r != 0)
+				{
+					m_lastResult = r;
+					m_state = -1;
+				}
+				else
 				{
 					MemoryCardMan.McUnmount(m_cardChannel);
 
-					if ((*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D4) == Game.m_gameWork.m_mcSerial1 &&
-						 *(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D0) == Game.m_gameWork.m_mcSerial0) &&
+					if (((*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D0) ^ Game.m_gameWork.m_mcSerial0) |
+						 (*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D4) ^ Game.m_gameWork.m_mcSerial1)) == 0 &&
 						(*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D8) == Game.m_gameWork.m_mcRandom))
 					{
 						r = 1;
@@ -14136,9 +14145,6 @@ int McCtrl::ChkNowData()
 					m_state = 7;
 					return r;
 				}
-
-				m_lastResult = r;
-				m_state = -1;
 			}
 		}
 		break;

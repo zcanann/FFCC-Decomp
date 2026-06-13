@@ -1541,14 +1541,20 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x46: {
-			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[0]))) : 0;
+			CGObject* target = 0;
+			if (static_cast<int>(object->m_localBase[0]) != 0) {
+				target = static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[0])));
+			}
 			engineObject->LookAt(target, 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		}
 		case -0x8C: {
-			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[0]))) : 0;
+			CGObject* target = 0;
+			if (static_cast<int>(object->m_localBase[0]) != 0) {
+				target = static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[0])));
+			}
 			engineObject->LookAt(target, RuntimeString(this, object->m_localBase[1]));
 			PushValue(this, object, 0);
 			outResult = 0;

@@ -936,11 +936,12 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			unsigned int* sp = object->m_sp;
 			unsigned int* top = --object->m_sp;
 			const u32 systemValue = sp[-2];
+			const int valIndex = static_cast<int>(systemValue) >> 13;
 			if (((systemValue >> 12) & 1) != 0) {
 				CObject* target = reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF));
-				onSetClassSystemVal(static_cast<int>(systemValue) >> 13, target, reinterpret_cast<CStack*>(top), 0);
+				onSetClassSystemVal(valIndex, target, reinterpret_cast<CStack*>(top), 0);
 			} else {
-				onSetSystemVal(static_cast<int>(systemValue) >> 13, reinterpret_cast<CStack*>(top), 0);
+				onSetSystemVal(valIndex, reinterpret_cast<CStack*>(top), 0);
 			}
 			break;
 		}
@@ -949,11 +950,12 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			unsigned int* sp = object->m_sp;
 			unsigned int* top = --object->m_sp;
 			const u32 systemValue = sp[-2];
+			const int valIndex = static_cast<int>(systemValue) >> 13;
 			if (((systemValue >> 12) & 1) != 0) {
 				CObject* target = reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF));
-				onSetClassSystemVal(static_cast<int>(systemValue) >> 13, target, reinterpret_cast<CStack*>(top), 1);
+				onSetClassSystemVal(valIndex, target, reinterpret_cast<CStack*>(top), 1);
 			} else {
-				onSetSystemVal(static_cast<int>(systemValue) >> 13, reinterpret_cast<CStack*>(top), 1);
+				onSetSystemVal(valIndex, reinterpret_cast<CStack*>(top), 1);
 			}
 			break;
 		}
@@ -962,11 +964,12 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			unsigned int* sp = object->m_sp;
 			unsigned int* top = --object->m_sp;
 			const u32 systemValue = sp[-2];
+			const int valIndex = static_cast<int>(systemValue) >> 13;
 			if (((systemValue >> 12) & 1) != 0) {
 				CObject* target = reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF));
-				onSetClassSystemVal(static_cast<int>(systemValue) >> 13, target, reinterpret_cast<CStack*>(top), -1);
+				onSetClassSystemVal(valIndex, target, reinterpret_cast<CStack*>(top), -1);
 			} else {
-				onSetSystemVal(static_cast<int>(systemValue) >> 13, reinterpret_cast<CStack*>(top), -1);
+				onSetSystemVal(valIndex, reinterpret_cast<CStack*>(top), -1);
 			}
 			break;
 		}

@@ -1775,6 +1775,7 @@ void CMenuPcs::CmakeJobClose()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs off
 int CMenuPcs::CmakeJobCtrl()
 {
     short repeat;
@@ -1889,6 +1890,7 @@ int CMenuPcs::CmakeJobCtrl()
     }
     return 0;
 }
+#pragma opt_common_subs on
 
 /*
  * --INFO--

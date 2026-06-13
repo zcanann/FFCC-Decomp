@@ -12032,9 +12032,9 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 	}
 
 #define halfTexel FLOAT_80331434
-	float u1;
-	float v0;
 	float u0;
+	float v0;
+	float u1;
 	float v1;
 
 	if ((flags & 8) != 0) {

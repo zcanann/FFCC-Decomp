@@ -269,19 +269,19 @@ int CMenuPcs::MLstCtrl()
 		result = 0;
 	} else {
 		if ((hold & 0x48) != 0) {
-			int cursor = this->m_menuLstState->cursor;
-			if (cursor != 0) {
-				this->m_menuLstState->cursor = cursor - 1;
+			MenuLstState* st = this->m_menuLstState;
+			if (st->cursor != 0) {
+				st->cursor = st->cursor - 1;
 			} else {
-				this->m_menuLstState->cursor = 8;
+				st->cursor = 8;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else if ((hold & 0x24) != 0) {
-			int cursor = this->m_menuLstState->cursor;
-			if (cursor < 8) {
-				this->m_menuLstState->cursor = cursor + 1;
+			MenuLstState* st = this->m_menuLstState;
+			if (st->cursor < 8) {
+				st->cursor = st->cursor + 1;
 			} else {
-				this->m_menuLstState->cursor = 0;
+				st->cursor = 0;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}

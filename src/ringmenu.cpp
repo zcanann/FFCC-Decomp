@@ -335,6 +335,7 @@ void CRingMenu::onScriptChanging(char*)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CRingMenu::drawGBA()
 {
 	float sinA;
@@ -443,6 +444,7 @@ void CRingMenu::drawGBA()
 
 	MenuPcs.DrawInit();
 }
+#pragma opt_propagation reset
 
 /*
  * --INFO--
@@ -453,6 +455,7 @@ void CRingMenu::drawGBA()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 void CRingMenu::onDraw()
 {
 	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1))) {
@@ -653,10 +656,10 @@ void CRingMenu::onDraw()
 			}
 
 			const char* label;
-			if ((buttonValue & 0x8000) == 0) {
-				label = Game.m_cFlatDataArr[1].TableStrings(4)[buttonValue];
-			} else {
+			if ((buttonValue & 0x8000) != 0) {
 				label = Game.m_cFlatDataArr[1].TableStrings(0)[(buttonValue & ~0x8000) * 5 + 4];
+			} else {
+				label = Game.m_cFlatDataArr[1].TableStrings(4)[buttonValue];
 			}
 
 			float fade = static_cast<float>((&m_buttonTimers[group * 3])[button]) * kRingMenuButtonFadeStep;
@@ -728,12 +731,15 @@ void CRingMenu::onDraw()
 				CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 				if (partyObj != 0) {
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
-					if ((caravanWork != 0) && ((CFlatGameFlags() & CFlatGameFlag_Bit1) == 0)) {
+					if ((caravanWork != 0)
+					    && (static_cast<signed char>(
+					            static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 30) & 0xC0000000) >> 31)
+					        == 0)) {
 						const float barY = kRingMenuTextOffsetX + textY;
 						const float fullAlpha = showScale * (kRingMenuAlphaMax * fade * transitionScale);
 						const float dimAlpha = showScale * (kRingMenuCommandPanelWidth * fade * transitionScale);
 
-						for (unsigned int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
+						for (int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
 							int maxCharge;
 							int curCharge;
 							int charge = caravanWork->GetMagicCharge(i, maxCharge, curCharge);
@@ -766,6 +772,7 @@ void CRingMenu::onDraw()
 
 	MenuPcs.DrawInit();
 }
+#pragma opt_lifetimes reset
 
 /*
  * --INFO--

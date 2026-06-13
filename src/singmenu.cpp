@@ -2210,7 +2210,7 @@ void CMenuPcs::SingleCalcCtrl()
         if (proc == 0) {
             result = EquipOpen();
         } else if (proc == 1) {
-            EquipCtrl();
+            result = EquipCtrl();
         } else {
             result = EquipClose();
         }

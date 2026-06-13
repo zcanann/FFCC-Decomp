@@ -262,7 +262,7 @@ void CMenuPcs::FavoDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::FavoClose()
+int CMenuPcs::FavoClose()
 {
 	FavoEntry* entry;
 	int finishedCount;
@@ -298,9 +298,9 @@ bool CMenuPcs::FavoClose()
 		entry++;
 	}
 
-	bool result = false;
+	int result = 0;
 	if (count == finishedCount) {
-		result = true;
+		result = 1;
 	}
 	return result;
 }
@@ -314,7 +314,7 @@ bool CMenuPcs::FavoClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CMenuPcs::FavoCtrl()
+int CMenuPcs::FavoCtrl()
 {
 	bool activeInput = false;
 	unsigned int rawPress;
@@ -380,7 +380,7 @@ noReset:
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::FavoOpen()
+int CMenuPcs::FavoOpen()
 {
 	FavoEntry* entry;
 	int finishedCount;
@@ -418,9 +418,9 @@ bool CMenuPcs::FavoOpen()
 		entry++;
 	}
 
-	bool result = false;
+	int result = 0;
 	if (count == finishedCount) {
-		result = true;
+		result = 1;
 	}
 	return result;
 }

@@ -362,7 +362,7 @@ void CMenuPcs::CompaDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::CompaClose()
+int CMenuPcs::CompaClose()
 {
     CompaOpenAnim* entry;
     int finishedCount;
@@ -398,9 +398,9 @@ bool CMenuPcs::CompaClose()
         entry++;
     }
 
-    bool result = false;
+    int result = 0;
     if (count == finishedCount) {
-        result = true;
+        result = 1;
     }
     return result;
 }
@@ -546,7 +546,7 @@ inline void CMenuPcs::CompaInit0()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::CompaOpen()
+int CMenuPcs::CompaOpen()
 {
     CompaOpenAnim* entry;
     int finishedCount;
@@ -583,9 +583,9 @@ bool CMenuPcs::CompaOpen()
         }
         entry++;
     }
-    bool result = false;
+    int result = 0;
     if (count == finishedCount) {
-        result = true;
+        result = 1;
     }
     return result;
 }

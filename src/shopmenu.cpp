@@ -2811,7 +2811,7 @@ void CShopMenu::SelectFigure()
             ++m_quantity;
             CCaravanWork* caravanWork = m_caravanWork;
             if (m_quantity <= (0x40 - caravanWork->m_inventoryItemCount)) {
-                int totalGil;
+                short totalGil;
                 if (m_selectedIndex == -1) {
                     totalGil = 0;
                 } else {
@@ -2826,13 +2826,14 @@ void CShopMenu::SelectFigure()
                                       *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
                             unitGil = gil / 100;
                         }
-                    } else if (m_listType == 1) {
+                    } else if (1 == m_listType) {
                         if (itemId <= 0) {
                             unitGil = 0;
                         } else {
                             int costBase = itemId * 0x48;
                             int gil = caravanWork->m_shopParam *
                                       *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
+                            register int gilReg = gil; gil = gilReg;
                             unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
                         }
                     } else {

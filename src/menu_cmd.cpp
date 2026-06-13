@@ -2458,8 +2458,12 @@ void CMenuPcs::DrawUniteList()
 	}
 
 	DrawInit();
-	if (GetCmdStateView(this)->mode == 0) {
-		const s16 helpSlot = caravan->m_commandListExtra[GetCmdStateView(this)->selected];
+	{
+		CmdState* const helpStateView = GetCmdStateView(this);
+		const s32 helpMode = helpStateView->mode;
+		const s16 helpSelected = helpStateView->selected;
+		if (helpMode == 0) {
+		const s16 helpSlot = caravan->m_commandListExtra[helpSelected];
 		if (helpSlot != 0) {
 			int helpId =  (helpSlot + 0);
 			const u8 helpAlpha =
@@ -2475,6 +2479,7 @@ void CMenuPcs::DrawUniteList()
 				static_cast<int>(drawY),
 				CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10,
 				kCmdMenuOne, kCmdMenuThree);
+		}
 		}
 	}
 }

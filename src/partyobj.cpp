@@ -2265,6 +2265,7 @@ int CGPartyObj::getReplaceStat(int state)
 
 #pragma push
 #pragma opt_propagation off
+#pragma opt_dead_assignments off
 /*
  * --INFO--
  * PAL Address: 0x8011ff8c

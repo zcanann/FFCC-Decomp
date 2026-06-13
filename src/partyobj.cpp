@@ -195,7 +195,8 @@ static inline int& CharaGhostValue(int offset)
 
 static inline int& PartyTraceParticleSlot(int port)
 {
-	return CFlatPartyTraceParticleSlot(port);
+	int* base = &CFlat.m_partyTraceParticleSlot[0];
+	return base[port];
 }
 
 static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
@@ -2547,7 +2548,8 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
 				PSVECSubtract(&obj->m_worldPosition, &m_worldPosition, &diff);
 				diff.y = 0.0f;
 				float distSq = PSVECSquareMag(&diff);
-				if (0.0f < distSq && distSq < radius * radius) {
+				float radiusSq = radius * radius;
+				if (0.0f < distSq && distSq < radiusSq) {
 					float absAngle = fabsf(dstTargetRot__8CGPrgObjFP8CGPrgObj(this, reinterpret_cast<CGPrgObj*>(obj)));
 					if (absAngle > bestAbsAngle) {
 						bestAbsAngle = absAngle;
@@ -2692,7 +2694,6 @@ void CGPartyObj::putComboParticle()
 void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 {
 	PartyObjOverlay& party = PartyData(this);
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (doInit != 0) {
 		party.flags.flag40 = targetSide;
 		party.flags.flag10 = 0;
@@ -2859,7 +2860,6 @@ int CGPartyObj::isRideTarget()
 void CGPartyObj::checkTargetParticle()
 {
 	PartyObjOverlay& party = PartyData(this);
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	unsigned char flags = party.partyFlags;
 
 	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(flags) << 27) & 0xC0000000) >> 31) != 0) {
@@ -2939,11 +2939,11 @@ void CGPartyObj::checkTargetParticle()
 		float dist = PSVECDistance(&m_worldPosition, targetPos);
 
 		float zero = LoadFloat(FLOAT_80331a78);
-		if (*reinterpret_cast<int*>(self + 0x520) == 2) {
-			int scriptPtr = *reinterpret_cast<int*>(self + 0x58);
+		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x520) == 2) {
+			int scriptPtr = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58);
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19A);
 			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-			unsigned int vItem = rows[*reinterpret_cast<int*>(self + 0x560)].m_field30;
+			unsigned int vItem = rows[*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560)].m_field30;
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
 			int vFlag;
 			if ((*reinterpret_cast<unsigned int*>(scriptPtr + 0x3B0) & 0x4000) != 0) {
@@ -2953,10 +2953,10 @@ void CGPartyObj::checkTargetParticle()
 			}
 			maxRange = zero + (base + static_cast<float>(vFlag));
 		} else {
-			int scriptPtr = *reinterpret_cast<int*>(self + 0x58);
+			int scriptPtr = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58);
 			unsigned int vNode = *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(scriptPtr + 0x24) + 0x19C);
 			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-			unsigned int vItem = rows[*reinterpret_cast<int*>(self + 0x560)].m_field30;
+			unsigned int vItem = rows[*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560)].m_field30;
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
 			int vFlag;
 			if ((*reinterpret_cast<unsigned int*>(scriptPtr + 0x3B0) & 0x8000) != 0) {
@@ -3099,8 +3099,7 @@ void CGPartyObj::checkTargetParticle()
  */
 void CGPartyObj::moveCenterTargetParticle()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	int step = *reinterpret_cast<int*>(self + 0x530);
+	int step = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x530);
 
 	if (step >= 5) {
 		return;
@@ -4931,10 +4930,10 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 #pragma opt_common_subs off
 void CGPartyObj::gpmCol()
 {
+	CGPartyObj* leader = Game.m_partyObjArr[0];
 	unsigned char* ghostWork = CGPartyObj::m_ghostWork;
 	int& activeTrailCount = *reinterpret_cast<int*>(ghostWork + 0x48);
 #define trailIndex (*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x4C))
-	CGPartyObj* leader = Game.m_partyObjArr[0];
 
 	unsigned char* trailBase = ghostWork + 0x50;
 	int i = 0;
@@ -5198,7 +5197,6 @@ messageMenu:
  */
 void CGPartyObj::gpmMove()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	CGPartyObj* leader = Game.m_partyObjArr[0];
 	CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
 
@@ -5290,10 +5288,10 @@ void CGPartyObj::gpmMove()
 	toLeader.y = 0.0f;
 	float dist = PSVECMag(&toLeader);
 	float nearDist = m_nearColRadius + leader->m_nearColRadius;
-	float clampedDist = (dist > *reinterpret_cast<float*>(self + 0x5BC)) ? *reinterpret_cast<float*>(self + 0x5BC) : dist;
+	float clampedDist = (dist > *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x5BC)) ? *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x5BC) : dist;
 
 	if (m_lastStateId == 0 &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
 		int moveKind = 0;
 		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) != 0) {
 			moveKind = 0;
@@ -5354,13 +5352,13 @@ void CGPartyObj::gpmMove()
 
 				switch (sGhostPartyWork.slotSel) {
 				case 0:
-					*reinterpret_cast<int*>(self + 0x560) = 0x207;
+					*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560) = 0x207;
 					break;
 				case 1:
-					*reinterpret_cast<int*>(self + 0x560) = 0x20F;
+					*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560) = 0x20F;
 					break;
 				case 2:
-					*reinterpret_cast<int*>(self + 0x560) = 0x20B;
+					*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560) = 0x20B;
 					break;
 				}
 				changeStat(2, 0, 0);
@@ -5454,7 +5452,7 @@ void CGPartyObj::gpmMove()
 		if (m_subState != 1) {
 			return;
 		}
-		if (*reinterpret_cast<int*>(self + 0x668) == 0) {
+		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x668) == 0) {
 			return;
 		}
 		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(leader).partyFlags) << 26) & 0xC0000000) >> 31) != 0) {

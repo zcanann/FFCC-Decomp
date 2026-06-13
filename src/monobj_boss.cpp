@@ -787,6 +787,7 @@ void CGMonObj::logicFuncRamoe()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CGMonObj::damagedFuncDuct()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
@@ -799,11 +800,12 @@ void CGMonObj::damagedFuncDuct()
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x1C) == 0) {
 		CGObject* bossObj = *reinterpret_cast<CGObject**>(CGMonObj::m_boss + 0x68);
 		CChara::CModel* model = bossObj->m_charaModelHandle->m_model;
-		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss + 0x8);
-		int dispIndex = model->GetDispIndex(nodes[slot]);
+		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
+		int dispIndex = model->GetDispIndex(nodes[slot + 2]);
 		model->m_meshVisibleMask &= ~(1 << dispIndex);
 	}
 }
+#pragma opt_propagation reset
 
 /*
  * --INFO--

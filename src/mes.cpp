@@ -1651,29 +1651,25 @@ void CMes::Next()
  */
 void CMes::Set(char* text, int param)
 {
-	float one;
-	float zero;
 	mText = text;
-	zero = kMesZero;
-	one = kMesOne;
 	mWaitActive = 0;
-	mMaxHeight = zero;
-	mMaxWidth = zero;
+	mMaxHeight = 0.0f;
+	mMaxWidth = 0.0f;
 	mCounter = 0;
 	mFlagCursor = 0;
 	mFlagCount = 0;
 	mRubyEnabled = 0;
 	mFontCount = param;
-	mLineSpacing = zero;
+	mLineSpacing = 0.0f;
 	mFontIndex = 0;
-	mScaleX = one;
-	mScaleY = one;
+	mScaleX = 1.0f;
+	mScaleY = 1.0f;
 	mAdvanceEnabled = 1;
 
 	if (text != 0) {
 		unsigned char flagBackup[0x50];
 		memcpy(flagBackup, mFlagVars, sizeof(flagBackup));
-		float lineZero = kMesZero;
+		float lineZero = 0.0f;
 
 		while (mWaitActive == 0) {
 			mCounter = 0;
@@ -1692,8 +1688,6 @@ void CMes::Set(char* text, int param)
 
 		memcpy(mFlagVars, flagBackup, sizeof(flagBackup));
 		float lineSkip = kMesLineHeightAdjust;
-		zero = kMesZero;
-		one = kMesOne;
 		mMaxWidth = mMaxWidth - mLineSpacing;
 		mMaxHeight = mMaxHeight - lineSkip;
 
@@ -1705,10 +1699,10 @@ void CMes::Set(char* text, int param)
 		mRubyEnabled = 0;
 		mFontAlign = 0;
 		mColor = 7;
-		mLineSpacing = zero;
+		mLineSpacing = 0.0f;
 		mFontIndex = 0;
-		mScaleX = one;
-		mScaleY = one;
+		mScaleX = 1.0f;
+		mScaleY = 1.0f;
 		mAdvanceEnabled = 1;
 		Next();
 	}

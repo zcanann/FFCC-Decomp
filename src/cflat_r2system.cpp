@@ -2004,10 +2004,10 @@ renderedDone:
         outResult = 0;
         break;
     case -0xFD: {
-        const double stickX = Pad.GetLeftStickX(*object->m_localBase);
-        const double stickY = Pad.GetLeftStickY(*object->m_localBase);
-        *reinterpret_cast<float*>(object->m_localBase[1]) = static_cast<float>(stickX);
-        *reinterpret_cast<float*>(object->m_localBase[2]) = static_cast<float>(stickY);
+        const float stickX = Pad.GetLeftStickX(*object->m_localBase);
+        const float stickY = Pad.GetLeftStickY(*object->m_localBase);
+        *reinterpret_cast<float*>(object->m_localBase[1]) = stickX;
+        *reinterpret_cast<float*>(object->m_localBase[2]) = stickY;
         this->push(object, 0);
         outResult = 0;
         break;

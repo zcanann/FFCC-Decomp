@@ -1781,7 +1781,7 @@ void CMenuPcs::calcWorld()
 				nextAnim = 4;
 			} else if (nextAnim == 4) {
 				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
-				nextAnim++;
+				nextAnim = 5;
 			} else if (nextAnim == 5) {
 				Sound.PlaySe(0x138D, 0x40, 0x7F, 0);
 				nextAnim = 6;
@@ -1841,7 +1841,7 @@ void CMenuPcs::calcWorld()
 	const float fVar7 = FLOAT_803317e8;
 	reinterpret_cast<float*>(worldObj + 0x68)[0] = fVar3;
 	fVar3 = FLOAT_803314bc;
-	worldObj[0x50] = 1;
+	*reinterpret_cast<unsigned int*>(worldObj + 0x50) = 1;
 	reinterpret_cast<float*>(worldObj + 0x84)[0] = fVar4;
 	reinterpret_cast<float*>(worldObj + 0x88)[0] = fVar4;
 	reinterpret_cast<float*>(worldObj + 0x8C)[0] = fVar4;
@@ -1864,7 +1864,7 @@ void CMenuPcs::calcWorld()
 	model->CalcMatrix();
 	model->CalcSkin();
 
-	const short updatedAnimState = m_wmWorldState->m_mainState;
+	const int updatedAnimState = m_wmWorldState->m_mainState;
 
 	if (updatedAnimState == 1 && animTime >= animEnd) {
 		if (m_wmWorldState->m_frameCounter < 10) {
@@ -2586,8 +2586,8 @@ void CMenuPcs::CalcMCardMenu()
 			if (m_wmWorldState->m_mcResult == 0) break;
 			if (m_wmWorldState->m_subState == 0x13) {
 				if (m_wmWorldState->m_menuMode != 8) {
-					gWmMenuWorkA = m_mcCtrl.m_serialLo;
 					gWmMenuWorkB = m_mcCtrl.m_serialHi;
+					gWmMenuWorkA = m_mcCtrl.m_serialLo;
 					gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.m_cardChannel;
 					gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 				}
@@ -3372,8 +3372,8 @@ void CMenuPcs::CalcLoadMenu()
 		           && m_wmWorldState->m_counter1A == 0) {
 			iVar10 = (int)m_wmWorldState->m_subState;
 			if (iVar10 == 0xD) {
-				GetMcCtrl()->Format(1);
-				m_wmWorldState->m_mcResult = (short)m_mcCtrl.m_lastResult;
+				short fmtRes = (short)GetMcCtrl()->Format(1);
+				m_wmWorldState->m_mcResult = fmtRes;
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
@@ -3386,15 +3386,14 @@ void CMenuPcs::CalcLoadMenu()
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 			} else {
-				short ldRes = (short)GetMcCtrl()->LoadDat();
-				m_wmWorldState->m_mcResult = ldRes;
-			}
-			if (m_wmWorldState->m_mcResult < 0) {
-				MemoryCardMan.m_opDoneFlag = 1;
-				MemoryCardMan.m_currentSlot = 0xFF;
+				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->LoadDat();
 			}
 
 			if (m_wmWorldState->m_mcResult != 0) {
+				if (m_wmWorldState->m_mcResult < 0) {
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+				}
 				if (m_wmWorldState->m_subState == 0x16) {
 					if (m_wmWorldState->m_menuMode != 8 && m_wmWorldState->m_mcResult == 1) {
 						gWmMenuWorkB = m_mcCtrl.m_serialHi;
@@ -3982,7 +3981,7 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 
 	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
 	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) =
-	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(static_cast<double>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4)))));
+	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4))));
 
 	if (offset < 0) {
 		float shift = static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
@@ -8423,6 +8422,7 @@ void CMenuPcs::PCAnimCtrl()
 			const float frameEnd = reinterpret_cast<float*>(animState)[4];
 			if (frame < frameEnd) {
 				handle->m_model->AddFrame(FLOAT_80331698);
+				animState[2]++;
 			} else {
 				if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
 					animState[0] = 0;
@@ -8436,8 +8436,8 @@ void CMenuPcs::PCAnimCtrl()
 					}
 				}
 				handle->m_model->SetFrame(FLOAT_803313dc);
+				animState[2]++;
 			}
-			animState[2]++;
 		}
 	}
 }
@@ -8811,7 +8811,7 @@ void CMenuPcs::CalcCharaSelect()
 		int connectedCount = 0;
 		int locallyConfirmedCount = 0;
 		int readyMask = 0;
-		for (int i = readyMask; i < 4; i++) {
+		for (int i = 0; i < 4; i++) {
 			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 			if (entry.m_connected != 0) {
 				CCaravanWork& work = Game.m_caravanWorkArr[entry.m_currentSlot];
@@ -10604,27 +10604,25 @@ input_check_done:
 				PSMTXConcat(scaleMtx, modelMtx, modelMtx);
 			}
 
-			if (GetWmWorldHandles(this)[i] != 0 && GetWmWorldHandles(this)[i]->m_model != 0) {
-				if (m_wmWorldState->m_mainState == 1) {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) =
-					    static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
-				} else if (m_wmWorldState->m_mainState == 2) {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313e8;
-				} else if (m_wmWorldState->m_mainState == 3) {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) =
-					    static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) -
-					                         DOUBLE_80331420));
-				} else {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313dc;
-				}
-				if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == 1 &&
-				    i == 1) {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313e8;
-				}
-				GetWmWorldHandles(this)[i]->m_model->SetMatrix(modelMtx);
-				GetWmWorldHandles(this)[i]->m_model->CalcMatrix();
-				GetWmWorldHandles(this)[i]->m_model->CalcSkin();
+			if (m_wmWorldState->m_mainState == 1) {
+				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) =
+				    static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+			} else if (m_wmWorldState->m_mainState == 2) {
+				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313e8;
+			} else if (m_wmWorldState->m_mainState == 3) {
+				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) =
+				    static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) -
+				                         DOUBLE_80331420));
+			} else {
+				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313dc;
 			}
+			if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == 1 &&
+			    i == 1) {
+				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313e8;
+			}
+			GetWmWorldHandles(this)[i]->m_model->SetMatrix(modelMtx);
+			GetWmWorldHandles(this)[i]->m_model->CalcMatrix();
+			GetWmWorldHandles(this)[i]->m_model->CalcSkin();
 		}
 	}
 }
@@ -11702,7 +11700,6 @@ void CMenuPcs::CalcMcObj()
 	const float* p50 = &FLOAT_803314A4;
 	const double* p25 = &DOUBLE_803314A8;
 
-	SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
 	int i;
 	unsigned int* panelState = reinterpret_cast<unsigned int*>(worldObj + 0x550);
 	for (i = 0; i < 4; i++, panelState = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(panelState) + 0x50)) {
@@ -11719,6 +11716,7 @@ void CMenuPcs::CalcMcObj()
 		reinterpret_cast<float*>(panelState)[6] = *p50;
 
 		unsigned char* const charaState = m_wmCharaState + i * 0x48;
+		SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
 		panelState[1]++;
 		if (static_cast<float>(static_cast<int>(panelState[1])) >=
 		    *p25 * static_cast<double>(yTbl->data[gWmModelYOffsetSplineCount * 4 - 4])) {
@@ -13622,10 +13620,9 @@ int McCtrl::LoadDat()
 		break;
 
 	case 5: {
-		unsigned int serialLo = 0;
-		unsigned int serialHi = 0;
-		int __p9 = serialLo;
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&__p9)) != 0) {
+		unsigned int serialLo;
+		unsigned int serialHi;
+		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();

@@ -436,7 +436,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 			while (obj != 0)
 			{
 				next = obj->m_next;
-				if ((u8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
+				if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
@@ -574,7 +574,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 			while (obj != 0)
 			{
 				_pppPObjLink* next = obj->m_next;
-				if ((u8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
+				if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 

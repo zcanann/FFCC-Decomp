@@ -1185,15 +1185,16 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
-		case -0x1D:
+		case -0x1D: {
+			CVector moveDir(reinterpret_cast<float*>(object->m_localBase)[0],
+			                reinterpret_cast<float*>(object->m_localBase)[1],
+			                reinterpret_cast<float*>(object->m_localBase)[2]);
 			engineObject->moveVector(
-			    CVector(reinterpret_cast<float*>(object->m_localBase)[0],
-			            reinterpret_cast<float*>(object->m_localBase)[1],
-			            reinterpret_cast<float*>(object->m_localBase)[2]),
-			    reinterpret_cast<float*>(object->m_localBase)[3], static_cast<int>(object->m_localBase[4]));
+			    moveDir, reinterpret_cast<float*>(object->m_localBase)[3], static_cast<int>(object->m_localBase[4]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		}
 		case -0x1F:
 			engineObject->m_attrFlags = object->m_localBase[0];
 			PushValue(this, object, 0);
@@ -1450,7 +1451,8 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x36: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			engineObject->moveVectorH(CVector(params[0], params[1], params[2]), params[3], static_cast<int>(object->m_localBase[4]));
+			CVector moveDir(params[0], params[1], params[2]);
+			engineObject->moveVectorH(moveDir, params[3], static_cast<int>(object->m_localBase[4]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

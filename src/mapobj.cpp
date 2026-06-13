@@ -959,8 +959,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (MapMng.m_shadowKeyInfoCount >= 4) {
                 break;
             }
-            CMapShadowKeyInfo* keyInfo = &MapMng.m_shadowKeyInfos[MapMng.m_shadowKeyInfoCount];
-            MapMng.m_shadowKeyInfoCount++;
+            CMapShadowKeyInfo* keyInfo = &MapMng.m_shadowKeyInfos[MapMng.m_shadowKeyInfoCount++];
             keyInfo->m_key = chunkFile.Get4();
             keyInfo->m_frame = static_cast<short>(static_cast<int>(chunkFile.GetF4()));
             keyInfo->m_unknown06 = chunkFile.Get1();

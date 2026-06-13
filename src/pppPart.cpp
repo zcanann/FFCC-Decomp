@@ -436,7 +436,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 			while (obj != 0)
 			{
 				next = obj->m_next;
-				if ((u8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
+				if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
@@ -574,7 +574,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 			while (obj != 0)
 			{
 				_pppPObjLink* next = obj->m_next;
-				if ((u8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
+				if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
@@ -1888,8 +1888,9 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	pppDataHead->m_modelNames = reinterpret_cast<u32>(modelRefs);
 
 	for (int i = 0; i < pppDataHead->m_modelCount; i++) {
+		u32 j = 0;
 		pppModelSt* model = PartMng.m_pppModelStArr;
-		for (u32 j = 0; j < 0x100; j++) {
+		for (; j < 0x100; j++) {
 			if (model->m_isUsed != 0 && strcmp(model->m_name, modelName) == 0) {
 				goto modelFound;
 			}
@@ -1909,8 +1910,9 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	pppDataHead->m_shapeNames = reinterpret_cast<u32>(shapeRefs);
 
 	for (int i = 0; i < pppDataHead->m_shapeCount; i++) {
+		u32 j = 0;
 		pppShapeSt* shape = PartMng.m_pppShapeStArr;
-		for (u32 j = 0; j < 0x100; j++) {
+		for (; j < 0x100; j++) {
 			if (shape->m_inUse != 0 && strcmp(shape->m_name, shapeName) == 0) {
 				goto shapeFound;
 			}

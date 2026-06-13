@@ -3623,6 +3623,8 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_common_subs off
 int JoyBus::InitialCode(ThreadParam* threadParam)
 {
     int result;
@@ -3770,6 +3772,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
     return result;
 }
+#pragma pop
 
 /*
  * --INFO--

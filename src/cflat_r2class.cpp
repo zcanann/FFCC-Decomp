@@ -1926,8 +1926,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x87: {
 			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
-			model->m_furLenScale = reinterpret_cast<float*>(object->m_localBase)[0];
-			model->m_furStep = reinterpret_cast<float*>(object->m_localBase)[1];
+			float furLenScale = reinterpret_cast<float*>(object->m_localBase)[0];
+			float furStep = reinterpret_cast<float*>(object->m_localBase)[1];
+			model->m_furLenScale = furLenScale;
+			model->m_furStep = furStep;
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

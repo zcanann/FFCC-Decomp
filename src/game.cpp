@@ -1056,7 +1056,7 @@ static inline void savePermanentScriptVars(char* scriptData)
     while (i < CFlatPermanentVarCount()) {
         int flagIndex = entryOffset + 1;
         if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
-            *reinterpret_cast<u32*>(scriptData + scriptOffset) = CFlatPermanentVarWord(entryOffset);
+            reinterpret_cast<u32*>(scriptData)[scriptOffset / 4] = CFlatPermanentVarWord(entryOffset);
             scriptOffset += 4;
         }
 

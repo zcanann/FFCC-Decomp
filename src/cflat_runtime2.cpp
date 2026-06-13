@@ -710,7 +710,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	}
 	case 4: {
 		CGMonObj* obj = reinterpret_cast<CGMonObj*>(m_objMon);
-		for (int i = 0; i < kFlatMonObjCount; i++, obj++) {
+		for (int i = 0; i < kFlatMonObjCount; obj++, i++) {
 			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}

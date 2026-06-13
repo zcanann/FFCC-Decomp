@@ -150,8 +150,9 @@ static inline void wrap_birth_angle(s32* value, s32 limit)
     s32 v = *value;
     if ((v >= limit) || (v < -0x8000)) {
         s32 w = *value;
+        u32 shifted = (u32)(w << 0x11);
         u32 sign = (u32)w >> 0x1F;
-        u32 y = (u32)(w << 0x11) - sign;
+        u32 y = shifted - sign;
         *value = (s32)(__rlwinm(y, 0xF, 0, 0x1F) + sign);
     }
 }

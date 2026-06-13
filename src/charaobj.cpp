@@ -3039,13 +3039,13 @@ checkParticle:
 			SCharaItemRow* targetRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 			if ((targetRows[effectId].m_particleFlags & 0x4000) != 0) {
 				CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
-				CFlatRuntime2Storage().SetParticleWorkTarget(m_jumpOffset);
+				CFlatRuntime2Storage().SetParticleWorkTarget(m_comboCenter);
 				CFlatRuntime2Storage().SetParticleWorkTrace(this);
 			}
 		} else if (pos != 0) {
 			CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
 		} else if ((particleEntry & 0x400) != 0) {
-			CFlatRuntime2Storage().SetParticleWorkPos(m_jumpOffset, kCharaObjZero);
+			CFlatRuntime2Storage().SetParticleWorkPos(m_comboCenter, kCharaObjZero);
 		} else {
 			CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
 		}

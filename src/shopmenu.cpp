@@ -1565,6 +1565,8 @@ void CShopMenu::DrawItemInfo0()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 void CShopMenu::DrawBuySellInfo()
 {
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
@@ -1665,6 +1667,7 @@ void CShopMenu::DrawBuySellInfo()
     MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightMoney)), FLOAT_80332d98, 0x19, 0x12);
     MenuPcs.DrawInit();
 }
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80151F98

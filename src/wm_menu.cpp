@@ -249,10 +249,10 @@ extern const float FLOAT_80331458 = 255.0f;
 extern const double DOUBLE_80331460 = 0.05;
 extern const float FLOAT_80331468 = 48.0f;
 extern const float FLOAT_8033146C = 248.0f;
-extern const float FLOAT_80331470 = 20.0f;
-extern const float FLOAT_80331474 = 1.3333333730697632f;
-extern const float FLOAT_80331478 = 10.0f;
-extern const float FLOAT_8033147c = 10000.0f;
+extern const float FLOAT_80331470;
+extern const float FLOAT_80331474;
+extern const float FLOAT_80331478;
+extern const float FLOAT_8033147c;
 extern const float FLOAT_80331480 = -96.0f;
 extern const double DOUBLE_80331488 = 48.0;
 extern const double DOUBLE_80331490 = 24.0;
@@ -12121,10 +12121,10 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 	}
 
 #define halfTexel FLOAT_80331434
-	float u0;
 	float u1;
-	float v0;
+	float u0;
 	float v1;
+	float v0;
 
 	if ((flags & 8) != 0) {
 		u1 = tx + halfTexel;
@@ -12142,11 +12142,13 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 		v1 = (ty + h) - halfTexel;
 	}
 
+	float wS = w * scaleX;
+	h = h * scaleY;
 	if ((flags & 1) != 0) {
-		x = x - halfTexel * (w * scaleX);
+		x = x - halfTexel * wS;
 	}
 	if ((flags & 2) != 0) {
-		y = y - halfTexel * (h * scaleY);
+		y = y - halfTexel * h;
 	}
 #undef halfTexel
 
@@ -12156,16 +12158,16 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 	out[0].y = y;
 	out[0].z = z;
 
-	out[1].x = x + (w * scaleX);
+	out[1].x = x + wS;
 	out[1].y = y;
 	out[1].z = z;
 
 	out[2].x = x;
-	out[2].y = y + (h * scaleY);
+	out[2].y = y + h;
 	out[2].z = z;
 
-	out[3].x = x + (w * scaleX);
-	out[3].y = y + (h * scaleY);
+	out[3].x = x + wS;
+	out[3].y = y + h;
 	out[3].z = z;
 
 	GXBegin(static_cast<GXPrimitive>(0x98), static_cast<GXVtxFmt>(0), 4);

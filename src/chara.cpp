@@ -1262,7 +1262,7 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	CModel* clone = cloneMem != 0 ? new (cloneMem) CModel() : 0;
 
 	clone->m_data = ModelRef(this);
-	RetainRefCounted(ModelRef(clone));
+	++*reinterpret_cast<int*>(reinterpret_cast<u8*>(ModelRef(this)) + 4);
 
 	clone->m_nodes = new (stage, const_cast<char*>(s_chara_cpp), 0x263) CChara::CNode[ModelNodeCount(this)];
 	{

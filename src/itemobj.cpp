@@ -993,10 +993,11 @@ void CGItemObj::onFrameStat()
 		if (m_carryFrame <= m_stateFrame) {
 			int worldParamA = m_worldParamA;
 
-			if ((worldParamA == 0xD || worldParamA == 0xE) &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(self[0x50]) << 24) & 0xC0000000) >> 31) != 0) {
-				changeStat(0x1F, 0, 0);
+			if (worldParamA == 0xD || worldParamA == 0xE) {
+				if (static_cast<signed char>(
+				        static_cast<int>((static_cast<unsigned int>(self[0x50]) << 24) & 0xC0000000) >> 31) != 0) {
+					changeStat(0x1F, 0, 0);
+				}
 			} else if (static_cast<signed char>(
 			               static_cast<int>((static_cast<unsigned int>(self[0x50]) << 24) & 0xC0000000) >> 31) != 0) {
 				changeStat(0, 0, 0);

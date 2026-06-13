@@ -3112,10 +3112,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     float nameW = 161.0f;
     int nameX = static_cast<int>(-(nameW / 2.0 - 400.0));
 
-    int baseY = 300;
-    if (x != 0) {
-        baseY = 0x130;
-    }
+    int baseY = (x != 0) ? 0x130 : 300;
 
     CFont* font = m_fonts[CMAKE_FONT_VALUE];
     font->SetShadow(1);

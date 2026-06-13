@@ -430,6 +430,8 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 			if ((cid & 0x6D) == 0x6D && *(void**)(self + 0x550) == classObj) {
 				changeStat(0x26, 0, 0);
 			}
+		} else {
+			return;
 		}
 	}
 

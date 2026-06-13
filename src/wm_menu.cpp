@@ -1781,7 +1781,7 @@ void CMenuPcs::calcWorld()
 				nextAnim = 4;
 			} else if (nextAnim == 4) {
 				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
-				nextAnim++;
+				nextAnim = 5;
 			} else if (nextAnim == 5) {
 				Sound.PlaySe(0x138D, 0x40, 0x7F, 0);
 				nextAnim = 6;

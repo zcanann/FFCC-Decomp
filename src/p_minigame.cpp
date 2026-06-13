@@ -18,6 +18,8 @@ int MG_GBA_THREAD_MSG_SETPORT_ct = 0;
 int g_errCt = 0;
 }
 
+extern "C" unsigned int g_tempFlag;
+
 extern "C" {
 void create__12CMiniGamePcsFv(CMiniGamePcs*);
 void destroy__12CMiniGamePcsFv(CMiniGamePcs*);
@@ -399,7 +401,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
     int offset = 0xA0;
     signed char* managerBase = reinterpret_cast<signed char*>(m_managerImage);
-    char checksum = 0xE7;
+    int checksum = 0xE7;
 
     managerBase[0xAC] = m_managerTag[0];
     managerBase[0xAD] = m_managerTag[1];
@@ -1488,7 +1490,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
             {
                 System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), 0x3FC);
             }
-            System.Printf(const_cast<char*>(s_miniGameSetPortFmt), static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), MG_GBA_THREAD_MSG_SETPORT_ct);
+            System.Printf(const_cast<char*>(s_miniGameSetPortFmt), static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)), g_tempFlag);
             OSSendMessage(reinterpret_cast<OSMessageQueue*>(paramBytes), reinterpret_cast<OSMessage>(5), 1);
         }
         else
@@ -1579,6 +1581,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
  * JP Address: TODO
  * JP Size: TODO
  */
+
 void CMiniGamePcs::calc(void)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
@@ -1736,6 +1739,7 @@ void CMiniGamePcs::calc(void)
     self[0x6495] = 0;
     m_managerState = 0;
 }
+
 
 /*
  * --INFO--

@@ -1704,7 +1704,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 								objects[count] = object;
 								count = count + 1;
 								if (count == maxCount) {
-									return count;
+									goto done;
 								}
 							} else {
 								int insertIndex = 0;
@@ -1734,6 +1734,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 			&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5));
 	}
 
+done:
 	return count;
 }
 

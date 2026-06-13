@@ -1376,6 +1376,7 @@ void CShopMenu::DrawItemInfo0()
     }
 
     int itemNo = getItemNo(m_selectedIndex);
+    register int itemNoReg = itemNo; itemNo = itemNoReg;
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     MenuPcs.DrawInit();
@@ -1423,7 +1424,7 @@ void CShopMenu::DrawItemInfo0()
                            *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + itemNo * 0x48);
                 totalGil = totalGil / 100;
             }
-        } else if (m_listType == 1) {
+        } else if (1 == m_listType) {
             if (itemNo <= 0) {
                 totalGil = 0;
             } else {
@@ -1477,7 +1478,7 @@ void CShopMenu::DrawItemInfo0()
         const char* quantityText = ShopMenuMes(languageId, SHOP_MENU_TEXT_QUANTITY);
         float quantityWidth = font->GetWidth(quantityText);
         font->DrawInit();
-        unsigned int quantityX = static_cast<int>(static_cast<float>(countRightX) - quantityWidth - FLOAT_80332d5c);
+        short quantityX = static_cast<int>(static_cast<float>(countRightX) - quantityWidth - FLOAT_80332d5c);
         MenuPcs.DrawNoShadowFont(font, const_cast<char*>(quantityText), static_cast<float>(quantityX), FLOAT_80332d6c, 0x18, 0x12);
         MenuPcs.DrawInit();
 
@@ -1612,8 +1613,8 @@ void CShopMenu::DrawBuySellInfo()
  */
 void CShopMenu::DrawItemList()
 {
-    int y = 0x4C;
     int itemIndex = m_listTop;
+    int y = 0x4C;
     unsigned int selectableFrame = 10;
     if (m_listType == 2) {
         selectableFrame = 0xF;
@@ -1628,6 +1629,7 @@ void CShopMenu::DrawItemList()
         }
 
         int itemNo = getItemNo(itemIndex);
+        unsigned int itemNoU = itemNo; itemNo = itemNoU;
 
         int canTrade;
         if (itemIndex == -1) {
@@ -2064,10 +2066,10 @@ void CShopMenu::Draw()
         projectionMtx[2][3] += FLOAT_80332D9C;
         GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-        _GXColor mat;
-        *reinterpret_cast<unsigned int*>(&mat) = DAT_80332D0C;
         _GXColor amb;
         *reinterpret_cast<unsigned int*>(&amb) = DAT_80332D08;
+        _GXColor mat;
+        *reinterpret_cast<unsigned int*>(&mat) = DAT_80332D0C;
         GXSetChanAmbColor(GX_COLOR0A0, amb);
         GXSetChanMatColor(GX_COLOR0A0, mat);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
@@ -2218,7 +2220,7 @@ void CShopMenu::DrawMake()
     float gilUnitWidth = font->GetWidth(ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL));
 
     float makeMarginW = FLOAT_80332E10;
-    int makeAmountX = static_cast<int>(FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c);
+    short makeAmountX = static_cast<int>(FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c);
     CFont* amountFont = MenuPcs.m_fonts[0];
     SetupShopMenuAmountFont(amountFont);
     DrawShopMenuAmountTrunc(amountFont, makeGil, makeAmountX, FLOAT_80332E18, 0x13);
@@ -2343,6 +2345,7 @@ void CShopMenu::DrawMake()
         MenuPcs.DrawInit();
 
         int ownedCount = 0;
+        int ownedCountAux = ownedCount; ownedCount = ownedCountAux;
         short materialItem = *material;
         for (int slot = 0; slot < 0x40; slot++) {
             if (ShopMenuCaravanWork(this)->m_inventoryItems[slot] == materialItem) {
@@ -2808,7 +2811,7 @@ void CShopMenu::SelectFigure()
             ++m_quantity;
             CCaravanWork* caravanWork = m_caravanWork;
             if (m_quantity <= (0x40 - caravanWork->m_inventoryItemCount)) {
-                int totalGil;
+                short totalGil;
                 if (m_selectedIndex == -1) {
                     totalGil = 0;
                 } else {
@@ -2823,13 +2826,14 @@ void CShopMenu::SelectFigure()
                                       *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
                             unitGil = gil / 100;
                         }
-                    } else if (m_listType == 1) {
+                    } else if (1 == m_listType) {
                         if (itemId <= 0) {
                             unitGil = 0;
                         } else {
                             int costBase = itemId * 0x48;
                             int gil = caravanWork->m_shopParam *
                                       *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
+                            register int gilReg = gil; gil = gilReg;
                             unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
                         }
                     } else {

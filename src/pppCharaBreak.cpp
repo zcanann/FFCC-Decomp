@@ -177,12 +177,13 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTab
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtrlTable* data)
 {
     CharaBreakWork* work;
+    CChara::CMesh* mesh;
     CChara::CModel* model;
     CGObject* handle;
-    CChara::CMesh* mesh;
     u32 i;
 
     if (ppvUserStopPartF != 0) {
@@ -342,6 +343,7 @@ fail:
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes on
 void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_pppCharaBreak_cpp), 0x319);
@@ -592,11 +594,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         if (stepData->m_spinMode == 1) {
                             short* angleState = &polygon->m_normalA.x;
                             if (polygon->m_normalA.y == 0) {
-                                int rand10 = (rand() % 10) + 10;
-                                *angleState += rand10;
+                                *angleState += (rand() % 10) + 10;
                             } else {
-                                int rand10 = (rand() % 10) + 10;
-                                *angleState -= rand10;
+                                *angleState -= (rand() % 10) + 10;
                             }
 
                             s32 angle = *angleState;

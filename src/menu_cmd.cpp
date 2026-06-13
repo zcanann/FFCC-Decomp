@@ -2568,8 +2568,8 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 		return 1;
 	}
 
-	float baseX = static_cast<float>(GetCmdListEntries(this)[0].x);
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	float baseX = static_cast<float>(GetCmdListEntries(this)[0].x);
 
 	if (topIdx >= 0) {
 		int finished = 0;

@@ -1273,6 +1273,7 @@ int CCharaPcs::GetNumTexShadow()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma opt_dead_assignments off
 void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, Vec* worldPositions, float (*shadowMatrices)[3][4])
 {
     int shadowIndex = 0;
@@ -1305,6 +1306,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
         handle = handle->m_next;
     }
 }
+#pragma opt_dead_assignments reset
 
 /*
  * --INFO--
@@ -3185,7 +3187,7 @@ void CCharaPcs::CHandle::LoadModelASync(int charaKind, unsigned long charaNo, un
 	}
 
 	m_asyncState = 0;
-	Graphic._WaitDrawDone((char*)"p_chara.cpp", 0x8C9);
+	Graphic._WaitDrawDone(const_cast<char*>(s_p_chara_cpp), 0x8C9);
 	PartMng.pppDeleteCHandle(this);
 
 	ReleaseShared(m_model);

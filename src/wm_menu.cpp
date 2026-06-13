@@ -2633,14 +2633,14 @@ void CMenuPcs::CalcMCardMenu()
 			}
 			if (m_wmWorldState->m_menuMode == 8) {
 				int iVar21 = 0;
+				unsigned char* pState = m_wmCharaState;
 				int cnt = 4;
-				int iVar13 = 0;
 				do {
-					if (*reinterpret_cast<char*>(m_wmCharaState + iVar13 + 0x42) == 0
-					    && *reinterpret_cast<int*>(m_wmCharaState + iVar13 + 8) > 0) {
+					if (*reinterpret_cast<char*>(pState + 0x42) == 0
+					    && *reinterpret_cast<int*>(pState + 8) > 0) {
 						iVar21++;
 					}
-					iVar13 += 0x48;
+					pState += 0x48;
 					cnt--;
 				} while (cnt != 0);
 				if (iVar21 == 0) {
@@ -3388,10 +3388,10 @@ void CMenuPcs::CalcLoadMenu()
 			} else {
 				short ldRes = (short)GetMcCtrl()->LoadDat();
 				m_wmWorldState->m_mcResult = ldRes;
-				if (m_wmWorldState->m_mcResult < 0) {
-					MemoryCardMan.m_opDoneFlag = 1;
-					MemoryCardMan.m_currentSlot = 0xFF;
-				}
+			}
+			if (m_wmWorldState->m_mcResult < 0) {
+				MemoryCardMan.m_opDoneFlag = 1;
+				MemoryCardMan.m_currentSlot = 0xFF;
 			}
 
 			if (m_wmWorldState->m_mcResult != 0) {

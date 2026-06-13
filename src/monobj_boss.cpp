@@ -498,13 +498,10 @@ int CGMonObj::calcBranchFuncLastBoss(int)
 void CGMonObj::frameStatFuncLastBoss()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
 	Mtx nodeMtx;
-	CChara::CModel* model = object->m_charaModelHandle->m_model;
-	CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
-	PSMTXCopy(nodes[1]->m_mtx, nodeMtx);
+	CChara::CModel* model = reinterpret_cast<CGObject*>(prgObj)->m_charaModelHandle->m_model;
+	PSMTXCopy(reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[1]->m_mtx, nodeMtx);
 
 	Vec* bossPos = reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x18);
 	nodeMtx[0][3] += model->m_drawMtx[0][3];
@@ -520,61 +517,58 @@ void CGMonObj::frameStatFuncLastBoss()
 	case 100:
 		if (prgObj->m_stateFrame == 0) {
 			reinterpret_cast<CGCharaObj*>(this)->damageDelete();
-			object->m_bgColMask &= 0xFFF7FFFF;
+			reinterpret_cast<CGObject*>(prgObj)->m_bgColMask &= 0xFFF7FFFF;
 			prgObj->reqAnim(0x18, 0, 0);
 
-			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x10, 0, object, kMonObjBossOne, 0);
+			prgObj->putParticle((reinterpret_cast<CGObject*>(prgObj)->m_charaModelHandle->GetPdtSlot() << 8) | 0x10, 0, reinterpret_cast<CGObject*>(prgObj), kMonObjBossOne, 0);
 			prgObj->playSe3D(0x12912, 0x32, 0x96, 0, 0);
 		} else if (prgObj->m_stateFrame == 0x7D) {
-			object->m_bodyEllipsoidRadius = kMonObjBossRightAngleDeg;
+			reinterpret_cast<CGObject*>(prgObj)->m_bodyEllipsoidRadius = kMonObjBossRightAngleDeg;
 		} else if (prgObj->isLoopAnim() != 0) {
-			object->m_bgColMask |= 0x80000;
-			object->SetAnimSlot(0x12, 0);
-			object->SetAnimSlot(0x14, 1);
-			object->SetAnimSlot(0x16, 4);
+			reinterpret_cast<CGObject*>(prgObj)->m_bgColMask |= 0x80000;
+			reinterpret_cast<CGObject*>(prgObj)->SetAnimSlot(0x12, 0);
+			reinterpret_cast<CGObject*>(prgObj)->SetAnimSlot(0x14, 1);
+			reinterpret_cast<CGObject*>(prgObj)->SetAnimSlot(0x16, 4);
 			prgObj->changeStat(0, 0, 0);
 			m_actionBranch = 2;
 		}
 		return;
 	case 0x65:
 		if (prgObj->m_stateFrame == 0) {
-			object->m_bgColMask &= 0xFFF7FFFF;
+			reinterpret_cast<CGObject*>(prgObj)->m_bgColMask &= 0xFFF7FFFF;
 			prgObj->reqAnim(0x19, 0, 0);
 
-			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x11, 0, object, kMonObjBossOne, 0);
-			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x12, 0, object, kMonObjBossOne, 0);
+			prgObj->putParticle((reinterpret_cast<CGObject*>(prgObj)->m_charaModelHandle->GetPdtSlot() << 8) | 0x11, 0, reinterpret_cast<CGObject*>(prgObj), kMonObjBossOne, 0);
+			prgObj->putParticle((reinterpret_cast<CGObject*>(prgObj)->m_charaModelHandle->GetPdtSlot() << 8) | 0x12, 0, reinterpret_cast<CGObject*>(prgObj), kMonObjBossOne, 0);
 			prgObj->playSe3D(0x12913, 0x32, 0x96, 0, 0);
 		} else if (prgObj->m_stateFrame == 0x29) {
-			object->m_bodyEllipsoidRadius = kMonObjBossLichTeleportHeight;
+			reinterpret_cast<CGObject*>(prgObj)->m_bodyEllipsoidRadius = kMonObjBossLichTeleportHeight;
 		} else if (prgObj->isLoopAnim() != 0) {
-			object->m_bgColMask |= 0x80000;
+			reinterpret_cast<CGObject*>(prgObj)->m_bgColMask |= 0x80000;
 			prgObj->changeStat(0, 0, 0);
-			object->SetAnimSlot(0x13, 0);
-			object->SetAnimSlot(0x15, 1);
-			object->SetAnimSlot(0x17, 4);
+			reinterpret_cast<CGObject*>(prgObj)->SetAnimSlot(0x13, 0);
+			reinterpret_cast<CGObject*>(prgObj)->SetAnimSlot(0x15, 1);
+			reinterpret_cast<CGObject*>(prgObj)->SetAnimSlot(0x17, 4);
 			m_actionBranch = 0;
 		}
 		return;
 	case 0x66:
 		if (prgObj->m_stateFrame == 0) {
-			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 5, *reinterpret_cast<int*>(mon + 0x58C), object, kMonObjBossOne, 0x12902);
+			prgObj->putParticle((reinterpret_cast<CGObject*>(prgObj)->m_charaModelHandle->GetPdtSlot() << 8) | 5, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(prgObj) + 0x58C), reinterpret_cast<CGObject*>(prgObj), kMonObjBossOne, 0x12902);
 		} else if (prgObj->m_stateFrame == 0x4B) {
-			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
 			for (int i = 0; i < 4; i++) {
-				CGPartyObj* party = work[i + 2];
-				if (party != 0) {
-					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
+				if (reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss)[i + 2] != 0) {
+					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss)[i + 2]);
 					if (partyPrg->m_lastStateId == 0x24) {
 						if (fabs(prgObj->getTargetRot(partyPrg)) < kMonObjBossQuarterPiF64) {
-							partyPrg->changeStat(0x25, 0, 0);
+							reinterpret_cast<CGPrgObj*>(reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss)[i + 2])->changeStat(0x25, 0, 0);
 						}
 					}
 				}
 			}
 		} else if (prgObj->m_stateFrame == 200) {
-			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
 			for (int i = 0; i < 4; i++) {
-				CGPartyObj* party = work[i + 2];
+				CGPartyObj* party = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss)[i + 2];
 				if (party != 0) {
 					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
 					if (partyPrg->m_lastStateId == 0x25) {
@@ -1573,8 +1567,6 @@ int CGMonObj::calcBranchFuncTetsukyojin(int)
 void CGMonObj::frameStatFuncTetsukyojin()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	u8* self = reinterpret_cast<u8*>(this);
 	const int state = prgObj->m_lastStateId;
 
 	switch (state) {
@@ -1596,16 +1588,16 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			}
 
 			PSVECNormalize(&attackVec, &attackVec);
-			PSVECScale(&attackVec, &attackVec, kMonObjBossAttackRange - object->m_capsuleHalfHeight);
+			PSVECScale(&attackVec, &attackVec, kMonObjBossAttackRange - reinterpret_cast<CGObject*>(prgObj)->m_capsuleHalfHeight);
 			*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4) = attackVec;
 
-			CVector objectPos(object->m_worldPosition);
+			CVector objectPos(reinterpret_cast<CGObject*>(prgObj)->m_worldPosition);
 			CVector delta;
 			PSVECSubtract(&attackVec, reinterpret_cast<Vec*>(&objectPos), reinterpret_cast<Vec*>(&delta));
 			attackVec.x = delta.x;
 			attackVec.y = delta.y;
 			attackVec.z = delta.z;
-			float distance = PSVECDistance(&attackVec, &object->m_worldPosition);
+			float distance = PSVECDistance(&attackVec, &reinterpret_cast<CGObject*>(prgObj)->m_worldPosition);
 			float cappedDistance = kMonObjBossMaxChaseDistance;
 			if (distance < kMonObjBossMaxChaseDistance) {
 				cappedDistance = distance;
@@ -1632,7 +1624,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			m_moveWork.m_targetPos.z = attackDir.z;
 			m_moveWork.m_speed = kMonObjBossFastMoveSpeed;
 			m_moveWork.m_limitFrame =
-			    static_cast<int>((kMonObjBossTwo * (kMonObjBossAttackRange - object->m_capsuleHalfHeight)) / kMonObjBossFastMoveSpeed);
+			    static_cast<int>((kMonObjBossTwo * (kMonObjBossAttackRange - reinterpret_cast<CGObject*>(prgObj)->m_capsuleHalfHeight)) / kMonObjBossFastMoveSpeed);
 		}
 		if (prgObj->m_stateFrame >= 0x10) {
 			moveFrame();
@@ -1646,10 +1638,10 @@ void CGMonObj::frameStatFuncTetsukyojin()
 				if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 0x14)) ||
 				    ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 5))) {
 					*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
-					object->DispCharaParts(1);
+					reinterpret_cast<CGObject*>(prgObj)->DispCharaParts(1);
 
-					int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-					prgObj->putParticle((pdtNo << 8) | 0x2D, 0, object, kMonObjBossOne, 0x101E4);
+					int pdtNo = reinterpret_cast<CGObject*>(prgObj)->m_charaModelHandle->GetPdtSlot();
+					prgObj->putParticle((pdtNo << 8) | 0x2D, 0, reinterpret_cast<CGObject*>(prgObj), kMonObjBossOne, 0x101E4);
 
 					if (m_actionBranch == 0) {
 						CFlatBossState() = CFlatBossState() - 1;
@@ -1668,7 +1660,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			if ((m_actionBranch == 1) && (prgObj->m_stateFrame == 0)) {
 				CFlatRuntime::CStack stack[3];
 
-				object->m_bgColMask &= 0xFFF3FFFD;
+				reinterpret_cast<CGObject*>(prgObj)->m_bgColMask &= 0xFFF3FFFD;
 				m_actionBranch = 2;
 				CFlatBossSubState() = 1;
 				stack[0].m_word = 10;

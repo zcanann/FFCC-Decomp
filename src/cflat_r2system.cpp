@@ -3963,9 +3963,10 @@ renderedDone:
         break;
     case -0xE3: {
         CCaravanWork* work = &Game.m_caravanWorkArr[object->m_localBase[0]];
+        const int item = object->m_localBase[2];
         unsigned int flags = 0;
         if ((object->m_localBase[1] & 2) != 0) {
-            const int itemIndex = work->FindItem(object->m_localBase[2]);
+            const int itemIndex = work->FindItem(item);
             flags = ((static_cast<unsigned int>(itemIndex) >> 31) - 1) & 2;
         }
         this->push(object, flags);

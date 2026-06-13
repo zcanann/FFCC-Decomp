@@ -2124,9 +2124,8 @@ void CGMonObj::attackedFuncSaw()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	if (prgObj->m_lastStateId == 100) {
 		prgObj->addSubStat();
-		LKShooterBossWork* work = reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss);
-		work->bits.m_bit80 = 1;
-		work->m_stunTimer = 0xFA;
+		reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 1;
+		reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_stunTimer = 0xFA;
 	}
 }
 
@@ -2905,25 +2904,25 @@ void CGMonObj::damagedFuncGiantCrab()
 	switch (m_actionBranch) {
 	case 0: {
 		unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-		if (script[0x1C / 2] >= ((script[0x1A / 2] * 2) / 3)) {
-			return;
+		if (script[0x1C / 2] < ((script[0x1A / 2] * 2) / 3)) {
+			object->DispCharaParts(3);
+			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0C, 0, object, kMonObjBossOne, 0);
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x4E36, 0x32, 500, 0, 0);
+			break;
 		}
-		object->DispCharaParts(3);
-		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0C, 0, object, kMonObjBossOne, 0);
-		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x4E36, 0x32, 500, 0, 0);
-		break;
+		return;
 	}
 	case 1: {
 		unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-		if (script[0x1C / 2] >= (script[0x1A / 2] / 3)) {
-			return;
+		if (script[0x1C / 2] < (script[0x1A / 2] / 3)) {
+			object->DispCharaParts(1);
+			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0D, 0, object, kMonObjBossOne, 0);
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x4E37, 0x32, 500, 0, 0);
+			break;
 		}
-		object->DispCharaParts(1);
-		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0D, 0, object, kMonObjBossOne, 0);
-		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x4E37, 0x32, 500, 0, 0);
-		break;
+		return;
 	}
 	default:
 		return;

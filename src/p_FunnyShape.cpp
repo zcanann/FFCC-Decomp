@@ -270,6 +270,7 @@ CFunnyShapePcs::~CFunnyShapePcs()
 {
 }
 
+#pragma pool_data off
 static CProcessTableCallback s_tableDesc[4] = {
     {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)},
     {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)},

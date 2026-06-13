@@ -1913,8 +1913,8 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			        static_cast<int>(object->m_localBase[2]),
 			        static_cast<int>(object->m_localBase[3]),
 			        static_cast<int>(object->m_localBase[4]),
-			        0,
-			        static_cast<int>(static_cast<signed char>(object->m_localBase[5]))));
+			        static_cast<int>(object->m_localBase[5]),
+			        static_cast<int>(object->m_localBase[6])));
 			outResult = 0;
 			break;
 		case -0x86: {

@@ -232,6 +232,7 @@ int CMenuPcs::ArtiCtrlCur()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_strength_reduction off
 void CMenuPcs::ArtiDraw()
 {
 	int hasSelectedArtifact = 0;
@@ -436,6 +437,7 @@ void CMenuPcs::ArtiDraw()
 		                LoadFloat(kArtiOne), LoadFloat(kArtiHelpScale));
 	}
 }
+#pragma opt_strength_reduction reset
 
 /*
  * --INFO--

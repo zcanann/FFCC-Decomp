@@ -1643,8 +1643,7 @@ void CShopMenu::DrawItemList()
             } else if (listType == 2) {
                 canTrade = 1;
                 if ((m_caravanWork->m_shopArgs[((int)(tradeItemNo - 0x191U) >> 5)] &
-                     (1 << ((tradeItemNo - 0x191U) & 0x1F))) != 0) {
-                } else {
+                     (1 << ((tradeItemNo - 0x191U) & 0x1F))) == 0) {
                     canTrade = 0;
                 }
             } else if (static_cast<unsigned char>(MenuPcs.EquipChk(itemIndex)) != 0) {
@@ -3477,14 +3476,13 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     projectionMtx[2][3] += FLOAT_80332D9C;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-    const unsigned int* materialWhite = &gShopMenuMaterialWhiteBase;
-    _GXColor mat;
-    *reinterpret_cast<unsigned int*>(&mat) = *materialWhite;
-    mat.a = alpha;
-
     int shapeData = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[shapeNo]->m_animData);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
+
+    _GXColor mat;
+    *reinterpret_cast<unsigned int*>(&mat) = gShopMenuMaterialWhiteBase;
+    mat.a = alpha;
 
     MaterialMan.SetDefaultStdDrawEnv(0xACE0F);
 
@@ -3560,9 +3558,8 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
-    const unsigned int* materialWhite = &gShopMenuMaterialWhiteBase;
     _GXColor mat;
-    *reinterpret_cast<unsigned int*>(&mat) = *materialWhite;
+    *reinterpret_cast<unsigned int*>(&mat) = gShopMenuMaterialWhiteBase;
     mat.a = alpha;
 
     MaterialMan.SetDefaultStdDrawEnv(0xACE0F);

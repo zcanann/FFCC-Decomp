@@ -467,7 +467,7 @@ void CMesMenu::onDraw()
             } else {
                 int padIndex = 0;
                 padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-                buttons = Pad.GetPadInputs()[padIndex].button[0];
+                buttons = Pad.m_padInputs[padIndex].button[0];
             }
 
             if ((buttons & 0x100) != 0) {

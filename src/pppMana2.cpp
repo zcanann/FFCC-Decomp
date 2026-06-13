@@ -466,12 +466,12 @@ static int RenderWaterMesh(VMana2* mana2)
 #pragma opt_common_subs off
 static int UpdateWaterMesh(VMana2* mana2)
 {
-    float* waterHeightA;
-    float* waterHeightB;
-    Vec* positions;
-    Vec origin;
-    float currentScale;
     float neighborScale;
+    float currentScale;
+    Vec origin;
+    Vec* positions;
+    float* waterHeightB;
+    float* waterHeightA;
 
     waterHeightA = mana2->m_waterHeightA;
     positions = mana2->m_positions;
@@ -735,7 +735,7 @@ void CalcReflectionVector2(
         u8 drawFmt = *(u8*)dl;
         u16 itemCount = *(u16*)((u8*)dl + 1);
         int i;
-        u32 fmt = drawFmt & 7;
+        s32 fmt = drawFmt & 7;
 
         dl = (u16*)((u8*)dl + 3);
         if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
@@ -1568,7 +1568,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
     VMana2* mana2 = (VMana2*)work;
     CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
-    int draw = 0;
+    unsigned int draw = 0;
     pppMana2Step* stepData = static_cast<pppMana2Step*>(step);
     int type = stepData->m_type;
 

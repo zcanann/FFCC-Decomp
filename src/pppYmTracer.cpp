@@ -64,6 +64,8 @@ static inline float* GetYmTracerDataValueWork(int dataValueIndex, int offset)
         offset);
 }
 
+#pragma opt_common_subs off
+
 /*
  * --INFO--
  * PAL Address: 8009312c
@@ -175,6 +177,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs on
 void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmTracerCtrl* param_3)
 {
     TRACE_POLYGON* entries;

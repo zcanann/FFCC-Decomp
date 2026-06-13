@@ -863,7 +863,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 			 obj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
 			obj->Frame();
 		}
-		return 1;
+		goto done;
 	}
 
 	if (mode == 1) {
@@ -910,7 +910,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->copy();
 		}
-		return 1;
+		goto done;
 	}
 
 	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
@@ -935,6 +935,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 		obj->Draw();
 	}
 
+done:
 	return 1;
 }
 

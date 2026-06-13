@@ -891,7 +891,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
         LoadAnimArray(this)->ReleaseAndRemoveAll();
         LoadTextureArray(this)->ReleaseAndRemoveAll();
         LoadPdtArray(this)->ReleaseAndRemoveAll();
-        CharaAmemSize() = 0;
+        Chara.AmemAnimSize() = 0;
         break;
     case 0: {
         const unsigned int releaseMask = ~(FreeMergeMask(this) | 0x10000000U);
@@ -921,7 +921,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
             goto releaseAllArrays;
         }
 
-        CharaAmemSize() = static_cast<unsigned int>(charaAmemSize);
+        Chara.AmemAnimSize() = static_cast<unsigned int>(charaAmemSize);
         goto complete;
     }
     }
@@ -2085,8 +2085,7 @@ void CCharaPcs::drawOverlap()
     GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
-    const CColor& black = CColor(0x00, 0x00, 0x00, 0xFF);
-    GXSetChanMatColor(GX_COLOR0A0, black.color);
+    GXSetChanMatColor(GX_COLOR0A0, CColor(0x00, 0x00, 0x00, 0xFF).color);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
@@ -2139,8 +2138,7 @@ void CCharaPcs::drawOverlap()
     GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
     GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
-    const CColor& blendBlack = CColor(0x00, 0x00, 0x00, static_cast<unsigned char>(m_overlapAlpha & 0xFF));
-    GXSetChanMatColor(GX_COLOR0A0, blendBlack.color);
+    GXSetChanMatColor(GX_COLOR0A0, CColor(0x00, 0x00, 0x00, static_cast<unsigned char>(m_overlapAlpha & 0xFF)).color);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
     GXSetCullMode(GX_CULL_NONE);
@@ -2173,8 +2171,7 @@ void CCharaPcs::drawOverlap()
     }
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
-    const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
-    GXSetChanMatColor(GX_COLOR0A0, white.color);
+    GXSetChanMatColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     GXLoadTexObj(backBufferTex, GX_TEXMAP0);
     PSMTXScale(texMtx, FLOAT_803302DC, FLOAT_803302E0, kCharaOne);
     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);

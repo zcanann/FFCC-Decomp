@@ -591,6 +591,7 @@ static int RenderWaterMesh(VYmMana* mana)
  */
 #pragma push
 #pragma opt_dead_assignments off
+#pragma opt_common_subs off
 static int UpdateWaterMesh(VYmMana* mana)
 {
     float* waterHeightA;
@@ -683,6 +684,7 @@ static int UpdateWaterMesh(VYmMana* mana)
                               mana->m_waterMtx, mana->m_colors, mana->m_texCoord1);
     return 1;
 }
+#pragma opt_common_subs reset
 #pragma pop
 
 /*

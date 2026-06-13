@@ -630,7 +630,7 @@ static inline const char* GetGoOutMessageLine(int languageId, int line)
     return g_strGooutMes[(languageId * 0x6E) + line];
 }
 
-static const char s_gooutCpp[] = "goout.cpp";
+extern const char s_gooutCpp[];
 
 static inline CGoOutSaveDatLayout& GoOutSaveDat(Mc::SaveDat* saveData)
 {

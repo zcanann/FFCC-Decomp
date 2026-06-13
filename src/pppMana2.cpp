@@ -463,6 +463,7 @@ static int RenderWaterMesh(VMana2* mana2)
  */
 #pragma push
 #pragma opt_dead_assignments off
+#pragma opt_common_subs off
 static int UpdateWaterMesh(VMana2* mana2)
 {
     float* waterHeightA;
@@ -736,11 +737,10 @@ void CalcReflectionVector2(
         int i;
         u32 fmt = drawFmt & 7;
 
+        dl = (u16*)((u8*)dl + 3);
         if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
             break;
         }
-
-        dl = (u16*)((u8*)dl + 3);
         for (i = 0; i < itemCount; i++) {
             Vec* outVec;
             u16 posIndex = dl[0];
@@ -871,6 +871,7 @@ void CalcReflectionVector2(
  */
 #pragma push
 #pragma opt_propagation off
+#pragma opt_dead_assignments off
 void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, float (*) [4], int)
 {
     VMana2* work;
@@ -1641,7 +1642,32 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
                 DCFlushRange(&mana2->m_runtimeColor, 4);
                 GXSetArray((GXAttr)0xB, mana2->m_meshColors, 4);
                 GXSetArray((GXAttr)0xD, mana2->m_meshTexCoords, 4);
-                MaterialMan.SetManaReflectionEnv(mana2->m_meshReflectionVec, mana2->m_baseParaboloidTexObjs, 0x2ACE0F);
+                {
+                    u32 tevBit = 0xACE0F;
+                    Vec* reflVec = mana2->m_meshReflectionVec;
+                    u8* mm = reinterpret_cast<u8*>(&MaterialMan);
+                    *reinterpret_cast<u32*>(mm + 0x128) = 0;
+                    *reinterpret_cast<u32*>(mm + 0x48) = tevBit;
+                    *reinterpret_cast<u32*>(mm + 0x12C) = 0x1E;
+                    *reinterpret_cast<u32*>(mm + 0x130) = 0;
+                    *reinterpret_cast<Vec**>(mm + 0x08) = reflVec;
+                    *reinterpret_cast<u32*>(mm + 0x44) = 0xFFFFFFFF;
+                    *reinterpret_cast<u8*>(mm + 0x4C) = 0xFF;
+                    *reinterpret_cast<u32*>(mm + 0x11C) = 0;
+                    *reinterpret_cast<u32*>(mm + 0x120) = 0x1E;
+                    *reinterpret_cast<u32*>(mm + 0x124) = 0;
+                    *reinterpret_cast<u8*>(mm + 0x205) = 0xFF;
+                    *reinterpret_cast<u8*>(mm + 0x206) = 0xFF;
+                    *reinterpret_cast<u32*>(mm + 0x58) = 0;
+                    *reinterpret_cast<u32*>(mm + 0x5C) = 0;
+                    *reinterpret_cast<u8*>(mm + 0x208) = 0;
+                    *reinterpret_cast<u32*>(mm + 0x48) = tevBit | 0x200000;
+                    *reinterpret_cast<u32*>(mm + 0x128) = 0;
+                    *reinterpret_cast<u32*>(mm + 0x12C) = 0x1E;
+                    *reinterpret_cast<u32*>(mm + 0x130) = 0;
+                    *reinterpret_cast<u32*>(mm + 0x40) = tevBit | 0x200000;
+                    *reinterpret_cast<_GXTexObj**>(mm + 0xD0) = mana2->m_baseParaboloidTexObjs;
+                }
                 GXSetCullMode((GXCullMode)1);
                 GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
                 MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);

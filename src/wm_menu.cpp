@@ -3400,7 +3400,7 @@ void CMenuPcs::CalcLoadMenu()
 						gWmMenuCursorY[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 					}
 					iVar10 = 0;
-					int iVar25 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0x7930;
+					int iVar25 = reinterpret_cast<int>(&Game);
 					int iVar23 = 0;
 					iVar14 = 0;
 					int pOff = 0;

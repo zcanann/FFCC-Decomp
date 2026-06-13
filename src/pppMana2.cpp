@@ -30,7 +30,9 @@ STATIC_ASSERT(offsetof(pppMana2Step, m_sourceTextureIds) == 0x04);
 STATIC_ASSERT(offsetof(pppMana2Step, m_type) == 0x1C);
 STATIC_ASSERT(offsetof(pppMana2Step, m_envTextureId0) == 0x24);
 STATIC_ASSERT(offsetof(pppMana2Step, m_envTextureId1) == 0x28);
-STATIC_ASSERT(offsetof(pppMana2Step, m_waterScale) == 0x30);
+STATIC_ASSERT(offsetof(pppMana2Step, m_waterScale) == 0x2C);
+STATIC_ASSERT(offsetof(pppMana2Step, m_waterOffset) == 0x30);
+STATIC_ASSERT(offsetof(pppMana2Step, m_rippleHeight) == 0x34);
 STATIC_ASSERT(offsetof(pppMana2Step, m_rippleLevel) == 0x38);
 
 static const char sRenderMana2Message[] = "Render Mana2!!";
@@ -1615,7 +1617,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
         offset.z = LoadFloat(kMana2Zero);
         offset.y = LoadFloat(kMana2Zero);
         offset.x = LoadFloat(kMana2Zero);
-        offset.y = stepData->m_waterScale;
+        offset.y = stepData->m_waterOffset;
         PSMTXMultVec(mtx, &offset, &offset);
 
         y = y - offset.y;

@@ -210,10 +210,11 @@ void CRingMenu::DrawIcon()
 	int vInt = iconCol / 8 * 0x30;
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
 	void* tlut = MenuPcs.m_externalFontTlut;
+	CTexture* iconTexture = MenuPcs.m_textures[0x18];
 	if (caravanWork->m_hp != 0) {
 		tlut = 0;
 	}
-	MenuPcs.m_textures[0x18]->SetExternalTlut(tlut, 1);
+	iconTexture->SetExternalTlut(tlut, 1);
 	GXSetTevDirect(GX_TEVSTAGE2);
 	_GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, GX_CC_ONE, GX_CC_RASA);
 	_GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_KONST, GX_CA_ZERO);

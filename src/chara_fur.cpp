@@ -1878,11 +1878,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	GXSetZMode((u8)1, (GXCompare)3, (u8)0);
 	const float shadeScale = kCharaFurShadeScale;
 	const float furCurVal = ModelFurCur(this);
-	const GXColor furColor = CColor(static_cast<unsigned char>(shadeScale * furCurVal),
+	GXSetChanMatColor(GX_COLOR0A0, CColor(static_cast<unsigned char>(shadeScale * furCurVal),
 	                                static_cast<unsigned char>(shadeScale * furCurVal),
 	                                static_cast<unsigned char>(shadeScale * furCurVal), 0xFF)
-	                             .color;
-	GXSetChanMatColor(GX_COLOR0A0, furColor);
+	                             .color);
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
 	GXSetNumIndStages(0);
 	GXSetNumTevStages(2);
@@ -2070,18 +2069,17 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			}
 
 			for (unsigned int layer = 0; layer < 8; layer++) {
+				register float shellReg = static_cast<float>(static_cast<int>(layer)) * 0.125f * furLength;
 				GXTexObj texObj;
-				void* texData = reinterpret_cast<unsigned char*>(m_pTexBuf) + (layer * 0x4000);
+				void* texData = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(&m_height)) + (layer * 0x4000);
 				GXInitTexObj(&texObj, texData, 0x80, 0x80, GX_TF_IA4, GX_REPEAT, GX_REPEAT, GX_FALSE);
 				GXLoadTexObj(&texObj, GX_TEXMAP1);
 
-				const float shellOffset = furLength * (static_cast<float>(layer) * 0.125f);
 				{
 					register const FurMeshRaw* meshReg = mesh;
-					register float shellReg = shellOffset;
+					register int remainingReg = displayList->m_size;
 					register const unsigned char* cursorReg =
 					    reinterpret_cast<const unsigned char*>(displayList->m_data);
-					register int remainingReg = displayList->m_size;
 					register int cmdReg;
 					register int countReg;
 					Vec posScratch;

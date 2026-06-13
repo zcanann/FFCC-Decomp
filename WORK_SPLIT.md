@@ -79,168 +79,160 @@ Generated against `build/GCCP01/report.json` on latest `main` (overall ~91%). Sc
 - **Pure register-allocation/numbering & instruction-scheduling cascades** (this in r30 vs r31, one extra callee-saved reg, mtctr vs subic when the target chose it, FIFO base-register choice) — not reachable from plausible C with this MWCC; the true ceiling. Would need a C++ register-allocation permuter (decomp-permuter cannot parse C++).
 
 ---
-## B1 Menus (primary)
-**4 units · 40,103 unmatched bytes**
 
-| unit | % | code | unmatched |
-|---|---:|---:|---:|
-| `src/wm_menu.cpp` | 86.2 | 115740 | 15996 |
-| `src/bonus_menu.cpp` | 70.2 | 45452 | 13555 |
-| `src/menu_cmd.cpp` | 76.0 | 23176 | 5571 |
-| `src/MenuUtil.cpp` | 72.5 | 18136 | 4981 |
+## Buckets v3 — rebalanced  on latest main (project 98.00%)
+Every unit below 100% reassigned from scratch; ~1052664 unmatched code bytes total, ~263k/bucket target. Domain-coherent to minimize shared-header conflicts; gate every change on report.json fuzzy.
 
-## B2 Menus (secondary) + cflat + sound
-**30 units · 41,236 unmatched bytes**
-
-| unit | % | code | unmatched |
-|---|---:|---:|---:|
-| `src/shopmenu.cpp` | 85.9 | 37516 | 5294 |
-| `src/cflat_r2system.cpp` | 83.7 | 31244 | 5085 |
-| `src/menu_letter.cpp` | 77.9 | 17544 | 3886 |
-| `src/gbaque.cpp` | 90.1 | 35712 | 3549 |
-| `src/cflat_runtime.cpp` | 80.2 | 15964 | 3155 |
-| `src/cflat_runtime2.cpp` | 88.9 | 20476 | 2281 |
-| `src/mesmenu.cpp` | 80.6 | 11484 | 2233 |
-| `src/singmenu.cpp` | 90.2 | 21836 | 2136 |
-| `src/ringmenu.cpp` | 78.6 | 9656 | 2063 |
-| `src/menu_equip.cpp` | 80.9 | 9792 | 1873 |
-| `src/mes.cpp` | 86.1 | 12740 | 1777 |
-| `src/cflat_r2class.cpp` | 90.5 | 13644 | 1302 |
-| `src/p_minigame.cpp` | 91.6 | 14040 | 1182 |
-| `src/menu_compa.cpp` | 84.7 | 5252 | 804 |
-| `src/menu_money.cpp` | 87.6 | 5804 | 720 |
-| `src/p_menu.cpp` | 95.2 | 14688 | 708 |
-| `src/menu_favo.cpp` | 89.2 | 5612 | 604 |
-| `src/menu_item.cpp` | 91.4 | 6916 | 595 |
-| `src/menu_arti.cpp` | 90.2 | 5300 | 518 |
-| `src/RedSound/RedExecute.cpp` | 98.0 | 17588 | 353 |
-| `src/sound.cpp` | 97.9 | 15028 | 322 |
-| `src/RedSound/RedCommand.cpp` | 96.6 | 6404 | 221 |
-| `src/RedSound/RedDriver.cpp` | 98.8 | 12328 | 149 |
-| `src/menu_lst.cpp` | 96.6 | 3476 | 117 |
-| `src/menu_tmparti.cpp` | 96.7 | 3044 | 102 |
-| `src/p_dbgmenu.cpp` | 98.9 | 7404 | 82 |
-| `src/RedSound/RedEntry.cpp` | 99.5 | 10700 | 55 |
-| `src/THPSimple.cpp` | 99.4 | 6324 | 39 |
-| `src/RedSound/RedStream.cpp` | 99.4 | 4344 | 27 |
-| `src/wmm_str.cpp` | 99.8 | 1408 | 3 |
-
-## B3 Characters, Objects & Particles
-**62 units · 47,878 unmatched bytes**
-
-| unit | % | code | unmatched |
-|---|---:|---:|---:|
-| `src/chara_fur.cpp` | 62.6 | 20676 | 7732 |
-| `src/partyobj.cpp` | 85.2 | 42020 | 6225 |
-| `src/charaobj.cpp` | 84.7 | 30452 | 4661 |
-| `src/p_chara.cpp` | 86.1 | 32924 | 4575 |
-| `src/partMng.cpp` | 88.7 | 32648 | 3689 |
-| `src/monobj.cpp` | 88.0 | 30752 | 3676 |
-| `src/chara.cpp` | 84.8 | 20464 | 3116 |
-| `src/pppRyjMegaBirthModel.cpp` | 84.1 | 15628 | 2488 |
-| `src/pppYmMegaBirthShpTail3.cpp` | 81.0 | 8712 | 1659 |
-| `src/pppYmMegaBirthShpTail2.cpp` | 81.7 | 7636 | 1396 |
-| `src/pppPart.cpp` | 91.0 | 14992 | 1352 |
-| `src/pppRyjMegaBirth.cpp` | 84.5 | 8044 | 1245 |
-| `src/itemobj.cpp` | 91.1 | 9360 | 830 |
-| `src/monobj_boss.cpp` | 95.7 | 19244 | 827 |
-| `src/pppYmMana.cpp` | 94.8 | 14996 | 782 |
-| `src/FunnyShape.cpp` | 88.4 | 6684 | 776 |
-| `src/pppMana2.cpp` | 95.5 | 12376 | 563 |
-| `src/pppKeShpTail3X.cpp` | 91.7 | 4448 | 371 |
-| `src/pppKeShpTail2X.cpp` | 88.7 | 2964 | 335 |
-| `src/p_tina.cpp` | 96.7 | 7628 | 252 |
-| `src/pppCharaBreak.cpp` | 96.9 | 6196 | 192 |
-| `src/pppYmEnv.cpp` | 98.0 | 6532 | 133 |
-| `src/pppYmDeformationShp.cpp` | 98.2 | 5908 | 105 |
-| `src/pppScreenBreak.cpp` | 98.0 | 4484 | 91 |
-| `src/pppLaser.cpp` | 98.5 | 4956 | 76 |
-| `src/pppYmLaser.cpp` | 98.4 | 4612 | 75 |
-| `src/pppYmTracer.cpp` | 97.6 | 3032 | 72 |
-| `src/pppYmChangeTex.cpp` | 97.4 | 2596 | 68 |
-| `src/p_chara_viewer.cpp` | 99.1 | 7640 | 65 |
-| `src/p_FunnyShape.cpp` | 97.4 | 2364 | 62 |
-| `src/pppMiasma.cpp` | 99.0 | 6176 | 59 |
-| `src/pppChangeTex.cpp` | 97.9 | 2620 | 55 |
-| `src/LocationTitle2.cpp` | 98.6 | 2184 | 31 |
-| `src/pppYmMelt.cpp` | 99.2 | 3136 | 26 |
-| `src/pppYmBreath.cpp` | 99.6 | 6464 | 24 |
-| `src/pppRain.cpp` | 98.7 | 1748 | 22 |
-| `src/chara_anim.cpp` | 99.1 | 2136 | 20 |
-| `src/pppBreathModel.cpp` | 99.7 | 6412 | 20 |
-| `src/pppLocationTitle.cpp` | 99.1 | 1760 | 16 |
-| `src/pppYmTracer2.cpp` | 99.3 | 2276 | 15 |
-| `src/pppCrystal.cpp` | 99.5 | 2692 | 13 |
-| `src/prgobj.cpp` | 99.5 | 2892 | 13 |
-| `src/pppCrystal2.cpp` | 99.5 | 2304 | 12 |
-| `src/pppYmDrawMdlTexAnm.cpp` | 99.5 | 2100 | 10 |
-| `src/pppColum.cpp` | 99.5 | 1732 | 8 |
-| `src/pppYmDeformationMdl.cpp` | 99.6 | 1808 | 7 |
-| `src/pppShape.cpp` | 99.7 | 1588 | 5 |
-| `src/pppYmMoveParabola.cpp` | 99.5 | 1028 | 5 |
-| `src/quadobj.cpp` | 99.5 | 956 | 5 |
-| `src/pppRandCV.cpp` | 99.5 | 540 | 3 |
-| `src/pppRandHCV.cpp` | 99.5 | 524 | 3 |
-| `src/pppRandIV.cpp` | 99.5 | 456 | 2 |
-| `src/pppRandDownHCV.cpp` | 99.6 | 456 | 2 |
-| `src/pppRandUpHCV.cpp` | 99.6 | 456 | 2 |
-| `src/pppRandDownCV.cpp` | 99.6 | 472 | 2 |
-| `src/pppRandUpCV.cpp` | 99.6 | 472 | 2 |
-| `src/pppRandDownIV.cpp` | 99.6 | 404 | 2 |
-| `src/pppRandUpIV.cpp` | 99.6 | 404 | 2 |
-| `src/pppYmMiasma.cpp` | 100.0 | 3544 | 1 |
-| `src/pppConstrainCameraDir.cpp` | 99.8 | 584 | 1 |
-| `src/pppRandDownFV.cpp` | 99.7 | 304 | 1 |
-| `src/pppRandUpFV.cpp` | 99.7 | 304 | 1 |
-
-## B4 Engine / Graphics / Map / Memory / System
-**36 units · 36,191 unmatched bytes**
-
-| unit | % | code | unmatched |
-|---|---:|---:|---:|
-| `src/joybus.cpp` | 86.7 | 51292 | 6796 |
-| `src/cmake.cpp` | 83.2 | 31248 | 5256 |
-| `src/gobject.cpp` | 88.4 | 25656 | 2976 |
-| `src/p_camera.cpp` | 83.3 | 17260 | 2885 |
-| `src/p_graphic.cpp` | 72.2 | 10168 | 2830 |
-| `src/goout.cpp` | 86.7 | 18616 | 2472 |
-| `src/map.cpp` | 89.9 | 21804 | 2196 |
-| `src/materialman.cpp` | 93.3 | 31576 | 2116 |
-| `src/mapobj.cpp` | 90.1 | 16180 | 1608 |
-| `src/gobjwork.cpp` | 93.4 | 19476 | 1286 |
-| `src/graphic.cpp` | 94.6 | 15240 | 822 |
-| `src/memory.cpp` | 94.8 | 15236 | 797 |
-| `src/memorycard.cpp` | 94.8 | 13856 | 715 |
-| `src/p_light.cpp` | 95.1 | 9888 | 486 |
-| `src/maphit.cpp` | 95.6 | 10516 | 465 |
-| `src/astar.cpp` | 95.1 | 6984 | 344 |
-| `src/p_map.cpp` | 95.1 | 6408 | 314 |
-| `src/mapocttree.cpp` | 98.0 | 11608 | 228 |
-| `src/p_MaterialEditor.cpp` | 95.9 | 5376 | 222 |
-| `src/game.cpp` | 97.8 | 9616 | 214 |
-| `src/textureman.cpp` | 97.1 | 7100 | 203 |
-| `src/ME_USB_process.cpp` | 96.1 | 4832 | 188 |
-| `src/util.cpp` | 98.2 | 10044 | 177 |
-| `src/pad.cpp` | 94.9 | 3392 | 174 |
-| `src/fontman.cpp` | 97.5 | 4820 | 118 |
-| `src/gxfunc.cpp` | 93.7 | 1576 | 99 |
-| `src/wind.cpp` | 97.7 | 3512 | 82 |
-| `src/FS_USB_Process.cpp` | 99.1 | 3524 | 32 |
-| `src/p_usb.cpp` | 97.6 | 1320 | 31 |
-| `src/maptexanim.cpp` | 99.1 | 2796 | 24 |
-| `src/texanim.cpp` | 99.7 | 5128 | 14 |
-| `src/file.cpp` | 99.8 | 4548 | 7 |
-| `src/mapanim.cpp` | 99.8 | 3376 | 6 |
-| `src/math.cpp` | 100.0 | 8384 | 4 |
-| `src/main.cpp` | 99.5 | 680 | 4 |
-| `src/ME_AppRequest.cpp` | 99.7 | 744 | 2 |
-## Balance
-| Bucket | units | unmatched |
+### B1 — Menus core (deep) — 6 units, ~246668 bytes
+| unit | fuzzy | unmatched |
 |---|---:|---:|
-| B1 Menus (primary) | 4 | 40,103 |
-| B2 Menus (secondary) + cflat + sound | 30 | 41,236 |
-| B3 Characters, Objects & Particles | 62 | 47,878 |
-| B4 Engine / Graphics / Map / Memory / System | 36 | 36,191 |
-| **Total** | **132** | **165,408** |
+| wm_menu | 94.89% | 108280 |
+| bonus_menu | 90.87% | 44716 |
+| shopmenu | 97.21% | 37516 |
+| menu_cmd | 96.53% | 22320 |
+| MenuUtil | 96.21% | 17000 |
+| singmenu | 98.39% | 16836 |
 
-Notes: B1 is only 4 units but huge (wm_menu alone 116KB) — few long agents. B3 has the most units (62, many tiny ppp*) — most agents, run in waves. Likely cross-unit shared headers: menu (B1/B2), chara/particle bases (B3), gobject.h/map.h/vector.h (B4) — coordinate via [cross] fast-merges.
+### B2 — Menus rest + Birth/effects particles — 28 units, ~239316 bytes
+| unit | fuzzy | unmatched |
+|---|---:|---:|
+| cmake | 99.34% | 29436 |
+| menu_letter | 95.10% | 17016 |
+| goout | 99.63% | 16800 |
+| pppRyjMegaBirthModel | 98.06% | 14536 |
+| mes | 94.51% | 11984 |
+| p_menu | 96.27% | 11728 |
+| pppPart | 97.22% | 10680 |
+| mesmenu | 95.58% | 10032 |
+| menu_equip | 95.86% | 9792 |
+| pppYmMana | 97.98% | 9676 |
+| pppMana2 | 97.53% | 9204 |
+| ringmenu | 92.98% | 9036 |
+| pppYmMegaBirthShpTail3 | 98.55% | 7640 |
+| menu_item | 96.86% | 6656 |
+| pppYmMegaBirthShpTail2 | 96.83% | 6616 |
+| pppRyjMegaBirth | 98.99% | 5784 |
+| pppMiasma | 99.06% | 5604 |
+| pppYmDeformationShp | 98.88% | 5488 |
+| menu_arti | 97.02% | 5216 |
+| pppYmBreath | 99.62% | 5208 |
+| menu_money | 96.35% | 5168 |
+| menu_compa | 93.84% | 4440 |
+| pppCharaBreak | 98.19% | 4432 |
+| p_dbgmenu | 99.30% | 4388 |
+| menu_favo | 95.81% | 4184 |
+| menu_lst | 97.29% | 3476 |
+| menu_tmparti | 97.01% | 3044 |
+| LocationTitle2 | 98.56% | 2052 |
+
+### B3 — Characters & objects (deep) — 16 units, ~244796 bytes
+| unit | fuzzy | unmatched |
+|---|---:|---:|
+| partyobj | 98.30% | 31612 |
+| monobj | 97.41% | 27072 |
+| charaobj | 97.74% | 26888 |
+| partMng | 97.39% | 26140 |
+| p_chara | 96.93% | 23444 |
+| chara_fur | 91.62% | 20276 |
+| gobject | 99.13% | 17848 |
+| materialman | 99.63% | 17460 |
+| chara | 97.68% | 14512 |
+| gobjwork | 98.32% | 11268 |
+| monobj_boss | 98.32% | 10640 |
+| itemobj | 97.91% | 7904 |
+| p_chara_viewer | 99.38% | 7060 |
+| chara_anim | 99.13% | 1772 |
+| prgobj | 99.98% | 476 |
+| quadobj | 99.50% | 424 |
+
+### B4 — Engine / cflat / map / sound / system + ppp tail (wide, mostly >99%) — 75 units, ~321884 bytes
+| unit | fuzzy | unmatched |
+|---|---:|---:|
+| joybus | 99.18% | 29940 |
+| gbaque | 96.71% | 25940 |
+| cflat_r2system | 94.92% | 25076 |
+| cflat_r2class | 96.40% | 13644 |
+| cflat_runtime2 | 98.48% | 13000 |
+| cflat_runtime | 96.67% | 12824 |
+| RedSound/RedExecute | 98.10% | 12100 |
+| p_minigame | 98.25% | 11828 |
+| map | 99.46% | 11320 |
+| memory | 99.65% | 10576 |
+| p_camera | 96.76% | 9040 |
+| mapobj | 99.71% | 8512 |
+| p_graphic | 98.77% | 7664 |
+| maphit | 99.59% | 6564 |
+| memorycard | 99.76% | 6420 |
+| sound | 98.82% | 5772 |
+| astar | 99.31% | 5736 |
+| ME_USB_process | 98.72% | 4784 |
+| game | 99.33% | 4600 |
+| pppLaser | 98.49% | 4476 |
+| pppYmLaser | 98.40% | 4316 |
+| FunnyShape | 96.46% | 4212 |
+| RedSound/RedEntry | 99.49% | 4136 |
+| graphic | 97.94% | 3976 |
+| pppYmEnv | 98.24% | 3584 |
+| RedSound/RedCommand | 96.56% | 3576 |
+| pppBreathModel | 99.69% | 3536 |
+| FS_USB_Process | 99.71% | 3524 |
+| THPSimple | 99.39% | 3468 |
+| p_light | 99.71% | 3072 |
+| pppYmMelt | 99.21% | 3020 |
+| pad | 98.69% | 2844 |
+| pppKeShpTail3X | 99.19% | 2624 |
+| pppCrystal | 99.51% | 2524 |
+| pppYmChangeTex | 98.18% | 2436 |
+| pppChangeTex | 98.39% | 2420 |
+| pppCrystal2 | 99.49% | 2136 |
+| p_tina | 96.70% | 1996 |
+| RedSound/RedStream | 99.39% | 1964 |
+| pppYmTracer | 99.04% | 1944 |
+| pppScreenBreak | 98.56% | 1920 |
+| RedSound/RedDriver | 98.79% | 1836 |
+| pppKeShpTail2X | 96.61% | 1796 |
+| file | 99.84% | 1696 |
+| pppRain | 98.97% | 1620 |
+| fontman | 98.81% | 1572 |
+| wind | 98.73% | 1560 |
+| pppYmDeformationMdl | 99.63% | 1384 |
+| pppColum | 99.54% | 1292 |
+| textureman | 99.65% | 1272 |
+| pppLocationTitle | 99.08% | 1228 |
+| util | 99.40% | 1160 |
+| pppYmDrawMdlTexAnm | 99.51% | 1152 |
+| mapanim | 99.83% | 996 |
+| p_map | 95.52% | 976 |
+| p_FunnyShape | 98.64% | 816 |
+| pppYmMiasma | 99.96% | 748 |
+| math | 99.95% | 628 |
+| pppRandCV | 99.48% | 540 |
+| pppRandHCV | 99.47% | 524 |
+| pppConstrainCameraDir | 99.79% | 508 |
+| pppShape | 99.70% | 480 |
+| pppRandDownCV | 99.58% | 472 |
+| pppRandUpCV | 99.58% | 472 |
+| gxfunc | 97.82% | 460 |
+| pppRandDownHCV | 99.56% | 456 |
+| pppRandIV | 99.52% | 456 |
+| pppRandUpHCV | 99.56% | 456 |
+| pppRandDownIV | 99.60% | 404 |
+| pppRandUpIV | 99.60% | 404 |
+| ME_AppRequest | 99.68% | 316 |
+| pppRandDownFV | 99.74% | 304 |
+| pppRandUpFV | 99.74% | 304 |
+| p_MaterialEditor | 98.96% | 280 |
+| mapocttree | 99.97% | 272 |
+
+## Balance & notes (v3)
+| Bucket | units | ~unmatched | character |
+|---|---:|---:|---|
+| B1 Menus core | 6 | 246,668 | few deep units (wm_menu 108k dominates) — long focused agents |
+| B2 Menus rest + Birth/effects | 28 | 239,316 | mixed; many mid-size menu_* + the MegaBirth/Mana/Miasma ppp families |
+| B3 Characters & objects | 16 | 244,796 | concentrated/deep (~15k/unit) — chara/obj/gobject/material/cflat-adjacent |
+| B4 Engine/cflat/map/sound/system + ppp tail | 75 | 321,884 | WIDE & shallow (~4.3k/unit, most >99%) — fan many small agents in waves |
+| **Total** | **125** | **1,052,664** | |
+
+- Byte totals over-state B4's effort: it's a long tail of near-100% units (fan-out friendly), while B3 is fewer/deeper. Real effort is closer than bytes.
+- Shared-header conflict zones to coordinate via `[cross]` fast-merge: menu headers (B1/B2), chara/gobject/particle bases (B3 + B2's ppp), map/vector/gobject (B4). cflat_* lives in B4 — keep its 4 units together (shared cflat headers).
+- Per-operator loop unchanged: branch from latest main → diff → apply lever-catalog → rebuild+remeasure → commit/push every net-positive change (gate on report.json) → merge at checkpoints. The full battle-tested lever catalog + dead-ends above apply to ALL buckets.

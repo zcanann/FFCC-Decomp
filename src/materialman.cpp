@@ -1007,6 +1007,7 @@ void CMaterialMan::addtev_full_shadow(long index)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs off
 void CMaterialMan::SetUnderWaterTex()
 {
     int x = 0;
@@ -1043,6 +1044,7 @@ void CMaterialMan::SetUnderWaterTex()
 
     PSMTXConcat(matrixA, matrixB, m_underWaterTexMtx);
 }
+#pragma opt_common_subs reset
 
 /*
  * --INFO--

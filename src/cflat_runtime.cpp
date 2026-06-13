@@ -1849,8 +1849,8 @@ void CFlatRuntime::Create(void* filePtr)
 				        u8[m_permanentVarCount << 2];
 
 				int i = 0;
-				const int variableCount = m_permanentVarCount;
 				u8* variableDef = m_permanentVarDefs;
+				const int variableCount = m_permanentVarCount;
 				for (; i < variableCount; i++, variableDef += 4) {
 					variableDef[0] = chunkFile.Get1();
 					variableDef[1] = chunkFile.Get1();
@@ -1866,14 +1866,14 @@ void CFlatRuntime::Create(void* filePtr)
 				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x9E)
 				        CClass[m_classCount];
 
-				int classIndex = 0;
 				int classOffset = 0;
+				int classIndex = 0;
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
+					CClass* classBase = reinterpret_cast<CClass*>(reinterpret_cast<u8*>(m_classes) + classOffset);
+					classBase->m_index = classIndex;
 					switch (chunk.m_id) {
 					case 'BLCK': {
-						CClass* classBase = reinterpret_cast<CClass*>(reinterpret_cast<u8*>(m_classes) + classOffset);
-						classBase->m_index = classIndex;
 						chunkFile.PushChunk();
 						while (chunkFile.GetNextChunk(chunk)) {
 							switch (chunk.m_id) {
@@ -1917,10 +1917,10 @@ void CFlatRuntime::Create(void* filePtr)
 				int funcOffset = 0;
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
+					CFunc* funcBase = reinterpret_cast<CFunc*>(m_funcs + funcOffset);
+					funcBase->m_index = funcIndex;
 					switch (chunk.m_id) {
 					case 'BLCK': {
-						CFunc* funcBase = reinterpret_cast<CFunc*>(m_funcs + funcOffset);
-						funcBase->m_index = funcIndex;
 						chunkFile.PushChunk();
 						while (chunkFile.GetNextChunk(chunk)) {
 							switch (chunk.m_id) {
@@ -1946,13 +1946,13 @@ void CFlatRuntime::Create(void* filePtr)
 								funcBase->m_codeSize = chunk.m_size;
 								funcBase->m_debugCode = 0;
 								funcBase->m_debugCodeSize = 0;
-								if (funcBase->m_codeSize == 0) {
-									funcBase->m_code = 0;
-								} else {
+								if (funcBase->m_codeSize != 0) {
 									funcBase->m_code = reinterpret_cast<u8*>(
 									    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x109)
 									        u8[chunk.m_size]);
 									memcpy(funcBase->m_code, chunkFile.GetAddress(), chunk.m_size);
+								} else {
+									funcBase->m_code = 0;
 								}
 								break;
 							default:

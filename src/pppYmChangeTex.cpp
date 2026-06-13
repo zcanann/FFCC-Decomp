@@ -216,9 +216,9 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 			int delta = static_cast<int>(frameShort) - static_cast<int>(curMesh->m_workPositions[v].y);
 			if (delta >= 0) {
 				int level = 0;
-				float threshold = ChangeTexConst(kPppYmChangeTexRampStart);
+				float threshold = kPppYmChangeTexRampStart;
 				for (int tries = 7; tries != 0; tries--) {
-					if ((float)delta > threshold * ChangeTexConst(kPppYmChangeTexRampScale)) {
+					if ((float)delta > threshold * kPppYmChangeTexRampScale) {
 						if (negativeRamp == 0xFF) {
 							vertColors->a = negativeRamp - (level << 4);
 						} else {
@@ -226,7 +226,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 						}
 						break;
 					}
-					threshold = threshold - ChangeTexConst(kPppYmChangeTexRampStep);
+					threshold = threshold - kPppYmChangeTexRampStep;
 					level = level + 1;
 				}
 			} else {
@@ -331,7 +331,7 @@ freeArrays:
  */
 void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
 {
-	float init = ChangeTexConst(kPppYmChangeTexInitZero);
+	float init = kPppYmChangeTexInitZero;
 	pppYmChangeTexState* state = GetChangeTexState(ymChangeTex, data);
 
 	state->m_value0 = init;

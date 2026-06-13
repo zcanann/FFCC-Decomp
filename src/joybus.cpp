@@ -6328,6 +6328,8 @@ int JoyBus::GBAReady(int portIndex)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_propagation off
 int JoyBus::SendAllStat(int portIndex)
 {
     m_threadParams[portIndex].m_state = 0;
@@ -6366,6 +6368,7 @@ int JoyBus::SendAllStat(int portIndex)
 
     return 0;
 }
+#pragma pop
 
 
 /*

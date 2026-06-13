@@ -2354,13 +2354,15 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
  */
 #pragma push
 #pragma optimization_level 2
+#pragma opt_propagation off
 int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
 	if (staIndex == 0 || staIndex == 4) {
 		SCharaStaBlock* staBlock = reinterpret_cast<SCharaStaBlock*>(m_scriptHandle);
 		if (staBlock->m_sta[staIndex] != 0) {
 			System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
-			return static_cast<int>(reinterpret_cast<SCharaStaBlock*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + staIndex * 2)->m_sta[0]);
+			SCharaStaBlock* blk = reinterpret_cast<SCharaStaBlock*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + staIndex * 2);
+			return static_cast<int>(blk->m_sta[0]);
 		}
 	}
 

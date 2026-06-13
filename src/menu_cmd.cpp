@@ -445,6 +445,7 @@ void CMenuPcs::CmdInit1()
 {
 	s32 idx = static_cast<s32>(GetCmdListStorage(this)->count);
 	CmdListEntry* entry;
+	s16 y = 0;
 
 	entry = &GetCmdListStorage(this)->entries[idx++];
 	entry->tex = 0x2e;
@@ -479,7 +480,7 @@ void CMenuPcs::CmdInit1()
 	entry->u = kCmdMenuZero;
 	entry->v = kCmdMenuZero;
 	entry->scale = kCmdMenuThreeQuarter;
-	entry->startFrame = 0;
+	entry->startFrame = y;
 	entry->duration = 5;
 
 	entry = &GetCmdListStorage(this)->entries[idx++];
@@ -491,11 +492,10 @@ void CMenuPcs::CmdInit1()
 	entry->height = 0x140;
 	entry->u = kCmdMenuZero;
 	entry->v = kCmdMenuZero;
-	entry->startFrame = 0;
+	entry->startFrame = y;
 	entry->duration = 5;
 
 	CmdListEntry* basePanel = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
-	s16 y = 0;
 	for (s32 i = 0; i < 8; i++) {
 		entry = &GetCmdListStorage(this)->entries[idx++];
 		entry->flags = 2;

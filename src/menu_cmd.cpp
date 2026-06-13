@@ -1266,10 +1266,10 @@ void CMenuPcs::CmdDraw()
 		DrawInit();
 	}
 
+	CmdListEntry* cursorEntry;
+	s32 cursorOnUnite = false;
 	if (((cmdMode == 0) && (animState == 1)) ||
 	    ((cmdMode != 0) && (GetCmdStateView(this)->phase == 1))) {
-		CmdListEntry* cursorEntry;
-		s32 cursorOnUnite = false;
 
 		if ((cmdMode == 0) || (cmdMode == 3)) {
 			s32 index = GetCmdStateSelections(GetCmdStateView(this))[cmdMode];

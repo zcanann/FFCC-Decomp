@@ -104,12 +104,12 @@ void CGMonObj::onChangePrg(int value)
 	unsigned int weaponModeBits = (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000;
 	if ((static_cast<int>(weaponModeBits) >> 31) != value &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB)) {
+		int isNormal = (static_cast<unsigned int>(__cntlzw(m_unk6BA)) >> 5) & 0xFF;
 		int isUndead =
 			(static_cast<unsigned int>(
 				 __cntlzw(0xB - *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC))) >>
 			 5) &
 			0xFF;
-		int isNormal = (static_cast<unsigned int>(__cntlzw(m_unk6BA)) >> 5) & 0xFF;
 		int mode = value;
 		if (isUndead == 0) {
 			mode = 1;
@@ -562,9 +562,8 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 #pragma optimization_level 4
 void CGMonObj::setRepop(int mode)
 {
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+#define object (reinterpret_cast<CGObject*>(this))
+#define mon (reinterpret_cast<unsigned char*>(this))
 	void** scriptHandle = object->m_scriptHandle;
 	int classId = reinterpret_cast<int>(scriptHandle[4]);
 
@@ -578,7 +577,7 @@ void CGMonObj::setRepop(int mode)
 			object->m_bgColMask = 0;
 			object->m_displayFlags = 0;
 			object->m_weaponNodeFlagBits.m_unk10 = 0;
-			prgObj->changeStat(0x28, 0, 0);
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x28, 0, 0);
 			return;
 		}
 	}
@@ -622,7 +621,7 @@ void CGMonObj::setRepop(int mode)
 
 	enableAttackCol(0, 0, 0);
 	enableDamageCol(1);
-	prgObj->changeStat(0, 0, 0);
+	reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 
 	unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE);
 
@@ -646,12 +645,12 @@ void CGMonObj::setRepop(int mode)
 		}
 
 		if ((scriptFlags & 0x200) != 0) {
-			prgObj->changeStat(0x36, 0, 0);
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x36, 0, 0);
 		}
 
 		if (mode == 0) {
-			prgObj->playSe3D(0x18, 0x32, 0x96, 0, (Vec*)0);
-			prgObj->putParticle(300, 0, &object->m_worldPosition, 1.0f, 0);
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x18, 0x32, 0x96, 0, (Vec*)0);
+			reinterpret_cast<CGPrgObj*>(this)->putParticle(300, 0, &object->m_worldPosition, kMonObjDefaultScale, 0);
 			object->m_bgColMask |= 0x90002;
 			*reinterpret_cast<float*>(mon + 0x694) = 1.0f;
 		}
@@ -686,7 +685,7 @@ void CGMonObj::setRepop(int mode)
 	pbDone:
 
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A4), object, 1.0f, 0);
+		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A4), object, kMonObjDefaultScale, 0);
 	}
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
@@ -694,7 +693,7 @@ void CGMonObj::setRepop(int mode)
 	unsigned short countB = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
 	for (int i = 0; i < static_cast<int>(countB); i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 1.0f, 0);
+		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, kMonObjDefaultScale, 0);
 	}
 
 	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 1) == 0) {
@@ -718,7 +717,7 @@ void CGMonObj::setRepop(int mode)
 
 	for (int i = 0; i < static_cast<int>(countC); i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		prgObj->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 1.0f, 0);
+		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, kMonObjDefaultScale, 0);
 	}
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
@@ -727,13 +726,15 @@ void CGMonObj::setRepop(int mode)
 
 	if (object->m_weaponNodeFlagBits.m_prg != 0) {
 		if (classId == 0x83) {
-			prgObj->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
 		} else if (classId == 0x7F) {
-			prgObj->playSe3D(0x11585, 0x32, 0x96, 0, (Vec*)0);
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x11585, 0x32, 0x96, 0, (Vec*)0);
 		}
 	}
 
 	m_unk6BA = 0;
+#undef object
+#undef mon
 }
 #pragma pop
 
@@ -1110,10 +1111,10 @@ int CGMonObj::aiSeq(int seqId, int priority, int currentState, int nextState, in
  */
 void CGMonObj::statMove(int* targetIndex)
 {
-	CGMonObj* monObj = this;
-	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
-	CGObject* object = reinterpret_cast<CGObject*>(monObj);
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(monObj);
+#define monObj (this)
+#define mon (reinterpret_cast<unsigned char*>(this))
+#define object (reinterpret_cast<CGObject*>(this))
+#define prgObj (reinterpret_cast<CGPrgObj*>(this))
 	int* chaseState = &monObj->m_chaseState;
 	int* chaseTimer = &monObj->m_chaseTimer;
 	int* targetPartyIdx = &monObj->m_targetPartyIndex;
@@ -1273,6 +1274,10 @@ void CGMonObj::statMove(int* targetIndex)
 	} else {
 		*chaseTimer += 1;
 	}
+#undef prgObj
+#undef object
+#undef mon
+#undef monObj
 }
 
 /*
@@ -1289,16 +1294,15 @@ void CGMonObj::statMove(int* targetIndex)
 void CGMonObj::statWatch()
 {
 	CGMonObj* monObj = this;
-	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
-	CGObject* object = reinterpret_cast<CGObject*>(monObj);
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(monObj);
+#define mon (reinterpret_cast<unsigned char*>(monObj))
+#define object (reinterpret_cast<CGObject*>(monObj))
 	int& targetPartyIndex = monObj->m_targetPartyIndex;
 	int& chaseState = monObj->m_chaseState;
 	int& chaseTimer = monObj->m_chaseTimer;
 #define actionState (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4))
 #define script (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
 
-	if (prgObj->m_lastStateId == 0) {
+	if (reinterpret_cast<CGPrgObj*>(monObj)->m_lastStateId == 0) {
 		monObj->m_unk6BD = 0;
 		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
 		float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
@@ -1555,7 +1559,7 @@ void CGMonObj::statWatch()
 		return;
 	}
 
-	if (prgObj->m_lastStateId == 0x21) {
+	if (reinterpret_cast<CGPrgObj*>(monObj)->m_lastStateId == 0x21) {
 		if ((*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) &&
 			(((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 			 (monObj->m_moveWork.m_frame >=
@@ -1569,6 +1573,8 @@ void CGMonObj::statWatch()
 	}
 #undef script
 #undef actionState
+#undef object
+#undef mon
 }
 #pragma pop
 
@@ -2000,6 +2006,7 @@ body:
 						if ((*reinterpret_cast<unsigned short*>(AISCRIPT + 0x102) & 0x40) != 0) {
 							monObj->m_moveWork.m_flags |= 0x10000;
 						}
+						monObj->m_moveWork.m_flags = *reinterpret_cast<volatile int*>(&monObj->m_moveWork.m_flags);
 						monObj->m_moveWork.m_mode = 2;
 					}
 					monObj->m_moveWork.m_target = target;
@@ -4284,9 +4291,8 @@ void CGMonObj::flyDown()
  */
 void CGMonObj::onFramePreCalc()
 {
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+#define object (reinterpret_cast<CGObject*>(this))
+#define mon (reinterpret_cast<unsigned char*>(this))
 
 	CGCharaObj::onFramePreCalc();
 	m_aliveFrames += 1;
@@ -4336,13 +4342,15 @@ void CGMonObj::onFramePreCalc()
 		}
 
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
-			if ((*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != -1) && (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != prgObj->m_lastStateId)) {
-				prgObj->changeStat(*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4), 0, 0);
+			if ((*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != -1) && (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != reinterpret_cast<CGPrgObj*>(this)->m_lastStateId)) {
+				reinterpret_cast<CGPrgObj*>(this)->changeStat(*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4), 0, 0);
 			}
-		} else if (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != prgObj->m_lastStateId) {
-			prgObj->changeStat(*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4), 0, 0);
+		} else if (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) != reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4), 0, 0);
 		}
 	}
+#undef object
+#undef mon
 }
 
 

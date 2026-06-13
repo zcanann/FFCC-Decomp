@@ -1317,7 +1317,7 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 		return 2;
 	}
 	if ((sourceObj->m_objectFlags & 0x100) != 0) {
-		changeStat(3, 0, 0);
+		bonus(3, 0, (CGPrgObj*)0);
 	}
 
 	sourceCid = sourceObj->GetCID();

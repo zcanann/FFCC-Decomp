@@ -335,6 +335,7 @@ void CRingMenu::onScriptChanging(char*)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CRingMenu::drawGBA()
 {
 	float sinA;
@@ -443,6 +444,7 @@ void CRingMenu::drawGBA()
 
 	MenuPcs.DrawInit();
 }
+#pragma opt_propagation reset
 
 /*
  * --INFO--

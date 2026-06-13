@@ -1721,11 +1721,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 
 								*reinterpret_cast<float*>(&object->m_0x44) = distance;
 								objects[insertIndex] = object;
-								if (count + 1 < maxCount) {
-									count = count + 1;
-								} else {
-									count = maxCount;
-								}
+								count = (count + 1 < maxCount) ? (count + 1) : maxCount;
 							}
 						}
 					}

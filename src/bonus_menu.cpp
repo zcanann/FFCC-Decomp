@@ -908,15 +908,15 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 			float gray;
 			unsigned int mask = ((int)(signed char)s_Rinfo->pad_0008 | (int)(signed char)s_Rinfo->m_missingArtifactMask) |
 			    s_Rinfo->m_party[partyIndex].m_ownedArtifactMask;
-			if ((mask & (1 << i)) != 0) {
-				gray = 0.7f * 255.0f;
-			} else {
+			if (!((mask & (1 << i)) != 0)) {
 				gray = 1.0f * 255.0f;
+			} else {
+				gray = 0.7f * 255.0f;
 			}
+			color.a = (unsigned char)(alpha * 255.0f);
 			color.r = (unsigned char)gray;
 			color.g = (unsigned char)gray;
 			color.b = (unsigned char)gray;
-			color.a = (unsigned char)(alpha * 255.0f);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 		MenuPcs.DrawRect(0, s_Base[0][i * 2 + 2], s_Base[0][i * 2 + 3], width, height,
@@ -3104,7 +3104,7 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->alpha = 1.0f;
 		} else {
 			int value = s_Rinfo->m_party[i].m_totalValue;
-			int __p27 = value;
+			int __p27 =  (value + 0);
 			if (frame == __p27) {
 				Sound.PlaySe(0x4b, 0x40, 0x7f, 0);
 				sprite->startFrame = frame;

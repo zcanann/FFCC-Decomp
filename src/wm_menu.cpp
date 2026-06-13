@@ -8422,6 +8422,7 @@ void CMenuPcs::PCAnimCtrl()
 			const float frameEnd = reinterpret_cast<float*>(animState)[4];
 			if (frame < frameEnd) {
 				handle->m_model->AddFrame(FLOAT_80331698);
+				animState[2]++;
 			} else {
 				if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
 					animState[0] = 0;
@@ -8435,8 +8436,8 @@ void CMenuPcs::PCAnimCtrl()
 					}
 				}
 				handle->m_model->SetFrame(FLOAT_803313dc);
+				animState[2]++;
 			}
-			animState[2]++;
 		}
 	}
 }

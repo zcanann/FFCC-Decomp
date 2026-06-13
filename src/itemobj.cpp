@@ -16,6 +16,7 @@
 #include <math.h>
 #include <string.h>
 #include "ffcc/fontman.h"
+#include "ffcc/p_mc.h"
 
 extern const float kItemObjHeightOffset;
 extern const float kItemObjUnitScale;
@@ -54,7 +55,7 @@ extern const float kItemObjMemoryTurnStep = 0.25f;
 extern const float kItemObjMemoryChaseAccel = 0.019999999552965164f;
 extern const float kItemObjMemoryChaseScale = 1.5f;
 static const char s_itemDamageBoneHip[] = "hip";
-u32 gItemObjCreateFlags;
+u32 g_tempFlag;
 extern char SoundBuffer[];
 extern const char sItemObjStringTableBase[];
 extern const char sItemNoDeletableObjectMsg[];
@@ -252,7 +253,7 @@ void CGItemObj::DrawOmoideName(CFont* font)
 void CGItemObj::onNewFinished()
 {
 	m_savedBodyRadius = m_bodyEllipsoidRadius;
-	m_createFlags = static_cast<u16>((gItemObjCreateFlags >> 3) & 1);
+	m_createFlags = static_cast<u16>((*(u32*)&McPcs >> 3) & 1);
 	loadModel();
 }
 
@@ -429,6 +430,8 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 			if ((cid & 0x6D) == 0x6D && *(void**)(self + 0x550) == classObj) {
 				changeStat(0x26, 0, 0);
 			}
+		} else {
+			return;
 		}
 	}
 
@@ -539,7 +542,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 
 		*(CGPartyObj**)(self + 0x550) = partyObj;
 		*(int*)(self + 0x554) = carryMode;
-		canSystemCall8 = (unsigned char)canSystemCall;
+		canSystemCall8 = static_cast<unsigned char>(canSystemCall);
 
 		if (carryMode == 0) {
 			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
@@ -603,7 +606,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		}
 
 		*(int*)(self + 0x554) = carryMode;
-		canSystemCall8 = (unsigned char)canSystemCall;
+		canSystemCall8 = static_cast<unsigned char>(canSystemCall);
 
 		if (carryMode == 0) {
 			Vec safePos;
@@ -701,7 +704,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	inStack[2].m_word = scriptArg;
 	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
 	*reinterpret_cast<float*>(&inStack[4].m_word) = launchAngle;
-	gItemObjCreateFlags = createFlags;
+	*(u32*)&McPcs = createFlags;
 	gCFlatRuntime().SystemCall(0, 1, 7, 5, inStack, &outStack);
 
 	if (createMode != 1) {
@@ -854,6 +857,10 @@ void CGItemObj::onFrameStat()
 	int stateId = m_lastStateId;
 	char* itemObjStrings = const_cast<char*>(sItemObjStringTableBase);
 	float zero = kItemObjZero;
+	union {
+		double value;
+		u32 word[2];
+	} particleValue;
 
 	switch (stateId) {
 	case 0x1b:
@@ -1131,7 +1138,7 @@ void CGItemObj::onFrameStat()
 		prgObj->m_moveOffset.y = kItemObjMoveOffsetXZ;
 		prgObj->m_rotTargetY += kItemObjMemoryTurnStep;
 
-		CVector monTarget(*reinterpret_cast<Vec*>(CGMonObj::m_aiWork + 4));
+		CVector monTarget(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x18));
 		CVector worldPos(prgObj->m_worldPosition);
 		CVector delta;
 
@@ -1174,10 +1181,6 @@ void CGItemObj::onFrameStat()
 				pdtNo = -1;
 			}
 
-			union {
-				double value;
-				u32 word[2];
-			} particleValue;
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			const double* u32Bias = &kItemObjU32ToDoubleBias;
 			const float* fineStep = &kItemObjFineStep;
@@ -1221,10 +1224,6 @@ void CGItemObj::onFrameStat()
 				pdtNo = -1;
 			}
 
-			union {
-				double value;
-				u32 word[2];
-			} particleValue;
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			const double* u32Bias = &kItemObjU32ToDoubleBias;
 			const float* fineStep = &kItemObjFineStep;
@@ -1298,8 +1297,8 @@ void CGItemObj::onFrame()
 			SetAnimSlot(0, 0);
 			PlayAnim(0, 1, 0, -1, -1, 0);
 
-			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
 			int ownerData = *(int*)((unsigned char*)m_owner + 0x58);
+			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
 			int soundEntry;
 			if (soundData != 0) {
 				soundEntry = soundData[5];

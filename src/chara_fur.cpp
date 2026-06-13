@@ -396,8 +396,8 @@ static inline void FurInterpolateHit(Vec& outViewPos, float& outU, float& outV, 
     outV = a.m_v * weights.x + b.m_v * weights.y + c.m_v * weights.z;
 }
 
-static void DrawFurDisplayListShell(const FurMeshRaw* mesh, const FurDisplayListRaw* displayList, float shellOffset,
-                                    int posQuant, int normQuant)
+static inline void DrawFurDisplayListShell(const FurMeshRaw* mesh, const FurDisplayListRaw* displayList, float shellOffset,
+                                           int posQuant, int normQuant)
 {
     if (mesh == 0 || mesh->m_data == 0 || mesh->m_workPositions == 0 || mesh->m_workNormals == 0 || displayList == 0 ||
         displayList->m_data == 0 || displayList->m_size <= 0) {
@@ -490,7 +490,7 @@ void CChara::TimeMogFur()
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
-			unsigned int tileIndex = ((y / 4) * 0x100 + (y % 4) * 4 + (x % 4) + (x / 4) * 0x10) * 2;
+			int tileIndex = ((y / 4) * 0x100 + (y % 4) * 4 + (x % 4) + (x / 4) * 0x10) * 2;
 			unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 
 			unsigned int a = (packed >> 12) & 7;
@@ -530,7 +530,7 @@ void CChara::TimeMogFur()
 
 #pragma push
 #pragma bool off
-static int FurColorMatch(CColor src, CColor ref, int limit)
+static inline int FurColorMatch(CColor src, CColor ref, int limit)
 {
 	int hits = 0;
 
@@ -888,7 +888,7 @@ static inline void CopyMogTextureFromChara(CChara::CModel* model)
 	GXInvalidateTexAll();
 }
 
-static void CopyMogTextureToChara(CChara::CModel* model)
+static inline void CopyMogTextureToChara(CChara::CModel* model)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	CTexture* texture = FindMogFurTexture(model);
@@ -905,7 +905,7 @@ static void CopyMogTextureToChara(CChara::CModel* model)
 	GXInvalidateTexAll();
 }
 
-static void OpenMogHintMessage(int messageId)
+static inline void OpenMogHintMessage(int messageId)
 {
 	if (messageId < 0) {
 		return;
@@ -2158,17 +2158,17 @@ void CChara::makeFurTex()
 {
 	CHairSet hairSet[0x20];
 
-	static CColor furColors[2] = { FurColorLval(CColor(0x80, 0x80, 0x80, 0xFF)),
-		                           FurColorLval(CColor(0xF0, 0xF0, 0xF0, 0)) };
-#define furBaseColor (furColors[0])
-#define furTipColor (furColors[1])
-	static CColor furNoise[2] = { FurColorLval(CColor(0, 0, 0, 0)), FurColorLval(CColor(8, 8, 8, 0)) };
-#define furNoiseBase (furNoise[0])
-#define furNoiseRange (furNoise[1])
-	static CVector velBase = CVector(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
-	static CVector velRand = CVector(kCharaFurDepthZero, kYmEnvQuarter, kCharaFurDepthZero);
-	static CVector accelBase = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
-	static CVector accelRand = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
+	static CColor color[2] = { FurColorLval(CColor(0x80, 0x80, 0x80, 0xFF)),
+		                       FurColorLval(CColor(0xF0, 0xF0, 0xF0, 0)) };
+#define furBaseColor (color[0])
+#define furTipColor (color[1])
+	static CColor colorr[2] = { FurColorLval(CColor(0, 0, 0, 0)), FurColorLval(CColor(8, 8, 8, 0)) };
+#define furNoiseBase (colorr[0])
+#define furNoiseRange (colorr[1])
+	static CVector vel = CVector(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
+	static CVector velr = CVector(kCharaFurDepthZero, kYmEnvQuarter, kCharaFurDepthZero);
+	static CVector accel = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
+	static CVector accelr = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
 
 	m_seed = 0;
 
@@ -2180,26 +2180,26 @@ void CChara::makeFurTex()
 	for (int i = 0; i < 0x20; i++) {
 		float velRandScale = FurRandScaleL(scaleBase, randScale, depthThreshold);
 		CVector velScaleOut;
-		PSVECScale(velRand, velScaleOut, velRandScale);
+		PSVECScale(velr, velScaleOut, velRandScale);
 		Vec velScaled;
 		velScaled.x = velScaleOut.x;
 		velScaled.y = velScaleOut.y;
 		velScaled.z = velScaleOut.z;
 		CVector velAddOut;
-		PSVECAdd(velBase, &velScaled, velAddOut);
+		PSVECAdd(vel, &velScaled, velAddOut);
 		hairSet[i].m_vec0.x = velAddOut.x;
 		hairSet[i].m_vec0.y = velAddOut.y;
 		hairSet[i].m_vec0.z = velAddOut.z;
 
 		float accelRandScale = FurRandScaleL(scaleBase, randScale, depthThreshold);
 		CVector accelScaleOut;
-		PSVECScale(accelRand, accelScaleOut, accelRandScale);
+		PSVECScale(accelr, accelScaleOut, accelRandScale);
 		Vec accelScaled;
 		accelScaled.x = accelScaleOut.x;
 		accelScaled.y = accelScaleOut.y;
 		accelScaled.z = accelScaleOut.z;
 		CVector accelAddOut;
-		PSVECAdd(accelBase, &accelScaled, accelAddOut);
+		PSVECAdd(accel, &accelScaled, accelAddOut);
 		hairSet[i].m_vec1.x = accelAddOut.x;
 		hairSet[i].m_vec1.y = accelAddOut.y;
 		hairSet[i].m_vec1.z = accelAddOut.z;
@@ -2570,7 +2570,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
  * JP Address: TODO
  * JP Size: TODO
  */
-int nearColor(CColor src, CColor ref)
+inline int nearColor(CColor src, CColor ref)
 {
 	int dr = static_cast<int>(src.color.r) - static_cast<int>(ref.color.r);
 	if (dr < 0) {
@@ -2607,7 +2607,7 @@ CHairSet::CHairSet()
  * Address:	TODO
  * Size:	TODO
  */
-void GXSetTexCoordGen(void)
+inline void GXSetTexCoordGen(void)
 {
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
 }

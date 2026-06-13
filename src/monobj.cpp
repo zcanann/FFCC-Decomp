@@ -2918,8 +2918,8 @@ void CGMonObj::onStatDie()
 			goto deathElse;
 		}
 		if (subFrame == 0) {
-			int particleId = *reinterpret_cast<int*>(mon + 0x560);
 			int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
+			int particleId = *reinterpret_cast<int*>(mon + 0x560);
 			switch (classId) {
 			case 4:
 				particleId = 0x253;
@@ -3630,7 +3630,7 @@ void CGMonObj::onFrameStat()
 			prgObj->changeStat(0, 0, 0);
 			object->m_bgColMask |= 0xD0002;
 			enableDamageCol(1);
-			*reinterpret_cast<int*>(mon + 0x6B0) = 1;
+			m_actionBranch = 1;
 		}
 		break;
 	}
@@ -3656,7 +3656,7 @@ void CGMonObj::onFrameStat()
 			prgObj->changeStat(0, 0, 0);
 			object->m_bgColMask |= 0xD0002;
 			enableDamageCol(1);
-			*reinterpret_cast<int*>(mon + 0x6B0) = 1;
+			m_actionBranch = 1;
 		}
 		break;
 	}
@@ -3689,7 +3689,7 @@ void CGMonObj::onFrameStat()
 			object->m_bgColMask |= 0xD0002;
 			enableDamageCol(1);
 			object->m_displayFlags |= 1;
-			*reinterpret_cast<int*>(mon + 0x6B0) = 1;
+			m_actionBranch = 1;
 			object->SetAnimSlot(0, 0);
 			if (reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x39) {
 				object->SetAnimSlot(1, 1);
@@ -3754,7 +3754,7 @@ void CGMonObj::onFrameStat()
 
 	case 0x18:
 		if (prgObj->m_stateFrame == 0) {
-			*reinterpret_cast<int*>(mon + 0x6B0) = 1;
+			m_actionBranch = 1;
 			prgObj->reqAnim(0x10, 0, 0);
 			object->SetAnimSlot(0, 0);
 			object->SetAnimSlot(4, 4);
@@ -4102,7 +4102,7 @@ void CGMonObj::onStatAttack(int state)
 		return;
 	}
 
-	if ((prgObj->m_stateArg == 0) && (prgObj->isLoopAnim() != 0)) {
+	if ((__cntlzw(prgObj->m_stateArg) >> 5 & 1) && (prgObj->isLoopAnim() != 0)) {
 		CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
 	}
 #undef attackData

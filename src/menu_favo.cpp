@@ -56,6 +56,7 @@ static inline double LoadDouble(const double& value)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 void CMenuPcs::FavoDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -251,6 +252,7 @@ void CMenuPcs::FavoDraw()
 
 	DrawInit();
 }
+#pragma opt_lifetimes reset
 /*
  * --INFO--
  * PAL Address: 0x80162d18

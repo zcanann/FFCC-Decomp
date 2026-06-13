@@ -186,8 +186,8 @@ void CMenuPcs::FavoDraw()
 		float barYf = static_cast<float>(drawEntry->y);
 		int barY = static_cast<int>(static_cast<float>(barHalfH / 2.0 + barYf));
 		DrawSingBar(barX, barY, rank->score, drawEntry->alpha);
-		rank++;
 		drawEntry++;
+		rank++;
 	}
 
 	rank = rankBase;
@@ -198,8 +198,8 @@ void CMenuPcs::FavoDraw()
 		float iconYf = static_cast<float>(drawEntry->y);
 		int iconY = static_cast<int>(iconHalfH / 2.0 + iconYf);
 		DrawSingleIcon(static_cast<char>(rank->foodId) + 0x14, iconX, iconY, drawEntry->alpha, 1, 1.0f);
-		rank++;
 		drawEntry++;
+		rank++;
 	}
 
 	CFont* rankFont = m_fonts[0];
@@ -224,8 +224,8 @@ void CMenuPcs::FavoDraw()
 		rankFont->SetPosY(posY - 4.0f);
 		rankFont->Draw(textBuf);
 		rankFont->SetShadow(0);
-		rank++;
 		drawEntry++;
+		rank++;
 	}
 
 	CFont* nameFont = m_fonts[4];
@@ -246,8 +246,8 @@ void CMenuPcs::FavoDraw()
 		nameFont->SetPosX(posX);
 		nameFont->SetPosY(posY - 4.0f);
 		nameFont->Draw(const_cast<char*>(name));
-		rank++;
 		drawEntry++;
+		rank++;
 	}
 
 	DrawInit();

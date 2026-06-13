@@ -298,7 +298,7 @@ int CMenuPcs::EquipCtrlCur()
 	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
-	u16 rawPress;
+	unsigned int rawPress;
 	if (blocked) {
 		rawPress = 0;
 	} else {
@@ -306,13 +306,13 @@ int CMenuPcs::EquipCtrlCur()
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		rawPress = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
-	press = (s16)rawPress;
+	press = (s16)(u16)rawPress;
 
 	blocked = false;
 	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
-	u16 rawHold;
+	unsigned int rawHold;
 	if (blocked) {
 		rawHold = 0;
 	} else {
@@ -320,7 +320,7 @@ int CMenuPcs::EquipCtrlCur()
 		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		rawHold = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
-	hold = (s16)rawHold;
+	hold = (s16)(u16)rawHold;
 
 	if (hold == 0) {
 		return 0;

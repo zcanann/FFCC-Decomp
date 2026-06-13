@@ -4398,11 +4398,12 @@ void CMenuPcs::DrawDiaryMenu()
 	GetWmWorldHandles(this)[1]->m_model->m_lightAlpha = FLOAT_803313e8;
 	{
 		unsigned char* const worldObj = m_wm.m_worldObjData;
+		Mtx lookAtMtx;
 		Mtx44 projectionMtx;
+		Mtx44 restoreMtx;
 		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		Mtx lookAtMtx;
 		C_MTXLookAt(lookAtMtx, reinterpret_cast<Vec*>(worldObj + 0x60),
 		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
 		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
@@ -4423,8 +4424,8 @@ void CMenuPcs::DrawDiaryMenu()
 		GetWmWorldHandles(this)[1]->Draw(5);
 		PSMTXCopy(reinterpret_cast<MtxPtr>(m_wm.m_pad744), CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
-		PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
-		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+		PSMTX44Copy(CameraPcs.m_screenMatrix, restoreMtx);
+		GXSetProjection(restoreMtx, GX_PERSPECTIVE);
 		Graphic.SetViewport();
 		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();

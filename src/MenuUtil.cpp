@@ -576,8 +576,9 @@ void CMenuPcs::DrawOptionMenu()
 	color.a = static_cast<unsigned char>(static_cast<int>(*(const volatile float*)&kOptionMenuAlphaMax * m_optionRowAnim));
 	int __p13 = rowAnimStep;
 	float rowAngle = static_cast<float>(__p13) * kOptionRowAngleStep;
-	float rowSin = static_cast<float>(sin(static_cast<double>(*(const volatile float*)&kOptionDegToRad * (kOptionTextNudge * rowAngle))));
-	float rowCos = static_cast<float>(cos(static_cast<double>(*(const volatile float*)&kOptionDegToRad * rowAngle)));
+	const float kDegToRadF = *(const volatile float*)&kOptionDegToRad;
+	float rowSin = static_cast<float>(sin(static_cast<double>(kDegToRadF * (kOptionTextNudge * rowAngle))));
+	float rowCos = static_cast<float>(cos(static_cast<double>(kDegToRadF * rowAngle)));
 
 	switch (m_optionIndex) {
 	case 0: {
@@ -1142,11 +1143,7 @@ void CMenuPcs::CalcOptionMenu()
 		}
 	}
 
-	if (m_optionAnimPhase != 0) {
-		if (m_optionAnimPhase == 1) {
-			return;
-		}
-	} else {
+	if (m_optionAnimPhase == 0 || m_optionAnimPhase == 1) {
 		return;
 	}
 

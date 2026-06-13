@@ -1769,14 +1769,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle);
 			int mode = static_cast<int>(object->m_localBase[0]);
 			int index = static_cast<int>(object->m_localBase[1]);
-			if (mode != 2) {
-				if (mode < 2) {
-					if (mode > 0) {
-						caravanWork->DeleteItemIdx(index, 1);
-					}
-				} else if (mode < 4) {
+			switch (mode) {
+				case 1:
+					caravanWork->DeleteItemIdx(index, 1);
+					break;
+				case 3:
 					caravanWork->DeleteCmdList(index, 1);
-				}
+					break;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1835,10 +1834,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x7E: {
+			int initArg = static_cast<int>(object->m_localBase[0]);
 			unsigned int workIndex = this->m_workAssignIndex;
 			this->m_workAssignIndex = workIndex + 1;
 			engineObject->SetClassWork(1, static_cast<int>(workIndex));
-			engineObject->InitWork(static_cast<int>(object->m_localBase[0]));
+			engineObject->InitWork(initArg);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

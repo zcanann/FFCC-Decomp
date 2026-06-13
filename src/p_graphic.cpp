@@ -212,6 +212,7 @@ inline void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int cent
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 void CGraphicPcs::drawScreenFade()
 {
     Mtx44 orthoMtx;
@@ -454,6 +455,7 @@ unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
 
     return result;
 }
+#pragma opt_lifetimes reset
 
 /*
  * --INFO--

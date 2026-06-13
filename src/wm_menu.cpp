@@ -8391,8 +8391,6 @@ void CMenuPcs::PCAnimCtrl()
 		}
 
 		const int isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
-		const float frame = reinterpret_cast<float*>(animState)[3];
-		const float frameEnd = reinterpret_cast<float*>(animState)[4];
 		if (isSelected == 0 &&
 		    m_wmWorldState->m_menuMode != 8 &&
 		    animState[0] == 0 && animState[2] >= 3000) {
@@ -8421,6 +8419,8 @@ void CMenuPcs::PCAnimCtrl()
 			reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
 		} else {
 		frameStep:
+			const float frame = reinterpret_cast<float*>(animState)[3];
+			const float frameEnd = reinterpret_cast<float*>(animState)[4];
 			if (frame < frameEnd) {
 				handle->m_model->AddFrame(FLOAT_80331698);
 			} else {
@@ -12667,9 +12667,9 @@ void CMenuPcs::BindMcObj()
 		*reinterpret_cast<int*>(createParam + 0x30) = -1;
 		createParam[0x34] = 0;
 		createParam[0x35] = 1;
-		*reinterpret_cast<int*>(createParam + 0x38) = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x38) = 0;
 		createParam[0x36] = 0;
-		*reinterpret_cast<int*>(createParam + 0x3C) = 30;
+		*reinterpret_cast<unsigned int*>(createParam + 0x3C) = 30;
 		*reinterpret_cast<int*>(createParam + 0x44) = 0;
 		*reinterpret_cast<short*>(createParam + 0x48) = 0;
 		createParam[0x4A] = 0;

@@ -981,8 +981,8 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1C));
-	float innerW = (float)((double)w - 16.0);
 	float xCorner = corner + x;
+	float innerW = (float)((double)w - 16.0);
 	MenuPcs.DrawRect(0, xCorner, y, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x22));
 	MenuPcs.DrawRect(0, xCorner, bottom, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);

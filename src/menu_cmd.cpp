@@ -443,6 +443,7 @@ void CMenuPcs::CmdInit0()
  */
 void CMenuPcs::CmdInit1()
 {
+	s32 tex = 0x2f;
 	s32 idx = static_cast<s32>(GetCmdListStorage(this)->count);
 	CmdListEntry* entry;
 
@@ -459,7 +460,10 @@ void CMenuPcs::CmdInit1()
 	entry->duration = 5;
 
 	entry = &GetCmdListStorage(this)->entries[idx++];
-	entry->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
+	if (GetCmdLayoutFlag(this) == 0) {
+		tex = 0x46;
+	}
+	entry->tex = tex;
 	entry->x = 0xa0;
 	entry->y = 0xe;
 	entry->width = 0x30;
@@ -470,8 +474,12 @@ void CMenuPcs::CmdInit1()
 	entry->startFrame = 0;
 	entry->duration = 5;
 
+	tex = 0x2f;
 	entry = &GetCmdListStorage(this)->entries[idx++];
-	entry->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
+	if (GetCmdLayoutFlag(this) == 0) {
+		tex = 0x46;
+	}
+	entry->tex = tex;
 	entry->width = 0x30;
 	entry->height = 0x30;
 	entry->x = 0xa5;

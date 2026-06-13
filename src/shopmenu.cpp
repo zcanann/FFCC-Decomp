@@ -2064,10 +2064,10 @@ void CShopMenu::Draw()
         projectionMtx[2][3] += FLOAT_80332D9C;
         GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-        _GXColor mat;
-        *reinterpret_cast<unsigned int*>(&mat) = DAT_80332D0C;
         _GXColor amb;
         *reinterpret_cast<unsigned int*>(&amb) = DAT_80332D08;
+        _GXColor mat;
+        *reinterpret_cast<unsigned int*>(&mat) = DAT_80332D0C;
         GXSetChanAmbColor(GX_COLOR0A0, amb);
         GXSetChanMatColor(GX_COLOR0A0, mat);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);

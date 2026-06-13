@@ -98,7 +98,11 @@ public:
         : public CRef
     {
     public:
-        CLoadModel();
+        CLoadModel()
+        {
+            m_model = 0;
+            m_streamMode = 0;
+        }
         ~CLoadModel();
 
         void* m_keyTag;                 // 0x08
@@ -129,13 +133,19 @@ public:
         char m_name[16];                // 0x18
         CChara::CAnim* m_anim;          // 0x28
         unsigned short m_unk2C;         // 0x2C
+        char m_unk30[0x40];             // 0x30
+        unsigned int m_unk70;           // 0x70
     };
 
     class CLoadTexture
         : public CRef
     {
     public:
-        CLoadTexture();
+        CLoadTexture()
+        {
+            m_textureSet = 0;
+            m_streamMode = 0;
+        }
         ~CLoadTexture();
 
         void* m_keyTag;                 // 0x08
@@ -153,7 +163,10 @@ public:
         : public CRef
     {
     public:
-        CLoadPdt();
+        CLoadPdt()
+        {
+            m_pdtSlot = -1;
+        }
         ~CLoadPdt();
 
         void* m_keyTag;                 // 0x08

@@ -496,7 +496,7 @@ void CPad::Frame()
 			for (iVar11 = 0; iVar11 < 4; iVar11++)
 			{
 				uVar8 = *puVar7;
-				puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar14 * 0x40 + iVar6 + 0x0C);
+				puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar6 + iVar14 * 0x40 + 0x0C);
 				uVar2 = *puVar10;
 				*puVar7 = uVar2;
 				uVar2 = *reinterpret_cast<u8*>(puVar10 + 1);

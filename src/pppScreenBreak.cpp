@@ -341,6 +341,7 @@ void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work)
 {
     s32 iVar6;
@@ -505,6 +506,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes on
 void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int meshIndex, int drawListIndex, float (*) [4])
 {
     VScreenBreak* work = static_cast<VScreenBreak*>(param_2);

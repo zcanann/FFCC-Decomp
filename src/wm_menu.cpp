@@ -8471,7 +8471,6 @@ void CMenuPcs::GetAnimNo(int animNo, int)
 void CMenuPcs::DrawChara()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = GetWmWorldState(this);
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* const view = m_wm.m_worldObjData + (0xA00 + i * 0x50);
@@ -8582,7 +8581,7 @@ void CMenuPcs::DrawChara()
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			float alpha;
-			if (worldState->m_mainState == 2) {
+			if (m_wmWorldState->m_mainState == 2) {
 				const float* pOneAl = &FLOAT_803313e8;
 				alpha = *pOneAl;
 			} else {
@@ -8627,7 +8626,7 @@ void CMenuPcs::DrawChara()
 			                   *pZeroR3, *pZeroR3, scale, scale);
 			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 		}
-		if (worldState->m_mainState == 2 && selectedMask != 0) {
+		if (m_wmWorldState->m_mainState == 2 && selectedMask != 0) {
 			for (int chan = 3; chan >= 0; chan--) {
 				if ((selectedMask & (1 << chan)) != 0) {
 					PartPcs.DrawMenuIdx(m_effectWork[chan + 32].m_partNo);

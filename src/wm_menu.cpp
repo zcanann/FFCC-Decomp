@@ -3981,7 +3981,7 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 
 	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
 	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) =
-	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(static_cast<double>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4)))));
+	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4))));
 
 	if (offset < 0) {
 		float shift = static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4));

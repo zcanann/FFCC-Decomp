@@ -1841,7 +1841,7 @@ void CMenuPcs::calcWorld()
 	const float fVar7 = FLOAT_803317e8;
 	reinterpret_cast<float*>(worldObj + 0x68)[0] = fVar3;
 	fVar3 = FLOAT_803314bc;
-	worldObj[0x50] = 1;
+	*reinterpret_cast<unsigned int*>(worldObj + 0x50) = 1;
 	reinterpret_cast<float*>(worldObj + 0x84)[0] = fVar4;
 	reinterpret_cast<float*>(worldObj + 0x88)[0] = fVar4;
 	reinterpret_cast<float*>(worldObj + 0x8C)[0] = fVar4;

@@ -1262,7 +1262,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     }
 
     if ((param_2->m_type == 1 || param_2->m_type == 2) && mana->m_waterHeightA != 0) {
-        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(mana->m_waterHeightA) + 0x240) = param_2->m_rippleLevel;
+        mana->m_waterHeightA[144] = param_2->m_rippleLevel;
     }
 
     } // end if (m_graphId == 0)

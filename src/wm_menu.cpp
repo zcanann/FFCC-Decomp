@@ -3121,17 +3121,19 @@ void CMenuPcs::CalcLoadMenu()
 				if (sVar8 == 5) { sVar18 = -1; }
 				else if (sVar8 == 6) { sVar18 = -3; }
 				else if (sVar8 == 7) { sVar18 = -4; } else { sVar18 = 0; }
-				if (sVar8 == 7) {
+				if (sVar8 != 7) {
+					if (m_wmWorldState->m_mcResult != 0 && m_wmWorldState->m_mcResult != sVar18 && m_wmWorldState->m_mcResult != 1) {
+						m_wmWorldState->m_state0E = -1;
+						m_wmWorldState->m_counter1A = 1;
+						break;
+					}
+				} else {
 					short chk = m_wmWorldState->m_mcResult;
 					if (chk != 0 && chk != sVar18 && chk != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
 					}
-				} else if (m_wmWorldState->m_mcResult != sVar18 && m_wmWorldState->m_mcResult != 1) {
-					m_wmWorldState->m_state0E = -1;
-					m_wmWorldState->m_counter1A = 1;
-					break;
 				}
 			}
 			if ((uVar4 & 0x300) != 0) {
@@ -3386,6 +3388,10 @@ void CMenuPcs::CalcLoadMenu()
 			} else {
 				short ldRes = (short)GetMcCtrl()->LoadDat();
 				m_wmWorldState->m_mcResult = ldRes;
+				if (m_wmWorldState->m_mcResult < 0) {
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+				}
 			}
 
 			if (m_wmWorldState->m_mcResult != 0) {

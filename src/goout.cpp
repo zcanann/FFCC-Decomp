@@ -46,6 +46,7 @@ extern char s_Cancelling_character_transfer_801DF218[];
 extern char s_until_the_character_transfer_is_complete_801DF238[];
 extern const char s_GoOutSlotA[8] = "Slot A.";
 extern const char s_GoOutSlotB[8] = "Slot B.";
+extern const char lbl_803331C4[2] = " ";
 static const char s_No_Memory_Card_found_in_801DF264[] = "No Memory Card found in";
 static const char s_This_data_is_a_copy_of_the_current_801DF27C[] = "This data is a copy of the current";
 static const char s_game_s_data_and_cannot_be_used_801DF2A0[] = "game's data and cannot be used.";
@@ -102,11 +103,7 @@ static const char s_deleted_from_the_current_data_801DF8F8[] = "deleted from the
 static const char s_In_der_Memory_Card_in_Steckplatz_A_801DF918[] = "In der Memory Card in Steckplatz A";
 static const char lbl_801DF93C[] = "befinden sich keine Spielst\xe4nde der";
 static const char s_aktuellen_Spielsitzung_Bitte_stecken_801DF960[] = "aktuellen Spielsitzung. Bitte stecken";
-static const char lbl_801DF988[0x25] = {
-    'S', 'i', 'e', ' ', 'e', 'i', 'n', 'e', ' ', 'M', 'e', 'm', 'o', 'r', 'y', ' ',
-    'C', 'a', 'r', 'd', ' ', 'm', 'i', 't', ' ', 'S', 'p', 'i', 'e', 'l', 's', 't',
-    '\xe4', 'n', 'd', 'e', 'n',
-};
+static const char lbl_801DF988[] = "Sie eine Memory Card mit Spielst\xe4nden";
 extern char s_der_aktuellen_Spielsitzung_in_Steckplatz_A_ein_801DF9B0[];
 extern char s_Auf_die_Memory_Card_wurde_noch_nicht_801DF9E0[];
 extern char s_gespeichert_Bitte_speichern_Sie_vorerst_801DFA08[];
@@ -289,7 +286,6 @@ extern char lbl_801E13B4[];
 extern char s_cancellato_dai_dati_attuali_801E13D8[];
 extern char lbl_801E13F8[];
 extern char lbl_801E1424[];
-extern char lbl_803331C4[];
 extern char lbl_801E1450[];
 extern char lbl_801E1480[];
 extern char lbl_801E14B0[];
@@ -630,7 +626,7 @@ static inline const char* GetGoOutMessageLine(int languageId, int line)
     return g_strGooutMes[(languageId * 0x6E) + line];
 }
 
-static const char s_gooutCpp[] = "goout.cpp";
+extern char s_gooutCpp[];
 
 static inline CGoOutSaveDatLayout& GoOutSaveDat(Mc::SaveDat* saveData)
 {

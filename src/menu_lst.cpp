@@ -223,6 +223,7 @@ int CMenuPcs::MLstClose()
  * JP Size: TODO
  */
 #pragma opt_propagation off
+#pragma opt_common_subs off
 int CMenuPcs::MLstCtrl()
 {
 	bool blocked;
@@ -326,6 +327,7 @@ int CMenuPcs::MLstCtrl()
 	}
 	return result;
 }
+#pragma opt_common_subs reset
 #pragma opt_propagation reset
 
 /*

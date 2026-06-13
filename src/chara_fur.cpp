@@ -584,7 +584,7 @@ void CChara::CalcMogScore()
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
-			const unsigned int dx = x - 0x20;
+			const int dx = x - 0x20;
 			const int dy = y - 0x20;
 			const int dist = static_cast<int>(sqrt(static_cast<double>(static_cast<int>(dx * dx + dy * dy))));
 
@@ -1057,7 +1057,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	const int debugPadLock = Pad.m_debugPadLock;
 	const short heldButtons = MogHeldButtons(debugPadLock);
 	const short triggerButtons = MogTriggerButtons(debugPadLock);
-	const unsigned short rotateButtons = static_cast<unsigned short>((MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : static_cast<unsigned short>(0));
+	const unsigned short rotateButtons = static_cast<unsigned short>((MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : static_cast<short>(0));
 
 	if (MogWork().m_started == 0) {
 		if ((heldButtons & 0x100) != 0) {

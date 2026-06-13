@@ -218,7 +218,6 @@ void CalcReflectionVector2(
         for (i = 0; i < itemCount; i++) {
             u16 posIndex = dl[0];
             u16 normalIndex = dl[1];
-            float denom;
 
             dl += 4;
             if (fmt == 2) {
@@ -249,9 +248,8 @@ void CalcReflectionVector2(
                 ((u8*)&color[posIndex])[3] = 0;
             }
 
-            denom = denomBias + reflectionVec[posIndex].z;
-            uv.x = -reflectionVec[posIndex].x / denom;
-            uv.y = -reflectionVec[posIndex].y / denom;
+            uv.x = -reflectionVec[posIndex].x / (denomBias + reflectionVec[posIndex].z);
+            uv.y = -reflectionVec[posIndex].y / (denomBias + reflectionVec[posIndex].z);
             uv.x *= half;
             uv.y *= half;
             uv.x += half;
@@ -260,9 +258,8 @@ void CalcReflectionVector2(
             uv.y = uv.y - scale * (warp * (uv.y - half));
             gUtil.ConvF2IVector2d(texCoordA[posIndex], uv, 12);
 
-            denom = denomBias - reflectionVec[posIndex].z;
-            uv.x = -reflectionVec[posIndex].x / denom;
-            uv.y = -reflectionVec[posIndex].y / denom;
+            uv.x = -reflectionVec[posIndex].x / (denomBias - reflectionVec[posIndex].z);
+            uv.y = -reflectionVec[posIndex].y / (denomBias - reflectionVec[posIndex].z);
             uv.x *= half;
             uv.y *= half;
             uv.x += half;

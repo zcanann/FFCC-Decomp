@@ -2149,7 +2149,6 @@ static void _KeyOnControl()
     RedTrackDATA* track;
     RedVoiceDATA* voice;
     int volume;
-    int muteTrackNo;
     u32 bit;
 
     _VoiceEnvelopeCheck();
@@ -2229,8 +2228,7 @@ static void _KeyOnControl()
                     soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
                     if (!(voice->m_track < soundControl->m_tracks) &&
                         (voice->m_track < RedSoundControlGetTrackEnd(soundControl))) {
-                        muteTrackNo = voice->m_track->m_trackNo;
-                        if ((RedMuteGetMask(muteTrackNo) & RedMuteGetWord(muteTrackNo)) == 0) {
+                        if ((RedMuteGetMask(voice->m_track->m_trackNo) & RedMuteGetWord(voice->m_track->m_trackNo)) == 0) {
                             volume = ((soundControl->m_volumeScale + 1) *
                                       (soundControl->m_volume >> REDSOUND_FIXED_SHIFT)) >>
                                      REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;
@@ -2247,9 +2245,7 @@ static void _KeyOnControl()
                             &soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY];
                         if (!(voice->m_track < secondaryControl->m_tracks) &&
                             (voice->m_track < RedSoundControlGetTrackEnd(secondaryControl))) {
-                            muteTrackNo = voice->m_track->m_trackNo;
-
-                            if ((RedMuteGetMask(muteTrackNo) & RedMuteGetWord(muteTrackNo)) == 0) {
+                            if ((RedMuteGetMask(voice->m_track->m_trackNo) & RedMuteGetWord(voice->m_track->m_trackNo)) == 0) {
                                 volume = ((secondaryControl->m_volumeScale + 1) *
                                           (secondaryControl->m_volume >> REDSOUND_FIXED_SHIFT)) >>
                                          REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;

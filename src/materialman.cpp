@@ -2480,8 +2480,9 @@ void CMaterialMan::SetPosition(
         CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
         int candidateCount = 0;
 
-        for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-            CMapShadow* shadow = (*mapShadowArray)[i];
+        int idx;
+        for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+            CMapShadow* shadow = (*mapShadowArray)[idx];
 
             if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
                 continue;
@@ -2552,9 +2553,10 @@ void CMaterialMan::SetPosition(
         }
     } else {
         unsigned int i = 0;
+        int idx;
         CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
-        for (; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-            CMapShadow* shadow = (*mapShadowArray)[i];
+        for (; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+            CMapShadow* shadow = (*mapShadowArray)[idx];
 
             if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
                 continue;
@@ -2616,8 +2618,9 @@ int CMaterialMan::GetCharaShadow(
     int outputCount = 0;
     int candidateCount = 0;
 
-    for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        CMapShadow* shadow = (*mapShadowArray)[i];
+    int idx;
+    for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+        CMapShadow* shadow = (*mapShadowArray)[idx];
         if (shadow->m_targetEnabled[0] == 0) {
             continue;
         }
@@ -3106,8 +3109,9 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
             case CHUNK_TIDX: {
                 {
                     unsigned long i;
-                    for (i = 0; i < static_cast<unsigned long>(m_materials.GetSize()); i++) {
-                        if (m_materials[i] == 0) {
+                    int idx;
+                    for (i = 0; (idx = i) < static_cast<unsigned long>(m_materials.GetSize()); i++) {
+                        if (m_materials[idx] == 0) {
                             goto slotFound;
                         }
                     }

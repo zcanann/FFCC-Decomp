@@ -206,14 +206,11 @@ void CMenuPcs::CompaDraw()
 
 	familyCount = 2;
 	compaList = this->m_compaList;
-	const short* evtWord = &caravanWork->m_evtWordArr[19];
-	int i = 2;
-	do {
-		if (evtWord[i] > 0) {
+	for (int i = familyCount; i < 7; i++) {
+		if (caravanWork->m_evtWordArr[19 + i] > 0) {
 			familyCount++;
 		}
-		i++;
-	} while (i < 7);
+	}
 	if (familyCount > 4 && static_cast<unsigned int>(System.m_execParam) >= 1) {
 		System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1BF,
 		              familyCount);

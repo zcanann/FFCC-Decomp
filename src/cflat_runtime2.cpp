@@ -710,7 +710,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 	}
 	case 4: {
 		CGMonObj* obj = reinterpret_cast<CGMonObj*>(m_objMon);
-		for (int i = 0; i < kFlatMonObjCount; i++, obj++) {
+		for (int i = 0; i < kFlatMonObjCount; obj++, i++) {
 			if (reinterpret_cast<CGBaseObj*>(obj)->m_isActiveBits.active == 0) {
 				count++;
 			}
@@ -1671,8 +1671,6 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 		FindNextGBaseObjByCidMask(&CFlat, CFlat.m_objectSentinel.m_next->m_next, 5));
 
 	while (object != 0) {
-		int newCount = count;
-
 		if (((object->m_attrFlags & static_cast<unsigned int>(classMask)) != 0) &&
 		    (((flags & 1) == 0) ||
 		     ((object->m_scriptHandle != 0) &&
@@ -1684,7 +1682,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 				    (center->z + radius >= object->m_worldPosition.z)) {
 					Vec offset;
 					PSVECSubtract(&object->m_worldPosition, center, &offset);
-					offset.y = 0.0f;
+					offset.y = FLOAT_80330144;
 
 					const float distanceSq = PSVECSquareMag(&offset);
 					if ((0.0f < distanceSq) && (distanceSq < radiusSq)) {
@@ -1692,9 +1690,9 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 						if (distance < radius) {
 							if ((flags & 2) != 0) {
 								Vec facing;
-								PSVECScale(&offset, &offset, 1.0f / distance);
+								PSVECScale(&offset, &offset, FLOAT_80330140 / distance);
 								facing.x = sin(angle);
-								facing.y = 0.0f;
+								facing.y = FLOAT_80330144;
 								facing.z = cos(angle);
 								if (PSVECDotProduct(&offset, &facing) <= 0.0f) {
 									goto advance;
@@ -1702,10 +1700,10 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 							}
 
 							if ((flags & 4) != 0) {
-								newCount = count + 1;
 								objects[count] = object;
-								if (newCount == maxCount) {
-									return newCount;
+								count = count + 1;
+								if (count == maxCount) {
+									return count;
 								}
 							} else {
 								int insertIndex = 0;
@@ -1722,9 +1720,10 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 
 								*reinterpret_cast<float*>(&object->m_0x44) = distance;
 								objects[insertIndex] = object;
-								newCount = maxCount;
 								if (count + 1 < maxCount) {
-									newCount = count + 1;
+									count = count + 1;
+								} else {
+									count = maxCount;
 								}
 							}
 						}
@@ -1736,7 +1735,6 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 	advance:
 		object = reinterpret_cast<CGObject*>(FindNextGBaseObjByCidMask(
 			&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5));
-		count = newCount;
 	}
 
 	return count;

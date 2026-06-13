@@ -656,7 +656,8 @@ void CChara::CalcMogScore()
 		if (*scorePtr < 0) {
 			sc = 0;
 		} else {
-			sc = (*scorePtr > 100) ? 100 : *scorePtr;
+			sc = 100;
+			if (*scorePtr <= 100) sc = *scorePtr;
 		}
 		*scorePtr = sc;
 
@@ -665,7 +666,8 @@ void CChara::CalcMogScore()
 		if (lv < 5) {
 			level = 5;
 		} else {
-			level = (lv > 0xF) ? 0xF : lv;
+			level = 0xF;
+			if (lv <= 0xF) level = lv;
 		}
 		fur.m_radarLevel[i] = level;
 	}
@@ -908,7 +910,6 @@ static inline void OpenMogHintMessage(int messageId)
  * JP Size: TODO
  */
 #pragma push
-#pragma optimization_level 3
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	int messageId = -1;

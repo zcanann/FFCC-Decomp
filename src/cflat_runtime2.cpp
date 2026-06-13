@@ -1376,8 +1376,8 @@ void CFlatRuntime2::Calc()
 		saveData[3] = header[3];
 		saveData[4] = header[4];
 		saveData[5] = header[5];
-		saveData[6] = header[6];
-		saveData[7] = header[7];
+		reinterpret_cast<float*>(saveData)[6] = reinterpret_cast<float*>(header)[6];
+		reinterpret_cast<float*>(saveData)[7] = reinterpret_cast<float*>(header)[7];
 
 		u32 record[7];
 
@@ -1403,9 +1403,9 @@ void CFlatRuntime2::Calc()
 			objectData[1] = record[1];
 			objectData[2] = record[2];
 			objectData[3] = record[3];
-			objectData[4] = record[4];
-			objectData[5] = record[5];
-			objectData[6] = record[6];
+			reinterpret_cast<float*>(objectData)[4] = reinterpret_cast<float*>(record)[4];
+			reinterpret_cast<float*>(objectData)[5] = reinterpret_cast<float*>(record)[5];
+			reinterpret_cast<float*>(objectData)[6] = reinterpret_cast<float*>(record)[6];
 			objectData += 7;
 		}
 
@@ -1414,9 +1414,9 @@ void CFlatRuntime2::Calc()
 		objectData[1] = record[1];
 		objectData[2] = record[2];
 		objectData[3] = record[3];
-		objectData[4] = record[4];
-		objectData[5] = record[5];
-		objectData[6] = record[6];
+		reinterpret_cast<float*>(objectData)[4] = reinterpret_cast<float*>(record)[4];
+		reinterpret_cast<float*>(objectData)[5] = reinterpret_cast<float*>(record)[5];
+		reinterpret_cast<float*>(objectData)[6] = reinterpret_cast<float*>(record)[6];
 		delete[] saveData;
 	}
 
@@ -1704,7 +1704,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 								objects[count] = object;
 								count = count + 1;
 								if (count == maxCount) {
-									return count;
+									goto done;
 								}
 							} else {
 								int insertIndex = 0;
@@ -1721,11 +1721,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 
 								*reinterpret_cast<float*>(&object->m_0x44) = distance;
 								objects[insertIndex] = object;
-								if (count + 1 < maxCount) {
-									count = count + 1;
-								} else {
-									count = maxCount;
-								}
+								count = (count + 1 < maxCount) ? (count + 1) : maxCount;
 							}
 						}
 					}
@@ -1738,6 +1734,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 			&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5));
 	}
 
+done:
 	return count;
 }
 

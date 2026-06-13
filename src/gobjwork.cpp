@@ -2685,7 +2685,7 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 				case 0xDF:
 					break;
 				case 0xE4:
-					hpMax += artifactValue;
+					hpMax = artifactValue + hpMax;
 					break;
 				}
 			}

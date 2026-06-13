@@ -2410,7 +2410,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x27: {
-        if ((RuntimeDebugFlags(this) & CFlatRuntimeDebugFlag_ClassCollision) != 0) {
+        if ((this->m_debugFlags & CFlatRuntimeDebugFlag_ClassCollision) != 0) {
             Mtx drawMtx;
             Mtx viewMtx;
             CameraPcs.GetViewMatrix(viewMtx);
@@ -2846,7 +2846,7 @@ renderedDone:
             MenuPcs.GetMesMenu(a0)->Open(message, a1, a2, a3, a4, a5, a6);
         } else {
             if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
-                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), a0);
+                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);
             }
         }
         this->push(object, 0);
@@ -2858,7 +2858,7 @@ renderedDone:
             MenuPcs.GetMesMenu(*object->m_localBase)->CloseRequest(1);
         } else {
             if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
-                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
+                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), *object->m_localBase);
             }
         }
         this->push(object, 0);
@@ -2870,7 +2870,7 @@ renderedDone:
             GetMes__9CFlatDataFi(MenuPcs.GetMesMenu(*object->m_localBase), object->m_localBase[1], object->m_localBase[2]);
         } else {
             if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
-                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
+                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), *object->m_localBase);
             }
         }
         this->push(object, 0);
@@ -2884,7 +2884,7 @@ renderedDone:
             this->push(object, GetErrorLevel__7CSystemFv(MenuPcs.GetMesMenu(a0), a1));
         } else {
             if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
-                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), a0);
+                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);
             }
             this->push(object, 0);
         }
@@ -2905,7 +2905,7 @@ renderedDone:
     case -0x4D: {
         if (MenuPcs.GetMesMenu(*object->m_localBase) == 0) {
             if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
-                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
+                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), *object->m_localBase);
             }
             this->push(object, 0);
             outResult = 0;
@@ -3273,7 +3273,7 @@ renderedDone:
         break;
     }
     case -0x82:
-        CFlatLetterEventEnabled() = static_cast<unsigned int>(*object->m_localBase);
+        this->m_letterEventEnabled = static_cast<unsigned int>(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3779,7 +3779,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0xCD:
-        gCFlatRuntime().ClearParmanent();
+        reinterpret_cast<CFlatRuntime&>(CFlat).ClearParmanent();
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3905,7 +3905,7 @@ renderedDone:
         break;
     case -0xDC: {
         CRomLetterWork* letters = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);
-        this->push(object, letters[*object->m_localBase].Word(object->m_localBase[1]));
+        this->push(object, reinterpret_cast<const unsigned short*>(&letters[*object->m_localBase])[object->m_localBase[1]]);
         outResult = 0;
         break;
     }

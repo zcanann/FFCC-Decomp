@@ -2586,8 +2586,8 @@ void CMenuPcs::CalcMCardMenu()
 			if (m_wmWorldState->m_mcResult == 0) break;
 			if (m_wmWorldState->m_subState == 0x13) {
 				if (m_wmWorldState->m_menuMode != 8) {
-					gWmMenuWorkA = m_mcCtrl.m_serialLo;
 					gWmMenuWorkB = m_mcCtrl.m_serialHi;
+					gWmMenuWorkA = m_mcCtrl.m_serialLo;
 					gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.m_cardChannel;
 					gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 				}
@@ -3372,8 +3372,8 @@ void CMenuPcs::CalcLoadMenu()
 		           && m_wmWorldState->m_counter1A == 0) {
 			iVar10 = (int)m_wmWorldState->m_subState;
 			if (iVar10 == 0xD) {
-				GetMcCtrl()->Format(1);
-				m_wmWorldState->m_mcResult = (short)m_mcCtrl.m_lastResult;
+				short fmtRes = (short)GetMcCtrl()->Format(1);
+				m_wmWorldState->m_mcResult = fmtRes;
 				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
@@ -8811,7 +8811,7 @@ void CMenuPcs::CalcCharaSelect()
 		int connectedCount = 0;
 		int locallyConfirmedCount = 0;
 		int readyMask = 0;
-		for (int i = readyMask; i < 4; i++) {
+		for (int i = 0; i < 4; i++) {
 			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 			if (entry.m_connected != 0) {
 				CCaravanWork& work = Game.m_caravanWorkArr[entry.m_currentSlot];

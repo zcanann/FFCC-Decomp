@@ -3623,6 +3623,8 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_common_subs off
 int JoyBus::InitialCode(ThreadParam* threadParam)
 {
     int result;
@@ -3770,6 +3772,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
     return result;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -5310,6 +5313,8 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
     return result;
 }
 
+#pragma push
+#pragma opt_propagation off
 /*
  * --INFO--
  * Address:	TODO
@@ -5411,6 +5416,7 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
 
     return result;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -6074,6 +6080,8 @@ int JoyBus::GetGBAStat(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_lifetimes off
 int JoyBus::ChgCtrlMode(int portIndex)
 {
     unsigned int word = 0;
@@ -6123,6 +6131,7 @@ int JoyBus::ChgCtrlMode(int portIndex)
 
     return ret;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -6322,6 +6331,8 @@ int JoyBus::GBAReady(int portIndex)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_propagation off
 int JoyBus::SendAllStat(int portIndex)
 {
     m_threadParams[portIndex].m_state = 0;
@@ -6360,6 +6371,7 @@ int JoyBus::SendAllStat(int portIndex)
 
     return 0;
 }
+#pragma pop
 
 
 /*

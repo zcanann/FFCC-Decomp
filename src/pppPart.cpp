@@ -975,6 +975,7 @@ allocated:
  */
 #pragma push
 #pragma optimization_level 4
+#pragma opt_dead_assignments off
 void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x362);
@@ -1084,6 +1085,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x3A1);
 	ppvMng = oldMngSt;
 }
+#pragma opt_dead_assignments reset
 #pragma pop
 
 /*

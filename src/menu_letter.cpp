@@ -2050,7 +2050,7 @@ int CMenuPcs::LetterCtrlCur()
 {
 	bool blocked = false;
 	int press;
-	unsigned int hold;
+	int hold;
 	int pressRaw;
 	int holdRaw;
 	int padState = Pad.m_debugPadLock;

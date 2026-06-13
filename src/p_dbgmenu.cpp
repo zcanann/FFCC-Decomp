@@ -582,6 +582,7 @@ void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_strength_reduction off
 void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, char* text)
 {
 	changeVtxFmt(1);
@@ -667,6 +668,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 		drawFont(5, x + 8, y - 6, text);
 	}
 }
+#pragma opt_strength_reduction reset
 
 /*
  * --INFO--

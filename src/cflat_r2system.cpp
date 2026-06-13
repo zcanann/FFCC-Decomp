@@ -2669,7 +2669,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x36:
-        this->EndParticleSlot(*object->m_localBase, object->m_localBase[1]);
+        this->EndParticleSlot(*object->m_localBase, 0);
         this->push(object, 0);
         outResult = 0;
         break;

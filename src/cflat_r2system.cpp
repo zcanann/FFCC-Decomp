@@ -1880,17 +1880,18 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 formatScan:
                     scan = spec + 1;
                     while (*scan != '\0') {
+                        unsigned int* slot = &localArgs[argIndex];
                         switch (*scan) {
                         case 'd':
                         case 'x':
-                            sprintf(rendered, spec, localArgs[argIndex]);
+                            sprintf(rendered, spec, *slot);
                             goto renderedDone;
                         case 'f':
                             sprintf(rendered, spec,
-                                    static_cast<double>(reinterpret_cast<float*>(localArgs)[argIndex]));
+                                    static_cast<double>(*reinterpret_cast<float*>(slot)));
                             goto renderedDone;
                         case 's':
-                            sprintf(rendered, spec, this->m_strBlob + this->m_strOffsets[localArgs[argIndex]]);
+                            sprintf(rendered, spec, this->m_strBlob + this->m_strOffsets[*slot]);
                             goto renderedDone;
                         default:
                             scan++;
@@ -2541,10 +2542,12 @@ renderedDone:
     }
     case -0x34: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+        const float angle1 = localFloats[1];
+        const float angle2 = localFloats[2];
         Vec axis;
-        axis.x = std::cosf(localFloats[1]);
+        axis.x = std::cosf(angle1);
         axis.y = 0.0f;
-        axis.z = std::sinf(localFloats[1]);
+        axis.z = std::sinf(angle1);
         Mtx matrix;
         Mtx rotation;
 
@@ -2553,7 +2556,7 @@ renderedDone:
             PSMTXIdentity(matrix);
         }
 
-        PSMTXRotAxisRad(rotation, &axis, localFloats[2]);
+        PSMTXRotAxisRad(rotation, &axis, angle2);
         PSMTXConcat(rotation, matrix, matrix);
 
         axis.x = 0.0f;
@@ -2854,11 +2857,12 @@ renderedDone:
         break;
     }
     case -0x46: {
-        if (MenuPcs.GetMesMenu(*object->m_localBase) != 0) {
-            MenuPcs.GetMesMenu(*object->m_localBase)->CloseRequest(1);
+        const int a0 = *object->m_localBase;
+        if (MenuPcs.GetMesMenu(a0) != 0) {
+            MenuPcs.GetMesMenu(a0)->CloseRequest(1);
         } else {
             if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
-                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), *object->m_localBase);
+                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);
             }
         }
         this->push(object, 0);
@@ -2866,8 +2870,11 @@ renderedDone:
         break;
     }
     case -0x47: {
-        if (MenuPcs.GetMesMenu(*object->m_localBase) != 0) {
-            GetMes__9CFlatDataFi(MenuPcs.GetMesMenu(*object->m_localBase), object->m_localBase[1], object->m_localBase[2]);
+        const int a0 = *object->m_localBase;
+        const int a1 = object->m_localBase[1];
+        const int a2 = object->m_localBase[2];
+        if (MenuPcs.GetMesMenu(a0) != 0) {
+            GetMes__9CFlatDataFi(MenuPcs.GetMesMenu(a0), a1, a2);
         } else {
             if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), *object->m_localBase);
@@ -2903,15 +2910,16 @@ renderedDone:
         break;
     }
     case -0x4D: {
-        if (MenuPcs.GetMesMenu(*object->m_localBase) == 0) {
+        const int a0 = *object->m_localBase;
+        if (MenuPcs.GetMesMenu(a0) == 0) {
             if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
-                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), *object->m_localBase);
+                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);
             }
             this->push(object, 0);
             outResult = 0;
             break;
         }
-        if (MenuPcs.GetMesMenu(*object->m_localBase)->IsUse() == 0) {
+        if (MenuPcs.GetMesMenu(a0)->IsUse() == 0) {
             this->push(object, 0);
             outResult = 0;
             break;
@@ -3065,7 +3073,8 @@ renderedDone:
         break;
     }
     case -0x61: {
-        const int group = (~(object->m_localBase[1] - 1 | 1 - object->m_localBase[1]) >> 31) & 3;
+        const int x = static_cast<int>(object->m_localBase[1]);
+        const int group = (~(x - 1 | 1 - x) >> 31) & 3;
         Memory.SetDefaultGroup(group);
         CharaPcs.LoadMergeFile(*object->m_localBase, object->m_localBase[1], 0);
         Memory.ResetDefaultGroup();
@@ -3261,13 +3270,13 @@ renderedDone:
         outResult = 0;
         break;
     case -0x81: {
-        float angle = reinterpret_cast<float*>(object->m_localBase)[2];
         Mtx& reflectMtx = m_centerMatrix;
         PSMTXReflect(
             reflectMtx,
             CVector(reinterpret_cast<float*>(object->m_localBase)[0], kCFlatPadStickZero,
                 reinterpret_cast<float*>(object->m_localBase)[1]),
-            CVector(std::sinf(angle), kCFlatPadStickZero, std::cosf(angle)));
+            CVector(std::sinf(reinterpret_cast<float*>(object->m_localBase)[2]), kCFlatPadStickZero,
+                std::cosf(reinterpret_cast<float*>(object->m_localBase)[2])));
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3423,12 +3432,11 @@ renderedDone:
         break;
     case -0x97: {
         unsigned int slot = static_cast<unsigned int>(*object->m_localBase);
-        CMapObjectInfo& mapObject = m_mapObjectInfo[slot];
-        mapObject.m_type = static_cast<char>(object->m_localBase[1]);
-        mapObject.m_x = *reinterpret_cast<float*>(object->m_localBase + 2);
-        mapObject.m_y = *reinterpret_cast<float*>(object->m_localBase + 3);
-        mapObject.m_z = *reinterpret_cast<float*>(object->m_localBase + 4);
-        mapObject.m_radius = *reinterpret_cast<float*>(object->m_localBase + 5);
+        m_mapObjectInfo[slot].m_type = static_cast<char>(object->m_localBase[1]);
+        m_mapObjectInfo[slot].m_x = *reinterpret_cast<float*>(object->m_localBase + 2);
+        m_mapObjectInfo[slot].m_y = *reinterpret_cast<float*>(object->m_localBase + 3);
+        m_mapObjectInfo[slot].m_z = *reinterpret_cast<float*>(object->m_localBase + 4);
+        m_mapObjectInfo[slot].m_radius = *reinterpret_cast<float*>(object->m_localBase + 5);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3955,9 +3963,10 @@ renderedDone:
         break;
     case -0xE3: {
         CCaravanWork* work = &Game.m_caravanWorkArr[object->m_localBase[0]];
+        const int item = object->m_localBase[2];
         unsigned int flags = 0;
         if ((object->m_localBase[1] & 2) != 0) {
-            const int itemIndex = work->FindItem(object->m_localBase[2]);
+            const int itemIndex = work->FindItem(item);
             flags = ((static_cast<unsigned int>(itemIndex) >> 31) - 1) & 2;
         }
         this->push(object, flags);

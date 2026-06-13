@@ -2323,7 +2323,7 @@ int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 {
 	while (true) {
 		int prev = cmdListIdx;
-		cmdListIdx = prev + dir;
+		cmdListIdx = prev + (dir != 0 ? dir : dir);
 
 		if (cmdListIdx < 0) {
 			cmdListIdx += m_numCmdListSlots;

@@ -2616,8 +2616,9 @@ int CMaterialMan::GetCharaShadow(
     int outputCount = 0;
     int candidateCount = 0;
 
-    for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        CMapShadow* shadow = (*mapShadowArray)[i];
+    int idx;
+    for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+        CMapShadow* shadow = (*mapShadowArray)[idx];
         if (shadow->m_targetEnabled[0] == 0) {
             continue;
         }

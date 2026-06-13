@@ -292,7 +292,7 @@ void CMenuPcs::CompaDraw()
 	font->SetScaleY(kCompaOne);
 	font->DrawInit();
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(kCompaColorMax * compaList->entries[0].alpha)).color);
 
 	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	drawIndex = 0;

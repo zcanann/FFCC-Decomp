@@ -1165,8 +1165,7 @@ void CMenuPcs::CmdDraw()
 					selDisp -= itemCount;
 				}
 				if (displayIdx == selDisp) {
-					int __p21 = skillId;
-					helpId = __p21;
+					helpId = skillId;
 					hasItemHelp = true;
 				}
 			} else {

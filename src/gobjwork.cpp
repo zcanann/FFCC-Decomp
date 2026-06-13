@@ -15,6 +15,8 @@
 extern const float kGObjWorkStatusScaleBase;
 extern const float kGObjWorkStatusScaleStep;
 extern const float kCaravanShoukiLimitScale[2] = {0.95f, 0.0f};
+extern const double DOUBLE_803309A0;
+__declspec(section ".sdata2") static const char lbl_803309B0[] = "CRef";
 
 namespace {
 static inline unsigned short* GetItemDataPtr(int itemIdx)

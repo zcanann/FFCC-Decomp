@@ -222,6 +222,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
  * JP Size: TODO
  */
 #pragma opt_propagation off
+#pragma opt_lifetimes off
 void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOnLineBreak)
 {
 	if (sTag54Init == 0)
@@ -525,6 +526,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		src++;
 	}
 }
+#pragma opt_lifetimes reset
 #pragma opt_propagation reset
 
 /*

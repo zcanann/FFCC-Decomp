@@ -920,10 +920,7 @@ void CSound::loadWaveFrame()
             playPoint0 = static_cast<int>(static_cast<unsigned int>(playPoint0) >> 16);
 
             if (static_cast<int>(streamHalf) != playPoint0) {
-                int readSize = 0x10000;
-                if (streamRemain < readSize) {
-                    readSize = streamRemain;
-                }
+                int readSize = (streamRemain < 0x10000) ? streamRemain : 0x10000;
 
                 if (readSize != 0) {
                     unsigned int curOffset = (unsigned int)streamOffset;

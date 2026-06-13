@@ -24,6 +24,8 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" int Rand__5CMathFUl(CMath* math);
+extern "C" CVector* __ct__7CVectorFv(void* self);
+extern "C" CVector* __ct__7CVectorFRC3Vec(void* self, const Vec* src);
 
 u8 CGMonObj::m_aiWork[0xC];
 u8 CGMonObj::m_boss[0x8C];
@@ -3055,7 +3057,7 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 					nextGroup = escapePos->m_groupB;
 				}
 				unsigned char* routeStep = reinterpret_cast<unsigned char*>(&AStar) +
-					routeFrom * 0x80 + static_cast<unsigned char>(nextGroup + 0x36) * 2 + 0x40c;
+					routeFrom * 0x80 + static_cast<unsigned char>(nextGroup) * 2 + 0x40c;
 				float portalDist = PSVECDistance(&object->m_worldPosition, &escapePos->m_position);
 				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 					routePrev = routeFrom;
@@ -3064,29 +3066,36 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 						routeStep[0] * 0x80 + forbiddenGroup * 2 + 0x40d)];
 				}
 
-				float targetDist = PSVECDistance(&targetPos, &object->m_worldPosition);
-				CVector portalVec(escapePos->m_position);
-				CVector myVec(object->m_worldPosition);
-				CVector dirRaw;
-				PSVECSubtract(myVec, portalVec, dirRaw);
 				Vec dir;
+				Vec myVec;
+				Vec portalVec;
+				volatile Vec finalVec;
+				Vec myVec2;
+				Vec dirScaled;
+				Vec dirRaw;
+				Vec scaled;
+				Vec result;
+				float targetDist = PSVECDistance(&targetPos, &object->m_worldPosition);
+				__ct__7CVectorFRC3Vec(&portalVec, &escapePos->m_position);
+				Vec* capturePtr;
+				capturePtr = reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(&myVec, &object->m_worldPosition));
+				__ct__7CVectorFv(&dirRaw);
+				PSVECSubtract(capturePtr, &portalVec, &dirRaw);
 				dir.x = dirRaw.x;
 				dir.y = dirRaw.y;
 				dir.z = dirRaw.z;
 				reinterpret_cast<CVector*>(&dir)->Normalize();
-				CVector scaled;
-				PSVECScale(reinterpret_cast<CVector&>(dir), scaled, targetDist);
-				Vec dirScaled;
+				__ct__7CVectorFv(&scaled);
+				PSVECScale(&dir, &scaled, targetDist);
 				dirScaled.x = scaled.x;
 				dirScaled.y = scaled.y;
 				dirScaled.z = scaled.z;
-				CVector myVec2(object->m_worldPosition);
-				CVector result;
-				PSVECAdd(myVec2, &dirScaled, result);
+				capturePtr = reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(&myVec2, &object->m_worldPosition));
+				__ct__7CVectorFv(&result);
+				PSVECAdd(capturePtr, &dirScaled, &result);
 				float rx = result.x;
 				float ry = result.y;
 				float rz = result.z;
-				volatile Vec finalVec;
 				finalVec.x = rx;
 				targetPos.x = rx;
 				targetPos.y = ry;
@@ -3881,14 +3890,17 @@ void CGMonObj::statWatch()
 			chaseTimer = 0;
 			monObj->m_chaseDirty = 1;
 		} else {
-			unsigned char* scriptBase = script;
+			void** handle = object->m_scriptHandle;
+			unsigned char* scriptBase = reinterpret_cast<unsigned char*>(handle[9]);
 			if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
 				if (attackResult >= 100) {
 					actionState = attackResult;
 				} else {
 					short aiState = monObj->m_aiState;
-					unsigned char* aiData = scriptBase;
-					if (aiState != 0) {
+					unsigned char* aiData;
+					if (aiState == 0) {
+						aiData = scriptBase;
+					} else {
 						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 							(aiState + *reinterpret_cast<unsigned short*>(scriptBase + 0x100)) * 0x1D0 + 0x10;
 					}
@@ -3928,21 +3940,21 @@ void CGMonObj::statWatch()
 					}
 					unsigned char* aiData3;
 					if (aiState == 0) {
-						aiData3 = script;
+						aiData3 = reinterpret_cast<unsigned char*>(handle[9]);
 					} else {
 						aiData3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0x100)) * 0x1D0 + 0x10;
 					}
 					float range = static_cast<float>(
 						*reinterpret_cast<unsigned short*>(aiData3 + actionOff + 0x11C));
 					unsigned char* aiData4;
 					if (aiState == 0) {
-						aiData4 = script;
+						aiData4 = reinterpret_cast<unsigned char*>(handle[9]);
 					} else {
 						aiData4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(handle[9]) + 0x100)) * 0x1D0 + 0x10;
 					}
-					short changeStat = *reinterpret_cast<unsigned short*>(aiData4 + actionOff + 0x11E);
+					short changeStat = static_cast<short>(*reinterpret_cast<unsigned short*>(aiData4 + actionOff + 0x11E));
 					actionState = 0x21;
 					CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
 					if (monObj->m_moveWork.m_mode != 2) {

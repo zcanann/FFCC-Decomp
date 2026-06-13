@@ -1,3 +1,4 @@
+#pragma optimization_level 3
 #include "ffcc/ptrarray.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/chara.h"

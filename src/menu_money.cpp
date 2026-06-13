@@ -316,6 +316,7 @@ int CMenuPcs::MoneyCtrlCur()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_loop_invariants off
 void CMenuPcs::MoneyDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -426,6 +427,7 @@ void CMenuPcs::MoneyDraw()
 		DrawCursor((int)x, (int)y, 1.0f);
 	}
 }
+#pragma opt_loop_invariants reset
 
 /*
  * --INFO--
@@ -554,7 +556,7 @@ int CMenuPcs::MoneyOpen()
 		firstAnim->w = 0xf8;
 		firstAnim->h = 0x88;
 		firstAnim->x =
-			static_cast<short>(static_cast<int>(-(((double)firstAnim->w * 0.5) - 216.0)));
+			static_cast<short>(static_cast<int>(216.0 - (double)firstAnim->w * 0.5));
 		firstAnim->u = 0.0f;
 		firstAnim->v = 0.0f;
 		firstAnim->uvScale = 1.0f;

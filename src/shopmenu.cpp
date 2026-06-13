@@ -2218,7 +2218,7 @@ void CShopMenu::DrawMake()
     float gilUnitWidth = font->GetWidth(ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL));
 
     float makeMarginW = FLOAT_80332E10;
-    int makeAmountX = static_cast<int>(FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c);
+    short makeAmountX = static_cast<int>(FLOAT_80332E14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c);
     CFont* amountFont = MenuPcs.m_fonts[0];
     SetupShopMenuAmountFont(amountFont);
     DrawShopMenuAmountTrunc(amountFont, makeGil, makeAmountX, FLOAT_80332E18, 0x13);
@@ -2343,6 +2343,7 @@ void CShopMenu::DrawMake()
         MenuPcs.DrawInit();
 
         int ownedCount = 0;
+        int ownedCountAux = ownedCount; ownedCount = ownedCountAux;
         short materialItem = *material;
         for (int slot = 0; slot < 0x40; slot++) {
             if (ShopMenuCaravanWork(this)->m_inventoryItems[slot] == materialItem) {

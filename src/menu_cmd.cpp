@@ -1211,9 +1211,9 @@ void CMenuPcs::CmdDraw()
 	}
 
 	if ((cmdMode == 1) && (GetCmdStateView(this)->phase == 1)) {
+		CmdListEntry* listPos = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
 		const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		const float mark = CalcListPos(GetCmdStateView(this)->scrollTop, letter[0], 1);
-		CmdListEntry* listPos = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
 		if (mark > kCmdMenuZero) {
 			DrawListPosMark(static_cast<float>(listPos->x), static_cast<float>(listPos->y), mark);
 		}

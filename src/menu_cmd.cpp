@@ -870,7 +870,7 @@ int CMenuPcs::CmdClose()
  */
 void CMenuPcs::CmdDraw()
 {
-	bool hasItemHelp = false;
+	s32 hasItemHelp = false;
 	s32 helpId;
 	float rowU;
 	float rowH;

@@ -1721,10 +1721,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x73: {
-			unsigned int buttons = 0;
+			unsigned int buttons;
 			int playerIndex = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->m_joybusCaravanId;
 			bool useDebugPad = (Pad.m_debugPadLock != 0) || ((playerIndex == 0) && (Pad.m_debugPadPort != -1));
-			if (!useDebugPad) {
+			if (useDebugPad) {
+				buttons = 0;
+			} else {
 				unsigned int slot = static_cast<unsigned int>(playerIndex)
 				    & ~((static_cast<int>(~(Pad.m_debugPadPort - playerIndex | playerIndex - Pad.m_debugPadPort)) >> 31));
 				buttons = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&Pad) + 0x54 + slot * 0x54);

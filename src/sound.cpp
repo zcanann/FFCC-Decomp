@@ -871,8 +871,9 @@ void CSound::loadWaveFrame()
             }
 
             unsigned int curOffset = (unsigned int)waveOffset;
-            waveFile->m_chunkSize = readSize;
-            waveFile->m_currentOffset = curOffset;
+            CFile::CHandle* handle = waveFile;
+            handle->m_chunkSize = readSize;
+            handle->m_currentOffset = curOffset;
             File.ReadASync(waveFile);
 
             if (waveSyncMode != 0) {
@@ -919,15 +920,13 @@ void CSound::loadWaveFrame()
             playPoint0 = static_cast<int>(static_cast<unsigned int>(playPoint0) >> 16);
 
             if (static_cast<int>(streamHalf) != playPoint0) {
-                int readSize = 0x10000;
-                if (streamRemain < readSize) {
-                    readSize = streamRemain;
-                }
+                int readSize = (streamRemain < 0x10000) ? streamRemain : 0x10000;
 
                 if (readSize != 0) {
                     unsigned int curOffset = (unsigned int)streamOffset;
-                    streamFile->m_chunkSize = (unsigned int)readSize;
-                    streamFile->m_currentOffset = curOffset;
+                    CFile::CHandle* handle = streamFile;
+                    handle->m_chunkSize = (unsigned int)readSize;
+                    handle->m_currentOffset = curOffset;
                     File.ReadASync(streamFile);
 
                     streamOffset += readSize;

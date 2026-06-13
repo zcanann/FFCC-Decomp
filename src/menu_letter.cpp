@@ -2017,10 +2017,12 @@ void CMenuPcs::LetterMessDraw()
 			if (mode == 2) {
 				itemSel += 1;
 			} else {
-				itemSel += (~((s_Attach - 2) | (2 - s_Attach)) >> 31) + 4;
+				int attachDiff = (s_Attach - 2) | (2 - s_Attach);
+				itemSel += ~attachDiff >> 31;
+				itemSel += 4;
 			}
 			itemSel *= SingWinMessHeight();
-			y0 = static_cast<float>(m_menuWindowInfo->y + itemSel + 0x20);
+			y0 = static_cast<float>(m_menuWindowInfo->y + (itemSel + 0x20));
 		} else if ((mode == 3) || (mode == 4)) {
 			x0 = static_cast<float>(m_menuWindowInfo->x - 8);
 			if (mode == 4) {
@@ -2028,7 +2030,7 @@ void CMenuPcs::LetterMessDraw()
 			}
 			int itemSel = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
 			itemSel *= SingWinMessHeight();
-			y0 = static_cast<float>(m_menuWindowInfo->y + itemSel + 0x20);
+			y0 = static_cast<float>(m_menuWindowInfo->y + (itemSel + 0x20));
 		}
 
 		int frameAnim = static_cast<int>(System.m_frameCounter) % 8;

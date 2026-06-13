@@ -3077,7 +3077,7 @@ renderedDone:
         const int x = static_cast<int>(object->m_localBase[1]);
         const int group = (~(x - 1 | 1 - x) >> 31) & 3;
         Memory.SetDefaultGroup(group);
-        CharaPcs.LoadMergeFile(*object->m_localBase, object->m_localBase[1], 0);
+        CharaPcs.LoadMergeFile(*object->m_localBase, x, 0);
         Memory.ResetDefaultGroup();
         this->push(object, 0);
         outResult = 0;

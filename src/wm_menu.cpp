@@ -7921,14 +7921,17 @@ void CMenuPcs::DrawWMFrame()
 void CMenuPcs::CalcWMFrame0(int param)
 {
 	reinterpret_cast<short*>(m_wm.m_frameInfo + 4)[0] = 0x10;
-	reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20)[0] = static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8)) + static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)))));
+	const float* rightPtr = &FLOAT_803313e0;
+	reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20)[0] =
+	    static_cast<short>(static_cast<int>(*rightPtr - static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8)) + static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)))));
 
 	if (param < 0) {
 		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8)) + static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)));
 		if (param >= -10) {
 			unsigned int sign = param >> 31;
 			float t_unclamped = static_cast<float>((sign ^ param) - sign);
-			offset *= DOUBLE_803314E8 * t_unclamped;
+			const double* falloffPtr = &DOUBLE_803314E8;
+			offset *= *falloffPtr * t_unclamped;
 			int absParam = ((param >> 31) ^ param) - (param >> 31);
 			if (absParam < 0) {
 				absParam = 0;
@@ -7937,7 +7940,9 @@ void CMenuPcs::CalcWMFrame0(int param)
 				absParam = 10;
 			}
 			float t_clamped = static_cast<float>(absParam);
-			offset *= static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * t_clamped * FLOAT_803316D4)));
+			const float* radPtr = &FLOAT_803314bc;
+			const float* scalePtr = &FLOAT_803316D4;
+			offset *= static_cast<float>(sin(static_cast<double>(t_clamped * *scalePtr * *radPtr)));
 		}
 		reinterpret_cast<short*>(m_wm.m_frameInfo + 4)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4))) - offset));
 		reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20))) + offset));

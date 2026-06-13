@@ -1325,7 +1325,7 @@ void CPartMng::ReadTex(CChunkFile&)
  */
 unsigned int CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
 {
-    char* textureNames[0x101];
+    char* textureNames[0x100];
     CChunkFile::CChunk chunk;
 
     unsigned int meshSize = 0;

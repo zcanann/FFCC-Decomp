@@ -574,11 +574,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			}
 
 			CGObject* attachSelf = this;
-			const char* attachName = s_itemAttachLeftItem;
-			if (useBossAttachName) {
-				attachName = s_itemAttachCenterItem3;
-			}
-			attachSelf->Attach(partyObj, const_cast<char*>(attachName), attachOffsetPtr);
+			attachSelf->Attach(partyObj, const_cast<char*>(useBossAttachName ? s_itemAttachCenterItem3 : s_itemAttachLeftItem), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			*(float*)(self + 0x144) = kItemObjZero;
 		} else {
@@ -939,11 +935,7 @@ void CGItemObj::onFrameStat()
 
 			CGObject* attachOwner = m_owner;
 			CGObject* attachSelf = this;
-			const char* attachName = s_itemAttachLeftItem;
-			if (useBossAttachName) {
-				attachName = s_itemAttachCenterItem3;
-			}
-			attachSelf->Attach(attachOwner, const_cast<char*>(attachName), attachOffsetPtr);
+			attachSelf->Attach(attachOwner, const_cast<char*>(useBossAttachName ? s_itemAttachCenterItem3 : s_itemAttachLeftItem), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			m_bodyEllipsoidRadius = kItemObjZero;
 		}
@@ -1001,10 +993,11 @@ void CGItemObj::onFrameStat()
 		if (m_carryFrame <= m_stateFrame) {
 			int worldParamA = m_worldParamA;
 
-			if ((worldParamA == 0xD || worldParamA == 0xE) &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(self[0x50]) << 24) & 0xC0000000) >> 31) != 0) {
-				changeStat(0x1F, 0, 0);
+			if (worldParamA == 0xD || worldParamA == 0xE) {
+				if (static_cast<signed char>(
+				        static_cast<int>((static_cast<unsigned int>(self[0x50]) << 24) & 0xC0000000) >> 31) != 0) {
+					changeStat(0x1F, 0, 0);
+				}
 			} else if (static_cast<signed char>(
 			               static_cast<int>((static_cast<unsigned int>(self[0x50]) << 24) & 0xC0000000) >> 31) != 0) {
 				changeStat(0, 0, 0);
@@ -1311,9 +1304,9 @@ void CGItemObj::onFrame()
 				u32 word[2];
 			} particleValue;
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
-			const double* u32Bias = &kItemObjU32ToDoubleBias;
 			const float* fineStep = &kItemObjFineStep;
 			const float* particleScaleBase = &kItemObjParticleScaleBase;
+			const double* u32Bias = &kItemObjU32ToDoubleBias;
 			particleValue.word[0] = 0x43300000;
 			particleValue.word[1] = itemRows[m_worldParamB].m_fineValue;
 			float particleScale = *fineStep * (float)(particleValue.value - *u32Bias) + *particleScaleBase;

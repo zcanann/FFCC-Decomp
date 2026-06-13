@@ -1000,8 +1000,8 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 #pragma opt_propagation off
 void CMenuPcs::CalcSelectCloseAnim()
 {
-	int activePartyCount = s_Rinfo->m_partyCount;
 	char* anchor = lbl_801DD510;
+	int activePartyCount = s_Rinfo->m_partyCount;
 	int partyByteOff;
 	int twice;
 	int i;

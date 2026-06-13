@@ -1177,7 +1177,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 	{
 		int i = 0;
-		int boardOff = i;
+		int boardOff = 0;
 		for (; i < activePartyCount; i++) {
 			int sprOff = ((4 + i) << 6) + 8;
 			BonusAnimSprite* sprite = (BonusAnimSprite*)(sprOff + this->m_bonusAnimPtr);
@@ -2893,8 +2893,8 @@ void CMenuPcs::DrawResultCountAnim()
 	int modelIndex = 0;
 	int lastKind = 0;
 	int i = 0;
-	int off;
-	off = i << 6;
+	int off = 0;
+	int doubleCount = activePartyCount * 2;
 	for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
 		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 
@@ -2903,7 +2903,7 @@ void CMenuPcs::DrawResultCountAnim()
 				CCharaPcs::CHandle* handle = 0;
 				if (modelIndex < activePartyCount) {
 					handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
-				} else if (modelIndex < activePartyCount * 2) {
+				} else if (modelIndex < doubleCount) {
 					int __p11 = modelIndex;
 					handle = GetBonusDisplayHandleSlots(this)[__p11 - activePartyCount];
 				} else {

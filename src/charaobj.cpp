@@ -3156,17 +3156,18 @@ checkParticle:
 		case 0x49F:
 			if (effectArg0 == 2) {
 				Mtx rotMtx;
+				CFlatRuntime2& flatStorage = CFlatRuntime2Storage();
 				PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
 				for (int i = 0; i < 2; i++) {
 					int side = (i == 0) ? 76 : -76;
 					const CVector& sidePos = CVector(static_cast<float>(side), kCharaObjZero, kCharaObjForwardParticleOffset);
 					Vec offsetPos;
 					PSMTXMultVec(rotMtx, (Vec*)&sidePos, &offsetPos);
-					CFlatParticleWorkPosition().x = m_worldPosition.x + offsetPos.x;
-					CFlatParticleWorkPosition().y = m_worldPosition.y + offsetPos.y;
-					CFlatParticleWorkPosition().z = m_worldPosition.z + offsetPos.z;
-					CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, kCharaObjZero);
-					CFlatRuntime2Storage().PutParticleWork();
+					flatStorage.m_particleWorkPos.x = m_worldPosition.x + offsetPos.x;
+					flatStorage.m_particleWorkPos.y = m_worldPosition.y + offsetPos.y;
+					flatStorage.m_particleWorkPos.z = m_worldPosition.z + offsetPos.z;
+					flatStorage.SetParticleWorkVector(m_rotTargetY, kCharaObjZero);
+					flatStorage.PutParticleWork();
 				}
 				emittedCustom = 1;
 			}

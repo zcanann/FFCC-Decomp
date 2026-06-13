@@ -118,7 +118,7 @@ inline void DisableIndWarp()
 {
     Mtx rotMtx;
     float indMtx[2][3];
-    const float& zero = kYmDeformationMdlZero;
+    const float zero = 0.0f;
 
     GXSetTevDirect((GXTevStageID)1);
     GXSetNumIndStages(0);

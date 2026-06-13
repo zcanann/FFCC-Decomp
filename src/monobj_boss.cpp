@@ -2836,11 +2836,11 @@ void CGMonObj::frameStatFuncGiantCrab()
 			case 0x5b:
 				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x4e2a, 0x32, 0x1c2, 0, 0);
 				break;
-			case 0x63:
-				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x8cab, 0x32, 0x1c2, 0, 0);
-				break;
 			case 0x6b:
 				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0xfdf3, 0x32, 0x1c2, 0, 0);
+				break;
+			case 0x63:
+				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x8cab, 0x32, 0x1c2, 0, 0);
 				break;
 			}
 		}

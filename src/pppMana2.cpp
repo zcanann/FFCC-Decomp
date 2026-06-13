@@ -463,6 +463,7 @@ static int RenderWaterMesh(VMana2* mana2)
  */
 #pragma push
 #pragma opt_dead_assignments off
+#pragma opt_common_subs off
 static int UpdateWaterMesh(VMana2* mana2)
 {
     float* waterHeightA;
@@ -736,11 +737,10 @@ void CalcReflectionVector2(
         int i;
         u32 fmt = drawFmt & 7;
 
+        dl = (u16*)((u8*)dl + 3);
         if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
             break;
         }
-
-        dl = (u16*)((u8*)dl + 3);
         for (i = 0; i < itemCount; i++) {
             Vec* outVec;
             u16 posIndex = dl[0];

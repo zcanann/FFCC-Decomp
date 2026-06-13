@@ -6077,6 +6077,8 @@ int JoyBus::GetGBAStat(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma push
+#pragma opt_lifetimes off
 int JoyBus::ChgCtrlMode(int portIndex)
 {
     unsigned int word = 0;
@@ -6126,6 +6128,7 @@ int JoyBus::ChgCtrlMode(int portIndex)
 
     return ret;
 }
+#pragma pop
 
 /*
  * --INFO--

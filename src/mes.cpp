@@ -221,6 +221,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOnLineBreak)
 {
 	if (sTag54Init == 0)
@@ -524,6 +525,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		src++;
 	}
 }
+#pragma opt_propagation reset
 
 /*
  * --INFO--
@@ -908,6 +910,7 @@ int CMes::GetWait()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 void CMes::addString(char** text, int branchMode)
 {
 	int fontSel = mFontIndex;
@@ -1547,6 +1550,7 @@ void CMes::addString(char** text, int branchMode)
 		mLineHeight = (mCurrentY < mLineHeight) ? mLineHeight : mCurrentY;
 	}
 }
+#pragma opt_lifetimes reset
 
 /*
  * --INFO--

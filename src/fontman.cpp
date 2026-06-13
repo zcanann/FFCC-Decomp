@@ -240,13 +240,13 @@ void CFont::Draw(unsigned short ch)
 		glyphIndex = static_cast<int>(drawGlyph->m_textureIndex);
 		row = glyphIndex / m_glyphColumns;
 		drawWidth = static_cast<int>(glyphInfo[1]);
-		u0 = static_cast<float>((static_cast<int>(glyphInfo[0]) + m_glyphWidth * (glyphIndex - row * m_glyphColumns)) * 2);
+		u0 = static_cast<float>((static_cast<int>(glyphInfo[0]) + m_glyphWidth * (glyphIndex - m_glyphColumns * row)) * 2);
 		v0 = static_cast<float>(m_glyphHeight * row * 2);
 	} else {
 		drawWidth = static_cast<int>(m_glyphWidth);
 		glyphIndex = static_cast<int>(drawGlyph->m_textureIndex);
 		row = glyphIndex / m_glyphColumns;
-		u0 = static_cast<float>(m_glyphWidth * (glyphIndex - row * m_glyphColumns) * 2);
+		u0 = static_cast<float>(m_glyphWidth * (glyphIndex - m_glyphColumns * row) * 2);
 		v0 = static_cast<float>(m_glyphHeight * row * 2);
 	}
 

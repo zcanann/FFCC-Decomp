@@ -122,6 +122,8 @@ void pppUnitMatrix(pppFMATRIX& pppFMtx)
 	PSMTXIdentity(pppFMtx.value);
 }
 
+#pragma push
+#pragma optimization_level 2
 /*
  * --INFO--
  * Address:	TODO
@@ -141,6 +143,7 @@ void pppRotMatrix(pppFMATRIX& dst, pppFMATRIX src, Vec rot)
 	PSMTXConcat(Rx.value, R.value, R.value);
 	PSMTXConcat(R.value, src.value, dst.value);
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -485,6 +488,8 @@ allocDone:
 	return allocation;
 }
 
+#pragma push
+#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 80056d20
@@ -616,6 +621,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 freeDone:
 	return allocation;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -670,6 +676,8 @@ extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*
 	return result;
 }
 
+#pragma push
+#pragma opt_propagation on
 /*
  * --INFO--
  * PAL Address: 80056b0c
@@ -742,6 +750,7 @@ void callCon2Prog(_pppPObject* pObject)
 
 	ppvIsLoopCalc = 0;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -966,7 +975,6 @@ allocated:
  */
 #pragma push
 #pragma optimization_level 4
-#pragma opt_lifetimes off
 void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x362);
@@ -1437,6 +1445,8 @@ LocalOnly:
  */
 static inline float LoadFloat(const float& f) { return f; }
 
+#pragma push
+#pragma opt_common_subs off
 void pppSetFpMatrix(_pppMngSt* pppMngSt)
 {
 	Vec local_a8;
@@ -1513,6 +1523,7 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	ppvWorldMatrixWood[1][3] = ppvWorldMatrix[1][3];
 	ppvWorldMatrixWood[2][3] = ppvWorldMatrix[2][3];
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -1539,6 +1550,8 @@ void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 	}
 }
 
+#pragma push
+#pragma optimizewithasm off
 /*
  * --INFO--
  * PAL Address: 80055308
@@ -1777,6 +1790,7 @@ DataValsAllocated:
 		}
 	}
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -1789,6 +1803,7 @@ DataValsAllocated:
  */
 #pragma push
 #pragma opt_loop_invariants off
+#pragma opt_common_subs off
 void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 {
 	int* table = (int*)(progOffsetReconstructionTable + 6);
@@ -2072,7 +2087,6 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
  */
 #pragma push
 #pragma optimization_level 3
-#pragma opt_lifetimes off
 void _pppDeadPart(_pppMngSt* pppMngSt)
 {
 	struct pppMngStDeadRaw

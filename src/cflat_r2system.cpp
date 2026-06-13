@@ -2004,10 +2004,10 @@ renderedDone:
         outResult = 0;
         break;
     case -0xFD: {
-        const double stickX = Pad.GetLeftStickX(*object->m_localBase);
-        const double stickY = Pad.GetLeftStickY(*object->m_localBase);
-        *reinterpret_cast<float*>(object->m_localBase[1]) = static_cast<float>(stickX);
-        *reinterpret_cast<float*>(object->m_localBase[2]) = static_cast<float>(stickY);
+        const float stickX = Pad.GetLeftStickX(*object->m_localBase);
+        const float stickY = Pad.GetLeftStickY(*object->m_localBase);
+        *reinterpret_cast<float*>(object->m_localBase[1]) = stickX;
+        *reinterpret_cast<float*>(object->m_localBase[2]) = stickY;
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2297,8 +2297,9 @@ renderedDone:
         float bestDistance = kLineBoundsInitMin;
         float bestLineDistance = 0.0f;
 
+        CLine<64>* lines = m_debugLines;
         for (unsigned int i = 0; i < 0x10; i++) {
-            CLine<64>& line = m_debugLines[i];
+            CLine<64>& line = lines[i];
             if (line.pointCount == 0 || (line.m_mask & mask) == 0 || line.IsInner(&target, margin) == 0) {
                 continue;
             }
@@ -2668,7 +2669,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x36:
-        this->EndParticleSlot(*object->m_localBase, object->m_localBase[1]);
+        this->EndParticleSlot(*object->m_localBase, 0);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2715,12 +2716,12 @@ renderedDone:
         break;
     case -0x94: {
         float* bounds = reinterpret_cast<float*>(object->m_localBase);
-        ppvEnv->m_boxMinX = bounds[0];
-        ppvEnv->m_boxMaxX = bounds[1];
-        ppvEnv->m_boxMinY = bounds[2];
-        ppvEnv->m_boxMaxY = bounds[3];
-        ppvEnv->m_boxMinZ = bounds[4];
-        ppvEnv->m_boxMaxZ = bounds[5];
+        PartMng.m_pppEnvSt.m_boxMinX = bounds[0];
+        PartMng.m_pppEnvSt.m_boxMaxX = bounds[1];
+        PartMng.m_pppEnvSt.m_boxMinY = bounds[2];
+        PartMng.m_pppEnvSt.m_boxMaxY = bounds[3];
+        PartMng.m_pppEnvSt.m_boxMinZ = bounds[4];
+        PartMng.m_pppEnvSt.m_boxMaxZ = bounds[5];
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3076,7 +3077,7 @@ renderedDone:
         const int x = static_cast<int>(object->m_localBase[1]);
         const int group = (~(x - 1 | 1 - x) >> 31) & 3;
         Memory.SetDefaultGroup(group);
-        CharaPcs.LoadMergeFile(*object->m_localBase, object->m_localBase[1], 0);
+        CharaPcs.LoadMergeFile(*object->m_localBase, x, 0);
         Memory.ResetDefaultGroup();
         this->push(object, 0);
         outResult = 0;

@@ -2492,16 +2492,15 @@ void CGMonObj::cancelStatFuncOrcKing()
 void CGMonObj::frameStatFuncArmstrong()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
 	int state = prgObj->m_lastStateId;
 	switch (state) {
 	case 100:
 		if (prgObj->m_stateFrame == 0) {
-			charaObj->enableDamageCol(0);
+			reinterpret_cast<CGCharaObj*>(prgObj)->enableDamageCol(0);
 		} else if (prgObj->m_stateFrame == 0x29) {
-			charaObj->enableDamageCol(1);
+			reinterpret_cast<CGCharaObj*>(prgObj)->enableDamageCol(1);
 		}
-		charaObj->statAttack();
+		reinterpret_cast<CGCharaObj*>(prgObj)->statAttack();
 		break;
 	case 0x65:
 	case 0x66:

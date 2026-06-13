@@ -520,7 +520,7 @@ void CChara::TimeMogFur()
 			}
 
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex) =
-			    static_cast<unsigned short>(g | (r << 4) | (clampedA << 12) | (light << 8));
+			    static_cast<unsigned short>((clampedA << 12) | (light << 8) | (r << 4) | g);
 		}
 	}
 

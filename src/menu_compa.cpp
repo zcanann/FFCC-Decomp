@@ -599,6 +599,7 @@ bool CMenuPcs::CompaOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CMenuPcs::CompaInit()
 {
 	CompaOpenAnimList* compaList;
@@ -698,3 +699,4 @@ void CMenuPcs::CompaInit()
 	this->m_compaMenuState->selectedIndex = 0;
 	this->m_compaMenuState->initialized = 1;
 }
+#pragma opt_propagation reset

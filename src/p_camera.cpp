@@ -737,6 +737,7 @@ void CCameraPcs::CalcQuake()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 void CCameraPcs::calc()
 {
     Mtx zRotMtx;
@@ -864,6 +865,7 @@ void CCameraPcs::calc()
     PSMTXMultVecSR(invMtx, &DirectionVec(), &DirectionVec());
     m_fromScript = 0;
 }
+#pragma opt_lifetimes on
 
 /*
  * --INFO--

@@ -134,11 +134,10 @@ static inline void wrap_particle_rotation_triplet_s32(u8* particleBytes, s32 off
     s32 count = 3;
     do {
         s32* value = s32_at(particleBytes, offset);
-        while (*value >= 0x8000) {
-            *value -= 0x10000;
-        }
-        while (*value < -0x8000) {
-            *value += 0x10000;
+        if (*value >= 0x8000) {
+            do { *value -= 0x10000; } while (*value >= 0x8000);
+        } else if (*value < -0x8000) {
+            do { *value += 0x10000; } while (*value < -0x8000);
         }
         particleBytes += 4;
         count--;

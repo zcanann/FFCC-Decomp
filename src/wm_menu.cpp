@@ -2633,14 +2633,14 @@ void CMenuPcs::CalcMCardMenu()
 			}
 			if (m_wmWorldState->m_menuMode == 8) {
 				int iVar21 = 0;
+				unsigned char* pState = m_wmCharaState;
 				int cnt = 4;
-				int iVar13 = 0;
 				do {
-					if (*reinterpret_cast<char*>(m_wmCharaState + iVar13 + 0x42) == 0
-					    && *reinterpret_cast<int*>(m_wmCharaState + iVar13 + 8) > 0) {
+					if (*reinterpret_cast<char*>(pState + 0x42) == 0
+					    && *reinterpret_cast<int*>(pState + 8) > 0) {
 						iVar21++;
 					}
-					iVar13 += 0x48;
+					pState += 0x48;
 					cnt--;
 				} while (cnt != 0);
 				if (iVar21 == 0) {
@@ -3120,18 +3120,20 @@ void CMenuPcs::CalcLoadMenu()
 				short sVar18;
 				if (sVar8 == 5) { sVar18 = -1; }
 				else if (sVar8 == 6) { sVar18 = -3; }
-				else if (!(sVar8 == 7)) { sVar18 = 0; } else { sVar18 = -4; }
-				if (sVar8 == 7) {
+				else if (sVar8 == 7) { sVar18 = -4; } else { sVar18 = 0; }
+				if (sVar8 != 7) {
+					if (m_wmWorldState->m_mcResult != 0 && m_wmWorldState->m_mcResult != sVar18 && m_wmWorldState->m_mcResult != 1) {
+						m_wmWorldState->m_state0E = -1;
+						m_wmWorldState->m_counter1A = 1;
+						break;
+					}
+				} else {
 					short chk = m_wmWorldState->m_mcResult;
 					if (chk != 0 && chk != sVar18 && chk != 1) {
 						m_wmWorldState->m_state0E = -1;
 						m_wmWorldState->m_counter1A = 1;
 						break;
 					}
-				} else if (m_wmWorldState->m_mcResult != sVar18 && m_wmWorldState->m_mcResult != 1) {
-					m_wmWorldState->m_state0E = -1;
-					m_wmWorldState->m_counter1A = 1;
-					break;
 				}
 			}
 			if ((uVar4 & 0x300) != 0) {
@@ -3387,6 +3389,10 @@ void CMenuPcs::CalcLoadMenu()
 				short ldRes = (short)GetMcCtrl()->LoadDat();
 				m_wmWorldState->m_mcResult = ldRes;
 			}
+			if (m_wmWorldState->m_mcResult < 0) {
+				MemoryCardMan.m_opDoneFlag = 1;
+				MemoryCardMan.m_currentSlot = 0xFF;
+			}
 
 			if (m_wmWorldState->m_mcResult != 0) {
 				if (m_wmWorldState->m_subState == 0x16) {
@@ -3400,7 +3406,7 @@ void CMenuPcs::CalcLoadMenu()
 						gWmMenuCursorY[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 					}
 					iVar10 = 0;
-					int iVar25 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0x7930;
+					int iVar25 = reinterpret_cast<int>(&Game);
 					int iVar23 = 0;
 					iVar14 = 0;
 					int pOff = 0;
@@ -3447,6 +3453,7 @@ void CMenuPcs::CalcLoadMenu()
 						pOff += 4;
 						iVar10 += 0x34;
 					} while (iVar14 < 8);
+
 					if (m_wmWorldState->m_menuMode != 8) {
 						m_wmWorldState->m_originalBackupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
 						m_wmWorldState->m_backupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
@@ -13344,6 +13351,7 @@ int McCtrl::SaveDat()
 				};
 				McListEntry entry;
 				memset(&entry, 0, 0x48);
+				entry.m_byte42 = 0;
 				for (int i = 0; i < kMcListCount; i++) {
 					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;
 				}
@@ -13452,14 +13460,14 @@ int McCtrl::SaveDat()
 	case 0x12: {
 		unsigned long long serial;
 		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
-			if (static_cast<unsigned char>(Game.m_gameWork.m_mcHasSerial) == 0) {
+			if (Game.m_gameWork.m_mcHasSerial == 0) {
 				Game.m_gameWork.m_mcSerial1 = static_cast<unsigned int>(serial);
 				Game.m_gameWork.m_mcSerial0 = static_cast<unsigned int>(serial >> 32);
 				Game.m_gameWork.m_mcRandom = Math.Rand(0x7FFFFFFF);
 				Game.m_gameWork.m_mcHasSerial = 1;
 			}
-			m_serialLo = static_cast<unsigned int>(serial);
-			m_serialHi = static_cast<unsigned int>(serial >> 32);
+			m_serialHi = static_cast<unsigned int>(serial);
+			m_serialLo = static_cast<unsigned int>(serial >> 32);
 			MemoryCardMan.CreateMcBuff();
 			if (m_userBuffer == 0) {
 				MemoryCardMan.MakeSaveData();

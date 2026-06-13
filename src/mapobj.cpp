@@ -59,6 +59,12 @@ extern const char sMapObjTooManyAttributesWarn[0x34] = {
     (char)0x82, (char)0xab, (char)0x82, (char)0xdc, (char)0x82, (char)0xb9, (char)0x82, (char)0xf1,
     (char)0x81, (char)0x42, (char)0x0a, (char)0x00,
 };
+extern const char s_CMapObjAtrPlaySta_801D71C0[] = "CMapObjAtrPlaySta";
+extern const char s_CMapObjAtr_801D71D4[] = "CMapObjAtr";
+extern const char s_CMapObjAtrMime_801D71E0[] = "CMapObjAtrMime";
+extern const char s_CMapObjAtrSpotLight_801D71F0[] = "CMapObjAtrSpotLight";
+extern const char s_CMapObjAtrPointLight_801D7204[] = "CMapObjAtrPointLight";
+extern const char s_CMapObjAtrMeshName_801D721C[] = "CMapObjAtrMeshName";
 _GXColor s_mapObjLightColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
 inline void* operator new(unsigned long, void* ptr)

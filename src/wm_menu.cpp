@@ -12597,7 +12597,6 @@ void CMenuPcs::BindMcObj()
 		}
 	}
 
-	const float kOne = FLOAT_803313e8;
 	for (int i = 0; i < 4; i++) {
 		unsigned int* charaState = reinterpret_cast<unsigned int*>(m_wmCharaState) + i * 0x12;
 		const int modelNo = static_cast<int>(charaState[3]);
@@ -12682,8 +12681,8 @@ void CMenuPcs::BindMcObj()
 		*reinterpret_cast<unsigned int*>(createParam + 0x18) = 0;
 		*reinterpret_cast<unsigned int*>(createParam + 0x1C) = 0;
 		*reinterpret_cast<unsigned int*>(createParam + 0x20) = 0;
-		*reinterpret_cast<float*>(createParam + 0x24) = kOne;
-		*reinterpret_cast<float*>(createParam + 0x28) = kOne;
+		*reinterpret_cast<float*>(createParam + 0x24) = FLOAT_803313e8;
+		*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
 		createParam[0x2C] = 0;
 
 		const int slot = i + 0x11;

@@ -14117,12 +14117,17 @@ int McCtrl::ChkNowData()
 				MemoryCardMan.DecodeData();
 
 				int r = MemoryCardMan.McClose();
-				if (r == 0)
+				if (r != 0)
+				{
+					m_lastResult = r;
+					m_state = -1;
+				}
+				else
 				{
 					MemoryCardMan.McUnmount(m_cardChannel);
 
-					if ((*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D4) == Game.m_gameWork.m_mcSerial1 &&
-						 *(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D0) == Game.m_gameWork.m_mcSerial0) &&
+					if (((*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D0) ^ Game.m_gameWork.m_mcSerial0) |
+						 (*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D4) ^ Game.m_gameWork.m_mcSerial1)) == 0 &&
 						(*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D8) == Game.m_gameWork.m_mcRandom))
 					{
 						r = 1;
@@ -14136,9 +14141,6 @@ int McCtrl::ChkNowData()
 					m_state = 7;
 					return r;
 				}
-
-				m_lastResult = r;
-				m_state = -1;
 			}
 		}
 		break;

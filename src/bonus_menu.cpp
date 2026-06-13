@@ -1400,7 +1400,7 @@ void CMenuPcs::CalcSelectWait()
 			}
 		}
 	} else {
-		if (delay == 0 && currentPartyIndex < activePartyCount) {
+		if ((int)delay == 0 && currentPartyIndex < activePartyCount) {
 			int padSlot = s_Rinfo->m_party[i].m_partySlot;
 			unsigned short repeat = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1))
 			    ? 0

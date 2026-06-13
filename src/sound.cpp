@@ -701,6 +701,7 @@ void CSound::CheckDriver(int mode)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_dead_assignments off
 void CSound::Frame()
 {
     loadWaveFrame();
@@ -788,6 +789,7 @@ next:
 
     m_redSound.MusicVolume(-1, m_curMusicVolume, 0);
 }
+#pragma opt_dead_assignments reset
 
 /*
  * --INFO--

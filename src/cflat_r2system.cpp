@@ -3273,7 +3273,7 @@ renderedDone:
         break;
     }
     case -0x82:
-        CFlatLetterEventEnabled() = static_cast<unsigned int>(*object->m_localBase);
+        this->m_letterEventEnabled = static_cast<unsigned int>(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3779,7 +3779,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0xCD:
-        gCFlatRuntime().ClearParmanent();
+        reinterpret_cast<CFlatRuntime&>(CFlat).ClearParmanent();
         this->push(object, 0);
         outResult = 0;
         break;

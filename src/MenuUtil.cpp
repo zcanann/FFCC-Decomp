@@ -201,7 +201,7 @@ static const MenuOptionEstandarData s_MenuOptionEstandarEs = {
 	},
 };
 
-static const char s_MenuUtil_cpp_801e37fc[] = "MenuUtil.cpp";
+__declspec(section ".rodata") static const char s_MenuUtil_cpp_801e37fc[] = "MenuUtil.cpp";
 static const char s_MenuUtilAllocErrorFmt[] = "%s(%d): Error: memory allocation error\n";
 
 // DrawHelpMessageUS anchors on the start of this TU's .rodata island

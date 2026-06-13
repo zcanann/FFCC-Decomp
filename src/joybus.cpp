@@ -4306,7 +4306,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         int sent = m_pposWordIndex[threadParam->m_portIndex];
         unsigned int* wordPtr = &posWords[sent];
 
-        while (sent < (int)(unsigned char)m_cmdBuffer[4 + threadParam->m_portIndex])
+        while (sent < (int)(signed char)m_cmdBuffer[4 + threadParam->m_portIndex])
         {
             unsigned int word = *wordPtr;
 

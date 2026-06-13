@@ -2174,18 +2174,21 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 						if (obj != 0)
 						{
 							Memory.Free(obj);
+							goto nextIter;
 						}
 					}
 					else
 					{
-						prev = obj;
+						goto doPrev;
 					}
 				}
 			}
 			else
 			{
+			doPrev:
 				prev = obj;
 			}
+		nextIter:
 
 			obj = next;
 		}

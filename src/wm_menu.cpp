@@ -3120,7 +3120,7 @@ void CMenuPcs::CalcLoadMenu()
 				short sVar18;
 				if (sVar8 == 5) { sVar18 = -1; }
 				else if (sVar8 == 6) { sVar18 = -3; }
-				else if (!(sVar8 == 7)) { sVar18 = 0; } else { sVar18 = -4; }
+				else if (sVar8 == 7) { sVar18 = -4; } else { sVar18 = 0; }
 				if (sVar8 == 7) {
 					short chk = m_wmWorldState->m_mcResult;
 					if (chk != 0 && chk != sVar18 && chk != 1) {
@@ -3447,6 +3447,7 @@ void CMenuPcs::CalcLoadMenu()
 						pOff += 4;
 						iVar10 += 0x34;
 					} while (iVar14 < 8);
+
 					if (m_wmWorldState->m_menuMode != 8) {
 						m_wmWorldState->m_originalBackupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
 						m_wmWorldState->m_backupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);

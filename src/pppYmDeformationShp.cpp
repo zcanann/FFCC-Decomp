@@ -187,16 +187,16 @@ inline void setVertexPos(Vec& v0, Vec& v1, Vec& v2, Vec& v3, float halfSize, s8 
 	} else if (orientation == 1) {
 		v0.x = -halfSize;
 		v0.y = kPppYmDeformationShpZero;
-		v0.z = halfSize;
+		v0.z = -halfSize;
 		v1.x = halfSize;
 		v1.y = kPppYmDeformationShpZero;
-		v1.z = halfSize;
+		v1.z = -halfSize;
 		v2.x = halfSize;
 		v2.y = kPppYmDeformationShpZero;
-		v2.z = -halfSize;
+		v2.z = halfSize;
 		v3.x = -halfSize;
 		v3.y = kPppYmDeformationShpZero;
-		v3.z = -halfSize;
+		v3.z = halfSize;
 	}
 }
 

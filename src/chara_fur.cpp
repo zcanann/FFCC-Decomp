@@ -912,6 +912,7 @@ static inline void OpenMogHintMessage(int messageId)
  * JP Size: TODO
  */
 #pragma push
+#pragma optimization_level 3
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	int messageId = -1;

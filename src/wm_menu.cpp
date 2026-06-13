@@ -2133,10 +2133,8 @@ void CMenuPcs::CalcMCardMenu()
 		float wave = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
 		if ((int)uVar15 >= -10) {
 			int absSign = (int)uVar15 >> 0x1F;
-			int absRaw = ((int)uVar15 ^ absSign) - absSign;
-			wave = (float)(wave * (DOUBLE_803314E8 * (double)absRaw));
-			int s16 = (int)uVar15 >> 0x1F;
-			int absOff = ((int)uVar15 ^ s16) - s16;
+			int absOff = ((int)uVar15 ^ absSign) - absSign;
+			wave = (float)(wave * (DOUBLE_803314E8 * (double)absOff));
 			if (absOff < 0) absOff = 0;
 			if (absOff > 10) absOff = 10;
 			wave = wave * (float)sin((double)(FLOAT_803314bc * ((float)absOff * FLOAT_803316D4)));
@@ -6208,10 +6206,9 @@ void CMenuPcs::SetWorldParam(int code, int value)
 
 	switch (code) {
 	case 0: {
-		const unsigned char primaryMask = s_wmWorldParamPrimaryDirtyMask;
 		bytes[5] = bytes[4];
 		bytes[4] = static_cast<unsigned char>(value);
-		bytes[0xA] = primaryMask | bytes[0xA];
+		bytes[0xA] = 1 | bytes[0xA];
 		break;
 	}
 	case 1:
@@ -6236,10 +6233,9 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		bytes[9] = static_cast<unsigned char>(value);
 		break;
 	case 8: {
-		const unsigned char secondaryMask = s_wmWorldParamSecondaryDirtyMask;
 		bytes[0xB] = bytes[0xC];
 		bytes[0xC] = static_cast<unsigned char>(value);
-		bytes[0xA] = secondaryMask | bytes[0xA];
+		bytes[0xA] = 2 | bytes[0xA];
 		break;
 	}
 	case 9:
@@ -6797,13 +6793,12 @@ void CMenuPcs::CalcFukidashi()
 
 		short flagsF = *reinterpret_cast<short*>(bytes + 0x1A);
 		int cnt = 0;
-		bitIdx = 0;
 		iVar9 = BUB();
 		int sVar15 = *reinterpret_cast<short*>(iVar9 + 0x1C) + *reinterpret_cast<short*>(iVar9 + 0x20);
 		if ((flagsF & 0xF) != 0) {
 			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15;
 			*reinterpret_cast<short*>(BUB() + 0x38) = sVar15;
-			for (; bitIdx < 4; bitIdx++) {
+			for (bitIdx = 0; bitIdx < 4; bitIdx++) {
 				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << bitIdx)) != 0) {
 					cnt++;
 				}
@@ -10304,9 +10299,11 @@ void CMenuPcs::SetAnim(int anim)
 	m_wm.m_handles[handleIdx]->SetAnim(animBase - 5, -1, -1,
 	    static_cast<int>(static_cast<unsigned int>(m_wm.m_handles[handleIdx]->m_currentAnimIndex) >> 31) - 1, 1);
 
-	reinterpret_cast<float*>(animState)[3] =
+	int animOffset3 = 0xc + 0x14 * anim;
+	int animOffset4 = 0x10 + 0x14 * anim;
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wmCharaAnimState) + animOffset3) =
 	    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model) + 0xB4)[0];
-	reinterpret_cast<float*>(animState)[4] =
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wmCharaAnimState) + animOffset4) =
 	    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[handleIdx]->m_model) + 0xC0)[0];
 #undef animState
 }

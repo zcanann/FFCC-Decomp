@@ -340,7 +340,9 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		}
 		case -3: {
 			CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
-			if ((static_cast<u32>(__cntlzw(static_cast<u32>(reinterpret_cast<u8*>(engineObject) - reinterpret_cast<u8*>(object)))) >> 5) == 0) {
+			if ((static_cast<u32>(__cntlzw(static_cast<u32>(reinterpret_cast<u8*>(engineObject) - reinterpret_cast<u8*>(object)))) >> 5) != 0) {
+				object->m_flagBits.m_deleteFlag = 1;
+			} else {
 				engineObject->m_previous->m_next = engineObject->m_next;
 				engineObject->m_next->m_previous = engineObject->m_previous;
 
@@ -353,8 +355,6 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				engineObject->m_flagBits.m_constructFlag = 0;
 
 				onDeleteObject(engineObject);
-			} else {
-				object->m_flagBits.m_deleteFlag = 1;
 			}
 
 			*object->m_sp = 0;

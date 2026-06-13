@@ -701,6 +701,7 @@ void CSound::CheckDriver(int mode)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_dead_assignments off
 void CSound::Frame()
 {
     loadWaveFrame();
@@ -788,6 +789,7 @@ next:
 
     m_redSound.MusicVolume(-1, m_curMusicVolume, 0);
 }
+#pragma opt_dead_assignments reset
 
 /*
  * --INFO--
@@ -798,6 +800,7 @@ next:
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CSound::Draw()
 {
     CSoundLayout& sound = SoundData(this);
@@ -841,6 +844,7 @@ void CSound::Draw()
         sound.m_lines[i].Draw();
     }
 }
+#pragma opt_propagation reset
 
 /*
  * --INFO--

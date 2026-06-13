@@ -208,6 +208,7 @@ void CRingMenu::DrawIcon()
 
 	int uInt = iconCol % 8 * 0x30;
 	int vInt = iconCol / 8 * 0x30;
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
 	void* tlut = MenuPcs.m_externalFontTlut;
 	if (caravanWork->m_hp != 0) {
 		tlut = 0;

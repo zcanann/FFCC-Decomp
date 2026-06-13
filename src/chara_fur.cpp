@@ -1348,8 +1348,8 @@ void CChara::CModel::InitMogFurTex()
 		}
 
 		texture->InitTexObj();
-		unsigned int flagsTemp = m_flagsA0;
 		int flagsBit = 1;
+		unsigned int flagsTemp = m_flagsA0;
 		m_flagsA0 = static_cast<unsigned char>(__rlwimi(flagsTemp, flagsBit, 6, 25, 25));
 	}
 }

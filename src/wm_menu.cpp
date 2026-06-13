@@ -12031,9 +12031,9 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 	}
 
 #define halfTexel FLOAT_80331434
-	float u0;
 	float u1;
 	float v0;
+	float u0;
 	float v1;
 
 	if ((flags & 8) != 0) {
@@ -12046,17 +12046,20 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 
 	if ((flags & 4) != 0) {
 		v1 = ty + halfTexel;
-		v0 = (ty + h) - halfTexel;
+		v0 = (v1 + h) - halfTexel;
 	} else {
 		v0 = ty + halfTexel;
 		v1 = (ty + h) - halfTexel;
 	}
 
+	float wS = w * scaleX;
+	float hS = h * scaleY;
+
 	if ((flags & 1) != 0) {
-		x = x - halfTexel * (w * scaleX);
+		x = x - halfTexel * wS;
 	}
 	if ((flags & 2) != 0) {
-		y = y - halfTexel * (h * scaleY);
+		y = y - halfTexel * hS;
 	}
 #undef halfTexel
 
@@ -12067,16 +12070,16 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 	in[0].y = y;
 	in[0].z = 0.0f;
 
-	in[1].x = x + (w * scaleX);
+	in[1].x = x + wS;
 	in[1].y = y;
 	in[1].z = 0.0f;
 
 	in[2].x = x;
-	in[2].y = y + (h * scaleY);
+	in[2].y = y + hS;
 	in[2].z = 0.0f;
 
-	in[3].x = x + (w * scaleX);
-	in[3].y = y + (h * scaleY);
+	in[3].x = x + wS;
+	in[3].y = y + hS;
 	in[3].z = 0.0f;
 
 	PSMTXMultVecArray(reinterpret_cast<MtxPtr>(mtx), in, out, 4);

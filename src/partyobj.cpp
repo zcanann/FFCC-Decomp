@@ -2263,6 +2263,8 @@ int CGPartyObj::getReplaceStat(int state)
 	return state;
 }
 
+#pragma push
+#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8011ff8c
@@ -2475,6 +2477,7 @@ void CGPartyObj::statCharge()
 		}
 	}
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -3085,6 +3088,8 @@ void CGPartyObj::checkTargetParticle()
 	}
 }
 
+#pragma push
+#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8011E870
@@ -3154,6 +3159,7 @@ void CGPartyObj::moveCenterTargetParticle()
 	CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 	work->m_targetCursorPosA = hitPos;
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -4388,6 +4394,8 @@ unsigned int CGPartyObj::IsDispRader()
 	return result;
 }
 
+#pragma push
+#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8011c59c
@@ -4424,6 +4432,7 @@ void CGPartyObj::ChangeCommandMode(int mode)
 		}
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

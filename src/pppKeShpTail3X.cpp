@@ -265,12 +265,12 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     nextBaseY = history[nextIndex].y;
     segDz = nextBaseZ - posZ;
     segDy = nextBaseY - posY;
-    initialSeg.x = segDx;
-    initialSeg.y = segDy;
-    initialSeg.z = segDz;
     zeroVecA.z = kPppKeShpTail3XZero;
     zeroVecA.y = kPppKeShpTail3XZero;
     zeroVecA.x = kPppKeShpTail3XZero;
+    initialSeg.x = segDx;
+    initialSeg.y = segDy;
+    initialSeg.z = segDz;
     segLen = PSVECDistance(&zeroVecA, &initialSeg);
     segRemain = segLen;
     life = work->m_shapeData;

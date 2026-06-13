@@ -365,7 +365,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2B:
 		{
-			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(out, FlatNameDirect(2, CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 4;
@@ -373,7 +373,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2C:
 		{
-			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(out, FlatNameDirect(3, CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 4;
@@ -381,7 +381,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2D:
 		{
-			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)(op + 2));
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
 			strcpy(out, (Game.m_cFlatDataArr[1].TableStrings(3) + 0x3C)[CMes::m_tempVar[varIndex]]);
 			out += strlen(out);
 			src += 4;
@@ -389,7 +389,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 		case 0x2E:
 		{
-			signed char varIndex = (unsigned char)GetMesNibbleValue((const char*)op);
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
 			strcpy(out, FlatNameDirect(5, CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 2;

@@ -443,10 +443,10 @@ void CMenuPcs::CmdInit0()
  */
 void CMenuPcs::CmdInit1()
 {
+	s16 y = 0;
 	s32 tex = 0x2f;
 	s32 idx = static_cast<s32>(GetCmdListStorage(this)->count);
 	CmdListEntry* entry;
-	s16 y = 0;
 
 	entry = &GetCmdListStorage(this)->entries[idx++];
 	entry->tex = 0x2e;

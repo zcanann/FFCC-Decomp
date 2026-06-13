@@ -13,6 +13,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" void CGMonObj_ResetActionState(CGMonObj*);
+extern "C" int getItemPdt__10CGCharaObjFiiRiRiRi(CGCharaObj*);
 static const float kMonObjBossZero = 0.0f;
 extern const double kMonObjBossHalfF64 = 0.5;
 extern const double kMonObjBossThreeF64 = 3.0;
@@ -168,70 +169,298 @@ struct MeteoParasiteCGameFlags {
 
 /*
  * --INFO--
- * PAL Address: 0x80132f68
- * PAL Size: 404b
+ * PAL Address: TODO
+ * PAL Size: TODO
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::damagedFuncGiantCrab()
+inline void CGMonObj::suikomiSub(CGObject*, float)
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	*reinterpret_cast<int*>(CGMonObj::m_boss) = 1;
-
-	switch (m_actionBranch) {
-	case 0: {
-		unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-		if (script[0x1C / 2] >= ((script[0x1A / 2] * 2) / 3)) {
-			return;
-		}
-		object->DispCharaParts(3);
-		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0C, 0, object, kMonObjBossOne, 0);
-		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x4E36, 0x32, 500, 0, 0);
-		break;
-	}
-	case 1: {
-		unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-		if (script[0x1C / 2] >= (script[0x1A / 2] / 3)) {
-			return;
-		}
-		object->DispCharaParts(1);
-		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0D, 0, object, kMonObjBossOne, 0);
-		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x4E37, 0x32, 500, 0, 0);
-		break;
-	}
-	default:
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	unsigned char* target = reinterpret_cast<unsigned char*>(Game.unk_flat3_0xc7d0);
+	if (target == 0) {
 		return;
 	}
 
-	reinterpret_cast<CGPrgObj*>(this)->changeStat(4, 0, 0);
-	m_actionBranch = m_actionBranch + 1;
-	m_unk6C8 = 0;
+	float dx = *(float*)(self + 0x15c) - *(float*)(target + 0x15c);
+	float dz = *(float*)(self + 0x164) - *(float*)(target + 0x164);
+	float distSq = dx * dx + dz * dz;
+	double dist = (double)distSq;
+
+	if (dist <= (double)kMonObjBossZero) {
+		if (kMonObjBossZeroF64 <= dist) {
+			unsigned int exp = (unsigned int)distSq & 0x7f800000;
+			int fpClass;
+			if (exp == 0x7f800000) {
+				fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 2 : 1;
+			} else if ((exp < 0x7f800000) && (exp == 0)) {
+				fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 3 : 5;
+			} else {
+				fpClass = 4;
+			}
+			if (fpClass == 1) {
+				dist = NAN;
+			}
+		} else {
+			dist = NAN;
+		}
+	} else {
+		double inv = (double)kMonObjBossOne / sqrt(dist);
+		inv = kMonObjBossHalfF64 * inv * -(dist * inv * inv - kMonObjBossThreeF64);
+		inv = kMonObjBossHalfF64 * inv * -(dist * inv * inv - kMonObjBossThreeF64);
+		dist = (double)(float)(dist * kMonObjBossHalfF64 * inv * -(dist * inv * inv - kMonObjBossThreeF64));
+	}
+
+	if ((double)kMonObjBossZero < dist) {
+		float accel = (float)((double)kMonObjBossOne / dist) * kMonObjBossQuarter *
+		              (float)(dist / (double)kMonObjBossLargeBodyRadius);
+		*(float*)(target + 0x104) += dx * accel;
+		*(float*)(target + 0x10c) += dz * accel;
+	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80132e80
- * PAL Size: 232b
+ * PAL Address: 0x8012e5dc
+ * PAL Size: 992b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::logicFuncGiantCrab()
+void CGMonObj::suikomi(int endFrame, float zOffset)
 {
-	int nextState = -1;
+	CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-	if (*reinterpret_cast<int*>(CGMonObj::m_boss) != 0) {
-		*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
-		if ((m_actionBranch == 0 && static_cast<unsigned int>(Math.Rand(10)) < 1) ||
-		    (m_actionBranch == 1 && static_cast<unsigned int>(Math.Rand(10)) < 2) ||
-		    (m_actionBranch == 2 && static_cast<unsigned int>(Math.Rand(10)) < 3)) {
-			nextState = 100;
+	if (prgObj->m_stateFrame == 0) {
+		prgObj->playSe3D(0xdec0, 0x32, 0x1c2, 0, 0);
+		for (int i = 0; i < 4; i++) {
+			CGPartyObj* party = Game.m_partyObjArr[i];
+			if (party != 0) {
+				CFlat.ResetParticleWork(0x26, *(int*)(self + 0x58c));
+				CFlat.SetParticleWorkTrace(this);
+				CFlat.SetParticleWorkBind(party);
+				CFlat.PutParticleWork();
+			}
+		}
+	}
+
+	if (prgObj->m_stateFrame <= endFrame) {
+		for (int i = 0; i < 4; i++) {
+			CGPartyObj* party = Game.m_partyObjArr[i];
+			if (party != 0) {
+				float dx = *(float*)(self + 0x15c) - *(float*)((unsigned char*)party + 0x15c);
+				float dz =
+				    zOffset + (*(float*)(self + 0x164) - *(float*)((unsigned char*)party + 0x164));
+				float distSq = dx * dx + dz * dz;
+				float dist = sqrtf(distSq);
+
+				if (kMonObjBossZero < dist) {
+					float accel = kMonObjBossOne / dist * (kMonObjBossQuarter * (dist / kMonObjBossLargeBodyRadius));
+					float ax = dx * accel;
+					float az = dz * accel;
+					*(float*)((unsigned char*)party + 0x104) += ax;
+					*(float*)((unsigned char*)party + 0x10c) += az;
+				}
+			}
+		}
+
+		if ((Game.unk_flat3_0xc7d0 != 0) && (*(unsigned int*)(Game.unk_flat3_0xc7d0 + 0x550) == 0)) {
+			unsigned int target = Game.unk_flat3_0xc7d0;
+			float dx = *(float*)(self + 0x15c) - *(float*)(target + 0x15c);
+			float dz = zOffset + (*(float*)(self + 0x164) - *(float*)(target + 0x164));
+			float distSq = dx * dx + dz * dz;
+			float dist = sqrtf(distSq);
+
+			if (kMonObjBossZero < dist) {
+				float accel = kMonObjBossOne / dist * (kMonObjBossQuarter * (dist / kMonObjBossLargeBodyRadius));
+				float ax = dx * accel;
+				float az = dz * accel;
+				*(float*)(target + 0x104) += ax;
+				*(float*)(target + 0x10c) += az;
+			}
+		}
+
+		if (prgObj->m_stateFrame == endFrame) {
+			chara->endPSlotBit(0x400);
+		}
+	}
+
+	chara->statAttack();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012e9bc
+ * PAL Size: 1360b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma global_optimizer off
+void CGMonObj::teleport(
+	int mode, int animId, int startFrame, int blendEndFrame, int seStart, int seEnd, int particleStart, int particleBlend, int particleEnd,
+	Vec* teleportPoints, int& teleportIndex, Vec& startPos
+)
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+#define object (reinterpret_cast<CGObject*>(prgObj))
+#define mon (reinterpret_cast<unsigned char*>(prgObj))
+	const int blendStartFrame = startFrame + 8;
+	const int blendEndPlusFrame = blendEndFrame + 8;
+	const int blendFrameCount = blendEndFrame - blendStartFrame;
+
+	if (m_stateFrame == 0) {
+		int pdtNo;
+		m_bgColMask &= 0xFFF3FFFC;
+		m_weaponNodeFlagBits.m_unk10 = 0;
+		m_groundHitOffset.z = kMonObjBossZero;
+		m_groundHitOffset.y = kMonObjBossZero;
+		m_groundHitOffset.x = kMonObjBossZero;
+
+		reqAnim(animId, 0, 0);
+		playSe3D(seStart, 0x32, 0x1C2, 0, 0);
+
+			pdtNo = m_charaModelHandle->GetPdtSlot();
+		putParticle(particleStart | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), this, kMonObjBossOne, 0);
+
+		if (mode == 0) {
+			pdtNo = m_charaModelHandle->GetPdtSlot();
+			putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &m_worldPosition, kMonObjBossOne, 0);
+		} else {
+			pdtNo = m_charaModelHandle->GetPdtSlot();
+			putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), this, kMonObjBossOne, 0);
+		}
+	}
+
+#define stateFrame (prgObj->m_stateFrame)
+
+	if (stateFrame <= blendStartFrame) {
+		if (startFrame <= stateFrame) {
+			const float angle = kMonObjBossHalfPi * static_cast<float>(stateFrame - startFrame) * kMonObjBossOneEighth;
+			const float wave = static_cast<float>(cos(angle));
+			m_rotationZ = wave;
+			m_rotationX = wave;
+			m_rotationY = kMonObjBossOne + static_cast<float>(sin(angle));
+		}
+	} else {
+		if (stateFrame <= blendEndFrame) {
+			if (stateFrame == blendStartFrame + 1) {
+				int nextIndex;
+				do {
+					nextIndex = Math.Rand(4);
+				} while (nextIndex == teleportIndex);
+
+				teleportIndex = nextIndex;
+				startPos = m_worldPosition;
+
+				if (mode == 1) {
+					m_displayFlags &= 0xFFFFFFFE;
+				}
+			}
+
+			const float ratio = static_cast<float>(stateFrame - blendStartFrame) / static_cast<float>(blendFrameCount);
+			const float blend = kMonObjBossHalf * (kMonObjBossOne + static_cast<float>(cos(kMonObjBossPi * ratio)));
+			const CVector& point = CVector(teleportPoints[teleportIndex]);
+			CVector scaledPoint;
+			PSVECScale(reinterpret_cast<Vec*>(const_cast<CVector*>(&point)), reinterpret_cast<Vec*>(&scaledPoint), kMonObjBossOne - blend);
+
+			Vec scaledPointCopy;
+			scaledPointCopy.x = scaledPoint.x;
+			scaledPointCopy.y = scaledPoint.y;
+			scaledPointCopy.z = scaledPoint.z;
+
+			const CVector& current = CVector(m_worldPosition);
+			CVector scaledCurrent;
+			PSVECScale(reinterpret_cast<Vec*>(const_cast<CVector*>(&current)), reinterpret_cast<Vec*>(&scaledCurrent), blend);
+
+			Vec scaledCurrentCopy;
+			scaledCurrentCopy.x = scaledCurrent.x;
+			scaledCurrentCopy.y = scaledCurrent.y;
+			scaledCurrentCopy.z = scaledCurrent.z;
+
+			CVector blended;
+			PSVECAdd(&scaledCurrentCopy, &scaledPointCopy, reinterpret_cast<Vec*>(&blended));
+			Vec blendedCopy;
+			blendedCopy.x = blended.x;
+			blendedCopy.y = blended.y;
+			blendedCopy.z = blended.z;
+			m_worldPosition.x = blendedCopy.x;
+			m_worldPosition.y = blendedCopy.y;
+			m_worldPosition.z = blendedCopy.z;
+
+			if (mode == 1 && stateFrame == blendEndFrame - 0x2A) {
+				int pdtNo = m_charaModelHandle->GetPdtSlot();
+				putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &teleportPoints[teleportIndex], kMonObjBossOne, 0);
+				playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
+			}
+		} else if (stateFrame <= blendEndPlusFrame) {
+			if (stateFrame == blendEndFrame + 1) {
+				if (mode == 0) {
+					int pdtNo = m_charaModelHandle->GetPdtSlot();
+					putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &m_worldPosition, kMonObjBossOne, 0);
+					playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
+				}
+
+				m_bgColMask |= 3;
+				m_weaponNodeFlagBits.m_unk10 = 1;
+				m_groundHitOffset.z = kMonObjBossZero;
+				m_groundHitOffset.y = kMonObjBossZero;
+				m_groundHitOffset.x = kMonObjBossZero;
+
+				if (mode == 1) {
+					m_displayFlags |= 1;
+				}
+			}
+
+			const float angle = kMonObjBossHalfPi * (kMonObjBossOne - static_cast<float>(stateFrame - blendEndFrame) * kMonObjBossOneEighth);
+			const float wave = static_cast<float>(cos(angle));
+			m_rotationZ = wave;
+			m_rotationX = wave;
+			m_rotationY = kMonObjBossOne + static_cast<float>(sin(angle));
+
+			if (stateFrame == blendEndPlusFrame) {
+				m_bgColMask |= 0xC0000;
+				setAttackAfter(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560));
+			}
+		}
+	}
+}
+#undef object
+#undef mon
+#undef stateFrame
+#pragma global_optimizer on
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012ef0c
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::logicFuncLastBoss()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int nextState = -1;
+
+	if (m_actionBranch == 2) {
+		int& timer = *reinterpret_cast<int*>(CGMonObj::m_boss + 0x24);
+		timer += 1;
+		if (timer >= 10) {
+			m_actionBranch = 3;
+			nextState = 0x65;
+			m_unk6C8 = 0;
+			object->m_bgColMask &= 0xFFF7FFFF;
+			timer = 0;
 		}
 	}
 
@@ -244,16 +473,2235 @@ void CGMonObj::logicFuncGiantCrab()
 
 /*
  * --INFO--
- * PAL Address: 0x80132e78
- * PAL Size: 8b
+ * PAL Address: 0x8012ef94
+ * PAL Size: 20b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGMonObj::calcBranchFuncGiantCrab(int)
+int CGMonObj::calcBranchFuncLastBoss(int)
 {
-	return m_actionBranch;
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	return (m_actionBranch != 0) ? 1 : 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012efa8
+ * PAL Size: 1088b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncLastBoss()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	Mtx nodeMtx;
+	CChara::CModel* model = object->m_charaModelHandle->m_model;
+	CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
+	PSMTXCopy(nodes[1]->m_mtx, nodeMtx);
+
+	Vec* bossPos = reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x18);
+	nodeMtx[0][3] += model->m_drawMtx[0][3];
+	nodeMtx[1][3] += model->m_drawMtx[1][3];
+	nodeMtx[2][3] += model->m_drawMtx[2][3];
+	bossPos->x = nodeMtx[0][3];
+	bossPos->y = nodeMtx[1][3];
+	bossPos->z = nodeMtx[2][3];
+
+	const int state = prgObj->m_lastStateId;
+
+	switch (state) {
+	case 100:
+		if (prgObj->m_stateFrame == 0) {
+			reinterpret_cast<CGCharaObj*>(this)->damageDelete();
+			object->m_bgColMask &= 0xFFF7FFFF;
+			prgObj->reqAnim(0x18, 0, 0);
+
+			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x10, 0, object, kMonObjBossOne, 0);
+			prgObj->playSe3D(0x12912, 0x32, 0x96, 0, 0);
+		} else if (prgObj->m_stateFrame == 0x7D) {
+			object->m_bodyEllipsoidRadius = kMonObjBossRightAngleDeg;
+		} else if (prgObj->isLoopAnim() != 0) {
+			object->m_bgColMask |= 0x80000;
+			object->SetAnimSlot(0x12, 0);
+			object->SetAnimSlot(0x14, 1);
+			object->SetAnimSlot(0x16, 4);
+			prgObj->changeStat(0, 0, 0);
+			m_actionBranch = 2;
+		}
+		return;
+	case 0x65:
+		if (prgObj->m_stateFrame == 0) {
+			object->m_bgColMask &= 0xFFF7FFFF;
+			prgObj->reqAnim(0x19, 0, 0);
+
+			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x11, 0, object, kMonObjBossOne, 0);
+			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x12, 0, object, kMonObjBossOne, 0);
+			prgObj->playSe3D(0x12913, 0x32, 0x96, 0, 0);
+		} else if (prgObj->m_stateFrame == 0x29) {
+			object->m_bodyEllipsoidRadius = kMonObjBossLichTeleportHeight;
+		} else if (prgObj->isLoopAnim() != 0) {
+			object->m_bgColMask |= 0x80000;
+			prgObj->changeStat(0, 0, 0);
+			object->SetAnimSlot(0x13, 0);
+			object->SetAnimSlot(0x15, 1);
+			object->SetAnimSlot(0x17, 4);
+			m_actionBranch = 0;
+		}
+		return;
+	case 0x66:
+		if (prgObj->m_stateFrame == 0) {
+			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 5, *reinterpret_cast<int*>(mon + 0x58C), object, kMonObjBossOne, 0x12902);
+		} else if (prgObj->m_stateFrame == 0x4B) {
+			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
+			for (int i = 0; i < 4; i++) {
+				CGPartyObj* party = work[i + 2];
+				if (party != 0) {
+					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
+					if (partyPrg->m_lastStateId == 0x24) {
+						if (fabs(prgObj->getTargetRot(partyPrg)) < kMonObjBossQuarterPiF64) {
+							partyPrg->changeStat(0x25, 0, 0);
+						}
+					}
+				}
+			}
+		} else if (prgObj->m_stateFrame == 200) {
+			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
+			for (int i = 0; i < 4; i++) {
+				CGPartyObj* party = work[i + 2];
+				if (party != 0) {
+					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
+					if (partyPrg->m_lastStateId == 0x25) {
+						partyPrg->changeStat(0x24, 0, 0);
+					}
+				}
+			}
+			reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		}
+
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		return;
+	default:
+		return;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012f3e8
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::cancelStatFuncLastBoss()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	switch (prgObj->m_lastStateId) {
+	case 0x66: {
+		CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
+		for (int i = 0; i < 4; i++) {
+			CGPartyObj* party = work[i + 2];
+			if (party != 0) {
+				CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
+				if (partyPrg->m_lastStateId == 0x25) {
+					partyPrg->changeStat(0x24, 0, 0);
+				}
+			}
+		}
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
+	}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012f480
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::changeStatFuncLastBoss(int stat)
+{
+	switch (stat) {
+	case 0x66:
+		setActionParam(-7);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012f4b0
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::damagedFuncLastBoss()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int& timer = *reinterpret_cast<int*>(CGMonObj::m_boss + 0x24);
+	if (timer >= 100 && m_actionBranch == 0) {
+		m_actionBranch = 1;
+		m_unk6C8 = 0;
+		prgObj->changeStat(100, 0, 0);
+		object->m_bgColMask &= 0xFFF7FFFF;
+		timer = 0;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012f534
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::initFinishedFuncLastBoss()
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	initFinishedFuncDefault();
+	*reinterpret_cast<CGMonObj**>(CGMonObj::m_boss) = this;
+
+	int nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sCrystalItemNodeName));
+	CChara::CModel* model = object->m_charaModelHandle->m_model;
+	*reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss + 4) = model->m_nodes + nodeIndex;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012f598
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncRamoe()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	switch (prgObj->m_lastStateId) {
+	case 100:
+		if (prgObj->m_stateFrame == 0x3A) {
+			unsigned int* scriptWork = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&Game) + 4);
+			for (int i = 1; i < 0x40; i++, scriptWork++) {
+				CGMonObj* monObj = reinterpret_cast<CGMonObj*>(scriptWork[0xC5D0 / 4]);
+				CGPrgObj* monPrg = reinterpret_cast<CGPrgObj*>(monObj);
+				if (monObj != 0 && monPrg->m_lastStateId == 9 && monPrg->m_subState == 2) {
+					monObj->setRepop(0);
+				}
+			}
+		}
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012f644
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::cancelStatFuncRamoe()
+{
+	return;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012f648
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::changeStatFuncRamoe(int stat)
+{
+	switch (stat) {
+	case 100:
+		setActionParam(-9);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012f678
+ * PAL Size: 308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::logicFuncRamoe()
+{
+	unsigned int* scriptWork = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&Game) + 4);
+	int activeCount = 0;
+	int nextState = -1;
+
+	for (int i = 1; i < 0x40; scriptWork++, i++) {
+		CGPrgObj* monObj = reinterpret_cast<CGPrgObj*>(scriptWork[0xC5D0 / 4]);
+		if (monObj != 0 && (monObj->m_lastStateId != 9 || monObj->m_subState != 2)) {
+			activeCount++;
+		}
+	}
+
+	if (activeCount == 0 && static_cast<unsigned int>(Math.Rand(3)) == 0) {
+		nextState = 100;
+	}
+
+	if (nextState != -1) {
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
+	} else {
+		logicFuncDefault();
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012f7ac
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::damagedFuncDuct()
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	void* scriptKind = object->m_scriptHandle[4];
+	CCharaPcs::CLoadPdt* loadPdt = object->m_charaModelHandle->m_pdtLoadRef;
+	int slot = reinterpret_cast<int>(scriptKind) - 0x8E;
+	int pdtNo = loadPdt != 0 ? loadPdt->m_pdtSlot : -1;
+	reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 2, 0, reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0);
+
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x1C) == 0) {
+		CGObject* bossObj = *reinterpret_cast<CGObject**>(CGMonObj::m_boss + 0x68);
+		CChara::CModel* model = bossObj->m_charaModelHandle->m_model;
+		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss + 0x8);
+		int dispIndex = model->GetDispIndex(nodes[slot]);
+		model->m_meshVisibleMask &= ~(1 << dispIndex);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012f870
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::initFinishedFuncDuct()
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	initFinishedFuncDefault();
+	const int slot = static_cast<int>(reinterpret_cast<long>(object->m_scriptHandle[4])) - 0x8E;
+	reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x38)[slot] = this;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012f8bc
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::aiAddDuct(int& seq)
+{
+	if (static_cast<unsigned int>(Math.Rand(300)) == 0) {
+		aiTarget();
+		aiSeq(-14, seq, 0, 1, 100, -1);
+		aiSeq(-13, seq, 1, 0, 100, -1);
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(Math.Rand(3) + 0x11D40, 0x32, 0x96, 0, 0);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012f984
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::attackCheckFuncMeteoParasite(int)
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int scriptState = reinterpret_cast<int>(object->m_scriptHandle[4]);
+
+	switch (scriptState) {
+	case 0x85:
+		return -2;
+	case 0x86:
+		if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == 1 && m_actionBranch == 1) {
+			return -1;
+		}
+		return -2;
+	case 0x87:
+		if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == 2 && m_actionBranch < 2) {
+			return -1;
+		}
+		return -2;
+	default:
+		return -1;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012fa20
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::logicFuncMeteoParasite()
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
+	int nextState = -1;
+
+	if (work->bits.m_meteo3) {
+		nextState = 0x68;
+	} else {
+		switch (reinterpret_cast<int>(object->m_scriptHandle[4])) {
+		case 0x87:
+			if (work->m_coreIndex == 2 && m_actionBranch < 2) {
+				if (work->m_objs[3]->m_lastStateId >= 100) {
+					return;
+				}
+				if (work->bits.m_bit80) {
+					return;
+				}
+			}
+			break;
+		}
+	}
+
+	if (nextState != -1) {
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
+	} else {
+		logicFuncDefault();
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012fad0
+ * PAL Size: 504b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncMeteoParasite()
+{
+	int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	int state = prgObj->m_lastStateId;
+
+	switch (state) {
+	case 100:
+		if (prgObj->m_stateFrame == 0) {
+			prgObj->reqAnim(10, 0, 0);
+		} else if (prgObj->isLoopAnim() != 0) {
+			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0xB, 0);
+			prgObj->changeStat(0, 0, 0);
+		}
+		break;
+	case 0x65:
+		if (prgObj->m_stateFrame == 0) {
+			prgObj->reqAnim(0xC, 0, 0);
+		} else if (prgObj->isLoopAnim() != 0) {
+			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);
+			prgObj->changeStat(0, 0, 0);
+		}
+		break;
+	case 0x66:
+		if (prgObj->m_stateFrame == 0) {
+			prgObj->reqAnim(0xD, 0, 0);
+		} else if (prgObj->isLoopAnim() != 0) {
+			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0xE, 0);
+			prgObj->changeStat(0, 0, 0);
+		}
+		break;
+	case 0x68:
+		break;
+	}
+
+	switch (scriptKind) {
+	case 0x87:
+		switch (prgObj->m_lastStateId) {
+		case 0x67: {
+			int frame = prgObj->m_stateFrame;
+			if (frame >= 0x19 && frame < 0x32) {
+				if (frame == 0x19) {
+					prgObj->playSe3D(0x11D5B, 0x32, 0x96, 0, 0);
+				}
+				if (prgObj->m_stateFrame % 3 == 0) {
+					CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
+					chara->putParticleFromItem(chara->m_itemId, 2, chara->m_particleSlots[0], 0);
+				}
+			}
+			reinterpret_cast<CGCharaObj*>(this)->statAttack();
+			break;
+		}
+		}
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012fcc8
+ * PAL Size: 796b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::alwaysFuncMeteoParasite()
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	const int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
+
+	switch (scriptKind) {
+	case 0x85:
+		if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 == 0) {
+			if (g_errCt == 0) {
+				g_errCt = 1;
+				MG_GBA_THREAD_MSG_SETPORT_ct = kMonObjBossZero;
+			}
+
+			PSMTXRotRad(reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[0]->m_localRuntimeMtx, 'x',
+			            MG_GBA_THREAD_MSG_SETPORT_ct);
+			PSMTXRotRad(reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[1]->m_localRuntimeMtx, 'x',
+			            -MG_GBA_THREAD_MSG_SETPORT_ct);
+
+			CGObject** rotObjects = reinterpret_cast<CGObject**>(CGMonObj::m_boss);
+			for (int i = 0; i < 12; i++) {
+				rotObjects[i + 14]->m_rotTargetY =
+				    kMonObjBossTwo * (kMonObjBossPi * static_cast<float>(i + 3)) / kMonObjBossTwelve +
+				    MG_GBA_THREAD_MSG_SETPORT_ct;
+			}
+
+			MG_GBA_THREAD_MSG_SETPORT_ct += kMonObjBossScaleStep;
+		}
+		break;
+	}
+
+	switch (scriptKind) {
+	case 0x85:
+	case 0x86:
+	case 0x87:
+		if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == scriptKind - 0x85 &&
+		    reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) {
+			if (getItemPdt__10CGCharaObjFiiRiRiRi(reinterpret_cast<CGCharaObj*>(this)) != 0) {
+				if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 0) {
+					reinterpret_cast<CGPrgObj*>(this)->changeStat(100, 0, 0);
+					m_actionBranch = 0;
+				}
+				if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 2) {
+					reinterpret_cast<CGPrgObj*>(this)->changeStat(0x65, 0, 0);
+					m_actionBranch = 2;
+				}
+				if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 1) {
+					reinterpret_cast<CGPrgObj*>(this)->changeStat(0x66, 0, 0);
+					m_actionBranch = 1;
+				}
+				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 0;
+			}
+		}
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012ffe4
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::changeStatFuncMeteoParasite(int stat)
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
+	switch (scriptKind) {
+	case 0x87:
+		switch (stat) {
+		case 0x67: {
+			CGMonObj* meteoC = *reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x74);
+			if (meteoC->m_actionBranch == 1) {
+				setActionParam(-13);
+			} else {
+				setActionParam(-14);
+			}
+			break;
+		}
+		}
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013004c
+ * PAL Size: 444b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::initFinishedFuncMeteoParasite()
+{
+	initFinishedFuncDefault();
+
+	const int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
+	switch (scriptKind) {
+	case 0x85: {
+		CGObject* object = reinterpret_cast<CGObject*>(this);
+		int nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sLichTeleportNodeA));
+		CChara::CNode* node = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
+		reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[0] = node;
+		node->m_flagsBits.m_flag_80 = 0;
+
+		nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sLichTeleportNodeB));
+		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
+		nodes[1] = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
+		nodes[1]->m_flagsBits.m_flag_80 = 0;
+
+		char nodeName[256];
+		for (int i = 0; i < 12; i++) {
+			sprintf(nodeName, sLichTeleportNodeFormat, i + 1);
+			nodeIndex = object->m_charaModelHandle->m_model->SearchNode(nodeName);
+			nodes[i + 2] = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
+			if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 != 0) {
+				int dispIndex = object->m_charaModelHandle->m_model->GetDispIndex(nodes[i + 2]);
+				object->m_charaModelHandle->m_model->m_meshVisibleMask &= ~(1 << dispIndex);
+			}
+		}
+		break;
+	}
+	}
+
+	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
+	int objIndex = scriptKind - 0x85;
+	work->m_objs[objIndex] = reinterpret_cast<CGPrgObj*>(this);
+
+	if (work->bits.m_meteo3 != 0) {
+		reinterpret_cast<CGObject*>(this)->SetAnimSlot(scriptKind == 0x87 ? 0x0D : 0x0E, 0);
+		reinterpret_cast<CGPrgObj*>(this)->reqAnim(0, 1, 0);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80130208
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::attackCheckFuncMeteoParasiteC(int)
+{
+	const int branch = m_actionBranch;
+	return (((branch - 1) | (1 - branch)) >> 31) - 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80130224
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::logicFuncMeteoParasiteC()
+{
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int nextState = -1;
+	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
+	if (work->bits.m_meteo3 != 0) {
+		nextState = 0x68;
+	} else {
+		work->m_wait = (work->m_wait - 1) & ~((work->m_wait - 1) >> 31);
+		if (m_actionBranch == 0) {
+			if (work->m_wait == 0) {
+				nextState = 0x65;
+			} else {
+				return;
+			}
+		}
+	}
+	if (nextState != -1) {
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
+	} else {
+		logicFuncDefault();
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801302b8
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::calcBranchFuncMeteoParasiteC(int)
+{
+	return *reinterpret_cast<int*>(CGMonObj::m_boss + 0x78);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801302c8
+ * PAL Size: 1008b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncMeteoParasiteC()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+
+	int state = prgObj->m_lastStateId;
+	switch (state) {
+	case 0x65:
+		if (prgObj->m_subState == 0) {
+			if (prgObj->m_subFrame == 0) {
+				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 1;
+				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreMode = 0;
+			} else if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 == 0) {
+				prgObj->addSubStat();
+			}
+		} else if (prgObj->m_subState == 1) {
+			if (prgObj->m_subFrame == 0) {
+				prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 0x16, 0, 0);
+				prgObj->playSe3D(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex * 2 + 0x11D35, 0x32, 0x96, 0, 0);
+			} else if (prgObj->isLoopAnim() != 0) {
+				reinterpret_cast<CGObject*>(this)->SetAnimSlot(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 0x19, 0);
+				prgObj->changeStat(0, 0, 0);
+				m_actionBranch = 1;
+				reinterpret_cast<CGObject*>(this)->m_bgColMask |= 0x80000;
+			}
+		}
+		return;
+	case 0x67: {
+		int subState = prgObj->m_subState;
+		if (subState == 0) {
+			if (prgObj->m_subFrame == 0) {
+				reinterpret_cast<CGCharaObj*>(this)->damageDelete();
+				prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex * 3 + 0x1C, 0, 0);
+			} else if (prgObj->isLoopAnim() != 0) {
+				prgObj->changeSubStat(1);
+			}
+		} else if (subState == 1) {
+			if (prgObj->m_subFrame == 0) {
+				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 1;
+				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreMode = 1;
+				prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex * 3 + 0x1D, 1, 0);
+			} else if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 == 0) {
+				prgObj->changeSubStat(2);
+			}
+		} else if (subState == 2) {
+			if (prgObj->m_subFrame == 0) {
+				prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex * 3 + 0x1E, 0, 0);
+				prgObj->playSe3D(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex * 2 + 0x11D34, 0x32, 0x96, 0, 0);
+			} else if (prgObj->isLoopAnim() != 0) {
+				reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);
+				prgObj->changeStat(0, 0, 0);
+				m_actionBranch = 0;
+				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreWait = 0x177;
+				m_unk6C8 = 0;
+			}
+		}
+		return;
+	}
+	default:
+		if (prgObj->m_stateFrame == 0) {
+			reinterpret_cast<CGCharaObj*>(this)->damageDelete();
+			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)
+			    ->m_objs[reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex]
+			    ->changeStat(0x65, 0, 0);
+			prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 0x25, 0, 0);
+			CFlatBossState() = CFlatBossState() + 1;
+			reinterpret_cast<MeteoParasiteCGameFlags*>(&CFlatGameFlags())->bits.m_bit5 = 1;
+		} else if (prgObj->isLoopAnim() != 0) {
+			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);
+			prgObj->changeStat(0, 0, 0);
+			m_actionBranch = 0;
+			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreWait = 0x177;
+			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex =
+			    reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 1;
+			if (3 <= reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex) {
+				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex = 0;
+			}
+			m_unk6C8 = 0;
+		}
+		return;
+	case 0x68:
+		if (prgObj->m_stateFrame == 0) {
+			prgObj->reqAnim(0x35, 1, 0);
+		}
+		return;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801306b8
+ * PAL Size: 284b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::damagedFuncMeteoParasiteC()
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
+
+	if (work->bits.m_meteo3 == 0) {
+		if (((work->m_coreIndex == 0) &&
+		     (reinterpret_cast<unsigned short*>(object->m_scriptHandle)[0x1C / 2] <
+		      ((reinterpret_cast<unsigned short*>(object->m_scriptHandle)[0x1A / 2] * 2) / 3))) ||
+		    ((work->m_coreIndex == 1) &&
+		     (reinterpret_cast<unsigned short*>(object->m_scriptHandle)[0x1C / 2] <
+		      (reinterpret_cast<unsigned short*>(object->m_scriptHandle)[0x1A / 2] / 3)))) {
+			*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) = 0;
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x66, 0, 0);
+			object->m_bgColMask &= 0xFFF7FFFF;
+		} else if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) >= 0x32) {
+			*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) = 0;
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x67, 0, 0);
+			object->m_bgColMask &= 0xFFF7FFFF;
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801307d4
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::initFinishedFuncMeteoParasiteC()
+{
+	initFinishedFuncDefault();
+	*reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x74) = this;
+
+	if (strcmp(Game.m_currentScriptName, sMeteoParasiteScriptName) == 0) {
+		MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
+		CGObject* object = reinterpret_cast<CGObject*>(this);
+		work->bits.m_meteo3 = 1;
+		work->m_index = 3;
+		*reinterpret_cast<u16*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) = 1;
+		object->SetAnimSlot(0x35, 0);
+		reinterpret_cast<CGPrgObj*>(this)->reqAnim(0x35, 1, 0);
+		object->PlayAnim(0x35, 1, 0, -1, -1, 0);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80130898
+ * PAL Size: 336b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncMolbol()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
+	u8* self = reinterpret_cast<u8*>(this);
+	int state = prgObj->m_lastStateId;
+
+	switch (state) {
+	case 100:
+		suikomi(0x53, kMonObjBossZero);
+		break;
+	case 0x65:
+		if (prgObj->m_stateFrame == 0 || prgObj->m_stateFrame == 5 || prgObj->m_stateFrame == 10) {
+			CVector pos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
+			pos.x += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
+			pos.z += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
+			charaObj->putParticleFromItem(charaObj->m_itemId, 3, charaObj->m_particleSlots[0], reinterpret_cast<Vec*>(&pos));
+		}
+		charaObj->statAttack();
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801309e8
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::cancelStatFuncMolbol()
+{
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80130a1c
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::changeStatFuncMolbol(int stat)
+{
+	switch (stat) {
+	case 100:
+		setActionParam(-13);
+		break;
+	case 101:
+		setActionParam(-14);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80130a64
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::damagedFuncWifeLamia()
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+	if (script[14] <= 1) {
+		reinterpret_cast<CGCharaObj*>(this)->ClearAllSta();
+		object->m_bgColMask &= 0xFFF7FFFF;
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(100, 0, 0);
+		m_actionBranch = 1;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80130ac8
+ * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncWifeLamia()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+
+	switch (prgObj->m_lastStateId) {
+	case 100:
+		if (prgObj->m_subState == 0) {
+			if (prgObj->m_subFrame == 0) {
+				memset(&m_moveWork, 0, sizeof(m_moveWork));
+				m_moveWork.m_flags = 0x10022;
+
+				const CVector& attackOffset =
+				    CVector(kMeteoParasiteAttackOffsetX, kMeteoParasiteAttackOffsetY, kMeteoParasiteAttackOffsetZ);
+				m_moveWork.m_targetPos.x = attackOffset.x;
+				m_moveWork.m_targetPos.y = attackOffset.y;
+				m_moveWork.m_targetPos.z = attackOffset.z;
+				m_moveWork.m_speed = kMonObjBossFastMoveSpeed;
+				m_moveWork.m_range = reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius;
+			}
+			moveFrame();
+			if ((m_moveWork.m_stateFlags & 1) != 0) {
+				prgObj->addSubStat();
+			}
+		} else if (prgObj->m_subState == 1) {
+			if (prgObj->m_subFrame == 0) {
+				prgObj->reqAnim(0x1A, 0, 0);
+			} else if (prgObj->isLoopAnim() != 0) {
+				prgObj->addSubStat();
+			}
+		} else if (prgObj->m_subState == 2 && prgObj->m_subFrame == 0) {
+			prgObj->reqAnim(0x1B, 1, 0);
+		}
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80130bf4
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::calcBranchFuncGigasLoad(int)
+{
+	CGame* game = &Game;
+	if (((game->m_scriptWork[0][0][1] != 0) &&
+	     (1 < *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(game->m_scriptWork[0][0][1] + 0x58) + 0x1C))) &&
+	    (CFlatBossState() == 1)) {
+		return 0;
+	}
+	return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80130c40
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::tgtFuncGigasLoad(int)
+{
+	aiTargetAttackRomMon(0x3B);
+	if (m_targetPartyIndex < 0) {
+		aiTarget();
+	}
+	return m_targetPartyIndex;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80130c88
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::damagedFuncGigasLoad()
+{
+	switch (m_actionBranch) {
+	case 0:
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(4, 0, 0);
+		m_actionBranch = 1;
+		CFlatBossState() = 1;
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80130ce4
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::calcBranchFuncTetsukyojin(int)
+{
+	const int branch = m_actionBranch;
+	int positive;
+	if (branch >= 1) {
+		positive = 1;
+	} else {
+		positive = 0;
+	}
+	return positive;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80130d00
+ * PAL Size: 1184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncTetsukyojin()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	u8* self = reinterpret_cast<u8*>(this);
+	const int state = prgObj->m_lastStateId;
+
+	switch (state) {
+	case 100:
+		if (prgObj->m_stateFrame == 0) {
+			CVector partyPos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
+			CVector attackDir(-partyPos.x, -partyPos.y, -partyPos.z);
+			Vec attackVec;
+			attackVec.x = attackDir.x;
+			attackVec.y = attackDir.y;
+			attackVec.z = attackDir.z;
+			attackVec.y = kMonObjBossZero;
+
+			if (PSVECMag(&attackVec) < kMonObjBossMinAttackDistance) {
+				CVector fallback(kMonObjBossZero, kMonObjBossZero, kMonObjBossNegativeOne);
+				attackVec.x = fallback.x;
+				attackVec.y = fallback.y;
+				attackVec.z = fallback.z;
+			}
+
+			PSVECNormalize(&attackVec, &attackVec);
+			PSVECScale(&attackVec, &attackVec, kMonObjBossAttackRange - object->m_capsuleHalfHeight);
+			*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4) = attackVec;
+
+			CVector objectPos(object->m_worldPosition);
+			CVector delta;
+			PSVECSubtract(&attackVec, reinterpret_cast<Vec*>(&objectPos), reinterpret_cast<Vec*>(&delta));
+			attackVec.x = delta.x;
+			attackVec.y = delta.y;
+			attackVec.z = delta.z;
+			float distance = PSVECDistance(&attackVec, &object->m_worldPosition);
+			float cappedDistance = kMonObjBossMaxChaseDistance;
+			if (distance < kMonObjBossMaxChaseDistance) {
+				cappedDistance = distance;
+			}
+
+			memset(&m_moveWork, 0, sizeof(m_moveWork));
+			m_moveWork.m_flags = 0x2114;
+			m_moveWork.m_targetPos = attackVec;
+			m_moveWork.m_speed = kMonObjBossTwo;
+			m_moveWork.m_limitFrame = static_cast<int>(cappedDistance * kMonObjBossHalf);
+			m_moveWork.m_changeStat = 0x67;
+		}
+		moveFrame();
+		return;
+	case 0x67:
+		if (prgObj->m_stateFrame == 0x10) {
+			memset(&m_moveWork, 0, sizeof(m_moveWork));
+			m_moveWork.m_flags = 0x2410;
+
+			const CVector& storedVec = CVector(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4));
+			const CVector& attackDir = CVector(-storedVec.x, -storedVec.y, -storedVec.z);
+			m_moveWork.m_targetPos.x = attackDir.x;
+			m_moveWork.m_targetPos.y = attackDir.y;
+			m_moveWork.m_targetPos.z = attackDir.z;
+			m_moveWork.m_speed = kMonObjBossFastMoveSpeed;
+			m_moveWork.m_limitFrame =
+			    static_cast<int>((kMonObjBossTwo * (kMonObjBossAttackRange - object->m_capsuleHalfHeight)) / kMonObjBossFastMoveSpeed);
+		}
+		if (prgObj->m_stateFrame >= 0x10) {
+			moveFrame();
+		}
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		return;
+	case 0x65:
+		if ((CFlatBossState() != 0) && (prgObj->m_stateFrame == 0x25)) {
+			int flatCount = CFlatBossState();
+			if (flatCount >= 1) {
+				if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 0x14)) ||
+				    ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 5))) {
+					*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
+					object->DispCharaParts(1);
+
+					int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+					prgObj->putParticle((pdtNo << 8) | 0x2D, 0, object, kMonObjBossOne, 0x101E4);
+
+					if (m_actionBranch == 0) {
+						CFlatBossState() = CFlatBossState() - 1;
+					}
+					m_actionBranch = 1;
+					m_unk6C8 = 0;
+				}
+			} else {
+				CFlatBossState() = 0;
+			}
+		}
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		return;
+	case 0x66:
+		if (CFlatBossState() >= 1) {
+			if ((m_actionBranch == 1) && (prgObj->m_stateFrame == 0)) {
+				CFlatRuntime::CStack stack[3];
+
+				object->m_bgColMask &= 0xFFF3FFFD;
+				m_actionBranch = 2;
+				CFlatBossSubState() = 1;
+				stack[0].m_word = 10;
+				stack[1].m_word = 0;
+				stack[2].m_word = 0;
+				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
+			}
+
+			if (CFlatBossSubState() == 0) {
+				m_actionBranch = 0;
+				m_unk6C8 = 0;
+				prgObj->changeStat(0, 0, 0);
+			}
+		} else {
+			prgObj->changeStat(0, 0, 0);
+		}
+		return;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801311a0
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::cancelStatFuncTetsukyojin()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	const int state = prgObj->m_lastStateId;
+	switch (state) {
+	case 0x66:
+		object->m_bgColMask |= 0xC0002;
+		return;
+	case 100:
+	case 0x67:
+		CGMonObj_ResetActionState(this);
+		return;
+	default:
+		return;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801311fc
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::changeStatFuncTetsukyojin(int stat)
+{
+	switch (stat) {
+	case 0x67:
+		setActionParam(-12);
+		break;
+	case 0x65:
+		setActionParam(-14);
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex++;
+		break;
+	case -0xD:
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex++;
+		break;
+	default:
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013127c
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::calcBranchFuncLich(int)
+{
+	const int flatFlags = CFlatBossState();
+	return ((flatFlags >> 1) & 1) ^ 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80131294
+ * PAL Size: 652b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncLich()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+
+	if (((CFlatBossState() & 1) == 0) && (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 != 0)) {
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 = 0;
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 1;
+		m_unk6C8 = 0;
+		prgObj->playSe3D(0x1157C, 0x32, 0x96, 0, 0);
+	} else if (((CFlatBossState() & 1) != 0) && (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 == 0)) {
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 = 1;
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 1;
+		m_unk6C8 = 0;
+		prgObj->playSe3D(0x1157D, 0x32, 0x96, 0, 0);
+	}
+
+	if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 != 0) {
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x800);
+		if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 != 0) {
+			int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
+			prgObj->putParticle((pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x590),
+			                    reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0);
+		}
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 0;
+	}
+
+	const int stat = prgObj->m_lastStateId;
+	switch (stat) {
+	case 100:
+		teleport(1, 0x0E, 0x29, 100, 0x11578, 0x11579, 0x2D, 0x2B, 0x2C, gLichTeleportPoints,
+		         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex,
+		         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportVec);
+		break;
+	case 0x65:
+		if (prgObj->m_stateFrame == 0 && CFlatBossState() == 3) {
+			prgObj->changeStat(0, 0, 0);
+		} else {
+			reinterpret_cast<CGCharaObj*>(this)->statAttack();
+			if (prgObj->m_stateFrame == 0x29) {
+				CFlatRuntime::CStack stack[3];
+				stack[0].m_word = 10;
+				stack[1].m_word = 1;
+				stack[2].m_word = 0;
+				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
+			}
+		}
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80131520
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::cancelStatFuncLich()
+{
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80131554
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::changeStatFuncLich(int stat)
+{
+	switch (stat) {
+	case 100:
+		setActionParam(-10);
+		break;
+	case 101:
+		setActionParam(-14);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013159c
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncCaveWorm()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	switch (prgObj->m_lastStateId) {
+	case 100:
+		suikomi(0x6c, kMonObjBossSuctionPower);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801315d4
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::cancelStatFuncCaveWorm()
+{
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80131608
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::changeStatFuncCaveWorm(int stat)
+{
+	switch (stat) {
+	case 100:
+		setActionParam(-8);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80131638
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::calcBranchFuncDragonZombie(int)
+{
+	return (m_actionBranch != 0) ? 1 : 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013164c
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncDragonZombie()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	int state = prgObj->m_lastStateId;
+
+	switch (state) {
+	case 100:
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		break;
+	case 0x65:
+		if (prgObj->m_stateFrame == 0) {
+			prgObj->reqAnim(0xF, 0, 0);
+			prgObj->playSe3D(0x987A, 0x32, 0x96, 0, 0);
+		}
+		if (prgObj->isLoopAnim() != 0) {
+			prgObj->changeStat(0, 0, 0);
+		}
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801316f8
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::cancelStatFuncDragonZombie()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	const int state = prgObj->m_lastStateId;
+	switch (state) {
+	case 100:
+		object->SetAnimSlot(0x0E, 0);
+		object->SetAnimSlot(0x13, 4);
+		object->SetAnimSlot(0x16, 0x1A);
+		object->SetAnimSlot(0x17, 0x1B);
+		object->SetAnimSlot(0x18, 0x1C);
+		m_actionBranch = 1;
+		return;
+	case 4:
+	case 0x65:
+		object->SetAnimSlot(0, 0);
+		object->SetAnimSlot(4, 4);
+		object->SetAnimSlot(0x1A, 0x1A);
+		object->SetAnimSlot(0x1B, 0x1B);
+		object->SetAnimSlot(0x1C, 0x1C);
+		m_actionBranch = 0;
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801317f8
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::changeStatFuncDragonZombie(int stat)
+{
+	switch (stat) {
+	case 100:
+		setActionParam(-11);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80131828
+ * PAL Size: 340b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::attackCheckFuncLKShooter(int)
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	LKShooterBossWork* work = reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss);
+
+	if (work->m_stunTimer == 0) {
+		if (work->bits.m_bit40 == 0 && (CFlatBossState() & 2) == 0) {
+			const CVector& left = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
+			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&left)), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
+			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown == 0) {
+				reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown = 300;
+				work->bits.m_bit40 = 1;
+				m_actionBranch = 2;
+				return 100;
+			}
+		}
+		if (work->bits.m_bit20 == 0 && (CFlatBossState() & 1) == 0) {
+			const CVector& right = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
+			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&right)), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
+			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_rightCooldown == 0) {
+				work->bits.m_bit20 = 1;
+				m_actionBranch = 1;
+				return 100;
+			}
+		}
+	}
+	return -1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013197c
+ * PAL Size: 604b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncLKShooter()
+{
+	u8* self = reinterpret_cast<u8*>(this);
+
+	int cooldown0 = *reinterpret_cast<int*>(CGMonObj::m_boss + 0xC) - 1;
+	int cooldown1 = *reinterpret_cast<int*>(CGMonObj::m_boss + 0x10) - 1;
+	*reinterpret_cast<int*>(CGMonObj::m_boss + 0xC) = cooldown0 & ~(cooldown0 >> 31);
+	*reinterpret_cast<int*>(CGMonObj::m_boss + 0x10) = cooldown1 & ~(cooldown1 >> 31);
+
+	const int state = *reinterpret_cast<int*>(self + 0x520);
+	switch (state) {
+	case 100:
+		reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
+		if (*reinterpret_cast<int*>(self + 0x528) == 0) {
+			memset(&m_moveWork, 0, sizeof(m_moveWork));
+			m_moveWork.m_flags = 0x322;
+
+			const CVector* targetPos;
+			if (m_actionBranch == 1) {
+				targetPos = &CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
+			} else {
+				targetPos = &CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
+			}
+			m_moveWork.m_targetPos.x = targetPos->x;
+			m_moveWork.m_targetPos.y = targetPos->y;
+			m_moveWork.m_targetPos.z = targetPos->z;
+			m_moveWork.m_range = kMonObjBossShortMoveRange;
+			m_moveWork.m_changeStat = 0x65;
+		}
+
+		moveFrame();
+		if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
+		    ((m_actionBranch == 1) && ((CFlatBossState() & 1) != 0)) ||
+		    ((m_actionBranch == 2) && ((CFlatBossState() & 2) != 0))) {
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
+		}
+		return;
+
+	case 0x65:
+		if (*reinterpret_cast<int*>(self + 0x528) == 0) {
+			reinterpret_cast<CGPrgObj*>(this)->reqAnim(-1, 0, 0);
+			rotTarget(m_targetPartyIndex, kMonObjBossTurnAroundDeg);
+		}
+		if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
+		    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < kMonObjBossFrameThreshold)) {
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
+		}
+		return;
+	}
+
+	if (m_actionBranch == 1) {
+		m_actionBranch = 0;
+		reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit20 = 0;
+		*reinterpret_cast<int*>(CGMonObj::m_boss + 0x10) = 0xFA;
+	}
+	if (m_actionBranch == 2) {
+		m_actionBranch = 0;
+		reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit40 = 0;
+		*reinterpret_cast<int*>(CGMonObj::m_boss + 0xC) = 0xFA;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80131bd8
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::attackedFuncSaw()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId == 100) {
+		prgObj->addSubStat();
+		LKShooterBossWork* work = reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss);
+		work->bits.m_bit80 = 1;
+		work->m_stunTimer = 0xFA;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80131c24
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::moveFrameFuncSaw()
+{
+	const float wave = kMonObjBossQuarter * (kMonObjBossOne + sinf(*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4))) + kMonObjBossHalf;
+	m_moveWork.m_targetPos.x = wave * (kMonObjBossWaveXRadius * sinf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
+	m_moveWork.m_targetPos.z = wave * (kMonObjBossAttackRange * cosf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
+	*reinterpret_cast<float*>(CGMonObj::m_boss) = *reinterpret_cast<float*>(CGMonObj::m_boss) +
+	    (kMonObjBossWavePhaseAccel * (kMonObjBossHalf - (wave - kMonObjBossHalf)) + kMonObjBossScaleStep);
+	*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) = *reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) + kMonObjBossWavePhaseStep;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80131d04
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::logicFuncSaw()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	int bossState = CFlatBossState();
+
+	if (bossState == 0 && reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) {
+		reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 0;
+	}
+
+	if (bossState != 0 && reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->bits.m_bit80 == 0) {
+		if (prgObj->m_lastStateId != 100) {
+			prgObj->changeStat(100, 0, 0);
+		}
+	} else {
+		if (prgObj->m_lastStateId == 100 && prgObj->m_subState == 1) {
+			prgObj->addSubStat();
+		}
+	}
+	int& cooldown = reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->m_cooldown;
+	cooldown = (cooldown - 1) & ~((cooldown - 1) >> 31);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80131dd8
+ * PAL Size: 560b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncSaw()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	switch (prgObj->m_lastStateId) {
+	case 100:
+		reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
+
+		if (prgObj->m_subState == 0) {
+			if (prgObj->m_subFrame == 0) {
+				prgObj->reqAnim(10, 0, 0);
+
+				int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
+
+				prgObj->putParticle(pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0x1C52C);
+				prgObj->playSe3D(0x1C52B, 0x32, 0x96, 0, 0);
+				memset(&m_moveWork, 0, sizeof(m_moveWork));
+				m_moveWork.m_flags = 0x1402;
+			} else if (prgObj->isLoopAnim() != 0) {
+				prgObj->addSubStat();
+			}
+		} else if (prgObj->m_subState == 1) {
+			if (prgObj->m_subFrame == 0) {
+				*reinterpret_cast<int*>(mon + 0x560) = 0x495;
+				prgObj->reqAnim(1, 1, 0);
+			}
+
+			if (prgObj->m_subFrame == 0x19) {
+				reinterpret_cast<CGCharaObj*>(this)->resetIgnoreHit();
+				enableAttackCol(1, 0, 0);
+				m_unk6C0 = 0;
+			}
+
+			if (prgObj->m_subFrame > 0x19 && m_unk6C0 != 0) {
+				prgObj->addSubStat();
+			}
+		} else if (prgObj->m_subState == 2) {
+			if (prgObj->m_subFrame == 0) {
+				enableAttackCol(0, 0, 0);
+				m_unk6C0 = 0;
+				prgObj->reqAnim(0xB, 0, 0);
+				reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
+				prgObj->playSe3D(0x1C52D, 0x32, 0x96, 0, 0);
+			} else if (prgObj->isLoopAnim() != 0) {
+				prgObj->changeStat(0, 0, 0);
+			}
+		}
+
+		moveFrame();
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80132008
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::cancelStatFuncSaw()
+{
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013203c
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::calcBranchFuncGoblinKing(int)
+{
+	return CFlatBossState();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013204c
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncGoblinKing()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	switch (prgObj->m_lastStateId) {
+	case 100:
+		teleport(0, 0xd, 8, 0x42, 0xa03e, 0xa03f, 3, 4, 5, gGoblinKingTeleportPoints,
+		         *reinterpret_cast<int*>(CGMonObj::m_boss), *reinterpret_cast<Vec*>(CGMonObj::m_boss + 4));
+		break;
+	}
+	return;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801320cc
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::cancelStatFuncGoblinKing()
+{
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80132100
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGMonObj::calcBranchFuncOrcKing(int)
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+	int branch = 0;
+	if (script[0x1C / 2] < (script[0x1A / 2] / 5)) {
+		branch = 2;
+	} else {
+		branch = calcBranchFuncDefault(1);
+	}
+	return branch;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80132158
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::moveCancelFuncOrcKing()
+{
+	return;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013215c
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::moveFrameFuncOrcKing()
+{
+	return;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80132160
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::alwaysFuncOrcKing()
+{
+	if (*reinterpret_cast<int*>(CGMonObj::m_boss) == 0) {
+		return;
+	}
+
+	if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 0x3C) {
+		reinterpret_cast<CGObject*>(this)->m_charaModelHandle->ChangeTexture(1, 0x39, 1, 0xFFFFFFFF, 0);
+		int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
+		reinterpret_cast<CGPrgObj*>(this)->putParticle(
+			(pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590),
+			reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0);
+	} else if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
+		CGMonObj* monObj = CFlat.FindGMonObjFirst();
+		while (monObj != 0) {
+			u8* monBytes = reinterpret_cast<u8*>(monObj);
+			u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
+			reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
+			monObj = CFlat.FindGMonObjNext(monObj);
+		}
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x8CBF, 0x32, 0x96, 0, 0);
+		*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
+		CFlatBossState() = 1;
+	}
+
+	if (*reinterpret_cast<int*>(CGMonObj::m_boss) != 0) {
+		*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) += 1;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801322dc
+ * PAL Size: 604b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncOrcKing()
+{
+	u8* self = reinterpret_cast<u8*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
+		if (m_actionBranch == 0) {
+			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x18, *reinterpret_cast<int*>(self + 0x58C), object, kMonObjBossOne, 0x8CC0);
+			reinterpret_cast<CGPrgObj*>(this)->reqAnim(0xF, 0, 0);
+			object->SetAnimSlot(0x10, 0);
+			object->SetAnimSlot(0x15, 4);
+		} else if (m_actionBranch == 0x96) {
+			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x19, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC1);
+		} else if (m_actionBranch == 300) {
+			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1A, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC2);
+		} else if (m_actionBranch == 0x1C2) {
+			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+
+			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1B, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC3);
+		} else if (m_actionBranch == 600) {
+			reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
+			object->m_bgColMask &= 0xFFF7FFFF;
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(-9, 0, 0);
+			object->SetAnimSlot(0, 0);
+
+			CGMonObj* monObj = CFlat.FindGMonObjFirst();
+			while (monObj != 0) {
+				if (monObj != this) {
+					u8* monBytes = reinterpret_cast<u8*>(monObj);
+					u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
+					reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
+				}
+				monObj = CFlat.FindGMonObjNext(monObj);
+			}
+			*reinterpret_cast<int*>(CGMonObj::m_boss) = 1;
+		}
+
+		m_actionBranch = m_actionBranch + 1;
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80132538
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::cancelStatFuncOrcKing()
+{
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013256c
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncArmstrong()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
+	int state = prgObj->m_lastStateId;
+	switch (state) {
+	case 100:
+		if (prgObj->m_stateFrame == 0) {
+			charaObj->enableDamageCol(0);
+		} else if (prgObj->m_stateFrame == 0x29) {
+			charaObj->enableDamageCol(1);
+		}
+		charaObj->statAttack();
+		break;
+	case 0x65:
+	case 0x66:
+	case 0x67:
+	case 0x68:
+		frameStatFuncGiantCrab();
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80132600
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::cancelStatFuncArmstrong()
+{
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	switch (prgObj->m_lastStateId) {
+	case 100:
+		enableDamageCol(1);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80132640
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::changeStatFuncArmstrong(int stat)
+{
+	switch (stat) {
+	case 100:
+		setActionParam(-14);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80132670
+ * PAL Size: 700b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::frameStatFuncGolem()
+{
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	int state = reinterpret_cast<CGPrgObj*>(this)->m_lastStateId;
+
+	switch (state) {
+	case 100:
+		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA17, 0x32, 0x96, 0, 0);
+		} else if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) {
+			reinterpret_cast<CGObject*>(this)->DispCharaParts(1);
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA18, 0x32, 0x96, 0, 0);
+			m_actionBranch = 1;
+		}
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		return;
+	case 0x65: {
+		int frame = reinterpret_cast<CGPrgObj*>(this)->m_stateFrame;
+		if (frame == 0) {
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA1A, 0x32, 0x96, 0, 0);
+		} else if (frame == 4) {
+			reinterpret_cast<CGObject*>(this)->DispCharaParts(3);
+			m_actionBranch = 0;
+		} else if (frame == 5) {
+			reinterpret_cast<CGObject*>(this)->DispCharaParts(7);
+		}
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		return;
+	}
+	case 0x67:
+		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame != 0x32) {
+			return;
+		}
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
+		return;
+	case 0x66:
+	case 0x68:
+		break;
+	default:
+		return;
+	}
+
+	if ((reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) ||
+	    (reinterpret_cast<CGObject*>(this)->m_stateFlags0Bits.unk1 != 0) ||
+	    ((state == 0x66) &&
+	     (*reinterpret_cast<float*>(self + 0x5D0 + m_targetPartyIndex * 4) <
+	      kMonObjBossTwo * reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius))) {
+		reinterpret_cast<CGObject*>(this)->m_rotTargetY =
+		    reinterpret_cast<CGPrgObj*>(this)->getTargetRot(
+		        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
+		setAttackAfter(*reinterpret_cast<int*>(self + 0x560));
+	} else {
+		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
+			float turnOffset;
+			if (state != 0x67) {
+				if (state < 0x67) {
+					if (state >= 0x66) {
+						turnOffset = kMonObjBossZero;
+					}
+				} else if (state < 0x69) {
+					turnOffset = kMonObjBossPi;
+				}
+			}
+			reinterpret_cast<CGPrgObj*>(this)->reqAnim(1, 1, 0);
+			reinterpret_cast<CGObject*>(this)->m_rotTargetY =
+			    reinterpret_cast<CGPrgObj*>(this)->getTargetRot(
+			        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
+			*reinterpret_cast<float*>(CGMonObj::m_boss + 0x10) = reinterpret_cast<CGObject*>(this)->m_rotTargetY + turnOffset;
+		}
+		unsigned short scriptScale =
+		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[9]) + 0xD4);
+		float moveSpeed =
+		    *reinterpret_cast<float*>(self + 0x690) *
+		    (kMonObjBossScaleStep * static_cast<float>(scriptScale) + kMonObjBossEpsilon);
+		reinterpret_cast<CGObject*>(this)->moveVectorHRot(*reinterpret_cast<float*>(CGMonObj::m_boss + 0x10), kMonObjBossZero,
+		                                                  moveSpeed, 1);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013292c
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma bool off
+int CGMonObj::calcBranchFuncGolem(int)
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	if (m_actionBranch == 1) {
+		return 2;
+	}
+
+	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+	return static_cast<unsigned int>(
+	           __cntlzw(script[0x1C / 2] >= static_cast<int>(static_cast<unsigned int>(script[0x1A / 2]) >> 1))) >>
+	       5;
+}
+#pragma bool on
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013296c
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::changeStatFuncGolem(int stat)
+{
+	switch (stat) {
+	case 100:
+		setActionParam(-10);
+		break;
+	case 101:
+		setActionParam(-9);
+		break;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801329b4
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGMonObj::damagedFuncGolem()
+{
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+	if (script[0x1C / 2] == 0) {
+		object->DispCharaParts(7);
+	}
 }
 
 /*
@@ -403,2263 +2851,38 @@ void CGMonObj::frameStatFuncGiantCrab()
 
 /*
  * --INFO--
- * PAL Address: 0x801329b4
- * PAL Size: 52b
+ * PAL Address: 0x80132e78
+ * PAL Size: 8b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::damagedFuncGolem()
+int CGMonObj::calcBranchFuncGiantCrab(int)
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-	if (script[0x1C / 2] == 0) {
-		object->DispCharaParts(7);
-	}
+	return m_actionBranch;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8013296c
- * PAL Size: 72b
+ * PAL Address: 0x80132e80
+ * PAL Size: 232b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::changeStatFuncGolem(int stat)
+void CGMonObj::logicFuncGiantCrab()
 {
-	switch (stat) {
-	case 100:
-		setActionParam(-10);
-		break;
-	case 101:
-		setActionParam(-9);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013292c
- * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma bool off
-int CGMonObj::calcBranchFuncGolem(int)
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	if (m_actionBranch == 1) {
-		return 2;
-	}
-
-	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-	return static_cast<unsigned int>(
-	           __cntlzw(script[0x1C / 2] >= static_cast<int>(static_cast<unsigned int>(script[0x1A / 2]) >> 1))) >>
-	       5;
-}
-#pragma bool on
-
-/*
- * --INFO--
- * PAL Address: 0x80132670
- * PAL Size: 700b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncGolem()
-{
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	int state = reinterpret_cast<CGPrgObj*>(this)->m_lastStateId;
-
-	switch (state) {
-	case 100:
-		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
-			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA17, 0x32, 0x96, 0, 0);
-		} else if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) {
-			reinterpret_cast<CGObject*>(this)->DispCharaParts(1);
-			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA18, 0x32, 0x96, 0, 0);
-			m_actionBranch = 1;
-		}
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
-		return;
-	case 0x65: {
-		int frame = reinterpret_cast<CGPrgObj*>(this)->m_stateFrame;
-		if (frame == 0) {
-			reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA1A, 0x32, 0x96, 0, 0);
-		} else if (frame == 4) {
-			reinterpret_cast<CGObject*>(this)->DispCharaParts(3);
-			m_actionBranch = 0;
-		} else if (frame == 5) {
-			reinterpret_cast<CGObject*>(this)->DispCharaParts(7);
-		}
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
-		return;
-	}
-	case 0x67:
-		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame != 0x32) {
-			return;
-		}
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
-		return;
-	case 0x66:
-	case 0x68:
-		break;
-	default:
-		return;
-	}
-
-	if ((reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) ||
-	    (reinterpret_cast<CGObject*>(this)->m_stateFlags0Bits.unk1 != 0) ||
-	    ((state == 0x66) &&
-	     (*reinterpret_cast<float*>(self + 0x5D0 + m_targetPartyIndex * 4) <
-	      kMonObjBossTwo * reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius))) {
-		reinterpret_cast<CGObject*>(this)->m_rotTargetY =
-		    reinterpret_cast<CGPrgObj*>(this)->getTargetRot(
-		        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
-		setAttackAfter(*reinterpret_cast<int*>(self + 0x560));
-	} else {
-		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
-			float turnOffset;
-			if (state != 0x67) {
-				if (state < 0x67) {
-					if (state >= 0x66) {
-						turnOffset = kMonObjBossZero;
-					}
-				} else if (state < 0x69) {
-					turnOffset = kMonObjBossPi;
-				}
-			}
-			reinterpret_cast<CGPrgObj*>(this)->reqAnim(1, 1, 0);
-			reinterpret_cast<CGObject*>(this)->m_rotTargetY =
-			    reinterpret_cast<CGPrgObj*>(this)->getTargetRot(
-			        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
-			*reinterpret_cast<float*>(CGMonObj::m_boss + 0x10) = reinterpret_cast<CGObject*>(this)->m_rotTargetY + turnOffset;
-		}
-		unsigned short scriptScale =
-		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[9]) + 0xD4);
-		float moveSpeed =
-		    *reinterpret_cast<float*>(self + 0x690) *
-		    (kMonObjBossScaleStep * static_cast<float>(scriptScale) + kMonObjBossEpsilon);
-		reinterpret_cast<CGObject*>(this)->moveVectorHRot(*reinterpret_cast<float*>(CGMonObj::m_boss + 0x10), kMonObjBossZero,
-		                                                  moveSpeed, 1);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80132640
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::changeStatFuncArmstrong(int stat)
-{
-	switch (stat) {
-	case 100:
-		setActionParam(-14);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80132600
- * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::cancelStatFuncArmstrong()
-{
+	int nextState = -1;
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	switch (prgObj->m_lastStateId) {
-	case 100:
-		enableDamageCol(1);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013256c
- * PAL Size: 148b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncArmstrong()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
-	int state = prgObj->m_lastStateId;
-	switch (state) {
-	case 100:
-		if (prgObj->m_stateFrame == 0) {
-			charaObj->enableDamageCol(0);
-		} else if (prgObj->m_stateFrame == 0x29) {
-			charaObj->enableDamageCol(1);
-		}
-		charaObj->statAttack();
-		break;
-	case 0x65:
-	case 0x66:
-	case 0x67:
-	case 0x68:
-		frameStatFuncGiantCrab();
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80132538
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::cancelStatFuncOrcKing()
-{
-	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
-	case 100:
-		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801322dc
- * PAL Size: 604b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncOrcKing()
-{
-	u8* self = reinterpret_cast<u8*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-
-	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
-	case 100:
-		if (m_actionBranch == 0) {
-			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-
-			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x18, *reinterpret_cast<int*>(self + 0x58C), object, kMonObjBossOne, 0x8CC0);
-			reinterpret_cast<CGPrgObj*>(this)->reqAnim(0xF, 0, 0);
-			object->SetAnimSlot(0x10, 0);
-			object->SetAnimSlot(0x15, 4);
-		} else if (m_actionBranch == 0x96) {
-			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-
-			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x19, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC1);
-		} else if (m_actionBranch == 300) {
-			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-
-			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1A, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC2);
-		} else if (m_actionBranch == 0x1C2) {
-			int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-
-			reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x1B, *reinterpret_cast<int*>(self + 0x590), object, kMonObjBossOne, 0x8CC3);
-		} else if (m_actionBranch == 600) {
-			reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
-			object->m_bgColMask &= 0xFFF7FFFF;
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(-9, 0, 0);
-			object->SetAnimSlot(0, 0);
-
-			CGMonObj* monObj = CFlat.FindGMonObjFirst();
-			while (monObj != 0) {
-				if (monObj != this) {
-					u8* monBytes = reinterpret_cast<u8*>(monObj);
-					u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
-					reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
-				}
-				monObj = CFlat.FindGMonObjNext(monObj);
-			}
-			*reinterpret_cast<int*>(CGMonObj::m_boss) = 1;
-		}
-
-		m_actionBranch = m_actionBranch + 1;
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80132160
- * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::alwaysFuncOrcKing()
-{
-	if (*reinterpret_cast<int*>(CGMonObj::m_boss) == 0) {
-		return;
-	}
-
-	if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 0x3C) {
-		reinterpret_cast<CGObject*>(this)->m_charaModelHandle->ChangeTexture(1, 0x39, 1, 0xFFFFFFFF, 0);
-		int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
-		reinterpret_cast<CGPrgObj*>(this)->putParticle(
-			(pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590),
-			reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0);
-	} else if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
-		CGMonObj* monObj = CFlat.FindGMonObjFirst();
-		while (monObj != 0) {
-			u8* monBytes = reinterpret_cast<u8*>(monObj);
-			u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
-			reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
-			monObj = CFlat.FindGMonObjNext(monObj);
-		}
-		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x8CBF, 0x32, 0x96, 0, 0);
-		*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
-		CFlatBossState() = 1;
-	}
 
 	if (*reinterpret_cast<int*>(CGMonObj::m_boss) != 0) {
-		*reinterpret_cast<int*>(CGMonObj::m_boss + 0x4) += 1;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013215c
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::moveFrameFuncOrcKing()
-{
-	return;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80132158
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::moveCancelFuncOrcKing()
-{
-	return;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80132100
- * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::calcBranchFuncOrcKing(int)
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-	int branch = 0;
-	if (script[0x1C / 2] < (script[0x1A / 2] / 5)) {
-		branch = 2;
-	} else {
-		branch = calcBranchFuncDefault(1);
-	}
-	return branch;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801320cc
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::cancelStatFuncGoblinKing()
-{
-	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
-	case 100:
-		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013204c
- * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncGoblinKing()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	switch (prgObj->m_lastStateId) {
-	case 100:
-		teleport(0, 0xd, 8, 0x42, 0xa03e, 0xa03f, 3, 4, 5, gGoblinKingTeleportPoints,
-		         *reinterpret_cast<int*>(CGMonObj::m_boss), *reinterpret_cast<Vec*>(CGMonObj::m_boss + 4));
-		break;
-	}
-	return;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013203c
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::calcBranchFuncGoblinKing(int)
-{
-	return CFlatBossState();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80132008
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::cancelStatFuncSaw()
-{
-	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
-	case 100:
-		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80131dd8
- * PAL Size: 560b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncSaw()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
-	switch (prgObj->m_lastStateId) {
-	case 100:
-		reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
-
-		if (prgObj->m_subState == 0) {
-			if (prgObj->m_subFrame == 0) {
-				prgObj->reqAnim(10, 0, 0);
-
-				int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
-
-				prgObj->putParticle(pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0x1C52C);
-				prgObj->playSe3D(0x1C52B, 0x32, 0x96, 0, 0);
-				memset(&m_moveWork, 0, sizeof(m_moveWork));
-				m_moveWork.m_flags = 0x1402;
-			} else if (prgObj->isLoopAnim() != 0) {
-				prgObj->addSubStat();
-			}
-		} else if (prgObj->m_subState == 1) {
-			if (prgObj->m_subFrame == 0) {
-				*reinterpret_cast<int*>(mon + 0x560) = 0x495;
-				prgObj->reqAnim(1, 1, 0);
-			}
-
-			if (prgObj->m_subFrame == 0x19) {
-				reinterpret_cast<CGCharaObj*>(this)->resetIgnoreHit();
-				enableAttackCol(1, 0, 0);
-				m_unk6C0 = 0;
-			}
-
-			if (prgObj->m_subFrame > 0x19 && m_unk6C0 != 0) {
-				prgObj->addSubStat();
-			}
-		} else if (prgObj->m_subState == 2) {
-			if (prgObj->m_subFrame == 0) {
-				enableAttackCol(0, 0, 0);
-				m_unk6C0 = 0;
-				prgObj->reqAnim(0xB, 0, 0);
-				reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
-				prgObj->playSe3D(0x1C52D, 0x32, 0x96, 0, 0);
-			} else if (prgObj->isLoopAnim() != 0) {
-				prgObj->changeStat(0, 0, 0);
-			}
-		}
-
-		moveFrame();
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80131d04
- * PAL Size: 212b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::logicFuncSaw()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	int bossState = CFlatBossState();
-
-	if (bossState == 0 && reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) {
-		reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 0;
-	}
-
-	if (bossState != 0 && reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->bits.m_bit80 == 0) {
-		if (prgObj->m_lastStateId != 100) {
-			prgObj->changeStat(100, 0, 0);
-		}
-	} else {
-		if (prgObj->m_lastStateId == 100 && prgObj->m_subState == 1) {
-			prgObj->addSubStat();
-		}
-	}
-	int& cooldown = reinterpret_cast<SawBossWork*>(CGMonObj::m_boss)->m_cooldown;
-	cooldown = (cooldown - 1) & ~((cooldown - 1) >> 31);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80131c24
- * PAL Size: 224b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::moveFrameFuncSaw()
-{
-	const float wave = kMonObjBossQuarter * (kMonObjBossOne + sinf(*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4))) + kMonObjBossHalf;
-	m_moveWork.m_targetPos.x = wave * (kMonObjBossWaveXRadius * sinf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
-	m_moveWork.m_targetPos.z = wave * (kMonObjBossAttackRange * cosf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
-	*reinterpret_cast<float*>(CGMonObj::m_boss) = *reinterpret_cast<float*>(CGMonObj::m_boss) +
-	    (kMonObjBossWavePhaseAccel * (kMonObjBossHalf - (wave - kMonObjBossHalf)) + kMonObjBossScaleStep);
-	*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) = *reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) + kMonObjBossWavePhaseStep;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80131bd8
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::attackedFuncSaw()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId == 100) {
-		prgObj->addSubStat();
-		LKShooterBossWork* work = reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss);
-		work->bits.m_bit80 = 1;
-		work->m_stunTimer = 0xFA;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013197c
- * PAL Size: 604b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncLKShooter()
-{
-	u8* self = reinterpret_cast<u8*>(this);
-
-	int cooldown0 = *reinterpret_cast<int*>(CGMonObj::m_boss + 0xC) - 1;
-	int cooldown1 = *reinterpret_cast<int*>(CGMonObj::m_boss + 0x10) - 1;
-	*reinterpret_cast<int*>(CGMonObj::m_boss + 0xC) = cooldown0 & ~(cooldown0 >> 31);
-	*reinterpret_cast<int*>(CGMonObj::m_boss + 0x10) = cooldown1 & ~(cooldown1 >> 31);
-
-	const int state = *reinterpret_cast<int*>(self + 0x520);
-	switch (state) {
-	case 100:
-		reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
-		if (*reinterpret_cast<int*>(self + 0x528) == 0) {
-			memset(&m_moveWork, 0, sizeof(m_moveWork));
-			m_moveWork.m_flags = 0x322;
-
-			const CVector* targetPos;
-			if (m_actionBranch == 1) {
-				targetPos = &CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
-			} else {
-				targetPos = &CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
-			}
-			m_moveWork.m_targetPos.x = targetPos->x;
-			m_moveWork.m_targetPos.y = targetPos->y;
-			m_moveWork.m_targetPos.z = targetPos->z;
-			m_moveWork.m_range = kMonObjBossShortMoveRange;
-			m_moveWork.m_changeStat = 0x65;
-		}
-
-		moveFrame();
-		if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
-		    ((m_actionBranch == 1) && ((CFlatBossState() & 1) != 0)) ||
-		    ((m_actionBranch == 2) && ((CFlatBossState() & 2) != 0))) {
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
-		}
-		return;
-
-	case 0x65:
-		if (*reinterpret_cast<int*>(self + 0x528) == 0) {
-			reinterpret_cast<CGPrgObj*>(this)->reqAnim(-1, 0, 0);
-			rotTarget(m_targetPartyIndex, kMonObjBossTurnAroundDeg);
-		}
-		if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
-		    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < kMonObjBossFrameThreshold)) {
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
-		}
-		return;
-	}
-
-	if (m_actionBranch == 1) {
-		m_actionBranch = 0;
-		reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit20 = 0;
-		*reinterpret_cast<int*>(CGMonObj::m_boss + 0x10) = 0xFA;
-	}
-	if (m_actionBranch == 2) {
-		m_actionBranch = 0;
-		reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit40 = 0;
-		*reinterpret_cast<int*>(CGMonObj::m_boss + 0xC) = 0xFA;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80131828
- * PAL Size: 340b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::attackCheckFuncLKShooter(int)
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	LKShooterBossWork* work = reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss);
-
-	if (work->m_stunTimer == 0) {
-		if (work->bits.m_bit40 == 0 && (CFlatBossState() & 2) == 0) {
-			const CVector& left = CVector(kMonObjBossLeftTargetX, kMonObjBossZero, kMonObjBossLeftTargetZ);
-			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&left)), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
-			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown == 0) {
-				reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_leftCooldown = 300;
-				work->bits.m_bit40 = 1;
-				m_actionBranch = 2;
-				return 100;
-			}
-		}
-		if (work->bits.m_bit20 == 0 && (CFlatBossState() & 1) == 0) {
-			const CVector& right = CVector(kMonObjBossRightTargetXZ, kMonObjBossZero, kMonObjBossRightTargetXZ);
-			if (PSVECDistance(reinterpret_cast<Vec*>(const_cast<CVector*>(&right)), &object->m_worldPosition) < kMonObjBossSideTargetRange &&
-			    reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->m_rightCooldown == 0) {
-				work->bits.m_bit20 = 1;
-				m_actionBranch = 1;
-				return 100;
-			}
-		}
-	}
-	return -1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801317f8
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::changeStatFuncDragonZombie(int stat)
-{
-	switch (stat) {
-	case 100:
-		setActionParam(-11);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801316f8
- * PAL Size: 256b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::cancelStatFuncDragonZombie()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	const int state = prgObj->m_lastStateId;
-	switch (state) {
-	case 100:
-		object->SetAnimSlot(0x0E, 0);
-		object->SetAnimSlot(0x13, 4);
-		object->SetAnimSlot(0x16, 0x1A);
-		object->SetAnimSlot(0x17, 0x1B);
-		object->SetAnimSlot(0x18, 0x1C);
-		m_actionBranch = 1;
-		return;
-	case 4:
-	case 0x65:
-		object->SetAnimSlot(0, 0);
-		object->SetAnimSlot(4, 4);
-		object->SetAnimSlot(0x1A, 0x1A);
-		object->SetAnimSlot(0x1B, 0x1B);
-		object->SetAnimSlot(0x1C, 0x1C);
-		m_actionBranch = 0;
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013164c
- * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncDragonZombie()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	int state = prgObj->m_lastStateId;
-
-	switch (state) {
-	case 100:
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
-		break;
-	case 0x65:
-		if (prgObj->m_stateFrame == 0) {
-			prgObj->reqAnim(0xF, 0, 0);
-			prgObj->playSe3D(0x987A, 0x32, 0x96, 0, 0);
-		}
-		if (prgObj->isLoopAnim() != 0) {
-			prgObj->changeStat(0, 0, 0);
-		}
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80131638
- * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::calcBranchFuncDragonZombie(int)
-{
-	return (m_actionBranch != 0) ? 1 : 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80131608
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::changeStatFuncCaveWorm(int stat)
-{
-	switch (stat) {
-	case 100:
-		setActionParam(-8);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801315d4
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::cancelStatFuncCaveWorm()
-{
-	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
-	case 100:
-		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013159c
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncCaveWorm()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	switch (prgObj->m_lastStateId) {
-	case 100:
-		suikomi(0x6c, kMonObjBossSuctionPower);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80131554
- * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::changeStatFuncLich(int stat)
-{
-	switch (stat) {
-	case 100:
-		setActionParam(-10);
-		break;
-	case 101:
-		setActionParam(-14);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80131520
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::cancelStatFuncLich()
-{
-	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
-	case 100:
-		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80131294
- * PAL Size: 652b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncLich()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-
-	if (((CFlatBossState() & 1) == 0) && (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 != 0)) {
-		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 = 0;
-		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 1;
-		m_unk6C8 = 0;
-		prgObj->playSe3D(0x1157C, 0x32, 0x96, 0, 0);
-	} else if (((CFlatBossState() & 1) != 0) && (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 == 0)) {
-		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 = 1;
-		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 1;
-		m_unk6C8 = 0;
-		prgObj->playSe3D(0x1157D, 0x32, 0x96, 0, 0);
-	}
-
-	if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 != 0) {
-		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x800);
-		if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit80 != 0) {
-			int pdtNo = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->GetPdtSlot();
-			prgObj->putParticle((pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x590),
-			                    reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0);
-		}
-		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->lichBits.m_lichBit40 = 0;
-	}
-
-	const int stat = prgObj->m_lastStateId;
-	switch (stat) {
-	case 100:
-		teleport(1, 0x0E, 0x29, 100, 0x11578, 0x11579, 0x2D, 0x2B, 0x2C, gLichTeleportPoints,
-		         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex,
-		         reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportVec);
-		break;
-	case 0x65:
-		if (prgObj->m_stateFrame == 0 && CFlatBossState() == 3) {
-			prgObj->changeStat(0, 0, 0);
-		} else {
-			reinterpret_cast<CGCharaObj*>(this)->statAttack();
-			if (prgObj->m_stateFrame == 0x29) {
-				CFlatRuntime::CStack stack[3];
-				stack[0].m_word = 10;
-				stack[1].m_word = 1;
-				stack[2].m_word = 0;
-				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
-			}
-		}
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013127c
- * PAL Size: 24b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::calcBranchFuncLich(int)
-{
-	const int flatFlags = CFlatBossState();
-	return ((flatFlags >> 1) & 1) ^ 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801311fc
- * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::changeStatFuncTetsukyojin(int stat)
-{
-	switch (stat) {
-	case 0x67:
-		setActionParam(-12);
-		break;
-	case 0x65:
-		setActionParam(-14);
-		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex++;
-		break;
-	case -0xD:
-		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_lichTeleportIndex++;
-		break;
-	default:
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801311a0
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::cancelStatFuncTetsukyojin()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	const int state = prgObj->m_lastStateId;
-	switch (state) {
-	case 0x66:
-		object->m_bgColMask |= 0xC0002;
-		return;
-	case 100:
-	case 0x67:
-		CGMonObj_ResetActionState(this);
-		return;
-	default:
-		return;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80130d00
- * PAL Size: 1184b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncTetsukyojin()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	u8* self = reinterpret_cast<u8*>(this);
-	const int state = prgObj->m_lastStateId;
-
-	switch (state) {
-	case 100:
-		if (prgObj->m_stateFrame == 0) {
-			CVector partyPos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
-			CVector attackDir(-partyPos.x, -partyPos.y, -partyPos.z);
-			Vec attackVec;
-			attackVec.x = attackDir.x;
-			attackVec.y = attackDir.y;
-			attackVec.z = attackDir.z;
-			attackVec.y = kMonObjBossZero;
-
-			if (PSVECMag(&attackVec) < kMonObjBossMinAttackDistance) {
-				CVector fallback(kMonObjBossZero, kMonObjBossZero, kMonObjBossNegativeOne);
-				attackVec.x = fallback.x;
-				attackVec.y = fallback.y;
-				attackVec.z = fallback.z;
-			}
-
-			PSVECNormalize(&attackVec, &attackVec);
-			PSVECScale(&attackVec, &attackVec, kMonObjBossAttackRange - object->m_capsuleHalfHeight);
-			*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4) = attackVec;
-
-			CVector objectPos(object->m_worldPosition);
-			CVector delta;
-			PSVECSubtract(&attackVec, reinterpret_cast<Vec*>(&objectPos), reinterpret_cast<Vec*>(&delta));
-			attackVec.x = delta.x;
-			attackVec.y = delta.y;
-			attackVec.z = delta.z;
-			float distance = PSVECDistance(&attackVec, &object->m_worldPosition);
-			float cappedDistance = kMonObjBossMaxChaseDistance;
-			if (distance < kMonObjBossMaxChaseDistance) {
-				cappedDistance = distance;
-			}
-
-			memset(&m_moveWork, 0, sizeof(m_moveWork));
-			m_moveWork.m_flags = 0x2114;
-			m_moveWork.m_targetPos = attackVec;
-			m_moveWork.m_speed = kMonObjBossTwo;
-			m_moveWork.m_limitFrame = static_cast<int>(cappedDistance * kMonObjBossHalf);
-			m_moveWork.m_changeStat = 0x67;
-		}
-		moveFrame();
-		return;
-	case 0x67:
-		if (prgObj->m_stateFrame == 0x10) {
-			memset(&m_moveWork, 0, sizeof(m_moveWork));
-			m_moveWork.m_flags = 0x2410;
-
-			const CVector& storedVec = CVector(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4));
-			const CVector& attackDir = CVector(-storedVec.x, -storedVec.y, -storedVec.z);
-			m_moveWork.m_targetPos.x = attackDir.x;
-			m_moveWork.m_targetPos.y = attackDir.y;
-			m_moveWork.m_targetPos.z = attackDir.z;
-			m_moveWork.m_speed = kMonObjBossFastMoveSpeed;
-			m_moveWork.m_limitFrame =
-			    static_cast<int>((kMonObjBossTwo * (kMonObjBossAttackRange - object->m_capsuleHalfHeight)) / kMonObjBossFastMoveSpeed);
-		}
-		if (prgObj->m_stateFrame >= 0x10) {
-			moveFrame();
-		}
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
-		return;
-	case 0x65:
-		if ((CFlatBossState() != 0) && (prgObj->m_stateFrame == 0x25)) {
-			int flatCount = CFlatBossState();
-			if (flatCount >= 1) {
-				if (((flatCount == 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 0x14)) ||
-				    ((flatCount > 1) && (*reinterpret_cast<int*>(CGMonObj::m_boss) >= 5))) {
-					*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
-					object->DispCharaParts(1);
-
-					int pdtNo = object->m_charaModelHandle->GetPdtSlot();
-					prgObj->putParticle((pdtNo << 8) | 0x2D, 0, object, kMonObjBossOne, 0x101E4);
-
-					if (m_actionBranch == 0) {
-						CFlatBossState() = CFlatBossState() - 1;
-					}
-					m_actionBranch = 1;
-					m_unk6C8 = 0;
-				}
-			} else {
-				CFlatBossState() = 0;
-			}
-		}
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
-		return;
-	case 0x66:
-		if (CFlatBossState() >= 1) {
-			if ((m_actionBranch == 1) && (prgObj->m_stateFrame == 0)) {
-				CFlatRuntime::CStack stack[3];
-
-				object->m_bgColMask &= 0xFFF3FFFD;
-				m_actionBranch = 2;
-				CFlatBossSubState() = 1;
-				stack[0].m_word = 10;
-				stack[1].m_word = 0;
-				stack[2].m_word = 0;
-				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
-			}
-
-			if (CFlatBossSubState() == 0) {
-				m_actionBranch = 0;
-				m_unk6C8 = 0;
-				prgObj->changeStat(0, 0, 0);
-			}
-		} else {
-			prgObj->changeStat(0, 0, 0);
-		}
-		return;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80130ce4
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::calcBranchFuncTetsukyojin(int)
-{
-	const int branch = m_actionBranch;
-	int positive;
-	if (branch >= 1) {
-		positive = 1;
-	} else {
-		positive = 0;
-	}
-	return positive;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80130c88
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::damagedFuncGigasLoad()
-{
-	switch (m_actionBranch) {
-	case 0:
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(4, 0, 0);
-		m_actionBranch = 1;
-		CFlatBossState() = 1;
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80130c40
- * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::tgtFuncGigasLoad(int)
-{
-	aiTargetAttackRomMon(0x3B);
-	if (m_targetPartyIndex < 0) {
-		aiTarget();
-	}
-	return m_targetPartyIndex;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80130bf4
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::calcBranchFuncGigasLoad(int)
-{
-	CGame* game = &Game;
-	if (((game->m_scriptWork[0][0][1] != 0) &&
-	     (1 < *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(game->m_scriptWork[0][0][1] + 0x58) + 0x1C))) &&
-	    (CFlatBossState() == 1)) {
-		return 0;
-	}
-	return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80130ac8
- * PAL Size: 300b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncWifeLamia()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-
-	switch (prgObj->m_lastStateId) {
-	case 100:
-		if (prgObj->m_subState == 0) {
-			if (prgObj->m_subFrame == 0) {
-				memset(&m_moveWork, 0, sizeof(m_moveWork));
-				m_moveWork.m_flags = 0x10022;
-
-				const CVector& attackOffset =
-				    CVector(kMeteoParasiteAttackOffsetX, kMeteoParasiteAttackOffsetY, kMeteoParasiteAttackOffsetZ);
-				m_moveWork.m_targetPos.x = attackOffset.x;
-				m_moveWork.m_targetPos.y = attackOffset.y;
-				m_moveWork.m_targetPos.z = attackOffset.z;
-				m_moveWork.m_speed = kMonObjBossFastMoveSpeed;
-				m_moveWork.m_range = reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius;
-			}
-			moveFrame();
-			if ((m_moveWork.m_stateFlags & 1) != 0) {
-				prgObj->addSubStat();
-			}
-		} else if (prgObj->m_subState == 1) {
-			if (prgObj->m_subFrame == 0) {
-				prgObj->reqAnim(0x1A, 0, 0);
-			} else if (prgObj->isLoopAnim() != 0) {
-				prgObj->addSubStat();
-			}
-		} else if (prgObj->m_subState == 2 && prgObj->m_subFrame == 0) {
-			prgObj->reqAnim(0x1B, 1, 0);
-		}
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80130a64
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::damagedFuncWifeLamia()
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-	if (script[14] <= 1) {
-		reinterpret_cast<CGCharaObj*>(this)->ClearAllSta();
-		object->m_bgColMask &= 0xFFF7FFFF;
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(100, 0, 0);
-		m_actionBranch = 1;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80130a1c
- * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::changeStatFuncMolbol(int stat)
-{
-	switch (stat) {
-	case 100:
-		setActionParam(-13);
-		break;
-	case 101:
-		setActionParam(-14);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801309e8
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::cancelStatFuncMolbol()
-{
-	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
-	case 100:
-		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80130898
- * PAL Size: 336b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncMolbol()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
-	u8* self = reinterpret_cast<u8*>(this);
-	int state = prgObj->m_lastStateId;
-
-	switch (state) {
-	case 100:
-		suikomi(0x53, kMonObjBossZero);
-		break;
-	case 0x65:
-		if (prgObj->m_stateFrame == 0 || prgObj->m_stateFrame == 5 || prgObj->m_stateFrame == 10) {
-			CVector pos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
-			pos.x += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
-			pos.z += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
-			charaObj->putParticleFromItem(charaObj->m_itemId, 3, charaObj->m_particleSlots[0], reinterpret_cast<Vec*>(&pos));
-		}
-		charaObj->statAttack();
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801307d4
- * PAL Size: 196b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::initFinishedFuncMeteoParasiteC()
-{
-	initFinishedFuncDefault();
-	*reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x74) = this;
-
-	if (strcmp(Game.m_currentScriptName, sMeteoParasiteScriptName) == 0) {
-		MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
-		CGObject* object = reinterpret_cast<CGObject*>(this);
-		work->bits.m_meteo3 = 1;
-		work->m_index = 3;
-		*reinterpret_cast<u16*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) = 1;
-		object->SetAnimSlot(0x35, 0);
-		reinterpret_cast<CGPrgObj*>(this)->reqAnim(0x35, 1, 0);
-		object->PlayAnim(0x35, 1, 0, -1, -1, 0);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801306b8
- * PAL Size: 284b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::damagedFuncMeteoParasiteC()
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
-
-	if (work->bits.m_meteo3 == 0) {
-		if (((work->m_coreIndex == 0) &&
-		     (reinterpret_cast<unsigned short*>(object->m_scriptHandle)[0x1C / 2] <
-		      ((reinterpret_cast<unsigned short*>(object->m_scriptHandle)[0x1A / 2] * 2) / 3))) ||
-		    ((work->m_coreIndex == 1) &&
-		     (reinterpret_cast<unsigned short*>(object->m_scriptHandle)[0x1C / 2] <
-		      (reinterpret_cast<unsigned short*>(object->m_scriptHandle)[0x1A / 2] / 3)))) {
-			*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) = 0;
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x66, 0, 0);
-			object->m_bgColMask &= 0xFFF7FFFF;
-		} else if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) >= 0x32) {
-			*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) = 0;
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(0x67, 0, 0);
-			object->m_bgColMask &= 0xFFF7FFFF;
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801302c8
- * PAL Size: 1008b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncMeteoParasiteC()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-
-	int state = prgObj->m_lastStateId;
-	switch (state) {
-	case 0x65:
-		if (prgObj->m_subState == 0) {
-			if (prgObj->m_subFrame == 0) {
-				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 1;
-				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreMode = 0;
-			} else if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 == 0) {
-				prgObj->addSubStat();
-			}
-		} else if (prgObj->m_subState == 1) {
-			if (prgObj->m_subFrame == 0) {
-				prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 0x16, 0, 0);
-				prgObj->playSe3D(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex * 2 + 0x11D35, 0x32, 0x96, 0, 0);
-			} else if (prgObj->isLoopAnim() != 0) {
-				reinterpret_cast<CGObject*>(this)->SetAnimSlot(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 0x19, 0);
-				prgObj->changeStat(0, 0, 0);
-				m_actionBranch = 1;
-				reinterpret_cast<CGObject*>(this)->m_bgColMask |= 0x80000;
-			}
-		}
-		return;
-	case 0x67: {
-		int subState = prgObj->m_subState;
-		if (subState == 0) {
-			if (prgObj->m_subFrame == 0) {
-				reinterpret_cast<CGCharaObj*>(this)->damageDelete();
-				prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex * 3 + 0x1C, 0, 0);
-			} else if (prgObj->isLoopAnim() != 0) {
-				prgObj->changeSubStat(1);
-			}
-		} else if (subState == 1) {
-			if (prgObj->m_subFrame == 0) {
-				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 1;
-				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreMode = 1;
-				prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex * 3 + 0x1D, 1, 0);
-			} else if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 == 0) {
-				prgObj->changeSubStat(2);
-			}
-		} else if (subState == 2) {
-			if (prgObj->m_subFrame == 0) {
-				prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex * 3 + 0x1E, 0, 0);
-				prgObj->playSe3D(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex * 2 + 0x11D34, 0x32, 0x96, 0, 0);
-			} else if (prgObj->isLoopAnim() != 0) {
-				reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);
-				prgObj->changeStat(0, 0, 0);
-				m_actionBranch = 0;
-				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreWait = 0x177;
-				m_unk6C8 = 0;
-			}
-		}
-		return;
-	}
-	default:
-		if (prgObj->m_stateFrame == 0) {
-			reinterpret_cast<CGCharaObj*>(this)->damageDelete();
-			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)
-			    ->m_objs[reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex]
-			    ->changeStat(0x65, 0, 0);
-			prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 0x25, 0, 0);
-			CFlatBossState() = CFlatBossState() + 1;
-			reinterpret_cast<MeteoParasiteCGameFlags*>(&CFlatGameFlags())->bits.m_bit5 = 1;
-		} else if (prgObj->isLoopAnim() != 0) {
-			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);
-			prgObj->changeStat(0, 0, 0);
-			m_actionBranch = 0;
-			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreWait = 0x177;
-			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex =
-			    reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex + 1;
-			if (3 <= reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex) {
-				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_coreIndex = 0;
-			}
-			m_unk6C8 = 0;
-		}
-		return;
-	case 0x68:
-		if (prgObj->m_stateFrame == 0) {
-			prgObj->reqAnim(0x35, 1, 0);
-		}
-		return;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801302b8
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::calcBranchFuncMeteoParasiteC(int)
-{
-	return *reinterpret_cast<int*>(CGMonObj::m_boss + 0x78);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80130224
- * PAL Size: 144b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::logicFuncMeteoParasiteC()
-{
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int nextState = -1;
-	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
-	if (work->bits.m_meteo3 != 0) {
-		nextState = 0x68;
-	} else {
-		work->m_wait = (work->m_wait - 1) & ~((work->m_wait - 1) >> 31);
-		if (m_actionBranch == 0) {
-			if (work->m_wait == 0) {
-				nextState = 0x65;
-			} else {
-				return;
-			}
-		}
-	}
-	if (nextState != -1) {
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
-	} else {
-		logicFuncDefault();
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80130208
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::attackCheckFuncMeteoParasiteC(int)
-{
-	const int branch = m_actionBranch;
-	return (((branch - 1) | (1 - branch)) >> 31) - 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8013004c
- * PAL Size: 444b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::initFinishedFuncMeteoParasite()
-{
-	initFinishedFuncDefault();
-
-	const int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
-	switch (scriptKind) {
-	case 0x85: {
-		CGObject* object = reinterpret_cast<CGObject*>(this);
-		int nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sLichTeleportNodeA));
-		CChara::CNode* node = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
-		reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[0] = node;
-		node->m_flagsBits.m_flag_80 = 0;
-
-		nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sLichTeleportNodeB));
-		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
-		nodes[1] = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
-		nodes[1]->m_flagsBits.m_flag_80 = 0;
-
-		char nodeName[256];
-		for (int i = 0; i < 12; i++) {
-			sprintf(nodeName, sLichTeleportNodeFormat, i + 1);
-			nodeIndex = object->m_charaModelHandle->m_model->SearchNode(nodeName);
-			nodes[i + 2] = object->m_charaModelHandle->m_model->m_nodes + nodeIndex;
-			if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 != 0) {
-				int dispIndex = object->m_charaModelHandle->m_model->GetDispIndex(nodes[i + 2]);
-				object->m_charaModelHandle->m_model->m_meshVisibleMask &= ~(1 << dispIndex);
-			}
-		}
-		break;
-	}
-	}
-
-	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
-	int objIndex = scriptKind - 0x85;
-	work->m_objs[objIndex] = reinterpret_cast<CGPrgObj*>(this);
-
-	if (work->bits.m_meteo3 != 0) {
-		reinterpret_cast<CGObject*>(this)->SetAnimSlot(scriptKind == 0x87 ? 0x0D : 0x0E, 0);
-		reinterpret_cast<CGPrgObj*>(this)->reqAnim(0, 1, 0);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012ffe4
- * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::changeStatFuncMeteoParasite(int stat)
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
-	switch (scriptKind) {
-	case 0x87:
-		switch (stat) {
-		case 0x67: {
-			CGMonObj* meteoC = *reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x74);
-			if (meteoC->m_actionBranch == 1) {
-				setActionParam(-13);
-			} else {
-				setActionParam(-14);
-			}
-			break;
-		}
-		}
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012fcc8
- * PAL Size: 796b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::alwaysFuncMeteoParasite()
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	const int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
-
-	switch (scriptKind) {
-	case 0x85:
-		if (reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 == 0) {
-			if (g_errCt == 0) {
-				g_errCt = 1;
-				MG_GBA_THREAD_MSG_SETPORT_ct = kMonObjBossZero;
-			}
-
-			PSMTXRotRad(reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[0]->m_localRuntimeMtx, 'x',
-			            MG_GBA_THREAD_MSG_SETPORT_ct);
-			PSMTXRotRad(reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss)[1]->m_localRuntimeMtx, 'x',
-			            -MG_GBA_THREAD_MSG_SETPORT_ct);
-
-			CGObject** rotObjects = reinterpret_cast<CGObject**>(CGMonObj::m_boss);
-			for (int i = 0; i < 12; i++) {
-				rotObjects[i + 14]->m_rotTargetY =
-				    kMonObjBossTwo * (kMonObjBossPi * static_cast<float>(i + 3)) / kMonObjBossTwelve +
-				    MG_GBA_THREAD_MSG_SETPORT_ct;
-			}
-
-			MG_GBA_THREAD_MSG_SETPORT_ct += kMonObjBossScaleStep;
-		}
-		break;
-	}
-
-	switch (scriptKind) {
-	case 0x85:
-	case 0x86:
-	case 0x87:
-		if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == scriptKind - 0x85 &&
-		    reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) {
-			int dummy;
-			if (reinterpret_cast<CGCharaObj*>(this)->getItemPdt(0, 0, dummy, dummy, dummy) != 0) {
-				if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 0) {
-					reinterpret_cast<CGPrgObj*>(this)->changeStat(100, 0, 0);
-					m_actionBranch = 0;
-				}
-				if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 2) {
-					reinterpret_cast<CGPrgObj*>(this)->changeStat(0x65, 0, 0);
-					m_actionBranch = 2;
-				}
-				if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x80) == 1) {
-					reinterpret_cast<CGPrgObj*>(this)->changeStat(0x66, 0, 0);
-					m_actionBranch = 1;
-				}
-				reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_bit80 = 0;
-			}
-		}
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012fad0
- * PAL Size: 504b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncMeteoParasite()
-{
-	int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	int state = prgObj->m_lastStateId;
-
-	switch (state) {
-	case 100:
-		if (prgObj->m_stateFrame == 0) {
-			prgObj->reqAnim(10, 0, 0);
-		} else if (prgObj->isLoopAnim() != 0) {
-			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0xB, 0);
-			prgObj->changeStat(0, 0, 0);
-		}
-		break;
-	case 0x65:
-		if (prgObj->m_stateFrame == 0) {
-			prgObj->reqAnim(0xC, 0, 0);
-		} else if (prgObj->isLoopAnim() != 0) {
-			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);
-			prgObj->changeStat(0, 0, 0);
-		}
-		break;
-	case 0x66:
-		if (prgObj->m_stateFrame == 0) {
-			prgObj->reqAnim(0xD, 0, 0);
-		} else if (prgObj->isLoopAnim() != 0) {
-			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0xE, 0);
-			prgObj->changeStat(0, 0, 0);
-		}
-		break;
-	case 0x68:
-		break;
-	}
-
-	switch (scriptKind) {
-	case 0x87:
-		switch (prgObj->m_lastStateId) {
-		case 0x67: {
-			int frame = prgObj->m_stateFrame;
-			if (frame >= 0x19 && frame < 0x32) {
-				if (frame == 0x19) {
-					prgObj->playSe3D(0x11D5B, 0x32, 0x96, 0, 0);
-				}
-				if (prgObj->m_stateFrame % 3 == 0) {
-					CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
-					chara->putParticleFromItem(chara->m_itemId, 2, chara->m_particleSlots[0], 0);
-				}
-			}
-			reinterpret_cast<CGCharaObj*>(this)->statAttack();
-			break;
-		}
-		}
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012fa20
- * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::logicFuncMeteoParasite()
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
-	int nextState = -1;
-
-	if (work->bits.m_meteo3) {
-		nextState = 0x68;
-	} else {
-		switch (reinterpret_cast<int>(object->m_scriptHandle[4])) {
-		case 0x87:
-			if (work->m_coreIndex == 2 && m_actionBranch < 2) {
-				if (work->m_objs[3]->m_lastStateId >= 100) {
-					return;
-				}
-				if (work->bits.m_bit80) {
-					return;
-				}
-			}
-			break;
-		}
-	}
-
-	if (nextState != -1) {
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
-	} else {
-		logicFuncDefault();
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012f984
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::attackCheckFuncMeteoParasite(int)
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int scriptState = reinterpret_cast<int>(object->m_scriptHandle[4]);
-
-	switch (scriptState) {
-	case 0x85:
-		return -2;
-	case 0x86:
-		if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == 1 && m_actionBranch == 1) {
-			return -1;
-		}
-		return -2;
-	case 0x87:
-		if (*reinterpret_cast<int*>(CGMonObj::m_boss + 0x78) == 2 && m_actionBranch < 2) {
-			return -1;
-		}
-		return -2;
-	default:
-		return -1;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012f8bc
- * PAL Size: 200b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::aiAddDuct(int& seq)
-{
-	if (static_cast<unsigned int>(Math.Rand(300)) == 0) {
-		aiTarget();
-		aiSeq(-14, seq, 0, 1, 100, -1);
-		aiSeq(-13, seq, 1, 0, 100, -1);
-		reinterpret_cast<CGPrgObj*>(this)->playSe3D(Math.Rand(3) + 0x11D40, 0x32, 0x96, 0, 0);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012f870
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::initFinishedFuncDuct()
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	initFinishedFuncDefault();
-	const int slot = static_cast<int>(reinterpret_cast<long>(object->m_scriptHandle[4])) - 0x8E;
-	reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x38)[slot] = this;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012f7ac
- * PAL Size: 196b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::damagedFuncDuct()
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	void* scriptKind = object->m_scriptHandle[4];
-	CCharaPcs::CLoadPdt* loadPdt = object->m_charaModelHandle->m_pdtLoadRef;
-	int slot = reinterpret_cast<int>(scriptKind) - 0x8E;
-	int pdtNo = loadPdt != 0 ? loadPdt->m_pdtSlot : -1;
-	reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 2, 0, reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0);
-
-	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x1C) == 0) {
-		CGObject* bossObj = *reinterpret_cast<CGObject**>(CGMonObj::m_boss + 0x68);
-		CChara::CModel* model = bossObj->m_charaModelHandle->m_model;
-		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss + 0x8);
-		int dispIndex = model->GetDispIndex(nodes[slot]);
-		model->m_meshVisibleMask &= ~(1 << dispIndex);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012f678
- * PAL Size: 308b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::logicFuncRamoe()
-{
-	unsigned int* scriptWork = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&Game) + 4);
-	int activeCount = 0;
-	int nextState = -1;
-
-	for (int i = 1; i < 0x40; scriptWork++, i++) {
-		CGPrgObj* monObj = reinterpret_cast<CGPrgObj*>(scriptWork[0xC5D0 / 4]);
-		if (monObj != 0 && (monObj->m_lastStateId != 9 || monObj->m_subState != 2)) {
-			activeCount++;
-		}
-	}
-
-	if (activeCount == 0 && static_cast<unsigned int>(Math.Rand(3)) == 0) {
-		nextState = 100;
-	}
-
-	if (nextState != -1) {
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
-	} else {
-		logicFuncDefault();
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012f648
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::changeStatFuncRamoe(int stat)
-{
-	switch (stat) {
-	case 100:
-		setActionParam(-9);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012f644
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::cancelStatFuncRamoe()
-{
-	return;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012f598
- * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncRamoe()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	switch (prgObj->m_lastStateId) {
-	case 100:
-		if (prgObj->m_stateFrame == 0x3A) {
-			unsigned int* scriptWork = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&Game) + 4);
-			for (int i = 1; i < 0x40; i++, scriptWork++) {
-				CGMonObj* monObj = reinterpret_cast<CGMonObj*>(scriptWork[0xC5D0 / 4]);
-				CGPrgObj* monPrg = reinterpret_cast<CGPrgObj*>(monObj);
-				if (monObj != 0 && monPrg->m_lastStateId == 9 && monPrg->m_subState == 2) {
-					monObj->setRepop(0);
-				}
-			}
-		}
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012f534
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::initFinishedFuncLastBoss()
-{
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	initFinishedFuncDefault();
-	*reinterpret_cast<CGMonObj**>(CGMonObj::m_boss) = this;
-
-	int nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sCrystalItemNodeName));
-	CChara::CModel* model = object->m_charaModelHandle->m_model;
-	*reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss + 4) = model->m_nodes + nodeIndex;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012f4b0
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::damagedFuncLastBoss()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int& timer = *reinterpret_cast<int*>(CGMonObj::m_boss + 0x24);
-	if (timer >= 100 && m_actionBranch == 0) {
-		m_actionBranch = 1;
-		m_unk6C8 = 0;
-		prgObj->changeStat(100, 0, 0);
-		object->m_bgColMask &= 0xFFF7FFFF;
-		timer = 0;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012f480
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::changeStatFuncLastBoss(int stat)
-{
-	switch (stat) {
-	case 0x66:
-		setActionParam(-7);
-		break;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012f3e8
- * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::cancelStatFuncLastBoss()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	switch (prgObj->m_lastStateId) {
-	case 0x66: {
-		CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
-		for (int i = 0; i < 4; i++) {
-			CGPartyObj* party = work[i + 2];
-			if (party != 0) {
-				CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
-				if (partyPrg->m_lastStateId == 0x25) {
-					partyPrg->changeStat(0x24, 0, 0);
-				}
-			}
-		}
-		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
-		break;
-	}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012efa8
- * PAL Size: 1088b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::frameStatFuncLastBoss()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
-	Mtx nodeMtx;
-	CChara::CModel* model = object->m_charaModelHandle->m_model;
-	CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
-	PSMTXCopy(nodes[1]->m_mtx, nodeMtx);
-
-	Vec* bossPos = reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x18);
-	nodeMtx[0][3] += model->m_drawMtx[0][3];
-	nodeMtx[1][3] += model->m_drawMtx[1][3];
-	nodeMtx[2][3] += model->m_drawMtx[2][3];
-	bossPos->x = nodeMtx[0][3];
-	bossPos->y = nodeMtx[1][3];
-	bossPos->z = nodeMtx[2][3];
-
-	const int state = prgObj->m_lastStateId;
-
-	switch (state) {
-	case 100:
-		if (prgObj->m_stateFrame == 0) {
-			reinterpret_cast<CGCharaObj*>(this)->damageDelete();
-			object->m_bgColMask &= 0xFFF7FFFF;
-			prgObj->reqAnim(0x18, 0, 0);
-
-			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x10, 0, object, 1.0f, 0);
-			prgObj->playSe3D(0x12912, 0x32, 0x96, 0, 0);
-		} else if (prgObj->m_stateFrame == 0x7D) {
-			object->m_bodyEllipsoidRadius = kMonObjBossRightAngleDeg;
-		} else if (prgObj->isLoopAnim() != 0) {
-			object->m_bgColMask |= 0x80000;
-			object->SetAnimSlot(0x12, 0);
-			object->SetAnimSlot(0x14, 1);
-			object->SetAnimSlot(0x16, 4);
-			prgObj->changeStat(0, 0, 0);
-			m_actionBranch = 2;
-		}
-		return;
-	case 0x65:
-		if (prgObj->m_stateFrame == 0) {
-			object->m_bgColMask &= 0xFFF7FFFF;
-			prgObj->reqAnim(0x19, 0, 0);
-
-			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x11, 0, object, 1.0f, 0);
-			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 0x12, 0, object, 1.0f, 0);
-			prgObj->playSe3D(0x12913, 0x32, 0x96, 0, 0);
-		} else if (prgObj->m_stateFrame == 0x29) {
-			object->m_bodyEllipsoidRadius = kMonObjBossLichTeleportHeight;
-		} else if (prgObj->isLoopAnim() != 0) {
-			object->m_bgColMask |= 0x80000;
-			prgObj->changeStat(0, 0, 0);
-			object->SetAnimSlot(0x13, 0);
-			object->SetAnimSlot(0x15, 1);
-			object->SetAnimSlot(0x17, 4);
-			m_actionBranch = 0;
-		}
-		return;
-	case 0x66:
-		if (prgObj->m_stateFrame == 0) {
-			prgObj->putParticle((object->m_charaModelHandle->GetPdtSlot() << 8) | 5, *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0x12902);
-		} else if (prgObj->m_stateFrame == 0x4B) {
-			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
-			for (int i = 0; i < 4; i++) {
-				CGPartyObj* party = work[i + 2];
-				if (party != 0) {
-					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
-					if (partyPrg->m_lastStateId == 0x24) {
-						if (fabs(prgObj->getTargetRot(partyPrg)) < kMonObjBossQuarterPiF64) {
-							partyPrg->changeStat(0x25, 0, 0);
-						}
-					}
-				}
-			}
-		} else if (prgObj->m_stateFrame == 200) {
-			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(CGMonObj::m_boss);
-			for (int i = 0; i < 4; i++) {
-				CGPartyObj* party = work[i + 2];
-				if (party != 0) {
-					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
-					if (partyPrg->m_lastStateId == 0x25) {
-						partyPrg->changeStat(0x24, 0, 0);
-					}
-				}
-			}
-			reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
-		}
-
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
-		return;
-	default:
-		return;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012ef94
- * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGMonObj::calcBranchFuncLastBoss(int)
-{
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	return (m_actionBranch != 0) ? 1 : 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012ef0c
- * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::logicFuncLastBoss()
-{
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int nextState = -1;
-
-	if (m_actionBranch == 2) {
-		int& timer = *reinterpret_cast<int*>(CGMonObj::m_boss + 0x24);
-		timer += 1;
-		if (timer >= 10) {
-			m_actionBranch = 3;
-			nextState = 0x65;
-			m_unk6C8 = 0;
-			object->m_bgColMask &= 0xFFF7FFFF;
-			timer = 0;
+		*reinterpret_cast<int*>(CGMonObj::m_boss) = 0;
+		if ((m_actionBranch == 0 && static_cast<unsigned int>(Math.Rand(10)) < 1) ||
+		    (m_actionBranch == 1 && static_cast<unsigned int>(Math.Rand(10)) < 2) ||
+		    (m_actionBranch == 2 && static_cast<unsigned int>(Math.Rand(10)) < 3)) {
+			nextState = 100;
 		}
 	}
 
@@ -2672,269 +2895,46 @@ void CGMonObj::logicFuncLastBoss()
 
 /*
  * --INFO--
- * PAL Address: 0x8012e9bc
- * PAL Size: 1360b
+ * PAL Address: 0x80132f68
+ * PAL Size: 404b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma global_optimizer off
-void CGMonObj::teleport(
-	int mode, int animId, int startFrame, int blendEndFrame, int seStart, int seEnd, int particleStart, int particleBlend, int particleEnd,
-	Vec* teleportPoints, int& teleportIndex, Vec& startPos
-)
+void CGMonObj::damagedFuncGiantCrab()
 {
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-#define object (reinterpret_cast<CGObject*>(prgObj))
-#define mon (reinterpret_cast<unsigned char*>(prgObj))
-	const int blendStartFrame = startFrame + 8;
-	const int blendEndPlusFrame = blendEndFrame + 8;
-	const int blendFrameCount = blendEndFrame - blendStartFrame;
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	*reinterpret_cast<int*>(CGMonObj::m_boss) = 1;
 
-	if (m_stateFrame == 0) {
-		int pdtNo;
-		m_bgColMask &= 0xFFF3FFFC;
-		m_weaponNodeFlagBits.m_unk10 = 0;
-		m_groundHitOffset.z = kMonObjBossZero;
-		m_groundHitOffset.y = kMonObjBossZero;
-		m_groundHitOffset.x = kMonObjBossZero;
-
-		reqAnim(animId, 0, 0);
-		playSe3D(seStart, 0x32, 0x1C2, 0, 0);
-
-			pdtNo = m_charaModelHandle->GetPdtSlot();
-		putParticle(particleStart | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), this, kMonObjBossOne, 0);
-
-		if (mode == 0) {
-			pdtNo = m_charaModelHandle->GetPdtSlot();
-			putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &m_worldPosition, kMonObjBossOne, 0);
-		} else {
-			pdtNo = m_charaModelHandle->GetPdtSlot();
-			putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), this, kMonObjBossOne, 0);
+	switch (m_actionBranch) {
+	case 0: {
+		unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+		if (script[0x1C / 2] >= ((script[0x1A / 2] * 2) / 3)) {
+			return;
 		}
+		object->DispCharaParts(3);
+		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0C, 0, object, kMonObjBossOne, 0);
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x4E36, 0x32, 500, 0, 0);
+		break;
 	}
-
-#define stateFrame (prgObj->m_stateFrame)
-
-	if (stateFrame <= blendStartFrame) {
-		if (startFrame <= stateFrame) {
-			const float angle = kMonObjBossHalfPi * static_cast<float>(stateFrame - startFrame) * kMonObjBossOneEighth;
-			const float wave = static_cast<float>(cos(angle));
-			m_rotationZ = wave;
-			m_rotationX = wave;
-			m_rotationY = kMonObjBossOne + static_cast<float>(sin(angle));
+	case 1: {
+		unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+		if (script[0x1C / 2] >= (script[0x1A / 2] / 3)) {
+			return;
 		}
-	} else {
-		if (stateFrame <= blendEndFrame) {
-			if (stateFrame == blendStartFrame + 1) {
-				int nextIndex;
-				do {
-					nextIndex = Math.Rand(4);
-				} while (nextIndex == teleportIndex);
-
-				teleportIndex = nextIndex;
-				startPos = m_worldPosition;
-
-				if (mode == 1) {
-					m_displayFlags &= 0xFFFFFFFE;
-				}
-			}
-
-			const float ratio = static_cast<float>(stateFrame - blendStartFrame) / static_cast<float>(blendFrameCount);
-			const float blend = kMonObjBossHalf * (kMonObjBossOne + static_cast<float>(cos(kMonObjBossPi * ratio)));
-			const CVector& point = CVector(teleportPoints[teleportIndex]);
-			CVector scaledPoint;
-			PSVECScale(reinterpret_cast<Vec*>(const_cast<CVector*>(&point)), reinterpret_cast<Vec*>(&scaledPoint), kMonObjBossOne - blend);
-
-			Vec scaledPointCopy;
-			scaledPointCopy.x = scaledPoint.x;
-			scaledPointCopy.y = scaledPoint.y;
-			scaledPointCopy.z = scaledPoint.z;
-
-			const CVector& current = CVector(m_worldPosition);
-			CVector scaledCurrent;
-			PSVECScale(reinterpret_cast<Vec*>(const_cast<CVector*>(&current)), reinterpret_cast<Vec*>(&scaledCurrent), blend);
-
-			Vec scaledCurrentCopy;
-			scaledCurrentCopy.x = scaledCurrent.x;
-			scaledCurrentCopy.y = scaledCurrent.y;
-			scaledCurrentCopy.z = scaledCurrent.z;
-
-			CVector blended;
-			PSVECAdd(&scaledCurrentCopy, &scaledPointCopy, reinterpret_cast<Vec*>(&blended));
-			Vec blendedCopy;
-			blendedCopy.x = blended.x;
-			blendedCopy.y = blended.y;
-			blendedCopy.z = blended.z;
-			m_worldPosition.x = blendedCopy.x;
-			m_worldPosition.y = blendedCopy.y;
-			m_worldPosition.z = blendedCopy.z;
-
-			if (mode == 1 && stateFrame == blendEndFrame - 0x2A) {
-				int pdtNo = m_charaModelHandle->GetPdtSlot();
-				putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &teleportPoints[teleportIndex], kMonObjBossOne, 0);
-				playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
-			}
-		} else if (stateFrame <= blendEndPlusFrame) {
-			if (stateFrame == blendEndFrame + 1) {
-				if (mode == 0) {
-					int pdtNo = m_charaModelHandle->GetPdtSlot();
-					putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58C), &m_worldPosition, kMonObjBossOne, 0);
-					playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
-				}
-
-				m_bgColMask |= 3;
-				m_weaponNodeFlagBits.m_unk10 = 1;
-				m_groundHitOffset.z = kMonObjBossZero;
-				m_groundHitOffset.y = kMonObjBossZero;
-				m_groundHitOffset.x = kMonObjBossZero;
-
-				if (mode == 1) {
-					m_displayFlags |= 1;
-				}
-			}
-
-			const float angle = kMonObjBossHalfPi * (kMonObjBossOne - static_cast<float>(stateFrame - blendEndFrame) * kMonObjBossOneEighth);
-			const float wave = static_cast<float>(cos(angle));
-			m_rotationZ = wave;
-			m_rotationX = wave;
-			m_rotationY = kMonObjBossOne + static_cast<float>(sin(angle));
-
-			if (stateFrame == blendEndPlusFrame) {
-				m_bgColMask |= 0xC0000;
-				setAttackAfter(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560));
-			}
-		}
+		object->DispCharaParts(1);
+		int pdtNo = object->m_charaModelHandle->GetPdtSlot();
+		reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 0x0D, 0, object, kMonObjBossOne, 0);
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x4E37, 0x32, 500, 0, 0);
+		break;
 	}
-}
-#undef object
-#undef mon
-#undef stateFrame
-#pragma global_optimizer on
-
-/*
- * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CGMonObj::suikomiSub(CGObject*, float)
-{
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	unsigned char* target = reinterpret_cast<unsigned char*>(Game.unk_flat3_0xc7d0);
-	if (target == 0) {
+	default:
 		return;
 	}
 
-	float dx = *(float*)(self + 0x15c) - *(float*)(target + 0x15c);
-	float dz = *(float*)(self + 0x164) - *(float*)(target + 0x164);
-	float distSq = dx * dx + dz * dz;
-	double dist = (double)distSq;
-
-	if (dist <= (double)kMonObjBossZero) {
-		if (kMonObjBossZeroF64 <= dist) {
-			unsigned int exp = (unsigned int)distSq & 0x7f800000;
-			int fpClass;
-			if (exp == 0x7f800000) {
-				fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 2 : 1;
-			} else if ((exp < 0x7f800000) && (exp == 0)) {
-				fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 3 : 5;
-			} else {
-				fpClass = 4;
-			}
-			if (fpClass == 1) {
-				dist = NAN;
-			}
-		} else {
-			dist = NAN;
-		}
-	} else {
-		double inv = (double)kMonObjBossOne / sqrt(dist);
-		inv = kMonObjBossHalfF64 * inv * -(dist * inv * inv - kMonObjBossThreeF64);
-		inv = kMonObjBossHalfF64 * inv * -(dist * inv * inv - kMonObjBossThreeF64);
-		dist = (double)(float)(dist * kMonObjBossHalfF64 * inv * -(dist * inv * inv - kMonObjBossThreeF64));
-	}
-
-	if ((double)kMonObjBossZero < dist) {
-		float accel = (float)((double)kMonObjBossOne / dist) * kMonObjBossQuarter *
-		              (float)(dist / (double)kMonObjBossLargeBodyRadius);
-		*(float*)(target + 0x104) += dx * accel;
-		*(float*)(target + 0x10c) += dz * accel;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012e5dc
- * PAL Size: 992b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGMonObj::suikomi(int endFrame, float zOffset)
-{
-	CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
-	if (prgObj->m_stateFrame == 0) {
-		prgObj->playSe3D(0xdec0, 0x32, 0x1c2, 0, 0);
-		for (int i = 0; i < 4; i++) {
-			CGPartyObj* party = Game.m_partyObjArr[i];
-			if (party != 0) {
-				CFlat.ResetParticleWork(0x26, *(int*)(self + 0x58c));
-				CFlat.SetParticleWorkTrace(this);
-				CFlat.SetParticleWorkBind(party);
-				CFlat.PutParticleWork();
-			}
-		}
-	}
-
-	if (prgObj->m_stateFrame <= endFrame) {
-		for (int i = 0; i < 4; i++) {
-			CGPartyObj* party = Game.m_partyObjArr[i];
-			if (party != 0) {
-				float dx = *(float*)(self + 0x15c) - *(float*)((unsigned char*)party + 0x15c);
-				float dz =
-				    zOffset + (*(float*)(self + 0x164) - *(float*)((unsigned char*)party + 0x164));
-				float distSq = dx * dx + dz * dz;
-				float dist = sqrtf(distSq);
-
-				if (kMonObjBossZero < dist) {
-					float accel = kMonObjBossOne / dist * (kMonObjBossQuarter * (dist / kMonObjBossLargeBodyRadius));
-					float ax = dx * accel;
-					float az = dz * accel;
-					*(float*)((unsigned char*)party + 0x104) += ax;
-					*(float*)((unsigned char*)party + 0x10c) += az;
-				}
-			}
-		}
-
-		if ((Game.unk_flat3_0xc7d0 != 0) && (*(unsigned int*)(Game.unk_flat3_0xc7d0 + 0x550) == 0)) {
-			unsigned int target = Game.unk_flat3_0xc7d0;
-			float dx = *(float*)(self + 0x15c) - *(float*)(target + 0x15c);
-			float dz = zOffset + (*(float*)(self + 0x164) - *(float*)(target + 0x164));
-			float distSq = dx * dx + dz * dz;
-			float dist = sqrtf(distSq);
-
-			if (kMonObjBossZero < dist) {
-				float accel = kMonObjBossOne / dist * (kMonObjBossQuarter * (dist / kMonObjBossLargeBodyRadius));
-				float ax = dx * accel;
-				float az = dz * accel;
-				*(float*)(target + 0x104) += ax;
-				*(float*)(target + 0x10c) += az;
-			}
-		}
-
-		if (prgObj->m_stateFrame == endFrame) {
-			chara->endPSlotBit(0x400);
-		}
-	}
-
-	chara->statAttack();
+	reinterpret_cast<CGPrgObj*>(this)->changeStat(4, 0, 0);
+	m_actionBranch = m_actionBranch + 1;
+	m_unk6C8 = 0;
 }

@@ -2297,8 +2297,9 @@ renderedDone:
         float bestDistance = kLineBoundsInitMin;
         float bestLineDistance = 0.0f;
 
+        CLine<64>* lines = m_debugLines;
         for (unsigned int i = 0; i < 0x10; i++) {
-            CLine<64>& line = m_debugLines[i];
+            CLine<64>& line = lines[i];
             if (line.pointCount == 0 || (line.m_mask & mask) == 0 || line.IsInner(&target, margin) == 0) {
                 continue;
             }

@@ -3905,7 +3905,7 @@ renderedDone:
         break;
     case -0xDC: {
         CRomLetterWork* letters = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);
-        this->push(object, letters[*object->m_localBase].Word(object->m_localBase[1]));
+        this->push(object, reinterpret_cast<const unsigned short*>(&letters[*object->m_localBase])[object->m_localBase[1]]);
         outResult = 0;
         break;
     }

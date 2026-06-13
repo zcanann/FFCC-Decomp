@@ -653,10 +653,10 @@ void CRingMenu::onDraw()
 			}
 
 			const char* label;
-			if ((buttonValue & 0x8000) == 0) {
-				label = Game.m_cFlatDataArr[1].TableStrings(4)[buttonValue];
-			} else {
+			if ((buttonValue & 0x8000) != 0) {
 				label = Game.m_cFlatDataArr[1].TableStrings(0)[(buttonValue & ~0x8000) * 5 + 4];
+			} else {
+				label = Game.m_cFlatDataArr[1].TableStrings(4)[buttonValue];
 			}
 
 			float fade = static_cast<float>((&m_buttonTimers[group * 3])[button]) * kRingMenuButtonFadeStep;

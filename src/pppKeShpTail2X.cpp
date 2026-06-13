@@ -222,9 +222,9 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     segDx = nextBaseX - curX;
     segDy = nextBaseY - curY;
     segDz = nextBaseZ - curZ;
-    zeroVec.x = 0.0f;
-    zeroVec.y = 0.0f;
     zeroVec.z = 0.0f;
+    zeroVec.y = 0.0f;
+    zeroVec.x = 0.0f;
     initialSeg.x = segDx;
     initialSeg.y = segDy;
     initialSeg.z = segDz;
@@ -289,7 +289,6 @@ update_step:
     if (trailStep <= 0.0f) {
         return;
     }
-
 advance_segment:
     if (segRemain >= trailStep) {
         curX = (segDx * segCursor) / segLen + segBaseX;
@@ -312,15 +311,15 @@ move_next_segment:
     segBaseX = nextBaseX;
     segBaseY = nextBaseY;
     segBaseZ = nextBaseZ;
-    nextBaseX = history[nextIndex].x;
     nextBaseY = history[nextIndex].y;
     nextBaseZ = history[nextIndex].z;
-    segDx = nextBaseX - segBaseX;
+    nextBaseX = history[nextIndex].x;
     segDy = nextBaseY - segBaseY;
     segDz = nextBaseZ - segBaseZ;
-    zeroVecB.x = 0.0f;
-    zeroVecB.y = 0.0f;
+    segDx = nextBaseX - segBaseX;
     zeroVecB.z = 0.0f;
+    zeroVecB.y = 0.0f;
+    zeroVecB.x = 0.0f;
     seg.x = segDx;
     seg.y = segDy;
     seg.z = segDz;

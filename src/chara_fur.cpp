@@ -568,6 +568,8 @@ static inline int FurColorMatch(CColor src, CColor ref, int limit)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CChara::CalcMogScore()
 {
 	char* fmtBase = lbl_801DB648;
@@ -582,7 +584,7 @@ void CChara::CalcMogScore()
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
-			const unsigned int dx = x - 0x20;
+			const int dx = x - 0x20;
 			const int dy = y - 0x20;
 			const int dist = static_cast<int>(sqrt(static_cast<double>(static_cast<int>(dx * dx + dy * dy))));
 
@@ -719,6 +721,7 @@ void CChara::CalcMogScore()
 		    radarLabel[Game.m_gameWork.m_mogScoreRadarType]);
 	}
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -1047,14 +1050,14 @@ void CChara::CModel::InitMogFurTex()
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_dead_assignments off
+#pragma optimization_level 3
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	int messageId = -1;
 	const int debugPadLock = Pad.m_debugPadLock;
 	const short heldButtons = MogHeldButtons(debugPadLock);
 	const short triggerButtons = MogTriggerButtons(debugPadLock);
-	const unsigned short rotateButtons = static_cast<unsigned short>((MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : static_cast<unsigned short>(0));
+	const unsigned short rotateButtons = static_cast<unsigned short>((MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : static_cast<short>(0));
 
 	if (MogWork().m_started == 0) {
 		if ((heldButtons & 0x100) != 0) {
@@ -1777,9 +1780,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0x0C);
 	LightPcs.EnableLight(1, 1);
 	GXSetZMode((u8)1, (GXCompare)3, (u8)0);
-	const GXColor furColor = CColor(static_cast<unsigned char>(kCharaFurShadeScale * ModelFurCur(this)),
-	                                static_cast<unsigned char>(kCharaFurShadeScale * ModelFurCur(this)),
-	                                static_cast<unsigned char>(kCharaFurShadeScale * ModelFurCur(this)), 0xFF)
+	const float shadeScale = kCharaFurShadeScale;
+	const float furCurVal = ModelFurCur(this);
+	const GXColor furColor = CColor(static_cast<unsigned char>(shadeScale * furCurVal),
+	                                static_cast<unsigned char>(shadeScale * furCurVal),
+	                                static_cast<unsigned char>(shadeScale * furCurVal), 0xFF)
 	                             .color;
 	GXSetChanMatColor(GX_COLOR0A0, furColor);
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));

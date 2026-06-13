@@ -596,21 +596,22 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 
 		while (count != 0) {
 			u32 col = vertexIndex & 1;
-			u32 row = vertexIndex >> 1;
-			u32 nextVertexIndex = vertexIndex + 1;
+			u32 row = (vertexIndex >> 1) & 1;
+			vertexIndex++;
 
 			GXPosition3f32((float)(x + (width & -static_cast<int>(col))),
-			               (float)(y + (height & -static_cast<int>(row & 1))),
+			               (float)(y + (height & -static_cast<int>(row))),
 			               z);
 			GXColor1u32(borderColors[0]);
 
-			vertexIndex = nextVertexIndex;
-			GXPosition3f32((float)(x + (width & -(nextVertexIndex & 1))),
-			               (float)(y + (height & -((nextVertexIndex >> 1) & 1))),
+			col = vertexIndex & 1;
+			row = (vertexIndex >> 1) & 1;
+			vertexIndex++;
+			GXPosition3f32((float)(x + (width & -static_cast<int>(col))),
+			               (float)(y + (height & -static_cast<int>(row))),
 			               z);
 			GXColor1u32(borderColors[1]);
 
-			vertexIndex = nextVertexIndex + 1;
 			borderColors += 2;
 			count--;
 		}

@@ -728,12 +728,15 @@ void CRingMenu::onDraw()
 				CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 				if (partyObj != 0) {
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
-					if ((caravanWork != 0) && ((CFlatGameFlags() & CFlatGameFlag_Bit1) == 0)) {
+					if ((caravanWork != 0)
+					    && (static_cast<signed char>(
+					            static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 30) & 0xC0000000) >> 31)
+					        == 0)) {
 						const float barY = kRingMenuTextOffsetX + textY;
 						const float fullAlpha = showScale * (kRingMenuAlphaMax * fade * transitionScale);
 						const float dimAlpha = showScale * (kRingMenuCommandPanelWidth * fade * transitionScale);
 
-						for (unsigned int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
+						for (int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
 							int maxCharge;
 							int curCharge;
 							int charge = caravanWork->GetMagicCharge(i, maxCharge, curCharge);

@@ -1586,9 +1586,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x52: {
+			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle);
 			unsigned int result = 0;
 			if ((object->m_localBase[0] & 2) != 0) {
-				result = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->FindItem(static_cast<int>(object->m_localBase[1])) >= 0 ? 2 : 0;
+				result = caravanWork->FindItem(static_cast<int>(object->m_localBase[1])) >= 0 ? 2 : 0;
 			}
 			PushValue(this, object, static_cast<int>(result));
 			outResult = 0;
@@ -1912,8 +1913,8 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			        static_cast<int>(object->m_localBase[2]),
 			        static_cast<int>(object->m_localBase[3]),
 			        static_cast<int>(object->m_localBase[4]),
-			        0,
-			        static_cast<int>(static_cast<signed char>(object->m_localBase[5]))));
+			        static_cast<int>(object->m_localBase[5]),
+			        static_cast<int>(object->m_localBase[6])));
 			outResult = 0;
 			break;
 		case -0x86: {
@@ -1925,8 +1926,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x87: {
 			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
-			model->m_furLenScale = reinterpret_cast<float*>(object->m_localBase)[0];
-			model->m_furStep = reinterpret_cast<float*>(object->m_localBase)[1];
+			float furLenScale = reinterpret_cast<float*>(object->m_localBase)[0];
+			float furStep = reinterpret_cast<float*>(object->m_localBase)[1];
+			model->m_furLenScale = furLenScale;
+			model->m_furStep = furStep;
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

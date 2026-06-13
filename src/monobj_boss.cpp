@@ -449,6 +449,7 @@ void CGMonObj::changeStatFuncGolem(int stat)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma bool off
 int CGMonObj::calcBranchFuncGolem(int)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
@@ -461,6 +462,7 @@ int CGMonObj::calcBranchFuncGolem(int)
 	           __cntlzw(script[0x1C / 2] >= static_cast<int>(static_cast<unsigned int>(script[0x1A / 2]) >> 1))) >>
 	       5;
 }
+#pragma bool on
 
 /*
  * --INFO--
@@ -2134,8 +2136,6 @@ void CGMonObj::alwaysFuncMeteoParasite()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma peephole off
 void CGMonObj::frameStatFuncMeteoParasite()
 {
 	int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
@@ -2192,7 +2192,6 @@ void CGMonObj::frameStatFuncMeteoParasite()
 		break;
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -2311,8 +2310,6 @@ void CGMonObj::initFinishedFuncDuct()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma peephole off
 void CGMonObj::damagedFuncDuct()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
@@ -2330,7 +2327,6 @@ void CGMonObj::damagedFuncDuct()
 		model->m_meshVisibleMask &= ~(1 << dispIndex);
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -2683,11 +2679,15 @@ void CGMonObj::logicFuncLastBoss()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma global_optimizer off
 void CGMonObj::teleport(
 	int mode, int animId, int startFrame, int blendEndFrame, int seStart, int seEnd, int particleStart, int particleBlend, int particleEnd,
 	Vec* teleportPoints, int& teleportIndex, Vec& startPos
 )
 {
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+#define object (reinterpret_cast<CGObject*>(prgObj))
+#define mon (reinterpret_cast<unsigned char*>(prgObj))
 	const int blendStartFrame = startFrame + 8;
 	const int blendEndPlusFrame = blendEndFrame + 8;
 	const int blendFrameCount = blendEndFrame - blendStartFrame;
@@ -2715,7 +2715,7 @@ void CGMonObj::teleport(
 		}
 	}
 
-	const int stateFrame = m_stateFrame;
+#define stateFrame (prgObj->m_stateFrame)
 
 	if (stateFrame <= blendStartFrame) {
 		if (startFrame <= stateFrame) {
@@ -2808,6 +2808,10 @@ void CGMonObj::teleport(
 		}
 	}
 }
+#undef object
+#undef mon
+#undef stateFrame
+#pragma global_optimizer on
 
 /*
  * --INFO--

@@ -353,8 +353,7 @@ void CMenuPcs::CmdInit()
 	memset(GetCmdListStorage(this), 0, sizeof(*GetCmdListStorage(this)));
 
 	float fVar2 = kCmdMenuOne;
-	CmdListEntry* entries = GetCmdListEntries(this);
-	CmdListEntry* entry = entries;
+	CmdListEntry* entry = GetCmdListEntries(this);
 	s32 iVar8 = 8;
 	do {
 		entry[0].scale = fVar2;
@@ -369,7 +368,7 @@ void CMenuPcs::CmdInit()
 		iVar8--;
 	} while (iVar8 != 0);
 
-	entry = entries;
+	entry = GetCmdListEntries(this);
 	float fVar3 = kCmdMenuZero;
 	float fVar4 = kCmdMenuSmallOffset;
 	for (s32 iVar5 = 0; iVar5 < 8; iVar5++) {

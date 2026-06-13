@@ -1784,6 +1784,8 @@ void CShopMenu::DrawItemList()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_lifetimes off
 void CShopMenu::DrawSoubiBase()
 {
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
@@ -1832,6 +1834,7 @@ void CShopMenu::DrawSoubiBase()
     }
     drawShapeSeqScale(3, 0, x, 0xA4, FLOAT_80332DD0, FLOAT_80332DCC, 0xFF);
 }
+#pragma pop
 /*
  * --INFO--
  * Address:	TODO

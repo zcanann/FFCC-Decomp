@@ -1173,6 +1173,7 @@ void CGame::Draw()
 	gCFlatRuntime().SystemCall(0, 1, 6, 0, 0, 0);
 }
 
+#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8001440c
@@ -1223,6 +1224,7 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
         entriesByteOffset + stageBase * (int)sizeof(CBossArtifactEntry));
 }
 
+#pragma opt_propagation on
 /*
  * --INFO--
  * PAL Address: 0x800143ec

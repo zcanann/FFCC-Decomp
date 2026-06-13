@@ -568,6 +568,8 @@ static inline int FurColorMatch(CColor src, CColor ref, int limit)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 void CChara::CalcMogScore()
 {
 	char* fmtBase = lbl_801DB648;
@@ -719,6 +721,7 @@ void CChara::CalcMogScore()
 		    radarLabel[Game.m_gameWork.m_mogScoreRadarType]);
 	}
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -1047,7 +1050,7 @@ void CChara::CModel::InitMogFurTex()
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_dead_assignments off
+#pragma optimization_level 3
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	int messageId = -1;

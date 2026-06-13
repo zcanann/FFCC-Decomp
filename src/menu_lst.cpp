@@ -246,8 +246,9 @@ int CMenuPcs::MLstCtrl()
 	if (blocked) {
 		rawPress = 0;
 	} else {
-		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
+		unsigned int padIndex = 0;
+		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
+		padIndex &= ~mask;
 		rawPress = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 	press = rawPress & 0xffff;
@@ -259,8 +260,9 @@ int CMenuPcs::MLstCtrl()
 	if (blocked) {
 		rawHold = 0;
 	} else {
-		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
+		unsigned int padIndex = 0;
+		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
+		padIndex &= ~mask;
 		rawHold = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
 	hold = rawHold & 0xffff;

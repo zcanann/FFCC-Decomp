@@ -1556,7 +1556,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x48:
 			engineObject->m_stepSlopeLimit = reinterpret_cast<float*>(object->m_localBase)[1];
-			if (object->m_localBase[0] != 0) {
+			if (static_cast<int>(object->m_localBase[0]) != 0) {
 				engineObject->m_lookAtTimer = engineObject->m_stepSlopeLimit;
 			}
 			PushValue(this, object, 0);

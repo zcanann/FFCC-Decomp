@@ -318,7 +318,7 @@ void GbaQueue::LoadAll()
 
 	spModeBits = 0;
 	for (i = 0; i < 4; i++) {
-		if (Game.m_gameWork.m_spModeFlags[i] != 0) {
+		if (static_cast<int>(Game.m_gameWork.m_spModeFlags[i]) != 0) {
 			spModeBits = static_cast<char>(spModeBits | (1 << i));
 		}
 	}

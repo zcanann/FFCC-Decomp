@@ -359,8 +359,8 @@ void CMenuPcs::MoneyDraw()
 	}
 
 	for (i = 0; i < 2; i++) {
-		y = (float)(drawBase->y + 0x18) + 32.0f * (float)i;
 		x = (float)(drawBase->x + 0x20);
+		y = (float)(drawBase->y + 0x18) + 32.0f * (float)i;
 		for (int j = 0; j < 8; j++) {
 			signed char digit = s_place[i * 8 + j];
 			if (digit >= 0) {

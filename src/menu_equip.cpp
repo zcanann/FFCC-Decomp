@@ -441,6 +441,7 @@ int CMenuPcs::EquipCtrlCur()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 void CMenuPcs::EquipDraw()
 {
 	int helpItem;
@@ -762,6 +763,7 @@ void CMenuPcs::EquipDraw()
 		}
 	}
 }
+#pragma opt_lifetimes reset
 
 /*
  * --INFO--
@@ -986,6 +988,7 @@ int CMenuPcs::EquipOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_dead_assignments off
 void CMenuPcs::EquipInit1()
 {
 	int i = (int)GetEquipListStorage(this)->count;
@@ -1066,3 +1069,4 @@ void CMenuPcs::EquipInit1()
 		psVar10++;
 	}
 }
+#pragma opt_dead_assignments reset

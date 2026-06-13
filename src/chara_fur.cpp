@@ -673,15 +673,17 @@ void CChara::CalcMogScore()
 	}
 
 	{
-		if (fur.m_score[0] >= 3
-		    && kYmEnvDefaultScale * static_cast<float>(fur.m_score[1] + fur.m_score[2]) < static_cast<float>(fur.m_score[0])) {
+		int sc0 = fur.m_score[0];
+		int sc1 = fur.m_score[1];
+		if (sc0 >= 3
+		    && kYmEnvDefaultScale * static_cast<float>(sc1 + fur.m_score[2]) < static_cast<float>(sc0)) {
 			Game.m_gameWork.m_mogScoreRadarType = 1;
-		} else if (fur.m_score[1] >= 3
-		           && kYmEnvDefaultScale * static_cast<float>(fur.m_score[0] + fur.m_score[2])
-		                  < static_cast<float>(fur.m_score[1])) {
+		} else if (sc1 >= 3
+		           && kYmEnvDefaultScale * static_cast<float>(sc0 + fur.m_score[2])
+		                  < static_cast<float>(sc1)) {
 			Game.m_gameWork.m_mogScoreRadarType = 2;
 		} else if (fur.m_score[2] >= 3
-		           && kYmEnvDefaultScale * static_cast<float>(fur.m_score[0] + fur.m_score[1])
+		           && kYmEnvDefaultScale * static_cast<float>(sc0 + sc1)
 		                  < static_cast<float>(fur.m_score[2])) {
 			Game.m_gameWork.m_mogScoreRadarType = 3;
 		} else {
@@ -1397,8 +1399,8 @@ int CChara::CModel::PickFur(
 	Vec hitToCMem;
 	Vec areaBCMem;
 	Vec areaCAMem;
-	FurPickPointerTable ptrTable;
-	FurPickWorkPointers workPtrs;
+	volatile FurPickPointerTable ptrTable;
+	volatile FurPickWorkPointers workPtrs;
 
 	for (unsigned int meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
@@ -1467,8 +1469,8 @@ int CChara::CModel::PickFur(
 				workPtrs.m_hitToCc = ptrTable.m_hitToC1;
 				workPtrs.m_areaBCc = ptrTable.m_areaBC1;
 				workPtrs.m_areaCAc = ptrTable.m_areaCA1;
-				workPtrs.m_hitToBw = ptrTable.m_hitToB2;
-				CVector* hitToCP = ptrTable.m_hitToC2;
+				CVector* hitToCP = ptrTable.m_hitToB2;
+				workPtrs.m_hitToBw = ptrTable.m_hitToC2;
 				workPtrs.m_areaBCw = ptrTable.m_areaBC2;
 				workPtrs.m_areaCAw = ptrTable.m_areaCA2;
 
@@ -1634,15 +1636,15 @@ int CChara::CModel::PickFur(
 						const CVector& vertB = CVector(verts[1].m_viewPos);
 						CVector hitToBSub;
 						PSVECSubtract(const_cast<CVector&>(vertB), hitViewPos, hitToBSub);
-						hitToBMem.y = hitToBSub.y;
+						hitToCMem.y = hitToBSub.y;
 						workPtrs.m_hitToBw->x = hitToBSub.x;
-						hitToBMem.z = hitToBSub.z;
+						hitToCMem.z = hitToBSub.z;
 						const CVector& vertC = CVector(verts[2].m_viewPos);
 						CVector hitToCSub;
 						PSVECSubtract(const_cast<CVector&>(vertC), hitViewPos, hitToCSub);
 						hitToCP->x = hitToCSub.x;
-						hitToCMem.y = hitToCSub.y;
-						hitToCMem.z = hitToCSub.z;
+						hitToBMem.y = hitToCSub.y;
+						hitToBMem.z = hitToCSub.z;
 
 						PSVECCrossProduct(hitToA, *workPtrs.m_hitToBw, areaAB);
 						PSVECCrossProduct(*workPtrs.m_hitToBw, *hitToCP, *workPtrs.m_areaBCw);

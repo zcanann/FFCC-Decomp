@@ -1083,14 +1083,12 @@ void CMenuPcs::CmdDraw()
 							}
 
 							int equippable = 1;
-							int __p18 = itemIdx;
-							if (__p18 + 2 < itemCount) {
+							if (itemIdx + 2 < itemCount) {
 								equippable = EquipChk(static_cast<int>(letterBuf[itemIdx + 1]));
 							}
 
 							if (static_cast<u8>(equippable) != 0) {
-								int __p8 = itemIdx;
-								if (__p8 + 2 < itemCount) {
+								if (itemIdx + 2 < itemCount) {
 									DrawEquipMark(static_cast<s32>(x - kCmdMenuTwelve),
 									    static_cast<s32>(((rowH - kCmdMenuTwentyFour) * kCmdMenuHalfD) + y),
 									    row->alpha);

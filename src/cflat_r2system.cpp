@@ -3066,7 +3066,8 @@ renderedDone:
         break;
     }
     case -0x61: {
-        const int group = (~(object->m_localBase[1] - 1 | 1 - object->m_localBase[1]) >> 31) & 3;
+        const int x = static_cast<int>(object->m_localBase[1]);
+        const int group = (~(x - 1 | 1 - x) >> 31) & 3;
         Memory.SetDefaultGroup(group);
         CharaPcs.LoadMergeFile(*object->m_localBase, object->m_localBase[1], 0);
         Memory.ResetDefaultGroup();

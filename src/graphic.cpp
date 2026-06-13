@@ -542,10 +542,9 @@ void CGraphic::Thread()
             debugCountdown--;
 
             if (debugCountdown == 0) {
-                u32 drawSyncRaw = GXReadDrawSync();
-                drawSyncRaw &= 0xFFFF;
-                int drawSyncPart = drawSyncRaw;
-                if ((drawSyncRaw & 0x8000) != 0) {
+                int drawSyncPart = GXReadDrawSync();
+                if ((drawSyncPart & 0x8000) != 0) {
+                    drawSyncPart &= 0xFFFF;
                     drawSyncPart &= 0x7FFF;
                     if (drawSyncPart == 0x7FFF) {
                         System.Printf(debugFmtBase + kGraphicCppPartControlDoneFmt, m_drawDoneFile, m_drawDoneLine);

@@ -2072,13 +2072,13 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			}
 			ok = 0;
 			k = 0;
-			for (const s16* q = &pat[3 + ok]; k < len1 - 1; k++, q++) {
+			for (const s16* q = pat + ok; k < len1 - 1; k++, q++) {
 				const int slot = selected - (len1 - 1 - k);
 				int __p5 = slot;
 				if (candidates[__p5] != 0) {
 					break;
 				}
-				if (*q == itemKinds[slot]) {
+				if (q[3] == itemKinds[slot]) {
 					ok++;
 				}
 			}

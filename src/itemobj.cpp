@@ -1131,7 +1131,7 @@ void CGItemObj::onFrameStat()
 		prgObj->m_moveOffset.y = kItemObjMoveOffsetXZ;
 		prgObj->m_rotTargetY += kItemObjMemoryTurnStep;
 
-		CVector monTarget(*reinterpret_cast<Vec*>(CGMonObj::m_aiWork + 4));
+		CVector monTarget(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x18));
 		CVector worldPos(prgObj->m_worldPosition);
 		CVector delta;
 
@@ -1298,8 +1298,8 @@ void CGItemObj::onFrame()
 			SetAnimSlot(0, 0);
 			PlayAnim(0, 1, 0, -1, -1, 0);
 
-			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
 			int ownerData = *(int*)((unsigned char*)m_owner + 0x58);
+			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
 			int soundEntry;
 			if (soundData != 0) {
 				soundEntry = soundData[5];

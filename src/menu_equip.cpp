@@ -330,8 +330,9 @@ int CMenuPcs::EquipCtrlCur()
 
 	if (mode == 0) {
 		if ((hold & 8) != 0) {
-			if (GetEquipMenuState(this)->selected[mode] != 0) {
-				GetEquipMenuState(this)->selected[mode] = GetEquipMenuState(this)->selected[mode] - 1;
+			int sel = GetEquipMenuState(this)->selected[mode];
+			if (sel != 0) {
+				GetEquipMenuState(this)->selected[mode] = sel - 1;
 			} else {
 				GetEquipMenuState(this)->selected[mode] = 3;
 			}

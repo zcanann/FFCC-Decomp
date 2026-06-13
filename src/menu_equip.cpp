@@ -379,14 +379,18 @@ int CMenuPcs::EquipCtrlCur()
 		int letterCount = letterBuffer[0];
 
 		if ((hold & 8) != 0) {
-			if (GetEquipMenuState(this)->selected[mode] != 0) {
-				GetEquipMenuState(this)->selected[mode] = GetEquipMenuState(this)->selected[mode] - 1;
-				Sound.PlaySe(1, 0x40, 0x7f, 0);
-			} else if (GetEquipMenuState(this)->scroll != 0) {
-				GetEquipMenuState(this)->scroll = GetEquipMenuState(this)->scroll - 1;
+			int sel = GetEquipMenuState(this)->selected[mode];
+			if (sel != 0) {
+				GetEquipMenuState(this)->selected[mode] = sel - 1;
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			} else {
-				Sound.PlaySe(4, 0x40, 0x7f, 0);
+				int scroll = GetEquipMenuState(this)->scroll;
+				if (scroll != 0) {
+					GetEquipMenuState(this)->scroll = scroll - 1;
+					Sound.PlaySe(1, 0x40, 0x7f, 0);
+				} else {
+					Sound.PlaySe(4, 0x40, 0x7f, 0);
+				}
 			}
 		} else if ((hold & 4) != 0) {
 			s16 selected = GetEquipMenuState(this)->selected[mode];

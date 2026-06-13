@@ -10050,8 +10050,8 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 void CMenuPcs::ChgAllModel2()
 {
 	int modelOffset = 0;
-	int pdtOffset = modelOffset;
 	unsigned char* handleData = reinterpret_cast<unsigned char*>(this);
+	int pdtOffset = modelOffset;
 	int i = 0;
 
 	do {
@@ -10092,9 +10092,9 @@ void CMenuPcs::ChgAllModel2()
 
 		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
 		i++;
-		pdtOffset += 0x9C0;
-		handleData += 4;
 		modelOffset += 0x34;
+		handleData += 4;
+		pdtOffset += 0x9C0;
 	} while (i < kWmMenuPlayerCount);
 }
 
@@ -10109,9 +10109,9 @@ void CMenuPcs::ChgAllModel2()
  */
 void CMenuPcs::ChgAllModel()
 {
-	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
 	int i = 0;
 	unsigned char* handleData = reinterpret_cast<unsigned char*>(this);
+	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
 	int modelOffset = 0;
 
 	do {
@@ -10135,8 +10135,8 @@ void CMenuPcs::ChgAllModel()
 		} else {
 			race = 0xFFFFFFFF;
 			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
-			variant = 0xFFFFFFFF;
 			index = 0xFFFFFFFF;
+			variant = 0xFFFFFFFF;
 		}
 
 		modelData = m_wm.m_charaModelData + modelOffset;
@@ -10157,8 +10157,8 @@ void CMenuPcs::ChgAllModel()
 		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
 
 		i++;
-		gameData += 0xC30;
 		handleData += 4;
+		gameData += 0xC30;
 		modelOffset += 0x34;
 	} while (i < kWmMenuPlayerCount);
 }

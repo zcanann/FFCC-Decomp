@@ -2136,8 +2136,6 @@ void CGMonObj::alwaysFuncMeteoParasite()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma peephole off
 void CGMonObj::frameStatFuncMeteoParasite()
 {
 	int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
@@ -2194,7 +2192,6 @@ void CGMonObj::frameStatFuncMeteoParasite()
 		break;
 	}
 }
-#pragma pop
 
 /*
  * --INFO--

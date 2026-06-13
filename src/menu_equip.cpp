@@ -441,6 +441,7 @@ int CMenuPcs::EquipCtrlCur()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 void CMenuPcs::EquipDraw()
 {
 	int helpItem;
@@ -762,6 +763,7 @@ void CMenuPcs::EquipDraw()
 		}
 	}
 }
+#pragma opt_lifetimes reset
 
 /*
  * --INFO--

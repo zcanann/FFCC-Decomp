@@ -1820,21 +1820,21 @@ checkLoaded:
                             continue;
                         }
 
-                        const int rawSize = static_cast<int>(chunk.m_size);
-
                         switch (dataType) {
                         case 0: {
-                            CLoadModel* loadModel = 0;
+                            CLoadModel* loadModel;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadModelArray(&CharaPcs)->GetSize()); i++) {
-                                CLoadModel* it = (*LoadModelArray(&CharaPcs))[i];
-                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
-                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId)) {
-                                    loadModel = it;
-                                    break;
+                                loadModel = (*LoadModelArray(&CharaPcs))[i];
+                                if (reinterpret_cast<int>(loadModel->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(loadModel->m_keyId) == static_cast<unsigned int>(keyId)) {
+                                    goto modelFound;
                                 }
                             }
+                            loadModel = 0;
+                        modelFound:
 
                             if (loadModel == 0) {
+                                const unsigned int rawSize = static_cast<int>(chunk.m_size);
                                 void* rawAddr = chunkFile.GetAddress();
                                 loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
                                 loadModel->m_keyTag = keyTag;
@@ -1853,7 +1853,9 @@ checkLoaded:
                                     loadModel->m_streamSize = rawSize;
                                     loadModel->m_streamMode = 1;
                                     Memory.CopyToAMemorySync(
-                                        rawAddr, reinterpret_cast<unsigned char*>(StageBase(m_amemWorkStage)) + LoadStreamCursor(this),
+                                        rawAddr,
+                                        reinterpret_cast<void*>(
+                                            LoadStreamCursor(this) + reinterpret_cast<unsigned int>(StageBase(m_amemWorkStage))),
                                         static_cast<unsigned long>(rawSize));
                                     LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                                 }
@@ -1867,18 +1869,20 @@ checkLoaded:
                             break;
                         }
                         case 1: {
-                            CLoadTexture* loadTexture = 0;
+                            CLoadTexture* loadTexture;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(&CharaPcs)->GetSize()); i++) {
-                                CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[i];
-                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
-                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId) &&
-                                    it->m_variantTag == variantTag) {
-                                    loadTexture = it;
-                                    break;
+                                loadTexture = (*LoadTextureArray(&CharaPcs))[i];
+                                if (reinterpret_cast<int>(loadTexture->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(loadTexture->m_keyId) == static_cast<unsigned int>(keyId) &&
+                                    loadTexture->m_variantTag == variantTag) {
+                                    goto textureFound;
                                 }
                             }
+                            loadTexture = 0;
+                        textureFound:
 
                             if (loadTexture == 0) {
+                                const unsigned int rawSize = static_cast<int>(chunk.m_size);
                                 void* rawAddr = chunkFile.GetAddress();
                                 loadTexture = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
                                 loadTexture->m_keyTag = keyTag;
@@ -1903,7 +1907,9 @@ checkLoaded:
                                     loadTexture->m_streamSize = rawSize;
                                     loadTexture->m_streamMode = 1;
                                     Memory.CopyToAMemorySync(
-                                        rawAddr, reinterpret_cast<unsigned char*>(StageBase(m_amemWorkStage)) + LoadStreamCursor(this),
+                                        rawAddr,
+                                        reinterpret_cast<void*>(
+                                            LoadStreamCursor(this) + reinterpret_cast<unsigned int>(StageBase(m_amemWorkStage))),
                                         static_cast<unsigned long>(rawSize));
                                     LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                                 }
@@ -1911,16 +1917,17 @@ checkLoaded:
                             break;
                         }
                         case 2: {
-                            CLoadAnim* loadAnim = 0;
+                            CLoadAnim* loadAnim;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadAnimArray(&CharaPcs)->GetSize()); i++) {
-                                CLoadAnim* it = (*LoadAnimArray(&CharaPcs))[i];
-                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
-                                    static_cast<unsigned int>(it->m_keyId) == static_cast<unsigned int>(keyId) &&
-                                    strcmp(animName, it->m_name) == 0) {
-                                    loadAnim = it;
-                                    break;
+                                loadAnim = (*LoadAnimArray(&CharaPcs))[i];
+                                if (reinterpret_cast<int>(loadAnim->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    static_cast<unsigned int>(loadAnim->m_keyId) == static_cast<unsigned int>(keyId) &&
+                                    strcmp(animName, loadAnim->m_name) == 0) {
+                                    goto animFound;
                                 }
                             }
+                            loadAnim = 0;
+                        animFound:
 
                             if (loadAnim == 0) {
                                 void* rawAddr = chunkFile.GetAddress();
@@ -1948,19 +1955,20 @@ checkLoaded:
                             break;
                         }
                         case 5: {
-                            CLoadPdt* loadPdt = 0;
+                            CLoadPdt* loadPdt;
                             for (unsigned int i = 0; i < static_cast<unsigned int>(LoadPdtArray(&CharaPcs)->GetSize()); i++) {
-                                CLoadPdt* it = (*LoadPdtArray(&CharaPcs))[i];
-                                if (reinterpret_cast<int>(it->m_keyTag) == reinterpret_cast<int>(keyTag) &&
-                                    it->m_keyId == keyId &&
-                                    reinterpret_cast<int>(it->m_variantTag) == reinterpret_cast<int>(variantTag)) {
-                                    loadPdt = it;
-                                    break;
+                                loadPdt = (*LoadPdtArray(&CharaPcs))[i];
+                                if (reinterpret_cast<int>(loadPdt->m_keyTag) == reinterpret_cast<int>(keyTag) &&
+                                    loadPdt->m_keyId == keyId &&
+                                    reinterpret_cast<int>(loadPdt->m_variantTag) == reinterpret_cast<int>(variantTag)) {
+                                    goto pdtFound;
                                 }
                             }
+                            loadPdt = 0;
+                        pdtFound:
 
                             void* primaryData = chunkFile.GetAddress();
-                            const int primarySize = rawSize;
+                            const int primarySize = static_cast<int>(chunk.m_size);
                             if (loadPdt == 0) {
                                 chunkFile.GetNextChunk(chunk);
                                 void* secondaryData = chunkFile.GetAddress();
@@ -2347,8 +2355,9 @@ foundTexture:
             File.LockBuffer();
             Memory.CopyFromAMemorySync(
                 File.m_readBuffer,
-                reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
-                    reinterpret_cast<unsigned int>(loadTexture->m_streamOffset),
+                reinterpret_cast<void*>(
+                    reinterpret_cast<unsigned int>(loadTexture->m_streamOffset) +
+                    reinterpret_cast<unsigned int>(StageBase(CharaPcs.m_amemWorkStage))),
                 static_cast<unsigned long>(loadTexture->m_streamSize));
             void* readBuffer = File.m_readBuffer;
             CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
@@ -2398,20 +2407,19 @@ foundTexture:
             textureSet->Create(readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
             loadTexture->m_textureSet = textureSet;
 
+            m_texLoadRef = loadTexture;
             File.Close(fileHandle);
+
+            m_texLoadRef->AddRef();
+            m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
+            m_textureSet->AddRef();
         } else {
             m_textureSet = 0;
             if (charaKind != 5 && static_cast<unsigned int>(System.m_execParam) >= 2) {
                 System.Printf(const_cast<char*>(s_charaTexMissingFmt), path);
             }
-            goto attach;
         }
     }
-
-    m_texLoadRef = loadTexture;
-    m_texLoadRef->AddRef();
-    m_textureSet = reinterpret_cast<CLoadTexture*>(m_texLoadRef)->m_textureSet;
-    m_textureSet->AddRef();
 attach:
     m_model->AttachTextureSet(m_textureSet);
 }
@@ -2477,8 +2485,9 @@ foundModel:
                 File.LockBuffer();
                 Memory.CopyFromAMemorySync(
                     File.m_readBuffer,
-                    reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
-                        reinterpret_cast<unsigned int>(loadModel->m_streamOffset),
+                    reinterpret_cast<void*>(
+                        reinterpret_cast<unsigned int>(loadModel->m_streamOffset) +
+                        reinterpret_cast<unsigned int>(StageBase(CharaPcs.m_amemWorkStage))),
                     static_cast<unsigned long>(loadModel->m_streamSize));
                 CChara::CModel* model =
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;

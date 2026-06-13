@@ -977,14 +977,9 @@ void CGObject::objectCollision()
                         const float thisPush = static_cast<float>(m_pushParamA + m_pushParamB);
                         const float otherPush = static_cast<float>(other->m_pushParamA + other->m_pushParamB);
                         const float rawSplit = sBgAttrNormal + (thisPush - otherPush) / sCrossCheckOuterRadius;
-                        float split;
-                        if (rawSplit < sZeroFloat) {
-                            split = sZeroFloat;
-                        } else if (sAnimFrameOffset < rawSplit) {
-                            split = sAnimFrameOffset;
-                        } else {
-                            split = rawSplit;
-                        }
+                        float split = (rawSplit < sZeroFloat)
+                            ? sZeroFloat
+                            : ((sAnimFrameOffset < rawSplit) ? sAnimFrameOffset : rawSplit);
 
                         Vec& delta = scratch;
                         Vec scaledDelta;

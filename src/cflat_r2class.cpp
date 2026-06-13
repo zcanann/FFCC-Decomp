@@ -1700,9 +1700,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x70:
-			engineObject->m_stateFlags0 =
-			    static_cast<signed char>((static_cast<signed char>(object->m_localBase[0]) << 4) & 0x10) |
-			    (engineObject->m_stateFlags0 & 0xEF);
+			engineObject->m_stateFlags0Bits.unk4 = static_cast<signed char>(object->m_localBase[0]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1712,7 +1710,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x72:
-			engineObject->SetDispItemName(static_cast<signed char>(object->m_localBase[0]));
+			engineObject->SetDispItemName(static_cast<int>(object->m_localBase[0]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1912,8 +1910,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x86: {
 			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
-			model->m_flags10C = static_cast<unsigned char>((static_cast<unsigned char>(object->m_localBase[0]) << 6) & 0x40) |
-			    (model->m_flags10C & 0xBF);
+			model->m_flags10CBits.m_flag10C_40 = static_cast<signed char>(object->m_localBase[0]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

@@ -1017,15 +1017,18 @@ void CGame::LoadInit()
  */
 static inline void loadPermanentScriptVars(char* scriptData)
 {
-    int n = 0;
+    int scriptOffset = 0;
     int i = 0;
+    int entryOffset = 0;
 
     while (i < CFlatPermanentVarCount()) {
-        if ((CFlatPermanentVarDefs()[i * 4 + 1] & 0x20) != 0) {
-            CFlatPermanentVarWord(i * 4) = reinterpret_cast<u32*>(scriptData)[n];
-            n++;
+        int flagIndex = entryOffset + 1;
+        if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
+            CFlatPermanentVarWord(entryOffset) = reinterpret_cast<u32*>(scriptData)[scriptOffset / 4];
+            scriptOffset += 4;
         }
 
+        entryOffset += 4;
         i++;
     }
 }
@@ -1053,7 +1056,7 @@ static inline void savePermanentScriptVars(char* scriptData)
     while (i < CFlatPermanentVarCount()) {
         int flagIndex = entryOffset + 1;
         if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
-            *reinterpret_cast<u32*>(scriptData + scriptOffset) = CFlatPermanentVarWord(entryOffset);
+            reinterpret_cast<u32*>(scriptData)[scriptOffset / 4] = CFlatPermanentVarWord(entryOffset);
             scriptOffset += 4;
         }
 

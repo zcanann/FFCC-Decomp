@@ -19,6 +19,7 @@
 #include "ffcc/ppp_linkage.h"
 
 extern const Vec kPppCharaBreakUpVector = {0.0f, 1.0f, 0.0f};
+extern const Vec kPppCharaBreakZeroVector = {0.0f, 0.0f, 0.0f};
 extern const int kCharaBreakInitialVertexFlag0;
 extern const int kCharaBreakInitialVertexFlag1;
 extern const int kCharaBreakInitialVertexFlag2;

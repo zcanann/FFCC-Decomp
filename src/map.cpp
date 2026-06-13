@@ -2228,8 +2228,9 @@ int CMapMng::ReadOtm(char* mapName)
         }
     }
 
-    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
-        GetMapShadowArray()[i]->Init();
+    int shadowIdx;
+    for (unsigned int i = 0; (shadowIdx = i) < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
+        GetMapShadowArray()[shadowIdx]->Init();
     }
 
     m_rootMapObj = SearchChildMapObj(GetMapObjArray(), 0);

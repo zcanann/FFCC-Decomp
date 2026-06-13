@@ -814,11 +814,11 @@ void CMenuPcs::calc()
             int limit = m_battleHud.m_gaugeTarget - current;
             limit = current + limit;
             if (limit >= value) {
-                current++;
-                if (current < limit) {
-                    limit = current;
+                int next = current + 1;
+                if (next >= limit) {
+                    next = limit;
                 }
-                value = limit;
+                value = next;
             }
             m_battleHud.m_gaugeValue = value;
 

@@ -1985,7 +1985,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			TextureMan.SetTexture(GX_TEXMAP0, material->GetTexture(0));
 			int hasExtraTexture;
 			int extraTextureFormat;
-			if (static_cast<unsigned short>(material->GetTextureIndex(1)) != -1) {
+			if (material->GetTextureIndex(1) != -1) {
 				CTexture* extraTexture = material->GetTexture(1);
 				hasExtraTexture = 1;
 				TextureMan.SetTexture(GX_TEXMAP2, extraTexture);

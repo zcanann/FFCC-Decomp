@@ -1624,13 +1624,13 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		System.Printf(dbg + 0x138);
 		return;
 	}
-	if (static_cast<unsigned char>(static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24 >> 30) << 30 >> 31) == 0) {
+	if (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24 >> 30) << 30 >> 31) == 0) {
 		System.Printf(dbg + 0x160);
 		return;
 	}
 
 	staType = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + resolvedItemId * 0x48 + 8);
-	if (static_cast<unsigned int>(staType) != 0x67 && static_cast<int>(staType) != 0x65 && static_cast<int>(staType) != 0x66 && CharaObjGameFlagBit5Set()) {
+	if (static_cast<int>(staType) != 0x67 && static_cast<int>(staType) != 0x65 && static_cast<int>(staType) != 0x66 && CharaObjGameFlagBit5Set()) {
 		System.Printf(dbg + 0x17C);
 		return;
 	}
@@ -2354,13 +2354,15 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
  */
 #pragma push
 #pragma optimization_level 2
+#pragma opt_propagation off
 int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
 	if (staIndex == 0 || staIndex == 4) {
 		SCharaStaBlock* staBlock = reinterpret_cast<SCharaStaBlock*>(m_scriptHandle);
 		if (staBlock->m_sta[staIndex] != 0) {
 			System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
-			return static_cast<int>(reinterpret_cast<SCharaStaBlock*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + staIndex * 2)->m_sta[0]);
+			SCharaStaBlock* blk = reinterpret_cast<SCharaStaBlock*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + staIndex * 2);
+			return static_cast<int>(blk->m_sta[0]);
 		}
 	}
 
@@ -3096,7 +3098,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_common_subs off
+#pragma opt_lifetimes off
 int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 {
 	unsigned short sourceCid = sourceObj->GetCID();

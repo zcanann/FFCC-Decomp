@@ -69,8 +69,8 @@ struct SplineTable {
 	float* data;
 };
 SplineTable s_YearTrns = {5, lbl_802109B4};
-int DAT_8032e8c8 = 3;
-float* DAT_8032e8cc = lbl_80210A04;
+int DAT_8032E8C8 = 3;
+float* DAT_8032E8CC = lbl_80210A04;
 int DAT_8032E8D0 = 4;
 float* DAT_8032E8D4 = lbl_80210A34;
 int DAT_8032E8D8 = 4;
@@ -7683,7 +7683,7 @@ LAB_calc:
 			    static_cast<short>(static_cast<int>(static_cast<float>(*reinterpret_cast<short*>(base + 0xD2)) + fVar5));
 
 			float fVar1;
-			WM_MENU_EVAL_SPLINE(fVar1, DAT_8032e8cc, DAT_8032e8c8, t);
+			WM_MENU_EVAL_SPLINE(fVar1, DAT_8032E8CC, DAT_8032E8C8, t);
 			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xE0) = fVar1;
 
 			if (uVar14 == 2) {
@@ -7695,7 +7695,7 @@ LAB_calc:
 			    static_cast<short>(static_cast<int>(
 			        static_cast<float>(*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6)) + fVar5));
 
-			WM_MENU_EVAL_SPLINE(fVar1, DAT_8032e8cc, DAT_8032e8c8, t);
+			WM_MENU_EVAL_SPLINE(fVar1, DAT_8032E8CC, DAT_8032E8C8, t);
 			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC4) = fVar1;
 			*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) =
 			    *reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) + 1;

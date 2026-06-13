@@ -1706,7 +1706,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x70:
-			engineObject->m_stateFlags0Bits.unk4 = static_cast<signed char>(object->m_localBase[0]);
+			engineObject->m_stateFlags0Bits.unk3 = static_cast<signed char>(object->m_localBase[0]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

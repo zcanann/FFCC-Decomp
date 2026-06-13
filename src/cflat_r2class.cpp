@@ -1541,14 +1541,20 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x46: {
-			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[0]))) : 0;
+			CGObject* target = 0;
+			if (static_cast<int>(object->m_localBase[0]) != 0) {
+				target = static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[0])));
+			}
 			engineObject->LookAt(target, 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		}
 		case -0x8C: {
-			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[0]))) : 0;
+			CGObject* target = 0;
+			if (static_cast<int>(object->m_localBase[0]) != 0) {
+				target = static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[0])));
+			}
 			engineObject->LookAt(target, RuntimeString(this, object->m_localBase[1]));
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1567,14 +1573,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			int mode = static_cast<int>(object->m_localBase[0]);
 			int itemId = static_cast<int>(object->m_localBase[1]);
 			int slot = -1;
-			if (mode != 2) {
-				if (mode < 2) {
-					if (mode >= 1) {
-						caravanWork->AddItem(itemId, &slot);
-					}
-				} else if (mode < 4) {
+			switch (mode) {
+				case 1:
+					caravanWork->AddItem(itemId, &slot);
+					break;
+				case 3:
 					caravanWork->AddComList(itemId, &slot);
-				}
+					break;
 			}
 			PushValue(this, object, slot);
 			outResult = 0;
@@ -1582,8 +1587,8 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x52: {
 			unsigned int result = 0;
-			if ((object->m_localBase[0] & 2) != 0 && reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->FindItem(static_cast<int>(object->m_localBase[1])) >= 0) {
-				result = 2;
+			if ((object->m_localBase[0] & 2) != 0) {
+				result = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->FindItem(static_cast<int>(object->m_localBase[1])) >= 0 ? 2 : 0;
 			}
 			PushValue(this, object, static_cast<int>(result));
 			outResult = 0;
@@ -1701,9 +1706,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x70:
-			engineObject->m_stateFlags0 =
-			    static_cast<signed char>((static_cast<signed char>(object->m_localBase[0]) << 4) & 0x10) |
-			    (engineObject->m_stateFlags0 & 0xEF);
+			engineObject->m_stateFlags0Bits.unk3 = static_cast<signed char>(object->m_localBase[0]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1713,15 +1716,17 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x72:
-			engineObject->SetDispItemName(static_cast<signed char>(object->m_localBase[0]));
+			engineObject->SetDispItemName(static_cast<int>(object->m_localBase[0]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x73: {
-			unsigned int buttons = 0;
+			unsigned int buttons;
 			int playerIndex = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->m_joybusCaravanId;
 			bool useDebugPad = (Pad.m_debugPadLock != 0) || ((playerIndex == 0) && (Pad.m_debugPadPort != -1));
-			if (!useDebugPad) {
+			if (useDebugPad) {
+				buttons = 0;
+			} else {
 				unsigned int slot = static_cast<unsigned int>(playerIndex)
 				    & ~((static_cast<int>(~(Pad.m_debugPadPort - playerIndex | playerIndex - Pad.m_debugPadPort)) >> 31));
 				buttons = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&Pad) + 0x54 + slot * 0x54);
@@ -1772,14 +1777,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle);
 			int mode = static_cast<int>(object->m_localBase[0]);
 			int index = static_cast<int>(object->m_localBase[1]);
-			if (mode != 2) {
-				if (mode < 2) {
-					if (mode > 0) {
-						caravanWork->DeleteItemIdx(index, 1);
-					}
-				} else if (mode < 4) {
+			switch (mode) {
+				case 1:
+					caravanWork->DeleteItemIdx(index, 1);
+					break;
+				case 3:
 					caravanWork->DeleteCmdList(index, 1);
-				}
+					break;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1838,10 +1842,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x7E: {
+			int initArg = static_cast<int>(object->m_localBase[0]);
 			unsigned int workIndex = this->m_workAssignIndex;
 			this->m_workAssignIndex = workIndex + 1;
 			engineObject->SetClassWork(1, static_cast<int>(workIndex));
-			engineObject->InitWork(static_cast<int>(object->m_localBase[0]));
+			engineObject->InitWork(initArg);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1913,8 +1918,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x86: {
 			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
-			model->m_flags10C = static_cast<unsigned char>((static_cast<unsigned char>(object->m_localBase[0]) << 6) & 0x40) |
-			    (model->m_flags10C & 0xBF);
+			model->m_flags10CBits.m_flag10C_40 = static_cast<signed char>(object->m_localBase[0]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

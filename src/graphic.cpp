@@ -558,18 +558,8 @@ void CGraphic::Thread()
 
                 CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
                 int drawSyncByte = static_cast<int>(static_cast<char>(drawSyncPart));
-                int orderIndex;
-                if (order != nullptr) {
-                    orderIndex = order->m_insertIndex;
-                } else {
-                    orderIndex = -1;
-                }
-                const char* orderName;
-                if (order != nullptr) {
-                    orderName = order->m_debugName;
-                } else {
-                    orderName = sGraphicUnknownOrderName;
-                }
+                int orderIndex = (order != nullptr) ? order->m_insertIndex : -1;
+                const char* orderName = (order != nullptr) ? order->m_debugName : sGraphicUnknownOrderName;
                 System.Printf(debugFmtBase + kGraphicCppDrawDoneFmt, m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
                               drawSyncByte);
             }

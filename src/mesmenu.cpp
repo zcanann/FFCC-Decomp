@@ -441,7 +441,7 @@ void CMesMenu::onDraw()
 {
     if ((m_menuIndex == 0) &&
         (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlatGameFlags()) << 30) >> 31) != 0)) {
-        int iconFrame = 0;
+        unsigned int iconFrame = 0;
         int charaMode = Chara.MogFur().m_commandIndex;
         switch (charaMode) {
         case 0:
@@ -469,7 +469,7 @@ void CMesMenu::onDraw()
             } else {
                 int padIndex = 0;
                 padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-                buttons = Pad.GetPadInputs()[padIndex].button[0];
+                buttons = Pad.m_padInputs[padIndex].button[0];
             }
 
             if ((buttons & 0x100) != 0) {

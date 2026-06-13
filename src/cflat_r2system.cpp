@@ -2542,10 +2542,12 @@ renderedDone:
     }
     case -0x34: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+        const float angle1 = localFloats[1];
+        const float angle2 = localFloats[2];
         Vec axis;
-        axis.x = std::cosf(localFloats[1]);
+        axis.x = std::cosf(angle1);
         axis.y = 0.0f;
-        axis.z = std::sinf(localFloats[1]);
+        axis.z = std::sinf(angle1);
         Mtx matrix;
         Mtx rotation;
 
@@ -2554,7 +2556,7 @@ renderedDone:
             PSMTXIdentity(matrix);
         }
 
-        PSMTXRotAxisRad(rotation, &axis, localFloats[2]);
+        PSMTXRotAxisRad(rotation, &axis, angle2);
         PSMTXConcat(rotation, matrix, matrix);
 
         axis.x = 0.0f;

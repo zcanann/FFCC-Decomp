@@ -6,6 +6,7 @@
 #include "ffcc/joybus.h"
 #include "ffcc/game.h"
 #include "ffcc/monobj.h"
+#include "ffcc/p_graphic.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_map.h"
 #include "ffcc/pad.h"
@@ -613,7 +614,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(*value));
 					switch (setMode) {
 					case -1:
-						*value = static_cast<signed char>(*value - static_cast<int>(stack->m_word));
+						*value = static_cast<unsigned char>(*value - static_cast<int>(stack->m_word));
 						break;
 					case 0:
 						*value = static_cast<signed char>(stack->m_word);
@@ -1295,7 +1296,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x27: {
-			CGObject* target = FindRuntimeObject(this, object->m_localBase[0]);
+			CGObject* target = static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[0])));
 			if (target != 0) {
 				Vec attachPos;
 				float* params = reinterpret_cast<float*>(object->m_localBase);
@@ -1319,6 +1320,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x2A:
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x2B:
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1385,6 +1389,26 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			    params[2],
 			    params[3],
 			    CVector(params[4], params[5], params[6]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x30: {
+			int index = static_cast<int>(object->m_localBase[0]);
+			int x = static_cast<int>(object->m_localBase[1]);
+			if (index == -1) {
+				*reinterpret_cast<int*>(&engineObject->m_damageColliders[1].m_localPosition.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_damageColliders[2].m_localPosition.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_damageColliders[3].m_localPosition.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_damageColliders[4].m_localPosition.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_damageColliders[5].m_localPosition.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_damageColliders[6].m_localPosition.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_damageColliders[7].m_localPosition.x) = x;
+				*reinterpret_cast<int*>(&engineObject->m_animPhase) = x;
+			} else {
+				*reinterpret_cast<int*>(
+				    reinterpret_cast<u8*>(&engineObject->m_damageColliders[1].m_localPosition.x) + index * 0x28) = x;
+			}
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1474,6 +1498,22 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x3B: {
+			CGraphicPcs::ScreenFadeSlot* slot = &GraphicPcs.m_screenFade[2];
+			slot->m_invert = static_cast<int>(object->m_localBase[0]);
+			slot->m_mode = 1;
+			slot->m_targetObj = engineObject;
+			slot->m_targetYOffs = reinterpret_cast<float*>(object->m_localBase)[1];
+			slot->m_colorA.r = static_cast<unsigned char>(object->m_localBase[2]);
+			slot->m_colorA.g = static_cast<unsigned char>(object->m_localBase[3]);
+			slot->m_colorA.b = static_cast<unsigned char>(object->m_localBase[4]);
+			slot->m_colorA.a = 0xFF;
+			slot->m_timer = static_cast<int>(object->m_localBase[5]);
+			slot->m_duration = static_cast<int>(object->m_localBase[5]);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
 		case -0x3C:
 			engineObject->m_frontHitAngle = reinterpret_cast<float*>(object->m_localBase)[0];
 			PushValue(this, object, 0);
@@ -1499,14 +1539,14 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x46: {
-			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0;
+			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[0]))) : 0;
 			engineObject->LookAt(target, 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		}
 		case -0x8C: {
-			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0;
+			CGObject* target = static_cast<int>(object->m_localBase[0]) != 0 ? static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[0]))) : 0;
 			engineObject->LookAt(target, RuntimeString(this, object->m_localBase[1]));
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1521,7 +1561,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x4F: {
-			CCaravanWork* caravanWork = ScriptCaravan(engineObject);
+			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle);
 			int mode = static_cast<int>(object->m_localBase[0]);
 			int itemId = static_cast<int>(object->m_localBase[1]);
 			int slot = -1;
@@ -1540,7 +1580,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x52: {
 			unsigned int result = 0;
-			if ((object->m_localBase[0] & 2) != 0 && ScriptCaravan(engineObject)->FindItem(static_cast<int>(object->m_localBase[1])) >= 0) {
+			if ((object->m_localBase[0] & 2) != 0 && reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->FindItem(static_cast<int>(object->m_localBase[1])) >= 0) {
 				result = 2;
 			}
 			PushValue(this, object, static_cast<int>(result));
@@ -1548,32 +1588,32 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x53:
-			ScriptCaravan(engineObject)->m_gil = static_cast<int>(object->m_localBase[0]);
+			reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->m_gil = static_cast<int>(object->m_localBase[0]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x55:
-			ScriptWork(engineObject)->m_hp = static_cast<unsigned short>(object->m_localBase[1]);
+			reinterpret_cast<CGObjWork*>(engineObject->m_scriptHandle)->m_hp = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x56:
-			ScriptWork(engineObject)->m_maxHp = static_cast<unsigned short>(object->m_localBase[1]);
+			reinterpret_cast<CGObjWork*>(engineObject->m_scriptHandle)->m_maxHp = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x5A:
-			ScriptWork(engineObject)->m_statusValues[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
+			reinterpret_cast<CGObjWork*>(engineObject->m_scriptHandle)->m_statusValues[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x5C:
-			ScriptMonWork(engineObject)->unk_0xd0[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
+			reinterpret_cast<CMonWork*>(engineObject->m_scriptHandle)->unk_0xd0[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x5D:
-			ScriptMonWork(engineObject)->unk_0xf0[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
+			reinterpret_cast<CMonWork*>(engineObject->m_scriptHandle)->unk_0xf0[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1585,7 +1625,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x60: {
 			Vec safePos;
-			float safeDist = engineObject->CalcSafePos(static_cast<int>(object->m_localBase[0]), FindRuntimeObject(this, object->m_localBase[1]), &safePos);
+			float safeDist = engineObject->CalcSafePos(static_cast<int>(object->m_localBase[0]), static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[1]))), &safePos);
 			*reinterpret_cast<float*>(object->m_localBase[2]) = safePos.x;
 			*reinterpret_cast<float*>(object->m_localBase[3]) = safePos.y;
 			*reinterpret_cast<float*>(object->m_localBase[4]) = safePos.z;
@@ -1594,7 +1634,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x61:
-			ScriptCaravan(engineObject)->AddLetter(
+			reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->AddLetter(
 			    static_cast<int>(object->m_localBase[0]),
 			    static_cast<int>(object->m_localBase[1]),
 			    static_cast<int>(object->m_localBase[2]),
@@ -1608,7 +1648,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x62: {
-			unsigned int changed = static_cast<unsigned int>(Joybus.ChgCtrlMode(ScriptPlayerIndex(engineObject)));
+			unsigned int changed = static_cast<unsigned int>(Joybus.ChgCtrlMode(reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->m_joybusCaravanId));
 			unsigned int topBit = __cntlzw(changed);
 			PushValue(this, object, (topBit >> 5) & 0xFF);
 			outResult = 0;
@@ -1619,18 +1659,18 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x64:
-			ScriptCaravan(engineObject)->unk_0x3e6 = static_cast<unsigned short>(object->m_localBase[0]);
+			reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->unk_0x3e6 = static_cast<unsigned short>(object->m_localBase[0]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x68:
-			BattleRingMenu(ScriptPlayerIndex(engineObject))
+			MenuPcs.m_battleRingMenus[reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->m_joybusCaravanId]
 			    ->SetBattleButton(static_cast<int>(object->m_localBase[0]), static_cast<int>(object->m_localBase[1]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x69:
-			BattleRingMenu(ScriptPlayerIndex(engineObject))
+			MenuPcs.m_battleRingMenus[reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->m_joybusCaravanId]
 			    ->SetBattleCommand(static_cast<int>(object->m_localBase[0]), static_cast<int>(object->m_localBase[1]), -1);
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1677,7 +1717,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x73: {
 			unsigned int buttons = 0;
-			int playerIndex = ScriptPlayerIndex(engineObject);
+			int playerIndex = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->m_joybusCaravanId;
 			bool useDebugPad = (Pad.m_debugPadLock != 0) || ((playerIndex == 0) && (Pad.m_debugPadPort != -1));
 			if (!useDebugPad) {
 				unsigned int slot = static_cast<unsigned int>(playerIndex)
@@ -1708,7 +1748,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x75: {
-			CCaravanWork* caravanWork = ScriptCaravan(engineObject);
+			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle);
 			if (static_cast<int>(caravanWork->m_evtState0) != static_cast<int>(object->m_localBase[0])) {
 				caravanWork->m_evtState0 = object->m_localBase[0];
 				caravanWork->m_evtState1 = 0;
@@ -1723,11 +1763,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x76:
-			PushValue(this, object, static_cast<int>(ScriptCaravan(engineObject)->m_evtState1));
+			PushValue(this, object, static_cast<int>(reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->m_evtState1));
 			outResult = 0;
 			break;
 		case -0x77: {
-			CCaravanWork* caravanWork = ScriptCaravan(engineObject);
+			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle);
 			int mode = static_cast<int>(object->m_localBase[0]);
 			int index = static_cast<int>(object->m_localBase[1]);
 			if (mode != 2) {
@@ -1783,7 +1823,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x7C:
 			PushValue(
-			    this, object, ScriptCaravan(engineObject)->GetFoodRank(static_cast<int>(object->m_localBase[0])));
+			    this, object, reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->GetFoodRank(static_cast<int>(object->m_localBase[0])));
 			outResult = 0;
 			break;
 		case -0x7D: {
@@ -1796,8 +1836,8 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x7E: {
-			unsigned int workIndex = RuntimeWorkAssignIndex(this);
-			RuntimeWorkAssignIndex(this) = workIndex + 1;
+			unsigned int workIndex = this->m_workAssignIndex;
+			this->m_workAssignIndex = workIndex + 1;
 			engineObject->SetClassWork(1, static_cast<int>(workIndex));
 			engineObject->InitWork(static_cast<int>(object->m_localBase[0]));
 			PushValue(this, object, 0);
@@ -1805,11 +1845,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x7F: {
-			unsigned int partyIndex = RuntimePartyAssignIndex(this);
-			RuntimePartyAssignIndex(this) = partyIndex + 1;
+			unsigned int partyIndex = this->m_partyAssignIndex;
+			this->m_partyAssignIndex = partyIndex + 1;
 			if (Game.m_gameWork.m_wmBackupParams[partyIndex] >= 0) {
 				engineObject->SetClassWork(0, static_cast<int>(partyIndex));
-				ScriptCaravan(engineObject)->m_joybusCaravanId = static_cast<unsigned int>(partyIndex);
+				reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->m_joybusCaravanId = static_cast<unsigned int>(partyIndex);
 				Game.m_partyObjArr[partyIndex] = reinterpret_cast<CGPartyObj*>(engineObject);
 				Joybus.SendAllStat(static_cast<int>(partyIndex));
 			}
@@ -1859,7 +1899,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(
 			    this,
 			    object,
-			    ScriptCaravan(engineObject)->ShopRequest(
+			    reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->ShopRequest(
 			        static_cast<int>(object->m_localBase[0]),
 			        static_cast<int>(object->m_localBase[1]),
 			        static_cast<int>(object->m_localBase[2]),
@@ -1913,7 +1953,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x8E:
 			reinterpret_cast<CGPartyObj*>(engineObject)
-			    ->carry(static_cast<int>(object->m_localBase[0]), FindRuntimeObject(this, object->m_localBase[1]), static_cast<int>(object->m_localBase[2]));
+			    ->carry(static_cast<int>(object->m_localBase[0]), static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[1]))), static_cast<int>(object->m_localBase[2]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1962,7 +2002,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x94:
-			ScriptCaravan(engineObject)->SetArtifact(static_cast<int>(object->m_localBase[0]), static_cast<int>(object->m_localBase[1]));
+			reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->SetArtifact(static_cast<int>(object->m_localBase[0]), static_cast<int>(object->m_localBase[1]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1979,7 +2019,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x97:
-			GbaQue.OpenMenu(ScriptPlayerIndex(engineObject), static_cast<int>(object->m_localBase[0]), 1);
+			GbaQue.OpenMenu(reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->m_joybusCaravanId, static_cast<int>(object->m_localBase[0]), 1);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

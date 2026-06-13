@@ -1265,7 +1265,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     }
 
     if ((param_2->m_type == 1 || param_2->m_type == 2) && mana->m_waterHeightA != 0) {
-        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(mana->m_waterHeightA) + 0x240) = param_2->m_rippleLevel;
+        *reinterpret_cast<float*>(reinterpret_cast<u8*>(mana->m_waterHeightA) + 0x240) = *reinterpret_cast<const float*>(&param_2->m_rippleLevel);
     }
 
     } // end if (m_graphId == 0)
@@ -1288,7 +1288,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
                         model->m_data->m_posQuant, model->m_data->m_normQuant, model->m_matrix,
                         mana->m_displayListCopies[dlIndex], mana->m_displayListSize, mana->m_meshColors,
                         mana->m_meshTexCoords0, mana->m_meshTexCoords1,
-                        &model->m_nodes[meshShape->m_nodeIndex], pppYmMana, mana);
+                        &model->m_nodes[meshShape->m_nodeIndex], (PYmMana*)param_2, mana);
                 }
             }
         }

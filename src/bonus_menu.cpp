@@ -3132,9 +3132,9 @@ void CMenuPcs::CalcResultCountAnim()
 	Mtx scaleMtx;
 	Mtx rotXMtx;
 	Mtx rotYMtx;
+	int tribeId;
 	for (int i = 0; activePartyCount > i * 2; i++) {
 		CCharaPcs::CHandle* handle;
-		int tribeId;
 		if (i < activePartyCount) {
 			handle = s_Rinfo->m_party[i].m_partyHandle;
 			tribeId = s_Rinfo->m_party[i].m_tribeId;

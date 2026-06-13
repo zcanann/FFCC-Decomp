@@ -13622,10 +13622,9 @@ int McCtrl::LoadDat()
 		break;
 
 	case 5: {
-		unsigned int serialLo = 0;
-		unsigned int serialHi = 0;
-		int __p9 = serialLo;
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&__p9)) != 0) {
+		unsigned int serialLo;
+		unsigned int serialHi;
+		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();

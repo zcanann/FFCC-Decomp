@@ -1963,7 +1963,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x8F:
-			EngineClassControl(engineObject, object->m_localBase[0], object->m_localBase[1]);
+			reinterpret_cast<CGPrgObj*>(engineObject)->ClassControl(static_cast<int>(object->m_localBase[0]), static_cast<int>(object->m_localBase[1]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -2042,7 +2042,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x9D:
 			PushValue(
-			    this, object, EngineGetClassControl(engineObject, object->m_localBase[0]));
+			    this, object, static_cast<unsigned int>(reinterpret_cast<CGPrgObj*>(engineObject)->GetClassControl(static_cast<int>(object->m_localBase[0]))));
 			outResult = 0;
 			break;
 		case -0x9E:

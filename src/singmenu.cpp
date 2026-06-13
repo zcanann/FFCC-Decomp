@@ -2917,6 +2917,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_dead_assignments off
 void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, int useDynamic)
 {
     CFont* font = m_fonts[0];
@@ -2971,6 +2972,7 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     *outWidth = static_cast<short>(widthLines * lineHeight + 0x40);
     *outHeight = static_cast<short>(lineCount * (lineHeight + 2) + 0x40);
 }
+#pragma opt_dead_assignments reset
 
 extern "C" const char* gSingMenuTextTableEn[] = {
     s_Empty_803321B8, s_Yes_803321BC, s_No_803321C0, s_Cancel_803321C4,
@@ -3446,6 +3448,7 @@ inline void CMenuPcs::CalcSingLife()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs off
 void CMenuPcs::DrawSingLife()
 {
     int lifeTimer = m_singleLifeTimer;
@@ -3491,6 +3494,7 @@ void CMenuPcs::DrawSingLife()
     xBase += static_cast<float>(((8 - halfHearts) * 0x18) / 2);
     MenuPcs.m_battleMesMenus[0]->DrawHeart(xBase, y - FLOAT_80332930, FLOAT_80332934, FLOAT_80332934);
 }
+#pragma opt_common_subs reset
 
 /*
  * --INFO--

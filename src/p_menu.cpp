@@ -465,7 +465,7 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         break;
     }
 
-    if ((slot == 0) && FontMan.m_font) {
+    if ((slot == 0) && ((static_cast<u32>(-reinterpret_cast<int>(FontMan.m_font) | reinterpret_cast<int>(FontMan.m_font)) >> 31) != 0)) {
         m_fonts[0] = FontMan.m_font;
         reinterpret_cast<u32*>(m_fonts[0])[1] = reinterpret_cast<u32*>(m_fonts[0])[1] + 1;
     } else {

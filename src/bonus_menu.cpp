@@ -3222,23 +3222,22 @@ void CMenuPcs::CalcResultCountAnim()
  */
 void CMenuPcs::DrawResultOpenAnim()
 {
-	int activePartyCount;
 	BonusAnimSprite* sprite;
 	int modelIndex;
-	int lastKind;
 	int i;
 	int partyOff;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) != 0) {
-		activePartyCount = s_Rinfo->m_partyCount;
+		int activePartyCount = s_Rinfo->m_partyCount;
+		int lastKind;
 
 		DrawInit();
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
+		i = 0;
 		modelIndex = 0;
 		lastKind = 0;
 		partyOff = 0;
-		i = 0;
 		for (; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
 			sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
 

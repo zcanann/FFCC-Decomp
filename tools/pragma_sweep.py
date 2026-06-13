@@ -38,6 +38,27 @@ def build_and_report():
     return None, 'UNIT_NOT_IN_REPORT'
 
 
+def misalign_map():
+    """Per-function structural misalignment count (DIFF_INSERT/DELETE/REPLACE).
+    NonMatching units are NOT linked into the DOL, so the DOL-sha1 gate does NOT
+    validate them — this real-alignment metric is the true purity signal. A pragma
+    that raises fuzzy but increases misalign is byte-noise (a fakematch), not a win."""
+    r = subprocess.run(['build/tools/objdiff-cli', 'diff', '-p', '.', '-u', 'main/' + UNIT,
+                        '--format', 'json', '-o', '-'], capture_output=True, text=True)
+    try:
+        d = json.loads(r.stdout)
+    except Exception:
+        return {}
+    out = {}
+    for s in d['left']['symbols']:
+        if 'instructions' not in s:
+            continue
+        mis = sum(1 for row in s['instructions']
+                  if row.get('diff_kind') not in (None, 'DIFF_NONE', 'DIFF_ARG_MISMATCH'))
+        out[s.get('name', '')] = mis
+    return out
+
+
 def dol_ok():
     # if a byte-exact ok target exists, require it; else accept
     r = subprocess.run(['ninja', 'build/GCCP01/ok'], capture_output=True, text=True)
@@ -93,8 +114,9 @@ def main():
              for f in u['functions'] if f['fuzzy_match_percent'] < 99.99]
     funcs.sort(key=lambda t: -(t[2] * (100 - t[1])))
     targets = funcs[:TOPN]
+    base_mis = misalign_map()
     print(f'{UNIT}: baseline funcs<100={len(funcs)}; sweeping top {len(targets)} '
-          f'(DOL-ok-gate={"yes" if has_ok else "no"})')
+          f'(DOL-ok-gate={"yes" if has_ok else "no"}; misalign-gated)')
     orig = open(SRC).read()
     cur = orig
     wins = []
@@ -117,19 +139,27 @@ def main():
             if rep is None:
                 continue
             newf = rep.get(fname_m, 0)
-            # no other function may regress
+            # no other function may regress (fuzzy)
             regress = any(rep.get(k, 100) < base.get(k, 100) - 0.001
                           for k in base if k != fname_m)
             okdol = dol_ok() if has_ok else True
+            # PURITY GATE: structural misalignment must NOT increase for ANY function
+            # (NonMatching units aren't linked, so DOL-ok can't catch byte-noise wins)
+            new_mis = misalign_map()
+            mis_worse = any(new_mis.get(k, 0) > base_mis.get(k, 0)
+                            for k in set(base_mis) | set(new_mis))
             tag = ''
-            if newf > best[1] + 0.001 and not regress and okdol:
-                best = (pr, newf); tag = ' <= BEST'
+            if newf > best[1] + 0.001 and not regress and okdol and not mis_worse:
+                best = (pr, newf, new_mis); tag = ' <= BEST'
             print(f'  {search} +{pr}: {newf:.3f} '
-                  f'{"REGRESS" if regress else ""}{"DOLDIFF" if not okdol else ""}{tag}')
+                  f'{"REGRESS " if regress else ""}{"DOLDIFF " if not okdol else ""}'
+                  f'{"MISALIGN+ " if mis_worse else ""}{tag}')
         if best[0]:
             cur = '\n'.join(lines[:s] + [f'#pragma {best[0]} off'] + lines[s:e + 1] +
                             [f'#pragma {best[0]} reset'] + lines[e + 1:])
             base[fname_m] = best[1]
+            if len(best) > 2:
+                base_mis = best[2]  # lock in the new (non-worse) misalign baseline
             wins.append((search, best[0], fbase, best[1]))
             print(f'  => {search}: KEEP {best[0]} ({fbase:.2f} -> {best[1]:.2f})')
         open(SRC, 'w').write(cur)

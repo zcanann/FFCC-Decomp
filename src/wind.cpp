@@ -315,9 +315,9 @@ found:
 	}
 
 	obj->type = 2;
-	obj->flagBits.active = 1;
-	float centerZ = pos->z;
 	float centerX = pos->x;
+	float centerZ = pos->z;
+	obj->flagBits.active = 1;
 
 	int id = m_nextId;
 	m_nextId = id + 1;

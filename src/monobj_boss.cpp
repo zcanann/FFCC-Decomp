@@ -900,9 +900,10 @@ void CGMonObj::logicFuncMeteoParasite()
 				if (work->m_objs[3]->m_lastStateId >= 100) {
 					return;
 				}
-				if (work->bits.m_bit80) {
-					return;
+				if (!work->bits.m_bit80) {
+					goto do_logic;
 				}
+				return;
 			}
 			break;
 		}
@@ -910,9 +911,10 @@ void CGMonObj::logicFuncMeteoParasite()
 
 	if (nextState != -1) {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
-	} else {
-		logicFuncDefault();
+		return;
 	}
+do_logic:
+	logicFuncDefault();
 }
 
 /*

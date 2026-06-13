@@ -453,6 +453,7 @@ void CRingMenu::drawGBA()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 void CRingMenu::onDraw()
 {
 	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1))) {
@@ -769,6 +770,7 @@ void CRingMenu::onDraw()
 
 	MenuPcs.DrawInit();
 }
+#pragma opt_lifetimes reset
 
 /*
  * --INFO--

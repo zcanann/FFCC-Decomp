@@ -986,6 +986,7 @@ int CMenuPcs::EquipOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_dead_assignments off
 void CMenuPcs::EquipInit1()
 {
 	int i = (int)GetEquipListStorage(this)->count;
@@ -1066,3 +1067,4 @@ void CMenuPcs::EquipInit1()
 		psVar10++;
 	}
 }
+#pragma opt_dead_assignments reset

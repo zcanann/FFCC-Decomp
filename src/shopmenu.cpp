@@ -1376,6 +1376,7 @@ void CShopMenu::DrawItemInfo0()
     }
 
     int itemNo = getItemNo(m_selectedIndex);
+    register int itemNoReg = itemNo; itemNo = itemNoReg;
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     MenuPcs.DrawInit();
@@ -1423,7 +1424,7 @@ void CShopMenu::DrawItemInfo0()
                            *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + itemNo * 0x48);
                 totalGil = totalGil / 100;
             }
-        } else if (m_listType == 1) {
+        } else if (1 == m_listType) {
             if (itemNo <= 0) {
                 totalGil = 0;
             } else {
@@ -1477,7 +1478,7 @@ void CShopMenu::DrawItemInfo0()
         const char* quantityText = ShopMenuMes(languageId, SHOP_MENU_TEXT_QUANTITY);
         float quantityWidth = font->GetWidth(quantityText);
         font->DrawInit();
-        unsigned int quantityX = static_cast<int>(static_cast<float>(countRightX) - quantityWidth - FLOAT_80332d5c);
+        short quantityX = static_cast<int>(static_cast<float>(countRightX) - quantityWidth - FLOAT_80332d5c);
         MenuPcs.DrawNoShadowFont(font, const_cast<char*>(quantityText), static_cast<float>(quantityX), FLOAT_80332d6c, 0x18, 0x12);
         MenuPcs.DrawInit();
 

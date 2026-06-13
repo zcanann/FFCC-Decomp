@@ -1426,7 +1426,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             tevColor3.g = 0;
             tevColor3.b = 0xFF;
             tevColor3.a = 0xFF;
-            GXSetTevColor(GX_TEVREG2, tevColor2);
+            GXSetTevColor(GX_TEVREG1, tevColor2);
             GXSetTevColor(static_cast<GXTevRegID>(3), tevColor3);
             GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
             _GXSetTevSwapModeTable(1, 0, 3, 3, 3);

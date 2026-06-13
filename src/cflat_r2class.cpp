@@ -1567,14 +1567,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			int mode = static_cast<int>(object->m_localBase[0]);
 			int itemId = static_cast<int>(object->m_localBase[1]);
 			int slot = -1;
-			if (mode != 2) {
-				if (mode < 2) {
-					if (mode >= 1) {
-						caravanWork->AddItem(itemId, &slot);
-					}
-				} else if (mode < 4) {
+			switch (mode) {
+				case 1:
+					caravanWork->AddItem(itemId, &slot);
+					break;
+				case 3:
 					caravanWork->AddComList(itemId, &slot);
-				}
+					break;
 			}
 			PushValue(this, object, slot);
 			outResult = 0;
@@ -1582,8 +1581,8 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x52: {
 			unsigned int result = 0;
-			if ((object->m_localBase[0] & 2) != 0 && reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->FindItem(static_cast<int>(object->m_localBase[1])) >= 0) {
-				result = 2;
+			if ((object->m_localBase[0] & 2) != 0) {
+				result = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->FindItem(static_cast<int>(object->m_localBase[1])) >= 0 ? 2 : 0;
 			}
 			PushValue(this, object, static_cast<int>(result));
 			outResult = 0;

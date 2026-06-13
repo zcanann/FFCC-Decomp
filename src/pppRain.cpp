@@ -76,11 +76,13 @@ static inline RainColorData* GetRainColorData(pppRain* rain, RAIN_DATA* data)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma global_optimizer off
 void pppRenderRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
 {
     int i;
-    RainColorData* colorData;
     VRain* work;
+    RainColorData* colorData;
     RainDrop* drop;
     float tex1;
     float tex0;
@@ -145,6 +147,7 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
     }
     GXSetLineWidth(8, GX_TO_ZERO);
 }
+#pragma pop
 
 /*
  * --INFO--

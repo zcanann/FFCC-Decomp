@@ -814,10 +814,7 @@ void CMenuPcs::calc()
             limit = current + limit;
             if (limit >= value) {
                 int next = current + 1;
-                if (next >= limit) {
-                    next = limit;
-                }
-                value = next;
+                value = (next < limit) ? next : limit;
             }
             m_battleHud.m_gaugeValue = value;
 
@@ -1233,15 +1230,8 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         scaledW = w * us;
         scaledH = h * vs;
 
-        x0 = x;
-        if ((attr & 1) != 0) {
-            x0 = -(scaledW * LoadFloat(kMenuHalf) - x);
-        }
-
-        y0 = y;
-        if ((attr & 2) != 0) {
-            y0 = -(scaledH * LoadFloat(kMenuHalf) - y);
-        }
+        x0 = ((attr & 1) != 0) ? -(scaledW * LoadFloat(kMenuHalf) - x) : x;
+        y0 = ((attr & 2) != 0) ? -(scaledH * LoadFloat(kMenuHalf) - y) : y;
 
         x1 = x0 + scaledW;
         y1 = y0 + scaledH;
@@ -1331,15 +1321,8 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         scaledW = w * us;
         scaledH = h * vs;
 
-        x0 = x;
-        if ((attr & 1) != 0) {
-            x0 = -(scaledW * LoadFloat(kMenuHalf) - x);
-        }
-
-        y0 = y;
-        if ((attr & 2) != 0) {
-            y0 = -(scaledH * LoadFloat(kMenuHalf) - y);
-        }
+        x0 = ((attr & 1) != 0) ? -(scaledW * LoadFloat(kMenuHalf) - x) : x;
+        y0 = ((attr & 2) != 0) ? -(scaledH * LoadFloat(kMenuHalf) - y) : y;
 
         x1 = x0 + scaledW;
         y1 = y0 + scaledH;

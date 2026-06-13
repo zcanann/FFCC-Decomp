@@ -1792,38 +1792,32 @@ DataValsAllocated:
 void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 {
 	int* table = (int*)(progOffsetReconstructionTable + 6);
-	int pppProgRelocOffset = progOffsetReconstructionTable[2];
-	int pdtRelocOffset = progOffsetReconstructionTable[3];
-	int tableHead = table[0];
-	int* pppProgRelocHead = (int*)((int)progOffsetReconstructionTable + pppProgRelocOffset);
-	int* pdtRelocHead = (int*)((int)progOffsetReconstructionTable + pdtRelocOffset);
-	int pppProgRelocCount = pppProgRelocHead[0];
-	int pdtRelocCount = pdtRelocHead[0];
-	int* pppProgRelocs = pppProgRelocHead + 1;
-	int* pdtRelocs = pdtRelocHead + 1;
+	int* pppProgRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]);
+	int* pdtRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]);
+	int pppProgRelocCount = *pppProgRelocs++;
+	int pdtRelocCount = *pdtRelocs++;
 
-	if ((u32)tableHead == 0) {
+	if ((u32)table[0] == 0) {
 		return;
 	}
 
-	int* head = table;
 	for (;;) {
-		*head = (int)progOffsetReconstructionTable + *head;
-		int* entry = head;
+		*table = (int)progOffsetReconstructionTable + *table;
+		int* entry = table;
 
-		for (int i = 0; i < *(short*)((int)head + 0x26); i++) {
+		for (int i = 0; i < *(short*)((int)table + 0x26); i++) {
 			entry[10] = (int)(pppProg + entry[10]);
 			entry[12] = (int)progOffsetReconstructionTable + entry[12];
 			entry[13] = (int)progOffsetReconstructionTable + entry[13];
 			entry += 4;
 		}
 
-		int* next = (int*)*head;
+		int* next = (int*)*table;
 		if (*(unsigned int*)next == 0) {
-			*head = 0;
+			*table = 0;
 			break;
 		}
-		head = next;
+		table = next;
 	}
 
 	for (int i = 0; i < pppProgRelocCount; i++) {
@@ -2283,29 +2277,35 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 
 	ppvMng = pppMngSt;
 	if (se->m_soundEffectSlot >= 0 &&
-		pppMngSt->m_currentFrame >= se->m_soundEffectStartFrame &&
-		(s32)se->m_soundEffectStopFlag == 0)
+		pppMngSt->m_currentFrame >= se->m_soundEffectStartFrame)
 	{
-		Vec soundPos;
-		soundPos.x = mtx->value[0][3];
-		soundPos.y = mtx->value[1][3];
-		soundPos.z = mtx->value[2][3];
+		switch ((s32)se->m_soundEffectStopFlag)
+		{
+		case 0:
+		{
+			Vec soundPos;
+			soundPos.x = mtx->value[0][3];
+			soundPos.y = mtx->value[1][3];
+			soundPos.z = mtx->value[2][3];
 
-		if (se->m_soundEffectHandle < 0)
-		{
-			if (se->m_soundEffectStartedOnce == 0)
+			if (se->m_soundEffectHandle < 0)
 			{
-				u32 soundTableKind = (u32)se->m_soundEffectKind;
-				se->m_soundEffectHandle = Sound.PlaySe3D(
-					se->m_soundEffectSlot, &soundPos,
-					(PartMng.m_pppEnvSt.m_soundVolumeTable - 3)[soundTableKind],
-					(PartMng.m_pppEnvSt.m_soundPitchTable - 3)[soundTableKind], 0);
-				se->m_soundEffectStartedOnce = 1;
+				if (se->m_soundEffectStartedOnce == 0)
+				{
+					u32 soundTableKind = (u32)se->m_soundEffectKind;
+					se->m_soundEffectHandle = Sound.PlaySe3D(
+						se->m_soundEffectSlot, &soundPos,
+						(PartMng.m_pppEnvSt.m_soundVolumeTable - 3)[soundTableKind],
+						(PartMng.m_pppEnvSt.m_soundPitchTable - 3)[soundTableKind], 0);
+					se->m_soundEffectStartedOnce = 1;
+				}
 			}
+			else
+			{
+				Sound.ChangeSe3DPos(se->m_soundEffectHandle, &soundPos);
+			}
+			break;
 		}
-		else
-		{
-			Sound.ChangeSe3DPos(se->m_soundEffectHandle, &soundPos);
 		}
 	}
 

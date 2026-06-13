@@ -276,6 +276,7 @@ void CMesMenu::onScriptChanging(char*)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs off
 void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 {
     (void)z;
@@ -349,6 +350,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         }
     }
 }
+#pragma opt_common_subs reset
 
 /*
  * --INFO--

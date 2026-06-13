@@ -802,8 +802,10 @@ void CGraphic::DrawDebugString()
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
 
-    int y = 0x10;
-    for (u32 i = 0; i < static_cast<u32>(m_debugStringCount); ++i) {
+    int y;
+    u32 i = 0;
+    y = 0x10;
+    for (; i < static_cast<u32>(m_debugStringCount); ++i) {
         s16 xCell = m_debugStringPositions[i].x;
 
         if (xCell == -1) {

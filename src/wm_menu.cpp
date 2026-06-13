@@ -1864,7 +1864,7 @@ void CMenuPcs::calcWorld()
 	model->CalcMatrix();
 	model->CalcSkin();
 
-	const short updatedAnimState = m_wmWorldState->m_mainState;
+	const int updatedAnimState = m_wmWorldState->m_mainState;
 
 	if (updatedAnimState == 1 && animTime >= animEnd) {
 		if (m_wmWorldState->m_frameCounter < 10) {

@@ -3861,7 +3861,7 @@ void CGMonObj::statWatch()
 				unsigned char* scriptBase = script;
 				if (monObj->m_partyDistance[targetPartyIndex] <
 					static_cast<float>(*reinterpret_cast<unsigned short*>(scriptBase + 0xCE))) {
-					if (*reinterpret_cast<short*>(scriptBase + 0x10C) == 1) {
+					if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
 						chaseState = 5;
 						chaseTimer = 0;
 						monObj->m_chaseDirty = 1;

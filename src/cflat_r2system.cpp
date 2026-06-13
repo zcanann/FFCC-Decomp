@@ -3266,13 +3266,13 @@ renderedDone:
         outResult = 0;
         break;
     case -0x81: {
-        float angle = reinterpret_cast<float*>(object->m_localBase)[2];
         Mtx& reflectMtx = m_centerMatrix;
         PSMTXReflect(
             reflectMtx,
             CVector(reinterpret_cast<float*>(object->m_localBase)[0], kCFlatPadStickZero,
                 reinterpret_cast<float*>(object->m_localBase)[1]),
-            CVector(std::sinf(angle), kCFlatPadStickZero, std::cosf(angle)));
+            CVector(std::sinf(reinterpret_cast<float*>(object->m_localBase)[2]), kCFlatPadStickZero,
+                std::cosf(reinterpret_cast<float*>(object->m_localBase)[2])));
         this->push(object, 0);
         outResult = 0;
         break;

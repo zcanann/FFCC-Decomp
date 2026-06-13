@@ -1297,7 +1297,9 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 		clone->m_texSet = m_texSet;
 		clone->m_texSet->AddRef();
 	}
-	clone->m_texAnimSet = (ModelTexAnimSet(this) != 0) ? ModelTexAnimSet(this)->Duplicate(stage) : 0;
+	if (ModelTexAnimSet(this) != 0) {
+		clone->m_texAnimSet = ModelTexAnimSet(this)->Duplicate(stage);
+	}
 
 	clone->m_time = 0.0f;
 	clone->m_curFrame = 0.0f;
@@ -2158,8 +2160,6 @@ foundPlain:
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 {
 	if (ModelLightAlpha(this) == FLOAT_803301b0) {
@@ -2278,7 +2278,6 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		afterDrawModel(this, m_callbackContext, m_callbackParam);
 	}
 }
-#pragma pop
 
 /*
  * --INFO--

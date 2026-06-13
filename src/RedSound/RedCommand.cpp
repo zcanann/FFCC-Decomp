@@ -446,7 +446,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
  */
 static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int volume)
 {
-	unsigned char seFlagsAndSequenceCount;
+	signed char seFlagsAndSequenceCount;
 	RedWaveHeadWD* waveHead;
 	RedTrackDATA* seTrack;
 	int eraseAttrMask;

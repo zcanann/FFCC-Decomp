@@ -1485,6 +1485,7 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
     }
 }
 
+#pragma scheduling off
 /*
  * --INFO--
  * PAL Address: 800178a4
@@ -1552,6 +1553,7 @@ void CGraphic::RenderTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor
 	GXWGFifo.f32 = tex1;
 }
 
+#pragma scheduling on
 /*
  * --INFO--
  * PAL Address: 800177f0

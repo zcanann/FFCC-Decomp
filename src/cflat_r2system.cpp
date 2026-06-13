@@ -1595,6 +1595,8 @@ int CCameraPcs::IsAbsolute()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long* nearestSegment,
                     float* nearestSegmentRatio, Vec* targetPosition, float maxDistance)
 {
@@ -1681,6 +1683,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
 
     return found;
 }
+#pragma pop
 
 int CLine<64>::IsInner(Vec* position, float margin)
 {

@@ -858,8 +858,8 @@ void CMes::Calc()
 doneAdvance:
 	if (advance)
 	{
-		int next = *(int*)((char*)this + 0x3C80) + 1;
 		int max = 0x7FFF;
+		int next = *(int*)((char*)this + 0x3C80) + 1;
 		if (next < 0x7FFF)
 		{
 			max = next;

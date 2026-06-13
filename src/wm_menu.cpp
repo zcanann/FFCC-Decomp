@@ -7920,27 +7920,35 @@ void CMenuPcs::DrawWMFrame()
  */
 void CMenuPcs::CalcWMFrame0(int param)
 {
-	reinterpret_cast<short*>(m_wm.m_frameInfo + 4)[0] = 0x10;
-	reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20)[0] = static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8)) + static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)))));
+	int value;
+	unsigned int animParam = param;
 
-	if (param < 0) {
-		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8)) + static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)));
-		if (param >= -10) {
-			unsigned int sign = param >> 31;
-			float t_unclamped = static_cast<float>((sign ^ param) - sign);
-			offset *= DOUBLE_803314E8 * t_unclamped;
-			int absParam = ((param >> 31) ^ param) - (param >> 31);
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
+	int frameSum = static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8)) +
+	               static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
+	value = static_cast<int>(FLOAT_803313e0 - static_cast<float>(frameSum));
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = static_cast<short>(value);
+
+	if (static_cast<int>(animParam) < 0) {
+		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8)) +
+		                                  static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)));
+		if (static_cast<int>(animParam) >= -10) {
+			int sign = static_cast<int>(animParam) >> 31;
+			int absRaw = (static_cast<int>(animParam) ^ sign) - sign;
+			offset = static_cast<float>(static_cast<double>(offset) * (DOUBLE_803314E8 * static_cast<double>(absRaw)));
+			int absParam = (static_cast<int>(animParam) ^ sign) - sign;
 			if (absParam < 0) {
 				absParam = 0;
 			}
 			if (absParam > 10) {
 				absParam = 10;
 			}
-			float t_clamped = static_cast<float>(absParam);
-			offset *= static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * t_clamped * FLOAT_803316D4)));
+			offset *= static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * (static_cast<float>(absParam) * FLOAT_803316D4))));
 		}
-		reinterpret_cast<short*>(m_wm.m_frameInfo + 4)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4))) - offset));
-		reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20))) + offset));
+		value = static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4))) - offset);
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = static_cast<short>(value);
+		value = static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20))) + offset);
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = static_cast<short>(value);
 	}
 }
 
@@ -12983,12 +12991,12 @@ int McCtrl::LoadMcList()
 				} else if (m_lastResult == -0x0D) {
 					m_state = -1;
 					return -2;
-				} else if (m_lastResult == -5) {
+				}
+				if (m_lastResult == -5) {
 					m_state = -1;
 					return -4;
-				} else {
-					m_state = -1;
 				}
+				m_state = -1;
 			} else {
 				m_state = 4;
 			}
@@ -13021,13 +13029,13 @@ int McCtrl::LoadMcList()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
 				m_state = 7;
+				if (m_lastResult == -5) {
+					return -4;
+				}
 			} else {
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
-			}
-			if (m_lastResult == -5) {
-				return -4;
 			}
 		} else if (MemoryCardMan.IsBrokenFile()) {
 			const int closeResult = MemoryCardMan.McClose();

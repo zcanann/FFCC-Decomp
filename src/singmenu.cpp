@@ -2813,7 +2813,7 @@ void CMenuPcs::DrawSingWin(short mode)
     s16 state = win->state;
     if (state == 0) {
         win->frame = win->frame + 1;
-        if (m_menuWindowInfo->frame > 5) {
+        if (m_menuWindowInfo->frame >= 6) {
             m_menuWindowInfo->frame = 6;
             m_menuWindowInfo->state = 1;
         }
@@ -2823,7 +2823,7 @@ void CMenuPcs::DrawSingWin(short mode)
         }
     } else if (state == 2) {
         win->frame = win->frame - 1;
-        if (m_menuWindowInfo->frame < 1) {
+        if (m_menuWindowInfo->frame <= 0) {
             m_menuWindowInfo->frame = 0;
             m_menuWindowInfo->state = 3;
         }

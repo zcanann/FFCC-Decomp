@@ -3424,12 +3424,11 @@ renderedDone:
         break;
     case -0x97: {
         unsigned int slot = static_cast<unsigned int>(*object->m_localBase);
-        CMapObjectInfo& mapObject = m_mapObjectInfo[slot];
-        mapObject.m_type = static_cast<char>(object->m_localBase[1]);
-        mapObject.m_x = *reinterpret_cast<float*>(object->m_localBase + 2);
-        mapObject.m_y = *reinterpret_cast<float*>(object->m_localBase + 3);
-        mapObject.m_z = *reinterpret_cast<float*>(object->m_localBase + 4);
-        mapObject.m_radius = *reinterpret_cast<float*>(object->m_localBase + 5);
+        m_mapObjectInfo[slot].m_type = static_cast<char>(object->m_localBase[1]);
+        m_mapObjectInfo[slot].m_x = *reinterpret_cast<float*>(object->m_localBase + 2);
+        m_mapObjectInfo[slot].m_y = *reinterpret_cast<float*>(object->m_localBase + 3);
+        m_mapObjectInfo[slot].m_z = *reinterpret_cast<float*>(object->m_localBase + 4);
+        m_mapObjectInfo[slot].m_radius = *reinterpret_cast<float*>(object->m_localBase + 5);
         this->push(object, 0);
         outResult = 0;
         break;

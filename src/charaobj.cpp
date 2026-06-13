@@ -1606,6 +1606,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	int resolvedItemId = itemId;
 	int staType;
+	int counterResist;
+	int counterAllow;
+	int counterEffect;
 	int resistType;
 	int allowEffect;
 	int damageClamp;
@@ -2101,9 +2104,6 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					counterSe = 0x7E3;
 					break;
 				}
-				int counterResist;
-				int counterAllow;
-				int counterEffect;
 				calcRegist(counterType, counterItem, counterResist, counterAllow, counterEffect, 1);
 				if (counterAllow != 0) {
 					if ((m_bgColMask & 0x80000) != 0) {
@@ -2114,9 +2114,6 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					}
 				}
 			} else {
-				int counterResist;
-				int counterAllow;
-				int counterEffect;
 				if (((DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0 ||
 				     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x6CC) == 2) &&
 				    (calcRegist(0x69, resolvedItemId, counterResist, counterAllow, counterEffect, 0), counterAllow != 0)) {
@@ -2366,6 +2363,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		}
 	}
 
+	int itemType;
 	unsigned int base = 0;
 	switch (staIndex) {
 		case 1:
@@ -2408,7 +2406,6 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 			break;
 	}
 
-	int itemType;
 	if (amount >= 0x1F5) {
 		SCharaItemRow* kindRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 		itemType = kindRows[amount].m_kind;

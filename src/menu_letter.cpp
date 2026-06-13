@@ -638,6 +638,7 @@ bool CMenuPcs::LetterOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 int CMenuPcs::LetterCtrl()
 {
 	int done;
@@ -1098,6 +1099,7 @@ int CMenuPcs::LetterCtrl()
 	}
 	return ret;
 }
+#pragma opt_lifetimes reset
 
 /*
  * --INFO--

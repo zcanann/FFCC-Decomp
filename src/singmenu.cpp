@@ -2885,7 +2885,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
 
     dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
-        font->SetTlut(8 - ((activeMask & (1 << i)) != 0));
+        font->SetTlut((activeMask & (1 << i)) != 0 ? 7 : 8);
 
         const char* text;
         if (useDynamic == 0) {

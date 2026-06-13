@@ -4454,7 +4454,7 @@ void CMenuPcs::DrawDiaryMenu()
 	const float scale = static_cast<float>(DOUBLE_80331450 * static_cast<double>(phase) + DOUBLE_80331448);
 	float x = static_cast<float>(DOUBLE_80331438 - static_cast<double>(FLOAT_80331440));
 	float y = FLOAT_80331444;
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor color;
 	color.r = 0xFF;
 	color.g = 0xFF;
@@ -4462,15 +4462,15 @@ void CMenuPcs::DrawDiaryMenu()
 	color.a = static_cast<unsigned char>(static_cast<int>(
 	    FLOAT_80331458 * static_cast<float>(DOUBLE_80331460 * static_cast<double>(phase) + DOUBLE_803313F8)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
 	x = static_cast<float>((FLOAT_80331468 - FLOAT_80331468 * scale) * DOUBLE_803313F8 + static_cast<double>(x));
 	y = static_cast<float>((FLOAT_80331440 - FLOAT_80331440 * scale) * DOUBLE_803313F8 + static_cast<double>(y));
 	if ((bytes[0xF] & 2) != 0) {
-		DrawRect(8, x, y, FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, FLOAT_803313dc);
+		MenuPcs.DrawRect(8, x, y, FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, FLOAT_803313dc);
 	}
 	x = x + FLOAT_8033146C;
 	if ((bytes[0xF] & 1) != 0) {
-		DrawRect(0, x, y, FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, FLOAT_803313dc);
+		MenuPcs.DrawRect(0, x, y, FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, FLOAT_803313dc);
 	}
 }
 

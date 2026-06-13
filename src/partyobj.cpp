@@ -952,7 +952,6 @@ void CGPartyObj::menu()
  */
 void CGPartyObj::onFrameAlways()
 {
-	CGPrgObj::onFrameAlways();
 	if (m_scriptHandle == nullptr) {
 		return;
 	}
@@ -1072,8 +1071,6 @@ traceJoin:
 		}
 		LoadShield(modelId);
 	}
-
-	CheckMenu();
 }
 
 /*

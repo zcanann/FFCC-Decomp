@@ -10604,27 +10604,25 @@ input_check_done:
 				PSMTXConcat(scaleMtx, modelMtx, modelMtx);
 			}
 
-			if (GetWmWorldHandles(this)[i] != 0 && GetWmWorldHandles(this)[i]->m_model != 0) {
-				if (m_wmWorldState->m_mainState == 1) {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) =
-					    static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
-				} else if (m_wmWorldState->m_mainState == 2) {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313e8;
-				} else if (m_wmWorldState->m_mainState == 3) {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) =
-					    static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) -
-					                         DOUBLE_80331420));
-				} else {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313dc;
-				}
-				if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == 1 &&
-				    i == 1) {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313e8;
-				}
-				GetWmWorldHandles(this)[i]->m_model->SetMatrix(modelMtx);
-				GetWmWorldHandles(this)[i]->m_model->CalcMatrix();
-				GetWmWorldHandles(this)[i]->m_model->CalcSkin();
+			if (m_wmWorldState->m_mainState == 1) {
+				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) =
+				    static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+			} else if (m_wmWorldState->m_mainState == 2) {
+				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313e8;
+			} else if (m_wmWorldState->m_mainState == 3) {
+				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) =
+				    static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) -
+				                         DOUBLE_80331420));
+			} else {
+				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313dc;
 			}
+			if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == 1 &&
+			    i == 1) {
+				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313e8;
+			}
+			GetWmWorldHandles(this)[i]->m_model->SetMatrix(modelMtx);
+			GetWmWorldHandles(this)[i]->m_model->CalcMatrix();
+			GetWmWorldHandles(this)[i]->m_model->CalcSkin();
 		}
 	}
 }

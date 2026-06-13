@@ -315,7 +315,7 @@ template class CPtrArray<CCharaPcs::CLoadAnim*>;
 template class CPtrArray<CCharaPcs::CLoadModel*>;
 
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadModel) == 0x28);
-STATIC_ASSERT(sizeof(CCharaPcs::CLoadAnim) == 0x30);
+STATIC_ASSERT(sizeof(CCharaPcs::CLoadAnim) == 0x74);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadTexture) == 0x2C);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadPdt) == 0x20);
 STATIC_ASSERT(sizeof(CCharaPcs::CCameraFrame) == 0x20);
@@ -1724,6 +1724,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
  * JP Address: TODO
  * JP Size: TODO
  */
+
 void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 {
     int hasLoaded;
@@ -3336,23 +3337,6 @@ void CCharaPcs::CHandle::CancelLoadModelASync()
  * Address:	TODO
  * Size:	TODO
  */
-CCharaPcs::CLoadModel::CLoadModel()
-{
-    m_keyTag = 0;
-    m_keyId = -1;
-    m_mergeFileId = -1;
-    m_mergeFlags = 0;
-    m_model = 0;
-    m_streamMode = 0;
-    m_streamOffset = 0;
-    m_streamSize = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 CCharaPcs::CLoadModel::~CLoadModel()
 {
     ReleaseShared(m_model);
@@ -3373,42 +3357,9 @@ CCharaPcs::CLoadAnim::~CLoadAnim()
  * Address:	TODO
  * Size:	TODO
  */
-CCharaPcs::CLoadTexture::CLoadTexture()
-{
-    m_keyTag = 0;
-    m_keyId = -1;
-    m_mergeFileId = -1;
-    m_mergeFlags = 0;
-    m_variantTag = 0;
-    m_textureSet = 0;
-    m_streamMode = 0;
-    m_streamOffset = 0;
-    m_streamSize = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 CCharaPcs::CLoadTexture::~CLoadTexture()
 {
     ReleaseShared(m_textureSet);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CCharaPcs::CLoadPdt::CLoadPdt()
-{
-    m_keyTag = 0;
-    m_keyId = -1;
-    m_variantTag = 0;
-    m_pdtSlot = -1;
-    m_mergeFileId = -1;
-    m_mergeFlags = 0;
 }
 
 /*

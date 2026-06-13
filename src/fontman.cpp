@@ -721,31 +721,6 @@ void* CFont::operator new(unsigned long size, CMemory::CStage* stage, char* file
 
 /*
  * --INFO--
- * PAL Address: 0x80092d74
- * PAL Size: 200b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CFont::~CFont()
-{
-	if (texturePtr != 0) {
-		CTexture* texture = texturePtr;
-		if (texture->DecRef() == 0) {
-			delete texture;
-		}
-		texturePtr = 0;
-	}
-
-	if (m_usesEmbeddedData == 0 && m_glyphData != 0) {
-		delete[] static_cast<unsigned char*>(m_glyphData);
-		m_glyphData = 0;
-	}
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80092e3c
  * PAL Size: 176b
  * EN Address: TODO
@@ -844,4 +819,29 @@ void CFontMan::Init()
  */
 CFontMan::~CFontMan()
 {
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80092d74
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CFont::~CFont()
+{
+	if (texturePtr != 0) {
+		CTexture* texture = texturePtr;
+		if (texture->DecRef() == 0) {
+			delete texture;
+		}
+		texturePtr = 0;
+	}
+
+	if (m_usesEmbeddedData == 0 && m_glyphData != 0) {
+		delete[] static_cast<unsigned char*>(m_glyphData);
+		m_glyphData = 0;
+	}
 }

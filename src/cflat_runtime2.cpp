@@ -1376,8 +1376,8 @@ void CFlatRuntime2::Calc()
 		saveData[3] = header[3];
 		saveData[4] = header[4];
 		saveData[5] = header[5];
-		saveData[6] = header[6];
-		saveData[7] = header[7];
+		reinterpret_cast<float*>(saveData)[6] = reinterpret_cast<float*>(header)[6];
+		reinterpret_cast<float*>(saveData)[7] = reinterpret_cast<float*>(header)[7];
 
 		u32 record[7];
 
@@ -1403,9 +1403,9 @@ void CFlatRuntime2::Calc()
 			objectData[1] = record[1];
 			objectData[2] = record[2];
 			objectData[3] = record[3];
-			objectData[4] = record[4];
-			objectData[5] = record[5];
-			objectData[6] = record[6];
+			reinterpret_cast<float*>(objectData)[4] = reinterpret_cast<float*>(record)[4];
+			reinterpret_cast<float*>(objectData)[5] = reinterpret_cast<float*>(record)[5];
+			reinterpret_cast<float*>(objectData)[6] = reinterpret_cast<float*>(record)[6];
 			objectData += 7;
 		}
 

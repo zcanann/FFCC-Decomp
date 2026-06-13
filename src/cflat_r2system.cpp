@@ -2716,12 +2716,12 @@ renderedDone:
         break;
     case -0x94: {
         float* bounds = reinterpret_cast<float*>(object->m_localBase);
-        ppvEnv->m_boxMinX = bounds[0];
-        ppvEnv->m_boxMaxX = bounds[1];
-        ppvEnv->m_boxMinY = bounds[2];
-        ppvEnv->m_boxMaxY = bounds[3];
-        ppvEnv->m_boxMinZ = bounds[4];
-        ppvEnv->m_boxMaxZ = bounds[5];
+        PartMng.m_pppEnvSt.m_boxMinX = bounds[0];
+        PartMng.m_pppEnvSt.m_boxMaxX = bounds[1];
+        PartMng.m_pppEnvSt.m_boxMinY = bounds[2];
+        PartMng.m_pppEnvSt.m_boxMaxY = bounds[3];
+        PartMng.m_pppEnvSt.m_boxMinZ = bounds[4];
+        PartMng.m_pppEnvSt.m_boxMaxZ = bounds[5];
         this->push(object, 0);
         outResult = 0;
         break;

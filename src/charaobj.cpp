@@ -3098,7 +3098,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_common_subs off
+#pragma opt_lifetimes off
 int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 {
 	unsigned short sourceCid = sourceObj->GetCID();

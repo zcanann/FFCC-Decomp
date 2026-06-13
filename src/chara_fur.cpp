@@ -914,8 +914,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	int messageId = -1;
 	const int debugPadLock = Pad.m_debugPadLock;
-	const int heldButtons = (short)MogHeldButtons(debugPadLock);
-	const int triggerButtons = (short)MogTriggerButtons(debugPadLock);
+	const int heldButtons = (unsigned short)MogHeldButtons(debugPadLock);
+	const int triggerButtons = (unsigned short)MogTriggerButtons(debugPadLock);
 	const unsigned short rotateButtons = static_cast<unsigned short>((MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : static_cast<short>(0));
 
 	if (MogWork().m_started == 0) {
@@ -1348,7 +1348,9 @@ void CChara::CModel::InitMogFurTex()
 		}
 
 		texture->InitTexObj();
-		m_flagsA0 = static_cast<unsigned char>(__rlwimi(m_flagsA0, 1, 6, 25, 25));
+		int flagsBit = 1;
+		unsigned int flagsTemp = m_flagsA0;
+		m_flagsA0 = static_cast<unsigned char>(__rlwimi(flagsTemp, flagsBit, 6, 25, 25));
 	}
 }
 #pragma pop
@@ -1983,7 +1985,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			TextureMan.SetTexture(GX_TEXMAP0, material->GetTexture(0));
 			int hasExtraTexture;
 			int extraTextureFormat;
-			if (static_cast<unsigned short>(material->GetTextureIndex(1)) != -1) {
+			if (material->GetTextureIndex(1) != -1) {
 				CTexture* extraTexture = material->GetTexture(1);
 				hasExtraTexture = 1;
 				TextureMan.SetTexture(GX_TEXMAP2, extraTexture);

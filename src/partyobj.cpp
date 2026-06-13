@@ -84,11 +84,13 @@ extern const float FLOAT_80331b04 = 1.2f;
 extern const float FLOAT_80331b08 = 1.25f;
 extern const char lbl_80331B0C[] = "%d\n";
 extern const char s_CMcPcsName[] = "CMcPcs";
-extern float FLOAT_8032EE78;
-extern float FLOAT_8032EE7C;
-extern float FLOAT_8032EE80;
-extern float FLOAT_8032EE84;
-int s_partyObjCreated_8032EE70;
+float FLOAT_8032EE78;
+float FLOAT_8032EE7C;
+float FLOAT_8032EE80;
+float FLOAT_8032EE84;
+float FLOAT_8032EE88;
+float FLOAT_8032EE8C;
+extern int s_partyObjCreated_8032EE70;
 extern char s_partyObjCreatedInit_8032EE74;
 
 unsigned char CGPartyObj::m_ghostWork[0x90];
@@ -930,7 +932,7 @@ void CGPartyObj::menu()
 	}
 
 	if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-		System.Printf(const_cast<char*>("port:%d mode:%d"), portIndex, Joybus.GetCtrlMode(static_cast<signed char>(m_animStateMisc)));
+		System.Printf(const_cast<char*>(lbl_801DCD78), portIndex, Joybus.GetCtrlMode(static_cast<signed char>(m_animStateMisc)));
 	}
 
 	Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));

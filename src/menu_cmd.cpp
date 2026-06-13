@@ -2461,7 +2461,7 @@ void CMenuPcs::DrawUniteList()
 	{
 		CmdState* const helpStateView = GetCmdStateView(this);
 		const s32 helpMode = helpStateView->mode;
-		const s16 helpSelected = helpStateView->selected;
+		const s32 helpSelected = helpStateView->selected;
 		if (helpMode == 0) {
 		const s16 helpSlot = caravan->m_commandListExtra[helpSelected];
 		if (helpSlot != 0) {

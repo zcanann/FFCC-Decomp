@@ -337,6 +337,11 @@ STATIC_ASSERT(offsetof(CCharaPcs, m_charaAllocStage) == 0xE4);
 
 #pragma dont_inline reset
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
@@ -1022,7 +1027,9 @@ int CCharaPcs::correctLoadAnimAmem()
         chunkSize = 0;
     } while (scanOffset < maxEnd);
 
-    delete tempBuffer;
+    if (tempBuffer != 0) {
+        delete tempBuffer;
+    }
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_charaAmemAnimCompactDoneFmt), compactedSize);
     }
@@ -2248,14 +2255,14 @@ CCharaPcs::CHandle::CHandle()
 	m_currentAnimIndex = -1;
 	m_flags = 0;
 
-	m_colorPhase = kCharaOne;
-	m_sortZ = kCharaZero;
+	m_colorPhase = LoadFloat(kCharaOne);
+	m_sortZ = LoadFloat(kCharaZero);
 	m_shadowTexturePtr = nullptr;
 
 	m_asyncState = 0;
 	m_asyncFileHandle = (CFile::CHandle*)nullptr;
 
-	m_fogBlend = kCharaZero;
+	m_fogBlend = LoadFloat(kCharaZero);
 	m_unk0x158 = 0;
 	m_drawListFlags = static_cast<unsigned char>(__rlwimi(m_drawListFlags, 1, 7, 24, 24));
 }
@@ -2824,6 +2831,18 @@ static inline void GetCameraClipPlanes(float* nearOut, float* farOut)
         *farOut = CameraPcs.m_farZ;
     }
 }
+
+#pragma opt_common_subs off
+
+#pragma opt_dead_assignments off
+
+#pragma opt_lifetimes off
+
+#pragma opt_propagation off
+
+#pragma global_optimizer off
+
+#pragma optimization_level 3
 
 void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 {

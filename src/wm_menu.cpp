@@ -3386,15 +3386,14 @@ void CMenuPcs::CalcLoadMenu()
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 			} else {
-				short ldRes = (short)GetMcCtrl()->LoadDat();
-				m_wmWorldState->m_mcResult = ldRes;
-			}
-			if (m_wmWorldState->m_mcResult < 0) {
-				MemoryCardMan.m_opDoneFlag = 1;
-				MemoryCardMan.m_currentSlot = 0xFF;
+				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->LoadDat();
 			}
 
 			if (m_wmWorldState->m_mcResult != 0) {
+				if (m_wmWorldState->m_mcResult < 0) {
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+				}
 				if (m_wmWorldState->m_subState == 0x16) {
 					if (m_wmWorldState->m_menuMode != 8 && m_wmWorldState->m_mcResult == 1) {
 						gWmMenuWorkB = m_mcCtrl.m_serialHi;

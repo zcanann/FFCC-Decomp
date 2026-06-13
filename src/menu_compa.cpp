@@ -83,6 +83,7 @@ static inline unsigned int GetMenuRepeatLock(int lock)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 void CMenuPcs::CompaDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -134,7 +135,7 @@ void CMenuPcs::CompaDraw()
 						end = y + h;
 						while (static_cast<float>(yStep) < end) {
 							float diff = end - static_cast<float>(yStep);
-							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<unsigned int>(diff);
+							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<int>(diff);
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								fillW, static_cast<float>(tileH), u, v,
@@ -166,7 +167,7 @@ void CMenuPcs::CompaDraw()
 						end = y + h;
 						while (static_cast<float>(yStep) < end) {
 							float diff = end - static_cast<float>(yStep);
-							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<unsigned int>(diff);
+							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<int>(diff);
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								remainW, static_cast<float>(tileH), u, v,
@@ -351,6 +352,7 @@ void CMenuPcs::CompaDraw()
 
 	DrawInit();
 }
+#pragma opt_propagation reset
 /*
  * --INFO--
  * PAL Address: 80161aac

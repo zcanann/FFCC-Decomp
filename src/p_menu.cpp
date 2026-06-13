@@ -385,9 +385,8 @@ void CMenuPcs::create()
 
     int* textureInfo = tTmp;
     for (int i = 0; i < 0x16; i++) {
-        CTextureSet* textureSet = m_textureSets[textureInfo[0]];
-        const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(reinterpret_cast<char*>(textureInfo[1])));
-        CTexture* texture = textureSet->GetTexture(textureIndex);
+        const unsigned long textureIndex = static_cast<unsigned long>(m_textureSets[textureInfo[0]]->Find(reinterpret_cast<char*>(textureInfo[1])));
+        CTexture* texture = m_textureSets[textureInfo[0]]->GetTexture(textureIndex);
         texture->AddRef();
         m_textures[i] = texture;
         textureInfo += 2;

@@ -871,6 +871,7 @@ void CalcReflectionVector2(
  */
 #pragma push
 #pragma opt_propagation off
+#pragma opt_dead_assignments off
 void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, float (*) [4], int)
 {
     VMana2* work;

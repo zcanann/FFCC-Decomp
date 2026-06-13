@@ -254,12 +254,11 @@ inline void SetUpIndWarp(VYmDeformationShp* work)
 	}
 
 	PSMTXRotRad(drawMtx, 'z', kPppYmDeformationShpDegToRad * (float)work->m_angle);
-	float scale = work->m_scale;
-	indMtx[0][0] = drawMtx[0][0] * scale;
-	indMtx[0][1] = drawMtx[0][1] * scale;
+	indMtx[0][0] = drawMtx[0][0] * work->m_scale;
+	indMtx[0][1] = drawMtx[0][1] * work->m_scale;
 	indMtx[0][2] = kPppYmDeformationShpZero;
-	indMtx[1][0] = drawMtx[1][0] * scale;
-	indMtx[1][1] = drawMtx[1][1] * scale;
+	indMtx[1][0] = drawMtx[1][0] * work->m_scale;
+	indMtx[1][1] = drawMtx[1][1] * work->m_scale;
 	indMtx[1][2] = kPppYmDeformationShpZero;
 	GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 }
@@ -306,17 +305,15 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		SetUpIndWarp(work);
 
 		if (param_2->m_splitMode == 0) {
-			u8 size = param_2->m_size;
 			s8 orientation = param_2->m_orientation;
-			float quadSize = (float)size;
-			setVertexPos(vertices[0], vertices[1], vertices[2], vertices[3], quadSize, orientation);
+			setVertexPos(vertices[0], vertices[1], vertices[2], vertices[3], (float)(u8)param_2->m_size, orientation);
 			setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, kPppYmDeformationShpOne, kPppYmDeformationShpOne);
 			RenderDeformationShape(object, work, vertices, uvs);
 		} else {
 			short size = param_2->m_size;
 			short split = param_2->m_splitSize;
-			float uvSplit = (kPppYmDeformationShpOne / (float)((u8)param_2->m_size << 1)) * (float)(size - split);
 			float uvRemainder;
+			float uvSplit = (kPppYmDeformationShpOne / (float)((u8)param_2->m_size << 1)) * (float)(size - split);
 
 			setVertexPos(vertices, (s8)param_2->m_orientation, -size, -split, -split, split);
 			uvRemainder = kPppYmDeformationShpOne - uvSplit;

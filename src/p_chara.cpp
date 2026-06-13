@@ -1414,7 +1414,8 @@ void CCharaPcs::drawShadow()
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 
-    LightPcs.SetAmbient(CColor(0x00, 0x00, 0x00, 0xFF).color);
+    const CColor& shadowBlack = CColor(0x00, 0x00, 0x00, 0xFF);
+    LightPcs.SetAmbient(shadowBlack.color);
     LightPcs.SetNumDiffuse(0);
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 

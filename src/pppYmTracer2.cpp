@@ -70,6 +70,7 @@ static inline YmTracer2DataOffsets* GetYmTracer2DataOffsets(_pppCtrlTable* ctrl)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs off
 void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _pppCtrlTable* param_3)
 {
     YmTracer2Work* work;
@@ -198,6 +199,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs on
 void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _pppCtrlTable* param_3)
 {
     YmTracer2Work* work;

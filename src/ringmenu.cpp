@@ -208,11 +208,13 @@ void CRingMenu::DrawIcon()
 
 	int uInt = iconCol % 8 * 0x30;
 	int vInt = iconCol / 8 * 0x30;
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
 	void* tlut = MenuPcs.m_externalFontTlut;
+	CTexture* iconTexture = MenuPcs.m_textures[0x18];
 	if (caravanWork->m_hp != 0) {
 		tlut = 0;
 	}
-	MenuPcs.m_textures[0x18]->SetExternalTlut(tlut, 1);
+	iconTexture->SetExternalTlut(tlut, 1);
 	GXSetTevDirect(GX_TEVSTAGE2);
 	_GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, GX_CC_ONE, GX_CC_RASA);
 	_GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_KONST, GX_CA_ZERO);
@@ -890,10 +892,10 @@ void CRingMenu::onCalc()
 			m_displayCounter = 0x10 - m_displayCounter;
 		}
 
-		float* anim = m_animFloat[0];
 		const float animStep = kRingMenuBlinkPhaseStep;
 		int count = 9;
 		const float animMin = kRingMenuZero;
+		CRingMenu* anim = this;
 
 		m_displayCounter = clampDecToZero(m_displayCounter);
 		m_transitionCounter = clampDecToZero(m_transitionCounter);
@@ -911,19 +913,19 @@ void CRingMenu::onCalc()
 		m_buttonTimers[7] = clampDecToZero(m_buttonTimers[7]);
 		m_buttonTimers[8] = clampDecToZero(m_buttonTimers[8]);
 		do {
-			anim[0] = anim[0] - animStep;
-			if (animMin > anim[0]) {
-				anim[0] = animMin;
+			anim->m_animFloat[0][0] = anim->m_animFloat[0][0] - animStep;
+			if (anim->m_animFloat[0][0] < animMin) {
+				anim->m_animFloat[0][0] = animMin;
 			}
-			anim[1] = anim[1] - animStep;
-			if (animMin > anim[1]) {
-				anim[1] = animMin;
+			anim->m_animFloat[0][1] = anim->m_animFloat[0][1] - animStep;
+			if (anim->m_animFloat[0][1] < animMin) {
+				anim->m_animFloat[0][1] = animMin;
 			}
-			anim[2] = anim[2] - animStep;
-			if (anim[2] < animMin) {
-				anim[2] = animMin;
+			anim->m_animFloat[0][2] = anim->m_animFloat[0][2] - animStep;
+			if (anim->m_animFloat[0][2] < animMin) {
+				anim->m_animFloat[0][2] = animMin;
 			}
-			anim += 3;
+			anim = reinterpret_cast<CRingMenu*>(&anim->m_transitionCounter);
 			count--;
 		} while (count != 0);
 

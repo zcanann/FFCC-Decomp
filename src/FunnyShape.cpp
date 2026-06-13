@@ -301,7 +301,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
             }
 
-            const s32 x0 = Div16Floor(S16At(entry, 0x10));
+            const u32 x0 = Div16Floor(S16At(entry, 0x10));
             const s32 y0 = Div16Floor(S16At(entry, 0x12));
             const s32 x1 = Div16Floor(S16At(entry, 0x14));
             const s32 y1 = Div16Floor(S16At(entry, 0x16));

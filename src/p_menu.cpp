@@ -375,7 +375,7 @@ void CMenuPcs::create()
 
             void* stage = m_mode == 1 ? MapMng.m_stage : m_menuStage;
 
-            CTextureSet* textureSet = new (m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
+            CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
             m_textureSets[i] = textureSet;
             m_textureSets[i]->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
 

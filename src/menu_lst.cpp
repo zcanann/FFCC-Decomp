@@ -222,6 +222,7 @@ int CMenuPcs::MLstClose()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 int CMenuPcs::MLstCtrl()
 {
 	bool blocked;
@@ -325,6 +326,7 @@ int CMenuPcs::MLstCtrl()
 	}
 	return result;
 }
+#pragma opt_propagation reset
 
 /*
  * --INFO--
@@ -335,6 +337,7 @@ int CMenuPcs::MLstCtrl()
  * JP Address: TODO  
  * JP Size: TODO
  */
+#pragma opt_strength_reduction off
 int CMenuPcs::MLstOpen()
 {
 	float one;
@@ -417,3 +420,4 @@ int CMenuPcs::MLstOpen()
 	}
 	return result;
 }
+#pragma opt_strength_reduction reset

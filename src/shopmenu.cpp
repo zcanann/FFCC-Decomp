@@ -1612,8 +1612,8 @@ void CShopMenu::DrawBuySellInfo()
  */
 void CShopMenu::DrawItemList()
 {
-    int y = 0x4C;
     int itemIndex = m_listTop;
+    int y = 0x4C;
     unsigned int selectableFrame = 10;
     if (m_listType == 2) {
         selectableFrame = 0xF;
@@ -1628,6 +1628,7 @@ void CShopMenu::DrawItemList()
         }
 
         int itemNo = getItemNo(itemIndex);
+        unsigned int itemNoU = itemNo; itemNo = itemNoU;
 
         int canTrade;
         if (itemIndex == -1) {

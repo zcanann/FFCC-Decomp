@@ -221,8 +221,9 @@ void CMenuPcs::CompaDraw()
 
 	int yOffset = 0;
 	for (int i = 0; i < familyCount; i++) {
+		float rowYBase = static_cast<float>(compaList->entries[0].y + 0x40);
 		float rowX = static_cast<float>(compaList->entries[0].x + 0x10);
-		float rowY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(yOffset);
+		float rowY = rowYBase + static_cast<float>(yOffset);
 		MenuPcs.DrawRect(
 			0,
 			rowX,
@@ -293,7 +294,7 @@ void CMenuPcs::CompaDraw()
 	font->SetScaleY(kCompaOne);
 	font->DrawInit();
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(kCompaColorMax * compaList->entries[0].alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
 
 	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	drawIndex = 0;

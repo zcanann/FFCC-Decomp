@@ -773,10 +773,11 @@ void CalcReflectionVector2(
             absPtr[2] = fabsf(outVec->z);
 
             axis = 0;
-            maxAxis = absPtr[0];
             if (absPtr[1] > absPtr[0]) {
                 axis = 1;
                 maxAxis = absPtr[1];
+            } else {
+                maxAxis = absPtr[0];
             }
             if (absPtr[2] > maxAxis) {
                 axis = 2;

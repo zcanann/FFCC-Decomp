@@ -4109,7 +4109,7 @@ renderedDone:
         PartPcs.pppSetDebugHide(static_cast<unsigned char>(*object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        break;
+        // fallthrough
     case -0xF5:
         Sound.SeMaxVolume(*object->m_localBase);
         this->push(object, 0);

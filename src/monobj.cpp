@@ -1955,8 +1955,10 @@ body:
 		(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10))
 					short aiState = monObj->m_aiState;
 					int aiStateI = aiState;
-					unsigned char* aiScript = scriptC;
-					if (aiState != 0) {
+					unsigned char* aiScript;
+					if (aiState == 0) {
+						aiScript = scriptC;
+					} else {
 						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 							(aiStateI + *reinterpret_cast<unsigned short*>(scriptC + 0x100)) * 0x1D0 + 0x10;
 					}

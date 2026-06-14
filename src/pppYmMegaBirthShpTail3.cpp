@@ -623,8 +623,8 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
     }
 
     if ((s32)paramBytes[0x18] < 8 && (s32)paramBytes[0x18] >= 0) {
-        Vec baseDir;
-        s32 angles[4];
+        union { Vec baseDir; double _bdAlign[2]; };
+        union { s32 angles[4]; double _angAlign[2]; };
         pppFMATRIX rot;
 
         baseDir.x = pYmMegaBirthShpTail3->m_matrix[2][0];
@@ -948,9 +948,9 @@ done:
     particleBytes[0x37] = 0x1f;
 
     Vec zeroVec;
-    zeroVec.x = 0.0f;
-    zeroVec.y = 0.0f;
     zeroVec.z = 0.0f;
+    zeroVec.y = 0.0f;
+    zeroVec.x = 0.0f;
     s16* angle = (s16*)particleData;
     Vec* history = (Vec*)((u8*)particleData + 0x80);
     for (int i = 0; i < 0x1f; i++) {

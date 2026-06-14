@@ -196,7 +196,7 @@ void CMenuPcs::FavoDraw()
 		int iconX = static_cast<int>(static_cast<float>(drawEntry->x + drawEntry->w - 0x10));
 		float iconHalfH = static_cast<float>(drawEntry->h) - 32.0f;
 		float iconYf = static_cast<float>(drawEntry->y);
-		int iconY = static_cast<int>(iconHalfH / 2.0 + iconYf);
+		int iconY = static_cast<int>(static_cast<float>(iconHalfH / 2.0 + iconYf));
 		DrawSingleIcon(static_cast<char>(rank->foodId) + 0x14, iconX, iconY, drawEntry->alpha, 1, 1.0f);
 		drawEntry++;
 		rank++;

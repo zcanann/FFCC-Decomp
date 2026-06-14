@@ -3717,10 +3717,6 @@ renderedDone:
         break;
     case -0xC5: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        CVector position(
-            localFloats[4],
-            localFloats[5],
-            localFloats[6]);
         MapMng.SetMapObjWorldMapLightID(
             *object->m_localBase,
             CColor(
@@ -3728,7 +3724,7 @@ renderedDone:
                 static_cast<u8>(object->m_localBase[2]),
                 static_cast<u8>(object->m_localBase[3]),
                 0xFF),
-            position);
+            CVector(localFloats[4], localFloats[5], localFloats[6]));
         this->push(object, 0);
         outResult = 0;
         break;

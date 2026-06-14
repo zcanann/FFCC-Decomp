@@ -2686,7 +2686,7 @@ renderedDone:
         break;
     case -0x5C: {
         CFlatRuntime::CObject* targetObject = static_cast<CFlatRuntime::CObject*>(this->intToClass(object->m_localBase[1]));
-        this->IgnoreParticle(static_cast<short>(*object->m_localBase), targetObject);
+        this->IgnoreParticle(*object->m_localBase, targetObject);
         this->push(object, 0);
         outResult = 0;
         break;

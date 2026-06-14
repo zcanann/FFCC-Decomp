@@ -2562,6 +2562,8 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_propagation off
 int CMenuPcs::UniteCloseAnim(int topIdx)
 {
 	if (s_unitePanelCount == 0) {
@@ -2617,6 +2619,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 
 	return 0;
 }
+#pragma pop
 
 /*
  * --INFO--

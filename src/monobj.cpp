@@ -2235,13 +2235,9 @@ void CGMonObj::isValidTarget()
 	}
 
 	{
-		double soundLimit = kMonObjNormalSoundRange;
-		if (Game.m_gameWork.m_soundOptionFlag != 0) {
-			soundLimit = kMonObjWideSoundRange;
-		}
-
 		int partyIndex = -1;
-		if (soundLimit > static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC))) {
+		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) <
+			(Game.m_gameWork.m_soundOptionFlag != 0 ? kMonObjWideSoundRange : kMonObjNormalSoundRange)) {
 			int colIndex;
 			float hitScale;
 			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),

@@ -1626,20 +1626,16 @@ void CFlatRuntime2::Draw()
  */
 void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, int bit6)
 {
-	u8* runtime = reinterpret_cast<u8*>(this);
-	int& count = DebugDrawCCCount(runtime);
+	if (static_cast<unsigned int>(m_debugDrawCCCount) < 0x10U) {
+		m_debugDrawCCEntries[m_debugDrawCCCount].m_from = *from;
+		m_debugDrawCCEntries[m_debugDrawCCCount].m_to = *to;
 
-	if (static_cast<unsigned int>(count) < 0x10U) {
-		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[count].m_from = *from;
-		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[count].m_to = *to;
+		m_debugDrawCCEntries[m_debugDrawCCCount].m_flagBits.m_bit7 = bit7;
+		m_debugDrawCCEntries[m_debugDrawCCCount].m_flagBits.m_bit6 = bit6;
 
-		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[count].m_flagBits.m_bit7 = bit7;
-		reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries[count].m_flagBits.m_bit6 = bit6;
-
-		const int index = count;
-		count = index + 1;
-		CFlatRuntime2::CDebugDrawCC* entry = reinterpret_cast<CFlatRuntime2::CDebugDrawCC*>(&count + 1) + index;
-		entry->m_radius = radius;
+		const int index = m_debugDrawCCCount;
+		m_debugDrawCCCount = index + 1;
+		m_debugDrawCCEntries[index].m_radius = radius;
 		return;
 	}
 

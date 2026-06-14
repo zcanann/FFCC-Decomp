@@ -82,8 +82,6 @@ extern const float kCameraDebugZoomStep;
 extern const float kCameraNegativeTenF;
 extern const float kCameraFiftyF;
 extern const float kCameraMinFov;
-extern const char s_p_camera_cpp[];
-extern const char sCameraInvalidFovFmt[0x40];
 unsigned char g_IsDbgDrawShadowPos;
 
 inline void* operator new(unsigned long, void* ptr)
@@ -1185,13 +1183,13 @@ void CCameraPcs::createFullShadow()
     CMapMng* map;
     char* fileName;
 
-    fileName = const_cast<char*>(s_p_camera_cpp);
+    fileName = const_cast<char*>(__FILE__);
     map = &MapMng;
     m_fullScreenShadow.m_shadowTexture = 0;
     m_fullScreenShadow.m_shadowTexture =
         new (map->m_stage, fileName, 0x3A5)
             u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
-    fileName = const_cast<char*>(s_p_camera_cpp);
+    fileName = const_cast<char*>(__FILE__);
     map = &MapMng;
     m_fullScreenShadow.m_rampTexture = 0;
     rampTex = new (map->m_stage, fileName, 0x361)
@@ -1748,7 +1746,7 @@ void CCameraPcs::SetStdProjectionMatrix()
 
     if (fov < kCameraMinFov) {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-            System.Printf(const_cast<char*>(sCameraInvalidFovFmt), fov);
+            System.Printf("!!!!!!!!!!!!!!!!!!FOV\202\314\222l\202\252\210\331\217\355\202\305\202\267\201B%f!!!!!!!!!!!!!!!!!!!!\012", fov);
         }
         fov = kCameraDefaultFov;
     }
@@ -1843,7 +1841,7 @@ void CCameraPcs::calc()
     float fov = m_fov;
     if (fov < kCameraMinFov) {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-            System.Printf(const_cast<char*>(sCameraInvalidFovFmt), fov);
+            System.Printf("!!!!!!!!!!!!!!!!!!FOV\202\314\222l\202\252\210\331\217\355\202\305\202\267\201B%f!!!!!!!!!!!!!!!!!!!!\012", fov);
         }
         fov = kCameraDefaultFov;
     }

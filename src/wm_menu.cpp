@@ -13079,15 +13079,16 @@ int McCtrl::LoadMcList()
 
 	case 5: {
 		unsigned long long serial;
-		if (CARDGetSerialNo(m_cardChannel, &serial) != 0) {
+		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
+			m_serialHi = static_cast<unsigned int>(serial);
+			m_serialLo = static_cast<unsigned int>(serial >> 32);
+		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			return -1;
 		}
-		m_serialHi = static_cast<unsigned int>(serial);
-		m_serialLo = static_cast<unsigned int>(serial >> 32);
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McRead(0, 0xA000, m_iteration * 0xA000 + 0x4000);
 		m_state = 6;

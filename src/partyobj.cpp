@@ -5174,12 +5174,11 @@ messageMenu:
 	int prevSlot = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x8C);
 	if (prevSlot != auraSlot) {
 		endPSlotBit(0x400);
-		prevSlot = auraSlot;
 		if (auraSlot != 0) {
 			putParticle(auraSlot | 0x200, m_particleSlots[10], this, kMonObjOne, 0);
 		}
 	}
-	*reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x8C) = prevSlot;
+	*reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x8C) = auraSlot;
 #undef bossState
 }
 

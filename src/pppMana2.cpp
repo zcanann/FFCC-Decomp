@@ -795,7 +795,10 @@ void CalcReflectionVector2(
 
             switch (axis) {
             case 0:
-                invAxis = LoadFloat(kMana2Two) * reflected.x;
+                {
+                    float two = LoadFloat(kMana2Two);
+                    invAxis = two * reflected.x;
+                }
                 if (outVec->x >= LoadFloat(kMana2Zero)) {
                     clr[0] = (u8)(clr[0] + 0x7F);
                     uv.x = half - reflected.z / invAxis;
@@ -815,7 +818,10 @@ void CalcReflectionVector2(
                 }
                 break;
             case 1:
-                invAxis = LoadFloat(kMana2Two) * reflected.y;
+                {
+                    float two = LoadFloat(kMana2Two);
+                    invAxis = two * reflected.y;
+                }
                 if (outVec->y >= LoadFloat(kMana2Zero)) {
                     clr[1] = (u8)(clr[1] + 0x7F);
                     uv.x = half + reflected.x / invAxis;
@@ -834,7 +840,10 @@ void CalcReflectionVector2(
                 }
                 break;
             case 2:
-                invAxis = LoadFloat(kMana2Two) * reflected.z;
+                {
+                    float two = LoadFloat(kMana2Two);
+                    invAxis = two * reflected.z;
+                }
                 if (outVec->z >= LoadFloat(kMana2Zero)) {
                     clr[2] = (u8)(clr[2] + 0x7F);
                     uv.x = half + reflected.x / invAxis;

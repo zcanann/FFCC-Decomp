@@ -2535,7 +2535,8 @@ void CMenuPcs::DrawResultCloseAnim()
 					strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 				} else {
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
-					strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[(int)caravanWork->m_bonusCondition * 2 + 1]);
+					int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
+					strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[strIdx]);
 				}
 
 				float x = (float)sprite->x + sprite->motionX;

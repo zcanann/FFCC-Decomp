@@ -2885,6 +2885,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
         lineHeight++;
     }
     int lineStep = lineHeight + 3;
+    float yOffset = 4.0f;
 
     dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
@@ -2900,7 +2901,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
             char lineBuffer[128];
             strcpy(lineBuffer, text);
             font->SetPosX(x);
-            font->SetPosY(y - 4.0f);
+            font->SetPosY(y - yOffset);
             font->Draw(lineBuffer);
         }
 

@@ -569,7 +569,7 @@ void CMenuPcs::ItemDraw()
     DrawSingLife();
 
     CFont* helpFont = this->m_fonts[0];
-    s8 helpAlpha = (s8)(entry->alpha * LoadFloat(kItemColorMax));
+    s8 helpAlpha = (s8)(entry->alpha * kItemColorMax);
     if (!foundSelected) {
         selectedItemId = -1;
     }

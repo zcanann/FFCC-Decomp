@@ -909,9 +909,9 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 			unsigned int mask = ((int)(signed char)s_Rinfo->pad_0008 | (int)(signed char)s_Rinfo->m_missingArtifactMask) |
 			    s_Rinfo->m_party[partyIndex].m_ownedArtifactMask;
 			if ((mask & (1 << i)) != 0) {
-				gray = 0.7f * 255.0f;
+				gray = FLOAT_80331EB4 * FLOAT_80331E98;
 			} else {
-				gray = 1.0f * 255.0f;
+				gray = FLOAT_80331EB0 * FLOAT_80331E98;
 			}
 			color.r = (unsigned char)gray;
 			color.g = (unsigned char)gray;
@@ -946,7 +946,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	color.g = 0xFF;
 	color.b = 0xFF;
 	color.a = (unsigned char)(255.0f * alpha);
-	const float corner = 8.0f;
+	const float corner = FLOAT_80331EB8;
 	const float texScale = 1.0f;
 
 	GXSetChanMatColor(GX_COLOR0A0, color);
@@ -981,19 +981,19 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1C));
-	float innerW = (float)((double)w - 16.0);
+	float innerW = (float)((double)w - DOUBLE_80331EC0);
 	float xCorner = corner + x;
 	MenuPcs.DrawRect(0, xCorner, y, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x22));
 	MenuPcs.DrawRect(0, xCorner, bottom, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
 	float yCorner = corner + y;
-	float innerH = (float)((double)h - 16.0);
+	float innerH = (float)((double)h - DOUBLE_80331EC0);
 	MenuPcs.DrawRect(0, x, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
 	MenuPcs.DrawRect(0, right, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	MenuPcs.DrawRect(0, xCorner, yCorner, (float)((double)w - 16.0), innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.DrawRect(0, xCorner, yCorner, (float)((double)w - DOUBLE_80331EC0), innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 }
 
 #pragma push

@@ -1495,12 +1495,12 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	local_9c.x = local_70.y;
 	local_9c.y = -local_70.x;
 	local_9c.z = LoadFloat(kPppPartZero);
-	((u32*)&local_60)[0] = ((u32*)&local_9c)[0];
-	((u32*)&local_60)[1] = ((u32*)&local_9c)[1];
-	((u32*)&local_60)[2] = ((u32*)&local_9c)[2];
 	ppvWorldMatrixWood[0][1] = local_70.x;
 	ppvWorldMatrixWood[1][1] = local_70.y;
 	ppvWorldMatrixWood[2][1] = local_70.z;
+	((u32*)&local_60)[0] = ((u32*)&local_9c)[0];
+	((u32*)&local_60)[1] = ((u32*)&local_9c)[1];
+	((u32*)&local_60)[2] = ((u32*)&local_9c)[2];
 
 	if ((local_60.x != LoadFloat(kPppPartZero)) || (local_60.y != LoadFloat(kPppPartZero)) || (local_60.z != LoadFloat(kPppPartZero))) {
 		PSVECNormalize(&local_60, &local_9c);
@@ -1891,14 +1891,17 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	for (int i = 0; i < pppDataHead->m_modelCount; i++) {
 		u32 j = 0;
 		pppModelSt* model = PartMng.m_pppModelStArr;
+		pppModelSt* foundModel;
 		for (; j < 0x100; j++) {
 			if (model->m_isUsed != 0 && strcmp(model->m_name, modelName) == 0) {
+				foundModel = model;
 				goto modelFound;
 			}
 			model++;
 		}
-		model = 0;
+		foundModel = 0;
 	modelFound:
+		model = foundModel;
 
 		modelName += 0x20;
 		reinterpret_cast<pppModelSt**>(pppDataHead->m_modelNames)[i] = model;
@@ -1913,14 +1916,17 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	for (int i = 0; i < pppDataHead->m_shapeCount; i++) {
 		u32 j = 0;
 		pppShapeSt* shape = PartMng.m_pppShapeStArr;
+		pppShapeSt* foundShape;
 		for (; j < 0x100; j++) {
 			if (shape->m_inUse != 0 && strcmp(shape->m_name, shapeName) == 0) {
+				foundShape = shape;
 				goto shapeFound;
 			}
 			shape++;
 		}
-		shape = 0;
+		foundShape = 0;
 	shapeFound:
+		shape = foundShape;
 
 		shapeName += 0x20;
 		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i] = shape;

@@ -222,7 +222,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 									}
 								}
 								rendered[outLen] = '\0';
-								strcat(rendered, spec + 1 + fmtIndex);
+								strcat(rendered, &spec[fmtIndex + 1]);
 							} else {
 								scan = spec + 1;
 								while (*scan != '\0') {

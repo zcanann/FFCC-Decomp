@@ -736,7 +736,7 @@ void CalcReflectionVector2(
         u8 drawFmt = *(u8*)dl;
         u16 itemCount = *(u16*)((u8*)dl + 1);
         int i;
-        s32 fmt = drawFmt & 7;
+        u32 fmt = drawFmt & 7;
 
         dl = (u16*)((u8*)dl + 3);
         if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
@@ -773,10 +773,11 @@ void CalcReflectionVector2(
             absPtr[2] = fabsf(outVec->z);
 
             axis = 0;
-            maxAxis = absPtr[0];
             if (absPtr[1] > absPtr[0]) {
                 axis = 1;
                 maxAxis = absPtr[1];
+            } else {
+                maxAxis = absPtr[0];
             }
             if (absPtr[2] > maxAxis) {
                 axis = 2;

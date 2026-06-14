@@ -213,8 +213,8 @@ void CMenuPcs::TmpArtiDraw()
 	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	for (int i = 0; i < GetTmpArtiList(this)->count; i++) {
-		int tex = entry->tex;
-		if (tex >= 0) {
+		if (entry->tex >= 0) {
+			int tex = entry->tex;
 			float left = (float)entry->x;
 			float top = (float)entry->y;
 			float width = (float)entry->width;

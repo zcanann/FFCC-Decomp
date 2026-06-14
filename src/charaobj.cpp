@@ -2963,7 +2963,8 @@ void CGCharaObj::setSta(int staIndex, int value)
 		}
 	}
 
-	reinterpret_cast<SCharaStaBlock*>(m_scriptHandle)->m_sta[staIndex] = static_cast<short>(clampedValue);
+	SCharaStaBlock* staStore = reinterpret_cast<SCharaStaBlock*>(m_scriptHandle);
+	staStore->m_sta[staIndex] = static_cast<short>(clampedValue);
 }
 
 /*

@@ -2718,12 +2718,12 @@ static inline void pppEditDrawPass(unsigned char* base, int drawPass, Vec& camer
                 PppCullBound bound;
                 float yOffset = mng->m_cullYOffset;
                 float radius = mng->m_cullRadius;
-                bound.m_min.y = partPos.y;
-                bound.m_max.y = partPos.y + yOffset;
                 bound.m_min.x = partPos.x - radius;
                 bound.m_max.x = partPos.x + radius;
                 bound.m_min.z = partPos.z - radius;
+                bound.m_min.y = partPos.y;
                 bound.m_max.z = partPos.z + radius;
+                bound.m_max.y = partPos.y + yOffset;
                 if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
                         cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                     goto drawPart;

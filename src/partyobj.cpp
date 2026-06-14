@@ -2315,8 +2315,9 @@ void CGPartyObj::statCharge()
 		}
 		if (m_subFrame == 5 && m_comboItemState >= 0) {
 			endPSlotBit(0x20);
+			int particleBase = m_comboItemState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 5;
 			CFlat.ResetParticleWork(
-			    ((m_comboItemState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 5) + 0x1C) | 0x400,
+			    (particleBase + 0x1C) | 0x400,
 			    m_particleSlots[5]);
 			CFlat.SetParticleWorkBind(reinterpret_cast<CFlatRuntime::CObject*>(this));
 			CFlat.PutParticleWork();

@@ -2550,7 +2550,7 @@ renderedDone:
         const float angle2 = localFloats[2];
         Vec axis;
         axis.x = std::cosf(angle1);
-        axis.y = 0.0f;
+        axis.y = kCFlatPadStickZero;
         axis.z = std::sinf(angle1);
         Mtx matrix;
         Mtx rotation;
@@ -2563,9 +2563,9 @@ renderedDone:
         PSMTXRotAxisRad(rotation, &axis, angle2);
         PSMTXConcat(rotation, matrix, matrix);
 
-        axis.x = 0.0f;
-        axis.y = 1.0f;
-        axis.z = 0.0f;
+        axis.x = kCFlatPadStickZero;
+        axis.y = kCFlatOneF;
+        axis.z = kCFlatPadStickZero;
         PSMTXRotAxisRad(rotation, &axis, localFloats[3]);
         PSMTXConcat(rotation, matrix, matrix);
         CameraPcs.SetWorldMapMatrix(matrix);

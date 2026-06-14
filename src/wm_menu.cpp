@@ -1924,6 +1924,7 @@ void CMenuPcs::CalcMainMenu()
 void CMenuPcs::CalcDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	char* const rodataBase = lbl_801DB7F8;
 
 	if (static_cast<signed char>(s_wmMenuMountStateInitialized) == 0) {
 		s_wmMenuLastMountState = 0;
@@ -1940,7 +1941,7 @@ void CMenuPcs::CalcDiaryMenu()
 			if (mounted != 0) {
 				text = s_TRUE_803317EC;
 			}
-			System.Printf(const_cast<char*>(s_mount____s_801dc460), text);
+			System.Printf(rodataBase + 0xC68, text);
 		}
 		s_wmMenuLastMountState = static_cast<unsigned char>(mounted);
 	}
@@ -2042,7 +2043,7 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	default:
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-			System.Printf(const_cast<char*>(s__s__d___Error_WM_menu_no_error___801dc424), s_wm_menu_cpp, 0x4c0);
+			System.Printf(rodataBase + 0xC2C, rodataBase + 0xC20, 0x4c0);
 		}
 		break;
 	}

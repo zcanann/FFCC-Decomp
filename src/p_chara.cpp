@@ -1276,8 +1276,8 @@ int CCharaPcs::GetNumTexShadow()
 #pragma opt_dead_assignments off
 void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, Vec* worldPositions, float (*shadowMatrices)[3][4])
 {
-    int shadowIndex = 0;
     CHandle* handle = m_handleList->m_next;
+    int shadowIndex = 0;
 
     while (m_handleList != handle) {
         if ((handle->m_flags & 0x200) != 0 && handle->m_shadowTexturePtr != 0) {

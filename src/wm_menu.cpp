@@ -1746,7 +1746,7 @@ void CMenuPcs::calcWorld()
 #define model handle->m_model
 	const int animState = m_wmWorldState->m_mainState;
 	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
-	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
+	float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
 
 	if (animState == 1) {
 		if (animTime < animEnd) {
@@ -1794,6 +1794,7 @@ void CMenuPcs::calcWorld()
 				reinterpret_cast<int*>(worldParams + 8)[0] = nextAnim;
 
 				if (nextAnim == 0) {
+					animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
 					model->SetFrame(animEnd);
 				}
 			}

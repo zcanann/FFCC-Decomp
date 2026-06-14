@@ -2080,7 +2080,7 @@ renderedDone:
         break;
     }
     case -0x1A: {
-        const unsigned int mode = *object->m_localBase;
+        const int mode = *object->m_localBase;
 
         float t = static_cast<float>(static_cast<int>(object->m_localBase[1])) /
                   static_cast<float>(static_cast<int>(object->m_localBase[2]));
@@ -2229,8 +2229,9 @@ renderedDone:
     case -0x1E:
         if (*object->m_localBase < 0x10) {
             CLine<64>& line = m_debugLines[*object->m_localBase];
+            int mask = object->m_localBase[1];
             line.pointCount = 0;
-            line.m_mask = object->m_localBase[1];
+            line.m_mask = mask;
         }
         this->push(object, 0);
         outResult = 0;
@@ -3573,7 +3574,9 @@ renderedDone:
         break;
     case -0xAF:
         this->push(
-            object, static_cast<int>(Game.m_caravanWorkArr[*object->m_localBase].m_name[object->m_localBase[1]]));
+            object,
+            static_cast<int>(
+                static_cast<signed char>(Game.m_caravanWorkArr[*object->m_localBase].m_name[object->m_localBase[1]])));
         outResult = 0;
         break;
     case -0xAE:
@@ -3588,7 +3591,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0xB0:
-        strcpy(Game.m_startScriptName, this->m_strBlob + this->m_strOffsets[*object->m_localBase]);
+        strcpy(Game.m_gameWork.m_townName, this->m_strBlob + this->m_strOffsets[*object->m_localBase]);
         this->push(object, 0);
         outResult = 0;
         break;

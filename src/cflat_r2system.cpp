@@ -3451,7 +3451,7 @@ renderedDone:
     case -0x99: {
         int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
         MapMng.SetMapObjAnim(
-            mapObjIndex, object->m_localBase[1], object->m_localBase[2], static_cast<char>(object->m_localBase[3]));
+            mapObjIndex, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3553,7 +3553,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0xAB:
-        this->push(object, static_cast<signed char>(Game.m_caravanWorkArr[*object->m_localBase].m_letterMeta[object->m_localBase[1]]));
+        this->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_letterMeta[object->m_localBase[1]]);
         outResult = 0;
         break;
     case -0xAA:

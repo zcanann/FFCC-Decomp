@@ -10681,9 +10681,11 @@ void CMenuPcs::DrawMainMenuSub()
 	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
+	const float* pDc0 = &FLOAT_803313dc;
+	const float* pE80 = &FLOAT_803313e8;
 	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x740),
-	            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
-	            reinterpret_cast<Point3d*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
+	            reinterpret_cast<Vec*>(&CVector(*pDc0, *pE80, *pDc0)),
+	            reinterpret_cast<Point3d*>(&CVector(*pDc0, *pDc0, *pDc0)));
 	PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(&m_wm));
 	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 	CharaPcs.InitEnv(5);
@@ -10695,19 +10697,26 @@ void CMenuPcs::DrawMainMenuSub()
 	GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x738)),
 	              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x73A)),
 	              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x73C)),
-	              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x73E)), FLOAT_803313dc, FLOAT_803313e8);
+	              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x73E)), *pDc0, *pE80);
 	GXSetScissor(*reinterpret_cast<unsigned int*>(worldObj + 0x770), *reinterpret_cast<unsigned int*>(worldObj + 0x774),
 	             *reinterpret_cast<unsigned int*>(worldObj + 0x778), *reinterpret_cast<unsigned int*>(worldObj + 0x77C));
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 
-	const float zSub = FLOAT_80331598;
+	const float* pZSub = &FLOAT_80331598;
+	const float zSub = *pZSub;
 	const Vec* posPtr = s_MMenuPos;
-	const double scaleX = DOUBLE_803315A0;
-	const double one = DOUBLE_80331420;
-	const double scaleY = DOUBLE_803315A8;
-	const float subX = FLOAT_803315B0;
-	const float subY = FLOAT_803315B4;
-	const float zero = FLOAT_803313dc;
+	const double* pScaleX = &DOUBLE_803315A0;
+	const double scaleX = *pScaleX;
+	const double* pOne = &DOUBLE_80331420;
+	const double one = *pOne;
+	const double* pScaleY = &DOUBLE_803315A8;
+	const double scaleY = *pScaleY;
+	const float* pSubX = &FLOAT_803315B0;
+	const float subX = *pSubX;
+	const float* pSubY = &FLOAT_803315B4;
+	const float subY = *pSubY;
+	const float* pZero = &FLOAT_803313dc;
+	const float zero = *pZero;
 	int viewOff = 0;
 	for (int i = 0; i < 5; i++) {
 		Vec viewPos;

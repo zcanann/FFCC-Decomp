@@ -832,7 +832,7 @@ void GbaQueue::ExecutQueue()
 							unsigned int cmdWord = queueWords[i];
 							unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
 							const int itemId =
-								reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_inventoryItems[bytes[2]];
+								reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_inventoryItems[static_cast<int>(bytes[2])];
 							reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->DeleteItemIdx(bytes[2], 1);
 							const unsigned short baseGil =
 								*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);

@@ -2271,6 +2271,7 @@ renderedDone:
         const float x = sinYaw * std::cosf(pitch);
         const float y = std::sinf(pitch);
         const float z = cosYaw * std::cosf(pitch);
+        unsigned int* diffuseBase = object->m_localBase;
         CVector direction(-x, -y, -z);
         Vec* directionPtr = direction;
         CColor color(
@@ -2279,7 +2280,7 @@ renderedDone:
             static_cast<u8>(object->m_localBase[4]),
             0xFF);
 
-        CharaPcs.SetDiffuse(*object->m_localBase, object->m_localBase[1], color, directionPtr);
+        CharaPcs.SetDiffuse(*diffuseBase, diffuseBase[1], color, directionPtr);
         this->push(object, 0);
         outResult = 0;
         break;

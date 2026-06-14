@@ -11919,8 +11919,10 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	}
 
 	effect->m_effectNo = effectNo;
-	const int effectNoXor = effectNo ^ 100;
-	const int group = static_cast<unsigned int>((effectNoXor >> 1) - (effectNoXor & effectNo)) >> 31;
+	int hundred = 100;
+	const int effectNoXor = effectNo ^ hundred;
+	const int half = effectNoXor >> 1;
+	const int group = static_cast<unsigned int>(half - (effectNoXor & effectNo)) >> 31;
 	CGObject* const object = &effect->m_object;
 	effect->m_slotNo = slot;
 	object->Create();

@@ -10497,7 +10497,7 @@ input_check_done:
 			int frame = 0;
 			float modelScale = FLOAT_803315d4;
 			if (i == 0) {
-				modelScale = static_cast<float>(static_cast<double>(modelScale) * DOUBLE_803315D8);
+				modelScale = static_cast<float>(static_cast<double>(FLOAT_803315d4) * DOUBLE_803315D8);
 			}
 
 			*reinterpret_cast<float*>(panel + 0x34) = modelScale;

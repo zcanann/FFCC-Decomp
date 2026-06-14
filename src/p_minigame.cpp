@@ -1888,6 +1888,8 @@ static inline unsigned int MiniGameCrc8(unsigned int value)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_dead_assignments off
+#pragma opt_lifetimes off
 void CMiniGamePcs::MngThreadMain(void*)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
@@ -2186,6 +2188,8 @@ next_player:
     }
 }
 
+#pragma opt_lifetimes on
+#pragma opt_dead_assignments on
 /*
  * --INFO--
  * Address:	TODO

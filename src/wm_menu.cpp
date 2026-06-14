@@ -9208,11 +9208,15 @@ void CMenuPcs::DrawCharaName()
 
 	float fade;
 	if (m_wmWorldState->m_mainState == 1) {
-		fade = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+		const double* pRate = &DOUBLE_803314E8;
+		fade = static_cast<float>(*pRate * static_cast<double>(m_wmWorldState->m_frameCounter));
 	} else if (m_wmWorldState->m_mainState == 2) {
-		fade = FLOAT_803313e8;
+		const float* pOne = &FLOAT_803313e8;
+		fade = *pOne;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
+		const double* pRate = &DOUBLE_803314E8;
+		const double* pOne = &DOUBLE_80331420;
+		fade = static_cast<float>(-(*pRate * static_cast<double>(m_wmWorldState->m_frameCounter) - *pOne));
 	}
 	unsigned int activeMask =  (int)(long)(0);
 	unsigned int confirmedMask = 0;

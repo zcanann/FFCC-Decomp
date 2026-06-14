@@ -3765,8 +3765,8 @@ renderedDone:
         outResult = 0;
         break;
     case -0xC9: {
-        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         MapMng.SetMapObjTransRate(
             mapObjIndex, localFloats[1], localFloats[2], localFloats[3]);
         this->push(object, 0);

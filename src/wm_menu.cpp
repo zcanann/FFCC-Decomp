@@ -13107,8 +13107,10 @@ int McCtrl::LoadMcList()
 	case 5: {
 		unsigned long long serial;
 		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
-			m_serialHi = static_cast<unsigned int>(serial);
-			m_serialLo = static_cast<unsigned int>(serial >> 32);
+			const unsigned int hi = static_cast<unsigned int>(serial);
+			const unsigned int lo = static_cast<unsigned int>(serial >> 32);
+			m_serialLo = lo;
+			m_serialHi = hi;
 		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
@@ -14634,8 +14636,10 @@ int McCtrl::EraseDat()
 	case 0x12: {
 		unsigned long long serial;
 		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
-			m_serialHi = static_cast<unsigned int>(serial);
-			m_serialLo = static_cast<unsigned int>(serial >> 32);
+			const unsigned int hi = static_cast<unsigned int>(serial);
+			const unsigned int lo = static_cast<unsigned int>(serial >> 32);
+			m_serialLo = lo;
+			m_serialHi = hi;
 		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);

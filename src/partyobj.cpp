@@ -5416,10 +5416,10 @@ void CGPartyObj::gpmMove()
 		sGhostPartyWork.carrySpeed += FLOAT_80331A70;
 		float speedScale = (sGhostPartyWork.pressure >= pressureLimit) ? kMonObjOne : FLOAT_80331A88;
 		float newSpeed = FLOAT_80331a78;
-		if (sGhostPartyWork.carrySpeed >= newSpeed) {
+		if (!(sGhostPartyWork.carrySpeed < newSpeed)) {
 			float speedLimit = speedScale * (m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[0]) + 0x690));
 			newSpeed = speedLimit;
-			if (speedLimit >= sGhostPartyWork.carrySpeed) {
+			if (!(speedLimit < sGhostPartyWork.carrySpeed)) {
 				newSpeed = sGhostPartyWork.carrySpeed;
 			}
 		}

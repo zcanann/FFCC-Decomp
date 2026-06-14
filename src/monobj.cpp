@@ -1739,11 +1739,11 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		}
 
 		if (selectorType == 0) {
-			float maxDist = static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x114));
+			int maxDistRaw = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x114);
 			float minDist = static_cast<float>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x112)));
 			unsigned int chance = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x116);
 
-			if ((targetDist < maxDist) && (minDist < targetDist)) {
+			if ((targetDist < static_cast<float>(maxDistRaw)) && (minDist < targetDist)) {
 
 			int forceAction = 0;
 			CGPartyObj* party = Game.m_partyObjArr[partyIndex];

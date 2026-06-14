@@ -62,6 +62,8 @@ extern const float FLOAT_80332930;
 extern const float FLOAT_80332934;
 extern const float FLOAT_8033294c;
 extern const float FLOAT_80332960;
+extern const float FLOAT_8033299C;
+extern const float FLOAT_803329A0;
 extern const float kSingStatBaseX;
 extern const float kSingStatPanelPad;
 extern const float kSingStatPanelW;
@@ -788,7 +790,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
         }
 
         strcpy(outText, text);
-        if (Game.m_gameWork.m_languageId == 2) {
+        if (static_cast<int>(Game.m_gameWork.m_languageId) == 2) {
             strcat(outText, (char*)s_plural_s_80332958);
         }
     }
@@ -800,7 +802,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
         return;
     }
 
-    raceType = genderMask >> 5;
+    raceType = (genderMask >> 5) & 1;
     switch (Game.m_gameWork.m_languageId) {
     case 2:
         suffix = (char*)gSingMenuTextTableDe[raceType + 17];
@@ -1340,8 +1342,9 @@ void CMenuPcs::drawSingleMenu()
         {
             SingleFadeState* fadeState = m_singleFadeState;
             int count = fadeState->count;
+            int i = 0;
             SingleFadeEntry* entry = fadeState->entries;
-            for (int i = 0; i < count; i++) {
+            for (; i < count; i++) {
                 if ((i == 0) || (m_singleMenuMode != 8)) {
                     if (i == 0) {
                         float alpha = entry->alpha;
@@ -1412,8 +1415,9 @@ void CMenuPcs::drawSingleMenu()
         {
             SingleFadeState* fadeState = m_singleFadeState;
             int count = fadeState->count;
+            int i = 0;
             SingleFadeEntry* entry = fadeState->entries;
-            for (int i = 0; i < count; i++) {
+            for (; i < count; i++) {
                 if ((i == 0) || (m_singleMenuMode != 8)) {
                     if (i == 0) {
                         float alpha = entry->alpha;
@@ -1751,12 +1755,13 @@ void CMenuPcs::DrawSingleStat(float alpha)
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
+    float sliceY = 40.0f;
     float sliceHeight = 8.0f;
-    for (float y = 40.0f; y < 408.0f; y += sliceHeight) {
-        if ((408.0f - y) < sliceHeight) {
-            sliceHeight = 408.0f - y;
+    for (; sliceY < 408.0f; sliceY += sliceHeight) {
+        if ((408.0f - sliceY) < sliceHeight) {
+            sliceHeight = 408.0f - sliceY;
         }
-        MenuPcs.DrawRect(0, 440.0f, y, 640.0f, sliceHeight,
+        MenuPcs.DrawRect(0, 440.0f, sliceY, 640.0f, sliceHeight,
                                          0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
@@ -1826,12 +1831,15 @@ void CMenuPcs::DrawSingleStat(float alpha)
     font->Draw(charaName);
 
     font->SetTlut(0x15);
+    float statY0 = 184.0f;
+    float statYStep = 36.0f;
+    float statPosX0 = 592.0f;
     const char** labelsDe = gSingMenuTextTableDe;
     const char** labelsIt = gSingMenuTextTableIt;
     const char** labelsFr = gSingMenuTextTableFr;
     const char** labelsEs = gSingMenuTextTableEs;
     const char** labelsEn = gSingMenuTextTableEn;
-    float y = 184.0f;
+    float y = statY0;
     for (int i = 0; i < 4; i++) {
         font->SetPosX(440.0f);
         font->SetPosY(y - 5.0f);
@@ -1888,12 +1896,12 @@ void CMenuPcs::DrawSingleStat(float alpha)
         char valueText[36];
         sprintf(valueText, "%d", stat);
         float valueW = static_cast<float>(font->GetWidth(valueText));
-        font->SetPosX(592.0f - valueW);
+        font->SetPosX(statPosX0 - valueW);
         font->Draw(valueText);
 
         GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
         font->SetMargin(1.0f);
-        y += 36.0f;
+        y += statYStep;
         labelsDe++;
         labelsIt++;
         labelsFr++;
@@ -2600,11 +2608,11 @@ float CMenuPcs::CalcListPos(int listPos, int listSize, int mode)
         span = static_cast<float>(listSize - 8);
     }
 
-    if ((span <= 0.0f) || (listSize <= 8)) {
-        return -1.0f;
+    if ((span <= FLOAT_8033294c) || (listSize <= 8)) {
+        return FLOAT_8033299C;
     }
 
-    return (192.0f * (static_cast<float>(listPos) / span)) + 32.0f;
+    return (FLOAT_803329A0 * (static_cast<float>(listPos) / span)) + FLOAT_8033292c;
 }
 
 /*
@@ -2759,7 +2767,7 @@ void CMenuPcs::DrawSingWin(short mode)
     float x1 = x0 + w - 32.0f;
     float y1 = y0 + h - 32.0f;
     unsigned long uvFlag;
-    for (int i = 0; i < 4; i++) {
+    for (unsigned int i = 0; i < 4; i++) {
         uvFlag = 0;
         float x;
         if ((i & 1) != 0) {
@@ -2882,6 +2890,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
         lineHeight++;
     }
     int lineStep = lineHeight + 3;
+    float yOffset = 4.0f;
 
     dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
@@ -2897,7 +2906,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
             char lineBuffer[128];
             strcpy(lineBuffer, text);
             font->SetPosX(x);
-            font->SetPosY(y - 4.0f);
+            font->SetPosY(y - yOffset);
             font->Draw(lineBuffer);
         }
 
@@ -3613,3 +3622,5 @@ const float kSingStatPanelW = 96.0f;
 const float kSingStatPanelH = 88.0f;
 const float kSingStatScreenPadX = 12.0f;
 const float kSingStatScreenY = 80.0f;
+const float FLOAT_8033299C = -1.0f;
+const float FLOAT_803329A0 = 192.0f;

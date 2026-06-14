@@ -2162,7 +2162,8 @@ void CShopMenu::DrawSoubi()
 
     char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
     int centerX2 = 0x1F8;
-    int cancelTextX = static_cast<int>((FLOAT_80332DD4 - labelFont->GetWidth(cancelText)) * FLOAT_80332d78 + centerX2);
+    float cancelTextDelta = FLOAT_80332DD4 - labelFont->GetWidth(cancelText);
+    int cancelTextX = static_cast<int>(cancelTextDelta * FLOAT_80332d78 + centerX2);
     labelFont->SetPosX(static_cast<float>(cancelTextX));
     labelFont->SetPosY(FLOAT_80332d88);
     labelFont->Draw(cancelText);

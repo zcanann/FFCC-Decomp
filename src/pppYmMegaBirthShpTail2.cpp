@@ -411,7 +411,7 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
         }
 
         spawnCount = 0;
-        i = 0;
+        i = spawnCount;
         particleData = (u8*)work->m_particles;
         worldMat = work->m_wmats;
         particleColor = work->m_colors;
@@ -871,9 +871,9 @@ done:
     particleBytes[0x37] = 0x1f;
 
     Vec zeroVec;
-    zeroVec.x = 0.0f;
-    zeroVec.y = 0.0f;
     zeroVec.z = 0.0f;
+    zeroVec.y = 0.0f;
+    zeroVec.x = 0.0f;
     Vec* history = (Vec*)(particleBytes + 0x40);
     for (int i = 0x1e; i >= 0; i--) {
         pppCopyVector(*history, zeroVec);

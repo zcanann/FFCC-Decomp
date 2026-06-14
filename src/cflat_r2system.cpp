@@ -2271,6 +2271,7 @@ renderedDone:
         const float x = sinYaw * std::cosf(pitch);
         const float y = std::sinf(pitch);
         const float z = cosYaw * std::cosf(pitch);
+        unsigned int* diffuseBase = object->m_localBase;
         CVector direction(-x, -y, -z);
         Vec* directionPtr = direction;
         CColor color(
@@ -2279,7 +2280,7 @@ renderedDone:
             static_cast<u8>(object->m_localBase[4]),
             0xFF);
 
-        CharaPcs.SetDiffuse(*object->m_localBase, object->m_localBase[1], color, directionPtr);
+        CharaPcs.SetDiffuse(*diffuseBase, diffuseBase[1], color, directionPtr);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2660,7 +2661,7 @@ renderedDone:
         break;
     }
     case -0x80:
-        this->SetParticleWorkSe(*object->m_localBase, static_cast<char>(object->m_localBase[1]), object->m_localBase[2]);
+        this->SetParticleWorkSe(*object->m_localBase, object->m_localBase[1], object->m_localBase[2]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2685,7 +2686,7 @@ renderedDone:
         break;
     case -0x5C: {
         CFlatRuntime::CObject* targetObject = static_cast<CFlatRuntime::CObject*>(this->intToClass(object->m_localBase[1]));
-        this->IgnoreParticle(static_cast<short>(*object->m_localBase), targetObject);
+        this->IgnoreParticle(*object->m_localBase, targetObject);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2878,7 +2879,7 @@ renderedDone:
             GetMes__9CFlatDataFi(MenuPcs.GetMesMenu(a0), a1, a2);
         } else {
             if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
-                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), *object->m_localBase);
+                System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);
             }
         }
         this->push(object, 0);
@@ -3244,7 +3245,7 @@ renderedDone:
         break;
     }
     case -0x7B: {
-        int result = Sound.PlaySe3DLine(*object->m_localBase, static_cast<char>(object->m_localBase[1]),
+        int result = Sound.PlaySe3DLine(*object->m_localBase, object->m_localBase[1],
                          *reinterpret_cast<float*>(object->m_localBase + 2),
                          *reinterpret_cast<float*>(object->m_localBase + 3), 0);
         this->push(object, result);
@@ -3450,7 +3451,7 @@ renderedDone:
     case -0x99: {
         int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
         MapMng.SetMapObjAnim(
-            mapObjIndex, object->m_localBase[1], object->m_localBase[2], static_cast<char>(object->m_localBase[3]));
+            mapObjIndex, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3552,7 +3553,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0xAB:
-        this->push(object, static_cast<signed char>(Game.m_caravanWorkArr[*object->m_localBase].m_letterMeta[object->m_localBase[1]]));
+        this->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_letterMeta[object->m_localBase[1]]);
         outResult = 0;
         break;
     case -0xAA:
@@ -4123,7 +4124,7 @@ renderedDone:
             static_cast<u8>(object->m_localBase[3]),
             static_cast<u8>(object->m_localBase[4]),
             static_cast<u8>(object->m_localBase[5]));
-        MenuPcs.GetFont22()->SetTlutColor(*object->m_localBase, 0xB, color);
+        MenuPcs.GetFont22()->SetTlutColor(*object->m_localBase + 0xB, object->m_localBase[1], color);
         MenuPcs.GetFont22()->FlushTlutColor();
         this->push(object, 0);
         outResult = 0;
@@ -4141,7 +4142,7 @@ renderedDone:
         if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347addNoFreeWave\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
-        Sound.AddNoFreeWave(static_cast<short>(*object->m_localBase));
+        Sound.AddNoFreeWave(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
         break;

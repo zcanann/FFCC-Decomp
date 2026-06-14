@@ -12095,8 +12095,9 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 
 	GXBegin(static_cast<GXPrimitive>(0x98), static_cast<GXVtxFmt>(0), 4);
 
+	float zeroZ = FLOAT_803313dc;
 	for (int i = 0; i < 4; i++) {
-		GXPosition3f32(out[i].x, out[i].y, out[i].z);
+		GXPosition3f32(out[i].x, out[i].y, zeroZ);
 		float uu;
 		if ((i & 1) != 0) {
 			uu = u1;

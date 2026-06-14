@@ -70,6 +70,8 @@ extern const float FLOAT_80330B44;
 extern const float FLOAT_80330B48;
 extern const float FLOAT_80330B4C;
 extern const float FLOAT_80330B5C;
+extern const float FLOAT_80330B60;
+extern const float FLOAT_80330B68;
 extern const float FLOAT_80330B88;
 extern const float FLOAT_80330B8C;
 extern const float FLOAT_80330B90;
@@ -1792,7 +1794,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= ~0xC00;
         }
-        this->push(object, static_cast<short>(buttons));
+        this->push(object, buttons);
         outResult = 0;
         break;
     }
@@ -1930,7 +1932,7 @@ renderedDone:
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= ~0xC00;
         }
-        this->push(object, static_cast<short>(buttons));
+        this->push(object, buttons);
         outResult = 0;
         break;
     }
@@ -1944,7 +1946,7 @@ renderedDone:
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= ~0xC00;
         }
-        this->push(object, static_cast<short>(buttons));
+        this->push(object, buttons);
         outResult = 0;
         break;
     }
@@ -2550,7 +2552,7 @@ renderedDone:
         const float angle2 = localFloats[2];
         Vec axis;
         axis.x = std::cosf(angle1);
-        axis.y = 0.0f;
+        axis.y = kCFlatPadStickZero;
         axis.z = std::sinf(angle1);
         Mtx matrix;
         Mtx rotation;
@@ -2563,9 +2565,9 @@ renderedDone:
         PSMTXRotAxisRad(rotation, &axis, angle2);
         PSMTXConcat(rotation, matrix, matrix);
 
-        axis.x = 0.0f;
-        axis.y = 1.0f;
-        axis.z = 0.0f;
+        axis.x = kCFlatPadStickZero;
+        axis.y = kCFlatOneF;
+        axis.z = kCFlatPadStickZero;
         PSMTXRotAxisRad(rotation, &axis, localFloats[3]);
         PSMTXConcat(rotation, matrix, matrix);
         CameraPcs.SetWorldMapMatrix(matrix);
@@ -2728,14 +2730,15 @@ renderedDone:
     }
     case -0xB4:
         PartMng.pppSetDeltaSlot(
-            *object->m_localBase, static_cast<long>(0.25f * *reinterpret_cast<float*>(object->m_localBase + 1)));
+            *object->m_localBase,
+            static_cast<long>(FLOAT_80330B60 * *reinterpret_cast<float*>(object->m_localBase + 1)));
         this->push(object, 0);
         outResult = 0;
         break;
     case -0xB5:
         PartMng.pppSetDeltaIdx(
             static_cast<short>(*object->m_localBase),
-            static_cast<long>(0.25f * *reinterpret_cast<float*>(object->m_localBase + 1)));
+            static_cast<long>(FLOAT_80330B60 * *reinterpret_cast<float*>(object->m_localBase + 1)));
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2935,7 +2938,7 @@ renderedDone:
             *reinterpret_cast<float*>(object->m_localBase + 2),
             *reinterpret_cast<float*>(object->m_localBase + 3),
             *reinterpret_cast<float*>(object->m_localBase + 4),
-            (kCFlatDegrees180 * (2.0f * *reinterpret_cast<float*>(object->m_localBase + 5))) /
+            (kCFlatDegrees180 * (FLOAT_80330B68 * *reinterpret_cast<float*>(object->m_localBase + 5))) /
                 kCFlatPi);
         this->push(object, 0);
         outResult = 0;

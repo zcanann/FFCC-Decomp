@@ -1985,7 +1985,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             CChunkFile::CChunk chunk;
             while (chunkFile.GetNextChunk(chunk)) {
                 switch (chunk.m_id) {
-                case 'DIXT': {
+                case 'TXID': {
 
                 if (res->m_textureSet == 0) {
                     res->m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;

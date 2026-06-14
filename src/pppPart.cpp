@@ -398,7 +398,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 			if (deniedPtr[0] == 0)
 			{
 				candidate = (_pppMngSt*)(mngBase + 0x2a18);
-				if (*(s32*)(mngBase + 0x2a2c) != -0x1000 && candidate->m_kind != 0)
+				if (candidate->m_baseTime != -0x1000 && candidate->m_kind != 0)
 				{
 					u8 prio = candidate->m_prio;
 					if (prio > 1)
@@ -537,7 +537,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 			if (deniedPtr[0] == 0)
 			{
 				candidate = (_pppMngSt*)(mngBase + 0x2a18);
-				if (*(s32*)(mngBase + 0x2a2c) != -0x1000 && candidate->m_kind != 0)
+				if (candidate->m_baseTime != -0x1000 && candidate->m_kind != 0)
 				{
 					u8 prio = candidate->m_prio;
 					if (prio > 1)
@@ -807,7 +807,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			if (deniedPtr[0] == 0)
 			{
 				candidate = (_pppMngSt*)(mngBase + 0x2a18);
-				if (*(s32*)(mngBase + 0x2a2c) != -0x1000 && candidate->m_kind != 0)
+				if (candidate->m_baseTime != -0x1000 && candidate->m_kind != 0)
 				{
 					u8 prio = candidate->m_prio;
 					if (prio > 1)
@@ -1655,7 +1655,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 				if (deniedPtr[0] == 0)
 				{
 					candidate = (_pppMngSt*)(mngBase + 0x2a18);
-					if (*(s32*)(mngBase + 0x2a2c) != -0x1000 && candidate->m_kind != 0)
+					if (candidate->m_baseTime != -0x1000 && candidate->m_kind != 0)
 					{
 						u8 prio = candidate->m_prio;
 						if (prio > 1)

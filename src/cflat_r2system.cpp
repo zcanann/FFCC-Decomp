@@ -2224,16 +2224,17 @@ renderedDone:
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x1E:
-        if (*object->m_localBase < 0x10) {
-            CLine<64>& line = m_debugLines[*object->m_localBase];
+    case -0x1E: {
+        unsigned int slot = *object->m_localBase;
+        if (slot < 0x10) {
             int mask = object->m_localBase[1];
-            line.pointCount = 0;
-            line.m_mask = mask;
+            m_debugLines[slot].pointCount = 0;
+            m_debugLines[slot].m_mask = mask;
         }
         this->push(object, 0);
         outResult = 0;
         break;
+    }
     case -0x1F: {
         unsigned int slot = *object->m_localBase;
         if (slot < 0x10) {

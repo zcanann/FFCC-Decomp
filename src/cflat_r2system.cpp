@@ -1794,7 +1794,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= ~0xC00;
         }
-        this->push(object, static_cast<short>(buttons));
+        this->push(object, buttons);
         outResult = 0;
         break;
     }
@@ -1932,7 +1932,7 @@ renderedDone:
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= ~0xC00;
         }
-        this->push(object, static_cast<short>(buttons));
+        this->push(object, buttons);
         outResult = 0;
         break;
     }
@@ -1946,7 +1946,7 @@ renderedDone:
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= ~0xC00;
         }
-        this->push(object, static_cast<short>(buttons));
+        this->push(object, buttons);
         outResult = 0;
         break;
     }

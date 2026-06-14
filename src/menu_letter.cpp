@@ -1874,8 +1874,9 @@ void CMenuPcs::LetterListDraw()
 
 	int iconY = 0x5B;
 	const int iconX = static_cast<int>(*static_cast<const volatile float*>(&FLOAT_80333168));
+	const int iconTopRow = static_cast<int>(*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34));
 	int iconLetterIndex;
-	for (int row = 0; row < 9 && (iconLetterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
+	for (int row = 0; row < 9 && (iconLetterIndex = iconTopRow + row) < caravanWork->m_letterCount; ++row) {
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[iconLetterIndex];
 		if (letter->AttachmentValue() != 0) {
 			const int icon = 0x26 + (letter->IsAttachmentClaimed() ? 1 : 0);
@@ -2586,7 +2587,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		}
 	}
 
-	if (param_1 >= DOUBLE_803330e8) {
+	if (!(param_1 < DOUBLE_803330e8)) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
 		MenuPcs.DrawRect(
 		    0, x0 - FLOAT_803330f4, y0 - FLOAT_80333108,

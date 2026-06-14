@@ -7757,7 +7757,7 @@ void CMenuPcs::DrawWMFrame()
 	const float baseX = FLOAT_803315B0;
 	const float baseY = FLOAT_803315B4;
 	for (int i = 0; i < 5; i++) {
-		short* const entry = reinterpret_cast<short*>(m_wm.m_frameData + (i * 0x1C + 0xC));
+		short* const entry = reinterpret_cast<short*>(m_wm.m_frameData + i * 0x1C + 0xC);
 		MenuPcs.DrawRect2(
 			0,
 			static_cast<float>(entry[0]) - baseX,

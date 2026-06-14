@@ -2074,7 +2074,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				continue;
 			}
 
-			for (unsigned int layer = 0; layer < 8; layer++) {
+			for (int layer = 0; layer < 8; layer++) {
 				register float shellReg = static_cast<float>(static_cast<int>(layer)) * 0.125f * furLength;
 				GXTexObj texObj;
 				void* texData = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(&m_height)) + (layer * 0x4000);

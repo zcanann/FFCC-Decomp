@@ -3730,7 +3730,9 @@ void CMenuPcs::CalcResultOpenAnim()
 				BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i + 1];
 				int boardOff = boardBase + i * 0x50;
 				*(short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0x8) = (short)(int)kBonusZClearOrigin;
-				int centerY = (int)(float)((double)(float)((double)sprite->h * DOUBLE_80331E78 + (double)sprite->y) - DOUBLE_80331EF0);
+				double dh = (double)sprite->h;
+				double dy = (double)sprite->y;
+				int centerY = (int)(float)((double)(float)(dh * DOUBLE_80331E78 + dy) - DOUBLE_80331EF0);
 				*(unsigned short*)(this->m_bonus.m_bonusBoardPtr + boardOff + 0xa) = (short)centerY;
 			}
 		}

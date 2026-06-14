@@ -1831,14 +1831,12 @@ void CMenuPcs::drawBattle()
                 MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - LoadFloat(kMenuMarkerCapSize), screenY, LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
             }
 
-            const int gauge = (m_battleHud.m_gaugeCounter * 0xFF) / 16;
-            const CColor fillTop(0xFF, gauge, gauge, static_cast<u8>(alphaF));
+            const CColor fillTop(0xFF, (m_battleHud.m_gaugeCounter * 0xFF) / 16, (m_battleHud.m_gaugeCounter * 0xFF) / 16, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, fillTop.color);
             TextureMan.SetTextureTev(0);
             DrawRect(0, bodyLeft, (screenY + LoadFloat(kMenuMarkerFillYOffset)) - LoadFloat(kMenuOne), static_cast<float>(fillWidth), LoadFloat(kMenuMarkerFillTopHeight), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
 
-            const int gaugeTop = ((m_battleHud.m_gaugeCounter * 0x7F) / 16) + 0x80;
-            const CColor fillBottom(0xFF, gaugeTop, gauge, static_cast<u8>(alphaF));
+            const CColor fillBottom(0xFF, ((m_battleHud.m_gaugeCounter * 0x7F) / 16) + 0x80, (m_battleHud.m_gaugeCounter * 0xFF) / 16, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, fillBottom.color);
             DrawRect(0, bodyLeft, screenY + LoadFloat(kMenuMarkerFillYOffset), static_cast<float>(fillWidth), LoadFloat(kMenuMarkerFillBottomHeight), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
         }

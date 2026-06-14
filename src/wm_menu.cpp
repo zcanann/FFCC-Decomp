@@ -2133,8 +2133,9 @@ void CMenuPcs::CalcMCardMenu()
 		float wave = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
 		if ((int)uVar15 >= -10) {
 			int absSign = (int)uVar15 >> 0x1F;
+			int absRaw = ((int)uVar15 ^ absSign) - absSign;
+			wave = (float)(wave * (DOUBLE_803314E8 * (double)absRaw));
 			int absOff = ((int)uVar15 ^ absSign) - absSign;
-			wave = (float)(wave * (DOUBLE_803314E8 * (double)absOff));
 			if (absOff < 0) absOff = 0;
 			if (absOff > 10) absOff = 10;
 			wave = wave * (float)sin((double)(FLOAT_803314bc * ((float)absOff * FLOAT_803316D4)));

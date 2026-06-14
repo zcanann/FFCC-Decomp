@@ -13496,7 +13496,6 @@ int McCtrl::SaveDat()
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
-			return -1;
 		}
 		break;
 	}

@@ -11736,8 +11736,8 @@ void CMenuPcs::CalcMcObj()
 			const float* pHalfB = &FLOAT_80331434;
 			const float* pB8 = &FLOAT_803314B8;
 			const float* pBC = &FLOAT_803314bc;
-			panelState[0] = 1;
 			reinterpret_cast<float*>(panelState)[7] = *pB0;
+			panelState[0] = 1;
 			reinterpret_cast<float*>(panelState)[8] = *pB4;
 			reinterpret_cast<float*>(panelState)[9] = *pZeroB;
 			reinterpret_cast<float*>(panelState)[0xD] = *pHalfB;

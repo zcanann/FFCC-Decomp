@@ -232,9 +232,8 @@ void CDbgMenuPcs::calc()
 		case 0x65:
 			stackData[0].m_word = 0;
 			stackData[2].m_word = 0;
-			unsigned char gameFlags = CFlatGameFlags();
-			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)gameFlags << 0x18) & 0xC0000000) >> 0x1f));
-			gameFlags = ((int)(char)(flags >> 5) & 1U) << 7 | (gameFlags & ~CFlatGameFlag_Shouki);
+			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)CFlatGameFlags() << 0x18) & 0xC0000000) >> 0x1f));
+			unsigned char gameFlags = ((int)(char)(flags >> 5) & 1U) << 7 | (CFlatGameFlags() & ~CFlatGameFlag_Shouki);
 			CFlatGameFlags() = gameFlags;
 			stackData[1].m_word = (s32)(((u32)gameFlags << 0x18) & 0xC0000000) >> 0x1f;
 			gCFlatRuntime().SystemCall(0, 1, 9, 3, stackData, 0);

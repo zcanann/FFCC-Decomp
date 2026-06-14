@@ -4459,7 +4459,9 @@ void CMenuPcs::DrawDiaryMenu()
 	const int remSign = rem >> 31;
 	const int phase = (rem ^ remSign) - remSign;
 	const float scale = static_cast<float>(DOUBLE_80331450 * static_cast<double>(phase) + DOUBLE_80331448);
-	float x = static_cast<float>(DOUBLE_80331438 - static_cast<double>(FLOAT_80331440));
+	const double* pDia438 = &DOUBLE_80331438;
+	const float* pDia440 = &FLOAT_80331440;
+	float x = static_cast<float>(*pDia438 - static_cast<double>(*pDia440));
 	float y = FLOAT_80331444;
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor color;

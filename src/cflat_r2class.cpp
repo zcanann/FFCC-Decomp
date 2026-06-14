@@ -1590,9 +1590,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x52: {
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle);
+			int findItemId = static_cast<int>(object->m_localBase[1]);
 			unsigned int result = 0;
 			if ((object->m_localBase[0] & 2) != 0) {
-				result = caravanWork->FindItem(static_cast<int>(object->m_localBase[1])) >= 0 ? 2 : 0;
+				result = caravanWork->FindItem(findItemId) >= 0 ? 2 : 0;
 			}
 			PushValue(this, object, static_cast<int>(result));
 			outResult = 0;

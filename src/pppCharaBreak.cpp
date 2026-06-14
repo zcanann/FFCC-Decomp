@@ -499,7 +499,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
                             gUtil.ConvF2IVector(*dst, transformedPos, ModelData(model)->m_posQuant);
                         } else {
-                            *dst = workPositions[polygon->m_posIndices[i]];
+                            *dst = mesh->m_workPositions[polygon->m_posIndices[i]];
                         }
 
                         if (stepData->m_clipMode == 0) {

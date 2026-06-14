@@ -1495,12 +1495,12 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	local_9c.x = local_70.y;
 	local_9c.y = -local_70.x;
 	local_9c.z = LoadFloat(kPppPartZero);
-	((u32*)&local_60)[0] = ((u32*)&local_9c)[0];
-	((u32*)&local_60)[1] = ((u32*)&local_9c)[1];
-	((u32*)&local_60)[2] = ((u32*)&local_9c)[2];
 	ppvWorldMatrixWood[0][1] = local_70.x;
 	ppvWorldMatrixWood[1][1] = local_70.y;
 	ppvWorldMatrixWood[2][1] = local_70.z;
+	((u32*)&local_60)[0] = ((u32*)&local_9c)[0];
+	((u32*)&local_60)[1] = ((u32*)&local_9c)[1];
+	((u32*)&local_60)[2] = ((u32*)&local_9c)[2];
 
 	if ((local_60.x != LoadFloat(kPppPartZero)) || (local_60.y != LoadFloat(kPppPartZero)) || (local_60.z != LoadFloat(kPppPartZero))) {
 		PSVECNormalize(&local_60, &local_9c);

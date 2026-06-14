@@ -2078,6 +2078,7 @@ renderedDone:
     }
     case -0x1A: {
         const int mode = *object->m_localBase;
+        const unsigned int modeBits = mode & 3;
 
         float t = static_cast<float>(static_cast<int>(object->m_localBase[1])) /
                   static_cast<float>(static_cast<int>(object->m_localBase[2]));
@@ -2169,13 +2170,12 @@ renderedDone:
             *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
             *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
         } else {
-            int easeMode = mode & 3;
-            if (easeMode == 3) {
+            if (modeBits == 3) {
                 float s = std::sinf(kCFlatPi * t + kCFlatHalfPi);
                 t = kCFlatOneF - kCFlatHalfF * (kCFlatOneF + s);
-            } else if (easeMode == 1) {
+            } else if (modeBits == 1) {
                 t = kCFlatOneF + std::sinf(kCFlatHalfPi * t + kCFlatThreeHalfPi);
-            } else if (easeMode == 2) {
+            } else if (modeBits == 2) {
                 t = std::sinf(kCFlatHalfPi * t);
             }
 

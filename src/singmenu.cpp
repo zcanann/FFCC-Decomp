@@ -62,6 +62,8 @@ extern const float FLOAT_80332930;
 extern const float FLOAT_80332934;
 extern const float FLOAT_8033294c;
 extern const float FLOAT_80332960;
+extern const float FLOAT_8033299C;
+extern const float FLOAT_803329A0;
 extern const float kSingStatBaseX;
 extern const float kSingStatPanelPad;
 extern const float kSingStatPanelW;
@@ -1706,8 +1708,8 @@ void CMenuPcs::DrawSingleBase(float alpha)
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
-    int sliceHeight = 32;
     int y = 64;
+    int sliceHeight = 32;
     while (y < 384) {
         if ((384 - y) < sliceHeight) {
             sliceHeight = 384 - y;
@@ -3617,3 +3619,5 @@ const float kSingStatPanelW = 96.0f;
 const float kSingStatPanelH = 88.0f;
 const float kSingStatScreenPadX = 12.0f;
 const float kSingStatScreenY = 80.0f;
+const float FLOAT_8033299C = -1.0f;
+const float FLOAT_803329A0 = 192.0f;

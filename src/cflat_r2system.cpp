@@ -2597,11 +2597,8 @@ renderedDone:
         break;
     case -0x38: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        CVector position(
-            localFloats[0],
-            localFloats[1],
-            localFloats[2]);
-        this->SetParticleWorkPos(position, localFloats[3]);
+        this->SetParticleWorkPos(
+            CVector(localFloats[0], localFloats[1], localFloats[2]), localFloats[3]);
         this->push(object, 0);
         outResult = 0;
         break;

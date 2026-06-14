@@ -2020,9 +2020,7 @@ void CMenuPcs::LetterMessDraw()
 			if (mode == 2) {
 				itemSel += 1;
 			} else {
-				int attachDiff = (s_Attach - 2) | (2 - s_Attach);
-				itemSel += ~attachDiff >> 31;
-				itemSel += 4;
+				itemSel = itemSel + (~((s_Attach - 2) | (2 - s_Attach)) >> 31) + 4;
 			}
 			itemSel *= SingWinMessHeight();
 			y0 = static_cast<float>(m_menuWindowInfo->y + (itemSel + 0x20));

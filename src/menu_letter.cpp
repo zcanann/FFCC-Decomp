@@ -2586,7 +2586,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		}
 	}
 
-	if (param_1 >= DOUBLE_803330e8) {
+	if (!(param_1 < DOUBLE_803330e8)) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
 		MenuPcs.DrawRect(
 		    0, x0 - FLOAT_803330f4, y0 - FLOAT_80333108,

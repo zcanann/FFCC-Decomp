@@ -757,16 +757,11 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
             indicesOut[indexOffset++] = lowerNextIndex;
             indicesOut[indexOffset++] = lowerIndex;
             indicesOut[indexOffset++] = quadIndex++;
-
-            nextIndex = quadIndex + 1;
-            lowerIndex = quadIndex + 0x11;
-            lowerNextIndex = quadIndex + 0x12;
-
             indicesOut[indexOffset++] = quadIndex;
-            indicesOut[indexOffset++] = nextIndex;
-            indicesOut[indexOffset++] = lowerNextIndex;
-            indicesOut[indexOffset++] = lowerNextIndex;
-            indicesOut[indexOffset++] = lowerIndex;
+            indicesOut[indexOffset++] = quadIndex + 1;
+            indicesOut[indexOffset++] = quadIndex + 0x12;
+            indicesOut[indexOffset++] = quadIndex + 0x12;
+            indicesOut[indexOffset++] = quadIndex + 0x11;
             indicesOut[indexOffset++] = quadIndex++;
         }
         rowCount = rowCount + 1;

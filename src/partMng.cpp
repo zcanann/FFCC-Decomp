@@ -1985,7 +1985,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             CChunkFile::CChunk chunk;
             while (chunkFile.GetNextChunk(chunk)) {
                 switch (chunk.m_id) {
-                case 'DIXT': {
+                case 'TXID': {
 
                 if (res->m_textureSet == 0) {
                     res->m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
@@ -2688,7 +2688,7 @@ static inline void pppEditDrawPass(unsigned char* base, int drawPass, Vec& camer
     int i;
     for (i = 0; i < kPppMngCount; i++, base += kPppMngStride) {
         mng = reinterpret_cast<_pppMngSt*>(base + kPppMngOffset);
-        if (base[kPppMngOffset + 0xE8] == 0 && mng->m_baseTime != -0x1000
+        if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000
             && (signed char)mng->m_drawPass == drawPass && mng->m_baseTime < 0
             && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
             ppvMng = mng;
@@ -2718,12 +2718,12 @@ static inline void pppEditDrawPass(unsigned char* base, int drawPass, Vec& camer
                 PppCullBound bound;
                 float yOffset = mng->m_cullYOffset;
                 float radius = mng->m_cullRadius;
-                bound.m_min.y = partPos.y;
-                bound.m_max.y = partPos.y + yOffset;
                 bound.m_min.x = partPos.x - radius;
                 bound.m_max.x = partPos.x + radius;
                 bound.m_min.z = partPos.z - radius;
+                bound.m_min.y = partPos.y;
                 bound.m_max.z = partPos.z + radius;
+                bound.m_max.y = partPos.y + yOffset;
                 if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
                         cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                     goto drawPart;
@@ -2737,7 +2737,7 @@ void CPartMng::pppEditDraw()
 {
     static const int kPppMngCount = 0x180;
     static const int kPppMngStride = 0x158;
-    static const int kEditCountOffset = 0x2355C;
+    static const int kEditCountOffset = 0x4;
     static const int kEditDrawModeOffset = 0x23570;
     static const int kCursorEnableOffset = 0xC;
     static const int kBaseTimeOffset = 0x14;
@@ -2746,7 +2746,7 @@ void CPartMng::pppEditDraw()
     static const int kMatrixOffset = 0x78;
     static const int kEndRequestedOffset = 0xe8;
     static const int kDrawPassOffset = 0xed;
-    static const int kStopAtLifeEndOffset = 0xef;
+    static const int kStopAtLifeEndOffset = 0xe4;
     static const int kSlotVisibleOffset = 0xe9;
     static const int kOwnerVisibleOffset = 0xea;
     static const int kCullRadiusSqOffset = 0x108;
@@ -2782,24 +2782,25 @@ void CPartMng::pppEditDraw()
             PPP_EDIT_DRAW_PASS(7)
 #undef PPP_EDIT_DRAW_PASS
         } else {
-            char* mng = reinterpret_cast<char*>(m_pppMng);
-            int editCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditCountOffset);
-            for (int i = 0; i < editCount; i++) {
-                int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);
-                ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+            static const int kPppMngOffset = 0x2A18;
+            char* base = reinterpret_cast<char*>(this);
+            for (int i = 0; i < *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditCountOffset); i++) {
+                _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(base + kPppMngOffset);
+                ppvMng = mng;
+                int baseTime = *reinterpret_cast<int*>(base + kPppMngOffset + kBaseTimeOffset);
                 if (baseTime != -0x1000 && baseTime < 0) {
-                    partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
-                    partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
-                    partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
+                    partPos.x = *reinterpret_cast<float*>(reinterpret_cast<char*>(mng) + kMatrixOffset + 0xc);
+                    partPos.y = *reinterpret_cast<float*>(reinterpret_cast<char*>(mng) + kMatrixOffset + 0x1c);
+                    partPos.z = *reinterpret_cast<float*>(reinterpret_cast<char*>(mng) + kMatrixOffset + 0x2c);
                     PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-                    *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
-                    ppvDrawMng.AddPrimOt(0x3ff, reinterpret_cast<_pppMngSt*>(mng));
-                    if (*reinterpret_cast<unsigned char*>(mng + kStopAtLifeEndOffset) != 0
-                        && *reinterpret_cast<int*>(mng + kCurrentFrameOffset) == *reinterpret_cast<int*>(mng + kLifeEndOffset)) {
+                    *reinterpret_cast<float*>(reinterpret_cast<char*>(mng) + kSortDepthOffset) = viewPos.z;
+                    ppvDrawMng.AddPrimOt(0x3ff, mng);
+                    if (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(mng) + kStopAtLifeEndOffset) != 0
+                        && *reinterpret_cast<int*>(reinterpret_cast<char*>(mng) + kCurrentFrameOffset) == *reinterpret_cast<int*>(reinterpret_cast<char*>(mng) + kLifeEndOffset)) {
                         gPppHeapUseRateWords[1] = 0;
                     }
                 }
-                mng += kPppMngStride;
+                base += kPppMngStride;
             }
             ppvDrawMng.DrawOt();
         }
@@ -4268,6 +4269,7 @@ struct PppHitIdBlock {
     int m_ids[8];
 };
 
+#pragma opt_common_subs off
 int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam, int allowFpOverride)
 {
     struct PppMngStCreateRaw {
@@ -4569,6 +4571,7 @@ foundMng:
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs reset
 int CPartMng::pppCreate(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam, int allowFpOverride)
 {
     if (PartPcs.m_usbStreamState.m_disableShokiDraw != 0) {

@@ -788,6 +788,7 @@ void CRingMenu::onDraw()
 void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* caravanWork, int cmdIndex, float angle, float alphaScale)
 {
 	float fVar1;
+	float alphaProduct;
 	bool reverseDir;
 	int waveDirection;
 	float clampedAlpha;
@@ -862,8 +863,9 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 
 	clampedAlpha = (fVar1 < kRingMenuZero) ? kRingMenuZero : ((kRingMenuOne < fVar1) ? kRingMenuOne : fVar1);
 
+	alphaProduct = kRingMenuAlphaMax * alphaScale;
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF,
-		static_cast<unsigned char>((kRingMenuAlphaMax * alphaScale) * clampedAlpha)).color);
+		static_cast<unsigned char>(alphaProduct * clampedAlpha)).color);
 	font->SetPosX(static_cast<float>(waveX) +
 		((kRingMenuTextBaseX + posX) - textWidth * kRingMenuHalf));
 	font->SetPosY(kRingMenuGbaOrbitYScale +

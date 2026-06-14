@@ -4068,6 +4068,8 @@ renderedDone:
             MapPcs.CalcHitPosition(hitPosition);
             *reinterpret_cast<float*>(object->m_localBase[4]) = hitPosition.y;
             this->push(object, 1);
+            outResult = 0;
+            break;
         } else {
             this->push(object, 0);
         }

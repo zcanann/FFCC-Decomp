@@ -310,8 +310,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			goto done;
 		}
 		case -2: {
-			CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
 			const u32 scriptGroup = *object->m_localBase;
+			CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
 
 			engineObject->m_next->m_previous = engineObject->m_previous;
 			engineObject->m_previous->m_next = engineObject->m_next;

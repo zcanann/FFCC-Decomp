@@ -1637,7 +1637,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x5F:
-			if (engineObject->m_charaModelHandle != 0 && PartMng.pppIsDeadCHandle(engineObject->m_charaModelHandle) != 0) {
+			if (engineObject->m_charaModelHandle != 0) {
+				if (PartMng.pppIsDeadCHandle(engineObject->m_charaModelHandle) != 0) {
+					PushValue(this, object, 0);
+					outResult = 0;
+				}
+			} else {
 				PushValue(this, object, 0);
 				outResult = 0;
 			}

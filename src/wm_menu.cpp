@@ -1513,7 +1513,7 @@ void CMenuPcs::InitCharaInfo()
 	for (; i < 8; i++) {
 		unsigned char* src0 = gameData + 0x13F0;
 		unsigned char* entry0 = m_wm.m_charaModelData + modelOffset;
-		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
+		if (*reinterpret_cast<int*>(src0 + 0x3A4) != 0) {
 			int modelNo = *reinterpret_cast<unsigned short*>(src0 + 0x3E0) * 200 + 100;
 			int flag0 = *reinterpret_cast<unsigned short*>(src0 + 0x3E2);
 			unsigned short add0  = *reinterpret_cast<unsigned short*>(src0 + 0x3E4);

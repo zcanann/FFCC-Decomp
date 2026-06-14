@@ -1814,7 +1814,7 @@ void CMenuPcs::drawBattle()
                 GXSetNumTexGens(1);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, bodyLeft, screenY, bodyWidth, LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
+                MenuPcs.DrawRect(0, left + LoadFloat(kMenuMarkerCapSize), screenY, bodyWidth, LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
 
                 tex = MenuPcs.m_textures[0x1C];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);

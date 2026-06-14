@@ -12840,9 +12840,8 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 				}
 			}
 		}
-		result++;
-
 		src += 0x1380;
+		result++;
 	}
 
 	if (strictMode == 0) {

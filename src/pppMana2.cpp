@@ -848,8 +848,8 @@ void CalcReflectionVector2(
                     clr[2] = (u8)(clr[2] + 0x7F);
                     uv.x = half + reflected.x / invAxis;
                     uv.y = half - reflected.y / invAxis;
-                    uv.x = uv.x * LoadFloat(kMana2Quarter);
                     uv.y = uv.y * LoadFloat(kMana2Quarter);
+                    uv.x = uv.x * LoadFloat(kMana2Quarter);
                     uv.y = uv.y + LoadFloat(kMana2Quarter);
                 } else {
                     clr[2] = (u8)(clr[2] - 0x7F);

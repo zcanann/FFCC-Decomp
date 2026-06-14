@@ -353,6 +353,8 @@ void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_strength_reduction off
 void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
 {
 	pppYmChangeTexState* state = (pppYmChangeTexState*)param_2;
@@ -402,6 +404,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 		}
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

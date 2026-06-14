@@ -413,7 +413,8 @@ void CMenuPcs::ItemDraw()
                 colors[3].b = 0xFF;
                 colors[3].a = 0;
 
-                w = (float)(LoadDouble(kItemOneDouble) / (double)entry->duration) * (float)entry->w;
+                float widthFrac = (float)(LoadDouble(kItemOneDouble) / (double)entry->duration);
+                w = widthFrac * (float)entry->w;
                 MenuPcs.DrawRect(
                     0, x, y, w, h, u, v, colors, LoadFloat(kItemOne), LoadFloat(kItemOne), LoadFloat(kItemZero));
             }

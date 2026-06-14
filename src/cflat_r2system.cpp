@@ -4124,7 +4124,7 @@ renderedDone:
             static_cast<u8>(object->m_localBase[3]),
             static_cast<u8>(object->m_localBase[4]),
             static_cast<u8>(object->m_localBase[5]));
-        MenuPcs.GetFont22()->SetTlutColor(*object->m_localBase, 0xB, color);
+        MenuPcs.GetFont22()->SetTlutColor(*object->m_localBase + 0xB, object->m_localBase[1], color);
         MenuPcs.GetFont22()->FlushTlutColor();
         this->push(object, 0);
         outResult = 0;

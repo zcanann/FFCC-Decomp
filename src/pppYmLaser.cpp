@@ -201,6 +201,11 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 			trailStartColor.g = trailColorG;
 			trailStartColor.b = trailColorB;
 			trailStartColor.a = (u8)alphaMax - alphaStep * j;
+			_GXColor trailEndColor;
+			trailEndColor.r = trailColorR;
+			trailEndColor.g = trailColorG;
+			trailEndColor.b = trailColorB;
+			trailEndColor.a = (u8)alphaMax - alphaStep * (j + 1);
 
 			GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
 			GXColor1u32(*(u32*)&trailStartColor);
@@ -210,11 +215,6 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 			GXColor1u32(*(u32*)&trailStartColor);
 			GXTexCoord2f32(u0, LoadLaserFloat(kPppYmLaserZero));
 
-			_GXColor trailEndColor;
-			trailEndColor.r = trailColorR;
-			trailEndColor.g = trailColorG;
-			trailEndColor.b = trailColorB;
-			trailEndColor.a = (u8)alphaMax - alphaStep * (j + 1);
 			GXPosition3f32(work->m_points[j + 1].x, work->m_points[j + 1].y, work->m_points[j + 1].z);
 			GXColor1u32(*(u32*)&trailEndColor);
 			GXTexCoord2f32(u1, LoadLaserFloat(kPppYmLaserZero));
@@ -371,8 +371,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 			pppCopyVector(work->m_points[j + 1], work->m_points[j]);
 		}
 
-		localB.x = kPppYmLaserZero;
-		localB.y = kPppYmLaserZero;
+		localB.x = LoadLaserFloat(kPppYmLaserZero);
+		localB.y = LoadLaserFloat(kPppYmLaserZero);
 		localB.z = work->m_length;
 
 		if (i == 0) {
@@ -401,10 +401,10 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 		pppSubVector(localA, work->m_points[i], work->m_origin);
 		PSVECScale(&localA, &localA, LoadLaserFloat(kPppYmLaserHitRayScale));
 
-		CMapCylinder cyl(LoadLaserFloat(kPppYmLaserCylinderMax), LoadLaserFloat(kPppYmLaserCylinderMin));
+		CMapCylinder cyl(LoadLaserFloat(kPppYmLaserCylinderMin), LoadLaserFloat(kPppYmLaserCylinderMax));
 		cyl.m_bottom = work->m_origin;
 		cyl.m_axis = localA;
-		cyl.m_radius = kPppYmLaserZero;
+		cyl.m_radius = LoadLaserFloat(kPppYmLaserZero);
 
 		int check = MapMng.CheckHitCylinderNear(&cyl, &localA, 0xffffffff);
 		int hit = 0;
@@ -419,8 +419,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 		}
 
 		if (i == 0) {
-			localB.x = kPppYmLaserZero;
-			localB.y = kPppYmLaserZero;
+			localB.x = LoadLaserFloat(kPppYmLaserZero);
+			localB.y = LoadLaserFloat(kPppYmLaserZero);
 			localB.z = work->m_length;
 			PSMTXMultVec(tempMtx, &localB, &work->m_points[i]);
 		}

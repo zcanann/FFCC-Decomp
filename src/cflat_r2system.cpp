@@ -3477,16 +3477,14 @@ renderedDone:
         outResult = 0;
         break;
     case -0x9C: {
-        int cameraSlot = *object->m_localBase;
         int cameraFrame = object->m_localBase[1];
-        if ((CharaPcs.m_cameraData[cameraSlot] == 0) || (cameraFrame < 0) ||
-            (CharaPcs.m_cameraFrameCount[cameraSlot] <= cameraFrame)) {
+        CCharaPcs::CCameraFrame*& cameraSlotRef = CharaPcs.m_cameraData[*object->m_localBase];
+        if ((cameraSlotRef == 0) || (cameraFrame < 0) ||
+            (CharaPcs.m_cameraFrameCount[*object->m_localBase] <= cameraFrame)) {
             this->push(object, 0);
             outResult = 0;
-            break;
         }
 
-        CCharaPcs::CCameraFrame*& cameraSlotRef = CharaPcs.m_cameraData[cameraSlot];
         *reinterpret_cast<float*>(object->m_localBase[2]) = cameraSlotRef[cameraFrame].m_values[0].m_float;
         *reinterpret_cast<float*>(object->m_localBase[3]) = -cameraSlotRef[cameraFrame].m_values[1].m_float;
         *reinterpret_cast<float*>(object->m_localBase[4]) = -cameraSlotRef[cameraFrame].m_values[2].m_float;

@@ -1963,12 +1963,14 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x8E:
+		case -0x8E: {
+			int carryIndex = static_cast<int>(object->m_localBase[0]);
 			reinterpret_cast<CGPartyObj*>(engineObject)
-			    ->carry(static_cast<int>(object->m_localBase[0]), static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[1]))), static_cast<int>(object->m_localBase[2]));
+			    ->carry(carryIndex, static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[1]))), static_cast<int>(object->m_localBase[2]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		}
 		case -0x8D:
 			reinterpret_cast<CGPartyObj*>(engineObject)->commandFinished();
 			PushValue(this, object, 0);

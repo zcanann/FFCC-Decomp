@@ -1755,12 +1755,13 @@ void CMenuPcs::DrawSingleStat(float alpha)
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
+    float sliceY = 40.0f;
     float sliceHeight = 8.0f;
-    for (float y = 40.0f; y < 408.0f; y += sliceHeight) {
-        if ((408.0f - y) < sliceHeight) {
-            sliceHeight = 408.0f - y;
+    for (; sliceY < 408.0f; sliceY += sliceHeight) {
+        if ((408.0f - sliceY) < sliceHeight) {
+            sliceHeight = 408.0f - sliceY;
         }
-        MenuPcs.DrawRect(0, 440.0f, y, 640.0f, sliceHeight,
+        MenuPcs.DrawRect(0, 440.0f, sliceY, 640.0f, sliceHeight,
                                          0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
 
@@ -2607,11 +2608,11 @@ float CMenuPcs::CalcListPos(int listPos, int listSize, int mode)
         span = static_cast<float>(listSize - 8);
     }
 
-    if ((span <= 0.0f) || (listSize <= 8)) {
-        return -1.0f;
+    if ((span <= FLOAT_8033294c) || (listSize <= 8)) {
+        return FLOAT_8033299C;
     }
 
-    return (192.0f * (static_cast<float>(listPos) / span)) + 32.0f;
+    return (FLOAT_803329A0 * (static_cast<float>(listPos) / span)) + FLOAT_8033292c;
 }
 
 /*

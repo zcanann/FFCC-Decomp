@@ -2299,7 +2299,7 @@ renderedDone:
         const float margin = localFloats[4];
         int found = 0;
         unsigned int bestLine = 0;
-        float bestDistance = kLineBoundsInitMin;
+        float bestDistance = FLOAT_80330B5C;
         float bestLineDistance = 0.0f;
 
         CLine<64>* lines = m_debugLines;

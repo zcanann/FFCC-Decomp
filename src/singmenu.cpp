@@ -788,7 +788,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
         }
 
         strcpy(outText, text);
-        if (Game.m_gameWork.m_languageId == 2) {
+        if (static_cast<int>(Game.m_gameWork.m_languageId) == 2) {
             strcat(outText, (char*)s_plural_s_80332958);
         }
     }
@@ -800,7 +800,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
         return;
     }
 
-    raceType = genderMask >> 5;
+    raceType = (genderMask >> 5) & 1;
     switch (Game.m_gameWork.m_languageId) {
     case 2:
         suffix = (char*)gSingMenuTextTableDe[raceType + 17];
@@ -2759,7 +2759,7 @@ void CMenuPcs::DrawSingWin(short mode)
     float x1 = x0 + w - 32.0f;
     float y1 = y0 + h - 32.0f;
     unsigned long uvFlag;
-    for (int i = 0; i < 4; i++) {
+    for (unsigned int i = 0; i < 4; i++) {
         uvFlag = 0;
         float x;
         if ((i & 1) != 0) {

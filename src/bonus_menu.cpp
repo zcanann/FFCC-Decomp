@@ -3704,7 +3704,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		{
-			unsigned int i = 0;
+			int i = 0;
 			int boardOff = i;
 			int half = activePartyCount * 0x50;
 			for (; i < activePartyCount; i++) {

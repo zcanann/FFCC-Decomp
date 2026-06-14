@@ -1255,8 +1255,7 @@ void CGPartyObj::command()
 		if (cmdDir != 0) {
 			Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
 			CCaravanWork* cmdDirCaravan = caravan;
-			const int curCmd = cmdDirCaravan->GetIdxCmdList();
-			cmdDirCaravan->IsUseCmdList(cmdDirCaravan->GetNextCmdListIdx(curCmd, cmdDir));
+			cmdDirCaravan->IsUseCmdList(cmdDirCaravan->GetNextCmdListIdx(cmdDirCaravan->GetIdxCmdList(), cmdDir));
 		}
 
 		const int cmdIdx = caravan->GetIdxCmdList();

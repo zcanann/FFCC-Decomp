@@ -121,6 +121,11 @@ static inline float LoadFloatFresh(const volatile float& value)
     return value;
 }
 
+static inline double LoadDouble(const double& value)
+{
+    return value;
+}
+
 static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
@@ -632,15 +637,11 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
             param_4[indexOffset++] = lowerNextIndex;
             param_4[indexOffset++] = lowerIndex;
             param_4[indexOffset++] = quadIndex++;
-            nextIndex = quadIndex + 1;
-            lowerIndex = quadIndex + 0x11;
-            lowerNextIndex = quadIndex + 0x12;
-
             param_4[indexOffset++] = quadIndex;
-            param_4[indexOffset++] = nextIndex;
-            param_4[indexOffset++] = lowerNextIndex;
-            param_4[indexOffset++] = lowerNextIndex;
-            param_4[indexOffset++] = lowerIndex;
+            param_4[indexOffset++] = quadIndex + 1;
+            param_4[indexOffset++] = quadIndex + 0x12;
+            param_4[indexOffset++] = quadIndex + 0x12;
+            param_4[indexOffset++] = quadIndex + 0x11;
             param_4[indexOffset++] = quadIndex++;
         }
         rowCount = rowCount + 1;
@@ -877,11 +878,11 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     VMana2* work;
     CChara::CModel* model;
     CCharaPcs::CHandle* handle;
-    Mtx identityMtx;
+    Mtx44 savedScreenMtx;
     Mtx savedCameraMtx;
+    Mtx identityMtx;
     Mtx lookAtMtx;
     Mtx44 projectionMtx;
-    Mtx44 savedScreenMtx;
     _GXTexObj sceneTexObj;
     _GXTexObj depthTexObj;
     Vec centerPos;
@@ -929,6 +930,8 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         centerPos.z = gObject->m_worldPosition.z;
     }
     centerPos.y = LoadFloat(kMana2ParaboloidCenterYOffset) + centerPos.y;
+    centerPos.x = centerPos.x;
+    centerPos.z = centerPos.z;
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)6, GX_FALSE, 0);
     GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)4, GX_FALSE, 0);
@@ -1103,11 +1106,11 @@ void pppRenderMana2(pppMana2*, pppMana2Step*, _pppCtrlTable*)
 void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* param_3)
 {
     u32 texBufferSize;
+    CGObject* gObject;
     VMana2* mana2Work;
     void* dstBuffer;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
-    CGObject* gObject;
     s32 i;
     CChara::CMesh* mesh;
     CChara::CMesh::CRefData* meshData;
@@ -1645,8 +1648,8 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
                     u32 tevBit = 0xACE0F;
                     Vec* reflVec = mana2->m_meshReflectionVec;
                     u8* mm = reinterpret_cast<u8*>(&MaterialMan);
-                    *reinterpret_cast<u32*>(mm + 0x128) = 0;
                     *reinterpret_cast<u32*>(mm + 0x48) = tevBit;
+                    *reinterpret_cast<u32*>(mm + 0x128) = 0;
                     *reinterpret_cast<u32*>(mm + 0x12C) = 0x1E;
                     *reinterpret_cast<u32*>(mm + 0x130) = 0;
                     *reinterpret_cast<Vec**>(mm + 0x08) = reflVec;

@@ -379,8 +379,8 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16*& puVar18, u16* p
 			puVar7 = puVar7 + 1;
 		}
 		uVar17 = uVar17 + 1;
-		puVar13 = puVar13 + 6;
 		iVar6 = iVar6 + 0x54;
+		puVar13 = puVar13 + 6;
 		puVar18 = puVar18 + 2;
 	} while (uVar17 < 4);
 }

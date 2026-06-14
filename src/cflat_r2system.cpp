@@ -3019,8 +3019,9 @@ renderedDone:
     }
     case -0x57: {
         int index = m_debugDataIndex;
+        const float value = *reinterpret_cast<float*>(object->m_localBase);
         m_debugDataIndex = index + 1;
-        m_debugDataBuffer[index] = *object->m_localBase;
+        m_debugDataBuffer[index] = *reinterpret_cast<const int*>(&value);
         this->push(object, 0);
         outResult = 0;
         break;

@@ -1826,12 +1826,15 @@ void CMenuPcs::DrawSingleStat(float alpha)
     font->Draw(charaName);
 
     font->SetTlut(0x15);
+    float statY0 = 184.0f;
+    float statYStep = 36.0f;
+    float statPosX0 = 592.0f;
     const char** labelsDe = gSingMenuTextTableDe;
     const char** labelsIt = gSingMenuTextTableIt;
     const char** labelsFr = gSingMenuTextTableFr;
     const char** labelsEs = gSingMenuTextTableEs;
     const char** labelsEn = gSingMenuTextTableEn;
-    float y = 184.0f;
+    float y = statY0;
     for (int i = 0; i < 4; i++) {
         font->SetPosX(440.0f);
         font->SetPosY(y - 5.0f);
@@ -1888,12 +1891,12 @@ void CMenuPcs::DrawSingleStat(float alpha)
         char valueText[36];
         sprintf(valueText, "%d", stat);
         float valueW = static_cast<float>(font->GetWidth(valueText));
-        font->SetPosX(592.0f - valueW);
+        font->SetPosX(statPosX0 - valueW);
         font->Draw(valueText);
 
         GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
         font->SetMargin(1.0f);
-        y += 36.0f;
+        y += statYStep;
         labelsDe++;
         labelsIt++;
         labelsFr++;

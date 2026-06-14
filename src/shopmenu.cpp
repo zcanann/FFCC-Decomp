@@ -2698,9 +2698,9 @@ sellBlock:
         } else if (m_listType == 0) {
             canTrade = 1;
         } else if (m_listType == 2) {
-            canTrade = 1;
             if ((m_caravanWork->m_shopArgs[((int)(tradeItem - 0x191U) >> 5)] &
                  (1 << ((tradeItem - 0x191U) & 0x1F))) != 0) {
+                canTrade = 1;
             } else {
                 canTrade = 0;
             }

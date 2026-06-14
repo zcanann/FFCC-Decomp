@@ -710,12 +710,12 @@ void CGMonObj::setRepop(int mode)
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	short countC = (weaponMode != 0) ?
+	int countC = (weaponMode != 0) ?
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
 	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
 
-	for (int i = 0; i < static_cast<int>(countC); i++) {
+	for (int i = 0; i < countC; i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, kMonObjDefaultScale, 0);
 	}

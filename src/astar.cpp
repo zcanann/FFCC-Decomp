@@ -178,6 +178,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_dead_assignments off
 CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int forbiddenGroup)
 {
 	Vec escapeDir;
@@ -191,7 +192,8 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 	CAPos* aheadBest = (CAPos*)0;
 	CAPos* behindBest = (CAPos*)0;
-	double aheadBestDist = LoadFloat(kAStarEscapeInitialBestDist);
+	const float& initialBestDist = kAStarEscapeInitialBestDist;
+	double aheadBestDist = initialBestDist;
 	double behindBestDist = aheadBestDist;
 	int i = 0;
 
@@ -268,6 +270,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 	return behindBest;
 }
+#pragma opt_dead_assignments reset
 /*
  * --INFO--
  * Address:	TODO

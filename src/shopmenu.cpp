@@ -574,9 +574,10 @@ static inline int CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemN
     } else if (listType == 0) {
         canTrade = 1;
     } else if (listType == 2) {
-        canTrade = 1;
         if ((shopMenu->m_caravanWork->m_shopArgs[((int)(itemNo - 0x191U) >> 5)] &
-             (1 << ((itemNo - 0x191U) & 0x1F))) == 0) {
+             (1 << ((itemNo - 0x191U) & 0x1F))) != 0) {
+            canTrade = 1;
+        } else {
             canTrade = 0;
         }
     } else if (static_cast<unsigned char>(MenuPcs.EquipChk(index)) != 0) {

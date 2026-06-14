@@ -1588,7 +1588,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			font->Draw(scratch);
 
 			int sel = m_artiState->currentSelection;
-			if ((static_cast<int>(m_battleStateFlag) == 2) && (sel == 1)) {
+			if ((*reinterpret_cast<short*>(self + 0x864) == 2) && (sel == 1)) {
 				u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
 
 				if ((effectFlags & 0x1000) == 0) {

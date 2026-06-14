@@ -930,6 +930,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         centerPos.z = gObject->m_worldPosition.z;
     }
     centerPos.y = LoadFloat(kMana2ParaboloidCenterYOffset) + centerPos.y;
+    centerPos.x = centerPos.x;
     centerPos.z = centerPos.z;
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)6, GX_FALSE, 0);

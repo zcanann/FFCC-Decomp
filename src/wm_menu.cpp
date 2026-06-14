@@ -6211,7 +6211,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 0: {
 		bytes[5] = bytes[4];
 		bytes[4] = static_cast<unsigned char>(value);
-		bytes[0xA] = 1 | bytes[0xA];
+		bytes[0xA] = *const_cast<const volatile unsigned int*>(&s_wmWorldParamPrimaryDirtyMask) | bytes[0xA];
 		break;
 	}
 	case 1:
@@ -6238,7 +6238,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 8: {
 		bytes[0xB] = bytes[0xC];
 		bytes[0xC] = static_cast<unsigned char>(value);
-		bytes[0xA] = 2 | bytes[0xA];
+		bytes[0xA] = *const_cast<const volatile unsigned int*>(&s_wmWorldParamSecondaryDirtyMask) | bytes[0xA];
 		break;
 	}
 	case 9:

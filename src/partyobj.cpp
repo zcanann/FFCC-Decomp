@@ -1255,8 +1255,7 @@ void CGPartyObj::command()
 		if (cmdDir != 0) {
 			Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
 			CCaravanWork* cmdDirCaravan = caravan;
-			const int curCmd = cmdDirCaravan->GetIdxCmdList();
-			cmdDirCaravan->IsUseCmdList(cmdDirCaravan->GetNextCmdListIdx(curCmd, cmdDir));
+			cmdDirCaravan->IsUseCmdList(cmdDirCaravan->GetNextCmdListIdx(cmdDirCaravan->GetIdxCmdList(), cmdDir));
 		}
 
 		const int cmdIdx = caravan->GetIdxCmdList();
@@ -5175,12 +5174,11 @@ messageMenu:
 	int prevSlot = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x8C);
 	if (prevSlot != auraSlot) {
 		endPSlotBit(0x400);
-		prevSlot = auraSlot;
 		if (auraSlot != 0) {
 			putParticle(auraSlot | 0x200, m_particleSlots[10], this, kMonObjOne, 0);
 		}
 	}
-	*reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x8C) = prevSlot;
+	*reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x8C) = auraSlot;
 #undef bossState
 }
 

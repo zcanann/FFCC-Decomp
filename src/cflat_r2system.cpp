@@ -2893,6 +2893,8 @@ renderedDone:
         int a1 = object->m_localBase[1];
         if (MenuPcs.GetMesMenu(a0) != 0) {
             this->push(object, GetErrorLevel__7CSystemFv(MenuPcs.GetMesMenu(a0), a1));
+            outResult = 0;
+            break;
         } else {
             if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);

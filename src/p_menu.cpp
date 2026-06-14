@@ -1194,6 +1194,7 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs off
 void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, float u, float v, float us, float vs, float angle)
 {
     if (w <= LoadFloat(kMenuInitOne) || h <= LoadFloat(kMenuInitOne)) {
@@ -1275,6 +1276,7 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         }
     }
 }
+#pragma opt_common_subs reset
 
 /*
  * --INFO--

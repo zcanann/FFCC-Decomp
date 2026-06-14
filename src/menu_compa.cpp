@@ -221,12 +221,10 @@ void CMenuPcs::CompaDraw()
 
 	int yOffset = 0;
 	for (int i = 0; i < familyCount; i++) {
-		float rowYBase = static_cast<float>(compaList->entries[0].y + 0x40);
-		float rowX = static_cast<float>(compaList->entries[0].x + 0x10);
-		float rowY = rowYBase + static_cast<float>(yOffset);
+		float rowY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(yOffset);
 		MenuPcs.DrawRect(
 			0,
-			rowX,
+			static_cast<float>(compaList->entries[0].x + 0x10),
 			rowY,
 			kCompaFoodIconWidth, kCompaFoodIconHeight, kCompaZero, kCompaZero, kCompaOne,
 			kCompaOne, kCompaZero);

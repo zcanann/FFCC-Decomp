@@ -299,9 +299,10 @@ int CMenuPcs::MLstCtrl()
 				Sound.PlaySe(3, 0x40, 0x7f, 0);
 				result = 1;
 			} else {
-				result = 0;
+				goto fail;
 			}
 		} else {
+		fail:
 			result = 0;
 		}
 	}

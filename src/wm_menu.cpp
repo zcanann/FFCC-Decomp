@@ -6218,7 +6218,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 0: {
 		bytes[5] = bytes[4];
 		bytes[4] = static_cast<unsigned char>(value);
-		bytes[0xA] = 1 | bytes[0xA];
+		bytes[0xA] = *const_cast<const volatile unsigned int*>(&s_wmWorldParamPrimaryDirtyMask) | bytes[0xA];
 		break;
 	}
 	case 1:
@@ -6245,7 +6245,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 8: {
 		bytes[0xB] = bytes[0xC];
 		bytes[0xC] = static_cast<unsigned char>(value);
-		bytes[0xA] = 2 | bytes[0xA];
+		bytes[0xA] = *const_cast<const volatile unsigned int*>(&s_wmWorldParamSecondaryDirtyMask) | bytes[0xA];
 		break;
 	}
 	case 9:
@@ -6551,12 +6551,16 @@ float CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 				float u = (t - *prev) / span;
 				float u2 = u * u;
 				float u3 = u2 * u;
-				float c4u2 = FLOAT_803314c4 * u2;
-				float negTerm = -(FLOAT_803314c8 * u2 - u3);
 
-				result = span * (prev[3] * (u + negTerm) + next[2] * (u3 - u2)) +
-				         (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - c4u2)) +
-				             next[1] * (FLOAT_803314cc * u3 + c4u2));
+				result = span *
+				             (prev[3] *
+				                  (u + (u3 - FLOAT_803314c8 * u2)) +
+				              next[2] * (u3 - u2)) +
+				         (prev[1] *
+				              (FLOAT_803313e8 +
+				               (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+				          next[1] *
+				              (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 			}
 			break;
 		}
@@ -9211,11 +9215,15 @@ void CMenuPcs::DrawCharaName()
 
 	float fade;
 	if (m_wmWorldState->m_mainState == 1) {
-		fade = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+		const double* pRate = &DOUBLE_803314E8;
+		fade = static_cast<float>(*pRate * static_cast<double>(m_wmWorldState->m_frameCounter));
 	} else if (m_wmWorldState->m_mainState == 2) {
-		fade = FLOAT_803313e8;
+		const float* pOne = &FLOAT_803313e8;
+		fade = *pOne;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
+		const double* pRate = &DOUBLE_803314E8;
+		const double* pOne = &DOUBLE_80331420;
+		fade = static_cast<float>(-(*pRate * static_cast<double>(m_wmWorldState->m_frameCounter) - *pOne));
 	}
 	unsigned int activeMask =  (int)(long)(0);
 	unsigned int confirmedMask = 0;
@@ -12823,16 +12831,16 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 	}
 
 	unsigned int result = 0;
-	const int cmpOffset = memberIndex * 0x9C0 + 0x1D94;
+	unsigned char* const cmpPtr = dst + 0x1D94 + memberIndex * 0x9C0;
 	for (int count = 4; count != 0; count--) {
 		if (*reinterpret_cast<int*>(src + 0x1A84) != 0) {
 			if (strictMode == 0) {
 				if (src[0x1D90] != 0 &&
-				    *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
+				    *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(cmpPtr)) {
 					break;
 				}
 			} else if (src[0x1D91] != 0 &&
-			           *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
+			           *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(cmpPtr)) {
 				unsigned int e0 = *reinterpret_cast<unsigned int*>(src + 0x1D98) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D0);
 				unsigned int e1 = *reinterpret_cast<unsigned int*>(src + 0x1D9C) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D4);
 				if ((e0 | e1) == 0 &&
@@ -12846,11 +12854,11 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 		if (*reinterpret_cast<int*>(src + 0x2444) != 0) {
 			if (strictMode == 0) {
 				if (src[0x2750] != 0 &&
-				    *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
+				    *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(cmpPtr)) {
 					break;
 				}
 			} else if (src[0x2751] != 0 &&
-			           *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
+			           *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(cmpPtr)) {
 				unsigned int e0 = *reinterpret_cast<unsigned int*>(src + 0x2758) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D0);
 				unsigned int e1 = *reinterpret_cast<unsigned int*>(src + 0x275C) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D4);
 				if ((e0 | e1) == 0 &&
@@ -13098,15 +13106,16 @@ int McCtrl::LoadMcList()
 
 	case 5: {
 		unsigned long long serial;
-		if (CARDGetSerialNo(m_cardChannel, &serial) != 0) {
+		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
+			m_serialHi = static_cast<unsigned int>(serial);
+			m_serialLo = static_cast<unsigned int>(serial >> 32);
+		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			return -1;
 		}
-		m_serialHi = static_cast<unsigned int>(serial);
-		m_serialLo = static_cast<unsigned int>(serial >> 32);
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McRead(0, 0xA000, m_iteration * 0xA000 + 0x4000);
 		m_state = 6;
@@ -14277,8 +14286,10 @@ int McCtrl::SaveDataBuffer(char* buffer)
 	case 0x10: {
 		unsigned long long serial;
 		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
-			m_serialHi = static_cast<unsigned int>(serial);
-			m_serialLo = static_cast<unsigned int>(serial >> 32);
+			const unsigned int hi = static_cast<unsigned int>(serial);
+			const unsigned int lo = static_cast<unsigned int>(serial >> 32);
+			m_serialLo = lo;
+			m_serialHi = hi;
 		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);

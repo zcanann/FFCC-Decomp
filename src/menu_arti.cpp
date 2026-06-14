@@ -317,7 +317,8 @@ void CMenuPcs::ArtiDraw()
 					if (itemCount > 0) {
 					} else {
 						texId = 0x34;
-						itemAlpha = (float)(LoadDouble(kArtiHalfDouble) * (double)animAlpha);
+						double half = LoadDouble(kArtiHalfDouble);
+						itemAlpha = (float)(half * (double)animAlpha);
 					}
 
 					if (texId == 0x37 && drawIndex == m_artiState->selections[0]) {
@@ -330,7 +331,8 @@ void CMenuPcs::ArtiDraw()
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
 				colors[0].b = 0xFF;
-				colors[0].a = (u8)(LoadFloat(kArtiColorMax) * itemAlpha);
+				float colorMax = LoadFloat(kArtiColorMax);
+				colors[0].a = (u8)(colorMax * itemAlpha);
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 				float uvScale = entry->scale;
 				MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, LoadFloat(kArtiZero));
@@ -355,7 +357,8 @@ void CMenuPcs::ArtiDraw()
 
 	ArtiOpenAnim* textEntry = entry;
 	for (int i = 0; i < 8; i++) {
-		u8 alpha = (u8)(LoadFloat(kArtiColorMax) * textEntry->alpha);
+		float colorMax = LoadFloat(kArtiColorMax);
+		u8 alpha = (u8)(colorMax * textEntry->alpha);
 		int menuIndex = i + m_artiState->scrollOffset;
 		listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, alpha).color);
 

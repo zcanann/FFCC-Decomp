@@ -1706,8 +1706,8 @@ void CMenuPcs::DrawSingleBase(float alpha)
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
-    int y = 64;
     int sliceHeight = 32;
+    int y = 64;
     while (y < 384) {
         if ((384 - y) < sliceHeight) {
             sliceHeight = 384 - y;

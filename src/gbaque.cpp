@@ -3573,16 +3573,18 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 
 	memset(equipIndices, 0xFF, sizeof(equipIndices));
 	equipCount = 0;
+	itemIndex = 0;
 	itemPtr = localPlayerData;
 	indexPtr = equipIndices;
 	for (i = 0; i < 0x40; i++) {
 		short itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
 		if ((itemId >= 0) && (itemId <= 0x9E)) {
-			*indexPtr = static_cast<unsigned char>(i);
+			*indexPtr = itemIndex;
 			equipCount++;
 			indexPtr++;
 		}
 		itemPtr += 2;
+		itemIndex++;
 	}
 
 	int indexBytesS = equipCount + 1;
@@ -3598,8 +3600,9 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	dataSize = indexBytes + 4;
 	outData += indexBytes;
 	outData -= 1;
+	indexPtr = equipIndices;
 	for (i = 0; i < equipCount; i++) {
-		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + equipIndices[i] * 2);
+		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + *indexPtr * 2);
 		int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 
 		equipData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
@@ -3608,6 +3611,7 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 		memcpy(outData, equipData, sizeof(equipData));
 		outData += 8;
 		dataSize += 8;
+		indexPtr++;
 	}
 
 	return dataSize;

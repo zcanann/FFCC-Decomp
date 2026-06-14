@@ -1414,11 +1414,12 @@ void CGMonObj::statWatch()
 		if (selectedTarget >= 0) {
 
 		targetPartyIndex = selectedTarget;
-		if (monObj->m_aiState == 0) {
+		short aiState1 = monObj->m_aiState;
+		if (aiState1 == 0) {
 			aiScript = script;
 		} else {
 			aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-				(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+				(static_cast<int>(aiState1) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 		}
 
 		if (static_cast<int>(*reinterpret_cast<unsigned short*>(aiScript + 0x10A)) == 1) {

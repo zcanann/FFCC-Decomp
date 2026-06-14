@@ -2688,7 +2688,7 @@ static inline void pppEditDrawPass(unsigned char* base, int drawPass, Vec& camer
     int i;
     for (i = 0; i < kPppMngCount; i++, base += kPppMngStride) {
         mng = reinterpret_cast<_pppMngSt*>(base + kPppMngOffset);
-        if (base[kPppMngOffset + 0xE8] == 0 && mng->m_baseTime != -0x1000
+        if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000
             && (signed char)mng->m_drawPass == drawPass && mng->m_baseTime < 0
             && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
             ppvMng = mng;
@@ -4268,6 +4268,7 @@ struct PppHitIdBlock {
     int m_ids[8];
 };
 
+#pragma opt_common_subs off
 int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam, int allowFpOverride)
 {
     struct PppMngStCreateRaw {
@@ -4569,6 +4570,7 @@ foundMng:
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_common_subs reset
 int CPartMng::pppCreate(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam, int allowFpOverride)
 {
     if (PartPcs.m_usbStreamState.m_disableShokiDraw != 0) {

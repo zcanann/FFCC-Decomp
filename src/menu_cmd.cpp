@@ -1057,21 +1057,21 @@ void CMenuPcs::CmdDraw()
 							    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 							const s16* canBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 							const s16* canItems = canBuf + 1;
-							u8 canUse;
+							int canUse;
 							if ((sel < 0) || (sel >= canBuf[0])) {
 								canUse = 0;
 							} else if (sel == 0) {
-								canUse = static_cast<u32>(
-								    caravan2->m_commandListInventorySlotRef[GetCmdStateView(this)->selected] >= 0);
+								canUse = static_cast<int>(
+								    static_cast<u32>(caravan2->m_commandListInventorySlotRef[GetCmdStateView(this)->selected]) >> 31) ^ 1;
 							} else if (sel == 1) {
 								int combo[5][2];
-								canUse = static_cast<u32>(
-								    ChkUnite(GetCmdStateView(this)->selected, combo) != 0);
+								canUse = (ChkUnite(GetCmdStateView(this)->selected, combo) != 0);
 							} else {
-								canUse = static_cast<u32>(static_cast<u8>(EquipChk(static_cast<int>(canItems[sel - 2]))) == 0);
+								canUse = static_cast<int>(
+								    static_cast<u32>(__cntlzw(static_cast<u8>(EquipChk(static_cast<int>(canItems[sel - 2]))))) >> 5);
 							}
 
-							if (canUse == 0) {
+							if ((canUse & 0xFF) == 0) {
 								rowAlpha = kCmdMenuHalfD * row->alpha;
 								rowTex = 0x34;
 							}

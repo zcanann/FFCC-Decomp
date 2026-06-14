@@ -1434,8 +1434,6 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 	float uOff;
 	float vOff;
 	const int tex = static_cast<int>(texBase);
-	const float xL = x;
-	const float yT = y;
 
 	midW = (midW < 0.0f) ? 0.0f : midW;
 	midH = height - twoCorner;
@@ -1452,16 +1450,16 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 	SetTexture(static_cast<CMenuPcs::TEX>(tex));
 	const float cornerW = corner - uOff;
 	const float cornerH = corner - vOff;
-	DrawRect(0, xL, yT, cornerW, cornerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, x, y, cornerW, cornerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 1));
-	DrawRect(0, x + corner, yT, midW, cornerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, x + corner, y, midW, cornerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 2));
-	DrawRect(0, ((x + width) - corner) + uOff, yT, cornerW, cornerH, uOff, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, ((x + width) - corner) + uOff, y, cornerW, cornerH, uOff, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 3));
-	DrawRect(0, xL, y + corner, corner, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, x, y + corner, corner, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 4));
 	DrawRect(0, x + corner, y + corner, midW, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -1470,7 +1468,7 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 	DrawRect(0, (x + width) - corner, y + corner, corner, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 6));
-	DrawRect(0, xL, ((y + height) - corner) + vOff, cornerW, cornerH, 0.0f, vOff, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, x, ((y + height) - corner) + vOff, cornerW, cornerH, 0.0f, vOff, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 7));
 	DrawRect(0, x + corner, ((y + height) - corner) + vOff, midW, cornerH, 0.0f, vOff, 1.0f, 1.0f, 0.0f);

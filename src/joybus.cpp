@@ -2915,6 +2915,7 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma opt_dead_assignments off
 int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 {
 
@@ -3241,6 +3242,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
     return static_cast<int>(recvBit | sendBit);
 }
 
+#pragma opt_dead_assignments on
 /*
  * --INFO--
  * Address:	TODO
@@ -6512,6 +6514,7 @@ int JoyBus::SendMask(int, unsigned short)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma opt_dead_assignments off
 int JoyBus::SetMoney(int portIndex, unsigned int money)
 {
     int result = 0;
@@ -6546,6 +6549,7 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
     return result;
 }
 
+#pragma opt_dead_assignments on
 /*
  * --INFO--
  * Address:	TODO

@@ -1790,9 +1790,7 @@ void CMenuPcs::drawBattle()
 
             if (static_cast<float>(totalWidth) > LoadFloat(kMenuInitOne)) {
                 float bodyWidth = static_cast<float>(totalWidth) - LoadFloat(kMenuMarkerMinY);
-                if (bodyWidth < LoadFloat(kMenuInitOne)) {
-                    bodyWidth = LoadFloat(kMenuInitOne);
-                }
+                bodyWidth = (bodyWidth < LoadFloat(kMenuInitOne)) ? LoadFloat(kMenuInitOne) : bodyWidth;
 
                 CTexture* tex = MenuPcs.m_textures[0x1A];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);

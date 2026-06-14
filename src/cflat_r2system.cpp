@@ -2078,7 +2078,7 @@ renderedDone:
     }
     case -0x1A: {
         const int mode = *object->m_localBase;
-        const unsigned int modeBits = mode & 3;
+        const int modeBits = mode & 3;
 
         float t = static_cast<float>(static_cast<int>(object->m_localBase[1])) /
                   static_cast<float>(static_cast<int>(object->m_localBase[2]));

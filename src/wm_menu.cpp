@@ -12106,8 +12106,9 @@ void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h
 
 	GXBegin(static_cast<GXPrimitive>(0x98), static_cast<GXVtxFmt>(0), 4);
 
+	float zeroZ = FLOAT_803313dc;
 	for (int i = 0; i < 4; i++) {
-		GXPosition3f32(out[i].x, out[i].y, out[i].z);
+		GXPosition3f32(out[i].x, out[i].y, zeroZ);
 		float uu;
 		if ((i & 1) != 0) {
 			uu = u1;
@@ -12155,7 +12156,7 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 
 	if ((flags & 4) != 0) {
 		v1 = ty + halfTexel;
-		v0 = (ty + h) - halfTexel;
+		v0 = (v1 + h) - halfTexel;
 	} else {
 		v0 = ty + halfTexel;
 		v1 = (ty + h) - halfTexel;
@@ -12273,8 +12274,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	}
 
 	sx = static_cast<float>(static_cast<int>(static_cast<double>(sx) - DOUBLE_803313F8));
-	sw = static_cast<float>(static_cast<int>(static_cast<double>(sw) - DOUBLE_80331420));
 	sy = static_cast<float>(static_cast<int>(static_cast<double>(sy) - DOUBLE_803313F8));
+	sw = static_cast<float>(static_cast<int>(static_cast<double>(sw) - DOUBLE_80331420));
 	sh = static_cast<float>(static_cast<int>(static_cast<double>(sh) - DOUBLE_80331420));
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));

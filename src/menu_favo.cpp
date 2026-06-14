@@ -514,6 +514,7 @@ void CMenuPcs::FavoInit0()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_strength_reduction off
 void CMenuPcs::FavoInit()
 {
 	float fVar4;
@@ -682,3 +683,4 @@ void CMenuPcs::FavoInit()
 	m_singMenuState->selectedIndex = 0;
 	m_singMenuState->initialized = 1;
 }
+#pragma opt_strength_reduction reset

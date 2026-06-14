@@ -2597,11 +2597,8 @@ renderedDone:
         break;
     case -0x38: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        CVector position(
-            localFloats[0],
-            localFloats[1],
-            localFloats[2]);
-        this->SetParticleWorkPos(position, localFloats[3]);
+        this->SetParticleWorkPos(
+            CVector(localFloats[0], localFloats[1], localFloats[2]), localFloats[3]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2923,14 +2920,13 @@ renderedDone:
             }
             this->push(object, 0);
             outResult = 0;
-            break;
+        } else {
+            if (MenuPcs.GetMesMenu(a0)->IsUse() == 0) {
+                this->push(object, 0);
+                outResult = 0;
+            }
         }
-        if (MenuPcs.GetMesMenu(a0)->IsUse() == 0) {
-            this->push(object, 0);
-            outResult = 0;
-            break;
-        }
-        return 1;
+        break;
     }
     case -0x4F:
         MapMng.SetMeshCameraSemiTransRange(
@@ -3012,16 +3008,18 @@ renderedDone:
     }
     case -0x56: {
         int index = m_debugDataIndex;
+        const unsigned int value = *object->m_localBase;
         m_debugDataIndex = index + 1;
-        m_debugDataBuffer[index] = *object->m_localBase;
+        m_debugDataBuffer[index] = value;
         this->push(object, 0);
         outResult = 0;
         break;
     }
     case -0x57: {
         int index = m_debugDataIndex;
+        const float value = *reinterpret_cast<float*>(object->m_localBase);
         m_debugDataIndex = index + 1;
-        m_debugDataBuffer[index] = *object->m_localBase;
+        m_debugDataBuffer[index] = *reinterpret_cast<const int*>(&value);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3479,16 +3477,14 @@ renderedDone:
         outResult = 0;
         break;
     case -0x9C: {
-        int cameraSlot = *object->m_localBase;
         int cameraFrame = object->m_localBase[1];
-        if ((CharaPcs.m_cameraData[cameraSlot] == 0) || (cameraFrame < 0) ||
-            (CharaPcs.m_cameraFrameCount[cameraSlot] <= cameraFrame)) {
+        CCharaPcs::CCameraFrame*& cameraSlotRef = CharaPcs.m_cameraData[*object->m_localBase];
+        if ((cameraSlotRef == 0) || (cameraFrame < 0) ||
+            (CharaPcs.m_cameraFrameCount[*object->m_localBase] <= cameraFrame)) {
             this->push(object, 0);
             outResult = 0;
-            break;
         }
 
-        CCharaPcs::CCameraFrame*& cameraSlotRef = CharaPcs.m_cameraData[cameraSlot];
         *reinterpret_cast<float*>(object->m_localBase[2]) = cameraSlotRef[cameraFrame].m_values[0].m_float;
         *reinterpret_cast<float*>(object->m_localBase[3]) = -cameraSlotRef[cameraFrame].m_values[1].m_float;
         *reinterpret_cast<float*>(object->m_localBase[4]) = -cameraSlotRef[cameraFrame].m_values[2].m_float;
@@ -3721,10 +3717,6 @@ renderedDone:
         break;
     case -0xC5: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        CVector position(
-            localFloats[4],
-            localFloats[5],
-            localFloats[6]);
         MapMng.SetMapObjWorldMapLightID(
             *object->m_localBase,
             CColor(
@@ -3732,7 +3724,7 @@ renderedDone:
                 static_cast<u8>(object->m_localBase[2]),
                 static_cast<u8>(object->m_localBase[3]),
                 0xFF),
-            position);
+            CVector(localFloats[4], localFloats[5], localFloats[6]));
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3746,18 +3738,20 @@ renderedDone:
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0xC7:
+    case -0xC7: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         MenuPcs.m_battleHud.m_worldPos[0] = localFloats[0];
         MenuPcs.m_battleHud.m_worldPos[1] = localFloats[1];
         MenuPcs.m_battleHud.m_worldPos[2] = localFloats[2];
-        if (static_cast<int>(object->m_localBase[3]) < MenuPcs.m_battleHud.m_gaugeTarget) {
+        const int gaugeTarget = object->m_localBase[3];
+        if (gaugeTarget < MenuPcs.m_battleHud.m_gaugeTarget) {
             MenuPcs.m_battleHud.m_gaugeCounter = 0x10;
         }
-        MenuPcs.m_battleHud.m_gaugeTarget = object->m_localBase[3];
+        MenuPcs.m_battleHud.m_gaugeTarget = gaugeTarget;
         this->push(object, 0);
         outResult = 0;
         break;
+    }
     case -0xC8:
         if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347cancelWaveAsync\202\265\202\334\202\265\202\275\201B\n"));
@@ -3767,8 +3761,8 @@ renderedDone:
         outResult = 0;
         break;
     case -0xC9: {
-        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         MapMng.SetMapObjTransRate(
             mapObjIndex, localFloats[1], localFloats[2], localFloats[3]);
         this->push(object, 0);
@@ -4115,7 +4109,7 @@ renderedDone:
         PartPcs.pppSetDebugHide(static_cast<unsigned char>(*object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        break;
+        // fallthrough
     case -0xF5:
         Sound.SeMaxVolume(*object->m_localBase);
         this->push(object, 0);

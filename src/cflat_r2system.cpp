@@ -3061,12 +3061,12 @@ renderedDone:
         break;
     }
     case -0x60: {
+        const unsigned int blurA = static_cast<unsigned int>(__cntlzw(object->m_localBase[4]));
+        const unsigned int blurB = static_cast<unsigned int>(__cntlzw(object->m_localBase[5]));
         const int alpha = static_cast<int>(kCFlatAlphaMax * *reinterpret_cast<float*>(object->m_localBase + 3)) & 0xFF;
-        const unsigned int blurA = (static_cast<unsigned int>(__cntlzw(object->m_localBase[4])) >> 5) & 0xFF;
-        const unsigned int blurB = (static_cast<unsigned int>(__cntlzw(object->m_localBase[5])) >> 5) & 0xFF;
         GraphicPcs.SetBlurParameter(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]),
             static_cast<unsigned char>(object->m_localBase[2]), static_cast<unsigned char>(alpha),
-            static_cast<unsigned char>(blurA), static_cast<unsigned char>(blurB),
+            static_cast<unsigned char>((blurA >> 5) & 0xFF), static_cast<unsigned char>((blurB >> 5) & 0xFF),
             static_cast<short>(object->m_localBase[6]));
         this->push(object, 0);
         outResult = 0;

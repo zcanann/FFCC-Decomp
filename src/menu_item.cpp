@@ -396,9 +396,9 @@ void CMenuPcs::ItemDraw()
 
             GXSetChanMatColor(GX_COLOR0A0, colors[0]);
             w = entry->alpha * w;
-            if (w > LoadFloat(kItemZero)) {
+            if (w > kItemZero) {
                 MenuPcs.DrawRect(
-                    0, x, y, w, h, u, v, colors, LoadFloat(kItemOne), LoadFloat(kItemOne), LoadFloat(kItemZero));
+                    0, x, y, w, h, u, v, colors, LoadFloat(kItemOne), LoadFloat(kItemOne), kItemZero);
                 x += w;
                 u += w;
             }

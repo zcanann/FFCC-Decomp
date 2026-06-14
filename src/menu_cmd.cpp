@@ -1956,6 +1956,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	int candidates[10];
 	int ok;
 	int k;
+	int w1;
+	int w2;
 
 	if (comboOut != nullptr) {
 		for (int i = 0; i < 5; i++) {
@@ -2053,11 +2055,12 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	}
 
 	matchCount = 0;
+	w1 = 0;
+	w2 = 0;
 	memset(matches, 0xff, sizeof(matches));
-	int* mp = matches;
-	int w = 0;
 
 	if ((itemKinds[selected] == 999) && (selected > 2)) {
+		int* mp1 = matches;
 		int patIdx = 0;
 		for (const s16* pat = s_uniteRecipePatterns; pat[1] >= 0; pat += 6, patIdx++) {
 			if (pat[0] == 0) {
@@ -2069,51 +2072,57 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			}
 			ok = 0;
 			k = 0;
-			for (const s16* q = &pat[3 + ok]; k < len1 - 1; k++, q++) {
+			const s16* q = pat + ok;
+			for (; k < len1 - 1; k++) {
 				const int slot = selected - (len1 - 1 - k);
-				int __p5 = slot;
-				if (candidates[__p5] != 0) {
-					break;
+				if (candidates[slot] != 0) {
+					goto next_pat1;
 				}
-				if (*q == itemKinds[slot]) {
+				if (q[3] == itemKinds[slot]) {
 					ok++;
+					q++;
 				}
 			}
-			if (len1 == ok - 1) {
-				mp[0] = patIdx;
+			if (ok == len1 - 1) {
+				mp1[0] = patIdx;
+				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w1 + 4) = selected - (len1 - 1);
+				mp1 += 2;
 				matchCount++;
-				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = selected - (len1 - 1);
-				mp += 2;
-				w += 8;
+				w1 += 8;
 			}
+		next_pat1:;
 		}
 	} else if (selectedFlag == 0) {
+		int* mp2 = matches;
 		const int baseLen = static_cast<int>(s_uniteRecipePatterns[2]);
 		int start = selected - (baseLen - 1);
 		for (int i = 0; i < baseLen; i++, start++) {
 			ok = 0;
 			k = 0;
-			for (const s16* q = &s_uniteRecipePatterns[3 + ok]; k < baseLen; k++, q++) {
+			const s16* q = s_uniteRecipePatterns + ok;
+			for (; k < baseLen; k++) {
 				const int slot = i + (selected - ((baseLen - 1) - k));
 				if (candidates[slot] != 0) {
-					break;
+					goto next_pat2;
 				}
-				if (*q == itemKinds[slot]) {
+				if (q[3] == itemKinds[slot]) {
 					ok++;
+					q++;
 				}
 			}
 			if (ok == baseLen) {
-				mp[0] = 0;
+				mp2[0] = 0;
+				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w2 + 4) = start;
+				mp2 += 2;
 				matchCount++;
-				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = start;
-				mp += 2;
-				w += 8;
+				w2 += 8;
 			}
+		next_pat2:;
 		}
 	}
 
-	mp = &matches[matchCount * 2];
-	w = matchCount * 8;
+	int* mp3 = &matches[matchCount * 2];
+	int w3 = matchCount * 8;
 	int group = 1;
 	for (const s16* pat = s_uniteRecipePatterns + 6; pat[1] >= 0; pat += 6, group++) {
 		if (((pat[0] != 0) && (itemKinds[selected] == 999) && (selected > 2)) ||
@@ -2121,7 +2130,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			continue;
 		}
 
-		const int len =  (s32)(static_cast<int>(pat[2]));
+		const int len = (s32)(static_cast<int>(pat[2]));
+		const int startBase = selected - (len - 1);
 		for (int start = 0; start < len; start++) {
 			if ((start == 0) && (selectedFlag != 0)) {
 				start++;
@@ -2129,23 +2139,26 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 			ok = 0;
 			k = 0;
-			for (const s16* q = &pat[3 + ok]; k < len; k++, q++) {
+			const s16* q = pat + ok;
+			for (; k < len; k++) {
 				const int slot = start + (selected - ((len - 1) - k));
 				if (candidates[slot] != 0) {
-					break;
+					goto next_pat3;
 				}
-				if (*q == itemKinds[slot]) {
+				if (q[3] == itemKinds[slot]) {
 					ok++;
+					q++;
 				}
 			}
 
 			if (ok == len) {
-				mp[0] = group;
+				mp3[0] = group;
+				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w3 + 4) = start + startBase;
+				mp3 += 2;
 				matchCount++;
-				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = start + (selected - (len - 1));
-				mp += 2;
-				w += 8;
+				w3 += 8;
 			}
+		next_pat3:;
 		}
 	}
 

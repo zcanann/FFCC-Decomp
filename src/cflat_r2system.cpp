@@ -2661,7 +2661,7 @@ renderedDone:
         break;
     }
     case -0x80:
-        this->SetParticleWorkSe(*object->m_localBase, static_cast<char>(object->m_localBase[1]), object->m_localBase[2]);
+        this->SetParticleWorkSe(*object->m_localBase, object->m_localBase[1], object->m_localBase[2]);
         this->push(object, 0);
         outResult = 0;
         break;

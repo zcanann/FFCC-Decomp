@@ -3011,8 +3011,9 @@ renderedDone:
     }
     case -0x56: {
         int index = m_debugDataIndex;
+        const unsigned int value = *object->m_localBase;
         m_debugDataIndex = index + 1;
-        m_debugDataBuffer[index] = *object->m_localBase;
+        m_debugDataBuffer[index] = value;
         this->push(object, 0);
         outResult = 0;
         break;

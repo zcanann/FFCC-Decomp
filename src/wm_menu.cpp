@@ -8670,7 +8670,7 @@ void CMenuPcs::CalcCharaSelect()
 
 	unsigned short padRepeat[4];
 	unsigned short padTrig[4];
-	int requestCancel;
+	volatile int requestCancel;
 	int requestFinalize;
 
 	*reinterpret_cast<short*>(bytes + 0x74) = static_cast<short>(*reinterpret_cast<short*>(bytes + 0x74) + 1);

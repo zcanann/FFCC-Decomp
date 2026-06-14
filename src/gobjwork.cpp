@@ -966,6 +966,8 @@ int CCaravanWork::GetFoodRank(int playerIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_lifetimes off
 void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxResults)
 {
 	int bit0;
@@ -1589,6 +1591,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 	}
 }
 
+#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x800a0628

@@ -1991,10 +1991,12 @@ void CMenuPcs::LetterMessDraw()
 	if ((*reinterpret_cast<u16*>(letterBytes + 0x3EE) & 0x1FF) != 0) {
 		x0 = FLOAT_8033314c;
 		y0 = FLOAT_80333150;
+		int iconX = static_cast<int>(x0);
+		int iconY = static_cast<int>(y0);
 		int icon = 0x26 +
 		           (reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->IsAttachmentClaimed() ? 1 : 0);
 		DrawSingleIcon(
-		    icon, static_cast<int>(x0), static_cast<int>(y0),
+		    icon, iconX, iconY,
 		    *reinterpret_cast<float*>(animBase + 0xC), 1, FLOAT_80333154);
 	}
 

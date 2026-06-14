@@ -353,8 +353,7 @@ void CMenuPcs::CmdInit()
 	memset(GetCmdListStorage(this), 0, sizeof(*GetCmdListStorage(this)));
 
 	float fVar2 = kCmdMenuOne;
-	CmdListEntry* entries = GetCmdListEntries(this);
-	CmdListEntry* entry = entries;
+	CmdListEntry* entry = GetCmdListEntries(this);
 	s32 iVar8 = 8;
 	do {
 		entry[0].scale = fVar2;
@@ -369,7 +368,7 @@ void CMenuPcs::CmdInit()
 		iVar8--;
 	} while (iVar8 != 0);
 
-	entry = entries;
+	entry = GetCmdListEntries(this);
 	float fVar3 = kCmdMenuZero;
 	float fVar4 = kCmdMenuSmallOffset;
 	for (s32 iVar5 = 0; iVar5 < 8; iVar5++) {
@@ -443,10 +442,10 @@ void CMenuPcs::CmdInit0()
  */
 void CMenuPcs::CmdInit1()
 {
+	s16 y = 0;
 	s32 tex = 0x2f;
 	s32 idx = static_cast<s32>(GetCmdListStorage(this)->count);
 	CmdListEntry* entry;
-	s16 y = 0;
 
 	entry = &GetCmdListStorage(this)->entries[idx++];
 	entry->tex = 0x2e;
@@ -1083,14 +1082,12 @@ void CMenuPcs::CmdDraw()
 							}
 
 							int equippable = 1;
-							int __p18 = itemIdx;
-							if (__p18 + 2 < itemCount) {
+							if (itemIdx + 2 < itemCount) {
 								equippable = EquipChk(static_cast<int>(letterBuf[itemIdx + 1]));
 							}
 
 							if (static_cast<u8>(equippable) != 0) {
-								int __p8 = itemIdx;
-								if (__p8 + 2 < itemCount) {
+								if (itemIdx + 2 < itemCount) {
 									DrawEquipMark(static_cast<s32>(x - kCmdMenuTwelve),
 									    static_cast<s32>(((rowH - kCmdMenuTwentyFour) * kCmdMenuHalfD) + y),
 									    row->alpha);
@@ -1168,8 +1165,7 @@ void CMenuPcs::CmdDraw()
 					selDisp -= itemCount;
 				}
 				if (displayIdx == selDisp) {
-					int __p21 = skillId;
-					helpId = __p21;
+					helpId = skillId;
 					hasItemHelp = true;
 				}
 			} else {
@@ -2281,11 +2277,12 @@ void CMenuPcs::DrawUniteList()
 			}
 		}
 
+		CMenuPcs& menuPcsRef = MenuPcs;
 		s32 barTex = 0x35;
 		if (groupSize == 2) {
 			barTex = 0x36;
 		}
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(barTex));
+		menuPcsRef.SetTexture(static_cast<CMenuPcs::TEX>(barTex));
 		MenuPcs.DrawRect(0,
 			rectX,
 			drawY - kCmdMenuSmallOffset,
@@ -2571,8 +2568,8 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 		return 1;
 	}
 
-	float baseX = static_cast<float>(GetCmdListEntries(this)[0].x);
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	float baseX = static_cast<float>(GetCmdListEntries(this)[0].x);
 
 	if (topIdx >= 0) {
 		int finished = 0;

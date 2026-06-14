@@ -1907,20 +1907,19 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x85:
-			PushValue(
-			    this,
-			    object,
-			    reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->ShopRequest(
-			        static_cast<int>(object->m_localBase[0]),
-			        static_cast<int>(object->m_localBase[1]),
-			        static_cast<int>(object->m_localBase[2]),
-			        static_cast<int>(object->m_localBase[3]),
-			        static_cast<int>(object->m_localBase[4]),
-			        static_cast<int>(object->m_localBase[5]),
-			        static_cast<int>(object->m_localBase[6])));
+		case -0x85: {
+			int shopResult = reinterpret_cast<CCaravanWork*>(engineObject->m_scriptHandle)->ShopRequest(
+			    static_cast<int>(object->m_localBase[0]),
+			    static_cast<int>(object->m_localBase[1]),
+			    static_cast<int>(object->m_localBase[2]),
+			    static_cast<int>(object->m_localBase[3]),
+			    static_cast<int>(object->m_localBase[4]),
+			    static_cast<int>(object->m_localBase[5]),
+			    static_cast<int>(object->m_localBase[6]));
+			PushValue(this, object, shopResult);
 			outResult = 0;
 			break;
+		}
 		case -0x86: {
 			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
 			model->m_flags10CBits.m_flag10C_40 = static_cast<signed char>(object->m_localBase[0]);

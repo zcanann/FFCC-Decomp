@@ -527,6 +527,7 @@ void CGraphic::_WaitDrawDone(char* file, int line)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_dead_assignments off
 void CGraphic::Thread()
 {
     char* debugFmtBase = const_cast<char*>(sGraphicInitData);
@@ -603,6 +604,7 @@ void CGraphic::Thread()
         OSRestoreInterrupts(interrupts);
     }
 }
+#pragma opt_dead_assignments on
 
 /*
  * --INFO--

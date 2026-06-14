@@ -3327,7 +3327,8 @@ void CMenuPcs::DrawResultOpenAnim()
 							colors[3].g = 0xFF;
 							colors[3].b = 0xFF;
 							colors[3].a = 0;
-							MenuPcs.DrawRect(0, x, y, (float)(DOUBLE_80331ED8 / (double)sprite->duration) * (float)sprite->w, (float)sprite->h,
+							float segW = (float)(DOUBLE_80331ED8 / (double)sprite->duration) * (float)sprite->w;
+							MenuPcs.DrawRect(0, x, y, segW, (float)sprite->h,
 							    fillWidth, sprite->mulY, colors, FLOAT_80331EB0, FLOAT_80331EB0, kBonusZClearOrigin);
 						}
 					} else {

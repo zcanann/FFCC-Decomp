@@ -1450,10 +1450,10 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 	}
 
 	overH = twoCorner - height;
+	uOff = overW * 0.5f;
 	if (overH < 0.0f) {
 		overH = 0.0f;
 	}
-	uOff = overW * 0.5f;
 	vOff = overH * 0.5f;
 
 	const float cornerW = corner - uOff;

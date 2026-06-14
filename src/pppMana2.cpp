@@ -930,6 +930,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         centerPos.z = gObject->m_worldPosition.z;
     }
     centerPos.y = LoadFloat(kMana2ParaboloidCenterYOffset) + centerPos.y;
+    centerPos.z = centerPos.z;
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)6, GX_FALSE, 0);
     GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)4, GX_FALSE, 0);
@@ -1104,11 +1105,11 @@ void pppRenderMana2(pppMana2*, pppMana2Step*, _pppCtrlTable*)
 void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* param_3)
 {
     u32 texBufferSize;
+    CGObject* gObject;
     VMana2* mana2Work;
     void* dstBuffer;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
-    CGObject* gObject;
     s32 i;
     CChara::CMesh* mesh;
     CChara::CMesh::CRefData* meshData;

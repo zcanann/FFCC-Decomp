@@ -1428,7 +1428,7 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 
 	const float twoCorner = corner * 2.0f;
 	float midW = width - twoCorner;
-	float midH = height - twoCorner;
+	float midH;
 	float overW;
 	float overH;
 	float uOff;
@@ -1438,6 +1438,7 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 	const float yT = y;
 
 	midW = (midW < 0.0f) ? 0.0f : midW;
+	midH = height - twoCorner;
 	midH = (midH < 0.0f) ? 0.0f : midH;
 
 	overW = twoCorner - width;

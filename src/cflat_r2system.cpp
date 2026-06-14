@@ -2084,9 +2084,11 @@ renderedDone:
                   static_cast<float>(static_cast<int>(object->m_localBase[2]));
 
         if ((mode & 4) != 0) {
-            const int segmentCount = m_pathPointCount + 1 - (mode & 1) - ((mode >> 1) & 1);
+            const int lowBit = mode & 1;
+            const int highBit = (mode >> 1) & 1;
+            const int segmentCount = m_pathPointCount + 1 - lowBit - highBit;
             const float scaled = t * static_cast<float>(segmentCount);
-            const int baseIndex = (mode & 1) + static_cast<int>(scaled);
+            const int baseIndex = lowBit + static_cast<int>(scaled);
             const float segmentT = std::fmodf(scaled, kCFlatOneF);
 
             CVector delta = CVector(m_pathPoints[1].m_position) - CVector(m_pathPoints[0].m_position);
@@ -2102,7 +2104,7 @@ renderedDone:
             Vec* p2;
             Vec* p3;
 
-            if ((mode & 1) != 0) {
+            if (lowBit != 0) {
                 if (baseIndex == 0) {
                     p0 = startPhantom2;
                 } else if (baseIndex == 1) {
@@ -2120,7 +2122,7 @@ renderedDone:
                 p1 = &m_pathPoints[(baseIndex - 1) < 0 ? 0 : (m_pathPointCount - 1 < (baseIndex - 1) ? m_pathPointCount - 1 : (baseIndex - 1))].m_position;
             }
 
-            if ((mode & 2) != 0) {
+            if (highBit != 0) {
                 if (baseIndex == m_pathPointCount) {
                     p2 = endPhantom1;
                 } else {

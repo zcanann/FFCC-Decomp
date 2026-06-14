@@ -1889,8 +1889,8 @@ void CFlatRuntime2::drawLayer(
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
 	int tevStage = TextureMan.SetTextureTev(texture);
 
-	scaleX = static_cast<float>(width) * scaleX;
 	scaleY = static_cast<float>(height) * scaleY;
+	scaleX = static_cast<float>(width) * scaleX;
 	int u1 = texU + width;
 	int v1 = texV + height;
 	float xAnchor;

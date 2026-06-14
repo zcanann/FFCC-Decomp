@@ -2737,7 +2737,7 @@ void CPartMng::pppEditDraw()
 {
     static const int kPppMngCount = 0x180;
     static const int kPppMngStride = 0x158;
-    static const int kEditCountOffset = 0x2355C;
+    static const int kEditCountOffset = 0x4;
     static const int kEditDrawModeOffset = 0x23570;
     static const int kCursorEnableOffset = 0xC;
     static const int kBaseTimeOffset = 0x14;
@@ -2746,7 +2746,7 @@ void CPartMng::pppEditDraw()
     static const int kMatrixOffset = 0x78;
     static const int kEndRequestedOffset = 0xe8;
     static const int kDrawPassOffset = 0xed;
-    static const int kStopAtLifeEndOffset = 0xef;
+    static const int kStopAtLifeEndOffset = 0xe4;
     static const int kSlotVisibleOffset = 0xe9;
     static const int kOwnerVisibleOffset = 0xea;
     static const int kCullRadiusSqOffset = 0x108;
@@ -2782,24 +2782,25 @@ void CPartMng::pppEditDraw()
             PPP_EDIT_DRAW_PASS(7)
 #undef PPP_EDIT_DRAW_PASS
         } else {
-            char* mng = reinterpret_cast<char*>(m_pppMng);
-            int editCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditCountOffset);
-            for (int i = 0; i < editCount; i++) {
-                int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);
-                ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+            static const int kPppMngOffset = 0x2A18;
+            char* base = reinterpret_cast<char*>(this);
+            for (int i = 0; i < *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditCountOffset); i++) {
+                _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(base + kPppMngOffset);
+                ppvMng = mng;
+                int baseTime = *reinterpret_cast<int*>(base + kPppMngOffset + kBaseTimeOffset);
                 if (baseTime != -0x1000 && baseTime < 0) {
-                    partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
-                    partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
-                    partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
+                    partPos.x = *reinterpret_cast<float*>(reinterpret_cast<char*>(mng) + kMatrixOffset + 0xc);
+                    partPos.y = *reinterpret_cast<float*>(reinterpret_cast<char*>(mng) + kMatrixOffset + 0x1c);
+                    partPos.z = *reinterpret_cast<float*>(reinterpret_cast<char*>(mng) + kMatrixOffset + 0x2c);
                     PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-                    *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
-                    ppvDrawMng.AddPrimOt(0x3ff, reinterpret_cast<_pppMngSt*>(mng));
-                    if (*reinterpret_cast<unsigned char*>(mng + kStopAtLifeEndOffset) != 0
-                        && *reinterpret_cast<int*>(mng + kCurrentFrameOffset) == *reinterpret_cast<int*>(mng + kLifeEndOffset)) {
+                    *reinterpret_cast<float*>(reinterpret_cast<char*>(mng) + kSortDepthOffset) = viewPos.z;
+                    ppvDrawMng.AddPrimOt(0x3ff, mng);
+                    if (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(mng) + kStopAtLifeEndOffset) != 0
+                        && *reinterpret_cast<int*>(reinterpret_cast<char*>(mng) + kCurrentFrameOffset) == *reinterpret_cast<int*>(reinterpret_cast<char*>(mng) + kLifeEndOffset)) {
                         gPppHeapUseRateWords[1] = 0;
                     }
                 }
-                mng += kPppMngStride;
+                base += kPppMngStride;
             }
             ppvDrawMng.DrawOt();
         }

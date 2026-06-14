@@ -1733,8 +1733,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			if (useDebugPad) {
 				buttons = 0;
 			} else {
+				int port = Pad.m_debugPadPort;
 				unsigned int slot = static_cast<unsigned int>(playerIndex)
-				    & ~((static_cast<int>(~(Pad.m_debugPadPort - playerIndex | playerIndex - Pad.m_debugPadPort)) >> 31));
+				    & ~((static_cast<int>(~((port - playerIndex) | (playerIndex - port))) >> 31));
 				buttons = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&Pad) + 0x54 + slot * 0x54);
 			}
 			PushValue(this, object, static_cast<int>(buttons));
@@ -1878,7 +1879,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			moveVector.x = static_cast<float>(sin(rotX)) * static_cast<float>(cos(rotY));
 			moveVector.y = static_cast<float>(sin(rotY));
 			moveVector.z = static_cast<float>(cos(rotX)) * static_cast<float>(cos(rotY));
-			engineObject->MoveVector(&moveVector, params[2], static_cast<int>(object->m_localBase[3]), 0, 0, 1);
+			engineObject->MoveVector(&moveVector, reinterpret_cast<float*>(object->m_localBase)[2], static_cast<int>(object->m_localBase[3]), 0, 0, 1);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

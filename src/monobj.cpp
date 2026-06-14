@@ -670,10 +670,11 @@ void CGMonObj::setRepop(int mode)
 			goto pbDone;
 		} else if (classId == 0xA9) {
 			goto pbSetA9;
-		} else if (classId < 0xA9) {
+		} else if (classId >= 0xA9) {
+			goto pbDone;
+		} else {
 			goto pbSet2;
 		}
-		goto pbDone;
 	pbSetA9:
 		particleBase = 0;
 		goto pbDone;

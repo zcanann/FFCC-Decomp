@@ -1746,7 +1746,7 @@ void CMenuPcs::calcWorld()
 #define model handle->m_model
 	const int animState = m_wmWorldState->m_mainState;
 	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
-	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
+	float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
 
 	if (animState == 1) {
 		if (animTime < animEnd) {
@@ -1794,6 +1794,7 @@ void CMenuPcs::calcWorld()
 				reinterpret_cast<int*>(worldParams + 8)[0] = nextAnim;
 
 				if (nextAnim == 0) {
+					animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
 					model->SetFrame(animEnd);
 				}
 			}
@@ -4461,7 +4462,9 @@ void CMenuPcs::DrawDiaryMenu()
 	const int remSign = rem >> 31;
 	const int phase = (rem ^ remSign) - remSign;
 	const float scale = static_cast<float>(DOUBLE_80331450 * static_cast<double>(phase) + DOUBLE_80331448);
-	float x = static_cast<float>(DOUBLE_80331438 - static_cast<double>(FLOAT_80331440));
+	const double* pDia438 = &DOUBLE_80331438;
+	const float* pDia440 = &FLOAT_80331440;
+	float x = static_cast<float>(*pDia438 - static_cast<double>(*pDia440));
 	float y = FLOAT_80331444;
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor color;
@@ -5255,7 +5258,9 @@ void CMenuPcs::DrawMoveMenu()
 		helpColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * moveAlpha));
 		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
-		MenuPcs.DrawRect(0, FLOAT_803313dc, static_cast<float>(DOUBLE_803314D0 - static_cast<double>(FLOAT_80331440)),
+		const float* pMove440 = &FLOAT_80331440;
+		const double* pMove4D0 = &DOUBLE_803314D0;
+		MenuPcs.DrawRect(0, FLOAT_803313dc, static_cast<float>(*pMove4D0 - static_cast<double>(*pMove440)),
 		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 	DrawWMFrame();
@@ -7755,7 +7760,7 @@ void CMenuPcs::DrawWMFrame()
 	const float baseX = FLOAT_803315B0;
 	const float baseY = FLOAT_803315B4;
 	for (int i = 0; i < 5; i++) {
-		short* const entry = reinterpret_cast<short*>(m_wm.m_frameData + (i * 0x1C + 0xC));
+		short* const entry = reinterpret_cast<short*>(m_wm.m_frameData + i * 0x1C + 0xC);
 		MenuPcs.DrawRect2(
 			0,
 			static_cast<float>(entry[0]) - baseX,

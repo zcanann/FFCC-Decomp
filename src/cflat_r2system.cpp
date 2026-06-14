@@ -4167,9 +4167,8 @@ renderedDone:
         outResult = 0;
         break;
     case -0xFC:
-        *reinterpret_cast<int*>(reinterpret_cast<char*>(&DbgMenuPcs) + 0x10844) = *object->m_localBase;
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&DbgMenuPcs) + 0x10848) =
-            object->m_localBase[1];
+        AStar.m_flags = *object->m_localBase;
+        AStar.m_hitAttributeMask = object->m_localBase[1];
         this->push(object, 0);
         outResult = 0;
         break;

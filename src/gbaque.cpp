@@ -3551,6 +3551,7 @@ void GbaQueue::SetShopFlg(int channel)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimize_for_size on
 int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 {
 	unsigned char localPlayerData[0xDC];
@@ -3574,19 +3575,15 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	equipCount = 0;
 	itemPtr = localPlayerData;
 	indexPtr = equipIndices;
-	itemIndex = 0;
-	remaining = 0x40;
-	do {
+	for (i = 0; i < 0x40; i++) {
 		short itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
 		if ((itemId >= 0) && (itemId <= 0x9E)) {
-			*indexPtr = static_cast<unsigned char>(itemIndex);
+			*indexPtr = static_cast<unsigned char>(i);
 			equipCount++;
 			indexPtr++;
 		}
 		itemPtr += 2;
-		itemIndex++;
-		remaining--;
-	} while (remaining != 0);
+	}
 
 	int indexBytesS = equipCount + 1;
 	if ((indexBytesS & 3) != 0) {
@@ -3615,6 +3612,7 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 
 	return dataSize;
 }
+#pragma optimize_for_size off
 
 /*
  * --INFO--

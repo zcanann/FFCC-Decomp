@@ -1615,21 +1615,27 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x5A:
-			reinterpret_cast<CGObjWork*>(engineObject->m_scriptHandle)->m_statusValues[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
+		case -0x5A: {
+			CGObjWork* work = reinterpret_cast<CGObjWork*>(engineObject->m_scriptHandle);
+			work->m_statusValues[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x5C:
-			reinterpret_cast<CMonWork*>(engineObject->m_scriptHandle)->unk_0xd0[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
+		}
+		case -0x5C: {
+			CMonWork* work = reinterpret_cast<CMonWork*>(engineObject->m_scriptHandle);
+			work->unk_0xd0[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x5D:
-			reinterpret_cast<CMonWork*>(engineObject->m_scriptHandle)->unk_0xf0[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
+		}
+		case -0x5D: {
+			CMonWork* work = reinterpret_cast<CMonWork*>(engineObject->m_scriptHandle);
+			work->unk_0xf0[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		}
 		case -0x5F:
 			if (engineObject->m_charaModelHandle != 0 && PartMng.pppIsDeadCHandle(engineObject->m_charaModelHandle) != 0) {
 				PushValue(this, object, 0);

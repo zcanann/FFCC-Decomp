@@ -1969,7 +1969,7 @@ void CMenuPcs::LetterMessDraw()
 		}
 
 		if (strlen(curLine) != 0) {
-			font->SetPosX(x0);
+			font->SetPosX(FLOAT_80333144);
 			font->SetPosY(y0 - FLOAT_80333148);
 			font->Draw(curLine);
 		}
@@ -2501,9 +2501,9 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	}
 
 	double innerW = w - DOUBLE_803330d8;
-	float innerX = FLOAT_803330f4 + x0;
 	float y = y0;
 	float innerWf = static_cast<float>(innerW);
+	float innerX = FLOAT_803330f4 + x0;
 	for (i = 0; i < 2; ++i) {
 		int tex = 0x49;
 		if (i != 0) {

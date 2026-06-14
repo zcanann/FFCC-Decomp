@@ -12144,7 +12144,7 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 
 	if ((flags & 4) != 0) {
 		v1 = ty + halfTexel;
-		v0 = (ty + h) - halfTexel;
+		v0 = (v1 + h) - halfTexel;
 	} else {
 		v0 = ty + halfTexel;
 		v1 = (ty + h) - halfTexel;

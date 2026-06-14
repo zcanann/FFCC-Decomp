@@ -3742,18 +3742,20 @@ renderedDone:
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0xC7:
+    case -0xC7: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         MenuPcs.m_battleHud.m_worldPos[0] = localFloats[0];
         MenuPcs.m_battleHud.m_worldPos[1] = localFloats[1];
         MenuPcs.m_battleHud.m_worldPos[2] = localFloats[2];
-        if (static_cast<int>(object->m_localBase[3]) < MenuPcs.m_battleHud.m_gaugeTarget) {
+        const int gaugeTarget = object->m_localBase[3];
+        if (gaugeTarget < MenuPcs.m_battleHud.m_gaugeTarget) {
             MenuPcs.m_battleHud.m_gaugeCounter = 0x10;
         }
-        MenuPcs.m_battleHud.m_gaugeTarget = object->m_localBase[3];
+        MenuPcs.m_battleHud.m_gaugeTarget = gaugeTarget;
         this->push(object, 0);
         outResult = 0;
         break;
+    }
     case -0xC8:
         if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347cancelWaveAsync\202\265\202\334\202\265\202\275\201B\n"));

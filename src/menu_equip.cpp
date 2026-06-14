@@ -931,8 +931,8 @@ int CMenuPcs::EquipOpen()
 		GetEquipListStorage(this)->count = 4;
 		EquipInit1();
 		puVar9 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		sVar10 = 0;
 		iVar6 = 0;
+		sVar10 = 0;
 		int letterMax = 0x40;
 		while (iVar6 < letterMax) {
 			iVar11 = GetItemType(iVar6, 0);

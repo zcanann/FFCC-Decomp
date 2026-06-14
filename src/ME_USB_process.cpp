@@ -12,6 +12,10 @@
 static const char s_ME_USB_process_cpp[] = "ME_USB_process.cpp";
 extern "C" const char sMemAllocErrorSizeFmt[] = "MemAlloc Error!!! size=%d\n";
 
+extern const float kMapEditorZero = 0.0f;
+extern const float kMapEditorOne = 1.0f;
+extern const double kMapEditorS32ToDoubleBias = 4503601774854144.0;
+
 namespace {
 struct ViewerSRT {
     float transX;
@@ -478,7 +482,3 @@ void CMaterialEditorPcs::MemFree(void* ptr)
         Memory.Free(ptr);
     }
 }
-
-extern const float kMapEditorZero = 0.0f;
-extern const float kMapEditorOne = 1.0f;
-extern const double kMapEditorS32ToDoubleBias = 4503601774854144.0;

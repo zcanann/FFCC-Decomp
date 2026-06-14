@@ -11508,7 +11508,7 @@ LAB_next:
 				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(0x19);
 				const unsigned int msgId =
-					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42)))) >> 5;
+					static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42))))) >> 5;
 				const int width = static_cast<int>(fontF8->GetWidth(const_cast<char*>(GetMcStr(msgId))));
 				const double* pHd1 = &DOUBLE_803313F8;
 				const float* pD8f1 = &FLOAT_803314D8;

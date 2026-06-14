@@ -796,7 +796,7 @@ public:
     int m_singleMenuTextureLoadIndex;
     int m_singleMenuTextureLoadState;
     union {
-        unsigned short m_battleStateFlag;
+        short m_battleStateFlag;
         short m_cmdLayoutFlag;
         short m_singleMenuMode;
     };

@@ -3573,7 +3573,9 @@ renderedDone:
         break;
     case -0xAF:
         this->push(
-            object, static_cast<int>(Game.m_caravanWorkArr[*object->m_localBase].m_name[object->m_localBase[1]]));
+            object,
+            static_cast<int>(
+                static_cast<signed char>(Game.m_caravanWorkArr[*object->m_localBase].m_name[object->m_localBase[1]])));
         outResult = 0;
         break;
     case -0xAE:

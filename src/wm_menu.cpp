@@ -14090,7 +14090,12 @@ int McCtrl::ChkNowData()
 		break;
 
 	case 5:
-		if (CARDGetSerialNo(m_cardChannel, (unsigned long long*)&serialLo) != 0)
+		if (CARDGetSerialNo(m_cardChannel, (unsigned long long*)&serialLo) == 0)
+		{
+			m_serialHi = serialHi;
+			m_serialLo = serialLo;
+		}
+		else
 		{
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
@@ -14098,9 +14103,6 @@ int McCtrl::ChkNowData()
 			m_state = -1;
 			return -999;
 		}
-
-		m_serialHi = serialHi;
-		m_serialLo = serialLo;
 
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McRead(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);

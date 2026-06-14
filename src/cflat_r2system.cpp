@@ -1843,6 +1843,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
                 const int argIndex = i + 3;
                 unsigned int* localArgs = object->m_localBase;
+                unsigned int* slot = &localArgs[argIndex];
                 char* scan = specBody;
                 if (spec[0] == '%') {
                     int fmtIndex = 1;
@@ -1859,7 +1860,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
                     {
                         char* out = rendered;
-                        int value = static_cast<int>(localArgs[argIndex]);
+                        int value = static_cast<int>(*slot);
                         int outLen = 0;
                         for (int bit = 0; bit < width; bit++) {
                             const int cur = (value >> ((width - bit) - 1)) & 1;
@@ -1877,7 +1878,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 } else {
 formatScan:
                     while (*scan != '\0') {
-                        unsigned int* slot = &localArgs[argIndex];
                         switch (*scan) {
                         case 'd':
                         case 'x':
@@ -2078,15 +2078,17 @@ renderedDone:
     }
     case -0x1A: {
         const int mode = *object->m_localBase;
-        const unsigned int modeBits = mode & 3;
+        const int modeBits = mode & 3;
 
         float t = static_cast<float>(static_cast<int>(object->m_localBase[1])) /
                   static_cast<float>(static_cast<int>(object->m_localBase[2]));
 
         if ((mode & 4) != 0) {
-            const int segmentCount = m_pathPointCount + 1 - (mode & 1) - ((mode >> 1) & 1);
+            const int lowBit = mode & 1;
+            const int highBit = (mode >> 1) & 1;
+            const int segmentCount = m_pathPointCount + 1 - lowBit - highBit;
             const float scaled = t * static_cast<float>(segmentCount);
-            const int baseIndex = (mode & 1) + static_cast<int>(scaled);
+            const int baseIndex = lowBit + static_cast<int>(scaled);
             const float segmentT = std::fmodf(scaled, kCFlatOneF);
 
             CVector delta = CVector(m_pathPoints[1].m_position) - CVector(m_pathPoints[0].m_position);
@@ -2102,7 +2104,7 @@ renderedDone:
             Vec* p2;
             Vec* p3;
 
-            if ((mode & 1) != 0) {
+            if (lowBit != 0) {
                 if (baseIndex == 0) {
                     p0 = startPhantom2;
                 } else if (baseIndex == 1) {
@@ -2120,7 +2122,7 @@ renderedDone:
                 p1 = &m_pathPoints[(baseIndex - 1) < 0 ? 0 : (m_pathPointCount - 1 < (baseIndex - 1) ? m_pathPointCount - 1 : (baseIndex - 1))].m_position;
             }
 
-            if ((mode & 2) != 0) {
+            if (highBit != 0) {
                 if (baseIndex == m_pathPointCount) {
                     p2 = endPhantom1;
                 } else {
@@ -2224,16 +2226,17 @@ renderedDone:
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x1E:
-        if (*object->m_localBase < 0x10) {
-            CLine<64>& line = m_debugLines[*object->m_localBase];
+    case -0x1E: {
+        unsigned int slot = *object->m_localBase;
+        if (slot < 0x10) {
             int mask = object->m_localBase[1];
-            line.pointCount = 0;
-            line.m_mask = mask;
+            m_debugLines[slot].pointCount = 0;
+            m_debugLines[slot].m_mask = mask;
         }
         this->push(object, 0);
         outResult = 0;
         break;
+    }
     case -0x1F: {
         unsigned int slot = *object->m_localBase;
         if (slot < 0x10) {
@@ -2890,6 +2893,8 @@ renderedDone:
         int a1 = object->m_localBase[1];
         if (MenuPcs.GetMesMenu(a0) != 0) {
             this->push(object, GetErrorLevel__7CSystemFv(MenuPcs.GetMesMenu(a0), a1));
+            outResult = 0;
+            break;
         } else {
             if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
                 System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);
@@ -4063,6 +4068,8 @@ renderedDone:
             MapPcs.CalcHitPosition(hitPosition);
             *reinterpret_cast<float*>(object->m_localBase[4]) = hitPosition.y;
             this->push(object, 1);
+            outResult = 0;
+            break;
         } else {
             this->push(object, 0);
         }

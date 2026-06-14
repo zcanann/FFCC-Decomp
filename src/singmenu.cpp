@@ -1831,18 +1831,17 @@ void CMenuPcs::DrawSingleStat(float alpha)
     font->Draw(charaName);
 
     font->SetTlut(0x15);
-    float statY0 = 184.0f;
-    float statYStep = 36.0f;
+    float y = 184.0f;
     float statPosX0 = 592.0f;
+    float statYStep = 36.0f;
     const char** labelsDe = gSingMenuTextTableDe;
     const char** labelsIt = gSingMenuTextTableIt;
     const char** labelsFr = gSingMenuTextTableFr;
     const char** labelsEs = gSingMenuTextTableEs;
     const char** labelsEn = gSingMenuTextTableEn;
-    float y = statY0;
     for (int i = 0; i < 4; i++) {
         font->SetPosX(440.0f);
-        font->SetPosY(y - 5.0f);
+        font->SetPosY(y - 4.0f);
 
         char* label;
         switch (Game.m_gameWork.m_languageId) {
@@ -2864,8 +2863,9 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     } else {
         lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
     }
-    char* dynamicText = s_DynamicMessStr;
+    char* dynamicTextBase = s_DynamicMessStr;
     const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
+    char* dynamicText = dynamicTextBase;
 
     for (int i = 0; i < lineCount; i++) {
         const char* text;
@@ -2892,7 +2892,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     int lineStep = lineHeight + 3;
     float yOffset = 4.0f;
 
-    dynamicText = s_DynamicMessStr;
+    dynamicText = dynamicTextBase;
     for (int i = 0; i < lineCount; i++) {
         font->SetTlut((activeMask & (1 << i)) != 0 ? 7 : 8);
 
@@ -2910,8 +2910,8 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
             font->Draw(lineBuffer);
         }
 
-        dynamicText += 0x80;
         y += static_cast<float>(lineStep);
+        dynamicText += 0x80;
     }
 
     DrawInit();

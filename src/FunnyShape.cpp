@@ -75,8 +75,8 @@ static inline float RotateShapeY(const u8* entry, u32 xOffset, u32 yOffset, floa
 
 static inline void WriteVertex(const float* pos, u32 color, const float* tex)
 {
-    const volatile float* vpos = pos;
-    const volatile float* vtex = tex;
+    const float* vpos = pos;
+    const float* vtex = tex;
     GXWGFifo.f32 = vpos[0];
     GXWGFifo.f32 = vpos[1];
     GXWGFifo.f32 = vpos[2];

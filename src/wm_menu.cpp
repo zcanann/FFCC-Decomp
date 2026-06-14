@@ -13626,7 +13626,7 @@ int McCtrl::LoadDat()
 			m_state = -1;
 			return -1;
 		}
-		m_serialHi = serialHi;
+		m_serialHi = *(&serialLo + 1);
 		m_serialLo = serialLo;
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McRead(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);

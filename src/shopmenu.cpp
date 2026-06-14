@@ -1796,6 +1796,7 @@ inline void CShopMenu::DrawObi(int)
  */
 #pragma push
 #pragma optimization_level 4
+#pragma opt_lifetimes off
 void CShopMenu::DrawMakeBase()
 {
     MenuPcs.DrawSingleBase(FLOAT_80332d28);

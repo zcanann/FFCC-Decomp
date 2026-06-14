@@ -2189,11 +2189,12 @@ void CGMonObj::isValidTarget()
 	float homeDist = PSVECDistance(&m_homePosition, reinterpret_cast<Vec*>(mon + 0x15C));
 	unsigned char* aiData;
 
-	if (m_aiState == 0) {
+	short aiState = m_aiState;
+	if (aiState == 0) {
 		aiData = script9;
 	} else {
 		aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-		         (m_aiState + *reinterpret_cast<unsigned short*>(script9 + 0x100)) *
+		         (aiState + *reinterpret_cast<unsigned short*>(script9 + 0x100)) *
 		             0x1D0 +
 		         0x10;
 	}

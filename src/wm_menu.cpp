@@ -2133,8 +2133,9 @@ void CMenuPcs::CalcMCardMenu()
 		float wave = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
 		if ((int)uVar15 >= -10) {
 			int absSign = (int)uVar15 >> 0x1F;
+			int absRaw = ((int)uVar15 ^ absSign) - absSign;
+			wave = (float)(wave * (DOUBLE_803314E8 * (double)absRaw));
 			int absOff = ((int)uVar15 ^ absSign) - absSign;
-			wave = (float)(wave * (DOUBLE_803314E8 * (double)absOff));
 			if (absOff < 0) absOff = 0;
 			if (absOff > 10) absOff = 10;
 			wave = wave * (float)sin((double)(FLOAT_803314bc * ((float)absOff * FLOAT_803316D4)));
@@ -2176,7 +2177,7 @@ void CMenuPcs::CalcMCardMenu()
 				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
 			}
 			int iLines = iVar14 / 0x16;
-			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
+			if (iVar14 % 0x16 != 0) iLines = iLines + 1;
 			sVar7 = (iLines + 2) * 0x16 + 0x40;
 			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
 			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313F8);
@@ -2274,7 +2275,7 @@ void CMenuPcs::CalcMCardMenu()
 			}
 			int iLines = iVar14 / 0x16;
 			int __p28 = iLines;
-			if (iVar14 - iLines * 0x16 != 0) iLines = __p28 + 1;
+			if (iVar14 % 0x16 != 0) iLines = __p28 + 1;
 			sVar7 = (iLines + 2) * 0x16 + 0x40;
 			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313F8);
 			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
@@ -2363,7 +2364,7 @@ void CMenuPcs::CalcMCardMenu()
 				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
 			}
 			int iLines = iVar14 / 0x16;
-			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
+			if (iVar14 % 0x16 != 0) iLines = iLines + 1;
 			sVar7 = (iLines + 2) * 0x16 + 0x40;
 			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
 			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313F8);
@@ -2443,7 +2444,7 @@ void CMenuPcs::CalcMCardMenu()
 				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
 			}
 			int iLines = iVar14 / 0x16;
-			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
+			if (iVar14 % 0x16 != 0) iLines = iLines + 1;
 			sVar7 = (iLines + 2) * 0x16 + 0x40;
 			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
 			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313F8);
@@ -2534,7 +2535,7 @@ void CMenuPcs::CalcMCardMenu()
 				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
 			}
 			int iLines = iVar14 / 0x16;
-			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
+			if (iVar14 % 0x16 != 0) iLines = iLines + 1;
 			sVar7 = (iLines + 2) * 0x16 + 0x40;
 			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
 			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313F8);

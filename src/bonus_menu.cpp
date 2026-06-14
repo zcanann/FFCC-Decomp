@@ -1088,7 +1088,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		}
 
 		base += activePartyCount;
-		s_ArtiTop = (unsigned char)base;
+		s_ArtiTop = (signed char)base;
 		for (int i = 0; i < 8; i++) {
 			int off = ((base + i) << 6) + 8;
 			BonusAnimSprite* spr = (BonusAnimSprite*)(off + this->m_bonusAnimPtr);

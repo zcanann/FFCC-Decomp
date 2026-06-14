@@ -801,8 +801,8 @@ void birth(
 	if ((s32)payload[0x2A] < 8 && (s32)payload[0x2A] >= 0) {
 		Vec baseDirection;
 		Vec* direction;
-		s32 angle[4];
 		pppFMATRIX rot;
+		s32 angle[4];
 
 		baseDirection.x = *f32_at(payload, 0xA0);
 		baseDirection.y = *f32_at(payload, 0xA4);
@@ -818,7 +818,6 @@ void birth(
 		if ((payload[0x2A] == 2) || (payload[0x2A] == 3)) {
 			angle[0] = 0;
 			angle[1] = 0;
-			angle[2] = 0;
 		}
 
 		pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angle);

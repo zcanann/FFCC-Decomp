@@ -12804,16 +12804,16 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 	}
 
 	unsigned int result = 0;
-	const int cmpOffset = memberIndex * 0x9C0 + 0x1D94;
+	unsigned char* const cmpPtr = dst + 0x1D94 + memberIndex * 0x9C0;
 	for (int count = 4; count != 0; count--) {
 		if (*reinterpret_cast<int*>(src + 0x1A84) != 0) {
 			if (strictMode == 0) {
 				if (src[0x1D90] != 0 &&
-				    *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
+				    *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(cmpPtr)) {
 					break;
 				}
 			} else if (src[0x1D91] != 0 &&
-			           *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
+			           *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(cmpPtr)) {
 				unsigned int e0 = *reinterpret_cast<unsigned int*>(src + 0x1D98) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D0);
 				unsigned int e1 = *reinterpret_cast<unsigned int*>(src + 0x1D9C) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D4);
 				if ((e0 | e1) == 0 &&
@@ -12827,11 +12827,11 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 		if (*reinterpret_cast<int*>(src + 0x2444) != 0) {
 			if (strictMode == 0) {
 				if (src[0x2750] != 0 &&
-				    *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
+				    *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(cmpPtr)) {
 					break;
 				}
 			} else if (src[0x2751] != 0 &&
-			           *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
+			           *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(cmpPtr)) {
 				unsigned int e0 = *reinterpret_cast<unsigned int*>(src + 0x2758) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D0);
 				unsigned int e1 = *reinterpret_cast<unsigned int*>(src + 0x275C) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D4);
 				if ((e0 | e1) == 0 &&

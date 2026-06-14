@@ -844,7 +844,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			while (obj != 0)
 			{
 				next = obj->m_next;
-				if ((u8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
+				if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
 				{
 					prev->m_next = next;
 
@@ -1780,8 +1780,9 @@ DataValsAllocated:
 
 	if (runControl != 0)
 	{
-		int entryOffset = 0;
-		for (int i = 0; i < pppMngSt->m_numControlPrograms; i++)
+		int i = 0;
+		int entryOffset = i;
+		for (; i < pppMngSt->m_numControlPrograms; i++)
 		{
 			void (*fn)(_pppMngSt*) = *(void (**)(_pppMngSt*))(*(int*)(reinterpret_cast<u8*>(pppMngSt->m_pppPObjLinkHead.m_owner) + entryOffset) + 0x10);
 			if (fn != 0)

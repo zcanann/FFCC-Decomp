@@ -6769,7 +6769,7 @@ void CMenuPcs::CalcFukidashi()
 		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) != 0) {
 			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x20;
 		} else if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) != 0) {
-			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x50;
+			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<unsigned short*>(BUB() + 0x1C) + 0x50;
 		} else {
 			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x38;
 		}
@@ -7061,7 +7061,7 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	// Player character model slots
-	unsigned int field1a = (unsigned int)*reinterpret_cast<short*>(bytes + 0x1A);
+	unsigned int field1a = (unsigned int)*reinterpret_cast<unsigned short*>(bytes + 0x1A);
 	if ((field1a & 0x200) != 0 && (field1a & 0xF) != 0) {
 		SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
 		int playerCount = 0;
@@ -11116,7 +11116,7 @@ LAB_next:
 			double rawA;
 			double rawB;
 			reinterpret_cast<int*>(&rawA)[1] = slot ^ 0x80000000;
-			reinterpret_cast<int*>(&rawA)[0] = 0x43300000;
+			reinterpret_cast<unsigned int*>(&rawA)[0] = 0x43300000;
 			reinterpret_cast<int*>(&rawB)[1] = slot ^ 0x80000000;
 			reinterpret_cast<int*>(&rawB)[0] = 0x43300000;
 			MenuPcs.DrawRect(0, FLOAT_803314D8,
@@ -11211,7 +11211,7 @@ LAB_next:
 					digitCount = 3;
 				}
 				if (digitCount == 3) {
-					const int dw10 = digitWidths[10];
+					const unsigned int dw10 = digitWidths[10];
 					const float* pZc4 = &FLOAT_803313dc;
 					const float* pOc4 = &FLOAT_803313e8;
 					const float* p520b = &FLOAT_80331520;
@@ -11476,7 +11476,7 @@ LAB_next:
 				         static_cast<float>(DOUBLE_80331510 + static_cast<double>(slotY)),
 				         FLOAT_80331578, FLOAT_80331578,
 				         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[1])) << 7),
-				         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[2])) << 7),
+				         static_cast<float>(static_cast<unsigned int>(static_cast<char>(mapInfo[2])) << 7),
 				         FLOAT_80331434, FLOAT_80331434, FLOAT_803313dc);
 			}
 		}

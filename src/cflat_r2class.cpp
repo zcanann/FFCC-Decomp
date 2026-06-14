@@ -1504,17 +1504,18 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x3B: {
+			unsigned int* localBase = object->m_localBase;
 			CGraphicPcs::ScreenFadeSlot* slot = &GraphicPcs.m_screenFade[2];
-			slot->m_invert = static_cast<int>(object->m_localBase[0]);
+			slot->m_invert = static_cast<int>(localBase[0]);
 			slot->m_mode = 1;
 			slot->m_targetObj = engineObject;
-			slot->m_targetYOffs = reinterpret_cast<float*>(object->m_localBase)[1];
-			slot->m_colorA.r = static_cast<unsigned char>(object->m_localBase[2]);
-			slot->m_colorA.g = static_cast<unsigned char>(object->m_localBase[3]);
-			slot->m_colorA.b = static_cast<unsigned char>(object->m_localBase[4]);
+			slot->m_targetYOffs = reinterpret_cast<float*>(localBase)[1];
+			slot->m_colorA.r = static_cast<unsigned char>(localBase[2]);
+			slot->m_colorA.g = static_cast<unsigned char>(localBase[3]);
+			slot->m_colorA.b = static_cast<unsigned char>(localBase[4]);
 			slot->m_colorA.a = 0xFF;
-			slot->m_timer = static_cast<int>(object->m_localBase[5]);
-			slot->m_duration = static_cast<int>(object->m_localBase[5]);
+			slot->m_timer = static_cast<int>(localBase[5]);
+			slot->m_duration = static_cast<int>(localBase[5]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1963,12 +1964,14 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x8E:
+		case -0x8E: {
+			int carryIndex = static_cast<int>(object->m_localBase[0]);
 			reinterpret_cast<CGPartyObj*>(engineObject)
-			    ->carry(static_cast<int>(object->m_localBase[0]), static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[1]))), static_cast<int>(object->m_localBase[2]));
+			    ->carry(carryIndex, static_cast<CGObject*>(this->intToClass(static_cast<int>(object->m_localBase[1]))), static_cast<int>(object->m_localBase[2]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		}
 		case -0x8D:
 			reinterpret_cast<CGPartyObj*>(engineObject)->commandFinished();
 			PushValue(this, object, 0);
@@ -2052,11 +2055,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x9D:
-			PushValue(
-			    this, object, static_cast<unsigned int>(reinterpret_cast<CGPrgObj*>(engineObject)->GetClassControl(static_cast<int>(object->m_localBase[0]))));
+		case -0x9D: {
+			unsigned int classControl = static_cast<unsigned int>(reinterpret_cast<CGPrgObj*>(engineObject)->GetClassControl(static_cast<int>(object->m_localBase[0])));
+			PushValue(this, object, classControl);
 			outResult = 0;
 			break;
+		}
 		case -0x9E:
 			engineObject->m_groundHitOffset.x += reinterpret_cast<float*>(object->m_localBase)[0];
 			engineObject->m_groundHitOffset.y += reinterpret_cast<float*>(object->m_localBase)[1];

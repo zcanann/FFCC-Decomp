@@ -13979,7 +13979,6 @@ int McCtrl::ChkConnect(int chan)
 int McCtrl::ChkNowData()
 {
 	unsigned int serialLo;
-	unsigned int serialHi;
 
 	if (m_state < 0)
 	{
@@ -14092,7 +14091,7 @@ int McCtrl::ChkNowData()
 	case 5:
 		if (CARDGetSerialNo(m_cardChannel, (unsigned long long*)&serialLo) == 0)
 		{
-			m_serialHi = serialHi;
+			m_serialHi = *(&serialLo + 1);
 			m_serialLo = serialLo;
 		}
 		else

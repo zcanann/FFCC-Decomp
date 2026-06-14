@@ -1638,8 +1638,9 @@ int CMenuPcs::LetterConfirmOpen()
 			switch (languageId) {
 			case 2:
 				if (s_Attach == 0) {
+					const char* attachName = Game.m_cFlatDataArr[1].TableStrings(0)[s_AttachItem * 5 + 4];
 					sprintf(lines[lineCount], s_fmt_pcts_pcts_pcts, GetMenuStr(0x23),
-					        Game.m_cFlatDataArr[1].TableStrings(0)[s_AttachItem * 5 + 4],
+					        attachName,
 					        GetMenuStr(0x24));
 				} else if (s_Attach == 1) {
 					sprintf(lines[lineCount], s_fmt_pctd_sp_pcts, s_AttachItem, GetMenuStr(4));

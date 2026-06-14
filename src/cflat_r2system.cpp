@@ -2193,9 +2193,10 @@ renderedDone:
                     const float scaleA = p1->m_distance - p0->m_distance;
                     const float scaleB = p2->m_distance - p1->m_distance;
                     const float scaleC = p3->m_distance - p2->m_distance;
-                    float segmentT = (kCFlatPadStickZero != scaleB)
-                                         ? (pathDistance - p1->m_distance) / scaleB
-                                         : kCFlatPadStickZero;
+                    float segmentT = kCFlatPadStickZero;
+                    if (kCFlatPadStickZero != scaleB) {
+                        segmentT = (pathDistance - p1->m_distance) / scaleB;
+                    }
 
                     Vec result;
                     CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(

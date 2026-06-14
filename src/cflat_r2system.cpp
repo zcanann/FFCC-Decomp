@@ -1818,6 +1818,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             char spec[256];
             char rendered[256];
             char line[264];
+            char* specBody = spec + 1;
             line[0] = '\0';
 
             for (int i = 0; i < object->m_argCount - 3; i++) {
@@ -1841,12 +1842,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
                 const int argIndex = i + 3;
                 unsigned int* localArgs = object->m_localBase;
-                char* scan;
+                char* scan = specBody;
                 if (spec[0] == '%') {
                     int fmtIndex = 1;
                     int width = 0;
                     int started = spec[1] == '0';
-                    for (char* digits = spec + 1; (*digits >= '0') && (*digits <= '9'); digits++) {
+                    for (char* digits = specBody; (*digits >= '0') && (*digits <= '9'); digits++) {
                         fmtIndex++;
                         width = (*digits - '0') + width * 10;
                     }
@@ -1874,7 +1875,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                     }
                 } else {
 formatScan:
-                    scan = spec + 1;
                     while (*scan != '\0') {
                         unsigned int* slot = &localArgs[argIndex];
                         switch (*scan) {

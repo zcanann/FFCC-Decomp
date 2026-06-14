@@ -3394,7 +3394,7 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
     MenuPcs.DrawRect(0, static_cast<float>(x + 0x10), static_cast<float>(barY),
                                     4.0f, 8.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(8, static_cast<float>(x + 0x10 + bars * 8 - 4), static_cast<float>(barY),
+    MenuPcs.DrawRect(8, static_cast<float>(x + 0x10 + (bars * 8 - 4)), static_cast<float>(barY),
                                     4.0f, 8.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);
 

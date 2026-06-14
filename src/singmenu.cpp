@@ -1671,8 +1671,8 @@ inline void CMenuPcs::SingCalcChara(float frameStep)
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = 0.0f;
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[2][3] = 0.0f;
 
     model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
@@ -2008,8 +2008,8 @@ void CMenuPcs::SingleCalcFadeIn()
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = 0.0f;
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[2][3] = 0.0f;
 
     m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
@@ -2109,8 +2109,8 @@ void CMenuPcs::SingleCalcFadeOut()
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = 0.0f;
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[2][3] = 0.0f;
 
     m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
@@ -2177,8 +2177,8 @@ void CMenuPcs::SingleCalcCtrl()
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = 0.0f;
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[2][3] = 0.0f;
 
     m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;

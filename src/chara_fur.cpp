@@ -1757,7 +1757,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 		int dx;
 		int py = centerY + dy;
 		for (dx = -2; dx <= 2; dx++) {
-			unsigned int px = centerX + dx;
+			int px = centerX + dx;
 			int distance;
 			int tileIndex;
 			unsigned short packed;
@@ -1775,7 +1775,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			const int sdy = dy >> 31;
 			const int ady = (dy ^ sdy) - sdy;
 			distance = adx + ady;
-			tileIndex = (px % 4 + ((py % 4) * 4 + ((px / 4) * 0x10 + (py / 4) * rowStride))) * 2;
+			tileIndex = ((unsigned int)px % 4 + ((py % 4) * 4 + ((unsigned int)px / 4 * 0x10 + (py / 4) * rowStride))) * 2;
 			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
 
 			b = packed & 0x0f;
@@ -2074,7 +2074,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				continue;
 			}
 
-			for (unsigned int layer = 0; layer < 8; layer++) {
+			for (int layer = 0; layer < 8; layer++) {
 				register float shellReg = static_cast<float>(static_cast<int>(layer)) * 0.125f * furLength;
 				GXTexObj texObj;
 				void* texData = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(&m_height)) + (layer * 0x4000);

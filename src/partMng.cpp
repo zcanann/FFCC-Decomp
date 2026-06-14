@@ -81,6 +81,7 @@ extern "C" const float kPartMngScreenHalfHeight = 224.0f;
 extern "C" const float kPartMngDepthUnit = 16777216.0f;
 extern "C" const float kPartMngScreenHalfWidth = 320.0f;
 extern "C" const double kPartMngS32ToDoubleBias = 4503601774854144.0;
+static inline float LoadFloat(const float& value) { return value; }
 extern "C" const char sPartMngTripleNewline[] = "\n\n\n";
 extern "C" const float kPartMngScreenFovY = 33.3f;
 extern "C" const float kPartMngScreenAspect = 0.93333334f;
@@ -970,8 +971,8 @@ void CPartMng::render3Dcursor()
     GXSetChanAmbColor((GXChannelID)4, color);
     GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32(x - kPartMngCullRadius, y, z);
-    GXPosition3f32(x + kPartMngCullRadius, y, z);
+    GXPosition3f32(x - LoadFloat(kPartMngCullRadius), y, z);
+    GXPosition3f32(x + LoadFloat(kPartMngCullRadius), y, z);
 
     color.r = 0x80;
     color.g = 0xff;
@@ -980,8 +981,8 @@ void CPartMng::render3Dcursor()
     GXSetChanAmbColor((GXChannelID)4, color);
     GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32(x, y - kPartMngCullRadius, z);
-    GXPosition3f32(x, y + kPartMngCullRadius, z);
+    GXPosition3f32(x, y - LoadFloat(kPartMngCullRadius), z);
+    GXPosition3f32(x, y + LoadFloat(kPartMngCullRadius), z);
 
     color.r = 0xff;
     color.g = 0xff;
@@ -990,8 +991,8 @@ void CPartMng::render3Dcursor()
     GXSetChanAmbColor((GXChannelID)4, color);
     GXSetChanMatColor((GXChannelID)4, color);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32(x, y, z - kPartMngCullRadius);
-    GXPosition3f32(x, y, z + kPartMngCullRadius);
+    GXPosition3f32(x, y, z - LoadFloat(kPartMngCullRadius));
+    GXPosition3f32(x, y, z + LoadFloat(kPartMngCullRadius));
 }
 
 /*

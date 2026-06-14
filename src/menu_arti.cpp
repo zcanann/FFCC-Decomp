@@ -292,8 +292,7 @@ void CMenuPcs::ArtiDraw()
 					u += w;
 				}
 
-				int wInt = entry->w;
-				if (w > LoadFloat(kArtiZero) && w < (float)wInt) {
+				if (w > LoadFloat(kArtiZero) && w < (float)entry->w) {
 					colors[1].r = 0xFF;
 					colors[1].g = 0xFF;
 					colors[1].b = 0xFF;
@@ -303,7 +302,7 @@ void CMenuPcs::ArtiDraw()
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
 					w = (float)(LoadDouble(kArtiOneDouble) / (double)entry->duration);
-					w = w * wInt;
+					w = w * entry->w;
 					MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, LoadFloat(kArtiOne), LoadFloat(kArtiOne), LoadFloat(kArtiZero));
 				}
 

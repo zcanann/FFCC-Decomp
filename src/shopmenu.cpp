@@ -1797,6 +1797,7 @@ inline void CShopMenu::DrawObi(int)
  */
 #pragma push
 #pragma optimization_level 4
+#pragma opt_lifetimes off
 void CShopMenu::DrawMakeBase()
 {
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
@@ -2470,8 +2471,8 @@ void CShopMenu::DrawShop0()
     }
 
     CFont* font;
-    ShopMenuTopMenuEntry* entry2 = s_shopMenuTopMenuEntries;
-    ShopMenuTopMenuEntry* entry = entry2;
+    ShopMenuTopMenuEntry* entry = s_shopMenuTopMenuEntries;
+    ShopMenuTopMenuEntry* entry2 = entry;
     for (int i = 0; i < 3; i++, entry++) {
         s_currentShopMenuTopMenuEntry = entry;
         int highlight = (m_topChoice == i) ? 1 : 0;

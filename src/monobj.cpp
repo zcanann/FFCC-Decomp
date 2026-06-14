@@ -1360,7 +1360,7 @@ void CGMonObj::statWatch()
 				*reinterpret_cast<unsigned short*>(script + 0xCC));
 
 			// Pass 2: select target.
-			int result = -1;
+			selectedTarget = -1;
 			for (int slot = 0; slot < 4; slot++) {
 				int partyIndex = *reinterpret_cast<int*>(mon + slot * 4 + 0x620);
 				CGPartyObj* party = Game.m_partyObjArr[partyIndex];
@@ -1373,7 +1373,7 @@ void CGMonObj::statWatch()
 					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
 					 (reinterpret_cast<int>(reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED]) == 0))) {
 					if (monObj->m_partyDistance[partyIndex] < homeRange2) {
-						result = partyIndex;
+						selectedTarget = partyIndex;
 						if (targetMode == 0) {
 							break;
 						}
@@ -1398,17 +1398,16 @@ void CGMonObj::statWatch()
 
 			switch (targetMode) {
 			case 1:
-				result = targetPartyIndex;
+				selectedTarget = targetPartyIndex;
 				break;
 			case 2:
 			case 3:
 			case 4:
 				if (accum >= 0) {
-					result = accum;
+					selectedTarget = accum;
 				}
 				break;
 			}
-			selectedTarget = result;
 		}
 
 		if (selectedTarget >= 0) {

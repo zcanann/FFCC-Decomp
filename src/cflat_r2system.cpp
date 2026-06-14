@@ -1843,6 +1843,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
                 const int argIndex = i + 3;
                 unsigned int* localArgs = object->m_localBase;
+                unsigned int* slot = &localArgs[argIndex];
                 char* scan = specBody;
                 if (spec[0] == '%') {
                     int fmtIndex = 1;
@@ -1859,7 +1860,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
                     {
                         char* out = rendered;
-                        int value = static_cast<int>(localArgs[argIndex]);
+                        int value = static_cast<int>(*slot);
                         int outLen = 0;
                         for (int bit = 0; bit < width; bit++) {
                             const int cur = (value >> ((width - bit) - 1)) & 1;
@@ -1877,7 +1878,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 } else {
 formatScan:
                     while (*scan != '\0') {
-                        unsigned int* slot = &localArgs[argIndex];
                         switch (*scan) {
                         case 'd':
                         case 'x':

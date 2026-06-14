@@ -514,6 +514,7 @@ void CMenuPcs::FavoInit0()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_strength_reduction off
 void CMenuPcs::FavoInit()
 {
 	float fVar4;
@@ -617,10 +618,8 @@ void CMenuPcs::FavoInit()
 	setupEntry->duration = 5;
 
 	FavoEntry* firstEntry = &this->m_favoList->entries[0];
-	int byteOff = 0x180;
-	for (iVar17 = 8; iVar17 > 0; iVar17--) {
-		setupEntry = reinterpret_cast<FavoEntry*>(reinterpret_cast<char*>(this->m_favoList->entries) + byteOff);
-		byteOff = byteOff + 0x40;
+	for (iVar17 = 6; iVar17 < 14; iVar17++) {
+		setupEntry = &this->m_favoList->entries[iVar17];
 		setupEntry->flags = 2;
 		setupEntry->tex = 0x37;
 		sVar11 = sVar11 + 1;
@@ -684,3 +683,4 @@ void CMenuPcs::FavoInit()
 	m_singMenuState->selectedIndex = 0;
 	m_singMenuState->initialized = 1;
 }
+#pragma opt_strength_reduction reset

@@ -1342,8 +1342,9 @@ void CMenuPcs::drawSingleMenu()
         {
             SingleFadeState* fadeState = m_singleFadeState;
             int count = fadeState->count;
+            int i = 0;
             SingleFadeEntry* entry = fadeState->entries;
-            for (int i = 0; i < count; i++) {
+            for (; i < count; i++) {
                 if ((i == 0) || (m_singleMenuMode != 8)) {
                     if (i == 0) {
                         float alpha = entry->alpha;
@@ -1414,8 +1415,9 @@ void CMenuPcs::drawSingleMenu()
         {
             SingleFadeState* fadeState = m_singleFadeState;
             int count = fadeState->count;
+            int i = 0;
             SingleFadeEntry* entry = fadeState->entries;
-            for (int i = 0; i < count; i++) {
+            for (; i < count; i++) {
                 if ((i == 0) || (m_singleMenuMode != 8)) {
                     if (i == 0) {
                         float alpha = entry->alpha;

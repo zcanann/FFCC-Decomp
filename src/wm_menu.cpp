@@ -10845,7 +10845,7 @@ void CMenuPcs::DrawMainMenuSub()
 		GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40), *reinterpret_cast<unsigned int*>(view + 0x44),
 		             *reinterpret_cast<unsigned int*>(view + 0x48), *reinterpret_cast<unsigned int*>(view + 0x4C));
 
-		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<int>(m_wmWorldState) + 0x10) == 2) {
+		if (*reinterpret_cast<short*>(reinterpret_cast<int>(m_wmWorldState) + 0x10) == 2) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);

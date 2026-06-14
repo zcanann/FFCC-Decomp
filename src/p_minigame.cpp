@@ -942,7 +942,7 @@ context_proc:
             }
             else
             {
-                writeSrc = channel * 0x60 + (step - 1) * 4 + 0x16AC + self;
+                writeSrc = channel * 0x60 + (step - 1) * 4 + (0x16AC + self);
             }
             ret = GBAWrite(channel, writeSrc, param + 0xC0);
             if (!(ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))

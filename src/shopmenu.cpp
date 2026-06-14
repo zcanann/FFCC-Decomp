@@ -1699,7 +1699,7 @@ void CShopMenu::DrawItemList()
     if (pulse < 0) {
         pulse = -pulse;
     }
-    unsigned char alpha = static_cast<int>(DOUBLE_80332DA0 * (DOUBLE_80332DB0 * static_cast<double>(pulse) + DOUBLE_80332DA8));
+    unsigned char alpha = static_cast<unsigned char>(DOUBLE_80332DA0 * (DOUBLE_80332DB0 * static_cast<double>(pulse) + DOUBLE_80332DA8));
     float scale = static_cast<float>(DOUBLE_80332DA8 * (DOUBLE_80332DC0 * static_cast<double>(pulse) + DOUBLE_80332DB8));
 
     if (m_canScrollUp != 0) {
@@ -2303,7 +2303,7 @@ void CShopMenu::DrawMake()
     float makeMarginScale = FLOAT_80332d28;
     float makeMarginBase = FLOAT_80332D10;
     short* material = recipeMaterial;
-    for (int i = 0; i < 3; i++, material++, rowY += 0x1E) {
+    for (int i = 0; i < 3; i++, rowY += 0x1E, material++) {
         if (*material <= 0) {
             break;
         }

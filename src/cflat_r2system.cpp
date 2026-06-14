@@ -2229,8 +2229,9 @@ renderedDone:
     case -0x1E:
         if (*object->m_localBase < 0x10) {
             CLine<64>& line = m_debugLines[*object->m_localBase];
+            int mask = object->m_localBase[1];
             line.pointCount = 0;
-            line.m_mask = object->m_localBase[1];
+            line.m_mask = mask;
         }
         this->push(object, 0);
         outResult = 0;

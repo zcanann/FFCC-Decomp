@@ -1883,9 +1883,11 @@ body:
 				void** handle = object->m_scriptHandle;
 				unsigned char* scriptB = reinterpret_cast<unsigned char*>(handle[9]);
 				if (*reinterpret_cast<unsigned short*>(scriptB + 0x10C) == 1) {
-					unsigned char* aiScript = scriptB;
+					unsigned char* aiScript;
 					short aiState = monObj->m_aiState;
-					if (aiState != 0) {
+					if (aiState == 0) {
+						aiScript = scriptB;
+					} else {
 						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 							(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(scriptB + 0x100)) * 0x1D0 + 0x10;
 					}

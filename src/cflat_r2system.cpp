@@ -1746,6 +1746,7 @@ void CLine<64>::CalcBound()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma pool_strings on
 int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFunc, int& outResult)
 {
     char* gbaPath = const_cast<char*>("dvd/gba/");
@@ -4192,6 +4193,7 @@ renderedDone:
 
     return 1;
 }
+#pragma pool_strings off
 
 /*
  * --INFO--

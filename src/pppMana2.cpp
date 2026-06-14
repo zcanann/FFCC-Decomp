@@ -121,6 +121,11 @@ static inline float LoadFloatFresh(const volatile float& value)
     return value;
 }
 
+static inline double LoadDouble(const double& value)
+{
+    return value;
+}
+
 static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
@@ -632,15 +637,11 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
             param_4[indexOffset++] = lowerNextIndex;
             param_4[indexOffset++] = lowerIndex;
             param_4[indexOffset++] = quadIndex++;
-            nextIndex = quadIndex + 1;
-            lowerIndex = quadIndex + 0x11;
-            lowerNextIndex = quadIndex + 0x12;
-
             param_4[indexOffset++] = quadIndex;
-            param_4[indexOffset++] = nextIndex;
-            param_4[indexOffset++] = lowerNextIndex;
-            param_4[indexOffset++] = lowerNextIndex;
-            param_4[indexOffset++] = lowerIndex;
+            param_4[indexOffset++] = quadIndex + 1;
+            param_4[indexOffset++] = quadIndex + 0x12;
+            param_4[indexOffset++] = quadIndex + 0x12;
+            param_4[indexOffset++] = quadIndex + 0x11;
             param_4[indexOffset++] = quadIndex++;
         }
         rowCount = rowCount + 1;

@@ -735,7 +735,7 @@ void CalcReflectionVector2(
     while (dl < dlEnd) {
         u8 drawFmt = *(u8*)dl;
         u16 itemCount = *(u16*)((u8*)dl + 1);
-        int i;
+        unsigned int i;
         s32 fmt = drawFmt & 7;
 
         dl = (u16*)((u8*)dl + 3);

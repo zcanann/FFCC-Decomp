@@ -13462,14 +13462,18 @@ int McCtrl::SaveDat()
 	case 0x12: {
 		unsigned long long serial;
 		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
-			if (Game.m_gameWork.m_mcHasSerial == 0) {
+			if (static_cast<signed char>(Game.m_gameWork.m_mcHasSerial) == 0) {
 				Game.m_gameWork.m_mcSerial1 = static_cast<unsigned int>(serial);
 				Game.m_gameWork.m_mcSerial0 = static_cast<unsigned int>(serial >> 32);
 				Game.m_gameWork.m_mcRandom = Math.Rand(0x7FFFFFFF);
 				Game.m_gameWork.m_mcHasSerial = 1;
 			}
-			m_serialHi = static_cast<unsigned int>(serial);
-			m_serialLo = static_cast<unsigned int>(serial >> 32);
+			{
+				const unsigned int hi = static_cast<unsigned int>(serial);
+				const unsigned int lo = static_cast<unsigned int>(serial >> 32);
+				m_serialLo = lo;
+				m_serialHi = hi;
+			}
 			MemoryCardMan.CreateMcBuff();
 			if (m_userBuffer == 0) {
 				MemoryCardMan.MakeSaveData();

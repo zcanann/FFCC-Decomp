@@ -155,7 +155,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 		    const_cast<char*>(s_pppChangeTex_cpp), 0x166);
 
 		GXColor** colorArray = work->m_meshColorArrays;
-		for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++) {
+		for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++, meshList++) {
 			ChangeTexMeshData* meshData = meshList->m_data;
 			if (strcmp(meshData->m_name, reinterpret_cast<const char*>(&sPppChangeTexMeshObjectName)) == 0) {
 				gUtil.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax, meshList->m_workPositions,
@@ -188,7 +188,6 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 			memset(*colorArray, 0, meshList->m_data->m_vertexCount * sizeof(GXColor));
 
 			colorArray++;
-			meshList++;
 		}
 	}
 
@@ -210,7 +209,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 	             ((float)colorBlock->m_color.rgba[3] / LoadFloat(kPppChangeTexAlphaScale)));
 
 	meshList = ChangeTexMeshes(model0);
-	for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++) {
+	for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++, meshList++) {
 		GXColor* colors = work->m_meshColorArrays[meshIdx];
 		unsigned int vertCount;
 		for (unsigned int v = 0; (vertCount = meshList->m_data->m_vertexCount, v < vertCount); v++) {
@@ -230,7 +229,6 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 		}
 
 		DCFlushRange(colors, vertCount * sizeof(GXColor));
-		meshList++;
 	}
 }
 

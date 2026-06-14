@@ -4102,8 +4102,9 @@ void CMenuPcs::drawWorld()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	if (static_cast<signed char>(bytes[0xD]) == 0) {
+		int i = 4;
 		unsigned char* menuSlot = bytes + 0x10;
-		for (int i = 4; i < 6; i++) {
+		for (; i < 6; i++) {
 			CMenu* const menu = *reinterpret_cast<CMenu**>(menuSlot + 0x10C);
 			menu->Draw();
 			menuSlot += 4;
@@ -4150,8 +4151,10 @@ void CMenuPcs::drawWorld()
 			break;
 		}
 
-		unsigned char* menuSlot = bytes + 0x10;
-		for (int i = 4; i < 6; i++) {
+		unsigned char* menuSlot;
+		int i = 4;
+		menuSlot = bytes + 0x10;
+		for (; i < 6; i++) {
 			CMenu* const menu = *reinterpret_cast<CMenu**>(menuSlot + 0x10C);
 			menu->Draw();
 			menuSlot += 4;

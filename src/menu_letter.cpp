@@ -1874,8 +1874,9 @@ void CMenuPcs::LetterListDraw()
 
 	int iconY = 0x5B;
 	const int iconX = static_cast<int>(*static_cast<const volatile float*>(&FLOAT_80333168));
+	const int iconTopRow = static_cast<int>(*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34));
 	int iconLetterIndex;
-	for (int row = 0; row < 9 && (iconLetterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {
+	for (int row = 0; row < 9 && (iconLetterIndex = iconTopRow + row) < caravanWork->m_letterCount; ++row) {
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[iconLetterIndex];
 		if (letter->AttachmentValue() != 0) {
 			const int icon = 0x26 + (letter->IsAttachmentClaimed() ? 1 : 0);

@@ -878,11 +878,11 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     VMana2* work;
     CChara::CModel* model;
     CCharaPcs::CHandle* handle;
-    Mtx identityMtx;
+    Mtx44 savedScreenMtx;
     Mtx savedCameraMtx;
+    Mtx identityMtx;
     Mtx lookAtMtx;
     Mtx44 projectionMtx;
-    Mtx44 savedScreenMtx;
     _GXTexObj sceneTexObj;
     _GXTexObj depthTexObj;
     Vec centerPos;
@@ -1646,8 +1646,8 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
                     u32 tevBit = 0xACE0F;
                     Vec* reflVec = mana2->m_meshReflectionVec;
                     u8* mm = reinterpret_cast<u8*>(&MaterialMan);
-                    *reinterpret_cast<u32*>(mm + 0x128) = 0;
                     *reinterpret_cast<u32*>(mm + 0x48) = tevBit;
+                    *reinterpret_cast<u32*>(mm + 0x128) = 0;
                     *reinterpret_cast<u32*>(mm + 0x12C) = 0x1E;
                     *reinterpret_cast<u32*>(mm + 0x130) = 0;
                     *reinterpret_cast<Vec**>(mm + 0x08) = reflVec;

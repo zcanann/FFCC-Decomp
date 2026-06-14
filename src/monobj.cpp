@@ -1790,12 +1790,15 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	if (selectorType == 1) {
 #define groupCursor (*reinterpret_cast<volatile int*>(&monObj->m_unk6CC))
 	wloop:
-		if (groupCount[groupCursor] == 0) {
-			groupCursor = groupCursor + 1;
-			if (groupCursor >= 8) {
-				groupCursor = 0;
+		{
+			int wcursor = groupCursor;
+			if (groupCount[wcursor] == 0) {
+				groupCursor = wcursor + 1;
+				if (groupCursor >= 8) {
+					groupCursor = 0;
+				}
+				goto wloop;
 			}
-			goto wloop;
 		}
 
 		int pick = Rand__5CMathFUl(&Math);

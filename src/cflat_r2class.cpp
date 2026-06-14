@@ -2054,11 +2054,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x9D:
-			PushValue(
-			    this, object, static_cast<unsigned int>(reinterpret_cast<CGPrgObj*>(engineObject)->GetClassControl(static_cast<int>(object->m_localBase[0]))));
+		case -0x9D: {
+			unsigned int classControl = static_cast<unsigned int>(reinterpret_cast<CGPrgObj*>(engineObject)->GetClassControl(static_cast<int>(object->m_localBase[0])));
+			PushValue(this, object, classControl);
 			outResult = 0;
 			break;
+		}
 		case -0x9E:
 			engineObject->m_groundHitOffset.x += reinterpret_cast<float*>(object->m_localBase)[0];
 			engineObject->m_groundHitOffset.y += reinterpret_cast<float*>(object->m_localBase)[1];

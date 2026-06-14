@@ -396,9 +396,9 @@ void CMenuPcs::ItemDraw()
 
             GXSetChanMatColor(GX_COLOR0A0, colors[0]);
             w = entry->alpha * w;
-            if (w > LoadFloat(kItemZero)) {
+            if (w > kItemZero) {
                 MenuPcs.DrawRect(
-                    0, x, y, w, h, u, v, colors, LoadFloat(kItemOne), LoadFloat(kItemOne), LoadFloat(kItemZero));
+                    0, x, y, w, h, u, v, colors, LoadFloat(kItemOne), LoadFloat(kItemOne), kItemZero);
                 x += w;
                 u += w;
             }
@@ -436,7 +436,7 @@ void CMenuPcs::ItemDraw()
                         DrawEquipMark(markX, markY, entry->alpha);
                     }
                     tex = 0x34;
-                    itemAlpha = (float)((double)entry->alpha * LoadDouble(kItemHalfDouble));
+                    itemAlpha = (float)((double)entry->alpha * kItemHalfDouble);
                 }
 
                 if (tex == 0x37 && drawIndex == this->m_itemMenuState->cursorIndex[0]) {
@@ -569,7 +569,7 @@ void CMenuPcs::ItemDraw()
     DrawSingLife();
 
     CFont* helpFont = this->m_fonts[0];
-    s8 helpAlpha = (s8)(entry->alpha * LoadFloat(kItemColorMax));
+    s8 helpAlpha = (s8)(entry->alpha * kItemColorMax);
     if (!foundSelected) {
         selectedItemId = -1;
     }

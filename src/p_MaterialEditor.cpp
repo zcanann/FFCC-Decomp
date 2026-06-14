@@ -704,3 +704,5 @@ void CMaterialEditorPcs::Init()
 
     m_loadedTextureCount = 0;
 }
+
+#pragma pool_data off

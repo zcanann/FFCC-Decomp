@@ -1637,7 +1637,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x5F:
-			if (engineObject->m_charaModelHandle != 0 && PartMng.pppIsDeadCHandle(engineObject->m_charaModelHandle) != 0) {
+			if (engineObject->m_charaModelHandle != 0) {
+				if (PartMng.pppIsDeadCHandle(engineObject->m_charaModelHandle) != 0) {
+					PushValue(this, object, 0);
+					outResult = 0;
+				}
+			} else {
 				PushValue(this, object, 0);
 				outResult = 0;
 			}
@@ -1811,7 +1816,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x79: {
 			signed char animList[8];
 			int animCount = 0;
-			int argCount = object->m_argCount - 1;
+			int argCount = reinterpret_cast<CFlatRuntime::CObject*>(engineObject)->m_argCount - 1;
 			if (argCount > 0) {
 				animList[0] = static_cast<signed char>(object->m_localBase[1]);
 				animCount = 1;

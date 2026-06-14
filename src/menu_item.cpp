@@ -436,7 +436,7 @@ void CMenuPcs::ItemDraw()
                         DrawEquipMark(markX, markY, entry->alpha);
                     }
                     tex = 0x34;
-                    itemAlpha = (float)((double)entry->alpha * LoadDouble(kItemHalfDouble));
+                    itemAlpha = (float)((double)entry->alpha * kItemHalfDouble);
                 }
 
                 if (tex == 0x37 && drawIndex == this->m_itemMenuState->cursorIndex[0]) {

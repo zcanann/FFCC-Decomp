@@ -1881,3 +1881,5 @@ CTexture* CMenuPcs::GetTexture(CMenuPcs::TEX tex)
 {
     return m_textures[static_cast<int>(tex)];
 }
+
+#pragma pool_data off

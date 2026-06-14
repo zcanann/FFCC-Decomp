@@ -4268,7 +4268,6 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 	System.Printf(const_cast<char*>(msgBase + 0x114), bonusCount);
 
 	int chosenBonus[4];
-	int* chosenWrite = chosenBonus;
 	int chosenCount = 0;
 	CGame::CBossArtifactStage* bossArtifacts =
 		&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
@@ -4299,8 +4298,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 				}
 			}
 
-			*chosenWrite++ = bonusIndex;
-			chosenCount++;
+			chosenBonus[chosenCount++] = bonusIndex;
 
 			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)
 			    ->SetBonusCondition(bossArtifacts->m_bonusConditions[bonusIndex]);

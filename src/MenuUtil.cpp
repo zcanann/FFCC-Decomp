@@ -1587,8 +1587,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
 			font->Draw(scratch);
 
-			int sel = m_artiState->currentSelection;
-			if ((static_cast<int>(m_cmdLayoutFlag) == 2) && (sel == 1)) {
+			if ((*reinterpret_cast<short*>(&m_battleStateFlag) == 2) && (m_artiState->currentSelection == 1)) {
+				int sel = m_artiState->currentSelection;
 				u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
 
 				if ((effectFlags & 0x1000) == 0) {

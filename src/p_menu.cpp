@@ -1428,48 +1428,38 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 
 	const float twoCorner = corner * 2.0f;
 	float midW = width - twoCorner;
-	float midH = height - twoCorner;
+	float midH;
 	float overW;
 	float overH;
 	float uOff;
 	float vOff;
 	const int tex = static_cast<int>(texBase);
-	const float xL = x;
-	const float yT = y;
 
-	if (midW < 0.0f) {
-		midW = 0.0f;
-	}
-	if (midH < 0.0f) {
-		midH = 0.0f;
-	}
+	midW = (midW < 0.0f) ? 0.0f : midW;
+	midH = height - twoCorner;
+	midH = (midH < 0.0f) ? 0.0f : midH;
 
 	overW = twoCorner - width;
-	if (overW < 0.0f) {
-		overW = 0.0f;
-	}
+	overW = (overW < 0.0f) ? 0.0f : overW;
 
 	overH = twoCorner - height;
-	if (overH < 0.0f) {
-		overH = 0.0f;
-	}
 	uOff = overW * 0.5f;
+	overH = (overH < 0.0f) ? 0.0f : overH;
 	vOff = overH * 0.5f;
 
+	SetTexture(static_cast<CMenuPcs::TEX>(tex));
 	const float cornerW = corner - uOff;
 	const float cornerH = corner - vOff;
-
-	SetTexture(static_cast<CMenuPcs::TEX>(tex));
-	DrawRect(0, xL, yT, cornerW, cornerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, x, y, cornerW, cornerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 1));
-	DrawRect(0, x + corner, yT, midW, cornerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, x + corner, y, midW, cornerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 2));
-	DrawRect(0, ((x + width) - corner) + uOff, yT, cornerW, cornerH, uOff, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, ((x + width) - corner) + uOff, y, cornerW, cornerH, uOff, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 3));
-	DrawRect(0, xL, y + corner, corner, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, x, y + corner, corner, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 4));
 	DrawRect(0, x + corner, y + corner, midW, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
@@ -1478,7 +1468,7 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 	DrawRect(0, (x + width) - corner, y + corner, corner, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 6));
-	DrawRect(0, xL, ((y + height) - corner) + vOff, cornerW, cornerH, 0.0f, vOff, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, x, ((y + height) - corner) + vOff, cornerW, cornerH, 0.0f, vOff, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 7));
 	DrawRect(0, x + corner, ((y + height) - corner) + vOff, midW, cornerH, 0.0f, vOff, 1.0f, 1.0f, 0.0f);
@@ -1800,9 +1790,7 @@ void CMenuPcs::drawBattle()
 
             if (static_cast<float>(totalWidth) > LoadFloat(kMenuInitOne)) {
                 float bodyWidth = static_cast<float>(totalWidth) - LoadFloat(kMenuMarkerMinY);
-                if (bodyWidth < LoadFloat(kMenuInitOne)) {
-                    bodyWidth = LoadFloat(kMenuInitOne);
-                }
+                bodyWidth = (bodyWidth < LoadFloat(kMenuInitOne)) ? LoadFloat(kMenuInitOne) : bodyWidth;
 
                 CTexture* tex = MenuPcs.m_textures[0x1A];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
@@ -1841,14 +1829,12 @@ void CMenuPcs::drawBattle()
                 MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - LoadFloat(kMenuMarkerCapSize), screenY, LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuMarkerCapSize), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
             }
 
-            const int gauge = (m_battleHud.m_gaugeCounter * 0xFF) / 16;
-            const CColor fillTop(0xFF, gauge, gauge, static_cast<u8>(alphaF));
+            const CColor fillTop(0xFF, (m_battleHud.m_gaugeCounter * 0xFF) / 16, (m_battleHud.m_gaugeCounter * 0xFF) / 16, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, fillTop.color);
             TextureMan.SetTextureTev(0);
             DrawRect(0, bodyLeft, (screenY + LoadFloat(kMenuMarkerFillYOffset)) - LoadFloat(kMenuOne), static_cast<float>(fillWidth), LoadFloat(kMenuMarkerFillTopHeight), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
 
-            const int gaugeTop = ((m_battleHud.m_gaugeCounter * 0x7F) / 16) + 0x80;
-            const CColor fillBottom(0xFF, gaugeTop, gauge, static_cast<u8>(alphaF));
+            const CColor fillBottom(0xFF, ((m_battleHud.m_gaugeCounter * 0x7F) / 16) + 0x80, (m_battleHud.m_gaugeCounter * 0xFF) / 16, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, fillBottom.color);
             DrawRect(0, bodyLeft, screenY + LoadFloat(kMenuMarkerFillYOffset), static_cast<float>(fillWidth), LoadFloat(kMenuMarkerFillBottomHeight), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(kMenuOne), LoadFloat(kMenuOne), LoadFloat(kMenuInitOne));
         }

@@ -1384,13 +1384,15 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x2F: {
-			float* params = reinterpret_cast<float*>(object->m_localBase);
+			CVector damageOffset(reinterpret_cast<float*>(object->m_localBase)[4],
+			                     reinterpret_cast<float*>(object->m_localBase)[5],
+			                     reinterpret_cast<float*>(object->m_localBase)[6]);
 			engineObject->SetDamageCol(
 			    static_cast<int>(object->m_localBase[0]),
 			    RuntimeString(this, object->m_localBase[1]),
-			    params[2],
-			    params[3],
-			    CVector(params[4], params[5], params[6]));
+			    reinterpret_cast<float*>(object->m_localBase)[2],
+			    reinterpret_cast<float*>(object->m_localBase)[3],
+			    reinterpret_cast<Vec*>(&damageOffset));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

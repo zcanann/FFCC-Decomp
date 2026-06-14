@@ -2080,7 +2080,7 @@ renderedDone:
         break;
     }
     case -0x1A: {
-        const unsigned int mode = *object->m_localBase;
+        const int mode = *object->m_localBase;
 
         float t = static_cast<float>(static_cast<int>(object->m_localBase[1])) /
                   static_cast<float>(static_cast<int>(object->m_localBase[2]));

@@ -1891,14 +1891,17 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	for (int i = 0; i < pppDataHead->m_modelCount; i++) {
 		u32 j = 0;
 		pppModelSt* model = PartMng.m_pppModelStArr;
+		pppModelSt* foundModel;
 		for (; j < 0x100; j++) {
 			if (model->m_isUsed != 0 && strcmp(model->m_name, modelName) == 0) {
+				foundModel = model;
 				goto modelFound;
 			}
 			model++;
 		}
-		model = 0;
+		foundModel = 0;
 	modelFound:
+		model = foundModel;
 
 		modelName += 0x20;
 		reinterpret_cast<pppModelSt**>(pppDataHead->m_modelNames)[i] = model;
@@ -1913,14 +1916,17 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	for (int i = 0; i < pppDataHead->m_shapeCount; i++) {
 		u32 j = 0;
 		pppShapeSt* shape = PartMng.m_pppShapeStArr;
+		pppShapeSt* foundShape;
 		for (; j < 0x100; j++) {
 			if (shape->m_inUse != 0 && strcmp(shape->m_name, shapeName) == 0) {
+				foundShape = shape;
 				goto shapeFound;
 			}
 			shape++;
 		}
-		shape = 0;
+		foundShape = 0;
 	shapeFound:
+		shape = foundShape;
 
 		shapeName += 0x20;
 		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i] = shape;

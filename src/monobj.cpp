@@ -1482,11 +1482,12 @@ void CGMonObj::statWatch()
 								monObj->m_moveWork.m_flags |= 0x400;
 							}
 							unsigned char* aiData2;
-							if (monObj->m_aiState == 0) {
+							short aiState2 = monObj->m_aiState;
+							if (aiState2 == 0) {
 								aiData2 = script;
 							} else {
 								aiData2 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-									(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+									(static_cast<int>(aiState2) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 							}
 							if ((*reinterpret_cast<unsigned short*>(aiData2 + 0x102) & 0x80) != 0) {
 								monObj->m_moveWork.m_flags |= 0x20000;
@@ -1527,11 +1528,12 @@ void CGMonObj::statWatch()
 						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 						monObj->m_moveWork.m_flags = 0x325;
 						unsigned char* aiData5;
-						if (monObj->m_aiState == 0) {
+						short aiState5 = monObj->m_aiState;
+						if (aiState5 == 0) {
 							aiData5 = script;
 						} else {
 							aiData5 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-								(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+								(static_cast<int>(aiState5) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 						}
 						if ((*reinterpret_cast<unsigned short*>(aiData5 + 0x102) & 0x40) != 0) {
 							monObj->m_moveWork.m_flags |= 0x10000;

@@ -2923,14 +2923,13 @@ renderedDone:
             }
             this->push(object, 0);
             outResult = 0;
-            break;
+        } else {
+            if (MenuPcs.GetMesMenu(a0)->IsUse() == 0) {
+                this->push(object, 0);
+                outResult = 0;
+            }
         }
-        if (MenuPcs.GetMesMenu(a0)->IsUse() == 0) {
-            this->push(object, 0);
-            outResult = 0;
-            break;
-        }
-        return 1;
+        break;
     }
     case -0x4F:
         MapMng.SetMeshCameraSemiTransRange(

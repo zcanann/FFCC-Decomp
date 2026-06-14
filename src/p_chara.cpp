@@ -3275,13 +3275,14 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
         m_model->CreateDynamics(readBuffer, HandleModelStage(m_asyncCharaKind, 0));
     } else {
         void* readBuffer = File.m_readBuffer;
-        int charaKind = m_asyncCharaKind;
         int keyId = m_asyncCharaNo;
+        int charaKind = m_asyncCharaKind;
+        int variant = m_asyncTextureVariant;
         void* keyTag = reinterpret_cast<void*>(charaKind);
         CLoadTexture* loadTexture = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
         loadTexture->m_keyTag = keyTag;
         loadTexture->m_keyId = keyId;
-        loadTexture->m_variantTag = reinterpret_cast<void*>(m_asyncTextureVariant);
+        loadTexture->m_variantTag = reinterpret_cast<void*>(variant);
         loadTexture->m_mergeFileId = -1;
         loadTexture->m_mergeFlags = 0;
         LoadTextureArray(&CharaPcs)->Add(loadTexture);

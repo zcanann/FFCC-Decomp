@@ -3588,7 +3588,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0xB0:
-        strcpy(Game.m_startScriptName, this->m_strBlob + this->m_strOffsets[*object->m_localBase]);
+        strcpy(Game.m_gameWork.m_townName, this->m_strBlob + this->m_strOffsets[*object->m_localBase]);
         this->push(object, 0);
         outResult = 0;
         break;

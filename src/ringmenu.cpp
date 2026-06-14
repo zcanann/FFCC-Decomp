@@ -646,9 +646,9 @@ void CRingMenu::onDraw()
 
 		const float textX2 = kRingMenuTextBaseX + drawX;
 		const float textX0 = textX2 + kRingMenuTextOffsetX;
-		const float textY1 = (kRingMenuTextOffsetY + drawY) - kRingMenuShadowOffset;
 		const float textY0 = (kRingMenuSmallOffset + drawY) - kRingMenuShadowOffset;
 		const float textX1 = (kRingMenuCommandCellSize + drawX) + kRingMenuTextOffsetX;
+		const float textY1 = (kRingMenuTextOffsetY + drawY) - kRingMenuShadowOffset;
 		const float textY2 = kRingMenuCommandTextOffsetY + drawY;
 		CFont* font = MenuPcs.m_fonts[1];
 		for (int button = 1; button >= 0; button--) {

@@ -1449,10 +1449,9 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 	overH = (overH < 0.0f) ? 0.0f : overH;
 	vOff = overH * 0.5f;
 
+	SetTexture(static_cast<CMenuPcs::TEX>(tex));
 	const float cornerW = corner - uOff;
 	const float cornerH = corner - vOff;
-
-	SetTexture(static_cast<CMenuPcs::TEX>(tex));
 	DrawRect(0, xL, yT, cornerW, cornerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 1));

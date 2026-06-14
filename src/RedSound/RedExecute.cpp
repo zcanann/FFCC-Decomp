@@ -2143,7 +2143,6 @@ static void _KeyOnControl()
     RedVoiceStartMask voiceStartMask;
     RedKeyOnSlot* reserve;
     RedVoiceDATA* voiceData;
-    RedSwingFunc waveFunc;
     int shakeDepth;
     RedSoundCONTROL* soundControl;
     RedTrackDATA* track;
@@ -2173,10 +2172,9 @@ static void _KeyOnControl()
         track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
-                waveFunc = track->m_shakeFunc;
                 shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
                 track->m_shakePan =
-                    (shakeDepth * waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
+                    (shakeDepth * track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
                     REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
@@ -2190,10 +2188,9 @@ static void _KeyOnControl()
         track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
-                waveFunc = track->m_shakeFunc;
                 shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
                 track->m_shakePan =
-                    (shakeDepth * waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
+                    (shakeDepth * track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
                     REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
@@ -2206,10 +2203,9 @@ static void _KeyOnControl()
         track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
-                waveFunc = track->m_shakeFunc;
                 shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
                 track->m_shakePan =
-                    (shakeDepth * waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
+                    (shakeDepth * track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
                     REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }

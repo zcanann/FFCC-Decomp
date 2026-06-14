@@ -3245,7 +3245,7 @@ renderedDone:
         break;
     }
     case -0x7B: {
-        int result = Sound.PlaySe3DLine(*object->m_localBase, static_cast<char>(object->m_localBase[1]),
+        int result = Sound.PlaySe3DLine(*object->m_localBase, object->m_localBase[1],
                          *reinterpret_cast<float*>(object->m_localBase + 2),
                          *reinterpret_cast<float*>(object->m_localBase + 3), 0);
         this->push(object, result);

@@ -2315,8 +2315,9 @@ void CGPartyObj::statCharge()
 		}
 		if (m_subFrame == 5 && m_comboItemState >= 0) {
 			endPSlotBit(0x20);
+			int particleBase = m_comboItemState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 5;
 			CFlat.ResetParticleWork(
-			    ((m_comboItemState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 5) + 0x1C) | 0x400,
+			    (particleBase + 0x1C) | 0x400,
 			    m_particleSlots[5]);
 			CFlat.SetParticleWorkBind(reinterpret_cast<CFlatRuntime::CObject*>(this));
 			CFlat.PutParticleWork();
@@ -5415,10 +5416,10 @@ void CGPartyObj::gpmMove()
 		sGhostPartyWork.carrySpeed += FLOAT_80331A70;
 		float speedScale = (sGhostPartyWork.pressure >= pressureLimit) ? kMonObjOne : FLOAT_80331A88;
 		float newSpeed = FLOAT_80331a78;
-		if (sGhostPartyWork.carrySpeed >= newSpeed) {
+		if (!(sGhostPartyWork.carrySpeed < newSpeed)) {
 			float speedLimit = speedScale * (m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[0]) + 0x690));
 			newSpeed = speedLimit;
-			if (speedLimit >= sGhostPartyWork.carrySpeed) {
+			if (!(speedLimit < sGhostPartyWork.carrySpeed)) {
 				newSpeed = sGhostPartyWork.carrySpeed;
 			}
 		}

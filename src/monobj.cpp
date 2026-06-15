@@ -670,10 +670,11 @@ void CGMonObj::setRepop(int mode)
 			goto pbDone;
 		} else if (classId == 0xA9) {
 			goto pbSetA9;
-		} else if (classId < 0xA9) {
+		} else if (classId >= 0xA9) {
+			goto pbDone;
+		} else {
 			goto pbSet2;
 		}
-		goto pbDone;
 	pbSetA9:
 		particleBase = 0;
 		goto pbDone;
@@ -710,12 +711,12 @@ void CGMonObj::setRepop(int mode)
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	short countC = (weaponMode != 0) ?
+	int countC = (weaponMode != 0) ?
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
 	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
 
-	for (int i = 0; i < static_cast<int>(countC); i++) {
+	for (int i = 0; i < countC; i++) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
 		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, kMonObjDefaultScale, 0);
 	}
@@ -1360,7 +1361,7 @@ void CGMonObj::statWatch()
 				*reinterpret_cast<unsigned short*>(script + 0xCC));
 
 			// Pass 2: select target.
-			int result = -1;
+			selectedTarget = -1;
 			for (int slot = 0; slot < 4; slot++) {
 				int partyIndex = *reinterpret_cast<int*>(mon + slot * 4 + 0x620);
 				CGPartyObj* party = Game.m_partyObjArr[partyIndex];
@@ -1373,7 +1374,7 @@ void CGMonObj::statWatch()
 					 ((static_cast<unsigned short>(reinterpret_cast<CGPrgObj*>(party)->GetCID()) & 0x6D) != 0x6D) ||
 					 (reinterpret_cast<int>(reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED]) == 0))) {
 					if (monObj->m_partyDistance[partyIndex] < homeRange2) {
-						result = partyIndex;
+						selectedTarget = partyIndex;
 						if (targetMode == 0) {
 							break;
 						}
@@ -1398,17 +1399,16 @@ void CGMonObj::statWatch()
 
 			switch (targetMode) {
 			case 1:
-				result = targetPartyIndex;
+				selectedTarget = targetPartyIndex;
 				break;
 			case 2:
 			case 3:
 			case 4:
 				if (accum >= 0) {
-					result = accum;
+					selectedTarget = accum;
 				}
 				break;
 			}
-			selectedTarget = result;
 		}
 
 		if (selectedTarget >= 0) {
@@ -1790,12 +1790,15 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	if (selectorType == 1) {
 #define groupCursor (*reinterpret_cast<volatile int*>(&monObj->m_unk6CC))
 	wloop:
-		if (groupCount[groupCursor] == 0) {
-			groupCursor = groupCursor + 1;
-			if (groupCursor >= 8) {
-				groupCursor = 0;
+		{
+			int wcursor = groupCursor;
+			if (groupCount[wcursor] == 0) {
+				groupCursor = wcursor + 1;
+				if (groupCursor >= 8) {
+					groupCursor = 0;
+				}
+				goto wloop;
 			}
-			goto wloop;
 		}
 
 		int pick = Rand__5CMathFUl(&Math);

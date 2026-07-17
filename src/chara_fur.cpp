@@ -491,7 +491,7 @@ void CChara::TimeMogFur()
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
-			int tileIndex = ((y / 4) * 0x100 + (y % 4) * 4 + (x % 4) + (x / 4) * 0x10) * 2;
+			int tileIndex = ((y / 4) * 0x100 + (x / 4) * 0x10 + (y % 4) * 4 + (x % 4)) * 2;
 			unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 
 			unsigned int a = (packed >> 12) & 7;

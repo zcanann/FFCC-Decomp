@@ -219,16 +219,15 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
-	int yOffset = 0;
+	int yOffset;
 	for (int i = 0; i < familyCount; i++) {
-		float rowY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(yOffset);
+		float rowY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(i * 0x28);
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
 			rowY,
 			kCompaFoodIconWidth, kCompaFoodIconHeight, kCompaZero, kCompaZero, kCompaOne,
 			kCompaOne, kCompaZero);
-		yOffset += 0x28;
 	}
 
 	int drawIndex = 0;
@@ -253,8 +252,7 @@ void CMenuPcs::CompaDraw()
 			drawIndex = i;
 		}
 
-		int foodIdx = drawIndex + 1;
-		const u8* foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][foodIdx];
+		const u8* foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][1 + drawIndex];
 		if (*foodPtr == 0 && static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1E0,
 			              shown);

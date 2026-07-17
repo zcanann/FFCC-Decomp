@@ -645,10 +645,10 @@ void CMesMenu::onDraw()
         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).Ref());
         unsigned int frameMask = m_menuIndex;
         float frameX = baseX - (float)((frameMask & 1) ? 0x80 : 0);
-        float frameY = baseY - (float)((frameMask >> 1 & 1) ? 0x38 : 0);
+        float frameY = baseY - (float)((frameMask & 2) ? 0x38 : 0);
         MenuPcs.DrawRect(
             0, frameX, frameY, FLOAT_80330964, FLOAT_80330948,
-            (float)((frameMask & 2) ? 0x80 : 0),
+            (float)(((frameMask & 2) != 0) ? 0x80 : 0),
             (float)(((frameMask & 1) != 0) ? 0x38 : 0), FLOAT_80330914, FLOAT_80330914,
             FLOAT_803308d8);
 

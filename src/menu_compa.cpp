@@ -95,6 +95,7 @@ void CMenuPcs::CompaDraw()
 	int familyCount;
 	int yStep;
 	float end;
+	float fillW;
 	CompaOpenAnim* entry = this->m_compaList->entries;
 	for (int i = 0; i < this->m_compaList->count; i++) {
 		int tex = entry->tex;
@@ -128,7 +129,7 @@ void CMenuPcs::CompaDraw()
 				colors[3].a = 0xFF;
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
-				float fillW = entry->alpha * w;
+				fillW = entry->alpha * w;
 				if (fillW > kCompaZero) {
 					if (entry->tex == 0x51) {
 						yStep = static_cast<int>(y);
@@ -161,7 +162,7 @@ void CMenuPcs::CompaDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					float remainW = static_cast<float>(1.0 / (double)entry->duration) * static_cast<float>(entry->w);
+					fillW = static_cast<float>(1.0 / (double)entry->duration) * static_cast<float>(entry->w);
 					if (entry->tex == 0x51) {
 						yStep = static_cast<int>(y);
 						end = y + h;
@@ -170,13 +171,13 @@ void CMenuPcs::CompaDraw()
 							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<int>(diff);
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-								remainW, static_cast<float>(tileH), u, v,
+								fillW, static_cast<float>(tileH), u, v,
 								colors, kCompaOne, kCompaOne, kCompaZero);
 							yStep += 0x18;
 						}
 					} else {
 						MenuPcs.DrawRect(
-							static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,
+							static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v,
 							colors, kCompaOne, kCompaOne, kCompaZero);
 					}
 				}

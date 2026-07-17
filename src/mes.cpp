@@ -949,7 +949,7 @@ void CMes::addString(char** text, int branchMode)
 	unsigned short uch;
 	while (running)
 	{
-		if ((uch = ReadMesChar(text)) == 0)
+		if ((uch = *(unsigned char*)(*text)++) == 0)
 		{
 			running = 0;
 			goto updateBounds;

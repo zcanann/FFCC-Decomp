@@ -912,6 +912,7 @@ int CMes::GetWait()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 void CMes::addString(char** text, int branchMode)
 {
 	int fontSel = mFontIndex;
@@ -1551,6 +1552,7 @@ void CMes::addString(char** text, int branchMode)
 		mLineHeight = (mCurrentY < mLineHeight) ? mLineHeight : mCurrentY;
 	}
 }
+#pragma opt_lifetimes reset
 
 /*
  * --INFO--

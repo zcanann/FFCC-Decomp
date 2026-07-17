@@ -644,15 +644,12 @@ void CMesMenu::onDraw()
         float titleAlpha = FLOAT_80330908 * stageBlend;
         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).Ref());
         unsigned int frameMask = m_menuIndex;
-        int maskU = 0x80;
-        int maskV = 0x38;
-        int frameNegX = -(int)(frameMask & 1);
-        float frameX = baseX - (float)(maskU & frameNegX);
-        float frameY = baseY - (float)(maskV & -(int)(frameMask >> 1 & 1));
+        float frameX = baseX - (float)((frameMask & 1) ? 0x80 : 0);
+        float frameY = baseY - (float)((frameMask >> 1 & 1) ? 0x38 : 0);
         MenuPcs.DrawRect(
             0, frameX, frameY, FLOAT_80330964, FLOAT_80330948,
-            (float)(maskU & ((int)(-(int)(frameMask & 2) | (int)(frameMask & 2)) >> 31)),
-            (float)(maskV & ((int)(frameNegX | (int)(frameMask & 1)) >> 31)), FLOAT_80330914, FLOAT_80330914,
+            (float)((frameMask & 2) ? 0x80 : 0),
+            (float)(((frameMask & 1) != 0) ? 0x38 : 0), FLOAT_80330914, FLOAT_80330914,
             FLOAT_803308d8);
 
         font->SetScale(FLOAT_8033094C);

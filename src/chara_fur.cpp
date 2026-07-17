@@ -1251,17 +1251,17 @@ void CChara::ChangeMogMode(int mogMode)
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_propagation off
 #pragma global_optimizer off
 void CChara::InitFurTexBuffer()
 {
 	MogFurState& fur = MogFur();
+	int idx;
+	int row;
 	int rowCount = 0;
-	int row = 0;
+	row = 0;
 	do {
 		unsigned int inner = 0;
 		int byteOffset = row << 1;
-		int idx;
 		for (idx = row; idx < row + 0x40; idx += 8) {
 			int idxBase = inner + row;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Chara.MogFur().m_texels) + byteOffset) = 0x7FFF;

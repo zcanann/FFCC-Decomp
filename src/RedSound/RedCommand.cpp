@@ -456,7 +456,6 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 	int tracksToStart;
 	RedVoiceDATA* voice;
 	int multiLoopReport;
-	int trackNo;
 	int loopReport;
 
 	RedSoundControlGet(REDSOUND_CONTROL_SE)->m_updateFlags = 0;
@@ -500,7 +499,7 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 		seTrack = SearchSeEmptyTrack((int)tracksToStart, seInfo->m_eraseTrack, eraseAttrMask);
 		eraseAttrMask = 0;
 		if (seTrack != 0) {
-			trackNo = seTrack->m_trackNo;
+			int trackNo = seTrack->m_trackNo;
 			voice = RedVoiceDataGet(trackNo);
 			do {
 				seTrack->m_waveBankData = waveHead;

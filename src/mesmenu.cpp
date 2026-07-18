@@ -889,9 +889,9 @@ void CMesMenu::onDraw()
             MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80330908 * stageBlend)).Ref());
 
             MenuPcs.DrawRect(
-                0, FLOAT_80330994 + *(float*)((char*)this + 0x3CB8),
-                (float)*(int*)((char*)this + 0x3D34) * *(float*)((char*)this + 0x3D40) +
-                    (FLOAT_803308e8 + *(float*)((char*)this + 0x3CBC) + *(float*)((char*)this + 0x3D3C)),
+                0, FLOAT_80330994 + m_mes.mBaseX,
+                (float)m_mes.mRubyHeight * m_mes.mRubySpacing +
+                    (FLOAT_803308e8 + m_mes.mBaseY + m_mes.mRubyY),
                 FLOAT_8033092c, FLOAT_8033092c, FLOAT_803308d8, FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
         }
         break;

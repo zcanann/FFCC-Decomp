@@ -3152,7 +3152,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 		return;
 	}
 
-	bool foundDuplicate = false;
+	int foundDuplicate = 0;
 	for (int i = 0; i < 4; i++) {
 		OSWaitSemaphore(accessSemaphores + i);
 	}
@@ -3162,7 +3162,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
 		    (cmakeInfo[i].m_jobType == valueBytes[2])) {
 			Joybus.SendResult(channel, 1, valueBytes[1], 0);
-			foundDuplicate = true;
+			foundDuplicate = 1;
 			break;
 		}
 	}

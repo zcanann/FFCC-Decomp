@@ -1333,7 +1333,7 @@ void GbaQueue::LoadPlayerStat()
 			if (caravanWork != 0) {
 				if ((menuStageMode == 0) || ((menuStageMode != 0) && (i == 0))) {
 					entry[3] = 1;
-				} else if ((menuStageMode != 0) && (i == 1) && (Game.m_scriptFoodBase[0] != 0)) {
+				} else if ((menuStageMode != 0) && (i == 1) && (Game.m_scriptFoodBase[i] != 0)) {
 					entry[3] = 1;
 				}
 

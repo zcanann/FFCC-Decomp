@@ -3426,15 +3426,15 @@ void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_propagation off
 int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 {
 	unsigned char localPlayerData[0xDC];
 	unsigned char* itemPtr;
-	CGame* game;
 	unsigned short cmdData[4];
 	int i;
 	int size;
-	unsigned char count;
+	int count;
 	unsigned char* writePtr;
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -3444,12 +3444,11 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	count = 0;
 	outData[0] = 0;
 	outData[1] = 0;
-	itemPtr = localPlayerData;
+	itemPtr = localPlayerData + count * 2;
 	outData[2] = 0;
 	writePtr = outData + 4;
 	outData[3] = 0;
 	size = 4;
-	game = &Game;
 
 	for (i = 0; i < 0x40; i++) {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
@@ -3457,7 +3456,7 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 			const int iconMask = localPlayerData[2] & 3;
 			const int icon = MenuPcs.GetItemIcon(itemId);
 			if (icon == iconMask) {
-				int itemBase = game->unkCFlatData0[2] + itemId * 0x48;
+				int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 
 				cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
 				cmdData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
@@ -3475,6 +3474,7 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	outData[0] = count;
 	return size;
 }
+#pragma opt_propagation on
 
 /*
  * --INFO--

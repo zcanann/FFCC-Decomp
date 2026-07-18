@@ -96,13 +96,6 @@ static inline int ReadTagS8(char** text)
 	return (int)ReadTagByte(text);
 }
 
-static inline unsigned short ReadMesChar(char** text)
-{
-	unsigned char* p = (unsigned char*)*text;
-	*text = (char*)(p + 1);
-	return *p;
-}
-
 static inline int ReadTagNibble(char** text)
 {
 	char* p = *text;

@@ -2174,7 +2174,7 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	outData[0] = 0x13;
 	outData[1] = static_cast<unsigned char>(hpFlags);
 	outData[2] = static_cast<unsigned char>(hp);
-	outData[3] = ((m_outOfShoukiFlags & channelMask) != 0);
+	outData[3] = ((static_cast<char>(m_outOfShoukiFlags) & channelMask) != 0);
 
 	return static_cast<unsigned char>(changed);
 }

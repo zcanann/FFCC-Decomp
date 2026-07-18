@@ -311,7 +311,8 @@ struct RedSeInfoSequence
 };
 
 #define RedSeInfoSequenceGetOffset(sequence)                                                       \
-	(((sequence)->m_offsetHiAndFlags * REDSOUND_SE_INFO_U16_HIGH_SCALE + (sequence)->m_offsetLo) & \
+	((((sequence)->m_offsetHiAndFlags << REDSOUND_SE_INFO_U16_HIGH_SHIFT) +                        \
+	  (sequence)->m_offsetLo) &                                                                    \
 	 REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK)
 
 #define RedSeInfoGetCommandData(sequence, count) reinterpret_cast<unsigned char*>((sequence) + (count))
@@ -347,6 +348,7 @@ enum RedSeInfoLayout {
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET = (unsigned int)&(((RedSeINFO*)0)->m_sequence),
 	REDSOUND_SE_INFO_MIN_SIZE = sizeof(RedSeINFO),
 	REDSOUND_SE_INFO_U16_HIGH_SCALE = 0x100,
+	REDSOUND_SE_INFO_U16_HIGH_SHIFT = 8,
 	REDSOUND_SE_INFO_MULTI_FLAG = 0x80,
 	REDSOUND_SE_INFO_COUNT_MASK = 0x7F,
 	REDSOUND_SE_INFO_SEQUENCE_CONTINUE_FLAG = 0x80,

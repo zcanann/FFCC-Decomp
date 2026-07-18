@@ -460,7 +460,7 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 	int loopReport;
 
 	RedSoundControlGet(REDSOUND_CONTROL_SE)->m_updateFlags = 0;
-	remainingSequences = (unsigned int)seInfo->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE +
+	remainingSequences = ((unsigned int)seInfo->m_waveNoHi << REDSOUND_SE_INFO_U16_HIGH_SHIFT) +
 	                     (unsigned int)seInfo->m_waveNoLo;
 	waveHead = c_RedEntry.SearchWaveBase(remainingSequences);
 	if (waveHead != 0) {

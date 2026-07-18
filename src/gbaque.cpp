@@ -1728,15 +1728,15 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 	const GbaQueuePlayerPosView* basePlayer = &player[channel];
 
 	nearbyMask = 0;
-	for (i = 0; i < 4;) {
+	for (i = 0; i < 4; i++) {
 		if (i == channel) {
 			nearbyMask = (nearbyMask | (1 << i)) & 0xFF;
-		} else if (player[0].m_active != 0) {
-			int px = player[0].m_posX;
+		} else if (player->m_active != 0) {
+			int px = player->m_posX;
 			const int dx = px - basePlayer->m_posX;
 
 			if (dx >= -0x50 && dx <= 0x50) {
-				int pz = player[0].m_posZ;
+				int pz = player->m_posZ;
 				const int dz = pz - basePlayer->m_posZ;
 
 				if (dz >= -0x40 && dz <= 0x40) {
@@ -1745,26 +1745,7 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 			}
 		}
 
-		i++;
-
-		if (i == channel) {
-			nearbyMask = (nearbyMask | (1 << i)) & 0xFF;
-		} else if (player[1].m_active != 0) {
-			int px = player[1].m_posX;
-			const int dx = px - basePlayer->m_posX;
-
-			if (dx >= -0x50 && dx <= 0x50) {
-				int pz = player[1].m_posZ;
-				const int dz = pz - basePlayer->m_posZ;
-
-				if (dz >= -0x40 && dz <= 0x40) {
-					nearbyMask = (nearbyMask | (1 << i)) & 0xFF;
-				}
-			}
-		}
-
-		player += 2;
-		i++;
+		player++;
 	}
 
 	packet[1] = static_cast<unsigned char>(nearbyMask);

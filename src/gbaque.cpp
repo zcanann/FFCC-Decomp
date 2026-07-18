@@ -1513,10 +1513,10 @@ void GbaQueue::LoadPlayerStat()
 			m_memorysFlags = static_cast<unsigned char>(m_memorysFlags | (1 << i));
 		}
 
-		if (base[0x7C4 + 0xD3] != base[0x454 + 0xD3]) {
+		if (base[0x7C4 + 0xD3] != static_cast<char>(localPlayerStat[(i * 0xDC) + 0xD3])) {
 			const int shift = i << 1;
 			m_cmdNumFlags = static_cast<unsigned char>(m_cmdNumFlags | (1 << shift));
-			if ((static_cast<int>(base[0x454 + 0xD3]) - static_cast<int>(base[0x7C4 + 0xD3])) != 1) {
+			if ((static_cast<int>(static_cast<char>(localPlayerStat[(i * 0xDC) + 0xD3])) - static_cast<int>(base[0x7C4 + 0xD3])) != 1) {
 				m_cmdNumFlags = static_cast<unsigned char>(m_cmdNumFlags | (2 << shift));
 			}
 		}

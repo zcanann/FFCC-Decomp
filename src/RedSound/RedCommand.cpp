@@ -901,12 +901,9 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_expression = REDSOUND_VOLUME_DEFAULT;
 		track->m_pan = REDSOUND_PAN_CENTER;
 		track->m_reverbDepth = RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC);
-		track->m_reverbDepthDelta = 0;
-		track->m_panDelta = 0;
-		track->m_expressionDelta = 0;
-		track->m_volumeDelta = 0;
-		track->m_sweepAdd = 0;
-		track->m_sweepDelta = 0;
+		track->m_volumeDelta = track->m_expressionDelta = track->m_panDelta =
+		    track->m_reverbDepthDelta = 0;
+		track->m_sweepDelta = track->m_sweepAdd = 0;
 		track->m_portamentTime = 0;
 		track->m_loopDepth = 0;
 		track->m_keyTranspose = 0;
@@ -914,27 +911,20 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_pitchBend = 0;
 		track->m_pitchBendRaw = 0;
 		track->m_fineTune = 0;
-		track->m_shakeFunc = REDSOUND_SWING_FUNC_NONE;
-		track->m_tremoloFunc = REDSOUND_SWING_FUNC_NONE;
-		track->m_vibrateFunc = REDSOUND_SWING_FUNC_NONE;
+		track->m_vibrateFunc = track->m_tremoloFunc = track->m_shakeFunc =
+		    REDSOUND_SWING_FUNC_NONE;
 		track->m_shakePan = 0;
-		track->m_tremoloDelay = 0;
-		track->m_vibrateDelay = 0;
-		track->m_tremoloDelayDepth = 0;
-		track->m_vibrateDelayDepth = 0;
+		track->m_vibrateDelay = track->m_tremoloDelay = 0;
+		track->m_vibrateDelayDepth = track->m_tremoloDelayDepth = 0;
 		track->m_waveData = REDSOUND_WAVE_DATA_NONE;
 		track->m_flags = ((musicHead->m_playFlags & REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES) != 0) ? REDSOUND_TRACK_FLAGS_NONE : REDSOUND_TRACK_FLAG_TENUTO;
-		track->m_step2 = 0;
-		track->m_step = 0;
-		track->m_fuzzyAdsrDepth = 0;
-		track->m_fuzzyDeltaTimeDepth = 0;
-		track->m_fuzzyPanDepth = 0;
-		track->m_fuzzyVolumeDepth = 0;
-		track->m_fuzzyPitchDepth = 0;
+		track->m_step = track->m_step2 = 0;
+		track->m_fuzzyPitchDepth = track->m_fuzzyVolumeDepth = track->m_fuzzyPanDepth =
+		    track->m_fuzzyDeltaTimeDepth = track->m_fuzzyAdsrDepth = 0;
 		track->m_portamentPitch = REDSOUND_TRACK_PORTAMENT_PITCH_NONE;
 		RedNoteAllocClear(track->m_note.m_allocFlags);
 		track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_MUSIC_DEFAULT;
-		memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_BYTE, REDSOUND_TRACK_ADSR_SIZE);
+		memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
 
 		remainingTrackCount--;
 		musicTrackNo++;

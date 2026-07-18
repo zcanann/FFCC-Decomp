@@ -1403,33 +1403,17 @@ void GbaQueue::LoadPlayerStat()
 
 				memcpy(entry + 0x3A, caravanWork->m_inventoryItems, 0x80);
 				{
-					int artifactIndex = 0;
 					unsigned int artifactBit = 1;
 					int artifactSlot;
 					int artifactWordOff;
-					int artifactGroup;
-					for (artifactGroup = 0; artifactGroup < 0x20; artifactGroup++) {
+					int artifactIndex;
+					for (artifactIndex = 0; artifactIndex < 0x60; artifactIndex++) {
 						artifactSlot = 0x40 + artifactIndex;
 						if (caravanWork->m_inventoryItems[artifactSlot] > 0) {
 							artifactWordOff = (artifactIndex >> 5) * 4 + 0x28;
 							*reinterpret_cast<unsigned int*>(entry + artifactWordOff) |=
 							    static_cast<unsigned int>(artifactBit << (artifactIndex % 32));
 						}
-						artifactIndex++;
-						artifactSlot = 0x40 + artifactIndex;
-						if (caravanWork->m_inventoryItems[artifactSlot] > 0) {
-							artifactWordOff = (artifactIndex >> 5) * 4 + 0x28;
-							*reinterpret_cast<unsigned int*>(entry + artifactWordOff) |=
-							    static_cast<unsigned int>(artifactBit << (artifactIndex % 32));
-						}
-						artifactIndex++;
-						artifactSlot = 0x40 + artifactIndex;
-						if (caravanWork->m_inventoryItems[artifactSlot] > 0) {
-							artifactWordOff = (artifactIndex >> 5) * 4 + 0x28;
-							*reinterpret_cast<unsigned int*>(entry + artifactWordOff) |=
-							    static_cast<unsigned int>(artifactBit << (artifactIndex % 32));
-						}
-						artifactIndex++;
 					}
 				}
 

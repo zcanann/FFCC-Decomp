@@ -792,7 +792,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 		waveY = waveY + 2.0f;
 	}
 
-	font->SetScale(static_cast<float>(-(0.25 * fabs(static_cast<double>(angle)) - 0.800000011920929)));
+	font->SetScale(static_cast<float>(0.800000011920929 - 0.25 * fabs(static_cast<double>(angle))));
 	textWidth = static_cast<float>(font->GetWidth(commandLabel));
 	fVar1 = static_cast<float>(-(0.5 * fabs(static_cast<double>(angle)) - 1.0));
 	textHeight = static_cast<float>(font->m_glyphHeight) * font->scaleY;

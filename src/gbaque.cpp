@@ -3527,9 +3527,9 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	unsigned char localPlayerData[0xDC];
 	char equipIndices[0x40];
 	unsigned int indexBytes;
+	int dataSize;
 	int equipCount;
 	unsigned short equipData[4];
-	int dataSize;
 	unsigned char* itemPtr;
 	char* indexPtr;
 	char itemIndex;

@@ -852,9 +852,11 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 
 	music->m_tracks = track;
 
+	RedMusicTrackBlock* musicTrackBlock;
+	unsigned int trackNo;
 	if (musicHead->m_reverbKind != 0) {
-		unsigned int reverbKind = ((int)musicHead->m_reverbKind - 1U) & REDSOUND_REVERB_MODE_INDEX_MASK;
-		SetReverb(0, RedReverbModeDataGet(reverbKind)->m_kind, RedReverbModeDataGet(reverbKind)->m_params);
+		trackNo = ((int)musicHead->m_reverbKind - 1U) & REDSOUND_REVERB_MODE_INDEX_MASK;
+		SetReverb(0, RedReverbModeDataGet(trackNo)->m_kind, RedReverbModeDataGet(trackNo)->m_params);
 	}
 
 	RedReverbDepthSetDepth(REDSOUND_REVERB_DEPTH_MUSIC, (int)musicHead->m_reverbDepth);
@@ -872,13 +874,13 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	RedReverbDepthSetCount(REDSOUND_REVERB_DEPTH_MUSIC, 0);
 	music->m_waveNo = musicHead->m_waveNo;
 
-	RedMusicTrackBlock* musicTrackBlock = RedMusicGetTrackBlocks(musicHead);
+	musicTrackBlock = RedMusicGetTrackBlocks(musicHead);
 	int remainingTrackCount = musicHead->m_trackCount;
-	char musicTrackNo = 0;
+	trackNo = 0;
 	track = music->m_tracks;
 	do {
 		int musicTrackBlockSize = RedMusicTrackBlockGetSize(musicTrackBlock);
-		track->m_trackNo = musicTrackNo - 1;
+		track->m_trackNo = trackNo - 1;
 		track->m_waveBankData = waveHead;
 		musicTrackBlock = RedMusicTrackBlockGetCommandBlock(musicTrackBlock);
 		track->m_command = (unsigned char*)musicTrackBlock;
@@ -924,7 +926,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
 
 		remainingTrackCount--;
-		musicTrackNo++;
+		trackNo++;
 		if (remainingTrackCount != 0) {
 			track++;
 		}

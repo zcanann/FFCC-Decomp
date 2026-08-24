@@ -2222,14 +2222,14 @@ static void _KeyOnControl()
                     if (!(voiceData->m_track < soundControl->m_tracks) &&
                         (voiceData->m_track < RedSoundControlGetTrackEnd(soundControl))) {
                         if ((RedMuteGetMask(voiceData->m_track->m_trackNo) & RedMuteGetWord(voiceData->m_track->m_trackNo)) == 0) {
-                            volume = ((soundControl->m_volumeScale + 1) *
-                                      (soundControl->m_volume >> REDSOUND_FIXED_SHIFT)) >>
-                                     REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;
+                            volume = (soundControl->m_volumeScale + 1) * (soundControl->m_volume >> REDSOUND_FIXED_SHIFT);
+                            volume >>= REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;
                             if (soundControl->m_masterVolumeDelta != 0) {
-                                volume = (volume * (soundControl->m_masterVolume >> REDSOUND_FIXED_SHIFT)) >>
-                                         REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
+                                volume *= soundControl->m_masterVolume >> REDSOUND_FIXED_SHIFT;
+                                volume >>= REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                             }
-                            volume = (volume * RedMasterMusicVolumeGet()) >> REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
+                            volume *= RedMasterMusicVolumeGet();
+                            volume >>= REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                         } else {
                             volume = 0;
                         }
@@ -2238,16 +2238,14 @@ static void _KeyOnControl()
                         if (!(voiceData->m_track < soundControl->m_tracks) &&
                             (voiceData->m_track < RedSoundControlGetTrackEnd(soundControl))) {
                             if ((RedMuteGetMask(voiceData->m_track->m_trackNo) & RedMuteGetWord(voiceData->m_track->m_trackNo)) == 0) {
-                                volume = ((soundControl->m_volumeScale + 1) *
-                                          (soundControl->m_volume >> REDSOUND_FIXED_SHIFT)) >>
-                                         REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;
+                                volume = (soundControl->m_volumeScale + 1) * (soundControl->m_volume >> REDSOUND_FIXED_SHIFT);
+                                volume >>= REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;
                                 if (soundControl->m_masterVolumeDelta != 0) {
-                                    volume = (volume * (soundControl->m_masterVolume >>
-                                                        REDSOUND_FIXED_SHIFT)) >>
-                                              REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
+                                    volume *= soundControl->m_masterVolume >> REDSOUND_FIXED_SHIFT;
+                                    volume >>= REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                                 }
-                                volume = (volume * RedMasterMusicVolumeGet()) >>
-                                         REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
+                                volume *= RedMasterMusicVolumeGet();
+                                volume >>= REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                             } else {
                                 volume = 0;
                             }

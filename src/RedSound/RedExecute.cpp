@@ -1252,7 +1252,8 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
             volumeScaleValue = 0;
         }
         velocityScaleValue = volumeScaleValue;
-        voiceMixVolume = voiceMixVolume * velocityScaleValue >> REDSOUND_VOLUME_MOD_SCALE_SHIFT;
+        voiceMixVolume *= velocityScaleValue;
+        voiceMixVolume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
     }
 
     volumeScaleValue = voice->m_track->m_mixVolume >> REDSOUND_FIXED_SHIFT;
@@ -1260,13 +1261,16 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         volumeScaleValue = volumeScaleValue + 1;
     }
 
-    voiceMixVolume = voiceMixVolume * volumeScaleValue >> REDSOUND_VOLUME_MOD_SCALE_SHIFT;
-    voiceMixVolume = voiceMixVolume * (*voice->m_trackVolume >> REDSOUND_FIXED_SHIFT) >> REDSOUND_VOLUME_TRACK_SCALE_SHIFT;
+    voiceMixVolume *= volumeScaleValue;
+    voiceMixVolume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
+    voiceMixVolume *= *voice->m_trackVolume >> REDSOUND_FIXED_SHIFT;
+    voiceMixVolume >>= REDSOUND_VOLUME_TRACK_SCALE_SHIFT;
     panPosition = voice->m_waveData->m_volume & REDSOUND_PAN_BYTE_MASK;
     if (panPosition != 0) {
         panPosition = panPosition + 1;
     }
-    voiceMixVolume = voiceMixVolume * panPosition >> REDSOUND_VOLUME_MOD_SCALE_SHIFT;
+    voiceMixVolume *= panPosition;
+    voiceMixVolume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
 
     if (voice->m_track->m_tremoloFunc != 0) {
         if (voice->m_volumeModDelay == 0) {
@@ -1278,7 +1282,8 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
             tremoloVolume = voiceMixVolume * volumeScaleValue >> REDSOUND_VOLUME_TREMOLO_DEPTH_SHIFT;
             volumeScaleValue = voice->m_track->m_tremoloFunc((unsigned int)voice->m_volumeModPhase >> REDSOUND_FIXED_SHIFT);
             tremoloRampFrames = voice->m_volumeModFrames;
-            tremoloVolume = tremoloVolume * (volumeScaleValue >> REDSOUND_VOLUME_MOD_WAVE_SHIFT) >> REDSOUND_FIXED_SHIFT;
+            tremoloVolume *= volumeScaleValue >> REDSOUND_VOLUME_MOD_WAVE_SHIFT;
+            tremoloVolume >>= REDSOUND_FIXED_SHIFT;
 
             if (tremoloRampFrames != 0) {
                 volumeScaleValue = voice->m_volumeModFrame;

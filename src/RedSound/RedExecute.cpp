@@ -2143,11 +2143,10 @@ static void _KeyOnControl()
     RedVoiceStartMask voiceStartMask;
     RedKeyOnSlot* reserve;
     RedVoiceDATA* voiceData;
-    int shakeDepth;
+    int work;
     RedSoundCONTROL* soundControl;
     RedTrackDATA* track;
     int volume;
-    u32 bit;
 
     _VoiceEnvelopeCheck();
     voiceStartMask.m_high = 0;
@@ -2170,9 +2169,9 @@ static void _KeyOnControl()
         track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
-                shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
+                work = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
                 track->m_shakePan =
-                    (shakeDepth * track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
+                    (work * track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
                     REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
@@ -2186,9 +2185,9 @@ static void _KeyOnControl()
         track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
-                shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
+                work = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
                 track->m_shakePan =
-                    (shakeDepth * track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
+                    (work * track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
                     REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
@@ -2201,9 +2200,9 @@ static void _KeyOnControl()
         track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
-                shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
+                work = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
                 track->m_shakePan =
-                    (shakeDepth * track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
+                    (work * track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
                     REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
@@ -2235,16 +2234,15 @@ static void _KeyOnControl()
                             volume = 0;
                         }
                     } else {
-                        RedSoundCONTROL* secondaryControl =
-                            &soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY];
-                        if (!(voiceData->m_track < secondaryControl->m_tracks) &&
-                            (voiceData->m_track < RedSoundControlGetTrackEnd(secondaryControl))) {
+                        soundControl = &soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY];
+                        if (!(voiceData->m_track < soundControl->m_tracks) &&
+                            (voiceData->m_track < RedSoundControlGetTrackEnd(soundControl))) {
                             if ((RedMuteGetMask(voiceData->m_track->m_trackNo) & RedMuteGetWord(voiceData->m_track->m_trackNo)) == 0) {
-                                volume = ((secondaryControl->m_volumeScale + 1) *
-                                          (secondaryControl->m_volume >> REDSOUND_FIXED_SHIFT)) >>
+                                volume = ((soundControl->m_volumeScale + 1) *
+                                          (soundControl->m_volume >> REDSOUND_FIXED_SHIFT)) >>
                                          REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;
-                                if (secondaryControl->m_masterVolumeDelta != 0) {
-                                    volume = (volume * (secondaryControl->m_masterVolume >>
+                                if (soundControl->m_masterVolumeDelta != 0) {
+                                    volume = (volume * (soundControl->m_masterVolume >>
                                                         REDSOUND_FIXED_SHIFT)) >>
                                               REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                                 }
@@ -2272,26 +2270,26 @@ static void _KeyOnControl()
 
     {
         voiceData = RedVoiceDataGetBegin();
-        bit = 1;
+        work = 1;
         do {
-            if ((voiceStartMask.m_low & bit) != 0) {
-                voiceStartMask.m_low &= ~bit;
+            if ((voiceStartMask.m_low & work) != 0) {
+                voiceStartMask.m_low &= ~work;
                 voiceData->m_flags |= REDSOUND_VOICE_FLAGS_START;
             }
-            bit <<= 1;
+            work <<= 1;
             voiceData++;
         } while (voiceStartMask.m_low != 0);
     }
 
     {
         voiceData = RedVoiceDataGet(REDSOUND_MUTE_BITS_PER_WORD);
-        bit = 1;
+        work = 1;
         do {
-            if ((voiceStartMask.m_high & bit) != 0) {
-                voiceStartMask.m_high &= ~bit;
+            if ((voiceStartMask.m_high & work) != 0) {
+                voiceStartMask.m_high &= ~work;
                 voiceData->m_flags |= REDSOUND_VOICE_FLAGS_START;
             }
-            bit <<= 1;
+            work <<= 1;
             voiceData++;
         } while (voiceStartMask.m_high != 0);
     }

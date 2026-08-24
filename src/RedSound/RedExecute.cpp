@@ -2151,11 +2151,10 @@ static void _KeyOnControl()
     u32 bit;
 
     _VoiceEnvelopeCheck();
-    int keyOnEntry = RedKeyOnEntryGet();
     voiceStartMask.m_high = 0;
     voiceStartMask.m_low = 0;
 
-    if (keyOnEntry != 0) {
+    if (RedKeyOnEntryGet() != 0) {
         reserve = RedKeyOnGetFixedBegin(RedKeyOnDataGet());
         voiceData = RedVoiceDataGetBegin();
         do {

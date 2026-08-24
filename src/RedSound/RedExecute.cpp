@@ -2146,7 +2146,6 @@ static void _KeyOnControl()
     int shakeDepth;
     RedSoundCONTROL* soundControl;
     RedTrackDATA* track;
-    RedVoiceDATA* voice;
     int volume;
     u32 bit;
 
@@ -2213,17 +2212,17 @@ static void _KeyOnControl()
     }
 
     {
-        voice = RedVoiceDataGetBegin();
+        voiceData = RedVoiceDataGetBegin();
         do {
-            if ((voice->m_active != REDSOUND_VOICE_ACTIVE_OFF) && (voice->m_track != 0) &&
-                ((voice->m_track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_SKIP_UPDATE) == 0)) {
-                if ((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_VOLUME) != 0 ||
-                    (voice->m_track->m_tremoloFunc != 0) ||
-                    (voice->m_track->m_shakeFunc != 0)) {
+            if ((voiceData->m_active != REDSOUND_VOICE_ACTIVE_OFF) && (voiceData->m_track != 0) &&
+                ((voiceData->m_track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_SKIP_UPDATE) == 0)) {
+                if ((voiceData->m_updateFlags & REDSOUND_VOICE_UPDATE_VOLUME) != 0 ||
+                    (voiceData->m_track->m_tremoloFunc != 0) ||
+                    (voiceData->m_track->m_shakeFunc != 0)) {
                     soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
-                    if (!(voice->m_track < soundControl->m_tracks) &&
-                        (voice->m_track < RedSoundControlGetTrackEnd(soundControl))) {
-                        if ((RedMuteGetMask(voice->m_track->m_trackNo) & RedMuteGetWord(voice->m_track->m_trackNo)) == 0) {
+                    if (!(voiceData->m_track < soundControl->m_tracks) &&
+                        (voiceData->m_track < RedSoundControlGetTrackEnd(soundControl))) {
+                        if ((RedMuteGetMask(voiceData->m_track->m_trackNo) & RedMuteGetWord(voiceData->m_track->m_trackNo)) == 0) {
                             volume = ((soundControl->m_volumeScale + 1) *
                                       (soundControl->m_volume >> REDSOUND_FIXED_SHIFT)) >>
                                      REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;
@@ -2238,9 +2237,9 @@ static void _KeyOnControl()
                     } else {
                         RedSoundCONTROL* secondaryControl =
                             &soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY];
-                        if (!(voice->m_track < secondaryControl->m_tracks) &&
-                            (voice->m_track < RedSoundControlGetTrackEnd(secondaryControl))) {
-                            if ((RedMuteGetMask(voice->m_track->m_trackNo) & RedMuteGetWord(voice->m_track->m_trackNo)) == 0) {
+                        if (!(voiceData->m_track < secondaryControl->m_tracks) &&
+                            (voiceData->m_track < RedSoundControlGetTrackEnd(secondaryControl))) {
+                            if ((RedMuteGetMask(voiceData->m_track->m_trackNo) & RedMuteGetWord(voiceData->m_track->m_trackNo)) == 0) {
                                 volume = ((secondaryControl->m_volumeScale + 1) *
                                           (secondaryControl->m_volume >> REDSOUND_FIXED_SHIFT)) >>
                                          REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;
@@ -2258,42 +2257,42 @@ static void _KeyOnControl()
                             volume = RedMasterSEVolumeGet();
                         }
                     }
-                    _VolumeExecute(voice, volume);
+                    _VolumeExecute(voiceData, volume);
                 }
 
-                if ((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) |
-                    (u32)voice->m_track->m_vibrateFunc) {
-                    _PitchExecute(voice);
+                if ((voiceData->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) |
+                    (u32)voiceData->m_track->m_vibrateFunc) {
+                    _PitchExecute(voiceData);
                 }
-                voice->m_updateFlags = 0;
+                voiceData->m_updateFlags = 0;
             }
-            voice++;
-        } while (voice < RedVoiceDataGetEnd());
+            voiceData++;
+        } while (voiceData < RedVoiceDataGetEnd());
     }
 
     {
-        voice = RedVoiceDataGetBegin();
+        voiceData = RedVoiceDataGetBegin();
         bit = 1;
         do {
             if ((voiceStartMask.m_low & bit) != 0) {
                 voiceStartMask.m_low &= ~bit;
-                voice->m_flags |= REDSOUND_VOICE_FLAGS_START;
+                voiceData->m_flags |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
-            voice++;
+            voiceData++;
         } while (voiceStartMask.m_low != 0);
     }
 
     {
-        voice = RedVoiceDataGet(REDSOUND_MUTE_BITS_PER_WORD);
+        voiceData = RedVoiceDataGet(REDSOUND_MUTE_BITS_PER_WORD);
         bit = 1;
         do {
             if ((voiceStartMask.m_high & bit) != 0) {
                 voiceStartMask.m_high &= ~bit;
-                voice->m_flags |= REDSOUND_VOICE_FLAGS_START;
+                voiceData->m_flags |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
-            voice++;
+            voiceData++;
         } while (voiceStartMask.m_high != 0);
     }
 }

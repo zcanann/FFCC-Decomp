@@ -2170,9 +2170,9 @@ static void _KeyOnControl()
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 work = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
-                track->m_shakePan =
-                    (work * track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
-                    REDSOUND_SHAKE_PAN_SCALE_SHIFT;
+                work *= track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
+                work >>= REDSOUND_SHAKE_PAN_SCALE_SHIFT;
+                track->m_shakePan = work;
                 track->m_shakeOutput += track->m_shakeRate;
             }
             track++;
@@ -2186,9 +2186,9 @@ static void _KeyOnControl()
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 work = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
-                track->m_shakePan =
-                    (work * track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
-                    REDSOUND_SHAKE_PAN_SCALE_SHIFT;
+                work *= track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
+                work >>= REDSOUND_SHAKE_PAN_SCALE_SHIFT;
+                track->m_shakePan = work;
                 track->m_shakeOutput += track->m_shakeRate;
             }
             track++;
@@ -2201,9 +2201,9 @@ static void _KeyOnControl()
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 work = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
-                track->m_shakePan =
-                    (work * track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
-                    REDSOUND_SHAKE_PAN_SCALE_SHIFT;
+                work *= track->m_shakeFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
+                work >>= REDSOUND_SHAKE_PAN_SCALE_SHIFT;
+                track->m_shakePan = work;
                 track->m_shakeOutput += track->m_shakeRate;
             }
             track++;

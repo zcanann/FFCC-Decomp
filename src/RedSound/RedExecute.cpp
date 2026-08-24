@@ -1353,42 +1353,44 @@ static void _PitchExecute(RedVoiceDATA* voice)
 {
     int adjustedPitchDelta = 0;
     int vibratoPitchDelta = 0;
+    int pitchWork;
+    int basePitch;
+    int vibratoWave;
 
     if ((voice->m_track->m_vibrateFunc != 0) && (voice->m_pitchModDelay == 0)) {
-        int vibratoDepth = voice->m_track->m_vibrateDepth >> REDSOUND_FIXED_SHIFT;
-        if (vibratoDepth < REDSOUND_PITCH_MOD_DEPTH_SPLIT) {
-            vibratoPitchDelta = (vibratoDepth + 1) * REDSOUND_PITCH_MOD_SHALLOW_SCALE;
+        pitchWork = voice->m_track->m_vibrateDepth >> REDSOUND_FIXED_SHIFT;
+        if (pitchWork < REDSOUND_PITCH_MOD_DEPTH_SPLIT) {
+            vibratoPitchDelta = (pitchWork + 1) * REDSOUND_PITCH_MOD_SHALLOW_SCALE;
         } else {
-            vibratoPitchDelta = ((vibratoDepth & REDSOUND_PAN_BYTE_MASK) + 1) * REDSOUND_PITCH_MOD_DEEP_SCALE;
+            vibratoPitchDelta = ((pitchWork & REDSOUND_PAN_BYTE_MASK) + 1) * REDSOUND_PITCH_MOD_DEEP_SCALE;
         }
 
-        int pitchOffset = voice->m_track->m_keyTranspose + voice->m_track->m_pitchBend + vibratoPitchDelta;
-        int basePitch;
+        pitchWork = voice->m_track->m_keyTranspose + voice->m_track->m_pitchBend + vibratoPitchDelta;
         if (RedVoiceIsPlaying(voice)) {
             basePitch = voice->m_basePitch + voice->m_track->m_pitch;
         } else {
             basePitch = voice->m_basePitch + RedMusicPitchControlGetValue();
         }
-        vibratoPitchDelta = PitchCompute(basePitch, pitchOffset, voice->m_waveData->m_pitch, voice->m_track->m_fineTune);
+        pitchWork = PitchCompute(basePitch, pitchWork, voice->m_waveData->m_pitch, voice->m_track->m_fineTune);
 
-        vibratoPitchDelta -= voice->m_pitch;
-        int vibratoWave = voice->m_track->m_vibrateFunc((u32)voice->m_pitchModPhase >> REDSOUND_FIXED_SHIFT);
-        vibratoPitchDelta *= vibratoWave >> REDSOUND_PITCH_MOD_WAVE_SHIFT;
-        vibratoPitchDelta >>= REDSOUND_FIXED_SHIFT;
+        pitchWork -= voice->m_pitch;
+        vibratoWave = voice->m_track->m_vibrateFunc((u32)voice->m_pitchModPhase >> REDSOUND_FIXED_SHIFT);
+        pitchWork *= vibratoWave >> REDSOUND_PITCH_MOD_WAVE_SHIFT;
+        pitchWork >>= REDSOUND_FIXED_SHIFT;
 
         if (voice->m_pitchModFrames != 0) {
-            vibratoPitchDelta *= voice->m_pitchModFrame;
+            pitchWork *= voice->m_pitchModFrame;
             voice->m_pitchModFrame = voice->m_pitchModFrame + 1;
-            vibratoPitchDelta /= voice->m_pitchModFrames;
+            pitchWork /= voice->m_pitchModFrames;
             if (voice->m_pitchModFrame >= voice->m_pitchModFrames) {
                 voice->m_pitchModFrames = 0;
             }
         }
 
-        if (vibratoPitchDelta < 0) {
-            adjustedPitchDelta = vibratoPitchDelta >> REDSOUND_PITCH_MOD_NEGATIVE_HALF_SHIFT;
+        if (pitchWork < 0) {
+            adjustedPitchDelta = pitchWork >> REDSOUND_PITCH_MOD_NEGATIVE_HALF_SHIFT;
         } else {
-            adjustedPitchDelta = vibratoPitchDelta;
+            adjustedPitchDelta = pitchWork;
         }
 
         voice->m_pitchModPhase += voice->m_track->m_vibrateRate;

@@ -1960,9 +1960,9 @@ void EnvelopeKeyExecute()
     int voiceIndex = 0;
 
     do {
-        if (voiceData->m_active != REDSOUND_VOICE_ACTIVE_OFF) {
-            AXVPB* voice;
+        AXVPB* voice;
 
+        if (voiceData->m_active != REDSOUND_VOICE_ACTIVE_OFF) {
             if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_START) != 0) {
                 if ((voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE) &&
                     (voiceData->m_axVoice->priority != 0)) {
@@ -2121,7 +2121,7 @@ void EnvelopeKeyExecute()
         } else {
             voiceData->m_envelopeLevel = 0;
             voiceData->m_waveData = REDSOUND_WAVE_DATA_NONE;
-            AXVPB* voice = voiceData->m_axVoice;
+            voice = voiceData->m_axVoice;
             if (voice != REDSOUND_AX_VOICE_NONE) {
                 if (voice->pb.state != REDSOUND_AX_VOICE_STOP) {
                     voice->pb.state = REDSOUND_AX_VOICE_STOP;

@@ -1537,12 +1537,15 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     }
     workValue = basePitch;
 
-    if (voice->m_waveData != 0) {
-        workValue = PitchCompute(workValue, pitchWork, voice->m_waveData->m_pitch, track->m_fineTune);
-    } else {
-        workValue = 0;
+    {
+        int s;
+        if (voice->m_waveData != 0) {
+            s = PitchCompute(workValue, pitchWork, voice->m_waveData->m_pitch, track->m_fineTune);
+        } else {
+            s = 0;
+        }
+        voice->m_pitch = s;
     }
-    voice->m_pitch = workValue;
 
     if ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR_RELEASE) != 0) {
         if (!RedNoteAllocHasDirectMask(track->m_note.m_allocFlags) ||
@@ -1561,12 +1564,15 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
             pitchWork =
                 pitchWork / (track->m_vibrateRate >> REDSOUND_FIXED_SHIFT);
         }
-        if (track->m_vibrateDelayDepth != 0) {
-            workValue = track->m_vibrateDelayDepth * (pitchWork * REDSOUND_MOD_DELAY_FRAME_SCALE);
-        } else {
-            workValue = 0;
+        {
+            int s;
+            if (track->m_vibrateDelayDepth != 0) {
+                s = track->m_vibrateDelayDepth * (pitchWork * REDSOUND_MOD_DELAY_FRAME_SCALE);
+            } else {
+                s = 0;
+            }
+            voice->m_pitchModFrames = s;
         }
-        voice->m_pitchModFrames = workValue;
         voice->m_pitchModFrame = 0;
         voice->m_pitchModPhase = 0;
     }
@@ -1578,12 +1584,15 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
             pitchWork =
                 pitchWork / (track->m_tremoloRate >> REDSOUND_FIXED_SHIFT);
         }
-        if (track->m_tremoloDelayDepth != 0) {
-            workValue = track->m_tremoloDelayDepth * (pitchWork * REDSOUND_MOD_DELAY_FRAME_SCALE);
-        } else {
-            workValue = 0;
+        {
+            int s;
+            if (track->m_tremoloDelayDepth != 0) {
+                s = track->m_tremoloDelayDepth * (pitchWork * REDSOUND_MOD_DELAY_FRAME_SCALE);
+            } else {
+                s = 0;
+            }
+            voice->m_volumeModFrames = s;
         }
-        voice->m_volumeModFrames = workValue;
         voice->m_volumeModFrame = 0;
         voice->m_volumeModPhase = 0;
     }

@@ -1973,8 +1973,9 @@ void EnvelopeKeyExecute()
                 if (RedVoiceIsPlaying(voiceData)) {
                     voiceData->m_axVoice = AXAcquireVoice(REDSOUND_VOICE_INDEX_MASK, _VoiceDropedCallback, 0);
                 } else {
-                    int prio = RedVoiceDataGetIndex(voiceData);
-                    prio = (REDSOUND_VOICE_COUNT - prio >> REDSOUND_AX_PRIORITY_HALF_SHIFT) - 1;
+                    int prio = REDSOUND_VOICE_COUNT - RedVoiceDataGetIndex(voiceData) >>
+                               REDSOUND_AX_PRIORITY_HALF_SHIFT;
+                    prio -= 1;
                     if (prio < 1) {
                         prio = 1;
                     }

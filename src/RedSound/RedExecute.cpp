@@ -1961,6 +1961,7 @@ void EnvelopeKeyExecute()
 
     do {
         AXVPB* voice;
+        int work;
 
         if (voiceData->m_active != REDSOUND_VOICE_ACTIVE_OFF) {
             if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_START) != 0) {
@@ -1973,13 +1974,13 @@ void EnvelopeKeyExecute()
                 if (RedVoiceIsPlaying(voiceData)) {
                     voiceData->m_axVoice = AXAcquireVoice(REDSOUND_VOICE_INDEX_MASK, _VoiceDropedCallback, 0);
                 } else {
-                    int prio = REDSOUND_VOICE_COUNT - RedVoiceDataGetIndex(voiceData) >>
-                               REDSOUND_AX_PRIORITY_HALF_SHIFT;
-                    prio -= 1;
-                    if (prio < 1) {
-                        prio = 1;
+                    work = REDSOUND_VOICE_COUNT - RedVoiceDataGetIndex(voiceData) >>
+                           REDSOUND_AX_PRIORITY_HALF_SHIFT;
+                    work -= 1;
+                    if (work < 1) {
+                        work = 1;
                     }
-                    voiceData->m_axVoice = AXAcquireVoice(prio, _VoiceDropedCallback, 0);
+                    voiceData->m_axVoice = AXAcquireVoice(work, _VoiceDropedCallback, 0);
                 }
             }
 
@@ -2051,17 +2052,16 @@ void EnvelopeKeyExecute()
                     voice->pb.addr.currentAddressLo = (u16)sampleAddress;
                     sampleAddress -= REDSOUND_AX_SAMPLE_ADDR_SCALE;
 
-                    int loopAddress;
                     if (waveData->m_loopStart < 0) {
                         voice->pb.addr.loopFlag = REDSOUND_AX_VOICE_LOOP_OFF;
-                        loopAddress = sampleAddress;
+                        work = sampleAddress;
                     } else {
                         voice->pb.addr.loopFlag = REDSOUND_AX_VOICE_LOOP_ON;
-                        loopAddress = sampleAddress + waveData->m_loopStart;
+                        work = sampleAddress + waveData->m_loopStart;
                     }
 
-                    voice->pb.addr.loopAddressHi = (u16)(loopAddress >> REDSOUND_AX_HIGH_WORD_SHIFT);
-                    voice->pb.addr.loopAddressLo = (u16)loopAddress;
+                    voice->pb.addr.loopAddressHi = (u16)(work >> REDSOUND_AX_HIGH_WORD_SHIFT);
+                    voice->pb.addr.loopAddressLo = (u16)work;
                     sampleAddress = sampleAddress + waveData->m_loopEnd;
                     voice->pb.addr.endAddressHi = (u16)(sampleAddress >> REDSOUND_AX_HIGH_WORD_SHIFT);
                     voice->pb.addr.endAddressLo = (u16)sampleAddress;

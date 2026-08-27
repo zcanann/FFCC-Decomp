@@ -3043,9 +3043,13 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 			step = s;
 		track->m_mixVolumeDelta -= step;
-		if ((track->m_mixVolumeDelta == 0) && (track->m_mixVolumeMode == REDSOUND_SE_VOLUME_MODE_FADE_OUT)) {
-			track->m_command = (u8*)RedTerminateNoteGet();
-			track->m_deltaTime = 1;
+		if (track->m_mixVolumeDelta == 0) {
+			switch (track->m_mixVolumeMode) {
+			case REDSOUND_SE_VOLUME_MODE_FADE_OUT:
+				track->m_command = (u8*)RedTerminateNoteGet();
+				track->m_deltaTime = 1;
+				break;
+			}
 		}
 		track->m_mixVolume += track->m_mixVolumeAdd * step;
 		voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
@@ -3081,9 +3085,9 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 
 	if (((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0) && (voice->m_waveData != 0)) {
 		int pitchOffset = (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend;
+		int basePitch = voice->m_basePitch + track->m_pitch;
 		voice->m_pitch =
-			PitchCompute(voice->m_basePitch + track->m_pitch, pitchOffset, voice->m_waveData->m_pitch,
-			             track->m_fineTune);
+			PitchCompute(basePitch, pitchOffset, voice->m_waveData->m_pitch, track->m_fineTune);
 	}
 
 	if (track->m_vibrateFunc != 0) {

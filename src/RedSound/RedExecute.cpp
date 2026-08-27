@@ -2247,10 +2247,11 @@ static void _KeyOnControl()
                             volume = 0;
                         }
                     } else {
-                        soundControl = &soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY];
-                        if (!(voiceData->m_track < soundControl->m_tracks) &&
-                            (voiceData->m_track < RedSoundControlGetTrackEnd(soundControl))) {
+                        if (!(voiceData->m_track < soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks) &&
+                            (voiceData->m_track <
+                             RedSoundControlGetTrackEnd(&soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY]))) {
                             if ((RedMuteGetMask(voiceData->m_track->m_trackNo) & RedMuteGetWord(voiceData->m_track->m_trackNo)) == 0) {
+                                soundControl = &soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY];
                                 volume = (soundControl->m_volumeScale + 1) * (soundControl->m_volume >> REDSOUND_FIXED_SHIFT);
                                 volume >>= REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;
                                 if (soundControl->m_masterVolumeDelta != 0) {

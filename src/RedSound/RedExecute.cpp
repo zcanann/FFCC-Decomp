@@ -1144,8 +1144,8 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_STEREO) != 0) {
-            leftMix =
-                (leftMix * ((track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT;
+            leftMix *= (track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1;
+            leftMix >>= REDSOUND_AX_MIX_SHIFT;
             if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
                 axMix->vAuxAL = (u16)leftMix;
                 axMix->vAuxAR = (u16)leftMix;
@@ -1163,23 +1163,25 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
                                 REDSOUND_PAN_MIX_SHIFT);
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_LEFT) != 0) {
-            axMix->vAuxAL =
-                (u16)((int)((u32)axMix->vL * ((track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT);
-            axMix->vAuxAS =
-                (u16)((int)((u32)axMix->vAuxBL *
-                             ((track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >>
-                      REDSOUND_AX_MIX_SHIFT);
+            leftMix = axMix->vL;
+            leftMix *= (track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1;
+            leftMix >>= REDSOUND_AX_MIX_SHIFT;
+            axMix->vAuxAL = (u16)leftMix;
+            leftMix = axMix->vAuxBL;
+            leftMix *= (track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1;
+            leftMix >>= REDSOUND_AX_MIX_SHIFT;
+            axMix->vAuxAS = (u16)leftMix;
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_RIGHT) != 0) {
-            axMix->vAuxAR =
-                (u16)((int)((u32)axMix->vR *
-                             ((track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >>
-                      REDSOUND_AX_MIX_SHIFT);
-            axMix->vAuxBS =
-                (u16)((int)((u32)axMix->vAuxBR *
-                             ((track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >>
-                      REDSOUND_AX_MIX_SHIFT);
+            leftMix = axMix->vR;
+            leftMix *= (track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1;
+            leftMix >>= REDSOUND_AX_MIX_SHIFT;
+            axMix->vAuxAR = (u16)leftMix;
+            leftMix = axMix->vAuxBR;
+            leftMix *= (track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1;
+            leftMix >>= REDSOUND_AX_MIX_SHIFT;
+            axMix->vAuxBS = (u16)leftMix;
         }
         break;
     default:
@@ -1199,7 +1201,8 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_LEFT) != 0) {
-            leftMix = (leftMix * ((track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT;
+            leftMix *= (track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1;
+            leftMix >>= REDSOUND_AX_MIX_SHIFT;
             if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
                 axMix->vAuxAL = (u16)leftMix;
             } else {
@@ -1208,7 +1211,8 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
         }
 
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_RIGHT) != 0) {
-            rightMix = (rightMix * ((track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1)) >> REDSOUND_AX_MIX_SHIFT;
+            rightMix *= (track->m_reverbDepth >> REDSOUND_FIXED_SHIFT) + 1;
+            rightMix >>= REDSOUND_AX_MIX_SHIFT;
             if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_REVERB_AUX_A) != 0) {
                 axMix->vAuxAR = (u16)rightMix;
             } else {

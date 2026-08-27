@@ -2049,19 +2049,20 @@ void EnvelopeKeyExecute()
                     sampleAddress *= REDSOUND_AX_SAMPLE_ADDR_SCALE;
                     voice->pb.addr.currentAddressHi = (u16)(sampleAddress >> REDSOUND_AX_HIGH_WORD_SHIFT);
                     voice->pb.addr.currentAddressLo = (u16)sampleAddress;
-                    int sampleBaseAddress = sampleAddress - REDSOUND_AX_SAMPLE_ADDR_SCALE;
+                    sampleAddress -= REDSOUND_AX_SAMPLE_ADDR_SCALE;
 
+                    int loopAddress;
                     if (waveData->m_loopStart < 0) {
                         voice->pb.addr.loopFlag = REDSOUND_AX_VOICE_LOOP_OFF;
-                        sampleAddress = sampleBaseAddress;
+                        loopAddress = sampleAddress;
                     } else {
                         voice->pb.addr.loopFlag = REDSOUND_AX_VOICE_LOOP_ON;
-                        sampleAddress = sampleBaseAddress + waveData->m_loopStart;
+                        loopAddress = sampleAddress + waveData->m_loopStart;
                     }
 
-                    voice->pb.addr.loopAddressHi = (u16)(sampleAddress >> REDSOUND_AX_HIGH_WORD_SHIFT);
-                    voice->pb.addr.loopAddressLo = (u16)sampleAddress;
-                    sampleAddress = sampleBaseAddress + waveData->m_loopEnd;
+                    voice->pb.addr.loopAddressHi = (u16)(loopAddress >> REDSOUND_AX_HIGH_WORD_SHIFT);
+                    voice->pb.addr.loopAddressLo = (u16)loopAddress;
+                    sampleAddress = sampleAddress + waveData->m_loopEnd;
                     voice->pb.addr.endAddressHi = (u16)(sampleAddress >> REDSOUND_AX_HIGH_WORD_SHIFT);
                     voice->pb.addr.endAddressLo = (u16)sampleAddress;
 

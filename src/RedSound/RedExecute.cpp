@@ -2163,7 +2163,7 @@ static void _KeyOnControl()
     int volume;
 
     _VoiceEnvelopeCheck();
-    voiceStartMask.m_high = voiceStartMask.m_low = 0;
+    voiceStartMask.m_low = voiceStartMask.m_high = 0;
 
     if (RedKeyOnEntryGet() != 0) {
         reserve = RedKeyOnGetFixedBegin(RedKeyOnDataGet());

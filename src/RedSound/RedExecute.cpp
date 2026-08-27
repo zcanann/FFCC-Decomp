@@ -1601,13 +1601,11 @@ skipModSetup:
 
     if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_PITCH) != 0) {
         unsigned int random = GetRandomData();
-        unsigned int randomSign = random & REDSOUND_RANDOM_BYTE_SIGN_BIT;
-        int randomScale = (int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1;
         pitchWork = voice->m_track->m_fuzzyPitchDepth;
         workValue = voice->m_pitch * pitchWork;
-        workValue *= randomScale;
+        workValue *= (int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1;
         pitchWork = workValue >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
-        if (randomSign != 0) {
+        if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) != 0) {
             voice->m_randomPitch = -(pitchWork >> REDSOUND_RANDOM_PITCH_NEGATIVE_HALF_SHIFT);
         } else {
             voice->m_randomPitch = pitchWork;
@@ -1674,8 +1672,7 @@ skipModSetup:
         memset(&voice->m_adsr, 0, REDSOUND_ADSR_DATA_SIZE);
     }
 
-    workValue = RedVoiceDataGetIndex(voice);
-    if (REDSOUND_VOICE_INDEX_MASK < workValue) {
+    if (REDSOUND_VOICE_INDEX_MASK < RedVoiceDataGetIndex(voice)) {
         voiceMask += 1;
     }
 

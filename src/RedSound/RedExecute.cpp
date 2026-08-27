@@ -2195,8 +2195,8 @@ static void _KeyOnControl()
 
     if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_activeTrackCount != 0) &&
         ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
+        track = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_tracks;
         soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY);
-        track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 work = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;

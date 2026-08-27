@@ -1234,7 +1234,6 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
     int tremoloVolume;
     int tremoloRampFrames;
     int panPosition;
-    int voiceMixVolume;
     int volumeScaleValue;
     int velocityScaleValue;
 
@@ -1242,8 +1241,8 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         volume = volume + 1;
     }
 
-    voiceMixVolume = volume * ((*voice->m_trackExpression >> REDSOUND_FIXED_SHIFT) + 1) >>
-               REDSOUND_VOLUME_MOD_SCALE_SHIFT;
+    volume *= (*voice->m_trackExpression >> REDSOUND_FIXED_SHIFT) + 1;
+    volume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
 
     if (voice->m_velocity != 0) {
         if (voice->m_velocity != 0) {
@@ -1252,8 +1251,8 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
             volumeScaleValue = 0;
         }
         velocityScaleValue = volumeScaleValue;
-        voiceMixVolume *= velocityScaleValue;
-        voiceMixVolume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
+        volume *= velocityScaleValue;
+        volume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
     }
 
     volumeScaleValue = voice->m_track->m_mixVolume >> REDSOUND_FIXED_SHIFT;
@@ -1261,16 +1260,16 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         volumeScaleValue = volumeScaleValue + 1;
     }
 
-    voiceMixVolume *= volumeScaleValue;
-    voiceMixVolume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
-    voiceMixVolume *= *voice->m_trackVolume >> REDSOUND_FIXED_SHIFT;
-    voiceMixVolume >>= REDSOUND_VOLUME_TRACK_SCALE_SHIFT;
+    volume *= volumeScaleValue;
+    volume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
+    volume *= *voice->m_trackVolume >> REDSOUND_FIXED_SHIFT;
+    volume >>= REDSOUND_VOLUME_TRACK_SCALE_SHIFT;
     panPosition = voice->m_waveData->m_volume & REDSOUND_PAN_BYTE_MASK;
     if (panPosition != 0) {
         panPosition = panPosition + 1;
     }
-    voiceMixVolume *= panPosition;
-    voiceMixVolume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
+    volume *= panPosition;
+    volume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
 
     if (voice->m_track->m_tremoloFunc != 0) {
         if (voice->m_volumeModDelay == 0) {
@@ -1279,7 +1278,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
                 volumeScaleValue = volumeScaleValue + 1;
             }
 
-            tremoloVolume = voiceMixVolume * volumeScaleValue >> REDSOUND_VOLUME_TREMOLO_DEPTH_SHIFT;
+            tremoloVolume = volume * volumeScaleValue >> REDSOUND_VOLUME_TREMOLO_DEPTH_SHIFT;
             volumeScaleValue = voice->m_track->m_tremoloFunc((unsigned int)voice->m_volumeModPhase >> REDSOUND_FIXED_SHIFT);
             tremoloRampFrames = voice->m_volumeModFrames;
             tremoloVolume *= volumeScaleValue >> REDSOUND_VOLUME_MOD_WAVE_SHIFT;
@@ -1294,13 +1293,13 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
                 }
             }
 
-            voiceMixVolume = voiceMixVolume + tremoloVolume;
+            volume = volume + tremoloVolume;
             voice->m_volumeModPhase = voice->m_volumeModPhase + voice->m_track->m_tremoloRate;
 
-            if (voiceMixVolume > REDSOUND_AX_MIX_MAX) {
-                voiceMixVolume = REDSOUND_AX_MIX_MAX;
-            } else if (voiceMixVolume < 0) {
-                voiceMixVolume = 0;
+            if (volume > REDSOUND_AX_MIX_MAX) {
+                volume = REDSOUND_AX_MIX_MAX;
+            } else if (volume < 0) {
+                volume = 0;
             }
         }
     }
@@ -1332,16 +1331,16 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
     }
 
     if (voice->m_randomVolume != 0) {
-        voiceMixVolume =
-            voiceMixVolume + (voiceMixVolume * voice->m_randomVolume >> REDSOUND_VOLUME_MOD_SCALE_SHIFT);
-        if (voiceMixVolume > REDSOUND_AX_MIX_MAX) {
-            voiceMixVolume = REDSOUND_AX_MIX_MAX;
-        } else if (voiceMixVolume < 0) {
-            voiceMixVolume = 0;
+        volume =
+            volume + (volume * voice->m_randomVolume >> REDSOUND_VOLUME_MOD_SCALE_SHIFT);
+        if (volume > REDSOUND_AX_MIX_MAX) {
+            volume = REDSOUND_AX_MIX_MAX;
+        } else if (volume < 0) {
+            volume = 0;
         }
     }
 
-    SetVoiceVolumeMix(voice, panPosition, voiceMixVolume);
+    SetVoiceVolumeMix(voice, panPosition, volume);
     voice->m_flags |= REDSOUND_VOICE_FLAGS_ADPCM_DIRTY;
 }
 

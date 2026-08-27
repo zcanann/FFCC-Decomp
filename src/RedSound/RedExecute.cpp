@@ -1232,10 +1232,9 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 static void _VolumeExecute(RedVoiceDATA* voice, int volume)
 {
     int tremoloVolume;
-    int tremoloRampFrames;
+    int tremoloWave;
     int panPosition;
     int volumeScaleValue;
-    int velocityScaleValue;
 
     if (volume != 0) {
         volume = volume + 1;
@@ -1245,13 +1244,14 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
     volume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
 
     if (voice->m_velocity != 0) {
+        int s;
         if (voice->m_velocity != 0) {
-            volumeScaleValue = voice->m_velocity + 1;
+            s = voice->m_velocity + 1;
         } else {
-            volumeScaleValue = 0;
+            s = 0;
         }
-        velocityScaleValue = volumeScaleValue;
-        volume *= velocityScaleValue;
+        volumeScaleValue = s;
+        volume *= volumeScaleValue;
         volume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
     }
 
@@ -1264,11 +1264,11 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
     volume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
     volume *= *voice->m_trackVolume >> REDSOUND_FIXED_SHIFT;
     volume >>= REDSOUND_VOLUME_TRACK_SCALE_SHIFT;
-    panPosition = voice->m_waveData->m_volume & REDSOUND_PAN_BYTE_MASK;
-    if (panPosition != 0) {
-        panPosition = panPosition + 1;
+    volumeScaleValue = voice->m_waveData->m_volume & REDSOUND_PAN_BYTE_MASK;
+    if (volumeScaleValue != 0) {
+        volumeScaleValue = volumeScaleValue + 1;
     }
-    volume *= panPosition;
+    volume *= volumeScaleValue;
     volume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
 
     if (voice->m_track->m_tremoloFunc != 0) {
@@ -1278,16 +1278,16 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
                 volumeScaleValue = volumeScaleValue + 1;
             }
 
-            tremoloVolume = volume * volumeScaleValue >> REDSOUND_VOLUME_TREMOLO_DEPTH_SHIFT;
-            volumeScaleValue = voice->m_track->m_tremoloFunc((unsigned int)voice->m_volumeModPhase >> REDSOUND_FIXED_SHIFT);
-            tremoloRampFrames = voice->m_volumeModFrames;
-            tremoloVolume *= volumeScaleValue >> REDSOUND_VOLUME_MOD_WAVE_SHIFT;
+            tremoloVolume = volume * volumeScaleValue;
+            tremoloVolume >>= REDSOUND_VOLUME_TREMOLO_DEPTH_SHIFT;
+            tremoloWave = voice->m_track->m_tremoloFunc((unsigned int)voice->m_volumeModPhase >> REDSOUND_FIXED_SHIFT);
+            tremoloVolume *= tremoloWave >> REDSOUND_VOLUME_MOD_WAVE_SHIFT;
             tremoloVolume >>= REDSOUND_FIXED_SHIFT;
 
-            if (tremoloRampFrames != 0) {
+            if (voice->m_volumeModFrames != 0) {
                 volumeScaleValue = voice->m_volumeModFrame;
                 voice->m_volumeModFrame = voice->m_volumeModFrame + 1;
-                tremoloVolume = (tremoloVolume * volumeScaleValue) / tremoloRampFrames;
+                tremoloVolume = (tremoloVolume * volumeScaleValue) / voice->m_volumeModFrames;
                 if (voice->m_volumeModFrame >= voice->m_volumeModFrames) {
                     voice->m_volumeModFrames = 0;
                 }

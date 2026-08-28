@@ -1812,7 +1812,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
     int stepFrames;
 
     nextLevel = adsrData->m_level[REDSOUND_VOICE_ADSR_ATTACK];
-    *stage    = 0;
+    voice->m_adsrStage = 0;
     do {
         prevLevel = nextLevel;
         stepFrames = adsrData->m_time[*stage];
@@ -1840,7 +1840,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
         }
         voice->m_adsrCurrentLevel = prevLevel;
         nextLevel |= REDSOUND_FIXED_HALF;
-        voice->m_adsrStepAdd = (nextLevel - prevLevel) / stepFrames;
+        stage[REDSOUND_ADSR_STATE_STEP_ADD] = (nextLevel - prevLevel) / stepFrames;
     } else {
         voice->m_adsrCurrentLevel = nextLevel;
     }

@@ -3185,7 +3185,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			s = voice->m_pitchModDelay;
 		}
 		step = s;
-		voice->m_pitchModDelay = voice->m_pitchModDelay - step;
+		voice->m_pitchModDelay -= step;
 	}
 
 	if (voice->m_volumeModDelay != 0) {
@@ -3196,7 +3196,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			s = voice->m_volumeModDelay;
 		}
 		step = s;
-		voice->m_volumeModDelay = voice->m_volumeModDelay - step;
+		voice->m_volumeModDelay -= step;
 	}
 }
 

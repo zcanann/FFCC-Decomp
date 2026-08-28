@@ -3217,13 +3217,14 @@ static int _SeMidiNoteExecute(
             track->m_seTickCounter -= tickStep * REDSOUND_SE_TICK_STEP;
             while (track->m_seTickCounter < 1) {
                 int clampedStep;
+                int executeStep;
                 track->m_seTickCounter += REDSOUND_CONTROL_TICK_PERIOD;
                 if (track->m_deltaTime < frames) {
                     clampedStep = track->m_deltaTime;
                 } else {
                     clampedStep = frames;
                 }
-                int executeStep = clampedStep;
+                executeStep = clampedStep;
                 track->m_deltaTime -= frames;
                 _SeTrackDataExecute(track, executeStep);
                 if (((track->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0) && (track->m_deltaTime == 1)) {
@@ -3233,12 +3234,10 @@ static int _SeMidiNoteExecute(
                 RedChangeStatusSet(0);
                 while ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_deltaTime < 1)) {
                     int deltaTime;
-                    unsigned char* commandPtr;
+                    int cmd;
                     track->m_loopStepCurrent += 1;
-                    commandPtr = track->m_command;
-                    track->m_command = commandPtr + 1;
-                    RedMidiControlFunc midiControlFunc = RedMidiControlFunctionGet(*commandPtr);
-                    midiControlFunc(control, keyOnData, track);
+                    cmd = RedTrackCommandReadU8(track);
+                    RedMidiControlFunctionGet(cmd)(control, keyOnData, track);
                     if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                         deltaTime = RedTrackCommandReadDeltaTime(track);
                         if (deltaTime != 0) {
@@ -3263,7 +3262,7 @@ static int _SeMidiNoteExecute(
                             } else {
                                 catchupStep = deltaTime;
                             }
-                            int executeStep = catchupStep;
+                            executeStep = catchupStep;
                             _SeTrackDataExecute(track, executeStep);
                         }
                         track->m_deltaTime += deltaTime;

@@ -2623,24 +2623,23 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
     do {
         if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
             int clampedStep;
+            int executeStep;
             RedChangeStatusSet(0);
             if (track->m_deltaTime < frames) {
                 clampedStep = track->m_deltaTime;
             } else {
                 clampedStep = frames;
             }
-            int executeStep = clampedStep;
+            executeStep = clampedStep;
             track->m_deltaTime -= frames;
             _MusicTrackDataExecute(track, executeStep);
             if (((track->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0) && (track->m_deltaTime == 1)) {
                 KeyOffSet(control, keyOnData, track);
             }
             while ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_deltaTime < 1)) {
-                unsigned char* command = track->m_command;
+                int cmd = RedTrackCommandReadU8(track);
                 int deltaTime;
-                track->m_command = command + 1;
-                RedMidiControlFunc func = RedMidiControlFunctionGet(*command);
-                func(control, keyOnData, track);
+                RedMidiControlFunctionGet(cmd)(control, keyOnData, track);
                 if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                     if (track->m_deltaTime < 1) {
                         deltaTime = RedTrackCommandReadDeltaTime(track);
@@ -2671,7 +2670,7 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
                         } else {
                             catchupStep = deltaTime;
                         }
-                        int executeStep = catchupStep;
+                        executeStep = catchupStep;
                         _MusicTrackDataExecute(track, executeStep);
                     }
                     track->m_deltaTime += deltaTime;

@@ -7,6 +7,8 @@ class CGame;
 
 class CMes
 {
+    friend class CMesMenu;
+
 public:
     class CFlag
     {

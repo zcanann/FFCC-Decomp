@@ -441,7 +441,7 @@ void CMesMenu::onDraw()
 {
     if ((m_menuIndex == 0) &&
         (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(CFlatGameFlags()) << 30) >> 31) != 0)) {
-        unsigned int iconFrame = 0;
+        int iconFrame = 0;
         int charaMode = Chara.MogFur().m_commandIndex;
         switch (charaMode) {
         case 0:
@@ -644,13 +644,12 @@ void CMesMenu::onDraw()
         float titleAlpha = FLOAT_80330908 * stageBlend;
         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).Ref());
         unsigned int frameMask = m_menuIndex;
-        int frameNegX = -(int)(frameMask & 1);
-        float frameX = baseX - (float)(frameNegX & 0x80);
-        float frameY = baseY - (float)(-(int)(frameMask >> 1 & 1) & 0x38);
+        float frameX = baseX - (float)((frameMask & 1) ? 0x80 : 0);
+        float frameY = baseY - (float)((frameMask & 2) ? 0x38 : 0);
         MenuPcs.DrawRect(
             0, frameX, frameY, FLOAT_80330964, FLOAT_80330948,
-            (float)(((int)(-(int)(frameMask & 2) | (int)(frameMask & 2)) >> 31) & 0x80),
-            (float)(((int)(frameNegX | (int)(frameMask & 1)) >> 31) & 0x38), FLOAT_80330914, FLOAT_80330914,
+            (float)(((frameMask & 2) != 0) ? 0x80 : 0),
+            (float)(((frameMask & 1) != 0) ? 0x38 : 0), FLOAT_80330914, FLOAT_80330914,
             FLOAT_803308d8);
 
         font->SetScale(FLOAT_8033094C);
@@ -861,8 +860,10 @@ void CMesMenu::onDraw()
             MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>((FLOAT_803308ec * alpha255) * stageBlend)).Ref());
             float promptX = (float)(int)(FLOAT_803308f8 + drawX);
             float promptY = (float)(int)(FLOAT_8033092c + drawY);
-            float waveX = promptX + FLOAT_80330984 * (pulseScale * sinX);
-            float waveY = promptY - FLOAT_80330988 * (pulseScale * sinY);
+            float driftX = FLOAT_80330984 * (pulseScale * sinX);
+            float driftY = FLOAT_80330988 * (pulseScale * sinY);
+            float waveX = promptX + driftX;
+            float waveY = promptY - driftY;
             float fadeScale = FLOAT_80330914 - pulseScale;
             float rotation = FLOAT_8033091c * (FLOAT_803308e8 * (time - FLOAT_803308ec));
             MenuPcs.DrawRect(
@@ -881,15 +882,19 @@ void CMesMenu::onDraw()
         }
     }
 
-    if ((m_state == 1) && (m_mes.GetWait() == 3)) {
-        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
-        MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80330908 * stageBlend)).Ref());
+    switch (m_state) {
+    case 1:
+        if (m_mes.GetWait() == 3) {
+            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
+            MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80330908 * stageBlend)).Ref());
 
-        MenuPcs.DrawRect(
-            0, FLOAT_80330994 + *(float*)((char*)this + 0x3CB8),
-            (float)*(int*)((char*)this + 0x3D34) * *(float*)((char*)this + 0x3D40) +
-                (FLOAT_803308e8 + *(float*)((char*)this + 0x3CBC) + *(float*)((char*)this + 0x3D3C)),
-            FLOAT_8033092c, FLOAT_8033092c, FLOAT_803308d8, FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
+            MenuPcs.DrawRect(
+                0, FLOAT_80330994 + m_mes.mBaseX,
+                (float)m_mes.mRubyHeight * m_mes.mRubySpacing +
+                    (FLOAT_803308e8 + m_mes.mBaseY + m_mes.mRubyY),
+                FLOAT_8033092c, FLOAT_8033092c, FLOAT_803308d8, FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
+        }
+        break;
     }
 }
 

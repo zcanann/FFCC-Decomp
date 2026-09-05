@@ -76,7 +76,6 @@ struct GbaQueuePlayerDataView
     unsigned char _padD5;
     unsigned char _padD6;
     unsigned char m_commandData[4];
-    unsigned char _padDB;
 };
 
 class GbaQueue

@@ -96,13 +96,6 @@ static inline int ReadTagS8(char** text)
 	return (int)ReadTagByte(text);
 }
 
-static inline unsigned short ReadMesChar(char** text)
-{
-	unsigned char* p = (unsigned char*)*text;
-	*text = (char*)(p + 1);
-	return *p;
-}
-
 static inline int ReadTagNibble(char** text)
 {
 	char* p = *text;
@@ -912,6 +905,7 @@ int CMes::GetWait()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma opt_lifetimes off
 void CMes::addString(char** text, int branchMode)
 {
 	int fontSel = mFontIndex;
@@ -948,7 +942,7 @@ void CMes::addString(char** text, int branchMode)
 	unsigned short uch;
 	while (running)
 	{
-		if ((uch = ReadMesChar(text)) == 0)
+		if ((uch = *(unsigned char*)(*text)++) == 0)
 		{
 			running = 0;
 			goto updateBounds;
@@ -1551,6 +1545,7 @@ void CMes::addString(char** text, int branchMode)
 		mLineHeight = (mCurrentY < mLineHeight) ? mLineHeight : mCurrentY;
 	}
 }
+#pragma opt_lifetimes reset
 
 /*
  * --INFO--

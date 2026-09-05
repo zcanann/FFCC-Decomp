@@ -95,6 +95,7 @@ void CMenuPcs::CompaDraw()
 	int familyCount;
 	int yStep;
 	float end;
+	float fillW;
 	CompaOpenAnim* entry = this->m_compaList->entries;
 	for (int i = 0; i < this->m_compaList->count; i++) {
 		int tex = entry->tex;
@@ -128,7 +129,7 @@ void CMenuPcs::CompaDraw()
 				colors[3].a = 0xFF;
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
-				float fillW = entry->alpha * w;
+				fillW = entry->alpha * w;
 				if (fillW > kCompaZero) {
 					if (entry->tex == 0x51) {
 						yStep = static_cast<int>(y);
@@ -161,7 +162,7 @@ void CMenuPcs::CompaDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					float remainW = static_cast<float>(1.0 / (double)entry->duration) * static_cast<float>(entry->w);
+					fillW = static_cast<float>(1.0 / (double)entry->duration) * static_cast<float>(entry->w);
 					if (entry->tex == 0x51) {
 						yStep = static_cast<int>(y);
 						end = y + h;
@@ -170,13 +171,13 @@ void CMenuPcs::CompaDraw()
 							int tileH = (diff >= kCompaTileHeight) ? 0x18 : static_cast<int>(diff);
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-								remainW, static_cast<float>(tileH), u, v,
+								fillW, static_cast<float>(tileH), u, v,
 								colors, kCompaOne, kCompaOne, kCompaZero);
 							yStep += 0x18;
 						}
 					} else {
 						MenuPcs.DrawRect(
-							static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,
+							static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v,
 							colors, kCompaOne, kCompaOne, kCompaZero);
 					}
 				}
@@ -219,16 +220,15 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
-	int yOffset = 0;
+	int yOffset;
 	for (int i = 0; i < familyCount; i++) {
-		float rowY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(yOffset);
+		float rowY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(i * 0x28);
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
 			rowY,
 			kCompaFoodIconWidth, kCompaFoodIconHeight, kCompaZero, kCompaZero, kCompaOne,
 			kCompaOne, kCompaZero);
-		yOffset += 0x28;
 	}
 
 	int drawIndex = 0;
@@ -253,8 +253,7 @@ void CMenuPcs::CompaDraw()
 			drawIndex = i;
 		}
 
-		int foodIdx = drawIndex + 1;
-		const u8* foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][foodIdx];
+		const u8* foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][1 + drawIndex];
 		if (*foodPtr == 0 && static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1E0,
 			              shown);

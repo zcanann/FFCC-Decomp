@@ -260,7 +260,7 @@ texanim.cpp:
 	.rodata     start:0x801D7AD0 end:0x801D7B80
 	.data       start:0x801E9C18 end:0x801E9C90
 	.sdata      start:0x8032E5A0 end:0x8032E5D8
-	.sdata2     start:0x8032FB38 end:0x8032FB50
+	.sdata2     start:0x8032FB30 end:0x8032FB50
 
 p_graphic.cpp:
 	extab       start:0x80006850 end:0x800068A8

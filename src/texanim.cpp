@@ -9,17 +9,9 @@
 #include <math.h>
 #include "dolphin/mtx.h"
 
-extern const float kTexAnimZero = 0.0f;
-extern const float kTexAnimOne = 1.0f;
-extern const double kTexAnimIntToDoubleBias = 4503599627370496.0;
 static const char s_texAnimSeqE1[] = "e1";
-extern const float kTexAnimChinFrameStep = 1.25f;
 
-static const char s_CTexAnimSeq[] = "CTexAnimSeq";
 static const char s_texanim_cpp[] = "texanim.cpp";
-static const char s_CTexAnim_CRefData[] = "CTexAnim::CRefData";
-static const char s_CTexAnim[] = "CTexAnim";
-static const char s_CTexAnimSet[] = "CTexAnimSet";
 static const char sTexAnimPtrArrayGrowError[] = {
     0x83, 0x6f, 0x83, 0x62, 0x83, 0x74, 0x83, 0x40, 0x90, 0xac, 0x92, 0xb7, 0x82, 0xaa,
     0x95, 0x73, 0x8b, 0x96, 0x89, 0xc2, 0x82, 0xc5, 0x82, 0xb7, 0x81, 0x42, 0x0a, 0x00,
@@ -85,7 +77,7 @@ inline CTexAnim::CRefData::CRefData()
  */
 inline CTexAnim::CTexAnim()
 {
-    const float& zero = kTexAnimZero;
+    const float zero = 0.0f;
     m_refData = 0;
     m_seqIndex = 0;
     m_frame = zero;
@@ -106,7 +98,7 @@ inline CTexAnim::CTexAnim()
  */
 CTexAnimSet::CTexAnimSet()
 {
-    const float& zero = kTexAnimZero;
+    const float zero = 0.0f;
     m_chin = zero;
 }
 
@@ -178,7 +170,7 @@ CTexAnim::~CTexAnim()
  */
 inline void CTexAnim::SetTexGen()
 {
-    const float zero = kTexAnimZero;
+    const float zero = 0.0f;
     CMaterial* material = m_refData->m_material;
 
     if (material != 0) {
@@ -211,7 +203,7 @@ inline void CTexAnim::SetTexGen()
  */
 void CTexAnimSet::SetTexGen()
 {
-    const float zero = kTexAnimZero;
+    const float zero = 0.0f;
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(m_texAnims.GetSize()); i++) {
         CTexAnim* texAnim = m_texAnims[i];
@@ -329,15 +321,15 @@ inline void CTexAnimSeq::Interp(float frame, Vec& texGen)
         if (((float)keyData->m_frame <= currentFrame) && (currentFrame < nextFrame)) {
             float t;
             float frameSpan = nextFrame - (float)keyData->m_frame;
-            if (frameSpan == kTexAnimZero) {
-                t = kTexAnimZero;
+            if (frameSpan == 0.0f) {
+                t = 0.0f;
             } else {
                 t = (currentFrame - (float)keyData->m_frame) / frameSpan;
             }
 
             Vec v0;
             Vec v1;
-            PSVECScale(&keyData->m_texGen, &v0, kTexAnimOne - t);
+            PSVECScale(&keyData->m_texGen, &v0, 1.0f - t);
             PSVECScale(&nextKeyData->m_texGen, &v1, t);
             PSVECAdd(&v0, &v1, &texGen);
 
@@ -431,7 +423,7 @@ inline void CTexAnim::AddFrame(float frameStep)
     CTexAnimSeq* seq = m_refData->m_texAnimSeqs[m_seqIndex];
 
     if (!IsTexAnimE1Flag(seq->m_flags) || !IsTexAnimE1Flag(seq->m_flags) ||
-        (kTexAnimOne != m_frame) || (static_cast<unsigned int>(Math.Rand(0x1E)) == 0)) {
+        (1.0f != m_frame) || (static_cast<unsigned int>(Math.Rand(0x1E)) == 0)) {
         seq->Interp(m_frame, m_texGen);
 
         if (m_mode != -3) {
@@ -466,9 +458,9 @@ void CTexAnimSet::AddFrame()
         float frameStep;
 
         if (m_texAnims[i]->IsChin()) {
-            frameStep = kTexAnimChinFrameStep;
+            frameStep = 1.25f;
         } else {
-            frameStep = kTexAnimOne;
+            frameStep = 1.0f;
         }
 
         m_texAnims[i]->AddFrame(frameStep);
@@ -476,7 +468,7 @@ void CTexAnimSet::AddFrame()
         if (m_texAnims[i]->IsChin()) {
             m_chin = m_texAnims[i]->GetChin();
         } else {
-            m_chin = kTexAnimZero;
+            m_chin = 0.0f;
         }
 
         i = i + 1;

@@ -1120,7 +1120,7 @@ pppYmMelt.cpp:
 	extabindex  start:0x8000E4C4 end:0x8000E4F4
 	.text       start:0x800A538C end:0x800A5FCC
 	.rodata     start:0x801DA048 end:0x801DA058
-	.sdata2     start:0x80330B08 end:0x80330B34
+	.sdata2     start:0x80330AF0 end:0x80330B1C
 	.sbss2      start:0x80333DE0 end:0x80333DE4
 
 pppYmCallBack.cpp:
@@ -1138,12 +1138,14 @@ joybus.cpp:
 	.bss        start:0x802EAAB0 end:0x802F2600
 	.sdata      start:0x8032E830 end:0x8032E840
 	.sbss       start:0x8032EDB8 end:0x8032EDBC
+	.sdata2     start:0x80330B20 end:0x80330B2C
 
 cflat_r2system.cpp:
 	extab       start:0x80008280 end:0x80008338
 	extabindex  start:0x8000E8D8 end:0x8000E9EC
 	.text       start:0x800B28F0 end:0x800BA2FC
 	.data       start:0x80210174 end:0x80210378
+	.sdata2     start:0x80330B30 end:0x80330B34
 
 cflat_r2class.cpp:
 	extab       start:0x80008338 end:0x80008350

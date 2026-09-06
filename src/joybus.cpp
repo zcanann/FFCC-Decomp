@@ -121,16 +121,13 @@ static const char s_send_type_error_fmt[] = "(%d): Error:send type error(%02x)\n
 static const char s_map_filename_fmt[] = "m%02d_%d.mcd";
 static const char s_mem_alloc_error_fmt[] = "%s(%d): Error: memory allocation error\n";
 
-extern const u32 kPppYmMeltMaskBit0;
-extern const u32 kPppYmMeltMaskBit4;
-
 namespace JoyBusConst {
 static char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
 static char* CLIENT_FILE = const_cast<char*>(s_ffcc_cli_bin);
 static char* OBJ_FILE = const_cast<char*>(s_objdat_spt);
 static char* ICON_FILE = const_cast<char*>(s_icon_dat);
-const unsigned int CTRL_GBA = 0x10;
-const unsigned int JOY_CODE_MASK = 0x1;
+extern const unsigned int CTRL_GBA;
+extern const unsigned int JOY_CODE_MASK;
 }
 
 enum {
@@ -3540,7 +3537,7 @@ inline int JoyBus::SendLanguage(ThreadParam* threadParam)
     cmd = 0;
     ((unsigned char*)&cmd)[0] = 0x14;
     ((unsigned char*)&cmd)[1] = 0x16;
-    ((unsigned char*)&cmd)[2] = (unsigned char)(Game.m_gameWork.m_languageId - 1) | kPppYmMeltMaskBit4;
+    ((unsigned char*)&cmd)[2] = (unsigned char)(Game.m_gameWork.m_languageId - 1) | JoyBusConst::JOY_CODE_MASK;
 
     return SetSendQueue(threadParam, cmd);
 }
@@ -6056,7 +6053,7 @@ int JoyBus::ChgCtrlMode(int portIndex)
         return 0;
     }
 
-    mode = (unsigned char)(mode ^ kPppYmMeltMaskBit0);
+    mode = (unsigned char)(mode ^ JoyBusConst::CTRL_GBA);
     wordBytes[0] = 0x09;
     wordBytes[1] = mode;
     unsigned int wordCache = word;
@@ -6804,3 +6801,8 @@ int CFile::IsDiskError()
 }
 
 extern const unsigned int kJoyBusCmdOpMask = 0x0000003F;
+
+namespace JoyBusConst {
+const unsigned int CTRL_GBA = 0x1;
+const unsigned int JOY_CODE_MASK = 0x10;
+}

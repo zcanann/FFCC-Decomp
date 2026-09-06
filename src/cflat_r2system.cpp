@@ -54,7 +54,7 @@ static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
     return &self->m_usbStreamState;
 }
 
-extern const float kCFlatPadStickZero;
+extern const float kCFlatPadStickZero = 0.0f;
 extern const float kCFlatAlphaMax;
 extern const float kCFlatPi;
 extern const float kCFlatDegrees180;

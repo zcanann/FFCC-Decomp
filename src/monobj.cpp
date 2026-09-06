@@ -1029,7 +1029,7 @@ void CGMonObj::onFrameAlways()
 
 		if (stepSeId != 0) {
 			int& stepSeHandle = m_stepSeHandle;
-			if (object->m_currentAnimSlot == *reinterpret_cast<char*>(&object->m_animStartFrame)) {
+			if (object->m_currentAnimSlot == object->m_animSlots[1]) {
 				if (stepSeHandle != 0) {
 					Sound.ChangeSe3DPos(stepSeHandle, &object->m_worldPosition);
 				} else {

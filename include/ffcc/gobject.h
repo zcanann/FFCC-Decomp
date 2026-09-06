@@ -204,22 +204,10 @@ public:
         signed char m_bit01 : 1;
     };
     union {
-        unsigned short m_shieldNodeFlags; // 0x9C
+        unsigned char m_shieldNodeFlags; // 0x9C
         ShieldNodeFlagBits m_shieldNodeFlagBits;
     };
-    unsigned short m_animStartFrame;  // 0x9E
-    unsigned short m_animEndFrame;    // 0xA0
-    unsigned short m_pushTimer;       // 0xA2
-    unsigned short m_lookAtNodeIndex; // 0xA4
-    unsigned short unk_0xA6;          // 0xA6
-    CCharaPcs::CHandle* m_modelHandle;  // 0xA8
-    CCharaPcs::CHandle* m_weaponHandle; // 0xAC
-    CCharaPcs::CHandle* m_shieldHandle; // 0xB0
-    Vec m_velocity;                   // 0xB4
-    Vec m_acceleration;               // 0xC0
-    Vec m_jumpVelocity;               // 0xCC
-    float m_stepHeight;               // 0xD8
-    unsigned char m_animQueueFlags;   // 0xDC
+    char m_animSlots[64];             // 0x9D
     unsigned char m_animQueuePos;     // 0xDD
     char m_animQueue[4];              // 0xDE
     unsigned char m_animStateMisc;    // 0xE2

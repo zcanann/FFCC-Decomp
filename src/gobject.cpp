@@ -54,6 +54,9 @@ struct GObjectSRT {
     Vec m_scale;
 };
 
+STATIC_ASSERT(offsetof(CGObject, m_animSlots) == 0x9D);
+STATIC_ASSERT(offsetof(CGObject, m_animQueuePos) == 0xDD);
+STATIC_ASSERT(offsetof(CGObject, m_charaModelHandle) == 0xF8);
 STATIC_ASSERT(offsetof(CGObject, m_weaponNodeFlags) == 0x9A);
 STATIC_ASSERT(offsetof(CGObject, m_weaponNodeFlagBits) == 0x9A);
 STATIC_ASSERT(offsetof(CGObject, m_weaponNodeFlagBytes) == 0x9A);
@@ -580,7 +583,7 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
  */
 void CGObject::SetAnimSlot(int slot, int anim)
 {
-    m_animQueue[anim - 0x41] = static_cast<char>(slot);
+    m_animSlots[anim] = static_cast<char>(slot);
 }
 
 /*
@@ -854,7 +857,7 @@ void CGObject::SetDispItemName(int showName)
  */
 void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5, signed char* animData)
 {
-    m_currentAnimSlot = m_animQueue[slot - 0x41];
+    m_currentAnimSlot = m_animSlots[slot];
 
     m_weaponNodeFlagAll.m_bits1.m_bit01 = static_cast<signed char>(param2);
 
@@ -1318,17 +1321,7 @@ void CGObject::Turn(float targetRot, int turnFrames)
         Math.DstRot(m_rotBaseY, m_rotTargetY) / static_cast<float>(turnFrames);
     *reinterpret_cast<int*>(&m_attackColliders[0].m_localStart.x) = turnFrames;
 
-    const int animSlot = (m_turnBaseSpeed < sZeroFloat) ? 2 : 3;
-
-    m_currentAnimSlot = m_animQueue[animSlot - 0x41];
-    m_weaponNodeFlagAll.m_bits1.m_bit01 = 0;
-    m_animExtraIndex = -1;
-    m_collisionPushTimer = -1;
-    m_shieldNodeFlagBits.m_bit02 = 0;
-    m_shieldNodeFlagBits.m_bit80 = 0;
-    m_shieldNodeFlagBits.m_bit08 = 1;
-    const float& zero = sZeroFloat;
-    m_turnSpeed = zero;
+    PlayAnim((m_turnBaseSpeed < sZeroFloat) ? 2 : 3, 0, 0, -1, -1, 0);
 }
 
 /*
@@ -2066,8 +2059,6 @@ void CGObject::update()
     const int miniGameModelPass = (static_cast<unsigned int>(__cntlzw(dbgFlags & 0x8000)) >> 5) & 0xFF;
     unsigned char& weaponFlagsLo = m_weaponNodeFlagBytes.m_flags0;
     unsigned char& weaponFlagsHi = m_weaponNodeFlagBytes.m_flags1;
-    unsigned char& shieldFlagsLo = *reinterpret_cast<unsigned char*>(&m_shieldNodeFlags);
-    unsigned char& shieldFlagsHi = *(reinterpret_cast<unsigned char*>(&m_shieldNodeFlags) + 1);
 
     int dispItemTimer = static_cast<signed char>(m_dispItemTimer) - 1;
     m_dispItemTimer = dispItemTimer & ~(dispItemTimer >> 31);
@@ -2362,7 +2353,7 @@ void CGObject::update()
         if ((m_displayFlags & 1) != 0) {
             if ((m_weaponNodeFlagBits.m_unk20 &&
                  miniGameModelPass == 0) ||
-                m_currentAnimSlot != -1 || m_animSlotSel != static_cast<signed char>(shieldFlagsHi)) {
+                m_currentAnimSlot != -1 || m_animSlotSel != m_animSlots[0]) {
                 m_charaModelHandle->m_model->CalcMatrix();
             }
             if (m_weaponNodeFlagBits.m_unk20 &&
@@ -2467,7 +2458,7 @@ void CGObject::update()
                     const char queuePos = m_animQueuePos++;
                     const char queuedAnim = m_animQueue[queuePos];
                     if (queuedAnim != -1) {
-                        m_currentAnimSlot = m_animQueue[queuedAnim - 'A'];
+                        m_currentAnimSlot = m_animSlots[queuedAnim];
                         m_weaponNodeFlagAll.m_bits1.m_bit01 = 0;
                         m_animExtraIndex = -1;
                         m_collisionPushTimer = -1;
@@ -3393,16 +3384,15 @@ void CGObject::move()
         }
 
         if (!movingWithScript || m_weaponNodeFlagAll.m_bits1.m_bit04) {
-            m_animSlotSel = *reinterpret_cast<s8*>(&m_animStartFrame);
+            m_animSlotSel = m_animSlots[1];
         } else {
-            m_animSlotSel = *(reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1);
+            m_animSlotSel = m_animSlots[0];
         }
         return;
     }
 
     const double rotDelta = static_cast<double>(Math.DstRot(m_rotTargetY, m_rotBaseY));
-    m_animSlotSel = (reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1)
-        [(fabs(rotDelta) <= sPitchLookCutoff) ? 0 : 1];
+    m_animSlotSel = m_animSlots[(fabs(rotDelta) <= sPitchLookCutoff) ? 0 : 1];
 }
 
 /*
@@ -3455,21 +3445,6 @@ void CGObject::onDestroy()
  * JP Address: TODO
  * JP Size: TODO
  */
-struct SAnimFillGroup {
-    s8 b0;
-    s8 b1;
-    s8 b2;
-    s8 b3;
-    s8 b4;
-    s8 b5;
-    s8 b6;
-    s8 b7;
-};
-
-#pragma push
-#pragma optimization_level 3
-#pragma opt_lifetimes off
-#pragma opt_propagation off
 void CGObject::onCreate()
 {
     int cFill = -1;
@@ -3608,56 +3583,13 @@ void CGObject::onCreate()
     m_field_0x56 = 0x7D;
     *reinterpret_cast<float*>(m_worldMode) = sZeroFloat;
 
-    int animStateOffset = 0;
-    for (int i = 0; i < 2; i++) {
-        s8* animState;
-        animState = reinterpret_cast<s8*>(animStateOffset + 0x9d);
-        animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
-        animState[0] = cFill;
-        animState[1] = cFill;
-        animState[2] = cFill;
-        animState[3] = cFill;
-        animState[4] = cFill;
-        animState[5] = cFill;
-        animState[6] = cFill;
-        animState[7] = cFill;
-        animState = reinterpret_cast<s8*>(animStateOffset + 0xa5);
-        animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
-        animState[0] = cFill;
-        animState[1] = cFill;
-        animState[2] = cFill;
-        animState[3] = cFill;
-        animState[4] = cFill;
-        animState[5] = cFill;
-        animState[6] = cFill;
-        animState[7] = cFill;
-        animState = reinterpret_cast<s8*>(animStateOffset + 0xad);
-        animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
-        animState[0] = cFill;
-        animState[1] = cFill;
-        animState[2] = cFill;
-        animState[3] = cFill;
-        animState[4] = cFill;
-        animState[5] = cFill;
-        animState[6] = cFill;
-        animState[7] = cFill;
-        animState = reinterpret_cast<s8*>(animStateOffset + 0xb5);
-        animState = reinterpret_cast<s8*>(this) + reinterpret_cast<int>(animState);
-        animStateOffset += 0x20;
-        animState[0] = cFill;
-        animState[1] = cFill;
-        animState[2] = cFill;
-        animState[3] = cFill;
-        animState[4] = cFill;
-        animState[5] = cFill;
-        animState[6] = cFill;
-        animState[7] = cFill;
+    for (unsigned int i = 0; i < sizeof(m_animSlots); i++) {
+        m_animSlots[i] = cFill;
     }
 
     memset(&m_attackColliders[0].m_localStart.y, 0, 0x180);
     memset(&m_damageColliders[0].m_localPosition.y, 0, 0x140);
     memset(m_dropItemCodes, 0, sizeof(m_dropItemCodes));
 }
-#pragma pop
 
 extern const double DOUBLE_80330400 = 0.0010000000474974513;

@@ -9,9 +9,37 @@ public:
 	CVector();
 	CVector(float, float, float);
 	CVector(const Vec&);
-	CVector(const CVector&);
+	/*
+	 * --INFO--
+	 * PAL Address: 0x800B9868
+	 * PAL Size: 28b
+	 * EN Address: TODO
+	 * EN Size: TODO
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	CVector(const CVector& other)
+	{
+		x = other.x;
+		y = other.y;
+		z = other.z;
+	}
 	CVector operator+(const CVector&) const;
-	CVector operator-(const CVector&) const;
+	/*
+	 * --INFO--
+	 * PAL Address: 0x800B9884
+	 * PAL Size: 112b
+	 * EN Address: TODO
+	 * EN Size: TODO
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	CVector operator-(const CVector& other) const
+	{
+		CVector out;
+		PSVECSubtract((const Vec*)this, (const Vec*)&other, (Vec*)&out);
+		return out;
+	}
 	operator Vec&() { return *reinterpret_cast<Vec*>(this); }
 	operator Vec*() { return reinterpret_cast<Vec*>(this); }
 	void operator=(const CVector&);

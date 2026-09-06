@@ -2318,12 +2318,16 @@ void CFlatRuntime2::IgnoreParticle(int slotNo, CFlatRuntime::CObject* object)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A05C
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime2::initAllFinished()
 {
-	memset(CGPartyObj::m_ghostWork, 0, sizeof(CGPartyObj::m_ghostWork));
+	memset(&CGPartyObj::m_ghostWork, 0, sizeof(CGPartyObj::m_ghostWork));
 }
 
 /*

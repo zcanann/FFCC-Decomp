@@ -14,7 +14,7 @@
 class CGObject;
 class CGPrgObj;
 class CGPartyObj;
-class CCombi2Set;
+class CCombi2;
 class CGObjWork;
 class CMapLightHolder;
 class CBound;
@@ -168,8 +168,8 @@ public:
     CGObject* m_monObjects[64];             // 0xC5D0
     CMonWork* m_monWorkRefs[64];             // 0xC6D0
     unsigned int unk_flat3_0xc7d0;          // 0xC7D0
-    unsigned int unk_flat3_count_0xc7d4;    // 0xC7D4
-    unsigned int unk_flat3_field_1C_0xc7d8; // 0xC7D8
+    unsigned int m_combiCount;             // 0xC7D4
+    CCombi2* m_combiTable;                 // 0xC7D8
     unsigned int unk_flat3_field_8_0xc7dc;  // 0xC7DC
     unsigned int unk_flat3_field_30_0xc7e0; // 0xC7E0
     CBossArtifactStage* m_bossArtifactBase; // 0xC7E4

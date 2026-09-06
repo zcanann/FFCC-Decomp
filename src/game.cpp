@@ -1,3 +1,4 @@
+#include "ffcc/combi.h"
 #include "ffcc/game.h"
 
 #include "ffcc/ptrarray.h"
@@ -874,8 +875,8 @@ void CGame::loadCfd()
     unkCFlatData0[2] = (unsigned int)m_cFlatDataArr[0].Data(2).m_data;
     m_romLetterWorkBase = (unsigned int)m_cFlatDataArr[2].Data(0).m_data;
     unk_flat3_field_8_0xc7dc = (unsigned int)m_cFlatDataArr[3].Data(0).m_data;
-    unk_flat3_field_1C_0xc7d8 = (unsigned int)m_cFlatDataArr[3].Data(1).m_data;
-    unk_flat3_count_0xc7d4 = m_cFlatDataArr[3].Data(1).m_size / 0x1A;
+    m_combiTable = reinterpret_cast<CCombi2*>(m_cFlatDataArr[3].Data(1).m_data);
+    m_combiCount = m_cFlatDataArr[3].Data(1).m_size / sizeof(CCombi2);
     unk_flat3_field_30_0xc7e0 = (unsigned int)m_cFlatDataArr[3].Data(2).m_data;
     m_bossArtifactBase = reinterpret_cast<CBossArtifactStage*>(m_cFlatDataArr[3].Data(3).m_data);
 }

@@ -44,10 +44,6 @@ extern const float kCharaViewerLightPosZ = -117.0f;
 extern const float kCharaViewerLightTargetX = 4391.0f;
 extern const float kCharaViewerLightTargetY = -1864.0f;
 extern const float kCharaViewerLightTargetZ = 7194.0f;
-extern const char kCharaViewerCRefName[] = "CRef";
-extern "C" const float kCharaSharedZeroF = 0.0f;
-extern "C" const float kCharaSharedOneF = 1.0f;
-extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 
 CLightPcs::CBumpLight* g_pLight = 0;
 

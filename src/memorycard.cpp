@@ -12,10 +12,10 @@
 #include "string.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern const char sCardGameCode[];
-extern const char sCardMakerCode[];
-extern const char sCardMachineCode[];
-extern const char sCardVersion[];
+static const char sCardGameCode[] = "FFCC";
+static const char sCardMakerCode[] = "GDS";
+static const char sCardMachineCode[] = "GC";
+static const char sCardVersion[] = "1.00";
 
 static const char sMemoryCardGbaDvdDir[] = "dvd/gba/";
 static const char sMemoryCardGbaClientBinaryName[] = "ffcc_cli.bin";

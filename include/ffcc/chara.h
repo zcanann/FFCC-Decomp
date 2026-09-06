@@ -56,7 +56,14 @@ public:
         void SetInterp(int);
         void InitQuantize();
 
-		u8 m_flags;                     // 0x08
+		union {
+			u8 m_flags;                 // 0x08
+			struct {
+				u8 m_blendEnabled : 1;
+				u8 m_clampFrames : 1;
+				u8 m_reserved : 6;
+			} m_flagsBits;
+		};
 		char m_interp;                  // 0x09
 		u8 m_quantizeX;                 // 0x0A
 		u8 m_quantizeY;                 // 0x0B
@@ -87,7 +94,14 @@ public:
 
 		char m_name[0x10];              // 0x00
 		u32 m_dataOffset;               // 0x10
-		u32 m_flags;                    // 0x14
+		union {
+			u32 m_flags;                // 0x14
+			struct {
+				u8 m_hasScale : 1;
+				u32 m_channelModes : 18;
+				u32 m_reserved : 13;
+			} m_flagsBits;
+		};
 	};
 
 	class CNode

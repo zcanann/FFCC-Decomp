@@ -13,25 +13,14 @@
 #include "ffcc/pppBreathParticle.h"
 #include "ffcc/pppShape.h"
 
-extern const float kCharaAnimZero;
-extern const float kCharaAnimDegToRad;
-extern const float kCharaAnimNegativeOne;
-extern const float kCharaAnimFullTurnDegrees;
-extern const float kYmBreathHalfCircleDegrees = 180.0f;
-extern const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
-extern const double kYmBreathIntToDoubleBias = 4503599627370496.0;
-extern const float kYmBreathSpreadScale = 2.0f;
-extern const double kYmBreathHalfChance = 0.5;
-extern const char sCardGameCode[] = "FFCC";
-extern const char sCardMakerCode[] = "GDS";
-extern const char sCardMachineCode[] = "GC";
-extern const char sCardVersion[] = "1.00";
 static const float kYmBreathZero = 0.0f;
-
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
+static const float kYmBreathDegToRad = 0.01745329238474369f;
+static const float kYmBreathNegativeOne = -1.0f;
+static const float kYmBreathFullTurnDegrees = 360.0f;
+static const float kYmBreathHalfCircleDegrees = 180.0f;
+static const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
+static const float kYmBreathSpreadScale = 2.0f;
+static const double kYmBreathHalfChance = 0.5;
 
 struct YmBreathParticleGroup {
     int active;
@@ -194,7 +183,7 @@ extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataO
     float zero;
 
     PSMTXIdentity(state->m_matrix);
-    zero = kCharaAnimZero;
+    zero = kYmBreathZero;
 
     state->m_direction.z = zero;
     state->m_direction.y = zero;
@@ -286,8 +275,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
             drawMtx[0][0] = particle->m_rotationX * ppvMng->m_scale.x;
             drawMtx[1][1] = particle->m_rotationY * ppvMng->m_scale.y;
             drawMtx[2][2] = drawMtx[0][0];
-            if (kCharaAnimZero != particle->m_angle) {
-                PSMTXRotRad(rotMtx, 'z', kCharaAnimDegToRad * particle->m_angle);
+            if (kYmBreathZero != particle->m_angle) {
+                PSMTXRotRad(rotMtx, 'z', kYmBreathDegToRad * particle->m_angle);
                 PSMTXConcat(drawMtx, rotMtx, drawMtx);
             }
 
@@ -521,9 +510,9 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
             }
         }
 
-        work->m_direction.x = kCharaAnimZero;
-        work->m_direction.y = kCharaAnimZero;
-        work->m_direction.z = kCharaAnimNegativeOne;
+        work->m_direction.x = kYmBreathZero;
+        work->m_direction.y = kYmBreathZero;
+        work->m_direction.z = kYmBreathNegativeOne;
         PSVECNormalize(&work->m_direction, &work->m_direction);
     }
 
@@ -561,9 +550,9 @@ group_ready:
             PSMTXConcat(particleMtx->m_matrix, ymBreath->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, &groupData->position, &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
-            rotMtx.value[0][3] = kCharaAnimZero;
-            rotMtx.value[1][3] = kCharaAnimZero;
-            rotMtx.value[2][3] = kCharaAnimZero;
+            rotMtx.value[0][3] = kYmBreathZero;
+            rotMtx.value[1][3] = kYmBreathZero;
+            rotMtx.value[2][3] = kYmBreathZero;
             groupData->scale = scaledOwner;
             pppCopyVector(dir, groupData->direction);
             PSMTXMultVec(rotMtx.value, &dir, &dir);
@@ -729,7 +718,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                 groupData->speed = params->m_groupSpeed;
                 unitVelocity.x = kYmBreathZero;
                 unitVelocity.y = kYmBreathZero;
-                unitVelocity.z = kCharaAnimNegativeOne;
+                unitVelocity.z = kYmBreathNegativeOne;
                 pppCopyVector(groupData->direction, unitVelocity);
                 groupData->position.z = kYmBreathZero;
                 groupData->position.y = kYmBreathZero;
@@ -792,11 +781,11 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
         particle->m_angleVelocity += params->m_angleAccel;
     }
 
-    while (LoadFloat(kYmBreathHalfCircleDegrees) <= particle->m_angle) {
-        particle->m_angle -= kCharaAnimFullTurnDegrees;
+    while (kYmBreathHalfCircleDegrees <= particle->m_angle) {
+        particle->m_angle -= kYmBreathFullTurnDegrees;
     }
-    while (particle->m_angle < LoadFloat(kYmBreathNegativeHalfCircleDegrees)) {
-        particle->m_angle += kCharaAnimFullTurnDegrees;
+    while (particle->m_angle < kYmBreathNegativeHalfCircleDegrees) {
+        particle->m_angle += kYmBreathFullTurnDegrees;
     }
 
     particle->m_rotationX += particle->m_rotationVelocityX;
@@ -861,7 +850,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     u8 flags;
 
     spread = (float)(unsigned int)reinterpret_cast<PYmBreath*>(pYmBreath)->m_spread;
-    range = spread * LoadFloat(kYmBreathSpreadScale);
+    range = spread * kYmBreathSpreadScale;
 
     memset(particleData, 0, sizeof(PARTICLE_DATA));
     if (particleWmat != NULL) {
@@ -874,16 +863,16 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     PYmBreath* params = reinterpret_cast<PYmBreath*>(pYmBreath);
     YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
 
-    baseDir.x = kCharaAnimZero;
-    baseDir.y = kCharaAnimZero;
-    baseDir.z = kCharaAnimNegativeOne;
+    baseDir.x = kYmBreathZero;
+    baseDir.y = kYmBreathZero;
+    baseDir.z = kYmBreathNegativeOne;
 
     angle[0] = (int)(range * Math.RandF() - spread);
-    angle[0] = (int)((float)(angle[0] << 15) / LoadFloat(kYmBreathHalfCircleDegrees));
+    angle[0] = (int)((float)(angle[0] << 15) / kYmBreathHalfCircleDegrees);
     angle[1] = (int)(range * Math.RandF() - spread);
-    angle[1] = (int)((float)(angle[1] << 15) / LoadFloat(kYmBreathHalfCircleDegrees));
+    angle[1] = (int)((float)(angle[1] << 15) / kYmBreathHalfCircleDegrees);
     angle[2] = (int)(range * Math.RandF() - spread);
-    angle[2] = (int)((float)(angle[2] << 15) / LoadFloat(kYmBreathHalfCircleDegrees));
+    angle[2] = (int)((float)(angle[2] << 15) / kYmBreathHalfCircleDegrees);
 
     pppGetRotMatrixXYZ(rotMtx, (pppIVECTOR4*)angle);
     PSMTXMultVecSR(rotMtx.value, &baseDir, &particle->m_direction);
@@ -895,7 +884,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     Vec directionNorm = particle->m_direction;
     pppNormalize(particle->m_direction, directionNorm);
 
-    if (kCharaAnimZero != params->m_spawnOffset) {
+    if (kYmBreathZero != params->m_spawnOffset) {
         PSVECScale(&particle->m_direction, &particle->m_position, params->m_spawnOffset);
     }
 
@@ -915,10 +904,10 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         flags = params->m_angleFlags;
         if (((flags & 1) != 0) && ((flags & 2) != 0)) {
             if (kYmBreathHalfChance < Math.RandF()) {
-                particle->m_angleRandom *= kCharaAnimNegativeOne;
+                particle->m_angleRandom *= kYmBreathNegativeOne;
             }
         } else if ((flags & 2) != 0) {
-            particle->m_angleRandom *= kCharaAnimNegativeOne;
+            particle->m_angleRandom *= kYmBreathNegativeOne;
         }
     }
 
@@ -929,11 +918,11 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         particle->m_angleVelocity += particle->m_angleRandom;
     }
 
-    while (LoadFloat(kYmBreathHalfCircleDegrees) <= particle->m_angle) {
-        particle->m_angle -= kCharaAnimFullTurnDegrees;
+    while (kYmBreathHalfCircleDegrees <= particle->m_angle) {
+        particle->m_angle -= kYmBreathFullTurnDegrees;
     }
-    while (particle->m_angle < LoadFloat(kYmBreathNegativeHalfCircleDegrees)) {
-        particle->m_angle += kCharaAnimFullTurnDegrees;
+    while (particle->m_angle < kYmBreathNegativeHalfCircleDegrees) {
+        particle->m_angle += kYmBreathFullTurnDegrees;
     }
 
     particle->m_rotationX = params->m_rotationStartX;
@@ -948,26 +937,26 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
             particle->m_rotationAccelX = rotationAccel;
             if (((params->m_rotationFlags & 1) != 0) && ((params->m_rotationFlags & 2) != 0)) {
                 if (kYmBreathHalfChance < Math.RandF()) {
-                    particle->m_rotationAccelX *= kCharaAnimNegativeOne;
-                    particle->m_rotationAccelY *= kCharaAnimNegativeOne;
+                    particle->m_rotationAccelX *= kYmBreathNegativeOne;
+                    particle->m_rotationAccelY *= kYmBreathNegativeOne;
                 }
             } else if ((params->m_rotationFlags & 2) != 0) {
-                particle->m_rotationAccelX *= kCharaAnimNegativeOne;
-                particle->m_rotationAccelY *= kCharaAnimNegativeOne;
+                particle->m_rotationAccelX *= kYmBreathNegativeOne;
+                particle->m_rotationAccelY *= kYmBreathNegativeOne;
             }
         } else {
             particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
             particle->m_rotationAccelY = params->m_rotationRandomY * Math.RandF();
             if (((params->m_rotationFlags & 1) != 0) && ((params->m_rotationFlags & 2) != 0)) {
                 if (kYmBreathHalfChance < Math.RandF()) {
-                    particle->m_rotationAccelX *= kCharaAnimNegativeOne;
+                    particle->m_rotationAccelX *= kYmBreathNegativeOne;
                 }
                 if (kYmBreathHalfChance < Math.RandF()) {
-                    particle->m_rotationAccelY *= kCharaAnimNegativeOne;
+                    particle->m_rotationAccelY *= kYmBreathNegativeOne;
                 }
             } else if ((params->m_rotationFlags & 2) != 0) {
-                particle->m_rotationAccelX *= kCharaAnimNegativeOne;
-                particle->m_rotationAccelY *= kCharaAnimNegativeOne;
+                particle->m_rotationAccelX *= kYmBreathNegativeOne;
+                particle->m_rotationAccelY *= kYmBreathNegativeOne;
             }
         }
     }
@@ -981,11 +970,11 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         particle->m_rotationVelocityY += particle->m_rotationAccelY;
     }
 
-    float zero = kCharaAnimZero;
+    float zero = kYmBreathZero;
     particle->m_scale = params->m_groupSpeed;
     if (zero != params->m_scaleRandomRange) {
         float rand = Math.RandF();
-        float scaledRange = params->m_scaleRandomRange * LoadFloat(kYmBreathSpreadScale);
+        float scaledRange = params->m_scaleRandomRange * kYmBreathSpreadScale;
         particle->m_scale += scaledRange * rand - params->m_scaleRandomRange;
     }
 

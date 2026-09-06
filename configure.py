@@ -508,7 +508,7 @@ config.libs = [
             Object(
                 NonMatching,
                 "chara_anim.cpp",
-                extra_cflags=["-inline auto,deferred", "-RTTI on", "-str reuse,pool,readonly"],
+                extra_cflags=["-inline auto,deferred", "-RTTI on", "-str reuse,readonly"],
             ),
             Object(NonMatching, "chara_fur.cpp"),
             Object(NonMatching, "chara.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),

@@ -1159,7 +1159,7 @@ p_chara_viewer.cpp:
 	.rodata     start:0x801DA7E8 end:0x801DA970
 	.bss        start:0x802F2600 end:0x802F2628
 	.sbss       start:0x8032EDC4 end:0x8032EDE0
-	.sdata2     start:0x80330BF8 end:0x80330C78
+	.sdata2     start:0x80330BF8 end:0x80330C60
 
 chara_anim.cpp:
 	extab       start:0x80008390 end:0x800083C0
@@ -1168,14 +1168,14 @@ chara_anim.cpp:
 	.rodata     start:0x801DA970 end:0x801DA9B0
 	.data       start:0x80210528 end:0x80210540
 	.sdata      start:0x8032E840 end:0x8032E850
-	.sdata2     start:0x80330C78 end:0x80330C98
+	.sdata2     start:0x80330C60 end:0x80330C80
 
 pppYmBreath.cpp:
 	extab       start:0x800083C0 end:0x800083F8
 	extabindex  start:0x8000EA88 end:0x8000EADC
 	.text       start:0x800BFE78 end:0x800C17B8
 	.rodata     start:0x801DA9B0 end:0x801DA9C0
-	.sdata2     start:0x80330C98 end:0x80330CD0
+	.sdata2     start:0x80330C80 end:0x80330CB8
 
 memorycard.cpp:
 	extab       start:0x800083F8 end:0x800084E0
@@ -1186,7 +1186,7 @@ memorycard.cpp:
 	.data       start:0x80210540 end:0x8021056C
 	.bss        start:0x802F2628 end:0x802F26C4
 	.sdata      start:0x8032E850 end:0x8032E880
-	.sdata2     start:0x80330CD0 end:0x80330CF0
+	.sdata2     start:0x80330CB8 end:0x80330CF0
 
 pppWDrawMatrixLoop.cpp:
 	extab       start:0x800084E0 end:0x800084E8

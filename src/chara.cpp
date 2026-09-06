@@ -535,7 +535,7 @@ static inline char* AnimNodeName(CChara::CAnimNode* node)
 
 static inline bool AnimNodeUsesScale(CChara::CAnimNode* node)
 {
-	return ((*reinterpret_cast<u8*>(&node->m_flags) >> 7) & 1) != 0;
+	return node->m_flagsBits.m_hasScale != 0;
 }
 
 static inline u8 ModelAttachMode(CChara::CModel* model)

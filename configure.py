@@ -532,7 +532,7 @@ config.libs = [
             Object(NonMatching, "joybus.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "KeLns.cpp"),
             Object(NonMatching, "LocationTitle2.cpp"),
-            Object(NonMatching, "main.cpp"),
+            Object(Matching, "main.cpp"),
             Object(NonMatching, "manager.cpp"),
             Object(NonMatching, "map.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "mapanim.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),

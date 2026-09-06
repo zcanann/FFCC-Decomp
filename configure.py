@@ -764,7 +764,7 @@ config.libs = [
             Object(NonMatching, "texanim.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "textureman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(
-                NonMatching,
+                Matching,
                 "THPDraw.cpp",
                 cflags=[
                     *replace_flag_prefix(cflags_thp, "-Cpp_exceptions ", "-Cpp_exceptions on"),

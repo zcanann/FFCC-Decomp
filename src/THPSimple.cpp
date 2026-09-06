@@ -75,9 +75,8 @@ static u16 VolumeTable[0x80] = {
 };
 s16 SoundBuffer[0x280] ATTRIBUTE_ALIGN(32);
 
-extern const char sTHPMagic_80331868[4];
+static const char sTHPMagic[] = "THP";
 extern const float kTHPSimpleDefaultVolume = 127.0f;
-extern const GXColorS10 kTHPYuvToRgbTevColor = {-90, 0, -114, 135};
 
 static inline float LoadFloat(const float& value)
 {
@@ -876,7 +875,7 @@ s32 THPSimpleOpen(const char* path)
     }
     memcpy(&SimpleControl.header, WorkBuffer, sizeof(THPHeader));
 
-    if (strcmp(SimpleControl.header.mMagic, sTHPMagic_80331868) != 0) {
+    if (strcmp(SimpleControl.header.mMagic, sTHPMagic) != 0) {
         DVDClose(&SimpleControl.fileInfo);
         return 0;
     }

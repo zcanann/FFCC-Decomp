@@ -1457,7 +1457,7 @@ pppYmTracer2.cpp:
 	extabindex  start:0x8000FD84 end:0x8000FDA8
 	.text       start:0x801035DC end:0x80103EC0
 	.rodata     start:0x801DC4B8 end:0x801DC4D0
-	.sdata2     start:0x80331848 end:0x8033186C
+	.sdata2     start:0x80331848 end:0x80331868
 	.sbss2      start:0x80333DF8 end:0x80333E00
 
 pppEraseCharaParts.cpp:
@@ -1472,20 +1472,20 @@ THPSimple.cpp:
 	.data       start:0x802111E8 end:0x802112E8
 	.bss        start:0x802FFA80 end:0x80300140
 	.sbss       start:0x8032EE48 end:0x8032EE60
-	.sdata2     start:0x8033186C end:0x80331878
+	.sdata2     start:0x80331868 end:0x80331870
 
 THPDraw.cpp:
 	extab       start:0x80009114 end:0x8000912C
 	extabindex  start:0x8000FE68 end:0x8000FE8C
 	.text       start:0x8010597C end:0x8010617C
-	.sdata2     start:0x80331878 end:0x803318A0
+	.sdata2     start:0x80331870 end:0x80331898
 
 pppMana2.cpp:
 	extab       start:0x8000912C end:0x8000918C
 	extabindex  start:0x8000FE8C end:0x8000FF1C
 	.text       start:0x8010617C end:0x801091D4
 	.rodata     start:0x801DC4D0 end:0x801DC4F0
-	.sdata2     start:0x803318A0 end:0x80331910
+	.sdata2     start:0x80331898 end:0x80331910
 
 pppConformBGNormal.cpp:
 	extab       start:0x8000918C end:0x80009194

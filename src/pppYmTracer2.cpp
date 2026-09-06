@@ -396,4 +396,3 @@ void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 }
 
 extern const float kYmTracer2Zero = 0.0f;
-extern const char sTHPMagic[4] = "THP";

@@ -459,8 +459,7 @@ void CAStar::drawAStar()
 
 		if (hasGroups)
 		{
-			_GXColor* whiteColor = &CColor(0xFF, 0xFF, 0xFF, 0xFF).color;
-			Graphic.DrawSphere(drawMtx, &m_lastGroupPos, LoadFloat(kDrawAStarSphereRadius), whiteColor);
+			Graphic.DrawSphere(drawMtx, &m_lastGroupPos, LoadFloat(kDrawAStarSphereRadius), CColor(0xFF, 0xFF, 0xFF, 0xFF));
 		}
 
 		int i = 0;
@@ -476,8 +475,7 @@ void CAStar::drawAStar()
 
 			if (exists)
 			{
-				_GXColor* yellowColor = &CColor(0xFF, 0xFF, 0x00, 0xFF).color;
-				Graphic.DrawSphere(drawMtx, &m_portals[i].m_position, LoadFloat(kDrawAStarSphereRadius), yellowColor);
+				Graphic.DrawSphere(drawMtx, &m_portals[i].m_position, LoadFloat(kDrawAStarSphereRadius), CColor(0xFF, 0xFF, 0x00, 0xFF));
 
 				int side = 0;
 				unsigned char* group = &m_portals[i].m_groupA;

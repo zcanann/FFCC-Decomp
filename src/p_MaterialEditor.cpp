@@ -6,7 +6,6 @@
 static const GXColor kMaterialEditorDefaultColorRgba = {0xFF, 0xFF, 0xFF, 0xFF};
 static const float kMaterialEditorControlMaxInit = 10000.0f;
 static const float kMaterialEditorControlMinInit = -10000.0f;
-static const char sMaterialEditorSpinnerText[5] = "|/-\\";
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
 #include <Dolphin/gx.h>
@@ -28,34 +27,25 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
-static CProcessTableCallback s_materialEditorTableDesc[4] = {
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)},
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)},
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)},
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)},
-};
+static CProcessTableCallback s_materialEditorCreateViewer =
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
+static CProcessTableCallback s_materialEditorDestroyViewer =
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
+static CProcessTableCallback s_materialEditorCalcViewer =
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
+static CProcessTableCallback s_materialEditorDrawViewer =
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
 CMaterialEditorPcs MaterialEditorPcs;
-static char* q;
 
 CProcessTable CMaterialEditorPcs::m_table = {
     const_cast<char*>(s_CMaterialEditorPcsViewer),
     {
-        s_materialEditorTableDesc[0].m_thisOffset,
-        s_materialEditorTableDesc[0].m_virtualOffset,
-        s_materialEditorTableDesc[0].m_function,
-        s_materialEditorTableDesc[1].m_thisOffset,
-        s_materialEditorTableDesc[1].m_virtualOffset,
-        s_materialEditorTableDesc[1].m_function,
-        s_materialEditorTableDesc[2].m_thisOffset,
-        s_materialEditorTableDesc[2].m_virtualOffset,
-        s_materialEditorTableDesc[2].m_function,
-        0x20,
-        0,
-        s_materialEditorTableDesc[3].m_thisOffset,
-        s_materialEditorTableDesc[3].m_virtualOffset,
-        s_materialEditorTableDesc[3].m_function,
-        0x41,
-        1,
+        s_materialEditorCreateViewer,
+        s_materialEditorDestroyViewer,
+        {
+            {s_materialEditorCalcViewer, 0x20, 0},
+            {s_materialEditorDrawViewer, 0x41, 1},
+        },
     },
 };
 static const double kMaterialEditorOneF64 = 1.0;
@@ -147,16 +137,10 @@ void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count,
  */
 void CMaterialEditorPcs::drawViewer()
 {
-    static char color;
-
-    if (color == 0) {
-        q = const_cast<char*>(sMaterialEditorSpinnerText);
-        color = 1;
-    }
-
-    static int pFan = 0;
-    pFan++;
-    char fan = q[(pFan >> 4) % 4];
+    static char* pFan = "|/-\\";
+    static int alive = 0;
+    alive++;
+    char fan = pFan[(alive >> 4) % 4];
     Graphic.Printf(const_cast<char*>(s_MaterialEditorFmt), (int)fan);
 
     if (m_displayTextureEnabled != 0) {

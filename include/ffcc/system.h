@@ -38,13 +38,13 @@ struct CProcessTable
     char* m_name;
     union
     {
-        u32 m_words[(0x15C - sizeof(char*)) / sizeof(u32)];
         struct Fields
         {
             CProcessTableCallback m_create;
             CProcessTableCallback m_destroy;
             CProcessTableEntry m_entries[16];
         } m_fields;
+        u32 m_words[(0x15C - sizeof(char*)) / sizeof(u32)];
     };
 };
 typedef int CProcessTable_size_mismatch[(sizeof(CProcessTable) == 0x15C) ? 1 : -1];

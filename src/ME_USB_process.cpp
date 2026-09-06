@@ -1,4 +1,5 @@
 #include "ffcc/ME_USB_process.h"
+#include "global.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/USBStreamData.h"
 #include "ffcc/memory.h"
@@ -8,6 +9,15 @@
 #include "dolphin/os/OSCache.h"
 
 #include <string.h>
+
+STATIC_ASSERT(sizeof(RSDITEM) == 0x1C);
+STATIC_ASSERT(offsetof(RSDITEM, m_positions) == 0x10);
+STATIC_ASSERT(offsetof(RSDITEM, m_normals) == 0x14);
+STATIC_ASSERT(offsetof(RSDITEM, m_polygons) == 0x18);
+STATIC_ASSERT(offsetof(CMaterialEditorPcs, m_usbEnabled) == 0x98);
+STATIC_ASSERT(offsetof(CMaterialEditorPcs, m_readRsdIndex) == 0x9C);
+STATIC_ASSERT(offsetof(CMaterialEditorPcs, m_rsdItem) == 0xBC);
+STATIC_ASSERT(sizeof(CMaterialEditorPcs) == 0x3E0);
 
 static const char s_ME_USB_process_cpp[] = "ME_USB_process.cpp";
 extern "C" const char sMemAllocErrorSizeFmt[] = "MemAlloc Error!!! size=%d\n";
@@ -28,11 +38,6 @@ struct ViewerSRT {
     float scaleY;
     float scaleZ;
 };
-
-static inline u8* Ptr(CMaterialEditorPcs* self, u32 offset)
-{
-    return reinterpret_cast<u8*>(self) + offset;
-}
 
 static inline CMemory::CStage* MaterialEditorStage()
 {
@@ -95,7 +100,6 @@ static inline void StoreSwapS16(s16* value)
 void CMaterialEditorPcs::SetUSBData()
 {
     CUSBStreamData& usb = m_usbStream;
-    CUSBStreamDataState& usbState = m_usbStreamState;
 
     switch (usb.m_packetCode) {
     case 0x21:
@@ -106,10 +110,10 @@ void CMaterialEditorPcs::SetUSBData()
         m_displayTextureEnabled = 0;
         break;
     case 3:
-        usbState.m_stageDefault = reinterpret_cast<CMemory::CStage*>(1);
+        m_usbEnabled = 1;
         break;
     case 4:
-        usbState.m_stageDefault = 0;
+        m_usbEnabled = 0;
         break;
     case 0x40:
         ResetRsdList(&m_zlist1);
@@ -125,9 +129,9 @@ void CMaterialEditorPcs::SetUSBData()
         Vec maxPos;
         RSDITEM* rsdItem = GetRsdItem()->rsdItem;
 
-        if (rsdItem->ptr10 != 0) {
-            delete[] static_cast<u8*>(rsdItem->ptr10);
-            rsdItem->ptr10 = 0;
+        if (rsdItem->m_positions != 0) {
+            delete[] rsdItem->m_positions;
+            rsdItem->m_positions = 0;
         }
 
         rsdItem->countA = usb.m_sizeBytes;
@@ -137,20 +141,18 @@ void CMaterialEditorPcs::SetUSBData()
         if (allocData == 0) {
             System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
         }
-        rsdItem->ptr10 = allocData;
+        rsdItem->m_positions = static_cast<Vec*>(allocData);
 
-        memcpy(rsdItem->ptr10, usb.m_data, usb.m_sizeBytes * 0xC);
+        memcpy(rsdItem->m_positions, usb.m_data, usb.m_sizeBytes * 0xC);
 
-        u32 offset;
-        u32 i;
-        for (i = 0, offset = 0; i < usb.m_sizeBytes; offset += 0xC, i++) {
-            StoreSwapFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x0));
-            StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x4));
-            StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x8));
+        for (u32 i = 0; i < usb.m_sizeBytes; i++) {
+            StoreSwapFloat(&rsdItem->m_positions[i].x);
+            StoreSwapNegFloat(&rsdItem->m_positions[i].y);
+            StoreSwapNegFloat(&rsdItem->m_positions[i].z);
         }
-        DCStoreRange(rsdItem->ptr10, usb.m_sizeBytes * 0xC);
+        DCStoreRange(rsdItem->m_positions, usb.m_sizeBytes * 0xC);
 
-        CreateBoundaryBox(minPos, maxPos, rsdItem->countA, reinterpret_cast<const Vec*>(rsdItem->ptr10));
+        CreateBoundaryBox(minPos, maxPos, rsdItem->countA, rsdItem->m_positions);
 
         s32 xDiff = static_cast<s32>(maxPos.y - minPos.y);
         s32 yDiff = static_cast<s32>(maxPos.z - minPos.z);
@@ -173,9 +175,9 @@ void CMaterialEditorPcs::SetUSBData()
     case 0x13: {
         RSDITEM* rsdItem = GetRsdItem()->rsdItem;
 
-        if (rsdItem->ptr18 != 0) {
-            delete[] static_cast<u8*>(rsdItem->ptr18);
-            rsdItem->ptr18 = 0;
+        if (rsdItem->m_polygons != 0) {
+            delete[] rsdItem->m_polygons;
+            rsdItem->m_polygons = 0;
         }
 
         rsdItem->countC = usb.m_sizeBytes;
@@ -185,43 +187,41 @@ void CMaterialEditorPcs::SetUSBData()
         if (allocData == 0) {
             System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
         }
-        rsdItem->ptr18 = allocData;
+        rsdItem->m_polygons = static_cast<MaterialEditorPolygon*>(allocData);
 
-        memset(rsdItem->ptr18, 0, usb.m_sizeBytes * 0x70);
-        memcpy(rsdItem->ptr18, usb.m_data, usb.m_sizeBytes * 0x70);
+        memset(rsdItem->m_polygons, 0, usb.m_sizeBytes * 0x70);
+        memcpy(rsdItem->m_polygons, usb.m_data, usb.m_sizeBytes * 0x70);
 
-        u32 offset;
-        u32 i;
-        for (i = 0, offset = 0; i < usb.m_sizeBytes; offset += 0x70, i++) {
-            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x00));
-            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x02));
-            StoreSwap32(reinterpret_cast<u32*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x04));
-            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x08));
-            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0A));
-            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0C));
-            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0E));
-            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x10));
-            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x12));
-            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x14));
-            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x16));
-            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x1C));
-            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x1E));
-            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x20));
-            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x22));
-            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x24));
-            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x26));
-            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x28));
-            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2A));
-            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2C));
-            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2E));
+        for (u32 i = 0; i < usb.m_sizeBytes; i++) {
+            StoreSwapS16(&rsdItem->m_polygons[i].flags);
+            StoreSwapU16(&rsdItem->m_polygons[i].blendMode);
+            StoreSwap32(&rsdItem->m_polygons[i]._04);
+            StoreSwapU16(&rsdItem->m_polygons[i].index0);
+            StoreSwapU16(&rsdItem->m_polygons[i].index1);
+            StoreSwapU16(&rsdItem->m_polygons[i].index2);
+            StoreSwapU16(&rsdItem->m_polygons[i].index3);
+            StoreSwapU16(&rsdItem->m_polygons[i]._10);
+            StoreSwapU16(&rsdItem->m_polygons[i]._12);
+            StoreSwapU16(&rsdItem->m_polygons[i]._14);
+            StoreSwapU16(&rsdItem->m_polygons[i]._16);
+            StoreSwapS16(&rsdItem->m_polygons[i]._1c);
+            StoreSwapS16(&rsdItem->m_polygons[i].textureIndex);
+            StoreSwapS16(&rsdItem->m_polygons[i].u0);
+            StoreSwapS16(&rsdItem->m_polygons[i].v0);
+            StoreSwapS16(&rsdItem->m_polygons[i].u1);
+            StoreSwapS16(&rsdItem->m_polygons[i].v1);
+            StoreSwapS16(&rsdItem->m_polygons[i].u2);
+            StoreSwapS16(&rsdItem->m_polygons[i].v2);
+            StoreSwapS16(&rsdItem->m_polygons[i].u3);
+            StoreSwapS16(&rsdItem->m_polygons[i].v3);
         }
-        DCStoreRange(rsdItem->ptr18, usb.m_sizeBytes * 0x70);
+        DCStoreRange(rsdItem->m_polygons, usb.m_sizeBytes * 0x70);
         break;
     }
     case 0x42:
-        memcpy(&usbState.m_stageLoad, usb.m_data, 4);
-        usbState.m_stageLoad = reinterpret_cast<CMemory::CStage*>(LoadSwap32(reinterpret_cast<u32>(usbState.m_stageLoad)));
-        DCStoreRange(&usbState.m_stageLoad, 4);
+        memcpy(&m_readRsdIndex, usb.m_data, 4);
+        m_readRsdIndex = LoadSwap32(m_readRsdIndex);
+        DCStoreRange(&m_readRsdIndex, 4);
         SetRsdIndex();
         break;
     case 0x43:
@@ -233,9 +233,9 @@ void CMaterialEditorPcs::SetUSBData()
     case 0x12: {
         RSDITEM* rsdItem = GetRsdItem()->rsdItem;
 
-        if (rsdItem->ptr14 != 0) {
-            delete[] static_cast<u8*>(rsdItem->ptr14);
-            rsdItem->ptr14 = 0;
+        if (rsdItem->m_normals != 0) {
+            delete[] rsdItem->m_normals;
+            rsdItem->m_normals = 0;
         }
 
         rsdItem->countB = usb.m_sizeBytes;
@@ -245,18 +245,16 @@ void CMaterialEditorPcs::SetUSBData()
         if (allocData == 0) {
             System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
         }
-        rsdItem->ptr14 = allocData;
+        rsdItem->m_normals = static_cast<Vec*>(allocData);
 
-        memcpy(rsdItem->ptr14, usb.m_data, usb.m_sizeBytes * 0xC);
+        memcpy(rsdItem->m_normals, usb.m_data, usb.m_sizeBytes * 0xC);
 
-        u32 offset;
-        u32 i;
-        for (i = 0, offset = 0; i < usb.m_sizeBytes; offset += 0xC, i++) {
-            StoreSwapFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x0));
-            StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x4));
-            StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x8));
+        for (u32 i = 0; i < usb.m_sizeBytes; i++) {
+            StoreSwapFloat(&rsdItem->m_normals[i].x);
+            StoreSwapNegFloat(&rsdItem->m_normals[i].y);
+            StoreSwapNegFloat(&rsdItem->m_normals[i].z);
         }
-        DCStoreRange(rsdItem->ptr14, usb.m_sizeBytes * 0xC);
+        DCStoreRange(rsdItem->m_normals, usb.m_sizeBytes * 0xC);
         break;
     }
     case 1: {
@@ -314,7 +312,7 @@ void CMaterialEditorPcs::SetUSBData()
         u32 dstOffset;
         for (i = 0, dstOffset = 0; i < usb.m_sizeBytes; dstOffset += 0x70, i++) {
             u8 value = *dstBuffer;
-            u8* writeBase = static_cast<u8*>(rsdItem->ptr18);
+            u8* writeBase = reinterpret_cast<u8*>(rsdItem->m_polygons);
             u32 writeOffset = dstOffset + 0x1A;
             dstBuffer++;
             writeBase[writeOffset] = value;

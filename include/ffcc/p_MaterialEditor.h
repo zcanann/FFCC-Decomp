@@ -10,15 +10,16 @@
 #include <Dolphin/gx.h>
 
 struct Vec;
+struct MaterialEditorPolygon;
 
 struct RSDITEM {
     u32 countA;
     u32 countB;
     u32 countC;
     void* ptrC;
-    void* ptr10;
-    void* ptr14;
-    void* ptr18;
+    Vec* m_positions;
+    Vec* m_normals;
+    MaterialEditorPolygon* m_polygons;
 };
 
 struct MaterialEditorPolygon {
@@ -114,9 +115,10 @@ public:
     Vec m_viewerSrtScale; // 0x54
     unsigned char _pad60[0x24];
     CUSBStreamData m_usbStream; // 0x84
-    CUSBStreamDataState m_usbStreamState; // 0x98
-    unsigned char _padB4[0x8];
-    u32 m_rsdIndex; // 0xBC
+    int m_usbEnabled; // 0x98
+    int m_readRsdIndex; // 0x9C
+    unsigned char _padA0[0x1C];
+    RSDITEM* m_rsdItem; // 0xBC
     int m_rsdFlag; // 0xC0
     int m_rsdListIndex; // 0xC4
 

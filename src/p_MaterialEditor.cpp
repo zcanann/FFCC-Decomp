@@ -171,8 +171,8 @@ void CMaterialEditorPcs::drawViewer()
         RSDLISTITEM* listItem = reinterpret_cast<RSDLISTITEM*>(zlist->GetDataNext(&it));
         RSDITEM* model = listItem->rsdItem;
 
-        GXSetArray(GX_VA_POS, model->ptr10, 0xC);
-        GXSetArray(GX_VA_NRM, model->ptr14, 0xC);
+        GXSetArray(GX_VA_POS, model->m_positions, 0xC);
+        GXSetArray(GX_VA_NRM, model->m_normals, 0xC);
         GXSetNumChans(1);
         GXClearVtxDesc();
         GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
@@ -202,7 +202,7 @@ void CMaterialEditorPcs::drawViewer()
 
         for (int pass = 0; pass < 2; pass++) {
             for (u32 polyIndex = 0; polyIndex < model->countC; polyIndex++) {
-#define polygon (&static_cast<MaterialEditorPolygon*>(model->ptr18)[polyIndex])
+#define polygon (&model->m_polygons[polyIndex])
                 if ((polygon->flags & 0x200) != 0) {
                     GXSetCullMode(GX_CULL_NONE);
                 } else {
@@ -550,7 +550,7 @@ void CMaterialEditorPcs::destroyViewer()
     GXSetCopyClear(clear, 0xffffff);
 
     m_usbStream.DeleteBuffer();
-    MemFree(reinterpret_cast<void*>(m_rsdIndex));
+    MemFree(m_rsdItem);
 
     unsigned int textureIndex;
     CMaterialEditorPcs* textureSlot = this;
@@ -593,7 +593,7 @@ void CMaterialEditorPcs::createViewer()
     clear.a = 0xff;
     GXSetCopyClear(clear, 0xffffff);
 
-    m_usbStreamState.m_stageDefault = reinterpret_cast<CMemory::CStage*>(1);
+    m_usbEnabled = 1;
     m_displayTextureEnabled = 0;
     memset(&m_usbTransform, 0, sizeof(m_usbTransform));
 
@@ -641,8 +641,8 @@ void CMaterialEditorPcs::Quit()
         textureSlot = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<char*>(textureSlot) + sizeof(void*));
     } while (textureIndex < 0x10);
 
-    if (m_rsdIndex != 0) {
-        MemFree(reinterpret_cast<void*>(m_rsdIndex));
+    if (m_rsdItem != 0) {
+        MemFree(m_rsdItem);
     }
 }
 /*
@@ -689,7 +689,7 @@ void CMaterialEditorPcs::Init()
     m_viewerSrtScale.z = one;
     m_viewerSrtScale.y = one;
     m_viewerSrtScale.x = one;
-    m_rsdIndex = 0;
+    m_rsdItem = 0;
 
     textureIndex = 0;
     while (textureIndex < 0x10) {

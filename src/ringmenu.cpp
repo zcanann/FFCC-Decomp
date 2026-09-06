@@ -299,7 +299,7 @@ void CRingMenu::drawGBA()
 		return;
 	}
 
-	showScale = static_cast<float>(m_displayCounter) * 0.0625f;
+	showScale = m_displayCounter / 16.0f;
 	if (m_displayDirection != 0) {
 		showScale = 1.0f - showScale;
 	}
@@ -409,7 +409,7 @@ void CRingMenu::onDraw()
 		return;
 	}
 
-	float showScale = static_cast<float>(m_displayCounter) * 0.0625f;
+	float showScale = m_displayCounter / 16.0f;
 	if (m_displayDirection != 0) {
 		showScale = 1.0f - showScale;
 	}
@@ -955,7 +955,7 @@ void CRingMenu::onCalc()
  */
 double CRingMenu::GetDispCounter()
 {
-	return static_cast<double>(1.0f - static_cast<float>(m_displayCounter) * 0.0625f);
+	return 1.0f - m_displayCounter / 16.0f;
 }
 
 /*

@@ -98,7 +98,7 @@ p_usb.cpp:
 	.text       start:0x8001FF6C end:0x80020494
 	.ctors      start:0x801D53BC end:0x801D53C0
 	.rodata     start:0x801D6CF0 end:0x801D6D24
-	.data       start:0x801E8690 end:0x801E8814
+	.data       start:0x801E8690 end:0x801E8854
 	.bss        start:0x80244028 end:0x8024413C
 	.sdata      start:0x8032E440 end:0x8032E458
 	.sbss       start:0x8032EC68 end:0x8032EC70
@@ -110,7 +110,7 @@ pad.cpp:
 	.text       start:0x80020494 end:0x800211D4
 	.ctors      start:0x801D53C0 end:0x801D53C4
 	.rodata     start:0x801D6D34 end:0x801D6D80
-	.data       start:0x801E8818 end:0x801E8838
+	.data       start:0x801E8858 end:0x801E8874
 	.bss        start:0x80244140 end:0x8024433C
 	.sdata      start:0x8032E458 end:0x8032E468
 	.sdata2     start:0x8032F818 end:0x8032F850
@@ -127,7 +127,7 @@ system.cpp:
 	.text       start:0x800214B4 end:0x8002244C
 	.ctors      start:0x801D53C4 end:0x801D53C8
 	.rodata     start:0x801D6D80 end:0x801D6F90
-	.data       start:0x801E8838 end:0x801E8898
+	.data       start:0x801E8878 end:0x801E8894
 	.bss        start:0x80244340 end:0x802455BC
 	.sdata      start:0x8032E468 end:0x8032E478
 	.sdata2     start:0x8032F868 end:0x8032F874

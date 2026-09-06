@@ -9,8 +9,6 @@
 int s_usbReadPollFrameCounter;
 char s_usbReadPollInitialized;
 
-static const char sUsbPcsClassName[] = "CUSBPcs";
-
 typedef int CUSBDataHeader_size_mismatch[(sizeof(CUSBPcs::CDataHeader) == 0x40) ? 1 : -1];
 typedef int CUSBDataHeader_payload_size_offset_mismatch
     [(((u32)&((CUSBPcs::CDataHeader*)0)->m_payloadSize) == 0x20) ? 1 : -1];
@@ -29,15 +27,15 @@ inline CUSBPcs::CUSBPcs()
     static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
     static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
 
-    CUSBProcessTable* table = &m_table;
+    CProcessTable* table = &m_table;
 
     table->m_fields.m_create = desc0;
     table->m_fields.m_destroy = desc1;
     table->m_fields.m_entries[0].m_callback = desc2;
 }
 
-CUSBProcessTable CUSBPcs::m_table = {
-    const_cast<char*>(sUsbPcsClassName),
+CProcessTable CUSBPcs::m_table = {
+    "CUSBPcs",
     {
         0,
         0,
@@ -57,10 +55,6 @@ CUSBProcessTable CUSBPcs::m_table = {
         0,
     },
 };
-static const char sUsbManagerClassName[] = "CManager";
-static const char sUsbProcessClassName[] = "CProcess";
-static const char s_p_usb_cpp[] = "p_usb.cpp";
-static const char s_usbRootPath[16] = "plot/kmitsuru/";
 
 CUSBPcs USBPcs;
 
@@ -71,75 +65,139 @@ static inline unsigned int Swap32(unsigned int x)
 
 /*
  * --INFO--
- * PAL Address: 0x8001ff6c
- * PAL Size: 532b
+ * PAL Address: 0x80020370
+ * PAL Size: 116b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
+void CUSBPcs::Init()
 {
-    unsigned int count;
-    int result;
-    int connected;
-    CDataHeader* packet;
-    CDataHeader* dstBuffer;
-    CMemory::CStage* stage;
-    unsigned int value;
+    CMemory* memory = &Memory;
 
-    count = elemSize * elemCount;
-    value = (count + 0x5F) & ~0x1F;
-    stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
+	m_smallStage = memory->CreateStage(0x2000, "CUSBPcs", 0);
+	m_bigStage = (CMemory::CStage*)nullptr;
 
-    unsigned char* raw = new (stage, const_cast<char*>(s_p_usb_cpp), 0x1ca) unsigned char[value];
-    packet = reinterpret_cast<CDataHeader*>(raw);
-    packet->m_packetSize = value;
-    packet->m_packetType = 4;
-    packet->m_packetCode = Swap32((unsigned int)code);
-    packet->m_elementCount = Swap32((unsigned int)elemCount);
-    packet->m_dataSize = Swap32(count);
-    packet->m_reserved2C = Swap32(0);
-    packet->m_payloadSize = Swap32(count);
-    memcpy(packet + 1, src, count);
+	strcpy(m_rootPath, "plot/kmitsuru/");
+	m_unk0x104 = 0;
+	m_unk0x108 = 0;
 
-    connected = USB.IsConnected();
-    if (connected == 0) {
-        result = 0;
-    } else {
-        stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
-
-        dstBuffer = reinterpret_cast<CDataHeader*>(new (stage, const_cast<char*>(s_p_usb_cpp), 0x19e)
-            unsigned char[(packet->m_packetSize + 0x1F) & ~0x1F]);
-        memcpy(dstBuffer, packet, (packet->m_packetSize + 0x1F) & ~0x1F);
-
-        dstBuffer->m_packetType = Swap32(packet->m_packetType);
-        dstBuffer->m_packetSize = Swap32(packet->m_packetSize);
-
-        DCFlushRange(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F);
-        DCInvalidateRange(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F);
-
-        if (USB.Write(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F) == 0) {
-            delete[] dstBuffer;
-            result = 0;
-        } else if (USB.SendMessage(0, (MCCChannel)9) == 0) {
-            delete[] dstBuffer;
-            result = 0;
-        } else {
-            delete[] dstBuffer;
-            result = 1;
-        }
-    }
-
-    if (packet != (CDataHeader*)nullptr) {
-        delete[] packet;
-    }
-    return result;
+	USB.Connect();
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80021db8
+ * PAL Address: 0x80020314
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUSBPcs::Quit()
+{
+	if (m_bigStage != (CMemory::CStage*)nullptr)
+	{
+		Memory.DestroyStage(m_bigStage);
+	}
+
+	Memory.DestroyStage(m_smallStage);
+	USB.Disconnect();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80020300
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CUSBPcs::GetTable(unsigned long param)
+{
+    return reinterpret_cast<int>(&m_table + param);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002027c
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUSBPcs::IsBigAlloc(int param_2)
+{
+    if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
+        m_bigStage = Memory.CreateStage(0x100000, "CUSBPcs", 0);
+    } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
+        Memory.DestroyStage(m_bigStage);
+        m_bigStage = (CMemory::CStage*)nullptr;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80020248
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUSBPcs::create()
+{
+	USB.AddMessageCallback(CUSBPcs::messageCallback, this);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80020218
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUSBPcs::destroy()
+{
+	USB.RemoveMessageCallback(CUSBPcs::messageCallback);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800201f0
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUSBPcs::func()
+{
+	USB.Frame();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800201ec
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUSBPcs::messageCallback(unsigned long, void*, MCCChannel)
+{
+    return;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80020180
  * PAL Size: 108b
  * EN Address: TODO
  * EN Size: TODO
@@ -167,132 +225,68 @@ void CUSBPcs::mccReadData()
 
 /*
  * --INFO--
- * PAL Address: 0x80021e24
- * PAL Size: 4b
+ * PAL Address: 0x8001ff6c
+ * PAL Size: 532b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CUSBPcs::messageCallback(unsigned long, void*, MCCChannel)
+int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
-    return;
-}
+    unsigned int count;
+    int result;
+    int connected;
+    CDataHeader* packet;
+    CDataHeader* dstBuffer;
+    CMemory::CStage* stage;
+    unsigned int value;
 
-/*
- * --INFO--
- * PAL Address: 0x80021e28
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUSBPcs::func()
-{
-	USB.Frame();
-}
+    count = elemSize * elemCount;
+    value = (count + 0x5F) & ~0x1F;
+    stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-/*
- * --INFO--
- * PAL Address: 0x80021e50
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUSBPcs::destroy()
-{
-	USB.RemoveMessageCallback(CUSBPcs::messageCallback);
-}
+    unsigned char* raw = new (stage, "p_usb.cpp", 0x1ca) unsigned char[value];
+    packet = reinterpret_cast<CDataHeader*>(raw);
+    packet->m_packetSize = value;
+    packet->m_packetType = 4;
+    packet->m_packetCode = Swap32((unsigned int)code);
+    packet->m_elementCount = Swap32((unsigned int)elemCount);
+    packet->m_dataSize = Swap32(count);
+    packet->m_reserved2C = Swap32(0);
+    packet->m_payloadSize = Swap32(count);
+    memcpy(packet + 1, src, count);
 
-/*
- * --INFO--
- * PAL Address: 0x80021e80
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUSBPcs::create()
-{
-	USB.AddMessageCallback(CUSBPcs::messageCallback, this);
-}
+    connected = USB.IsConnected();
+    if (connected == 0) {
+        result = 0;
+    } else {
+        stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-/*
- * --INFO--
- * PAL Address: 0x80021eb4
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUSBPcs::IsBigAlloc(int param_2)
-{
-    if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
-        m_bigStage = Memory.CreateStage(0x100000, const_cast<char*>(sUsbPcsClassName), 0);
-    } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
-        Memory.DestroyStage(m_bigStage);
-        m_bigStage = (CMemory::CStage*)nullptr;
+        dstBuffer = reinterpret_cast<CDataHeader*>(new (stage, "p_usb.cpp", 0x19e)
+            unsigned char[(packet->m_packetSize + 0x1F) & ~0x1F]);
+        memcpy(dstBuffer, packet, (packet->m_packetSize + 0x1F) & ~0x1F);
+
+        dstBuffer->m_packetType = Swap32(packet->m_packetType);
+        dstBuffer->m_packetSize = Swap32(packet->m_packetSize);
+
+        DCFlushRange(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F);
+        DCInvalidateRange(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F);
+
+        if (USB.Write(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F) == 0) {
+            delete[] dstBuffer;
+            result = 0;
+        } else if (USB.SendMessage(0, (MCCChannel)9) == 0) {
+            delete[] dstBuffer;
+            result = 0;
+        } else {
+            delete[] dstBuffer;
+            result = 1;
+        }
     }
-}
 
-/*
- * --INFO--
- * PAL Address: 0x80021f38
- * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CUSBPcs::GetTable(unsigned long param)
-{
-    return reinterpret_cast<int>(reinterpret_cast<char*>(&m_table) + param * sizeof(CProcessTable));
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80021f4c
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUSBPcs::Quit()
-{
-	if (m_bigStage != (CMemory::CStage*)nullptr)
-	{
-		Memory.DestroyStage(m_bigStage);
-	}
-
-	Memory.DestroyStage(m_smallStage);
-	USB.Disconnect();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80021fa8
- * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUSBPcs::Init()
-{
-    CMemory* memory = &Memory;
-
-	m_smallStage = memory->CreateStage(0x2000, const_cast<char*>(sUsbPcsClassName), 0);
-	m_bigStage = (CMemory::CStage*)nullptr;
-
-	strcpy(m_rootPath, s_usbRootPath);
-	m_unk0x104 = 0;
-	m_unk0x108 = 0;
-
-	USB.Connect();
+    if (packet != (CDataHeader*)nullptr) {
+        delete[] packet;
+    }
+    return result;
 }

@@ -3,10 +3,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
-extern "C" {
-extern const float kPppParHitSphZero;
-extern const char s_pppParHitSphWin[] = "win";
-}
+static const float kPppParHitSphZero = 0.0f;
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 

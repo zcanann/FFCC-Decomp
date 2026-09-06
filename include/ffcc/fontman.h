@@ -62,7 +62,7 @@ public:
 	float GetWidth(unsigned short);
 
 	CFontGlyphEntry* searchChar(unsigned short);
-	void getNextChar(char**, unsigned short*);
+	int getNextChar(char**, unsigned short*);
 
 	unsigned short m_glyphWidth;
 	unsigned short m_glyphHeight;

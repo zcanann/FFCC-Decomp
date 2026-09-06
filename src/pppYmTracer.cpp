@@ -13,8 +13,6 @@ extern f32 gPppDefaultValueBuffer[];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern const u32 kYmTracerTopColorBase;
-extern const u32 kYmTracerBottomColorBase;
 extern const f32 kYmTracerZero;
 extern const f32 kYmTracerOne;
 
@@ -85,8 +83,6 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
     s32 i;
     s32 colorOffset;
     s32 dataValIndex;
-    pppPackedColor colorTop;
-    pppPackedColor colorBottom;
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
@@ -140,9 +136,9 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
                     (kYmTracerZero != next->from.y) && (kYmTracerZero != next->from.z)) {
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
-                    colorTop.value = kYmTracerTopColorBase;
+                    pppPackedColor colorTop = {0xFFFFFF00};
                     colorTop.bytes[3] = poly->alpha;
-                    colorBottom.value = kYmTracerBottomColorBase;
+                    pppPackedColor colorBottom = {0xFFFFFF00};
                     colorBottom.bytes[3] = next->alpha;
 
                     GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
@@ -402,10 +398,5 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
     work->_pad2e = 0;
 }
 
-extern const u32 kYmTracerTopColorBase = 0xFFFFFF00;
-extern const u32 kYmTracerBottomColorBase = 0xFFFFFF00;
 extern const f32 kYmTracerZero = 0.0f;
 extern const f32 kYmTracerOne = 1.0f;
-
-extern const f64 kPppParHitSphZero = 0.0;
-extern const char sYmTracerCommonName[8] = "common";

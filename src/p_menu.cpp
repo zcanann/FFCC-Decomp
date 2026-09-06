@@ -171,10 +171,10 @@ CProcessTable CMenuPcs::m_table = {
     },
 };
 
-extern const char sYmTracerCommonName[];
-extern const char s_pppParHitSphWin[];
+static const char sMenuCommonName[] = "common";
+static const char sMenuWinName[] = "win";
 const char* sMenuCommonTextureNames[] = {
-    sYmTracerCommonName, s_pppParHitSphWin,
+    sMenuCommonName, sMenuWinName,
 };
 
 extern const char* sMenuTextureRegionNameTable[];

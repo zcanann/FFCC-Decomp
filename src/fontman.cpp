@@ -2,6 +2,7 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/color.h"
 #include "ffcc/gxfunc.h"
+#include "global.h"
 #include "ffcc/p_camera.h"
 extern "C" {
 unsigned char g_tFont22[0x10D40] = {
@@ -12,15 +13,7 @@ unsigned char g_tFont22[0x10D40] = {
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
 #include <dolphin/mtx.h>
 
-extern const float kFontZero = 0.0f;
-extern const double kFontUnsignedIntToDoubleBias = 4503601774854144.0;
-extern const float kFontOne = 1.0f;
-extern const double kFontSignedIntToDoubleBias = 4503599627370496.0;
-extern const float kFontOrthoHeight = 448.0f;
-extern const float kFontOrthoWidth = 640.0f;
-
 static const char s_fontman_cpp[] = "fontman.cpp";
-static const char sFontManClassName[] = "CFontMan";
 
 CFontMan FontMan;
 
@@ -28,12 +21,17 @@ struct CFontGlyphEntry
 {
 	u16 m_textureIndex;
 	u8 m_codeHigh;
-	u8 m_left;
-	u8 m_width;
-	u8 m_shadowLeft;
-	u8 m_shadowWidth;
+	struct Metrics {
+		u8 m_left;
+		u8 m_width;
+	};
+	Metrics m_metrics[2];
 	u8 m_pad;
 };
+
+STATIC_ASSERT(sizeof(CFontGlyphEntry) == 8);
+STATIC_ASSERT(sizeof(CFontGlyphEntry::Metrics) == 2);
+STATIC_ASSERT(offsetof(CFontGlyphEntry, m_metrics) == 3);
 
 namespace {
 struct CFontRenderFlagBits
@@ -56,15 +54,29 @@ static inline CFontGlyphEntry* FirstGlyph(unsigned short* bucket)
 	return reinterpret_cast<CFontGlyphEntry*>(bucket + 1);
 }
 
-static inline float LoadFloat(const float& value)
-{
-	return value;
-}
-
 static inline float FloorF(float value)
 {
 	return static_cast<float>(floor(value));
 }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CFont::getNextChar(char** text, unsigned short* ch)
+{
+	if (static_cast<unsigned char>(**text) == 0) {
+		return 0;
+	}
+	*ch = static_cast<unsigned char>(**text);
+	(*text)++;
+	return 1;
 }
 
 inline CFontGlyphEntry* CFont::searchChar(unsigned short ch)
@@ -111,11 +123,7 @@ found_fallback:
 	if (renderFlagBits.fixedWidth != 0) {
 		drawWidth = static_cast<int>(m_glyphWidth);
 	} else {
-		signed char sign = static_cast<signed char>(renderFlagBits.shadow);
-		unsigned int extra = static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2;
-		unsigned char* glyphBytes = reinterpret_cast<unsigned char*>(glyph);
-		glyphBytes += extra;
-		drawWidth = static_cast<int>(glyphBytes[4]);
+		drawWidth = glyph->m_metrics[renderFlagBits.shadow != 0].m_width;
 	}
 
 	float width = localScaleX * (localMargin + static_cast<float>(drawWidth));
@@ -130,7 +138,7 @@ find_fallback:
 	if (glyph != 0) {
 		goto found_fallback;
 	}
-	return LoadFloat(kFontZero);
+	return 0.0f;
 }
 
 /*
@@ -145,64 +153,11 @@ find_fallback:
 float CFont::GetWidth(char* text)
 {
 	char* textPtr = text;
-	float width = LoadFloat(kFontZero);
+	float width = 0.0f;
 	unsigned short ch;
-	int hasChar;
-
-	goto read_char;
-
-	while (hasChar != 0) {
-		CFontGlyphEntry* glyph = searchChar(ch);
-		float charWidth;
-
-		if (glyph == 0) {
-			goto find_fallback;
-		}
-
-use_glyph:
-		CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
-		int drawWidth;
-		float localMargin;
-		float localScaleX;
-		localScaleX = scaleX;
-		localMargin = margin;
-
-		if (renderFlagBits.fixedWidth != 0) {
-			drawWidth = static_cast<int>(m_glyphWidth);
-		} else {
-			signed char sign = static_cast<signed char>(renderFlagBits.shadow);
-			drawWidth = static_cast<int>(
-			    *(reinterpret_cast<unsigned char*>(glyph) +
-			      ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 4)));
-		}
-
-		charWidth = localScaleX * (localMargin + static_cast<float>(drawWidth));
-		if (renderFlagBits.snapPosition != 0) {
-			charWidth = static_cast<float>(floor(charWidth));
-		}
-		goto add_width;
-
-find_fallback:
-		glyph = searchChar('?');
-		if (glyph != 0) {
-			goto use_glyph;
-		}
-		charWidth = LoadFloat(kFontZero);
-
-add_width:
-		width += charWidth;
-		goto read_char;
-
-read_char:
-		if (static_cast<unsigned char>(*textPtr) == 0) {
-			hasChar = 0;
-		} else {
-			ch = static_cast<unsigned char>(*textPtr);
-			hasChar = 1;
-			textPtr++;
-		}
+	while (getNextChar(&textPtr, &ch)) {
+		width += GetWidth(ch);
 	}
-
 	return width;
 }
 
@@ -227,10 +182,8 @@ void CFont::Draw(unsigned short ch)
 
 	unsigned char flags = renderFlags;
 	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
-	signed char sign = static_cast<signed char>(renderFlagBits.shadow);
 	int drawWidth;
-	unsigned int glyphOffset = static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2;
-	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(drawGlyph) + glyphOffset + 3;
+	CFontGlyphEntry::Metrics* glyphInfo = &drawGlyph->m_metrics[renderFlagBits.shadow != 0];
 	int row;
 	int glyphIndex;
 	float u0;
@@ -239,8 +192,8 @@ void CFont::Draw(unsigned short ch)
 	if (renderFlagBits.fixedWidth == 0) {
 		glyphIndex = static_cast<int>(drawGlyph->m_textureIndex);
 		row = glyphIndex / m_glyphColumns;
-		drawWidth = static_cast<int>(glyphInfo[1]);
-		u0 = static_cast<float>((static_cast<int>(glyphInfo[0]) + m_glyphWidth * (glyphIndex - m_glyphColumns * row)) * 2);
+		drawWidth = static_cast<int>(glyphInfo->m_width);
+		u0 = static_cast<float>((static_cast<int>(glyphInfo->m_left) + m_glyphWidth * (glyphIndex - m_glyphColumns * row)) * 2);
 		v0 = static_cast<float>(m_glyphHeight * row * 2);
 	} else {
 		drawWidth = static_cast<int>(m_glyphWidth);
@@ -268,15 +221,15 @@ void CFont::Draw(unsigned short ch)
 	}
 	posX += advance;
 
-	if (glyphInfo[0] == 0) {
-		u0 += LoadFloat(kFontOne);
+	if (glyphInfo->m_left == 0) {
+		u0 += 1.0f;
 	}
-	if (m_glyphWidth == glyphInfo[0] + glyphInfo[1]) {
-		u1 -= LoadFloat(kFontOne);
+	if (m_glyphWidth == glyphInfo->m_left + glyphInfo->m_width) {
+		u1 -= 1.0f;
 	}
 
-	v0 += LoadFloat(kFontOne);
-	v1 -= LoadFloat(kFontOne);
+	v0 += 1.0f;
+	v1 -= 1.0f;
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	GXPosition3f32(x0, y0, posZ);
@@ -305,21 +258,8 @@ void CFont::Draw(char* text)
 {
 	char* textPtr = text;
 	unsigned short ch;
-	int hasChar;
-
-	goto read_char;
-
-	while (hasChar != 0) {
+	while (getNextChar(&textPtr, &ch)) {
 		Draw(ch);
-
-read_char:
-		if (static_cast<unsigned char>(*textPtr) == 0) {
-			hasChar = 0;
-		} else {
-			ch = static_cast<unsigned char>(*textPtr);
-			hasChar = 1;
-			textPtr++;
-		}
 	}
 }
 
@@ -364,13 +304,13 @@ void CFont::DrawInit()
 
     CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
     if (renderFlagBits.zCompare != 0 || renderFlagBits.zUpdate != 0) {
-        C_MTXOrtho(projMtx, LoadFloat(kFontZero), LoadFloat(kFontOrthoHeight), LoadFloat(kFontZero),
-            LoadFloat(kFontOrthoWidth), LoadFloat(kFontZero), LoadFloat(kFontOne));
-        projMtx[2][2] = LoadFloat(kFontOne);
-        projMtx[2][3] = LoadFloat(kFontZero);
+        C_MTXOrtho(projMtx, 0.0f, 448.0f, 0.0f,
+            640.0f, 0.0f, 1.0f);
+        projMtx[2][2] = 1.0f;
+        projMtx[2][3] = 0.0f;
     } else {
-        C_MTXOrtho(projMtx, LoadFloat(kFontZero), LoadFloat(kFontOrthoHeight), LoadFloat(kFontZero),
-            LoadFloat(kFontOrthoWidth), LoadFloat(kFontZero), LoadFloat(kFontOne));
+        C_MTXOrtho(projMtx, 0.0f, 448.0f, 0.0f,
+            640.0f, 0.0f, 1.0f);
     }
     GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
 
@@ -400,7 +340,7 @@ void CFont::DrawInit()
 
     float texWidth = static_cast<float>(texturePtr->m_width);
     float texHeight = static_cast<float>(texturePtr->m_height);
-    PSMTXScale(texMtx, LoadFloat(kFontOne) / texWidth, LoadFloat(kFontOne) / texHeight, LoadFloat(kFontOne));
+    PSMTXScale(texMtx, 1.0f / texWidth, 1.0f / texHeight, 1.0f);
     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 
     GXSetNumTexGens(1);
@@ -666,30 +606,9 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                     }
 
                     unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
-                    for (int i = 0; i < 256; i += 8) {
-                        m_glyphBuckets[i + 0] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
-                        bucket++;
-                        m_glyphBuckets[i + 1] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
-                        bucket++;
-                        m_glyphBuckets[i + 2] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
-                        bucket++;
-                        m_glyphBuckets[i + 3] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
-                        bucket++;
-                        m_glyphBuckets[i + 4] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
-                        bucket++;
-                        m_glyphBuckets[i + 5] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
-                        bucket++;
-                        m_glyphBuckets[i + 6] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
-                        bucket++;
-                        m_glyphBuckets[i + 7] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
+                    for (int i = 0; i < 256; i++) {
+                        m_glyphBuckets[i] = bucket;
+                        bucket += *bucket * (sizeof(CFontGlyphEntry) / sizeof(unsigned short));
                         bucket++;
                     }
                     break;
@@ -732,14 +651,14 @@ CFont::CFont()
 {
 	m_glyphData = 0;
 	texturePtr = 0;
-	margin = LoadFloat(kFontZero);
-	posZ = LoadFloat(kFontZero);
-	posY = LoadFloat(kFontZero);
-	posX = LoadFloat(kFontZero);
+	margin = 0.0f;
+	posZ = 0.0f;
+	posY = 0.0f;
+	posX = 0.0f;
 	CFontRenderFlagBits& bits = GetRenderFlagBits(renderFlags);
 	bits.shadow = 0;
-	scaleY = LoadFloat(kFontOne);
-	scaleX = LoadFloat(kFontOne);
+	scaleY = 1.0f;
+	scaleX = 1.0f;
 	bits.snapPosition = 0;
 	m_color.r = 0xFF;
 	m_color.g = 0xFF;
@@ -799,7 +718,7 @@ void CFontMan::Init()
 {
 	m_font = 0;
 
-	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(sFontManClassName), 0);
+	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>("CFontMan"), 0);
 	m_stage = stage;
 
 	CFont* font = new (stage, const_cast<char*>(s_fontman_cpp), 0x3D) CFont;

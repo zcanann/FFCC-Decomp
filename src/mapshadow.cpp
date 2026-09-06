@@ -10,20 +10,6 @@
 #include "ffcc/vector.h"
 #include <dolphin/mtx.h>
 
-extern const double kMapShadowDepthBias;
-static const float kMapShadowScaleStep = 0.5f;
-static const double kMapShadowUnsignedDoubleBias = 4503599627370496.0;
-
-static inline float LoadFloat(const float& value)
-{
-	return value;
-}
-
-static inline double LoadDouble(const double& value)
-{
-	return value;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8004c71c
@@ -63,6 +49,10 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
  * --INFO--
  * PAL Address: 0x8004c808
  * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapShadow::Draw()
 {
@@ -90,6 +80,10 @@ void CMapShadow::Draw()
  * --INFO--
  * PAL Address: 0x8004c8c8
  * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapShadow::Calc()
 {
@@ -107,6 +101,10 @@ void CMapShadow::Calc()
  * --INFO--
  * PAL Address: 0x8004c91c
  * PAL Size: 236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapShadow::Init()
 {
@@ -123,14 +121,14 @@ void CMapShadow::Init()
 	m_materialMode = texture->m_wrapMode;
 	if (m_useFrustum != 0) {
 		float scale = m_shadowScale;
-		double scaleBias = LoadDouble(kMapShadowDepthBias);
-		float scaleStep = LoadFloat(kMapShadowScaleStep);
+		double scaleBias = 0.5;
+		float scaleStep = 0.5f;
 		C_MTXLightFrustum(m_lightMtx, -height, height, -width, width, m_frustumNear,
 		                  (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	} else {
 		float scale = m_shadowScale;
-		double scaleBias = LoadDouble(kMapShadowDepthBias);
-		float scaleStep = LoadFloat(kMapShadowScaleStep);
+		double scaleBias = 0.5;
+		float scaleStep = 0.5f;
 		C_MTXLightOrtho(m_lightMtx, -height, height, -width, width,
 		                (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	}

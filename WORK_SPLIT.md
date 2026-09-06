@@ -4,11 +4,11 @@ Generated against `build/GCCP01/report.json` on latest `main` (overall ~91%). Sc
 
 ## Model
 - **4 employees**, each runs its own **Claude**, each spawns **N worktree-isolated background agents** (~one per unit, waves of ~5-6 concurrent).
-- Per-unit loop: branch from latest `main` -> configure+build -> diff -> fix -> rebuild+remeasure -> **commit/push every net-positive plausible change** -> one PR per unit -> **merge at a good-sized checkpoint, relaunch from fresh main**. Repeat until the unit's source-reachable frontier is closed.
+- Per-unit loop: start from current `staging` -> configure+build -> diff -> fix -> rebuild+remeasure -> **commit every net-positive plausible change**. Contributors with direct write access sync, revalidate, and push checkpoints to the permanent staging branch; outside contributors push fork topic branches and open or update PRs against staging. Follow the integration workflow in [`AGENTS.md`](AGENTS.md). Repeat until the unit's source-reachable frontier is closed.
 
 ## Coordination policy (UPDATED)
 1. Buckets are domain-grouped to minimize file overlap — stay in your bucket by default.
-2. **Cross-unit fixes are ALLOWED.** If a fix needs a shared header/struct/symbol touching other buckets: keep it minimal, prefix the PR title `[cross]`, and **merge it FAST** so the other 3 orchestrators rebase/resolve quickly. Don't sit on cross-unit changes.
+2. **Cross-unit fixes are ALLOWED.** If a fix needs a shared header/struct/symbol touching other buckets: keep it minimal, prefix the checkpoint commit (or outside contributor's PR) title `[cross]`, and publish validated work promptly so other operators can sync and resolve dependencies. Coordinate shared-header edits before landing them.
 3. **report.json is the source of truth** for match percent (diverges from on-demand `objdiff-cli diff` by ~0.1 to 0.5 points — always gate on report.json).
 4. orig/ hygiene: symlink only individual files INSIDE `orig/<ver>/`; never replace an `orig/<ver>` dir with a symlink; never `git add -A` under `orig/`.
 5. Confirm `ninja build/GCCP01/ok` (DOL sha1) after shared-header/struct changes.
@@ -244,5 +244,5 @@ Every unit below 100% reassigned from scratch; ~1052664 unmatched code bytes tot
 | **Total** | **125** | **1,052,664** | |
 
 - Byte totals over-state B4's effort: it's a long tail of near-100% units (fan-out friendly), while B3 is fewer/deeper. Real effort is closer than bytes.
-- Shared-header conflict zones to coordinate via `[cross]` fast-merge: menu headers (B1/B2), chara/gobject/particle bases (B3 + B2's ppp), map/vector/gobject (B4). cflat_* lives in B4 — keep its 4 units together (shared cflat headers).
-- Per-operator loop unchanged: branch from latest main → diff → apply lever-catalog → rebuild+remeasure → commit/push every net-positive change (gate on report.json) → merge at checkpoints. The full battle-tested lever catalog + dead-ends above apply to ALL buckets.
+- Shared-header conflict zones to coordinate via `[cross]` checkpoints: menu headers (B1/B2), chara/gobject/particle bases (B3 + B2's ppp), map/vector/gobject (B4). cflat_* lives in B4 — keep its 4 units together (shared cflat headers).
+- Per-operator loop: sync staging → diff → apply lever-catalog → rebuild+remeasure → commit every net-positive plausible change (gate on report.json). Direct-write contributors sync, revalidate, and push to staging; outside contributors submit fork PRs against staging. Maintainers batch integration into main. The full battle-tested lever catalog + dead-ends above apply to ALL buckets.

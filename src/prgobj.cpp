@@ -211,11 +211,7 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	float targetRot;
 	float deltaX;
 	float deltaZ;
-	CVector targetPos(target->m_worldPosition);
-	Vec* basePos = CVector(m_worldPosition);
-	CVector deltaPos;
-
-	PSVECSubtract(basePos, targetPos, deltaPos);
+	CVector deltaPos = CVector(m_worldPosition) - target->m_worldPosition;
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((kPrgObjZero == deltaX) || (kPrgObjZero == deltaZ)) {
@@ -242,11 +238,7 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	float targetRot;
 	float deltaX;
 	float deltaZ;
-	CVector targetPos(target->m_worldPosition);
-	Vec* basePos = CVector(m_worldPosition);
-	CVector deltaPos;
-
-	PSVECSubtract(basePos, targetPos, deltaPos);
+	CVector deltaPos = CVector(m_worldPosition) - target->m_worldPosition;
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((kPrgObjZero == deltaX) || (kPrgObjZero == deltaZ)) {
@@ -271,11 +263,7 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	float targetRot;
 	float deltaX;
 	float deltaZ;
-	CVector targetPos(target->m_worldPosition);
-	Vec* basePos = CVector(m_worldPosition);
-	CVector deltaPos;
-
-	PSVECSubtract(basePos, targetPos, deltaPos);
+	CVector deltaPos = CVector(m_worldPosition) - target->m_worldPosition;
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((kPrgObjZero == deltaX) || (kPrgObjZero == deltaZ)) {

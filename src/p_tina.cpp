@@ -534,14 +534,14 @@ unsigned int CPartPcs::IsLoadPartCompleted()
 void CPartPcs::drawAfterViewer()
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x3f1);
-	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
-	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
+	g_par_draw_prof.Start();
+	g_par_calc_prof.Start();
 	Graphic.SetFog(1, 0);
 	pppInitDrawEnv(0);
 	PartMng.pppEditPartDrawAfter();
-	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
+	g_par_calc_prof.Stop();
 	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x3fb);
-	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
+	g_par_draw_prof.Stop();
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 
@@ -764,14 +764,14 @@ void CPartPcs::drawAfter()
 void CPartPcs::drawViewer()
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x31a);
-    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
-    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
+    g_par_draw_prof.Start();
+    g_par_calc_prof.Start();
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDraw();
-    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
+    g_par_calc_prof.Stop();
     Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x322);
-    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
+    g_par_draw_prof.Stop();
     pppClearDrawEnv();
 }
 
@@ -787,14 +787,14 @@ void CPartPcs::drawViewer()
 void CPartPcs::drawShadowViewer()
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x308);
-    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
-    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
+    g_par_draw_prof.Start();
+    g_par_calc_prof.Start();
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDrawShadow();
-    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
+    g_par_calc_prof.Stop();
     Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x30f);
-    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
+    g_par_draw_prof.Stop();
     pppClearDrawEnv();
 }
 
@@ -924,10 +924,10 @@ void CPartPcs::calcViewer()
 {
     int packetCode;
 
-    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
+    g_par_calc_prof.Start();
     PartMng.pppEditBeforeCalc();
     PartMng.pppEditPartCalc();
-    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
+    g_par_calc_prof.Stop();
 
     USBPcs.mccReadData();
     if (m_usbStreamData.IsUSBStreamDataDone()) {

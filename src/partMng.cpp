@@ -2450,7 +2450,7 @@ void CPartMng::pppEditPartCalc()
         ppvSysStopPartF = 0;
     }
 
-    reinterpret_cast<CStopWatch&>(g_par_calc_prof).Stop();
+    g_par_calc_prof.Stop();
     if (*reinterpret_cast<CGObject**>(self + 0x80c) != 0) {
         (*reinterpret_cast<CGObject**>(self + 0x80c))->m_charaModelHandle->m_model->CalcMatrix();
         (*reinterpret_cast<CGObject**>(self + 0x80c))->m_charaModelHandle->m_model->CalcSkin();
@@ -2460,7 +2460,7 @@ void CPartMng::pppEditPartCalc()
             *reinterpret_cast<float*>(self + 0x23564) += kPartMngOne;
         }
     }
-    reinterpret_cast<CStopWatch&>(g_par_calc_prof).Start();
+    g_par_calc_prof.Start();
 
     if (usbEdit[0x18] != 0) {
         usbEdit[0x18] = 0;

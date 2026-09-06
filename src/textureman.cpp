@@ -8,32 +8,33 @@
 
 CTextureMan TextureMan;
 
-inline void* operator new(unsigned long, void* p)
-{
-    return p;
-}
-
-static const char s_CTextureSet[] = "CTextureSet";
 static const char s_textureman_cpp[] = "textureman.cpp";
 static const char s_errorTextureDimensions[] = "Error width=%d height=%d\n";
 static const char s_CTextureStageName[] = "CTexture.texture";
-static const char s_CTexture[] = "CTexture";
-static const char s_CTextureMan[] = "CTextureMan";
-static const char s_CManager[] = "CManager";
 static const char s_ptrarray_grow_error[] = {
     0x83, 0x6f, 0x83, 0x62, 0x83, 0x74, 0x83, 0x40, 0x90, 0xac, 0x92, 0xb7, 0x82, 0xaa,
     0x95, 0x73, 0x8b, 0x96, 0x89, 0xc2, 0x82, 0xc5, 0x82, 0xb7, 0x81, 0x42, 0x0a, 0x00,
 };
 static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
-static const char s_CPtrArray_CTexture[] = "CPtrArray<CTexture *>";
-extern const char kTextureCRefName[];
-extern const float kTextureOne;
-extern const float kTextureZero;
 
 enum {
     kTextureC8TlutEntries = 0x100,
     kTextureC4TlutEntries = 0x10
 };
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003B894
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* CTexture::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
+{
+    return Memory._Alloc(size, TextureMan.m_memoryStage, file, line, 0);
+}
 
 /*
  * --INFO--
@@ -54,12 +55,6 @@ CTexture::CTexture()
     m_name[0] = 0;
     m_cacheId = -1;
     m_usesExternalAddress = 0;
-}
-
-static inline CTexture* NewTexture(CMemory::CStage* textureStage, char* file, int line)
-{
-    void* memory = Memory._Alloc(sizeof(CTexture), textureStage, file, line, 0);
-    return ::new (memory) CTexture;
 }
 
 static inline int TextureTlutEntryCount(unsigned int format)
@@ -143,7 +138,7 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
     while (chunkFile.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x54585452:
-            texture = NewTexture(TextureMan.m_memoryStage, const_cast<char*>(s_textureman_cpp), 0x2ED);
+            texture = new (stage, const_cast<char*>(s_textureman_cpp), 0x2ED) CTexture;
             texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
             if (texture->m_name[0] != 0) {
@@ -192,7 +187,6 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
 void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
 {
     CChunkFile::CChunk chunk;
-    CChunkFile::CChunk textureChunk;
     CChunkFile chunkFile(filePtr);
 
     while (chunkFile.GetNextChunk(chunk)) {
@@ -206,60 +200,7 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                 chunkFile.PushChunk();
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x54534554) {
-                        if (append == 0) {
-                            m_textureArray.ReleaseAndRemoveAll();
-                        }
-
-                        chunkFile.PushChunk();
-                        while (chunkFile.GetNextChunk(textureChunk)) {
-                            switch (textureChunk.m_id) {
-                            case 0x54585452:
-                                CTexture* texture = NewTexture(TextureMan.m_memoryStage, const_cast<char*>(s_textureman_cpp), 0x2ED);
-                                texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
-
-                                if (texture->m_name[0] != 0) {
-                                    unsigned int duplicateIdx;
-                                    char* textureName = texture->m_name;
-                                    for (duplicateIdx = 0; duplicateIdx < (unsigned int)m_textureArray.GetSize(); duplicateIdx++) {
-                                        CTexture* existing = m_textureArray[duplicateIdx];
-                                        if ((existing != 0)
-                                            && (strcmp(existing->m_name, textureName) == 0)) {
-                                            goto found_duplicate;
-                                        }
-                                    }
-                                    duplicateIdx = 0xFFFFFFFF;
-
-                                found_duplicate:
-                                    if ((int)duplicateIdx >= 0) {
-                                        if (amemCacheSet != 0) {
-                                            amemCacheSet->DestroyCache(static_cast<int>(texture->m_cacheId));
-                                            amemCacheSet->AmemPrev();
-                                        }
-
-                                        if (texture->DecRef() == 0) {
-                                            delete texture;
-                                        }
-
-                                        texture = m_textureArray[duplicateIdx];
-                                        texture->AddRef();
-                                    }
-                                }
-
-                                if (append != 0) {
-                                    for (unsigned long i = 0; i < static_cast<unsigned long>(m_textureArray.GetSize()); i++) {
-                                        if (m_textureArray[i] == 0) {
-                                            m_textureArray.SetAt(i, texture);
-                                            goto next_texture;
-                                        }
-                                    }
-                                }
-
-                                m_textureArray.Add(texture);
-                                break;
-                            }
-                        next_texture:;
-                            }
-                        chunkFile.PopChunk();
+                        Create(chunkFile, stage, append, amemCacheSet, cacheTag, useAddress);
                     }
                 }
             }
@@ -771,24 +712,6 @@ void CTexture::InitTexObj()
         GXInitTexObjLOD(&m_texObj, GX_LIN_MIP_LIN, GX_LINEAR, 0.0f, static_cast<float>(m_maxLod) - 1.0f,
                         0.0f, GX_TRUE, GX_FALSE, GX_ANISO_1);
     }
-}
-
-extern const char kTextureCRefName[] = "CRef";
-extern const float kTextureOne = 1.0f;
-extern const float kTextureZero = 0.0f;
-
-/*
- * --INFO--
- * PAL Address: 0x8003B894
- * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void* CTexture::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
-{
-    return Memory._Alloc(size, TextureMan.m_memoryStage, file, line, 0);
 }
 
 /*

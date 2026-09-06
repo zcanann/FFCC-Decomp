@@ -550,7 +550,7 @@ void CGPartyObj::onChangeStat(int state)
 		*reinterpret_cast<int*>(self + 0x68C) = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		if (Game.m_gameWork.m_menuStageMode != 0) {
 			int cmdListItem =
-			    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCmdListItem(PartyData(this).weaponItem);
+			    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetWeaponAttrib(PartyData(this).weaponItem);
 			if (cmdListItem >= 0) {
 				m_comboItemState = cmdListItem;
 			}
@@ -1222,7 +1222,7 @@ void CGPartyObj::command()
 		int cmdDir = 0;
 
 		if ((getPadHeldForSlot(padSlot) & 0x60) == 0x60) {
-			caravan->IsUseCmdList(0);
+			caravan->SetIdxCmdList(0);
 		} else if ((getPadTrigForSlot(padSlot) & 0x20) != 0) {
 			cmdDir = 1;
 		} else if ((getPadTrigForSlot(padSlot) & 0x40) != 0) {
@@ -1232,7 +1232,7 @@ void CGPartyObj::command()
 		if (cmdDir != 0) {
 			Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
 			CCaravanWork* cmdDirCaravan = caravan;
-			cmdDirCaravan->IsUseCmdList(cmdDirCaravan->GetNextCmdListIdx(cmdDirCaravan->GetIdxCmdList(), cmdDir));
+			cmdDirCaravan->SetIdxCmdList(cmdDirCaravan->GetNextCmdListIdx(cmdDirCaravan->GetIdxCmdList(), cmdDir));
 		}
 
 		const int cmdIdx = caravan->GetIdxCmdList();
@@ -1242,7 +1242,7 @@ void CGPartyObj::command()
 			ringCommand = 9;
 		} else {
 			CCaravanWork* delCaravan = caravan;
-			const int itemId = delCaravan->DelCmdListAndItem(delCaravan->GetIdxCmdList());
+			const int itemId = delCaravan->GetCmdListItem(delCaravan->GetIdxCmdList());
 			const int itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
 			switch (itemKind) {
 			case 1:
@@ -1513,7 +1513,7 @@ targetJoin: ;
 			return;
 		}
 
-		const int itemId = caravan->DelCmdListAndItem(cmdIdx);
+		const int itemId = caravan->GetCmdListItem(cmdIdx);
 		const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
 		switch (itemKind) {
 		case 0x100:
@@ -1521,7 +1521,7 @@ targetJoin: ;
 				if (static_cast<unsigned int>(Math.Rand(3)) == 0) {
 					ClearAllSta();
 					setSta(0x1B, 900);
-					caravan->GetNumCombi(party.unk6BC, 1);
+					caravan->DelCmdListAndItem(party.unk6BC, 1);
 					return;
 				}
 				m_itemId = itemId;
@@ -1560,7 +1560,7 @@ targetJoin: ;
 		case 0x186:
 		case 0x17D:
 			if (useItem(itemId) != 0) {
-				caravan->GetNumCombi(party.unk6BC, 1);
+				caravan->DelCmdListAndItem(party.unk6BC, 1);
 			}
 			return;
 		case 0xDF: {
@@ -3184,7 +3184,7 @@ void CGPartyObj::onStatMagic()
 			endPSlotBit(0x10);
 			endPSlotBit(0x100);
 			if ((*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x524) & 2) != 0) {
-				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetNumCombi(PartyData(this).unk6BC, 1);
+				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->DelCmdListAndItem(PartyData(this).unk6BC, 1);
 			}
 		}
 		if (m_subFrame == 8 && m_comboLinkCount != 0) {

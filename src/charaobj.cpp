@@ -2265,8 +2265,8 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
 			CGPartyObj* party = static_cast<CGPartyObj*>(this);
 			for (int i = 2; i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAA); i++) {
-				if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->DelCmdListAndItem(i) == 0x125) {
-					reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetNumCombi(i, 1);
+				if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCmdListItem(i) == 0x125) {
+					reinterpret_cast<CCaravanWork*>(m_scriptHandle)->DelCmdListAndItem(i, 1);
 					reinterpret_cast<CharaObjPartyFlag04*>(&party->m_partyData.partyFlags)->m_bit04 = 1;
 					return;
 				}

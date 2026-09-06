@@ -682,15 +682,13 @@ void CRingMenu::onDraw()
 						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
 
 						for (int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
-							int maxCharge;
-							int curCharge;
-							int charge = caravanWork->GetMagicCharge(i, maxCharge, curCharge);
+							int selected = caravanWork->IsSelectedCmdList(i);
 
 							float blink;
-							if (charge != 0) {
+							if (selected != 0) {
 								MenuPcs.SetColor(CColor(0x00, 0xFF, 0x00, static_cast<unsigned char>(fullAlpha)));
 								blink = static_cast<float>(static_cast<int>((System.m_frameCounter >> 2) & 1));
-							} else if (caravanWork->IsSelectedCmdList(i)) {
+							} else if (caravanWork->IsUseCmdList(i)) {
 								MenuPcs.SetColor(CColor(0x20, 0xFF, 0x20, static_cast<unsigned char>(fullAlpha)));
 								blink = 0.0f;
 							} else {
@@ -752,7 +750,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 		}
 		commandLabel = cmdNameTable[tlut];
 	} else {
-		commandLabel = caravanWork->GetWeaponAttrib(cmdIndex);
+		commandLabel = caravanWork->GetCmdListItemName(cmdIndex);
 	}
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {

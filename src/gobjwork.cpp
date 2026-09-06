@@ -2071,7 +2071,7 @@ int CCaravanWork::GetIdxCmdList()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::IsUseCmdList(int cmdListIdx)
+void CCaravanWork::SetIdxCmdList(int cmdListIdx)
 {
 	m_currentCmdListIndex = cmdListIdx;
 }
@@ -2085,7 +2085,7 @@ void CCaravanWork::IsUseCmdList(int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
+int CCaravanWork::IsUseCmdList(int cmdListIdx)
 {
 	unsigned int isInvalid = 0;
 	short slotRef = m_commandListInventorySlotRef[cmdListIdx];
@@ -2096,26 +2096,26 @@ int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 	return ((unsigned int)__cntlzw((unsigned char)isInvalid)) >> 5;
 }
 
-static inline int GetNumGroupedCmdList(CCaravanWork* work, int cmdListIdx)
+inline int CCaravanWork::GetNumCombi(int cmdListIdx)
 {
 	int numGrouped;
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		numGrouped = 1;
-	} else if (work->m_commandListExtra[cmdListIdx] == 0) {
+	} else if (m_commandListExtra[cmdListIdx] == 0) {
 		numGrouped = 1;
 	} else {
 		int topIdx;
 		for (topIdx = cmdListIdx; topIdx >= 0; topIdx--) {
-			if (work->m_commandListExtra[topIdx] != -1) {
+			if (m_commandListExtra[topIdx] != -1) {
 				break;
 			}
 		}
 
 		numGrouped = 1;
 		int nextIdx = topIdx + 1;
-		short numSlots = work->m_numCmdListSlots;
+		short numSlots = m_numCmdListSlots;
 		for (int n = topIdx + 1; n < numSlots; n++) {
-			if (work->m_commandListExtra[nextIdx] != -1) {
+			if (m_commandListExtra[nextIdx] != -1) {
 				break;
 			}
 			numGrouped++;
@@ -2134,7 +2134,7 @@ static inline int GetNumGroupedCmdList(CCaravanWork* work, int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
+unsigned int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 {
 	unsigned int isInvalid = 0;
 	short slotRef = m_commandListInventorySlotRef[cmdListIdx];
@@ -2146,7 +2146,7 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 		return 0;
 	}
 
-	int groupedCountLocal = GetNumGroupedCmdList(this, cmdListIdx);
+	int groupedCountLocal = GetNumCombi(cmdListIdx);
 
 	if (groupedCountLocal == 1) {
 		return (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
@@ -2177,14 +2177,14 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
  * JP Address: TODO
  * JP Size: TODO
  */
-const char* CCaravanWork::GetWeaponAttrib(int cmdListIdx)
+const char* CCaravanWork::GetCmdListItemName(int cmdListIdx)
 {
-	int weaponType = GetCmdListItem(cmdListIdx);
+	int weaponType = GetWeaponAttrib(cmdListIdx);
 	if (weaponType >= 0 && weaponType < 3) {
 		return MenuPcs.GetSkillStr(weaponType);
 	}
 
-	int itemId = DelCmdListAndItem(cmdListIdx);
+	int itemId = GetCmdListItem(cmdListIdx);
 	return Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
 }
 
@@ -2197,13 +2197,13 @@ const char* CCaravanWork::GetWeaponAttrib(int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::GetCmdListItem(int cmdListIdx)
+int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 {
 	int cmdTopIdx;
 	int itemCmdListIdx;
 	int result = -1;
 
-	if (GetCmdListItemName(cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+	if (GetMagicCharge(cmdListIdx, cmdTopIdx, itemCmdListIdx) != 0) {
 		short cmdId = m_commandListExtra[cmdTopIdx];
 		switch (cmdId) {
 		case 0x207:
@@ -2230,7 +2230,7 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
+int CCaravanWork::GetCmdListItem(int cmdListIdx)
 {
 	int result;
 	int inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
@@ -2250,7 +2250,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 			result = (short)m_inventoryItems[equipmentSlot];
 		}
 	} else {
-		int numGrouped = GetNumGroupedCmdList(this, cmdListIdx);
+		int numGrouped = GetNumCombi(cmdListIdx);
 
 		if (numGrouped > 1) {
 			for (int n = cmdListIdx; n >= 0; n--) {
@@ -2263,7 +2263,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 			int cmdResult = m_commandListExtra[cmdListIdx];
 			int cmdTopIdx;
 			int itemCmdListIdx;
-			if (GetCmdListItemName(cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+			if (GetMagicCharge(cmdListIdx, cmdTopIdx, itemCmdListIdx) != 0) {
 				cmdResult = (short)m_inventoryItems[(short)m_commandListInventorySlotRef[itemCmdListIdx]];
 			}
 			result = cmdResult;
@@ -2288,7 +2288,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::GetNumCombi(int cmdListIdx, int updateJoybus)
+void CCaravanWork::DelCmdListAndItem(int cmdListIdx, int updateJoybus)
 {
 	int nextCmdIdx = 0;
 	short* slotRefPtr = (short*)((char*)this + cmdListIdx * 2);
@@ -2328,7 +2328,7 @@ int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 {
 	while (true) {
 		int prev = cmdListIdx;
-		cmdListIdx = prev + (dir != 0 ? dir : dir);
+		cmdListIdx = prev + dir;
 
 		if (cmdListIdx < 0) {
 			cmdListIdx += m_numCmdListSlots;
@@ -2347,7 +2347,7 @@ int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 			}
 		}
 
-		int item = DelCmdListAndItem(cmdListIdx);
+		int item = GetCmdListItem(cmdListIdx);
 		if (cmdListIdx < 2 || item > 0) {
 			return cmdListIdx;
 		}
@@ -2390,7 +2390,7 @@ void CCaravanWork::GetCurrentWeaponItem(int& weaponItem, int& weaponRef)
 	} else if (weaponIdx != 1) {
 		weaponItem = weaponIdx;
 		CCaravanWork* ownerWork = *reinterpret_cast<CCaravanWork**>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x58);
-		weaponRef = ownerWork->DelCmdListAndItem(m_weaponIdx);
+		weaponRef = ownerWork->GetCmdListItem(m_weaponIdx);
 	}
 }
 
@@ -2421,7 +2421,7 @@ void CCaravanWork::SetCurrentWeaponIdx(int weaponIdx)
 void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
 {
 	int reset = 0;
-	int weaponItem = DelCmdListAndItem(weaponIdx);
+	int weaponItem = GetCmdListItem(weaponIdx);
 	if ((0 < weaponItem) && (*GetItemDataPtr(weaponItem) == 1)) {
 		return;
 	}
@@ -2582,7 +2582,7 @@ void CCaravanWork::UniteComList(int startIdx, int count, int cmdId)
 	if ((m_weaponIdx >= startIdx) && (m_weaponIdx < (startIdx + count))) {
 		int cmdTopIdx;
 		int itemCmdListIdx;
-		if (GetCmdListItemName(startIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+		if (GetMagicCharge(startIdx, cmdTopIdx, itemCmdListIdx) != 0) {
 			m_weaponIdx = (short)itemCmdListIdx;
 		}
 	}
@@ -2602,7 +2602,7 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
 	if (m_weaponIdx == startIdx) {
 		int cmdTopIdx;
 		int itemCmdListIdx;
-		if (GetCmdListItemName(startIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+		if (GetMagicCharge(startIdx, cmdTopIdx, itemCmdListIdx) != 0) {
 			m_weaponIdx = (short)itemCmdListIdx;
 		}
 	}
@@ -2614,8 +2614,8 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
 
 /*
  * --INFO--
- * PAL Address: 0x800a7e18
- * PAL Size: 132b
+ * PAL Address: 0x8009f730
+ * PAL Size: 352b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -2623,10 +2623,10 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
  */
 #pragma push
 #pragma opt_common_subs off
-int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
+int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdListIdx)
 {
 	int extraOff = cmdListIdx * 2;
-	int groupedCount = GetNumGroupedCmdList(this, cmdListIdx);
+	int groupedCount = GetNumCombi(cmdListIdx);
 
 	if (groupedCount > 1) {
 		short* cur2 = (short*)((char*)this + extraOff);
@@ -2640,14 +2640,14 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 
 		short cmdId = m_commandListExtra[cmdListIdx];
 		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
-			*firstCmdIdx = cmdListIdx;
+			firstCmdIdx = cmdListIdx;
 			int i = 0;
 			for (; groupedCount > 0; groupedCount--) {
 				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
 				short itemId = (short)m_inventoryItems[invSlot];
 				int itemType = GetItemDataPtr(itemId)[0];
 				if (itemType == 1) {
-					*itemCmdListIdx = cmdListIdx + i;
+					itemCmdListIdx = cmdListIdx + i;
 					return 1;
 				}
 				i++;

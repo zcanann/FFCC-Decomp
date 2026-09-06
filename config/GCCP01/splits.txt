@@ -905,12 +905,13 @@ pppRyjMegaBirthModel.cpp:
 	.rodata     start:0x801D9C18 end:0x801D9C31
 	.data       start:0x801FD3D0 end:0x801FD420
 	.bss        start:0x802EA0B0 end:0x802EA110
-	.sdata2     start:0x803304A8 end:0x80330500
+	.sdata2     start:0x803304A8 end:0x803304EC
 
 pppDrawMdlTs.cpp:
 	extab       start:0x80007A00 end:0x80007A08
 	extabindex  start:0x8000DC54 end:0x8000DC60
 	.text       start:0x80087EF0 end:0x800880F0
+	.sdata2     start:0x803304F0 end:0x803304F4
 
 pppKeShpTail.cpp:
 	extab       start:0x80007A08 end:0x80007A10
@@ -921,6 +922,7 @@ pppKeZCrctShp.cpp:
 	extab       start:0x80007A10 end:0x80007A18
 	extabindex  start:0x8000DC6C end:0x8000DC78
 	.text       start:0x8008821C end:0x80088698
+	.sdata2     start:0x803304F8 end:0x803304FC
 
 pppKeShpTail2X.cpp:
 	extab       start:0x80007A18 end:0x80007A38

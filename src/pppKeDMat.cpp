@@ -19,7 +19,7 @@ static inline pppFMATRIX* GetKeDMatTargetMatrix(_pppPObject* pObject, _pppCtrlTa
 
 /*
  * --INFO--
- * PAL Address: 0x80095854
+ * PAL Address: 0x8008ed4c
  * PAL Size: 380b
  * EN Address: TODO
  * EN Size: TODO

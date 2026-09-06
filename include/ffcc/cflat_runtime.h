@@ -9,16 +9,21 @@ class CChunkFile;
 class CFlatRuntime
 {
 public:
-	struct CStack
-	{
-		u32 m_word;
-
-		void operator=(const CStack&);
-	};
-
 	class CCodeIndex
 	{
-		void operator=(const CCodeIndex&);
+	public:
+		short m_codeFunc : 12;
+		int m_codeOffset : 20;
+	};
+
+	struct CStack
+	{
+		union {
+			u32 m_word;
+			s32 m_int;
+			float m_float;
+			CCodeIndex m_codeIndex;
+		};
 	};
 
 	class CClass
@@ -50,18 +55,12 @@ public:
 		void* m_engineObject;      // 0x18
 		union {
 			unsigned int m_codePos; // 0x1C
-			struct {
-				short m_codeFunc : 12;
-				int m_codeOffset : 20;
-			} m_codeIndex;
+			CCodeIndex m_codeIndex;
 		};
 		CObject* m_previous;       // 0x20
 		CObject* m_next;           // 0x24
 		int m_waitCounter;	       // 0x28
-		unsigned char m_reqFlag0;  // 0x2C
-		unsigned char m_reqFlag1;  // 0x2D
-		unsigned char m_reqFlag2;  // 0x2E
-		unsigned char m_reqFlag3;  // 0x2F
+		int m_requestPending;     // 0x2C
 		short m_particleId;        // 0x30
 		short m_0x32;              // 0x32
 		unsigned short m_0x34;     // 0x34-0x36
@@ -200,17 +199,11 @@ public:
     CObject m_freeObjectSentinel;   // 0x0918
     union {
         u32 m_currentCodePos;       // 0x0964
-        struct {
-            short m_codeFunc : 12;
-            int m_codeOffset : 20;
-        } m_currentCodeIndex;
+        CCodeIndex m_currentCodeIndex;
     };
     union {
         u32 m_previousCodePos;      // 0x0968
-        struct {
-            short m_codeFunc : 12;
-            int m_codeOffset : 20;
-        } m_previousCodeIndex;
+        CCodeIndex m_previousCodeIndex;
     };
     u8 m_pad_096C[4];               // 0x096C
     int m_0x970;                    // 0x0970
@@ -227,6 +220,9 @@ public:
     int m_0x1298;                   // 0x1298
 };
 
+STATIC_ASSERT(sizeof(CFlatRuntime::CCodeIndex) == 4);
+STATIC_ASSERT(sizeof(CFlatRuntime::CStack) == 4);
+STATIC_ASSERT(offsetof(CFlatRuntime::CObject, m_requestPending) == 0x2C);
 STATIC_ASSERT(sizeof(CFlatRuntime::CClass) == 0x22C);
 STATIC_ASSERT(offsetof(CFlatRuntime::CClass, m_functionTable) == 0x24);
 STATIC_ASSERT(offsetof(CFlatRuntime::CClass, m_localCount) == 0x224);

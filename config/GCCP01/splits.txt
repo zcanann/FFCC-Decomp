@@ -1585,7 +1585,6 @@ p_minigame.cpp:
 	.data       start:0x802121A8 end:0x80212398
 	.bss        start:0x80300268 end:0x80306708
 	.sdata      start:0x8032EA30 end:0x8032EA48
-	.sbss       start:0x8032EEA0 end:0x8032EEA8
 	.sdata2     start:0x80331BF0 end:0x80331BF8
 
 pppLerpPos.cpp:
@@ -1628,6 +1627,7 @@ monobj_boss.cpp:
 	extabindex  start:0x80010918 end:0x80010C18
 	.text       start:0x8012E5DC end:0x80133108
 	.data       start:0x802127C0 end:0x80212820
+	.sbss       start:0x8032EEA0 end:0x8032EEA8
 	.sdata2     start:0x80331CF8 end:0x80331DDC
 
 bonus_menu.cpp:

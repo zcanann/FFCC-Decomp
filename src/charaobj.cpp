@@ -170,41 +170,50 @@ static int CharaObjGetModelPdtNo(CGCharaObj* charaObj)
 	return -1;
 }
 
-struct CharaObjModelAnimState
+/*
+ * --INFO--
+ * PAL Address: 0x8010CAF0
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int la(CGObject* object)
 {
-	unsigned char m_padB4[0xB4];
-	float m_time;
-	unsigned char m_padBC[4];
-	float m_animStart;
-	float m_animEnd;
-	unsigned char m_padC8[0xC];
-	CChara::CAnim* m_anim;
-};
-
-static __inline int CharaObjIsAttackAnimBoundary(CGCharaObj* charaObj)
-{
-	bool valid = charaObj->m_charaModelHandle != 0 && charaObj->m_charaModelHandle->m_model != 0;
-	if (!valid) {
-		return 1;
+	bool hasMotion = false;
+	int result;
+	CCharaPcs::CHandle* model = object->m_charaModelHandle;
+	if (model != 0 && model->m_model != 0) {
+		hasMotion = true;
 	}
 
-	CharaObjModelAnimState* model = reinterpret_cast<CharaObjModelAnimState*>(charaObj->m_charaModelHandle->m_model);
-	if (model->m_anim != 0) {
-		int span = static_cast<int>(kOneF32 + (model->m_animEnd - model->m_animStart));
-		if (span == 1) {
-			return 1;
+	if (!hasMotion) {
+		result = 1;
+	} else {
+		CChara::CModel* motion = model->m_model;
+		if (motion->m_anim != 0) {
+			int frame;
+			int period = static_cast<int>(kOneF32 + (motion->m_animEnd -
+				motion->m_animStart));
+			if (period == 1) {
+				result = 1;
+			} else {
+				frame = static_cast<int>(object->m_turnSpeed);
+				int frameMod = frame % period;
+				if (object->m_lastBgAttr < kCharaObjZero) {
+					result = __rlwnm(1, static_cast<unsigned int>(__cntlzw(frameMod)), 31, 31) & 0xFF;
+				} else {
+					bool isPeriod = (period <= frame);
+					result = isPeriod;
+				}
+			}
+		} else {
+			result = 1;
 		}
-
-		int frame = static_cast<int>(charaObj->m_turnSpeed);
-		int remainder = frame % span;
-		if (charaObj->m_lastBgAttr < kCharaObjZero) {
-			return __rlwnm(1, static_cast<unsigned int>(__cntlzw(remainder)), 31, 31) & 0xFF;
-		}
-
-		return (span <= frame) & 0xFF;
 	}
 
-	return 1;
+	return result;
 }
 
 static __inline void CharaObjPutMonsterScaledParticle(CGCharaObj* charaObj, int particleNo, int slot, float scale)
@@ -937,7 +946,6 @@ void CGCharaObj::combi2()
 	}
 }
 
-
 /*
  * --INFO--
  * PAL Address: 0x8010C0C4
@@ -1121,20 +1129,6 @@ void CGCharaObj::onStatMagic()
 {
 }
 
-
-/*
- * --INFO--
- * PAL Address: N/A (not in Ghidra export)
- * PAL Size: N/A
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void la(CGObject*)
-{
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8010C704
@@ -1153,7 +1147,7 @@ void CGCharaObj::statAttack()
 	if ((cid & 0xAD) == 0xAD && m_subState == 0) {
 		int animPoint = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x10);
 		if (animPoint == 0x88 || animPoint == 0x87) {
-			if (CharaObjIsAttackAnimBoundary(this)) {
+			if (la(this)) {
 				m_subState = 1;
 				m_stateFrame = 0;
 			} else {
@@ -1212,53 +1206,6 @@ void CGCharaObj::statAttack()
 }
 
 #pragma pop
-
-
-/*
- * --INFO--
- * PAL Address: 0x8010C6B4
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, int& outArg1)
-{
-	bool hasMotion = false;
-	int result;
-	CCharaPcs::CHandle* model = m_charaModelHandle;
-	if (model != 0 && *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x168) != 0) {
-		hasMotion = true;
-	}
-
-	if (!hasMotion) {
-		result = 1;
-	} else {
-		unsigned char* motion = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x168));
-		if (*reinterpret_cast<void**>(motion + 0xD0) != 0) {
-			int frame;
-			int period = static_cast<int>(kOneF32 + (*reinterpret_cast<float*>(motion + 0xC0) -
-				*reinterpret_cast<float*>(motion + 0xBC)));
-			if (period == 1) {
-				result = 1;
-			} else {
-				frame = static_cast<int>(m_turnSpeed);
-				int frameMod = frame % period;
-				if (m_lastBgAttr < kCharaObjZero) {
-					result = __rlwnm(1, static_cast<unsigned int>(__cntlzw(frameMod)), 31, 31) & 0xFF;
-				} else {
-					bool isPeriod = (period <= frame);
-					result = isPeriod;
-				}
-			}
-		} else {
-			result = 1;
-		}
-	}
-
-	return result;
-}
 
 /*
  * --INFO--

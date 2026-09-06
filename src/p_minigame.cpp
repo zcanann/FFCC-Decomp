@@ -13,11 +13,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" {
-int MG_GBA_THREAD_MSG_SETPORT_ct = 0;
-int g_errCt = 0;
-}
-
 extern "C" unsigned int g_tempFlag;
 
 extern "C" {

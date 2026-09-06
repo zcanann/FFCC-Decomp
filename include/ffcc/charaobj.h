@@ -15,7 +15,7 @@ class CGObjWork;
 class CFlatRuntime2;
 class CVector;
 
-void la(CGObject*);
+int la(CGObject*);
 void SAFE_CAST_WORK(CGObjWork*);
 
 extern int gCGCharaObjCreateSerial;

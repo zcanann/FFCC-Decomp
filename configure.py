@@ -723,7 +723,7 @@ config.libs = [
             Object(Matching, "pppVertexAp.cpp"),
             Object(Matching, "pppVertexApAt.cpp"),
             Object(Matching, "pppVertexApLc.cpp"),
-            Object(NonMatching, "pppVertexApMtx.cpp"),
+            Object(Matching, "pppVertexApMtx.cpp"),
             Object(Matching, "pppVertexAttend.cpp"),
             Object(Matching, "pppVtMime.cpp"),
             Object(Matching, "pppfunctbl.cpp", extra_cflags=["-str reuse,readonly"]),

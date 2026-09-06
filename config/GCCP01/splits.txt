@@ -1244,7 +1244,7 @@ pppYmDeformationMdl.cpp:
 	extab       start:0x80008A7C end:0x80008A8C
 	extabindex  start:0x8000F484 end:0x8000F49C
 	.text       start:0x800D19F0 end:0x800D2100
-	.sdata2     start:0x80330DAC end:0x80330DC0
+	.sdata2     start:0x80330D98 end:0x80330DB8
 
 pppPointApMtx.cpp:
 	extab       start:0x80008A8C end:0x80008A94
@@ -1255,7 +1255,7 @@ pppVertexApMtx.cpp:
 	extab       start:0x80008A94 end:0x80008A9C
 	extabindex  start:0x8000F4A8 end:0x8000F4B4
 	.text       start:0x800D2250 end:0x800D25E0
-	.sdata2     start:0x80330DD0 end:0x80330DD8
+	.sdata2     start:0x80330DB8 end:0x80330DC0
 
 pppSDrawMatrix.cpp:
 	extab       start:0x80008A9C end:0x80008AA4
@@ -1267,7 +1267,7 @@ pppYmLaser.cpp:
 	extabindex  start:0x8000F4C0 end:0x8000F4F0
 	.text       start:0x800D2614 end:0x800D3818
 	.rodata     start:0x801DB4B0 end:0x801DB4C0
-	.sdata2     start:0x80330DD8 end:0x80330DF8
+	.sdata2     start:0x80330DC0 end:0x80330DF4
 
 pppSpMatrix.cpp:
 	extab       start:0x80008AC4 end:0x80008ACC

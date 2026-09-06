@@ -22,7 +22,7 @@ static const f32 kPppYmLaserDebugPointScale = 2.0f;
 
 static inline f32 LoadLaserFloat(const f32& value)
 {
-	return *reinterpret_cast<const f32*>(&value);
+	return value;
 }
 
 static const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
@@ -319,7 +319,7 @@ static const f32 kPppYmLaserHistoryBackstep = -1.0f;
 static const f32 kPppYmLaserHitRayScale = 1.2f;
 static const f32 kPppYmLaserCylinderMax = 10000000000.0f;
 static const f32 kPppYmLaserCylinderMin = -10000000000.0f;
-static const f32 kPppYmLaserFullTurn[2] = {6.2831855f, 0.0f};
+static const f32 kPppYmLaserFullTurn = 6.2831855f;
 
 /*
  * --INFO--
@@ -532,7 +532,7 @@ extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable
 extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
 	f32 zero = kPppYmLaserZero;
-	f32 randArg = kPppYmLaserFullTurn[0];
+	f32 randArg = kPppYmLaserFullTurn;
 	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
 
 	work->m_length = zero;

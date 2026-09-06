@@ -79,15 +79,6 @@ STATIC_ASSERT(kGbaQueueMapItemHistoryBlockBytes == 0x500);
 STATIC_ASSERT(sizeof(GbaQueueMapObjWork) == kGbaQueueMapObjWorkBytes);
 STATIC_ASSERT(sizeof(GbaQueue) == 0x2D64);
 
-static inline GbaQueuePlayerDataView* GetPlayerDataView(GbaQueue* gbaQueue, int channel)
-{
-	return reinterpret_cast<GbaQueuePlayerDataView*>(reinterpret_cast<unsigned char*>(gbaQueue) + channel * 0xDC + 0x454);
-}
-
-static inline GbaQueuePlayerDataView* GetPlayerDataBlock(GbaQueue* gbaQueue)
-{
-	return GetPlayerDataView(gbaQueue, 0);
-}
 
 static inline GbaQueueSetQueueView* GetSetQueueView(GbaQueue* gbaQueue)
 {
@@ -197,7 +188,7 @@ void GbaQueue::Init()
 	memset(m_queue, 0, sizeof(m_queue));
 	memset(m_queueCount, 0, sizeof(m_queueCount));
 	memset(m_queueFull, 0, sizeof(m_queueFull));
-	memset(GetPlayerDataBlock(this), 0, kGbaQueuePlayerDataBlockBytes);
+	memset(m_playerData, 0, kGbaQueuePlayerDataBlockBytes);
 	memset(m_playerHistory, 0, sizeof(m_playerHistory));
 	memset(m_enemies, 0, sizeof(m_enemies));
 	memset(m_enemyHistory, 0, sizeof(m_enemyHistory));
@@ -1971,7 +1962,7 @@ int GbaQueue::GetMapObjInfo(int channel, unsigned char* outData)
 void GbaQueue::GetPlayerStat(int channel, GbaPInfo* outInfo)
 {
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(outInfo, GetPlayerDataBlock(this), sizeof(*outInfo));
+	memcpy(outInfo, m_playerData, sizeof(*outInfo));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 

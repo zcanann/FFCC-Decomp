@@ -143,6 +143,14 @@ enum {
 };
 
 STATIC_ASSERT(sizeof(ThreadParam) == 0x3C);
+STATIC_ASSERT(offsetof(ThreadParam, m_initialCodeReceived) == 0x10);
+STATIC_ASSERT(sizeof(GbaQueuePlayerDataView) == 0xDC);
+STATIC_ASSERT(sizeof(GbaPInfo) == 0x370);
+STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_progress) == 0x14);
+STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_maxHp) == 0x16);
+STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_letterMeta) == 0x18);
+STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_strength) == 0x20);
+STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_gil) == 0x24);
 STATIC_ASSERT(sizeof(JoyBus::JoyBusRecvBuffer) == 0x408);
 
 static inline void ClearJoyDataPacketPayload(JoyBus* joybus, int port)
@@ -3236,40 +3244,21 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 #pragma opt_dead_assignments on
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800acf48
+ * PAL Size: 468b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void JoyBus::ResetQueue(ThreadParam* threadParam)
 {
     OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-    for (int index = 0; index < 8; index++)
-	{
-		int base = index * 8;
-
-        m_cmdQueueData[threadParam->m_portIndex][base] = 0;
-        m_recvQueueEntriesArr[threadParam->m_portIndex][base] = 0;
-
-        m_cmdQueueData[threadParam->m_portIndex][base + 1] = 0;
-        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 1] = 0;
-
-        m_cmdQueueData[threadParam->m_portIndex][base + 2] = 0;
-        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 2] = 0;
-
-        m_cmdQueueData[threadParam->m_portIndex][base + 3] = 0;
-        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 3] = 0;
-
-        m_cmdQueueData[threadParam->m_portIndex][base + 4] = 0;
-        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 4] = 0;
-
-        m_cmdQueueData[threadParam->m_portIndex][base + 5] = 0;
-        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 5] = 0;
-
-        m_cmdQueueData[threadParam->m_portIndex][base + 6] = 0;
-        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 6] = 0;
-
-        m_cmdQueueData[threadParam->m_portIndex][base + 7] = 0;
-        m_recvQueueEntriesArr[threadParam->m_portIndex][base + 7] = 0;
+    for (int index = 0; index < 64; index++)
+    {
+        m_cmdQueueData[threadParam->m_portIndex][index] = 0;
+        m_recvQueueEntriesArr[threadParam->m_portIndex][index] = 0;
     }
 
     m_cmdCount[threadParam->m_portIndex] = 0;
@@ -3613,8 +3602,12 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800b1394
+ * PAL Size: 2392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 #pragma push
 #pragma opt_common_subs off
@@ -3651,7 +3644,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
             {
                 threadParam->m_recvReadIdx = readBuf;
 
-                *reinterpret_cast<unsigned int*>(&threadParam->m_deviceType) = 1;
+                threadParam->m_initialCodeReceived = 1;
             }
         }
 
@@ -4481,8 +4474,12 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800aad94
+ * PAL Size: 1208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 {
@@ -4512,18 +4509,18 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             unsigned char* body = &payload[1];
             GbaQue.GetCaravanName((char*)body);
 
-            signed char* p = (signed char*)&playerInfo;
+            GbaQueuePlayerDataView* player = playerInfo.m_players;
             unsigned char lowBits = 0;
             unsigned char* cf = classFlags;
 
             for (int highBits = 0; highBits < 4; highBits++)
             {
-                if (p[0x16] != 0)
+                if (player->m_maxHp != 0)
                 {
-                    int idx = (int)p[0] >> 1;
+                    int idx = (int)player->m_saveSlot >> 1;
                     signed char v = (cf[idx] & 0x0F) | lowBits;
 
-                    if ((p[0] & 1) != 0)
+                    if ((player->m_saveSlot & 1) != 0)
                     {
                         v = (cf[idx] & 0xF0) | highBits;
                     }
@@ -4531,29 +4528,26 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                     cf[idx] = v;
                 }
 
-                p        += 0xDC;
+                player++;
                 lowBits  += 0x10;
             }
 
             memcpy(&body[0x80], classFlags, sizeof(classFlags));
 
-            unsigned char* playerData = playerInfo.m_data;
-
-            body[0x84] = playerData[0x16];
-            body[0x85] = playerData[0x17];
-            body[0x86] = playerData[0xF2];
-            body[0x87] = playerData[0xF3];
-            body[0x88] = playerData[0x1CE];
-            body[0x89] = playerData[0x1CF];
-            body[0x8A] = playerData[0x2AA];
-            body[0x8B] = playerData[0x2AB];
-            body[0x8C] = playerData[threadParam->m_portIndex * 0xDC + 2];
+            body[0x84] = playerInfo.m_players[0].m_maxHp;
+            body[0x85] = playerInfo.m_players[0].m_hp;
+            body[0x86] = playerInfo.m_players[1].m_maxHp;
+            body[0x87] = playerInfo.m_players[1].m_hp;
+            body[0x88] = playerInfo.m_players[2].m_maxHp;
+            body[0x89] = playerInfo.m_players[2].m_hp;
+            body[0x8A] = playerInfo.m_players[3].m_maxHp;
+            body[0x8B] = playerInfo.m_players[3].m_hp;
+            body[0x8C] = playerInfo.m_players[threadParam->m_portIndex].m_appearance;
 
             unsigned char* q = body + 0x8D;
-            int statOffset = threadParam->m_portIndex * 0xDC;
-            memcpy(q, (unsigned char*)&playerInfo + statOffset + 0x20, 3);
+            memcpy(q, playerInfo.m_players[threadParam->m_portIndex].m_strength, 3);
 
-            unsigned short statHalf = __lhbrx(&playerInfo, threadParam->m_portIndex * 0xDC + 0x14);
+            unsigned short statHalf = __lhbrx(&playerInfo.m_players[threadParam->m_portIndex].m_progress, 0);
             memcpy(q + 3, &statHalf, 2);
 
             q += 5;
@@ -4564,10 +4558,9 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             const int byteLen = compatLen + 0x97;
 
-            int statOffset2 = threadParam->m_portIndex * 0xDC;
-            memcpy(q, (unsigned char*)&playerInfo + statOffset2 + 0x18, 8);
+            memcpy(q, playerInfo.m_players[threadParam->m_portIndex].m_letterMeta, 8);
 
-            unsigned int statWord = __lwbrx(&playerInfo, threadParam->m_portIndex * 0xDC + 0x24);
+            unsigned int statWord = __lwbrx(&playerInfo.m_players[threadParam->m_portIndex].m_gil, 0);
             memcpy(q + 8, &statWord, sizeof(statWord));
 
             int wordCount = MakeJoyData((char*)payload, byteLen + 0xC, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
@@ -4580,7 +4573,6 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             m_txWordCount[threadParam->m_portIndex] = wordCount;
             threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
-            // Immediately queue the first word (same as the subState == 1 path)
             unsigned int sendPort = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[sendPort][2 + m_txWordIndex[sendPort] * 4];
 
@@ -4593,28 +4585,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             unsigned int statPort = threadParam->m_portIndex;
             unsigned int word = *(unsigned int*)&m_joyDataPacketBuffer[statPort][2 + m_txWordIndex[statPort] * 4];
 
-            if (static_cast<signed char>(m_threadRunningMask) == 0)
-            {
-                result = 0;
-            }
-            else
-            {
-                OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-                if ((int)m_cmdCount[threadParam->m_portIndex] >= 0x40)
-                {
-                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                    result = -1;
-                }
-                else
-                {
-                    m_cmdQueueData[threadParam->m_portIndex][m_cmdCount[threadParam->m_portIndex]] = word;
-                    m_cmdCount[threadParam->m_portIndex]++;
-
-                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                    result = 0;
-                }
-            }
+            result = SetSendQueue(threadParam, word);
         }
         break;
 
@@ -4623,7 +4594,6 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
         break;
     }
 
-    // Common tail: advance word index and clear GBA flag when finished.
     if (result == 0)
     {
         m_txWordIndex[threadParam->m_portIndex]++;

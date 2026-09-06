@@ -14,8 +14,7 @@ struct ThreadParam
 	unsigned int    m_recvWriteIdx;      // 0x08
 	unsigned int    m_recvReadIdx;       // 0x0C
 
-	unsigned char   m_deviceType;        // 0x10
-	unsigned char   m_padding[3];        // 0x11
+	unsigned int    m_initialCodeReceived; // 0x10
 
 	unsigned int    m_gbaStatus;         // 0x14
 	unsigned int    m_padType;           // 0x18

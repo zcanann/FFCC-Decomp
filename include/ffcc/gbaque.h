@@ -7,11 +7,6 @@ struct GbaPInfo;
 struct GbaCMakeInfo;
 class HitEInfo;
 
-struct GbaPInfo
-{
-    unsigned char m_data[0x370];
-};
-
 struct GbaCMakeInfo
 {
     unsigned char m_active;
@@ -52,18 +47,18 @@ struct GbaQueueMapObjWork
 
 struct GbaQueuePlayerDataView
 {
-    unsigned char _pad00;
+    signed char m_saveSlot;
     unsigned char _pad01;
-    unsigned char _pad02;
+    unsigned char m_appearance;
     unsigned char _pad03;
     unsigned int _pad04[4];
-    unsigned short _pad14;
-    unsigned char _pad16;
-    unsigned char _pad17;
-    unsigned int _pad18[2];
+    unsigned short m_progress;
+    signed char m_maxHp;
+    signed char m_hp;
+    unsigned char m_letterMeta[8];
     unsigned char m_strength[3];
     unsigned char _pad23;
-    unsigned int _pad24;
+    unsigned int m_gil;
     unsigned int m_artifacts[3];
     unsigned short _pad34;
     unsigned char _pad36[4];
@@ -76,6 +71,11 @@ struct GbaQueuePlayerDataView
     unsigned char _padD5;
     unsigned char _padD6;
     unsigned char m_commandData[4];
+};
+
+struct GbaPInfo
+{
+    GbaQueuePlayerDataView m_players[4];
 };
 
 struct GbaQueueMapEntity

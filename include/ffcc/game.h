@@ -165,7 +165,8 @@ public:
     unsigned int m_romLetterWorkBase;       // 0xC5AC
     CGPartyObj* m_partyObjArr[4];           // 0xC5B0
     unsigned int m_scriptFoodBase[4];       // 0xC5C0
-    unsigned int m_scriptWork[16][4][2];     // 0xC5D0
+    CGObject* m_monObjects[64];             // 0xC5D0
+    CMonWork* m_monWorkRefs[64];             // 0xC6D0
     unsigned int unk_flat3_0xc7d0;          // 0xC7D0
     unsigned int unk_flat3_count_0xc7d4;    // 0xC7D4
     unsigned int unk_flat3_field_1C_0xc7d8; // 0xC7D8
@@ -206,6 +207,8 @@ STATIC_ASSERT(sizeof(CGame::CBossArtifactEntry) == 0x08);
 STATIC_ASSERT(sizeof(CGame::CBossArtifactStage) == 0x168);
 STATIC_ASSERT(offsetof(CGame::CBossArtifactStage, m_entries) == 0x20);
 STATIC_ASSERT(offsetof(CGame::CBossArtifactStage, m_rankThresholds) == 0x160);
+STATIC_ASSERT(offsetof(CGame, m_monObjects) == 0xC5D0);
+STATIC_ASSERT(offsetof(CGame, m_monWorkRefs) == 0xC6D0);
 STATIC_ASSERT(offsetof(CGame, m_bossArtifactBase) == 0xC7E4);
 STATIC_ASSERT(sizeof(CGame) == 0x11F88);
 

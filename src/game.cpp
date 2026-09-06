@@ -538,7 +538,6 @@ void CGame::InitNewGame()
 void CGame::clearWork()
 {
     int i;
-    int j;
 
     CFlatRuntime2Storage().CFlatRuntime2::Destroy();
 
@@ -560,13 +559,9 @@ void CGame::clearWork()
 
     unk_flat3_0xc7d0 = 0;
 
-    for (i = 0; i < 8; i++) {
-        for (j = 0; j < 4; j++) {
-            m_scriptWork[i][j][0] = 0;
-            m_scriptWork[i + 8][j][0] = 0;
-            m_scriptWork[i][j][1] = 0;
-            m_scriptWork[i + 8][j][1] = 0;
-        }
+    for (int i = 0; i < 64; i++) {
+        m_monObjects[i] = 0;
+        m_monWorkRefs[i] = 0;
     }
 
     m_gameWork.m_soundOptionFlag = '\0';
@@ -636,13 +631,9 @@ inline void CGame::clearWorkScript()
 
     unk_flat3_0xc7d0 = 0;
 
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 4; j++) {
-            m_scriptWork[i][j][0] = 0;
-            m_scriptWork[i + 8][j][0] = 0;
-            m_scriptWork[i][j][1] = 0;
-            m_scriptWork[i + 8][j][1] = 0;
-        }
+    for (int i = 0; i < 64; i++) {
+        m_monObjects[i] = 0;
+        m_monWorkRefs[i] = 0;
     }
 
     m_gameWork.m_soundOptionFlag = 0;
@@ -799,7 +790,6 @@ void CGame::ScriptChanging(char*)
 void CGame::ScriptChanged(char*, int)
 {
     int i;
-    int j;
 
     for (i = 0; i < 4; i++) {
         m_partyObjArr[i] = 0;
@@ -808,13 +798,9 @@ void CGame::ScriptChanged(char*, int)
 
     unk_flat3_0xc7d0 = 0;
 
-    for (i = 0; i < 8; i++) {
-        for (j = 0; j < 4; j++) {
-            m_scriptWork[i][j][0] = 0;
-            m_scriptWork[i + 8][j][0] = 0;
-            m_scriptWork[i][j][1] = 0;
-            m_scriptWork[i + 8][j][1] = 0;
-        }
+    for (int i = 0; i < 64; i++) {
+        m_monObjects[i] = 0;
+        m_monWorkRefs[i] = 0;
     }
 
     m_gameWork.m_soundOptionFlag = 0;

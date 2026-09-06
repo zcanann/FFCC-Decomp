@@ -1488,8 +1488,8 @@ void CGMonObj::frameStatFuncWifeLamia()
 int CGMonObj::calcBranchFuncGigasLoad(int)
 {
 	CGame* game = &Game;
-	if (((game->m_scriptWork[0][0][1] != 0) &&
-	     (1 < *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(game->m_scriptWork[0][0][1] + 0x58) + 0x1C))) &&
+	if (((game->m_monObjects[1] != 0) &&
+	     (1 < reinterpret_cast<CMonWork*>(game->m_monObjects[1]->m_scriptHandle)->m_hp)) &&
 	    (CFlatBossState() == 1)) {
 		return 0;
 	}

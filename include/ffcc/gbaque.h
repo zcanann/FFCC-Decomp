@@ -78,6 +78,19 @@ struct GbaQueuePlayerDataView
     unsigned char m_commandData[4];
 };
 
+struct GbaQueueMapEntity
+{
+    unsigned char m_visible;
+    unsigned char m_kind;
+    unsigned char m_radarEnabled;
+    unsigned char m_baseDataIndex;
+    unsigned short m_hp;
+    unsigned short m_maxHp;
+    short m_posX;
+    short m_posZ;
+    unsigned short m_dropItemCodes[4];
+};
+
 class GbaQueue
 {
 public:
@@ -228,7 +241,12 @@ private:
     unsigned char m_stageFlags;       // 0x044C
     unsigned char _pad44D[0x7];       // 0x044D
     GbaQueuePlayerDataView m_playerData[4]; // 0x0454
-    unsigned char _pad7C4[0x2330];    // 0x07C4
+    GbaQueuePlayerDataView m_playerHistory[4]; // 0x07C4
+    GbaQueueMapEntity m_enemies[64];            // 0x0B34
+    GbaQueueMapEntity m_enemyHistory[4][64];    // 0x1034
+    GbaQueueMapEntity m_mapItems[16];           // 0x2434
+    GbaQueueMapEntity m_mapItemHistory[4][16];  // 0x2574
+    char m_caravanName[0x80];                  // 0x2A74
     char m_mapItemCount;              // 0x2AF4
     unsigned char _pad2AF5[0x3];      // 0x2AF5
     int m_scrInitEnd;                 // 0x2AF8

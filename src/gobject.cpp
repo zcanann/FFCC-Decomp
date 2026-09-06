@@ -1268,8 +1268,8 @@ void CGObject::SetClassWork(int ownerType, int workIndex)
         m_scriptHandle = reinterpret_cast<void**>(&Game.m_monWorkArr[workIndex]);
         m_scriptHandle[3] = this;
         m_scriptHandle[2] = reinterpret_cast<void*>(workIndex);
-        Game.m_scriptWork[0][0][workIndex] = reinterpret_cast<u32>(this);
-        Game.m_scriptWork[8][0][workIndex] = reinterpret_cast<u32>(m_scriptHandle);
+        Game.m_monObjects[workIndex] = this;
+        Game.m_monWorkRefs[workIndex] = reinterpret_cast<CMonWork*>(m_scriptHandle);
         return;
 
     default:

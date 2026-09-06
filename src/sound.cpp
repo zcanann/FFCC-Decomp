@@ -219,6 +219,15 @@ void CLine<10>::Draw()
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x800C8838
+ * PAL Size: 352b
+ * EN Address: 0x800DFB4C
+ * EN Size: 604b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void CLine<10>::CalcBound()
 {
     min.x = kLineBoundsInitMin;
@@ -229,8 +238,7 @@ void CLine<10>::CalcBound()
     max.z = kLineBoundsInitMax;
     totalLength = kLineSegmentMinT;
 
-    u32 i = 0;
-    while (i < pointCount) {
+    for (u32 i = 0; i < pointCount; i++) {
         if (points[i].x < min.x) {
             min.x = points[i].x;
         }
@@ -252,17 +260,14 @@ void CLine<10>::CalcBound()
         }
 
         if (i != 0) {
-            u32 prevIndex = i - 1;
-            PSVECSubtract(&points[i], &points[prevIndex], &segments[prevIndex].delta);
-            segments[prevIndex].length = PSVECMag(&segments[prevIndex].delta);
-            segments[prevIndex].startLength = totalLength;
-            totalLength += segments[prevIndex].length;
-            if (segments[prevIndex].length != kLineSegmentMinT) {
-                PSVECNormalize(&segments[prevIndex].delta, &segments[prevIndex].normal);
+            PSVECSubtract(&points[i], &points[i - 1], &segments[i - 1].delta);
+            segments[i - 1].length = PSVECMag(&segments[i - 1].delta);
+            segments[i - 1].startLength = totalLength;
+            totalLength += segments[i - 1].length;
+            if (segments[i - 1].length != kLineSegmentMinT) {
+                PSVECNormalize(&segments[i - 1].delta, &segments[i - 1].normal);
             }
         }
-
-        i++;
     }
 }
 
@@ -754,7 +759,6 @@ next:
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 void CSound::Draw()
 {
     Mtx cameraMatrix;
@@ -779,10 +783,8 @@ void CSound::Draw()
     CSe3D* se = m_seWork;
     for (u32 i = 0; i < 0x80; i++, se++) {
         if (se->m_bits.m_active) {
-            CColor innerColor(0xC0, 0xC0, 0xC0, 0x80);
-            Graphic.DrawSphere(cameraMatrix, &se->m_position, se->m_nearDistance, reinterpret_cast<GXColor*>(&innerColor));
-            CColor outerColor(0x80, 0x80, 0x80, 0x80);
-            Graphic.DrawSphere(cameraMatrix, &se->m_position, se->m_farDistance, reinterpret_cast<GXColor*>(&outerColor));
+            Graphic.DrawSphere(cameraMatrix, &se->m_position, se->m_nearDistance, CColor(0xC0, 0xC0, 0xC0, 0x80));
+            Graphic.DrawSphere(cameraMatrix, &se->m_position, se->m_farDistance, CColor(0x80, 0x80, 0x80, 0x80));
         }
     }
 
@@ -797,7 +799,6 @@ void CSound::Draw()
         m_lines[i].Draw();
     }
 }
-#pragma opt_propagation reset
 
 /*
  * --INFO--

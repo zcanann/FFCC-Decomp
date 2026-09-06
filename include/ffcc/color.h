@@ -12,7 +12,16 @@ public:
 	CColor(_GXColor& other);
 	operator CColor&() { return *this; }
 	operator _GXColor();
-	operator _GXColor*();
+	/*
+	 * --INFO--
+	 * PAL Address: 0x800B9224
+	 * PAL Size: 4b
+	 * EN Address: 0x80044340
+	 * EN Size: 4b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	operator _GXColor*() { return &color; }
 	void Identity()
 	{
 		color.r = 0xFF;

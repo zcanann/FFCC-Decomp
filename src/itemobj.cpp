@@ -16,10 +16,9 @@
 #include <math.h>
 #include <string.h>
 #include "ffcc/fontman.h"
-#include "ffcc/p_mc.h"
 
-extern const float kItemObjHeightOffset;
-extern const float kItemObjUnitScale;
+extern const float kItemObjUnitScale = 1.0f;
+extern const float kItemObjHeightOffset = 10.0f;
 extern const float kItemObjZero = 0.0f;
 extern const float kItemObjGroundProbeDown = -2000.0f;
 extern const float kItemObjBoundsInitMin = 10000000000.0f;
@@ -253,7 +252,7 @@ void CGItemObj::DrawOmoideName(CFont* font)
 void CGItemObj::onNewFinished()
 {
 	m_savedBodyRadius = m_bodyEllipsoidRadius;
-	m_createFlags = static_cast<u16>((*(u32*)&McPcs >> 3) & 1);
+	m_createFlags = static_cast<u16>((g_tempFlag >> 3) & 1);
 	loadModel();
 }
 
@@ -700,7 +699,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	inStack[2].m_word = scriptArg;
 	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
 	*reinterpret_cast<float*>(&inStack[4].m_word) = launchAngle;
-	*(u32*)&McPcs = createFlags;
+	g_tempFlag = createFlags;
 	gCFlatRuntime().SystemCall(0, 1, 7, 5, inStack, &outStack);
 
 	if (createMode != 1) {

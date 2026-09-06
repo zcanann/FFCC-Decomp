@@ -1547,18 +1547,19 @@ partyobj.cpp:
 	.data       start:0x802116A4 end:0x80211D88
 	.bss        start:0x803001D8 end:0x80300268
 	.sdata      start:0x8032E9A0 end:0x8032E9D0
-	.sbss       start:0x8032EE78 end:0x8032EE90
-	.sdata2     start:0x80331A58 end:0x80331B18
+	.sbss       start:0x8032EE78 end:0x8032EE88
+	.sdata2     start:0x80331A58 end:0x80331B10
 
 p_mc.cpp:
 	extab       start:0x800095FC end:0x8000960C
 	extabindex  start:0x800105C4 end:0x800105DC
 	.text       start:0x80124998 end:0x80124B78
 	.ctors      start:0x801D5438 end:0x801D543C
+	.rodata     start:0x801DCE08 end:0x801DCE20
 	.data       start:0x80211D88 end:0x80211F4C
 	.sdata      start:0x8032E9D0 end:0x8032E9E8
-	.sbss       start:0x8032EE90 end:0x8032EE94
-	.sdata2     start:0x80331B18 end:0x80331B20
+	.sbss       start:0x8032EE88 end:0x8032EE8C
+	.sdata2     start:0x80331B10 end:0x80331B18
 
 itemobj.cpp:
 	extab       start:0x8000960C end:0x8000968C
@@ -1566,8 +1567,8 @@ itemobj.cpp:
 	.text       start:0x80124B78 end:0x80127008
 	.data       start:0x80211F50 end:0x802120D0
 	.sdata      start:0x8032E9E8 end:0x8032EA10
-	.sbss       start:0x8032EE98 end:0x8032EE9C
-	.sdata2     start:0x80331B20 end:0x80331BD0
+	.sbss       start:0x8032EE90 end:0x8032EE94
+	.sdata2     start:0x80331B18 end:0x80331BD0
 
 prgobj.cpp:
 	extab       start:0x8000968C end:0x8000970C
@@ -1590,6 +1591,7 @@ p_minigame.cpp:
 	.data       start:0x802121A8 end:0x80212398
 	.bss        start:0x80300268 end:0x80306708
 	.sdata      start:0x8032EA30 end:0x8032EA48
+	.sbss       start:0x8032EE98 end:0x8032EE9C
 	.sdata2     start:0x80331BF0 end:0x80331BF8
 
 pppLerpPos.cpp:

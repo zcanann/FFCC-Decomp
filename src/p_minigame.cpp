@@ -14,7 +14,7 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" unsigned int g_tempFlag;
+int MG_GBA_THREAD_MSG_SETPORT_ct;
 
 extern "C" {
 void create__12CMiniGamePcsFv(CMiniGamePcs*);
@@ -1327,7 +1327,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
             {
                 System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), static_cast<int>(param->m_channel), 0x3FC);
             }
-            System.Printf(const_cast<char*>(s_miniGameSetPortFmt), static_cast<int>(param->m_channel), g_tempFlag);
+            System.Printf(const_cast<char*>(s_miniGameSetPortFmt), static_cast<int>(param->m_channel), MG_GBA_THREAD_MSG_SETPORT_ct);
             OSSendMessage(&param->m_queue, reinterpret_cast<OSMessage>(5), 1);
         }
         else

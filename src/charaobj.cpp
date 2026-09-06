@@ -40,7 +40,6 @@ static int l_idxAttackCol = 0;
 int gCGCharaObjCreateSerial = 0;
 char gCGCharaObjCreateSerialInit = 0;
 extern "C" {
-extern const float kOneF32;
 extern const float kCharaObjZero;
 extern const float FLOAT_803319A8;
 extern const float FLOAT_803319AC;
@@ -55,8 +54,6 @@ extern const float FLOAT_803319B0;
 extern const float FLOAT_803319B4;
 extern const float FLOAT_803319B8[2];
 }
-
-extern const float kQuadObjDebugHeight;
 
 // Padded row view of the CFlat item/particle table (stride 0x48). Real array
 // indexing through this struct keeps the field offset as a load displacement
@@ -173,52 +170,6 @@ static int CharaObjGetModelPdtNo(CGCharaObj* charaObj)
 		return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(charaObj->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 	}
 	return -1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8010CAF0
- * PAL Size: 216b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int la(CGObject* object)
-{
-	bool hasMotion = false;
-	int result;
-	CCharaPcs::CHandle* model = object->m_charaModelHandle;
-	if (model != 0 && model->m_model != 0) {
-		hasMotion = true;
-	}
-
-	if (!hasMotion) {
-		result = 1;
-	} else {
-		CChara::CModel* motion = model->m_model;
-		if (motion->m_anim != 0) {
-			int frame;
-			int period = static_cast<int>(kOneF32 + (motion->m_animEnd -
-				motion->m_animStart));
-			if (period == 1) {
-				result = 1;
-			} else {
-				frame = static_cast<int>(object->m_turnSpeed);
-				int frameMod = frame % period;
-				if (object->m_lastBgAttr < kCharaObjZero) {
-					result = __rlwnm(1, static_cast<unsigned int>(__cntlzw(frameMod)), 31, 31) & 0xFF;
-				} else {
-					bool isPeriod = (period <= frame);
-					result = isPeriod;
-				}
-			}
-		} else {
-			result = 1;
-		}
-	}
-
-	return result;
 }
 
 static __inline void CharaObjPutMonsterScaledParticle(CGCharaObj* charaObj, int particleNo, int slot, float scale)
@@ -352,7 +303,7 @@ static __inline bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj
 	}
 
 	CVector scaledVec;
-	PSVECScale(&delta, reinterpret_cast<Vec*>(&scaledVec), kOneF32 / mag);
+	PSVECScale(&delta, reinterpret_cast<Vec*>(&scaledVec), 1.0f / mag);
 	Vec scaledDelta;
 	scaledDelta.x = scaledVec.x;
 	scaledDelta.y = scaledVec.y;
@@ -434,7 +385,7 @@ static __inline float CharaObjGetStatusMultiplier(int offset)
 static __inline float CharaObjGetMonsterScale(unsigned char* script9, bool isMon)
 {
 	if (!isMon || script9 == 0) {
-		return kOneF32;
+		return 1.0f;
 	}
 	return static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0x1B4)) * 0.01f;
 }
@@ -769,7 +720,7 @@ void CGCharaObj::combi2()
 				continue;
 			}
 
-			if (PSVECDistance(&CharaObjComboCenter(candidates[i]), &CharaObjComboCenter(other)) < kQuadObjDebugHeight) {
+			if (PSVECDistance(&CharaObjComboCenter(candidates[i]), &CharaObjComboCenter(other)) < 20.0f) {
 				hasNearbyPartner = 1;
 				break;
 			}
@@ -801,7 +752,7 @@ void CGCharaObj::combi2()
 
 	for (int i = 1; i < candidateCount; i++) {
 		CGPartyObj** slot = &candidates[i];
-		if (kQuadObjDebugHeight < PSVECDistance(&CharaObjComboCenter(candidates[0]), &CharaObjComboCenter(*slot))) {
+		if (20.0f < PSVECDistance(&CharaObjComboCenter(candidates[0]), &CharaObjComboCenter(*slot))) {
 			for (int k = i; k < candidateCount - 1; k++) {
 				slot[0] = slot[1];
 				slot++;
@@ -832,7 +783,7 @@ void CGCharaObj::combi2()
 			CVector candidateCenter(CharaObjComboCenter(candidates[i]));
 			PSVECAdd(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&candidateCenter), reinterpret_cast<Vec*>(&comboCenter));
 		}
-		PSVECScale(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&comboCenter), kOneF32 / static_cast<float>(participantCount));
+		PSVECScale(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&comboCenter), 1.0f / static_cast<float>(participantCount));
 	}
 
 	System.Printf(const_cast<char*>(sCharaObjComboDecisionFmt), System.m_frameCounter, comboData->m_command);
@@ -1004,7 +955,7 @@ int CGCharaObj::calcCastTime(int itemId)
 	} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x4C) != 0) {
 		castScale = CharaObjGetStatusMultiplier(0x2);
 	} else {
-		castScale = kOneF32;
+		castScale = 1.0f;
 	}
 
 	SCharaItemRow* typeRows = castRows;
@@ -1088,6 +1039,52 @@ void CGCharaObj::onChangePrg(int arg)
  */
 void CGCharaObj::onStatMagic()
 {
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8010CAF0
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int la(CGObject* object)
+{
+	bool hasMotion = false;
+	int result;
+	CCharaPcs::CHandle* model = object->m_charaModelHandle;
+	if (model != 0 && model->m_model != 0) {
+		hasMotion = true;
+	}
+
+	if (!hasMotion) {
+		result = 1;
+	} else {
+		CChara::CModel* motion = model->m_model;
+		if (motion->m_anim != 0) {
+			int frame;
+			int period = static_cast<int>(1.0f + (motion->m_animEnd -
+				motion->m_animStart));
+			if (period == 1) {
+				result = 1;
+			} else {
+				frame = static_cast<int>(object->m_turnSpeed);
+				int frameMod = frame % period;
+				if (object->m_lastBgAttr < kCharaObjZero) {
+					result = __rlwnm(1, static_cast<unsigned int>(__cntlzw(frameMod)), 31, 31) & 0xFF;
+				} else {
+					bool isPeriod = (period <= frame);
+					result = isPeriod;
+				}
+			}
+		} else {
+			result = 1;
+		}
+	}
+
+	return result;
 }
 
 /*
@@ -1576,7 +1573,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		float frontMag = PSVECMag(&frontDelta);
 		if (frontMag > kCharaObjZero) {
 			CVector scaledVec;
-			PSVECScale(&frontDelta, reinterpret_cast<Vec*>(&scaledVec), kOneF32 / frontMag);
+			PSVECScale(&frontDelta, reinterpret_cast<Vec*>(&scaledVec), 1.0f / frontMag);
 			frontDelta.x = scaledVec.x;
 			frontDelta.y = scaledVec.y;
 			frontDelta.z = scaledVec.z;
@@ -1881,7 +1878,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				}
 				unsigned int sourcePower = rawSourcePower;
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
-				float defenseRate = kOneF32;
+				float defenseRate = 1.0f;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					defenseRate = CharaObjGetStatusMultiplier(0x32);
 				}
@@ -2150,7 +2147,6 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 	outC = static_cast<unsigned int>((xorA >> 1) - (xorA & 3)) >> 31;
 }
 
-
 /*
  * --INFO--
  * PAL Address: 0x8010CAF0
@@ -2194,7 +2190,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 
 		next = (hpValue + delta) & ~(static_cast<int>(hpValue + delta) >> 31);
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(next);
-		m_worldParam = kOneF32;
+		m_worldParam = 1.0f;
 
 		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
 			CGPartyObj* party = static_cast<CGPartyObj*>(this);
@@ -2635,7 +2631,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				if (isIceJ) {
 					int modelPdtNo = CharaObjGetModelPdtNo(this);
-					putParticle((modelPdtNo << 8) | 0x16, 0, this, kOneF32, 0);
+					putParticle((modelPdtNo << 8) | 0x16, 0, this, 1.0f, 0);
 				} else {
 					putParticle(0x10B, 0, this, FLOAT_803319AC * m_attackColRadius, 0);
 				}
@@ -2672,7 +2668,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					monsterScale = static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x1B4)) * 0.01f;
 				} else {
-					monsterScale = kOneF32;
+					monsterScale = 1.0f;
 				}
 				int particleNo = isMon ? 0x6D : 0x11;
 				float scaledRadius = FLOAT_803319AC * m_attackColRadius;
@@ -2689,7 +2685,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					monsterScale = static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x1B4)) * 0.01f;
 				} else {
-					monsterScale = kOneF32;
+					monsterScale = 1.0f;
 				}
 				int particleNo = isMon ? 0x6F : 0x13;
 				float scaledRadius = FLOAT_803319AC * m_attackColRadius;
@@ -2741,7 +2737,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
 					}
 				}
-				putParticle(0x11C, m_particleSlots[10], this, kOneF32, 0x1290D);
+				putParticle(0x11C, m_particleSlots[10], this, 1.0f, 0x1290D);
 				break;
 			case 1:
 				for (int i = 0; i < 0x16; i++) {
@@ -2751,7 +2747,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				if (isIceJ) {
 					int modelPdtNo = CharaObjGetModelPdtNo(this);
-					putParticle((modelPdtNo << 8) | 0x14, m_particleSlots[6], this, kOneF32, 0);
+					putParticle((modelPdtNo << 8) | 0x14, m_particleSlots[6], this, 1.0f, 0);
 				} else {
 					putParticle(0x12A, m_particleSlots[6], this, FLOAT_803319AC * m_attackColRadius, 0);
 				}
@@ -2764,7 +2760,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				if (isIceJ) {
 					int modelPdtNo = CharaObjGetModelPdtNo(this);
-					putParticleBindTrace((modelPdtNo << 8) | 0x15, m_particleSlots[2], this, kOneF32, 0);
+					putParticleBindTrace((modelPdtNo << 8) | 0x15, m_particleSlots[2], this, 1.0f, 0);
 				} else {
 					putParticle(0x10A, m_particleSlots[2], this, FLOAT_803319AC * m_attackColRadius, 0);
 				}
@@ -2780,7 +2776,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				if (isIceJ) {
 					int modelPdtNo = CharaObjGetModelPdtNo(this);
-					putParticle((modelPdtNo << 8) | 0x17, m_particleSlots[7], this, kOneF32, 0);
+					putParticle((modelPdtNo << 8) | 0x17, m_particleSlots[7], this, 1.0f, 0);
 				} else {
 					putParticle(0x130, m_particleSlots[7], this, FLOAT_803319AC * m_attackColRadius, 0);
 				}
@@ -2805,7 +2801,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					monsterScale = static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x1B4)) * 0.01f;
 				} else {
-					monsterScale = kOneF32;
+					monsterScale = 1.0f;
 				}
 				int particleNo = isMon ? 0x6C : 0x10;
 				float scaledRadius = FLOAT_803319AC * m_attackColRadius;
@@ -2822,7 +2818,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
 					monsterScale = static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x1B4)) * 0.01f;
 				} else {
-					monsterScale = kOneF32;
+					monsterScale = 1.0f;
 				}
 				int particleNo = isMon ? 0x6E : 0x12;
 				float scaledRadius = FLOAT_803319AC * m_attackColRadius;
@@ -3416,8 +3412,8 @@ float CGCharaObj::onAlphaUpdate()
 	float clamped;
 	if (alpha < kCharaObjZero) {
 		clamped = kCharaObjZero;
-	} else if (kOneF32 < alpha) {
-		clamped = kOneF32;
+	} else if (1.0f < alpha) {
+		clamped = 1.0f;
 	} else {
 		clamped = alpha;
 	}
@@ -3470,7 +3466,7 @@ void CGCharaObj::onFramePreCalc()
 		}
 	}
 
-	m_pushScale = kOneF32;
+	m_pushScale = 1.0f;
 #define CHARA_SCRIPT (reinterpret_cast<unsigned char*>(m_scriptHandle))
 	if (*reinterpret_cast<unsigned short*>(CHARA_SCRIPT + 0x4E) != 0) {
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x34)) * 0.01f) + 1.0e-07f;
@@ -3782,8 +3778,8 @@ void CGCharaObj::onCreate()
 	m_comboState = 0;
 	m_damageParticle = -1;
 	m_unk688 = 0;
-	m_pushScale = kOneF32;
-	m_alpha = kOneF32;
+	m_pushScale = 1.0f;
+	m_alpha = 1.0f;
 	m_aStarGroupId = 0;
 	m_stateTick = 0;
 	m_castTimeTick = 0;

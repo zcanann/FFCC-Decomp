@@ -1503,7 +1503,7 @@ pppMiasma.cpp:
 	extab       start:0x8000919C end:0x800091B4
 	extabindex  start:0x8000FF34 end:0x8000FF58
 	.text       start:0x80109930 end:0x8010B150
-	.sdata2     start:0x80331930 end:0x80331958
+	.sdata2     start:0x80331930 end:0x80331950
 
 baseobj.cpp:
 	extab       start:0x800091B4 end:0x800091E4
@@ -1520,7 +1520,7 @@ quadobj.cpp:
 	.rodata     start:0x801DC518 end:0x801DC548
 	.data       start:0x80211320 end:0x80211370
 	.sdata      start:0x8032E930 end:0x8032E948
-	.sdata2     start:0x80331958 end:0x80331968
+	.sdata2     start:0x80331950 end:0x8033195C
 
 charaobj.cpp:
 	extab       start:0x800091EC end:0x800092E4
@@ -1529,7 +1529,7 @@ charaobj.cpp:
 	.data       start:0x80211370 end:0x80211498
 	.sdata      start:0x8032E948 end:0x8032E970
 	.sbss       start:0x8032EE60 end:0x8032EE70
-	.sdata2     start:0x80331968 end:0x803319C8
+	.sdata2     start:0x80331960 end:0x803319C8
 
 monobj.cpp:
 	extab       start:0x800092E4 end:0x8000944C

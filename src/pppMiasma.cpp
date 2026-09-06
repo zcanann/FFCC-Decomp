@@ -709,6 +709,3 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     Graphic.SetViewport();
     gUtil.InitConstantRegister();
 }
-
-extern const float kQuadObjMaxBounds = 10000000.0f;
-extern const float kQuadObjMinBounds = -10000000.0f;

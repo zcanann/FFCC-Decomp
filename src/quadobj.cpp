@@ -6,15 +6,14 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern const float kQuadObjMaxBounds;
-extern const float kQuadObjMinBounds;
-extern const float kQuadObjDebugHeight;
-extern const float kOneF32;
-
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010B2A4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CGQuadObj::GetCID()
 {
@@ -23,8 +22,12 @@ int CGQuadObj::GetCID()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010B2AC
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGQuadObj::Add(float x, float z)
 {
@@ -41,18 +44,22 @@ void CGQuadObj::Add(float x, float z)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010B37C
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGQuadObj::Reset(float base, float height)
 {
 	m_vertexCount = 0;
 	m_yBase = base;
 	m_yHeight = height;
-	m_bboxMinZ = kQuadObjMaxBounds;
-	m_bboxMinX = kQuadObjMaxBounds;
-	m_bboxMaxZ = kQuadObjMinBounds;
-	m_bboxMaxX = kQuadObjMinBounds;
+	m_bboxMinZ = 10000000.0f;
+	m_bboxMinX = 10000000.0f;
+	m_bboxMaxZ = -10000000.0f;
+	m_bboxMaxX = -10000000.0f;
 }
 
 /*
@@ -66,21 +73,17 @@ void CGQuadObj::Reset(float base, float height)
  */
 int CGQuadObj::isInner(Vec* vec)
 {
-	CGQuadObj* current;
 	u32 count = m_vertexCount;
 	if ((((count != 0) && (m_bboxMinX <= vec->x)) && (m_bboxMinZ <= vec->z)) && ((m_bboxMaxX >= vec->x) && (m_bboxMaxZ >= vec->z))) {
 		if ((m_yBase <= vec->y) && ((m_yBase + m_yHeight) >= vec->y)) {
-			current = this;
 			int i = 0;
 			for (; i < (int)count; i++) {
-				float z0 = current->m_vertices[0].z;
-				float x0 = current->m_vertices[0].x;
-				int quotient = (i + 1) / (int)count;
-				int next = (i + 1) - quotient * (int)count;
+				float z0 = m_vertices[i].z;
+				float x0 = m_vertices[i].x;
+				int next = (i + 1) % (int)count;
 				if (((m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0)) < 0.0f) {
 					break;
 				}
-				current = reinterpret_cast<CGQuadObj*>(reinterpret_cast<char*>(current) + sizeof(QuadVertex));
 			}
 
 			if (i == (int)count) {
@@ -91,10 +94,6 @@ int CGQuadObj::isInner(Vec* vec)
 
 	return false;
 }
-
-extern const float kQuadObjZero = 0.0f;
-extern const float kQuadObjDebugHeight = 20.0f;
-extern const float kOneF32 = 1.0f;
 
 /*
  * --INFO--
@@ -112,36 +111,27 @@ void CGQuadObj::onDraw()
         GXLoadPosMtxImm(CameraPcs.m_cameraMatrix, GX_PNMTX0);
         GXBegin(GX_LINES, GX_VTXFMT0, ((u32)m_vertexCount << 1) + ((u32)m_vertexCount << 2));
 
-        int next;
-        QuadVertex* vertex;
-        CGQuadObj* current = this;
-        int i = 0;
-
-        while (i < (int)(u32)m_vertexCount) {
-            u32 count;
-
-            next = i + 1;
-            i = i + 1;
-            GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
-            count = m_vertexCount;
-            int nextIndex = next % (int)count;
-            GXPosition3f32(m_vertices[nextIndex].x, m_yBase, m_vertices[nextIndex].z);
-            GXPosition3f32(current->m_vertices[0].x, m_yBase + m_yHeight, current->m_vertices[0].z);
-            count = m_vertexCount;
-            nextIndex = next % (int)count;
-            GXPosition3f32(m_vertices[nextIndex].x, m_yBase + m_yHeight, m_vertices[nextIndex].z);
-            GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
-            vertex = current->m_vertices;
-            current = reinterpret_cast<CGQuadObj*>(reinterpret_cast<char*>(current) + sizeof(QuadVertex));
-            GXPosition3f32(vertex->x, m_yBase + m_yHeight, vertex->z);
+        for (int i = 0; i < m_vertexCount; i++) {
+            GXPosition3f32(m_vertices[i].x, m_yBase, m_vertices[i].z);
+            int next = (i + 1) % m_vertexCount;
+            GXPosition3f32(m_vertices[next].x, m_yBase, m_vertices[next].z);
+            GXPosition3f32(m_vertices[i].x, m_yBase + m_yHeight, m_vertices[i].z);
+            next = (i + 1) % m_vertexCount;
+            GXPosition3f32(m_vertices[next].x, m_yBase + m_yHeight, m_vertices[next].z);
+            GXPosition3f32(m_vertices[i].x, m_yBase, m_vertices[i].z);
+            GXPosition3f32(m_vertices[i].x, m_yBase + m_yHeight, m_vertices[i].z);
         }
     }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010B650
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGQuadObj::onDestroy()
 {
@@ -149,8 +139,12 @@ void CGQuadObj::onDestroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010B654
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGQuadObj::onCreate()
 {

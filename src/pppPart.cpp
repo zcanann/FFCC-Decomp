@@ -754,17 +754,17 @@ void callCon2Prog(_pppPObject* pObject)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800566ac
+ * PAL Size: 1120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 {
-	struct {
-		s8 m_denied[0x180];
-		_pppProgSetDef* volatile m_programSet;
-	} loc;
-#define denied     loc.m_denied
-#define programSet loc.m_programSet
+	s8 denied[0x180];
+	_pppProgSetDef* programSet;
 	char* fmt = const_cast<char*>(s_pppPart_cpp);
 	_pppPObjLink* newObj = 0;
 	int firstFailure = 1;
@@ -799,14 +799,13 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 		int selectedPrio = 1;
 		s32 i;
 		s8* deniedPtr = denied;
-		u8* mngBase = (u8*)&PartMng;
 		int selectedPrioTime;
 
 		for (i = 0; i < 0x180; i++)
 		{
 			if (deniedPtr[0] == 0)
 			{
-				candidate = (_pppMngSt*)(mngBase + 0x2a18);
+				candidate = &PartMng.m_pppMng[i];
 				if (candidate->m_baseTime != -0x1000 && candidate->m_kind != 0)
 				{
 					u8 prio = candidate->m_prio;
@@ -827,7 +826,6 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 				}
 			}
 			deniedPtr++;
-			mngBase += sizeof(_pppMngSt);
 		}
 
 		if (selectedMngSt == 0)
@@ -960,8 +958,6 @@ allocated:
 		}
 		return newObject;
 	}
-#undef denied
-#undef programSet
 }
 
 /*
@@ -2337,23 +2333,23 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 		}
 	}
 
-	s32 i = 0;
-	s32 pDataValOffset = 0;
-	for (; i < pppMngSt->m_numPrograms; i++)
+	for (s32 i = 0; i < pppMngSt->m_numPrograms; i++)
 	{
 		_pppPDataVal* pDataVals = pppMngSt->m_pppPDataVals;
-		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pDataVals + pDataValOffset);
-		if (pDataVals != 0 && pDataVal != 0 && pppMngSt->m_currentFrame >= pDataVal->m_nextSpawnTime)
+		if (pDataVals != 0)
 		{
-			pDataVal->m_nextSpawnTime = 0x7FFFFFFF;
-			_pppPObject* pObject = pppCreatePObject(pppMngSt, pDataVal);
-			if (pObject == 0)
+			_pppPDataVal* pDataVal = &pDataVals[i];
+			if (pDataVal != 0 && pppMngSt->m_currentFrame >= pDataVal->m_nextSpawnTime)
 			{
-				break;
+				pDataVal->m_nextSpawnTime = 0x7FFFFFFF;
+				_pppPObject* pObject = pppCreatePObject(pppMngSt, pDataVal);
+				if (pObject == 0)
+				{
+					break;
+				}
+				pObject->m_field7C = 0;
 			}
-			pObject->m_field7C = 0;
 		}
-		pDataValOffset += sizeof(_pppPDataVal);
 	}
 
 	pppCalcPartStd(pppMngSt);

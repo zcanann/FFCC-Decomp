@@ -82,7 +82,7 @@ static const char sF999Root[] = "f999_root";
 static const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 
 static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return model->m_drawMtx; }
-static inline CCharaModelData* ScreenBreakModelRef(CChara::CModel* model) { return model->m_data; }
+static inline CChara::CModel::CRefData* ScreenBreakModelRef(CChara::CModel* model) { return model->m_data; }
 static inline u32 ScreenBreakMeshNodeIndex(ScreenBreakMeshData* meshData) { return meshData->m_nodeIndex; }
 static inline ScreenBreakDataOffsets* GetScreenBreakDataOffsets(_pppCtrlTable* ctrl) { return reinterpret_cast<ScreenBreakDataOffsets*>(ctrl->m_serializedDataOffsets); }
 static inline u8* GetScreenBreakWork(pppScreenBreak* screenBreak, s32 offset) { return screenBreak->m_workArea + offset; }

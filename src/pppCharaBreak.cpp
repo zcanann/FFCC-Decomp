@@ -57,10 +57,10 @@ typedef CChara::CMesh::CRefData CharaBreakMeshData;
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
-STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xC);
-STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x24);
-STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x34);
-STATIC_ASSERT(offsetof(CCharaModelData, m_normQuant) == 0x38);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_meshCount) == 0xC);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_materialSet) == 0x24);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_posQuant) == 0x34);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_normQuant) == 0x38);
 STATIC_ASSERT(offsetof(CharaBreakStep, m_worldSpaceMode) == 0x42);
 
 static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
@@ -68,7 +68,7 @@ static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
     return model->m_matrix;
 }
 
-static inline CCharaModelData* ModelData(CChara::CModel* model)
+static inline CChara::CModel::CRefData* ModelData(CChara::CModel* model)
 {
     return model->m_data;
 }

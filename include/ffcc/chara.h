@@ -17,27 +17,6 @@ class SRT;
 struct _GXColor;
 struct Vec;
 
-struct CCharaModelData
-{
-    u8 _pad0[0x8];
-    u32 m_nodeCount;
-    u32 m_meshCount;
-    void* m_nodeRefData;
-    void* m_meshRefData;
-    void* m_bank;
-    s16 m_headNodeIndex;
-    s16 m_chest3NodeIndex;
-    s16 m_chest2NodeIndex;
-    s16 m_chest1NodeIndex;
-    CMaterialSet* m_materialSet;
-    float m_baseScale;
-    u8 _pad2C[0x8];
-    u32 m_posQuant;
-    u32 m_normQuant;
-    u32 m_dynCount;
-    void* m_dynParams;
-};
-
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);
 void VECLerp(Vec*, Vec*, Vec*, float);
 
@@ -286,7 +265,7 @@ public:
 		};
 		u8 m_attachMode;
 		u8 _padA2[0x2];
-		CCharaModelData* m_data;
+		CRefData* m_data;
 		CNode* m_nodes;
 		CMesh* m_meshes;
 		CTextureSet* m_texSet;

@@ -39,11 +39,6 @@ extern const char lbl_80330218[5];
 extern "C" const char lbl_801D90D4[];
 extern const Vec DAT_801D9078;
 
-inline void* operator new(unsigned long, void* ptr)
-{
-	return ptr;
-}
-
 extern "C" const char s_chara_cpp[];
 
 namespace {
@@ -83,16 +78,14 @@ STATIC_ASSERT(offsetof(CChara::CAnimNode, m_name) == 0x00);
 STATIC_ASSERT(offsetof(CChara::CAnimNode, m_dataOffset) == 0x10);
 STATIC_ASSERT(offsetof(CChara::CAnimNode, m_flags) == 0x14);
 
-typedef CCharaModelData CCharaModelRefRaw;
-
-STATIC_ASSERT(sizeof(CCharaModelRefRaw) == 0x44);
-STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_nodeCount) == 0x08);
-STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_meshCount) == 0x0C);
-STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_nodeRefData) == 0x10);
-STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_meshRefData) == 0x14);
-STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_bank) == 0x18);
-STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_materialSet) == 0x24);
-STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_posQuant) == 0x34);
+STATIC_ASSERT(sizeof(CChara::CModel::CRefData) == 0x44);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_nodeCount) == 0x08);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_meshCount) == 0x0C);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_nodeRefData) == 0x10);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_meshRefData) == 0x14);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_bank) == 0x18);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_materialSet) == 0x24);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_posQuant) == 0x34);
 STATIC_ASSERT(sizeof(CChara::CNode) == 0xC0);
 STATIC_ASSERT(offsetof(CChara::CNode, m_refData) == 0x00);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);
@@ -130,7 +123,7 @@ static inline u8* ModelRaw(CChara::CModel* model)
 	return reinterpret_cast<u8*>(model);
 }
 
-static inline CCharaModelRefRaw* ModelRef(CChara::CModel* model)
+static inline CChara::CModel::CRefData* ModelRef(CChara::CModel* model)
 {
 	return model->m_data;
 }
@@ -574,19 +567,6 @@ static inline void RetainRefCounted(void* refObject)
 	}
 }
 
-static inline void CopyDuplicatedNodeState(CChara::CNode* dst, CChara::CNode* src)
-{
-	dst->m_refData = src->m_refData;
-	PSMTXCopy(NodeLocalRuntimeMtx(src), NodeLocalRuntimeMtx(dst));
-	PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
-	NodePreviousQuat(dst) = NodePreviousQuat(src);
-	NodePreviousPosition(dst) = NodePreviousPosition(src);
-	NodePreviousScale(dst) = NodePreviousScale(src);
-	NodeAnimNode0(dst) = 0;
-	NodeAnimNode1(dst) = 0;
-	NodeRuntimeFlags(dst) = (NodeRuntimeFlags(dst) & 0x7F) | (NodeRuntimeFlags(src) & 0x80);
-}
-
 static void CalcOneBindNode(CChara::CNode* node, CChara::CModel* model)
 {
 	s16 parent = NodeParentIndex(node);
@@ -604,16 +584,6 @@ static CChara::CNode* GetBindChildNode(CChara::CModel* model, CChara::CNode* nod
 	u8* bank = reinterpret_cast<u8*>(ModelBank(model));
 	u16 nodeIndex = *reinterpret_cast<u16*>(bank + NodeChildBankOffset(node) + childIndex * 2);
 	return ModelNodes(model) + nodeIndex;
-}
-
-static void CopyDuplicatedMeshState(CChara::CMesh* dst, CChara::CMesh* src)
-{
-	u8* srcRaw = reinterpret_cast<u8*>(src);
-	u8* dstRaw = reinterpret_cast<u8*>(dst);
-
-	*reinterpret_cast<void**>(dstRaw) = *reinterpret_cast<void**>(srcRaw);
-	*reinterpret_cast<void**>(dstRaw + 4) = 0;
-	*reinterpret_cast<void**>(dstRaw + 8) = 0;
 }
 
 static const char s_charaMeshWorkOverflow[] = "chara mesh work buffer overflow\n";
@@ -642,7 +612,6 @@ inline void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[
 	out[1][3] = a[1][3];
 	out[2][3] = a[2][3];
 }
-
 
 /*
  * --INFO--
@@ -790,33 +759,28 @@ CChara::CModel::CRefData::CRefData()
  */
 CChara::CModel::CRefData::~CRefData()
 {
-	u8* raw = reinterpret_cast<u8*>(this);
-	void** ptr;
-
-	ptr = reinterpret_cast<void**>(raw + 0x40);
-	if (*ptr != 0) {
-		delete[] static_cast<u8*>(*ptr);
-		*ptr = 0;
+	if (m_dynParams != 0) {
+		delete[] static_cast<u8*>(m_dynParams);
+		m_dynParams = 0;
 	}
-	ptr = reinterpret_cast<void**>(raw + 0x10);
-	if (*ptr != 0) {
-		delete[] reinterpret_cast<CChara::CNode::CRefData*>(*ptr);
-		*ptr = 0;
+	if (m_nodeRefData != 0) {
+		delete[] static_cast<CNode::CRefData*>(m_nodeRefData);
+		m_nodeRefData = 0;
 	}
-	ptr = reinterpret_cast<void**>(raw + 0x14);
-	if (*ptr != 0) {
-		delete[] reinterpret_cast<CChara::CMesh::CRefData*>(*ptr);
-		*ptr = 0;
+	if (m_meshRefData != 0) {
+		delete[] static_cast<CMesh::CRefData*>(m_meshRefData);
+		m_meshRefData = 0;
 	}
-	ptr = reinterpret_cast<void**>(raw + 0x18);
-	if (*ptr != 0) {
-		delete[] static_cast<u8*>(*ptr);
-		*ptr = 0;
+	if (m_bank != 0) {
+		delete[] static_cast<u8*>(m_bank);
+		m_bank = 0;
 	}
-	ptr = reinterpret_cast<void**>(raw + 0x24);
-	if (*ptr != 0) {
-		ReleaseRefCountedNonNull(*ptr);
-		*ptr = 0;
+	CMaterialSet* materialSet = m_materialSet;
+	if (materialSet != 0) {
+		if (materialSet->DecRef() == 0) {
+			delete materialSet;
+		}
+		m_materialSet = 0;
 	}
 }
 
@@ -982,9 +946,7 @@ void CChara::CModel::Init()
  */
 void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 {
-	CCharaModelRefRaw* ref = reinterpret_cast<CCharaModelRefRaw*>(
-	    new (stage, const_cast<char*>(s_chara_cpp), 0x111) CChara::CModel::CRefData());
-	m_data = ref;
+	m_data = new (stage, const_cast<char*>(s_chara_cpp), 0x111) CRefData;
 
 	CChunkFile chunkFile(fileData);
 	CChunkFile::CChunk chunk;
@@ -1249,6 +1211,42 @@ void CChara::CModel::setup()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CChara::CNode::Duplicate(CChara::CNode* src, CMemory::CStage*)
+{
+	m_refData = src->m_refData;
+	PSMTXCopy(src->m_localRuntimeMtx, m_localRuntimeMtx);
+	PSMTXCopy(src->m_mtx, m_mtx);
+	m_previousQuat = src->m_previousQuat;
+	m_previousPosition = src->m_previousPosition;
+	m_previousScale = src->m_previousScale;
+	m_flagsBits.m_flag_80 = src->m_flagsBits.m_flag_80;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CChara::CMesh::Duplicate(CChara::CMesh* src, CMemory::CStage*)
+{
+	m_data = src->m_data;
+	m_workPositions = 0;
+	m_workNormals = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80072530
  * PAL Size: 1016b
  * EN Address: TODO
@@ -1258,39 +1256,19 @@ void CChara::CModel::setup()
  */
 CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 {
-	void* cloneMem = operator new(sizeof(CModel), stage, const_cast<char*>(s_chara_cpp), 0x25A);
-	CModel* clone = cloneMem != 0 ? new (cloneMem) CModel() : 0;
+	CModel* clone = new (stage, const_cast<char*>(s_chara_cpp), 0x25A) CModel;
 
-	clone->m_data = ModelRef(this);
-	++*reinterpret_cast<int*>(reinterpret_cast<u8*>(ModelRef(this)) + 4);
+	clone->m_data = m_data;
+	m_data->AddRef();
 
-	clone->m_nodes = new (stage, const_cast<char*>(s_chara_cpp), 0x263) CChara::CNode[ModelNodeCount(this)];
-	{
-		u32 i = 0;
-		u32 byteOff = 0;
-		for (; i < ModelNodeCount(this); byteOff += 0xc0, i++) {
-			CChara::CNode* src = reinterpret_cast<CChara::CNode*>(reinterpret_cast<u8*>(ModelNodes(this)) + byteOff);
-			CChara::CNode* dst = reinterpret_cast<CChara::CNode*>(reinterpret_cast<u8*>(clone->m_nodes) + byteOff);
-			dst->m_refData = src->m_refData;
-			PSMTXCopy(NodeLocalRuntimeMtx(src), NodeLocalRuntimeMtx(dst));
-			PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
-			NodePreviousQuat(dst) = NodePreviousQuat(src);
-			NodePreviousPosition(dst) = NodePreviousPosition(src);
-			NodePreviousScale(dst) = NodePreviousScale(src);
-			dst->m_flagsBits.m_flag_80 = src->m_flagsBits.m_flag_80;
-		}
+	clone->m_nodes = new (stage, const_cast<char*>(s_chara_cpp), 0x263) CNode[m_data->m_nodeCount];
+	for (u32 i = 0; i < m_data->m_nodeCount; i++) {
+		clone->m_nodes[i].Duplicate(&m_nodes[i], stage);
 	}
 
-	CChara::CMesh* cloneMeshes = new (stage, const_cast<char*>(s_chara_cpp), 0x26C) CChara::CMesh[ModelMeshCount(this)];
-	clone->m_meshes = cloneMeshes;
-	for (u32 i = 0; i < ModelMeshCount(this); i++) {
-		CChara::CMesh* dst = &reinterpret_cast<CChara::CMesh*>(clone->m_meshes)[i];
-		CChara::CMesh* src = &reinterpret_cast<CChara::CMesh*>(ModelMeshes(this))[i];
-		u8* dstRaw = reinterpret_cast<u8*>(dst);
-		u8* srcRaw = reinterpret_cast<u8*>(src);
-		*reinterpret_cast<void**>(dstRaw + 8) = *reinterpret_cast<void**>(srcRaw + 8);
-		*reinterpret_cast<void**>(dstRaw + 0xc) = 0;
-		*reinterpret_cast<void**>(dstRaw + 0x10) = 0;
+	clone->m_meshes = new (stage, const_cast<char*>(s_chara_cpp), 0x26C) CMesh[m_data->m_meshCount];
+	for (u32 i = 0; i < m_data->m_meshCount; i++) {
+		clone->m_meshes[i].Duplicate(&m_meshes[i], stage);
 	}
 
 	if (m_texSet != 0) {
@@ -1372,37 +1350,34 @@ void CChara::CModel::calcBindMatrix()
  */
 void CChara::CModel::CalcMatrix()
 {
-	float(*localMtx)[4] = (float(*)[4])((u8*)this + 0x08);
-	float(*worldBaseMtx)[4] = (float(*)[4])((u8*)this + 0x38);
-	float(*drawMtx)[4] = (float(*)[4])((u8*)this + 0x68);
 	const float zero = FLOAT_803301b0;
 	const float one = FLOAT_803301BC;
 
-	worldBaseMtx[0][0] = localMtx[0][0];
-	worldBaseMtx[1][0] = localMtx[1][0];
-	worldBaseMtx[2][0] = localMtx[2][0];
-	worldBaseMtx[0][1] = localMtx[0][1];
-	worldBaseMtx[1][1] = localMtx[1][1];
-	worldBaseMtx[2][1] = localMtx[2][1];
-	worldBaseMtx[0][2] = localMtx[0][2];
-	worldBaseMtx[1][2] = localMtx[1][2];
-	worldBaseMtx[2][2] = localMtx[2][2];
-	worldBaseMtx[0][3] = zero;
-	worldBaseMtx[1][3] = zero;
-	worldBaseMtx[2][3] = zero;
+	m_worldBaseMtx[0][0] = m_matrix[0][0];
+	m_worldBaseMtx[1][0] = m_matrix[1][0];
+	m_worldBaseMtx[2][0] = m_matrix[2][0];
+	m_worldBaseMtx[0][1] = m_matrix[0][1];
+	m_worldBaseMtx[1][1] = m_matrix[1][1];
+	m_worldBaseMtx[2][1] = m_matrix[2][1];
+	m_worldBaseMtx[0][2] = m_matrix[0][2];
+	m_worldBaseMtx[1][2] = m_matrix[1][2];
+	m_worldBaseMtx[2][2] = m_matrix[2][2];
+	m_worldBaseMtx[0][3] = zero;
+	m_worldBaseMtx[1][3] = zero;
+	m_worldBaseMtx[2][3] = zero;
 
-	drawMtx[0][0] = one;
-	drawMtx[1][0] = zero;
-	drawMtx[2][0] = zero;
-	drawMtx[0][1] = zero;
-	drawMtx[1][1] = one;
-	drawMtx[2][1] = zero;
-	drawMtx[0][2] = zero;
-	drawMtx[1][2] = zero;
-	drawMtx[2][2] = one;
-	drawMtx[0][3] = localMtx[0][3];
-	drawMtx[1][3] = localMtx[1][3];
-	drawMtx[2][3] = localMtx[2][3];
+	m_drawMtx[0][0] = one;
+	m_drawMtx[1][0] = zero;
+	m_drawMtx[2][0] = zero;
+	m_drawMtx[0][1] = zero;
+	m_drawMtx[1][1] = one;
+	m_drawMtx[2][1] = zero;
+	m_drawMtx[0][2] = zero;
+	m_drawMtx[1][2] = zero;
+	m_drawMtx[2][2] = one;
+	m_drawMtx[0][3] = m_matrix[0][3];
+	m_drawMtx[1][3] = m_matrix[1][3];
+	m_drawMtx[2][3] = m_matrix[2][3];
 
 	u16& blendCur = ModelBlendCur(this);
 	if (blendCur != 0) {
@@ -2564,24 +2539,9 @@ void CChara::CModel::SetFrame(float frame)
 void CChara::CModel::CalcFurColor()
 {
 	float delta = m_furTarget - m_furCur;
-	float step;
-	if (delta < FLOAT_803301B4) {
-		step = FLOAT_803301B4;
-	} else if (FLOAT_803301B8 < delta) {
-		step = FLOAT_803301B8;
-	} else {
-		step = delta;
-	}
-	m_furCur += step;
-	float furColor;
-	if (m_furCur < 0.0f) {
-		furColor = 0.0f;
-	} else if (1.0f < m_furCur) {
-		furColor = 1.0f;
-	} else {
-		furColor = m_furCur;
-	}
-	m_furCur = furColor;
+	m_furCur += delta < FLOAT_803301B4 ? FLOAT_803301B4 :
+	    FLOAT_803301B8 < delta ? FLOAT_803301B8 : delta;
+	m_furCur = m_furCur < 0.0f ? 0.0f : 1.0f < m_furCur ? 1.0f : m_furCur;
 }
 
 /*
@@ -2595,17 +2555,7 @@ void CChara::CModel::CalcFurColor()
  */
 int CChara::CModel::GetDispIndex(CChara::CNode* node)
 {
-	struct CNodeRefDataDisplay {
-		u8 _pad[0x8D];
-		s8 m_displayIndex;
-	};
-
-	struct CNodeDisplayView {
-		CNodeRefDataDisplay* m_refData;
-	};
-
-	CNodeDisplayView* nodeView = (CNodeDisplayView*)node;
-	return (int)nodeView->m_refData->m_displayIndex;
+	return node->m_refData->m_displayIndex;
 }
 
 /*
@@ -2690,21 +2640,6 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 		}
 	}
 	chunk.PopChunk();
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 0b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CChara::CNode::Duplicate(CChara::CNode* src, CMemory::CStage* stage)
-{
-	(void)stage;
-	CopyDuplicatedNodeState(this, src);
 }
 
 /*
@@ -2936,21 +2871,6 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		}
 	}
 	chunk.PopChunk();
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 0b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CChara::CMesh::Duplicate(CChara::CMesh* src, CMemory::CStage* stage)
-{
-	(void)stage;
-	CopyDuplicatedMeshState(this, src);
 }
 
 #pragma push

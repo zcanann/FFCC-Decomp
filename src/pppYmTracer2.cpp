@@ -36,9 +36,6 @@ STATIC_ASSERT(offsetof(YmTracer2Work, visibleCount) == 0x2c);
 STATIC_ASSERT(offsetof(YmTracer2Work, alphaStep) == 0x30);
 STATIC_ASSERT(offsetof(YmTracer2ColorBlock, color) == 0x8);
 
-static pppPackedColor g_pppYmTracer2_1;
-static pppPackedColor g_pppYmTracer2_2;
-
 static inline void copyPolygonData(YmTracer2Polygon* dst, YmTracer2Polygon* src)
 {
     dst->active = src->active;
@@ -82,8 +79,6 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
     s32 dataOffset;
     s32 colorOffset;
     s32 dataValIndex;
-    pppPackedColor colorTop;
-    pppPackedColor colorBottom;
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
@@ -156,8 +151,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
                         alphaScale = uvMax;
                     }
 
-                    colorTop = g_pppYmTracer2_1;
-                    colorBottom = g_pppYmTracer2_2;
+                    pppPackedColor colorTop = {0};
+                    pppPackedColor colorBottom = {0};
                     colorTop.bytes[0] = current->colorR;
                     colorTop.bytes[1] = current->colorG;
                     colorTop.bytes[2] = current->colorB;

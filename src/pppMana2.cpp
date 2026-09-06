@@ -589,7 +589,6 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     float* normals;
     float* uvs;
     int colCount;
-    int pairCount;
 
     normalY = LoadFloat(kMana2One);
     zero = LoadFloat(kMana2Zero);
@@ -626,23 +625,13 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     rowBase = 0;
     do {
         quadIndex = rowBase;
-        for (pairCount = 0; pairCount < 8; pairCount++) {
-            int nextIndex = quadIndex + 1;
-            int lowerIndex = quadIndex + 0x11;
-            int lowerNextIndex = quadIndex + 0x12;
-
-            param_4[indexOffset++] = quadIndex;
-            param_4[indexOffset++] = nextIndex;
-            param_4[indexOffset++] = lowerNextIndex;
-            param_4[indexOffset++] = lowerNextIndex;
-            param_4[indexOffset++] = lowerIndex;
-            param_4[indexOffset++] = quadIndex++;
+        for (int col = 0; col < 16; col++, quadIndex++) {
             param_4[indexOffset++] = quadIndex;
             param_4[indexOffset++] = quadIndex + 1;
-            param_4[indexOffset++] = quadIndex + 0x12;
-            param_4[indexOffset++] = quadIndex + 0x12;
-            param_4[indexOffset++] = quadIndex + 0x11;
-            param_4[indexOffset++] = quadIndex++;
+            param_4[indexOffset++] = quadIndex + 18;
+            param_4[indexOffset++] = quadIndex + 18;
+            param_4[indexOffset++] = quadIndex + 17;
+            param_4[indexOffset++] = quadIndex;
         }
         rowCount = rowCount + 1;
         rowBase = rowBase + 0x11;

@@ -971,7 +971,7 @@ int CGCharaObj::calcCastTime(int itemId)
 			}
 		}
 
-		unsigned int playerCid = (static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(static_cast<unsigned short>(GetCID()) & 0x6D))) >> 5) & 0xFFU;
+		unsigned int playerCid = (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D;
 		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD8)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
@@ -986,7 +986,7 @@ int CGCharaObj::calcCastTime(int itemId)
 		System.Printf(fmt + 0xB0, baseCast);
 	} else if (itemNo == 0x1F8) {
 		unsigned int castBonus = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCB];
-		unsigned int playerCid = (static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(static_cast<unsigned short>(GetCID()) & 0x6D))) >> 5) & 0xFFU;
+		unsigned int playerCid = (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D;
 		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD9)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
@@ -1163,12 +1163,10 @@ void CGCharaObj::statAttack()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 3
 void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg1, Vec* pos)
 {
-	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
-	int particleBank = *reinterpret_cast<unsigned short*>(itemData + 0x12);
+	SCharaItemRow* itemData = &reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[effectId];
+	int particleBank = itemData->m_particleBank;
 	int particleEntry;
 	int particleNo;
 	int seNo;
@@ -1219,7 +1217,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 checkParticle:
 	if (hasParticle == 0) {
 		if (effectArg0 == 2) {
-			unsigned short seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x40);
+			unsigned short seSpec = itemData->m_se2;
 			seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));
 			if (seNo != 0) {
 				int seHandle = playSe3D(seNo, 0x32, 0x96, 0, pos);
@@ -1490,9 +1488,6 @@ checkParticle:
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma pop
-#pragma push
-#pragma optimization_level 3
 void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, int, Vec* hitPos)
 {
 	l_pHitCross = hitPos;
@@ -2054,18 +2049,15 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma pop
 #pragma push
 #pragma optimization_level 2
 void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int& outC, int forceNormal)
 {
-	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (itemId * 0x48);
-
-	int normFlag = 0;
-	if ((*reinterpret_cast<unsigned short*>(itemData + 0x32) & 1) != 0 || forceNormal != 0) {
-		normFlag = 1;
+	bool normFlag = false;
+	SCharaItemRow* itemData = &reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[itemId];
+	if ((itemData->m_flags32 & 1) != 0 || forceNormal != 0) {
+		normFlag = true;
 	}
-	unsigned char isNormal = normFlag;
 
 	outA = 3;
 	switch (staIndex) {
@@ -2094,20 +2086,12 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 	if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[31] == 0 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 		(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 1) != 0 &&
 		staIndex != 0x1C) {
-		int clamped = 2;
-		if (outA >= 2) {
-			clamped = outA;
-		}
-		outA = clamped;
+		outA = outA < 2 ? 2 : outA;
 	}
 	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 		(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 4) != 0 &&
 		reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[13] == 0) {
-		int clamped = 2;
-		if (outA >= 2) {
-			clamped = outA;
-		}
-		outA = clamped;
+		outA = outA < 2 ? 2 : outA;
 	}
 
 	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_baseDataIndex == 0x7F &&
@@ -2126,14 +2110,13 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		outB = 1;
 		break;
 	case 1:
-		outB = (isNormal != 0) ? 1 : 0;
+		outB = (normFlag != 0) ? 1 : 0;
 		break;
 	default:
 		outB = 0;
 		break;
 	}
-	int xorA = outA ^ 3;
-	outC = static_cast<unsigned int>((xorA >> 1) - (xorA & 3)) >> 31;
+	outC = outA < 3;
 }
 
 /*
@@ -2984,8 +2967,6 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_lifetimes off
 int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 {
 	unsigned short sourceCid = sourceObj->GetCID();
@@ -3038,7 +3019,6 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma pop
 void CGCharaObj::damageDelete()
 {
 	Sound.StopSe3DGroup(m_particleId);

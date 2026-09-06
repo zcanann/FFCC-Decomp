@@ -40,9 +40,18 @@ public:
     void Init();
     void Quit();
     void SetStereo(int);
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: 0x800DC838
+     * EN Size: 76b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    int IsStereo() { return m_redSound.GetSoundMode() ? 0 : 1; }
     void SetBgmMasterVolume(int);
     void SetSeMasterVolume(int);
-    unsigned int GetSoundMode() { return m_redSound.GetSoundMode(); }
     int DMAEntry(int flags, int direction, int mainMemory, int aramMemory, int size,
                  RedDmaCallback callback, void* callbackData)
     {

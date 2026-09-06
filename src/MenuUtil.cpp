@@ -1308,9 +1308,7 @@ void CMenuPcs::GetOptionData()
 	gameInitMode =
 	    static_cast<signed char>(static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_gameInitFlag))) >> 5);
 
-	unsigned int soundMode = Sound.GetSoundMode();
-	unsigned int soundModeClz = static_cast<unsigned int>(__cntlzw(soundMode));
-	stereoMode = static_cast<signed char>(static_cast<unsigned int>(__cntlzw(soundModeClz >> 5)) >> 5);
+	stereoMode = Sound.IsStereo() ? 0 : 1;
 
 	int value = Sound.GetBgmMasterVolume();
 	bgmVolume = static_cast<signed char>(value / 10);

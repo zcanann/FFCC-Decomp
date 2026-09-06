@@ -291,6 +291,35 @@ CSound::~CSound()
 
 /*
  * --INFO--
+ * PAL Address: 0x800c7f20
+ * PAL Size: 44b
+ * EN Address: 0x800DCCB8
+ * EN Size: 84b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CSound::SetStereo(int stereo)
+{
+    m_redSound.SetSoundMode(stereo ? 0 : 1);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: 0x800DF41C
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CSound::IsDebugPrint(int enabled)
+{
+    m_debugPrint = enabled;
+    m_redSound.ReportPrint(enabled != 0);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800c810c
  * PAL Size: 372b
  * EN Address: TODO
@@ -315,9 +344,9 @@ void CSound::Init()
     ARQInit();
 
     m_redSound.Init(m_aramBuffer, 0x80000, 0x800000, 0x800000);
-    m_redSound.ReportPrint(static_cast<u32>(-m_debugPrint | m_debugPrint) >> 31);
+    IsDebugPrint(m_debugPrint);
 
-    m_redSound.SetSoundMode((u32)__cntlzw((u32)__cntlzw(m_redSound.GetSoundMode()) >> 5) >> 5);
+    SetStereo(IsStereo());
 
     m_redSound.MusicMasterVolume(m_bgmMasterVolume);
     m_redSound.SeMasterVolume(m_seMasterVolume);
@@ -396,20 +425,6 @@ void CSound::Quit()
     }
 
     Memory.DestroyStage(m_stage);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800c7f20
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CSound::SetStereo(int stereo)
-{
-    m_redSound.SetSoundMode((u32)__cntlzw(stereo) >> 5);
 }
 
 /*
@@ -520,10 +535,9 @@ void CSound::Realloc(int isMinMemoryMode)
     int waveHeapSize = (isMinMemoryMode != 0) ? 0xE00000 : 0x800000;
     m_redSound.Init(m_aramBuffer, 0x80000, waveHeapSize, streamHeapSize);
 
-    u32 reportFlag = m_debugPrint;
-    m_redSound.ReportPrint(((-reportFlag) | reportFlag) >> 31);
+    IsDebugPrint(m_debugPrint);
 
-    m_redSound.SetSoundMode((u32)__cntlzw((u32)__cntlzw(m_redSound.GetSoundMode()) >> 5) >> 5);
+    SetStereo(IsStereo());
 
     m_redSound.MusicMasterVolume(m_bgmMasterVolume);
     m_redSound.SeMasterVolume(m_seMasterVolume);
@@ -642,13 +656,11 @@ void CSound::PauseDiscError(int pause)
 void CSound::CheckDriver(int mode)
 {
     unsigned int oldPrint = m_debugPrint;
-    m_debugPrint = 1;
-    m_redSound.ReportPrint(1);
+    IsDebugPrint(1);
     m_redSound.TestProcess(mode);
     m_redSound.DisplayWaveInfo();
     m_redSound.DisplaySePlayInfo();
-    m_debugPrint = oldPrint;
-    m_redSound.ReportPrint((-oldPrint | oldPrint) >> 0x1F);
+    IsDebugPrint(oldPrint);
 }
 
 /*
@@ -978,8 +990,7 @@ void CSound::CancelLoadWaveASync()
  */
 int CSound::IsLoadWaveASyncCompleted()
 {
-    CFile::CHandle* waveFile = m_waveFile;
-    return (u32)__cntlzw((u32)waveFile) >> 5;
+    return m_waveFile == 0 ? 1 : 0;
 }
 
 /*
@@ -2082,15 +2093,6 @@ inline void CSound::IsPlayStream()
 	// TODO
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void CSound::IsDebugPrint(int)
-{
-	// TODO
-}
 
 /*
  * --INFO--

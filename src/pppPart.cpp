@@ -1104,22 +1104,22 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 
 	switch (pppMngSt->m_rotationOrder) {
 	case 0:
-		pppGetRotMatrixXYZ(ppvMng->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixXYZ(ppvMng->m_matrix, reinterpret_cast<pppIVECTOR4*>(&pppMngSt->m_rotation));
 		break;
 	case 1:
-		pppGetRotMatrixXZY(ppvMng->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixXZY(ppvMng->m_matrix, reinterpret_cast<pppIVECTOR4*>(&pppMngSt->m_rotation));
 		break;
 	case 2:
-		pppGetRotMatrixYXZ(ppvMng->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixYXZ(ppvMng->m_matrix, reinterpret_cast<pppIVECTOR4*>(&pppMngSt->m_rotation));
 		break;
 	case 3:
-		pppGetRotMatrixYZX(ppvMng->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixYZX(ppvMng->m_matrix, reinterpret_cast<pppIVECTOR4*>(&pppMngSt->m_rotation));
 		break;
 	case 4:
-		pppGetRotMatrixZXY(ppvMng->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixZXY(ppvMng->m_matrix, reinterpret_cast<pppIVECTOR4*>(&pppMngSt->m_rotation));
 		break;
 	case 5:
-		pppGetRotMatrixZYX(ppvMng->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixZYX(ppvMng->m_matrix, reinterpret_cast<pppIVECTOR4*>(&pppMngSt->m_rotation));
 		break;
 	default:
 		break;

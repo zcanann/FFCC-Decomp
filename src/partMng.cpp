@@ -1,5 +1,7 @@
+#include "global.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/partMng.h"
+
 #include "ffcc/pppPart.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/cflat_runtime.h"
@@ -33,6 +35,16 @@ extern float ppvScreenMatrixZbuff;
 #include <dolphin/gx/GXCpu2Efb.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
+
+STATIC_ASSERT(sizeof(pppIVECTOR3) == 0xC);
+STATIC_ASSERT(sizeof(pppIVECTOR4) == 0x10);
+STATIC_ASSERT(offsetof(pppIVECTOR4, y) == 4);
+STATIC_ASSERT(offsetof(pppIVECTOR4, z) == 8);
+STATIC_ASSERT(offsetof(_pppMngSt, m_rotation) == 0x18);
+STATIC_ASSERT(offsetof(_pppMngSt, m_lifeEnd) == 0x24);
+STATIC_ASSERT(offsetof(_pppMngSt, m_scale) == 0x28);
+STATIC_ASSERT(offsetof(_pppMngSt, m_matrix) == 0x78);
+STATIC_ASSERT(sizeof(_pppMngSt) == 0x158);
 
 extern "C" {
 extern Mtx ppvCameraMatrix;
@@ -1128,9 +1140,7 @@ void CPartMng::SetFp()
         unsigned char m_pad04[0x08 - 0x04];
         Vec m_position;                      // 0x08
         int m_baseTime;                      // 0x14
-        float m_rotationX;                   // 0x18
-        float m_rotationZ;                   // 0x1C
-        int m_rotationSpeed;                 // 0x20
+        pppIVECTOR3 m_rotation;              // 0x18
         unsigned char m_pad24[0x28 - 0x24];
         Vec m_scale;                         // 0x28
         unsigned char m_pad34[0x38 - 0x34];
@@ -1211,9 +1221,9 @@ void CPartMng::SetFp()
         mng->m_position.x = recvBuff[0];
         mng->m_position.y = recvBuff[1];
         mng->m_position.z = recvBuff[2];
-        *reinterpret_cast<int*>(&mng->m_rotationX) = reinterpret_cast<int*>(recvBuff)[4];
-        *reinterpret_cast<int*>(&mng->m_rotationZ) = reinterpret_cast<int*>(recvBuff)[5];
-        mng->m_rotationSpeed = reinterpret_cast<int*>(recvBuff)[6];
+        mng->m_rotation.x = reinterpret_cast<int*>(recvBuff)[4];
+        mng->m_rotation.y = reinterpret_cast<int*>(recvBuff)[5];
+        mng->m_rotation.z = reinterpret_cast<int*>(recvBuff)[6];
         mng->m_scale.x = recvBuff[8];
         mng->m_scale.y = recvBuff[9];
         mng->m_scale.z = recvBuff[0x0A];
@@ -1751,9 +1761,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_pppMng[0].m_position.x = payloadFloats[0];
         m_pppMng[0].m_position.y = payloadFloats[1];
         m_pppMng[0].m_position.z = payloadFloats[2];
-        *reinterpret_cast<int*>(&m_pppMng[0].m_rotation.x) = payloadWords[4];
-        *reinterpret_cast<int*>(&m_pppMng[0].m_rotation.z) = payloadWords[5];
-        m_pppMng[0].m_rotationSpeed = payloadWords[6];
+        m_pppMng[0].m_rotation.x = payloadWords[4];
+        m_pppMng[0].m_rotation.y = payloadWords[5];
+        m_pppMng[0].m_rotation.z = payloadWords[6];
         m_pppMng[0].m_scale.x = payloadFloats[8];
         m_pppMng[0].m_scale.y = payloadFloats[9];
         m_pppMng[0].m_scale.z = payloadFloats[0xA];
@@ -4278,8 +4288,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         int m_partIndex;             // 0x04
         Vec m_position;              // 0x08
         int m_baseTime;              // 0x14
-        pppIVECTOR4 m_rotation;      // 0x18
-        int m_rotationSpeed;         // 0x20
+        pppIVECTOR3 m_rotation;      // 0x18
         int m_lifeEnd;               // 0x24
         Vec m_scale;                 // 0x28
         int m_currentFrame;          // 0x34
@@ -4499,16 +4508,15 @@ foundMng:
     }
 
     if (createParam->m_rotationPtr == 0) {
-        *reinterpret_cast<int*>(&mng->m_rotation.x) = *reinterpret_cast<int*>(fpData + 0x10);
-        *reinterpret_cast<int*>(&mng->m_rotation.z) = *reinterpret_cast<int*>(fpData + 0x14);
-        mng->m_rotationSpeed = *reinterpret_cast<int*>(fpData + 0x18);
+        mng->m_rotation.x = *reinterpret_cast<int*>(fpData + 0x10);
+        mng->m_rotation.y = *reinterpret_cast<int*>(fpData + 0x14);
+        mng->m_rotation.z = *reinterpret_cast<int*>(fpData + 0x18);
     } else {
-        unsigned char* mngB = reinterpret_cast<unsigned char*>(mng);
-        *reinterpret_cast<int*>(mngB + 0x18) =
+        mng->m_rotation.x =
             static_cast<int>(32768.0f * createParam->m_rotationPtr->x / 180.0f);
-        *reinterpret_cast<int*>(mngB + 0x1C) =
+        mng->m_rotation.y =
             static_cast<int>(32768.0f * createParam->m_rotationPtr->y / 180.0f);
-        *reinterpret_cast<int*>(mngB + 0x20) =
+        mng->m_rotation.z =
             static_cast<int>(32768.0f * createParam->m_rotationPtr->z / 180.0f);
     }
 

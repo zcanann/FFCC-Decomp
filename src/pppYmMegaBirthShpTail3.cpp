@@ -623,25 +623,25 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
     }
 
     if ((s32)paramBytes[0x18] < 8 && (s32)paramBytes[0x18] >= 0) {
-        union { Vec baseDir; double _bdAlign[2]; };
-        union { s32 angles[4]; double _angAlign[2]; };
+        Vec baseDir;
+        pppIVECTOR4 angles;
         pppFMATRIX rot;
 
         baseDir.x = pYmMegaBirthShpTail3->m_matrix[2][0];
         baseDir.y = pYmMegaBirthShpTail3->m_matrix[2][1];
         baseDir.z = pYmMegaBirthShpTail3->m_matrix[2][2];
-        angles[0] = (s32)(spreadRange * Math.RandF() - spread);
-        angles[0] = (s32)((float)(angles[0] << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
-        angles[1] = (s32)(spreadRange * Math.RandF() - spread);
-        angles[1] = (s32)((float)(angles[1] << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
-        angles[2] = (s32)(spreadRange * Math.RandF() - spread);
-        angles[2] = (s32)((float)(angles[2] << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
+        angles.x = (s32)(spreadRange * Math.RandF() - spread);
+        angles.x = (s32)((float)(angles.x << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
+        angles.y = (s32)(spreadRange * Math.RandF() - spread);
+        angles.y = (s32)((float)(angles.y << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
+        angles.z = (s32)(spreadRange * Math.RandF() - spread);
+        angles.z = (s32)((float)(angles.z << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
         if ((paramBytes[0x18] == 2) || (paramBytes[0x18] == 3)) {
-            angles[0] = 0;
-            angles[1] = 0;
+            angles.x = 0;
+            angles.y = 0;
         }
 
-        pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angles);
+        pppGetRotMatrixXYZ(rot, &angles);
         PSMTXMultVecSR(rot.value, &baseDir, reinterpret_cast<Vec*>(particleData->m_matrix[1]));
         reinterpret_cast<Vec*>(particleData->m_matrix[1])->x *= pYmMegaBirthShpTail3->m_speedScaleX;
         reinterpret_cast<Vec*>(particleData->m_matrix[1])->y *= pYmMegaBirthShpTail3->m_speedScaleYZ.x;

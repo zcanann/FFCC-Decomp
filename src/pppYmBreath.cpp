@@ -33,9 +33,7 @@ struct YmBreathParticleGroup {
     Mtx matrix;
 };
 
-struct PARTICLE_DATA {
-    u8 _pad[0x60];
-};
+struct PARTICLE_DATA;
 
 struct VYmBreath {
     Mtx m_matrix;
@@ -53,7 +51,7 @@ struct VYmBreath {
     unsigned char _pad59[3];
 };
 
-struct YmBreathParticleData {
+struct PARTICLE_DATA {
     Vec m_position;
     Vec m_direction;
     unsigned char _pad18[0x08];
@@ -81,6 +79,10 @@ struct YmBreathParticleData {
     unsigned char _pad5C[0x04];
 };
 
+STATIC_ASSERT(sizeof(PARTICLE_DATA) == 0x60);
+STATIC_ASSERT(offsetof(PARTICLE_DATA, m_life) == 0x20);
+STATIC_ASSERT(offsetof(PARTICLE_DATA, m_shapeFrame0) == 0x56);
+STATIC_ASSERT(sizeof(YmBreathParticleGroup) == 0x5C);
 STATIC_ASSERT(sizeof(YmBreathDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(YmBreathDataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(YmBreathDataOffsets, m_colorOffset) == 0x4);
@@ -99,6 +101,78 @@ static inline YmBreathDataOffsets* GetYmBreathDataOffsets(_pppCtrlTable* ctrl)
 static inline VYmBreath* GetYmBreathWork(pppYmBreath* ymBreath, s32 offset)
 {
     return reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + offset);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int IsDeadGroupBreath(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short groupIndex)
+{
+    YmBreathParticleGroup* group = &vYmBreath->m_groups[groupIndex];
+    for (int slot = 0; slot < pYmBreath->m_slotCount; slot++) {
+        if (group->particleIndices[slot] != -1 || group->particleStates[slot] != 1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int SearchIndex(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short& groupIndex, short& slotIndex, short particleIndex)
+{
+    YmBreathParticleGroup* groupTable = vYmBreath->m_groups;
+    short g;
+    short s;
+
+    groupIndex = -1;
+    slotIndex = -1;
+
+    for (g = 0; g < pYmBreath->m_groupCount; g++) {
+        for (s = 0; s < pYmBreath->m_slotCount; s++) {
+            if ((int)particleIndex == (int)groupTable->particleIndices[s]) {
+                groupIndex = g;
+                slotIndex = s;
+                return true;
+            }
+        }
+        groupTable++;
+    }
+
+    return false;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short groupIndex)
+{
+    YmBreathParticleGroup* group = &vYmBreath->m_groups[groupIndex];
+    for (short slot = 0; slot < pYmBreath->m_slotCount; slot++) {
+        if (group->particleIndices[slot] == -1 || group->particleStates[slot] != 1) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /*
@@ -212,12 +286,12 @@ extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataO
  */
 extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _pppCtrlTable* offsets)
 {
-    PYmBreath* params = reinterpret_cast<PYmBreath*>(pYmBreath);
+    PYmBreath* params = pYmBreath;
     int workOffset;
     int colorOffset;
     VYmBreath* work;
     VColor* color;
-    YmBreathParticleData* particle;
+    PARTICLE_DATA* particle;
     PARTICLE_WMAT* matrixList;
     PARTICLE_COLOR* particleColor;
     YmBreathParticleGroup* groupData;
@@ -242,7 +316,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
     colorOffset = GetYmBreathDataOffsets(offsets)->m_colorOffset;
     work = reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + workOffset);
     color = reinterpret_cast<VColor*>(ymBreath->m_workArea + colorOffset);
-    particle = reinterpret_cast<YmBreathParticleData*>(work->m_particleData);
+    particle = work->m_particleData;
     matrixList = work->m_particleWmats;
     particleColor = work->m_particleColors;
     groupData = work->m_groups;
@@ -421,7 +495,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
  */
 extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _pppCtrlTable* offsets)
 {
-    PYmBreath* params = reinterpret_cast<PYmBreath*>(pYmBreath);
+    PYmBreath* params = pYmBreath;
     YmBreathParticleGroup* groupData;
     _pppMngSt* mngSt;
     YmBreathDataOffsets* dataOffsets;
@@ -432,12 +506,9 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
     int i;
     int groupIndex;
     int firstParticle;
-    short slotIndex;
     int particleSlot;
     int slotCount;
-    int ready;
     float scaledOwner;
-    YmBreathParticleGroup* groupCheck;
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;
@@ -522,17 +593,8 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
     particleWMat = work->m_particleWmats;
     groupData = work->m_groups;
     for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
-        groupCheck = &work->m_groups[(short)groupIndex];
         slotCount = params->m_slotCount;
-        for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
-            if ((groupCheck->particleIndices[slotIndex] == -1) || (groupCheck->particleStates[slotIndex] != 1)) {
-                ready = 0;
-                goto group_ready;
-            }
-        }
-        ready = 1;
-group_ready:
-        if (ready) {
+        if (IsExistGroupParticle(params, work, (short)groupIndex)) {
             firstParticle = -1;
             scaledOwner = mngSt->m_previousPosition.z * params->m_groupOwnerScale;
             for (particleSlot = 0; particleSlot < slotCount; particleSlot++) {
@@ -577,29 +639,24 @@ group_ready:
  */
 void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VColor* vColor)
 {
-    PYmBreath* params = reinterpret_cast<PYmBreath*>(pYmBreath);
-    YmBreathParticleData* particleData;
+    PYmBreath* params = pYmBreath;
+    PARTICLE_DATA* particleData;
     PARTICLE_WMAT* particleWmat;
     PARTICLE_COLOR* particleColor;
     YmBreathParticleGroup* groupTable;
     int maxParticleCount;
     unsigned short* emitFrameCounter;
-    int found;
     int spawnCount;
     int i;
     int k;
     int j;
-    YmBreathParticleGroup* checkGroup;
-    YmBreathParticleGroup* groupCursor;
     YmBreathParticleGroup* groupData;
-    short groupIndex;
-    short slotIndex;
     short foundSlot;
     short foundGroup;
     Vec unitVelocity;
     Vec stepVelocity;
 
-    particleData = reinterpret_cast<YmBreathParticleData*>(vYmBreath->m_particleData);
+    particleData = vYmBreath->m_particleData;
     particleWmat = vYmBreath->m_particleWmats;
     particleColor = vYmBreath->m_particleColors;
     groupTable = vYmBreath->m_groups;
@@ -612,7 +669,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
 
         for (i = 0; i < maxParticleCount; i++) {
             if (particleData->m_life > 0) {
-                UpdateParticle(vYmBreath, pYmBreath, (PARTICLE_DATA*)particleData, vColor, particleColor);
+                UpdateParticle(vYmBreath, pYmBreath, particleData, vColor, particleColor);
                 pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[params->m_shapeStepValue];
                 pppCalcFrameShape(static_cast<long*>(shape->m_animData), particleData->m_shapeFrame1,
                                   particleData->m_shapeFrame2, particleData->m_shapeFrame0,
@@ -620,52 +677,16 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             } else {
                 float zero = kYmBreathZero;
 
-                groupCursor = vYmBreath->m_groups;
-                foundGroup = -1;
-                foundSlot = -1;
-                for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++, groupCursor++) {
-                    for (slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
-                        signed char* particleIndices = groupCursor->particleIndices;
-                        if ((short)i == *(signed char*)(particleIndices + (short)slotIndex)) {
-                            foundGroup = groupIndex;
-                            foundSlot = slotIndex;
-                            found = true;
-                            goto found_index;
-                        }
-                    }
+                if (SearchIndex(params, vYmBreath, foundGroup, foundSlot, (short)i)) {
+                    groupTable[foundGroup].particleIndices[foundSlot] = -1;
                 }
-                found = false;
-
-            found_index:
-                if (found) {
-                    groupTable[(int)foundGroup].particleIndices[(int)foundSlot] = -1;
-                }
-
-                if ((int)foundGroup != -1) {
-                    int slot;
-
-                    slot = 0;
-                    checkGroup = &vYmBreath->m_groups[(int)foundGroup];
-                    for (slot = 0; slot < (int)params->m_slotCount; slot++) {
-                        if ((checkGroup->particleIndices[slot] != -1) ||
-                            (checkGroup->particleStates[slot] != 1)) {
-                            found = false;
-                            goto group_checked;
-                        }
-                    }
-                    found = true;
-
-                group_checked:
-                    if (found == 1) {
-                        groupData = &groupTable[(int)foundGroup];
-                        for (slot = 0; slot < (int)params->m_slotCount; slot++) {
+                if (foundGroup != -1) {
+                    if (IsDeadGroupBreath(params, vYmBreath, foundGroup) == 1) {
+                        groupData = &groupTable[foundGroup];
+                        for (int slot = 0; slot < params->m_slotCount; slot++) {
                             groupData->particleStates[slot] = -1;
-                            groupData->position.z = zero;
-                            groupData->position.y = zero;
-                            groupData->position.x = zero;
-                            groupData->direction.z = zero;
-                            groupData->direction.y = zero;
-                            groupData->direction.x = zero;
+                            groupData->position.x = groupData->position.y = groupData->position.z = zero;
+                            groupData->direction.x = groupData->direction.y = groupData->direction.z = zero;
                             groupData->speed = zero;
                         }
                         groupData->active = 0;
@@ -675,7 +696,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                 if ((params->m_emitInterval <= *emitFrameCounter) && (spawnCount < (int)params->m_emitCount)) {
                     bool placing;
 
-                    BirthParticle(pppObject, vYmBreath, pYmBreath, vColor, (PARTICLE_DATA*)particleData,
+                    BirthParticle(pppObject, vYmBreath, pYmBreath, vColor, particleData,
                                   particleWmat, particleColor);
                     placing = true;
                     spawnCount += 1;
@@ -752,9 +773,9 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
 void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* particleData, VColor* vColor,
                     PARTICLE_COLOR* particleColor)
 {
-    PYmBreath* params = reinterpret_cast<PYmBreath*>(pYmBreath);
+    PYmBreath* params = pYmBreath;
     int alpha = vColor->m_alpha;
-    YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
+    PARTICLE_DATA* particle = particleData;
     Vec step;
 
     (void)vYmBreath;
@@ -843,13 +864,13 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
                    PARTICLE_WMAT* particleWmat, PARTICLE_COLOR* particleColor)
 {
     Vec baseDir;
-    int angle[3];
+    pppIVECTOR4 angle;
     pppFMATRIX rotMtx;
     float spread;
     float range;
     u8 flags;
 
-    spread = (float)(unsigned int)reinterpret_cast<PYmBreath*>(pYmBreath)->m_spread;
+    spread = (float)(unsigned int)pYmBreath->m_spread;
     range = spread * kYmBreathSpreadScale;
 
     memset(particleData, 0, sizeof(PARTICLE_DATA));
@@ -860,21 +881,21 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         memset(particleColor, 0, sizeof(PARTICLE_COLOR));
     }
 
-    PYmBreath* params = reinterpret_cast<PYmBreath*>(pYmBreath);
-    YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
+    PYmBreath* params = pYmBreath;
+    PARTICLE_DATA* particle = particleData;
 
     baseDir.x = kYmBreathZero;
     baseDir.y = kYmBreathZero;
     baseDir.z = kYmBreathNegativeOne;
 
-    angle[0] = (int)(range * Math.RandF() - spread);
-    angle[0] = (int)((float)(angle[0] << 15) / kYmBreathHalfCircleDegrees);
-    angle[1] = (int)(range * Math.RandF() - spread);
-    angle[1] = (int)((float)(angle[1] << 15) / kYmBreathHalfCircleDegrees);
-    angle[2] = (int)(range * Math.RandF() - spread);
-    angle[2] = (int)((float)(angle[2] << 15) / kYmBreathHalfCircleDegrees);
+    angle.x = (int)(range * Math.RandF() - spread);
+    angle.x = (int)((float)(angle.x << 15) / kYmBreathHalfCircleDegrees);
+    angle.y = (int)(range * Math.RandF() - spread);
+    angle.y = (int)((float)(angle.y << 15) / kYmBreathHalfCircleDegrees);
+    angle.z = (int)(range * Math.RandF() - spread);
+    angle.z = (int)((float)(angle.z << 15) / kYmBreathHalfCircleDegrees);
 
-    pppGetRotMatrixXYZ(rotMtx, (pppIVECTOR4*)angle);
+    pppGetRotMatrixXYZ(rotMtx, &angle);
     PSMTXMultVecSR(rotMtx.value, &baseDir, &particle->m_direction);
 
     particle->m_direction.x *= params->m_directionScaleX;
@@ -985,7 +1006,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     }
     particle->m_age = 0;
 
-    PSMTXCopy(*(Mtx*)vYmBreath, particleWmat->m_matrix);
+    PSMTXCopy(vYmBreath->m_matrix, particleWmat->m_matrix);
     if (particleColor != NULL) {
         particleColor->m_colorFrameDeltas[0] = params->m_colorFrameDelta0;
         particleColor->m_colorFrameDeltas[1] = params->m_colorFrameDelta1;
@@ -1020,7 +1041,7 @@ inline void get_rand()
 inline void SetParticleMatrix(_pppPObject* pppObject, VYmBreath* vYmBreath, PARTICLE_DATA* particleData,
                               PARTICLE_WMAT* particleWmat)
 {
-    YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
+    PARTICLE_DATA* particle = particleData;
     Mtx workMtx;
 
     PSMTXCopy(vYmBreath->m_matrix, particleWmat->m_matrix);
@@ -1032,94 +1053,4 @@ inline void SetParticleMatrix(_pppPObject* pppObject, VYmBreath* vYmBreath, PART
     PSMTXMultVec(workMtx, &particle->m_direction, &particle->m_direction);
     PSVECNormalize(&particle->m_direction, &particle->m_direction);
     PSMTXConcat(particleWmat->m_matrix, pppObject->m_localMatrix.value, particleWmat->m_matrix);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void IsDeadGroupBreath(PYmBreath* pYmBreath, VYmBreath* vBreathModel, short groupIndex)
-{
-    int i;
-    bool isDead = true;
-    float zero = 0.0f;
-    PYmBreath* params = reinterpret_cast<PYmBreath*>(pYmBreath);
-    YmBreathParticleGroup* groupData = &vBreathModel->m_groups[(int)groupIndex];
-
-    for (i = 0; i < params->m_slotCount; i++) {
-        if ((groupData->particleIndices[i] != -1) || (groupData->particleStates[i] != 1)) {
-            isDead = false;
-            break;
-        }
-    }
-
-    if (isDead) {
-        for (i = 0; i < params->m_slotCount; i++) {
-            groupData->particleStates[i] = -1;
-        }
-        groupData->position.x = zero;
-        groupData->position.y = zero;
-        groupData->position.z = zero;
-        groupData->direction.x = zero;
-        groupData->direction.y = zero;
-        groupData->direction.z = zero;
-        groupData->speed = zero;
-        groupData->active = 0;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void SearchIndex(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short& slotIndex, short& groupIndex, short particleIndex)
-{
-    PYmBreath* params = reinterpret_cast<PYmBreath*>(pYmBreath);
-    YmBreathParticleGroup* groupTable = vYmBreath->m_groups;
-    short g;
-    short s;
-
-    for (g = 0; g < params->m_groupCount; g++) {
-        for (s = 0; s < params->m_slotCount; s++) {
-            if ((int)particleIndex == (int)groupTable->particleIndices[s]) {
-                slotIndex = s;
-                groupIndex = g;
-                return;
-            }
-        }
-        groupTable++;
-    }
-
-    slotIndex = -1;
-    groupIndex = -1;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short particleIndex)
-{
-    short slotIndex;
-    short groupIndex;
-
-    SearchIndex(pYmBreath, vYmBreath, slotIndex, groupIndex, particleIndex);
-    if (groupIndex != -1) {
-        vYmBreath->m_groups[groupIndex].particleIndices[slotIndex] = -1;
-    }
 }

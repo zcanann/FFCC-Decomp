@@ -257,12 +257,19 @@ struct pppShapeGroupRaw
     s16* m_shapeList;  // 0x4
 }; // Size 0x8
 
+struct pppIVECTOR3
+{
+    s32 x;
+    s32 y;
+    s32 z;
+};
+
 struct pppIVECTOR4
 {
-    short x;
-    short y;
-    short z;
-    short w;
+    s32 x;
+    s32 y;
+    s32 z;
+    s32 w;
 };
 
 struct _pppEnvSt
@@ -302,8 +309,7 @@ struct _pppMngSt
     int m_partIndex;                   // 0x04
     Vec m_position;                    // 0x08
     int m_baseTime;                    // 0x14
-    pppIVECTOR4 m_rotation;            // 0x18
-    int m_rotationSpeed;               // 0x20
+    pppIVECTOR3 m_rotation;            // 0x18
     int m_lifeEnd;                     // 0x24
     Vec m_scale;                       // 0x28
     int m_currentFrame;                // 0x34

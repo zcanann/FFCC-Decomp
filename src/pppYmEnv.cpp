@@ -621,22 +621,22 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
 
     switch (mngSt->m_rotationOrder) {
     case 0:
-        pppGetRotMatrixXYZ(localMatrix, &mngSt->m_rotation);
+        pppGetRotMatrixXYZ(localMatrix, reinterpret_cast<pppIVECTOR4*>(&mngSt->m_rotation));
         break;
     case 1:
-        pppGetRotMatrixXZY(localMatrix, &mngSt->m_rotation);
+        pppGetRotMatrixXZY(localMatrix, reinterpret_cast<pppIVECTOR4*>(&mngSt->m_rotation));
         break;
     case 2:
-        pppGetRotMatrixYXZ(localMatrix, &mngSt->m_rotation);
+        pppGetRotMatrixYXZ(localMatrix, reinterpret_cast<pppIVECTOR4*>(&mngSt->m_rotation));
         break;
     case 3:
-        pppGetRotMatrixYZX(localMatrix, &mngSt->m_rotation);
+        pppGetRotMatrixYZX(localMatrix, reinterpret_cast<pppIVECTOR4*>(&mngSt->m_rotation));
         break;
     case 4:
-        pppGetRotMatrixZXY(localMatrix, &mngSt->m_rotation);
+        pppGetRotMatrixZXY(localMatrix, reinterpret_cast<pppIVECTOR4*>(&mngSt->m_rotation));
         break;
     case 5:
-        pppGetRotMatrixZYX(localMatrix, &mngSt->m_rotation);
+        pppGetRotMatrixZYX(localMatrix, reinterpret_cast<pppIVECTOR4*>(&mngSt->m_rotation));
         break;
     }
 

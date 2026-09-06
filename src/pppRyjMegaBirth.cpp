@@ -802,25 +802,25 @@ void birth(
 		Vec baseDirection;
 		Vec* direction;
 		pppFMATRIX rot;
-		s32 angle[4];
+		pppIVECTOR4 angle;
 
 		baseDirection.x = *f32_at(payload, 0xA0);
 		baseDirection.y = *f32_at(payload, 0xA4);
 		baseDirection.z = *f32_at(payload, 0xA8);
 
-		angle[0] = (s32)(range * Math.RandF() - spread);
-		angle[0] = (s32)((float)(angle[0] << 15) / kPppRyjMegaBirthHalfTurnDegrees);
-		angle[1] = (s32)(range * Math.RandF() - spread);
-		angle[1] = (s32)((float)(angle[1] << 15) / kPppRyjMegaBirthHalfTurnDegrees);
-		angle[2] = (s32)(range * Math.RandF() - spread);
-		angle[2] = (s32)((float)(angle[2] << 15) / kPppRyjMegaBirthHalfTurnDegrees);
+		angle.x = (s32)(range * Math.RandF() - spread);
+		angle.x = (s32)((float)(angle.x << 15) / kPppRyjMegaBirthHalfTurnDegrees);
+		angle.y = (s32)(range * Math.RandF() - spread);
+		angle.y = (s32)((float)(angle.y << 15) / kPppRyjMegaBirthHalfTurnDegrees);
+		angle.z = (s32)(range * Math.RandF() - spread);
+		angle.z = (s32)((float)(angle.z << 15) / kPppRyjMegaBirthHalfTurnDegrees);
 
 		if ((payload[0x2A] == 2) || (payload[0x2A] == 3)) {
-			angle[0] = 0;
-			angle[1] = 0;
+			angle.x = 0;
+			angle.y = 0;
 		}
 
-		pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angle);
+		pppGetRotMatrixXYZ(rot, &angle);
 		PSMTXMultVecSR(rot.value, &baseDirection, (Vec*)(particlePayload + 0x10));
 		*f32_at(particlePayload, 0x10) = *f32_at(particlePayload, 0x10) * *f32_at(payload, 0xD8);
 		*f32_at(particlePayload, 0x14) = *f32_at(particlePayload, 0x14) * *f32_at(payload, 0xDC);

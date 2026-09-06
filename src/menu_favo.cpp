@@ -27,8 +27,6 @@ static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
 	return reinterpret_cast<CFontRenderFlagBits&>(flags);
 }
 
-extern "C" const float kCompaFoodIconUvScale = 0.75f;
-extern "C" const float kCompaFrameU = 72.0f;
 static const float kFavoWideTextureWidth = 384.0f;
 static const float kFavoIconUvScale = 0.75f;
 

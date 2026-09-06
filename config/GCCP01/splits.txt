@@ -1780,23 +1780,23 @@ menu_compa.cpp:
 	extabindex  start:0x800113C8 end:0x80011404
 	.text       start:0x80160EDC end:0x80162360
 	.rodata     start:0x801DEDC8 end:0x801DEDF8
-	.sdata2     start:0x80332FF8 end:0x80333038
+	.sdata2     start:0x80332FF8 end:0x80333040
 
 menu_favo.cpp:
 	extab       start:0x80009F7C end:0x80009FAC
 	extabindex  start:0x80011404 end:0x8001144C
 	.text       start:0x80162360 end:0x8016394C
 	.bss        start:0x8030BA68 end:0x8030BA88
-	.sdata2     start:0x80333038 end:0x80333080
+	.sdata2     start:0x80333040 end:0x80333088
 
 menu_letter.cpp:
 	extab       start:0x80009FAC end:0x8000A004
 	extabindex  start:0x8001144C end:0x800114D0
 	.text       start:0x8016394C end:0x80167DD4
-	.rodata     start:0x801DEDF8 end:0x801DF264
+	.rodata     start:0x801DEDF8 end:0x801DEE30
 	.bss        start:0x8030BA88 end:0x8030BB08
 	.sbss       start:0x8032EEE8 end:0x8032EF08
-	.sdata2     start:0x80333080 end:0x803331A8
+	.sdata2     start:0x80333088 end:0x803331A8
 
 pppConstrainCameraForLoc.cpp:
 	extab       start:0x8000A004 end:0x8000A01C
@@ -1808,7 +1808,7 @@ goout.cpp:
 	extab       start:0x8000A01C end:0x8000A06C
 	extabindex  start:0x800114F4 end:0x8001156C
 	.text       start:0x80168130 end:0x8016C9E8
-	.rodata     start:0x801DF264 end:0x801DF9B0
+	.rodata     start:0x801DEE30 end:0x801DF9B0
 	.data       start:0x80214FE0 end:0x80215968
 	.bss        start:0x8030BB08 end:0x8030BB58
 	.sbss       start:0x8032EF08 end:0x8032EF10

@@ -60,13 +60,24 @@ struct MenuBoardEntry
 
 struct SingleFadeEntry
 {
-    char pad_00[0x10];
+    short x;
+    short y;
+    short width;
+    short height;
+    float u;
+    float v;
     float alpha;
-    char pad_14[0x0C];
+    float uvScale;
+    int unk18;
+    int tex;
     int elapsed;
     int startFrame;
     int duration;
-    char pad_2C[0x14];
+    unsigned int flags;
+    float dx;
+    float dy;
+    float targetX;
+    float targetY;
 };
 
 struct SingleFadeState
@@ -942,6 +953,11 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_goOutUnknown88B) == 0x88B);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWork) == 0x88C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferWorkActive) == 0x88C);
 STATIC_ASSERT(sizeof(SingleFadeEntry) == 0x40);
+STATIC_ASSERT(offsetof(SingleFadeEntry, uvScale) == 0x14);
+STATIC_ASSERT(offsetof(SingleFadeEntry, tex) == 0x1C);
+STATIC_ASSERT(offsetof(SingleFadeEntry, flags) == 0x2C);
+STATIC_ASSERT(offsetof(SingleFadeEntry, dx) == 0x30);
+STATIC_ASSERT(offsetof(SingleFadeEntry, targetX) == 0x38);
 STATIC_ASSERT(sizeof(SingleFadeState) == 0x1008);
 STATIC_ASSERT(sizeof(WmWorldState) == 0x48);
 STATIC_ASSERT(offsetof(WmWorldState, m_originalBackupParams) == 0x36);

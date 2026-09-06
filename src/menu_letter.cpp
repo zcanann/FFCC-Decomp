@@ -19,8 +19,6 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern "C" const float kFavoWideTextureWidth = 384.0f;
-extern "C" const float kFavoIconUvScale = 0.75f;
 extern "C" const float FLOAT_80333088 = 592.0f;
 extern "C" const float FLOAT_8033308c = 160.0f;
 extern "C" const double DOUBLE_80333090 = 0.7;
@@ -92,62 +90,19 @@ const char s_letterItemInfoFmt[] = "%s%s%s%s";
 static const char s_pctspctspctspcts[] = "%s%s%s%s?";
 static const char s_pctspctd_pcts_801DEE20[] = "%s%d %s?";
 
-extern "C" const char s_msg_801DEE30[] __attribute__((aligned(8))) = "The Memory Card in Slot A contains";
-extern "C" const char s_msg_801DEE54[] = "no save data for your current game,";
-extern "C" const char s_msg_801DEE78[] = "or contains corrupt data. Please";
-extern "C" const char s_msg_801DEE9C[] = "insert a Memory Card containing";
-extern "C" const char s_msg_801DEEBC[] = "valid save data into Slot A.";
-extern "C" const char s_msg_801DEEDC[] = "This game has not been saved.";
-extern "C" const char s_msg_801DEEFC[] = "You must save your game before";
-extern "C" const char s_msg_801DEF1C[] = "you can import a character.";
-extern "C" const char s_msg_801DEF38[] = "This game contains character data";
-extern "C" const char s_msg_801DEF5C[] = "that has not yet been saved.";
-extern "C" const char s_msg_801DEF7C[] = "Please insert a Memory Card with the";
-extern "C" const char s_msg_801DEFA4[] = "current game's data into Slot A.";
-extern "C" const char s_msg_801DEFC8[] = "Insert into Slot B a Memory Card";
-extern "C" const char s_msg_801DEFEC[] = "with the character data to be transferred.";
-extern "C" const char s_msg_801DF018[] = "Please do not remove either Memory Card";
-extern "C" const char s_msg_801DF040[] = "until the transfer is complete.";
-extern "C" const char s_msg_801DF060[] = "Are you sure you wish to import";
-extern "C" const char s_msg_801DF080[] = "the selected character into the";
-extern "C" const char s_msg_801DF0A0[] = "current game? The character will";
-extern "C" const char s_msg_801DF0C4[] = "be unavailable until returned.";
-extern "C" const char s_msg_801DF0E4[] = "$Yes      No";
-extern "C" const char s_msg_801DF0F4[] = "Are you sure you wish to return";
-extern "C" const char s_msg_801DF114[] = "the selected character to the";
-extern "C" const char s_msg_801DF134[] = "current game? The character's";
-extern "C" const char s_msg_801DF154[] = "guest data will be deleted.";
-extern "C" const char s_msg_801DF170[] = "Saving data to the Memory";
-extern "C" const char s_msg_801DF18C[] = "Card in Slot A. Please do";
-extern "C" const char s_msg_801DF1A8[] = "not touch the Memory Card";
-extern "C" const char s_msg_801DF1C4[] = "or the POWER Button.";
-extern "C" const char s_msg_801DF1DC[] = "Card in Slot B. Please do";
-extern "C" const char s_msg_801DF1F8[] = "A Memory Card has been removed.";
-extern "C" const char s_msg_801DF218[] = "Cancelling character transfer.";
-extern "C" const char s_msg_801DF238[] = "until the character transfer is complete.";
-
 namespace {
 enum {
 	kLetterTextScratchSize = 0x400,
 };
-
-struct LetterAnimStorage {
-	s16 count;
-	s16 pad_02;
-	unsigned char pad_04[4];
-	unsigned char entries[64][0x40];
-};
-
-STATIC_ASSERT(sizeof(LetterAnimStorage) == 0x1008);
 
 static inline int GetLetterStateBase(CMenuPcs* menu)
 {
 	return reinterpret_cast<int>(menu->m_singMenuState);
 }
 
-static inline LetterAnimStorage* GetLetterAnimStorage(CMenuPcs* menu)
+static inline SingleFadeState* GetLetterAnimStorage(CMenuPcs* menu)
 {
-	return reinterpret_cast<LetterAnimStorage*>(menu->m_singleFadeState);
+	return menu->m_singleFadeState;
 }
 
 static inline char* GetLetterItemName(int itemId)
@@ -184,9 +139,9 @@ static inline void ResetLetterPanelProgress(CMenuPcs* menu)
 static inline void ClearLetterAnimStorage(CMenuPcs* menu)
 {
 	memset(GetLetterAnimStorage(menu), 0, sizeof(*GetLetterAnimStorage(menu)));
-	int anim = GetLetterAnimBase(menu) + 8;
-	for (int i = 0; i < 64; ++i, anim += 0x40) {
-		*reinterpret_cast<float*>(anim + 0x14) = FLOAT_803330f8;
+	SingleFadeEntry* panel = menu->m_singleFadeState->entries;
+	for (int i = 0; i < 64; ++i, ++panel) {
+		panel->uvScale = FLOAT_803330f8;
 	}
 }
 
@@ -292,7 +247,7 @@ void CMenuPcs::LetterInit1()
 
 	s16* p;
 	int n = 0;
-	p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+	p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 	*reinterpret_cast<int*>(p + 0xE) = 0x5F;
 	p[2] = 0x238;
 	p[3] = 0x178;
@@ -305,7 +260,7 @@ void CMenuPcs::LetterInit1()
 	*reinterpret_cast<int*>(p + 0x12) = 0;
 	*reinterpret_cast<int*>(p + 0x14) = 10;
 
-	p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+	p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 	*reinterpret_cast<int*>(p + 0xE) = 0x3E;
 	p[2] = 0xA8;
 	p[3] = 0x60;
@@ -532,25 +487,22 @@ bool CMenuPcs::LetterOpen()
 	int iVar6;
 	int iVar8;
 	float fVar1;
-	s16* psVar7;
+	SingleFadeEntry* panel;
 
 	s_OpenClose = 1;
 	if (m_singMenuState->initialized == '\0') {
 		ClearLetterAnimStorage(this);
 		int dur = 10;
 		int n = 0;
-		s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
-		*reinterpret_cast<int*>(p + 0xE) = 0;
-		*reinterpret_cast<int*>(p + 0x12) = 0;
-		*reinterpret_cast<int*>(p + 0x14) = dur;
-		p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
-		*reinterpret_cast<int*>(p + 0xE) = 0;
-		*reinterpret_cast<unsigned int*>(p + 0x12) =
-			dur &
-			~((-static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag)) |
-			   static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag))) >>
-			  31);
-		*reinterpret_cast<int*>(p + 0x14) = dur;
+		SingleFadeEntry* entry = &m_singleFadeState->entries[n++];
+		entry->tex = 0;
+		entry->startFrame = 0;
+		entry->duration = dur;
+		entry = &m_singleFadeState->entries[n++];
+		entry->tex = 0;
+		entry->startFrame = dur & ~((-static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag)) |
+		    static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag))) >> 31);
+		entry->duration = dur;
 		GetLetterAnimStorage(this)->count = static_cast<s16>(n);
 		m_singMenuState->frame = 0;
 		m_singMenuState->initialized = 1;
@@ -558,10 +510,10 @@ bool CMenuPcs::LetterOpen()
 		if (iVar4 >= 0) {
 			ClearLetterAnimStorage(this);
 			int n2 = 0;
-			s16* p2 = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n2++]);
-			*reinterpret_cast<int*>(p2 + 0xE) = 0;
-			*reinterpret_cast<int*>(p2 + 0x12) = 0;
-			*reinterpret_cast<int*>(p2 + 0x14) = 10;
+			SingleFadeEntry* entry = &m_singleFadeState->entries[n2++];
+			entry->tex = 0;
+			entry->startFrame = 0;
+			entry->duration = 10;
 			GetLetterAnimStorage(this)->count = static_cast<s16>(n2);
 			m_singMenuState->frame = 0;
 			m_singMenuState->selectedIndex = static_cast<s16>(s_BackUpCur[0]);
@@ -586,34 +538,34 @@ bool CMenuPcs::LetterOpen()
 	m_singMenuState->frame =
 		m_singMenuState->frame + 1;
 	iVar5 = static_cast<int>(GetLetterAnimStorage(this)->count);
-	psVar7 = GetLetterPanelBase(this);
+	panel = m_singleFadeState->entries;
 	iVar8 = static_cast<int>(m_singMenuState->frame);
 	for (iVar4 = 0; iVar4 < iVar5; ++iVar4) {
 		{
 			fVar1 = FLOAT_803330bc;
-			if (iVar8 >= *reinterpret_cast<int*>(psVar7 + 0x12)) {
-				if (*reinterpret_cast<int*>(psVar7 + 0x12) + *reinterpret_cast<int*>(psVar7 + 0x14) <= iVar8) {
+			if (iVar8 >= panel->startFrame) {
+				if (panel->startFrame + panel->duration <= iVar8) {
 					iVar6 = iVar6 + 1;
-					*reinterpret_cast<float*>(psVar7 + 8) = FLOAT_803330f8;
-					*reinterpret_cast<float*>(psVar7 + 0x18) = fVar1;
-					*reinterpret_cast<float*>(psVar7 + 0x1A) = fVar1;
+					panel->alpha = FLOAT_803330f8;
+					panel->dx = fVar1;
+					panel->dy = fVar1;
 				} else {
-					*reinterpret_cast<int*>(psVar7 + 0x10) = *reinterpret_cast<int*>(psVar7 + 0x10) + 1;
-					*reinterpret_cast<float*>(psVar7 + 8) =
-						static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x14)))) *
-						                   static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x10))));
-					if ((*reinterpret_cast<unsigned int*>(psVar7 + 0x16) & 2) == 0) {
-						fVar1 = static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x14)))) *
-						                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x10))));
-						float dx = (*reinterpret_cast<float*>(psVar7 + 0x1C) - static_cast<float>(psVar7[0])) * fVar1;
-						float dy = (*reinterpret_cast<float*>(psVar7 + 0x1E) - static_cast<float>(psVar7[1])) * fVar1;
-						*reinterpret_cast<float*>(psVar7 + 0x18) = dx;
-						*reinterpret_cast<float*>(psVar7 + 0x1A) = dy;
+					panel->elapsed = panel->elapsed + 1;
+					panel->alpha =
+						static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
+						                   static_cast<double>(static_cast<float>(panel->elapsed)));
+					if ((panel->flags & 2) == 0) {
+						fVar1 = static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
+						                           static_cast<double>(static_cast<float>(panel->elapsed)));
+						float dx = (panel->targetX - static_cast<float>(panel->x)) * fVar1;
+						float dy = (panel->targetY - static_cast<float>(panel->y)) * fVar1;
+						panel->dx = dx;
+						panel->dy = dy;
 					}
 				}
 			}
 		}
-		psVar7 += 0x20;
+		panel++;
 	}
 	bool allFinished = iVar5 == iVar6;
 	if (allFinished) {
@@ -925,11 +877,11 @@ int CMenuPcs::LetterCtrl()
 						}
 						int n = 0;
 						int dur = 10;
-						s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+						s16* p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 						*reinterpret_cast<int*>(p + 0xE) = 0;
 						*reinterpret_cast<int*>(p + 0x12) = 0;
 						*reinterpret_cast<int*>(p + 0x14) = dur;
-						p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+						p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 						*reinterpret_cast<int*>(p + 0xE) = 0;
 						*reinterpret_cast<unsigned int*>(p + 0x12) =
 						    dur &
@@ -1003,10 +955,10 @@ int CMenuPcs::LetterCtrl()
 						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 2;
 						*reinterpret_cast<unsigned char*>(GetLetterStateBase(this) + 8) = 0xFF;
 						int n = 0;
-						s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+						s16* p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 						*reinterpret_cast<int*>(p + 0x12) = 0;
 						*reinterpret_cast<int*>(p + 0x14) = 10;
-						p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+						p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 						*reinterpret_cast<int*>(p + 0x12) = 0;
 						*reinterpret_cast<int*>(p + 0x14) = 10;
 						int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
@@ -1042,10 +994,10 @@ int CMenuPcs::LetterCtrl()
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 2;
 					*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
 					int n = 0;
-					s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+					s16* p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 					*reinterpret_cast<int*>(p + 0x12) = 0;
 					*reinterpret_cast<int*>(p + 0x14) = 10;
-					p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+					p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 					*reinterpret_cast<int*>(p + 0x12) = 0;
 					*reinterpret_cast<int*>(p + 0x14) = 10;
 					int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
@@ -1065,11 +1017,11 @@ int CMenuPcs::LetterCtrl()
 		if (s_Attach == 2) {
 			float f = FLOAT_803330f8;
 			int n = 0;
-			s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+			s16* p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 			*reinterpret_cast<int*>(p + 0xE) = 0;
 			*reinterpret_cast<int*>(p + 0x12) = 10;
 			*reinterpret_cast<int*>(p + 0x14) = 10;
-			p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+			p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 			*reinterpret_cast<int*>(p + 0xE) = 0;
 			*reinterpret_cast<int*>(p + 0x12) = 0;
 			*reinterpret_cast<int*>(p + 0x14) = 10;
@@ -1083,7 +1035,7 @@ int CMenuPcs::LetterCtrl()
 		} else {
 			float f = FLOAT_803330f8;
 			int n = 0;
-			s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+			s16* p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 			*reinterpret_cast<int*>(p + 0xE) = 0;
 			*reinterpret_cast<int*>(p + 0x12) = 0;
 			*reinterpret_cast<int*>(p + 0x14) = 10;
@@ -1749,37 +1701,37 @@ void CMenuPcs::LetterDraw()
  */
 void CMenuPcs::LetterListDraw()
 {
-	int menuDataBase = GetLetterAnimBase(this);
+	SingleFadeEntry* panels = m_singleFadeState->entries;
 
 	if ((static_cast<char>(s_OpenClose) != 0) && (static_cast<char>(m_singleMenuCtrlResetFlag) == '\0')) {
 		DrawSingleCrescent(FLOAT_803330f8,
-			static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18))));
+			static_cast<float>(DOUBLE_803330e8 - static_cast<double>(panels[0].alpha)));
 		DrawSingleStat(
-			static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18))));
+			static_cast<float>(DOUBLE_803330e8 - static_cast<double>(panels[0].alpha)));
 		DrawSingleHelpWim(
-			static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18))));
+			static_cast<float>(DOUBLE_803330e8 - static_cast<double>(panels[0].alpha)));
 	}
 
 	if (GetLetterAnimStorage(this)->count == 1) {
 		return;
 	}
 
-	LetterLstBaseDraw(*reinterpret_cast<float*>(menuDataBase + 0x58));
+	LetterLstBaseDraw(panels[1].alpha);
 
-	CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<char*>(this) + 0xF8);
+	CFont* font = m_fonts[0];
 	font->SetMargin(FLOAT_803330f8);
 	font->SetShadow(1);
 	font->SetScale(FLOAT_803330f8);
 	font->DrawInit();
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(menuDataBase + 0x58))).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * panels[1].alpha)).color);
 
 	char* menuTitle = GetMenuStr(0x1D);
 	float titleX = static_cast<float>((FLOAT_80333158 - font->GetWidth(menuTitle)) *
 	                                  DOUBLE_803330a8);
 	DrawShadowFont(font, menuTitle, titleX, FLOAT_8033315c, 0x18, 0x12);
 
-	if (static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x58)) < DOUBLE_803330e8) {
+	if (static_cast<double>(panels[1].alpha) < DOUBLE_803330e8) {
 		return;
 	}
 
@@ -1821,7 +1773,7 @@ void CMenuPcs::LetterListDraw()
 
 	DrawInit();
 
-	s16 topVal = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34);
+	s16 topVal = m_singMenuState->topIndex;
 	int pageMark = 0;
 	if (topVal != 0) {
 		pageMark |= 1;
@@ -1874,7 +1826,7 @@ void CMenuPcs::LetterListDraw()
 
 	int iconY = 0x5B;
 	const int iconX = static_cast<int>(*static_cast<const volatile float*>(&FLOAT_80333168));
-	const int iconTopRow = static_cast<int>(*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34));
+	const int iconTopRow = static_cast<int>(m_singMenuState->topIndex);
 	int iconLetterIndex;
 	for (int row = 0; row < 9 && (iconLetterIndex = iconTopRow + row) < caravanWork->m_letterCount; ++row) {
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[iconLetterIndex];
@@ -2151,11 +2103,11 @@ int CMenuPcs::LetterCtrlCur()
 			CMes::m_tempVar[2] = reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->TempVar(2);
 			CMes::m_tempVar[3] = reinterpret_cast<CCaravanWork::CLetterWork*>(letterBytes + 0x3EC)->TempVar(3);
 
-			s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+			s16* p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 			*reinterpret_cast<int*>(p + 0xE) = 0;
 			*reinterpret_cast<int*>(p + 0x12) = 10;
 			*reinterpret_cast<int*>(p + 0x14) = 10;
-			p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+			p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 			*reinterpret_cast<int*>(p + 0xE) = 0;
 			*reinterpret_cast<int*>(p + 0x12) = 0;
 			*reinterpret_cast<int*>(p + 0x14) = 10;
@@ -2209,10 +2161,10 @@ int CMenuPcs::LetterCtrlCur()
 			*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) = -1;
 			*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) + 1;
 			int n = 0;
-			s16* p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+			s16* p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 			*reinterpret_cast<int*>(p + 0x12) = 0;
 			*reinterpret_cast<int*>(p + 0x14) = 10;
-			p = reinterpret_cast<s16*>(GetLetterAnimStorage(this)->entries[n++]);
+			p = reinterpret_cast<s16*>(&GetLetterAnimStorage(this)->entries[n++]);
 			*reinterpret_cast<int*>(p + 0x12) = 0;
 			*reinterpret_cast<int*>(p + 0x14) = 10;
 

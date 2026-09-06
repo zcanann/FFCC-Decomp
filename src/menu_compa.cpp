@@ -22,8 +22,8 @@ static const float kCompaTextYOffset = 4.0f;
 static const float kCompaJobFontScale = 1.2f;
 static const float kCompaJobYOffset = 2.0f;
 static const double kCompaIntToDoubleBias = 4503601774854144.0;
-extern "C" const float kCompaFoodIconUvScale;
-extern "C" const float kCompaFrameU;
+static const float kCompaFoodIconUvScale = 0.75f;
+static const float kCompaFrameU = 72.0f;
 
 static const char sCompaFamilyCountErrorFmt[] = "%s(%d):family cnt error!!(%d)\n";
 static const char s_menu_compa_cpp[] = "menu_compa.cpp";

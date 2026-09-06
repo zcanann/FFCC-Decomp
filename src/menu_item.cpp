@@ -837,10 +837,9 @@ void CMenuPcs::ItemInit()
 
     memset(GetItemOpenAnimList(this), 0, sizeof(*GetItemOpenAnimList(this)));
     {
-        float one = LoadFloat(kItemOne);
         entry = GetItemOpenAnimList(this)->anims;
         for (int initCount = 0; initCount < 64; initCount++, entry++) {
-            entry->uvScale = one;
+            entry->uvScale = kItemOne;
         }
     }
 
@@ -851,13 +850,9 @@ void CMenuPcs::ItemInit()
     entry->y = 0x28;
     entry->w = 0x78;
     entry->h = 0x108;
-    float titleAlpha = LoadFloat(kItemInitU);
-    float titleScale = LoadFloat(kItemInitV);
-    float one = LoadFloat(kItemOne);
-    float zero = LoadFloat(kItemZero);
-    entry->u = titleAlpha;
-    entry->v = titleScale;
-    entry->uvScale = one;
+    entry->u = kItemInitU;
+    entry->v = kItemInitV;
+    entry->uvScale = kItemOne;
     entry->startFrame = 5;
     entry->duration = 5;
 
@@ -867,9 +862,9 @@ void CMenuPcs::ItemInit()
     entry->y = 0xE;
     entry->w = 0x30;
     entry->h = 0x30;
-    entry->u = zero;
-    entry->v = zero;
-    entry->uvScale = one;
+    entry->u = kItemZero;
+    entry->v = kItemZero;
+    entry->uvScale = kItemOne;
     entry->startFrame = 0;
     entry->duration = 5;
 
@@ -879,10 +874,9 @@ void CMenuPcs::ItemInit()
     entry->w = 0x30;
     entry->h = 0x30;
     entry->y = 0x150 - entry->h;
-    float rightUvScale = LoadFloat(kItemSmallScale);
-    entry->u = zero;
-    entry->v = zero;
-    entry->uvScale = rightUvScale;
+    entry->u = kItemZero;
+    entry->v = kItemZero;
+    entry->uvScale = kItemSmallScale;
     entry->startFrame = 0;
     entry->duration = 5;
 
@@ -893,14 +887,14 @@ void CMenuPcs::ItemInit()
     entry->y = 8;
     entry->w = 0x48;
     entry->h = 0x140;
-    entry->u = zero;
-    entry->v = zero;
+    entry->u = kItemZero;
+    entry->v = kItemZero;
     entry->startFrame = 0;
     entry->duration = 5;
 
     itemList = GetItemOpenAnimList(this);
     yOffset = 0;
-    for (int loopCount = 0; loopCount < 4; loopCount++) {
+    for (int loopCount = 0; loopCount < 8; loopCount++) {
         entry = GetItemOpenAnim(this, index++);
         entry->flags = 2;
         entry->tex = 0x37;
@@ -909,21 +903,8 @@ void CMenuPcs::ItemInit()
         yOffset += 0x20;
         entry->w = 200;
         entry->h = 0x28;
-        entry->u = zero;
-        entry->v = zero;
-        entry->startFrame = 7;
-        entry->duration = 5;
-
-        entry = GetItemOpenAnim(this, index++);
-        entry->flags = 2;
-        entry->tex = 0x37;
-        entry->x = itemList->anims[0].x + 0x24;
-        entry->y = itemList->anims[0].y + yOffset;
-        yOffset += 0x20;
-        entry->w = 200;
-        entry->h = 0x28;
-        entry->u = zero;
-        entry->v = zero;
+        entry->u = kItemZero;
+        entry->v = kItemZero;
         entry->startFrame = 7;
         entry->duration = 5;
     }

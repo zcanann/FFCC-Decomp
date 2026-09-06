@@ -42,10 +42,6 @@
 
 extern "C" char* strcat(char*, const char*);
 
-extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
-    float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outResult,
-    Vec* p0, Vec* p1, Vec* p2, Vec* p3);
-
 namespace std {
 float sinf(float x);
 float cosf(float x);
@@ -2171,9 +2167,8 @@ renderedDone:
                     }
 
                     Vec result;
-                    CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
-                        scaleA, scaleB, scaleC, segmentT, kCFlatOneF, &Math, reinterpret_cast<float*>(&result),
-                        &p0->m_position, &p1->m_position, &p2->m_position, &p3->m_position);
+                    Math.CalcSpline(&result, &p0->m_position, &p1->m_position, &p2->m_position, &p3->m_position,
+                                    scaleA, scaleB, scaleC, segmentT, kCFlatOneF);
                     *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
                     *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
                     *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;

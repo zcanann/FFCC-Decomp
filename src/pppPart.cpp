@@ -31,8 +31,6 @@ extern float ppvScreenMatrixZbuff;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
-    CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
 
 static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
 {
@@ -2690,21 +2688,21 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 					CGObject::DamageCol* damageCol = &gObject->m_damageColliders[colliderIndex];
 
 					if ((gObject->m_bgColMask & 0x80000) == 0 ||
-						(*(u32*)&damageCol[1].m_localPosition.x & hitRaw->m_objHitMask) == 0)
+						(damageCol->m_hitMask & hitRaw->m_objHitMask) == 0)
 					{
 						continue;
 					}
 
-					if ((kPppPartZero == damageCol->m_hitInnerRadius) &&
-						(kPppPartZero == damageCol->m_hitOuterRadius))
+					if ((kPppPartZero == damageCol->m_horizontalRadius) &&
+						(kPppPartZero == damageCol->m_verticalRadius))
 					{
 						continue;
 					}
 
 					Vec hitPos;
-					if (CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
-					        &Math, &hitPos, 0, origin, vector, (Vec*)&damageCol->m_worldPosition.y,
-					        radius, damageCol->m_hitInnerRadius, damageCol->m_hitOuterRadius) == 0)
+					if (Math.CrossCheckEllipseCapsule(
+					        &hitPos, 0, origin, vector, radius, &damageCol->m_worldPosition,
+					        damageCol->m_horizontalRadius, damageCol->m_verticalRadius) == 0)
 					{
 						continue;
 					}

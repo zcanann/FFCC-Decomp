@@ -26,8 +26,6 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
-    CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
 extern const Vec DAT_801D9B88;
 extern const Vec DAT_801D9B94;
 
@@ -54,6 +52,14 @@ struct GObjectSRT {
     Vec m_scale;
 };
 
+STATIC_ASSERT(sizeof(CGObject::AttackCol) == 0x30);
+STATIC_ASSERT(sizeof(CGObject::DamageCol) == 0x28);
+STATIC_ASSERT(offsetof(CGObject::AttackCol, m_hitMask) == 0x2C);
+STATIC_ASSERT(offsetof(CGObject::DamageCol, m_hitMask) == 0x24);
+STATIC_ASSERT(offsetof(CGObject, m_turnAnimFrames) == 0x1DC);
+STATIC_ASSERT(offsetof(CGObject, m_attackColliders) == 0x1E0);
+STATIC_ASSERT(offsetof(CGObject, m_damageColliders) == 0x360);
+STATIC_ASSERT(offsetof(CGObject, m_turnSpeed) == 0x4A0);
 STATIC_ASSERT(offsetof(CGObject, m_animSlots) == 0x9D);
 STATIC_ASSERT(offsetof(CGObject, m_animQueuePos) == 0xDD);
 STATIC_ASSERT(offsetof(CGObject, m_charaModelHandle) == 0xF8);
@@ -1319,7 +1325,7 @@ void CGObject::Turn(float targetRot, int turnFrames)
     m_rotTargetY = targetRot;
     m_turnBaseSpeed =
         Math.DstRot(m_rotBaseY, m_rotTargetY) / static_cast<float>(turnFrames);
-    *reinterpret_cast<int*>(&m_attackColliders[0].m_localStart.x) = turnFrames;
+    m_turnAnimFrames = turnFrames;
 
     PlayAnim((m_turnBaseSpeed < sZeroFloat) ? 2 : 3, 0, 0, -1, -1, 0);
 }
@@ -1404,7 +1410,7 @@ void CGObject::boundCheck()
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::SetDamageCol(int colliderIndex, char* nodeName, float hitMask, float active, Vec* position)
+void CGObject::SetDamageCol(int colliderIndex, char* nodeName, float horizontalRadius, float verticalRadius, Vec* position)
 {
     CCharaPcs::CHandle* handle = m_charaModelHandle;
     bool hasModel = false;
@@ -1417,11 +1423,11 @@ void CGObject::SetDamageCol(int colliderIndex, char* nodeName, float hitMask, fl
         int nodeIndex = handle->m_model->SearchNode(nodeName);
 
         m_damageColliders[colliderIndex].m_nodeIndex = nodeIndex;
-        m_damageColliders[colliderIndex].m_hitInnerRadius = hitMask;
-        m_damageColliders[colliderIndex].m_hitOuterRadius = active;
-        m_damageColliders[colliderIndex].m_localPosition.y = position->x;
-        m_damageColliders[colliderIndex].m_localPosition.z = position->y;
-        m_damageColliders[colliderIndex].m_worldPosition.x = position->z;
+        m_damageColliders[colliderIndex].m_horizontalRadius = horizontalRadius;
+        m_damageColliders[colliderIndex].m_verticalRadius = verticalRadius;
+        m_damageColliders[colliderIndex].m_localPosition.x = position->x;
+        m_damageColliders[colliderIndex].m_localPosition.y = position->y;
+        m_damageColliders[colliderIndex].m_localPosition.z = position->z;
     }
 }
 
@@ -1430,7 +1436,7 @@ void CGObject::SetDamageCol(int colliderIndex, char* nodeName, float hitMask, fl
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::SetAttackCol(int hitIndex, char* nodeName, float hitMask, Vec* position)
+void CGObject::SetAttackCol(int hitIndex, char* nodeName, float radius, Vec* position)
 {
     CCharaPcs::CHandle* handle = m_charaModelHandle;
     bool hasModel = false;
@@ -1443,10 +1449,10 @@ void CGObject::SetAttackCol(int hitIndex, char* nodeName, float hitMask, Vec* po
         int nodeIndex = handle->m_model->SearchNode(nodeName);
 
         m_attackColliders[hitIndex].m_nodeIndex = nodeIndex;
-        m_attackColliders[hitIndex].m_hitRadius = hitMask;
-        m_attackColliders[hitIndex].m_localStart.y = position->x;
-        m_attackColliders[hitIndex].m_localStart.z = position->y;
-        m_attackColliders[hitIndex].m_localEnd.x = position->z;
+        m_attackColliders[hitIndex].m_radius = radius;
+        m_attackColliders[hitIndex].m_localPosition.x = position->x;
+        m_attackColliders[hitIndex].m_localPosition.y = position->y;
+        m_attackColliders[hitIndex].m_localPosition.z = position->z;
     }
 }
 
@@ -1898,33 +1904,33 @@ void CGObject::onDraw()
     if (((CFlat.m_debugFlags & 0x40000) != 0) && ((m_bgColMask & 0x40000) != 0)) {
         for (int i = 0; i < 8; i++) {
             AttackCol* collider = &m_attackColliders[i];
-            if (*reinterpret_cast<int*>(&collider[1].m_localStart.x) == 0) {
+            if (collider->m_hitMask == 0) {
                 continue;
             }
 
             loopColorPtr = &CColor(0xFF, 0x80, 0x80, 0xFF).color;
-            Graphic.DrawSphere(posMtx, reinterpret_cast<Vec*>(&collider->m_worldPosition.y),
-                               collider->m_hitRadius,
+            Graphic.DrawSphere(posMtx, &collider->m_worldPosition,
+                               collider->m_radius,
                                loopColorPtr);
 
             GXLoadPosMtxImm(posMtx, GX_PNMTX0);
             GXBegin(GX_LINES, GX_VTXFMT0, 2);
-            GXPosition3f32(collider->m_localEnd.y, collider->m_localEnd.z, collider->m_worldPosition.x);
-            GXPosition3f32(collider->m_worldPosition.y, collider->m_worldPosition.z, collider->m_radius);
+            GXPosition3f32(collider->m_previousWorldPosition.x, collider->m_previousWorldPosition.y, collider->m_previousWorldPosition.z);
+            GXPosition3f32(collider->m_worldPosition.x, collider->m_worldPosition.y, collider->m_worldPosition.z);
         }
     }
 
     if (((CFlat.m_debugFlags & 0x80000) != 0) && ((m_bgColMask & 0x80000) != 0)) {
         for (int i = 0; i < 8; i++) {
             DamageCol* collider = &m_damageColliders[i];
-            if (*reinterpret_cast<int*>(&collider[1].m_localPosition.x) == 0) {
+            if (collider->m_hitMask == 0) {
                 continue;
             }
 
             loopColorPtr = &CColor(0x80, 0x80, 0xFF, 0xFF).color;
-            const float hitInner = collider->m_hitInnerRadius;
-            Graphic.DrawSphere(posMtx, reinterpret_cast<Vec*>(&collider->m_worldPosition.y),
-                               CVector(hitInner, collider->m_hitOuterRadius, hitInner),
+            const float horizontalRadius = collider->m_horizontalRadius;
+            Graphic.DrawSphere(posMtx, &collider->m_worldPosition,
+                               CVector(horizontalRadius, collider->m_verticalRadius, horizontalRadius),
                                loopColorPtr);
         }
     }
@@ -2066,9 +2072,9 @@ void CGObject::update()
     if (HasLoadedModel(m_charaModelHandle)) {
         for (int i = 0; i < 8; i++) {
             AttackCol* attack = &m_attackColliders[i];
-            attack->m_localEnd.y = attack->m_worldPosition.y;
-            attack->m_localEnd.z = attack->m_worldPosition.z;
-            attack->m_worldPosition.x = attack->m_radius;
+            attack->m_previousWorldPosition.x = attack->m_worldPosition.x;
+            attack->m_previousWorldPosition.y = attack->m_worldPosition.y;
+            attack->m_previousWorldPosition.z = attack->m_worldPosition.z;
         }
     }
 
@@ -2376,7 +2382,7 @@ void CGObject::update()
                     const unsigned short frameCount = *reinterpret_cast<unsigned short*>(
                         reinterpret_cast<unsigned char*>(ModelAnim(m_charaModelHandle->m_model)) + 0x10);
                     frameStep = static_cast<float>(frameCount) /
-                                 static_cast<float>(*reinterpret_cast<unsigned int*>(&m_attackColliders[0].m_localStart.x)) + m_turnSpeed;
+                                 static_cast<float>(m_turnAnimFrames) + m_turnSpeed;
                 } else {
                     if (static_cast<unsigned int>(System.m_execParam) >= 2) {
                         System.Printf(const_cast<char*>(s_noTurnMotion));
@@ -2561,27 +2567,25 @@ void CGObject::hit()
         return;
     }
     for (int i = 0; i < 8; i++) {
-        AttackCol* attack = &m_attackColliders[i];
-        const int node = attack->m_nodeIndex;
+        const int node = m_attackColliders[i].m_nodeIndex;
         u8* const modelNodes =
             *reinterpret_cast<u8**>(reinterpret_cast<u8*>(m_charaModelHandle->m_model) + 0xA8);
         PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0x6C),
-                     reinterpret_cast<Vec*>(&attack->m_localStart.y),
-                     reinterpret_cast<Vec*>(&attack->m_worldPosition.y));
-        PSVECAdd(reinterpret_cast<Vec*>(&attack->m_worldPosition.y), &m_worldPosition,
-                 reinterpret_cast<Vec*>(&attack->m_worldPosition.y));
+                     &m_attackColliders[i].m_localPosition,
+                     &m_attackColliders[i].m_worldPosition);
+        PSVECAdd(&m_attackColliders[i].m_worldPosition, &m_worldPosition,
+                 &m_attackColliders[i].m_worldPosition);
     }
 
     for (int i = 0; i < 8; i++) {
-        DamageCol* damage = &m_damageColliders[i];
-        const int node = damage->m_nodeIndex;
+        const int node = m_damageColliders[i].m_nodeIndex;
         u8* const modelNodes =
             *reinterpret_cast<u8**>(reinterpret_cast<u8*>(m_charaModelHandle->m_model) + 0xA8);
         PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0x6C),
-                     reinterpret_cast<Vec*>(&damage->m_localPosition.y),
-                     reinterpret_cast<Vec*>(&damage->m_worldPosition.y));
-        PSVECAdd(reinterpret_cast<Vec*>(&damage->m_worldPosition.y), &m_worldPosition,
-                 reinterpret_cast<Vec*>(&damage->m_worldPosition.y));
+                     &m_damageColliders[i].m_localPosition,
+                     &m_damageColliders[i].m_worldPosition);
+        PSVECAdd(&m_damageColliders[i].m_worldPosition, &m_worldPosition,
+                 &m_damageColliders[i].m_worldPosition);
     }
 
     if ((m_bgColMask & 0x40000) == 0) {
@@ -2604,28 +2608,27 @@ void CGObject::hit()
 
         const float zero = sZeroFloat;
 
-        float* attackCur = &m_attackColliders[0].m_localStart.y;
-        for (int attackIndex = 0; attackIndex < 8; attackIndex++, attackCur += 0xC) {
-            if (zero == attackCur[10]) {
+        AttackCol* attackCur = m_attackColliders;
+        for (int attackIndex = 0; attackIndex < 8; attackIndex++, attackCur++) {
+            if (zero == attackCur->m_radius) {
                 continue;
             }
 
-            float* damageCur = &other->m_damageColliders[0].m_localPosition.y;
-            for (int damageIndex = 0; damageIndex < 8; damageIndex++, damageCur += 0xA) {
-                if (((*reinterpret_cast<u32*>(&attackCur[11]) & *reinterpret_cast<u32*>(&damageCur[9])) == 0) ||
-                    (sZeroFloat == damageCur[7]) ||
-                    (sZeroFloat == damageCur[8])) {
+            DamageCol* damageCur = other->m_damageColliders;
+            for (int damageIndex = 0; damageIndex < 8; damageIndex++, damageCur++) {
+                if (((attackCur->m_hitMask & damageCur->m_hitMask) == 0) ||
+                    (sZeroFloat == damageCur->m_horizontalRadius) ||
+                    (sZeroFloat == damageCur->m_verticalRadius)) {
                     continue;
                 }
 
                 Vec hitPos;
                 Vec attackVec;
-                PSVECSubtract(reinterpret_cast<Vec*>(attackCur + 6),
-                              reinterpret_cast<Vec*>(attackCur + 3), &attackVec);
-                if (CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
-                        &Math, &hitPos, 0, reinterpret_cast<Vec*>(attackCur + 3), &attackVec,
-                        reinterpret_cast<Vec*>(damageCur + 3),
-                        attackCur[10], damageCur[7], damageCur[8]) == 0) {
+                PSVECSubtract(&attackCur->m_worldPosition,
+                              &attackCur->m_previousWorldPosition, &attackVec);
+                if (Math.CrossCheckEllipseCapsule(
+                        &hitPos, 0, &attackCur->m_previousWorldPosition, &attackVec, attackCur->m_radius,
+                        &damageCur->m_worldPosition, damageCur->m_horizontalRadius, damageCur->m_verticalRadius) == 0) {
                     continue;
                 }
 
@@ -3587,8 +3590,8 @@ void CGObject::onCreate()
         m_animSlots[i] = cFill;
     }
 
-    memset(&m_attackColliders[0].m_localStart.y, 0, 0x180);
-    memset(&m_damageColliders[0].m_localPosition.y, 0, 0x140);
+    memset(m_attackColliders, 0, sizeof(m_attackColliders));
+    memset(m_damageColliders, 0, sizeof(m_damageColliders));
     memset(m_dropItemCodes, 0, sizeof(m_dropItemCodes));
 }
 

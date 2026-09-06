@@ -3081,19 +3081,12 @@ int CGMonObj::getReplaceStat(int state)
  */
 void CGMonObj::enableDamageCol(int enabled)
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-
-	unsigned int& damageCol1X =
-		*reinterpret_cast<unsigned int*>(&object->m_damageColliders[1].m_localPosition.x);
-	unsigned int& damageCol2X =
-		*reinterpret_cast<unsigned int*>(&object->m_damageColliders[2].m_localPosition.x);
-
 	if (enabled != 0) {
-		damageCol1X = 1;
-		damageCol2X = 1;
+		m_damageColliders[0].m_hitMask = 1;
+		m_damageColliders[1].m_hitMask = 1;
 	} else {
-		damageCol1X = 0;
-		damageCol2X = 0;
+		m_damageColliders[0].m_hitMask = 0;
+		m_damageColliders[1].m_hitMask = 0;
 	}
 }
 
@@ -3114,8 +3107,8 @@ void CGMonObj::enableAttackCol(int enabled, int, int)
 		int attackKind = *reinterpret_cast<int*>(mon + 0x560);
 		unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) +
 			attackKind * 0x48;
-		unsigned int colMask = *reinterpret_cast<unsigned short*>(attackData + 0xC);
-		unsigned int colValue;
+		int colMask = *reinterpret_cast<unsigned short*>(attackData + 0xC);
+		int colValue;
 		if (attackKind >= 0x1F5) {
 			colValue = *reinterpret_cast<unsigned short*>(attackData + 2);
 		} else {
@@ -3123,30 +3116,12 @@ void CGMonObj::enableAttackCol(int enabled, int, int)
 		}
 
 		for (int i = 0; i < 8; i++) {
-			if ((((int)colMask >> i) & 1) != 0) {
-				if (i == -1) {
-					*reinterpret_cast<unsigned int*>(mon + 0x20C) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x23C) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x26C) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x29C) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x2CC) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x2FC) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x32C) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x35C) = colValue;
-				} else {
-					*reinterpret_cast<unsigned int*>(mon + 0x20C + i * 0x30) = colValue;
-				}
+			if (((colMask >> i) & 1) != 0) {
+				SetAttackColMask(i, colValue);
 			}
 		}
 	} else {
-		*reinterpret_cast<unsigned int*>(mon + 0x20C) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x23C) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x26C) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x29C) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x2CC) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x2FC) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x32C) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x35C) = 0;
+		SetAttackColMask(-1, 0);
 	}
 }
 

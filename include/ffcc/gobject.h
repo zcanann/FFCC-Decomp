@@ -91,37 +91,22 @@ public:
 
     struct AttackCol
     {
-        Vec m_localStart;       // 0x00-0x0C
-        Vec m_localEnd;         // 0x0C-0x18
-        Vec m_worldPosition;    // 0x18-0x24
-        float m_radius;         // 0x24
-        union {
-            float m_radius2;    // 0x28
-            int m_nodeIndex;    // 0x28
-        };
-        union {
-            unsigned int m_hitMask; // 0x2C
-            float m_hitRadius;      // 0x2C
-        };
+        Vec m_localPosition;         // 0x00
+        Vec m_previousWorldPosition; // 0x0C
+        Vec m_worldPosition;         // 0x18
+        int m_nodeIndex;             // 0x24
+        float m_radius;              // 0x28
+        int m_hitMask;               // 0x2C
     };
 
     struct DamageCol
     {
-        Vec m_localPosition;    // 0x00-0x0C
-        Vec m_worldPosition;    // 0x0C-0x18
-        float m_innerRadius;    // 0x18
-        union {
-            float m_outerRadius; // 0x1C
-            int m_nodeIndex;     // 0x1C
-        };
-        union {
-            unsigned int m_hitMask; // 0x20
-            float m_hitInnerRadius; // 0x20
-        };
-        union {
-            int m_active;            // 0x24
-            float m_hitOuterRadius;  // 0x24
-        };
+        Vec m_localPosition;      // 0x00
+        Vec m_worldPosition;      // 0x0C
+        int m_nodeIndex;          // 0x18
+        float m_horizontalRadius; // 0x1C
+        float m_verticalRadius;   // 0x20
+        int m_hitMask;            // 0x24
     };
 
     union {
@@ -265,9 +250,9 @@ public:
     Vec m_moveTarget;                 // 0x1C8
     float m_moveTimer;                // 0x1D4
     unsigned int m_turnFrames;        // 0x1D8
-    AttackCol m_attackColliders[8];   // 0x1DC
-    DamageCol m_damageColliders[8];   // 0x35C
-    float m_animPhase;                // 0x49C
+    unsigned int m_turnAnimFrames;   // 0x1DC
+    AttackCol m_attackColliders[8];   // 0x1E0
+    DamageCol m_damageColliders[8];   // 0x360
     float m_turnSpeed;                // 0x4A0
     float m_turnBaseSpeed;            // 0x4A4
     float m_frontHitAngle;            // 0x4A8
@@ -295,5 +280,45 @@ public:
     Vec& HitFaceNormal() { return *reinterpret_cast<Vec*>(&m_hitNormal.y); }
     const Vec& HitFaceNormal() const { return *reinterpret_cast<const Vec*>(&m_hitNormal.y); }
 };
+
+/*
+ * --INFO--
+ * PAL Address: 0x800C81A8
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGObject::SetDamageColMask(int index, int mask)
+{
+	if (index == -1) {
+		for (int i = 0; i < 8; ++i) {
+			m_damageColliders[i].m_hitMask = mask;
+		}
+	} else {
+		m_damageColliders[index].m_hitMask = mask;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800C81E4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGObject::SetAttackColMask(int index, int mask)
+{
+	if (index == -1) {
+		for (int i = 0; i < 8; ++i) {
+			m_attackColliders[i].m_hitMask = mask;
+		}
+	} else {
+		m_attackColliders[index].m_hitMask = mask;
+	}
+}
 
 #endif // _FFCC_CGOBJECT_H_

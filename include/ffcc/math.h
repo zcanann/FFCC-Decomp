@@ -33,7 +33,8 @@ public:
     void MTX44MultVec4(float(*)[4], Vec4d*, Vec4d*);
     void MTXGetScale(float(*)[4], Vec*);
     int CrossCheckSphereVector(Vec*, float*, Vec*, Vec*, Vec*, float);
-    void CrossCheckEllipseCapsule(Vec*, float*, Vec*, Vec*, float, Vec*, float, float);
+    int CrossCheckEllipseCapsule(Vec*, float*, Vec*, Vec*, float, Vec*, float, float);
+    void CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float, float);
     void MakeSpline1Dtable(int, float*, float*, float*);
     float Spline1D(int, float, float*, float*, float*);
     float Line1D(int, float, float*, float*);

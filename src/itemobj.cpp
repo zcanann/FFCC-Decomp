@@ -1067,7 +1067,7 @@ void CGItemObj::onFrameStat()
 			const CVector& damageOffset = CVector(zero, zero, zero);
 			SetDamageCol(0, itemObjStrings + kItemObjStrF051Root, kItemObjDamageRadius, kItemObjDamageRadius,
 			             reinterpret_cast<Vec*>(const_cast<CVector*>(&damageOffset)));
-			*reinterpret_cast<int*>(&prgObj->m_damageColliders[1].m_localPosition.x) = 9;
+			prgObj->m_damageColliders[0].m_hitMask = 9;
 			}
 		} else if (m_subFrame == 0x7D) {
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
@@ -1316,7 +1316,7 @@ void CGItemObj::onFrame()
 			const float* memoryRadius = &kItemObjMemoryRadius;
 			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), *memoryRadius, *memoryRadius,
 			             CVector(*zero, *zero, *zero));
-			*reinterpret_cast<unsigned int*>(&m_damageColliders[1].m_localPosition.x) = 8;
+			m_damageColliders[0].m_hitMask = 8;
 			addSubStat();
 		}
 	}

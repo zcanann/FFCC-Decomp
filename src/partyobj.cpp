@@ -2158,28 +2158,27 @@ void CGPartyObj::onAnimPoint(int no, int dataNo)
  */
 void CGPartyObj::enableAttackCol(int enabled, int isFriendly, int hitMask)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (enabled != 0) {
 		resetIgnoreHit();
 		bool col0Enabled = false;
 		if (isFriendly == 0 || (hitMask & 1) != 0) {
 			col0Enabled = true;
 		}
-		*reinterpret_cast<unsigned int*>(self + 0x20C) = col0Enabled != false;
+		m_attackColliders[0].m_hitMask = col0Enabled != false;
 		bool col1Enabled = false;
 		if (isFriendly != 0 && (hitMask & 2) != 0) {
 			col1Enabled = true;
 		}
-		*reinterpret_cast<unsigned int*>(self + 0x23C) = col1Enabled != false;
+		m_attackColliders[1].m_hitMask = col1Enabled != false;
 		bool col2Enabled = false;
 		if (isFriendly != 0 && (hitMask & 4) != 0) {
 			col2Enabled = true;
 		}
-		*reinterpret_cast<unsigned int*>(self + 0x26C) = col2Enabled != false;
+		m_attackColliders[2].m_hitMask = col2Enabled != false;
 	} else {
-		*reinterpret_cast<int*>(self + 0x20C) = 0;
-		*reinterpret_cast<int*>(self + 0x23C) = 0;
-		*reinterpret_cast<int*>(self + 0x26C) = 0;
+		m_attackColliders[0].m_hitMask = 0;
+		m_attackColliders[1].m_hitMask = 0;
+		m_attackColliders[2].m_hitMask = 0;
 	}
 }
 
@@ -2194,7 +2193,6 @@ void CGPartyObj::enableAttackCol(int enabled, int isFriendly, int hitMask)
  */
 void CGPartyObj::enableDamageCol(int onOff)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	unsigned int hitMask = 4;
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 		hitMask = 8;
@@ -2205,11 +2203,11 @@ void CGPartyObj::enableDamageCol(int onOff)
 	     Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F ||
 	     (static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D ||
 	     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) == 0)) {
-		*reinterpret_cast<unsigned int*>(self + 0x384) = hitMask;
-		*reinterpret_cast<unsigned int*>(self + 0x3AC) = hitMask;
+		m_damageColliders[0].m_hitMask = hitMask;
+		m_damageColliders[1].m_hitMask = hitMask;
 	} else {
-		*reinterpret_cast<unsigned int*>(self + 0x384) = 0;
-		*reinterpret_cast<unsigned int*>(self + 0x3AC) = 0;
+		m_damageColliders[0].m_hitMask = 0;
+		m_damageColliders[1].m_hitMask = 0;
 	}
 }
 

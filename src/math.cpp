@@ -345,18 +345,17 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
-    float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outCoeffScalar, Vec* p0,
-    Vec* p1, Vec* p2, Vec* p3)
+void CMath::CalcSpline(Vec* outPos, Vec* p0, Vec* p1, Vec* p2, Vec* p3,
+                      float scaleA, float scaleB, float scaleC, float t, float scale)
 {
     float scaleAB = scaleA + scaleB;
-    float radiusSquared = radius * radius;
-    float radiusCubed = radiusSquared * radius;
+    float tSquared = t * t;
+    float tCubed = tSquared * t;
     Vec4d coeffs;
-    coeffs.x = 1.0f + ((2.0f * radiusCubed) - (3.0f * radiusSquared));
-    coeffs.y = radius + (radiusCubed - (2.0f * radiusSquared));
-    coeffs.z = (-2.0f * radiusCubed) + (3.0f * radiusSquared);
-    coeffs.w = radiusCubed - radiusSquared;
+    coeffs.x = 1.0f + ((2.0f * tCubed) - (3.0f * tSquared));
+    coeffs.y = t + (tCubed - (2.0f * tSquared));
+    coeffs.z = (-2.0f * tCubed) + (3.0f * tSquared);
+    coeffs.w = tCubed - tSquared;
 
     Mtx44 control;
     control[0][0] = p1->x;
@@ -393,10 +392,10 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[2][3] = tangent.z;
     control[3][3] = 1.0f;
 
-    MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(math, control, &coeffs, &coeffs);
-    outCoeffScalar[0] = coeffs.x;
-    outCoeffScalar[1] = coeffs.y;
-    outCoeffScalar[2] = coeffs.z;
+    MTX44MultVec4(control, &coeffs, &coeffs);
+    outPos->x = coeffs.x;
+    outPos->y = coeffs.y;
+    outPos->z = coeffs.z;
 }
 
 /*
@@ -408,11 +407,9 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
-    CMath* math, Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale, float scale,
-    float innerRadius, float outerRadius)
+int CMath::CrossCheckEllipseCapsule(Vec* outPos, float* outT, Vec* origin, Vec* vector, float radius,
+                                  Vec* ellipseCenter, float horizontalRadius, float verticalRadius)
 {
-    (void)math;
     int hit;
     float dVar6;
     float dVar7;
@@ -424,9 +421,9 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     Vec local_78;
     Vec local_84;
 
-    dVar8 = innerRadius + scale;
-    dVar10 = dVar8 / (outerRadius + scale);
-    PSVECSubtract(origin, ellipseScale, &local_60);
+    dVar8 = horizontalRadius + radius;
+    dVar10 = dVar8 / (verticalRadius + radius);
+    PSVECSubtract(origin, ellipseCenter, &local_60);
     dVar8 = dVar8 * dVar8;
     local_60.y = local_60.y * dVar10;
     local_6c.x = vector->x;

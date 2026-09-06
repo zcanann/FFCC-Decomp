@@ -751,7 +751,7 @@ config.libs = [
             Object(Matching, "pppYmMoveParabola.cpp"),
             Object(Matching, "pppYmTraceMove.cpp"),
             Object(NonMatching, "pppYmTracer.cpp"),
-            Object(NonMatching, "pppYmTracer2.cpp", cflags=cflags_game),
+            Object(Matching, "pppYmTracer2.cpp", cflags=cflags_game),
             Object(NonMatching, "prgobj.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),
             Object(NonMatching, "quadobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(Matching, "ref.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),

@@ -16,8 +16,8 @@ extern f32 gPppDefaultValueBuffer[];
 
 #pragma exceptions on
 
-extern const float kYmTracer2UvMin;
-extern const float kYmTracer2UvMax;
+static const float kYmTracer2UvMin = 0.0f;
+static const float kYmTracer2UvMax = 1.0f;
 
 static const char s_pppYmTracer2_cpp[] = "pppYmTracer2.cpp";
 
@@ -134,8 +134,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
                 GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
 
                 YmTracer2Polygon* current = poly;
-                const f32& uvMin = kYmTracer2UvMin;
-                const f32& uvMax = kYmTracer2UvMax;
+                f32 uvMin = kYmTracer2UvMin;
+                f32 uvMax = kYmTracer2UvMax;
 
                 i = 0;
                 while (i < (s32)(work->visibleCount - 1)) {
@@ -394,5 +394,3 @@ void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
     work->alphaStep = 0;
     work->pad32 = 0;
 }
-
-extern const float kYmTracer2Zero = 0.0f;

@@ -423,8 +423,6 @@ extern const char lbl_80331820[7] = "last_l";
 extern const char lbl_80331828[7] = "last_r";
 extern const char lbl_80331830[8] = "w_close";
 extern const char lbl_80331838[7] = "w_idle";
-extern const float kYmTracer2UvMin = 0.0f;
-extern const float kYmTracer2UvMax = 1.0f;
 
 extern char lbl_801DB7F8[];
 extern float FLOAT_80331490;

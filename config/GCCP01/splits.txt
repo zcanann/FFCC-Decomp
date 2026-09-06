@@ -1443,7 +1443,7 @@ wm_menu.cpp:
 	.bss        start:0x802FF408 end:0x802FF450
 	.sdata      start:0x8032E8A8 end:0x8032E920
 	.sbss       start:0x8032EE1C end:0x8032EE34
-	.sdata2     start:0x80331134 end:0x80331848
+	.sdata2     start:0x80331134 end:0x80331840
 
 gxfunc.cpp:
 	extab       start:0x80009024 end:0x8000907C
@@ -1457,7 +1457,7 @@ pppYmTracer2.cpp:
 	extabindex  start:0x8000FD84 end:0x8000FDA8
 	.text       start:0x801035DC end:0x80103EC0
 	.rodata     start:0x801DC4B8 end:0x801DC4D0
-	.sdata2     start:0x80331848 end:0x80331868
+	.sdata2     start:0x80331840 end:0x80331864
 	.sbss2      start:0x80333DF8 end:0x80333E00
 
 pppEraseCharaParts.cpp:

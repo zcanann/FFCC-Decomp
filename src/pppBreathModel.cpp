@@ -27,7 +27,7 @@ struct BreathParticleGroup {
     Mtx matrix;
 };
 
-struct BreathParticleData {
+struct PARTICLE_DATA {
     Mtx m_modelMtx;
     Vec m_position;
     Vec m_direction;
@@ -54,10 +54,10 @@ struct BreathParticleData {
     u8 _pad91[0x07];
 };
 
-struct PARTICLE_DATA {
-    u8 _pad[0x98];
-};
-
+STATIC_ASSERT(sizeof(PARTICLE_DATA) == 0x98);
+STATIC_ASSERT(offsetof(PARTICLE_DATA, m_life) == 0x50);
+STATIC_ASSERT(offsetof(PARTICLE_DATA, m_alpha) == 0x88);
+STATIC_ASSERT(sizeof(BreathParticleGroup) == 0x5C);
 STATIC_ASSERT(sizeof(BreathModelDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(BreathModelDataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(BreathModelDataOffsets, m_colorOffset) == 0x4);
@@ -121,6 +121,78 @@ inline void MTXSetCol(Mtx& matrix, int col, Vec in)
 void BirthParticle(_pppPObject*, VBreathModel*, PBreathModel*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);
 void UpdateParticle(VBreathModel*, PBreathModel*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*);
 void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor);
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short groupIndex)
+{
+    BreathParticleGroup* group = &vBreathModel->m_groups[groupIndex];
+    for (int slot = 0; slot < pBreathModel->m_slotCount; slot++) {
+        if (group->particleIndices[slot] != -1 || group->particleStates[slot] != 1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int SearchIndex(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short& groupIndex, short& slotIndex, short particleIndex)
+{
+    BreathParticleGroup* groupTable = vBreathModel->m_groups;
+    short g;
+    short s;
+
+    groupIndex = -1;
+    slotIndex = -1;
+
+    for (g = 0; g < pBreathModel->m_groupCount; g++) {
+        for (s = 0; s < pBreathModel->m_slotCount; s++) {
+            if ((int)particleIndex == (int)groupTable->particleIndices[s]) {
+                groupIndex = g;
+                slotIndex = s;
+                return true;
+            }
+        }
+        groupTable++;
+    }
+
+    return false;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short groupIndex)
+{
+    BreathParticleGroup* group = &vBreathModel->m_groups[groupIndex];
+    for (short slot = 0; slot < pBreathModel->m_slotCount; slot++) {
+        if (group->particleIndices[slot] == -1 || group->particleStates[slot] != 1) {
+            return false;
+        }
+    }
+    return true;
+}
 
 /*
  * --INFO--
@@ -209,12 +281,12 @@ extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, _pppCtrl
  */
 extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, _pppCtrlTable* offsets)
 {
-    PBreathModel* params = reinterpret_cast<PBreathModel*>(pBreathModel);
+    PBreathModel* params = pBreathModel;
     int workOffset;
     int colorOffset;
     VBreathModel* work;
     VColor* color;
-    BreathParticleData* particleData;
+    PARTICLE_DATA* particleData;
     PARTICLE_WMAT* matrixList;
     PARTICLE_COLOR* particleColor;
     BreathParticleGroup* groupData;
@@ -239,7 +311,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     colorOffset = GetBreathModelDataOffsets(offsets)->m_colorOffset;
     work = reinterpret_cast<VBreathModel*>(breathModel->m_workArea + workOffset);
     color = reinterpret_cast<VColor*>(breathModel->m_workArea + colorOffset);
-    particleData = reinterpret_cast<BreathParticleData*>(work->m_particleData);
+    particleData = work->m_particleData;
     matrixList = work->m_particleWmats;
     particleColor = work->m_particleColors;
     groupData = work->m_groups;
@@ -420,12 +492,9 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     PARTICLE_WMAT* particleMtx;
     int groupIndex;
     int firstParticle;
-    short slotIndex;
     int particleSlot;
     int slotCount;
-    int ready;
     float scaledOwner;
-    BreathParticleGroup* groupCheck;
     Mtx scaleMtx;
     Mtx worldMtx;
     pppFMATRIX rotMtx;
@@ -510,17 +579,8 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     particleWMat = work->m_particleWmats;
     groupData = work->m_groups;
     for (groupIndex = 0; groupIndex < (int)pBreathModel->m_groupCount; groupIndex++) {
-        groupCheck = &work->m_groups[(short)groupIndex];
         slotCount = pBreathModel->m_slotCount;
-        for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
-            if ((groupCheck->particleIndices[slotIndex] == -1) || (groupCheck->particleStates[slotIndex] != 1)) {
-                ready = 0;
-                goto group_ready;
-            }
-        }
-        ready = 1;
-group_ready:
-        if (ready) {
+        if (IsExistGroupParticle(pBreathModel, work, (short)groupIndex)) {
             firstParticle = -1;
             scaledOwner = mngSt->m_previousPosition.z * pBreathModel->m_groupOwnerScale;
             for (particleSlot = 0; particleSlot < slotCount; particleSlot++) {
@@ -556,34 +616,33 @@ group_ready:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800DBBD0
+ * PAL Size: 1028b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor)
 {
-    PBreathModel* params = reinterpret_cast<PBreathModel*>(pBreathModel);
-    BreathParticleData* particleData;
+    PBreathModel* params = pBreathModel;
+    PARTICLE_DATA* particleData;
     PARTICLE_WMAT* particleWmat;
     PARTICLE_COLOR* particleColor;
     BreathParticleGroup* groupTable;
     int maxParticleCount;
     unsigned short* emitFrameCounter;
-    int found;
     int spawnCount;
     int i;
     int k;
     int j;
-    BreathParticleGroup* checkGroup;
-    BreathParticleGroup* groupCursor;
     BreathParticleGroup* groupData;
-    short groupIndex;
-    short slotIndex;
     short foundSlot;
     short foundGroup;
     Vec unitVelocity;
     Vec stepVelocity;
 
-    particleData = reinterpret_cast<BreathParticleData*>(vBreathModel->m_particleData);
+    particleData = vBreathModel->m_particleData;
     particleWmat = vBreathModel->m_particleWmats;
     particleColor = vBreathModel->m_particleColors;
     groupTable = vBreathModel->m_groups;
@@ -597,56 +656,20 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
         for (i = 0; i < maxParticleCount; i++) {
             if (particleData->m_life > 0) {
                 UpdateParticle(
-                    vBreathModel, pBreathModel, (PARTICLE_DATA*)particleData, vColor, particleColor);
+                    vBreathModel, pBreathModel, particleData, vColor, particleColor);
             } else {
                 float zero = 0.0f;
 
-                groupCursor = vBreathModel->m_groups;
-                foundGroup = -1;
-                foundSlot = -1;
-                for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++, groupCursor++) {
-                    for (slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
-                        signed char* particleIndices = groupCursor->particleIndices;
-                        if ((short)i == particleIndices[(short)slotIndex]) {
-                            foundGroup = groupIndex;
-                            foundSlot = slotIndex;
-                            found = true;
-                            goto found_index;
-                        }
-                    }
+                if (SearchIndex(params, vBreathModel, foundGroup, foundSlot, (short)i)) {
+                    groupTable[foundGroup].particleIndices[foundSlot] = -1;
                 }
-                found = false;
-
-            found_index:
-                if (found) {
-                    groupTable[(int)foundGroup].particleIndices[(int)foundSlot] = -1;
-                }
-
-                if ((int)foundGroup != -1) {
-                    int slot;
-
-                    slot = 0;
-                    checkGroup = &vBreathModel->m_groups[(int)foundGroup];
-                    for (slot = 0; slot < (int)params->m_slotCount; slot++) {
-                        if ((checkGroup->particleIndices[slot] != -1) ||
-                            (checkGroup->particleStates[slot] != 1)) {
-                            found = false;
-                            goto group_checked;
-                        }
-                    }
-                    found = true;
-
-                group_checked:
-                    if (found == 1) {
-                        groupData = &groupTable[(int)foundGroup];
-                        for (slot = 0; slot < (int)params->m_slotCount; slot++) {
+                if (foundGroup != -1) {
+                    if (IsDeadGroupBreath(params, vBreathModel, foundGroup) == 1) {
+                        groupData = &groupTable[foundGroup];
+                        for (int slot = 0; slot < params->m_slotCount; slot++) {
                             groupData->particleStates[slot] = -1;
-                            groupData->position.z = zero;
-                            groupData->position.y = zero;
-                            groupData->position.x = zero;
-                            groupData->direction.z = zero;
-                            groupData->direction.y = zero;
-                            groupData->direction.x = zero;
+                            groupData->position.x = groupData->position.y = groupData->position.z = zero;
+                            groupData->direction.x = groupData->direction.y = groupData->direction.z = zero;
                             groupData->speed = zero;
                         }
                         groupData->active = 0;
@@ -657,7 +680,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                     bool placing;
 
                     BirthParticle(
-                        pppObject, vBreathModel, pBreathModel, vColor, (PARTICLE_DATA*)particleData,
+                        pppObject, vBreathModel, pBreathModel, vColor, particleData,
                         particleWmat, particleColor);
                     placing = true;
                     spawnCount += 1;
@@ -734,8 +757,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
 void UpdateParticle(
     VBreathModel*, PBreathModel* pBreathModel, PARTICLE_DATA* particleData, VColor* vColor, PARTICLE_COLOR* particleColor)
 {
-    PBreathModel* params = reinterpret_cast<PBreathModel*>(pBreathModel);
-    BreathParticleData* particle = reinterpret_cast<BreathParticleData*>(particleData);
+    PBreathModel* params = pBreathModel;
+    PARTICLE_DATA* particle = particleData;
     int alpha = vColor->m_alpha;
     Vec step;
 
@@ -827,8 +850,8 @@ void BirthParticle(
     _pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor,
     PARTICLE_DATA* particleData, PARTICLE_WMAT* particleWmat, PARTICLE_COLOR* particleColor)
 {
-    PBreathModel* params = reinterpret_cast<PBreathModel*>(pBreathModel);
-    BreathParticleData* particle = reinterpret_cast<BreathParticleData*>(particleData);
+    PBreathModel* params = pBreathModel;
+    PARTICLE_DATA* particle = particleData;
     Mtx workMtx;
     Mtx cameraMtx;
     Vec jitter;
@@ -952,7 +975,7 @@ void BirthParticle(
     }
     particle->m_age = 0;
 
-    PSMTXCopy(*(Mtx*)vBreathModel, *(Mtx*)particleWmat);
+    PSMTXCopy(vBreathModel->m_matrix, particleWmat->m_matrix);
     if (particleColor != NULL) {
         particleColor->m_colorFrameDeltas[0] = params->m_colorFrameDelta0;
         particleColor->m_colorFrameDeltas[1] = params->m_colorFrameDelta1;
@@ -960,7 +983,7 @@ void BirthParticle(
         particleColor->m_colorFrameDeltas[3] = params->m_colorFrameDelta3;
     }
 
-    PSMTXCopy(*(Mtx*)particleWmat, workMtx);
+    PSMTXCopy(particleWmat->m_matrix, workMtx);
     workMtx[0][3] = 0.0f;
     workMtx[1][3] = 0.0f;
     workMtx[2][3] = 0.0f;
@@ -976,16 +999,16 @@ void BirthParticle(
     jitter.y = Math.RandF(params->m_spawnJitterY) - params->m_spawnJitterY * half;
     jitter.z = Math.RandF(params->m_spawnJitterZ) - params->m_spawnJitterZ * half;
 
-    pos.x = (*(Mtx*)particleWmat)[0][3];
-    pos.y = (*(Mtx*)particleWmat)[1][3];
-    pos.z = (*(Mtx*)particleWmat)[2][3];
+    pos.x = particleWmat->m_matrix[0][3];
+    pos.y = particleWmat->m_matrix[1][3];
+    pos.z = particleWmat->m_matrix[2][3];
     PSVECAdd(&jitter, &pos, &pos);
-    (*(Mtx*)particleWmat)[0][3] = pos.x;
-    (*(Mtx*)particleWmat)[1][3] = pos.y;
-    (*(Mtx*)particleWmat)[2][3] = pos.z;
+    particleWmat->m_matrix[0][3] = pos.x;
+    particleWmat->m_matrix[1][3] = pos.y;
+    particleWmat->m_matrix[2][3] = pos.z;
 
-    PSMTXConcat(*(Mtx*)particleWmat, pppObject->m_localMatrix.value, *(Mtx*)particleData);
-    PSMTXConcat(ppvCameraMatrix, *(Mtx*)particleData, cameraMtx);
+    PSMTXConcat(particleWmat->m_matrix, pppObject->m_localMatrix.value, particleData->m_modelMtx);
+    PSMTXConcat(ppvCameraMatrix, particleData->m_modelMtx, cameraMtx);
 
     particle->m_direction.x = 0.0f;
     particle->m_direction.y = 0.0f;
@@ -1005,7 +1028,7 @@ inline void SetParticleMatrix(
     _pppPObject* pppObject, VBreathModel* vBreathModel, PARTICLE_DATA* particleData, PARTICLE_WMAT* particleWmat,
     _pppMngSt*)
 {
-    BreathParticleData* particle = reinterpret_cast<BreathParticleData*>(particleData);
+    PARTICLE_DATA* particle = particleData;
     Mtx workMtx;
 
     PSMTXCopy(vBreathModel->m_matrix, particleWmat->m_matrix);
@@ -1017,94 +1040,4 @@ inline void SetParticleMatrix(
     PSMTXMultVec(workMtx, &particle->m_direction, &particle->m_direction);
     PSVECNormalize(&particle->m_direction, &particle->m_direction);
     PSMTXConcat(particleWmat->m_matrix, pppObject->m_localMatrix.value, particleWmat->m_matrix);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short groupIndex)
-{
-    int i;
-    bool isDead = true;
-    float zero = 0.0f;
-    BreathParticleGroup* groupData = &vBreathModel->m_groups[(int)groupIndex];
-
-    for (i = 0; i < pBreathModel->m_slotCount; i++) {
-        if ((groupData->particleIndices[i] != -1) || (groupData->particleStates[i] != 1)) {
-            isDead = false;
-            break;
-        }
-    }
-
-    if (isDead) {
-        for (i = 0; i < pBreathModel->m_slotCount; i++) {
-            groupData->particleStates[i] = -1;
-            groupData->position.x = zero;
-            groupData->position.y = zero;
-            groupData->position.z = zero;
-            groupData->direction.x = zero;
-            groupData->direction.y = zero;
-            groupData->direction.z = zero;
-            groupData->speed = zero;
-        }
-        groupData->active = 0;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void SearchIndex(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short& slotIndex, short& groupIndex, short particleIndex)
-{
-    BreathParticleGroup* groupTable = vBreathModel->m_groups;
-    short g;
-    short s;
-
-    for (g = 0; g < pBreathModel->m_groupCount; g++) {
-        for (s = 0; s < pBreathModel->m_slotCount; s++) {
-            if ((int)particleIndex == (int)groupTable->particleIndices[s]) {
-                slotIndex = s;
-                groupIndex = g;
-                return;
-            }
-        }
-        groupTable++;
-    }
-
-    slotIndex = -1;
-    groupIndex = -1;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short particleIndex)
-{
-    short slotIndex;
-    short groupIndex;
-    BreathParticleGroup* groupArray;
-
-    SearchIndex(pBreathModel, vBreathModel, slotIndex, groupIndex, particleIndex);
-    if (groupIndex != -1) {
-        groupArray = vBreathModel->m_groups;
-        groupArray[groupIndex].particleIndices[slotIndex] = -1;
-    }
 }

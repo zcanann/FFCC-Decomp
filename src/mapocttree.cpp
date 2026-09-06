@@ -34,16 +34,106 @@ static const char sMapOctTreeNodeMeshTypeFmt[] =
 static const char s_mapocttree_cpp[] = "mapocttree.cpp";
 
 namespace {
-static inline unsigned char* Ptr(void* ptr, unsigned int offset)
-{
-    return reinterpret_cast<unsigned char*>(ptr) + offset;
-}
-
 static inline CMapObj* GetMapObjByIndex(unsigned short index)
 {
     return MapMng.GetMapObj(index);
 }
 
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002c704
+ * PAL Size: 420b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long flag)
+{
+	float radiusPad;
+	Mtx inverseMtx;
+	CMapHit* mapHit;
+
+	if (m_type == 2) {
+		mapHit = static_cast<CMapHit*>(m_mapObject->m_mapData);
+		if (mapHit != 0) {
+			PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
+			PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
+			PSMTXMultVec(inverseMtx, &cylinder->m_top, &s_cyl.m_top);
+			PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &s_cyl.m_axis);
+			PSMTXMultVecSR(inverseMtx, move, &s_mvec);
+
+			s_cyl.m_radius = cylinder->m_radius;
+			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
+			if (s_cyl.m_bottom.x < s_cyl.m_top.x) {
+				s_cyl.m_bound.m_min.x = s_cyl.m_bottom.x - radiusPad;
+				s_cyl.m_bound.m_max.x = s_cyl.m_top.x + radiusPad;
+			} else {
+				s_cyl.m_bound.m_min.x = s_cyl.m_top.x - radiusPad;
+				s_cyl.m_bound.m_max.x = s_cyl.m_bottom.x + radiusPad;
+			}
+
+			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
+			if (s_cyl.m_bottom.y < s_cyl.m_top.y) {
+				s_cyl.m_bound.m_min.y = s_cyl.m_bottom.y - radiusPad;
+				s_cyl.m_bound.m_max.y = s_cyl.m_top.y + radiusPad;
+			} else {
+				s_cyl.m_bound.m_min.y = s_cyl.m_top.y - radiusPad;
+				s_cyl.m_bound.m_max.y = s_cyl.m_bottom.y + radiusPad;
+			}
+
+			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
+			if (s_cyl.m_bottom.z < s_cyl.m_top.z) {
+				s_cyl.m_bound.m_min.z = s_cyl.m_bottom.z - radiusPad;
+				s_cyl.m_bound.m_max.z = s_cyl.m_top.z + radiusPad;
+			} else {
+				s_cyl.m_bound.m_min.z = s_cyl.m_top.z - radiusPad;
+				s_cyl.m_bound.m_max.z = s_cyl.m_bottom.z + radiusPad;
+			}
+			InsertShadow_level = flag;
+			CheckHitCylinderNear_r(m_nodePool);
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002e27c
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void COctTree::DrawCharaShadow(unsigned char drawType)
+{
+	CMapObj* mapObj;
+
+	if (m_type == 0) {
+		mapObj = m_mapObject;
+		unsigned char mapDrawType = mapObj->m_drawPriority;
+		unsigned char targetDrawType = drawType;
+		if (mapDrawType != targetDrawType) {
+			return;
+		}
+
+		LightPcs.SetBumpTexMatirx(mapObj->m_worldMtx, 0, reinterpret_cast<Vec*>(&mapObj->m_transRateX),
+		                          mapObj->m_bumpTexMatrixMode);
+
+		if (kMapOctTreeDefaultOffsetZ != m_mapObject->m_zBufferOffset) {
+			CameraPcs.SetOffsetZBuff(m_mapObject->m_zBufferOffset);
+		}
+
+		static_cast<CMapMesh*>(m_mapObject->m_mapData)->SetRenderArray();
+		DrawCharaShadowTypeMeshFlag_r(m_nodePool);
+
+		float offsetZ = m_mapObject->m_zBufferOffset;
+		if (kMapOctTreeDefaultOffsetZ != offsetZ) {
+			CameraPcs.SetOffsetZBuff(kMapOctTreeDefaultOffsetZ);
+		}
+	}
 }
 
 /*
@@ -211,6 +301,42 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 
 /*
  * --INFO--
+ * PAL Address: 8002ef48
+ * PAL Size: 84b
+ */
+void CMaterialMan::InitEnv()
+{
+	m_curEnvTevBit = 0x000ACE0F;
+	m_activeEnvTevBit = 0xFFFFFFFF;
+	m_vtxDescMode = 0xFF;
+	m_stdTexMapId = 0;
+	m_texMapIdCur = 0;
+	m_stdTexMtx = 0x1E;
+	m_texMtxCur = 0x1E;
+	m_stdTexCoordId = 0;
+	m_texCoordIdCur = 0;
+	m_blendMode = 0xFF;
+	m_fogEnable = 0xFF;
+	m_shadowMaterialCount = 0;
+	m_shadowTextureCount = 0;
+	m_shadowKColorMask = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 8002ef24
+ * PAL Size: 36b
+ */
+void CMaterialMan::LockEnv()
+{
+	m_stdTexMapId = m_texMapIdCur;
+	m_stdTexMtx = m_texMtxCur;
+	m_stdTexCoordId = m_texCoordIdCur;
+	m_stdEnvTevBit = m_curEnvTevBit;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8002ebc0
  * PAL Size: 868b
  * EN Address: TODO
@@ -220,16 +346,9 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
  */
 void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 {
-	int iVar1;
-	int iVar5;
-	COctNode* nodeIter;
-	COctNode* pCVar4;
-	COctNode* pCVar3;
-	int iVar2;
-
 	if ((octNode->m_meshCount != 0) &&
 	    ((octNode->m_drawFlags & 1) != 0)) {
-		MaterialMan.SetDefaultDrawEnv(0xACE0F);
+		MaterialMan.InitEnv();
 		if (m_mapObject->m_enableFullScreenShadow != 0) {
 			CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
 		}
@@ -237,75 +356,41 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &octNode->m_shadowFlags,
 			                           m_mapObject->m_worldMtx);
 		}
-		MaterialMan.LockEnvInline();
+		MaterialMan.LockEnv();
 		LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &octNode->m_lightFlags);
 		m_mapObject->SetDrawEnv();
 		static_cast<CMapMesh*>(m_mapObject->m_mapData)
 			->DrawMesh(octNode->m_meshStart,
 			           octNode->m_meshCount);
 	}
-	nodeIter = octNode;
-	iVar2 = 0;
-	do {
-		pCVar4 = nodeIter->m_children[0];
-		if (pCVar4 == 0) {
+	for (int i = 0; i < 8; i++) {
+		if (octNode->m_children[i] == 0) {
 			return;
 		}
-		if ((pCVar4->m_meshCount != 0) &&
-		    ((pCVar4->m_drawFlags & 1) != 0)) {
-			MaterialMan.SetDefaultDrawEnv(0xACE0F);
-			if (m_mapObject->m_enableFullScreenShadow != 0) {
-				CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
-			}
-			if (m_mapObject->m_shadowTarget != 0) {
-				MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &pCVar4->m_shadowFlags,
-				                           m_mapObject->m_worldMtx);
-			}
-			MaterialMan.LockEnvInline();
-			LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &pCVar4->m_lightFlags);
-			m_mapObject->SetDrawEnv();
-			static_cast<CMapMesh*>(m_mapObject->m_mapData)
-				->DrawMesh(pCVar4->m_meshStart,
-				           pCVar4->m_meshCount);
+		DrawTypeMeshFlag_r(octNode->m_children[i]);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002e758
+ * PAL Size: 572b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
+{
+	if (octNode->m_meshCount != 0) {
+		octNode->m_drawFlags |= 1;
+	}
+	for (int i = 0; i < 8; i++) {
+		if (octNode->m_children[i] == 0) {
+			return;
 		}
-		iVar5 = 0;
-		do {
-			pCVar3 = pCVar4->m_children[0];
-			if (pCVar3 == 0) {
-				break;
-			}
-			if ((pCVar3->m_meshCount != 0) &&
-			    ((pCVar3->m_drawFlags & 1) != 0)) {
-				MaterialMan.InitEnv();
-				if (m_mapObject->m_enableFullScreenShadow != 0) {
-					CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
-				}
-				if (m_mapObject->m_shadowTarget != 0) {
-					MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &pCVar3->m_shadowFlags,
-					                           m_mapObject->m_worldMtx);
-				}
-				MaterialMan.LockEnv();
-				LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &pCVar3->m_lightFlags);
-				m_mapObject->SetDrawEnv();
-				static_cast<CMapMesh*>(m_mapObject->m_mapData)
-					->DrawMesh(pCVar3->m_meshStart,
-					           pCVar3->m_meshCount);
-			}
-			iVar1 = 0;
-			do {
-				if (pCVar3->m_children[0] == 0) {
-					break;
-				}
-				DrawTypeMeshFlag_r(pCVar3->m_children[0]);
-				iVar1 = iVar1 + 1;
-				pCVar3 = reinterpret_cast<COctNode*>(Ptr(pCVar3, 4));
-			} while (iVar1 < 8);
-			iVar5 = iVar5 + 1;
-			pCVar4 = reinterpret_cast<COctNode*>(Ptr(pCVar4, 4));
-		} while (iVar5 < 8);
-		iVar2 = iVar2 + 1;
-		nodeIter = reinterpret_cast<COctNode*>(Ptr(nodeIter, 4));
-	} while (iVar2 < 8);
+		DrawTypeMeshFrustumIn_r(octNode->m_children[i]);
+	}
 }
 
 /*
@@ -333,142 +418,6 @@ void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode* octNode)
 			return;
 		}
 		DrawCharaShadowTypeMeshFlag_r(octNode->m_children[i]);
-	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
-{
-	int i;
-	int j;
-	int k;
-	int m;
-	int n;
-	int o;
-	int p;
-	int q;
-	int r;
-	COctNode* child1;
-	COctNode* child2;
-	COctNode* child3;
-	COctNode* child4;
-	COctNode* child5;
-	COctNode* child6;
-	COctNode* child7;
-	COctNode* child8;
-	COctNode* node;
-
-	if (octNode->m_meshCount != 0) {
-		octNode->m_drawFlags |= 1;
-	}
-
-	node = octNode;
-	for (i = 0; i < 8; i++) {
-		child1 = node->m_children[0];
-		if (child1 == 0) {
-			return;
-		}
-		if (child1->m_meshCount != 0) {
-			child1->m_drawFlags |= 1;
-		}
-
-		for (j = 0; j < 8; j++) {
-			child2 = child1->m_children[0];
-			if (child2 == 0) {
-				break;
-			}
-			if (child2->m_meshCount != 0) {
-				child2->m_drawFlags |= 1;
-			}
-
-			for (k = 0; k < 8; k++) {
-				child3 = child2->m_children[0];
-				if (child3 == 0) {
-					break;
-				}
-				if (child3->m_meshCount != 0) {
-					child3->m_drawFlags |= 1;
-				}
-
-				for (m = 0; m < 8; m++) {
-					child4 = child3->m_children[0];
-					if (child4 == 0) {
-						break;
-					}
-					if (child4->m_meshCount != 0) {
-						child4->m_drawFlags |= 1;
-					}
-
-					for (n = 0; n < 8; n++) {
-						child5 = child4->m_children[0];
-						if (child5 == 0) {
-							break;
-						}
-						if (child5->m_meshCount != 0) {
-							child5->m_drawFlags |= 1;
-						}
-
-						for (o = 0; o < 8; o++) {
-							child6 = child5->m_children[0];
-							if (child6 == 0) {
-								break;
-							}
-							if (child6->m_meshCount != 0) {
-								child6->m_drawFlags |= 1;
-							}
-
-							for (p = 0; p < 8; p++) {
-								child7 = child6->m_children[0];
-								if (child7 == 0) {
-									break;
-								}
-								if (child7->m_meshCount != 0) {
-									child7->m_drawFlags |= 1;
-								}
-
-								for (q = 0; q < 8; q++) {
-									child8 = child7->m_children[0];
-									if (child8 == 0) {
-										break;
-									}
-									if (child8->m_meshCount != 0) {
-										child8->m_drawFlags |= 1;
-									}
-
-									for (r = 0; r < 8; r++) {
-										if (child8->m_children[0] == 0) {
-											break;
-										}
-										DrawTypeMeshFrustumIn_r(child8->m_children[0]);
-										child8 = reinterpret_cast<COctNode*>(Ptr(child8, 4));
-									}
-
-									child7 = reinterpret_cast<COctNode*>(Ptr(child7, 4));
-								}
-
-								child6 = reinterpret_cast<COctNode*>(Ptr(child6, 4));
-							}
-
-							child5 = reinterpret_cast<COctNode*>(Ptr(child5, 4));
-						}
-
-						child4 = reinterpret_cast<COctNode*>(Ptr(child4, 4));
-					}
-
-					child3 = reinterpret_cast<COctNode*>(Ptr(child3, 4));
-				}
-
-				child2 = reinterpret_cast<COctNode*>(Ptr(child2, 4));
-			}
-
-			child1 = reinterpret_cast<COctNode*>(Ptr(child1, 4));
-		}
-
-		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
 	}
 }
 
@@ -571,19 +520,17 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 
 	if (orMask == 0) {
 		for (int i = 0; i < 8; i++) {
-			if (octNode->m_children[0] == 0) {
+			if (octNode->m_children[i] == 0) {
 				return;
 			}
-			DrawTypeMeshFrustumIn_r(octNode->m_children[0]);
-			octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
+			DrawTypeMeshFrustumIn_r(octNode->m_children[i]);
 		}
 	} else {
 		for (int i = 0; i < 8; i++) {
-			if (octNode->m_children[0] == 0) {
+			if (octNode->m_children[i] == 0) {
 				return;
 			}
-			DrawTypeMesh_r(octNode->m_children[0]);
-			octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
+			DrawTypeMesh_r(octNode->m_children[i]);
 		}
 	}
 }
@@ -633,44 +580,6 @@ void COctTree::Draw(unsigned char drawType)
 			if (kMapOctTreeDefaultOffsetZ != offsetZ) {
 				CameraPcs.SetOffsetZBuff(kMapOctTreeDefaultOffsetZ);
 			}
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002e27c
- * PAL Size: 188b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void COctTree::DrawCharaShadow(unsigned char drawType)
-{
-	CMapObj* mapObj;
-
-	if (m_type == 0) {
-		mapObj = m_mapObject;
-		unsigned char mapDrawType = mapObj->m_drawPriority;
-		unsigned char targetDrawType = drawType;
-		if (mapDrawType != targetDrawType) {
-			return;
-		}
-
-		LightPcs.SetBumpTexMatirx(mapObj->m_worldMtx, 0, reinterpret_cast<Vec*>(&mapObj->m_transRateX),
-		                          mapObj->m_bumpTexMatrixMode);
-
-		if (kMapOctTreeDefaultOffsetZ != m_mapObject->m_zBufferOffset) {
-			CameraPcs.SetOffsetZBuff(m_mapObject->m_zBufferOffset);
-		}
-
-		static_cast<CMapMesh*>(m_mapObject->m_mapData)->SetRenderArray();
-		DrawCharaShadowTypeMeshFlag_r(m_nodePool);
-
-		float offsetZ = m_mapObject->m_zBufferOffset;
-		if (kMapOctTreeDefaultOffsetZ != offsetZ) {
-			CameraPcs.SetOffsetZBuff(kMapOctTreeDefaultOffsetZ);
 		}
 	}
 }
@@ -740,8 +649,6 @@ void COctTree::ClearLight()
 {
 	ClearLight_r(m_nodePool);
 }
-
-
 
 /*
  * --INFO--
@@ -870,7 +777,6 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 	return 0;
 }
 
-
 #pragma inline_depth(2)
 /*
  * --INFO--
@@ -987,44 +893,11 @@ inline void SetShadow_r(COctNode* node)
 	if (node->m_meshCount != 0) {
 		setbit32(&node->m_shadowFlags, s_shadow_no);
 	}
-
-	COctNode* nodeIter = node;
 	for (int i = 0; i < 8; i++) {
-		COctNode* child = nodeIter->m_children[0];
-		if (child == 0) {
+		if (node->m_children[i] == 0) {
 			return;
 		}
-
-		if (child->m_meshCount != 0) {
-			setbit32(&child->m_shadowFlags, s_shadow_no);
-		}
-
-		COctNode* childIter = child;
-		for (int j = 0; j < 8; j++) {
-			COctNode* grandChild = childIter->m_children[0];
-			if (grandChild == 0) {
-				break;
-			}
-
-			if (grandChild->m_meshCount != 0) {
-				setbit32(&grandChild->m_shadowFlags, s_shadow_no);
-			}
-
-			COctNode* grandChildIter = grandChild;
-			for (int k = 0; k < 8; k++) {
-				COctNode* greatGrandChild = grandChildIter->m_children[0];
-				if (greatGrandChild == 0) {
-					break;
-				}
-
-				SetShadow_r(greatGrandChild);
-				grandChildIter = reinterpret_cast<COctNode*>(Ptr(grandChildIter, 4));
-			}
-
-			childIter = reinterpret_cast<COctNode*>(Ptr(childIter, 4));
-		}
-
-		nodeIter = reinterpret_cast<COctNode*>(Ptr(nodeIter, 4));
+		SetShadow_r(node->m_children[i]);
 	}
 }
 
@@ -1142,7 +1015,6 @@ void COctTree::ClearFlag(unsigned long flag)
 	ClearFlag_r(m_nodePool);
 }
 
-
 /*
  * --INFO--
  * PAL Address: 0x8002cd38
@@ -1203,101 +1075,6 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 
 	return 0;
 }
-
-
-/*
- * --INFO--
- * PAL Address: 0x8002c704
- * PAL Size: 420b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long flag)
-{
-	float radiusPad;
-	Mtx inverseMtx;
-	CMapHit* mapHit;
-
-	if (m_type == 2) {
-		mapHit = static_cast<CMapHit*>(m_mapObject->m_mapData);
-		if (mapHit != 0) {
-			PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
-			PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
-			PSMTXMultVec(inverseMtx, &cylinder->m_top, &s_cyl.m_top);
-			PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &s_cyl.m_axis);
-			PSMTXMultVecSR(inverseMtx, move, &s_mvec);
-
-			s_cyl.m_radius = cylinder->m_radius;
-			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
-			if (s_cyl.m_bottom.x < s_cyl.m_top.x) {
-				s_cyl.m_bound.m_min.x = s_cyl.m_bottom.x - radiusPad;
-				s_cyl.m_bound.m_max.x = s_cyl.m_top.x + radiusPad;
-			} else {
-				s_cyl.m_bound.m_min.x = s_cyl.m_top.x - radiusPad;
-				s_cyl.m_bound.m_max.x = s_cyl.m_bottom.x + radiusPad;
-			}
-
-			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
-			if (s_cyl.m_bottom.y < s_cyl.m_top.y) {
-				s_cyl.m_bound.m_min.y = s_cyl.m_bottom.y - radiusPad;
-				s_cyl.m_bound.m_max.y = s_cyl.m_top.y + radiusPad;
-			} else {
-				s_cyl.m_bound.m_min.y = s_cyl.m_top.y - radiusPad;
-				s_cyl.m_bound.m_max.y = s_cyl.m_bottom.y + radiusPad;
-			}
-
-			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
-			if (s_cyl.m_bottom.z < s_cyl.m_top.z) {
-				s_cyl.m_bound.m_min.z = s_cyl.m_bottom.z - radiusPad;
-				s_cyl.m_bound.m_max.z = s_cyl.m_top.z + radiusPad;
-			} else {
-				s_cyl.m_bound.m_min.z = s_cyl.m_top.z - radiusPad;
-				s_cyl.m_bound.m_max.z = s_cyl.m_bottom.z + radiusPad;
-			}
-			InsertShadow_level = flag;
-			CheckHitCylinderNear_r(m_nodePool);
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 8002ef24
- * PAL Size: 36b
- */
-void CMaterialMan::LockEnv()
-{
-	m_stdTexMapId = m_texMapIdCur;
-	m_stdTexMtx = m_texMtxCur;
-	m_stdTexCoordId = m_texCoordIdCur;
-	m_stdEnvTevBit = m_curEnvTevBit;
-}
-
-/*
- * --INFO--
- * PAL Address: 8002ef48
- * PAL Size: 84b
- */
-void CMaterialMan::InitEnv()
-{
-	m_curEnvTevBit = 0x000ACE0F;
-	m_activeEnvTevBit = 0xFFFFFFFF;
-	m_vtxDescMode = 0xFF;
-	m_stdTexMapId = 0;
-	m_texMapIdCur = 0;
-	m_stdTexMtx = 0x1E;
-	m_texMtxCur = 0x1E;
-	m_stdTexCoordId = 0;
-	m_texCoordIdCur = 0;
-	m_blendMode = 0xFF;
-	m_fogEnable = 0xFF;
-	m_shadowMaterialCount = 0;
-	m_shadowTextureCount = 0;
-	m_shadowKColorMask = 0;
-}
-
 
 /*
  * --INFO--

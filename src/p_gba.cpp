@@ -5,9 +5,6 @@
 #include "ffcc/system.h"
 #include <dolphin/gba/GBA.h>
 
-extern const char sCGbaPcsProcessName[] = "CGbaPcs";
-static const char sGbaJoybusLoadBinError[] = "JoyBus::LoadBin() error\n";
-
 extern "C" {
 void create__7CGbaPcsFv(CGbaPcs*);
 void destroy__7CGbaPcsFv(CGbaPcs*);
@@ -40,7 +37,7 @@ inline CGbaPcs::CGbaPcs()
 }
 
 CProcessTable CGbaPcs::m_table = {
-    const_cast<char*>(sCGbaPcsProcessName),
+    "CGbaPcs",
     {
         0x00000000,
         0x00000000,
@@ -65,66 +62,79 @@ CGbaPcs GbaPcs;
 
 /*
  * --INFO--
- * PAL Address: 0x800977d8
+ * PAL Address: 0x800979cc
  * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGbaPcs::SetFirstZone()
+void CGbaPcs::Init()
 {
-	GbaQue.ClrRadarTypeFlg();
+	m_stage = (CMemory::CStage*)0;
+	GBAInit();
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80097800
- * PAL Size: 40b
+ * PAL Address: 0x800979c8
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGbaPcs::onScriptChanging(char*)
+void CGbaPcs::Quit()
 {
-	GbaQue.ClrScrInitEnd();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGbaPcs::onMapChanged(int, int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8009782c
- * PAL Size: 92b
+ * PAL Address: 0x800979b4
+ * PAL Size: 20b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGbaPcs::onMapChanging(int stageNo1, int stageNo2)
+int CGbaPcs::GetTable(unsigned long tableIndex)
 {
-	if (Joybus.IsThreadRunning()) {
-		GbaQue.SetStageNo(stageNo1, stageNo2);
+	return reinterpret_cast<int>(&m_table + tableIndex);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80097918
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGbaPcs::create()
+{
+	m_stage = Memory.CreateStage(0x56000, "CGbaPcs", 0);
+	Joybus.CreateInit();
+	int result = Joybus.LoadBin();
+	if ((result != 0) && (2 <= (unsigned int)System.m_execParam)) {
+		System.Printf("JoyBus::LoadBin() error\n");
 	}
+	Joybus.ThreadInit();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800978d4
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGbaPcs::draw()
+void CGbaPcs::destroy()
 {
-	// TODO
+	Joybus.Destroy();
+	Memory.DestroyStage(m_stage);
 }
 
 /*
@@ -146,74 +156,70 @@ void CGbaPcs::calc()
 
 /*
  * --INFO--
- * PAL Address: 0x800978d4
- * PAL Size: 68b
+ * PAL Address: 0x80097888
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGbaPcs::destroy()
+void CGbaPcs::draw()
 {
-	Joybus.Destroy();
-	Memory.DestroyStage(m_stage);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80097918
- * PAL Size: 156b
+ * PAL Address: 0x8009782c
+ * PAL Size: 92b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGbaPcs::create()
+void CGbaPcs::onMapChanging(int stageNo1, int stageNo2)
 {
-	m_stage = Memory.CreateStage(0x56000, const_cast<char*>(sCGbaPcsProcessName), 0);
-	Joybus.CreateInit();
-	int result = Joybus.LoadBin();
-	if ((result != 0) && (2 <= (unsigned int)System.m_execParam)) {
-		System.Printf(const_cast<char*>(sGbaJoybusLoadBinError));
+	if (Joybus.IsThreadRunning()) {
+		GbaQue.SetStageNo(stageNo1, stageNo2);
 	}
-	Joybus.ThreadInit();
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800979b4
- * PAL Size: 20b
+ * PAL Address: 0x80097828
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGbaPcs::GetTable(unsigned long tableIndex)
+void CGbaPcs::onMapChanged(int, int, int)
 {
-	return reinterpret_cast<int>(&m_table + tableIndex);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGbaPcs::Quit()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800979cc
+ * PAL Address: 0x80097800
  * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGbaPcs::Init()
+void CGbaPcs::onScriptChanging(char*)
 {
-	m_stage = (CMemory::CStage*)0;
-	GBAInit();
+	GbaQue.ClrScrInitEnd();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800977d8
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGbaPcs::SetFirstZone()
+{
+	GbaQue.ClrRadarTypeFlg();
 }

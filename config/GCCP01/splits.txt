@@ -137,7 +137,7 @@ usb.cpp:
 	extabindex  start:0x8000B5D8 end:0x8000B5FC
 	.text       start:0x8002244C end:0x80022724
 	.ctors      start:0x801D53C8 end:0x801D53CC
-	.rodata     start:0x801D6F90 end:0x801D7058
+	.rodata     start:0x801D6F90 end:0x801D705C
 	.data       start:0x801E8898 end:0x801E88B4
 	.bss        start:0x802455C0 end:0x80245640
 	.sdata      start:0x8032E478 end:0x8032E488
@@ -1052,7 +1052,7 @@ p_menu.cpp:
 	extabindex  start:0x8000DF6C end:0x8000E0A4
 	.text       start:0x80093E78 end:0x800977D8
 	.ctors      start:0x801D541C end:0x801D5420
-	.rodata     start:0x801D9D3C end:0x801D9DE0
+	.rodata     start:0x801D9D3C end:0x801D9DC8
 	.data       start:0x8020EDF8 end:0x8020F2F8
 	.bss        start:0x802EA1A0 end:0x802EAA60
 	.sdata      start:0x8032E7A0 end:0x8032E7C0
@@ -1063,7 +1063,7 @@ p_gba.cpp:
 	extabindex  start:0x8000E0A4 end:0x8000E104
 	.text       start:0x800977D8 end:0x80097AC8
 	.ctors      start:0x801D5420 end:0x801D5424
-	.rodata     start:0x801D9DE0 end:0x801D9E00
+	.rodata     start:0x801D9DC8 end:0x801D9DFC
 	.data       start:0x8020F2F8 end:0x8020F4C8
 	.sdata      start:0x8032E7C0 end:0x8032E7D8
 	.sbss       start:0x8032EDA8 end:0x8032EDB0

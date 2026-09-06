@@ -120,8 +120,6 @@ void pppUnitMatrix(pppFMATRIX& pppFMtx)
 	PSMTXIdentity(pppFMtx.value);
 }
 
-#pragma push
-#pragma optimization_level 2
 /*
  * --INFO--
  * Address:	TODO
@@ -141,7 +139,6 @@ void pppRotMatrix(pppFMATRIX& dst, pppFMATRIX src, Vec rot)
 	PSMTXConcat(Rx.value, R.value, R.value);
 	PSMTXConcat(R.value, src.value, dst.value);
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -486,8 +483,6 @@ allocDone:
 	return allocation;
 }
 
-#pragma push
-#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 80056d20
@@ -619,7 +614,6 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 freeDone:
 	return allocation;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -674,8 +668,6 @@ extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*
 	return result;
 }
 
-#pragma push
-#pragma opt_propagation on
 /*
  * --INFO--
  * PAL Address: 80056b0c
@@ -748,7 +740,6 @@ void callCon2Prog(_pppPObject* pObject)
 
 	ppvIsLoopCalc = 0;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1546,8 +1537,6 @@ void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 	}
 }
 
-#pragma push
-#pragma optimizewithasm off
 /*
  * --INFO--
  * PAL Address: 80055308
@@ -1787,7 +1776,6 @@ DataValsAllocated:
 		}
 	}
 }
-#pragma pop
 
 /*
  * --INFO--

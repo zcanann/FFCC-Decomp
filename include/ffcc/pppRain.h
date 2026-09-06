@@ -4,17 +4,9 @@
 #include <dolphin/types.h>
 
 struct _pppPObject;
-struct pppProg;
+struct _pppCtrlTable;
 
 typedef _pppPObject pppRain;
-
-struct RAIN_DATA {
-    pppProg* m_prog;
-    u16 m_workOffset;
-    u16 m_workFlags;
-    s32 m_unk8;
-    s32* m_serializedDataOffsets;
-};
 
 struct RainDataOffsets {
     s32 _unused0;
@@ -59,10 +51,10 @@ struct PRain {
 extern "C" {
 #endif
 
-void pppConstructRain(pppRain*, RAIN_DATA*);
-void pppDestructRain(pppRain*, RAIN_DATA*);
-void pppFrameRain(pppRain*, PRain*, RAIN_DATA*);
-void pppRenderRain(pppRain*, PRain*, RAIN_DATA*);
+void pppConstructRain(pppRain*, _pppCtrlTable*);
+void pppDestructRain(pppRain*, _pppCtrlTable*);
+void pppFrameRain(pppRain*, PRain*, _pppCtrlTable*);
+void pppRenderRain(pppRain*, PRain*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

@@ -7,26 +7,25 @@
  * Address: TODO
  * Size: TODO
  */
-void CChunkFile::Align(unsigned long alignment)
+CChunkFile::CChunkFile()
 {
-    unsigned long offset = (unsigned long)(m_cursor - m_base);
-    offset += alignment - 1;
-    offset -= offset % alignment;
-    m_cursor = m_base + offset;
 }
-
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * Address: TODO
+ * Size: TODO
  */
-inline void CChunkFile::Skip(unsigned long size)
+CChunkFile::CChunkFile(void* filePtr)
 {
-    m_cursor += size;
+    unsigned int header = *reinterpret_cast<unsigned int*>((unsigned char*)(filePtr) + 4);
+    unsigned int scopeSize = header & 0x00FFFFFF;
+
+    m_base = (unsigned char*)(filePtr);
+    m_headerPtr = (unsigned char*)(filePtr);
+    m_scopeSize = scopeSize;
+    m_scopeOffset = 0;
+    m_lastChunkSize = -1;
+    m_stackDepth = 0;
 }
 
 /*
@@ -34,17 +33,17 @@ inline void CChunkFile::Skip(unsigned long size)
  * Address: TODO
  * Size: TODO
  */
-char* CChunkFile::GetString()
+void CChunkFile::SetBuf(void* filePtr)
 {
-    char* stringPtr = (char*)m_cursor;
-    unsigned char currentChar;
+    unsigned int header = *reinterpret_cast<unsigned int*>((unsigned char*)(filePtr) + 4);
+    unsigned int scopeSize = header & 0x00FFFFFF;
 
-    do
-    {
-        currentChar = *m_cursor++;
-    } while (currentChar != 0);
-
-    return stringPtr;
+    m_base = (unsigned char*)(filePtr);
+    m_headerPtr = (unsigned char*)(filePtr);
+    m_scopeSize = scopeSize;
+    m_scopeOffset = 0;
+    m_lastChunkSize = -1;
+    m_stackDepth = 0;
 }
 
 /*
@@ -52,13 +51,18 @@ char* CChunkFile::GetString()
  * Address: TODO
  * Size: TODO
  */
-unsigned int CChunkFile::Get4()
+void CChunkFile::PushChunk()
 {
-    unsigned int* value = (unsigned int*)m_cursor;
-
-    m_cursor += sizeof(unsigned int);
-
-    return *value;
+    m_chunkScopes[m_stackDepth].m_scopeSize = m_scopeSize;
+    m_chunkScopes[m_stackDepth].m_lastChunkSize = m_lastChunkSize;
+    m_chunkScopes[m_stackDepth].m_scopeOffset = m_scopeOffset;
+    m_chunkScopes[m_stackDepth].m_base = m_headerPtr;
+    m_chunkScopes[m_stackDepth].m_headerPtr = m_cursor;
+    m_stackDepth = m_stackDepth + 1;
+    m_scopeSize = m_lastChunkSize;
+    m_scopeOffset = 0;
+    m_lastChunkSize = -1;
+    m_headerPtr = m_cursor;
 }
 
 /*
@@ -66,64 +70,14 @@ unsigned int CChunkFile::Get4()
  * Address: TODO
  * Size: TODO
  */
-float CChunkFile::GetF4()
+void CChunkFile::PopChunk()
 {
-    union {
-        unsigned int bits;
-        float value;
-    } u;
-
-    u.bits = Get4();
-    return u.value;
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-unsigned short CChunkFile::Get2()
-{
-    unsigned short* value = (unsigned short*)m_cursor;
-
-    m_cursor += sizeof(unsigned short);
-
-    return *value;
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-unsigned char CChunkFile::Get1()
-{
-    unsigned char* value = m_cursor;
-
-    m_cursor += sizeof(unsigned char);
-
-    return *value;
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void CChunkFile::Get(void* dest, long size)
-{
-    memcpy(dest, m_cursor, size);
-    m_cursor += size;
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-unsigned char* CChunkFile::GetAddress()
-{
-    return m_cursor;
+    m_stackDepth = m_stackDepth - 1;
+    m_scopeSize = m_chunkScopes[m_stackDepth].m_scopeSize;
+    m_lastChunkSize = m_chunkScopes[m_stackDepth].m_lastChunkSize;
+    m_scopeOffset = m_chunkScopes[m_stackDepth].m_scopeOffset;
+    m_headerPtr = m_chunkScopes[m_stackDepth].m_base;
+    m_cursor = m_chunkScopes[m_stackDepth].m_headerPtr;
 }
 
 /*
@@ -179,14 +133,9 @@ int CChunkFile::GetNextChunk(CChunk& outChunk)
  * Address: TODO
  * Size: TODO
  */
-void CChunkFile::PopChunk()
+unsigned char* CChunkFile::GetAddress()
 {
-    m_stackDepth = m_stackDepth - 1;
-    m_scopeSize = m_chunkScopes[m_stackDepth].m_scopeSize;
-    m_lastChunkSize = m_chunkScopes[m_stackDepth].m_lastChunkSize;
-    m_scopeOffset = m_chunkScopes[m_stackDepth].m_scopeOffset;
-    m_headerPtr = m_chunkScopes[m_stackDepth].m_base;
-    m_cursor = m_chunkScopes[m_stackDepth].m_headerPtr;
+    return m_cursor;
 }
 
 /*
@@ -194,18 +143,10 @@ void CChunkFile::PopChunk()
  * Address: TODO
  * Size: TODO
  */
-void CChunkFile::PushChunk()
+void CChunkFile::Get(void* dest, long size)
 {
-    m_chunkScopes[m_stackDepth].m_scopeSize = m_scopeSize;
-    m_chunkScopes[m_stackDepth].m_lastChunkSize = m_lastChunkSize;
-    m_chunkScopes[m_stackDepth].m_scopeOffset = m_scopeOffset;
-    m_chunkScopes[m_stackDepth].m_base = m_headerPtr;
-    m_chunkScopes[m_stackDepth].m_headerPtr = m_cursor;
-    m_stackDepth = m_stackDepth + 1;
-    m_scopeSize = m_lastChunkSize;
-    m_scopeOffset = 0;
-    m_lastChunkSize = -1;
-    m_headerPtr = m_cursor;
+    memcpy(dest, m_cursor, size);
+    m_cursor += size;
 }
 
 /*
@@ -213,17 +154,13 @@ void CChunkFile::PushChunk()
  * Address: TODO
  * Size: TODO
  */
-void CChunkFile::SetBuf(void* filePtr)
+unsigned char CChunkFile::Get1()
 {
-    unsigned int header = *reinterpret_cast<unsigned int*>((unsigned char*)(filePtr) + 4);
-    unsigned int scopeSize = header & 0x00FFFFFF;
+    unsigned char* value = m_cursor;
 
-    m_base = (unsigned char*)(filePtr);
-    m_headerPtr = (unsigned char*)(filePtr);
-    m_scopeSize = scopeSize;
-    m_scopeOffset = 0;
-    m_lastChunkSize = -1;
-    m_stackDepth = 0;
+    m_cursor += sizeof(unsigned char);
+
+    return *value;
 }
 
 /*
@@ -231,17 +168,13 @@ void CChunkFile::SetBuf(void* filePtr)
  * Address: TODO
  * Size: TODO
  */
-CChunkFile::CChunkFile(void* filePtr)
+unsigned short CChunkFile::Get2()
 {
-    unsigned int header = *reinterpret_cast<unsigned int*>((unsigned char*)(filePtr) + 4);
-    unsigned int scopeSize = header & 0x00FFFFFF;
+    unsigned short* value = (unsigned short*)m_cursor;
 
-    m_base = (unsigned char*)(filePtr);
-    m_headerPtr = (unsigned char*)(filePtr);
-    m_scopeSize = scopeSize;
-    m_scopeOffset = 0;
-    m_lastChunkSize = -1;
-    m_stackDepth = 0;
+    m_cursor += sizeof(unsigned short);
+
+    return *value;
 }
 
 /*
@@ -249,6 +182,72 @@ CChunkFile::CChunkFile(void* filePtr)
  * Address: TODO
  * Size: TODO
  */
-CChunkFile::CChunkFile()
+unsigned int CChunkFile::Get4()
 {
+    unsigned int* value = (unsigned int*)m_cursor;
+
+    m_cursor += sizeof(unsigned int);
+
+    return *value;
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+float CChunkFile::GetF4()
+{
+    union {
+        unsigned int bits;
+        float value;
+    } u;
+
+    u.bits = Get4();
+    return u.value;
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+char* CChunkFile::GetString()
+{
+    char* stringPtr = (char*)m_cursor;
+    unsigned char currentChar;
+
+    do
+    {
+        currentChar = *m_cursor++;
+    } while (currentChar != 0);
+
+    return stringPtr;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CChunkFile::Skip(unsigned long size)
+{
+    m_cursor += size;
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+void CChunkFile::Align(unsigned long alignment)
+{
+    unsigned long offset = (unsigned long)(m_cursor - m_base);
+    offset += alignment - 1;
+    offset -= offset % alignment;
+    m_cursor = m_base + offset;
 }

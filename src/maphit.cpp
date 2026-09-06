@@ -54,7 +54,6 @@ unsigned char g_MapHitFaceFlag;
 CMapHitFace* g_hit_lpface;
 CMapHitFace* g_hit_f;
 CMapHitFace* g_hit_lpface_min;
-int g_hitTgt;
 
 /*
  * --INFO--

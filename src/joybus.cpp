@@ -198,7 +198,7 @@ inline JoyBus::JoyBus()
     strcpy(m_pathBuf, JoyBusConst::DVD_DIR);
     strcat(m_pathBuf, JoyBusConst::CLIENT_FILE);
 
-    memset(m_sendBuffer, 0, sizeof(m_sendBuffer));
+    memset(m_threadStacks, 0, sizeof(m_threadStacks));
     memset(m_stageFlags, 0, sizeof(m_stageFlags));
     memset(m_cmdQueueData, 0, sizeof(m_cmdQueueData));
     memset(m_recvQueueEntriesArr, 0, sizeof(m_recvQueueEntriesArr));
@@ -243,7 +243,7 @@ JoyBus::~JoyBus()
  */
 inline void JoyBus::Init()
 {
-    memset(m_sendBuffer, 0, sizeof(m_sendBuffer));
+    memset(m_threadStacks, 0, sizeof(m_threadStacks));
     memset(m_stageFlags, 0, sizeof(m_stageFlags));
     memset(m_cmdQueueData, 0, sizeof(m_cmdQueueData));
     memset(m_recvQueueEntriesArr, 0, sizeof(m_recvQueueEntriesArr));
@@ -419,70 +419,57 @@ void JoyBus::Destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800b1ec8
+ * PAL Size: 620b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
-#pragma optimize_for_size on
-#pragma use_lmw_stmw off
 int JoyBus::LoadBin()
 {
-    if (static_cast<signed char>(m_binLoaded) != 0)
+    if (m_binLoaded != 0)
     {
         return 0;
     }
 
+    CFile::CHandle* file = File.Open(m_pathBuf, 0, CFile::PRI_LOW);
+    if (file == 0)
     {
-        CFile::CHandle* file = File.Open((char*)this, 0, CFile::PRI_LOW);
-
-        if (file == 0)
+        if ((unsigned int)System.m_execParam >= 2)
         {
-            if ((unsigned int)System.m_execParam >= 2)
-            {
-                System.Printf(const_cast<char*>(s_not_found_error_fmt), (char*)this);
-            }
-
-            return -1;
+            System.Printf(const_cast<char*>(s_not_found_error_fmt), m_pathBuf);
         }
-        else
-        {
-            File.Read(file);
-            File.SyncCompleted(file);
-
-            m_gbaBootImageSize = File.GetLength(file);
-            memcpy(m_gbaBootImage, File.m_readBuffer, m_gbaBootImageSize);
-
-            File.Close(file);
-
-            m_diskId = (char*)File.GetCurrentDiskID();
-
-            m_gbaBootImage[0xAC] = (unsigned char)m_diskId[0];
-            m_gbaBootImage[0xAD] = (unsigned char)m_diskId[1];
-            m_gbaBootImage[0xAE] = (unsigned char)m_diskId[2];
-            m_gbaBootImage[0xAF] = (unsigned char)m_diskId[3];
-
-            unsigned char* buf = (unsigned char*)m_gbaBootImage;
-            int sum = 0xE7 - buf[0xA0] - buf[0xA1] - buf[0xA2] - buf[0xA3] - buf[0xA4] - buf[0xA5] - buf[0xA6] - buf[0xA7] - buf[0xA8] - buf[0xA9] - buf[0xAA] - buf[0xAB] - buf[0xAC] - buf[0xAD] - buf[0xAE] - buf[0xAF] - buf[0xB0] - buf[0xB1] - buf[0xB2] - buf[0xB3] - buf[0xB4] - buf[0xB5] - buf[0xB6] - buf[0xB7] - buf[0xB8] - buf[0xB9] - buf[0xBA] - buf[0xBB];
-
-            int idx = (sum != 0) ? 0xBC : 0xBC;
-
-            for (; idx < 0xBD; idx++)
-            {
-                sum -= (unsigned char)m_gbaBootImage[idx];
-            }
-
-            m_gbaBootImage[idx] = (unsigned char)sum;
-
-            *(unsigned int*)(m_gbaBootImage + 200) = OSGetTick();
-
-            m_binLoaded = true;
-        }
+        return -1;
     }
 
+    File.Read(file);
+    File.SyncCompleted(file);
+
+    m_gbaBootImageSize = File.GetLength(file);
+    memcpy(m_gbaBootImage, File.m_readBuffer, m_gbaBootImageSize);
+    File.Close(file);
+
+    m_diskId = File.GetCurrentDiskID();
+    m_gbaBootImage[0xAC] = m_diskId->gameName[0];
+    m_gbaBootImage[0xAD] = m_diskId->gameName[1];
+    m_gbaBootImage[0xAE] = m_diskId->gameName[2];
+    m_gbaBootImage[0xAF] = m_diskId->gameName[3];
+
+    unsigned char* buf = (unsigned char*)m_gbaBootImage;
+    unsigned char sum = 0xE7;
+    int idx;
+    for (idx = 0xA0; idx < 0xBD; idx++)
+    {
+        sum -= buf[idx];
+    }
+    m_gbaBootImage[idx] = sum;
+
+    *(unsigned int*)(m_gbaBootImage + 200) = OSGetTick();
+    m_binLoaded = true;
     return 0;
 }
-#pragma pop
+
 
 
 /*
@@ -2573,8 +2560,12 @@ void JoyBus::_ThreadMain(void* param)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ae2cc
+ * PAL Size: 228b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void JoyBus::ThreadInit()
 {
@@ -2588,14 +2579,14 @@ void JoyBus::ThreadInit()
         m_threadParams[i].m_portIndex = i;
         m_threadParams[i].m_gbaStatus = 1;
 
-        unsigned char* stackBase = m_sendBuffer[i + 1];
+        void* stackTop = &m_threadStacks[i + 1];
 
         OSCreateThread(
             &m_threads[i],
             (void* (*)(void*))JoyBus::_ThreadMain,
             &m_threadParams[i],
-            stackBase,
-            sizeof(m_sendBuffer[0]),
+            stackTop,
+            sizeof(m_threadStacks[0]),
             8,
             1
         );
@@ -6632,151 +6623,25 @@ bool JoyBus::IsThreadRunning()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a6724
+ * PAL Size: 892b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-#pragma push
-#pragma optimize_for_size on
 void JoyBus::RestartThread()
 {
     m_threadInitFlag = 0;
     Joybus.CreateInit();
-    int err;
-
-    if (static_cast<signed char>(Joybus.m_binLoaded) != 0)
-    {
-        err = 0;
-    }
-    else
-    {
-        CFile::CHandle* file = File.Open((char*)&Joybus, 0, CFile::PRI_LOW);
-
-        if (file == 0)
-        {
-            if ((unsigned int)System.m_execParam >= 2)
-                System.Printf(const_cast<char*>(s_not_found_error_fmt), (char*)&Joybus);
-
-            err = -1;
-        }
-        else
-        {
-            File.Read(file);
-            File.SyncCompleted(file);
-
-            unsigned int binLen = File.GetLength(file);
-
-            Joybus.m_gbaBootImageSize = binLen;
-            memcpy(Joybus.m_gbaBootImage, File.m_readBuffer, binLen);
-
-            File.Close(file);
-
-            Joybus.m_diskId = (char*)File.GetCurrentDiskID();
-
-            unsigned char* img;
-            unsigned char* p;
-            int idx;
-            int sum;
-
-            Joybus.m_gbaBootImage[0xAC] = Joybus.m_diskId[0];
-            Joybus.m_gbaBootImage[0xAD] = Joybus.m_diskId[1];
-            Joybus.m_gbaBootImage[0xAE] = Joybus.m_diskId[2];
-            Joybus.m_gbaBootImage[0xAF] = Joybus.m_diskId[3];
-
-            img = (unsigned char*)Joybus.m_gbaBootImage;
-            p = img + 0xBC;
-
-            sum =
-                (
-                    ((((((((((((((((((((((((((((0xE7
-                    - img[0xA0])
-                    - img[0xA1])
-                    - img[0xA2])
-                    - img[0xA3])
-                    - img[0xA4])
-                    - img[0xA5])
-                    - img[0xA6])
-                    - img[0xA7])
-                    - img[0xA8])
-                    - img[0xA9])
-                    - img[0xAA])
-                    - img[0xAB])
-                    - img[0xAC])
-                    - img[0xAD])
-                    - img[0xAE])
-                    - img[0xAF])
-                    - img[0xB0])
-                    - img[0xB1])
-                    - img[0xB2])
-                    - img[0xB3])
-                    - img[0xB4])
-                    - img[0xB5])
-                    - img[0xB6])
-                    - img[0xB7])
-                    - img[0xB8])
-                    - img[0xB9])
-                    - img[0xBA])
-                    - img[0xBB])
-                );
-
-            idx = (sum != 0) ? 0xBC : 0xBC;
-
-            for (; idx < 0xBD; idx++)
-            {
-                sum -= *p++;
-            }
-
-            img[idx] = (unsigned char)sum;
-
-            *(unsigned int*)(Joybus.m_gbaBootImage + 200) = OSGetTick();
-
-            Joybus.m_binLoaded = 1;
-            err = 0;
-        }
-    }
-
+    int err = Joybus.LoadBin();
     if (err != 0 && (unsigned int)System.m_execParam >= 2)
-	{
-        System.Printf(const_cast<char*>(s_load_bin_error));
-	}
-
-    memset(Joybus.m_threadParams, 0, sizeof(Joybus.m_threadParams));
-
-    unsigned int i;
-    JoyBus* paramCursor = &Joybus;
-
-    Joybus.m_threadInitFlag = i = 0;
-    Joybus.m_threadRunningMask = i;
-
-    JoyBus* threadCursor = paramCursor;
-
-    do
     {
-        paramCursor->m_threadParams[0].m_portIndex = i;
-        paramCursor->m_threadParams[0].m_gbaStatus = 1;
-
-        OSCreateThread(
-            threadCursor->m_threads,
-            (void* (*)(void*))JoyBus::_ThreadMain,
-            paramCursor->m_threadParams,
-            &Joybus.m_sendBuffer[i + 1],
-            sizeof(Joybus.m_sendBuffer[0]),
-            8,
-            1
-        );
-
-        OSResumeThread(threadCursor->m_threads);
-
-        Joybus.m_threadRunningMask |= (1 << i);
-        i = i + 1;
-
-        paramCursor = (JoyBus*)((char*)paramCursor + sizeof(Joybus.m_threadParams[0]));
-        threadCursor = (JoyBus*)((char*)threadCursor + sizeof(Joybus.m_threads[0]));
-    } while ((int)i < 4);
-
-    if ((unsigned int)System.m_execParam >= 2)
-        System.Printf(const_cast<char*>(s_thread_init_end));
+        System.Printf(const_cast<char*>(s_load_bin_error));
+    }
+    Joybus.ThreadInit();
 }
-#pragma pop
+
 
 /*
  * --INFO--

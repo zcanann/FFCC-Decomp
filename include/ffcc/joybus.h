@@ -185,12 +185,12 @@ public:
     char* m_gbaBootImage;
     unsigned int m_gbaBootImageSize;
 
-    char* m_diskId;
+    DVDDiskID* m_diskId;
     unsigned char m_diskIdBytes[4];
 
     OSThread m_threads[4];
 
-    unsigned char m_sendBuffer[4][0x1000];
+    unsigned char m_threadStacks[4][0x1000];
 
     ThreadParam m_threadParams[4];
 
@@ -211,7 +211,7 @@ public:
     char m_stateFlagArr[4];
 
     uchar m_threadInitFlag;
-    bool m_binLoaded;
+    signed char m_binLoaded;
     bool m_exitThreadFlag;
     uchar m_threadRunningMask;
 

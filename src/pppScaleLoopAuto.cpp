@@ -6,8 +6,6 @@
 #include <dolphin/types.h>
 #include "ffcc/ppp_linkage.h"
 
-const float gPppScaleLoopAutoZero = 0.0f;
-
 struct pppScaleLoopAutoWork {
     float m_scale[3];
     u8 _pad0x0c[4];
@@ -32,6 +30,35 @@ static inline pppScaleLoopAutoDataOffsets* GetScaleLoopAutoDataOffsets(_pppCtrlT
 static inline pppScaleLoopAutoWork* GetScaleLoopAutoWork(_pppPObject* object, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<pppScaleLoopAutoWork*>(object->m_workArea + GetScaleLoopAutoDataOffsets(ctrl)->m_workOffset);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012b4a8
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppScaleLoopAutoCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
+{
+	float zero = 0.0f;
+
+	pppScaleLoopAutoWork* work = GetScaleLoopAutoWork(object, ctrlTable);
+
+	work->m_scale[2] = zero;
+	work->m_scale[1] = zero;
+	work->m_scale[0] = zero;
+	work->m_baseScale[2] = zero;
+	work->m_baseScale[1] = zero;
+	work->m_baseScale[0] = zero;
+	work->m_initialized = 0;
+	work->m_step = 0;
+	work->m_angle = 0;
+	work->m_countB = 0;
+	work->m_countA = 0;
+	work->m_delta = zero;
 }
 
 /*
@@ -107,34 +134,4 @@ void pppScaleLoopAuto(_pppPObject* arg1, pppScaleLoopAutoStep* arg2, _pppCtrlTab
         work->m_scale[1] = work->m_baseScale[1] + delta;
         work->m_scale[2] = work->m_baseScale[2] + delta;
     }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012b4a8
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppScaleLoopAutoCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
-{
-	const float* zeroPtr = &gPppScaleLoopAutoZero;
-	float zero = *zeroPtr;
-
-	pppScaleLoopAutoWork* work = GetScaleLoopAutoWork(object, ctrlTable);
-	
-	work->m_scale[2] = zero;
-	work->m_scale[1] = zero;
-	work->m_scale[0] = zero;
-	work->m_baseScale[2] = zero;
-	work->m_baseScale[1] = zero;
-	work->m_baseScale[0] = zero;
-	work->m_initialized = 0;
-	work->m_step = 0;
-	work->m_angle = 0;
-	work->m_countB = 0;
-	work->m_countA = 0;
-	work->m_delta = zero;
 }

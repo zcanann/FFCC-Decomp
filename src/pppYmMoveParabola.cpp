@@ -16,19 +16,8 @@ struct pppYmMoveParabolaWork {
     Vec m_basePosition;
 };
 
-extern const float gPppYmMoveParabolaYOffsetStep = 1.0f;
-extern const float gPppYmMoveParabolaZero = 0.0f;
-extern const float gPppYmMoveParabolaAngleScale = 32768.0f;
-extern const float gPppYmMoveParabolaAngleDivisor = 180.0f;
-extern const float gPppYmMoveParabolaGravityScale = 0.5f;
-
 STATIC_ASSERT(sizeof(YmMoveParabolaDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(YmMoveParabolaDataOffsets, m_workOffset) == 0x0);
-
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
 
 static inline YmMoveParabolaDataOffsets* GetYmMoveParabolaDataOffsets(_pppCtrlTable* ctrl)
 {
@@ -81,8 +70,8 @@ extern "C" void pppFrameYmMoveParabola(pppYmMoveParabola* basePtr, pppYmMovePara
     Vec newPosition;
     Vec direction;
     if ((s32)Game.m_currentSceneId == 7) {
-        f32 yOffset = gPppYmMoveParabolaYOffsetStep;
-        f32 zero = gPppYmMoveParabolaZero;
+        f32 yOffset = 1.0f;
+        f32 zero = 0.0f;
 
         direction.x = yOffset;
         direction.z = direction.y = zero;
@@ -93,10 +82,10 @@ extern "C" void pppFrameYmMoveParabola(pppYmMoveParabola* basePtr, pppYmMovePara
     Vec normalizedSource = direction;
     pppNormalize(direction, normalizedSource);
 
-    s32 sinIndex = (s32)((gPppYmMoveParabolaAngleScale * stepData->m_dataValIndex) / gPppYmMoveParabolaAngleDivisor);
+    s32 sinIndex = (s32)((32768.0f * stepData->m_dataValIndex) / 180.0f);
     f32 xzScale = frameCount * (work->m_distance * ppvSinTbl[((sinIndex + 0x4000) & 0xFFFC) >> 2]);
     newPosition.x = direction.x * xzScale;
-    f32 gravityOffset = gPppYmMoveParabolaGravityScale * stepData->m_initWOrk;
+    f32 gravityOffset = 0.5f * stepData->m_initWOrk;
     newPosition.y = (frameCount * (work->m_distance * ppvSinTbl[(sinIndex & 0xFFFC) >> 2])) -
                     (frameCount * (gravityOffset * frameCount));
     newPosition.z = direction.z * xzScale;
@@ -130,7 +119,7 @@ extern "C" void pppFrameYmMoveParabola(pppYmMoveParabola* basePtr, pppYmMovePara
  */
 extern "C" void pppConstructYmMoveParabola(pppYmMoveParabola* basePtr, _pppCtrlTable* dataPtr)
 {
-    const f32 zero = LoadFloat(gPppYmMoveParabolaZero);
+    const f32 zero = 0.0f;
     _pppMngSt* pppMngSt = ppvMng;
     pppYmMoveParabolaWork* work = ParabolaWork(basePtr, dataPtr);
 
@@ -150,6 +139,6 @@ extern "C" void pppConstructYmMoveParabola(pppYmMoveParabola* basePtr, _pppCtrlT
 
         pppAddVector(work->m_basePosition, work->m_basePosition, matrixOffset);
         pppCopyVector(pppMngSt->m_paramVec0, work->m_basePosition);
-        pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + LoadFloat(gPppYmMoveParabolaYOffsetStep);
+        pppMngSt->m_paramVec0.x += 1.0f;
     }
 }

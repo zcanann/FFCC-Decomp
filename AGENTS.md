@@ -57,6 +57,8 @@ PAL (`GCCP01`) is the only active target.
 ## Contribution Loop
 
 ### 1. Select a target
+Choose a target using objdiff, MAP evidence, and your judgment about where plausible source changes can make progress. Continue with a promising dependency cluster when appropriate. The automatic selector is optional:
+
 ```sh
 python3 tools/agent_select_target.py
 ```
@@ -182,7 +184,7 @@ Do not treat the selected symbol as a tiny sandbox. Treat it as the center of a 
 If matching the target requires fixing adjacent linkage, includes, headers, structs, globals, constructors, or helper functions, do that work. Recovering coherent original source is the goal, not narrowly editing one function while leaving the surrounding code obviously wrong.
 
 ## Minimal Workflow
-1. `python3 tools/agent_select_target.py`
+1. Choose a target from evidence and judgment; optionally use `python3 tools/agent_select_target.py`
 2. Sync `staging` (direct write access), or branch from upstream staging in a fork (outside contributor)
 3. Fix the target and any adjacent blockers
 4. `ninja`

@@ -12,7 +12,7 @@ class OSThread;
 
 void ChgHL16(unsigned short);
 void MiniGameFileRead(char*, void*, unsigned long&);
-void CalcCrc(unsigned long);
+unsigned long CalcCrc(unsigned long);
 void AdjustGbaImageRegistry(char*, char*);
 void _OpenCallback(MgGbaThreadParam*, void*);
 void getKoubutsuList(unsigned char*, int);
@@ -61,7 +61,10 @@ public:
     void SetNumPlayer();
 
 private:
-    u8 m_work[0x1340];
+    OSThread m_managerThread; // 0x8
+    OSMessageQueue m_managerQueue; // 0x320
+    OSMessage m_managerMessage; // 0x340
+    u8 m_managerStack[0x1000]; // 0x344
     char m_managerTag[4]; // 0x1344
     unsigned char m_managerState; // 0x1348
     u8 m_work1349;
@@ -73,10 +76,11 @@ private:
     unsigned char m_managerIndex; // 0x1350
     u8 m_work1351[3];
     unsigned char* m_managerImage; // 0x1354
-    unsigned int m_managerImageSize; // 0x1358
+    unsigned long m_managerImageSize; // 0x1358
     unsigned char* m_managerSpImage; // 0x135C
-    unsigned int m_managerSpImageSize; // 0x1360
-    u8 m_work1364[0x6484 - 0x1364];
+    unsigned long m_managerSpImageSize; // 0x1360
+    unsigned int m_sessionId; // 0x1364
+    u8 m_work1368[0x6484 - 0x1368];
 
 public:
     unsigned int m_flags; // 0x6484

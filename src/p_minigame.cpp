@@ -1,4 +1,5 @@
 #include "ffcc/p_minigame.h"
+#include "global.h"
 #include "ffcc/joybus.h"
 #include "ffcc/file.h"
 #include "ffcc/game.h"
@@ -23,6 +24,13 @@ void calc__12CMiniGamePcsFv(CMiniGamePcs*);
 
 inline CMiniGamePcs::CMiniGamePcs()
 {
+    STATIC_ASSERT(offsetof(CMiniGamePcs, m_managerThread) == 0x8);
+    STATIC_ASSERT(offsetof(CMiniGamePcs, m_managerQueue) == 0x320);
+    STATIC_ASSERT(offsetof(CMiniGamePcs, m_managerMessage) == 0x340);
+    STATIC_ASSERT(offsetof(CMiniGamePcs, m_managerStack) == 0x344);
+    STATIC_ASSERT(offsetof(CMiniGamePcs, m_managerTag) == 0x1344);
+    STATIC_ASSERT(offsetof(CMiniGamePcs, m_sessionId) == 0x1364);
+    STATIC_ASSERT(sizeof(CMiniGamePcs) == 0x64A0);
     static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
     static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
     static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
@@ -90,7 +98,16 @@ struct MiniGameAlarm {
     OSThread* thread;
 };
 
-static inline void MiniGameThreadSleepTicks(OSTime ticks)
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void GbaThreadSleep(long long ticks)
 {
     MiniGameAlarm alarm;
     OSCreateAlarm(&alarm.alarm);
@@ -120,32 +137,53 @@ void ChgHL16(unsigned short)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void MiniGameFileRead(char*, void*, unsigned long&)
+inline void MiniGameFileRead(char* path, void* destination, unsigned long& size)
 {
-	// TODO
+    CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
+    if (handle != 0)
+    {
+        size = File.GetLength(handle);
+        File.Read(handle);
+        File.SyncCompleted(handle);
+        void* buffer = File.m_readBuffer;
+        File.Close(handle);
+        memcpy(destination, buffer, size);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CalcCrc(unsigned long)
+inline void AdjustGbaImageRegistry(char* image, char* tag)
 {
-	// TODO
-}
+    signed char* bytes = reinterpret_cast<signed char*>(image);
+    int offset = 0xA0;
+    int checksum = 0xE7;
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void AdjustGbaImageRegistry(char*, char*)
-{
-	// TODO
+    bytes[0xAC] = tag[0];
+    bytes[0xAD] = tag[1];
+    bytes[0xAE] = tag[2];
+    bytes[0xAF] = tag[3];
+
+    while (offset < 0xBD)
+    {
+        checksum -= bytes[offset];
+        offset++;
+    }
+    bytes[offset] = checksum;
 }
 
 /*
@@ -184,16 +222,6 @@ void getKoubutsuList(unsigned char*, int)
 void GbaThreadAlarmHandler(OSAlarm* alarm, OSContext*)
 {
     OSResumeThread(reinterpret_cast<MiniGameAlarm*>(alarm)->thread);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GbaThreadSleep(long long ticks)
-{
-    MiniGameThreadSleepTicks((OSTime)ticks);
 }
 
 /*
@@ -278,6 +306,27 @@ void CMiniGamePcs::Quit()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMiniGamePcs::SetNumPlayer()
+{
+    m_playerCount = 0;
+    for (int player = 0; player < 4; player++)
+    {
+        if ((m_playerMask & (1 << player)) != 0)
+        {
+            m_playerCount++;
+        }
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8012b0d4
  * PAL Size: 172b
  * EN Address: TODO
@@ -287,24 +336,14 @@ void CMiniGamePcs::Quit()
  */
 void CMiniGamePcs::create()
 {
-    int playerBit = 0;
-
-    m_managerState = playerBit;
-    m_managerIndex = playerBit;
+    m_managerState = 0;
+    m_managerIndex = 0;
     m_managerImage = 0;
     m_managerSpImage = 0;
-    m_managerMode = playerBit;
+    m_managerMode = 0;
     m_playerMask = 0xF;
-    m_managerThreadStop = playerBit;
-    m_playerCount = playerBit;
-
-    for (; playerBit < 4; playerBit++)
-    {
-        if ((m_playerMask & (1 << playerBit)) != 0)
-        {
-            m_playerCount += 1;
-        }
-    }
+    m_managerThreadStop = 0;
+    SetNumPlayer();
 }
 
 /*
@@ -323,29 +362,27 @@ void CMiniGamePcs::destroy()
 
 /*
  * --INFO--
- * PAL Address: 0x8012aac8
- * PAL Size: 1492b
+ * PAL Address: UNUSED
+ * PAL Size: 368b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
+inline void CMiniGamePcs::EndThread()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
     if (m_managerImage != 0)
     {
         m_managerThreadStop = 1;
 
         while (m_managerThreadStop != 0)
         {
-            MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
+            GbaThreadSleep(OSMillisecondsToTicks(100));
         }
 
-        while (OSIsThreadTerminated(reinterpret_cast<OSThread*>(self + 8)) == 0)
+        while (OSIsThreadTerminated(&m_managerThread) == 0)
         {
-            MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
+            GbaThreadSleep(OSMillisecondsToTicks(100));
         }
 
         if (m_managerImage != 0)
@@ -360,6 +397,22 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
             m_managerSpImage = 0;
         }
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012aac8
+ * PAL Size: 1492b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
+{
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    EndThread();
 
     m_miniGameParams[0] = -1;
     m_miniGameParams[1] = -1;
@@ -376,80 +429,28 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     m_managerSpImage =
         new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2) unsigned char[0x40000];
 
-    *reinterpret_cast<unsigned int*>(self + 0x1364) = OSGetTick();
-    *reinterpret_cast<unsigned int*>(m_managerImage + 200) = *reinterpret_cast<unsigned int*>(self + 0x1364);
-    *reinterpret_cast<unsigned int*>(m_managerSpImage + 200) = *reinterpret_cast<unsigned int*>(self + 0x1364);
+    m_sessionId = OSGetTick();
+    *reinterpret_cast<unsigned int*>(m_managerImage + 200) = m_sessionId;
+    *reinterpret_cast<unsigned int*>(m_managerSpImage + 200) = m_sessionId;
 
     strncpy(m_managerTag, s_miniGameManagerTag, 4);
 
-    void* managerImage = m_managerImage;
-    CFile::CHandle* fileHandle = File.Open(managerFilePath, 0, CFile::PRI_LOW);
-    if (fileHandle != 0)
-    {
-        m_managerImageSize = File.GetLength(fileHandle);
-        File.Read(fileHandle);
-        File.SyncCompleted(fileHandle);
-        void* readBuffer = File.m_readBuffer;
-        File.Close(fileHandle);
-        memcpy(managerImage, readBuffer, m_managerImageSize);
-    }
-
-    int offset = 0xA0;
-    signed char* managerBase = reinterpret_cast<signed char*>(m_managerImage);
-    int checksum = 0xE7;
-
-    managerBase[0xAC] = m_managerTag[0];
-    managerBase[0xAD] = m_managerTag[1];
-    managerBase[0xAE] = m_managerTag[2];
-    managerBase[0xAF] = m_managerTag[3];
-
-    while (offset < 0xBD)
-    {
-        checksum -= managerBase[offset];
-        offset++;
-    }
-    managerBase[offset] = checksum;
-
-    void* managerSpImage = m_managerSpImage;
-    fileHandle = File.Open(managerSpFilePath, 0, CFile::PRI_LOW);
-    if (fileHandle != 0)
-    {
-        m_managerSpImageSize = File.GetLength(fileHandle);
-        File.Read(fileHandle);
-        File.SyncCompleted(fileHandle);
-        void* readBuffer = File.m_readBuffer;
-        File.Close(fileHandle);
-        memcpy(managerSpImage, readBuffer, m_managerSpImageSize);
-    }
-
-    offset = 0xA0;
-    managerBase = reinterpret_cast<signed char*>(m_managerSpImage);
-    checksum = 0xE7;
-
-    managerBase[0xAC] = m_managerTag[0];
-    managerBase[0xAD] = m_managerTag[1];
-    managerBase[0xAE] = m_managerTag[2];
-    managerBase[0xAF] = m_managerTag[3];
-
-    while (offset < 0xBD)
-    {
-        checksum -= managerBase[offset];
-        offset++;
-    }
-    managerBase[offset] = checksum;
+    MiniGameFileRead(managerFilePath, m_managerImage, m_managerImageSize);
+    AdjustGbaImageRegistry(reinterpret_cast<char*>(m_managerImage), m_managerTag);
+    MiniGameFileRead(managerSpFilePath, m_managerSpImage, m_managerSpImageSize);
+    AdjustGbaImageRegistry(reinterpret_cast<char*>(m_managerSpImage), m_managerTag);
 
     u8 gbaStatus[8];
     GBAReset(0, gbaStatus);
 
-    memset(self + 8, 0, sizeof(OSThread));
-    memset(self + 800, 0, sizeof(OSMessageQueue));
-    memset(self + 0x340, 0, sizeof(OSMessage));
-    OSInitMessageQueue(reinterpret_cast<OSMessageQueue*>(self + 800),
-                       reinterpret_cast<OSMessage*>(self + 0x340), 1);
-    OSCreateThread(reinterpret_cast<OSThread*>(self + 8),
-                   reinterpret_cast<void* (*)(void*)>(_MngThreadMain), 0, m_managerTag, 0x1000,
-                   8, 1);
-    OSResumeThread(reinterpret_cast<OSThread*>(self + 8));
+    memset(&m_managerThread, 0, sizeof(m_managerThread));
+    memset(&m_managerQueue, 0, sizeof(m_managerQueue));
+    memset(&m_managerMessage, 0, sizeof(m_managerMessage));
+    OSInitMessageQueue(&m_managerQueue, &m_managerMessage, 1);
+    OSCreateThread(&m_managerThread,
+                   reinterpret_cast<void* (*)(void*)>(_MngThreadMain), 0,
+                   m_managerStack + sizeof(m_managerStack), sizeof(m_managerStack), 8, 1);
+    OSResumeThread(&m_managerThread);
 }
 
 /*
@@ -476,7 +477,7 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
 
     gbaContext[1] = paramBytes[0xBC];
     gbaContext[3] = 1;
-    *reinterpret_cast<unsigned int*>(gbaContext + 4) = *reinterpret_cast<unsigned int*>(self + 0x1364);
+    *reinterpret_cast<unsigned int*>(gbaContext + 4) = m_sessionId;
     gbaContext[0x10] = self[0x134A];
     gbaContext[0x11] = m_playerMask;
 
@@ -762,14 +763,14 @@ receive_message:
 
     if (message == 1)
     {
-        MiniGameThreadSleepTicks(OSMillisecondsToTicks(10));
+        GbaThreadSleep(OSMillisecondsToTicks(10));
         command = 0x80000000;
         for (int i = 0; i < 100; i++)
         {
             GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
-            MiniGameThreadSleepTicks(OSMillisecondsToTicks(10));
+            GbaThreadSleep(OSMillisecondsToTicks(10));
         }
-        MiniGameThreadSleepTicks(OSMillisecondsToTicks(10));
+        GbaThreadSleep(OSMillisecondsToTicks(10));
         self[0x649D] |= (1 << channel);
         OSExitThread(0);
         return;
@@ -804,7 +805,7 @@ receive_message:
     goto retry_loop;
 
 retry_sleep:
-    MiniGameThreadSleepTicks(OSMillisecondsToTicks(1));
+    GbaThreadSleep(OSMillisecondsToTicks(1));
 
 retry_loop:
     if (param[0xBE] != 0)
@@ -1044,7 +1045,7 @@ recv_next:
             goto retry_loop;
         }
 
-        MiniGameThreadSleepTicks(OSMillisecondsToTicks(500));
+        GbaThreadSleep(OSMillisecondsToTicks(500));
         if (ret == 3)
         {
             if ((param[0xC0] & (GBA_JSTAT_SEND | GBA_JSTAT_RECV)) == (GBA_JSTAT_SEND | GBA_JSTAT_RECV))
@@ -1321,7 +1322,7 @@ ctx_done8:
             ret = GBAGetStatus(channel, param + 0xC0);
             if (!(ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_PSF0))
             {
-                MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
+                GbaThreadSleep(OSMicrosecondsToTicks(100));
                 retryLine = 0x333;
                 goto retry_loop;
             }
@@ -1344,14 +1345,14 @@ ctx_done8:
             ret = GBAGetStatus(channel, param + 0xC0);
             if ((param[0xC0] & GBA_JSTAT_FLAGS_MASK) != GBA_JSTAT_FLAGS_MASK)
             {
-                MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
+                GbaThreadSleep(OSMicrosecondsToTicks(100));
                 if (OSGetTime() - startTime > OSMillisecondsToTicks(200))
                 {
                     System.Printf(const_cast<char*>(s_miniGameFlagsRetryFmt), channel);
                     command = 0x10000000;
                     ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
                     startTime = OSGetTime();
-                    MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
+                    GbaThreadSleep(OSMicrosecondsToTicks(100));
                 }
                 retryLine = 0x352;
                 goto retry_loop;
@@ -1362,7 +1363,7 @@ ctx_done8:
                 retryLine = 0x367;
                 goto retry_loop;
             }
-            MiniGameThreadSleepTicks(OSMicrosecondsToTicks(10));
+            GbaThreadSleep(OSMicrosecondsToTicks(10));
             ret = GBARead(channel, param + 0xA0, param + 0xC0);
             if (ret != 0 || ((*reinterpret_cast<unsigned int*>(param + 0xA0) >> 24) != 0x20))
             {
@@ -1406,7 +1407,7 @@ ctx_done8:
                 startTime = OSGetTime();
                 step = 2;
             }
-            MiniGameThreadSleepTicks(OSMicrosecondsToTicks(1000));
+            GbaThreadSleep(OSMicrosecondsToTicks(1000));
             retryLine = 0x39E;
             goto retry_loop;
 
@@ -1417,7 +1418,7 @@ transfer_done:
         }
 
         ret = GBAWrite(channel, param + (step - 2) * 4 + 0xA8, param + 0xC0);
-        MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
+        GbaThreadSleep(OSMicrosecondsToTicks(100));
         if (ret == 0)
         {
             goto write_next;
@@ -1569,6 +1570,56 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 496b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMiniGamePcs::MiniGameEnd()
+{
+    if (1 <= (unsigned int)System.m_execParam)
+    {
+        System.Printf(const_cast<char*>(s_miniGameEnd0000Text));
+    }
+
+    EndThread();
+
+    m_playerMask = 0xF;
+    if (1 <= (unsigned int)System.m_execParam)
+    {
+        System.Printf(const_cast<char*>(s_miniGameEnd1111Text));
+    }
+
+    Joybus.RestartThread();
+
+    if (1 <= (unsigned int)System.m_execParam)
+    {
+        System.Printf(const_cast<char*>(s_miniGameEnd2222Text));
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMiniGamePcs::CallMiniGameParam(int code, int param1, int param2)
+{
+    CFlatRuntime::CStack stack[3];
+    stack[0].m_word = code;
+    stack[1].m_word = param1;
+    stack[2].m_word = param2;
+    gCFlatRuntime().SystemCall(0, 1, 8, 3, stack, 0);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801287f0
  * PAL Size: 1244b
  * EN Address: TODO
@@ -1613,8 +1664,6 @@ void CMiniGamePcs::calc(void)
 
     if (self[0x6496] != 0)
     {
-        CFlatRuntime::CStack raceEndStack[3];
-
         System.Printf(const_cast<char*>(s_miniGameRaceHeader));
         for (int i = 0; i < 4; i++)
         {
@@ -1622,17 +1671,12 @@ void CMiniGamePcs::calc(void)
         }
         System.Printf(const_cast<char*>(s_miniGameSeparator));
 
-        raceEndStack[0].m_word = 0x3000;
-        raceEndStack[1].m_word = 0;
-        raceEndStack[2].m_word = 0;
-        gCFlatRuntime().SystemCall(0, 1, 8, 3, raceEndStack, 0);
+        CallMiniGameParam(0x3000, 0, 0);
         self[0x6496] = 0;
     }
 
     if (self[0x6497] != 0)
     {
-        CFlatRuntime::CStack continueStack[3];
-
         m_miniGameParams[0] = -1;
         m_miniGameParams[1] = -1;
         m_miniGameParams[2] = -1;
@@ -1642,10 +1686,7 @@ void CMiniGamePcs::calc(void)
             System.Printf(const_cast<char*>(s_miniGameContinueText));
         }
 
-        continueStack[0].m_word = 0x3002;
-        continueStack[1].m_word = 0;
-        continueStack[2].m_word = 0;
-        gCFlatRuntime().SystemCall(0, 1, 8, 3, continueStack, 0);
+        CallMiniGameParam(0x3002, 0, 0);
         self[0x6497] = 0;
     }
 
@@ -1659,62 +1700,14 @@ void CMiniGamePcs::calc(void)
         System.Printf(const_cast<char*>(s_miniGameMgrEndStartText));
     }
 
-    {
-        CFlatRuntime::CStack mgrEndStack[3];
-        mgrEndStack[0].m_word = 0x3001;
-        mgrEndStack[1].m_word = 0;
-        mgrEndStack[2].m_word = 0;
-        gCFlatRuntime().SystemCall(0, 1, 8, 3, mgrEndStack, 0);
-    }
+    CallMiniGameParam(0x3001, 0, 0);
 
     if (1 <= (unsigned int)System.m_execParam)
     {
         System.Printf(const_cast<char*>(s_miniGameMgrEndEndText));
     }
 
-    if (1 <= (unsigned int)System.m_execParam)
-    {
-        System.Printf(const_cast<char*>(s_miniGameEnd0000Text));
-    }
-
-    if (*reinterpret_cast<void**>(self + 0x1354) != 0)
-    {
-        self[0x649C] = 1;
-        while (self[0x649C] != 0)
-        {
-            MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
-        }
-
-        while (OSIsThreadTerminated(reinterpret_cast<OSThread*>(self + 8)) == 0)
-        {
-            MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
-        }
-
-        if (*reinterpret_cast<void**>(self + 0x1354) != 0)
-        {
-            delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x1354));
-            *reinterpret_cast<void**>(self + 0x1354) = 0;
-        }
-
-        if (*reinterpret_cast<void**>(self + 0x135C) != 0)
-        {
-            delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x135C));
-            *reinterpret_cast<void**>(self + 0x135C) = 0;
-        }
-    }
-
-    m_playerMask = 0xF;
-    if (1 <= (unsigned int)System.m_execParam)
-    {
-        System.Printf(const_cast<char*>(s_miniGameEnd1111Text));
-    }
-
-    Joybus.RestartThread();
-
-    if (1 <= (unsigned int)System.m_execParam)
-    {
-        System.Printf(const_cast<char*>(s_miniGameEnd2222Text));
-    }
+    MiniGameEnd();
 
     if (1 <= (unsigned int)System.m_execParam)
     {
@@ -1734,7 +1727,6 @@ void CMiniGamePcs::calc(void)
     self[0x6495] = 0;
     m_managerState = 0;
 }
-
 
 /*
  * --INFO--
@@ -1805,59 +1797,40 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMiniGamePcs::EndThread()
-{
-	// TODO
-}
-
-static inline unsigned int MiniGameCrc8(unsigned int value)
+inline unsigned long CalcCrc(unsigned long value)
 {
     unsigned int crc = 0;
     unsigned int data = ((value >> 16) & 0xFF) | (value & 0xFF00);
 
-    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
+    for (int byte = 0; byte < 2; byte++)
     {
-        crc = crc * 2;
-        if ((data & mask) != 0)
+        for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
         {
-            if ((crc & 0x100) != 0)
+            crc = crc * 2;
+            if ((data & mask) != 0)
             {
-                crc ^= 0xCC;
+                if ((crc & 0x100) != 0)
+                {
+                    crc ^= 0xCC;
+                }
+                else
+                {
+                    crc += 1;
+                }
             }
-            else
+            else if ((crc & 0x100) != 0)
             {
-                crc += 1;
-            }
-        }
-        else if ((crc & 0x100) != 0)
-        {
-            crc ^= 0xCD;
-        }
-    }
-
-    data >>= 8;
-
-    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
-    {
-        crc = crc * 2;
-        if ((data & mask) != 0)
-        {
-            if ((crc & 0x100) != 0)
-            {
-                crc ^= 0xCC;
-            }
-            else
-            {
-                crc += 1;
+                crc ^= 0xCD;
             }
         }
-        else if ((crc & 0x100) != 0)
-        {
-            crc ^= 0xCD;
-        }
+        data >>= 8;
     }
 
     unsigned int i = 0;
@@ -1883,8 +1856,6 @@ static inline unsigned int MiniGameCrc8(unsigned int value)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_dead_assignments off
-#pragma opt_lifetimes off
 void CMiniGamePcs::MngThreadMain(void*)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
@@ -1932,7 +1903,7 @@ void CMiniGamePcs::MngThreadMain(void*)
 
     while (true)
     {
-        MiniGameThreadSleepTicks(OSMillisecondsToTicks(1));
+        GbaThreadSleep(OSMillisecondsToTicks(1));
 
         if (self[0x649C] != 0)
         {
@@ -1940,17 +1911,17 @@ void CMiniGamePcs::MngThreadMain(void*)
 
             for (int i = 0; i <= 3; i++)
             {
-                MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
+                GbaThreadSleep(OSMillisecondsToTicks(100));
 
                 unsigned char* threadParam = self + 0x138C + i * 200;
                 OSSendMessage(reinterpret_cast<OSMessageQueue*>(threadParam), reinterpret_cast<OSMessage>(1), 1);
             }
 
-            MiniGameThreadSleepTicks(OSMillisecondsToTicks(200));
+            GbaThreadSleep(OSMillisecondsToTicks(200));
 
             while (self[0x649D] != 0x0F)
             {
-                MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
+                GbaThreadSleep(OSMillisecondsToTicks(100));
             }
 
             do
@@ -1967,7 +1938,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                     threadState += sizeof(OSThread);
                     if (count > 3)
                     {
-                        MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
+                        GbaThreadSleep(OSMillisecondsToTicks(100));
 
                         self[0x649C] = 0;
                         OSExitThread(0);
@@ -2021,7 +1992,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                                 if (playerBase[0x144E] != 0)
                                 {
                                     unsigned int packet = *reinterpret_cast<unsigned int*>(playerBase + 0x142C);
-                                    unsigned int crc = MiniGameCrc8(packet);
+                                    unsigned int crc = CalcCrc(packet);
                                     if ((packet & 0xFF) == (crc & 0xFF))
                                     {
                                         self[0x6490 + i] = playerBase[0x144E];
@@ -2055,63 +2026,10 @@ disconnect_player:
                                     goto next_player;
                                 }
                                 self[0x6490 + i] = 1;
-                                bit = 0;
                                 *reinterpret_cast<unsigned int*>(channelBase + 0x1368) = 0x40000000;
                                 *reinterpret_cast<unsigned int*>(channelBase + 0x1368) |= 0x12000;
-                                {
-                                    unsigned int data = ((*reinterpret_cast<unsigned int*>(channelBase + 0x1368) >> 16) & 0xFF) |
-                                                        (*reinterpret_cast<unsigned int*>(channelBase + 0x1368) & 0xFF00);
-                                    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
-                                    {
-                                        bit = bit * 2;
-                                        if ((data & mask) != 0)
-                                        {
-                                            if ((bit & 0x100) != 0)
-                                            {
-                                                bit ^= 0xCC;
-                                            }
-                                            else
-                                            {
-                                                bit += 1;
-                                            }
-                                        }
-                                        else if ((bit & 0x100) != 0)
-                                        {
-                                            bit ^= 0xCD;
-                                        }
-                                    }
-                                    data >>= 8;
-                                    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
-                                    {
-                                        bit = bit * 2;
-                                        if ((data & mask) != 0)
-                                        {
-                                            if ((bit & 0x100) != 0)
-                                            {
-                                                bit ^= 0xCC;
-                                            }
-                                            else
-                                            {
-                                                bit += 1;
-                                            }
-                                        }
-                                        else if ((bit & 0x100) != 0)
-                                        {
-                                            bit ^= 0xCD;
-                                        }
-                                    }
-                                }
-                                unsigned int n = 0;
-                                do
-                                {
-                                    bit <<= 1;
-                                    if ((bit & 0x100) != 0)
-                                    {
-                                        bit ^= 0xCD;
-                                    }
-                                    n++;
-                                } while (n < 8);
-                                *reinterpret_cast<unsigned int*>(channelBase + 0x1368) |= bit & 0xFF;
+                                unsigned long crc = CalcCrc(*reinterpret_cast<unsigned int*>(channelBase + 0x1368));
+                                *reinterpret_cast<unsigned int*>(channelBase + 0x1368) |= crc & 0xFF;
                             }
                         }
                         OSSendMessage(reinterpret_cast<OSMessageQueue*>(playerBase + 0x138C), reinterpret_cast<OSMessage>(6), 1);
@@ -2140,7 +2058,7 @@ next_player:
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) = (j + 0x40) * 0x1000000;
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) =
                         *reinterpret_cast<unsigned int*>(txBase + 0x1378) | masked;
-                    crc = MiniGameCrc8(*reinterpret_cast<int*>(txBase + 0x1378));
+                    crc = CalcCrc(*reinterpret_cast<int*>(txBase + 0x1378));
                     j++;
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) =
                         *reinterpret_cast<unsigned int*>(txBase + 0x1378) | (crc & 0xFF);
@@ -2154,7 +2072,7 @@ next_player:
                     (static_cast<unsigned int>(static_cast<unsigned short>(
                          *reinterpret_cast<unsigned short*>(self + 0x134E) >> 8 |
                          *reinterpret_cast<unsigned short*>(self + 0x134E) << 8)) << 8);
-                seqCrc = MiniGameCrc8(*reinterpret_cast<int*>(self + 5000));
+                seqCrc = CalcCrc(*reinterpret_cast<int*>(self + 5000));
                 int k = 0;
                 *reinterpret_cast<unsigned int*>(self + 5000) =
                     *reinterpret_cast<unsigned int*>(self + 5000) | (seqCrc & 0xFF);
@@ -2181,36 +2099,4 @@ next_player:
 
         loopCounter += 1;
     }
-}
-
-#pragma opt_lifetimes on
-#pragma opt_dead_assignments on
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::MiniGameEnd()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::CallMiniGameParam(int, int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::SetNumPlayer()
-{
-	// TODO
 }

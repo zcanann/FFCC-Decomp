@@ -111,9 +111,6 @@ extern "C" char* PTR_s_Alle_Rassen_8021430c;
 extern "C" char* PTR_s_Todos_802145ac;
 extern "C" const char* PTR_s_Clavat_80214110[];
 extern "C" {
-extern const float kPppFilterScreenMin = 0.0f;
-extern const float kPppFilterScreenMaxX = 640.0f;
-extern const float kPppFilterScreenMaxY[2] = {448.0f, 0.0f};
 const char s_Clavat_803320D8[] = "Clavat";
 const char s_Lilty_803320E0[] = "Lilty";
 const char s_Yuke_803320E8[] = "Yuke";

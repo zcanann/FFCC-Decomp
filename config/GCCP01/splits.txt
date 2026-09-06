@@ -1693,19 +1693,19 @@ astar.cpp:
 	.ctors      start:0x801D5444 end:0x801D5448
 	.rodata     start:0x801DD6A8 end:0x801DD6F8
 	.bss        start:0x80309178 end:0x8030B62C
-	.sdata2     start:0x80332088 end:0x803320A8
+	.sdata2     start:0x80332088 end:0x803320B8
 
 pppConstrainCameraDir.cpp:
 	extab       start:0x80009BFC end:0x80009C04
 	extabindex  start:0x80010EC4 end:0x80010ED0
 	.text       start:0x80143098 end:0x801432E0
-	.sdata2     start:0x803320A8 end:0x803320B8
+	.sdata2     start:0x803320B8 end:0x803320C8
 
 pppFilter.cpp:
 	extab       start:0x80009C04 end:0x80009C0C
 	extabindex  start:0x80010ED0 end:0x80010EDC
 	.text       start:0x801432E0 end:0x801433B8
-	.sdata2     start:0x803320B8 end:0x803320C8
+	.sdata2     start:0x803320C8 end:0x803320D4
 
 monobj_table.cpp:
 	extab       start:0x80009C0C end:0x80009C14
@@ -1722,7 +1722,7 @@ singmenu.cpp:
 	.bss        start:0x8030B630 end:0x8030BA48
 	.sdata      start:0x8032EA78 end:0x8032EA80
 	.sbss       start:0x8032EEB8 end:0x8032EEC8
-	.sdata2     start:0x803320C8 end:0x80332A50
+	.sdata2     start:0x803320D8 end:0x80332A50
 
 menu_cmd.cpp:
 	extab       start:0x80009D04 end:0x80009D94

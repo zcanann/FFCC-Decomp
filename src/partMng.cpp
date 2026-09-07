@@ -1063,7 +1063,7 @@ void CPartMng::setProcSpeed(ProcSpdSt*, int)
  */
 void CPartMng::drawEnd()
 {
-    gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(ppvEnv->m_stagePtr);
+    gPppHeapUseRateWords[0] = pppHeapUseRate(ppvEnv->m_stagePtr);
     int heapCheckCount = gPppHeapUseRateWords[2];
     gPppHeapUseRateWords[2] = heapCheckCount - 1;
     if ((heapCheckCount == 0) || (gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1])) {
@@ -3133,7 +3133,7 @@ void CPartMng::pppPartDrawAfter()
         }
     }
 
-    gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(ppvEnv->m_stagePtr);
+    gPppHeapUseRateWords[0] = pppHeapUseRate(ppvEnv->m_stagePtr);
     {
         int prevInterval = gPppHeapUseRateWords[2];
         gPppHeapUseRateWords[2] = prevInterval - 1;

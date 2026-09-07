@@ -274,7 +274,7 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
     void* heap = work->m_particles;
 
     if (heap != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(heap));
+        pppMemFree(heap);
     }
 }
 

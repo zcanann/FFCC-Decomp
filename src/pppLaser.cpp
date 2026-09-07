@@ -163,7 +163,7 @@ void pppDestructLaser(pppLaser *pppLaser, _pppCtrlTable *param_2)
     LaserWork* work = GetLaserWork(pppLaser, param_2);
     void* alloc = work->m_points;
     if (alloc != 0) {
-        pppHeapUseRate(static_cast<CMemory::CStage*>(alloc));
+        pppMemFree(alloc);
         work->m_points = 0;
     }
 }

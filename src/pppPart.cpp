@@ -457,13 +457,13 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 {
 	int firstAllocFailure = 1;
 	int canRetry;
-	_pppPObjLink* allocation;
+	void* allocation;
 	char denied[0x180];
 
 	ppvMemAllocErrorF = 0;
 	do
 	{
-		allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
+		allocation = Memory._Alloc(allocSize, stage, file, line, 1);
 		if (allocation != 0)
 		{
 			goto allocDone;
@@ -498,20 +498,20 @@ allocDone:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage, char* file, int line)
+void* pppMemAllocNoReport(unsigned long allocSize, CMemory::CStage* stage, char* file, int line)
 {
 	int firstAllocFailure = 1;
 	int canRetry;
-	_pppPObjLink* allocation;
+	void* allocation;
 	char denied[0x180];
 
 	ppvMemAllocErrorF = 0;
 	do
 	{
-		allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
+		allocation = Memory._Alloc(allocSize, stage, file, line, 1);
 		if (allocation != 0)
 		{
-			goto freeDone;
+			goto allocDone;
 		}
 
 		if (firstAllocFailure)
@@ -529,20 +529,24 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 
 	ppvMemAllocErrorF = 1;
 	return 0;
-freeDone:
+allocDone:
 	return allocation;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80056CEC
+ * PAL Size: 52b
+ * EN Address: 0x80062A54
+ * EN Size: 64b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppHeapUseRate(CMemory::CStage* stage)
-{ 
-	if (stage != (CMemory::CStage*)0)
+void pppMemFree(void* allocation)
+{
+	if (allocation != 0)
 	{
-		Memory.Free(stage);
+		Memory.Free(allocation);
 	}
 }
 
@@ -550,8 +554,8 @@ void pppHeapUseRate(CMemory::CStage* stage)
  * --INFO--
  * PAL Address: 80056c74
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80062AEC
+ * EN Size: 52b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -564,12 +568,12 @@ void pppHeapCheckLeak(CMemory::CStage* stage)
  * --INFO--
  * PAL Address: 80056ca0
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80062A94
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage* stage)
+unsigned long pppHeapUseRate(CMemory::CStage* stage)
 {
 	unsigned long heapTotal;
 	unsigned long heapUseRate;

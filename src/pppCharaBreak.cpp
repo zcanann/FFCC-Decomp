@@ -226,7 +226,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
         work->m_miscValue = kPppCharaBreakInitialMiscValue;
         work->m_meshBuffers =
             static_cast<CharaBreakDisplayListPair***>(
-                pppMemFree__FPv(ModelData(model)->m_meshCount << 2,
+                pppMemAllocNoReport(ModelData(model)->m_meshCount << 2,
                                 ppvEnv->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp), 0x3D0));
         if (work->m_meshBuffers == NULL) {
             goto fail;
@@ -247,7 +247,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                 }
             }
 
-            work->m_meshBuffers[i] = static_cast<CharaBreakDisplayListPair**>(pppMemFree__FPv(
+            work->m_meshBuffers[i] = static_cast<CharaBreakDisplayListPair**>(pppMemAllocNoReport(
                 MeshData(mesh)->m_displayListCount << 2, ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppCharaBreak_cpp), 0x3E9));
             CharaBreakDisplayListPair** meshBuffer = work->m_meshBuffers[i];
@@ -270,7 +270,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                 CharaBreakDisplayListPair** dlEntries =
                     meshBuffer + dl;
                 for (; dl >= 0; dl--, displayList++) {
-                    *dlEntries = (CharaBreakDisplayListPair*)pppMemFree__FPv(
+                    *dlEntries = (CharaBreakDisplayListPair*)pppMemAllocNoReport(
                         0x10, ppvEnv->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp), 0x3FC);
                     if (*dlEntries == NULL) {
                         goto fail;
@@ -280,7 +280,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                     (*dlEntries)->m_displayListSize = 0;
                     (*dlEntries)->m_polygonData = 0;
                     (*dlEntries)->m_displayListSize = displayList->m_size;
-                    (*dlEntries)->m_rewrittenDisplayList = pppMemFree__FPv(
+                    (*dlEntries)->m_rewrittenDisplayList = pppMemAllocNoReport(
                         displayList->m_size, ppvEnv->m_stagePtr,
                         const_cast<char*>(s_pppCharaBreak_cpp), 0x40B);
                     if ((*dlEntries)->m_rewrittenDisplayList == NULL) {
@@ -291,7 +291,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                     gUtil.ReWriteDisplayList((*dlEntries)->m_rewrittenDisplayList, displayList->m_size, 1);
 
                     u32 polygonCount = gUtil.GetNumPolygonFromDL((*dlEntries)->m_rewrittenDisplayList, displayList->m_size);
-                    (*dlEntries)->m_polygonData = (POLYGON_DATA*)pppMemFree__FPv(
+                    (*dlEntries)->m_polygonData = (POLYGON_DATA*)pppMemAllocNoReport(
                         polygonCount * 0x34, ppvEnv->m_stagePtr,
                         const_cast<char*>(s_pppCharaBreak_cpp), 0x423);
                     if ((*dlEntries)->m_polygonData == NULL) {
@@ -357,16 +357,16 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
                 for (u32 dlIndex = 0; dlIndex < meshData->m_displayListCount; dlIndex++) {
                     if (*dlEntries != NULL) {
                         if ((*dlEntries)->m_rewrittenDisplayList != NULL) {
-                            pppHeapUseRate((CMemory::CStage*)(*dlEntries)->m_rewrittenDisplayList);
+                            pppMemFree((*dlEntries)->m_rewrittenDisplayList);
                             (*dlEntries)->m_rewrittenDisplayList = 0;
                         }
                         if ((*dlEntries)->m_polygonData != NULL) {
-                            pppHeapUseRate((CMemory::CStage*)(*dlEntries)->m_polygonData);
+                            pppMemFree((*dlEntries)->m_polygonData);
                             (*dlEntries)->m_polygonData = 0;
                         }
                     }
                     if (*dlEntries != NULL) {
-                        pppHeapUseRate((CMemory::CStage*)*dlEntries);
+                        pppMemFree(*dlEntries);
                         *dlEntries = 0;
                     }
                     dlEntries++;
@@ -374,7 +374,7 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
             }
 
             if (*meshBufferSlot != NULL) {
-                pppHeapUseRate((CMemory::CStage*)*meshBufferSlot);
+                pppMemFree(*meshBufferSlot);
                 *meshBufferSlot = 0;
             }
             meshBufferSlot++;
@@ -383,7 +383,7 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
     }
 
     if (perMeshBuffers != NULL) {
-        pppHeapUseRate((CMemory::CStage*)perMeshBuffers);
+        pppMemFree(perMeshBuffers);
     }
 }
 

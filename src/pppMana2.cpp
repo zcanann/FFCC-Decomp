@@ -1358,79 +1358,79 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
     MaterialMan.ClearManaParaboloidTexObjs();
 
     if (work->m_generatedTexObj0 != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_generatedTexObj0);
+        pppMemFree(work->m_generatedTexObj0);
         work->m_generatedTexObj0 = 0;
     }
     if (work->m_generatedTexObj1 != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_generatedTexObj1);
+        pppMemFree(work->m_generatedTexObj1);
         work->m_generatedTexObj1 = 0;
     }
     if (work->m_generatedTexture0 != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_generatedTexture0);
+        pppMemFree(work->m_generatedTexture0);
         work->m_generatedTexture0 = 0;
     }
     if (work->m_generatedTexture1 != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_generatedTexture1);
+        pppMemFree(work->m_generatedTexture1);
         work->m_generatedTexture1 = 0;
     }
     if (work->m_baseParaboloidTexObjs != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_baseParaboloidTexObjs);
+        pppMemFree(work->m_baseParaboloidTexObjs);
         work->m_baseParaboloidTexObjs = 0;
     }
     if (work->m_positions != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_positions);
+        pppMemFree(work->m_positions);
         work->m_positions = 0;
     }
     if (work->m_normals != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_normals);
+        pppMemFree(work->m_normals);
         work->m_normals = 0;
     }
     if (work->m_waterHeightA != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_waterHeightA);
+        pppMemFree(work->m_waterHeightA);
         work->m_waterHeightA = 0;
     }
     if (work->m_waterHeightB != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_waterHeightB);
+        pppMemFree(work->m_waterHeightB);
         work->m_waterHeightB = 0;
     }
     if (work->m_indices != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_indices);
+        pppMemFree(work->m_indices);
         work->m_indices = 0;
     }
     if (work->m_texCoord0 != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_texCoord0);
+        pppMemFree(work->m_texCoord0);
         work->m_texCoord0 = 0;
     }
     if (work->m_texCoord1 != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_texCoord1);
+        pppMemFree(work->m_texCoord1);
         work->m_texCoord1 = 0;
     }
     if (work->m_sourceTexObjs != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_sourceTexObjs);
+        pppMemFree(work->m_sourceTexObjs);
         work->m_sourceTexObjs = 0;
     }
     if (work->m_paraboloidMap != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_paraboloidMap);
+        pppMemFree(work->m_paraboloidMap);
         work->m_paraboloidMap = 0;
     }
     if (work->m_colors != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_colors);
+        pppMemFree(work->m_colors);
         work->m_colors = 0;
     }
     if (work->m_reflectionVec != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_reflectionVec);
+        pppMemFree(work->m_reflectionVec);
         work->m_reflectionVec = 0;
     }
     if (work->m_meshReflectionVec != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_meshReflectionVec);
+        pppMemFree(work->m_meshReflectionVec);
         work->m_meshReflectionVec = 0;
     }
     if (work->m_meshColors != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_meshColors);
+        pppMemFree(work->m_meshColors);
         work->m_meshColors = 0;
     }
     if (work->m_meshTexCoords != NULL) {
-        pppHeapUseRate((CMemory::CStage*)work->m_meshTexCoords);
+        pppMemFree(work->m_meshTexCoords);
         work->m_meshTexCoords = 0;
     }
     gObject = (CGObject*)ppvMng->m_lookTarget;
@@ -1448,12 +1448,12 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
             if (strcmp(meshData->m_name, s_manaShapeObj5) == 0) {
                 for (j = 0; j < meshData->m_displayListCount; j++) {
                     if (work->m_displayListCopies != NULL && work->m_displayListCopies[j] != NULL) {
-                        pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies[j]);
+                        pppMemFree(work->m_displayListCopies[j]);
                         work->m_displayListCopies[j] = 0;
                     }
                 }
                 if (work->m_displayListCopies != NULL) {
-                    pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies);
+                    pppMemFree(work->m_displayListCopies);
                     work->m_displayListCopies = 0;
                 }
             }
@@ -1461,24 +1461,24 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
             if (strcmp(meshData->m_name, s_manaShapeObj3) == 0) {
                 for (j = 0; j < meshData->m_displayListCount; j++) {
                     if (work->m_displayListCopies != NULL && work->m_displayListCopies[j] != NULL) {
-                        pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies[j]);
+                        pppMemFree(work->m_displayListCopies[j]);
                         work->m_displayListCopies[j] = 0;
                     }
                 }
                 if (work->m_displayListCopies != NULL) {
-                    pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies);
+                    pppMemFree(work->m_displayListCopies);
                     work->m_displayListCopies = 0;
                 }
             }
         } else if (stepType == 3 && strcmp(meshData->m_name, s_manaShapeObj1) == 0) {
             for (j = 0; j < meshData->m_displayListCount; j++) {
                 if (work->m_displayListCopies != NULL && work->m_displayListCopies[j] != NULL) {
-                    pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies[j]);
+                    pppMemFree(work->m_displayListCopies[j]);
                     work->m_displayListCopies[j] = 0;
                 }
             }
             if (work->m_displayListCopies != NULL) {
-                pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies);
+                pppMemFree(work->m_displayListCopies);
                 work->m_displayListCopies = 0;
             }
         }

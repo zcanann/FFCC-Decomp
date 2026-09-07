@@ -900,15 +900,15 @@ void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTabl
     void** ptrC4 = (void**)(work + 0x44);
 
     if (*ptrBc != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrBc));
+        pppMemFree(*ptrBc);
         *ptrBc = 0;
     }
     if (*ptrC0 != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrC0));
+        pppMemFree(*ptrC0);
         *ptrC0 = 0;
     }
     if (*ptrC4 != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrC4));
+        pppMemFree(*ptrC4);
         *ptrC4 = 0;
     }
 }

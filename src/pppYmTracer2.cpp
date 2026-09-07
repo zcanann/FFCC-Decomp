@@ -340,7 +340,7 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 {
     YmTracer2Work* work = (YmTracer2Work*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_2)->m_workOffset);
     if (work->entries != 0) {
-        pppHeapUseRate((CMemory::CStage*)work->entries);
+        pppMemFree(work->entries);
     }
 }
 

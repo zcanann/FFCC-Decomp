@@ -223,7 +223,7 @@ void pppDestructColum(pppColum *column, _pppCtrlTable *param_2)
     pppColumFrameWork* work = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
 
     if (work->m_values != 0) {
-        pppHeapUseRate((CMemory::CStage*)work->m_values);
+        pppMemFree(work->m_values);
         work->m_values = 0;
     }
 }

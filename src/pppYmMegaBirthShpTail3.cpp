@@ -980,15 +980,15 @@ void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTai
     VYmMegaBirthShpTail3* work = reinterpret_cast<VYmMegaBirthShpTail3*>(pppYmMegaBirthShpTail3_->m_workArea + offset);
 
     if (work->m_particles != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particles));
+        pppMemFree(work->m_particles);
         work->m_particles = 0;
     }
     if (work->m_wmats != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_wmats));
+        pppMemFree(work->m_wmats);
         work->m_wmats = 0;
     }
     if (work->m_colors != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_colors));
+        pppMemFree(work->m_colors);
         work->m_colors = 0;
     }
 }

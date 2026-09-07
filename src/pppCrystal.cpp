@@ -361,17 +361,17 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlTa
 void pppDestructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* param_2)
 {
 	CrystalWork* work = GetCrystalWork(pppCrystal, param_2);
-	CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(work->m_refractionMap);
+	HSD_ImageBuffer* textureInfo = work->m_refractionMap;
 
-	if ((stage != 0) && (*(CMemory::CStage**)stage != 0)) {
-		pppHeapUseRate(*(CMemory::CStage**)stage);
-		*(u32*)stage = 0;
+	if ((textureInfo != 0) && (textureInfo->m_imageData != 0)) {
+		pppMemFree(textureInfo->m_imageData);
+		textureInfo->m_imageData = 0;
 	}
-	if (stage != 0) {
-		pppHeapUseRate(stage);
+	if (textureInfo != 0) {
+		pppMemFree(textureInfo);
 	}
 	if (work->m_refractionTexObj != 0) {
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_refractionTexObj));
+		pppMemFree(work->m_refractionTexObj);
 		work->m_refractionTexObj = 0;
 	}
 }

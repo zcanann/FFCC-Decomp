@@ -294,7 +294,7 @@ void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTit
     LocationTitleWork* work = GetLocationTitleWork(pppLocationTitle, param_2);
 
     if (work->m_particles != NULL) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particles));
+        pppMemFree(work->m_particles);
         work->m_particles = 0;
     }
 }

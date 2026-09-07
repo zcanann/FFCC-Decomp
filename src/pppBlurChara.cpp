@@ -303,12 +303,12 @@ void pppDestructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* data)
     model->m_callbackParam = 0;
 
     if ((CMemory::CStage*)work->m_captureBuffer != 0) {
-        pppHeapUseRate((CMemory::CStage*)work->m_captureBuffer);
+        pppMemFree(work->m_captureBuffer);
         work->m_captureBuffer = 0;
     }
 
     if ((CMemory::CStage*)work->m_smallTexObj != 0) {
-        pppHeapUseRate((CMemory::CStage*)work->m_smallTexObj);
+        pppMemFree(work->m_smallTexObj);
         work->m_smallTexObj = 0;
     }
 

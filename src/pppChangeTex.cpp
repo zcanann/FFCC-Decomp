@@ -282,22 +282,22 @@ freeArrays:
 		ChangeTexDisplayListCopy** dlEntries = *stageArray;
 		for (unsigned int j = 0; j < meshData->m_displayListCount; j++) {
 			if ((*dlEntries)->m_data != 0) {
-				pppHeapUseRate(reinterpret_cast<CMemory::CStage*>((*dlEntries)->m_data));
+				pppMemFree((*dlEntries)->m_data);
 				(*dlEntries)->m_data = 0;
 			}
 			if (*dlEntries != 0) {
-				pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*dlEntries));
+				pppMemFree(*dlEntries);
 				*dlEntries = 0;
 			}
 			dlEntries++;
 		}
 
 		if (*stageArray != 0) {
-			pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*stageArray));
+			pppMemFree(*stageArray);
 			*stageArray = 0;
 		}
 		if (*meshArray != 0) {
-			pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*meshArray));
+			pppMemFree(*meshArray);
 			*meshArray = 0;
 		}
 
@@ -306,10 +306,10 @@ freeArrays:
 	}
 
 	if (stageArrayOrig != 0) {
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(stageArrayOrig));
+		pppMemFree(stageArrayOrig);
 	}
 	if (meshArrayOrig != 0) {
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(meshArrayOrig));
+		pppMemFree(meshArrayOrig);
 	}
 }
 

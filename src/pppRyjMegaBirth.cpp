@@ -120,19 +120,19 @@ void pppRyjMegaBirthDes(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 
 	if (work->m_particleBlock != 0)
 	{
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particleBlock));
+		pppMemFree(work->m_particleBlock);
 		work->m_particleBlock = 0;
 	}
 
 	if (work->m_worldMatrixBlock != 0)
 	{
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_worldMatrixBlock));
+		pppMemFree(work->m_worldMatrixBlock);
 		work->m_worldMatrixBlock = 0;
 	}
 
 	if (work->m_colorBlock != 0)
 	{
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_colorBlock));
+		pppMemFree(work->m_colorBlock);
 		work->m_colorBlock = 0;
 	}
 }

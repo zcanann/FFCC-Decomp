@@ -191,17 +191,17 @@ extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataOf
         reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + GetYmBreathDataOffsets(dataOffsets)->m_workOffset);
 
     if (state->m_particleData != NULL) {
-        pppHeapUseRate((CMemory::CStage*)state->m_particleData);
+        pppMemFree(state->m_particleData);
         state->m_particleData = 0;
     }
 
     if (state->m_particleWmats != NULL) {
-        pppHeapUseRate((CMemory::CStage*)state->m_particleWmats);
+        pppMemFree(state->m_particleWmats);
         state->m_particleWmats = 0;
     }
 
     if (state->m_particleColors != NULL) {
-        pppHeapUseRate((CMemory::CStage*)state->m_particleColors);
+        pppMemFree(state->m_particleColors);
         state->m_particleColors = 0;
     }
 
@@ -211,19 +211,19 @@ extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataOf
 
         for (i = 0; i < state->m_groupCount; i++) {
             if (group->particleIndices != NULL) {
-                pppHeapUseRate((CMemory::CStage*)group->particleIndices);
+                pppMemFree(group->particleIndices);
                 group->particleIndices = 0;
             }
 
             if (group->particleStates != NULL) {
-                pppHeapUseRate((CMemory::CStage*)group->particleStates);
+                pppMemFree(group->particleStates);
                 group->particleStates = 0;
             }
 
             group++;
         }
 
-        pppHeapUseRate((CMemory::CStage*)state->m_groups);
+        pppMemFree(state->m_groups);
         state->m_groups = 0;
     }
 }

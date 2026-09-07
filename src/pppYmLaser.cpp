@@ -489,7 +489,7 @@ extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 	void* stage = work->m_points;
 
 	if (stage != 0) {
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(stage));
+		pppMemFree(stage);
 		work->m_points = 0;
 	}
 }

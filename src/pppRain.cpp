@@ -293,7 +293,7 @@ void pppDestructRain(pppRain* pppRain, _pppCtrlTable* param_2)
 
     work = GetRainWork(pppRain, param_2);
     if (work->drops != 0) {
-        pppHeapUseRate((CMemory::CStage*)work->drops);
+        pppMemFree(work->drops);
         work->drops = 0;
     }
 }

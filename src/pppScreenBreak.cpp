@@ -252,11 +252,11 @@ void pppDesScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* param_2)
         model->SetBeforeCalcMatrixCallback(0);
     }
     if (pppData->m_pieces != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(pppData->m_pieces));
+        pppMemFree(pppData->m_pieces);
         pppData->m_pieces = 0;
     }
     if (pppData->m_backBufferTexObj != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(pppData->m_backBufferTexObj));
+        pppMemFree(pppData->m_backBufferTexObj);
         pppData->m_backBufferTexObj = 0;
     }
 }

@@ -348,7 +348,7 @@ void pppDestructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
 {
     YmTracerWork* work = GetYmTracerWork(pppYmTracer, param_2);
     if (work->entries != 0) {
-        pppHeapUseRate((CMemory::CStage*)work->entries);
+        pppMemFree(work->entries);
     }
 }
 

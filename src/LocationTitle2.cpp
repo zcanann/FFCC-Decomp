@@ -369,7 +369,7 @@ extern "C" void pppDestructLocationTitle2(pppLocationTitle2* locationTitle, pppL
     LocationTitle2Work* work = GetLocationTitle2Work(locationTitle, unkC);
 
     if (work->m_particles != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particles));
+        pppMemFree(work->m_particles);
         work->m_particles = 0;
     }
 }

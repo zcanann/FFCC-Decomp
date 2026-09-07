@@ -350,7 +350,7 @@ void pppDestructYmMelt(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
     YmMeltWork* work = GetYmMeltWork(ymMelt, offsets);
 
     if (work->m_vertexData != nullptr) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_vertexData));
+        pppMemFree(work->m_vertexData);
     }
 }
 

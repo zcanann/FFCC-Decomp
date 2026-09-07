@@ -252,9 +252,9 @@ void pppDestructEmission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
     ClearEmissionModelCallbacks(model);
 
     Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp), 0x118);
-    CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(state->m_particles);
-    if (stage != (CMemory::CStage*)0) {
-        pppHeapUseRate(stage);
+    EmissionParticle* particles = state->m_particles;
+    if (particles != 0) {
+        pppMemFree(particles);
         state->m_particles = 0;
     }
 

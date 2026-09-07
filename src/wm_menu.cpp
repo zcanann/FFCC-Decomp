@@ -3757,21 +3757,7 @@ void CMenuPcs::DrawMCardMenu()
 		}
 		const double* pStride = &DOUBLE_80331498;
 		cursorX = (float)(*pStride * (double)(int)saveIdx + (double)cursorXbase);
-		MenuPcs.SetAttrFmt((FMT)0);
-		_GXColor cursorColor;
-		cursorColor.r = 0xFF;
-		cursorColor.g = 0xFF;
-		cursorColor.b = 0xFF;
-		cursorColor.a = 0xFF;
-		GXSetChanMatColor(GX_COLOR0A0, cursorColor);
-		MenuPcs.SetTexture((TEX)0);
-		const float* pSz = &FLOAT_80331410;
-		const float* pZc = &FLOAT_803313dc;
-		const float* pOc = &FLOAT_803313e8;
-		MenuPcs.DrawRect(0, (float)(int)cursorY, (float)(int)cursorX,
-		         *pSz, *pSz,
-		         *pZc, *pZc,
-		         *pOc, *pOc, *pZc);
+		DrawCursor((int)cursorY, (int)cursorX, 1.0f);
 
 		// 3D character viewports (4 slots)
 		int* piVar12 = reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_worldObjData) + 0x550);
@@ -3812,19 +3798,7 @@ void CMenuPcs::DrawMCardMenu()
 				DrawMcWinMess(0, 0);
 				float rectY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
 				float rectX = (float)GetSlotABXPos((int)m_wmWorldState->m_cardChannel);
-				MenuPcs.SetAttrFmt((FMT)0);
-				_GXColor curColor;
-				curColor.r = 0xFF;
-				curColor.g = 0xFF;
-				curColor.b = 0xFF;
-				curColor.a = 0xFF;
-				GXSetChanMatColor(GX_COLOR0A0, curColor);
-				MenuPcs.SetTexture((TEX)0);
-				MenuPcs.DrawRect(0, (float)(int)rectX,
-				         (float)(int)rectY,
-				         FLOAT_80331410, FLOAT_80331410,
-				         FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				DrawCursor((int)rectX, (int)rectY, 1.0f);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
 				if (m_wmWorldState->m_state0E < 0) {
@@ -3942,19 +3916,7 @@ void CMenuPcs::DrawMCardMenu()
 				float rectY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
 				float rectX = (float)GetYesNoXPos((int)m_wmWorldState->m_cardChannel);
 				if (m_wmWorldState->m_subState != 0x19) {
-					MenuPcs.SetAttrFmt((FMT)0);
-					_GXColor ynColor;
-					ynColor.r = 0xFF;
-					ynColor.g = 0xFF;
-					ynColor.b = 0xFF;
-					ynColor.a = 0xFF;
-					GXSetChanMatColor(GX_COLOR0A0, ynColor);
-					MenuPcs.SetTexture((TEX)0);
-					MenuPcs.DrawRect(0, (float)(int)rectX,
-					         (float)(int)rectY,
-					         FLOAT_80331410, FLOAT_80331410,
-					         FLOAT_803313dc, FLOAT_803313dc,
-					         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+					DrawCursor((int)rectX, (int)rectY, 1.0f);
 				} else {
 					short ss2 = m_wmWorldState->m_mcResult;
 					if (ss2 < 0) {
@@ -4524,18 +4486,7 @@ void CMenuPcs::DrawLoadMenu()
 		reinterpret_cast<int*>(&rawIdx)[0] = 0x43300000;
 		reinterpret_cast<int*>(&rawIdx)[1] = saveIdx ^ 0x80000000;
 		cursorXbase = static_cast<float>(DOUBLE_80331498 * (rawIdx - DOUBLE_80331408) + static_cast<double>(cursorXbase));
-		MenuPcs.SetAttrFmt((FMT)0);
-		_GXColor cursorColor;
-		cursorColor.r = 0xFF;
-		cursorColor.g = 0xFF;
-		cursorColor.b = 0xFF;
-		cursorColor.a = 0xFF;
-		GXSetChanMatColor(GX_COLOR0A0, cursorColor);
-		MenuPcs.SetTexture((TEX)0);
-		MenuPcs.DrawRect(0, (float)(int)cursorY0, (float)(int)cursorXbase,
-		         FLOAT_80331410, FLOAT_80331410,
-		         FLOAT_803313dc, FLOAT_803313dc,
-		         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+		DrawCursor((int)cursorY0, (int)cursorXbase, 1.0f);
 
 		// 3D character model viewports
 		int* piVar13 = reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_worldObjData) + 0x550);
@@ -4575,18 +4526,7 @@ void CMenuPcs::DrawLoadMenu()
 				DrawMcWinMess(0, 0);
 				float slotY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
 				float slotX = (float)GetSlotABXPos(m_wmWorldState->m_cardChannel);
-				MenuPcs.SetAttrFmt((FMT)0);
-				_GXColor slotColor;
-				slotColor.r = 0xFF;
-				slotColor.g = 0xFF;
-				slotColor.b = 0xFF;
-				slotColor.a = 0xFF;
-				GXSetChanMatColor(GX_COLOR0A0, slotColor);
-				MenuPcs.SetTexture((TEX)0);
-				MenuPcs.DrawRect(0, (float)(int)slotX, (float)(int)slotY,
-				         FLOAT_80331410, FLOAT_80331410,
-				         FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				DrawCursor((int)slotX, (int)slotY, 1.0f);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
 				if (m_wmWorldState->m_state0E < 0) {
@@ -4713,18 +4653,7 @@ void CMenuPcs::DrawLoadMenu()
 				float ynY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
 				float ynX = (float)GetYesNoXPos(m_wmWorldState->m_cardChannel);
 				if (m_wmWorldState->m_subState != 0x19) {
-					MenuPcs.SetAttrFmt((FMT)0);
-					_GXColor ynColor;
-					ynColor.r = 0xFF;
-					ynColor.g = 0xFF;
-					ynColor.b = 0xFF;
-					ynColor.a = 0xFF;
-					GXSetChanMatColor(GX_COLOR0A0, ynColor);
-					MenuPcs.SetTexture((TEX)0);
-					MenuPcs.DrawRect(0, (float)(int)ynX, (float)(int)ynY,
-					         FLOAT_80331410, FLOAT_80331410,
-					         FLOAT_803313dc, FLOAT_803313dc,
-					         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+					DrawCursor((int)ynX, (int)ynY, 1.0f);
 				} else {
 					short ynResult0 = m_wmWorldState->m_mcResult;
 					if (ynResult0 < 0) {

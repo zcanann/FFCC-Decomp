@@ -24,9 +24,28 @@ class CFunnyShapePcs : public CProcess
 public:
     static CProcessCallbackTable m_table;
 
-    CFunnyShapePcs();
-    ~CFunnyShapePcs();
-	
+    /*
+     * --INFO--
+     * PAL Address: TODO
+     * PAL Size: TODO
+     * EN Address: 0x8005BF64
+     * EN Size: 96b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    CFunnyShapePcs() {}
+
+    /*
+     * --INFO--
+     * PAL Address: 0x8004E964
+     * PAL Size: 136b
+     * EN Address: 0x8005BEDC
+     * EN Size: 136b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    ~CFunnyShapePcs() {}
+
     void Init();
     void Quit();
     int GetTable(unsigned long);

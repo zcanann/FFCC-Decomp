@@ -211,11 +211,6 @@ inline void CGPartyObj::changeWeapon(int weaponIndex, int itemId, int forceImmed
 	}
 }
 
-static inline int& CharaGhostValue(int offset)
-{
-	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + offset);
-}
-
 static inline int& PartyTraceParticleSlot(int port)
 {
 	int* base = &CFlat.m_partyTraceParticleSlot[0];
@@ -229,9 +224,9 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 		CGPartyObj::m_ghostWork.counters[1]++;
 		CGPartyObj::m_ghostWork.counters[2]++;
 		System.Printf(const_cast<char*>(sBossGhostPartyCountersFmt),
-		    CGPartyObj::m_ghostWork.counters[0], CharaGhostValue(0x2048),
-		    CGPartyObj::m_ghostWork.counters[1], CharaGhostValue(0x204C),
-		    CGPartyObj::m_ghostWork.counters[2], CharaGhostValue(0x2050));
+		    CGPartyObj::m_ghostWork.counters[0], Chara.MogFur().m_radarLevel[0],
+		    CGPartyObj::m_ghostWork.counters[1], Chara.MogFur().m_radarLevel[1],
+		    CGPartyObj::m_ghostWork.counters[2], Chara.MogFur().m_radarLevel[2]);
 	}
 }
 
@@ -4112,8 +4107,7 @@ void CGPartyObj::InitFinished()
 		*reinterpret_cast<float*>(self + 0x134) = FLOAT_80331AB0;
 		*reinterpret_cast<float*>(self + 0x13C) = FLOAT_80331A98;
 		m_turnFactor = FLOAT_80331AB4;
-		unsigned int leadingZeros = __cntlzw(*reinterpret_cast<unsigned int*>(self + 0x6F0));
-		CGPartyObj::m_ghostWork.flagBits.flag80 = static_cast<signed char>(leadingZeros >> 5);
+		CGPartyObj::m_ghostWork.flagBits.flag80 = PartyData(this).carryObject == 0;
 	}
 }
 
@@ -4733,8 +4727,8 @@ void CGPartyObj::gpmCol()
  * --INFO--
  * PAL Address: 0x8011b268
  * PAL Size: 1320b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80142FDC
+ * EN Size: 1196b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -4768,7 +4762,7 @@ void CGPartyObj::ghostPartyMog()
 		break;
 	}
 
-	float ramp = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
+	float ramp = static_cast<float>(Chara.MogFur().m_alphaScore) / kMonObjPercentMax;
 	float scale;
 	switch (stageMode) {
 	default:
@@ -4783,15 +4777,14 @@ void CGPartyObj::ghostPartyMog()
 	}
 	unsigned int distFar = static_cast<unsigned int>(static_cast<int>(FLOAT_80331A5C * scale));
 
-	unsigned char* flags = &CGPartyObj::m_ghostWork.flags;
 
 	if (static_cast<double>(m_partyDistance[0]) > DOUBLE_80331A90) {
 		CGPartyObj::m_ghostWork.state = 1;
 	} else {
 		int exceeded;
-		if (static_cast<int>(CGPartyObj::m_ghostWork.counters[0]) >= CharaGhostValue(0x2048) ||
-		    static_cast<int>(CGPartyObj::m_ghostWork.counters[1]) >= CharaGhostValue(0x204C) ||
-		    static_cast<int>(CGPartyObj::m_ghostWork.counters[2]) >= CharaGhostValue(0x2050)) {
+		if (static_cast<int>(CGPartyObj::m_ghostWork.counters[0]) >= Chara.MogFur().m_radarLevel[0] ||
+		    static_cast<int>(CGPartyObj::m_ghostWork.counters[1]) >= Chara.MogFur().m_radarLevel[1] ||
+		    static_cast<int>(CGPartyObj::m_ghostWork.counters[2]) >= Chara.MogFur().m_radarLevel[2]) {
 			exceeded = 1;
 		} else {
 			exceeded = 0;
@@ -4825,14 +4818,21 @@ void CGPartyObj::ghostPartyMog()
 				moodMode = 2;
 				break;
 			}
-			if (moodMode == 1) {
-				if (CharaGhostValue(0x2054) < 0x32) {
+			switch (moodMode) {
+			case 0:
+				break;
+			case 1:
+				if (Chara.MogFur().m_alphaScore < 0x32) {
 					CGPartyObj::m_ghostWork.state = 5;
-				} else if (CharaGhostValue(0x2054) >= 0x5F) {
+				} else if (Chara.MogFur().m_alphaScore >= 0x5F) {
 					CGPartyObj::m_ghostWork.state = 4;
 				}
-			} else if (moodMode > 1 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
-				CGPartyObj::m_ghostWork.state = 6;
+				break;
+			case 2:
+				if (Chara.MogFur().m_alphaScore < 0x32) {
+					CGPartyObj::m_ghostWork.state = 6;
+				}
+				break;
 			}
 			CGPartyObj::m_ghostWork.flagBits.flag08 = 1;
 		} else {
@@ -4887,15 +4887,13 @@ void CGPartyObj::ghostPartyMog()
 	}
 
 messageMenu:
-	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(&leader->m_weaponNodeFlags)[1]) << 24) & 0xC0000000) >> 31) != 0) &&
+	if ((leader->m_weaponNodeFlagAll.m_bits1.m_shield != 0) &&
 	    CGPartyObj::m_ghostWork.state != 0 &&
 	    CGPartyObj::m_ghostWork.state != CGPartyObj::m_ghostWork.field20) {
-#define mesMenu (*reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x120))
-		if (!mesMenu->IsActiveMessage()) {
+		if (!MenuPcs.m_battleMesMenus[5]->IsActiveMessage()) {
 			CGPartyObj::m_ghostWork.field20 = CGPartyObj::m_ghostWork.state;
-			mesMenu->Open(Game.m_cFlatDataArr[1].Message(CGPartyObj::m_ghostWork.state - 1), 0x260, 0x20, 0x8E20, 0, 0x65, 0x8B);
+			MenuPcs.m_battleMesMenus[5]->Open(Game.m_cFlatDataArr[1].Message(CGPartyObj::m_ghostWork.state - 1), 0x260, 0x20, 0x8E20, 0, 0x65, 0x8B);
 		}
-#undef mesMenu
 	}
 
 	int auraSlot = 0;
@@ -4922,8 +4920,8 @@ messageMenu:
  * --INFO--
  * PAL Address: 0x8011a94c
  * PAL Size: 2332b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80143488
+ * EN Size: 2532b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -4968,7 +4966,7 @@ void CGPartyObj::gpmMove()
 		break;
 	}
 
-	float frameScale = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
+	float frameScale = static_cast<float>(Chara.MogFur().m_alphaScore) / kMonObjPercentMax;
 	float pressureScale;
 	switch (stageMode) {
 	default:
@@ -5006,26 +5004,24 @@ void CGPartyObj::gpmMove()
 	if (CGPartyObj::m_ghostWork.pressure < pressureLimit / 3) {
 		CGPartyObj::m_ghostWork.flagBits.flag04 = 0;
 	}
-	{
-		int trailDec = CGPartyObj::m_ghostWork.moodTimer - 1;
-		CGPartyObj::m_ghostWork.moodTimer = trailDec & ~(trailDec >> 31);
-	}
+	int moodTimer = CGPartyObj::m_ghostWork.moodTimer - 1;
+	CGPartyObj::m_ghostWork.moodTimer = moodTimer < 0 ? 0 : moodTimer;
 
 	Vec pathVec;
 	float pathDist;
 	gpmCalcDist(&pathVec, pathDist);
 
-	Vec toLeader;
-	toLeader = m_targetDelta;
-	toLeader.y = 0.0f;
-	float dist = PSVECMag(&toLeader);
-	float nearDist = m_nearColRadius + leader->m_nearColRadius;
-	float clampedDist = (dist > *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x5BC)) ? *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x5BC) : dist;
+	Vec toChalice;
+	toChalice = m_targetDelta;
+	toChalice.y = 0.0f;
+	float followDist = PSVECMag(&toChalice);
+	float chaliceDist = m_targetDist;
+	followDist = followDist < chaliceDist ? followDist : chaliceDist;
 
 	if (m_lastStateId == 0 &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
+	    (m_unk63CBits.m_bit80 != 0)) {
 		int moveKind = 0;
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CGPartyObj::m_ghostWork.flags) << 24) & 0xC0000000) >> 31) != 0) {
+		if (CGPartyObj::m_ghostWork.flagBits.flag80 != 0) {
 			moveKind = 0;
 			if (PartyData(this).carryObject != nullptr) {
 				CGPartyObj::m_ghostWork.carrySpeed = 0.0f;
@@ -5037,15 +5033,15 @@ void CGPartyObj::gpmMove()
 			if (pathDist < Game.unkFloat_0xca10 * limit) {
 				if ((leader->m_lastStateId != 2 && leader->m_lastStateId != 6) ||
 				    leader->m_subState != 1 ||
-				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||
-				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x660) != 0) {
+				    leader->m_comboState == 0 ||
+				    leader->m_comboFrame != 0) {
 					return;
 				}
 
 				int anyReady;
-				if (CGPartyObj::m_ghostWork.counters[0] >= CharaGhostValue(0x2048) ||
-				    CGPartyObj::m_ghostWork.counters[1] >= CharaGhostValue(0x204C) ||
-				    CGPartyObj::m_ghostWork.counters[2] >= CharaGhostValue(0x2050)) {
+				if (CGPartyObj::m_ghostWork.counters[0] >= Chara.MogFur().m_radarLevel[0] ||
+				    CGPartyObj::m_ghostWork.counters[1] >= Chara.MogFur().m_radarLevel[1] ||
+				    CGPartyObj::m_ghostWork.counters[2] >= Chara.MogFur().m_radarLevel[2]) {
 					anyReady = 1;
 				} else {
 					anyReady = 0;
@@ -5054,13 +5050,13 @@ void CGPartyObj::gpmMove()
 					return;
 				}
 
-				unsigned char* chCounters = reinterpret_cast<unsigned char*>(&Chara);
+				const int* thresholds = Chara.MogFur().m_radarLevel;
 				GhostPartyWork& ghostWork = CGPartyObj::m_ghostWork;
 				int choices = 0;
 				int i;
 				for (i = 0; i < 3; i++) {
 					if (ghostWork.counters[i] >=
-					    *reinterpret_cast<int*>(chCounters + 0x2048 + i * 4)) {
+					    thresholds[i]) {
 						choices++;
 					}
 				}
@@ -5070,7 +5066,7 @@ void CGPartyObj::gpmMove()
 				int newSlotSel;
 				for (i = 0; i < 3; i++) {
 					if (ghostWork.counters[i] >=
-					    *reinterpret_cast<int*>(chCounters + 0x2048 + i * 4)) {
+					    thresholds[i]) {
 						if (cursor == pick) {
 							newSlotSel = i;
 							goto slotPicked;
@@ -5084,13 +5080,13 @@ void CGPartyObj::gpmMove()
 
 				switch (CGPartyObj::m_ghostWork.slotSel) {
 				case 0:
-					*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560) = 0x207;
+					m_itemId = 0x207;
 					break;
 				case 1:
-					*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560) = 0x20F;
+					m_itemId = 0x20F;
 					break;
 				case 2:
-					*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560) = 0x20B;
+					m_itemId = 0x20B;
 					break;
 				}
 				changeStat(2, 0, 0);
@@ -5102,10 +5098,10 @@ void CGPartyObj::gpmMove()
 		} else {
 			moveKind = 0;
 			if (PartyData(this).carryObject == nullptr &&
-			    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) << 24) & 0xC0000000) >> 31) != 0) &&
-			    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
-				float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A84;
-				if (dist < pickupRadius) {
+			    (chalice->m_weaponNodeFlagBits.m_prg != 0) &&
+			    reinterpret_cast<CGItemObj*>(chalice)->m_owner == 0) {
+				float pickupRadius = (leader->m_bodyEllipsoidRadius + chalice->m_bodyEllipsoidRadius) * FLOAT_80331A84;
+				if (chaliceDist < pickupRadius) {
 					CancelMove(1);
 					rotTarget(reinterpret_cast<CGPrgObj*>(chalice));
 					CGPartyObj::m_ghostWork.carrySpeed = 0.0f;
@@ -5122,8 +5118,8 @@ void CGPartyObj::gpmMove()
 				}
 			}
 			if (moveKind == 1) {
-				float keepDist = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A58;
-				if (clampedDist < keepDist) {
+				float keepDist = (leader->m_bodyEllipsoidRadius + chalice->m_bodyEllipsoidRadius) * FLOAT_80331A58;
+				if (followDist < keepDist) {
 					return;
 				}
 			}
@@ -5136,27 +5132,20 @@ void CGPartyObj::gpmMove()
 
 		CVector moveDir;
 		if (moveKind == 0) {
-			CVector pathVecV(pathVec);
-			moveDir.x = pathVecV.x;
-			moveDir.y = pathVecV.y;
-			moveDir.z = pathVecV.z;
+			moveDir = CVector(pathVec);
 		} else {
-			CVector toLeaderV(toLeader);
-			moveDir.x = toLeaderV.x;
-			moveDir.y = toLeaderV.y;
-			moveDir.z = toLeaderV.z;
+			moveDir = CVector(toChalice);
 		}
 
 		CGPartyObj::m_ghostWork.carryDir = *reinterpret_cast<Vec*>(&moveDir);
 		CGPartyObj::m_ghostWork.carrySpeed += FLOAT_80331A70;
 		float speedScale = (CGPartyObj::m_ghostWork.pressure >= pressureLimit) ? kMonObjOne : FLOAT_80331A88;
-		float newSpeed = FLOAT_80331a78;
-		if (!(CGPartyObj::m_ghostWork.carrySpeed < newSpeed)) {
-			float speedLimit = speedScale * (m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[0]) + 0x690));
-			newSpeed = speedLimit;
-			if (!(speedLimit < CGPartyObj::m_ghostWork.carrySpeed)) {
-				newSpeed = CGPartyObj::m_ghostWork.carrySpeed;
-			}
+		float newSpeed = CGPartyObj::m_ghostWork.carrySpeed;
+		if (newSpeed < FLOAT_80331a78) {
+			newSpeed = FLOAT_80331a78;
+		} else {
+			float speedLimit = speedScale * (m_moveBaseSpeed * Game.m_partyObjArr[0]->m_pushScale);
+			newSpeed = speedLimit < newSpeed ? speedLimit : newSpeed;
 		}
 		CGPartyObj::m_ghostWork.carrySpeed = newSpeed;
 
@@ -5170,13 +5159,13 @@ void CGPartyObj::gpmMove()
 	if (m_lastStateId != 2) {
 		return;
 	}
-	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CGPartyObj::m_ghostWork.flags) << 24) & 0xC0000000) >> 31) == 0) {
+	if (CGPartyObj::m_ghostWork.flagBits.flag80 == 0) {
 		changeStat(0, 0, 0);
 		return;
 	}
 
 	if (leader->m_lastStateId != 2 && leader->m_lastStateId != 6) {
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CGPartyObj::m_ghostWork.flags) << 26) & 0xC0000000) >> 31) == 0) {
+		if (CGPartyObj::m_ghostWork.flagBits.flag20 == 0) {
 			changeStat(0, 0, 0);
 			return;
 		}
@@ -5184,13 +5173,13 @@ void CGPartyObj::gpmMove()
 		if (m_subState != 1) {
 			return;
 		}
-		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x668) == 0) {
+		if (m_comboState == 0) {
 			return;
 		}
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(leader).partyFlags) << 26) & 0xC0000000) >> 31) != 0) {
+		if (PartyData(leader).flags.flag20 != 0) {
 			CGPartyObj::m_ghostWork.gauge = 0;
 		}
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) == 0) {
+		if (PartyData(this).flags.flag40 == 0) {
 			return;
 		}
 
@@ -5199,7 +5188,7 @@ void CGPartyObj::gpmMove()
 		if (CGPartyObj::m_ghostWork.gauge <= 0xF) {
 			return;
 		}
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CGPartyObj::m_ghostWork.flags) << 25) & 0xC0000000) >> 31) != 0) {
+		if (CGPartyObj::m_ghostWork.flagBits.flag40 != 0) {
 			return;
 		}
 	}
@@ -5283,7 +5272,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 			break;
 		}
 
-		float rate = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
+		float rate = static_cast<float>(Chara.MogFur().m_alphaScore) / kMonObjPercentMax;
 		float angleScale;
 		switch (bossKind) {
 		default:
@@ -5297,9 +5286,9 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 			break;
 		}
 
-		sprintf(text, s_partyObjGhostFmt, CGPartyObj::m_ghostWork.counters[0], CharaGhostValue(0x2048),
-		        CGPartyObj::m_ghostWork.counters[1], CharaGhostValue(0x204C),
-		        CGPartyObj::m_ghostWork.counters[2], CharaGhostValue(0x2050));
+		sprintf(text, s_partyObjGhostFmt, CGPartyObj::m_ghostWork.counters[0], Chara.MogFur().m_radarLevel[0],
+		        CGPartyObj::m_ghostWork.counters[1], Chara.MogFur().m_radarLevel[1],
+		        CGPartyObj::m_ghostWork.counters[2], Chara.MogFur().m_radarLevel[2]);
 
 		float curY = y;
 		float width = static_cast<float>(font->GetWidth(text));
@@ -5311,7 +5300,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		y = y - lineH;
 
 		sprintf(text, s_partyObjGhostAngleFmt, CGPartyObj::m_ghostWork.pressure,
-		        static_cast<int>(FLOAT_80331A5C * angleScale), CharaGhostValue(0x2054));
+		        static_cast<int>(FLOAT_80331A5C * angleScale), Chara.MogFur().m_alphaScore);
 
 		float curY2 = y;
 		width = static_cast<float>(font->GetWidth(text));

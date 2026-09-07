@@ -212,7 +212,20 @@ public:
     };
     struct Sprt
     {
-        void operator=(const Sprt&);
+        short m_x;
+        short m_y;
+        short m_width;
+        short m_height;
+        float m_u;
+        float m_v;
+        float m_scaleX;
+        float m_scaleY;
+        unsigned int m_flags;
+    };
+    struct WmFrameInfo
+    {
+        int m_unknown;
+        Sprt m_sprites[2];
     };
     struct Sprt2
     {
@@ -691,7 +704,7 @@ public:
         unsigned char* m_worldObjData;
         unsigned char* m_bubbleData;
         unsigned char* m_frameData;
-        unsigned char* m_frameInfo;
+        WmFrameInfo* m_frameInfo;
         unsigned char* m_charaModelData;
         unsigned char* m_charaSelectData;
     };
@@ -973,5 +986,9 @@ STATIC_ASSERT(offsetof(SingMenuState, selectedIndex) == 0x26);
 STATIC_ASSERT(offsetof(SingMenuState, result) == 0x2E);
 STATIC_ASSERT(offsetof(SingMenuState, uniteState) == 0x30);
 STATIC_ASSERT(offsetof(SingMenuState, topIndex) == 0x34);
+
+STATIC_ASSERT(sizeof(CMenuPcs::Sprt) == 0x1C);
+STATIC_ASSERT(sizeof(CMenuPcs::WmFrameInfo) == 0x3C);
+STATIC_ASSERT(offsetof(CMenuPcs::WmFrameInfo, m_sprites) == 0x4);
 
 #endif // _FFCC_P_MENU_H_

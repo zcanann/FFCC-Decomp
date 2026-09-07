@@ -418,7 +418,6 @@ static const int kWmMenuPlayerCount = 8;
 static const int kWmMenuControllerCount = 4;
 static const int kWmCharaSelectCount = kWmMenuPlayerCount;
 static const int kWmCharaSelectBytes = sizeof(WmCharaSelectEntry) * kWmCharaSelectCount;
-static const int kWmFrameInfoBytes = 0x3C;
 static const int kWmMenuCharaStateBytes = 0x120;
 
 struct GbaCMakeInfoRaw
@@ -492,41 +491,6 @@ static inline int GetWmMenuFade(short state, short frame)
 static inline CFont* GetWmFont(CMenuPcs* menu)
 {
 	return *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(menu) + 0xF8);
-}
-
-static inline void CalcWmFrame0Inline(CMenuPcs* menu, int param)
-{
-#define frame (menu->m_wm.m_frameInfo)
-
-	*reinterpret_cast<short*>(frame + 4) = 0x10;
-	int frameAddr = reinterpret_cast<int>(frame);
-	*reinterpret_cast<short*>(frameAddr + 0x20) =
-	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(
-	                                            static_cast<int>(*reinterpret_cast<short*>(frameAddr + 8)) +
-	                                            static_cast<int>(*reinterpret_cast<short*>(frameAddr + 4)))));
-
-	if (param < 0) {
-		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 8)) +
-		                                  static_cast<int>(*reinterpret_cast<short*>(frame + 4)));
-		if (param >= -10) {
-			int sign = param >> 31;
-			unsigned int absParam = static_cast<unsigned int>((param ^ sign) - sign);
-			float scaledOffset = offset * static_cast<float>(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(absParam)));
-			if (static_cast<int>(absParam) < 0) {
-				absParam = 0;
-			}
-			if (static_cast<int>(absParam) > 10) {
-				absParam = 10;
-			}
-			float tClamped = static_cast<float>(static_cast<int>(absParam));
-			offset = scaledOffset * static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * tClamped * FLOAT_803316D4)));
-		}
-		*reinterpret_cast<short*>(frame + 4) =
-		    static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 4))) - offset));
-		*reinterpret_cast<short*>(frame + 0x20) =
-		    static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 0x20))) + offset));
-	}
-#undef frame
 }
 
 static inline void QueueWmCharaAnimState(CMenuPcs* menu, int slot, int state)
@@ -831,39 +795,9 @@ void CMenuPcs::loadData()
 	}
 
 	m_wm.m_frameInfo =
-	    static_cast<unsigned char*>(operator new(kWmFrameInfoBytes, MenuPcs.m_menuStage, srcFile, 0x231));
-	memset(m_wm.m_frameInfo, 0, kWmFrameInfoBytes);
-	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x4) = 0x10;
-	{
-		const float oneF = FLOAT_803313e8;
-		const float zeroF = FLOAT_803313dc;
-		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x6) = 0x10;
-		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x8) = 0xE8;
-		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0xA) = 0x168;
-		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0xC) = zeroF;
-		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x10) = zeroF;
-		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x14) = oneF;
-		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x18) = oneF;
-		*reinterpret_cast<int*>(m_wm.m_frameInfo + 0x1C) = 0;
-	}
-	{
-		unsigned char* const frame = m_wm.m_frameInfo;
-		*reinterpret_cast<short*>(frame + 0x20) = *reinterpret_cast<short*>(frame + 0x4);
-		*reinterpret_cast<short*>(frame + 0x22) = *reinterpret_cast<short*>(frame + 0x6);
-		*reinterpret_cast<short*>(frame + 0x24) = *reinterpret_cast<short*>(frame + 0x8);
-		*reinterpret_cast<short*>(frame + 0x26) = *reinterpret_cast<short*>(frame + 0xA);
-		*reinterpret_cast<float*>(frame + 0x28) = *reinterpret_cast<float*>(frame + 0xC);
-		*reinterpret_cast<float*>(frame + 0x2C) = *reinterpret_cast<float*>(frame + 0x10);
-		*reinterpret_cast<float*>(frame + 0x30) = *reinterpret_cast<float*>(frame + 0x14);
-		*reinterpret_cast<float*>(frame + 0x34) = *reinterpret_cast<float*>(frame + 0x18);
-		*reinterpret_cast<int*>(frame + 0x38) = *reinterpret_cast<int*>(frame + 0x1C);
-	}
-	{
-		unsigned char* const frame = m_wm.m_frameInfo;
-		*reinterpret_cast<short*>(frame + 0x20) = static_cast<short>(
-		    0x280 - (*reinterpret_cast<short*>(frame + 0x8) + *reinterpret_cast<short*>(frame + 0x4)));
-	}
-	*reinterpret_cast<int*>(m_wm.m_frameInfo + 0x38) = 8;
+	    new (MenuPcs.m_menuStage, srcFile, 0x231) WmFrameInfo;
+	memset(m_wm.m_frameInfo, 0, sizeof(WmFrameInfo));
+	InitFrame0Info();
 
 	m_wm.m_charaModelData =
 	    static_cast<unsigned char*>(operator new[](0x1A0, MenuPcs.m_menuStage, srcFile, 0x237));
@@ -1266,9 +1200,9 @@ void CMenuPcs::loadData()
  */
 inline void CMenuPcs::InitFrameInfo()
 {
-	unsigned char* const frame = m_wm.m_frameInfo;
+	WmFrameInfo* const frame = m_wm.m_frameInfo;
 	if (frame != 0) {
-		memset(frame, 0, 0x3C);
+		memset(frame, 0, sizeof(WmFrameInfo));
 	}
 	InitFrame0Info();
 }
@@ -1284,47 +1218,26 @@ inline void CMenuPcs::InitFrameInfo()
  */
 void CMenuPcs::InitFrame0Info()
 {
-	*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 4) = 0x10;
+	m_wm.m_frameInfo->m_sprites[0].m_x = 0x10;
 	float one = FLOAT_803313e8;
 	float zero = FLOAT_803313dc;
-	*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 6) = 0x10;
-	*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 8) = 0xE8;
-	*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 0xA) = 0x168;
-	*reinterpret_cast<float*>(m_wm.m_frameInfo + 0xC) = zero;
-	*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x10) = zero;
-	*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x14) = one;
-	*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x18) = one;
-	*reinterpret_cast<unsigned int*>(m_wm.m_frameInfo + 0x1C) = 0;
+	m_wm.m_frameInfo->m_sprites[0].m_y = 0x10;
+	m_wm.m_frameInfo->m_sprites[0].m_width = 0xE8;
+	m_wm.m_frameInfo->m_sprites[0].m_height = 0x168;
+	m_wm.m_frameInfo->m_sprites[0].m_u = zero;
+	m_wm.m_frameInfo->m_sprites[0].m_v = zero;
+	m_wm.m_frameInfo->m_sprites[0].m_scaleX = one;
+	m_wm.m_frameInfo->m_sprites[0].m_scaleY = one;
+	m_wm.m_frameInfo->m_sprites[0].m_flags = 0;
 
-	unsigned char* frame = m_wm.m_frameInfo;
-	*reinterpret_cast<short*>(frame + 0x20) = *reinterpret_cast<short*>(frame + 4);
-	*reinterpret_cast<short*>(frame + 0x22) = *reinterpret_cast<short*>(frame + 6);
-	*reinterpret_cast<short*>(frame + 0x24) = *reinterpret_cast<short*>(frame + 8);
-	*reinterpret_cast<short*>(frame + 0x26) = *reinterpret_cast<short*>(frame + 0xA);
-	*reinterpret_cast<float*>(frame + 0x28) = *reinterpret_cast<float*>(frame + 0xC);
-	*reinterpret_cast<float*>(frame + 0x2C) = *reinterpret_cast<float*>(frame + 0x10);
-	*reinterpret_cast<float*>(frame + 0x30) = *reinterpret_cast<float*>(frame + 0x14);
-	*reinterpret_cast<float*>(frame + 0x34) = *reinterpret_cast<float*>(frame + 0x18);
-	*reinterpret_cast<unsigned int*>(frame + 0x38) = *reinterpret_cast<unsigned int*>(frame + 0x1C);
+	WmFrameInfo* frame = m_wm.m_frameInfo;
+	frame->m_sprites[1] = frame->m_sprites[0];
 
 	frame = m_wm.m_frameInfo;
-	*reinterpret_cast<short*>(frame + 0x20) = 0x280 - (*reinterpret_cast<short*>(frame + 8) + *reinterpret_cast<short*>(frame + 4));
-	*reinterpret_cast<unsigned int*>(m_wm.m_frameInfo + 0x38) = 8;
+	frame->m_sprites[1].m_x = 0x280 - (frame->m_sprites[0].m_width + frame->m_sprites[0].m_x);
+	m_wm.m_frameInfo->m_sprites[1].m_flags = 8;
 }
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt& src)
-{
-	memcpy(this, &src, sizeof(CMenuPcs::Sprt));
-}
 
 /*
  * --INFO--
@@ -1682,7 +1595,7 @@ void CMenuPcs::CalcDiaryMenu()
 			} else {
 				frameStep = -m_wmWorldState->m_frameCounter;
 			}
-			CalcWmFrame0Inline(this, frameStep);
+			CalcWMFrame0(frameStep);
 		}
 		CalcMainMenuSub();
 		break;
@@ -1716,7 +1629,7 @@ void CMenuPcs::CalcDiaryMenu()
 				} else {
 					frameStep = -m_wmWorldState->m_frameCounter;
 				}
-				CalcWmFrame0Inline(this, frameStep);
+				CalcWMFrame0(frameStep);
 				const short animState = m_wmWorldState->m_mainState;
 				if (animState > 0 && animState < 4) {
 					CalcChara();
@@ -1984,27 +1897,7 @@ void CMenuPcs::CalcMCardMenu()
 		uVar15 = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	}
 
-	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
-	int frameSum = (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4);
-	iVar14 = (int)(FLOAT_803313e0 - (float)frameSum);
-	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = (short)iVar14;
-
-	if ((int)uVar15 < 0) {
-		float wave = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
-		if ((int)uVar15 >= -10) {
-			int absSign = (int)uVar15 >> 0x1F;
-			int absOff = ((int)uVar15 ^ absSign) - absSign;
-			wave = (float)(wave * (DOUBLE_803314E8 * (double)absOff));
-			if (absOff < 0) absOff = 0;
-			if (absOff > 10) absOff = 10;
-			wave = wave * (float)sin((double)(FLOAT_803314bc * ((float)absOff * FLOAT_803316D4)));
-		}
-
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) - wave);
-		*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = (short)iVar14;
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) + wave);
-		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = (short)iVar14;
-	}
+	CalcWMFrame0(static_cast<int>(uVar15));
 
 	float fVar2 = FLOAT_803313e8;
 	if (m_wmWorldState->m_mainState != 2) {
@@ -2723,42 +2616,9 @@ void CMenuPcs::CalcLoadMenu()
 	unsigned short uVar7 = GetButtonRepeat(0);
 
 	if (m_wmWorldState->m_worldReady == 0) {
-		float one;
-		float zero = FLOAT_803313dc;
-		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 4) = 0x10;
-		one = FLOAT_803313e8;
-		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 6) = 0x10;
-		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 8) = 0xE8;
-		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 0xA) = 0x168;
-		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0xC) = zero;
-		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x10) = zero;
-		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x14) = one;
-		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x18) = one;
-		*reinterpret_cast<unsigned int*>(m_wm.m_frameInfo + 0x1C) = 0;
+		InitFrame0Info();
 
-		unsigned char* frame0 = m_wm.m_frameInfo;
-		*reinterpret_cast<short*>(frame0 + 0x20) = *reinterpret_cast<short*>(frame0 + 4);
-		*reinterpret_cast<short*>(frame0 + 0x22) = *reinterpret_cast<short*>(frame0 + 6);
-		*reinterpret_cast<short*>(frame0 + 0x24) = *reinterpret_cast<short*>(frame0 + 8);
-		*reinterpret_cast<short*>(frame0 + 0x26) = *reinterpret_cast<short*>(frame0 + 0xA);
-		*reinterpret_cast<float*>(frame0 + 0x28) = *reinterpret_cast<float*>(frame0 + 0xC);
-		*reinterpret_cast<float*>(frame0 + 0x2C) = *reinterpret_cast<float*>(frame0 + 0x10);
-		*reinterpret_cast<float*>(frame0 + 0x30) = *reinterpret_cast<float*>(frame0 + 0x14);
-		*reinterpret_cast<float*>(frame0 + 0x34) = *reinterpret_cast<float*>(frame0 + 0x18);
-		*reinterpret_cast<unsigned int*>(frame0 + 0x38) = *reinterpret_cast<unsigned int*>(frame0 + 0x1C);
-
-		frame0 = m_wm.m_frameInfo;
-		*reinterpret_cast<short*>(frame0 + 0x20) = 0x280 - (*reinterpret_cast<short*>(frame0 + 8) + *reinterpret_cast<short*>(frame0 + 4));
-		*reinterpret_cast<unsigned int*>(m_wm.m_frameInfo + 0x38) = 8;
-
-		m_mcCtrl.m_previousState = 0;
-		m_mcCtrl.m_state = 0;
-		m_mcCtrl.m_lastResult = 0;
-		m_mcCtrl.m_iteration = 0;
-		m_mcCtrl.m_userBuffer = 0;
-		m_mcCtrl.m_createFlag = 0;
-		m_mcCtrl.m_cardChannel = 0;
-		m_mcCtrl.m_saveIndex = 0;
+		m_mcCtrl.Init();
 		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 
 		Game.m_gameWork.m_wmBackupParams[0] = m_wmWorldState->m_originalBackupParams[0];
@@ -2785,31 +2645,8 @@ void CMenuPcs::CalcLoadMenu()
 		uVar15 = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	}
 
-	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
-	int iVar10 = reinterpret_cast<int>(m_wm.m_frameInfo);
-	int frameSum = (int)*reinterpret_cast<short*>(iVar10 + 8) + (int)*reinterpret_cast<short*>(iVar10 + 4);
-	iVar14 = (int)(FLOAT_803313e0 - (float)frameSum);
-	*reinterpret_cast<short*>(iVar10 + 0x20) = (short)iVar14;
-
-	if ((int)uVar15 < 0) {
-		float wave = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
-		if ((int)uVar15 >= -10) {
-			int s15 = (int)uVar15 >> 31;
-			int __p5 = s15;
-			int absRaw = ((int)uVar15 ^ s15) - __p5;
-			wave = (float)(wave * (DOUBLE_803314E8 * (double)absRaw));
-			int s16 = (int)uVar15 >> 31;
-			int absOff = ((int)uVar15 ^ s16) - s16;
-			if (absOff < 0) absOff = 0;
-			if (absOff > 10) absOff = 10;
-			wave = wave * (float)sin((double)(FLOAT_803314bc * ((float)absOff * FLOAT_803316D4)));
-		}
-
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) - wave);
-		*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = (short)iVar14;
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) + wave);
-		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = (short)iVar14;
-	}
+	CalcWMFrame0(static_cast<int>(uVar15));
+	int iVar10;
 
 	if (m_wmWorldState->m_mainState != 2) {
 		return;
@@ -3815,31 +3652,7 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 		offset = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	}
 
-	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
-	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) =
-	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4))));
-
-	if (offset < 0) {
-		float shift = static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
-		if (offset >= -10) {
-			shift = static_cast<float>(static_cast<double>(shift) * (DOUBLE_803314E8 * static_cast<double>(offset < 0 ? -offset : offset)));
-			int absOffset =  (s32)(offset < 0 ? -offset : offset);
-			if (absOffset < 0) {
-				absOffset = 0;
-			}
-			if (absOffset > 10) {
-				absOffset = 10;
-			}
-			int __p1 = absOffset;
-			const float t = static_cast<float>(__p1);
-			shift *= static_cast<float>(sin(FLOAT_803314bc * (t * FLOAT_803316D4)));
-		}
-
-		*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) =
-		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)) - shift);
-		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) =
-		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20)) + shift);
-	}
+	CalcWMFrame0(offset);
 
 	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
 		CalcChara();
@@ -4039,19 +3852,17 @@ void CMenuPcs::DrawMainMenu()
 	GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	int bit = 0;
-	int offset = bit;
 	do {
 		if (((1 << bit) & 1) != 0) {
 			const float* pZmm1 = &FLOAT_803313dc;
 			const float* pOmm2 = &FLOAT_803313e8;
-			short* const entry = reinterpret_cast<short*>(m_wm.m_frameInfo + offset + 4);
-			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(entry + 0xC), static_cast<float>(entry[0]),
-			                 static_cast<float>(entry[1]), static_cast<float>(entry[2]), static_cast<float>(entry[3]),
-			                 *reinterpret_cast<float*>(entry + 4), *reinterpret_cast<float*>(entry + 6),
+			Sprt* const entry = &m_wm.m_frameInfo->m_sprites[bit];
+			MenuPcs.DrawRect(entry->m_flags, static_cast<float>(entry->m_x),
+			                 static_cast<float>(entry->m_y), static_cast<float>(entry->m_width), static_cast<float>(entry->m_height),
+			                 entry->m_u, entry->m_v,
 			                 *pOmm2, *pOmm2, *pZmm1);
 		}
 		bit++;
-		offset += 0x1C;
 	} while (bit < 2);
 
 	if (m_wmWorldState->m_mainState >= 1 && m_wmWorldState->m_mainState <= 3) {
@@ -4856,10 +4667,10 @@ void CMenuPcs::DrawCMakeMenu()
 		if (((1 << bit) & 3) != 0) {
 			const float* pZeroF = &FLOAT_803313dc;
 			const float* pOneF = &FLOAT_803313e8;
-			short* const entry = reinterpret_cast<short*>(reinterpret_cast<unsigned char(*)[0x1C]>(m_wm.m_frameInfo)[bit] + 4);
-			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(entry + 0xC), static_cast<float>(entry[0]),
-			                 static_cast<float>(entry[1]), static_cast<float>(entry[2]), static_cast<float>(entry[3]),
-			                 *reinterpret_cast<float*>(entry + 4), *reinterpret_cast<float*>(entry + 6),
+			Sprt* const entry = &m_wm.m_frameInfo->m_sprites[bit];
+			MenuPcs.DrawRect(entry->m_flags, static_cast<float>(entry->m_x),
+			                 static_cast<float>(entry->m_y), static_cast<float>(entry->m_width), static_cast<float>(entry->m_height),
+			                 entry->m_u, entry->m_v,
 			                 *pOneF, *pOneF, *pZeroF);
 		}
 		bit++;
@@ -7752,22 +7563,20 @@ void CMenuPcs::DrawWMFrame()
 void CMenuPcs::CalcWMFrame0(int param)
 {
 	int value;
-	unsigned int animParam = param;
 
-	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
-	int frameSum = static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8)) +
-	               static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
+	m_wm.m_frameInfo->m_sprites[0].m_x = 0x10;
+	int frameSum = static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_width) +
+	               static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_x);
 	value = static_cast<int>(FLOAT_803313e0 - static_cast<float>(frameSum));
-	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = static_cast<short>(value);
+	m_wm.m_frameInfo->m_sprites[1].m_x = static_cast<short>(value);
 
-	if (static_cast<int>(animParam) < 0) {
-		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8)) +
-		                                  static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)));
-		if (static_cast<int>(animParam) >= -10) {
-			int sign = static_cast<int>(animParam) >> 31;
-			int absRaw = (static_cast<int>(animParam) ^ sign) - sign;
+	if (param < 0) {
+		float offset = static_cast<float>(static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_width) +
+		                                  static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_x));
+		if (param >= -10) {
+			int absRaw = (param < 0 ? -param : param);
 			offset = static_cast<float>(static_cast<double>(offset) * (DOUBLE_803314E8 * static_cast<double>(absRaw)));
-			int absParam = (static_cast<int>(animParam) ^ sign) - sign;
+			int absParam = (param < 0 ? -param : param);
 			if (absParam < 0) {
 				absParam = 0;
 			}
@@ -7776,10 +7585,10 @@ void CMenuPcs::CalcWMFrame0(int param)
 			}
 			offset *= static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * (static_cast<float>(absParam) * FLOAT_803316D4))));
 		}
-		value = static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4))) - offset);
-		*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = static_cast<short>(value);
-		value = static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20))) + offset);
-		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = static_cast<short>(value);
+		value = static_cast<int>(static_cast<float>(static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_x)) - offset);
+		m_wm.m_frameInfo->m_sprites[0].m_x = static_cast<short>(value);
+		value = static_cast<int>(static_cast<float>(static_cast<int>(m_wm.m_frameInfo->m_sprites[1].m_x)) + offset);
+		m_wm.m_frameInfo->m_sprites[1].m_x = static_cast<short>(value);
 	}
 }
 
@@ -7805,20 +7614,17 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 
-	int offset;
 	int i;
 	i = 0;
-	offset = 0;
 	do {
 		if ((static_cast<unsigned int>(mask) & (1 << i)) != 0) {
-			short* psVar1 = reinterpret_cast<short*>(m_wm.m_frameInfo + offset + 4);
-			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(psVar1 + 0xC), static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
-			         static_cast<float>(static_cast<int>(psVar1[2])), static_cast<float>(static_cast<int>(psVar1[3])),
-			         *reinterpret_cast<float*>(psVar1 + 4), *reinterpret_cast<float*>(psVar1 + 6),
+			Sprt* sprite = &m_wm.m_frameInfo->m_sprites[i];
+			MenuPcs.DrawRect(sprite->m_flags, static_cast<float>(static_cast<int>(sprite->m_x)), static_cast<float>(static_cast<int>(sprite->m_y)),
+			         static_cast<float>(static_cast<int>(sprite->m_width)), static_cast<float>(static_cast<int>(sprite->m_height)),
+			         sprite->m_u, sprite->m_v,
 			         1.0f, 1.0f, 0.0f);
 		}
 		i = i + 1;
-		offset = offset + 0x1C;
 	} while (i < 2);
 }
 
@@ -7834,7 +7640,7 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 inline void CMenuPcs::DrawMainMenuBase(float baseAlpha)
 {
 	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const frame = m_wm.m_frameInfo;
+	WmFrameInfo* const frame = m_wm.m_frameInfo;
 	float alpha = baseAlpha;
 
 	if (alpha <= 0.0f) {
@@ -7863,11 +7669,11 @@ inline void CMenuPcs::DrawMainMenuBase(float baseAlpha)
 
 	if (frame != 0) {
 		for (int i = 0; i < 2; i++) {
-			unsigned char* const entry = frame + 4 + i * 0x1C;
-			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(entry + 0)),
-			         static_cast<float>(*reinterpret_cast<short*>(entry + 2)), static_cast<float>(*reinterpret_cast<short*>(entry + 4)),
-			         static_cast<float>(*reinterpret_cast<short*>(entry + 6)), *reinterpret_cast<float*>(entry + 8),
-			         *reinterpret_cast<float*>(entry + 0x0C), 1.0f, 1.0f, static_cast<float>(*reinterpret_cast<unsigned int*>(entry + 0x18)));
+			Sprt* const entry = &frame->m_sprites[i];
+			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(entry->m_x),
+			         static_cast<float>(entry->m_y), static_cast<float>(entry->m_width),
+			         static_cast<float>(entry->m_height), entry->m_u,
+			         entry->m_v, 1.0f, 1.0f, static_cast<float>(entry->m_flags));
 		}
 	}
 
@@ -9508,29 +9314,7 @@ void CMenuPcs::WMChgMenu()
 	m_menuWindowInfo->state = 3;
 	m_textureLocIndex = 0;
 
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 4) = 0x10;
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 6) = 0x10;
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 8) = 0xE8;
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 10) = 0x168;
-	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0xC) = fVar4;
-	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x10) = fVar4;
-	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x14) = fVar5;
-	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x18) = fVar5;
-	*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x1C) = 0;
-
-	int frameInfo = reinterpret_cast<int>(m_wm.m_frameInfo);
-	*reinterpret_cast<short*>(frameInfo + 0x20) = *reinterpret_cast<short*>(frameInfo + 4);
-	*reinterpret_cast<short*>(frameInfo + 0x22) = *reinterpret_cast<short*>(frameInfo + 6);
-	*reinterpret_cast<short*>(frameInfo + 0x24) = *reinterpret_cast<short*>(frameInfo + 8);
-	*reinterpret_cast<short*>(frameInfo + 0x26) = *reinterpret_cast<short*>(frameInfo + 10);
-	*reinterpret_cast<float*>(frameInfo + 0x28) = *reinterpret_cast<float*>(frameInfo + 0xC);
-	*reinterpret_cast<float*>(frameInfo + 0x2C) = *reinterpret_cast<float*>(frameInfo + 0x10);
-	*reinterpret_cast<float*>(frameInfo + 0x30) = *reinterpret_cast<float*>(frameInfo + 0x14);
-	*reinterpret_cast<float*>(frameInfo + 0x34) = *reinterpret_cast<float*>(frameInfo + 0x18);
-	*reinterpret_cast<int*>(frameInfo + 0x38) = *reinterpret_cast<int*>(frameInfo + 0x1C);
-
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x20) = 0x280 - (*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 8) + *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 4));
-	*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x38) = 8;
+	InitFrame0Info();
 
 	if (iVar14 == 3 && Game.m_gameWork.m_menuStageMode != 0
 	    && m_singleCmakeSlot >= 0
@@ -10810,13 +10594,13 @@ LAB_next:
 		if (((1 << slot) & 2) != 0) {
 			const float* pZeroE = &FLOAT_803313dc;
 			const float* pOneE = &FLOAT_803313e8;
-			unsigned char* const frameEntry = m_wm.m_frameInfo + slotOff + 4;
-			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(frameEntry + 0x18),
-			         static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
-			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 2)),
-			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 4)),
-			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 6)),
-			         *reinterpret_cast<float*>(frameEntry + 8), *reinterpret_cast<float*>(frameEntry + 0x0C),
+			Sprt* const frameEntry = &m_wm.m_frameInfo->m_sprites[slot];
+			MenuPcs.DrawRect(frameEntry->m_flags,
+			         static_cast<float>(frameEntry->m_x),
+			         static_cast<float>(frameEntry->m_y),
+			         static_cast<float>(frameEntry->m_width),
+			         static_cast<float>(frameEntry->m_height),
+			         frameEntry->m_u, frameEntry->m_v,
 			         *pOneE, *pOneE, *pZeroE);
 		}
 	}

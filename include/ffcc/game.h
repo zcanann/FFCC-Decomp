@@ -155,6 +155,7 @@ public:
     char* GetMonNames(int);
     char* GetMonArts(int);
     char* GetMonName(int, int);
+    char* GetSysMes(int);
 
     // void* vtable;                        // 0x00
     int unk_0x4;                            // 0x04

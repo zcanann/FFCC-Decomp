@@ -124,6 +124,7 @@ public:
     COrder* GetNextOrder(COrder*);
     COrder* GetOrder(int);
     unsigned int GetCounter();
+    int GetErrorLevel();
     int IsGdev();
     static void errorHandler(unsigned short, OSContext*, unsigned long, unsigned long);
 

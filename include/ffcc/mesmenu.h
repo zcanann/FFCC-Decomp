@@ -24,6 +24,8 @@ public:
     void CloseRequest(int);
     void SetPos(float, float);
     int IsUse();
+    int GetValue(int);
+    void SetValue(int, int);
     void SetBattleIndex(int index)
     {
         m_menuIndex = index;

@@ -16,7 +16,8 @@ class PPPIFPARAM;
 struct SItemFlatRow {
 	unsigned char m_pad00[2];
 	unsigned short m_model;
-	unsigned char m_pad04[4];
+	unsigned short m_equipFlags;
+	unsigned short m_value;
 	unsigned short m_attribute;
 	unsigned char m_pad0A[2];
 	unsigned short m_stage;
@@ -39,6 +40,8 @@ STATIC_ASSERT(offsetof(SItemFlatRow, m_attribute) == 0x08);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_fineValue) == 0x10);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_stage) == 0x0C);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_model) == 0x02);
+STATIC_ASSERT(offsetof(SItemFlatRow, m_equipFlags) == 0x04);
+STATIC_ASSERT(offsetof(SItemFlatRow, m_value) == 0x06);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_particles) == 0x14);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_price) == 0x20);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_smithPrice) == 0x24);

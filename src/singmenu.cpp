@@ -1,3 +1,4 @@
+#include "ffcc/itemobj.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/singmenu.h"
 #include "ffcc/chara.h"
@@ -3060,8 +3061,8 @@ int CMenuPcs::SingWinMessHeight()
  * --INFO--
  * PAL Address: 0x8014624c
  * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8016C45C
+ * EN Size: 284b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3069,7 +3070,7 @@ int CMenuPcs::SingWinMessHeight()
 int CMenuPcs::ChkEquipPossible(int itemNo)
 {
     unsigned int genderMask = 0x10;
-    int flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    int flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
     int raceBits = flags & 0xF;
     int genderBits = flags & 0x30;
     unsigned int raceMask = 1 << (SingleCaravanWork()->m_tribeId & 3);
@@ -3098,14 +3099,14 @@ int CMenuPcs::ChkEquipPossible(int itemNo)
  * --INFO--
  * PAL Address: 0x80146190
  * PAL Size: 188b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8016C578
+ * EN Size: 348b
  * JP Address: TODO
  * JP Size: TODO
  */
 int CMenuPcs::GetEquipType(int itemNo)
 {
-    u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    u16 flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
     int equipType;
 
     if (flags & 0x100) {
@@ -3126,18 +3127,12 @@ int CMenuPcs::GetEquipType(int itemNo)
     return equipType;
 }
 
-struct SingItemRecord {
-    u8 _pad0[0x38];
-    u16 raceItems[4];
-    u8 _pad1[0x8];
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80145ff4
  * PAL Size: 412b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8016C6D4
+ * EN Size: 332b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3148,11 +3143,11 @@ int CMenuPcs::GetSmithItem(int itemNo)
     GetItemType(itemNo, 1);
     u16 race = *reinterpret_cast<u16*>(caravanWork + 0x3e0);
     int raceType = race & 3;
-    SingItemRecord* rec = &reinterpret_cast<SingItemRecord*>(Game.unkCFlatData0[2])[itemNo];
-    int smithItem = rec->raceItems[race & 3];
+    SItemFlatRow* rec = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo];
+    int smithItem = rec->m_smithResults[race & 3];
     if (smithItem > 0) {
         unsigned int genderMask = 0x10;
-        int flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
+        int flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[smithItem].m_equipFlags;
         int raceFlags = flags & 0xF;
         int genderFlags = flags & 0x30;
         unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e0) & 3);
@@ -3179,7 +3174,7 @@ int CMenuPcs::GetSmithItem(int itemNo)
 
     for (int i = 0; i < 4; i++) {
         if (raceType != i) {
-            smithItem = rec->raceItems[i];
+            smithItem = rec->m_smithResults[i];
             if (smithItem > 0) {
                 return smithItem;
             }
@@ -3192,8 +3187,8 @@ int CMenuPcs::GetSmithItem(int itemNo)
  * --INFO--
  * PAL Address: 0x80145f70
  * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8016C820
+ * EN Size: 232b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3201,22 +3196,22 @@ void CMenuPcs::GetRecipeMaterial(int itemNo, CMenuPcs::MaterialInfo* materialInf
 {
     GetItemType(itemNo, 1);
 
-    u8* itemBase = reinterpret_cast<u8*>(Game.unkCFlatData0[2]) + (itemNo * 0x48);
+    const SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo];
 
-    materialInfo->m_itemNo[0] = *reinterpret_cast<u16*>(itemBase + 0x26);
-    materialInfo->m_count[0] = *reinterpret_cast<u16*>(itemBase + 0x2C);
-    materialInfo->m_itemNo[1] = *reinterpret_cast<u16*>(itemBase + 0x28);
-    materialInfo->m_count[1] = *reinterpret_cast<u16*>(itemBase + 0x2E);
-    materialInfo->m_itemNo[2] = *reinterpret_cast<u16*>(itemBase + 0x2A);
-    materialInfo->m_count[2] = *reinterpret_cast<u16*>(itemBase + 0x30);
+    materialInfo->m_itemNo[0] = itemBase->m_smithMaterials[0];
+    materialInfo->m_count[0] = itemBase->m_smithMaterialCounts[0];
+    materialInfo->m_itemNo[1] = itemBase->m_smithMaterials[1];
+    materialInfo->m_count[1] = itemBase->m_smithMaterialCounts[1];
+    materialInfo->m_itemNo[2] = itemBase->m_smithMaterials[2];
+    materialInfo->m_count[2] = itemBase->m_smithMaterialCounts[2];
 }
 
 /*
  * --INFO--
  * PAL Address: 0x80145c84
  * PAL Size: 748b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8016C908
+ * EN Size: 400b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3228,7 +3223,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     char* suffix;
 
     GetItemType(itemNo, 1);
-    raceBits = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    raceBits = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
     int raceLow = raceBits & 0xF;
     int genderMask = raceBits & 0x30;
     outText[0] = '\0';

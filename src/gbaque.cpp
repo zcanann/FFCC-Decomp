@@ -3323,8 +3323,8 @@ void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
  * --INFO--
  * PAL Address: 0x800CBB04
  * PAL Size: 328b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800E71BC
+ * EN Size: 380b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3358,11 +3358,11 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 			const int iconMask = localPlayerData[2] & 3;
 			const int icon = MenuPcs.GetItemIcon(itemId);
 			if (icon == iconMask) {
-				int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
+				SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
 
-				cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
-				cmdData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
-				cmdData[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
+				cmdData[0] = __lhbrx(&itemBase->m_equipFlags, 0);
+				cmdData[1] = __lhbrx(&itemBase->m_value, 0);
+				cmdData[2] = __lhbrx(&itemBase->m_attribute, 0);
 				memcpy(writePtr, cmdData, sizeof(cmdData));
 
 				writePtr += 8;
@@ -3382,8 +3382,8 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
  * --INFO--
  * PAL Address: 0x800CB968
  * PAL Size: 412b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800E7338
+ * EN Size: 476b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3439,11 +3439,11 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	indexPtr = equipIndices;
 	for (i = 0; i < equipCount; i++) {
 		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + *indexPtr * 2);
-		int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
+		SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
 
-		equipData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
-		equipData[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
-		equipData[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
+		equipData[0] = __lhbrx(&itemBase->m_equipFlags, 0);
+		equipData[1] = __lhbrx(&itemBase->m_value, 0);
+		equipData[2] = __lhbrx(&itemBase->m_attribute, 0);
 		memcpy(outData, equipData, sizeof(equipData));
 		outData += 8;
 		dataSize += 8;
@@ -3721,10 +3721,10 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		if ((work < 1) || (work > 0x9E)) {
 			memset(sellInfo, 0, sizeof(sellInfo));
 		} else {
-			const int itemBase = Game.unkCFlatData0[2] + work * 0x48;
-			sellInfo[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
-			sellInfo[1] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 6), 0);
-			sellInfo[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 8), 0);
+			SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[work];
+			sellInfo[0] = __lhbrx(&itemBase->m_equipFlags, 0);
+			sellInfo[1] = __lhbrx(&itemBase->m_value, 0);
+			sellInfo[2] = __lhbrx(&itemBase->m_attribute, 0);
 		}
 		memcpy(writePtr, sellInfo, 8);
 		writePtr += 8;
@@ -3835,13 +3835,12 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
 		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
-			const unsigned int itemOffset = itemId * 0x48;
-			unsigned short* itemBase = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemOffset);
+			SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
 
 			memset(itemBuf, 0, sizeof(itemBuf));
 
 			int price = static_cast<int>(
-				static_cast<float>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(reinterpret_cast<int>(itemBase) + 0x24))) *
+				static_cast<float>(itemBase->m_smithPrice) *
 				static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopParam) / 100.0));
 
 			work = price;
@@ -3853,19 +3852,19 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			}
 
 			for (int j = 0; j < 4; j++) {
-				const int recipeBase = Game.unkCFlatData0[2] + itemOffset + j * 2;
+				SItemFlatRow* recipeRow = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
 				reinterpret_cast<unsigned short*>(itemBuf)[8 + j] =
-				    __lhbrx(reinterpret_cast<unsigned short*>(recipeBase + 0x38), 0);
-				work = *reinterpret_cast<unsigned short*>(recipeBase + 0x38);
+				    __lhbrx(&recipeRow->m_smithResults[j], 0);
+				work = recipeRow->m_smithResults[j];
 				if (work == 0) {
 					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 4] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 4] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 4] = 0;
 				} else {
-					const int materialBase = Game.unkCFlatData0[2] + work * 0x48;
-					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 4] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 4] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 6), 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 4] = __lhbrx(reinterpret_cast<unsigned short*>(materialBase + 8), 0);
+					SItemFlatRow* materialBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[work];
+					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 4] = __lhbrx(&materialBase->m_equipFlags, 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 4] = __lhbrx(&materialBase->m_value, 0);
+					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 4] = __lhbrx(&materialBase->m_attribute, 0);
 				}
 			}
 

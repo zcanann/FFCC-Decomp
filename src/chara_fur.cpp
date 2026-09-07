@@ -203,7 +203,7 @@ static inline CTexture* FindMogFurTexture(CChara::CModel* model)
 	CTextureSet* textureSet = model->m_texSet;
 
 	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find("n915m_2"));
-	return textureSet->GetTexture(textureIdx);
+	return textureSet->m_textureArray[textureIdx];
 }
 
 static inline void OpenMogHintMessage(int messageId)
@@ -1105,7 +1105,7 @@ int CChara::CModel::PickFur(
 								const float magBC = PSVECMag(areaBC);
 								CVector weights = CVector(magBC, magCA, magAB) * 0.5f;
 								PSVECScale(weights, weights,
-									       1.0f / (weights.z + weights.x + weights.y));
+									       1.0f / (weights.x + weights.y + weights.z));
 
 								const float outU =
 									verts[2].m_uv.x * weights.z + (verts[0].m_uv.x * weights.x + verts[1].m_uv.x * weights.y);

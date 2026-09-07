@@ -24,7 +24,15 @@ struct SItemFlatRow {
 	unsigned short m_fineValue;
 	unsigned char m_pad12[2];
 	unsigned short m_particles[3];
-	unsigned char m_pad1A[0x2E];
+	unsigned char m_pad1A[6];
+	unsigned short m_price;
+	unsigned char m_pad22[2];
+	unsigned short m_smithPrice;
+	unsigned short m_smithMaterials[3];
+	unsigned short m_smithMaterialCounts[3];
+	unsigned char m_pad32[6];
+	unsigned short m_smithResults[4];
+	unsigned char m_pad40[8];
 };
 STATIC_ASSERT(sizeof(SItemFlatRow) == 0x48);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_attribute) == 0x08);
@@ -32,6 +40,11 @@ STATIC_ASSERT(offsetof(SItemFlatRow, m_fineValue) == 0x10);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_stage) == 0x0C);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_model) == 0x02);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_particles) == 0x14);
+STATIC_ASSERT(offsetof(SItemFlatRow, m_price) == 0x20);
+STATIC_ASSERT(offsetof(SItemFlatRow, m_smithPrice) == 0x24);
+STATIC_ASSERT(offsetof(SItemFlatRow, m_smithMaterials) == 0x26);
+STATIC_ASSERT(offsetof(SItemFlatRow, m_smithMaterialCounts) == 0x2C);
+STATIC_ASSERT(offsetof(SItemFlatRow, m_smithResults) == 0x38);
 
 class CGItemObj : public CGPrgObj
 {

@@ -681,8 +681,8 @@ inline void GbaQueue::ChgCmdLstData(int channel, unsigned int data)
  * --INFO--
  * PAL Address: 0x800CFF38
  * PAL Size: 2972b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800E08B8
+ * EN Size: 2004b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -830,7 +830,7 @@ void GbaQueue::ExecutQueue()
 								reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_inventoryItems[static_cast<int>(bytes[2])];
 							reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->DeleteItemIdx(bytes[2], 1);
 							const unsigned short baseGil =
-								*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+								reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_price;
 							int gil = static_cast<int>(
 								static_cast<float>(
 									static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0)
@@ -855,7 +855,7 @@ void GbaQueue::ExecutQueue()
 								}
 							}
 							const unsigned short baseGil =
-								*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + shopItem * 0x48 + 0x20);
+								reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[shopItem].m_price;
 							const int gil = static_cast<int>(
 								static_cast<float>(
 									static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0)
@@ -947,8 +947,8 @@ inline void GbaQueue::SetBuyData(int, unsigned int)
  * --INFO--
  * PAL Address: 0x800CFCB8
  * PAL Size: 640b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800E17A0
+ * EN Size: 856b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -964,73 +964,40 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 
 	caravanWork->DeleteItemIdx(itemSlot, 1);
 
-	const unsigned int itemTableBase = Game.unkCFlatData0[2] + baseItem * 0x48;
-	unsigned short* recipeBase = reinterpret_cast<unsigned short*>(itemTableBase) + recipeIndex;
-	const int smithItem = recipeBase[0x1C];
+	const SItemFlatRow* itemRow = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[baseItem];
+	const int smithItem = itemRow->m_smithResults[recipeIndex];
 
-	unsigned int materialTable = itemTableBase;
-	for (int i = 0; i < 3; i++, materialTable += 2) {
-		const int materialId = *reinterpret_cast<unsigned short*>(materialTable + 0x26);
+	for (int i = 0; i < 3; i++) {
+		const int materialId = itemRow->m_smithMaterials[i];
 		if (materialId <= 0) {
 			break;
 		}
 
-		const int materialCount = *reinterpret_cast<unsigned short*>(materialTable + 0x2C);
+		const int materialCount = itemRow->m_smithMaterialCounts[i];
 		if (materialCount == 0) {
 			break;
 		}
 
 		for (int materialIdx = 0; materialIdx < static_cast<int>(materialCount); materialIdx++) {
-			int foundSlot = 0;
-			int groups;
-
-			for (groups = 0; groups < 8; groups++) {
+			int foundSlot;
+			for (foundSlot = 0; foundSlot < 64; foundSlot++) {
 				CCaravanWork* materialWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
 				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
 					break;
 				}
-				foundSlot++;
-				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
-					break;
-				}
-				foundSlot++;
-				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
-					break;
-				}
-				foundSlot++;
-				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
-					break;
-				}
-				foundSlot++;
-				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
-					break;
-				}
-				foundSlot++;
-				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
-					break;
-				}
-				foundSlot++;
-				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
-					break;
-				}
-				foundSlot++;
-				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
-					break;
-				}
-				foundSlot++;
 			}
 
 			reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->DeleteItemIdx(foundSlot, 1);
 		}
 	}
 
-	const int addItemResult = reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddItem(smithItem, 0);
-	if ((static_cast<unsigned int>(-addItemResult | addItemResult) >> 31) == 0) {
+	const bool addItemResult = reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddItem(smithItem, 0);
+	if (!addItemResult) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 
 	const float smithRate = static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->m_shopParam) / 100.0);
-	const int gilCost = -static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(itemTableBase + 0x24)) * smithRate);
+	const int gilCost = -static_cast<int>(static_cast<float>(itemRow->m_smithPrice) * smithRate);
 	const int addGilResult = reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(gilCost);
 	if ((static_cast<unsigned int>(-addGilResult | addGilResult) >> 31) == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
@@ -3615,8 +3582,8 @@ inline void GbaQueue::SmithEnd(int channel)
  * --INFO--
  * PAL Address: 0x800cb49c
  * PAL Size: 892b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800E78F8
+ * EN Size: 1144b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3674,7 +3641,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopList[i];
 		work = static_cast<int>(
 			static_cast<float>(static_cast<unsigned short>(
-				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + work * 0x48 + 0x20))) *
+				reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[work].m_price)) *
 			userRate);
 		if (work < 1) {
 			work = 1;
@@ -3716,8 +3683,8 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
  * --INFO--
  * PAL Address: 0x800cb0d0
  * PAL Size: 972b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800E7D70
+ * EN Size: 1264b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3773,7 +3740,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		if (work > 0) {
 			work = static_cast<int>(
 				static_cast<float>(static_cast<unsigned short>(
-					*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + work * 0x48 + 0x20))) *
+					reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[work].m_price)) *
 				userRate);
 			if (work < 1) {
 				work = 1;

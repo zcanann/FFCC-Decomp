@@ -238,17 +238,12 @@ static inline float& ModelChestAmp(CChara::CModel* model)
 
 static inline void* ModelCalcCbUser0(CChara::CModel* model)
 {
-	return *reinterpret_cast<void**>(ModelRaw(model) + 0xE4);
+	return model->m_callbackContext;
 }
 
 static inline void* ModelCalcCbUser1(CChara::CModel* model)
 {
-	return *reinterpret_cast<void**>(ModelRaw(model) + 0xE8);
-}
-
-static inline BeforeCalcMatrixCallback ModelBeforeCalcMatrixCallback(CChara::CModel* model)
-{
-	return *reinterpret_cast<BeforeCalcMatrixCallback*>(ModelRaw(model) + 0xEC);
+	return model->m_callbackParam;
 }
 
 static inline BeforeDrawModelCallback ModelBeforeDrawCallback(CChara::CModel* model)
@@ -288,12 +283,12 @@ static inline AfterMeshDrawCallback ModelShadowDisplayListCallback(CChara::CMode
 
 static inline void* ModelCbUser0(CChara::CModel* model)
 {
-	return *reinterpret_cast<void**>(ModelRaw(model) + 0xE4);
+	return model->m_callbackContext;
 }
 
 static inline void* ModelCbUser1(CChara::CModel* model)
 {
-	return *reinterpret_cast<void**>(ModelRaw(model) + 0xE8);
+	return model->m_callbackParam;
 }
 
 static inline float& ModelTwistAngle(CChara::CModel* model)
@@ -1272,16 +1267,13 @@ void CChara::CModel::calcBindMatrix()
  * --INFO--
  * PAL Address: 0x800723a4
  * PAL Size: 276b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8007FDCC
+ * EN Size: 392b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CChara::CModel::CalcMatrix()
 {
-	const float zero = FLOAT_803301b0;
-	const float one = FLOAT_803301BC;
-
 	m_worldBaseMtx[0][0] = m_matrix[0][0];
 	m_worldBaseMtx[1][0] = m_matrix[1][0];
 	m_worldBaseMtx[2][0] = m_matrix[2][0];
@@ -1291,33 +1283,32 @@ void CChara::CModel::CalcMatrix()
 	m_worldBaseMtx[0][2] = m_matrix[0][2];
 	m_worldBaseMtx[1][2] = m_matrix[1][2];
 	m_worldBaseMtx[2][2] = m_matrix[2][2];
-	m_worldBaseMtx[0][3] = zero;
-	m_worldBaseMtx[1][3] = zero;
-	m_worldBaseMtx[2][3] = zero;
+	m_worldBaseMtx[0][3] = 0.0f;
+	m_worldBaseMtx[1][3] = 0.0f;
+	m_worldBaseMtx[2][3] = 0.0f;
 
-	m_drawMtx[0][0] = one;
-	m_drawMtx[1][0] = zero;
-	m_drawMtx[2][0] = zero;
-	m_drawMtx[0][1] = zero;
-	m_drawMtx[1][1] = one;
-	m_drawMtx[2][1] = zero;
-	m_drawMtx[0][2] = zero;
-	m_drawMtx[1][2] = zero;
-	m_drawMtx[2][2] = one;
+	m_drawMtx[0][0] = 1.0f;
+	m_drawMtx[1][0] = 0.0f;
+	m_drawMtx[2][0] = 0.0f;
+	m_drawMtx[0][1] = 0.0f;
+	m_drawMtx[1][1] = 1.0f;
+	m_drawMtx[2][1] = 0.0f;
+	m_drawMtx[0][2] = 0.0f;
+	m_drawMtx[1][2] = 0.0f;
+	m_drawMtx[2][2] = 1.0f;
 	m_drawMtx[0][3] = m_matrix[0][3];
 	m_drawMtx[1][3] = m_matrix[1][3];
 	m_drawMtx[2][3] = m_matrix[2][3];
 
-	u16& blendCur = ModelBlendCur(this);
-	if (blendCur != 0) {
-		blendCur--;
+	if (m_blendCur != 0) {
+		m_blendCur--;
 	}
 
-	BeforeCalcMatrixCallback beforeCalcMatrix = ModelBeforeCalcMatrixCallback(this);
-	if (beforeCalcMatrix == 0 || beforeCalcMatrix(this, ModelCalcCbUser0(this), ModelCalcCbUser1(this)) != 0) {
+	BeforeCalcMatrixCallback beforeCalcMatrix = m_beforeCalcMatrixCallback;
+	if (beforeCalcMatrix == 0 || beforeCalcMatrix(this, m_callbackContext, m_callbackParam) != 0) {
 		calcMatrix();
 
-		CTexAnimSet* texAnimSet = ModelTexAnimSet(this);
+		CTexAnimSet* texAnimSet = m_texAnimSet;
 		if (texAnimSet != 0) {
 			texAnimSet->AddFrame();
 		}

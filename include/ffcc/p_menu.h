@@ -99,6 +99,25 @@ struct MenuWindowInfo
     short state;
 };
 
+struct WmCharaSelectEntry
+{
+    int m_padType;                   // 0x00
+    short m_currentSlot;             // 0x04
+    short m_displaySlot;             // 0x06
+    unsigned short m_disconnectTime; // 0x08
+    unsigned char m_confirmed;       // 0x0A
+    unsigned char m_cmakePending;    // 0x0B
+    unsigned char m_cmakeReady;      // 0x0C
+    unsigned char m_connected;       // 0x0D
+    unsigned char m_cancelled;       // 0x0E
+    unsigned char _pad0F;            // 0x0F
+};
+
+STATIC_ASSERT(sizeof(WmCharaSelectEntry) == 0x10);
+STATIC_ASSERT(offsetof(WmCharaSelectEntry, m_currentSlot) == 0x04);
+STATIC_ASSERT(offsetof(WmCharaSelectEntry, m_confirmed) == 0x0A);
+STATIC_ASSERT(offsetof(WmCharaSelectEntry, m_cancelled) == 0x0E);
+
 struct WmCharaAnimState
 {
     int m_animIndex;
@@ -706,7 +725,7 @@ public:
         unsigned char* m_frameData;
         WmFrameInfo* m_frameInfo;
         unsigned char* m_charaModelData;
-        unsigned char* m_charaSelectData;
+        WmCharaSelectEntry* m_charaSelectData;
     };
 
     unsigned char m_pad04[0x14 - 0x04];

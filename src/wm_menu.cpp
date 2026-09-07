@@ -399,22 +399,6 @@ struct WmMenuLightTable
 
 extern "C" WmMenuLightTable gWmMenuLightTables[];
 
-struct WmCharaSelectEntry
-{
-	int m_padType;                   // 0x00
-	short m_currentSlot;             // 0x04
-	short m_displaySlot;             // 0x06
-	unsigned short m_disconnectTime; // 0x08
-	unsigned char m_confirmed;       // 0x0A
-	unsigned char m_cmakePending;    // 0x0B
-	unsigned char m_cmakeReady;      // 0x0C
-	unsigned char m_connected;       // 0x0D
-	unsigned char m_cancelled;       // 0x0E
-	unsigned char _pad0F;            // 0x0F
-};
-
-STATIC_ASSERT(sizeof(WmCharaSelectEntry) == 0x10);
-
 static const int kWmMenuPlayerCount = 8;
 static const int kWmMenuControllerCount = 4;
 static const int kWmCharaSelectCount = kWmMenuPlayerCount;
@@ -437,11 +421,6 @@ struct GbaCMakeInfoRaw
 };
 
 STATIC_ASSERT(sizeof(GbaCMakeInfoRaw) == 0x20);
-
-static inline WmCharaSelectEntry* GetWmCharaSelectEntries(CMenuPcs* menu)
-{
-	return reinterpret_cast<WmCharaSelectEntry*>(menu->m_wm.m_charaSelectData);
-}
 
 static inline unsigned char* GetWmMenuCharaState(CMenuPcs* menu)
 {
@@ -826,7 +805,7 @@ void CMenuPcs::loadData()
 	InitCharaInfo();
 
 	m_wm.m_charaSelectData =
-	    static_cast<unsigned char*>(operator new[](kWmCharaSelectBytes, MenuPcs.m_menuStage, srcFile, 0x243));
+	    new (MenuPcs.m_menuStage, srcFile, 0x243) WmCharaSelectEntry[kWmCharaSelectCount];
 
 	m_wmWorldState =
 	    static_cast<WmWorldState*>(operator new(sizeof(WmWorldState), MenuPcs.m_menuStage, srcFile, 0x246));
@@ -1307,30 +1286,30 @@ inline void CMenuPcs::InitCSelCurPos()
 {
 	signed char usedMask = 0;
 	for (int i = 0; i < kWmMenuControllerCount; i++) {
-		GetWmCharaSelectEntries(this)[i].m_cmakeReady = 0;
-		GetWmCharaSelectEntries(this)[i].m_cmakePending = 0;
-		GetWmCharaSelectEntries(this)[i].m_confirmed = 0;
+		m_wm.m_charaSelectData[i].m_cmakeReady = 0;
+		m_wm.m_charaSelectData[i].m_cmakePending = 0;
+		m_wm.m_charaSelectData[i].m_confirmed = 0;
 		int slot = m_wmWorldState->m_backupParams[i];
 		if (slot < 0) {
-			GetWmCharaSelectEntries(this)[i].m_currentSlot = -1;
+			m_wm.m_charaSelectData[i].m_currentSlot = -1;
 		} else {
-			GetWmCharaSelectEntries(this)[i].m_currentSlot = static_cast<short>(slot);
+			m_wm.m_charaSelectData[i].m_currentSlot = static_cast<short>(slot);
 			usedMask |= 1 << slot;
 		}
 	}
 
 	for (int i = 0; i < kWmMenuControllerCount; i++) {
-		if (GetWmCharaSelectEntries(this)[i].m_currentSlot < 0) {
+		if (m_wm.m_charaSelectData[i].m_currentSlot < 0) {
 			int slot;
 			for (slot = 0; slot < kWmMenuPlayerCount; slot++) {
 				if ((usedMask & (1 << slot)) == 0) {
 					break;
 				}
 			}
-			GetWmCharaSelectEntries(this)[i].m_currentSlot = static_cast<short>(slot);
+			m_wm.m_charaSelectData[i].m_currentSlot = static_cast<short>(slot);
 			usedMask |= 1 << slot;
 		}
-		GetWmCharaSelectEntries(this)[i].m_displaySlot = GetWmCharaSelectEntries(this)[i].m_currentSlot;
+		m_wm.m_charaSelectData[i].m_displaySlot = m_wm.m_charaSelectData[i].m_currentSlot;
 	}
 }
 
@@ -3453,7 +3432,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	if (loadedCount != validCount) {
 		return;
 	}
-	WmCharaSelectEntry& entry = *reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
+	WmCharaSelectEntry& entry = m_wm.m_charaSelectData[0];
 	if (entry.m_confirmed != 0) {
 		return;
 	}
@@ -3517,7 +3496,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		return;
 	}
 
-	WmCharaSelectEntry& curEntry = *reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
+	WmCharaSelectEntry& curEntry = m_wm.m_charaSelectData[0];
 	int cursor = static_cast<int>(curEntry.m_currentSlot);
 	if ((repeat & 0x0C) != 0) {
 		if (cursor < 4) {
@@ -3616,7 +3595,7 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 		CalcChara();
 	}
 
-	WmCharaSelectEntry* const entry = GetWmCharaSelectEntries(this);
+	WmCharaSelectEntry* const entry = m_wm.m_charaSelectData;
 	if (entry->m_cancelled != 0) {
 		return -2;
 	}
@@ -3657,7 +3636,7 @@ void CMenuPcs::SetMenuCharaAnim(int charaIndex, int animIndex)
  */
 void CMenuPcs::CalcGoOutSelCharInit()
 {
-	WmCharaSelectEntry* const entry = GetWmCharaSelectEntries(this);
+	WmCharaSelectEntry* const entry = m_wm.m_charaSelectData;
 
 	entry->m_confirmed = 0;
 	entry->m_cancelled = 0;
@@ -7684,17 +7663,10 @@ void CMenuPcs::CalcChara()
 	int* charaWork = reinterpret_cast<int*>(m_wm.m_worldObjData + 0xA00);
 	unsigned int selectedMask = 0;
 
-	if (m_wm.m_charaSelectData[0x0D] == 1) {
-		selectedMask = 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x04));
-	}
-	if (m_wm.m_charaSelectData[0x1D] == 1) {
-		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x14));
-	}
-	if (m_wm.m_charaSelectData[0x2D] == 1) {
-		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x24));
-	}
-	if (m_wm.m_charaSelectData[0x3D] == 1) {
-		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x34));
+	for (int i = 0; i < kWmMenuControllerCount; i++) {
+		if (m_wm.m_charaSelectData[i].m_connected == 1) {
+			selectedMask |= 1u << static_cast<unsigned int>(m_wm.m_charaSelectData[i].m_currentSlot);
+		}
 	}
 
 	for (int slot = 0; slot < 8; slot++) {
@@ -7702,9 +7674,9 @@ void CMenuPcs::CalcChara()
 		int effectCount = 0;
 
 		for (int player = 0; player < 4; player++) {
-			unsigned char* const entry = m_wm.m_charaSelectData + player * 0x10;
-			const int currentSlot = *reinterpret_cast<short*>(entry + 0x04);
-			if ((entry[0x0D] == 1) && (currentSlot >= 0) && (slot == currentSlot)) {
+			WmCharaSelectEntry* const entry = &m_wm.m_charaSelectData[player];
+			const int currentSlot = entry->m_currentSlot;
+			if ((entry->m_connected == 1) && (currentSlot >= 0) && (slot == currentSlot)) {
 				effectCount++;
 				effectMask |= 1u << player;
 			}
@@ -7871,20 +7843,13 @@ void CMenuPcs::CalcChara()
  */
 void CMenuPcs::PCAnimCtrl()
 {
-	unsigned char* const charaSelect = m_wm.m_charaSelectData;
+	WmCharaSelectEntry* const charaSelect = m_wm.m_charaSelectData;
 	unsigned int selectedMask = 0;
 
-	if (charaSelect[0x0D] != 0 && charaSelect[0x0A] != 0) {
-		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 4)[0];
-	}
-	if (charaSelect[0x1D] != 0 && charaSelect[0x1A] != 0) {
-		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 0x14)[0];
-	}
-	if (charaSelect[0x2D] != 0 && charaSelect[0x2A] != 0) {
-		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 0x24)[0];
-	}
-	if (charaSelect[0x3D] != 0 && charaSelect[0x3A] != 0) {
-		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 0x34)[0];
+	for (int i = 0; i < kWmMenuControllerCount; i++) {
+		if (charaSelect[i].m_connected != 0 && charaSelect[i].m_confirmed != 0) {
+			selectedMask |= 1 << charaSelect[i].m_currentSlot;
+		}
 	}
 
 	WmCharaAnimState* animState = m_wmCharaAnimState;
@@ -8000,7 +7965,7 @@ void CMenuPcs::DrawChara()
 
 		int selectedMask = 0;
 		for (int chan = 0; chan < 4; chan++) {
-			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[chan];
+			WmCharaSelectEntry& entry = m_wm.m_charaSelectData[chan];
 			const int slot = entry.m_currentSlot;
 			if (entry.m_connected == 1 && slot >= 0 && i == slot) {
 				selectedMask |= 1 << chan;
@@ -8185,7 +8150,6 @@ int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
 void CMenuPcs::CalcCharaSelect()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
@@ -8204,7 +8168,7 @@ void CMenuPcs::CalcCharaSelect()
 	requestCancel = 0;
 	requestFinalize = 0;
 	for (int i = 0; i < 4; i++) {
-		WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
+		WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
 
 		if ((i != 0) && (Game.m_gameWork.m_menuStageMode != 0)) {
 			padRepeat[i] = 0;
@@ -8248,7 +8212,7 @@ void CMenuPcs::CalcCharaSelect()
 		if (winState == 1 && (__p3 & 0x0300) != 0) {
 			m_menuWindowInfo->state = 2;
 			for (int i = 0; i < 4; i++) {
-				WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
+				WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
 				if (entry.m_confirmed != 0) {
 					GetWmCharaAnimState(this)[entry.m_currentSlot].m_nextAnimIndex = 0;
 				}
@@ -8266,8 +8230,8 @@ void CMenuPcs::CalcCharaSelect()
 			if (Game.m_gameWork.m_menuStageMode != 0) {
 				break;
 			}
-			if (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0) {
-				pendingMask |= 1u << static_cast<unsigned int>(GetWmCharaSelectEntries(this)[i].m_currentSlot);
+			if (m_wm.m_charaSelectData[i].m_cmakePending != 0) {
+				pendingMask |= 1u << static_cast<unsigned int>(m_wm.m_charaSelectData[i].m_currentSlot);
 			}
 		}
 
@@ -8275,7 +8239,7 @@ void CMenuPcs::CalcCharaSelect()
 			if (Game.m_gameWork.m_menuStageMode != 0) {
 				break;
 			}
-			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
+			WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
 
 			if (entry.m_connected == 0) {
 				GbaQue.ClrCmakeInfo(i);
@@ -8306,8 +8270,8 @@ void CMenuPcs::CalcCharaSelect()
 
 		unsigned int confirmedSlotMask = 0;
 		for (int i = 0; i < 4; i++) {
-			if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0) {
-				confirmedSlotMask |= 1u << static_cast<unsigned int>(GetWmCharaSelectEntries(this)[i].m_currentSlot);
+			if (m_wm.m_charaSelectData[i].m_confirmed != 0) {
+				confirmedSlotMask |= 1u << static_cast<unsigned int>(m_wm.m_charaSelectData[i].m_currentSlot);
 			}
 		}
 
@@ -8326,7 +8290,7 @@ void CMenuPcs::CalcCharaSelect()
 		int locallyConfirmedCount = 0;
 		int readyMask = 0;
 		for (int i = 0; i < 4; i++) {
-			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
+			WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
 			if (entry.m_connected != 0) {
 				CCaravanWork& work = Game.m_caravanWorkArr[entry.m_currentSlot];
 				readyMask |= 1 << i;
@@ -8384,9 +8348,8 @@ void CMenuPcs::CalcCharaSelect()
 		unsigned short* pRep = padRepeat + 3;
 		unsigned short* pTrig = padTrig + 3;
 		int i = 3;
-		int entOff = 0x30;
-		for (; i >= 0; i--, pRep--, pTrig--, entOff -= 0x10) {
-			WmCharaSelectEntry& entry = (*reinterpret_cast<WmCharaSelectEntry*>(reinterpret_cast<char*>(GetWmCharaSelectEntries(this)) + entOff));
+		for (; i >= 0; i--, pRep--, pTrig--) {
+			WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
 			if (entry.m_cmakeReady == 1) {
 				GbaCMakeInfoRaw info;
 				entry.m_confirmed = 1;
@@ -8519,8 +8482,8 @@ void CMenuPcs::CalcCharaSelect()
 						} else {
 							int other;
 							for (other = 0; other < 4; other++) {
-								if (i != other && GetWmCharaSelectEntries(this)[other].m_cmakePending != 0 &&
-								    GetWmCharaSelectEntries(this)[other].m_currentSlot == currentSlot) {
+								if (i != other && m_wm.m_charaSelectData[other].m_cmakePending != 0 &&
+								    m_wm.m_charaSelectData[other].m_currentSlot == currentSlot) {
 									Sound.PlaySe(4, 0x40, 0x7F, 0);
 									break;
 								}
@@ -8538,8 +8501,8 @@ void CMenuPcs::CalcCharaSelect()
 					} else {
 						int other;
 						for (other = 0; other < 4; other++) {
-							if (i != other && GetWmCharaSelectEntries(this)[other].m_confirmed != 0 &&
-							    GetWmCharaSelectEntries(this)[other].m_currentSlot == currentSlot) {
+							if (i != other && m_wm.m_charaSelectData[other].m_confirmed != 0 &&
+							    m_wm.m_charaSelectData[other].m_currentSlot == currentSlot) {
 								Sound.PlaySe(4, 0x40, 0x7F, 0);
 								break;
 							}
@@ -8582,7 +8545,7 @@ void CMenuPcs::CalcCharaSelect()
 		if (requestCancel) {
 			int anySelected = 0;
 			for (int i = 0; i < 4; i++) {
-				if ((GetWmCharaSelectEntries(this)[i].m_confirmed != 0) || (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0)) {
+				if ((m_wm.m_charaSelectData[i].m_confirmed != 0) || (m_wm.m_charaSelectData[i].m_cmakePending != 0)) {
 					anySelected = 1;
 					break;
 				}
@@ -8599,12 +8562,12 @@ void CMenuPcs::CalcCharaSelect()
 		if (requestFinalize) {
 			int activeCount = 0;
 			for (int i = 0; i < 4; i++) {
-				if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0) {
+				if (m_wm.m_charaSelectData[i].m_confirmed != 0) {
 					activeCount++;
 				}
 			}
 			for (int i = 0; i < 4; i++) {
-				if (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0) {
+				if (m_wm.m_charaSelectData[i].m_cmakePending != 0) {
 					activeCount = 0;
 					break;
 				}
@@ -8623,7 +8586,7 @@ void CMenuPcs::CalcCharaSelect()
 
 		int finishedMask = 0;
 		for (int i = 0; i < 4; i++) {
-			if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0) {
+			if (m_wm.m_charaSelectData[i].m_confirmed != 0) {
 				finishedMask |= 1 << i;
 			}
 		}
@@ -8632,7 +8595,7 @@ void CMenuPcs::CalcCharaSelect()
 			GetWmWorldState(this)->m_delay = 10;
 		} else {
 			for (int i = 0; i < 4; i++) {
-				if (GetWmCharaSelectEntries(this)[i].m_connected == 0 && GetWmCharaSelectEntries(this)[i].m_disconnectTime < 0x1E) {
+				if (m_wm.m_charaSelectData[i].m_connected == 0 && m_wm.m_charaSelectData[i].m_disconnectTime < 0x1E) {
 					readyMask |= 1 << i;
 				}
 			}
@@ -8644,42 +8607,17 @@ void CMenuPcs::CalcCharaSelect()
 
 		if (GetWmWorldState(this)->m_nextMenuMode != 0) {
 			GbaQue.SetControllerMode(1);
-			{
-				WmCharaSelectEntry& e0 = GetWmCharaSelectEntries(this)[0];
-				if (e0.m_cmakePending != 0) {
-					e0.m_confirmed = 0;
-					e0.m_cmakePending = 0;
-					e0.m_cmakeReady = 0;
-				}
-			}
-			{
-				WmCharaSelectEntry& e1 = GetWmCharaSelectEntries(this)[1];
-				if (e1.m_cmakePending != 0) {
-					e1.m_confirmed = 0;
-					e1.m_cmakePending = 0;
-					e1.m_cmakeReady = 0;
-				}
-			}
-			{
-				WmCharaSelectEntry& e2 = GetWmCharaSelectEntries(this)[2];
-				if (e2.m_cmakePending != 0) {
-					e2.m_confirmed = 0;
-					e2.m_cmakePending = 0;
-					e2.m_cmakeReady = 0;
-				}
-			}
-			{
-				WmCharaSelectEntry& e3 = GetWmCharaSelectEntries(this)[3];
-				if (e3.m_cmakePending != 0) {
-					e3.m_confirmed = 0;
-					e3.m_cmakePending = 0;
-					e3.m_cmakeReady = 0;
+			for (int i = 0; i < kWmMenuControllerCount; i++) {
+				WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
+				if (entry.m_cmakePending != 0) {
+					entry.m_confirmed = 0;
+					entry.m_cmakePending = 0;
+					entry.m_cmakeReady = 0;
 				}
 			}
 		}
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -8695,7 +8633,7 @@ void CMenuPcs::CalcCharaSelect()
 void CMenuPcs::DrawCharaName()
 {
 	CFont* const font = GetWmFont(this);
-	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
+	WmCharaSelectEntry* const selectEntries = m_wm.m_charaSelectData;
 	unsigned char nameBuf[0x20];
 
 	const char** emptyText;
@@ -8919,7 +8857,7 @@ void CMenuPcs::DrawCMLife()
 {
 	static FCV s_LifePos = {3, gWmLifeYOffsetSplinePoints};
 #define worldState GetWmWorldState(this)
-#define selectEntries GetWmCharaSelectEntries(this)
+#define selectEntries m_wm.m_charaSelectData
 
 	float fade;
 	if (worldState->m_mainState == 1) {
@@ -9260,7 +9198,6 @@ void CMenuPcs::WMChgMenu()
 		break;
 	}
 	case 3: {
-			int iVar11 = iVar8;
 			double dVar16b = (double)FLOAT_80331664;
 			int iVar12 = 0;
 			int iVar13 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0xA00;
@@ -9268,8 +9205,8 @@ void CMenuPcs::WMChgMenu()
 				const int handleIdx = iVar12 + 0x20;
 				*reinterpret_cast<unsigned char*>(m_wm.m_charaModelData + iVar8 + 0xC) = 1;
 				*reinterpret_cast<float*>(iVar13 + 0x2C) = (float)dVar16b;
-				int selectData = reinterpret_cast<int>(m_wm.m_charaSelectData) + iVar11;
-				*reinterpret_cast<short*>(selectData + 6) = *reinterpret_cast<short*>(selectData + 4);
+				WmCharaSelectEntry* const selectData = &m_wm.m_charaSelectData[iVar12];
+				selectData->m_displaySlot = selectData->m_currentSlot;
 				if (m_wm.m_handles[handleIdx]->IsModelLoaded(1)) {
 					Mtx mtx;
 					PSMTXIdentity(mtx);
@@ -9278,7 +9215,6 @@ void CMenuPcs::WMChgMenu()
 					m_wm.m_handles[handleIdx]->m_model->CalcSkin();
 				}
 				iVar12 = iVar12 + 1;
-				iVar11 = iVar11 + 0x10;
 				iVar13 = iVar13 + 0x50;
 				iVar8 = iVar8 + 0x34;
 			} while (iVar12 < 8);
@@ -9301,10 +9237,9 @@ void CMenuPcs::WMChgMenu()
 	switch (iVar14) {
 	case 0: {
 		if (m_wmWorldState->m_menuMode == 4) {
-			Game.m_gameWork.m_wmBackupParams[0] = (int)m_wmWorldState->m_backupParams[0];
-			Game.m_gameWork.m_wmBackupParams[1] = (int)m_wmWorldState->m_backupParams[1];
-			Game.m_gameWork.m_wmBackupParams[2] = (int)m_wmWorldState->m_backupParams[2];
-			Game.m_gameWork.m_wmBackupParams[3] = (int)m_wmWorldState->m_backupParams[3];
+			for (int i = 0; i < kWmMenuControllerCount; i++) {
+				Game.m_gameWork.m_wmBackupParams[i] = m_wmWorldState->m_backupParams[i];
+			}
 			bytes[0x10] = 1;
 			bytes[0x12] = 0;
 			bytes[0x13] = 0;
@@ -9319,27 +9254,12 @@ void CMenuPcs::WMChgMenu()
 		break;
 	case 3: {
 		if (m_wmWorldState->m_menuMode == 4) {
-			int selectBase = reinterpret_cast<int>(m_wm.m_charaSelectData);
-			int* bp = Game.m_gameWork.m_wmBackupParams;
-			int v0 = (*reinterpret_cast<unsigned char*>(selectBase + 10) != 0)
-			    ? (int)*reinterpret_cast<short*>(selectBase + 4) : -1;
-			*bp++ = v0;
-			m_wmWorldState->m_backupParams[0] = (short)v0;
-
-			int v1 = (*reinterpret_cast<unsigned char*>(selectBase + 0x1A) != 0)
-			    ? (int)*reinterpret_cast<short*>(selectBase + 0x14) : -1;
-			*bp++ = v1;
-			m_wmWorldState->m_backupParams[1] = (short)v1;
-
-			int v2 = (*reinterpret_cast<unsigned char*>(selectBase + 0x2A) != 0)
-			    ? (int)*reinterpret_cast<short*>(selectBase + 0x24) : -1;
-			*bp++ = v2;
-			m_wmWorldState->m_backupParams[2] = (short)v2;
-
-			int v3 = (*reinterpret_cast<unsigned char*>(selectBase + 0x3A) != 0)
-			    ? (int)*reinterpret_cast<short*>(selectBase + 0x34) : -1;
-			*bp++ = v3;
-			m_wmWorldState->m_backupParams[3] = (short)v3;
+			for (int i = 0; i < kWmMenuControllerCount; i++) {
+				const int slot = m_wm.m_charaSelectData[i].m_confirmed != 0
+				    ? m_wm.m_charaSelectData[i].m_currentSlot : -1;
+				Game.m_gameWork.m_wmBackupParams[i] = slot;
+				m_wmWorldState->m_backupParams[i] = static_cast<short>(slot);
+			}
 
 			bytes[0x10] = 1;
 			bytes[0x12] = 0;
@@ -9422,10 +9342,10 @@ inline void CMenuPcs::SetParty()
  */
 void CMenuPcs::SetCMakeEnd(int channel)
 {
-	m_wm.m_charaSelectData[channel * 0x10 + 0xC] = 1;
+	m_wm.m_charaSelectData[channel].m_cmakeReady = 1;
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), channel,
-		               (int)*reinterpret_cast<short*>(&m_wm.m_charaSelectData[channel * 0x10 + 4]));
+		               (int)m_wm.m_charaSelectData[channel].m_currentSlot);
 	}
 }
 
@@ -9440,8 +9360,8 @@ void CMenuPcs::SetCMakeEnd(int channel)
  */
 void CMenuPcs::ClrCMakeFlg(int channel)
 {
-	m_wm.m_charaSelectData[channel * 0x10 + 0xB] = 0;
-	const int current = *reinterpret_cast<short*>(&m_wm.m_charaSelectData[channel * 0x10 + 4]);
+	m_wm.m_charaSelectData[channel].m_cmakePending = 0;
+	const int current = m_wm.m_charaSelectData[channel].m_currentSlot;
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390), channel, current);
 	}
@@ -9536,7 +9456,7 @@ void CMenuPcs::ChgAllModel2()
 inline void CMenuPcs::SetMakeChara(int slot)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const selectData = m_wm.m_charaSelectData;
+	WmCharaSelectEntry* const selectData = m_wm.m_charaSelectData;
 	unsigned char* const modelData = m_wm.m_charaModelData;
 	WmWorldState* const worldState = m_wmWorldState;
 
@@ -9548,16 +9468,16 @@ inline void CMenuPcs::SetMakeChara(int slot)
 	}
 
 	if (selectData != 0) {
-		unsigned char* const entry = selectData + slot * 0x10;
-		*reinterpret_cast<short*>(entry + 6) = *reinterpret_cast<short*>(entry + 4);
-		if (entry[0x0D] == 0) {
-			entry[0x0A] = 0;
-			entry[0x0B] = 0;
-		} else if (entry[0x0B] == 0) {
-			entry[0x0B] = 1;
+		WmCharaSelectEntry* const entry = &selectData[slot];
+		entry->m_displaySlot = entry->m_currentSlot;
+		if (entry->m_connected == 0) {
+			entry->m_confirmed = 0;
+			entry->m_cmakePending = 0;
+		} else if (entry->m_cmakePending == 0) {
+			entry->m_cmakePending = 1;
 		}
-		bytes[0x17] = entry[0x0A];
-		gWmMenuWorkB = *reinterpret_cast<short*>(entry + 4);
+		bytes[0x17] = entry->m_confirmed;
+		gWmMenuWorkB = entry->m_currentSlot;
 	}
 
 	if (modelData != 0 && modelData[slot * 0x34 + 0x0C] != 0) {
@@ -12129,10 +12049,10 @@ inline void CMenuPcs::IsAsyncCharaLoadFinish()
 		loadedCount++;
 	}
 	if (ready != 0) {
-		const unsigned char* const selectData = m_wm.m_charaSelectData;
+		const WmCharaSelectEntry* const selectData = m_wm.m_charaSelectData;
 		if (selectData != 0) {
 			for (int i = 0; i < 4; i++) {
-				if (selectData[i * 0x10 + 0xB] != 0 && selectData[i * 0x10 + 0xC] == 0) {
+				if (selectData[i].m_cmakePending != 0 && selectData[i].m_cmakeReady == 0) {
 					ready = 0;
 					break;
 				}

@@ -70,8 +70,6 @@ static unsigned int m_seed;
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma bool off
 static inline int nearColor(CColor src, CColor ref)
 {
 	int hits = 0;
@@ -81,25 +79,24 @@ static inline int nearColor(CColor src, CColor ref)
 		dr = -dr;
 	}
 	dr += 7 - static_cast<int>(src.color.a);
-	hits += (dr <= 5);
+	hits += dr <= 5 ? 1 : 0;
 
 	int dg = static_cast<int>(src.color.g) - static_cast<int>(ref.color.g);
 	if (dg < 0) {
 		dg = -dg;
 	}
 	dg += 7 - static_cast<int>(src.color.a);
-	hits += (dg <= 5);
+	hits += dg <= 5 ? 1 : 0;
 
 	int db = static_cast<int>(src.color.b) - static_cast<int>(ref.color.b);
 	if (db < 0) {
 		db = -db;
 	}
 	db += 7 - static_cast<int>(src.color.a);
-	hits += (db <= 5);
+	hits += db <= 5 ? 1 : 0;
 
-	return hits == 3;
+	return hits == 3 ? 1 : 0;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -805,6 +802,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	LightPcs.EnableLight(1, 0);
 }
 
+static inline int FurTexelIndex(int x, int y, int tileRowStride)
+{
+	return x % 4 + (y % 4) * 4 + (x / 4) * 0x10 + (y / 4) * tileRowStride;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800e2174
@@ -847,7 +849,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 			}
 
 			distance = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
-			tileIndex = px % 4 + (py % 4) * 4 + px / 4 * 0x10 + (py / 4) * rowStride;
+			tileIndex = FurTexelIndex(px, py, rowStride);
 			packed = pixels[tileIndex];
 
 			b = packed & 0x0f;
@@ -1639,7 +1641,7 @@ void CChara::CalcMogScore()
 				continue;
 			}
 
-			const int tileIndex = ((y % 4) * 4 + (x / 4) * 0x10 + (y / 4) * 0x100) + (x % 4);
+			const int tileIndex = FurTexelIndex(x, y, 0x100);
 
 			const unsigned short packed = texels[tileIndex];
 			const int a = (packed >> 12) & 7;
@@ -1795,7 +1797,7 @@ void CChara::TimeMogFur()
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
-			int tileIndex = (y / 4) * 0x100 + (x / 4) * 0x10 + (y % 4) * 4 + (x % 4);
+			int tileIndex = FurTexelIndex(x, y, 0x100);
 			unsigned short packed = texels[tileIndex];
 			int a = (packed >> 12) & 7;
 			int baseLight = 7 - a;

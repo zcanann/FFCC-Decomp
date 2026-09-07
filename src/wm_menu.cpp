@@ -60,25 +60,14 @@ extern const char lbl_80331208[5];
 
 char* DAT_8032E8A8 = const_cast<char*>(lbl_80331208);
 unsigned char lbl_8032E8AC = 1;
-int gWmModelYOffsetSplineCount = 9;
-float* gWmModelYOffsetSpline = gWmModelYOffsetSplinePoints;
-int gWmModelRotationSplineCount = 5;
-float* gWmModelRotationSpline = gWmModelRotationSplinePoints;
-struct SplineTable {
-	int count;
-	float* data;
-};
-SplineTable s_YearTrns = {5, lbl_802109B4};
-int DAT_8032E8C8 = 3;
-float* DAT_8032E8CC = lbl_80210A04;
-int DAT_8032E8D0 = 4;
-float* DAT_8032E8D4 = lbl_80210A34;
-int DAT_8032E8D8 = 4;
-float* DAT_8032E8DC = lbl_80210A74;
-int DAT_8032E8E0 = 5;
-float* DAT_8032E8E4 = lbl_80210AB4;
-int DAT_8032E8E8 = 7;
-float* DAT_8032E8EC = lbl_80210B04;
+static CMenuPcs::FCV s_WoodTrns = {9, gWmModelYOffsetSplinePoints};
+static CMenuPcs::FCV s_WoodRot = {5, gWmModelRotationSplinePoints};
+static CMenuPcs::FCV s_YearTrns = {5, lbl_802109B4};
+static CMenuPcs::FCV s_YearAlpha = {3, lbl_80210A04};
+static CMenuPcs::FCV s_MenuObjYRot = {4, lbl_80210A34};
+static CMenuPcs::FCV s_MenuObjZRot = {4, lbl_80210A74};
+static CMenuPcs::FCV s_MenuObjYTrs = {5, lbl_80210AB4};
+static CMenuPcs::FCV s_MenuObjScl = {7, lbl_80210B04};
 extern int DAT_8032ef08;
 extern int DAT_80238028;
 extern char cRam8032ee21;
@@ -379,8 +368,6 @@ const char* s_wmEmptyCreatingTextDe_8032E8F8[] = {s_Frei_803313AC, s_Wird_kreier
 const char* s_wmEmptyCreatingTextIt_8032E900[] = {s_Vuoto_803313B4, s_Creazione_801DC26C};
 const char* s_wmEmptyCreatingTextFr_8032E908[] = {s_Vide_803313BC, s_Creation_801DC27C};
 const char* s_wmEmptyCreatingTextEs_8032E910[] = {s_Vacio_803313C4, s_Creando_801DC288};
-int gWmLifeYOffsetSplineCount = 3;
-float* gWmLifeYOffsetSpline = gWmLifeYOffsetSplinePoints;
 extern "C" const char s_wm_menu_cpp[] = "wm_menu.cpp";
 static const char s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
 static const char s_chan_pctd_cur_pctd_801DC3D8[] = "chan = %d  cur = %d\n";
@@ -411,49 +398,6 @@ struct WmMenuLightTable
 };
 
 extern "C" WmMenuLightTable gWmMenuLightTables[];
-
-#define WM_MENU_EVAL_SPLINE(result, wmTblArg, wmCntArg, wmTimeArg)                                      \
-	do {                                                                                       \
-		SplineTable wmSpline;                                                                  \
-		SplineTable* wmSplinePtr = &wmSpline;                                                  \
-		wmSpline.count = (wmCntArg);                                                              \
-		wmSpline.data = (wmTblArg);                                                               \
-		result = FLOAT_803313dc;                                                               \
-		if ((wmTimeArg) >= wmSplinePtr->data[wmSplinePtr->count * 4 - 4]) {                                 \
-			result = wmSplinePtr->data[wmSplinePtr->count * 4 - 3];                                     \
-		} else {                                                                               \
-			float* wmSplineTable = wmSplinePtr->data;                                              \
-			int wmSplineIndex;                                                                 \
-			for (wmSplineIndex = 0; wmSplineIndex < wmSplinePtr->count;                            \
-			     wmSplineTable += 4, wmSplineIndex++) {                                        \
-				if ((wmTimeArg) <= *wmSplineTable) {                                                \
-					if (wmSplineIndex == 0) {                                                  \
-						result = wmSplinePtr->data[wmSplineIndex * 4 + 1];                          \
-					} else {                                                                   \
-						float* wmSplineCur = wmSplinePtr->data + wmSplineIndex * 4;                 \
-						float* wmSplinePrev = wmSplinePtr->data + (wmSplineIndex - 1) * 4;          \
-						float wmSplineDt = *wmSplineCur - *wmSplinePrev;                       \
-						float wmSplineU = ((wmTimeArg) - *wmSplinePrev) / wmSplineDt;               \
-						float wmSplineU2 = wmSplineU * wmSplineU;                              \
-						float wmSplineU3 = wmSplineU2 * wmSplineU;                             \
-						result = wmSplineDt *                                                   \
-						             (wmSplinePrev[3] *                                       \
-						                  (wmSplineU + (wmSplineU3 -                           \
-						                                FLOAT_803314c8 * wmSplineU2)) +        \
-						              wmSplineCur[2] * (wmSplineU3 - wmSplineU2)) +            \
-						         (wmSplinePrev[1] *                                            \
-						              (FLOAT_803313e8 +                                       \
-						               (FLOAT_803314c8 * wmSplineU3 - FLOAT_803314c4 *         \
-						                                                 wmSplineU2)) +         \
-						          wmSplineCur[1] *                                             \
-						              (FLOAT_803314cc * wmSplineU3 + FLOAT_803314c4 *          \
-						                                                 wmSplineU2));          \
-					}                                                                          \
-					break;                                                                     \
-				}                                                                              \
-			}                                                                                  \
-		}                                                                                      \
-	} while (0)
 
 struct WmCharaSelectEntry
 {
@@ -6913,13 +6857,13 @@ void CMenuPcs::CalcFukidashi()
 		// Spline evaluation for Y position
 		*reinterpret_cast<float*>(puVar20 + 8) =
 		    *reinterpret_cast<float*>(puVar20 + 8) +
-		    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelYOffsetSplineCount),
+		    static_cast<float>(GetFcvValue(s_WoodTrns,
 		                                   static_cast<float>(puVar20[1])));
 
 		// Spline evaluation for rotation
 		*reinterpret_cast<float*>(puVar20 + 0xB) =
 		    FLOAT_803314bc *
-		    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelRotationSplineCount),
+		    static_cast<float>(GetFcvValue(s_WoodRot,
 		                                   static_cast<float>(puVar20[1])));
 		*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_803315d0;
 
@@ -6943,7 +6887,7 @@ void CMenuPcs::CalcFukidashi()
 		puVar20[1] = puVar20[1] + 1;
 		if (static_cast<double>(static_cast<float>(puVar20[1])) >=
 		    DOUBLE_803314A8 * static_cast<double>(
-		        reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount)->data[gWmModelYOffsetSplineCount * 4 - 4])) {
+		        s_WoodTrns.keys[s_WoodTrns.keyCount * 4 - 4])) {
 			puVar20[1] = 0;
 		}
 	}
@@ -6951,7 +6895,7 @@ void CMenuPcs::CalcFukidashi()
 	// Player character model slots
 	unsigned int field1a = (unsigned int)*reinterpret_cast<short*>(bytes + 0x1A);
 	if ((field1a & 0x200) != 0 && (field1a & 0xF) != 0) {
-		SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
+		CMenuPcs::FCV* const yTbl = &s_WoodTrns;
 		int playerCount = 0;
 		for (bitIdx = 0; bitIdx < 4; bitIdx++) {
 			if ((field1a & (1 << bitIdx)) != 0) playerCount++;
@@ -6991,13 +6935,13 @@ void CMenuPcs::CalcFukidashi()
 				// Spline Y for player models
 				*reinterpret_cast<float*>(puVar20 + 8) =
 				    *reinterpret_cast<float*>(puVar20 + 8) +
-				    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelYOffsetSplineCount),
+				    static_cast<float>(GetFcvValue(s_WoodTrns,
 				                                   static_cast<float>(puVar20[1])));
 
 				// Spline rotation for player models
 				*reinterpret_cast<float*>(puVar20 + 0xB) =
 				    FLOAT_803314bc *
-				    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelRotationSplineCount),
+				    static_cast<float>(GetFcvValue(s_WoodRot,
 				                                   static_cast<float>(puVar20[1])));
 				if (playerCount == 1) {
 					*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_80331744;
@@ -7023,7 +6967,7 @@ void CMenuPcs::CalcFukidashi()
 
 				puVar20[1] = puVar20[1] + 1;
 				if (static_cast<double>(static_cast<float>(puVar20[1])) >=
-				    DOUBLE_803314A8 * static_cast<double>(yTbl->data[gWmModelYOffsetSplineCount * 4 - 4])) {
+				    DOUBLE_803314A8 * static_cast<double>(yTbl->keys[s_WoodTrns.keyCount * 4 - 4])) {
 					puVar20[1] = 0;
 				}
 				slotIdx++;
@@ -7560,27 +7504,27 @@ LAB_calc:
 		int base = reinterpret_cast<int>(m_wm.m_frameData);
 		unsigned int uVar = (unsigned int)*reinterpret_cast<int*>(base + 8);
 		if (static_cast<float>(static_cast<int>(uVar - 5)) <
-		    static_cast<float>(DOUBLE_803314A8 * static_cast<double>(s_YearTrns.data[s_YearTrns.count * 4 - 4]))) {
-			float t = (float)(int)(uVar) / FLOAT_803314c0;
+		    static_cast<float>(DOUBLE_803314A8 * static_cast<double>(s_YearTrns.keys[s_YearTrns.keyCount * 4 - 4]))) {
+			float t = static_cast<float>(static_cast<int>(uVar));
 			float fVar5;
-			WM_MENU_EVAL_SPLINE(fVar5, s_YearTrns.data, s_YearTrns.count, t);
+			fVar5 = GetFcvValue(s_YearTrns, t);
 			*reinterpret_cast<short*>(base + 0xD2) =
 			    static_cast<short>(static_cast<int>(static_cast<float>(*reinterpret_cast<short*>(base + 0xD2)) + fVar5));
 
 			float fVar1;
-			WM_MENU_EVAL_SPLINE(fVar1, DAT_8032E8CC, DAT_8032E8C8, t);
+			fVar1 = GetFcvValue(s_YearAlpha, t);
 			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xE0) = fVar1;
 
 			if (uVar14 == 2) {
 				uVar -= 5;
 			}
-			t = (float)(int)(uVar) / FLOAT_803314c0;
-			WM_MENU_EVAL_SPLINE(fVar5, s_YearTrns.data, s_YearTrns.count, t);
+			t = static_cast<float>(static_cast<int>(uVar));
+			fVar5 = GetFcvValue(s_YearTrns, t);
 			*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6) =
 			    static_cast<short>(static_cast<int>(
 			        static_cast<float>(*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6)) + fVar5));
 
-			WM_MENU_EVAL_SPLINE(fVar1, DAT_8032E8CC, DAT_8032E8C8, t);
+			fVar1 = GetFcvValue(s_YearAlpha, t);
 			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC4) = fVar1;
 			*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) =
 			    *reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) + 1;
@@ -9274,6 +9218,7 @@ void CMenuPcs::DrawCharaName()
  */
 void CMenuPcs::DrawCMLife()
 {
+	static FCV s_LifePos = {3, gWmLifeYOffsetSplinePoints};
 #define worldState GetWmWorldState(this)
 #define selectEntries GetWmCharaSelectEntries(this)
 
@@ -9369,7 +9314,7 @@ void CMenuPcs::DrawCMLife()
 		kRectSize = *pRectSize;
 
 		for (i = 0; i < count; i++) {
-			float yAdd = GetFcvValue(*reinterpret_cast<FCV*>(&gWmLifeYOffsetSplineCount), step);
+			float yAdd = GetFcvValue(s_LifePos, step);
 
 			MenuPcs.DrawRect(
 			    0, x, yTmp + yAdd, FLOAT_80331558, FLOAT_80331558,
@@ -10314,16 +10259,16 @@ void CMenuPcs::CalcMainMenuSub()
 		PSMTXRotRad(rotMtx, 'y', FLOAT_803314bc * -*reinterpret_cast<float*>(bytes + 0x7C));
 		PSMTXConcat(baseMtx, rotMtx, baseMtx);
 
-		float selectedRotY = GetFcvValue(*reinterpret_cast<FCV*>(&DAT_8032E8D0),
+		float selectedRotY = GetFcvValue(s_MenuObjYRot,
 		                                 static_cast<float>(m_wmWorldState->m_titleState));
-		float selectedRotZ = GetFcvValue(*reinterpret_cast<FCV*>(&DAT_8032E8D8),
+		float selectedRotZ = GetFcvValue(s_MenuObjZRot,
 		                                 static_cast<float>(m_wmWorldState->m_titleState));
-		float selectedYOffset = GetFcvValue(*reinterpret_cast<FCV*>(&DAT_8032E8E0),
+		float selectedYOffset = GetFcvValue(s_MenuObjYTrs,
 		                                    static_cast<float>(m_wmWorldState->m_titleState));
 
 		float openScale;
 		if (m_wmWorldState->m_nextMenuMode != -1) {
-			openScale = GetFcvValue(*reinterpret_cast<FCV*>(&DAT_8032E8E8),
+			openScale = GetFcvValue(s_MenuObjScl,
 			                        static_cast<float>(0x14 - m_wmWorldState->m_delay));
 		} else {
 			openScale = FLOAT_803313dc;
@@ -11550,10 +11495,10 @@ void CMenuPcs::CalcMcObj()
 		reinterpret_cast<float*>(panelState)[6] = *p50;
 
 		unsigned char* const charaState = m_wmCharaState + i * 0x48;
-		SplineTable* const yTbl = reinterpret_cast<SplineTable*>(&gWmModelYOffsetSplineCount);
+		CMenuPcs::FCV* const yTbl = &s_WoodTrns;
 		panelState[1]++;
 		if (static_cast<float>(static_cast<int>(panelState[1])) >=
-		    *p25 * static_cast<double>(yTbl->data[gWmModelYOffsetSplineCount * 4 - 4])) {
+		    *p25 * static_cast<double>(yTbl->keys[s_WoodTrns.keyCount * 4 - 4])) {
 			panelState[1] = 0;
 		}
 
@@ -11582,11 +11527,11 @@ void CMenuPcs::CalcMcObj()
 
 			reinterpret_cast<float*>(panelState)[8] =
 			    reinterpret_cast<float*>(panelState)[8] +
-			    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelYOffsetSplineCount),
+			    static_cast<float>(GetFcvValue(s_WoodTrns,
 			                                   static_cast<float>(static_cast<int>(panelState[1]))));
 
 			const float rotVal =
-			    static_cast<float>(GetFcvValue(*reinterpret_cast<FCV*>(&gWmModelRotationSplineCount),
+			    static_cast<float>(GetFcvValue(s_WoodRot,
 			                                   static_cast<float>(static_cast<int>(panelState[1]))));
 			const float* pBC2 = &FLOAT_803314bc;
 			reinterpret_cast<float*>(panelState)[0xB] = *pBC2 * rotVal;

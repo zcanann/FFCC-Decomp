@@ -59,47 +59,17 @@ static const char sDbgMenuOn[] = "ON";
 static const char sDbgMenuOff[] = "OFF";
 static const char sDbgMenuUnknown[] = "?";
 
-extern "C" {
-void create__11CDbgMenuPcsFv(CDbgMenuPcs*);
-void destroy__11CDbgMenuPcsFv(CDbgMenuPcs*);
-void calc__11CDbgMenuPcsFv(CDbgMenuPcs*);
-void draw__11CDbgMenuPcsFv(CDbgMenuPcs*);
-}
-
 inline CDbgMenuPcs::CDbgMenuPcs()
 {
-	static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
-	static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
-	static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
-	static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
-
-	CProcessTable* table = &m_table;
-
-	table->m_fields.m_create = desc0;
-	table->m_fields.m_destroy = desc1;
-	table->m_fields.m_entries[0].m_callback = desc2;
-	table->m_fields.m_entries[1].m_callback = desc3;
 }
 
-CProcessTable CDbgMenuPcs::m_table = {
+CProcessCallbackTable CDbgMenuPcs::m_table = {
     const_cast<char*>(sCDbgMenuPcs),
+    static_cast<CProcessCallback>(&CDbgMenuPcs::create),
+    static_cast<CProcessCallback>(&CDbgMenuPcs::destroy),
     {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0x11,
-        0,
-        0,
-        0,
-        0,
-        0x4A,
-        1,
+        {static_cast<CProcessCallback>(&CDbgMenuPcs::calc), 0x11, 0},
+        {static_cast<CProcessCallback>(&CDbgMenuPcs::draw), 0x4A, 1},
     },
 };
 
@@ -771,9 +741,7 @@ void CDbgMenuPcs::Add()
     CDMParam rootParam;
     CDMParam nodeParam;
     CDMParam actionParam;
-    DbgMenuDef* menuDefs;
     int y;
-    int index;
 
     if (m_rootMenuNode.m_firstChild != 0) {
         return;
@@ -795,9 +763,8 @@ void CDbgMenuPcs::Add()
     Add(0, 10, param);
 
     y = 10;
-    menuDefs = tWork;
-    index = 0;
-    do {
+    for (int index = 0; index < static_cast<int>(sizeof(tWork) / sizeof(tWork[0])); index++) {
+        DbgMenuDef* menuDefs = &tWork[index];
         memset(&nodeParam, 0, sizeof(nodeParam));
         nodeParam.m_type = 1;
         nodeParam.m_flags = 0;
@@ -830,10 +797,8 @@ void CDbgMenuPcs::Add()
         param = actionParam;
         Add(10, (int)menuDefs->id, param);
 
-        index++;
         y += 0x10;
-        menuDefs++;
-    } while (index < 0x17);
+    }
 }
 
 /*
@@ -914,3 +879,5 @@ inline CDbgMenuPcs::CDM::CDM()
 	memset(this, 0, sizeof(CDMParam));
 	memset(&m_status, 0, sizeof(*this) - sizeof(CDMParam));
 }
+
+#pragma pool_data off

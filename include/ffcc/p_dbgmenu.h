@@ -62,7 +62,7 @@ public:
 
     CDbgMenuPcs();
 
-    static CProcessTable m_table;
+    static CProcessCallbackTable m_table;
 	
     void Init();
     void Quit();

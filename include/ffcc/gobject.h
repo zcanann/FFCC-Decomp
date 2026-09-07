@@ -240,7 +240,7 @@ public:
     float m_rotTargetX;               // 0x1B0
     float m_rotTargetY;               // 0x1B4
     float m_rotTargetZ;               // 0x1B8
-    unsigned int m_bgFlags;           // 0x1BC
+    float m_homeRotY;                 // 0x1BC
     unsigned int m_bgColMask;         // 0x1C0
     u32 m_bgHitMask;                  // 0x1C4
     Vec m_moveTarget;                 // 0x1C8

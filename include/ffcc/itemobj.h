@@ -50,6 +50,46 @@ STATIC_ASSERT(offsetof(SItemFlatRow, m_smithMaterials) == 0x26);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_smithMaterialCounts) == 0x2C);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_smithResults) == 0x38);
 
+// CFlat item and particle table row.
+struct SCharaItemRow {
+	unsigned short m_effect;        // 0x00
+	unsigned short m_kind;          // 0x02
+	unsigned short m_field04;       // 0x04
+	unsigned short m_basePower;     // 0x06
+	unsigned short m_staType;       // 0x08
+	unsigned short m_status;        // 0x0A
+	unsigned short m_particleFlags; // 0x0C
+	unsigned short m_actionType;  // 0x0E
+	unsigned short m_scale;         // 0x10
+	unsigned short m_particleBank;  // 0x12
+	unsigned short m_particleEntries[4]; // 0x14
+	unsigned short m_particleSpec;  // 0x1C
+	unsigned char m_pad1E[0x2];     // 0x1E
+	unsigned short m_attackStartFrame; // 0x20
+	unsigned short m_attackEndFrame; // 0x22
+	unsigned short m_fanCount;      // 0x24
+	unsigned short m_speed;         // 0x26
+	unsigned char m_pad28[0x2];     // 0x28
+	unsigned short m_distance;      // 0x2A
+	unsigned short m_flags2C;       // 0x2C
+	unsigned short m_power;         // 0x2E
+	unsigned short m_sourcePower;   // 0x30
+	unsigned short m_flags32;       // 0x32
+	unsigned char m_pad34[0x4];     // 0x34
+	unsigned short m_se;            // 0x38
+	unsigned short m_seFlag;        // 0x3A
+	unsigned short m_se1;           // 0x3C
+	unsigned short m_seFlag1;       // 0x3E
+	unsigned short m_se2;           // 0x40
+	unsigned short m_seSpec;        // 0x42
+	unsigned char m_pad44[0x4];     // 0x44
+};
+
+STATIC_ASSERT(sizeof(SCharaItemRow) == 0x48);
+STATIC_ASSERT(offsetof(SCharaItemRow, m_actionType) == 0x0E);
+STATIC_ASSERT(offsetof(SCharaItemRow, m_attackStartFrame) == 0x20);
+STATIC_ASSERT(offsetof(SCharaItemRow, m_attackEndFrame) == 0x22);
+
 class CGItemObj : public CGPrgObj
 {
 public:

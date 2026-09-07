@@ -1,6 +1,7 @@
 #include "ffcc/combi.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/charaobj.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/astar.h"
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/fontman.h"
@@ -54,39 +55,6 @@ extern const float FLOAT_803319B0;
 extern const float FLOAT_803319B4;
 extern const float FLOAT_803319B8[2];
 }
-
-// CFlat item and particle table row.
-struct SCharaItemRow {
-	unsigned short m_effect;        // 0x00
-	unsigned short m_kind;          // 0x02
-	unsigned short m_field04;       // 0x04
-	unsigned short m_basePower;     // 0x06
-	unsigned short m_staType;       // 0x08
-	unsigned short m_status;        // 0x0A
-	unsigned short m_particleFlags; // 0x0C
-	unsigned short m_particleLife;  // 0x0E
-	unsigned short m_scale;         // 0x10
-	unsigned short m_particleBank;  // 0x12
-	unsigned short m_particleEntries[4]; // 0x14
-	unsigned short m_particleSpec;  // 0x1C
-	unsigned char m_pad1E[0x6];     // 0x1E
-	unsigned short m_fanCount;      // 0x24
-	unsigned short m_speed;         // 0x26
-	unsigned char m_pad28[0x2];     // 0x28
-	unsigned short m_distance;      // 0x2A
-	unsigned short m_flags2C;       // 0x2C
-	unsigned short m_power;         // 0x2E
-	unsigned short m_sourcePower;   // 0x30
-	unsigned short m_flags32;       // 0x32
-	unsigned char m_pad34[0x4];     // 0x34
-	unsigned short m_se;            // 0x38
-	unsigned short m_seFlag;        // 0x3A
-	unsigned short m_se1;           // 0x3C
-	unsigned short m_seFlag1;       // 0x3E
-	unsigned short m_se2;           // 0x40
-	unsigned short m_seSpec;        // 0x42
-	unsigned char m_pad44[0x4];     // 0x44
-};
 
 // Padded view of the script handle's status block (u16 slots from 0x3E).
 struct SCharaStaBlock {
@@ -949,7 +917,7 @@ int CGCharaObj::calcCastTime(int itemId)
 
 	SCharaItemRow* typeRows = castRows;
 	int itemNo = typeRows[itemId].m_effect;
-	int itemType = typeRows[itemId].m_particleLife;
+	int itemType = typeRows[itemId].m_actionType;
 	int result;
 
 	if (itemNo != 0x1F8 && itemType == 2) {
@@ -2990,7 +2958,7 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 
 			unsigned int particleIndex = static_cast<unsigned int>(m_itemId);
 			SCharaItemRow* lifeRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
-			unsigned short particleLife = lifeRows[particleIndex].m_particleLife;
+			unsigned short particleLife = lifeRows[particleIndex].m_actionType;
 			m_ignoreHit[i].m_timer = (particleLife == 3) ? 0x1E : 0;
 			break;
 		}

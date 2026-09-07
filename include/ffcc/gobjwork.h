@@ -110,11 +110,13 @@ public:
     
     unsigned short unk_0xac[4];  // 0x00AC
     unsigned short unk_0xb4[14]; // 0x00B4
-    unsigned short unk_0xd0[16]; // 0x00D0
-    unsigned short unk_0xf0[16]; // 0x00F0
+    unsigned short m_actionItems[16]; // 0x00D0
+    unsigned short m_actionAnimations[16]; // 0x00F0
 }; // Size 0x110
 
 STATIC_ASSERT(sizeof(CMonWork) == 0x110);
+STATIC_ASSERT(offsetof(CMonWork, m_actionItems) == 0xD0);
+STATIC_ASSERT(offsetof(CMonWork, m_actionAnimations) == 0xF0);
 
 class CCaravanWork : public CGObjWork
 {

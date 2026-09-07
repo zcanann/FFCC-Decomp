@@ -2746,8 +2746,8 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 
 	memcpy(unk_0xac, romWork->MonsterParams0(), 8);
 	memcpy(unk_0xb4, romWork->MonsterParams1(), 0x1C);
-	memset(unk_0xd0, 0, sizeof(unk_0xd0));
-	memset(unk_0xf0, 0, sizeof(unk_0xf0));
+	memset(m_actionItems, 0, sizeof(m_actionItems));
+	memset(m_actionAnimations, 0, sizeof(m_actionAnimations));
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 		int rank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];

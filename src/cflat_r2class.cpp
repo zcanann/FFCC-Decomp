@@ -1574,14 +1574,14 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x5C: {
 			CMonWork* work = reinterpret_cast<CMonWork*>(engineObject->m_scriptHandle);
-			work->unk_0xd0[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
+			work->m_actionItems[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		}
 		case -0x5D: {
 			CMonWork* work = reinterpret_cast<CMonWork*>(engineObject->m_scriptHandle);
-			work->unk_0xf0[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
+			work->m_actionAnimations[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

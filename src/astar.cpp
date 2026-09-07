@@ -31,16 +31,6 @@ extern const char kAStarNewLine[4] = "\n";
 
 #include "string.h"
 
-struct CMapCylinderRaw
-{
-	Vec m_bottom;
-	Vec m_top;
-	Vec m_axis;
-	float m_radius;
-	Vec m_boundsMax;
-	Vec m_boundsMin;
-};
-
 struct CABlock
 {
 	unsigned int m_words[16];
@@ -55,19 +45,14 @@ static inline CVector& SubVector(Vec* a, const CVector& b)
 	return result;
 }
 
-static inline float LoadFloat(const float& value)
-{
-	return value;
-}
-
 CAStar AStar;
 
 /*
  * --INFO--
  * PAL Address: 0x80141550
  * PAL Size: 468b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801636D8
+ * EN Size: 228b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -77,25 +62,16 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 	{
 		unsigned int mask = m_hitAttributeMask;
 		const CVector& baseVec =
-		    CVector(LoadFloat(kPolyGroupBaseXZ), LoadFloat(kPolyGroupBaseY), LoadFloat(kPolyGroupBaseXZ));
+		    CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
 		const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
 		Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
 		Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
-		CMapCylinderRaw cyl;
-		float aabbMin = LoadFloat(kPolyGroupAabbMin);
-		float aabbMax = LoadFloat(kPolyGroupAabbMax);
-
-		cyl.m_boundsMax.z = aabbMax;
-		cyl.m_boundsMax.y = aabbMax;
-		cyl.m_boundsMax.x = aabbMax;
-		cyl.m_boundsMin.z = aabbMin;
-		cyl.m_boundsMin.y = aabbMin;
-		cyl.m_boundsMin.x = aabbMin;
+		CMapCylinder cyl(kPolyGroupAabbMax, kPolyGroupAabbMin);
 		cyl.m_bottom = *top;
 		cyl.m_axis = *base;
-		cyl.m_radius = LoadFloat(kPolyGroupBaseXZ);
+		cyl.m_radius = kPolyGroupBaseXZ;
 
-		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), base, mask) != 0)
+		if (MapMng.CheckHitCylinderNear(&cyl, base, mask) != 0)
 		{
 			return gMapHitFace->m_groupIndex;
 		}
@@ -105,25 +81,16 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 	else
 	{
 		const CVector& baseVec =
-		    CVector(LoadFloat(kPolyGroupBaseXZ), LoadFloat(kPolyGroupBaseY), LoadFloat(kPolyGroupBaseXZ));
+		    CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
 		const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
 		Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
 		Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
-		CMapCylinderRaw cyl;
-		float aabbMin = LoadFloat(kPolyGroupAabbMin);
-		float aabbMax = LoadFloat(kPolyGroupAabbMax);
-
-		cyl.m_boundsMax.z = aabbMax;
-		cyl.m_boundsMax.y = aabbMax;
-		cyl.m_boundsMax.x = aabbMax;
-		cyl.m_boundsMin.z = aabbMin;
-		cyl.m_boundsMin.y = aabbMin;
-		cyl.m_boundsMin.x = aabbMin;
+		CMapCylinder cyl(kPolyGroupAabbMax, kPolyGroupAabbMin);
 		cyl.m_bottom = *top;
 		cyl.m_axis = *base;
-		cyl.m_radius = LoadFloat(kPolyGroupBaseXZ);
+		cyl.m_radius = kPolyGroupBaseXZ;
 
-		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), base, hitAttributeMask) != 0)
+		if (MapMng.CheckHitCylinderNear(&cyl, base, hitAttributeMask) != 0)
 		{
 			return gMapHitFace->m_groupIndex;
 		}
@@ -135,8 +102,8 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
  * --INFO--
  * PAL Address: 0x80141724
  * PAL Size: 252b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80163618
+ * EN Size: 192b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -144,25 +111,16 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
 	unsigned int mask = m_hitAttributeMask;
 	const CVector& baseVec =
-	    CVector(LoadFloat(kPolyGroupBaseXZ), LoadFloat(kPolyGroupBaseY), LoadFloat(kPolyGroupBaseXZ));
+	    CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
 	const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
 	Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
 	Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
-	CMapCylinderRaw cyl;
-	float aabbMin = LoadFloat(kPolyGroupAabbMin);
-	float aabbMax = LoadFloat(kPolyGroupAabbMax);
-
-	cyl.m_boundsMax.z = aabbMax;
-	cyl.m_boundsMax.y = aabbMax;
-	cyl.m_boundsMax.x = aabbMax;
-	cyl.m_boundsMin.z = aabbMin;
-	cyl.m_boundsMin.y = aabbMin;
-	cyl.m_boundsMin.x = aabbMin;
+	CMapCylinder cyl(kPolyGroupAabbMax, kPolyGroupAabbMin);
 	cyl.m_bottom = *top;
 	cyl.m_axis = *base;
-	cyl.m_radius = LoadFloat(kPolyGroupBaseXZ);
+	cyl.m_radius = kPolyGroupBaseXZ;
 
-	if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), base, mask) != 0)
+	if (MapMng.CheckHitCylinderNear(&cyl, base, mask) != 0)
 	{
 		return gMapHitFace->m_groupIndex;
 	}
@@ -173,8 +131,8 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
  * --INFO--
  * PAL Address: 0x80141820
  * PAL Size: 584b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801633CC
+ * EN Size: 588b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -243,7 +201,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 					float dist = PSVECMag(reinterpret_cast<Vec*>(&portalVec));
 
-					if (dot >= LoadFloat(kPolyGroupBaseXZ))
+					if (dot >= kPolyGroupBaseXZ)
 					{
 						if (aheadBestDist < dist)
 						{
@@ -424,10 +382,10 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 }
 /*
  * --INFO--
- * PAL Address: 0x80141eb4
+ * PAL Address: 0x80141EB4
  * PAL Size: 700b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80162FA8
+ * EN Size: 736b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -459,7 +417,7 @@ void CAStar::drawAStar()
 
 		if (hasGroups)
 		{
-			Graphic.DrawSphere(drawMtx, &m_lastGroupPos, LoadFloat(kDrawAStarSphereRadius), CColor(0xFF, 0xFF, 0xFF, 0xFF));
+			Graphic.DrawSphere(drawMtx, &m_lastGroupPos, kDrawAStarSphereRadius, CColor(0xFF, 0xFF, 0xFF, 0xFF));
 		}
 
 		int i = 0;
@@ -475,7 +433,7 @@ void CAStar::drawAStar()
 
 			if (exists)
 			{
-				Graphic.DrawSphere(drawMtx, &m_portals[i].m_position, LoadFloat(kDrawAStarSphereRadius), CColor(0xFF, 0xFF, 0x00, 0xFF));
+				Graphic.DrawSphere(drawMtx, &m_portals[i].m_position, kDrawAStarSphereRadius, CColor(0xFF, 0xFF, 0x00, 0xFF));
 
 				int side = 0;
 				unsigned char* group = &m_portals[i].m_groupA;
@@ -539,8 +497,12 @@ void CAStar::drawAStar()
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80142170
+ * PAL Size: 324b
+ * EN Address: 0x80162E44
+ * EN Size: 356b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAStar::calcAStar()
 {
@@ -555,7 +517,7 @@ void CAStar::calcAStar()
 				continue;
 			}
 
-			m_bestPath.m_cost = LoadFloat(kInfiniteCost);
+			m_bestPath.m_cost = kInfiniteCost;
 
 			CATemp temp;
 
@@ -563,7 +525,7 @@ void CAStar::calcAStar()
 
 			check(from, (int)(unsigned int)to, temp);
 
-			if (m_bestPath.m_cost < LoadFloat(kInfiniteCost))
+			if (m_bestPath.m_cost < kInfiniteCost)
 			{
 				System.Printf(const_cast<char*>(kAStarCostDebugFormat), from, to, m_bestPath.m_cost);
 
@@ -596,8 +558,12 @@ void CAStar::calcAStar()
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801422B4
+ * PAL Size: 1964b
+ * EN Address: 0x80162D2C
+ * EN Size: 280b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 {
@@ -653,7 +619,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 						*reinterpret_cast<CABlock*>(m_bestPath.m_visited) = *reinterpret_cast<CABlock*>(level1.m_visited);
 						*reinterpret_cast<CABlock*>(m_bestPath.m_path) = *reinterpret_cast<CABlock*>(level1.m_path);
 						m_bestPath.m_pathLength = level1.m_pathLength;
-						m_bestPath.m_cost = LoadFloat(level1.m_cost);
+						m_bestPath.m_cost = level1.m_cost;
 					}
 				}
 				else

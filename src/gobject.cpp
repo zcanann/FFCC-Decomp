@@ -569,7 +569,7 @@ void CGObject::SetAnimSlot(int slot, int anim)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGObject::AddAnimPoint(int slot, int pointType, int pointFrame)
+void CGObject::AddAnimPoint(int slot, int pointFrame, int pointType)
 {
     bool hasModel = false;
     CCharaPcs::CHandle* handle = m_charaModelHandle;
@@ -582,17 +582,14 @@ void CGObject::AddAnimPoint(int slot, int pointType, int pointFrame)
         return;
     }
 
-    CRef* animRef = handle->m_animSlot[slot];
+    CCharaPcs::CLoadAnim* animRef = handle->m_animSlot[slot];
     if (animRef == 0) {
         return;
     }
 
-    u8* animRefBytes = reinterpret_cast<u8*>(animRef);
-    u16* count = reinterpret_cast<u16*>(animRefBytes + 0x2C);
-
-    reinterpret_cast<u16*>(animRefBytes + 0x2E)[*count * 2] = static_cast<u16>(pointFrame);
-    reinterpret_cast<u16*>(animRefBytes + 0x30)[*count * 2] = static_cast<u16>(pointType);
-    *count = static_cast<u16>(*count + 1);
+    animRef->m_points[animRef->m_pointCount].m_type = pointType;
+    animRef->m_points[animRef->m_pointCount].m_frame = pointFrame;
+    animRef->m_pointCount++;
 }
 
 /*
@@ -621,7 +618,7 @@ void CGObject::ResetAnimPoint(int slot)
         return;
     }
 
-    *reinterpret_cast<u16*>(reinterpret_cast<u8*>(handle->m_animSlot[slot]) + 0x2C) = 0;
+    handle->m_animSlot[slot]->m_pointCount = 0;
 }
 
 /*
@@ -2342,8 +2339,7 @@ void CGObject::update()
                 float frameDelta = m_lastBgAttr;
                 const int activeAnimIndex = m_charaModelHandle->m_currentAnimIndex;
                 if (activeAnimIndex >= 0 &&
-                    (*reinterpret_cast<unsigned int*>(
-                         reinterpret_cast<unsigned char*>(m_charaModelHandle->m_animSlot[activeAnimIndex]) + 0x70) &
+                    (m_charaModelHandle->m_animSlot[activeAnimIndex]->m_playbackFlags &
                      0x4) != 0) {
                     frameDelta = frameDelta < sZeroFloat ? sNegativeOne : sAnimFrameOffset;
                 }
@@ -2356,9 +2352,8 @@ void CGObject::update()
 
             const int activeAnimIndex = m_charaModelHandle->m_currentAnimIndex;
             if (activeAnimIndex >= 0 && m_charaModelHandle->m_animSlot[activeAnimIndex] != 0) {
-                unsigned char* animRefBytes =
-                    reinterpret_cast<unsigned char*>(m_charaModelHandle->m_animSlot[activeAnimIndex]);
-                const unsigned short pointCount = *reinterpret_cast<unsigned short*>(animRefBytes + 0x2C);
+                CCharaPcs::CLoadAnim* animRef = m_charaModelHandle->m_animSlot[activeAnimIndex];
+                const unsigned short pointCount = animRef->m_pointCount;
                 if (pointCount > 0) {
                     const float animSpan =
                         sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
@@ -2369,15 +2364,15 @@ void CGObject::update()
                         nextWrapped = (animSpan - sAnimFrameOffset) - nextWrapped;
                     }
 
-                    for (int i = 0; i < *reinterpret_cast<unsigned short*>(animRefBytes + 0x2C); i++) {
-                        const unsigned short pointFrame = *reinterpret_cast<unsigned short*>(animRefBytes + 0x30 + i * 4);
+                    for (int i = 0; i < animRef->m_pointCount; i++) {
+                        const unsigned short pointFrame = animRef->m_points[i].m_frame;
                         const float eventFrame = static_cast<float>(pointFrame) + ModelAnimStart(m_charaModelHandle->m_model);
                         if (prevWrapped < eventFrame && (eventFrame <= nextWrapped || nextWrapped < prevWrapped)) {
                             CFlatRuntime::CStack stackIn[2];
                             stackIn[0].m_word = static_cast<unsigned int>(m_animSlotSel);
-                            stackIn[1].m_word = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(animRefBytes + 0x2E + i * 4));
+                            stackIn[1].m_word = static_cast<unsigned int>(animRef->m_points[i].m_type);
                             gCFlatRuntime().SystemCall(this, 2, 9, 2, stackIn, 0);
-                            onAnimPoint(m_animSlotSel, *reinterpret_cast<unsigned short*>(animRefBytes + 0x2E + i * 4));
+                            onAnimPoint(m_animSlotSel, animRef->m_points[i].m_type);
                         }
                     }
                 }

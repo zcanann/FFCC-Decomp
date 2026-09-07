@@ -228,6 +228,9 @@ template class CPtrArray<CCharaPcs::CLoadModel*>;
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadModel) == 0x28);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadAnim) == 0x74);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadTexture) == 0x2C);
+STATIC_ASSERT(offsetof(CCharaPcs::CLoadAnim, m_pointCount) == 0x2C);
+STATIC_ASSERT(offsetof(CCharaPcs::CLoadAnim, m_points) == 0x2E);
+STATIC_ASSERT(offsetof(CCharaPcs::CLoadAnim, m_playbackFlags) == 0x70);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadPdt) == 0x20);
 STATIC_ASSERT(sizeof(CCharaPcs::CCameraFrame) == 0x20);
 STATIC_ASSERT(offsetof(CCharaPcs, m_cameraFrameCount) == 0x04);
@@ -944,31 +947,17 @@ int CCharaPcs::correctLoadAnimAmem()
 
 /*
  * --INFO--
- * PAL Address: 0x8007999c
+ * PAL Address: 0x8007999C
  * PAL Size: 420b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80084aa4
+ * EN Size: 232b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CCharaPcs::onScriptChanging(char*)
 {
     for (int i = 0; i < 5; i++) {
-        const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
-        CColor shade;
-
-        float scale = static_cast<float>(i);
-        scale *= FLOAT_80330308;
-        shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
-        shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
-        shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
-        shade.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
-        CColor shadeCopy(shade);
-
-        m_viewerChoiceColor[i].color.r = shadeCopy.color.r;
-        m_viewerChoiceColor[i].color.g = shadeCopy.color.g;
-        m_viewerChoiceColor[i].color.b = shadeCopy.color.b;
-        m_viewerChoiceColor[i].color.a = shadeCopy.color.a;
+        m_viewerChoiceColor[i] = CColor(0xFF, 0xFF, 0xFF, 0xFF) * (static_cast<float>(i) * FLOAT_80330308);
     }
 
     m_overlapEnabled = 0;
@@ -2154,7 +2143,7 @@ CCharaPcs::CHandle::CHandle()
 
 	for (int i = 0; i < 64; ++i)
 	{
-		m_animSlot[i] = (CRef*)nullptr;
+		m_animSlot[i] = 0;
 	}
 
 	// PDT load ref
@@ -2213,7 +2202,7 @@ CCharaPcs::CHandle::~CHandle()
 
     CharaPcs.releaseUnuseLoadModel(0);
     {
-        CRef** slotPtr = &m_animSlot[0];
+        CLoadAnim** slotPtr = &m_animSlot[0];
         for (int i = 0; i < 64; i++, slotPtr++) {
             CRef* animRef = *slotPtr;
             if (animRef != 0) {
@@ -2537,14 +2526,18 @@ foundModel:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80075920
+ * PAL Size: 1300b
+ * EN Address: 0x8008882c
+ * EN Size: 392b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CCharaPcs::CHandle::LoadAnim(
     char* animName, int animIndex, int animFlags, int charaKind, int charaNo, int mergeFileId, int mergeFlags)
 {
     if (animIndex == -1) {
-        CRef** slotPtr = &m_animSlot[0];
+        CLoadAnim** slotPtr = &m_animSlot[0];
         for (int i = 0; i < 64; i++, slotPtr++) {
             CRef* animRef = *slotPtr;
             if (animRef != 0) {
@@ -2553,10 +2546,10 @@ int CCharaPcs::CHandle::LoadAnim(
         }
         PruneUnsharedAnimRefs(&CharaPcs, 0);
     } else {
-        CLoadAnim* previousAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
+        CLoadAnim* previousAnim = m_animSlot[animIndex];
         if (previousAnim != 0) {
             ReleaseSharedNonNull(m_animSlot[animIndex]);
-            PruneUnsharedAnimRefs(&CharaPcs, reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]));
+            PruneUnsharedAnimRefs(&CharaPcs, m_animSlot[animIndex]);
             m_animSlot[animIndex] = 0;
         }
     }
@@ -2590,13 +2583,13 @@ int CCharaPcs::CHandle::LoadAnim(
     loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
 
     m_animSlot[animIndex] = loadAnim;
-    reinterpret_cast<CRef*>(loadAnim)->AddRef();
+    loadAnim->AddRef();
 
-    *reinterpret_cast<unsigned int*>(Ptr(m_animSlot[animIndex], 0x70)) = static_cast<unsigned int>(animFlags);
+    m_animSlot[animIndex]->m_playbackFlags = static_cast<unsigned int>(animFlags);
     {
-        unsigned char& flags1 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
+        unsigned char& flags1 = m_animSlot[animIndex]->m_anim->m_flags;
         flags1 = static_cast<unsigned char>(__rlwimi(flags1, animFlags, 7, 24, 24));
-        unsigned char& flags2 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
+        unsigned char& flags2 = m_animSlot[animIndex]->m_anim->m_flags;
         flags2 = static_cast<unsigned char>(__rlwimi(flags2, animFlags, 5, 25, 25));
     }
 
@@ -2643,8 +2636,12 @@ void CCharaPcs::CHandle::FreeModel()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800754E8
+ * PAL Size: 532b
+ * EN Address: 0x80088bec
+ * EN Size: 264b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCharaPcs::CHandle::FreeAnim(int animIndex)
 {
@@ -2656,20 +2653,24 @@ void CCharaPcs::CHandle::FreeAnim(int animIndex)
         return;
     }
 
-    CLoadAnim* previousAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
+    CLoadAnim* previousAnim = m_animSlot[animIndex];
     if (previousAnim == 0) {
         return;
     }
 
     ReleaseSharedNonNull(m_animSlot[animIndex]);
-    PruneUnsharedAnimRefs(&CharaPcs, reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]));
+    PruneUnsharedAnimRefs(&CharaPcs, m_animSlot[animIndex]);
     m_animSlot[animIndex] = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80075400
+ * PAL Size: 232b
+ * EN Address: 0x80088cf4
+ * EN Size: 304b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int blendMode, int forceSet)
 {
@@ -2685,7 +2686,7 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
         if (animIndex == -1) {
             anim = 0;
         } else {
-            CLoadAnim* loadAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
+            CLoadAnim* loadAnim = m_animSlot[animIndex];
             anim = loadAnim != 0 ? loadAnim->m_anim : 0;
         }
 

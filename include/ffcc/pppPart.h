@@ -76,7 +76,6 @@ void pppHeapUseRate(CMemory::CStage* stage);
 void pppHeapCheckLeak(CMemory::CStage* stage);
 extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage* stage);
 unsigned long pppMngStHeapCheckLeak(CMemory::CStage* stage);
-void callCon2Prog(_pppPObject*);
 _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 void _pppAllFreePObject(_pppMngSt*);
 void pppSetBindChrSync(_pppMngSt*);

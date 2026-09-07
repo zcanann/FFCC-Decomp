@@ -586,24 +586,23 @@ extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*
  * --INFO--
  * PAL Address: 80056b0c
  * PAL Size: 360b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80062C50
+ * EN Size: 620b
  * JP Address: TODO
  * JP Size: TODO
  */
-void callCon2Prog(_pppPObject* pObject)
+static void callCon2Prog(_pppPObject* pObject)
 {
 	_pppPDataVal* owner = pObject->m_link.m_owner;
 	_pppProgSetDef* progSet = owner->m_programSetDef;
 
 	ppvIsLoopCalc = 1;
 
-	_pppProgSetDef* stageSet = progSet;
 	int stageIdx = 0;
 	u32* initWork = (u32*)(((u8*)pObject) + progSet->m_workBaseOffset);
 	for (; stageIdx < progSet->m_numStages; stageIdx++)
 	{
-		_pppCtrlTable* stage = stageSet->m_stages;
+		_pppCtrlTable* stage = &progSet->m_stages[stageIdx];
 		pppProg* prog = stage->m_prog;
 		if (prog != 0)
 		{
@@ -620,19 +619,16 @@ void callCon2Prog(_pppPObject* pObject)
 				}
 			}
 		}
-		stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 	}
 
 	pObject->m_graphId = 0;
 	while (pObject->m_graphId <= progSet->m_endFrame)
 	{
-		stageSet = progSet;
 		int stageCount = 0;
-		u32 stageSlotOffset = 0;
 		for (; stageCount < progSet->m_numStages; stageCount++)
 		{
-			_pppCtrlTable* stage = stageSet->m_stages;
-			s32** slotPtr = (s32**)(((u8*)pObject) + progSet->m_workBaseOffset + stageSlotOffset);
+			_pppCtrlTable* stage = &progSet->m_stages[stageCount];
+			s32** slotPtr = &((s32**)(((u8*)pObject) + progSet->m_workBaseOffset))[stageCount];
 			s32* nextSlot = (s32*)(((u8*)*slotPtr) + stage->m_workOffset);
 			pppProg* prog = stage->m_prog;
 
@@ -644,9 +640,6 @@ void callCon2Prog(_pppPObject* pObject)
 			{
 				((pppProgOperationCallback)prog->m_pppFunctionOperation)(pObject, *slotPtr, stage);
 			}
-
-			stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
-			stageSlotOffset += 4;
 		}
 
 		pObject->m_graphId += 0x1000;
@@ -1534,40 +1527,37 @@ DataValsAllocated:
  * --INFO--
  * PAL Address: 800550ac
  * PAL Size: 604b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800646BC
+ * EN Size: 556b
  * JP Address: TODO
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_loop_invariants off
 #pragma opt_common_subs off
 void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 {
-	int* table = (int*)(progOffsetReconstructionTable + 6);
+	_pppProgSetDef* table = (_pppProgSetDef*)(progOffsetReconstructionTable + 6);
 	int* pppProgRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]);
 	int* pdtRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]);
 	int pppProgRelocCount = *pppProgRelocs++;
 	int pdtRelocCount = *pdtRelocs++;
 
-	if ((u32)table[0] == 0) {
+	if (table->m_next == 0) {
 		return;
 	}
 
 	for (;;) {
-		*table = (int)progOffsetReconstructionTable + *table;
-		int* entry = table;
-
-		for (int i = 0; i < *(short*)((int)table + 0x26); i++) {
-			entry[10] = (int)(pppProg + entry[10]);
-			entry[12] = (int)progOffsetReconstructionTable + entry[12];
-			entry[13] = (int)progOffsetReconstructionTable + entry[13];
-			entry += 4;
+		table->m_next = (_pppProgSetDef*)((u8*)progOffsetReconstructionTable + (u32)table->m_next);
+		for (int i = 0; i < table->m_numStages; i++) {
+			_pppCtrlTable* entry = &table->m_stages[i];
+			entry->m_prog = pppProg + (u32)entry->m_prog;
+			entry->m_unk8 = (int)progOffsetReconstructionTable + entry->m_unk8;
+			entry->m_serializedDataOffsets = (int*)((u8*)progOffsetReconstructionTable + (u32)entry->m_serializedDataOffsets);
 		}
 
-		int* next = (int*)*table;
-		if (*(unsigned int*)next == 0) {
-			*table = 0;
+		_pppProgSetDef* next = table->m_next;
+		if (next->m_next == 0) {
+			table->m_next = 0;
 			break;
 		}
 		table = next;
@@ -2282,35 +2272,18 @@ void pppInitDrawEnv(unsigned char useZeroDepth)
  * --INFO--
  * PAL Address: 0x80053d04
  * PAL Size: 876b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80065E74
+ * EN Size: 796b
  * JP Address: TODO
  * JP Size: TODO
  */
 int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, float radius, float cylScale)
 {
-	struct PppMngStHitRaw
-	{
-		u8 m_pad0[0x74];
-		s16 m_kind;
-		s16 m_nodeIndex;
-		u8 m_pad1[0xBC - 0x78];
-		u32 m_objHitMask;
-		u32 m_cylinderAttribute;
-		u8 m_pad2[0xE8 - 0xC4];
-		u8 m_endRequested;
-		u8 m_pad3[0x11C - 0xE9];
-		PPPSEST m_soundEffectData;
-		PPPIFPARAM m_hitParams;
-		s16 m_hitObjectIds[0x10];
-	};
-
-	PppMngStHitRaw* hitRaw = (PppMngStHitRaw*)pppMngSt;
 	int hadHit = 0;
 
 	if (kPppPartZero != cylScale)
 	{
-		u32 cylinderAttribute = hitRaw->m_cylinderAttribute;
+		u32 cylinderAttribute = pppMngSt->m_cylinderAttribute;
 		CMapCylinder cylinder(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
 		cylinder.m_bottom = *origin;
 		cylinder.m_axis = *vector;
@@ -2320,38 +2293,38 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 		{
 			if (Game.m_currentSceneId == 7)
 			{
-				hitRaw->m_endRequested = 1;
-				if ((hitRaw->m_soundEffectData.m_soundEffectSlot >= 0) &&
-					(hitRaw->m_soundEffectData.m_soundEffectHandle >= 0))
+				pppMngSt->m_hitBgFlag = 1;
+				if ((pppMngSt->m_soundEffectData.m_soundEffectSlot >= 0) &&
+					(pppMngSt->m_soundEffectData.m_soundEffectHandle >= 0))
 				{
-					Sound.FadeOutSe3D(hitRaw->m_soundEffectData.m_soundEffectHandle,
-						hitRaw->m_soundEffectData.m_soundEffectFadeFrames);
-					hitRaw->m_soundEffectData.m_soundEffectHandle = -1;
+					Sound.FadeOutSe3D(pppMngSt->m_soundEffectData.m_soundEffectHandle,
+						pppMngSt->m_soundEffectData.m_soundEffectFadeFrames);
+					pppMngSt->m_soundEffectData.m_soundEffectHandle = -1;
 				}
 			}
 			else
 			{
 				Vec hitPos;
 				MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
-				s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
-				Game.HitParticleBG(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, &hitPos, &hitRaw->m_hitParams);
+				s32 partIndex = pppMngSt - PartMng.m_pppMng;
+				Game.HitParticleBG(partIndex, pppMngSt->m_kind, pppMngSt->m_nodeIndex, &hitPos, &pppMngSt->m_hitParams);
 			}
 			hadHit = 1;
 		}
 	}
 
-	if (Game.m_currentSceneId != 7 && hitRaw->m_hitParams.m_hitObjectCount < 0x10)
+	if (Game.m_currentSceneId != 7 && pppMngSt->m_hitParams.m_hitObjectCount < 0x10)
 	{
-		s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
+		s32 partIndex = pppMngSt - PartMng.m_pppMng;
 
 		for (CGObject* gObject = CFlat.FindGObjFirst(); gObject != 0;
 			 gObject = CFlat.FindGObjNext(gObject))
 		{
-			int previousCount = hitRaw->m_hitParams.m_hitObjectCount;
+			int previousCount = pppMngSt->m_hitParams.m_hitObjectCount;
 			int objectSlot;
 			for (objectSlot = 0; objectSlot < previousCount; objectSlot++)
 			{
-				if (hitRaw->m_hitObjectIds[objectSlot] == gObject->m_particleId)
+				if (pppMngSt->m_hitObjectIds[objectSlot] == gObject->m_particleId)
 				{
 					break;
 				}
@@ -2364,7 +2337,7 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 					CGObject::DamageCol* damageCol = &gObject->m_damageColliders[colliderIndex];
 
 					if ((gObject->m_bgColMask & 0x80000) == 0 ||
-						(damageCol->m_hitMask & hitRaw->m_objHitMask) == 0)
+						(damageCol->m_hitMask & pppMngSt->m_objHitMask) == 0)
 					{
 						continue;
 					}
@@ -2393,16 +2366,16 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 					}
 					else
 					{
-						gObject->HitParticle(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, colliderIndex, &hitPos,
-											 &hitRaw->m_hitParams);
-						int newCount = hitRaw->m_hitParams.m_hitObjectCount;
+						gObject->HitParticle(partIndex, pppMngSt->m_kind, pppMngSt->m_nodeIndex, colliderIndex, &hitPos,
+											 &pppMngSt->m_hitParams);
+						int newCount = pppMngSt->m_hitParams.m_hitObjectCount;
 						if (previousCount != newCount)
 						{
 							previousCount = newCount;
 							int updatedSlot;
 							for (updatedSlot = 0; updatedSlot < newCount; updatedSlot++)
 							{
-								if (hitRaw->m_hitObjectIds[updatedSlot] == gObject->m_particleId)
+								if (pppMngSt->m_hitObjectIds[updatedSlot] == gObject->m_particleId)
 								{
 									break;
 								}

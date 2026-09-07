@@ -79,6 +79,40 @@ public:
     unsigned short GetButtonRepeat(long);
     unsigned short GetButton(long);
     int IsGba(long);
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: 0x8005396C
+     * EN Size: 164b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    int IsDebug(long port)
+    {
+        bool suppress = false;
+        if (m_debugPadLock != 0 || (port == 0 && m_debugPadPort != -1)) {
+            suppress = true;
+        }
+        int result;
+        if (suppress) {
+            result = 0;
+        } else {
+            unsigned int index = (port == m_debugPadPort) ? 0 : static_cast<unsigned int>(port);
+            result = m_padInputs[index].holdOverride;
+        }
+        return result;
+    }
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: 0x80053964
+     * EN Size: 8b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    int GetPortEmulation() { return m_debugPadPort; }
     PadInput* GetPadInputs() { return m_padInputs; }
     const PadInput* GetPadInputs() const { return m_padInputs; }
     PadInput* GetMergedPad() { return &GetPadInputs()[4]; }

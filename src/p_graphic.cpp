@@ -95,24 +95,14 @@ static const char s_scenegraph_step_x1_2[] = "x1/2";
 extern const float kGraphicZero;
 extern const float kGraphicScreenHeight;
 extern const float kGraphicScreenWidth;
-extern const float kGraphicOrthoFarZ;
-extern const float kGraphicOne;
-extern const float kScreenFadeHalfPi;
-extern const float kGraphicColorMax;
-extern const float kScreenFadeBarEdge;
-extern const float kScreenFadeRingWidth;
 extern const float kGraphicScreenCenterX;
 extern const float kGraphicScreenCenterY;
-extern const float kScreenFadeCircleRadius;
 extern const float kGraphicHalf;
-extern const float kSFCircleAngleStep;
 extern const float kDebugBarLeft;
 extern const float kDebugBarTop;
 extern const float kDebugBarRight;
 extern const float kDebugBarBottom;
-extern const float kDebugBarFrameBudget;
 extern const float kDebugBarMoveBottom;
-extern const float kDebugBarObjectTop;
 extern const float kDebugIndicatorTop;
 extern const float kDebugIndicatorFrameRight;
 extern const float kDebugIndicatorBottom;
@@ -207,12 +197,11 @@ inline void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int cent
  * --INFO--
  * PAL Address: 0x80045178
  * PAL Size: 4256b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80052678
+ * EN Size: 4836b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_lifetimes off
 void CGraphicPcs::drawScreenFade()
 {
     Mtx44 orthoMtx;
@@ -221,7 +210,7 @@ void CGraphicPcs::drawScreenFade()
     Mtx44 worldScreenMtx;
     Mtx identityMtx;
 
-    C_MTXOrtho(orthoMtx, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, kGraphicOrthoFarZ);
+    C_MTXOrtho(orthoMtx, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, -100.0f);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
@@ -229,7 +218,7 @@ void CGraphicPcs::drawScreenFade()
     screenMtx[3][2] = kGraphicZero;
     screenMtx[3][1] = kGraphicZero;
     screenMtx[3][0] = kGraphicZero;
-    screenMtx[3][3] = kGraphicOne;
+    screenMtx[3][3] = 1.0f;
     PSMTX44Copy(CameraPcs.m_screenMatrix, worldScreenMtx);
     PSMTX44Concat(worldScreenMtx, screenMtx, worldScreenMtx);
 
@@ -270,10 +259,10 @@ void CGraphicPcs::drawScreenFade()
 
         float t = (float)slotData->m_timer / (float)slotData->m_duration;
         if (slotData->m_invert != 0) {
-            t = kGraphicOne - t;
+            t = 1.0f - t;
         }
-        const float fadeWave = (float)sin((double)(kScreenFadeHalfPi * t));
-        const u8 fadeAlpha = (u8)(kGraphicColorMax * fadeWave);
+        const float fadeWave = (float)sin((double)(1.5707964f * t));
+        const u8 fadeAlpha = (u8)(255.0f * fadeWave);
 
         _GXColor baseColor;
         _GXColor baseColor2;
@@ -289,8 +278,8 @@ void CGraphicPcs::drawScreenFade()
         baseColor2.a = 0;
 
         if (slot == 3) {
-            const int barHeight = (int)(kScreenFadeBarEdge * fadeWave);
-            const int barEdge = (int)(kScreenFadeRingWidth * fadeWave);
+            const int barHeight = (int)(48.0f * fadeWave);
+            const int barEdge = (int)(8.0f * fadeWave);
 
             drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, (float)barHeight, baseColor, baseColor);
             drawSFRect(kGraphicZero, (float)barHeight, kGraphicScreenWidth, (float)(barHeight + barEdge), baseColor, baseColor2);
@@ -305,7 +294,7 @@ void CGraphicPcs::drawScreenFade()
             drawSlot2Fullscreen:
                 drawSFRect(kGraphicZero, kGraphicZero, kGraphicScreenWidth, kGraphicScreenHeight, baseColor, baseColor);
             } else if (mode == 1) {
-                CGObject* obj = static_cast<CGObject*>(slotData->m_targetObj);
+                CGObject* obj = slotData->m_targetObj;
                 if (obj == NULL) {
                     goto drawSlot2Fullscreen;
                 }
@@ -326,7 +315,7 @@ void CGraphicPcs::drawScreenFade()
                     pos.y = clampedY;
                 }
 
-                const int radius = (int)(kScreenFadeCircleRadius * (kGraphicOne - fadeWave));
+                const int radius = (int)(1280.0f * (1.0f - fadeWave));
                 drawSFCircle(0x500, radius, (int)pos.x, (int)pos.y, baseColor, baseColor);
                 drawSFCircle(radius, radius - 8, (int)pos.x, (int)pos.y, baseColor, baseColor2);
             }
@@ -341,10 +330,10 @@ void CGraphicPcs::drawScreenFade()
                 _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
                 GXLoadTexObj(&Graphic.m_smallBackTexObj, GX_TEXMAP0);
 
-                t = slotData->m_amplitude * (kGraphicOne - t);
+                t = slotData->m_amplitude * (1.0f - t);
                 const float offX = slotData->m_stretch * ((kGraphicScreenCenterX * t) * (float)sin((double)slotData->m_phase));
                 const float offY = slotData->m_stretch * ((kGraphicScreenCenterY * t) * (float)cos((double)slotData->m_phase));
-                t += kGraphicOne;
+                t += 1.0f;
 
                 drawSFRect((kGraphicScreenCenterX + offX) - kGraphicScreenCenterX * t,
                            (kGraphicScreenCenterY + offY) - kGraphicScreenCenterY * t,
@@ -455,21 +444,20 @@ unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
 
     return result;
 }
-#pragma opt_lifetimes reset
 
 /*
  * --INFO--
- * PAL Address: 0x800462b8
+ * PAL Address: 0x800462B8
  * PAL Size: 596b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800522E0
+ * EN Size: 812b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, int centerY, _GXColor innerColor, _GXColor outerColor)
 {
     float ringPoints[32][4];
-    const float step = kSFCircleAngleStep;
+    const float step = 0.19634955f;
 
     for (int i = 0; i < 32; i++) {
         const float angle = step * (float)i;
@@ -622,15 +610,6 @@ void CGraphicPcs::drawCopy()
 	drawScreenFade();
 }
 
-/*
- * --INFO--
- * PAL Address: 0x8004674c
- * PAL Size: 2812b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
 static inline void setBarColor(GXColor& dst, const u32& colorWord)
 {
     const GXColor* src = (const GXColor*)&colorWord;
@@ -640,11 +619,20 @@ static inline void setBarColor(GXColor& dst, const u32& colorWord)
     dst.a = src->a;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8004674C
+ * PAL Size: 2812b
+ * EN Address: 0x800514DC
+ * EN Size: 2500b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void CGraphicPcs::drawBar()
 {
     Mtx44 ortho;
     Mtx identity;
-    C_MTXOrtho(ortho, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, kGraphicOrthoFarZ);
+    C_MTXOrtho(ortho, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, -100.0f);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);
 
     _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)1);
@@ -672,20 +660,8 @@ void CGraphicPcs::drawBar()
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
-    int drawText;
-    bool useDebugPad;
-    useDebugPad = drawText = 0;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
-        useDebugPad = true;
-    }
-    int padState;
-    if (useDebugPad) {
-        padState = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        padState = Pad.GetPadInputs()[padIndex].holdOverride;
-    }
+    int drawText = 0;
+    int padState = Pad.IsDebug(0);
     if ((padState != 0) && (Joybus.GetPadType(0) != 0x40000)) {
         drawText = 1;
     }
@@ -696,7 +672,7 @@ void CGraphicPcs::drawBar()
     drawSFRect(kDebugBarLeft, kDebugBarTop, kDebugBarRight, kDebugBarBottom, barColor, barColor);
 
     int hue;
-    u32 y;
+    int y;
     CSystem::COrder* order = System.GetFirstOrder();
     const int orderCount = System.m_orderCount;
     int i = 0;
@@ -706,24 +682,24 @@ void CGraphicPcs::drawBar()
         const int priority = order->m_priority;
         const float lastTime = order->m_lastTime;
         setBarColor(barColor, Math.Hsb2Rgb(hue / orderCount, 100, 100));
-        const float width = (kGraphicScreenCenterX * lastTime) / kDebugBarFrameBudget;
+        const float width = (kGraphicScreenCenterX * lastTime) / 100.0f;
 
         if (priority == 0x26) {
-            drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
-                       kGraphicOne + (x + width), kDebugBarTop, barColor, barColor);
+            drawSFRect(x, textFlag ? static_cast<float>(y) : kDebugBarMoveBottom,
+                       1.0f + (x + width), kDebugBarTop, barColor, barColor);
             x += width;
         } else if (priority != 0x27) {
-            drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarObjectTop,
-                       kGraphicOne + (x + width), kDebugBarMoveBottom, barColor, barColor);
+            drawSFRect(x, textFlag ? static_cast<float>(y) : 432.0f,
+                       1.0f + (x + width), kDebugBarMoveBottom, barColor, barColor);
             x += width;
         }
 
         if (i == orderCount - 1) {
             setBarColor(barColor, Math.Hsb2Rgb(0, 100, 100));
-            const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / kDebugBarFrameBudget;
+            const float soundWidth = (kGraphicScreenCenterX * Sound.GetPerformance()) / 100.0f;
 
-            drawSFRect(x, textFlag ? static_cast<float>(static_cast<int>(y)) : kDebugBarMoveBottom,
-                       kGraphicOne + (x + soundWidth), kDebugBarTop, barColor, barColor);
+            drawSFRect(x, textFlag ? static_cast<float>(y) : kDebugBarMoveBottom,
+                       1.0f + (x + soundWidth), kDebugBarTop, barColor, barColor);
         }
 
         order = System.GetNextOrder(order);
@@ -746,7 +722,7 @@ void CGraphicPcs::drawBar()
         y = 0x10;
         for (; i < orderCount; i++) {
             const int priority = order->m_priority;
-            const float width = (kGraphicScreenCenterX * order->m_lastTime) / kDebugBarFrameBudget;
+            const float width = (kGraphicScreenCenterX * order->m_lastTime) / 100.0f;
 
             if (priority != 0x27) {
                 char debugString[260];
@@ -761,7 +737,7 @@ void CGraphicPcs::drawBar()
                     strcat(debugString, extraString);
                 }
 
-                Graphic.DrawDebugStringDirect(static_cast<u32>(kGraphicOne + x), y, debugString, kDebugBarLineStep);
+                Graphic.DrawDebugStringDirect(static_cast<u32>(1.0f + x), y, debugString, kDebugBarLineStep);
                 x += width;
             }
 
@@ -778,8 +754,8 @@ void CGraphicPcs::drawBar()
  * --INFO--
  * PAL Address: 0x80047248
  * PAL Size: 736b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80051148
+ * EN Size: 916b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -803,8 +779,8 @@ void CGraphicPcs::drawEnd()
 			Graphic.DrawDebugStringDirect(0x10, 0x10, const_cast<char*>(s_scenegraph_step_labels[System.m_scenegraphStepMode]), 0xC);
 		}
 
-		if (Pad.m_debugPadPort != -1) {
-			sprintf(debugPadString, s_debug_pad_port_fmt, Pad.m_debugPadPort + 1);
+		if (Pad.GetPortEmulation() != -1) {
+			sprintf(debugPadString, s_debug_pad_port_fmt, Pad.GetPortEmulation() + 1);
 			Graphic.DrawDebugStringDirect(0x10, 0x11, debugPadString, 0xC);
 		}
 
@@ -812,13 +788,13 @@ void CGraphicPcs::drawEnd()
 		int port = 0;
 		x = 0x10;
 		for (; port < 4; port++) {
-			bool suppress = (Pad.m_debugPadLock != 0) || ((port == 0) && (Pad.m_debugPadPort != -1));
+			bool suppress = (Pad.m_debugPadLock != 0) || ((port == 0) && (Pad.GetPortEmulation() != -1));
 
 			u16 held;
 			if (suppress) {
 				held = 0;
 			} else {
-				int selectedPort = Pad.m_debugPadPort;
+				int selectedPort = Pad.GetPortEmulation();
 				u32 portIndex = port & ~((int)~((selectedPort - port) | (port - selectedPort)) >> 31);
 				held = Pad.GetPadInputs()[portIndex].button[0];
 			}

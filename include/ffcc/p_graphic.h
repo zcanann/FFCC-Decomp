@@ -6,6 +6,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+class CGObject;
+
 class CGraphicPcs : public CProcess
 {
 public:
@@ -17,7 +19,7 @@ public:
         _GXColor m_colorB;   // 0x0C
         int m_invert;        // 0x10
         int m_mode;          // 0x14
-        void* m_targetObj;   // 0x18
+        CGObject* m_targetObj; // 0x18
         float m_targetYOffs; // 0x1C
         float m_phase;       // 0x20
         float m_stretch;     // 0x24

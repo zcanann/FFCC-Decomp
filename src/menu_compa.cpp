@@ -369,6 +369,55 @@ int CMenuPcs::CompaClose()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 328b
+ * EN Address: 0x801837E0
+ * EN Size: 356b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::CompaInit0()
+{
+	CompaOpenAnimList* compaList = this->m_compaList;
+	int entryIndex = 0;
+	CompaOpenAnim* setupEntry = &compaList->entries[entryIndex++];
+	setupEntry->startFrame = 2;
+	setupEntry->duration = 5;
+	compaList = this->m_compaList;
+	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry->startFrame = 2;
+	setupEntry->duration = 5;
+	compaList = this->m_compaList;
+	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry->startFrame = 2;
+	setupEntry->duration = 5;
+	compaList = this->m_compaList;
+	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry->startFrame = 7;
+	setupEntry->duration = 5;
+	compaList = this->m_compaList;
+	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry->startFrame = 7;
+	setupEntry->duration = 5;
+	compaList = this->m_compaList;
+	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry->flags = 2;
+	setupEntry->startFrame = 7;
+	setupEntry->duration = 5;
+
+	CompaOpenAnimList* animList = this->m_compaList;
+	int entryCount = animList->count;
+	CompaOpenAnim* entry = animList->entries;
+	while (entryCount > 0) {
+		entry->frame = 0;
+		entry->alpha = LoadFloat(kCompaOne);
+		entry++;
+		entryCount--;
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 80161c28
  * PAL Size: 800b
  * EN Address: TODO
@@ -410,92 +459,10 @@ noReset:
 	}
 
 	if (doReset != 0) {
-		CompaOpenAnimList* compaList = this->m_compaList;
-		int entryIndex = 0;
-		CompaOpenAnim* setupEntry = &compaList->entries[entryIndex++];
-		setupEntry->startFrame = 2;
-		setupEntry->duration = 5;
-		compaList = this->m_compaList;
-		setupEntry = &compaList->entries[entryIndex++];
-		setupEntry->startFrame = 2;
-		setupEntry->duration = 5;
-		compaList = this->m_compaList;
-		setupEntry = &compaList->entries[entryIndex++];
-		setupEntry->startFrame = 2;
-		setupEntry->duration = 5;
-		compaList = this->m_compaList;
-		setupEntry = &compaList->entries[entryIndex++];
-		setupEntry->startFrame = 7;
-		setupEntry->duration = 5;
-		compaList = this->m_compaList;
-		setupEntry = &compaList->entries[entryIndex++];
-		setupEntry->startFrame = 7;
-		setupEntry->duration = 5;
-		compaList = this->m_compaList;
-		setupEntry = &compaList->entries[entryIndex++];
-		setupEntry->flags = 2;
-		setupEntry->startFrame = 7;
-		setupEntry->duration = 5;
-
-		CompaOpenAnimList* animList = this->m_compaList;
-		int entryCount = animList->count;
-		CompaOpenAnim* entry = animList->entries;
-		for (; entryCount > 0; entryCount--) {
-			entry->frame = 0;
-			entry->alpha = LoadFloat(kCompaOne);
-			entry++;
-		}
+		CompaInit0();
 	}
 
 	return;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 328b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::CompaInit0()
-{
-	CompaOpenAnimList* compaList = this->m_compaList;
-	int entryIndex = 0;
-	CompaOpenAnim* setupEntry = &compaList->entries[entryIndex++];
-	setupEntry->startFrame = 2;
-	setupEntry->duration = 5;
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
-	setupEntry->startFrame = 2;
-	setupEntry->duration = 5;
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
-	setupEntry->startFrame = 2;
-	setupEntry->duration = 5;
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
-	setupEntry->startFrame = 7;
-	setupEntry->duration = 5;
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
-	setupEntry->startFrame = 7;
-	setupEntry->duration = 5;
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
-	setupEntry->flags = 2;
-	setupEntry->startFrame = 7;
-	setupEntry->duration = 5;
-
-	unsigned int entryCount = compaList->count;
-	CompaOpenAnim* entry = compaList->entries;
-	while (entryCount != 0) {
-		entry->frame = 0;
-		entry->alpha = LoadFloat(kCompaOne);
-		entry++;
-		entryCount--;
-	}
 }
 
 /*

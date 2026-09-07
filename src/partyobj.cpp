@@ -117,39 +117,52 @@ struct SCfdItemRow {
 	unsigned char pad34[0x14]; // 0x34
 };
 
-// Sub-record views inside a flat3 row (row stride 0x1CA).
-struct SAtkRec { // stride 0x12, indexed by attackSel
-	unsigned short m_f0;     // 0x00
-	unsigned short m_f2;     // 0x02
-	unsigned char pad4[6];   // 0x04
-	unsigned short m_fA;     // 0x0A
-	unsigned char padC[6];   // 0x0C
+struct SAtkRec {
+	unsigned short m_attackStartFrame;
+	unsigned short m_attackEndFrame;
+	unsigned short m_moveStartFrame;
+	unsigned short m_moveEndFrame;
+	unsigned short m_moveSpeed;
+	unsigned short m_controlStartFrame;
+	unsigned short m_comboStartFrame;
+	unsigned short m_comboEndFrame;
+	unsigned short m_comboNextFrame;
 };
 
-struct SFoodRec { // stride 0x42, indexed by item low byte
-	unsigned char pad0[0x38]; // 0x00
-	unsigned short m_f38;     // 0x38
-	unsigned short m_f3A;     // 0x3A
-	unsigned char pad3C[6];   // 0x3C
+STATIC_ASSERT(sizeof(SAtkRec) == 0x12);
+
+struct SChargePhase {
+	unsigned short m_attackCol;
+	unsigned short m_attackStartFrame;
+	unsigned short m_attackEndFrame;
+	unsigned short m_moveStartFrame;
+	unsigned short m_moveEndFrame;
+	unsigned short m_moveSpeed;
 };
 
-struct SCarryAnimRow { // stride 0x1CA flat3 row; carry anim ids at +0x1C2..0x1C8
-	unsigned char pad[0x1C2];
-	unsigned short m_anim0; // 0x1C2
-	unsigned short m_anim1; // 0x1C4
-	unsigned short m_anim2; // 0x1C6
-	unsigned short m_anim3; // 0x1C8
+struct SChargeRec {
+	SChargePhase m_phases[5];
+	unsigned short m_twistLimit;
+	unsigned short m_twistStartFrame;
+	unsigned short m_twistEndFrame;
 };
 
-struct SAtkTblRow { // stride 0x1CA flat3 row, viewed as SAtkRec records
-	SAtkRec recs[25];
-	unsigned char tail[8];
+STATIC_ASSERT(sizeof(SChargePhase) == 0xC);
+STATIC_ASSERT(sizeof(SChargeRec) == 0x42);
+STATIC_ASSERT(offsetof(SChargeRec, m_twistLimit) == 0x3C);
+
+struct SPartyAnimRow {
+	SAtkRec m_attacks[3];
+	SChargeRec m_chargeAttacks[6];
+	unsigned short m_carryAnim0;
+	unsigned short m_carryAnim1;
+	unsigned short m_carryAnim2;
+	unsigned short m_carryAnim3;
 };
 
-struct SFoodTblRow { // stride 0x1CA flat3 row, viewed as SFoodRec records
-	SFoodRec recs[6];
-	unsigned char tail[62];
-};
+STATIC_ASSERT(sizeof(SPartyAnimRow) == 0x1CA);
+STATIC_ASSERT(offsetof(SPartyAnimRow, m_chargeAttacks) == 0x36);
+STATIC_ASSERT(offsetof(SPartyAnimRow, m_carryAnim0) == 0x1C2);
 
 static inline int getEquipWeaponInventoryItem(CCaravanWork* work)
 {
@@ -350,25 +363,25 @@ static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
 	if (carryType == 0) {
 		if (CFlatItemCarryMode() == 1) {
 			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-			SCarryAnimRow* rows = reinterpret_cast<SCarryAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
 			return rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_anim2;
+			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_carryAnim2;
 		}
 		unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-		SCarryAnimRow* rows = reinterpret_cast<SCarryAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+		SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
 		return rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-		            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_anim0;
+		            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_carryAnim0;
 	} else {
 		if (CFlatItemCarryMode() == 1) {
 			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-			SCarryAnimRow* rows = reinterpret_cast<SCarryAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
 			return rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_anim3;
+			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_carryAnim3;
 		}
 		unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-		SCarryAnimRow* rows = reinterpret_cast<SCarryAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+		SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
 		return rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-		            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_anim1;
+		            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_carryAnim1;
 	}
 }
 
@@ -495,24 +508,26 @@ void CGPartyObj::onChangeStat(int state)
 	case 1: {
 		int attackSel = party.attackSel;
 		*reinterpret_cast<int*>(self + 0x550) = (attackSel == 0) ? 5 : ((attackSel == 1) ? 7 : 8);
-		int row = attackSel * 0x12;
-		*reinterpret_cast<int*>(self + 0x630) =
-		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 +
-		        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-		         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row);
 		{
-			SAtkTblRow* rows = reinterpret_cast<SAtkTblRow*>(Game.unk_flat3_field_30_0xc7e0);
-			*reinterpret_cast<int*>(self + 0x634) =
-			    rows[*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2]
-			        .recs[attackSel].m_f2;
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			m_castFrameStart =
+			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+			         reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+			        .m_attacks[attackSel].m_attackStartFrame;
 		}
 		{
-			SAtkTblRow* rows = reinterpret_cast<SAtkTblRow*>(Game.unk_flat3_field_30_0xc7e0);
-			*reinterpret_cast<int*>(self + 0x638) =
-			    rows[*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2]
-			        .recs[attackSel].m_fA;
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			m_castFrameEnd =
+			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+			        .m_attacks[attackSel].m_attackEndFrame;
+		}
+		{
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			m_castFrameCurrent =
+			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+			        .m_attacks[attackSel].m_controlStartFrame;
 		}
 		break;
 	}
@@ -551,18 +566,18 @@ void CGPartyObj::onChangeStat(int state)
 		System.Printf(const_cast<char*>(msgBase + 0x3AC), itemLow);
 		*reinterpret_cast<int*>(self + 0x558) = itemHigh + 0x2A;
 		{
-			SFoodTblRow* rows = reinterpret_cast<SFoodTblRow*>(Game.unk_flat3_field_30_0xc7e0);
-			*reinterpret_cast<int*>(self + 0x630) =
-			    rows[*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2]
-			        .recs[itemLow].m_f38;
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			m_castFrameStart =
+			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+			        .m_chargeAttacks[itemLow].m_phases[0].m_attackStartFrame;
 		}
 		{
-			SFoodTblRow* rows = reinterpret_cast<SFoodTblRow*>(Game.unk_flat3_field_30_0xc7e0);
-			*reinterpret_cast<int*>(self + 0x634) =
-			    rows[*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2]
-			        .recs[itemLow].m_f3A;
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			m_castFrameEnd =
+			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+			        .m_chargeAttacks[itemLow].m_phases[0].m_attackEndFrame;
 		}
 		*reinterpret_cast<int*>(self + 0x68C) = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		if (Game.m_gameWork.m_menuStageMode != 0) {
@@ -2190,15 +2205,12 @@ int CGPartyObj::getReplaceStat(int state)
 	return state;
 }
 
-#pragma push
-#pragma opt_propagation off
-#pragma opt_dead_assignments off
 /*
  * --INFO--
  * PAL Address: 0x8011ff8c
  * PAL Size: 2560b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013D870
+ * EN Size: 2412b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2245,7 +2257,7 @@ void CGPartyObj::statCharge()
 		}
 		if (m_subFrame == 5 && m_comboItemState >= 0) {
 			endPSlotBit(0x20);
-			int particleBase = m_comboItemState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 5;
+			int particleBase = m_comboItemState + reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 5;
 			CFlat.ResetParticleWork(
 			    (particleBase + 0x1C) | 0x400,
 			    m_particleSlots[5]);
@@ -2284,10 +2296,10 @@ void CGPartyObj::statCharge()
 					base = 0x6F;
 					break;
 				}
-				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) > 1) {
+				if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_hp > 1) {
 					addHp(-1, static_cast<CGPrgObj*>(0));
 				}
-				putParticle((base + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2)) | 0x500, 0,
+				putParticle((base + reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag) | 0x500, 0,
 				    reinterpret_cast<CGObject*>(this), kMonObjOne, 0);
 			}
 		}
@@ -2297,17 +2309,16 @@ void CGPartyObj::statCharge()
 			putParticleFromItem(m_itemId, 3, m_particleSlots[0], static_cast<Vec*>(0));
 		}
 
-		int entry = (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-		             *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA;
+		SPartyAnimRow* animRows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
 		SCfdItemRow* rowRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-		int row = (static_cast<int>(rowRows[m_itemId].m_fieldA) >> 8) * 0x42;
-		unsigned short* table =
-		    reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + row + 0x36);
+		SChargeRec* table = &animRows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+		                            reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+		                        .m_chargeAttacks[rowRows[m_itemId].m_fieldA >> 8];
 
-		unsigned short* p = table;
-		for (int i = 0; i < 5; i++, p += 6) {
-			if (phase == p[3] && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
-				unsigned int dist = (p[4] - p[3]) + 1;
+		SChargePhase* p = table->m_phases;
+		for (int i = 0; i < 5; i++, p++) {
+			if (phase == p->m_moveStartFrame && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+				unsigned int dist = (p->m_moveEndFrame - p->m_moveStartFrame) + 1;
 				if (i == 0 && (itemType == 2 || itemType == 3)) {
 					Vec delta;
 					PSVECSubtract(&m_comboCenter, &m_worldPosition, &delta);
@@ -2317,25 +2328,8 @@ void CGPartyObj::statCharge()
 					if ((flagRows[m_itemId].m_field32 & 0x10) != 0) {
 						unsigned int maxReach = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70);
 						if (static_cast<float>(maxReach) < mag) {
-							const CVector& dir = CVector(delta);
-							CVector scaled;
-							PSVECScale((Vec*)&dir, reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
-							Vec scaledCopy;
-							scaledCopy.x = scaled.x;
-							scaledCopy.y = scaled.y;
-							scaledCopy.z = scaled.z;
-							CVector unit;
-							PSVECScale(&scaledCopy, reinterpret_cast<Vec*>(&unit), kMonObjOne / mag);
-							Vec unitCopy;
-							unitCopy.x = unit.x;
-							unitCopy.y = unit.y;
-							unitCopy.z = unit.z;
-							const CVector& origin = CVector(m_worldPosition);
-							CVector sum;
-							PSVECAdd((Vec*)&origin, reinterpret_cast<Vec*>(&unitCopy), reinterpret_cast<Vec*>(&sum));
-							dest.x = sum.x;
-							dest.y = sum.y;
-							dest.z = sum.z;
+							dest = CVector(m_worldPosition) +
+							       (CVector(delta) * (mag - static_cast<float>(maxReach))) * (kMonObjOne / mag);
 							mag = mag - static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70));
 						} else {
 							mag = FLOAT_80331a78;
@@ -2345,14 +2339,14 @@ void CGPartyObj::statCharge()
 						Move(reinterpret_cast<Vec*>(&dest), mag / static_cast<float>(static_cast<int>(dist)), dist, 1, 1, 0, 1);
 					}
 				} else {
-					moveVectorRot(m_rotTargetY, FLOAT_80331a78, FLOAT_80331ADC * static_cast<float>(p[5]),
+					moveVectorRot(m_rotTargetY, FLOAT_80331a78, FLOAT_80331ADC * static_cast<float>(p->m_moveSpeed),
 					    dist);
 				}
 			}
-			if (phase == p[1]) {
-				enableAttackCol(1, 1, p[0]);
+			if (phase == p->m_attackStartFrame) {
+				enableAttackCol(1, 1, p->m_attackCol);
 			}
-			if (phase == p[2]) {
+			if (phase == p->m_attackEndFrame) {
 				enableAttackCol(0, 0, 0);
 			}
 		}
@@ -2362,16 +2356,13 @@ void CGPartyObj::statCharge()
 			return;
 		}
 
-		unsigned int limitFrames = table[0x1E];
-		if (limitFrames != 0) {
-			float angLimit = FLOAT_80331AE0 * static_cast<float>(limitFrames);
-			if (phase == table[0x1F]) {
-				CVector worldPos(m_worldPosition);
-				const CVector& center = CVector(m_comboCenter);
-				CVector diff;
-				PSVECSubtract((Vec*)&center, reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
+		unsigned int twistLimit = table->m_twistLimit;
+		if (twistLimit != 0) {
+			float angLimit = FLOAT_80331AE0 * static_cast<float>(twistLimit);
+			if (phase == table->m_twistStartFrame) {
+				CVector diff = CVector(m_comboCenter) - CVector(m_worldPosition);
 				float horizSq = diff.z * diff.z + diff.x * diff.x;
-				float horiz = (horizSq > FLOAT_80331a78) ? sqrtf(horizSq) : horizSq;
+				float horiz = sqrtf(horizSq);
 				if (FLOAT_80331a78 != diff.y && FLOAT_80331a78 != horiz) {
 					float ang = -static_cast<float>(atan2(diff.y, horiz));
 					float clamped = -angLimit;
@@ -2385,7 +2376,7 @@ void CGPartyObj::statCharge()
 					}
 					m_twistTarget = clamped;
 				}
-			} else if (phase == table[0x20]) {
+			} else if (phase == table->m_twistEndFrame) {
 				m_twistTarget = FLOAT_80331a78;
 			}
 		}
@@ -2406,7 +2397,6 @@ void CGPartyObj::statCharge()
 		}
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -2497,8 +2487,8 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
  * --INFO--
  * PAL Address: 0x8011fa88
  * PAL Size: 800b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013E500
+ * EN Size: 724b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2524,23 +2514,20 @@ void CGPartyObj::onStatAttack(int chargeType)
 		return;
 	}
 
-	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	const int chain = party.unk6CC;
-	unsigned char* attackEntry = reinterpret_cast<unsigned char*>(
-	    Game.unk_flat3_field_30_0xc7e0 +
-	    ((*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-	      *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) *
-	         0x1CA) +
-	    chain * 0x12);
+	SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+	SAtkRec* attackEntry = &rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+	                           reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+	                       .m_attacks[chain];
 
-	if (chain > 0 && m_stateFrame == *reinterpret_cast<unsigned short*>(attackEntry + 4) && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
-		const float stepSpeed = FLOAT_80331ADC * static_cast<float>(*reinterpret_cast<unsigned short*>(attackEntry + 8));
+	if (chain > 0 && m_stateFrame == attackEntry->m_moveStartFrame && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+		const float stepSpeed = FLOAT_80331ADC * static_cast<float>(attackEntry->m_moveSpeed);
 		moveVectorRot(m_rotTargetY, FLOAT_80331a78, stepSpeed,
-		    (*reinterpret_cast<unsigned short*>(attackEntry + 6) - *reinterpret_cast<unsigned short*>(attackEntry + 4)) + 1);
+		    (attackEntry->m_moveEndFrame - attackEntry->m_moveStartFrame) + 1);
 	}
 
-	if (m_stateFrame >= *reinterpret_cast<unsigned short*>(attackEntry + 0x0C) &&
-	    m_stateFrame <= *reinterpret_cast<unsigned short*>(attackEntry + 0x0E)) {
+	if (m_stateFrame >= attackEntry->m_comboStartFrame &&
+	    m_stateFrame <= attackEntry->m_comboEndFrame) {
 		if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) != 0) {
 			party.commandFlagBits.commandActive = 1;
 		}
@@ -2550,7 +2537,7 @@ void CGPartyObj::onStatAttack(int chargeType)
 		}
 	}
 
-	if (m_stateFrame == *reinterpret_cast<unsigned short*>(attackEntry + 0x10)) {
+	if (m_stateFrame == attackEntry->m_comboNextFrame) {
 		if (party.commandFlagBits.commandActive != 0 && party.commandFlagBits.flag40 == 0 && party.unk6CC < 2) {
 			party.attackSel = party.unk6CC + 1;
 			changeStat(1, 0, 0);
@@ -2558,8 +2545,7 @@ void CGPartyObj::onStatAttack(int chargeType)
 		}
 	}
 
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if (m_stateFrame == *reinterpret_cast<int*>(self + 0x638)) {
+	if (m_stateFrame == m_castFrameCurrent) {
 		m_unk63CBits.m_bit80 = 1;
 	}
 

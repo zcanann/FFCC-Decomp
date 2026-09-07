@@ -708,7 +708,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 		if (createMode == 2) {
 			newItem->m_scriptArg = scriptArg;
-			newItem->m_radiusCtrl.y = kItemObjUnitScale;
+			newItem->m_swayTarget.x = kItemObjUnitScale;
 		}
 
 		newItem->changeStat(0x1B, 0, 0);

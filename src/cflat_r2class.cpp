@@ -917,7 +917,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					    static_cast<unsigned int>(static_cast<int>((*(engineObject + 0x50) & 0xC0) << 0x18) >> 0x1F);
 					break;
 				case -8:
-					LastResult(this) = (*reinterpret_cast<unsigned int*>(engineObject + 0x4CC) >> 0x17) & 0xF;
+					LastResult(this) = (reinterpret_cast<CGObject*>(engineObject)->m_bgGroupMask >> 0x17) & 0xF;
 					break;
 				case -9:
 					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x94);
@@ -1846,7 +1846,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x4A:
-			engineObject->m_hitNormal.x = reinterpret_cast<float*>(object->m_localBase)[0];
+			engineObject->m_turnFactor = reinterpret_cast<float*>(object->m_localBase)[0];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

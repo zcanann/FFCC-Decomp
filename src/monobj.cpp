@@ -343,9 +343,9 @@ void CGMonObj::moveFrame()
 		}
 
 		float dstRot = Math.DstRot(rotY, oldRotY);
-		float hitNrmX = m_hitNormal.x;
-		float baseDelta = dstRot * hitNrmX;
-		float rotDelta = dstRot * (1.0f - hitNrmX);
+		float turnFactor = m_turnFactor;
+		float baseDelta = dstRot * turnFactor;
+		float rotDelta = dstRot * (1.0f - turnFactor);
 		m_rotBaseY = m_rotBaseY + baseDelta;
 		rotY = rotY - rotDelta;
 		m_rotTargetY = m_rotBaseY;
@@ -748,7 +748,7 @@ void CGMonObj::initFinishedFuncDefault()
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
 	// Script value is authored in centi-units.
-	object->m_hitNormal.x = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B0));
+	object->m_turnFactor = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B0));
 
 	CCharaPcs::CHandle* handle = object->m_charaModelHandle;
 	if (handle != NULL) {

@@ -54,6 +54,14 @@ STATIC_ASSERT(offsetof(CGObject, m_turnAnimFrames) == 0x1DC);
 STATIC_ASSERT(offsetof(CGObject, m_attackColliders) == 0x1E0);
 STATIC_ASSERT(offsetof(CGObject, m_damageColliders) == 0x360);
 STATIC_ASSERT(offsetof(CGObject, m_turnSpeed) == 0x4A0);
+STATIC_ASSERT(offsetof(CGObject, m_motionMode) == 0x98);
+STATIC_ASSERT(offsetof(CGObject, m_lastBgGroup) == 0xE8);
+STATIC_ASSERT(offsetof(CGObject, m_bgGroupMask) == 0x4CC);
+STATIC_ASSERT(offsetof(CGObject, m_swayTarget) == 0x4D0);
+STATIC_ASSERT(offsetof(CGObject, m_swayDirection) == 0x4DC);
+STATIC_ASSERT(offsetof(CGObject, m_turnFactor) == 0x4E8);
+STATIC_ASSERT(offsetof(CGObject, m_hitFaceNormal) == 0x4EC);
+STATIC_ASSERT(offsetof(CGObject, m_twistTarget) == 0x4FC);
 STATIC_ASSERT(offsetof(CGObject, m_animSlots) == 0x9D);
 STATIC_ASSERT(offsetof(CGObject, m_animQueuePos) == 0xDD);
 STATIC_ASSERT(offsetof(CGObject, m_charaModelHandle) == 0xF8);
@@ -2053,7 +2061,7 @@ void CGObject::update()
         turnDelta = ClampDouble(turnDelta, negLimit, turnLimit);
         turnFactor = sAnimFrameOffset;
     } else {
-        turnFactor = m_hitNormal.x;
+        turnFactor = m_turnFactor;
     }
     m_rotBaseY += turnDelta * turnFactor;
 
@@ -2094,15 +2102,15 @@ void CGObject::update()
         if (m_worldParamA == 0x20 || m_worldParamA == 0x13 || m_worldParamA == 0x15 ||
             m_worldParamA == 0x16 || m_worldParamA == 0x17 || m_worldParamA == 0x14) {
             const float wobbleBias = m_worldParamA == 0x20 ? sWobbleBiasLarge : sWobbleBiasSmall;
-            m_radiusCtrl.z += sRadiusWobbleScale * m_radiusCtrl.y + wobbleBias;
-            m_radiusCtrl.y *= sRadiusWobbleDecay;
-            srt.m_rotation.y += m_radiusCtrl.z;
+            m_swayTarget.y += sRadiusWobbleScale * m_swayTarget.x + wobbleBias;
+            m_swayTarget.x *= sRadiusWobbleDecay;
+            srt.m_rotation.y += m_swayTarget.y;
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             const float cameraYaw = CameraPcs.m_yaw;
             srt.m_rotation.y = sPiFloat - cameraYaw;
-            srt.m_rotation.y += sBgAttrNormal * cosf(sBgAttrNormal * m_radiusCtrl.y);
-            srt.m_position.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);
-            m_radiusCtrl.y += sRadiusCtrlStep;
+            srt.m_rotation.y += sBgAttrNormal * cosf(sBgAttrNormal * m_swayTarget.x);
+            srt.m_position.y += sAnimFrameOffset + sinf(m_swayTarget.x);
+            m_swayTarget.x += sRadiusCtrlStep;
         }
 
         Math.SRTToMatrix(modelMtx, &srt);
@@ -2136,21 +2144,21 @@ void CGObject::update()
             modelMtx[2][3] = tz;
         } else if ((m_objectFlags & 0x90) != 0 && m_stateFlags0Bits.unk0) {
             if (m_groundHitOffset.x != sZeroFloat || m_groundHitOffset.z != sZeroFloat) {
-                m_radiusCtrl.y += sSwayImpulse * m_groundHitOffset.x;
-                m_radiusCtrlVel.x += sSwayImpulse * m_groundHitOffset.z;
+                m_swayTarget.x += sSwayImpulse * m_groundHitOffset.x;
+                m_swayTarget.z += sSwayImpulse * m_groundHitOffset.z;
             }
 
-            const float swayDx = m_radiusCtrlVel.x - m_groundFriction;
-            const float swayDz = m_radiusCtrl.y - m_radiusCtrlVel.y;
+            const float swayDx = m_swayTarget.z - m_swayDirection.z;
+            const float swayDz = m_swayTarget.x - m_swayDirection.x;
             const float swayMag = GObjSqrtf(swayDz * swayDz + swayDx * swayDx);
-            m_radiusCtrlVel.y += sBgAttrNormal * swayDz;
-            m_groundFriction += sBgAttrNormal * swayDx;
+            m_swayDirection.x += sBgAttrNormal * swayDz;
+            m_swayDirection.z += sBgAttrNormal * swayDx;
 
             float mtx0;
             float mtx1;
             float mtx2;
             Vec swayDir;
-            PSVECNormalize(reinterpret_cast<Vec*>(&m_radiusCtrlVel.y), &swayDir);
+            PSVECNormalize(&m_swayDirection, &swayDir);
             const float swayDot = PSVECDotProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat));
             if (swayDot < sSwayDotLimit) {
                 const float negSwayAngle = -acosf(swayDot);
@@ -2173,16 +2181,16 @@ void CGObject::update()
                 modelMtx[1][3] = mtx1;
             }
 
-            const float swayRy = m_radiusCtrl.y;
-            const float swayRx = m_radiusCtrlVel.x;
+            const float swayRy = m_swayTarget.x;
+            const float swayRx = m_swayTarget.z;
             float swayClamp = swayDot < sAnimFrameOffset ? swayDot : sAnimFrameOffset;
             swayClamp = swayClamp < sZeroFloat ? sZeroFloat : swayClamp;
             const float swaySin = sinf(swayClamp);
             const float swayCos = cosf(swayClamp);
-            m_radiusCtrl.y = swayCos * swayRy - swaySin * swayRx;
-            m_radiusCtrlVel.x = swaySin * swayRy + swayCos * swayRx;
-            m_radiusCtrl.y *= sSwayDamping;
-            m_radiusCtrlVel.x *= sSwayDamping;
+            m_swayTarget.x = swayCos * swayRy - swaySin * swayRx;
+            m_swayTarget.z = swaySin * swayRy + swayCos * swayRx;
+            m_swayTarget.x *= sSwayDamping;
+            m_swayTarget.z *= sSwayDamping;
         }
     }
 
@@ -2267,7 +2275,7 @@ void CGObject::update()
         ModelChestTilt(chestModel) = chestTilt;
         CChara::CModel* twistModel = m_charaModelHandle->m_model;
         const float twistAngle = ModelTwistAngle(twistModel);
-        ModelTwistAngle(twistModel) = sBgAttrFast * (*reinterpret_cast<float*>(m_worldMode) - twistAngle) + twistAngle;
+        ModelTwistAngle(twistModel) = sBgAttrFast * (m_twistTarget - twistAngle) + twistAngle;
 
         m_charaModelHandle->m_model->SetMatrix(modelMtx);
 
@@ -2705,11 +2713,11 @@ void CGObject::bgWorldCollision()
 
         if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
             m_stateFlags0Bits.unk0 = 1;
-            *reinterpret_cast<u32*>(&m_radiusCtrl.x) =
+            m_bgGroupMask =
                 MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask;
             const int groupIndex = gMapHitFace->m_groupIndex;
             if (groupIndex != 0) {
-                *reinterpret_cast<char*>(&m_lastBgGroup) = static_cast<char>(groupIndex);
+                m_lastBgGroup = static_cast<char>(groupIndex);
             }
             MapMng.m_hitMapObj->GetHitFaceNormal(&HitFaceNormal());
         }
@@ -2814,11 +2822,11 @@ void CGObject::bgNormalCollision()
 
     if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
         m_stateFlags0Bits.unk0 = 1;
-        *reinterpret_cast<u32*>(&m_radiusCtrl.x) =
+        m_bgGroupMask =
             MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask;
         const int groupIndex = gMapHitFace->m_groupIndex;
         if (groupIndex != 0) {
-            *reinterpret_cast<char*>(&m_lastBgGroup) = static_cast<char>(groupIndex);
+            m_lastBgGroup = static_cast<char>(groupIndex);
         }
         MapMng.m_hitMapObj->GetHitFaceNormal(&HitFaceNormal());
     }
@@ -2889,7 +2897,7 @@ void CGObject::bgCollision()
     m_stateFlags0Bits.unk0 = 0;
     m_stateFlags0Bits.unk1 = 0;
 
-    *reinterpret_cast<int*>(&m_radiusCtrl.x) = 0;
+    m_bgGroupMask = 0;
     m_gravityY = sZeroFloat;
 
     bgAttribCollision();
@@ -3258,7 +3266,7 @@ void CGObject::move()
                 }
             }
 
-            if ((*reinterpret_cast<u32*>(&m_radiusCtrl.x) & 0x400000) != 0) {
+            if ((m_bgGroupMask & 0x400000) != 0) {
                 speed *= sBgAttrSlow;
             }
 
@@ -3471,26 +3479,26 @@ void CGObject::onCreate()
     m_shieldNodeFlagBits.m_bit04 = 0;
     m_collisionPushTimerMax = 0x32;
 
-    *reinterpret_cast<u32*>(&m_radiusCtrl.x) = 0;
-    *reinterpret_cast<unsigned char*>(&m_lastBgGroup) = 0;
+    m_bgGroupMask = 0;
+    m_lastBgGroup = 0;
     m_lifeTimer = 0;
     m_stateFlags0Bits.unk4 = 0;
     m_ownerSlot = 0;
     m_stateFlags0Bits.unk0 = 0;
-    m_radiusCtrlVel.x = sZeroFloat;
-    m_radiusCtrl.y = sZeroFloat;
-    m_radiusCtrl.z = sAnimFrameOffset;
-    m_radiusCtrlVel.y = m_radiusCtrl.y;
-    m_radiusCtrlVel.z = m_radiusCtrl.z;
-    m_groundFriction = m_radiusCtrlVel.x;
+    m_swayTarget.z = sZeroFloat;
+    m_swayTarget.x = sZeroFloat;
+    m_swayTarget.y = sAnimFrameOffset;
+    m_swayDirection.x = m_swayTarget.x;
+    m_swayDirection.y = m_swayTarget.y;
+    m_swayDirection.z = m_swayTarget.z;
 
-    m_hitNormal.x = sBgAttrFast;
+    m_turnFactor = sBgAttrFast;
     m_bgDownDist = sDefaultBgDownDist;
     m_moveMode = 0;
     m_moveModePrevious = 4;
-    m_groundSlide = sZeroFloat;
-    m_hitNormal.z = sZeroFloat;
-    m_hitNormal.y = sZeroFloat;
+    m_hitFaceNormal.z = sZeroFloat;
+    m_hitFaceNormal.y = sZeroFloat;
+    m_hitFaceNormal.x = sZeroFloat;
     m_worldParam = sZeroFloat;
 
     m_lookAtTargetNodeIndex = cFill;
@@ -3499,14 +3507,14 @@ void CGObject::onCreate()
     m_lookAtAccumPitch = sZeroFloat;
     m_weaponAttachNode = cFill;
     m_shieldAttachNodeIndex = cFill;
-    *reinterpret_cast<u16*>(&m_lastMapIdHit) = 0;
+    m_motionMode = 0;
     m_weaponNodeFlagBits.m_prg = 0;
     m_extraMoveVec.z = sZeroFloat;
     m_extraMoveVec.y = sZeroFloat;
     m_extraMoveVec.x = sZeroFloat;
     m_shieldNodeFlagBits.m_bit01 = 0;
     m_field_0x56 = 0x7D;
-    *reinterpret_cast<float*>(m_worldMode) = sZeroFloat;
+    m_twistTarget = sZeroFloat;
 
     for (unsigned int i = 0; i < sizeof(m_animSlots); i++) {
         m_animSlots[i] = cFill;

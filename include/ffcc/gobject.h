@@ -139,8 +139,7 @@ public:
     float m_gravityY;                 // 0x80
     Qtrn m_bgCollisionQtrn;           // 0x84
     int m_lifeTimer;                 // 0x94
-    unsigned char m_lastMapIdHit;     // 0x98
-    unsigned char m_lastMapIdExtra;   // 0x99
+    short m_motionMode;              // 0x98
     struct WeaponNodeFlagBits {
         signed char m_prg : 1;
         signed char m_unk40 : 1;
@@ -198,7 +197,7 @@ public:
     unsigned char m_dispItemTimer;    // 0xE5
     unsigned char m_pushParamA;       // 0xE6
     unsigned char m_pushParamB;       // 0xE7
-    short m_lastBgGroup;              // 0xE8
+    char m_lastBgGroup;               // 0xE8
     short m_weaponAttachNode;         // 0xEA
     short m_shieldAttachNodeIndex;    // 0xEC
     short m_animExtraIndex;           // 0xEE
@@ -261,21 +260,21 @@ public:
     float m_bgAttrValue;              // 0x4C0
     float m_animBlend;                // 0x4C4
     float m_lastBgAttr;               // 0x4C8
-    Vec m_radiusCtrl;                 // 0x4CC
-    Vec m_radiusCtrlVel;              // 0x4D8
-    float m_groundFriction;           // 0x4E4
-    Vec m_hitNormal;                  // 0x4E8
-    float m_groundSlide;              // 0x4F4
+    u32 m_bgGroupMask;                // 0x4CC
+    Vec m_swayTarget;                 // 0x4D0
+    Vec m_swayDirection;              // 0x4DC
+    float m_turnFactor;               // 0x4E8
+    Vec m_hitFaceNormal;              // 0x4EC
     float m_worldParam;               // 0x4F8
-    unsigned char m_worldMode[4];     // 0x4FC
+    float m_twistTarget;              // 0x4FC
     int m_worldParamA;                // 0x500
     int m_worldParamB;                // 0x504
     float m_lookAtAccumYaw;           // 0x508
     float m_lookAtAccumPitch;         // 0x50C
     short m_dropItemCodes[4];          // 0x510
 
-    Vec& HitFaceNormal() { return *reinterpret_cast<Vec*>(&m_hitNormal.y); }
-    const Vec& HitFaceNormal() const { return *reinterpret_cast<const Vec*>(&m_hitNormal.y); }
+    Vec& HitFaceNormal() { return m_hitFaceNormal; }
+    const Vec& HitFaceNormal() const { return m_hitFaceNormal; }
 };
 
 /*

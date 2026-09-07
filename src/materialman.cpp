@@ -109,41 +109,6 @@ static inline void SetMaterialColor(CMaterial* material, unsigned int rgba)
 
 /*
  * --INFO--
- * PAL Address: 0x80041F28
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline unsigned short CPad::GetButtonDown(long padIndex)
-{
-    bool shouldZero = false;
-    unsigned int result;
-
-    if (m_debugPadLock == 0) {
-        if (padIndex != 0) {
-            goto read_slot;
-        }
-        if (m_debugPadPort == -1) {
-            goto read_slot;
-        }
-    }
-
-    shouldZero = true;
-read_slot:
-    if (shouldZero) {
-        result = 0;
-    } else {
-        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
-        result = GetPadInputs()[resolvedIndex].buttonDown[0];
-    }
-
-    return static_cast<unsigned short>(result);
-}
-
-/*
- * --INFO--
  * PAL Address: UNUSED
  * PAL Size: TODO
  * EN Address: 0x8004F400

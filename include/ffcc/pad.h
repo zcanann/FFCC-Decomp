@@ -148,4 +148,32 @@ typedef char CPad_PadInput_size_check[(sizeof(CPad::PadInput) == 0x54) ? 1 : -1]
 
 extern CPad Pad;
 
+/*
+ * --INFO--
+ * PAL Address: 0x80041F28
+ * PAL Size: 100b
+ * EN Address: 0x8002CEB4
+ * EN Size: 164b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline unsigned short CPad::GetButtonDown(long padIndex)
+{
+    bool shouldZero = false;
+    unsigned int result;
+
+    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
+        shouldZero = true;
+    }
+
+    if (shouldZero) {
+        result = 0;
+    } else {
+        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
+        result = GetPadInputs()[resolvedIndex].buttonDown[0];
+    }
+
+    return static_cast<unsigned short>(result);
+}
+
 #endif

@@ -1189,10 +1189,10 @@ memorycard.cpp:
 	.text       start:0x800C17B8 end:0x800C4DD8
 	.ctors      start:0x801D5428 end:0x801D542C
 	.rodata     start:0x801DA9C0 end:0x801DB0B0
-	.data       start:0x80210540 end:0x8021056C
+	.data       start:0x80210540 end:0x80210560
 	.bss        start:0x802F2628 end:0x802F26C4
 	.sdata      start:0x8032E850 end:0x8032E880
-	.sdata2     start:0x80330CB8 end:0x80330CF0
+	.sdata2     start:0x80330CB8 end:0x80330CD8
 
 pppWDrawMatrixLoop.cpp:
 	extab       start:0x800084E0 end:0x800084E8
@@ -1203,7 +1203,7 @@ vector.cpp:
 	extab       start:0x800084E8 end:0x800084F8
 	extabindex  start:0x8000EC44 end:0x8000EC5C
 	.text       start:0x800C4E50 end:0x800C4F04
-	.sdata2     start:0x80330CF0 end:0x80330CF8
+	.sdata2     start:0x80330CD8 end:0x80330CE0
 
 color.cpp:
 	.text       start:0x800C4F04 end:0x800C4F50
@@ -1219,10 +1219,10 @@ sound.cpp:
 	.text       start:0x800C4FD8 end:0x800C8A8C
 	.ctors      start:0x801D542C end:0x801D5430
 	.rodata     start:0x801DB0B0 end:0x801DB2E0
-	.data       start:0x8021056C end:0x80210580
+	.data       start:0x80210560 end:0x80210580
 	.bss        start:0x802F26C8 end:0x802F49AC
 	.sdata      start:0x8032E880 end:0x8032E890
-	.sdata2     start:0x80330CF8 end:0x80330D50
+	.sdata2     start:0x80330CE0 end:0x80330D38
 
 gbaque.cpp:
 	extab       start:0x800086CC end:0x80008A64
@@ -1231,7 +1231,7 @@ gbaque.cpp:
 	.ctors      start:0x801D5430 end:0x801D5434
 	.rodata     start:0x801DB2E0 end:0x801DB4AF
 	.bss        start:0x802F49B0 end:0x802F7720
-	.sdata2     start:0x80330D50 end:0x80330D78
+	.sdata2     start:0x80330D38 end:0x80330D78
 
 pppYmMoveCircle.cpp:
 	extab       start:0x80008A64 end:0x80008A74

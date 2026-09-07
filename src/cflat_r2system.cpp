@@ -1,7 +1,6 @@
 #include "ffcc/ptrarray.h"
 #include "ffcc/cflat_r2system.h"
 #include "ffcc/astar.h"
-#include "ffcc/line_constants.h"
 #include "ffcc/linkage.h"
 #include "ffcc/color.h"
 #include "ffcc/file.h"
@@ -2196,7 +2195,7 @@ renderedDone:
         const float margin = localFloats[4];
         int found = 0;
         unsigned int bestLine = 0;
-        float bestDistance = kLineBoundsInitMin;
+        float bestDistance = 10000000.0f;
         float bestLineDistance = 0.0f;
 
         CLine<64>* lines = m_debugLines;

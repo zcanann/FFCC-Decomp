@@ -36,15 +36,6 @@ struct CABlock
 	unsigned int m_words[16];
 };
 
-static inline CVector& SubVector(Vec* a, const CVector& b)
-{
-	CVector result;
-
-	PSVECSubtract(a, reinterpret_cast<Vec*>(const_cast<CVector*>(&b)), reinterpret_cast<Vec*>(&result));
-
-	return result;
-}
-
 CAStar AStar;
 
 /*
@@ -136,17 +127,10 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_dead_assignments off
 CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int forbiddenGroup)
 {
-	Vec escapeDir;
-	Vec portalVec;
-	const CVector& escapeDirSource = SubVector(CVector(from), CVector(base));
-
-	escapeDir.x = escapeDirSource.x;
-	escapeDir.y = escapeDirSource.y;
-	escapeDir.z = escapeDirSource.z;
-	reinterpret_cast<CVector*>(&escapeDir)->Normalize();
+	CVector escapeDir = CVector(from) - CVector(base);
+	escapeDir.Normalize();
 
 	CAPos* aheadBest = (CAPos*)0;
 	CAPos* behindBest = (CAPos*)0;
@@ -183,23 +167,12 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 				if (forbiddenGroup != otherGroup)
 				{
-					const CVector& dirToPortalSource = SubVector(CVector(m_portals[i].m_position), CVector(base));
+					CVector portalVec = CVector(m_portals[i].m_position) - CVector(base);
+					portalVec.Normalize();
 
-					portalVec.x = dirToPortalSource.x;
-					portalVec.y = dirToPortalSource.y;
-					portalVec.z = dirToPortalSource.z;
-					reinterpret_cast<CVector*>(&portalVec)->Normalize();
-
-					float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&escapeDir),
-					                            reinterpret_cast<Vec*>(&portalVec));
-
-					const CVector& distVecSource = SubVector(CVector(m_portals[i].m_position), CVector(base));
-
-					portalVec.x = distVecSource.x;
-					portalVec.y = distVecSource.y;
-					portalVec.z = distVecSource.z;
-
-					float dist = PSVECMag(reinterpret_cast<Vec*>(&portalVec));
+					float dot = PSVECDotProduct(escapeDir, portalVec);
+					portalVec = CVector(m_portals[i].m_position) - CVector(base);
+					float dist = PSVECMag(portalVec);
 
 					if (dot >= kPolyGroupBaseXZ)
 					{
@@ -228,7 +201,6 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 	return behindBest;
 }
-#pragma opt_dead_assignments reset
 /*
  * --INFO--
  * Address:	TODO
@@ -978,7 +950,7 @@ void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 {
 	int groupLow = groupA;
 	int groupHigh = groupB;
-	Vec* pos = reinterpret_cast<Vec*>(&CVector(x, y, z));
+	const CVector& pos = CVector(x, y, z);
 
 	if (groupB < groupA)
 	{
@@ -1021,9 +993,9 @@ void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 
 	CAPos& portal = m_portals[index];
 
-	portal.m_position.x = pos->x;
-	portal.m_position.y = pos->y;
-	portal.m_position.z = pos->z;
+	portal.m_position.x = pos.x;
+	portal.m_position.y = pos.y;
+	portal.m_position.z = pos.z;
 	m_portals[index].m_groupA = static_cast<unsigned char>(groupLow);
 	m_portals[index].m_groupB = static_cast<unsigned char>(groupHigh);
 }

@@ -85,10 +85,8 @@ void CRingMenu::DrawIcon()
 	Vec viewPos;
 	Vec4d clipPos;
 	Vec viewInput;
-	CVector offset(0.0f, 0.5f * partyObj->unk_0x188, 0.0f);
-	Vec* baseWorldPos = CVector(partyObj->m_worldPosition);
-	CVector worldPos;
-	PSVECAdd(baseWorldPos, offset, worldPos);
+	CVector worldPos = CVector(partyObj->m_worldPosition) +
+		CVector(0.0f, 0.5f * partyObj->unk_0x188, 0.0f);
 
 	viewInput.x = worldPos.x;
 	viewInput.y = worldPos.y;

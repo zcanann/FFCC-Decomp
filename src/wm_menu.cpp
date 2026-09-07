@@ -910,48 +910,7 @@ void CMenuPcs::loadData()
 	bytes[0x86E] = 0;
 	bytes[0x858] = 0;
 	*reinterpret_cast<int*>(bytes + 0x854) = 0;
-	memset(m_wm.m_charaSelectData, 0, 0x80);
-
-	// Assign chara-select party slots from the backed-up world state.
-	{
-		signed char usedMask = 0;
-		for (int i = 0, j = 0, count = 2; count != 0; count--, i += 0x20, j += 4) {
-			m_wm.m_charaSelectData[i + 0x0C] = 0;
-			m_wm.m_charaSelectData[i + 0x0B] = 0;
-			m_wm.m_charaSelectData[i + 0x0A] = 0;
-			int slotA = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_wmWorldState) + j + 0x3E);
-			if (slotA < 0) {
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) = -1;
-			} else {
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) = static_cast<short>(slotA);
-				usedMask = static_cast<signed char>(usedMask | (1 << slotA));
-			}
-			m_wm.m_charaSelectData[i + 0x1C] = 0;
-			m_wm.m_charaSelectData[i + 0x1B] = 0;
-			m_wm.m_charaSelectData[i + 0x1A] = 0;
-			int slotB = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_wmWorldState) + j + 0x40);
-			if (slotB < 0) {
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 0x14) = -1;
-			} else {
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 0x14) = static_cast<short>(slotB);
-				usedMask = static_cast<signed char>(usedMask | (1 << slotB));
-			}
-		}
-		for (int i = 0, count = 4; count != 0; count--, i += 0x10) {
-			if (*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) < 0) {
-				int freeSlot;
-				for (freeSlot = 0; freeSlot < 8; freeSlot++) {
-					if ((usedMask & (1 << freeSlot)) == 0) {
-						break;
-					}
-				}
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) = static_cast<short>(freeSlot);
-				usedMask = static_cast<signed char>(usedMask | (1 << freeSlot));
-			}
-			unsigned char* const entry = m_wm.m_charaSelectData + i;
-			*reinterpret_cast<short*>(entry + 6) = *reinterpret_cast<short*>(entry + 4);
-		}
-	}
+	InitCharaSelectInfo();
 
 	SetManaWaterEffect();
 	m_crystalPart = -1;
@@ -1331,20 +1290,8 @@ void CMenuPcs::InitCharaInfo()
  */
 inline void CMenuPcs::InitCharaSelectInfo()
 {
-	unsigned char* const selectData = m_wm.m_charaSelectData;
-	if (selectData != 0) {
-		memset(selectData, 0, kWmCharaSelectBytes);
-		for (int i = 0; i < kWmCharaSelectCount; i++) {
-			unsigned char* const entry = selectData + i * 0x10;
-			*reinterpret_cast<short*>(entry + 4) = static_cast<short>(i);
-			*reinterpret_cast<short*>(entry + 6) = static_cast<short>(i);
-			*reinterpret_cast<short*>(entry + 8) = 0;
-			entry[0xA] = 0;
-			entry[0xB] = 0;
-			entry[0xC] = 0;
-			entry[0xD] = 0;
-		}
-	}
+	memset(m_wm.m_charaSelectData, 0, kWmCharaSelectBytes);
+	InitCSelCurPos();
 }
 
 /*
@@ -1358,22 +1305,32 @@ inline void CMenuPcs::InitCharaSelectInfo()
  */
 inline void CMenuPcs::InitCSelCurPos()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	bytes[0x16] = 0;
-	bytes[0x17] = 0;
-	bytes[0x0E] = 0;
-	bytes[0x0F] = 0;
-	*reinterpret_cast<short*>(bytes + 0x1A) = 0;
-	gWmMenuWorkA = 0;
-	gWmMenuWorkB = 0;
-	gWmMenuCursorX[0] = static_cast<char>(0xFF);
-	gWmMenuCursorX[1] = static_cast<char>(0xFF);
-	gWmMenuCursorY[0] = static_cast<char>(0xFF);
-	gWmMenuCursorY[1] = static_cast<char>(0xFF);
+	signed char usedMask = 0;
+	for (int i = 0; i < kWmMenuControllerCount; i++) {
+		GetWmCharaSelectEntries(this)[i].m_cmakeReady = 0;
+		GetWmCharaSelectEntries(this)[i].m_cmakePending = 0;
+		GetWmCharaSelectEntries(this)[i].m_confirmed = 0;
+		int slot = m_wmWorldState->m_backupParams[i];
+		if (slot < 0) {
+			GetWmCharaSelectEntries(this)[i].m_currentSlot = -1;
+		} else {
+			GetWmCharaSelectEntries(this)[i].m_currentSlot = static_cast<short>(slot);
+			usedMask |= 1 << slot;
+		}
+	}
 
-	WmWorldState* const worldState = m_wmWorldState;
-	if (worldState != 0) {
-		worldState->m_cardChannel = 0;
+	for (int i = 0; i < kWmMenuControllerCount; i++) {
+		if (GetWmCharaSelectEntries(this)[i].m_currentSlot < 0) {
+			int slot;
+			for (slot = 0; slot < kWmMenuPlayerCount; slot++) {
+				if ((usedMask & (1 << slot)) == 0) {
+					break;
+				}
+			}
+			GetWmCharaSelectEntries(this)[i].m_currentSlot = static_cast<short>(slot);
+			usedMask |= 1 << slot;
+		}
+		GetWmCharaSelectEntries(this)[i].m_displaySlot = GetWmCharaSelectEntries(this)[i].m_currentSlot;
 	}
 }
 
@@ -9117,9 +9074,6 @@ inline void CMenuPcs::WMSubMenuInit()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 void CMenuPcs::WMChgMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
@@ -9355,54 +9309,7 @@ void CMenuPcs::WMChgMenu()
 			bytes[0x12] = 0;
 			bytes[0x13] = 0;
 		} else {
-			memset(GetWmCharaSelectEntries(this), 0, kWmCharaSelectBytes);
-			char bVar7 = 0;
-			iVar8 = bVar7;
-			int iVar11 = iVar8;
-			for (int iVar12 = 0; iVar12 < 2; iVar12++) {
-				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xC) = 0;
-				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xB) = 0;
-				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 10) = 0;
-				int sv = m_wmWorldState->m_backupParams[iVar11 / 2];
-				if (sv < 0) {
-					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)0xFFFF;
-				} else {
-					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)sv;
-					bVar7 = bVar7 | (1 << (int)sv);
-				}
-				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1C) = 0;
-				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1B) = 0;
-				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1A) = 0;
-				sv = m_wmWorldState->m_backupParams[iVar11 / 2 + 1];
-				if (sv < 0) {
-					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = (short)0xFFFF;
-				} else {
-					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = (short)sv;
-					bVar7 = bVar7 | (1 << (int)sv);
-				}
-				iVar8 = iVar8 + 0x20;
-				iVar11 = iVar11 + 4;
-			}
-
-			iVar8 = 0;
-			iVar11 = 4;
-			do {
-				if (*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) < 0) {
-					int iVar12b;
-					unsigned int uVar10 = (unsigned int)(char)bVar7;
-					for (iVar12b = 0; iVar12b < 8; iVar12b++) {
-						if ((uVar10 & (1 << iVar12b)) == 0) {
-							break;
-						}
-					}
-					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)iVar12b;
-					bVar7 = bVar7 | (1 << iVar12b);
-				}
-				int iVar12c = reinterpret_cast<int>(m_wm.m_charaSelectData) + iVar8;
-				iVar8 = iVar8 + 0x10;
-				*reinterpret_cast<short*>(iVar12c + 6) = *reinterpret_cast<short*>(iVar12c + 4);
-				iVar11 = iVar11 - 1;
-			} while (iVar11 != 0);
+			InitCharaSelectInfo();
 		}
 		break;
 	}
@@ -9443,56 +9350,7 @@ void CMenuPcs::WMChgMenu()
 	case 4: {
 		Sound.PlaySe(0x31, 0x40, 0x7F, 0);
 		bytes[0x10] = 0;
-		memset(GetWmCharaSelectEntries(this), 0, kWmCharaSelectBytes);
-		char bVar7 = 0;
-		iVar8 = bVar7;
-		int iVar11 = iVar8;
-		int iVar12 = 2;
-		do {
-			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xC) = 0;
-			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xB) = 0;
-			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 10) = 0;
-			int sv = m_wmWorldState->m_backupParams[iVar11 / 2];
-			if (sv < 0) {
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)0xFFFF;
-			} else {
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)sv;
-				bVar7 = bVar7 | (1 << (int)sv);
-			}
-			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1C) = 0;
-			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1B) = 0;
-			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1A) = 0;
-			sv = m_wmWorldState->m_backupParams[iVar11 / 2 + 1];
-			if (sv < 0) {
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = (short)0xFFFF;
-			} else {
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = (short)sv;
-				bVar7 = bVar7 | (1 << (int)sv);
-			}
-			iVar8 = iVar8 + 0x20;
-			iVar11 = iVar11 + 4;
-			iVar12 = iVar12 - 1;
-		} while (iVar12 != 0);
-
-		iVar8 = 0;
-		iVar11 = 4;
-		do {
-			if (*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) < 0) {
-				int iVar12b;
-				unsigned int uVar10 = (unsigned int)(char)bVar7;
-				for (iVar12b = 0; iVar12b < 8; iVar12b++) {
-					if ((uVar10 & (1 << iVar12b)) == 0) {
-						break;
-					}
-				}
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)iVar12b;
-				bVar7 = bVar7 | (1 << iVar12b);
-			}
-			int iVar12c = reinterpret_cast<int>(m_wm.m_charaSelectData) + iVar8;
-			iVar8 = iVar8 + 0x10;
-			*reinterpret_cast<short*>(iVar12c + 6) = *reinterpret_cast<short*>(iVar12c + 4);
-			iVar11 = iVar11 - 1;
-		} while (iVar11 != 0);
+		InitCharaSelectInfo();
 		break;
 	}
 	case 7:
@@ -9517,7 +9375,6 @@ void CMenuPcs::WMChgMenu()
 		MapMng.GetMapIdGrpArray()[0xF7].m_primaryColor.a = 1;
 	}
 }
-#pragma pop
 
 /*
  * --INFO--

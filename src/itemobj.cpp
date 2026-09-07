@@ -81,10 +81,15 @@ static inline CFlatRuntime2* ItemCFlatRuntime()
 }
 
 struct SItemFlatRow {
-	unsigned char m_pad[0x10];
+	unsigned char m_pad00[8];
+	unsigned short m_attribute;
+	unsigned char m_pad0A[6];
 	unsigned short m_fineValue;
 	unsigned char m_pad2[0x36];
 };
+STATIC_ASSERT(sizeof(SItemFlatRow) == 0x48);
+STATIC_ASSERT(offsetof(SItemFlatRow, m_attribute) == 0x08);
+STATIC_ASSERT(offsetof(SItemFlatRow, m_fineValue) == 0x10);
 
 /*
  * --INFO--
@@ -374,10 +379,9 @@ void CGItemObj::loadModel()
 #pragma optimization_level 2
 void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* hitParam)
 {
-	unsigned char* self = (unsigned char*)this;
-	int worldParamA = *(int*)(self + 0x500);
-	unsigned char* particleRow = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + hitParam->m_particleIndex * 0x48);
-	int particleAttr = (int)*reinterpret_cast<unsigned short*>(particleRow + 8);
+	int worldParamA = m_worldParamA;
+	SItemFlatRow* particleRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+	int particleAttr = particleRows[hitParam->m_particleIndex].m_attribute;
 
 	if (worldParamA == 0xD || worldParamA == 0xE) {
 		if (((particleAttr == 0 || particleAttr == 4) && worldParamA == 0xD) ||
@@ -400,20 +404,16 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 				break;
 			}
 
-			ItemCFlatRuntime()->EndParticleSlot(*(int*)(self + 0x55C), 0);
-			ItemCFlatRuntime()->ResetParticleWork(particleNo | 0x100, *(int*)(self + 0x55C));
-			ItemCFlatRuntime()->SetParticleWorkPos(*(Vec*)(self + 0x15C), kItemObjZero);
+			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
+			ItemCFlatRuntime()->ResetParticleWork(particleNo | 0x100, m_particleSlot);
+			ItemCFlatRuntime()->SetParticleWorkPos(m_worldPosition, kItemObjZero);
 			ItemCFlatRuntime()->SetParticleWorkCol(9, 0, kItemObjUnitScale);
 			ItemCFlatRuntime()->SetParticleWorkParam(classControl, this);
 			ItemCFlatRuntime()->PutParticleWork();
-			*(unsigned int*)(self + 0x1C0) &= 0xFFF7FFFF;
+			m_bgColMask &= 0xFFF7FFFF;
 			addSubStat();
 		}
-	} else {
-		if (((worldParamA != 0xCB) || (*(int*)(self + 0x520) != 0x24)) && *(int*)(self + 0x520) != 0x25) {
-			return;
-		}
-
+	} else if ((worldParamA == 0xCB && m_lastStateId == 0x24) || m_lastStateId == 0x25) {
 		if ((static_cast<unsigned int>(particleAttr - 0x66) <= 1U) || (particleAttr == 0x65)) {
 			int classId = hitParam->m_classId;
 			CGObject* classObj;
@@ -426,12 +426,12 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 
 			unsigned short cid = classObj->GetCID();
 
-			if ((cid & 0x6D) == 0x6D && *(void**)(self + 0x550) == classObj) {
+			if ((cid & 0x6D) == 0x6D && m_owner == classObj) {
 				changeStat(0x26, 0, 0);
 			}
-		} else {
-			return;
 		}
+	} else {
+		return;
 	}
 
 	ItemCFlatRuntime()->IgnoreParticle(effectIndex, this);
@@ -535,12 +535,12 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 				isStageCarry = true;
 			}
 		}
-		if (isStageCarry && *(int*)(*(unsigned char**)((unsigned char*)partyObj + 0x58) + 0x3B4) != 0) {
+		if (isStageCarry && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x3B4) != 0) {
 			canSystemCall = 1;
 		}
 
-		*(CGPartyObj**)(self + 0x550) = partyObj;
-		*(int*)(self + 0x554) = carryMode;
+		m_owner = partyObj;
+		m_carryFrame = carryMode;
 		canSystemCall8 = static_cast<unsigned char>(canSystemCall);
 
 		if (carryMode == 0) {
@@ -564,7 +564,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 						condB = true;
 					}
 				}
-				if (condB && *(int*)(*(unsigned char**)((unsigned char*)partyObj + 0x58) + 0x3B4) != 0) {
+				if (condB && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x3B4) != 0) {
 					condA = true;
 				}
 				if (condA) {
@@ -575,7 +575,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			CGObject* attachSelf = this;
 			attachSelf->Attach(partyObj, const_cast<char*>(useBossAttachName ? s_itemAttachCenterItem3 : s_itemAttachLeftItem), attachOffsetPtr);
 			changeStat(0, 0, 0);
-			*(float*)(self + 0x144) = kItemObjZero;
+			m_bodyEllipsoidRadius = kItemObjZero;
 		} else {
 			changeStat(0xB, 0, 0);
 		}
@@ -589,37 +589,37 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			isMenuBossStage = true;
 		}
 		if (isMenuBossStage) {
-			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
+			CGObject* carryObj = m_owner;
 			unsigned short cid = static_cast<unsigned short>(carryObj->GetCID());
 			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
 			if (((stageCarry >> 5) & 0xFF) != 0) {
 				isStageCarry = true;
 			}
 		}
-		if (isStageCarry && *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4) != 0) {
+		if (isStageCarry && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3B4) != 0) {
 			canSystemCall = 1;
 		}
 
-		*(int*)(self + 0x554) = carryMode;
+		m_carryFrame = carryMode;
 		canSystemCall8 = static_cast<unsigned char>(canSystemCall);
 
 		if (carryMode == 0) {
 			Vec safePos;
-			float safeDist = CalcSafePos(0x41, *(CGPartyObj**)(self + 0x550), &safePos);
+			float safeDist = CalcSafePos(0x41, m_owner, &safePos);
 			if (safeDist > kItemObjZero) {
-				CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
+				CGObject* carryObj = m_owner;
 				carryObj->moveVectorHRot(
-					kItemObjPi + *(float*)((unsigned char*)carryObj + 0x1A8),
+					kItemObjPi + carryObj->m_rotBaseY,
 					kItemObjZero,
 					safeDist / kItemObjSafeMoveDivisor,
 					3);
 			}
 			Detach();
-			*(Vec*)(self + 0x15C) = safePos;
-			*(int*)(self + 0x550) = 0;
+			m_worldPosition = safePos;
+			m_owner = 0;
 			changeStat(0, 0, 0);
-			*(int*)(self + 0x56C) = 8;
-			*(float*)(self + 0x144) = kItemObjZero;
+			m_itemJumpCountdown = 8;
+			m_bodyEllipsoidRadius = kItemObjZero;
 		} else {
 			changeStat(((int)~(carryState - 1 | 1 - carryState) >> 0x1F) + 0xD, 0, 0);
 		}
@@ -627,7 +627,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		*reinterpret_cast<u32*>(self + 0x94) = 0x1194;
 	}
 
-	if ((*(unsigned int*)(self + 0x5C) & 0x10) != 0 && canSystemCall8 != 0) {
+	if ((m_objectFlags & 0x10) != 0 && canSystemCall8 != 0) {
 		stack[0].m_word = 3;
 		stack[1].m_word = static_cast<unsigned int>(-carryState | carryState) >> 0x1F;
 		stack[2].m_word = 0;
@@ -1130,24 +1130,17 @@ void CGItemObj::onFrameStat()
 		prgObj->m_moveOffset.y = kItemObjMoveOffsetXZ;
 		prgObj->m_rotTargetY += kItemObjMemoryTurnStep;
 
-		CVector monTarget(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x18));
-		CVector worldPos(prgObj->m_worldPosition);
-		CVector delta;
-
-		PSVECSubtract(reinterpret_cast<Vec*>(&monTarget), reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&delta));
-		monTarget.x = delta.x;
-		monTarget.y = delta.y;
-		monTarget.z = delta.z;
-
-		float distance = PSVECMag(reinterpret_cast<Vec*>(&monTarget));
+		CVector delta(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x18));
+		delta = delta - CVector(prgObj->m_worldPosition);
+		float distance = PSVECMag(delta);
 		if (distance < kItemObjMemoryRadius) {
 			changeStat(0x27, 0, 0);
 		} else if (distance > zero) {
 			float moveScale = kItemObjMemoryChaseAccel * prgObj->m_moveTimer;
 
-			prgObj->m_groundHitOffset.x += kItemObjMemoryChaseScale * monTarget.x * moveScale;
-			prgObj->m_groundHitOffset.y += kItemObjMemoryChaseScale * monTarget.y * moveScale;
-			prgObj->m_groundHitOffset.z += kItemObjMemoryChaseScale * monTarget.z * moveScale;
+			prgObj->m_groundHitOffset.x += kItemObjMemoryChaseScale * delta.x * moveScale;
+			prgObj->m_groundHitOffset.y += kItemObjMemoryChaseScale * delta.y * moveScale;
+			prgObj->m_groundHitOffset.z += kItemObjMemoryChaseScale * delta.z * moveScale;
 		} else {
 			prgObj->m_groundHitOffset.z = zero;
 			prgObj->m_groundHitOffset.y = zero;

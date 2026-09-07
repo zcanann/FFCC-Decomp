@@ -155,7 +155,7 @@ void CFunnyShapePcs::SetUSBData()
         m_funnyShape.m_texObjData[m_funnyShape.m_textureCount] =
             new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x73)
                 GXTexObj;
-        GXInitTexObj(static_cast<GXTexObj*>(m_funnyShape.m_texObjData[m_funnyShape.m_textureCount]), m_funnyShape.m_textureData[m_funnyShape.m_textureCount], tmp->width, tmp->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObj(m_funnyShape.m_texObjData[m_funnyShape.m_textureCount], m_funnyShape.m_textureData[m_funnyShape.m_textureCount], tmp->width, tmp->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
         m_funnyShape.m_textureCount++;
         if (tmp != 0) {

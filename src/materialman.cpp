@@ -3349,10 +3349,10 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
     while (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
         CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
-            if (static_cast<int>(material->m_textureCount) == 0) {
+            if (static_cast<int>(material->GetNumTexture()) == 0) {
                 material->SetTevBit(static_cast<CMaterialMan::TEV_BIT>(1));
             } else {
-                for (int i = 0; i < material->m_textureCount; i++) {
+                for (int i = 0; i < material->GetNumTexture(); i++) {
                     ReleaseRef(material->m_textureData.m_textures[i]);
                     material->m_textureData.m_textures[i] = 0;
 
@@ -3384,7 +3384,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                 }
 
                 if ((material->m_materialType != 0) &&
-                    (material->m_textureCount >= 2) &&
+                    (material->GetNumTexture() >= 2) &&
                     (material->m_textureData.m_textures[0] != 0) &&
                     (material->m_textureData.m_textures[1] != 0)) {
                     material->m_texShiftU = static_cast<char>(HighestSetBit(
@@ -3518,7 +3518,6 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
     }
 }
 
-
 /*
  * --INFO--
  * PAL Address: 0x8003d9f0
@@ -3617,8 +3616,8 @@ void CMaterial::CacheRefCnt0UpTexture(CAmemCacheSet* amemCacheSet)
  */
 void CMaterial::CacheUnLoadTexture(CAmemCacheSet* amemCacheSet)
 {
-    for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
-        CTexture* texture = m_textureData.m_textures[i];
+    for (int i = 0; i < GetNumTexture(); i++) {
+        CTexture* texture = GetTexture(i);
         if (texture != 0) {
             texture->CacheUnLoadTexture(amemCacheSet);
         }
@@ -3632,29 +3631,11 @@ void CMaterial::CacheUnLoadTexture(CAmemCacheSet* amemCacheSet)
  */
 void CMaterial::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
 {
-    for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
-        CTexture* texture = m_textureData.m_textures[i];
+    for (int i = 0; i < GetNumTexture(); i++) {
+        CTexture* texture = GetTexture(i);
         if (texture != 0) {
             texture->CacheLoadTexture(amemCacheSet);
         }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003c71c
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
-{
-    CMaterial* material =
-        m_materials[static_cast<unsigned long>(materialIndex)];
-    if (material != 0) {
-        material->CacheUnLoadTexture(amemCacheSet);
     }
 }
 
@@ -3674,8 +3655,12 @@ void CMaterialSet::CacheRefCnt0UpTexture(int materialIndex, CAmemCacheSet* amemC
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x8003c71c
+ * PAL Size: 132b
+ * EN Address: 0x8004E740
+ * EN Size: 84b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMaterialSet::CacheUnLoadTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
@@ -3886,16 +3871,6 @@ int CMaterial::Set(_GXTexMapID texMapId)
     return curTexMap;
 }
 
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void CMaterial::GetNumTexture()
-{
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -3912,7 +3887,7 @@ inline void CMaterial::SetTag(int)
  */
 inline void CMaterial::AddTextureIdx(CChunkFile& chunkFile)
 {
-    int index = GetTextureCount();
+    int index = GetNumTexture();
     m_textureCount = static_cast<unsigned short>(index + 1);
     m_textureIndices[index] = static_cast<short>(chunkFile.Get2());
 }

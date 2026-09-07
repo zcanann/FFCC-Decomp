@@ -417,8 +417,16 @@ public:
     {
         m_tevBit |= static_cast<unsigned long>(tevBit);
     }
-    void GetNumTexture();
-    unsigned short GetTextureCount() const
+    /*
+     * --INFO--
+     * PAL Address: TODO
+     * PAL Size: TODO
+     * EN Address: 0x8004EE88
+     * EN Size: 8b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    unsigned short GetNumTexture()
     {
         return m_textureCount;
     }

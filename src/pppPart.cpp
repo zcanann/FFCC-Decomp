@@ -788,6 +788,55 @@ allocated:
 
 /*
  * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 136b
+ * EN Address: 0x80064034
+ * EN Size: 176b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void pppCacheUnLoadModel(short* modelList, _pppDataHead* head)
+{
+	short modelCount = *modelList;
+	short i = 0;
+	modelList++;
+	while (i < modelCount)
+	{
+		short modelIndex = *modelList;
+		modelList++;
+		pppModelSt* model = ((pppModelSt**)head->m_modelNames)[modelIndex];
+		ppvAmemCacheSet.Release(model->m_cacheId);
+		model->pppCacheUnLoadModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
+		i++;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 108b
+ * EN Address: 0x800640E4
+ * EN Size: 152b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void pppCacheUnLoadShape(short* shapeList, _pppDataHead* head)
+{
+	short shapeCount = *shapeList;
+	short i = 0;
+	shapeList++;
+	while (i < shapeCount)
+	{
+		short shapeIndex = *shapeList;
+		shapeList++;
+		pppShapeSt* shape = ((pppShapeSt**)head->m_shapeNames)[shapeIndex];
+		pppCacheUnLoadShapeTexture(shape, PartMng.m_materialSet);
+		i++;
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 800563fc
  * PAL Size: 688b
  * EN Address: TODO
@@ -802,13 +851,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 	_pppMngSt* oldMngSt = ppvMng;
 	ppvMng = pppMngSt;
 
-	if (pppMngSt->m_soundEffectData.m_soundEffectSlot >= 0 &&
-		pppMngSt->m_soundEffectData.m_soundEffectHandle >= 0)
-	{
-		Sound.FadeOutSe3D(pppMngSt->m_soundEffectData.m_soundEffectHandle,
-			pppMngSt->m_soundEffectData.m_soundEffectFadeFrames);
-		pppMngSt->m_soundEffectData.m_soundEffectHandle = -1;
-	}
+	pppStopSe(pppMngSt, &pppMngSt->m_soundEffectData);
 
 	for (_pppPObjLink* obj = pppMngSt->m_pppPObjLinkHead.m_next; obj != 0;)
 	{
@@ -834,41 +877,20 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 	{
 		if (pppMngSt->m_hasMapRef != 0)
 		{
-			u32 pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
-			s16* partResource = (s16*)(*(u32*)(pppResSet + 0x10) + pppMngSt->m_partIndex * 8);
-
-			s16 cacheIndex = *partResource;
-			if (cacheIndex != -1)
+			CPartMng::PppPdtSlot* slot = (CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet;
+			pppCacheChunk* chunk = &((pppCacheChunk*)slot->m_pppDataHead->m_cacheChunks)[pppMngSt->m_partIndex];
+			if (chunk->m_cacheIndex != -1)
 			{
-				ppvAmemCacheSet.Release(cacheIndex);
+				ppvAmemCacheSet.Release(chunk->m_cacheIndex);
 			}
 
 			if (pppMngSt->m_mapTexLoaded != 0)
 			{
-				u32 mapTexRef = *(u32*)(partResource + 2);
-				s16* mapMeshIndices = (s16*)(mapTexRef + *(u32*)(mapTexRef + 0x10));
-				s16* shapeIndices = (s16*)(mapTexRef + *(u32*)(mapTexRef + 0x14));
-
-				s16 mapMeshCount = *mapMeshIndices;
-				mapMeshIndices++;
-				pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
-				for (s16 i = 0; i < mapMeshCount; i++)
-				{
-					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *mapMeshIndices * 4);
-					mapMeshIndices++;
-					ppvAmemCacheSet.Release(*(s16*)((u8*)mapMesh + 0x66));
-					mapMesh->pppCacheDumpModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
-				}
-
-				s16 shapeCount = *shapeIndices;
-				s16* shapeIter = shapeIndices + 1;
-				pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
-				for (s16 i = 0; i < shapeCount; i++)
-				{
-					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + *shapeIter * 4);
-					shapeIter++;
-					pppCacheDumpShapeTexture(shape, PartMng.m_materialSet);
-				}
+				long* pdt = chunk->m_pdt;
+				short* modelIndices = (short*)((u8*)pdt + pdt[4]);
+				short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
+				pppCacheUnLoadModel(modelIndices, ((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead);
+				pppCacheUnLoadShape(shapeIndices, ((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead);
 			}
 		}
 

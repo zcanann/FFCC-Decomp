@@ -81,12 +81,12 @@ void pppGetShapePos(long* animData, short frameIndex, Vec& minPos, Vec& maxPos, 
  * --INFO--
  * PAL Address: 0x8006580c
  * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80074CB0
+ * EN Size: 184b
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
+void pppCacheUnLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
     short shapeOffset;
     unsigned char* shapeEntry;
@@ -123,7 +123,7 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {
-            materialSet->CacheDumpTexture(textureIndex, &ppvAmemCacheSet);
+            materialSet->CacheUnLoadTexture(textureIndex, &ppvAmemCacheSet);
         }
         textureIndex++;
         texturePtr++;

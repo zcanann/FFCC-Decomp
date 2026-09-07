@@ -1440,9 +1440,8 @@ inline void CMiniGamePcs::CallMiniGameParam(int code, int param1, int param2)
  * JP Size: TODO
  */
 
-void CMiniGamePcs::calc(void)
+void CMiniGamePcs::calc()
 {
-
     switch (m_managerState) {
     case 1:
         Joybus.ExitThread();
@@ -1465,78 +1464,77 @@ void CMiniGamePcs::calc(void)
             m_managerState = 3;
         }
 
-        return;
+        break;
     case 3:
+        if (m_raceEnded != 0)
+        {
+            System.Printf(const_cast<char*>(s_miniGameRaceHeader));
+            for (int i = 0; i < 4; i++)
+            {
+                System.Printf(const_cast<char*>(s_miniGameRaceResultFmt), i + 1, static_cast<int>(m_miniGameParams[i]));
+            }
+            System.Printf(const_cast<char*>(s_miniGameSeparator));
+
+            CallMiniGameParam(0x3000, 0, 0);
+            m_raceEnded = 0;
+        }
+
+        if (m_continueRequested != 0)
+        {
+            m_miniGameParams[0] = -1;
+            m_miniGameParams[1] = -1;
+            m_miniGameParams[2] = -1;
+            m_miniGameParams[3] = -1;
+            if ((unsigned int)System.m_execParam >= 3)
+            {
+                System.Printf(const_cast<char*>(s_miniGameContinueText));
+            }
+
+            CallMiniGameParam(0x3002, 0, 0);
+            m_continueRequested = 0;
+        }
+
+        if (m_miniGameFailed == 0)
+        {
+            return;
+        }
+
+        if (1 <= (unsigned int)System.m_execParam)
+        {
+            System.Printf(const_cast<char*>(s_miniGameMgrEndStartText));
+        }
+
+        CallMiniGameParam(0x3001, 0, 0);
+
+        if (1 <= (unsigned int)System.m_execParam)
+        {
+            System.Printf(const_cast<char*>(s_miniGameMgrEndEndText));
+        }
+
+        MiniGameEnd();
+
+        if (1 <= (unsigned int)System.m_execParam)
+        {
+            System.Printf(g_MsgFlashy);
+        }
+
+        if (1 <= (unsigned int)System.m_execParam)
+        {
+            System.Printf(const_cast<char*>(s_miniGameEndBannerText));
+        }
+
+        if (1 <= (unsigned int)System.m_execParam)
+        {
+            System.Printf(g_MsgFlashy);
+        }
+
+        m_miniGameFailed = 0;
+        m_managerState = 0;
         break;
     case 0:
     default:
-        return;
+        break;
     }
-
-    if (m_raceEnded != 0)
-    {
-        System.Printf(const_cast<char*>(s_miniGameRaceHeader));
-        for (int i = 0; i < 4; i++)
-        {
-            System.Printf(const_cast<char*>(s_miniGameRaceResultFmt), i + 1, static_cast<int>(m_miniGameParams[i]));
-        }
-        System.Printf(const_cast<char*>(s_miniGameSeparator));
-
-        CallMiniGameParam(0x3000, 0, 0);
-        m_raceEnded = 0;
-    }
-
-    if (m_continueRequested != 0)
-    {
-        m_miniGameParams[0] = -1;
-        m_miniGameParams[1] = -1;
-        m_miniGameParams[2] = -1;
-        m_miniGameParams[3] = -1;
-        if ((unsigned int)System.m_execParam >= 3)
-        {
-            System.Printf(const_cast<char*>(s_miniGameContinueText));
-        }
-
-        CallMiniGameParam(0x3002, 0, 0);
-        m_continueRequested = 0;
-    }
-
-    if (m_miniGameFailed == 0)
-    {
-        return;
-    }
-
-    if (1 <= (unsigned int)System.m_execParam)
-    {
-        System.Printf(const_cast<char*>(s_miniGameMgrEndStartText));
-    }
-
-    CallMiniGameParam(0x3001, 0, 0);
-
-    if (1 <= (unsigned int)System.m_execParam)
-    {
-        System.Printf(const_cast<char*>(s_miniGameMgrEndEndText));
-    }
-
-    MiniGameEnd();
-
-    if (1 <= (unsigned int)System.m_execParam)
-    {
-        System.Printf(g_MsgFlashy);
-    }
-
-    if (1 <= (unsigned int)System.m_execParam)
-    {
-        System.Printf(const_cast<char*>(s_miniGameEndBannerText));
-    }
-
-    if (1 <= (unsigned int)System.m_execParam)
-    {
-        System.Printf(g_MsgFlashy);
-    }
-
-    m_miniGameFailed = 0;
-    m_managerState = 0;
 }
 
 /*
@@ -1741,7 +1739,7 @@ void CMiniGamePcs::MngThreadMain(void*)
 
         if (m_playerMask != 0)
         {
-            unsigned int successMask = 0;
+            unsigned char successMask = 0;
             int i = 0;
             do
             {
@@ -1773,7 +1771,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                             {
                                 m_gbaParams[i].m_connectionReset = 1;
                                 m_playerMessageReady[i] = 1;
-                                successMask = (successMask | bit) & 0xFF;
+                                successMask |= bit;
                                 m_receivedWords[i] = 0;
                             }
                             else
@@ -1785,7 +1783,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                                     if ((packet & 0xFF) == (crc & 0xFF))
                                     {
                                         m_playerMessageReady[i] = m_gbaParams[i].m_transferComplete;
-                                        successMask = (successMask | bit) & 0xFF;
+                                        successMask |= bit;
                                         m_receivedWords[i] =
                                             m_gbaParams[i].m_receivedPacket & 0xFFFF00;
                                     }

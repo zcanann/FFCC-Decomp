@@ -22,6 +22,8 @@ class CMesMenu;
 class CShopMenu;
 struct ArtiState;
 struct ArtiOpenAnimList;
+struct CmdState;
+struct CmdListStorage;
 struct EquipMenuState;
 struct EquipOpenAnimList;
 struct MoneyMenuState;
@@ -858,7 +860,7 @@ public:
         CompaMenuState* m_compaMenuState;
         TmpArtiState* m_tmpArtiState;
         CmakeMenuState* m_cmakeState;
-        short* m_cmdState;
+        CmdState* m_cmdState;
         WmWorldState* m_wmWorldState;
         GoOutMenuState* m_goOutState;
         int m_bonusStatePtr;
@@ -891,7 +893,7 @@ public:
         FavoListStorage* m_favoList;
         CompaOpenAnimList* m_compaList;
         TmpArtiList* m_tmpArtiList;
-        short* m_cmdList;
+        CmdListStorage* m_cmdList;
         SingleFadeState* m_singleFadeState;
     };
     unsigned char* m_wmWorkBuffer;

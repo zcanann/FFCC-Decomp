@@ -22,6 +22,7 @@ void DrawGoOutMenu();
 class CGoOutMenu
 {
     friend void DrawGoOutMenu();
+    friend class CMenuPcs;
 
 public:
     void CharaSelClose();

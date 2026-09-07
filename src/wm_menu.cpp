@@ -3525,14 +3525,7 @@ void CMenuPcs::DrawMainMenu()
 	}
 
 	DrawMainMenuSub();
-	PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
-	GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
-	Mtx44 projectionMtx;
-	PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
-	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-	Graphic.SetViewport();
-	GXSetScissor(0, 0, 0x280, 0x1C0);
-	DrawInit();
+	RestoreProjection();
 
 	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
 		const int helpState = m_wmWorldState->m_mainState;
@@ -3650,7 +3643,6 @@ void CMenuPcs::DrawDiaryMenu()
 		unsigned char* const worldObj = m_wm.m_worldObjData;
 		Mtx lookAtMtx;
 		Mtx44 projectionMtx;
-		Mtx44 restoreMtx;
 		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
@@ -3672,13 +3664,7 @@ void CMenuPcs::DrawDiaryMenu()
 		GXSetScissor(*reinterpret_cast<unsigned int*>(worldObj + 0x90), *reinterpret_cast<unsigned int*>(worldObj + 0x94),
 		             *reinterpret_cast<unsigned int*>(worldObj + 0x98), *reinterpret_cast<unsigned int*>(worldObj + 0x9C));
 		GetWmWorldHandles(this)[1]->Draw(5);
-		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
-		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
-		PSMTX44Copy(CameraPcs.m_screenMatrix, restoreMtx);
-		GXSetProjection(restoreMtx, GX_PERSPECTIVE);
-		Graphic.SetViewport();
-		GXSetScissor(0, 0, 0x280, 0x1C0);
-		DrawInit();
+		RestoreProjection();
 	}
 
 	const int state = m_wmWorldState->m_mainState;
@@ -3738,7 +3724,6 @@ void CMenuPcs::DrawMCardMenu()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	Mtx savedCamera;
 	Mtx44 projMtx;
-	Mtx44 screenMtx;
 
 	float cursorX;
 	float cursorY;
@@ -3878,13 +3863,7 @@ void CMenuPcs::DrawMCardMenu()
 			charaOff += 0x524;
 		} while (i < 4);
 		DrawInit();
-		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
-		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
-		PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-		GXSetProjection(screenMtx, GX_PERSPECTIVE);
-		Graphic.SetViewport();
-		GXSetScissor(0, 0, 0x280, 0x1C0);
-		DrawInit();
+		RestoreProjection();
 	}
 
 	// State machine for MC operations
@@ -4271,14 +4250,7 @@ void CMenuPcs::DrawCMakeMenu()
 
 		DrawCharaBase();
 		DrawChara();
-		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
-		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
-		Mtx44 projectionMtx;
-		PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
-		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-		Graphic.SetViewport();
-		GXSetScissor(0, 0, 0x280, 0x1C0);
-		DrawInit();
+		RestoreProjection();
 		DrawCharaName();
 		DrawCMLife();
 
@@ -4346,10 +4318,10 @@ void CMenuPcs::DrawCMakeMenu()
 			          *pW1b, *pH1b, *pH1b);
 			}
 		} else if (m_wmWorldState->m_menuMode == 8) {
-			const int mainMode = *(reinterpret_cast<char*>(g_pGoOutMenu) + 0x2C);
+			const int mainMode = g_pGoOutMenu->m_mainMode;
 			switch (mainMode) {
 			case 2:
-				switch (*(reinterpret_cast<char*>(g_pGoOutMenu) + 0x18)) {
+				switch (g_pGoOutMenu->m_goOutMode) {
 				case 0x0E: {
 					char** const caseText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
 				unsigned int ci = 8;
@@ -4383,7 +4355,7 @@ void CMenuPcs::DrawCMakeMenu()
 				}
 				break;
 			case 3:
-				switch (*(reinterpret_cast<char*>(g_pGoOutMenu) + 0x24)) {
+				switch (g_pGoOutMenu->m_deleteMode) {
 				case 2: {
 					char** const caseText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
 				unsigned int ci = 10;
@@ -4534,14 +4506,7 @@ void CMenuPcs::DrawMoveMenu()
 			}
 		}
 
-		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
-		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0x00FFFFFF);
-		Mtx44 restoreMtx;
-		PSMTX44Copy(CameraPcs.m_screenMatrix, restoreMtx);
-		GXSetProjection(restoreMtx, GX_PERSPECTIVE);
-		Graphic.SetViewport();
-		GXSetScissor(0, 0, 0x280, 0x1C0);
-		DrawInit();
+		RestoreProjection();
 #undef handle
 	}
 
@@ -4730,14 +4695,7 @@ void CMenuPcs::DrawLoadMenu()
 			i++;
 		} while (i < 4);
 		DrawInit();
-		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
-		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
-		Mtx44 projMtx2;
-		PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx2);
-		GXSetProjection(projMtx2, GX_PERSPECTIVE);
-		Graphic.SetViewport();
-		GXSetScissor(0, 0, 0x280, 0x1C0);
-		DrawInit();
+		RestoreProjection();
 	}
 
 	// State machine for MC operations
@@ -5136,15 +5094,7 @@ void CMenuPcs::DrawTitleMenu()
 		              FLOAT_803313dc, FLOAT_803313e8);
 
 		PartPcs.DrawMenuIdx(m_effectWork[23].m_partNo);
-		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
-		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
-
-		Mtx44 projMtx2;
-		PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx2);
-		GXSetProjection(projMtx2, GX_PERSPECTIVE);
-		Graphic.SetViewport();
-		GXSetScissor(0, 0, 0x280, 0x1C0);
-		DrawInit();
+		RestoreProjection();
 
 		// Fade-in overlay (state 1)
 			state = m_wmWorldState->m_mainState;
@@ -6582,14 +6532,7 @@ void CMenuPcs::DrawFukidashi()
 	}
 
 	if (viewportSetup != 0) {
-		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
-		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
-		Mtx44 screenCopy;
-		PSMTX44Copy(CameraPcs.m_screenMatrix, screenCopy);
-		GXSetProjection(screenCopy, GX_PERSPECTIVE);
-		Graphic.SetViewport();
-		GXSetScissor(0, 0, 0x280, 0x1C0);
-		DrawInit();
+		RestoreProjection();
 	}
 }
 

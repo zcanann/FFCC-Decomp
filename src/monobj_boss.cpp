@@ -305,7 +305,6 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma global_optimizer off
 void CGMonObj::teleport(
 	int mode, int animId, int startFrame, int blendEndFrame, int seStart, int seEnd, int particleStart, int particleBlend, int particleEnd,
 	Vec* teleportPoints, int& teleportIndex, Vec& startPos
@@ -345,7 +344,7 @@ void CGMonObj::teleport(
 
 	if (stateFrame <= blendStartFrame) {
 		if (startFrame <= stateFrame) {
-			const float angle = kMonObjBossHalfPi * static_cast<float>(stateFrame - startFrame) * kMonObjBossOneEighth;
+			const float angle = kMonObjBossHalfPi * (static_cast<float>(stateFrame - startFrame) * kMonObjBossOneEighth);
 			const float wave = static_cast<float>(cos(angle));
 			m_rotationZ = wave;
 			m_rotationX = wave;
@@ -369,33 +368,8 @@ void CGMonObj::teleport(
 
 			const float ratio = static_cast<float>(stateFrame - blendStartFrame) / static_cast<float>(blendFrameCount);
 			const float blend = kMonObjBossHalf * (kMonObjBossOne + static_cast<float>(cos(kMonObjBossPi * ratio)));
-			const CVector& point = CVector(teleportPoints[teleportIndex]);
-			CVector scaledPoint;
-			PSVECScale(reinterpret_cast<Vec*>(const_cast<CVector*>(&point)), reinterpret_cast<Vec*>(&scaledPoint), kMonObjBossOne - blend);
-
-			Vec scaledPointCopy;
-			scaledPointCopy.x = scaledPoint.x;
-			scaledPointCopy.y = scaledPoint.y;
-			scaledPointCopy.z = scaledPoint.z;
-
-			const CVector& current = CVector(m_worldPosition);
-			CVector scaledCurrent;
-			PSVECScale(reinterpret_cast<Vec*>(const_cast<CVector*>(&current)), reinterpret_cast<Vec*>(&scaledCurrent), blend);
-
-			Vec scaledCurrentCopy;
-			scaledCurrentCopy.x = scaledCurrent.x;
-			scaledCurrentCopy.y = scaledCurrent.y;
-			scaledCurrentCopy.z = scaledCurrent.z;
-
-			CVector blended;
-			PSVECAdd(&scaledCurrentCopy, &scaledPointCopy, reinterpret_cast<Vec*>(&blended));
-			Vec blendedCopy;
-			blendedCopy.x = blended.x;
-			blendedCopy.y = blended.y;
-			blendedCopy.z = blended.z;
-			m_worldPosition.x = blendedCopy.x;
-			m_worldPosition.y = blendedCopy.y;
-			m_worldPosition.z = blendedCopy.z;
+			m_worldPosition = CVector(m_worldPosition) * blend +
+				CVector(teleportPoints[teleportIndex]) * (kMonObjBossOne - blend);
 
 			if (mode == 1 && stateFrame == blendEndFrame - 0x2A) {
 				int pdtNo = m_charaModelHandle->GetPdtSlot();
@@ -437,7 +411,6 @@ void CGMonObj::teleport(
 #undef object
 #undef mon
 #undef stateFrame
-#pragma global_optimizer on
 
 /*
  * --INFO--

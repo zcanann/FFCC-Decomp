@@ -23,10 +23,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" int Rand__5CMathFUl(CMath* math);
-extern "C" CVector* __ct__7CVectorFv(void* self);
-extern "C" CVector* __ct__7CVectorFRC3Vec(void* self, const Vec* src);
-
 u8 CGMonObj::m_aiWork[0xC];
 u8 CGMonObj::m_boss[0x8C];
 
@@ -473,15 +469,12 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 		if (((m_moveWork.m_flags & 0x10000) != 0) && ((m_moveWork.m_flags & 0x40) == 0)) {
 			short currentRoute = routeFrom;
 			if ((currentRoute != 0) && (forbiddenGroup != 0) && (currentRoute != forbiddenGroup)) {
-				int forbiddenIdx = forbiddenGroup + 0x36;
-				unsigned char* routeStep = reinterpret_cast<unsigned char*>(&AStar) +
-					currentRoute * 0x80 + forbiddenGroup * 2 + 0x40c;
+				unsigned char* routeStep = AStar.m_routeTable[currentRoute][forbiddenGroup];
 				CAStar::CAPos* portalPos = &AStar.m_portals[routeStep[1]];
 				float portalDist = PSVECDistance(&object->m_worldPosition, &portalPos->m_position);
 				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 					routeFrom = routeStep[0];
-					portalPos = &AStar.m_portals[*(reinterpret_cast<unsigned char*>(&AStar) +
-						routeStep[0] * 0x80 + forbiddenGroup * 2 + 0x40d)];
+					portalPos = &AStar.m_portals[AStar.m_routeTable[routeStep[0]][forbiddenGroup][1]];
 				}
 				targetPos.x = portalPos->m_position.x;
 				targetPos.y = portalPos->m_position.y;
@@ -491,56 +484,22 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 			CAStar::CAPos* escapePos;
 			if ((routeFrom != 0) && (forbiddenGroup != 0) &&
 				((escapePos = AStar.getEscapePos(object->m_worldPosition, targetPos, routeFrom, routePrev)) != NULL)) {
-				unsigned int nextGroup = escapePos->m_groupA;
-				if (static_cast<unsigned short>(nextGroup) == routeFrom) {
+				unsigned short nextGroup = escapePos->m_groupA;
+				if (nextGroup == routeFrom) {
 					nextGroup = escapePos->m_groupB;
 				}
-				unsigned char* routeStep = reinterpret_cast<unsigned char*>(&AStar) +
-					routeFrom * 0x80 + static_cast<unsigned char>(nextGroup) * 2 + 0x40c;
+				unsigned char* routeStep = AStar.m_routeTable[routeFrom][static_cast<unsigned char>(nextGroup)];
 				float portalDist = PSVECDistance(&object->m_worldPosition, &escapePos->m_position);
 				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 					routePrev = routeFrom;
 					routeFrom = routeStep[0];
-					escapePos = &AStar.m_portals[*(reinterpret_cast<unsigned char*>(&AStar) +
-						routeStep[0] * 0x80 + forbiddenGroup * 2 + 0x40d)];
+					escapePos = &AStar.m_portals[AStar.m_routeTable[routeStep[0]][forbiddenGroup][1]];
 				}
 
-				Vec dir;
-				Vec myVec;
-				Vec portalVec;
-				volatile Vec finalVec;
-				Vec myVec2;
-				Vec dirScaled;
-				Vec dirRaw;
-				Vec scaled;
-				Vec result;
 				float targetDist = PSVECDistance(&targetPos, &object->m_worldPosition);
-				__ct__7CVectorFRC3Vec(&portalVec, &escapePos->m_position);
-				Vec* capturePtr;
-				capturePtr = reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(&myVec, &object->m_worldPosition));
-				__ct__7CVectorFv(&dirRaw);
-				PSVECSubtract(capturePtr, &portalVec, &dirRaw);
-				dir.x = dirRaw.x;
-				dir.y = dirRaw.y;
-				dir.z = dirRaw.z;
-				reinterpret_cast<CVector*>(&dir)->Normalize();
-				__ct__7CVectorFv(&scaled);
-				PSVECScale(&dir, &scaled, targetDist);
-				dirScaled.x = scaled.x;
-				dirScaled.y = scaled.y;
-				dirScaled.z = scaled.z;
-				capturePtr = reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(&myVec2, &object->m_worldPosition));
-				__ct__7CVectorFv(&result);
-				PSVECAdd(capturePtr, &dirScaled, &result);
-				float rx = result.x;
-				float ry = result.y;
-				float rz = result.z;
-				finalVec.x = rx;
-				targetPos.x = rx;
-				targetPos.y = ry;
-				finalVec.y = ry;
-				finalVec.z = rz;
-				targetPos.z = rz;
+				CVector dir = CVector(object->m_worldPosition) - CVector(escapePos->m_position);
+				dir.Normalize();
+				targetPos = CVector(object->m_worldPosition) + dir * targetDist;
 			}
 		}
 	}
@@ -1788,20 +1747,21 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	}
 
 	if (selectorType == 1) {
-#define groupCursor (*reinterpret_cast<volatile int*>(&monObj->m_unk6CC))
-	wloop:
-		{
-			int wcursor = groupCursor;
-			if (groupCount[wcursor] == 0) {
-				groupCursor = wcursor + 1;
-				if (groupCursor >= 8) {
-					groupCursor = 0;
-				}
-				goto wloop;
+		int& groupCursor = monObj->m_unk6CC;
+		int count;
+		for (;;) {
+			int cursor = groupCursor;
+			count = groupCount[cursor];
+			if (count != 0) {
+				break;
+			}
+			groupCursor = cursor + 1;
+			if (groupCursor >= 8) {
+				groupCursor = 0;
 			}
 		}
 
-		int pick = Rand__5CMathFUl(&Math);
+		int pick = Math.Rand(count);
 		int seen = 0;
 		int i = 0;
 		for (int pass = 0; pass < 2; pass++) {
@@ -1819,7 +1779,6 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			}
 			groupPtr += 4;
 		}
-#undef groupCursor
 	}
 
 mlDone:

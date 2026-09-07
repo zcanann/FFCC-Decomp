@@ -83,8 +83,8 @@ inline void InitRainData(VRain*, PRain* rain, RAIN_DATA* drop)
 
     int randA = rand();
     int randB = rand();
-    unitA = 0.00003051851f * (float)randA;
-    unitB = 0.00003051851f * (float)randB;
+    unitA = (1.0f / RAND_MAX) * (float)randA;
+    unitB = (1.0f / RAND_MAX) * (float)randB;
     minX = rain->m_minX;
     maxX = rain->m_maxX;
     zRange = rain->m_maxZ - rain->m_minZ;

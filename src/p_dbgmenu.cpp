@@ -551,7 +551,6 @@ void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_strength_reduction off
 void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, char* text)
 {
 	changeVtxFmt(1);
@@ -560,38 +559,18 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 	if ((flags & 1) == 0) {
 		GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT1, 4);
 
-		const u32* borderColors = gDbgMenuWindowBorderColors;
-		u32 vertexIndex = 0;
-		int count = 2;
-
-		while (count != 0) {
-			u32 col = vertexIndex & 1;
-			u32 row = (vertexIndex >> 1) & 1;
-			vertexIndex++;
-
-			GXPosition3f32((float)(x + (width & -static_cast<int>(col))),
-			               (float)(y + (height & -static_cast<int>(row))),
-			               z);
-			GXColor1u32(borderColors[0]);
-
-			col = vertexIndex & 1;
-			row = (vertexIndex >> 1) & 1;
-			vertexIndex++;
-			GXPosition3f32((float)(x + (width & -static_cast<int>(col))),
-			               (float)(y + (height & -static_cast<int>(row))),
-			               z);
-			GXColor1u32(borderColors[1]);
-
-			borderColors += 2;
-			count--;
+		for (int vertexIndex = 0; vertexIndex < 4; vertexIndex++) {
+			GXPosition3f32((float)(x + ((vertexIndex & 1) ? width : 0)),
+			              (float)(y + ((vertexIndex & 2) ? height : 0)), z);
+			GXColor1u32(gDbgMenuWindowBorderColors[vertexIndex]);
 		}
 	}
 
 	int fillColorIndex = (flags >> 1) & 1;
 
 	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
-	width += x;
-	height += y;
+	width = x + width;
+	height = y + height;
 	GXPosition3f32((float)width, (float)y, z);
 	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[fillColorIndex]));
 	GXPosition3f32((float)x, (float)y, z);
@@ -607,8 +586,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 	GXPosition3f32((float)x, (float)height, z);
 	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[1 - fillColorIndex]));
 
-	s8 selected = static_cast<s32>((static_cast<u32>(m_currentMenu->m_status) << 25) & 0xC0000000) >> 31;
-	if (selected != 0) {
+	if (m_currentMenu->m_statusBits.m_selected != 0) {
 		u8 alpha = 0xC0;
 
 		if ((System.m_frameCounter >> 2 & 1) != 0) {
@@ -637,7 +615,6 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 		drawFont(5, x + 8, y - 6, text);
 	}
 }
-#pragma opt_strength_reduction reset
 
 /*
  * --INFO--
@@ -688,8 +665,7 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 inline CDbgMenuPcs::CDM* CDbgMenuPcs::searchFreeCDM()
 {
 	for (int i = 0; i < 0x80; i++) {
-		s8 used = static_cast<s32>((static_cast<u32>(m_menuPool[i].m_status) << 24) & 0xC0000000) >> 31;
-		if (used == 0) {
+		if (m_menuPool[i].m_statusBits.m_used == 0) {
 			return &m_menuPool[i];
 		}
 	}

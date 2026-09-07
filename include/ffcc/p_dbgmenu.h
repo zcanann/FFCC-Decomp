@@ -26,9 +26,9 @@ public:
             u8 m_status;                        // 0x34
             struct
             {
-                u8 m_used : 1;
-                u8 m_selected : 1;
-                u8 m_statusRest : 6;
+                s8 m_used : 1;
+                s8 m_selected : 1;
+                s8 m_statusRest : 6;
             } m_statusBits;
         };
         u8 m_pad35[3];                          // 0x35

@@ -1305,26 +1305,6 @@ void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
 
 /*
  * --INFO--
- * PAL Address: 0x800B984C
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CVector::operator=(const CVector& other)
-{
-    const float* src = &other.x;
-    float x = *src++;
-    float y = *src++;
-    this->x = x;
-    float z = *src;
-    this->y = y;
-    this->z = z;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B98F4
  * PAL Size: 36b
  * EN Address: TODO

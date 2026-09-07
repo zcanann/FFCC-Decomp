@@ -10,6 +10,42 @@ public:
 	CColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 	CColor(CColor& other);
 	CColor(_GXColor& other);
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
+	 * PAL Size: TODO
+	 * EN Address: 0x8008A454
+	 * EN Size: 276b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	CColor operator*(float scale) const
+	{
+		CColor out;
+		out.color.r = static_cast<unsigned char>(static_cast<int>(color.r * scale));
+		out.color.g = static_cast<unsigned char>(static_cast<int>(color.g * scale));
+		out.color.b = static_cast<unsigned char>(static_cast<int>(color.b * scale));
+		out.color.a = static_cast<unsigned char>(static_cast<int>(color.a * scale));
+		return out;
+	}
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
+	 * PAL Size: TODO
+	 * EN Address: 0x8008A654
+	 * EN Size: 156b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	CColor operator+(const CColor& other) const
+	{
+		CColor out;
+		out.color.r = color.r + other.color.r;
+		out.color.g = color.g + other.color.g;
+		out.color.b = color.b + other.color.b;
+		out.color.a = color.a + other.color.a;
+		return out;
+	}
 	operator CColor&() { return *this; }
 	operator _GXColor();
 	/*

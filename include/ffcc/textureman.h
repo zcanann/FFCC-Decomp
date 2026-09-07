@@ -101,7 +101,7 @@ public:
     void Create(CChunkFile&, CMemory::CStage*, int, CAmemCacheSet*, int, int);
     int Find(char*);
     void ReleaseTextureIdx(int, CAmemCacheSet*);
-    CTexture* GetTexture(long index) { return m_textureArray[static_cast<unsigned long>(index)]; }
+    CTexture* GetTexture(long index) { return m_textureArray.GetAt(static_cast<unsigned long>(index)); }
     int GetNumTexture() { return m_textureArray.GetSize(); }
 
     CPtrArray<CTexture*> m_textureArray;

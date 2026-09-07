@@ -174,10 +174,14 @@ static inline float LoadFloat(const float& value)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80097760
+ * PAL Size: 120b
+ * EN Address: 0x800AA7C4
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CMenuPcs::~CMenuPcs()
+inline CMenuPcs::~CMenuPcs()
 {
     if (&m_mcCtrl != nullptr) {
         m_mcCtrl.m_previousState = 0;
@@ -975,10 +979,14 @@ void CMenuPcs::SetAttrFmt(CMenuPcs::FMT fmt)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: 0x800A82EC
+ * EN Size: 56b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawQuit()
+inline void CMenuPcs::DrawQuit()
 {
 	Mtx44 screenMtx;
 
@@ -1348,10 +1356,14 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 880b
+ * EN Address: 0x800A8E3C
+ * EN Size: 424b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBase, float alpha)
+inline void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBase, float alpha)
 {
     if (width <= 0.0f) {
         return;
@@ -1522,10 +1534,14 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 380b
+ * EN Address: 0x800A97A8
+ * EN Size: 240b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::drawPause()
+inline void CMenuPcs::drawPause()
 {
     if (((CFlatEventFlags() & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
         return;
@@ -1638,10 +1654,14 @@ void CMenuPcs::createBattle()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 480b
+ * EN Address: 0x800A9B6C
+ * EN Size: 252b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::destroyBattle()
+inline void CMenuPcs::destroyBattle()
 {
     void** slot = reinterpret_cast<void**>(&m_textures[0x16]);
     for (int i = 0; i < 10; i++, slot++) {
@@ -1669,10 +1689,14 @@ void CMenuPcs::destroyBattle()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 216b
+ * EN Address: 0x800A9C68
+ * EN Size: 292b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::calcBattle()
+inline void CMenuPcs::calcBattle()
 {
     for (int i = 0; i < 4; i++) {
         m_battleRingMenus[i]->Calc();
@@ -1845,10 +1869,14 @@ void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x800AA498
+ * EN Size: 16b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CTexture* CMenuPcs::GetTexture(CMenuPcs::TEX tex)
+inline CTexture* CMenuPcs::GetTexture(CMenuPcs::TEX tex)
 {
     return m_textures[static_cast<int>(tex)];
 }

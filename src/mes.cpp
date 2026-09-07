@@ -10,15 +10,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern float kMesIconDrawYOffset;
-extern float kMesIconDefaultWidth;
-extern float kMesOne;
-extern float kMesZero;
-extern float kMesTagScaleStep;
-extern float kMesLineHeightAdjust;
-extern float kMesRubyLineIndent;
-extern float kMesPackedScaleFactor;
-extern float kMesHalf;
 // PAL map: CMes::m_tempVar in mes.o, .bss size 0x50.
 int CMes::m_tempVar[0x14];
 
@@ -33,25 +24,6 @@ static const char s_mesFallback[] = "---";
 static const char s_mesEmpty[] = "";
 static char* sTag54Source;
 static char sTag54Init;
-
-// One drawn character record inside CMes (this+0xC, stride 0x14).
-struct CMesCharCell
-{
-	float m_x;                     // 0x00
-	float m_width;                 // 0x04
-	short m_y;                     // 0x08
-	unsigned char m_scaleX;        // 0x0A
-	char m_pad0B;                  // 0x0B
-	short m_reveal;                // 0x0C
-	unsigned char m_fontAlign : 4; // 0x0E hi
-	unsigned char m_fontIndex : 4; // 0x0E lo
-	unsigned char m_textAlign : 4; // 0x0F hi
-	unsigned char m_pad0F : 4;     // 0x0F lo
-	char m_char;                   // 0x10
-	unsigned char m_scaleY;        // 0x11
-	char m_color;                  // 0x12
-	char m_flagCount;              // 0x13
-};
 
 static inline char GetMesNibbleValue(const char* data)
 {
@@ -562,6 +534,42 @@ void CMes::SetPosition(float x, float y)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 256b
+ * EN Address: 0x800ab74c
+ * EN Size: 280b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CFont* CMes::getFont(int fontIndex, int draw)
+{
+	CFont* font;
+	switch (fontIndex)
+	{
+	case 0:
+		font = MenuPcs.m_fonts[0];
+		break;
+	case 2:
+		font = MenuPcs.m_fonts[2];
+		break;
+	case 3:
+		font = MenuPcs.m_fonts[2];
+		break;
+	}
+	font->SetShadow(mShadow);
+	font->SetMargin(0.0f);
+	float scaleY = mScaleY;
+	font->SetScaleX(mScaleX);
+	font->SetScaleY(scaleY);
+	if (draw)
+	{
+		font->DrawInit();
+	}
+	return font;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80098c90
  * PAL Size: 1600b
  * EN Address: TODO
@@ -571,34 +579,33 @@ void CMes::SetPosition(float x, float y)
  */
 void CMes::Draw()
 {
-	if (*(int*)((char*)this + 8) != 0)
+	if (mCounter != 0)
 	{
 		int globalAlpha;
 		bool fading = false;
-		if ((*(int*)((char*)this + 0x3CAC) != 0) && (*(int*)((char*)this + 0x3CB8) != 0))
+		if ((mFadeEnabled != 0) && (mFadeFrames != 0))
 		{
 			fading = true;
 		}
 		if (fading)
 		{
-			globalAlpha = 0xFF - (*(int*)((char*)this + 0x3CBC) * 0xFF) / *(int*)((char*)this + 0x3CB8);
+			globalAlpha = 0xFF - (mFadeCursor * 0xFF) / mFadeFrames;
 		}
 		else
 		{
 			globalAlpha = 0xFF;
 		}
 
-		float* glyph = (float*)((char*)this + 0x0C);
+		CMesCharCell* glyph = m_chars;
 		CFont* font = 0;
-		CFont* nextFont;
 		int activeTlut = 0xFFFFFFFF;
 		int activeFontId = 0xFFFFFFFF;
 
-		for (int i = 0; i < *(int*)((char*)this + 8); i++, glyph += 5)
+		for (int i = 0; i < mCounter; i++, glyph++)
 		{
-			if (*(int*)((char*)this + 0x3C80) >= (int)(unsigned int)*(unsigned short*)((char*)glyph + 0x0C))
+			if (mDrawCursor >= glyph->m_reveal)
 			{
-				if ((unsigned int)*(unsigned char*)(glyph + 4) < 0x20)
+				if ((unsigned int)glyph->m_char < 0x20)
 				{
 					if (font != 0)
 					{
@@ -606,7 +613,7 @@ void CMes::Draw()
 					}
 					MenuPcs.DrawInit();
 
-					int iconId = *(unsigned char*)(glyph + 4);
+					int iconId = glyph->m_char;
 					switch (iconId + 0x48)
 					{
 					case 0x4F:
@@ -691,10 +698,10 @@ void CMes::Draw()
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x15));
 
 					MenuPcs.DrawRect(
-					    0, *(float*)((char*)this + 0x3C9C) + *glyph,
-					    kMesIconDrawYOffset + (*(float*)((char*)this + 0x3CA0) + (float)*(unsigned short*)(glyph + 2)),
-					    kMesIconDefaultWidth, kMesIconDefaultWidth, (float)((iconId % 5) * 0x16),
-					    (float)((iconId / 5) * 0x16), kMesOne, kMesOne, kMesZero);
+					    0, mBaseX + glyph->m_x,
+					    8.0f + (mBaseY + (float)glyph->m_y),
+					    22.0f, 22.0f, (float)((iconId % 5) * 0x16),
+					    (float)((iconId / 5) * 0x16), 1.0f, 1.0f, 0.0f);
 
 					if (font != 0)
 					{
@@ -703,41 +710,22 @@ void CMes::Draw()
 				}
 				else
 				{
-					int fontId = (int)((unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F);
+					int fontId = (int)glyph->m_fontIndex;
 					if (activeFontId != fontId)
 					{
 						activeFontId = fontId;
-						switch (fontId)
-						{
-						case 0:
-							nextFont = MenuPcs.m_fonts[0];
-							break;
-						case 2:
-							nextFont = MenuPcs.m_fonts[2];
-							break;
-						case 3:
-							nextFont = MenuPcs.m_fonts[2];
-							break;
-						}
-
-						nextFont->SetShadow(*(int*)((char*)this + 0x3D38));
-						nextFont->SetMargin(kMesZero);
-						float fontScaleY = *(float*)((char*)this + 0x3D48);
-						nextFont->SetScaleX(*(float*)((char*)this + 0x3D44));
-						nextFont->SetScaleY(fontScaleY);
-						nextFont->DrawInit();
-						font = nextFont;
+						font = getFont(fontId, 1);
 					}
 
-					unsigned int fadeCur = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) & 0x0F;
-					unsigned int fadeMax = (*(signed char*)((char*)glyph + 0x0F) >> 4) & 0xF;
+					unsigned int fadeCur = glyph->m_fadeCursor;
+					unsigned int fadeMax = glyph->m_fadeFrames;
 					float ratio = (float)fadeCur / (float)fadeMax;
 					_GXColor color;
 					color.r = 0xFF;
 					color.g = 0xFF;
 					color.b = 0xFF;
 					int alpha;
-					if (ratio < kMesOne)
+					if (ratio < 1.0f)
 					{
 						alpha = (unsigned char)(ratio * (float)globalAlpha);
 					}
@@ -748,20 +736,20 @@ void CMes::Draw()
 					color.a = alpha;
 					font->SetColor(color);
 
-					int tlut = (int)*(unsigned char*)((char*)glyph + 0x12);
-					if ((activeTlut != tlut) && (((unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F) < 2))
+					int tlut = (int)glyph->m_color;
+					if ((activeTlut != tlut) && (glyph->m_fontIndex < 2))
 					{
 						activeTlut = tlut;
-						font->SetTlut(tlut + *(int*)((char*)this + 0x3D34));
+						font->SetTlut(tlut + mTlutBase);
 					}
 
-					font->SetPosX(*(float*)((char*)this + 0x3C9C) + *glyph);
-					font->SetPosY(*(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2));
-					float glyphScaleY = kMesTagScaleStep * (float)*(unsigned char*)((char*)glyph + 0x11);
-					font->SetScaleX(kMesTagScaleStep * (float)*(unsigned char*)((char*)glyph + 0x0A));
+					font->SetPosX(mBaseX + glyph->m_x);
+					font->SetPosY(mBaseY + (float)glyph->m_y);
+					float glyphScaleY = 0.01f * (float)glyph->m_scaleY;
+					font->SetScaleX(0.01f * (float)glyph->m_scaleX);
 					font->SetScaleY(glyphScaleY);
 					font->renderFlags.snapPosition = 1;
-					font->Draw((unsigned short)*(unsigned char*)(glyph + 4));
+					font->Draw((unsigned short)glyph->m_char);
 					font->renderFlags.snapPosition = 0;
 				}
 			}
@@ -782,84 +770,52 @@ void CMes::Draw()
  */
 void CMes::Calc()
 {
-	if (*(int*)((char*)this + 8) == 0)
+	if (mCounter == 0)
 	{
 		return;
 	}
 
 	int fadeCurr;
 	int fadeMax;
-	int textEntry = (int)((char*)this + 0xC);
+	CMesCharCell* cell = m_chars;
 	unsigned int maxAdvance = 0;
-	for (int i = 0; i < *(int*)((char*)this + 8); i++, textEntry += 0x14)
+	for (int i = 0; i < mCounter; i++, cell++)
 	{
-		if ((int)(unsigned int)*(unsigned short*)(textEntry + 0xC) <= *(int*)((char*)this + 0x3C80))
+		if (cell->m_reveal <= mDrawCursor)
 		{
-			CMesCharCell* cell = (CMesCharCell*)textEntry;
-			fadeCurr = cell->m_pad0F + 1;
-			fadeMax = cell->m_textAlign;
+			fadeCurr = cell->m_fadeCursor + 1;
+			fadeMax = cell->m_fadeFrames;
 			if (fadeCurr < fadeMax)
 			{
 				fadeMax = fadeCurr;
 			}
-			cell->m_pad0F = fadeMax;
-			maxAdvance = (unsigned int)*(unsigned char*)(textEntry + 0x13);
+			cell->m_fadeCursor = fadeMax;
+			maxAdvance = (unsigned int)cell->m_flagCount;
 		}
 	}
 
-	unsigned char* flagEntry =
-	    (unsigned char*)((char*)this + *(int*)((char*)this + 0x3C10) * 6 + 0x3C14);
-	int advance;
-	while (*(int*)((char*)this + 0x3C10) < (int)maxAdvance)
-	{
-		int type = *flagEntry;
-		switch (type)
-		{
-		case 2:
-			*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) =
-			    (int)*(short*)(flagEntry + 4);
-			break;
-		case 1:
-		{
-			int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0);
-			*slot = *slot + 1;
-			break;
-		}
-		case 4:
-			if (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) == 0)
-			{
-				advance = 0;
-				goto doneAdvance;
-			}
-			break;
-		}
+	int advance = useFlag(maxAdvance, 0);
 
-		flagEntry += 6;
-		*(int*)((char*)this + 0x3C10) = *(int*)((char*)this + 0x3C10) + 1;
-	}
-	advance = 1;
-
-doneAdvance:
 	if (advance)
 	{
 		int max = 0x7FFF;
-		int next = *(int*)((char*)this + 0x3C80) + 1;
+		int next = mDrawCursor + 1;
 		if (next < 0x7FFF)
 		{
 			max = next;
 		}
-		*(int*)((char*)this + 0x3C80) = max;
+		mDrawCursor = max;
 	}
 
-	if (*(int*)((char*)this + 0x3CAC) != 0)
+	if (mFadeEnabled != 0)
 	{
-		int next = *(int*)((char*)this + 0x3CBC) + 1;
-		int max = *(int*)((char*)this + 0x3CB8);
+		int next = mFadeCursor + 1;
+		int max = mFadeFrames;
 		if (next < max)
 		{
 			max = next;
 		}
-		*(int*)((char*)this + 0x3CBC) = max;
+		mFadeCursor = max;
 	}
 }
 
@@ -893,27 +849,7 @@ int CMes::GetWait()
 #pragma opt_lifetimes off
 void CMes::addString(char** text, int branchMode)
 {
-	int fontSel = mFontIndex;
-	CFont* setupFont;
-	switch (fontSel)
-	{
-	case 0:
-		setupFont = MenuPcs.m_fonts[0];
-		break;
-	case 2:
-		setupFont = MenuPcs.m_fonts[2];
-		break;
-	case 3:
-		setupFont = MenuPcs.m_fonts[2];
-		break;
-	}
-
-	setupFont->SetShadow(mShadow);
-	setupFont->SetMargin(kMesZero);
-	float setupScaleY = mScaleY;
-	setupFont->SetScaleX(mScaleX);
-	setupFont->SetScaleY(setupScaleY);
-	CFont* font = setupFont;
+	CFont* font = getFont(mFontIndex, 0);
 
 	int running = 1;
 	unsigned char caseMode = 0;
@@ -949,13 +885,13 @@ void CMes::addString(char** text, int branchMode)
 		case 0:
 		advanceLine:
 		{
-			mCurrentX = kMesZero;
+			mCurrentX = 0.0f;
 			float lineAdvance = (float)font->m_glyphHeight * font->scaleY;
-			mCurrentY = mCurrentY + (kMesLineHeightAdjust + lineAdvance);
+			mCurrentY = mCurrentY + (-2.0f + lineAdvance);
 			if (mRubyEnabled != 0)
 			{
 				mRubyLine = mRubyLine + 1;
-				mCurrentX = mCurrentX + (kMesRubyLineIndent + mLineSpacing);
+				mCurrentX = mCurrentX + (28.0f + mLineSpacing);
 			}
 			break;
 		}
@@ -999,11 +935,11 @@ void CMes::addString(char** text, int branchMode)
 			mRubyHeight = ReadTagS8(text);
 			{
 				float rubyAdvance = (float)font->m_glyphHeight * font->scaleY;
-				mRubySpacing = kMesLineHeightAdjust + rubyAdvance;
+				mRubySpacing = -2.0f + rubyAdvance;
 			}
 			mRubyY = mCurrentY;
 			mRubyOffset = ReadTagS8(text);
-			mCurrentX = mCurrentX + kMesRubyLineIndent + mLineSpacing;
+			mCurrentX = mCurrentX + 28.0f + mLineSpacing;
 			break;
 		case 8:
 		{
@@ -1276,30 +1212,12 @@ void CMes::addString(char** text, int branchMode)
 		case 0x34:
 		{
 			mFontIndex = ReadTagS8(text);
-			CFont* newFont;
-			switch (mFontIndex)
-			{
-			case 0:
-				newFont = MenuPcs.m_fonts[0];
-				break;
-			case 2:
-				newFont = MenuPcs.m_fonts[2];
-				break;
-			case 3:
-				newFont = MenuPcs.m_fonts[2];
-				break;
-			}
-			newFont->SetShadow(mShadow);
-			newFont->SetMargin(kMesZero);
-			float newScaleY = mScaleY;
-			newFont->SetScaleX(mScaleX);
-			newFont->SetScaleY(newScaleY);
-			font = newFont;
+			font = getFont(mFontIndex, 0);
 			break;
 		}
 		case 0x35:
 		{
-			float scale = kMesTagScaleStep * (float)ReadTagS16(text);
+			float scale = 0.01f * (float)ReadTagS16(text);
 			mScaleY = scale;
 			mScaleX = scale;
 			float tagScaleY = mScaleY;
@@ -1309,7 +1227,7 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x1A:
 		{
-			mScaleX = kMesTagScaleStep * (float)ReadTagS16(text);
+			mScaleX = 0.01f * (float)ReadTagS16(text);
 			float tagScaleY = mScaleY;
 			font->SetScaleX(mScaleX);
 			font->SetScaleY(tagScaleY);
@@ -1475,9 +1393,9 @@ void CMes::addString(char** text, int branchMode)
 	renderTag:
 		if (flowMode != 2)
 		{
-			CMesCharCell* glyph = (CMesCharCell*)((int*)this + mCounter * 5 + 3);
-			glyph->m_color = (char)mColor;
-			glyph->m_char = (char)uch;
+			CMesCharCell* glyph = &m_chars[mCounter];
+			glyph->m_color = mColor;
+			glyph->m_char = uch;
 			glyph->m_x = mCurrentX;
 			glyph->m_y = (short)(int)mCurrentY;
 
@@ -1485,20 +1403,20 @@ void CMes::addString(char** text, int branchMode)
 			float width;
 			if (uch < 0x20)
 			{
-				width = kMesIconDefaultWidth;
+				width = 22.0f;
 			}
 			else
 			{
 				width = font->GetWidth(uch);
 			}
 			glyph->m_width = width;
-			float packedScale = kMesPackedScaleFactor;
+			float packedScale = 100.0f;
 			font->renderFlags.snapPosition = 0;
 
-			glyph->m_reveal = (short)mRevealCursor;
-			glyph->m_textAlign = mTextAlign;
-			glyph->m_pad0F = 0;
-			glyph->m_flagCount = (char)mFlagCount;
+			glyph->m_reveal = mRevealCursor;
+			glyph->m_fadeFrames = mTextAlign;
+			glyph->m_fadeCursor = 0;
+			glyph->m_flagCount = mFlagCount;
 			glyph->m_fontAlign = mFontAlign;
 			glyph->m_fontIndex = mFontIndex;
 			glyph->m_scaleX = (char)(int)(packedScale * mScaleX);
@@ -1547,41 +1465,16 @@ void CMes::Next()
 	float groupWidth;
 	float halfVal;
 	int remaining;
-	unsigned int runLength;
 	int i;
-	unsigned char* flagEntry;
-	float* start;
-	int entryCount;
-	float* curr;
+	CMesCharCell* start;
+	CMesCharCell* curr;
 	char tempFlags[0x50];
 
 	if (mText != 0)
 	{
-		entryCount = *(int*)((char*)this + 0x3c0c);
-		flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
-		while (*(int*)((char*)this + 0x3c10) < entryCount)
-		{
-			type = *flagEntry;
-			switch (type)
-			{
-			case 2:
-				*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) =
-				    (int)*(short*)(flagEntry + 4);
-				break;
-			case 1:
-			{
-				int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0);
-				*slot = *slot + 1;
-				break;
-			}
-			case 4:
-				break;
-			}
-			flagEntry += 6;
-			*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
-		}
+		useFlag(mFlagCount, 1);
 		mCounter = 0;
-		halfVal = kMesZero;
+		halfVal = 0.0f;
 		mFlagCursor = 0;
 		mFlagCount = 0;
 		mCurrentY = halfVal;
@@ -1594,32 +1487,32 @@ void CMes::Next()
 		memcpy(tempFlags, mFlagVars, sizeof(tempFlags));
 		addString(&mText, 0);
 		memcpy(mFlagVars, tempFlags, sizeof(tempFlags));
-		halfVal = kMesHalf;
+		halfVal = 0.5f;
 		i = 0;
-		start = (float*)((char*)this + 0xc);
+		start = m_chars;
 		while ((remaining = mCounter, i < remaining))
 		{
 			int j = i + 1;
-			curr = start + 5;
-			for (; j < remaining; j = j + 1, curr = curr + 5)
+			curr = start + 1;
+			for (; j < remaining; j = j + 1, curr++)
 			{
-				if ((((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4 & 0xF) != ((unsigned int)*(unsigned char*)((char*)curr + 0xe) >> 4 & 0xF)) ||
-				    (*(short*)(start + 2) != *(short*)(curr + 2)))
+				if ((start->m_fontAlign != curr->m_fontAlign) ||
+				    (start->m_y != curr->m_y))
 				{
 					break;
 				}
 			}
-			groupWidth = (curr[-5] - *start) + (start[1] + *(float*)((char*)this + 0x3d3c));
-			for (; start <= curr - 5; start = start + 5)
+			groupWidth = (curr[-1].m_x - start->m_x) + (start->m_width + mLineSpacing);
+			for (; start <= curr - 1; start++)
 			{
-				type = (*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF;
+				type = start->m_fontAlign;
 				if (type == 1)
 				{
-					*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;
+					start->m_x = halfVal * (mMaxWidth - groupWidth) + start->m_x;
 				}
 				else if ((unsigned int)type == 2)
 				{
-					*start = *start + (*(float*)((char*)this + 0x3ca4) - groupWidth);
+					start->m_x = start->m_x + (mMaxWidth - groupWidth);
 				}
 			}
 			i = j;
@@ -1671,7 +1564,7 @@ void CMes::Set(char* text, int param)
 		}
 
 		memcpy(mFlagVars, flagBackup, sizeof(flagBackup));
-		float lineSkip = kMesLineHeightAdjust;
+		float lineSkip = -2.0f;
 		mMaxWidth = mMaxWidth - mLineSpacing;
 		mMaxHeight = mMaxHeight - lineSkip;
 

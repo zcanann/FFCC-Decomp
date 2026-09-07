@@ -777,7 +777,7 @@ config.libs = [
             Object(NonMatching, "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline auto,deferred"]),
             Object(Matching, "vector.cpp", mw_version="GC/2.6"),
             Object(NonMatching, "wind.cpp"),
-            Object(NonMatching, "wm_menu.cpp"),
+            Object(NonMatching, "wm_menu.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "wmm_str.cpp"),
             Object(Matching, "zlist.cpp"),
         ]

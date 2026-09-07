@@ -593,18 +593,6 @@ static inline void QueueWmCharaAnimState(CMenuPcs* menu, int slot, int state)
 	GetWmCharaAnimState(menu)[slot * 5 + 1] = state;
 }
 
-static void releaseRefCounted(void** refObj)
-{
-	if (refObj == 0 || *refObj == 0) {
-		return;
-	}
-	CRef* const obj = reinterpret_cast<CRef*>(*refObj);
-	if (obj->DecRef() == 0) {
-		delete obj;
-	}
-	*refObj = 0;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80102e9c
@@ -685,12 +673,12 @@ void CMenuPcs::createWorld()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 312b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801047A8
+ * EN Size: 364b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::ChkNumItemAll()
+inline void CMenuPcs::ChkNumItemAll()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	int total = 0;
@@ -1309,7 +1297,7 @@ void CMenuPcs::loadData()
 		     i++, dst += 4) {
 			*reinterpret_cast<CTexture**>(dst + 0xC0) =
 			    reinterpret_cast<CTextureSet*>(*reinterpret_cast<CTextureSet**>(bytes + 0xBC))
-			        ->m_textureArray[i];
+			        ->GetTexture(i);
 		}
 	}
 
@@ -1327,12 +1315,12 @@ void CMenuPcs::loadData()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 352b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80105EAC
+ * EN Size: 456b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::InitFrameInfo()
+inline void CMenuPcs::InitFrameInfo()
 {
 	unsigned char* const frame = m_wm.m_frameInfo;
 	if (frame != 0) {
@@ -1382,14 +1370,14 @@ void CMenuPcs::InitFrame0Info()
 
 /*
  * --INFO--
- * PAL Address: 0x80101444
- * PAL Size: 532b
+ * PAL Address: UNUSED
+ * PAL Size: TODO
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt& src)
+inline void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt& src)
 {
 	memcpy(this, &src, sizeof(CMenuPcs::Sprt));
 }
@@ -1478,12 +1466,12 @@ void CMenuPcs::InitCharaInfo()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 576b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80106324
+ * EN Size: 64b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::InitCharaSelectInfo()
+inline void CMenuPcs::InitCharaSelectInfo()
 {
 	unsigned char* const selectData = m_wm.m_charaSelectData;
 	if (selectData != 0) {
@@ -1505,12 +1493,12 @@ void CMenuPcs::InitCharaSelectInfo()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 560b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80106364
+ * EN Size: 428b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::InitCSelCurPos()
+inline void CMenuPcs::InitCSelCurPos()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	bytes[0x16] = 0;
@@ -1663,174 +1651,14 @@ void CMenuPcs::destroyWorld()
 
 /*
  * --INFO--
- * PAL Address: 0x801005d8
- * PAL Size: 1320b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::calcWorld()
-{
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-#define worldParams m_wmWorldParams
-
-	reinterpret_cast<unsigned int*>(worldParams + 4)[0] = reinterpret_cast<unsigned int*>(worldParams + 8)[0];
-
-	if (m_wmWorldState->m_worldReady == 0) {
-		Sound.PlaySe(0x138B, 0x40, 0x7F, 0);
-		GetWmWorldHandles(this)[1]->SetAnim(0, -1, -1, -1, 0);
-		reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
-		m_wmWorldState->m_worldReady = 1;
-		m_wmWorldState->m_mainState = 1;
-	}
-
-#define handle GetWmWorldHandles(this)[1]
-#define model handle->m_model
-	const int animState = m_wmWorldState->m_mainState;
-	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
-	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
-
-	if (animState == 1) {
-		if (animTime < animEnd) {
-			model->AddFrame(FLOAT_80331698);
-			m_wmWorldState->m_frameCounter = 0;
-		} else {
-			if (m_wmWorldState->m_frameCounter >= 10) {
-				CFlatRuntime::CStack stackData[3];
-
-				handle->SetAnim(1, -1, -1, -1, 0);
-				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
-				stackData[0].m_word = 2;
-				stackData[1].m_word = 0;
-				stackData[2].m_word = 0;
-				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
-				m_wmWorldState->m_mainState = 2;
-				m_wmWorldState->m_frameCounter = 0;
-			}
-		}
-	} else if (animState == 2) {
-		int nextAnim = static_cast<signed char>(bytes[0xE]);
-
-		if (nextAnim != 0) {
-			if (nextAnim == 1) {
-				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
-				nextAnim = 2;
-			} else if (nextAnim == 2) {
-				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
-				nextAnim = 3;
-			} else if (nextAnim == 3) {
-				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
-				nextAnim = 4;
-			} else if (nextAnim == 4) {
-				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
-				nextAnim = 5;
-			} else if (nextAnim == 5) {
-				Sound.PlaySe(0x138D, 0x40, 0x7F, 0);
-				nextAnim = 6;
-				m_wmWorldState->m_mainState = 3;
-				m_wmWorldState->m_frameCounter = 0;
-			}
-
-			if (nextAnim != reinterpret_cast<int*>(worldParams + 8)[0]) {
-				handle->SetAnim(nextAnim, -1, -1, -1, 0);
-				reinterpret_cast<int*>(worldParams + 8)[0] = nextAnim;
-
-				if (nextAnim == 0) {
-					model->SetFrame(animEnd);
-				}
-			}
-			bytes[0xE] = 0;
-		} else {
-			if (animTime < animEnd) {
-				model->AddFrame(FLOAT_80331698);
-			} else {
-				handle->SetAnim(1, -1, -1, -1, 0);
-				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
-			}
-		}
-	} else if (animState == 3 && m_wmWorldState->m_frameCounter >= 10) {
-		if (animTime < animEnd) {
-			model->AddFrame(FLOAT_80331698);
-		} else {
-			handle->SetAnim(0, -1, -1, -1, 0);
-			reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
-			m_wmWorldState->m_delay = 10;
-			m_wmWorldState->m_nextMenuMode = -1;
-			m_wmWorldState->m_mainState = 4;
-			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
-		}
-	} else if (animState == 4) {
-		if (m_wmWorldState->m_delay != 0) {
-			m_wmWorldState->m_delay--;
-		} else {
-			m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
-			m_wmWorldState->m_nextMenuMode = 0;
-		}
-	}
-
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	reinterpret_cast<short*>(worldObj + 0x58)[0] = 0;
-	const float fVar1 = FLOAT_803313dc;
-	reinterpret_cast<short*>(worldObj + 0x5A)[0] = 0;
-	float fVar3 = FLOAT_80331598;
-	reinterpret_cast<short*>(worldObj + 0x5C)[0] = 0x280;
-	const float fVar4 = FLOAT_803315d4;
-	reinterpret_cast<short*>(worldObj + 0x5E)[0] = 0x1C0;
-	const float fVar5 = FLOAT_803317e0;
-	reinterpret_cast<float*>(worldObj + 0x60)[0] = fVar1;
-	const float fVar6 = FLOAT_803317e4;
-	reinterpret_cast<float*>(worldObj + 0x64)[0] = fVar1;
-	const float fVar7 = FLOAT_803317e8;
-	reinterpret_cast<float*>(worldObj + 0x68)[0] = fVar3;
-	fVar3 = FLOAT_803314bc;
-	*reinterpret_cast<unsigned int*>(worldObj + 0x50) = 1;
-	reinterpret_cast<float*>(worldObj + 0x84)[0] = fVar4;
-	reinterpret_cast<float*>(worldObj + 0x88)[0] = fVar4;
-	reinterpret_cast<float*>(worldObj + 0x8C)[0] = fVar4;
-	reinterpret_cast<float*>(worldObj + 0x6C)[0] = fVar1;
-	reinterpret_cast<float*>(worldObj + 0x70)[0] = fVar5;
-	reinterpret_cast<float*>(worldObj + 0x74)[0] = fVar6;
-	reinterpret_cast<float*>(worldObj + 0x78)[0] = fVar7;
-	reinterpret_cast<float*>(worldObj + 0x7C)[0] = fVar1;
-	reinterpret_cast<float*>(worldObj + 0x80)[0] = fVar1;
-
-	Mtx matrix;
-	PSMTXRotRad(matrix, 'x', fVar3 * reinterpret_cast<float*>(worldObj + 0x78)[0]);
-	matrix[0][3] = reinterpret_cast<float*>(worldObj + 0x6C)[0];
-	matrix[1][3] = reinterpret_cast<float*>(worldObj + 0x70)[0];
-	matrix[2][3] = reinterpret_cast<float*>(worldObj + 0x74)[0];
-	PSMTXScaleApply(matrix, matrix, reinterpret_cast<float*>(worldObj + 0x84)[0], reinterpret_cast<float*>(worldObj + 0x88)[0],
-	                reinterpret_cast<float*>(worldObj + 0x8C)[0]);
-
-	model->SetMatrix(matrix);
-	model->CalcMatrix();
-	model->CalcSkin();
-
-	const int updatedAnimState = m_wmWorldState->m_mainState;
-
-	if (updatedAnimState == 1 && animTime >= animEnd) {
-		if (m_wmWorldState->m_frameCounter < 10) {
-			m_wmWorldState->m_frameCounter++;
-		}
-	} else if (updatedAnimState == 3 && m_wmWorldState->m_frameCounter < 10) {
-		m_wmWorldState->m_frameCounter++;
-	}
-#undef worldParams
-#undef model
-#undef handle
-}
-
-/*
- * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 504b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80106AB8
+ * EN Size: 168b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CalcMainMenu()
+inline void CMenuPcs::CalcMainMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const worldState = m_wmWorldState;
@@ -2002,6 +1830,166 @@ void CMenuPcs::CalcDiaryMenu()
 
 /*
  * --INFO--
+ * PAL Address: 0x801005d8
+ * PAL Size: 1320b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::calcWorld()
+{
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+#define worldParams m_wmWorldParams
+
+	reinterpret_cast<unsigned int*>(worldParams + 4)[0] = reinterpret_cast<unsigned int*>(worldParams + 8)[0];
+
+	if (m_wmWorldState->m_worldReady == 0) {
+		Sound.PlaySe(0x138B, 0x40, 0x7F, 0);
+		GetWmWorldHandles(this)[1]->SetAnim(0, -1, -1, -1, 0);
+		reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
+		m_wmWorldState->m_worldReady = 1;
+		m_wmWorldState->m_mainState = 1;
+	}
+
+#define handle GetWmWorldHandles(this)[1]
+#define model handle->m_model
+	const int animState = m_wmWorldState->m_mainState;
+	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
+	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
+
+	if (animState == 1) {
+		if (animTime < animEnd) {
+			model->AddFrame(FLOAT_80331698);
+			m_wmWorldState->m_frameCounter = 0;
+		} else {
+			if (m_wmWorldState->m_frameCounter >= 10) {
+				CFlatRuntime::CStack stackData[3];
+
+				handle->SetAnim(1, -1, -1, -1, 0);
+				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
+				stackData[0].m_word = 2;
+				stackData[1].m_word = 0;
+				stackData[2].m_word = 0;
+				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
+				m_wmWorldState->m_mainState = 2;
+				m_wmWorldState->m_frameCounter = 0;
+			}
+		}
+	} else if (animState == 2) {
+		int nextAnim = static_cast<signed char>(bytes[0xE]);
+
+		if (nextAnim != 0) {
+			if (nextAnim == 1) {
+				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
+				nextAnim = 2;
+			} else if (nextAnim == 2) {
+				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
+				nextAnim = 3;
+			} else if (nextAnim == 3) {
+				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
+				nextAnim = 4;
+			} else if (nextAnim == 4) {
+				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
+				nextAnim = 5;
+			} else if (nextAnim == 5) {
+				Sound.PlaySe(0x138D, 0x40, 0x7F, 0);
+				nextAnim = 6;
+				m_wmWorldState->m_mainState = 3;
+				m_wmWorldState->m_frameCounter = 0;
+			}
+
+			if (nextAnim != reinterpret_cast<int*>(worldParams + 8)[0]) {
+				handle->SetAnim(nextAnim, -1, -1, -1, 0);
+				reinterpret_cast<int*>(worldParams + 8)[0] = nextAnim;
+
+				if (nextAnim == 0) {
+					model->SetFrame(animEnd);
+				}
+			}
+			bytes[0xE] = 0;
+		} else {
+			if (animTime < animEnd) {
+				model->AddFrame(FLOAT_80331698);
+			} else {
+				handle->SetAnim(1, -1, -1, -1, 0);
+				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
+			}
+		}
+	} else if (animState == 3 && m_wmWorldState->m_frameCounter >= 10) {
+		if (animTime < animEnd) {
+			model->AddFrame(FLOAT_80331698);
+		} else {
+			handle->SetAnim(0, -1, -1, -1, 0);
+			reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
+			m_wmWorldState->m_delay = 10;
+			m_wmWorldState->m_nextMenuMode = -1;
+			m_wmWorldState->m_mainState = 4;
+			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
+		}
+	} else if (animState == 4) {
+		if (m_wmWorldState->m_delay != 0) {
+			m_wmWorldState->m_delay--;
+		} else {
+			m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
+			m_wmWorldState->m_nextMenuMode = 0;
+		}
+	}
+
+	unsigned char* const worldObj = m_wm.m_worldObjData;
+	reinterpret_cast<short*>(worldObj + 0x58)[0] = 0;
+	const float fVar1 = FLOAT_803313dc;
+	reinterpret_cast<short*>(worldObj + 0x5A)[0] = 0;
+	float fVar3 = FLOAT_80331598;
+	reinterpret_cast<short*>(worldObj + 0x5C)[0] = 0x280;
+	const float fVar4 = FLOAT_803315d4;
+	reinterpret_cast<short*>(worldObj + 0x5E)[0] = 0x1C0;
+	const float fVar5 = FLOAT_803317e0;
+	reinterpret_cast<float*>(worldObj + 0x60)[0] = fVar1;
+	const float fVar6 = FLOAT_803317e4;
+	reinterpret_cast<float*>(worldObj + 0x64)[0] = fVar1;
+	const float fVar7 = FLOAT_803317e8;
+	reinterpret_cast<float*>(worldObj + 0x68)[0] = fVar3;
+	fVar3 = FLOAT_803314bc;
+	*reinterpret_cast<unsigned int*>(worldObj + 0x50) = 1;
+	reinterpret_cast<float*>(worldObj + 0x84)[0] = fVar4;
+	reinterpret_cast<float*>(worldObj + 0x88)[0] = fVar4;
+	reinterpret_cast<float*>(worldObj + 0x8C)[0] = fVar4;
+	reinterpret_cast<float*>(worldObj + 0x6C)[0] = fVar1;
+	reinterpret_cast<float*>(worldObj + 0x70)[0] = fVar5;
+	reinterpret_cast<float*>(worldObj + 0x74)[0] = fVar6;
+	reinterpret_cast<float*>(worldObj + 0x78)[0] = fVar7;
+	reinterpret_cast<float*>(worldObj + 0x7C)[0] = fVar1;
+	reinterpret_cast<float*>(worldObj + 0x80)[0] = fVar1;
+
+	Mtx matrix;
+	PSMTXRotRad(matrix, 'x', fVar3 * reinterpret_cast<float*>(worldObj + 0x78)[0]);
+	matrix[0][3] = reinterpret_cast<float*>(worldObj + 0x6C)[0];
+	matrix[1][3] = reinterpret_cast<float*>(worldObj + 0x70)[0];
+	matrix[2][3] = reinterpret_cast<float*>(worldObj + 0x74)[0];
+	PSMTXScaleApply(matrix, matrix, reinterpret_cast<float*>(worldObj + 0x84)[0], reinterpret_cast<float*>(worldObj + 0x88)[0],
+	                reinterpret_cast<float*>(worldObj + 0x8C)[0]);
+
+	model->SetMatrix(matrix);
+	model->CalcMatrix();
+	model->CalcSkin();
+
+	const int updatedAnimState = m_wmWorldState->m_mainState;
+
+	if (updatedAnimState == 1 && animTime >= animEnd) {
+		if (m_wmWorldState->m_frameCounter < 10) {
+			m_wmWorldState->m_frameCounter++;
+		}
+	} else if (updatedAnimState == 3 && m_wmWorldState->m_frameCounter < 10) {
+		m_wmWorldState->m_frameCounter++;
+	}
+#undef worldParams
+#undef model
+#undef handle
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800fec40
  * PAL Size: 6552b
  * EN Address: TODO
@@ -2014,19 +2002,7 @@ void CMenuPcs::CalcMCardMenu()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	bool bVar1 = false;
-	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
-		bVar1 = true;
-	}
-	unsigned short uVar3s;
-	if (bVar1) {
-		uVar3s = 0;
-	} else {
-		unsigned int padIndex = 0;
-		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-		int __p11 =  (0 + padIndex);
-		uVar3s = Pad.GetPadInputs()[__p11].buttonDown[0];
-	}
-	unsigned int uVar3 = uVar3s;
+	unsigned int uVar3 = Pad.GetButtonDown(0);
 	unsigned short uVar6 = GetButtonRepeat(0);
 
 	if ((signed char)m_wmWorldState->m_worldReady == 0) {
@@ -2697,12 +2673,12 @@ void CMenuPcs::CalcMCardMenu()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 636b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801084A0
+ * EN Size: 304b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CalcCMakeMenu()
+inline void CMenuPcs::CalcCMakeMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const worldState = m_wmWorldState;
@@ -2730,12 +2706,12 @@ void CMenuPcs::CalcCMakeMenu()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801085D0
+ * EN Size: 172b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CalcMoveMenu()
+inline void CMenuPcs::CalcMoveMenu()
 {
 	WmWorldState* const worldState = m_wmWorldState;
 	if (worldState == 0) {
@@ -2802,17 +2778,7 @@ void CMenuPcs::CalcLoadMenu()
 	unsigned char bVar1 = 0;
 	m_textureLocIndex = 0;
 
-	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
-		bVar1 = true;
-	}
-	unsigned short uVar4s;
-	if (bVar1) {
-		uVar4s = 0;
-	} else {
-		unsigned int padIndex = (!(!(Pad.m_debugPadPort == 0))) ? 0 : 0;
-		uVar4s = Pad.GetPadInputs()[padIndex].buttonDown[0];
-	}
-	unsigned int uVar4 = uVar4s;
+	unsigned int uVar4 = Pad.GetButtonDown(0);
 	unsigned short uVar7 = GetButtonRepeat(0);
 
 	if (m_wmWorldState->m_worldReady == 0) {
@@ -3585,19 +3551,7 @@ void CMenuPcs::CalcTitleMenu()
 		lbl_8032EE38[0] = 1;
 	}
 
-	bool bVar1 = false;
-	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
-		bVar1 = true;
-	}
-	int down;
-	if (bVar1) {
-		down = 0;
-	} else {
-		int padIndex = 0;
-		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-		down = Pad.GetPadInputs()[padIndex].buttonDown[0];
-	}
-	down = static_cast<unsigned short>(down);
+	int down = Pad.GetButtonDown(0);
 	const unsigned short repeat = GetButtonRepeat(0);
 
 	{
@@ -6431,12 +6385,12 @@ void CMenuPcs::CallWorldParam(int p0, int p1, int p2)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8010F9B8
+ * EN Size: 244b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CalcSpl(CMenuPcs::SPL* out, CMenuPcs::SPL* in, float t)
+inline void CMenuPcs::CalcSpl(CMenuPcs::SPL* out, CMenuPcs::SPL* in, float t)
 {
 	if (out == 0 || in == 0) {
 		return;
@@ -6578,7 +6532,7 @@ void CMenuPcs::RestoreProjection()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawObj(int kind)
+inline void CMenuPcs::DrawObj(int kind)
 {
 	if (kind == 0) {
 		DrawChara();
@@ -7332,7 +7286,7 @@ void CMenuPcs::DrawFukidashi()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::ChkPlaceLength(char* text)
+inline void CMenuPcs::ChkPlaceLength(char* text)
 {
 	if (text == 0) {
 		gWmMenuWorkA = 0;
@@ -7354,12 +7308,12 @@ void CMenuPcs::ChkPlaceLength(char* text)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80111588
+ * EN Size: 132b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
+inline void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
 {
 	if (left != 0) {
 		left[0] = '\0';
@@ -7389,12 +7343,12 @@ void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 188b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011163C
+ * EN Size: 216b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFont*, int)
+inline void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFont*, int)
 {
 	SplitPlace(text, left, right);
 	if (left != 0) {
@@ -7943,12 +7897,12 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 388b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801130AC
+ * EN Size: 548b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawMainMenuBase(float baseAlpha)
+inline void CMenuPcs::DrawMainMenuBase(float baseAlpha)
 {
 	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char* const frame = m_wm.m_frameInfo;
@@ -7999,12 +7953,12 @@ void CMenuPcs::DrawMainMenuBase(float baseAlpha)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801132D0
+ * EN Size: 4b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CalcCharaBase()
+inline void CMenuPcs::CalcCharaBase()
 {
 	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char* const worldObj = m_wm.m_worldObjData;
@@ -8387,12 +8341,12 @@ void CMenuPcs::PCAnimCtrl()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 180b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80113EAC
+ * EN Size: 244b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetAnimNo(int animNo, int)
+inline void CMenuPcs::GetAnimNo(int animNo, int)
 {
 	if (animNo < 0) {
 		animNo = 0;
@@ -8647,14 +8601,8 @@ void CMenuPcs::CalcCharaSelect()
 		}
 
 		if (entry.m_connected == 1 && entry.m_cmakePending == 0) {
-			const bool lockedRepeat = Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1);
-			padRepeat[i] = lockedRepeat
-			                   ? 0
-			                   : Pad.GetPadInputs()[(Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i)].repeatButton;
-			const bool lockedTrig = Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1);
-			padTrig[i] = lockedTrig
-			                 ? 0
-			                 : Pad.GetPadInputs()[(Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i)].buttonDown[0];
+			padRepeat[i] = Pad.GetButtonRepeat(i);
+			padTrig[i] = Pad.GetButtonDown(i);
 		} else {
 			padRepeat[i] = 0;
 			padTrig[i] = 0;
@@ -9477,12 +9425,12 @@ void CMenuPcs::DrawCMLife()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80116144
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::WMSubMenuInit()
+inline void CMenuPcs::WMSubMenuInit()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	bytes[0x14] = 0;
@@ -9928,12 +9876,12 @@ void CMenuPcs::WMChgMenu()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 184b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801169D4
+ * EN Size: 132b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SetParty()
+inline void CMenuPcs::SetParty()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const modelData = m_wm.m_charaModelData;
@@ -9996,66 +9944,6 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 	unsigned char* modelData = m_wm.m_charaModelData + current * 0x34;
 	modelData[0xC] = 0;
 	GetWmCharaHandles(this)[current]->LoadModelASync(3, 0x43, 0);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800eeb9c
- * PAL Size: 232b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::ChgAllModel2()
-{
-	int modelOffset = 0;
-	unsigned char* handleData = reinterpret_cast<unsigned char*>(this);
-	int pdtOffset = modelOffset;
-	int i = 0;
-
-	do {
-		unsigned char* pdtData =
-		    m_cmakeWork + pdtOffset + 0x14D0;
-		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
-		unsigned int race;
-		int variant;
-		unsigned int index;
-		int modelId;
-		int loadMode;
-
-		if (*reinterpret_cast<int*>(pdtData + 0x5B4) != 0) {
-			race = *reinterpret_cast<unsigned short*>(pdtData + 0x2E);
-			index = *reinterpret_cast<unsigned short*>(pdtData + 0x32);
-			variant = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
-		} else {
-			race = 0xFFFFFFFF;
-			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
-			index = 0xFFFFFFFF;
-			variant = 0xFFFFFFFF;
-		}
-
-		modelData = m_wm.m_charaModelData + modelOffset;
-		if ((int)race >= 0) {
-			loadMode = 0;
-			modelId = race * 200 + 100;
-			if (variant != 0) {
-				modelId += 100;
-			}
-			modelId += index;
-			modelData[0xC] = 1;
-		} else {
-			modelData[0xC] = 0;
-			loadMode = 3;
-			modelId = 0x43;
-		}
-
-		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
-		i++;
-		modelOffset += 0x34;
-		handleData += 4;
-		pdtOffset += 0x9C0;
-	} while (i < kWmMenuPlayerCount);
 }
 
 /*
@@ -10125,14 +10013,74 @@ void CMenuPcs::ChgAllModel()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 660b
+ * PAL Address: 0x800eeb9c
+ * PAL Size: 232b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SetMakeChara(int slot)
+void CMenuPcs::ChgAllModel2()
+{
+	int modelOffset = 0;
+	unsigned char* handleData = reinterpret_cast<unsigned char*>(this);
+	int pdtOffset = modelOffset;
+	int i = 0;
+
+	do {
+		unsigned char* pdtData =
+		    m_cmakeWork + pdtOffset + 0x14D0;
+		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
+		unsigned int race;
+		int variant;
+		unsigned int index;
+		int modelId;
+		int loadMode;
+
+		if (*reinterpret_cast<int*>(pdtData + 0x5B4) != 0) {
+			race = *reinterpret_cast<unsigned short*>(pdtData + 0x2E);
+			index = *reinterpret_cast<unsigned short*>(pdtData + 0x32);
+			variant = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
+		} else {
+			race = 0xFFFFFFFF;
+			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
+			index = 0xFFFFFFFF;
+			variant = 0xFFFFFFFF;
+		}
+
+		modelData = m_wm.m_charaModelData + modelOffset;
+		if ((int)race >= 0) {
+			loadMode = 0;
+			modelId = race * 200 + 100;
+			if (variant != 0) {
+				modelId += 100;
+			}
+			modelId += index;
+			modelData[0xC] = 1;
+		} else {
+			modelData[0xC] = 0;
+			loadMode = 3;
+			modelId = 0x43;
+		}
+
+		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
+		i++;
+		modelOffset += 0x34;
+		handleData += 4;
+		pdtOffset += 0x9C0;
+	} while (i < kWmMenuPlayerCount);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 660b
+ * EN Address: 0x80116C58
+ * EN Size: 576b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::SetMakeChara(int slot)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const selectData = m_wm.m_charaSelectData;
@@ -10289,26 +10237,7 @@ void CMenuPcs::DrawCursor(int x, int y, float scale)
 void CMenuPcs::CalcMainMenuSub()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	int port = 0;
-	bool noInput = false;
-	u32 btnRaw;
-	if (Pad.m_debugPadLock == 0) {
-		if (port != 0) {
-			goto input_check_done;
-		}
-		if (Pad.m_debugPadPort == -1) {
-			goto input_check_done;
-		}
-	}
-	noInput = true;
-input_check_done:
-	if (noInput) {
-		btnRaw = 0;
-	} else {
-		u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
-		btnRaw = Pad.GetPadInputs()[clamped].buttonDown[0];
-	}
-	const unsigned short btn = static_cast<unsigned short>(btnRaw);
+	const unsigned short btn = Pad.GetButtonDown(0);
 	const short state = m_wmWorldState->m_mainState;
 
 	if (((state > 0) && (state < 4)) || m_wmWorldState->m_cardChannel == 1) {
@@ -10574,12 +10503,12 @@ input_check_done:
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80118104
+ * EN Size: 300b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::ChkSelectParty()
+inline void CMenuPcs::ChkSelectParty()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const modelData = m_wm.m_charaModelData;
@@ -10840,12 +10769,12 @@ void CMenuPcs::GetMcOdekakePos(int* x, int* y)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80118790
+ * EN Size: 108b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::ChkMcDataCnt()
+inline void CMenuPcs::ChkMcDataCnt()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const list = m_wmWorkBuffer;
@@ -11581,12 +11510,12 @@ LAB_next:
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 248b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011A1BC
+ * EN Size: 372b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawHelpBase(int kind, float baseAlpha)
+inline void CMenuPcs::DrawHelpBase(int kind, float baseAlpha)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const worldState = m_wmWorldState;
@@ -11726,12 +11655,12 @@ void CMenuPcs::CalcMcObj()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 804b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011A654
+ * EN Size: 228b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawMcObj()
+inline void CMenuPcs::DrawMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldObj = m_wm.m_worldObjData;
@@ -11780,12 +11709,12 @@ void CMenuPcs::DrawMcObj()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 188b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011A738
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SetMcList(int index, McListInfo* info)
+inline void CMenuPcs::SetMcList(int index, McListInfo* info)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const list = m_wmWorkBuffer;
@@ -11806,7 +11735,7 @@ void CMenuPcs::SetMcList(int index, McListInfo* info)
  * JP Address: TODO
  * JP Size: TODO
  */
-void McListInfo::operator= (const McListInfo& src)
+inline void McListInfo::operator= (const McListInfo& src)
 {
 	memcpy(this, &src, kMcListEntrySize);
 }
@@ -11815,12 +11744,12 @@ void McListInfo::operator= (const McListInfo& src)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011A838
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::ClrMcList()
+inline void CMenuPcs::ClrMcList()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const list = m_wmWorkBuffer;
@@ -11907,12 +11836,12 @@ void CMenuPcs::SetLight(int mode)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 524b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011AACC
+ * EN Size: 680b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawPageMark()
+inline void CMenuPcs::DrawPageMark()
 {
 	int x;
 	int y;
@@ -12461,12 +12390,12 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011C2E8
+ * EN Size: 316b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SetTextureLoc(int index)
+inline void CMenuPcs::SetTextureLoc(int index)
 {
 	if (index < 0) {
 		index = 0;
@@ -12825,12 +12754,12 @@ int CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 520b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011CA28
+ * EN Size: 340b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::IsAsyncCharaLoadFinish()
+inline void CMenuPcs::IsAsyncCharaLoadFinish()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	int ready = 1;
@@ -12866,7 +12795,7 @@ void CMenuPcs::IsAsyncCharaLoadFinish()
  * JP Address: TODO
  * JP Size: TODO
  */
-McCtrl::McCtrl()
+inline McCtrl::McCtrl()
 {
 	Init();
 }
@@ -12880,7 +12809,7 @@ McCtrl::McCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-McCtrl::~McCtrl()
+inline McCtrl::~McCtrl()
 {
 	return;
 }
@@ -12894,7 +12823,7 @@ McCtrl::~McCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::Init()
+inline void McCtrl::Init()
 {
 	m_previousState = 0;
 	m_state = 0;
@@ -13165,12 +13094,12 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 232b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011D25C
+ * EN Size: 108b
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::SetBrokenFile(int isBroken)
+inline void McCtrl::SetBrokenFile(int isBroken)
 {
 	m_createFlag = isBroken;
 	if (isBroken != 0) {
@@ -14293,12 +14222,12 @@ int McCtrl::SaveDataBuffer(char* buffer)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 244b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011F050
+ * EN Size: 184b
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::ChkParty(char*)
+inline void McCtrl::ChkParty(char*)
 {
 	m_lastResult = 0;
 	if (m_userBuffer == 0) {

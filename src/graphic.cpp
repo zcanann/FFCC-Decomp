@@ -1329,13 +1329,13 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
             textureSize /= 2;
         }
 
-        GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
-        GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, static_cast<_GXTexFmt>(texFormat), GX_FALSE);
+        GXSetTexCopySrc(x, y, width, height);
+        GXSetTexCopyDst(width, height, static_cast<_GXTexFmt>(texFormat), GX_FALSE);
         DCInvalidateRange(m_scratchTextureBuffer, textureSize);
         GXCopyTex(m_scratchTextureBuffer, doClear);
         GXPixModeSync();
         GXInvalidateTexAll();
-        GXInitTexObj(&m_backBufferTexObj, m_scratchTextureBuffer, width & 0xFFFF, height & 0xFFFF,
+        GXInitTexObj(&m_backBufferTexObj, m_scratchTextureBuffer, width, height,
                      static_cast<_GXTexFmt>(texFormat), GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&m_backBufferTexObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF,
                         kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
@@ -1370,14 +1370,14 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
         return;
     }
     {
-        void* textureBase;
-        int textureSize = GXGetTexBufferSize((u16)width, (u16)height, format, GX_FALSE, GX_FALSE);
-        textureBase = reinterpret_cast<void*>(OSRoundUp32B(static_cast<u8*>(dstBuffer) + OSRoundUp32B(dstOffset)));
+        int textureSize = GXGetTexBufferSize(width, height, format, GX_FALSE, GX_FALSE);
+        dstBuffer = static_cast<u8*>(dstBuffer) + OSRoundUp32B(dstOffset);
+        dstBuffer = reinterpret_cast<void*>(OSRoundUp32B(dstBuffer));
 
-        GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, (u16)width, (u16)height);
-        GXSetTexCopyDst((u16)width, (u16)height, format, GX_FALSE);
-        DCInvalidateRange(textureBase, textureSize);
-        GXCopyTex(textureBase, doClear);
+        GXSetTexCopySrc(x, y, width, height);
+        GXSetTexCopyDst(width, height, format, GX_FALSE);
+        DCInvalidateRange(dstBuffer, textureSize);
+        GXCopyTex(dstBuffer, doClear);
         GXPixModeSync();
         GXInvalidateTexAll();
 
@@ -1402,7 +1402,7 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
         }
 
         if (texObj != nullptr) {
-            GXInitTexObj(texObj, textureBase, (u16)width, (u16)height, format, GX_CLAMP, GX_CLAMP,
+            GXInitTexObj(texObj, dstBuffer, width, height, format, GX_CLAMP, GX_CLAMP,
                          GX_FALSE);
             float zero = LoadFloat(kGraphicZeroF);
             GXInitTexObjLOD(texObj, filter, filter, zero, zero, zero, GX_FALSE, GX_FALSE,

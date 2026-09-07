@@ -295,9 +295,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     packedWork.bytes[2] = (u8)(work->m_position[2] >> 7);
     packedWork.bytes[3] = (u8)(work->m_position[3] >> 7);
 
-    i4TexSize = GXGetTexBufferSize((int)kPppAlignmentScaleScreenWidth, (int)kPppAlignmentScaleScreenHalfHeight,
+    i4TexSize = GXGetTexBufferSize(kPppAlignmentScaleScreenWidth, kPppAlignmentScaleScreenHalfHeight,
                                    (GXTexFmt)6, GX_FALSE, 0);
-    rgba8TexSize = GXGetTexBufferSize((int)kPppAlignmentScaleScreenWidth, (int)kPppAlignmentScaleScreenHalfHeight,
+    rgba8TexSize = GXGetTexBufferSize(kPppAlignmentScaleScreenWidth, kPppAlignmentScaleScreenHalfHeight,
                                       (GXTexFmt)0x28, GX_FALSE, 0);
 
     managerPos.x = ppvMng->m_matrix.value[0][3];

@@ -125,6 +125,25 @@ public:
     void CalcQuake();
     void calc();
 
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: 0x80022F18
+     * EN Size: 36b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void GetClip(float* nearZ, float* farZ)
+    {
+        if (nearZ != 0) {
+            *nearZ = m_nearZ;
+        }
+        if (farZ != 0) {
+            *farZ = m_farZ;
+        }
+    }
+
     void SetStdProjectionMatrix();
     void draw();
 

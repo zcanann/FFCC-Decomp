@@ -64,16 +64,6 @@ extern const float kGraphicNoiseTexScaleU = 0.015625f;
 extern const float kGraphicNoiseTexScaleV = 0.010416667163372f;
 extern const char sGraphicUnknownOrderName[4] = "---";
 
-static inline float CameraNearZ()
-{
-    return CameraPcs.m_nearZ;
-}
-
-static inline float CameraFarZ()
-{
-    return CameraPcs.m_farZ;
-}
-
 static inline float CameraWorldX()
 {
     return CameraPcs.m_positionX;
@@ -1059,8 +1049,8 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
  * --INFO--
  * PAL Address: 0x80018300
  * PAL Size: 1124b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001FCA8
+ * EN Size: 892b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1112,66 +1102,24 @@ void CGraphic::makeSphere()
     int ringStart = 1;
     for (; ring < 5; ring++) {
         int current = ringStart;
-        for (int seg = 0; seg < 8; seg += 2) {
-            int i0 = current;
-            current += 2;
-
-            GXWGFifo.f32 = vertices[i0 * 3 + 1];
-            GXWGFifo.f32 = vertices[i0 * 3 + 0];
-            GXWGFifo.f32 = vertices[i0 * 3 + 2];
-
-            int next0 = ringStart + ((seg + 1) % 8);
-            GXWGFifo.f32 = vertices[next0 * 3 + 1];
-            GXWGFifo.f32 = vertices[next0 * 3 + 0];
-            GXWGFifo.f32 = vertices[next0 * 3 + 2];
-
-            int ringBase = ringStart;
-            int next1 = ringBase + ((seg + 2) % 8);
-            GXWGFifo.f32 = vertices[(i0 + 1) * 3 + 1];
-            GXWGFifo.f32 = vertices[(i0 + 1) * 3 + 0];
-            GXWGFifo.f32 = vertices[(i0 + 1) * 3 + 2];
-
-            GXWGFifo.f32 = vertices[next1 * 3 + 1];
-            GXWGFifo.f32 = vertices[next1 * 3 + 0];
-            GXWGFifo.f32 = vertices[next1 * 3 + 2];
+        for (int seg = 0; seg < 8; seg++) {
+            GXPosition3f32(vertices[current * 3 + 1], vertices[current * 3], vertices[current * 3 + 2]);
+            int next = ringStart + (seg + 1) % 8;
+            GXPosition3f32(vertices[next * 3 + 1], vertices[next * 3], vertices[next * 3 + 2]);
+            current++;
         }
         ringStart += 8;
     }
 
     for (int seg = 0; seg < 8; seg++) {
         int ring = 0;
-        int ringPairBase = 1;
-        for (int ringPair = 0; ringPair < 3; ringPair++) {
-            int idx0 = ring == 0 ? 0 : (ring - 1) * 8 + seg + 1;
-            GXWGFifo.f32 = vertices[idx0 * 3 + 1];
-            GXWGFifo.f32 = vertices[idx0 * 3 + 0];
-            GXWGFifo.f32 = vertices[idx0 * 3 + 2];
-
-            int idx2 = 0x29;
-            if (ring + 1 != 6) {
-                idx2 = seg + ringPairBase;
-            }
-            GXWGFifo.f32 = vertices[idx2 * 3 + 1];
-            int vertexIndex = idx2;
-            GXWGFifo.f32 = vertices[vertexIndex * 3 + 0];
-            GXWGFifo.f32 = vertices[idx2 * 3 + 2];
-
-            ringPairBase += 8;
-            ring++;
-            int idx1 = ring == 0 ? 0 : (ring - 1) * 8 + seg + 1;
-            GXWGFifo.f32 = vertices[idx1 * 3 + 1];
-            GXWGFifo.f32 = vertices[idx1 * 3 + 0];
-            GXWGFifo.f32 = vertices[idx1 * 3 + 2];
-
-            int idx3 = 0x29;
-            if (ring + 1 != 6) {
-                idx3 = seg + ringPairBase;
-            }
-            ringPairBase += 8;
-            ring++;
-            GXWGFifo.f32 = vertices[idx3 * 3 + 1];
-            GXWGFifo.f32 = vertices[idx3 * 3 + 0];
-            GXWGFifo.f32 = vertices[idx3 * 3 + 2];
+        int ringBase = 1;
+        for (; ring < 6; ring++) {
+            int current = ring == 0 ? 0 : (ring - 1) * 8 + seg + 1;
+            GXPosition3f32(vertices[current * 3 + 1], vertices[current * 3], vertices[current * 3 + 2]);
+            int next = ring + 1 == 6 ? 41 : seg + ringBase;
+            GXPosition3f32(vertices[next * 3 + 1], vertices[next * 3], vertices[next * 3 + 2]);
+            ringBase += 8;
         }
     }
 
@@ -1283,24 +1231,19 @@ void CGraphic::SetFogParam(float startZ, float endZ)
  * --INFO--
  * PAL Address: 0x80017ea8
  * PAL Size: 148b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800203D4
+ * EN Size: 204b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGraphic::SetFog(int useFog, int useGlobalColor)
+void CGraphic::SetFog(int useFog, int useBlack)
 {
+    static _GXColor black = {0, 0, 0, 0};
     float nearZ;
     float farZ;
+    CameraPcs.GetClip(&nearZ, &farZ);
 
-    if (&nearZ != 0) {
-        nearZ = CameraNearZ();
-    }
-    if (&farZ != 0) {
-        farZ = CameraFarZ();
-    }
-
-    GXSetFog(useFog != 0 ? GX_FOG_LIN : GX_FOG_NONE, m_fogStart, m_fogEnd, nearZ, farZ, useGlobalColor != 0 ? gGraphicDefaultClearColor : m_fogColor);
+    GXSetFog(useFog != 0 ? GX_FOG_LIN : GX_FOG_NONE, m_fogStart, m_fogEnd, nearZ, farZ, useBlack != 0 ? black : m_fogColor);
 }
 
 /*

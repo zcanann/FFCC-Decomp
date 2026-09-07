@@ -176,4 +176,60 @@ inline unsigned short CPad::GetButtonDown(long padIndex)
     return static_cast<unsigned short>(result);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x800B9AE0
+ * PAL Size: 100b
+ * EN Address: 0x800AA5CC
+ * EN Size: 164b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline unsigned short CPad::GetButtonRepeat(long padIndex)
+{
+    bool shouldZero = false;
+    unsigned int result;
+
+    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
+        shouldZero = true;
+    }
+
+    if (shouldZero) {
+        result = 0;
+    } else {
+        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
+        result = GetPadInputs()[resolvedIndex].repeatButton;
+    }
+
+    return static_cast<unsigned short>(result);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9BB8
+ * PAL Size: 100b
+ * EN Address: 0x8004429C
+ * EN Size: 164b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline unsigned short CPad::GetButton(long padIndex)
+{
+    bool shouldZero = false;
+    unsigned int result;
+
+    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
+        shouldZero = true;
+    }
+
+    if (shouldZero) {
+        result = 0;
+    } else {
+        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
+        result = GetPadInputs()[resolvedIndex].button[0];
+    }
+
+    return static_cast<unsigned short>(result);
+}
+
 #endif

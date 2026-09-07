@@ -289,38 +289,9 @@ int CMenuPcs::EquipOpen0()
  */
 int CMenuPcs::EquipCtrlCur()
 {
-	bool blocked = false;
-	int press;
-	int hold;
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-
-	int padLock = Pad.m_debugPadLock;
-	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-		blocked = true;
-	}
-	unsigned int rawPress;
-	if (blocked) {
-		rawPress = 0;
-	} else {
-		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		rawPress = Pad.GetPadInputs()[padIndex].buttonDown[0];
-	}
-	press = (s16)(u16)rawPress;
-
-	blocked = false;
-	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-		blocked = true;
-	}
-	unsigned int rawHold;
-	if (blocked) {
-		rawHold = 0;
-	} else {
-		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		rawHold = Pad.GetPadInputs()[padIndex].repeatButton;
-	}
-	hold = (s16)(u16)rawHold;
+	int press = static_cast<s16>(Pad.GetButtonDown(0));
+	int hold = static_cast<s16>(Pad.GetButtonRepeat(0));
 
 	if (hold == 0) {
 		return 0;

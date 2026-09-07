@@ -40,40 +40,6 @@ static inline float LoadFloat(float value)
 	return value;
 }
 
-static inline unsigned int GetMenuPressLock(int lock)
-{
-	bool activeInput = false;
-
-	if ((lock != 0) || (Pad.m_debugPadPort != -1)) {
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		return 0;
-	}
-
-	int padIndex = 0;
-	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-	return Pad.GetPadInputs()[padIndex].buttonDown[0];
-}
-
-static inline unsigned int GetMenuRepeatLock(int lock)
-{
-	bool activeInput = false;
-
-	if ((lock != 0) || (Pad.m_debugPadPort != -1)) {
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		return 0;
-	}
-
-	int padIndex = 0;
-	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-	return Pad.GetPadInputs()[padIndex].repeatButton;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80160edc
@@ -412,13 +378,12 @@ int CMenuPcs::CompaClose()
  */
 void CMenuPcs::CompaCtrl()
 {
-	int padState = Pad.m_debugPadLock;
 	short press;
 	short hold;
 	int doReset;
 
-	press = GetMenuPressLock(padState) & 0xffff;
-	hold = GetMenuRepeatLock(padState) & 0xffff;
+	press = Pad.GetButtonDown(0);
+	hold = Pad.GetButtonRepeat(0);
 
 	if (hold == 0) {
 		doReset = 0;

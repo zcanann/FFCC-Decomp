@@ -162,32 +162,6 @@ static inline float CalcCmakeFadeAlpha(CMenuPcs* menu)
     return static_cast<float>(1.0 - 0.1 * static_cast<double>(frame));
 }
 
-static unsigned short GetCmakePadDown()
-{
-    unsigned char noPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    int held;
-    if (noPad) {
-        held = 0;
-    } else {
-        int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-        held = Pad.GetPadInputs()[padIndex].buttonDown[0];
-    }
-    return static_cast<unsigned short>(held);
-}
-
-static unsigned short GetCmakePadRepeat()
-{
-    unsigned char noPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    int held;
-    if (noPad) {
-        held = 0;
-    } else {
-        int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-        held = Pad.GetPadInputs()[padIndex].repeatButton;
-    }
-    return static_cast<unsigned short>(held);
-}
-
 static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
 {
     int modelBlock = MenuS32(menu, 0x814);
@@ -444,12 +418,12 @@ static inline char* GetCmakeNameBuffer()
     return s_CmakeInfo.m_name;
 }
 
-static void LoadCmakeVillageName()
+static inline void LoadCmakeVillageName()
 {
     strcpy(s_CmakeInfo.m_name, Game.m_gameWork.m_townName);
 }
 
-static void StoreCmakeVillageName()
+static inline void StoreCmakeVillageName()
 {
     memset(Game.m_gameWork.m_townName, 0, 17);
     strcpy(Game.m_gameWork.m_townName, s_CmakeInfo.m_name);
@@ -470,7 +444,7 @@ static bool IsCmakeNameBlank(const char* name)
     return true;
 }
 
-static int IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
+static inline int IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
 {
     const char* nm = name;
     int slot = 0;
@@ -912,36 +886,8 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     const char* name;
     char picked[8];
 
-    bool padBusy = false;
-    int padLock = Pad.m_debugPadLock;
-    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-        padBusy = true;
-    }
-    {
-        int held;
-        if (padBusy) {
-            held = 0;
-        } else {
-            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-            held = Pad.GetPadInputs()[padIndex].buttonDown[0];
-        }
-        down = static_cast<short>(static_cast<unsigned short>(held));
-    }
-
-    padBusy = false;
-    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-        padBusy = true;
-    }
-    {
-        int held;
-        if (padBusy) {
-            held = 0;
-        } else {
-            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-            held = Pad.GetPadInputs()[padIndex].repeatButton;
-        }
-        repeat = static_cast<short>(static_cast<unsigned short>(held));
-    }
+    down = Pad.GetButtonDown(0);
+    repeat = Pad.GetButtonRepeat(0);
 
     if (repeat == 0) {
         return 0;
@@ -1760,42 +1706,13 @@ void CMenuPcs::CmakeJobClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_common_subs off
 int CMenuPcs::CmakeJobCtrl()
 {
     short repeat;
     short down;
 
-    bool padBusy = false;
-    int padLock = Pad.m_debugPadLock;
-    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-        padBusy = true;
-    }
-    {
-        int held;
-        if (padBusy) {
-            held = 0;
-        } else {
-            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-            held = Pad.GetPadInputs()[padIndex].buttonDown[0];
-        }
-        down = static_cast<short>(static_cast<unsigned short>(held));
-    }
-
-    padBusy = false;
-    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-        padBusy = true;
-    }
-    {
-        int held;
-        if (padBusy) {
-            held = 0;
-        } else {
-            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-            held = Pad.GetPadInputs()[padIndex].repeatButton;
-        }
-        repeat = static_cast<short>(static_cast<unsigned short>(held));
-    }
+    down = Pad.GetButtonDown(0);
+    repeat = Pad.GetButtonRepeat(0);
 
     if (repeat == 0) {
         return 0;
@@ -1875,7 +1792,6 @@ int CMenuPcs::CmakeJobCtrl()
     }
     return 0;
 }
-#pragma opt_common_subs on
 
 /*
  * --INFO--
@@ -2080,36 +1996,8 @@ int CMenuPcs::CmakeTribeCtrl()
     short repeat;
     short down;
 
-    bool padBusy = false;
-    int padLock = Pad.m_debugPadLock;
-    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-        padBusy = true;
-    }
-    {
-        int held;
-        if (padBusy) {
-            held = 0;
-        } else {
-            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-            held = Pad.GetPadInputs()[padIndex].buttonDown[0];
-        }
-        down = static_cast<short>(static_cast<unsigned short>(held));
-    }
-
-    padBusy = false;
-    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-        padBusy = true;
-    }
-    {
-        int held;
-        if (padBusy) {
-            held = 0;
-        } else {
-            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-            held = Pad.GetPadInputs()[padIndex].repeatButton;
-        }
-        repeat = static_cast<short>(static_cast<unsigned short>(held));
-    }
+    down = Pad.GetButtonDown(0);
+    repeat = Pad.GetButtonRepeat(0);
 
     if (repeat == 0) {
         return 0;
@@ -2574,43 +2462,14 @@ void CMenuPcs::CmakeNameClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_common_subs off
 int CMenuPcs::CmakeNameCtrl()
 {
     short repeat;
     short down;
     const char* name;
 
-    bool padBusy = false;
-    int padLock = Pad.m_debugPadLock;
-    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-        padBusy = true;
-    }
-    {
-        int held;
-        if (padBusy) {
-            held = 0;
-        } else {
-            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-            held = Pad.GetPadInputs()[padIndex].buttonDown[0];
-        }
-        down = static_cast<short>(static_cast<unsigned short>(held));
-    }
-
-    padBusy = false;
-    if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-        padBusy = true;
-    }
-    {
-        int held;
-        if (padBusy) {
-            held = 0;
-        } else {
-            int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-            held = Pad.GetPadInputs()[padIndex].repeatButton;
-        }
-        repeat = static_cast<short>(static_cast<unsigned short>(held));
-    }
+    down = Pad.GetButtonDown(0);
+    repeat = Pad.GetButtonRepeat(0);
 
     if (repeat == 0) {
         return 0;
@@ -2819,7 +2678,6 @@ int CMenuPcs::CmakeNameCtrl()
 
     return 0;
 }
-#pragma opt_common_subs on
 
 /*
  * --INFO--
@@ -3143,14 +3001,14 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 348b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
+inline void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -3175,14 +3033,14 @@ void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 340b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
+inline void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
 {
     (void)page;
 
@@ -3284,14 +3142,14 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 304b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawCmakeBallCursor(int kind, int frame, float alpha)
+inline void CMenuPcs::DrawCmakeBallCursor(int kind, int frame, float alpha)
 {
     DrawCrystal(kind, frame, alpha);
 }
@@ -3363,28 +3221,28 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 332b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawCmakePageMark(float alpha)
+inline void CMenuPcs::DrawCmakePageMark(float alpha)
 {
     DrawCrystal(0, 0, alpha);
 }
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 424b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawCmakeNameBase(int page, float alpha)
+inline void CMenuPcs::DrawCmakeNameBase(int page, float alpha)
 {
     DrawCmakeWin(0.0f, 0.0f, alpha);
     DrawCmakeTitle(page, 0.0f, alpha);
@@ -3392,14 +3250,14 @@ void CMenuPcs::DrawCmakeNameBase(int page, float alpha)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 360b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawCrystal(int type, int frame, float alpha)
+inline void CMenuPcs::DrawCrystal(int type, int frame, float alpha)
 {
     int index = type + frame;
     if (index < 0) {
@@ -3487,14 +3345,14 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 372b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
+inline void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
 {
     (void)y;
 
@@ -3801,8 +3659,8 @@ void CMenuPcs::CalcSingCMake()
             }
             result = done;
         } else if (CmakeState(this)->m_mode == 1) {
-            down = GetCmakePadDown();
-            repeat = GetCmakePadRepeat();
+            down = Pad.GetButtonDown(0);
+            repeat = Pad.GetButtonRepeat(0);
 
             int done;
             if (repeat == 0) {
@@ -3914,8 +3772,8 @@ void CMenuPcs::CalcSingCMake()
             }
             result = done;
         } else if (CmakeState(this)->m_mode == 1) {
-            down = GetCmakePadDown();
-            repeat = GetCmakePadRepeat();
+            down = Pad.GetButtonDown(0);
+            repeat = Pad.GetButtonRepeat(0);
 
             int done;
             if (repeat == 0) {
@@ -4017,8 +3875,8 @@ void CMenuPcs::CalcSingCMake()
             }
             result = done;
         } else if (CmakeState(this)->m_mode == 1) {
-            down = GetCmakePadDown();
-            repeat = GetCmakePadRepeat();
+            down = Pad.GetButtonDown(0);
+            repeat = Pad.GetButtonRepeat(0);
 
             int done;
             if (repeat == 0) {

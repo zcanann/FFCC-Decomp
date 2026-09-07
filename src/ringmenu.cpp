@@ -907,19 +907,7 @@ void CRingMenu::onCalc()
 						}
 						if ((prevDir != 0) || (nextDir != 0)) {
 							if ((prevDir != 0) && (nextDir != 0)) {
-								const int menuIdx = m_menuIndex;
-								unsigned char lockOut = 0;
-								if ((Pad.m_debugPadLock != 0) || ((menuIdx == 0) && (Pad.m_debugPadPort != -1))) {
-									lockOut = 1;
-								}
-								unsigned short trigger;
-								if (lockOut != 0) {
-									trigger = 0;
-								} else {
-									const int idx =
-										menuIdx & ~(~(Pad.m_debugPadPort - menuIdx | menuIdx - Pad.m_debugPadPort) >> 31);
-									trigger = Pad.GetPadInputs()[idx].button[0];
-								}
+								unsigned short trigger = Pad.GetButton(m_menuIndex);
 								if ((trigger & 0x40) != 0) {
 									nextDir = prevDir;
 								}

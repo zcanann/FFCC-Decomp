@@ -1382,38 +1382,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	int hold;
 	s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	const int padLock = Pad.m_debugPadLock;
-
-	bool blocked = false;
-	int __p12 = padLock;
-	if ((__p12 != 0) || (Pad.m_debugPadPort != -1)) {
-		blocked = true;
-	}
-	if (blocked) {
-		press = 0;
-	} else {
-		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		int __p20 = padIndex;
-		int __p18 = __p20;
-		const int pressRaw = Pad.GetPadInputs()[__p18].buttonDown[0];
-		press = static_cast<u16>(static_cast<u16>(pressRaw));
-	}
-
-	blocked = false;
-	int __p13 =  (int)(unsigned int)(padLock);
-	if ((__p13 != 0) || (Pad.m_debugPadPort != -1)) {
-		blocked = true;
-	}
-	if (blocked) {
-		hold = 0;
-	} else {
-		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		int __p14 = padIndex;
-		const int holdRaw = Pad.GetPadInputs()[__p14].repeatButton;
-		hold = static_cast<u16>(static_cast<s16>(holdRaw));
-	}
+	press = Pad.GetButtonDown(0);
+	hold = Pad.GetButtonRepeat(0);
 
 	if (hold == 0) {
 		return 0;
@@ -1616,8 +1586,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				}
 			}
 		}
-	int __p13 = mode;
-	} else if (__p13 == 2) {
+	} else if (mode == 2) {
 		CmdListStorage* cmdList = GetCmdListStorage(this);
 		const int animSlot = cmdList->listEnd + 3;
 		int maxPos;

@@ -1155,12 +1155,11 @@ void CMenuPcs::InitFrame0Info()
  * --INFO--
  * PAL Address: 0x80101444
  * PAL Size: 532b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801061A0
+ * EN Size: 388b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 void CMenuPcs::InitCharaInfo()
 {
 	float z;
@@ -1173,8 +1172,8 @@ void CMenuPcs::InitCharaInfo()
 	int col;
 	int y;
 
-	zero = FLOAT_803313dc;
-	z = FLOAT_803314A4;
+	zero = 0.0f;
+	z = 50.0f;
 	row = 0;
 	baseSlot = 0x20;
 	baseY = 0x66;
@@ -1215,8 +1214,6 @@ void CMenuPcs::InitCharaInfo()
 		}
 	}
 }
-
-#pragma opt_propagation on
 
 /*
  * --INFO--

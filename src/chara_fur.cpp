@@ -104,9 +104,21 @@ struct FurPickWorkPointers {
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
 extern "C" char lbl_801DB648[];
-extern "C" {
-extern unsigned char m_mogWork[0x2C];
-}
+struct MogWorkState
+{
+    int m_state;
+    int m_frameCount;
+    int m_pickTicks;
+    int m_idleTicks;
+    int m_offColorTicks;
+    int m_eraseTicks;
+    int m_prevScore[3];
+    int m_loopSeHandle;
+    int m_started;
+};
+
+STATIC_ASSERT(sizeof(MogWorkState) == 0x2C);
+MogWorkState m_mogWork;
 static float m_height;
 static void* m_pDisplayList;
 static void* m_pTexBuf;
@@ -148,26 +160,6 @@ struct FurProjectedVertex
 
 STATIC_ASSERT(sizeof(FurProjectedVertex) == 0x30);
 STATIC_ASSERT(offsetof(FurProjectedVertex, m_v) == 0x2C);
-
-struct MogWorkRaw
-{
-    int m_state;
-    int m_frameCount;
-    int m_pickTicks;
-    int m_idleTicks;
-    int m_offColorTicks;
-    int m_eraseTicks;
-    int m_prevScoreA;
-    int m_prevScoreB;
-    int m_prevScoreC;
-    int m_loopSeHandle;
-    int m_started;
-};
-
-static inline MogWorkRaw& MogWork()
-{
-    return *reinterpret_cast<MogWorkRaw*>(m_mogWork);
-}
 
 static inline CMaterialSet* ModelMaterialSet(CChara::CModel* model)
 {
@@ -732,7 +724,7 @@ static inline CColor FurNoiseColor(const CColor& base, const CColor& noise, floa
 	return resultTmp;
 }
 
-void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*);
+static void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*);
 
 namespace {
 
@@ -741,13 +733,17 @@ static inline bool HasDebugPadOverride(int debugPadLock)
 	return (debugPadLock != 0) || (Pad.m_debugPadPort != -1);
 }
 
+static inline int MogPadIndex(int padIndex)
+{
+	return Pad.m_debugPadPort == padIndex ? 0 : padIndex;
+}
+
 static inline unsigned short MogHeldButtons(int debugPadLock)
 {
 	if (HasDebugPadOverride(debugPadLock)) {
 		return 0;
 	}
-	int padIndex = 0;
-	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	int padIndex = MogPadIndex(0);
 	return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].button[0]);
 }
 
@@ -756,29 +752,35 @@ static inline unsigned short MogTriggerButtons(int debugPadLock)
 	if (HasDebugPadOverride(debugPadLock)) {
 		return 0;
 	}
-	int padIndex = 0;
-	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+	int padIndex = MogPadIndex(0);
 	return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
 }
 
-static inline int MogPadInt(int debugPadLock, int offset)
+static inline int MogDigitalStickOverride(int debugPadLock)
 {
 	if (HasDebugPadOverride(debugPadLock)) {
 		return 0;
 	}
-	int padIndex = 0;
-	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * sizeof(CPad::PadInput) + offset);
+	int padIndex = MogPadIndex(0);
+	return Pad.GetPadInputs()[padIndex].digitalStickOverride;
 }
 
-static inline float MogPadFloat(int debugPadLock, int offset)
+static inline float MogLeftStickX(int debugPadLock)
 {
 	if (HasDebugPadOverride(debugPadLock)) {
 		return kCharaFurDepthZero;
 	}
-	int padIndex = 0;
-	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-	return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * sizeof(CPad::PadInput) + offset);
+	int padIndex = MogPadIndex(0);
+	return Pad.GetPadInputs()[padIndex].stickXF;
+}
+
+static inline float MogLeftStickY(int debugPadLock)
+{
+	if (HasDebugPadOverride(debugPadLock)) {
+		return kCharaFurDepthZero;
+	}
+	int padIndex = MogPadIndex(0);
+	return Pad.GetPadInputs()[padIndex].stickYF;
 }
 
 static inline unsigned char MogRadarType()
@@ -804,7 +806,7 @@ static inline _GXColor MogBrushColor(unsigned char radarType)
 	}
 }
 
-static inline void StopMogLoopSe(MogWorkRaw& work)
+static inline void StopMogLoopSe(MogWorkState& work)
 {
 	if (work.m_loopSeHandle != 0) {
 		Sound.StopSe(work.m_loopSeHandle);
@@ -860,13 +862,11 @@ static inline void OpenMogHintMessage(int messageId)
 		return;
 	}
 
-	if ((*reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x120))->IsActiveMessage()) {
+	if (MenuPcs.m_battleMesMenus[5]->IsActiveMessage()) {
 		return;
 	}
 
-	CFlatData* flatData = reinterpret_cast<CFlatData*>(reinterpret_cast<unsigned char*>(&Game) + 0xCC38 + sizeof(CFlatData));
-	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<unsigned char*>(flatData) + 0xD4);
-	(*reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x120))->Open(mesPtr[messageId + 8], 0x160, 0x20, 0x220, 0, -1, -1);
+	MenuPcs.m_battleMesMenus[5]->Open(Game.m_cFlatDataArr[1].Message(messageId + 8), 0x160, 0x20, 0x220, 0, -1, -1);
 }
 
 } // namespace
@@ -875,36 +875,34 @@ static inline void OpenMogHintMessage(int messageId)
  * --INFO--
  * PAL Address: 0x800e00a8
  * PAL Size: 4120b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800FF818
+ * EN Size: 4068b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 3
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	int messageId = -1;
 	const int debugPadLock = Pad.m_debugPadLock;
 	const int heldButtons = (unsigned short)MogHeldButtons(debugPadLock);
 	const int triggerButtons = (unsigned short)MogTriggerButtons(debugPadLock);
-	const unsigned short rotateButtons = static_cast<unsigned short>((MogPadInt(debugPadLock, 64) == 0) ? MogHeldButtons(debugPadLock) : static_cast<short>(0));
+	const unsigned short rotateButtons = static_cast<unsigned short>((MogDigitalStickOverride(debugPadLock) == 0) ? MogHeldButtons(debugPadLock) : static_cast<short>(0));
 
-	if (MogWork().m_started == 0) {
+	if (m_mogWork.m_started == 0) {
 		if ((heldButtons & 0x100) != 0) {
 			return;
 		}
-		MogWork().m_started = 1;
+		m_mogWork.m_started = 1;
 	}
 
-	if (MogWork().m_frameCount == 0) {
+	if (m_mogWork.m_frameCount == 0) {
 		messageId = 0;
-		MogWork().m_prevScoreA = Chara.MogFur().m_score[0];
-		MogWork().m_prevScoreB = Chara.MogFur().m_score[1];
-		MogWork().m_prevScoreC = Chara.MogFur().m_score[2];
+		for (int i = 0; i < 3; i++) {
+			m_mogWork.m_prevScore[i] = Chara.MogFur().m_score[i];
+		}
 	}
 
-	if (MogWork().m_state == 0) {
+	if (m_mogWork.m_state == 0) {
 		if ((rotateButtons & 1) != 0) {
 			gObject->m_rotTargetY -= kYmEnvQuarter;
 			if (gObject->m_currentAnimSlot < 0) {
@@ -920,29 +918,28 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 
 		if ((rotateButtons & 8) != 0) {
-			MogWork().m_state = 1;
+			m_mogWork.m_state = 1;
 			gObject->PlayAnim(0x37, 1, 0, -1, -1, 0);
 			messageId = 7;
 		}
-	} else if (MogWork().m_state == 1) {
-		unsigned char* objectBytes = reinterpret_cast<unsigned char*>(gObject);
-		if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD4])) {
+	} else if (m_mogWork.m_state == 1) {
+		if (gObject->m_currentAnimSlot == gObject->m_animSlots[0x37]) {
 			if (gObject->IsLoopAnim(1) != 0) {
 				gObject->PlayAnim(0x38, 1, 0, -1, -1, 0);
 			}
-		} else if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD5])) {
+		} else if (gObject->m_currentAnimSlot == gObject->m_animSlots[0x38]) {
 			if ((rotateButtons & 4) != 0) {
 				gObject->PlayAnim(0x39, 1, 0, -1, -1, 0);
 			}
 		} else if (gObject->IsLoopAnim(1) != 0) {
 			gObject->CancelAnim(1);
-			MogWork().m_state = 0;
+			m_mogWork.m_state = 0;
 		}
 	}
 
-	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * MogPadFloat(debugPadLock, 36) +
+	Chara.MogFur().m_cursorX = static_cast<int>(kYmEnvTen * MogLeftStickX(debugPadLock) +
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)));
-	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogPadFloat(debugPadLock, 40) -
+	Chara.MogFur().m_cursorY = static_cast<int>(-(kYmEnvTen * MogLeftStickY(debugPadLock) -
 	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
 
 	const int cursorXv = static_cast<int>(Chara.MogFur().m_cursorX);
@@ -974,9 +971,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	if ((heldButtons & 0x100) != 0) {
 		if (Chara.MogFur().m_trackedCommandIndex != Chara.MogFur().m_commandIndex) {
 			Chara.MogFur().m_trackedCommandIndex = Chara.MogFur().m_commandIndex;
-			MogWork().m_pickTicks = 0;
-			Sound.StopSe(MogWork().m_loopSeHandle);
-			MogWork().m_loopSeHandle = 0;
+			m_mogWork.m_pickTicks = 0;
+			Sound.StopSe(m_mogWork.m_loopSeHandle);
+			m_mogWork.m_loopSeHandle = 0;
 		}
 		int eraseMode = 0;
 		int doPaint = 1;
@@ -1031,45 +1028,27 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		Chara.CalcMogScore();
 
 		if (pickResult >= 0) {
-			MogWork().m_pickTicks++;
+			m_mogWork.m_pickTicks++;
 
-			int* prevScoreP = &MogWork().m_prevScoreA;
-			int* scoreP = &Chara.MogFur().m_score[0];
-			if (prevScoreP[0] + 5 <= scoreP[0]) {
-				prevScoreP[0] = scoreP[0];
-				messageId = 1;
-			} else if (prevScoreP[0] - 5 > scoreP[0]) {
-				prevScoreP[0] = scoreP[0];
-				messageId = 6;
-			}
-			prevScoreP++;
-			scoreP++;
-			if (prevScoreP[0] + 5 <= scoreP[0]) {
-				prevScoreP[0] = scoreP[0];
-				messageId = 1;
-			} else if (prevScoreP[0] - 5 > scoreP[0]) {
-				prevScoreP[0] = scoreP[0];
-				messageId = 6;
-			}
-			prevScoreP++;
-			scoreP++;
-			if (prevScoreP[0] + 5 <= scoreP[0]) {
-				prevScoreP[0] = scoreP[0];
-				messageId = 1;
-			} else if (prevScoreP[0] - 5 > scoreP[0]) {
-				prevScoreP[0] = scoreP[0];
-				messageId = 6;
+			for (int i = 0; i < 3; i++) {
+				if (m_mogWork.m_prevScore[i] + 5 <= Chara.MogFur().m_score[i]) {
+					m_mogWork.m_prevScore[i] = Chara.MogFur().m_score[i];
+					messageId = 1;
+				} else if (m_mogWork.m_prevScore[i] - 5 > Chara.MogFur().m_score[i]) {
+					m_mogWork.m_prevScore[i] = Chara.MogFur().m_score[i];
+					messageId = 6;
+				}
 			}
 
 			if (pickResult == 0) {
-				MogWork().m_idleTicks++;
-				if (MogWork().m_idleTicks == 0x3C && messageId == -1) {
+				m_mogWork.m_idleTicks++;
+				if (m_mogWork.m_idleTicks == 0x3C && messageId == -1) {
 					messageId = 3;
-				} else if (MogWork().m_idleTicks == 0xF0 && messageId == -1) {
+				} else if (m_mogWork.m_idleTicks == 0xF0 && messageId == -1) {
 					messageId = 4;
 				}
 			} else {
-				MogWork().m_idleTicks = 0;
+				m_mogWork.m_idleTicks = 0;
 			}
 
 			if (doPaint != 0) {
@@ -1081,27 +1060,27 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				_GXColor& particleColor = particleColorObj.color;
 				switch (Chara.MogFur().m_commandIndex) {
 				case 0:
-					MogWork().m_offColorTicks = 0;
+					m_mogWork.m_offColorTicks = 0;
 					particleNo = 0x73;
-					MogWork().m_eraseTicks = 0;
+					m_mogWork.m_eraseTicks = 0;
 					particleColor = CColor(0xF, 4, 4, 2).color;
 					break;
 				case 1:
-					MogWork().m_offColorTicks = 0;
+					m_mogWork.m_offColorTicks = 0;
 					particleNo = 0x73;
-					MogWork().m_eraseTicks = 0;
+					m_mogWork.m_eraseTicks = 0;
 					particleColor = CColor(4, 8, 0xF, 2).color;
 					break;
 				case 2:
-					MogWork().m_offColorTicks = 0;
+					m_mogWork.m_offColorTicks = 0;
 					particleNo = 0x73;
-					MogWork().m_eraseTicks = 0;
+					m_mogWork.m_eraseTicks = 0;
 					particleColor = CColor(4, 0xF, 4, 2).color;
 					break;
 				case 3:
-					MogWork().m_eraseTicks = 0;
+					m_mogWork.m_eraseTicks = 0;
 					if ((((centerBefore.r < 0x0D) || (centerBefore.g < 0x0D)) || (centerBefore.b < 0x0D)) && (centerBefore.a != 0)) {
-						MogWork().m_offColorTicks++;
+						m_mogWork.m_offColorTicks++;
 					}
 					seId = 0x249f4;
 					particleNo = 0x74;
@@ -1109,9 +1088,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					playGate = ((static_cast<int>(System.m_frameCounter) % 16) == 0);
 					break;
 				case 4:
-					MogWork().m_offColorTicks = 0;
+					m_mogWork.m_offColorTicks = 0;
 					if ((doPaint != 0) && (centerBefore.a != 0) && (centerAfter.a == 0)) {
-						MogWork().m_eraseTicks++;
+						m_mogWork.m_eraseTicks++;
 					}
 					emitParticle = 1;
 					particleNo = 0x72;
@@ -1138,34 +1117,34 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 					Sound.PlaySe(seId, 0x40, 0x7F, 0);
 				}
 
-				if (MogWork().m_offColorTicks == 10) {
+				if (m_mogWork.m_offColorTicks == 10) {
 					if (messageId == -1) {
 						messageId = 2;
 					}
-					MogWork().m_offColorTicks++;
+					m_mogWork.m_offColorTicks++;
 				}
-				if (MogWork().m_eraseTicks == 10) {
+				if (m_mogWork.m_eraseTicks == 10) {
 					if (messageId == -1) {
 						messageId = 5;
 					}
-					MogWork().m_eraseTicks++;
+					m_mogWork.m_eraseTicks++;
 				}
-				if (MogWork().m_eraseTicks == 0x32) {
+				if (m_mogWork.m_eraseTicks == 0x32) {
 					if (messageId == -1) {
 						messageId = 6;
 					}
-					MogWork().m_eraseTicks++;
+					m_mogWork.m_eraseTicks++;
 				}
 
 				if (Chara.MogFur().m_commandIndex < 3 && Chara.MogFur().m_commandIndex >= 0 && doPaint != 0
-				    && MogWork().m_loopSeHandle == 0) {
-					MogWork().m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
+				    && m_mogWork.m_loopSeHandle == 0) {
+					m_mogWork.m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
 				}
 			}
 		}
 	} else {
 		if (Chara.MogFur().m_commandIndex < 3 && Chara.MogFur().m_commandIndex >= 0) {
-			StopMogLoopSe(MogWork());
+			StopMogLoopSe(m_mogWork);
 		}
 	}
 
@@ -1178,16 +1157,15 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	}
 
 	OpenMogHintMessage(messageId);
-	MogWork().m_frameCount++;
+	m_mogWork.m_frameCount++;
 }
-#pragma pop
 
 /*
  * --INFO--
  * PAL Address: 0x800e10c0
  * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800FF774
+ * EN Size: 164b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1196,14 +1174,14 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 void CChara::ChangeMogMode(int mogMode)
 {
 	if (mogMode != 0) {
-		memset(m_mogWork, 0, sizeof(MogWorkRaw));
+		memset(&m_mogWork, 0, sizeof(m_mogWork));
 		MogFur().m_cursorX = 0x140;
 		MogFur().m_cursorY = 0xE0;
 		MogFur().m_dirty = 0;
 		return;
 	}
 
-	int& mogSoundHandle = MogWork().m_loopSeHandle;
+	int& mogSoundHandle = m_mogWork.m_loopSeHandle;
 	if (mogSoundHandle != 0) {
 		Sound.StopSe(mogSoundHandle);
 		mogSoundHandle = 0;
@@ -1267,8 +1245,8 @@ void CChara::LoadFurTexBuffer(unsigned short* inTexels)
  * --INFO--
  * PAL Address: 0x800e12e4
  * PAL Size: 280b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800FF390
+ * EN Size: 340b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1281,8 +1259,8 @@ void CChara::CModel::InitMogFurTex()
 	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(const_cast<char*>(sMogFurTextureName)));
 	CTexture* texture = textureSet->GetTexture(textureIdx);
 
-	if ((texture != 0) && (texture->m_format == 4)) {
-		texture->m_format = 5;
+	if ((texture != 0) && (texture->m_format == GX_TF_RGB565)) {
+		texture->m_format = GX_TF_RGB5A3;
 		Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 
 		textureSet = m_texSet;
@@ -1299,9 +1277,7 @@ void CChara::CModel::InitMogFurTex()
 		}
 
 		texture->InitTexObj();
-		int flagsBit = 1;
-		unsigned int flagsTemp = m_flagsA0;
-		m_flagsA0 = static_cast<unsigned char>(__rlwimi(flagsTemp, flagsBit, 6, 25, 25));
+		m_flagsA0Bits.m_flagA0_40 = 1;
 	}
 }
 #pragma pop
@@ -1673,22 +1649,19 @@ noHitReturn:
 }
 
 #pragma pop
-extern "C" {
-unsigned char m_mogWork[0x2C];
-}
 
 /*
  * --INFO--
  * PAL Address: 0x800e2174
  * PAL Size: 1140b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800FDF78
+ * EN Size: 1600b
  * JP Address: TODO
  * JP Size: TODO
  */
 #pragma push
 #pragma opt_loop_invariants off
-void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
+static void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
 {
 	_GXColor defaultColor = CColor(0x0f, 0x0f, 0x0f, 0).color;
 	*centerAfter = defaultColor;
@@ -1723,8 +1696,8 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			const int sdy = dy >> 31;
 			const int ady = (dy ^ sdy) - sdy;
 			distance = adx + ady;
-			tileIndex = ((unsigned int)px % 4 + ((py % 4) * 4 + ((unsigned int)px / 4 * 0x10 + (py / 4) * rowStride))) * 2;
-			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
+			tileIndex = ((unsigned int)px % 4 + ((py % 4) * 4 + ((unsigned int)px / 4 * 0x10 + (py / 4) * rowStride)));
+			packed = pixels[tileIndex];
 
 			b = packed & 0x0f;
 			g = (packed >> 4) & 0x0f;
@@ -1754,7 +1727,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 				b = (b < 0) ? 0 : (b > 0x0f ? 0x0f : b);
 			}
 
-			*(unsigned short*)(((char*)pixels) + tileIndex) = (unsigned short)((a << 12) | (r << 8) | (g << 4) | b);
+			pixels[tileIndex] = (unsigned short)((a << 12) | (r << 8) | (g << 4) | b);
 
 			if (distance == 0) {
 				_GXColor afterColor = CColor((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a).color;

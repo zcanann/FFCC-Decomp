@@ -45,13 +45,82 @@ public:
 		~CAnim();
 
 		void Create(void*, CMemory::CStage*);
-        void SetAmemAddress(int);
-        void GetBankSize();
-        void GetAmemAddress();
-        void AddHistory();
-        void ReleaseBank();
-        void GetHistory();
-        void IsBanked();
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A708
+         * EN Size: 8b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        void SetAmemAddress(int address) { m_bankAddress = address; }
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A710
+         * EN Size: 8b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        unsigned int GetBankSize() { return m_bankSize; }
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A718
+         * EN Size: 8b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        int GetAmemAddress() { return m_bankAddress; }
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A720
+         * EN Size: 16b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        void AddHistory() { m_lastFrame++; }
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A730
+         * EN Size: 68b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        void ReleaseBank()
+        {
+            if (m_bank != 0) {
+                operator delete(m_bank);
+                m_bank = 0;
+            }
+        }
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A774
+         * EN Size: 8b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        int GetHistory() { return m_lastFrame; }
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A77C
+         * EN Size: 48b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        int IsBanked() { return m_bank != 0; }
         void SetLastFrame(int);
         void SetInterp(int);
         void InitQuantize();

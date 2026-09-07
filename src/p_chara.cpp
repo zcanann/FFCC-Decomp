@@ -878,7 +878,7 @@ int CCharaPcs::correctLoadAnimAmem()
     for (int i = 0; i < loadAnimCount; i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
-        const int animEnd = static_cast<int>(anim->m_bankSize) + anim->m_bankAddress;
+        const int animEnd = static_cast<int>(anim->GetBankSize()) + anim->GetAmemAddress();
         if (maxEnd < animEnd) {
             maxEnd = animEnd;
         }
@@ -896,8 +896,8 @@ int CCharaPcs::correctLoadAnimAmem()
 
         for (int i = 0; i < loadAnimCount; i++) {
             CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-            const unsigned int animOffset = static_cast<unsigned int>(loadAnim->m_anim->m_bankAddress);
-            const int animSize = static_cast<int>(loadAnim->m_anim->m_bankSize);
+            const unsigned int animOffset = static_cast<unsigned int>(loadAnim->m_anim->GetAmemAddress());
+            const int animSize = static_cast<int>(loadAnim->m_anim->GetBankSize());
             if (animOffset < static_cast<unsigned int>(scanOffset)) {
                 continue;
             }
@@ -916,7 +916,7 @@ int CCharaPcs::correctLoadAnimAmem()
                 reinterpret_cast<void*>(static_cast<int>(animOffset) + m_amemStage->m_heapTop),
                 static_cast<unsigned long>(animSize));
 
-            loadAnim->m_anim->m_bankAddress = compactedSize + chunkSize;
+            loadAnim->m_anim->SetAmemAddress(compactedSize + chunkSize);
             chunkSize += animSize;
         }
 
@@ -999,9 +999,8 @@ void CCharaPcs::calcAfter()
     for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
-        if (anim->GetRef() == 1 && anim->m_bank != 0) {
-            operator delete(anim->m_bank);
-            anim->m_bank = 0;
+        if (anim->GetRef() == 1) {
+            anim->ReleaseBank();
         }
     }
 
@@ -1009,7 +1008,7 @@ void CCharaPcs::calcAfter()
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         const int bankRefCount = loadAnim->m_anim->GetRef();
         if (bankRefCount == 1) {
-            loadAnim->m_anim->m_lastFrame++;
+            loadAnim->m_anim->AddHistory();
         }
     }
 }
@@ -1027,11 +1026,7 @@ void CCharaPcs::ReleaseAllAnimBank()
             continue;
         }
 
-        void*& bankPtr = loadAnim->m_anim->m_bank;
-        if (bankPtr != 0) {
-            operator delete(bankPtr);
-            bankPtr = 0;
-        }
+        loadAnim->m_anim->ReleaseBank();
     }
 }
 
@@ -1048,11 +1043,8 @@ void CCharaPcs::ReleaseUnusedAnimBank()
             continue;
         }
 
-        void*& bankPtr = loadAnim->m_anim->m_bank;
-        const int bankRefCount = loadAnim->m_anim->GetRef();
-        if (bankRefCount == 1 && bankPtr != 0) {
-            operator delete(bankPtr);
-            bankPtr = 0;
+        if (loadAnim->m_anim->GetRef() == 1) {
+            loadAnim->m_anim->ReleaseBank();
         }
     }
 }
@@ -1078,19 +1070,14 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
 
-        if (anim->m_bank && releaseSize < anim->m_lastFrame) {
-            releaseSize = anim->m_lastFrame;
+        if (anim->IsBanked() && releaseSize < anim->GetHistory()) {
+            releaseSize = anim->GetHistory();
             releaseAnim = loadAnim;
         }
     }
 
     if (releaseAnim != 0) {
-        CChara::CAnim* releaseAnimData = releaseAnim->m_anim;
-        void* bankPtr = releaseAnimData->m_bank;
-        if (bankPtr != 0) {
-            operator delete(bankPtr);
-            releaseAnimData->m_bank = 0;
-        }
+        releaseAnim->m_anim->ReleaseBank();
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(s_charaReleaseAnimBankFmt), releaseSize, releaseAnim->m_name);

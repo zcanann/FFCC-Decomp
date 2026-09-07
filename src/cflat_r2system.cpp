@@ -1305,23 +1305,6 @@ void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
 
 /*
  * --INFO--
- * PAL Address: 0x800B97DC
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CVector CVector::operator+(const CVector& other) const
-{
-    CVector out;
-
-    PSVECAdd((const Vec*)this, (const Vec*)&other, (Vec*)&out);
-    return out;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B984C
  * PAL Size: 28b
  * EN Address: TODO

@@ -24,7 +24,22 @@ public:
 		y = other.y;
 		z = other.z;
 	}
-	CVector operator+(const CVector&) const;
+	/*
+	 * --INFO--
+	 * PAL Address: 0x800B97DC
+	 * PAL Size: 112b
+	 * EN Address: TODO
+	 * EN Size: TODO
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	CVector operator+(const CVector& other) const
+	{
+		CVector out;
+
+		PSVECAdd((const Vec*)this, (const Vec*)&other, (Vec*)&out);
+		return out;
+	}
 	/*
 	 * --INFO--
 	 * PAL Address: 0x800B9884

@@ -56,90 +56,9 @@ static const char lbl_80330260[] = "CRef";
 CCharaPcs CharaPcs;
 CLightPcs::CBumpLight* gCharaPartWorkPtr = 0;
 
-extern "C" void create__9CCharaPcsFv(CCharaPcs*);
-extern "C" void destroy__9CCharaPcsFv(CCharaPcs*);
-extern "C" void calc__9CCharaPcsFv(CCharaPcs*);
-extern "C" void drawBefore__9CCharaPcsFv(CCharaPcs*);
-extern "C" void drawShadow__9CCharaPcsFv(CCharaPcs*);
-extern "C" void draw__9CCharaPcsFv(CCharaPcs*);
-extern "C" void drawOverlap__9CCharaPcsFv(CCharaPcs*);
-extern "C" void calcAfter__9CCharaPcsFv(CCharaPcs*);
-extern "C" void createViewer__9CCharaPcsFv(CCharaPcs*);
-extern "C" void destroyViewer__9CCharaPcsFv(CCharaPcs*);
-extern "C" void calcViewer__9CCharaPcsFv(CCharaPcs*);
-extern "C" void drawViewer__9CCharaPcsFv(CCharaPcs*);
-
 static const char s_CCharaPcs_GAME_801D9128[] = "CCharaPcs(GAME)";
 static const char s_CCharaPcs_VIEWER_801D9138[] = "CCharaPcs(VIEWER)";
 static const char s_CCharaPcs_PART_801D914C[] = "CCharaPcs(PART)";
-
-static CProcessTableCallback s_charaTableDescCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescCalc = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDrawBefore = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBefore__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDrawShadow = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDraw = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDrawOverlap = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawOverlap__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescCalcAfter = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescCreateViewer = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDestroyViewer = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescCalcViewer = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDrawViewer = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescViewerCalcAfter = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescPartCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescPartDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescPartCalc = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescPartDraw = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescPartCalcAfter = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
-
-CProcessTable PTR_s_CCharaPcs_GAME_[3] = {
-    {
-        const_cast<char*>(s_CCharaPcs_GAME_801D9128),
-        {
-            s_charaTableDescCreate.m_thisOffset, s_charaTableDescCreate.m_virtualOffset, s_charaTableDescCreate.m_function,
-            s_charaTableDescDestroy.m_thisOffset, s_charaTableDescDestroy.m_virtualOffset, s_charaTableDescDestroy.m_function,
-            s_charaTableDescCalc.m_thisOffset, s_charaTableDescCalc.m_virtualOffset, s_charaTableDescCalc.m_function,
-            0x1F, 0,
-            s_charaTableDescDrawBefore.m_thisOffset, s_charaTableDescDrawBefore.m_virtualOffset, s_charaTableDescDrawBefore.m_function,
-            0x36, 1,
-            s_charaTableDescDrawShadow.m_thisOffset, s_charaTableDescDrawShadow.m_virtualOffset, s_charaTableDescDrawShadow.m_function,
-            0x30, 1,
-            s_charaTableDescDraw.m_thisOffset, s_charaTableDescDraw.m_virtualOffset, s_charaTableDescDraw.m_function,
-            0x3B, 1,
-            s_charaTableDescDrawOverlap.m_thisOffset, s_charaTableDescDrawOverlap.m_virtualOffset, s_charaTableDescDrawOverlap.m_function,
-            0x46, 1,
-            s_charaTableDescCalcAfter.m_thisOffset, s_charaTableDescCalcAfter.m_virtualOffset, s_charaTableDescCalcAfter.m_function,
-            0x4D, 8,
-        },
-    },
-    {
-        const_cast<char*>(s_CCharaPcs_VIEWER_801D9138),
-        {
-            s_charaTableDescCreateViewer.m_thisOffset, s_charaTableDescCreateViewer.m_virtualOffset, s_charaTableDescCreateViewer.m_function,
-            s_charaTableDescDestroyViewer.m_thisOffset, s_charaTableDescDestroyViewer.m_virtualOffset, s_charaTableDescDestroyViewer.m_function,
-            s_charaTableDescCalcViewer.m_thisOffset, s_charaTableDescCalcViewer.m_virtualOffset, s_charaTableDescCalcViewer.m_function,
-            0x1F, 0,
-            s_charaTableDescDrawViewer.m_thisOffset, s_charaTableDescDrawViewer.m_virtualOffset, s_charaTableDescDrawViewer.m_function,
-            0x3B, 1,
-            s_charaTableDescViewerCalcAfter.m_thisOffset, s_charaTableDescViewerCalcAfter.m_virtualOffset,
-            s_charaTableDescViewerCalcAfter.m_function,
-            0x4D, 0,
-        },
-    },
-    {
-        const_cast<char*>(s_CCharaPcs_PART_801D914C),
-        {
-            s_charaTableDescPartCreate.m_thisOffset, s_charaTableDescPartCreate.m_virtualOffset, s_charaTableDescPartCreate.m_function,
-            s_charaTableDescPartDestroy.m_thisOffset, s_charaTableDescPartDestroy.m_virtualOffset, s_charaTableDescPartDestroy.m_function,
-            s_charaTableDescPartCalc.m_thisOffset, s_charaTableDescPartCalc.m_virtualOffset, s_charaTableDescPartCalc.m_function,
-            0x1F, 0,
-            s_charaTableDescPartDraw.m_thisOffset, s_charaTableDescPartDraw.m_virtualOffset, s_charaTableDescPartDraw.m_function,
-            0x3B, 1,
-            s_charaTableDescPartCalcAfter.m_thisOffset, s_charaTableDescPartCalcAfter.m_virtualOffset, s_charaTableDescPartCalcAfter.m_function,
-            0x4D, 0,
-        },
-    },
-};
 
 inline void* operator new(unsigned long, void* ptr)
 {
@@ -299,14 +218,6 @@ extern const float FLOAT_80330340 = -10000000000.0f;
 static const char s_charaDumpAnimHdr2[] = "no  t num name           lv  mask     addr     banksize banksum  histroy\n";
 static const char s_charaDumpAnimSep[] = "--- - --- -------------- --- -------- -------- -------- -------- --------\n";
 static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %14s %3d %08x %08x %8d %8d %8d\n";
-static const char* s_charaKindPathParts[][3] = {
-    {lbl_80330228, lbl_8033022C, lbl_80330230},
-    {lbl_80330238, lbl_8033023C, lbl_80330230},
-    {lbl_80330240, lbl_80330244, lbl_80330230},
-    {lbl_80330248, lbl_8033024C, lbl_80330230},
-    {lbl_80330250, lbl_80330254, lbl_80330230},
-    {lbl_80330258, lbl_8033025C, lbl_80330230},
-};
 
 #pragma dont_inline on
 template class CPtrArray<CCharaPcs::CLoadPdt*>;
@@ -466,7 +377,7 @@ static int LoadAnimFromDisk(
     CCharaPcs* self, int charaKind, int charaNo, const char* animName, int mergeFileId, int mergeFlags)
 {
     char path[0x100];
-    const char** pathParts = s_charaKindPathParts[charaKind];
+    const char** pathParts = CCharaPcs::m_modelTable[charaKind];
     sprintf(path, s_charaAnimPathFmt, pathParts[0], pathParts[1], charaNo, animName);
 
     CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
@@ -529,7 +440,7 @@ static inline void PruneUnsharedAnimRefs(CCharaPcs* self, CCharaPcs::CLoadAnim* 
 
 static inline void BuildCharaBasePath(int charaKind, unsigned long charaNo, char* outPath)
 {
-    const char** pathParts = s_charaKindPathParts[charaKind];
+    const char** pathParts = CCharaPcs::m_modelTable[charaKind];
     sprintf(outPath, s_charaBasePathFmt, pathParts[0], pathParts[1], static_cast<int>(charaNo), pathParts[1],
             static_cast<int>(charaNo), pathParts[2]);
 }
@@ -726,7 +637,7 @@ void CCharaPcs::Quit()
  */
 int CCharaPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(&PTR_s_CCharaPcs_GAME_[index]);
+    return reinterpret_cast<int>(&m_table[index]);
 }
 
 /*
@@ -3387,3 +3298,49 @@ void CCharaPcs::GetAnimStage()
 {
 	// TODO
 }
+
+#pragma pool_data off
+CProcessCallbackTable CCharaPcs::m_table[3] = {
+    {
+        const_cast<char*>(s_CCharaPcs_GAME_801D9128),
+        static_cast<CProcessCallback>(&CCharaPcs::create),
+        static_cast<CProcessCallback>(&CCharaPcs::destroy),
+        {
+            {static_cast<CProcessCallback>(&CCharaPcs::calc), 0x1F, 0},
+            {static_cast<CProcessCallback>(&CCharaPcs::drawBefore), 0x36, 1},
+            {static_cast<CProcessCallback>(&CCharaPcs::drawShadow), 0x30, 1},
+            {static_cast<CProcessCallback>(&CCharaPcs::draw), 0x3B, 1},
+            {static_cast<CProcessCallback>(&CCharaPcs::drawOverlap), 0x46, 1},
+            {static_cast<CProcessCallback>(&CCharaPcs::calcAfter), 0x4D, 8},
+        },
+    },
+    {
+        const_cast<char*>(s_CCharaPcs_VIEWER_801D9138),
+        static_cast<CProcessCallback>(&CCharaPcs::createViewer),
+        static_cast<CProcessCallback>(&CCharaPcs::destroyViewer),
+        {
+            {static_cast<CProcessCallback>(&CCharaPcs::calcViewer), 0x1F, 0},
+            {static_cast<CProcessCallback>(&CCharaPcs::drawViewer), 0x3B, 1},
+            {static_cast<CProcessCallback>(&CCharaPcs::calcAfter), 0x4D, 0},
+        },
+    },
+    {
+        const_cast<char*>(s_CCharaPcs_PART_801D914C),
+        static_cast<CProcessCallback>(&CCharaPcs::create),
+        static_cast<CProcessCallback>(&CCharaPcs::destroy),
+        {
+            {static_cast<CProcessCallback>(&CCharaPcs::calc), 0x1F, 0},
+            {static_cast<CProcessCallback>(&CCharaPcs::draw), 0x3B, 1},
+            {static_cast<CProcessCallback>(&CCharaPcs::calcAfter), 0x4D, 0},
+        },
+    },
+};
+
+const char* CCharaPcs::m_modelTable[6][3] = {
+    {lbl_80330228, lbl_8033022C, lbl_80330230},
+    {lbl_80330238, lbl_8033023C, lbl_80330230},
+    {lbl_80330240, lbl_80330244, lbl_80330230},
+    {lbl_80330248, lbl_8033024C, lbl_80330230},
+    {lbl_80330250, lbl_80330254, lbl_80330230},
+    {lbl_80330258, lbl_8033025C, lbl_80330230},
+};

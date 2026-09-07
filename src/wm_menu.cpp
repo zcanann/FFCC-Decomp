@@ -1787,10 +1787,9 @@ void CMenuPcs::CalcMCardMenu()
 			m_mcCtrl.m_saveIndex = 0;
 		}
 		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-		Game.m_gameWork.m_wmBackupParams[0] = m_wmWorldState->m_originalBackupParams[0];
-		Game.m_gameWork.m_wmBackupParams[1] = m_wmWorldState->m_originalBackupParams[1];
-		Game.m_gameWork.m_wmBackupParams[2] = m_wmWorldState->m_originalBackupParams[2];
-		Game.m_gameWork.m_wmBackupParams[3] = m_wmWorldState->m_originalBackupParams[3];
+		for (int i = 0; i < kWmMenuControllerCount; i++) {
+			Game.m_gameWork.m_wmBackupParams[i] = m_wmWorldState->m_originalBackupParams[i];
+		}
 		m_wmWorldState->m_flag0A = 0;
 		m_wmWorldState->m_worldReady = 1;
 	}
@@ -1809,47 +1808,20 @@ void CMenuPcs::CalcMCardMenu()
 
 	CalcWMFrame0(static_cast<int>(uVar15));
 
-	float fVar2 = FLOAT_803313e8;
 	if (m_wmWorldState->m_mainState != 2) {
 		return;
 	}
 
-	iVar14 = reinterpret_cast<int>(m_wmWorldState);
 	iVar12 = m_wmWorldState->m_subState;
 	switch (iVar12) {
 	case 0:
 	case 2:
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			m_wmWorldState->m_cardChannel = static_cast<short>(m_mcCtrl.m_cardChannel);
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(fVar2);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(0);
-			iVar14 = 0;
-			int* piVar4 = reinterpret_cast<int*>(GetWinMess(0));
-			int* piVar18 = piVar4;
-			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
-				const char* pcVar10 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4)];
-				if (pcVar10 != 0) {
-					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
-					if (iVar25 > iVar14) iVar14 = iVar25;
-				}
-				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
-			}
-			int iLines = iVar14 / 0x16;
-			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
-			sVar7 = (iLines + 2) * 0x16 + 0x40;
-			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
-			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313F8);
-			iVar12 = (int)(float)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313F8);
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar12;
-			m_menuWindowInfo->width = sVar7;
-			m_menuWindowInfo->height = sVar16;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
+			short windowWidth;
+			short windowHeight;
+			GetWinSize(0, &windowWidth, &windowHeight, 0);
+			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 			m_wmWorldState->m_flag09 = 1;
@@ -1918,36 +1890,10 @@ void CMenuPcs::CalcMCardMenu()
 			else if (iVar12 == 0x1B) { uVar20 = 1; uVar17 = 0x1C; }
 			else if (iVar12 == 0x15) { bVar1 = false; uVar17 = 0xE; }
 			else { uVar17 = 0xF; }
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(uVar20);
-			iVar14 = 0;
-			int* piVar4 = reinterpret_cast<int*>(GetWinMess(uVar17));
-			int* piVar18 = piVar4;
-			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
-				const char* pcVar10 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4)];
-				if (pcVar10 != 0) {
-					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
-					if (iVar25 > iVar14) iVar14 = iVar25;
-				}
-				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
-			}
-			int iLines = iVar14 / 0x16;
-			int __p28 = iLines;
-			if (iVar14 - iLines * 0x16 != 0) iLines = __p28 + 1;
-			sVar7 = (iLines + 2) * 0x16 + 0x40;
-			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313F8);
-			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
-			iVar12 = (int)(float)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313F8);
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar12;
-			m_menuWindowInfo->width = sVar7;
-			m_menuWindowInfo->height = sVar16;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
+			short windowWidth;
+			short windowHeight;
+			GetWinSize(uVar17, &windowWidth, &windowHeight, uVar20);
+			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			m_wmWorldState->m_flag09 = 1;
 			m_wmWorldState->m_counter1A = 0;
@@ -2008,35 +1954,10 @@ void CMenuPcs::CalcMCardMenu()
 	}
 	case 4:
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(0);
-			iVar14 = 0;
-			int* piVar4 = reinterpret_cast<int*>(GetWinMess(6));
-			int* piVar18 = piVar4;
-			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
-				const char* pcVar10 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4)];
-				if (pcVar10 != 0) {
-					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
-					if (iVar25 > iVar14) iVar14 = iVar25;
-				}
-				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
-			}
-			int iLines = iVar14 / 0x16;
-			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
-			sVar7 = (iLines + 2) * 0x16 + 0x40;
-			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
-			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313F8);
-			iVar12 = (int)(float)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313F8);
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar12;
-			m_menuWindowInfo->width = sVar7;
-			m_menuWindowInfo->height = sVar16;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
+			short windowWidth;
+			short windowHeight;
+			GetWinSize(6, &windowWidth, &windowHeight, 0);
+			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			m_mcCtrl.m_previousState = 0;
 			m_mcCtrl.m_state = 0;
@@ -2088,35 +2009,10 @@ void CMenuPcs::CalcMCardMenu()
 				uVar17 = 0x12;
 				m_wmWorldState->m_cardChannel = 1;
 			}
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(uVar20);
-			iVar14 = 0;
-			int* piVar4 = reinterpret_cast<int*>(GetWinMess(uVar17));
-			int* piVar18 = piVar4;
-			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
-				const char* pcVar10 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4)];
-				if (pcVar10 != 0) {
-					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
-					if (iVar25 > iVar14) iVar14 = iVar25;
-				}
-				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
-			}
-			int iLines = iVar14 / 0x16;
-			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
-			sVar7 = (iLines + 2) * 0x16 + 0x40;
-			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
-			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313F8);
-			iVar12 = (int)(float)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313F8);
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar12;
-			m_menuWindowInfo->width = sVar7;
-			m_menuWindowInfo->height = sVar16;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
+			short windowWidth;
+			short windowHeight;
+			GetWinSize(uVar17, &windowWidth, &windowHeight, uVar20);
+			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			m_wmWorldState->m_flag09 = 1;
 		}
@@ -2179,35 +2075,10 @@ void CMenuPcs::CalcMCardMenu()
 			if (iVar12 == 0xD) { uVar17 = 7; }
 			else if (iVar12 == 0x1A) { uVar17 = 0x1A; uVar20 = 1; }
 			else { uVar17 = 8; }
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(uVar20);
-			iVar14 = 0;
-			int* piVar4 = reinterpret_cast<int*>(GetWinMess(uVar17));
-			int* piVar18 = piVar4;
-			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
-				const char* pcVar10 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4)];
-				if (pcVar10 != 0) {
-					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
-					if (iVar25 > iVar14) iVar14 = iVar25;
-				}
-				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
-			}
-			int iLines = iVar14 / 0x16;
-			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
-			sVar7 = (iLines + 2) * 0x16 + 0x40;
-			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
-			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313F8);
-			iVar12 = (int)(float)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313F8);
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar12;
-			m_menuWindowInfo->width = sVar7;
-			m_menuWindowInfo->height = sVar16;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
+			short windowWidth;
+			short windowHeight;
+			GetWinSize(uVar17, &windowWidth, &windowHeight, uVar20);
+			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			m_mcCtrl.m_previousState = 0;
 			m_mcCtrl.m_state = 0;
@@ -2518,7 +2389,6 @@ void CMenuPcs::InitSaveLoadMenu()
 void CMenuPcs::CalcLoadMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char bVar1 = 0;
 	m_textureLocIndex = 0;
 
@@ -2531,10 +2401,9 @@ void CMenuPcs::CalcLoadMenu()
 		m_mcCtrl.Init();
 		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 
-		Game.m_gameWork.m_wmBackupParams[0] = m_wmWorldState->m_originalBackupParams[0];
-		Game.m_gameWork.m_wmBackupParams[1] = m_wmWorldState->m_originalBackupParams[1];
-		Game.m_gameWork.m_wmBackupParams[2] = m_wmWorldState->m_originalBackupParams[2];
-		Game.m_gameWork.m_wmBackupParams[3] = m_wmWorldState->m_originalBackupParams[3];
+		for (int i = 0; i < kWmMenuControllerCount; i++) {
+			Game.m_gameWork.m_wmBackupParams[i] = m_wmWorldState->m_originalBackupParams[i];
+		}
 		if (m_wmWorldState->m_menuMode == 8 && m_cmakeWorkCardChannel != 0) {
 			m_mcCtrl.m_cardChannel = (int)m_cmakeWorkCardChannel - 1;
 			m_wmWorldState->m_subState = 3;
@@ -2562,44 +2431,16 @@ void CMenuPcs::CalcLoadMenu()
 		return;
 	}
 
-	iVar14 = reinterpret_cast<int>(worldState);
 	iVar10 = m_wmWorldState->m_subState;
 	switch (iVar10) {
 	case 0:
 	case 2:
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_cardChannel;
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(0);
-			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess(0));
-			int iVar23 = 0;
-			short* psVar20 = reinterpret_cast<short*>(piVar5);
-			for (; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[psVar20[2]];
-				if (pcVar12 != 0) {
-					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
-					if (iVar25 > iVar14) iVar14 = iVar25;
-				}
-				psVar20++;
-			}
-			iVar10 = iVar14 / 0x16;
-			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
-			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
-			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)(float)((float)(0x280 - sVar8) * DOUBLE_803313F8);
-			{ float yDiff = FLOAT_80331430 - (float)sVar18; iVar10 = (int)(float)(yDiff * DOUBLE_803313F8); }
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar10;
-			int __p4 = sVar8;
-			m_menuWindowInfo->width = __p4;
-			m_menuWindowInfo->height = sVar18;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
+			short windowWidth;
+			short windowHeight;
+			GetWinSize(0, &windowWidth, &windowHeight, 0);
+			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 			m_wmWorldState->m_flag09 = 1;
@@ -2668,37 +2509,10 @@ void CMenuPcs::CalcLoadMenu()
 			if (bVar1) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(uVar22);
-			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess(uVar19));
-			int iVar23 = 0;
-			short* psVar20 = reinterpret_cast<short*>(piVar5);
-			for (; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[psVar20[2]];
-				if (pcVar12 != 0) {
-					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
-					if (iVar25 > iVar14) iVar14 = iVar25;
-				}
-				psVar20++;
-			}
-			iVar10 = iVar14 / 0x16;
-			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
-			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
-			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)(float)((float)(0x280 - sVar8) * DOUBLE_803313F8);
-			{ float yDiff = FLOAT_80331430 - (float)sVar18; iVar10 = (int)(float)(yDiff * DOUBLE_803313F8); }
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar10;
-			int __p14 =  (sVar8 - 0);
-			m_menuWindowInfo->width = __p14;
-			m_menuWindowInfo->height = sVar18;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
+			short windowWidth;
+			short windowHeight;
+			GetWinSize(uVar19, &windowWidth, &windowHeight, uVar22);
+			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			m_wmWorldState->m_flag09 = 1;
 			m_wmWorldState->m_counter1A = 0;
@@ -2750,37 +2564,10 @@ void CMenuPcs::CalcLoadMenu()
 	}
 	case 4:
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(0);
-			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess(6));
-			int iVar23 = 0;
-			short* psVar20 = reinterpret_cast<short*>(piVar5);
-			for (; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[psVar20[2]];
-				if (pcVar12 != 0) {
-					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
-					if (iVar25 > iVar14) iVar14 = iVar25;
-				}
-				psVar20++;
-			}
-			iVar10 = iVar14 / 0x16;
-			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
-			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
-			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)(float)((float)(0x280 - sVar8) * DOUBLE_803313F8);
-			{ float yDiff = FLOAT_80331430 - (float)sVar18; iVar10 = (int)(float)(yDiff * DOUBLE_803313F8); }
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar10;
-			int __p13 = sVar8;
-			m_menuWindowInfo->width = __p13;
-			m_menuWindowInfo->height = sVar18;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
+			short windowWidth;
+			short windowHeight;
+			GetWinSize(6, &windowWidth, &windowHeight, 0);
+			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			m_mcCtrl.m_previousState = 0;
 			m_mcCtrl.m_state = 0;
@@ -2827,36 +2614,10 @@ void CMenuPcs::CalcLoadMenu()
 				uVar19 = 5;
 				m_wmWorldState->m_cardChannel = 1;
 			}
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(uVar22);
-			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess(uVar19));
-			int iVar23 = 0;
-			short* psVar20 = reinterpret_cast<short*>(piVar5);
-			for (; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[psVar20[2]];
-				if (pcVar12 != 0) {
-					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
-					if (iVar25 > iVar14) iVar14 = iVar25;
-				}
-				psVar20++;
-			}
-			iVar10 = iVar14 / 0x16;
-			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
-			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
-			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)(float)((float)(0x280 - sVar8) * DOUBLE_803313F8);
-			{ float yDiff = FLOAT_80331430 - (float)sVar18; iVar10 = (int)(float)(yDiff * DOUBLE_803313F8); }
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar10;
-			m_menuWindowInfo->width = sVar8;
-			m_menuWindowInfo->height = sVar18;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
+			short windowWidth;
+			short windowHeight;
+			GetWinSize(uVar19, &windowWidth, &windowHeight, uVar22);
+			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			m_wmWorldState->m_flag09 = 1;
 		}
@@ -2919,36 +2680,10 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar10 == 0xD) { uVar19 = 7; }
 			else if (iVar10 == 0x1A) { uVar19 = 0x1A; uVar22 = 1; }
 			else { uVar19 = 9; }
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(uVar22);
-			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess(uVar19));
-			int iVar23 = 0;
-			short* psVar20 = reinterpret_cast<short*>(piVar5);
-			for (; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[psVar20[2]];
-				if (pcVar12 != 0) {
-					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
-					if (iVar25 > iVar14) iVar14 = iVar25;
-				}
-				psVar20++;
-			}
-			iVar10 = iVar14 / 0x16;
-			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
-			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
-			short sVar18 = *piVar5 * 0x1E + 0x40;
-			iVar14 = (int)(float)((float)(0x280 - sVar8) * DOUBLE_803313F8);
-			{ float yDiff = FLOAT_80331430 - (float)sVar18; iVar10 = (int)(float)(yDiff * DOUBLE_803313F8); }
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar10;
-			m_menuWindowInfo->width = sVar8;
-			m_menuWindowInfo->height = sVar18;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
+			short windowWidth;
+			short windowHeight;
+			GetWinSize(uVar19, &windowWidth, &windowHeight, uVar22);
+			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			m_mcCtrl.m_previousState = 0;
 			m_mcCtrl.m_state = 0;
@@ -3043,14 +2778,10 @@ void CMenuPcs::CalcLoadMenu()
 					} while (iVar14 < 8);
 
 					if (m_wmWorldState->m_menuMode != 8) {
-						m_wmWorldState->m_originalBackupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
-						m_wmWorldState->m_backupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
-						m_wmWorldState->m_originalBackupParams[1] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
-						m_wmWorldState->m_backupParams[1] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
-						m_wmWorldState->m_originalBackupParams[2] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
-						m_wmWorldState->m_backupParams[2] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
-						m_wmWorldState->m_originalBackupParams[3] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
-						m_wmWorldState->m_backupParams[3] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
+						for (int i = 0; i < kWmMenuControllerCount; i++) {
+							m_wmWorldState->m_originalBackupParams[i] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[i]);
+							m_wmWorldState->m_backupParams[i] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[i]);
+						}
 					}
 				}
 				m_wmWorldState->m_state0E = 1;
@@ -8249,45 +7980,10 @@ void CMenuPcs::CalcCharaSelect()
 		}
 
 		if (connectedCount != 0 && connectedCount == locallyConfirmedCount) {
-			CFont* const font = GetWmFont(this);
-			font->SetMargin(FLOAT_803313e8);
-			font->SetShadow(0);
-			font->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(1);
-			int maxWidth = 0;
-			int* winMess = reinterpret_cast<int*>(GetWinMess(0x17));
-			int* msgIter = winMess;
-			for (int i = 0; i < *winMess; i++) {
-				const char* text = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(msgIter) + 4)];
-				if (text != 0) {
-					if (*text == '$') {
-						text++;
-					}
-					const int width = static_cast<int>(static_cast<double>(font->GetWidth(text)));
-					if (width > maxWidth) {
-						maxWidth = width;
-					}
-				}
-				msgIter = reinterpret_cast<int*>(reinterpret_cast<int>(msgIter) + 2);
-			}
-
-			int widthCells = maxWidth / 0x16;
-			if ((maxWidth % 0x16) != 0) {
-				widthCells++;
-			}
-			const double dF8 = DOUBLE_803313F8;
-			const float f430 = FLOAT_80331430;
-			const short winWidth = (widthCells + 2) * 0x16 + 0x40;
-			const short winHeight = *winMess * 0x1E + 0x40;
-			m_menuWindowInfo->x = static_cast<short>(static_cast<int>(static_cast<float>(
-			    static_cast<float>(0x280 - winWidth) * dF8)));
-			m_menuWindowInfo->y = static_cast<short>(static_cast<int>(static_cast<float>(
-			    (f430 - static_cast<float>(winHeight)) * dF8)));
-			int __p4 = winWidth;
-			m_menuWindowInfo->width = __p4;
-			m_menuWindowInfo->height = winHeight;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
+			short windowWidth;
+			short windowHeight;
+			GetWinSize(0x17, &windowWidth, &windowHeight, 1);
+			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			return;
 		}

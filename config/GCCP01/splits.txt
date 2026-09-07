@@ -1081,7 +1081,7 @@ mes.cpp:
 	extabindex  start:0x8000E128 end:0x8000E188
 	.text       start:0x800981F0 end:0x8009B3B4
 	.rodata     start:0x801D9E10 end:0x801D9E58
-	.data       start:0x8020F758 end:0x8020F968
+	.data       start:0x8020F4C8 end:0x8020F968
 	.bss        start:0x802EAA60 end:0x802EAAB0
 	.sbss       start:0x8032EDB0 end:0x8032EDB8
 
@@ -1149,14 +1149,14 @@ cflat_r2system.cpp:
 	extab       start:0x80008280 end:0x80008338
 	extabindex  start:0x8000E8D8 end:0x8000E9EC
 	.text       start:0x800B28F0 end:0x800BA2FC
-	.data       start:0x80210174 end:0x80210378
+	.data       start:0x8020FB30 end:0x802101F0
 	.sdata2     start:0x80330B30 end:0x80330B34
 
 cflat_r2class.cpp:
 	extab       start:0x80008338 end:0x80008350
 	extabindex  start:0x8000E9EC end:0x8000EA10
 	.text       start:0x800BA2FC end:0x800BD848
-	.data       start:0x80210378 end:0x80210528
+	.data       start:0x802101F0 end:0x80210528
 	.sdata2     start:0x80330BE0 end:0x80330BF8
 
 p_chara_viewer.cpp:

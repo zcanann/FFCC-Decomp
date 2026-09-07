@@ -281,9 +281,22 @@ public:
         short m_height;
         float m_u;
         float m_v;
-        float m_scaleX;
-        float m_scaleY;
+        float m_alpha;
+        float m_scale;
         unsigned int m_flags;
+    };
+    struct WmBubbleInfo
+    {
+        Sprt m_sprites[5];
+    };
+    struct WmFrameData
+    {
+        int m_unknown00;
+        int m_titleFrame;
+        int m_yearFrame;
+        Sprt m_frameSprites[5];
+        Sprt m_titleSprite;
+        Sprt m_yearSprites[2];
     };
     struct WmFrameInfo
     {
@@ -765,8 +778,8 @@ public:
         Mtx m_savedCameraMatrix;
         CCharaPcs::CHandle* m_handles[0x28];
         WmWorldObjInfo* m_worldObjData;
-        unsigned char* m_bubbleData;
-        unsigned char* m_frameData;
+        WmBubbleInfo* m_bubbleData;
+        WmFrameData* m_frameData;
         WmFrameInfo* m_frameInfo;
         WmCharaModelInfo* m_charaModelData;
         WmCharaSelectEntry* m_charaSelectData;
@@ -1051,6 +1064,11 @@ STATIC_ASSERT(offsetof(SingMenuState, uniteState) == 0x30);
 STATIC_ASSERT(offsetof(SingMenuState, topIndex) == 0x34);
 
 STATIC_ASSERT(sizeof(CMenuPcs::Sprt) == 0x1C);
+STATIC_ASSERT(sizeof(CMenuPcs::WmBubbleInfo) == 0x8C);
+STATIC_ASSERT(sizeof(CMenuPcs::WmFrameData) == 0xEC);
+STATIC_ASSERT(offsetof(CMenuPcs::WmFrameData, m_frameSprites) == 0x0C);
+STATIC_ASSERT(offsetof(CMenuPcs::WmFrameData, m_titleSprite) == 0x98);
+STATIC_ASSERT(offsetof(CMenuPcs::WmFrameData, m_yearSprites) == 0xB4);
 STATIC_ASSERT(sizeof(CMenuPcs::WmFrameInfo) == 0x3C);
 STATIC_ASSERT(offsetof(CMenuPcs::WmFrameInfo, m_sprites) == 0x4);
 

@@ -709,12 +709,12 @@ void CMenuPcs::loadData()
 	}
 
 	m_wm.m_bubbleData =
-	    static_cast<unsigned char*>(operator new(0x8C, MenuPcs.m_menuStage, srcFile, 0x227));
-	memset(m_wm.m_bubbleData, 0, 0x8C);
+	    new (MenuPcs.m_menuStage, srcFile, 0x227) WmBubbleInfo;
+	memset(m_wm.m_bubbleData, 0, sizeof(WmBubbleInfo));
 
 	m_wm.m_frameData =
-	    static_cast<unsigned char*>(operator new(0xEC, MenuPcs.m_menuStage, srcFile, 0x22B));
-	memset(m_wm.m_frameData, 0, 0xEC);
+	    new (MenuPcs.m_menuStage, srcFile, 0x22B) WmFrameData;
+	memset(m_wm.m_frameData, 0, sizeof(WmFrameData));
 	{
 		int frameSrc[20];
 		unsigned int* dst = reinterpret_cast<unsigned int*>(frameSrc) - 1;
@@ -744,16 +744,16 @@ void CMenuPcs::loadData()
 
 		int* tbl = frameSrc;
 		float* wsrc = reinterpret_cast<float*>(wordSrc);
-		for (int i = 0, count = 5; count != 0; count--, i += 0x1C) {
-			*reinterpret_cast<short*>(m_wm.m_frameData + i + 0xC) = static_cast<short>(tbl[0]);
-			*reinterpret_cast<short*>(m_wm.m_frameData + i + 0xE) = static_cast<short>(tbl[1]);
-			*reinterpret_cast<short*>(m_wm.m_frameData + i + 0x10) = static_cast<short>(tbl[2]);
-			*reinterpret_cast<short*>(m_wm.m_frameData + i + 0x12) = static_cast<short>(tbl[3]);
-			*reinterpret_cast<float*>(m_wm.m_frameData + i + 0x14) = wsrc[0];
-			*reinterpret_cast<float*>(m_wm.m_frameData + i + 0x18) = wsrc[1];
-			*reinterpret_cast<float*>(m_wm.m_frameData + i + 0x1C) = oneF;
-			*reinterpret_cast<float*>(m_wm.m_frameData + i + 0x20) = oneF;
-			*reinterpret_cast<int*>(m_wm.m_frameData + i + 0x24) = 0;
+		for (int i = 0; i < 5; i++) {
+			m_wm.m_frameData->m_frameSprites[i].m_x = static_cast<short>(tbl[0]);
+			m_wm.m_frameData->m_frameSprites[i].m_y = static_cast<short>(tbl[1]);
+			m_wm.m_frameData->m_frameSprites[i].m_width = static_cast<short>(tbl[2]);
+			m_wm.m_frameData->m_frameSprites[i].m_height = static_cast<short>(tbl[3]);
+			m_wm.m_frameData->m_frameSprites[i].m_u = wsrc[0];
+			m_wm.m_frameData->m_frameSprites[i].m_v = wsrc[1];
+			m_wm.m_frameData->m_frameSprites[i].m_alpha = oneF;
+			m_wm.m_frameData->m_frameSprites[i].m_scale = oneF;
+			m_wm.m_frameData->m_frameSprites[i].m_flags = 0;
 			tbl += 4;
 			wsrc += 2;
 		}
@@ -1139,8 +1139,8 @@ void CMenuPcs::InitFrame0Info()
 	m_wm.m_frameInfo->m_sprites[0].m_height = 0x168;
 	m_wm.m_frameInfo->m_sprites[0].m_u = zero;
 	m_wm.m_frameInfo->m_sprites[0].m_v = zero;
-	m_wm.m_frameInfo->m_sprites[0].m_scaleX = one;
-	m_wm.m_frameInfo->m_sprites[0].m_scaleY = one;
+	m_wm.m_frameInfo->m_sprites[0].m_alpha = one;
+	m_wm.m_frameInfo->m_sprites[0].m_scale = one;
 	m_wm.m_frameInfo->m_sprites[0].m_flags = 0;
 
 	WmFrameInfo* frame = m_wm.m_frameInfo;
@@ -4359,8 +4359,8 @@ void CMenuPcs::DrawMoveMenu()
 	    (worldState->m_mainState == 2 && bytes[0x13] != 0)) {
 		if (static_cast<double>(worldState->m_posX) <= DOUBLE_803314F0) {
 			worldState->m_mainState++;
-			*reinterpret_cast<int*>(m_wm.m_frameData + 4) = 0;
-			*reinterpret_cast<int*>(m_wm.m_frameData + 8) = 0;
+			m_wm.m_frameData->m_titleFrame = 0;
+			m_wm.m_frameData->m_yearFrame = 0;
 			worldState->m_frameCounter = 0;
 		}
 	} else if (worldState->m_mainState == 1 && worldState->m_frameCounter >= 10) {
@@ -5676,90 +5676,79 @@ void CMenuPcs::CalcFukidashi()
 	}
 	int bitIdx;
 
-#define BUB() reinterpret_cast<int>(m_wm.m_bubbleData)
-	*reinterpret_cast<unsigned short*>(BUB()) = *reinterpret_cast<short*>(bytes + 0x1C);
+	m_wm.m_bubbleData->m_sprites[0].m_x = *reinterpret_cast<short*>(bytes + 0x1C);
 	float fVar1 = FLOAT_803313dc;
-	*reinterpret_cast<short*>(BUB() + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
-	*reinterpret_cast<short*>(BUB() + 4) = 0xF0;
-	*reinterpret_cast<short*>(BUB() + 6) = 0xC4;
-	*reinterpret_cast<float*>(BUB() + 0x0C) = fVar1;
+	m_wm.m_bubbleData->m_sprites[0].m_y = *reinterpret_cast<short*>(bytes + 0x1E);
+	m_wm.m_bubbleData->m_sprites[0].m_width = 0xF0;
+	m_wm.m_bubbleData->m_sprites[0].m_height = 0xC4;
+	m_wm.m_bubbleData->m_sprites[0].m_v = fVar1;
 	if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
-		*reinterpret_cast<float*>(BUB() + 8) = FLOAT_803313dc;
+		m_wm.m_bubbleData->m_sprites[0].m_u = FLOAT_803313dc;
 	} else {
-		*reinterpret_cast<float*>(BUB() + 8) = FLOAT_80331704;
+		m_wm.m_bubbleData->m_sprites[0].m_u = FLOAT_80331704;
 	}
 
 	fVar1 = FLOAT_80331708;
 	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
-		*reinterpret_cast<short*>(BUB() + 0x20) = 0x50;
+		m_wm.m_bubbleData->m_sprites[1].m_width = 0x50;
 		float fVar2 = FLOAT_803313dc;
-		*reinterpret_cast<short*>(BUB() + 0x22) = 0x48;
-		*reinterpret_cast<float*>(BUB() + 0x24) = fVar1;
-		*reinterpret_cast<float*>(BUB() + 0x28) = fVar2;
-		*reinterpret_cast<short*>(BUB() + 0x1E) = *reinterpret_cast<short*>(BUB() + 2) + 0x1C;
+		m_wm.m_bubbleData->m_sprites[1].m_height = 0x48;
+		m_wm.m_bubbleData->m_sprites[1].m_u = fVar1;
+		m_wm.m_bubbleData->m_sprites[1].m_v = fVar2;
+		m_wm.m_bubbleData->m_sprites[1].m_y = m_wm.m_bubbleData->m_sprites[0].m_y + 0x1C;
 		if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
-			*reinterpret_cast<short*>(BUB() + 0x1E) = *reinterpret_cast<short*>(BUB() + 0x1E) + 0x10;
+			m_wm.m_bubbleData->m_sprites[1].m_y = m_wm.m_bubbleData->m_sprites[1].m_y + 0x10;
 		}
-		*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB());
+		m_wm.m_bubbleData->m_sprites[1].m_x = m_wm.m_bubbleData->m_sprites[0].m_x;
 		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) != 0) {
-			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x20;
+			m_wm.m_bubbleData->m_sprites[1].m_x = m_wm.m_bubbleData->m_sprites[1].m_x + 0x20;
 		} else if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) != 0) {
-			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x50;
+			m_wm.m_bubbleData->m_sprites[1].m_x = m_wm.m_bubbleData->m_sprites[1].m_x + 0x50;
 		} else {
-			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x38;
+			m_wm.m_bubbleData->m_sprites[1].m_x = m_wm.m_bubbleData->m_sprites[1].m_x + 0x38;
 		}
 	}
 
 	fVar1 = FLOAT_803313dc;
 	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x1FF) != 0) {
-		*reinterpret_cast<short*>(BUB() + 0x3C) = 0x20;
-		*reinterpret_cast<short*>(BUB() + 0x3E) = 0x20;
-		*reinterpret_cast<float*>(BUB() + 0x40) = fVar1;
-		*reinterpret_cast<float*>(BUB() + 0x44) = fVar1;
+		m_wm.m_bubbleData->m_sprites[2].m_width = 0x20;
+		m_wm.m_bubbleData->m_sprites[2].m_height = 0x20;
+		m_wm.m_bubbleData->m_sprites[2].m_u = fVar1;
+		m_wm.m_bubbleData->m_sprites[2].m_v = fVar1;
 
-		// Copy first icon rect to second
-		int iVar9 = BUB();
-		*reinterpret_cast<short*>(iVar9 + 0x54) = *reinterpret_cast<short*>(iVar9 + 0x38);
-		*reinterpret_cast<short*>(iVar9 + 0x56) = *reinterpret_cast<short*>(iVar9 + 0x3A);
-		*reinterpret_cast<short*>(iVar9 + 0x58) = *reinterpret_cast<short*>(iVar9 + 0x3C);
-		*reinterpret_cast<short*>(iVar9 + 0x5A) = *reinterpret_cast<short*>(iVar9 + 0x3E);
-		*reinterpret_cast<float*>(iVar9 + 0x5C) = *reinterpret_cast<float*>(iVar9 + 0x40);
-		*reinterpret_cast<float*>(iVar9 + 0x60) = *reinterpret_cast<float*>(iVar9 + 0x44);
-		*reinterpret_cast<float*>(iVar9 + 0x64) = *reinterpret_cast<float*>(iVar9 + 0x48);
-		*reinterpret_cast<float*>(iVar9 + 0x68) = *reinterpret_cast<float*>(iVar9 + 0x4C);
-		*reinterpret_cast<int*>(iVar9 + 0x6C) = *reinterpret_cast<int*>(iVar9 + 0x50);
+		m_wm.m_bubbleData->m_sprites[3] = m_wm.m_bubbleData->m_sprites[2];
 
 		short flagsF = *reinterpret_cast<short*>(bytes + 0x1A);
 		int cnt = 0;
-		iVar9 = BUB();
-		int sVar15 = *reinterpret_cast<short*>(iVar9 + 0x1C) + *reinterpret_cast<short*>(iVar9 + 0x20);
+		WmBubbleInfo* bubble = m_wm.m_bubbleData;
+		int sVar15 = bubble->m_sprites[1].m_x + bubble->m_sprites[1].m_width;
 		if ((flagsF & 0xF) != 0) {
-			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15;
-			*reinterpret_cast<short*>(BUB() + 0x38) = sVar15;
+			bubble->m_sprites[3].m_x = sVar15;
+			m_wm.m_bubbleData->m_sprites[2].m_x = sVar15;
 			for (bitIdx = 0; bitIdx < 4; bitIdx++) {
 				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << bitIdx)) != 0) {
 					cnt++;
 				}
 			}
 			if (cnt == 1) {
-				*reinterpret_cast<short*>(BUB() + 0x3A) =
-				    *reinterpret_cast<short*>(BUB() + 0x1E);
-				*reinterpret_cast<short*>(BUB() + 0x3A) =
-				    *reinterpret_cast<short*>(BUB() + 0x3A) + 0x14;
+				m_wm.m_bubbleData->m_sprites[2].m_y =
+				    m_wm.m_bubbleData->m_sprites[1].m_y;
+				m_wm.m_bubbleData->m_sprites[2].m_y =
+				    m_wm.m_bubbleData->m_sprites[2].m_y + 0x14;
 			} else {
-				*reinterpret_cast<short*>(BUB() + 0x3A) =
-				    *reinterpret_cast<short*>(BUB() + 0x1E);
-				iVar9 = BUB();
-				*reinterpret_cast<short*>(iVar9 + 0x56) =
-				    *reinterpret_cast<short*>(iVar9 + 0x1E) + *reinterpret_cast<short*>(iVar9 + 0x22) - 0x20;
+				m_wm.m_bubbleData->m_sprites[2].m_y =
+				    m_wm.m_bubbleData->m_sprites[1].m_y;
+				bubble = m_wm.m_bubbleData;
+				bubble->m_sprites[3].m_y =
+				    bubble->m_sprites[1].m_y + bubble->m_sprites[1].m_height - 0x20;
 			}
 		} else {
-			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15 + 8;
-			*reinterpret_cast<short*>(BUB() + 0x38) = sVar15 + 8;
-			*reinterpret_cast<short*>(BUB() + 0x3A) =
-			    *reinterpret_cast<short*>(BUB() + 0x1E);
-			*reinterpret_cast<short*>(BUB() + 0x3A) =
-			    *reinterpret_cast<short*>(BUB() + 0x3A) + 0x14;
+			bubble->m_sprites[3].m_x = sVar15 + 8;
+			m_wm.m_bubbleData->m_sprites[2].m_x = sVar15 + 8;
+			m_wm.m_bubbleData->m_sprites[2].m_y =
+			    m_wm.m_bubbleData->m_sprites[1].m_y;
+			m_wm.m_bubbleData->m_sprites[2].m_y =
+			    m_wm.m_bubbleData->m_sprites[2].m_y + 0x14;
 		}
 	}
 
@@ -5815,10 +5804,10 @@ void CMenuPcs::CalcFukidashi()
 	float nameWidthF = fontFC->GetWidth(nameBuffer);
 
 	int sVar15 = 0x4C;
-	*reinterpret_cast<short*>(BUB() + 0x70) =
+	m_wm.m_bubbleData->m_sprites[4].m_x =
 	    static_cast<short>(static_cast<int>(
 	        (FLOAT_80331704 - nameWidthF) * FLOAT_80331434 +
-	        static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(BUB())))));
+	        static_cast<float>(static_cast<int>(m_wm.m_bubbleData->m_sprites[0].m_x))));
 	float fVar2 = FLOAT_803314A4;
 	fVar1 = FLOAT_803313dc;
 	unsigned short uVar3 = *reinterpret_cast<short*>(bytes + 0x1A);
@@ -5830,14 +5819,14 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	// Set text position
-	*reinterpret_cast<short*>(BUB() + 0x72) =
-	    *reinterpret_cast<short*>(BUB() + 2) + sVar15;
-	*reinterpret_cast<short*>(BUB() + 0x72) =
-	    *reinterpret_cast<short*>(BUB() + 0x72) - 4;
+	m_wm.m_bubbleData->m_sprites[4].m_y =
+	    m_wm.m_bubbleData->m_sprites[0].m_y + sVar15;
+	m_wm.m_bubbleData->m_sprites[4].m_y =
+	    m_wm.m_bubbleData->m_sprites[4].m_y - 4;
 
 	// Setup model viewport slots
-	int sVar15b = *reinterpret_cast<short*>(BUB()) - 0x28;
-	int sVar22 = *reinterpret_cast<short*>(BUB() + 2) - 0x0E;
+	int sVar15b = m_wm.m_bubbleData->m_sprites[0].m_x - 0x28;
+	int sVar22 = m_wm.m_bubbleData->m_sprites[0].m_y - 0x0E;
 	for (int i = 6; i <= 16; i++) {
 		WmWorldObjInfo* slot = &m_wm.m_worldObjData[i];
 		slot->m_active = 0;
@@ -6012,7 +6001,6 @@ void CMenuPcs::CalcFukidashi()
 			}
 		}
 	}
-#undef BUB
 }
 
 /*
@@ -6048,19 +6036,19 @@ void CMenuPcs::DrawFukidashi()
 	GXSetChanMatColor(GX_COLOR0A0, matColor);
 	MenuPcs.SetTexture((TEX)0x18);
 
-	short* bubData = reinterpret_cast<short*>(m_wm.m_bubbleData);
+	Sprt* background = &m_wm.m_bubbleData->m_sprites[0];
 	MenuPcs.DrawRect(texMode,
-		(float)(int)bubData[0], (float)(int)bubData[1],
-		(float)(int)bubData[2], (float)(int)bubData[3],
-		*reinterpret_cast<float*>(bubData + 4), *reinterpret_cast<float*>(bubData + 6),
+		(float)(int)background->m_x, (float)(int)background->m_y,
+		(float)(int)background->m_width, (float)(int)background->m_height,
+		background->m_u, background->m_v,
 		FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
-		int bd = reinterpret_cast<int>(m_wm.m_bubbleData);
+		WmBubbleInfo* bubble = m_wm.m_bubbleData;
 		MenuPcs.DrawRect(0,
-			(float)*reinterpret_cast<short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
-			(float)*reinterpret_cast<short*>(bd + 0x20), (float)*reinterpret_cast<short*>(bd + 0x22),
-			*reinterpret_cast<float*>(bd + 0x24), *reinterpret_cast<float*>(bd + 0x28),
+			(float)bubble->m_sprites[1].m_x, (float)bubble->m_sprites[1].m_y,
+			(float)bubble->m_sprites[1].m_width, (float)bubble->m_sprites[1].m_height,
+			bubble->m_sprites[1].m_u, bubble->m_sprites[1].m_v,
 			FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
@@ -6072,16 +6060,16 @@ void CMenuPcs::DrawFukidashi()
 			while (iVar5 < 4 && iVar9 < 2) {
 				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << iVar5)) != 0) {
 					MenuPcs.SetTexture((TEX)(iVar5 + 0x19));
-					short* psVar4;
+					Sprt* icon;
 					if (iVar9 == 0) {
-						psVar4 = reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x38);
+						icon = &m_wm.m_bubbleData->m_sprites[2];
 					} else {
-						psVar4 = reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x54);
+						icon = &m_wm.m_bubbleData->m_sprites[3];
 					}
 					MenuPcs.DrawRect(0,
-						(float)(int)psVar4[0], (float)(int)psVar4[1],
-						(float)(int)psVar4[2], (float)(int)psVar4[3],
-						*reinterpret_cast<float*>(psVar4 + 4), *reinterpret_cast<float*>(psVar4 + 6),
+						(float)(int)icon->m_x, (float)(int)icon->m_y,
+						(float)(int)icon->m_width, (float)(int)icon->m_height,
+						icon->m_u, icon->m_v,
 						FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 					iVar9++;
 				}
@@ -6091,11 +6079,11 @@ void CMenuPcs::DrawFukidashi()
 			for (int idx = 0; idx < 5; idx++) {
 				if ((uVar3 & (0x10 << idx)) != 0) {
 					MenuPcs.SetTexture((TEX)(idx + 0x19));
-					int bd = *reinterpret_cast<int*>(bytes + 0x818);
+					WmBubbleInfo* bubble = m_wm.m_bubbleData;
 					MenuPcs.DrawRect(0,
-						(float)*reinterpret_cast<short*>(bd + 0x38), (float)*reinterpret_cast<short*>(bd + 0x3A),
-						(float)*reinterpret_cast<short*>(bd + 0x3C), (float)*reinterpret_cast<short*>(bd + 0x3E),
-						*reinterpret_cast<float*>(bd + 0x40), *reinterpret_cast<float*>(bd + 0x44),
+						(float)bubble->m_sprites[2].m_x, (float)bubble->m_sprites[2].m_y,
+						(float)bubble->m_sprites[2].m_width, (float)bubble->m_sprites[2].m_height,
+						bubble->m_sprites[2].m_u, bubble->m_sprites[2].m_v,
 						FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 					break;
 				}
@@ -6160,16 +6148,16 @@ void CMenuPcs::DrawFukidashi()
 	fontFC->SetScale(FLOAT_803313e8);
 	fontFC->DrawInit();
 	fontFC->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-	fontFC->SetPosX((float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x70));
-	fontFC->SetPosY((float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72));
+	fontFC->SetPosX((float)m_wm.m_bubbleData->m_sprites[4].m_x);
+	fontFC->SetPosY((float)m_wm.m_bubbleData->m_sprites[4].m_y);
 	fontFC->Draw(nameBuffer);
 
 	if (twoLines != 0) {
 		strcpy(nameBuffer, "");
 		float w2 = fontFC->GetWidth(secondLine);
 		fontFC->SetPosX((FLOAT_80331704 - w2) * FLOAT_80331434 +
-		                (float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818)));
-		fontFC->SetPosY((float)(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72) + 0x16));
+		                (float)m_wm.m_bubbleData->m_sprites[0].m_x);
+		fontFC->SetPosY((float)(m_wm.m_bubbleData->m_sprites[4].m_y + 0x16));
 		fontFC->Draw(secondLine);
 	}
 
@@ -6315,64 +6303,47 @@ void CMenuPcs::CalcWMFrame()
 		return;
 	}
 
-	int wmFrame;
 	if (sVar3 == 2 && bytes[0x13] != 0) {
-		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-		*reinterpret_cast<int*>(wmFrame + 4) = *reinterpret_cast<int*>(wmFrame + 4) - 1;
-		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-		if (*reinterpret_cast<int*>(wmFrame + 4) < 0) {
-			*reinterpret_cast<int*>(wmFrame + 4) = 0;
+		m_wm.m_frameData->m_titleFrame--;
+		if (m_wm.m_frameData->m_titleFrame < 0) {
+			m_wm.m_frameData->m_titleFrame = 0;
 		}
-	} else {
-		if ((bytes[0x0A] & 1) != 0) {
-			wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-			int iVar16 = *reinterpret_cast<int*>(wmFrame + 4);
-			if (iVar16 != 0) {
-				*reinterpret_cast<int*>(wmFrame + 4) = iVar16 - 1;
-				wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-				if (*reinterpret_cast<int*>(wmFrame + 4) < 0) {
-					*reinterpret_cast<int*>(wmFrame + 4) = 0;
-				}
-				wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-				if (*reinterpret_cast<int*>(wmFrame + 4) == 0) {
-					int flagTmp = bytes[0x0A];
-					bytes[0x0A] = flagTmp & ~1;
-				}
-				goto LAB_calc;
-			}
+	} else if ((bytes[0x0A] & 1) != 0 && m_wm.m_frameData->m_titleFrame != 0) {
+		m_wm.m_frameData->m_titleFrame--;
+		if (m_wm.m_frameData->m_titleFrame < 0) {
+			m_wm.m_frameData->m_titleFrame = 0;
 		}
-		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-		int iVar16 = *reinterpret_cast<int*>(wmFrame + 4);
-		if (iVar16 < 10) {
-			*reinterpret_cast<int*>(wmFrame + 4) = iVar16 + 1;
+		if (m_wm.m_frameData->m_titleFrame == 0) {
+			bytes[0x0A] &= ~1;
 		}
+	} else if (m_wm.m_frameData->m_titleFrame < 10) {
+		m_wm.m_frameData->m_titleFrame++;
 	}
-LAB_calc:
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x98) = 0x68;
+	m_wm.m_frameData->m_titleSprite.m_x = 0x68;
 	float fVar1 = FLOAT_803313dc;
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x9A) = 0x14;
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x9C) = 200;
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x9E) = 0x28;
-	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xA0) = fVar1;
+	m_wm.m_frameData->m_titleSprite.m_y = 0x14;
+	m_wm.m_frameData->m_titleSprite.m_width = 200;
+	m_wm.m_frameData->m_titleSprite.m_height = 0x28;
+	m_wm.m_frameData->m_titleSprite.m_u = fVar1;
 
 	if ((bytes[0x0A] & 1) != 0) {
-		int frameA = reinterpret_cast<int>(m_wm.m_frameData);
-		int yOff = (int)*reinterpret_cast<short*>(frameA + 0x9E) * (int)(char)bytes[0x05];
-		*reinterpret_cast<float*>(frameA + 0xA4) = (float)yOff;
+		WmFrameData* frameA = m_wm.m_frameData;
+		int yOff = (int)frameA->m_titleSprite.m_height * (int)(char)bytes[0x05];
+		frameA->m_titleSprite.m_v = (float)yOff;
 	} else {
-		int frameA = reinterpret_cast<int>(m_wm.m_frameData);
-		int yOff = (int)*reinterpret_cast<short*>(frameA + 0x9E) * (int)(char)bytes[0x04];
-		*reinterpret_cast<float*>(frameA + 0xA4) = (float)yOff;
+		WmFrameData* frameA = m_wm.m_frameData;
+		int yOff = (int)frameA->m_titleSprite.m_height * (int)(char)bytes[0x04];
+		frameA->m_titleSprite.m_v = (float)yOff;
 	}
 
-	wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-	*reinterpret_cast<short*>(wmFrame + 0x98) =
-	    (10 - *reinterpret_cast<int*>(wmFrame + 4)) * 2 + 0x68;
+	WmFrameData* wmFrame = m_wm.m_frameData;
+	wmFrame->m_titleSprite.m_x =
+	    (10 - wmFrame->m_titleFrame) * 2 + 0x68;
 
 	if (((bytes[0x0A] & 2) != 0 ||
 	     (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0))
-	    && *reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) >= 10) {
-		*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) = 0;
+	    && m_wm.m_frameData->m_yearFrame >= 10) {
+		m_wm.m_frameData->m_yearFrame = 0;
 		bytes[0x0A] = bytes[0x0A] & ~2;
 	}
 
@@ -6393,19 +6364,19 @@ LAB_calc:
 	}
 
 	float fE8 = FLOAT_803313e8;
-	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 200) = fE8;
-	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xE4) = fE8;
+	m_wm.m_frameData->m_yearSprites[0].m_scale = fE8;
+	m_wm.m_frameData->m_yearSprites[1].m_scale = fE8;
 
 	if (uVar14 == 3) {
 		int iVar16 = DAT_801dc118[10];
 		const float fV1 = FLOAT_80331524;
 		const float fV4 = FLOAT_80331528;
-		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB4) = (0x2B - iVar16) / 2 + 0x2C;
-		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6) = 0x43;
-		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB8) = (short)iVar16;
-		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xBA) = 0x20;
-		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xBC) = fV1;
-		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC0) = fV4;
+		m_wm.m_frameData->m_yearSprites[0].m_x = (0x2B - iVar16) / 2 + 0x2C;
+		m_wm.m_frameData->m_yearSprites[0].m_y = 0x43;
+		m_wm.m_frameData->m_yearSprites[0].m_width = (short)iVar16;
+		m_wm.m_frameData->m_yearSprites[0].m_height = 0x20;
+		m_wm.m_frameData->m_yearSprites[0].m_u = fV1;
+		m_wm.m_frameData->m_yearSprites[0].m_v = fV4;
 	} else {
 		int digits[2];
 		digits[0] = (int)uVar13 % 10;
@@ -6418,108 +6389,101 @@ LAB_calc:
 		}
 		int iVar19 = uVar14 - 1;
 		int iVar15 = (0x2B - iVar16) / 2 + 0x2C;
-		int off = iVar19 * 0x1C;
-		int* piVar17 = digits + iVar19;
 		const double dV10 = DOUBLE_80331490;
 		const double dV12 = DOUBLE_80331540;
 		const double dV11 = DOUBLE_80331538;
 		int wmDigitIdx;
 		for (wmDigitIdx = iVar19; wmDigitIdx >= 0; wmDigitIdx--) {
-				int digit = *piVar17;
-				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xB4) = (short)iVar15;
+				int digit = digits[wmDigitIdx];
+				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_x = (short)iVar15;
 				int digitW = DAT_801dc118[digit];
-				piVar17--;
-				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xB6) = 0x43;
-				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xB8) = (short)digitW;
-				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xBA) = 0x20;
+				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_y = 0x43;
+				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_width = (short)digitW;
+				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_height = 0x20;
 				int col = digit % 5;
 				int row = digit / 5;
-				*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xBC) = (float)(dV10 * (double)(float)col);
-				*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xC0) = (float)(dV12 * (double)(float)row + dV11);
+				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_u = (float)(dV10 * (double)(float)col);
+				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_v = (float)(dV12 * (double)(float)row + dV11);
 				iVar15 = iVar15 + digitW;
-				off = off - 0x1C;
 		}
 	}
 
 	if ((bytes[0x0A] & 2) != 0 ||
 	    (worldState->m_mainState == 2 && bytes[0x13] != 0)) {
-		int i = 0;
-		int off = i;
-		int cnt = uVar14;
 		const double dE8 = DOUBLE_803316E8;
 		const double dF8 = DOUBLE_803313F8;
-		for (; cnt > 0; cnt--, off += 0x1C, i++) {
+		for (int i = 0; i < uVar14; i++) {
 			if (i != 0 && uVar14 != 2) {
 				break;
 			}
 			float fVar1 = static_cast<float>(
-			    static_cast<double>(static_cast<float>(10 - *reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8))) / dE8);
-			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xC4) = fVar1;
-			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 200) =
+			    static_cast<double>(static_cast<float>(10 - m_wm.m_frameData->m_yearFrame)) / dE8);
+			m_wm.m_frameData->m_yearSprites[i].m_alpha = fVar1;
+			m_wm.m_frameData->m_yearSprites[i].m_scale =
 			    static_cast<float>(dF8 * static_cast<double>(fVar1) + dF8);
 
-			int entry = reinterpret_cast<int>(m_wm.m_frameData) + off;
-			float prodBA = static_cast<float>(*reinterpret_cast<short*>(entry + 0xBA)) *
-			               *reinterpret_cast<float*>(entry + 200);
-			*reinterpret_cast<short*>(entry + 0xB6) =
-			    static_cast<short>(*reinterpret_cast<short*>(entry + 0xB6) +
+			Sprt* entry = &m_wm.m_frameData->m_yearSprites[i];
+			float prodBA = static_cast<float>(entry->m_height) *
+			               entry->m_scale;
+			entry->m_y =
+			    static_cast<short>(entry->m_y +
 			                       static_cast<int>(
-			                           static_cast<float>(*reinterpret_cast<short*>(entry + 0xBA)) -
+			                           static_cast<float>(entry->m_height) -
 			                           prodBA));
 
 			if (i == 0 && (uVar14 == 1 || uVar14 == 3)) {
-				entry = reinterpret_cast<int>(m_wm.m_frameData) + off;
-				float prodB8a = static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) *
-				               *reinterpret_cast<float*>(entry + 200);
-				*reinterpret_cast<short*>(entry + 0xB4) =
-				    static_cast<short>(*reinterpret_cast<short*>(entry + 0xB4) +
+				entry = &m_wm.m_frameData->m_yearSprites[i];
+				float prodB8a = static_cast<float>(entry->m_width) *
+				               entry->m_scale;
+				entry->m_x =
+				    static_cast<short>(entry->m_x +
 				                       static_cast<int>(
 				                           (DOUBLE_80331420 +
 				                            static_cast<double>(
-				                                static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) -
+				                                static_cast<float>(entry->m_width) -
 				                                prodB8a)) *
 				                           DOUBLE_803313F8));
 			} else if (i != 0) {
-				entry = reinterpret_cast<int>(m_wm.m_frameData) + off;
-				float prodB8b = static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) *
-				               *reinterpret_cast<float*>(entry + 200);
-				*reinterpret_cast<short*>(entry + 0xB4) =
-				    static_cast<short>(*reinterpret_cast<short*>(entry + 0xB4) +
+				entry = &m_wm.m_frameData->m_yearSprites[i];
+				float prodB8b = static_cast<float>(entry->m_width) *
+				               entry->m_scale;
+				entry->m_x =
+				    static_cast<short>(entry->m_x +
 				                       static_cast<int>(
-				                           static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) -
+				                           static_cast<float>(entry->m_width) -
 				                           prodB8b));
 			}
 		}
-		int wmEnd = reinterpret_cast<int>(m_wm.m_frameData);
-		*reinterpret_cast<int*>(wmEnd + 8) = *reinterpret_cast<int*>(wmEnd + 8) + 1;
+		WmFrameData* wmEnd = m_wm.m_frameData;
+		wmEnd->m_yearFrame = wmEnd->m_yearFrame + 1;
 	} else {
-		int base = reinterpret_cast<int>(m_wm.m_frameData);
-		unsigned int uVar = (unsigned int)*reinterpret_cast<int*>(base + 8);
+		WmFrameData* base = m_wm.m_frameData;
+		unsigned int uVar = (unsigned int)base->m_yearFrame;
 		if (static_cast<float>(static_cast<int>(uVar - 5)) <
 		    static_cast<float>(DOUBLE_803314A8 * static_cast<double>(s_YearTrns.keys[s_YearTrns.keyCount * 4 - 4]))) {
 			float t = static_cast<float>(static_cast<int>(uVar));
 			float fVar5;
 			fVar5 = GetFcvValue(s_YearTrns, t);
-			*reinterpret_cast<short*>(base + 0xD2) =
-			    static_cast<short>(static_cast<int>(static_cast<float>(*reinterpret_cast<short*>(base + 0xD2)) + fVar5));
+			base->m_yearSprites[1].m_y =
+			    static_cast<short>(static_cast<int>(static_cast<float>(base->m_yearSprites[1].m_y) + fVar5));
 
 			float fVar1;
 			fVar1 = GetFcvValue(s_YearAlpha, t);
-			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xE0) = fVar1;
+			m_wm.m_frameData->m_yearSprites[1].m_alpha = fVar1;
 
 			if (uVar14 == 2) {
 				uVar -= 5;
 			}
 			t = static_cast<float>(static_cast<int>(uVar));
 			fVar5 = GetFcvValue(s_YearTrns, t);
-			*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6) =
+			m_wm.m_frameData->m_yearSprites[0].m_y =
 			    static_cast<short>(static_cast<int>(
-			        static_cast<float>(*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6)) + fVar5));
+			        static_cast<float>(m_wm.m_frameData->m_yearSprites[0].m_y) + fVar5));
 
 			fVar1 = GetFcvValue(s_YearAlpha, t);
-			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC4) = fVar1;
-			*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) =
-			    *reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) + 1;
+			m_wm.m_frameData->m_yearSprites[0].m_alpha = fVar1;
+			m_wm.m_frameData->m_yearFrame =
+			    m_wm.m_frameData->m_yearFrame + 1;
 		}
 	}
 #undef worldState
@@ -6577,15 +6541,15 @@ void CMenuPcs::DrawWMFrame()
 	const float baseX = FLOAT_803315B0;
 	const float baseY = FLOAT_803315B4;
 	for (int i = 0; i < 5; i++) {
-		short* const entry = reinterpret_cast<short*>(m_wm.m_frameData + (i * 0x1C + 0xC));
+		Sprt* const entry = &m_wm.m_frameData->m_frameSprites[i];
 		MenuPcs.DrawRect2(
 			0,
-			static_cast<float>(entry[0]) - baseX,
-			static_cast<float>(entry[1]) - baseY,
-			(float)entry[2],
-			(float)entry[3],
-			*reinterpret_cast<float*>(entry + 4),
-			*reinterpret_cast<float*>(entry + 6),
+			static_cast<float>(entry->m_x) - baseX,
+			static_cast<float>(entry->m_y) - baseY,
+			(float)entry->m_width,
+			(float)entry->m_height,
+			entry->m_u,
+			entry->m_v,
 			FLOAT_803313e8,
 			FLOAT_803313e8,
 			rotMtx);
@@ -6596,7 +6560,7 @@ void CMenuPcs::DrawWMFrame()
 		MenuPcs.SetTexture((TEX)0x17);
 		unsigned char gaugeAlpha = static_cast<unsigned char>(static_cast<int>(
 		    DOUBLE_80331508 *
-		    (static_cast<float>(*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 4)) /
+		    (static_cast<float>(m_wm.m_frameData->m_titleFrame) /
 		     DOUBLE_803316E8)));
 		matColor.r = 0xFF;
 		matColor.g = 0xFF;
@@ -6605,12 +6569,12 @@ void CMenuPcs::DrawWMFrame()
 		GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 		const float kZeroG = FLOAT_803313dc;
 		MenuPcs.DrawRect(0,
-			(float)*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x98),
-			(float)*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x9A),
-			(float)*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x9C),
-			(float)*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x9E),
-			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xA0),
-			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xA4),
+			(float)m_wm.m_frameData->m_titleSprite.m_x,
+			(float)m_wm.m_frameData->m_titleSprite.m_y,
+			(float)m_wm.m_frameData->m_titleSprite.m_width,
+			(float)m_wm.m_frameData->m_titleSprite.m_height,
+			m_wm.m_frameData->m_titleSprite.m_u,
+			m_wm.m_frameData->m_titleSprite.m_v,
 			FLOAT_803313e8,
 			FLOAT_803313e8,
 			kZeroG);
@@ -6650,7 +6614,7 @@ void CMenuPcs::DrawWMFrame()
 
 			if (digitCnt == 3) {
 				int alphaInt =
-				    static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC4)));
+				    static_cast<int>(DOUBLE_80331508 * static_cast<double>(m_wm.m_frameData->m_yearSprites[0].m_alpha));
 				matColor.r = 0xFF;
 				matColor.g = 0xFF;
 				matColor.b = 0xFF;
@@ -6658,47 +6622,47 @@ void CMenuPcs::DrawWMFrame()
 				GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
 				const float kZero3 = FLOAT_803313dc;
 				MenuPcs.DrawRect(0,
-					(float)*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB4),
-					(float)(*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6) + languageYOffset),
-					(float)*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB8),
-					(float)*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xBA),
-					*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xBC),
-					*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC0),
-					*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC8),
-					*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC8),
+					(float)m_wm.m_frameData->m_yearSprites[0].m_x,
+					(float)(m_wm.m_frameData->m_yearSprites[0].m_y + languageYOffset),
+					(float)m_wm.m_frameData->m_yearSprites[0].m_width,
+					(float)m_wm.m_frameData->m_yearSprites[0].m_height,
+					m_wm.m_frameData->m_yearSprites[0].m_u,
+					m_wm.m_frameData->m_yearSprites[0].m_v,
+					m_wm.m_frameData->m_yearSprites[0].m_scale,
+					m_wm.m_frameData->m_yearSprites[0].m_scale,
 					kZero3);
 			} else {
 				const double k255 = DOUBLE_80331508;
 				const float kZero = FLOAT_803313dc;
-				for (int i = 0, off2 = 0; i < digitCnt; i++, off2 += 0x1C) {
+				for (int i = 0; i < digitCnt; i++) {
 					int alphaInt =
-					    static_cast<int>(k255 * static_cast<double>(*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off2 + 0xC4)));
+					    static_cast<int>(k255 * static_cast<double>(m_wm.m_frameData->m_yearSprites[i].m_alpha));
 						matColor.r = 0xFF;
 					matColor.g = 0xFF;
 					matColor.b = 0xFF;
 					matColor.a = alphaInt;
 					GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-					int off = reinterpret_cast<int>(m_wm.m_frameData) + off2;
+					Sprt* digit = &m_wm.m_frameData->m_yearSprites[i];
 					MenuPcs.DrawRect(0,
-						(float)*reinterpret_cast<short*>(off + 0xB4),
-						(float)(*reinterpret_cast<short*>(off + 0xB6) + languageYOffset),
-						(float)*reinterpret_cast<short*>(off + 0xB8),
-						(float)*reinterpret_cast<short*>(off + 0xBA),
-						*reinterpret_cast<float*>(off + 0xBC),
-						*reinterpret_cast<float*>(off + 0xC0),
-						*reinterpret_cast<float*>(off + 0xC8),
-						*reinterpret_cast<float*>(off + 0xC8),
+						(float)digit->m_x,
+						(float)(digit->m_y + languageYOffset),
+						(float)digit->m_width,
+						(float)digit->m_height,
+						digit->m_u,
+						digit->m_v,
+						digit->m_scale,
+						digit->m_scale,
 						kZero);
 				}
 			}
 
 			if (digitCnt != 3 && language != 5) {
-				int off = reinterpret_cast<int>(m_wm.m_frameData);
+				Sprt* digit = &m_wm.m_frameData->m_yearSprites[0];
 				float suffixU = FLOAT_803313dc;
-				float suffixX = static_cast<float>(*reinterpret_cast<short*>(off + 0xB8)) * *reinterpret_cast<float*>(off + 0xC8) +
-				                static_cast<float>(*reinterpret_cast<short*>(off + 0xB4));
-				float suffixY = static_cast<float>(*reinterpret_cast<short*>(off + 0xB6));
-				float suffixScale = *reinterpret_cast<float*>(off + 0xC8);
+				float suffixX = static_cast<float>(digit->m_width) * digit->m_scale +
+				                static_cast<float>(digit->m_x);
+				float suffixY = static_cast<float>(digit->m_y);
+				float suffixScale = digit->m_scale;
 				if (language == 1) {
 					if (gWmMenuScriptValueCache / 10 == 1) {
 						suffixU = FLOAT_8033151c;
@@ -6718,7 +6682,7 @@ void CMenuPcs::DrawWMFrame()
 					suffixY += FLOAT_80331550;
 				}
 				int alphaInt =
-				    static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0xC4)));
+				    static_cast<int>(DOUBLE_80331508 * static_cast<double>(digit->m_alpha));
 				MenuPcs.SetAttrFmt((FMT)0);
 				matColor.r = 0xFF;
 				matColor.g = 0xFF;

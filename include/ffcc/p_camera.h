@@ -99,17 +99,11 @@ public:
         float m_scale;
     };
 
-    CCameraPcs()
+    CCameraPcs() : m_shadowRectBound(kCameraBoundsMinInitial, kCameraBoundsMaxInitial)
     {
-        m_shadowRectBound.m_min.z = kCameraBoundsMinInitial;
-        m_shadowRectBound.m_min.y = kCameraBoundsMinInitial;
-        m_shadowRectBound.m_min.x = kCameraBoundsMinInitial;
-        m_shadowRectBound.m_max.z = kCameraBoundsMaxInitial;
-        m_shadowRectBound.m_max.y = kCameraBoundsMaxInitial;
-        m_shadowRectBound.m_max.x = kCameraBoundsMaxInitial;
     }
 
-    static CProcessTable m_table[7];
+    static CProcessCallbackTable m_table[7];
 
     void Init();
     void Quit();

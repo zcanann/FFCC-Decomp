@@ -394,21 +394,6 @@ void CPartMng::Create()
  */
 void CPartMng::Destroy()
 {
-    struct PartMngResRaw {
-        unsigned char m_unk0[0x7e4];
-        CMaterialSet* m_materialSet;
-        CTextureSet* m_textureSet;
-        pppModelSt* m_pppModelStArr;
-        pppShapeSt* m_pppShapeStArr;
-        unsigned char m_unk7f4[0x18];
-        void* m_editorObj;
-    };
-
-    struct CRefRaw {
-        void** m_vtable;
-        int m_refCount;
-    };
-
     struct PartMngModelStBlock {
         pppModelSt m_entries[0x100];
     };
@@ -417,15 +402,12 @@ void CPartMng::Destroy()
         pppShapeSt m_entries[0x100];
     };
 
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
-
     for (int i = 0; i < 0x20; i++) {
         pppReleasePdt(i);
     }
 
-    if (res->m_pppModelStArr != 0) {
-        pppModelSt* modelArr = res->m_pppModelStArr;
+    if (m_pppModelStArr != 0) {
+        pppModelSt* modelArr = m_pppModelStArr;
         if (modelArr != 0) {
             for (unsigned int i = 0; i < 0x100; i++) {
                 pppModelSt* model = &modelArr[i];
@@ -433,8 +415,8 @@ void CPartMng::Destroy()
                     if (--model->m_refCount <= 0) {
                         if (model->m_cacheId != -1) {
                             ppvAmemCacheSet.DestroyCache(model->m_cacheId);
-                            *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
-                            *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x28) = 0;
+                            model->m_meshData = 0;
+                            model->m_displayListData = 0;
                         }
                         model->Destroy();
                         model->m_refCount = 0;
@@ -444,11 +426,11 @@ void CPartMng::Destroy()
             }
             delete reinterpret_cast<PartMngModelStBlock*>(modelArr);
         }
-        res->m_pppModelStArr = 0;
+        m_pppModelStArr = 0;
     }
 
-    if (res->m_pppShapeStArr != 0) {
-        pppShapeSt* shapeArr = res->m_pppShapeStArr;
+    if (m_pppShapeStArr != 0) {
+        pppShapeSt* shapeArr = m_pppShapeStArr;
         if (shapeArr != 0) {
             for (unsigned int i = 0; i < 0x100; i++) {
                 pppShapeSt* shape = &shapeArr[i];
@@ -469,35 +451,34 @@ void CPartMng::Destroy()
             }
             delete reinterpret_cast<PartMngShapeStBlock*>(shapeArr);
         }
-        res->m_pppShapeStArr = 0;
+        m_pppShapeStArr = 0;
     }
 
-    if (res->m_textureSet != 0) {
-        CTextureSet* textureSet = res->m_textureSet;
-        if (--reinterpret_cast<CRefRaw*>(textureSet)->m_refCount == 0) {
+    if (m_textureSet != 0) {
+        CTextureSet* textureSet = m_textureSet;
+        if (textureSet->DecRef() == 0) {
             delete textureSet;
         }
-        res->m_textureSet = 0;
+        m_textureSet = 0;
     }
 
-    if (res->m_materialSet != 0) {
-        CMaterialSet* materialSet = res->m_materialSet;
-        if (--reinterpret_cast<CRefRaw*>(materialSet)->m_refCount == 0) {
+    if (m_materialSet != 0) {
+        CMaterialSet* materialSet = m_materialSet;
+        if (materialSet->DecRef() == 0) {
             delete materialSet;
         }
-        res->m_materialSet = 0;
+        m_materialSet = 0;
     }
 
-    if (res->m_editorObj != 0) {
-        CCharaPcs::CHandle* handle =
-            *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(res->m_editorObj) + 0xf8);
+    if (m_editorObject != 0) {
+        CCharaPcs::CHandle* handle = m_editorObject->m_charaModelHandle;
         if (handle != 0) {
             delete handle;
-            *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(res->m_editorObj) + 0xf8) = 0;
+            m_editorObject->m_charaModelHandle = 0;
         }
-        if (res->m_editorObj != 0) {
-            operator delete(res->m_editorObj);
-            res->m_editorObj = 0;
+        if (m_editorObject != 0) {
+            operator delete(m_editorObject);
+            m_editorObject = 0;
         }
     }
 
@@ -1411,21 +1392,15 @@ void pppEditGetProjectionMatrix(float (*projectionMatrix)[4])
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005D660
+ * PAL Size: 628b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-#pragma opt_lifetimes off
-#pragma opt_strength_reduction off
 void CPartMng::pppEditAllReleaseResource()
 {
-    static const int kUsbMapMeshTableOffset = 0x7F4;
-    static const int kUsbShapeSlotTableOffset = 0x7F8;
-    static const int kRecvBuffOffset = 0x1C8;
-
-#define self (reinterpret_cast<unsigned char*>(this))
-    int iVar3;
-    unsigned char* iter;
-
     if (m_materialSet != 0) {
         delete m_materialSet;
         m_materialSet = 0;
@@ -1435,96 +1410,72 @@ void CPartMng::pppEditAllReleaseResource()
         m_textureSet = 0;
     }
 
-    iter = self;
-    iVar3 = 0;
-    do {
-        if (*reinterpret_cast<void**>(iter + 0x1D4) != 0) {
-            operator delete(*reinterpret_cast<void**>(iter + 0x1D4));
-            *reinterpret_cast<void**>(iter + 0x1D4) = 0;
+    for (int i = 0; i < 0x80; i++) {
+        if (m_editDataBuffers[i] != 0) {
+            operator delete(m_editDataBuffers[i]);
+            m_editDataBuffers[i] = 0;
         }
-        iVar3 = iVar3 + 1;
-        iter = iter + 0x4;
-    } while (iVar3 < 0x80);
-
-    iter = self;
-    iVar3 = 0;
-    do {
-        if (*reinterpret_cast<void**>(iter + 0x3D8) != 0) {
-            operator delete(*reinterpret_cast<void**>(iter + 0x3D8));
-            *reinterpret_cast<void**>(iter + 0x3D8) = 0;
-        }
-        iVar3 = iVar3 + 1;
-        iter = iter + 0x4;
-    } while (iVar3 < 0x80);
-
-    iter = self;
-    iVar3 = 0;
-    do {
-        if (*reinterpret_cast<long**>(iter + 0x5DC) != 0) {
-            operator delete(*reinterpret_cast<long**>(iter + 0x5DC));
-            *reinterpret_cast<long**>(iter + 0x5DC) = 0;
-        }
-        iVar3 = iVar3 + 1;
-        iter = iter + 0x4;
-    } while (iVar3 < 0x80);
-
-    u8*& recvBuffer = *reinterpret_cast<u8**>(self + kRecvBuffOffset);
-    if (recvBuffer != 0) {
-        delete[] recvBuffer;
-        recvBuffer = 0;
     }
 
-    pppModelSt**& modelSlots = *reinterpret_cast<pppModelSt***>(self + kUsbMapMeshTableOffset);
-    if (modelSlots != 0) {
+    for (int i = 0; i < 0x80; i++) {
+        if (m_editTextBuffers[i] != 0) {
+            operator delete(m_editTextBuffers[i]);
+            m_editTextBuffers[i] = 0;
+        }
+    }
+
+    for (int i = 0; i < 0x80; i++) {
+        if (m_editProgramData[i] != 0) {
+            operator delete(m_editProgramData[i]);
+            m_editProgramData[i] = 0;
+        }
+    }
+
+    if (m_editNodeNameBuffer != 0) {
+        delete[] m_editNodeNameBuffer;
+        m_editNodeNameBuffer = 0;
+    }
+
+    if (m_editModelSlots != 0) {
         for (int i = 0; i < 0x88; i++) {
-            pppModelSt* model = modelSlots[i];
-            if (model != 0) {
-                delete model;
-                modelSlots[i] = 0;
+            if (m_editModelSlots[i] != 0) {
+                delete m_editModelSlots[i];
+                m_editModelSlots[i] = 0;
             }
         }
 
-        if (modelSlots != 0) {
-            operator delete(modelSlots);
-            modelSlots = 0;
+        if (m_editModelSlots != 0) {
+            operator delete(m_editModelSlots);
+            m_editModelSlots = 0;
         }
     }
 
-    pppShapeSt**& shapeSlots = *reinterpret_cast<pppShapeSt***>(self + kUsbShapeSlotTableOffset);
-    if (shapeSlots != 0) {
+    if (m_editShapeSlots != 0) {
         for (int i = 0; i < 0x80; i++) {
-            pppShapeSt* shape = shapeSlots[i];
-            if (shape != 0) {
-                delete shape;
-                shapeSlots[i] = 0;
+            if (m_editShapeSlots[i] != 0) {
+                delete m_editShapeSlots[i];
+                m_editShapeSlots[i] = 0;
             }
         }
 
-        if (shapeSlots != 0) {
-            operator delete(shapeSlots);
-            shapeSlots = 0;
+        if (m_editShapeSlots != 0) {
+            operator delete(m_editShapeSlots);
+            m_editShapeSlots = 0;
         }
     }
 
-    iVar3 = 0;
-    iter = self;
-    do {
-        if (*reinterpret_cast<void**>(iter + 0x3D8) != 0) {
-            operator delete(*reinterpret_cast<void**>(iter + 0x3D8));
-            *reinterpret_cast<void**>(iter + 0x3D8) = 0;
+    for (int i = 0; i < 0x80; i++) {
+        if (m_editTextBuffers[i] != 0) {
+            operator delete(m_editTextBuffers[i]);
+            m_editTextBuffers[i] = 0;
         }
-        iVar3 = iVar3 + 1;
-        iter = iter + 0x4;
-    } while (iVar3 < 0x80);
-
-    if (*reinterpret_cast<void**>(self + 0x7FC) != 0) {
-        operator delete(*reinterpret_cast<void**>(self + 0x7FC));
-        *reinterpret_cast<int*>(self + 0x7FC) = 0;
     }
-#undef self
+
+    if (m_editTextTable != 0) {
+        operator delete(m_editTextTable);
+        m_editTextTable = 0;
+    }
 }
-#pragma opt_lifetimes reset
-#pragma opt_strength_reduction reset
 
 /*
  * --INFO--

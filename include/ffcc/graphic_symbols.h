@@ -12,7 +12,7 @@ extern int gGraphicDrawDoneRequest;
 extern signed char gGraphicDrawDoneRequestInit;
 extern int gGraphicDrawDonePartControlRequest;
 extern signed char gGraphicDrawDonePartControlInit;
-extern GXRenderModeObj gDefaultGXRenderMode;
+extern GXRenderModeObj _GXPal528IntDf;
 extern const char sGraphicInitData[];
 extern const char sGraphicSourceStrings[];
 extern u8 gGraphicNoiseTextureI8_64x96[];

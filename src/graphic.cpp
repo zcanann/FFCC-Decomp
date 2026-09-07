@@ -21,6 +21,21 @@
 
 CGraphic Graphic;
 
+GXRenderModeObj _GXPal528IntDf = {
+    VI_TVMODE_PAL_INT,
+    640, 448, 528,
+    40, 23,
+    640, 528,
+    VI_XFBMODE_DF,
+    GX_FALSE, GX_FALSE,
+    {
+        {6, 6}, {6, 6}, {6, 6}, {6, 6},
+        {6, 6}, {6, 6}, {6, 6}, {6, 6},
+        {6, 6}, {6, 6}, {6, 6}, {6, 6}
+    },
+    {8, 8, 10, 12, 10, 8, 8}
+};
+
 extern "C" {
 OSThread m_thread;
 u8 m_threadStack[0x4000] ATTRIBUTE_ALIGN(8);
@@ -148,7 +163,7 @@ void CGraphic::Init()
     OSResumeThread(&m_thread);
 
     VIInit();
-    m_renderMode = &gDefaultGXRenderMode;
+    m_renderMode = &_GXPal528IntDf;
     m_displayCopyEnabled = 1;
 
     GXRenderModeObj* renderMode = m_renderMode;
@@ -279,12 +294,12 @@ int CGraphic::GetProgressive()
  */
 void CGraphic::ChangeProgressive(int mode)
 {
-    GXRenderModeObj* defaultRenderMode = &gDefaultGXRenderMode;
+    GXRenderModeObj* defaultRenderMode = &_GXPal528IntDf;
     if (m_renderMode != defaultRenderMode) {
         m_renderMode = defaultRenderMode;
         GXAdjustForOverscan(m_renderMode, m_renderMode, 0, 0x10);
         VIConfigure(m_renderMode);
-        GXSetCopyFilter(m_renderMode->aa, m_renderMode->sample_pattern, GX_TRUE, gDefaultGXRenderMode.vfilter);
+        GXSetCopyFilter(m_renderMode->aa, m_renderMode->sample_pattern, GX_TRUE, _GXPal528IntDf.vfilter);
         VIFlush();
         VIWaitForRetrace();
         VIWaitForRetrace();

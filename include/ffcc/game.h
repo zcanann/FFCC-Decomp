@@ -129,7 +129,7 @@ public:
     void LoadScript(char*);
     void LoadInit();
     void LoadFinished();
-    int GetBossArtifact(int, int);
+    CBossArtifactEntry* GetBossArtifact(int, int);
     int GetFoodLevel(int, int);
     void GetTargetCursor(int, Vec&, Vec&);
     int GetParticleSpecialInfo(PPPIFPARAM&, int&, int&);

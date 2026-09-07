@@ -4197,9 +4197,9 @@ void CMenuPcs::createBonus()
 
 		s_Rinfo->m_partyCount = activeCount;
 
-		unsigned short* bossArtifact = reinterpret_cast<unsigned short*>(Game.GetBossArtifact(s_Rinfo->m_partyCount, totalValue));
+		CGame::CBossArtifactEntry* bossArtifact = Game.GetBossArtifact(s_Rinfo->m_partyCount, totalValue);
 		for (int i = 0; i < 4; i++) {
-			s_Rinfo->m_bossArtifacts[i] = bossArtifact[i];
+			s_Rinfo->m_bossArtifacts[i] = bossArtifact->m_values[i];
 		}
 
 		s_Rinfo->m_missingArtifactMask = 0;

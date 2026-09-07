@@ -156,10 +156,10 @@ static s8 sMapObjRotationInitialized;
 
 /*
  * --INFO--
- * PAL Address: 0x8001439c
+ * PAL Address: 0x8001439C
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001DDBC
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -168,13 +168,14 @@ inline int CGBaseObj::GetCID()
     return 1;
 }
 
-template <>
-CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index);
-
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline CGame::CGame()
     : m_partyMinX(kGamePartyBoundsMinInit)
@@ -184,15 +185,14 @@ inline CGame::CGame()
     , m_partyMaxY(kGamePartyBoundsMaxInit)
     , m_partyMaxZ(kGamePartyBoundsMaxInit)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001600c
+ * PAL Address: 0x8001600C
  * PAL Size: 476b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001AA90
+ * EN Size: 508b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -255,10 +255,10 @@ void CGame::Init()
 
 /*
  * --INFO--
- * PAL Address: 0x80015f14
+ * PAL Address: 0x80015F14
  * PAL Size: 248b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001AC8C
+ * EN Size: 256b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -288,8 +288,12 @@ void CGame::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80015E8C
+ * PAL Size: 136b
+ * EN Address: 0x8001AD8C
+ * EN Size: 144b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::LoadLogoWaitingData()
 {
@@ -308,10 +312,10 @@ void CGame::LoadLogoWaitingData()
 
 /*
  * --INFO--
- * PAL Address: 0x800157a8
+ * PAL Address: 0x800157A8
  * PAL Size: 1764b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001AE1C
+ * EN Size: 1876b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -443,8 +447,8 @@ void CGame::Exec()
  * --INFO--
  * PAL Address: 0x80015610
  * PAL Size: 408b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001B570
+ * EN Size: 164b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -491,8 +495,12 @@ void CGame::Create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800155F0
+ * PAL Size: 32b
+ * EN Address: 0x8001B614
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Destroy()
 {
@@ -501,10 +509,10 @@ void CGame::Destroy()
 
 /*
  * --INFO--
- * PAL Address: 0x8001551c
+ * PAL Address: 0x8001551C
  * PAL Size: 212b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001B63C
+ * EN Size: 132b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -531,8 +539,8 @@ void CGame::InitNewGame()
  * --INFO--
  * PAL Address: 0x80015280
  * PAL Size: 668b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001B6C0
+ * EN Size: 152b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -643,10 +651,10 @@ inline void CGame::clearWorkScript()
 
 /*
  * --INFO--
- * PAL Address: 0x80014ff8
+ * PAL Address: 0x80014FF8
  * PAL Size: 648b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001B934
+ * EN Size: 436b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -721,10 +729,10 @@ void CGame::CheckScriptChange()
 
 /*
  * --INFO--
- * PAL Address: 0x80014e78
+ * PAL Address: 0x80014E78
  * PAL Size: 384b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001BAE8
+ * EN Size: 680b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -766,10 +774,10 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
 
 /*
  * --INFO--
- * PAL Address: 0x80014e44
+ * PAL Address: 0x80014E44
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001BD90
+ * EN Size: 52b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -781,10 +789,10 @@ void CGame::ScriptChanging(char*)
 
 /*
  * --INFO--
- * PAL Address: 0x80014d04
+ * PAL Address: 0x80014D04
  * PAL Size: 320b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001BDC4
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -817,8 +825,12 @@ void CGame::ScriptChanged(char*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014D00
+ * PAL Size: 4b
+ * EN Address: 0x8001BDEC
+ * EN Size: 4b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::MapChanging(int, int)
 {
@@ -827,8 +839,12 @@ void CGame::MapChanging(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014CFC
+ * PAL Size: 4b
+ * EN Address: 0x8001BDF0
+ * EN Size: 4b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::MapChanged(int, int, int)
 {
@@ -837,10 +853,10 @@ void CGame::MapChanged(int, int, int)
 
 /*
  * --INFO--
- * PAL Address: 0x80014b90
+ * PAL Address: 0x80014B90
  * PAL Size: 364b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001BDF4
+ * EN Size: 1108b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -883,8 +899,12 @@ void CGame::loadCfd()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014994
+ * PAL Size: 508b
+ * EN Address: 0x8001C248
+ * EN Size: 356b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Calc()
 {
@@ -936,8 +956,8 @@ void CGame::Calc()
  * --INFO--
  * PAL Address: 0x80014964
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001C3AC
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -950,8 +970,8 @@ void CGame::Calc2()
  * --INFO--
  * PAL Address: 0x80014934
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001C3DC
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -963,107 +983,77 @@ void CGame::Calc3()
 
 /*
  * --INFO--
- * PAL Address: 0x80014540
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x800148F4
+ * PAL Size: 64b
+ * EN Address: 0x8001C40C
+ * EN Size: 64b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::LoadFinished()
+void CGame::Draw()
 {
-	for (int i = 0; i < 8; ++i) {
-		m_caravanWorkArr[i].LoadFinished();
-	}
+	gCFlatRuntime().SystemCall(0, 1, 6, 0, 0, 0);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001458c
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x800148C0
+ * PAL Size: 52b
+ * EN Address: 0x8001C44C
+ * EN Size: 52b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::LoadInit()
+void CGame::Draw2()
 {
-	for (int i = 0; i < 8; ++i) {
-		m_caravanWorkArr[i].LoadInit();
-	}
+	CFlatRuntime2Storage().Draw();
+	Wind.Draw();
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800145d8
+ * PAL Address: 0x8001486C
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001C480
+ * EN Size: 84b
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline void loadPermanentScriptVars(char* scriptData)
+void CGame::Draw3()
 {
-    int scriptOffset = 0;
-    int i = 0;
-    int entryOffset = 0;
-
-    while (i < CFlatPermanentVarCount()) {
-        int flagIndex = entryOffset + 1;
-        if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
-            CFlatPermanentVarWord(entryOffset) = reinterpret_cast<u32*>(scriptData)[scriptOffset / 4];
-            scriptOffset += 4;
-        }
-
-        entryOffset += 4;
-        i++;
-    }
-}
-
-void CGame::LoadScript(char* scriptData)
-{
-    loadPermanentScriptVars(scriptData);
+	CFlatRuntime2Storage().CFlatRuntime2::Frame(0, 2);
+	gCFlatRuntime().SystemCall(0, 1, 5, 0, 0, 0);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001462c
- * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x800147F8
+ * PAL Size: 116b
+ * EN Address: 0x8001C4D4
+ * EN Size: 164b
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline void savePermanentScriptVars(char* scriptData)
+void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PPPIFPARAM* hitParam)
 {
-    int scriptOffset = 0;
-    int i = 0;
-    int entryOffset = 0;
-
-    while (i < CFlatPermanentVarCount()) {
-        int flagIndex = entryOffset + 1;
-        if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
-            reinterpret_cast<u32*>(scriptData)[scriptOffset / 4] = CFlatPermanentVarWord(entryOffset);
-            scriptOffset += 4;
-        }
-
-        entryOffset += 4;
-        i++;
-    }
-}
-
-void CGame::SaveScript(char* scriptData)
-{
-    memset(scriptData, 0, kGameScriptSaveDataSize);
-    savePermanentScriptVars(scriptData);
+	CFlatRuntime::CStack stack[8];
+	stack[0].m_word = (u32)effectIndex;
+	stack[1].m_word = (u32)kind;
+	stack[2].m_word = (u32)nodeIndex;
+	*(float*)&stack[3].m_word = pos->x;
+	*(float*)&stack[4].m_word = pos->y;
+	*(float*)&stack[5].m_word = pos->z;
+	stack[6].m_word = (u32)hitParam->m_particleIndex;
+	stack[7].m_word = (u32)hitParam->m_classId;
+	gCFlatRuntime().SystemCall(0, 1, 1, 8, stack, 0);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800146b4
+ * PAL Address: 0x800146B4
  * PAL Size: 324b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001C578
+ * EN Size: 420b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1093,84 +1083,113 @@ void CGame::ParticleFrameCallback(int effectIndex, int scriptLine, int scriptSte
 	}
 }
 
-/*
- * --INFO--
- * PAL Address: 0x800147f8
- * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PPPIFPARAM* hitParam)
+static inline void savePermanentScriptVars(char* scriptData)
 {
-	CFlatRuntime::CStack stack[8];
-	stack[0].m_word = (u32)effectIndex;
-	stack[1].m_word = (u32)kind;
-	stack[2].m_word = (u32)nodeIndex;
-	*(float*)&stack[3].m_word = pos->x;
-	*(float*)&stack[4].m_word = pos->y;
-	*(float*)&stack[5].m_word = pos->z;
-	stack[6].m_word = (u32)hitParam->m_particleIndex;
-	stack[7].m_word = (u32)hitParam->m_classId;
-	gCFlatRuntime().SystemCall(0, 1, 1, 8, stack, 0);
+    int scriptOffset = 0;
+    int i = 0;
+    int entryOffset = 0;
+
+    while (i < CFlatPermanentVarCount()) {
+        int flagIndex = entryOffset + 1;
+        if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
+            reinterpret_cast<u32*>(scriptData)[scriptOffset / 4] = CFlatPermanentVarWord(entryOffset);
+            scriptOffset += 4;
+        }
+
+        entryOffset += 4;
+        i++;
+    }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001486c
+ * PAL Address: 0x8001462C
+ * PAL Size: 136b
+ * EN Address: 0x8001C71C
+ * EN Size: 236b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGame::SaveScript(char* scriptData)
+{
+    memset(scriptData, 0, kGameScriptSaveDataSize);
+    savePermanentScriptVars(scriptData);
+}
+
+static inline void loadPermanentScriptVars(char* scriptData)
+{
+    int scriptOffset = 0;
+    int i = 0;
+    int entryOffset = 0;
+
+    while (i < CFlatPermanentVarCount()) {
+        int flagIndex = entryOffset + 1;
+        if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
+            CFlatPermanentVarWord(entryOffset) = reinterpret_cast<u32*>(scriptData)[scriptOffset / 4];
+            scriptOffset += 4;
+        }
+
+        entryOffset += 4;
+        i++;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800145D8
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001C808
+ * EN Size: 224b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::Draw3()
+void CGame::LoadScript(char* scriptData)
 {
-	CFlatRuntime2Storage().CFlatRuntime2::Frame(0, 2);
-	gCFlatRuntime().SystemCall(0, 1, 5, 0, 0, 0);
+    loadPermanentScriptVars(scriptData);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800148c0
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x8001458C
+ * PAL Size: 76b
+ * EN Address: 0x8001C8E8
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::Draw2()
+void CGame::LoadInit()
 {
-	CFlatRuntime2Storage().Draw();
-	Wind.Draw();
+	for (int i = 0; i < 8; ++i) {
+		m_caravanWorkArr[i].LoadInit();
+	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800148f4
- * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x80014540
+ * PAL Size: 76b
+ * EN Address: 0x8001C938
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::Draw()
+void CGame::LoadFinished()
 {
-	gCFlatRuntime().SystemCall(0, 1, 6, 0, 0, 0);
+	for (int i = 0; i < 8; ++i) {
+		m_caravanWorkArr[i].LoadFinished();
+	}
 }
 
-#pragma opt_propagation off
 /*
  * --INFO--
- * PAL Address: 0x8001440c
+ * PAL Address: 0x8001440C
  * PAL Size: 308b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001C988
+ * EN Size: 452b
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGame::GetBossArtifact(int ratioIndex, int amount)
+CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
 {
     static s16 s_top[] = {0, 2, 4, 0};
 
@@ -1184,40 +1203,31 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
     int stageBase = s_top[stage];
 
     u16 thresholds[4];
-    memset(thresholds, 0, 8);
+    memset(thresholds, 0, sizeof(thresholds));
 
     int stageIndex = (int)Game.m_gameWork.m_bossArtifactStageIndex;
-    int stageByteOffset = stageIndex * sizeof(CBossArtifactStage);
     CBossArtifactStage* artifactBase = Game.m_bossArtifactBase;
-    CBossArtifactStage* stageArtifacts =
-        reinterpret_cast<CBossArtifactStage*>(reinterpret_cast<char*>(artifactBase) + stageByteOffset);
     int artifactRank = 3;
 
-    thresholds[1] = stageArtifacts->m_rankThresholds[1];
-    thresholds[2] = stageArtifacts->m_rankThresholds[2];
-    thresholds[3] = stageArtifacts->m_rankThresholds[3];
+    thresholds[1] = artifactBase[stageIndex].m_rankThresholds[1];
+    thresholds[2] = artifactBase[stageIndex].m_rankThresholds[2];
+    thresholds[3] = artifactBase[stageIndex].m_rankThresholds[3];
 
     if (((scaledAmount < (s16)thresholds[3]) && (artifactRank = 2, scaledAmount < (s16)thresholds[2])) &&
         (artifactRank = 1, scaledAmount < (s16)thresholds[1])) {
         artifactRank = 0;
     }
 
-    scaledAmount = rand();
-    int divisor = artifactRank + 1;
-    int entriesByteOffset = stageByteOffset + offsetof(CBossArtifactStage, m_entries);
-    int quotient = scaledAmount / divisor;
-    stageBase += scaledAmount - quotient * divisor;
-    return reinterpret_cast<int>(reinterpret_cast<char*>(artifactBase) +
-        entriesByteOffset + stageBase * (int)sizeof(CBossArtifactEntry));
+    stageBase += rand() % (artifactRank + 1);
+    return &artifactBase[stageIndex].m_entries[stageBase];
 }
 
-#pragma opt_propagation on
 /*
  * --INFO--
- * PAL Address: 0x800143ec
+ * PAL Address: 0x800143EC
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001CB4C
+ * EN Size: 172b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1230,10 +1240,10 @@ int CGame::GetFoodLevel(int playerIndex, int foodIndex)
 
 /*
  * --INFO--
- * PAL Address: 0x800143a4
+ * PAL Address: 0x800143A4
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001CBF8
+ * EN Size: 204b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1253,10 +1263,10 @@ void CGame::GetTargetCursor(int playerIndex, Vec& posA, Vec& posB)
 
 /*
  * --INFO--
- * PAL Address: 0x800142e4
+ * PAL Address: 0x800142E4
  * PAL Size: 184b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001CCC4
+ * EN Size: 188b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1288,8 +1298,12 @@ int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800142D0
+ * PAL Size: 20b
+ * EN Address: 0x8001CD80
+ * EN Size: 20b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CGPartyObj* CGame::GetPartyObj(int index)
 {
@@ -1298,10 +1312,10 @@ CGPartyObj* CGame::GetPartyObj(int index)
 
 /*
  * --INFO--
- * PAL Address: 0x800141e0
+ * PAL Address: 0x800141E0
  * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001CD94
+ * EN Size: 180b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1344,8 +1358,8 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
  * --INFO--
  * PAL Address: 0x80014144
  * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001CE48
+ * EN Size: 144b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1374,10 +1388,10 @@ char* CGame::MakeArtsItemNames(char* out, int itemIndex)
 
 /*
  * --INFO--
- * PAL Address: 0x800140c8
+ * PAL Address: 0x800140C8
  * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001CED8
+ * EN Size: 104b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1397,10 +1411,10 @@ char* CGame::MakeNumItemName(char* out, int itemIndex, int count)
 
 /*
  * --INFO--
- * PAL Address: 0x80013fd8
+ * PAL Address: 0x80013FD8
  * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001CF40
+ * EN Size: 180b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1441,10 +1455,10 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
 
 /*
  * --INFO--
- * PAL Address: 0x80013f3c
+ * PAL Address: 0x80013F3C
  * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001CFF4
+ * EN Size: 144b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1473,10 +1487,10 @@ char* CGame::MakeArtsMonNames(char* out, int monIndex)
 
 /*
  * --INFO--
- * PAL Address: 0x80013ec0
+ * PAL Address: 0x80013EC0
  * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001D084
+ * EN Size: 104b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1496,10 +1510,10 @@ char* CGame::MakeNumMonName(char* out, int monIndex, int count)
 
 /*
  * --INFO--
- * PAL Address: 80013e70
+ * PAL Address: 0x80013E70
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001D0EC
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1728,19 +1742,4 @@ inline CGame::CGameWork::CGameWork()
     m_chaliceElement = 1;
     strcpy(m_townName, m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
     m_gameInitFlag = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800161f0
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index)
-{
-    return GetAt(index);
 }

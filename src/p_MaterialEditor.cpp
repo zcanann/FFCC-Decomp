@@ -1,3 +1,4 @@
+#include "ffcc/math.h"
 #include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/p_camera.h"
@@ -387,32 +388,18 @@ void CMaterialEditorPcs::drawViewer()
 }
 /*
  * --INFO--
- * PAL Address: 0x8004bec8
+ * PAL Address: 0x8004BEC8
  * PAL Size: 464b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80057EDC
+ * EN Size: 432b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMaterialEditorPcs::calcViewer()
 {
-    struct ViewerSRT {
-        float transX;
-        float transY;
-        float transZ;
-        float rotX;
-        float rotY;
-        float rotZ;
-        float scaleX;
-        float scaleY;
-        float scaleZ;
-    };
-
     Mtx cameraMatrix;
-    ViewerSRT srt;
+    SRT srt;
     Mtx scaleMatrix;
-    float rotationValue;
-    float one;
 
     USBPcs.mccReadData();
 
@@ -422,21 +409,11 @@ void CMaterialEditorPcs::calcViewer()
         m_usbStream.SetUSBStreamDataDone();
     }
 
-    one = LoadFloat(kMaterialEditorOneF);
-    rotationValue = LoadFloat(kMaterialEditorZeroF);
-    srt.transZ = rotationValue;
-    srt.transY = rotationValue;
-    srt.transX = rotationValue;
-    srt.rotZ = rotationValue;
-    srt.rotY = rotationValue;
-    srt.rotX = rotationValue;
-    srt.scaleZ = one;
-    srt.scaleY = one;
-    srt.scaleX = one;
-    srt.transX = m_usbTransform.m_cameraPosition.x;
-    srt.transY = m_usbTransform.m_cameraPosition.y;
-    srt.transZ = -m_usbTransform.m_cameraPosition.z;
-    CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
+    srt.Identity();
+    srt.m_position.x = m_usbTransform.m_cameraPosition.x;
+    srt.m_position.y = m_usbTransform.m_cameraPosition.y;
+    srt.m_position.z = -m_usbTransform.m_cameraPosition.z;
+    CameraPcs.SetViewerSRT(&srt);
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
 

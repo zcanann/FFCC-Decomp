@@ -1,3 +1,4 @@
+#include "ffcc/math.h"
 #include "ffcc/ME_USB_process.h"
 #include "global.h"
 #include "ffcc/p_camera.h"
@@ -27,17 +28,6 @@ extern const float kMapEditorOne = 1.0f;
 extern const double kMapEditorS32ToDoubleBias = 4503601774854144.0;
 
 namespace {
-struct ViewerSRT {
-    float transX;
-    float transY;
-    float transZ;
-    float rotX;
-    float rotY;
-    float rotZ;
-    float scaleX;
-    float scaleY;
-    float scaleZ;
-};
 
 static inline CMemory::CStage* MaterialEditorStage()
 {
@@ -92,8 +82,8 @@ static inline void StoreSwapS16(s16* value)
  * --INFO--
  * PAL Address: 0x8004CA08
  * PAL Size: 4784b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80059AC4
+ * EN Size: 5368b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -122,9 +112,7 @@ void CMaterialEditorPcs::SetUSBData()
         AddRsdList(&m_zlist1);
         break;
     case 0x10: {
-        extern const float kMapEditorZero;
-        extern const float kMapEditorOne;
-        ViewerSRT srt;
+        SRT srt;
         Vec minPos;
         Vec maxPos;
         RSDITEM* rsdItem = GetRsdItem()->rsdItem;
@@ -157,19 +145,11 @@ void CMaterialEditorPcs::SetUSBData()
         s32 xDiff = static_cast<s32>(maxPos.y - minPos.y);
         s32 yDiff = static_cast<s32>(maxPos.z - minPos.z);
 
-        srt.transX = kMapEditorZero;
-        srt.transZ = kMapEditorZero;
-        srt.transY = kMapEditorZero;
-        srt.rotZ = kMapEditorZero;
-        srt.rotY = kMapEditorZero;
-        srt.rotX = kMapEditorZero;
-        srt.scaleZ = kMapEditorOne;
-        srt.scaleY = kMapEditorOne;
-        srt.scaleX = kMapEditorOne;
-        srt.transX = kMapEditorZero;
-        srt.transY = static_cast<f32>(-xDiff / 2);
-        srt.transZ = static_cast<f32>(-yDiff * (xDiff / 0x14) - 10);
-        CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
+        srt.Identity();
+        srt.m_position.x = kMapEditorZero;
+        srt.m_position.y = static_cast<f32>(-xDiff / 2);
+        srt.m_position.z = static_cast<f32>(-yDiff * (xDiff / 0x14) - 10);
+        CameraPcs.SetViewerSRT(&srt);
         break;
     }
     case 0x13: {
@@ -308,14 +288,8 @@ void CMaterialEditorPcs::SetUSBData()
         RSDITEM* rsdItem = this->GetRsdItem()->rsdItem;
         memcpy(dstBuffer, usb.m_data, usb.m_sizeBytes);
 
-        u32 i;
-        u32 dstOffset;
-        for (i = 0, dstOffset = 0; i < usb.m_sizeBytes; dstOffset += 0x70, i++) {
-            u8 value = *dstBuffer;
-            u8* writeBase = reinterpret_cast<u8*>(rsdItem->m_polygons);
-            u32 writeOffset = dstOffset + 0x1A;
-            dstBuffer++;
-            writeBase[writeOffset] = value;
+        for (u32 i = 0; i < usb.m_sizeBytes; i++) {
+            rsdItem->m_polygons[i]._1a[0] = *dstBuffer++;
         }
 
         if (src != 0) {

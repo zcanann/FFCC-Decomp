@@ -878,10 +878,10 @@ int CMath::Rand(unsigned long max)
 
 /*
  * --INFO--
- * PAL Address: 0x8001bfe0
+ * PAL Address: 0x8001BFE0
  * PAL Size: 324b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800235D8
+ * EN Size: 96b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -896,14 +896,13 @@ void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
     float sinXSinY;
     float cosXSinY;
     float* matrix = &out[0][0];
-    float* values = reinterpret_cast<float*>(srt);
 
-    sinX = (float)sin((double)values[3]);
-    cosX = (float)cos((double)values[3]);
-    sinY = (float)sin((double)values[4]);
-    cosY = (float)cos((double)values[4]);
-    sinZ = (float)sin((double)values[5]);
-    cosZ = (float)cos((double)values[5]);
+    sinX = (float)sin((double)srt->m_rotation.x);
+    cosX = (float)cos((double)srt->m_rotation.x);
+    sinY = (float)sin((double)srt->m_rotation.y);
+    cosY = (float)cos((double)srt->m_rotation.y);
+    sinZ = (float)sin((double)srt->m_rotation.z);
+    cosZ = (float)cos((double)srt->m_rotation.z);
 
     sinXSinY = sinX * sinY;
     cosXSinY = cosX * sinY;
@@ -916,23 +915,22 @@ void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
     matrix[2] = cosZ * cosXSinY + sinX * sinZ;
     matrix[6] = sinZ * cosXSinY - sinX * cosZ;
     matrix[10] = cosX * cosY;
-    matrix[3] = values[0];
-    matrix[7] = values[1];
-    matrix[11] = values[2];
+    matrix[3] = srt->m_position.x;
+    matrix[7] = srt->m_position.y;
+    matrix[11] = srt->m_position.z;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001c124
+ * PAL Address: 0x8001C124
  * PAL Size: 360b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80023554
+ * EN Size: 132b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
 {
-    float* s = reinterpret_cast<float*>(srt);
     Mtx rot;
     float sx;
     float cx;
@@ -946,13 +944,13 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     float zRotY;
     float zRotZ;
 
-    PSMTXScale(out, s[6], s[7], s[8]);
-    sx = (float)sin((double)s[3]);
-    cx = (float)cos((double)s[3]);
-    sy = (float)sin((double)s[4]);
-    cy = (float)cos((double)s[4]);
-    sz = (float)sin((double)s[5]);
-    cz = (float)cos((double)s[5]);
+    PSMTXScale(out, srt->m_scale.x, srt->m_scale.y, srt->m_scale.z);
+    sx = (float)sin((double)srt->m_rotation.x);
+    cx = (float)cos((double)srt->m_rotation.x);
+    sy = (float)sin((double)srt->m_rotation.y);
+    cy = (float)cos((double)srt->m_rotation.y);
+    sz = (float)sin((double)srt->m_rotation.z);
+    cz = (float)cos((double)srt->m_rotation.z);
 
     sxsy = sx * sy;
     cxsy = cx * sy;
@@ -968,9 +966,9 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     rot[0][2] = zRotX;
     rot[1][2] = zRotY;
     rot[2][2] = zRotZ;
-    rot[0][3] = s[0];
-    rot[1][3] = s[1];
-    rot[2][3] = s[2];
+    rot[0][3] = srt->m_position.x;
+    rot[1][3] = srt->m_position.y;
+    rot[2][3] = srt->m_position.z;
 
     PSMTXConcat(rot, out, out);
 }

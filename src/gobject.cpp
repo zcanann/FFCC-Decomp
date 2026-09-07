@@ -46,12 +46,6 @@ struct ModelFlagsA0Signed {
     s8 m_lo : 5;
 };
 
-struct GObjectSRT {
-    Vec m_trans;
-    Vec m_rot;
-    Vec m_scale;
-};
-
 STATIC_ASSERT(sizeof(CGObject::AttackCol) == 0x30);
 STATIC_ASSERT(sizeof(CGObject::DamageCol) == 0x28);
 STATIC_ASSERT(offsetof(CGObject::AttackCol, m_hitMask) == 0x2C);
@@ -148,7 +142,6 @@ static inline float GObjSqrtf(float x)
 
     return x;
 }
-
 
 static inline unsigned char* ModelBytes(CChara::CModel* model)
 {
@@ -1797,7 +1790,6 @@ void CGObject::CancelMove(int moveType)
     gCFlatRuntime().SystemCall(this, 2, 7, 1, &arg, 0);
 }
 
-
 /*
  * --INFO--
  * PAL Address: 0x8007df50
@@ -2021,10 +2013,10 @@ void CGObject::copy()
 
 /*
  * --INFO--
- * PAL Address: 0x8007e698
+ * PAL Address: 0x8007E698
  * PAL Size: 6216b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8008EB64
+ * EN Size: 6668b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2101,17 +2093,17 @@ void CGObject::update()
         modelMtx[1][3] = m_worldPosition.y;
         modelMtx[2][3] = m_worldPosition.z;
     } else {
-        GObjectSRT srt;
+        SRT srt;
         const float scaleInit = sAnimFrameOffset;
-        srt.m_trans.x = srt.m_trans.y = srt.m_trans.z = sZeroFloat;
-        srt.m_rot.x = srt.m_rot.y = srt.m_rot.z = sZeroFloat;
+        srt.m_position.x = srt.m_position.y = srt.m_position.z = sZeroFloat;
+        srt.m_rotation.x = srt.m_rotation.y = srt.m_rotation.z = sZeroFloat;
         srt.m_scale.x = srt.m_scale.y = srt.m_scale.z = scaleInit;
-        srt.m_trans = m_worldPosition;
-        PSVECAdd(&srt.m_trans, &m_extraMoveVec, &srt.m_trans);
+        srt.m_position = m_worldPosition;
+        PSVECAdd(&srt.m_position, &m_extraMoveVec, &srt.m_position);
 
-        srt.m_rot.x = m_rotBaseX;
-        srt.m_rot.y = m_rotBaseY;
-        srt.m_rot.z = m_rotBaseZ;
+        srt.m_rotation.x = m_rotBaseX;
+        srt.m_rotation.y = m_rotBaseY;
+        srt.m_rotation.z = m_rotBaseZ;
         srt.m_scale.x = m_rotationX;
         srt.m_scale.y = m_rotationY;
         srt.m_scale.z = m_rotationZ;
@@ -2121,16 +2113,16 @@ void CGObject::update()
             const float wobbleBias = m_worldParamA == 0x20 ? sWobbleBiasLarge : sWobbleBiasSmall;
             m_radiusCtrl.z += sRadiusWobbleScale * m_radiusCtrl.y + wobbleBias;
             m_radiusCtrl.y *= sRadiusWobbleDecay;
-            srt.m_rot.y += m_radiusCtrl.z;
+            srt.m_rotation.y += m_radiusCtrl.z;
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             const float cameraYaw = CameraPcs.m_yaw;
-            srt.m_rot.y = sPiFloat - cameraYaw;
-            srt.m_rot.y += sBgAttrNormal * cosf(sBgAttrNormal * m_radiusCtrl.y);
-            srt.m_trans.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);
+            srt.m_rotation.y = sPiFloat - cameraYaw;
+            srt.m_rotation.y += sBgAttrNormal * cosf(sBgAttrNormal * m_radiusCtrl.y);
+            srt.m_position.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);
             m_radiusCtrl.y += sRadiusCtrlStep;
         }
 
-        Math.SRTToMatrix(modelMtx, reinterpret_cast<SRT*>(&srt));
+        Math.SRTToMatrix(modelMtx, &srt);
 
         Mtx rotScratch;
         if (m_stateFlags0Bits.unk3) {

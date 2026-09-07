@@ -45,13 +45,6 @@ namespace {
 
 typedef CChara::CMesh::CDisplayList CCharaDisplayListRaw;
 
-struct SRTView
-{
-	Vec m_position;
-	Vec m_rotation;
-	Vec m_scale;
-};
-
 typedef CChara::CMesh::CRefData CCharaMeshRefRaw;
 typedef CChara::CMesh CCharaMeshRaw;
 
@@ -1461,10 +1454,10 @@ void CChara::CModel::calcNowFrame()
 
 /*
  * --INFO--
- * PAL Address: 0x80071b64
+ * PAL Address: 0x80071B64
  * PAL Size: 1936b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800800F8
+ * EN Size: 1636b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1508,7 +1501,7 @@ void CChara::CModel::calcMatrix()
 			parentNode = ModelNodes(this) + ref->m_parentIndex;
 		}
 
-		SRTView srt;
+		SRT srt;
 		Mtx animMtx;
 
 		if (NodeAnimNode0(node) != 0 || NodeAnimNode1(node) != 0) {
@@ -1534,11 +1527,11 @@ void CChara::CModel::calcMatrix()
 			}
 
 			if (NodeAnimNode1(node) != 0) {
-				NodeAnimNode1(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
+				NodeAnimNode1(node)->Interp(m_anim, &srt, frame);
 				if (AnimNodeUsesScale(NodeAnimNode1(node))) {
-					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
+					Math.SRTToMatrix(animMtx, &srt);
 				} else {
-					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
+					Math.SRTToMatrixRT(animMtx, &srt);
 				}
 				PSMTXConcat(NodeLocalRuntimeMtx(node), animMtx, NodeLocalRuntimeMtx(node));
 				PSMTXScale(animMtx,
@@ -1549,7 +1542,7 @@ void CChara::CModel::calcMatrix()
 			}
 
 			if (NodeAnimNode0(node) != 0) {
-				NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
+				NodeAnimNode0(node)->Interp(m_anim, &srt, frame);
 				s16 nodeIndex = ref->m_index;
 				if (nodeIndex == ModelHeadIndex(this) || nodeIndex == ModelChest3Index(this) ||
 				    nodeIndex == ModelChest2Index(this)) {
@@ -1566,9 +1559,9 @@ void CChara::CModel::calcMatrix()
 					srt.m_rotation.z += TexAnimSetChin(ModelTexAnimSet(this));
 				}
 				if (AnimNodeUsesScale(NodeAnimNode0(node))) {
-					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
+					Math.SRTToMatrix(animMtx, &srt);
 				} else {
-					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
+					Math.SRTToMatrixRT(animMtx, &srt);
 				}
 				if (NodeRuntimeFlag80(node)) {
 					PSMTXConcat(NodeLocalRuntimeMtx(node), animMtx, NodeLocalRuntimeMtx(node));
@@ -1674,10 +1667,10 @@ void CChara::CModel::calcMatrix()
 #pragma opt_common_subs off
 /*
  * --INFO--
- * PAL Address: 0x800716c4
+ * PAL Address: 0x800716C4
  * PAL Size: 1184b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8008075C
+ * EN Size: 1140b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1690,7 +1683,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 	PSMTXIdentity(out);
 
 	int reuseAnimNode0Srt = 0;
-	SRTView parentScaleSrt;
+	SRT parentScaleSrt;
 	while (node != 0) {
 		CNode* parentNode = 0;
 		CChara::CNode::CRefData* ref = node->m_refData;
@@ -1703,15 +1696,15 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 		int curReuseAnimNode0Srt = reuseAnimNode0Srt;
 		reuseAnimNode0Srt = 0;
-		SRTView cachedParentScaleSrt = parentScaleSrt;
-		SRTView srt;
+		SRT cachedParentScaleSrt = parentScaleSrt;
+		SRT srt;
 		Mtx animMtx;
 		Mtx localMtx;
 
 		if (NodeAnimNode0(node) != 0 || NodeAnimNode1(node) != 0) {
 			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 &&
 			    AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
-				NodeAnimNode0(parentNode)->Interp(m_anim, reinterpret_cast<SRT*>(&parentScaleSrt), frame);
+				NodeAnimNode0(parentNode)->Interp(m_anim, &parentScaleSrt, frame);
 				reuseAnimNode0Srt = 1;
 				PSMTXScale(localMtx,
 				           FLOAT_803301BC / parentScaleSrt.m_scale.x,
@@ -1731,11 +1724,11 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			}
 
 			if (NodeAnimNode1(node) != 0) {
-				NodeAnimNode1(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
+				NodeAnimNode1(node)->Interp(m_anim, &srt, frame);
 				if (AnimNodeUsesScale(NodeAnimNode1(node))) {
-					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
+					Math.SRTToMatrix(animMtx, &srt);
 				} else {
-					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
+					Math.SRTToMatrixRT(animMtx, &srt);
 				}
 				PSMTXConcat(localMtx, animMtx, localMtx);
 
@@ -1750,12 +1743,12 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				if (curReuseAnimNode0Srt) {
 					srt = cachedParentScaleSrt;
 				} else {
-					NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
+					NodeAnimNode0(node)->Interp(m_anim, &srt, frame);
 				}
 				if (AnimNodeUsesScale(NodeAnimNode0(node))) {
-					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
+					Math.SRTToMatrix(animMtx, &srt);
 				} else {
-					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
+					Math.SRTToMatrixRT(animMtx, &srt);
 				}
 				PSMTXConcat(localMtx, animMtx, localMtx);
 			}

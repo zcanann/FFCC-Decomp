@@ -23,9 +23,7 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" int Rand__5CMathFUl(CMath* math);
-extern "C" CVector* __ct__7CVectorFv(void* self);
-extern "C" CVector* __ct__7CVectorFRC3Vec(void* self, const Vec* src);
+STATIC_ASSERT(offsetof(CGObject, m_homeRotY) == 0x1BC);
 
 u8 CGMonObj::m_aiWork[0xC];
 u8 CGMonObj::m_boss[0x8C];
@@ -270,13 +268,15 @@ void CGMonObj::logicFuncDefault()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80113098
+ * PAL Size: 1508b
+ * EN Address: 0x80139CC0
+ * EN Size: 1812b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrame()
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-
 	unsigned int& moveStateFlags = m_moveWork.m_stateFlags;
 	unsigned int& moveFlags = m_moveWork.m_flags;
 	float& moveSpeed = m_moveWork.m_speed;
@@ -287,9 +287,9 @@ void CGMonObj::moveFrame()
 	float& moveSpeedRate = m_pushScale;
 	short& aStarGroupId = m_aStarGroupId;
 
-	CVector local_68;
-	CVector local_74;
-	float in_f29 = 0.0f;
+	CVector targetPos;
+	CVector moveDirection;
+	float targetDist = 0.0f;
 
 	if ((moveStateFlags & 1) != 0) {
 		return;
@@ -298,104 +298,78 @@ void CGMonObj::moveFrame()
 	(this->*m_funcs->moveFrame)();
 
 	if ((moveFlags & 1) != 0) {
-		{
-			CVector tmp(m_moveWork.m_target->m_worldPosition);
-			local_68.x = tmp.x;
-			local_68.y = tmp.y;
-			local_68.z = tmp.z;
-		}
-		in_f29 = PSVECDistance(reinterpret_cast<Vec*>(&local_68), &object->m_worldPosition);
+		targetPos = CVector(m_moveWork.m_target->m_worldPosition);
+		targetDist = PSVECDistance(static_cast<Vec*>(targetPos), &m_worldPosition);
 
 		if (((moveFlags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
 			short targetAStarGroupId = m_moveWork.m_target->m_aStarGroupId;
-			moveAStar(aStarGroupId, targetAStarGroupId, local_68);
+			moveAStar(aStarGroupId, targetAStarGroupId, targetPos);
 		}
 	} else if ((moveFlags & 2) != 0) {
-		{
-			CVector tmp(m_moveWork.m_targetPos);
-			local_68.x = tmp.x;
-			local_68.y = tmp.y;
-			local_68.z = tmp.z;
-		}
-		in_f29 = PSVECDistance(reinterpret_cast<Vec*>(&local_68), &object->m_worldPosition);
+		targetPos = CVector(m_moveWork.m_targetPos);
+		targetDist = PSVECDistance(static_cast<Vec*>(targetPos), &m_worldPosition);
 
 		if (((moveFlags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
-			int polygonGroup = AStar.calcPolygonGroup(reinterpret_cast<Vec*>(&local_68), static_cast<int>(object->m_bgHitMask));
-			moveAStar(aStarGroupId, polygonGroup, local_68);
+			int polygonGroup = AStar.calcPolygonGroup(static_cast<Vec*>(targetPos), static_cast<int>(m_bgHitMask));
+			moveAStar(aStarGroupId, polygonGroup, targetPos);
 		}
 	} else if ((moveFlags & 0x2000) != 0) {
-		CVector tmpTarget(m_moveWork.m_targetPos);
-		CVector tmpWorld(object->m_worldPosition);
-		CVector result;
-		PSVECAdd(reinterpret_cast<Vec*>(&tmpWorld), reinterpret_cast<Vec*>(&tmpTarget), reinterpret_cast<Vec*>(&result));
-		local_68.x = result.x;
-		local_68.y = result.y;
-		local_68.z = result.z;
-		in_f29 = PSVECDistance(reinterpret_cast<Vec*>(&local_68), &object->m_worldPosition);
+		targetPos = CVector(m_worldPosition) + CVector(m_moveWork.m_targetPos);
+		targetDist = PSVECDistance(static_cast<Vec*>(targetPos), &m_worldPosition);
 	}
 
-	{
-		CVector tmpWorld(object->m_worldPosition);
-		CVector result;
-		PSVECSubtract(reinterpret_cast<Vec*>(&local_68), reinterpret_cast<Vec*>(&tmpWorld), reinterpret_cast<Vec*>(&result));
-		local_74.x = result.x;
-		local_74.y = result.y;
-		local_74.z = result.z;
-	}
+	moveDirection = targetPos - CVector(m_worldPosition);
 	if ((moveFlags & 0x40) != 0) {
-		CVector neg(-local_74.x, -local_74.y, -local_74.z);
-		local_74.x = neg.x;
-		local_74.y = neg.y;
-		local_74.z = neg.z;
+		moveDirection = CVector(-moveDirection.x, -moveDirection.y, -moveDirection.z);
 	}
 
-	float rotY = local_74.GetRotateY();
-	float distance = PSVECMag(reinterpret_cast<Vec*>(&local_74));
+	float rotY = moveDirection.GetRotateY();
+	float distance = PSVECMag(static_cast<Vec*>(moveDirection));
 
-	if ((((moveFlags & 0x20) != 0) && !(in_f29 < moveRange)) ||
-		(((moveFlags & 0x40) != 0) && !(moveRange <= in_f29))) {
+	if ((((moveFlags & 0x20) != 0) && (targetDist < moveRange)) ||
+		(((moveFlags & 0x40) != 0) && (targetDist >= moveRange))) {
 	moveCancelExit:
 		moveStateFlags |= 1;
 		(this->*m_funcs->moveCancel)();
 		moveStateFlags |= 2;
 		if ((moveFlags & 0x100) != 0) {
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(moveChangeStat, 0, 0);
+			changeStat(moveChangeStat, 0, 0);
 		}
 		return;
 	}
 
 	if ((moveFlags & 4) != 0) {
-		float oldRotY = object->m_rotBaseY;
+		float oldRotY = m_rotBaseY;
 		if ((moveFlags & 0x8000) != 0) {
 			oldRotY += 3.1415927f;
 		}
 
 		float dstRot = Math.DstRot(rotY, oldRotY);
-		float hitNrmX = object->m_hitNormal.x;
-		float baseDelta = dstRot * hitNrmX;
-		float rotDelta = dstRot * (1.0f - hitNrmX);
-		object->m_rotBaseY = object->m_rotBaseY + baseDelta;
+		float turnFactor = m_turnFactor;
+		float baseDelta = dstRot * turnFactor;
+		float rotDelta = dstRot * (1.0f - turnFactor);
+		m_rotBaseY = m_rotBaseY + baseDelta;
 		rotY = rotY - rotDelta;
-		object->m_rotTargetY = object->m_rotBaseY;
+		m_rotTargetY = m_rotBaseY;
 
 		float s = sinf(dstRot);
 		float c = cosf(dstRot);
-		float x = local_74.x;
-		local_74.x = (c * x) - (s * local_74.z);
-		local_74.z = (s * x) + (c * local_74.z);
-		distance = PSVECMag(reinterpret_cast<Vec*>(&local_74));
+		float x = moveDirection.x;
+		moveDirection.x = (c * x) - (s * moveDirection.z);
+		moveDirection.z = (s * x) + (c * moveDirection.z);
+		distance = PSVECMag(static_cast<Vec*>(moveDirection));
 	}
 
-	if (((moveFlags & 0x80) != 0) && (object->m_stateFlags0Bits.unk1 < 0)) {
+	if (((moveFlags & 0x80) != 0) && (m_stateFlags0Bits.unk1 != 0)) {
 		goto moveCancelExit;
 	}
 
 	float stepDist;
 	if ((moveFlags & 0x200) != 0) {
-		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4);
+		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xD4);
 		stepDist = moveSpeedRate * (0.01f * speedScale + kMonObjEpsilon);
 	} else if ((moveFlags & 0x800) != 0) {
-		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4);
+		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xD4);
 		stepDist = moveSpeedRate * (0.01f * speedScale + kMonObjEpsilon);
 	} else {
 		stepDist = moveSpeed;
@@ -403,42 +377,33 @@ void CGMonObj::moveFrame()
 
 	CVector moveDelta;
 	if ((moveFlags & 0x1000) != 0) {
-		moveDelta.x = local_74.x;
-		moveDelta.y = local_74.y;
-		moveDelta.z = local_74.z;
+		moveDelta = moveDirection;
 	} else {
 		if (__fabs(distance) < kMonObjSmallStepF64) {
-			CVector zero(0.0f, 0.0f, 0.0f);
-			moveDelta.x = zero.x;
-			moveDelta.y = zero.y;
-			moveDelta.z = zero.z;
+			moveDelta = CVector(0.0f, 0.0f, 0.0f);
 		} else {
-			CVector scaledStep;
-			PSVECScale(reinterpret_cast<Vec*>(&local_74), static_cast<Vec*>(scaledStep), (1.0f / distance) * stepDist);
-			moveDelta.x = scaledStep.x;
-			moveDelta.y = scaledStep.y;
-			moveDelta.z = scaledStep.z;
+			moveDelta = moveDirection * ((1.0f / distance) * stepDist);
 		}
 	}
 
 	if ((moveFlags & 0x4000) != 0) {
-		PSVECAdd(&object->m_groundHitOffset, static_cast<Vec*>(moveDelta), &object->m_groundHitOffset);
+		PSVECAdd(&m_groundHitOffset, static_cast<Vec*>(moveDelta), &m_groundHitOffset);
 	} else {
-		object->m_groundHitOffset.x += moveDelta.x;
-		object->m_groundHitOffset.z += moveDelta.z;
+		m_groundHitOffset.x += moveDelta.x;
+		m_groundHitOffset.z += moveDelta.z;
 	}
 
-	float stepRemaining = in_f29 - stepDist;
+	float stepRemaining = targetDist - stepDist;
 	if ((moveFlags & 0x8000) != 0) {
-		object->m_rotTargetY = 3.1415927f + rotY;
+		m_rotTargetY = 3.1415927f + rotY;
 	} else {
-		object->m_rotTargetY = rotY;
+		m_rotTargetY = rotY;
 	}
 
 	if (((moveFlags & 0x20) == 0 || !(stepRemaining < moveRange)) &&
-		((moveFlags & 0x40) == 0 || !(moveRange <= stepRemaining))) {
+		((moveFlags & 0x40) == 0 || !(stepRemaining >= moveRange))) {
 		if ((moveFrame == 0) && ((moveFlags & 0x400) == 0)) {
-			reinterpret_cast<CGPrgObj*>(this)->reqAnim(1, 1, 0);
+			reqAnim(1, 1, 0);
 		}
 
 		moveFrame++;
@@ -473,15 +438,12 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 		if (((m_moveWork.m_flags & 0x10000) != 0) && ((m_moveWork.m_flags & 0x40) == 0)) {
 			short currentRoute = routeFrom;
 			if ((currentRoute != 0) && (forbiddenGroup != 0) && (currentRoute != forbiddenGroup)) {
-				int forbiddenIdx = forbiddenGroup + 0x36;
-				unsigned char* routeStep = reinterpret_cast<unsigned char*>(&AStar) +
-					currentRoute * 0x80 + forbiddenGroup * 2 + 0x40c;
+				unsigned char* routeStep = AStar.m_routeTable[currentRoute][forbiddenGroup];
 				CAStar::CAPos* portalPos = &AStar.m_portals[routeStep[1]];
 				float portalDist = PSVECDistance(&object->m_worldPosition, &portalPos->m_position);
 				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 					routeFrom = routeStep[0];
-					portalPos = &AStar.m_portals[*(reinterpret_cast<unsigned char*>(&AStar) +
-						routeStep[0] * 0x80 + forbiddenGroup * 2 + 0x40d)];
+					portalPos = &AStar.m_portals[AStar.m_routeTable[routeStep[0]][forbiddenGroup][1]];
 				}
 				targetPos.x = portalPos->m_position.x;
 				targetPos.y = portalPos->m_position.y;
@@ -491,56 +453,22 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 			CAStar::CAPos* escapePos;
 			if ((routeFrom != 0) && (forbiddenGroup != 0) &&
 				((escapePos = AStar.getEscapePos(object->m_worldPosition, targetPos, routeFrom, routePrev)) != NULL)) {
-				unsigned int nextGroup = escapePos->m_groupA;
-				if (static_cast<unsigned short>(nextGroup) == routeFrom) {
+				unsigned short nextGroup = escapePos->m_groupA;
+				if (nextGroup == routeFrom) {
 					nextGroup = escapePos->m_groupB;
 				}
-				unsigned char* routeStep = reinterpret_cast<unsigned char*>(&AStar) +
-					routeFrom * 0x80 + static_cast<unsigned char>(nextGroup) * 2 + 0x40c;
+				unsigned char* routeStep = AStar.m_routeTable[routeFrom][static_cast<unsigned char>(nextGroup)];
 				float portalDist = PSVECDistance(&object->m_worldPosition, &escapePos->m_position);
 				if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 					routePrev = routeFrom;
 					routeFrom = routeStep[0];
-					escapePos = &AStar.m_portals[*(reinterpret_cast<unsigned char*>(&AStar) +
-						routeStep[0] * 0x80 + forbiddenGroup * 2 + 0x40d)];
+					escapePos = &AStar.m_portals[AStar.m_routeTable[routeStep[0]][forbiddenGroup][1]];
 				}
 
-				Vec dir;
-				Vec myVec;
-				Vec portalVec;
-				volatile Vec finalVec;
-				Vec myVec2;
-				Vec dirScaled;
-				Vec dirRaw;
-				Vec scaled;
-				Vec result;
 				float targetDist = PSVECDistance(&targetPos, &object->m_worldPosition);
-				__ct__7CVectorFRC3Vec(&portalVec, &escapePos->m_position);
-				Vec* capturePtr;
-				capturePtr = reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(&myVec, &object->m_worldPosition));
-				__ct__7CVectorFv(&dirRaw);
-				PSVECSubtract(capturePtr, &portalVec, &dirRaw);
-				dir.x = dirRaw.x;
-				dir.y = dirRaw.y;
-				dir.z = dirRaw.z;
-				reinterpret_cast<CVector*>(&dir)->Normalize();
-				__ct__7CVectorFv(&scaled);
-				PSVECScale(&dir, &scaled, targetDist);
-				dirScaled.x = scaled.x;
-				dirScaled.y = scaled.y;
-				dirScaled.z = scaled.z;
-				capturePtr = reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(&myVec2, &object->m_worldPosition));
-				__ct__7CVectorFv(&result);
-				PSVECAdd(capturePtr, &dirScaled, &result);
-				float rx = result.x;
-				float ry = result.y;
-				float rz = result.z;
-				finalVec.x = rx;
-				targetPos.x = rx;
-				targetPos.y = ry;
-				finalVec.y = ry;
-				finalVec.z = rz;
-				targetPos.z = rz;
+				CVector dir = CVector(object->m_worldPosition) - CVector(escapePos->m_position);
+				dir.Normalize();
+				targetPos = CVector(object->m_worldPosition) + dir * targetDist;
 			}
 		}
 	}
@@ -587,7 +515,7 @@ void CGMonObj::setRepop(int mode)
 		m_homePosition.y = object->unk_0x16C;
 		m_homePosition.z = object->unk_0x170;
 		object->m_worldPosition = m_homePosition;
-		float baseRot = *reinterpret_cast<float*>(&object->m_bgFlags);
+		float baseRot = object->m_homeRotY;
 		object->m_rotBaseY = baseRot;
 		object->m_rotTargetY = baseRot;
 
@@ -822,7 +750,7 @@ void CGMonObj::initFinishedFuncDefault()
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
 	// Script value is authored in centi-units.
-	object->m_hitNormal.x = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B0));
+	object->m_turnFactor = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B0));
 
 	CCharaPcs::CHandle* handle = object->m_charaModelHandle;
 	if (handle != NULL) {
@@ -1029,7 +957,7 @@ void CGMonObj::onFrameAlways()
 
 		if (stepSeId != 0) {
 			int& stepSeHandle = m_stepSeHandle;
-			if (object->m_currentAnimSlot == *reinterpret_cast<char*>(&object->m_animStartFrame)) {
+			if (object->m_currentAnimSlot == object->m_animSlots[1]) {
 				if (stepSeHandle != 0) {
 					Sound.ChangeSe3DPos(stepSeHandle, &object->m_worldPosition);
 				} else {
@@ -1132,7 +1060,7 @@ void CGMonObj::statMove(int* targetIndex)
 			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 		}
 		if (*chaseTimer == 0) {
-			object->m_rotTargetY = *reinterpret_cast<float*>(&object->m_bgFlags);
+			object->m_rotTargetY = object->m_homeRotY;
 		}
 
 		double soundLimit = (Game.m_gameWork.m_soundOptionFlag != 0) ? kMonObjWideSoundRange : kMonObjNormalSoundRange;
@@ -1788,20 +1716,21 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	}
 
 	if (selectorType == 1) {
-#define groupCursor (*reinterpret_cast<volatile int*>(&monObj->m_unk6CC))
-	wloop:
-		{
-			int wcursor = groupCursor;
-			if (groupCount[wcursor] == 0) {
-				groupCursor = wcursor + 1;
-				if (groupCursor >= 8) {
-					groupCursor = 0;
-				}
-				goto wloop;
+		int& groupCursor = monObj->m_unk6CC;
+		int count;
+		for (;;) {
+			int cursor = groupCursor;
+			count = groupCount[cursor];
+			if (count != 0) {
+				break;
+			}
+			groupCursor = cursor + 1;
+			if (groupCursor >= 8) {
+				groupCursor = 0;
 			}
 		}
 
-		int pick = Rand__5CMathFUl(&Math);
+		int pick = Math.Rand(count);
 		int seen = 0;
 		int i = 0;
 		for (int pass = 0; pass < 2; pass++) {
@@ -1819,7 +1748,6 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			}
 			groupPtr += 4;
 		}
-#undef groupCursor
 	}
 
 mlDone:
@@ -3081,19 +3009,12 @@ int CGMonObj::getReplaceStat(int state)
  */
 void CGMonObj::enableDamageCol(int enabled)
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-
-	unsigned int& damageCol1X =
-		*reinterpret_cast<unsigned int*>(&object->m_damageColliders[1].m_localPosition.x);
-	unsigned int& damageCol2X =
-		*reinterpret_cast<unsigned int*>(&object->m_damageColliders[2].m_localPosition.x);
-
 	if (enabled != 0) {
-		damageCol1X = 1;
-		damageCol2X = 1;
+		m_damageColliders[0].m_hitMask = 1;
+		m_damageColliders[1].m_hitMask = 1;
 	} else {
-		damageCol1X = 0;
-		damageCol2X = 0;
+		m_damageColliders[0].m_hitMask = 0;
+		m_damageColliders[1].m_hitMask = 0;
 	}
 }
 
@@ -3114,8 +3035,8 @@ void CGMonObj::enableAttackCol(int enabled, int, int)
 		int attackKind = *reinterpret_cast<int*>(mon + 0x560);
 		unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) +
 			attackKind * 0x48;
-		unsigned int colMask = *reinterpret_cast<unsigned short*>(attackData + 0xC);
-		unsigned int colValue;
+		int colMask = *reinterpret_cast<unsigned short*>(attackData + 0xC);
+		int colValue;
 		if (attackKind >= 0x1F5) {
 			colValue = *reinterpret_cast<unsigned short*>(attackData + 2);
 		} else {
@@ -3123,30 +3044,12 @@ void CGMonObj::enableAttackCol(int enabled, int, int)
 		}
 
 		for (int i = 0; i < 8; i++) {
-			if ((((int)colMask >> i) & 1) != 0) {
-				if (i == -1) {
-					*reinterpret_cast<unsigned int*>(mon + 0x20C) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x23C) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x26C) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x29C) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x2CC) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x2FC) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x32C) = colValue;
-					*reinterpret_cast<unsigned int*>(mon + 0x35C) = colValue;
-				} else {
-					*reinterpret_cast<unsigned int*>(mon + 0x20C + i * 0x30) = colValue;
-				}
+			if (((colMask >> i) & 1) != 0) {
+				SetAttackColMask(i, colValue);
 			}
 		}
 	} else {
-		*reinterpret_cast<unsigned int*>(mon + 0x20C) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x23C) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x26C) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x29C) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x2CC) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x2FC) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x32C) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x35C) = 0;
+		SetAttackColMask(-1, 0);
 	}
 }
 
@@ -3273,7 +3176,7 @@ void CGMonObj::onStatMagic()
 						if (rotLimit > kMonObjTwoThirdsPi) {
 							object->m_rotTargetY = targetRot;
 						} else {
-							float delta = Math.DstRot(targetRot, *reinterpret_cast<float*>(&object->m_bgFlags));
+							float delta = Math.DstRot(targetRot, object->m_homeRotY);
 							float clamped = -rotLimit;
 							if (!(delta < clamped)) {
 								if (rotLimit < delta) {
@@ -3282,7 +3185,7 @@ void CGMonObj::onStatMagic()
 									clamped = delta;
 								}
 							}
-							object->m_rotTargetY = *reinterpret_cast<float*>(&object->m_bgFlags) + clamped;
+							object->m_rotTargetY = object->m_homeRotY + clamped;
 						}
 					}
 				}
@@ -3797,8 +3700,6 @@ void CGMonObj::onFrameStat()
 #undef SET_DRAW_FLAG
 }
 
-
-
 /*
  * --INFO--
  * PAL Address: 0x80119278
@@ -3860,42 +3761,41 @@ void CGMonObj::onCancelStat(int state)
 /*
  * --INFO--
  * PAL Address: 0x80119428
- * PAL Size: 252b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Size: 256b
+ * EN Address: 0x80133B84
+ * EN Size: 352b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGMonObj::setActionParam(int state)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
 
 	int scriptOffset = (state + 0xE) * 2;
 	unsigned int action = *reinterpret_cast<unsigned short*>(script + scriptOffset + 0xD0);
-	*reinterpret_cast<unsigned int*>(mon + 0x560) = action;
+	m_itemId = action;
 
 	unsigned int motion = *reinterpret_cast<unsigned short*>(script + scriptOffset + 0xF0);
-	*reinterpret_cast<unsigned int*>(mon + 0x550) = motion;
-	*reinterpret_cast<int*>(mon + 0x554) = *reinterpret_cast<int*>(mon + 0x550) + 1;
-	*reinterpret_cast<int*>(mon + 0x558) = *reinterpret_cast<int*>(mon + 0x554) + 1;
-	*reinterpret_cast<int*>(mon + 0x55C) = *reinterpret_cast<int*>(mon + 0x558) + 1;
+	m_attackAnimId = motion;
+	m_unk554 = m_attackAnimId + 1;
+	m_unk558 = m_unk554 + 1;
+	m_unk55C = m_unk558 + 1;
 
-	int actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0xE);
+	int actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0xE);
 	switch (actionType) {
 	case 0:
 	case 1:
 	case 3:
-		*reinterpret_cast<unsigned int*>(mon + 0x630) =
-			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x20);
-		*reinterpret_cast<unsigned int*>(mon + 0x634) =
-			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x22));
-		*reinterpret_cast<unsigned int*>(mon + 0x638) =
-			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x22));
+		m_castFrameStart =
+			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x20);
+		m_castFrameEnd =
+			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (m_itemId * 0x48 + 0x22));
+		m_castFrameCurrent =
+			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (m_itemId * 0x48 + 0x22));
 		break;
 	case 2:
-		*reinterpret_cast<int*>(mon + 0x68C) = CGCharaObj::calcCastTime(*reinterpret_cast<int*>(mon + 0x560));
+		m_unk68C = CGCharaObj::calcCastTime(m_itemId);
 		break;
 	case 4:
 		break;
@@ -3905,16 +3805,15 @@ void CGMonObj::setActionParam(int state)
 /*
  * --INFO--
  * PAL Address: 0x80119528
- * PAL Size: 324b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Size: 332b
+ * EN Address: 0x80133AFC
+ * EN Size: 136b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGMonObj::onChangeStat(int state)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	(this->*m_funcs->changeStat)(state);
 
 	if ((state < 3) && (state < -4) && (state >= -14)) {
@@ -3922,28 +3821,28 @@ void CGMonObj::onChangeStat(int state)
 		int actionType;
 
 		unsigned int action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (scriptOffset + 0xD0));
-		*reinterpret_cast<unsigned int*>(mon + 0x560) = action;
+		m_itemId = action;
 		unsigned int motion = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (scriptOffset + 0xF0));
-		*reinterpret_cast<unsigned int*>(mon + 0x550) = motion;
-		*reinterpret_cast<int*>(mon + 0x554) = *reinterpret_cast<int*>(mon + 0x550) + 1;
-		*reinterpret_cast<int*>(mon + 0x558) = *reinterpret_cast<int*>(mon + 0x554) + 1;
-		*reinterpret_cast<int*>(mon + 0x55C) = *reinterpret_cast<int*>(mon + 0x558) + 1;
+		m_attackAnimId = motion;
+		m_unk554 = m_attackAnimId + 1;
+		m_unk558 = m_unk554 + 1;
+		m_unk55C = m_unk558 + 1;
 
-		actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0xE);
+		actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0xE);
 		switch (actionType) {
 		case 0:
 		case 1:
 		case 3:
-			*reinterpret_cast<unsigned int*>(mon + 0x630) =
-				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x20);
-			*reinterpret_cast<unsigned int*>(mon + 0x634) =
-				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x22));
-			*reinterpret_cast<unsigned int*>(mon + 0x638) =
-				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x22));
+			m_castFrameStart =
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x20);
+			m_castFrameEnd =
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (m_itemId * 0x48 + 0x22));
+			m_castFrameCurrent =
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (m_itemId * 0x48 + 0x22));
 			break;
 		case 2:
-			*reinterpret_cast<unsigned int*>(mon + 0x68C) =
-				CGCharaObj::calcCastTime(*reinterpret_cast<int*>(mon + 0x560));
+			m_unk68C =
+				CGCharaObj::calcCastTime(m_itemId);
 			break;
 		case 4:
 			break;
@@ -4043,8 +3942,8 @@ void CGMonObj::setAttackAfter(int attackKind)
  * --INFO--
  * PAL Address: 0x80119A64
  * PAL Size: 1116b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801333C4
+ * EN Size: 664b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -4052,10 +3951,9 @@ void CGMonObj::onStatAttack(int state)
 {
 #define prgObj (reinterpret_cast<CGPrgObj*>(this))
 #define object (reinterpret_cast<CGObject*>(this))
-#define mon (reinterpret_cast<unsigned char*>(this))
-	unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + *reinterpret_cast<int*>(mon + 0x560) * 0x48;
-	int attackType = *reinterpret_cast<unsigned short*>(attackData + 0xE);
-	unsigned short attackFlags = *reinterpret_cast<unsigned short*>(attackData + 0x32);
+	SCharaItemRow* attackData = &reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
+	int attackType = attackData->m_actionType;
+	unsigned short attackFlags = attackData->m_flags32;
 
 	if (state == 0) {
 		if ((prgObj->m_stateFrame == 0) && (m_targetPartyIndex >= 0)) {
@@ -4065,26 +3963,19 @@ void CGMonObj::onStatAttack(int state)
 			if ((attackFlags & 2) == 0) {
 				float rotLimit = kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
 				if (m_targetPartyIndex >= 0) {
-					float targetRot = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
+					float targetRot = getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 					if (rotLimit > kMonObjTwoThirdsPi) {
-						object->m_rotTargetY = targetRot;
+						m_rotTargetY = targetRot;
 					} else {
-						float delta = Math.DstRot(targetRot, *reinterpret_cast<float*>(&object->m_bgFlags));
-						float clamped = -rotLimit;
-						if (!(delta < clamped)) {
-							if (rotLimit < delta) {
-								clamped = rotLimit;
-							} else {
-								clamped = delta;
-							}
-						}
-						object->m_rotTargetY = *reinterpret_cast<float*>(&object->m_bgFlags) + clamped;
+						float delta = Math.DstRot(targetRot, m_homeRotY);
+						float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
+						m_rotTargetY = m_homeRotY + clamped;
 					}
 				}
 			}
 
 			target = Game.m_partyObjArr[m_targetPartyIndex];
-			reinterpret_cast<CGPrgObj*>(target)->bonus(0x17, *reinterpret_cast<int*>(mon + 0x560), reinterpret_cast<CGPrgObj*>(target));
+			reinterpret_cast<CGPrgObj*>(target)->bonus(0x17, m_itemId, reinterpret_cast<CGPrgObj*>(target));
 		}
 		return;
 	}
@@ -4098,19 +3989,19 @@ void CGMonObj::onStatAttack(int state)
 			break;
 		case 1:
 			if (prgObj->m_subFrame == 0) {
-				prgObj->reqAnim(*reinterpret_cast<int*>(mon + 0x554), 1, 0);
+				prgObj->reqAnim(m_unk554, 1, 0);
 			}
-			if (prgObj->m_subFrame == *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (*reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x2E))) {
+			if (prgObj->m_subFrame == *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (m_itemId * 0x48 + 0x2E))) {
 				prgObj->addSubStat();
 			}
 			break;
 		case 2:
 			if (prgObj->m_subFrame == 0) {
-				prgObj->reqAnim(*reinterpret_cast<int*>(mon + 0x558), 0, 0);
+				prgObj->reqAnim(m_unk558, 0, 0);
 				reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
 			}
 			if (prgObj->isLoopAnim() != 0) {
-				CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
+				CGMonObj_SetAttackAfter(this, m_itemId);
 			}
 			break;
 		}
@@ -4118,9 +4009,8 @@ void CGMonObj::onStatAttack(int state)
 	}
 
 	if ((__cntlzw(prgObj->m_stateArg) >> 5 & 1) && (prgObj->isLoopAnim() != 0)) {
-		CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
+		CGMonObj_SetAttackAfter(this, m_itemId);
 	}
-#undef attackData
 #undef prgObj
 #undef object
 #undef mon
@@ -4130,31 +4020,21 @@ void CGMonObj::onStatAttack(int state)
  * --INFO--
  * PAL Address: 0x80119EC0
  * PAL Size: 180b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801332A8
+ * EN Size: 284b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
 {
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-
 	if (targetPartyIndex >= 0) {
-		float targetRot = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[targetPartyIndex]));
+		float targetRot = getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[targetPartyIndex]));
 		if (rotLimit > kMonObjTwoThirdsPi) {
-			object->m_rotTargetY = targetRot;
+			m_rotTargetY = targetRot;
 		} else {
-			float delta = Math.DstRot(targetRot, *reinterpret_cast<float*>(&object->m_bgFlags));
-			float clamped = -rotLimit;
-			if (!(delta < clamped)) {
-				if (rotLimit < delta) {
-					clamped = rotLimit;
-				} else {
-					clamped = delta;
-				}
-			}
-			object->m_rotTargetY = *reinterpret_cast<float*>(&object->m_bgFlags) + clamped;
+			float delta = Math.DstRot(targetRot, m_homeRotY);
+			float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
+			m_rotTargetY = m_homeRotY + clamped;
 		}
 	}
 }

@@ -516,8 +516,8 @@ frame_input_done:
  * --INFO--
  * PAL Address: 0x8001EC94
  * PAL Size: 764b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80025C60
+ * EN Size: 792b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -529,9 +529,9 @@ void CMemory::Draw()
 
     extern const float kMemoryDrawZero;
 
-    Mtx orthoMtx;
+    Mtx44 orthoMtx;
     Mtx modelMtx;
-    char line[0x104];
+    char line[0x100];
 
     C_MTXOrtho(orthoMtx, kMemoryDrawZero, kMemoryDrawOrthoBottom, kMemoryDrawZero, kMemoryDrawOrthoRight,
                kMemoryDrawZero, kMemoryDrawOrthoFar);
@@ -962,8 +962,8 @@ void CMemory::CStage::quitBlock()
  * --INFO--
  * PAL Address: 0x8001E2EC
  * PAL Size: 524b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80026B4C
+ * EN Size: 956b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -985,17 +985,17 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
                 if (((node->m_flags & kMemoryBlockUsedFlag) == 0) &&
                     (size <= static_cast<unsigned int>(node->m_size))) {
                     if (size < static_cast<unsigned int>(node->m_size - 0x40)) {
-                        CBlock* split = stageBlockAt(reinterpret_cast<unsigned long>(node) + size);
-                        split[1].m_flags = 0;
-                        split[1].m_size = (node->m_size - static_cast<int>(size)) - 0x40;
+                        CBlock* split =
+                            reinterpret_cast<CBlock*>(static_cast<unsigned char*>(payloadFromBlock(node)) + size);
+                        split->m_flags = 0;
+                        split->m_size = (node->m_size - static_cast<int>(size)) - 0x40;
                         node->m_size = size;
-                        split[1].m_magicStart = kMemoryBlockStartMagic;
-                        split[1].m_magicEnd = kMemoryBlockEndMagic;
-                        split[1].m_prev = node;
-                        split[1].m_next = node->m_next;
-                        CBlock* split1 = split + 1;
-                        node->m_next = split1;
-                        split1->m_next->m_prev = split1;
+                        split->m_magicStart = kMemoryBlockStartMagic;
+                        split->m_magicEnd = kMemoryBlockEndMagic;
+                        split->m_prev = node;
+                        split->m_next = node->m_next;
+                        node->m_next = split;
+                        split->m_next->m_prev = split;
                     }
 
                     node->m_line = static_cast<unsigned short>(line);
@@ -1198,8 +1198,8 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
  * --INFO--
  * PAL Address: 0x8001DB48
  * PAL Size: 1088b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80027608
+ * EN Size: 1536b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1207,23 +1207,12 @@ void CMemory::CStage::drawHeapBar(int y)
 {
     extern const float kMemoryDrawZero;
     _GXColor color;
-    unsigned int colors[16];
-    colors[0] = sHeapBarColors[0];
-    colors[1] = sHeapBarColors[1];
-    colors[2] = sHeapBarColors[2];
-    colors[3] = sHeapBarColors[3];
-    colors[4] = sHeapBarColors[4];
-    colors[5] = sHeapBarColors[5];
-    colors[6] = sHeapBarColors[6];
-    colors[7] = sHeapBarColors[7];
-    colors[8] = sHeapBarColors[8];
-    colors[9] = sHeapBarColors[9];
-    colors[10] = sHeapBarColors[10];
-    colors[11] = sHeapBarColors[11];
-    colors[12] = sHeapBarColors[12];
-    colors[13] = sHeapBarColors[13];
-    colors[14] = sHeapBarColors[14];
-    colors[15] = sHeapBarColors[15];
+    unsigned int colors[16] = {
+        0xFFFFFF80, 0xFF808080, 0x80FF8080, 0xC0C0FF80,
+        0xFFFF8080, 0xFF80FF80, 0x80FFFF80, 0x80808080,
+        0x80000080, 0x00800080, 0x00008080, 0x80800080,
+        0x80008080, 0x00808080, 0xFF800080, 0xFF008080,
+    };
 
     CBlock* prevNode;
     CBlock* node;
@@ -1808,10 +1797,39 @@ void CAmemCache::IsEnable()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x800294B4
+ * EN Size: 372b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CAmemCacheSet::DumpCache()
+{
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
+    }
+
+    for (int i = 0; i < m_cacheCount; i++) {
+        CAmemCache& entry = cacheEntryAt(this, i);
+        if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
+            System.Printf(
+                const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(entry),
+                cacheTypeName(entry), entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
+        }
+    }
+
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(sAmemCacheSeparator));
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8001CD48
  * PAL Size: 360b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80028B98
+ * EN Size: 316b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1819,29 +1837,10 @@ void CAmemCacheSet::AddRef(short index)
 {
     m_cacheTable[index].m_refCount += 1;
     if (m_cacheTable[index].m_refCount >= 0xFFFF) {
-        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-            System.Printf(const_cast<char*>(sAmemCacheAddRefFmt), static_cast<int>(index));
-        }
+        DumpCache();
 
-        int offset = 0;
-        for (int i = 0; i < m_cacheCount; i++) {
-            CAmemCache& current = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
-            if (((current.m_inUse != 0) || (current.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
-                System.Printf(
-                    const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(current),
-                    cacheTypeName(current), current.m_refCount, current.m_priority,
-                    reinterpret_cast<int>(current.m_cacheData));
-            }
-            offset += sizeof(CAmemCache);
-        }
-
-        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-            System.Printf(const_cast<char*>(sAmemCacheSeparator));
-        }
-
-        void (*overflowHook)(int) = reinterpret_cast<void (*)(int)>(m_overflowHook);
-        if (overflowHook != 0) {
-            overflowHook(static_cast<unsigned int>(index));
+        if (m_overflowHook != 0) {
+            m_overflowHook(static_cast<unsigned long>(index));
         }
     }
 
@@ -1852,8 +1851,8 @@ void CAmemCacheSet::AddRef(short index)
  * --INFO--
  * PAL Address: 0x8001CBF4
  * PAL Size: 340b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80028CD4
+ * EN Size: 288b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1862,30 +1861,10 @@ void CAmemCacheSet::Release(short index)
     m_cacheTable[index].m_refCount -= 1;
 
     if (m_cacheTable[index].m_refCount >= 0xFFFF) {
-        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-            System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
-        }
+        DumpCache();
 
-        int i = 0;
-        int offset = i;
-        for (; i < m_cacheCount; i++) {
-            CAmemCache& cache = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
-            if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
-                System.Printf(
-                    const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(cache),
-                    cacheTypeName(cache), cache.m_refCount,
-                    cache.m_priority, reinterpret_cast<int>(cache.m_cacheData));
-            }
-            offset += sizeof(CAmemCache);
-        }
-
-        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-            System.Printf(const_cast<char*>(sAmemCacheSeparator));
-        }
-
-        void (*onUnderflow)(int) = reinterpret_cast<void (*)(int)>(m_overflowHook);
-        if (onUnderflow != 0) {
-            onUnderflow(static_cast<unsigned int>(index));
+        if (m_overflowHook != 0) {
+            m_overflowHook(static_cast<unsigned long>(index));
         }
     }
 }
@@ -2085,54 +2064,14 @@ void CAmemCacheSet::RefCnt0Compare()
  * --INFO--
  * PAL Address: 0x8001C40C
  * PAL Size: 288b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800292FC
+ * EN Size: 440b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CAmemCacheSet::AssertCache()
 {
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
-    }
-
-    for (int i = 0; i < m_cacheCount; i++) {
-        CAmemCache& entry = cacheEntryAt(this, i);
-        if ((entry.m_inUse != 0 || entry.m_cacheData != 0) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
-            System.Printf(
-                const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(entry),
-                cacheTypeName(entry), entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
-        }
-    }
-
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(sAmemCacheSeparator));
-    }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CAmemCacheSet::DumpCache()
-{
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
-    }
-
-    for (int i = 0; i < m_cacheCount; i++) {
-        CAmemCache& entry = cacheEntryAt(this, i);
-        if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
-            System.Printf(
-                const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(entry),
-                cacheTypeName(entry), entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
-        }
-    }
-
-    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-        System.Printf(const_cast<char*>(sAmemCacheSeparator));
-    }
+    DumpCache();
 }
 
 /*

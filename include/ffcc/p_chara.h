@@ -26,6 +26,7 @@ class CCharaPcs : public CProcess
 {
 public:
     class CLoadPdt;
+    class CLoadAnim;
 
     struct CCameraFrame
     {
@@ -49,7 +50,7 @@ public:
         void Add();
 
         void ChangeTexture(int, unsigned long, unsigned long, int, int);
-        void LoadModel(int, unsigned long, unsigned long, unsigned long, int, int, int);
+        int LoadModel(int, unsigned long, unsigned long, unsigned long, int, int, int);
         int LoadAnim(char*, int, int, int, int, int, int);
         int IsModelLoaded(int checkModelField);
         void FreeModel();
@@ -69,7 +70,7 @@ public:
         int m_charaNo;                      // 0x004
         unsigned int m_flags;               // 0x008
         float m_sortZ;                      // 0x00C
-        CRef* m_animSlot[64];               // 0x010-0x110
+        CLoadAnim* m_animSlot[64];          // 0x010-0x110
         int m_currentAnimIndex;             // 0x110
         float m_bgCharmPlaneY;              // 0x114
         float m_worldPosY;                  // 0x118
@@ -122,7 +123,7 @@ public:
         CLoadAnim()
         {
             m_anim = 0;
-            m_unk2C = 0;
+            m_pointCount = 0;
         }
         ~CLoadAnim();
 
@@ -132,9 +133,13 @@ public:
         int m_mergeFlags;               // 0x14
         char m_name[16];                // 0x18
         CChara::CAnim* m_anim;          // 0x28
-        unsigned short m_unk2C;         // 0x2C
-        char m_unk30[0x40];             // 0x30
-        unsigned int m_unk70;           // 0x70
+        struct CAnimPoint {
+            unsigned short m_type;
+            unsigned short m_frame;
+        };
+        unsigned short m_pointCount;   // 0x2C
+        CAnimPoint m_points[16];       // 0x2E
+        unsigned int m_playbackFlags;  // 0x70
     };
 
     class CLoadTexture
@@ -181,6 +186,9 @@ public:
 	{
 		TODO,
 	};
+
+    static CProcessCallbackTable m_table[3];
+    static const char* m_modelTable[6][3];
 
     CCharaPcs();
     ~CCharaPcs();

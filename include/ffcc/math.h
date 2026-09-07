@@ -6,16 +6,34 @@
 #include "ffcc/pppVec.h"
 
 struct Vec;
-struct SRT;
 
 void VECMultAdd(Vec*, Vec*, Vec*, float);
 
 class SRT
 {
 public:
-    void operator=(const SRT&);
-    void Identity();
+    /*
+     * --INFO--
+     * PAL Address: TODO
+     * PAL Size: TODO
+     * EN Address: 0x80044344
+     * EN Size: 52b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void Identity()
+    {
+        m_position.x = m_position.y = m_position.z = 0.0f;
+        m_rotation.x = m_rotation.y = m_rotation.z = 0.0f;
+        m_scale.x = m_scale.y = m_scale.z = 1.0f;
+    }
+
+    Vec m_position;
+    Vec m_rotation;
+    Vec m_scale;
 };
+
+typedef char SRT_size_check[(sizeof(SRT) == 0x24) ? 1 : -1];
 
 class CMath : public CManager
 {
@@ -33,7 +51,8 @@ public:
     void MTX44MultVec4(float(*)[4], Vec4d*, Vec4d*);
     void MTXGetScale(float(*)[4], Vec*);
     int CrossCheckSphereVector(Vec*, float*, Vec*, Vec*, Vec*, float);
-    void CrossCheckEllipseCapsule(Vec*, float*, Vec*, Vec*, float, Vec*, float, float);
+    int CrossCheckEllipseCapsule(Vec*, float*, Vec*, Vec*, float, Vec*, float, float);
+    void CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float, float);
     void MakeSpline1Dtable(int, float*, float*, float*);
     float Spline1D(int, float, float*, float*, float*);
     float Line1D(int, float, float*, float*);

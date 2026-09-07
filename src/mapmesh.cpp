@@ -91,31 +91,6 @@ static inline CMemory::CStage*& MapMeshAllocStage()
 
 /*
  * --INFO--
- * PAL Address: 0x80027774
- * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapMesh::pppCacheDumpModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
-{
-    int remaining = static_cast<int>(m_displayListCount);
-    CMapMeshDrawEntry* entry = m_drawEntries;
-    while (remaining-- != 0) {
-        if (entry->m_size != 0) {
-            if (entry->m_materialIdx == 0xFFFF) {
-                entry->m_materialIdx = 0;
-            } else {
-                materialSet->CacheDumpTexture(entry->m_materialIdx, cacheSet);
-            }
-        }
-        entry++;
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: TODO
  * PAL Size: TODO
  * EN Address: TODO
@@ -141,14 +116,14 @@ inline void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet* materialSet, C
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x80027774
+ * PAL Size: 120b
+ * EN Address: 0x8003324C
+ * EN Size: 144b
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapMesh::pppCacheUnLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
+void CMapMesh::pppCacheUnLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
 {
     int remaining = static_cast<int>(m_displayListCount);
     CMapMeshDrawEntry* entry = m_drawEntries;

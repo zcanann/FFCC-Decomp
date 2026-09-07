@@ -9,7 +9,10 @@ class CFunnyShapePcs;
 struct FS_DISPLAY_STATUS
 {
     u32 flags;        // 0x00
-    GXColor clear;    // 0x04
+    u8 clearR;        // 0x04
+    u8 clearG;        // 0x05
+    u8 clearB;        // 0x06
+    u8 clearA;        // 0x07
     f32 unk08;        // 0x08
     f32 unk0C;        // 0x0C
     f32 unk10;        // 0x10
@@ -22,7 +25,8 @@ struct FS_DISPLAY_STATUS
     s16 unk2A;        // 0x2A
     f32 unk2C;        // 0x2C
     f32 unk30;        // 0x30
-    u8 unk34[0xC];    // 0x34
+    u8 unk34;         // 0x34
+    u8 unk35[0xB];    // 0x35
 };
 
 struct OSFS_SHAPE_ST

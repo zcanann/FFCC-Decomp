@@ -345,18 +345,17 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
-    float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outCoeffScalar, Vec* p0,
-    Vec* p1, Vec* p2, Vec* p3)
+void CMath::CalcSpline(Vec* outPos, Vec* p0, Vec* p1, Vec* p2, Vec* p3,
+                      float scaleA, float scaleB, float scaleC, float t, float scale)
 {
     float scaleAB = scaleA + scaleB;
-    float radiusSquared = radius * radius;
-    float radiusCubed = radiusSquared * radius;
+    float tSquared = t * t;
+    float tCubed = tSquared * t;
     Vec4d coeffs;
-    coeffs.x = 1.0f + ((2.0f * radiusCubed) - (3.0f * radiusSquared));
-    coeffs.y = radius + (radiusCubed - (2.0f * radiusSquared));
-    coeffs.z = (-2.0f * radiusCubed) + (3.0f * radiusSquared);
-    coeffs.w = radiusCubed - radiusSquared;
+    coeffs.x = 1.0f + ((2.0f * tCubed) - (3.0f * tSquared));
+    coeffs.y = t + (tCubed - (2.0f * tSquared));
+    coeffs.z = (-2.0f * tCubed) + (3.0f * tSquared);
+    coeffs.w = tCubed - tSquared;
 
     Mtx44 control;
     control[0][0] = p1->x;
@@ -393,10 +392,10 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
     control[2][3] = tangent.z;
     control[3][3] = 1.0f;
 
-    MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(math, control, &coeffs, &coeffs);
-    outCoeffScalar[0] = coeffs.x;
-    outCoeffScalar[1] = coeffs.y;
-    outCoeffScalar[2] = coeffs.z;
+    MTX44MultVec4(control, &coeffs, &coeffs);
+    outPos->x = coeffs.x;
+    outPos->y = coeffs.y;
+    outPos->z = coeffs.z;
 }
 
 /*
@@ -408,11 +407,9 @@ extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
-    CMath* math, Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale, float scale,
-    float innerRadius, float outerRadius)
+int CMath::CrossCheckEllipseCapsule(Vec* outPos, float* outT, Vec* origin, Vec* vector, float radius,
+                                  Vec* ellipseCenter, float horizontalRadius, float verticalRadius)
 {
-    (void)math;
     int hit;
     float dVar6;
     float dVar7;
@@ -424,9 +421,9 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     Vec local_78;
     Vec local_84;
 
-    dVar8 = innerRadius + scale;
-    dVar10 = dVar8 / (outerRadius + scale);
-    PSVECSubtract(origin, ellipseScale, &local_60);
+    dVar8 = horizontalRadius + radius;
+    dVar10 = dVar8 / (verticalRadius + radius);
+    PSVECSubtract(origin, ellipseCenter, &local_60);
     dVar8 = dVar8 * dVar8;
     local_60.y = local_60.y * dVar10;
     local_6c.x = vector->x;
@@ -881,10 +878,10 @@ int CMath::Rand(unsigned long max)
 
 /*
  * --INFO--
- * PAL Address: 0x8001bfe0
+ * PAL Address: 0x8001BFE0
  * PAL Size: 324b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800235D8
+ * EN Size: 96b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -899,14 +896,13 @@ void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
     float sinXSinY;
     float cosXSinY;
     float* matrix = &out[0][0];
-    float* values = reinterpret_cast<float*>(srt);
 
-    sinX = (float)sin((double)values[3]);
-    cosX = (float)cos((double)values[3]);
-    sinY = (float)sin((double)values[4]);
-    cosY = (float)cos((double)values[4]);
-    sinZ = (float)sin((double)values[5]);
-    cosZ = (float)cos((double)values[5]);
+    sinX = (float)sin((double)srt->m_rotation.x);
+    cosX = (float)cos((double)srt->m_rotation.x);
+    sinY = (float)sin((double)srt->m_rotation.y);
+    cosY = (float)cos((double)srt->m_rotation.y);
+    sinZ = (float)sin((double)srt->m_rotation.z);
+    cosZ = (float)cos((double)srt->m_rotation.z);
 
     sinXSinY = sinX * sinY;
     cosXSinY = cosX * sinY;
@@ -919,23 +915,22 @@ void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
     matrix[2] = cosZ * cosXSinY + sinX * sinZ;
     matrix[6] = sinZ * cosXSinY - sinX * cosZ;
     matrix[10] = cosX * cosY;
-    matrix[3] = values[0];
-    matrix[7] = values[1];
-    matrix[11] = values[2];
+    matrix[3] = srt->m_position.x;
+    matrix[7] = srt->m_position.y;
+    matrix[11] = srt->m_position.z;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8001c124
+ * PAL Address: 0x8001C124
  * PAL Size: 360b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80023554
+ * EN Size: 132b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
 {
-    float* s = reinterpret_cast<float*>(srt);
     Mtx rot;
     float sx;
     float cx;
@@ -949,13 +944,13 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     float zRotY;
     float zRotZ;
 
-    PSMTXScale(out, s[6], s[7], s[8]);
-    sx = (float)sin((double)s[3]);
-    cx = (float)cos((double)s[3]);
-    sy = (float)sin((double)s[4]);
-    cy = (float)cos((double)s[4]);
-    sz = (float)sin((double)s[5]);
-    cz = (float)cos((double)s[5]);
+    PSMTXScale(out, srt->m_scale.x, srt->m_scale.y, srt->m_scale.z);
+    sx = (float)sin((double)srt->m_rotation.x);
+    cx = (float)cos((double)srt->m_rotation.x);
+    sy = (float)sin((double)srt->m_rotation.y);
+    cy = (float)cos((double)srt->m_rotation.y);
+    sz = (float)sin((double)srt->m_rotation.z);
+    cz = (float)cos((double)srt->m_rotation.z);
 
     sxsy = sx * sy;
     cxsy = cx * sy;
@@ -971,9 +966,9 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
     rot[0][2] = zRotX;
     rot[1][2] = zRotY;
     rot[2][2] = zRotZ;
-    rot[0][3] = s[0];
-    rot[1][3] = s[1];
-    rot[2][3] = s[2];
+    rot[0][3] = srt->m_position.x;
+    rot[1][3] = srt->m_position.y;
+    rot[2][3] = srt->m_position.z;
 
     PSMTXConcat(rot, out, out);
 }

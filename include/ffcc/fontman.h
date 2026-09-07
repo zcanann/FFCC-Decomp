@@ -7,6 +7,18 @@
 
 #include <dolphin/gx.h>
 
+struct CFontRenderFlagBits
+{
+	signed char shadow : 1;
+	signed char zCompare : 1;
+	signed char zUpdate : 1;
+	signed char fixedWidth : 1;
+	signed char snapPosition : 1;
+	signed char pad : 3;
+};
+
+typedef char CFontRenderFlagBits_size_check[(sizeof(CFontRenderFlagBits) == 1) ? 1 : -1];
+
 class CFont;
 struct CFontGlyphEntry;
 
@@ -62,7 +74,7 @@ public:
 	float GetWidth(unsigned short);
 
 	CFontGlyphEntry* searchChar(unsigned short);
-	void getNextChar(char**, unsigned short*);
+	int getNextChar(char**, unsigned short*);
 
 	unsigned short m_glyphWidth;
 	unsigned short m_glyphHeight;
@@ -73,7 +85,7 @@ public:
 	float posY;
 	float posZ;
 	float margin;
-	unsigned char renderFlags;
+	CFontRenderFlagBits renderFlags;
 	unsigned char m_pad25[3];
 	float scaleX;
 	float scaleY;

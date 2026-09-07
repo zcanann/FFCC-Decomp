@@ -2,8 +2,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 
-extern const float kPppRyjMegaBirthModelZero;
-
 /*
  * --INFO--
  * PAL Address: 0x8008821c
@@ -34,9 +32,9 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
     pppScaleVector(scaledY, rowY, ppvMng->m_scale.y);
     pppScaleVector(scaledZ, rowZ, ppvMng->m_scale.z);
 
-    zeroVec.z = kPppRyjMegaBirthModelZero;
-    zeroVec.y = kPppRyjMegaBirthModelZero;
-    zeroVec.x = kPppRyjMegaBirthModelZero;
+    zeroVec.z = 0.0f;
+    zeroVec.y = 0.0f;
+    zeroVec.x = 0.0f;
     pppSetRowVector(transformMatrix, scaledX, scaledY, scaledZ, zeroVec);
 
     pppCopyVector(transformedPos, rowPos);

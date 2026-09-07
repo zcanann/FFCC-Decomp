@@ -1,4 +1,5 @@
 #include "ffcc/gobjwork.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/joybus.h"
@@ -19,9 +20,9 @@ extern const double DOUBLE_803309A0;
 __declspec(section ".sdata2") static const char lbl_803309B0[] = "CRef";
 
 namespace {
-static inline unsigned short* GetItemDataPtr(int itemIdx)
+static inline SItemFlatRow* GetItemDataPtr(int itemIdx)
 {
-	return (unsigned short*)(Game.unkCFlatData0[2] + (itemIdx * 0x48));
+	return &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemIdx];
 }
 
 struct ShoukiByteFlags {
@@ -725,16 +726,16 @@ int CCaravanWork::CanAddTmpArtifact(int numItems)
 {
 	int emptySlots = 0;
 
-	if (m_treasures[0] == -1) {
+	if (m_artifacts[CCaravanWork::kPermanentArtifactCount + 0] == -1) {
 		emptySlots++;
 	}
-	if (m_treasures[1] == -1) {
+	if (m_artifacts[CCaravanWork::kPermanentArtifactCount + 1] == -1) {
 		emptySlots++;
 	}
-	if (m_treasures[2] == -1) {
+	if (m_artifacts[CCaravanWork::kPermanentArtifactCount + 2] == -1) {
 		emptySlots++;
 	}
-	if (m_treasures[3] == -1) {
+	if (m_artifacts[CCaravanWork::kPermanentArtifactCount + 3] == -1) {
 		emptySlots++;
 	}
 
@@ -865,8 +866,8 @@ int CCaravanWork::DeleteItem(int itemIndex, int updateJoybus)
 int CCaravanWork::AddTmpArtifact(int itemId, int* outIndex)
 {
     for (int i = 0; i < 4; i++) {
-        if (m_treasures[i] == -1) {
-            m_treasures[i] = (short)itemId;
+        if (m_artifacts[CCaravanWork::kPermanentArtifactCount + i] == -1) {
+            m_artifacts[CCaravanWork::kPermanentArtifactCount + i] = (short)itemId;
             Joybus.SetTmpArti(m_joybusCaravanId, i, itemId);
             if (outIndex != 0) {
                 *outIndex = i;
@@ -1688,8 +1689,8 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
  * --INFO--
  * PAL Address: 0x800a0210
  * PAL Size: 936b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800B48F0
+ * EN Size: 476b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1699,17 +1700,14 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
 	}
 
-	int artifactIndex = 0;
-	CCaravanWork* artifactCur = this;
 	int totalSlots = 0;
-	for (int i = 50; i != 0; i--) {
-		if (artifactIndex < 96) {
-			int artifactId = artifactCur->m_artifacts[0];
+	for (int artifactIndex = 0; artifactIndex < kArtifactCount; artifactIndex++) {
+		if (artifactIndex < kPermanentArtifactCount) {
+			int artifactId = m_artifacts[artifactIndex];
 			if (artifactId > 0) {
-				unsigned short* artifactData =
-					(unsigned short*)(Game.unkCFlatData0[2] + artifactId * 0x48);
-				unsigned short slots = artifactData[3];
-				switch (artifactData[0]) {
+				SItemFlatRow* artifactData = GetItemDataPtr(artifactId);
+				unsigned short slots = artifactData->m_value;
+				switch (artifactData->m_kind) {
 				case 0xDB:
 					totalSlots += slots;
 					break;
@@ -1723,31 +1721,6 @@ void CCaravanWork::SafeDeleteTempItem()
 				}
 			}
 		}
-
-		artifactIndex++;
-		if (artifactIndex < 96) {
-			int artifactId = artifactCur->m_artifacts[1];
-			if (artifactId > 0) {
-				unsigned short* artifactData =
-					(unsigned short*)(Game.unkCFlatData0[2] + artifactId * 0x48);
-				unsigned short slots = artifactData[3];
-				switch (artifactData[0]) {
-				case 0xDB:
-					totalSlots += slots;
-					break;
-				case 0x9F:
-				case 0xB6:
-				case 0xCC:
-				case 0xDF:
-				case 0xE4:
-				default:
-					break;
-				}
-			}
-		}
-
-		artifactCur = (CCaravanWork*)&artifactCur->m_objType;
-		artifactIndex++;
 	}
 
 	totalSlots += (short)m_baseCmdListSlots;
@@ -1761,10 +1734,10 @@ void CCaravanWork::SafeDeleteTempItem()
 	}
 
 	short invalidItem = -1;
-	m_treasures[0] = invalidItem;
-	m_treasures[1] = invalidItem;
-	m_treasures[2] = invalidItem;
-	m_treasures[3] = invalidItem;
+	m_artifacts[CCaravanWork::kPermanentArtifactCount + 0] = invalidItem;
+	m_artifacts[CCaravanWork::kPermanentArtifactCount + 1] = invalidItem;
+	m_artifacts[CCaravanWork::kPermanentArtifactCount + 2] = invalidItem;
+	m_artifacts[CCaravanWork::kPermanentArtifactCount + 3] = invalidItem;
 
 	for (int i = 0; i < 64; i++) {
 		short item = m_inventoryItems[i];
@@ -1790,8 +1763,8 @@ void CCaravanWork::SafeDeleteTempItem()
  * --INFO--
  * PAL Address: 0x8009fa44
  * PAL Size: 1996b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800B4CF0
+ * EN Size: 1956b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1865,12 +1838,12 @@ void CCaravanWork::CalcStatus()
 	int strBonus = 0;
 	int magBonus = 0;
 	int defBonus = 0;
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < kArtifactCount; i++) {
 		int artifactId = m_artifacts[i];
 		if (artifactId > 0) {
-			unsigned short* artifactData = GetItemDataPtr(artifactId);
-			int artifactEffect = artifactData[0];
-			int value = artifactData[3];
+			SItemFlatRow* artifactData = GetItemDataPtr(artifactId);
+			int artifactEffect = artifactData->m_kind;
+			int value = artifactData->m_value;
 
 			switch (artifactEffect) {
 			case 0x9F:
@@ -1916,7 +1889,7 @@ void CCaravanWork::CalcStatus()
 		int equipSlot = m_equipment[equipIdx];
 		if (equipSlot >= 0) {
 			int itemIdx = m_inventoryItems[equipSlot];
-			int itemType = GetItemDataPtr(itemIdx)[0];
+			int itemType = GetItemDataPtr(itemIdx)->m_kind;
 
 			if (itemType == 1) {
 				int weaponRef;
@@ -1927,7 +1900,7 @@ void CCaravanWork::CalcStatus()
 				}
 			}
 
-			unsigned short itemValue = (short)GetItemDataPtr(itemIdx)[3];
+			unsigned short itemValue = (short)GetItemDataPtr(itemIdx)->m_value;
 			if (itemType != 0x45) {
 				if (itemType < 0x45) {
 					if (itemType == 1) {
@@ -1948,7 +1921,7 @@ void CCaravanWork::CalcStatus()
 			m_defense += itemValue;
 			m_baseDefense += itemValue;
 		apply_effect:
-			int itemEffect = GetItemDataPtr(itemIdx)[4];
+			int itemEffect = GetItemDataPtr(itemIdx)->m_attribute;
 			unsigned short effectValue = itemValue;
 			switch (itemEffect) {
 			case 1:
@@ -2071,7 +2044,7 @@ int CCaravanWork::GetIdxCmdList()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::IsUseCmdList(int cmdListIdx)
+void CCaravanWork::SetIdxCmdList(int cmdListIdx)
 {
 	m_currentCmdListIndex = cmdListIdx;
 }
@@ -2085,7 +2058,7 @@ void CCaravanWork::IsUseCmdList(int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
+int CCaravanWork::IsUseCmdList(int cmdListIdx)
 {
 	unsigned int isInvalid = 0;
 	short slotRef = m_commandListInventorySlotRef[cmdListIdx];
@@ -2096,26 +2069,26 @@ int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 	return ((unsigned int)__cntlzw((unsigned char)isInvalid)) >> 5;
 }
 
-static inline int GetNumGroupedCmdList(CCaravanWork* work, int cmdListIdx)
+inline int CCaravanWork::GetNumCombi(int cmdListIdx)
 {
 	int numGrouped;
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		numGrouped = 1;
-	} else if (work->m_commandListExtra[cmdListIdx] == 0) {
+	} else if (m_commandListExtra[cmdListIdx] == 0) {
 		numGrouped = 1;
 	} else {
 		int topIdx;
 		for (topIdx = cmdListIdx; topIdx >= 0; topIdx--) {
-			if (work->m_commandListExtra[topIdx] != -1) {
+			if (m_commandListExtra[topIdx] != -1) {
 				break;
 			}
 		}
 
 		numGrouped = 1;
 		int nextIdx = topIdx + 1;
-		short numSlots = work->m_numCmdListSlots;
+		short numSlots = m_numCmdListSlots;
 		for (int n = topIdx + 1; n < numSlots; n++) {
-			if (work->m_commandListExtra[nextIdx] != -1) {
+			if (m_commandListExtra[nextIdx] != -1) {
 				break;
 			}
 			numGrouped++;
@@ -2134,7 +2107,7 @@ static inline int GetNumGroupedCmdList(CCaravanWork* work, int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
+unsigned int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 {
 	unsigned int isInvalid = 0;
 	short slotRef = m_commandListInventorySlotRef[cmdListIdx];
@@ -2146,7 +2119,7 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 		return 0;
 	}
 
-	int groupedCountLocal = GetNumGroupedCmdList(this, cmdListIdx);
+	int groupedCountLocal = GetNumCombi(cmdListIdx);
 
 	if (groupedCountLocal == 1) {
 		return (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
@@ -2177,14 +2150,14 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
  * JP Address: TODO
  * JP Size: TODO
  */
-const char* CCaravanWork::GetWeaponAttrib(int cmdListIdx)
+const char* CCaravanWork::GetCmdListItemName(int cmdListIdx)
 {
-	int weaponType = GetCmdListItem(cmdListIdx);
+	int weaponType = GetWeaponAttrib(cmdListIdx);
 	if (weaponType >= 0 && weaponType < 3) {
 		return MenuPcs.GetSkillStr(weaponType);
 	}
 
-	int itemId = DelCmdListAndItem(cmdListIdx);
+	int itemId = GetCmdListItem(cmdListIdx);
 	return Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
 }
 
@@ -2197,13 +2170,13 @@ const char* CCaravanWork::GetWeaponAttrib(int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::GetCmdListItem(int cmdListIdx)
+int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 {
 	int cmdTopIdx;
 	int itemCmdListIdx;
 	int result = -1;
 
-	if (GetCmdListItemName(cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+	if (GetMagicCharge(cmdListIdx, cmdTopIdx, itemCmdListIdx) != 0) {
 		short cmdId = m_commandListExtra[cmdTopIdx];
 		switch (cmdId) {
 		case 0x207:
@@ -2230,7 +2203,7 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
+int CCaravanWork::GetCmdListItem(int cmdListIdx)
 {
 	int result;
 	int inventorySlot = m_commandListInventorySlotRef[cmdListIdx];
@@ -2250,7 +2223,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 			result = (short)m_inventoryItems[equipmentSlot];
 		}
 	} else {
-		int numGrouped = GetNumGroupedCmdList(this, cmdListIdx);
+		int numGrouped = GetNumCombi(cmdListIdx);
 
 		if (numGrouped > 1) {
 			for (int n = cmdListIdx; n >= 0; n--) {
@@ -2263,7 +2236,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 			int cmdResult = m_commandListExtra[cmdListIdx];
 			int cmdTopIdx;
 			int itemCmdListIdx;
-			if (GetCmdListItemName(cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+			if (GetMagicCharge(cmdListIdx, cmdTopIdx, itemCmdListIdx) != 0) {
 				cmdResult = (short)m_inventoryItems[(short)m_commandListInventorySlotRef[itemCmdListIdx]];
 			}
 			result = cmdResult;
@@ -2288,7 +2261,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::GetNumCombi(int cmdListIdx, int updateJoybus)
+void CCaravanWork::DelCmdListAndItem(int cmdListIdx, int updateJoybus)
 {
 	int nextCmdIdx = 0;
 	short* slotRefPtr = (short*)((char*)this + cmdListIdx * 2);
@@ -2328,7 +2301,7 @@ int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 {
 	while (true) {
 		int prev = cmdListIdx;
-		cmdListIdx = prev + (dir != 0 ? dir : dir);
+		cmdListIdx = prev + dir;
 
 		if (cmdListIdx < 0) {
 			cmdListIdx += m_numCmdListSlots;
@@ -2347,7 +2320,7 @@ int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 			}
 		}
 
-		int item = DelCmdListAndItem(cmdListIdx);
+		int item = GetCmdListItem(cmdListIdx);
 		if (cmdListIdx < 2 || item > 0) {
 			return cmdListIdx;
 		}
@@ -2390,7 +2363,7 @@ void CCaravanWork::GetCurrentWeaponItem(int& weaponItem, int& weaponRef)
 	} else if (weaponIdx != 1) {
 		weaponItem = weaponIdx;
 		CCaravanWork* ownerWork = *reinterpret_cast<CCaravanWork**>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x58);
-		weaponRef = ownerWork->DelCmdListAndItem(m_weaponIdx);
+		weaponRef = ownerWork->GetCmdListItem(m_weaponIdx);
 	}
 }
 
@@ -2413,16 +2386,16 @@ void CCaravanWork::SetCurrentWeaponIdx(int weaponIdx)
  * --INFO--
  * PAL Address: 0x8009f178
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800B6274
+ * EN Size: 124b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
 {
 	int reset = 0;
-	int weaponItem = DelCmdListAndItem(weaponIdx);
-	if ((0 < weaponItem) && (*GetItemDataPtr(weaponItem) == 1)) {
+	int weaponItem = GetCmdListItem(weaponIdx);
+	if ((0 < weaponItem) && (GetItemDataPtr(weaponItem)->m_kind == 1)) {
 		return;
 	}
 
@@ -2582,7 +2555,7 @@ void CCaravanWork::UniteComList(int startIdx, int count, int cmdId)
 	if ((m_weaponIdx >= startIdx) && (m_weaponIdx < (startIdx + count))) {
 		int cmdTopIdx;
 		int itemCmdListIdx;
-		if (GetCmdListItemName(startIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+		if (GetMagicCharge(startIdx, cmdTopIdx, itemCmdListIdx) != 0) {
 			m_weaponIdx = (short)itemCmdListIdx;
 		}
 	}
@@ -2602,7 +2575,7 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
 	if (m_weaponIdx == startIdx) {
 		int cmdTopIdx;
 		int itemCmdListIdx;
-		if (GetCmdListItemName(startIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+		if (GetMagicCharge(startIdx, cmdTopIdx, itemCmdListIdx) != 0) {
 			m_weaponIdx = (short)itemCmdListIdx;
 		}
 	}
@@ -2614,19 +2587,19 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
 
 /*
  * --INFO--
- * PAL Address: 0x800a7e18
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x8009f730
+ * PAL Size: 352b
+ * EN Address: 0x800B5828
+ * EN Size: 420b
  * JP Address: TODO
  * JP Size: TODO
  */
 #pragma push
 #pragma opt_common_subs off
-int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
+int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdListIdx)
 {
 	int extraOff = cmdListIdx * 2;
-	int groupedCount = GetNumGroupedCmdList(this, cmdListIdx);
+	int groupedCount = GetNumCombi(cmdListIdx);
 
 	if (groupedCount > 1) {
 		short* cur2 = (short*)((char*)this + extraOff);
@@ -2640,14 +2613,14 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 
 		short cmdId = m_commandListExtra[cmdListIdx];
 		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
-			*firstCmdIdx = cmdListIdx;
+			firstCmdIdx = cmdListIdx;
 			int i = 0;
 			for (; groupedCount > 0; groupedCount--) {
 				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
 				short itemId = (short)m_inventoryItems[invSlot];
-				int itemType = GetItemDataPtr(itemId)[0];
+				int itemType = GetItemDataPtr(itemId)->m_kind;
 				if (itemType == 1) {
-					*itemCmdListIdx = cmdListIdx + i;
+					itemCmdListIdx = cmdListIdx + i;
 					return 1;
 				}
 				i++;
@@ -2670,17 +2643,17 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
  */
 int CCaravanWork::GetArtifactIncludeHpMax()
 {
-	unsigned short* artifactDataBase = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2]);
+	SItemFlatRow* artifactDataBase = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
 	int hpMax = 0;
 
-	for (int artifactIndex = 0; artifactIndex < 100; artifactIndex++) {
-		if (artifactIndex < 0x60) {
+	for (int artifactIndex = 0; artifactIndex < kArtifactCount; artifactIndex++) {
+		if (artifactIndex < kPermanentArtifactCount) {
 			int artifactId = m_artifacts[artifactIndex];
 			if (artifactId > 0) {
-				unsigned short* artifactData = artifactDataBase + (artifactId * 0x24);
-				unsigned short artifactType = artifactData[0];
-				unsigned short artifactValue = artifactData[3];
+				SItemFlatRow* artifactData = &artifactDataBase[artifactId];
+				unsigned short artifactType = artifactData->m_kind;
+				unsigned short artifactValue = artifactData->m_value;
 
 				switch (artifactType) {
 				case 0x9F:
@@ -2773,8 +2746,8 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 
 	memcpy(unk_0xac, romWork->MonsterParams0(), 8);
 	memcpy(unk_0xb4, romWork->MonsterParams1(), 0x1C);
-	memset(unk_0xd0, 0, sizeof(unk_0xd0));
-	memset(unk_0xf0, 0, sizeof(unk_0xf0));
+	memset(m_actionItems, 0, sizeof(m_actionItems));
+	memset(m_actionAnimations, 0, sizeof(m_actionAnimations));
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 		int rank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
@@ -2876,8 +2849,3 @@ void CMonWork::CalcStatus()
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
 	}
 }
-
-unsigned char sRingMenuBlinkAlphaTable[16] = {
-	0x00, 0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0, 0xE0,
-	0xFF, 0xE0, 0xC0, 0xA0, 0x80, 0x60, 0x40, 0x20,
-};

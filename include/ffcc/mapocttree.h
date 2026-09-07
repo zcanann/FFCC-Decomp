@@ -37,7 +37,67 @@ public:
 	int CheckFrustum0(float);
 	int CheckFrustum(Vec&, float(*)[4], float);
 	void SetMinMax(Vec*, Vec*);
-	int CheckCross(CBound&);
+	/*
+	 * --INFO--
+	 * PAL Address: 0x8002CC28
+	 * PAL Size: 272b
+	 * EN Address: 0x80031B7C
+	 * EN Size: 412b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	int CheckCross(CBound& other)
+	{
+		bool xyOverlap;
+		bool overlap;
+		int xOverlap;
+
+		overlap = false;
+		xyOverlap = overlap;
+		if (m_min.x < other.m_min.x) {
+			xOverlap = other.m_min.x <= m_max.x;
+		} else {
+			if (m_min.x > other.m_min.x) {
+				xOverlap = m_min.x <= other.m_max.x;
+			} else {
+				xOverlap = true;
+			}
+		}
+
+		if (xOverlap) {
+			if (m_min.y < other.m_min.y) {
+				xOverlap = other.m_min.y <= m_max.y;
+			} else {
+				if (m_min.y > other.m_min.y) {
+					xOverlap = m_min.y <= other.m_max.y;
+				} else {
+					xOverlap = true;
+				}
+			}
+
+			if (xOverlap) {
+				xyOverlap = true;
+			}
+		}
+
+		if (xyOverlap) {
+			if (m_min.z < other.m_min.z) {
+				xOverlap = other.m_min.z <= m_max.z;
+			} else {
+				if (m_min.z > other.m_min.z) {
+					xOverlap = m_min.z <= other.m_max.z;
+				} else {
+					xOverlap = true;
+				}
+			}
+
+			if (xOverlap) {
+				overlap = true;
+			}
+		}
+
+		return (unsigned char)overlap;
+	}
 
 	Vec m_min;              // 0x00
 	Vec m_max;              // 0x0C

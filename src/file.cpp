@@ -11,7 +11,6 @@
 #include "ffcc/util.h"
 
 #include <PowerPC_EABI_Support/Runtime/New.h>
-#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
 #include <dolphin/vi.h>
@@ -439,7 +438,6 @@ next:
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void CFile::kick()
 {
     CHandle* handle = CheckQueue();
@@ -478,14 +476,12 @@ void CFile::kick()
         handle = handle->m_previous;
     } while (handle != &m_fileHandle);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma dont_inline on
 void CFile::SyncCompleted(CFile::CHandle* fileHandle)
 {
 	while (fileHandle->m_completionStatus != 3)
@@ -493,7 +489,6 @@ void CFile::SyncCompleted(CFile::CHandle* fileHandle)
 		kick();
 	}
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -527,8 +522,8 @@ void CFile::Close(CFile::CHandle* fileHandle)
 	fileHandle->m_closedFlag = 1;
 	fileHandle->m_next->m_previous = fileHandle->m_previous;
 	fileHandle->m_previous->m_next = fileHandle->m_next;
-	fileHandle->m_previous = m_freeList;
-	m_freeList = fileHandle;
+	fileHandle->m_previous = m_freeHandle.m_previous;
+	m_freeHandle.m_previous = fileHandle;
 }
 
 /*
@@ -604,7 +599,6 @@ void CFile::Read(CFile::CHandle* fileHandle)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma dont_inline on
 void CFile::BackAllFilesToQueue(CHandle* fileHandle)
 {
     CHandle* inFlight;
@@ -640,7 +634,6 @@ void CFile::BackAllFilesToQueue(CHandle* fileHandle)
         inFlight->m_completionStatus = 1;
     }
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -690,8 +683,8 @@ CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
 
         DVDFastOpen(entry, &fi);
         length = fi.length;
-        handle = m_freeList;
-        m_freeList = handle->m_previous;
+        handle = m_freeHandle.m_previous;
+        m_freeHandle.m_previous = handle->m_previous;
         handle->m_previous = it;
         handle->m_next = it->m_next;
         it->m_next->m_previous = handle;
@@ -754,13 +747,12 @@ void CFile::Quit()
         m_readBuffer = 0;
     }
 
-    u32 nextOffset = m_handlePoolHead.m_currentOffset;
-    if (nextOffset != 0) {
-        delete[] reinterpret_cast<CHandle*>(nextOffset);
-        m_handlePoolHead.m_currentOffset = 0;
+    if (m_handlePool != 0) {
+        delete[] m_handlePool;
+        m_handlePool = 0;
     }
 
-    Memory.DestroyStage((CMemory::CStage*)m_allocStage);
+    Memory.DestroyStage(m_allocStage);
 }
 
 /*
@@ -778,23 +770,21 @@ void CFile::Init()
     m_allocStage = Memory.CreateStage(0x10ac00, const_cast<char*>(s_cFile), 0);
     m_fatalDiskErrorFlag = 0;
     m_isDiskError = 0;
-    m_readBuffer = new ((CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2b) unsigned char[0x100000];
-    void* handlePool = operator new[](sizeof(CHandle) * 0x80 + 0x10, (CMemory::CStage*)m_allocStage,
-                                      const_cast<char*>(s_fileCpp), 0x2e);
-    m_handlePoolHead.m_currentOffset = (u32)__construct_new_array(handlePool, 0, 0, sizeof(CHandle), 0x80);
+    m_readBuffer = new (m_allocStage, const_cast<char*>(s_fileCpp), 0x2b) unsigned char[0x100000];
+    m_handlePool = new (m_allocStage, const_cast<char*>(s_fileCpp), 0x2e) CHandle[0x80];
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
-    m_freeList = (CHandle*)m_handlePoolHead.m_currentOffset;
+    m_freeHandle.m_previous = m_handlePool;
 
     for (unsigned int i = 0; i < 0x80; i++) {
         CHandle* nextHandle;
         if (i == 0x7F) {
-            nextHandle = (CHandle*)&m_freeListSentinelDummy;
+            nextHandle = &m_freeHandle;
         } else {
-            nextHandle = (CHandle*)(m_handlePoolHead.m_currentOffset + (i + 1) * sizeof(CHandle));
+            nextHandle = &m_handlePool[i + 1];
         }
 
-        ((CHandle*)(m_handlePoolHead.m_currentOffset + i * sizeof(CHandle)))->m_previous = nextHandle;
+        m_handlePool[i].m_previous = nextHandle;
     }
 }

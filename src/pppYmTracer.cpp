@@ -13,8 +13,6 @@ extern f32 gPppDefaultValueBuffer[];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern const u32 kYmTracerTopColorBase;
-extern const u32 kYmTracerBottomColorBase;
 extern const f32 kYmTracerZero;
 extern const f32 kYmTracerOne;
 
@@ -38,6 +36,28 @@ STATIC_ASSERT(offsetof(YmTracerColorBlock, color) == 0x8);
 static inline YmTracerDataOffsets* GetYmTracerDataOffsets(pppYmTracerCtrl* ctrl)
 {
     return reinterpret_cast<YmTracerDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline void initTracePolygon(PYmTracer* params, TRACE_POLYGON& polygon)
+{
+    polygon.life = -1;
+    polygon.alpha = params->m_tracer.m_entryAlpha;
+    polygon.decay = params->m_tracer.m_entryAlpha / params->m_tracer.m_entryLife;
+    polygon.from.z = kYmTracerZero;
+    polygon.from.y = kYmTracerZero;
+    polygon.from.x = kYmTracerZero;
+    polygon.to.z = kYmTracerZero;
+    polygon.to.y = kYmTracerZero;
+    polygon.to.x = kYmTracerZero;
 }
 
 static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
@@ -85,8 +105,6 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
     s32 i;
     s32 colorOffset;
     s32 dataValIndex;
-    pppPackedColor colorTop;
-    pppPackedColor colorBottom;
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
@@ -140,9 +158,9 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
                     (kYmTracerZero != next->from.y) && (kYmTracerZero != next->from.z)) {
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
-                    colorTop.value = kYmTracerTopColorBase;
+                    pppPackedColor colorTop = {0xFFFFFF00};
                     colorTop.bytes[3] = poly->alpha;
-                    colorBottom.value = kYmTracerBottomColorBase;
+                    pppPackedColor colorBottom = {0xFFFFFF00};
                     colorBottom.bytes[3] = next->alpha;
 
                     GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
@@ -199,19 +217,10 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
         work->entries = (TRACE_POLYGON*)pppMemAlloc(
             (u32)param_2->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmTracer_cpp), 0xEB);
-        fVar3 = kYmTracerZero;
         entries = work->entries;
         entry = entries;
         for (i = 0; i < (s32)(u32)param_2->m_tracer.m_entryCount; i++) {
-            entry->life = -1;
-            entry->alpha = param_2->m_tracer.m_entryAlpha;
-            entry->decay = (u8)((u16)param_2->m_tracer.m_entryAlpha / param_2->m_tracer.m_entryLife);
-            entry->from.z = fVar3;
-            entry->from.y = fVar3;
-            entry->from.x = fVar3;
-            entry->to.z = fVar3;
-            entry->to.y = fVar3;
-            entry->to.x = fVar3;
+            initTracePolygon(param_2, *entry);
             entry++;
         }
     }
@@ -234,16 +243,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
         }
 
         entries = work->entries;
-        entries[0].life = -1;
-        entries[0].alpha = param_2->m_tracer.m_entryAlpha;
-        entries[0].decay = (u8)((u16)param_2->m_tracer.m_entryAlpha / param_2->m_tracer.m_entryLife);
-        fVar3 = kYmTracerZero;
-        entries[0].from.z = fVar3;
-        entries[0].from.y = fVar3;
-        entries[0].from.x = fVar3;
-        entries[0].to.z = fVar3;
-        entries[0].to.y = fVar3;
-        entries[0].to.x = fVar3;
+        initTracePolygon(param_2, entries[0]);
 
         fVar3 = work->initWork[0];
         work->from.x = fVar3;
@@ -348,7 +348,7 @@ void pppDestructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
 {
     YmTracerWork* work = GetYmTracerWork(pppYmTracer, param_2);
     if (work->entries != 0) {
-        pppHeapUseRate((CMemory::CStage*)work->entries);
+        pppMemFree(work->entries);
     }
 }
 
@@ -402,10 +402,5 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
     work->_pad2e = 0;
 }
 
-extern const u32 kYmTracerTopColorBase = 0xFFFFFF00;
-extern const u32 kYmTracerBottomColorBase = 0xFFFFFF00;
 extern const f32 kYmTracerZero = 0.0f;
 extern const f32 kYmTracerOne = 1.0f;
-
-extern const f64 kPppParHitSphZero = 0.0;
-extern const char sYmTracerCommonName[8] = "common";

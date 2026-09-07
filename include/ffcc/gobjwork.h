@@ -110,11 +110,13 @@ public:
     
     unsigned short unk_0xac[4];  // 0x00AC
     unsigned short unk_0xb4[14]; // 0x00B4
-    unsigned short unk_0xd0[16]; // 0x00D0
-    unsigned short unk_0xf0[16]; // 0x00F0
+    unsigned short m_actionItems[16]; // 0x00D0
+    unsigned short m_actionAnimations[16]; // 0x00F0
 }; // Size 0x110
 
 STATIC_ASSERT(sizeof(CMonWork) == 0x110);
+STATIC_ASSERT(offsetof(CMonWork, m_actionItems) == 0xD0);
+STATIC_ASSERT(offsetof(CMonWork, m_actionAnimations) == 0xF0);
 
 class CCaravanWork : public CGObjWork
 {
@@ -257,15 +259,15 @@ public:
     void ValidCmdList(int);
     int GetIdxCmdList();
     void SetIdxCmdList(int);
-    void IsUseCmdList(int);
-    int IsSelectedCmdList(int);
-    unsigned int GetMagicCharge(int, int&, int&);
-    int GetCmdListItemName(int, int*, int*);
-    const char* GetWeaponAttrib(int);
+    int IsUseCmdList(int);
+    unsigned int IsSelectedCmdList(int);
+    int GetMagicCharge(int, int&, int&);
+    const char* GetCmdListItemName(int);
+    int GetWeaponAttrib(int);
     int GetCmdListItem(int);
-    int DelCmdListAndItem(int);
     void SearchCombiTop(int);
-    void GetNumCombi(int, int);
+    void DelCmdListAndItem(int, int);
+    int GetNumCombi(int);
     int GetNextCmdListIdx(int, int);
     int CanPlayerPutItem();
     void GetCurrentWeaponItem(int&, int&);
@@ -284,8 +286,9 @@ public:
     short m_equipment[4];                       // 0x00AC weapon[0], armor[1], tribal[2], accessory[3]
     unsigned short m_inventoryItemCount;        // 0x00B4
     short m_inventoryItems[64];                 // 0x00B6
-    short m_artifacts[96];                      // 0x0136
-    short m_treasures[4];                       // 0x01F6
+    enum { kPermanentArtifactCount = 96, kTemporaryArtifactCount = 4,
+           kArtifactCount = kPermanentArtifactCount + kTemporaryArtifactCount };
+    short m_artifacts[kArtifactCount];          // 0x0136, temporary artifacts start at 0x01F6
     unsigned char m_treasureFlags;              // 0x01FE
     unsigned char m_moneyFlags;                 // 0x01FF
     int m_gil;                                  // 0x0200
@@ -357,6 +360,9 @@ public:
 }; // Size 0xC30
 
 STATIC_ASSERT(sizeof(CCaravanWork) == 0xC30);
+STATIC_ASSERT(offsetof(CCaravanWork, m_artifacts) == 0x136);
+STATIC_ASSERT(offsetof(CCaravanWork, m_artifacts) + CCaravanWork::kPermanentArtifactCount * sizeof(short) == 0x1F6);
+STATIC_ASSERT(offsetof(CCaravanWork, m_treasureFlags) == 0x1FE);
 STATIC_ASSERT(sizeof(CCaravanWork::CLetterWork) == 0x0C);
 STATIC_ASSERT(sizeof(CRomLetterWork) == 0x3E);
 STATIC_ASSERT(offsetof(CCaravanWork, m_targetCursorPosA) == 0x0BAC);

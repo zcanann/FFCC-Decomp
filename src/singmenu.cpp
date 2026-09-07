@@ -1,3 +1,4 @@
+#include "ffcc/itemobj.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/singmenu.h"
 #include "ffcc/chara.h"
@@ -71,21 +72,6 @@ extern const float kSingStatPanelH;
 extern const float kSingStatScreenPadX;
 extern const float kSingStatScreenY;
 
-struct CFontRenderFlagBits
-{
-    signed char shadow : 1;
-    signed char zCompare : 1;
-    signed char zUpdate : 1;
-    signed char fixedWidth : 1;
-    signed char snapPosition : 1;
-    signed char pad : 3;
-};
-
-static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
-{
-    return reinterpret_cast<CFontRenderFlagBits&>(flags);
-}
-
 struct SingMenuStaticMessageInfo
 {
     int lineCount;
@@ -111,9 +97,6 @@ extern "C" char* PTR_s_Alle_Rassen_8021430c;
 extern "C" char* PTR_s_Todos_802145ac;
 extern "C" const char* PTR_s_Clavat_80214110[];
 extern "C" {
-extern const float kPppFilterScreenMin = 0.0f;
-extern const float kPppFilterScreenMaxX = 640.0f;
-extern const float kPppFilterScreenMaxY[2] = {448.0f, 0.0f};
 const char s_Clavat_803320D8[] = "Clavat";
 const char s_Lilty_803320E0[] = "Lilty";
 const char s_Yuke_803320E8[] = "Yuke";
@@ -718,111 +701,6 @@ char* CMenuPcs::GetTribeStr(int index)
             return (char*)PTR_s_Clavat_802140f0[index];
     }
 }
-/*
- * --INFO--
- * PAL Address: 0x80145c84
- * PAL Size: 748b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::GetRaceStr(int itemNo, char* outText)
-{
-    unsigned short raceBits;
-    int raceType;
-    char* text;
-    char* suffix;
-
-    GetItemType(itemNo, 1);
-    raceBits = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
-    int raceLow = raceBits & 0xF;
-    int genderMask = raceBits & 0x30;
-    outText[0] = '\0';
-
-    if (raceLow == 0xF) {
-        switch (Game.m_gameWork.m_languageId) {
-        case 2:
-            text = (char*)gSingMenuTextTableDe[19];
-            break;
-        case 3:
-            text = (char*)gSingMenuTextTableIt[19];
-            break;
-        case 4:
-            text = (char*)gSingMenuTextTableFr[19];
-            break;
-        case 5:
-            text = (char*)gSingMenuTextTableEs[19];
-            break;
-        case 1:
-        default:
-            text = (char*)gSingMenuTextTableEn[19];
-            break;
-        }
-        strcpy(outText, text);
-        return;
-    }
-
-    for (raceType = 0; raceType < 4; raceType++) {
-        if ((raceBits & (1 << raceType)) != 0) {
-            break;
-        }
-    }
-
-    if (raceType < 4) {
-        switch (Game.m_gameWork.m_languageId) {
-        case 2:
-            text = (char*)PTR_s_Clavat_80214100[raceType];
-            break;
-        case 3:
-            text = (char*)PTR_s_Clavat_80214110[raceType];
-            break;
-        case 4:
-            text = (char*)PTR_s_Clavat_80214120[raceType];
-            break;
-        case 5:
-            text = (char*)PTR_s_Clavate[raceType];
-            break;
-        case 1:
-        default:
-            text = (char*)PTR_s_Clavat_802140f0[raceType];
-            break;
-        }
-
-        strcpy(outText, text);
-        if (static_cast<int>(Game.m_gameWork.m_languageId) == 2) {
-            strcat(outText, (char*)s_plural_s_80332958);
-        }
-    }
-
-    if (raceLow != 0 && genderMask != 0) {
-        strcpy(outText, (char*)s_space_8033295c);
-    }
-    if (genderMask == 0) {
-        return;
-    }
-
-    raceType = (genderMask >> 5) & 1;
-    switch (Game.m_gameWork.m_languageId) {
-    case 2:
-        suffix = (char*)gSingMenuTextTableDe[raceType + 17];
-        break;
-    case 3:
-        suffix = (char*)gSingMenuTextTableIt[raceType + 17];
-        break;
-    case 4:
-        suffix = (char*)gSingMenuTextTableFr[raceType + 17];
-        break;
-    case 5:
-        suffix = (char*)gSingMenuTextTableEs[raceType + 17];
-        break;
-    case 1:
-    default:
-        suffix = (char*)gSingMenuTextTableEn[raceType + 17];
-        break;
-    }
-    strcat(outText, suffix);
-}
 
 extern "C" const char* PTR_s_Clavat_802140f0[] = {
     s_Clavat_803320D8, s_Lilty_803320E0, s_Yuke_803320E8, s_Selkie_803320F0,
@@ -858,6 +736,86 @@ extern "C" const char* PTR_s_Forgeron[] = {
 extern "C" const char* PTR_s_Herrero[] = {
     s_Herrero_803321A8, s_Sastre_803321B0, s_Campesino_801DD7CC, s_Granjero_801DD7D8,
     s_Molinero_801DD7E4, s_Pescador_801DD7F0, s_Comerciante_801DD7FC, s_Alquimista_801DD808,
+};
+extern "C" const char* gSingMenuTextTableEn[] = {
+    s_Empty_803321B8, s_Yes_803321BC, s_No_803321C0, s_Cancel_803321C4,
+    s_gil_803321CC, s_Strength_801DD814, s_Defence_803321D0, s_Magic_803321D8,
+    s_Memories_801DD820, s_Attack_803321E0, s_Defend_803321E8, s_Remove_803321F0,
+    s_Fuse_803321F8, s_Split_80332200, s_Use_80332208, s_Drop_8033220C,
+    s_Destroy_80332214, s_Male_8033221C, s_Female_80332224, s_All_8033222C,
+    s_QuestionMarks_80332230, s_g_period_80332234, s_Father_80332238, s_Mother_80332240,
+    s_Brother_80332248, s_Sister_80332250, s_Brother_80332248, s_Sister_80332250,
+    s_Empty_803321B8, s_Letters_80332258, s_Send_item_801DD82C, s_Send_gil_801DD838,
+    s_Send_nothing_801DD844, s_Proceed_801DD854, s_Take_out_801DD860, s_Quote_80332260,
+    s_Quote_80332260, s_Send_80332264, s_the_reply_801DD86C, s_Empty_803321B8,
+    s_Include_801DD878, s_Confirm_8033226C, s_Name_80332274, s_Gender_8033227C,
+    s_Tribe_80332284, s_Family_Trade_801DD884, s_Command_List_801DD894, s_Items_8033228C,
+    s_Equip_80332294, s_Artefacts_801DD8A4, s_Treasures_801DD8B0, s_Money_8033229C,
+    s_Favourites_801DD8BC, s_Family_803322A4, s_Letters_80332258, s_Done_803322AC,
+};
+extern "C" const char* gSingMenuTextTableDe[] = {
+    s_Empty_803321B8, s_Ja_803322B4, s_Nein_803322B8, s_Abbrechen_801DD8C8,
+    s_Gil_803322C0, s_Staerke_803322C4, s_Abwehr_803322CC, s_Magie_803322D4,
+    s_Erinnerungen_801DD8D4, s_Angreifen_801DD8E4, s_Verteidigen_801DD8F0, s_Ablegen_803322DC,
+    s_Kombinieren_801DD8FC, s_Aufloesen_801DD908, s_Benutzen_801DD914, s_Wegwerfen_801DD920,
+    s_Zerstoeren_801DD92C, s_Maennlich_801DD938, s_Weiblich_801DD944, s_Alle_Rassen_801DD950,
+    s_QuestionMarks_80332230, s_G_803322E4, s_Vater_803322E8, s_Mutter_803322F0,
+    s_Bruder_803322F8, s_Schwester_801DD95C, s_kl_Bruder_801DD968, s_kl_Schwester_801DD974,
+    s_Empty_803321B8, s_Liste_erhaltener_Briefe_801DD984, s_Gegenstand_beifuegen_801DD99C, s_Gil_beifuegen_801DD9B0,
+    s_Nichts_beifuegen_801DD9C0, s_Weiter_80332300, s_herausholen_801DD9D0, s_specialChar_80332308,
+    s_Quote_80332260, s_Empty_803321B8, s_die_Antwort_801DD9E0, s_schicken_801DD9F0,
+    s_beifuegen_801DD9FC, s_Bestaetigen_801DDA08, s_Name_80332274, s_Geschlecht_801DDA14,
+    s_Rasse_8033230C, s_Elterlicher_Beruf_801DDA20, s_Kommandoliste_801DDA34, s_Gegenstaende_801DDA44,
+    s_Ausruesten_801DDA50, s_Artefakte_801DDA5C, s_Geborgtes_801DDA68, s_Geld_80332314,
+    s_Geschmack_801DDA74, s_Familie_8033231C, s_Briefe_80332324, s_Abbrechen_801DD8C8,
+};
+extern "C" const char* gSingMenuTextTableIt[] = {
+    s_Empty_803321B8, s_Si_8033232C, s_No_803321C0, s_Annulla_80332330,
+    s_guil_80332338, s_Forza_80332340, s_Difesa_80332348, s_Magia_80332350,
+    s_Memorie_80332358, s_Attacco_80332360, s_Difesa_80332348, s_Rimuovi_80332368,
+    s_Fusione_80332370, s_Dividi_80332378, s_Usa_80332380, s_Posa_80332384,
+    s_Distruggi_801DDA80, s_Maschio_8033238C, s_Femmina_80332394, s_Tutti_8033239C,
+    s_QuestionMarks_80332230, s_g_period_80332234, s_Padre_803323A4, s_Madre_803323AC,
+    s_Fratello_801DDA8C, s_Sorella_803323B4, s_Fratello_801DDA8C, s_Sorella_803323B4,
+    s_Empty_803321B8, s_Lettere_803323BC, s_Invia_oggetto_801DDA98, s_Invia_guil_801DDAA8,
+    s_Non_inviare_nulla_801DDAB4, s_Vuoi_procedere_801DDAC8, s_Vuoi_prendere_801DDAD8, s_Quote_80332260,
+    s_Quote_80332260, s_con_803323C4, s_Vuoi_rispondere_a_801DDAE8, s_Empty_803321B8,
+    s_Allegato_801DDAFC, s_Conferma_801DDB08, s_Nome_803323CC, s_Sesso_803323D4,
+    s_Razza_803323DC, s_Mestiere_801DDB14, s_Lista_Comandi_801DDB20, s_Oggetti_803323E4,
+    s_Equipaggiamento_801DDB30, s_Manufatti_801DDB40, s_Tesori_803323EC, s_Denaro_803323F4,
+    s_Preferiti_801DDB4C, s_Famiglia_801DDB58, s_Lettere_803323BC, s_Fatto_803323FC,
+};
+extern "C" const char* gSingMenuTextTableFr[] = {
+    s_Empty_803321B8, s_Oui_80332404, s_Non_80332408, s_Annuler_8033240C,
+    s_gils_80332414, s_Force_8033241C, s_Resistance_801DDB64, s_Magie_803322D4,
+    s_Souvenirs_801DDB70, s_Attaquer_801DDB7C, s_Defendre_801DDB88, s_Retirer_80332424,
+    s_Fusionner_801DDB94, s_Separer_8033242C, s_Utiliser_801DDBA0, s_Jeter_80332434,
+    s_Detruire_801DDBAC, s_Masculin_801DDBB8, s_Feminin_8033243C, s_Tous_80332444,
+    s_QuestionMarks_80332230, s_g_period_80332234, s_Pere_8033244C, s_Mere_80332454,
+    s_Frere_8033245C, s_Soeur_80332464, s_Frere_8033245C, s_Soeur_80332464,
+    s_Empty_803321B8, s_Lettres_8033246C, s_Envoyer_un_objet_801DDBC4, s_Envoyer_des_gils_801DDBD8,
+    s_Ne_rien_envoyer_801DDBEC, s_Continuer_801DDBFC, s_Prendre_801DDC08, s_Quote_80332260,
+    s_Quote_80332260, s_la_reponse_801DDC14, s_Envoyer_a_801DDC20, s_Empty_803321B8,
+    s_Joindre_801DDC2C, s_Confirmer_801DDC38, s_Nom_80332474, s_Sexe_8033247C,
+    s_Tribu_80332484, s_Metier_8033248C, s_Commandes_801DDC44, s_Objets_80332494,
+    s_Equiper_8033249C, s_Artefacts_801DD8A4, s_Tresors_803324A4, s_Gils_803324AC,
+    s_Preferences_801DDC50, s_Famille_803324B4, s_Lettres_8033246C, s_Laisser_803324BC,
+};
+extern "C" const char* gSingMenuTextTableEs[] = {
+    s_Empty_803321B8, s_Si_803324C4, s_No_803321C0, s_Cancelar_801DDC5C,
+    s_guiles_803324C8, s_Fuerza_803324D0, s_Defensa_803324D8, s_Magia_80332350,
+    s_Memorias_801DDC68, s_Atacar_803324E0, s_Defender_801DDC74, s_Quitar_803324E8,
+    s_Fusionar_801DDC80, s_Separar_803324F0, s_Utilizar_801DDC8C, s_Descartar_801DDC98,
+    s_Destruir_801DDCA4, s_Hombre_803324F8, s_Mujer_80332500, s_Todos_80332508,
+    s_invQuestions_80332510, s_g_period_80332234, s_Padre_803323A4, s_Madre_803323AC,
+    s_Hermano_80332518, s_Hermana_80332520, s_Hermano_80332518, s_Hermana_80332520,
+    s_Empty_803321B8, s_Cartas_80332528, s_Enviar_objeto_801DDCB0, s_Enviar_guiles_801DDCC0,
+    s_No_enviar_nada_801DDCD0, s_Continuar_801DDCE0, s_Extraer_801DDCEC, s_Quote_80332260,
+    s_Quote_80332260, s_period_80332530, s_Enviar_la_respuesta_a_801DDCF8, s_Empty_803321B8,
+    s_Incluir_801DDD10, s_Confirmar_801DDD1C, s_Nombre_80332534, s_Sexo_8033253C,
+    s_Tribu_80332484, s_Oficio_familiar_801DDD28, s_Comandos_801DDD3C, s_Objetos_80332544,
+    s_Equipo_8033254C, s_Artefactos_801DDD48, s_Tesoros_80332554, s_Dinero_8033255C,
+    s_Favoritos_801DDD54, s_Familia_80332564, s_Cartas_80332528, s_Hecho_8033256C,
 };
 extern "C" const char* PTR_s_Cowlick[] = {
     s_Cowlick_80332574, s_Natural_8033257C, s_Headband_801DDD60, s_Cap_80332584,
@@ -949,6 +907,12 @@ extern int s_DynamicMess[5];
 }
 extern char s_DynamicMessStr[0x400];
 extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[];
+
+extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[] = {
+    {4, {14, 15, 16, 3, 0, 0, 0, 0}},
+    {2, {15, 3, 0, 0, 0, 0, 0, 0}},
+    {4, {30, 31, 32, 3, 0, 0, 0, 0}},
+};
 
 extern "C" SingMenuSoloNameTable PTR_s_solo2 = {
     {(char*)s_solo2_80332718, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -1182,15 +1146,7 @@ void CMenuPcs::SingMenuInit()
 
     MenuBoardEntry* boardEntry = reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr);
     int screenY = static_cast<int>(kSingStatScreenY);
-    boardEntry->m_rotZ = 0.0f;
-    boardEntry->m_rotY = 0.0f;
-    boardEntry->m_rotX = 0.0f;
-    boardEntry->m_scaleZ = 0.0f;
-    boardEntry->m_scaleY = 0.0f;
-    boardEntry->m_scaleX = 0.0f;
-    boardEntry->m_unk3c = 1.0f;
-    boardEntry->m_unk38 = 1.0f;
-    boardEntry->m_unk34 = 1.0f;
+    boardEntry->m_transform.Identity();
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_modelHandle = 0;
     float centerY = static_cast<float>(static_cast<double>(static_cast<float>(kSingStatPanelH * 0.5
                 + kSingStatPanelH)) - 224.0);
@@ -1257,6 +1213,129 @@ inline void CMenuPcs::SingMenuEnd()
 inline void CMenuPcs::calcSingleMenu()
 {
     loadTextureAsync(0, 0, 0, 0, 0, 0, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80149e5c
+ * PAL Size: 952b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, int)
+{
+    gSingMenuHasScriptFoodBase = static_cast<int>(SingleCaravanWork()->m_shopRequestState != 0);
+    if (Game.m_gameWork.m_menuStageMode == 0) {
+        if (m_singleMenuStageActive == 0) {
+            return;
+        }
+
+        m_stageF0 = 0;
+        m_singleMenuStageActive = 0;
+        m_singleMenuInitialized = 0;
+        return;
+    }
+
+    if (m_singleMenuStageActive == 0) {
+        createSingleMenu();
+    }
+    if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag == 0) {
+        return;
+    }
+    if (m_singleMenuInitialized == 0) {
+        SingMenuInit();
+    }
+
+    if (SingleCaravanWork()->m_shopRequestState == 0) {
+        int loadCompleted;
+        int loadIndex = m_singleMenuTextureLoadIndex;
+        if (loadIndex >= 2) {
+            loadCompleted = 1;
+        } else {
+            if (m_singleMenuTextureLoadState == 0) {
+                char path[260];
+                sprintf(path, s_singMenuTexturePathFmt, Game.GetLangString(), PTR_s_solo1.entries[loadIndex]);
+                gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
+                File.ReadASync(gSingMenuAsyncFileHandle);
+                m_singleMenuTextureLoadState = m_singleMenuTextureLoadState + 1;
+            } else if (m_singleMenuTextureLoadState == 1) {
+                if (!File.IsCompleted(gSingMenuAsyncFileHandle)) {
+                    loadCompleted = 0;
+                    goto store_load_completed;
+                }
+
+                m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
+
+                m_textureSets[loadIndex + 5]->Create(File.m_readBuffer, Game.m_gameWork.m_menuStageMode != 0 ? m_stageF4 : m_menuStage, 0, 0, 0, 0);
+                File.Close(gSingMenuAsyncFileHandle);
+                gSingMenuAsyncFileHandle = 0;
+                m_singleMenuTextureLoadState = 0;
+                m_singleMenuTextureLoadIndex = m_singleMenuTextureLoadIndex + 1;
+            }
+
+            if (m_singleMenuTextureLoadIndex < 2) {
+                loadCompleted = 0;
+            } else {
+                SingMenuTextureRef* mapping = s_singleMenuModelTextureTable;
+                int i = 0;
+                u8* texSlot = reinterpret_cast<u8*>(this);
+                do {
+                    int texIdx = m_textureSets[mapping->textureSetIndex]->Find(mapping->textureName);
+                    CTexture* tex = m_textureSets[mapping->textureSetIndex]->GetTexture(static_cast<unsigned long>(texIdx));
+                    i++;
+                    mapping++;
+                    tex->AddRef();
+                    *reinterpret_cast<CTexture**>(texSlot + offsetof(CMenuPcs, m_textures[45])) = tex;
+                    texSlot += sizeof(CTexture*);
+                } while (i < 0x33);
+                loadCompleted = 1;
+            }
+        }
+store_load_completed:
+        gSingMenuAsyncLoadCompleted = loadCompleted;
+    }
+
+post_texture_load:
+    if (m_singleFadeState->done != 0) {
+        m_singleMenuPhase = m_singleMenuPhase + 1;
+        m_singleFadeState->done = 0;
+        m_singleFadeState->active = 0;
+        m_singMenuState->initialized = 0;
+        m_singMenuState->closeRequested = 0;
+        m_singMenuState->stepState = 0;
+        m_singMenuState->frame = 0;
+    }
+
+    char menuKind = SingleCaravanWork()->m_shopRequestState;
+    if (menuKind == 1) {
+        if (m_shopMenu == 0) {
+            CreateShopMenu();
+        } else {
+            m_shopMenu->Calc();
+        }
+    } else if (menuKind == 2) {
+        if (m_shopMenu == 0) {
+            CreateSmithMenu();
+        } else {
+            m_shopMenu->Calc();
+        }
+    }
+
+    if (gSingMenuHasScriptFoodBase == 0) {
+        switch (m_singleMenuPhase) {
+            case 0:
+                SingleCalcFadeIn();
+                break;
+            case 1:
+                SingleCalcCtrl();
+                break;
+            case 2:
+                SingleCalcFadeOut();
+                break;
+        }
+    }
 }
 
 /*
@@ -1531,129 +1610,6 @@ void CMenuPcs::drawSingleMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x80149e5c
- * PAL Size: 952b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, int)
-{
-    gSingMenuHasScriptFoodBase = static_cast<int>(SingleCaravanWork()->m_shopRequestState != 0);
-    if (Game.m_gameWork.m_menuStageMode == 0) {
-        if (m_singleMenuStageActive == 0) {
-            return;
-        }
-
-        m_stageF0 = 0;
-        m_singleMenuStageActive = 0;
-        m_singleMenuInitialized = 0;
-        return;
-    }
-
-    if (m_singleMenuStageActive == 0) {
-        createSingleMenu();
-    }
-    if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag == 0) {
-        return;
-    }
-    if (m_singleMenuInitialized == 0) {
-        SingMenuInit();
-    }
-
-    if (SingleCaravanWork()->m_shopRequestState == 0) {
-        int loadCompleted;
-        int loadIndex = m_singleMenuTextureLoadIndex;
-        if (loadIndex >= 2) {
-            loadCompleted = 1;
-        } else {
-            if (m_singleMenuTextureLoadState == 0) {
-                char path[260];
-                sprintf(path, s_singMenuTexturePathFmt, Game.GetLangString(), PTR_s_solo1.entries[loadIndex]);
-                gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
-                File.ReadASync(gSingMenuAsyncFileHandle);
-                m_singleMenuTextureLoadState = m_singleMenuTextureLoadState + 1;
-            } else if (m_singleMenuTextureLoadState == 1) {
-                if (!File.IsCompleted(gSingMenuAsyncFileHandle)) {
-                    loadCompleted = 0;
-                    goto store_load_completed;
-                }
-
-                m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
-
-                m_textureSets[loadIndex + 5]->Create(File.m_readBuffer, Game.m_gameWork.m_menuStageMode != 0 ? m_stageF4 : m_menuStage, 0, 0, 0, 0);
-                File.Close(gSingMenuAsyncFileHandle);
-                gSingMenuAsyncFileHandle = 0;
-                m_singleMenuTextureLoadState = 0;
-                m_singleMenuTextureLoadIndex = m_singleMenuTextureLoadIndex + 1;
-            }
-
-            if (m_singleMenuTextureLoadIndex < 2) {
-                loadCompleted = 0;
-            } else {
-                SingMenuTextureRef* mapping = s_singleMenuModelTextureTable;
-                int i = 0;
-                u8* texSlot = reinterpret_cast<u8*>(this);
-                do {
-                    int texIdx = m_textureSets[mapping->textureSetIndex]->Find(mapping->textureName);
-                    CTexture* tex = m_textureSets[mapping->textureSetIndex]->GetTexture(static_cast<unsigned long>(texIdx));
-                    i++;
-                    mapping++;
-                    tex->AddRef();
-                    *reinterpret_cast<CTexture**>(texSlot + offsetof(CMenuPcs, m_textures[45])) = tex;
-                    texSlot += sizeof(CTexture*);
-                } while (i < 0x33);
-                loadCompleted = 1;
-            }
-        }
-store_load_completed:
-        gSingMenuAsyncLoadCompleted = loadCompleted;
-    }
-
-post_texture_load:
-    if (m_singleFadeState->done != 0) {
-        m_singleMenuPhase = m_singleMenuPhase + 1;
-        m_singleFadeState->done = 0;
-        m_singleFadeState->active = 0;
-        m_singMenuState->initialized = 0;
-        m_singMenuState->closeRequested = 0;
-        m_singMenuState->stepState = 0;
-        m_singMenuState->frame = 0;
-    }
-
-    char menuKind = SingleCaravanWork()->m_shopRequestState;
-    if (menuKind == 1) {
-        if (m_shopMenu == 0) {
-            CreateShopMenu();
-        } else {
-            m_shopMenu->Calc();
-        }
-    } else if (menuKind == 2) {
-        if (m_shopMenu == 0) {
-            CreateSmithMenu();
-        } else {
-            m_shopMenu->Calc();
-        }
-    }
-
-    if (gSingMenuHasScriptFoodBase == 0) {
-        switch (m_singleMenuPhase) {
-            case 0:
-                SingleCalcFadeIn();
-                break;
-            case 1:
-                SingleCalcCtrl();
-                break;
-            case 2:
-                SingleCalcFadeOut();
-                break;
-        }
-    }
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -1872,7 +1828,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
         }
         font->Draw(label);
 
-        GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
+        font->renderFlags.fixedWidth = 1;
         if (languageId == 2) {
             font->SetMargin(-5.0f);
             font->SetScaleX(0.7199999690055847f);
@@ -1899,7 +1855,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
         font->SetPosX(statPosX0 - valueW);
         font->Draw(valueText);
 
-        GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
+        font->renderFlags.fixedWidth = 0;
         font->SetMargin(1.0f);
         y += statYStep;
         labelsDe++;
@@ -1909,9 +1865,59 @@ void CMenuPcs::DrawSingleStat(float alpha)
         labelsEn++;
     }
 
-    GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
+    font->renderFlags.fixedWidth = 0;
     font->SetMargin(1.0f);
     DrawInit();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801488f0
+ * PAL Size: 680b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::DrawSingleHelpWim(float alpha)
+{
+    DrawInit();
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+    int alphaInt = static_cast<int>(255.0f * alpha);
+    _GXColor color;
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = static_cast<u8>(alphaInt);
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
+    MenuPcs.DrawRect(0, 32.0f, 312.0f, 32.0f, 32.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(8, 576.0f, 312.0f, 32.0f, 32.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(4, 32.0f, 384.0f, 32.0f, 32.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(0xC, 576.0f, 384.0f, 32.0f, 32.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x27));
+    MenuPcs.DrawRect(0, 64.0f, 312.0f, 512.0f, 32.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(4, 64.0f, 384.0f, 512.0f, 32.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x24));
+    MenuPcs.DrawRect(0, 32.0f, 344.0f, 32.0f, 40.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(8, 576.0f, 344.0f, 32.0f, 40.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
+    MenuPcs.DrawRect(8, 64.0f, 344.0f, 512.0f, 40.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -2471,55 +2477,6 @@ void CMenuPcs::SingleDrawCtrl()
 
 /*
  * --INFO--
- * PAL Address: 0x801488f0
- * PAL Size: 680b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::DrawSingleHelpWim(float alpha)
-{
-    DrawInit();
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    int alphaInt = static_cast<int>(255.0f * alpha);
-    _GXColor color;
-    color.r = 0xFF;
-    color.g = 0xFF;
-    color.b = 0xFF;
-    color.a = static_cast<u8>(alphaInt);
-    GXSetChanMatColor(GX_COLOR0A0, color);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
-    MenuPcs.DrawRect(0, 32.0f, 312.0f, 32.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(8, 576.0f, 312.0f, 32.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(4, 32.0f, 384.0f, 32.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(0xC, 576.0f, 384.0f, 32.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x27));
-    MenuPcs.DrawRect(0, 64.0f, 312.0f, 512.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(4, 64.0f, 384.0f, 512.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x24));
-    MenuPcs.DrawRect(0, 32.0f, 344.0f, 32.0f, 40.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(8, 576.0f, 344.0f, 32.0f, 40.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
-    MenuPcs.DrawRect(8, 64.0f, 344.0f, 512.0f, 40.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-}
-/*
- * --INFO--
  * PAL Address: 0x80147728
  * PAL Size: 420b
  * EN Address: TODO
@@ -2983,86 +2940,6 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
 }
 #pragma opt_dead_assignments reset
 
-extern "C" const char* gSingMenuTextTableEn[] = {
-    s_Empty_803321B8, s_Yes_803321BC, s_No_803321C0, s_Cancel_803321C4,
-    s_gil_803321CC, s_Strength_801DD814, s_Defence_803321D0, s_Magic_803321D8,
-    s_Memories_801DD820, s_Attack_803321E0, s_Defend_803321E8, s_Remove_803321F0,
-    s_Fuse_803321F8, s_Split_80332200, s_Use_80332208, s_Drop_8033220C,
-    s_Destroy_80332214, s_Male_8033221C, s_Female_80332224, s_All_8033222C,
-    s_QuestionMarks_80332230, s_g_period_80332234, s_Father_80332238, s_Mother_80332240,
-    s_Brother_80332248, s_Sister_80332250, s_Brother_80332248, s_Sister_80332250,
-    s_Empty_803321B8, s_Letters_80332258, s_Send_item_801DD82C, s_Send_gil_801DD838,
-    s_Send_nothing_801DD844, s_Proceed_801DD854, s_Take_out_801DD860, s_Quote_80332260,
-    s_Quote_80332260, s_Send_80332264, s_the_reply_801DD86C, s_Empty_803321B8,
-    s_Include_801DD878, s_Confirm_8033226C, s_Name_80332274, s_Gender_8033227C,
-    s_Tribe_80332284, s_Family_Trade_801DD884, s_Command_List_801DD894, s_Items_8033228C,
-    s_Equip_80332294, s_Artefacts_801DD8A4, s_Treasures_801DD8B0, s_Money_8033229C,
-    s_Favourites_801DD8BC, s_Family_803322A4, s_Letters_80332258, s_Done_803322AC,
-};
-extern "C" const char* gSingMenuTextTableDe[] = {
-    s_Empty_803321B8, s_Ja_803322B4, s_Nein_803322B8, s_Abbrechen_801DD8C8,
-    s_Gil_803322C0, s_Staerke_803322C4, s_Abwehr_803322CC, s_Magie_803322D4,
-    s_Erinnerungen_801DD8D4, s_Angreifen_801DD8E4, s_Verteidigen_801DD8F0, s_Ablegen_803322DC,
-    s_Kombinieren_801DD8FC, s_Aufloesen_801DD908, s_Benutzen_801DD914, s_Wegwerfen_801DD920,
-    s_Zerstoeren_801DD92C, s_Maennlich_801DD938, s_Weiblich_801DD944, s_Alle_Rassen_801DD950,
-    s_QuestionMarks_80332230, s_G_803322E4, s_Vater_803322E8, s_Mutter_803322F0,
-    s_Bruder_803322F8, s_Schwester_801DD95C, s_kl_Bruder_801DD968, s_kl_Schwester_801DD974,
-    s_Empty_803321B8, s_Liste_erhaltener_Briefe_801DD984, s_Gegenstand_beifuegen_801DD99C, s_Gil_beifuegen_801DD9B0,
-    s_Nichts_beifuegen_801DD9C0, s_Weiter_80332300, s_herausholen_801DD9D0, s_specialChar_80332308,
-    s_Quote_80332260, s_Empty_803321B8, s_die_Antwort_801DD9E0, s_schicken_801DD9F0,
-    s_beifuegen_801DD9FC, s_Bestaetigen_801DDA08, s_Name_80332274, s_Geschlecht_801DDA14,
-    s_Rasse_8033230C, s_Elterlicher_Beruf_801DDA20, s_Kommandoliste_801DDA34, s_Gegenstaende_801DDA44,
-    s_Ausruesten_801DDA50, s_Artefakte_801DDA5C, s_Geborgtes_801DDA68, s_Geld_80332314,
-    s_Geschmack_801DDA74, s_Familie_8033231C, s_Briefe_80332324, s_Abbrechen_801DD8C8,
-};
-extern "C" const char* gSingMenuTextTableIt[] = {
-    s_Empty_803321B8, s_Si_8033232C, s_No_803321C0, s_Annulla_80332330,
-    s_guil_80332338, s_Forza_80332340, s_Difesa_80332348, s_Magia_80332350,
-    s_Memorie_80332358, s_Attacco_80332360, s_Difesa_80332348, s_Rimuovi_80332368,
-    s_Fusione_80332370, s_Dividi_80332378, s_Usa_80332380, s_Posa_80332384,
-    s_Distruggi_801DDA80, s_Maschio_8033238C, s_Femmina_80332394, s_Tutti_8033239C,
-    s_QuestionMarks_80332230, s_g_period_80332234, s_Padre_803323A4, s_Madre_803323AC,
-    s_Fratello_801DDA8C, s_Sorella_803323B4, s_Fratello_801DDA8C, s_Sorella_803323B4,
-    s_Empty_803321B8, s_Lettere_803323BC, s_Invia_oggetto_801DDA98, s_Invia_guil_801DDAA8,
-    s_Non_inviare_nulla_801DDAB4, s_Vuoi_procedere_801DDAC8, s_Vuoi_prendere_801DDAD8, s_Quote_80332260,
-    s_Quote_80332260, s_con_803323C4, s_Vuoi_rispondere_a_801DDAE8, s_Empty_803321B8,
-    s_Allegato_801DDAFC, s_Conferma_801DDB08, s_Nome_803323CC, s_Sesso_803323D4,
-    s_Razza_803323DC, s_Mestiere_801DDB14, s_Lista_Comandi_801DDB20, s_Oggetti_803323E4,
-    s_Equipaggiamento_801DDB30, s_Manufatti_801DDB40, s_Tesori_803323EC, s_Denaro_803323F4,
-    s_Preferiti_801DDB4C, s_Famiglia_801DDB58, s_Lettere_803323BC, s_Fatto_803323FC,
-};
-extern "C" const char* gSingMenuTextTableFr[] = {
-    s_Empty_803321B8, s_Oui_80332404, s_Non_80332408, s_Annuler_8033240C,
-    s_gils_80332414, s_Force_8033241C, s_Resistance_801DDB64, s_Magie_803322D4,
-    s_Souvenirs_801DDB70, s_Attaquer_801DDB7C, s_Defendre_801DDB88, s_Retirer_80332424,
-    s_Fusionner_801DDB94, s_Separer_8033242C, s_Utiliser_801DDBA0, s_Jeter_80332434,
-    s_Detruire_801DDBAC, s_Masculin_801DDBB8, s_Feminin_8033243C, s_Tous_80332444,
-    s_QuestionMarks_80332230, s_g_period_80332234, s_Pere_8033244C, s_Mere_80332454,
-    s_Frere_8033245C, s_Soeur_80332464, s_Frere_8033245C, s_Soeur_80332464,
-    s_Empty_803321B8, s_Lettres_8033246C, s_Envoyer_un_objet_801DDBC4, s_Envoyer_des_gils_801DDBD8,
-    s_Ne_rien_envoyer_801DDBEC, s_Continuer_801DDBFC, s_Prendre_801DDC08, s_Quote_80332260,
-    s_Quote_80332260, s_la_reponse_801DDC14, s_Envoyer_a_801DDC20, s_Empty_803321B8,
-    s_Joindre_801DDC2C, s_Confirmer_801DDC38, s_Nom_80332474, s_Sexe_8033247C,
-    s_Tribu_80332484, s_Metier_8033248C, s_Commandes_801DDC44, s_Objets_80332494,
-    s_Equiper_8033249C, s_Artefacts_801DD8A4, s_Tresors_803324A4, s_Gils_803324AC,
-    s_Preferences_801DDC50, s_Famille_803324B4, s_Lettres_8033246C, s_Laisser_803324BC,
-};
-extern "C" const char* gSingMenuTextTableEs[] = {
-    s_Empty_803321B8, s_Si_803324C4, s_No_803321C0, s_Cancelar_801DDC5C,
-    s_guiles_803324C8, s_Fuerza_803324D0, s_Defensa_803324D8, s_Magia_80332350,
-    s_Memorias_801DDC68, s_Atacar_803324E0, s_Defender_801DDC74, s_Quitar_803324E8,
-    s_Fusionar_801DDC80, s_Separar_803324F0, s_Utilizar_801DDC8C, s_Descartar_801DDC98,
-    s_Destruir_801DDCA4, s_Hombre_803324F8, s_Mujer_80332500, s_Todos_80332508,
-    s_invQuestions_80332510, s_g_period_80332234, s_Padre_803323A4, s_Madre_803323AC,
-    s_Hermano_80332518, s_Hermana_80332520, s_Hermano_80332518, s_Hermana_80332520,
-    s_Empty_803321B8, s_Cartas_80332528, s_Enviar_objeto_801DDCB0, s_Enviar_guiles_801DDCC0,
-    s_No_enviar_nada_801DDCD0, s_Continuar_801DDCE0, s_Extraer_801DDCEC, s_Quote_80332260,
-    s_Quote_80332260, s_period_80332530, s_Enviar_la_respuesta_a_801DDCF8, s_Empty_803321B8,
-    s_Incluir_801DDD10, s_Confirmar_801DDD1C, s_Nombre_80332534, s_Sexo_8033253C,
-    s_Tribu_80332484, s_Oficio_familiar_801DDD28, s_Comandos_801DDD3C, s_Objetos_80332544,
-    s_Equipo_8033254C, s_Artefactos_801DDD48, s_Tesoros_80332554, s_Dinero_8033255C,
-    s_Favoritos_801DDD54, s_Familia_80332564, s_Cartas_80332528, s_Hecho_8033256C,
-};
 
 /*
  * --INFO--
@@ -3131,11 +3008,6 @@ extern "C" {
 int s_DynamicMess[5];
 }
 char s_DynamicMessStr[0x400];
-extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[] = {
-    {4, {14, 15, 16, 3, 0, 0, 0, 0}},
-    {2, {15, 3, 0, 0, 0, 0, 0, 0}},
-    {4, {30, 31, 32, 3, 0, 0, 0, 0}},
-};
 
 /*
  * --INFO--
@@ -3189,8 +3061,8 @@ int CMenuPcs::SingWinMessHeight()
  * --INFO--
  * PAL Address: 0x8014624c
  * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8016C45C
+ * EN Size: 284b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3198,7 +3070,7 @@ int CMenuPcs::SingWinMessHeight()
 int CMenuPcs::ChkEquipPossible(int itemNo)
 {
     unsigned int genderMask = 0x10;
-    int flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    int flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
     int raceBits = flags & 0xF;
     int genderBits = flags & 0x30;
     unsigned int raceMask = 1 << (SingleCaravanWork()->m_tribeId & 3);
@@ -3227,14 +3099,14 @@ int CMenuPcs::ChkEquipPossible(int itemNo)
  * --INFO--
  * PAL Address: 0x80146190
  * PAL Size: 188b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8016C578
+ * EN Size: 348b
  * JP Address: TODO
  * JP Size: TODO
  */
 int CMenuPcs::GetEquipType(int itemNo)
 {
-    u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    u16 flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
     int equipType;
 
     if (flags & 0x100) {
@@ -3255,18 +3127,12 @@ int CMenuPcs::GetEquipType(int itemNo)
     return equipType;
 }
 
-struct SingItemRecord {
-    u8 _pad0[0x38];
-    u16 raceItems[4];
-    u8 _pad1[0x8];
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80145ff4
  * PAL Size: 412b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8016C6D4
+ * EN Size: 332b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3277,11 +3143,11 @@ int CMenuPcs::GetSmithItem(int itemNo)
     GetItemType(itemNo, 1);
     u16 race = *reinterpret_cast<u16*>(caravanWork + 0x3e0);
     int raceType = race & 3;
-    SingItemRecord* rec = &reinterpret_cast<SingItemRecord*>(Game.unkCFlatData0[2])[itemNo];
-    int smithItem = rec->raceItems[race & 3];
+    SItemFlatRow* rec = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo];
+    int smithItem = rec->m_smithResults[race & 3];
     if (smithItem > 0) {
         unsigned int genderMask = 0x10;
-        int flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
+        int flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[smithItem].m_equipFlags;
         int raceFlags = flags & 0xF;
         int genderFlags = flags & 0x30;
         unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e0) & 3);
@@ -3308,7 +3174,7 @@ int CMenuPcs::GetSmithItem(int itemNo)
 
     for (int i = 0; i < 4; i++) {
         if (raceType != i) {
-            smithItem = rec->raceItems[i];
+            smithItem = rec->m_smithResults[i];
             if (smithItem > 0) {
                 return smithItem;
             }
@@ -3321,8 +3187,8 @@ int CMenuPcs::GetSmithItem(int itemNo)
  * --INFO--
  * PAL Address: 0x80145f70
  * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8016C820
+ * EN Size: 232b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3330,16 +3196,121 @@ void CMenuPcs::GetRecipeMaterial(int itemNo, CMenuPcs::MaterialInfo* materialInf
 {
     GetItemType(itemNo, 1);
 
-    u8* itemBase = reinterpret_cast<u8*>(Game.unkCFlatData0[2]) + (itemNo * 0x48);
+    const SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo];
 
-    materialInfo->m_itemNo[0] = *reinterpret_cast<u16*>(itemBase + 0x26);
-    materialInfo->m_count[0] = *reinterpret_cast<u16*>(itemBase + 0x2C);
-    materialInfo->m_itemNo[1] = *reinterpret_cast<u16*>(itemBase + 0x28);
-    materialInfo->m_count[1] = *reinterpret_cast<u16*>(itemBase + 0x2E);
-    materialInfo->m_itemNo[2] = *reinterpret_cast<u16*>(itemBase + 0x2A);
-    materialInfo->m_count[2] = *reinterpret_cast<u16*>(itemBase + 0x30);
+    materialInfo->m_itemNo[0] = itemBase->m_smithMaterials[0];
+    materialInfo->m_count[0] = itemBase->m_smithMaterialCounts[0];
+    materialInfo->m_itemNo[1] = itemBase->m_smithMaterials[1];
+    materialInfo->m_count[1] = itemBase->m_smithMaterialCounts[1];
+    materialInfo->m_itemNo[2] = itemBase->m_smithMaterials[2];
+    materialInfo->m_count[2] = itemBase->m_smithMaterialCounts[2];
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80145c84
+ * PAL Size: 748b
+ * EN Address: 0x8016C908
+ * EN Size: 400b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::GetRaceStr(int itemNo, char* outText)
+{
+    unsigned short raceBits;
+    int raceType;
+    char* text;
+    char* suffix;
+
+    GetItemType(itemNo, 1);
+    raceBits = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
+    int raceLow = raceBits & 0xF;
+    int genderMask = raceBits & 0x30;
+    outText[0] = '\0';
+
+    if (raceLow == 0xF) {
+        switch (Game.m_gameWork.m_languageId) {
+        case 2:
+            text = (char*)gSingMenuTextTableDe[19];
+            break;
+        case 3:
+            text = (char*)gSingMenuTextTableIt[19];
+            break;
+        case 4:
+            text = (char*)gSingMenuTextTableFr[19];
+            break;
+        case 5:
+            text = (char*)gSingMenuTextTableEs[19];
+            break;
+        case 1:
+        default:
+            text = (char*)gSingMenuTextTableEn[19];
+            break;
+        }
+        strcpy(outText, text);
+        return;
+    }
+
+    for (raceType = 0; raceType < 4; raceType++) {
+        if ((raceBits & (1 << raceType)) != 0) {
+            break;
+        }
+    }
+
+    if (raceType < 4) {
+        switch (Game.m_gameWork.m_languageId) {
+        case 2:
+            text = (char*)PTR_s_Clavat_80214100[raceType];
+            break;
+        case 3:
+            text = (char*)PTR_s_Clavat_80214110[raceType];
+            break;
+        case 4:
+            text = (char*)PTR_s_Clavat_80214120[raceType];
+            break;
+        case 5:
+            text = (char*)PTR_s_Clavate[raceType];
+            break;
+        case 1:
+        default:
+            text = (char*)PTR_s_Clavat_802140f0[raceType];
+            break;
+        }
+
+        strcpy(outText, text);
+        if (static_cast<int>(Game.m_gameWork.m_languageId) == 2) {
+            strcat(outText, (char*)s_plural_s_80332958);
+        }
+    }
+
+    if (raceLow != 0 && genderMask != 0) {
+        strcpy(outText, (char*)s_space_8033295c);
+    }
+    if (genderMask == 0) {
+        return;
+    }
+
+    raceType = (genderMask >> 5) & 1;
+    switch (Game.m_gameWork.m_languageId) {
+    case 2:
+        suffix = (char*)gSingMenuTextTableDe[raceType + 17];
+        break;
+    case 3:
+        suffix = (char*)gSingMenuTextTableIt[raceType + 17];
+        break;
+    case 4:
+        suffix = (char*)gSingMenuTextTableFr[raceType + 17];
+        break;
+    case 5:
+        suffix = (char*)gSingMenuTextTableEs[raceType + 17];
+        break;
+    case 1:
+    default:
+        suffix = (char*)gSingMenuTextTableEn[raceType + 17];
+        break;
+    }
+    strcat(outText, suffix);
+}
 
 /*
  * --INFO--
@@ -3390,11 +3361,14 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
     }
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+    int barX = x + 0x10;
     int barY = y + 8;
-    MenuPcs.DrawRect(0, static_cast<float>(x + 0x10), static_cast<float>(barY),
+    MenuPcs.DrawRect(0, static_cast<float>(barX), static_cast<float>(barY),
                                     4.0f, 8.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(8, static_cast<float>(x + 0x10 + bars * 8 - 4), static_cast<float>(barY),
+    barX += bars * 8;
+    barX -= 4;
+    MenuPcs.DrawRect(8, static_cast<float>(barX), static_cast<float>(barY),
                                     4.0f, 8.0f, 0.0f, 0.0f,
                                     1.0f, 1.0f, 0.0f);
 
@@ -3602,7 +3576,6 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
     }
     return 9;
 }
-
 
 const float FLOAT_80332918 = 366.0f;
 const float FLOAT_8033291c = -32.0f;

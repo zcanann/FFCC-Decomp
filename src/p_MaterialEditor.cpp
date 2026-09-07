@@ -1,3 +1,4 @@
+#include "ffcc/math.h"
 #include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/p_camera.h"
@@ -6,17 +7,12 @@
 static const GXColor kMaterialEditorDefaultColorRgba = {0xFF, 0xFF, 0xFF, 0xFF};
 static const float kMaterialEditorControlMaxInit = 10000.0f;
 static const float kMaterialEditorControlMinInit = -10000.0f;
-static const char sMaterialEditorSpinnerText[5] = "|/-\\";
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
 #include <Dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
 #include <string.h>
 
-extern "C" void createViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
-extern "C" void destroyViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
-extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
-extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 static const char s_CMaterialEditorPcsViewer[] = "CMaterialEditorPcs(VIEWER)";
 static const char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 static const char sMaterialEditorCManagerName[] = "CManager";
@@ -28,34 +24,15 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
-static CProcessTableCallback s_materialEditorTableDesc[4] = {
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)},
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)},
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)},
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)},
-};
 CMaterialEditorPcs MaterialEditorPcs;
-static char* q;
 
-CProcessTable CMaterialEditorPcs::m_table = {
+CProcessCallbackTable CMaterialEditorPcs::m_table = {
     const_cast<char*>(s_CMaterialEditorPcsViewer),
+    static_cast<CProcessCallback>(&CMaterialEditorPcs::createViewer),
+    static_cast<CProcessCallback>(&CMaterialEditorPcs::destroyViewer),
     {
-        s_materialEditorTableDesc[0].m_thisOffset,
-        s_materialEditorTableDesc[0].m_virtualOffset,
-        s_materialEditorTableDesc[0].m_function,
-        s_materialEditorTableDesc[1].m_thisOffset,
-        s_materialEditorTableDesc[1].m_virtualOffset,
-        s_materialEditorTableDesc[1].m_function,
-        s_materialEditorTableDesc[2].m_thisOffset,
-        s_materialEditorTableDesc[2].m_virtualOffset,
-        s_materialEditorTableDesc[2].m_function,
-        0x20,
-        0,
-        s_materialEditorTableDesc[3].m_thisOffset,
-        s_materialEditorTableDesc[3].m_virtualOffset,
-        s_materialEditorTableDesc[3].m_function,
-        0x41,
-        1,
+        {static_cast<CProcessCallback>(&CMaterialEditorPcs::calcViewer), 0x20, 0},
+        {static_cast<CProcessCallback>(&CMaterialEditorPcs::drawViewer), 0x41, 1},
     },
 };
 static const double kMaterialEditorOneF64 = 1.0;
@@ -147,16 +124,10 @@ void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count,
  */
 void CMaterialEditorPcs::drawViewer()
 {
-    static char color;
-
-    if (color == 0) {
-        q = const_cast<char*>(sMaterialEditorSpinnerText);
-        color = 1;
-    }
-
-    static int pFan = 0;
-    pFan++;
-    char fan = q[(pFan >> 4) % 4];
+    static char* pFan = "|/-\\";
+    static int alive = 0;
+    alive++;
+    char fan = pFan[(alive >> 4) % 4];
     Graphic.Printf(const_cast<char*>(s_MaterialEditorFmt), (int)fan);
 
     if (m_displayTextureEnabled != 0) {
@@ -171,8 +142,8 @@ void CMaterialEditorPcs::drawViewer()
         RSDLISTITEM* listItem = reinterpret_cast<RSDLISTITEM*>(zlist->GetDataNext(&it));
         RSDITEM* model = listItem->rsdItem;
 
-        GXSetArray(GX_VA_POS, model->ptr10, 0xC);
-        GXSetArray(GX_VA_NRM, model->ptr14, 0xC);
+        GXSetArray(GX_VA_POS, model->m_positions, 0xC);
+        GXSetArray(GX_VA_NRM, model->m_normals, 0xC);
         GXSetNumChans(1);
         GXClearVtxDesc();
         GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
@@ -202,7 +173,7 @@ void CMaterialEditorPcs::drawViewer()
 
         for (int pass = 0; pass < 2; pass++) {
             for (u32 polyIndex = 0; polyIndex < model->countC; polyIndex++) {
-#define polygon (&static_cast<MaterialEditorPolygon*>(model->ptr18)[polyIndex])
+#define polygon (&model->m_polygons[polyIndex])
                 if ((polygon->flags & 0x200) != 0) {
                     GXSetCullMode(GX_CULL_NONE);
                 } else {
@@ -417,32 +388,18 @@ void CMaterialEditorPcs::drawViewer()
 }
 /*
  * --INFO--
- * PAL Address: 0x8004bec8
+ * PAL Address: 0x8004BEC8
  * PAL Size: 464b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80057EDC
+ * EN Size: 432b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMaterialEditorPcs::calcViewer()
 {
-    struct ViewerSRT {
-        float transX;
-        float transY;
-        float transZ;
-        float rotX;
-        float rotY;
-        float rotZ;
-        float scaleX;
-        float scaleY;
-        float scaleZ;
-    };
-
     Mtx cameraMatrix;
-    ViewerSRT srt;
+    SRT srt;
     Mtx scaleMatrix;
-    float rotationValue;
-    float one;
 
     USBPcs.mccReadData();
 
@@ -452,21 +409,11 @@ void CMaterialEditorPcs::calcViewer()
         m_usbStream.SetUSBStreamDataDone();
     }
 
-    one = LoadFloat(kMaterialEditorOneF);
-    rotationValue = LoadFloat(kMaterialEditorZeroF);
-    srt.transZ = rotationValue;
-    srt.transY = rotationValue;
-    srt.transX = rotationValue;
-    srt.rotZ = rotationValue;
-    srt.rotY = rotationValue;
-    srt.rotX = rotationValue;
-    srt.scaleZ = one;
-    srt.scaleY = one;
-    srt.scaleX = one;
-    srt.transX = m_usbTransform.m_cameraPosition.x;
-    srt.transY = m_usbTransform.m_cameraPosition.y;
-    srt.transZ = -m_usbTransform.m_cameraPosition.z;
-    CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
+    srt.Identity();
+    srt.m_position.x = m_usbTransform.m_cameraPosition.x;
+    srt.m_position.y = m_usbTransform.m_cameraPosition.y;
+    srt.m_position.z = -m_usbTransform.m_cameraPosition.z;
+    CameraPcs.SetViewerSRT(&srt);
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
 
@@ -550,7 +497,7 @@ void CMaterialEditorPcs::destroyViewer()
     GXSetCopyClear(clear, 0xffffff);
 
     m_usbStream.DeleteBuffer();
-    MemFree(reinterpret_cast<void*>(m_rsdIndex));
+    MemFree(m_rsdItem);
 
     unsigned int textureIndex;
     CMaterialEditorPcs* textureSlot = this;
@@ -593,7 +540,7 @@ void CMaterialEditorPcs::createViewer()
     clear.a = 0xff;
     GXSetCopyClear(clear, 0xffffff);
 
-    m_usbStreamState.m_stageDefault = reinterpret_cast<CMemory::CStage*>(1);
+    m_usbEnabled = 1;
     m_displayTextureEnabled = 0;
     memset(&m_usbTransform, 0, sizeof(m_usbTransform));
 
@@ -641,8 +588,8 @@ void CMaterialEditorPcs::Quit()
         textureSlot = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<char*>(textureSlot) + sizeof(void*));
     } while (textureIndex < 0x10);
 
-    if (m_rsdIndex != 0) {
-        MemFree(reinterpret_cast<void*>(m_rsdIndex));
+    if (m_rsdItem != 0) {
+        MemFree(m_rsdItem);
     }
 }
 /*
@@ -689,7 +636,7 @@ void CMaterialEditorPcs::Init()
     m_viewerSrtScale.z = one;
     m_viewerSrtScale.y = one;
     m_viewerSrtScale.x = one;
-    m_rsdIndex = 0;
+    m_rsdItem = 0;
 
     textureIndex = 0;
     while (textureIndex < 0x10) {

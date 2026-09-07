@@ -57,9 +57,6 @@ struct VertexApMtxSource
 	Vec* points;
 };
 
-extern const double kPppYmSharedDoubleBias;
-extern "C" const f64 kPppVertexApMtxDoubleBias = 4503599627370496.0;
-
 /*
  * --INFO--
  * PAL Address: 0x800de360

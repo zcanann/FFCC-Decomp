@@ -47,11 +47,10 @@ struct PartyObjOverlay {
     int attackSel;
     int unk6CC;
     int unk6D0;
-    unsigned short unk6D2;
-    unsigned short _pad6D4;
-    int weaponRef;
-    int weaponItem;
-    int pendingWeaponItem;
+    int pendingWeaponIndex;
+    int pendingWeaponItemId;
+    int weaponIndex;
+    int weaponItemId;
     union {
         CGObject* target;
         CGBaseObj* carryTarget;
@@ -74,9 +73,10 @@ STATIC_ASSERT(offsetof(PartyObjOverlay, unk6BC) == 0x04);
 STATIC_ASSERT(offsetof(PartyObjOverlay, unk6C0) == 0x08);
 STATIC_ASSERT(offsetof(PartyObjOverlay, commandFlags) == 0x0C);
 STATIC_ASSERT(offsetof(PartyObjOverlay, attackSel) == 0x10);
-STATIC_ASSERT(offsetof(PartyObjOverlay, weaponRef) == 0x20);
-STATIC_ASSERT(offsetof(PartyObjOverlay, weaponItem) == 0x24);
-STATIC_ASSERT(offsetof(PartyObjOverlay, pendingWeaponItem) == 0x28);
+STATIC_ASSERT(offsetof(PartyObjOverlay, pendingWeaponIndex) == 0x1C);
+STATIC_ASSERT(offsetof(PartyObjOverlay, pendingWeaponItemId) == 0x20);
+STATIC_ASSERT(offsetof(PartyObjOverlay, weaponIndex) == 0x24);
+STATIC_ASSERT(offsetof(PartyObjOverlay, weaponItemId) == 0x28);
 STATIC_ASSERT(offsetof(PartyObjOverlay, target) == 0x2C);
 STATIC_ASSERT(offsetof(PartyObjOverlay, targetOverride) == 0x30);
 STATIC_ASSERT(offsetof(PartyObjOverlay, unk6EC) == 0x34);
@@ -86,8 +86,8 @@ STATIC_ASSERT(offsetof(PartyObjOverlay, commandMode) == 0x3C);
 STATIC_ASSERT(sizeof(PartyObjOverlay) == 0x40);
 
 struct GhostPartyWorkFlags {
-	unsigned char flag80 : 1;
-	unsigned char flag40 : 1;
+	signed char flag80 : 1;
+	signed char flag40 : 1;
 	signed char flag20 : 1;
 	signed char flag10 : 1;
 	signed char flag08 : 1;
@@ -108,24 +108,31 @@ struct GhostPartyWork {
 	int gauge;                 // 0x18
 	int state;                 // 0x1C
 	int field20;               // 0x20
-	int thresholdA;            // 0x24
-	int thresholdB;            // 0x28
-	int thresholdC;            // 0x2C
+	int counters[3];           // 0x24
 	int slotSel;               // 0x30
 	float carrySpeed;          // 0x34
 	int pressure;              // 0x38
 	int settleTimer;           // 0x3C
-	int activeTrailCount;      // 0x40
-	unsigned char _pad44[0x90 - 0x44];
+	int moodTimer;             // 0x40
+	int holdTimer;             // 0x44
+	int activeTrailCount;      // 0x48
+	int trailIndex;            // 0x4C
+	Vec trailPositions[5];     // 0x50
+	unsigned int auraSlot;     // 0x8C
 };
 STATIC_ASSERT(offsetof(GhostPartyWork, carryDir) == 0x0C);
 STATIC_ASSERT(offsetof(GhostPartyWork, gauge) == 0x18);
-STATIC_ASSERT(offsetof(GhostPartyWork, thresholdA) == 0x24);
+STATIC_ASSERT(offsetof(GhostPartyWork, counters) == 0x24);
 STATIC_ASSERT(offsetof(GhostPartyWork, slotSel) == 0x30);
 STATIC_ASSERT(offsetof(GhostPartyWork, carrySpeed) == 0x34);
 STATIC_ASSERT(offsetof(GhostPartyWork, pressure) == 0x38);
 STATIC_ASSERT(offsetof(GhostPartyWork, settleTimer) == 0x3C);
-STATIC_ASSERT(offsetof(GhostPartyWork, activeTrailCount) == 0x40);
+STATIC_ASSERT(offsetof(GhostPartyWork, moodTimer) == 0x40);
+STATIC_ASSERT(offsetof(GhostPartyWork, holdTimer) == 0x44);
+STATIC_ASSERT(offsetof(GhostPartyWork, activeTrailCount) == 0x48);
+STATIC_ASSERT(offsetof(GhostPartyWork, trailIndex) == 0x4C);
+STATIC_ASSERT(offsetof(GhostPartyWork, trailPositions) == 0x50);
+STATIC_ASSERT(offsetof(GhostPartyWork, auraSlot) == 0x8C);
 STATIC_ASSERT(sizeof(GhostPartyWork) == 0x90);
 
 class CGPartyObj : public CGCharaObj
@@ -133,7 +140,7 @@ class CGPartyObj : public CGCharaObj
 public:
     CGPartyObj();
 
-	static unsigned char m_ghostWork[0x90];
+	static GhostPartyWork m_ghostWork;
 
     void onCreate();
     void onDestroy();

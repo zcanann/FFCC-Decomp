@@ -103,7 +103,7 @@ void pppDestructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl)
     void** work = (void**)GetLerpPosHistory(object, ctrl);
 
     if (*work != 0) {
-        pppHeapUseRate((CMemory::CStage*)*work);
+        pppMemFree(*work);
         *work = 0;
     }
 }

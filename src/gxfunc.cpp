@@ -76,124 +76,79 @@ unsigned short s_GXSetNumTevStages_nStages;
 
 /*
  * --INFO--
- * PAL Address: 0x80102fb4
- * PAL Size: 460b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 68b
+ * EN Address: 0x8011FB3C
+ * EN Size: 124b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma always_inline on
-static inline void initTevRegs()
+inline void _GXSetTev0_Init(_GXTevStageID stage)
 {
-	int* puVar2 = (int*)s_GXSetTevOrder_Reg;
-	int iVar1 = 0;
-	int iVar8 = 0;
-	int iVar10 = 0;
-	int iVar9 = 0;
-	int* colorIn = (int*)s_GXSetTevColorIn_Reg;
-	int* alphaIn = (int*)s_GXSetTevAlphaIn_Reg;
-	int* colorOp = (int*)s_GXSetTevColorOp_Reg;
-	int* alphaOp = (int*)s_GXSetTevAlphaOp_Reg;
-	int* swapMode = (int*)s_GXSetTevSwapMode_Reg;
-
-	for (int iVar13 = 2; iVar13 != 0; iVar13--) {
-		int iVar3 = iVar1 + 1;
-		int iVar4 = iVar1 + 2;
-
-		colorOp[iVar9 / 4] = -1;
-
-		int iVar6 = iVar1 + 4;
-
-		alphaOp[iVar9 / 4] = -1;
-
-		int iVar5 = iVar1 + 3;
-
-		swapMode[iVar10 / 4] = -1;
-
-		int iVar7 = iVar1 + 5;
-
-		colorIn[iVar8 / 4] = -1;
-		alphaIn[iVar8 / 4] = -1;
-
-		int iVar12 = iVar1 + 6;
-
-		puVar2[0] = -1;
-
-		int iVar11 = iVar1 + 7;
-
-		swapMode[iVar3 * 2] = -1;
-		colorIn[iVar3 * 4] = -1;
-		alphaIn[iVar3 * 4] = -1;
-		colorOp[iVar3 * 5] = -1;
-		alphaOp[iVar3 * 5] = -1;
-
-		iVar1 += 8;
-		puVar2[3] = -1;
-		iVar10 += 0x40;
-
-		colorIn[iVar4 * 4] = -1;
-		iVar9 += 0xA0;
-		iVar8 += 0x80;
-		alphaIn[iVar4 * 4] = -1;
-		colorOp[iVar4 * 5] = -1;
-		alphaOp[iVar4 * 5] = -1;
-		swapMode[iVar4 * 2] = -1;
-		puVar2[6] = -1;
-		colorIn[iVar5 * 4] = -1;
-		alphaIn[iVar5 * 4] = -1;
-		colorOp[iVar5 * 5] = -1;
-		alphaOp[iVar5 * 5] = -1;
-		swapMode[iVar5 * 2] = -1;
-		puVar2[9] = -1;
-		colorIn[iVar6 * 4] = -1;
-		alphaIn[iVar6 * 4] = -1;
-		colorOp[iVar6 * 5] = -1;
-		alphaOp[iVar6 * 5] = -1;
-		swapMode[iVar6 * 2] = -1;
-		puVar2[12] = -1;
-		colorIn[iVar7 * 4] = -1;
-		alphaIn[iVar7 * 4] = -1;
-		colorOp[iVar7 * 5] = -1;
-		alphaOp[iVar7 * 5] = -1;
-		swapMode[iVar7 * 2] = -1;
-		puVar2[15] = -1;
-		colorIn[iVar12 * 4] = -1;
-		alphaIn[iVar12 * 4] = -1;
-		colorOp[iVar12 * 5] = -1;
-		alphaOp[iVar12 * 5] = -1;
-		swapMode[iVar12 * 2] = -1;
-		puVar2[18] = -1;
-		puVar2[21] = -1;
-		puVar2 = (int*)((char*)puVar2 + 0x60);
-		colorIn[iVar11 * 4] = -1;
-		alphaIn[iVar11 * 4] = -1;
-		colorOp[iVar11 * 5] = -1;
-		alphaOp[iVar11 * 5] = -1;
-		swapMode[iVar11 * 2] = -1;
-	}
+	s_GXSetTevColorIn_Reg[stage].a = static_cast<_GXTevColorArg>(-1);
+	s_GXSetTevAlphaIn_Reg[stage].a = static_cast<_GXTevAlphaArg>(-1);
+	s_GXSetTevColorOp_Reg[stage].op = static_cast<_GXTevOp>(-1);
+	s_GXSetTevAlphaOp_Reg[stage].op = static_cast<_GXTevOp>(-1);
+	s_GXSetTevSwapMode_Reg[stage].rasSel = static_cast<_GXTevSwapSel>(-1);
 }
 
-void _InitGxFunc()
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 456b
+ * EN Address: 0x8011FBB8
+ * EN Size: 176b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void _GXSetTev_Init()
 {
-	initTevRegs();
-
-	s_GXSetTevSwapModeTable_Reg[0].red = static_cast<_GXTevColorChan>(-1);
-	s_GXSetTevSwapModeTable_Reg[1].red = static_cast<_GXTevColorChan>(-1);
-	s_GXSetTevSwapModeTable_Reg[2].red = static_cast<_GXTevColorChan>(-1);
-	s_GXSetTevSwapModeTable_Reg[3].red = static_cast<_GXTevColorChan>(-1);
+	for (int i = 0; i < 16; i++) {
+		_GXSetTev0_Init(static_cast<_GXTevStageID>(i));
+		s_GXSetTevOrder_Reg[i].coord = static_cast<_GXTexCoordID>(-1);
+	}
+	for (int i = 0; i < 4; i++) {
+		s_GXSetTevSwapModeTable_Reg[i].red = static_cast<_GXTevColorChan>(-1);
+	}
 	s_GXSetAlphaCompare_Reg.comp0 = static_cast<_GXCompare>(-1);
 	s_GXSetNumTevStages_nStages = 0xFFFF;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 16b
+ * EN Address: 0x801203C8
+ * EN Size: 20b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void _GXSetPixel_Init()
+{
 	s_GXSetBlendMode_Reg.mode = static_cast<_GXBlendMode>(-1);
 }
-#pragma always_inline off
+
+/*
+ * --INFO--
+ * PAL Address: 0x80102FB4
+ * PAL Size: 460b
+ * EN Address: 0x801204BC
+ * EN Size: 36b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void _InitGxFunc()
+{
+	_GXSetTev_Init();
+	_GXSetPixel_Init();
+}
 
 /*
  * --INFO--
  * PAL Address: 0x80103180
  * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801203DC
+ * EN Size: 224b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -213,8 +168,8 @@ void _GXSetBlendMode(_GXBlendMode mode, _GXBlendFactor srcFactor, _GXBlendFactor
  * --INFO--
  * PAL Address: 0x801031e8
  * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801202E8
+ * EN Size: 224b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -234,8 +189,8 @@ void _GXSetTevSwapModeTable(_GXTevSwapSel table, _GXTevColorChan red, _GXTevColo
  * --INFO--
  * PAL Address: 0x80103258
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80120238
+ * EN Size: 176b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -271,8 +226,8 @@ inline void _GXSetNumTevStages(unsigned char nStages)
  * --INFO--
  * PAL Address: 0x801032a8
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80120170
+ * EN Size: 200b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -292,8 +247,8 @@ void _GXSetTevOrder(_GXTevStageID stage, _GXTexCoordID coord, _GXTexMapID map, _
  * --INFO--
  * PAL Address: 0x80103308
  * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80120068
+ * EN Size: 264b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -314,8 +269,8 @@ void _GXSetAlphaCompare(_GXCompare comp0, unsigned char ref0, _GXAlphaOp op, _GX
  * --INFO--
  * PAL Address: 0x80103394
  * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011FF68
+ * EN Size: 256b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -337,8 +292,8 @@ void _GXSetTevAlphaOp(_GXTevStageID stage, _GXTevOp op, _GXTevBias bias, _GXTevS
  * --INFO--
  * PAL Address: 0x80103418
  * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011FE68
+ * EN Size: 256b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -360,8 +315,8 @@ void _GXSetTevColorOp(_GXTevStageID stage, _GXTevOp op, _GXTevBias bias, _GXTevS
  * --INFO--
  * PAL Address: 0x8010349c
  * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011FD88
+ * EN Size: 224b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -382,8 +337,8 @@ void _GXSetTevAlphaIn(_GXTevStageID stage, _GXTevAlphaArg a, _GXTevAlphaArg b, _
  * --INFO--
  * PAL Address: 0x8010350c
  * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011FCA8
+ * EN Size: 224b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -404,17 +359,13 @@ void _GXSetTevColorIn(_GXTevStageID stage, _GXTevColorArg a, _GXTevColorArg b, _
  * --INFO--
  * PAL Address: 0x8010357c
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8011FC68
+ * EN Size: 64b
  * JP Address: TODO
  * JP Size: TODO
  */
 void _GXSetTevOp(_GXTevStageID stage, _GXTevMode mode)
 {
-	s_GXSetTevColorIn_Reg[stage].a = (_GXTevColorArg)-1;
-	s_GXSetTevAlphaIn_Reg[stage].a = (_GXTevAlphaArg)-1;
-	s_GXSetTevColorOp_Reg[stage].op = (_GXTevOp)-1;
-	s_GXSetTevAlphaOp_Reg[stage].op = (_GXTevOp)-1;
-	s_GXSetTevSwapMode_Reg[stage].rasSel = (_GXTevSwapSel)-1;
+	_GXSetTev0_Init(stage);
 	GXSetTevOp(stage, mode);
 }

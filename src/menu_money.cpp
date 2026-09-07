@@ -106,38 +106,8 @@ STATIC_ASSERT(sizeof(MoneyMenuAnimList) == 0x1008);
  */
 int CMenuPcs::MoneyCtrlCur()
 {
-	bool blocked;
-	u16 pressRaw;
-	u16 holdRaw;
-	s16 hold;
-	s16 press;
-
-	int padLock = Pad.m_debugPadLock;
-	blocked = false;
-	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-		blocked = true;
-	}
-	if (blocked) {
-		pressRaw = 0;
-	} else {
-		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		pressRaw = Pad.GetPadInputs()[padIndex].buttonDown[0];
-	}
-	press = (s16)(u16)pressRaw;
-
-	blocked = false;
-	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-		blocked = true;
-	}
-	if (blocked) {
-		holdRaw = 0;
-	} else {
-		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-		holdRaw = Pad.GetPadInputs()[padIndex].repeatButton;
-	}
-	hold = (s16)(u16)holdRaw;
+	s16 press = Pad.GetButtonDown(0);
+	s16 hold = Pad.GetButtonRepeat(0);
 
 	if (hold == 0) {
 		return 0;

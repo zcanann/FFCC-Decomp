@@ -100,7 +100,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
     const u32 dataValIndex = *(u32*)(step + 4);
 
     pppShapeAnimData* shapeAnim =
-        static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
+        static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[dataValIndex]->m_animData);
     pppSetDrawEnv(
         0, &object->m_drawMatrix, *(float*)(step + 0x88), step[0x8C], step[0x0C],
         step[0x6E], 0, step[0x6B] == 0, 1, 0);
@@ -516,8 +516,7 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
     frameIndex = *(u16*)(color + 0x1e);
     shapeAnim =
         static_cast<pppShapeAnimData*>(
-        ppvEnv->m_resourceTables
-            .m_shapeTablePtr[*reinterpret_cast<s32*>((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 4)]
+        ppvEnv->m_shapeTablePtr[*reinterpret_cast<s32*>((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 4)]
             ->m_animData);
     *(u16*)(color + 0x20) = frameIndex;
 
@@ -569,25 +568,25 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
     }
 
     if ((s32)paramBytes[0x18] < 8 && (s32)paramBytes[0x18] >= 0) {
-        union { Vec baseDir; double _bdAlign[2]; };
-        union { s32 angles[4]; double _angAlign[2]; };
+        Vec baseDir;
+        pppIVECTOR4 angles;
         pppFMATRIX rot;
 
         baseDir.x = param->m_matrix[2][0];
         baseDir.y = param->m_matrix[2][1];
         baseDir.z = param->m_matrix[2][2];
-        angles[0] = (s32)(spreadRange * Math.RandF() - spread);
-        angles[0] = (s32)((float)(angles[0] << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
-        angles[1] = (s32)(spreadRange * Math.RandF() - spread);
-        angles[1] = (s32)((float)(angles[1] << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
-        angles[2] = (s32)(spreadRange * Math.RandF() - spread);
-        angles[2] = (s32)((float)(angles[2] << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
+        angles.x = (s32)(spreadRange * Math.RandF() - spread);
+        angles.x = (s32)((float)(angles.x << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
+        angles.y = (s32)(spreadRange * Math.RandF() - spread);
+        angles.y = (s32)((float)(angles.y << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
+        angles.z = (s32)(spreadRange * Math.RandF() - spread);
+        angles.z = (s32)((float)(angles.z << 15) / kPppYmMegaBirthShpTail2HalfTurnDegrees);
         if ((paramBytes[0x18] == 2) || (paramBytes[0x18] == 3)) {
-            angles[0] = 0;
-            angles[1] = 0;
+            angles.x = 0;
+            angles.y = 0;
         }
 
-        pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angles);
+        pppGetRotMatrixXYZ(rot, &angles);
         PSMTXMultVecSR(rot.value, &baseDir, reinterpret_cast<Vec*>(particleData->m_matrix[1]));
         particleData->m_matrix[1][0] *= *(float*)(paramBytes + 0x58);
         particleData->m_matrix[1][1] *= param->m_speedScale.x;
@@ -744,7 +743,7 @@ path:
         float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
         if (param->m_tail2PathIndex >= 0) {
-            short* pathInfo = (short*)(*(int*)&ppvEnv->m_particleColors[1] + param->m_tail2PathIndex * 8);
+            short* pathInfo = reinterpret_cast<short*>(ppvEnv->m_shapeGroupPtr + (param->m_tail2PathIndex));
 
             if (pathBase == 0) {
                 pathBase = (float*)ppvEnv->m_mapMeshPtr[*pathInfo]->m_vertices;
@@ -901,15 +900,15 @@ void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTabl
     void** ptrC4 = (void**)(work + 0x44);
 
     if (*ptrBc != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrBc));
+        pppMemFree(*ptrBc);
         *ptrBc = 0;
     }
     if (*ptrC0 != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrC0));
+        pppMemFree(*ptrC0);
         *ptrC0 = 0;
     }
     if (*ptrC4 != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrC4));
+        pppMemFree(*ptrC4);
         *ptrC4 = 0;
     }
 }

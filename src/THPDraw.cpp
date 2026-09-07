@@ -2,30 +2,36 @@
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
 #include "ffcc/gxfunc.h"
-extern "C" {
-extern const f32 kThpDrawLodBias;
-extern const GXColorS10 kTHPYuvToRgbTevColor;
-}
+static const GXColorS10 sTevColor = {-90, 0, -114, 135};
 
 static const GXColor sKColor0 = {0, 0, 226, 88};
 static const GXColor sKColor1 = {179, 0, 0, 182};
 static const GXColor sKColor2 = {255, 0, 255, 128};
 
+/*
+ * --INFO--
+ * PAL Address: 0x8010597c
+ * PAL Size: 476b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void THPGXYuv2RgbDraw(u32* yImage, u32* uImage, u32* vImage, s16 x, s16 y, s16 texWidth, s16 texHeight, s16 polyWidth, s16 polyHeight) {
     GXTexObj yTexObj;
     GXTexObj uTexObj;
     GXTexObj vTexObj;
     
     GXInitTexObj(&yTexObj, yImage, texWidth, texHeight, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&yTexObj, GX_NEAR, GX_NEAR, kThpDrawLodBias, kThpDrawLodBias, kThpDrawLodBias, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(&yTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&yTexObj, GX_TEXMAP0);
     
     GXInitTexObj(&uTexObj, uImage, texWidth >> 1, texHeight >> 1, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&uTexObj, GX_NEAR, GX_NEAR, kThpDrawLodBias, kThpDrawLodBias, kThpDrawLodBias, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(&uTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&uTexObj, GX_TEXMAP1);
     
     GXInitTexObj(&vTexObj, vImage, texWidth >> 1, texHeight >> 1, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&vTexObj, GX_NEAR, GX_NEAR, kThpDrawLodBias, kThpDrawLodBias, kThpDrawLodBias, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(&vTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&vTexObj, GX_TEXMAP2);
     
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
@@ -122,7 +128,7 @@ void THPGXYuv2RgbSetup(GXRenderModeObj* rmode) {
     _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevKColorSel(GX_TEVSTAGE3, GX_TEV_KCSEL_K2);
 
-    GXSetTevColorS10(GX_TEVREG0, kTHPYuvToRgbTevColor);
+    GXSetTevColorS10(GX_TEVREG0, sTevColor);
 
     GXSetTevKColor(GX_KCOLOR0, sKColor0);
 
@@ -165,9 +171,4 @@ void THPGXRestore(void) {
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_GREEN, GX_CH_GREEN, GX_CH_GREEN, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_BLUE, GX_CH_BLUE, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetAlphaCompare(GX_GEQUAL, 0, GX_AOP_AND, GX_ALWAYS, 0);
-}
-
-extern "C" {
-extern const f32 sTHPDrawZero = 0.0f;
-extern const f32 sTHPDrawNegativeOne = -1.0f;
 }

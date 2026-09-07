@@ -50,12 +50,11 @@ static inline _pppEnvSt* DeformationMdlEnv()
     return ppvEnv;
 }
 
-extern const float kYmDeformationMdlScreenWidth;
-extern const float kYmDeformationMdlScreenHeight;
-extern const float kYmDeformationMdlTexOffset;
-extern const float kYmDeformationMdlTexDepth;
-extern const float kYmDeformationMdlDegToRad;
-static const float kYmDeformationMdlZero = 0.0f;
+static const float kYmDeformationMdlScreenWidth = 320.0f;
+static const float kYmDeformationMdlScreenHeight = 224.0f;
+static const float kYmDeformationMdlTexOffset = -0.5f;
+static const float kYmDeformationMdlTexDepth = -1.0f;
+static const float kYmDeformationMdlDegToRad = 0.017453292f;
 
 static inline Mtx& CameraMatrix()
 {
@@ -69,7 +68,7 @@ static inline Mtx44& CameraScreenMatrix()
 
 static inline float DeformationMdlZero()
 {
-    return kYmDeformationMdlZero;
+    return 0.0f;
 }
 
 /*
@@ -315,7 +314,7 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*)
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* param_2)
 {
-    const float& value = kYmDeformationMdlZero;
+    float value = 0.0f;
     YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl_, param_2);
 
     state->m_values[1] = value;
@@ -337,7 +336,7 @@ void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _p
  */
 void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* param_2)
 {
-    const float& zero = kYmDeformationMdlZero;
+    float zero = 0.0f;
     YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl_, param_2);
 
     state->m_angle = 0;
@@ -349,5 +348,3 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pp
     state->m_values[3] = zero;
     state->m_values[2] = zero;
 }
-
-extern const double kPppYmSharedDoubleBias = 4503601774854144.0;

@@ -18,31 +18,20 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/ppp_linkage.h"
 
-extern const Vec kPppCharaBreakUpVector = {0.0f, 1.0f, 0.0f};
-__declspec(section ".rodata") extern const int kCharaBreakInitialVertexFlag0;
-__declspec(section ".rodata") extern const int kCharaBreakInitialVertexFlag1;
-__declspec(section ".rodata") extern const int kCharaBreakInitialVertexFlag2;
 static const char s_pppCharaBreak_cpp[] = "pppCharaBreak.cpp";
-extern const float kPppCharaBreakZero = 0.0f;
-extern const float kPppCharaBreakOne = 1.0f;
-extern const float kPppCharaBreakInitialMiscValue = -10000.0f;
-extern const char sPppCharaBreakObjMeshName[4] = "obj";
-extern const float kPppCharaBreakTriangleCenterScale = 0.3333333f;
-extern const float kPppCharaBreakDegToRad = 0.017453292f;
-extern const float kPppCharaBreakHalfTurnDegrees = 180.0f;
-extern const float kPppCharaBreakWobbleRange = 0.8f;
-extern const double kPppCharaBreakU32ToDoubleBias = 4503601774854144.0;
-extern const double kPppCharaBreakS32ToDoubleBias = 4503599627370496.0;
-extern const float kPppCharaBreakRandomSign = -1.0f;
+static const char sPppCharaBreakObjMeshName[4] = "obj";
+static const float kPppCharaBreakZero = 0.0f;
+static const float kPppCharaBreakOne = 1.0f;
+static const float kPppCharaBreakInitialMiscValue = -10000.0f;
+static const float kPppCharaBreakTriangleCenterScale = 0.3333333f;
+static const float kPppCharaBreakDegToRad = 0.017453292f;
+static const float kPppCharaBreakHalfTurnDegrees = 180.0f;
+static const float kPppCharaBreakWobbleRange = 0.8f;
+static const float kPppCharaBreakRandomSign = -1.0f;
 
 static inline Mtx& CameraMatrix()
 {
     return CameraPcs.m_cameraMatrix;
-}
-
-static inline float CharaBreakConst(const float& value)
-{
-    return *reinterpret_cast<const float*>(&value);
 }
 
 STATIC_ASSERT(sizeof(POLYGON_DATA) == 0x34);
@@ -57,10 +46,10 @@ typedef CChara::CMesh::CRefData CharaBreakMeshData;
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
-STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xC);
-STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x24);
-STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x34);
-STATIC_ASSERT(offsetof(CCharaModelData, m_normQuant) == 0x38);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_meshCount) == 0xC);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_materialSet) == 0x24);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_posQuant) == 0x34);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_normQuant) == 0x38);
 STATIC_ASSERT(offsetof(CharaBreakStep, m_worldSpaceMode) == 0x42);
 
 static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
@@ -68,7 +57,7 @@ static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
     return model->m_matrix;
 }
 
-static inline CCharaModelData* ModelData(CChara::CModel* model)
+static inline CChara::CModel::CRefData* ModelData(CChara::CModel* model)
 {
     return model->m_data;
 }
@@ -152,7 +141,7 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTab
         pppSetDrawEnv(
             reinterpret_cast<pppCVECTOR*>(&colorWork->result),
             &charaBreak->m_drawMatrix,
-            CharaBreakConst(kPppCharaBreakZero),
+            kPppCharaBreakZero,
             0,
             0,
             0,
@@ -237,7 +226,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
         work->m_miscValue = kPppCharaBreakInitialMiscValue;
         work->m_meshBuffers =
             static_cast<CharaBreakDisplayListPair***>(
-                pppMemFree__FPv(ModelData(model)->m_meshCount << 2,
+                pppMemAllocNoReport(ModelData(model)->m_meshCount << 2,
                                 ppvEnv->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp), 0x3D0));
         if (work->m_meshBuffers == NULL) {
             goto fail;
@@ -258,7 +247,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                 }
             }
 
-            work->m_meshBuffers[i] = static_cast<CharaBreakDisplayListPair**>(pppMemFree__FPv(
+            work->m_meshBuffers[i] = static_cast<CharaBreakDisplayListPair**>(pppMemAllocNoReport(
                 MeshData(mesh)->m_displayListCount << 2, ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppCharaBreak_cpp), 0x3E9));
             CharaBreakDisplayListPair** meshBuffer = work->m_meshBuffers[i];
@@ -281,7 +270,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                 CharaBreakDisplayListPair** dlEntries =
                     meshBuffer + dl;
                 for (; dl >= 0; dl--, displayList++) {
-                    *dlEntries = (CharaBreakDisplayListPair*)pppMemFree__FPv(
+                    *dlEntries = (CharaBreakDisplayListPair*)pppMemAllocNoReport(
                         0x10, ppvEnv->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp), 0x3FC);
                     if (*dlEntries == NULL) {
                         goto fail;
@@ -291,7 +280,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                     (*dlEntries)->m_displayListSize = 0;
                     (*dlEntries)->m_polygonData = 0;
                     (*dlEntries)->m_displayListSize = displayList->m_size;
-                    (*dlEntries)->m_rewrittenDisplayList = pppMemFree__FPv(
+                    (*dlEntries)->m_rewrittenDisplayList = pppMemAllocNoReport(
                         displayList->m_size, ppvEnv->m_stagePtr,
                         const_cast<char*>(s_pppCharaBreak_cpp), 0x40B);
                     if ((*dlEntries)->m_rewrittenDisplayList == NULL) {
@@ -302,7 +291,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
                     gUtil.ReWriteDisplayList((*dlEntries)->m_rewrittenDisplayList, displayList->m_size, 1);
 
                     u32 polygonCount = gUtil.GetNumPolygonFromDL((*dlEntries)->m_rewrittenDisplayList, displayList->m_size);
-                    (*dlEntries)->m_polygonData = (POLYGON_DATA*)pppMemFree__FPv(
+                    (*dlEntries)->m_polygonData = (POLYGON_DATA*)pppMemAllocNoReport(
                         polygonCount * 0x34, ppvEnv->m_stagePtr,
                         const_cast<char*>(s_pppCharaBreak_cpp), 0x423);
                     if ((*dlEntries)->m_polygonData == NULL) {
@@ -368,16 +357,16 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
                 for (u32 dlIndex = 0; dlIndex < meshData->m_displayListCount; dlIndex++) {
                     if (*dlEntries != NULL) {
                         if ((*dlEntries)->m_rewrittenDisplayList != NULL) {
-                            pppHeapUseRate((CMemory::CStage*)(*dlEntries)->m_rewrittenDisplayList);
+                            pppMemFree((*dlEntries)->m_rewrittenDisplayList);
                             (*dlEntries)->m_rewrittenDisplayList = 0;
                         }
                         if ((*dlEntries)->m_polygonData != NULL) {
-                            pppHeapUseRate((CMemory::CStage*)(*dlEntries)->m_polygonData);
+                            pppMemFree((*dlEntries)->m_polygonData);
                             (*dlEntries)->m_polygonData = 0;
                         }
                     }
                     if (*dlEntries != NULL) {
-                        pppHeapUseRate((CMemory::CStage*)*dlEntries);
+                        pppMemFree(*dlEntries);
                         *dlEntries = 0;
                     }
                     dlEntries++;
@@ -385,7 +374,7 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
             }
 
             if (*meshBufferSlot != NULL) {
-                pppHeapUseRate((CMemory::CStage*)*meshBufferSlot);
+                pppMemFree(*meshBufferSlot);
                 *meshBufferSlot = 0;
             }
             meshBufferSlot++;
@@ -394,7 +383,7 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
     }
 
     if (perMeshBuffers != NULL) {
-        pppHeapUseRate((CMemory::CStage*)perMeshBuffers);
+        pppMemFree(perMeshBuffers);
     }
 }
 
@@ -409,10 +398,10 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    float fVar1 = CharaBreakConst(kPppCharaBreakZero);
+    float fVar1 = kPppCharaBreakZero;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
-    work->m_value2 = CharaBreakConst(kPppCharaBreakZero);
+    work->m_value2 = kPppCharaBreakZero;
     work->m_value1 = fVar1;
     work->m_value0 = fVar1;
     work->m_value5 = fVar1;
@@ -431,7 +420,7 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    float fVar1 = CharaBreakConst(kPppCharaBreakZero);
+    float fVar1 = kPppCharaBreakZero;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
     work->m_meshBuffers = 0;
@@ -467,7 +456,6 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
     for (meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++) {
         s32 needsMtxUpdate = 0;
         Mtx meshToWorld;
-        S16Vec* workPositions = mesh->m_workPositions;
 
         if (MeshData(mesh)->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
             needsMtxUpdate = 1;
@@ -484,16 +472,13 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                 S16Vec transformed[3];
 
                 if (polygon->m_enabled == 0) {
-                    int flags[3];
-                    flags[0] = kCharaBreakInitialVertexFlag0;
-                    flags[1] = kCharaBreakInitialVertexFlag1;
-                    flags[2] = kCharaBreakInitialVertexFlag2;
+                    int flags[3] = {0, 0, 0};
 
                     for (int i = 0; i < 3; i++) {
                         S16Vec* dst = &transformed[i];
 
                         if (needsMtxUpdate) {
-                            S16Vec* srcPos = workPositions + polygon->m_posIndices[i];
+                            S16Vec* srcPos = mesh->m_workPositions + polygon->m_posIndices[i];
                             Vec transformedPos;
                             gUtil.ConvI2FVector(transformedPos, *srcPos, ModelData(model)->m_posQuant);
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
@@ -521,19 +506,11 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         }
                     }
 
-                    if (flags[0] == 0) {
-                        polygon->m_enabled = 0;
-                    } else {
+                    for (int i = 0; i < 3; i++) {
                         polygon->m_enabled = 1;
-                        if (flags[1] == 0) {
+                        if (flags[i] == 0) {
                             polygon->m_enabled = 0;
-                        } else {
-                            polygon->m_enabled = 1;
-                            if (flags[2] == 0) {
-                                polygon->m_enabled = 0;
-                            } else {
-                                polygon->m_enabled = 1;
-                            }
+                            break;
                         }
                     }
 
@@ -668,16 +645,12 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
     u32 count = polygonCount;
     CChara::CModel* modelPtr = model;
     POLYGON_DATA* polygon = polygonData;
-    f32 zero = CharaBreakConst(kPppCharaBreakZero);
+    f32 zero = kPppCharaBreakZero;
 
-    const volatile u32* upSrc = (const volatile u32*)&kPppCharaBreakUpVector.x;
     for (u32 i = 0; i < count; i++) {
         Vec normal;
-        Vec up;
+        Vec up = {0.0f, 1.0f, 0.0f};
         Vec tangent;
-        ((u32*)&up)[0] = upSrc[0];
-        ((u32*)&up)[1] = upSrc[1];
-        ((u32*)&up)[2] = upSrc[2];
 
         int alpha = (int)stepData->m_alphaBase + rand() % stepData->m_alphaRange;
         if (alpha > 0xFF) {
@@ -693,12 +666,12 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
         }
 
         if (MeshData(mesh)->m_skinCount == 0) {
-            normal.x = Math.RandF(CharaBreakConst(kPppCharaBreakOne));
-            normal.y = Math.RandF(CharaBreakConst(kPppCharaBreakOne));
-            normal.z = Math.RandF(CharaBreakConst(kPppCharaBreakOne));
-            normal.x *= (rand() % 2) ? CharaBreakConst(kPppCharaBreakOne) : CharaBreakConst(kPppCharaBreakRandomSign);
-            normal.y *= (rand() % 2) ? CharaBreakConst(kPppCharaBreakOne) : CharaBreakConst(kPppCharaBreakRandomSign);
-            normal.z *= (rand() % 2) ? CharaBreakConst(kPppCharaBreakOne) : CharaBreakConst(kPppCharaBreakRandomSign);
+            normal.x = Math.RandF(kPppCharaBreakOne);
+            normal.y = Math.RandF(kPppCharaBreakOne);
+            normal.z = Math.RandF(kPppCharaBreakOne);
+            normal.x *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
+            normal.y *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
+            normal.z *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
             PSVECNormalize(&normal, &normal);
             gUtil.ConvF2IVector(polygon->m_normalA, normal, ModelData(modelPtr)->m_normQuant);
         } else {
@@ -713,11 +686,11 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             tangent.y = zero;
             tangent.z = zero;
         } else {
-            PSVECScale(&tangent, &tangent, CharaBreakConst(kPppCharaBreakOne) / tangentMag);
+            PSVECScale(&tangent, &tangent, kPppCharaBreakOne / tangentMag);
         }
 
         if (zero == tangent.x && zero == tangent.y && zero == tangent.z) {
-            tangent.x = CharaBreakConst(kPppCharaBreakOne);
+            tangent.x = kPppCharaBreakOne;
             tangent.y = zero;
             tangent.z = zero;
         }
@@ -984,7 +957,3 @@ static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel* model, void* mode
 
     return (u32)__cntlzw(1 - (u32)stepData->m_worldSpaceMode) >> 5;
 }
-
-__declspec(section ".rodata") const int kCharaBreakInitialVertexFlag0 = 0;
-__declspec(section ".rodata") const int kCharaBreakInitialVertexFlag1 = 0;
-__declspec(section ".rodata") const int kCharaBreakInitialVertexFlag2 = 0;

@@ -21,7 +21,6 @@
 
 #include <math.h>
 
-extern unsigned char sRingMenuBlinkAlphaTable[];
 static const char sRingMenuDisplayToggleChangedFmt[] = {
 	0x72, 0x69, 0x6E, 0x67, 0x4D, 0x65, 0x6E, 0x75,
 	(char)0x95, (char)0x8E, (char)0xA6, 0x6F, 0x6E, 0x2F, 0x6F, 0x66,
@@ -38,8 +37,8 @@ static inline unsigned char* MenuPcsRaw()
 
 static inline int clampDecToZero(int value)
 {
-	unsigned int next = static_cast<unsigned int>(value - 1);
-	return static_cast<int>(next & ~static_cast<unsigned int>(static_cast<int>(next) >> 31));
+	int next = value - 1;
+	return next < 0 ? 0 : next;
 }
 
 /*
@@ -53,6 +52,11 @@ static inline int clampDecToZero(int value)
  */
 void CRingMenu::DrawIcon()
 {
+	static unsigned char color[16] = {
+		0x00, 0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0, 0xE0,
+		0xFF, 0xE0, 0xC0, 0xA0, 0x80, 0x60, 0x40, 0x20,
+	};
+
 	drawGBA();
 
 	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 2))) {
@@ -81,10 +85,8 @@ void CRingMenu::DrawIcon()
 	Vec viewPos;
 	Vec4d clipPos;
 	Vec viewInput;
-	CVector offset(0.0f, 0.5f * partyObj->unk_0x188, 0.0f);
-	Vec* baseWorldPos = CVector(partyObj->m_worldPosition);
-	CVector worldPos;
-	PSVECAdd(baseWorldPos, offset, worldPos);
+	CVector worldPos = CVector(partyObj->m_worldPosition) +
+		CVector(0.0f, 0.5f * partyObj->unk_0x188, 0.0f);
 
 	viewInput.x = worldPos.x;
 	viewInput.y = worldPos.y;
@@ -118,7 +120,7 @@ void CRingMenu::DrawIcon()
 
 	float posX = 320.0f * clipPos.x + 320.0f;
 	float posY = 224.0f - 224.0f * clipPos.y;
-	unsigned char blinkAlpha = sRingMenuBlinkAlphaTable[static_cast<int>(System.m_frameCounter) % 16];
+	unsigned char blinkAlpha = color[static_cast<int>(System.m_frameCounter) % 16];
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x19));
 	int iconRow;
@@ -295,7 +297,7 @@ void CRingMenu::drawGBA()
 		return;
 	}
 
-	showScale = static_cast<float>(m_displayCounter) * 0.0625f;
+	showScale = m_displayCounter / 16.0f;
 	if (m_displayDirection != 0) {
 		showScale = 1.0f - showScale;
 	}
@@ -405,7 +407,7 @@ void CRingMenu::onDraw()
 		return;
 	}
 
-	float showScale = static_cast<float>(m_displayCounter) * 0.0625f;
+	float showScale = m_displayCounter / 16.0f;
 	if (m_displayDirection != 0) {
 		showScale = 1.0f - showScale;
 	}
@@ -678,15 +680,13 @@ void CRingMenu::onDraw()
 						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
 
 						for (int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
-							int maxCharge;
-							int curCharge;
-							int charge = caravanWork->GetMagicCharge(i, maxCharge, curCharge);
+							int selected = caravanWork->IsSelectedCmdList(i);
 
 							float blink;
-							if (charge != 0) {
+							if (selected != 0) {
 								MenuPcs.SetColor(CColor(0x00, 0xFF, 0x00, static_cast<unsigned char>(fullAlpha)));
 								blink = static_cast<float>(static_cast<int>((System.m_frameCounter >> 2) & 1));
-							} else if (caravanWork->IsSelectedCmdList(i)) {
+							} else if (caravanWork->IsUseCmdList(i)) {
 								MenuPcs.SetColor(CColor(0x20, 0xFF, 0x20, static_cast<unsigned char>(fullAlpha)));
 								blink = 0.0f;
 							} else {
@@ -748,7 +748,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 		}
 		commandLabel = cmdNameTable[tlut];
 	} else {
-		commandLabel = caravanWork->GetWeaponAttrib(cmdIndex);
+		commandLabel = caravanWork->GetCmdListItemName(cmdIndex);
 	}
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
@@ -826,46 +826,26 @@ void CRingMenu::onCalc()
 			(CFlatEnabledEventFlags() >> 2) & 1;
 		if (m_displayDirection != static_cast<int>(targetAnimDirection)) {
 			System.Printf(const_cast<char*>(sRingMenuDisplayToggleChangedFmt), m_menuIndex, targetAnimDirection);
-			m_displayDirection = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(m_displayDirection))) >> 5) & 0xFF;
+			m_displayDirection = !m_displayDirection;
 			m_displayCounter = 0x10 - m_displayCounter;
 		}
-
-		const float animStep = 0.1f;
-		int count = 9;
-		const float animMin = 0.0f;
-		float (*anim)[3] = m_animFloat;
 
 		m_displayCounter = clampDecToZero(m_displayCounter);
 		m_transitionCounter = clampDecToZero(m_transitionCounter);
 		m_commonFrameCounter = m_commonFrameCounter + 1;
 		m_timerB = clampDecToZero(m_timerB);
 
-		m_buttonTimers[0] = clampDecToZero(m_buttonTimers[0]);
-		m_buttonTimers[1] = clampDecToZero(m_buttonTimers[1]);
-		m_buttonTimers[2] = clampDecToZero(m_buttonTimers[2]);
-		m_buttonTimers[3] = clampDecToZero(m_buttonTimers[3]);
-		m_buttonTimers[4] = clampDecToZero(m_buttonTimers[4]);
-		m_buttonTimers[5] = clampDecToZero(m_buttonTimers[5]);
-
-		m_buttonTimers[6] = clampDecToZero(m_buttonTimers[6]);
-		m_buttonTimers[7] = clampDecToZero(m_buttonTimers[7]);
-		m_buttonTimers[8] = clampDecToZero(m_buttonTimers[8]);
-		do {
-			(*anim)[0] = (*anim)[0] - animStep;
-			if ((*anim)[0] < animMin) {
-				(*anim)[0] = animMin;
+		for (int button = 0; button < 9; button++) {
+			m_buttonTimers[button] = clampDecToZero(m_buttonTimers[button]);
+		}
+		for (int anim = 0; anim < 9; anim++) {
+			for (int component = 0; component < 3; component++) {
+				m_animFloat[anim][component] -= 0.1f;
+				if (m_animFloat[anim][component] < 0.0f) {
+					m_animFloat[anim][component] = 0.0f;
+				}
 			}
-			(*anim)[1] = (*anim)[1] - animStep;
-			if ((*anim)[1] < animMin) {
-				(*anim)[1] = animMin;
-			}
-			(*anim)[2] = (*anim)[2] - animStep;
-			if ((*anim)[2] < animMin) {
-				(*anim)[2] = animMin;
-			}
-			anim++;
-			count--;
-		} while (count != 0);
+		}
 
 		fmod(static_cast<double>(m_spinPhase), 1.0);
 		int i = 0x1B;
@@ -874,7 +854,7 @@ void CRingMenu::onCalc()
 		}
 
 		int ctrlMode = Joybus.GetCtrlMode(m_menuIndex);
-		unsigned int gbaConnected = (static_cast<unsigned int>(__cntlzw(1 - ctrlMode)) >> 5) & 0xFF;
+		unsigned int gbaConnected = ctrlMode == 1;
 
 		if (!Joybus.GetGBAStart(m_menuIndex)) {
 			gbaConnected = 1;
@@ -925,19 +905,7 @@ void CRingMenu::onCalc()
 						}
 						if ((prevDir != 0) || (nextDir != 0)) {
 							if ((prevDir != 0) && (nextDir != 0)) {
-								const int menuIdx = m_menuIndex;
-								unsigned char lockOut = 0;
-								if ((Pad.m_debugPadLock != 0) || ((menuIdx == 0) && (Pad.m_debugPadPort != -1))) {
-									lockOut = 1;
-								}
-								unsigned short trigger;
-								if (lockOut != 0) {
-									trigger = 0;
-								} else {
-									const int idx =
-										menuIdx & ~(~(Pad.m_debugPadPort - menuIdx | menuIdx - Pad.m_debugPadPort) >> 31);
-									trigger = Pad.GetPadInputs()[idx].button[0];
-								}
+								unsigned short trigger = Pad.GetButton(m_menuIndex);
 								if ((trigger & 0x40) != 0) {
 									nextDir = prevDir;
 								}
@@ -973,7 +941,7 @@ void CRingMenu::onCalc()
  */
 double CRingMenu::GetDispCounter()
 {
-	return static_cast<double>(1.0f - static_cast<float>(m_displayCounter) * 0.0625f);
+	return 1.0f - m_displayCounter / 16.0f;
 }
 
 /*

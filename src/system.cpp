@@ -373,41 +373,8 @@ void CSystem::ExecScenegraph()
         {
             for (int port = 0; port < 4; port++)
             {
-                u16 trigger;
-                u16 held;
-                bool noInput;
-
-                noInput = false;
-                if ((Pad.m_debugPadLock != 0) || ((port == 0) && (Pad.m_debugPadPort != -1)))
-                {
-                    noInput = true;
-                }
-                if (noInput)
-                {
-                    trigger = 0;
-                }
-                else
-                {
-                    unsigned int padIndex = (Pad.m_debugPadPort == port) ? 0 : port;
-                    trigger = Pad.GetPadInputs()[padIndex].buttonDown[1];
-                }
-                trigger = (unsigned short)trigger;
-
-                noInput = false;
-                if ((Pad.m_debugPadLock != 0) || ((port == 0) && (Pad.m_debugPadPort != -1)))
-                {
-                    noInput = true;
-                }
-                if (noInput)
-                {
-                    held = 0;
-                }
-                else
-                {
-                    unsigned int padIndex = (Pad.m_debugPadPort == port) ? 0 : port;
-                    held = Pad.GetPadInputs()[padIndex].buttonDown[0];
-                }
-                held = (unsigned short)held;
+                u16 trigger = Pad.GetGbaButtonDown(port);
+                u16 held = Pad.GetButtonDown(port);
 
                 if (((held | trigger) & 0x1000) != 0)
                 {

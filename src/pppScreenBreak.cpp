@@ -72,7 +72,6 @@ static const float kScreenBreakMeshCenterScale = -0.5f;
 static const float kScreenBreakOne = 1.0f;
 static const float kScreenBreakNegativeOne = -1.0f;
 static const float kScreenBreakDegToRad = 0.017453292f;
-static const double kScreenBreakS32ToDoubleBias = 4503599627370496.0;
 static const float kScreenBreakLightOffset = 30.0f;
 static const float kScreenBreakLightAttnA2 = 4.0f;
 static const float kScreenBreakLightAttnK2 = -3.0f;
@@ -82,7 +81,7 @@ static const char sF999Root[] = "f999_root";
 static const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 
 static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return model->m_drawMtx; }
-static inline CCharaModelData* ScreenBreakModelRef(CChara::CModel* model) { return model->m_data; }
+static inline CChara::CModel::CRefData* ScreenBreakModelRef(CChara::CModel* model) { return model->m_data; }
 static inline u32 ScreenBreakMeshNodeIndex(ScreenBreakMeshData* meshData) { return meshData->m_nodeIndex; }
 static inline ScreenBreakDataOffsets* GetScreenBreakDataOffsets(_pppCtrlTable* ctrl) { return reinterpret_cast<ScreenBreakDataOffsets*>(ctrl->m_serializedDataOffsets); }
 static inline u8* GetScreenBreakWork(pppScreenBreak* screenBreak, s32 offset) { return screenBreak->m_workArea + offset; }
@@ -167,7 +166,7 @@ void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* param_2, _pp
         PSVECNormalize(&param_2->m_gravityDir, &param_2->m_gravityDir);
     }
 
-    const float& two = kScreenBreakExtentScale;
+    float two = kScreenBreakExtentScale;
     float sx = two * value->m_extent.x;
     float sy = two * value->m_extent.y;
     ScreenBreakPiece* piece = value->m_pieces;
@@ -253,11 +252,11 @@ void pppDesScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* param_2)
         model->SetBeforeCalcMatrixCallback(0);
     }
     if (pppData->m_pieces != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(pppData->m_pieces));
+        pppMemFree(pppData->m_pieces);
         pppData->m_pieces = 0;
     }
     if (pppData->m_backBufferTexObj != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(pppData->m_backBufferTexObj));
+        pppMemFree(pppData->m_backBufferTexObj);
         pppData->m_backBufferTexObj = 0;
     }
 }
@@ -275,7 +274,7 @@ void pppCon2ScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* param_2)
 {
     ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(param_2);
     VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
-    const float& f = kScreenBreakZero;
+    float f = kScreenBreakZero;
     value->m_graphValue2 = f;
     value->m_graphValue1 = f;
     value->m_graphValue0 = f;
@@ -299,7 +298,7 @@ void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* param_2)
     CChara::CModel* model = GetCharaModelPtr(handle);
     gObject->m_displayFlags |= 0x40;
     model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)SB_BeforeDrawCallback;
-    const float& f = kScreenBreakZero;
+    float f = kScreenBreakZero;
     model->SetDrawMeshDLCallback(SB_DrawMeshDLCallback);
     model->SetBeforeMeshLockEnvCallback(SB_BeforeMeshLockEnvCallback);
     model->SetBeforeCalcMatrixCallback(SB_BeforeCalcMatrixCallback);
@@ -341,47 +340,27 @@ void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_lifetimes off
 void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work)
 {
-    s32 iVar6;
-    u32 uVar15;
-    PScreenBreak* stepData = step;
     ScreenBreakPiece* piece;
-    s32 iVar16;
-    float dVar17;
-    float dVar19;
-    float dVar18;
-    float dVar20;
-    float dVar21;
-    float dVar22;
-    float dVar24;
-    float dVar25;
     S16Vec globalMax;
-    u32 uStack_b4;
 
     memset(work->m_pieces, 0, ScreenBreakModelRef(model)->m_meshCount * sizeof(ScreenBreakPiece));
-    dVar19 = kScreenBreakTranslationRandLimit;
+    float translationRandLimit = kScreenBreakTranslationRandLimit;
     CChara::CMesh* mesh = model->m_meshes;
-    dVar18 = -dVar19;
+    float negativeRandLimit = -translationRandLimit;
     piece = work->m_pieces;
-    dVar20 = kScreenBreakOne;
     globalMax.x = -0x7FFF;
     globalMax.y = -0x7FFF;
-    dVar21 = kScreenBreakNegativeOne;
     globalMax.z = -0x7FFF;
-    dVar22 = kScreenBreakZero;
-    dVar24 = kScreenBreakExtentScale;
-    dVar25 = kScreenBreakDegToRad;
 
-    for (uVar15 = 0; uVar15 < ScreenBreakModelRef(model)->m_meshCount;) {
+    for (u32 i = 0; i < model->m_data->m_meshCount; i++) {
         ScreenBreakMeshData* meshData = mesh->m_data;
         CChara::CNode* node = &model->m_nodes[ScreenBreakMeshNodeIndex(meshData)];
         node->m_flagsBits.m_flag_80 = 0;
         PSMTXIdentity(node->m_localRuntimeMtx);
 
         u32 vertexCount = meshData->m_vertexCount;
-        iVar6 = 0;
         S16Vec meshMax;
         meshMax.x = -0x7FFF;
         meshMax.y = -0x7FFF;
@@ -392,68 +371,15 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         meshMin.z = 0x7FFF;
 
         for (u32 j = 0; j < vertexCount; j++) {
-            s16 x = *(s16*)((u8*)meshData->m_vertices + iVar6);
-            s16 globalX = globalMax.x;
-            if (globalX < x) {
-                globalX = x;
-            }
-            globalMax.x = globalX;
-
-            s16 y = *(s16*)((u8*)meshData->m_vertices + iVar6 + 2);
-            s16 globalY = globalMax.y;
-            if (globalY < y) {
-                globalY = y;
-            }
-            globalMax.y = globalY;
-
-            s16 z = *(s16*)((u8*)meshData->m_vertices + iVar6 + 4);
-            s16 globalZ = globalMax.z;
-            if (globalZ < z) {
-                globalZ = z;
-            }
-            globalMax.z = globalZ;
-
-            s16* vertex = (s16*)((u8*)meshData->m_vertices + iVar6);
-
-            s16 minCandidateX = vertex[0];
-            if (meshMin.x < vertex[0]) {
-                minCandidateX = meshMin.x;
-            }
-            meshMin.x = minCandidateX;
-
-            s16 minCandidateY = vertex[1];
-            if (meshMin.y < vertex[1]) {
-                minCandidateY = meshMin.y;
-            }
-            meshMin.y = minCandidateY;
-
-            s16 minCandidateZ = vertex[2];
-            if (meshMin.z < vertex[2]) {
-                minCandidateZ = meshMin.z;
-            }
-            meshMin.z = minCandidateZ;
-
-            s16 maxCandidateX = meshMax.x;
-            if (maxCandidateX < vertex[0]) {
-                maxCandidateX = vertex[0];
-            }
-            meshMax.x = maxCandidateX;
-
-            s16* vertexY = (s16*)((u8*)meshData->m_vertices + iVar6);
-            s16 maxCandidateY = meshMax.y;
-            if (maxCandidateY < vertexY[1]) {
-                maxCandidateY = vertexY[1];
-            }
-            meshMax.y = maxCandidateY;
-
-            s16* vertexZ = (s16*)((u8*)meshData->m_vertices + iVar6);
-            s16 maxCandidateZ = meshMax.z;
-            if (maxCandidateZ < vertexZ[2]) {
-                maxCandidateZ = vertexZ[2];
-            }
-            meshMax.z = maxCandidateZ;
-
-            iVar6 += 6;
+            globalMax.x = globalMax.x < meshData->m_vertices[j].x ? meshData->m_vertices[j].x : globalMax.x;
+            globalMax.y = globalMax.y < meshData->m_vertices[j].y ? meshData->m_vertices[j].y : globalMax.y;
+            globalMax.z = globalMax.z < meshData->m_vertices[j].z ? meshData->m_vertices[j].z : globalMax.z;
+            meshMin.x = meshMin.x < meshData->m_vertices[j].x ? meshMin.x : meshData->m_vertices[j].x;
+            meshMin.y = meshMin.y < meshData->m_vertices[j].y ? meshMin.y : meshData->m_vertices[j].y;
+            meshMin.z = meshMin.z < meshData->m_vertices[j].z ? meshMin.z : meshData->m_vertices[j].z;
+            meshMax.x = meshMax.x < meshData->m_vertices[j].x ? meshData->m_vertices[j].x : meshMax.x;
+            meshMax.y = meshMax.y < meshData->m_vertices[j].y ? meshData->m_vertices[j].y : meshMax.y;
+            meshMax.z = meshMax.z < meshData->m_vertices[j].z ? meshData->m_vertices[j].z : meshMax.z;
         }
 
         meshMax.x += meshMin.x;
@@ -462,34 +388,32 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         gUtil.ConvI2FVector(piece->m_translation, meshMax, ScreenBreakModelRef(model)->m_posQuant);
         PSVECScale(&piece->m_translation, &piece->m_translation, kScreenBreakMeshCenterScale);
 
-        dVar17 = piece->m_translation.x;
-        if (piece->m_translation.x > dVar19) {
-            dVar17 = Math.RandF(dVar19);
+        float velocityX = piece->m_translation.x;
+        if (piece->m_translation.x > translationRandLimit) {
+            velocityX = Math.RandF(translationRandLimit);
         }
-        if (piece->m_translation.x < dVar18) {
-            dVar17 = -Math.RandF(dVar19);
+        if (piece->m_translation.x < negativeRandLimit) {
+            velocityX = -Math.RandF(translationRandLimit);
         }
 
-        piece->m_velocity.x = dVar17;
-        piece->m_velocity.y = dVar20;
-        piece->m_velocity.z = dVar21;
+        piece->m_velocity.x = velocityX;
+        piece->m_velocity.y = kScreenBreakOne;
+        piece->m_velocity.z = kScreenBreakNegativeOne;
         PSVECNormalize(&piece->m_velocity, &piece->m_velocity);
         Vec up = {0.0f, 1.0f, 0.0f};
         PSVECCrossProduct(&piece->m_velocity, &up, &piece->m_axis);
 
-        dVar17 = Math.RandF(stepData->m_speedRand);
-        PSVECScale(&piece->m_velocity, &piece->m_velocity, stepData->m_speedBase + dVar17);
+        float speed = Math.RandF(step->m_speedRand);
+        PSVECScale(&piece->m_velocity, &piece->m_velocity, step->m_speedBase + speed);
 
-        piece->m_offset.z = dVar22;
-        piece->m_offset.y = dVar22;
-        piece->m_offset.x = dVar22;
-        piece->m_timer = dVar22;
+        piece->m_offset.z = kScreenBreakZero;
+        piece->m_offset.y = kScreenBreakZero;
+        piece->m_offset.x = kScreenBreakZero;
+        piece->m_timer = kScreenBreakZero;
 
-        uStack_b4 = static_cast<u32>(stepData->m_angleRand);
-        dVar17 = Math.RandF((float)uStack_b4);
+        float angle = Math.RandF(static_cast<float>(step->m_angleRand));
         mesh++;
-        uVar15++;
-        piece->m_angle = dVar25 * (dVar24 + dVar17);
+        piece->m_angle = kScreenBreakDegToRad * (kScreenBreakExtentScale + angle);
         piece->m_active = 0;
         piece++;
     }
@@ -506,7 +430,6 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_lifetimes on
 void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int meshIndex, int drawListIndex, float (*) [4])
 {
     VScreenBreak* work = static_cast<VScreenBreak*>(param_2);
@@ -523,7 +446,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
         MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 1, (_GXTevScale)0);
         GXSetArray((GXAttr)0xB, &work->m_color, 4);
 
-        if (material->GetTextureCount() == 1) {
+        if (material->GetNumTexture() == 1) {
             GXSetNumChans(1);
             _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
             GXSetTevKColor((GXTevKColorID)0, CColor(0xA0, 0xA0, 0xA0, 0xA0).color);
@@ -573,7 +496,7 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     Vec lightDir;
     GXLightObj lightObj;
     CCameraPcs* camera = &CameraPcs;
-    const float& zero = kScreenBreakZero;
+    float zero = kScreenBreakZero;
 
     lightDir.x = camera->m_directionX - (30.0f + camera->m_positionX);
     lightDir.y = camera->m_directionY - (30.0f + camera->m_positionY);

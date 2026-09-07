@@ -10,7 +10,6 @@
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/system.h"
-#include "ffcc/line_constants.h"
 #include <Runtime.PPCEABI.H/NMWException.h>
 #include "dolphin/ar.h"
 #include "dolphin/gx.h"
@@ -20,103 +19,11 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern char sSoundStageName[] = "CSound";
-extern const char sSoundManagerClassName[] = "CManager";
-extern const float kSoundVolumeRange = 127.0f;
-extern const float kLineSegmentMinT = 0.0f;
-extern const float kLineSegmentMaxT = 1.0f;
-extern const float kSoundBossDistanceScale = 5.0f;
-extern const float kSoundOptionDistanceScale = 3.0f;
-extern const float kSoundMap33PanDivisor = 2.5f;
-extern const float kSoundLineDebugScale = 100.0f;
-extern const double kSoundU32ToDoubleBias = 4503599627370496.0;
-extern const float kLineBoundsInitMin = 10000000.0f;
-extern const double kLineBoundsHalf = 0.5;
-extern const float kVectorFive;
-extern const float kVectorOne;
-extern const char sSoundNoFreeWaveWarn[] =
-    "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeWaev\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
-    "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
-extern const char sSoundNoFreeSeGroupWarn[] =
-    "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeSeGroup\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
-    "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
-extern const char sSoundStreamPathFmt[] = "dvd/sound/stream/str%04d.str";
-extern const char s_soundMinusOneFmt[] =
-    "Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n";
-extern const char s_soundLineTableFullFmt[] =
-    "CSound: \x83\x89\x83\x43\x83\x93\x82\xcc\x92\xb8\x93\x5F\x82\xaa\x91\xbd\x82\xb7"
-    "\x82\xac\x82\xdc\x82\xb7\x81\x42\n";
-extern const char s_soundLineOutOfRangeFmt[] =
-    "CSound: \x83\x89\x83\x43\x83\x93\x82\xaa\x91\xbd\x82\xb7\x82\xac\x82\xdc\x82\xb7"
-    "\x81\x42\n";
-extern const char s_soundLoadWaveErrorFmt[] =
-    "\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
-    "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
-    "\x81\x42\n";
-extern const char s_soundWavePathFmt[] = "dvd/sound/wave/wave%04d.wd";
-extern const char s_soundLoadWaveMergeFmt[] =
-    "\x1B[31mMerge: \x94\x67\x8C\x60\x82\xF0" "DVD\x82\xA9\x82\xE7\x93\xC7\x82\xDD\x8D\x9E"
-    "\x82\xDD\x82\xDC\x82\xB5\x82\xBD\x81\x42%d\n\x1B[0m";
-extern const char s_soundSeSepPathFmt[] = "dvd/sound/se/sep/se%06d.sep";
-extern const char s_soundLoadSeMergeFmt[] =
-    "\x1B[31mMerge: \x95\x88\x96\xCA\x82\xF0" "DVD\x82\xA9\x82\xE7\x93\xC7\x82\xDD\x8D\x9E"
-    "\x82\xDD\x82\xDC\x82\xB5\x82\xBD\x81\x42%d\n\x1B[0m";
-extern const char s_soundSeBlockPathFmt[] = "dvd/sound/se/block/se%03d.seb";
-extern const char s_soundMusicPathFmt[] = "dvd/sound/music/music%03d.bgm";
-extern const char s_soundEnvSePlayFmt[] = "\x1B[32mEnvSePlay: %06d\n\x1B[0m";
-extern const char s_soundEnvSeStopFmt[] = "\x1B[32mEnvSeStop: %06d\n\x1B[0m";
-static const char s_sound_cpp[] = "sound.cpp";
-
-extern double DOUBLE_80330d20;
-extern double DOUBLE_80330d28;
 CSound Sound;
 
 inline void* operator new(unsigned long, void* ptr)
 {
     return ptr;
-}
-
-struct CSoundLayout {
-    u32 m_vtable;
-    CMemory::CStage* m_stage;
-    u32 m_redSoundWord0;
-    u8* m_aramBuffer;
-    CFile::CHandle* m_waveFile;
-    int m_waveRemain;
-    int m_waveOffset;
-    int m_waveID;
-    int m_waveState;
-    int m_waveSyncMode;
-    int m_seCount;
-    CSound::CSe3D m_seWork[128];
-    CLine<10> m_lines[8];
-    u8* m_streamBuffer;
-    CFile::CHandle* m_streamFile;
-    int m_streamOffset;
-    int m_streamID;
-    u32 m_streamHalf;
-    int m_streamPlaying;
-    int m_streamRemain;
-    int m_streamState;
-    int m_streamWaveID;
-    int m_bgmMasterVolume;
-    int m_seMasterVolume;
-    int m_curMusicVolume;
-    int m_seMaxVolume;
-    s16 m_noFreeSeGroups[4];
-    s16 m_noFreeWaves[4];
-    int m_pauseAllSe;
-    int m_debugPrint;
-};
-
-static inline CSoundLayout& SoundData(CSound* self)
-{
-    return *reinterpret_cast<CSoundLayout*>(self);
-}
-
-static inline const CSoundLayout& SoundData(const CSound* self)
-{
-    return *reinterpret_cast<const CSoundLayout*>(self);
 }
 
 template <int PointCount>
@@ -125,14 +32,24 @@ CLine<PointCount>::CLine()
     pointCount = 0;
 }
 
-int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT, Vec* queryPos, float maxDistance)
+/*
+ * --INFO--
+ * PAL Address: 0x800C8280
+ * PAL Size: 1144b
+ * EN Address: 0x800DF68C
+ * EN Size: 816b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <int PointCount>
+int CLine<PointCount>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT, Vec* queryPos, float maxDistance)
 {
     float bestPosX;
     float bestPosY;
     float bestPosZ;
-    float bestT = kLineSegmentMinT;
-    const int infiniteRange = (kLineSegmentMinT == maxDistance);
-    float bestDistance = infiniteRange ? kLineBoundsInitMin : maxDistance;
+    float bestT = 0.0f;
+    const int infiniteRange = (0.0f == maxDistance);
+    float bestDistance = infiniteRange ? 10000000.0f : maxDistance;
     const float maxDistanceSq = maxDistance * maxDistance;
     u32 bestIndex;
     int found = 0;
@@ -149,7 +66,7 @@ int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT,
                 bestPosY = candidatePosition.y;
                 bestPosZ = candidatePosition.z;
                 bestIndex = i;
-                bestT = kLineSegmentMinT;
+                bestT = 0.0f;
                 found = 1;
             }
         }
@@ -165,7 +82,7 @@ int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT,
                     bestPosY = candidatePosition.y;
                     bestPosZ = candidatePosition.z;
                     bestIndex = i;
-                    bestT = kVectorOne;
+                    bestT = 1.0f;
                     found = 1;
                 }
             }
@@ -174,7 +91,7 @@ int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT,
         const float dotQuery = PSVECDotProduct(queryPos, &segments[i].delta);
         const float dotStart = PSVECDotProduct(&points[i], &segments[i].delta);
         const float t = (-dotStart + dotQuery) / (segments[i].length * segments[i].length);
-        if (((t >= kLineSegmentMinT) && (t <= kVectorOne)) || infiniteRange) {
+        if (((t >= 0.0f) && (t <= 1.0f)) || infiniteRange) {
             Vec scaled;
             PSVECScale(&segments[i].delta, &scaled, t);
             PSVECAdd(&points[i], &scaled, &candidatePosition);
@@ -211,7 +128,8 @@ int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT,
     return found;
 }
 
-void CLine<10>::Draw()
+template <int PointCount>
+void CLine<PointCount>::Draw()
 {
     if (pointCount == 0) {
         return;
@@ -233,7 +151,7 @@ void CLine<10>::Draw()
     GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
     for (u32 i = 0; i < pointCount; i++) {
         float x = points[i].x;
-        float y = kVectorFive + points[i].y;
+        float y = 5.0f + points[i].y;
         float z = points[i].z;
         GXWGFifo.f32 = x;
         GXWGFifo.f32 = y;
@@ -252,7 +170,7 @@ void CLine<10>::Draw()
         GXWGFifo.f32 = y;
         GXWGFifo.f32 = z;
         {
-            float raisedY = kVectorFive + points[i].y;
+            float raisedY = 5.0f + points[i].y;
             float raisedZ = points[i].z;
             float raisedX = points[i].x;
             GXWGFifo.f32 = raisedX;
@@ -262,18 +180,27 @@ void CLine<10>::Draw()
     }
 }
 
-void CLine<10>::CalcBound()
+/*
+ * --INFO--
+ * PAL Address: 0x800C8838
+ * PAL Size: 352b
+ * EN Address: 0x800DFB4C
+ * EN Size: 604b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <int PointCount>
+void CLine<PointCount>::CalcBound()
 {
-    min.x = kLineBoundsInitMin;
-    min.y = kLineBoundsInitMin;
-    min.z = kLineBoundsInitMin;
-    max.x = kLineBoundsInitMax;
-    max.y = kLineBoundsInitMax;
-    max.z = kLineBoundsInitMax;
-    totalLength = kLineSegmentMinT;
+    min.x = 10000000.0f;
+    min.y = 10000000.0f;
+    min.z = 10000000.0f;
+    max.x = -10000000.0f;
+    max.y = -10000000.0f;
+    max.z = -10000000.0f;
+    totalLength = 0.0f;
 
-    u32 i = 0;
-    while (i < pointCount) {
+    for (u32 i = 0; i < pointCount; i++) {
         if (points[i].x < min.x) {
             min.x = points[i].x;
         }
@@ -295,24 +222,25 @@ void CLine<10>::CalcBound()
         }
 
         if (i != 0) {
-            u32 prevIndex = i - 1;
-            PSVECSubtract(&points[i], &points[prevIndex], &segments[prevIndex].delta);
-            segments[prevIndex].length = PSVECMag(&segments[prevIndex].delta);
-            segments[prevIndex].startLength = totalLength;
-            totalLength += segments[prevIndex].length;
-            if (segments[prevIndex].length != kLineSegmentMinT) {
-                PSVECNormalize(&segments[prevIndex].delta, &segments[prevIndex].normal);
+            PSVECSubtract(&points[i], &points[i - 1], &segments[i - 1].delta);
+            segments[i - 1].length = PSVECMag(&segments[i - 1].delta);
+            segments[i - 1].startLength = totalLength;
+            totalLength += segments[i - 1].length;
+            if (segments[i - 1].length != 0.0f) {
+                PSVECNormalize(&segments[i - 1].delta, &segments[i - 1].normal);
             }
         }
-
-        i++;
     }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x800DFEA0
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline CSound::CSound()
 {
@@ -320,10 +248,14 @@ inline CSound::CSound()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C8A1C
+ * PAL Size: 100b
+ * EN Address: 0x800DFE3C
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CSound::~CSound()
+inline CSound::~CSound()
 {
 }
 
@@ -338,10 +270,10 @@ CSound::~CSound()
  */
 void CSound::Init()
 {
-    m_stage = Memory.CreateStage(0xA4000, sSoundStageName, 0);
+    m_stage = Memory.CreateStage(0xA4000, "CSound", 0);
 
-    m_aramBuffer = new (m_stage, const_cast<char*>(s_sound_cpp), 0x2E) u8[0x80000];
-    m_streamBuffer = new (m_stage, const_cast<char*>(s_sound_cpp), 0x2F) u8[0x20000];
+    m_aramBuffer = new (m_stage, "sound.cpp", 0x2E) u8[0x80000];
+    m_streamBuffer = new (m_stage, "sound.cpp", 0x2F) u8[0x20000];
 
     m_bgmMasterVolume = 0x7F;
     m_seMasterVolume = 0x7F;
@@ -353,9 +285,9 @@ void CSound::Init()
     ARQInit();
 
     m_redSound.Init(m_aramBuffer, 0x80000, 0x800000, 0x800000);
-    m_redSound.ReportPrint(static_cast<u32>(-m_debugPrint | m_debugPrint) >> 31);
+    IsDebugPrint(m_debugPrint);
 
-    m_redSound.SetSoundMode((u32)__cntlzw((u32)__cntlzw(m_redSound.GetSoundMode()) >> 5) >> 5);
+    SetStereo(IsStereo());
 
     m_redSound.MusicMasterVolume(m_bgmMasterVolume);
     m_redSound.SeMasterVolume(m_seMasterVolume);
@@ -384,7 +316,9 @@ void CSound::Quit()
     if (m_waveFile != 0) {
         File.Close(m_waveFile);
         m_waveFile = 0;
-        System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
+        System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
+            "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
+            "\x81\x42\n");
     }
 
     m_redSound.SetWaveData(-1, nullptr, 0);
@@ -440,14 +374,14 @@ void CSound::Quit()
  * --INFO--
  * PAL Address: 0x800c7f20
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800DCCB8
+ * EN Size: 84b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CSound::SetStereo(int stereo)
 {
-    m_redSound.SetSoundMode((u32)__cntlzw(stereo) >> 5);
+    m_redSound.SetSoundMode(stereo ? 0 : 1);
 }
 
 /*
@@ -461,7 +395,7 @@ void CSound::SetStereo(int stereo)
  */
 void CSound::SetBgmMasterVolume(int volume)
 {
-    SoundData(this).m_bgmMasterVolume = volume;
+    m_bgmMasterVolume = volume;
     m_redSound.MusicMasterVolume(volume);
 }
 
@@ -476,7 +410,7 @@ void CSound::SetBgmMasterVolume(int volume)
  */
 void CSound::SetSeMasterVolume(int volume)
 {
-    SoundData(this).m_seMasterVolume = volume;
+    m_seMasterVolume = volume;
     m_redSound.SeMasterVolume(volume);
 }
 
@@ -514,7 +448,9 @@ void CSound::Realloc(int isMinMemoryMode)
     if (m_waveFile != 0) {
         File.Close(m_waveFile);
         m_waveFile = 0;
-        System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
+        System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
+            "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
+            "\x81\x42\n");
     }
 
     m_redSound.SetWaveData(-1, 0, 0);
@@ -558,10 +494,9 @@ void CSound::Realloc(int isMinMemoryMode)
     int waveHeapSize = (isMinMemoryMode != 0) ? 0xE00000 : 0x800000;
     m_redSound.Init(m_aramBuffer, 0x80000, waveHeapSize, streamHeapSize);
 
-    u32 reportFlag = m_debugPrint;
-    m_redSound.ReportPrint(((-reportFlag) | reportFlag) >> 31);
+    IsDebugPrint(m_debugPrint);
 
-    m_redSound.SetSoundMode((u32)__cntlzw((u32)__cntlzw(m_redSound.GetSoundMode()) >> 5) >> 5);
+    SetStereo(IsStereo());
 
     m_redSound.MusicMasterVolume(m_bgmMasterVolume);
     m_redSound.SeMasterVolume(m_seMasterVolume);
@@ -586,13 +521,15 @@ void CSound::Realloc(int isMinMemoryMode)
         if (m_waveFile != 0) {
             File.Close(m_waveFile);
             m_waveFile = 0;
-            System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
+            System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
+                "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
+                "\x81\x42\n");
         }
 
         m_redSound.SetWaveData(-1, 0, 0);
 
         char wavePath[256];
-        sprintf(wavePath, s_soundWavePathFmt, 0);
+        sprintf(wavePath, "dvd/sound/wave/wave%04d.wd", 0);
         m_waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (m_waveFile != 0) {
             m_waveRemain = File.GetLength(m_waveFile);
@@ -610,13 +547,15 @@ void CSound::Realloc(int isMinMemoryMode)
         if (m_waveFile != 0) {
             File.Close(m_waveFile);
             m_waveFile = 0;
-            System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
+            System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
+                "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
+                "\x81\x42\n");
         }
 
         m_redSound.SetWaveData(-1, 0, 0);
 
         char wavePath[256];
-        sprintf(wavePath, s_soundWavePathFmt, 500);
+        sprintf(wavePath, "dvd/sound/wave/wave%04d.wd", 500);
         m_waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (m_waveFile != 0) {
             m_waveRemain = File.GetLength(m_waveFile);
@@ -631,7 +570,7 @@ void CSound::Realloc(int isMinMemoryMode)
     }
 
     for (int i = 0; i < 4; i++) {
-        sprintf(sePath, s_soundSeBlockPathFmt, i);
+        sprintf(sePath, "dvd/sound/se/block/se%03d.seb", i);
         CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {
             File.Read(handle);
@@ -666,9 +605,7 @@ float CSound::GetPerformance()
  */
 void CSound::PauseDiscError(int pause)
 {
-    CSoundLayout& sound = SoundData(this);
-
-    if (sound.m_pauseAllSe == 0) {
+    if (m_pauseAllSe == 0) {
         m_redSound.SePause(-1, static_cast<u32>(-pause | pause) >> 31);
         m_redSound.StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
     }
@@ -681,15 +618,12 @@ void CSound::PauseDiscError(int pause)
  */
 void CSound::CheckDriver(int mode)
 {
-    CSoundLayout& sound = SoundData(this);
-    unsigned int oldPrint = sound.m_debugPrint;
-    sound.m_debugPrint = 1;
-    m_redSound.ReportPrint(1);
+    unsigned int oldPrint = m_debugPrint;
+    IsDebugPrint(1);
     m_redSound.TestProcess(mode);
     m_redSound.DisplayWaveInfo();
     m_redSound.DisplaySePlayInfo();
-    sound.m_debugPrint = oldPrint;
-    m_redSound.ReportPrint((-oldPrint | oldPrint) >> 0x1F);
+    IsDebugPrint(oldPrint);
 }
 
 /*
@@ -717,14 +651,14 @@ void CSound::Frame()
             if (se->m_bits.m_paused) {
                 if (volume != 0) {
                     if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Sound) != 0) {
-                        System.Printf(const_cast<char*>(s_soundEnvSePlayFmt), se->m_soundId);
+                        System.Printf("\x1B[32mEnvSePlay: %06d\n\x1B[0m", se->m_soundId);
                     }
 
                     int vol = volume;
                     int seNo = se->m_soundId;
                     int panValue = pan;
                     if (seNo < 0) {
-                        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+                        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
                         seNo = -1;
                     } else if (seNo < 4000) {
                         int bank = seNo / 1000;
@@ -746,7 +680,7 @@ void CSound::Frame()
                         (m_redSound.GetSeVolume(se->m_playId, REDSOUND_SE_VOLUME_QUERY_VALUE) == 0) &&
                         (m_redSound.GetSeVolume(se->m_playId, REDSOUND_SE_VOLUME_QUERY_DELTA) == 0)) {
                         if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Sound) != 0) {
-                            System.Printf(const_cast<char*>(s_soundEnvSeStopFmt), se->m_soundId);
+                            System.Printf("\x1B[32mEnvSeStop: %06d\n\x1B[0m", se->m_soundId);
                         }
                         m_redSound.SeStop(se->m_playId);
                         se->m_bits.m_paused = 1;
@@ -755,7 +689,7 @@ void CSound::Frame()
 
                     if (static_cast<signed char>(se->m_pan) != pan) {
                         if (se->m_playId < 0) {
-                            System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+                            System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
                         } else {
                             m_redSound.SePan(se->m_playId, pan, 0x1E);
                         }
@@ -764,7 +698,7 @@ void CSound::Frame()
 
                     if (static_cast<signed char>(se->m_volume) != volume) {
                         if (se->m_playId < 0) {
-                            System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+                            System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
                         } else {
                             m_redSound.SeVolume(se->m_playId, volume, 0x1E);
                         }
@@ -800,10 +734,8 @@ next:
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 void CSound::Draw()
 {
-    CSoundLayout& sound = SoundData(this);
     Mtx cameraMatrix;
     GXColor lineColor;
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
@@ -823,13 +755,11 @@ void CSound::Draw()
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 
-    CSe3D* se = sound.m_seWork;
+    CSe3D* se = m_seWork;
     for (u32 i = 0; i < 0x80; i++, se++) {
         if (se->m_bits.m_active) {
-            CColor innerColor(0xC0, 0xC0, 0xC0, 0x80);
-            Graphic.DrawSphere(cameraMatrix, &se->m_position, se->m_nearDistance, reinterpret_cast<GXColor*>(&innerColor));
-            CColor outerColor(0x80, 0x80, 0x80, 0x80);
-            Graphic.DrawSphere(cameraMatrix, &se->m_position, se->m_farDistance, reinterpret_cast<GXColor*>(&outerColor));
+            Graphic.DrawSphere(cameraMatrix, &se->m_position, se->m_nearDistance, CColor(0xC0, 0xC0, 0xC0, 0x80));
+            Graphic.DrawSphere(cameraMatrix, &se->m_position, se->m_farDistance, CColor(0x80, 0x80, 0x80, 0x80));
         }
     }
 
@@ -841,10 +771,9 @@ void CSound::Draw()
     GXLoadPosMtxImm(cameraMatrix, 0);
 
     for (u32 i = 0; i < 8; i++) {
-        sound.m_lines[i].Draw();
+        m_lines[i].Draw();
     }
 }
-#pragma opt_propagation reset
 
 /*
  * --INFO--
@@ -857,13 +786,12 @@ void CSound::Draw()
  */
 void CSound::loadWaveFrame()
 {
-    CSoundLayout& sound = SoundData(this);
-    CFile::CHandle*& waveFile = sound.m_waveFile;
-    int& waveRemain = sound.m_waveRemain;
-    int& waveOffset = sound.m_waveOffset;
-    int& waveID = sound.m_waveID;
-    int& waveState = sound.m_waveState;
-    int& waveSyncMode = sound.m_waveSyncMode;
+    CFile::CHandle*& waveFile = m_waveFile;
+    int& waveRemain = m_waveRemain;
+    int& waveOffset = m_waveOffset;
+    int& waveID = m_waveID;
+    int& waveState = m_waveState;
+    int& waveSyncMode = m_waveSyncMode;
 
     if (waveFile != 0) {
         if (waveState == 0) {
@@ -904,18 +832,18 @@ void CSound::loadWaveFrame()
     }
 
     bool streamPlaying = false;
-    int& isStreamEnabled = sound.m_streamPlaying;
-    int& streamID = sound.m_streamID;
+    int& isStreamEnabled = m_streamPlaying;
+    int& streamID = m_streamID;
     if (isStreamEnabled != 0 && m_redSound.StreamPlayState(streamID) != 0) {
         streamPlaying = true;
     }
 
-    CFile::CHandle*& streamFile = sound.m_streamFile;
+    CFile::CHandle*& streamFile = m_streamFile;
     if (streamPlaying && streamFile != 0) {
-        int& streamState = sound.m_streamState;
-        int& streamRemain = sound.m_streamRemain;
-        int& streamOffset = sound.m_streamOffset;
-        u32& streamHalf = sound.m_streamHalf;
+        int& streamState = m_streamState;
+        int& streamRemain = m_streamRemain;
+        int& streamOffset = m_streamOffset;
+        unsigned int& streamHalf = m_streamHalf;
 
         if (streamState == 0) {
             int playPoint0;
@@ -940,7 +868,7 @@ void CSound::loadWaveFrame()
                 }
             }
         } else if (File.IsCompleted(streamFile)) {
-            memcpy(reinterpret_cast<u8*>(sound.m_streamBuffer) + (1 - streamHalf) * 0x10000, File.m_readBuffer, 0x10000);
+            memcpy(reinterpret_cast<u8*>(m_streamBuffer) + (1 - streamHalf) * 0x10000, File.m_readBuffer, 0x10000);
             streamState = 0;
 
             if (streamRemain == 0) {
@@ -965,18 +893,20 @@ void CSound::loadWaveFrame()
 void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
 {
     if (waveNo < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else if (m_redSound.ReentryWaveData(waveNo) == -1) {
         if (m_waveFile != 0) {
             File.Close(m_waveFile);
             m_waveFile = 0;
-            System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
+            System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
+                "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
+                "\x81\x42\n");
         }
 
         m_redSound.SetWaveData(-1, nullptr, 0);
 
         char wavePath[244];
-        sprintf(wavePath, s_soundWavePathFmt, waveNo);
+        sprintf(wavePath, "dvd/sound/wave/wave%04d.wd", waveNo);
         m_waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (m_waveFile != 0) {
             m_waveRemain = File.GetLength(m_waveFile);
@@ -1005,11 +935,13 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
  */
 void CSound::CancelLoadWaveASync()
 {
-    CFile::CHandle*& handle = SoundData(this).m_waveFile;
+    CFile::CHandle*& handle = m_waveFile;
     if (handle != 0) {
         File.Close(handle);
         handle = 0;
-        System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
+        System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
+            "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
+            "\x81\x42\n");
     }
     m_redSound.SetWaveData(-1, nullptr, 0);
 }
@@ -1025,8 +957,7 @@ void CSound::CancelLoadWaveASync()
  */
 int CSound::IsLoadWaveASyncCompleted()
 {
-    CFile::CHandle* waveFile = SoundData(this).m_waveFile;
-    return (u32)__cntlzw((u32)waveFile) >> 5;
+    return m_waveFile == 0 ? 1 : 0;
 }
 
 /*
@@ -1041,10 +972,10 @@ int CSound::IsLoadWaveASyncCompleted()
 void CSound::LoadBgm(int bgmId)
 {
     if (bgmId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else if (m_redSound.ReentryMusicData(bgmId) == -1) {
         char musicPath[256];
-        sprintf(musicPath, s_soundMusicPathFmt, bgmId);
+        sprintf(musicPath, "dvd/sound/music/music%03d.bgm", bgmId);
 
         CFile::CHandle* handle = File.Open(musicPath, 0, CFile::PRI_LOW);
         if (handle != 0) {
@@ -1068,7 +999,7 @@ void CSound::LoadBgm(int bgmId)
 void CSound::PlayBgm(int bgmId)
 {
     if (bgmId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
         m_redSound.MusicStop(-1);
         m_redSound.SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_OFF);
@@ -1088,7 +1019,7 @@ void CSound::PlayBgm(int bgmId)
 void CSound::CrossPlayBgm(int bgmId, int crossFrames)
 {
     if (bgmId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
         m_redSound.SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_OFF);
         m_redSound.MusicCrossPlay(bgmId, 0x7F, crossFrames);
@@ -1107,7 +1038,7 @@ void CSound::CrossPlayBgm(int bgmId, int crossFrames)
 void CSound::PlayNextBgm(int bgmId)
 {
     if (bgmId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
         m_redSound.MusicNextPlay(bgmId, 0x7F, 0);
         m_redSound.SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_ON);
@@ -1153,8 +1084,7 @@ void CSound::FadeOutBgm(int fadeFrames)
  */
 void CSound::LoadBlock()
 {
-    CSoundLayout& sound = SoundData(this);
-    CFile::CHandle*& waveFile = sound.m_waveFile;
+    CFile::CHandle*& waveFile = m_waveFile;
     char sePath[256];
     char wavePath0[256];
     char wavePath1[256];
@@ -1163,19 +1093,21 @@ void CSound::LoadBlock()
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
-            System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
+            System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
+                "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
+                "\x81\x42\n");
         }
 
         m_redSound.SetWaveData(-1, 0, 0);
 
-        sprintf(wavePath0, s_soundWavePathFmt, 0);
+        sprintf(wavePath0, "dvd/sound/wave/wave%04d.wd", 0);
         waveFile = File.Open(wavePath0, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
-            sound.m_waveRemain = File.GetLength(waveFile);
-            sound.m_waveOffset = 0;
-            sound.m_waveState = 0;
-            sound.m_waveID = 0;
-            sound.m_waveSyncMode = 1;
+            m_waveRemain = File.GetLength(waveFile);
+            m_waveOffset = 0;
+            m_waveState = 0;
+            m_waveID = 0;
+            m_waveSyncMode = 1;
             while (((u32)__cntlzw((u32)waveFile) >> 5) == 0) {
                 loadWaveFrame();
             }
@@ -1186,19 +1118,21 @@ void CSound::LoadBlock()
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
-            System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
+            System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
+                "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
+                "\x81\x42\n");
         }
 
         m_redSound.SetWaveData(-1, 0, 0);
 
-        sprintf(wavePath1, s_soundWavePathFmt, 500);
+        sprintf(wavePath1, "dvd/sound/wave/wave%04d.wd", 500);
         waveFile = File.Open(wavePath1, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
-            sound.m_waveRemain = File.GetLength(waveFile);
-            sound.m_waveOffset = 0;
-            sound.m_waveState = 0;
-            sound.m_waveID = 1;
-            sound.m_waveSyncMode = 1;
+            m_waveRemain = File.GetLength(waveFile);
+            m_waveOffset = 0;
+            m_waveState = 0;
+            m_waveID = 1;
+            m_waveSyncMode = 1;
             while (((u32)__cntlzw((u32)waveFile) >> 5) == 0) {
                 loadWaveFrame();
             }
@@ -1206,7 +1140,7 @@ void CSound::LoadBlock()
     }
 
     for (int i = 0; i < 4; i++) {
-        sprintf(sePath, s_soundSeBlockPathFmt, i);
+        sprintf(sePath, "dvd/sound/se/block/se%03d.seb", i);
         CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {
             File.Read(handle);
@@ -1247,10 +1181,10 @@ void CSound::FreeBlock()
 void CSound::LoadSe(int seId)
 {
     if (seId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else if (m_redSound.ReentrySeSepData(seId) == -1) {
         char sePath[264];
-        sprintf(sePath, s_soundSeSepPathFmt, seId);
+        sprintf(sePath, "dvd/sound/se/sep/se%06d.sep", seId);
         CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {
             File.Read(handle);
@@ -1258,7 +1192,8 @@ void CSound::LoadSe(int seId)
             m_redSound.SetSeSepData(File.m_readBuffer);
             File.Close(handle);
             if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
-                System.Printf(const_cast<char*>(s_soundLoadSeMergeFmt), seId);
+                System.Printf("\x1B[31mMerge: \x95\x88\x96\xCA\x82\xF0" "DVD\x82\xA9\x82\xE7\x93\xC7\x82\xDD\x8D\x9E"
+                    "\x82\xDD\x82\xDC\x82\xB5\x82\xBD\x81\x42%d\n\x1B[0m", seId);
             }
         }
     }
@@ -1291,34 +1226,35 @@ void CSound::LoadSe(void* seData)
  */
 void CSound::LoadWave(int waveId)
 {
-    CSoundLayout& sound = SoundData(this);
-    CFile::CHandle*& waveFile = sound.m_waveFile;
+    CFile::CHandle*& waveFile = m_waveFile;
 
     if (waveId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
         if (m_redSound.ReentryWaveData(waveId) == -1) {
             if (waveId < 0) {
-                System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+                System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
             } else if (m_redSound.ReentryWaveData(waveId) == -1) {
                 if (waveFile != 0) {
                     File.Close(waveFile);
                     waveFile = 0;
-                    System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
+                    System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
+                        "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
+                        "\x81\x42\n");
                 }
 
                 m_redSound.SetWaveData(-1, nullptr, 0);
 
                 char wavePath[260];
-                sprintf(wavePath, s_soundWavePathFmt, waveId);
+                sprintf(wavePath, "dvd/sound/wave/wave%04d.wd", waveId);
                 waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
 
                 if (waveFile != 0) {
-                    sound.m_waveRemain = File.GetLength(waveFile);
-                    sound.m_waveOffset = 0;
-                    sound.m_waveState = 0;
-                    sound.m_waveID = -1;
-                    sound.m_waveSyncMode = 1;
+                    m_waveRemain = File.GetLength(waveFile);
+                    m_waveOffset = 0;
+                    m_waveState = 0;
+                    m_waveID = -1;
+                    m_waveSyncMode = 1;
                     while (((u32)__cntlzw((u32)waveFile) >> 5) == 0) {
                         loadWaveFrame();
                     }
@@ -1326,7 +1262,8 @@ void CSound::LoadWave(int waveId)
             }
 
             if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
-                System.Printf(const_cast<char*>(s_soundLoadWaveMergeFmt), waveId);
+                System.Printf("\x1B[31mMerge: \x94\x67\x8C\x60\x82\xF0" "DVD\x82\xA9\x82\xE7\x93\xC7\x82\xDD\x8D\x9E"
+                    "\x82\xDD\x82\xDC\x82\xB5\x82\xBD\x81\x42%d\n\x1B[0m", waveId);
             }
         }
     }
@@ -1343,14 +1280,15 @@ void CSound::LoadWave(int waveId)
  */
 void CSound::LoadWave(void* waveData)
 {
-    CSoundLayout& sound = SoundData(this);
-    CFile::CHandle*& waveFile = sound.m_waveFile;
+    CFile::CHandle*& waveFile = m_waveFile;
 
     if (m_redSound.ReentryWaveData(reinterpret_cast<s16*>(waveData)[1]) == -1) {
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
-            System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
+            System.Printf("\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
+                "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
+                "\x81\x42\n");
         }
         m_redSound.SetWaveData(-1, nullptr, 0);
         m_redSound.SetWaveData(-1, waveData, -1);
@@ -1369,7 +1307,7 @@ void CSound::LoadWave(void* waveData)
 void CSound::FreeWave(int waveId)
 {
     if (waveId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
         m_redSound.ClearWaveData(waveId);
     }
@@ -1386,24 +1324,23 @@ void CSound::FreeWave(int waveId)
  */
 void CSound::StopAndFreeAllSe(int clearMode)
 {
-    CSoundLayout& sound = SoundData(this);
     if (clearMode != 0) {
         m_redSound.SeStop(-1);
         m_redSound.ClearSeSepData(-1);
         m_redSound.ClearWaveData(-3);
     } else {
-        m_redSound.SeStopMG(sound.m_noFreeSeGroups[0], sound.m_noFreeSeGroups[1], sound.m_noFreeSeGroups[2],
-                            sound.m_noFreeSeGroups[3]);
-        m_redSound.ClearSeSepDataMG(sound.m_noFreeSeGroups[0], sound.m_noFreeSeGroups[1], sound.m_noFreeSeGroups[2],
-                                    sound.m_noFreeSeGroups[3]);
-        m_redSound.ClearWaveDataM(sound.m_noFreeWaves[0], sound.m_noFreeWaves[1], sound.m_noFreeWaves[2],
-                                  sound.m_noFreeWaves[3]);
+        m_redSound.SeStopMG(m_noFreeSeGroups[0], m_noFreeSeGroups[1], m_noFreeSeGroups[2],
+                            m_noFreeSeGroups[3]);
+        m_redSound.ClearSeSepDataMG(m_noFreeSeGroups[0], m_noFreeSeGroups[1], m_noFreeSeGroups[2],
+                                    m_noFreeSeGroups[3]);
+        m_redSound.ClearWaveDataM(m_noFreeWaves[0], m_noFreeWaves[1], m_noFreeWaves[2],
+                                  m_noFreeWaves[3]);
     }
 
-    sound.m_seCount = 10000000;
-    memset(sound.m_seWork, 0, sizeof(sound.m_seWork));
-    memset(sound.m_noFreeSeGroups, 0xFF, sizeof(sound.m_noFreeSeGroups));
-    memset(sound.m_noFreeWaves, 0xFF, sizeof(sound.m_noFreeWaves));
+    m_seCount = 10000000;
+    memset(m_seWork, 0, sizeof(m_seWork));
+    memset(m_noFreeSeGroups, 0xFF, sizeof(m_noFreeSeGroups));
+    memset(m_noFreeWaves, 0xFF, sizeof(m_noFreeWaves));
 }
 
 /*
@@ -1420,7 +1357,7 @@ int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
     int seId;
 
     if (seNo < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
         return -1;
     } else if (seNo < 4000) {
         seId = m_redSound.SePlay(seNo / 1000, seNo % 1000, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
@@ -1449,7 +1386,7 @@ int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
 void CSound::StopSe(int seId)
 {
     if (seId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
         m_redSound.SeStop(seId);
     }
@@ -1467,7 +1404,7 @@ void CSound::StopSe(int seId)
 void CSound::FadeOutSe(int seId, int fadeFrames)
 {
     if (seId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
         m_redSound.SeFadeOut(seId, fadeFrames);
     }
@@ -1482,10 +1419,10 @@ void CSound::FadeOutSe(int seId, int fadeFrames)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CSound::ChangeSeVolume(int seId, int volume, int frames)
+inline void CSound::ChangeSeVolume(int seId, int volume, int frames)
 {
     if (seId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
         m_redSound.SeVolume(seId, volume, frames);
     }
@@ -1500,225 +1437,13 @@ void CSound::ChangeSeVolume(int seId, int volume, int frames)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CSound::ChangeSePan(int seId, int pan, int frames)
+inline void CSound::ChangeSePan(int seId, int pan, int frames)
 {
     if (seId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
         m_redSound.SePan(seId, pan, frames);
     }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800c5b7c
- * PAL Size: 220b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CSound::SetSe3DGroup(int se3dHandle, int group)
-{
-    if (se3dHandle < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-    } else {
-        char* se = reinterpret_cast<char*>(this) + 0x2C;
-        char* found;
-        int result = 0;
-        int count;
-        for (count = 0x20; count != 0; count--) {
-            found = se;
-            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
-                goto found_se;
-            }
-
-            found += 0x28;
-            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
-                goto found_se;
-            }
-
-            found += 0x28;
-            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
-                goto found_se;
-            }
-
-            found += 0x28;
-            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
-                goto found_se;
-            }
-
-            result += 3;
-            se = found + 0x28;
-        }
-        found = 0;
-found_se:
-        if (found != 0) {
-            reinterpret_cast<CSe3D*>(found)->m_group = group;
-        }
-        return result;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800c5c58
- * PAL Size: 468b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float farDistance, int fadeFrames)
-{
-    int volumeValue;
-    CSe3D* se;
-    int loopCount;
-    int slot;
-    int volume;
-    int pan;
-    int panValue;
-
-    if (soundId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-        return -1;
-    }
-
-    CSoundLayout& sound = SoundData(this);
-    se = sound.m_seWork;
-
-    for (loopCount = 0x80; loopCount != 0; loopCount--, se++) {
-        if (se->m_bits.m_active) {
-            continue;
-        }
-
-        se->m_bits.m_active = 1;
-        se->m_bits.m_paused = 0;
-        se->m_soundId = soundId;
-        slot = sound.m_seCount;
-        sound.m_seCount = slot + 1;
-        se->m_handle = slot;
-
-        se->m_nearDistance = nearDistance;
-        se->m_farDistance = farDistance;
-        se->m_lineIndex = static_cast<s8>(lineIndex);
-
-        calcVolumePan(se, volume, pan);
-        se->m_volume = static_cast<u8>(volume);
-        se->m_pan = static_cast<u8>(pan);
-        se->m_group = -1;
-        volumeValue = volume;
-        panValue = pan;
-
-        if (soundId < 0) {
-            System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-            slot = -1;
-        } else if (soundId < 4000) {
-            int bank = soundId / 1000;
-            slot = m_redSound.SePlay(bank, soundId % 1000, panValue,
-                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
-            if (fadeFrames != 0) {
-                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
-            }
-        } else {
-            slot = m_redSound.SePlay(-1, soundId, panValue,
-                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
-            if (fadeFrames != 0) {
-                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
-            }
-        }
-
-        se->m_playId = slot;
-        return se->m_handle;
-    }
-
-    return -1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800c5e2c
- * PAL Size: 496b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistance, int fadeFrames)
-{
-    int volumeValue;
-    CSe3D* se;
-    int loopCount;
-    int slot;
-    int volume;
-    int pan;
-    int panValue;
-
-    if (soundId < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-        return -1;
-    }
-
-    CSoundLayout& sound = SoundData(this);
-    se = sound.m_seWork;
-
-    for (loopCount = 0x80; loopCount != 0; loopCount--, se++) {
-        if (se->m_bits.m_active) {
-            continue;
-        }
-
-        se->m_bits.m_active = 1;
-        se->m_bits.m_paused = 0;
-        se->m_soundId = soundId;
-        slot = sound.m_seCount;
-        sound.m_seCount = slot + 1;
-        se->m_handle = slot;
-
-        se->m_nearDistance = nearDistance;
-        se->m_farDistance = farDistance;
-        se->m_position = *pos;
-        se->m_lineIndex = -1;
-
-        calcVolumePan(se, volume, pan);
-        se->m_volume = static_cast<u8>(volume);
-        se->m_pan = static_cast<u8>(pan);
-        se->m_group = -1;
-        volumeValue = volume;
-        panValue = pan;
-
-        if (soundId < 0) {
-            System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-            slot = -1;
-        } else if (soundId < 4000) {
-            int bank = soundId / 1000;
-            slot = m_redSound.SePlay(bank, soundId % 1000, panValue,
-                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
-            if (fadeFrames != 0) {
-                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
-            }
-        } else {
-            slot = m_redSound.SePlay(-1, soundId, panValue,
-                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
-            if (fadeFrames != 0) {
-                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
-            }
-        }
-
-        se->m_playId = slot;
-        return se->m_handle;
-    }
-
-    return -1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void CSound::searchSe3D(int)
-{
-	// TODO
 }
 
 /*
@@ -1742,7 +1467,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
     Vec nearestPoint;
 
     if (se3D->m_lineIndex >= 0) {
-        iVar4 = SoundData(this).m_lines[se3D->m_lineIndex].Calc(
+        iVar4 = m_lines[se3D->m_lineIndex].Calc(
             &nearestPoint, &nearestDistance, (u32*)0, &nearestT, reinterpret_cast<Vec*>(&CameraPcs.m_targetX),
             se3D->m_farDistance);
         if (iVar4 != 0) {
@@ -1751,7 +1476,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
                 outVolume = 0x7F;
             } else {
                 fVar3 = se3D->m_nearDistance;
-                outVolume = 0x7F - (int)(kSoundVolumeRange * ((nearestDistance - fVar3) / (se3D->m_farDistance - fVar3)));
+                outVolume = 0x7F - (int)(127.0f * ((nearestDistance - fVar3) / (se3D->m_farDistance - fVar3)));
             }
 
             iVar4 = (int)nearestPoint.x;
@@ -1768,19 +1493,19 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             outVolume = 0;
             outPan = 0x40;
         }
-    } else if ((kLineSegmentMinT == se3D->m_nearDistance) && (kLineSegmentMinT == se3D->m_farDistance)) {
+    } else if ((0.0f == se3D->m_nearDistance) && (0.0f == se3D->m_farDistance)) {
         outVolume = 0x7F;
         outPan = 0x40;
     } else {
-        fVar1 = kLineSegmentMaxT;
+        fVar1 = 1.0f;
         if (static_cast<int>(Game.m_gameWork.m_soundOptionFlag) != 0) {
             switch (Game.m_gameWork.m_bossArtifactStageIndex) {
             case 8:
             case 0xE:
-                fVar1 = kSoundBossDistanceScale;
+                fVar1 = 5.0f;
                 break;
             default:
-                fVar1 = kSoundOptionDistanceScale;
+                fVar1 = 3.0f;
                 break;
             }
         }
@@ -1797,14 +1522,14 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             if (fVar3 < nearScaled) {
                 outVolume = 0x7F;
             } else {
-                outVolume = 0x7F - (int)(kSoundVolumeRange * ((fVar3 - nearScaled) / (fVar2 - nearScaled)));
+                outVolume = 0x7F - (int)(127.0f * ((fVar3 - nearScaled) / (fVar2 - nearScaled)));
             }
         } else {
             outVolume = 0;
         }
 
         if (Game.m_currentMapId == 0x21) {
-            iVar4 = (int)(nearestPoint.x / kSoundMap33PanDivisor);
+            iVar4 = (int)(nearestPoint.x / 2.5f);
             if (iVar4 < -0x38) {
                 iVar5 = -0x38;
             } else {
@@ -1828,8 +1553,198 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
         }
     }
 
-    if (outVolume > SoundData(this).m_curMusicVolume) {
-        outVolume = SoundData(this).m_curMusicVolume;
+    if (outVolume > m_curMusicVolume) {
+        outVolume = m_curMusicVolume;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CSound::CSe3D* CSound::searchSe3D(int se3dHandle)
+{
+    CSe3D* se = m_seWork;
+    for (int i = 0; i < 128; i++, se++) {
+        if (se->m_bits.m_active && se->m_handle == se3dHandle) {
+            return se;
+        }
+    }
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800c5e2c
+ * PAL Size: 496b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistance, int fadeFrames)
+{
+    int volumeValue;
+    CSe3D* se;
+    int loopCount;
+    int slot;
+    int volume;
+    int pan;
+    int panValue;
+
+    if (soundId < 0) {
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
+        return -1;
+    }
+
+    se = m_seWork;
+
+    for (loopCount = 0x80; loopCount != 0; loopCount--, se++) {
+        if (se->m_bits.m_active) {
+            continue;
+        }
+
+        se->m_bits.m_active = 1;
+        se->m_bits.m_paused = 0;
+        se->m_soundId = soundId;
+        slot = m_seCount;
+        m_seCount = slot + 1;
+        se->m_handle = slot;
+
+        se->m_nearDistance = nearDistance;
+        se->m_farDistance = farDistance;
+        se->m_position = *pos;
+        se->m_lineIndex = -1;
+
+        calcVolumePan(se, volume, pan);
+        se->m_volume = static_cast<u8>(volume);
+        se->m_pan = static_cast<u8>(pan);
+        se->m_group = -1;
+        volumeValue = volume;
+        panValue = pan;
+
+        if (soundId < 0) {
+            System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
+            slot = -1;
+        } else if (soundId < 4000) {
+            int bank = soundId / 1000;
+            slot = m_redSound.SePlay(bank, soundId % 1000, panValue,
+                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+            if (fadeFrames != 0) {
+                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
+            }
+        } else {
+            slot = m_redSound.SePlay(-1, soundId, panValue,
+                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+            if (fadeFrames != 0) {
+                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
+            }
+        }
+
+        se->m_playId = slot;
+        return se->m_handle;
+    }
+
+    return -1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800c5c58
+ * PAL Size: 468b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float farDistance, int fadeFrames)
+{
+    int volumeValue;
+    CSe3D* se;
+    int loopCount;
+    int slot;
+    int volume;
+    int pan;
+    int panValue;
+
+    if (soundId < 0) {
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
+        return -1;
+    }
+
+    se = m_seWork;
+
+    for (loopCount = 0x80; loopCount != 0; loopCount--, se++) {
+        if (se->m_bits.m_active) {
+            continue;
+        }
+
+        se->m_bits.m_active = 1;
+        se->m_bits.m_paused = 0;
+        se->m_soundId = soundId;
+        slot = m_seCount;
+        m_seCount = slot + 1;
+        se->m_handle = slot;
+
+        se->m_nearDistance = nearDistance;
+        se->m_farDistance = farDistance;
+        se->m_lineIndex = static_cast<s8>(lineIndex);
+
+        calcVolumePan(se, volume, pan);
+        se->m_volume = static_cast<u8>(volume);
+        se->m_pan = static_cast<u8>(pan);
+        se->m_group = -1;
+        volumeValue = volume;
+        panValue = pan;
+
+        if (soundId < 0) {
+            System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
+            slot = -1;
+        } else if (soundId < 4000) {
+            int bank = soundId / 1000;
+            slot = m_redSound.SePlay(bank, soundId % 1000, panValue,
+                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+            if (fadeFrames != 0) {
+                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
+            }
+        } else {
+            slot = m_redSound.SePlay(-1, soundId, panValue,
+                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+            if (fadeFrames != 0) {
+                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
+            }
+        }
+
+        se->m_playId = slot;
+        return se->m_handle;
+    }
+
+    return -1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800c5b7c
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CSound::SetSe3DGroup(int se3dHandle, int group)
+{
+    if (se3dHandle < 0) {
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
+    } else {
+        CSe3D* se = searchSe3D(se3dHandle);
+        if (se != 0) {
+            se->m_group = group;
+        }
     }
 }
 
@@ -1844,70 +1759,12 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
  */
 void CSound::StopSe3DGroup(int group)
 {
-    char* sound = reinterpret_cast<char*>(this);
-    char* se = sound + 0x2C;
-    u32 i = 0;
-
-    while (i < 0x80) {
-        if ((((static_cast<u8>(*se) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(se + 0x24) >= 0) &&
-            (*reinterpret_cast<int*>(se + 0x24) == group)) {
-            int se3dHandle = *reinterpret_cast<int*>(se + 4);
-            if (se3dHandle < 0) {
-                System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-            } else {
-                char* found = sound + 0x2C;
-                int idx = 0;
-                int count;
-
-                for (count = 0x20; count != 0; count--) {
-                    if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                        if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                            goto found_se;
-                        }
-                    }
-
-                    found += 0x28;
-                    if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                        if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                            goto found_se;
-                        }
-                    }
-
-                    found += 0x28;
-                    if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                        if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                            goto found_se;
-                        }
-                    }
-
-                    found += 0x28;
-                    if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                        if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                            goto found_se;
-                        }
-                    }
-
-                    idx += 3;
-                    found += 0x28;
-                }
-                found = 0;
-found_se:
-                if (found != 0) {
-                    CSe3D* foundSe = reinterpret_cast<CSe3D*>(found);
-                    int playId = foundSe->m_playId;
-                    if (playId < 0) {
-                        System.Printf(const_cast<char*>(s_soundMinusOneFmt), idx);
-                    } else {
-                        m_redSound.SeStop(playId);
-                    }
-                    foundSe->m_bits.m_active = 0;
-                }
-            }
-            reinterpret_cast<CSe3D*>(se)->m_bits.m_active = 0;
+    CSe3D* se = m_seWork;
+    for (u32 i = 0; i < 128; i++, se++) {
+        if (se->m_bits.m_active && se->m_group >= 0 && se->m_group == group) {
+            StopSe3D(se->m_handle);
+            se->m_bits.m_active = 0;
         }
-
-        i++;
-        se += 0x28;
     }
 }
 
@@ -1923,55 +1780,12 @@ found_se:
 void CSound::StopSe3D(int se3dHandle)
 {
     if (se3dHandle < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
-        char* found = reinterpret_cast<char*>(this) + 0x2C;
-        int idx = 0;
-        int count;
-
-        for (count = 0x20; count != 0; count--) {
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
-                }
-            }
-
-            found += 0x28;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
-                }
-            }
-
-            found += 0x28;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
-                }
-            }
-
-            found += 0x28;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
-                }
-            }
-
-            idx += 3;
-            found += 0x28;
-        }
-        found = 0;
-
-found_entry:
-        if (found != 0) {
-            CSe3D* foundSe = reinterpret_cast<CSe3D*>(found);
-            const int playId = foundSe->m_playId;
-            if (playId < 0) {
-                System.Printf(const_cast<char*>(s_soundMinusOneFmt), idx);
-            } else {
-                m_redSound.SeStop(playId);
-            }
-            foundSe->m_bits.m_active = 0;
+        CSe3D* se = searchSe3D(se3dHandle);
+        if (se != 0) {
+            StopSe(se->m_playId);
+            se->m_bits.m_active = 0;
         }
     }
 }
@@ -1988,55 +1802,12 @@ found_entry:
 void CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
 {
     if (se3dHandle < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
-        char* found = reinterpret_cast<char*>(this) + 0x2C;
-        int ret = 0;
-        int count;
-
-        for (count = 0x20; count != 0; count--) {
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
-                }
-            }
-
-            found += 0x28;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
-                }
-            }
-
-            found += 0x28;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
-                }
-            }
-
-            found += 0x28;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
-                }
-            }
-
-            ret += 3;
-            found += 0x28;
-        }
-        found = 0;
-
-found_entry:
-        if (found != 0) {
-            CSe3D* foundSe = reinterpret_cast<CSe3D*>(found);
-            const int playId = foundSe->m_playId;
-            if (playId < 0) {
-                System.Printf(const_cast<char*>(s_soundMinusOneFmt), fadeFrames, ret);
-            } else {
-                m_redSound.SeFadeOut(playId, fadeFrames);
-            }
-            foundSe->m_bits.m_active = 0;
+        CSe3D* se = searchSe3D(se3dHandle);
+        if (se != 0) {
+            FadeOutSe(se->m_playId, fadeFrames);
+            se->m_bits.m_active = 0;
         }
     }
 }
@@ -2050,48 +1821,15 @@ found_entry:
  * JP Address: TODO
  * JP Size: TODO
  */
-int CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
+void CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
 {
-    int ret;
-    char* se;
-    char* found;
-    int count;
-
     if (se3dHandle < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
-        se = reinterpret_cast<char*>(this) + 0x2C;
-        ret = 0;
-        for (count = 0x20; count != 0; count--) {
-            found = se;
-            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
-                goto found_entry;
-            }
-
-            found += 0x28;
-            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
-                goto found_entry;
-            }
-
-            found += 0x28;
-            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
-                goto found_entry;
-            }
-
-            found += 0x28;
-            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
-                goto found_entry;
-            }
-
-            ret += 3;
-            se = found + 0x28;
+        CSe3D* se = searchSe3D(se3dHandle);
+        if (se != 0) {
+            se->m_position = *position;
         }
-        found = 0;
-found_entry:
-        if (found != 0) {
-            reinterpret_cast<CSe3D*>(found)->m_position = *position;
-        }
-        return ret;
     }
 }
 
@@ -2107,47 +1845,11 @@ found_entry:
 void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
 {
     if (se3dHandle < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
-        char* se = reinterpret_cast<char*>(this) + 0x2C;
-        int count;
-
-        for (count = 0x20; count != 0; count--) {
-            if (((static_cast<u8>(*se) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(se + 4) == se3dHandle) {
-                    break;
-                }
-            }
-
-            se += 0x28;
-            if (((static_cast<u8>(*se) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(se + 4) == se3dHandle) {
-                    break;
-                }
-            }
-
-            se += 0x28;
-            if (((static_cast<u8>(*se) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(se + 4) == se3dHandle) {
-                    break;
-                }
-            }
-
-            se += 0x28;
-            if (((static_cast<u8>(*se) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(se + 4) == se3dHandle) {
-                    break;
-                }
-            }
-
-            se += 0x28;
-        }
-        if (count == 0) {
-            se = 0;
-        }
-
+        CSe3D* se = searchSe3D(se3dHandle);
         if (se != 0) {
-            m_redSound.SePitch(reinterpret_cast<CSe3D*>(se)->m_playId, pitch << 8, frames);
+            m_redSound.SePitch(se->m_playId, pitch << 8, frames);
         }
     }
 }
@@ -2164,10 +1866,11 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
 void CSound::Clear3DLine(int lineIndex)
 {
     if ((u32)lineIndex >= 8) {
-        System.Printf(const_cast<char*>(s_soundLineOutOfRangeFmt));
+        System.Printf("CSound: \x83\x89\x83\x43\x83\x93\x82\xaa\x91\xbd\x82\xb7\x82\xac\x82\xdc\x82\xb7"
+            "\x81\x42\n");
     }
 
-    SoundData(this).m_lines[lineIndex].pointCount = 0;
+    m_lines[lineIndex].pointCount = 0;
 }
 
 /*
@@ -2181,15 +1884,15 @@ void CSound::Clear3DLine(int lineIndex)
  */
 void CSound::Add3DLine(int lineIndex, Vec* position)
 {
-    CSoundLayout& sound = SoundData(this);
-    const u32 pointCount = sound.m_lines[lineIndex].pointCount;
+    const u32 pointCount = m_lines[lineIndex].pointCount;
 
     if (pointCount < 10) {
-        sound.m_lines[lineIndex].pointCount = pointCount + 1;
-        sound.m_lines[lineIndex].points[pointCount] = *position;
-        sound.m_lines[lineIndex].CalcBound();
+        m_lines[lineIndex].pointCount = pointCount + 1;
+        m_lines[lineIndex].points[pointCount] = *position;
+        m_lines[lineIndex].CalcBound();
     } else {
-        System.Printf(const_cast<char*>(s_soundLineTableFullFmt));
+        System.Printf("CSound: \x83\x89\x83\x43\x83\x93\x82\xcc\x92\xb8\x93\x5F\x82\xaa\x91\xbd\x82\xb7"
+            "\x82\xac\x82\xdc\x82\xb7\x81\x42\n");
     }
 }
 
@@ -2220,45 +1923,44 @@ void CSound::SetReverb(int reverb, int depth)
 void CSound::LoadStream(int streamID)
 {
     if (streamID < 0) {
-        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
     } else {
-        CSoundLayout& sound = SoundData(this);
         bool isPlaying = false;
 
-        if (sound.m_streamPlaying != 0) {
-            if (m_redSound.StreamPlayState(sound.m_streamID) != 0) {
+        if (m_streamPlaying != 0) {
+            if (m_redSound.StreamPlayState(m_streamID) != 0) {
                 isPlaying = true;
             }
         }
 
         if (isPlaying) {
-            m_redSound.StreamStop(sound.m_streamID);
+            m_redSound.StreamStop(m_streamID);
         }
 
-        if (sound.m_streamFile != 0) {
-            File.Close(sound.m_streamFile);
-            sound.m_streamFile = 0;
+        if (m_streamFile != 0) {
+            File.Close(m_streamFile);
+            m_streamFile = 0;
         }
 
-        sound.m_streamPlaying = 0;
+        m_streamPlaying = 0;
 
         char streamPath[252];
-        sprintf(streamPath, sSoundStreamPathFmt, streamID);
-        sound.m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
-        if (sound.m_streamFile != 0) {
-            CFile::CHandle* streamFile = sound.m_streamFile;
+        sprintf(streamPath, "dvd/sound/stream/str%04d.str", streamID);
+        m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
+        if (m_streamFile != 0) {
+            CFile::CHandle* streamFile = m_streamFile;
             streamFile->m_chunkSize = 0x20000;
             streamFile->m_currentOffset = 0;
-            File.Read(sound.m_streamFile);
-            File.SyncCompleted(sound.m_streamFile);
-            memcpy(sound.m_streamBuffer, File.m_readBuffer, 0x20000);
-            sound.m_streamOffset = 0x20000;
-            sound.m_streamHalf = 0;
-            sound.m_streamRemain = File.GetLength(sound.m_streamFile) - 0x20000;
-            sound.m_streamState = 0;
-            sound.m_streamWaveID = streamID;
-            File.Close(sound.m_streamFile);
-            sound.m_streamFile = 0;
+            File.Read(m_streamFile);
+            File.SyncCompleted(m_streamFile);
+            memcpy(m_streamBuffer, File.m_readBuffer, 0x20000);
+            m_streamOffset = 0x20000;
+            m_streamHalf = 0;
+            m_streamRemain = File.GetLength(m_streamFile) - 0x20000;
+            m_streamState = 0;
+            m_streamWaveID = streamID;
+            File.Close(m_streamFile);
+            m_streamFile = 0;
         }
     }
 }
@@ -2275,15 +1977,14 @@ void CSound::LoadStream(int streamID)
 void CSound::PlayStreamASync()
 {
     char streamPath[252];
-    CSoundLayout& sound = SoundData(this);
-    sprintf(streamPath, sSoundStreamPathFmt, sound.m_streamWaveID);
+    sprintf(streamPath, "dvd/sound/stream/str%04d.str", m_streamWaveID);
 
-    sound.m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
-    if (sound.m_streamFile == 0) {
+    m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
+    if (m_streamFile == 0) {
         return;
     }
 
-    int streamId = sound.m_streamWaveID;
+    int streamId = m_streamWaveID;
     int volume;
     switch (streamId) {
     case 2:
@@ -2298,21 +1999,21 @@ void CSound::PlayStreamASync()
     case 1:
     case 5:
         int bgmVolume;
-        bgmVolume = sound.m_bgmMasterVolume;
+        bgmVolume = m_bgmMasterVolume;
         volume = bgmVolume;
         if (streamId == 1) {
             volume = bgmVolume - (bgmVolume * 0x19) / 0x7f;
         }
         break;
     default:
-        volume = sound.m_seMasterVolume;
+        volume = m_seMasterVolume;
         break;
     }
-    void* streamBuffer = sound.m_streamBuffer;
+    void* streamBuffer = m_streamBuffer;
     CRedSound* redSound = &m_redSound;
     int streamNo = redSound->StreamPlay(streamBuffer, 0x20000, 0x40, volume < 0 ? 0 : (volume <= 0x7f ? volume : 0x7f));
-    sound.m_streamID = streamNo;
-    sound.m_streamPlaying = 1;
+    m_streamID = streamNo;
+    m_streamPlaying = 1;
 }
 
 /*
@@ -2326,26 +2027,25 @@ void CSound::PlayStreamASync()
  */
 void CSound::StopStream()
 {
-    CSoundLayout& sound = SoundData(this);
     bool shouldStop = false;
 
-    if (sound.m_streamPlaying != 0) {
-        int state = m_redSound.StreamPlayState(sound.m_streamID);
+    if (m_streamPlaying != 0) {
+        int state = m_redSound.StreamPlayState(m_streamID);
         if (state != 0) {
             shouldStop = true;
         }
     }
 
     if (shouldStop) {
-        m_redSound.StreamStop(sound.m_streamID);
+        m_redSound.StreamStop(m_streamID);
     }
 
-    CFile::CHandle* handle = sound.m_streamFile;
+    CFile::CHandle* handle = m_streamFile;
     if (handle != 0) {
         File.Close(handle);
-        sound.m_streamFile = 0;
+        m_streamFile = 0;
     }
-    sound.m_streamPlaying = 0;
+    m_streamPlaying = 0;
 }
 
 /*
@@ -2372,14 +2072,20 @@ inline void CSound::IsPlayStream()
 	// TODO
 }
 
+
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: 0x800DF41C
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-inline void CSound::IsDebugPrint(int)
+inline void CSound::IsDebugPrint(int enabled)
 {
-	// TODO
+    m_debugPrint = enabled;
+    m_redSound.ReportPrint(enabled != 0);
 }
 
 /*
@@ -2393,11 +2099,9 @@ inline void CSound::IsDebugPrint(int)
  */
 void CSound::PauseAllSe(int pause)
 {
-    CSoundLayout& sound = SoundData(this);
-
     m_redSound.SePause(-1, static_cast<u32>(-pause | pause) >> 31);
     m_redSound.StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
-    sound.m_pauseAllSe = pause;
+    m_pauseAllSe = pause;
 }
 
 /*
@@ -2412,8 +2116,8 @@ void CSound::PauseAllSe(int pause)
 void CSound::AddNoFreeSeGroup(int group)
 {
     for (int i = 0; i < 4; i++) {
-        if (SoundData(this).m_noFreeSeGroups[i] == -1) {
-            SoundData(this).m_noFreeSeGroups[i] = static_cast<s16>(group);
+        if (m_noFreeSeGroups[i] == -1) {
+            m_noFreeSeGroups[i] = static_cast<s16>(group);
             return;
         }
     }
@@ -2422,7 +2126,8 @@ void CSound::AddNoFreeSeGroup(int group)
         return;
     }
 
-    System.Printf(const_cast<char*>(sSoundNoFreeSeGroupWarn));
+    System.Printf("\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeSeGroup\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
+        "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n");
 }
 
 /*
@@ -2437,8 +2142,8 @@ void CSound::AddNoFreeSeGroup(int group)
 void CSound::AddNoFreeWave(int wave)
 {
     for (int i = 0; i < 4; i++) {
-        if (SoundData(this).m_noFreeWaves[i] == -1) {
-            SoundData(this).m_noFreeWaves[i] = static_cast<s16>(wave);
+        if (m_noFreeWaves[i] == -1) {
+            m_noFreeWaves[i] = static_cast<s16>(wave);
             return;
         }
     }
@@ -2447,7 +2152,8 @@ void CSound::AddNoFreeWave(int wave)
         return;
     }
 
-    System.Printf(const_cast<char*>(sSoundNoFreeWaveWarn));
+    System.Printf("\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeWaev\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
+        "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n");
 }
 
 /*

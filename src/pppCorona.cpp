@@ -7,16 +7,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern const float kPppScreenWidth = 640.0f;
-extern const float kPppScreenHeight = 448.0f;
-extern const float kPppHalfScreenWidth = 320.0f;
-extern const float kPppHalfScreenHeight = 224.0f;
-extern const unsigned int kPppS32ToDoubleBiasWords[2] = {0x43300000, 0x80000000};
-extern const float kYmEnvViewportWidth;
-extern const float kYmEnvViewportHeight;
-extern const float kYmEnvZero;
-extern const float kYmEnvOne;
-
 struct CoronaWork {
     s16 m_shapeX;
     s16 m_shapeY;
@@ -95,20 +85,20 @@ void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl
         return;
     }
 
-    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[shapeId];
+    shape = ppvEnv->m_shapeTablePtr[shapeId];
 
     PSMTXIdentity(mtx.value);
 
-    viewDir.x = kYmEnvViewportWidth;
-    viewDir.y = kYmEnvViewportHeight;
-    viewDir.z = kYmEnvZero;
+    viewDir.x = 320.0f;
+    viewDir.y = 224.0f;
+    viewDir.z = 0.0f;
     PSVECSubtract(&vecWork->m_cameraOffset, &viewDir, &fromOrigin);
 
     mag = PSVECMag(&fromOrigin);
     scale = data->m_distMin;
     if (mag < data->m_distRange) {
         distScale = data->m_distMax - data->m_distMin;
-        distScale *= kYmEnvOne - (mag / data->m_distRange);
+        distScale *= 1.0f - (mag / data->m_distRange);
         scale = data->m_distMin + distScale;
     }
 
@@ -128,7 +118,7 @@ void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl
     color.rgba[2] = data->m_colorB;
     color.rgba[3] = alpha;
 
-    pppSetDrawEnv(&color, (pppFMATRIX*)0, kYmEnvZero, data->m_drawA, data->m_drawB, data->m_blendMode, 0, 1,
+    pppSetDrawEnv(&color, (pppFMATRIX*)0, 0.0f, data->m_drawA, data->m_drawB, data->m_blendMode, 0, 1,
                   1, 0);
     pppSetBlendMode(data->m_blendMode);
     pppDrawShp(static_cast<long*>(shape->m_animData), work->m_shapeY, ppvEnv->m_materialSetPtr, data->m_blendMode);
@@ -162,7 +152,7 @@ void pppFrameCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl)
         return;
     }
 
-    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[shapeId];
+    shape = ppvEnv->m_shapeTablePtr[shapeId];
     pppCalcFrameShape(static_cast<long*>(shape->m_animData), work->m_shapeX, work->m_shapeY, work->m_shapeZ, data->m_shapeStep);
 
     if (data->m_graphId == object->m_graphId) {
@@ -196,7 +186,7 @@ void pppDestructCorona(_pppPObject*, _pppCtrlTable*)
  */
 void pppConstructCorona(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    float fVar1 = kYmEnvZero;
+    float fVar1 = 0.0f;
     CoronaWork* work = GetCoronaWork(object, ctrl);
     work->m_shapeZ = 0;
     work->m_shapeY = 0;

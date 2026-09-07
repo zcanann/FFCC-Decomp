@@ -83,40 +83,14 @@ extern const float FLOAT_80331b00 = 1.1f;
 extern const float FLOAT_80331b04 = 1.2f;
 extern const float FLOAT_80331b08 = 1.25f;
 extern const char lbl_80331B0C[] = "%d\n";
-extern const char s_CMcPcsName[] = "CMcPcs";
 float FLOAT_8032EE78;
 float FLOAT_8032EE7C;
 float FLOAT_8032EE80;
 float FLOAT_8032EE84;
-float FLOAT_8032EE88;
-float FLOAT_8032EE8C;
 extern int s_partyObjCreated_8032EE70;
 extern char s_partyObjCreatedInit_8032EE74;
 
-unsigned char CGPartyObj::m_ghostWork[0x90];
-#define sGhostPartyWork (*reinterpret_cast<GhostPartyWork*>(CGPartyObj::m_ghostWork))
-
-struct BossGhostPartyCounters {
-	unsigned char _pad0[0x24];
-	int thresholdA;
-	int thresholdB;
-	int thresholdC;
-};
-
-#define sBossGhostPartyCounters (*reinterpret_cast<BossGhostPartyCounters*>(CGPartyObj::m_ghostWork))
-
-struct GhostMogMenuWork {
-	struct {
-		signed char carryActive : 1;
-		signed char flag40 : 1;
-		signed char _bits : 6;
-	} flags;
-	unsigned char _pad1[0x3F];
-	int mood;
-	int holdTimer;
-};
-
-#define sGhostMogMenuWork (*reinterpret_cast<GhostMogMenuWork*>(CGPartyObj::m_ghostWork))
+GhostPartyWork CGPartyObj::m_ghostWork;
 
 struct SScriptShieldView { // script overlay: shield item table at +0xB6
 	unsigned char pad[0xB6];
@@ -143,39 +117,52 @@ struct SCfdItemRow {
 	unsigned char pad34[0x14]; // 0x34
 };
 
-// Sub-record views inside a flat3 row (row stride 0x1CA).
-struct SAtkRec { // stride 0x12, indexed by attackSel
-	unsigned short m_f0;     // 0x00
-	unsigned short m_f2;     // 0x02
-	unsigned char pad4[6];   // 0x04
-	unsigned short m_fA;     // 0x0A
-	unsigned char padC[6];   // 0x0C
+struct SAtkRec {
+	unsigned short m_attackStartFrame;
+	unsigned short m_attackEndFrame;
+	unsigned short m_moveStartFrame;
+	unsigned short m_moveEndFrame;
+	unsigned short m_moveSpeed;
+	unsigned short m_controlStartFrame;
+	unsigned short m_comboStartFrame;
+	unsigned short m_comboEndFrame;
+	unsigned short m_comboNextFrame;
 };
 
-struct SFoodRec { // stride 0x42, indexed by item low byte
-	unsigned char pad0[0x38]; // 0x00
-	unsigned short m_f38;     // 0x38
-	unsigned short m_f3A;     // 0x3A
-	unsigned char pad3C[6];   // 0x3C
+STATIC_ASSERT(sizeof(SAtkRec) == 0x12);
+
+struct SChargePhase {
+	unsigned short m_attackCol;
+	unsigned short m_attackStartFrame;
+	unsigned short m_attackEndFrame;
+	unsigned short m_moveStartFrame;
+	unsigned short m_moveEndFrame;
+	unsigned short m_moveSpeed;
 };
 
-struct SCarryAnimRow { // stride 0x1CA flat3 row; carry anim ids at +0x1C2..0x1C8
-	unsigned char pad[0x1C2];
-	unsigned short m_anim0; // 0x1C2
-	unsigned short m_anim1; // 0x1C4
-	unsigned short m_anim2; // 0x1C6
-	unsigned short m_anim3; // 0x1C8
+struct SChargeRec {
+	SChargePhase m_phases[5];
+	unsigned short m_twistLimit;
+	unsigned short m_twistStartFrame;
+	unsigned short m_twistEndFrame;
 };
 
-struct SAtkTblRow { // stride 0x1CA flat3 row, viewed as SAtkRec records
-	SAtkRec recs[25];
-	unsigned char tail[8];
+STATIC_ASSERT(sizeof(SChargePhase) == 0xC);
+STATIC_ASSERT(sizeof(SChargeRec) == 0x42);
+STATIC_ASSERT(offsetof(SChargeRec, m_twistLimit) == 0x3C);
+
+struct SPartyAnimRow {
+	SAtkRec m_attacks[3];
+	SChargeRec m_chargeAttacks[6];
+	unsigned short m_carryAnim0;
+	unsigned short m_carryAnim1;
+	unsigned short m_carryAnim2;
+	unsigned short m_carryAnim3;
 };
 
-struct SFoodTblRow { // stride 0x1CA flat3 row, viewed as SFoodRec records
-	SFoodRec recs[6];
-	unsigned char tail[62];
-};
+STATIC_ASSERT(sizeof(SPartyAnimRow) == 0x1CA);
+STATIC_ASSERT(offsetof(SPartyAnimRow, m_chargeAttacks) == 0x36);
+STATIC_ASSERT(offsetof(SPartyAnimRow, m_carryAnim0) == 0x1C2);
 
 static inline int getEquipWeaponInventoryItem(CCaravanWork* work)
 {
@@ -188,9 +175,40 @@ static inline PartyObjOverlay& PartyData(CGPartyObj* self)
 	return self->m_partyData;
 }
 
-static inline int& CharaGhostValue(int offset)
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 304b
+ * EN Address: 0x801418DC
+ * EN Size: 268b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGPartyObj::changeWeapon(int weaponIndex, int itemId, int forceImmediate)
 {
-	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + offset);
+	PartyObjOverlay& party = PartyData(this);
+	if (forceImmediate || !m_weaponNodeFlagBits.m_prg ||
+	    !m_weaponNodeFlagAll.m_bits1.m_shield || party.carryObject != 0 ||
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0 ||
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[12] != 0 ||
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[6] != 0) {
+		if (itemId <= 0) {
+			LoadWeapon(-1, 0);
+		} else {
+			SItemFlatRow* rows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+			unsigned short model = rows[itemId].m_model;
+			LoadWeapon(model & 0xFFF, model >> 12);
+		}
+		party.weaponIndex = weaponIndex;
+		party.weaponItemId = itemId;
+		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponIndex);
+		party.commandFlagBits.flag20 = 0;
+	} else {
+		party.pendingWeaponIndex = weaponIndex;
+		party.pendingWeaponItemId = itemId;
+		party.commandFlagBits.flag20 = 1;
+		changeStat(0x0F, 0, 0);
+	}
 }
 
 static inline int& PartyTraceParticleSlot(int port)
@@ -202,13 +220,13 @@ static inline int& PartyTraceParticleSlot(int port)
 static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 {
 	if (((static_cast<unsigned short>(attacker->GetCID()) & 0xAD) == 0xAD) && Game.m_gameWork.m_menuStageMode != 0) {
-		sBossGhostPartyCounters.thresholdA++;
-		sBossGhostPartyCounters.thresholdB++;
-		sBossGhostPartyCounters.thresholdC++;
+		CGPartyObj::m_ghostWork.counters[0]++;
+		CGPartyObj::m_ghostWork.counters[1]++;
+		CGPartyObj::m_ghostWork.counters[2]++;
 		System.Printf(const_cast<char*>(sBossGhostPartyCountersFmt),
-		    sBossGhostPartyCounters.thresholdA, CharaGhostValue(0x2048),
-		    sBossGhostPartyCounters.thresholdB, CharaGhostValue(0x204C),
-		    sBossGhostPartyCounters.thresholdC, CharaGhostValue(0x2050));
+		    CGPartyObj::m_ghostWork.counters[0], Chara.MogFur().m_radarLevel[0],
+		    CGPartyObj::m_ghostWork.counters[1], Chara.MogFur().m_radarLevel[1],
+		    CGPartyObj::m_ghostWork.counters[2], Chara.MogFur().m_radarLevel[2]);
 	}
 }
 
@@ -325,26 +343,10 @@ static bool isFrameInterval(int frame, int interval)
 
 static inline bool isGhostPartyTargetMode(CGPartyObj* self)
 {
-	bool result = false;
-	bool cidMatch = false;
-	bool stageOk = false;
-
-	if (Game.m_gameWork.m_menuStageMode != 0) {
-		if (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) {
-			stageOk = true;
-		}
-	}
-	if (stageOk) {
-		if ((__cntlzw(0x6D - (static_cast<unsigned short>(self->GetCID()) & 0x6D)) >> 5 & 0xFF) != 0) {
-			cidMatch = true;
-		}
-	}
-	if (cidMatch) {
-		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(self->m_scriptHandle) + 0x3B4) != 0) {
-			result = true;
-		}
-	}
-	return result;
+	return Game.m_gameWork.m_menuStageMode != 0 &&
+	       Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	       self->IsKindOf(0x6D) &&
+	       reinterpret_cast<CCaravanWork*>(self->m_scriptHandle)->m_joybusCaravanId != 0;
 }
 
 static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
@@ -356,25 +358,25 @@ static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
 	if (carryType == 0) {
 		if (CFlatItemCarryMode() == 1) {
 			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-			SCarryAnimRow* rows = reinterpret_cast<SCarryAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
 			return rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_anim2;
+			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_carryAnim2;
 		}
 		unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-		SCarryAnimRow* rows = reinterpret_cast<SCarryAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+		SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
 		return rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-		            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_anim0;
+		            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_carryAnim0;
 	} else {
 		if (CFlatItemCarryMode() == 1) {
 			unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-			SCarryAnimRow* rows = reinterpret_cast<SCarryAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
 			return rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_anim3;
+			            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_carryAnim3;
 		}
 		unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
-		SCarryAnimRow* rows = reinterpret_cast<SCarryAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+		SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
 		return rows[*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-		            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_anim1;
+		            *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2].m_carryAnim1;
 	}
 }
 
@@ -434,8 +436,8 @@ void CGPartyObj::onCreate()
 
 	party.flags.commandActive = 0;
 	party.flags.flag08 = 0;
-	party.weaponItem = 0;
-	party.pendingWeaponItem = 0;
+	party.weaponIndex = 0;
+	party.weaponItemId = 0;
 	party.flags.flag40 = 0;
 	party.flags.flag20 = 0;
 	party.flags.flag10 = 0;
@@ -501,24 +503,26 @@ void CGPartyObj::onChangeStat(int state)
 	case 1: {
 		int attackSel = party.attackSel;
 		*reinterpret_cast<int*>(self + 0x550) = (attackSel == 0) ? 5 : ((attackSel == 1) ? 7 : 8);
-		int row = attackSel * 0x12;
-		*reinterpret_cast<int*>(self + 0x630) =
-		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 +
-		        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-		         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row);
 		{
-			SAtkTblRow* rows = reinterpret_cast<SAtkTblRow*>(Game.unk_flat3_field_30_0xc7e0);
-			*reinterpret_cast<int*>(self + 0x634) =
-			    rows[*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2]
-			        .recs[attackSel].m_f2;
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			m_castFrameStart =
+			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+			         reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+			        .m_attacks[attackSel].m_attackStartFrame;
 		}
 		{
-			SAtkTblRow* rows = reinterpret_cast<SAtkTblRow*>(Game.unk_flat3_field_30_0xc7e0);
-			*reinterpret_cast<int*>(self + 0x638) =
-			    rows[*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2]
-			        .recs[attackSel].m_fA;
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			m_castFrameEnd =
+			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+			        .m_attacks[attackSel].m_attackEndFrame;
+		}
+		{
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			m_castFrameCurrent =
+			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+			        .m_attacks[attackSel].m_controlStartFrame;
 		}
 		break;
 	}
@@ -557,23 +561,23 @@ void CGPartyObj::onChangeStat(int state)
 		System.Printf(const_cast<char*>(msgBase + 0x3AC), itemLow);
 		*reinterpret_cast<int*>(self + 0x558) = itemHigh + 0x2A;
 		{
-			SFoodTblRow* rows = reinterpret_cast<SFoodTblRow*>(Game.unk_flat3_field_30_0xc7e0);
-			*reinterpret_cast<int*>(self + 0x630) =
-			    rows[*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2]
-			        .recs[itemLow].m_f38;
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			m_castFrameStart =
+			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+			        .m_chargeAttacks[itemLow].m_phases[0].m_attackStartFrame;
 		}
 		{
-			SFoodTblRow* rows = reinterpret_cast<SFoodTblRow*>(Game.unk_flat3_field_30_0xc7e0);
-			*reinterpret_cast<int*>(self + 0x634) =
-			    rows[*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-			        *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2]
-			        .recs[itemLow].m_f3A;
+			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			m_castFrameEnd =
+			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+			        .m_chargeAttacks[itemLow].m_phases[0].m_attackEndFrame;
 		}
 		*reinterpret_cast<int*>(self + 0x68C) = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		if (Game.m_gameWork.m_menuStageMode != 0) {
 			int cmdListItem =
-			    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCmdListItem(PartyData(this).weaponItem);
+			    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetWeaponAttrib(PartyData(this).weaponIndex);
 			if (cmdListItem >= 0) {
 				m_comboItemState = cmdListItem;
 			}
@@ -609,19 +613,7 @@ void CGPartyObj::onCancelStat(int state)
 		break;
 	case 0x0F:
 		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x6C4]) << 26) & 0xC0000000) >> 31) != 0) {
-			int weaponB = *reinterpret_cast<int*>(self + 0x6D4);
-			int weaponA = *reinterpret_cast<int*>(self + 0x6D8);
-			if (weaponA <= 0) {
-				LoadWeapon(-1, 0);
-			} else {
-				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-				unsigned short packedItem = rows[weaponA].m_model;
-				LoadWeapon(packedItem & 0xFFF, packedItem >> 12);
-			}
-			*reinterpret_cast<int*>(self + 0x6DC) = weaponB;
-			*reinterpret_cast<int*>(self + 0x6E0) = weaponA;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(*reinterpret_cast<int*>(self + 0x6DC));
-			party.commandFlagBits.flag20 = 0;
+			changeWeapon(party.pendingWeaponIndex, party.pendingWeaponItemId, 1);
 		}
 		break;
 	case 0x15:
@@ -635,7 +627,7 @@ void CGPartyObj::onCancelStat(int state)
 		{
 			if (party.carryObject != 0) {
 				if (CFlatItemCarryMode() == 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0x0B, 0);
 						SetAnimSlot(0x0C, 1);
 					} else {
@@ -648,7 +640,7 @@ void CGPartyObj::onCancelStat(int state)
 				}
 			} else {
 				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0, 0);
 						SetAnimSlot(1, 1);
 					} else {
@@ -656,7 +648,7 @@ void CGPartyObj::onCancelStat(int state)
 						SetAnimSlot(0x30, 1);
 					}
 				} else {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0x25, 0);
 						SetAnimSlot(0x24, 1);
 					} else {
@@ -672,7 +664,7 @@ void CGPartyObj::onCancelStat(int state)
 		{
 			if (party.carryObject != 0) {
 				if (CFlatItemCarryMode() == 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0x0B, 0);
 						SetAnimSlot(0x0C, 1);
 					} else {
@@ -685,7 +677,7 @@ void CGPartyObj::onCancelStat(int state)
 				}
 			} else {
 				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0, 0);
 						SetAnimSlot(1, 1);
 					} else {
@@ -693,7 +685,7 @@ void CGPartyObj::onCancelStat(int state)
 						SetAnimSlot(0x30, 1);
 					}
 				} else {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0x25, 0);
 						SetAnimSlot(0x24, 1);
 					} else {
@@ -718,7 +710,7 @@ void CGPartyObj::onCancelStat(int state)
 		{
 			if (party.carryObject != 0) {
 				if (CFlatItemCarryMode() == 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0x0B, 0);
 						SetAnimSlot(0x0C, 1);
 					} else {
@@ -731,7 +723,7 @@ void CGPartyObj::onCancelStat(int state)
 				}
 			} else {
 				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0, 0);
 						SetAnimSlot(1, 1);
 					} else {
@@ -739,7 +731,7 @@ void CGPartyObj::onCancelStat(int state)
 						SetAnimSlot(0x30, 1);
 					}
 				} else {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0x25, 0);
 						SetAnimSlot(0x24, 1);
 					} else {
@@ -769,7 +761,7 @@ void CGPartyObj::onCancelStat(int state)
 		{
 			if (party.carryObject != 0) {
 				if (CFlatItemCarryMode() == 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0x0B, 0);
 						SetAnimSlot(0x0C, 1);
 					} else {
@@ -782,7 +774,7 @@ void CGPartyObj::onCancelStat(int state)
 				}
 			} else {
 				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0, 0);
 						SetAnimSlot(1, 1);
 					} else {
@@ -790,7 +782,7 @@ void CGPartyObj::onCancelStat(int state)
 						SetAnimSlot(0x30, 1);
 					}
 				} else {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0x25, 0);
 						SetAnimSlot(0x24, 1);
 					} else {
@@ -810,7 +802,7 @@ void CGPartyObj::onCancelStat(int state)
 		}
 		break;
 	case 6:
-		*reinterpret_cast<float*>(self + 0x4FC) = FLOAT_80331a78;
+		m_twistTarget = FLOAT_80331a78;
 		break;
 	default:
 		break;
@@ -964,21 +956,9 @@ void CGPartyObj::onFrameAlways()
 	}
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0 &&
-	    (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1)) {
+	    (m_motionMode == 1)) {
 		if (m_weaponModelHandle == nullptr) {
-			int weaponItem = party.pendingWeaponItem;
-			int weaponRef = party.weaponItem;
-			if (weaponItem <= 0) {
-				LoadWeapon(-1, 0);
-			} else {
-				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-				unsigned short packedItem = rows[weaponItem].m_model;
-				LoadWeapon(packedItem & 0xFFF, packedItem >> 12);
-			}
-			party.weaponItem = weaponRef;
-			party.pendingWeaponItem = weaponItem;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponItem);
-			party.commandFlagBits.flag20 = 0;
+			changeWeapon(party.weaponIndex, party.weaponItemId, 1);
 		}
 
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
@@ -1097,8 +1077,8 @@ void CGPartyObj::CheckMenu()
  * --INFO--
  * PAL Address: 0x801230a0
  * PAL Size: 844b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013B6F4
+ * EN Size: 688b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1111,52 +1091,26 @@ void CGPartyObj::onFramePreCalc()
 	CGCharaObj::onFramePreCalc();
 
 	PartyObjOverlay& party = PartyData(this);
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (Game.unk_flat3_0xc7d0 != 0) {
 		const Vec* chalicePos = reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C);
-		*reinterpret_cast<float*>(self + 0x5BC) = PSVECDistance(&m_worldPosition, chalicePos);
+		m_targetDist = PSVECDistance(&m_worldPosition, chalicePos);
 	}
 
-	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(party.partyFlags) << 24) & 0xC0000000) >> 31) == 0) &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 25) & 0xC0000000) >> 31) == 0)) {
-		unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
-		if (held != 0) {
-			changeStat(0, 0, 0);
-		}
-	}
-
-	int weaponItem;
-	int weaponRef;
-	if (static_cast<int>(CFlatCenterState()) == 0) {
-		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
-		if (party.weaponItem != weaponItem || party.pendingWeaponItem != weaponRef) {
-		bool canImmediateSwap =
-		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
-		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) != 0) &&
-		    (party.carryObject == nullptr) &&
-		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) &&
-		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
-		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0);
-
-		if (canImmediateSwap) {
-			if (weaponItem <= 0) {
-				LoadWeapon(-1, 0);
-			} else {
-				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-				unsigned short packedItem = rows[weaponItem].m_model;
-				LoadWeapon(packedItem & 0x0FFF, packedItem >> 12);
+	if (m_unk63CBits.m_bit80 != 0 && party.flags.commandActive == 0) {
+		if (m_weaponNodeFlagAll.m_bits1.m_menuReady == 0) {
+			unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
+			if (held != 0) {
+				changeStat(0, 0, 0);
 			}
-			party.weaponItem = weaponItem;
-			party.pendingWeaponItem = weaponRef;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponItem);
-			party.commandFlagBits.flag20 = 0;
-		} else {
-			*reinterpret_cast<int*>(self + 0x6D4) = weaponItem;
-			party.weaponRef = weaponRef;
-			party.commandFlagBits.flag20 = 1;
-			changeStat(0x0F, 0, 0);
 		}
+
+		int weaponIndex;
+		int itemId;
+		if (CFlatCenterState() == 0) {
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponIndex, itemId);
+			if (party.weaponIndex != weaponIndex || party.weaponItemId != itemId) {
+				changeWeapon(weaponIndex, itemId, 0);
+			}
 		}
 	}
 
@@ -1164,7 +1118,7 @@ void CGPartyObj::onFramePreCalc()
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
 		if (party.carryObject != nullptr ||
-		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+		    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_hp == 0) {
 			float speedScale;
 			if (static_cast<int>(CFlatCenterState()) == 0) {
 				speedScale = FLOAT_80331b08;
@@ -1175,7 +1129,7 @@ void CGPartyObj::onFramePreCalc()
 		} else {
 			m_moveBaseSpeed = FLOAT_80331ad4;
 		}
-		m_moveBaseSpeed *= *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x690);
+		m_moveBaseSpeed *= m_pushScale;
 	}
 }
 
@@ -1245,7 +1199,7 @@ void CGPartyObj::command()
 		int cmdDir = 0;
 
 		if ((getPadHeldForSlot(padSlot) & 0x60) == 0x60) {
-			caravan->IsUseCmdList(0);
+			caravan->SetIdxCmdList(0);
 		} else if ((getPadTrigForSlot(padSlot) & 0x20) != 0) {
 			cmdDir = 1;
 		} else if ((getPadTrigForSlot(padSlot) & 0x40) != 0) {
@@ -1255,7 +1209,7 @@ void CGPartyObj::command()
 		if (cmdDir != 0) {
 			Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
 			CCaravanWork* cmdDirCaravan = caravan;
-			cmdDirCaravan->IsUseCmdList(cmdDirCaravan->GetNextCmdListIdx(cmdDirCaravan->GetIdxCmdList(), cmdDir));
+			cmdDirCaravan->SetIdxCmdList(cmdDirCaravan->GetNextCmdListIdx(cmdDirCaravan->GetIdxCmdList(), cmdDir));
 		}
 
 		const int cmdIdx = caravan->GetIdxCmdList();
@@ -1265,7 +1219,7 @@ void CGPartyObj::command()
 			ringCommand = 9;
 		} else {
 			CCaravanWork* delCaravan = caravan;
-			const int itemId = delCaravan->DelCmdListAndItem(delCaravan->GetIdxCmdList());
+			const int itemId = delCaravan->GetCmdListItem(delCaravan->GetIdxCmdList());
 			const int itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
 			switch (itemKind) {
 			case 1:
@@ -1503,8 +1457,8 @@ targetJoin: ;
 			if (weaponItem != party.unk6BC ||
 			    weaponRef != getEquipWeaponInventoryItem(caravan)) {
 				int newWeaponRef = getEquipWeaponInventoryItem(caravan);
-				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = party.unk6BC;
-				party.weaponRef = newWeaponRef;
+				party.pendingWeaponIndex = party.unk6BC;
+				party.pendingWeaponItemId = newWeaponRef;
 				party.commandFlagBits.flag20 = 1;
 				changeStat(0x0F, 0, 0);
 				return;
@@ -1536,7 +1490,7 @@ targetJoin: ;
 			return;
 		}
 
-		const int itemId = caravan->DelCmdListAndItem(cmdIdx);
+		const int itemId = caravan->GetCmdListItem(cmdIdx);
 		const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
 		switch (itemKind) {
 		case 0x100:
@@ -1544,7 +1498,7 @@ targetJoin: ;
 				if (static_cast<unsigned int>(Math.Rand(3)) == 0) {
 					ClearAllSta();
 					setSta(0x1B, 900);
-					caravan->GetNumCombi(party.unk6BC, 1);
+					caravan->DelCmdListAndItem(party.unk6BC, 1);
 					return;
 				}
 				m_itemId = itemId;
@@ -1566,8 +1520,8 @@ targetJoin: ;
 			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 			if (weaponItem != caravan->GetIdxCmdList() || weaponRef != itemId) {
-				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = caravan->GetIdxCmdList();
-				party.weaponRef = itemId;
+				party.pendingWeaponIndex = caravan->GetIdxCmdList();
+				party.pendingWeaponItemId = itemId;
 				party.commandFlagBits.flag20 = 1;
 				changeStat(0x0F, 0, 0);
 				return;
@@ -1583,7 +1537,7 @@ targetJoin: ;
 		case 0x186:
 		case 0x17D:
 			if (useItem(itemId) != 0) {
-				caravan->GetNumCombi(party.unk6BC, 1);
+				caravan->DelCmdListAndItem(party.unk6BC, 1);
 			}
 			return;
 		case 0xDF: {
@@ -1887,17 +1841,17 @@ void CGPartyObj::onFrameStat()
 			int heldMask = held & 0x400;
 			unsigned short up = getPadButtonUpForSlot(static_cast<signed char>(m_animStateMisc));
 			if ((up & 0x400) != 0) {
-				if (sGhostMogMenuWork.holdTimer < 10 &&
+				if (CGPartyObj::m_ghostWork.holdTimer < 10 &&
 				    party.carryObject != chaliceObj) {
-					sGhostMogMenuWork.flags.carryActive = (party.carryObject != nullptr);
+					CGPartyObj::m_ghostWork.flagBits.flag80 = (party.carryObject != nullptr);
 				}
 			} else if (heldMask != 0) {
-				sGhostMogMenuWork.holdTimer++;
-				if (sGhostMogMenuWork.holdTimer >= 10 && sGhostMogMenuWork.mood == 0) {
-					sGhostMogMenuWork.mood = 2;
+				CGPartyObj::m_ghostWork.holdTimer++;
+				if (CGPartyObj::m_ghostWork.holdTimer >= 10 && CGPartyObj::m_ghostWork.moodTimer == 0) {
+					CGPartyObj::m_ghostWork.moodTimer = 2;
 				}
 			} else {
-				sGhostMogMenuWork.holdTimer = 0;
+				CGPartyObj::m_ghostWork.holdTimer = 0;
 			}
 		}
 		break;
@@ -1954,7 +1908,7 @@ void CGPartyObj::onFrameStat()
 		if (isLoopAnim() != 0) {
 			if (party.carryObject != nullptr) {
 				if (CFlatItemCarryMode() == 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0x0B, 0);
 						SetAnimSlot(0x0C, 1);
 					} else {
@@ -1966,14 +1920,14 @@ void CGPartyObj::onFrameStat()
 					SetAnimSlot(0x0C, 1);
 				}
 			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+				if (m_motionMode == 1) {
 					SetAnimSlot(0, 0);
 					SetAnimSlot(1, 1);
 				} else {
 					SetAnimSlot(0x25, 0);
 					SetAnimSlot(0x30, 1);
 				}
-			} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+			} else if (m_motionMode == 1) {
 				SetAnimSlot(0x25, 0);
 				SetAnimSlot(0x24, 1);
 			} else {
@@ -2004,19 +1958,7 @@ void CGPartyObj::onFrameStat()
 			reqAnim(0x29, 0, 0);
 		}
 		if (m_stateFrame == 4) {
-			int weaponItem = party.weaponRef;
-			int weaponRef = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4);
-			if (weaponItem <= 0) {
-				LoadWeapon(-1, 0);
-			} else {
-				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-				unsigned short itemKind = rows[weaponItem].m_model;
-				LoadWeapon(itemKind & 0xFFF, itemKind >> 12);
-			}
-			party.weaponItem = weaponRef;
-			party.pendingWeaponItem = weaponItem;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponItem);
-			party.commandFlagBits.flag20 = 0;
+			changeWeapon(party.pendingWeaponIndex, party.pendingWeaponItemId, 1);
 		}
 		if (isLoopAnim() != 0) {
 			changeStat(0, 0, 0);
@@ -2096,7 +2038,7 @@ void CGPartyObj::onFrameStat()
 			enableDamageCol(1);
 			if (party.carryObject != nullptr) {
 				if (CFlatItemCarryMode() == 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0x0B, 0);
 						SetAnimSlot(0x0C, 1);
 					} else {
@@ -2108,14 +2050,14 @@ void CGPartyObj::onFrameStat()
 					SetAnimSlot(0x0C, 1);
 				}
 			} else if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+				if (m_motionMode == 1) {
 					SetAnimSlot(0, 0);
 					SetAnimSlot(1, 1);
 				} else {
 					SetAnimSlot(0x25, 0);
 					SetAnimSlot(0x30, 1);
 				}
-			} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+			} else if (m_motionMode == 1) {
 				SetAnimSlot(0x25, 0);
 				SetAnimSlot(0x24, 1);
 			} else {
@@ -2181,28 +2123,27 @@ void CGPartyObj::onAnimPoint(int no, int dataNo)
  */
 void CGPartyObj::enableAttackCol(int enabled, int isFriendly, int hitMask)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (enabled != 0) {
 		resetIgnoreHit();
 		bool col0Enabled = false;
 		if (isFriendly == 0 || (hitMask & 1) != 0) {
 			col0Enabled = true;
 		}
-		*reinterpret_cast<unsigned int*>(self + 0x20C) = col0Enabled != false;
+		m_attackColliders[0].m_hitMask = col0Enabled != false;
 		bool col1Enabled = false;
 		if (isFriendly != 0 && (hitMask & 2) != 0) {
 			col1Enabled = true;
 		}
-		*reinterpret_cast<unsigned int*>(self + 0x23C) = col1Enabled != false;
+		m_attackColliders[1].m_hitMask = col1Enabled != false;
 		bool col2Enabled = false;
 		if (isFriendly != 0 && (hitMask & 4) != 0) {
 			col2Enabled = true;
 		}
-		*reinterpret_cast<unsigned int*>(self + 0x26C) = col2Enabled != false;
+		m_attackColliders[2].m_hitMask = col2Enabled != false;
 	} else {
-		*reinterpret_cast<int*>(self + 0x20C) = 0;
-		*reinterpret_cast<int*>(self + 0x23C) = 0;
-		*reinterpret_cast<int*>(self + 0x26C) = 0;
+		m_attackColliders[0].m_hitMask = 0;
+		m_attackColliders[1].m_hitMask = 0;
+		m_attackColliders[2].m_hitMask = 0;
 	}
 }
 
@@ -2217,7 +2158,6 @@ void CGPartyObj::enableAttackCol(int enabled, int isFriendly, int hitMask)
  */
 void CGPartyObj::enableDamageCol(int onOff)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	unsigned int hitMask = 4;
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 		hitMask = 8;
@@ -2228,11 +2168,11 @@ void CGPartyObj::enableDamageCol(int onOff)
 	     Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F ||
 	     (static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D ||
 	     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) == 0)) {
-		*reinterpret_cast<unsigned int*>(self + 0x384) = hitMask;
-		*reinterpret_cast<unsigned int*>(self + 0x3AC) = hitMask;
+		m_damageColliders[0].m_hitMask = hitMask;
+		m_damageColliders[1].m_hitMask = hitMask;
 	} else {
-		*reinterpret_cast<unsigned int*>(self + 0x384) = 0;
-		*reinterpret_cast<unsigned int*>(self + 0x3AC) = 0;
+		m_damageColliders[0].m_hitMask = 0;
+		m_damageColliders[1].m_hitMask = 0;
 	}
 }
 
@@ -2260,15 +2200,12 @@ int CGPartyObj::getReplaceStat(int state)
 	return state;
 }
 
-#pragma push
-#pragma opt_propagation off
-#pragma opt_dead_assignments off
 /*
  * --INFO--
  * PAL Address: 0x8011ff8c
  * PAL Size: 2560b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013D870
+ * EN Size: 2412b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2315,7 +2252,7 @@ void CGPartyObj::statCharge()
 		}
 		if (m_subFrame == 5 && m_comboItemState >= 0) {
 			endPSlotBit(0x20);
-			int particleBase = m_comboItemState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 5;
+			int particleBase = m_comboItemState + reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 5;
 			CFlat.ResetParticleWork(
 			    (particleBase + 0x1C) | 0x400,
 			    m_particleSlots[5]);
@@ -2354,10 +2291,10 @@ void CGPartyObj::statCharge()
 					base = 0x6F;
 					break;
 				}
-				if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) > 1) {
+				if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_hp > 1) {
 					addHp(-1, static_cast<CGPrgObj*>(0));
 				}
-				putParticle((base + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2)) | 0x500, 0,
+				putParticle((base + reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag) | 0x500, 0,
 				    reinterpret_cast<CGObject*>(this), kMonObjOne, 0);
 			}
 		}
@@ -2367,17 +2304,16 @@ void CGPartyObj::statCharge()
 			putParticleFromItem(m_itemId, 3, m_particleSlots[0], static_cast<Vec*>(0));
 		}
 
-		int entry = (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
-		             *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA;
+		SPartyAnimRow* animRows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
 		SCfdItemRow* rowRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-		int row = (static_cast<int>(rowRows[m_itemId].m_fieldA) >> 8) * 0x42;
-		unsigned short* table =
-		    reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + row + 0x36);
+		SChargeRec* table = &animRows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+		                            reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+		                        .m_chargeAttacks[rowRows[m_itemId].m_fieldA >> 8];
 
-		unsigned short* p = table;
-		for (int i = 0; i < 5; i++, p += 6) {
-			if (phase == p[3] && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
-				unsigned int dist = (p[4] - p[3]) + 1;
+		SChargePhase* p = table->m_phases;
+		for (int i = 0; i < 5; i++, p++) {
+			if (phase == p->m_moveStartFrame && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+				unsigned int dist = (p->m_moveEndFrame - p->m_moveStartFrame) + 1;
 				if (i == 0 && (itemType == 2 || itemType == 3)) {
 					Vec delta;
 					PSVECSubtract(&m_comboCenter, &m_worldPosition, &delta);
@@ -2387,25 +2323,8 @@ void CGPartyObj::statCharge()
 					if ((flagRows[m_itemId].m_field32 & 0x10) != 0) {
 						unsigned int maxReach = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70);
 						if (static_cast<float>(maxReach) < mag) {
-							const CVector& dir = CVector(delta);
-							CVector scaled;
-							PSVECScale((Vec*)&dir, reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
-							Vec scaledCopy;
-							scaledCopy.x = scaled.x;
-							scaledCopy.y = scaled.y;
-							scaledCopy.z = scaled.z;
-							CVector unit;
-							PSVECScale(&scaledCopy, reinterpret_cast<Vec*>(&unit), kMonObjOne / mag);
-							Vec unitCopy;
-							unitCopy.x = unit.x;
-							unitCopy.y = unit.y;
-							unitCopy.z = unit.z;
-							const CVector& origin = CVector(m_worldPosition);
-							CVector sum;
-							PSVECAdd((Vec*)&origin, reinterpret_cast<Vec*>(&unitCopy), reinterpret_cast<Vec*>(&sum));
-							dest.x = sum.x;
-							dest.y = sum.y;
-							dest.z = sum.z;
+							dest = CVector(m_worldPosition) +
+							       (CVector(delta) * (mag - static_cast<float>(maxReach))) * (kMonObjOne / mag);
 							mag = mag - static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70));
 						} else {
 							mag = FLOAT_80331a78;
@@ -2415,14 +2334,14 @@ void CGPartyObj::statCharge()
 						Move(reinterpret_cast<Vec*>(&dest), mag / static_cast<float>(static_cast<int>(dist)), dist, 1, 1, 0, 1);
 					}
 				} else {
-					moveVectorRot(m_rotTargetY, FLOAT_80331a78, FLOAT_80331ADC * static_cast<float>(p[5]),
+					moveVectorRot(m_rotTargetY, FLOAT_80331a78, FLOAT_80331ADC * static_cast<float>(p->m_moveSpeed),
 					    dist);
 				}
 			}
-			if (phase == p[1]) {
-				enableAttackCol(1, 1, p[0]);
+			if (phase == p->m_attackStartFrame) {
+				enableAttackCol(1, 1, p->m_attackCol);
 			}
-			if (phase == p[2]) {
+			if (phase == p->m_attackEndFrame) {
 				enableAttackCol(0, 0, 0);
 			}
 		}
@@ -2432,16 +2351,13 @@ void CGPartyObj::statCharge()
 			return;
 		}
 
-		unsigned int limitFrames = table[0x1E];
-		if (limitFrames != 0) {
-			float angLimit = FLOAT_80331AE0 * static_cast<float>(limitFrames);
-			if (phase == table[0x1F]) {
-				CVector worldPos(m_worldPosition);
-				const CVector& center = CVector(m_comboCenter);
-				CVector diff;
-				PSVECSubtract((Vec*)&center, reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
+		unsigned int twistLimit = table->m_twistLimit;
+		if (twistLimit != 0) {
+			float angLimit = FLOAT_80331AE0 * static_cast<float>(twistLimit);
+			if (phase == table->m_twistStartFrame) {
+				CVector diff = CVector(m_comboCenter) - CVector(m_worldPosition);
 				float horizSq = diff.z * diff.z + diff.x * diff.x;
-				float horiz = (horizSq > FLOAT_80331a78) ? sqrtf(horizSq) : horizSq;
+				float horiz = sqrtf(horizSq);
 				if (FLOAT_80331a78 != diff.y && FLOAT_80331a78 != horiz) {
 					float ang = -static_cast<float>(atan2(diff.y, horiz));
 					float clamped = -angLimit;
@@ -2453,10 +2369,10 @@ void CGPartyObj::statCharge()
 							clamped = angLimit;
 						}
 					}
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x4FC) = clamped;
+					m_twistTarget = clamped;
 				}
-			} else if (phase == table[0x20]) {
-				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x4FC) = FLOAT_80331a78;
+			} else if (phase == table->m_twistEndFrame) {
+				m_twistTarget = FLOAT_80331a78;
 			}
 		}
 		break;
@@ -2476,7 +2392,6 @@ void CGPartyObj::statCharge()
 		}
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -2567,8 +2482,8 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
  * --INFO--
  * PAL Address: 0x8011fa88
  * PAL Size: 800b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013E500
+ * EN Size: 724b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2594,23 +2509,20 @@ void CGPartyObj::onStatAttack(int chargeType)
 		return;
 	}
 
-	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	const int chain = party.unk6CC;
-	unsigned char* attackEntry = reinterpret_cast<unsigned char*>(
-	    Game.unk_flat3_field_30_0xc7e0 +
-	    ((*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-	      *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) *
-	         0x1CA) +
-	    chain * 0x12);
+	SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+	SAtkRec* attackEntry = &rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
+	                           reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
+	                       .m_attacks[chain];
 
-	if (chain > 0 && m_stateFrame == *reinterpret_cast<unsigned short*>(attackEntry + 4) && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
-		const float stepSpeed = FLOAT_80331ADC * static_cast<float>(*reinterpret_cast<unsigned short*>(attackEntry + 8));
+	if (chain > 0 && m_stateFrame == attackEntry->m_moveStartFrame && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+		const float stepSpeed = FLOAT_80331ADC * static_cast<float>(attackEntry->m_moveSpeed);
 		moveVectorRot(m_rotTargetY, FLOAT_80331a78, stepSpeed,
-		    (*reinterpret_cast<unsigned short*>(attackEntry + 6) - *reinterpret_cast<unsigned short*>(attackEntry + 4)) + 1);
+		    (attackEntry->m_moveEndFrame - attackEntry->m_moveStartFrame) + 1);
 	}
 
-	if (m_stateFrame >= *reinterpret_cast<unsigned short*>(attackEntry + 0x0C) &&
-	    m_stateFrame <= *reinterpret_cast<unsigned short*>(attackEntry + 0x0E)) {
+	if (m_stateFrame >= attackEntry->m_comboStartFrame &&
+	    m_stateFrame <= attackEntry->m_comboEndFrame) {
 		if ((getPadTrigForSlot(static_cast<signed char>(m_animStateMisc)) & 0x100) != 0) {
 			party.commandFlagBits.commandActive = 1;
 		}
@@ -2620,7 +2532,7 @@ void CGPartyObj::onStatAttack(int chargeType)
 		}
 	}
 
-	if (m_stateFrame == *reinterpret_cast<unsigned short*>(attackEntry + 0x10)) {
+	if (m_stateFrame == attackEntry->m_comboNextFrame) {
 		if (party.commandFlagBits.commandActive != 0 && party.commandFlagBits.flag40 == 0 && party.unk6CC < 2) {
 			party.attackSel = party.unk6CC + 1;
 			changeStat(1, 0, 0);
@@ -2628,8 +2540,7 @@ void CGPartyObj::onStatAttack(int chargeType)
 		}
 	}
 
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if (m_stateFrame == *reinterpret_cast<int*>(self + 0x638)) {
+	if (m_stateFrame == m_castFrameCurrent) {
 		m_unk63CBits.m_bit80 = 1;
 	}
 
@@ -2686,8 +2597,8 @@ void CGPartyObj::putComboParticle()
  * --INFO--
  * PAL Address: 0x8011f5a4
  * PAL Size: 1028b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013E87C
+ * EN Size: 792b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2702,36 +2613,18 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		rayDir.x = sinf(m_rotTargetY) * FLOAT_80331A98;
 		rayDir.y = FLOAT_80331a78;
 		rayDir.z = cosf(m_rotTargetY) * FLOAT_80331A98;
-		bool bossTarget = false;
-		bool bossStage = bossTarget;
-		bool bossCid = bossTarget;
-		if ((Game.m_gameWork.m_menuStageMode != 0) &&
-		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
-			bossStage = true;
-		}
-		if (bossStage && ((__cntlzw(0x6D - (static_cast<unsigned short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0)) {
-			bossCid = true;
-		}
-		if (bossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {
-			bossTarget = true;
-		}
+
 		float radius;
-		if (bossTarget) {
+		if (isGhostPartyTargetMode(this)) {
 			radius = FLOAT_80331AB0;
 		} else {
 			radius = FLOAT_80331A88;
 		}
 
-		CVector startOffset(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-		const CVector& worldPos = CVector(m_worldPosition);
-		CVector startPos;
-		PSVECAdd((Vec*)&worldPos, reinterpret_cast<Vec*>(&startOffset), reinterpret_cast<Vec*>(&startPos));
+		CVector startPos = CVector(m_worldPosition) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
 
-		Vec startPosCopy;
-		Vec* copyPtr = &startPosCopy;
-		startPosCopy.x = startPos.x;
-		startPosCopy.y = startPos.y;
-		startPosCopy.z = startPos.z;
+		CVector startPosCopy(startPos);
+		Vec* copyPtr = startPosCopy;
 
 		CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		hitCylinder.m_bottom.x = copyPtr->x;
@@ -2743,15 +2636,9 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		if (MapMng.CheckHitCylinderNear(&hitCylinder, &rayDir, 0x30) != 0) {
 			getMapHitObject()->CalcHitPosition(&m_comboCenter);
 		} else {
-			CVector startOffset2(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-			const CVector& worldPos2 = CVector(m_worldPosition);
-			CVector startPos2;
-			PSVECAdd((Vec*)&worldPos2, reinterpret_cast<Vec*>(&startOffset2), reinterpret_cast<Vec*>(&startPos2));
-			Vec startPosVec;
-			startPosVec.x = startPos2.x;
-			startPosVec.y = startPos2.y;
-			startPosVec.z = startPos2.z;
-			PSVECAdd(&startPosVec, &rayDir, &m_comboCenter);
+			CVector startPos2 = CVector(m_worldPosition) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
+			CVector startPosVec(startPos2);
+			PSVECAdd(startPosVec, &rayDir, &m_comboCenter);
 		}
 		const CVector& down = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
@@ -2760,22 +2647,20 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		floorCylinder.m_radius = FLOAT_80331a78;
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, (Vec*)&down, 0x30) != 0) {
 			getMapHitObject()->CalcHitPosition(&m_comboCenter);
-			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 			Vec faceNormal;
-			caravanWork->m_targetCursorPosA = m_comboCenter;
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosA = m_comboCenter;
 			getMapHitObject()->GetHitFaceNormal(&faceNormal);
-			caravanWork->m_targetCursorPosB = faceNormal;
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosB = faceNormal;
 		}
 		m_comboTarget = m_comboCenter;
 	}
 
 	endPSlotBit(0x10);
-	CFlat.ResetParticleWork(((targetSide != 0) ? 4 : 0) +
-	                                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) +
-	                                     0x47 | 0x100,
-	                                 m_particleSlots[4]);
+	int particleId = ((targetSide != 0) ? 4 : 0) +
+	                 reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId + 0x47;
+	CFlat.ResetParticleWork(particleId | 0x100, m_particleSlots[4]);
 	CFlat.SetParticleWorkPos(m_comboCenter, FLOAT_80331a78);
-	CFlat.SetParticleWorkParam(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4), 0);
+	CFlat.SetParticleWorkParam(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId, 0);
 	CFlat.PutParticleWork();
 }
 
@@ -2798,17 +2683,16 @@ void CGPartyObj::endTargetParticle()
  * --INFO--
  * PAL Address: 0x8011F574
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013EBC0
+ * EN Size: 96b
  * JP Address: TODO
  * JP Size: TODO
  */
 int CGPartyObj::isDispTarget()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	unsigned char result = 0;
 	if ((m_lastStateId == 2 || m_lastStateId == 6) &&
-	    (*reinterpret_cast<int*>(self + 0x668) != 0)) {
+	    (m_comboState != 0)) {
 		result = 1;
 	}
 
@@ -2819,32 +2703,17 @@ int CGPartyObj::isDispTarget()
  * --INFO--
  * PAL Address: 0x8011F520
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013EC20
+ * EN Size: 100b
  * JP Address: TODO
  * JP Size: TODO
  */
 int CGPartyObj::isRideTarget()
 {
-	PartyObjOverlay& party = PartyData(this);
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	bool hasTarget;
 	unsigned char result = 0;
-	hasTarget = result;
-
-	if (m_lastStateId == 2 || m_lastStateId == 6) {
-		if (*reinterpret_cast<int*>(self + 0x668) != 0) {
-			hasTarget = true;
-		}
+	if (isDispTarget() && m_partyData.flags.flag40) {
+		result = 1;
 	}
-
-	if (hasTarget) {
-		unsigned char flags = party.partyFlags;
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31) != 0) {
-			result = 1;
-		}
-	}
-
 	return result;
 }
 
@@ -2852,18 +2721,17 @@ int CGPartyObj::isRideTarget()
  * --INFO--
  * PAL Address:	8011ead4
  * PAL Size:	2636b
- * EN Address:	TODO
- * EN Size:	TODO
+ * EN Address:	0x8013EC84
+ * EN Size:	2464b
  * JP Address:	TODO
  * JP Size:	TODO
  */
 void CGPartyObj::checkTargetParticle()
 {
 	PartyObjOverlay& party = PartyData(this);
-	unsigned char flags = party.partyFlags;
 
-	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(flags) << 27) & 0xC0000000) >> 31) != 0) {
-		putTargetParticle(static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31, 0);
+	if (party.flags.flag10) {
+		putTargetParticle(party.flags.flag40, 0);
 		party.flags.flag10 = 0;
 	}
 
@@ -2898,15 +2766,8 @@ void CGPartyObj::checkTargetParticle()
 		CGPartyObj* leader = Game.m_partyObjArr[0];
 		if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
 		    leader->m_comboState != 0) {
-			CVector leaderCenter(leader->m_comboCenter);
-			const CVector& selfCenter = CVector(m_comboCenter);
-			CVector subResult;
-			PSVECSubtract((Vec*)&selfCenter, reinterpret_cast<Vec*>(&leaderCenter), reinterpret_cast<Vec*>(&subResult));
-			Vec toLeaderTarget;
-			toLeaderTarget.x = subResult.x;
-			toLeaderTarget.y = subResult.y;
-			toLeaderTarget.z = subResult.z;
-			if (PSVECMag(&toLeaderTarget) > FLOAT_80331A98) {
+			CVector toLeaderTarget = CVector(m_comboCenter) - CVector(leader->m_comboCenter);
+			if (PSVECMag(toLeaderTarget) > FLOAT_80331A98) {
 				input.x = toLeaderTarget.x;
 				input.z = toLeaderTarget.z;
 			}
@@ -2967,65 +2828,31 @@ void CGPartyObj::checkTargetParticle()
 			maxRange = zero + (base + static_cast<float>(vFlag));
 		}
 
-		CVector worldPosV(m_worldPosition);
-		const CVector& targetCenterV = CVector(*targetPos);
-		CVector fromCenterResult;
-		PSVECSubtract((Vec*)&targetCenterV, reinterpret_cast<Vec*>(&worldPosV), reinterpret_cast<Vec*>(&fromCenterResult));
-		Vec fromCenter;
-		fromCenter.x = fromCenterResult.x;
-		fromCenter.y = fromCenterResult.y;
-		fromCenter.z = fromCenterResult.z;
+		CVector fromCenter = CVector(*targetPos) - CVector(m_worldPosition);
 		if (dist > maxRange) {
 			Vec scaled;
-			PSVECScale(&fromCenter, &scaled, maxRange / dist);
+			PSVECScale(fromCenter, &scaled, maxRange / dist);
 			PSVECAdd(&m_worldPosition, &scaled, targetPos);
 		}
 
-		CVector targetCenterV2(*targetPos);
-		const CVector& centerTargetV = CVector(*centerPos);
-		CVector moveResult;
-		PSVECSubtract(reinterpret_cast<Vec*>(&targetCenterV2), (Vec*)&centerTargetV, reinterpret_cast<Vec*>(&moveResult));
-		Vec move;
-		move.x = moveResult.x;
-		move.y = moveResult.y;
-		move.z = moveResult.z;
+		CVector move = CVector(*targetPos) - CVector(*centerPos);
 		int iter = 4;
 		do {
-			bool loopBossStage = false;
-			bool loopBossCid = false;
-			bool loopBossTarget = false;
-			if ((Game.m_gameWork.m_menuStageMode != 0) &&
-			    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
-				loopBossStage = true;
-			}
-			if (loopBossStage && ((__cntlzw(0x6D - (static_cast<unsigned short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0)) {
-				loopBossCid = true;
-			}
-			if (loopBossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {
-				loopBossTarget = true;
-			}
 			float radius;
-			if (loopBossTarget) {
+			if (isGhostPartyTargetMode(this)) {
 				radius = FLOAT_80331AB0;
 			} else {
 				radius = FLOAT_80331A88;
 			}
 
-			CVector up(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-			const CVector& centerForBottom = CVector(*centerPos);
-			CVector bottomResult;
-			PSVECAdd((Vec*)&centerForBottom, reinterpret_cast<Vec*>(&up), reinterpret_cast<Vec*>(&bottomResult));
-			Vec bottom;
-			bottom.x = bottomResult.x;
-			bottom.y = bottomResult.y;
-			bottom.z = bottomResult.z;
+			CVector bottom = CVector(*centerPos) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
 
 			CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 			hitCylinder.m_bottom = bottom;
 			hitCylinder.m_top = move;
 			hitCylinder.m_radius = radius;
 
-			if (MapMng.CheckHitCylinderNear(&hitCylinder, &move, 0x30) == 0) {
+			if (MapMng.CheckHitCylinderNear(&hitCylinder, move, 0x30) == 0) {
 				break;
 			}
 			if (iter == 1) {
@@ -3033,20 +2860,13 @@ void CGPartyObj::checkTargetParticle()
 				move.y = FLOAT_80331a78;
 				move.z = FLOAT_80331a78;
 			} else {
-				getMapHitObject()->CalcHitSlide(&move, FLOAT_80331A98);
+				getMapHitObject()->CalcHitSlide(move, FLOAT_80331A98);
 			}
 			iter--;
 		} while (iter > 0);
 
-		CVector upFinal(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-		const CVector& centerFinal = CVector(*centerPos);
-		CVector addUpResult;
-		PSVECAdd((Vec*)&centerFinal, reinterpret_cast<Vec*>(&upFinal), reinterpret_cast<Vec*>(&addUpResult));
-		Vec centerPlusUp;
-		centerPlusUp.x = addUpResult.x;
-		centerPlusUp.y = addUpResult.y;
-		centerPlusUp.z = addUpResult.z;
-		PSVECAdd(&centerPlusUp, &move, targetPos);
+		CVector centerPlusUp = CVector(*centerPos) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
+		PSVECAdd(centerPlusUp, move, targetPos);
 
 		const CVector& down = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
@@ -3073,33 +2893,24 @@ void CGPartyObj::checkTargetParticle()
 		party.flags.flag20 = 0;
 	}
 
-	CVector worldPosFinal(m_worldPosition);
-	const CVector& comboCenterFinal = CVector(m_comboCenter);
-	CVector deltaResult;
-	PSVECSubtract((Vec*)&comboCenterFinal, reinterpret_cast<Vec*>(&worldPosFinal), reinterpret_cast<Vec*>(&deltaResult));
-	Vec delta;
-	delta.x = deltaResult.x;
-	delta.y = deltaResult.y;
-	delta.z = deltaResult.z;
-	if (FLOAT_80331a78 < PSVECMag(&delta)) {
+	CVector delta = CVector(m_comboCenter) - CVector(m_worldPosition);
+	if (FLOAT_80331a78 < PSVECMag(delta)) {
 		m_rotTargetY = atan2(delta.x, delta.z);
 	}
 }
 
-#pragma push
-#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8011E870
  * PAL Size: 612b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013F624
+ * EN Size: 448b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGPartyObj::moveCenterTargetParticle()
 {
-	int step = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x530);
+	int step = m_subFrame;
 
 	if (step >= 5) {
 		return;
@@ -3107,36 +2918,13 @@ void CGPartyObj::moveCenterTargetParticle()
 
 	float wave = static_cast<float>(sin(FLOAT_80331ac8 * ((float)(step + 1) / FLOAT_80331ac4)));
 
-	CVector centerPos(m_comboTarget);
-	const CVector& targetPos = CVector(m_comboCenter);
-	CVector subResult;
-	PSVECSubtract((Vec*)&targetPos, reinterpret_cast<Vec*>(&centerPos), reinterpret_cast<Vec*>(&subResult));
-	Vec toTarget;
-	toTarget.x = subResult.x;
-	toTarget.y = subResult.y;
-	toTarget.z = subResult.z;
-
-	CVector scaleResult;
-	PSVECScale(&toTarget, reinterpret_cast<Vec*>(&scaleResult), wave);
-	Vec movement;
-	movement.x = scaleResult.x;
-	movement.y = scaleResult.y;
-	movement.z = scaleResult.z;
-
-	const CVector& centerPos2 = CVector(m_comboTarget);
-	CVector addResult;
-	PSVECAdd((Vec*)&centerPos2, &movement, reinterpret_cast<Vec*>(&addResult));
-	Vec hitPos;
-	hitPos.x = addResult.x;
-	hitPos.y = addResult.y;
-	hitPos.z = addResult.z;
+	CVector hitPos = CVector(m_comboTarget) + (CVector(m_comboCenter) - CVector(m_comboTarget)) * wave;
 
 	const CVector& moveVec = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 	CVector yOffset(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
 	Vec hitNormal;
 
-	CVector bottomResult;
-	PSVECAdd(&hitPos, reinterpret_cast<Vec*>(&yOffset), reinterpret_cast<Vec*>(&bottomResult));
+	CVector bottomResult = hitPos + yOffset;
 
 	CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 	hitCylinder.m_bottom.x = bottomResult.x;
@@ -3146,7 +2934,7 @@ void CGPartyObj::moveCenterTargetParticle()
 	hitCylinder.m_radius = FLOAT_80331a78;
 
 	if (MapMng.CheckHitCylinderNear(&hitCylinder, (Vec*)&moveVec, 0x30) != 0) {
-		getMapHitObject()->CalcHitPosition(&hitPos);
+		getMapHitObject()->CalcHitPosition(hitPos);
 		getMapHitObject()->GetHitFaceNormal(&hitNormal);
 
 		CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
@@ -3156,14 +2944,13 @@ void CGPartyObj::moveCenterTargetParticle()
 	CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 	work->m_targetCursorPosA = hitPos;
 }
-#pragma pop
 
 /*
  * --INFO--
  * PAL Address: 0x8011e32c
  * PAL Size: 1348b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013F7E4
+ * EN Size: 1200b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3209,7 +2996,7 @@ void CGPartyObj::onStatMagic()
 			endPSlotBit(0x10);
 			endPSlotBit(0x100);
 			if ((*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x524) & 2) != 0) {
-				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetNumCombi(PartyData(this).unk6BC, 1);
+				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->DelCmdListAndItem(PartyData(this).unk6BC, 1);
 			}
 		}
 		if (m_subFrame == 8 && m_comboLinkCount != 0) {
@@ -3230,23 +3017,9 @@ void CGPartyObj::onStatMagic()
 		return;
 	}
 
-	const int magicReady = static_cast<int>(static_cast<unsigned int>(__cntlzw(0x103 - m_itemId)) >> 5);
-	bool ghostTargetActive = false;
-	bool canTargetMagic = false;
-	bool menuStageGhost = false;
-	if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) {
-		menuStageGhost = true;
-	}
-	if (menuStageGhost) {
-		if ((__cntlzw(0x6D - (static_cast<unsigned short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0) {
-			canTargetMagic = true;
-		}
-	}
-	if (canTargetMagic && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
-		ghostTargetActive = true;
-	}
+	const bool magicReady = m_itemId == 0x103;
 
-	if (!ghostTargetActive) {
+	if (!isGhostPartyTargetMode(this)) {
 		unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
 		if ((held & 0x100) == 0) {
 			if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {
@@ -3271,7 +3044,7 @@ void CGPartyObj::onStatMagic()
 	}
 
 	if (m_subState == 1 && m_comboState != 0 &&
-	    sGhostMogMenuWork.flags.flag40 != 0) {
+	    CGPartyObj::m_ghostWork.flagBits.flag40 != 0) {
 		if (m_comboFrame == 1) {
 			putParticleTrace(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) + 0x4FU | 0x100,
 			    m_particleSlots[8], this, kMonObjOne, 0);
@@ -3404,8 +3177,8 @@ void CGPartyObj::commandFinished()
  * --INFO--
  * PAL Address: 0x8011da84
  * PAL Size: 1620b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013FFA4
+ * EN Size: 980b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3425,7 +3198,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 			PartyData(this).carryObject = object;
 			if (PartyData(this).carryObject != nullptr) {
 				if (CFlatItemCarryMode() == 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0x0B, 0);
 						SetAnimSlot(0x0C, 1);
 					} else {
@@ -3437,7 +3210,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 					SetAnimSlot(0x0C, 1);
 				}
 			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+				if (m_motionMode == 1) {
 					SetAnimSlot(0, 0);
 					SetAnimSlot(1, 1);
 				} else {
@@ -3445,7 +3218,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 					SetAnimSlot(0x30, 1);
 				}
 			} else {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+				if (m_motionMode == 1) {
 					SetAnimSlot(0x25, 0);
 					SetAnimSlot(0x24, 1);
 				} else {
@@ -3469,7 +3242,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 			PartyData(this).carryObject = (CGObject*)0;
 				if (PartyData(this).carryObject != nullptr) {
 					if (CFlatItemCarryMode() == 0) {
-						if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						if (m_motionMode == 1) {
 							SetAnimSlot(0x0B, 0);
 							SetAnimSlot(0x0C, 1);
 						} else {
@@ -3481,7 +3254,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 						SetAnimSlot(0x0C, 1);
 					}
 				} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0, 0);
 						SetAnimSlot(1, 1);
 					} else {
@@ -3489,7 +3262,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 						SetAnimSlot(0x30, 1);
 					}
 				} else {
-					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					if (m_motionMode == 1) {
 						SetAnimSlot(0x25, 0);
 						SetAnimSlot(0x24, 1);
 					} else {
@@ -3572,7 +3345,7 @@ void CGPartyObj::statPut()
 			seNo = 0x24;
 			break;
 		case 0x1B:
-			anim = (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) ? 0x28 : 9;
+			anim = (m_motionMode == 1) ? 0x28 : 9;
 			seNo = 0x24;
 			break;
 		}
@@ -3584,7 +3357,7 @@ void CGPartyObj::statPut()
 		PartyObjOverlay& party = PartyData(this);
 		if (party.carryObject != 0) {
 			if (static_cast<int>(CFlatCenterState()) == 0) {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+				if (m_motionMode == 1) {
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
 				} else {
@@ -3596,14 +3369,14 @@ void CGPartyObj::statPut()
 				SetAnimSlot(0x0C, 1);
 			}
 		} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+			if (m_motionMode == 1) {
 				SetAnimSlot(0, 0);
 				SetAnimSlot(1, 1);
 			} else {
 				SetAnimSlot(0x25, 0);
 				SetAnimSlot(0x30, 1);
 			}
-		} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+		} else if (m_motionMode == 1) {
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x24, 1);
 		} else {
@@ -4181,36 +3954,10 @@ inline void CGPartyObj::statJump()
 inline void CGPartyObj::statWeaponChange()
 {
 	PartyObjOverlay& party = PartyData(this);
-	changeWeapon(party.weaponItem, party.pendingWeaponItem, 0);
+	changeWeapon(party.weaponIndex, party.weaponItemId, 0);
 
 	if (m_subFrame > 1) {
 		changeStat(0, 0, 0);
-	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void CGPartyObj::changeWeapon(int weaponRef, int weaponItem, int forceIdle)
-{
-	PartyObjOverlay& party = PartyData(this);
-	party.weaponItem = weaponRef;
-	party.pendingWeaponItem = weaponItem;
-
-	if (weaponItem <= 0) {
-		LoadWeapon(-1, 0);
-	} else {
-		LoadWeapon(weaponItem & 0xFFF, weaponItem >> 12);
-	}
-
-	if (m_scriptHandle != nullptr) {
-		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
-	}
-
-	if (forceIdle != 0 || m_lastStateId != 0) {
-		setIdleMotion();
 	}
 }
 
@@ -4346,8 +4093,8 @@ void CGPartyObj::InitFinished()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(
-	    PartyData(this).weaponItem,
-	    PartyData(this).pendingWeaponItem);
+	    PartyData(this).weaponIndex,
+	    PartyData(this).weaponItemId);
 	enableDamageCol(1);
 	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD0) = 0;
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
@@ -4359,9 +4106,8 @@ void CGPartyObj::InitFinished()
 		*reinterpret_cast<float*>(self + 0x144) = FLOAT_80331AB0;
 		*reinterpret_cast<float*>(self + 0x134) = FLOAT_80331AB0;
 		*reinterpret_cast<float*>(self + 0x13C) = FLOAT_80331A98;
-		*reinterpret_cast<float*>(self + 0x4E8) = FLOAT_80331AB4;
-		unsigned int leadingZeros = __cntlzw(*reinterpret_cast<unsigned int*>(self + 0x6F0));
-		sGhostPartyWork.flagBits.flag80 = static_cast<signed char>(leadingZeros >> 5);
+		m_turnFactor = FLOAT_80331AB4;
+		CGPartyObj::m_ghostWork.flagBits.flag80 = PartyData(this).carryObject == 0;
 	}
 }
 
@@ -4443,8 +4189,8 @@ inline void CGPartyObj::checkAndSetWeapon()
 	int weaponItem;
 	int weaponRef;
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
-	PartyData(this).weaponRef = weaponRef;
-	PartyData(this).weaponItem = weaponItem;
+	PartyData(this).pendingWeaponItemId = weaponRef;
+	PartyData(this).weaponIndex = weaponItem;
 	if (weaponItem <= 0) {
 		LoadWeapon(-1, 0);
 	} else {
@@ -4476,16 +4222,16 @@ void CGPartyObj::changeMotionMode(int mode)
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	PartyObjOverlay& party = PartyData(this);
 
-	if (*reinterpret_cast<short*>(&m_lastMapIdHit) == mode) {
+	if (m_motionMode == mode) {
 		return;
 	}
 
-	*reinterpret_cast<short*>(&m_lastMapIdHit) = static_cast<short>(mode);
+	m_motionMode = static_cast<short>(mode);
 	changeStat(0, 0, 0);
 
 	if (party.carryObject != 0) {
 		if (CFlatItemCarryMode() == 0) {
-			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+			if (m_motionMode == 1) {
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
 			} else {
@@ -4498,14 +4244,14 @@ void CGPartyObj::changeMotionMode(int mode)
 		}
 	} else {
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+			if (m_motionMode == 1) {
 				SetAnimSlot(0, 0);
 				SetAnimSlot(1, 1);
 			} else {
 				SetAnimSlot(0x25, 0);
 				SetAnimSlot(0x30, 1);
 			}
-		} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+		} else if (m_motionMode == 1) {
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x24, 1);
 		} else {
@@ -4527,7 +4273,7 @@ void CGPartyObj::changeMotionMode(int mode)
 
 	if (party.carryObject != 0) {
 		if (CFlatItemCarryMode() == 0) {
-			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+			if (m_motionMode == 1) {
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
 			} else {
@@ -4540,14 +4286,14 @@ void CGPartyObj::changeMotionMode(int mode)
 		}
 	} else {
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+			if (m_motionMode == 1) {
 				SetAnimSlot(0, 0);
 				SetAnimSlot(1, 1);
 			} else {
 				SetAnimSlot(0x25, 0);
 				SetAnimSlot(0x30, 1);
 			}
-		} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+		} else if (m_motionMode == 1) {
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x24, 1);
 		} else {
@@ -4588,7 +4334,7 @@ void CGPartyObj::setIdleMotion()
 {
 	if (PartyData(this).carryObject != 0) {
 		if (CFlatItemCarryMode() == 0) {
-			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+			if (m_motionMode == 1) {
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
 			} else {
@@ -4601,14 +4347,14 @@ void CGPartyObj::setIdleMotion()
 		}
 	} else {
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+			if (m_motionMode == 1) {
 				SetAnimSlot(0, 0);
 				SetAnimSlot(1, 1);
 			} else {
 				SetAnimSlot(0x25, 0);
 				SetAnimSlot(0x30, 1);
 			}
-		} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+		} else if (m_motionMode == 1) {
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x24, 1);
 		} else {
@@ -4642,7 +4388,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 
 	if (party.carryObject != 0) {
 		if (static_cast<int>(CFlatCenterState()) == 0) {
-			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+			if (m_motionMode == 1) {
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
 			} else {
@@ -4654,14 +4400,14 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 			SetAnimSlot(0x0C, 1);
 		}
 	} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-		if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+		if (m_motionMode == 1) {
 			SetAnimSlot(0, 0);
 			SetAnimSlot(1, 1);
 		} else {
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x30, 1);
 		}
-	} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+	} else if (m_motionMode == 1) {
 		SetAnimSlot(0x25, 0);
 		SetAnimSlot(0x24, 1);
 	} else {
@@ -4855,9 +4601,8 @@ inline void calcWeightMax()
  */
 void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 {
-	unsigned char* countBase = CGPartyObj::m_ghostWork;
-	unsigned char* ghostWork = CGPartyObj::m_ghostWork;
-	int& activeTrailCount = *reinterpret_cast<int*>(countBase + 0x48);
+	GhostPartyWork& ghostWork = m_ghostWork;
+	int& activeTrailCount = ghostWork.activeTrailCount;
 
 	if (activeTrailCount == 0) {
 	reset:
@@ -4874,9 +4619,8 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 
 	CVector unused;
 	int capturedCurrent = 0;
-	unsigned char* loopBase = CGPartyObj::m_ghostWork;
-	int& loopTrailIndex = *reinterpret_cast<int*>(loopBase + 0x4C);
-	unsigned char* leaderPtr = loopBase;
+	GhostPartyWork& loopWork = m_ghostWork;
+	int& loopTrailIndex = loopWork.trailIndex;
 
 	outDist = 0.0f;
 	float flatLen = 0.0f;
@@ -4886,10 +4630,10 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 			if (i == loopTrailIndex) {
 				nextPos = &m_worldPosition;
 			} else {
-				nextPos = reinterpret_cast<Vec*>(CGPartyObj::m_ghostWork + (i - 1) * 0xC + 0x50);
+				nextPos = &m_ghostWork.trailPositions[i - 1];
 			}
 			Vec delta;
-			PSVECSubtract(reinterpret_cast<Vec*>(leaderPtr + 0x50), nextPos, &delta);
+			PSVECSubtract(&loopWork.trailPositions[i], nextPos, &delta);
 			outDist += PSVECMag(&delta);
 
 			delta.y = FLOAT_80331a78;
@@ -4906,7 +4650,6 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 				}
 			}
 		}
-		leaderPtr += 0xC;
 	}
 
 	outDist = (outDist < flatLen) ? outDist : flatLen;
@@ -4929,24 +4672,15 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 void CGPartyObj::gpmCol()
 {
 	CGPartyObj* leader = Game.m_partyObjArr[0];
-	unsigned char* ghostWork = CGPartyObj::m_ghostWork;
-	int& activeTrailCount = *reinterpret_cast<int*>(ghostWork + 0x48);
-#define trailIndex (*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x4C))
-
-	unsigned char* trailBase = ghostWork + 0x50;
+	GhostPartyWork& ghostWork = m_ghostWork;
+	int& activeTrailCount = ghostWork.activeTrailCount;
+	Vec* trailBase = ghostWork.trailPositions;
 	int i = 0;
 	do {
 		Vec* pos = (i == 0) ? &m_worldPosition
-		                    : reinterpret_cast<Vec*>(trailBase + (i - 1) * 0xC);
+		                    : &trailBase[i - 1];
 
-		Vec diffVec;
-		CVector posV(*pos);
-		const CVector& leaderV = CVector(leader->m_worldPosition);
-		CVector diff;
-		PSVECSubtract((Vec*)&leaderV, reinterpret_cast<Vec*>(&posV), reinterpret_cast<Vec*>(&diff));
-		diffVec.x = diff.x;
-		diffVec.y = diff.y;
-		diffVec.z = diff.z;
+		CVector diffVec = CVector(leader->m_worldPosition) - CVector(*pos);
 
 		unsigned int flags = leader->m_bgHitMask & ~0x10U;
 		float halfHeight = m_capsuleHalfHeight;
@@ -4956,24 +4690,24 @@ void CGPartyObj::gpmCol()
 		cylinder.m_bottom.x = bottom.x;
 		cylinder.m_bottom.y = bottom.y;
 		cylinder.m_bottom.z = bottom.z;
-		cylinder.m_top.x = diffVec.x;
-		cylinder.m_top.y = diffVec.y;
-		cylinder.m_top.z = diffVec.z;
-		cylinder.m_axis.x = halfHeight;
+		cylinder.m_axis.x = diffVec.x;
+		cylinder.m_axis.y = diffVec.y;
+		cylinder.m_axis.z = diffVec.z;
+		cylinder.m_radius = halfHeight;
 
-		if (MapMng.CheckHitCylinderNear(&cylinder, &diffVec, flags) != 0) {
+		if (MapMng.CheckHitCylinderNear(&cylinder, diffVec, flags) != 0) {
 			int capped = i + 1;
 			if (activeTrailCount < capped) {
 				capped = activeTrailCount;
 			}
 			activeTrailCount = capped;
 		} else {
-			*reinterpret_cast<float*>(trailBase + i * 0xC) = leader->m_worldPosition.x;
-			Vec* slot = reinterpret_cast<Vec*>(trailBase + i * 0xC);
+			trailBase[i].x = leader->m_worldPosition.x;
+			Vec* slot = &trailBase[i];
 			slot->y = leader->m_worldPosition.y;
 			slot->z = leader->m_worldPosition.z;
 			int idx = i;
-			int* trailIdxPtr = reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x4C);
+			int* trailIdxPtr = &m_ghostWork.trailIndex;
 			activeTrailCount = i + 1;
 			if (*trailIdxPtr < idx) {
 				idx = *trailIdxPtr;
@@ -4983,12 +4717,9 @@ void CGPartyObj::gpmCol()
 		}
 		i++;
 	} while (static_cast<unsigned int>(i) < 5);
-#define gpmColClamp ((activeTrailCount - 1) & ~((activeTrailCount - 1) >> 31))
-	if (trailIndex >= gpmColClamp) {
-		trailIndex = gpmColClamp;
-	}
-#undef gpmColClamp
-#undef trailIndex
+	int lastTrailIndex = activeTrailCount - 1;
+	lastTrailIndex = lastTrailIndex < 0 ? 0 : lastTrailIndex;
+	m_ghostWork.trailIndex = m_ghostWork.trailIndex < lastTrailIndex ? m_ghostWork.trailIndex : lastTrailIndex;
 }
 #pragma pop
 
@@ -4996,8 +4727,8 @@ void CGPartyObj::gpmCol()
  * --INFO--
  * PAL Address: 0x8011b268
  * PAL Size: 1320b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80142FDC
+ * EN Size: 1196b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -5031,7 +4762,7 @@ void CGPartyObj::ghostPartyMog()
 		break;
 	}
 
-	float ramp = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
+	float ramp = static_cast<float>(Chara.MogFur().m_alphaScore) / kMonObjPercentMax;
 	float scale;
 	switch (stageMode) {
 	default:
@@ -5046,27 +4777,25 @@ void CGPartyObj::ghostPartyMog()
 	}
 	unsigned int distFar = static_cast<unsigned int>(static_cast<int>(FLOAT_80331A5C * scale));
 
-	unsigned char* flags = &CGPartyObj::m_ghostWork[0];
-#define bossState (*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x1C))
 
 	if (static_cast<double>(m_partyDistance[0]) > DOUBLE_80331A90) {
-		bossState = 1;
+		CGPartyObj::m_ghostWork.state = 1;
 	} else {
 		int exceeded;
-		if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x24)) >= CharaGhostValue(0x2048) ||
-		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x28)) >= CharaGhostValue(0x204C) ||
-		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x2C)) >= CharaGhostValue(0x2050)) {
+		if (static_cast<int>(CGPartyObj::m_ghostWork.counters[0]) >= Chara.MogFur().m_radarLevel[0] ||
+		    static_cast<int>(CGPartyObj::m_ghostWork.counters[1]) >= Chara.MogFur().m_radarLevel[1] ||
+		    static_cast<int>(CGPartyObj::m_ghostWork.counters[2]) >= Chara.MogFur().m_radarLevel[2]) {
 			exceeded = 1;
 		} else {
 			exceeded = 0;
 		}
 
-		if (exceeded && sGhostPartyWork.flagBits.flag10 == 0) {
-			sGhostPartyWork.flagBits.flag10 = 1;
-			bossState = 2;
+		if (exceeded && CGPartyObj::m_ghostWork.flagBits.flag10 == 0) {
+			CGPartyObj::m_ghostWork.flagBits.flag10 = 1;
+			CGPartyObj::m_ghostWork.state = 2;
 			putParticle(299, 0, this, kMonObjOne, 0);
-		} else if (sGhostPartyWork.flagBits.flag08 == 0 &&
-		           static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) >= 10) {
+		} else if (CGPartyObj::m_ghostWork.flagBits.flag08 == 0 &&
+		           static_cast<int>(CGPartyObj::m_ghostWork.pressure) >= 10) {
 			int moodMode;
 			switch (Game.m_gameWork.m_bossArtifactStageIndex) {
 			default:
@@ -5089,18 +4818,25 @@ void CGPartyObj::ghostPartyMog()
 				moodMode = 2;
 				break;
 			}
-			if (moodMode == 1) {
-				if (CharaGhostValue(0x2054) < 0x32) {
-					bossState = 5;
-				} else if (CharaGhostValue(0x2054) >= 0x5F) {
-					bossState = 4;
+			switch (moodMode) {
+			case 0:
+				break;
+			case 1:
+				if (Chara.MogFur().m_alphaScore < 0x32) {
+					CGPartyObj::m_ghostWork.state = 5;
+				} else if (Chara.MogFur().m_alphaScore >= 0x5F) {
+					CGPartyObj::m_ghostWork.state = 4;
 				}
-			} else if (moodMode > 1 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
-				bossState = 6;
+				break;
+			case 2:
+				if (Chara.MogFur().m_alphaScore < 0x32) {
+					CGPartyObj::m_ghostWork.state = 6;
+				}
+				break;
 			}
-			sGhostPartyWork.flagBits.flag08 = 1;
+			CGPartyObj::m_ghostWork.flagBits.flag08 = 1;
 		} else {
-			if (sGhostPartyWork.flagBits.flag04 == 0) {
+			if (CGPartyObj::m_ghostWork.flagBits.flag04 == 0) {
 				int innerMode;
 				switch (Game.m_gameWork.m_bossArtifactStageIndex) {
 				default:
@@ -5135,35 +4871,33 @@ void CGPartyObj::ghostPartyMog()
 					innerScale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
 					break;
 				}
-				if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38)) >= static_cast<int>(FLOAT_80331A5C * innerScale)) {
-					bossState = 3;
-					sGhostPartyWork.flagBits.flag04 = 1;
+				if (static_cast<int>(CGPartyObj::m_ghostWork.pressure) >= static_cast<int>(FLOAT_80331A5C * innerScale)) {
+					CGPartyObj::m_ghostWork.state = 3;
+					CGPartyObj::m_ghostWork.flagBits.flag04 = 1;
 					goto messageMenu;
 				}
 			}
-			if (sGhostPartyWork.flagBits.flag04 == 0 && static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x3C)) > 0x96) {
-				bossState = 8;
+			if (CGPartyObj::m_ghostWork.flagBits.flag04 == 0 && static_cast<int>(CGPartyObj::m_ghostWork.settleTimer) > 0x96) {
+				CGPartyObj::m_ghostWork.state = 8;
 			} else {
-				bossState = 0;
-				*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20) = 0;
+				CGPartyObj::m_ghostWork.state = 0;
+				CGPartyObj::m_ghostWork.field20 = 0;
 			}
 		}
 	}
 
 messageMenu:
-	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(&leader->m_weaponNodeFlags)[1]) << 24) & 0xC0000000) >> 31) != 0) &&
-	    bossState != 0 &&
-	    bossState != *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20)) {
-#define mesMenu (*reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x120))
-		if (!mesMenu->IsActiveMessage()) {
-			*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x20) = bossState;
-			mesMenu->Open(Game.m_cFlatDataArr[1].Message(bossState - 1), 0x260, 0x20, 0x8E20, 0, 0x65, 0x8B);
+	if ((leader->m_weaponNodeFlagAll.m_bits1.m_shield != 0) &&
+	    CGPartyObj::m_ghostWork.state != 0 &&
+	    CGPartyObj::m_ghostWork.state != CGPartyObj::m_ghostWork.field20) {
+		if (!MenuPcs.m_battleMesMenus[5]->IsActiveMessage()) {
+			CGPartyObj::m_ghostWork.field20 = CGPartyObj::m_ghostWork.state;
+			MenuPcs.m_battleMesMenus[5]->Open(Game.m_cFlatDataArr[1].Message(CGPartyObj::m_ghostWork.state - 1), 0x260, 0x20, 0x8E20, 0, 0x65, 0x8B);
 		}
-#undef mesMenu
 	}
 
 	int auraSlot = 0;
-	int gauge = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x38);
+	int gauge = CGPartyObj::m_ghostWork.pressure;
 	if (gauge > static_cast<int>(distFar * 3) / 3) {
 		auraSlot = 0xF;
 	} else if (gauge > static_cast<int>(distFar << 1) / 3) {
@@ -5172,23 +4906,22 @@ messageMenu:
 		auraSlot = 0xD;
 	}
 
-	int prevSlot = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x8C);
+	int prevSlot = CGPartyObj::m_ghostWork.auraSlot;
 	if (prevSlot != auraSlot) {
 		endPSlotBit(0x400);
 		if (auraSlot != 0) {
 			putParticle(auraSlot | 0x200, m_particleSlots[10], this, kMonObjOne, 0);
 		}
 	}
-	*reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x8C) = auraSlot;
-#undef bossState
+	CGPartyObj::m_ghostWork.auraSlot = auraSlot;
 }
 
 /*
  * --INFO--
  * PAL Address: 0x8011a94c
  * PAL Size: 2332b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80143488
+ * EN Size: 2532b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -5200,15 +4933,15 @@ void CGPartyObj::gpmMove()
 	if (leader->m_lastStateId == 0 &&
 	    leader->m_animSlotSel == 0x0C &&
 	    PartyData(leader).carryObject == chalice) {
-		sGhostPartyWork.settleTimer++;
+		CGPartyObj::m_ghostWork.settleTimer++;
 	} else {
-		sGhostPartyWork.settleTimer = 0;
+		CGPartyObj::m_ghostWork.settleTimer = 0;
 	}
 
-	if (FLOAT_80331A70 < sGhostPartyWork.carrySpeed) {
-		moveVector(&sGhostPartyWork.carryDir, sGhostPartyWork.carrySpeed, 1);
+	if (FLOAT_80331A70 < CGPartyObj::m_ghostWork.carrySpeed) {
+		moveVector(&CGPartyObj::m_ghostWork.carryDir, CGPartyObj::m_ghostWork.carrySpeed, 1);
 	}
-	sGhostPartyWork.carrySpeed *= FLOAT_80331a74;
+	CGPartyObj::m_ghostWork.carrySpeed *= FLOAT_80331a74;
 
 	int stageMode;
 	switch (Game.m_gameWork.m_bossArtifactStageIndex) {
@@ -5233,7 +4966,7 @@ void CGPartyObj::gpmMove()
 		break;
 	}
 
-	float frameScale = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
+	float frameScale = static_cast<float>(Chara.MogFur().m_alphaScore) / kMonObjPercentMax;
 	float pressureScale;
 	switch (stageMode) {
 	default:
@@ -5248,69 +4981,67 @@ void CGPartyObj::gpmMove()
 	}
 
 	int pressureLimit = static_cast<int>(FLOAT_80331A5C * pressureScale);
-	if (FLOAT_80331A58 < sGhostPartyWork.carrySpeed) {
+	if (FLOAT_80331A58 < CGPartyObj::m_ghostWork.carrySpeed) {
 		int delta = -2;
 		if (PartyData(this).carryObject != nullptr) {
 			delta = 2;
 		}
-		sGhostPartyWork.pressure += delta;
+		CGPartyObj::m_ghostWork.pressure += delta;
 	} else if (PartyData(this).carryObject != nullptr) {
-		sGhostPartyWork.pressure -= 3;
+		CGPartyObj::m_ghostWork.pressure -= 3;
 	} else {
-		sGhostPartyWork.pressure -= 4;
+		CGPartyObj::m_ghostWork.pressure -= 4;
 	}
 
-	int clampedPressure = sGhostPartyWork.pressure;
+	int clampedPressure = CGPartyObj::m_ghostWork.pressure;
 	if (clampedPressure < 0) {
 		clampedPressure = 0;
 	} else if (pressureLimit + 100 < clampedPressure) {
 		clampedPressure = pressureLimit + 100;
 	}
-	sGhostPartyWork.pressure = clampedPressure;
+	CGPartyObj::m_ghostWork.pressure = clampedPressure;
 
-	if (sGhostPartyWork.pressure < pressureLimit / 3) {
-		sGhostPartyWork.flagBits.flag04 = 0;
+	if (CGPartyObj::m_ghostWork.pressure < pressureLimit / 3) {
+		CGPartyObj::m_ghostWork.flagBits.flag04 = 0;
 	}
-	{
-		int trailDec = sGhostPartyWork.activeTrailCount - 1;
-		sGhostPartyWork.activeTrailCount = trailDec & ~(trailDec >> 31);
-	}
+	int moodTimer = CGPartyObj::m_ghostWork.moodTimer - 1;
+	CGPartyObj::m_ghostWork.moodTimer = moodTimer < 0 ? 0 : moodTimer;
 
 	Vec pathVec;
 	float pathDist;
 	gpmCalcDist(&pathVec, pathDist);
 
-	Vec toLeader;
-	toLeader = m_targetDelta;
-	toLeader.y = 0.0f;
-	float dist = PSVECMag(&toLeader);
-	float nearDist = m_nearColRadius + leader->m_nearColRadius;
-	float clampedDist = (dist > *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x5BC)) ? *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x5BC) : dist;
+	Vec toChalice;
+	toChalice = m_targetDelta;
+	toChalice.y = 0.0f;
+	float followDist = PSVECMag(&toChalice);
+	float chaliceDist = m_targetDist;
+	followDist = followDist < chaliceDist ? followDist : chaliceDist;
 
 	if (m_lastStateId == 0 &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
+	    (m_unk63CBits.m_bit80 != 0)) {
 		int moveKind = 0;
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) != 0) {
+		if (CGPartyObj::m_ghostWork.flagBits.flag80 != 0) {
 			moveKind = 0;
 			if (PartyData(this).carryObject != nullptr) {
-				sGhostPartyWork.carrySpeed = 0.0f;
+				CGPartyObj::m_ghostWork.carrySpeed = 0.0f;
 				carry(1, static_cast<CGObject*>(0), 0);
 				return;
 			}
 
-			float limit = (sGhostPartyWork.activeTrailCount != 0) ? FLOAT_80331A7C : FLOAT_80331A80;
+			float limit = (CGPartyObj::m_ghostWork.moodTimer != 0) ? FLOAT_80331A7C : FLOAT_80331A80;
 			if (pathDist < Game.unkFloat_0xca10 * limit) {
 				if ((leader->m_lastStateId != 2 && leader->m_lastStateId != 6) ||
 				    leader->m_subState != 1 ||
-				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) == 0 ||
-				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x660) != 0) {
+				    leader->m_comboState == 0 ||
+				    leader->m_comboFrame != 0) {
 					return;
 				}
 
 				int anyReady;
-				if (sGhostPartyWork.thresholdA >= CharaGhostValue(0x2048) ||
-				    sGhostPartyWork.thresholdB >= CharaGhostValue(0x204C) ||
-				    sGhostPartyWork.thresholdC >= CharaGhostValue(0x2050)) {
+				if (CGPartyObj::m_ghostWork.counters[0] >= Chara.MogFur().m_radarLevel[0] ||
+				    CGPartyObj::m_ghostWork.counters[1] >= Chara.MogFur().m_radarLevel[1] ||
+				    CGPartyObj::m_ghostWork.counters[2] >= Chara.MogFur().m_radarLevel[2]) {
 					anyReady = 1;
 				} else {
 					anyReady = 0;
@@ -5319,13 +5050,13 @@ void CGPartyObj::gpmMove()
 					return;
 				}
 
-				unsigned char* chCounters = reinterpret_cast<unsigned char*>(&Chara);
-				unsigned char* gwCounters = CGPartyObj::m_ghostWork;
+				const int* thresholds = Chara.MogFur().m_radarLevel;
+				GhostPartyWork& ghostWork = CGPartyObj::m_ghostWork;
 				int choices = 0;
 				int i;
 				for (i = 0; i < 3; i++) {
-					if (*reinterpret_cast<int*>(gwCounters + 0x24 + i * 4) >=
-					    *reinterpret_cast<int*>(chCounters + 0x2048 + i * 4)) {
+					if (ghostWork.counters[i] >=
+					    thresholds[i]) {
 						choices++;
 					}
 				}
@@ -5334,8 +5065,8 @@ void CGPartyObj::gpmMove()
 				int cursor = 0;
 				int newSlotSel;
 				for (i = 0; i < 3; i++) {
-					if (*reinterpret_cast<int*>(gwCounters + 0x24 + i * 4) >=
-					    *reinterpret_cast<int*>(chCounters + 0x2048 + i * 4)) {
+					if (ghostWork.counters[i] >=
+					    thresholds[i]) {
 						if (cursor == pick) {
 							newSlotSel = i;
 							goto slotPicked;
@@ -5345,35 +5076,35 @@ void CGPartyObj::gpmMove()
 				}
 				newSlotSel = 0;
 			slotPicked:
-				sGhostPartyWork.slotSel = newSlotSel;
+				CGPartyObj::m_ghostWork.slotSel = newSlotSel;
 
-				switch (sGhostPartyWork.slotSel) {
+				switch (CGPartyObj::m_ghostWork.slotSel) {
 				case 0:
-					*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560) = 0x207;
+					m_itemId = 0x207;
 					break;
 				case 1:
-					*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560) = 0x20F;
+					m_itemId = 0x20F;
 					break;
 				case 2:
-					*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560) = 0x20B;
+					m_itemId = 0x20B;
 					break;
 				}
 				changeStat(2, 0, 0);
-				sGhostPartyWork.gauge = 0;
-				sGhostPartyWork.flagBits.flag40 = 0;
-				sGhostPartyWork.flagBits.flag20 = 0;
+				CGPartyObj::m_ghostWork.gauge = 0;
+				CGPartyObj::m_ghostWork.flagBits.flag40 = 0;
+				CGPartyObj::m_ghostWork.flagBits.flag20 = 0;
 				return;
 			}
 		} else {
 			moveKind = 0;
 			if (PartyData(this).carryObject == nullptr &&
-			    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) << 24) & 0xC0000000) >> 31) != 0) &&
-			    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
-				float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A84;
-				if (dist < pickupRadius) {
+			    (chalice->m_weaponNodeFlagBits.m_prg != 0) &&
+			    reinterpret_cast<CGItemObj*>(chalice)->m_owner == 0) {
+				float pickupRadius = (leader->m_bodyEllipsoidRadius + chalice->m_bodyEllipsoidRadius) * FLOAT_80331A84;
+				if (chaliceDist < pickupRadius) {
 					CancelMove(1);
 					rotTarget(reinterpret_cast<CGPrgObj*>(chalice));
-					sGhostPartyWork.carrySpeed = 0.0f;
+					CGPartyObj::m_ghostWork.carrySpeed = 0.0f;
 					carry(0, chalice, 0);
 					return;
 				}
@@ -5381,53 +5112,46 @@ void CGPartyObj::gpmMove()
 			}
 
 			if (moveKind == 0) {
-				float limit = (sGhostPartyWork.activeTrailCount != 0) ? FLOAT_80331A7C : FLOAT_80331A58;
+				float limit = (CGPartyObj::m_ghostWork.moodTimer != 0) ? FLOAT_80331A7C : FLOAT_80331A58;
 				if (pathDist < Game.unkFloat_0xca10 * limit) {
 					return;
 				}
 			}
 			if (moveKind == 1) {
-				float keepDist = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * FLOAT_80331A58;
-				if (clampedDist < keepDist) {
+				float keepDist = (leader->m_bodyEllipsoidRadius + chalice->m_bodyEllipsoidRadius) * FLOAT_80331A58;
+				if (followDist < keepDist) {
 					return;
 				}
 			}
 		}
 
-		if (sGhostPartyWork.field04 != moveKind) {
-			sGhostPartyWork.field04 = moveKind;
-			sGhostPartyWork.field08 = 0;
+		if (CGPartyObj::m_ghostWork.field04 != moveKind) {
+			CGPartyObj::m_ghostWork.field04 = moveKind;
+			CGPartyObj::m_ghostWork.field08 = 0;
 		}
 
 		CVector moveDir;
 		if (moveKind == 0) {
-			CVector pathVecV(pathVec);
-			moveDir.x = pathVecV.x;
-			moveDir.y = pathVecV.y;
-			moveDir.z = pathVecV.z;
+			moveDir = CVector(pathVec);
 		} else {
-			CVector toLeaderV(toLeader);
-			moveDir.x = toLeaderV.x;
-			moveDir.y = toLeaderV.y;
-			moveDir.z = toLeaderV.z;
+			moveDir = CVector(toChalice);
 		}
 
-		sGhostPartyWork.carryDir = *reinterpret_cast<Vec*>(&moveDir);
-		sGhostPartyWork.carrySpeed += FLOAT_80331A70;
-		float speedScale = (sGhostPartyWork.pressure >= pressureLimit) ? kMonObjOne : FLOAT_80331A88;
-		float newSpeed = FLOAT_80331a78;
-		if (!(sGhostPartyWork.carrySpeed < newSpeed)) {
-			float speedLimit = speedScale * (m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[0]) + 0x690));
-			newSpeed = speedLimit;
-			if (!(speedLimit < sGhostPartyWork.carrySpeed)) {
-				newSpeed = sGhostPartyWork.carrySpeed;
-			}
+		CGPartyObj::m_ghostWork.carryDir = *reinterpret_cast<Vec*>(&moveDir);
+		CGPartyObj::m_ghostWork.carrySpeed += FLOAT_80331A70;
+		float speedScale = (CGPartyObj::m_ghostWork.pressure >= pressureLimit) ? kMonObjOne : FLOAT_80331A88;
+		float newSpeed = CGPartyObj::m_ghostWork.carrySpeed;
+		if (newSpeed < FLOAT_80331a78) {
+			newSpeed = FLOAT_80331a78;
+		} else {
+			float speedLimit = speedScale * (m_moveBaseSpeed * Game.m_partyObjArr[0]->m_pushScale);
+			newSpeed = speedLimit < newSpeed ? speedLimit : newSpeed;
 		}
-		sGhostPartyWork.carrySpeed = newSpeed;
+		CGPartyObj::m_ghostWork.carrySpeed = newSpeed;
 
-		sGhostPartyWork.field08++;
-		if (sGhostPartyWork.field08 == 4) {
-			sGhostPartyWork.field08 = 0;
+		CGPartyObj::m_ghostWork.field08++;
+		if (CGPartyObj::m_ghostWork.field08 == 4) {
+			CGPartyObj::m_ghostWork.field08 = 0;
 		}
 		return;
 	}
@@ -5435,13 +5159,13 @@ void CGPartyObj::gpmMove()
 	if (m_lastStateId != 2) {
 		return;
 	}
-	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 24) & 0xC0000000) >> 31) == 0) {
+	if (CGPartyObj::m_ghostWork.flagBits.flag80 == 0) {
 		changeStat(0, 0, 0);
 		return;
 	}
 
 	if (leader->m_lastStateId != 2 && leader->m_lastStateId != 6) {
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 26) & 0xC0000000) >> 31) == 0) {
+		if (CGPartyObj::m_ghostWork.flagBits.flag20 == 0) {
 			changeStat(0, 0, 0);
 			return;
 		}
@@ -5449,40 +5173,39 @@ void CGPartyObj::gpmMove()
 		if (m_subState != 1) {
 			return;
 		}
-		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x668) == 0) {
+		if (m_comboState == 0) {
 			return;
 		}
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(leader).partyFlags) << 26) & 0xC0000000) >> 31) != 0) {
-			sGhostPartyWork.gauge = 0;
+		if (PartyData(leader).flags.flag20 != 0) {
+			CGPartyObj::m_ghostWork.gauge = 0;
 		}
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(PartyData(this).partyFlags) << 25) & 0xC0000000) >> 31) == 0) {
+		if (PartyData(this).flags.flag40 == 0) {
 			return;
 		}
 
-		sGhostPartyWork.flagBits.flag20 = 1;
-		sGhostPartyWork.gauge++;
-		if (sGhostPartyWork.gauge <= 0xF) {
+		CGPartyObj::m_ghostWork.flagBits.flag20 = 1;
+		CGPartyObj::m_ghostWork.gauge++;
+		if (CGPartyObj::m_ghostWork.gauge <= 0xF) {
 			return;
 		}
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(sGhostPartyWork.flags) << 25) & 0xC0000000) >> 31) != 0) {
+		if (CGPartyObj::m_ghostWork.flagBits.flag40 != 0) {
 			return;
 		}
 	}
 
-	sGhostPartyWork.flagBits.flag40 = 1;
+	CGPartyObj::m_ghostWork.flagBits.flag40 = 1;
 	{
-		unsigned char* base = CGPartyObj::m_ghostWork;
-		const int slotSel = sGhostPartyWork.slotSel;
+		GhostPartyWork& ghostWork = CGPartyObj::m_ghostWork;
+		const int slotSel = CGPartyObj::m_ghostWork.slotSel;
 		for (int slot = 0; slot < 3; slot++) {
 			if (slot == slotSel) {
-				*reinterpret_cast<int*>(base + 0x24) = 0;
+				ghostWork.counters[slot] = 0;
 			} else {
-				*reinterpret_cast<int*>(base + 0x24) = *reinterpret_cast<int*>(base + 0x24) / 2;
+				ghostWork.counters[slot] = ghostWork.counters[slot] / 2;
 			}
-			base += 4;
 		}
 	}
-	sGhostPartyWork.flagBits.flag10 = 0;
+	CGPartyObj::m_ghostWork.flagBits.flag10 = 0;
 }
 
 /*
@@ -5549,7 +5272,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 			break;
 		}
 
-		float rate = static_cast<float>(CharaGhostValue(0x2054)) / kMonObjPercentMax;
+		float rate = static_cast<float>(Chara.MogFur().m_alphaScore) / kMonObjPercentMax;
 		float angleScale;
 		switch (bossKind) {
 		default:
@@ -5563,9 +5286,9 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 			break;
 		}
 
-		sprintf(text, s_partyObjGhostFmt, sGhostPartyWork.thresholdA, CharaGhostValue(0x2048),
-		        sGhostPartyWork.thresholdB, CharaGhostValue(0x204C),
-		        sGhostPartyWork.thresholdC, CharaGhostValue(0x2050));
+		sprintf(text, s_partyObjGhostFmt, CGPartyObj::m_ghostWork.counters[0], Chara.MogFur().m_radarLevel[0],
+		        CGPartyObj::m_ghostWork.counters[1], Chara.MogFur().m_radarLevel[1],
+		        CGPartyObj::m_ghostWork.counters[2], Chara.MogFur().m_radarLevel[2]);
 
 		float curY = y;
 		float width = static_cast<float>(font->GetWidth(text));
@@ -5576,8 +5299,8 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 		float lineH = static_cast<float>(font->m_glyphHeight) * font->scaleY;
 		y = y - lineH;
 
-		sprintf(text, s_partyObjGhostAngleFmt, sGhostPartyWork.pressure,
-		        static_cast<int>(FLOAT_80331A5C * angleScale), CharaGhostValue(0x2054));
+		sprintf(text, s_partyObjGhostAngleFmt, CGPartyObj::m_ghostWork.pressure,
+		        static_cast<int>(FLOAT_80331A5C * angleScale), Chara.MogFur().m_alphaScore);
 
 		float curY2 = y;
 		width = static_cast<float>(font->GetWidth(text));

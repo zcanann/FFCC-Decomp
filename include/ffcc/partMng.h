@@ -19,6 +19,8 @@ class CTexture;
 class CTextureSet;
 class CProfile;
 
+struct _pppMngSt;
+
 struct _PARTICLE_WMAT
 {
     Mtx value;
@@ -46,6 +48,9 @@ struct pppShapeSt
 
     pppShapeSt();
     ~pppShapeSt();
+    void Release();
+    void AddRef() { m_refCount++; }
+    void SetUse() { m_refCount = 0; m_inUse = 1; }
 
     CTexture* GetTexture(long*, CMaterialSet*, int&);
 }; // Size 0x2c
@@ -59,7 +64,34 @@ struct pppModelSt : public CMapMesh
 
     pppModelSt();
     ~pppModelSt();
+    void Release();
+    void AddRef() { m_refCount++; }
+    void SetUse() { m_refCount = 0; m_isUsed = 1; }
 }; // Size 0x6c
+
+class CParModelSet
+{
+public:
+    CParModelSet();
+    ~CParModelSet();
+    pppModelSt* GetFree();
+    void Create(CChunkFile&, int, int);
+    int GetNumModel() { return 0x100; }
+
+    pppModelSt m_models[0x100];
+};
+
+class CParShapeSet
+{
+public:
+    CParShapeSet();
+    ~CParShapeSet();
+    pppShapeSt* GetFree();
+    void Create(CChunkFile&, int);
+    int GetNumShape() { return 0x100; }
+
+    pppShapeSt m_shapes[0x100];
+};
 
 struct PPPCREATEPARAM
 {
@@ -172,6 +204,7 @@ struct _pppPObject
 };
 
 typedef void (*pppProgAnyCallback)(void);
+typedef void (*pppProgInitCallback)(_pppMngSt*);
 typedef void (*pppProgOperationCallback)(_pppPObject*, void*, _pppCtrlTable*);
 typedef void (*pppProgOperation2Callback)(_pppPObject*, void*);
 typedef void (*pppProgRenderCallback)(_pppPObject*, void*, _pppCtrlTable*);
@@ -211,7 +244,9 @@ struct pppProg
     char* m_unkPtr;                             // 0x4
     pppProgAnyCallback m_pppFunctionOperation;  // 0x8
     pppProgAnyCallback m_pppFunctionRender;     // 0xC
-    CGObject* m_objects[3];                     // 0x10
+    pppProgInitCallback m_pppFunctionInit;        // 0x10
+    void* m_unk14;                              // 0x14
+    void* m_unk18;                              // 0x18
     pppProgAnyCallback m_pppFunctionConstructor;  // 0x1C
     pppProgAnyCallback m_pppFunctionConstructor2; // 0x20
     pppProgAnyCallback m_pppFunctionConstructor3; // 0x24
@@ -226,6 +261,12 @@ struct _pppCtrlTable
     int m_unk8;                         // 0x8
     int* m_serializedDataOffsets;       // 0xC
 };
+
+struct pppCacheChunk
+{
+    s16 m_cacheIndex; // 0x0
+    long* m_pdt;      // 0x4
+}; // Size 0x8
 
 struct _pppDataHead
 {
@@ -242,11 +283,39 @@ struct _pppDataHead
     unsigned int m_shapeGroups;       // 0x1c
 }; // Size 0x20
 
+struct pppIVECTOR3
+{
+    s32 x;
+    s32 y;
+    s32 z;
+};
+
 struct _pppFieldParticleData
 {
-    unsigned char m_pad00[0x2C];
-    int m_autoCreateMarker;           // 0x2c
-    unsigned char m_pad30[0x60 - 0x30];
+    Vec m_position;                        // 0x00
+    unsigned char m_pad0C[4];
+    pppIVECTOR3 m_rotation;                // 0x10
+    unsigned char m_pad1C[4];
+    Vec m_scale;                           // 0x20
+    int m_autoCreateMarker;                // 0x2C
+    int m_partIndex;                       // 0x30
+    float m_cullDistance;                  // 0x34
+    float m_cullRadius;                    // 0x38
+    float m_cullYOffset;                   // 0x3C
+    unsigned short m_fieldId;              // 0x40
+    unsigned short m_field118;             // 0x42
+    unsigned char m_drawPass;              // 0x44
+    unsigned char m_matrixMode;            // 0x45
+    unsigned char m_drawVariant;           // 0x46
+    unsigned char m_rotationOrder;         // 0x47
+    short m_mapObjIndex;                   // 0x48
+    unsigned char m_fpBillboard;           // 0x4A
+    unsigned char m_prio;                  // 0x4B
+    signed char m_drawSubType;             // 0x4C
+    unsigned char m_ownerFlagsInitialized; // 0x4D
+    unsigned char m_nodeScaleInitialized;  // 0x4E
+    unsigned char m_fieldF2;               // 0x4F
+    char m_nodeName[0x10];                 // 0x50
 }; // Size 0x60
 typedef int _pppFieldParticleData_size_mismatch[(sizeof(_pppFieldParticleData) == 0x60) ? 1 : -1];
 
@@ -259,10 +328,10 @@ struct pppShapeGroupRaw
 
 struct pppIVECTOR4
 {
-    short x;
-    short y;
-    short z;
-    short w;
+    s32 x;
+    s32 y;
+    s32 z;
+    s32 w;
 };
 
 struct _pppEnvSt
@@ -270,29 +339,9 @@ struct _pppEnvSt
     CMemory::CStage* m_stagePtr;       // 0x0
     CMaterialSet* m_materialSetPtr;    // 0x4
     CMapMesh** m_mapMeshPtr;           // 0x8
-    union {
-        _pppColor m_particleColors[10]; // 0xc
-        struct {
-            pppShapeSt** m_shapeTablePtr;       // 0xc
-            pppShapeGroupRaw* m_shapeGroupPtr;  // 0x10
-            unsigned char m_resourcePad[0x20];  // 0x14
-        } m_resourceTables;
-    };
-    unsigned int m_mngStCount;      // 0x34
-    unsigned int m_debugCounter;    // 0x38
-    int m_isEditMode;               // 0x3c
-    int m_unknown;                  // 0x40
-    int m_lastEnvCmd;               // 0x44
-    float m_envParam;               // 0x48
-    float m_boxMinX;                // 0x4c
-    float m_boxMinY;                // 0x50
-    float m_boxMinZ;                // 0x54
-    float m_soundVolumeTable[5];    // 0x58
-    float m_boxMaxX;                // 0x6c
-    float m_boxMaxY;                // 0x70
-    float m_boxMaxZ;                // 0x74
-    float m_soundPitchTable[5];     // 0x78
-}; // Size 0x8c
+    pppShapeSt** m_shapeTablePtr;       // 0xC
+    pppShapeGroupRaw* m_shapeGroupPtr;  // 0x10
+}; // Size 0x14
 
 struct _pppMngSt
 {
@@ -302,8 +351,7 @@ struct _pppMngSt
     int m_partIndex;                   // 0x04
     Vec m_position;                    // 0x08
     int m_baseTime;                    // 0x14
-    pppIVECTOR4 m_rotation;            // 0x18
-    int m_rotationSpeed;               // 0x20
+    pppIVECTOR3 m_rotation;            // 0x18
     int m_lifeEnd;                     // 0x24
     Vec m_scale;                       // 0x28
     int m_currentFrame;                // 0x34
@@ -311,18 +359,15 @@ struct _pppMngSt
     float m_userFloat1;                // 0x3C
     float m_scaleFactor;               // 0x40
     float m_ownerScale;                // 0x44
-    float m_userPositionX;             // 0x48
-    float m_userPositionY;             // 0x4C
-    Vec m_savedPosition;               // 0x50
-    Vec m_previousPosition;            // 0x5C (third float doubles as a generic param)
+    Vec m_userPosition;                // 0x48
+    float m_movementScale;             // 0x54
+    Vec m_basePosition;                // 0x58
+    float m_hitScale;                  // 0x64
     Vec m_paramVec0;                   // 0x68
     short m_kind;                      // 0x74
     short m_nodeIndex;                 // 0x76
     pppFMATRIX m_matrix;               // 0x78
-    unsigned char m_envColorR;         // 0xA8
-    unsigned char m_envColorG;         // 0xA9
-    unsigned char m_envColorB;         // 0xAA
-    unsigned char m_envColorA;         // 0xAB
+    long m_deltaTime;                  // 0xA8
     int m_spawnedCount;                // 0xAC
     int m_previousFrame2;              // 0xB0
     int m_numControlPrograms;          // 0xB4
@@ -344,7 +389,7 @@ struct _pppMngSt
     unsigned char m_ownerFacing;       // 0xEA
     unsigned char m_drawVariant;       // 0xEB
     unsigned char m_rotationOrder;     // 0xEC
-    unsigned char m_drawPass;          // 0xED
+    signed char m_drawPass;            // 0xED
     signed char m_drawSubType;         // 0xEE
     unsigned char m_useOwnerScaleSign; // 0xEF
     unsigned char m_ownerFlagsInitialized; // 0xF0
@@ -370,20 +415,17 @@ struct _pppMngSt
     PPPIFPARAM m_hitParams;            // 0x130
     short m_hitObjectIds[0x10];        // 0x138
 
-    Vec& UserPosition() { return *reinterpret_cast<Vec*>(&m_userPositionX); }
-    Vec& BasePosition() { return *reinterpret_cast<Vec*>(&m_savedPosition.z); }
-    const Vec& UserPosition() const { return *reinterpret_cast<const Vec*>(&m_userPositionX); }
-    const Vec& BasePosition() const { return *reinterpret_cast<const Vec*>(&m_savedPosition.z); }
+    Vec& UserPosition() { return m_userPosition; }
+    Vec& BasePosition() { return m_basePosition; }
+    const Vec& UserPosition() const { return m_userPosition; }
+    const Vec& BasePosition() const { return m_basePosition; }
 }; // Size: 0x158
 
-void Screen2world(Vec&, Vec&);
 void pppEditGetViewPos(Vec*);
 void pppEditGetViewMatrix(float (*)[4]);
 void pppEditGetProjectionMatrix(float (*)[4]);
 void pppEditSetProjection2D();
 void pppSetProjection();
-void CheckSum(char*, unsigned long, unsigned long);
-void pppSetFog(unsigned char, unsigned char, unsigned char, unsigned char, float, float);
 
 class CPartMng
 {
@@ -401,9 +443,10 @@ public:
     void pppReleasePmng(int);
     void pppReleasePdt(int);
 
-    void pppGetFreePppMngSt();
+    _pppMngSt* pppGetFreePppMngSt();
     int pppGetNumFreePppMngSt();
-    void pppGetFreePppDataMngSt();
+    struct PppPdtSlot;
+    PppPdtSlot* pppGetFreePppDataMngSt();
 
     void drawLine(int, int, int, int, _GXColor&);
     void drawLine3D(Vec*, Vec*, _GXColor&);
@@ -491,26 +534,58 @@ public:
     void pppDeleteAll();
     void pppDestroyAll();
 
-    unsigned char m_unk0[0x1C8];
+    int m_editProgramCount;             // 0x00
+    int m_editParticleCount;            // 0x04
+    unsigned char m_unk8[8];
+    int m_cursorRequest;                // 0x10
+    unsigned char m_unk14[4];
+    Vec m_editorCursorPosition;          // 0x18
+    unsigned char m_unk24[4];
+    int m_editorCursorX;                // 0x28
+    int m_editorCursorY;                // 0x2C
+    unsigned char m_unk30[0x1C8 - 0x30];
     unsigned char* m_editNodeNameBuffer;  // 0x1C8
-    unsigned char m_unk1CC[0x7E4 - 0x1CC];
+    unsigned char* m_editReceiveCursor; // 0x1CC
+    unsigned char m_unk1D0[4];
+    void* m_editDataBuffers[0x80];       // 0x1D4
+    unsigned char m_unk3D4[4];
+    void* m_editTextBuffers[0x80];       // 0x3D8
+    unsigned char m_unk5D8[4];
+    long* m_editProgramData[0x80];       // 0x5DC
+    unsigned char m_unk7DC[8];
     CMaterialSet* m_materialSet;          // 0x7E4
     CTextureSet* m_textureSet;            // 0x7E8
-    pppModelSt* m_pppModelStArr;          // 0x7EC
-    pppShapeSt* m_pppShapeStArr;          // 0x7F0
-    unsigned char m_unk7F4[0x2224];
+    CParModelSet* m_modelSet;          // 0x7EC
+    CParShapeSet* m_shapeSet;          // 0x7F0
+    pppModelSt** m_editModelSlots;       // 0x7F4
+    pppShapeSt** m_editShapeSlots;       // 0x7F8
+    pppShapeGroupRaw* m_editShapeGroups; // 0x7FC
+    unsigned char m_unk800[8];
+    unsigned char m_editorFlags[3];     // 0x808
+    unsigned char m_unk80B;
+    CGObject* m_editorObject;           // 0x80C
+    unsigned char m_unk810[0x2A18 - 0x810];
     _pppMngSt m_pppMng[0x180];           // 0x2A18
 
     struct PppPdtSlot
     {
         _pppDataHead* m_pppDataHead;      // 0x00
-        unsigned int m_envFields[5];      // 0x04
+        _pppEnvSt m_env;                // 0x04
         char m_name[0x20];                // 0x18
     }; // Size 0x38
 
     PppPdtSlot m_pdtSlots[0x20];          // 0x22E18
     unsigned char m_unk23518[0x4];        // 0x23518
     _pppEnvSt m_pppEnvSt;                 // 0x2351C
+    unsigned char m_unk23530[0x20];
+    unsigned int m_mngStCount;      // 0x23550
+    unsigned int m_debugCounter;    // 0x23554
+    int m_isEditMode;               // 0x23558
+    int m_unknown;                  // 0x2355C
+    int m_lastEnvCmd;               // 0x23560
+    float m_envParam;               // 0x23564
+    float m_soundNearDistance[8];  // 0x23568
+    float m_soundFarDistance[8];   // 0x23588
     unsigned char m_unk235A8[0x14C];      // 0x235A8
     unsigned int m_partAMemBase;          // 0x236F4
     unsigned int m_partAMemCursor;        // 0x236F8

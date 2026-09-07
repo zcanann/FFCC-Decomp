@@ -24,7 +24,7 @@ static inline CMemory::CStage* MaterialEditorStage()
  */
 RSDLISTITEM* CMaterialEditorPcs::GetRsdItem()
 {
-    return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(reinterpret_cast<int>(m_usbStreamState.m_stageLoad)));
+    return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(m_readRsdIndex));
 }
 
 /*
@@ -38,7 +38,7 @@ RSDLISTITEM* CMaterialEditorPcs::GetRsdItem()
  */
 inline RSDITEM* CMaterialEditorPcs::GetReadRsd()
 {
-    return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(reinterpret_cast<int>(m_usbStreamState.m_stageLoad)))->rsdItem;
+    return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(m_readRsdIndex))->rsdItem;
 }
 
 /*
@@ -61,7 +61,7 @@ int CMaterialEditorPcs::SetRsdIndex()
         return 0;
     }
 
-    m_rsdIndex = reinterpret_cast<u32>(rsd->rsdItem);
+    m_rsdItem = rsd->rsdItem;
     return 1;
 }
 
@@ -166,17 +166,17 @@ inline void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
             delete[] static_cast<u8*>(rsdItem->ptrC);
             rsdItem->ptrC = 0;
         }
-        if (rsdItem->ptr10 != (void*)0) {
-            delete[] static_cast<u8*>(rsdItem->ptr10);
-            rsdItem->ptr10 = 0;
+        if (rsdItem->m_positions != (void*)0) {
+            delete[] rsdItem->m_positions;
+            rsdItem->m_positions = 0;
         }
-        if (rsdItem->ptr14 != (void*)0) {
-            delete[] static_cast<u8*>(rsdItem->ptr14);
-            rsdItem->ptr14 = 0;
+        if (rsdItem->m_normals != (void*)0) {
+            delete[] rsdItem->m_normals;
+            rsdItem->m_normals = 0;
         }
-        if (rsdItem->ptr18 != (void*)0) {
-            delete[] static_cast<u8*>(rsdItem->ptr18);
-            rsdItem->ptr18 = 0;
+        if (rsdItem->m_polygons != (void*)0) {
+            delete[] rsdItem->m_polygons;
+            rsdItem->m_polygons = 0;
         }
         delete rsdItem;
         listItem->rsdItem = (RSDITEM*)0;
@@ -212,7 +212,7 @@ inline RSDLISTITEM* CMaterialEditorPcs::GetRsdItemR()
 void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 {
     ZLIST* list;
-    _ZLISTITEM* it[1];
+    _ZLISTITEM* it;
     RSDITEM* rsdItem;
     int i;
     ZCANMGRP* colAnmData;
@@ -220,26 +220,26 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
     RSDLISTITEM* listItem;
 
     list = zlist;
-    it[0] = list->m_root.m_previous;
-    while (it[0] != (_ZLISTITEM*)0) {
-        listItem = (RSDLISTITEM*)list->GetDataNext(it);
+    it = list->m_root.m_previous;
+    while (it != (_ZLISTITEM*)0) {
+        listItem = (RSDLISTITEM*)list->GetDataNext(&it);
         rsdItem = listItem->rsdItem;
         if (rsdItem != (RSDITEM*)0) {
             if (rsdItem->ptrC != (void*)0) {
                 delete[] static_cast<u8*>(rsdItem->ptrC);
                 rsdItem->ptrC = 0;
             }
-            if (rsdItem->ptr10 != (void*)0) {
-                delete[] static_cast<u8*>(rsdItem->ptr10);
-                rsdItem->ptr10 = 0;
+            if (rsdItem->m_positions != (void*)0) {
+                delete[] rsdItem->m_positions;
+                rsdItem->m_positions = 0;
             }
-            if (rsdItem->ptr14 != (void*)0) {
-                delete[] static_cast<u8*>(rsdItem->ptr14);
-                rsdItem->ptr14 = 0;
+            if (rsdItem->m_normals != (void*)0) {
+                delete[] rsdItem->m_normals;
+                rsdItem->m_normals = 0;
             }
-            if (rsdItem->ptr18 != (void*)0) {
-                delete[] static_cast<u8*>(rsdItem->ptr18);
-                rsdItem->ptr18 = 0;
+            if (rsdItem->m_polygons != (void*)0) {
+                delete[] rsdItem->m_polygons;
+                rsdItem->m_polygons = 0;
             }
             if (rsdItem != (RSDITEM*)0) {
                 delete rsdItem;

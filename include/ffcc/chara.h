@@ -17,27 +17,6 @@ class SRT;
 struct _GXColor;
 struct Vec;
 
-struct CCharaModelData
-{
-    u8 _pad0[0x8];
-    u32 m_nodeCount;
-    u32 m_meshCount;
-    void* m_nodeRefData;
-    void* m_meshRefData;
-    void* m_bank;
-    s16 m_headNodeIndex;
-    s16 m_chest3NodeIndex;
-    s16 m_chest2NodeIndex;
-    s16 m_chest1NodeIndex;
-    CMaterialSet* m_materialSet;
-    float m_baseScale;
-    u8 _pad2C[0x8];
-    u32 m_posQuant;
-    u32 m_normQuant;
-    u32 m_dynCount;
-    void* m_dynParams;
-};
-
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);
 void VECLerp(Vec*, Vec*, Vec*, float);
 
@@ -66,18 +45,94 @@ public:
 		~CAnim();
 
 		void Create(void*, CMemory::CStage*);
-        void SetAmemAddress(int);
-        void GetBankSize();
-        void GetAmemAddress();
-        void AddHistory();
-        void ReleaseBank();
-        void GetHistory();
-        void IsBanked();
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A708
+         * EN Size: 8b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        void SetAmemAddress(int address) { m_bankAddress = address; }
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A710
+         * EN Size: 8b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        unsigned int GetBankSize() { return m_bankSize; }
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A718
+         * EN Size: 8b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        int GetAmemAddress() { return m_bankAddress; }
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A720
+         * EN Size: 16b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        void AddHistory() { m_lastFrame++; }
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A730
+         * EN Size: 68b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        void ReleaseBank()
+        {
+            if (m_bank != 0) {
+                operator delete(m_bank);
+                m_bank = 0;
+            }
+        }
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A774
+         * EN Size: 8b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        int GetHistory() { return m_lastFrame; }
+        /*
+         * --INFO--
+         * PAL Address: UNUSED
+         * PAL Size: TODO
+         * EN Address: 0x8008A77C
+         * EN Size: 48b
+         * JP Address: TODO
+         * JP Size: TODO
+         */
+        int IsBanked() { return m_bank != 0; }
         void SetLastFrame(int);
         void SetInterp(int);
         void InitQuantize();
 
-		u8 m_flags;                     // 0x08
+		union {
+			u8 m_flags;                 // 0x08
+			struct {
+				u8 m_blendEnabled : 1;
+				u8 m_clampFrames : 1;
+				u8 m_reserved : 6;
+			} m_flagsBits;
+		};
 		char m_interp;                  // 0x09
 		u8 m_quantizeX;                 // 0x0A
 		u8 m_quantizeY;                 // 0x0B
@@ -108,7 +163,14 @@ public:
 
 		char m_name[0x10];              // 0x00
 		u32 m_dataOffset;               // 0x10
-		u32 m_flags;                    // 0x14
+		union {
+			u32 m_flags;                // 0x14
+			struct {
+				u8 m_hasScale : 1;
+				u32 m_channelModes : 18;
+				u32 m_reserved : 13;
+			} m_flagsBits;
+		};
 	};
 
 	class CNode
@@ -238,6 +300,7 @@ public:
 		void SetFrame(float);
 		void CalcFurColor();
 		void InitMogFurTex();
+		void CopyFurTex(int loadFromTexture);
 		void MogFurFrame(CGObject*);
 		int PickFur(float (*)[4], _GXColor, int, int, _GXColor*, _GXColor*, Vec*);
 		void DrawFur(float (*)[4], int);
@@ -286,7 +349,7 @@ public:
 		};
 		u8 m_attachMode;
 		u8 _padA2[0x2];
-		CCharaModelData* m_data;
+		CRefData* m_data;
 		CNode* m_nodes;
 		CMesh* m_meshes;
 		CTextureSet* m_texSet;
@@ -440,8 +503,8 @@ public:
             u32 m_prevRadarType;              // 0x2004
             int m_trackedCommandIndex;
         };
-        u32 m_cursorX;                        // 0x2008
-        u32 m_cursorY;                        // 0x200C
+        int m_cursorX;                        // 0x2008
+        int m_cursorY;                        // 0x200C
         int m_timestamp;                      // 0x2010
         int m_score[3];                       // 0x2014
         int m_bitScore[3];                    // 0x2020

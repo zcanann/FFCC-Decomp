@@ -13,13 +13,6 @@ struct Vec;
 class CLightPcs : public CProcess
 {
 public:
-    struct Vec3f
-    {
-        float x;
-        float y;
-        float z;
-    };
-
     class CLight
     {
     public:
@@ -27,8 +20,8 @@ public:
         void Set(CLightPcs::CLight*);
 
         u32 m_type;               // 0x00
-        Vec3f m_position;         // 0x04
-        Vec3f m_targetPosition;   // 0x10
+        Vec m_position;           // 0x04
+        Vec m_targetPosition;     // 0x10
         float m_attenRadius;      // 0x1C
         float m_attenFalloff;     // 0x20
         float m_range;            // 0x24
@@ -36,7 +29,7 @@ public:
         float m_offsetX;          // 0x2C
         float m_offsetZ;          // 0x30
         u32 m_partMask;           // 0x34
-        Vec3f m_direction;        // 0x38
+        Vec m_direction;          // 0x38
         float m_spotScale;        // 0x44
         float m_specularScale;    // 0x48
         u8 m_spotFn;              // 0x4C
@@ -72,7 +65,7 @@ public:
     };
 
     CLightPcs();
-    static CProcessTable m_table;
+    static CProcessCallbackTable m_table;
 
     void Init();
     void Quit();
@@ -100,12 +93,13 @@ public:
     void InsertOctTree(CLightPcs::TARGET, COctTree&);
     void MakeLightMap();
     void SetBumpTexMatirx(float (*)[4], CLightPcs::CBumpLight*, Vec*, unsigned char);
-    float (*GetBumpIndTexMtx())[3] { return reinterpret_cast<float (*)[3]>(&m_bumpTexScratch[12]); }
+    float (*GetBumpIndTexMtx())[3] { return m_bumpIndTexMtx; }
     CBumpLight* GetBumpLight(CLightPcs::TARGET target, int index) { return &m_bumpLights[target][index]; }
 
     Mtx m_bumpTexMtx0;               // 0x04
     Mtx m_bumpTexMtx1;               // 0x34
-    float m_bumpTexScratch[18];      // 0x64
+    Mtx m_bumpTexMtx2;               // 0x64
+    Mtx23 m_bumpIndTexMtx;            // 0x94
     u32 m_numDiffuse;                // 0xAC
     u32 m_loadedLightCount;          // 0xB0
     u32 m_loadedLightMask;           // 0xB4
@@ -114,11 +108,14 @@ public:
     CLight m_sceneLights[0x20];      // 0x63C
     CBumpLight m_bumpLights[4][8];   // 0x1C3C
     _GXColor m_mapLightColor[4];     // 0x433C
-    float m_mapLightParams[9];       // 0x434C
+    Vec m_mapLightParams[3];         // 0x434C
     GXLightObj m_mapLightObj;        // 0x4370
 };
 
-void setchanctrl(CLightPcs::TARGET, unsigned long);
+typedef int CLight_size_check[(sizeof(CLightPcs::CLight) == 0xB0) ? 1 : -1];
+typedef int CBumpLight_size_check[(sizeof(CLightPcs::CBumpLight) == 0x138) ? 1 : -1];
+typedef int CLightPcs_size_check[(sizeof(CLightPcs) == 0x43B0) ? 1 : -1];
+
 extern CLightPcs LightPcs;
 extern CLightPcs::CBumpLight* gCharaPartWorkPtr;
 

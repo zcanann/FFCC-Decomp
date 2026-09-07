@@ -22,8 +22,8 @@ static const float kCompaTextYOffset = 4.0f;
 static const float kCompaJobFontScale = 1.2f;
 static const float kCompaJobYOffset = 2.0f;
 static const double kCompaIntToDoubleBias = 4503601774854144.0;
-extern "C" const float kCompaFoodIconUvScale;
-extern "C" const float kCompaFrameU;
+static const float kCompaFoodIconUvScale = 0.75f;
+static const float kCompaFrameU = 72.0f;
 
 static const char sCompaFamilyCountErrorFmt[] = "%s(%d):family cnt error!!(%d)\n";
 static const char s_menu_compa_cpp[] = "menu_compa.cpp";
@@ -38,40 +38,6 @@ static inline double LoadDouble(double value)
 static inline float LoadFloat(float value)
 {
 	return value;
-}
-
-static inline unsigned int GetMenuPressLock(int lock)
-{
-	bool activeInput = false;
-
-	if ((lock != 0) || (Pad.m_debugPadPort != -1)) {
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		return 0;
-	}
-
-	int padIndex = 0;
-	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-	return Pad.GetPadInputs()[padIndex].buttonDown[0];
-}
-
-static inline unsigned int GetMenuRepeatLock(int lock)
-{
-	bool activeInput = false;
-
-	if ((lock != 0) || (Pad.m_debugPadPort != -1)) {
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		return 0;
-	}
-
-	int padIndex = 0;
-	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-	return Pad.GetPadInputs()[padIndex].repeatButton;
 }
 
 /*
@@ -403,94 +369,10 @@ int CMenuPcs::CompaClose()
 
 /*
  * --INFO--
- * PAL Address: 80161c28
- * PAL Size: 800b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::CompaCtrl()
-{
-	int padState = Pad.m_debugPadLock;
-	short press;
-	short hold;
-	int doReset;
-
-	press = GetMenuPressLock(padState) & 0xffff;
-	hold = GetMenuRepeatLock(padState) & 0xffff;
-
-	if (hold == 0) {
-		doReset = 0;
-	} else if ((press & 0x20) != 0) {
-		this->m_compaMenuState->cursorMove = 1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = 1;
-	} else if ((press & 0x40) != 0) {
-		this->m_compaMenuState->cursorMove = -1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = 1;
-	} else {
-		if ((press & 0x100) != 0) {
-			Sound.PlaySe(4, 0x40, 0x7f, 0);
-			goto noReset;
-		} else if ((press & 0x200) != 0) {
-			this->m_compaMenuState->closeRequested = 1;
-			Sound.PlaySe(3, 0x40, 0x7f, 0);
-			doReset = 1;
-		} else {
-noReset:
-			doReset = 0;
-		}
-	}
-
-	if (doReset != 0) {
-		CompaOpenAnimList* compaList = this->m_compaList;
-		int entryIndex = 0;
-		CompaOpenAnim* setupEntry = &compaList->entries[entryIndex++];
-		setupEntry->startFrame = 2;
-		setupEntry->duration = 5;
-		compaList = this->m_compaList;
-		setupEntry = &compaList->entries[entryIndex++];
-		setupEntry->startFrame = 2;
-		setupEntry->duration = 5;
-		compaList = this->m_compaList;
-		setupEntry = &compaList->entries[entryIndex++];
-		setupEntry->startFrame = 2;
-		setupEntry->duration = 5;
-		compaList = this->m_compaList;
-		setupEntry = &compaList->entries[entryIndex++];
-		setupEntry->startFrame = 7;
-		setupEntry->duration = 5;
-		compaList = this->m_compaList;
-		setupEntry = &compaList->entries[entryIndex++];
-		setupEntry->startFrame = 7;
-		setupEntry->duration = 5;
-		compaList = this->m_compaList;
-		setupEntry = &compaList->entries[entryIndex++];
-		setupEntry->flags = 2;
-		setupEntry->startFrame = 7;
-		setupEntry->duration = 5;
-
-		CompaOpenAnimList* animList = this->m_compaList;
-		int entryCount = animList->count;
-		CompaOpenAnim* entry = animList->entries;
-		for (; entryCount > 0; entryCount--) {
-			entry->frame = 0;
-			entry->alpha = LoadFloat(kCompaOne);
-			entry++;
-		}
-	}
-
-	return;
-}
-
-/*
- * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 328b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801837E0
+ * EN Size: 356b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -523,14 +405,64 @@ inline void CMenuPcs::CompaInit0()
 	setupEntry->startFrame = 7;
 	setupEntry->duration = 5;
 
-	unsigned int entryCount = compaList->count;
-	CompaOpenAnim* entry = compaList->entries;
-	while (entryCount != 0) {
+	CompaOpenAnimList* animList = this->m_compaList;
+	int entryCount = animList->count;
+	CompaOpenAnim* entry = animList->entries;
+	while (entryCount > 0) {
 		entry->frame = 0;
 		entry->alpha = LoadFloat(kCompaOne);
 		entry++;
 		entryCount--;
 	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 80161c28
+ * PAL Size: 800b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::CompaCtrl()
+{
+	short press;
+	short hold;
+	int doReset;
+
+	press = Pad.GetButtonDown(0);
+	hold = Pad.GetButtonRepeat(0);
+
+	if (hold == 0) {
+		doReset = 0;
+	} else if ((press & 0x20) != 0) {
+		this->m_compaMenuState->cursorMove = 1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		doReset = 1;
+	} else if ((press & 0x40) != 0) {
+		this->m_compaMenuState->cursorMove = -1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		doReset = 1;
+	} else {
+		if ((press & 0x100) != 0) {
+			Sound.PlaySe(4, 0x40, 0x7f, 0);
+			goto noReset;
+		} else if ((press & 0x200) != 0) {
+			this->m_compaMenuState->closeRequested = 1;
+			Sound.PlaySe(3, 0x40, 0x7f, 0);
+			doReset = 1;
+		} else {
+noReset:
+			doReset = 0;
+		}
+	}
+
+	if (doReset != 0) {
+		CompaInit0();
+	}
+
+	return;
 }
 
 /*

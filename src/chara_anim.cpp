@@ -6,21 +6,6 @@
 
 #include <string.h>
 
-static const char sCharaAnimClassName[] = "CChara::CAnim";
-static const char s_charaAnimSourceFile[] = "chara_anim.cpp";
-static const char s_charaAnimAllocWarn[32] =
-    "\214\303\202\242\203\101\203\152\203\201\201\133\203\126\203\207\203\223"
-    "\214\140\216\256\202\305\202\267\201\102\n";
-extern const float kCharaSharedZeroF;
-extern const float kCharaSharedOneF;
-extern const double kCharaSharedSignedIntBias;
-extern const double kCharaAnimDoubleMagic = 4503599627370496.0;
-extern const float kCharaAnimZero = 0.0f;
-extern const float kCharaAnimDegToRad = 0.01745329238474369f;
-extern const double kCharaAnimSignedDoubleMagic = 4503601774854144.0;
-extern const float kCharaAnimNegativeOne = -1.0f;
-extern const float kCharaAnimFullTurnDegrees = 360.0f;
-
 namespace {
 static inline void i2f_5(float* out, register const unsigned short* in)
 {
@@ -109,8 +94,8 @@ CChara::CAnim::CAnim()
 	m_nodeCount = 0;
 	m_nodes = 0;
 	m_bank = 0;
-	m_flags = static_cast<unsigned char>(__rlwimi(m_flags, 1, 7, 24, 24));
-	m_flags = static_cast<unsigned char>(__rlwimi(m_flags, 0, 6, 25, 25));
+	m_flagsBits.m_blendEnabled = 1;
+	m_flagsBits.m_clampFrames = 0;
 	m_quantizeX = 5;
 	m_quantizeY = 0xB;
 	m_quantizeZ = 10;
@@ -153,8 +138,6 @@ CChara::CAnim::~CAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_dead_assignments off
 void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 {
 	CChunkFile chunkFile(data);
@@ -169,7 +152,8 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 		}
 		if (chunk.m_version < 2) {
 			if ((unsigned int)System.m_execParam >= 2) {
-				System.Printf(const_cast<char*>(s_charaAnimAllocWarn));
+				System.Printf("\214\303\202\242\203\101\203\152\203\201\201\133\203\126\203\207\203\223"
+				              "\214\140\216\256\202\305\202\267\201\102\n");
 			}
 			return;
 		}
@@ -184,9 +168,9 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 			m_nodeCount = static_cast<unsigned short>(chunk.m_arg0);
 			unsigned short nodeCount = m_nodeCount;
 
-			m_nodes = new (stage, const_cast<char*>(s_charaAnimSourceFile), 0x5F) CChara::CAnimNode[nodeCount];
+			m_nodes = new (stage, "chara_anim.cpp", 0x5F) CChara::CAnimNode[nodeCount];
 
-			unsigned int nodeOffset = 0;
+			unsigned int nodeIndex = 0;
 			chunkFile.PushChunk();
 			while (chunkFile.GetNextChunk(chunk)) {
 				chunkId = static_cast<int>(chunk.m_id);
@@ -207,16 +191,12 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 					m_quantizeZ = static_cast<unsigned char>(chunkFile.Get4());
 					break;
 				case 0x4E4F4445: {
-					CAnimNode* currentNode =
-					    reinterpret_cast<CAnimNode*>(reinterpret_cast<unsigned char*>(m_nodes) + nodeOffset);
-					nodeOffset += sizeof(CAnimNode);
-
-					currentNode->Create(chunkFile);
+					m_nodes[nodeIndex++].Create(chunkFile);
 					break;
 				}
 				case 0x42414E4B:
 					m_bankSize = (chunk.m_size + 0x1F) & 0xFFFFFFE0;
-					m_bank = new (stage, const_cast<char*>(s_charaAnimSourceFile), 0x7C) unsigned char[chunk.m_size];
+					m_bank = new (stage, "chara_anim.cpp", 0x7C) unsigned char[chunk.m_size];
 					chunkFile.Get(m_bank, chunk.m_size);
 
 					Memory.CopyToAMemorySync(
@@ -238,7 +218,6 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 		chunkFile.PopChunk();
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -269,9 +248,8 @@ void CChara::CAnim::InitQuantize()
  */
 CChara::CAnimNode::CAnimNode()
 {
-	*reinterpret_cast<unsigned char*>(&m_flags) =
-	    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&m_flags), 0, 7, 24, 24));
-	m_flags = __rlwimi(m_flags, 0, 13, 1, 18);
+	m_flagsBits.m_hasScale = 0;
+	m_flagsBits.m_channelModes = 0;
 }
 
 /*
@@ -315,12 +293,10 @@ inline void CChara::CAnimNode::Create(CChunkFile& chunkFile)
 					m_dataOffset = dataOffset;
 				}
 
-				unsigned int flags = ((m_flags >> 0xD) & 0x3FFFF) | (static_cast<unsigned int>(mode) << shift);
-				m_flags = __rlwimi(m_flags, flags, 13, 1, 18);
+				m_flagsBits.m_channelModes |= static_cast<unsigned int>(mode) << shift;
 
 				if ((i >= 6) && (type != 0)) {
-					unsigned char* flagsByte = reinterpret_cast<unsigned char*>(&m_flags);
-					*flagsByte = static_cast<unsigned char>(__rlwimi(*flagsByte, 1, 7, 24, 24));
+					m_flagsBits.m_hasScale = 1;
 				}
 
 				i++;
@@ -366,7 +342,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	if (anim->m_bank == 0) {
 		while (anim->m_bank == 0) {
 			anim->m_bank =
-			    Memory._Alloc(anim->m_bankSize, anim->m_stage, const_cast<char*>(s_charaAnimSourceFile), 0x160, 1);
+			    Memory._Alloc(anim->m_bankSize, anim->m_stage, "chara_anim.cpp", 0x160, 1);
 
 			if (anim->m_bank != 0) {
 				break;
@@ -387,10 +363,10 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 
 	float frameFrac = frame - static_cast<float>(frameInt);
 	if (frameInt == anim->m_frameCount - 1) {
-		frameFrac = kCharaSharedZeroF;
+		frameFrac = 0.0f;
 	}
 
-	register int flags = static_cast<int>((m_flags >> 0xD) & 0x3FFFF);
+	register int flags = static_cast<int>(m_flagsBits.m_channelModes);
 	register unsigned int dataOffset = m_dataOffset;
 	frameInt *= 2;
 	register unsigned short* inData =
@@ -407,7 +383,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 				inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (anim->m_frameCount + 1) * 2);
 			}
 		} else {
-			*outData = kCharaSharedZeroF;
+			*outData = 0.0f;
 		}
 		flags >>= 2;
 		outData++;
@@ -423,7 +399,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 				inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (anim->m_frameCount + 1) * 2);
 			}
 		} else {
-			*outData = kCharaSharedZeroF;
+			*outData = 0.0f;
 		}
 		flags >>= 2;
 		outData++;
@@ -439,7 +415,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 				inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (anim->m_frameCount + 1) * 2);
 			}
 		} else {
-			*outData = kCharaSharedOneF;
+			*outData = 1.0f;
 		}
 		flags >>= 2;
 		outData++;

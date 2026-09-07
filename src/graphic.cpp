@@ -21,6 +21,21 @@
 
 CGraphic Graphic;
 
+GXRenderModeObj _GXPal528IntDf = {
+    VI_TVMODE_PAL_INT,
+    640, 448, 528,
+    40, 23,
+    640, 528,
+    VI_XFBMODE_DF,
+    GX_FALSE, GX_FALSE,
+    {
+        {6, 6}, {6, 6}, {6, 6}, {6, 6},
+        {6, 6}, {6, 6}, {6, 6}, {6, 6},
+        {6, 6}, {6, 6}, {6, 6}, {6, 6}
+    },
+    {8, 8, 10, 12, 10, 8, 8}
+};
+
 extern "C" {
 OSThread m_thread;
 u8 m_threadStack[0x4000] ATTRIBUTE_ALIGN(8);
@@ -63,36 +78,6 @@ extern const float kGraphicBlurAlphaScale = -100.0f;
 extern const float kGraphicNoiseTexScaleU = 0.015625f;
 extern const float kGraphicNoiseTexScaleV = 0.010416667163372f;
 extern const char sGraphicUnknownOrderName[4] = "---";
-
-static inline float CameraNearZ()
-{
-    return CameraPcs.m_nearZ;
-}
-
-static inline float CameraFarZ()
-{
-    return CameraPcs.m_farZ;
-}
-
-static inline float CameraWorldX()
-{
-    return CameraPcs.m_positionX;
-}
-
-static inline float CameraWorldY()
-{
-    return CameraPcs.m_positionY;
-}
-
-static inline float CameraWorldZ()
-{
-    return CameraPcs.m_positionZ;
-}
-
-static inline Mtx& CameraMatrix()
-{
-    return CameraPcs.m_cameraMatrix;
-}
 
 struct GraphicSleepAlarm {
     OSAlarm alarm;
@@ -178,7 +163,7 @@ void CGraphic::Init()
     OSResumeThread(&m_thread);
 
     VIInit();
-    m_renderMode = &gDefaultGXRenderMode;
+    m_renderMode = &_GXPal528IntDf;
     m_displayCopyEnabled = 1;
 
     GXRenderModeObj* renderMode = m_renderMode;
@@ -224,7 +209,7 @@ void CGraphic::Init()
     VISetNextFrameBuffer(m_frameBuffer);
     VIFlush();
     VIWaitForRetrace();
-    if ((*reinterpret_cast<u32*>(m_renderMode) & 1) != 0) {
+    if ((m_renderMode->viTVmode & 1) != 0) {
         VIWaitForRetrace();
     }
 
@@ -309,12 +294,12 @@ int CGraphic::GetProgressive()
  */
 void CGraphic::ChangeProgressive(int mode)
 {
-    GXRenderModeObj* defaultRenderMode = &gDefaultGXRenderMode;
+    GXRenderModeObj* defaultRenderMode = &_GXPal528IntDf;
     if (m_renderMode != defaultRenderMode) {
         m_renderMode = defaultRenderMode;
         GXAdjustForOverscan(m_renderMode, m_renderMode, 0, 0x10);
         VIConfigure(m_renderMode);
-        GXSetCopyFilter(m_renderMode->aa, m_renderMode->sample_pattern, GX_TRUE, gDefaultGXRenderMode.vfilter);
+        GXSetCopyFilter(m_renderMode->aa, m_renderMode->sample_pattern, GX_TRUE, _GXPal528IntDf.vfilter);
         VIFlush();
         VIWaitForRetrace();
         VIWaitForRetrace();
@@ -1059,8 +1044,8 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
  * --INFO--
  * PAL Address: 0x80018300
  * PAL Size: 1124b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001FCA8
+ * EN Size: 892b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1112,66 +1097,24 @@ void CGraphic::makeSphere()
     int ringStart = 1;
     for (; ring < 5; ring++) {
         int current = ringStart;
-        for (int seg = 0; seg < 8; seg += 2) {
-            int i0 = current;
-            current += 2;
-
-            GXWGFifo.f32 = vertices[i0 * 3 + 1];
-            GXWGFifo.f32 = vertices[i0 * 3 + 0];
-            GXWGFifo.f32 = vertices[i0 * 3 + 2];
-
-            int next0 = ringStart + ((seg + 1) % 8);
-            GXWGFifo.f32 = vertices[next0 * 3 + 1];
-            GXWGFifo.f32 = vertices[next0 * 3 + 0];
-            GXWGFifo.f32 = vertices[next0 * 3 + 2];
-
-            int ringBase = ringStart;
-            int next1 = ringBase + ((seg + 2) % 8);
-            GXWGFifo.f32 = vertices[(i0 + 1) * 3 + 1];
-            GXWGFifo.f32 = vertices[(i0 + 1) * 3 + 0];
-            GXWGFifo.f32 = vertices[(i0 + 1) * 3 + 2];
-
-            GXWGFifo.f32 = vertices[next1 * 3 + 1];
-            GXWGFifo.f32 = vertices[next1 * 3 + 0];
-            GXWGFifo.f32 = vertices[next1 * 3 + 2];
+        for (int seg = 0; seg < 8; seg++) {
+            GXPosition3f32(vertices[current * 3 + 1], vertices[current * 3], vertices[current * 3 + 2]);
+            int next = ringStart + (seg + 1) % 8;
+            GXPosition3f32(vertices[next * 3 + 1], vertices[next * 3], vertices[next * 3 + 2]);
+            current++;
         }
         ringStart += 8;
     }
 
     for (int seg = 0; seg < 8; seg++) {
         int ring = 0;
-        int ringPairBase = 1;
-        for (int ringPair = 0; ringPair < 3; ringPair++) {
-            int idx0 = ring == 0 ? 0 : (ring - 1) * 8 + seg + 1;
-            GXWGFifo.f32 = vertices[idx0 * 3 + 1];
-            GXWGFifo.f32 = vertices[idx0 * 3 + 0];
-            GXWGFifo.f32 = vertices[idx0 * 3 + 2];
-
-            int idx2 = 0x29;
-            if (ring + 1 != 6) {
-                idx2 = seg + ringPairBase;
-            }
-            GXWGFifo.f32 = vertices[idx2 * 3 + 1];
-            int vertexIndex = idx2;
-            GXWGFifo.f32 = vertices[vertexIndex * 3 + 0];
-            GXWGFifo.f32 = vertices[idx2 * 3 + 2];
-
-            ringPairBase += 8;
-            ring++;
-            int idx1 = ring == 0 ? 0 : (ring - 1) * 8 + seg + 1;
-            GXWGFifo.f32 = vertices[idx1 * 3 + 1];
-            GXWGFifo.f32 = vertices[idx1 * 3 + 0];
-            GXWGFifo.f32 = vertices[idx1 * 3 + 2];
-
-            int idx3 = 0x29;
-            if (ring + 1 != 6) {
-                idx3 = seg + ringPairBase;
-            }
-            ringPairBase += 8;
-            ring++;
-            GXWGFifo.f32 = vertices[idx3 * 3 + 1];
-            GXWGFifo.f32 = vertices[idx3 * 3 + 0];
-            GXWGFifo.f32 = vertices[idx3 * 3 + 2];
+        int ringBase = 1;
+        for (; ring < 6; ring++) {
+            int current = ring == 0 ? 0 : (ring - 1) * 8 + seg + 1;
+            GXPosition3f32(vertices[current * 3 + 1], vertices[current * 3], vertices[current * 3 + 2]);
+            int next = ring + 1 == 6 ? 41 : seg + ringBase;
+            GXPosition3f32(vertices[next * 3 + 1], vertices[next * 3], vertices[next * 3 + 2]);
+            ringBase += 8;
         }
     }
 
@@ -1184,14 +1127,13 @@ void CGraphic::makeSphere()
  * --INFO--
  * PAL Address: 0x80017f6c
  * PAL Size: 916b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8002007C
+ * EN Size: 792b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGraphic::DrawBound(CBound& bound, _GXColor color)
 {
-    float* box = reinterpret_cast<float*>(&bound);
     Mtx cameraMtx;
 
     _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -1208,7 +1150,7 @@ void CGraphic::DrawBound(CBound& bound, _GXColor color)
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 
-    PSMTXCopy(CameraMatrix(), cameraMtx);
+    CameraPcs.GetViewMatrix(cameraMtx);
     GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
     _GXColor materialColor = color;
     GXSetChanMatColor(GX_COLOR0A0, materialColor);
@@ -1216,30 +1158,30 @@ void CGraphic::DrawBound(CBound& bound, _GXColor color)
     GXSetChanAmbColor(GX_COLOR0A0, ambientColor);
 
     GXBegin(GX_LINES, GX_VTXFMT7, 0x18);
-    GXPosition3f32(box[0], box[1], box[2]);
-    GXPosition3f32(box[3], box[1], box[2]);
-    GXPosition3f32(box[0], box[4], box[2]);
-    GXPosition3f32(box[3], box[4], box[2]);
-    GXPosition3f32(box[0], box[1], box[5]);
-    GXPosition3f32(box[3], box[1], box[5]);
-    GXPosition3f32(box[0], box[4], box[5]);
-    GXPosition3f32(box[3], box[4], box[5]);
-    GXPosition3f32(box[0], box[1], box[2]);
-    GXPosition3f32(box[0], box[4], box[2]);
-    GXPosition3f32(box[3], box[1], box[2]);
-    GXPosition3f32(box[3], box[4], box[2]);
-    GXPosition3f32(box[0], box[1], box[5]);
-    GXPosition3f32(box[0], box[4], box[5]);
-    GXPosition3f32(box[3], box[1], box[5]);
-    GXPosition3f32(box[3], box[4], box[5]);
-    GXPosition3f32(box[0], box[1], box[2]);
-    GXPosition3f32(box[0], box[1], box[5]);
-    GXPosition3f32(box[3], box[1], box[2]);
-    GXPosition3f32(box[3], box[1], box[5]);
-    GXPosition3f32(box[0], box[4], box[2]);
-    GXPosition3f32(box[0], box[4], box[5]);
-    GXPosition3f32(box[3], box[4], box[2]);
-    GXPosition3f32(box[3], box[4], box[5]);
+    GXPosition3f32(bound.m_min.x, bound.m_min.y, bound.m_min.z);
+    GXPosition3f32(bound.m_max.x, bound.m_min.y, bound.m_min.z);
+    GXPosition3f32(bound.m_min.x, bound.m_max.y, bound.m_min.z);
+    GXPosition3f32(bound.m_max.x, bound.m_max.y, bound.m_min.z);
+    GXPosition3f32(bound.m_min.x, bound.m_min.y, bound.m_max.z);
+    GXPosition3f32(bound.m_max.x, bound.m_min.y, bound.m_max.z);
+    GXPosition3f32(bound.m_min.x, bound.m_max.y, bound.m_max.z);
+    GXPosition3f32(bound.m_max.x, bound.m_max.y, bound.m_max.z);
+    GXPosition3f32(bound.m_min.x, bound.m_min.y, bound.m_min.z);
+    GXPosition3f32(bound.m_min.x, bound.m_max.y, bound.m_min.z);
+    GXPosition3f32(bound.m_max.x, bound.m_min.y, bound.m_min.z);
+    GXPosition3f32(bound.m_max.x, bound.m_max.y, bound.m_min.z);
+    GXPosition3f32(bound.m_min.x, bound.m_min.y, bound.m_max.z);
+    GXPosition3f32(bound.m_min.x, bound.m_max.y, bound.m_max.z);
+    GXPosition3f32(bound.m_max.x, bound.m_min.y, bound.m_max.z);
+    GXPosition3f32(bound.m_max.x, bound.m_max.y, bound.m_max.z);
+    GXPosition3f32(bound.m_min.x, bound.m_min.y, bound.m_min.z);
+    GXPosition3f32(bound.m_min.x, bound.m_min.y, bound.m_max.z);
+    GXPosition3f32(bound.m_max.x, bound.m_min.y, bound.m_min.z);
+    GXPosition3f32(bound.m_max.x, bound.m_min.y, bound.m_max.z);
+    GXPosition3f32(bound.m_min.x, bound.m_max.y, bound.m_min.z);
+    GXPosition3f32(bound.m_min.x, bound.m_max.y, bound.m_max.z);
+    GXPosition3f32(bound.m_max.x, bound.m_max.y, bound.m_min.z);
+    GXPosition3f32(bound.m_max.x, bound.m_max.y, bound.m_max.z);
 }
 
 /*
@@ -1283,24 +1225,19 @@ void CGraphic::SetFogParam(float startZ, float endZ)
  * --INFO--
  * PAL Address: 0x80017ea8
  * PAL Size: 148b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800203D4
+ * EN Size: 204b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGraphic::SetFog(int useFog, int useGlobalColor)
+void CGraphic::SetFog(int useFog, int useBlack)
 {
+    static _GXColor black = {0, 0, 0, 0};
     float nearZ;
     float farZ;
+    CameraPcs.GetClip(&nearZ, &farZ);
 
-    if (&nearZ != 0) {
-        nearZ = CameraNearZ();
-    }
-    if (&farZ != 0) {
-        farZ = CameraFarZ();
-    }
-
-    GXSetFog(useFog != 0 ? GX_FOG_LIN : GX_FOG_NONE, m_fogStart, m_fogEnd, nearZ, farZ, useGlobalColor != 0 ? gGraphicDefaultClearColor : m_fogColor);
+    GXSetFog(useFog != 0 ? GX_FOG_LIN : GX_FOG_NONE, m_fogStart, m_fogEnd, nearZ, farZ, useBlack != 0 ? black : m_fogColor);
 }
 
 /*
@@ -1392,13 +1329,13 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
             textureSize /= 2;
         }
 
-        GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
-        GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, static_cast<_GXTexFmt>(texFormat), GX_FALSE);
+        GXSetTexCopySrc(x, y, width, height);
+        GXSetTexCopyDst(width, height, static_cast<_GXTexFmt>(texFormat), GX_FALSE);
         DCInvalidateRange(m_scratchTextureBuffer, textureSize);
         GXCopyTex(m_scratchTextureBuffer, doClear);
         GXPixModeSync();
         GXInvalidateTexAll();
-        GXInitTexObj(&m_backBufferTexObj, m_scratchTextureBuffer, width & 0xFFFF, height & 0xFFFF,
+        GXInitTexObj(&m_backBufferTexObj, m_scratchTextureBuffer, width, height,
                      static_cast<_GXTexFmt>(texFormat), GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&m_backBufferTexObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF,
                         kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
@@ -1412,8 +1349,8 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
  * --INFO--
  * PAL Address: 0x80017980
  * PAL Size: 432b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80020AA8
+ * EN Size: 568b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1433,16 +1370,14 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
         return;
     }
     {
-        void* textureBase;
-        int textureSize = GXGetTexBufferSize((u16)width, (u16)height, format, GX_FALSE, GX_FALSE);
-        textureBase =
-            reinterpret_cast<void*>((reinterpret_cast<u32>(dstBuffer) + ((dstOffset + 0x1F) & 0xFFFFFFE0) + 0x1F) &
-                                    0xFFFFFFE0);
+        int textureSize = GXGetTexBufferSize(width, height, format, GX_FALSE, GX_FALSE);
+        dstBuffer = static_cast<u8*>(dstBuffer) + OSRoundUp32B(dstOffset);
+        dstBuffer = reinterpret_cast<void*>(OSRoundUp32B(dstBuffer));
 
-        GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, (u16)width, (u16)height);
-        GXSetTexCopyDst((u16)width, (u16)height, format, GX_FALSE);
-        DCInvalidateRange(textureBase, textureSize);
-        GXCopyTex(textureBase, doClear);
+        GXSetTexCopySrc(x, y, width, height);
+        GXSetTexCopyDst(width, height, format, GX_FALSE);
+        DCInvalidateRange(dstBuffer, textureSize);
+        GXCopyTex(dstBuffer, doClear);
         GXPixModeSync();
         GXInvalidateTexAll();
 
@@ -1467,7 +1402,7 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
         }
 
         if (texObj != nullptr) {
-            GXInitTexObj(texObj, textureBase, (u16)width, (u16)height, format, GX_CLAMP, GX_CLAMP,
+            GXInitTexObj(texObj, dstBuffer, width, height, format, GX_CLAMP, GX_CLAMP,
                          GX_FALSE);
             float zero = LoadFloat(kGraphicZeroF);
             GXInitTexObjLOD(texObj, filter, filter, zero, zero, zero, GX_FALSE, GX_FALSE,
@@ -1644,9 +1579,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	farAlpha = 0;
 	texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
 
-	cameraPos.x = CameraWorldX();
-	cameraPos.y = CameraWorldY();
-	cameraPos.z = CameraWorldZ();
+	CameraPcs.GetPosition(&cameraPos);
 	hasNearAlpha = 0;
 	cameraPos.y = kGraphicZeroF;
 	hasFarAlpha = 0;
@@ -1656,7 +1589,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 
 	GXGetProjectionv(gxProjection);
 	GXGetViewportv(gxViewport);
-	PSMTXCopy(CameraMatrix(), cameraMtx);
+	CameraPcs.GetViewMatrix(cameraMtx);
 
 	if (mode != 2) {
 		PSVECScale(&cameraToTarget, &scaledDir, nearDist);
@@ -1906,8 +1839,8 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     quadMax.z = kGraphicZeroF;
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
-    PSMTXCopy(CameraMatrix(), cameraMtx);
-    PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
+    CameraPcs.GetViewMatrix(cameraMtx);
+    CameraPcs.GetProjectionMatrix(projection);
     GXLoadPosMtxImm(cameraMtx, 0);
     GXSetProjection(projection, GX_PERSPECTIVE);
 }
@@ -2008,9 +1941,9 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     PSMTXIdentity(identity);
-    GXLoadPosMtxImm(CameraMatrix(), 0);
+    GXLoadPosMtxImm(CameraPcs.GetViewMatrix(), 0);
     GXSetCurrentMtx(0);
-    GXSetProjection(CameraPcs.m_screenMatrix, GX_PERSPECTIVE);
+    GXSetProjection(CameraPcs.GetProjectionMatrix(), GX_PERSPECTIVE);
     GXSetAlphaUpdate(GX_TRUE);
 
     if (m_blurDelayCounter < textureDelay) {

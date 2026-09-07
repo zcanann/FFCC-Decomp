@@ -3425,7 +3425,7 @@ void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int l
 
         for (mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
             CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[mapAnimNodeIndex];
-            if (mapAnimNode->m_node == reinterpret_cast<CMapAnimTargetNode*>(mapObj)) {
+            if (mapAnimNode->m_node == mapObj) {
                 goto startMapObjAnim;
             }
         }
@@ -3621,9 +3621,9 @@ void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
     {
         CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
         spotAttr->m_color = spotColor;
-        mapObj->m_localRotationX = spotPosition.x;
-        mapObj->m_localRotationY = spotPosition.y;
-        mapObj->m_localRotationZ = spotPosition.z;
+        mapObj->m_localRotation.x = spotPosition.x;
+        mapObj->m_localRotation.y = spotPosition.y;
+        mapObj->m_localRotation.z = spotPosition.z;
         mapObj->m_localMtxDirty = 1;
         mapObj->m_calcMtxPending = 1;
         break;

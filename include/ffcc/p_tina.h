@@ -9,7 +9,6 @@ struct Vec;
 struct pppIVECTOR3;
 struct pppFVECTOR4;
 
-void LoadFieldPdt0(int, int);
 unsigned char pppNotAllocAmemCacheRmem(unsigned long);
 unsigned int pppFreeMngStPrioForData();
 unsigned char pppAmemDeletePmng(unsigned long);
@@ -18,7 +17,7 @@ unsigned char pppAmemRefCntError(unsigned long);
 class CPartPcs : public CProcess
 {
 public:
-    static CProcessTable m_table[2];
+    static CProcessCallbackTable m_table[2];
 
     CUSBStreamData m_usbStreamData; // 0x04
     CUSBStreamDataState m_usbStreamState; // 0x18

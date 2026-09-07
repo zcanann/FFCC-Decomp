@@ -3,6 +3,7 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
+#include "ffcc/mapobj.h"
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
 #include "dolphin/mtx.h"
@@ -136,6 +137,54 @@ inline CMapAnimKeyDt::CMapAnimKeyDt()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 564b
+ * EN Address: 0x80056d30
+ * EN Size: 580b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAnim)
+{
+    CChunkFile::CChunk chunk;
+    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = &MapMng.GetMapAnimKeyDtArray();
+    int hasChunk;
+
+    m_mapAnim = mapAnim;
+    chunkFile.PushChunk();
+    while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(chunk))) != 0) {
+        if (chunk.m_id == 0x4E494458) {
+            int nodeIdx = static_cast<int>(chunkFile.Get4());
+            m_node = MapMng.GetMapObj(nodeIdx);
+        } else if (chunk.m_id == 0x5452414E) {
+            CMapAnimKeyDt* keyData =
+                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
+            m_tracks = keyData;
+            mapAnimKeyDtArray->Add(m_tracks);
+            m_tracks->position.count = chunk.m_size >> 4;
+            m_tracks->position.keys =
+                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4F)
+                    CMapAnimKey[m_tracks->position.count];
+            memcpy(m_tracks->position.keys, chunkFile.GetAddress(), chunk.m_size);
+        } else if (chunk.m_id == 0x524F5420) {
+            m_tracks->rotation.count = chunk.m_size >> 4;
+            m_tracks->rotation.keys =
+                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x55)
+                    CMapAnimKey[m_tracks->rotation.count];
+            memcpy(m_tracks->rotation.keys, chunkFile.GetAddress(), chunk.m_size);
+        } else if (chunk.m_id == 0x5343414C) {
+            m_tracks->scale.count = chunk.m_size >> 4;
+            m_tracks->scale.keys =
+                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x5B)
+                    CMapAnimKey[m_tracks->scale.count];
+            memcpy(m_tracks->scale.keys, chunkFile.GetAddress(), chunk.m_size);
+        }
+    }
+    chunkFile.PopChunk();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8004a5d8
  * PAL Size: 728b
  * EN Address: TODO
@@ -145,56 +194,16 @@ inline CMapAnimKeyDt::CMapAnimKeyDt()
  */
 void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
 {
-    unsigned int outerChunkData[4];
-    unsigned int& chunkId = outerChunkData[0];
-    unsigned int innerChunkData[4];
-    unsigned int& innerChunkId = innerChunkData[0];
-    unsigned int& innerChunkSize = innerChunkData[3];
-    int hasChunk;
-    CMapAnimNode* item;
-    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray;
-    int nodeIdx;
+    CChunkFile::CChunk chunk;
 
     chunkFile.PushChunk();
-    mapAnimKeyDtArray = &MapMng.GetMapAnimKeyDtArray();
-    while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(outerChunkData)))) != 0) {
-        if (chunkId == 0x4652414D) {
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id == 0x4652414D) {
             m_startFrame = static_cast<int>(chunkFile.Get4());
             m_endFrame = static_cast<int>(chunkFile.Get4());
-        } else if (chunkId == 0x4E4F4445) {
-            item = new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0xC2) CMapAnimNode;
-            item->m_mapAnim = this;
-
-            chunkFile.PushChunk();
-            while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(innerChunkData)))) != 0) {
-                if (innerChunkId == 0x4E494458) {
-                    nodeIdx = static_cast<int>(chunkFile.Get4());
-                    item->m_node = reinterpret_cast<CMapAnimTargetNode*>(MapMng.GetMapObj(nodeIdx));
-                } else if (innerChunkId == 0x5452414E) {
-                    CMapAnimKeyDt* tracks = new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
-
-                    item->m_tracks = tracks;
-                    mapAnimKeyDtArray->Add(item->m_tracks);
-                    item->m_tracks->position.count = innerChunkSize >> 4;
-                    item->m_tracks->position.keys =
-                        new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4F)
-                            CMapAnimNodeTrackKey[item->m_tracks->position.count];
-                    memcpy(item->m_tracks->position.keys, chunkFile.GetAddress(), innerChunkSize);
-                } else if (innerChunkId == 0x524F5420) {
-                    item->m_tracks->rotation.count = innerChunkSize >> 4;
-                    item->m_tracks->rotation.keys =
-                        new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x55)
-                            CMapAnimNodeTrackKey[item->m_tracks->rotation.count];
-                    memcpy(item->m_tracks->rotation.keys, chunkFile.GetAddress(), innerChunkSize);
-                } else if (innerChunkId == 0x5343414C) {
-                    item->m_tracks->scale.count = innerChunkSize >> 4;
-                    item->m_tracks->scale.keys =
-                        new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x5B)
-                            CMapAnimNodeTrackKey[item->m_tracks->scale.count];
-                    memcpy(item->m_tracks->scale.keys, chunkFile.GetAddress(), innerChunkSize);
-                }
-            }
-            chunkFile.PopChunk();
+        } else if (chunk.m_id == 0x4E4F4445) {
+            CMapAnimNode* item = new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0xC2) CMapAnimNode;
+            item->ReadOtmAnimNode(chunkFile, this);
             mapAnimNodes.Add(item);
         }
     }
@@ -215,10 +224,8 @@ CMapAnim::~CMapAnim()
     unsigned int i = 0;
 
     while (static_cast<unsigned int>(mapAnimNodes.GetSize()) > i) {
-        CMapAnimNode* node = mapAnimNodes[i];
-        if (node != 0 && (node = mapAnimNodes[i], node != 0)) {
-            node->m_mapAnim = 0;
-            operator delete(node);
+        if (mapAnimNodes[i] != 0) {
+            delete mapAnimNodes[i];
         }
         i++;
     }
@@ -244,34 +251,29 @@ CMapAnim::CMapAnim()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 368b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80057050
+ * EN Size: 436b
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMapAnimNode::interp(Vec* out, CMapAnimKey* track, int frameInLoop, int loopFrameCount)
+inline void CMapAnimNode::interp(Vec* out, CMapAnimKey* keys, int trackCount, int frameInLoop)
 {
-    CMapAnimNodeTrackKey* keys = track->keys;
-    int trackCount = track->count;
-
     if (trackCount == 1) {
-        out->x = keys[0].value.x;
-        out->y = keys[0].value.y;
-        out->z = keys[0].value.z;
+        *out = keys[0].value;
     } else {
-        CMapAnimNodeTrackKey* current = keys;
         unsigned int i = 0;
-        unsigned int keyCount = static_cast<unsigned int>(trackCount);
 
-        for (; i < keyCount; i++) {
-            unsigned int nextIndex = (keyCount <= (i + 1)) ? 0 : (i + 1);
-            CMapAnimNodeTrackKey* next = keys + nextIndex;
+        for (; i < trackCount; i++) {
+            CMapAnimKey* current = &keys[i];
+            unsigned int nextIndex = (trackCount <= (i + 1)) ? 0 : (i + 1);
+            CMapAnimKey* next = keys + nextIndex;
             unsigned int endFrame;
 
             if (nextIndex != 0) {
                 endFrame = next->frame;
             } else {
-                endFrame = next->frame + loopFrameCount;
+                endFrame = next->frame +
+                    static_cast<unsigned int>((m_mapAnim->m_endFrame - m_mapAnim->m_startFrame) + 1);
             }
 
             unsigned int currentFrame = current->frame;
@@ -279,8 +281,8 @@ inline void CMapAnimNode::interp(Vec* out, CMapAnimKey* track, int frameInLoop, 
                 (frameInLoop < static_cast<int>(endFrame))) {
                 unsigned int frameRange = endFrame - currentFrame;
                 float t;
-                Vec nextScaled;
                 Vec currentScaled;
+                Vec nextScaled;
 
                 if (frameRange == 0) {
                     t = 0.0f;
@@ -294,8 +296,6 @@ inline void CMapAnimNode::interp(Vec* out, CMapAnimKey* track, int frameInLoop, 
                 PSVECAdd(&currentScaled, &nextScaled, out);
                 break;
             }
-
-            current++;
         }
     }
 }
@@ -311,215 +311,13 @@ inline void CMapAnimNode::interp(Vec* out, CMapAnimKey* track, int frameInLoop, 
  */
 void CMapAnimNode::Interp(int frame)
 {
-    int startFrame = m_mapAnim->m_startFrame;
-    CMapAnimNodeTrackKey* positionKeys = m_tracks->position.keys;
-    int positionTrackCount = m_tracks->position.count;
-    unsigned int loopFrameCount = static_cast<unsigned int>((m_mapAnim->m_endFrame - startFrame) + 1);
-    Vec* positionOut = &m_node->position;
-    unsigned int frameInLoop = startFrame + (frame % loopFrameCount);
+    int frameInLoop = m_mapAnim->m_startFrame +
+        (frame % static_cast<unsigned int>(m_mapAnim->m_endFrame - m_mapAnim->m_startFrame + 1));
 
-    {
-        CMapAnimNodeTrackKey* keys = positionKeys;
-        int trackCount = positionTrackCount;
-        Vec* out = positionOut;
-
-        if (trackCount == 1) {
-            out->x = keys[0].value.x;
-            out->y = keys[0].value.y;
-            out->z = keys[0].value.z;
-        } else {
-            unsigned int i = 0;
-            CMapAnimNodeTrackKey* current = keys;
-            unsigned int keyCount = static_cast<unsigned int>(trackCount);
-
-            for (; i < keyCount; i++) {
-                unsigned int nextIndex = (keyCount <= (i + 1)) ? 0 : (i + 1);
-                CMapAnimNodeTrackKey* next = keys + nextIndex;
-                unsigned int endFrame;
-
-                if (nextIndex != 0) {
-                    endFrame = next->frame;
-                } else {
-                    endFrame = next->frame + loopFrameCount;
-                }
-
-                unsigned int currentFrame = current->frame;
-                if ((currentFrame <= frameInLoop) && ((int)frameInLoop < (int)endFrame)) {
-                    unsigned int frameRange = endFrame - currentFrame;
-                    float t;
-                    Vec nextScaled;
-                    Vec currentScaled;
-
-                    if (frameRange == 0) {
-                        t = 0.0f;
-                    } else {
-                        t = static_cast<float>(frameInLoop - currentFrame) / static_cast<float>(frameRange);
-                    }
-
-                    PSVECScale(&current->value, &currentScaled, t);
-                    PSVECScale(&next->value, &nextScaled, 1.0f - t);
-                    PSVECAdd(&currentScaled, &nextScaled, out);
-                    break;
-                }
-
-                current++;
-            }
-        }
-    }
-
-    {
-        CMapAnimNodeTrack* track = &m_tracks->rotation;
-        CMapAnimNodeTrackKey* keys = track->keys;
-        int trackCount = track->count;
-        Vec* out = &m_node->rotation;
-
-        if (trackCount == 1) {
-            out->x = keys[0].value.x;
-            out->y = keys[0].value.y;
-            out->z = keys[0].value.z;
-        } else {
-            CMapAnimNodeTrackKey* current = keys;
-            unsigned int i = 0;
-            unsigned int keyCount = static_cast<unsigned int>(trackCount);
-
-            for (; i < keyCount; i++) {
-                unsigned int nextIndex = (keyCount <= (i + 1)) ? 0 : (i + 1);
-                CMapAnimNodeTrackKey* next = keys + nextIndex;
-                unsigned int endFrame;
-
-                if (nextIndex != 0) {
-                    endFrame = next->frame;
-                } else {
-                    endFrame = next->frame +
-                               static_cast<unsigned int>((m_mapAnim->m_endFrame - m_mapAnim->m_startFrame) + 1);
-                }
-
-                unsigned int currentFrame = current->frame;
-                if ((currentFrame <= frameInLoop) && ((int)frameInLoop < (int)endFrame)) {
-                    unsigned int frameRange = endFrame - currentFrame;
-                    float t;
-                    Vec nextScaled;
-                    Vec currentScaled;
-
-                    if (frameRange == 0) {
-                        t = 0.0f;
-                    } else {
-                        t = static_cast<float>(frameInLoop - currentFrame) / static_cast<float>(frameRange);
-                    }
-
-                    PSVECScale(&current->value, &currentScaled, t);
-                    PSVECScale(&next->value, &nextScaled, 1.0f - t);
-                    PSVECAdd(&currentScaled, &nextScaled, out);
-                    break;
-                }
-
-                current++;
-            }
-        }
-    }
-
-    {
-        CMapAnimNodeTrack* track = &m_tracks->scale;
-        CMapAnimNodeTrackKey* keys = track->keys;
-        int trackCount = track->count;
-        Vec* out = &m_node->scale;
-
-        if (trackCount == 1) {
-            out->x = keys[0].value.x;
-            out->y = keys[0].value.y;
-            out->z = keys[0].value.z;
-        } else {
-            CMapAnimNodeTrackKey* current = keys;
-            unsigned int i = 0;
-            unsigned int keyCount = static_cast<unsigned int>(trackCount);
-
-            for (; i < keyCount; i++) {
-                unsigned int nextIndex = (keyCount <= (i + 1)) ? 0 : (i + 1);
-                CMapAnimNodeTrackKey* next = keys + nextIndex;
-                unsigned int endFrame;
-
-                if (nextIndex != 0) {
-                    endFrame = next->frame;
-                } else {
-                    endFrame = next->frame +
-                               static_cast<unsigned int>((m_mapAnim->m_endFrame - m_mapAnim->m_startFrame) + 1);
-                }
-
-                unsigned int currentFrame = current->frame;
-                if ((currentFrame <= frameInLoop) && ((int)frameInLoop < (int)endFrame)) {
-                    unsigned int frameRange = endFrame - currentFrame;
-                    float t;
-                    Vec nextScaled;
-                    Vec currentScaled;
-
-                    if (frameRange == 0) {
-                        t = 0.0f;
-                    } else {
-                        t = static_cast<float>(frameInLoop - currentFrame) / static_cast<float>(frameRange);
-                    }
-
-                    PSVECScale(&current->value, &currentScaled, t);
-                    PSVECScale(&next->value, &nextScaled, 1.0f - t);
-                    PSVECAdd(&currentScaled, &nextScaled, out);
-                    break;
-                }
-
-                current++;
-            }
-        }
-    }
-
-    m_node->dirty = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 564b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAnim)
-{
-    unsigned int chunkData[4];
-    unsigned int& chunkId = chunkData[0];
-    unsigned int& chunkSize = chunkData[3];
-    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = &MapMng.GetMapAnimKeyDtArray();
-    int hasChunk;
-
-    m_mapAnim = mapAnim;
-    chunkFile.PushChunk();
-    while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(chunkData)))) != 0) {
-        if (chunkId == 0x4E494458) {
-            int nodeIdx = static_cast<int>(chunkFile.Get4());
-            m_node = reinterpret_cast<CMapAnimTargetNode*>(MapMng.GetMapObj(nodeIdx));
-        } else if (chunkId == 0x5452414E) {
-            CMapAnimKeyDt* keyData =
-                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
-            m_tracks = keyData;
-            mapAnimKeyDtArray->Add(keyData);
-            m_tracks->position.count = chunkSize >> 4;
-            m_tracks->position.keys =
-                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4F)
-                    CMapAnimNodeTrackKey[m_tracks->position.count];
-            memcpy(m_tracks->position.keys, chunkFile.GetAddress(), chunkSize);
-        } else if (chunkId == 0x524F5420) {
-            m_tracks->rotation.count = chunkSize >> 4;
-            m_tracks->rotation.keys =
-                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x55)
-                    CMapAnimNodeTrackKey[m_tracks->rotation.count];
-            memcpy(m_tracks->rotation.keys, chunkFile.GetAddress(), chunkSize);
-        } else if (chunkId == 0x5343414C) {
-            m_tracks->scale.count = chunkSize >> 4;
-            m_tracks->scale.keys =
-                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x5B)
-                    CMapAnimNodeTrackKey[m_tracks->scale.count];
-            memcpy(m_tracks->scale.keys, chunkFile.GetAddress(), chunkSize);
-        }
-    }
-    chunkFile.PopChunk();
+    interp(&m_node->m_localPosition, m_tracks->position.keys, m_tracks->position.count, frameInLoop);
+    interp(&m_node->m_localRotation, m_tracks->rotation.keys, m_tracks->rotation.count, frameInLoop);
+    interp(&m_node->m_localScale, m_tracks->scale.keys, m_tracks->scale.count, frameInLoop);
+    m_node->m_calcMtxPending = 1;
 }
 
 /*

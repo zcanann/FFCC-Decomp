@@ -222,14 +222,9 @@ int CMenuPcs::MLstClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
-#pragma opt_common_subs off
 int CMenuPcs::MLstCtrl()
 {
-	bool blocked;
 	float one;
-	unsigned int rawPress;
-	unsigned int rawHold;
 	short press;
 	short hold;
 	unsigned int itemCount;
@@ -237,37 +232,10 @@ int CMenuPcs::MLstCtrl()
 	int i;
 	int startFrame;
 	int duration;
-	int padLock;
 	int result;
 
-	blocked = false;
-	padLock = Pad.m_debugPadLock;
-	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-		blocked = true;
-	}
-	if (blocked) {
-		rawPress = 0;
-	} else {
-		unsigned int padIndex = 0;
-		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
-		padIndex &= ~mask;
-		rawPress = Pad.GetPadInputs()[padIndex].buttonDown[0];
-	}
-	press = rawPress & 0xffff;
-
-	blocked = false;
-	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
-		blocked = true;
-	}
-	if (blocked) {
-		rawHold = 0;
-	} else {
-		unsigned int padIndex = 0;
-		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
-		padIndex &= ~mask;
-		rawHold = Pad.GetPadInputs()[padIndex].repeatButton;
-	}
-	hold = rawHold & 0xffff;
+	press = Pad.GetButtonDown(0);
+	hold = Pad.GetButtonRepeat(0);
 
 	if (hold == 0) {
 		result = 0;
@@ -328,8 +296,6 @@ int CMenuPcs::MLstCtrl()
 	}
 	return result;
 }
-#pragma opt_common_subs reset
-#pragma opt_propagation reset
 
 /*
  * --INFO--

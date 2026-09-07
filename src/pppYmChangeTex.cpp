@@ -28,9 +28,9 @@ STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_workPositions) == 0xC);
 STATIC_ASSERT(offsetof(ChangeTexDataOffsets, m_colorBlockOffset) == 0x4);
 STATIC_ASSERT(offsetof(ChangeTexDataOffsets, m_workOffset) == 0x8);
-STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xC);
-STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x24);
-STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x34);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_meshCount) == 0xC);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_materialSet) == 0x24);
+STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_posQuant) == 0x34);
 STATIC_ASSERT(sizeof(pppYmChangeTexState) == 0x28);
 STATIC_ASSERT(offsetof(pppYmChangeTexState, m_meshColorArrays) == 0x0C);
 STATIC_ASSERT(offsetof(pppYmChangeTexState, m_displayListArrays) == 0x10);
@@ -289,22 +289,22 @@ freeArrays:
 		ChangeTexDisplayListCopy** dlEntries = *stageArray;
 		for (unsigned int j = 0; j < meshData->m_displayListCount; j++) {
 			if ((*dlEntries)->m_data != 0) {
-				pppHeapUseRate(reinterpret_cast<CMemory::CStage*>((*dlEntries)->m_data));
+				pppMemFree((*dlEntries)->m_data);
 				(*dlEntries)->m_data = 0;
 			}
 			if (*dlEntries != 0) {
-				pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*dlEntries));
+				pppMemFree(*dlEntries);
 				*dlEntries = 0;
 			}
 			dlEntries++;
 		}
 
 		if (*stageArray != 0) {
-			pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*stageArray));
+			pppMemFree(*stageArray);
 			*stageArray = 0;
 		}
 		if (*meshArray != 0) {
-			pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*meshArray));
+			pppMemFree(*meshArray);
 			*meshArray = 0;
 		}
 
@@ -313,10 +313,10 @@ freeArrays:
 	}
 
 	if (stageArrayOrig != 0) {
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(stageArrayOrig));
+		pppMemFree(stageArrayOrig);
 	}
 	if (meshArrayOrig != 0) {
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(meshArrayOrig));
+		pppMemFree(meshArrayOrig);
 	}
 }
 

@@ -1,27 +1,11 @@
 #ifndef _FFCC_MCCTRL_H_
 #define _FFCC_MCCTRL_H_
 
-struct McCtrlData
-{
-    int m_previousState;
-    int m_state;
-    int m_cardChannel;
-    int m_lastResult;
-    int m_saveIndex;
-    int m_iteration;
-    int m_createFlag;
-    void* m_userBuffer;
-    unsigned int m_serialLo;
-    unsigned int m_serialHi;
-};
-typedef int McCtrlData_size_mismatch[(sizeof(McCtrlData) == 0x28) ? 1 : -1];
-
-class McCtrl : public McCtrlData
+class McCtrl
 {
 public:
     McCtrl();
     ~McCtrl();
-
     void Init();
     int LoadMcList();
     void SetListDat(int, int);
@@ -41,7 +25,67 @@ public:
     void GetSlot();
     void SetDno(int);
     void SetSlot(int);
+
+    int m_previousState;
+    int m_state;
+    int m_cardChannel;
+    int m_lastResult;
+    int m_saveIndex;
+    int m_iteration;
+    int m_createFlag;
+    void* m_userBuffer;
+    unsigned int m_serialLo;
+    unsigned int m_serialHi;
 };
 typedef int McCtrl_size_mismatch[(sizeof(McCtrl) == 0x28) ? 1 : -1];
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline McCtrl::McCtrl()
+{
+    Init();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline McCtrl::~McCtrl()
+{
+    Init();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void McCtrl::Init()
+{
+    m_previousState = 0;
+    m_state = 0;
+    m_lastResult = 0;
+    m_iteration = 0;
+    m_userBuffer = 0;
+    m_createFlag = 0;
+    m_cardChannel = 0;
+    m_saveIndex = 0;
+}
 
 #endif // _FFCC_MCCTRL_H_

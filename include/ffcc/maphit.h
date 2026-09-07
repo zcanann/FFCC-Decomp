@@ -46,6 +46,45 @@ public:
     {
     }
 
+    /*
+     * --INFO--
+     * PAL Address: TODO
+     * PAL Size: TODO
+     * EN Address: 0x80036C2C
+     * EN Size: 300b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void CalcBound()
+    {
+        float marginX = 1.0f + m_radius;
+        if (m_bottom.x < m_top.x) {
+            m_bound.m_min.x = m_bottom.x - marginX;
+            m_bound.m_max.x = m_top.x + marginX;
+        } else {
+            m_bound.m_min.x = m_top.x - marginX;
+            m_bound.m_max.x = m_bottom.x + marginX;
+        }
+
+        float marginY = 1.0f + m_radius;
+        if (m_bottom.y < m_top.y) {
+            m_bound.m_min.y = m_bottom.y - marginY;
+            m_bound.m_max.y = m_top.y + marginY;
+        } else {
+            m_bound.m_min.y = m_top.y - marginY;
+            m_bound.m_max.y = m_bottom.y + marginY;
+        }
+
+        float marginZ = 1.0f + m_radius;
+        if (m_bottom.z < m_top.z) {
+            m_bound.m_min.z = m_bottom.z - marginZ;
+            m_bound.m_max.z = m_top.z + marginZ;
+        } else {
+            m_bound.m_min.z = m_top.z - marginZ;
+            m_bound.m_max.z = m_bottom.z + marginZ;
+        }
+    }
+
     CBound* GetBound() { return &m_bound; }
     CMapCylinderProbeView& Probe() { return *reinterpret_cast<CMapCylinderProbeView*>(&m_top); }
     const CMapCylinderProbeView& Probe() const { return *reinterpret_cast<const CMapCylinderProbeView*>(&m_top); }
@@ -99,8 +138,7 @@ public:
 
     unsigned short m_vertexCount; // 0x00
     unsigned short m_faceCount;   // 0x02
-    Vec m_positionMin;            // 0x04
-    Vec m_positionMax;            // 0x10
+    CBound m_bound;               // 0x04
     Vec* m_vertices;              // 0x1c
     CMapHitFace* m_faces;         // 0x20
 };

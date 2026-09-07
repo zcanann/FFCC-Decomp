@@ -16,8 +16,8 @@ extern f32 gPppDefaultValueBuffer[];
 
 #pragma exceptions on
 
-extern const float kYmTracer2UvMin;
-extern const float kYmTracer2UvMax;
+static const float kYmTracer2UvMin = 0.0f;
+static const float kYmTracer2UvMax = 1.0f;
 
 static const char s_pppYmTracer2_cpp[] = "pppYmTracer2.cpp";
 
@@ -35,9 +35,6 @@ STATIC_ASSERT(offsetof(YmTracer2Work, entries) == 0x28);
 STATIC_ASSERT(offsetof(YmTracer2Work, visibleCount) == 0x2c);
 STATIC_ASSERT(offsetof(YmTracer2Work, alphaStep) == 0x30);
 STATIC_ASSERT(offsetof(YmTracer2ColorBlock, color) == 0x8);
-
-static pppPackedColor g_pppYmTracer2_1;
-static pppPackedColor g_pppYmTracer2_2;
 
 static inline void copyPolygonData(YmTracer2Polygon* dst, YmTracer2Polygon* src)
 {
@@ -82,8 +79,6 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
     s32 dataOffset;
     s32 colorOffset;
     s32 dataValIndex;
-    pppPackedColor colorTop;
-    pppPackedColor colorBottom;
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
@@ -139,8 +134,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
                 GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
 
                 YmTracer2Polygon* current = poly;
-                const f32& uvMin = kYmTracer2UvMin;
-                const f32& uvMax = kYmTracer2UvMax;
+                f32 uvMin = kYmTracer2UvMin;
+                f32 uvMax = kYmTracer2UvMax;
 
                 i = 0;
                 while (i < (s32)(work->visibleCount - 1)) {
@@ -156,8 +151,8 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
                         alphaScale = uvMax;
                     }
 
-                    colorTop = g_pppYmTracer2_1;
-                    colorBottom = g_pppYmTracer2_2;
+                    pppPackedColor colorTop = {0};
+                    pppPackedColor colorBottom = {0};
                     colorTop.bytes[0] = current->colorR;
                     colorTop.bytes[1] = current->colorG;
                     colorTop.bytes[2] = current->colorB;
@@ -345,7 +340,7 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 {
     YmTracer2Work* work = (YmTracer2Work*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_2)->m_workOffset);
     if (work->entries != 0) {
-        pppHeapUseRate((CMemory::CStage*)work->entries);
+        pppMemFree(work->entries);
     }
 }
 
@@ -399,6 +394,3 @@ void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
     work->alphaStep = 0;
     work->pad32 = 0;
 }
-
-extern const float kYmTracer2Zero = 0.0f;
-extern const char sTHPMagic[4] = "THP";

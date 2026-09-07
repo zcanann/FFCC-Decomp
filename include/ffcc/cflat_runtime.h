@@ -9,16 +9,21 @@ class CChunkFile;
 class CFlatRuntime
 {
 public:
-	struct CStack
-	{
-		u32 m_word;
-
-		void operator=(const CStack&);
-	};
-
 	class CCodeIndex
 	{
-		void operator=(const CCodeIndex&);
+	public:
+		short m_codeFunc : 12;
+		int m_codeOffset : 20;
+	};
+
+	struct CStack
+	{
+		union {
+			u32 m_word;
+			s32 m_int;
+			float m_float;
+			CCodeIndex m_codeIndex;
+		};
 	};
 
 	class CClass
@@ -32,6 +37,14 @@ public:
 		s32 m_variableCount;      // 0x228
 	};
 
+	struct CStackBlock
+	{
+		CStackBlock* m_previous; // 0x00
+		CStackBlock* m_next;     // 0x04
+		int m_offset;           // 0x08, words
+		int m_size;             // 0x0C, words
+	};
+
 	class CObject
 	{
 	public:
@@ -41,7 +54,7 @@ public:
 		}
 
 		unsigned int m_id;         // 0x0
-		void** m_freeListNode;     // 0x4
+		CStackBlock* m_freeListNode; // 0x4
 		unsigned int* m_sp;        // 0x8
 		unsigned int* m_localBase; // 0xC
 		unsigned int* m_thisBase;  // 0x10
@@ -50,18 +63,12 @@ public:
 		void* m_engineObject;      // 0x18
 		union {
 			unsigned int m_codePos; // 0x1C
-			struct {
-				short m_codeFunc : 12;
-				int m_codeOffset : 20;
-			} m_codeIndex;
+			CCodeIndex m_codeIndex;
 		};
 		CObject* m_previous;       // 0x20
 		CObject* m_next;           // 0x24
 		int m_waitCounter;	       // 0x28
-		unsigned char m_reqFlag0;  // 0x2C
-		unsigned char m_reqFlag1;  // 0x2D
-		unsigned char m_reqFlag2;  // 0x2E
-		unsigned char m_reqFlag3;  // 0x2F
+		int m_requestPending;     // 0x2C
 		short m_particleId;        // 0x30
 		short m_0x32;              // 0x32
 		unsigned short m_0x34;     // 0x34-0x36
@@ -86,9 +93,6 @@ public:
 	class CFunc
 	{
 	public:
-		CFunc();
-		~CFunc();
-
 		s32 m_index;         // 0x00
 		char m_name[0x20];   // 0x04
 		s32 m_argCount;      // 0x24
@@ -179,11 +183,11 @@ public:
     int m_permanentVarCount;        // 0x0004
     u8* m_permanentVarDefs;         // 0x0008
     u8* m_permanentVarValues;       // 0x000C
-    void* m_initScratchA;           // 0x0010
+    u32* m_stackStorage;           // 0x0010
     int m_classCount;              // 0x0014
     CClass* m_classes;              // 0x0018
     int m_funcCount;                // 0x001C
-    u8* m_funcs;                    // 0x0020
+    CFunc* m_funcs;                 // 0x0020
     int m_strCount;                 // 0x0024
     char* m_strBlob;                // 0x0028
     u16* m_strOffsets;              // 0x002C
@@ -200,33 +204,28 @@ public:
     CObject m_freeObjectSentinel;   // 0x0918
     union {
         u32 m_currentCodePos;       // 0x0964
-        struct {
-            short m_codeFunc : 12;
-            int m_codeOffset : 20;
-        } m_currentCodeIndex;
+        CCodeIndex m_currentCodeIndex;
     };
     union {
         u32 m_previousCodePos;      // 0x0968
-        struct {
-            short m_codeFunc : 12;
-            int m_codeOffset : 20;
-        } m_previousCodeIndex;
+        CCodeIndex m_previousCodeIndex;
     };
     u8 m_pad_096C[4];               // 0x096C
     int m_0x970;                    // 0x0970
     int m_0x974;                    // 0x0974
-    void** m_freeListPrev;          // 0x0978
-    void** m_freeListNext;          // 0x097C
-    int m_freeListCount;            // 0x0980
-    void* m_0x984;                  // 0x0984
-    void* m_objectPoolBase;         // 0x0988
-    void** m_objectFreeListHead;    // 0x098C
-    u8 m_pad_0990[0x904];           // 0x0990
-    u8 m_0x1294;                    // 0x1294
-    u8 m_pad_1295[3];               // 0x1295
+    CStackBlock m_stackBlocks;        // 0x0978
+    CStackBlock m_freeStackBlocks;    // 0x0988
+    CStackBlock m_stackBlockPool[144]; // 0x0998
     int m_0x1298;                   // 0x1298
 };
 
+STATIC_ASSERT(sizeof(CFlatRuntime::CStackBlock) == 0x10);
+STATIC_ASSERT(offsetof(CFlatRuntime, m_stackBlocks) == 0x978);
+STATIC_ASSERT(offsetof(CFlatRuntime, m_freeStackBlocks) == 0x988);
+STATIC_ASSERT(offsetof(CFlatRuntime, m_stackBlockPool) == 0x998);
+STATIC_ASSERT(sizeof(CFlatRuntime::CCodeIndex) == 4);
+STATIC_ASSERT(sizeof(CFlatRuntime::CStack) == 4);
+STATIC_ASSERT(offsetof(CFlatRuntime::CObject, m_requestPending) == 0x2C);
 STATIC_ASSERT(sizeof(CFlatRuntime::CClass) == 0x22C);
 STATIC_ASSERT(offsetof(CFlatRuntime::CClass, m_functionTable) == 0x24);
 STATIC_ASSERT(offsetof(CFlatRuntime::CClass, m_localCount) == 0x224);

@@ -1019,7 +1019,7 @@ inline int CShopMenu::getItemHaveCnt(int itemNo)
 
 static inline long* GetShopMenuShapeAnimData(int shapeNo)
 {
-    pppShapeSt** shapeTable = ppvEnv->m_resourceTables.m_shapeTablePtr;
+    pppShapeSt** shapeTable = ppvEnv->m_shapeTablePtr;
     if (shapeTable == 0) {
         return 0;
     }
@@ -1854,8 +1854,6 @@ void CShopMenu::DrawMakeBase()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CShopMenu::DrawShopBase()
 {
     Graphic.SetDrawDoneDebugData(1);
@@ -1864,12 +1862,12 @@ void CShopMenu::DrawShopBase()
     Graphic.SetDrawDoneDebugData(2);
     pppInitDrawEnv(0);
 
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)11, (GXCompCnt)1, (GXCompType)5, 0);
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)13, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     GXSetNumChans(1);
-    GXSetChanCtrl((GXChannelID)0, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanCtrl((GXChannelID)2, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_COLOR0, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetCullMode(GX_CULL_NONE);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     GXSetColorUpdate(GX_TRUE);
@@ -1982,7 +1980,7 @@ void CShopMenu::DrawShopBase()
         }
     }
 }
-#pragma pop
+
 /*
  * --INFO--
  * Address:	TODO
@@ -1998,7 +1996,7 @@ void CShopMenu::Draw()
     }
 
     Graphic.SetDrawDoneDebugData(0x46);
-    ppvEnv = reinterpret_cast<_pppEnvSt*>(PartMng.m_pdtSlots[m_pdtSlot].m_envFields);
+    ppvEnv = &PartMng.m_pdtSlots[m_pdtSlot].m_env;
 
     MenuPcs.DrawInit();
 
@@ -3331,7 +3329,7 @@ void CShopMenu::Calc()
  */
 void CMenuPcs::CreateSmithMenu()
 {
-    short* cacheChunks;
+    pppCacheChunk* cacheChunks;
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
             s_shopmenu_cpp, 0x2E9));
@@ -3345,10 +3343,10 @@ void CMenuPcs::CreateSmithMenu()
     shopMenu->m_pdtSlot = PartPcs.LoadMenuPdt(const_cast<char*>(s_shop_80332e54));
 
     CPartMng::PppPdtSlot* slot = &PartMng.m_pdtSlots[shopMenu->m_pdtSlot];
-    cacheChunks = reinterpret_cast<short*>(slot->m_pppDataHead->m_cacheChunks);
-    *reinterpret_cast<int*>(cacheChunks + 2) =
-        ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp, 0x32A);
-    int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
+    cacheChunks = reinterpret_cast<pppCacheChunk*>(slot->m_pppDataHead->m_cacheChunks);
+    cacheChunks->m_pdt = reinterpret_cast<long*>(
+        ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, s_shopmenu_cpp, 0x32A));
+    int cacheData = reinterpret_cast<int>(cacheChunks->m_pdt);
     pppCacheLoadShape(reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)),
         slot->m_pppDataHead);
 }
@@ -3363,7 +3361,7 @@ void CMenuPcs::CreateSmithMenu()
  */
 void CMenuPcs::CreateShopMenu()
 {
-    short* cacheChunks;
+    pppCacheChunk* cacheChunks;
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
             s_shopmenu_cpp, 0x2E2));
@@ -3377,10 +3375,10 @@ void CMenuPcs::CreateShopMenu()
     shopMenu->m_pdtSlot = PartPcs.LoadMenuPdt(const_cast<char*>(s_shop_80332e54));
 
     CPartMng::PppPdtSlot* slot = &PartMng.m_pdtSlots[shopMenu->m_pdtSlot];
-    cacheChunks = reinterpret_cast<short*>(slot->m_pppDataHead->m_cacheChunks);
-    *reinterpret_cast<int*>(cacheChunks + 2) =
-        ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp, 0x32A);
-    int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
+    cacheChunks = reinterpret_cast<pppCacheChunk*>(slot->m_pppDataHead->m_cacheChunks);
+    cacheChunks->m_pdt = reinterpret_cast<long*>(
+        ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, s_shopmenu_cpp, 0x32A));
+    int cacheData = reinterpret_cast<int>(cacheChunks->m_pdt);
     pppCacheLoadShape(reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)),
         slot->m_pppDataHead);
 }
@@ -3412,7 +3410,7 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     _GXColor matColor;
     *reinterpret_cast<unsigned int*>(&matColor) = reinterpret_cast<unsigned int>(g_shopMenu);
 
-    int shapeData = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[shapeNo]->m_animData);
+    int shapeData = reinterpret_cast<int>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
@@ -3476,7 +3474,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     projectionMtx[2][3] += FLOAT_80332D9C;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-    int shapeData = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[shapeNo]->m_animData);
+    int shapeData = reinterpret_cast<int>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
@@ -3554,7 +3552,7 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     projectionMtx[2][3] += zOffset;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-    int shapeData = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[shapeNo]->m_animData);
+    int shapeData = reinterpret_cast<int>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 

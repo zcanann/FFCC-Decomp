@@ -102,7 +102,7 @@ extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLoc
 
     particle = work->m_particles;
     graphId = locationTitle->m_graphId;
-    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[unkB->m_dataValIndex];
+    shape = ppvEnv->m_shapeTablePtr[unkB->m_dataValIndex];
     graphFrame = GetGraphFrameFromId(graphId);
 
     pppSetBlendMode(unkB->m_blendMode);
@@ -369,7 +369,7 @@ extern "C" void pppDestructLocationTitle2(pppLocationTitle2* locationTitle, pppL
     LocationTitle2Work* work = GetLocationTitle2Work(locationTitle, unkC);
 
     if (work->m_particles != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particles));
+        pppMemFree(work->m_particles);
         work->m_particles = 0;
     }
 }

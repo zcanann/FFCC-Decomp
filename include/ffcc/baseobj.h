@@ -17,6 +17,20 @@ public:
 	virtual void onFrame();                     // vtable entry 0x24
 	virtual void onDraw();                      // vtable entry 0x28
 
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
+	 * PAL Size: 76b
+	 * EN Address: 0x8001DD5C
+	 * EN Size: 96b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	bool IsKindOf(unsigned short cid)
+	{
+		return (static_cast<unsigned short>(GetCID()) & cid) == cid;
+	}
+
 	void Create();
 	void Destroy();
 	void Frame();

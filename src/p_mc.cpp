@@ -3,10 +3,6 @@
 #include "ffcc/math.h"
 #include "ffcc/wm_menu.h"
 
-extern const char s_CMcPcsName[];
-extern const float kItemObjUnitScale = 1.0f;
-extern const float kItemObjHeightOffset = 10.0f;
-
 extern "C" {
 void create__6CMcPcsFv(CMcPcs*);
 void destroy__6CMcPcsFv(CMcPcs*);
@@ -27,7 +23,7 @@ inline CMcPcs::CMcPcs()
 }
 
 CProcessTable CMcPcs::m_table = {
-    const_cast<char*>(s_CMcPcsName),
+    "CMcPcs",
     {
         0,
         0,

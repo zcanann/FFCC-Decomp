@@ -12,23 +12,6 @@ typedef signed short s16;
 
 static FoodRank s_rank[8];
 
-struct CFontRenderFlagBits
-{
-	signed char shadow : 1;
-	signed char zCompare : 1;
-	signed char zUpdate : 1;
-	signed char fixedWidth : 1;
-	signed char snapPosition : 1;
-	signed char pad : 3;
-};
-
-static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
-{
-	return reinterpret_cast<CFontRenderFlagBits&>(flags);
-}
-
-extern "C" const float kCompaFoodIconUvScale = 0.75f;
-extern "C" const float kCompaFrameU = 72.0f;
 static const float kFavoWideTextureWidth = 384.0f;
 static const float kFavoIconUvScale = 0.75f;
 
@@ -217,7 +200,7 @@ void CMenuPcs::FavoDraw()
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
 		float posX = static_cast<float>(drawEntry->x - 0xC);
 		float posY = static_cast<float>(drawEntry->y + 0xA);
-		GetRenderFlagBits(rankFont->renderFlags).fixedWidth = 1;
+		rankFont->renderFlags.fixedWidth = 1;
 		rankFont->SetMargin(1.0f);
 		sprintf(textBuf, "%d", static_cast<int>(rank->place));
 		rankFont->SetPosX(posX);
@@ -315,29 +298,8 @@ int CMenuPcs::FavoClose()
  */
 int CMenuPcs::FavoCtrl()
 {
-	bool activeInput = false;
-	unsigned int rawPress;
-	short press;
+	short press = Pad.GetButtonDown(0);
 	int doReset;
-
-	if (Pad.m_debugPadLock == 0) {
-		if (Pad.m_debugPadPort != -1) {
-			goto active;
-		}
-	} else {
-active:
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		rawPress = 0;
-	} else {
-		unsigned int port = 0;
-		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
-		port &= ~mask;
-		rawPress = Pad.GetPadInputs()[port].buttonDown[0];
-	}
-	press = rawPress & 0xffff;
 
 	if (press == 0) {
 		doReset = 0;

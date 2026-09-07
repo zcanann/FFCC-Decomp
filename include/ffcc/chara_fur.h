@@ -18,14 +18,11 @@ class CGObjWork;
 struct Vec;
 class CFlatRuntime2;
 
-void la(CGObject*);
 void SAFE_CAST_WORK(CGObjWork*);
 
 class CHairSet
 {
 public:
-    CHairSet();
-
     CVector m_vec0;
     CVector m_vec1;
     CColor m_colors[2];

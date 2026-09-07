@@ -59,47 +59,17 @@ static const char sDbgMenuOn[] = "ON";
 static const char sDbgMenuOff[] = "OFF";
 static const char sDbgMenuUnknown[] = "?";
 
-extern "C" {
-void create__11CDbgMenuPcsFv(CDbgMenuPcs*);
-void destroy__11CDbgMenuPcsFv(CDbgMenuPcs*);
-void calc__11CDbgMenuPcsFv(CDbgMenuPcs*);
-void draw__11CDbgMenuPcsFv(CDbgMenuPcs*);
-}
-
 inline CDbgMenuPcs::CDbgMenuPcs()
 {
-	static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
-	static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
-	static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
-	static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
-
-	CProcessTable* table = &m_table;
-
-	table->m_fields.m_create = desc0;
-	table->m_fields.m_destroy = desc1;
-	table->m_fields.m_entries[0].m_callback = desc2;
-	table->m_fields.m_entries[1].m_callback = desc3;
 }
 
-CProcessTable CDbgMenuPcs::m_table = {
+CProcessCallbackTable CDbgMenuPcs::m_table = {
     const_cast<char*>(sCDbgMenuPcs),
+    static_cast<CProcessCallback>(&CDbgMenuPcs::create),
+    static_cast<CProcessCallback>(&CDbgMenuPcs::destroy),
     {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0x11,
-        0,
-        0,
-        0,
-        0,
-        0x4A,
-        1,
+        {static_cast<CProcessCallback>(&CDbgMenuPcs::calc), 0x11, 0},
+        {static_cast<CProcessCallback>(&CDbgMenuPcs::draw), 0x4A, 1},
     },
 };
 
@@ -581,7 +551,6 @@ void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_strength_reduction off
 void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, char* text)
 {
 	changeVtxFmt(1);
@@ -590,38 +559,18 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 	if ((flags & 1) == 0) {
 		GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT1, 4);
 
-		const u32* borderColors = gDbgMenuWindowBorderColors;
-		u32 vertexIndex = 0;
-		int count = 2;
-
-		while (count != 0) {
-			u32 col = vertexIndex & 1;
-			u32 row = (vertexIndex >> 1) & 1;
-			vertexIndex++;
-
-			GXPosition3f32((float)(x + (width & -static_cast<int>(col))),
-			               (float)(y + (height & -static_cast<int>(row))),
-			               z);
-			GXColor1u32(borderColors[0]);
-
-			col = vertexIndex & 1;
-			row = (vertexIndex >> 1) & 1;
-			vertexIndex++;
-			GXPosition3f32((float)(x + (width & -static_cast<int>(col))),
-			               (float)(y + (height & -static_cast<int>(row))),
-			               z);
-			GXColor1u32(borderColors[1]);
-
-			borderColors += 2;
-			count--;
+		for (int vertexIndex = 0; vertexIndex < 4; vertexIndex++) {
+			GXPosition3f32((float)(x + ((vertexIndex & 1) ? width : 0)),
+			              (float)(y + ((vertexIndex & 2) ? height : 0)), z);
+			GXColor1u32(gDbgMenuWindowBorderColors[vertexIndex]);
 		}
 	}
 
 	int fillColorIndex = (flags >> 1) & 1;
 
 	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
-	width += x;
-	height += y;
+	width = x + width;
+	height = y + height;
 	GXPosition3f32((float)width, (float)y, z);
 	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[fillColorIndex]));
 	GXPosition3f32((float)x, (float)y, z);
@@ -637,8 +586,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 	GXPosition3f32((float)x, (float)height, z);
 	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[1 - fillColorIndex]));
 
-	s8 selected = static_cast<s32>((static_cast<u32>(m_currentMenu->m_status) << 25) & 0xC0000000) >> 31;
-	if (selected != 0) {
+	if (m_currentMenu->m_statusBits.m_selected != 0) {
 		u8 alpha = 0xC0;
 
 		if ((System.m_frameCounter >> 2 & 1) != 0) {
@@ -667,7 +615,6 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 		drawFont(5, x + 8, y - 6, text);
 	}
 }
-#pragma opt_strength_reduction reset
 
 /*
  * --INFO--
@@ -718,8 +665,7 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 inline CDbgMenuPcs::CDM* CDbgMenuPcs::searchFreeCDM()
 {
 	for (int i = 0; i < 0x80; i++) {
-		s8 used = static_cast<s32>((static_cast<u32>(m_menuPool[i].m_status) << 24) & 0xC0000000) >> 31;
-		if (used == 0) {
+		if (m_menuPool[i].m_statusBits.m_used == 0) {
 			return &m_menuPool[i];
 		}
 	}
@@ -771,9 +717,7 @@ void CDbgMenuPcs::Add()
     CDMParam rootParam;
     CDMParam nodeParam;
     CDMParam actionParam;
-    DbgMenuDef* menuDefs;
     int y;
-    int index;
 
     if (m_rootMenuNode.m_firstChild != 0) {
         return;
@@ -795,9 +739,8 @@ void CDbgMenuPcs::Add()
     Add(0, 10, param);
 
     y = 10;
-    menuDefs = tWork;
-    index = 0;
-    do {
+    for (int index = 0; index < static_cast<int>(sizeof(tWork) / sizeof(tWork[0])); index++) {
+        DbgMenuDef* menuDefs = &tWork[index];
         memset(&nodeParam, 0, sizeof(nodeParam));
         nodeParam.m_type = 1;
         nodeParam.m_flags = 0;
@@ -830,10 +773,8 @@ void CDbgMenuPcs::Add()
         param = actionParam;
         Add(10, (int)menuDefs->id, param);
 
-        index++;
         y += 0x10;
-        menuDefs++;
-    } while (index < 0x17);
+    }
 }
 
 /*
@@ -914,3 +855,5 @@ inline CDbgMenuPcs::CDM::CDM()
 	memset(this, 0, sizeof(CDMParam));
 	memset(&m_status, 0, sizeof(*this) - sizeof(CDMParam));
 }
+
+#pragma pool_data off

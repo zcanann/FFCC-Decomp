@@ -4,13 +4,12 @@
 #include <Dolphin/types.h>
 #include <dolphin/os.h>
 
-#include "ffcc/manager.h"
+#include "ffcc/linkage.h"
 
 class CStopWatch : public OSStopwatch
 {
 public:
-	CStopWatch() {}
-	CStopWatch(char* name);
+	CStopWatch(char* name = "no name");
 	~CStopWatch();
 
 	void Reset();
@@ -19,7 +18,7 @@ public:
 	float Get();
 };
 
-class CProfile : public OSStopwatch
+class CProfile : public CStopWatch
 {
 public:
 	CProfile(char* name);
@@ -28,11 +27,15 @@ public:
 	void ProfStart();
 	void ProfEnd();
 
-	// OSStopwatch is 0x30. These pad bytes model the real class layout up to 0x60.
+	// Unrecovered profile storage between the stopwatch and timing fields.
 	u8 _pad_0x30[0x30];
 	float m_lastTime; // 0x60
 	float m_maxTime;  // 0x64
 	int m_frame;      // 0x68
 };
+
+STATIC_ASSERT(sizeof(CStopWatch) == 0x30);
+STATIC_ASSERT(sizeof(CProfile) == 0x70);
+STATIC_ASSERT(offsetof(CProfile, m_lastTime) == 0x60);
 
 #endif // _FFCC_STOPWATCH_H

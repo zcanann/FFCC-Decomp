@@ -130,51 +130,22 @@ extern "C" const f32 kMenuOrthoRight = 640.0f;
 extern "C" const f32 kMenuOrthoFar = -100.0f;
 extern "C" const f32 kMenuPaletteBlendStep = 0.125f;
 
-extern "C" {
-void create__8CMenuPcsFv(CMenuPcs*);
-void destroy__8CMenuPcsFv(CMenuPcs*);
-void calc__8CMenuPcsFv(CMenuPcs*);
-void draw__8CMenuPcsFv(CMenuPcs*);
-void loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
-    CMenuPcs*, char**, int, int, CMenuPcs::CTmp*, int, int, int);
-void drawSingleMenu__8CMenuPcsFv(CMenuPcs*);
-}
-
-static CProcessTableCallback s_menuTableDescCreate = {0, 0xFFFFFFFF,
-                                                       reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
-static CProcessTableCallback s_menuTableDescDestroy = {0, 0xFFFFFFFF,
-                                                        reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
-static CProcessTableCallback s_menuTableDescCalc = {0, 0xFFFFFFFF,
-                                                     reinterpret_cast<unsigned int>(calc__8CMenuPcsFv)};
-static CProcessTableCallback s_menuTableDescDraw = {0, 0xFFFFFFFF,
-                                                     reinterpret_cast<unsigned int>(draw__8CMenuPcsFv)};
-static CProcessTableCallback s_menuTableDescLoadTextureAsync = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
-static CProcessTableCallback s_menuTableDescDrawSingleMenu = {0, 0xFFFFFFFF,
-                                                              reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
-
-CProcessTable CMenuPcs::m_table = {
+CProcessCallbackTable CMenuPcs::m_table = {
     const_cast<char*>(sCMenuPcsProcessName),
+    static_cast<CProcessCallback>(&CMenuPcs::create),
+    static_cast<CProcessCallback>(&CMenuPcs::destroy),
     {
-        s_menuTableDescCreate.m_thisOffset, s_menuTableDescCreate.m_virtualOffset, s_menuTableDescCreate.m_function,
-        s_menuTableDescDestroy.m_thisOffset, s_menuTableDescDestroy.m_virtualOffset, s_menuTableDescDestroy.m_function,
-        s_menuTableDescCalc.m_thisOffset, s_menuTableDescCalc.m_virtualOffset, s_menuTableDescCalc.m_function,
-        0x1A, 0,
-        s_menuTableDescDraw.m_thisOffset, s_menuTableDescDraw.m_virtualOffset, s_menuTableDescDraw.m_function,
-        0x49, 0x1,
-        s_menuTableDescLoadTextureAsync.m_thisOffset, s_menuTableDescLoadTextureAsync.m_virtualOffset,
-        s_menuTableDescLoadTextureAsync.m_function,
-        0x1A, 0x10,
-        s_menuTableDescDrawSingleMenu.m_thisOffset, s_menuTableDescDrawSingleMenu.m_virtualOffset,
-        s_menuTableDescDrawSingleMenu.m_function,
-        0x49, 0x11,
+        {static_cast<CProcessCallback>(&CMenuPcs::calc), 0x1A, 0},
+        {static_cast<CProcessCallback>(&CMenuPcs::draw), 0x49, 1},
+        {reinterpret_cast<CProcessCallback>(&CMenuPcs::loadTextureAsync), 0x1A, 0x10},
+        {static_cast<CProcessCallback>(&CMenuPcs::drawSingleMenu), 0x49, 0x11},
     },
 };
 
-extern const char sYmTracerCommonName[];
-extern const char s_pppParHitSphWin[];
+static const char sMenuCommonName[] = "common";
+static const char sMenuWinName[] = "win";
 const char* sMenuCommonTextureNames[] = {
-    sYmTracerCommonName, s_pppParHitSphWin,
+    sMenuCommonName, sMenuWinName,
 };
 
 extern const char* sMenuTextureRegionNameTable[];
@@ -203,21 +174,15 @@ static inline float LoadFloat(const float& value)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80097760
+ * PAL Size: 120b
+ * EN Address: 0x800AA7C4
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CMenuPcs::~CMenuPcs()
+inline CMenuPcs::~CMenuPcs()
 {
-    if (&m_mcCtrl != nullptr) {
-        m_mcCtrl.m_previousState = 0;
-        m_mcCtrl.m_state = 0;
-        m_mcCtrl.m_lastResult = 0;
-        m_mcCtrl.m_iteration = 0;
-        m_mcCtrl.m_userBuffer = 0;
-        m_mcCtrl.m_createFlag = 0;
-        m_mcCtrl.m_cardChannel = 0;
-        m_mcCtrl.m_saveIndex = 0;
-    }
 }
 
 /*
@@ -1004,10 +969,14 @@ void CMenuPcs::SetAttrFmt(CMenuPcs::FMT fmt)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: 0x800A82EC
+ * EN Size: 56b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawQuit()
+inline void CMenuPcs::DrawQuit()
 {
 	Mtx44 screenMtx;
 
@@ -1026,28 +995,7 @@ void CMenuPcs::DrawQuit()
  */
 u16 CMenuPcs::GetButtonDown(int port)
 {
-    bool noInput = false;
-    u32 result;
-
-    if (Pad.m_debugPadLock == 0) {
-        if (port != 0) {
-            goto input_check_done;
-        }
-        if (Pad.m_debugPadPort == -1) {
-            goto input_check_done;
-        }
-    }
-    noInput = true;
-
-input_check_done:
-    if (noInput) {
-        result = 0;
-    } else {
-        u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
-        result = Pad.GetPadInputs()[clamped].buttonDown[0];
-    }
-
-    return result;
+    return Pad.GetButtonDown(port);
 }
 
 /*
@@ -1061,28 +1009,7 @@ input_check_done:
  */
 u16 CMenuPcs::GetButtonRepeat(int port)
 {
-    bool noInput = false;
-    u32 result;
-
-    if (Pad.m_debugPadLock == 0) {
-        if (port != 0) {
-            goto repeat_check_done;
-        }
-        if (Pad.m_debugPadPort == -1) {
-            goto repeat_check_done;
-        }
-    }
-    noInput = true;
-
-repeat_check_done:
-    if (noInput) {
-        result = 0;
-    } else {
-        u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
-        result = Pad.GetPadInputs()[clamped].repeatButton;
-    }
-
-    return result;
+    return Pad.GetButtonRepeat(port);
 }
 
 /*
@@ -1377,10 +1304,14 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 880b
+ * EN Address: 0x800A8E3C
+ * EN Size: 424b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBase, float alpha)
+inline void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBase, float alpha)
 {
     if (width <= 0.0f) {
         return;
@@ -1551,10 +1482,14 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 380b
+ * EN Address: 0x800A97A8
+ * EN Size: 240b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::drawPause()
+inline void CMenuPcs::drawPause()
 {
     if (((CFlatEventFlags() & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
         return;
@@ -1667,10 +1602,14 @@ void CMenuPcs::createBattle()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 480b
+ * EN Address: 0x800A9B6C
+ * EN Size: 252b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::destroyBattle()
+inline void CMenuPcs::destroyBattle()
 {
     void** slot = reinterpret_cast<void**>(&m_textures[0x16]);
     for (int i = 0; i < 10; i++, slot++) {
@@ -1698,10 +1637,14 @@ void CMenuPcs::destroyBattle()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 216b
+ * EN Address: 0x800A9C68
+ * EN Size: 292b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::calcBattle()
+inline void CMenuPcs::calcBattle()
 {
     for (int i = 0; i < 4; i++) {
         m_battleRingMenus[i]->Calc();
@@ -1874,10 +1817,16 @@ void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x800AA498
+ * EN Size: 16b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CTexture* CMenuPcs::GetTexture(CMenuPcs::TEX tex)
+inline CTexture* CMenuPcs::GetTexture(CMenuPcs::TEX tex)
 {
     return m_textures[static_cast<int>(tex)];
 }
+
+#pragma pool_data off

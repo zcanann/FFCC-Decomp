@@ -2,6 +2,7 @@
 #define _FFCC_P_MENU_H_
 
 #include "ffcc/memory.h"
+#include "ffcc/math.h"
 #include "ffcc/memorycard.h"
 #include "ffcc/mcctrl.h"
 #include "ffcc/gobject.h"
@@ -20,7 +21,10 @@ class CRingMenu;
 class CMesMenu;
 class CShopMenu;
 struct ArtiState;
+struct BonusMenuState;
 struct ArtiOpenAnimList;
+struct CmdState;
+struct CmdListStorage;
 struct EquipMenuState;
 struct EquipOpenAnimList;
 struct MoneyMenuState;
@@ -43,15 +47,7 @@ struct MenuBoardEntry
     float m_posX;
     float m_posY;
     float m_depth;
-    float m_rotX;
-    float m_rotY;
-    float m_rotZ;
-    float m_scaleX;
-    float m_scaleY;
-    float m_scaleZ;
-    float m_unk34;
-    float m_unk38;
-    float m_unk3c;
+    SRT m_transform;
     int m_screenX;
     int m_screenY;
     int m_screenWidth;
@@ -60,13 +56,24 @@ struct MenuBoardEntry
 
 struct SingleFadeEntry
 {
-    char pad_00[0x10];
+    short x;
+    short y;
+    short width;
+    short height;
+    float u;
+    float v;
     float alpha;
-    char pad_14[0x0C];
+    float uvScale;
+    int unk18;
+    int tex;
     int elapsed;
     int startFrame;
     int duration;
-    char pad_2C[0x14];
+    unsigned int flags;
+    float dx;
+    float dy;
+    float targetX;
+    float targetY;
 };
 
 struct SingleFadeState
@@ -78,6 +85,14 @@ struct SingleFadeState
     SingleFadeEntry entries[64];
 };
 
+struct WinMessEntry
+{
+    int m_lineCount;
+    short m_messageIds[8];
+};
+STATIC_ASSERT(sizeof(WinMessEntry) == 0x14);
+STATIC_ASSERT(offsetof(WinMessEntry, m_messageIds) == 0x04);
+
 struct MenuWindowInfo
 {
     short x;
@@ -87,6 +102,70 @@ struct MenuWindowInfo
     short frame;
     short state;
 };
+
+struct WmWorldObjInfo
+{
+    int m_active;
+    int m_frameCounter;
+    short m_viewportX;
+    short m_viewportY;
+    short m_viewportWidth;
+    short m_viewportHeight;
+    Vec m_cameraPosition;
+    SRT m_transform;
+    unsigned int m_scissorX;
+    unsigned int m_scissorY;
+    unsigned int m_scissorWidth;
+    unsigned int m_scissorHeight;
+};
+STATIC_ASSERT(sizeof(WmWorldObjInfo) == 0x50);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_viewportX) == 0x08);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_cameraPosition) == 0x10);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_transform) == 0x1C);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_scissorX) == 0x40);
+
+struct WmCharaModelInfo
+{
+    int m_unknown00;
+    int m_unknown04;
+    int m_modelNo;
+    unsigned char m_modelChanged;
+    unsigned char m_pad0D[3];
+    SRT m_transform;
+};
+STATIC_ASSERT(sizeof(WmCharaModelInfo) == 0x34);
+STATIC_ASSERT(offsetof(WmCharaModelInfo, m_modelNo) == 0x08);
+STATIC_ASSERT(offsetof(WmCharaModelInfo, m_modelChanged) == 0x0C);
+STATIC_ASSERT(offsetof(WmCharaModelInfo, m_transform) == 0x10);
+
+struct WmCharaSelectEntry
+{
+    int m_padType;                   // 0x00
+    short m_currentSlot;             // 0x04
+    short m_displaySlot;             // 0x06
+    unsigned short m_disconnectTime; // 0x08
+    unsigned char m_confirmed;       // 0x0A
+    unsigned char m_cmakePending;    // 0x0B
+    unsigned char m_cmakeReady;      // 0x0C
+    unsigned char m_connected;       // 0x0D
+    unsigned char m_cancelled;       // 0x0E
+    unsigned char _pad0F;            // 0x0F
+};
+
+STATIC_ASSERT(sizeof(WmCharaSelectEntry) == 0x10);
+STATIC_ASSERT(offsetof(WmCharaSelectEntry, m_currentSlot) == 0x04);
+STATIC_ASSERT(offsetof(WmCharaSelectEntry, m_confirmed) == 0x0A);
+STATIC_ASSERT(offsetof(WmCharaSelectEntry, m_cancelled) == 0x0E);
+
+struct WmCharaAnimState
+{
+    int m_animIndex;
+    int m_nextAnimIndex;
+    int m_timer;
+    float m_frame;
+    float m_endFrame;
+};
+STATIC_ASSERT(sizeof(WmCharaAnimState) == 0x14);
 
 struct WmWorldState
 {
@@ -158,7 +237,7 @@ struct McListInfo
 class CMenuPcs : public CProcess
 {
 public:
-    static CProcessTable m_table;
+    static CProcessCallbackTable m_table;
 
     struct BattleHudState
     {
@@ -191,11 +270,54 @@ public:
     };
     struct Sprt
     {
-        void operator=(const Sprt&);
+        short m_x;
+        short m_y;
+        short m_width;
+        short m_height;
+        float m_u;
+        float m_v;
+        float m_alpha;
+        float m_scale;
+        unsigned int m_flags;
+    };
+    struct WmBubbleInfo
+    {
+        Sprt m_sprites[5];
+    };
+    struct WmFrameData
+    {
+        int m_unknown00;
+        int m_titleFrame;
+        int m_yearFrame;
+        Sprt m_frameSprites[5];
+        Sprt m_titleSprite;
+        Sprt m_yearSprites[2];
+    };
+    struct WmFrameInfo
+    {
+        int m_unknown;
+        Sprt m_sprites[2];
     };
     struct Sprt2
     {
-        void operator=(const Sprt2&);
+        short x;
+        short y;
+        short w;
+        short h;
+        float mulX;
+        float mulY;
+        float alpha;
+        float depth;
+        int tex;
+        int kind;
+        int timer;
+        int startFrame;
+        int duration;
+        int flags;
+        float motionX;
+        float motionY;
+        float targetX;
+        float targetY;
     };
     struct SPL
     {
@@ -236,17 +358,7 @@ public:
 		TODOC,
 	};
 
-    CMenuPcs()
-    {
-        m_mcCtrl.m_previousState = 0;
-        m_mcCtrl.m_state = 0;
-        m_mcCtrl.m_lastResult = 0;
-        m_mcCtrl.m_iteration = 0;
-        m_mcCtrl.m_userBuffer = 0;
-        m_mcCtrl.m_createFlag = 0;
-        m_mcCtrl.m_cardChannel = 0;
-        m_mcCtrl.m_saveIndex = 0;
-    }
+    CMenuPcs() {}
     ~CMenuPcs();
 
     void Init();
@@ -338,7 +450,7 @@ public:
     void ChgPlayModeFromScript(bool);
 
     CTexture* GetTexture(TEX);
-    McCtrl* GetMcCtrl() { return reinterpret_cast<McCtrl*>(&m_mcCtrl); }
+    McCtrl* GetMcCtrl() { return &m_mcCtrl; }
 
     void WmInit();
     void createWorld();
@@ -648,7 +760,7 @@ public:
     int GetSlotABXPos(int);
     const char* GetMcStr(int);
     const char* const* GetMcWinMessBuff(int);
-    int GetWinMess(int);
+    WinMessEntry* GetWinMess(int);
     int GetYesNoXPos(int);
     void SetTextureLoc(int);
     float GetMaxAnimWait();
@@ -675,14 +787,14 @@ public:
 
     struct WmStorage
     {
-        unsigned char m_pad744[0x774 - 0x744];
+        Mtx m_savedCameraMatrix;
         CCharaPcs::CHandle* m_handles[0x28];
-        unsigned char* m_worldObjData;
-        unsigned char* m_bubbleData;
-        unsigned char* m_frameData;
-        unsigned char* m_frameInfo;
-        unsigned char* m_charaModelData;
-        unsigned char* m_charaSelectData;
+        WmWorldObjInfo* m_worldObjData;
+        WmBubbleInfo* m_bubbleData;
+        WmFrameData* m_frameData;
+        WmFrameInfo* m_frameInfo;
+        WmCharaModelInfo* m_charaModelData;
+        WmCharaSelectEntry* m_charaSelectData;
     };
 
     unsigned char m_pad04[0x14 - 0x04];
@@ -690,7 +802,7 @@ public:
     unsigned char m_pad15[0x18 - 0x15];
     signed char m_mcRequest;
     unsigned char m_pad19[0x20 - 0x19];
-    McCtrlData m_mcCtrl;
+    McCtrl m_mcCtrl;
     BattleHudState m_battleHud;
     int m_manaWaterTimerA;
     unsigned char m_pad74[0x80 - 0x74];
@@ -749,10 +861,10 @@ public:
         CompaMenuState* m_compaMenuState;
         TmpArtiState* m_tmpArtiState;
         CmakeMenuState* m_cmakeState;
-        short* m_cmdState;
+        CmdState* m_cmdState;
         WmWorldState* m_wmWorldState;
         GoOutMenuState* m_goOutState;
-        int m_bonusStatePtr;
+        BonusMenuState* m_bonusState;
     };
     union {
         unsigned char m_pad830[0x838 - 0x830];
@@ -763,13 +875,10 @@ public:
         unsigned char* m_wmCharaState;
     };
     unsigned char* m_wmWorldParams;
-    union {
-        EffectInfo* m_effectWork;
-        int m_bonusListPtr;
-    };
+    EffectInfo* m_effectWork;
     union {
         unsigned char m_pad844[0x848 - 0x844];
-        int* m_wmCharaAnimState;
+        WmCharaAnimState* m_wmCharaAnimState;
     };
     MenuWindowInfo* m_menuWindowInfo;
     union {
@@ -785,7 +894,7 @@ public:
         FavoListStorage* m_favoList;
         CompaOpenAnimList* m_compaList;
         TmpArtiList* m_tmpArtiList;
-        short* m_cmdList;
+        CmdListStorage* m_cmdList;
         SingleFadeState* m_singleFadeState;
     };
     unsigned char* m_wmWorkBuffer;
@@ -857,6 +966,8 @@ extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];
 
 STATIC_ASSERT(sizeof(MenuBoardEntry) == 0x50);
+STATIC_ASSERT(offsetof(MenuBoardEntry, m_transform) == 0x1C);
+STATIC_ASSERT(offsetof(MenuBoardEntry, m_screenX) == 0x40);
 STATIC_ASSERT(sizeof(CMenuPcs::BattleHudState) == 0x28);
 STATIC_ASSERT(sizeof(MenuWindowInfo) == 0x0C);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
@@ -881,6 +992,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeWork) == 0xC0);
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonus) == 0x744);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm) == 0x744);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_savedCameraMatrix) == 0x744);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_worldObjData) == 0x814);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_bubbleData) == 0x818);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_frameData) == 0x81C);
@@ -897,12 +1009,11 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorldState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_goOutState) == 0x82C);
-STATIC_ASSERT(offsetof(CMenuPcs, m_bonusStatePtr) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonusState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeVillageWork) == 0x830);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorldParams) == 0x83C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
-STATIC_ASSERT(offsetof(CMenuPcs, m_bonusListPtr) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaAnimState) == 0x844);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuWindowInfo) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAnimPtr) == 0x84C);
@@ -942,6 +1053,11 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_goOutUnknown88B) == 0x88B);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWork) == 0x88C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferWorkActive) == 0x88C);
 STATIC_ASSERT(sizeof(SingleFadeEntry) == 0x40);
+STATIC_ASSERT(offsetof(SingleFadeEntry, uvScale) == 0x14);
+STATIC_ASSERT(offsetof(SingleFadeEntry, tex) == 0x1C);
+STATIC_ASSERT(offsetof(SingleFadeEntry, flags) == 0x2C);
+STATIC_ASSERT(offsetof(SingleFadeEntry, dx) == 0x30);
+STATIC_ASSERT(offsetof(SingleFadeEntry, targetX) == 0x38);
 STATIC_ASSERT(sizeof(SingleFadeState) == 0x1008);
 STATIC_ASSERT(sizeof(WmWorldState) == 0x48);
 STATIC_ASSERT(offsetof(WmWorldState, m_originalBackupParams) == 0x36);
@@ -956,5 +1072,14 @@ STATIC_ASSERT(offsetof(SingMenuState, selectedIndex) == 0x26);
 STATIC_ASSERT(offsetof(SingMenuState, result) == 0x2E);
 STATIC_ASSERT(offsetof(SingMenuState, uniteState) == 0x30);
 STATIC_ASSERT(offsetof(SingMenuState, topIndex) == 0x34);
+
+STATIC_ASSERT(sizeof(CMenuPcs::Sprt) == 0x1C);
+STATIC_ASSERT(sizeof(CMenuPcs::WmBubbleInfo) == 0x8C);
+STATIC_ASSERT(sizeof(CMenuPcs::WmFrameData) == 0xEC);
+STATIC_ASSERT(offsetof(CMenuPcs::WmFrameData, m_frameSprites) == 0x0C);
+STATIC_ASSERT(offsetof(CMenuPcs::WmFrameData, m_titleSprite) == 0x98);
+STATIC_ASSERT(offsetof(CMenuPcs::WmFrameData, m_yearSprites) == 0xB4);
+STATIC_ASSERT(sizeof(CMenuPcs::WmFrameInfo) == 0x3C);
+STATIC_ASSERT(offsetof(CMenuPcs::WmFrameInfo, m_sprites) == 0x4);
 
 #endif // _FFCC_P_MENU_H_

@@ -1,7 +1,6 @@
 #include "ffcc/ptrarray.h"
 #include "ffcc/cflat_r2system.h"
 #include "ffcc/astar.h"
-#include "ffcc/line_constants.h"
 #include "ffcc/linkage.h"
 #include "ffcc/color.h"
 #include "ffcc/file.h"
@@ -42,10 +41,6 @@
 
 extern "C" char* strcat(char*, const char*);
 
-extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
-    float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outResult,
-    Vec* p0, Vec* p1, Vec* p2, Vec* p3);
-
 namespace std {
 float sinf(float x);
 float cosf(float x);
@@ -58,7 +53,7 @@ static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
     return &self->m_usbStreamState;
 }
 
-extern const float kCFlatPadStickZero;
+extern const float kCFlatPadStickZero = 0.0f;
 extern const float kCFlatAlphaMax;
 extern const float kCFlatPi;
 extern const float kCFlatDegrees180;
@@ -80,12 +75,6 @@ extern const float kCFlatHalfPi;
 extern const float kCFlatPi;
 extern const float kCFlatThreeHalfPi;
 
-
-static inline int RemapPadSlot(CPad* pad, int padIndex)
-{
-    int activePad = pad->m_debugPadPort;
-    return static_cast<int>(padIndex & ~(static_cast<int>(~((activePad - padIndex) | (padIndex - activePad))) >> 31));
-}
 
 static inline void StoreSetU32(CFlatRuntime::CStack* stack, int setMode, unsigned int* value)
 {
@@ -344,7 +333,7 @@ void CPartPcs::pppSetDebugHide(unsigned char hide)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::CalcHitPosition(Vec* hitPosition)
+inline void CMapPcs::CalcHitPosition(Vec* hitPosition)
 {
     MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
 }
@@ -358,7 +347,7 @@ void CMapPcs::CalcHitPosition(Vec* hitPosition)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
+inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
 {
     float max = -10000000000.0f;
     float min = 10000000000.0f;
@@ -422,7 +411,7 @@ int CMiniGamePcs::GetMiniGameParam(int id)
 __declspec(section ".rodata") static const char sMiniGameParamDebugFmt[] =
     "SetMiniGameParam no 0x%04x data[%d]\n";
 
-void CMiniGamePcs::SetMiniGameParam(int id, int value)
+inline void CMiniGamePcs::SetMiniGameParam(int id, int value)
 {
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(sMiniGameParamDebugFmt), id, value);
@@ -453,7 +442,7 @@ void CMiniGamePcs::SetMiniGameParam(int id, int value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::CGameWork::ClearEvtWork()
+inline void CGame::CGameWork::ClearEvtWork()
 {
     memset(m_eventFlags, 0, sizeof(m_eventFlags));
     memset(m_eventWork, 0, sizeof(m_eventWork));
@@ -524,20 +513,6 @@ void CCharaPcs::SetTexShadowColor(_GXColor color)
 CColor::operator _GXColor()
 {
     return color;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9224
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CColor::operator _GXColor*()
-{
-    return &color;
 }
 
 /*
@@ -641,238 +616,6 @@ void CMes::SetTempValue(int index, int value)
     m_tempVar[index] = value;
 }
 
-/*
- * --INFO--
- * PAL Address: 0x800B9330
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned short CPad::GetGbaButtonDown(long padIndex)
-{
-    bool isInvalidPad = false;
-    unsigned int result;
-
-    if (m_debugPadLock == 0) {
-        if (padIndex != 0) {
-            goto done_check;
-        }
-        if (m_debugPadPort == -1) {
-            goto done_check;
-        }
-    }
-    isInvalidPad = true;
-
-done_check:
-    if (isInvalidPad) {
-        result = 0;
-    } else {
-        int slot = RemapPadSlot(this, padIndex);
-        result = GetPadInputs()[slot].buttonDown[1];
-    }
-
-    return (unsigned short)result;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9960
- * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-float CPad::GetRightStickY(long padIndex)
-{
-    bool isInvalidPad = false;
-
-    if (m_debugPadLock == 0) {
-        if (padIndex != 0) {
-            goto done_check;
-        }
-        if (m_debugPadPort == -1) {
-            goto done_check;
-        }
-    }
-    isInvalidPad = true;
-
-done_check:
-    if (isInvalidPad) {
-        return kCFlatPadStickZero;
-    }
-
-    int slot = RemapPadSlot(this, padIndex);
-    return GetPadInputs()[slot].substickYF;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B99C0
- * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-float CPad::GetRightStickX(long padIndex)
-{
-    bool isInvalidPad = false;
-
-    if (m_debugPadLock == 0) {
-        if (padIndex != 0) {
-            goto done_check;
-        }
-        if (m_debugPadPort == -1) {
-            goto done_check;
-        }
-    }
-    isInvalidPad = true;
-
-done_check:
-    if (isInvalidPad) {
-        return kCFlatPadStickZero;
-    }
-
-    int slot = RemapPadSlot(this, padIndex);
-    return GetPadInputs()[slot].substickXF;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9A20
- * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-float CPad::GetLeftStickY(long padIndex)
-{
-    bool isInvalidPad = false;
-
-    if (m_debugPadLock == 0) {
-        if (padIndex != 0) {
-            goto done_check;
-        }
-        if (m_debugPadPort == -1) {
-            goto done_check;
-        }
-    }
-    isInvalidPad = true;
-
-done_check:
-    if (isInvalidPad) {
-        return kCFlatPadStickZero;
-    }
-
-    int slot = RemapPadSlot(this, padIndex);
-    return GetPadInputs()[slot].stickYF;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9A80
- * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-float CPad::GetLeftStickX(long padIndex)
-{
-    bool isInvalidPad = false;
-
-    if (m_debugPadLock == 0) {
-        if (padIndex != 0) {
-            goto done_check;
-        }
-        if (m_debugPadPort == -1) {
-            goto done_check;
-        }
-    }
-    isInvalidPad = true;
-
-done_check:
-    if (isInvalidPad) {
-        return kCFlatPadStickZero;
-    }
-
-    int slot = RemapPadSlot(this, padIndex);
-    return GetPadInputs()[slot].stickXF;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9AE0
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned short CPad::GetButtonRepeat(long padIndex)
-{
-    bool isInvalidPad = false;
-    unsigned int result;
-
-    if (m_debugPadLock == 0) {
-        if (padIndex != 0) {
-            goto done_check;
-        }
-        if (m_debugPadPort == -1) {
-            goto done_check;
-        }
-    }
-    isInvalidPad = true;
-
-done_check:
-    if (isInvalidPad) {
-        result = 0;
-    } else {
-        int slot = RemapPadSlot(this, padIndex);
-        result = GetPadInputs()[slot].repeatButton;
-    }
-
-    return (unsigned short)result;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9BB8
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned short CPad::GetButton(long padIndex)
-{
-    bool isInvalidPad = false;
-    unsigned int result;
-
-    if (m_debugPadLock == 0) {
-        if (padIndex != 0) {
-            goto done_check;
-        }
-        if (m_debugPadPort == -1) {
-            goto done_check;
-        }
-    }
-    isInvalidPad = true;
-
-done_check:
-    if (isInvalidPad) {
-        result = 0;
-    } else {
-        int slot = RemapPadSlot(this, padIndex);
-        result = GetPadInputs()[slot].button[0];
-    }
-
-    return (unsigned short)result;
-}
 
 /*
  * --INFO--
@@ -975,7 +718,7 @@ void CGraphicPcs::SetUseDOF(int enabled)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFile::CHandle::Close()
+inline void CFile::CHandle::Close()
 {
     File.Close(this);
 }
@@ -1003,7 +746,7 @@ void* CFile::GetBuffer()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFile::CHandle::SyncCompleted()
+inline void CFile::CHandle::SyncCompleted()
 {
     File.SyncCompleted(this);
 }
@@ -1017,7 +760,7 @@ void CFile::CHandle::SyncCompleted()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFile::CHandle::Read()
+inline void CFile::CHandle::Read()
 {
     File.Read(this);
 }
@@ -1045,7 +788,7 @@ void CGraphicPcs::ReqScreenCapture()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMesMenu::IsUse()
+inline int CMesMenu::IsUse()
 {
     unsigned char result = 0;
     if (m_active != 0 && m_state <= 1 && m_mes.GetWait() != 4) {
@@ -1059,84 +802,84 @@ int CMesMenu::IsUse()
  * --INFO--
  * PAL Address: 0x800B94DC
  * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CF354
+ * EN Size: 52b
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int GetErrorLevel__7CSystemFv(void* system, int index)
+inline int CMesMenu::GetValue(int index)
 {
-    return ((int*)((char*)system + 0x3CDC))[index];
+    return m_mes.mFlagVars[index];
 }
 
 /*
  * --INFO--
  * PAL Address: 0x800B94EC
  * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CF388
+ * EN Size: 60b
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void GetMes__9CFlatDataFi(void* flatData, int index, int value)
+inline void CMesMenu::SetValue(int index, int value)
 {
-    ((int*)((char*)flatData + 0x3CDC))[index] = value;
+    m_mes.mFlagVars[index] = value;
 }
 
 /*
  * --INFO--
  * PAL Address: 0x800B94FC
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8001A8C4
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int GetNumMes__9CFlatDataFv(void* flatData)
+inline int CSystem::GetErrorLevel()
 {
-    return *(int*)((char*)flatData + 0x125C);
+    return m_execParam;
 }
 
 /*
  * --INFO--
  * PAL Address: 0x800B9504
  * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CF3C4
+ * EN Size: 16b
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int GetSysMes__5CGameFi(void* game, int index)
+inline char* CFlatData::GetMes(int index)
 {
-    return ((int*)((char*)game + 0xD4))[index];
+    return m_mesPtr[index];
 }
 
 /*
  * --INFO--
  * PAL Address: 0x800B9514
  * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CECB0
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" char* GetNumSysMes__5CGameFv(void* game, int index)
+inline char* CGame::GetSysMes(int index)
 {
-    return ((char**)((char*)game + 0xE1E0))[index];
+    return m_cFlatDataArr[1].GetMes(index);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800B9538
+ * PAL Address: 0x800B9528
  * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CEF2C
+ * EN Size: 16b
  * JP Address: TODO
  * JP Size: TODO
  */
-CMesMenu* CMenuPcs::GetMesMenu(int index)
+inline CMesMenu* CMenuPcs::GetMesMenu(int index)
 {
-    return reinterpret_cast<CMesMenu**>(reinterpret_cast<char*>(this) + 0x10C)[index];
+    return m_battleMesMenus[index];
 }
 
 
@@ -1149,7 +892,7 @@ CMesMenu* CMenuPcs::GetMesMenu(int index)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCameraPcs::SetWorldMapMatrix(float (*matrix)[4])
+inline void CCameraPcs::SetWorldMapMatrix(float (*matrix)[4])
 {
     PSMTXCopy(matrix, (MtxPtr)((char*)this + 0x34));
     PSMTXInverse(matrix, (MtxPtr)((char*)this + 0x64));
@@ -1164,7 +907,7 @@ void CCameraPcs::SetWorldMapMatrix(float (*matrix)[4])
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCameraPcs::GetWorldMapMatrix(float (*matrix)[4])
+inline void CCameraPcs::GetWorldMapMatrix(float (*matrix)[4])
 {
     PSMTXCopy((MtxPtr)((char*)this + 0x34), matrix);
 }
@@ -1231,20 +974,6 @@ void CCameraPcs::SetFullScreenShadowEnable(unsigned char enable)
 
 /*
  * --INFO--
- * PAL Address: 0x800B965C
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCameraPcs::GetViewMatrix(float (*matrix)[4])
-{
-    PSMTXCopy((MtxPtr)((char*)this + 4), matrix);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B9680
  * PAL Size: 120b
  * EN Address: TODO
@@ -1252,7 +981,7 @@ void CCameraPcs::GetViewMatrix(float (*matrix)[4])
  * JP Address: TODO
  * JP Size: TODO
  */
-void VECLerp(Vec* a, Vec* b, Vec* out, float t)
+inline void VECLerp(Vec* a, Vec* b, Vec* out, float t)
 {
     Vec scaledA;
     Vec scaledB;
@@ -1313,82 +1042,12 @@ void CCharaPcs::SetAmbient(int index, _GXColor* color)
  * JP Address: TODO
  * JP Size: TODO
  */
-void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
+inline void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
 {
     Vec scaled;
 
     PSVECScale(b, &scaled, scale);
     PSVECAdd(a, &scaled, out);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B97DC
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CVector CVector::operator+(const CVector& other) const
-{
-    CVector out;
-
-    PSVECAdd((const Vec*)this, (const Vec*)&other, (Vec*)&out);
-    return out;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B984C
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CVector::operator=(const CVector& other)
-{
-    const float* src = &other.x;
-    float x = *src++;
-    float y = *src++;
-    this->x = x;
-    float z = *src;
-    this->y = y;
-    this->z = z;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9868
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CVector::CVector(const CVector& other)
-{
-    this->x = other.x;
-    this->y = other.y;
-    this->z = other.z;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9884
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CVector CVector::operator-(const CVector& other) const
-{
-    CVector out;
-
-    PSVECSubtract((const Vec*)this, (const Vec*)&other, (Vec*)&out);
-    return out;
 }
 
 /*
@@ -1400,7 +1059,7 @@ CVector CVector::operator-(const CVector& other) const
  * JP Address: TODO
  * JP Size: TODO
  */
-float std::fmodf(float x, float y)
+inline float std::fmodf(float x, float y)
 {
     return (float)fmod((double)x, (double)y);
 }
@@ -1471,7 +1130,7 @@ int CDbgMenuPcs::GetDbgFlag()
  * JP Address: TODO
  * JP Size: TODO
  */
-float std::atan2(float y, float x)
+inline float std::atan2(float y, float x)
 {
     return (float)::atan2((double)y, (double)x);
 }
@@ -1485,7 +1144,7 @@ float std::atan2(float y, float x)
  * JP Address: TODO
  * JP Size: TODO
  */
-float std::cosf(float x)
+inline float std::cosf(float x)
 {
     return (float)cos((double)x);
 }
@@ -1499,7 +1158,7 @@ float std::cosf(float x)
  * JP Address: TODO
  * JP Size: TODO
  */
-float std::sinf(float x)
+inline float std::sinf(float x)
 {
     return (float)sin((double)x);
 }
@@ -1586,10 +1245,62 @@ int CCameraPcs::IsAbsolute()
 
 /*
  * --INFO--
- * PAL Address: 0x800B9C84
- * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x800BA19C
+ * PAL Size: 352b
+ * EN Address: 0x800CF7B8
+ * EN Size: 604b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CLine<64>::CalcBound()
+{
+    min.x = FLOAT_80330B5C;
+    min.y = FLOAT_80330B5C;
+    min.z = FLOAT_80330B5C;
+    max.x = FLOAT_80330BC0;
+    max.y = FLOAT_80330BC0;
+    max.z = FLOAT_80330BC0;
+    totalLength = kCFlatPadStickZero;
+
+    for (u32 i = 0; i < pointCount; i++) {
+        if (points[i].x < min.x) {
+            min.x = points[i].x;
+        }
+        if (points[i].y < min.y) {
+            min.y = points[i].y;
+        }
+        if (points[i].z < min.z) {
+            min.z = points[i].z;
+        }
+
+        if (points[i].x > max.x) {
+            max.x = points[i].x;
+        }
+        if (points[i].y > max.y) {
+            max.y = points[i].y;
+        }
+        if (points[i].z > max.z) {
+            max.z = points[i].z;
+        }
+
+        if (i != 0) {
+            PSVECSubtract(&points[i], &points[i - 1], &segments[i - 1].delta);
+            segments[i - 1].length = PSVECMag(&segments[i - 1].delta);
+            segments[i - 1].startLength = totalLength;
+            totalLength += segments[i - 1].length;
+            if (kCFlatPadStickZero != segments[i - 1].length) {
+                PSVECNormalize(&segments[i - 1].delta, &segments[i - 1].normal);
+            }
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9D24
+ * PAL Size: 1144b
+ * EN Address: 0x800CF488
+ * EN Size: 816b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1683,6 +1394,15 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
 }
 #pragma pop
 
+/*
+ * --INFO--
+ * PAL Address: 0x800B9C84
+ * PAL Size: 160b
+ * EN Address: 0x800CF3DC
+ * EN Size: 172b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 int CLine<64>::IsInner(Vec* position, float margin)
 {
     if (pointCount != 0) {
@@ -1696,48 +1416,6 @@ int CLine<64>::IsInner(Vec* position, float margin)
     return 0;
 }
 
-void CLine<64>::CalcBound()
-{
-    min.x = FLOAT_80330B5C;
-    min.y = FLOAT_80330B5C;
-    min.z = FLOAT_80330B5C;
-    max.x = FLOAT_80330BC0;
-    max.y = FLOAT_80330BC0;
-    max.z = FLOAT_80330BC0;
-    totalLength = kCFlatPadStickZero;
-
-    for (u32 i = 0; i < pointCount; i++) {
-        if (points[i].x < min.x) {
-            min.x = points[i].x;
-        }
-        if (points[i].y < min.y) {
-            min.y = points[i].y;
-        }
-        if (points[i].z < min.z) {
-            min.z = points[i].z;
-        }
-
-        if (points[i].x > max.x) {
-            max.x = points[i].x;
-        }
-        if (points[i].y > max.y) {
-            max.y = points[i].y;
-        }
-        if (points[i].z > max.z) {
-            max.z = points[i].z;
-        }
-
-        if (i != 0) {
-            PSVECSubtract(&points[i], &points[i - 1], &segments[i - 1].delta);
-            segments[i - 1].length = PSVECMag(&segments[i - 1].delta);
-            segments[i - 1].startLength = totalLength;
-            totalLength += segments[i - 1].length;
-            if (kCFlatPadStickZero != segments[i - 1].length) {
-                PSVECNormalize(&segments[i - 1].delta, &segments[i - 1].normal);
-            }
-        }
-    }
-}
 
 /*
  * --INFO--
@@ -2204,9 +1882,8 @@ renderedDone:
                     }
 
                     Vec result;
-                    CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
-                        scaleA, scaleB, scaleC, segmentT, kCFlatOneF, &Math, reinterpret_cast<float*>(&result),
-                        &p0->m_position, &p1->m_position, &p2->m_position, &p3->m_position);
+                    Math.CalcSpline(&result, &p0->m_position, &p1->m_position, &p2->m_position, &p3->m_position,
+                                    scaleA, scaleB, scaleC, segmentT, kCFlatOneF);
                     *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
                     *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
                     *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
@@ -2299,7 +1976,7 @@ renderedDone:
         const float margin = localFloats[4];
         int found = 0;
         unsigned int bestLine = 0;
-        float bestDistance = kLineBoundsInitMin;
+        float bestDistance = 10000000.0f;
         float bestLineDistance = 0.0f;
 
         CLine<64>* lines = m_debugLines;
@@ -2717,13 +2394,13 @@ renderedDone:
         outResult = 0;
         break;
     case -0x94: {
-        float* bounds = reinterpret_cast<float*>(object->m_localBase);
-        PartMng.m_pppEnvSt.m_boxMinX = bounds[0];
-        PartMng.m_pppEnvSt.m_boxMaxX = bounds[1];
-        PartMng.m_pppEnvSt.m_boxMinY = bounds[2];
-        PartMng.m_pppEnvSt.m_boxMaxY = bounds[3];
-        PartMng.m_pppEnvSt.m_boxMinZ = bounds[4];
-        PartMng.m_pppEnvSt.m_boxMaxZ = bounds[5];
+        float* distances = reinterpret_cast<float*>(object->m_localBase);
+        PartMng.m_soundNearDistance[0] = distances[0];
+        PartMng.m_soundFarDistance[0] = distances[1];
+        PartMng.m_soundNearDistance[1] = distances[2];
+        PartMng.m_soundFarDistance[1] = distances[3];
+        PartMng.m_soundNearDistance[2] = distances[4];
+        PartMng.m_soundFarDistance[2] = distances[5];
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2841,18 +2518,18 @@ renderedDone:
         if (MenuPcs.GetMesMenu(a0) != 0) {
             char* message;
             if ((a3 & 0x80) != 0) {
-                message = GetNumSysMes__5CGameFv(&Game, a7);
+                message = Game.GetSysMes(a7);
             } else {
-                message = reinterpret_cast<char*>(GetSysMes__5CGameFi(&m_flatData, a7));
+                message = m_flatData.GetMes(a7);
             }
             if ((a3 & 0x80) != 0) {
-                message = GetNumSysMes__5CGameFv(&Game, a7);
+                message = Game.GetSysMes(a7);
             } else {
-                message = reinterpret_cast<char*>(GetSysMes__5CGameFi(&m_flatData, a7));
+                message = m_flatData.GetMes(a7);
             }
             MenuPcs.GetMesMenu(a0)->Open(message, a1, a2, a3, a4, a5, a6);
         } else {
-            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
+            if (System.GetErrorLevel() >= 1U) {
                 System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);
             }
         }
@@ -2865,7 +2542,7 @@ renderedDone:
         if (MenuPcs.GetMesMenu(a0) != 0) {
             MenuPcs.GetMesMenu(a0)->CloseRequest(1);
         } else {
-            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
+            if (System.GetErrorLevel() >= 1U) {
                 System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);
             }
         }
@@ -2878,9 +2555,9 @@ renderedDone:
         const int a1 = object->m_localBase[1];
         const int a2 = object->m_localBase[2];
         if (MenuPcs.GetMesMenu(a0) != 0) {
-            GetMes__9CFlatDataFi(MenuPcs.GetMesMenu(a0), a1, a2);
+            MenuPcs.GetMesMenu(a0)->SetValue(a1, a2);
         } else {
-            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
+            if (System.GetErrorLevel() >= 1U) {
                 System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);
             }
         }
@@ -2892,11 +2569,11 @@ renderedDone:
         int a0 = *object->m_localBase;
         int a1 = object->m_localBase[1];
         if (MenuPcs.GetMesMenu(a0) != 0) {
-            this->push(object, GetErrorLevel__7CSystemFv(MenuPcs.GetMesMenu(a0), a1));
+            this->push(object, MenuPcs.GetMesMenu(a0)->GetValue(a1));
             outResult = 0;
             break;
         } else {
-            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
+            if (System.GetErrorLevel() >= 1U) {
                 System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);
             }
             this->push(object, 0);
@@ -2918,7 +2595,7 @@ renderedDone:
     case -0x4D: {
         const int a0 = *object->m_localBase;
         if (MenuPcs.GetMesMenu(a0) == 0) {
-            if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
+            if (System.GetErrorLevel() >= 1U) {
                 System.Printf(const_cast<char*>("\203\201\203b\203Z\201[\203W\203\201\203j\203\205\201[%d\202\315\202\240\202\350\202\334\202\271\202\361\201B\n"), a0);
             }
             this->push(object, 0);
@@ -3053,7 +2730,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x5E:
-        if (GetNumMes__9CFlatDataFv(&System) >= 1U) {
+        if (System.GetErrorLevel() >= 1U) {
             System.Printf(const_cast<char*>("\203f\203o\203b\203O\227p\212\326\220\224setForceAnimInterp\202\315\224p\216~\202\263\202\352\202\334\202\265\202\275\201B\n"));
         }
         this->push(object, 0);
@@ -3122,7 +2799,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x67:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347loadWaveAsync\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.LoadWaveASync(*object->m_localBase, -1, 0);
@@ -3131,7 +2808,7 @@ renderedDone:
         break;
     case -0x68: {
         const int completed = Sound.IsLoadWaveASyncCompleted();
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347isLoadWaveAsyncCompleted\202\265\202\334\202\265\202\275\201B\223\307\202\335\215\236\202\335\202\315%s\n"),
                 completed != 0 ? "\212\256\227\271" : "\226\242\212\256\227\271");
         }
@@ -3140,7 +2817,7 @@ renderedDone:
         break;
     }
     case -0x69:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347loadBgm\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.LoadBgm(*object->m_localBase);
@@ -3148,7 +2825,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x6A:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347playBgm\202\360\215\304\220\266\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.PlayBgm(*object->m_localBase);
@@ -3229,7 +2906,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x77:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347loadWave\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.LoadWave(*object->m_localBase);
@@ -3329,7 +3006,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x89:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347loadStream\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.LoadStream(*object->m_localBase);
@@ -3337,7 +3014,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x8A:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347playStream\202\265\202\334\202\265\202\275\201B\n"));
         }
         Sound.PlayStreamASync();
@@ -3350,7 +3027,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0xA0:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347streamVolume\202\265\202\334\202\265\202\275\201B\n"));
         }
         Sound.SetStreamVolume(*object->m_localBase, object->m_localBase[1]);
@@ -3358,7 +3035,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x8C:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347freeWave\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.FreeWave(*object->m_localBase);
@@ -3366,7 +3043,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x8D:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347stopBgm\202\265\202\334\202\265\202\275\201B\n"));
         }
         Sound.StopBgm();
@@ -3374,7 +3051,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x8E:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347fadeOutBgm\202\265\202\334\202\265\202\275\201B\n"));
         }
         Sound.FadeOutBgm(*object->m_localBase);
@@ -3387,7 +3064,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x90:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347playNextBgm\202\360\215\304\220\266\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.PlayNextBgm(*object->m_localBase);
@@ -3423,9 +3100,11 @@ renderedDone:
             PartMng.pppDestroyAll();
             Game.ChangeMap(object->m_localBase[1], object->m_localBase[2], 2, 1);
             break;
-        case 6:
-            result = static_cast<unsigned int>(MapPcs.IsLoadMapCompleted()) & PartPcs.IsLoadPartCompleted();
+        case 6: {
+            int mapLoaded = MapPcs.IsLoadMapCompleted();
+            result = mapLoaded & PartPcs.IsLoadPartCompleted();
             break;
+        }
         }
         this->push(object, result);
         outResult = 0;
@@ -3756,7 +3435,7 @@ renderedDone:
         break;
     }
     case -0xC8:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347cancelWaveAsync\202\265\202\334\202\265\202\275\201B\n"));
         }
         Sound.CancelLoadWaveASync();
@@ -3833,7 +3512,7 @@ renderedDone:
         break;
     }
     case -0xD1:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347crossPlayBgm\202\360\215\304\220\266\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.CrossPlayBgm(*object->m_localBase, object->m_localBase[1]);
@@ -4136,7 +3815,7 @@ renderedDone:
         break;
     }
     case -0xF8:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347addNoFreeSeGroup\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.AddNoFreeSeGroup(*object->m_localBase);
@@ -4144,7 +3823,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x93:
-        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
+        if (System.GetErrorLevel() >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347addNoFreeWave\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.AddNoFreeWave(*object->m_localBase);

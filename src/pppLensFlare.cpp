@@ -35,14 +35,6 @@ static inline _pppColorWork* GetLensFlareColorWork(pppColum* obj, _pppCtrlTable*
 	return reinterpret_cast<_pppColorWork*>(obj->m_workArea + GetLensFlareDataOffsets(ctrlTable)->m_colorWorkOffset);
 }
 
-extern const double kPppLensFlareZeroD = 0.0;
-extern const float kPppLensFlareOne = 1.0f;
-extern const double kPppLensFlareOcclusionStep = 0.2f;
-extern const float kPppLensFlareZero;
-extern const float kPppLensFlareAlphaScale;
-extern const float kPppLensFlareNegate;
-extern const float kPppLensFlareZScale;
-
 /*
  * --INFO--
  * PAL Address: 0x800de718
@@ -59,7 +51,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTa
 	s32 dataValIndex = unkB->m_dataValIndex;
 
 	if (dataValIndex != 0xFFFF) {
-		pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
+		pppShapeSt* shape = ppvEnv->m_shapeTablePtr[dataValIndex];
 		if (work->m_alpha != 0) {
 			pppCVECTOR local_70;
 			Vec local_60;
@@ -92,7 +84,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTa
 			local_70.rgba[3] = work->m_alpha;
 
 			pppSetDrawEnv(
-				&local_70, (pppFMATRIX*)0, kPppLensFlareZero, unkB->m_lensFlare.m_drawEnvLightTarget, unkB->m_unk13,
+				&local_70, (pppFMATRIX*)0, 0.0f, unkB->m_lensFlare.m_drawEnvLightTarget, unkB->m_unk13,
 				unkB->m_unk12, 0, 1, 1, 0);
 
 			pppSetBlendMode(unkB->m_unk12);
@@ -142,7 +134,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTab
 		s16 stepSize;
 		float alphaScale;
 
-		alphaScale = (float)sourceAlpha * kPppLensFlareAlphaScale;
+		alphaScale = (float)sourceAlpha / 128.0f;
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);
 		PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
@@ -162,7 +154,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTab
 		objectPos.y = ppvMng->m_matrix.value[1][3];
 		objectPos.z = ppvMng->m_matrix.value[2][3];
 		PSVECSubtract(&cameraPos, &objectPos, &cameraToObject);
-		PSVECScale(&cameraToObject, &cameraToObject, kPppLensFlareNegate);
+		PSVECScale(&cameraToObject, &cameraToObject, -1.0f);
 		PSVECNormalize(&lookDir, &lookDir);
 		PSVECNormalize(&cameraToObject, &cameraToObject);
 		work->m_dot = PSVECDotProduct(&cameraToObject, &lookDir);
@@ -172,7 +164,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTab
 		zAtPixel = 0;
 		flareWidth = unkB->m_arg3;
 		halfWidth = flareWidth >> 1;
-		z0 = __cvt_fp2unsigned((double)(kPppLensFlareZScale * work->m_projectedZ));
+		z0 = __cvt_fp2unsigned((double)(16777215.0f * work->m_projectedZ));
 		y0 = (u16)projectedYInt;
 		x0 = (u16)projectedXInt;
 		stepSize = (s16)((u16)flareWidth / (u16)unkB->m_count);
@@ -209,7 +201,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTab
 
 		work->m_alpha = (u8)(int)((float)(u8)work->m_alpha * alphaScale);
 		if (unkB->m_dataValIndex != 0xffff) {
-			pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[unkB->m_dataValIndex];
+			pppShapeSt* shape = ppvEnv->m_shapeTablePtr[unkB->m_dataValIndex];
 			pppCalcFrameShape(static_cast<long*>(shape->m_animData), work->m_shapeFrame0, work->m_shapeFrame1,
 			                  work->m_shapeFrame2, unkB->m_initWOrk);
 		}
@@ -235,7 +227,7 @@ void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
 	LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);
 
-	float initValue = kPppLensFlareZero;
+	float initValue = 0.0f;
 
 	work->m_projectedZ = initValue;
 	work->m_projectedY = initValue;

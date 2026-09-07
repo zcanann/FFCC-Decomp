@@ -31,8 +31,10 @@ extern float ppvScreenMatrixZbuff;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
-    CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
+STATIC_ASSERT(offsetof(_pppProgSetDef, m_drawFlags) == 0xC);
+STATIC_ASSERT(offsetof(_pppProgSetDef, m_startFrame) == 0x10);
+STATIC_ASSERT(offsetof(_pppProgSetDef, m_stages) == 0x28);
+
 
 static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
 {
@@ -122,12 +124,14 @@ void pppUnitMatrix(pppFMATRIX& pppFMtx)
 	PSMTXIdentity(pppFMtx.value);
 }
 
-#pragma push
-#pragma optimization_level 2
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005767C
+ * PAL Size: 160b
+ * EN Address: 0x8006222C
+ * EN Size: 144b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppRotMatrix(pppFMATRIX& dst, pppFMATRIX src, Vec rot)
 {
@@ -143,7 +147,6 @@ void pppRotMatrix(pppFMATRIX& dst, pppFMATRIX src, Vec rot)
 	PSMTXConcat(Rx.value, R.value, R.value);
 	PSMTXConcat(R.value, src.value, dst.value);
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -353,6 +356,100 @@ void pppDestroyHeap(_pppEnvSt* pppEnvSt)
 
 /*
  * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 196b
+ * EN Address: 0x80063104
+ * EN Size: 300b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void pppDeletePObject(_pppPObject* object)
+{
+    _pppPDataVal* owner = object->m_link.m_owner;
+    _pppProgSetDef* progSet = owner->m_programSetDef;
+    for (int stageIndex = 0; stageIndex < progSet->m_numStages; stageIndex++) {
+        _pppCtrlTable* stage = &progSet->m_stages[stageIndex];
+        if (stage->m_prog != 0 && stage->m_prog->m_pppFunctionDestructor != 0) {
+            ((pppProgDestructCallback)stage->m_prog->m_pppFunctionDestructor)(&object->m_link, stage);
+        }
+    }
+    if (--owner->m_activeCount == 0) {
+        owner->m_pppPObjLink = 0;
+    } else if (owner->m_pppPObjLink == &object->m_link) {
+        owner->m_pppPObjLink = object->m_link.m_next;
+    }
+    if (object != 0) {
+        Memory.Free(object);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 260b
+ * EN Address: 0x80062718
+ * EN Size: 128b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline void pppFreePObjectPrio(_pppMngSt* mng)
+{
+    _pppPObjLink* prev = &mng->m_pppPObjLinkHead;
+    _pppPObjLink* obj = mng->m_pppPObjLinkHead.m_next;
+    while (obj != 0) {
+        _pppPObjLink* next = obj->m_next;
+        if (obj->m_owner->m_programSetDef->m_drawFlagBits.m_keepOnHeap == 0) {
+            prev->m_next = next;
+            pppDeletePObject((_pppPObject*)obj);
+        } else {
+            prev = obj;
+        }
+        obj = next;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 580b
+ * EN Address: 0x80062798
+ * EN Size: 284b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline int pppFreeMngStPrioForHeap(char* denied)
+{
+    _pppMngSt* selectedMngSt = 0;
+    int selectedPrio = 1;
+    int selectedPrioTime;
+    for (int i = 0; i < 0x180; i++) {
+        if (denied[i] == 0) {
+            _pppMngSt* candidate = &PartMng.m_pppMng[i];
+            if (candidate->m_baseTime != -0x1000 && candidate->m_kind != 0) {
+                u8 prio = candidate->m_prio;
+                if (prio > 1) {
+                    if (selectedPrio < prio) {
+                        selectedPrioTime = candidate->m_prioTime;
+                        selectedPrio = prio;
+                        selectedMngSt = candidate;
+                    } else if (selectedPrio == prio && selectedPrioTime < candidate->m_prioTime) {
+                        selectedPrioTime = candidate->m_prioTime;
+                        selectedMngSt = candidate;
+                    }
+                }
+            }
+        }
+    }
+    if (selectedMngSt == 0) {
+        return 0;
+    }
+    denied[selectedMngSt - PartMng.m_pppMng] = 1;
+    pppFreePObjectPrio(selectedMngSt);
+    return 1;
+}
+
+/*
+ * --INFO--
  * PAL Address: 80057008
  * PAL Size: 780b
  * EN Address: TODO
@@ -364,13 +461,13 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 {
 	int firstAllocFailure = 1;
 	int canRetry;
-	_pppPObjLink* allocation;
-	s8 denied[0x180];
+	void* allocation;
+	char denied[0x180];
 
 	ppvMemAllocErrorF = 0;
 	do
 	{
-		allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
+		allocation = Memory._Alloc(allocSize, stage, file, line, 1);
 		if (allocation != 0)
 		{
 			goto allocDone;
@@ -385,99 +482,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 			denied[currentIdx] = 1;
 		}
 
-		_pppMngSt* selectedMngSt = 0;
-		_pppMngSt* candidate;
-		int selectedPrio = 1;
-		s32 i;
-		s8* deniedPtr = (s8*)denied;
-		u8* mngBase = (u8*)&PartMng;
-		int selectedPrioTime;
-
-		for (i = 0; i < 0x180; i++)
-		{
-			if (deniedPtr[0] == 0)
-			{
-				candidate = (_pppMngSt*)(mngBase + 0x2a18);
-				if (candidate->m_baseTime != -0x1000 && candidate->m_kind != 0)
-				{
-					u8 prio = candidate->m_prio;
-					if (prio > 1)
-					{
-						if (selectedPrio < prio)
-						{
-							selectedPrioTime = candidate->m_prioTime;
-							selectedPrio = prio;
-							selectedMngSt = candidate;
-						}
-						else if (selectedPrio == prio && selectedPrioTime < candidate->m_prioTime)
-						{
-							selectedPrioTime = candidate->m_prioTime;
-							selectedMngSt = candidate;
-						}
-					}
-				}
-			}
-			deniedPtr++;
-			mngBase += sizeof(_pppMngSt);
-		}
-
-
-		if (selectedMngSt == 0)
-		{
-			canRetry = 0;
-		}
-		else
-		{
-			s32 deniedIdx = selectedMngSt - PartMng.m_pppMng;
-			denied[deniedIdx] = 1;
-			_pppPObjLink* next;
-			_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
-			_pppPObjLink* obj = selectedMngSt->m_pppPObjLinkHead.m_next;
-			while (obj != 0)
-			{
-				next = obj->m_next;
-				if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
-				{
-					prev->m_next = next;
-
-					s32 stageIndex;
-					_pppProgSetDef* ownerSet;
-					_pppPDataVal* owner = obj->m_owner;
-					_pppProgSetDef* stageSet;
-					ownerSet = owner->m_programSetDef;
-					stageSet = ownerSet;
-					for (stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
-					{
-						_pppCtrlTable* entry = stageSet->m_stages;
-						if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
-						{
-							((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
-						}
-						stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
-					}
-
-					if (--owner->m_activeCount == 0)
-					{
-						owner->m_pppPObjLink = 0;
-					}
-					else if (owner->m_pppPObjLink == obj)
-					{
-						owner->m_pppPObjLink = obj->m_next;
-					}
-
-					if (obj != 0)
-					{
-						Memory.Free(obj);
-					}
-				}
-				else
-				{
-					prev = obj;
-				}
-				obj = next;
-			}
-			canRetry = 1;
-		}
+		canRetry = pppFreeMngStPrioForHeap(denied);
 	}
 	while (canRetry);
 
@@ -488,8 +493,6 @@ allocDone:
 	return allocation;
 }
 
-#pragma push
-#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 80056d20
@@ -499,20 +502,20 @@ allocDone:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage, char* file, int line)
+void* pppMemAllocNoReport(unsigned long allocSize, CMemory::CStage* stage, char* file, int line)
 {
 	int firstAllocFailure = 1;
 	int canRetry;
-	_pppPObjLink* allocation;
+	void* allocation;
 	char denied[0x180];
 
 	ppvMemAllocErrorF = 0;
 	do
 	{
-		allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
+		allocation = Memory._Alloc(allocSize, stage, file, line, 1);
 		if (allocation != 0)
 		{
-			goto freeDone;
+			goto allocDone;
 		}
 
 		if (firstAllocFailure)
@@ -524,115 +527,30 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 			denied[currentIdx] = 1;
 		}
 
-		_pppMngSt* candidate;
-		_pppMngSt* selectedMngSt = 0;
-		int selectedPrio = 1;
-		s32 i;
-		s8* deniedPtr = (s8*)denied;
-		u8* mngBase = (u8*)&PartMng;
-		int selectedPrioTime;
-
-		for (i = 0; i < 0x180; i++)
-		{
-			if (deniedPtr[0] == 0)
-			{
-				candidate = (_pppMngSt*)(mngBase + 0x2a18);
-				if (candidate->m_baseTime != -0x1000 && candidate->m_kind != 0)
-				{
-					u8 prio = candidate->m_prio;
-					if (prio > 1)
-					{
-						if (selectedPrio < prio)
-						{
-							selectedPrioTime = candidate->m_prioTime;
-							selectedPrio = prio;
-							selectedMngSt = candidate;
-						}
-						else if (selectedPrio == prio && selectedPrioTime < candidate->m_prioTime)
-						{
-							selectedPrioTime = candidate->m_prioTime;
-							selectedMngSt = candidate;
-						}
-					}
-				}
-			}
-			deniedPtr++;
-			mngBase += sizeof(_pppMngSt);
-		}
-
-		if (selectedMngSt == 0)
-		{
-			canRetry = 0;
-		}
-		else
-		{
-			s32 deniedIdx = selectedMngSt - PartMng.m_pppMng;
-			denied[deniedIdx] = 1;
-
-			_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
-			_pppPObjLink* obj = selectedMngSt->m_pppPObjLinkHead.m_next;
-			while (obj != 0)
-			{
-				_pppPObjLink* next = obj->m_next;
-				if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
-				{
-					prev->m_next = next;
-
-					_pppPDataVal* owner = obj->m_owner;
-					_pppProgSetDef* ownerSet = owner->m_programSetDef;
-					_pppProgSetDef* stageSet = ownerSet;
-					for (s32 stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
-					{
-						_pppCtrlTable* entry = stageSet->m_stages;
-						if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
-						{
-							((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
-						}
-						stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
-					}
-
-					if (--owner->m_activeCount == 0)
-					{
-						owner->m_pppPObjLink = 0;
-					}
-					else if (owner->m_pppPObjLink == obj)
-					{
-						owner->m_pppPObjLink = obj->m_next;
-					}
-
-					if (obj != 0)
-					{
-						Memory.Free(obj);
-					}
-				}
-				else
-				{
-					prev = obj;
-				}
-				obj = next;
-			}
-			canRetry = 1;
-		}
+		canRetry = pppFreeMngStPrioForHeap(denied);
 	}
 	while (canRetry);
 
 	ppvMemAllocErrorF = 1;
 	return 0;
-freeDone:
+allocDone:
 	return allocation;
 }
-#pragma pop
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80056CEC
+ * PAL Size: 52b
+ * EN Address: 0x80062A54
+ * EN Size: 64b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppHeapUseRate(CMemory::CStage* stage)
-{ 
-	if (stage != (CMemory::CStage*)0)
+void pppMemFree(void* allocation)
+{
+	if (allocation != 0)
 	{
-		Memory.Free(stage);
+		Memory.Free(allocation);
 	}
 }
 
@@ -640,8 +558,8 @@ void pppHeapUseRate(CMemory::CStage* stage)
  * --INFO--
  * PAL Address: 80056c74
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80062AEC
+ * EN Size: 52b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -654,12 +572,12 @@ void pppHeapCheckLeak(CMemory::CStage* stage)
  * --INFO--
  * PAL Address: 80056ca0
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80062A94
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage* stage)
+unsigned long pppHeapUseRate(CMemory::CStage* stage)
 {
 	unsigned long heapTotal;
 	unsigned long heapUseRate;
@@ -676,30 +594,27 @@ extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*
 	return result;
 }
 
-#pragma push
-#pragma opt_propagation on
 /*
  * --INFO--
  * PAL Address: 80056b0c
  * PAL Size: 360b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80062C50
+ * EN Size: 620b
  * JP Address: TODO
  * JP Size: TODO
  */
-void callCon2Prog(_pppPObject* pObject)
+static void callCon2Prog(_pppPObject* pObject)
 {
 	_pppPDataVal* owner = pObject->m_link.m_owner;
 	_pppProgSetDef* progSet = owner->m_programSetDef;
 
 	ppvIsLoopCalc = 1;
 
-	_pppProgSetDef* stageSet = progSet;
 	int stageIdx = 0;
 	u32* initWork = (u32*)(((u8*)pObject) + progSet->m_workBaseOffset);
 	for (; stageIdx < progSet->m_numStages; stageIdx++)
 	{
-		_pppCtrlTable* stage = stageSet->m_stages;
+		_pppCtrlTable* stage = &progSet->m_stages[stageIdx];
 		pppProg* prog = stage->m_prog;
 		if (prog != 0)
 		{
@@ -716,19 +631,16 @@ void callCon2Prog(_pppPObject* pObject)
 				}
 			}
 		}
-		stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 	}
 
 	pObject->m_graphId = 0;
 	while (pObject->m_graphId <= progSet->m_endFrame)
 	{
-		stageSet = progSet;
 		int stageCount = 0;
-		u32 stageSlotOffset = 0;
 		for (; stageCount < progSet->m_numStages; stageCount++)
 		{
-			_pppCtrlTable* stage = stageSet->m_stages;
-			s32** slotPtr = (s32**)(((u8*)pObject) + progSet->m_workBaseOffset + stageSlotOffset);
+			_pppCtrlTable* stage = &progSet->m_stages[stageCount];
+			s32** slotPtr = &((s32**)(((u8*)pObject) + progSet->m_workBaseOffset))[stageCount];
 			s32* nextSlot = (s32*)(((u8*)*slotPtr) + stage->m_workOffset);
 			pppProg* prog = stage->m_prog;
 
@@ -740,9 +652,6 @@ void callCon2Prog(_pppPObject* pObject)
 			{
 				((pppProgOperationCallback)prog->m_pppFunctionOperation)(pObject, *slotPtr, stage);
 			}
-
-			stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
-			stageSlotOffset += 4;
 		}
 
 		pObject->m_graphId += 0x1000;
@@ -750,218 +659,148 @@ void callCon2Prog(_pppPObject* pObject)
 
 	ppvIsLoopCalc = 0;
 }
-#pragma pop
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: 140b
+ * EN Address: 0x80062EBC
+ * EN Size: 256b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline void callConProg(_pppPObject* object)
+{
+	_pppProgSetDef* freshSet = object->m_link.m_owner->m_programSetDef;
+	u32* initWork = (u32*)(((u8*)object) + freshSet->m_workBaseOffset);
+	for (s32 stageIndex = 0; stageIndex < freshSet->m_numStages; stageIndex++)
+	{
+		_pppCtrlTable* entry = &freshSet->m_stages[stageIndex];
+		pppProg* prog = entry->m_prog;
+		*initWork++ = entry->m_unk8;
+		if (prog != 0 && prog->m_pppFunctionConstructor != 0)
+		{
+			((pppProgConstructCallback)prog->m_pppFunctionConstructor)(&object->m_link, entry);
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800566ac
+ * PAL Size: 1120b
+ * EN Address: 0x80062FBC
+ * EN Size: 328b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 {
-	struct {
-		s8 m_denied[0x180];
-		_pppProgSetDef* volatile m_programSet;
-	} loc;
-#define denied     loc.m_denied
-#define programSet loc.m_programSet
-	char* fmt = const_cast<char*>(s_pppPart_cpp);
-	_pppPObjLink* newObj = 0;
-	int firstFailure = 1;
-	CMemory::CStage* stage;
-	u32 totalSize;
-	int canRetry;
 	_pppPDataVal* dataVal = pppPDataVal;
+	_pppProgSetDef* programSet = dataVal->m_programSetDef;
+	_pppPObject* newObject = (_pppPObject*)pppMemAlloc(
+		programSet->m_workBaseOffset + programSet->m_numStages * sizeof(u32),
+		ppvEnv->m_stagePtr, const_cast<char*>(s_pppPart_cpp), 0x305);
 
-	programSet = dataVal->m_programSetDef;
-	stage = ppvEnv->m_stagePtr;
-	totalSize = programSet->m_workBaseOffset + ((u32)dataVal->m_programSetDef->m_numStages * sizeof(u32));
-	ppvMemAllocErrorF = 0;
-	do
+	if (newObject == 0)
 	{
-		newObj = (_pppPObjLink*)Memory._Alloc(totalSize, stage, fmt, 0x305, 1);
-		if (newObj != 0)
-		{
-			goto allocated;
-		}
-
-		if (firstFailure)
-		{
-			firstFailure = 0;
-			memset(denied, 0, sizeof(denied));
-
-			s32 currentIdx = ppvMng - PartMng.m_pppMng;
-			denied[currentIdx] = 1;
-		}
-
-		_pppMngSt* selectedMngSt = 0;
-		_pppMngSt* candidate;
-		int selectedPrio = 1;
-		s32 i;
-		s8* deniedPtr = denied;
-		u8* mngBase = (u8*)&PartMng;
-		int selectedPrioTime;
-
-		for (i = 0; i < 0x180; i++)
-		{
-			if (deniedPtr[0] == 0)
-			{
-				candidate = (_pppMngSt*)(mngBase + 0x2a18);
-				if (candidate->m_baseTime != -0x1000 && candidate->m_kind != 0)
-				{
-					u8 prio = candidate->m_prio;
-					if (prio > 1)
-					{
-						if (selectedPrio < prio)
-						{
-							selectedPrioTime = candidate->m_prioTime;
-							selectedPrio = prio;
-							selectedMngSt = candidate;
-						}
-						else if (selectedPrio == prio && selectedPrioTime < candidate->m_prioTime)
-						{
-							selectedPrioTime = candidate->m_prioTime;
-							selectedMngSt = candidate;
-						}
-					}
-				}
-			}
-			deniedPtr++;
-			mngBase += sizeof(_pppMngSt);
-		}
-
-		if (selectedMngSt == 0)
-		{
-			canRetry = 0;
-		}
-		else
-		{
-			s32 deniedIdx = selectedMngSt - PartMng.m_pppMng;
-			denied[deniedIdx] = 1;
-			_pppPObjLink* next;
-			_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
-			_pppPObjLink* obj = selectedMngSt->m_pppPObjLinkHead.m_next;
-			while (obj != 0)
-			{
-				next = obj->m_next;
-				if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
-				{
-					prev->m_next = next;
-
-					s32 stageIndex;
-					_pppProgSetDef* ownerSet;
-					_pppPDataVal* owner = obj->m_owner;
-					_pppProgSetDef* stageSet;
-					ownerSet = owner->m_programSetDef;
-					stageSet = ownerSet;
-					for (stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
-					{
-						_pppCtrlTable* entry = stageSet->m_stages;
-						if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
-						{
-							((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
-						}
-						stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
-					}
-
-					if (--owner->m_activeCount == 0)
-					{
-						owner->m_pppPObjLink = 0;
-					}
-					else if (owner->m_pppPObjLink == obj)
-					{
-						owner->m_pppPObjLink = obj->m_next;
-					}
-
-					if (obj != 0)
-					{
-						Memory.Free(obj);
-					}
-				}
-				else
-				{
-					prev = obj;
-				}
-				obj = next;
-			}
-			canRetry = 1;
-		}
+		return 0;
 	}
-	while (canRetry);
 
-	ppvEnv->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
-	PartMng.pppDumpMngSt();
-	ppvMemAllocErrorF = 1;
+	newObject->m_graphId = 0;
+	newObject->m_drawMatrixPtr = 0;
+	newObject->m_field74 = 0;
+	newObject->m_link.m_owner = pppPDataVal;
+	newObject->m_field7C = 1;
 
-allocated:
+	_pppPObjLink* firstObj = pppMngSt->m_pppPObjLinkHead.m_next;
+	if (firstObj == 0)
 	{
-		_pppPObject* newObject = (_pppPObject*)newObj;
-		if (newObj == 0)
-		{
-			return 0;
-		}
-
-		((_pppPObject*)newObj)->m_graphId = 0;
-		((_pppPObject*)newObj)->m_drawMatrixPtr = 0;
-		((_pppPObject*)newObj)->m_field74 = 0;
-		((_pppPObject*)newObj)->m_link.m_owner = pppPDataVal;
-		((_pppPObject*)newObj)->m_field7C = 1;
-
-		_pppPObjLink* firstObj = pppMngSt->m_pppPObjLinkHead.m_next;
-		if (firstObj == 0)
-		{
-			dataVal->m_pppPObjLink = newObj;
-			pppMngSt->m_pppPObjLinkHead.m_next = newObj;
-			newObj->m_next = 0;
-		}
-		else if (dataVal->m_pppPObjLink != 0)
-		{
-			newObj->m_next = dataVal->m_pppPObjLink->m_next;
-			dataVal->m_pppPObjLink->m_next = newObj;
-		}
-		else
-		{
-			_pppPObjLink* prev = &pppMngSt->m_pppPObjLinkHead;
-			s16 sortKey = programSet->m_sortKey;
-			_pppPObjLink* iter = firstObj;
-			do
-			{
-				_pppProgSetDef* iterSet = iter->m_owner->m_programSetDef;
-				if (iterSet->m_sortKey >= sortKey)
-				{
-					dataVal->m_pppPObjLink = &newObject->m_link;
-					prev->m_next = &newObject->m_link;
-					newObject->m_link.m_next = iter;
-					goto done_insert;
-				}
-				prev = iter;
-				iter = iter->m_next;
-			} while (iter != 0);
-			dataVal->m_pppPObjLink = &newObject->m_link;
-			prev->m_next = &newObject->m_link;
-			newObject->m_link.m_next = 0;
-		}
-
-	done_insert:
-		dataVal->m_activeCount++;
-		_pppProgSetDef* freshSet = newObject->m_link.m_owner->m_programSetDef;
-		u32* initWork = (u32*)(((u8*)newObject) + freshSet->m_workBaseOffset);
-		_pppProgSetDef* stageSet = freshSet;
-		for (s32 stageIndex = 0; stageIndex < freshSet->m_numStages; stageIndex++)
-		{
-			_pppCtrlTable* entry = stageSet->m_stages;
-			pppProg* prog = entry->m_prog;
-			*initWork++ = entry->m_unk8;
-			if (prog != 0 && prog->m_pppFunctionConstructor != 0)
-			{
-				((pppProgConstructCallback)prog->m_pppFunctionConstructor)(&newObject->m_link, (_pppCtrlTable*)entry);
-			}
-			stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
-		}
-		return newObject;
+		dataVal->m_pppPObjLink = &newObject->m_link;
+		pppMngSt->m_pppPObjLinkHead.m_next = &newObject->m_link;
+		newObject->m_link.m_next = 0;
 	}
-#undef denied
-#undef programSet
+	else if (dataVal->m_pppPObjLink != 0)
+	{
+		newObject->m_link.m_next = dataVal->m_pppPObjLink->m_next;
+		dataVal->m_pppPObjLink->m_next = &newObject->m_link;
+	}
+	else
+	{
+		_pppPObjLink* prev = &pppMngSt->m_pppPObjLinkHead;
+		s16 sortKey = programSet->m_sortKey;
+		_pppPObjLink* iter = firstObj;
+		do
+		{
+			_pppProgSetDef* iterSet = iter->m_owner->m_programSetDef;
+			if (iterSet->m_sortKey >= sortKey)
+			{
+				dataVal->m_pppPObjLink = &newObject->m_link;
+				prev->m_next = &newObject->m_link;
+				newObject->m_link.m_next = iter;
+				goto done_insert;
+			}
+			prev = iter;
+			iter = iter->m_next;
+		} while (iter != 0);
+		dataVal->m_pppPObjLink = &newObject->m_link;
+		prev->m_next = &newObject->m_link;
+		newObject->m_link.m_next = 0;
+	}
+
+done_insert:
+	dataVal->m_activeCount++;
+	callConProg(newObject);
+	return newObject;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 136b
+ * EN Address: 0x80064034
+ * EN Size: 176b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void pppCacheUnLoadModel(short* modelList, _pppDataHead* head)
+{
+	short modelCount = *modelList;
+	short i = 0;
+	modelList++;
+	while (i < modelCount)
+	{
+		short modelIndex = *modelList;
+		modelList++;
+		pppModelSt* model = ((pppModelSt**)head->m_modelNames)[modelIndex];
+		ppvAmemCacheSet.Release(model->m_cacheId);
+		model->pppCacheUnLoadModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
+		i++;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 108b
+ * EN Address: 0x800640E4
+ * EN Size: 152b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void pppCacheUnLoadShape(short* shapeList, _pppDataHead* head)
+{
+	short shapeCount = *shapeList;
+	short i = 0;
+	shapeList++;
+	while (i < shapeCount)
+	{
+		short shapeIndex = *shapeList;
+		shapeList++;
+		pppShapeSt* shape = ((pppShapeSt**)head->m_shapeNames)[shapeIndex];
+		pppCacheUnLoadShapeTexture(shape, PartMng.m_materialSet);
+		i++;
+	}
 }
 
 /*
@@ -973,9 +812,6 @@ allocated:
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 4
-#pragma opt_dead_assignments off
 void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x362);
@@ -983,43 +819,12 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 	_pppMngSt* oldMngSt = ppvMng;
 	ppvMng = pppMngSt;
 
-	if (pppMngSt->m_soundEffectData.m_soundEffectSlot >= 0 &&
-		pppMngSt->m_soundEffectData.m_soundEffectHandle >= 0)
-	{
-		Sound.FadeOutSe3D(pppMngSt->m_soundEffectData.m_soundEffectHandle,
-			pppMngSt->m_soundEffectData.m_soundEffectFadeFrames);
-		pppMngSt->m_soundEffectData.m_soundEffectHandle = -1;
-	}
+	pppStopSe(pppMngSt, &pppMngSt->m_soundEffectData);
 
 	for (_pppPObjLink* obj = pppMngSt->m_pppPObjLinkHead.m_next; obj != 0;)
 	{
-		_pppPDataVal* owner = obj->m_owner;
 		_pppPObjLink* next = obj->m_next;
-		_pppProgSetDef* ownerSet = owner->m_programSetDef;
-		_pppProgSetDef* stageSet = ownerSet;
-		for (s32 stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
-		{
-			_pppCtrlTable* entry = stageSet->m_stages;
-			if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
-			{
-				((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
-			}
-			stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
-		}
-
-		if (--owner->m_activeCount == 0)
-		{
-			owner->m_pppPObjLink = 0;
-		}
-		else if (owner->m_pppPObjLink == obj)
-		{
-			owner->m_pppPObjLink = obj->m_next;
-		}
-
-		if (obj != 0)
-		{
-			Memory.Free(obj);
-		}
+		pppDeletePObject((_pppPObject*)obj);
 		obj = next;
 	}
 
@@ -1040,41 +845,20 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 	{
 		if (pppMngSt->m_hasMapRef != 0)
 		{
-			u32 pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
-			s16* partResource = (s16*)(*(u32*)(pppResSet + 0x10) + pppMngSt->m_partIndex * 8);
-
-			s16 cacheIndex = *partResource;
-			if (cacheIndex != -1)
+			CPartMng::PppPdtSlot* slot = (CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet;
+			pppCacheChunk* chunk = &((pppCacheChunk*)slot->m_pppDataHead->m_cacheChunks)[pppMngSt->m_partIndex];
+			if (chunk->m_cacheIndex != -1)
 			{
-				ppvAmemCacheSet.Release(cacheIndex);
+				ppvAmemCacheSet.Release(chunk->m_cacheIndex);
 			}
 
 			if (pppMngSt->m_mapTexLoaded != 0)
 			{
-				u32 mapTexRef = *(u32*)(partResource + 2);
-				s16* mapMeshIndices = (s16*)(mapTexRef + *(u32*)(mapTexRef + 0x10));
-				s16* shapeIndices = (s16*)(mapTexRef + *(u32*)(mapTexRef + 0x14));
-
-				s16 mapMeshCount = *mapMeshIndices;
-				mapMeshIndices++;
-				pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
-				for (s16 i = 0; i < mapMeshCount; i++)
-				{
-					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *mapMeshIndices * 4);
-					mapMeshIndices++;
-					ppvAmemCacheSet.Release(*(s16*)((u8*)mapMesh + 0x66));
-					mapMesh->pppCacheDumpModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
-				}
-
-				s16 shapeCount = *shapeIndices;
-				s16* shapeIter = shapeIndices + 1;
-				pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
-				for (s16 i = 0; i < shapeCount; i++)
-				{
-					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + *shapeIter * 4);
-					shapeIter++;
-					pppCacheDumpShapeTexture(shape, PartMng.m_materialSet);
-				}
+				long* pdt = chunk->m_pdt;
+				short* modelIndices = (short*)((u8*)pdt + pdt[4]);
+				short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
+				pppCacheUnLoadModel(modelIndices, ((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead);
+				pppCacheUnLoadShape(shapeIndices, ((CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet)->m_pppDataHead);
 			}
 		}
 
@@ -1085,8 +869,6 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x3A1);
 	ppvMng = oldMngSt;
 }
-#pragma opt_dead_assignments reset
-#pragma pop
 
 /*
  * --INFO--
@@ -1110,22 +892,22 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 
 	switch (pppMngSt->m_rotationOrder) {
 	case 0:
-		pppGetRotMatrixXYZ(ppvMng->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixXYZ(ppvMng->m_matrix, reinterpret_cast<pppIVECTOR4*>(&pppMngSt->m_rotation));
 		break;
 	case 1:
-		pppGetRotMatrixXZY(ppvMng->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixXZY(ppvMng->m_matrix, reinterpret_cast<pppIVECTOR4*>(&pppMngSt->m_rotation));
 		break;
 	case 2:
-		pppGetRotMatrixYXZ(ppvMng->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixYXZ(ppvMng->m_matrix, reinterpret_cast<pppIVECTOR4*>(&pppMngSt->m_rotation));
 		break;
 	case 3:
-		pppGetRotMatrixYZX(ppvMng->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixYZX(ppvMng->m_matrix, reinterpret_cast<pppIVECTOR4*>(&pppMngSt->m_rotation));
 		break;
 	case 4:
-		pppGetRotMatrixZXY(ppvMng->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixZXY(ppvMng->m_matrix, reinterpret_cast<pppIVECTOR4*>(&pppMngSt->m_rotation));
 		break;
 	case 5:
-		pppGetRotMatrixZYX(ppvMng->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixZYX(ppvMng->m_matrix, reinterpret_cast<pppIVECTOR4*>(&pppMngSt->m_rotation));
 		break;
 	default:
 		break;
@@ -1529,6 +1311,33 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 
 /*
  * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 208b
+ * EN Address: 0x80063EA4
+ * EN Size: 248b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void pppCacheLoadModel(short* modelList, _pppDataHead* head)
+{
+	short modelCount = *modelList++;
+	for (short i = 0; i < modelCount; i++)
+	{
+		pppModelSt* mapMesh = ((pppModelSt**)head->m_modelNames)[*modelList++];
+		if (ppvAmemCacheSet.IsEnable(mapMesh->m_cacheId) == 0)
+		{
+			mapMesh->Ptr2Off();
+			mapMesh->m_meshData =
+			    reinterpret_cast<void*>(ppvAmemCacheSet.GetData(mapMesh->m_cacheId, (char*)s_pppPart_cpp, 0x4E5));
+			mapMesh->Off2Ptr();
+		}
+		ppvAmemCacheSet.AddRef(mapMesh->m_cacheId);
+		mapMesh->pppCacheLoadModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 80055868
  * PAL Size: 108b
  * EN Address: TODO
@@ -1552,20 +1361,39 @@ void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 	}
 }
 
-#pragma push
-#pragma optimizewithasm off
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 120b
+ * EN Address: 0x80062BD8
+ * EN Size: 120b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline void callInitProg(_pppMngSt* pppMngSt)
+{
+	for (int i = 0; i < pppMngSt->m_numControlPrograms; i++)
+	{
+		pppProg* prog = ((pppProg**)pppMngSt->m_pppPObjLinkHead.m_owner)[i];
+		pppProgInitCallback fn = prog->m_pppFunctionInit;
+		if (fn != 0)
+		{
+			fn(pppMngSt);
+		}
+	}
+}
+
 /*
  * --INFO--
  * PAL Address: 80055308
  * PAL Size: 1376b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8006442C
+ * EN Size: 656b
  * JP Address: TODO
  * JP Size: TODO
  */
 void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 {
-	int volatile runControl = runControlPrograms;
 	_pppProgSetDef* programSet = (_pppProgSetDef*)(pdt + 6);
 	ppvMng = pppMngSt;
 	pppMngSt->m_lifeEnd = (int)pdt[0];
@@ -1577,34 +1405,9 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	if (Game.m_currentSceneId != 7)
 	{
-		short modelCount = *modelIndices;
-		short* modelList = modelIndices + 1;
-		u32 pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
-
-		for (short i = 0; i < modelCount; i++)
-		{
-			pppModelSt* mapMesh = *(pppModelSt**)(*(u32*)(pppResSet + 0x14) + *modelList++ * 4);
-
-			if (ppvAmemCacheSet.IsEnable(mapMesh->m_cacheId) == 0)
-			{
-				mapMesh->Ptr2Off();
-				mapMesh->m_meshData =
-				    reinterpret_cast<void*>(ppvAmemCacheSet.GetData(mapMesh->m_cacheId, (char*)s_pppPart_cpp, 0x4E5));
-				mapMesh->Off2Ptr();
-			}
-
-			ppvAmemCacheSet.AddRef(mapMesh->m_cacheId);
-			mapMesh->pppCacheLoadModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
-		}
-
-		short shapeCount = *shapeIndices;
-		short* shapeList = shapeIndices + 1;
-		pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
-
-		for (short i = 0; i < shapeCount; i++)
-		{
-			pppCacheLoadShapeTexture(*(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + *shapeList++ * 4), PartMng.m_materialSet);
-		}
+		CPartMng::PppPdtSlot* slot = (CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet;
+		pppCacheLoadModel(modelIndices, slot->m_pppDataHead);
+		pppCacheLoadShape(shapeIndices, slot->m_pppDataHead);
 
 		pppMngSt->m_mapTexLoaded = 1;
 	}
@@ -1617,129 +1420,9 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	if (pppMngSt->m_numPrograms != 0)
 	{
-		u32 allocSize = (u32)pppMngSt->m_numPrograms << 4;
-		CMemory::CStage* stage = ppvEnv->m_stagePtr;
-		int firstAllocFailure = 1;
-		int canRetry;
-		_pppPDataVal* pDataVals = 0;
-		s8 denied[0x180];
-
-		ppvMemAllocErrorF = 0;
-		do
-		{
-			pDataVals = (_pppPDataVal*)Memory._Alloc(
-			    allocSize, stage, (char*)s_pppPart_cpp, 0x585, 1);
-			if (pDataVals != 0)
-			{
-				goto DataValsAllocated;
-			}
-
-			if (firstAllocFailure)
-			{
-				firstAllocFailure = 0;
-				memset(denied, 0, sizeof(denied));
-				int currentIdx = ppvMng - PartMng.m_pppMng;
-				denied[currentIdx] = 1;
-			}
-
-			_pppMngSt* selectedMngSt = 0;
-			_pppMngSt* candidate;
-			int selectedPrio = 1;
-			s32 i;
-			s8* deniedPtr = (s8*)denied;
-			u8* mngBase = (u8*)&PartMng;
-			int selectedPrioTime;
-
-			for (i = 0; i < 0x180; i++)
-			{
-				if (deniedPtr[0] == 0)
-				{
-					candidate = (_pppMngSt*)(mngBase + 0x2a18);
-					if (candidate->m_baseTime != -0x1000 && candidate->m_kind != 0)
-					{
-						u8 prio = candidate->m_prio;
-						if (prio > 1)
-						{
-							if (selectedPrio < prio)
-							{
-								selectedPrioTime = candidate->m_prioTime;
-								selectedPrio = prio;
-								selectedMngSt = candidate;
-							}
-							else if (selectedPrio == prio && selectedPrioTime < candidate->m_prioTime)
-							{
-								selectedPrioTime = candidate->m_prioTime;
-								selectedMngSt = candidate;
-							}
-						}
-					}
-				}
-				deniedPtr++;
-				mngBase += sizeof(_pppMngSt);
-			}
-
-
-			if (selectedMngSt == 0)
-			{
-				canRetry = 0;
-			}
-			else
-			{
-				int deniedIdx = selectedMngSt - PartMng.m_pppMng;
-				denied[deniedIdx] = 1;
-
-				_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
-				_pppPObjLink* obj = selectedMngSt->m_pppPObjLinkHead.m_next;
-				while (obj != 0)
-				{
-					_pppPObjLink* next = obj->m_next;
-					if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
-					{
-						prev->m_next = next;
-
-						_pppPDataVal* owner = obj->m_owner;
-						_pppProgSetDef* ownerSet = owner->m_programSetDef;
-						_pppProgSetDef* stageSet = ownerSet;
-						for (int stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
-						{
-							_pppCtrlTable* entry = stageSet->m_stages;
-							if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
-							{
-								((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
-							}
-							stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
-						}
-
-						if (--owner->m_activeCount == 0)
-						{
-							owner->m_pppPObjLink = 0;
-						}
-						else if (owner->m_pppPObjLink == obj)
-						{
-							owner->m_pppPObjLink = obj->m_next;
-						}
-
-						if (obj != 0)
-						{
-							Memory.Free(obj);
-						}
-					}
-					else
-					{
-						prev = obj;
-					}
-					obj = next;
-				}
-				canRetry = 1;
-			}
-		}
-		while (canRetry);
-
-		ppvEnv->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
-		PartMng.pppDumpMngSt();
-		ppvMemAllocErrorF = 1;
-DataValsAllocated:
-		pppMngSt->m_pppPDataVals = pDataVals;
+		pppMngSt->m_pppPDataVals = (_pppPDataVal*)pppMemAlloc(
+			pppMngSt->m_numPrograms * sizeof(_pppPDataVal), ppvEnv->m_stagePtr,
+			const_cast<char*>(s_pppPart_cpp), 0x585);
 	}
 	else
 	{
@@ -1778,61 +1461,47 @@ DataValsAllocated:
 		pDataVals++;
 	}
 
-	if (runControl != 0)
+	if (runControlPrograms != 0)
 	{
-		int i = 0;
-		int entryOffset = i;
-		for (; i < pppMngSt->m_numControlPrograms; i++)
-		{
-			void (*fn)(_pppMngSt*) = *(void (**)(_pppMngSt*))(*(int*)(reinterpret_cast<u8*>(pppMngSt->m_pppPObjLinkHead.m_owner) + entryOffset) + 0x10);
-			if (fn != 0)
-			{
-				fn(pppMngSt);
-			}
-			entryOffset += 4;
-		}
+		callInitProg(pppMngSt);
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
  * PAL Address: 800550ac
  * PAL Size: 604b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800646BC
+ * EN Size: 556b
  * JP Address: TODO
  * JP Size: TODO
  */
 #pragma push
-#pragma opt_loop_invariants off
 #pragma opt_common_subs off
 void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 {
-	int* table = (int*)(progOffsetReconstructionTable + 6);
+	_pppProgSetDef* table = (_pppProgSetDef*)(progOffsetReconstructionTable + 6);
 	int* pppProgRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]);
 	int* pdtRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]);
 	int pppProgRelocCount = *pppProgRelocs++;
 	int pdtRelocCount = *pdtRelocs++;
 
-	if ((u32)table[0] == 0) {
+	if (table->m_next == 0) {
 		return;
 	}
 
 	for (;;) {
-		*table = (int)progOffsetReconstructionTable + *table;
-		int* entry = table;
-
-		for (int i = 0; i < *(short*)((int)table + 0x26); i++) {
-			entry[10] = (int)(pppProg + entry[10]);
-			entry[12] = (int)progOffsetReconstructionTable + entry[12];
-			entry[13] = (int)progOffsetReconstructionTable + entry[13];
-			entry += 4;
+		table->m_next = (_pppProgSetDef*)((u8*)progOffsetReconstructionTable + (u32)table->m_next);
+		for (int i = 0; i < table->m_numStages; i++) {
+			_pppCtrlTable* entry = &table->m_stages[i];
+			entry->m_prog = pppProg + (u32)entry->m_prog;
+			entry->m_unk8 = (int)progOffsetReconstructionTable + entry->m_unk8;
+			entry->m_serializedDataOffsets = (int*)((u8*)progOffsetReconstructionTable + (u32)entry->m_serializedDataOffsets);
 		}
 
-		int* next = (int*)*table;
-		if (*(unsigned int*)next == 0) {
-			*table = 0;
+		_pppProgSetDef* next = table->m_next;
+		if (next->m_next == 0) {
+			table->m_next = 0;
 			break;
 		}
 		table = next;
@@ -1867,8 +1536,8 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	pppDataHead->m_shapeGroups = pppDataHead->m_shapeGroups + reinterpret_cast<u32>(dataBase);
 
 	int* chunkOffsets = reinterpret_cast<int*>(pppDataHead->m_cacheChunks);
-	s16* cacheChunks = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620)
-	    s16[static_cast<u32>(pppDataHead->m_cacheChunkCount) * 4];
+	pppCacheChunk* cacheChunks = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620)
+	    pppCacheChunk[pppDataHead->m_cacheChunkCount];
 	pppDataHead->m_cacheChunks = reinterpret_cast<u32>(cacheChunks);
 
 	for (int i = 0; i < pppDataHead->m_cacheChunkCount; i++) {
@@ -1877,7 +1546,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 		u8* chunkData = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x626) u8[chunkSize];
 
 		memcpy(chunkData, chunkSrc, chunkSize);
-		reinterpret_cast<s16*>(pppDataHead->m_cacheChunks)[i << 2] =
+		reinterpret_cast<pppCacheChunk*>(pppDataHead->m_cacheChunks)[i].m_cacheIndex =
 		    ppvAmemCacheSet.SetData(chunkData, chunkSize, CAmemCache::PDT, param_3);
 		delete chunkData;
 		chunkOffsets++;
@@ -1890,7 +1559,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 	for (int i = 0; i < pppDataHead->m_modelCount; i++) {
 		u32 j = 0;
-		pppModelSt* model = PartMng.m_pppModelStArr;
+		pppModelSt* model = PartMng.m_modelSet->m_models;
 		pppModelSt* foundModel;
 		for (; j < 0x100; j++) {
 			if (model->m_isUsed != 0 && strcmp(model->m_name, modelName) == 0) {
@@ -1905,7 +1574,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 		modelName += 0x20;
 		reinterpret_cast<pppModelSt**>(pppDataHead->m_modelNames)[i] = model;
-		reinterpret_cast<pppModelSt**>(pppDataHead->m_modelNames)[i]->m_refCount++;
+		reinterpret_cast<pppModelSt**>(pppDataHead->m_modelNames)[i]->AddRef();
 	}
 
 	char* shapeName = reinterpret_cast<char*>(pppDataHead->m_shapeNames);
@@ -1915,7 +1584,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 	for (int i = 0; i < pppDataHead->m_shapeCount; i++) {
 		u32 j = 0;
-		pppShapeSt* shape = PartMng.m_pppShapeStArr;
+		pppShapeSt* shape = PartMng.m_shapeSet->m_shapes;
 		pppShapeSt* foundShape;
 		for (; j < 0x100; j++) {
 			if (shape->m_inUse != 0 && strcmp(shape->m_name, shapeName) == 0) {
@@ -1930,7 +1599,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 		shapeName += 0x20;
 		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i] = shape;
-		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i]->m_refCount++;
+		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i]->AddRef();
 	}
 
 	pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups);
@@ -1954,8 +1623,8 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
  * --INFO--
  * PAL Address: 80054c58
  * PAL Size: 304b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80064BE4
+ * EN Size: 1228b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1974,11 +1643,10 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 			if (pDataVal->m_activeCount != 0)
 			{
 				s32 workOffsetStep = 0;
-				_pppProgSetDef* stageSet = progSet;
 
 				for (s32 stage = 0; stage < progSet->m_numStages; stage++)
 				{
-					_pppCtrlTable* stageIter = stageSet->m_stages;
+					_pppCtrlTable* stageIter = &progSet->m_stages[stage];
 					pppProg* prog = stageIter->m_prog;
 					if (prog != 0)
 					{
@@ -2011,7 +1679,6 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 						printf(sPppProgNullErrorMsg);
 					}
 
-					stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 					workOffsetStep += 4;
 				}
 			}
@@ -2029,8 +1696,8 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
  * --INFO--
  * PAL Address: 80054b30
  * PAL Size: 296b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800650B0
+ * EN Size: 464b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2041,15 +1708,13 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 	{
 		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pppMngSt->m_pppPDataVals + pDataValOffset);
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0 &&
-		    (s8)((s32)(((u32)pDataVal->m_programSetDef->m_drawFlags << 24) & 0xC0000000) >> 31) == 0 && pDataVal->m_activeCount > 0)
+		    pDataVal->m_programSetDef->m_drawFlagBits.m_skipDraw == 0 && pDataVal->m_activeCount > 0)
 		{
-			s32 workOffsetStep = 0;
 			_pppProgSetDef* progSet = pDataVal->m_programSetDef;
-			_pppProgSetDef* stageSet = progSet;
 
 			for (s32 stage = 0; stage < progSet->m_numStages; stage++)
 			{
-				_pppCtrlTable* stageIter = stageSet->m_stages;
+				_pppCtrlTable* stageIter = &progSet->m_stages[stage];
 				pppProg* prog = stageIter->m_prog;
 				if (prog != 0)
 				{
@@ -2064,7 +1729,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 							if (((_pppPObject*)obj)->m_field7C == 0)
 							{
 								fn((_pppPObject*)obj,
-								   *(void**)(((u8*)obj) + progSet->m_workBaseOffset + workOffsetStep),
+								   ((void**)((u8*)obj + progSet->m_workBaseOffset))[stage],
 								   stageIter);
 							}
 							count--;
@@ -2079,9 +1744,6 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 				{
 					printf(sPppProgNullErrorMsg);
 				}
-
-				stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
-				workOffsetStep += 4;
 			}
 		}
 		pDataValOffset += sizeof(_pppPDataVal);
@@ -2100,30 +1762,14 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 #pragma optimization_level 3
 void _pppDeadPart(_pppMngSt* pppMngSt)
 {
-	struct pppMngStDeadRaw
-	{
-		u8 m_pad0[0x24];
-		s32 m_lifeEndFrame;
-		u8 m_pad1[0x34 - 0x28];
-		s32 m_currentFrame;
-		u8 m_pad2[0xB0 - 0x38];
-		s32 m_prevFrame;
-		u8 m_pad3[0xC4 - 0xB4];
-		_pppPObjLink m_objHead;
-		u8 m_pad4[0xE4 - 0xD0];
-		u8 m_hasLifeEnd;
-		u8 m_loopMode;
-		u8 m_isDead;
-	};
-
-	pppMngStDeadRaw* mng = (pppMngStDeadRaw*)pppMngSt;
+	_pppMngSt* mng = pppMngSt;
 	u32 maxDeleteFrame;
 
 	if (ppvUserStopPartF == 0)
 	{
 		maxDeleteFrame = 0;
-		_pppPObjLink* obj = mng->m_objHead.m_next;
-		_pppPObjLink* prev = &mng->m_objHead;
+		_pppPObjLink* obj = mng->m_pppPObjLinkHead.m_next;
+		_pppPObjLink* prev = &mng->m_pppPObjLinkHead;
 		for (; obj != 0;)
 		{
 			_pppPObjLink* next = obj->m_next;
@@ -2147,7 +1793,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					}
 				}
 
-				if (mng->m_loopMode == 0 &&
+				if (mng->m_particleEnded == 0 &&
 					((_pppPObject*)obj)->m_graphId >= progSet->m_loopFrame &&
 					progSet->m_loopFrame != 0x70000000)
 				{
@@ -2161,32 +1807,8 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					{
 						prev->m_next = next;
 
-						_pppPDataVal* deadOwner = (_pppPDataVal*)obj->m_owner;
-						_pppProgSetDef* deadProgSet = deadOwner->m_programSetDef;
-						for (stageIdx = 0; stageIdx < deadProgSet->m_numStages; stageIdx++)
-						{
-							_pppCtrlTable* stage = &deadProgSet->m_stages[stageIdx];
-							pppProg* prog = stage->m_prog;
-							if (prog != 0 && prog->m_pppFunctionDestructor != 0)
-							{
-								((pppProgDestructCallback)prog->m_pppFunctionDestructor)(obj, stage);
-							}
-						}
-
-						if (--deadOwner->m_activeCount == 0)
-						{
-							deadOwner->m_pppPObjLink = 0;
-						}
-						else if (deadOwner->m_pppPObjLink == obj)
-						{
-							deadOwner->m_pppPObjLink = obj->m_next;
-						}
-
-						if (obj != 0)
-						{
-							Memory.Free(obj);
-							goto nextIter;
-						}
+						pppDeletePObject((_pppPObject*)obj);
+						goto nextIter;
 					}
 					else
 					{
@@ -2204,65 +1826,40 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 			obj = next;
 		}
 
-		if (mng->m_loopMode != 0 && maxDeleteFrame == 0x70000000)
+		if (mng->m_particleEnded != 0 && maxDeleteFrame == 0x70000000)
 		{
-			for (_pppPObjLink* obj = mng->m_objHead.m_next; obj != 0;)
+			for (_pppPObjLink* obj = mng->m_pppPObjLinkHead.m_next; obj != 0;)
 			{
 				_pppPObjLink* next = obj->m_next;
-				_pppPDataVal* owner = (_pppPDataVal*)obj->m_owner;
-				_pppProgSetDef* progSet = owner->m_programSetDef;
-
-				for (int stageIdx = 0; stageIdx < progSet->m_numStages; stageIdx++)
-				{
-					_pppCtrlTable* stage = &progSet->m_stages[stageIdx];
-					pppProg* prog = stage->m_prog;
-					if (prog != 0 && prog->m_pppFunctionDestructor != 0)
-					{
-						((pppProgDestructCallback)prog->m_pppFunctionDestructor)(obj, stage);
-					}
-				}
-
-				if (--owner->m_activeCount == 0)
-				{
-					owner->m_pppPObjLink = 0;
-				}
-				else if (owner->m_pppPObjLink == obj)
-				{
-					owner->m_pppPObjLink = obj->m_next;
-				}
-
-				if (obj != 0)
-				{
-					Memory.Free(obj);
-				}
+				pppDeletePObject((_pppPObject*)obj);
 				obj = next;
 			}
 
-			mng->m_objHead.m_next = 0;
+			mng->m_pppPObjLinkHead.m_next = 0;
 		}
 	}
 
 	if (ppvUserStopPartF == 0)
 	{
-		mng->m_prevFrame = mng->m_currentFrame;
+		mng->m_previousFrame2 = mng->m_currentFrame;
 		mng->m_currentFrame += 0x1000;
 	}
 
-	if (mng->m_hasLifeEnd != 0)
+	if (mng->m_mode != 0)
 	{
-		if (mng->m_loopMode != 0)
+		if (mng->m_particleEnded != 0)
 		{
-			mng->m_isDead = (mng->m_objHead.m_next == 0) ? 1 : 0;
+			mng->m_isFinished = (mng->m_pppPObjLinkHead.m_next == 0) ? 1 : 0;
 		}
 		else if (mng->m_currentFrame >= 0x70000000)
 		{
-			mng->m_prevFrame = 0x6FFFF000;
+			mng->m_previousFrame2 = 0x6FFFF000;
 			mng->m_currentFrame = 0x70000000;
 		}
 	}
 	else
 	{
-		mng->m_isDead = (mng->m_currentFrame >= mng->m_lifeEndFrame) ? 1 : 0;
+		mng->m_isFinished = (mng->m_currentFrame >= mng->m_lifeEnd) ? 1 : 0;
 	}
 }
 #pragma pop
@@ -2323,8 +1920,8 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 					u32 soundTableKind = (u32)se->m_soundEffectKind;
 					se->m_soundEffectHandle = Sound.PlaySe3D(
 						se->m_soundEffectSlot, &soundPos,
-						(PartMng.m_pppEnvSt.m_soundVolumeTable - 3)[soundTableKind],
-						(PartMng.m_pppEnvSt.m_soundPitchTable - 3)[soundTableKind], 0);
+						PartMng.m_soundNearDistance[soundTableKind],
+						PartMng.m_soundFarDistance[soundTableKind], 0);
 					se->m_soundEffectStartedOnce = 1;
 				}
 			}
@@ -2337,23 +1934,23 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 		}
 	}
 
-	s32 i = 0;
-	s32 pDataValOffset = 0;
-	for (; i < pppMngSt->m_numPrograms; i++)
+	for (s32 i = 0; i < pppMngSt->m_numPrograms; i++)
 	{
 		_pppPDataVal* pDataVals = pppMngSt->m_pppPDataVals;
-		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pDataVals + pDataValOffset);
-		if (pDataVals != 0 && pDataVal != 0 && pppMngSt->m_currentFrame >= pDataVal->m_nextSpawnTime)
+		if (pDataVals != 0)
 		{
-			pDataVal->m_nextSpawnTime = 0x7FFFFFFF;
-			_pppPObject* pObject = pppCreatePObject(pppMngSt, pDataVal);
-			if (pObject == 0)
+			_pppPDataVal* pDataVal = &pDataVals[i];
+			if (pDataVal != 0 && pppMngSt->m_currentFrame >= pDataVal->m_nextSpawnTime)
 			{
-				break;
+				pDataVal->m_nextSpawnTime = 0x7FFFFFFF;
+				_pppPObject* pObject = pppCreatePObject(pppMngSt, pDataVal);
+				if (pObject == 0)
+				{
+					break;
+				}
+				pObject->m_field7C = 0;
 			}
-			pObject->m_field7C = 0;
 		}
-		pDataValOffset += sizeof(_pppPDataVal);
 	}
 
 	pppCalcPartStd(pppMngSt);
@@ -2612,35 +2209,18 @@ void pppInitDrawEnv(unsigned char useZeroDepth)
  * --INFO--
  * PAL Address: 0x80053d04
  * PAL Size: 876b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80065E74
+ * EN Size: 796b
  * JP Address: TODO
  * JP Size: TODO
  */
 int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, float radius, float cylScale)
 {
-	struct PppMngStHitRaw
-	{
-		u8 m_pad0[0x74];
-		s16 m_kind;
-		s16 m_nodeIndex;
-		u8 m_pad1[0xBC - 0x78];
-		u32 m_objHitMask;
-		u32 m_cylinderAttribute;
-		u8 m_pad2[0xE8 - 0xC4];
-		u8 m_endRequested;
-		u8 m_pad3[0x11C - 0xE9];
-		PPPSEST m_soundEffectData;
-		PPPIFPARAM m_hitParams;
-		s16 m_hitObjectIds[0x10];
-	};
-
-	PppMngStHitRaw* hitRaw = (PppMngStHitRaw*)pppMngSt;
 	int hadHit = 0;
 
 	if (kPppPartZero != cylScale)
 	{
-		u32 cylinderAttribute = hitRaw->m_cylinderAttribute;
+		u32 cylinderAttribute = pppMngSt->m_cylinderAttribute;
 		CMapCylinder cylinder(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
 		cylinder.m_bottom = *origin;
 		cylinder.m_axis = *vector;
@@ -2650,38 +2230,38 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 		{
 			if (Game.m_currentSceneId == 7)
 			{
-				hitRaw->m_endRequested = 1;
-				if ((hitRaw->m_soundEffectData.m_soundEffectSlot >= 0) &&
-					(hitRaw->m_soundEffectData.m_soundEffectHandle >= 0))
+				pppMngSt->m_hitBgFlag = 1;
+				if ((pppMngSt->m_soundEffectData.m_soundEffectSlot >= 0) &&
+					(pppMngSt->m_soundEffectData.m_soundEffectHandle >= 0))
 				{
-					Sound.FadeOutSe3D(hitRaw->m_soundEffectData.m_soundEffectHandle,
-						hitRaw->m_soundEffectData.m_soundEffectFadeFrames);
-					hitRaw->m_soundEffectData.m_soundEffectHandle = -1;
+					Sound.FadeOutSe3D(pppMngSt->m_soundEffectData.m_soundEffectHandle,
+						pppMngSt->m_soundEffectData.m_soundEffectFadeFrames);
+					pppMngSt->m_soundEffectData.m_soundEffectHandle = -1;
 				}
 			}
 			else
 			{
 				Vec hitPos;
 				MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
-				s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
-				Game.HitParticleBG(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, &hitPos, &hitRaw->m_hitParams);
+				s32 partIndex = pppMngSt - PartMng.m_pppMng;
+				Game.HitParticleBG(partIndex, pppMngSt->m_kind, pppMngSt->m_nodeIndex, &hitPos, &pppMngSt->m_hitParams);
 			}
 			hadHit = 1;
 		}
 	}
 
-	if (Game.m_currentSceneId != 7 && hitRaw->m_hitParams.m_hitObjectCount < 0x10)
+	if (Game.m_currentSceneId != 7 && pppMngSt->m_hitParams.m_hitObjectCount < 0x10)
 	{
-		s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
+		s32 partIndex = pppMngSt - PartMng.m_pppMng;
 
 		for (CGObject* gObject = CFlat.FindGObjFirst(); gObject != 0;
 			 gObject = CFlat.FindGObjNext(gObject))
 		{
-			int previousCount = hitRaw->m_hitParams.m_hitObjectCount;
+			int previousCount = pppMngSt->m_hitParams.m_hitObjectCount;
 			int objectSlot;
 			for (objectSlot = 0; objectSlot < previousCount; objectSlot++)
 			{
-				if (hitRaw->m_hitObjectIds[objectSlot] == gObject->m_particleId)
+				if (pppMngSt->m_hitObjectIds[objectSlot] == gObject->m_particleId)
 				{
 					break;
 				}
@@ -2694,21 +2274,21 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 					CGObject::DamageCol* damageCol = &gObject->m_damageColliders[colliderIndex];
 
 					if ((gObject->m_bgColMask & 0x80000) == 0 ||
-						(*(u32*)&damageCol[1].m_localPosition.x & hitRaw->m_objHitMask) == 0)
+						(damageCol->m_hitMask & pppMngSt->m_objHitMask) == 0)
 					{
 						continue;
 					}
 
-					if ((kPppPartZero == damageCol->m_hitInnerRadius) &&
-						(kPppPartZero == damageCol->m_hitOuterRadius))
+					if ((kPppPartZero == damageCol->m_horizontalRadius) &&
+						(kPppPartZero == damageCol->m_verticalRadius))
 					{
 						continue;
 					}
 
 					Vec hitPos;
-					if (CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
-					        &Math, &hitPos, 0, origin, vector, (Vec*)&damageCol->m_worldPosition.y,
-					        radius, damageCol->m_hitInnerRadius, damageCol->m_hitOuterRadius) == 0)
+					if (Math.CrossCheckEllipseCapsule(
+					        &hitPos, 0, origin, vector, radius, &damageCol->m_worldPosition,
+					        damageCol->m_horizontalRadius, damageCol->m_verticalRadius) == 0)
 					{
 						continue;
 					}
@@ -2723,16 +2303,16 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 					}
 					else
 					{
-						gObject->HitParticle(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, colliderIndex, &hitPos,
-											 &hitRaw->m_hitParams);
-						int newCount = hitRaw->m_hitParams.m_hitObjectCount;
+						gObject->HitParticle(partIndex, pppMngSt->m_kind, pppMngSt->m_nodeIndex, colliderIndex, &hitPos,
+											 &pppMngSt->m_hitParams);
+						int newCount = pppMngSt->m_hitParams.m_hitObjectCount;
 						if (previousCount != newCount)
 						{
 							previousCount = newCount;
 							int updatedSlot;
 							for (updatedSlot = 0; updatedSlot < newCount; updatedSlot++)
 							{
-								if (hitRaw->m_hitObjectIds[updatedSlot] == gObject->m_particleId)
+								if (pppMngSt->m_hitObjectIds[updatedSlot] == gObject->m_particleId)
 								{
 									break;
 								}

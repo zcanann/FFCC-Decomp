@@ -7,16 +7,10 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
-extern "C" {
-void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
-}
-
 static const char s_cflat_runtime_newline[] = "\n";
 extern const char lbl_8033011C[8] = "no name";
 extern const char s_CFlatRuntime_801D8EE8[] = "CFlatRuntime";
 static const char s_cflat_runtime_cpp[] = "cflat_runtime.cpp";
-
 
 /*
  * --INFO--
@@ -145,8 +139,8 @@ void CFlatRuntime::ResetPerformance()
  * --INFO--
  * PAL Address: 0x80065d1c
  * PAL Size: 1760b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8007940C
+ * EN Size: 2188b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -272,7 +266,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 	} else {
 		switch (systemIndex) {
 		case -1: {
-			const int reqFlags = *reinterpret_cast<int*>(&object->m_reqFlag0);
+			const int reqFlags = object->m_requestPending;
 			if (reqFlags != 0) {
 				*object->m_sp = 0;
 				object->m_sp++;
@@ -283,7 +277,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			const u32 requestIndex = object->m_localBase[0];
 			const int noPush = object->m_localBase[1];
 			object->m_waitCounter = 1;
-			*reinterpret_cast<int*>(&object->m_reqFlag0) = 1;
+			object->m_requestPending = 1;
 
 			if (request(object, 2, requestIndex, object->m_argCount - 2,
 			            reinterpret_cast<CStack*>(object->m_localBase + 2)) != 0) {
@@ -298,7 +292,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				goto done;
 			}
 
-			*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
+			object->m_requestPending = 0;
 
 			if (noPush != 0) {
 				goto done;
@@ -346,12 +340,11 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				engineObject->m_previous->m_next = engineObject->m_next;
 				engineObject->m_next->m_previous = engineObject->m_previous;
 
-				*reinterpret_cast<void**>(reinterpret_cast<u8*>(*engineObject->m_freeListNode) + 0x04) =
-				    engineObject->m_freeListNode[1];
-				*reinterpret_cast<void**>(engineObject->m_freeListNode[1]) = *engineObject->m_freeListNode;
+				engineObject->m_freeListNode->m_previous->m_next = engineObject->m_freeListNode->m_next;
+				engineObject->m_freeListNode->m_next->m_previous = engineObject->m_freeListNode->m_previous;
 
-				engineObject->m_freeListNode[1] = m_objectFreeListHead;
-				m_objectFreeListHead = engineObject->m_freeListNode;
+				engineObject->m_freeListNode->m_next = m_freeStackBlocks.m_next;
+				m_freeStackBlocks.m_next = engineObject->m_freeListNode;
 				engineObject->m_flagBits.m_constructFlag = 0;
 
 				onDeleteObject(engineObject);
@@ -363,8 +356,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			goto done;
 		}
 		case -4:
-			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-			    this, object, 2, *object->m_localBase, object->m_argCount - 1,
+			SystemCall(object, 2, *object->m_localBase, object->m_argCount - 1,
 			    reinterpret_cast<CStack*>(object->m_localBase + 1), 0);
 			*object->m_sp = 0;
 			object->m_sp++;
@@ -387,21 +379,24 @@ done:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline CFlatRuntime::CFunc* CFlatRuntime::searchFunc(int classIndex, int systemKind, int systemIndex)
 {
 	if ((classIndex >= 0)
 	    && (((systemKind == 2) || (systemKind == 3)) && (systemIndex >= 0))) {
-		u8* const classes = reinterpret_cast<u8*>(m_classes) + (classIndex * 0x22C) + 0x24;
-		const int funcIndex = *reinterpret_cast<int*>(classes + (systemIndex * 4));
+		const int funcIndex = m_classes[classIndex].m_functionTable[systemIndex];
 		if (funcIndex >= 0) {
-			return reinterpret_cast<CFunc*>(m_funcs) + funcIndex;
+			return m_funcs + funcIndex;
 		}
 	} else {
 		const int funcCount = m_funcCount;
-		CFunc* func = reinterpret_cast<CFunc*>(m_funcs);
+		CFunc* func = m_funcs;
 
 		for (int i = 0; i < funcCount; i++, func++) {
 			if (func->m_systemKind != systemKind) {
@@ -436,16 +431,38 @@ inline int CFlatRuntime::pop(CFlatRuntime::CObject* object)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CFlatRuntime::push(CFlatRuntime::CObject* object, CFlatRuntime::CStack* args, int argCount)
+{
+	int copiedArgs;
+	for (copiedArgs = 0; copiedArgs < argCount; copiedArgs++) {
+		reinterpret_cast<CStack*>(object->m_sp)[copiedArgs] = args[copiedArgs];
+	}
+	object->m_sp += copiedArgs;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 452b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void CFlatRuntime::callSetup(CFlatRuntime::CObject* object, CFlatRuntime::CFunc* func, int callFlag)
 {
-	const u32 prevCodePos = object->m_codePos;
+	CCodeIndex prevCodePos = object->m_codeIndex;
 	const int prevCallFlag = object->m_flagBits.m_callFlag;
 	unsigned int* const prevLocalBase = object->m_localBase;
 	const int prevWaitCounter = object->m_waitCounter;
-	const int prevReqFlag0 = *reinterpret_cast<int*>(&object->m_reqFlag0);
+	const int prevRequestPending = object->m_requestPending;
 	const int prevArgCount = object->m_argCount;
 
 	if (func->m_useCallerArgs != 0) {
@@ -462,16 +479,16 @@ inline void CFlatRuntime::callSetup(CFlatRuntime::CObject* object, CFlatRuntime:
 
 	object->m_flagBits.m_callFlag = callFlag;
 	object->m_waitCounter = 0;
-	*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
+	object->m_requestPending = 0;
 
 	*object->m_sp = reinterpret_cast<u32>(prevLocalBase);
 	object->m_sp++;
-	*object->m_sp = prevCodePos;
+	reinterpret_cast<CStack*>(object->m_sp)->m_codeIndex = prevCodePos;
 	object->m_sp++;
 	*object->m_sp = static_cast<u32>(prevCallFlag);
 	object->m_sp++;
 	*object->m_sp =
-	    static_cast<u32>(prevArgCount | ((prevWaitCounter << 16) | (prevReqFlag0 << 15)));
+	    static_cast<u32>(prevArgCount | ((prevWaitCounter << 16) | (prevRequestPending << 15)));
 	object->m_sp++;
 
 	int clearCount = func->m_localCount - func->m_argCount;
@@ -486,45 +503,35 @@ inline void CFlatRuntime::callSetup(CFlatRuntime::CObject* object, CFlatRuntime:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline int CFlatRuntime::getTopBit(unsigned int value)
-{
-	int bit = 0x1F;
-
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 8; j++) {
-			if ((value & 0x80000000) != 0) {
-				return bit;
-			}
-			value <<= 1;
-			bit--;
-		}
-	}
-
-	return -1;
-}
-/*
- * --INFO--
- * PAL Address: 0x800663fc
- * PAL Size: 5600b
+ * PAL Address: UNUSED
+ * PAL Size: 152b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
+inline int CFlatRuntime::getTopBit(unsigned int value)
+{
+	for (int bit = 31; bit >= 0; bit--) {
+		if ((value & 0x80000000) != 0) {
+			return bit;
+		}
+		value <<= 1;
+	}
+	return -1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800663fc
+ * PAL Size: 5600b
+ * EN Address: 0x80077904
+ * EN Size: 6516b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 {
-	union CodeWord {
-		u32 u;
-		s32 s;
-	};
-	struct CodeIndexView {
-		short m_codeFunc : 12;
-		int m_codeOffset : 20;
-	};
-
 	CStopWatch watch(const_cast<char*>(lbl_8033011C));
 	watch.Reset();
 	watch.Start();
@@ -538,8 +545,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		goto callSystemFunction;
 	}
 
-	code = *reinterpret_cast<u8**>(
-	    *reinterpret_cast<u8**>(self + 0x20) + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+	code = m_funcs[object->m_codeIndex.m_codeFunc].m_code
 	    + object->m_codeIndex.m_codeOffset;
 
 	while (true) {
@@ -568,34 +574,34 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				object->m_sp++;
 			} else if ((arg & 2) != 0) {
 				if (index < 0) {
-					CodeWord offset;
+					CStack offset;
 					object->m_sp--;
-					offset.u = *object->m_sp;
+					offset.m_word = *object->m_sp;
 					value = reinterpret_cast<unsigned int*>((arg & 0x10) != 0
-					                                            ? onSystemVal(object, index + offset.s)
-					                                            : onClassSystemVal(object, index + offset.s));
+					                                            ? onSystemVal(object, index + offset.m_int)
+					                                            : onClassSystemVal(object, index + offset.m_int));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
-						CodeWord offset;
+						CStack offset;
 						object->m_sp--;
-						offset.u = *object->m_sp;
-						value = object->m_thisBase + (index + offset.s);
+						offset.m_word = *object->m_sp;
+						value = object->m_thisBase + (index + offset.m_int);
 					} else {
-						CodeWord offset;
+						CStack offset;
 						object->m_sp--;
-						offset.u = *object->m_sp;
-						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + ((index + offset.s) * 4));
+						offset.m_word = *object->m_sp;
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + ((index + offset.m_int) * 4));
 					}
 				} else {
-					CodeWord offset;
+					CStack offset;
 					object->m_sp--;
-					offset.u = *object->m_sp;
-					value = object->m_localBase + (index + offset.s);
+					offset.m_word = *object->m_sp;
+					value = object->m_localBase + (index + offset.m_int);
 				}
 				*object->m_sp = *value;
 				object->m_sp++;
 			} else if ((arg & 4) != 0) {
-				CodeWord offset;
+				CStack offset;
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
 					    (arg & 0x10) != 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
@@ -609,8 +615,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 					value = object->m_localBase + index;
 				}
 				object->m_sp--;
-				offset.u = *object->m_sp;
-				*object->m_sp = *reinterpret_cast<unsigned int*>(*value + (offset.s * 4));
+				offset.m_word = *object->m_sp;
+				*object->m_sp = *reinterpret_cast<unsigned int*>(*value + (offset.m_int * 4));
 				object->m_sp++;
 			}
 			break;
@@ -636,34 +642,34 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				object->m_sp++;
 			} else if ((arg & 2) != 0) {
 				if (index < 0) {
-					CodeWord offset;
+					CStack offset;
 					object->m_sp--;
-					offset.u = *object->m_sp;
+					offset.m_word = *object->m_sp;
 					value = reinterpret_cast<unsigned int*>((arg & 0x10) != 0
-					                                            ? onSystemVal(object, index + offset.s)
-					                                            : onClassSystemVal(object, index + offset.s));
+					                                            ? onSystemVal(object, index + offset.m_int)
+					                                            : onClassSystemVal(object, index + offset.m_int));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
-						CodeWord offset;
+						CStack offset;
 						object->m_sp--;
-						offset.u = *object->m_sp;
-						value = object->m_thisBase + (index + offset.s);
+						offset.m_word = *object->m_sp;
+						value = object->m_thisBase + (index + offset.m_int);
 					} else {
-						CodeWord offset;
+						CStack offset;
 						object->m_sp--;
-						offset.u = *object->m_sp;
-						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + ((index + offset.s) * 4));
+						offset.m_word = *object->m_sp;
+						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + ((index + offset.m_int) * 4));
 					}
 				} else {
-					CodeWord offset;
+					CStack offset;
 					object->m_sp--;
-					offset.u = *object->m_sp;
-					value = object->m_localBase + (index + offset.s);
+					offset.m_word = *object->m_sp;
+					value = object->m_localBase + (index + offset.m_int);
 				}
 				*object->m_sp = reinterpret_cast<u32>(value);
 				object->m_sp++;
 			} else if ((arg & 4) != 0) {
-				CodeWord offset;
+				CStack offset;
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
 					    (arg & 0x10) != 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
@@ -677,8 +683,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 					value = object->m_localBase + index;
 				}
 				object->m_sp--;
-				offset.u = *object->m_sp;
-				*object->m_sp = *value + (offset.s * 4);
+				offset.m_word = *object->m_sp;
+				*object->m_sp = *value + (offset.m_int * 4);
 				object->m_sp++;
 			}
 			break;
@@ -692,11 +698,11 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				              | ((arg >> 4 & 1) != 0 ? 0x1000 : 0);
 				object->m_sp++;
 			} else if ((arg & 2) != 0) {
-				CodeWord offset;
+				CStack offset;
 				const u32 sign = (arg >> 4 & 1) != 0 ? 0x1000 : 0;
 				object->m_sp--;
-				offset.u = *object->m_sp;
-				*object->m_sp = sign | ((classId & 0xFFF) | (index + offset.s) * 0x2000);
+				offset.m_word = *object->m_sp;
+				*object->m_sp = sign | ((classId & 0xFFF) | (index + offset.m_int) * 0x2000);
 				object->m_sp++;
 			}
 			break;
@@ -738,23 +744,23 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			break;
 		}
 		case 7: {
-			CodeIndexView* const view = reinterpret_cast<CodeIndexView*>(&object->m_codePos);
+			CCodeIndex* const view = &object->m_codeIndex;
 			const int delta = static_cast<int>(*reinterpret_cast<u32*>(code + 1) & 0x00FFFFFF) - view->m_codeOffset;
 			code += delta;
 			object->m_codeIndex.m_codeOffset = object->m_codeIndex.m_codeOffset + delta;
 			continue;
 		}
 		case 9: {
-			CodeWord cond;
-			cond.u = pop(object);
-			if (cond.s != 0) {
+			CStack cond;
+			cond.m_word = pop(object);
+			if (cond.m_int != 0) {
 				const u32 jumpArg = *reinterpret_cast<u32*>(code + 1);
 				if ((static_cast<int>(jumpArg) >> 24) != 0) {
 					*object->m_sp = 1;
 					object->m_sp++;
 				}
 				const int delta = static_cast<int>(jumpArg & 0x00FFFFFF)
-				    - reinterpret_cast<CodeIndexView*>(&object->m_codePos)->m_codeOffset;
+				    - object->m_codeIndex.m_codeOffset;
 				code += delta;
 				object->m_codeIndex.m_codeOffset = object->m_codeIndex.m_codeOffset + delta;
 				continue;
@@ -762,16 +768,16 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			break;
 		}
 		case 8: {
-			CodeWord cond;
-			cond.u = pop(object);
-			if (cond.s == 0) {
+			CStack cond;
+			cond.m_word = pop(object);
+			if (cond.m_int == 0) {
 				const u32 jumpArg = *reinterpret_cast<u32*>(code + 1);
 				if ((static_cast<int>(jumpArg) >> 24) != 0) {
 					*object->m_sp = 0;
 					object->m_sp++;
 				}
 				const int delta = static_cast<int>(jumpArg & 0x00FFFFFF)
-				    - reinterpret_cast<CodeIndexView*>(&object->m_codePos)->m_codeOffset;
+				    - object->m_codeIndex.m_codeOffset;
 				code += delta;
 				object->m_codeIndex.m_codeOffset = object->m_codeIndex.m_codeOffset + delta;
 				continue;
@@ -780,14 +786,14 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		}
 		case 0x0A: {
 			const u32 arg = *reinterpret_cast<u32*>(code + 1);
-			CFunc* func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20)) + (arg & 0xFFFF);
+			CFunc* func = m_funcs + (arg & 0xFFFF);
 
 			if ((static_cast<int>(arg) >> 16) >= 0) {
 				const int funcIndex = *reinterpret_cast<int*>(*reinterpret_cast<u8**>(self + 0x18) + (object->m_classIndex * 0x22C) + 0x24 + (func->m_systemIndex * 4));
 				if (funcIndex < 0) {
 					continue;
 				}
-				func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20)) + funcIndex;
+				func = m_funcs + funcIndex;
 			}
 
 			callSetup(object, func, 0);
@@ -798,7 +804,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		}
 		callSystemFunction: {
 			const int funcIndex = object->m_codeIndex.m_codeFunc;
-			CFunc* func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20)) + funcIndex;
+			CFunc* func = m_funcs + funcIndex;
 			const int ret = systemFunc(object, func->m_systemKind, func->m_systemIndex, systemResult);
 
 			if (ret != 0) {
@@ -816,13 +822,12 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			goto returnFromCall;
 		}
 		recomputeCode:
-			code = *reinterpret_cast<u8**>(
-			    *reinterpret_cast<u8**>(self + 0x20) + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+			code = m_funcs[object->m_codeIndex.m_codeFunc].m_code
 			    + object->m_codeIndex.m_codeOffset;
 			continue;
 		case 0x0B: {
 			CObject* newObject = createObject(*reinterpret_cast<int*>(code + 1));
-			CFunc* func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20))
+			CFunc* func = m_funcs
 			              + *reinterpret_cast<int*>(*reinterpret_cast<u8**>(self + 0x18) + (newObject->m_activeClassIndex * 0x22C) + 0x24);
 
 			for (int i = 0; i < func->m_argCount; i++) {
@@ -830,50 +835,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			}
 			newObject->m_sp += func->m_argCount;
 
-			CodeWord argCount;
-			CodeWord prevCodePos;
-			prevCodePos.u = newObject->m_codePos;
-			unsigned int* const prevLocalBase = newObject->m_localBase;
-			const int prevWaitCounter = newObject->m_waitCounter;
-			const int prevActive = newObject->m_flagBits.m_callFlag;
-			const int prevReqFlags = *reinterpret_cast<int*>(&newObject->m_reqFlag0);
-			const int prevArgCount = newObject->m_argCount;
-
-			if (func->m_useCallerArgs != 0) {
-				newObject->m_sp--;
-				argCount.u = *newObject->m_sp;
-				newObject->m_argCount = static_cast<s16>(argCount.s);
-				newObject->m_localBase = newObject->m_sp - newObject->m_argCount;
-				newObject->m_sp = newObject->m_localBase + newObject->m_argCount;
-			} else {
-				newObject->m_localBase = newObject->m_sp - func->m_argCount;
-				newObject->m_sp = newObject->m_localBase + func->m_localCount;
-			}
-
-			newObject->m_codeIndex.m_codeFunc = static_cast<s16>(func->m_index);
-			newObject->m_codeIndex.m_codeOffset = 0;
-			newObject->m_flagBits.m_callFlag = 1;
-			newObject->m_waitCounter = 0;
-			*reinterpret_cast<int*>(&newObject->m_reqFlag0) = 0;
-
-			*newObject->m_sp = reinterpret_cast<unsigned int>(prevLocalBase);
-			newObject->m_sp++;
-			*newObject->m_sp = static_cast<u32>(prevCodePos.s);
-			newObject->m_sp++;
-			*newObject->m_sp = prevActive;
-			newObject->m_sp++;
-			*newObject->m_sp =
-			    static_cast<u32>(prevArgCount | ((prevWaitCounter << 16) | (prevReqFlags << 15)));
-			newObject->m_sp++;
-
-			int clearCount = func->m_localCount - func->m_argCount;
-			if (clearCount != 0) {
-				unsigned int* clear = newObject->m_localBase + func->m_argCount;
-				while (clearCount > 0) {
-					*clear++ = 0;
-					clearCount--;
-				}
-			}
+			callSetup(newObject, func, 1);
 
 			objectFrame(newObject);
 			--newObject->m_sp;
@@ -992,7 +954,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		case 0x29:
 		case 0x2A:
 		case 0x2B:
-			GetCodeInfo(reinterpret_cast<char*>(object));
+			calc(object, code[0]);
 			break;
 		case 0x2C: {
 			unsigned int* sp = object->m_sp;
@@ -1088,37 +1050,37 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			break;
 		case 0x3C:
 		returnFromCall: {
-			CodeWord previousLocalBase;
-			CodeWord previousCodePos;
-			CodeWord previousActive;
-			CodeWord packedFlags;
-			CodeWord returnValue;
-			CodeWord codePosTemp;
-			CodeWord returnTemp;
+			CStack previousLocalBase;
+			CStack previousCodePos;
+			CStack previousActive;
+			CStack packedFlags;
+			CStack returnValue;
+			CStack codePosTemp;
+			CStack returnTemp;
 			const int oldCallFlag = object->m_flagBits.m_callFlag;
 
 			object->m_sp--;
-			returnValue.u = *object->m_sp;
-			returnTemp.s = returnValue.s;
+			returnValue.m_word = *object->m_sp;
+			returnTemp.m_int = returnValue.m_int;
 			object->m_sp--;
-			packedFlags.u = *object->m_sp;
+			packedFlags.m_word = *object->m_sp;
 			object->m_sp--;
-			previousActive.u = *object->m_sp;
+			previousActive.m_word = *object->m_sp;
 			object->m_sp--;
-			previousCodePos.u = *object->m_sp;
-			codePosTemp.s = previousCodePos.s;
+			previousCodePos.m_word = *object->m_sp;
+			codePosTemp.m_int = previousCodePos.m_int;
 			object->m_sp--;
-			previousLocalBase.u = *object->m_sp;
+			previousLocalBase.m_word = *object->m_sp;
 
 			object->m_sp = object->m_localBase;
-			*object->m_sp = returnTemp.u;
+			*object->m_sp = returnTemp.m_word;
 			object->m_sp++;
-			object->m_localBase = reinterpret_cast<unsigned int*>(previousLocalBase.s);
-			object->m_codePos = codePosTemp.u;
-			object->m_flagBits.m_callFlag = static_cast<s8>(previousActive.s);
-			object->m_waitCounter = packedFlags.s >> 16;
-			*reinterpret_cast<int*>(&object->m_reqFlag0) = (packedFlags.u >> 15) & 1;
-			object->m_argCount = static_cast<s16>(packedFlags.u);
+			object->m_localBase = reinterpret_cast<unsigned int*>(previousLocalBase.m_int);
+			object->m_codePos = codePosTemp.m_word;
+			object->m_flagBits.m_callFlag = static_cast<s8>(previousActive.m_int);
+			object->m_waitCounter = packedFlags.m_int >> 16;
+			object->m_requestPending = (packedFlags.m_word >> 15) & 1;
+			object->m_argCount = static_cast<s16>(packedFlags.m_word);
 
 			if (object->m_flagBits.m_deleteFlag != 0) {
 				return 0;
@@ -1127,8 +1089,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				return 1;
 			}
 
-			code = *reinterpret_cast<u8**>(
-			    *reinterpret_cast<u8**>(self + 0x20) + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+			code = m_funcs[object->m_codeIndex.m_codeFunc].m_code
 			    + object->m_codeIndex.m_codeOffset;
 			break;
 		}
@@ -1167,105 +1128,91 @@ suspend:
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFlatRuntime::GetCodeInfo(char* codeInfo)
+void CFlatRuntime::calc(CFlatRuntime::CObject* object, int op)
 {
-	union CodeWord {
-		u32 u;
-		s32 s;
-		float f;
-	};
-
-	CObject* object = reinterpret_cast<CObject*>(codeInfo);
-	register int op;
-	CodeWord lhsFloat;
-	CodeWord rhsFloat;
-	CodeWord result;
-	CodeWord rhs;
-	CodeWord lhs;
-
-#ifdef __MWERKS__
-	asm { mr op, r5 };
-#else
-	op = 0;
-#endif
+	CStack lhsFloat;
+	CStack rhsFloat;
+	CStack result;
+	CStack rhs;
+	CStack lhs;
 
 	object->m_sp--;
-	rhs.u = *object->m_sp;
-	rhsFloat.u = rhs.u;
+	rhs.m_word = *object->m_sp;
+	rhsFloat.m_word = rhs.m_word;
 
 	if ((op == 0x20) || (op == 0x23) || (op == 0x25) || (op == 0x2B)) {
 		switch (op) {
 		case 0x20:
-			result.s = -rhsFloat.s;
+			result.m_int = -rhsFloat.m_int;
 			break;
 		case 0x23:
-			result.u = static_cast<u32>((__cntlzw(rhsFloat.u) >> 5) & 0xFF);
+			result.m_word = static_cast<u32>((__cntlzw(rhsFloat.m_word) >> 5) & 0xFF);
 			break;
 		case 0x25:
-			result.u = ~rhsFloat.u;
+			result.m_word = ~rhsFloat.m_word;
 			break;
 		case 0x2B:
-			result.f = -rhsFloat.f;
+			result.m_float = -rhsFloat.m_float;
 			break;
 		}
 	} else {
 		object->m_sp--;
-		lhs.u = *object->m_sp;
-		lhsFloat.u = lhs.u;
+		lhs.m_word = *object->m_sp;
+		lhsFloat.m_word = lhs.m_word;
 
 		switch (op) {
 		case 0x19:
-			result.s = lhs.s + rhs.s;
+			result.m_int = lhs.m_int + rhs.m_int;
 			break;
 		case 0x1A:
-			result.s = lhs.s - rhs.s;
+			result.m_int = lhs.m_int - rhs.m_int;
 			break;
 		case 0x1B:
-			result.s = lhs.s * rhs.s;
+			result.m_int = lhs.m_int * rhs.m_int;
 			break;
 		case 0x1C:
-			result.s = lhs.s / rhs.s;
+			result.m_int = lhs.m_int / rhs.m_int;
 			break;
 		case 0x1D:
 		{
-			int quotient = lhs.s / rhs.s;
-			result.s = lhs.s - (quotient * rhs.s);
+			int quotient = lhs.m_int / rhs.m_int;
+			result.m_int = lhs.m_int - (quotient * rhs.m_int);
 			break;
 		}
 		case 0x1E:
-			result.u = lhs.u | rhs.u;
+			result.m_word = lhs.m_word | rhs.m_word;
 			break;
 		case 0x1F:
-			result.u = lhs.u & rhs.u;
+			result.m_word = lhs.m_word & rhs.m_word;
 			break;
 		case 0x21:
-			result.s = lhs.s >> rhs.u;
+			result.m_int = lhs.m_int >> rhs.m_word;
 			break;
 		case 0x22:
-			result.s = lhs.s << rhs.s;
+			result.m_int = lhs.m_int << rhs.m_int;
 			break;
 		case 0x24:
-			result.u = lhs.u ^ rhs.u;
+			result.m_word = lhs.m_word ^ rhs.m_word;
 			break;
 		case 0x26:
-			result.f = lhsFloat.f + rhsFloat.f;
+			result.m_float = lhsFloat.m_float + rhsFloat.m_float;
 			break;
 		case 0x27:
-			result.f = lhsFloat.f - rhsFloat.f;
+			result.m_float = lhsFloat.m_float - rhsFloat.m_float;
 			break;
 		case 0x28:
-			result.f = lhsFloat.f * rhsFloat.f;
+			result.m_float = lhsFloat.m_float * rhsFloat.m_float;
 			break;
 		case 0x29:
-			result.f = lhsFloat.f / rhsFloat.f;
+			result.m_float = lhsFloat.m_float / rhsFloat.m_float;
 			break;
 		case 0x2A:
-			result.f = static_cast<float>(fmod(static_cast<double>(lhsFloat.f), static_cast<double>(rhsFloat.f)));
+			result.m_float = static_cast<float>(fmod(static_cast<double>(lhsFloat.m_float), static_cast<double>(rhsFloat.m_float)));
 			break;
 		}
 	}
 
-	*object->m_sp = result.u;
+	*object->m_sp = result.m_word;
 	object->m_sp++;
 }
 
@@ -1338,53 +1285,9 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 		engineObject->m_0x34 |= 1 << reqFlagIndex;
 	}
 
-	int copiedArgs;
-	for (copiedArgs = 0; copiedArgs < argCount; copiedArgs++) {
-		engineObject->m_sp[copiedArgs] = args[copiedArgs].m_word;
-	}
-	engineObject->m_sp += copiedArgs;
+	push(engineObject, args, argCount);
 
-	const u32 prevCodePos = engineObject->m_codePos;
-	const int prevCallFlag = engineObject->m_flagBits.m_callFlag;
-	unsigned int* const prevLocalBase = engineObject->m_localBase;
-	const int prevWaitCounter = engineObject->m_waitCounter;
-	const int prevReqFlag0 = *reinterpret_cast<int*>(&engineObject->m_reqFlag0);
-	const s16 prevArgCount = engineObject->m_argCount;
-
-	if (func->m_useCallerArgs != 0) {
-		engineObject->m_argCount = static_cast<s16>(pop(engineObject));
-		engineObject->m_localBase = engineObject->m_sp - engineObject->m_argCount;
-		engineObject->m_sp = engineObject->m_localBase + engineObject->m_argCount;
-	} else {
-		engineObject->m_localBase = engineObject->m_sp - func->m_argCount;
-		engineObject->m_sp = engineObject->m_localBase + func->m_localCount;
-	}
-
-	engineObject->m_codeIndex.m_codeFunc = static_cast<s16>(func->m_index);
-	engineObject->m_codeIndex.m_codeOffset = 0;
-
-	engineObject->m_flagBits.m_callFlag = 1;
-	engineObject->m_waitCounter = 0;
-	*reinterpret_cast<int*>(&engineObject->m_reqFlag0) = 0;
-
-	*engineObject->m_sp = reinterpret_cast<u32>(prevLocalBase);
-	engineObject->m_sp++;
-	*engineObject->m_sp = prevCodePos;
-	engineObject->m_sp++;
-	*engineObject->m_sp = static_cast<u32>(prevCallFlag);
-	engineObject->m_sp++;
-	*engineObject->m_sp =
-	    static_cast<u32>(prevArgCount | ((prevWaitCounter << 16) | (prevReqFlag0 << 15)));
-	engineObject->m_sp++;
-
-	int clearCount = func->m_localCount - func->m_argCount;
-	if (clearCount != 0) {
-		unsigned int* clearPtr = engineObject->m_localBase + func->m_argCount;
-		while (clearCount > 0) {
-			*clearPtr++ = 0;
-			clearCount--;
-		}
-	}
+	callSetup(engineObject, func, 1);
 
 	return 1;
 }
@@ -1412,83 +1315,15 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 		return 1;
 	}
 
-	const int classIndex = object->m_activeClassIndex;
-	if ((classIndex >= 0)
-	    && (((systemKind == 2) || (systemKind == 3)) && (systemIndex >= 0))) {
-		u8* const classes = reinterpret_cast<u8*>(m_classes) + (classIndex * 0x22C) + 0x24;
-		const int funcIndex = *reinterpret_cast<int*>(classes + (systemIndex * 4));
-		if (funcIndex >= 0) {
-			func = reinterpret_cast<CFunc*>(m_funcs) + funcIndex;
-			goto haveFunc;
-		}
-	} else {
-		const int funcCount = m_funcCount;
-		func = reinterpret_cast<CFunc*>(m_funcs);
-
-		for (int i = 0; i < funcCount; i++, func++) {
-			if (func->m_systemKind != systemKind) {
-				continue;
-			}
-			if (func->m_systemIndex != systemIndex) {
-				continue;
-			}
-			goto haveFunc;
-		}
-	}
-	func = 0;
-haveFunc:
+	func = searchFunc(object->m_activeClassIndex, systemKind, systemIndex);
 
 	if ((func == 0) || (func->m_codeSize == 0)) {
 		return 0;
 	}
 
-	int copiedArgs;
-	for (copiedArgs = 0; copiedArgs < argCount; copiedArgs++) {
-		object->m_sp[copiedArgs] = args[copiedArgs].m_word;
-	}
-	object->m_sp += copiedArgs;
+	push(object, args, argCount);
 
-	const u32 prevCodePos = object->m_codePos;
-	const int prevCallFlag = object->m_flagBits.m_callFlag;
-	unsigned int* const prevLocalBase = object->m_localBase;
-	const int prevWaitCounter = object->m_waitCounter;
-	const int prevReqFlag0 = *reinterpret_cast<int*>(&object->m_reqFlag0);
-	const s16 prevArgCount = object->m_argCount;
-
-	if (func->m_useCallerArgs != 0) {
-		object->m_argCount = static_cast<s16>(pop(object));
-		object->m_localBase = object->m_sp - object->m_argCount;
-		object->m_sp = object->m_localBase + object->m_argCount;
-	} else {
-		object->m_localBase = object->m_sp - func->m_argCount;
-		object->m_sp = object->m_localBase + func->m_localCount;
-	}
-
-	object->m_codeIndex.m_codeFunc = static_cast<s16>(func->m_index);
-	object->m_codeIndex.m_codeOffset = 0;
-
-	object->m_flagBits.m_callFlag = 1;
-	object->m_waitCounter = 0;
-	*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
-
-	*object->m_sp = reinterpret_cast<u32>(prevLocalBase);
-	object->m_sp++;
-	*object->m_sp = prevCodePos;
-	object->m_sp++;
-	*object->m_sp = static_cast<u32>(prevCallFlag);
-	object->m_sp++;
-	*object->m_sp =
-	    static_cast<u32>(prevArgCount | ((prevWaitCounter << 16) | (prevReqFlag0 << 15)));
-	object->m_sp++;
-
-	int clearCount = func->m_localCount - func->m_argCount;
-	if (clearCount != 0) {
-		unsigned int* clearPtr = object->m_localBase + func->m_argCount;
-		while (clearCount > 0) {
-			*clearPtr++ = 0;
-			clearCount--;
-		}
-	}
+	callSetup(object, func, 1);
 
 	objectFrame(object);
 
@@ -1503,14 +1338,13 @@ haveFunc:
  * --INFO--
  * PAL Address: 0x800684c8
  * PAL Size: 724b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80076420
+ * EN Size: 1032b
  * JP Address: TODO
  * JP Size: TODO
  */
 CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 {
-	u8* const self = reinterpret_cast<u8*>(this);
 	CClass* classBase;
 	if (classIndex == -1) {
 		classBase = 0;
@@ -1536,7 +1370,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	object->m_0x34 = 0;
 	object->m_0x32 = 0xF;
 	object->m_waitCounter = 0;
-	*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
+	object->m_requestPending = 0;
 	object->m_classIndex = static_cast<s16>(classIndex);
 	object->m_activeClassIndex = object->m_classIndex;
 	object->m_flagBits.m_activeFlag = setBit;
@@ -1544,37 +1378,37 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	const int classLocalCount = (classIndex == -1) ? 0 : classBase->m_localCount;
 
 	const int requiredWords = classLocalCount + 0x60;
-	u8* scanNode = reinterpret_cast<u8*>(m_freeListNext);
-	const int noScan = static_cast<u8>(scanNode == self + 0x978);
-	u8* selectedNode;
+	CStackBlock* scanNode = m_stackBlocks.m_next;
+	const int noScan = static_cast<u8>(scanNode == &m_stackBlocks);
+	CStackBlock* selectedNode;
 	do {
 		selectedNode = scanNode;
 		if (noScan != 0) {
 			break;
 		}
-		scanNode = *reinterpret_cast<u8**>(selectedNode + 4);
-	} while ((*reinterpret_cast<int*>(selectedNode + 8) + requiredWords) +
-	             *reinterpret_cast<int*>(selectedNode + 0xC) >
-	         *reinterpret_cast<int*>(scanNode + 8));
+		scanNode = selectedNode->m_next;
+	} while ((selectedNode->m_offset + requiredWords) +
+	             selectedNode->m_size >
+	         scanNode->m_offset);
 
-	void** const freeNode = m_objectFreeListHead;
-	m_objectFreeListHead = reinterpret_cast<void**>(freeNode[1]);
-	freeNode[0] = selectedNode;
-	freeNode[1] = *reinterpret_cast<void**>(selectedNode + 4);
-	*reinterpret_cast<void***>(freeNode[1]) = freeNode;
-	*reinterpret_cast<void**>(selectedNode + 4) = freeNode;
+	CStackBlock* const freeNode = m_freeStackBlocks.m_next;
+	m_freeStackBlocks.m_next = freeNode->m_next;
+	freeNode->m_previous = selectedNode;
+	freeNode->m_next = selectedNode->m_next;
+	freeNode->m_next->m_previous = freeNode;
+	selectedNode->m_next = freeNode;
 
-	const int scanOffset = *reinterpret_cast<int*>(selectedNode + 0xC);
-	const int baseWords = (noScan != 0) ? 0 : *reinterpret_cast<int*>(selectedNode + 8);
-	freeNode[2] = reinterpret_cast<void*>(static_cast<int>(scanOffset + baseWords));
-	freeNode[3] = reinterpret_cast<void*>(requiredWords);
+	const int scanOffset = selectedNode->m_size;
+	const int baseWords = (noScan != 0) ? 0 : selectedNode->m_offset;
+	freeNode->m_offset = scanOffset + baseWords;
+	freeNode->m_size = requiredWords;
 
 	object->m_freeListNode = freeNode;
-	object->m_id = reinterpret_cast<u32>(*reinterpret_cast<u8**>(self + 0x10) + (reinterpret_cast<s32>(freeNode[2]) * 4));
+	object->m_id = reinterpret_cast<u32>(m_stackStorage + freeNode->m_offset);
 
 	unsigned int* varBase = 0;
 	if (classIndex == -1) {
-		varBase = *reinterpret_cast<unsigned int**>(self + 0x0C);
+		varBase = reinterpret_cast<unsigned int*>(m_permanentVarValues);
 	} else {
 		varBase = reinterpret_cast<unsigned int*>(object->m_id);
 	}
@@ -1614,13 +1448,12 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	return object;
 }
 
-
 /*
  * --INFO--
  * PAL Address: 0x8006879c
  * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80076320
+ * EN Size: 256b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1629,11 +1462,11 @@ void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 	object->m_previous->m_next = object->m_next;
 	object->m_next->m_previous = object->m_previous;
 
-	*(void**)((char*)*object->m_freeListNode + 4) = object->m_freeListNode[1];
-	*(void**)object->m_freeListNode[1] = *object->m_freeListNode;
+	object->m_freeListNode->m_previous->m_next = object->m_freeListNode->m_next;
+	object->m_freeListNode->m_next->m_previous = object->m_freeListNode->m_previous;
 
-	object->m_freeListNode[1] = m_objectFreeListHead;
-	m_objectFreeListHead = object->m_freeListNode;
+	object->m_freeListNode->m_next = m_freeStackBlocks.m_next;
+	m_freeStackBlocks.m_next = object->m_freeListNode;
 
 	object->m_flagBits.m_constructFlag = 0;
 
@@ -1644,8 +1477,8 @@ void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
  * --INFO--
  * PAL Address: 0x80068824
  * PAL Size: 236b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80076298
+ * EN Size: 136b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1657,18 +1490,7 @@ void CFlatRuntime::AfterFrame(int mode)
 		CObject* const next = object->m_next;
 
 		if ((mode != 0) || (object->m_flagBits.m_deleteFlag != 0)) {
-			object->m_previous->m_next = object->m_next;
-			object->m_next->m_previous = object->m_previous;
-
-			*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
-			*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
-
-			object->m_freeListNode[1] = m_objectFreeListHead;
-			m_objectFreeListHead = object->m_freeListNode;
-
-			object->m_flagBits.m_constructFlag = 0;
-
-			onDeleteObject(object);
+			deleteObject(object);
 		}
 
 		object = next;
@@ -1679,8 +1501,8 @@ void CFlatRuntime::AfterFrame(int mode)
  * --INFO--
  * PAL Address: 0x80068910
  * PAL Size: 756b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80076140
+ * EN Size: 344b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1717,18 +1539,7 @@ processObject:
 		CObject* const next = object->m_next;
 
 		if (object->m_flagBits.m_deleteFlag != 0) {
-			object->m_previous->m_next = object->m_next;
-			object->m_next->m_previous = object->m_previous;
-
-			*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
-			*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
-
-			object->m_freeListNode[1] = m_objectFreeListHead;
-			m_objectFreeListHead = object->m_freeListNode;
-
-			object->m_flagBits.m_constructFlag = 0;
-
-			onDeleteObject(object);
+			deleteObject(object);
 		}
 
 		object = next;
@@ -1741,8 +1552,8 @@ processObject:
  * --INFO--
  * PAL Address: 0x80068c04
  * PAL Size: 500b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80075E14
+ * EN Size: 660b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1750,7 +1561,6 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 {
 	CChunkFile chunkFile(filePtr);
 	CChunkFile::CChunk chunk;
-	int debugOffset = debugChunkIndex * 0x50;
 
 	while (chunkFile.GetNextChunk(chunk)) {
 		if (chunk.m_id != 'CFLT') {
@@ -1758,7 +1568,6 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 		}
 
 		chunkFile.PushChunk();
-		int funcOffset = debugOffset;
 
 		while (chunkFile.GetNextChunk(chunk)) {
 			switch (chunk.m_id) {
@@ -1767,10 +1576,9 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 
 			case 'FUNC': {
 				chunkFile.PushChunk();
-				int blockOffset = funcOffset;
 
 				while (chunkFile.GetNextChunk(chunk)) {
-					CFunc* funcBase = reinterpret_cast<CFunc*>(m_funcs + blockOffset);
+					CFunc* funcBase = &m_funcs[debugChunkIndex];
 					switch (chunk.m_id) {
 					case 'BLCK':
 						chunkFile.PushChunk();
@@ -1796,9 +1604,6 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 						}
 
 						chunkFile.PopChunk();
-						blockOffset += 0x50;
-						funcOffset += 0x50;
-						debugOffset += 0x50;
 						debugChunkIndex++;
 						break;
 					}
@@ -1819,7 +1624,6 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 	}
 	return result;
 }
-
 
 /*
  * --INFO--
@@ -1914,13 +1718,12 @@ void CFlatRuntime::Create(void* filePtr)
 				m_funcCount = chunk.m_arg0;
 				m_funcs =
 				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0xD9)
-				        u8[m_funcCount * 0x50];
+				        CFunc[m_funcCount];
 
 				int funcIndex = 0;
-				int funcOffset = 0;
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
-					CFunc* funcBase = reinterpret_cast<CFunc*>(m_funcs + funcOffset);
+					CFunc* funcBase = &m_funcs[funcIndex];
 					funcBase->m_index = funcIndex;
 					switch (chunk.m_id) {
 					case 'BLCK': {
@@ -1964,7 +1767,6 @@ void CFlatRuntime::Create(void* filePtr)
 						}
 						chunkFile.PopChunk();
 
-						funcOffset += 0x50;
 						funcIndex++;
 						break;
 					}
@@ -2070,8 +1872,8 @@ CFlatRuntime::CClass::CClass()
  * --INFO--
  * PAL Address: 0x80069608
  * PAL Size: 452b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8007542C
+ * EN Size: 396b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2101,20 +1903,16 @@ void CFlatRuntime::clear()
 	m_objectSentinel.m_next = &m_objectSentinel;
 	m_objectSentinel.m_0x32 = 0x10;
 
-	m_freeListPrev = reinterpret_cast<void**>(self + 0x978);
-	m_freeListNext = reinterpret_cast<void**>(self + 0x978);
-	m_freeListCount = 0x5220;
-	m_0x984 = 0;
-	m_objectFreeListHead = reinterpret_cast<void**>(self + 0x998);
-	m_objectPoolBase = self + 0x1288;
+	m_stackBlocks.m_previous = &m_stackBlocks;
+	m_stackBlocks.m_next = &m_stackBlocks;
+	m_stackBlocks.m_offset = 0x5220;
+	m_stackBlocks.m_size = 0;
+	m_freeStackBlocks.m_next = &m_stackBlockPool[0];
+	m_freeStackBlocks.m_previous = &m_stackBlockPool[143];
 
-	u8* node = self;
-	for (int idx = 0; idx < 0x90; idx++) {
-		*reinterpret_cast<void**>(node + 0x998) =
-		    (idx == 0) ? (self + 0x988) : (self + ((idx - 1) * 0x10) + 0x998);
-		*reinterpret_cast<void**>(node + 0x99C) =
-		    (idx == 0x8F) ? (self + 0x988) : (self + ((idx + 1) * 0x10) + 0x998);
-		node += 0x10;
+	for (int idx = 0; idx < 144; idx++) {
+		m_stackBlockPool[idx].m_previous = (idx == 0) ? &m_freeStackBlocks : &m_stackBlockPool[idx - 1];
+		m_stackBlockPool[idx].m_next = (idx == 143) ? &m_freeStackBlocks : &m_stackBlockPool[idx + 1];
 	}
 
 	memset(&m_performanceTotalTime, 0, sizeof(m_performanceTotalTime) + sizeof(m_performanceBlock));
@@ -2124,8 +1922,8 @@ void CFlatRuntime::clear()
  * --INFO--
  * PAL Address: 0x800697CC
  * PAL Size: 416b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800752DC
+ * EN Size: 336b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2140,11 +1938,11 @@ void CFlatRuntime::Destroy()
 		object->m_previous->m_next = next;
 		object->m_next->m_previous = object->m_previous;
 
-		*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
-		*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
+		object->m_freeListNode->m_previous->m_next = object->m_freeListNode->m_next;
+		object->m_freeListNode->m_next->m_previous = object->m_freeListNode->m_previous;
 
-		object->m_freeListNode[1] = m_objectFreeListHead;
-		m_objectFreeListHead = object->m_freeListNode;
+		object->m_freeListNode->m_next = m_freeStackBlocks.m_next;
+		m_freeStackBlocks.m_next = object->m_freeListNode;
 
 		object->m_flagBits.m_constructFlag = 0;
 
@@ -2158,14 +1956,13 @@ void CFlatRuntime::Destroy()
 		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
-	for (int i = 0, off = 0; i < m_funcCount; off += 0x50, i++) {
-		delete[] *reinterpret_cast<u8**>(m_funcs + off + 0x34);
-		delete[] *reinterpret_cast<u8**>(m_funcs + off + 0x3C);
+	for (int i = 0; i < m_funcCount; i++) {
+		delete[] m_funcs[i].m_code;
+		delete[] m_funcs[i].m_debugCode;
 	}
 
-	ptr = m_funcs;
-	if (ptr != 0) {
-		delete[] reinterpret_cast<u8*>(ptr);
+	if (m_funcs != 0) {
+		delete[] m_funcs;
 	}
 
 	if (m_classes != 0) {
@@ -2209,28 +2006,32 @@ void CFlatRuntime::Destroy()
  * --INFO--
  * PAL Address: 0x8006996c
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800752A4
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CFlatRuntime::Quit()
 {
 	delete[] (char*)m_permanentVarValues;
-	delete[] (char*)m_initScratchA;
+	delete[] m_stackStorage;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800699A4
+ * PAL Size: 136b
+ * EN Address: 0x80075218
+ * EN Size: 140b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime::Init()
 {
 	m_permanentVarValues =
 	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2A) u8[0x3000];
-	m_initScratchA =
-	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2B) u8[0x14880];
+	m_stackStorage =
+	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2B) u32[0x5220];
 }
 
 /*
@@ -2277,16 +2078,6 @@ void CFlatRuntime::createVal(CChunkFile&, int, CFlatRuntime::CVal*)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::CStack::operator= (const CFlatRuntime::CStack&)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CFlatRuntime::callCleanup(CFlatRuntime::CObject*)
 {
 	// TODO
@@ -2297,27 +2088,7 @@ void CFlatRuntime::callCleanup(CFlatRuntime::CObject*)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::CCodeIndex::operator= (const CFlatRuntime::CCodeIndex&)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CFlatRuntime::initVal(int, CFlatRuntime::CVal*, CFlatRuntime::CStack*, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime::push(CFlatRuntime::CObject*, CFlatRuntime::CStack*, int)
 {
 	// TODO
 }
@@ -2348,16 +2119,6 @@ void CFlatRuntime::PrintCodeInfo()
  * Size:	TODO
  */
 void CFlatRuntime::checkWB(void*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime::calc(CFlatRuntime::CObject*, int)
 {
 	// TODO
 }

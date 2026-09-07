@@ -18,19 +18,18 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern const f32 kPppBlurZero;
-extern const f32 kPppBlurProjScaleX;
-extern const f32 kPppBlurProjScaleY;
-extern const f32 kPppBlurOne;
-extern const f32 kPppBlurNegOne;
-extern const f32 kPppScreenAspect;
-extern const f32 kPppScreenWidth;
-extern const f32 kPppScreenHeight;
-extern const f32 kPppHalfScreenWidth;
-extern const f32 kPppHalfScreenHeight;
-extern const double kPppNewtonSqrtThree = 3.0;
-
 static const char s_pppBlurChara_cpp[] = "pppBlurChara.cpp";
+
+extern const float kPppBlurZero;
+extern const float kPppBlurProjScaleX;
+extern const float kPppBlurProjScaleY;
+extern const float kPppBlurOne;
+extern const float kPppBlurNegOne;
+extern const float kPppScreenAspect;
+extern const float kPppScreenWidth;
+extern const float kPppScreenHeight;
+extern const float kPppHalfScreenWidth;
+extern const float kPppHalfScreenHeight;
 
 struct pppBlurCharaWork {
     void* m_captureBuffer;
@@ -304,12 +303,12 @@ void pppDestructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* data)
     model->m_callbackParam = 0;
 
     if ((CMemory::CStage*)work->m_captureBuffer != 0) {
-        pppHeapUseRate((CMemory::CStage*)work->m_captureBuffer);
+        pppMemFree(work->m_captureBuffer);
         work->m_captureBuffer = 0;
     }
 
     if ((CMemory::CStage*)work->m_smallTexObj != 0) {
-        pppHeapUseRate((CMemory::CStage*)work->m_smallTexObj);
+        pppMemFree(work->m_smallTexObj);
         work->m_smallTexObj = 0;
     }
 
@@ -456,3 +455,14 @@ void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
     MaterialMan.OrCurrentEnvTevBit(0x10000);
 }
+
+extern const float kPppBlurZero = 0.0f;
+extern const float kPppBlurProjScaleX = 0.003125f;
+extern const float kPppBlurProjScaleY = -0.004464f;
+extern const float kPppBlurOne = 1.0f;
+extern const float kPppBlurNegOne = -1.0f;
+extern const float kPppScreenAspect = 1.3333334f;
+extern const float kPppScreenWidth = 640.0f;
+extern const float kPppScreenHeight = 448.0f;
+extern const float kPppHalfScreenWidth = 320.0f;
+extern const float kPppHalfScreenHeight = 224.0f;

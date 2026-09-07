@@ -70,7 +70,7 @@ void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
 
     if (state->vertexBuffer != 0) {
         Graphic._WaitDrawDone(const_cast<char*>(s_pppVtMime_cpp), 0x50);
-        pppHeapUseRate(static_cast<CMemory::CStage*>(state->vertexBuffer));
+        pppMemFree(state->vertexBuffer);
         state->vertexBuffer = 0;
     }
 }

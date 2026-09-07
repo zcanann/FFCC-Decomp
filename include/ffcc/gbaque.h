@@ -7,11 +7,6 @@ struct GbaPInfo;
 struct GbaCMakeInfo;
 class HitEInfo;
 
-struct GbaPInfo
-{
-    unsigned char m_data[0x370];
-};
-
 struct GbaCMakeInfo
 {
     unsigned char m_active;
@@ -52,18 +47,18 @@ struct GbaQueueMapObjWork
 
 struct GbaQueuePlayerDataView
 {
-    unsigned char _pad00;
+    signed char m_saveSlot;
     unsigned char _pad01;
-    unsigned char _pad02;
+    unsigned char m_appearance;
     unsigned char _pad03;
     unsigned int _pad04[4];
-    unsigned short _pad14;
-    unsigned char _pad16;
-    unsigned char _pad17;
-    unsigned int _pad18[2];
+    unsigned short m_progress;
+    signed char m_maxHp;
+    signed char m_hp;
+    unsigned char m_letterMeta[8];
     unsigned char m_strength[3];
     unsigned char _pad23;
-    unsigned int _pad24;
+    unsigned int m_gil;
     unsigned int m_artifacts[3];
     unsigned short _pad34;
     unsigned char _pad36[4];
@@ -76,6 +71,24 @@ struct GbaQueuePlayerDataView
     unsigned char _padD5;
     unsigned char _padD6;
     unsigned char m_commandData[4];
+};
+
+struct GbaPInfo
+{
+    GbaQueuePlayerDataView m_players[4];
+};
+
+struct GbaQueueMapEntity
+{
+    unsigned char m_visible;
+    unsigned char m_kind;
+    unsigned char m_radarEnabled;
+    unsigned char m_baseDataIndex;
+    unsigned short m_hp;
+    unsigned short m_maxHp;
+    short m_posX;
+    short m_posZ;
+    unsigned short m_dropItemCodes[4];
 };
 
 class GbaQueue
@@ -228,7 +241,12 @@ private:
     unsigned char m_stageFlags;       // 0x044C
     unsigned char _pad44D[0x7];       // 0x044D
     GbaQueuePlayerDataView m_playerData[4]; // 0x0454
-    unsigned char _pad7C4[0x2330];    // 0x07C4
+    GbaQueuePlayerDataView m_playerHistory[4]; // 0x07C4
+    GbaQueueMapEntity m_enemies[64];            // 0x0B34
+    GbaQueueMapEntity m_enemyHistory[4][64];    // 0x1034
+    GbaQueueMapEntity m_mapItems[16];           // 0x2434
+    GbaQueueMapEntity m_mapItemHistory[4][16];  // 0x2574
+    char m_caravanName[0x80];                  // 0x2A74
     char m_mapItemCount;              // 0x2AF4
     unsigned char _pad2AF5[0x3];      // 0x2AF5
     int m_scrInitEnd;                 // 0x2AF8

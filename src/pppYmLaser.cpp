@@ -22,7 +22,7 @@ static const f32 kPppYmLaserDebugPointScale = 2.0f;
 
 static inline f32 LoadLaserFloat(const f32& value)
 {
-	return *reinterpret_cast<const f32*>(&value);
+	return value;
 }
 
 static const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
@@ -154,7 +154,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 	GXTexCoord2f32(LoadLaserFloat(kPppYmLaserOne), work->m_length);
 
 	if (step->m_stepValue != 0xFFFF) {
-		pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[step->m_stepValue];
+		pppShapeSt* shape = ppvEnv->m_shapeTablePtr[step->m_stepValue];
 		PSMTXIdentity(shapeMtx);
 		shapeMtx[0][0] = step->m_laser.m_shapeScale * ppvMng->m_scale.x;
 		shapeMtx[1][1] = step->m_laser.m_shapeScale * ppvMng->m_scale.y;
@@ -262,7 +262,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 			GXSetZMode(1, GX_LEQUAL, 0);
 
 			if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
-				float radius = ppvMng->m_previousPosition.z * step->m_laser.m_hitScale;
+				float radius = ppvMng->m_hitScale * step->m_laser.m_hitScale;
 				float distance = PSVECDistance(work->m_points, &work->m_origin);
 				debugSource.x = LoadLaserFloat(kPppYmLaserZero);
 				debugSource.y = LoadLaserFloat(kPppYmLaserZero);
@@ -319,7 +319,7 @@ static const f32 kPppYmLaserHistoryBackstep = -1.0f;
 static const f32 kPppYmLaserHitRayScale = 1.2f;
 static const f32 kPppYmLaserCylinderMax = 10000000000.0f;
 static const f32 kPppYmLaserCylinderMin = -10000000000.0f;
-static const f32 kPppYmLaserFullTurn[2] = {6.2831855f, 0.0f};
+static const f32 kPppYmLaserFullTurn = 6.2831855f;
 
 /*
  * --INFO--
@@ -361,7 +361,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 		step->m_laser.m_lengthStepVelocity, step->m_laser.m_lengthStepAccel);
 
 	pppCalcFrameShape(
-		static_cast<long*>(ppvEnv->m_resourceTables.m_shapeTablePtr[step->m_stepValue]->m_animData), work->m_shapeArg1,
+		static_cast<long*>(ppvEnv->m_shapeTablePtr[step->m_stepValue]->m_animData), work->m_shapeArg1,
 		work->m_shapeArg2, work->m_shapeArg0, step->m_laser.m_shapeFrameStep);
 
 	for (int i = 0; i < (int)((u32)step->m_laser.m_historyFrameCount + 1); i++) {
@@ -428,7 +428,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 		if (step->m_laser.m_disableHitCylinder == 0) {
 			pppHitCylinderSendSystem(
 				ppvMng, &work->m_origin, &localA,
-				ppvMng->m_previousPosition.z * step->m_laser.m_hitScale,
+				ppvMng->m_hitScale * step->m_laser.m_hitScale,
 				step->m_laser.m_hitRadius);
 		}
 
@@ -489,7 +489,7 @@ extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 	void* stage = work->m_points;
 
 	if (stage != 0) {
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(stage));
+		pppMemFree(stage);
 		work->m_points = 0;
 	}
 }
@@ -532,7 +532,7 @@ extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable
 extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
 	f32 zero = kPppYmLaserZero;
-	f32 randArg = kPppYmLaserFullTurn[0];
+	f32 randArg = kPppYmLaserFullTurn;
 	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
 
 	work->m_length = zero;

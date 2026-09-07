@@ -15,16 +15,6 @@
 
 CWind Wind;
 
-static inline s8 GetWindActiveFlag(const WindObject* obj)
-{
-    return static_cast<s8>((((int)(obj->flags & 0xC0)) << 24) >> 31);
-}
-
-static inline s8 GetGrassActiveFlag(const WindGrassObject* obj)
-{
-    return static_cast<s8>((((int)(obj->flags & 0xC0)) << 24) >> 31);
-}
-
 const float kWindZero = 0.0f;
 const float kWindMinDistanceSq = 0.0001f;
 const float kWindOne = 1.0f;
@@ -118,7 +108,7 @@ inline WindObject* CWind::getObj(int id)
     WindObject* obj = m_objects;
 
     for (int i = 0; i < 32; i++, obj++) {
-        if ((GetWindActiveFlag(obj) != 0) && (id == obj->id)) {
+        if ((obj->flagBits.active != 0) && (id == obj->id)) {
             return obj;
         }
     }
@@ -140,7 +130,7 @@ inline WindObject* CWind::searchFreeObj()
     WindObject* obj = m_objects;
 
     for (int i = 0; i < 32; i++, obj++) {
-        if (GetWindActiveFlag(obj) == 0) {
+        if (obj->flagBits.active == 0) {
             return obj;
         }
     }
@@ -162,7 +152,7 @@ inline WindGrassObject* CWind::getGrass(int id)
     WindGrassObject* grass = m_grass;
 
     for (int i = 0; i < 512; i++, grass++) {
-        if ((GetGrassActiveFlag(grass) != 0) && (id == grass->id)) {
+        if ((grass->flagBits.active != 0) && (id == grass->id)) {
             return grass;
         }
     }
@@ -184,7 +174,7 @@ inline WindGrassObject* CWind::searchFreeGrass()
     WindGrassObject* grass = m_grass;
 
     for (int i = 0; i < 512; i++, grass++) {
-        if (GetGrassActiveFlag(grass) == 0) {
+        if (grass->flagBits.active == 0) {
             return grass;
         }
     }
@@ -229,21 +219,8 @@ inline int CWind::AddGrass(const Vec* pos)
  */
 void CWind::ChangePower(int id, float power)
 {
-    WindObject* obj;
-    WindObject* scan = m_objects;
+    WindObject* obj = getObj(id);
 
-    for (int i = 0; i < 32; i++, scan++) {
-        if (GetWindActiveFlag(scan) != 0) {
-            if (id == scan->id) {
-                obj = scan;
-                goto found;
-            }
-        }
-    }
-
-    obj = 0;
-
-found:
     if (obj == 0) {
         return;
     }
@@ -263,54 +240,10 @@ found:
  */
 int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 {
-	int checked = 0;
-	int blocks = 4;
-	WindObject* scan = m_objects;
-	WindObject* obj;
+	WindObject* obj = searchFreeObj();
 
-	do {
-		if (GetWindActiveFlag(scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-
-		checked += 7;
-		scan++;
-	} while (--blocks != 0);
-
-	obj = 0;
-
-found:
 	if (obj == 0) {
-		System.Printf(const_cast<char*>(sWindAddSphereFailedMsg), life, checked);
+		System.Printf(const_cast<char*>(sWindAddSphereFailedMsg));
 		return -1;
 	}
 
@@ -347,53 +280,10 @@ found:
  */
 int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
-	int checked = 0;
-	WindObject* scan = m_objects;
-	WindObject* obj;
+	WindObject* obj = searchFreeObj();
 
-	for (int blocks = 4; blocks != 0; blocks--) {
-		if (GetWindActiveFlag(scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-
-		checked += 7;
-		scan++;
-	}
-
-	obj = 0;
-
-found:
 	if (obj == 0) {
-		System.Printf(const_cast<char*>(sWindAddDiffuseFailedMsg), checked);
+		System.Printf(const_cast<char*>(sWindAddDiffuseFailedMsg));
 		return -1;
 	}
 
@@ -444,20 +334,8 @@ found:
  */
 int CWind::AddAmbient(float dir, float speed)
 {
-	int checked = 0;
-	WindObject* scan = m_objects;
-	WindObject* obj;
+	WindObject* obj = searchFreeObj();
 
-	for (; checked < 32; checked++, scan++) {
-		if (GetWindActiveFlag(scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-	}
-
-	obj = 0;
-
-found:
 	if (obj == 0) {
 		System.Printf(const_cast<char*>(sWindAddAmbientFailedMsg));
 		return -1;
@@ -510,7 +388,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
     obj = m_objects;
     i = 0;
     do {
-        if (GetWindActiveFlag(obj) != 0) {
+        if (obj->flagBits.active != 0) {
             if (obj->type == 0) {
                 if (randomize == 0) {
                     PSVECAdd(out, &obj->force, out);
@@ -579,7 +457,7 @@ void CWind::Draw()
         WindObject* obj = m_objects;
         int i = 0;
         do {
-            if (GetWindActiveFlag(obj) != 0) {
+            if (obj->flagBits.active != 0) {
                 if (obj->type == 1) {
                     const CColor& color = CColor(0xff, 0xff, 0, 0xff);
                     Graphic.DrawSphere(viewMtx,
@@ -622,7 +500,7 @@ void CWind::Frame()
     i = 0;
 
     while (true) {
-        if (GetWindActiveFlag(obj) != 0) {
+        if (obj->flagBits.active != 0) {
             rnd = Math.Rand(10);
             if (rnd == 0) {
                 rnd = Math.Rand(3);

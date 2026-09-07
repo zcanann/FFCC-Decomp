@@ -12,11 +12,6 @@
 #include <math.h>
 #include <stddef.h>
 
-union ColumFloatBits {
-    float value;
-    u32 bits;
-};
-
 STATIC_ASSERT(sizeof(pppColumValue) == 0x0C);
 STATIC_ASSERT(offsetof(pppColumFrameWork, m_values) == 0x08);
 STATIC_ASSERT(sizeof(pppColumFrameWork) == 0x0C);
@@ -28,67 +23,9 @@ STATIC_ASSERT(offsetof(pppColumDataOffsets, m_frameWorkOffset) == 0x0C);
 
 static const char s_pppColum_cpp[] = "pppColum.cpp";
 
-extern const float kPppCrystalModulationScale = 5.0f;
-extern const float kPppCrystalCoordOffset = 128.0f;
-extern const float kPppCrystalCoordScaleAndZero[] = {127.0f, 0.0f};
-extern const float kPppRainTexCoordBase = 0.0f;
-extern const float kPppRainTexCoordOne = 1.0f;
-extern const float kPppRainRandomUnitScale = 0.00003051851f;
-extern const double kPppColumS32ToDoubleBias = 4503601774854144.0;
-extern const float kPppBlurZero = 0.0f;
-extern const float kPppBlurProjScaleX = 0.003125f;
-extern const float kPppBlurProjScaleY = -0.004464f;
-extern const float kPppBlurOne = 1.0f;
-extern const float kPppBlurNegOne = -1.0f;
-extern const float kPppScreenAspect = 1.3333334f;
-
-extern const float kPppColumScreenCenterX;
-extern const float kPppColumScreenCenterY;
-extern const float kPppColumCameraZOffset;
-extern const float kPppColumZero;
-extern const double kPppColumSqrtHalf;
-extern const double kPppColumSqrtThree;
-extern const double kPppColumZeroD;
-extern const float kPppColumNormalizeEpsilon;
-extern const float kPppColumOne;
-extern const float kPppColumSegmentScale;
-
 static inline pppColumDataOffsets* GetColumDataOffsets(_pppCtrlTable* ctrl)
 {
     return reinterpret_cast<pppColumDataOffsets*>(ctrl->m_serializedDataOffsets);
-}
-
-static inline int ColumFpClassify(float value)
-{
-    ColumFloatBits bits;
-
-    bits.value = value;
-    switch (bits.bits & 0x7F800000) {
-    case 0x7F800000:
-        if ((bits.bits & 0x007FFFFF) != 0) {
-            return 1;
-        }
-        return 2;
-
-    case 0:
-        if ((bits.bits & 0x007FFFFF) != 0) {
-            return 5;
-        }
-        return 3;
-    }
-
-    return 4;
-}
-
-static inline float ColumSqrtPositive(float value)
-{
-    double guess = __frsqrte((double)value);
-
-    guess = kPppColumSqrtHalf * guess * (kPppColumSqrtThree - guess * guess * value);
-    guess = kPppColumSqrtHalf * guess * (kPppColumSqrtThree - guess * guess * value);
-    guess = kPppColumSqrtHalf * guess * (kPppColumSqrtThree - guess * guess * value);
-
-    return (float)(value * guess);
 }
 
 /*
@@ -111,7 +48,7 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
     pppCVECTOR color;
 
     if (param_2->m_dataValIndex != 0xFFFF) {
-        pppShapeSt* shapeSt = ppvEnv->m_resourceTables.m_shapeTablePtr[param_2->m_dataValIndex];
+        pppShapeSt* shapeSt = ppvEnv->m_shapeTablePtr[param_2->m_dataValIndex];
         CTexture* texture;
 
         texture = shapeSt->GetTexture((long*)shapeSt->m_animData, ppvEnv->m_materialSetPtr, textureIndex);
@@ -130,7 +67,6 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
             float lengthXY;
             float segmentStep;
             float drawScale;
-            float zero;
             float deltaY;
             float deltaX;
             float deltaX2;
@@ -140,32 +76,24 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
             baseX = positionWork->m_position.x;
             baseY = positionWork->m_position.y;
             baseZ = positionWork->m_position.z;
-            deltaX = kPppColumScreenCenterX - baseX;
-            deltaY = kPppColumScreenCenterY - baseY;
+            deltaX = 320.0f - baseX;
+            deltaY = 224.0f - baseY;
             cameraDelta.x = deltaX;
             cameraDelta.y = deltaY;
-            cameraDelta.z = kPppColumCameraZOffset + baseZ;
+            cameraDelta.z = -0.5f + baseZ;
 
             deltaX2 = deltaX * deltaX;
             deltaY2 = deltaY * deltaY;
-            lengthXY = deltaX2 + deltaY2;
-            if (lengthXY > kPppColumZero) {
-                lengthXY = ColumSqrtPositive(lengthXY);
-            } else if ((double)lengthXY < kPppColumZeroD) {
-                lengthXY = NAN;
-            } else if (ColumFpClassify(lengthXY) == 1) {
-                lengthXY = NAN;
-            }
-            drawScale = kPppColumZero;
-            if (lengthXY > kPppColumNormalizeEpsilon) {
-                PSVECScale(&cameraDelta, &cameraDelta, kPppColumOne / lengthXY);
+            lengthXY = sqrtf(deltaX2 + deltaY2);
+            drawScale = 0.0f;
+            if (lengthXY > 0.000001f) {
+                PSVECScale(&cameraDelta, &cameraDelta, 1.0f / lengthXY);
             }
 
-            zero = kPppColumZero;
             pppInitBlendMode();
             values = frameWork->m_values;
             segmentStep =
-                (kPppColumSegmentScale * lengthXY) / (float)param_2->m_count;
+                (2.0f * lengthXY) / (float)param_2->m_count;
 
             for (int i = 0; i < param_2->m_count; i++) {
                 float positionScale = segmentStep * values->m_positionScale;
@@ -173,7 +101,7 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
                 float offsetY;
                 u8 alpha;
 
-                center.z = zero;
+                center.z = 0.0f;
                 offsetX = cameraDelta.x * (float)(i + 1);
                 center.x = baseX + positionScale * offsetX;
                 offsetY = cameraDelta.y * (float)(i + 1);
@@ -186,7 +114,7 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
                     u32 baseAlpha = positionWork->m_alpha;
 
                     alpha = (u8)baseAlpha;
-                    if (dist < param_2->m_colum.m_fadeDistance && fadeAmount > kPppColumZero) {
+                    if (dist < param_2->m_colum.m_fadeDistance && fadeAmount > 0.0f) {
                         alpha = (u8)((float)baseAlpha * fadeAmount);
                     }
                 }
@@ -196,7 +124,7 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
                 color.rgba[3] = alpha;
 
                 pppSetDrawEnv(
-                    &color, (pppFMATRIX*)0, kPppColumZero, param_2->m_colum.m_drawEnvColor1,
+                    &color, (pppFMATRIX*)0, 0.0f, param_2->m_colum.m_drawEnvColor1,
                     param_2->m_colum.m_drawEnvColor0,
                     param_2->m_arg3, 0, 0, 1, 0);
 
@@ -271,7 +199,7 @@ void pppFrameColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *param
         }
 
         if (param_2->m_dataValIndex != 0xFFFF) {
-            pppShapeSt* shapeSt = ppvEnv->m_resourceTables.m_shapeTablePtr[param_2->m_dataValIndex];
+            pppShapeSt* shapeSt = ppvEnv->m_shapeTablePtr[param_2->m_dataValIndex];
             long* animData = static_cast<long*>(shapeSt->m_animData);
             pppCalcFrameShape(
                 animData,
@@ -295,7 +223,7 @@ void pppDestructColum(pppColum *column, _pppCtrlTable *param_2)
     pppColumFrameWork* work = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
 
     if (work->m_values != 0) {
-        pppHeapUseRate((CMemory::CStage*)work->m_values);
+        pppMemFree(work->m_values);
         work->m_values = 0;
     }
 }

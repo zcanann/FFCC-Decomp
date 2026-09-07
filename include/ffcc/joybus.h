@@ -14,8 +14,7 @@ struct ThreadParam
 	unsigned int    m_recvWriteIdx;      // 0x08
 	unsigned int    m_recvReadIdx;       // 0x0C
 
-	unsigned char   m_deviceType;        // 0x10
-	unsigned char   m_padding[3];        // 0x11
+	unsigned int    m_initialCodeReceived; // 0x10
 
 	unsigned int    m_gbaStatus;         // 0x14
 	unsigned int    m_padType;           // 0x18
@@ -185,12 +184,12 @@ public:
     char* m_gbaBootImage;
     unsigned int m_gbaBootImageSize;
 
-    char* m_diskId;
+    DVDDiskID* m_diskId;
     unsigned char m_diskIdBytes[4];
 
     OSThread m_threads[4];
 
-    unsigned char m_sendBuffer[4][0x1000];
+    unsigned char m_threadStacks[4][0x1000];
 
     ThreadParam m_threadParams[4];
 
@@ -211,7 +210,7 @@ public:
     char m_stateFlagArr[4];
 
     uchar m_threadInitFlag;
-    bool m_binLoaded;
+    signed char m_binLoaded;
     bool m_exitThreadFlag;
     uchar m_threadRunningMask;
 

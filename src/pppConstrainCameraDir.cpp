@@ -8,18 +8,6 @@
 #include "ffcc/pppYmEnv.h"
 #include <dolphin/mtx.h>
 
-extern "C" {
-extern const float kDrawAStarSphereRadius = 10.0f;
-extern const float kInfiniteCost = 10000000.0f;
-extern const char kAStarStepDebugFormat[] = "%d ";
-extern const char kAStarNewLine[4] = "\n";
-}
-
-extern const float kConstrainCameraDirScaleOne;
-extern const float kConstrainCameraDirBaseFov;
-extern const float kConstrainCameraDirWideAspect;
-extern const float kConstrainCameraDirZero;
-
 STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
 
 STATIC_ASSERT(sizeof(ConstrainCameraDirDataOffsets) == 0x4);
@@ -61,15 +49,15 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             float cameraPosX = CameraPcs.m_positionX;
             float cameraPosY = CameraPcs.m_positionY;
             float cameraPosZ = CameraPcs.m_positionZ;
-            float scale = kConstrainCameraDirScaleOne;
-            float baseFov = kConstrainCameraDirBaseFov;
+            float scale = 1.0f;
+            float baseFov = 25.0f;
             scale += (CameraPcs.m_fov - baseFov) / baseFov;
 
             PSMTXIdentity(ppvMng->m_matrix.value);
 
-            pppMngSt->m_scale.x = kConstrainCameraDirWideAspect * scale;
+            pppMngSt->m_scale.x = 1.3333f * scale;
             pppMngSt->m_scale.y = scale;
-            pppMngSt->m_scale.z = kConstrainCameraDirScaleOne;
+            pppMngSt->m_scale.z = 1.0f;
 
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
@@ -119,7 +107,7 @@ void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
  */
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
-    float uVar1 = kConstrainCameraDirZero;
+    float uVar1 = 0.0f;
     float* puVar2 =
         (float*)(pppConstrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(param_2)->m_workOffset);
     puVar2[2] = uVar1;
@@ -138,7 +126,7 @@ void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDi
  */
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
-    float uVar1 = kConstrainCameraDirZero;
+    float uVar1 = 0.0f;
     float* puVar2 =
         (float*)(pppConstrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(param_2)->m_workOffset);
     puVar2[2] = uVar1;

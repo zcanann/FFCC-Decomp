@@ -6,7 +6,7 @@
 
 struct WindObjectFlags
 {
-    u8 active : 1;
+    s8 active : 1;
     u8 secondary : 1;
     u8 _unused : 6;
 };
@@ -53,6 +53,10 @@ struct WindGrassObject
     s32 id;
     u8 _pad14[0x24];
 };
+
+typedef int WindObjectFlags_size_mismatch[(sizeof(WindObjectFlags) == 1) ? 1 : -1];
+typedef int WindObject_size_mismatch[(sizeof(WindObject) == 0x64) ? 1 : -1];
+typedef int WindGrassObject_size_mismatch[(sizeof(WindGrassObject) == 0x38) ? 1 : -1];
 
 class CWind
 {

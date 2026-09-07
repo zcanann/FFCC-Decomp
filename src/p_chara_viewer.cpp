@@ -44,10 +44,6 @@ extern const float kCharaViewerLightPosZ = -117.0f;
 extern const float kCharaViewerLightTargetX = 4391.0f;
 extern const float kCharaViewerLightTargetY = -1864.0f;
 extern const float kCharaViewerLightTargetZ = 7194.0f;
-extern const char kCharaViewerCRefName[] = "CRef";
-extern "C" const float kCharaSharedZeroF = 0.0f;
-extern "C" const float kCharaSharedOneF = 1.0f;
-extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 
 CLightPcs::CBumpLight* g_pLight = 0;
 
@@ -57,20 +53,6 @@ CLightPcs::CBumpLight* g_pLight = 0;
 #include <math.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
-
-struct CharaViewerSRT {
-    float transX;
-    float transY;
-    float transZ;
-    float rotX;
-    float rotY;
-    float rotZ;
-    float scaleX;
-    float scaleY;
-    float scaleZ;
-};
-
-typedef char CharaViewerSRT_size_check[(sizeof(CharaViewerSRT) == 0x24) ? 1 : -1];
 
 struct coord {
     Vec pos;
@@ -317,8 +299,8 @@ void CCharaPcs::drawViewer()
  * --INFO--
  * PAL Address: 0x800BDED8
  * PAL Size: 3960b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800D4BE0
+ * EN Size: 4008b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -338,9 +320,10 @@ void CCharaPcs::calcViewer()
         self->m_viewerStoreSavedAnim = 0;
     }
 
-    if ((self->m_viewerLoadModel != 0) || (self->m_viewerLoadAnim != 0) || (self->m_viewerLoadTexture != 0) ||
+    int loadModel = self->m_viewerLoadModel;
+    if ((loadModel != 0) || (self->m_viewerLoadAnim != 0) || (self->m_viewerLoadTexture != 0) ||
         (self->m_viewerLoadAnimContinuous != 0)) {
-        if (self->m_viewerLoadModel != 0) {
+        if (loadModel != 0) {
             System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerModelPath);
             fileHandle = File.Open(self->m_viewerModelPath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
@@ -618,7 +601,7 @@ void CCharaPcs::calcViewer()
             }
         }
 
-        static CharaViewerSRT srt;
+        static SRT srt;
         static int bFirst;
         static char init;
         if (init == 0) {
@@ -626,15 +609,7 @@ void CCharaPcs::calcViewer()
             init = 1;
         }
         if (bFirst != 0) {
-            srt.transZ = LoadFloat(kCharaViewerZero);
-            srt.transY = LoadFloat(kCharaViewerZero);
-            srt.transX = LoadFloat(kCharaViewerZero);
-            srt.rotZ = LoadFloat(kCharaViewerZero);
-            srt.rotY = LoadFloat(kCharaViewerZero);
-            srt.rotX = LoadFloat(kCharaViewerZero);
-            srt.scaleZ = LoadFloat(kCharaViewerUnitStep);
-            srt.scaleY = LoadFloat(kCharaViewerUnitStep);
-            srt.scaleX = LoadFloat(kCharaViewerUnitStep);
+            srt.Identity();
             bFirst = 0;
         }
 
@@ -646,11 +621,11 @@ void CCharaPcs::calcViewer()
             padIndex &= ~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 31);
             rotY = Pad.GetPadInputs()[padIndex].substickXF;
         }
-        srt.rotY = srt.rotY + rotY;
-        srt.transX = translateX;
+        srt.m_rotation.y = srt.m_rotation.y + rotY;
+        srt.m_position.x = translateX;
 
         Mtx modelMtx;
-        Math.SRTToMatrix(modelMtx, reinterpret_cast<SRT*>(&srt));
+        Math.SRTToMatrix(modelMtx, &srt);
         self->m_viewerModel[i]->SetMatrix(modelMtx);
 
         CStopWatch matrixWatch(const_cast<char*>(kCharaViewerNoName));

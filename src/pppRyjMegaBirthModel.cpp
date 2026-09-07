@@ -42,9 +42,7 @@ extern const float kPppRyjMegaBirthModelSpeedFalloff = 0.7f;
 extern const float kPppRyjMegaBirthModelHalfF = 0.5f;
 extern const double kPppRyjMegaBirthModelOneF64 = 1.0;
 extern const double kPppRyjMegaBirthModelHalfF64 = 0.5;
-extern const float kPppRyjMegaBirthModelNegOneZeroPair[2] = { -1.0f, 0.0f };
-extern const float kPppRyjMegaBirthModelZeroPair[2] = { 0.0f, 0.0f };
-extern const float kPppRyjMegaBirthModelZero = 0.0f;
+extern const float kPppRyjMegaBirthModelNegativeOne = -1.0f;
 
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_modelIndex) == 0x04);
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_fogIndex) == 0x09);
@@ -650,7 +648,7 @@ mesh_block:
         Vec* pathBase = pObject->m_drawMatrixPtr;
 
         if (pathIndex >= 0) {
-            s16* pathInfo = (s16*)(*(int*)&ppvEnv->m_particleColors[1] + pathIndex * 8);
+            s16* pathInfo = reinterpret_cast<s16*>(ppvEnv->m_shapeGroupPtr + (pathIndex));
             float t;
             float vx;
             float vy;
@@ -856,19 +854,19 @@ join_position:
             if (((rotBits & 1) != 0) && ((rotBits & 2) != 0)) {
                 if (MegaBirthHalfDouble() < (double)Math.RandF()) {
                     float v74 = *f32_at(particleData, 0x74);
-                    *f32_at(particleData, 0x74) = v74 * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                    *f32_at(particleData, 0x74) = v74 * kPppRyjMegaBirthModelNegativeOne;
                     float v78 = *f32_at(particleData, 0x78);
-                    *f32_at(particleData, 0x78) = v78 * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                    *f32_at(particleData, 0x78) = v78 * kPppRyjMegaBirthModelNegativeOne;
                     float v7C = *f32_at(particleData, 0x7C);
-                    *f32_at(particleData, 0x7C) = v7C * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                    *f32_at(particleData, 0x7C) = v7C * kPppRyjMegaBirthModelNegativeOne;
                 }
             } else if ((rotBits & 2) != 0) {
                 float v74 = *f32_at(particleData, 0x74);
-                *f32_at(particleData, 0x74) = v74 * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                *f32_at(particleData, 0x74) = v74 * kPppRyjMegaBirthModelNegativeOne;
                 float v78 = *f32_at(particleData, 0x78);
-                *f32_at(particleData, 0x78) = v78 * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                *f32_at(particleData, 0x78) = v78 * kPppRyjMegaBirthModelNegativeOne;
                 float v7C = *f32_at(particleData, 0x7C);
-                *f32_at(particleData, 0x7C) = v7C * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                *f32_at(particleData, 0x7C) = v7C * kPppRyjMegaBirthModelNegativeOne;
             }
         } else {
             *f32_at(particleData, 0x74) = *(float*)(payload + 0xC0) * Math.RandF();
@@ -882,17 +880,17 @@ join_position:
                 s32 i;
                 for (i = 0; i < 3; i++) {
                     if (h < (double)Math.RandF()) {
-                        *(float*)(base + 0x74) = *(float*)(base + 0x74) * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                        *(float*)(base + 0x74) = *(float*)(base + 0x74) * kPppRyjMegaBirthModelNegativeOne;
                     }
                     base += 4;
                 }
             } else if ((rotBits & 2) != 0) {
                 float v74 = *f32_at(particleData, 0x74);
-                *f32_at(particleData, 0x74) = v74 * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                *f32_at(particleData, 0x74) = v74 * kPppRyjMegaBirthModelNegativeOne;
                 float v78 = *f32_at(particleData, 0x78);
-                *f32_at(particleData, 0x78) = v78 * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                *f32_at(particleData, 0x78) = v78 * kPppRyjMegaBirthModelNegativeOne;
                 float v7C = *f32_at(particleData, 0x7C);
-                *f32_at(particleData, 0x7C) = v7C * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                *f32_at(particleData, 0x7C) = v7C * kPppRyjMegaBirthModelNegativeOne;
             }
         }
 
@@ -1405,17 +1403,17 @@ void pppRyjMegaBirthModelDes(_pppPObject* pObject, PRyjMegaBirthModelOffsets* of
         reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + GetRyjMegaBirthModelDataOffsets(offsets)->m_workOffset);
 
     if (work->m_particleBlock != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particleBlock));
+        pppMemFree(work->m_particleBlock);
         work->m_particleBlock = 0;
     }
 
     if (work->m_worldMatrixBlock != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_worldMatrixBlock));
+        pppMemFree(work->m_worldMatrixBlock);
         work->m_worldMatrixBlock = 0;
     }
 
     if (work->m_colorBlock != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_colorBlock));
+        pppMemFree(work->m_colorBlock);
         work->m_colorBlock = 0;
     }
 }

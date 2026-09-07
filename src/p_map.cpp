@@ -26,22 +26,6 @@ private:
     unsigned int m_data;
 };
 
-extern "C" {
-void create__7CMapPcsFv(CMapPcs*);
-void destroy__7CMapPcsFv(CMapPcs*);
-void calcInit__7CMapPcsFv(CMapPcs*);
-void calc__7CMapPcsFv(CMapPcs*);
-void drawShadow__7CMapPcsFv(CMapPcs*);
-void drawBefore__7CMapPcsFv(CMapPcs*);
-void draw__7CMapPcsFv(CMapPcs*);
-void drawAfter__7CMapPcsFv(CMapPcs*);
-void createViewer__7CMapPcsFv(CMapPcs*);
-void calcViewer__7CMapPcsFv(CMapPcs*);
-void drawBeforeViewer__7CMapPcsFv(CMapPcs*);
-void drawViewer__7CMapPcsFv(CMapPcs*);
-void drawAfterViewer__7CMapPcsFv(CMapPcs*);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80036254
@@ -51,58 +35,9 @@ void drawAfterViewer__7CMapPcsFv(CMapPcs*);
  * JP Address: TODO
  * JP Size: TODO
  */
-CRelProfile::~CRelProfile()
+inline CRelProfile::~CRelProfile()
 {
 }
-
-static CProcessTableCallback s_mapTableDescCreate = {0, 0xFFFFFFFF,
-                                                      reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
-static CProcessTableCallback s_mapTableDescDestroy = {0, 0xFFFFFFFF,
-                                                       reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
-static CProcessTableCallback s_mapTableDescCalcInit = {0, 0xFFFFFFFF,
-                                                        reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
-static CProcessTableCallback s_mapTableDescCalc = {0, 0xFFFFFFFF,
-                                                    reinterpret_cast<unsigned int>(calc__7CMapPcsFv)};
-static CProcessTableCallback s_mapTableDescDrawShadow = {0, 0xFFFFFFFF,
-                                                          reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
-static CProcessTableCallback s_mapTableDescDrawBefore = {0, 0xFFFFFFFF,
-                                                          reinterpret_cast<unsigned int>(drawBefore__7CMapPcsFv)};
-static CProcessTableCallback s_mapTableDescDraw = {0, 0xFFFFFFFF,
-                                                    reinterpret_cast<unsigned int>(draw__7CMapPcsFv)};
-static CProcessTableCallback s_mapTableDescDrawAfter = {0, 0xFFFFFFFF,
-                                                         reinterpret_cast<unsigned int>(drawAfter__7CMapPcsFv)};
-static CProcessTableCallback s_mapViewerTableDescCreate = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
-static CProcessTableCallback s_mapViewerTableDescDestroy = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
-static CProcessTableCallback s_mapViewerTableDescCalcInit = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
-static CProcessTableCallback s_mapViewerTableDescCalc = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
-static CProcessTableCallback s_mapViewerTableDescDrawShadow = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
-static CProcessTableCallback s_mapViewerTableDescDrawBefore = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
-static CProcessTableCallback s_mapViewerTableDescDraw = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
-static CProcessTableCallback s_mapViewerTableDescDrawAfter = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
-static CProcessTableCallback s_mapPartTableDescCreate = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
-static CProcessTableCallback s_mapPartTableDescDestroy = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
-static CProcessTableCallback s_mapPartTableDescCalcInit = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
-static CProcessTableCallback s_mapPartTableDescCalc = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
-static CProcessTableCallback s_mapPartTableDescDrawShadow = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
-static CProcessTableCallback s_mapPartTableDescDrawBefore = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
-static CProcessTableCallback s_mapPartTableDescDraw = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
-static CProcessTableCallback s_mapPartTableDescDrawAfter = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
 
 static const char sMapPcsGameTableName[] = "CMapPcs(GAME)";
 static const char sMapPcsViewerTableName[] = "CMapPcs(VIEWER)";
@@ -110,76 +45,54 @@ static const char sMapPcsPartTableName[] = "CMapPcs(PART)";
 static const char sMapPcsManagerClassName[] = "CManager";
 static const char sMapPcsProcessClassName[] = "CProcess";
 
-CProcessTable CMapPcs::m_table[3] = {
-    {
-        const_cast<char*>(sMapPcsGameTableName),
-        0, 0, 0,
-        0, 0, 0,
-        0, 0, 0,
-        0x14,                        0,                           0, 0, 0,  0x1E,
-        0,                           0, 0, 0,  0x2F,                        1,
-        0, 0, 0,
-        0x35,                        1,                           0, 0, 0,  0x37,
-        1,                           0, 0, 0,  0x3F,                        1,
-    },
-    {
-        const_cast<char*>(sMapPcsViewerTableName),
-        0, 0, 0,
-        0, 0, 0,
-        0, 0, 0,
-        0x14,                        0,                           0, 0, 0, 0x1E,
-        0,                           0, 0, 0, 0x2F,                        1,
-        0, 0, 0,
-        0x35,                        1,                           0, 0, 0, 0x37,
-        1,                           0, 0, 0, 0x3F,                        1,
-    },
-    {
-        const_cast<char*>(sMapPcsPartTableName),
-        0, 0, 0,
-        0, 0, 0,
-        0, 0, 0,
-        0x14,                        0,                           0, 0, 0, 0x1E,
-        0,                           0, 0, 0, 0x2F,                        1,
-        0, 0, 0,
-        0x35,                        1,                           0, 0, 0, 0x37,
-        1,                           0, 0, 0, 0x3F,                        1,
-    },
-};
-
-#pragma inline_max_size(10000)
 inline CMapPcs::CMapPcs()
 {
-    CProcessTable* table = reinterpret_cast<CProcessTable*>(m_table);
-
-    table[0].m_fields.m_create = s_mapTableDescCreate;
-    table[0].m_fields.m_destroy = s_mapTableDescDestroy;
-    table[0].m_fields.m_entries[0].m_callback = s_mapTableDescCalcInit;
-    table[0].m_fields.m_entries[1].m_callback = s_mapTableDescCalc;
-    table[0].m_fields.m_entries[2].m_callback = s_mapTableDescDrawShadow;
-    table[0].m_fields.m_entries[3].m_callback = s_mapTableDescDrawBefore;
-    table[0].m_fields.m_entries[4].m_callback = s_mapTableDescDraw;
-    table[0].m_fields.m_entries[5].m_callback = s_mapTableDescDrawAfter;
-
-    table[1].m_fields.m_create = s_mapViewerTableDescCreate;
-    table[1].m_fields.m_destroy = s_mapViewerTableDescDestroy;
-    table[1].m_fields.m_entries[0].m_callback = s_mapViewerTableDescCalcInit;
-    table[1].m_fields.m_entries[1].m_callback = s_mapViewerTableDescCalc;
-    table[1].m_fields.m_entries[2].m_callback = s_mapViewerTableDescDrawShadow;
-    table[1].m_fields.m_entries[3].m_callback = s_mapViewerTableDescDrawBefore;
-    table[1].m_fields.m_entries[4].m_callback = s_mapViewerTableDescDraw;
-    table[1].m_fields.m_entries[5].m_callback = s_mapViewerTableDescDrawAfter;
-
-    table[2].m_fields.m_create = s_mapPartTableDescCreate;
-    table[2].m_fields.m_destroy = s_mapPartTableDescDestroy;
-    table[2].m_fields.m_entries[0].m_callback = s_mapPartTableDescCalcInit;
-    table[2].m_fields.m_entries[1].m_callback = s_mapPartTableDescCalc;
-    table[2].m_fields.m_entries[2].m_callback = s_mapPartTableDescDrawShadow;
-    table[2].m_fields.m_entries[3].m_callback = s_mapPartTableDescDrawBefore;
-    table[2].m_fields.m_entries[4].m_callback = s_mapPartTableDescDraw;
-    table[2].m_fields.m_entries[5].m_callback = s_mapPartTableDescDrawAfter;
 }
 
 CMapPcs MapPcs;
+
+CProcessCallbackTable CMapPcs::m_table[3] = {
+    {
+        const_cast<char*>(sMapPcsGameTableName),
+        static_cast<CProcessCallback>(&CMapPcs::create),
+        static_cast<CProcessCallback>(&CMapPcs::destroy),
+        {
+            {static_cast<CProcessCallback>(&CMapPcs::calcInit), 0x14, 0},
+            {static_cast<CProcessCallback>(&CMapPcs::calc), 0x1E, 0},
+            {static_cast<CProcessCallback>(&CMapPcs::drawShadow), 0x2F, 1},
+            {static_cast<CProcessCallback>(&CMapPcs::drawBefore), 0x35, 1},
+            {static_cast<CProcessCallback>(&CMapPcs::draw), 0x37, 1},
+            {static_cast<CProcessCallback>(&CMapPcs::drawAfter), 0x3F, 1},
+        },
+    },
+    {
+        const_cast<char*>(sMapPcsViewerTableName),
+        static_cast<CProcessCallback>(&CMapPcs::createViewer),
+        static_cast<CProcessCallback>(&CMapPcs::destroy),
+        {
+            {static_cast<CProcessCallback>(&CMapPcs::calcInit), 0x14, 0},
+            {static_cast<CProcessCallback>(&CMapPcs::calcViewer), 0x1E, 0},
+            {static_cast<CProcessCallback>(&CMapPcs::drawShadow), 0x2F, 1},
+            {static_cast<CProcessCallback>(&CMapPcs::drawBeforeViewer), 0x35, 1},
+            {static_cast<CProcessCallback>(&CMapPcs::drawViewer), 0x37, 1},
+            {static_cast<CProcessCallback>(&CMapPcs::drawAfterViewer), 0x3F, 1},
+        },
+    },
+    {
+        const_cast<char*>(sMapPcsPartTableName),
+        static_cast<CProcessCallback>(&CMapPcs::createViewer),
+        static_cast<CProcessCallback>(&CMapPcs::destroy),
+        {
+            {static_cast<CProcessCallback>(&CMapPcs::calcInit), 0x14, 0},
+            {static_cast<CProcessCallback>(&CMapPcs::calcViewer), 0x1E, 0},
+            {static_cast<CProcessCallback>(&CMapPcs::drawShadow), 0x2F, 1},
+            {static_cast<CProcessCallback>(&CMapPcs::drawBeforeViewer), 0x35, 1},
+            {static_cast<CProcessCallback>(&CMapPcs::drawViewer), 0x37, 1},
+            {static_cast<CProcessCallback>(&CMapPcs::drawAfterViewer), 0x3F, 1},
+        },
+    },
+};
+
 extern unsigned int s_loadedMapNo__7CMapPcs;
 CRelProfile g_mapStage;
 CRelProfile g_mapSection;
@@ -342,9 +255,9 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                     cameraPos.z = center * LoadFloat(kMapBoundsCenterScale);
                 } else {
                     CMapObj* mapObj = MapMng.GetMapObj(1);
-                    cameraPos.x = mapObj->m_localTranslateX;
-                    cameraPos.y = mapObj->m_localTranslateY;
-                    cameraPos.z = mapObj->m_localTranslateZ;
+                    cameraPos.x = mapObj->m_localPosition.x;
+                    cameraPos.y = mapObj->m_localPosition.y;
+                    cameraPos.z = mapObj->m_localPosition.z;
                 }
             }
             cameraPos.y += LoadFloat(kMapCameraCenterYOffset);
@@ -365,7 +278,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         CPtrArray<CMapLightHolder*>& mapLightHolderArr = MapMng.GetMapLightHolderArray(1);
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) > mapLightHolderIndex) {
-            mapLightHolderArr[mapLightHolderIndex]->GetLightHolder(
+            mapLightHolderArr.GetAt(mapLightHolderIndex)->GetLightHolder(
                 &MapMng.m_mapColor, static_cast<Vec*>(0));
         }
     }
@@ -380,54 +293,19 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
  * --INFO--
  * PAL Address: 0x80035980
  * PAL Size: 260b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8003F834
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned long long CMapPcs::IsLoadMapCompleted()
+int CMapPcs::IsLoadMapCompleted()
 {
-    unsigned int value = 0;
-    CMapMng* map = &MapMng;
-
-    for (int count = 2; count != 0; count--) {
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
+    for (int i = 0; i < 16; i++) {
+        if (MapMng.m_asyncLoadState.m_asyncHandles[i] != 0) {
+            return 0;
         }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        value += 7;
     }
-
-    return ((unsigned long long)1 << 32) | value;
+    return 1;
 }
 
 /*
@@ -516,9 +394,9 @@ void CMapPcs::calc()
                     cameraPos.z = center * LoadFloat(kMapBoundsCenterScale);
                 } else {
                     CMapObj* mapObj = MapMng.GetMapObj(1);
-                    cameraPos.x = mapObj->m_localTranslateX;
-                    cameraPos.y = mapObj->m_localTranslateY;
-                    cameraPos.z = mapObj->m_localTranslateZ;
+                    cameraPos.x = mapObj->m_localPosition.x;
+                    cameraPos.y = mapObj->m_localPosition.y;
+                    cameraPos.z = mapObj->m_localPosition.z;
                 }
             }
             cameraPos.y += LoadFloat(kMapCameraCenterYOffset);
@@ -539,7 +417,7 @@ void CMapPcs::calc()
         CPtrArray<CMapLightHolder*>* mapLightHolderArr = &MapMng.GetMapLightHolderArray(1);
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
-            (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(
+            mapLightHolderArr->GetAt(mapLightHolderIndex)->GetLightHolder(
                 &MapMng.m_mapColor, static_cast<Vec*>(0));
         }
 

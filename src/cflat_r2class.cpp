@@ -303,45 +303,7 @@ CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork* work)
 	return static_cast<CCaravanWork*>(work);
 }
 
-/*
- * --INFO--
- * PAL Address: 0x800C81A8
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGObject::SetDamageColMask(int index, int mask)
-{
-	if (index < 0) {
-		for (int i = 0; i < 8; ++i) {
-			m_damageColliders[i].m_hitMask = mask;
-		}
-	} else if (index < 8) {
-		m_damageColliders[index].m_hitMask = mask;
-	}
-}
 
-/*
- * --INFO--
- * PAL Address: 0x800C81E4
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGObject::SetAttackColMask(int index, int mask)
-{
-	if (index < 0) {
-		for (int i = 0; i < 8; ++i) {
-			m_attackColliders[i].m_hitMask = mask;
-		}
-	} else if (index < 8) {
-		m_attackColliders[index].m_hitMask = mask;
-	}
-}
 
 /*
  * --INFO--
@@ -955,7 +917,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					    static_cast<unsigned int>(static_cast<int>((*(engineObject + 0x50) & 0xC0) << 0x18) >> 0x1F);
 					break;
 				case -8:
-					LastResult(this) = (*reinterpret_cast<unsigned int*>(engineObject + 0x4CC) >> 0x17) & 0xF;
+					LastResult(this) = (reinterpret_cast<CGObject*>(engineObject)->m_bgGroupMask >> 0x17) & 0xF;
 					break;
 				case -9:
 					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x94);
@@ -1367,17 +1329,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			int index = static_cast<int>(object->m_localBase[0]);
 			int x = static_cast<int>(object->m_localBase[1]);
 			if (index == -1) {
-				*reinterpret_cast<int*>(&engineObject->m_attackColliders[1].m_localStart.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_attackColliders[2].m_localStart.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_attackColliders[3].m_localStart.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_attackColliders[4].m_localStart.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_attackColliders[5].m_localStart.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_attackColliders[6].m_localStart.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_attackColliders[7].m_localStart.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_damageColliders[0].m_localPosition.x) = x;
+				for (int i = 0; i < 8; i++) {
+					engineObject->m_attackColliders[i].m_hitMask = x;
+				}
 			} else {
-				*reinterpret_cast<int*>(
-				    reinterpret_cast<u8*>(&engineObject->m_attackColliders[1].m_localStart.x) + index * 0x30) = x;
+				engineObject->m_attackColliders[index].m_hitMask = x;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1401,17 +1357,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			int index = static_cast<int>(object->m_localBase[0]);
 			int x = static_cast<int>(object->m_localBase[1]);
 			if (index == -1) {
-				*reinterpret_cast<int*>(&engineObject->m_damageColliders[1].m_localPosition.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_damageColliders[2].m_localPosition.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_damageColliders[3].m_localPosition.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_damageColliders[4].m_localPosition.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_damageColliders[5].m_localPosition.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_damageColliders[6].m_localPosition.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_damageColliders[7].m_localPosition.x) = x;
-				*reinterpret_cast<int*>(&engineObject->m_animPhase) = x;
+				for (int i = 0; i < 8; i++) {
+					engineObject->m_damageColliders[i].m_hitMask = x;
+				}
 			} else {
-				*reinterpret_cast<int*>(
-				    reinterpret_cast<u8*>(&engineObject->m_damageColliders[1].m_localPosition.x) + index * 0x28) = x;
+				engineObject->m_damageColliders[index].m_hitMask = x;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1624,14 +1574,14 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x5C: {
 			CMonWork* work = reinterpret_cast<CMonWork*>(engineObject->m_scriptHandle);
-			work->unk_0xd0[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
+			work->m_actionItems[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		}
 		case -0x5D: {
 			CMonWork* work = reinterpret_cast<CMonWork*>(engineObject->m_scriptHandle);
-			work->unk_0xf0[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
+			work->m_actionAnimations[object->m_localBase[0]] = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1896,7 +1846,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x4A:
-			engineObject->m_hitNormal.x = reinterpret_cast<float*>(object->m_localBase)[0];
+			engineObject->m_turnFactor = reinterpret_cast<float*>(object->m_localBase)[0];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

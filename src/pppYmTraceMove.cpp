@@ -33,7 +33,7 @@ static inline Vec* GetYmTraceMovePreviousPosition(_pppMngSt* pppMngSt)
 
 static inline f32 GetYmTraceMoveScale(_pppMngSt* pppMngSt)
 {
-	return pppMngSt->m_savedPosition.y;
+	return pppMngSt->m_movementScale;
 }
 
 static inline Vec* GetYmTraceMoveBasePosition(_pppMngSt* pppMngSt)

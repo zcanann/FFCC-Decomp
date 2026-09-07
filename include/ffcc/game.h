@@ -14,7 +14,7 @@
 class CGObject;
 class CGPrgObj;
 class CGPartyObj;
-class CCombi2Set;
+class CCombi2;
 class CGObjWork;
 class CMapLightHolder;
 class CBound;
@@ -129,7 +129,7 @@ public:
     void LoadScript(char*);
     void LoadInit();
     void LoadFinished();
-    int GetBossArtifact(int, int);
+    CBossArtifactEntry* GetBossArtifact(int, int);
     int GetFoodLevel(int, int);
     void GetTargetCursor(int, Vec&, Vec&);
     int GetParticleSpecialInfo(PPPIFPARAM&, int&, int&);
@@ -155,6 +155,7 @@ public:
     char* GetMonNames(int);
     char* GetMonArts(int);
     char* GetMonName(int, int);
+    char* GetSysMes(int);
 
     // void* vtable;                        // 0x00
     int unk_0x4;                            // 0x04
@@ -165,10 +166,11 @@ public:
     unsigned int m_romLetterWorkBase;       // 0xC5AC
     CGPartyObj* m_partyObjArr[4];           // 0xC5B0
     unsigned int m_scriptFoodBase[4];       // 0xC5C0
-    unsigned int m_scriptWork[16][4][2];     // 0xC5D0
+    CGObject* m_monObjects[64];             // 0xC5D0
+    CMonWork* m_monWorkRefs[64];             // 0xC6D0
     unsigned int unk_flat3_0xc7d0;          // 0xC7D0
-    unsigned int unk_flat3_count_0xc7d4;    // 0xC7D4
-    unsigned int unk_flat3_field_1C_0xc7d8; // 0xC7D8
+    unsigned int m_combiCount;             // 0xC7D4
+    CCombi2* m_combiTable;                 // 0xC7D8
     unsigned int unk_flat3_field_8_0xc7dc;  // 0xC7DC
     unsigned int unk_flat3_field_30_0xc7e0; // 0xC7E0
     CBossArtifactStage* m_bossArtifactBase; // 0xC7E4
@@ -206,6 +208,8 @@ STATIC_ASSERT(sizeof(CGame::CBossArtifactEntry) == 0x08);
 STATIC_ASSERT(sizeof(CGame::CBossArtifactStage) == 0x168);
 STATIC_ASSERT(offsetof(CGame::CBossArtifactStage, m_entries) == 0x20);
 STATIC_ASSERT(offsetof(CGame::CBossArtifactStage, m_rankThresholds) == 0x160);
+STATIC_ASSERT(offsetof(CGame, m_monObjects) == 0xC5D0);
+STATIC_ASSERT(offsetof(CGame, m_monWorkRefs) == 0xC6D0);
 STATIC_ASSERT(offsetof(CGame, m_bossArtifactBase) == 0xC7E4);
 STATIC_ASSERT(sizeof(CGame) == 0x11F88);
 

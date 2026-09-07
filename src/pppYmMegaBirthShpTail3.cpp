@@ -96,7 +96,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     const u32 dataValIndex = *(u32*)(step + 4);
 
     pppShapeAnimData* shapeAnim =
-        static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
+        static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[dataValIndex]->m_animData);
     pppSetDrawEnv(
         0, &object->m_drawMatrix, *(float*)(payload + 0xA0), payload[0xA4], step[0x0C],
         payload[0x58], 0, (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5), 1, 0);
@@ -623,25 +623,25 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
     }
 
     if ((s32)paramBytes[0x18] < 8 && (s32)paramBytes[0x18] >= 0) {
-        union { Vec baseDir; double _bdAlign[2]; };
-        union { s32 angles[4]; double _angAlign[2]; };
+        Vec baseDir;
+        pppIVECTOR4 angles;
         pppFMATRIX rot;
 
         baseDir.x = pYmMegaBirthShpTail3->m_matrix[2][0];
         baseDir.y = pYmMegaBirthShpTail3->m_matrix[2][1];
         baseDir.z = pYmMegaBirthShpTail3->m_matrix[2][2];
-        angles[0] = (s32)(spreadRange * Math.RandF() - spread);
-        angles[0] = (s32)((float)(angles[0] << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
-        angles[1] = (s32)(spreadRange * Math.RandF() - spread);
-        angles[1] = (s32)((float)(angles[1] << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
-        angles[2] = (s32)(spreadRange * Math.RandF() - spread);
-        angles[2] = (s32)((float)(angles[2] << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
+        angles.x = (s32)(spreadRange * Math.RandF() - spread);
+        angles.x = (s32)((float)(angles.x << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
+        angles.y = (s32)(spreadRange * Math.RandF() - spread);
+        angles.y = (s32)((float)(angles.y << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
+        angles.z = (s32)(spreadRange * Math.RandF() - spread);
+        angles.z = (s32)((float)(angles.z << 15) / kPppYmMegaBirthShpTail3HalfTurnDegrees);
         if ((paramBytes[0x18] == 2) || (paramBytes[0x18] == 3)) {
-            angles[0] = 0;
-            angles[1] = 0;
+            angles.x = 0;
+            angles.y = 0;
         }
 
-        pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angles);
+        pppGetRotMatrixXYZ(rot, &angles);
         PSMTXMultVecSR(rot.value, &baseDir, reinterpret_cast<Vec*>(particleData->m_matrix[1]));
         reinterpret_cast<Vec*>(particleData->m_matrix[1])->x *= pYmMegaBirthShpTail3->m_speedScaleX;
         reinterpret_cast<Vec*>(particleData->m_matrix[1])->y *= pYmMegaBirthShpTail3->m_speedScaleYZ.x;
@@ -810,7 +810,7 @@ path:
         float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
         if (*(s16*)(paramBytes + 0x6a) >= 0) {
-            short* pathInfo = (short*)(*(int*)&ppvEnv->m_particleColors[1] + *(s16*)(paramBytes + 0x6a) * 8);
+            short* pathInfo = reinterpret_cast<short*>(ppvEnv->m_shapeGroupPtr + (*(s16*)(paramBytes + 0x6a)));
 
             if (pathBase == 0) {
                 pathBase = *(float**)((u8*)ppvEnv->m_mapMeshPtr[*pathInfo] + 0x2C);
@@ -980,15 +980,15 @@ void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTai
     VYmMegaBirthShpTail3* work = reinterpret_cast<VYmMegaBirthShpTail3*>(pppYmMegaBirthShpTail3_->m_workArea + offset);
 
     if (work->m_particles != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particles));
+        pppMemFree(work->m_particles);
         work->m_particles = 0;
     }
     if (work->m_wmats != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_wmats));
+        pppMemFree(work->m_wmats);
         work->m_wmats = 0;
     }
     if (work->m_colors != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_colors));
+        pppMemFree(work->m_colors);
         work->m_colors = 0;
     }
 }

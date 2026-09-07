@@ -5,6 +5,26 @@ class CFont;
 class CMenuPcs;
 class CGame;
 
+struct CMesCharCell
+{
+	float m_x;                      // 0x00
+	float m_width;                  // 0x04
+	short m_y;                      // 0x08
+	unsigned char m_scaleX;         // 0x0A
+	char m_pad0B;                   // 0x0B
+	unsigned short m_reveal;        // 0x0C
+	unsigned char m_fontAlign : 4;  // 0x0E hi
+	unsigned char m_fontIndex : 4;  // 0x0E lo
+	unsigned char m_fadeFrames : 4; // 0x0F hi
+	unsigned char m_fadeCursor : 4; // 0x0F lo
+	unsigned char m_char;           // 0x10
+	unsigned char m_scaleY;         // 0x11
+	unsigned char m_color;          // 0x12
+	unsigned char m_flagCount;      // 0x13
+};
+
+typedef char CMesCharCell_size_check[(sizeof(CMesCharCell) == 0x14) ? 1 : -1];
+
 class CMes
 {
     friend class CMesMenu;
@@ -29,10 +49,10 @@ public:
 
     void Set(char*, int);
     void Next();
-    void getFont(int, int);
+    CFont* getFont(int, int);
     void addString(char**, int);
-    void GET_2(char**);
-    void GET_1(char**);
+    int GET_2(char**);
+    char GET_1(char**);
     int GetWait();
     void SetPlayerIndex(int index) { m_playerIndex = index; }
     float GetMaxWidth() const { return mMaxWidth; }
@@ -56,9 +76,7 @@ private:
     int m_playerIndex;
     char* mText;
     int mCounter;
-    int mFlags;
-
-    char mData[0x3BFC];
+    CMesCharCell m_chars[768];
     int mFlagCount;             // 0x3C0C
     int mFlagCursor;            // 0x3C10
     CFlag mFlagEntries[0x10];   // 0x3C14

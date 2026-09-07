@@ -13,6 +13,23 @@ struct OSThread;
 typedef void (CProcess::*CProcessCallback)();
 typedef int CProcessCallback_size_mismatch[(sizeof(CProcessCallback) == 0xC) ? 1 : -1];
 
+struct CProcessCallbackTable
+{
+    struct Entry
+    {
+        CProcessCallback m_callback;
+        u32 m_priority;
+        u32 m_flags;
+    };
+
+    char* m_name;
+    CProcessCallback m_create;
+    CProcessCallback m_destroy;
+    Entry m_entries[16];
+};
+typedef int CProcessCallbackTable_entry_size_mismatch[(sizeof(CProcessCallbackTable::Entry) == 0x14) ? 1 : -1];
+typedef int CProcessCallbackTable_size_mismatch[(sizeof(CProcessCallbackTable) == 0x15C) ? 1 : -1];
+
 struct CProcessTableCallback
 {
     u32 m_thisOffset;
@@ -38,13 +55,13 @@ struct CProcessTable
     char* m_name;
     union
     {
-        u32 m_words[(0x15C - sizeof(char*)) / sizeof(u32)];
         struct Fields
         {
             CProcessTableCallback m_create;
             CProcessTableCallback m_destroy;
             CProcessTableEntry m_entries[16];
         } m_fields;
+        u32 m_words[(0x15C - sizeof(char*)) / sizeof(u32)];
     };
 };
 typedef int CProcessTable_size_mismatch[(sizeof(CProcessTable) == 0x15C) ? 1 : -1];
@@ -107,6 +124,7 @@ public:
     COrder* GetNextOrder(COrder*);
     COrder* GetOrder(int);
     unsigned int GetCounter();
+    int GetErrorLevel();
     int IsGdev();
     static void errorHandler(unsigned short, OSContext*, unsigned long, unsigned long);
 

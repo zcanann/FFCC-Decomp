@@ -56,90 +56,9 @@ static const char lbl_80330260[] = "CRef";
 CCharaPcs CharaPcs;
 CLightPcs::CBumpLight* gCharaPartWorkPtr = 0;
 
-extern "C" void create__9CCharaPcsFv(CCharaPcs*);
-extern "C" void destroy__9CCharaPcsFv(CCharaPcs*);
-extern "C" void calc__9CCharaPcsFv(CCharaPcs*);
-extern "C" void drawBefore__9CCharaPcsFv(CCharaPcs*);
-extern "C" void drawShadow__9CCharaPcsFv(CCharaPcs*);
-extern "C" void draw__9CCharaPcsFv(CCharaPcs*);
-extern "C" void drawOverlap__9CCharaPcsFv(CCharaPcs*);
-extern "C" void calcAfter__9CCharaPcsFv(CCharaPcs*);
-extern "C" void createViewer__9CCharaPcsFv(CCharaPcs*);
-extern "C" void destroyViewer__9CCharaPcsFv(CCharaPcs*);
-extern "C" void calcViewer__9CCharaPcsFv(CCharaPcs*);
-extern "C" void drawViewer__9CCharaPcsFv(CCharaPcs*);
-
 static const char s_CCharaPcs_GAME_801D9128[] = "CCharaPcs(GAME)";
 static const char s_CCharaPcs_VIEWER_801D9138[] = "CCharaPcs(VIEWER)";
 static const char s_CCharaPcs_PART_801D914C[] = "CCharaPcs(PART)";
-
-static CProcessTableCallback s_charaTableDescCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescCalc = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDrawBefore = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBefore__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDrawShadow = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDraw = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDrawOverlap = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawOverlap__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescCalcAfter = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescCreateViewer = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDestroyViewer = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescCalcViewer = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescDrawViewer = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescViewerCalcAfter = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescPartCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescPartDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescPartCalc = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescPartDraw = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CCharaPcsFv)};
-static CProcessTableCallback s_charaTableDescPartCalcAfter = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
-
-CProcessTable PTR_s_CCharaPcs_GAME_[3] = {
-    {
-        const_cast<char*>(s_CCharaPcs_GAME_801D9128),
-        {
-            s_charaTableDescCreate.m_thisOffset, s_charaTableDescCreate.m_virtualOffset, s_charaTableDescCreate.m_function,
-            s_charaTableDescDestroy.m_thisOffset, s_charaTableDescDestroy.m_virtualOffset, s_charaTableDescDestroy.m_function,
-            s_charaTableDescCalc.m_thisOffset, s_charaTableDescCalc.m_virtualOffset, s_charaTableDescCalc.m_function,
-            0x1F, 0,
-            s_charaTableDescDrawBefore.m_thisOffset, s_charaTableDescDrawBefore.m_virtualOffset, s_charaTableDescDrawBefore.m_function,
-            0x36, 1,
-            s_charaTableDescDrawShadow.m_thisOffset, s_charaTableDescDrawShadow.m_virtualOffset, s_charaTableDescDrawShadow.m_function,
-            0x30, 1,
-            s_charaTableDescDraw.m_thisOffset, s_charaTableDescDraw.m_virtualOffset, s_charaTableDescDraw.m_function,
-            0x3B, 1,
-            s_charaTableDescDrawOverlap.m_thisOffset, s_charaTableDescDrawOverlap.m_virtualOffset, s_charaTableDescDrawOverlap.m_function,
-            0x46, 1,
-            s_charaTableDescCalcAfter.m_thisOffset, s_charaTableDescCalcAfter.m_virtualOffset, s_charaTableDescCalcAfter.m_function,
-            0x4D, 8,
-        },
-    },
-    {
-        const_cast<char*>(s_CCharaPcs_VIEWER_801D9138),
-        {
-            s_charaTableDescCreateViewer.m_thisOffset, s_charaTableDescCreateViewer.m_virtualOffset, s_charaTableDescCreateViewer.m_function,
-            s_charaTableDescDestroyViewer.m_thisOffset, s_charaTableDescDestroyViewer.m_virtualOffset, s_charaTableDescDestroyViewer.m_function,
-            s_charaTableDescCalcViewer.m_thisOffset, s_charaTableDescCalcViewer.m_virtualOffset, s_charaTableDescCalcViewer.m_function,
-            0x1F, 0,
-            s_charaTableDescDrawViewer.m_thisOffset, s_charaTableDescDrawViewer.m_virtualOffset, s_charaTableDescDrawViewer.m_function,
-            0x3B, 1,
-            s_charaTableDescViewerCalcAfter.m_thisOffset, s_charaTableDescViewerCalcAfter.m_virtualOffset,
-            s_charaTableDescViewerCalcAfter.m_function,
-            0x4D, 0,
-        },
-    },
-    {
-        const_cast<char*>(s_CCharaPcs_PART_801D914C),
-        {
-            s_charaTableDescPartCreate.m_thisOffset, s_charaTableDescPartCreate.m_virtualOffset, s_charaTableDescPartCreate.m_function,
-            s_charaTableDescPartDestroy.m_thisOffset, s_charaTableDescPartDestroy.m_virtualOffset, s_charaTableDescPartDestroy.m_function,
-            s_charaTableDescPartCalc.m_thisOffset, s_charaTableDescPartCalc.m_virtualOffset, s_charaTableDescPartCalc.m_function,
-            0x1F, 0,
-            s_charaTableDescPartDraw.m_thisOffset, s_charaTableDescPartDraw.m_virtualOffset, s_charaTableDescPartDraw.m_function,
-            0x3B, 1,
-            s_charaTableDescPartCalcAfter.m_thisOffset, s_charaTableDescPartCalcAfter.m_virtualOffset, s_charaTableDescPartCalcAfter.m_function,
-            0x4D, 0,
-        },
-    },
-};
 
 inline void* operator new(unsigned long, void* ptr)
 {
@@ -299,14 +218,6 @@ extern const float FLOAT_80330340 = -10000000000.0f;
 static const char s_charaDumpAnimHdr2[] = "no  t num name           lv  mask     addr     banksize banksum  histroy\n";
 static const char s_charaDumpAnimSep[] = "--- - --- -------------- --- -------- -------- -------- -------- --------\n";
 static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %14s %3d %08x %08x %8d %8d %8d\n";
-static const char* s_charaKindPathParts[][3] = {
-    {lbl_80330228, lbl_8033022C, lbl_80330230},
-    {lbl_80330238, lbl_8033023C, lbl_80330230},
-    {lbl_80330240, lbl_80330244, lbl_80330230},
-    {lbl_80330248, lbl_8033024C, lbl_80330230},
-    {lbl_80330250, lbl_80330254, lbl_80330230},
-    {lbl_80330258, lbl_8033025C, lbl_80330230},
-};
 
 #pragma dont_inline on
 template class CPtrArray<CCharaPcs::CLoadPdt*>;
@@ -317,6 +228,9 @@ template class CPtrArray<CCharaPcs::CLoadModel*>;
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadModel) == 0x28);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadAnim) == 0x74);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadTexture) == 0x2C);
+STATIC_ASSERT(offsetof(CCharaPcs::CLoadAnim, m_pointCount) == 0x2C);
+STATIC_ASSERT(offsetof(CCharaPcs::CLoadAnim, m_points) == 0x2E);
+STATIC_ASSERT(offsetof(CCharaPcs::CLoadAnim, m_playbackFlags) == 0x70);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadPdt) == 0x20);
 STATIC_ASSERT(sizeof(CCharaPcs::CCameraFrame) == 0x20);
 STATIC_ASSERT(offsetof(CCharaPcs, m_cameraFrameCount) == 0x04);
@@ -466,7 +380,7 @@ static int LoadAnimFromDisk(
     CCharaPcs* self, int charaKind, int charaNo, const char* animName, int mergeFileId, int mergeFlags)
 {
     char path[0x100];
-    const char** pathParts = s_charaKindPathParts[charaKind];
+    const char** pathParts = CCharaPcs::m_modelTable[charaKind];
     sprintf(path, s_charaAnimPathFmt, pathParts[0], pathParts[1], charaNo, animName);
 
     CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
@@ -529,7 +443,7 @@ static inline void PruneUnsharedAnimRefs(CCharaPcs* self, CCharaPcs::CLoadAnim* 
 
 static inline void BuildCharaBasePath(int charaKind, unsigned long charaNo, char* outPath)
 {
-    const char** pathParts = s_charaKindPathParts[charaKind];
+    const char** pathParts = CCharaPcs::m_modelTable[charaKind];
     sprintf(outPath, s_charaBasePathFmt, pathParts[0], pathParts[1], static_cast<int>(charaNo), pathParts[1],
             static_cast<int>(charaNo), pathParts[2]);
 }
@@ -548,11 +462,6 @@ static inline CMemory::CStage* HandleTextureStage(int charaKind)
     int allocStageMode = CharaPcs.m_charaAllocStage;
     int index = charaKind == 4 ? 3 : 1;
     return GET_CHARA_ALLOC_STAGE_S(allocStageMode, (&CharaPcs.m_viewerModelStage)[index]);
-}
-
-static inline Mtx* ModelLocalMtx(CChara::CModel* model)
-{
-    return reinterpret_cast<Mtx*>(Ptr(model, 8));
 }
 
 static inline _GXColor BlendColor(const _GXColor& a, const _GXColor& b, float t)
@@ -726,7 +635,7 @@ void CCharaPcs::Quit()
  */
 int CCharaPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(&PTR_s_CCharaPcs_GAME_[index]);
+    return reinterpret_cast<int>(&m_table[index]);
 }
 
 /*
@@ -969,7 +878,7 @@ int CCharaPcs::correctLoadAnimAmem()
     for (int i = 0; i < loadAnimCount; i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
-        const int animEnd = static_cast<int>(anim->m_bankSize) + anim->m_bankAddress;
+        const int animEnd = static_cast<int>(anim->GetBankSize()) + anim->GetAmemAddress();
         if (maxEnd < animEnd) {
             maxEnd = animEnd;
         }
@@ -987,8 +896,8 @@ int CCharaPcs::correctLoadAnimAmem()
 
         for (int i = 0; i < loadAnimCount; i++) {
             CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-            const unsigned int animOffset = static_cast<unsigned int>(loadAnim->m_anim->m_bankAddress);
-            const int animSize = static_cast<int>(loadAnim->m_anim->m_bankSize);
+            const unsigned int animOffset = static_cast<unsigned int>(loadAnim->m_anim->GetAmemAddress());
+            const int animSize = static_cast<int>(loadAnim->m_anim->GetBankSize());
             if (animOffset < static_cast<unsigned int>(scanOffset)) {
                 continue;
             }
@@ -1007,7 +916,7 @@ int CCharaPcs::correctLoadAnimAmem()
                 reinterpret_cast<void*>(static_cast<int>(animOffset) + m_amemStage->m_heapTop),
                 static_cast<unsigned long>(animSize));
 
-            loadAnim->m_anim->m_bankAddress = compactedSize + chunkSize;
+            loadAnim->m_anim->SetAmemAddress(compactedSize + chunkSize);
             chunkSize += animSize;
         }
 
@@ -1038,31 +947,17 @@ int CCharaPcs::correctLoadAnimAmem()
 
 /*
  * --INFO--
- * PAL Address: 0x8007999c
+ * PAL Address: 0x8007999C
  * PAL Size: 420b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80084aa4
+ * EN Size: 232b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CCharaPcs::onScriptChanging(char*)
 {
     for (int i = 0; i < 5; i++) {
-        const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
-        CColor shade;
-
-        float scale = static_cast<float>(i);
-        scale *= FLOAT_80330308;
-        shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
-        shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
-        shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
-        shade.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
-        CColor shadeCopy(shade);
-
-        m_viewerChoiceColor[i].color.r = shadeCopy.color.r;
-        m_viewerChoiceColor[i].color.g = shadeCopy.color.g;
-        m_viewerChoiceColor[i].color.b = shadeCopy.color.b;
-        m_viewerChoiceColor[i].color.a = shadeCopy.color.a;
+        m_viewerChoiceColor[i] = CColor(0xFF, 0xFF, 0xFF, 0xFF) * (static_cast<float>(i) * FLOAT_80330308);
     }
 
     m_overlapEnabled = 0;
@@ -1104,9 +999,8 @@ void CCharaPcs::calcAfter()
     for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
-        if (anim->GetRef() == 1 && anim->m_bank != 0) {
-            operator delete(anim->m_bank);
-            anim->m_bank = 0;
+        if (anim->GetRef() == 1) {
+            anim->ReleaseBank();
         }
     }
 
@@ -1114,7 +1008,7 @@ void CCharaPcs::calcAfter()
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         const int bankRefCount = loadAnim->m_anim->GetRef();
         if (bankRefCount == 1) {
-            loadAnim->m_anim->m_lastFrame++;
+            loadAnim->m_anim->AddHistory();
         }
     }
 }
@@ -1132,11 +1026,7 @@ void CCharaPcs::ReleaseAllAnimBank()
             continue;
         }
 
-        void*& bankPtr = loadAnim->m_anim->m_bank;
-        if (bankPtr != 0) {
-            operator delete(bankPtr);
-            bankPtr = 0;
-        }
+        loadAnim->m_anim->ReleaseBank();
     }
 }
 
@@ -1153,11 +1043,8 @@ void CCharaPcs::ReleaseUnusedAnimBank()
             continue;
         }
 
-        void*& bankPtr = loadAnim->m_anim->m_bank;
-        const int bankRefCount = loadAnim->m_anim->GetRef();
-        if (bankRefCount == 1 && bankPtr != 0) {
-            operator delete(bankPtr);
-            bankPtr = 0;
+        if (loadAnim->m_anim->GetRef() == 1) {
+            loadAnim->m_anim->ReleaseBank();
         }
     }
 }
@@ -1183,19 +1070,14 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
 
-        if (anim->m_bank && releaseSize < anim->m_lastFrame) {
-            releaseSize = anim->m_lastFrame;
+        if (anim->IsBanked() && releaseSize < anim->GetHistory()) {
+            releaseSize = anim->GetHistory();
             releaseAnim = loadAnim;
         }
     }
 
     if (releaseAnim != 0) {
-        CChara::CAnim* releaseAnimData = releaseAnim->m_anim;
-        void* bankPtr = releaseAnimData->m_bank;
-        if (bankPtr != 0) {
-            operator delete(bankPtr);
-            releaseAnimData->m_bank = 0;
-        }
+        releaseAnim->m_anim->ReleaseBank();
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(s_charaReleaseAnimBankFmt), releaseSize, releaseAnim->m_name);
@@ -1291,7 +1173,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
                     GX_FALSE);
 
                 Mtx modelMtx;
-                PSMTXCopy(*ModelLocalMtx(handle->m_model), modelMtx);
+                PSMTXCopy(handle->m_model->m_matrix, modelMtx);
                 worldPositions[outIndex].x = modelMtx[0][3];
                 worldPositions[outIndex].y = modelMtx[1][3];
                 worldPositions[outIndex].z = modelMtx[2][3];
@@ -2248,7 +2130,7 @@ CCharaPcs::CHandle::CHandle()
 
 	for (int i = 0; i < 64; ++i)
 	{
-		m_animSlot[i] = (CRef*)nullptr;
+		m_animSlot[i] = 0;
 	}
 
 	// PDT load ref
@@ -2307,7 +2189,7 @@ CCharaPcs::CHandle::~CHandle()
 
     CharaPcs.releaseUnuseLoadModel(0);
     {
-        CRef** slotPtr = &m_animSlot[0];
+        CLoadAnim** slotPtr = &m_animSlot[0];
         for (int i = 0; i < 64; i++, slotPtr++) {
             CRef* animRef = *slotPtr;
             if (animRef != 0) {
@@ -2450,10 +2332,14 @@ attach:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80075E34
+ * PAL Size: 2352b
+ * EN Address: 0x800881D4
+ * EN Size: 1624b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCharaPcs::CHandle::LoadModel(
+int CCharaPcs::CHandle::LoadModel(
     int charaKind, unsigned long charaNo, unsigned long textureVariant, unsigned long unusedArg, int mergeFileId,
     int mergeFlags, int specialModelStage)
 {
@@ -2544,7 +2430,7 @@ foundModel:
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle == 0) {
-            return;
+            return 0;
         }
 
         File.Read(fileHandle);
@@ -2622,72 +2508,87 @@ foundModel:
             m_pdtLoadRef->AddRef();
         }
     }
+    return 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800756FC
+ * PAL Size: 548b
+ * EN Address: 0x800889b4
+ * EN Size: 332b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int unusedArg, int mergeFileId, int mergeFlags)
+{
+    (void)unusedArg;
+
+    CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
+    if (loadAnim == 0) {
+        return LoadAnimFromDisk(&CharaPcs, charaKind, charaNo, animName, mergeFileId, mergeFlags);
+    }
+    return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800754E8
+ * PAL Size: 532b
+ * EN Address: 0x80088bec
+ * EN Size: 264b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CCharaPcs::CHandle::FreeAnim(int animIndex)
+{
+    if (animIndex == -1) {
+        for (int i = 0; i < 64; i++) {
+            ReleaseHandleAnimSlot(this, i);
+        }
+        PruneUnsharedAnimRefs(&CharaPcs, 0);
+        return;
+    }
+
+    CLoadAnim* previousAnim = m_animSlot[animIndex];
+    if (previousAnim == 0) {
+        return;
+    }
+
+    ReleaseSharedNonNull(m_animSlot[animIndex]);
+    PruneUnsharedAnimRefs(&CharaPcs, m_animSlot[animIndex]);
+    m_animSlot[animIndex] = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80075920
+ * PAL Size: 1300b
+ * EN Address: 0x8008882c
+ * EN Size: 392b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CCharaPcs::CHandle::LoadAnim(
     char* animName, int animIndex, int animFlags, int charaKind, int charaNo, int mergeFileId, int mergeFlags)
 {
-    if (animIndex == -1) {
-        CRef** slotPtr = &m_animSlot[0];
-        for (int i = 0; i < 64; i++, slotPtr++) {
-            CRef* animRef = *slotPtr;
-            if (animRef != 0) {
-                ReleaseShared(*slotPtr);
-            }
-        }
-        PruneUnsharedAnimRefs(&CharaPcs, 0);
-    } else {
-        CLoadAnim* previousAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
-        if (previousAnim != 0) {
-            ReleaseSharedNonNull(m_animSlot[animIndex]);
-            PruneUnsharedAnimRefs(&CharaPcs, reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]));
-            m_animSlot[animIndex] = 0;
-        }
+    FreeAnim(animIndex);
+
+    if (CharaPcs.LoadAnim(charaKind == -1 ? m_charaKind : charaKind,
+                         charaNo == -1 ? m_charaNo : charaNo,
+                         animName, 0, mergeFileId, mergeFlags) == 0) {
+        return 0;
     }
 
-    int resolvedKind;
-    if (charaKind == -1) {
-        resolvedKind = m_charaKind;
-    } else {
-        resolvedKind = charaKind;
-    }
-    int resolvedNo;
-    if (charaNo == -1) {
-        resolvedNo = m_charaNo;
-    } else {
-        resolvedNo = charaNo;
-    }
-
-    CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, resolvedKind, resolvedNo, animName);
-    if (loadAnim == 0) {
-        if (LoadAnimFromDisk(&CharaPcs, resolvedKind, resolvedNo, animName, mergeFileId, mergeFlags) == 0) {
-            return 0;
-        }
-    }
-
-    if (charaKind == -1) {
-        charaKind = m_charaKind;
-    }
-    if (charaNo == -1) {
-        charaNo = m_charaNo;
-    }
-    loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
+    CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, charaKind == -1 ? m_charaKind : charaKind,
+                                       charaNo == -1 ? m_charaNo : charaNo, animName);
 
     m_animSlot[animIndex] = loadAnim;
-    reinterpret_cast<CRef*>(loadAnim)->AddRef();
+    loadAnim->AddRef();
 
-    *reinterpret_cast<unsigned int*>(Ptr(m_animSlot[animIndex], 0x70)) = static_cast<unsigned int>(animFlags);
-    {
-        unsigned char& flags1 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
-        flags1 = static_cast<unsigned char>(__rlwimi(flags1, animFlags, 7, 24, 24));
-        unsigned char& flags2 = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex])->m_anim->m_flags;
-        flags2 = static_cast<unsigned char>(__rlwimi(flags2, animFlags, 5, 25, 25));
-    }
+    m_animSlot[animIndex]->m_playbackFlags = static_cast<unsigned int>(animFlags);
+    m_animSlot[animIndex]->m_anim->m_flagsBits.m_blendEnabled = animFlags & 1;
+    m_animSlot[animIndex]->m_anim->m_flagsBits.m_clampFrames = (animFlags & 2) != 0;
 
     return 1;
 }
@@ -2709,22 +2610,6 @@ int CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
  * Address:	TODO
  * Size:	TODO
  */
-int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int unusedArg, int mergeFileId, int mergeFlags)
-{
-    (void)unusedArg;
-
-    CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
-    if (loadAnim == 0) {
-        return LoadAnimFromDisk(&CharaPcs, charaKind, charaNo, animName, mergeFileId, mergeFlags);
-    }
-    return 1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CCharaPcs::CHandle::FreeModel()
 {
 	// TODO
@@ -2732,33 +2617,12 @@ void CCharaPcs::CHandle::FreeModel()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::CHandle::FreeAnim(int animIndex)
-{
-    if (animIndex == -1) {
-        for (int i = 0; i < 64; i++) {
-            ReleaseHandleAnimSlot(this, i);
-        }
-        PruneUnsharedAnimRefs(&CharaPcs, 0);
-        return;
-    }
-
-    CLoadAnim* previousAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
-    if (previousAnim == 0) {
-        return;
-    }
-
-    ReleaseSharedNonNull(m_animSlot[animIndex]);
-    PruneUnsharedAnimRefs(&CharaPcs, reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]));
-    m_animSlot[animIndex] = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80075400
+ * PAL Size: 232b
+ * EN Address: 0x80088cf4
+ * EN Size: 304b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int blendMode, int forceSet)
 {
@@ -2774,7 +2638,7 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
         if (animIndex == -1) {
             anim = 0;
         } else {
-            CLoadAnim* loadAnim = reinterpret_cast<CLoadAnim*>(m_animSlot[animIndex]);
+            CLoadAnim* loadAnim = m_animSlot[animIndex];
             anim = loadAnim != 0 ? loadAnim->m_anim : 0;
         }
 
@@ -2835,18 +2699,15 @@ static inline void GetCameraClipPlanes(float* nearOut, float* farOut)
     }
 }
 
-#pragma opt_common_subs off
-
-#pragma opt_dead_assignments off
-
-#pragma opt_lifetimes off
-
-#pragma opt_propagation off
-
-#pragma global_optimizer off
-
-#pragma optimization_level 3
-
+/*
+ * --INFO--
+ * PAL Address: 0x80074598
+ * PAL Size: 3556b
+ * EN Address: 0x80088F08
+ * EN Size: 3248b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 {
     if (m_model == 0) {
@@ -2879,8 +2740,8 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     if (immediatePass != 0 && drawPass == 0 && (m_model->m_lightAlpha < kCharaOne || (flags & 0x40000) != 0)) {
         if (immediatePass != 0) {
             ppvDrawMng.AddPrim(-m_sortZ, this);
-            return;
         }
+        return;
     }
 
     if (drawPass == 3 && (flags & 0x81C) == 0) {
@@ -2890,44 +2751,17 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         return;
     }
 
+    const unsigned int lightBank = (flags >> 19) & 1;
     if (drawPass != 1 && drawPass != 2 && (flags & 0x200000) == 0) {
-        const unsigned int lightBank = (flags >> 19) & 1;
         const float phase = m_colorPhase * FLOAT_80330290;
         unsigned int phaseIndex = static_cast<int>(phase);
         const float blendT = static_cast<float>(fmod(static_cast<double>(phase), DOUBLE_80330298));
         CColor shade;
         if ((m_flags & 0x20000) != 0 && drawPass != 3) {
-            CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-            shade.color.r = white.color.r;
-            shade.color.g = white.color.g;
-            shade.color.b = white.color.b;
-            shade.color.a = white.color.a;
+            shade = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         } else {
-            CColor next;
-            next.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.r) * blendT));
-            next.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.g) * blendT));
-            next.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.b) * blendT));
-            next.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.a) * blendT));
-            CColor nextCopy(next);
-
-            CColor cur;
-            const float inv = kCharaOne - blendT;
-            cur.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.r) * inv));
-            cur.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.g) * inv));
-            cur.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.b) * inv));
-            cur.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.a) * inv));
-            CColor curCopy(cur);
-
-            CColor blended;
-            blended.color.r = static_cast<unsigned char>(curCopy.color.r + nextCopy.color.r);
-            blended.color.g = static_cast<unsigned char>(curCopy.color.g + nextCopy.color.g);
-            blended.color.b = static_cast<unsigned char>(curCopy.color.b + nextCopy.color.b);
-            blended.color.a = static_cast<unsigned char>(curCopy.color.a + nextCopy.color.a);
-            CColor blendedCopy(blended);
-            shade.color.r = blendedCopy.color.r;
-            shade.color.g = blendedCopy.color.g;
-            shade.color.b = blendedCopy.color.b;
-            shade.color.a = blendedCopy.color.a;
+            shade = CharaPcs.m_viewerChoiceColor[phaseIndex] * (kCharaOne - blendT) +
+                    CharaPcs.m_viewerChoiceColor[phaseIndex + 1] * blendT;
         }
 
         const CColor3& ambientBase = CColor3(CharaPcs.m_viewerAmbientColor[lightBank]);
@@ -2954,7 +2788,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         Vec lightPos;
         Mtx modelMtx;
-        PSMTXCopy(*ModelLocalMtx(m_model), modelMtx);
+        PSMTXCopy(m_model->m_matrix, modelMtx);
         lightPos.x = modelMtx[0][3];
         lightPos.y = modelMtx[1][3];
         lightPos.z = modelMtx[2][3];
@@ -2979,71 +2813,28 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     } else if (drawPass == 2) {
         CVector modelPos;
         Mtx modelMtx;
-        Vec delta;
-        PSMTXCopy(*ModelLocalMtx(m_model), modelMtx);
+        PSMTXCopy(m_model->m_matrix, modelMtx);
         modelPos.x = modelMtx[0][3];
         modelPos.y = modelMtx[1][3];
         modelPos.z = modelMtx[2][3];
 
-        const CVector& focusPos = CVector(CharaPcs.m_texShadowPos);
-        Vec shadowPos;
-        Vec shadowBase;
-        Vec scaledDeltaCopy;
-        Vec eye;
-        CVector deltaTmp;
-        PSVECSubtract((Vec*)&focusPos, modelPos, deltaTmp);
-        delta.x = deltaTmp.x;
-        delta.y = deltaTmp.y;
-        delta.z = deltaTmp.z;
+        CVector delta = CVector(CharaPcs.m_texShadowPos) - modelPos;
         if (delta.x == kCharaZero && delta.z == kCharaZero) {
             return;
         }
 
-        const float distRatio = PSVECMag(&delta) / CharaPcs.m_texShadowRadius;
+        const float distRatio = PSVECMag(delta) / CharaPcs.m_texShadowRadius;
         if (distRatio > kCharaOne) {
             return;
         }
         const float shadowFade = kCharaOne - distRatio;
+        delta.Normalize();
 
-        reinterpret_cast<CVector*>(&delta)->Normalize();
-
-        {
-            CVector up(kCharaZero, FLOAT_803302A8, kCharaZero);
-            CVector eyeTmp;
-            PSVECAdd(modelPos, up, eyeTmp);
-            eye.x = eyeTmp.x;
-            eye.y = eyeTmp.y;
-            eye.z = eyeTmp.z;
-        }
-
+        CVector eye = modelPos + CVector(kCharaZero, FLOAT_803302A8, kCharaZero);
         CVector lookAtUp(kCharaZero, kCharaOne, kCharaZero);
-        CVector shadowUp(kCharaZero, FLOAT_803302A8, kCharaZero);
-
-        const float shadowDistance = static_cast<float>(CharaPcs.m_texShadowDistance);
-        CVector scaledDelta;
-        PSVECScale(&delta, scaledDelta, shadowDistance);
-
-        {
-            scaledDeltaCopy.x = scaledDelta.x;
-            scaledDeltaCopy.y = scaledDelta.y;
-            scaledDeltaCopy.z = scaledDelta.z;
-            CVector baseTmp;
-            PSVECAdd(modelPos, &scaledDeltaCopy, baseTmp);
-            shadowBase.x = baseTmp.x;
-            shadowBase.y = baseTmp.y;
-            shadowBase.z = baseTmp.z;
-        }
-
-        {
-            CVector posTmp;
-            PSVECAdd(&shadowBase, shadowUp, posTmp);
-            shadowPos.x = posTmp.x;
-            shadowPos.y = posTmp.y;
-            shadowPos.z = posTmp.z;
-        }
-
-        C_MTXLookAt(m_shadowViewMtx, reinterpret_cast<Point3d*>(&shadowPos),
-                    static_cast<Vec*>(lookAtUp), reinterpret_cast<Point3d*>(&eye));
+        CVector shadowPos = modelPos + delta * static_cast<float>(CharaPcs.m_texShadowDistance) +
+                            CVector(kCharaZero, FLOAT_803302A8, kCharaZero);
+        C_MTXLookAt(m_shadowViewMtx, shadowPos, lookAtUp, eye);
         PSMTXCopy(m_shadowViewMtx, viewMtx);
 
         float nearZ;
@@ -3115,15 +2906,14 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         if (drawPass == 2) {
             const unsigned short shadowSize = static_cast<unsigned short>(CharaPcs.m_texShadowSize);
             GXSetTexCopySrc(0, 0, shadowSize, shadowSize);
-            GXSetTexCopyDst(static_cast<unsigned short>(CharaPcs.m_texShadowSize),
-                            static_cast<unsigned short>(CharaPcs.m_texShadowSize), GX_CTF_R4, GX_FALSE);
+            GXSetTexCopyDst(CharaPcs.m_texShadowSize, CharaPcs.m_texShadowSize, GX_CTF_R4, GX_FALSE);
             m_shadowTexturePtr = reinterpret_cast<unsigned char*>(CharaPcs.m_texShadowTextureBase) +
                                  CharaPcs.m_texShadowTextureOffset;
             DCInvalidateRange(m_shadowTexturePtr, (CharaPcs.m_texShadowSize * CharaPcs.m_texShadowSize) / 2);
             GXCopyTex(m_shadowTexturePtr, GX_TRUE);
         }
 
-        const int shadowMode = static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(1 - drawPass))) >> 5;
+        const int shadowMode = drawPass == 1;
         m_model->DrawShadow(viewMtx, shadowMode);
 
         if (drawPass == 2) {
@@ -3387,3 +3177,49 @@ void CCharaPcs::GetAnimStage()
 {
 	// TODO
 }
+
+#pragma pool_data off
+CProcessCallbackTable CCharaPcs::m_table[3] = {
+    {
+        const_cast<char*>(s_CCharaPcs_GAME_801D9128),
+        static_cast<CProcessCallback>(&CCharaPcs::create),
+        static_cast<CProcessCallback>(&CCharaPcs::destroy),
+        {
+            {static_cast<CProcessCallback>(&CCharaPcs::calc), 0x1F, 0},
+            {static_cast<CProcessCallback>(&CCharaPcs::drawBefore), 0x36, 1},
+            {static_cast<CProcessCallback>(&CCharaPcs::drawShadow), 0x30, 1},
+            {static_cast<CProcessCallback>(&CCharaPcs::draw), 0x3B, 1},
+            {static_cast<CProcessCallback>(&CCharaPcs::drawOverlap), 0x46, 1},
+            {static_cast<CProcessCallback>(&CCharaPcs::calcAfter), 0x4D, 8},
+        },
+    },
+    {
+        const_cast<char*>(s_CCharaPcs_VIEWER_801D9138),
+        static_cast<CProcessCallback>(&CCharaPcs::createViewer),
+        static_cast<CProcessCallback>(&CCharaPcs::destroyViewer),
+        {
+            {static_cast<CProcessCallback>(&CCharaPcs::calcViewer), 0x1F, 0},
+            {static_cast<CProcessCallback>(&CCharaPcs::drawViewer), 0x3B, 1},
+            {static_cast<CProcessCallback>(&CCharaPcs::calcAfter), 0x4D, 0},
+        },
+    },
+    {
+        const_cast<char*>(s_CCharaPcs_PART_801D914C),
+        static_cast<CProcessCallback>(&CCharaPcs::create),
+        static_cast<CProcessCallback>(&CCharaPcs::destroy),
+        {
+            {static_cast<CProcessCallback>(&CCharaPcs::calc), 0x1F, 0},
+            {static_cast<CProcessCallback>(&CCharaPcs::draw), 0x3B, 1},
+            {static_cast<CProcessCallback>(&CCharaPcs::calcAfter), 0x4D, 0},
+        },
+    },
+};
+
+const char* CCharaPcs::m_modelTable[6][3] = {
+    {lbl_80330228, lbl_8033022C, lbl_80330230},
+    {lbl_80330238, lbl_8033023C, lbl_80330230},
+    {lbl_80330240, lbl_80330244, lbl_80330230},
+    {lbl_80330248, lbl_8033024C, lbl_80330230},
+    {lbl_80330250, lbl_80330254, lbl_80330230},
+    {lbl_80330258, lbl_8033025C, lbl_80330230},
+};

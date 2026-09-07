@@ -120,19 +120,19 @@ void pppRyjMegaBirthDes(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 
 	if (work->m_particleBlock != 0)
 	{
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particleBlock));
+		pppMemFree(work->m_particleBlock);
 		work->m_particleBlock = 0;
 	}
 
 	if (work->m_worldMatrixBlock != 0)
 	{
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_worldMatrixBlock));
+		pppMemFree(work->m_worldMatrixBlock);
 		work->m_worldMatrixBlock = 0;
 	}
 
 	if (work->m_colorBlock != 0)
 	{
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_colorBlock));
+		pppMemFree(work->m_colorBlock);
 		work->m_colorBlock = 0;
 	}
 }
@@ -274,7 +274,7 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 		break;
 	}
 
-	pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[params->m_shapeIndex];
+	pppShapeSt* shape = ppvEnv->m_shapeTablePtr[params->m_shapeIndex];
 	int useTexture = params->m_textureMode == 0;
 	float drawScale = params->m_drawDepthEnabled != 0 ? params->m_drawDepth : kPppRyjMegaBirthZero;
 
@@ -569,7 +569,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 
 				frame = *(u16*)((u8*)particle + 0x1E);
 				shapeAnim =
-					static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[param->m_shapeIndex]->m_animData);
+					static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[param->m_shapeIndex]->m_animData);
 				*(u16*)((u8*)particle + 0x20) = frame;
 				frameData = &shapeAnim->m_frames[frame];
 
@@ -802,25 +802,25 @@ void birth(
 		Vec baseDirection;
 		Vec* direction;
 		pppFMATRIX rot;
-		s32 angle[4];
+		pppIVECTOR4 angle;
 
 		baseDirection.x = *f32_at(payload, 0xA0);
 		baseDirection.y = *f32_at(payload, 0xA4);
 		baseDirection.z = *f32_at(payload, 0xA8);
 
-		angle[0] = (s32)(range * Math.RandF() - spread);
-		angle[0] = (s32)((float)(angle[0] << 15) / kPppRyjMegaBirthHalfTurnDegrees);
-		angle[1] = (s32)(range * Math.RandF() - spread);
-		angle[1] = (s32)((float)(angle[1] << 15) / kPppRyjMegaBirthHalfTurnDegrees);
-		angle[2] = (s32)(range * Math.RandF() - spread);
-		angle[2] = (s32)((float)(angle[2] << 15) / kPppRyjMegaBirthHalfTurnDegrees);
+		angle.x = (s32)(range * Math.RandF() - spread);
+		angle.x = (s32)((float)(angle.x << 15) / kPppRyjMegaBirthHalfTurnDegrees);
+		angle.y = (s32)(range * Math.RandF() - spread);
+		angle.y = (s32)((float)(angle.y << 15) / kPppRyjMegaBirthHalfTurnDegrees);
+		angle.z = (s32)(range * Math.RandF() - spread);
+		angle.z = (s32)((float)(angle.z << 15) / kPppRyjMegaBirthHalfTurnDegrees);
 
 		if ((payload[0x2A] == 2) || (payload[0x2A] == 3)) {
-			angle[0] = 0;
-			angle[1] = 0;
+			angle.x = 0;
+			angle.y = 0;
 		}
 
-		pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angle);
+		pppGetRotMatrixXYZ(rot, &angle);
 		PSMTXMultVecSR(rot.value, &baseDirection, (Vec*)(particlePayload + 0x10));
 		*f32_at(particlePayload, 0x10) = *f32_at(particlePayload, 0x10) * *f32_at(payload, 0xD8);
 		*f32_at(particlePayload, 0x14) = *f32_at(particlePayload, 0x14) * *f32_at(payload, 0xDC);
@@ -985,7 +985,7 @@ mesh_block:
 		Vec* pathBase = reinterpret_cast<Vec*>(pObject->m_drawMatrixPtr);
 
 		if (pathIndex >= 0) {
-			s16* pathInfo = (s16*)(*(int*)&ppvEnv->m_particleColors[1] + pathIndex * 8);
+			s16* pathInfo = reinterpret_cast<s16*>(ppvEnv->m_shapeGroupPtr + (pathIndex));
 			float sampleT;
 			float m1;
 			float m2;

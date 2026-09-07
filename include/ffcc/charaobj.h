@@ -15,7 +15,7 @@ class CGObjWork;
 class CFlatRuntime2;
 class CVector;
 
-void la(CGObject*);
+int la(CGObject*);
 void SAFE_CAST_WORK(CGObjWork*);
 
 extern int gCGCharaObjCreateSerial;
@@ -90,8 +90,8 @@ public:
 	void StaticFrame();
 	static void combi2();
 	void sendCombiToScript(CGCharaObj*, int, int);
-	void scCheckItem(CCombi2Set*, CGCharaObj*, int);
-	void scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int);
+	static int scCheckItem(CCombi2Set*, CGCharaObj*, int);
+	static int scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int);
 	static int searchCombi(int, CGPartyObj **, int&);
 	int GetCID();
 

@@ -69,21 +69,7 @@ static inline CFont* GetTmpArtiFont(CMenuPcs* menu)
  */
 inline int CMenuPcs::TmpArtiCtrlCur()
 {
-    bool hasInput = false;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
-        hasInput = true;
-    }
-
-    unsigned int rawPress;
-    if (hasInput) {
-        rawPress = 0;
-    } else {
-        unsigned int padIndex = 0;
-        int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
-        padIndex &= ~mask;
-        rawPress = Pad.GetPadInputs()[padIndex].buttonDown[0];
-    }
-    short buttonDown = rawPress & 0xffff;
+    short buttonDown = Pad.GetButtonDown(0);
 
     if (buttonDown == 0) {
         return 0;
@@ -224,7 +210,7 @@ void CMenuPcs::TmpArtiDraw()
 			float rawAlpha = entry->alpha;
 			float alpha = rawAlpha;
 
-			if (caravanWork->m_treasures[i] < 0) {
+			if (caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + i] < 0) {
 				tex = 0x34;
 				alpha = (float)(kTmpArtiHalfDouble * (double)rawAlpha);
 			}
@@ -246,7 +232,7 @@ void CMenuPcs::TmpArtiDraw()
 
 	entry = GetTmpArtiEntries(this);
 	for (int i = 0; i < 4; i++) {
-		short icon = caravanWork->m_treasures[i];
+		short icon = caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + i];
 		if (icon >= 0) {
 			int posX = (int)TmpArtiIntToFloat(entry->x + entry->width - 0x10);
 			int posY = (int)(TmpArtiIntToFloat(entry->y + 6) - kTmpArtiOne);
@@ -263,12 +249,12 @@ void CMenuPcs::TmpArtiDraw()
 
 	entry = GetTmpArtiEntries(this);
 	for (int i = 0; i < 4; i++) {
-		if (caravanWork->m_treasures[i] >= 0) {
+		if (caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + i] >= 0) {
 			float alpha = entry->alpha;
 			CColor textColor(0xFF, 0xFF, 0xFF, kTmpArtiColorMax * alpha);
 			font->SetColor(textColor.color);
 
-			const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[caravanWork->m_treasures[i] * 5 + 4];
+			const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + i] * 5 + 4];
 			float width = font->GetWidth(text);
 			float posX = (float)((((float)entry->width - width) * kTmpArtiHalfDouble) + (float)entry->x);
 			float posY = (float)(entry->y + 11);

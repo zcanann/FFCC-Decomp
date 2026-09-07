@@ -25,6 +25,7 @@ public:
 
 	void Create(void*);
 	void Destroy();
+    char* GetMes(int);
 
     DataEntry& Data(int index) { return m_data[index]; }
     const DataEntry& Data(int index) const { return m_data[index]; }

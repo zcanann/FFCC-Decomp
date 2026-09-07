@@ -284,8 +284,9 @@ public:
     short m_equipment[4];                       // 0x00AC weapon[0], armor[1], tribal[2], accessory[3]
     unsigned short m_inventoryItemCount;        // 0x00B4
     short m_inventoryItems[64];                 // 0x00B6
-    short m_artifacts[96];                      // 0x0136
-    short m_treasures[4];                       // 0x01F6
+    enum { kPermanentArtifactCount = 96, kTemporaryArtifactCount = 4,
+           kArtifactCount = kPermanentArtifactCount + kTemporaryArtifactCount };
+    short m_artifacts[kArtifactCount];          // 0x0136, temporary artifacts start at 0x01F6
     unsigned char m_treasureFlags;              // 0x01FE
     unsigned char m_moneyFlags;                 // 0x01FF
     int m_gil;                                  // 0x0200
@@ -357,6 +358,9 @@ public:
 }; // Size 0xC30
 
 STATIC_ASSERT(sizeof(CCaravanWork) == 0xC30);
+STATIC_ASSERT(offsetof(CCaravanWork, m_artifacts) == 0x136);
+STATIC_ASSERT(offsetof(CCaravanWork, m_artifacts) + CCaravanWork::kPermanentArtifactCount * sizeof(short) == 0x1F6);
+STATIC_ASSERT(offsetof(CCaravanWork, m_treasureFlags) == 0x1FE);
 STATIC_ASSERT(sizeof(CCaravanWork::CLetterWork) == 0x0C);
 STATIC_ASSERT(sizeof(CRomLetterWork) == 0x3E);
 STATIC_ASSERT(offsetof(CCaravanWork, m_targetCursorPosA) == 0x0BAC);

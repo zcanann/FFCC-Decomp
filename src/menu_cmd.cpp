@@ -1800,22 +1800,22 @@ void CMenuPcs::GetCmdItem()
 	}
 
 	write2 = list + count;
-	if (IsMagicArti(caravanWork->m_treasures[0])) {
+	if (IsMagicArti(caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + 0])) {
 		count++;
 		write2++;
 		*write2 = 0xa0;
 	}
-	if (IsMagicArti(caravanWork->m_treasures[1])) {
+	if (IsMagicArti(caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + 1])) {
 		count++;
 		write2++;
 		*write2 = 0xa1;
 	}
-	if (IsMagicArti(caravanWork->m_treasures[2])) {
+	if (IsMagicArti(caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + 2])) {
 		count++;
 		write2++;
 		*write2 = 0xa2;
 	}
-	if (IsMagicArti(caravanWork->m_treasures[3])) {
+	if (IsMagicArti(caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + 3])) {
 		count++;
 		write2[1] = 0xa3;
 	}

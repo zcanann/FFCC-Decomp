@@ -1379,10 +1379,10 @@ void GbaQueue::LoadPlayerStat()
 					}
 				}
 
-				*reinterpret_cast<unsigned short*>(entry + 0xBA) = caravanWork->m_treasures[0];
-				*reinterpret_cast<unsigned short*>(entry + 0xBC) = caravanWork->m_treasures[1];
-				*reinterpret_cast<unsigned short*>(entry + 0xBE) = caravanWork->m_treasures[2];
-				*reinterpret_cast<unsigned short*>(entry + 0xC0) = caravanWork->m_treasures[3];
+				*reinterpret_cast<unsigned short*>(entry + 0xBA) = caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + 0];
+				*reinterpret_cast<unsigned short*>(entry + 0xBC) = caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + 1];
+				*reinterpret_cast<unsigned short*>(entry + 0xBE) = caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + 2];
+				*reinterpret_cast<unsigned short*>(entry + 0xC0) = caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + 3];
 
 				entry[0xD3] = static_cast<unsigned char>(caravanWork->m_numCmdListSlots);
 				*reinterpret_cast<unsigned short*>(entry + 0xC2) = caravanWork->m_commandListInventorySlotRef[0];

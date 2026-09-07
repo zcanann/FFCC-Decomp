@@ -4050,19 +4050,19 @@ void CMenuPcs::createBonus()
 			activeCount++;
 
 			unsigned int* slot = &Game.m_scriptFoodBase[i];
-			int treasure0 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_treasures[0];
+			int treasure0 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[CCaravanWork::kPermanentArtifactCount + 0];
 			if (treasure0 > 0) {
 				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure0;
 			}
-			int treasure1 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_treasures[1];
+			int treasure1 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[CCaravanWork::kPermanentArtifactCount + 1];
 			if (treasure1 > 0) {
 				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure1;
 			}
-			int treasure2 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_treasures[2];
+			int treasure2 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[CCaravanWork::kPermanentArtifactCount + 2];
 			if (treasure2 > 0) {
 				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure2;
 			}
-			int treasure3 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_treasures[3];
+			int treasure3 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[CCaravanWork::kPermanentArtifactCount + 3];
 			if (treasure3 > 0) {
 				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = (short)treasure3;
 			}

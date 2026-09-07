@@ -14,7 +14,7 @@ struct Vec;
 class PPPIFPARAM;
 
 struct SItemFlatRow {
-	unsigned char m_pad00[2];
+	unsigned short m_kind;
 	unsigned short m_model;
 	unsigned short m_equipFlags;
 	unsigned short m_value;
@@ -36,6 +36,7 @@ struct SItemFlatRow {
 	unsigned char m_pad40[8];
 };
 STATIC_ASSERT(sizeof(SItemFlatRow) == 0x48);
+STATIC_ASSERT(offsetof(SItemFlatRow, m_kind) == 0x00);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_attribute) == 0x08);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_fineValue) == 0x10);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_stage) == 0x0C);

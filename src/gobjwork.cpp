@@ -1,4 +1,5 @@
 #include "ffcc/gobjwork.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/joybus.h"
@@ -19,9 +20,9 @@ extern const double DOUBLE_803309A0;
 __declspec(section ".sdata2") static const char lbl_803309B0[] = "CRef";
 
 namespace {
-static inline unsigned short* GetItemDataPtr(int itemIdx)
+static inline SItemFlatRow* GetItemDataPtr(int itemIdx)
 {
-	return (unsigned short*)(Game.unkCFlatData0[2] + (itemIdx * 0x48));
+	return &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemIdx];
 }
 
 struct ShoukiByteFlags {
@@ -725,16 +726,16 @@ int CCaravanWork::CanAddTmpArtifact(int numItems)
 {
 	int emptySlots = 0;
 
-	if (m_treasures[0] == -1) {
+	if (m_artifacts[CCaravanWork::kPermanentArtifactCount + 0] == -1) {
 		emptySlots++;
 	}
-	if (m_treasures[1] == -1) {
+	if (m_artifacts[CCaravanWork::kPermanentArtifactCount + 1] == -1) {
 		emptySlots++;
 	}
-	if (m_treasures[2] == -1) {
+	if (m_artifacts[CCaravanWork::kPermanentArtifactCount + 2] == -1) {
 		emptySlots++;
 	}
-	if (m_treasures[3] == -1) {
+	if (m_artifacts[CCaravanWork::kPermanentArtifactCount + 3] == -1) {
 		emptySlots++;
 	}
 
@@ -865,8 +866,8 @@ int CCaravanWork::DeleteItem(int itemIndex, int updateJoybus)
 int CCaravanWork::AddTmpArtifact(int itemId, int* outIndex)
 {
     for (int i = 0; i < 4; i++) {
-        if (m_treasures[i] == -1) {
-            m_treasures[i] = (short)itemId;
+        if (m_artifacts[CCaravanWork::kPermanentArtifactCount + i] == -1) {
+            m_artifacts[CCaravanWork::kPermanentArtifactCount + i] = (short)itemId;
             Joybus.SetTmpArti(m_joybusCaravanId, i, itemId);
             if (outIndex != 0) {
                 *outIndex = i;
@@ -1688,8 +1689,8 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
  * --INFO--
  * PAL Address: 0x800a0210
  * PAL Size: 936b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800B48F0
+ * EN Size: 476b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1699,17 +1700,14 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
 	}
 
-	int artifactIndex = 0;
-	CCaravanWork* artifactCur = this;
 	int totalSlots = 0;
-	for (int i = 50; i != 0; i--) {
-		if (artifactIndex < 96) {
-			int artifactId = artifactCur->m_artifacts[0];
+	for (int artifactIndex = 0; artifactIndex < kArtifactCount; artifactIndex++) {
+		if (artifactIndex < kPermanentArtifactCount) {
+			int artifactId = m_artifacts[artifactIndex];
 			if (artifactId > 0) {
-				unsigned short* artifactData =
-					(unsigned short*)(Game.unkCFlatData0[2] + artifactId * 0x48);
-				unsigned short slots = artifactData[3];
-				switch (artifactData[0]) {
+				SItemFlatRow* artifactData = GetItemDataPtr(artifactId);
+				unsigned short slots = artifactData->m_value;
+				switch (artifactData->m_kind) {
 				case 0xDB:
 					totalSlots += slots;
 					break;
@@ -1723,31 +1721,6 @@ void CCaravanWork::SafeDeleteTempItem()
 				}
 			}
 		}
-
-		artifactIndex++;
-		if (artifactIndex < 96) {
-			int artifactId = artifactCur->m_artifacts[1];
-			if (artifactId > 0) {
-				unsigned short* artifactData =
-					(unsigned short*)(Game.unkCFlatData0[2] + artifactId * 0x48);
-				unsigned short slots = artifactData[3];
-				switch (artifactData[0]) {
-				case 0xDB:
-					totalSlots += slots;
-					break;
-				case 0x9F:
-				case 0xB6:
-				case 0xCC:
-				case 0xDF:
-				case 0xE4:
-				default:
-					break;
-				}
-			}
-		}
-
-		artifactCur = (CCaravanWork*)&artifactCur->m_objType;
-		artifactIndex++;
 	}
 
 	totalSlots += (short)m_baseCmdListSlots;
@@ -1761,10 +1734,10 @@ void CCaravanWork::SafeDeleteTempItem()
 	}
 
 	short invalidItem = -1;
-	m_treasures[0] = invalidItem;
-	m_treasures[1] = invalidItem;
-	m_treasures[2] = invalidItem;
-	m_treasures[3] = invalidItem;
+	m_artifacts[CCaravanWork::kPermanentArtifactCount + 0] = invalidItem;
+	m_artifacts[CCaravanWork::kPermanentArtifactCount + 1] = invalidItem;
+	m_artifacts[CCaravanWork::kPermanentArtifactCount + 2] = invalidItem;
+	m_artifacts[CCaravanWork::kPermanentArtifactCount + 3] = invalidItem;
 
 	for (int i = 0; i < 64; i++) {
 		short item = m_inventoryItems[i];
@@ -1790,8 +1763,8 @@ void CCaravanWork::SafeDeleteTempItem()
  * --INFO--
  * PAL Address: 0x8009fa44
  * PAL Size: 1996b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800B4CF0
+ * EN Size: 1956b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1865,12 +1838,12 @@ void CCaravanWork::CalcStatus()
 	int strBonus = 0;
 	int magBonus = 0;
 	int defBonus = 0;
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < kArtifactCount; i++) {
 		int artifactId = m_artifacts[i];
 		if (artifactId > 0) {
-			unsigned short* artifactData = GetItemDataPtr(artifactId);
-			int artifactEffect = artifactData[0];
-			int value = artifactData[3];
+			SItemFlatRow* artifactData = GetItemDataPtr(artifactId);
+			int artifactEffect = artifactData->m_kind;
+			int value = artifactData->m_value;
 
 			switch (artifactEffect) {
 			case 0x9F:
@@ -1916,7 +1889,7 @@ void CCaravanWork::CalcStatus()
 		int equipSlot = m_equipment[equipIdx];
 		if (equipSlot >= 0) {
 			int itemIdx = m_inventoryItems[equipSlot];
-			int itemType = GetItemDataPtr(itemIdx)[0];
+			int itemType = GetItemDataPtr(itemIdx)->m_kind;
 
 			if (itemType == 1) {
 				int weaponRef;
@@ -1927,7 +1900,7 @@ void CCaravanWork::CalcStatus()
 				}
 			}
 
-			unsigned short itemValue = (short)GetItemDataPtr(itemIdx)[3];
+			unsigned short itemValue = (short)GetItemDataPtr(itemIdx)->m_value;
 			if (itemType != 0x45) {
 				if (itemType < 0x45) {
 					if (itemType == 1) {
@@ -1948,7 +1921,7 @@ void CCaravanWork::CalcStatus()
 			m_defense += itemValue;
 			m_baseDefense += itemValue;
 		apply_effect:
-			int itemEffect = GetItemDataPtr(itemIdx)[4];
+			int itemEffect = GetItemDataPtr(itemIdx)->m_attribute;
 			unsigned short effectValue = itemValue;
 			switch (itemEffect) {
 			case 1:
@@ -2413,8 +2386,8 @@ void CCaravanWork::SetCurrentWeaponIdx(int weaponIdx)
  * --INFO--
  * PAL Address: 0x8009f178
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800B6274
+ * EN Size: 124b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2422,7 +2395,7 @@ void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
 {
 	int reset = 0;
 	int weaponItem = GetCmdListItem(weaponIdx);
-	if ((0 < weaponItem) && (*GetItemDataPtr(weaponItem) == 1)) {
+	if ((0 < weaponItem) && (GetItemDataPtr(weaponItem)->m_kind == 1)) {
 		return;
 	}
 
@@ -2616,8 +2589,8 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
  * --INFO--
  * PAL Address: 0x8009f730
  * PAL Size: 352b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800B5828
+ * EN Size: 420b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2645,7 +2618,7 @@ int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdL
 			for (; groupedCount > 0; groupedCount--) {
 				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
 				short itemId = (short)m_inventoryItems[invSlot];
-				int itemType = GetItemDataPtr(itemId)[0];
+				int itemType = GetItemDataPtr(itemId)->m_kind;
 				if (itemType == 1) {
 					itemCmdListIdx = cmdListIdx + i;
 					return 1;
@@ -2670,17 +2643,17 @@ int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdL
  */
 int CCaravanWork::GetArtifactIncludeHpMax()
 {
-	unsigned short* artifactDataBase = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2]);
+	SItemFlatRow* artifactDataBase = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
 	int hpMax = 0;
 
-	for (int artifactIndex = 0; artifactIndex < 100; artifactIndex++) {
-		if (artifactIndex < 0x60) {
+	for (int artifactIndex = 0; artifactIndex < kArtifactCount; artifactIndex++) {
+		if (artifactIndex < kPermanentArtifactCount) {
 			int artifactId = m_artifacts[artifactIndex];
 			if (artifactId > 0) {
-				unsigned short* artifactData = artifactDataBase + (artifactId * 0x24);
-				unsigned short artifactType = artifactData[0];
-				unsigned short artifactValue = artifactData[3];
+				SItemFlatRow* artifactData = &artifactDataBase[artifactId];
+				unsigned short artifactType = artifactData->m_kind;
+				unsigned short artifactValue = artifactData->m_value;
 
 				switch (artifactType) {
 				case 0x9F:

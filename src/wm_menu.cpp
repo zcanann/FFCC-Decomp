@@ -3842,28 +3842,7 @@ void CMenuPcs::DrawMainMenu()
 		frameAlpha = static_cast<float>(-(*pRmm2 * static_cast<double>(m_wmWorldState->m_frameCounter) - *pUmm1));
 	}
 
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor matColor;
-	matColor.r = 0xFF;
-	matColor.g = 0xFF;
-	matColor.b = 0xFF;
-	const double* pAmm1 = &DOUBLE_80331508;
-	matColor.a = static_cast<unsigned char>(static_cast<int>(*pAmm1 * static_cast<double>(frameAlpha)));
-	GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	int bit = 0;
-	do {
-		if (((1 << bit) & 1) != 0) {
-			const float* pZmm1 = &FLOAT_803313dc;
-			const float* pOmm2 = &FLOAT_803313e8;
-			Sprt* const entry = &m_wm.m_frameInfo->m_sprites[bit];
-			MenuPcs.DrawRect(entry->m_flags, static_cast<float>(entry->m_x),
-			                 static_cast<float>(entry->m_y), static_cast<float>(entry->m_width), static_cast<float>(entry->m_height),
-			                 entry->m_u, entry->m_v,
-			                 *pOmm2, *pOmm2, *pZmm1);
-		}
-		bit++;
-	} while (bit < 2);
+	DrawWMFrame0(1, frameAlpha);
 
 	if (m_wmWorldState->m_mainState >= 1 && m_wmWorldState->m_mainState <= 3) {
 		const int tileState = m_wmWorldState->m_mainState;
@@ -4653,28 +4632,7 @@ void CMenuPcs::DrawCMakeMenu()
 		frameAlpha = static_cast<float>(-(*pRate * static_cast<double>(m_wmWorldState->m_frameCounter) - *pOne));
 	}
 
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor frameColor;
-	frameColor.r = 0xFF;
-	frameColor.g = 0xFF;
-	frameColor.b = 0xFF;
-	const double* pAlphaScale = &DOUBLE_80331508;
-	frameColor.a = static_cast<unsigned char>(static_cast<int>(*pAlphaScale * static_cast<double>(frameAlpha)));
-	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	int bit = 0;
-	do {
-		if (((1 << bit) & 3) != 0) {
-			const float* pZeroF = &FLOAT_803313dc;
-			const float* pOneF = &FLOAT_803313e8;
-			Sprt* const entry = &m_wm.m_frameInfo->m_sprites[bit];
-			MenuPcs.DrawRect(entry->m_flags, static_cast<float>(entry->m_x),
-			                 static_cast<float>(entry->m_y), static_cast<float>(entry->m_width), static_cast<float>(entry->m_height),
-			                 entry->m_u, entry->m_v,
-			                 *pOneF, *pOneF, *pZeroF);
-		}
-		bit++;
-	} while (bit < 2);
+	DrawWMFrame0(3, frameAlpha);
 
 	short contentState;
 	WmWorldState* const contentWS = m_wmWorldState;
@@ -10581,30 +10539,7 @@ LAB_next:
 		const double* pOneD = &DOUBLE_80331420;
 		frameAlpha = static_cast<float>(-(*pRateC * static_cast<double>(static_cast<int>(worldState->m_frameCounter)) - *pOneD));
 	}
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor frameColor;
-	frameColor.r = 0xFF;
-	frameColor.g = 0xFF;
-	frameColor.b = 0xFF;
-	const double* p255B = &DOUBLE_80331508;
-	frameColor.a = static_cast<unsigned char>(static_cast<int>(*p255B * static_cast<double>(frameAlpha)));
-	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	for (slot = 0, slotOff = slot; slot < 2; slot++, slotOff += 0x1C) {
-		if (((1 << slot) & 2) != 0) {
-			const float* pZeroE = &FLOAT_803313dc;
-			const float* pOneE = &FLOAT_803313e8;
-			Sprt* const frameEntry = &m_wm.m_frameInfo->m_sprites[slot];
-			MenuPcs.DrawRect(frameEntry->m_flags,
-			         static_cast<float>(frameEntry->m_x),
-			         static_cast<float>(frameEntry->m_y),
-			         static_cast<float>(frameEntry->m_width),
-			         static_cast<float>(frameEntry->m_height),
-			         frameEntry->m_u, frameEntry->m_v,
-			         *pOneE, *pOneE, *pZeroE);
-		}
-	}
-
+	DrawWMFrame0(2, frameAlpha);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white;
 	white.r = 0xFF;

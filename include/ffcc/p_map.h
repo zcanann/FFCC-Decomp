@@ -21,7 +21,7 @@ public:
     void create();
     void createViewer();
     void LoadMap(int, int, void*, unsigned long, unsigned char);
-    unsigned long long IsLoadMapCompleted();
+    int IsLoadMapCompleted();
     void destroy();
     void calcInit();
     void calc();

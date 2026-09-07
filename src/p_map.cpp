@@ -293,54 +293,19 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
  * --INFO--
  * PAL Address: 0x80035980
  * PAL Size: 260b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8003F834
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned long long CMapPcs::IsLoadMapCompleted()
+int CMapPcs::IsLoadMapCompleted()
 {
-    unsigned int value = 0;
-    CMapMng* map = &MapMng;
-
-    for (int count = 2; count != 0; count--) {
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
+    for (int i = 0; i < 16; i++) {
+        if (MapMng.m_asyncLoadState.m_asyncHandles[i] != 0) {
+            return 0;
         }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
-            return (unsigned long long)value;
-        }
-
-        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
-        value += 7;
     }
-
-    return ((unsigned long long)1 << 32) | value;
+    return 1;
 }
 
 /*

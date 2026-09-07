@@ -3319,9 +3319,11 @@ renderedDone:
             PartMng.pppDestroyAll();
             Game.ChangeMap(object->m_localBase[1], object->m_localBase[2], 2, 1);
             break;
-        case 6:
-            result = static_cast<unsigned int>(MapPcs.IsLoadMapCompleted()) & PartPcs.IsLoadPartCompleted();
+        case 6: {
+            int mapLoaded = MapPcs.IsLoadMapCompleted();
+            result = mapLoaded & PartPcs.IsLoadPartCompleted();
             break;
+        }
         }
         this->push(object, result);
         outResult = 0;

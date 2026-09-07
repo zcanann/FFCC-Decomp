@@ -20,21 +20,6 @@ extern const float kPppHeapUseRateDivisor;
 extern "C" const char sNoNameProfileLabel[];
 extern "C" unsigned char g_IsDrawHeapSize = 1;
 
-extern "C" void create__8CPartPcsFv(CPartPcs*);
-extern "C" void destroy__8CPartPcsFv(CPartPcs*);
-extern "C" void calcInit__8CPartPcsFv(CPartPcs*);
-extern "C" void calc__8CPartPcsFv(CPartPcs*);
-extern "C" void calcDead__8CPartPcsFv(CPartPcs*);
-extern "C" void ClearOt__8CPartPcsFv(CPartPcs*);
-extern "C" void drawShadow__8CPartPcsFv(CPartPcs*);
-extern "C" void drawCharaBefore__8CPartPcsFv(CPartPcs*);
-extern "C" void draw__8CPartPcsFv(CPartPcs*);
-extern "C" void drawAfter__8CPartPcsFv(CPartPcs*);
-extern "C" void createViewer__8CPartPcsFv(CPartPcs*);
-extern "C" void calcViewer__8CPartPcsFv(CPartPcs*);
-extern "C" void drawShadowViewer__8CPartPcsFv(CPartPcs*);
-extern "C" void drawViewer__8CPartPcsFv(CPartPcs*);
-extern "C" void drawAfterViewer__8CPartPcsFv(CPartPcs*);
 
 extern const char sTinaGbaResourceStrings[] = {
     (char)0x64, (char)0x76, (char)0x64, (char)0x2F, (char)0x67, (char)0x62, (char)0x61, (char)0x2F,
@@ -130,87 +115,34 @@ inline CPartPcs::~CPartPcs()
 }
 
 CPartPcs PartPcs;
-static CProcessTableCallback s_partTableDescCreate = {0, 0xFFFFFFFF,
-                                                       reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
-static CProcessTableCallback s_partTableDescDestroy = {0, 0xFFFFFFFF,
-                                                        reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
-static CProcessTableCallback s_partTableDescCalcInit = {0, 0xFFFFFFFF,
-                                                         reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
-static CProcessTableCallback s_partTableDescCalc = {0, 0xFFFFFFFF,
-                                                     reinterpret_cast<unsigned int>(calc__8CPartPcsFv)};
-static CProcessTableCallback s_partTableDescCalcDead = {0, 0xFFFFFFFF,
-                                                         reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
-static CProcessTableCallback s_partTableDescClearOt = {0, 0xFFFFFFFF,
-                                                        reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
-static CProcessTableCallback s_partTableDescDrawShadow = {0, 0xFFFFFFFF,
-                                                           reinterpret_cast<unsigned int>(drawShadow__8CPartPcsFv)};
-static CProcessTableCallback s_partTableDescDrawCharaBefore = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCharaBefore__8CPartPcsFv)};
-static CProcessTableCallback s_partTableDescDraw = {0, 0xFFFFFFFF,
-                                                     reinterpret_cast<unsigned int>(draw__8CPartPcsFv)};
-static CProcessTableCallback s_partTableDescDrawAfter = {0, 0xFFFFFFFF,
-                                                          reinterpret_cast<unsigned int>(drawAfter__8CPartPcsFv)};
-static CProcessTableCallback s_partViewerTableDescCreate = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__8CPartPcsFv)};
-static CProcessTableCallback s_partViewerTableDescDestroy = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
-static CProcessTableCallback s_partViewerTableDescCalcInit = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
-static CProcessTableCallback s_partViewerTableDescCalc = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__8CPartPcsFv)};
-static CProcessTableCallback s_partViewerTableDescCalcDead = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
-static CProcessTableCallback s_partViewerTableDescClearOt = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
-static CProcessTableCallback s_partViewerTableDescDrawShadow = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowViewer__8CPartPcsFv)};
-static CProcessTableCallback s_partViewerTableDescDraw = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__8CPartPcsFv)};
-static CProcessTableCallback s_partViewerTableDescDrawAfter = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__8CPartPcsFv)};
-CProcessTable CPartPcs::m_table[2] = {
+CProcessCallbackTable CPartPcs::m_table[2] = {
     {
         const_cast<char*>(sPartPcsGameTableName),
+        static_cast<CProcessCallback>(&CPartPcs::create),
+        static_cast<CProcessCallback>(&CPartPcs::destroy),
         {
-            s_partTableDescCreate.m_thisOffset, s_partTableDescCreate.m_virtualOffset, s_partTableDescCreate.m_function,
-            s_partTableDescDestroy.m_thisOffset, s_partTableDescDestroy.m_virtualOffset, s_partTableDescDestroy.m_function,
-            s_partTableDescCalcInit.m_thisOffset, s_partTableDescCalcInit.m_virtualOffset, s_partTableDescCalcInit.m_function,
-            0x15, 0,
-            s_partTableDescCalc.m_thisOffset, s_partTableDescCalc.m_virtualOffset, s_partTableDescCalc.m_function,
-            0x1D, 0,
-            s_partTableDescCalcDead.m_thisOffset, s_partTableDescCalcDead.m_virtualOffset, s_partTableDescCalcDead.m_function,
-            0x28, 0,
-            s_partTableDescClearOt.m_thisOffset, s_partTableDescClearOt.m_virtualOffset, s_partTableDescClearOt.m_function,
-            0x2C, 1,
-            s_partTableDescDrawShadow.m_thisOffset, s_partTableDescDrawShadow.m_virtualOffset, s_partTableDescDrawShadow.m_function,
-            0x31, 1,
-            s_partTableDescDrawCharaBefore.m_thisOffset, s_partTableDescDrawCharaBefore.m_virtualOffset, s_partTableDescDrawCharaBefore.m_function,
-            0x38, 1,
-            s_partTableDescDraw.m_thisOffset, s_partTableDescDraw.m_virtualOffset, s_partTableDescDraw.m_function,
-            0x3E, 1,
-            s_partTableDescDrawAfter.m_thisOffset, s_partTableDescDrawAfter.m_virtualOffset, s_partTableDescDrawAfter.m_function,
-            0x40, 1,
+            {static_cast<CProcessCallback>(&CPartPcs::calcInit), 0x15, 0},
+            {static_cast<CProcessCallback>(&CPartPcs::calc), 0x1D, 0},
+            {static_cast<CProcessCallback>(&CPartPcs::calcDead), 0x28, 0},
+            {static_cast<CProcessCallback>(&CPartPcs::ClearOt), 0x2C, 1},
+            {static_cast<CProcessCallback>(&CPartPcs::drawShadow), 0x31, 1},
+            {static_cast<CProcessCallback>(&CPartPcs::drawCharaBefore), 0x38, 1},
+            {static_cast<CProcessCallback>(&CPartPcs::draw), 0x3E, 1},
+            {static_cast<CProcessCallback>(&CPartPcs::drawAfter), 0x40, 1},
         },
     },
     {
         const_cast<char*>(sPartPcsViewerTableName),
+        static_cast<CProcessCallback>(&CPartPcs::createViewer),
+        static_cast<CProcessCallback>(&CPartPcs::destroy),
         {
-            s_partViewerTableDescCreate.m_thisOffset, s_partViewerTableDescCreate.m_virtualOffset, s_partViewerTableDescCreate.m_function,
-            s_partViewerTableDescDestroy.m_thisOffset, s_partViewerTableDescDestroy.m_virtualOffset, s_partViewerTableDescDestroy.m_function,
-            s_partViewerTableDescCalcInit.m_thisOffset, s_partViewerTableDescCalcInit.m_virtualOffset, s_partViewerTableDescCalcInit.m_function,
-            0x15, 0,
-            s_partViewerTableDescCalc.m_thisOffset, s_partViewerTableDescCalc.m_virtualOffset, s_partViewerTableDescCalc.m_function,
-            0x1D, 0,
-            s_partViewerTableDescCalcDead.m_thisOffset, s_partViewerTableDescCalcDead.m_virtualOffset, s_partViewerTableDescCalcDead.m_function,
-            0x28, 0,
-            s_partViewerTableDescClearOt.m_thisOffset, s_partViewerTableDescClearOt.m_virtualOffset, s_partViewerTableDescClearOt.m_function,
-            0x2C, 1,
-            s_partViewerTableDescDrawShadow.m_thisOffset, s_partViewerTableDescDrawShadow.m_virtualOffset, s_partViewerTableDescDrawShadow.m_function,
-            0x31, 1,
-            s_partViewerTableDescDraw.m_thisOffset, s_partViewerTableDescDraw.m_virtualOffset, s_partViewerTableDescDraw.m_function,
-            0x3E, 1,
-            s_partViewerTableDescDrawAfter.m_thisOffset, s_partViewerTableDescDrawAfter.m_virtualOffset, s_partViewerTableDescDrawAfter.m_function,
-            0x40, 1,
+            {static_cast<CProcessCallback>(&CPartPcs::calcInit), 0x15, 0},
+            {static_cast<CProcessCallback>(&CPartPcs::calcViewer), 0x1D, 0},
+            {static_cast<CProcessCallback>(&CPartPcs::calcDead), 0x28, 0},
+            {static_cast<CProcessCallback>(&CPartPcs::ClearOt), 0x2C, 1},
+            {static_cast<CProcessCallback>(&CPartPcs::drawShadowViewer), 0x31, 1},
+            {static_cast<CProcessCallback>(&CPartPcs::drawViewer), 0x3E, 1},
+            {static_cast<CProcessCallback>(&CPartPcs::drawAfterViewer), 0x40, 1},
         },
     },
 };
@@ -1355,3 +1287,5 @@ void CPartPcs::EndMiruraEvent()
     PartMng.pppReleasePdt(7);
     m_usbStreamState.m_miruraEventActive = 0;
 }
+
+#pragma pool_data off

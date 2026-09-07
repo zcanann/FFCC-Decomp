@@ -54,43 +54,20 @@ static const char sLightProcessClassName[] = "CProcess";
 static const char sLightTextureFullMsg[0x18] =
     "\x83\x89\x83\x43\x83\x67\x82\xAA\x91\xAB\x82\xE8\x82\xDC\x82\xB9\x82\xF1\x81\x42\x0A";
 
-extern "C" {
-void create__9CLightPcsFv(CLightPcs*);
-void destroy__9CLightPcsFv(CLightPcs*);
-void calc__9CLightPcsFv(CLightPcs*);
-void draw__9CLightPcsFv(CLightPcs*);
-void MakeLightMap__9CLightPcsFv(CLightPcs*);
-}
-
 inline CLightPcs::CLightPcs()
 {
-    static CProcessTableCallback s_lightTableDescCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
-    static CProcessTableCallback s_lightTableDescDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};
-    static CProcessTableCallback s_lightTableDescCalc = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CLightPcsFv)};
-    static CProcessTableCallback s_lightTableDescDraw = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
-    static CProcessTableCallback s_lightTableDescMakeLightMap = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
-    CProcessTable* table = &m_table;
-
-    table->m_fields.m_create = s_lightTableDescCreate;
-    table->m_fields.m_destroy = s_lightTableDescDestroy;
-    table->m_fields.m_entries[0].m_callback = s_lightTableDescCalc;
-    table->m_fields.m_entries[1].m_callback = s_lightTableDescDraw;
-    table->m_fields.m_entries[2].m_callback = s_lightTableDescMakeLightMap;
 }
 
 CLightPcs LightPcs;
 
-CProcessTable CLightPcs::m_table = {
+CProcessCallbackTable CLightPcs::m_table = {
     const_cast<char*>(sLightPcsClassName),
+    static_cast<CProcessCallback>(&CLightPcs::create),
+    static_cast<CProcessCallback>(&CLightPcs::destroy),
     {
-        0, 0, 0,
-        0, 0, 0,
-        0, 0, 0,
-        0x1C, 0,
-        0, 0, 0,
-        0x2A, 0,
-        0, 0, 0,
-        0x2D, 1,
+        {static_cast<CProcessCallback>(&CLightPcs::calc), 0x1C, 0},
+        {static_cast<CProcessCallback>(&CLightPcs::draw), 0x2A, 0},
+        {static_cast<CProcessCallback>(&CLightPcs::MakeLightMap), 0x2D, 1},
     },
 };
 
@@ -1290,3 +1267,5 @@ extern const float kMapLightAttnNegScale = -0.125f;
 extern const float kMapLightAttnNegFineScale = -0.015625f;
 extern const float kLightAnimPhaseStep = 0.1f;
 extern const float kLightRadToDeg = 57.29578f;
+
+#pragma pool_data off

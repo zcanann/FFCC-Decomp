@@ -3640,29 +3640,7 @@ void CMenuPcs::DrawDiaryMenu()
 
 	GetWmWorldHandles(this)[1]->m_model->m_lightAlpha = FLOAT_803313e8;
 	{
-		unsigned char* const worldObj = m_wm.m_worldObjData;
-		Mtx lookAtMtx;
-		Mtx44 projectionMtx;
-		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
-		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Vec*>(worldObj + 0x60),
-		            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
-		            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
-		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-		CharaPcs.InitEnv(5);
-		GXSetColorUpdate(0);
-		GXSetAlphaUpdate(0);
-		GXSetCopyClear(CColor(0, 0, 0, 0).color, 0xFFFFFF);
-		GXSetColorUpdate(1);
-		GXSetAlphaUpdate(1);
-		GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x58)),
-		              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x5A)),
-		              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x5C)),
-		              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x5E)), FLOAT_803313dc, FLOAT_803313e8);
-		GXSetScissor(*reinterpret_cast<unsigned int*>(worldObj + 0x90), *reinterpret_cast<unsigned int*>(worldObj + 0x94),
-		             *reinterpret_cast<unsigned int*>(worldObj + 0x98), *reinterpret_cast<unsigned int*>(worldObj + 0x9C));
+		SetProjection(1);
 		GetWmWorldHandles(this)[1]->Draw(5);
 		RestoreProjection();
 	}
@@ -3722,8 +3700,6 @@ void CMenuPcs::DrawDiaryMenu()
 void CMenuPcs::DrawMCardMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	Mtx savedCamera;
-	Mtx44 projMtx;
 
 	float cursorX;
 	float cursorY;
@@ -3799,68 +3775,24 @@ void CMenuPcs::DrawMCardMenu()
 
 		// 3D character viewports (4 slots)
 		int* piVar12 = reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_worldObjData) + 0x550);
-		int charaOff = 0;
-		unsigned int* serial = &m_mcCtrl.m_serialHi;
-		int viewBase = 0x550;
-		int i =  (int)(unsigned int)(0);
+
+		int i = 0;
 		do {
 			if (*piVar12 != 0) {
-				int slot = reinterpret_cast<int>(m_wm.m_worldObjData) + viewBase;
-				const float* pFov = &FLOAT_80331470;
-				const float* pAsp = &FLOAT_80331474;
-				const float* pNear = &FLOAT_80331478;
-				const float* pFar = &FLOAT_8033147c;
-				C_MTXPerspective(projMtx, *pFov, *pAsp, *pNear, *pFar);
-				GXSetProjection(projMtx, GX_PERSPECTIVE);
-				PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
-				const float* pZt = &FLOAT_803313dc;
-				const float* pOt = &FLOAT_803313e8;
-				C_MTXLookAt(savedCamera, (Vec*)(slot + 0x10),
-				    CVector(*pZt, *pOt, *pZt), CVector(*pZt, *pZt, *pZt));
-				PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
-				PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
-				CharaPcs.InitEnv(5);
-				GXSetColorUpdate(0);
-				GXSetAlphaUpdate(0);
-				CColor clear(0, 0, 0, 0);
-				GXColor clearColor = *(_GXColor*)&clear;
-				GXSetCopyClear(clearColor, 0xFFFFFF);
-				GXSetColorUpdate(1);
-				GXSetAlphaUpdate(1);
-				const float* pZv = &FLOAT_803313dc;
-				const float* pOv = &FLOAT_803313e8;
-				GXSetViewport(
-					(float)*reinterpret_cast<short*>(slot + 8),
-					(float)*reinterpret_cast<short*>(slot + 0xa),
-					(float)*reinterpret_cast<short*>(slot + 0xc),
-					(float)*reinterpret_cast<short*>(slot + 0xe),
-					*pZv, *pOv);
-				GXSetScissor(*reinterpret_cast<int*>(slot + 0x40), *reinterpret_cast<int*>(slot + 0x44),
-				             *reinterpret_cast<int*>(slot + 0x48), *reinterpret_cast<int*>(slot + 0x4c));
-				Graphic.SetFog(1, 0);
-				LightPcs.SetAmbient(gWmMenuLightTables[0].m_ambient);
-				LightPcs.SetNumDiffuse(gWmMenuLightTables[0].m_diffuseCount);
-				for (int j = 0; j < gWmMenuLightTables[0].m_diffuseCount; j++) {
-					LightPcs.SetDiffuse(
-						j, gWmMenuLightTables[0].m_diffuseColors[j],
-						&gWmMenuLightTables[0].m_diffuseDirs[j], 0);
-				}
-				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
-				reinterpret_cast<CCharaPcs::CHandle*>(serial[0x1dd])->Draw(5);
-				int partA = *reinterpret_cast<int*>(m_bonusListPtr + charaOff + 0x5768);
+				SetProjection(i + 17);
+				SetLight(0);
+				m_wm.m_handles[i + 17]->Draw(5);
+				int partA = m_effectWork[i + 17].m_partNo;
 				if (partA >= 0) {
 					PartPcs.DrawMenuIdx(partA);
 				}
-				int partB = *reinterpret_cast<int*>(m_bonusListPtr + charaOff + 0x6bf8);
+				int partB = m_effectWork[i + 21].m_partNo;
 				if (partB >= 0) {
 					PartPcs.DrawMenuIdx(partB);
 				}
 			}
 			i++;
-			viewBase += 0x50;
-			serial++;
 			piVar12 += 0x14;
-			charaOff += 0x524;
 		} while (i < 4);
 		DrawInit();
 		RestoreProjection();
@@ -4452,44 +4384,9 @@ void CMenuPcs::DrawMoveMenu()
 	DrawWMFrame();
 
 	if (worldState->m_mainState > 0 && worldState->m_mainState < 3) {
-		unsigned char* const worldObj = m_wm.m_worldObjData;
 #define handle (reinterpret_cast<CCharaPcs::CHandle*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]))
-		Mtx lookAtMtx;
-		Mtx44 projectionMtx;
-
-		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
-		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x1A0),
-		            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
-		            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
-		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-		CharaPcs.InitEnv(5);
-		GXSetColorUpdate(0);
-		GXSetAlphaUpdate(0);
-		GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
-		GXSetColorUpdate(1);
-		GXSetAlphaUpdate(1);
-		GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x198)),
-		              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x19A)),
-		              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x19C)),
-		              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x19E)),
-		              FLOAT_803313dc, FLOAT_803313e8);
-		GXSetScissor(*reinterpret_cast<unsigned int*>(worldObj + 0x1D0),
-		             *reinterpret_cast<unsigned int*>(worldObj + 0x1D4),
-		             *reinterpret_cast<unsigned int*>(worldObj + 0x1D8),
-		             *reinterpret_cast<unsigned int*>(worldObj + 0x1DC));
-		Graphic.SetFog(1, 0);
-		WmMenuLightTable& lightTable = gWmMenuLightTables[0];
-		LightPcs.SetAmbient(lightTable.m_ambient);
-		LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
-		for (int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
-			LightPcs.SetDiffuse(
-				lightIndex, lightTable.m_diffuseColors[lightIndex],
-				&lightTable.m_diffuseDirs[lightIndex], 0);
-		}
-		LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+		SetProjection(5);
+		SetLight(0);
 
 		{
 			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_effectWork) + 0x1E70) = handle->m_model->m_lightAlpha;
@@ -4642,46 +4539,12 @@ void CMenuPcs::DrawLoadMenu()
 
 		// 3D character model viewports
 		int* piVar13 = reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_worldObjData) + 0x550);
-		int viewBase = 0x550;
+
 		int i = 0;
 		do {
 			if (*piVar13 != 0) {
-				int slot = reinterpret_cast<int>(m_wm.m_worldObjData) + viewBase;
-				Mtx44 projMtx;
-				C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
-				GXSetProjection(projMtx, GX_PERSPECTIVE);
-				PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
-
-				Mtx lookAtMtx;
-				C_MTXLookAt(lookAtMtx, (Vec*)(slot + 0x10),
-				            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
-				            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
-				PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
-				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-				CharaPcs.InitEnv(5);
-				GXSetColorUpdate(0);
-				GXSetAlphaUpdate(0);
-				GXSetCopyClear(CColor(0, 0, 0, 0).color, 0xFFFFFF);
-				GXSetColorUpdate(1);
-				GXSetAlphaUpdate(1);
-				GXSetViewport(
-					(float)*reinterpret_cast<short*>(slot + 8),
-					(float)*reinterpret_cast<short*>(slot + 0xa),
-					(float)*reinterpret_cast<short*>(slot + 0xc),
-					(float)*reinterpret_cast<short*>(slot + 0xe),
-					FLOAT_803313dc, FLOAT_803313e8);
-				GXSetScissor(*reinterpret_cast<int*>(slot + 0x40), *reinterpret_cast<int*>(slot + 0x44),
-				             *reinterpret_cast<int*>(slot + 0x48), *reinterpret_cast<int*>(slot + 0x4c));
-				Graphic.SetFog(1, 0);
-				WmMenuLightTable& lightTable = gWmMenuLightTables[0];
-				LightPcs.SetAmbient(lightTable.m_ambient);
-				LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
-				for (int j = 0; j < lightTable.m_diffuseCount; j++) {
-					LightPcs.SetDiffuse(
-						j, lightTable.m_diffuseColors[j],
-						&lightTable.m_diffuseDirs[j], 0);
-				}
-				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+				SetProjection(i + 17);
+				SetLight(0);
 				m_wm.m_handles[17 + i]->Draw(5);
 				if (m_effectWork[17 + i].m_partNo >= 0) {
 					PartPcs.DrawMenuIdx(m_effectWork[17 + i].m_partNo);
@@ -4691,7 +4554,7 @@ void CMenuPcs::DrawLoadMenu()
 				}
 			}
 			piVar13 += 0x14;
-			viewBase += 0x50;
+
 			i++;
 		} while (i < 4);
 		DrawInit();
@@ -6480,42 +6343,10 @@ void CMenuPcs::DrawFukidashi()
 			int* piVar10 = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + viewOff);
 			if (*piVar10 != 0) {
 				if (viewportSetup == 0) {
-					Mtx44 projMtx;
-					C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
-					GXSetProjection(projMtx, GX_PERSPECTIVE);
-					PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
-
-					Mtx lookAtMtx;
-					C_MTXLookAt(lookAtMtx, (Vec*)(piVar10 + 4),
-					            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
-					            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
-					PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
-					PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-					CharaPcs.InitEnv(5);
-					GXSetColorUpdate(0);
-					GXSetAlphaUpdate(0);
-					GXSetCopyClear(CColor(0, 0, 0, 0).color, 0xFFFFFF);
-					GXSetColorUpdate(1);
-					GXSetAlphaUpdate(1);
-
-					GXSetViewport(
-						(float)*reinterpret_cast<short*>(piVar10 + 2),
-						(float)*reinterpret_cast<short*>((int)(piVar10 + 2) + 2),
-						(float)*reinterpret_cast<short*>(piVar10 + 3),
-						(float)*reinterpret_cast<short*>((int)(piVar10 + 3) + 2),
-						FLOAT_803313dc, FLOAT_803313e8);
-					GXSetScissor(piVar10[0x10], piVar10[0x11], piVar10[0x12], piVar10[0x13]);
+					SetProjection(slot);
 					viewportSetup = 1;
 				}
-				Graphic.SetFog(1, 0);
-				LightPcs.SetAmbient(gWmMenuLightTables[0].m_ambient);
-				LightPcs.SetNumDiffuse(gWmMenuLightTables[0].m_diffuseCount);
-				for (int j = 0; j < gWmMenuLightTables[0].m_diffuseCount; j++) {
-					LightPcs.SetDiffuse(
-						j, gWmMenuLightTables[0].m_diffuseColors[j],
-						&gWmMenuLightTables[0].m_diffuseDirs[j], 0);
-				}
-				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+				SetLight(0);
 				m_wm.m_handles[slot]->Draw(5);
 				if (slot != 6) {
 					int* effData = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + effOff);
@@ -7598,92 +7429,14 @@ void CMenuPcs::DrawChara()
 			continue;
 		}
 
-		{
-			Mtx lookAtMtx;
-			Mtx44 projectionMtx;
-			const float* pFovA = &FLOAT_80331470;
-			const float* pAspectA = &FLOAT_80331474;
-			const float* pNearA = &FLOAT_80331478;
-			const float* pFarA = &FLOAT_8033147c;
-			C_MTXPerspective(projectionMtx, *pFovA, *pAspectA, *pNearA, *pFarA);
-			GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-			PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-			const float* pZeroA1 = &FLOAT_803313dc;
-			const float* pOneA = &FLOAT_803313e8;
-			const float* pZeroA2 = &FLOAT_803313dc;
-			C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10),
-			            CVector(*pZeroA1, *pOneA, *pZeroA1),
-			            CVector(*pZeroA2, *pZeroA2, *pZeroA2));
-			PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
-			PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-			CharaPcs.InitEnv(5);
-			GXSetColorUpdate(0);
-			GXSetAlphaUpdate(0);
-			GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
-			GXSetColorUpdate(1);
-			GXSetAlphaUpdate(1);
-			const float* pZeroV = &FLOAT_803313dc;
-			const float* pOneV = &FLOAT_803313e8;
-			GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)),
-			              static_cast<float>(*reinterpret_cast<short*>(view + 0xA)),
-			              static_cast<float>(*reinterpret_cast<short*>(view + 0xC)),
-			              static_cast<float>(*reinterpret_cast<short*>(view + 0xE)),
-			              *pZeroV, *pOneV);
-			GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40),
-			             *reinterpret_cast<unsigned int*>(view + 0x44),
-			             *reinterpret_cast<unsigned int*>(view + 0x48),
-			             *reinterpret_cast<unsigned int*>(view + 0x4C));
-			Graphic.SetFog(1, 0);
-			WmMenuLightTable& lightTable = gWmMenuLightTables[0];
-			LightPcs.SetAmbient(lightTable.m_ambient);
-			LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
-			for (int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
-				LightPcs.SetDiffuse(lightIndex, lightTable.m_diffuseColors[lightIndex],
-				                    &lightTable.m_diffuseDirs[lightIndex], 0);
-			}
-			LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
-		}
+		SetProjection(i + 32);
+		SetLight(0);
 		if (GetWmCharaHandles(this)[i]->m_charaKind != 3) {
 			GetWmCharaHandles(this)[i]->Draw(5);
 		} else {
 			DrawInit();
 			GXSetZMode(GX_TRUE, static_cast<GXCompare>(7), GX_TRUE);
-			{
-				Mtx44 projectionMtx;
-				const float* pFovB = &FLOAT_80331470;
-				const float* pAspectB = &FLOAT_80331474;
-				const float* pNearB = &FLOAT_80331478;
-				const float* pFarB = &FLOAT_8033147c;
-				C_MTXPerspective(projectionMtx, *pFovB, *pAspectB, *pNearB, *pFarB);
-				GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-				PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-				Mtx lookAtMtx;
-				const float* pZeroB1 = &FLOAT_803313dc;
-				const float* pOneB = &FLOAT_803313e8;
-				const float* pZeroB2 = &FLOAT_803313dc;
-				C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10),
-				            CVector(*pZeroB1, *pOneB, *pZeroB1),
-				            CVector(*pZeroB2, *pZeroB2, *pZeroB2));
-				PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
-				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-				CharaPcs.InitEnv(5);
-				GXSetColorUpdate(0);
-				GXSetAlphaUpdate(0);
-				GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
-				GXSetColorUpdate(1);
-				GXSetAlphaUpdate(1);
-				const float* pZeroV2 = &FLOAT_803313dc;
-				const float* pOneV2 = &FLOAT_803313e8;
-				GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)),
-				              static_cast<float>(*reinterpret_cast<short*>(view + 0xA)),
-				              static_cast<float>(*reinterpret_cast<short*>(view + 0xC)),
-				              static_cast<float>(*reinterpret_cast<short*>(view + 0xE)),
-				              *pZeroV2, *pOneV2);
-				GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40),
-				             *reinterpret_cast<unsigned int*>(view + 0x44),
-				             *reinterpret_cast<unsigned int*>(view + 0x48),
-				             *reinterpret_cast<unsigned int*>(view + 0x4C));
-			}
+			SetProjection(i + 32);
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			float alpha;
@@ -9486,28 +9239,7 @@ void CMenuPcs::DrawMainMenuSub()
 	float depthValues[5];
 	unsigned int drawOrder[5];
 
-	Mtx lookAtMtx;
-	Mtx44 projectionMtx;
-	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
-	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x740),
-	            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
-	            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
-	PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
-	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-	CharaPcs.InitEnv(5);
-	GXSetColorUpdate(0);
-	GXSetAlphaUpdate(0);
-	GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
-	GXSetColorUpdate(1);
-	GXSetAlphaUpdate(1);
-	GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x738)),
-	              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x73A)),
-	              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x73C)),
-	              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x73E)), FLOAT_803313dc, FLOAT_803313e8);
-	GXSetScissor(*reinterpret_cast<unsigned int*>(worldObj + 0x770), *reinterpret_cast<unsigned int*>(worldObj + 0x774),
-	             *reinterpret_cast<unsigned int*>(worldObj + 0x778), *reinterpret_cast<unsigned int*>(worldObj + 0x77C));
+	SetProjection(23);
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 
 	const float zSub = FLOAT_80331598;
@@ -9619,16 +9351,7 @@ void CMenuPcs::DrawMainMenuSub()
 		              FLOAT_803313dc, FLOAT_803313e8);
 		GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40), *reinterpret_cast<unsigned int*>(view + 0x44),
 		             *reinterpret_cast<unsigned int*>(view + 0x48), *reinterpret_cast<unsigned int*>(view + 0x4C));
-		Graphic.SetFog(1, 0);
-		WmMenuLightTable& lightTable = gWmMenuLightTables[0];
-		LightPcs.SetAmbient(lightTable.m_ambient);
-		LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
-		for (int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
-			LightPcs.SetDiffuse(
-				lightIndex, lightTable.m_diffuseColors[lightIndex],
-				&lightTable.m_diffuseDirs[lightIndex], 0);
-		}
-		LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+		SetLight(0);
 		reinterpret_cast<CCharaPcs::CHandle*>(
 		    *reinterpret_cast<int*>(reinterpret_cast<int>(this) + drawOrder[orderIndex] * 4 + 0x774))
 		    ->Draw(5);

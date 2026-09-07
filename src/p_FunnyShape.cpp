@@ -271,31 +271,23 @@ CFunnyShapePcs::~CFunnyShapePcs()
 }
 
 #pragma pool_data off
-static CProcessTableCallback s_tableDesc[4] = {
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)},
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)},
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)},
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)},
-};
+static CProcessTableCallback s_funnyShapeCreateViewer =
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
+static CProcessTableCallback s_funnyShapeDestroyViewer =
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
+static CProcessTableCallback s_funnyShapeCalcViewer =
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
+static CProcessTableCallback s_funnyShapeDrawViewer =
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
 CFunnyShapePcs FunnyShapePcs;
 CProcessTable CFunnyShapePcs::m_table = {
     const_cast<char*>(s_CFunnyShapePcsViewer),
     {
-        s_tableDesc[0].m_thisOffset,
-        s_tableDesc[0].m_virtualOffset,
-        s_tableDesc[0].m_function,
-        s_tableDesc[1].m_thisOffset,
-        s_tableDesc[1].m_virtualOffset,
-        s_tableDesc[1].m_function,
-        s_tableDesc[2].m_thisOffset,
-        s_tableDesc[2].m_virtualOffset,
-        s_tableDesc[2].m_function,
-        0x21,
-        0,
-        s_tableDesc[3].m_thisOffset,
-        s_tableDesc[3].m_virtualOffset,
-        s_tableDesc[3].m_function,
-        0x42,
-        1,
+        s_funnyShapeCreateViewer,
+        s_funnyShapeDestroyViewer,
+        {
+            {s_funnyShapeCalcViewer, 0x21, 0},
+            {s_funnyShapeDrawViewer, 0x42, 1},
+        },
     },
 };

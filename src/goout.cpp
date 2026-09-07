@@ -8,8 +8,6 @@ CGoOutMenu g_GoOutMenu;
 CGoOutMenu* g_pGoOutMenu;
 int g_freeCaravanIdx;
 
-extern "C" void SetMenuCharaAnim__8CMenuPcsFii2(CMenuPcs*);
-
 static const char s_The_Memory_Card_in_Slot_A_contains_801DEE30[] = "The Memory Card in Slot A contains";
 static const char s_no_save_data_for_your_current_game_801DEE54[] = "no save data for your current game,";
 static const char s_or_contains_corrupt_data_Please_801DEE78[] = "or contains corrupt data. Please";
@@ -1264,7 +1262,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0xE:
         MenuPcs.InitSaveLoadMenu();
-        SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
+        MenuPcs.CalcGoOutSelCharInit();
         MenuPcs.CopyNowCaravanDat(MenuPcs.m_goOutTransferSaveData);
         MenuPcs.m_goOutSaveLoadMode = 2;
         MenuPcs.m_goOutUnknown88A = 1;
@@ -1283,7 +1281,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         if (m_saveLoadMenuOpen == 0) {
             MenuPcs.InitSaveLoadMenu();
         }
-        SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
+        MenuPcs.CalcGoOutSelCharInit();
         m_saveLoadMenuOpen = 1;
         if (m_currentMessage >= 0) {
             MenuPcs.m_menuWindowInfo->state = 2;
@@ -1672,7 +1670,7 @@ card_connected:;
             if (MenuPcs.m_goOutLoadResult == 4) {
                 MenuGoOutState().m_resultSelect = 0;
                 MenuPcs.InitSaveLoadMenu();
-                SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
+                MenuPcs.CalcGoOutSelCharInit();
                 if (MenuPcs.CheckSameMcFormatID(MenuPcs.m_goOutTransferSaveData,
                                                 static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork)) != 0) {
                     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
@@ -1696,7 +1694,7 @@ card_connected:;
             } else {
                 MenuGoOutState().m_resultSelect = 0;
                 MenuPcs.InitSaveLoadMenu();
-                SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
+                MenuPcs.CalcGoOutSelCharInit();
                 int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
                 SetMenuStr(0, 7,
                            GetGoOutMessageLine(languageId, 50),
@@ -2184,7 +2182,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
         if (m_deleteInitSelChar == 0) {
             MenuPcs.InitSaveLoadMenu();
         }
-        SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
+        MenuPcs.CalcGoOutSelCharInit();
         m_deleteInitSelChar = 1;
         break;
     case 1:
@@ -2712,7 +2710,7 @@ void CGoOutMenu::Calc()
                 if ((input & 0x200) != 0) {
                     Sound.PlaySe(3, 0x40, 0x7f, 0);
                     MenuPcs.InitSaveLoadMenu();
-                    SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
+                    MenuPcs.CalcGoOutSelCharInit();
                     MenuGoOutState().m_resultSelect = -1;
 
                     if (MenuPcs.m_goOutTransferSaveData != 0) {

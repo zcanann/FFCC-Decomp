@@ -409,7 +409,8 @@ struct WmCharaSelectEntry
 	unsigned char m_cmakePending;    // 0x0B
 	unsigned char m_cmakeReady;      // 0x0C
 	unsigned char m_connected;       // 0x0D
-	unsigned short _pad0E;           // 0x0E
+	unsigned char m_cancelled;       // 0x0E
+	unsigned char _pad0F;            // 0x0F
 };
 
 STATIC_ASSERT(sizeof(WmCharaSelectEntry) == 0x10);
@@ -3618,7 +3619,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 			}
 		}
 	} else if ((down & 0x200) != 0) {
-		*reinterpret_cast<unsigned char*>(&curEntry._pad0E) = 1;
+		curEntry.m_cancelled = 1;
 		Sound.PlaySe(0x34, 0x40, 0x7F, 0);
 	}
 }
@@ -3658,34 +3659,17 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 		CalcChara();
 	}
 
-	if (m_wm.m_charaSelectData[0x0E] != 0) {
+	WmCharaSelectEntry* const entry = GetWmCharaSelectEntries(this);
+	if (entry->m_cancelled != 0) {
 		return -2;
 	}
 
-	if (m_wm.m_charaSelectData[0x0A] != 0 &&
-	    (m_wmCharaAnimState[*reinterpret_cast<short*>(m_wm.m_charaSelectData + 4)].m_animIndex != 3 || slot == 0)) {
-		return static_cast<int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 4));
+	if (entry->m_confirmed != 0 &&
+	    (m_wmCharaAnimState[entry->m_currentSlot].m_animIndex != 3 || slot == 0)) {
+		return static_cast<int>(entry->m_currentSlot);
 	}
 
 	return -1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800fc220
- * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::CalcGoOutSelCharInit()
-{
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	bytes[0x16] = 0;
-	bytes[0x17] = 0;
-	bytes[0xE] = 0;
-	bytes[0xF] = 0;
 }
 
 /*
@@ -3709,17 +3693,17 @@ void CMenuPcs::SetMenuCharaAnim(int charaIndex, int animIndex)
  * --INFO--
  * PAL Address: 0x800fc220
  * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8010a840
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetMenuCharaAnim__8CMenuPcsFii2(CMenuPcs* menuPcs)
+void CMenuPcs::CalcGoOutSelCharInit()
 {
-	unsigned char* const data = menuPcs->m_wm.m_charaSelectData;
+	WmCharaSelectEntry* const entry = GetWmCharaSelectEntries(this);
 
-	data[0xA] = 0;
-	data[0xE] = 0;
+	entry->m_confirmed = 0;
+	entry->m_cancelled = 0;
 }
 
 /*

@@ -183,16 +183,6 @@ static inline float LoadFloat(const float& value)
  */
 inline CMenuPcs::~CMenuPcs()
 {
-    if (&m_mcCtrl != nullptr) {
-        m_mcCtrl.m_previousState = 0;
-        m_mcCtrl.m_state = 0;
-        m_mcCtrl.m_lastResult = 0;
-        m_mcCtrl.m_iteration = 0;
-        m_mcCtrl.m_userBuffer = 0;
-        m_mcCtrl.m_createFlag = 0;
-        m_mcCtrl.m_cardChannel = 0;
-        m_mcCtrl.m_saveIndex = 0;
-    }
 }
 
 /*

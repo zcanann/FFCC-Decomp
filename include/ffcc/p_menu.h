@@ -99,6 +99,16 @@ struct MenuWindowInfo
     short state;
 };
 
+struct WmCharaAnimState
+{
+    int m_animIndex;
+    int m_nextAnimIndex;
+    int m_timer;
+    float m_frame;
+    float m_endFrame;
+};
+STATIC_ASSERT(sizeof(WmCharaAnimState) == 0x14);
+
 struct WmWorldState
 {
     float m_posX;
@@ -247,17 +257,7 @@ public:
 		TODOC,
 	};
 
-    CMenuPcs()
-    {
-        m_mcCtrl.m_previousState = 0;
-        m_mcCtrl.m_state = 0;
-        m_mcCtrl.m_lastResult = 0;
-        m_mcCtrl.m_iteration = 0;
-        m_mcCtrl.m_userBuffer = 0;
-        m_mcCtrl.m_createFlag = 0;
-        m_mcCtrl.m_cardChannel = 0;
-        m_mcCtrl.m_saveIndex = 0;
-    }
+    CMenuPcs() {}
     ~CMenuPcs();
 
     void Init();
@@ -349,7 +349,7 @@ public:
     void ChgPlayModeFromScript(bool);
 
     CTexture* GetTexture(TEX);
-    McCtrl* GetMcCtrl() { return reinterpret_cast<McCtrl*>(&m_mcCtrl); }
+    McCtrl* GetMcCtrl() { return &m_mcCtrl; }
 
     void WmInit();
     void createWorld();
@@ -701,7 +701,7 @@ public:
     unsigned char m_pad15[0x18 - 0x15];
     signed char m_mcRequest;
     unsigned char m_pad19[0x20 - 0x19];
-    McCtrlData m_mcCtrl;
+    McCtrl m_mcCtrl;
     BattleHudState m_battleHud;
     int m_manaWaterTimerA;
     unsigned char m_pad74[0x80 - 0x74];
@@ -780,7 +780,7 @@ public:
     };
     union {
         unsigned char m_pad844[0x848 - 0x844];
-        int* m_wmCharaAnimState;
+        WmCharaAnimState* m_wmCharaAnimState;
     };
     MenuWindowInfo* m_menuWindowInfo;
     union {

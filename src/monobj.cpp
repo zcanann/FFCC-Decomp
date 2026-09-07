@@ -24,6 +24,9 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 STATIC_ASSERT(offsetof(CGObject, m_homeRotY) == 0x1BC);
+STATIC_ASSERT(offsetof(CGCharaObj, m_partyDistance) == 0x5D0);
+STATIC_ASSERT(offsetof(CGCharaObj, m_partyRank) == 0x620);
+STATIC_ASSERT(offsetof(CCaravanWork, m_joybusCaravanId) == 0x3B4);
 
 u8 CGMonObj::m_aiWork[0xC];
 u8 CGMonObj::m_boss[0x8C];
@@ -2466,16 +2469,16 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 			if (((Game.m_gameWork.m_menuStageMode != 0) &&
 				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
-				 ((static_cast<unsigned short>(partyObj->GetCID()) & 0x6D) == 0x6D) &&
-				 (reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) != 0)) ||
-				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x1C) == 0) ||
+				 partyObj->IsKindOf(0x6D) &&
+				 (reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId != 0)) ||
+				(reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_hp == 0) ||
 				(partyObj->m_lastStateId == 9) ||
 				(partyObj->m_lastStateId == 0x22) ||
 				((Game.m_gameWork.m_menuStageMode != 0) &&
 				 (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
-				 ((static_cast<unsigned short>(partyObj->GetCID()) & 0x6D) == 0x6D) &&
-				 (reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) != 0)) ||
-				!(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0) <
+				 partyObj->IsKindOf(0x6D) &&
+				 (reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId != 0)) ||
+				!(m_partyDistance[partyIndex] <
 				 (coneLength - sideDist))) {
 				continue;
 			}
@@ -2549,7 +2552,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 			if (mapHit == 0) {
 				if (hitPartyIndex != NULL) {
-					*hitPartyIndex = reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]);
+					*hitPartyIndex = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId;
 				}
 				break;
 			}
@@ -3856,69 +3859,63 @@ void CGMonObj::onChangeStat(int state)
  * --INFO--
  * PAL Address: 0x80119674
  * PAL Size: 700b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80133808
+ * EN Size: 756b
  * JP Address: TODO
  * JP Size: TODO
  */
 int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float maxDist, int classId)
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	CGObject* monObject = reinterpret_cast<CGObject*>(this);
 	int foundCount = 0;
 	int selectedPartyIndex = -1;
 
-	unsigned char* slotPtr = mon;
 	for (int slot = 0; slot < 4; slot++) {
-		int partyIndex = *reinterpret_cast<int*>(slotPtr + 0x620);
+		int partyIndex = m_partyRank[slot];
 		CGPartyObj* party = Game.m_partyObjArr[partyIndex];
-		CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
-		CGObject* partyObj = reinterpret_cast<CGObject*>(party);
 
 		if ((party != NULL) &&
 			(((Game.m_gameWork.m_menuStageMode == 0) ||
 				(0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
-				((static_cast<unsigned short>(partyPrg->GetCID()) & 0x6D) != 0x6D) ||
-				(reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) == 0))) &&
+				!party->IsKindOf(0x6D) ||
+				(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId == 0))) &&
 			(((flags & 1) == 0) ||
-				((*reinterpret_cast<unsigned short*>(partyObj->m_scriptHandle + 7) != 0) &&
-					(partyPrg->m_lastStateId != 9) && (partyPrg->m_lastStateId != 0x22) &&
+				((reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_hp != 0) &&
+					(party->m_lastStateId != 9) && (party->m_lastStateId != 0x22) &&
 					((Game.m_gameWork.m_menuStageMode == 0) ||
 						(0xF <= Game.m_gameWork.m_bossArtifactStageIndex) ||
-						((static_cast<unsigned short>(partyPrg->GetCID()) & 0x6D) != 0x6D) ||
-						(reinterpret_cast<int>(partyObj->m_scriptHandle[0xED]) == 0)))) &&
+						!party->IsKindOf(0x6D) ||
+						(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId == 0)))) &&
 			(((flags & 0x10) == 0) ||
-				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x4E) != 0)) &&
+				(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_statusTimers[11] != 0)) &&
 			(((flags & 0x20) == 0) ||
-				(((partyPrg->m_lastStateId == 6) || (partyPrg->m_lastStateId == 2)) &&
-					(partyPrg->m_subState == 1))) &&
+				(((party->m_lastStateId == 6) || (party->m_lastStateId == 2)) &&
+					(party->m_subState == 1))) &&
 			(((flags & 0x40) == 0) ||
 				((party->m_partyData.unk6C0 >= 0) &&
-					(reinterpret_cast<int>(partyObj->m_scriptHandle[4]) == classId))) &&
-			(((flags & 2) != 0) || !(*reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4) < minDist)) &&
-			(((flags & 4) != 0) || !(maxDist < *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4)))) {
-			if (((flags & 8) != 0) && (0.0f < *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4))) {
+					(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_baseDataIndex == classId))) &&
+			(((flags & 2) != 0) || !(m_partyDistance[partyIndex] < minDist)) &&
+			(((flags & 4) != 0) || !(maxDist < m_partyDistance[partyIndex]))) {
+			if (((flags & 8) != 0) && (0.0f < m_partyDistance[partyIndex])) {
 				Vec toParty;
 				Vec facing;
-				PSVECSubtract(&partyObj->m_worldPosition, &monObject->m_worldPosition, &toParty);
-				PSVECScale(&toParty, &toParty, kMonObjDefaultScale / *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4));
-				facing.x = sin(monObject->m_rotTargetY);
+				PSVECSubtract(&party->m_worldPosition, &m_worldPosition, &toParty);
+				PSVECScale(&toParty, &toParty, kMonObjDefaultScale / m_partyDistance[partyIndex]);
+				facing.x = sin(m_rotTargetY);
 				facing.y = 0.0f;
-				facing.z = cos(monObject->m_rotTargetY);
+				facing.z = cos(m_rotTargetY);
 				if (PSVECDotProduct(&toParty, &facing) <= 0.0f) {
-					goto next_slot;
+					continue;
 				}
 			}
 
-			if (((targetOrdinal == -1) || (targetOrdinal == foundCount)) &&
-				(selectedPartyIndex = partyIndex, targetOrdinal == foundCount)) {
-				return partyIndex;
+			if ((targetOrdinal == -1) || (targetOrdinal == foundCount)) {
+				selectedPartyIndex = partyIndex;
+				if (targetOrdinal == foundCount) {
+					break;
+				}
 			}
 			foundCount++;
 		}
-
-	next_slot:
-		slotPtr += 4;
 	}
 
 	return selectedPartyIndex;

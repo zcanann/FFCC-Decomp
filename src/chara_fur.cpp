@@ -141,7 +141,7 @@ static inline int myRand(int range)
  */
 static inline float myRandFPM(float scale)
 {
-	return scale * ((2.0f / 32767.0f) * static_cast<float>(myRand(32767)) - 1.0f);
+	return scale * (-1.0f + (2.0f / 32767.0f) * static_cast<float>(myRand(32767)));
 }
 
 static void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*);
@@ -351,8 +351,7 @@ void CChara::makeFurTex()
 		float layerFactor = static_cast<float>(layer) * layerStep;
 		layerFactor = layerFactor * layerFactor;
 
-		CColor layerColor = color[0] * (scaleBase2 - layerFactor) + color[1] * layerFactor;
-		CColor clearColor(layerColor);
+		CColor clearColor = color[0] * (scaleBase2 - layerFactor) + color[1] * layerFactor;
 		clearColor.color.a = 0;
 		Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
 		GXCopyTex(static_cast<unsigned char*>(m_pTexBuf) + layer * 0x4000, GX_TRUE);
@@ -964,7 +963,7 @@ int CChara::CModel::PickFur(
 	float hitV = 0.0f;
 	float nearestDepth = 10000000.0f;
 	int hitAny = 0;
-	unsigned int hitPaintable = 0;
+	int hitPaintable = 0;
 	CVector hitViewPos;
 	hitViewPos.Identity();
 	Mtx44 screenMtx;
@@ -1003,7 +1002,7 @@ int CChara::CModel::PickFur(
 		int displayCount = mesh->m_data->m_displayListCount;
 		while (--displayCount >= 0) {
 			CMaterial* material = m_data->m_materialSet->m_materials[displayList->m_material];
-			unsigned int paintableMaterial = 0;
+			int paintableMaterial = 0;
 			CTexture* pickTexture = material->GetFurPickTexture();
 			if (pickTexture != 0 && pickTexture->m_format == GX_TF_RGB5A3) {
 				paintableMaterial = 1;
@@ -1012,24 +1011,16 @@ int CChara::CModel::PickFur(
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
 			if ((cursor[0] & 7) == 0) {
 				int remaining = displayList->m_size;
-				unsigned char command;
-				do {
-					while (true) {
-						if (remaining == 0) {
-							goto displayDone;
-						}
-						command = cursor[0];
-						const unsigned short count = *reinterpret_cast<const short*>(cursor + 1);
-						cursor += 3;
-						const int primitive = command & 0xF8;
-						remaining -= static_cast<int>(static_cast<unsigned short>(count)) * 8 + 3;
-						if (primitive != GX_TRIANGLES && primitive != GX_TRIANGLESTRIP) {
-							break;
-						}
-
-						for (unsigned int vertexIndex = 0; vertexIndex < count; vertexIndex++) {
-							const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
-
+				while (remaining != 0) {
+					unsigned char command = cursor[0];
+					unsigned int count = *reinterpret_cast<const unsigned short*>(cursor + 1);
+					cursor += 3;
+					const int primitive = command & 0xF8;
+					remaining -= count * 8 + 3;
+					int vertexIndex = 0;
+					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
+					if (primitive == GX_TRIANGLES || primitive == GX_TRIANGLESTRIP) {
+						for (; count--; vertexIndex++) {
 							register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];
 							register const unsigned char* uvPtr = mesh->m_data->m_uvs;
 							register int uvOff = static_cast<unsigned int>(indices[3]) << 2;
@@ -1065,8 +1056,8 @@ int CChara::CModel::PickFur(
 							verts[1] = verts[2];
 							verts[2] = incoming;
 
-							if ((primitive == GX_TRIANGLES && static_cast<int>(vertexIndex) % 3 == 2) ||
-								(primitive == GX_TRIANGLESTRIP && static_cast<int>(vertexIndex) >= 2)) {
+							if ((primitive == GX_TRIANGLES && vertexIndex % 3 == 2) ||
+								(primitive == GX_TRIANGLESTRIP && vertexIndex >= 2)) {
 								CWork* vp = &verts[0];
 								int passed = 0;
 								float depthAccum = 0.0f;
@@ -1170,11 +1161,13 @@ int CChara::CModel::PickFur(
 								}
 							}
 nextVertex:
-							cursor += 8;
+							indices += 4;
 						}
+						cursor = reinterpret_cast<const unsigned char*>(indices);
+					} else if (primitive == 0) {
+						break;
 					}
-				} while ((command & 0xF8) != 0);
-displayDone:;
+				}
 			}
 			displayList++;
 		}
@@ -1205,11 +1198,9 @@ displayDone:;
 		PSMTXMultVec(invViewMtx, outWorldPos, outWorldPos);
 	}
 
-	if (10000000.0f == nearestDepth) {
-		goto noHitReturn;
+	if (10000000.0f != nearestDepth) {
+		return 1;
 	}
-	return 1;
-noHitReturn:
 	return -(hitAny == 0);
 }
 
@@ -1431,11 +1422,11 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	}
 
 	Chara.MogFur().m_cursorX = static_cast<int>(10.0f * MogLeftStickX(debugPadLock) +
-	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)));
+	                                     static_cast<float>(Chara.MogFur().m_cursorX));
 	Chara.MogFur().m_cursorY = static_cast<int>(-(10.0f * MogLeftStickY(debugPadLock) -
-	                                     static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY))));
+	                                     static_cast<float>(Chara.MogFur().m_cursorY)));
 
-	const int cursorXv = static_cast<int>(Chara.MogFur().m_cursorX);
+	const int cursorXv = Chara.MogFur().m_cursorX;
 	int cursorXc;
 	if (cursorXv < 0) {
 		cursorXc = 0;
@@ -1446,7 +1437,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 	Chara.MogFur().m_cursorX = cursorXc;
-	const int cursorYv = static_cast<int>(Chara.MogFur().m_cursorY);
+	const int cursorYv = Chara.MogFur().m_cursorY;
 	int cursorYc;
 	if (cursorYv < 0) {
 		cursorYc = 0;

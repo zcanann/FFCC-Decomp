@@ -13,6 +13,22 @@ public:
 	/*
 	 * --INFO--
 	 * PAL Address: UNUSED
+	 * PAL Size: UNUSED
+	 * EN Address: 0x8008A430
+	 * EN Size: 36b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	void operator=(const CColor& other)
+	{
+		color.r = other.color.r;
+		color.g = other.color.g;
+		color.b = other.color.b;
+		color.a = other.color.a;
+	}
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
 	 * PAL Size: TODO
 	 * EN Address: 0x8008A454
 	 * EN Size: 276b

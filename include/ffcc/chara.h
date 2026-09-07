@@ -434,8 +434,8 @@ public:
             u32 m_prevRadarType;              // 0x2004
             int m_trackedCommandIndex;
         };
-        u32 m_cursorX;                        // 0x2008
-        u32 m_cursorY;                        // 0x200C
+        int m_cursorX;                        // 0x2008
+        int m_cursorY;                        // 0x200C
         int m_timestamp;                      // 0x2010
         int m_score[3];                       // 0x2014
         int m_bitScore[3];                    // 0x2020

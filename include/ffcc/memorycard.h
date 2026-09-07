@@ -4,8 +4,8 @@
 #include <Dolphin/types.h>
 #include <Dolphin/card.h>
 #include "ffcc/manager.h"
+#include "ffcc/memory.h"
 
-class CStage;
 namespace Mc
 {
 class SaveDat
@@ -77,7 +77,7 @@ public:
     // void* vtable;           // 0x00
     int m_result;              // 0x04
     char m_opDoneFlag;         // 0x08
-    CStage* m_stage;           // 0x0C
+    CMemory::CStage* m_stage;   // 0x0C
     void* m_mountWorkArea;     // 0x10
     char* m_saveBuffer;        // 0x14
     CARDFileInfo m_fileInfo;   // 0x18 (size 0x12)

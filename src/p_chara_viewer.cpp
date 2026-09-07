@@ -320,9 +320,10 @@ void CCharaPcs::calcViewer()
         self->m_viewerStoreSavedAnim = 0;
     }
 
-    if ((self->m_viewerLoadModel != 0) || (self->m_viewerLoadAnim != 0) || (self->m_viewerLoadTexture != 0) ||
+    int loadModel = self->m_viewerLoadModel;
+    if ((loadModel != 0) || (self->m_viewerLoadAnim != 0) || (self->m_viewerLoadTexture != 0) ||
         (self->m_viewerLoadAnimContinuous != 0)) {
-        if (self->m_viewerLoadModel != 0) {
+        if (loadModel != 0) {
             System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerModelPath);
             fileHandle = File.Open(self->m_viewerModelPath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {

@@ -255,9 +255,9 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                     cameraPos.z = center * LoadFloat(kMapBoundsCenterScale);
                 } else {
                     CMapObj* mapObj = MapMng.GetMapObj(1);
-                    cameraPos.x = mapObj->m_localTranslateX;
-                    cameraPos.y = mapObj->m_localTranslateY;
-                    cameraPos.z = mapObj->m_localTranslateZ;
+                    cameraPos.x = mapObj->m_localPosition.x;
+                    cameraPos.y = mapObj->m_localPosition.y;
+                    cameraPos.z = mapObj->m_localPosition.z;
                 }
             }
             cameraPos.y += LoadFloat(kMapCameraCenterYOffset);
@@ -394,9 +394,9 @@ void CMapPcs::calc()
                     cameraPos.z = center * LoadFloat(kMapBoundsCenterScale);
                 } else {
                     CMapObj* mapObj = MapMng.GetMapObj(1);
-                    cameraPos.x = mapObj->m_localTranslateX;
-                    cameraPos.y = mapObj->m_localTranslateY;
-                    cameraPos.z = mapObj->m_localTranslateZ;
+                    cameraPos.x = mapObj->m_localPosition.x;
+                    cameraPos.y = mapObj->m_localPosition.y;
+                    cameraPos.z = mapObj->m_localPosition.z;
                 }
             }
             cameraPos.y += LoadFloat(kMapCameraCenterYOffset);

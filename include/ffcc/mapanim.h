@@ -7,7 +7,7 @@
 class CChunkFile;
 class CMapAnim;
 class CMapAnimNode;
-struct CMapAnimTargetNode;
+class CMapObj;
 class CMapAnimKey;
 class CMapAnimKeyDt;
 class CMapAnimRun;
@@ -25,16 +25,6 @@ struct CMapAnimNodeTrack
     CMapAnimKey* keys;
 };
 
-struct CMapAnimTargetNode
-{
-    unsigned char _00[0x1B];
-    unsigned char dirty;
-    unsigned char _1C[0x48];
-    Vec position;
-    Vec rotation;
-    Vec scale;
-};
-
 class CMapAnimKeyDt
 {
 public:
@@ -49,7 +39,7 @@ public:
 class CMapAnimNode
 {
 public:
-    CMapAnimTargetNode* m_node;
+    CMapObj* m_node;
     CMapAnim* m_mapAnim;
     CMapAnimKeyDt* m_tracks;
 

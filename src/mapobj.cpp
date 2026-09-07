@@ -404,27 +404,27 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             break;
         }
         case CHUNK_TFRM: {
-            m_localTranslateX = chunkFile.GetF4();
-            m_localTranslateY = chunkFile.GetF4();
-            m_localTranslateZ = chunkFile.GetF4();
-            m_localRotationX = chunkFile.GetF4();
-            m_localRotationY = chunkFile.GetF4();
-            m_localRotationZ = chunkFile.GetF4();
-            m_localScaleX = chunkFile.GetF4();
-            m_localScaleY = chunkFile.GetF4();
-            m_localScaleZ = chunkFile.GetF4();
+            m_localPosition.x = chunkFile.GetF4();
+            m_localPosition.y = chunkFile.GetF4();
+            m_localPosition.z = chunkFile.GetF4();
+            m_localRotation.x = chunkFile.GetF4();
+            m_localRotation.y = chunkFile.GetF4();
+            m_localRotation.z = chunkFile.GetF4();
+            m_localScale.x = chunkFile.GetF4();
+            m_localScale.y = chunkFile.GetF4();
+            m_localScale.z = chunkFile.GetF4();
 
             if (((m_mapDataType == 2) || (m_mapDataType == 3)) &&
-                ((1.0f != m_localScaleX) || (1.0f != m_localScaleY) || (1.0f != m_localScaleZ))) {
+                ((1.0f != m_localScale.x) || (1.0f != m_localScale.y) || (1.0f != m_localScale.z))) {
                 if (m_attribute == 0) {
                     System.Printf(const_cast<char*>(sMapObjScaleWithoutNameWarn));
                 } else {
                     System.Printf(const_cast<char*>(sMapObjScaleWithNameWarn),
                                   reinterpret_cast<CMapObjAtrMeshName*>(m_attribute)->m_name);
                 }
-                m_localScaleX = 1.0f;
-                m_localScaleY = 1.0f;
-                m_localScaleZ = 1.0f;
+                m_localScale.x = 1.0f;
+                m_localScale.y = 1.0f;
+                m_localScale.z = 1.0f;
             }
 
             m_localMtxDirty = 1;
@@ -909,14 +909,14 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
         if (obj->m_calcMtxPending != 0) {
             obj->m_calcMtxPending = 0;
             if (obj->m_localMtxDirty != 0) {
-                PSMTXScale(obj->m_localMtx, obj->m_localScaleX, obj->m_localScaleY, obj->m_localScaleZ);
-                PSMTXRotRad(mtx, 'x', 0.017453292f * obj->m_localRotationX);
+                PSMTXScale(obj->m_localMtx, obj->m_localScale.x, obj->m_localScale.y, obj->m_localScale.z);
+                PSMTXRotRad(mtx, 'x', 0.017453292f * obj->m_localRotation.x);
                 PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
-                PSMTXRotRad(mtx, 'y', 0.017453292f * obj->m_localRotationY);
+                PSMTXRotRad(mtx, 'y', 0.017453292f * obj->m_localRotation.y);
                 PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
-                PSMTXRotRad(mtx, 'z', 0.017453292f * obj->m_localRotationZ);
+                PSMTXRotRad(mtx, 'z', 0.017453292f * obj->m_localRotation.z);
                 PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
-                PSMTXTrans(mtx, obj->m_localTranslateX, obj->m_localTranslateY, obj->m_localTranslateZ);
+                PSMTXTrans(mtx, obj->m_localPosition.x, obj->m_localPosition.y, obj->m_localPosition.z);
                 PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
             }
 

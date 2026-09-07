@@ -26,7 +26,7 @@ public:
         float m_amplitude;   // 0x28
     };
 
-    static CProcessTable m_table;
+    static CProcessCallbackTable m_table;
     void Init();
     void Quit();
     int GetTable(unsigned long);

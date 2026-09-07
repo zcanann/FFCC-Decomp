@@ -18,43 +18,8 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" {
-void create__11CGraphicPcsFv(CGraphicPcs*);
-void destroy__11CGraphicPcsFv(CGraphicPcs*);
-void calc__11CGraphicPcsFv(CGraphicPcs*);
-void drawBegin__11CGraphicPcsFv(CGraphicPcs*);
-void drawWait__11CGraphicPcsFv(CGraphicPcs*);
-void drawFlip__11CGraphicPcsFv(CGraphicPcs*);
-void drawEnd__11CGraphicPcsFv(CGraphicPcs*);
-void drawCopy__11CGraphicPcsFv(CGraphicPcs*);
-void preDrawEnvInit__11CGraphicPcsFv(CGraphicPcs*);
-void stdDrawEnvInit__11CGraphicPcsFv(CGraphicPcs*);
-}
-
 inline CGraphicPcs::CGraphicPcs()
 {
-    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__11CGraphicPcsFv)};
-    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__11CGraphicPcsFv)};
-    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__11CGraphicPcsFv)};
-    static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawWait__11CGraphicPcsFv)};
-    static CProcessTableCallback desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawFlip__11CGraphicPcsFv)};
-    static CProcessTableCallback desc5 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBegin__11CGraphicPcsFv)};
-    static CProcessTableCallback desc6 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCopy__11CGraphicPcsFv)};
-    static CProcessTableCallback desc7 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawEnd__11CGraphicPcsFv)};
-    static CProcessTableCallback desc8 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(preDrawEnvInit__11CGraphicPcsFv)};
-    static CProcessTableCallback desc9 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(stdDrawEnvInit__11CGraphicPcsFv)};
-    CProcessTable* table = &m_table;
-
-    table->m_fields.m_create = desc0;
-    table->m_fields.m_destroy = desc1;
-    table->m_fields.m_entries[0].m_callback = desc2;
-    table->m_fields.m_entries[1].m_callback = desc3;
-    table->m_fields.m_entries[2].m_callback = desc4;
-    table->m_fields.m_entries[3].m_callback = desc5;
-    table->m_fields.m_entries[4].m_callback = desc6;
-    table->m_fields.m_entries[5].m_callback = desc7;
-    table->m_fields.m_entries[6].m_callback = desc8;
-    table->m_fields.m_entries[7].m_callback = desc9;
 }
 
 CGraphicPcs GraphicPcs;
@@ -62,27 +27,19 @@ static const char s_CGraphicPcs[] = "CGraphicPcs";
 static const char sGraphicPcsManagerClassName[] = "CManager";
 static const char sGraphicPcsProcessClassName[] = "CProcess";
 
-CProcessTable CGraphicPcs::m_table = {
+CProcessCallbackTable CGraphicPcs::m_table = {
     const_cast<char*>(s_CGraphicPcs),
+    static_cast<CProcessCallback>(&CGraphicPcs::create),
+    static_cast<CProcessCallback>(&CGraphicPcs::destroy),
     {
-        0, 0, 0,
-        0, 0, 0,
-        0, 0, 0,
-        0x22, 0x8,
-        0, 0, 0,
-        0x26, 0x9,
-        0, 0, 0,
-        0x27, 0xC,
-        0, 0, 0,
-        0x29, 0x9,
-        0, 0, 0,
-        0x48, 1,
-        0, 0, 0,
-        0x4B, 0x9,
-        0, 0, 0,
-        0x2B, 0x9,
-        0, 0, 0,
-        0x34, 0x9,
+        {static_cast<CProcessCallback>(&CGraphicPcs::calc), 0x22, 0x8},
+        {static_cast<CProcessCallback>(&CGraphicPcs::drawWait), 0x26, 0x9},
+        {static_cast<CProcessCallback>(&CGraphicPcs::drawFlip), 0x27, 0xC},
+        {static_cast<CProcessCallback>(&CGraphicPcs::drawBegin), 0x29, 0x9},
+        {static_cast<CProcessCallback>(&CGraphicPcs::drawCopy), 0x48, 1},
+        {static_cast<CProcessCallback>(&CGraphicPcs::drawEnd), 0x4B, 0x9},
+        {static_cast<CProcessCallback>(&CGraphicPcs::preDrawEnvInit), 0x2B, 0x9},
+        {static_cast<CProcessCallback>(&CGraphicPcs::stdDrawEnvInit), 0x34, 0x9},
     },
 };
 
@@ -788,17 +745,7 @@ void CGraphicPcs::drawEnd()
 		int port = 0;
 		x = 0x10;
 		for (; port < 4; port++) {
-			bool suppress = (Pad.m_debugPadLock != 0) || ((port == 0) && (Pad.GetPortEmulation() != -1));
-
-			u16 held;
-			if (suppress) {
-				held = 0;
-			} else {
-				int selectedPort = Pad.GetPortEmulation();
-				u32 portIndex = port & ~((int)~((selectedPort - port) | (port - selectedPort)) >> 31);
-				held = Pad.GetPadInputs()[portIndex].button[0];
-			}
-			const u16 buttons = held;
+			const u16 buttons = Pad.GetButton(port);
 
 			const char c = ((buttons & 0x20) != 0) ? 'r' : ' ';
 			const char z = ((buttons & 0x40) != 0) ? 'l' : ' ';

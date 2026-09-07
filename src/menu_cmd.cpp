@@ -403,10 +403,14 @@ void CMenuPcs::CmdInit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 356b
+ * EN Address: 0x8016D928
+ * EN Size: 188b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::CmdInit0()
+inline void CMenuPcs::CmdInit0()
 {
 	CmdListStorage* list = GetCmdListStorage(this);
 	CmdListEntry* entries = list->entries;
@@ -429,8 +433,6 @@ void CMenuPcs::CmdInit0()
 	GetCmdStateView(this)->commandResult = 0;
 }
 
-#pragma push
-#pragma opt_unroll_loops off
 /*
  * --INFO--
  * PAL Address: 0x8014ff0c
@@ -529,7 +531,7 @@ void CMenuPcs::CmdInit1()
 		fillEntry++;
 	}
 }
-#pragma pop
+
 
 /*
  * --INFO--
@@ -1881,10 +1883,14 @@ void CMenuPcs::GetCmdItem()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 248b
+ * EN Address: 0x80171108
+ * EN Size: 276b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::ChkCmdActive(int itemIndex)
+inline void CMenuPcs::ChkCmdActive(int itemIndex)
 {
 	CmdState* const cmd = GetCmdStateView(this);
 	cmd->commandResult = 0;
@@ -2135,10 +2141,14 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: 0x80171AAC
+ * EN Size: 120b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::CmdUnite(int selected, int comboIndex)
+inline void CMenuPcs::CmdUnite(int selected, int comboIndex)
 {
 	int combo[5][2];
 	const int comboCount = ChkUnite(selected, combo);
@@ -2154,10 +2164,14 @@ void CMenuPcs::CmdUnite(int selected, int comboIndex)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 152b
+ * EN Address: 0x80171B24
+ * EN Size: 156b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::CmdDismantle(int selected)
+inline void CMenuPcs::CmdDismantle(int selected)
 {
 	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	int count = 1;
@@ -2450,10 +2464,6 @@ void CMenuPcs::DrawUniteList()
 	}
 }
 
-#pragma push
-#pragma peephole off
-#pragma opt_loop_invariants off
-#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8014b7ec
@@ -2495,7 +2505,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		targetX = kCmdMenuPanelSize64 + baseX;
 		s32* top = &s_UniteTop[finished];
 		for (int i = 0; i < s_unitePanelCount; i++) {
-			for (unsigned int j = 0; j < 3; j++) {
+			for (int j = 0; j < 3; j++) {
 				CmdListEntry* entry = &GetCmdListStorage(this)->entries[j + *top];
 				int idx = j + *top;
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
@@ -2520,7 +2530,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 
 	return 0;
 }
-#pragma pop
+
 
 /*
  * --INFO--
@@ -2781,10 +2791,14 @@ unsigned int CMenuPcs::CmdClose1()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 392b
+ * EN Address: 0x801735F8
+ * EN Size: 428b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::CmdOpen2()
+inline void CMenuPcs::CmdOpen2()
 {
 	CmdState* cmd = GetCmdStateView(this);
 	CmdListStorage* list = GetCmdListStorage(this);
@@ -2940,41 +2954,19 @@ unsigned int CMenuPcs::CmdClose2()
  */
 const char* CMenuPcs::GetSkillStr(int index)
 {
-	const int languageId = Game.m_gameWork.m_languageId;
-
-	if (languageId == 3) {
-		goto language_3;
+	switch (Game.m_gameWork.m_languageId) {
+	case 2:
+		return s_SkillStr_ge[index];
+	case 3:
+		return s_SkillStr_it[index];
+	case 4:
+		return s_SkillStr_fr[index];
+	case 5:
+		return s_SkillStr_sp[index];
+	case 1:
+	default:
+		return s_SkillStr_us[index];
 	}
-	if (languageId >= 3) {
-		goto language_ge_3;
-	}
-	if (languageId == 1) {
-		goto language_default;
-	}
-	if (languageId >= 1) {
-		goto language_2;
-	}
-	goto language_default;
-
-language_ge_3:
-	if (languageId == 5) {
-		goto language_5;
-	}
-	if (languageId >= 5) {
-		goto language_default;
-	}
-	goto language_4;
-
-language_2:
-	return s_SkillStr_ge[index];
-language_3:
-	return s_SkillStr_it[index];
-language_4:
-	return s_SkillStr_fr[index];
-language_5:
-	return s_SkillStr_sp[index];
-language_default:
-	return s_SkillStr_us[index];
 }
 
 extern "C" const char* s_SkillStr_us[] = {

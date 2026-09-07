@@ -519,7 +519,7 @@ config.libs = [
             Object(NonMatching, "file.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(Matching, "strcase.c"),
             Object(NonMatching, "fontman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
-            Object(NonMatching, "FS_USB_Process.cpp", cflags=cflags_game),
+            Object(NonMatching, "FS_USB_Process.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "FunnyShape.cpp"),
             Object(NonMatching, "game.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline noauto,deferred"]),
             Object(NonMatching, "gbaque.cpp"),

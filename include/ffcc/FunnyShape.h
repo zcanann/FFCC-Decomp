@@ -33,6 +33,16 @@ public:
 	void Render();
 	void RenderTexture();
 	void RenderShape();
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: 0x8005ce50
+     * EN Size: 52b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void SetDisplay(FS_DISPLAY_STATUS display) { m_displayCurrent = display; }
 	void SetDefaultStage();
 	void ClearShapeData();
 	void Create();

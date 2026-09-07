@@ -29,7 +29,15 @@ struct _pppProgSetDef
     u16 m_spawnCount;            // 0x04
     u16 m_reserved6;             // 0x06
     u32 m_flags;                 // 0x08
-    u8 m_drawFlags;              // 0x0C
+    union {
+        u8 m_drawFlags;
+        struct {
+            signed char m_skipDraw : 1;
+            unsigned char m_reserved : 5;
+            signed char m_keepOnHeap : 1;
+            unsigned char m_reserved0 : 1;
+        } m_drawFlagBits;
+    };                          // 0x0C
     u8 m_pad0D[3];               // 0x0D
     s32 m_startFrame;            // 0x10
     s32 m_deadFrame;             // 0x14

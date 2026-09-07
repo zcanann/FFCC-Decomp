@@ -31,6 +31,10 @@ extern float ppvScreenMatrixZbuff;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+STATIC_ASSERT(offsetof(_pppProgSetDef, m_drawFlags) == 0xC);
+STATIC_ASSERT(offsetof(_pppProgSetDef, m_startFrame) == 0x10);
+STATIC_ASSERT(offsetof(_pppProgSetDef, m_stages) == 0x28);
+
 
 static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
 {
@@ -390,7 +394,7 @@ static inline void pppFreePObjectPrio(_pppMngSt* mng)
     _pppPObjLink* obj = mng->m_pppPObjLinkHead.m_next;
     while (obj != 0) {
         _pppPObjLink* next = obj->m_next;
-        if ((obj->m_owner->m_programSetDef->m_drawFlags & 2) == 0) {
+        if (obj->m_owner->m_programSetDef->m_drawFlagBits.m_keepOnHeap == 0) {
             prev->m_next = next;
             pppDeletePObject((_pppPObject*)obj);
         } else {
@@ -1375,8 +1379,8 @@ static inline void callInitProg(_pppMngSt* pppMngSt)
  * --INFO--
  * PAL Address: 80055308
  * PAL Size: 1376b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8006442C
+ * EN Size: 656b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1408,40 +1412,9 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	if (pppMngSt->m_numPrograms != 0)
 	{
-		u32 allocSize = pppMngSt->m_numPrograms * sizeof(_pppPDataVal);
-		CMemory::CStage* stage = ppvEnv->m_stagePtr;
-		int firstAllocFailure = 1;
-		int canRetry;
-		_pppPDataVal* pDataVals = 0;
-		char denied[0x180];
-
-		ppvMemAllocErrorF = 0;
-		do
-		{
-			pDataVals = (_pppPDataVal*)Memory._Alloc(
-			    allocSize, stage, (char*)s_pppPart_cpp, 0x585, 1);
-			if (pDataVals != 0)
-			{
-				goto DataValsAllocated;
-			}
-
-			if (firstAllocFailure)
-			{
-				firstAllocFailure = 0;
-				memset(denied, 0, sizeof(denied));
-				int currentIdx = ppvMng - PartMng.m_pppMng;
-				denied[currentIdx] = 1;
-			}
-
-			canRetry = pppFreeMngStPrioForHeap(denied);
-		}
-		while (canRetry);
-
-		ppvEnv->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
-		PartMng.pppDumpMngSt();
-		ppvMemAllocErrorF = 1;
-DataValsAllocated:
-		pppMngSt->m_pppPDataVals = pDataVals;
+		pppMngSt->m_pppPDataVals = (_pppPDataVal*)pppMemAlloc(
+			pppMngSt->m_numPrograms * sizeof(_pppPDataVal), ppvEnv->m_stagePtr,
+			const_cast<char*>(s_pppPart_cpp), 0x585);
 	}
 	else
 	{
@@ -1717,8 +1690,8 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
  * --INFO--
  * PAL Address: 80054b30
  * PAL Size: 296b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800650B0
+ * EN Size: 464b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1729,7 +1702,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 	{
 		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pppMngSt->m_pppPDataVals + pDataValOffset);
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0 &&
-		    (s8)((s32)(((u32)pDataVal->m_programSetDef->m_drawFlags << 24) & 0xC0000000) >> 31) == 0 && pDataVal->m_activeCount > 0)
+		    pDataVal->m_programSetDef->m_drawFlagBits.m_skipDraw == 0 && pDataVal->m_activeCount > 0)
 		{
 			s32 workOffsetStep = 0;
 			_pppProgSetDef* progSet = pDataVal->m_programSetDef;

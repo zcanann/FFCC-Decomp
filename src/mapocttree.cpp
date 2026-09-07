@@ -650,63 +650,6 @@ void COctTree::ClearLight()
 	ClearLight_r(m_nodePool);
 }
 
-/*
- * --INFO--
- * PAL Address: 8002cc28
- * PAL Size: 272b
- */
-int CBound::CheckCross(CBound& other)
-{
-	bool xyOverlap;
-	bool overlap;
-	int xOverlap;
-
-	overlap = false;
-	xyOverlap = overlap;
-	if (m_min.x < other.m_min.x) {
-		xOverlap = other.m_min.x <= m_max.x;
-	} else {
-		if (m_min.x > other.m_min.x) {
-			xOverlap = m_min.x <= other.m_max.x;
-		} else {
-			xOverlap = true;
-		}
-	}
-
-	if (xOverlap) {
-		if (m_min.y < other.m_min.y) {
-			xOverlap = other.m_min.y <= m_max.y;
-		} else {
-			if (m_min.y > other.m_min.y) {
-				xOverlap = m_min.y <= other.m_max.y;
-			} else {
-				xOverlap = true;
-			}
-		}
-
-		if (xOverlap) {
-			xyOverlap = true;
-		}
-	}
-
-	if (xyOverlap) {
-		if (m_min.z < other.m_min.z) {
-			xOverlap = other.m_min.z <= m_max.z;
-		} else {
-			if (m_min.z > other.m_min.z) {
-				xOverlap = m_min.z <= other.m_max.z;
-			} else {
-				xOverlap = true;
-			}
-		}
-
-		if (xOverlap) {
-			overlap = true;
-		}
-	}
-
-	return (unsigned char)overlap;
-}
 
 /*
  * --INFO--

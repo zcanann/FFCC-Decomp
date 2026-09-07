@@ -710,21 +710,21 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 m_vertices[i].z = chunkFile.GetF4();
 
                 Vec* v = &m_vertices[i];
-                m_positionMin.x = (m_positionMin.x < v->x) ? m_positionMin.x : v->x;
-                m_positionMin.y = (m_positionMin.y < v->y) ? m_positionMin.y : v->y;
-                m_positionMin.z = (m_positionMin.z < v->z) ? m_positionMin.z : v->z;
+                m_bound.m_min.x = (m_bound.m_min.x < v->x) ? m_bound.m_min.x : v->x;
+                m_bound.m_min.y = (m_bound.m_min.y < v->y) ? m_bound.m_min.y : v->y;
+                m_bound.m_min.z = (m_bound.m_min.z < v->z) ? m_bound.m_min.z : v->z;
 
-                m_positionMax.x = (m_positionMax.x > v->x) ? m_positionMax.x : v->x;
-                m_positionMax.y = (m_positionMax.y > v->y) ? m_positionMax.y : v->y;
-                m_positionMax.z = (m_positionMax.z > v->z) ? m_positionMax.z : v->z;
+                m_bound.m_max.x = (m_bound.m_max.x > v->x) ? m_bound.m_max.x : v->x;
+                m_bound.m_max.y = (m_bound.m_max.y > v->y) ? m_bound.m_max.y : v->y;
+                m_bound.m_max.z = (m_bound.m_max.z > v->z) ? m_bound.m_max.z : v->z;
             }
 
-            m_positionMin.x -= kMapHitUnitScale;
-            m_positionMin.y -= kMapHitUnitScale;
-            m_positionMin.z -= kMapHitUnitScale;
-            m_positionMax.x += kMapHitUnitScale;
-            m_positionMax.y += kMapHitUnitScale;
-            m_positionMax.z += kMapHitUnitScale;
+            m_bound.m_min.x -= kMapHitUnitScale;
+            m_bound.m_min.y -= kMapHitUnitScale;
+            m_bound.m_min.z -= kMapHitUnitScale;
+            m_bound.m_max.x += kMapHitUnitScale;
+            m_bound.m_max.y += kMapHitUnitScale;
+            m_bound.m_max.z += kMapHitUnitScale;
             break;
         }
         case 'HITF': {
@@ -864,23 +864,16 @@ CMapHit::~CMapHit()
 
 /*
  * --INFO--
- * PAL Address: 0x80026dec
+ * PAL Address: 0x80026DEC
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8002FF04
+ * EN Size: 84b
  * JP Address: TODO
  * JP Size: TODO
  */
 CMapHit::CMapHit()
+    : m_bound(kMapHitBoundsMinInit, kMapHitBoundsMaxInit)
 {
-    m_positionMin.z = kMapHitBoundsMinInit;
-    m_positionMin.y = kMapHitBoundsMinInit;
-    m_positionMin.x = kMapHitBoundsMinInit;
-
-    m_positionMax.z = kMapHitBoundsMaxInit;
-    m_positionMax.y = kMapHitBoundsMaxInit;
-    m_positionMax.x = kMapHitBoundsMaxInit;
-
     m_vertexCount = 0;
     m_faceCount = 0;
     m_vertices = 0;

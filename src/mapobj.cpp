@@ -22,222 +22,14 @@
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 extern const char s_mapobj_cpp[] = "mapobj.cpp";
-extern const char sMapObjScaleWithoutNameWarn[0x78] = {
-    (char)0x83, (char)0x47, (char)0x83, (char)0x89, (char)0x81, (char)0x5b, (char)0x81, (char)0x49,
-    (char)0x81, (char)0x49, (char)0x81, (char)0x49, (char)0x20, (char)0x67, (char)0x72, (char)0x6f,
-    (char)0x75, (char)0x6e, (char)0x64, (char)0x5f, (char)0x61, (char)0x20, (char)0x6f, (char)0x72,
-    (char)0x20, (char)0x6f, (char)0x62, (char)0x6a, (char)0x5f, (char)0x61, (char)0x20, (char)0x83,
-    (char)0x6d, (char)0x81, (char)0x5b, (char)0x83, (char)0x68, (char)0x20, (char)0x82, (char)0xcc,
-    (char)0x83, (char)0x58, (char)0x83, (char)0x50, (char)0x81, (char)0x5b, (char)0x83, (char)0x8b,
-    (char)0x82, (char)0xaa, (char)0x20, (char)0x82, (char)0x50, (char)0x20, (char)0x82, (char)0xc5,
-    (char)0x82, (char)0xcd, (char)0x82, (char)0xc8, (char)0x82, (char)0xa2, (char)0x81, (char)0x42,
-    (char)0x0a, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x8c, (char)0xc3,
-    (char)0x82, (char)0xa2, (char)0x83, (char)0x6f, (char)0x81, (char)0x5b, (char)0x83, (char)0x57,
-    (char)0x83, (char)0x87, (char)0x83, (char)0x93, (char)0x82, (char)0xcc, (char)0x20, (char)0x82,
-    (char)0x6e, (char)0x82, (char)0x73, (char)0x82, (char)0x6c, (char)0x82, (char)0xc8, (char)0x82,
-    (char)0xcc, (char)0x82, (char)0xc5, (char)0x83, (char)0x6d, (char)0x81, (char)0x5b, (char)0x83,
-    (char)0x68, (char)0x96, (char)0xbc, (char)0x82, (char)0xcd, (char)0x95, (char)0x73, (char)0x96,
-    (char)0xbe, (char)0x82, (char)0xc5, (char)0x82, (char)0xb7, (char)0x81, (char)0x42, (char)0x00,
-};
-extern const char sMapObjScaleWithNameWarn[0x48] = {
-    (char)0x83, (char)0x47, (char)0x83, (char)0x89, (char)0x81, (char)0x5b, (char)0x81, (char)0x49,
-    (char)0x81, (char)0x49, (char)0x81, (char)0x49, (char)0x20, (char)0x67, (char)0x72, (char)0x6f,
-    (char)0x75, (char)0x6e, (char)0x64, (char)0x5f, (char)0x61, (char)0x20, (char)0x6f, (char)0x72,
-    (char)0x20, (char)0x6f, (char)0x62, (char)0x6a, (char)0x5f, (char)0x61, (char)0x20, (char)0x83,
-    (char)0x6d, (char)0x81, (char)0x5b, (char)0x83, (char)0x68, (char)0x20, (char)0x25, (char)0x73,
-    (char)0x20, (char)0x82, (char)0xcc, (char)0x83, (char)0x58, (char)0x83, (char)0x50, (char)0x81,
-    (char)0x5b, (char)0x83, (char)0x8b, (char)0x82, (char)0xaa, (char)0x20, (char)0x82, (char)0x50,
-    (char)0x20, (char)0x82, (char)0xc5, (char)0x82, (char)0xcd, (char)0x82, (char)0xc8, (char)0x82,
-    (char)0xa2, (char)0x81, (char)0x42, (char)0x0a, (char)0x00, (char)0x00, (char)0x00, (char)0x00,
-};
-extern const char sMapObjTooManyAttributesWarn[0x34] = {
-    (char)0x6e, (char)0x6f, (char)0x64, (char)0x65, (char)0x20, (char)0x25, (char)0x64, (char)0x20,
-    (char)0x82, (char)0xcd, (char)0x82, (char)0xb1, (char)0x82, (char)0xea, (char)0x88, (char)0xc8,
-    (char)0x8f, (char)0xe3, (char)0x83, (char)0x41, (char)0x83, (char)0x67, (char)0x83, (char)0x8a,
-    (char)0x83, (char)0x72, (char)0x83, (char)0x85, (char)0x81, (char)0x5b, (char)0x83, (char)0x67,
-    (char)0x82, (char)0xf0, (char)0x92, (char)0xc7, (char)0x89, (char)0xc1, (char)0x82, (char)0xc5,
-    (char)0x82, (char)0xab, (char)0x82, (char)0xdc, (char)0x82, (char)0xb9, (char)0x82, (char)0xf1,
-    (char)0x81, (char)0x42, (char)0x0a, (char)0x00,
-};
-extern const char s_CMapObjAtrPlaySta_801D71C0[] = "CMapObjAtrPlaySta";
-extern const char s_CMapObjAtr_801D71D4[] = "CMapObjAtr";
-extern const char s_CMapObjAtrMime_801D71E0[] = "CMapObjAtrMime";
-extern const char s_CMapObjAtrSpotLight_801D71F0[] = "CMapObjAtrSpotLight";
-extern const char s_CMapObjAtrPointLight_801D7204[] = "CMapObjAtrPointLight";
-extern const char s_CMapObjAtrMeshName_801D721C[] = "CMapObjAtrMeshName";
+extern const char sMapObjScaleWithoutNameWarn[] = "エラー！！！ ground_a or obj_a ノード のスケールが １ ではない。\n     古いバージョンの ＯＴＭなのでノード名は不明です。";
+extern const char sMapObjScaleWithNameWarn[] = "エラー！！！ ground_a or obj_a ノード %s のスケールが １ ではない。\n";
+extern const char sMapObjTooManyAttributesWarn[] = "node %d はこれ以上アトリビュートを追加できません。\n";
 _GXColor s_mapObjLightColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
 inline void* operator new(unsigned long, void* ptr)
 {
     return ptr;
-}
-
-namespace {
-static inline CMapObj* NextSlot(CMapObj* obj)
-{
-    return obj + 1;
-}
-
-static inline CMapObj* MapObjArrayStart()
-{
-    return MapMng.GetMapObjArray();
-}
-
-static inline Mtx& MapObjHitDrawMtx()
-{
-    return MapMng.m_viewMtx;
-}
-
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
-
-static inline float LoadFloatVolatile(const volatile float& value)
-{
-    return value;
-}
-
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002C444
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma dont_inline on
-template <>
-int CPtrArray<CMapAnimRun*>::Add(CMapAnimRun* item)
-{
-    if (setSize(m_numItems + 1) == 0) {
-        return 0;
-    }
-
-    m_items[m_numItems] = item;
-    m_numItems = m_numItems + 1;
-    return 1;
-}
-#pragma dont_inline off
-
-/*
- * --INFO--
- * PAL Address: 0x8002C4B4
- * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-int CPtrArray<CMapAnimRun*>::setSize(unsigned long newSize)
-{
-    extern const char s_CPtrArrayGrowError[];
-    extern const char s_CPtrArrayFile[];
-    CMapAnimRun** newItems;
-
-    if (m_size < newSize) {
-        if (m_size == 0) {
-            m_size = m_defaultSize;
-        } else {
-            if (m_growCapacity == 0) {
-                System.Printf(const_cast<char*>(s_CPtrArrayGrowError));
-            }
-            m_size = m_size << 1;
-        }
-
-        newItems = static_cast<CMapAnimRun**>(Memory._Alloc(m_size * sizeof(CMapAnimRun*), m_stage,
-                                                            const_cast<char*>(s_CPtrArrayFile), 0xfa, 0));
-        if (newItems == 0) {
-            return 0;
-        }
-
-        if (m_items != 0) {
-            memcpy(newItems, m_items, m_numItems * sizeof(CMapAnimRun*));
-        }
-
-        if (m_items != 0) {
-            delete[] m_items;
-            m_items = 0;
-        }
-
-        m_items = newItems;
-    }
-
-    return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002C5A4
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma dont_inline on
-template <>
-int CPtrArray<CMapShadow*>::Add(CMapShadow* item)
-{
-    if (setSize(m_numItems + 1) == 0) {
-        return 0;
-    }
-
-    m_items[m_numItems] = item;
-    m_numItems = m_numItems + 1;
-    return 1;
-}
-#pragma dont_inline off
-
-/*
- * --INFO--
- * PAL Address: 0x8002C614
- * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-int CPtrArray<CMapShadow*>::setSize(unsigned long newSize)
-{
-    extern const char s_CPtrArrayGrowError[];
-    extern const char s_CPtrArrayFile[];
-    CMapShadow** newItems;
-
-    if (m_size < newSize) {
-        if (m_size == 0) {
-            m_size = m_defaultSize;
-        } else {
-            if (m_growCapacity == 0) {
-                System.Printf(const_cast<char*>(s_CPtrArrayGrowError));
-            }
-            m_size = m_size << 1;
-        }
-
-        newItems = static_cast<CMapShadow**>(Memory._Alloc(m_size * sizeof(CMapShadow*), m_stage,
-                                                           const_cast<char*>(s_CPtrArrayFile), 0xfa, 0));
-        if (newItems == 0) {
-            return 0;
-        }
-
-        if (m_items != 0) {
-            memcpy(newItems, m_items, m_numItems * sizeof(CMapShadow*));
-        }
-
-        if (m_items != 0) {
-            delete[] m_items;
-            m_items = 0;
-        }
-
-        m_items = newItems;
-    }
-
-    return 1;
 }
 
 /*
@@ -251,10 +43,8 @@ int CPtrArray<CMapShadow*>::setSize(unsigned long newSize)
  */
 CBound::CBound()
 {
-    extern const float kMapObjBoundMinInit;
-    extern const float kMapObjBoundMaxInit;
-    float max = kMapObjBoundMaxInit;
-    float min = kMapObjBoundMinInit;
+    float max = -10000000000.0f;
+    float min = 10000000000.0f;
 
     m_min.z = min;
     m_min.y = min;
@@ -266,10 +56,103 @@ CBound::CBound()
 
 /*
  * --INFO--
+ * PAL Address: 0x8002BE34
+ * PAL Size: 72b
+ * EN Address: 0x800364A4
+ * EN Size: 88b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CMapObjAtr::~CMapObjAtr()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002BFF0
+ * PAL Size: 92b
+ * EN Address: 0x80036B30
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CMapObjAtrPlaySta::~CMapObjAtrPlaySta()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002C04C
+ * PAL Size: 292b
+ * EN Address: 0x80036A50
+ * EN Size: 224b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CMapObjAtrMime::~CMapObjAtrMime()
+{
+    int i = 0;
+
+    while (i < static_cast<int>(m_vertexListCount)) {
+        if (m_vertexLists[i] != 0) {
+            delete m_vertexLists[i];
+            m_vertexLists[i] = 0;
+        }
+
+        i++;
+    }
+
+    if (m_vertexLists != 0) {
+        delete m_vertexLists;
+        m_vertexLists = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002C170
+ * PAL Size: 316b
+ * EN Address: 0x800369D4
+ * EN Size: 124b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002C2AC
+ * PAL Size: 316b
+ * EN Address: 0x80036958
+ * EN Size: 124b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CMapObjAtrPointLight::~CMapObjAtrPointLight()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002C3E8
+ * PAL Size: 92b
+ * EN Address: 0x800368F4
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CMapObjAtrMeshName::~CMapObjAtrMeshName()
+{
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8002BEFC
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80033780
+ * EN Size: 52b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -282,8 +165,8 @@ CMapObj::CMapObj()
  * --INFO--
  * PAL Address: 0x8002BE7C
  * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800337B4
+ * EN Size: 152b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -301,16 +184,13 @@ CMapObj::~CMapObj()
  * --INFO--
  * PAL Address: 0x8002BF2C
  * PAL Size: 196b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80033658
+ * EN Size: 296b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMapObj::Init()
 {
-    extern const float kMapObjOne;
-    extern const float kMapObjInitNegOne;
-    extern const float kMapObjInitValue50;
     m_calcMtxPending = 1;
     m_localMtxDirty = 1;
     m_parent = 0;
@@ -331,10 +211,10 @@ void CMapObj::Init()
     m_unknown19 = 1;
     m_meshId = 0xFFFF;
 
-    m_cameraSemiTransFar = kMapObjInitNegOne;
-    m_cameraSemiTransNear = kMapObjInitNegOne;
-    m_cameraSemiTransMinAlpha = kMapObjInitNegOne;
-    m_cameraSemiTransMaxAlpha = kMapObjInitValue50;
+    m_cameraSemiTransFar = 1000000000000000.0f;
+    m_cameraSemiTransNear = 1000000000000000.0f;
+    m_cameraSemiTransMinAlpha = 1000000000000000.0f;
+    m_cameraSemiTransMaxAlpha = -1.0f;
 
     m_cameraSemiTransStep = 0;
     m_cameraSemiTransTargetAlpha = 0;
@@ -346,11 +226,11 @@ void CMapObj::Init()
     m_enableFullScreenShadow = 1;
     m_shadowTarget = -1;
 
-    m_transRateZ = kMapObjOne;
-    m_transRateY = kMapObjOne;
-    m_transRateX = kMapObjOne;
+    m_transRateZ = 0.0f;
+    m_transRateY = 0.0f;
+    m_transRateX = 0.0f;
     m_bumpTexMatrixMode = 0;
-    m_zBufferOffset = kMapObjOne;
+    m_zBufferOffset = 0.0f;
     m_cameraSemiTransBeyondMax = 1;
     m_cameraSemiTransActive = 0;
     m_lightSetIndex = -1;
@@ -358,8 +238,12 @@ void CMapObj::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80036544
+ * EN Size: 16b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline CMapObjAtr::CMapObjAtr()
 {
@@ -367,8 +251,12 @@ inline CMapObjAtr::CMapObjAtr()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x800364FC
+ * EN Size: 72b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline CMapObjAtrPlaySta::CMapObjAtrPlaySta()
 {
@@ -377,8 +265,12 @@ inline CMapObjAtrPlaySta::CMapObjAtrPlaySta()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x80036554
+ * EN Size: 88b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline CMapObjAtrMime::CMapObjAtrMime()
 {
@@ -388,8 +280,12 @@ inline CMapObjAtrMime::CMapObjAtrMime()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8003687C
+ * EN Size: 72b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline CMapObjAtrMeshName::CMapObjAtrMeshName()
 {
@@ -400,16 +296,13 @@ inline CMapObjAtrMeshName::CMapObjAtrMeshName()
  * --INFO--
  * PAL Address: 0x8002A5B0
  * PAL Size: 6240b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8003384C
+ * EN Size: 6764b
  * JP Address: TODO
  * JP Size: TODO
  */
 int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 {
-    extern const float kMapObjZero;
-    extern const float kMapObjOne;
-    extern const float kMapObjDefaultAngle;
     enum {
         CHUNK_AMBI = 0x414D4249,
         CHUNK_ANIM = 0x414E494D,
@@ -451,7 +344,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
     Init();
 
     chunkFile.PushChunk();
-    int objIndex = this - MapObjArrayStart();
+    int objIndex = this - MapMng.GetMapObjArray();
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
@@ -494,9 +387,9 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             switch (m_meshType) {
             case 8:
             case 9:
-                m_transRateX = kMapObjZero;
-                m_transRateY = kMapObjOne;
-                m_transRateZ = kMapObjZero;
+                m_transRateX = 1.0f;
+                m_transRateY = 0.0f;
+                m_transRateZ = 1.0f;
                 break;
             }
             break;
@@ -522,16 +415,16 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_localScaleZ = chunkFile.GetF4();
 
             if (((m_mapDataType == 2) || (m_mapDataType == 3)) &&
-                ((kMapObjZero != m_localScaleX) || (kMapObjZero != m_localScaleY) || (kMapObjZero != m_localScaleZ))) {
+                ((1.0f != m_localScaleX) || (1.0f != m_localScaleY) || (1.0f != m_localScaleZ))) {
                 if (m_attribute == 0) {
                     System.Printf(const_cast<char*>(sMapObjScaleWithoutNameWarn));
                 } else {
                     System.Printf(const_cast<char*>(sMapObjScaleWithNameWarn),
                                   reinterpret_cast<CMapObjAtrMeshName*>(m_attribute)->m_name);
                 }
-                m_localScaleX = kMapObjZero;
-                m_localScaleY = kMapObjZero;
-                m_localScaleZ = kMapObjZero;
+                m_localScaleX = 1.0f;
+                m_localScaleY = 1.0f;
+                m_localScaleZ = 1.0f;
             }
 
             m_localMtxDirty = 1;
@@ -739,7 +632,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 spotLight->m_target = &MapMng.m_mapObjArray[targetIndex];
                 spotLight->m_colorMode = chunkFile.Get1();
                 spotLight->m_useAltColor = chunkFile.Get1();
-                spotLight->m_angle = kMapObjDefaultAngle;
+                spotLight->m_angle = 48.0f;
                 spotLight->m_unknown2E = 0;
             }
             m_attribute = spotLight;
@@ -824,7 +717,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 shadow->m_targetBounds[0].m_max.z = chunkFile.GetF4();
                 shadow->m_targetEnabled[1] = 1;
                 shadow->m_targetEnabled[0] = 1;
-                shadow->m_targetBoundsScale = kMapObjZero;
+                shadow->m_targetBoundsScale = 1.0f;
             }
 
             shadow->m_targetBounds[1].m_min.x = shadow->m_targetBounds[0].m_min.x * shadow->m_targetBoundsScale;
@@ -1000,15 +893,13 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
  * --INFO--
  * PAL Address: 0x8002A258
  * PAL Size: 856b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800352B8
+ * EN Size: 344b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma inline_depth(2)
 void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
 {
-    extern const float kMapObjDegToRad;
     Mtx mtx;
     CMapObj* obj = this;
 
@@ -1019,11 +910,11 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
             obj->m_calcMtxPending = 0;
             if (obj->m_localMtxDirty != 0) {
                 PSMTXScale(obj->m_localMtx, obj->m_localScaleX, obj->m_localScaleY, obj->m_localScaleZ);
-                PSMTXRotRad(mtx, 'x', kMapObjDegToRad * obj->m_localRotationX);
+                PSMTXRotRad(mtx, 'x', 0.017453292f * obj->m_localRotationX);
                 PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
-                PSMTXRotRad(mtx, 'y', kMapObjDegToRad * obj->m_localRotationY);
+                PSMTXRotRad(mtx, 'y', 0.017453292f * obj->m_localRotationY);
                 PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
-                PSMTXRotRad(mtx, 'z', kMapObjDegToRad * obj->m_localRotationZ);
+                PSMTXRotRad(mtx, 'z', 0.017453292f * obj->m_localRotationZ);
                 PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
                 PSMTXTrans(mtx, obj->m_localTranslateX, obj->m_localTranslateY, obj->m_localTranslateZ);
                 PSMTXConcat(mtx, obj->m_localMtx, obj->m_localMtx);
@@ -1048,14 +939,12 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
  * --INFO--
  * PAL Address: 0x8002A008
  * PAL Size: 592b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80035410
+ * EN Size: 136b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma inline_depth(8)
 #pragma inline_max_size(10000)
-#pragma inline_max_total_size(10000)
 void CMapObj::SetShow_r(int show)
 {
     CMapObj* obj = this;
@@ -1079,8 +968,8 @@ void CMapObj::SetShow_r(int show)
  * --INFO--
  * PAL Address: 0x80029FB8
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80035498
+ * EN Size: 120b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1101,12 +990,11 @@ void CMapObj::SetShow(int show)
  * --INFO--
  * PAL Address: 0x80029D18
  * PAL Size: 672b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80035510
+ * EN Size: 132b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma inline_depth(8)
 void CMapObj::SetLink()
 {
     CMapObj* cursor = MapMng.m_mapObjArray;
@@ -1126,12 +1014,11 @@ void CMapObj::SetLink()
 
 static inline void calcRunningColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
 {
-    extern const float kMapObjColorBlendScale;
     float blend;
     int key0;
     int key1;
     if (keyFrame->Get(key0, key1, blend) != 0) {
-        int blendRate = static_cast<int>(kMapObjColorBlendScale * blend);
+        int blendRate = static_cast<int>(255.0f * blend);
         _GXColor c0 = colors[key0];
         _GXColor c1 = colors[key1];
 
@@ -1153,7 +1040,6 @@ static inline void calcRunningColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& ou
 
 static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
 {
-    extern const float kMapObjColorBlendScale;
     if (keyFrame->IsRun() == 0) {
         return;
     }
@@ -1162,7 +1048,7 @@ static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXC
     int key0;
     int key1;
     if (keyFrame->Get(key0, key1, blend) != 0) {
-        int blendRate = static_cast<int>(kMapObjColorBlendScale * blend);
+        int blendRate = static_cast<int>(255.0f * blend);
         _GXColor c0 = colors[key0];
         _GXColor c1 = colors[key1];
 
@@ -1186,15 +1072,13 @@ static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXC
  * --INFO--
  * PAL Address: 0x80029538
  * PAL Size: 2016b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80035724
+ * EN Size: 772b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMapObj::Calc()
 {
-    extern const float kMapObjOne;
-    extern const float kMapObjInitNegOne;
     Vec delta;
     Vec posCam;
     Vec pos;
@@ -1222,7 +1106,7 @@ void CMapObj::Calc()
     if ((static_cast<unsigned int>(m_mapDataType) == 1U) && (m_mapData != 0) &&
         (m_octTreeIndex == -1) &&
         ((m_showFlags & 1) != 0)) {
-        if ((m_cameraSemiTransMaxAlpha < kMapObjOne) && (m_cameraSemiTransMinAlpha >= kMapObjInitNegOne)) {
+        if ((m_cameraSemiTransMaxAlpha < 0.0f) && (m_cameraSemiTransMinAlpha >= 1000000000000000.0f)) {
             m_drawPriority = m_baseDrawPriority;
             m_cameraSemiTransBeyondMax = 1;
             m_cameraSemiTransActive = 0;
@@ -1317,8 +1201,8 @@ void CMapObj::Calc()
  * --INFO--
  * PAL Address: 0x800293C8
  * PAL Size: 368b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80035A28
+ * EN Size: 496b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1358,44 +1242,13 @@ void CMapObj::SetDrawEnv()
  * --INFO--
  * PAL Address: 0x80029094
  * PAL Size: 820b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80035D24
+ * EN Size: 416b
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline void drawMapColorAlpha(CMapObj* obj)
-{
-    _GXColor mapColor;
-
-    if (obj->m_useAmbientColor != 0) {
-        mapColor = obj->m_ambientColor;
-    } else {
-        mapColor = MapMng.m_mapColor;
-    }
-
-    if (MapMng.m_colorScaleEnable != 0) {
-        mapColor.r = static_cast<unsigned char>((mapColor.r * MapMng.m_colorScale.r) >> 8);
-        mapColor.g = static_cast<unsigned char>((mapColor.g * MapMng.m_colorScale.g) >> 8);
-        mapColor.b = static_cast<unsigned char>((mapColor.b * MapMng.m_colorScale.b) >> 8);
-        mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
-    }
-
-    if (obj->m_colorAlphaRate != 0xFF) {
-        unsigned char alphaRate = obj->m_colorAlphaRate;
-        mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
-        mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
-        mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
-    }
-
-    _GXColor lightColor = s_mapObjLightColor;
-    LightPcs.SetMapColorAlpha(obj->m_worldMtx, mapColor, lightColor, obj->m_cameraSemiTransActive,
-                              obj->m_cameraSemiTransNear, obj->m_cameraSemiTransFar, obj->m_cameraSemiTransFadeRange,
-                              static_cast<unsigned char>(obj->m_cameraSemiTransAlpha >> 7));
-}
-
 void CMapObj::Draw(unsigned char priority)
 {
-    extern const float kMapObjOne;
     if (m_drawPriority != priority) {
         return;
     }
@@ -1422,12 +1275,11 @@ void CMapObj::Draw(unsigned char priority)
 
     MaterialMan.SaveCurrentEnvAsStd();
 
-    s_mapObjLightColor.a = m_lightAlpha;
-    drawMapColorAlpha(this);
+    SetDrawEnv();
     LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(m_bumpLight),
                               reinterpret_cast<Vec*>(&m_transRateX), m_bumpTexMatrixMode);
 
-    if (kMapObjOne != m_zBufferOffset) {
+    if (0.0f != m_zBufferOffset) {
         CameraPcs.SetOffsetZBuff(m_zBufferOffset);
     }
     if (m_disableZWrite != 0) {
@@ -1440,7 +1292,7 @@ void CMapObj::Draw(unsigned char priority)
     if (m_disableZWrite != 0) {
         GXSetZMode(1, GX_LEQUAL, 1);
     }
-    if (kMapObjOne != m_zBufferOffset) {
+    if (0.0f != m_zBufferOffset) {
         CameraPcs.SetOffsetZBuff(m_zBufferOffset);
     }
 }
@@ -1449,8 +1301,8 @@ void CMapObj::Draw(unsigned char priority)
  * --INFO--
  * PAL Address: 0x80028FD8
  * PAL Size: 188b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80035EC4
+ * EN Size: 212b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1475,15 +1327,15 @@ void CMapObj::SetDrawFlag()
  * --INFO--
  * PAL Address: 0x80028F70
  * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80035F98
+ * EN Size: 104b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMapObj::DrawHit()
 {
     if ((m_mapDataType == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), m_worldMtx);
+        MaterialMan.SetObjMatrix(MapMng.m_viewMtx, m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->Draw();
     }
 }
@@ -1492,15 +1344,15 @@ void CMapObj::DrawHit()
  * --INFO--
  * PAL Address: 0x80028F08
  * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80036000
+ * EN Size: 104b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMapObj::DrawHitWire()
 {
     if ((m_mapDataType == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), m_worldMtx);
+        MaterialMan.SetObjMatrix(MapMng.m_viewMtx, m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->DrawWire();
     }
 }
@@ -1509,15 +1361,15 @@ void CMapObj::DrawHitWire()
  * --INFO--
  * PAL Address: 0x80028EA0
  * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80036068
+ * EN Size: 104b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMapObj::DrawHitNormal()
 {
     if ((m_mapDataType == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), m_worldMtx);
+        MaterialMan.SetObjMatrix(MapMng.m_viewMtx, m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->DrawNormal();
     }
 }
@@ -1526,102 +1378,27 @@ void CMapObj::DrawHitNormal()
  * --INFO--
  * PAL Address: 0x80028BC0
  * PAL Size: 736b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800360D0
+ * EN Size: 264b
  * JP Address: TODO
  * JP Size: TODO
  */
 int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    extern const float kMapObjBoundMinInit;
-    extern const float kMapObjBoundMaxInit;
-    extern const float kMapObjZero;
     if ((m_mapDataType == 2) && (m_mapData != 0) && (m_octTreeIndex == -1)) {
         Mtx inverseMtx;
 
         PSMTXInverse(m_worldMtx, inverseMtx);
-        float boundMinInit = kMapObjBoundMinInit;
-        CMapCylinder localCylinder(boundMinInit, kMapObjBoundMaxInit);
+        float boundMinInit = 10000000000.0f;
+        CMapCylinder localCylinder(boundMinInit, -10000000000.0f);
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
         localCylinder.m_radius = cylinder->m_radius;
-        float marginX = kMapObjZero + localCylinder.m_radius;
-
-        if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
-            localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - marginX;
-            localCylinder.m_bound.m_max.x = localCylinder.m_top.x + marginX;
-        } else {
-            localCylinder.m_bound.m_min.x = localCylinder.m_top.x - marginX;
-            localCylinder.m_bound.m_max.x = localCylinder.m_bottom.x + marginX;
-        }
-
-        float marginY = LoadFloatVolatile(kMapObjZero);
-        marginY += localCylinder.m_radius;
-        if (localCylinder.m_bottom.y < localCylinder.m_top.y) {
-            localCylinder.m_bound.m_min.y = localCylinder.m_bottom.y - marginY;
-            localCylinder.m_bound.m_max.y = localCylinder.m_top.y + marginY;
-        } else {
-            localCylinder.m_bound.m_min.y = localCylinder.m_top.y - marginY;
-            localCylinder.m_bound.m_max.y = localCylinder.m_bottom.y + marginY;
-        }
-
-        float marginZ = LoadFloatVolatile(kMapObjZero);
-        marginZ += localCylinder.m_radius;
-        if (localCylinder.m_bottom.z < localCylinder.m_top.z) {
-            localCylinder.m_bound.m_min.z = localCylinder.m_bottom.z - marginZ;
-            localCylinder.m_bound.m_max.z = localCylinder.m_top.z + marginZ;
-        } else {
-            localCylinder.m_bound.m_min.z = localCylinder.m_top.z - marginZ;
-            localCylinder.m_bound.m_max.z = localCylinder.m_bottom.z + marginZ;
-        }
+        localCylinder.CalcBound();
 
         CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-        unsigned char hitBounds = 0;
-        unsigned char xyOverlap = 0;
-        {
-            int xOverlap = 0;
-            int yOverlap = 0;
-            float positionMinX = mapHit->m_positionMin.x;
-            if (positionMinX < localCylinder.m_bound.m_min.x) {
-                xOverlap = localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x;
-            } else if (positionMinX > localCylinder.m_bound.m_min.x) {
-                xOverlap = positionMinX <= localCylinder.m_bound.m_max.x;
-            } else {
-                xOverlap = 1;
-            }
-
-            if (xOverlap) {
-                float positionMinY = mapHit->m_positionMin.y;
-                if (positionMinY < localCylinder.m_bound.m_min.y) {
-                    yOverlap = localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y;
-                } else if (positionMinY > localCylinder.m_bound.m_min.y) {
-                    yOverlap = positionMinY <= localCylinder.m_bound.m_max.y;
-                } else {
-                    yOverlap = 1;
-                }
-                if (yOverlap) {
-                    xyOverlap = 1;
-                }
-            }
-
-            if (xyOverlap) {
-                int zOverlap = 0;
-                float positionMinZ = mapHit->m_positionMin.z;
-                if (positionMinZ < localCylinder.m_bound.m_min.z) {
-                    zOverlap = localCylinder.m_bound.m_min.z <= mapHit->m_positionMax.z;
-                } else if (positionMinZ > localCylinder.m_bound.m_min.z) {
-                    zOverlap = positionMinZ <= localCylinder.m_bound.m_max.z;
-                } else {
-                    zOverlap = 1;
-                }
-
-                if (zOverlap) {
-                    hitBounds = 1;
-                }
-            }
-        }
-        if (hitBounds) {
+        if (mapHit->m_bound.CheckCross(localCylinder.m_bound)) {
             Vec localMove;
             PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &localCylinder.m_axis);
             PSMTXMultVecSR(inverseMtx, move, &localMove);
@@ -1638,103 +1415,28 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
  * --INFO--
  * PAL Address: 0x800288F4
  * PAL Size: 716b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800361D8
+ * EN Size: 244b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    extern const float kMapObjBoundMinInit;
-    extern const float kMapObjBoundMaxInit;
-    extern const float kMapObjZero;
     if ((m_mapDataType == 2) && (m_mapData != 0) && (m_octTreeIndex == -1)) {
         Mtx inverseMtx;
         Vec localMove;
 
         PSMTXInverse(m_worldMtx, inverseMtx);
-        float boundMinInit = kMapObjBoundMinInit;
-        CMapCylinder localCylinder(boundMinInit, kMapObjBoundMaxInit);
+        float boundMinInit = 10000000000.0f;
+        CMapCylinder localCylinder(boundMinInit, -10000000000.0f);
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
         localCylinder.m_radius = cylinder->m_radius;
-        float marginX = kMapObjZero + localCylinder.m_radius;
-
-        if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
-            localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - marginX;
-            localCylinder.m_bound.m_max.x = localCylinder.m_top.x + marginX;
-        } else {
-            localCylinder.m_bound.m_min.x = localCylinder.m_top.x - marginX;
-            localCylinder.m_bound.m_max.x = localCylinder.m_bottom.x + marginX;
-        }
-
-        float marginY = LoadFloatVolatile(kMapObjZero);
-        marginY += localCylinder.m_radius;
-        if (localCylinder.m_bottom.y < localCylinder.m_top.y) {
-            localCylinder.m_bound.m_min.y = localCylinder.m_bottom.y - marginY;
-            localCylinder.m_bound.m_max.y = localCylinder.m_top.y + marginY;
-        } else {
-            localCylinder.m_bound.m_min.y = localCylinder.m_top.y - marginY;
-            localCylinder.m_bound.m_max.y = localCylinder.m_bottom.y + marginY;
-        }
-
-        float marginZ = LoadFloatVolatile(kMapObjZero);
-        marginZ += localCylinder.m_radius;
-        if (localCylinder.m_bottom.z < localCylinder.m_top.z) {
-            localCylinder.m_bound.m_min.z = localCylinder.m_bottom.z - marginZ;
-            localCylinder.m_bound.m_max.z = localCylinder.m_top.z + marginZ;
-        } else {
-            localCylinder.m_bound.m_min.z = localCylinder.m_top.z - marginZ;
-            localCylinder.m_bound.m_max.z = localCylinder.m_bottom.z + marginZ;
-        }
+        localCylinder.CalcBound();
 
         CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-        unsigned char hitBounds = 0;
-        unsigned char xyOverlap = 0;
-        {
-            int xOverlap = 0;
-            int yOverlap = 0;
-            float positionMinX = mapHit->m_positionMin.x;
-            if (positionMinX < localCylinder.m_bound.m_min.x) {
-                xOverlap = localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x;
-            } else if (positionMinX > localCylinder.m_bound.m_min.x) {
-                xOverlap = positionMinX <= localCylinder.m_bound.m_max.x;
-            } else {
-                xOverlap = 1;
-            }
-
-            if (xOverlap) {
-                float positionMinY = mapHit->m_positionMin.y;
-                if (positionMinY < localCylinder.m_bound.m_min.y) {
-                    yOverlap = localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y;
-                } else if (positionMinY > localCylinder.m_bound.m_min.y) {
-                    yOverlap = positionMinY <= localCylinder.m_bound.m_max.y;
-                } else {
-                    yOverlap = 1;
-                }
-                if (yOverlap) {
-                    xyOverlap = 1;
-                }
-            }
-
-            if (xyOverlap) {
-                int zOverlap = 0;
-                float positionMinZ = mapHit->m_positionMin.z;
-                if (positionMinZ < localCylinder.m_bound.m_min.z) {
-                    zOverlap = localCylinder.m_bound.m_min.z <= mapHit->m_positionMax.z;
-                } else if (positionMinZ > localCylinder.m_bound.m_min.z) {
-                    zOverlap = positionMinZ <= localCylinder.m_bound.m_max.z;
-                } else {
-                    zOverlap = 1;
-                }
-
-                if (zOverlap) {
-                    hitBounds = 1;
-                }
-            }
-        }
-        if (hitBounds) {
+        if (mapHit->m_bound.CheckCross(localCylinder.m_bound)) {
             PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &localCylinder.m_axis);
             PSMTXMultVecSR(inverseMtx, move, &localMove);
             reinterpret_cast<CMapHit*>(m_mapData)->CheckHitCylinderNear(&localCylinder, &localMove, mask);
@@ -1745,10 +1447,10 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
 
 /*
  * --INFO--
- * PAL Address: 0x800288a8
+ * PAL Address: 0x800288A8
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800362CC
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1761,10 +1463,10 @@ void CMapObj::GetHitFaceNormal(Vec* out)
 
 /*
  * --INFO--
- * PAL Address: 0x8002884c
+ * PAL Address: 0x8002884C
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8003631C
+ * EN Size: 104b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1780,8 +1482,8 @@ int CMapObj::CalcHitSlide(Vec* out, float y)
  * --INFO--
  * PAL Address: 0x80028800
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80036384
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1796,8 +1498,8 @@ void CMapObj::CalcHitPosition(Vec* out)
  * --INFO--
  * PAL Address: 0x800287D0
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800363D4
+ * EN Size: 208b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1816,114 +1518,3 @@ void CMapObj::SetMime(int mode, int target, int type)
     mime->m_keyFrame.m_loop = static_cast<unsigned char>(type);
     mime->m_keyFrame.m_isRun = 1;
 }
-
-/*
- * --INFO--
- * PAL Address: 0x8002BE34
- * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapObjAtr::~CMapObjAtr()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002BFF0
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapObjAtrPlaySta::~CMapObjAtrPlaySta()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002C04C
- * PAL Size: 292b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapObjAtrMime::~CMapObjAtrMime()
-{
-    int i = 0;
-
-    while (i < static_cast<int>(m_vertexListCount)) {
-        if (m_vertexLists[i] != 0) {
-            delete m_vertexLists[i];
-            m_vertexLists[i] = 0;
-        }
-
-        i++;
-    }
-
-    if (m_vertexLists != 0) {
-        delete m_vertexLists;
-        m_vertexLists = 0;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002C170
- * PAL Size: 316b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002C2AC
- * PAL Size: 316b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapObjAtrPointLight::~CMapObjAtrPointLight()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002C3E8
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapObjAtrMeshName::~CMapObjAtrMeshName()
-{
-}
-
-extern const float kMapObjBoundMinInit = 10000000000.0f;
-extern const float kMapObjBoundMaxInit = -10000000000.0f;
-extern const float kMapObjZero = 1.0f;
-extern const float kMapObjOne = 0.0f;
-extern const float kMapObjInitNegOne = 1000000000000000.0f;
-extern const float kMapObjColorBlendScale = 255.0f;
-extern const float kMapObjDegToRad = 0.017453292f;
-extern const float kMapObjDefaultAngle = 48.0f;
-extern const float kMapObjInitValue50 = -1.0f;
-
-extern const char s_CPtrArrayGrowError[0x1C] = {
-    (char)0x83, (char)0x6F, (char)0x83, (char)0x62, (char)0x83, (char)0x74, (char)0x83, (char)0x40,
-    (char)0x90, (char)0xAC, (char)0x92, (char)0xB7, (char)0x82, (char)0xAA, (char)0x95, (char)0x73,
-    (char)0x8B, (char)0x96, (char)0x89, (char)0xC2, (char)0x82, (char)0xC5, (char)0x82, (char)0xB7,
-    (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
-};
-extern const char s_CPtrArrayFile[] = "collection_ptrarray.h";

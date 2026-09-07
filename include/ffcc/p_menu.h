@@ -44,15 +44,7 @@ struct MenuBoardEntry
     float m_posX;
     float m_posY;
     float m_depth;
-    float m_rotX;
-    float m_rotY;
-    float m_rotZ;
-    float m_scaleX;
-    float m_scaleY;
-    float m_scaleZ;
-    float m_unk34;
-    float m_unk38;
-    float m_unk3c;
+    SRT m_transform;
     int m_screenX;
     int m_screenY;
     int m_screenWidth;
@@ -880,10 +872,7 @@ public:
         unsigned char* m_wmCharaState;
     };
     unsigned char* m_wmWorldParams;
-    union {
-        EffectInfo* m_effectWork;
-        int m_bonusListPtr;
-    };
+    EffectInfo* m_effectWork;
     union {
         unsigned char m_pad844[0x848 - 0x844];
         WmCharaAnimState* m_wmCharaAnimState;
@@ -974,6 +963,8 @@ extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];
 
 STATIC_ASSERT(sizeof(MenuBoardEntry) == 0x50);
+STATIC_ASSERT(offsetof(MenuBoardEntry, m_transform) == 0x1C);
+STATIC_ASSERT(offsetof(MenuBoardEntry, m_screenX) == 0x40);
 STATIC_ASSERT(sizeof(CMenuPcs::BattleHudState) == 0x28);
 STATIC_ASSERT(sizeof(MenuWindowInfo) == 0x0C);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
@@ -1020,7 +1011,6 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeVillageWork) == 0x830);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorldParams) == 0x83C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
-STATIC_ASSERT(offsetof(CMenuPcs, m_bonusListPtr) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaAnimState) == 0x844);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuWindowInfo) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAnimPtr) == 0x84C);

@@ -1145,15 +1145,7 @@ void CMenuPcs::SingMenuInit()
 
     MenuBoardEntry* boardEntry = reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr);
     int screenY = static_cast<int>(kSingStatScreenY);
-    boardEntry->m_rotZ = 0.0f;
-    boardEntry->m_rotY = 0.0f;
-    boardEntry->m_rotX = 0.0f;
-    boardEntry->m_scaleZ = 0.0f;
-    boardEntry->m_scaleY = 0.0f;
-    boardEntry->m_scaleX = 0.0f;
-    boardEntry->m_unk3c = 1.0f;
-    boardEntry->m_unk38 = 1.0f;
-    boardEntry->m_unk34 = 1.0f;
+    boardEntry->m_transform.Identity();
     reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_modelHandle = 0;
     float centerY = static_cast<float>(static_cast<double>(static_cast<float>(kSingStatPanelH * 0.5
                 + kSingStatPanelH)) - 224.0);

@@ -169,7 +169,7 @@ struct McListInfo
 class CMenuPcs : public CProcess
 {
 public:
-    static CProcessTable m_table;
+    static CProcessCallbackTable m_table;
 
     struct BattleHudState
     {

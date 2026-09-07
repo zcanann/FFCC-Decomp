@@ -130,44 +130,15 @@ extern "C" const f32 kMenuOrthoRight = 640.0f;
 extern "C" const f32 kMenuOrthoFar = -100.0f;
 extern "C" const f32 kMenuPaletteBlendStep = 0.125f;
 
-extern "C" {
-void create__8CMenuPcsFv(CMenuPcs*);
-void destroy__8CMenuPcsFv(CMenuPcs*);
-void calc__8CMenuPcsFv(CMenuPcs*);
-void draw__8CMenuPcsFv(CMenuPcs*);
-void loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
-    CMenuPcs*, char**, int, int, CMenuPcs::CTmp*, int, int, int);
-void drawSingleMenu__8CMenuPcsFv(CMenuPcs*);
-}
-
-static CProcessTableCallback s_menuTableDescCreate = {0, 0xFFFFFFFF,
-                                                       reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
-static CProcessTableCallback s_menuTableDescDestroy = {0, 0xFFFFFFFF,
-                                                        reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
-static CProcessTableCallback s_menuTableDescCalc = {0, 0xFFFFFFFF,
-                                                     reinterpret_cast<unsigned int>(calc__8CMenuPcsFv)};
-static CProcessTableCallback s_menuTableDescDraw = {0, 0xFFFFFFFF,
-                                                     reinterpret_cast<unsigned int>(draw__8CMenuPcsFv)};
-static CProcessTableCallback s_menuTableDescLoadTextureAsync = {
-    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
-static CProcessTableCallback s_menuTableDescDrawSingleMenu = {0, 0xFFFFFFFF,
-                                                              reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
-
-CProcessTable CMenuPcs::m_table = {
+CProcessCallbackTable CMenuPcs::m_table = {
     const_cast<char*>(sCMenuPcsProcessName),
+    static_cast<CProcessCallback>(&CMenuPcs::create),
+    static_cast<CProcessCallback>(&CMenuPcs::destroy),
     {
-        s_menuTableDescCreate.m_thisOffset, s_menuTableDescCreate.m_virtualOffset, s_menuTableDescCreate.m_function,
-        s_menuTableDescDestroy.m_thisOffset, s_menuTableDescDestroy.m_virtualOffset, s_menuTableDescDestroy.m_function,
-        s_menuTableDescCalc.m_thisOffset, s_menuTableDescCalc.m_virtualOffset, s_menuTableDescCalc.m_function,
-        0x1A, 0,
-        s_menuTableDescDraw.m_thisOffset, s_menuTableDescDraw.m_virtualOffset, s_menuTableDescDraw.m_function,
-        0x49, 0x1,
-        s_menuTableDescLoadTextureAsync.m_thisOffset, s_menuTableDescLoadTextureAsync.m_virtualOffset,
-        s_menuTableDescLoadTextureAsync.m_function,
-        0x1A, 0x10,
-        s_menuTableDescDrawSingleMenu.m_thisOffset, s_menuTableDescDrawSingleMenu.m_virtualOffset,
-        s_menuTableDescDrawSingleMenu.m_function,
-        0x49, 0x11,
+        {static_cast<CProcessCallback>(&CMenuPcs::calc), 0x1A, 0},
+        {static_cast<CProcessCallback>(&CMenuPcs::draw), 0x49, 1},
+        {reinterpret_cast<CProcessCallback>(&CMenuPcs::loadTextureAsync), 0x1A, 0x10},
+        {static_cast<CProcessCallback>(&CMenuPcs::drawSingleMenu), 0x49, 0x11},
     },
 };
 
@@ -1881,3 +1852,5 @@ CTexture* CMenuPcs::GetTexture(CMenuPcs::TEX tex)
 {
     return m_textures[static_cast<int>(tex)];
 }
+
+#pragma pool_data off

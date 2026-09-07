@@ -16,11 +16,10 @@
 
 int MG_GBA_THREAD_MSG_SETPORT_ct;
 
-extern "C" {
-void create__12CMiniGamePcsFv(CMiniGamePcs*);
-void destroy__12CMiniGamePcsFv(CMiniGamePcs*);
-void calc__12CMiniGamePcsFv(CMiniGamePcs*);
-}
+static void _OpenCallback(MgGbaThreadParam*, void*);
+static void GbaThreadAlarmHandler(OSAlarm*, OSContext*);
+static void _GbaThreadMain(void*);
+static void _MngThreadMain(void*);
 
 inline CMiniGamePcs::CMiniGamePcs()
 {
@@ -42,14 +41,6 @@ inline CMiniGamePcs::CMiniGamePcs()
     STATIC_ASSERT(offsetof(CMiniGamePcs, m_playerMessageReady) == 0x6490);
     STATIC_ASSERT(offsetof(CMiniGamePcs, m_workerStoppedMask) == 0x649D);
     STATIC_ASSERT(sizeof(CMiniGamePcs) == 0x64A0);
-    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
-    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
-    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
-    CProcessTable* table = &m_table;
-
-    table->m_fields.m_create = desc0;
-    table->m_fields.m_destroy = desc1;
-    table->m_fields.m_entries[0].m_callback = desc2;
 }
 
 extern const char sMiniGameGbaDvdDir[] = "dvd/gba/";
@@ -59,22 +50,16 @@ extern const char sMiniGamePcsGameProcessName[] = "CMiniGamePcs(GAME)";
 extern const char sMiniGamePcsProcessName[] = "CMiniGamePcs";
 extern const char sMiniGameManagerClassName[] = "CManager";
 extern const char sMiniGameProcessClassName[12] = "CProcess";
-CProcessTable CMiniGamePcs::m_table = {
+CMiniGamePcs MiniGamePcs;
+
+CProcessCallbackTable CMiniGamePcs::m_table = {
     const_cast<char*>(sMiniGamePcsGameProcessName),
+    static_cast<CProcessCallback>(&CMiniGamePcs::create),
+    static_cast<CProcessCallback>(&CMiniGamePcs::destroy),
     {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0x24,
+        {static_cast<CProcessCallback>(&CMiniGamePcs::calc), 0x24, 0},
     },
 };
-CMiniGamePcs MiniGamePcs;
 static const char s_miniGameManagerTag[] = "GMGR";
 static const char s_miniGameEnd0000Text[] = "MiniGameEnd 0000\n";
 static const char s_miniGameEnd1111Text[] = "MiniGameEnd 1111\n";
@@ -206,7 +191,7 @@ inline void AdjustGbaImageRegistry(char* image, char* tag)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _OpenCallback(MgGbaThreadParam* param, void* context)
+static void _OpenCallback(MgGbaThreadParam* param, void* context)
 {
     MiniGamePcs.OpenCallback(param, context);
 }
@@ -261,54 +246,12 @@ inline void getKoubutsuList(unsigned char* food, int player)
 
 /*
  * --INFO--
- * PAL Address: 0x8012a5d0
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void GbaThreadAlarmHandler(OSAlarm* alarm, OSContext*)
-{
-    OSResumeThread(reinterpret_cast<MiniGameAlarm*>(alarm)->thread);
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
 void GbaThreadReadInitialCode(MgGbaThreadParam*)
 {
 	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801290a0
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void _GbaThreadMain(void* param)
-{
-    MiniGamePcs.GbaThreadMain(param);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80128574
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void _MngThreadMain(void* param)
-{
-    MiniGamePcs.MngThreadMain(param);
 }
 
 /*
@@ -549,6 +492,20 @@ void CMiniGamePcs::GbaThreadWriteInitialCode(MgGbaThreadParam*)
 void CMiniGamePcs::GbaThreadReadContext(MgGbaThreadParam*)
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012a5d0
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void GbaThreadAlarmHandler(OSAlarm* alarm, OSContext*)
+{
+    OSResumeThread(reinterpret_cast<MiniGameAlarm*>(alarm)->thread);
 }
 
 /*
@@ -1288,6 +1245,20 @@ inline void CMiniGamePcs::GbaThreadInit(long channel, MgGbaThreadParam* param, O
 
 /*
  * --INFO--
+ * PAL Address: 0x801290a0
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _GbaThreadMain(void* param)
+{
+    MiniGamePcs.GbaThreadMain(param);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80128ccc
  * PAL Size: 980b
  * EN Address: TODO
@@ -1688,6 +1659,20 @@ inline unsigned long CalcCrc(unsigned long value)
 
 /*
  * --INFO--
+ * PAL Address: 0x80128574
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void _MngThreadMain(void* param)
+{
+    MiniGamePcs.MngThreadMain(param);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80127b74
  * PAL Size: 2560b
  * EN Address: TODO
@@ -1897,3 +1882,5 @@ next_player:
         loopCounter += 1;
     }
 }
+
+#pragma pool_data off

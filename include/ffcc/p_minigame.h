@@ -14,13 +14,9 @@ void ChgHL16(unsigned short);
 void MiniGameFileRead(char*, void*, unsigned long&);
 unsigned long CalcCrc(unsigned long);
 void AdjustGbaImageRegistry(char*, char*);
-void _OpenCallback(MgGbaThreadParam*, void*);
 void getKoubutsuList(unsigned char*, int);
-void GbaThreadAlarmHandler(OSAlarm*, OSContext*);
 void GbaThreadSleep(long long);
 void GbaThreadReadInitialCode(MgGbaThreadParam*);
-void _GbaThreadMain(void*);
-void _MngThreadMain(void*);
 
 struct MgGbaContext
 {
@@ -71,7 +67,7 @@ public:
 class CMiniGamePcs : public CProcess
 {
 public:
-    static CProcessTable m_table;
+    static CProcessCallbackTable m_table;
 
     CMiniGamePcs();
 

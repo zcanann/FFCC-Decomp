@@ -106,11 +106,11 @@ extern "C" char sMogRadarDebugFormatBlock[];
 extern "C" char lbl_801DB648[];
 extern "C" {
 extern unsigned char m_mogWork[0x2C];
-float m_height;
-void* m_pDisplayList;
-void* m_pTexBuf;
-unsigned int m_seed;
 }
+static float m_height;
+static void* m_pDisplayList;
+static void* m_pTexBuf;
+static unsigned int m_seed;
 
 namespace {
 
@@ -452,14 +452,11 @@ static inline void DrawFurDisplayListShell(const FurMeshRaw* mesh, const FurDisp
  * --INFO--
  * PAL Address: 0x800df618
  * PAL Size: 480b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80101240
+ * EN Size: 728b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 3
-#pragma opt_dead_assignments off
 void CChara::TimeMogFur()
 {
 	const int frameCounter = static_cast<int>(System.m_frameCounter);
@@ -482,43 +479,24 @@ void CChara::TimeMogFur()
 
 	for (int y = 0; y < 0x40; y++) {
 		for (int x = 0; x < 0x40; x++) {
-			int tileIndex = ((y / 4) * 0x100 + (x / 4) * 0x10 + (y % 4) * 4 + (x % 4)) * 2;
-			unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
-
-			unsigned int a = (packed >> 12) & 7;
-			int baseLight = 7 - static_cast<int>(a);
+			int tileIndex = (y / 4) * 0x100 + (x / 4) * 0x10 + (y % 4) * 4 + (x % 4);
+			unsigned short packed = texels[tileIndex];
+			int a = (packed >> 12) & 7;
+			int baseLight = 7 - a;
 			int r = ((packed >> 8) & 0xF) + 4 + baseLight;
+			int g = ((packed >> 4) & 0xF) + 4 + baseLight;
 			int b = (packed & 0xF) + 4 + baseLight;
-			int gNibble = (packed >> 4) & 0xF;
-			int g = gNibble + 4 + baseLight;
-
-			int light = 0xF;
-			if (r < 0xF) {
-				light = r;
-			}
-			r = 0xF;
-			if (g < 0xF) {
-				r = g;
-			}
-			g = 0xF;
-			if (b < 0xF) {
-				g = b;
-			}
-
-			int aPlus = static_cast<int>(a) + 2;
-			int clampedA = 7;
-			if (aPlus < 7) {
-				clampedA = aPlus;
-			}
-
-			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex) =
-			    static_cast<unsigned short>((clampedA << 12) | (light << 8) | (r << 4) | g);
+			r = r < 0xF ? r : 0xF;
+			g = g < 0xF ? g : 0xF;
+			b = b < 0xF ? b : 0xF;
+			a += 2;
+			a = a < 7 ? a : 7;
+			texels[tileIndex] = static_cast<unsigned short>((a << 12) | (r << 8) | (g << 4) | b);
 		}
 	}
 
 	CalcMogScore();
 }
-#pragma pop
 
 #pragma push
 #pragma bool off
@@ -1236,46 +1214,25 @@ void CChara::ChangeMogMode(int mogMode)
  * --INFO--
  * PAL Address: 0x800e1148
  * PAL Size: 292b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800FF560
+ * EN Size: 184b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma global_optimizer off
 void CChara::InitFurTexBuffer()
 {
 	MogFurState& fur = MogFur();
-	int idx;
-	int row;
-	int rowCount = 0;
-	row = 0;
-	do {
-		unsigned int inner = 0;
-		int byteOffset = row << 1;
-		for (idx = row; idx < row + 0x40; idx += 8) {
-			int idxBase = inner + row;
-			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Chara.MogFur().m_texels) + byteOffset) = 0x7FFF;
-			byteOffset += 0x10;
-			Chara.MogFur().m_texels[idxBase + 1] = 0x7FFF;
-			Chara.MogFur().m_texels[idxBase + 2] = 0x7FFF;
-			Chara.MogFur().m_texels[idxBase + 3] = 0x7FFF;
-			Chara.MogFur().m_texels[idxBase + 4] = 0x7FFF;
-			Chara.MogFur().m_texels[idxBase + 5] = 0x7FFF;
-			Chara.MogFur().m_texels[idxBase + 6] = 0x7FFF;
-			Chara.MogFur().m_texels[idxBase + 7] = 0x7FFF;
-			inner += 8;
+	for (int y = 0; y < 0x40; y++) {
+		for (int x = 0; x < 0x40; x++) {
+			Chara.MogFur().m_texels[y * 0x40 + x] = 0x7FFF;
 		}
-		rowCount++;
-		row += 0x40;
-	} while (rowCount < 0x40);
+	}
 
 	fur.m_dirty = 0;
 	Chara.MogFur().m_timestamp = System.m_frameCounter;
 	memset(fur.m_score, 0, 0x40);
 	CalcMogScore();
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -2068,7 +2025,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			for (int layer = 0; layer < 8; layer++) {
 				register float shellReg = static_cast<float>(static_cast<int>(layer)) * 0.125f * furLength;
 				GXTexObj texObj;
-				void* texData = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(&m_height)) + (layer * 0x4000);
+				void* texData = reinterpret_cast<unsigned char*>(m_pTexBuf) + (layer * 0x4000);
 				GXInitTexObj(&texObj, texData, 0x80, 0x80, GX_TF_IA4, GX_REPEAT, GX_REPEAT, GX_FALSE);
 				GXLoadTexObj(&texObj, GX_TEXMAP1);
 
@@ -2228,9 +2185,9 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
  */
 void CChara::freeFurTex()
 {
-	if (*reinterpret_cast<void**>(&m_height) != 0) {
-		Memory.Free(*reinterpret_cast<void**>(&m_height));
-		*reinterpret_cast<void**>(&m_height) = 0;
+	if (m_pTexBuf != 0) {
+		Memory.Free(m_pTexBuf);
+		m_pTexBuf = 0;
 	}
 }
 

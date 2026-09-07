@@ -98,7 +98,7 @@ inline CGObject::CGObject()
 {
 }
 
-extern float FLOAT_8032ee18;
+static float s_MaxAnimWait;
 unsigned char lbl_8032EE1C;
 char gWmMenuCursorX[2];
 char gWmMenuCursorY[2];
@@ -644,7 +644,7 @@ void CMenuPcs::WmInit()
 	m_wmWorldParams = 0;
 	m_effectWork = 0;
 	m_wmWorkBuffer = 0;
-	FLOAT_8032ee18 = initValue;
+	s_MaxAnimWait = initValue;
 	m_wmThpActive = 0;
 	m_textureLocIndex = 0;
 	memset(bytes + 4, 0, 0x1C);
@@ -1170,7 +1170,7 @@ void CMenuPcs::loadData()
 		}
 	}
 
-	FLOAT_8032ee18 = FLOAT_803317FC;
+	s_MaxAnimWait = FLOAT_803317FC;
 	for (int i = 0; i < 8; i++) {
 		const int modelNo = (i + 1) * 100;
 		CharaPcs.LoadAnim(0, modelNo, const_cast<char*>(s_wmCharaAnimStand), 1, 0, 0);
@@ -1228,8 +1228,8 @@ void CMenuPcs::loadData()
 				            anim * 4 + 0xC) +
 				        0x28) +
 				    0x10));
-				if (FLOAT_8032ee18 < maxWait) {
-					FLOAT_8032ee18 = maxWait;
+				if (s_MaxAnimWait < maxWait) {
+					s_MaxAnimWait = maxWait;
 				}
 			}
 		}
@@ -9065,7 +9065,7 @@ void CMenuPcs::CalcCharaSelect()
 			}
 			if (finishedMask != 0 && finishedMask == readyMask) {
 				GetWmWorldState(this)->m_nextMenuMode = 1;
-				GetWmWorldState(this)->m_delay = static_cast<short>(FLOAT_8032ee18);
+				GetWmWorldState(this)->m_delay = static_cast<short>(s_MaxAnimWait);
 			}
 		}
 
@@ -12504,7 +12504,7 @@ void GXSetTexCoordGen(void)
  */
 float CMenuPcs::GetMaxAnimWait()
 {
-	return FLOAT_8032ee18;
+	return s_MaxAnimWait;
 }
 
 /*
@@ -14699,7 +14699,7 @@ void McCtrl::SetSlot(int slot)
  */
 void CMenuPcs::AlphaNormal()
 {
-	FLOAT_8032ee18 = FLOAT_803313dc;
+	s_MaxAnimWait = FLOAT_803313dc;
 }
 
 /*
@@ -14713,7 +14713,7 @@ void CMenuPcs::AlphaNormal()
  */
 void CMenuPcs::AlphaAdd()
 {
-	FLOAT_8032ee18 = FLOAT_803315d4;
+	s_MaxAnimWait = FLOAT_803315d4;
 }
 
 /*

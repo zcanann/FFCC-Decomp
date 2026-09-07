@@ -2526,92 +2526,12 @@ foundModel:
 
 /*
  * --INFO--
- * PAL Address: 0x80075920
- * PAL Size: 1300b
- * EN Address: 0x8008882c
- * EN Size: 392b
+ * PAL Address: 0x800756FC
+ * PAL Size: 548b
+ * EN Address: 0x800889b4
+ * EN Size: 332b
  * JP Address: TODO
  * JP Size: TODO
- */
-int CCharaPcs::CHandle::LoadAnim(
-    char* animName, int animIndex, int animFlags, int charaKind, int charaNo, int mergeFileId, int mergeFlags)
-{
-    if (animIndex == -1) {
-        CLoadAnim** slotPtr = &m_animSlot[0];
-        for (int i = 0; i < 64; i++, slotPtr++) {
-            CRef* animRef = *slotPtr;
-            if (animRef != 0) {
-                ReleaseShared(*slotPtr);
-            }
-        }
-        PruneUnsharedAnimRefs(&CharaPcs, 0);
-    } else {
-        CLoadAnim* previousAnim = m_animSlot[animIndex];
-        if (previousAnim != 0) {
-            ReleaseSharedNonNull(m_animSlot[animIndex]);
-            PruneUnsharedAnimRefs(&CharaPcs, m_animSlot[animIndex]);
-            m_animSlot[animIndex] = 0;
-        }
-    }
-
-    int resolvedKind;
-    if (charaKind == -1) {
-        resolvedKind = m_charaKind;
-    } else {
-        resolvedKind = charaKind;
-    }
-    int resolvedNo;
-    if (charaNo == -1) {
-        resolvedNo = m_charaNo;
-    } else {
-        resolvedNo = charaNo;
-    }
-
-    CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, resolvedKind, resolvedNo, animName);
-    if (loadAnim == 0) {
-        if (LoadAnimFromDisk(&CharaPcs, resolvedKind, resolvedNo, animName, mergeFileId, mergeFlags) == 0) {
-            return 0;
-        }
-    }
-
-    if (charaKind == -1) {
-        charaKind = m_charaKind;
-    }
-    if (charaNo == -1) {
-        charaNo = m_charaNo;
-    }
-    loadAnim = FindLoadedAnim(&CharaPcs, charaKind, charaNo, animName);
-
-    m_animSlot[animIndex] = loadAnim;
-    loadAnim->AddRef();
-
-    m_animSlot[animIndex]->m_playbackFlags = static_cast<unsigned int>(animFlags);
-    {
-        unsigned char& flags1 = m_animSlot[animIndex]->m_anim->m_flags;
-        flags1 = static_cast<unsigned char>(__rlwimi(flags1, animFlags, 7, 24, 24));
-        unsigned char& flags2 = m_animSlot[animIndex]->m_anim->m_flags;
-        flags2 = static_cast<unsigned char>(__rlwimi(flags2, animFlags, 5, 25, 25));
-    }
-
-    return 1;
-}
-
-int CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
-{
-	if ((m_asyncState == 0 || m_asyncState == 7)
-		&& m_model != nullptr
-		&& (checkModelField == 0 || m_model->m_texSet != 0))
-	{
-			return true;
-	}
-
-	return false;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
  */
 int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int unusedArg, int mergeFileId, int mergeFlags)
 {
@@ -2622,16 +2542,6 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int unusedAr
         return LoadAnimFromDisk(&CharaPcs, charaKind, charaNo, animName, mergeFileId, mergeFlags);
     }
     return 1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::CHandle::FreeModel()
-{
-	// TODO
 }
 
 /*
@@ -2661,6 +2571,61 @@ void CCharaPcs::CHandle::FreeAnim(int animIndex)
     ReleaseSharedNonNull(m_animSlot[animIndex]);
     PruneUnsharedAnimRefs(&CharaPcs, m_animSlot[animIndex]);
     m_animSlot[animIndex] = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80075920
+ * PAL Size: 1300b
+ * EN Address: 0x8008882c
+ * EN Size: 392b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CCharaPcs::CHandle::LoadAnim(
+    char* animName, int animIndex, int animFlags, int charaKind, int charaNo, int mergeFileId, int mergeFlags)
+{
+    FreeAnim(animIndex);
+
+    if (CharaPcs.LoadAnim(charaKind == -1 ? m_charaKind : charaKind,
+                         charaNo == -1 ? m_charaNo : charaNo,
+                         animName, 0, mergeFileId, mergeFlags) == 0) {
+        return 0;
+    }
+
+    CLoadAnim* loadAnim = FindLoadedAnim(&CharaPcs, charaKind == -1 ? m_charaKind : charaKind,
+                                       charaNo == -1 ? m_charaNo : charaNo, animName);
+
+    m_animSlot[animIndex] = loadAnim;
+    loadAnim->AddRef();
+
+    m_animSlot[animIndex]->m_playbackFlags = static_cast<unsigned int>(animFlags);
+    m_animSlot[animIndex]->m_anim->m_flagsBits.m_blendEnabled = animFlags & 1;
+    m_animSlot[animIndex]->m_anim->m_flagsBits.m_clampFrames = (animFlags & 2) != 0;
+
+    return 1;
+}
+
+int CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
+{
+	if ((m_asyncState == 0 || m_asyncState == 7)
+		&& m_model != nullptr
+		&& (checkModelField == 0 || m_model->m_texSet != 0))
+	{
+			return true;
+	}
+
+	return false;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CCharaPcs::CHandle::FreeModel()
+{
+	// TODO
 }
 
 /*

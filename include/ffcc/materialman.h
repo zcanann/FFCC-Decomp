@@ -404,7 +404,19 @@ public:
     void CacheDumpTexture(CAmemCacheSet*);
     void* operator new(unsigned long, CMemory::CStage*, char*, int);
     void IncNumTexture();
-    void SetTevBit(CMaterialMan::TEV_BIT);
+    /*
+     * --INFO--
+     * PAL Address: TODO
+     * PAL Size: TODO
+     * EN Address: 0x8004EE5C
+     * EN Size: 44b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void SetTevBit(CMaterialMan::TEV_BIT tevBit)
+    {
+        m_tevBit |= static_cast<unsigned long>(tevBit);
+    }
     void GetNumTexture();
     unsigned short GetTextureCount() const
     {
@@ -508,7 +520,23 @@ public:
     unsigned long Find(char*);
     void SetPartFromTextureSet(CTextureSet*, int);
     void ReleaseTag(CTextureSet*, int, CAmemCacheSet*);
-    void AddMaterial(CMaterial*, int);
+    /*
+     * --INFO--
+     * PAL Address: TODO
+     * PAL Size: TODO
+     * EN Address: 0x8004EDEC
+     * EN Size: 112b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void AddMaterial(CMaterial* material, int index)
+    {
+        if (static_cast<unsigned long>(index) >= static_cast<unsigned long>(m_materials.GetSize())) {
+            m_materials.Add(material);
+        } else {
+            m_materials.SetAt(index, material);
+        }
+    }
 
     CPtrArray<CMaterial*> m_materials;        // 0x008
     int GetNumMaterial()

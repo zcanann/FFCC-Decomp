@@ -56,6 +56,8 @@ STATIC_ASSERT(offsetof(_pppMngSt, m_movementScale) == 0x54);
 STATIC_ASSERT(offsetof(_pppMngSt, m_basePosition) == 0x58);
 STATIC_ASSERT(offsetof(_pppMngSt, m_hitScale) == 0x64);
 
+STATIC_ASSERT(sizeof(pppCacheChunk) == 0x8);
+STATIC_ASSERT(offsetof(pppCacheChunk, m_pdt) == 0x4);
 STATIC_ASSERT(sizeof(_pppEnvSt) == 0x14);
 STATIC_ASSERT(sizeof(CPartMng::PppPdtSlot) == 0x38);
 STATIC_ASSERT(offsetof(CPartMng::PppPdtSlot, m_env) == 0x4);
@@ -730,7 +732,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         }
 
         for (int i = 0; i < pdt->m_cacheChunkCount; i++) {
-            ppvAmemCacheSet.DestroyCache(reinterpret_cast<s16*>(pdt->m_cacheChunks)[i * 4]);
+            ppvAmemCacheSet.DestroyCache(reinterpret_cast<pppCacheChunk*>(pdt->m_cacheChunks)[i].m_cacheIndex);
         }
 
         if (pdt->m_cacheChunks != 0) {
@@ -1268,12 +1270,8 @@ inline void CPartMng::InitMaterialSet()
 
         CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
         defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(defaultMaterial) + 0x24) |= 1;
-        if (static_cast<unsigned int>(m_materialSet->m_materials.GetSize()) == 0U) {
-            materialSet->m_materials.Add(defaultMaterial);
-        } else {
-            materialSet->m_materials.SetAt(0, defaultMaterial);
-        }
+        defaultMaterial->SetTevBit(static_cast<CMaterialMan::TEV_BIT>(1));
+        m_materialSet->AddMaterial(defaultMaterial, 0);
     }
 }
 
@@ -2655,7 +2653,7 @@ void CPartMng::pppSetRendMatrix()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppPartCalc()
+void CPartMng::pppDumpCacheIdx()
 {
 	// TODO
 }
@@ -2671,55 +2669,24 @@ void CPartMng::pppRefCnt0Up()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005A6C0
+ * PAL Size: 512b
+ * EN Address: 0x80069F30
+ * EN Size: 444b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppDumpCacheIdx()
+void CPartMng::pppPartCalc()
 {
-    struct PppPartResourceRaw {
-        short m_cacheIndex;
-        short m_pad;
-        long* m_pdt;
-    };
-
-    struct PppMngStDumpRaw {
-        void* m_pppResSet;              // 0x00
-        int m_partIndex;                // 0x04
-        unsigned char m_pad08[0x14 - 8];
-        int m_baseTime;                 // 0x14
-        unsigned char m_pad18[0xA8 - 0x18];
-        long m_deltaTime;                  // 0xA8
-        int m_spawnedCount;             // 0xAC
-        unsigned char m_padB0[0xE4 - 0xB0];
-        unsigned char m_endRequested;   // 0xE4
-        unsigned char m_stopRequested;  // 0xE5
-        unsigned char m_isFinished;     // 0xE6
-        unsigned char m_matrixMode;     // 0xE7
-        unsigned char m_hitBgFlag;      // 0xE8
-        unsigned char m_slotVisible;    // 0xE9
-        unsigned char m_ownerFacing;    // 0xEA
-        unsigned char m_drawVariant;    // 0xEB
-        unsigned char m_rotationOrder;  // 0xEC
-        signed char m_drawPass;         // 0xED
-        signed char m_drawSubType;      // 0xEE
-        unsigned char m_useOwnerScaleSign; // 0xEF
-        unsigned char m_ownerFlagsInitialized; // 0xF0
-        unsigned char m_nodeScaleInitialized;  // 0xF1
-        unsigned char m_fieldF2;        // 0xF2
-        unsigned char m_padF3[0xF6 - 0xF3];
-        unsigned char m_hasMapRef;      // 0xF6
-    };
-
     pppSetRendMatrix();
 
     int i;
     int gamePaused = Game.m_gameWork.m_gamePaused;
     for (i = 0; i < 0x180; i++) {
-        PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(
-            reinterpret_cast<unsigned char*>(this) + 0x2A18 + i * 0x158);
+        _pppMngSt* mng = &m_pppMng[i];
         if ((gamePaused == 0 || (mng->m_drawPass >= 6 && mng->m_drawPass <= 7)) &&
             mng->m_baseTime != -0x1000) {
-            ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+            ppvMng = mng;
             if (mng->m_hitBgFlag != 0) {
                 continue;
             }
@@ -2730,15 +2697,15 @@ void CPartMng::pppDumpCacheIdx()
             }
 
         runFrame:
-            pppSetMatrix(reinterpret_cast<_pppMngSt*>(mng));
-            pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
+            pppSetMatrix(mng);
+            pppSetFpMatrix(mng);
 
             mng->m_spawnedCount += mng->m_deltaTime;
             ppvIs2ndCalc = 0;
 
             while (mng->m_spawnedCount >= 0x1000) {
-                _pppCalcPart(reinterpret_cast<_pppMngSt*>(mng));
-                _pppDeadPart(reinterpret_cast<_pppMngSt*>(mng));
+                _pppCalcPart(mng);
+                _pppDeadPart(mng);
                 if (mng->m_isFinished != 0) {
                     break;
                 }
@@ -2761,9 +2728,8 @@ void CPartMng::pppDumpCacheIdx()
 
             {
                 _pppDataHead* pdtHead = *reinterpret_cast<_pppDataHead**>(mng->m_pppResSet);
-                PppPartResourceRaw* partResource =
-                    reinterpret_cast<PppPartResourceRaw*>(reinterpret_cast<unsigned char*>(pdtHead->m_cacheChunks) +
-                                                          mng->m_partIndex * sizeof(PppPartResourceRaw));
+                pppCacheChunk* partResource =
+                    &reinterpret_cast<pppCacheChunk*>(pdtHead->m_cacheChunks)[mng->m_partIndex];
 
                 if (ppvAmemCacheSet.IsEnable(partResource->m_cacheIndex) == 0) {
                     partResource->m_pdt = reinterpret_cast<long*>(
@@ -2774,7 +2740,7 @@ void CPartMng::pppDumpCacheIdx()
 
                 ppvAmemCacheSet.AddRef(partResource->m_cacheIndex);
                 mng->m_hasMapRef = 1;
-                _pppStartPart(reinterpret_cast<_pppMngSt*>(mng), partResource->m_pdt, 1);
+                _pppStartPart(mng, partResource->m_pdt, 1);
             }
             goto runFrame;
         }
@@ -3416,11 +3382,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
 
         CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xC17) CMaterial;
         defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
-        if (static_cast<unsigned int>(m_materialSet->m_materials.GetSize()) == 0U) {
-            materialSet->m_materials.Add(defaultMaterial);
-        } else {
-            materialSet->m_materials.SetAt(0, defaultMaterial);
-        }
+        m_materialSet->AddMaterial(defaultMaterial, 0);
     }
 
     CChunkFile chunkFile;

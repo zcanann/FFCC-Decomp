@@ -959,7 +959,7 @@ void CPartPcs::calc()
 		System.Printf(const_cast<char*>(sTinaParticleAMemFreeFmt), freeSize / 1024);
 	}
 	ppvAmemCacheSet.CalcPrio();
-	PartMng.pppDumpCacheIdx();
+	PartMng.pppPartCalc();
 }
 
 /*

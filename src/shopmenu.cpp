@@ -3331,7 +3331,7 @@ void CShopMenu::Calc()
  */
 void CMenuPcs::CreateSmithMenu()
 {
-    short* cacheChunks;
+    pppCacheChunk* cacheChunks;
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
             s_shopmenu_cpp, 0x2E9));
@@ -3345,10 +3345,10 @@ void CMenuPcs::CreateSmithMenu()
     shopMenu->m_pdtSlot = PartPcs.LoadMenuPdt(const_cast<char*>(s_shop_80332e54));
 
     CPartMng::PppPdtSlot* slot = &PartMng.m_pdtSlots[shopMenu->m_pdtSlot];
-    cacheChunks = reinterpret_cast<short*>(slot->m_pppDataHead->m_cacheChunks);
-    *reinterpret_cast<int*>(cacheChunks + 2) =
-        ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp, 0x32A);
-    int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
+    cacheChunks = reinterpret_cast<pppCacheChunk*>(slot->m_pppDataHead->m_cacheChunks);
+    cacheChunks->m_pdt = reinterpret_cast<long*>(
+        ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, s_shopmenu_cpp, 0x32A));
+    int cacheData = reinterpret_cast<int>(cacheChunks->m_pdt);
     pppCacheLoadShape(reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)),
         slot->m_pppDataHead);
 }
@@ -3363,7 +3363,7 @@ void CMenuPcs::CreateSmithMenu()
  */
 void CMenuPcs::CreateShopMenu()
 {
-    short* cacheChunks;
+    pppCacheChunk* cacheChunks;
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
             s_shopmenu_cpp, 0x2E2));
@@ -3377,10 +3377,10 @@ void CMenuPcs::CreateShopMenu()
     shopMenu->m_pdtSlot = PartPcs.LoadMenuPdt(const_cast<char*>(s_shop_80332e54));
 
     CPartMng::PppPdtSlot* slot = &PartMng.m_pdtSlots[shopMenu->m_pdtSlot];
-    cacheChunks = reinterpret_cast<short*>(slot->m_pppDataHead->m_cacheChunks);
-    *reinterpret_cast<int*>(cacheChunks + 2) =
-        ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp, 0x32A);
-    int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
+    cacheChunks = reinterpret_cast<pppCacheChunk*>(slot->m_pppDataHead->m_cacheChunks);
+    cacheChunks->m_pdt = reinterpret_cast<long*>(
+        ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, s_shopmenu_cpp, 0x32A));
+    int cacheData = reinterpret_cast<int>(cacheChunks->m_pdt);
     pppCacheLoadShape(reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)),
         slot->m_pppDataHead);
 }

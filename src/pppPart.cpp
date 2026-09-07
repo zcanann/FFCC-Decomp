@@ -1842,8 +1842,8 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	pppDataHead->m_shapeGroups = pppDataHead->m_shapeGroups + reinterpret_cast<u32>(dataBase);
 
 	int* chunkOffsets = reinterpret_cast<int*>(pppDataHead->m_cacheChunks);
-	s16* cacheChunks = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620)
-	    s16[static_cast<u32>(pppDataHead->m_cacheChunkCount) * 4];
+	pppCacheChunk* cacheChunks = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620)
+	    pppCacheChunk[pppDataHead->m_cacheChunkCount];
 	pppDataHead->m_cacheChunks = reinterpret_cast<u32>(cacheChunks);
 
 	for (int i = 0; i < pppDataHead->m_cacheChunkCount; i++) {
@@ -1852,7 +1852,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 		u8* chunkData = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x626) u8[chunkSize];
 
 		memcpy(chunkData, chunkSrc, chunkSize);
-		reinterpret_cast<s16*>(pppDataHead->m_cacheChunks)[i << 2] =
+		reinterpret_cast<pppCacheChunk*>(pppDataHead->m_cacheChunks)[i].m_cacheIndex =
 		    ppvAmemCacheSet.SetData(chunkData, chunkSize, CAmemCache::PDT, param_3);
 		delete chunkData;
 		chunkOffsets++;

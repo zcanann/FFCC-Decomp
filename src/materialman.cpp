@@ -3144,11 +3144,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     }
                 }
 
-                if (materialIndex >= static_cast<unsigned long>(m_materials.GetSize())) {
-                    m_materials.Add(material);
-                } else {
-                    m_materials.SetAt(materialIndex, material);
-                }
+                AddMaterial(material, materialIndex);
             } break;
             case CHUNK_NAME: {
                 material = m_materials[materialIndex];
@@ -3354,7 +3350,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
         CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
             if (static_cast<int>(material->m_textureCount) == 0) {
-                material->m_tevBit |= 1;
+                material->SetTevBit(static_cast<CMaterialMan::TEV_BIT>(1));
             } else {
                 for (int i = 0; i < material->m_textureCount; i++) {
                     ReleaseRef(material->m_textureData.m_textures[i]);
@@ -3374,12 +3370,12 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                                 isIntensity = false;
                             }
                             if (isIntensity) {
-                                material->m_tevBit |= 0x200;
+                                material->SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x200));
                             } else if (format == 1) {
-                                material->m_tevBit |= 0x400;
+                                material->SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x400));
                             }
                             if (static_cast<int>(material->m_textureData.m_textures[i]->m_isAlphaLut) != 0) {
-                                material->m_tevBit |= 0x800;
+                                material->SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x800));
                             }
                         }
                     } else {
@@ -3448,11 +3444,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             newMaterial->m_textureIndices[0] = static_cast<short>(textureIndex);
             newMaterial->m_pdtSlotIndex = pdtSlotIndex;
 
-            if (materialIndex >= static_cast<u32>(m_materials.GetSize())) {
-                m_materials.Add(newMaterial);
-            } else {
-                m_materials.SetAt(materialIndex, newMaterial);
-            }
+            AddMaterial(newMaterial, materialIndex);
         }
 next:
         textureIndex = textureIndex + 1;
@@ -3526,15 +3518,6 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
     }
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterialSet::AddMaterial(CMaterial*, int)
-{
-	// TODO
-}
 
 /*
  * --INFO--
@@ -3903,14 +3886,6 @@ int CMaterial::Set(_GXTexMapID texMapId)
     return curTexMap;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void CMaterial::SetTevBit(CMaterialMan::TEV_BIT)
-{
-}
 
 /*
  * --INFO--

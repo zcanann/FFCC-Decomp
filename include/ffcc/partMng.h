@@ -257,6 +257,12 @@ struct _pppCtrlTable
     int* m_serializedDataOffsets;       // 0xC
 };
 
+struct pppCacheChunk
+{
+    s16 m_cacheIndex; // 0x0
+    long* m_pdt;      // 0x4
+}; // Size 0x8
+
 struct _pppDataHead
 {
     unsigned int m_version;           // 0x0
@@ -378,7 +384,7 @@ struct _pppMngSt
     unsigned char m_ownerFacing;       // 0xEA
     unsigned char m_drawVariant;       // 0xEB
     unsigned char m_rotationOrder;     // 0xEC
-    unsigned char m_drawPass;          // 0xED
+    signed char m_drawPass;            // 0xED
     signed char m_drawSubType;         // 0xEE
     unsigned char m_useOwnerScaleSign; // 0xEF
     unsigned char m_ownerFlagsInitialized; // 0xF0

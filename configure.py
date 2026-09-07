@@ -762,7 +762,7 @@ config.libs = [
             Object(Matching, "stopwatch.cpp", extra_cflags=["-inline auto,deferred", "-str reuse,readonly"]),
             Object(NonMatching, "system.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "texanim.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
-            Object(NonMatching, "textureman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "textureman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
             Object(
                 Matching,
                 "THPDraw.cpp",

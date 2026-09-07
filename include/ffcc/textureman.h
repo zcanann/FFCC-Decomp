@@ -41,6 +41,26 @@ public:
             amemCacheSet->Release(m_cacheId);
         }
     }
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: 0x80046364
+     * EN Size: 48b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    int GetNumTlut()
+    {
+        if (m_format == GX_TF_C8) {
+            return 0x100;
+        }
+        if (m_format == GX_TF_C4) {
+            return 0x10;
+        }
+        return 0;
+    }
+
     int CheckName(char*);
     void SetExternalTlut(void*, int);
     void FlushExternalTlut(void*, int);

@@ -181,16 +181,16 @@ void CGItemObj::ItemJump(int state, float jump)
 {
 	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
 	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
-		CGObject* object = reinterpret_cast<CGObject*>(itemObj);
+		CGObject* object = itemObj;
 
 		if ((object->m_objectFlags & 0x10) == 0) {
 			Vec bottom = object->m_worldPosition;
+			bottom.y += kItemObjHeightOffset;
 			Vec move;
 
 			move.x = kItemObjZero;
 			move.z = kItemObjZero;
 			move.y = kItemObjGroundProbeDown;
-			bottom.y += kItemObjHeightOffset;
 			unsigned int mapMask = object->m_bgHitMask;
 			CMapCylinder cylinder(kItemObjBoundsInitMin, kItemObjBoundsInitMax);
 			cylinder.m_bottom = bottom;
@@ -276,14 +276,13 @@ void CGItemObj::onNewFinished()
  */
 void CGItemObj::loadModel()
 {
-	unsigned char* self = (unsigned char*)this;
 	int modelNo = -1;
 	int modelVariant = 0;
 	int modelFlag = 0;
 	unsigned long animFlags = (unsigned long)-1;
 	char* standAnim = const_cast<char*>(sStandAnim);
 	int useParticleTable = 1;
-	int itemType = *(int*)(self + 0x500);
+	int itemType = m_worldParamA;
 
 	switch (itemType) {
 	case 0xA:
@@ -313,13 +312,13 @@ void CGItemObj::loadModel()
 	case 0x20:
 	case 0x21:
 	case 0x24: {
-		int itemEntryOffset = *(int*)(self + 0x504) * 0x48 + 2;
+		int itemEntryOffset = m_worldParamB * 0x48 + 2;
 		int itemEntry = *(unsigned short*)(Game.unkCFlatData0[2] + itemEntryOffset);
 
-		self[0x53] = 1;
+		m_ownerSlot = 1;
 		modelNo = itemEntry & 0xFFF;
 		modelVariant = itemEntry >> 0xC;
-		self[0x50] = static_cast<unsigned char>(__rlwimi(self[0x50], 1, 3, 28, 28));
+		m_stateFlags0Bits.unk4 = 1;
 		m_lifeTimer = 0x1194;
 		animFlags = 0x12;
 		modelFlag = 1;
@@ -337,15 +336,15 @@ void CGItemObj::loadModel()
 		PlayAnim(0, 1, 0, -1, -1, 0);
 	}
 
-	if (*(int*)(self + 0x500) == 0x12) {
+	if (m_worldParamA == 0x12) {
 		DispCharaParts(0);
-		self[0x50] = static_cast<unsigned char>(__rlwimi(self[0x50], 1, 4, 27, 27));
+		m_stateFlags0Bits.unk3 = 1;
 	}
 
 	if (useParticleTable != 0) {
 		for (int i = 0; i < 3; i++) {
 			if (i != 0 || m_createFlags != 1) {
-				int entryBase = Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48;
+				int entryBase = Game.unkCFlatData0[2] + m_worldParamB * 0x48;
 				int particleNo = *(unsigned short*)(entryBase + i * 2 + 0x14);
 
 				if (particleNo != 0xFFFF) {
@@ -353,21 +352,20 @@ void CGItemObj::loadModel()
 					const float& particleScaleBase = kItemObjParticleScaleBase;
 					float particleScale =
 					    particleScaleStep * (float)(unsigned short)*(unsigned short*)(entryBase + 0x10) + particleScaleBase;
-					putParticle(particleNo | 0x100, *(int*)(self + 0x55C), this, particleScale, 0);
+					putParticle(particleNo | 0x100, m_particleSlot, this, particleScale, 0);
 				}
 			}
 		}
 	}
 
-	if (*(int*)(self + 0x500) == 0xCB) {
+	if (m_worldParamA == 0xCB) {
 		const float& randBase = kItemObjMotionStep;
 		const float& randRange = kItemObjParticleRandomRange;
-		*(float*)(self + 0x1D4) = randBase - Math.RandF(randRange);
-		*(unsigned char*)(self + 0x9A) =
-		    static_cast<unsigned char>(__rlwimi(*(unsigned char*)(self + 0x9A), 0, 2, 29, 29));
+		m_moveTimer = randBase - Math.RandF(randRange);
+		m_weaponNodeFlagBits.m_unk04 = 0;
 	}
 
-	self[0x54C] = static_cast<unsigned char>(__rlwimi(self[0x54C], 1, 7, 24, 24));
+	m_flagBits.bits.unk0 = 1;
 }
 
 /*

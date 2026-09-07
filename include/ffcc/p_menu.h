@@ -305,7 +305,24 @@ public:
     };
     struct Sprt2
     {
-        void operator=(const Sprt2&);
+        short x;
+        short y;
+        short w;
+        short h;
+        float mulX;
+        float mulY;
+        float alpha;
+        float depth;
+        int tex;
+        int kind;
+        int timer;
+        int startFrame;
+        int duration;
+        int flags;
+        float motionX;
+        float motionY;
+        float targetX;
+        float targetY;
     };
     struct SPL
     {

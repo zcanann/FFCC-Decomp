@@ -231,6 +231,7 @@ public:
 		void SetFrame(float);
 		void CalcFurColor();
 		void InitMogFurTex();
+		void CopyFurTex(int loadFromTexture);
 		void MogFurFrame(CGObject*);
 		int PickFur(float (*)[4], _GXColor, int, int, _GXColor*, _GXColor*, Vec*);
 		void DrawFur(float (*)[4], int);

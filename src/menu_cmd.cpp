@@ -50,37 +50,45 @@ static const float kCmdMenuThreeQuarter = 0.75f;
 static s32 s_unitePanelCount;
 static s32 s_UniteTop[3];
 
-extern "C" const s16 s_uniteRecipePatterns[] = {
-    0x0000, 0x022A, 0x0003, 0x0107, 0x0105, 0x0105,
-    0x0001, 0x0207, 0x0002, 0x0100, 0x03E7, 0x0000,
-    0x0001, 0x020B, 0x0002, 0x0101, 0x03E7, 0x0000,
-    0x0001, 0x020F, 0x0002, 0x0102, 0x03E7, 0x0000,
-    0x0000, 0x0230, 0x0003, 0x0100, 0x0100, 0x0100,
-    0x0000, 0x0231, 0x0003, 0x0101, 0x0101, 0x0101,
-    0x0000, 0x0232, 0x0003, 0x0102, 0x0102, 0x0102,
-    0x0000, 0x0208, 0x0002, 0x0100, 0x0100, 0x0000,
-    0x0000, 0x020C, 0x0002, 0x0101, 0x0101, 0x0000,
-    0x0000, 0x0210, 0x0002, 0x0102, 0x0102, 0x0000,
-    0x0000, 0x0226, 0x0002, 0x0100, 0x0101, 0x0000,
-    0x0000, 0x0226, 0x0002, 0x0100, 0x0102, 0x0000,
-    0x0000, 0x0226, 0x0002, 0x0101, 0x0100, 0x0000,
-    0x0000, 0x0226, 0x0002, 0x0101, 0x0102, 0x0000,
-    0x0000, 0x0226, 0x0002, 0x0102, 0x0100, 0x0000,
-    0x0000, 0x0226, 0x0002, 0x0102, 0x0101, 0x0000,
-    0x0000, 0x0221, 0x0002, 0x0100, 0x0107, 0x0000,
-    0x0000, 0x0221, 0x0002, 0x0101, 0x0107, 0x0000,
-    0x0000, 0x0221, 0x0002, 0x0102, 0x0107, 0x0000,
-    0x0000, 0x0214, 0x0002, 0x0107, 0x0100, 0x0000,
-    0x0000, 0x0214, 0x0002, 0x0107, 0x0101, 0x0000,
-    0x0000, 0x0214, 0x0002, 0x0107, 0x0102, 0x0000,
-    0x0000, 0x023E, 0x0003, 0x0107, 0x0100, 0x0101,
-    0x0000, 0x023E, 0x0003, 0x0107, 0x0100, 0x0102,
-    0x0000, 0x023E, 0x0003, 0x0107, 0x0101, 0x0100,
-    0x0000, 0x023E, 0x0003, 0x0107, 0x0101, 0x0102,
-    0x0000, 0x023E, 0x0003, 0x0107, 0x0102, 0x0100,
-    0x0000, 0x023E, 0x0003, 0x0107, 0x0102, 0x0101,
-    static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF),
-    static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF),
+struct UniteRecipe {
+    s16 food;
+    s16 command;
+    s16 count;
+    s16 ingredients[3];
+};
+
+STATIC_ASSERT(sizeof(UniteRecipe) == 12);
+
+static const UniteRecipe s_Unite[] = {
+    { 0x0000, 0x022A, 0x0003, { 0x0107, 0x0105, 0x0105 } },
+    { 0x0001, 0x0207, 0x0002, { 0x0100, 0x03E7, 0x0000 } },
+    { 0x0001, 0x020B, 0x0002, { 0x0101, 0x03E7, 0x0000 } },
+    { 0x0001, 0x020F, 0x0002, { 0x0102, 0x03E7, 0x0000 } },
+    { 0x0000, 0x0230, 0x0003, { 0x0100, 0x0100, 0x0100 } },
+    { 0x0000, 0x0231, 0x0003, { 0x0101, 0x0101, 0x0101 } },
+    { 0x0000, 0x0232, 0x0003, { 0x0102, 0x0102, 0x0102 } },
+    { 0x0000, 0x0208, 0x0002, { 0x0100, 0x0100, 0x0000 } },
+    { 0x0000, 0x020C, 0x0002, { 0x0101, 0x0101, 0x0000 } },
+    { 0x0000, 0x0210, 0x0002, { 0x0102, 0x0102, 0x0000 } },
+    { 0x0000, 0x0226, 0x0002, { 0x0100, 0x0101, 0x0000 } },
+    { 0x0000, 0x0226, 0x0002, { 0x0100, 0x0102, 0x0000 } },
+    { 0x0000, 0x0226, 0x0002, { 0x0101, 0x0100, 0x0000 } },
+    { 0x0000, 0x0226, 0x0002, { 0x0101, 0x0102, 0x0000 } },
+    { 0x0000, 0x0226, 0x0002, { 0x0102, 0x0100, 0x0000 } },
+    { 0x0000, 0x0226, 0x0002, { 0x0102, 0x0101, 0x0000 } },
+    { 0x0000, 0x0221, 0x0002, { 0x0100, 0x0107, 0x0000 } },
+    { 0x0000, 0x0221, 0x0002, { 0x0101, 0x0107, 0x0000 } },
+    { 0x0000, 0x0221, 0x0002, { 0x0102, 0x0107, 0x0000 } },
+    { 0x0000, 0x0214, 0x0002, { 0x0107, 0x0100, 0x0000 } },
+    { 0x0000, 0x0214, 0x0002, { 0x0107, 0x0101, 0x0000 } },
+    { 0x0000, 0x0214, 0x0002, { 0x0107, 0x0102, 0x0000 } },
+    { 0x0000, 0x023E, 0x0003, { 0x0107, 0x0100, 0x0101 } },
+    { 0x0000, 0x023E, 0x0003, { 0x0107, 0x0100, 0x0102 } },
+    { 0x0000, 0x023E, 0x0003, { 0x0107, 0x0101, 0x0100 } },
+    { 0x0000, 0x023E, 0x0003, { 0x0107, 0x0101, 0x0102 } },
+    { 0x0000, 0x023E, 0x0003, { 0x0107, 0x0102, 0x0100 } },
+    { 0x0000, 0x023E, 0x0003, { 0x0107, 0x0102, 0x0101 } },
+    { -1, -1, -1, { -1, -1, -1 } },
 };
 
 static const char s_Flamestrike_801DEA6C[] = "Flamestrike";
@@ -317,12 +325,12 @@ static inline s16 GetCmdLayoutFlag(CMenuPcs* menu)
 
 static inline s16 GetUniteRecipeCmd(int recipe)
 {
-	return s_uniteRecipePatterns[recipe * 6 + 1];
+	return s_Unite[recipe].command;
 }
 
 static inline s16 GetUniteRecipeCount(int recipe)
 {
-	return s_uniteRecipePatterns[recipe * 6 + 2];
+	return s_Unite[recipe].count;
 }
 
 } // namespace
@@ -1917,17 +1925,19 @@ inline void CMenuPcs::ChkCmdActive(int itemIndex)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014c6bc
+ * PAL Size: 1572b
+ * EN Address: 0x8017121c
+ * EN Size: 2192b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-
 int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 {
-	u8* self = reinterpret_cast<u8*>(this);
 	const CCaravanWork* const caravan = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	int itemKinds[10];
-	int matches[10];
+	int matches[5][2];
 	int candidates[10];
 	int ok;
 	int k;
@@ -1940,8 +1950,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	}
 
 	const s16 selectedState = caravan->m_commandListExtra[selected];
-	const s32 selectedFlag =
-	    (static_cast<u32>(-selectedState) & ~static_cast<u32>(selectedState)) >> 31;
+	const s32 selectedFlag = selectedState > 0 ? 1 : 0;
 
 	if ((GetCmdStateView(this)->mode == 1) && (GetCmdStateView(this)->phase == 2)) {
 		if (selectedState < 0) {
@@ -1954,32 +1963,26 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	memset(candidates, 0xff, sizeof(candidates));
 
-	int write = 2;
-	for (int slot = 2; slot < 8; slot++, write++) {
+	for (int slot = 2; slot < 8; slot++) {
 		if (slot == selected) {
 			if (caravan->m_commandListExtra[slot] == 0) {
-				candidates[write] = 0;
+				candidates[slot] = 0;
 			} else {
-				candidates[write] = 0;
-				write++;
-				candidates[write] = 0;
-				slot++;
+				candidates[slot] = 0;
+				candidates[++slot] = 0;
 				if (caravan->m_commandListExtra[slot + 1] < 0) {
-					write++;
-					candidates[write] = 0;
-					slot++;
+					candidates[++slot] = 0;
 				}
 			}
 		} else {
 			const s32 v = caravan->m_commandListExtra[slot];
-			candidates[write] = (-v | v) >> 31;
+			candidates[slot] = v != 0 ? -1 : 0;
 		}
 	}
 
 	memset(itemKinds, 0xff, sizeof(itemKinds));
 
-	int index = 2;
-	for (int slot = 2; slot < 8; slot++, index++) {
+	for (int slot = 2; slot < 8; slot++) {
 		if (caravan->m_numCmdListSlots <= slot) {
 			break;
 		}
@@ -1993,32 +1996,22 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 		if (IsMagicArti(itemId)) {
 			if (itemId == 0xdf) {
-				itemKinds[index] = 0x100;
+				itemKinds[slot] = 0x100;
 			} else if (itemId == 0xe0) {
-				itemKinds[index] = 0x101;
+				itemKinds[slot] = 0x101;
 			} else if (itemId == 0xe1) {
-				itemKinds[index] = 0x102;
+				itemKinds[slot] = 0x102;
 			} else if (itemId == 0xe2) {
-				itemKinds[index] = 0x105;
+				itemKinds[slot] = 0x105;
 			} else {
-				itemKinds[index] = 0x107;
+				itemKinds[slot] = 0x107;
 			}
-		} else if (icon == 0) {
-			goto setFood;
-		} else if (icon == 1) {
-			goto setFood;
-		} else if (icon == 2) {
-			goto setFood;
-		} else if (icon == 3) {
-		setFood:
-			itemKinds[index] = 999;
-		} else if (icon == 0x10) {
-			goto setItem;
-		} else if (icon == 0x11) {
-		setItem:
-			itemKinds[index] = itemId;
+		} else if ((icon == 0) || (icon == 1) || (icon == 2) || (icon == 3)) {
+			itemKinds[slot] = 999;
+		} else if ((icon == 0x10) || (icon == 0x11)) {
+			itemKinds[slot] = itemId;
 		} else {
-			itemKinds[index] = -1;
+			itemKinds[slot] = -1;
 		}
 	}
 
@@ -2029,74 +2022,65 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	matchCount = 0;
 	memset(matches, 0xff, sizeof(matches));
-	int* mp = matches;
-	int w = 0;
 
 	if ((itemKinds[selected] == 999) && (selected > 2)) {
 		int patIdx = 0;
-		for (const s16* pat = s_uniteRecipePatterns; pat[1] >= 0; pat += 6, patIdx++) {
-			if (pat[0] == 0) {
+		for (const UniteRecipe* pat = s_Unite; pat->command >= 0; pat++, patIdx++) {
+			if (pat->food == 0) {
 				continue;
 			}
-			const int len1 = pat[2];
+			const int len1 = pat->count;
 			if ((len1 == 2) && (selectedFlag != 0)) {
 				continue;
 			}
 			ok = 0;
 			k = 0;
-			for (const s16* q = &pat[3 + ok]; k < len1 - 1; k++, q++) {
+			for (; k < len1 - 1; k++) {
 				const int slot = selected - (len1 - 1 - k);
-				int __p5 = slot;
-				if (candidates[__p5] != 0) {
+				if (candidates[slot] != 0) {
 					break;
 				}
-				if (*q == itemKinds[slot]) {
+				if (pat->ingredients[k] == itemKinds[slot]) {
 					ok++;
 				}
 			}
-			if (len1 == ok - 1) {
-				mp[0] = patIdx;
+			if (ok == len1 - 1) {
+				matches[matchCount][0] = patIdx;
+				matches[matchCount][1] = selected - (len1 - 1);
 				matchCount++;
-				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = selected - (len1 - 1);
-				mp += 2;
-				w += 8;
 			}
 		}
 	} else if (selectedFlag == 0) {
-		const int baseLen = static_cast<int>(s_uniteRecipePatterns[2]);
+		const int baseLen = static_cast<int>(s_Unite[0].count);
 		int start = selected - (baseLen - 1);
 		for (int i = 0; i < baseLen; i++, start++) {
 			ok = 0;
 			k = 0;
-			for (const s16* q = &s_uniteRecipePatterns[3 + ok]; k < baseLen; k++, q++) {
+			for (; k < baseLen; k++) {
 				const int slot = i + (selected - ((baseLen - 1) - k));
 				if (candidates[slot] != 0) {
 					break;
 				}
-				if (*q == itemKinds[slot]) {
+				if (s_Unite[0].ingredients[k] == itemKinds[slot]) {
 					ok++;
 				}
 			}
 			if (ok == baseLen) {
-				mp[0] = 0;
+				matches[matchCount][0] = 0;
+				matches[matchCount][1] = start;
 				matchCount++;
-				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = start;
-				mp += 2;
-				w += 8;
 			}
 		}
 	}
 
-	mp = &matches[matchCount * 2];
-	w = matchCount * 8;
 	int group = 1;
-	for (const s16* pat = s_uniteRecipePatterns + 6; pat[1] >= 0; pat += 6, group++) {
-		if (((pat[0] != 0) && (itemKinds[selected] == 999) && (selected > 2)) ||
-		    ((pat[2] == 2) && (selectedFlag != 0))) {
+	for (const UniteRecipe* pat = s_Unite + 1; pat->command >= 0; pat++, group++) {
+		if (((pat->food != 0) && (itemKinds[selected] == 999) && (selected > 2)) ||
+		    ((pat->count == 2) && (selectedFlag != 0))) {
 			continue;
 		}
 
-		const int len =  (s32)(static_cast<int>(pat[2]));
+		const int len =  (s32)(static_cast<int>(pat->count));
 		for (int start = 0; start < len; start++) {
 			if ((start == 0) && (selectedFlag != 0)) {
 				start++;
@@ -2104,22 +2088,20 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 			ok = 0;
 			k = 0;
-			for (const s16* q = &pat[3 + ok]; k < len; k++, q++) {
+			for (; k < len; k++) {
 				const int slot = start + (selected - ((len - 1) - k));
 				if (candidates[slot] != 0) {
 					break;
 				}
-				if (*q == itemKinds[slot]) {
+				if (pat->ingredients[k] == itemKinds[slot]) {
 					ok++;
 				}
 			}
 
 			if (ok == len) {
-				mp[0] = group;
+				matches[matchCount][0] = group;
+				matches[matchCount][1] = start + (selected - (len - 1));
 				matchCount++;
-				*reinterpret_cast<int*>(reinterpret_cast<u8*>(matches) + w + 4) = start + (selected - (len - 1));
-				mp += 2;
-				w += 8;
 			}
 		}
 	}
@@ -2127,8 +2109,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	int (*out)[2] = comboOut;
 	for (int rank = 0; rank < 2; rank++) {
 		for (int i = 0; i < matchCount; i++) {
-			const int* m = &matches[i * 2];
-			if (rank + 2 == s_uniteRecipePatterns[2 + m[0] * 6]) {
+			const int* m = matches[i];
+			if (rank + 2 == s_Unite[m[0]].count) {
 				out[0][0] = m[0];
 				out++;
 				out[-1][1] = m[1];

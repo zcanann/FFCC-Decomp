@@ -5,7 +5,7 @@
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/math.h"
-#include "ffcc/monobj.h"
+#include "ffcc/monobj_boss.h"
 #include "ffcc/partMng.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/prgobj.h"
@@ -87,6 +87,10 @@ struct SItemFlatRow {
 	unsigned short m_fineValue;
 	unsigned char m_pad2[0x36];
 };
+STATIC_ASSERT(offsetof(LastBossWork, m_capsules) == 0x08);
+STATIC_ASSERT(offsetof(LastBossWork, m_targetPosition) == 0x18);
+STATIC_ASSERT(offsetof(LastBossWork, m_phaseTimer) == 0x24);
+STATIC_ASSERT(offsetof(CGObject, m_lifeTimer) == 0x94);
 STATIC_ASSERT(sizeof(SItemFlatRow) == 0x48);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_attribute) == 0x08);
 STATIC_ASSERT(offsetof(SItemFlatRow, m_fineValue) == 0x10);
@@ -316,7 +320,7 @@ void CGItemObj::loadModel()
 		modelNo = itemEntry & 0xFFF;
 		modelVariant = itemEntry >> 0xC;
 		self[0x50] = static_cast<unsigned char>(__rlwimi(self[0x50], 1, 3, 28, 28));
-		*(int*)(self + 0x94) = 0x1194;
+		m_lifeTimer = 0x1194;
 		animFlags = 0x12;
 		modelFlag = 1;
 		break;
@@ -624,7 +628,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			changeStat(((int)~(carryState - 1 | 1 - carryState) >> 0x1F) + 0xD, 0, 0);
 		}
 
-		*reinterpret_cast<u32*>(self + 0x94) = 0x1194;
+		m_lifeTimer = 0x1194;
 	}
 
 	if ((m_objectFlags & 0x10) != 0 && canSystemCall8 != 0) {
@@ -652,26 +656,25 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	System.Printf(itemObjStrings + kItemObjStrNumFreeItemFmt, freeItemCount);
 
 	if (freeItemCount == 0) {
-		int bestScriptObjectPos = 0x00989680;
-		unsigned char* bestItemObj = 0;
+		int shortestLifetime = 0x00989680;
+		CGItemObj* bestItemObj = 0;
 		int deletedCount = 0;
 		CFlatRuntime2* runtime = ItemCFlatRuntime();
 
-		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(runtime->FindGItemObjFirst());
+		for (CGItemObj* itemObj = runtime->FindGItemObjFirst();
 			 itemObj != 0;
-		     itemObj = reinterpret_cast<unsigned char*>(
-		         runtime->FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
-			if (*(void**)(itemObj + 0x550) == 0 &&
+		     itemObj = runtime->FindGItemObjNext(itemObj)) {
+			if (itemObj->m_owner == 0 &&
 			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
-			    (itemObj[0x53] & 1) != 0 && *(int*)(itemObj + 0x94) < bestScriptObjectPos) {
-				bestScriptObjectPos = *(int*)(itemObj + 0x94);
+			        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0 &&
+			    (itemObj->m_ownerSlot & 1) != 0 && itemObj->m_lifeTimer < shortestLifetime) {
+				shortestLifetime = itemObj->m_lifeTimer;
 				bestItemObj = itemObj;
 			}
 		}
 
 		if (bestItemObj != 0) {
-			runtime->deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
+			runtime->deleteObject(bestItemObj);
 			goto markDeleted;
 		} else {
 			if ((unsigned int)System.m_execParam >= 3U) {
@@ -703,11 +706,10 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	gCFlatRuntime().SystemCall(0, 1, 7, 5, inStack, &outStack);
 
 	if (createMode != 1) {
-		CGPrgObj* newItem = (CGPrgObj*)CFlat.intToClass((int)outStack.m_word);
-		unsigned char* itemSelf = (unsigned char*)newItem;
+		CGItemObj* newItem = static_cast<CGItemObj*>(CFlat.intToClass((int)outStack.m_word));
 
 		if (createMode == 2) {
-			*(int*)(itemSelf + 0x558) = scriptArg;
+			newItem->m_scriptArg = scriptArg;
 			newItem->m_radiusCtrl.y = kItemObjUnitScale;
 		}
 
@@ -745,28 +747,28 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			newItem->m_worldPosition.x = owner->m_worldPosition.x;
 			newItem->m_worldPosition.y = owner->m_worldPosition.y + kItemObjLaunchYOffset;
 			newItem->m_worldPosition.z = owner->m_worldPosition.z;
-			*(CGObject**)(itemSelf + 0x550) = owner;
+			newItem->m_owner = owner;
 
 			void* ownerScriptSlot = owner->m_scriptHandle[0xED];
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleCreateFmt, ownerScriptSlot);
 			}
-			*(CGPrgObj**)(CGMonObj::m_boss + (int)ownerScriptSlot * 4 + 8) = newItem;
+			reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_capsules[(int)ownerScriptSlot] = newItem;
 
 			CCharaPcs::CHandle* handle =
 			    new (Game.m_mainStage, itemObjStrings + kItemObjStrItemobjCpp, 0x28E) CCharaPcs::CHandle;
-			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle = handle;
-			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle->Add();
+			newItem->m_pendingModelHandle = handle;
+			newItem->m_pendingModelHandle->Add();
 
-			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
+			newItem->m_pendingModelHandle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleAsyncStartMsg);
 			}
 
-			reinterpret_cast<CGItemObj*>(newItem)->m_pendingAnimFlags = ccfs->m_pendingAnimFlags;
-			reinterpret_cast<CGItemObj*>(newItem)->m_pendingAnimName = ccfs->m_pendingAnimName;
-			reinterpret_cast<CGItemObj*>(newItem)->m_memoryCapsuleNameIndex = ccfs->m_memoryCapsuleNameIndex;
+			newItem->m_pendingAnimFlags = ccfs->m_pendingAnimFlags;
+			newItem->m_pendingAnimName = ccfs->m_pendingAnimName;
+			newItem->m_memoryCapsuleNameIndex = ccfs->m_memoryCapsuleNameIndex;
 		}
 
 		return newItem;
@@ -805,24 +807,23 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 	int deletedCount = 0;
 
 	while (deletedCount < maxDeleteCount) {
-		unsigned char* bestItemObj = 0;
-		int bestScriptObjectPos = 0x00989680;
+		CGItemObj* bestItemObj = 0;
+		int shortestLifetime = 0x00989680;
 
-		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(ItemCFlatRuntime()->FindGItemObjFirst());
+		for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst();
 			 itemObj != 0;
-			 itemObj = reinterpret_cast<unsigned char*>(
-			     ItemCFlatRuntime()->FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
-			if (*(void**)(itemObj + 0x550) == 0 &&
+			 itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
+			if (itemObj->m_owner == 0 &&
 				static_cast<signed char>(
-				    static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
-				(((int)(char)itemObj[0x53] & deleteMask) != 0) && *(int*)(itemObj + 0x94) < bestScriptObjectPos) {
-				bestScriptObjectPos = *(int*)(itemObj + 0x94);
+				    static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0 &&
+				(((int)(char)itemObj->m_ownerSlot & deleteMask) != 0) && itemObj->m_lifeTimer < shortestLifetime) {
+				shortestLifetime = itemObj->m_lifeTimer;
 				bestItemObj = itemObj;
 			}
 		}
 
 		if (bestItemObj != 0) {
-			gCFlatRuntime().deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
+			gCFlatRuntime().deleteObject(bestItemObj);
 		} else {
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(const_cast<char*>(sItemNoDeletableObjectMsg));
@@ -852,10 +853,6 @@ void CGItemObj::onFrameStat()
 	int stateId = m_lastStateId;
 	char* itemObjStrings = const_cast<char*>(sItemObjStringTableBase);
 	float zero = kItemObjZero;
-	union {
-		double value;
-		u32 word[2];
-	} particleValue;
 
 	switch (stateId) {
 	case 0x1b:
@@ -890,7 +887,7 @@ void CGItemObj::onFrameStat()
 				}
 			}
 
-			if (*(int*)(self + 0x94) <= 0 || distance > kItemObjExpireDistance) {
+			if (m_lifeTimer <= 0 || distance > kItemObjExpireDistance) {
 				System.Printf(itemObjStrings + kItemObjStrExpireByTimeOrDistanceMsg);
 				m_bgDownDist = kItemObjMotionStep;
 				m_stepSlopeLimit = zero;
@@ -1130,7 +1127,7 @@ void CGItemObj::onFrameStat()
 		prgObj->m_moveOffset.y = kItemObjMoveOffsetXZ;
 		prgObj->m_rotTargetY += kItemObjMemoryTurnStep;
 
-		CVector delta(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x18));
+		CVector delta(reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_targetPosition);
 		delta = delta - CVector(prgObj->m_worldPosition);
 		float distance = PSVECMag(delta);
 		if (distance < kItemObjMemoryRadius) {
@@ -1159,20 +1156,10 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
-			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
-			if (soundData != 0) {
-				pdtNo = soundData[5];
-			} else {
-				pdtNo = -1;
-			}
+			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
 
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
-			const double* u32Bias = &kItemObjU32ToDoubleBias;
-			const float* fineStep = &kItemObjFineStep;
-			const float* particleScaleBase = &kItemObjParticleScaleBase;
-			particleValue.word[0] = 0x43300000;
-			particleValue.word[1] = itemRows[prgObj->m_worldParamB].m_fineValue;
-			float particleScale = *fineStep * (float)(particleValue.value - *u32Bias) + *particleScaleBase;
+			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
 			putParticle((pdtNo << 8) | 0x13, m_particleSlot, this, particleScale, 0x12903);
 		} else if (m_stateFrame == 0xD) {
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
@@ -1183,7 +1170,7 @@ void CGItemObj::onFrameStat()
 
 			CFlatRuntime::CStack stack;
 			stack.m_word = 0;
-			*(int*)(CGMonObj::m_boss + ownerSlot * 4 + 8) = 0;
+			reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_capsules[ownerSlot] = 0;
 			gCFlatRuntime().SystemCall(
 			    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
 
@@ -1202,20 +1189,10 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
-			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
-			if (soundData != 0) {
-				pdtNo = soundData[5];
-			} else {
-				pdtNo = -1;
-			}
+			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
 
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
-			const double* u32Bias = &kItemObjU32ToDoubleBias;
-			const float* fineStep = &kItemObjFineStep;
-			const float* particleScaleBase = &kItemObjParticleScaleBase;
-			particleValue.word[0] = 0x43300000;
-			particleValue.word[1] = itemRows[prgObj->m_worldParamB].m_fineValue;
-			float particleScale = *fineStep * (float)(particleValue.value - *u32Bias) + *particleScaleBase;
+			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
 			putParticle((pdtNo << 8) | 4, m_particleSlot, this, particleScale, 0x12908);
 		} else if (m_stateFrame == 0xD) {
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
@@ -1224,7 +1201,7 @@ void CGItemObj::onFrameStat()
 				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleSuccessFmt, ownerSlot);
 			}
 
-			*(int*)(CGMonObj::m_boss + ownerSlot * 4 + 8) = 0;
+			reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_capsules[ownerSlot] = 0;
 			CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, kItemObjZero, 0);
 			if (newItem != 0) {
 				unsigned char* newItemSelf = reinterpret_cast<unsigned char*>(newItem);
@@ -1266,7 +1243,6 @@ void CGItemObj::onFrameStat()
  */
 void CGItemObj::onFrame()
 {
-	unsigned char* self = (unsigned char*)this;
 	CCharaPcs::CHandle* handle = m_pendingModelHandle;
 
 	if (handle != 0 && handle->IsLoadModelASyncCompleted()) {
@@ -1274,7 +1250,7 @@ void CGItemObj::onFrame()
 			System.Printf(const_cast<char*>(sItemMemoryCapsuleAsyncEndMsg));
 		}
 
-		m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle*>(m_pendingModelHandle);
+		m_charaModelHandle = m_pendingModelHandle;
 		m_pendingModelHandle = 0;
 
 		if (m_worldParamA == 0xCB) {
@@ -1282,32 +1258,15 @@ void CGItemObj::onFrame()
 			SetAnimSlot(0, 0);
 			PlayAnim(0, 1, 0, -1, -1, 0);
 
-			int ownerData = *(int*)((unsigned char*)m_owner + 0x58);
-			int* soundData = *(int**)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
-			int soundEntry;
-			if (soundData != 0) {
-				soundEntry = soundData[5];
-			} else {
-				soundEntry = -1;
-			}
+			unsigned char* ownerData = reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle);
+			int soundEntry = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
 
-			union {
-				double value;
-				u32 word[2];
-			} particleValue;
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
-			const float* fineStep = &kItemObjFineStep;
-			const float* particleScaleBase = &kItemObjParticleScaleBase;
-			const double* u32Bias = &kItemObjU32ToDoubleBias;
-			particleValue.word[0] = 0x43300000;
-			particleValue.word[1] = itemRows[m_worldParamB].m_fineValue;
-			float particleScale = *fineStep * (float)(particleValue.value - *u32Bias) + *particleScaleBase;
+			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
 			putParticle((soundEntry << 8) | *(int*)(ownerData + 0x3B4), m_particleSlot, this, particleScale, 0x12909);
 
-			const float* zero = &kItemObjZero;
-			const float* memoryRadius = &kItemObjMemoryRadius;
-			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), *memoryRadius, *memoryRadius,
-			             CVector(*zero, *zero, *zero));
+			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), kItemObjMemoryRadius, kItemObjMemoryRadius,
+			             CVector(kItemObjZero, kItemObjZero, kItemObjZero));
 			m_damageColliders[0].m_hitMask = 8;
 			addSubStat();
 		}
@@ -1366,12 +1325,10 @@ void CGItemObj::onChangeStat(int state)
  */
 void CGItemObj::onFramePostCalc()
 {
-	unsigned char* self = (unsigned char*)this;
-
 	if (static_cast<signed char>(
-	        static_cast<int>((static_cast<unsigned int>(self[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
-	    *(void**)(self + 0x550) == 0) {
-		*(int*)(self + 0x94) = *(int*)(self + 0x94) - 1;
+	        static_cast<int>((static_cast<unsigned int>(m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0 &&
+	    m_owner == 0) {
+		m_lifeTimer = m_lifeTimer - 1;
 	}
 }
 

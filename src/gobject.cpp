@@ -3478,7 +3478,7 @@ void CGObject::onCreate()
 
     *reinterpret_cast<u32*>(&m_radiusCtrl.x) = 0;
     *reinterpret_cast<unsigned char*>(&m_lastBgGroup) = 0;
-    *reinterpret_cast<u32*>(&m_moveAnimState) = 0;
+    m_lifeTimer = 0;
     m_stateFlags0Bits.unk4 = 0;
     m_ownerSlot = 0;
     m_stateFlags0Bits.unk0 = 0;

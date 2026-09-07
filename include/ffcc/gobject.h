@@ -138,10 +138,7 @@ public:
     float m_jumpLandingDampening;     // 0x7C
     float m_gravityY;                 // 0x80
     Qtrn m_bgCollisionQtrn;           // 0x84
-    unsigned char m_moveAnimState;    // 0x94
-    unsigned char m_moveAnimSubState; // 0x95
-    unsigned char m_randSeedLo;       // 0x96
-    unsigned char m_randSeedHi;       // 0x97
+    int m_lifeTimer;                 // 0x94
     unsigned char m_lastMapIdHit;     // 0x98
     unsigned char m_lastMapIdExtra;   // 0x99
     struct WeaponNodeFlagBits {

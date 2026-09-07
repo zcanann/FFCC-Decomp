@@ -85,7 +85,7 @@ void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl
         return;
     }
 
-    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[shapeId];
+    shape = ppvEnv->m_shapeTablePtr[shapeId];
 
     PSMTXIdentity(mtx.value);
 
@@ -152,7 +152,7 @@ void pppFrameCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl)
         return;
     }
 
-    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[shapeId];
+    shape = ppvEnv->m_shapeTablePtr[shapeId];
     pppCalcFrameShape(static_cast<long*>(shape->m_animData), work->m_shapeX, work->m_shapeY, work->m_shapeZ, data->m_shapeStep);
 
     if (data->m_graphId == object->m_graphId) {

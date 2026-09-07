@@ -96,7 +96,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     const u32 dataValIndex = *(u32*)(step + 4);
 
     pppShapeAnimData* shapeAnim =
-        static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
+        static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[dataValIndex]->m_animData);
     pppSetDrawEnv(
         0, &object->m_drawMatrix, *(float*)(payload + 0xA0), payload[0xA4], step[0x0C],
         payload[0x58], 0, (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5), 1, 0);
@@ -810,7 +810,7 @@ path:
         float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
         if (*(s16*)(paramBytes + 0x6a) >= 0) {
-            short* pathInfo = (short*)(*(int*)&ppvEnv->m_particleColors[1] + *(s16*)(paramBytes + 0x6a) * 8);
+            short* pathInfo = reinterpret_cast<short*>(ppvEnv->m_shapeGroupPtr + (*(s16*)(paramBytes + 0x6a)));
 
             if (pathBase == 0) {
                 pathBase = *(float**)((u8*)ppvEnv->m_mapMeshPtr[*pathInfo] + 0x2C);

@@ -98,7 +98,7 @@ static inline void RenderParticleInline(_pppPObject* pppPObject, PYmMiasma* pYmM
         return;
     }
 
-    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[pYmMiasma->m_dataValIndex];
+    shape = ppvEnv->m_shapeTablePtr[pYmMiasma->m_dataValIndex];
 
     pppUnitMatrix(model);
     scale = state->m_speed;
@@ -453,7 +453,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     }
 
     if (pYmMiasma->m_dataValIndex != 0xffff) {
-        pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[pYmMiasma->m_dataValIndex];
+        pppShapeSt* shape = ppvEnv->m_shapeTablePtr[pYmMiasma->m_dataValIndex];
 
         pppCalcFrameShape(static_cast<long*>(shape->m_animData), state->m_shapeCurrentFrame, state->m_shapeDrawFrame,
                           state->m_shapeFrameTime, (short)pYmMiasma->m_shapeFrameStep);
@@ -495,7 +495,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     randomValue = rand();
     randomScale = 0.00003051850947599719f * (float)randomValue;
     shape = static_cast<pppShapeAnimData*>(
-        ppvEnv->m_resourceTables.m_shapeTablePtr[pYmMiasma->m_dataValIndex]->m_animData);
+        ppvEnv->m_shapeTablePtr[pYmMiasma->m_dataValIndex]->m_animData);
     shapeRandom = rand();
     shapeCount = shape->m_frameCount;
     angle = (s32)(32768.0f * (3.1415927410125732f * (2.0f * randomScale)) - 16384.0f);

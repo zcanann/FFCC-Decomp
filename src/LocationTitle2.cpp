@@ -102,7 +102,7 @@ extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLoc
 
     particle = work->m_particles;
     graphId = locationTitle->m_graphId;
-    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[unkB->m_dataValIndex];
+    shape = ppvEnv->m_shapeTablePtr[unkB->m_dataValIndex];
     graphFrame = GetGraphFrameFromId(graphId);
 
     pppSetBlendMode(unkB->m_blendMode);

@@ -185,7 +185,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     }
 
     work = GetKeShpTail2XWork(&obj->m_object, param_3);
-    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
+    shape = ppvEnv->m_shapeTablePtr[dataValIndex];
     pppShapeAnimData* shapeAnim = static_cast<pppShapeAnimData*>(shape->m_animData);
     {
         u16 prevFrame = work->m_shapePrevFrame;
@@ -394,7 +394,7 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _pppCt
 
     {
         pppShapeAnimData* shape =
-            static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[step->m_dataValIndex]->m_animData);
+            static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[step->m_dataValIndex]->m_animData);
         u16 shapeFrame;
         pppShapeAnimFrame* frameEntry;
 

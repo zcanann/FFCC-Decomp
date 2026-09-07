@@ -51,7 +51,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTa
 	s32 dataValIndex = unkB->m_dataValIndex;
 
 	if (dataValIndex != 0xFFFF) {
-		pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
+		pppShapeSt* shape = ppvEnv->m_shapeTablePtr[dataValIndex];
 		if (work->m_alpha != 0) {
 			pppCVECTOR local_70;
 			Vec local_60;
@@ -201,7 +201,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTab
 
 		work->m_alpha = (u8)(int)((float)(u8)work->m_alpha * alphaScale);
 		if (unkB->m_dataValIndex != 0xffff) {
-			pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[unkB->m_dataValIndex];
+			pppShapeSt* shape = ppvEnv->m_shapeTablePtr[unkB->m_dataValIndex];
 			pppCalcFrameShape(static_cast<long*>(shape->m_animData), work->m_shapeFrame0, work->m_shapeFrame1,
 			                  work->m_shapeFrame2, unkB->m_initWOrk);
 		}

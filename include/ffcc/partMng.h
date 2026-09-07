@@ -328,29 +328,9 @@ struct _pppEnvSt
     CMemory::CStage* m_stagePtr;       // 0x0
     CMaterialSet* m_materialSetPtr;    // 0x4
     CMapMesh** m_mapMeshPtr;           // 0x8
-    union {
-        _pppColor m_particleColors[10]; // 0xc
-        struct {
-            pppShapeSt** m_shapeTablePtr;       // 0xc
-            pppShapeGroupRaw* m_shapeGroupPtr;  // 0x10
-            unsigned char m_resourcePad[0x20];  // 0x14
-        } m_resourceTables;
-    };
-    unsigned int m_mngStCount;      // 0x34
-    unsigned int m_debugCounter;    // 0x38
-    int m_isEditMode;               // 0x3c
-    int m_unknown;                  // 0x40
-    int m_lastEnvCmd;               // 0x44
-    float m_envParam;               // 0x48
-    float m_boxMinX;                // 0x4c
-    float m_boxMinY;                // 0x50
-    float m_boxMinZ;                // 0x54
-    float m_soundVolumeTable[5];    // 0x58
-    float m_boxMaxX;                // 0x6c
-    float m_boxMaxY;                // 0x70
-    float m_boxMaxZ;                // 0x74
-    float m_soundPitchTable[5];     // 0x78
-}; // Size 0x8c
+    pppShapeSt** m_shapeTablePtr;       // 0xC
+    pppShapeGroupRaw* m_shapeGroupPtr;  // 0x10
+}; // Size 0x14
 
 struct _pppMngSt
 {
@@ -579,13 +559,22 @@ public:
     struct PppPdtSlot
     {
         _pppDataHead* m_pppDataHead;      // 0x00
-        unsigned int m_envFields[5];      // 0x04
+        _pppEnvSt m_env;                // 0x04
         char m_name[0x20];                // 0x18
     }; // Size 0x38
 
     PppPdtSlot m_pdtSlots[0x20];          // 0x22E18
     unsigned char m_unk23518[0x4];        // 0x23518
     _pppEnvSt m_pppEnvSt;                 // 0x2351C
+    unsigned char m_unk23530[0x20];
+    unsigned int m_mngStCount;      // 0x23550
+    unsigned int m_debugCounter;    // 0x23554
+    int m_isEditMode;               // 0x23558
+    int m_unknown;                  // 0x2355C
+    int m_lastEnvCmd;               // 0x23560
+    float m_envParam;               // 0x23564
+    float m_soundNearDistance[8];  // 0x23568
+    float m_soundFarDistance[8];   // 0x23588
     unsigned char m_unk235A8[0x14C];      // 0x235A8
     unsigned int m_partAMemBase;          // 0x236F4
     unsigned int m_partAMemCursor;        // 0x236F8

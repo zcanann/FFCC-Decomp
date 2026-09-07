@@ -92,7 +92,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
 
     fadeDivisor = -1;
     particles = work->m_particles;
-    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
+    shape = ppvEnv->m_shapeTablePtr[dataValIndex];
     graphFrame = pppLocationTitle->m_graphId / 0x1000;
 
     if ((int)param_2->m_fadeStartFrame <= graphFrame) {
@@ -182,7 +182,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
         return;
     }
 
-    shapeAnim = static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[param_2->m_dataValIndex]->m_animData);
+    shapeAnim = static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[param_2->m_dataValIndex]->m_animData);
     work->m_vel += work->m_acc;
     work->m_cur += work->m_vel;
 

@@ -1019,7 +1019,7 @@ inline int CShopMenu::getItemHaveCnt(int itemNo)
 
 static inline long* GetShopMenuShapeAnimData(int shapeNo)
 {
-    pppShapeSt** shapeTable = ppvEnv->m_resourceTables.m_shapeTablePtr;
+    pppShapeSt** shapeTable = ppvEnv->m_shapeTablePtr;
     if (shapeTable == 0) {
         return 0;
     }
@@ -1998,7 +1998,7 @@ void CShopMenu::Draw()
     }
 
     Graphic.SetDrawDoneDebugData(0x46);
-    ppvEnv = reinterpret_cast<_pppEnvSt*>(PartMng.m_pdtSlots[m_pdtSlot].m_envFields);
+    ppvEnv = &PartMng.m_pdtSlots[m_pdtSlot].m_env;
 
     MenuPcs.DrawInit();
 
@@ -3412,7 +3412,7 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     _GXColor matColor;
     *reinterpret_cast<unsigned int*>(&matColor) = reinterpret_cast<unsigned int>(g_shopMenu);
 
-    int shapeData = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[shapeNo]->m_animData);
+    int shapeData = reinterpret_cast<int>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
@@ -3476,7 +3476,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     projectionMtx[2][3] += FLOAT_80332D9C;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-    int shapeData = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[shapeNo]->m_animData);
+    int shapeData = reinterpret_cast<int>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
@@ -3554,7 +3554,7 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     projectionMtx[2][3] += zOffset;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-    int shapeData = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[shapeNo]->m_animData);
+    int shapeData = reinterpret_cast<int>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 

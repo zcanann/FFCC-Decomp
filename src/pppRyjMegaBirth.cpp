@@ -274,7 +274,7 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 		break;
 	}
 
-	pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[params->m_shapeIndex];
+	pppShapeSt* shape = ppvEnv->m_shapeTablePtr[params->m_shapeIndex];
 	int useTexture = params->m_textureMode == 0;
 	float drawScale = params->m_drawDepthEnabled != 0 ? params->m_drawDepth : kPppRyjMegaBirthZero;
 
@@ -569,7 +569,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 
 				frame = *(u16*)((u8*)particle + 0x1E);
 				shapeAnim =
-					static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[param->m_shapeIndex]->m_animData);
+					static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[param->m_shapeIndex]->m_animData);
 				*(u16*)((u8*)particle + 0x20) = frame;
 				frameData = &shapeAnim->m_frames[frame];
 
@@ -985,7 +985,7 @@ mesh_block:
 		Vec* pathBase = reinterpret_cast<Vec*>(pObject->m_drawMatrixPtr);
 
 		if (pathIndex >= 0) {
-			s16* pathInfo = (s16*)(*(int*)&ppvEnv->m_particleColors[1] + pathIndex * 8);
+			s16* pathInfo = reinterpret_cast<s16*>(ppvEnv->m_shapeGroupPtr + (pathIndex));
 			float sampleT;
 			float m1;
 			float m2;

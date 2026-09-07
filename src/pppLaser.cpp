@@ -216,7 +216,7 @@ extern "C" void pppFrameLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCtr
         step->m_laser.m_lengthStepBase, step->m_laser.m_lengthStepVelocity, step->m_laser.m_lengthStepAccel);
 
     pppCalcFrameShape(
-        static_cast<long*>(ppvEnv->m_resourceTables.m_shapeTablePtr[step->m_stepValue]->m_animData), work->m_shapeArg1,
+        static_cast<long*>(ppvEnv->m_shapeTablePtr[step->m_stepValue]->m_animData), work->m_shapeArg1,
         work->m_shapeArg2, work->m_shapeArg0, step->m_laser.m_shapeFrameStep);
 
     for (int i = 0; i < (int)(u32)(step->m_laser.m_historyFrameCount + 1); i++) {
@@ -441,7 +441,7 @@ extern "C" void pppRenderLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCt
     GXTexCoord2f32(LaserConst(kPppLaserOne), work->m_length);
 
     if (step->m_stepValue != 0xFFFF) {
-        pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[step->m_stepValue];
+        pppShapeSt* shape = ppvEnv->m_shapeTablePtr[step->m_stepValue];
         PSMTXIdentity(shapeMtx);
         shapeMtx[0][0] = step->m_laser.m_shapeScale * ppvMng->m_scale.x;
         shapeMtx[1][1] = step->m_laser.m_shapeScale * ppvMng->m_scale.y;

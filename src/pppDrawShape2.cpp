@@ -37,7 +37,7 @@ void pppDrawShape2(_pppPObject* object, Shape2ControlData* controlData, _pppCtrl
         return;
     }
 
-    pppShapeSt* shapeSt = ppvEnv->m_resourceTables.m_shapeTablePtr[type];
+    pppShapeSt* shapeSt = ppvEnv->m_shapeTablePtr[type];
     pppShapeAnimData* shapeSpec = (pppShapeAnimData*)shapeSt->m_animData;
     pppShapeAnimFrame* shape = &shapeSpec->m_frames[shapeData->currentId];
     void* drawShape = (u8*)shapeSpec + shape->m_shapeOffset;
@@ -82,7 +82,7 @@ void pppCalcShape2(_pppPObject* object, Shape2ControlData* controlData, _pppCtrl
         return;
     }
 
-    pppShapeSt* shapeSt = ppvEnv->m_resourceTables.m_shapeTablePtr[type];
+    pppShapeSt* shapeSt = ppvEnv->m_shapeTablePtr[type];
     pppShapeAnimData* shapeSpec = (pppShapeAnimData*)shapeSt->m_animData;
     pppShapeAnimFrame* shape = &shapeSpec->m_frames[shapeData->counter];
 

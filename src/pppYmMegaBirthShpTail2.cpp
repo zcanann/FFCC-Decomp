@@ -100,7 +100,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
     const u32 dataValIndex = *(u32*)(step + 4);
 
     pppShapeAnimData* shapeAnim =
-        static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
+        static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[dataValIndex]->m_animData);
     pppSetDrawEnv(
         0, &object->m_drawMatrix, *(float*)(step + 0x88), step[0x8C], step[0x0C],
         step[0x6E], 0, step[0x6B] == 0, 1, 0);
@@ -516,8 +516,7 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
     frameIndex = *(u16*)(color + 0x1e);
     shapeAnim =
         static_cast<pppShapeAnimData*>(
-        ppvEnv->m_resourceTables
-            .m_shapeTablePtr[*reinterpret_cast<s32*>((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 4)]
+        ppvEnv->m_shapeTablePtr[*reinterpret_cast<s32*>((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 4)]
             ->m_animData);
     *(u16*)(color + 0x20) = frameIndex;
 
@@ -744,7 +743,7 @@ path:
         float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
         if (param->m_tail2PathIndex >= 0) {
-            short* pathInfo = (short*)(*(int*)&ppvEnv->m_particleColors[1] + param->m_tail2PathIndex * 8);
+            short* pathInfo = reinterpret_cast<short*>(ppvEnv->m_shapeGroupPtr + (param->m_tail2PathIndex));
 
             if (pathBase == 0) {
                 pathBase = (float*)ppvEnv->m_mapMeshPtr[*pathInfo]->m_vertices;

@@ -2648,13 +2648,13 @@ renderedDone:
         outResult = 0;
         break;
     case -0x94: {
-        float* bounds = reinterpret_cast<float*>(object->m_localBase);
-        PartMng.m_pppEnvSt.m_boxMinX = bounds[0];
-        PartMng.m_pppEnvSt.m_boxMaxX = bounds[1];
-        PartMng.m_pppEnvSt.m_boxMinY = bounds[2];
-        PartMng.m_pppEnvSt.m_boxMaxY = bounds[3];
-        PartMng.m_pppEnvSt.m_boxMinZ = bounds[4];
-        PartMng.m_pppEnvSt.m_boxMaxZ = bounds[5];
+        float* distances = reinterpret_cast<float*>(object->m_localBase);
+        PartMng.m_soundNearDistance[0] = distances[0];
+        PartMng.m_soundFarDistance[0] = distances[1];
+        PartMng.m_soundNearDistance[1] = distances[2];
+        PartMng.m_soundFarDistance[1] = distances[3];
+        PartMng.m_soundNearDistance[2] = distances[4];
+        PartMng.m_soundFarDistance[2] = distances[5];
         this->push(object, 0);
         outResult = 0;
         break;

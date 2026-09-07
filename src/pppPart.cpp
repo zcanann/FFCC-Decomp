@@ -2298,8 +2298,8 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 					u32 soundTableKind = (u32)se->m_soundEffectKind;
 					se->m_soundEffectHandle = Sound.PlaySe3D(
 						se->m_soundEffectSlot, &soundPos,
-						(PartMng.m_pppEnvSt.m_soundVolumeTable - 3)[soundTableKind],
-						(PartMng.m_pppEnvSt.m_soundPitchTable - 3)[soundTableKind], 0);
+						PartMng.m_soundNearDistance[soundTableKind],
+						PartMng.m_soundFarDistance[soundTableKind], 0);
 					se->m_soundEffectStartedOnce = 1;
 				}
 			}

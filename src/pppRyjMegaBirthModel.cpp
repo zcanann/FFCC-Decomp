@@ -648,7 +648,7 @@ mesh_block:
         Vec* pathBase = pObject->m_drawMatrixPtr;
 
         if (pathIndex >= 0) {
-            s16* pathInfo = (s16*)(*(int*)&ppvEnv->m_particleColors[1] + pathIndex * 8);
+            s16* pathInfo = reinterpret_cast<s16*>(ppvEnv->m_shapeGroupPtr + (pathIndex));
             float t;
             float vx;
             float vy;

@@ -326,7 +326,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
         return;
     }
 
-    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[params->m_shapeStepValue];
+    shape = ppvEnv->m_shapeTablePtr[params->m_shapeStepValue];
     pppSetBlendMode(params->m_blendMode);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     pppSetDrawEnv(
@@ -670,7 +670,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
         for (i = 0; i < maxParticleCount; i++) {
             if (particleData->m_life > 0) {
                 UpdateParticle(vYmBreath, pYmBreath, particleData, vColor, particleColor);
-                pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[params->m_shapeStepValue];
+                pppShapeSt* shape = ppvEnv->m_shapeTablePtr[params->m_shapeStepValue];
                 pppCalcFrameShape(static_cast<long*>(shape->m_animData), particleData->m_shapeFrame1,
                                   particleData->m_shapeFrame2, particleData->m_shapeFrame0,
                                   params->m_shapeFrameArg);

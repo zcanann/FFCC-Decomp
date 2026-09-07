@@ -146,6 +146,9 @@ struct FurProjectedVertex
     float m_v;
 };
 
+STATIC_ASSERT(sizeof(FurProjectedVertex) == 0x30);
+STATIC_ASSERT(offsetof(FurProjectedVertex, m_v) == 0x2C);
+
 struct MogWorkRaw
 {
     int m_state;
@@ -1350,8 +1353,8 @@ void CChara::CModel::InitMogFurTex()
  * --INFO--
  * PAL Address: 0x800e13fc
  * PAL Size: 3448b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800FE5B8
+ * EN Size: 3544b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1514,13 +1517,13 @@ int CChara::CModel::PickFur(
 						int* si = reinterpret_cast<int*>(&incoming);
 						d0[0] = s0[0]; d0[1] = s0[1]; d0[2] = s0[2]; d0[3] = s0[3];
 						d0[4] = s0[4]; d0[5] = s0[5]; d0[6] = s0[6]; d0[7] = s0[7];
-						d0[8] = s0[8]; d0[9] = s0[9]; d0[10] = s0[10];
+						d0[8] = s0[8]; d0[9] = s0[9]; d0[10] = s0[10]; d0[11] = s0[11];
 						s0[0] = s1[0]; s0[1] = s1[1]; s0[2] = s1[2]; s0[3] = s1[3];
 						s0[4] = s1[4]; s0[5] = s1[5]; s0[6] = s1[6]; s0[7] = s1[7];
-						s0[8] = s1[8]; s0[9] = s1[9]; s0[10] = s1[10];
+						s0[8] = s1[8]; s0[9] = s1[9]; s0[10] = s1[10]; s0[11] = s1[11];
 						s1[0] = si[0]; s1[1] = si[1]; s1[2] = si[2]; s1[3] = si[3];
 						s1[4] = si[4]; s1[5] = si[5]; s1[6] = si[6]; s1[7] = si[7];
-						s1[8] = si[8]; s1[9] = si[9]; s1[10] = si[10];
+						s1[8] = si[8]; s1[9] = si[9]; s1[10] = si[10]; s1[11] = si[11];
 					}
 
 					if ((primitive == 0x90 && static_cast<int>(vertexIndex) % 3 == 2) ||

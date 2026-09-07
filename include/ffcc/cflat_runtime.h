@@ -85,9 +85,6 @@ public:
 	class CFunc
 	{
 	public:
-		CFunc();
-		~CFunc();
-
 		s32 m_index;         // 0x00
 		char m_name[0x20];   // 0x04
 		s32 m_argCount;      // 0x24
@@ -182,7 +179,7 @@ public:
     int m_classCount;              // 0x0014
     CClass* m_classes;              // 0x0018
     int m_funcCount;                // 0x001C
-    u8* m_funcs;                    // 0x0020
+    CFunc* m_funcs;                 // 0x0020
     int m_strCount;                 // 0x0024
     char* m_strBlob;                // 0x0028
     u16* m_strOffsets;              // 0x002C

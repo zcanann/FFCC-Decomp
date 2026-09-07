@@ -393,11 +393,11 @@ inline CFlatRuntime::CFunc* CFlatRuntime::searchFunc(int classIndex, int systemK
 	    && (((systemKind == 2) || (systemKind == 3)) && (systemIndex >= 0))) {
 		const int funcIndex = m_classes[classIndex].m_functionTable[systemIndex];
 		if (funcIndex >= 0) {
-			return reinterpret_cast<CFunc*>(m_funcs) + funcIndex;
+			return m_funcs + funcIndex;
 		}
 	} else {
 		const int funcCount = m_funcCount;
-		CFunc* func = reinterpret_cast<CFunc*>(m_funcs);
+		CFunc* func = m_funcs;
 
 		for (int i = 0; i < funcCount; i++, func++) {
 			if (func->m_systemKind != systemKind) {
@@ -526,8 +526,8 @@ inline int CFlatRuntime::getTopBit(unsigned int value)
  * --INFO--
  * PAL Address: 0x800663fc
  * PAL Size: 5600b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80077904
+ * EN Size: 6516b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -546,8 +546,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		goto callSystemFunction;
 	}
 
-	code = *reinterpret_cast<u8**>(
-	    *reinterpret_cast<u8**>(self + 0x20) + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+	code = m_funcs[object->m_codeIndex.m_codeFunc].m_code
 	    + object->m_codeIndex.m_codeOffset;
 
 	while (true) {
@@ -788,14 +787,14 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		}
 		case 0x0A: {
 			const u32 arg = *reinterpret_cast<u32*>(code + 1);
-			CFunc* func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20)) + (arg & 0xFFFF);
+			CFunc* func = m_funcs + (arg & 0xFFFF);
 
 			if ((static_cast<int>(arg) >> 16) >= 0) {
 				const int funcIndex = *reinterpret_cast<int*>(*reinterpret_cast<u8**>(self + 0x18) + (object->m_classIndex * 0x22C) + 0x24 + (func->m_systemIndex * 4));
 				if (funcIndex < 0) {
 					continue;
 				}
-				func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20)) + funcIndex;
+				func = m_funcs + funcIndex;
 			}
 
 			callSetup(object, func, 0);
@@ -806,7 +805,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		}
 		callSystemFunction: {
 			const int funcIndex = object->m_codeIndex.m_codeFunc;
-			CFunc* func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20)) + funcIndex;
+			CFunc* func = m_funcs + funcIndex;
 			const int ret = systemFunc(object, func->m_systemKind, func->m_systemIndex, systemResult);
 
 			if (ret != 0) {
@@ -824,13 +823,12 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			goto returnFromCall;
 		}
 		recomputeCode:
-			code = *reinterpret_cast<u8**>(
-			    *reinterpret_cast<u8**>(self + 0x20) + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+			code = m_funcs[object->m_codeIndex.m_codeFunc].m_code
 			    + object->m_codeIndex.m_codeOffset;
 			continue;
 		case 0x0B: {
 			CObject* newObject = createObject(*reinterpret_cast<int*>(code + 1));
-			CFunc* func = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20))
+			CFunc* func = m_funcs
 			              + *reinterpret_cast<int*>(*reinterpret_cast<u8**>(self + 0x18) + (newObject->m_activeClassIndex * 0x22C) + 0x24);
 
 			for (int i = 0; i < func->m_argCount; i++) {
@@ -1092,8 +1090,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				return 1;
 			}
 
-			code = *reinterpret_cast<u8**>(
-			    *reinterpret_cast<u8**>(self + 0x20) + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+			code = m_funcs[object->m_codeIndex.m_codeFunc].m_code
 			    + object->m_codeIndex.m_codeOffset;
 			break;
 		}
@@ -1579,8 +1576,8 @@ processObject:
  * --INFO--
  * PAL Address: 0x80068c04
  * PAL Size: 500b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80075E14
+ * EN Size: 660b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1588,7 +1585,6 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 {
 	CChunkFile chunkFile(filePtr);
 	CChunkFile::CChunk chunk;
-	int debugOffset = debugChunkIndex * 0x50;
 
 	while (chunkFile.GetNextChunk(chunk)) {
 		if (chunk.m_id != 'CFLT') {
@@ -1596,7 +1592,6 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 		}
 
 		chunkFile.PushChunk();
-		int funcOffset = debugOffset;
 
 		while (chunkFile.GetNextChunk(chunk)) {
 			switch (chunk.m_id) {
@@ -1605,10 +1600,9 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 
 			case 'FUNC': {
 				chunkFile.PushChunk();
-				int blockOffset = funcOffset;
 
 				while (chunkFile.GetNextChunk(chunk)) {
-					CFunc* funcBase = reinterpret_cast<CFunc*>(m_funcs + blockOffset);
+					CFunc* funcBase = &m_funcs[debugChunkIndex];
 					switch (chunk.m_id) {
 					case 'BLCK':
 						chunkFile.PushChunk();
@@ -1634,9 +1628,6 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 						}
 
 						chunkFile.PopChunk();
-						blockOffset += 0x50;
-						funcOffset += 0x50;
-						debugOffset += 0x50;
 						debugChunkIndex++;
 						break;
 					}
@@ -1751,13 +1742,12 @@ void CFlatRuntime::Create(void* filePtr)
 				m_funcCount = chunk.m_arg0;
 				m_funcs =
 				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0xD9)
-				        u8[m_funcCount * 0x50];
+				        CFunc[m_funcCount];
 
 				int funcIndex = 0;
-				int funcOffset = 0;
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
-					CFunc* funcBase = reinterpret_cast<CFunc*>(m_funcs + funcOffset);
+					CFunc* funcBase = &m_funcs[funcIndex];
 					funcBase->m_index = funcIndex;
 					switch (chunk.m_id) {
 					case 'BLCK': {
@@ -1801,7 +1791,6 @@ void CFlatRuntime::Create(void* filePtr)
 						}
 						chunkFile.PopChunk();
 
-						funcOffset += 0x50;
 						funcIndex++;
 						break;
 					}
@@ -1961,8 +1950,8 @@ void CFlatRuntime::clear()
  * --INFO--
  * PAL Address: 0x800697CC
  * PAL Size: 416b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800752DC
+ * EN Size: 336b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1995,14 +1984,13 @@ void CFlatRuntime::Destroy()
 		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
-	for (int i = 0, off = 0; i < m_funcCount; off += 0x50, i++) {
-		delete[] *reinterpret_cast<u8**>(m_funcs + off + 0x34);
-		delete[] *reinterpret_cast<u8**>(m_funcs + off + 0x3C);
+	for (int i = 0; i < m_funcCount; i++) {
+		delete[] m_funcs[i].m_code;
+		delete[] m_funcs[i].m_debugCode;
 	}
 
-	ptr = m_funcs;
-	if (ptr != 0) {
-		delete[] reinterpret_cast<u8*>(ptr);
+	if (m_funcs != 0) {
+		delete[] m_funcs;
 	}
 
 	if (m_classes != 0) {

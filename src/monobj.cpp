@@ -266,13 +266,15 @@ void CGMonObj::logicFuncDefault()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80113098
+ * PAL Size: 1508b
+ * EN Address: 0x80139CC0
+ * EN Size: 1812b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrame()
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-
 	unsigned int& moveStateFlags = m_moveWork.m_stateFlags;
 	unsigned int& moveFlags = m_moveWork.m_flags;
 	float& moveSpeed = m_moveWork.m_speed;
@@ -283,9 +285,9 @@ void CGMonObj::moveFrame()
 	float& moveSpeedRate = m_pushScale;
 	short& aStarGroupId = m_aStarGroupId;
 
-	CVector local_68;
-	CVector local_74;
-	float in_f29 = 0.0f;
+	CVector targetPos;
+	CVector moveDirection;
+	float targetDist = 0.0f;
 
 	if ((moveStateFlags & 1) != 0) {
 		return;
@@ -294,104 +296,78 @@ void CGMonObj::moveFrame()
 	(this->*m_funcs->moveFrame)();
 
 	if ((moveFlags & 1) != 0) {
-		{
-			CVector tmp(m_moveWork.m_target->m_worldPosition);
-			local_68.x = tmp.x;
-			local_68.y = tmp.y;
-			local_68.z = tmp.z;
-		}
-		in_f29 = PSVECDistance(reinterpret_cast<Vec*>(&local_68), &object->m_worldPosition);
+		targetPos = CVector(m_moveWork.m_target->m_worldPosition);
+		targetDist = PSVECDistance(static_cast<Vec*>(targetPos), &m_worldPosition);
 
 		if (((moveFlags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
 			short targetAStarGroupId = m_moveWork.m_target->m_aStarGroupId;
-			moveAStar(aStarGroupId, targetAStarGroupId, local_68);
+			moveAStar(aStarGroupId, targetAStarGroupId, targetPos);
 		}
 	} else if ((moveFlags & 2) != 0) {
-		{
-			CVector tmp(m_moveWork.m_targetPos);
-			local_68.x = tmp.x;
-			local_68.y = tmp.y;
-			local_68.z = tmp.z;
-		}
-		in_f29 = PSVECDistance(reinterpret_cast<Vec*>(&local_68), &object->m_worldPosition);
+		targetPos = CVector(m_moveWork.m_targetPos);
+		targetDist = PSVECDistance(static_cast<Vec*>(targetPos), &m_worldPosition);
 
 		if (((moveFlags & 0x30000) != 0) && (AStar.m_portalCount != 0)) {
-			int polygonGroup = AStar.calcPolygonGroup(reinterpret_cast<Vec*>(&local_68), static_cast<int>(object->m_bgHitMask));
-			moveAStar(aStarGroupId, polygonGroup, local_68);
+			int polygonGroup = AStar.calcPolygonGroup(static_cast<Vec*>(targetPos), static_cast<int>(m_bgHitMask));
+			moveAStar(aStarGroupId, polygonGroup, targetPos);
 		}
 	} else if ((moveFlags & 0x2000) != 0) {
-		CVector tmpTarget(m_moveWork.m_targetPos);
-		CVector tmpWorld(object->m_worldPosition);
-		CVector result;
-		PSVECAdd(reinterpret_cast<Vec*>(&tmpWorld), reinterpret_cast<Vec*>(&tmpTarget), reinterpret_cast<Vec*>(&result));
-		local_68.x = result.x;
-		local_68.y = result.y;
-		local_68.z = result.z;
-		in_f29 = PSVECDistance(reinterpret_cast<Vec*>(&local_68), &object->m_worldPosition);
+		targetPos = CVector(m_worldPosition) + CVector(m_moveWork.m_targetPos);
+		targetDist = PSVECDistance(static_cast<Vec*>(targetPos), &m_worldPosition);
 	}
 
-	{
-		CVector tmpWorld(object->m_worldPosition);
-		CVector result;
-		PSVECSubtract(reinterpret_cast<Vec*>(&local_68), reinterpret_cast<Vec*>(&tmpWorld), reinterpret_cast<Vec*>(&result));
-		local_74.x = result.x;
-		local_74.y = result.y;
-		local_74.z = result.z;
-	}
+	moveDirection = targetPos - CVector(m_worldPosition);
 	if ((moveFlags & 0x40) != 0) {
-		CVector neg(-local_74.x, -local_74.y, -local_74.z);
-		local_74.x = neg.x;
-		local_74.y = neg.y;
-		local_74.z = neg.z;
+		moveDirection = CVector(-moveDirection.x, -moveDirection.y, -moveDirection.z);
 	}
 
-	float rotY = local_74.GetRotateY();
-	float distance = PSVECMag(reinterpret_cast<Vec*>(&local_74));
+	float rotY = moveDirection.GetRotateY();
+	float distance = PSVECMag(static_cast<Vec*>(moveDirection));
 
-	if ((((moveFlags & 0x20) != 0) && !(in_f29 < moveRange)) ||
-		(((moveFlags & 0x40) != 0) && !(moveRange <= in_f29))) {
+	if ((((moveFlags & 0x20) != 0) && (targetDist < moveRange)) ||
+		(((moveFlags & 0x40) != 0) && (targetDist >= moveRange))) {
 	moveCancelExit:
 		moveStateFlags |= 1;
 		(this->*m_funcs->moveCancel)();
 		moveStateFlags |= 2;
 		if ((moveFlags & 0x100) != 0) {
-			reinterpret_cast<CGPrgObj*>(this)->changeStat(moveChangeStat, 0, 0);
+			changeStat(moveChangeStat, 0, 0);
 		}
 		return;
 	}
 
 	if ((moveFlags & 4) != 0) {
-		float oldRotY = object->m_rotBaseY;
+		float oldRotY = m_rotBaseY;
 		if ((moveFlags & 0x8000) != 0) {
 			oldRotY += 3.1415927f;
 		}
 
 		float dstRot = Math.DstRot(rotY, oldRotY);
-		float hitNrmX = object->m_hitNormal.x;
+		float hitNrmX = m_hitNormal.x;
 		float baseDelta = dstRot * hitNrmX;
 		float rotDelta = dstRot * (1.0f - hitNrmX);
-		object->m_rotBaseY = object->m_rotBaseY + baseDelta;
+		m_rotBaseY = m_rotBaseY + baseDelta;
 		rotY = rotY - rotDelta;
-		object->m_rotTargetY = object->m_rotBaseY;
+		m_rotTargetY = m_rotBaseY;
 
 		float s = sinf(dstRot);
 		float c = cosf(dstRot);
-		float x = local_74.x;
-		local_74.x = (c * x) - (s * local_74.z);
-		local_74.z = (s * x) + (c * local_74.z);
-		distance = PSVECMag(reinterpret_cast<Vec*>(&local_74));
+		float x = moveDirection.x;
+		moveDirection.x = (c * x) - (s * moveDirection.z);
+		moveDirection.z = (s * x) + (c * moveDirection.z);
+		distance = PSVECMag(static_cast<Vec*>(moveDirection));
 	}
 
-	if (((moveFlags & 0x80) != 0) && (object->m_stateFlags0Bits.unk1 < 0)) {
+	if (((moveFlags & 0x80) != 0) && (m_stateFlags0Bits.unk1 != 0)) {
 		goto moveCancelExit;
 	}
 
 	float stepDist;
 	if ((moveFlags & 0x200) != 0) {
-		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4);
+		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xD4);
 		stepDist = moveSpeedRate * (0.01f * speedScale + kMonObjEpsilon);
 	} else if ((moveFlags & 0x800) != 0) {
-		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4);
+		unsigned short speedScale = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xD4);
 		stepDist = moveSpeedRate * (0.01f * speedScale + kMonObjEpsilon);
 	} else {
 		stepDist = moveSpeed;
@@ -399,42 +375,33 @@ void CGMonObj::moveFrame()
 
 	CVector moveDelta;
 	if ((moveFlags & 0x1000) != 0) {
-		moveDelta.x = local_74.x;
-		moveDelta.y = local_74.y;
-		moveDelta.z = local_74.z;
+		moveDelta = moveDirection;
 	} else {
 		if (__fabs(distance) < kMonObjSmallStepF64) {
-			CVector zero(0.0f, 0.0f, 0.0f);
-			moveDelta.x = zero.x;
-			moveDelta.y = zero.y;
-			moveDelta.z = zero.z;
+			moveDelta = CVector(0.0f, 0.0f, 0.0f);
 		} else {
-			CVector scaledStep;
-			PSVECScale(reinterpret_cast<Vec*>(&local_74), static_cast<Vec*>(scaledStep), (1.0f / distance) * stepDist);
-			moveDelta.x = scaledStep.x;
-			moveDelta.y = scaledStep.y;
-			moveDelta.z = scaledStep.z;
+			moveDelta = moveDirection * ((1.0f / distance) * stepDist);
 		}
 	}
 
 	if ((moveFlags & 0x4000) != 0) {
-		PSVECAdd(&object->m_groundHitOffset, static_cast<Vec*>(moveDelta), &object->m_groundHitOffset);
+		PSVECAdd(&m_groundHitOffset, static_cast<Vec*>(moveDelta), &m_groundHitOffset);
 	} else {
-		object->m_groundHitOffset.x += moveDelta.x;
-		object->m_groundHitOffset.z += moveDelta.z;
+		m_groundHitOffset.x += moveDelta.x;
+		m_groundHitOffset.z += moveDelta.z;
 	}
 
-	float stepRemaining = in_f29 - stepDist;
+	float stepRemaining = targetDist - stepDist;
 	if ((moveFlags & 0x8000) != 0) {
-		object->m_rotTargetY = 3.1415927f + rotY;
+		m_rotTargetY = 3.1415927f + rotY;
 	} else {
-		object->m_rotTargetY = rotY;
+		m_rotTargetY = rotY;
 	}
 
 	if (((moveFlags & 0x20) == 0 || !(stepRemaining < moveRange)) &&
-		((moveFlags & 0x40) == 0 || !(moveRange <= stepRemaining))) {
+		((moveFlags & 0x40) == 0 || !(stepRemaining >= moveRange))) {
 		if ((moveFrame == 0) && ((moveFlags & 0x400) == 0)) {
-			reinterpret_cast<CGPrgObj*>(this)->reqAnim(1, 1, 0);
+			reqAnim(1, 1, 0);
 		}
 
 		moveFrame++;

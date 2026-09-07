@@ -47,7 +47,7 @@ CAStar AStar;
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
+int CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
 	if ((AStar.m_flags & 1) != 0)
 	{

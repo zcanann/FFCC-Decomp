@@ -2,6 +2,7 @@
 #include "ffcc/prgobj.h"
 #include "ffcc/charaobj.h"
 #include "ffcc/partyobj.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/game.h"
@@ -172,55 +173,26 @@ struct MeteoParasiteCGameFlags {
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 336b
+ * EN Address: 0x80153F3C
+ * EN Size: 292b
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CGMonObj::suikomiSub(CGObject*, float)
+inline void CGMonObj::suikomiSub(CGObject* target, float zOffset)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	unsigned char* target = reinterpret_cast<unsigned char*>(Game.unk_flat3_0xc7d0);
-	if (target == 0) {
-		return;
-	}
-
-	float dx = *(float*)(self + 0x15c) - *(float*)(target + 0x15c);
-	float dz = *(float*)(self + 0x164) - *(float*)(target + 0x164);
+	float dx = m_worldPosition.x - target->m_worldPosition.x;
+	float dz = zOffset + (m_worldPosition.z - target->m_worldPosition.z);
 	float distSq = dx * dx + dz * dz;
-	double dist = (double)distSq;
+	float dist = sqrtf(distSq);
 
-	if (dist <= (double)kMonObjBossZero) {
-		if (kMonObjBossZeroF64 <= dist) {
-			unsigned int exp = (unsigned int)distSq & 0x7f800000;
-			int fpClass;
-			if (exp == 0x7f800000) {
-				fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 2 : 1;
-			} else if ((exp < 0x7f800000) && (exp == 0)) {
-				fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 3 : 5;
-			} else {
-				fpClass = 4;
-			}
-			if (fpClass == 1) {
-				dist = NAN;
-			}
-		} else {
-			dist = NAN;
-		}
-	} else {
-		double inv = (double)kMonObjBossOne / sqrt(dist);
-		inv = kMonObjBossHalfF64 * inv * -(dist * inv * inv - kMonObjBossThreeF64);
-		inv = kMonObjBossHalfF64 * inv * -(dist * inv * inv - kMonObjBossThreeF64);
-		dist = (double)(float)(dist * kMonObjBossHalfF64 * inv * -(dist * inv * inv - kMonObjBossThreeF64));
-	}
-
-	if ((double)kMonObjBossZero < dist) {
-		float accel = (float)((double)kMonObjBossOne / dist) * kMonObjBossQuarter *
-		              (float)(dist / (double)kMonObjBossLargeBodyRadius);
-		*(float*)(target + 0x104) += dx * accel;
-		*(float*)(target + 0x10c) += dz * accel;
+	if (kMonObjBossZero < dist) {
+		float accel = kMonObjBossOne / dist * (kMonObjBossQuarter * (dist / kMonObjBossLargeBodyRadius));
+		float ax = dx * accel;
+		float az = dz * accel;
+		target->m_groundHitOffset.x += ax;
+		target->m_groundHitOffset.z += az;
 	}
 }
 
@@ -235,16 +207,12 @@ inline void CGMonObj::suikomiSub(CGObject*, float)
  */
 void CGMonObj::suikomi(int endFrame, float zOffset)
 {
-	CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
-	if (prgObj->m_stateFrame == 0) {
-		prgObj->playSe3D(0xdec0, 0x32, 0x1c2, 0, 0);
+	if (m_stateFrame == 0) {
+		playSe3D(0xdec0, 0x32, 0x1c2, 0, 0);
 		for (int i = 0; i < 4; i++) {
 			CGPartyObj* party = Game.m_partyObjArr[i];
 			if (party != 0) {
-				CFlat.ResetParticleWork(0x26, *(int*)(self + 0x58c));
+				CFlat.ResetParticleWork(0x26, m_particleSlots[10]);
 				CFlat.SetParticleWorkTrace(this);
 				CFlat.SetParticleWorkBind(party);
 				CFlat.PutParticleWork();
@@ -252,48 +220,24 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 		}
 	}
 
-	if (prgObj->m_stateFrame <= endFrame) {
+	if (m_stateFrame <= endFrame) {
 		for (int i = 0; i < 4; i++) {
 			CGPartyObj* party = Game.m_partyObjArr[i];
 			if (party != 0) {
-				float dx = *(float*)(self + 0x15c) - *(float*)((unsigned char*)party + 0x15c);
-				float dz =
-				    zOffset + (*(float*)(self + 0x164) - *(float*)((unsigned char*)party + 0x164));
-				float distSq = dx * dx + dz * dz;
-				float dist = sqrtf(distSq);
-
-				if (kMonObjBossZero < dist) {
-					float accel = kMonObjBossOne / dist * (kMonObjBossQuarter * (dist / kMonObjBossLargeBodyRadius));
-					float ax = dx * accel;
-					float az = dz * accel;
-					*(float*)((unsigned char*)party + 0x104) += ax;
-					*(float*)((unsigned char*)party + 0x10c) += az;
-				}
+				suikomiSub(party, zOffset);
 			}
 		}
 
-		if ((Game.unk_flat3_0xc7d0 != 0) && (*(unsigned int*)(Game.unk_flat3_0xc7d0 + 0x550) == 0)) {
-			unsigned int target = Game.unk_flat3_0xc7d0;
-			float dx = *(float*)(self + 0x15c) - *(float*)(target + 0x15c);
-			float dz = zOffset + (*(float*)(self + 0x164) - *(float*)(target + 0x164));
-			float distSq = dx * dx + dz * dz;
-			float dist = sqrtf(distSq);
-
-			if (kMonObjBossZero < dist) {
-				float accel = kMonObjBossOne / dist * (kMonObjBossQuarter * (dist / kMonObjBossLargeBodyRadius));
-				float ax = dx * accel;
-				float az = dz * accel;
-				*(float*)(target + 0x104) += ax;
-				*(float*)(target + 0x10c) += az;
-			}
+		if ((Game.unk_flat3_0xc7d0 != 0) && (reinterpret_cast<CGItemObj*>(Game.unk_flat3_0xc7d0)->m_owner == 0)) {
+			suikomiSub(reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0), zOffset);
 		}
 
-		if (prgObj->m_stateFrame == endFrame) {
-			chara->endPSlotBit(0x400);
+		if (m_stateFrame == endFrame) {
+			endPSlotBit(0x400);
 		}
 	}
 
-	chara->statAttack();
+	statAttack();
 }
 
 /*

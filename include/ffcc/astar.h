@@ -56,7 +56,7 @@ public:
 	void addRealTime(CGPartyObj* gPartyObj);
 	CAPos* getEscapePos(Vec& from, Vec& base, int startGroup, int forbiddenGroup);
 	unsigned char calcSpecialPolygonGroup(Vec* pos);
-	unsigned char calcPolygonGroup(Vec* pos, int hitAttributeMask);
+	int calcPolygonGroup(Vec* pos, int hitAttributeMask);
 
 	unsigned int m_flags;                   // 0x00
 	unsigned int m_hitAttributeMask;        // 0x4

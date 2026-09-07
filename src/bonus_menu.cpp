@@ -2966,21 +2966,20 @@ void CMenuPcs::DrawResultCountAnim()
  * --INFO--
  * PAL Address: 0x8013a22c
  * PAL Size: 1736b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80157290
+ * EN Size: 1568b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMenuPcs::CalcResultCountAnim()
 {
-	const int activePartyCount =  (int)(unsigned int)(s_Rinfo->m_partyCount);
+	const int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int countTop = ((BonusAnimHeader*)this->m_bonusAnimPtr)->count;
-		int partyByteOff = 0;
 		short y = 0x28;
-		for (int i = 0; i < activePartyCount; i++, partyByteOff += sizeof(BonusPartySummary)) {
-			int rank = *(int*)((int)s_Rinfo + partyByteOff + 0x34);
+		for (int i = 0; i < activePartyCount; i++) {
+			int rank = s_Rinfo->m_party[i].m_rank;
 			CMenuPcs::Sprt2* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[countTop + i];
 			sprite->kind = 0x19;
 			short stripX = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
@@ -3029,8 +3028,7 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->alpha = 1.0f;
 		} else {
 			int value = s_Rinfo->m_party[i].m_totalValue;
-			int __p27 = value;
-			if (frame == __p27) {
+			if (frame == value) {
 				Sound.PlaySe(0x4b, 0x40, 0x7f, 0);
 				sprite->startFrame = frame;
 			}
@@ -3041,11 +3039,11 @@ void CMenuPcs::CalcResultCountAnim()
 				int elapsed = frame - sprite->startFrame;
 				sprite->alpha = 1.0f;
 				if (elapsed < sprite->duration) {
-					float fy = (float)sprite->y;
-					float ty = sprite->targetY;
-					double progress = 1.0 - (double)((float)elapsed / (float)sprite->duration);
-					sprite->motionX = (float)((double)(sprite->targetX - (float)sprite->x) * progress);
-					sprite->motionY = (float)((double)(ty - fy) * progress);
+					float dx = sprite->targetX - static_cast<float>(sprite->x);
+					float dy = sprite->targetY - static_cast<float>(sprite->y);
+					double progress = 1.0 - static_cast<double>(static_cast<float>(elapsed) / static_cast<float>(sprite->duration));
+					sprite->motionX = static_cast<float>(dx * progress);
+					sprite->motionY = static_cast<float>(dy * progress);
 				} else {
 					sprite->motionX = 0.0f;
 					sprite->motionY = 0.0f;
@@ -3063,10 +3061,14 @@ void CMenuPcs::CalcResultCountAnim()
 		if (i < activePartyCount) {
 			handle = s_Rinfo->m_party[i].m_partyHandle;
 			tribeId = s_Rinfo->m_party[i].m_tribeId;
+		} else {
+			handle = GetBonusDisplayHandleSlots(this)[i - activePartyCount];
+		}
+
+		if (i < activePartyCount) {
 			float modelScale = s_BonusModelScale[tribeId];
 			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 		} else {
-			handle = GetBonusDisplayHandleSlots(this)[i - activePartyCount];
 			PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
 		}
 

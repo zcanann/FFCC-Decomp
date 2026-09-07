@@ -781,8 +781,8 @@ CChara::CModel::CRefData::~CRefData()
  * --INFO--
  * PAL Address: 0x800736e4
  * PAL Size: 308b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8007ecb8
+ * EN Size: 152b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -799,40 +799,7 @@ CChara::CModel::CModel()
 
 	m_furLenScale = 0.2f;
 	m_furStep = 3.0f;
-	m_time = 0.0f;
-	m_curFrame = 0.0f;
-	m_dynJitter.x = 0.0f;
-	m_dynJitter.y = 0.0f;
-	m_dynJitter.z = 0.0f;
-	m_blendCur = 0;
-	m_blendMax = 0;
-	m_meshVisibleMask = 0xFFFFFFFF;
-	m_animStart = 0.0f;
-	m_animEnd = 0.0f;
-	m_chestAmp = 0.0f;
-	m_chestTilt = 0.0f;
-	m_lightAlpha = 1.0f;
-	m_callbackContext = 0;
-	m_callbackParam = 0;
-	m_afterMeshDrawCallback = 0;
-	m_beforeCalcMatrixCallback = 0;
-	m_beforeMeshLockEnvCallback = 0;
-	m_beforeDrawShadowLockEnvCallback = 0;
-	m_drawMeshDLCallback = 0;
-	m_drawShadowMeshDLCallback = 0;
-	m_afterDrawMeshCallback = 0;
-	m_afterDrawModelCallback = 0;
-
-	m_flags10CBits.m_flag10C_80 = 1;
-	m_flagsA0Bits.m_flagA0_80 = 0;
-	m_flagsA0Bits.m_flagA0_40 = 0;
-	m_flagsA0Bits.m_flagA0_20 = 1;
-	m_flags10CBits.m_flag10C_40 = 0;
-
-	m_furTarget = 1.0f;
-	m_furCur = 1.0f;
-	m_attachMode = 0;
-	m_twistAngle = 0.0f;
+	Init();
 }
 
 /*
@@ -887,12 +854,12 @@ CChara::CModel::~CModel()
  * --INFO--
  * PAL Address: 0x80073480
  * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8007ee6c
+ * EN Size: 316b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CModel::Init()
+inline void CChara::CModel::Init()
 {
 	m_time = 0.0f;
 	m_curFrame = 0.0f;
@@ -1272,38 +1239,7 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 		clone->m_texAnimSet = ModelTexAnimSet(this)->Duplicate(stage);
 	}
 
-	clone->m_time = 0.0f;
-	clone->m_curFrame = 0.0f;
-	clone->m_dynJitter.x = 0.0f;
-	clone->m_dynJitter.y = 0.0f;
-	clone->m_dynJitter.z = 0.0f;
-	clone->m_blendCur = 0;
-	clone->m_blendMax = 0;
-	clone->m_meshVisibleMask = 0xFFFFFFFF;
-	clone->m_animStart = 0.0f;
-	clone->m_animEnd = 0.0f;
-	clone->m_chestAmp = 0.0f;
-	clone->m_chestTilt = 0.0f;
-	clone->m_lightAlpha = 1.0f;
-	clone->m_callbackContext = 0;
-	clone->m_callbackParam = 0;
-	clone->m_afterMeshDrawCallback = 0;
-	clone->m_beforeCalcMatrixCallback = 0;
-	clone->m_beforeMeshLockEnvCallback = 0;
-	clone->m_beforeDrawShadowLockEnvCallback = 0;
-	clone->m_drawMeshDLCallback = 0;
-	clone->m_drawShadowMeshDLCallback = 0;
-	clone->m_afterDrawMeshCallback = 0;
-	clone->m_afterDrawModelCallback = 0;
-	clone->m_flags10CBits.m_flag10C_80 = 1;
-	clone->m_flagsA0Bits.m_flagA0_80 = 0;
-	clone->m_flagsA0Bits.m_flagA0_40 = 0;
-	clone->m_flagsA0Bits.m_flagA0_20 = 1;
-	clone->m_flags10CBits.m_flag10C_40 = 0;
-	clone->m_furTarget = 1.0f;
-	clone->m_furCur = 1.0f;
-	clone->m_attachMode = 0;
-	clone->m_twistAngle = 0.0f;
+	clone->Init();
 
 	clone->setup();
 	return clone;

@@ -46,6 +46,9 @@ struct pppShapeSt
 
     pppShapeSt();
     ~pppShapeSt();
+    void Release();
+    void AddRef() { m_refCount++; }
+    void SetUse() { m_refCount = 0; m_inUse = 1; }
 
     CTexture* GetTexture(long*, CMaterialSet*, int&);
 }; // Size 0x2c
@@ -59,7 +62,34 @@ struct pppModelSt : public CMapMesh
 
     pppModelSt();
     ~pppModelSt();
+    void Release();
+    void AddRef() { m_refCount++; }
+    void SetUse() { m_refCount = 0; m_isUsed = 1; }
 }; // Size 0x6c
+
+class CParModelSet
+{
+public:
+    CParModelSet();
+    ~CParModelSet();
+    pppModelSt* GetFree();
+    void Create(CChunkFile&, int, int);
+    int GetNumModel() { return 0x100; }
+
+    pppModelSt m_models[0x100];
+};
+
+class CParShapeSet
+{
+public:
+    CParShapeSet();
+    ~CParShapeSet();
+    pppShapeSt* GetFree();
+    void Create(CChunkFile&, int);
+    int GetNumShape() { return 0x100; }
+
+    pppShapeSt m_shapes[0x100];
+};
 
 struct PPPCREATEPARAM
 {
@@ -514,8 +544,8 @@ public:
     unsigned char m_unk7DC[8];
     CMaterialSet* m_materialSet;          // 0x7E4
     CTextureSet* m_textureSet;            // 0x7E8
-    pppModelSt* m_pppModelStArr;          // 0x7EC
-    pppShapeSt* m_pppShapeStArr;          // 0x7F0
+    CParModelSet* m_modelSet;          // 0x7EC
+    CParShapeSet* m_shapeSet;          // 0x7F0
     pppModelSt** m_editModelSlots;       // 0x7F4
     pppShapeSt** m_editShapeSlots;       // 0x7F8
     void* m_editTextTable;              // 0x7FC

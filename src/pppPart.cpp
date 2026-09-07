@@ -1865,7 +1865,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 	for (int i = 0; i < pppDataHead->m_modelCount; i++) {
 		u32 j = 0;
-		pppModelSt* model = PartMng.m_pppModelStArr;
+		pppModelSt* model = PartMng.m_modelSet->m_models;
 		pppModelSt* foundModel;
 		for (; j < 0x100; j++) {
 			if (model->m_isUsed != 0 && strcmp(model->m_name, modelName) == 0) {
@@ -1880,7 +1880,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 		modelName += 0x20;
 		reinterpret_cast<pppModelSt**>(pppDataHead->m_modelNames)[i] = model;
-		reinterpret_cast<pppModelSt**>(pppDataHead->m_modelNames)[i]->m_refCount++;
+		reinterpret_cast<pppModelSt**>(pppDataHead->m_modelNames)[i]->AddRef();
 	}
 
 	char* shapeName = reinterpret_cast<char*>(pppDataHead->m_shapeNames);
@@ -1890,7 +1890,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 	for (int i = 0; i < pppDataHead->m_shapeCount; i++) {
 		u32 j = 0;
-		pppShapeSt* shape = PartMng.m_pppShapeStArr;
+		pppShapeSt* shape = PartMng.m_shapeSet->m_shapes;
 		pppShapeSt* foundShape;
 		for (; j < 0x100; j++) {
 			if (shape->m_inUse != 0 && strcmp(shape->m_name, shapeName) == 0) {
@@ -1905,7 +1905,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 		shapeName += 0x20;
 		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i] = shape;
-		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i]->m_refCount++;
+		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i]->AddRef();
 	}
 
 	pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups);

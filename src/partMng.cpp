@@ -36,6 +36,8 @@ extern float ppvScreenMatrixZbuff;
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
+STATIC_ASSERT(sizeof(CParModelSet) == 0x6C00);
+STATIC_ASSERT(sizeof(CParShapeSet) == 0x2C00);
 STATIC_ASSERT(sizeof(pppIVECTOR3) == 0xC);
 STATIC_ASSERT(sizeof(pppIVECTOR4) == 0x10);
 STATIC_ASSERT(offsetof(pppIVECTOR4, y) == 4);
@@ -335,8 +337,8 @@ void CPartMng::Create()
 
     m_materialSet = 0;
     m_textureSet = 0;
-    m_pppModelStArr = 0;
-    m_pppShapeStArr = 0;
+    m_modelSet = 0;
+    m_shapeSet = 0;
 
     for (int i = 0; i < 0x80; i++) {
         m_editDataBuffers[i] = 0;
@@ -386,6 +388,124 @@ void CPartMng::Create()
 
 /*
  * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8006DF04
+ * EN Size: 208b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void pppModelSt::Release()
+{
+    if (--m_refCount <= 0) {
+        if (m_cacheId != -1) {
+            ppvAmemCacheSet.DestroyCache(m_cacheId);
+            m_meshData = 0;
+            m_displayListData = 0;
+        }
+        Destroy();
+        m_refCount = 0;
+        m_isUsed = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8006DD7C
+ * EN Size: 136b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void pppShapeSt::Release()
+{
+    if (--m_refCount <= 0) {
+        if (m_animData != 0) {
+            delete reinterpret_cast<u8*>(m_animData);
+            m_animData = 0;
+        }
+        if (m_displayListData != 0) {
+            delete reinterpret_cast<u8*>(m_displayListData);
+            m_displayListData = 0;
+        }
+        m_refCount = 0;
+        m_inUse = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8006E240
+ * EN Size: 128b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CParModelSet::CParModelSet()
+{
+    for (int i = 0; i < 0x100; i++) {
+        m_models[i].m_isUsed = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8006DE04
+ * EN Size: 168b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CParModelSet::~CParModelSet()
+{
+    for (unsigned int i = 0; i < 0x100; i++) {
+        pppModelSt* model = &m_models[i];
+        if (model->m_isUsed != 0) {
+            model->Release();
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8006E37C
+ * EN Size: 128b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CParShapeSet::CParShapeSet()
+{
+    for (int i = 0; i < 0x100; i++) {
+        m_shapes[i].m_inUse = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8006DC50
+ * EN Size: 168b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CParShapeSet::~CParShapeSet()
+{
+    for (unsigned int i = 0; i < 0x100; i++) {
+        pppShapeSt* shape = &m_shapes[i];
+        if (shape->m_inUse != 0) {
+            shape->Release();
+        }
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8005ee7c
  * PAL Size: 640b
  * EN Address: TODO
@@ -395,64 +515,18 @@ void CPartMng::Create()
  */
 void CPartMng::Destroy()
 {
-    struct PartMngModelStBlock {
-        pppModelSt m_entries[0x100];
-    };
-
-    struct PartMngShapeStBlock {
-        pppShapeSt m_entries[0x100];
-    };
-
     for (int i = 0; i < 0x20; i++) {
         pppReleasePdt(i);
     }
 
-    if (m_pppModelStArr != 0) {
-        pppModelSt* modelArr = m_pppModelStArr;
-        if (modelArr != 0) {
-            for (unsigned int i = 0; i < 0x100; i++) {
-                pppModelSt* model = &modelArr[i];
-                if (model->m_isUsed != 0) {
-                    if (--model->m_refCount <= 0) {
-                        if (model->m_cacheId != -1) {
-                            ppvAmemCacheSet.DestroyCache(model->m_cacheId);
-                            model->m_meshData = 0;
-                            model->m_displayListData = 0;
-                        }
-                        model->Destroy();
-                        model->m_refCount = 0;
-                        model->m_isUsed = 0;
-                    }
-                }
-            }
-            delete reinterpret_cast<PartMngModelStBlock*>(modelArr);
-        }
-        m_pppModelStArr = 0;
+    if (m_modelSet != 0) {
+        delete m_modelSet;
+        m_modelSet = 0;
     }
 
-    if (m_pppShapeStArr != 0) {
-        pppShapeSt* shapeArr = m_pppShapeStArr;
-        if (shapeArr != 0) {
-            for (unsigned int i = 0; i < 0x100; i++) {
-                pppShapeSt* shape = &shapeArr[i];
-                if (shape->m_inUse != 0) {
-                    if (--shape->m_refCount <= 0) {
-                        if (shape->m_animData != 0) {
-                            delete reinterpret_cast<u8*>(shape->m_animData);
-                            shape->m_animData = 0;
-                        }
-                        if (shape->m_displayListData != 0) {
-                            delete reinterpret_cast<u8*>(shape->m_displayListData);
-                            shape->m_displayListData = 0;
-                        }
-                        shape->m_refCount = 0;
-                        shape->m_inUse = 0;
-                    }
-                }
-            }
-            delete reinterpret_cast<PartMngShapeStBlock*>(shapeArr);
-        }
-        m_pppShapeStArr = 0;
+    if (m_shapeSet != 0) {
+        delete m_shapeSet;
+        m_shapeSet = 0;
     }
 
     if (m_textureSet != 0) {
@@ -587,12 +661,22 @@ void CPartMng::pppAmemCacheCountEnd()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: 180b
+ * EN Address: 0x80066A58
+ * EN Size: 196b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppReleasePmng(int)
+inline void CPartMng::pppReleasePmng(int pdtSlotIndex)
 {
-	// TODO
+    PppPdtSlot* pdtSlot = &m_pdtSlots[pdtSlotIndex];
+    ppvEnv = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
+    for (int i = 0; i < 0x180; i++) {
+        if (m_pppMng[i].m_pppResSet == pdtSlot) {
+            _pppAllFreePObject(&m_pppMng[i]);
+        }
+    }
 }
 
 /*
@@ -606,12 +690,6 @@ void CPartMng::pppReleasePmng(int)
  */
 void CPartMng::pppReleasePdt(int pdtSlotIndex)
 {
-    struct PppMngStRaw {
-        void* m_pppResSet;
-        char m_unused[0x154];
-    };
-
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     PppPdtSlot* pdtSlot = m_pdtSlots + pdtSlotIndex;
     _pppDataHead* pdt = pdtSlot->m_pppDataHead;
 
@@ -623,15 +701,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     m_materialSet->ReleaseTag(m_textureSet, pdtSlotIndex, &ppvAmemCacheSet);
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x13a);
 
-    ppvEnv = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
-    unsigned char* mngWalk = self;
-    for (int i = 0; i < 0x180; i++) {
-        PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(mngWalk + 0x2A18);
-        if (pppMngSt->m_pppResSet == pdtSlot) {
-            _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(pppMngSt));
-        }
-        mngWalk += 0x158;
-    }
+    pppReleasePmng(pdtSlotIndex);
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x149);
 
@@ -639,16 +709,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     if (pdt != 0) {
         for (int i = 0; i < pdt->m_modelCount; i++) {
             pppModelSt* model = reinterpret_cast<pppModelSt**>(pdt->m_modelNames)[i];
-            if (--model->m_refCount <= 0) {
-                if (model->m_cacheId != -1) {
-                    ppvAmemCacheSet.DestroyCache(model->m_cacheId);
-                    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
-                    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x28) = 0;
-                }
-                model->Destroy();
-                model->m_refCount = 0;
-                model->m_isUsed = 0;
-            }
+            model->Release();
         }
 
         if (reinterpret_cast<pppModelSt**>(pdt->m_modelNames) != 0) {
@@ -658,18 +719,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
 
         for (int i = 0; i < pdt->m_shapeCount; i++) {
             pppShapeSt* shape = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames)[i];
-            if (--shape->m_refCount <= 0) {
-                if (shape->m_animData != 0) {
-                    delete reinterpret_cast<u8*>(shape->m_animData);
-                    shape->m_animData = 0;
-                }
-                if (shape->m_displayListData != 0) {
-                    delete reinterpret_cast<u8*>(shape->m_displayListData);
-                    shape->m_displayListData = 0;
-                }
-                shape->m_refCount = 0;
-                shape->m_inUse = 0;
-            }
+            shape->Release();
         }
 
         if (reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames) != 0) {
@@ -1804,16 +1854,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 #define slotIndex (static_cast<int>(*reinterpret_cast<short*>(payload)))
             pppModelSt* modelSlot = (*modelTablePtr)[slotIndex];
             if (modelSlot != 0) {
-                if (--modelSlot->m_refCount <= 0) {
-                    if (modelSlot->m_cacheId != -1) {
-                        ppvAmemCacheSet.DestroyCache(modelSlot->m_cacheId);
-                        modelSlot->m_meshData = 0;
-                        modelSlot->m_displayListData = 0;
-                    }
-                    modelSlot->Destroy();
-                    modelSlot->m_refCount = 0;
-                    modelSlot->m_isUsed = 0;
-                }
+                modelSlot->Release();
                 (*modelTablePtr)[slotIndex] = 0;
             }
 
@@ -3637,12 +3678,114 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8006E198
+ * EN Size: 168b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppLoadPmd(CChunkFile&)
+inline pppModelSt* CParModelSet::GetFree()
 {
-	// TODO
+    for (int i = 0; i < GetNumModel(); i++) {
+        if (m_models[i].m_isUsed == 0) {
+            return &m_models[i];
+        }
+    }
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 508b
+ * EN Address: 0x8006B5EC
+ * EN Size: 420b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CParModelSet::Create(CChunkFile& chunkFile, int cachePriority, int addReference)
+{
+    pppModelSt* modelArray = m_models;
+    pppModelSt* targetModel = 0;
+
+    CChunkFile::CChunk innerChunk;
+    while (chunkFile.GetNextChunk(innerChunk)) {
+        switch (innerChunk.m_id) {
+        case kChunkNAME: {
+            char* name = chunkFile.GetString();
+
+            pppModelSt* searchModel = modelArray;
+            unsigned int i = 0;
+            for (;;) {
+                if (searchModel->m_isUsed != 0 && strcmp(searchModel->m_name, name) == 0) {
+                    goto pmdNameSearchDone;
+                }
+                i++;
+                searchModel++;
+                if (i >= 0x100) {
+                    searchModel = 0;
+                    goto pmdNameSearchDone;
+                }
+            }
+        pmdNameSearchDone:
+
+            if (searchModel == 0) {
+                targetModel = GetFree();
+
+                targetModel->SetUse();
+                strcpy(targetModel->m_name, name);
+            } else {
+                targetModel = 0;
+            }
+            break;
+        }
+        case kChunkRSDM:
+            if (targetModel != 0) {
+                CChunkFile rsdFile;
+                rsdFile.SetBuf(chunkFile.GetAddress());
+                unsigned int meshSize = PartMng.pppReadRsd(rsdFile, targetModel);
+                targetModel->Ptr2Off();
+
+                targetModel->m_cacheId = static_cast<short>(ppvAmemCacheSet.SetData(
+                    targetModel->m_meshData, meshSize, static_cast<CAmemCache::TYPE>(1), cachePriority));
+
+                if (targetModel->m_meshData != 0) {
+                    operator delete(targetModel->m_meshData);
+                    targetModel->m_meshData = 0;
+                }
+
+                if (addReference != 0) {
+                    targetModel->AddRef();
+                }
+                targetModel = 0;
+            }
+            break;
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 556b
+ * EN Address: 0x8006B790
+ * EN Size: 136b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CPartMng::pppLoadPmd(CChunkFile& chunkFile)
+{
+    CChunkFile::CChunk outerChunk;
+    while (chunkFile.GetNextChunk(outerChunk)) {
+        chunkFile.PushChunk();
+        switch (outerChunk.m_id) {
+        case kChunkRSET:
+            m_modelSet->Create(chunkFile, 1, 1);
+            break;
+        }
+        chunkFile.PopChunk();
+    }
 }
 
 /*
@@ -3672,110 +3815,119 @@ int CPartMng::pppLoadPmd(const char* baseName)
         return 0;
     }
 
-    if (m_pppModelStArr == 0) {
+    if (m_modelSet == 0) {
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
-        struct PartMngModelStBlock {
-            pppModelSt m_entries[0x100];
-        };
-        pppModelSt* modelArray = reinterpret_cast<pppModelSt*>(new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9) PartMngModelStBlock);
-        for (int i = 0; i < 0x100; i++) {
-            modelArray[i].m_isUsed = 0;
-        }
-        m_pppModelStArr = modelArray;
+        m_modelSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9) CParModelSet;
     }
 
     CChunkFile chunkFile;
     chunkFile.SetBuf(fileData);
 
-    CChunkFile::CChunk outerChunk;
-    while (chunkFile.GetNextChunk(outerChunk)) {
-        chunkFile.PushChunk();
-        switch (outerChunk.m_id) {
-        case kChunkRSET: {
-            pppModelSt* modelArray = m_pppModelStArr;
-            pppModelSt* targetModel = 0;
-
-            CChunkFile::CChunk innerChunk;
-            while (chunkFile.GetNextChunk(innerChunk)) {
-                switch (innerChunk.m_id) {
-                case kChunkNAME: {
-                    char* name = chunkFile.GetString();
-
-                    pppModelSt* searchModel = modelArray;
-                    unsigned int i = 0;
-                    for (;;) {
-                        if (searchModel->m_isUsed != 0 && strcmp(searchModel->m_name, name) == 0) {
-                            goto pmdNameSearchDone;
-                        }
-                        i++;
-                        searchModel++;
-                        if (i >= 0x100) {
-                            searchModel = 0;
-                            goto pmdNameSearchDone;
-                        }
-                    }
-                pmdNameSearchDone:
-
-                    if (searchModel == 0) {
-                        pppModelSt* freeModel = modelArray;
-                        for (int freeIndex = 0; freeIndex < 0x100; freeIndex++) {
-                            if (freeModel->m_isUsed == 0) {
-                                targetModel = modelArray + freeIndex;
-                                goto foundFreeModel;
-                            }
-                            freeModel++;
-                        }
-                        targetModel = 0;
-                    foundFreeModel:
-
-                        targetModel->m_refCount = 0;
-                        targetModel->m_isUsed = 1;
-                        strcpy(targetModel->m_name, name);
-                    } else {
-                        targetModel = 0;
-                    }
-                    break;
-                }
-                case kChunkRSDM:
-                    if (targetModel != 0) {
-                        CChunkFile rsdFile;
-                        rsdFile.SetBuf(chunkFile.GetAddress());
-                        unsigned int meshSize = pppReadRsd(rsdFile, targetModel);
-                        targetModel->Ptr2Off();
-
-                        void** meshDataPtr =
-                            reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(targetModel) + 0x24);
-                        targetModel->m_cacheId = static_cast<short>(ppvAmemCacheSet.SetData(
-                            *meshDataPtr, meshSize, static_cast<CAmemCache::TYPE>(1), 1));
-
-                        if (*meshDataPtr != 0) {
-                            operator delete(*meshDataPtr);
-                            *meshDataPtr = 0;
-                        }
-
-                        targetModel->m_refCount++;
-                        targetModel = 0;
-                    }
-                    break;
-                }
-            }
-            break;
-        }
-        }
-        chunkFile.PopChunk();
-    }
+    pppLoadPmd(chunkFile);
 
     return 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: 0x8006E2D4
+ * EN Size: 168b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppLoadPan(CChunkFile&)
+inline pppShapeSt* CParShapeSet::GetFree()
 {
-	// TODO
+    for (int i = 0; i < GetNumShape(); i++) {
+        if (m_shapes[i].m_inUse == 0) {
+            return &m_shapes[i];
+        }
+    }
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 412b
+ * EN Address: 0x8006B970
+ * EN Size: 304b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CParShapeSet::Create(CChunkFile& chunkFile, int addReference)
+{
+    pppShapeSt* shapeArray = m_shapes;
+    pppShapeSt* targetShape = 0;
+
+    CChunkFile::CChunk innerChunk;
+    while (chunkFile.GetNextChunk(innerChunk)) {
+        switch (innerChunk.m_id) {
+        case kChunkNAME: {
+            char* name = chunkFile.GetString();
+
+            pppShapeSt* searchShape = shapeArray;
+            unsigned int i = 0;
+            for (;;) {
+                if (searchShape->m_inUse != 0 && strcmp(searchShape->m_name, name) == 0) {
+                    goto panNameSearchDone;
+                }
+                i++;
+                searchShape++;
+                if (i >= 0x100) {
+                    searchShape = 0;
+                    goto panNameSearchDone;
+                }
+            }
+        panNameSearchDone:
+
+            if (searchShape == 0) {
+                targetShape = GetFree();
+
+                targetShape->SetUse();
+                strcpy(targetShape->m_name, name);
+            } else {
+                targetShape = 0;
+            }
+            break;
+        }
+        case kChunkSHPM:
+            if (targetShape != 0) {
+                CChunkFile shpFile;
+                shpFile.SetBuf(chunkFile.GetAddress());
+                PartMng.pppReadShp(shpFile, targetShape);
+                if (addReference != 0) {
+                    targetShape->AddRef();
+                }
+                targetShape = 0;
+            }
+            break;
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 464b
+ * EN Address: 0x8006BAA0
+ * EN Size: 132b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CPartMng::pppLoadPan(CChunkFile& chunkFile)
+{
+    CChunkFile::CChunk outerChunk;
+    while (chunkFile.GetNextChunk(outerChunk)) {
+        chunkFile.PushChunk();
+        switch (outerChunk.m_id) {
+        case kChunkSSET:
+            m_shapeSet->Create(chunkFile, 1);
+            break;
+        }
+        chunkFile.PopChunk();
+    }
 }
 
 /*
@@ -3805,89 +3957,15 @@ int CPartMng::pppLoadPan(const char* baseName)
         return 0;
     }
 
-    if (m_pppShapeStArr == 0) {
+    if (m_shapeSet == 0) {
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
-        struct PartMngShapeStBlock {
-            pppShapeSt m_entries[0x100];
-        };
-        pppShapeSt* shapeArray = reinterpret_cast<pppShapeSt*>(new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b) PartMngShapeStBlock);
-        for (int i = 0; i < 0x100; i++) {
-            shapeArray[i].m_inUse = 0;
-        }
-        m_pppShapeStArr = shapeArray;
+        m_shapeSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b) CParShapeSet;
     }
 
     CChunkFile chunkFile;
     chunkFile.SetBuf(fileData);
 
-    CChunkFile::CChunk outerChunk;
-    while (chunkFile.GetNextChunk(outerChunk)) {
-        chunkFile.PushChunk();
-        switch (outerChunk.m_id) {
-        case kChunkSSET: {
-            pppShapeSt* shapeArray = m_pppShapeStArr;
-            pppShapeSt* targetShape = 0;
-
-            CChunkFile::CChunk innerChunk;
-            while (chunkFile.GetNextChunk(innerChunk)) {
-                switch (innerChunk.m_id) {
-                case kChunkNAME: {
-                    char* name = chunkFile.GetString();
-
-                    pppShapeSt* searchShape = shapeArray;
-                    unsigned int i = 0;
-                    for (;;) {
-                        if (searchShape->m_inUse != 0 && strcmp(searchShape->m_name, name) == 0) {
-                            goto panNameSearchDone;
-                        }
-                        i++;
-                        searchShape = reinterpret_cast<pppShapeSt*>(
-                            reinterpret_cast<unsigned char*>(searchShape) + 0x2c);
-                        if (i >= 0x100) {
-                            searchShape = 0;
-                            goto panNameSearchDone;
-                        }
-                    }
-                panNameSearchDone:
-
-                    if (searchShape == 0) {
-                        pppShapeSt* freeShape = shapeArray;
-                        for (int freeIndex = 0; freeIndex < 0x100; freeIndex++) {
-                            if (freeShape->m_inUse == 0) {
-                                targetShape = reinterpret_cast<pppShapeSt*>(
-                                    reinterpret_cast<unsigned char*>(shapeArray) + freeIndex * 0x2c);
-                                goto foundFree;
-                            }
-                            freeShape = reinterpret_cast<pppShapeSt*>(
-                                reinterpret_cast<unsigned char*>(freeShape) + 0x2c);
-                        }
-                        targetShape = 0;
-                    foundFree:
-
-                        targetShape->m_refCount = 0;
-                        targetShape->m_inUse = 1;
-                        strcpy(targetShape->m_name, name);
-                    } else {
-                        targetShape = 0;
-                    }
-                    break;
-                }
-                case kChunkSHPM:
-                    if (targetShape != 0) {
-                        CChunkFile shpFile;
-                        shpFile.SetBuf(chunkFile.GetAddress());
-                        pppReadShp(shpFile, targetShape);
-                        targetShape->m_refCount++;
-                        targetShape = 0;
-                    }
-                    break;
-                }
-            }
-            break;
-        }
-        }
-        chunkFile.PopChunk();
-    }
+    pppLoadPan(chunkFile);
 
     return 1;
 }
@@ -3944,131 +4022,12 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
             while (pdtFile.GetNextChunk(parentChunk)) {
                 pdtFile.PushChunk();
                 switch (parentChunk.m_id) {
-                case kChunkRSET: {
-                    pppModelSt* modelArray = m_pppModelStArr;
-                    pppModelSt* targetModel = 0;
-
-                    CChunkFile::CChunk resourceChunk;
-                    while (pdtFile.GetNextChunk(resourceChunk)) {
-                        switch (resourceChunk.m_id) {
-                        case kChunkNAME: {
-                            char* name = pdtFile.GetString();
-
-                            pppModelSt* searchModel = modelArray;
-                            unsigned int i = 0;
-                            for (;;) {
-                                if (searchModel->m_isUsed != 0 && strcmp(searchModel->m_name, name) == 0) {
-                                    goto nameSearchDone;
-                                }
-                                i++;
-                                searchModel++;
-                                if (i >= 0x100) {
-                                    searchModel = 0;
-                                    goto nameSearchDone;
-                                }
-                            }
-                        nameSearchDone:
-
-                            if (searchModel == 0) {
-                                pppModelSt* freeModel = modelArray;
-                                for (int freeIndex = 0; freeIndex < 0x100; freeIndex++) {
-                                    if (freeModel->m_isUsed == 0) {
-                                        targetModel = modelArray + freeIndex;
-                                        goto foundFreeModel;
-                                    }
-                                    freeModel++;
-                                }
-                                targetModel = 0;
-                            foundFreeModel:
-
-                                targetModel->m_refCount = 0;
-                                targetModel->m_isUsed = 1;
-                                strcpy(targetModel->m_name, name);
-                            } else {
-                                targetModel = 0;
-                            }
-                            break;
-                        }
-                        case kChunkRSDM:
-                            if (targetModel != 0) {
-                                CChunkFile rsdFile;
-                                rsdFile.SetBuf(pdtFile.GetAddress());
-                                unsigned int meshSize = PartMng.pppReadRsd(rsdFile, targetModel);
-                                targetModel->Ptr2Off();
-
-                                void** meshDataPtr =
-                                    reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(targetModel) + 0x24);
-                                targetModel->m_cacheId = static_cast<short>(ppvAmemCacheSet.SetData(
-                                    *meshDataPtr, meshSize, static_cast<CAmemCache::TYPE>(1), cachePriority));
-
-                                if (*meshDataPtr != 0) {
-                                    operator delete(*meshDataPtr);
-                                    *meshDataPtr = 0;
-                                }
-                                targetModel = 0;
-                            }
-                            break;
-                        }
-                    }
+                case kChunkRSET:
+                    m_modelSet->Create(pdtFile, cachePriority, 0);
                     break;
-                }
-                case kChunkSSET: {
-                    pppShapeSt* shapeArray = m_pppShapeStArr;
-                    pppShapeSt* targetShape = 0;
-
-                    CChunkFile::CChunk shapeChunk;
-                    while (pdtFile.GetNextChunk(shapeChunk)) {
-                        switch (shapeChunk.m_id) {
-                        case kChunkNAME: {
-                            char* name = pdtFile.GetString();
-
-                            pppShapeSt* searchShape = shapeArray;
-                            unsigned int i = 0;
-                            for (;;) {
-                                if (searchShape->m_inUse != 0 && strcmp(searchShape->m_name, name) == 0) {
-                                    goto shapeNameSearchDone;
-                                }
-                                i++;
-                                searchShape++;
-                                if (i >= 0x100) {
-                                    searchShape = 0;
-                                    goto shapeNameSearchDone;
-                                }
-                            }
-                        shapeNameSearchDone:
-
-                            if (searchShape == 0) {
-                                pppShapeSt* freeShape = shapeArray;
-                                for (int freeIndex = 0; freeIndex < 0x100; freeIndex++) {
-                                    if (freeShape->m_inUse == 0) {
-                                        targetShape = shapeArray + freeIndex;
-                                        goto foundFreeShape;
-                                    }
-                                    freeShape++;
-                                }
-                                targetShape = 0;
-                            foundFreeShape:
-
-                                targetShape->m_refCount = 0;
-                                targetShape->m_inUse = 1;
-                                strcpy(targetShape->m_name, name);
-                            } else {
-                                targetShape = 0;
-                            }
-                            break;
-                        }
-                        case kChunkSHPM:
-                            if (targetShape != 0) {
-                                CChunkFile shpFile;
-                                shpFile.SetBuf(pdtFile.GetAddress());
-                                PartMng.pppReadShp(shpFile, targetShape);
-                                targetShape = 0;
-                            }
-                            break;
-                        }
-                    }
+                case kChunkSSET:
+                    m_shapeSet->Create(pdtFile, 0);
                     break;
-                }
                 case kChunkPDTS: {
                     _pppDataHead* sourceHead = reinterpret_cast<_pppDataHead*>(pdtFile.GetAddress());
                     pppInitData(sourceHead, pppGetSysProgTable(), cachePriority);

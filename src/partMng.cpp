@@ -3437,25 +3437,24 @@ inline void CParModelSet::Create(CChunkFile& chunkFile, int cachePriority, int a
             unsigned int i = 0;
             for (;;) {
                 if (searchModel->m_isUsed != 0 && strcmp(searchModel->m_name, name) == 0) {
-                    goto pmdNameSearchDone;
+                    break;
                 }
                 i++;
                 searchModel++;
                 if (i >= 0x100) {
                     searchModel = 0;
-                    goto pmdNameSearchDone;
+                    break;
                 }
             }
-        pmdNameSearchDone:
 
-            if (searchModel == 0) {
-                targetModel = GetFree();
-
-                targetModel->SetUse();
-                strcpy(targetModel->m_name, name);
-            } else {
+            if (searchModel != 0) {
                 targetModel = 0;
+                break;
             }
+
+            targetModel = GetFree();
+            targetModel->SetUse();
+            strcpy(targetModel->m_name, name);
             break;
         }
         case kChunkRSDM:
@@ -3589,25 +3588,24 @@ inline void CParShapeSet::Create(CChunkFile& chunkFile, int addReference)
             unsigned int i = 0;
             for (;;) {
                 if (searchShape->m_inUse != 0 && strcmp(searchShape->m_name, name) == 0) {
-                    goto panNameSearchDone;
+                    break;
                 }
                 i++;
                 searchShape++;
                 if (i >= 0x100) {
                     searchShape = 0;
-                    goto panNameSearchDone;
+                    break;
                 }
             }
-        panNameSearchDone:
 
-            if (searchShape == 0) {
-                targetShape = GetFree();
-
-                targetShape->SetUse();
-                strcpy(targetShape->m_name, name);
-            } else {
+            if (searchShape != 0) {
                 targetShape = 0;
+                break;
             }
+
+            targetShape = GetFree();
+            targetShape->SetUse();
+            strcpy(targetShape->m_name, name);
             break;
         }
         case kChunkSHPM:
@@ -3750,15 +3748,14 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                     _pppDataHead* sourceHead = reinterpret_cast<_pppDataHead*>(pdtFile.GetAddress());
                     pppInitData(sourceHead, pppGetSysProgTable(), cachePriority);
 
-                    _pppDataHead* copiedHead = static_cast<_pppDataHead*>(
+                    pdtSlot->m_pppDataHead = static_cast<_pppDataHead*>(
                         operator new[](
                             sourceHead->m_partCount * sizeof(_pppFieldParticleData) + sizeof(_pppDataHead), PartPcs.m_usbStreamState.m_stageLoad,
                             const_cast<char*>(s_partMng_cpp), 0xd56));
-                    pdtSlot->m_pppDataHead = copiedHead;
 
-                    memcpy(copiedHead, sourceHead, sourceHead->m_partCount * sizeof(_pppFieldParticleData) + sizeof(_pppDataHead));
+                    memcpy(pdtSlot->m_pppDataHead, sourceHead, sourceHead->m_partCount * sizeof(_pppFieldParticleData) + sizeof(_pppDataHead));
 
-                    pppInitEnv(&pdtSlot->m_env, copiedHead, 0);
+                    pppInitEnv(&pdtSlot->m_env, pdtSlot->m_pppDataHead, 0);
                     break;
                 }
                 }

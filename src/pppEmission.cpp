@@ -17,14 +17,6 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h"
 #include "ffcc/ppp_linkage.h"
 
-extern const char s_pppEmissionShapeObj2;
-extern const float kPppEmissionAlphaDivisor;
-extern const float kPppEmissionUnitScale;
-extern const float kPppEmissionZeroScale;
-extern const float kCharaFurColorComponentScale = 15.0f;
-extern const float kCharaFurAlphaComponentScale = 7.0f;
-extern const double kPppEmissionDoubleBias = 4503599627370496.0;
-extern const float kCharaFurNoHitDepth = 10000000.0f;
 static const char s_pppEmission_cpp[] = "pppEmission.cpp";
 
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
@@ -147,7 +139,7 @@ void pppFrameEmission(pppEmission* pppEmission_, PEmission* param_2, _pppCtrlTab
     CChara::CModel* model = GetCharaModelPtr(handle);
     SetEmissionModelCallbacks(model, state, param_2);
 
-    float alphaScale = (float)dataSet[0xB] / kPppEmissionAlphaDivisor;
+    float alphaScale = (float)dataSet[0xB] / 255.0f;
     state->m_colorR = dataSet[8];
     state->m_colorG = dataSet[9];
     state->m_colorB = dataSet[0xA];
@@ -182,7 +174,7 @@ void pppFrameEmission(pppEmission* pppEmission_, PEmission* param_2, _pppCtrlTab
 
             EmissionParticle* particle = state->m_particles;
             for (int i = 0; i < param_2->m_initWOrk; i++) {
-                Math.RandF(kPppEmissionUnitScale);
+                Math.RandF(1.0f);
 
                 s16 lifeJitter = (s16)(rand() % payload.m_lifeJitterFrames);
                 s16 safeJitter = (lifeJitter >= 1) ? lifeJitter : 1;
@@ -190,7 +182,7 @@ void pppFrameEmission(pppEmission* pppEmission_, PEmission* param_2, _pppCtrlTab
                 particle->m_fieldC = payload.m_fadeInFrames + safeJitter;
                 s16 fade = (u16)payload.m_fadeOutFrames + safeJitter;
                 particle->m_fieldA = particle->m_fieldC + safeJitter + fade;
-                particle->m_scale = ((float)i * Math.RandF(payload.m_scaleRandomRange)) + kPppEmissionUnitScale;
+                particle->m_scale = ((float)i * Math.RandF(payload.m_scaleRandomRange)) + 1.0f;
                 particle->m_alpha = 0;
                 particle->m_fieldE = (u8)((int)payload.m_targetAlpha / (int)fade);
                 particle++;
@@ -226,7 +218,7 @@ void pppFrameEmission(pppEmission* pppEmission_, PEmission* param_2, _pppCtrlTab
 
                 particle->m_fieldC = payload.m_fadeInFrames;
                 particle->m_fieldA = payload.m_fadeInFrames + payload.m_holdFrames + jitter + payload.m_fadeOutFrames;
-                particle->m_scale = kPppEmissionUnitScale + Math.RandF(payload.m_scaleRandomRange);
+                particle->m_scale = 1.0f + Math.RandF(payload.m_scaleRandomRange);
                 particle->m_alpha = 0;
                 particle->m_fieldE = payload.m_targetAlpha / payload.m_fadeOutFrames;
             }
@@ -266,8 +258,8 @@ void pppDestructEmission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
         state->m_particles = 0;
     }
 
-    baseScale = kPppEmissionZeroScale;
-    state->m_scale2 = kPppEmissionZeroScale;
+    baseScale = 0.0f;
+    state->m_scale2 = 0.0f;
     state->m_scale1 = baseScale;
     state->m_scale0 = baseScale;
 }
@@ -282,7 +274,7 @@ void pppDestructEmission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
  * JP Size: TODO
  */
 void pppConstruct2Emission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
-    float baseScale = kPppEmissionZeroScale;
+    float baseScale = 0.0f;
     EmissionState* state = GetEmissionState(pppEmission_, param_2);
     state->m_scale2 = baseScale;
     state->m_scale1 = baseScale;
@@ -299,7 +291,7 @@ void pppConstruct2Emission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
  * JP Size: TODO
  */
 void pppConstructEmission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
-    float baseScale = kPppEmissionZeroScale;
+    float baseScale = 0.0f;
     EmissionState* state = GetEmissionState(pppEmission_, param_2);
 
     state->m_texture = 0;
@@ -335,7 +327,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     EmissionState* state = (EmissionState*)param_2;
     PEmission* step = (PEmission*)param_3;
     EmissionMeshData* meshData = EmissionMeshAt(model, meshIndex);
-    if ((strcmp(meshData->m_name, &s_pppEmissionShapeObj2) == 0) && (state->m_colorA != 0)) {
+    if ((strcmp(meshData->m_name, "obj2") == 0) && (state->m_colorA != 0)) {
         u32 drawTevBits = 0xACE0F;
         CTexture* texture = state->m_texture;
 
@@ -353,7 +345,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
         if (step->m_emission.m_particleMode == 0) {
             EmissionDisplayList* displayList;
             for (int i = 0; i < step->m_initWOrk; i++) {
-                float scale = kPppEmissionUnitScale;
+                float scale = 1.0f;
                 scale += (float)i * state->m_scale0;
                 PSMTXScale(objMtx0, scale, scale, scale);
                 PSMTXConcat(param_5, objMtx0, objMtx0);
@@ -444,7 +436,7 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
     EmissionDisplayList* displayList = meshData->m_displayLists;
     displayList += displayListIndex;
 
-    if (strcmp(meshData->m_name, &s_pppEmissionShapeObj2) == 0) {
+    if (strcmp(meshData->m_name, "obj2") == 0) {
         meshData->m_colors[0] = 0;
         meshData->m_colors[1] = 0;
         meshData->m_colors[2] = 0;

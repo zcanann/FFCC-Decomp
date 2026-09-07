@@ -5,11 +5,7 @@
 #include "ffcc/game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
-extern "C" {
-extern const float kPppRainTexCoordBase;
-extern const float kPppRainTexCoordOne;
-extern const float kPppRainRandomUnitScale;
-}
+
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
@@ -87,8 +83,8 @@ inline void InitRainData(VRain*, PRain* rain, RAIN_DATA* drop)
 
     int randA = rand();
     int randB = rand();
-    unitA = kPppRainRandomUnitScale * (float)randA;
-    unitB = kPppRainRandomUnitScale * (float)randB;
+    unitA = 0.00003051851f * (float)randA;
+    unitB = 0.00003051851f * (float)randB;
     minX = rain->m_minX;
     maxX = rain->m_maxX;
     zRange = rain->m_maxZ - rain->m_minZ;
@@ -161,7 +157,7 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
     pppSetDrawEnv(
         &colorData->color,
         reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
-        kPppRainTexCoordBase,
+        0.0f,
         param_2->m_lightTarget,
         param_2->m_fogIndex,
         param_2->m_blendMode,
@@ -182,10 +178,10 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
     baseX = ppvMng->m_matrix.value[0][3];
     baseY = ppvMng->m_matrix.value[1][3];
     baseZ = ppvMng->m_matrix.value[2][3];
-    tex0 = kPppRainTexCoordBase;
+    tex0 = 0.0f;
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
-    tex0 = kPppRainTexCoordBase;
-    tex1 = kPppRainTexCoordOne;
+    tex0 = 0.0f;
+    tex1 = 1.0f;
     {
         RAIN_DATA* currentDrop = drop;
         for (i = 0; i < (int)(u32)param_2->m_dataValIndex; i++, currentDrop++) {
@@ -316,14 +312,10 @@ void pppConstructRain(pppRain* pppRain, _pppCtrlTable* param_2)
     float fVar1;
     VRain* work;
 
-    fVar1 = kPppRainTexCoordBase;
+    fVar1 = 0.0f;
     work = GetRainWork(pppRain, param_2);
     work->drops = 0;
     work->accelZ = fVar1;
     work->accelY = fVar1;
     work->moveY = fVar1;
 }
-
-extern const float kPppCrystalCoordMin = -1.0f;
-extern const float kPppCrystalZero = 0.0f;
-extern const double kPppNewtonSqrtHalf = 0.5;

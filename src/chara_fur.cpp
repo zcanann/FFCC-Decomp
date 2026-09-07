@@ -28,23 +28,36 @@
 #include <stddef.h>
 #include <string.h>
 
-extern const float kPppLensFlareZero = 0.0f;
-extern const float kPppLensFlareAlphaScale = 0.0078125f;
-extern const float kPppLensFlareNegate = -1.0f;
-extern const float kPppLensFlareZScale = 16777215.0f;
-extern const double kPppLensFlareDoubleMagic = 4503599627370496.0;
-extern const float kPppColumScreenCenterX = 320.0f;
-extern const float kPppColumScreenCenterY = 224.0f;
-extern const float kPppColumCameraZOffset = -0.5f;
-extern const float kPppColumZero = 0.0f;
-extern const double kPppColumSqrtHalf = 0.5;
-extern const double kPppColumSqrtThree = 3.0;
-extern const double kPppColumZeroD = 0.0;
-extern const float kPppColumNormalizeEpsilon = 0.000001f;
-extern const float kPppColumOne = 1.0f;
-extern const float kPppColumSegmentScale = 2.0f;
+extern const char sYmEnvMapLabel[] = "MAP";
+extern const char sYmEnvMonsterLabel[] = "MON";
+extern const char sYmEnvScoreLabel[] = "SCO";
+extern const char sYmEnvTreeLabel[] = "TRE";
+extern const char sYmEnvSeparator[4] = "|\n";
 extern const double kYmEnvRadToDeg;
 extern const float kYmEnvDefaultScale;
+extern const float kYmEnvQuarter;
+extern const float kCharaFurDepthZero;
+extern const float kYmEnvTen;
+extern const char sMogFurTextureName[] = "n915m_2";
+extern const float kCharaFurColorComponentScale;
+extern const float kCharaFurAlphaComponentScale;
+extern const float kCharaFurNoHitDepth;
+extern const float kCharaFurScreenCenterY;
+extern const float kCharaFurDepthScaleBase;
+extern const float kCharaFurScreenCenterX;
+extern const float kCharaFurTriangleVertexCount;
+extern const float kCharaFurPickRayFarZ;
+extern const float kCharaFurWeightScale;
+extern const float kCharaFurViewDepthThreshold;
+extern const float kCharaFurShadeScale;
+extern const float kCharaFurShadowRange;
+extern const float kCharaFurShadowFade;
+extern const float FLOAT_8033115C;
+extern const float FLOAT_80331160;
+extern const float FLOAT_80331164;
+extern const float FLOAT_80331168;
+extern const float FLOAT_8033116C;
+
 extern "C" {
 double atan2(double, double);
 double sqrt(double);
@@ -88,11 +101,9 @@ struct FurPickWorkPointers {
 	CVector* volatile m_rayEndc;
 };
 
-extern char sYmEnvSeparator[4];
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
 extern "C" char lbl_801DB648[];
-extern "C" char sMogFurTextureName[8];
 extern "C" {
 extern unsigned char m_mogWork[0x2C];
 float m_height;
@@ -100,29 +111,6 @@ void* m_pDisplayList;
 void* m_pTexBuf;
 unsigned int m_seed;
 }
-extern float kCharaFurDepthZero;
-extern float kCharaFurDepthScaleBase;
-extern float kCharaFurColorComponentScale;
-extern float kCharaFurAlphaComponentScale;
-extern float kCharaFurNoHitDepth;
-extern float kCharaFurScreenCenterY;
-extern float kCharaFurScreenCenterX;
-extern float kCharaFurTriangleVertexCount;
-extern float kCharaFurPickRayFarZ;
-extern float kCharaFurWeightScale;
-extern float kCharaFurViewDepthThreshold;
-extern float kCharaFurShadeScale;
-extern float kCharaFurShadowRange;
-extern float kCharaFurShadowFade;
-extern float FLOAT_8033115C;
-extern float FLOAT_80331160;
-extern float FLOAT_80331164;
-extern float FLOAT_80331168;
-extern float FLOAT_8033116C;
-extern float kYmEnvQuarter;
-extern float kYmEnvTen;
-extern double kYmEnvSignedDoubleMagic;
-extern double kPppEmissionDoubleBias;
 
 namespace {
 
@@ -476,13 +464,13 @@ void CChara::TimeMogFur()
 	if (MogFur().m_timestamp + 0x1A5E0 < frameCounter) {
 		MogFur().m_timestamp = frameCounter;
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-			System.Printf(sYmEnvSeparator);
+			System.Printf(const_cast<char*>(sYmEnvSeparator));
 		}
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf(sMogRadarDebugFormatBlock);
 		}
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-			System.Printf(sYmEnvSeparator);
+			System.Printf(const_cast<char*>(sYmEnvSeparator));
 		}
 	}
 
@@ -847,7 +835,7 @@ static inline CTexture* FindMogFurTexture(CChara::CModel* model)
 {
 	CTextureSet* textureSet = model->m_texSet;
 
-	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
+	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(const_cast<char*>(sMogFurTextureName)));
 	return textureSet->GetTexture(textureIdx);
 }
 
@@ -1330,7 +1318,7 @@ void CChara::LoadFurTexBuffer(unsigned short* inTexels)
 void CChara::CModel::InitMogFurTex()
 {
 	CTextureSet* textureSet = m_texSet;
-	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
+	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(const_cast<char*>(sMogFurTextureName)));
 	CTexture* texture = textureSet->GetTexture(textureIdx);
 
 	if ((texture != 0) && (texture->m_format == 4)) {
@@ -1338,7 +1326,7 @@ void CChara::CModel::InitMogFurTex()
 		Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 
 		textureSet = m_texSet;
-		textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
+		textureIdx = static_cast<unsigned int>(textureSet->Find(const_cast<char*>(sMogFurTextureName)));
 		CTexture* textureData = textureSet->GetTexture(textureIdx);
 		if (textureData != 0) {
 			void* dstBuffer = textureData->m_imageData;
@@ -2572,7 +2560,6 @@ void CChara::makeFurTex()
 #undef furNoiseRange
 #pragma pop
 
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -2623,3 +2610,27 @@ inline void GXSetTexCoordGen(void)
 {
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
 }
+
+extern const double kYmEnvRadToDeg = 57.295780181884766;
+extern const float kYmEnvDefaultScale = 1.5f;
+extern const float kYmEnvQuarter = 0.25f;
+extern const float kCharaFurDepthZero = 0.0f;
+extern const float kYmEnvTen = 10.0f;
+extern const float kCharaFurColorComponentScale = 15.0f;
+extern const float kCharaFurAlphaComponentScale = 7.0f;
+extern const float kCharaFurNoHitDepth = 10000000.0f;
+extern const float kCharaFurScreenCenterY = 224.0f;
+extern const float kCharaFurDepthScaleBase = 1.0f;
+extern const float kCharaFurScreenCenterX = 320.0f;
+extern const float kCharaFurTriangleVertexCount = 3.0f;
+extern const float kCharaFurPickRayFarZ = -100.0f;
+extern const float kCharaFurWeightScale = 0.5f;
+extern const float kCharaFurViewDepthThreshold = -1.0f;
+extern const float kCharaFurShadeScale = 255.0f;
+extern const float kCharaFurShadowRange = 100.0f;
+extern const float kCharaFurShadowFade = 20.0f;
+extern const float FLOAT_8033115C = 0.125f;
+extern const float FLOAT_80331160 = 4.0f;
+extern const float FLOAT_80331164 = 6.103701889514923e-05f;
+extern const float FLOAT_80331168 = 128.0f;
+extern const float FLOAT_8033116C = 8.0f;

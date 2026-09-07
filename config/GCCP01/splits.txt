@@ -1375,40 +1375,40 @@ pppCrystal.cpp:
 	extabindex  start:0x8000F784 end:0x8000F7A8
 	.text       start:0x800DC9A0 end:0x800DD424
 	.rodata     start:0x801DB5B8 end:0x801DB610
-	.sdata2     start:0x80330FA8 end:0x80330FD4
+	.sdata2     start:0x80330FA8 end:0x80331014
 
 pppRain.cpp:
 	extab       start:0x80008C94 end:0x80008CAC
 	extabindex  start:0x8000F7A8 end:0x8000F7CC
 	.text       start:0x800DD424 end:0x800DDAF8
 	.rodata     start:0x801DB610 end:0x801DB61C
-	.sdata2     start:0x80330FD4 end:0x80330FE8
+	.sdata2     start:0x80331018 end:0x80331030
 
 pppBlurChara.cpp:
 	extab       start:0x80008CAC end:0x80008CDC
 	extabindex  start:0x8000F7CC end:0x8000F814
 	.text       start:0x800DDAF8 end:0x800DE718
 	.rodata     start:0x801DB620 end:0x801DB638
-	.sdata2     start:0x80330FE8 end:0x80330FF0
+	.sdata2     start:0x80331030 end:0x80331060
 
 pppLensFlare.cpp:
 	extab       start:0x80008CDC end:0x80008CEC
 	extabindex  start:0x8000F814 end:0x8000F82C
 	.text       start:0x800DE718 end:0x800DEC5C
-	.sdata2     start:0x80330FF0 end:0x80331008
+	.sdata2     start:0x80331060 end:0x80331078
 
 pppColum.cpp:
 	extab       start:0x80008CEC end:0x80008D04
 	extabindex  start:0x8000F82C end:0x8000F850
 	.text       start:0x800DEC5C end:0x800DF320
 	.rodata     start:0x801DB638 end:0x801DB648
-	.sdata2     start:0x80331008 end:0x80331048
+	.sdata2     start:0x80331078 end:0x803310C0
 
 pppCorona.cpp:
 	extab       start:0x80008D04 end:0x80008D14
 	extabindex  start:0x8000F850 end:0x8000F868
 	.text       start:0x800DF320 end:0x800DF618
-	.sdata2     start:0x80331048 end:0x80331060
+	.sdata2     start:0x803310C0 end:0x803310D8
 
 chara_fur.cpp:
 	extab       start:0x80008D14 end:0x80008D84
@@ -1417,7 +1417,7 @@ chara_fur.cpp:
 	.rodata     start:0x801DB72C end:0x801DB740
 	.bss        start:0x802FF3A8 end:0x802FF404
 	.sbss       start:0x8032EDF0 end:0x8032EE1C
-	.sdata2     start:0x80331060 end:0x803310C0
+	.sdata2     start:0x803310D8 end:0x80331170
 	.sbss2      start:0x80333DE8 end:0x80333DF8
 
 pppYmEnv.cpp:
@@ -1425,14 +1425,14 @@ pppYmEnv.cpp:
 	extabindex  start:0x8000F910 end:0x8000F958
 	.text       start:0x800E46DC end:0x800E6060
 	.rodata     start:0x801DB740 end:0x801DB7E8
-	.sdata2     start:0x803310C0 end:0x8033111C
+	.sdata2     start:0x80331170 end:0x803311E0
 
 pppEmission.cpp:
 	extab       start:0x80008DB4 end:0x80008DE4
 	extabindex  start:0x8000F958 end:0x8000F9A0
 	.text       start:0x800E6060 end:0x800E6B98
 	.rodata     start:0x801DB7E8 end:0x801DB7F8
-	.sdata2     start:0x8033111C end:0x80331134
+	.sdata2     start:0x803311E0 end:0x80331208
 
 wm_menu.cpp:
 	extab       start:0x80008DE4 end:0x80009024
@@ -1443,7 +1443,7 @@ wm_menu.cpp:
 	.bss        start:0x802FF408 end:0x802FF450
 	.sdata      start:0x8032E8A8 end:0x8032E920
 	.sbss       start:0x8032EE1C end:0x8032EE34
-	.sdata2     start:0x80331134 end:0x80331840
+	.sdata2     start:0x80331208 end:0x80331840
 
 gxfunc.cpp:
 	extab       start:0x80009024 end:0x8000907C

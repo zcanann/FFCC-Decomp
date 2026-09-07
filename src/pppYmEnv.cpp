@@ -32,38 +32,6 @@ extern const float kYmEnvNegativeTwoPi;
 extern const double kYmEnvCosEpsilon;
 extern const float kYmEnvTwoPi;
 extern const char s_Exiting_803311CC[8];
-extern const u32 sYmEnvXAxisIdsWord;
-extern const u16 sYmEnvXAxisIdsTail;
-extern const u32 sYmEnvYAxisAngle0;
-extern const u32 sYmEnvYAxisAngle180;
-
-struct YmEnvPackedXAxisIds {
-    u32 m_word;
-    u16 m_tail;
-};
-
-struct YmEnvPackedYAxisAngles {
-    u32 m_zero;
-    u32 m_oneEighty;
-};
-
-extern const float kYmEnvViewportWidth = 320.0f;
-extern const float kYmEnvViewportHeight = 224.0f;
-extern const float kYmEnvZero = 0.0f;
-extern const float kYmEnvOne = 1.0f;
-extern const double kYmEnvDoubleMagic = 4503599627370496.0;
-extern const char sYmEnvMapLabel[] = "MAP";
-extern const char sYmEnvMonsterLabel[] = "MON";
-extern const char sYmEnvScoreLabel[] = "SCO";
-extern const char sYmEnvTreeLabel[] = "TRE";
-extern const char sYmEnvSeparator[4] = "|\n";
-extern const double kYmEnvRadToDeg = 57.295780181884766;
-extern const float kYmEnvDefaultScale = 1.5f;
-extern const double kYmEnvSignedDoubleMagic = 4503601774854144.0;
-extern const float kYmEnvQuarter = 0.25f;
-extern const float kCharaFurDepthZero = 0.0f;
-extern const float kYmEnvTen = 10.0f;
-extern const char sMogFurTextureName[] = "n915m_2";
 
 /*
  * --INFO--
@@ -83,13 +51,8 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     const unsigned char s_yAxisRotIndices[] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1};
     static const unsigned char s_unusedRotIndices[] = {2, 0, 1, 3, 4, 2, 1, 0, 4, 3};
     const float s_xAxisAngles[] = {90.0f, 180.0f, 270.0f, 180.0f, -90.0f, 90.0f};
-    YmEnvPackedXAxisIds s_xAxisIds;
-    YmEnvPackedYAxisAngles s_yAxisAngles;
-
-    s_xAxisIds.m_word = sYmEnvXAxisIdsWord;
-    s_xAxisIds.m_tail = sYmEnvXAxisIdsTail;
-    s_yAxisAngles.m_zero = sYmEnvYAxisAngle0;
-    s_yAxisAngles.m_oneEighty = sYmEnvYAxisAngle180;
+    const char s_xAxisIds[] = {'y', 'y', 'y', 'y', 'x', 'x'};
+    const float s_yAxisAngles[] = {0.0f, 180.0f};
 
     const unsigned int texWidth = GXGetTexObjWidth(targetTexObj);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
@@ -215,13 +178,13 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
 
         PSMTXIdentity(objectMtx);
 
-        const float yAxisAngle = reinterpret_cast<const float*>(&s_yAxisAngles)[yRotIdx];
+        const float yAxisAngle = s_yAxisAngles[yRotIdx];
         if (yAxisAngle != kZero) {
             PSMTXRotRad(tempMtx, 'y', kYmEnvDegToRadF * yAxisAngle);
             PSMTXConcat(objectMtx, tempMtx, objectMtx);
         }
 
-        PSMTXRotRad(tempMtx, reinterpret_cast<const char*>(&s_xAxisIds)[xRotIdx], kDegToRad * s_xAxisAngles[xRotIdx]);
+        PSMTXRotRad(tempMtx, s_xAxisIds[xRotIdx], kDegToRad * s_xAxisAngles[xRotIdx]);
         PSMTXConcat(objectMtx, tempMtx, objectMtx);
         PSMTXConcat(lightFrustumMtx, objectMtx, objectMtx);
 
@@ -817,3 +780,19 @@ CChara::CModel* GetModelPtr(CGObject* gObject)
 
     return 0;
 }
+
+extern const float kYmEnvRenderZero = 0.0f;
+extern const float kYmEnvRenderOne = 1.0f;
+extern const float kYmEnvNegativeOne = -1.0f;
+extern const float kYmEnvOrthoFarZ = 100.0f;
+extern const float kYmEnvTwo = 2.0f;
+extern const float kYmEnvFrustumExtent = 1.0199999809265137f;
+extern const float kYmEnvFrustumNegExtent = -1.0199999809265137f;
+extern const float kYmEnvFrustumScale = 0.5f;
+extern const float kYmEnvDegToRadF = 0.01745329238474369f;
+extern const float kYmEnvPi = 3.1415927410125732f;
+extern const float kYmEnvParaboloidNormalScale = -2.0f;
+extern const float kYmEnvNegativeTwoPi = -6.2831854820251465f;
+extern const double kYmEnvCosEpsilon = 0.009999999776482582;
+extern const float kYmEnvTwoPi = 6.2831854820251465f;
+extern const char s_Exiting_803311CC[8] = "Exiting";

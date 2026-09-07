@@ -17,31 +17,6 @@ union ColumFloatBits {
     u32 bits;
 };
 
-STATIC_ASSERT(sizeof(pppColumValue) == 0x0C);
-STATIC_ASSERT(offsetof(pppColumFrameWork, m_values) == 0x08);
-STATIC_ASSERT(sizeof(pppColumFrameWork) == 0x0C);
-STATIC_ASSERT(offsetof(pppColumPositionWork, m_position) == 0x10);
-STATIC_ASSERT(offsetof(pppColumPositionWork, m_alpha) == 0x32);
-STATIC_ASSERT(sizeof(pppColumDataOffsets) == 0x10);
-STATIC_ASSERT(offsetof(pppColumDataOffsets, m_positionWorkOffset) == 0x08);
-STATIC_ASSERT(offsetof(pppColumDataOffsets, m_frameWorkOffset) == 0x0C);
-
-static const char s_pppColum_cpp[] = "pppColum.cpp";
-
-extern const float kPppCrystalModulationScale = 5.0f;
-extern const float kPppCrystalCoordOffset = 128.0f;
-extern const float kPppCrystalCoordScaleAndZero[] = {127.0f, 0.0f};
-extern const float kPppRainTexCoordBase = 0.0f;
-extern const float kPppRainTexCoordOne = 1.0f;
-extern const float kPppRainRandomUnitScale = 0.00003051851f;
-extern const double kPppColumS32ToDoubleBias = 4503601774854144.0;
-extern const float kPppBlurZero = 0.0f;
-extern const float kPppBlurProjScaleX = 0.003125f;
-extern const float kPppBlurProjScaleY = -0.004464f;
-extern const float kPppBlurOne = 1.0f;
-extern const float kPppBlurNegOne = -1.0f;
-extern const float kPppScreenAspect = 1.3333334f;
-
 extern const float kPppColumScreenCenterX;
 extern const float kPppColumScreenCenterY;
 extern const float kPppColumCameraZOffset;
@@ -52,6 +27,17 @@ extern const double kPppColumZeroD;
 extern const float kPppColumNormalizeEpsilon;
 extern const float kPppColumOne;
 extern const float kPppColumSegmentScale;
+
+STATIC_ASSERT(sizeof(pppColumValue) == 0x0C);
+STATIC_ASSERT(offsetof(pppColumFrameWork, m_values) == 0x08);
+STATIC_ASSERT(sizeof(pppColumFrameWork) == 0x0C);
+STATIC_ASSERT(offsetof(pppColumPositionWork, m_position) == 0x10);
+STATIC_ASSERT(offsetof(pppColumPositionWork, m_alpha) == 0x32);
+STATIC_ASSERT(sizeof(pppColumDataOffsets) == 0x10);
+STATIC_ASSERT(offsetof(pppColumDataOffsets, m_positionWorkOffset) == 0x08);
+STATIC_ASSERT(offsetof(pppColumDataOffsets, m_frameWorkOffset) == 0x0C);
+
+static const char s_pppColum_cpp[] = "pppColum.cpp";
 
 static inline pppColumDataOffsets* GetColumDataOffsets(_pppCtrlTable* ctrl)
 {
@@ -318,3 +304,14 @@ void pppConstructColum(pppColum *column, _pppCtrlTable *param_2)
     work->m_shapeA = 0;
     work->m_values = 0;
 }
+
+extern const float kPppColumScreenCenterX = 320.0f;
+extern const float kPppColumScreenCenterY = 224.0f;
+extern const float kPppColumCameraZOffset = -0.5f;
+extern const float kPppColumZero = 0.0f;
+extern const double kPppColumSqrtHalf = 0.5;
+extern const double kPppColumSqrtThree = 3.0;
+extern const double kPppColumZeroD = 0.0;
+extern const float kPppColumNormalizeEpsilon = 0.000001f;
+extern const float kPppColumOne = 1.0f;
+extern const float kPppColumSegmentScale = 2.0f;

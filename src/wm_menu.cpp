@@ -110,61 +110,6 @@ unsigned char s_wmMenuMountStateInitialized;
 extern char* DAT_8032EE34;
 extern unsigned char lbl_8032EE38[8];
 
-// wm_menu.o owns this .sdata2 constant pool (0x80331134-0x803311BC). These
-// named float/int constants are emitted into wm_menu's .sdata2 in address
-// order; defining them in-unit makes wm_menu.o's .sdata2 match the target.
-extern const float kCharaFurScreenCenterY = 224.0f;
-extern const float kCharaFurDepthScaleBase = 1.0f;
-extern const float kCharaFurScreenCenterX = 320.0f;
-extern const float kCharaFurTriangleVertexCount = 3.0f;
-extern const float kCharaFurPickRayFarZ = -100.0f;
-extern const float kCharaFurWeightScale = 0.5f;
-extern const float kCharaFurViewDepthThreshold = -1.0f;
-extern const float kCharaFurShadeScale = 255.0f;
-extern const float kCharaFurShadowRange = 100.0f;
-extern const float kCharaFurShadowFade = 20.0f;
-extern const float FLOAT_8033115C = 0.125f;
-extern const float FLOAT_80331160 = 4.0f;
-extern const float FLOAT_80331164 = 6.103701889514923e-05f;
-extern const float FLOAT_80331168 = 128.0f;
-extern const float FLOAT_8033116C = 8.0f;
-extern const int sYmEnvXAxisIdsWord = 0x79797979;
-extern const short sYmEnvXAxisIdsTail = 0x7878;
-extern const float sYmEnvYAxisAngle0 = 0.0f;
-extern const float sYmEnvYAxisAngle180 = 180.0f;
-extern const float kYmEnvRenderZero = 0.0f;
-extern const float kYmEnvRenderOne = 1.0f;
-extern const float kYmEnvNegativeOne = -1.0f;
-extern const float kYmEnvOrthoFarZ = 100.0f;
-extern const float kYmEnvTwo = 2.0f;
-extern const float kYmEnvFrustumExtent = 1.0199999809265137f;
-extern const float kYmEnvFrustumNegExtent = -1.0199999809265137f;
-extern const float kYmEnvFrustumScale = 0.5f;
-extern const float kYmEnvDegToRadF = 0.01745329238474369f;
-extern const float kYmEnvPi = 3.1415927410125732f;
-extern const float kYmEnvParaboloidNormalScale = -2.0f;
-extern const float kYmEnvNegativeTwoPi = -6.2831854820251465f;
-
-// wm_menu.o also owns the .sdata2 literal pool 0x803311C0-0x80331848, claimed
-// from the previously-unowned gap after the pool above (see splits.txt).
-// Values are extracted verbatim from the DOL; definition order == target
-// address order. The anonymous literals (@364/@365/@366 int-conversion magic
-// doubles) are emitted by the compiler on demand and intentionally skipped.
-// Note: scalars referenced by code in THIS file get constant-folded by mwcc
-// into equal-valued anonymous literals (objdiff matches those relocations by
-// value), while string symbols keep their named relocations. Symbols here
-// that wm_menu itself never touches belong to code in pppYmEnv, pppEmission,
-// pppYmTracer2 and friends, which lived in the same original translation unit.
-extern const double kYmEnvCosEpsilon = 0.009999999776482582;
-extern const float kYmEnvTwoPi = 6.2831854820251465f;
-extern const char s_Exiting_803311CC[8] = "Exiting";
-// 0x803311D8: anonymous literal @366 emitted by compiler
-extern const float kPppEmissionAlphaDivisor = 255.0f;
-extern const float kPppEmissionUnitScale = 1.0f;
-// 0x803311E8: anonymous literal @364 emitted by compiler
-// 0x803311F0: anonymous literal @365 emitted by compiler
-extern const float kPppEmissionZeroScale = 0.0f;
-extern const char s_pppEmissionShapeObj2[5] = "obj2";
 extern const char lbl_80331208[5] = "1.00";
 extern const char lbl_80331210[6] = "world";
 extern const char lbl_80331218[7] = "world2";
@@ -12963,7 +12908,6 @@ void McCtrl::Init()
 	m_serialHi = 0;
 }
 
-
 /*
  * --INFO--
  * PAL Address: 0x800e9348
@@ -13963,7 +13907,6 @@ int McCtrl::ChkConnect(int chan)
 
 	return result;
 }
-
 
 /*
  * --INFO--

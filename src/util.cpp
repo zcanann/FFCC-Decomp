@@ -4,296 +4,937 @@
 #include "ffcc/textureman.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
-struct UtilHermiteBasis {
-	float m_value[4];
-};
-
-extern const UtilHermiteBasis kUtilHermiteBasis;
-extern Vec gUtilUpVector;
-
-extern const float kUtilZero = 0.0f;
-extern const float kUtilOne = 1.0f;
-
-static inline MtxPtr GetCameraMatrix()
-{
-    return CameraPcs.m_cameraMatrix;
-}
-
-static inline Mtx44Ptr GetScreenMatrix()
-{
-    return CameraPcs.m_screenMatrix;
-}
-
 CUtil gUtil;
 
-/*
- * --INFO--
- * PAL Address: 0x80022724
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::InitConstantRegister()
+static inline void SendTexQuadVerts(Vec v1, Vec v0, GXColor quadColor, Vec2d* uv1, Vec2d* uv2)
 {
-    int i = 0;
+    float v2;
+    float u2;
+    float v;
+    float u1;
 
-    do {
-        GXSetTevKColorSel((GXTevStageID)i, (GXTevKColorSel)6);
-        GXSetTevKAlphaSel((GXTevStageID)i, (GXTevKAlphaSel)0);
-        _GXSetTevSwapMode((GXTevStageID)i, (_GXTevSwapSel)0, (_GXTevSwapSel)0);
-        i++;
-    } while (i < 0x10);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80022780
- * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::GetDirectVector(Vec* param_2, Vec* param_3, Vec param_4)
-{
-    Vec local_vec = gUtilUpVector;
-
-    PSVECCrossProduct(&param_4, &local_vec, param_2);
-    PSVECNormalize(param_2, param_2);
-    PSVECCrossProduct(param_2, &param_4, param_3);
-    PSVECNormalize(param_3, param_3);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80022818
- * PAL Size: 324b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
-{
-    u8* data = static_cast<u8*>(dlData);
-    int running = true;
-    int polygonCount = 0;
-
-    while (running) {
-        u32 opcode = *data;
-        u16 vertexCount = *(u16*)(data + 1);
-        int count = vertexCount;
-        u32 vertexFormat = opcode & 7;
-        u32 primitive = opcode & 0xF8;
-        int isPrimitive;
-
-        data += 3;
-
-        switch (primitive) {
-        case 0x80:
-        case 0x90:
-        case 0x98:
-        case 0xA0:
-        case 0xA8:
-        case 0xB0:
-        case 0xB8:
-            isPrimitive = true;
-            break;
-
-        default:
-            isPrimitive = false;
-            break;
-        }
-
-        if (!isPrimitive) {
-            running = false;
-            continue;
-        }
-
-        if (primitive == 0x90) {
-            polygonCount += count / 3;
-        } else if (primitive == 0x98) {
-            polygonCount += count - 2;
-        }
-
-        if (vertexFormat == 2) {
-            int remaining = count;
-            while (remaining > 0) {
-                data += 10;
-                remaining--;
-            }
-        } else {
-            int remaining = count;
-            while (remaining > 0) {
-                data += 8;
-                remaining--;
-            }
-        }
+    if (uv1 == 0 || uv2 == 0) {
+        u1 = 0.0f;
+        v = 0.0f;
+        u2 = 1.0f;
+        v2 = 1.0f;
+    } else {
+        u1 = uv1->x;
+        v = uv1->y;
+        u2 = uv2->x;
+        v2 = uv2->y;
     }
 
-    return polygonCount;
+    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v;
+
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = v;
+
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = v2;
+
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v2;
 }
 
-/*
- * --INFO--
- * PAL Address: 0x8002295c
- * PAL Size: 548b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, unsigned long count, unsigned long shift)
+static inline void RenderColorQuadVtx(Vec v1, Vec v0, GXColor quadColor)
 {
-    S16Vec min;
-    S16Vec max;
-
-    min.z = 0x7FFF;
-    min.y = 0x7FFF;
-    min.x = 0x7FFF;
-    max.z = -0x7FFF;
-    max.y = -0x7FFF;
-    max.x = -0x7FFF;
-
-    for (unsigned long i = 0; i < count; i++, vecs++) {
-        min.x = min.x < vecs->x ? min.x : vecs->x;
-        min.y = min.y < vecs->y ? min.y : vecs->y;
-        min.z = min.z < vecs->z ? min.z : vecs->z;
-        max.x = max.x < vecs->x ? vecs->x : max.x;
-        max.y = max.y < vecs->y ? vecs->y : max.y;
-        max.z = max.z < vecs->z ? vecs->z : max.z;
-    }
-
-    S16Vec finalMin = min;
-    int scale = 1 << shift;
-
-    minOut->x = (float)finalMin.x / (float)scale;
-    minOut->y = (float)finalMin.y / (float)scale;
-    minOut->z = (float)finalMin.z / (float)scale;
-    S16Vec finalMax = max;
-    maxOut->x = (float)finalMax.x / (float)scale;
-    maxOut->y = (float)finalMax.y / (float)scale;
-    maxOut->z = (float)finalMax.z / (float)scale;
+    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80022b80
- * PAL Size: 292b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long copyFlags)
-{
-	u8* data = (u8*)dlData;
-	u8* end = data + dlSize;
-	u8* current = data;
-
-	while (current < end) {
-		u8 cmd = *current;
-		int count = *(u16*)(current + 1);
-		u8 primitive = cmd & 0xF8;
-		u8 indexFormat = cmd & 7;
-		int isPrimitive;
-		current += 3;
-
-		switch (primitive) {
-			case 0x80:
-			case 0x90:
-			case 0x98:
-			case 0xA0:
-			case 0xA8:
-			case 0xB0:
-			case 0xB8:
-				isPrimitive = true;
-				break;
-			default:
-				isPrimitive = false;
-				break;
-		}
-
-		if (!isPrimitive) {
-			break;
-		}
-
-		for (int i = 0; i < count; i++) {
-			u16 value = *(u16*)current;
-
-			if ((copyFlags & 1) != 0) {
-				*(u16*)(current + 4) = value;
-				current += 6;
-			} else {
-				current += 6;
-			}
-			if ((copyFlags & 2) != 0) {
-				*(u16*)current = value;
-				current += 2;
-			} else {
-				current += 2;
-			}
-			if (indexFormat == 2) {
-				if ((copyFlags & 2) != 0) {
-					*(u16*)current = value;
-					current += 2;
-				} else {
-					current += 2;
-				}
-			}
-		}
-	}
-	DCFlushRange(dlData, dlSize);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80022ca4
+ * PAL Address: 0x80024de0
  * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8002D400
+ * EN Size: 104b
  * JP Address: TODO
  * JP Size: TODO
  */
-int CUtil::IsHasDrawFmtDL(unsigned char cmd)
+void CUtil::SetVtxFmt_POS_CLR()
 {
-    switch (cmd & 0xF8) {
-    case 0x80:
-    case 0x90:
-    case 0x98:
-    case 0xA0:
-    case 0xA8:
-    case 0xB0:
-    case 0xB8:
-        return 1;
-    default:
-        return 0;
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80024d54
+ * PAL Size: 140b
+ * EN Address: 0x8002D468
+ * EN Size: 140b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::SetVtxFmt_POS_CLR_TEX()
+{
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80024cc8
+ * PAL Size: 140b
+ * EN Address: 0x8002D4F4
+ * EN Size: 140b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::SetVtxFmt_POS_TEX0_TEX1()
+{
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX1, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX1, GX_TEX_ST, GX_F32, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80024c18
+ * PAL Size: 176b
+ * EN Address: 0x8002D580
+ * EN Size: 176b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::SetVtxFmt_POS_CLR_TEX0_TEX1()
+{
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX1, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX1, GX_TEX_ST, GX_F32, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80024bb4
+ * PAL Size: 100b
+ * EN Address: 0x8002D630
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::SetOrthoEnv()
+{
+    Mtx modelMtx;
+    Mtx44 orthoMtx;
+
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, 0);
+    GXSetCurrentMtx(0);
+    C_MTXOrtho(orthoMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f,
+               1.0f);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80024b38
+ * PAL Size: 124b
+ * EN Address: 0x8002D694
+ * EN Size: 144b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CUtil::GetNoise(unsigned char noise)
+{
+    float maxNoise = (float)(noise * 2);
+    float minNoise = (float)(noise >> 1);
+    return (int)(maxNoise * Math.RandF() - minNoise);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800249ac
+ * PAL Size: 396b
+ * EN Address: 0x8002D724
+ * EN Size: 552b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, float scale)
+{
+	Vec tan0;
+	Vec tan1;
+
+	PSVECSubtract(&p2, &p0, &tan0);
+	PSVECScale(&tan0, &tan0, scale);
+	PSVECSubtract(&p3, &p1, &tan1);
+	PSVECScale(&tan1, &tan1, scale);
+
+	float hermite[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+	float pos;
+	float t2;
+	float t3;
+
+	t2 = t * t;
+	t3 = t2 * t;
+
+	float coeff3 = 3.0f;
+	float coeff2 = 2.0f;
+	float coeffNeg2 = -2.0f;
+	float k3t2 = coeff3 * t2;
+	hermite[1] = k3t2 + (coeffNeg2 * t3);
+	hermite[0] = 1.0f + ((coeff2 * t3) - k3t2);
+	hermite[2] = t + (t3 - (coeff2 * t2));
+	hermite[3] = t3 - t2;
+
+	pos = hermite[1] * p2.x;
+	pos += hermite[0] * p1.x;
+	pos += hermite[2] * tan0.x;
+	pos += hermite[3] * tan1.x;
+	out.x = pos;
+
+	pos = hermite[1] * p2.y;
+	pos += hermite[0] * p1.y;
+	pos += hermite[2] * tan0.y;
+	pos += hermite[3] * tan1.y;
+	out.y = pos;
+
+	pos = hermite[1] * p2.z;
+	pos += hermite[0] * p1.z;
+	pos += hermite[2] * tan0.z;
+	pos += hermite[3] * tan1.z;
+	out.z = pos;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800248fc
+ * PAL Size: 176b
+ * EN Address: 0x8002D94C
+ * EN Size: 240b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::ConvI2FVector(Vec& out, S16Vec in, long shift)
+{
+    int x = in.x;
+    int y = in.y;
+    int z = in.z;
+
+    out.x = (float)x / (float)(1 << shift);
+    out.y = (float)y / (float)(1 << shift);
+    out.z = (float)z / (float)(1 << shift);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80024864
+ * PAL Size: 152b
+ * EN Address: 0x8002DA3C
+ * EN Size: 204b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::ConvF2IVector(S16Vec& out, Vec in, long shift)
+{
+    int scaleInt = 1 << shift;
+    float y = in.y;
+    float z = in.z;
+
+    out.x = (short)(int)(in.x * (float)scaleInt);
+    out.y = (short)(int)(y * (float)scaleInt);
+    out.z = (short)(int)(z * (float)scaleInt);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800247f4
+ * PAL Size: 112b
+ * EN Address: 0x8002DB08
+ * EN Size: 140b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::ConvF2IVector2d(S16Vec2d& out, Vec2d in, long shift)
+{
+    int scaleInt = 1 << shift;
+    float y = in.y;
+
+    out.x = (short)(int)(in.x * (float)scaleInt);
+    out.y = (short)(int)(y * (float)scaleInt);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80024748
+ * PAL Size: 172b
+ * EN Address: 0x8002DB94
+ * EN Size: 180b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
+{
+    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    f32 x2;
+    f32 x1 = pos1.x;
+    f32 y1 = pos1.y;
+
+    GXWGFifo.f32 = x1;
+    f32 z1 = pos1.z;
+    GXWGFifo.f32 = y1;
+    u32 rgba = *reinterpret_cast<u32*>(&color);
+    GXWGFifo.f32 = z1;
+    x2 = pos2.x;
+    GXWGFifo.u32 = rgba;
+    f32 y2 = pos2.y;
+
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y1;
+    GXWGFifo.f32 = z1;
+    GXWGFifo.u32 = rgba;
+
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
+    GXWGFifo.u32 = rgba;
+
+    GXWGFifo.f32 = x1;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
+    GXWGFifo.u32 = rgba;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80024608
+ * PAL Size: 320b
+ * EN Address: 0x8002DC94
+ * EN Size: 312b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
+{
+    u32* colorPtr = reinterpret_cast<u32*>(&color);
+    float u0;
+    float v0;
+    float u1;
+    float v1;
+
+    if (uv1 == NULL || uv2 == NULL) {
+        u0 = 0.0f;
+        u1 = 1.0f;
+        v0 = u0;
+        v1 = u1;
+    } else {
+        u0 = uv1->x;
+        v0 = uv1->y;
+        u1 = uv2->x;
+        v1 = uv2->y;
+    }
+
+    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    f32 x2;
+    f32 x1 = pos1.x;
+    f32 y1 = pos1.y;
+    GXWGFifo.f32 = x1;
+    f32 z1 = pos1.z;
+    GXWGFifo.f32 = y1;
+    u32 rgba = *colorPtr;
+    GXWGFifo.f32 = z1;
+    x2 = pos2.x;
+    GXWGFifo.u32 = rgba;
+    f32 y2 = pos2.y;
+    GXWGFifo.f32 = u0;
+    GXWGFifo.f32 = v0;
+
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y1;
+    GXWGFifo.f32 = z1;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v0;
+
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v1;
+
+    GXWGFifo.f32 = x1;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u0;
+    GXWGFifo.f32 = v1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800244a8
+ * PAL Size: 352b
+ * EN Address: 0x8002DDCC
+ * EN Size: 360b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
+{
+    u32* colorPtr = reinterpret_cast<u32*>(&color);
+    float u1;
+    float v1;
+    float u2;
+    float v2;
+
+    if (uv1 == NULL || uv2 == NULL) {
+        u1 = 0.0f;
+        v1 = u1;
+        u2 = 1.0f;
+        v2 = u2;
+    } else {
+        u1 = uv1->x;
+        v1 = uv1->y;
+        u2 = uv2->x;
+        v2 = uv2->y;
+    }
+
+    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    f32 x2;
+    f32 x1 = pos1.x;
+    f32 y1 = pos1.y;
+    GXWGFifo.f32 = x1;
+    f32 z1 = pos1.z;
+    GXWGFifo.f32 = y1;
+    u32 rgba = *colorPtr;
+    GXWGFifo.f32 = z1;
+    x2 = pos2.x;
+    GXWGFifo.u32 = rgba;
+    f32 y2 = pos2.y;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v1;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v1;
+
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y1;
+    GXWGFifo.f32 = z1;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = v1;
+    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = v1;
+
+    GXWGFifo.f32 = x2;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = v2;
+    GXWGFifo.f32 = u2;
+    GXWGFifo.f32 = v2;
+
+    GXWGFifo.f32 = x1;
+    GXWGFifo.f32 = y2;
+    GXWGFifo.f32 = z1;
+    GXWGFifo.u32 = rgba;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v2;
+    GXWGFifo.f32 = u1;
+    GXWGFifo.f32 = v2;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80024444
+ * PAL Size: 100b
+ * EN Address: 0x8002DF34
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::DisableIndMtx()
+{
+    float indMtx[2][3];
+
+    GXSetNumIndStages(0);
+    memset(indMtx, 0, sizeof(indMtx));
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800242e8
+ * PAL Size: 348b
+ * EN Address: 0x8002DF98
+ * EN Size: 224b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::BeginQuadEnv()
+{
+    Mtx44 orthoMtx;
+    Mtx modelMtx;
+    float indMtx[2][3];
+
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(orthoMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f,
+               1.0f);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    GXSetNumTevStages(1);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE,
+                  GX_AF_NONE);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetNumIndStages(0);
+    memset(indMtx, 0, sizeof(indMtx));
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002428c
+ * PAL Size: 92b
+ * EN Address: 0x8002E0C0
+ * EN Size: 84b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::EndQuadEnv()
+{
+    Mtx cameraMtx;
+    Mtx44 screenMtx;
+
+    CameraPcs.GetViewMatrix(cameraMtx);
+    CameraPcs.GetProjectionMatrix(screenMtx);
+    GXLoadPosMtxImm(cameraMtx, 0);
+    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80023ed0
+ * PAL Size: 956b
+ * EN Address: 0x8002E114
+ * EN Size: 536b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::ClearZBufferRect(float x, float y, float width, float height)
+{
+    Mtx44 screenMtx;
+    Mtx cameraMtx;
+    Mtx44 orthoMtx;
+    Mtx modelMtx;
+    GXColor white;
+    float indMtx[2][3];
+
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(orthoMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    GXSetNumTevStages(1);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetNumIndStages(0);
+    memset(indMtx, 0, sizeof(indMtx));
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+    GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GXSetNumTexGens(0);
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
+    GXSetChanAmbColor(GX_COLOR0A0, white);
+    GXSetChanMatColor(GX_COLOR0A0, white);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+
+    float x2 = x + width;
+    float y2 = y + height;
+    Vec pos0;
+    Vec pos1;
+    pos0.x = x;
+    pos0.y = y;
+    pos0.z = -0.9999999f;
+    pos1.x = x2;
+    pos1.y = y2;
+    pos1.z = -0.9999999f;
+
+    GXSetColorUpdate(GX_FALSE);
+    GXSetAlphaUpdate(GX_FALSE);
+
+    RenderColorQuadVtx(pos0, pos1, white);
+
+    CameraPcs.GetViewMatrix(cameraMtx);
+    CameraPcs.GetProjectionMatrix(screenMtx);
+    GXLoadPosMtxImm(cameraMtx, 0);
+    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+    GXSetColorUpdate(GX_TRUE);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80023b4c
+ * PAL Size: 900b
+ * EN Address: 0x8002E32C
+ * EN Size: 444b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColor color)
+{
+    Mtx44 screenMtx;
+    Mtx cameraMtx;
+    Mtx44 orthoMtx;
+    float indMtx[2][3];
+    GXColor white;
+    Mtx modelMtx;
+
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(orthoMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    GXSetNumTevStages(1);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetNumIndStages(0);
+    memset(indMtx, 0, sizeof(indMtx));
+
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GXSetNumTexGens(0);
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
+    GXSetChanAmbColor(GX_COLOR0A0, white);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetNumChans(1);
+
+    float x2 = x + width;
+    float y2 = y + height;
+    Vec pos0;
+    Vec pos1;
+    pos0.x = x;
+    pos0.y = y;
+    pos0.z = 0.0f;
+    pos1.x = x2;
+    pos1.y = y2;
+    pos1.z = 0.0f;
+    RenderColorQuadVtx(pos0, pos1, color);
+
+    CameraPcs.GetViewMatrix(cameraMtx);
+    CameraPcs.GetProjectionMatrix(screenMtx);
+    GXLoadPosMtxImm(cameraMtx, 0);
+    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800235c0
+ * PAL Size: 1420b
+ * EN Address: 0x8002E4E8
+ * EN Size: 748b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTexObj* texObj, Vec2d* uv1, Vec2d* uv2,
+                              _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
+{
+    Mtx44 screenMtx;
+    Mtx cameraMtx;
+    Mtx44 orthoMtx;
+    Mtx modelMtx;
+    float indMtx[2][3];
+    GXColor white;
+    float x2;
+    float y2;
+
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(orthoMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    GXSetNumTevStages(1);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetNumIndStages(0);
+    memset(indMtx, 0, sizeof(indMtx));
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXLoadTexObj(texObj, GX_TEXMAP0);
+
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
+    GXSetChanAmbColor(GX_COLOR0A0, white);
+    GXSetChanMatColor(GX_COLOR0A0, white);
+    _GXSetBlendMode(GX_BM_BLEND, srcBlend, dstBlend, GX_LO_NOOP);
+
+    if (GXGetTexObjFmt(texObj) == GX_TF_I8) {
+        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
+    }
+
+    x2 = x + width;
+    y2 = y + height;
+    Vec pos0;
+    Vec pos1;
+    pos0.x = x;
+    pos0.y = y;
+    pos0.z = 0.0f;
+    pos1.x = x2;
+    pos1.y = y2;
+    pos1.z = 0.0f;
+
+    if (color != 0) {
+        SendTexQuadVerts(pos0, pos1, *color, uv1, uv2);
+    } else {
+        SendTexQuadVerts(pos0, pos1, white, uv1, uv2);
+    }
+
+    CameraPcs.GetViewMatrix(cameraMtx);
+    CameraPcs.GetProjectionMatrix(screenMtx);
+    GXLoadPosMtxImm(cameraMtx, 0);
+    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+
+    if (GXGetTexObjFmt(texObj) == GX_TF_I8) {
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80022d0c
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x80023014
+ * PAL Size: 1452b
+ * EN Address: 0x8002E7D4
+ * EN Size: 788b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CUtil::CalcUV(float& u, float& v, unsigned long x, unsigned long y, unsigned long width, unsigned long height)
+void CUtil::RenderTextureQuad(float x, float y, float width, float height, CTexture* texture, Vec2d* uv1, Vec2d* uv2,
+                              _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
 {
-    u = (float)x / (float)width;
-    v = (float)y / (float)height;
+    Mtx44 screenMtx;
+    Mtx cameraMtx;
+    Mtx44 orthoMtx;
+    Mtx modelMtx;
+    float indMtx[2][3];
+    GXColor white;
+    float x2;
+    float y2;
+
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(orthoMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    GXSetNumTevStages(1);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetNumIndStages(0);
+    memset(indMtx, 0, sizeof(indMtx));
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
+
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
+    GXSetChanAmbColor(GX_COLOR0A0, white);
+    GXSetChanMatColor(GX_COLOR0A0, white);
+    _GXSetBlendMode(GX_BM_BLEND, srcBlend, dstBlend, GX_LO_NOOP);
+
+    int textureFormat = texture->m_format;
+    if (textureFormat == 1) {
+        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
+    } else if (textureFormat == 9 || textureFormat == 8) {
+        SetPaletteEnv(texture);
+    }
+
+    x2 = x + width;
+    y2 = y + height;
+    Vec pos0;
+    Vec pos1;
+    pos0.x = x;
+    pos0.y = y;
+    pos0.z = 0.0f;
+    pos1.x = x2;
+    pos1.y = y2;
+    pos1.z = 0.0f;
+
+    if (color != 0) {
+        SendTexQuadVerts(pos0, pos1, *color, uv1, uv2);
+    } else {
+        SendTexQuadVerts(pos0, pos1, white, uv1, uv2);
+    }
+
+    CameraPcs.GetViewMatrix(cameraMtx);
+    CameraPcs.GetProjectionMatrix(screenMtx);
+    GXLoadPosMtxImm(cameraMtx, 0);
+    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+
+    if (GXGetTexObjFmt(&texture->m_texObj) == GX_TF_I8) {
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    }
 }
 
 /*
  * --INFO--
  * PAL Address: 0x80022d70
  * PAL Size: 676b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8002EAE8
+ * EN Size: 788b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -371,976 +1012,266 @@ void CUtil::SetPaletteEnv(CTexture* texture)
     GXLoadTlut(&texture->m_tlutObj1, GX_TLUT1);
 }
 
-#pragma always_inline on
-#pragma inline_max_size(10000)
-static inline void SendTexQuadVerts(Vec v1, Vec v0, GXColor quadColor, Vec2d* uv1, Vec2d* uv2)
-{
-    float v2;
-    float u2;
-    float v;
-    float u1;
-
-    if (uv1 == 0 || uv2 == 0) {
-        u1 = 0.0f;
-        v = 0.0f;
-        u2 = 1.0f;
-        v2 = 1.0f;
-    } else {
-        u1 = uv1->x;
-        v = uv1->y;
-        u2 = uv2->x;
-        v2 = uv2->y;
-    }
-
-    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    GXWGFifo.f32 = v1.x;
-    GXWGFifo.f32 = v1.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v;
-
-    GXWGFifo.f32 = v0.x;
-    GXWGFifo.f32 = v1.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v;
-
-    GXWGFifo.f32 = v0.x;
-    GXWGFifo.f32 = v0.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v2;
-
-    GXWGFifo.f32 = v1.x;
-    GXWGFifo.f32 = v0.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v2;
-}
-#pragma always_inline off
-
 /*
  * --INFO--
- * PAL Address: 0x80023014
- * PAL Size: 1452b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::RenderTextureQuad(float x, float y, float width, float height, CTexture* texture, Vec2d* uv1, Vec2d* uv2,
-                              _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
-{
-    extern const float kUtilZero;
-    extern const float kUtilOne;
-    extern const float kUtilOrthoBottom;
-    extern const float kUtilOrthoRight;
-
-    Mtx44 screenMtx;
-    Mtx cameraMtx;
-    Mtx44 orthoMtx;
-    Mtx modelMtx;
-    float indMtx[2][3];
-    GXColor white;
-    float x2;
-    float y2;
-
-    PSMTXIdentity(modelMtx);
-    GXLoadPosMtxImm(modelMtx, 0);
-    GXSetCurrentMtx(0);
-
-    C_MTXOrtho(orthoMtx, kUtilZero, kUtilOrthoBottom, kUtilZero, kUtilOrthoRight, kUtilZero, kUtilOne);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    GXSetNumTevStages(1);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetNumIndStages(0);
-    memset(indMtx, 0, sizeof(indMtx));
-    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
-
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
-    GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
-
-    white.r = 0xFF;
-    white.g = 0xFF;
-    white.b = 0xFF;
-    white.a = 0xFF;
-    GXSetChanAmbColor(GX_COLOR0A0, white);
-    GXSetChanMatColor(GX_COLOR0A0, white);
-    _GXSetBlendMode(GX_BM_BLEND, srcBlend, dstBlend, GX_LO_NOOP);
-
-    int textureFormat = texture->m_format;
-    if (textureFormat == 1) {
-        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
-        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
-    } else if (textureFormat == 9 || textureFormat == 8) {
-        SetPaletteEnv(texture);
-    }
-
-    x2 = x + width;
-    y2 = y + height;
-    Vec pos0;
-    Vec pos1;
-    pos0.x = x;
-    pos0.y = y;
-    pos0.z = kUtilZero;
-    pos1.x = x2;
-    pos1.y = y2;
-    pos1.z = kUtilZero;
-
-    if (color != 0) {
-        SendTexQuadVerts(pos0, pos1, *color, uv1, uv2);
-    } else {
-        SendTexQuadVerts(pos0, pos1, white, uv1, uv2);
-    }
-
-    PSMTXCopy(GetCameraMatrix(), cameraMtx);
-    PSMTX44Copy(GetScreenMatrix(), screenMtx);
-    GXLoadPosMtxImm(cameraMtx, 0);
-    GXSetProjection(screenMtx, GX_PERSPECTIVE);
-
-    if (GXGetTexObjFmt(&texture->m_texObj) == GX_TF_I8) {
-        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800235c0
- * PAL Size: 1420b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTexObj* texObj, Vec2d* uv1, Vec2d* uv2,
-                              _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
-{
-    extern const float kUtilZero;
-    extern const float kUtilOne;
-    extern const float kUtilOrthoBottom;
-    extern const float kUtilOrthoRight;
-
-    Mtx44 screenMtx;
-    Mtx cameraMtx;
-    Mtx44 orthoMtx;
-    Mtx modelMtx;
-    float indMtx[2][3];
-    GXColor white;
-    float x2;
-    float y2;
-
-    PSMTXIdentity(modelMtx);
-    GXLoadPosMtxImm(modelMtx, 0);
-    GXSetCurrentMtx(0);
-
-    C_MTXOrtho(orthoMtx, kUtilZero, kUtilOrthoBottom, kUtilZero, kUtilOrthoRight, kUtilZero, kUtilOne);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    GXSetNumTevStages(1);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetNumIndStages(0);
-    memset(indMtx, 0, sizeof(indMtx));
-    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
-
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
-    GXLoadTexObj(texObj, GX_TEXMAP0);
-
-    white.r = 0xFF;
-    white.g = 0xFF;
-    white.b = 0xFF;
-    white.a = 0xFF;
-    GXSetChanAmbColor(GX_COLOR0A0, white);
-    GXSetChanMatColor(GX_COLOR0A0, white);
-    _GXSetBlendMode(GX_BM_BLEND, srcBlend, dstBlend, GX_LO_NOOP);
-
-    if (GXGetTexObjFmt(texObj) == GX_TF_I8) {
-        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
-        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
-    }
-
-    x2 = x + width;
-    y2 = y + height;
-    Vec pos0;
-    Vec pos1;
-    pos0.x = x;
-    pos0.y = y;
-    pos0.z = kUtilZero;
-    pos1.x = x2;
-    pos1.y = y2;
-    pos1.z = kUtilZero;
-
-    if (color != 0) {
-        SendTexQuadVerts(pos0, pos1, *color, uv1, uv2);
-    } else {
-        SendTexQuadVerts(pos0, pos1, white, uv1, uv2);
-    }
-
-    PSMTXCopy(GetCameraMatrix(), cameraMtx);
-    PSMTX44Copy(GetScreenMatrix(), screenMtx);
-    GXLoadPosMtxImm(cameraMtx, 0);
-    GXSetProjection(screenMtx, GX_PERSPECTIVE);
-
-    if (GXGetTexObjFmt(texObj) == GX_TF_I8) {
-        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    }
-}
-
-#pragma always_inline on
-#pragma inline_max_size(10000)
-static inline void RenderColorQuadVtx(Vec v1, Vec v0, GXColor quadColor)
-{
-    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    GXWGFifo.f32 = v1.x;
-    GXWGFifo.f32 = v1.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = v0.x;
-    GXWGFifo.f32 = v1.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = v0.x;
-    GXWGFifo.f32 = v0.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-    GXWGFifo.f32 = v1.x;
-    GXWGFifo.f32 = v0.y;
-    GXWGFifo.f32 = v1.z;
-    GXWGFifo.u32 = *reinterpret_cast<u32*>(&quadColor);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80023b4c
- * PAL Size: 900b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColor color)
-{
-    extern const float kUtilZero;
-    extern const float kUtilOne;
-    extern const float kUtilOrthoBottom;
-    extern const float kUtilOrthoRight;
-
-    Mtx44 screenMtx;
-    Mtx cameraMtx;
-    Mtx44 orthoMtx;
-    float indMtx[2][3];
-    GXColor white;
-    Mtx modelMtx;
-
-    PSMTXIdentity(modelMtx);
-    GXLoadPosMtxImm(modelMtx, 0);
-    GXSetCurrentMtx(0);
-
-    C_MTXOrtho(orthoMtx, kUtilZero, kUtilOrthoBottom, kUtilZero, kUtilOrthoRight, kUtilZero, kUtilOne);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    GXSetNumTevStages(1);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetNumIndStages(0);
-    memset(indMtx, 0, sizeof(indMtx));
-
-    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
-
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-    GXSetNumTexGens(0);
-    white.r = 0xFF;
-    white.g = 0xFF;
-    white.b = 0xFF;
-    white.a = 0xFF;
-    GXSetChanAmbColor(GX_COLOR0A0, white);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetNumChans(1);
-
-    float x2 = x + width;
-    float y2 = y + height;
-    Vec pos0;
-    Vec pos1;
-    pos0.x = x;
-    pos0.y = y;
-    pos0.z = kUtilZero;
-    pos1.x = x2;
-    pos1.y = y2;
-    pos1.z = kUtilZero;
-    RenderColorQuadVtx(pos0, pos1, color);
-
-    PSMTXCopy(GetCameraMatrix(), cameraMtx);
-    PSMTX44Copy(GetScreenMatrix(), screenMtx);
-    GXLoadPosMtxImm(cameraMtx, 0);
-    GXSetProjection(screenMtx, GX_PERSPECTIVE);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80023ed0
- * PAL Size: 956b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::ClearZBufferRect(float x, float y, float width, float height)
-{
-    extern const float kUtilZero;
-    extern const float kUtilOne;
-    extern const float kUtilOrthoBottom;
-    extern const float kUtilOrthoRight;
-    extern const float kUtilQuadDepth;
-
-    Mtx44 screenMtx;
-    Mtx cameraMtx;
-    Mtx44 orthoMtx;
-    Mtx modelMtx;
-    GXColor white;
-    float indMtx[2][3];
-
-    PSMTXIdentity(modelMtx);
-    GXLoadPosMtxImm(modelMtx, 0);
-    GXSetCurrentMtx(0);
-
-    C_MTXOrtho(orthoMtx, kUtilZero, kUtilOrthoBottom, kUtilZero, kUtilOrthoRight, kUtilZero, kUtilOne);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    GXSetNumTevStages(1);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetNumIndStages(0);
-    memset(indMtx, 0, sizeof(indMtx));
-    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
-    GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
-
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-    GXSetNumTexGens(0);
-    white.r = 0xFF;
-    white.g = 0xFF;
-    white.b = 0xFF;
-    white.a = 0xFF;
-    GXSetChanAmbColor(GX_COLOR0A0, white);
-    GXSetChanMatColor(GX_COLOR0A0, white);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-
-    float x2 = x + width;
-    float y2 = y + height;
-    Vec pos0;
-    Vec pos1;
-    pos0.x = x;
-    pos0.y = y;
-    pos0.z = kUtilQuadDepth;
-    pos1.x = x2;
-    pos1.y = y2;
-    pos1.z = kUtilQuadDepth;
-
-    GXSetColorUpdate(GX_FALSE);
-    GXSetAlphaUpdate(GX_FALSE);
-
-    RenderColorQuadVtx(pos0, pos1, white);
-
-    PSMTXCopy(GetCameraMatrix(), cameraMtx);
-    PSMTX44Copy(GetScreenMatrix(), screenMtx);
-    GXLoadPosMtxImm(cameraMtx, 0);
-    GXSetProjection(screenMtx, GX_PERSPECTIVE);
-    GXSetColorUpdate(GX_TRUE);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002428c
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::EndQuadEnv()
-{
-    Mtx cameraMtx;
-    Mtx44 screenMtx;
-
-    PSMTXCopy(GetCameraMatrix(), cameraMtx);
-    PSMTX44Copy(GetScreenMatrix(), screenMtx);
-    GXLoadPosMtxImm(cameraMtx, 0);
-    GXSetProjection(screenMtx, GX_PERSPECTIVE);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800242e8
- * PAL Size: 348b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::BeginQuadEnv()
-{
-    extern const float kUtilZero;
-    extern const float kUtilOne;
-    extern const float kUtilOrthoBottom;
-    extern const float kUtilOrthoRight;
-
-    Mtx44 orthoMtx;
-    Mtx modelMtx;
-    float indMtx[2][3];
-
-    PSMTXIdentity(modelMtx);
-    GXLoadPosMtxImm(modelMtx, 0);
-    GXSetCurrentMtx(0);
-
-    C_MTXOrtho(orthoMtx, kUtilZero, kUtilOrthoBottom, kUtilZero, kUtilOrthoRight, kUtilZero,
-               kUtilOne);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    GXSetNumTevStages(1);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
-    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE,
-                  GX_AF_NONE);
-    GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetNumIndStages(0);
-    memset(indMtx, 0, sizeof(indMtx));
-    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80024444
+ * PAL Address: 0x80022d0c
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8002EDFC
+ * EN Size: 124b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CUtil::DisableIndMtx()
+void CUtil::CalcUV(float& u, float& v, unsigned long x, unsigned long y, unsigned long width, unsigned long height)
 {
-    float indMtx[2][3];
-
-    GXSetNumIndStages(0);
-    memset(indMtx, 0, sizeof(indMtx));
-    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
-    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+    u = (float)x / (float)width;
+    v = (float)y / (float)height;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800244a8
- * PAL Size: 352b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
-{
-    extern const float kUtilZero;
-    extern const float kUtilOne;
-
-    u32* colorPtr = reinterpret_cast<u32*>(&color);
-    float u1;
-    float v1;
-    float u2;
-    float v2;
-
-    if (uv1 == NULL || uv2 == NULL) {
-        u1 = kUtilZero;
-        v1 = u1;
-        u2 = kUtilOne;
-        v2 = u2;
-    } else {
-        u1 = uv1->x;
-        v1 = uv1->y;
-        u2 = uv2->x;
-        v2 = uv2->y;
-    }
-
-    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    f32 x2;
-    f32 x1 = pos1.x;
-    f32 y1 = pos1.y;
-    GXWGFifo.f32 = x1;
-    f32 z1 = pos1.z;
-    GXWGFifo.f32 = y1;
-    u32 rgba = *colorPtr;
-    GXWGFifo.f32 = z1;
-    x2 = pos2.x;
-    GXWGFifo.u32 = rgba;
-    f32 y2 = pos2.y;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v1;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v1;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y1;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v1;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v1;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v2;
-    GXWGFifo.f32 = u2;
-    GXWGFifo.f32 = v2;
-
-    GXWGFifo.f32 = x1;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v2;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v2;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80024608
- * PAL Size: 320b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
-{
-    extern const float kUtilZero;
-    extern const float kUtilOne;
-
-    u32* colorPtr = reinterpret_cast<u32*>(&color);
-    float u0;
-    float v0;
-    float u1;
-    float v1;
-
-    if (uv1 == NULL || uv2 == NULL) {
-        u0 = kUtilZero;
-        u1 = kUtilOne;
-        v0 = u0;
-        v1 = u1;
-    } else {
-        u0 = uv1->x;
-        v0 = uv1->y;
-        u1 = uv2->x;
-        v1 = uv2->y;
-    }
-
-    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    f32 x2;
-    f32 x1 = pos1.x;
-    f32 y1 = pos1.y;
-    GXWGFifo.f32 = x1;
-    f32 z1 = pos1.z;
-    GXWGFifo.f32 = y1;
-    u32 rgba = *colorPtr;
-    GXWGFifo.f32 = z1;
-    x2 = pos2.x;
-    GXWGFifo.u32 = rgba;
-    f32 y2 = pos2.y;
-    GXWGFifo.f32 = u0;
-    GXWGFifo.f32 = v0;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y1;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v0;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u1;
-    GXWGFifo.f32 = v1;
-
-    GXWGFifo.f32 = x1;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-    GXWGFifo.f32 = u0;
-    GXWGFifo.f32 = v1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80024748
- * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
-{
-    GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    f32 x2;
-    f32 x1 = pos1.x;
-    f32 y1 = pos1.y;
-
-    GXWGFifo.f32 = x1;
-    f32 z1 = pos1.z;
-    GXWGFifo.f32 = y1;
-    u32 rgba = *reinterpret_cast<u32*>(&color);
-    GXWGFifo.f32 = z1;
-    x2 = pos2.x;
-    GXWGFifo.u32 = rgba;
-    f32 y2 = pos2.y;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y1;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-
-    GXWGFifo.f32 = x2;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-
-    GXWGFifo.f32 = x1;
-    GXWGFifo.f32 = y2;
-    GXWGFifo.f32 = z1;
-    GXWGFifo.u32 = rgba;
-}
-
-#pragma always_inline off
-
-/*
- * --INFO--
- * PAL Address: 0x800247f4
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::ConvF2IVector2d(S16Vec2d& out, Vec2d in, long shift)
-{
-    int scaleInt = 1 << shift;
-    float y = in.y;
-
-    out.x = (short)(int)(in.x * (float)scaleInt);
-    out.y = (short)(int)(y * (float)scaleInt);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80024864
- * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::ConvF2IVector(S16Vec& out, Vec in, long shift)
-{
-    int scaleInt = 1 << shift;
-    float y = in.y;
-    float z = in.z;
-
-    out.x = (short)(int)(in.x * (float)scaleInt);
-    out.y = (short)(int)(y * (float)scaleInt);
-    out.z = (short)(int)(z * (float)scaleInt);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800248fc
- * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::ConvI2FVector(Vec& out, S16Vec in, long shift)
-{
-    int x = in.x;
-    int y = in.y;
-    int z = in.z;
-
-    out.x = (float)x / (float)(1 << shift);
-    out.y = (float)y / (float)(1 << shift);
-    out.z = (float)z / (float)(1 << shift);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800249ac
- * PAL Size: 396b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, float scale)
-{
-    extern const float kUtilOne;
-    extern const float kUtilHermiteCoeff2;
-    extern const float kUtilHermiteCoeff3;
-    extern const float kUtilHermiteCoeffNeg2;
-
-	Vec tan0;
-	Vec tan1;
-
-	PSVECSubtract(&p2, &p0, &tan0);
-	PSVECScale(&tan0, &tan0, scale);
-	PSVECSubtract(&p3, &p1, &tan1);
-	PSVECScale(&tan1, &tan1, scale);
-
-	UtilHermiteBasis hermite = kUtilHermiteBasis;
-	float pos;
-	float t2;
-	float t3;
-
-	t2 = t * t;
-	t3 = t2 * t;
-
-	float coeff3 = kUtilHermiteCoeff3;
-	float coeff2 = kUtilHermiteCoeff2;
-	float coeffNeg2 = kUtilHermiteCoeffNeg2;
-	float k3t2 = coeff3 * t2;
-	hermite.m_value[1] = k3t2 + (coeffNeg2 * t3);
-	hermite.m_value[0] = kUtilOne + ((coeff2 * t3) - k3t2);
-	hermite.m_value[2] = t + (t3 - (coeff2 * t2));
-	hermite.m_value[3] = t3 - t2;
-
-	pos = hermite.m_value[1] * p2.x;
-	pos += hermite.m_value[0] * p1.x;
-	pos += hermite.m_value[2] * tan0.x;
-	pos += hermite.m_value[3] * tan1.x;
-	out.x = pos;
-
-	pos = hermite.m_value[1] * p2.y;
-	pos += hermite.m_value[0] * p1.y;
-	pos += hermite.m_value[2] * tan0.y;
-	pos += hermite.m_value[3] * tan1.y;
-	out.y = pos;
-
-	pos = hermite.m_value[1] * p2.z;
-	pos += hermite.m_value[0] * p1.z;
-	pos += hermite.m_value[2] * tan0.z;
-	pos += hermite.m_value[3] * tan1.z;
-	out.z = pos;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80024b38
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CUtil::GetNoise(unsigned char noise)
-{
-    float maxNoise = (float)(noise * 2);
-    float minNoise = (float)(noise >> 1);
-    return (int)(maxNoise * Math.RandF() - minNoise);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80024bb4
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::SetOrthoEnv()
-{
-    extern const float kUtilZero;
-    extern const float kUtilOne;
-    extern const float kUtilOrthoBottom;
-    extern const float kUtilOrthoRight;
-
-    Mtx modelMtx;
-    Mtx44 orthoMtx;
-
-    PSMTXIdentity(modelMtx);
-    GXLoadPosMtxImm(modelMtx, 0);
-    GXSetCurrentMtx(0);
-    C_MTXOrtho(orthoMtx, kUtilZero, kUtilOrthoBottom, kUtilZero, kUtilOrthoRight, kUtilZero,
-               kUtilOne);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80024c18
- * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::SetVtxFmt_POS_CLR_TEX0_TEX1()
-{
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX1, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX1, GX_TEX_ST, GX_F32, 0);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80024cc8
- * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::SetVtxFmt_POS_TEX0_TEX1()
-{
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX1, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX1, GX_TEX_ST, GX_F32, 0);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80024d54
- * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CUtil::SetVtxFmt_POS_CLR_TEX()
-{
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80024de0
+ * PAL Address: 0x80022ca4
  * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8002EE78
+ * EN Size: 124b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CUtil::SetVtxFmt_POS_CLR()
+int CUtil::IsHasDrawFmtDL(unsigned char cmd)
 {
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    switch (cmd & 0xF8) {
+    case 0x80:
+    case 0x90:
+    case 0x98:
+    case 0xA0:
+    case 0xA8:
+    case 0xB0:
+    case 0xB8:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80022b80
+ * PAL Size: 292b
+ * EN Address: 0x8002EEF4
+ * EN Size: 348b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long copyFlags)
+{
+	u8* data = (u8*)dlData;
+	u8* end = data + dlSize;
+	u8* current = data;
+
+	while (current < end) {
+		u8 cmd = *current;
+		int count = *(u16*)(current + 1);
+		u8 primitive = cmd & 0xF8;
+		u8 indexFormat = cmd & 7;
+		int isPrimitive;
+		current += 3;
+
+		switch (primitive) {
+			case 0x80:
+			case 0x90:
+			case 0x98:
+			case 0xA0:
+			case 0xA8:
+			case 0xB0:
+			case 0xB8:
+				isPrimitive = true;
+				break;
+			default:
+				isPrimitive = false;
+				break;
+		}
+
+		if (!isPrimitive) {
+			break;
+		}
+
+		for (int i = 0; i < count; i++) {
+			u16 value = *(u16*)current;
+
+			if ((copyFlags & 1) != 0) {
+				*(u16*)(current + 4) = value;
+				current += 6;
+			} else {
+				current += 6;
+			}
+			if ((copyFlags & 2) != 0) {
+				*(u16*)current = value;
+				current += 2;
+			} else {
+				current += 2;
+			}
+			if (indexFormat == 2) {
+				if ((copyFlags & 2) != 0) {
+					*(u16*)current = value;
+					current += 2;
+				} else {
+					current += 2;
+				}
+			}
+		}
+	}
+	DCFlushRange(dlData, dlSize);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002295c
+ * PAL Size: 548b
+ * EN Address: 0x8002F050
+ * EN Size: 516b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, unsigned long count, unsigned long shift)
+{
+    S16Vec min;
+    S16Vec max;
+
+    min.z = 0x7FFF;
+    min.y = 0x7FFF;
+    min.x = 0x7FFF;
+    max.z = -0x7FFF;
+    max.y = -0x7FFF;
+    max.x = -0x7FFF;
+
+    for (unsigned long i = 0; i < count; i++, vecs++) {
+        min.x = min.x < vecs->x ? min.x : vecs->x;
+        min.y = min.y < vecs->y ? min.y : vecs->y;
+        min.z = min.z < vecs->z ? min.z : vecs->z;
+        max.x = max.x < vecs->x ? vecs->x : max.x;
+        max.y = max.y < vecs->y ? vecs->y : max.y;
+        max.z = max.z < vecs->z ? vecs->z : max.z;
+    }
+
+    S16Vec finalMin = min;
+    int scale = 1 << shift;
+
+    minOut->x = (float)finalMin.x / (float)scale;
+    minOut->y = (float)finalMin.y / (float)scale;
+    minOut->z = (float)finalMin.z / (float)scale;
+    S16Vec finalMax = max;
+    maxOut->x = (float)finalMax.x / (float)scale;
+    maxOut->y = (float)finalMax.y / (float)scale;
+    maxOut->z = (float)finalMax.z / (float)scale;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80022818
+ * PAL Size: 324b
+ * EN Address: 0x8002F254
+ * EN Size: 380b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
+{
+    u8* data = static_cast<u8*>(dlData);
+    int running = true;
+    int polygonCount = 0;
+
+    while (running) {
+        u32 opcode = *data;
+        u16 vertexCount = *(u16*)(data + 1);
+        int count = vertexCount;
+        u32 vertexFormat = opcode & 7;
+        u32 primitive = opcode & 0xF8;
+        int isPrimitive;
+
+        data += 3;
+
+        switch (primitive) {
+        case 0x80:
+        case 0x90:
+        case 0x98:
+        case 0xA0:
+        case 0xA8:
+        case 0xB0:
+        case 0xB8:
+            isPrimitive = true;
+            break;
+
+        default:
+            isPrimitive = false;
+            break;
+        }
+
+        if (!isPrimitive) {
+            running = false;
+            continue;
+        }
+
+        if (primitive == 0x90) {
+            polygonCount += count / 3;
+        } else if (primitive == 0x98) {
+            polygonCount += count - 2;
+        }
+
+        if (vertexFormat == 2) {
+            int remaining = count;
+            while (remaining > 0) {
+                data += 10;
+                remaining--;
+            }
+        } else {
+            int remaining = count;
+            while (remaining > 0) {
+                data += 8;
+                remaining--;
+            }
+        }
+    }
+
+    return polygonCount;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80022780
+ * PAL Size: 152b
+ * EN Address: 0x8002F3D0
+ * EN Size: 152b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::GetDirectVector(Vec* param_2, Vec* param_3, Vec param_4)
+{
+    Vec local_vec = {0.0f, 1.0f, 0.0f};
+
+    PSVECCrossProduct(&param_4, &local_vec, param_2);
+    PSVECNormalize(param_2, param_2);
+    PSVECCrossProduct(param_2, &param_4, param_3);
+    PSVECNormalize(param_3, param_3);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80022724
+ * PAL Size: 92b
+ * EN Address: 0x8002F468
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CUtil::InitConstantRegister()
+{
+    int i = 0;
+
+    do {
+        GXSetTevKColorSel((GXTevStageID)i, (GXTevKColorSel)6);
+        GXSetTevKAlphaSel((GXTevStageID)i, (GXTevKAlphaSel)0);
+        _GXSetTevSwapMode((GXTevStageID)i, (_GXTevSwapSel)0, (_GXTevSwapSel)0);
+        i++;
+    } while (i < 0x10);
 }
 
 /*
@@ -1362,10 +1293,3 @@ void CUtil::Quit()
 {
 	// TODO
 }
-
-extern const float kUtilOrthoBottom = 448.0f;
-extern const float kUtilOrthoRight = 640.0f;
-extern const float kUtilQuadDepth = -0.9999999f;
-extern const float kUtilHermiteCoeff2 = 2.0f;
-extern const float kUtilHermiteCoeff3 = 3.0f;
-extern const float kUtilHermiteCoeffNeg2 = -2.0f;

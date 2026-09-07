@@ -774,7 +774,7 @@ config.libs = [
             Object(NonMatching, "THPSimple.cpp"),
             Object(Matching, "usb.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "USBStreamData.cpp"),
-            Object(NonMatching, "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline auto,deferred"]),
             Object(Matching, "vector.cpp", mw_version="GC/2.6"),
             Object(NonMatching, "wind.cpp"),
             Object(NonMatching, "wm_menu.cpp"),

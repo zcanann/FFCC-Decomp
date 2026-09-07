@@ -138,7 +138,7 @@ usb.cpp:
 	extabindex  start:0x8000B5D8 end:0x8000B5FC
 	.text       start:0x8002244C end:0x80022724
 	.ctors      start:0x801D53C8 end:0x801D53CC
-	.rodata     start:0x801D6F90 end:0x801D705C
+	.rodata     start:0x801D6F90 end:0x801D7060
 	.data       start:0x801E8898 end:0x801E88B4
 	.bss        start:0x802455C0 end:0x80245640
 	.sdata      start:0x8032E478 end:0x8032E488
@@ -149,6 +149,7 @@ util.cpp:
 	extabindex  start:0x8000B5FC end:0x8000B734
 	.text       start:0x80022724 end:0x80024E60
 	.ctors      start:0x801D53CC end:0x801D53D0
+	.rodata     start:0x801D7060 end:0x801D7088
 	.data       start:0x801E88B8 end:0x801E88D4
 	.sdata      start:0x8032E488 end:0x8032E498
 	.sbss       start:0x8032EC70 end:0x8032EC74

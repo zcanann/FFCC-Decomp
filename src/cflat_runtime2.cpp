@@ -106,13 +106,8 @@ static const char sCFlatRuntime2LoadMsg[] =
 	"\x82\xdd\x8f\x49\x97\xb9\n";
 static const char sCFlatRuntimeObjectClassName[] = "CFlatRuntime::CObject\0\0";
 
-struct CFlatLayerResource {
-	int m_allocStage;
-	CTextureSet* m_textureSet;
-	CFile::CHandle* m_fileHandle;
-};
-
 STATIC_ASSERT(sizeof(CFlatLayerResource) * kFlatLayerResourceCount == 0x60);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_layerResources) == 0x1770);
 
 static inline void InitFlatObjectSlot(CGBaseObj* object, u16 particleId)
 {
@@ -131,11 +126,7 @@ static inline CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlat
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			u8 flags = object->m_flags;
-			if (static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 24) & 0xC0000000) >> 31) == 0 &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31) == 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & cidMask) == cidMask) {
 					return reinterpret_cast<CGBaseObj*>(object);
 				}
@@ -248,10 +239,6 @@ static inline CFlatRuntime2::CDebugDrawCC* DebugDrawCCEntries(u8* runtime)
 	return reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries;
 }
 
-static inline CFlatLayerResource* LayerResources(CFlatRuntime2* runtime)
-{
-	return reinterpret_cast<CFlatLayerResource*>(runtime->m_pad_1770_17D4);
-}
 
 static inline CFlatRuntime2::CParticleWork& ParticleWork(CFlatRuntime2* runtime)
 {
@@ -470,15 +457,13 @@ CFlatRuntime2::CFlatRuntime2()
 	m_debugDataIndex = 0;
 	m_letterEventEnabled = 0;
 	memset(m_savedNextScript, 0, sizeof(m_savedNextScript));
-	memset(LayerResources(this), 0, sizeof(CFlatLayerResource) * kFlatLayerResourceCount);
+	memset(m_layerResources, 0, sizeof(CFlatLayerResource) * kFlatLayerResourceCount);
 
 	resetChangeScript();
 	memset(m_spawnBits, 0, sizeof(m_spawnBits));
 
-	CGBaseObj* baseObj = m_objBase;
 	for (int i = 0; i < 0x28; i++) {
-		InitFlatObjectSlot(baseObj, static_cast<u16>(i + 1));
-		baseObj++;
+		InitFlatObjectSlot(&m_objBase[i], static_cast<u16>(i + 1));
 	}
 
 	CGQuadObj* quadObj = reinterpret_cast<CGQuadObj*>(m_objQuad);
@@ -859,8 +844,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 		CGPartyObj::CheckGameOver();
 		reinterpret_cast<CFlatRuntime*>(this)->CFlatRuntime::Frame(arg0, mode);
 
-		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(&CFlat, CFlat.m_objectSentinel.m_next->m_next, 5); obj != 0;
-			 obj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
+		for (CGObject* obj = CFlat.FindGObjFirst(); obj != 0; obj = CFlat.FindGObjNext(obj)) {
 			obj->Frame();
 		}
 		goto done;
@@ -930,8 +914,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 	AStar.drawAStar();
 
-	for (CGBaseObj* obj = FindNextGBaseObjByCidMask(&CFlat, CFlat.m_objectSentinel.m_next->m_next, 1); obj != 0;
-		 obj = FindNextGBaseObjByCidMask(&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 1)) {
+	for (CGBaseObj* obj = CFlat.FindGBaseObjFirst(); obj != 0; obj = CFlat.FindGBaseObjNext(obj)) {
 		obj->Draw();
 	}
 
@@ -1009,11 +992,7 @@ CGObject* CFlatRuntime2::FindGObjFirst()
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			u8 flags = object->m_flags;
-			if (static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 24) & 0xC0000000) >> 31) == 0 &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31) == 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
 					return reinterpret_cast<CGObject*>(object);
 				}
@@ -1041,11 +1020,7 @@ CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			u8 flags = object->m_flags;
-			if (static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 24) & 0xC0000000) >> 31) == 0 &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31) == 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
 					return reinterpret_cast<CGObject*>(object);
 				}
@@ -1059,22 +1034,58 @@ CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 164b
+ * EN Address: 0x8007B204
+ * EN Size: 168b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::FindGBaseObjFirst()
+inline CGBaseObj* CFlatRuntime2::FindGBaseObjFirst()
 {
-	// TODO
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
+	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
+
+	while (object != root) {
+		if (object->m_classIndex >= 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 1) == 1) {
+					return reinterpret_cast<CGBaseObj*>(object);
+				}
+			}
+		}
+		object = object->m_next;
+	}
+
+	return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 160b
+ * EN Address: 0x8007B2AC
+ * EN Size: 172b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::FindGBaseObjNext(CGBaseObj*)
+inline CGBaseObj* CFlatRuntime2::FindGBaseObjNext(CGBaseObj* gObject)
 {
-	// TODO
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
+	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
+
+	while (object != root) {
+		if (object->m_classIndex >= 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 1) == 1) {
+					return reinterpret_cast<CGBaseObj*>(object);
+				}
+			}
+		}
+		object = object->m_next;
+	}
+
+	return 0;
 }
 
 /*
@@ -1093,11 +1104,7 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjFirst()
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			u8 flags = object->m_flags;
-			if (static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 24) & 0xC0000000) >> 31) == 0 &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31) == 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 3) == 3) {
 					return reinterpret_cast<CGQuadObj*>(object);
 				}
@@ -1125,11 +1132,7 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjNext(CGQuadObj* gQuadObj)
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			u8 flags = object->m_flags;
-			if (static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 24) & 0xC0000000) >> 31) == 0 &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31) == 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 3) == 3) {
 					return reinterpret_cast<CGQuadObj*>(object);
 				}
@@ -1157,11 +1160,7 @@ CGMonObj* CFlatRuntime2::FindGMonObjFirst()
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			u8 flags = object->m_flags;
-			if (static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 24) & 0xC0000000) >> 31) == 0 &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31) == 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0xAD) == 0xAD) {
 					return reinterpret_cast<CGMonObj*>(object);
 				}
@@ -1189,11 +1188,7 @@ CGMonObj* CFlatRuntime2::FindGMonObjNext(CGMonObj* gMonObj)
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			u8 flags = object->m_flags;
-			if (static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 24) & 0xC0000000) >> 31) == 0 &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31) == 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0xAD) == 0xAD) {
 					return reinterpret_cast<CGMonObj*>(object);
 				}
@@ -1221,11 +1216,7 @@ CGItemObj* CFlatRuntime2::FindGItemObjFirst()
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			u8 flags = object->m_flags;
-			if (static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 24) & 0xC0000000) >> 31) == 0 &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31) == 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0x1D) == 0x1D) {
 					return reinterpret_cast<CGItemObj*>(object);
 				}
@@ -1253,11 +1244,7 @@ CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			u8 flags = object->m_flags;
-			if (static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 24) & 0xC0000000) >> 31) == 0 &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31) == 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0x1D) == 0x1D) {
 					return reinterpret_cast<CGItemObj*>(object);
 				}
@@ -1283,19 +1270,18 @@ void CFlatRuntime2::Destroy()
 	CFlatRuntime::Destroy();
 	m_flatData.Destroy();
 
-	int zero = 0;
 	for (int i = 0; i < 8; i++) {
-		CFlatLayerResource* layer = &LayerResources(this)[i];
+		CFlatLayerResource* layer = &m_layerResources[i];
 		CFile::CHandle* fileHandle = layer->m_fileHandle;
 		if (fileHandle != 0) {
 			File.Close(fileHandle);
-			layer->m_fileHandle = reinterpret_cast<CFile::CHandle*>(zero);
+			layer->m_fileHandle = 0;
 		}
 
 		CTextureSet* textureSet = layer->m_textureSet;
 		if (textureSet != 0) {
 			delete textureSet;
-			layer->m_textureSet = reinterpret_cast<CTextureSet*>(zero);
+			layer->m_textureSet = 0;
 		}
 	}
 }
@@ -1313,9 +1299,8 @@ void CFlatRuntime2::Calc()
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
 
-	char* base = reinterpret_cast<char*>(this);
-	for (int i = 0; i < 8; i++, base += sizeof(CFlatLayerResource)) {
-		CFlatLayerResource* layer = reinterpret_cast<CFlatLayerResource*>(base + 0x1770);
+	for (int i = 0; i < 8; i++) {
+		CFlatLayerResource* layer = &m_layerResources[i];
 		CFile::CHandle* fileHandle = layer->m_fileHandle;
 		if (fileHandle == 0) {
 			continue;
@@ -1745,10 +1730,10 @@ done:
  */
 void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 {
-	CTextureSet* textureSet = LayerResources(this)[layerNo].m_textureSet;
+	CTextureSet* textureSet = m_layerResources[layerNo].m_textureSet;
 	if (textureSet != 0) {
 		delete textureSet;
-		LayerResources(this)[layerNo].m_textureSet = 0;
+		m_layerResources[layerNo].m_textureSet = 0;
 	}
 
 	char path[0x104];
@@ -1760,9 +1745,9 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 		File.SyncCompleted(fileHandle);
 
 		textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x4F4) CTextureSet;
-		LayerResources(this)[layerNo].m_textureSet = textureSet;
+		m_layerResources[layerNo].m_textureSet = textureSet;
 		void* readBuffer = File.m_readBuffer;
-		LayerResources(this)[layerNo].m_textureSet->Create(
+		m_layerResources[layerNo].m_textureSet->Create(
 			readBuffer,
 			GET_CHARA_ALLOC_STAGE_S(CharaPcs.m_charaAllocStage, Game.m_mainStage),
 			0, 0, 0, 0);
@@ -1778,7 +1763,7 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
  */
 unsigned int CFlatRuntime2::isLoadLayerASyncCompleted(int layerNo)
 {
-	return static_cast<unsigned int>(__cntlzw(reinterpret_cast<int>(LayerResources(this)[layerNo].m_fileHandle))) >> 5;
+	return static_cast<unsigned int>(__cntlzw(reinterpret_cast<int>(m_layerResources[layerNo].m_fileHandle))) >> 5;
 }
 
 /*
@@ -1792,27 +1777,27 @@ unsigned int CFlatRuntime2::isLoadLayerASyncCompleted(int layerNo)
  */
 void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 {
-	CFile::CHandle* fileHandle = LayerResources(this)[layerNo].m_fileHandle;
+	CFile::CHandle* fileHandle = m_layerResources[layerNo].m_fileHandle;
 	if (fileHandle != 0) {
 		File.Close(fileHandle);
-		LayerResources(this)[layerNo].m_fileHandle = 0;
+		m_layerResources[layerNo].m_fileHandle = 0;
 	}
 
-	CTextureSet* textureSet = LayerResources(this)[layerNo].m_textureSet;
+	CTextureSet* textureSet = m_layerResources[layerNo].m_textureSet;
 	if (textureSet != 0) {
 		delete textureSet;
-		LayerResources(this)[layerNo].m_textureSet = 0;
+		m_layerResources[layerNo].m_textureSet = 0;
 	}
 
 	char path[0xF4];
 	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
 
-	LayerResources(this)[layerNo].m_fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-	if (LayerResources(this)[layerNo].m_fileHandle != 0) {
-		File.ReadASync(LayerResources(this)[layerNo].m_fileHandle);
+	m_layerResources[layerNo].m_fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+	if (m_layerResources[layerNo].m_fileHandle != 0) {
+		File.ReadASync(m_layerResources[layerNo].m_fileHandle);
 	}
 
-	LayerResources(this)[layerNo].m_allocStage = CharaPcs.m_charaAllocStage;
+	m_layerResources[layerNo].m_allocStage = CharaPcs.m_charaAllocStage;
 }
 
 /*
@@ -1828,15 +1813,14 @@ void CFlatRuntime2::drawLayer(
 	int layerNo, char* textureName, int x, int y, int width, int height, int texU, int texV, float scaleX,
 	float scaleY, _GXColor* color, int flags)
 {
-	CFlatLayerResource* layer = &LayerResources(this)[layerNo];
-	if (layer->m_textureSet == 0) {
+	if (m_layerResources[layerNo].m_textureSet == 0) {
 		return;
 	}
 
-	int textureIndex = layer->m_textureSet->Find(textureName);
+	int textureIndex = m_layerResources[layerNo].m_textureSet->Find(textureName);
 	if (textureIndex >= 0) {
 
-	CTexture* texture = layer->m_textureSet->GetTexture(static_cast<unsigned long>(textureIndex));
+	CTexture* texture = m_layerResources[layerNo].m_textureSet->GetTexture(static_cast<unsigned long>(textureIndex));
 
 	GXSetNumChans(1);
 	GXSetChanCtrl(

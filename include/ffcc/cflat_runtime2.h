@@ -6,6 +6,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/line.h"
 #include "ffcc/memory.h"
+#include "ffcc/file.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/partMng.h"
 
@@ -20,7 +21,14 @@ class CGBaseObj;
 class CGQuadObj;
 class CGMonObj;
 class CGItemObj;
+class CTextureSet;
 struct Vec;
+
+struct CFlatLayerResource {
+	int m_allocStage;
+	CTextureSet* m_textureSet;
+	CFile::CHandle* m_fileHandle;
+};
 
 struct CFlatPathPoint
 {
@@ -143,8 +151,8 @@ public:
 	CGObject* FindGObjFirst();
 	CGObject* FindGObjNext(CGObject*);
 
-	void FindGBaseObjFirst();
-	void FindGBaseObjNext(CGBaseObj*);
+	CGBaseObj* FindGBaseObjFirst();
+	CGBaseObj* FindGBaseObjNext(CGBaseObj*);
 
 	CGQuadObj* FindGQuadObjFirst();
 	CGQuadObj* FindGQuadObjNext(CGQuadObj*);
@@ -250,7 +258,8 @@ public:
 	float m_particleWorkPosPad;     // 0x1754
 	Vec m_particleWorkScale;        // 0x1758
 	Vec m_particleWorkTarget;       // 0x1764
-	u8 m_pad_1770_17D4[0x64];       // 0x1770
+	CFlatLayerResource m_layerResources[8]; // 0x1770
+	u8 m_pad_17D0_17D4[4];        // 0x17D0
 	int m_pathPointCount;           // 0x17D4
 	float m_pathTotalDistance;      // 0x17D8
 	CFlatPathPoint m_pathPoints[0x40]; // 0x17DC

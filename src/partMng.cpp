@@ -45,6 +45,7 @@ STATIC_ASSERT(offsetof(_pppMngSt, m_lifeEnd) == 0x24);
 STATIC_ASSERT(offsetof(_pppMngSt, m_scale) == 0x28);
 STATIC_ASSERT(offsetof(_pppMngSt, m_matrix) == 0x78);
 STATIC_ASSERT(sizeof(_pppMngSt) == 0x158);
+STATIC_ASSERT(offsetof(_pppMngSt, m_deltaTime) == 0xA8);
 
 STATIC_ASSERT(sizeof(CPartMng) == 0x23FD8);
 STATIC_ASSERT(offsetof(CPartMng, m_cursorRequest) == 0x10);
@@ -714,9 +715,14 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppGetFreePppMngSt()
+inline _pppMngSt* CPartMng::pppGetFreePppMngSt()
 {
-	// TODO
+    for (int i = 0; i < 0x180; i++) {
+        if (m_pppMng[i].m_baseTime == -0x1000) {
+            return &m_pppMng[i];
+        }
+    }
+    return 0;
 }
 
 /*
@@ -744,9 +750,14 @@ int CPartMng::pppGetNumFreePppMngSt()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppGetFreePppDataMngSt()
+inline CPartMng::PppPdtSlot* CPartMng::pppGetFreePppDataMngSt()
 {
-	// TODO
+    for (int i = 8; i < 0x20; i++) {
+        if (m_pdtSlots[i].m_pppDataHead == 0) {
+            return &m_pdtSlots[i];
+        }
+    }
+    return 0;
 }
 
 /*
@@ -2384,7 +2395,7 @@ void CPartMng::pppEditPartCalc()
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3b3);
         _pppMngSt* firstMng = m_pppMng;
         firstMng->m_particleEnded = 0;
-        *reinterpret_cast<int*>(&firstMng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
+        firstMng->m_deltaTime = *reinterpret_cast<int*>(self + 0x168);
         _pppStartPart(firstMng, *reinterpret_cast<long**>(self + 0x5dc), 1);
     }
 
@@ -2436,7 +2447,7 @@ void CPartMng::pppEditPartCalc()
                 }
             }
             mng->m_particleEnded = 0;
-            *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
+            mng->m_deltaTime = *reinterpret_cast<int*>(self + 0x168);
             _pppStartPart(mng, reinterpret_cast<long*>(*reinterpret_cast<long*>(self + 0x5dc +
                                    (*reinterpret_cast<int**>(self + 0x1C8))[i * 0x18 + 0xC] * 4)), 1);
             goto runFrameA;
@@ -2483,7 +2494,7 @@ void CPartMng::pppEditPartCalc()
                 }
             }
             mng->m_particleEnded = 0;
-            *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
+            mng->m_deltaTime = *reinterpret_cast<int*>(self + 0x168);
             _pppStartPart(mng, reinterpret_cast<long*>(*reinterpret_cast<long*>(self + 0x5dc +
                                    (*reinterpret_cast<int**>(self + 0x1C8))[i * 0x18 + 0xC] * 4)), 1);
             goto runFrameB;
@@ -2839,10 +2850,7 @@ void CPartMng::pppDumpCacheIdx()
         unsigned char m_pad08[0x14 - 8];
         int m_baseTime;                 // 0x14
         unsigned char m_pad18[0xA8 - 0x18];
-        unsigned char m_envColorR;      // 0xA8
-        unsigned char m_envColorG;      // 0xA9
-        unsigned char m_envColorB;      // 0xAA
-        unsigned char m_envColorA;      // 0xAB
+        long m_deltaTime;                  // 0xA8
         int m_spawnedCount;             // 0xAC
         unsigned char m_padB0[0xE4 - 0xB0];
         unsigned char m_endRequested;   // 0xE4
@@ -2887,7 +2895,7 @@ void CPartMng::pppDumpCacheIdx()
             pppSetMatrix(reinterpret_cast<_pppMngSt*>(mng));
             pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
 
-            mng->m_spawnedCount += *reinterpret_cast<int*>(&mng->m_envColorR);
+            mng->m_spawnedCount += mng->m_deltaTime;
             ppvIs2ndCalc = 0;
 
             while (mng->m_spawnedCount >= 0x1000) {
@@ -4107,17 +4115,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
  */
 int CPartMng::pppGetFreeDataMng()
 {
-    PppPdtSlot* freeSlot;
-    int slotIndex = 8;
-    for (int count = 0x18; count != 0; count--) {
-        if (m_pdtSlots[slotIndex].m_pppDataHead == 0) {
-            freeSlot = &m_pdtSlots[slotIndex];
-            goto found;
-        }
-        slotIndex++;
-    }
-    freeSlot = 0;
-found:
+    PppPdtSlot* freeSlot = pppGetFreePppDataMngSt();
 
     if (freeSlot == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
@@ -4162,6 +4160,10 @@ PPPCREATEPARAM* CPartMng::pppGetDefaultCreateParam()
     return &g_dcp;
 }
 
+struct PppHitIdBlock {
+    int m_ids[8];
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80058148
@@ -4171,89 +4173,9 @@ PPPCREATEPARAM* CPartMng::pppGetDefaultCreateParam()
  * JP Address: TODO
  * JP Size: TODO
  */
-struct PppHitIdBlock {
-    int m_ids[8];
-};
-
-#pragma opt_common_subs off
 int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam, int allowFpOverride)
 {
-    struct PppMngStCreateRaw {
-        void* m_pppResSet;           // 0x00
-        int m_partIndex;             // 0x04
-        Vec m_position;              // 0x08
-        int m_baseTime;              // 0x14
-        pppIVECTOR3 m_rotation;      // 0x18
-        int m_lifeEnd;               // 0x24
-        Vec m_scale;                 // 0x28
-        int m_currentFrame;          // 0x34
-        int m_previousFrame;         // 0x38
-        int m_numControlPrograms;    // 0x3C
-        float m_scaleFactor;         // 0x40
-        float m_ownerScale;          // 0x44
-        float m_userFloat0;          // 0x48
-        float m_userFloat1;          // 0x4C
-        Vec m_savedPosition;         // 0x50
-        Vec m_previousPosition;      // 0x5C
-        Vec m_paramVec0;             // 0x68
-        short m_kind;                // 0x74
-        short m_nodeIndex;           // 0x76
-        pppFMATRIX m_matrix;         // 0x78
-        unsigned char m_envColorR;   // 0xA8
-        unsigned char m_envColorG;   // 0xA9
-        unsigned char m_envColorB;   // 0xAA
-        unsigned char m_envColorA;   // 0xAB
-        int m_spawnedCount;          // 0xAC
-        int m_previousFrame2;        // 0xB0
-        int m_numControlPrograms2;   // 0xB4
-        int m_numPrograms2;          // 0xB8
-        unsigned int m_objHitMask;   // 0xBC
-        unsigned int m_cylinderAttribute; // 0xC0
-        _pppPObjLink m_pppPObjLinkHead;   // 0xC4 (size 0xC)
-        void* m_programTable;        // 0xD0
-        void* m_pppPDataVals;        // 0xD4
-        void* m_owner;               // 0xD8
-        void* m_lookTarget;          // 0xDC
-        void* m_bindNode;            // 0xE0
-        unsigned char m_endRequested;     // 0xE4
-        unsigned char m_stopRequested;    // 0xE5
-        unsigned char m_isFinished;       // 0xE6
-        unsigned char m_matrixMode;       // 0xE7
-        unsigned char m_hitBgFlag;        // 0xE8
-        unsigned char m_slotVisible;      // 0xE9
-        unsigned char m_ownerFacing;      // 0xEA
-        unsigned char m_drawVariant;      // 0xEB
-        unsigned char m_rotationOrder;    // 0xEC
-        unsigned char m_drawPass;         // 0xED
-        signed char m_drawSubType;        // 0xEE
-        unsigned char m_useOwnerScaleSign; // 0xEF
-        unsigned char m_ownerFlagsInitialized; // 0xF0
-        unsigned char m_nodeScaleInitialized;   // 0xF1
-        unsigned char m_fieldF2;          // 0xF2
-        unsigned char m_padF3[0xF5 - 0xF3];
-        unsigned char m_mapTexLoaded;     // 0xF5
-        unsigned char m_hasMapRef;        // 0xF6
-        unsigned char m_fpBillboard;      // 0xF7
-        unsigned char m_prio;             // 0xF8
-        unsigned char m_padF9;            // 0xF9
-        unsigned short m_prioTime;        // 0xFA
-        unsigned char m_padFC[0x100 - 0xFC];
-        int m_paramA;                     // 0x100
-        unsigned int m_paramB;            // 0x104
-        float m_cullRadiusSq;             // 0x108
-        float m_cullRadius;               // 0x10C
-        float m_cullYOffset;              // 0x110
-        float m_sortDepth;                // 0x114
-        unsigned short m_field118;        // 0x118
-        short m_mapObjIndex;              // 0x11A
-        PPPSEST m_soundEffectData;        // 0x11C
-        PPPIFPARAM m_hitParams;           // 0x130
-        int m_hitObjectIds[8];            // 0x138
-    };
-
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    unsigned char* kindBase = self + pdtSlotIndex * 0x38;
-    PppPdtSlot* slot = reinterpret_cast<PppPdtSlot*>(kindBase + 0x22E18);
+    PppPdtSlot* slot = &m_pdtSlots[pdtSlotIndex];
     if (slot == 0 || slot->m_pppDataHead == 0) {
         return -1;
     }
@@ -4261,29 +4183,21 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
 
     unsigned char* fpData = reinterpret_cast<unsigned char*>(pdt) + 0x20 + fpNo * 0x60;
 
-    PppMngStCreateRaw* mng;
-    for (int i = 0; i < 0x180; i++) {
-        if (m_pppMng[i].m_baseTime == -0x1000) {
-            mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18 + i * 0x158);
-            goto foundMng;
-        }
-    }
-    mng = 0;
-foundMng:
+    _pppMngSt* mng = pppGetFreePppMngSt();
     if (mng == 0) {
         return -1;
     }
 
     if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
         System.Printf(const_cast<char*>(sPppCreateLogFmt), pdtSlotIndex, fpNo,
-                      mng - reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18),
-                      *reinterpret_cast<char**>(kindBase + 0x22E30));
+                      mng - m_pppMng,
+                      m_pdtSlots[pdtSlotIndex].m_name);
     }
 
     unsigned char* fpData1 = fpData + 0x20;
     unsigned char* fpData2 = fpData + 0x40;
 
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(mng) + 0x104) = -1;
+    mng->m_paramB = -1;
     mng->m_prioTime = 0;
     mng->m_kind = static_cast<short>(pdtSlotIndex);
     mng->m_nodeIndex = static_cast<short>(fpNo);
@@ -4297,9 +4211,9 @@ foundMng:
 
     mng->m_mapTexLoaded = 0;
     mng->m_hasMapRef = 0;
-    *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = 0x1333;
+    mng->m_deltaTime = 0x1333;
     if (reinterpret_cast<unsigned char*>(&PartPcs)[0x2f] != 0 && pdtSlotIndex == 7 && fpNo == 0) {
-        *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = 0x1000;
+        mng->m_deltaTime = 0x1000;
     }
 
     mng->m_soundEffectData = createParam->m_soundEffectParams;
@@ -4307,7 +4221,7 @@ foundMng:
 
     mng->m_isFinished = 0;
     mng->m_hitBgFlag = 0;
-    mng->m_stopRequested = 0;
+    mng->m_particleEnded = 0;
     mng->m_slotVisible = 1;
     mng->m_ownerFacing = 1;
 
@@ -4335,7 +4249,7 @@ foundMng:
     mng->m_matrixMode = *reinterpret_cast<unsigned char*>(fpData2 + 0x5);
     mng->m_drawVariant = *reinterpret_cast<unsigned char*>(fpData2 + 0x6);
     mng->m_rotationOrder = *reinterpret_cast<unsigned char*>(fpData2 + 0x7);
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(mng) + 0xED) =
+    mng->m_drawPass =
         *reinterpret_cast<unsigned char*>(fpData2 + 0x4);
     mng->m_drawSubType = *reinterpret_cast<signed char*>(fpData2 + 0x0C);
     mng->m_ownerFlagsInitialized = *reinterpret_cast<unsigned char*>(fpData2 + 0x0D);
@@ -4360,7 +4274,7 @@ foundMng:
     mng->m_prio = *reinterpret_cast<unsigned char*>(fpData2 + 0x0B);
     mng->m_mapObjIndex = *reinterpret_cast<short*>(fpData2 + 0x08);
 
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(mng) + 0xE0) = 0;
+    mng->m_bindNode = 0;
     mng->m_objHitMask = createParam->m_objectHitMask;
     mng->m_cylinderAttribute = createParam->m_cylinderAttribute;
     mng->m_paramA = createParam->m_paramA;
@@ -4425,13 +4339,13 @@ foundMng:
         mng->m_scale.z = createParam->m_scalePtr->z * *reinterpret_cast<float*>(fpData1 + 0x08);
     }
 
-    reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;
+    mng->m_lookTarget = createParam->m_lookTargetPtr;
     mng->m_ownerScale = kPartMngOne;
     mng->m_scaleFactor = kPartMngOne;
-    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(mng) + 0x3C) = kPartMngOne;
-    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(mng) + 0x38) = kPartMngOne;
+    mng->m_userFloat1 = kPartMngOne;
+    mng->m_userFloat0 = kPartMngOne;
     mng->m_useOwnerScaleSign = 0;
-    reinterpret_cast<_pppMngSt*>(mng)->m_owner = 0;
+    mng->m_owner = 0;
 
     const unsigned char mode = *reinterpret_cast<unsigned char*>(fpData2 + 0x05);
     switch (mode) {
@@ -4446,24 +4360,21 @@ foundMng:
     case 8:
         mng->m_ownerFacing = 0;
         {
-#define owner (reinterpret_cast<CGObject*>(createParam->m_paramB))
-            reinterpret_cast<_pppMngSt*>(mng)->m_owner = owner;
-            reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;
-            if (owner != 0) {
-                int node = owner->m_charaModelHandle->m_model->SearchNodeSk(reinterpret_cast<char*>(fpData2 + 0x10));
+            mng->m_owner = reinterpret_cast<CGObject*>(createParam->m_paramB);
+            mng->m_lookTarget = createParam->m_lookTargetPtr;
+            if (reinterpret_cast<CGObject*>(createParam->m_paramB) != 0) {
+                int node = reinterpret_cast<CGObject*>(createParam->m_paramB)->m_charaModelHandle->m_model->SearchNodeSk(
+                    reinterpret_cast<char*>(fpData2 + 0x10));
                 if (node >= 0) {
-                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(mng) + 0xE0) =
-                        *reinterpret_cast<int*>(
-                            reinterpret_cast<unsigned char*>(owner->m_charaModelHandle->m_model) + 0xA8) +
-                        node * 0xC0;
+                    mng->m_bindNode =
+                        &reinterpret_cast<CGObject*>(createParam->m_paramB)->m_charaModelHandle->m_model->m_nodes[node];
                 }
             }
-#undef owner
         }
         break;
     }
 
-    return mng - reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18);
+    return mng - m_pppMng;
 }
 
 /*
@@ -4475,7 +4386,6 @@ foundMng:
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_common_subs reset
 int CPartMng::pppCreate(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam, int allowFpOverride)
 {
     if (PartPcs.m_usbStreamState.m_disableShokiDraw != 0) {
@@ -4517,22 +4427,19 @@ int CPartMng::pppGetFreeSlot()
  */
 void CPartMng::pppDeleteSlot(int slot, int checkHitFlags)
 {
-    char* base = reinterpret_cast<char*>(this);
-
     for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        _pppMngSt* pppMngSt = &m_pppMng[i];
         int baseTime = pppMngSt->m_baseTime;
         if (baseTime != -0x1000 && pppMngSt->m_paramA == slot) {
-            if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x137) & 1) == 0) {
+            if (checkHitFlags == 0 || (pppMngSt->m_hitParams.m_hitFlags & 1) == 0) {
                 if (baseTime < 0) {
-                    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) = 1;
+                    pppMngSt->m_hitBgFlag = 1;
                     pppStopSe(pppMngSt, &pppMngSt->m_soundEffectData);
                 } else {
                     pppMngSt->m_baseTime = -0x1000;
                 }
             }
         }
-        base += 0x158;
     }
 }
 
@@ -4547,18 +4454,15 @@ void CPartMng::pppDeleteSlot(int slot, int checkHitFlags)
  */
 void CPartMng::pppEndSlot(int slot, int checkHitFlags)
 {
-    char* base = reinterpret_cast<char*>(this);
-
     for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        _pppMngSt* pppMngSt = &m_pppMng[i];
         if (pppMngSt->m_baseTime != -0x1000
             && pppMngSt->m_paramA == slot) {
-            if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x137) & 1) == 0) {
-                *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE5) = 1;
+            if (checkHitFlags == 0 || (pppMngSt->m_hitParams.m_hitFlags & 1) == 0) {
+                pppMngSt->m_particleEnded = 1;
                 pppStopSe(pppMngSt, &pppMngSt->m_soundEffectData);
             }
         }
-        base += 0x158;
     }
 }
 
@@ -4573,14 +4477,10 @@ void CPartMng::pppEndSlot(int slot, int checkHitFlags)
  */
 void CPartMng::pppShowSlot(int slot, unsigned char isVisible)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
-
     for (int i = 0; i < 0x180; i++) {
-        if (*reinterpret_cast<int*>(pppMngSt + 0x2A2C) != -0x1000
-            && *reinterpret_cast<int*>(pppMngSt + 0x2B18) == slot) {
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0x2B01) = isVisible;
+        if (m_pppMng[i].m_baseTime != -0x1000 && m_pppMng[i].m_paramA == slot) {
+            m_pppMng[i].m_slotVisible = isVisible;
         }
-        pppMngSt += 0x158;
     }
 }
 
@@ -4595,23 +4495,12 @@ void CPartMng::pppShowSlot(int slot, unsigned char isVisible)
  */
 void CPartMng::pppDeletePart(int index)
 {
-    struct PppMngLifecycleState {
-        void* m_pppResSet;                   // 0x00
-        unsigned char m_pad04[0x14 - 0x4];
-        int m_baseTime;                      // 0x14
-        unsigned char m_pad18[0xE8 - 0x18];
-        unsigned char m_deleteRequested;     // 0xE8
-        unsigned char m_padE9[0x11C - 0xE9];
-        PPPSEST m_soundEffectData;           // 0x11C
-    };
-
-    PppMngLifecycleState* mng = reinterpret_cast<PppMngLifecycleState*>(
-        reinterpret_cast<unsigned char*>(this) + 0x2A18 + index * 0x158);
+    _pppMngSt* mng = &m_pppMng[index];
     int baseTime = mng->m_baseTime;
 
     if (baseTime < 0) {
-        mng->m_deleteRequested = 1;
-        pppStopSe(reinterpret_cast<_pppMngSt*>(mng), &mng->m_soundEffectData);
+        mng->m_hitBgFlag = 1;
+        pppStopSe(mng, &mng->m_soundEffectData);
     } else {
         mng->m_baseTime = -0x1000;
     }
@@ -4619,23 +4508,19 @@ void CPartMng::pppDeletePart(int index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057E58
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppEndPart(int index)
 {
-    struct PppMngLifecycleState {
-        unsigned char m_pad00[0xE5];
-        unsigned char m_stopRequested;       // 0xE5
-        unsigned char m_padE6[0x11C - 0xE6];
-        PPPSEST m_soundEffectData;           // 0x11C
-    };
+    _pppMngSt* mng = &m_pppMng[index];
 
-    PppMngLifecycleState* mng = reinterpret_cast<PppMngLifecycleState*>(
-        reinterpret_cast<unsigned char*>(this) + 0x2A18 + index * 0x158);
-
-    mng->m_stopRequested = 1;
-    pppStopSe(reinterpret_cast<_pppMngSt*>(mng), &mng->m_soundEffectData);
+    mng->m_particleEnded = 1;
+    pppStopSe(mng, &mng->m_soundEffectData);
 }
 
 /*
@@ -4649,8 +4534,7 @@ void CPartMng::pppEndPart(int index)
  */
 PPPIFPARAM* CPartMng::pppGetIfDt(short index)
 {
-    int offset = index * 0x158;
-    return reinterpret_cast<PPPIFPARAM*>(reinterpret_cast<char*>(this) + offset + 0x2B48);
+    return &m_pppMng[index].m_hitParams;
 }
 
 /*
@@ -4664,7 +4548,7 @@ PPPIFPARAM* CPartMng::pppGetIfDt(short index)
  */
 void CPartMng::pppShowIdx(short index, unsigned char visible)
 {
-	reinterpret_cast<unsigned char*>(this)[(index * 0x158) + 0x2b01] = visible;
+	m_pppMng[index].m_slotVisible = visible;
 }
 
 /*
@@ -4678,50 +4562,27 @@ void CPartMng::pppShowIdx(short index, unsigned char visible)
  */
 void CPartMng::pppFieldShowFpNo(short fieldNo, unsigned char visible)
 {
-    CPartMng* partMng = this;
-    int fieldNoInt = fieldNo;
-
-    int i;
-    for (i = 0; i < 0x120; i += 3) {
-        if ((partMng->m_pppMng[0].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[0].m_kind == 0) &&
-            (partMng->m_pppMng[0].m_nodeIndex == fieldNoInt)) {
-            partMng->m_pppMng[0].m_slotVisible = visible;
+    for (int i = 0; i < 0x180; i++) {
+        if (m_pppMng[i].m_baseTime != -0x1000 && m_pppMng[i].m_kind == 0 &&
+            m_pppMng[i].m_nodeIndex == fieldNo) {
+            m_pppMng[i].m_slotVisible = visible;
         }
-        if ((partMng->m_pppMng[1].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[1].m_kind == 0) &&
-            (partMng->m_pppMng[1].m_nodeIndex == fieldNoInt)) {
-            partMng->m_pppMng[1].m_slotVisible = visible;
-        }
-        if ((partMng->m_pppMng[2].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[2].m_kind == 0) &&
-            (partMng->m_pppMng[2].m_nodeIndex == fieldNoInt)) {
-            partMng->m_pppMng[2].m_slotVisible = visible;
-        }
-        if ((partMng->m_pppMng[3].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[3].m_kind == 0) &&
-            (partMng->m_pppMng[3].m_nodeIndex == fieldNoInt)) {
-            partMng->m_pppMng[3].m_slotVisible = visible;
-        }
-
-        partMng = reinterpret_cast<CPartMng*>(reinterpret_cast<char*>(partMng) + 0x560);
-    }
-    if (i < 0x120) {
-        return;
     }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057CE0
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppFieldEndFpNo(short fieldNo)
 {
-    char* base = reinterpret_cast<char*>(this);
-
     for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        _pppMngSt* pppMngSt = &m_pppMng[i];
         int baseTime = pppMngSt->m_baseTime;
         if ((baseTime != -0x1000) && (pppMngSt->m_kind == 0) && (pppMngSt->m_nodeIndex == fieldNo)) {
             if (baseTime < 0) {
@@ -4731,62 +4592,38 @@ void CPartMng::pppFieldEndFpNo(short fieldNo)
                 pppMngSt->m_baseTime = -0x1000;
             }
         }
-        base += 0x158;
     }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057CCC
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppSetDeltaIdx(short index, long color)
+void CPartMng::pppSetDeltaIdx(short index, long deltaTime)
 {
-    char* delta = reinterpret_cast<char*>(this);
-    delta += index * 0x158;
-    *reinterpret_cast<long*>(delta + 0x2ac0) = color;
+    m_pppMng[index].m_deltaTime = deltaTime;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057C08
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppSetDeltaSlot(int slot, long color)
+void CPartMng::pppSetDeltaSlot(int slot, long deltaTime)
 {
-    CPartMng* partMng = this;
-
-    int i;
-    for (i = 0; i < 0x140; i += 5) {
-        if ((partMng->m_pppMng[0].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[0].m_paramA == slot)) {
-            *reinterpret_cast<long*>(&partMng->m_pppMng[0].m_envColorR) = color;
+    for (int i = 0; i < 0x180; i++) {
+        if (m_pppMng[i].m_baseTime != -0x1000 && m_pppMng[i].m_paramA == slot) {
+            m_pppMng[i].m_deltaTime = deltaTime;
         }
-        if ((partMng->m_pppMng[1].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[1].m_paramA == slot)) {
-            *reinterpret_cast<long*>(&partMng->m_pppMng[1].m_envColorR) = color;
-        }
-        if ((partMng->m_pppMng[2].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[2].m_paramA == slot)) {
-            *reinterpret_cast<long*>(&partMng->m_pppMng[2].m_envColorR) = color;
-        }
-        if ((partMng->m_pppMng[3].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[3].m_paramA == slot)) {
-            *reinterpret_cast<long*>(&partMng->m_pppMng[3].m_envColorR) = color;
-        }
-        if ((partMng->m_pppMng[4].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[4].m_paramA == slot)) {
-            *reinterpret_cast<long*>(&partMng->m_pppMng[4].m_envColorR) = color;
-        }
-        if ((partMng->m_pppMng[5].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[5].m_paramA == slot)) {
-            *reinterpret_cast<long*>(&partMng->m_pppMng[5].m_envColorR) = color;
-        }
-
-        partMng = reinterpret_cast<CPartMng*>(reinterpret_cast<char*>(partMng) + 0x810);
-    }
-    if (i < 0x140) {
-        return;
     }
 }
 
@@ -4801,39 +4638,10 @@ void CPartMng::pppSetDeltaSlot(int slot, long color)
  */
 void CPartMng::pppSetLocSlot(int slot, Vec* position)
 {
-    CPartMng* partMng = this;
-
-    int i;
-    for (i = 0; i < 0x120; i += 3) {
-        if ((partMng->m_pppMng[0].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[0].m_paramA == slot)) {
-            partMng->m_pppMng[0].m_position.x = position->x;
-            partMng->m_pppMng[0].m_position.y = position->y;
-            partMng->m_pppMng[0].m_position.z = position->z;
+    for (int i = 0; i < 0x180; i++) {
+        if (m_pppMng[i].m_baseTime != -0x1000 && m_pppMng[i].m_paramA == slot) {
+            m_pppMng[i].m_position = *position;
         }
-        if ((partMng->m_pppMng[1].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[1].m_paramA == slot)) {
-            partMng->m_pppMng[1].m_position.x = position->x;
-            partMng->m_pppMng[1].m_position.y = position->y;
-            partMng->m_pppMng[1].m_position.z = position->z;
-        }
-        if ((partMng->m_pppMng[2].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[2].m_paramA == slot)) {
-            partMng->m_pppMng[2].m_position.x = position->x;
-            partMng->m_pppMng[2].m_position.y = position->y;
-            partMng->m_pppMng[2].m_position.z = position->z;
-        }
-        if ((partMng->m_pppMng[3].m_baseTime != -0x1000) &&
-            (partMng->m_pppMng[3].m_paramA == slot)) {
-            partMng->m_pppMng[3].m_position.x = position->x;
-            partMng->m_pppMng[3].m_position.y = position->y;
-            partMng->m_pppMng[3].m_position.z = position->z;
-        }
-
-        partMng = reinterpret_cast<CPartMng*>(reinterpret_cast<char*>(partMng) + 0x560);
-    }
-    if (i < 0x120) {
-        return;
     }
 }
 
@@ -4848,21 +4656,20 @@ void CPartMng::pppSetLocSlot(int slot, Vec* position)
  */
 void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle* handle)
 {
-    char* base = reinterpret_cast<char*>(this);
     unsigned char mode;
     int baseTime;
 
     for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        _pppMngSt* pppMngSt = &m_pppMng[i];
         baseTime = pppMngSt->m_baseTime;
         if (baseTime != -0x1000) {
-            mode = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE7);
+            mode = pppMngSt->m_matrixMode;
             if (mode == 3 || static_cast<unsigned char>(mode - 5) <= 2 || mode == 8) {
-                void* owner = pppMngSt->m_owner;
+                CGObject* owner = pppMngSt->m_owner;
                 if (owner != 0 &&
-                    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(owner) + 0xf8) == handle) {
+                    owner->m_charaModelHandle == handle) {
                     if (baseTime < 0) {
-                        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) = 1;
+                        pppMngSt->m_hitBgFlag = 1;
                         pppStopSe(
                             pppMngSt,
                             &pppMngSt->m_soundEffectData);
@@ -4872,7 +4679,6 @@ void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle* handle)
                 }
             }
         }
-        base += 0x158;
     }
 }
 
@@ -4883,23 +4689,21 @@ void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle* handle)
  */
 void CPartMng::pppEndCHandle(CCharaPcs::CHandle* handle)
 {
-    char* base = reinterpret_cast<char*>(this);
     for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        _pppMngSt* pppMngSt = &m_pppMng[i];
         if (pppMngSt->m_baseTime != -0x1000) {
-            unsigned char mode = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE7);
+            unsigned char mode = pppMngSt->m_matrixMode;
             if (mode == 3 || static_cast<unsigned char>(mode - 5) <= 2 || mode == 8) {
-                void* owner = pppMngSt->m_owner;
+                CGObject* owner = pppMngSt->m_owner;
                 if (owner != 0 &&
-                    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(owner) + 0xf8) == handle) {
-                    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE5) = 1;
+                    owner->m_charaModelHandle == handle) {
+                    pppMngSt->m_particleEnded = 1;
                     pppStopSe(
                         pppMngSt,
                         &pppMngSt->m_soundEffectData);
                 }
             }
         }
-        base += 0x158;
     }
 }
 

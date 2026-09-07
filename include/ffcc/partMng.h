@@ -325,10 +325,7 @@ struct _pppMngSt
     short m_kind;                      // 0x74
     short m_nodeIndex;                 // 0x76
     pppFMATRIX m_matrix;               // 0x78
-    unsigned char m_envColorR;         // 0xA8
-    unsigned char m_envColorG;         // 0xA9
-    unsigned char m_envColorB;         // 0xAA
-    unsigned char m_envColorA;         // 0xAB
+    long m_deltaTime;                  // 0xA8
     int m_spawnedCount;                // 0xAC
     int m_previousFrame2;              // 0xB0
     int m_numControlPrograms;          // 0xB4
@@ -407,9 +404,10 @@ public:
     void pppReleasePmng(int);
     void pppReleasePdt(int);
 
-    void pppGetFreePppMngSt();
+    _pppMngSt* pppGetFreePppMngSt();
     int pppGetNumFreePppMngSt();
-    void pppGetFreePppDataMngSt();
+    struct PppPdtSlot;
+    PppPdtSlot* pppGetFreePppDataMngSt();
 
     void drawLine(int, int, int, int, _GXColor&);
     void drawLine3D(Vec*, Vec*, _GXColor&);

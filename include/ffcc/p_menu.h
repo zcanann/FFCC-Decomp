@@ -21,6 +21,7 @@ class CRingMenu;
 class CMesMenu;
 class CShopMenu;
 struct ArtiState;
+struct BonusMenuState;
 struct ArtiOpenAnimList;
 struct CmdState;
 struct CmdListStorage;
@@ -863,7 +864,7 @@ public:
         CmdState* m_cmdState;
         WmWorldState* m_wmWorldState;
         GoOutMenuState* m_goOutState;
-        int m_bonusStatePtr;
+        BonusMenuState* m_bonusState;
     };
     union {
         unsigned char m_pad830[0x838 - 0x830];
@@ -1008,7 +1009,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorldState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_goOutState) == 0x82C);
-STATIC_ASSERT(offsetof(CMenuPcs, m_bonusStatePtr) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonusState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeVillageWork) == 0x830);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorldParams) == 0x83C);

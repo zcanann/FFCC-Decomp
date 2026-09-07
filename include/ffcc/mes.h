@@ -51,8 +51,8 @@ public:
     void Next();
     CFont* getFont(int, int);
     void addString(char**, int);
-    void GET_2(char**);
-    void GET_1(char**);
+    int GET_2(char**);
+    char GET_1(char**);
     int GetWait();
     void SetPlayerIndex(int index) { m_playerIndex = index; }
     float GetMaxWidth() const { return mMaxWidth; }

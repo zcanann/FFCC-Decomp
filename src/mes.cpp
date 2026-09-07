@@ -32,7 +32,16 @@ static inline char GetMesNibbleValue(const char* data)
 	return val;
 }
 
-static inline char ReadTagByte(char** text)
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x800acce4
+ * EN Size: 92b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline char CMes::GET_1(char** text)
 {
 	char* p0 = *text;
 	*text = p0 + 1;
@@ -43,16 +52,6 @@ static inline char ReadTagByte(char** text)
 	return val;
 }
 
-static inline int ReadTagU8(char** text)
-{
-	return (unsigned char)ReadTagByte(text);
-}
-
-static inline int ReadTagS8(char** text)
-{
-	return (int)ReadTagByte(text);
-}
-
 static inline int ReadTagNibble(char** text)
 {
 	char* p = *text;
@@ -60,7 +59,16 @@ static inline int ReadTagNibble(char** text)
 	return *p & 0x0F;
 }
 
-static inline int ReadTagS16(char** text)
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x800acc38
+ * EN Size: 172b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMes::GET_2(char** text)
 {
 	short acc = (short)(ReadTagNibble(text) << 4);
 	acc = (short)(acc | ReadTagNibble(text));
@@ -478,6 +486,20 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 }
 #pragma opt_lifetimes reset
 #pragma opt_propagation reset
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 132b
+ * EN Address: 0x800ad4cc
+ * EN Size: 152b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMes::addFlag(CFlag& flag)
+{
+	mFlagEntries[mFlagCount++] = flag;
+}
 
 /*
  * --INFO--
@@ -918,7 +940,7 @@ void CMes::addString(char** text, int branchMode)
 			mWaitActive = 1;
 			goto advanceLine;
 		case 3:
-			mRevealCursor = mRevealCursor + ReadTagS8(text);
+			mRevealCursor = mRevealCursor + GET_1(text);
 			break;
 		case 4:
 			mFontAlign = 0;
@@ -932,24 +954,24 @@ void CMes::addString(char** text, int branchMode)
 		case 7:
 			mRubyEnabled = 1;
 			mRubyLine = 0;
-			mRubyHeight = ReadTagS8(text);
+			mRubyHeight = GET_1(text);
 			{
 				float rubyAdvance = (float)font->m_glyphHeight * font->scaleY;
 				mRubySpacing = -2.0f + rubyAdvance;
 			}
 			mRubyY = mCurrentY;
-			mRubyOffset = ReadTagS8(text);
-			mCurrentX = mCurrentX + 28.0f + mLineSpacing;
+			mRubyOffset = GET_1(text);
+			mCurrentX = mCurrentX + (28.0f + mLineSpacing);
 			break;
 		case 8:
 		{
-			char colorTag = ReadTagByte(text);
+			char colorTag = GET_1(text);
 			int oldColor = mColor;
 			if (colorTag != 0)
 			{
 				mColor = 6;
 			}
-			char* flatText = (char*)Game.m_caravanWorkArr[mFlagVars[ReadTagS8(text)] & 0xFFFF].m_name;
+			char* flatText = (char*)Game.m_caravanWorkArr[mFlagVars[GET_1(text)] & 0xFFFF].m_name;
 			addString(&flatText, branchMode);
 			mColor = oldColor;
 			break;
@@ -963,13 +985,13 @@ void CMes::addString(char** text, int branchMode)
 		case 0x3D:
 		case 0x3F:
 		{
-			char colorTag = ReadTagByte(text);
+			char colorTag = GET_1(text);
 			int oldColor = mColor;
 			if (colorTag != 0)
 			{
 				mColor = 5;
 			}
-			int value = mFlagVars[ReadTagS8(text)] & 0xFFFF;
+			int value = mFlagVars[GET_1(text)] & 0xFFFF;
 			char* namePtr = nameItem;
 			switch (uch)
 			{
@@ -987,10 +1009,10 @@ void CMes::addString(char** text, int branchMode)
 				Game.MakeArtsItemNames(namePtr, value);
 				break;
 			case 0x3D:
-				Game.MakeArtItemName(namePtr, value, mFlagVars[ReadTagS8(text)] & 0xFFFF);
+				Game.MakeArtItemName(namePtr, value, mFlagVars[GET_1(text)] & 0xFFFF);
 				break;
 			case 0x3F:
-				Game.MakeNumItemName(namePtr, value, mFlagVars[ReadTagS8(text)] & 0xFFFF);
+				Game.MakeNumItemName(namePtr, value, mFlagVars[GET_1(text)] & 0xFFFF);
 				break;
 			case 0x1D:
 				strcpy(namePtr, FlatNameDirect(0, value * 5));
@@ -1010,13 +1032,13 @@ void CMes::addString(char** text, int branchMode)
 		case 0x3E:
 		case 0x40:
 		{
-			char colorTag = ReadTagByte(text);
+			char colorTag = GET_1(text);
 			int oldColor = mColor;
 			if (colorTag != 0)
 			{
 				mColor = 0;
 			}
-			int value = mFlagVars[ReadTagS8(text)] & 0xFFFF;
+			int value = mFlagVars[GET_1(text)] & 0xFFFF;
 			char* namePtr = nameMon;
 			switch (uch)
 			{
@@ -1034,10 +1056,10 @@ void CMes::addString(char** text, int branchMode)
 				Game.MakeArtsMonNames(namePtr, value);
 				break;
 			case 0x3E:
-				Game.MakeArtMonName(namePtr, value, mFlagVars[ReadTagS8(text)] & 0xFFFF);
+				Game.MakeArtMonName(namePtr, value, mFlagVars[GET_1(text)] & 0xFFFF);
 				break;
 			case 0x40:
-				Game.MakeNumMonName(namePtr, value, mFlagVars[ReadTagS8(text)] & 0xFFFF);
+				Game.MakeNumMonName(namePtr, value, mFlagVars[GET_1(text)] & 0xFFFF);
 				break;
 			case 0x1E:
 				strcpy(namePtr, FlatNameDirect(1, value * 5));
@@ -1052,14 +1074,14 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x2B:
 		{
-			char colorTag = ReadTagByte(text);
+			char colorTag = GET_1(text);
 			int oldColor = mColor;
 			if (colorTag != 0)
 			{
 				mColor = 6;
 			}
 			char* namePtr;
-			strcpy(namePtr = nameTag2B, FlatNameDirect(2, mFlagVars[ReadTagS8(text)] & 0xFFFF));
+			strcpy(namePtr = nameTag2B, FlatNameDirect(2, mFlagVars[GET_1(text)] & 0xFFFF));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
@@ -1067,14 +1089,14 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x2C:
 		{
-			char colorTag = ReadTagByte(text);
+			char colorTag = GET_1(text);
 			int oldColor = mColor;
 			if (colorTag != 0)
 			{
 				mColor = 4;
 			}
 			char* namePtr;
-			strcpy(namePtr = nameTag2C, FlatNameDirect(3, mFlagVars[ReadTagS8(text)] & 0xFFFF));
+			strcpy(namePtr = nameTag2C, FlatNameDirect(3, mFlagVars[GET_1(text)] & 0xFFFF));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
@@ -1082,14 +1104,14 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x2D:
 		{
-			char colorTag = ReadTagByte(text);
+			char colorTag = GET_1(text);
 			int oldColor = mColor;
 			if (colorTag != 0)
 			{
 				mColor = 3;
 			}
 			char* namePtr;
-			strcpy(namePtr = nameTag2D, FlatNameDirect(3, (mFlagVars[ReadTagS8(text)] & 0xFFFF) + 0x3C));
+			strcpy(namePtr = nameTag2D, FlatNameDirect(3, (mFlagVars[GET_1(text)] & 0xFFFF) + 0x3C));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
@@ -1097,7 +1119,7 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x2E:
 		{
-			char* flatText = FlatNameDirect(5, mFlagVars[ReadTagS8(text)] & 0xFFFF);
+			char* flatText = FlatNameDirect(5, mFlagVars[GET_1(text)] & 0xFFFF);
 			addString(&flatText, branchMode);
 			break;
 		}
@@ -1111,14 +1133,14 @@ void CMes::addString(char** text, int branchMode)
 		{
 			char number[256];
 			char* numberPtr;
-			sprintf(numberPtr = number, s_mesNumFmt, mFlagVars[ReadTagS8(text)]);
+			sprintf(numberPtr = number, s_mesNumFmt, mFlagVars[GET_1(text)]);
 			addString(&numberPtr, branchMode);
 			break;
 		}
 		case 0x0A:
 		{
-			unsigned char idx = (unsigned char)ReadTagU8(text);
-			short value = (short)ReadTagS16(text);
+			unsigned char idx = (unsigned char)GET_1(text);
+			short value = (short)GET_2(text);
 			mFlagVars[idx] = value;
 			if (branchMode == 0)
 			{
@@ -1126,20 +1148,20 @@ void CMes::addString(char** text, int branchMode)
 				flag.m_param.m_index = idx;
 				flag.m_param.m_value = value;
 				flag.m_type = 2;
-				mFlagEntries[mFlagCount++] = flag;
+				addFlag(flag);
 			}
 			break;
 		}
 		case 0x0B:
 		{
-			unsigned char idx = (unsigned char)ReadTagU8(text);
+			unsigned char idx = (unsigned char)GET_1(text);
 			mFlagVars[idx] = mFlagVars[idx] + 1;
 			if (branchMode == 0)
 			{
 				CFlag flag;
 				flag.m_param.m_index = idx;
 				flag.m_type = 1;
-				mFlagEntries[mFlagCount++] = flag;
+				addFlag(flag);
 			}
 			break;
 		}
@@ -1167,14 +1189,14 @@ void CMes::addString(char** text, int branchMode)
 			mWaitFrames = 1;
 			goto advanceLine;
 		case 0x26:
-			mTextAlign = ReadTagS8(text);
+			mTextAlign = GET_1(text);
 			break;
 		case 0x27:
-			mFadeFrames = ReadTagS8(text);
+			mFadeFrames = GET_1(text);
 			break;
 		case 0x25:
 		{
-			int value = ReadTagS8(text);
+			int value = GET_1(text);
 			if (mFontCount != 0)
 			{
 				if ((unsigned int)System.m_execParam >= 1U)
@@ -1193,13 +1215,13 @@ void CMes::addString(char** text, int branchMode)
 			break;
 		}
 		case 0x31:
-			mCurrentX = (float)ReadTagS16(text);
-			mCurrentY = (float)ReadTagS16(text);
+			mCurrentX = (float)GET_2(text);
+			mCurrentY = (float)GET_2(text);
 			break;
 		case 0x22:
 		{
-			float x = (float)ReadTagS16(text);
-			float y = (float)ReadTagS16(text);
+			float x = (float)GET_2(text);
+			float y = (float)GET_2(text);
 			MenuPcs.m_battleMesMenus[m_playerIndex]->SetPos(x, y);
 			break;
 		}
@@ -1207,17 +1229,17 @@ void CMes::addString(char** text, int branchMode)
 			mColor = 9;
 			break;
 		case 0x33:
-			mLineSpacing = (float)ReadTagS8(text);
+			mLineSpacing = (float)GET_1(text);
 			break;
 		case 0x34:
 		{
-			mFontIndex = ReadTagS8(text);
+			mFontIndex = GET_1(text);
 			font = getFont(mFontIndex, 0);
 			break;
 		}
 		case 0x35:
 		{
-			float scale = 0.01f * (float)ReadTagS16(text);
+			float scale = 0.01f * (float)GET_2(text);
 			mScaleY = scale;
 			mScaleX = scale;
 			float tagScaleY = mScaleY;
@@ -1227,7 +1249,7 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x1A:
 		{
-			mScaleX = 0.01f * (float)ReadTagS16(text);
+			mScaleX = 0.01f * (float)GET_2(text);
 			float tagScaleY = mScaleY;
 			font->SetScaleX(mScaleX);
 			font->SetScaleY(tagScaleY);
@@ -1235,19 +1257,19 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x36:
 		{
-			signed char idx = (unsigned char)ReadTagU8(text);
+			signed char idx = (unsigned char)GET_1(text);
 			if (branchMode == 0)
 			{
 				CFlag flag;
 				flag.m_param.m_index = idx;
 				flag.m_type = 4;
-				mFlagEntries[mFlagCount++] = flag;
+				addFlag(flag);
 			}
 			break;
 		}
 		case 0x41:
 		{
-			int mode = ReadTagS8(text);
+			int mode = GET_1(text);
 			int newCaseMode;
 			if (mode == 1)
 			{
@@ -1287,7 +1309,7 @@ void CMes::addString(char** text, int branchMode)
 		case 0x42:
 		{
 			int newFlowMode = 2;
-			if (mFlagVars[ReadTagS8(text)] == 1)
+			if (mFlagVars[GET_1(text)] == 1)
 			{
 				newFlowMode = 1;
 			}
@@ -1297,7 +1319,7 @@ void CMes::addString(char** text, int branchMode)
 		case 0x45:
 		{
 			int newFlowMode = 2;
-			if (Game.m_caravanWorkArr[mFlagVars[ReadTagS8(text)]].m_genderFlag == 0)
+			if (Game.m_caravanWorkArr[mFlagVars[GET_1(text)]].m_genderFlag == 0)
 			{
 				newFlowMode = 1;
 			}
@@ -1307,7 +1329,7 @@ void CMes::addString(char** text, int branchMode)
 		case 0x20:
 		{
 			signed char vowel =
-			    (signed char)Game.m_caravanWorkArr[mFlagVars[ReadTagS8(text)]].m_name[0];
+			    (signed char)Game.m_caravanWorkArr[mFlagVars[GET_1(text)]].m_name[0];
 			if ((vowel == 'A') || (vowel == 'I') || (vowel == 'U') ||
 			    (vowel == 'E') || (vowel == 'O') || (vowel == 'Y'))
 			{
@@ -1321,7 +1343,7 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x21:
 		{
-			char vowel = *FlatNameDirect(2, mFlagVars[ReadTagS8(text)]);
+			char vowel = *FlatNameDirect(2, mFlagVars[GET_1(text)]);
 			if ((vowel == 'A') || (vowel == 'I') || (vowel == 'U') ||
 			    (vowel == 'E') || (vowel == 'O') || (vowel == 'Y'))
 			{
@@ -1346,7 +1368,7 @@ void CMes::addString(char** text, int branchMode)
 		case 0x1B:
 		{
 			int newFlowMode = 2;
-			if ((mFlagVars[ReadTagS8(text)] & 1) == 0)
+			if ((mFlagVars[GET_1(text)] & 1) == 0)
 			{
 				newFlowMode = 1;
 			}
@@ -1356,7 +1378,7 @@ void CMes::addString(char** text, int branchMode)
 		case 0x1C:
 		{
 			int newFlowMode = 2;
-			if ((mFlagVars[ReadTagS8(text)] & 1) == 1)
+			if ((mFlagVars[GET_1(text)] & 1) == 1)
 			{
 				newFlowMode = 1;
 			}

@@ -307,40 +307,6 @@ static inline void SetUv(Vec2d& uv, float u, float v)
 }
 }
 
-static inline unsigned short GetMenuPress()
-{
-	bool activeInput = false;
-
-	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		return 0;
-	}
-
-	int padIndex = 0;
-	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-	return Pad.GetPadInputs()[padIndex].buttonDown[0];
-}
-
-static inline unsigned short GetMenuPressLock(int lock)
-{
-	bool activeInput = false;
-
-	if ((lock != 0) || (Pad.m_debugPadPort != -1)) {
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		return 0;
-	}
-
-	int padIndex = 0;
-	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-	return Pad.GetPadInputs()[padIndex].buttonDown[0];
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8017683c
@@ -1027,7 +993,7 @@ void CMenuPcs::DrawOptionMenu()
  */
 void CMenuPcs::CalcOptionMenu()
 {
-	unsigned short press = static_cast<unsigned short>(GetMenuPress());
+	unsigned short press = static_cast<unsigned short>(Pad.GetButtonDown(0));
 	int optionChanged = 0;
 
 	if (m_optionMenuState == 0) {
@@ -1134,7 +1100,7 @@ void CMenuPcs::CalcOptionMenu()
 	int specialModeEdit = m_specialModeEdit;
 	if (specialModeEdit == 0) {
 		unsigned short press2;
-		press2 = GetMenuPress();
+		press2 = Pad.GetButtonDown(0);
 
 		if ((press2 & 0x200) != 0) {
 			m_optionMenuState = 2;
@@ -1234,9 +1200,8 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (m_optionIndex == 4) {
-		int lock = Pad.m_debugPadLock;
 		unsigned short press3;
-		press3 = GetMenuPressLock(lock);
+		press3 = Pad.GetButtonDown(0);
 
 		if ((press3 & 0x100) != 0) {
 			if (m_specialModeEdit == 0) {
@@ -1244,7 +1209,7 @@ void CMenuPcs::CalcOptionMenu()
 				m_specialModeEdit = 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			}
-		} else if ((m_specialModeEdit != 0) && ((GetMenuPressLock(lock) & 0x200) != 0)) {
+		} else if ((m_specialModeEdit != 0) && ((Pad.GetButtonDown(0) & 0x200) != 0)) {
 			m_specialModeCursor = 0;
 			m_specialModeEdit = 0;
 			Sound.PlaySe(3, 0x40, 0x7F, 0);

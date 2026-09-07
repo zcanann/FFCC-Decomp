@@ -69,21 +69,7 @@ static inline CFont* GetTmpArtiFont(CMenuPcs* menu)
  */
 inline int CMenuPcs::TmpArtiCtrlCur()
 {
-    bool hasInput = false;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
-        hasInput = true;
-    }
-
-    unsigned int rawPress;
-    if (hasInput) {
-        rawPress = 0;
-    } else {
-        unsigned int padIndex = 0;
-        int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
-        padIndex &= ~mask;
-        rawPress = Pad.GetPadInputs()[padIndex].buttonDown[0];
-    }
-    short buttonDown = rawPress & 0xffff;
+    short buttonDown = Pad.GetButtonDown(0);
 
     if (buttonDown == 0) {
         return 0;

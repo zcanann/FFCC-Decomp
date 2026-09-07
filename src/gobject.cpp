@@ -194,20 +194,6 @@ static inline int RemapPadSlot(CPad* pad, int padIndex)
     return static_cast<int>(padIndex & ~(static_cast<int>(~((activePad - padIndex) | (padIndex - activePad))) >> 31));
 }
 
-static inline unsigned short GetMovePadButton(int player)
-{
-    return (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
-        ? 0
-        : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].button[0];
-}
-
-static inline unsigned short GetMovePadButtonDown(int player)
-{
-    return (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
-        ? 0
-        : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].buttonDown[0];
-}
-
 static inline unsigned short GetMovePadButtonUp(int player)
 {
     return (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
@@ -3161,8 +3147,8 @@ void CGObject::move()
             && m_weaponNodeFlagAll.m_bits1.m_shield
             && m_weaponNodeFlagAll.m_bits1.m_menuReady
             && ((Game.m_gameWork.m_menuStageMode == 0) || (Game.m_gameWork.m_menuStageMode == 0) || (static_cast<s8>(animMiscRaw) == 0))) {
-            u16 buttons = GetMovePadButton(player);
-            const u16 buttonsDown = GetMovePadButtonDown(player);
+            u16 buttons = Pad.GetButton(player);
+            const u16 buttonsDown = Pad.GetButtonDown(player);
             const u16 buttonsRepeat = GetMovePadButtonUp(player);
 
             if ((buttons != 0) && (buttonsRepeat != 0)) {

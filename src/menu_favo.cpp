@@ -298,29 +298,8 @@ int CMenuPcs::FavoClose()
  */
 int CMenuPcs::FavoCtrl()
 {
-	bool activeInput = false;
-	unsigned int rawPress;
-	short press;
+	short press = Pad.GetButtonDown(0);
 	int doReset;
-
-	if (Pad.m_debugPadLock == 0) {
-		if (Pad.m_debugPadPort != -1) {
-			goto active;
-		}
-	} else {
-active:
-		activeInput = true;
-	}
-
-	if (activeInput) {
-		rawPress = 0;
-	} else {
-		unsigned int port = 0;
-		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
-		port &= ~mask;
-		rawPress = Pad.GetPadInputs()[port].buttonDown[0];
-	}
-	press = rawPress & 0xffff;
 
 	if (press == 0) {
 		doReset = 0;

@@ -1372,12 +1372,8 @@ void CMenuPcs::CalcSelectWait()
 	if (this->m_menuWindowInfo->state != 3) {
 		if (this->m_menuWindowInfo->state == 1) {
 			int padSlot = s_Rinfo->m_party[i].m_partySlot;
-			unsigned short repeat = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1))
-			    ? 0
-			    : Pad.m_padInputs[(Pad.m_debugPadPort == padSlot) ? 0 : padSlot].repeatButton;
-			unsigned short down = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1))
-			    ? 0
-			    : Pad.m_padInputs[(Pad.m_debugPadPort == padSlot) ? 0 : padSlot].buttonDown[0];
+			unsigned short repeat = Pad.GetButtonRepeat(padSlot);
+			unsigned short down = Pad.GetButtonDown(padSlot);
 			if ((repeat & 3) != 0) {
 				confirmSel = (short)(confirmSel ^ 1);
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
@@ -1401,12 +1397,8 @@ void CMenuPcs::CalcSelectWait()
 	} else {
 		if ((int)delay == 0 && currentPartyIndex < activePartyCount) {
 			int padSlot = s_Rinfo->m_party[i].m_partySlot;
-			unsigned short repeat = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1))
-			    ? 0
-			    : Pad.m_padInputs[(Pad.m_debugPadPort == padSlot) ? 0 : padSlot].repeatButton;
-			unsigned short down = (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1))
-			    ? 0
-			    : Pad.m_padInputs[(Pad.m_debugPadPort == padSlot) ? 0 : padSlot].buttonDown[0];
+			unsigned short repeat = Pad.GetButtonRepeat(padSlot);
+			unsigned short down = Pad.GetButtonDown(padSlot);
 			if ((repeat & 9) != 0) {
 				selection = (short)(selection + 1);
 				if (*(short*)(this->m_bonusStatePtr + 0x26) > 7) {

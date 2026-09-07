@@ -1005,28 +1005,7 @@ inline void CMenuPcs::DrawQuit()
  */
 u16 CMenuPcs::GetButtonDown(int port)
 {
-    bool noInput = false;
-    u32 result;
-
-    if (Pad.m_debugPadLock == 0) {
-        if (port != 0) {
-            goto input_check_done;
-        }
-        if (Pad.m_debugPadPort == -1) {
-            goto input_check_done;
-        }
-    }
-    noInput = true;
-
-input_check_done:
-    if (noInput) {
-        result = 0;
-    } else {
-        u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
-        result = Pad.GetPadInputs()[clamped].buttonDown[0];
-    }
-
-    return result;
+    return Pad.GetButtonDown(port);
 }
 
 /*
@@ -1040,28 +1019,7 @@ input_check_done:
  */
 u16 CMenuPcs::GetButtonRepeat(int port)
 {
-    bool noInput = false;
-    u32 result;
-
-    if (Pad.m_debugPadLock == 0) {
-        if (port != 0) {
-            goto repeat_check_done;
-        }
-        if (Pad.m_debugPadPort == -1) {
-            goto repeat_check_done;
-        }
-    }
-    noInput = true;
-
-repeat_check_done:
-    if (noInput) {
-        result = 0;
-    } else {
-        u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
-        result = Pad.GetPadInputs()[clamped].repeatButton;
-    }
-
-    return result;
+    return Pad.GetButtonRepeat(port);
 }
 
 /*

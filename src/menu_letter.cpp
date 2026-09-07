@@ -2004,39 +2004,8 @@ void CMenuPcs::LetterMessDraw()
  */
 int CMenuPcs::LetterCtrlCur()
 {
-	bool blocked = false;
-	int press;
-	int hold;
-	int pressRaw;
-	int holdRaw;
-	int padState = Pad.m_debugPadLock;
-
-	if ((padState != 0) || (Pad.m_debugPadPort != -1)) {
-		blocked = true;
-	}
-	if (blocked) {
-		pressRaw = 0;
-	} else {
-		int padIndex = 0;
-		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
-		padIndex &= ~mask;
-		pressRaw = Pad.GetPadInputs()[padIndex].buttonDown[0];
-	}
-	press = static_cast<s16>(static_cast<u16>(pressRaw));
-
-	blocked = false;
-	if ((padState != 0) || (Pad.m_debugPadPort != -1)) {
-		blocked = true;
-	}
-	if (blocked) {
-		holdRaw = 0;
-	} else {
-		int padIndex = 0;
-		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
-		padIndex &= ~mask;
-		holdRaw = Pad.GetPadInputs()[padIndex].repeatButton;
-	}
-	hold = static_cast<s16>(static_cast<u16>(holdRaw));
+	int press = static_cast<s16>(Pad.GetButtonDown(0));
+	int hold = static_cast<s16>(Pad.GetButtonRepeat(0));
 
 	if (hold == 0) {
 		return 0;

@@ -497,14 +497,35 @@ public:
     void pppDeleteAll();
     void pppDestroyAll();
 
-    unsigned char m_unk0[0x1C8];
+    unsigned char m_unk0[0x10];
+    int m_cursorRequest;                // 0x10
+    unsigned char m_unk14[4];
+    Vec m_editorCursorPosition;          // 0x18
+    unsigned char m_unk24[4];
+    int m_editorCursorX;                // 0x28
+    int m_editorCursorY;                // 0x2C
+    unsigned char m_unk30[0x1C8 - 0x30];
     unsigned char* m_editNodeNameBuffer;  // 0x1C8
-    unsigned char m_unk1CC[0x7E4 - 0x1CC];
+    unsigned int m_editReceiveOffset;   // 0x1CC
+    unsigned char m_unk1D0[4];
+    void* m_editDataBuffers[0x80];       // 0x1D4
+    unsigned char m_unk3D4[4];
+    void* m_editTextBuffers[0x80];       // 0x3D8
+    unsigned char m_unk5D8[4];
+    long* m_editProgramData[0x80];       // 0x5DC
+    unsigned char m_unk7DC[8];
     CMaterialSet* m_materialSet;          // 0x7E4
     CTextureSet* m_textureSet;            // 0x7E8
     pppModelSt* m_pppModelStArr;          // 0x7EC
     pppShapeSt* m_pppShapeStArr;          // 0x7F0
-    unsigned char m_unk7F4[0x2224];
+    pppModelSt** m_editModelSlots;       // 0x7F4
+    pppShapeSt** m_editShapeSlots;       // 0x7F8
+    void* m_editTextTable;              // 0x7FC
+    unsigned char m_unk800[8];
+    unsigned char m_editorFlags[3];     // 0x808
+    unsigned char m_unk80B;
+    CGObject* m_editorObject;           // 0x80C
+    unsigned char m_unk810[0x2A18 - 0x810];
     _pppMngSt m_pppMng[0x180];           // 0x2A18
 
     struct PppPdtSlot

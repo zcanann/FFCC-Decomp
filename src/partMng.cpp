@@ -46,6 +46,18 @@ STATIC_ASSERT(offsetof(_pppMngSt, m_scale) == 0x28);
 STATIC_ASSERT(offsetof(_pppMngSt, m_matrix) == 0x78);
 STATIC_ASSERT(sizeof(_pppMngSt) == 0x158);
 
+STATIC_ASSERT(sizeof(CPartMng) == 0x23FD8);
+STATIC_ASSERT(offsetof(CPartMng, m_cursorRequest) == 0x10);
+STATIC_ASSERT(offsetof(CPartMng, m_editorCursorPosition) == 0x18);
+STATIC_ASSERT(offsetof(CPartMng, m_editorCursorX) == 0x28);
+STATIC_ASSERT(offsetof(CPartMng, m_editDataBuffers) == 0x1D4);
+STATIC_ASSERT(offsetof(CPartMng, m_editTextBuffers) == 0x3D8);
+STATIC_ASSERT(offsetof(CPartMng, m_editProgramData) == 0x5DC);
+STATIC_ASSERT(offsetof(CPartMng, m_materialSet) == 0x7E4);
+STATIC_ASSERT(offsetof(CPartMng, m_editorObject) == 0x80C);
+STATIC_ASSERT(offsetof(CPartMng, m_pppMng) == 0x2A18);
+STATIC_ASSERT(offsetof(CPartMng, m_pdtSlots) == 0x22E18);
+
 extern "C" {
 extern Mtx ppvCameraMatrix;
 extern float ppvChrScl[3];
@@ -284,19 +296,14 @@ CPartMng::CPartMng()
  */
 void CPartMng::Create()
 {
-    static const int kPppMngCount = 0x180;
-    static const int kPppMngStride = 0x158;
-
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
     C_MTXPerspective(ppvScreenMatrix, kPartMngScreenFovY, kPartMngScreenAspect, kPartMngScreenNear, kPartMngPppFar);
     PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
 
-    memset(self + 0x235a8, 0, 0x108);
+    memset(m_unk235A8, 0, 0x108);
 
-    self[0x80a] = 0;
-    self[0x809] = 0;
-    self[0x808] = 0;
+    m_editorFlags[2] = 0;
+    m_editorFlags[1] = 0;
+    m_editorFlags[0] = 0;
 
     ppvSysStopPartF = 1;
     ppvSysGoPartF = 0;
@@ -330,71 +337,43 @@ void CPartMng::Create()
     m_pppModelStArr = 0;
     m_pppShapeStArr = 0;
 
-    {
-        int* zero = reinterpret_cast<int*>(self);
-        for (int i = 0; i < 0x80; i++) {
-            zero[0x75 + i] = 0;
-        }
+    for (int i = 0; i < 0x80; i++) {
+        m_editDataBuffers[i] = 0;
     }
-    {
-        int* zero = reinterpret_cast<int*>(self);
-        for (int i = 0; i < 0x80; i++) {
-            zero[0xf6 + i] = 0;
-        }
+    for (int i = 0; i < 0x80; i++) {
+        m_editTextBuffers[i] = 0;
     }
-    {
-        int* zero = reinterpret_cast<int*>(self);
-        for (int i = 0; i < 0x80; i++) {
-            zero[0x177 + i] = 0;
-        }
+    for (int i = 0; i < 0x80; i++) {
+        m_editProgramData[i] = 0;
     }
 
-    {
-        unsigned char* mng = self;
-        for (int i = 0; i < kPppMngCount / 6; i++) {
-            for (int k = 0; k < 6; k++) {
-                unsigned char* e = mng + (k * kPppMngStride);
-                *reinterpret_cast<int*>(e + 0x2A18 + 0x14) = -0x1000;
-                *reinterpret_cast<int*>(e + 0x2A18 + 0x12c) = -1;
-                *reinterpret_cast<int*>(e + 0x2A18 + 0x11c) = -1;
-                *reinterpret_cast<unsigned char*>(e + 0x2A18 + 0x120) = 0;
-                *reinterpret_cast<unsigned char*>(e + 0x2A18 + 0x121) = 1;
-                *reinterpret_cast<int*>(e + 0x2A18 + 0x124) = 0;
-                *reinterpret_cast<unsigned char*>(e + 0x2A18 + 0x122) = 0;
-                *reinterpret_cast<int*>(e + 0x2A18 + 0x128) = 0x1e;
-            }
-            mng += 6 * kPppMngStride;
-        }
+    for (int i = 0; i < 0x180; i++) {
+        m_pppMng[i].m_baseTime = -0x1000;
+        m_pppMng[i].m_soundEffectData.m_soundEffectHandle = -1;
+        m_pppMng[i].m_soundEffectData.m_soundEffectSlot = -1;
+        m_pppMng[i].m_soundEffectData.m_soundEffectStopFlag = 0;
+        m_pppMng[i].m_soundEffectData.m_soundEffectKind = 1;
+        m_pppMng[i].m_soundEffectData.m_soundEffectStartFrame = 0;
+        m_pppMng[i].m_soundEffectData.m_soundEffectStartedOnce = 0;
+        m_pppMng[i].m_soundEffectData.m_soundEffectFadeFrames = 30;
     }
 
-    {
-        unsigned char* walk = self;
-        for (int k = 0; k < 4; k++) {
-            int* e = reinterpret_cast<int*>(walk + 0x22e18);
-            e[0x00 / 4] = 0;
-            e[0x38 / 4] = 0;
-            e[0x70 / 4] = 0;
-            e[0xa8 / 4] = 0;
-            e[0xe0 / 4] = 0;
-            e[0x118 / 4] = 0;
-            e[0x150 / 4] = 0;
-            e[0x188 / 4] = 0;
-            walk += 0x1c0;
-        }
+    for (int i = 0; i < 0x20; i++) {
+        m_pdtSlots[i].m_pppDataHead = 0;
     }
 
-    *reinterpret_cast<void**>(self + 0x1c8) = 0;
-    *reinterpret_cast<int*>(self + 0x7f4) = 0;
-    *reinterpret_cast<int*>(self + 0x7f8) = 0;
-    *reinterpret_cast<int*>(self + 0x7fc) = 0;
+    m_editNodeNameBuffer = 0;
+    m_editModelSlots = 0;
+    m_editShapeSlots = 0;
+    m_editTextTable = 0;
 
     m_pppEnvSt.m_envParam = kPartMngZero;
     m_pppEnvSt.m_mngStCount = 0x10;
     m_pppEnvSt.m_isEditMode = 1;
 
-    *reinterpret_cast<int*>(self + 0x80c) = 0;
+    m_editorObject = 0;
 
-    memset(self + 0x235a8, 0, 0x108);
+    memset(m_unk235A8, 0, 0x108);
 
     m_pppEnvSt.m_boxMinX = kPartMngEnvBoxMinX;
     m_pppEnvSt.m_boxMaxX = kPartMngEnvBoxMaxXz;
@@ -820,7 +799,7 @@ void CPartMng::drawLine3D(Vec*, Vec*, _GXColor&)
  */
 void CPartMng::drawCursor()
 {
-    if (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x28) == 0x7fff) {
+    if (m_editorCursorX == 0x7fff) {
         return;
     }
 
@@ -855,8 +834,8 @@ void CPartMng::drawCursor()
     color.g = 0xff;
     color.b = 0xff;
     color.a = 0xff;
-    int cursorX = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x28);
-    int cursorY = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x2c);
+    int cursorX = m_editorCursorX;
+    int cursorY = m_editorCursorY;
     float zero = kPartMngZero;
 
     GXSetChanAmbColor((GXChannelID)4, color);
@@ -941,10 +920,9 @@ void CPartMng::render3Dcursor()
     GXLoadPosMtxImm(ppvCameraMatrix, 0);
     pppSetBlendMode(3);
 
-    float* cursorPos = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x18);
-    float x = cursorPos[0];
-    float y = cursorPos[1];
-    float z = cursorPos[2];
+    float x = m_editorCursorPosition.x;
+    float y = m_editorCursorPosition.y;
+    float z = m_editorCursorPosition.z;
 
     _GXColor color;
     color.r = 0xff;
@@ -990,39 +968,34 @@ void Screen2world(Vec&, Vec&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005DEE8
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppGet2Dpos()
 {
-    struct PartMngMouseRaw {
-        unsigned char pad00[0x10];
-        int requestFlag;
-        unsigned char pad14[0x14];
-        unsigned int cursorX;
-        unsigned int cursorY;
-    };
-
-    int zAtPixel;
+    u32 zAtPixel;
     Vec worldPos;
     Vec viewPos;
     Mtx invCamera;
-    PartMngMouseRaw* raw = reinterpret_cast<PartMngMouseRaw*>(this);
 
-    if (raw->requestFlag != 0) {
-        int x = raw->cursorX + 0x140;
-        int y = raw->cursorY + 0xE0;
+    if (m_cursorRequest != 0) {
+        int x = m_editorCursorX + 0x140;
+        int y = m_editorCursorY + 0xE0;
         if ((x >= 0) && (x < 0x27E) && (y >= 0) && (y < 0x1BE)) {
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x2A2);
-            GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), reinterpret_cast<u32*>(&zAtPixel));
+            GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), &zAtPixel);
 
             const float* screenHalfHeight = &kPartMngScreenHalfHeight;
             const float* depthUnit = &kPartMngDepthUnit;
             const float* screenHalfWidth = &kPartMngScreenHalfWidth;
-            float normY = -(float)(int)raw->cursorY / *screenHalfHeight / ppvScreenMatrix0[1][1];
+            float normY = -(float)m_editorCursorY / *screenHalfHeight / ppvScreenMatrix0[1][1];
             float viewZ = ppvScreenMatrix0[2][3]
-                          / ((float)(zAtPixel - 0xFFFFFF) / *depthUnit + ppvScreenMatrix0[2][2]);
-            float normX = (float)(int)raw->cursorX / *screenHalfWidth / ppvScreenMatrix0[0][0];
+                          / ((float)((int)zAtPixel - 0xFFFFFF) / *depthUnit + ppvScreenMatrix0[2][2]);
+            float normX = (float)m_editorCursorX / *screenHalfWidth / ppvScreenMatrix0[0][0];
             viewPos.x = viewZ * normX;
             viewPos.y = viewZ * normY;
             viewPos.z = -viewZ;
@@ -1031,7 +1004,7 @@ void CPartMng::pppGet2Dpos()
             PSMTXMultVec(invCamera, &viewPos, &worldPos);
             USBPcs.SendDataCode(0x60, &worldPos, 1, 0xC);
         }
-        raw->requestFlag = 0;
+        m_cursorRequest = 0;
     }
 }
 
@@ -5072,9 +5045,8 @@ void CPartMng::pppDestroyAll()
  */
 _pppMngSt::_pppMngSt()
 {
-    char* base = reinterpret_cast<char*>(this);
-    PPPSEST* soundEffectData = reinterpret_cast<PPPSEST*>(base + 0x11c);
-    PPPIFPARAM* hitParams = reinterpret_cast<PPPIFPARAM*>(base + 0x130);
+    PPPSEST* soundEffectData = &m_soundEffectData;
+    PPPIFPARAM* hitParams = &m_hitParams;
 
     soundEffectData->m_soundEffectHandle = -1;
     soundEffectData->m_soundEffectSlot = -1;

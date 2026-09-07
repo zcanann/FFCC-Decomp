@@ -1615,8 +1615,8 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
  * --INFO--
  * PAL Address: 80054c58
  * PAL Size: 304b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80064BE4
+ * EN Size: 1228b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1635,11 +1635,10 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 			if (pDataVal->m_activeCount != 0)
 			{
 				s32 workOffsetStep = 0;
-				_pppProgSetDef* stageSet = progSet;
 
 				for (s32 stage = 0; stage < progSet->m_numStages; stage++)
 				{
-					_pppCtrlTable* stageIter = stageSet->m_stages;
+					_pppCtrlTable* stageIter = &progSet->m_stages[stage];
 					pppProg* prog = stageIter->m_prog;
 					if (prog != 0)
 					{
@@ -1672,7 +1671,6 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 						printf(sPppProgNullErrorMsg);
 					}
 
-					stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 					workOffsetStep += 4;
 				}
 			}
@@ -1704,13 +1702,11 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0 &&
 		    pDataVal->m_programSetDef->m_drawFlagBits.m_skipDraw == 0 && pDataVal->m_activeCount > 0)
 		{
-			s32 workOffsetStep = 0;
 			_pppProgSetDef* progSet = pDataVal->m_programSetDef;
-			_pppProgSetDef* stageSet = progSet;
 
 			for (s32 stage = 0; stage < progSet->m_numStages; stage++)
 			{
-				_pppCtrlTable* stageIter = stageSet->m_stages;
+				_pppCtrlTable* stageIter = &progSet->m_stages[stage];
 				pppProg* prog = stageIter->m_prog;
 				if (prog != 0)
 				{
@@ -1725,7 +1721,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 							if (((_pppPObject*)obj)->m_field7C == 0)
 							{
 								fn((_pppPObject*)obj,
-								   *(void**)(((u8*)obj) + progSet->m_workBaseOffset + workOffsetStep),
+								   ((void**)((u8*)obj + progSet->m_workBaseOffset))[stage],
 								   stageIter);
 							}
 							count--;
@@ -1740,9 +1736,6 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 				{
 					printf(sPppProgNullErrorMsg);
 				}
-
-				stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
-				workOffsetStep += 4;
 			}
 		}
 		pDataValOffset += sizeof(_pppPDataVal);

@@ -2658,8 +2658,8 @@ void CGPartyObj::putComboParticle()
  * --INFO--
  * PAL Address: 0x8011f5a4
  * PAL Size: 1028b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013E87C
+ * EN Size: 792b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2681,10 +2681,10 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
 			bossStage = true;
 		}
-		if (bossStage && ((__cntlzw(0x6D - (static_cast<unsigned short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0)) {
+		if (bossStage && IsKindOf(0x6D)) {
 			bossCid = true;
 		}
-		if (bossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {
+		if (bossCid && (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0)) {
 			bossTarget = true;
 		}
 		float radius;
@@ -2694,16 +2694,10 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 			radius = FLOAT_80331A88;
 		}
 
-		CVector startOffset(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-		const CVector& worldPos = CVector(m_worldPosition);
-		CVector startPos;
-		PSVECAdd((Vec*)&worldPos, reinterpret_cast<Vec*>(&startOffset), reinterpret_cast<Vec*>(&startPos));
+		CVector startPos = CVector(m_worldPosition) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
 
-		Vec startPosCopy;
-		Vec* copyPtr = &startPosCopy;
-		startPosCopy.x = startPos.x;
-		startPosCopy.y = startPos.y;
-		startPosCopy.z = startPos.z;
+		CVector startPosCopy(startPos);
+		Vec* copyPtr = startPosCopy;
 
 		CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		hitCylinder.m_bottom.x = copyPtr->x;
@@ -2715,15 +2709,9 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		if (MapMng.CheckHitCylinderNear(&hitCylinder, &rayDir, 0x30) != 0) {
 			getMapHitObject()->CalcHitPosition(&m_comboCenter);
 		} else {
-			CVector startOffset2(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-			const CVector& worldPos2 = CVector(m_worldPosition);
-			CVector startPos2;
-			PSVECAdd((Vec*)&worldPos2, reinterpret_cast<Vec*>(&startOffset2), reinterpret_cast<Vec*>(&startPos2));
-			Vec startPosVec;
-			startPosVec.x = startPos2.x;
-			startPosVec.y = startPos2.y;
-			startPosVec.z = startPos2.z;
-			PSVECAdd(&startPosVec, &rayDir, &m_comboCenter);
+			CVector startPos2 = CVector(m_worldPosition) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
+			CVector startPosVec(startPos2);
+			PSVECAdd(startPosVec, &rayDir, &m_comboCenter);
 		}
 		const CVector& down = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
@@ -2732,22 +2720,20 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		floorCylinder.m_radius = FLOAT_80331a78;
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, (Vec*)&down, 0x30) != 0) {
 			getMapHitObject()->CalcHitPosition(&m_comboCenter);
-			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 			Vec faceNormal;
-			caravanWork->m_targetCursorPosA = m_comboCenter;
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosA = m_comboCenter;
 			getMapHitObject()->GetHitFaceNormal(&faceNormal);
-			caravanWork->m_targetCursorPosB = faceNormal;
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosB = faceNormal;
 		}
 		m_comboTarget = m_comboCenter;
 	}
 
 	endPSlotBit(0x10);
-	CFlat.ResetParticleWork(((targetSide != 0) ? 4 : 0) +
-	                                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) +
-	                                     0x47 | 0x100,
-	                                 m_particleSlots[4]);
+	int particleId = ((targetSide != 0) ? 4 : 0) +
+	                 reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId + 0x47;
+	CFlat.ResetParticleWork(particleId | 0x100, m_particleSlots[4]);
 	CFlat.SetParticleWorkPos(m_comboCenter, FLOAT_80331a78);
-	CFlat.SetParticleWorkParam(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4), 0);
+	CFlat.SetParticleWorkParam(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId, 0);
 	CFlat.PutParticleWork();
 }
 

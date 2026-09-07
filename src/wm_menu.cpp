@@ -4179,7 +4179,7 @@ void CMenuPcs::DrawMainMenu()
 	}
 
 	DrawMainMenuSub();
-	PSMTXCopy(reinterpret_cast<float(*)[4]>(bytes + 0x744), CameraPcs.m_cameraMatrix);
+	PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
 	GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 	Mtx44 projectionMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
@@ -4309,9 +4309,9 @@ void CMenuPcs::DrawDiaryMenu()
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
 		C_MTXLookAt(lookAtMtx, reinterpret_cast<Vec*>(worldObj + 0x60),
-		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
-		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(m_wm.m_pad744));
+		            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+		            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
@@ -4326,7 +4326,7 @@ void CMenuPcs::DrawDiaryMenu()
 		GXSetScissor(*reinterpret_cast<unsigned int*>(worldObj + 0x90), *reinterpret_cast<unsigned int*>(worldObj + 0x94),
 		             *reinterpret_cast<unsigned int*>(worldObj + 0x98), *reinterpret_cast<unsigned int*>(worldObj + 0x9C));
 		GetWmWorldHandles(this)[1]->Draw(5);
-		PSMTXCopy(reinterpret_cast<MtxPtr>(m_wm.m_pad744), CameraPcs.m_cameraMatrix);
+		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 		PSMTX44Copy(CameraPcs.m_screenMatrix, restoreMtx);
 		GXSetProjection(restoreMtx, GX_PERSPECTIVE);
@@ -4484,10 +4484,9 @@ void CMenuPcs::DrawMCardMenu()
 				PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
 				const float* pZt = &FLOAT_803313dc;
 				const float* pOt = &FLOAT_803313e8;
-				CVector target(*pZt, *pZt, *pZt);
-				CVector up(*pZt, *pOt, *pZt);
-				C_MTXLookAt(savedCamera, (Vec*)(slot + 0x10), (Vec*)&up, (Vec*)&target);
-				PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
+				C_MTXLookAt(savedCamera, (Vec*)(slot + 0x10),
+				    CVector(*pZt, *pOt, *pZt), CVector(*pZt, *pZt, *pZt));
+				PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
 				PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
 				CharaPcs.InitEnv(5);
 				GXSetColorUpdate(0);
@@ -4533,7 +4532,7 @@ void CMenuPcs::DrawMCardMenu()
 			charaOff += 0x524;
 		} while (i < 4);
 		DrawInit();
-		PSMTXCopy(reinterpret_cast<MtxPtr>(bytes + 0x744), CameraPcs.m_cameraMatrix);
+		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 		PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 		GXSetProjection(screenMtx, GX_PERSPECTIVE);
@@ -4947,7 +4946,7 @@ void CMenuPcs::DrawCMakeMenu()
 
 		DrawCharaBase();
 		DrawChara();
-		PSMTXCopy(reinterpret_cast<MtxPtr>(bytes + 0x744), CameraPcs.m_cameraMatrix);
+		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 		Mtx44 projectionMtx;
 		PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
@@ -5165,9 +5164,9 @@ void CMenuPcs::DrawMoveMenu()
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
 		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x1A0),
-		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
-		            reinterpret_cast<Point3d*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
+		            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+		            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
@@ -5210,7 +5209,7 @@ void CMenuPcs::DrawMoveMenu()
 			}
 		}
 
-		PSMTXCopy(reinterpret_cast<MtxPtr>(bytes + 0x744), CameraPcs.m_cameraMatrix);
+		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0x00FFFFFF);
 		Mtx44 restoreMtx;
 		PSMTX44Copy(CameraPcs.m_screenMatrix, restoreMtx);
@@ -5277,17 +5276,12 @@ void CMenuPcs::DrawLoadMenu()
 	float cursorXbase;
 	float alpha;
 	if (state > 0 && state < 4) {
-		double raw;
 		if (state == 1) {
-			reinterpret_cast<int*>(&raw)[0] = 0x43300000;
-			reinterpret_cast<int*>(&raw)[1] = static_cast<int>(m_wmWorldState->m_frameCounter) ^ 0x80000000;
-			alpha = static_cast<float>(DOUBLE_803314E8 * (raw - DOUBLE_80331408));
+			alpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 		} else if (state == 2) {
 			alpha = FLOAT_803313e8;
 		} else {
-			reinterpret_cast<int*>(&raw)[0] = 0x43300000;
-			reinterpret_cast<int*>(&raw)[1] = static_cast<int>(m_wmWorldState->m_frameCounter) ^ 0x80000000;
-			alpha = static_cast<float>(-(DOUBLE_803314E8 * (raw - DOUBLE_80331408) - DOUBLE_80331420));
+			alpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 		}
 		if (static_cast<double>(alpha) > DOUBLE_803314F0) {
 			MenuPcs.SetAttrFmt((FMT)0);
@@ -5370,9 +5364,9 @@ void CMenuPcs::DrawLoadMenu()
 
 				Mtx lookAtMtx;
 				C_MTXLookAt(lookAtMtx, (Vec*)(slot + 0x10),
-				            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
-				            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
-				PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(m_wm.m_pad744));
+				            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+				            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
+				PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
 				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 				CharaPcs.InitEnv(5);
 				GXSetColorUpdate(0);
@@ -5411,7 +5405,7 @@ void CMenuPcs::DrawLoadMenu()
 			i++;
 		} while (i < 4);
 		DrawInit();
-		PSMTXCopy(reinterpret_cast<MtxPtr>(m_wm.m_pad744), CameraPcs.m_cameraMatrix);
+		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 		Mtx44 projMtx2;
 		PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx2);
@@ -5802,9 +5796,9 @@ void CMenuPcs::DrawTitleMenu()
 		eye.z = FLOAT_80331768;
 		Mtx lookAtMtx;
 		C_MTXLookAt(lookAtMtx, &eye,
-		            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
-		            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(m_wm.m_pad744));
+		            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+		            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
@@ -5817,7 +5811,7 @@ void CMenuPcs::DrawTitleMenu()
 		              FLOAT_803313dc, FLOAT_803313e8);
 
 		PartPcs.DrawMenuIdx(m_effectWork[23].m_partNo);
-		PSMTXCopy(reinterpret_cast<MtxPtr>(m_wm.m_pad744), CameraPcs.m_cameraMatrix);
+		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 
 		Mtx44 projMtx2;
@@ -6471,13 +6465,11 @@ void CMenuPcs::SetProjection(int mode)
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
 
-	CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
-	CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
-
 	Mtx lookAtMtx;
-	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10), reinterpret_cast<Vec*>(&up),
-	    reinterpret_cast<Point3d*>(&target));
-	PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(this) + 0x744));
+	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10),
+	    CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+	    CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
+	PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
 	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 
 	CharaPcs.InitEnv(5);
@@ -6512,8 +6504,7 @@ void CMenuPcs::SetProjection(int mode)
  */
 void CMenuPcs::RestoreProjection()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	PSMTXCopy(reinterpret_cast<float(*)[4]>(bytes + 0x744), CameraPcs.m_cameraMatrix);
+	PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
 	GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0x00FFFFFF);
 	Mtx44 projectionMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
@@ -7221,9 +7212,9 @@ void CMenuPcs::DrawFukidashi()
 
 					Mtx lookAtMtx;
 					C_MTXLookAt(lookAtMtx, (Vec*)(piVar10 + 4),
-					            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
-					            (Vec*)&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
-					PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
+					            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+					            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
+					PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
 					PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 					CharaPcs.InitEnv(5);
 					GXSetColorUpdate(0);
@@ -7266,7 +7257,7 @@ void CMenuPcs::DrawFukidashi()
 	}
 
 	if (viewportSetup != 0) {
-		PSMTXCopy(reinterpret_cast<MtxPtr>(bytes + 0x744), CameraPcs.m_cameraMatrix);
+		PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 		Mtx44 screenCopy;
 		PSMTX44Copy(CameraPcs.m_screenMatrix, screenCopy);
@@ -8192,16 +8183,7 @@ void CMenuPcs::CalcChara()
 		}
 
 		WmWorldState* const ws = m_wmWorldState;
-		union {
-			double d;
-			struct {
-				unsigned int hi;
-				unsigned int lo;
-			} u;
-		} frameConv;
-		frameConv.u.hi = 0x43300000;
-		frameConv.u.lo = static_cast<unsigned int>(static_cast<int>(ws->m_frameCounter)) ^ 0x80000000;
-		float alpha = static_cast<float>(DOUBLE_803314E8 * (frameConv.d - DOUBLE_80331408));
+		float alpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(ws->m_frameCounter));
 		if (alpha > DOUBLE_80331420) {
 			alpha = FLOAT_803313e8;
 		}
@@ -8401,9 +8383,9 @@ void CMenuPcs::DrawChara()
 			const float* pOneA = &FLOAT_803313e8;
 			const float* pZeroA2 = &FLOAT_803313dc;
 			C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10),
-			            reinterpret_cast<Vec*>(&CVector(*pZeroA1, *pOneA, *pZeroA1)),
-			            reinterpret_cast<Vec*>(&CVector(*pZeroA2, *pZeroA2, *pZeroA2)));
-			PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
+			            CVector(*pZeroA1, *pOneA, *pZeroA1),
+			            CVector(*pZeroA2, *pZeroA2, *pZeroA2));
+			PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
 			PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 			CharaPcs.InitEnv(5);
 			GXSetColorUpdate(0);
@@ -8451,9 +8433,9 @@ void CMenuPcs::DrawChara()
 				const float* pOneB = &FLOAT_803313e8;
 				const float* pZeroB2 = &FLOAT_803313dc;
 				C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10),
-				            reinterpret_cast<Vec*>(&CVector(*pZeroB1, *pOneB, *pZeroB1)),
-				            reinterpret_cast<Vec*>(&CVector(*pZeroB2, *pZeroB2, *pZeroB2)));
-				PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
+				            CVector(*pZeroB1, *pOneB, *pZeroB1),
+				            CVector(*pZeroB2, *pZeroB2, *pZeroB2));
+				PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
 				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 				CharaPcs.InitEnv(5);
 				GXSetColorUpdate(0);
@@ -10554,9 +10536,9 @@ void CMenuPcs::DrawMainMenuSub()
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
 	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x740),
-	            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
-	            reinterpret_cast<Point3d*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
-	PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(&m_wm));
+	            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+	            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
+	PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
 	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 	CharaPcs.InitEnv(5);
 	GXSetColorUpdate(0);
@@ -10666,9 +10648,9 @@ void CMenuPcs::DrawMainMenuSub()
 		GXSetProjection(projectionMtx0, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx0, CameraPcs.m_screenMatrix);
 		C_MTXLookAt(lookAtMtx0, reinterpret_cast<Point3d*>(view + 0x10),
-		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
-		            reinterpret_cast<Point3d*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(&m_wm));
+		            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+		            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
 		PSMTXCopy(lookAtMtx0, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
@@ -10704,9 +10686,9 @@ void CMenuPcs::DrawMainMenuSub()
 		GXSetProjection(projectionMtx1, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx1, CameraPcs.m_screenMatrix);
 		C_MTXLookAt(lookAtMtx1, reinterpret_cast<Point3d*>(view + 0x10),
-		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
-		            reinterpret_cast<Point3d*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(&m_wm));
+		            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+		            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
 		PSMTXCopy(lookAtMtx1, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
@@ -10970,39 +10952,29 @@ LAB_next:
 	    worldState->m_mainState == 2) {
 		const float* psZ = &FLOAT_803313dc;
 		const double* psSl = &DOUBLE_80331498;
-		const double* psBi = &DOUBLE_80331408;
 		const double* psBa = &DOUBLE_80331490;
 		const double* psOf = &DOUBLE_80331510;
 		double sepOff;
 		double sepBase;
-		double sepBias;
 		double sepSlope;
 		float sepZero;
 		sepZero = *psZ;
 		sepSlope = *psSl;
-		sepBias = *psBi;
 		sepBase = *psBa;
 		sepOff = *psOf;
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-			double rawA;
-			double rawB;
-			reinterpret_cast<int*>(&rawA)[1] = slot ^ 0x80000000;
-			reinterpret_cast<int*>(&rawA)[0] = 0x43300000;
-			reinterpret_cast<int*>(&rawB)[1] = slot ^ 0x80000000;
-			reinterpret_cast<int*>(&rawB)[0] = 0x43300000;
 			MenuPcs.DrawRect(0, FLOAT_803314D8,
-			         static_cast<float>(static_cast<float>(sepSlope * (rawA - sepBias) + sepBase) -
+			         static_cast<float>(static_cast<float>(sepSlope * static_cast<double>(slot) + sepBase) -
 			                            sepOff),
 			         FLOAT_803314D8, FLOAT_803314D8,
-			         static_cast<float>(sepBase * (rawB - sepBias)), FLOAT_803313e0,
+			         static_cast<float>(sepBase * static_cast<double>(slot)), FLOAT_803313e0,
 			         FLOAT_803313e8, FLOAT_803313e8, sepZero);
 		}
 	}
 
 	if (worldState->m_subState >= 0x11 &&
 	    worldState->m_mainState < 3) {
-		const double* pBi2 = &DOUBLE_80331408;
 		const double* pSl2 = &DOUBLE_80331498;
 		const double* pBa2 = &DOUBLE_80331490;
 		const double* pOff2 = &DOUBLE_80331510;
@@ -11011,20 +10983,15 @@ LAB_next:
 		float slotY;
 		double mapX;
 		double rowSlopeD;
-		double rowBias;
 		mapX = *pOff2 + static_cast<double>(*p518a);
 		const int language = Game.m_gameWork.m_languageId;
 		int* digitWidths = reinterpret_cast<int*>(rodataBase + 0x920);
 		int* playWidths = reinterpret_cast<int*>(rodataBase + 0xab0);
 		rowSlopeD = *pSl2;
-		rowBias = *pBi2;
 		rowBaseD = *pBa2;
 		for (slot = 0, slotOff = slot; slot < kMcListCount; slot++, slotOff += kMcListEntrySize) {
 			unsigned char* const slotData = m_wmCharaState + slotOff;
-			double rawRow;
-			reinterpret_cast<int*>(&rawRow)[1] = slot ^ 0x80000000;
-			reinterpret_cast<int*>(&rawRow)[0] = 0x43300000;
-			slotY = static_cast<float>(rowSlopeD * (rawRow - rowBias) + rowBaseD);
+			slotY = static_cast<float>(rowSlopeD * static_cast<double>(slot) + rowBaseD);
 			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<char*>(slotData + 0x41) != 0) {
 				const float* pH40a = &FLOAT_80331440;
 				float digitX;
@@ -11356,8 +11323,6 @@ LAB_next:
 		// Draw text info for each save slot
 		const double* pSl3 = &DOUBLE_80331498;
 		const double tSlope = *pSl3;
-		const double* pBi3 = &DOUBLE_80331408;
-		const double tBias = *pBi3;
 		const double* pBa3 = &DOUBLE_80331490;
 		const double tBase = *pBa3;
 		for (slot = 0, slotOff = slot; slot < 4; slot++, slotOff += 0x48) {
@@ -11366,10 +11331,7 @@ LAB_next:
 			char line1[64];
 			char line2[64];
 			unsigned char* const slotData = m_wmCharaState + slotOff;
-			double rawT;
-			reinterpret_cast<int*>(&rawT)[1] = slot ^ 0x80000000;
-			reinterpret_cast<int*>(&rawT)[0] = 0x43300000;
-			const float slotY = static_cast<float>(tSlope * (rawT - tBias) + tBase);
+			const float slotY = static_cast<float>(tSlope * static_cast<double>(slot) + tBase);
 			if (*reinterpret_cast<char*>(slotData + 0x42) != 0 || *reinterpret_cast<int*>(slotData + 8) <= 0) {
 				const float* pMa1 = &FLOAT_803313e8;
 				fontF8->SetMargin(*pMa1);
@@ -11791,8 +11753,7 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	}
 
 	effect->m_effectNo = effectNo;
-	const int effectNoXor = effectNo ^ 100;
-	const int group = static_cast<unsigned int>((effectNoXor >> 1) - (effectNoXor & effectNo)) >> 31;
+	const int group = effectNo > 100;
 	CGObject* const object = &effect->m_object;
 	effect->m_slotNo = slot;
 	object->Create();
@@ -12472,30 +12433,7 @@ void CMenuPcs::BindMcObj()
 		const int modelNo = static_cast<int>(charaState[3]);
 
 		if (modelNo != 0) {
-			unsigned char createParam[0x6C];
-			*reinterpret_cast<int*>(createParam + 0x40) = -1;
-			*reinterpret_cast<int*>(createParam + 0x30) = -1;
-			createParam[0x34] = 0;
-			createParam[0x35] = 1;
-			*reinterpret_cast<int*>(createParam + 0x38) = 0;
-			createParam[0x36] = 0;
-			*reinterpret_cast<int*>(createParam + 0x3C) = 30;
-			*reinterpret_cast<int*>(createParam + 0x44) = 0;
-			*reinterpret_cast<short*>(createParam + 0x48) = 0;
-			createParam[0x4A] = 0;
-			createParam[0x4B] = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x00) = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x04) = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x08) = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x0C) = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x10) = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x14) = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x18) = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x1C) = 0;
-			*reinterpret_cast<unsigned int*>(createParam + 0x20) = 0;
-			*reinterpret_cast<float*>(createParam + 0x24) = FLOAT_803313e8;
-			*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
-			createParam[0x2C] = 0;
+			PPPCREATEPARAM createParam;
 
 			const int slot = i + 0x11;
 			EffectInfo* effect = &m_effectWork[slot];
@@ -12510,10 +12448,10 @@ void CMenuPcs::BindMcObj()
 			effect->m_slotNo = i + 0x11;
 			object->Create();
 			object->m_charaModelHandle = m_wm.m_handles[slot];
-			*reinterpret_cast<void**>(createParam + 0x18) = object;
-			*reinterpret_cast<void**>(createParam + 0x14) = object;
+			createParam.m_lookTargetPtr = object;
+			createParam.m_paramB = reinterpret_cast<unsigned int>(object);
 			effect->m_partNo =
-			    PartMng.pppCreate(group, modelNo + 0x16, reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
+			    PartMng.pppCreate(group, modelNo + 0x16, &createParam, 1);
 		}
 
 		const unsigned int flags = charaState[0xA];
@@ -12530,30 +12468,7 @@ void CMenuPcs::BindMcObj()
 			weaponModel = 4;
 		}
 
-		unsigned char createParam[0x6C];
-		*reinterpret_cast<int*>(createParam + 0x40) = -1;
-		*reinterpret_cast<int*>(createParam + 0x30) = -1;
-		createParam[0x34] = 0;
-		createParam[0x35] = 1;
-		*reinterpret_cast<unsigned int*>(createParam + 0x38) = 0;
-		createParam[0x36] = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x3C) = 30;
-		*reinterpret_cast<int*>(createParam + 0x44) = 0;
-		*reinterpret_cast<short*>(createParam + 0x48) = 0;
-		createParam[0x4A] = 0;
-		createParam[0x4B] = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x00) = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x04) = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x08) = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x0C) = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x10) = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x14) = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x18) = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x1C) = 0;
-		*reinterpret_cast<unsigned int*>(createParam + 0x20) = 0;
-		*reinterpret_cast<float*>(createParam + 0x24) = FLOAT_803313e8;
-		*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
-		createParam[0x2C] = 0;
+		PPPCREATEPARAM createParam;
 
 		const int slot = i + 0x11;
 		EffectInfo* effect = &m_effectWork[slot];
@@ -12568,10 +12483,10 @@ void CMenuPcs::BindMcObj()
 		effect->m_slotNo = i + 0x11;
 		object->Create();
 		object->m_charaModelHandle = m_wm.m_handles[slot];
-		*reinterpret_cast<void**>(createParam + 0x18) = object;
-		*reinterpret_cast<void**>(createParam + 0x14) = object;
+		createParam.m_lookTargetPtr = object;
+		createParam.m_paramB = reinterpret_cast<unsigned int>(object);
 		effect->m_partNo =
-		    PartMng.pppCreate(group, weaponModel + 0x1A, reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
+		    PartMng.pppCreate(group, weaponModel + 0x1A, &createParam, 1);
 	}
 }
 

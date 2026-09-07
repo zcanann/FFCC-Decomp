@@ -686,7 +686,7 @@ public:
 
     struct WmStorage
     {
-        unsigned char m_pad744[0x774 - 0x744];
+        Mtx m_savedCameraMatrix;
         CCharaPcs::CHandle* m_handles[0x28];
         unsigned char* m_worldObjData;
         unsigned char* m_bubbleData;
@@ -892,6 +892,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeWork) == 0xC0);
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonus) == 0x744);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm) == 0x744);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_savedCameraMatrix) == 0x744);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_worldObjData) == 0x814);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_bubbleData) == 0x818);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_frameData) == 0x81C);

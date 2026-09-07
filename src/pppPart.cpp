@@ -126,8 +126,12 @@ void pppUnitMatrix(pppFMATRIX& pppFMtx)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005767C
+ * PAL Size: 160b
+ * EN Address: 0x8006222C
+ * EN Size: 144b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppRotMatrix(pppFMATRIX& dst, pppFMATRIX src, Vec rot)
 {

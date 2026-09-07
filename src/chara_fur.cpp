@@ -158,24 +158,6 @@ static inline int MogPadIndex(int padIndex)
 	return Pad.m_debugPadPort == padIndex ? 0 : padIndex;
 }
 
-static inline unsigned short MogHeldButtons(int debugPadLock)
-{
-	if (HasDebugPadOverride(debugPadLock)) {
-		return 0;
-	}
-	int padIndex = MogPadIndex(0);
-	return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].button[0]);
-}
-
-static inline unsigned short MogTriggerButtons(int debugPadLock)
-{
-	if (HasDebugPadOverride(debugPadLock)) {
-		return 0;
-	}
-	int padIndex = MogPadIndex(0);
-	return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
-}
-
 static inline int MogDigitalStickOverride(int debugPadLock)
 {
 	if (HasDebugPadOverride(debugPadLock)) {
@@ -183,24 +165,6 @@ static inline int MogDigitalStickOverride(int debugPadLock)
 	}
 	int padIndex = MogPadIndex(0);
 	return Pad.GetPadInputs()[padIndex].digitalStickOverride;
-}
-
-static inline float MogLeftStickX(int debugPadLock)
-{
-	if (HasDebugPadOverride(debugPadLock)) {
-		return 0.0f;
-	}
-	int padIndex = MogPadIndex(0);
-	return Pad.GetPadInputs()[padIndex].stickXF;
-}
-
-static inline float MogLeftStickY(int debugPadLock)
-{
-	if (HasDebugPadOverride(debugPadLock)) {
-		return 0.0f;
-	}
-	int padIndex = MogPadIndex(0);
-	return Pad.GetPadInputs()[padIndex].stickYF;
 }
 
 static inline unsigned char MogRadarType()
@@ -1368,9 +1332,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	int messageId = -1;
 	const int debugPadLock = Pad.m_debugPadLock;
-	const int heldButtons = (unsigned short)MogHeldButtons(debugPadLock);
-	const int triggerButtons = (unsigned short)MogTriggerButtons(debugPadLock);
-	const unsigned short rotateButtons = static_cast<unsigned short>((MogDigitalStickOverride(debugPadLock) == 0) ? MogHeldButtons(debugPadLock) : static_cast<short>(0));
+	const int heldButtons = (unsigned short)Pad.GetButton(0);
+	const int triggerButtons = (unsigned short)Pad.GetButtonDown(0);
+	const unsigned short rotateButtons = static_cast<unsigned short>((MogDigitalStickOverride(debugPadLock) == 0) ? Pad.GetButton(0) : static_cast<short>(0));
 
 	if (m_mogWork.m_started == 0) {
 		if ((heldButtons & 0x100) != 0) {
@@ -1421,9 +1385,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 
-	Chara.MogFur().m_cursorX = static_cast<int>(10.0f * MogLeftStickX(debugPadLock) +
+	Chara.MogFur().m_cursorX = static_cast<int>(10.0f * Pad.GetLeftStickX(0) +
 	                                     static_cast<float>(Chara.MogFur().m_cursorX));
-	Chara.MogFur().m_cursorY = static_cast<int>(-(10.0f * MogLeftStickY(debugPadLock) -
+	Chara.MogFur().m_cursorY = static_cast<int>(-(10.0f * Pad.GetLeftStickY(0) -
 	                                     static_cast<float>(Chara.MogFur().m_cursorY)));
 
 	const int cursorXv = Chara.MogFur().m_cursorX;

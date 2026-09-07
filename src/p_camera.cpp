@@ -91,19 +91,9 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
-static inline CPad::PadInput& CameraDebugPadInput()
+static inline CPad::PadInput& CameraPadInput(int port)
 {
-    return Pad.GetPadInputs()[(Pad.m_debugPadPort == 4) ? 0 : 4];
-}
-
-static inline CPad::PadInput& CameraShadowPadInput()
-{
-    return Pad.GetPadInputs()[(Pad.m_debugPadPort == 1) ? 0 : 1];
-}
-
-static inline CPad::PadInput& CameraRawPadInput()
-{
-    return reinterpret_cast<CPad::PadInput*>(&Pad)[(Pad.m_debugPadPort == 0) ? 0 : 0];
+    return Pad.GetPadInputs()[(Pad.m_debugPadPort == port) ? 0 : port];
 }
 
 extern "C" {
@@ -322,7 +312,7 @@ void CCameraPcs::calcFunnyShape()
     if (Pad.m_debugPadLock != 0) {
         padButtons = 0;
     } else {
-        padButtons = CameraDebugPadInput().button[0];
+        padButtons = CameraPadInput(4).button[0];
     }
 
     stick = ((padButtons & 8) != 0) ? kCameraHalfF : kCameraZeroF;
@@ -331,16 +321,16 @@ void CCameraPcs::calcFunnyShape()
     stick = ((padButtons & 4) != 0) ? kCameraHalfF : kCameraZeroF;
     m_viewer.m_position.y -= stick;
 
-    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickXF;
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(4).stickXF;
     m_viewer.m_rotY = kCameraDebugRotateStep * stick + m_viewer.m_rotY;
 
-    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickYF;
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(4).stickYF;
     m_viewer.m_rotX = -((kCameraDebugRotateStep * stick) - m_viewer.m_rotX);
 
-    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerLeftF;
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(4).triggerLeftF;
     m_viewer.m_distance = -((kCameraTwoF * stick) - m_viewer.m_distance);
 
-    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerRightF;
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(4).triggerRightF;
     m_viewer.m_distance = kCameraTwoF * stick + m_viewer.m_distance;
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
@@ -423,7 +413,7 @@ void CCameraPcs::calcMaterialEditor()
     if (Pad.m_debugPadLock != 0) {
         padButtons = 0;
     } else {
-        padButtons = CameraDebugPadInput().button[0];
+        padButtons = CameraPadInput(4).button[0];
     }
 
     stick = ((padButtons & 8) != 0) ? kCameraHalfF : kCameraZeroF;
@@ -432,16 +422,16 @@ void CCameraPcs::calcMaterialEditor()
     stick = ((padButtons & 4) != 0) ? kCameraHalfF : kCameraZeroF;
     m_viewer.m_position.y -= stick;
 
-    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickXF;
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(4).stickXF;
     m_viewer.m_rotY = kCameraDebugRotateStep * stick + m_viewer.m_rotY;
 
-    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickYF;
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(4).stickYF;
     m_viewer.m_rotX = -((kCameraDebugRotateStep * stick) - m_viewer.m_rotX);
 
-    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerLeftF;
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(4).triggerLeftF;
     m_viewer.m_distance = -((kCameraTwoF * stick) - m_viewer.m_distance);
 
-    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerRightF;
+    stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(4).triggerRightF;
     m_viewer.m_distance = kCameraTwoF * stick + m_viewer.m_distance;
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
@@ -710,10 +700,10 @@ void CCameraPcs::drawShadowBegin()
     CopyCameraState(m_shadowCamera, CurrentCameraState());
 
     if (Game.m_currentSceneId == 3) {
-        float stickX = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraShadowPadInput().stickXF;
+        float stickX = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(1).stickXF;
         m_fullScreenShadow.m_rotY += kCameraDegToRad * (kCameraDebugMoveStep * stickX);
 
-        float stickY = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraShadowPadInput().stickYF;
+        float stickY = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(1).stickYF;
         m_fullScreenShadow.m_rotX += kCameraDegToRad * (kCameraTwoF * stickY);
     }
 
@@ -1085,15 +1075,15 @@ void CCameraPcs::calcMap()
     };
     HitCylinder hitCylinder;
 
-    buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraRawPadInput().buttonDown[0];
+    buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraPadInput(0).button[0];
 
-    stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().substickYF;
+    stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraPadInput(0).substickXF;
     stickH = 0.017453292519943295f * (stickH / 0.125f);
 
-    stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
+    stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraPadInput(0).substickYF;
     stickV = -(0.017453292519943295f * (stickV / 0.125f));
 
-    triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraRawPadInput().stickYF;
+    triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? kCameraZeroF : CameraPadInput(0).stickXF;
 
     m_fov += triggerL;
     m_mapRotX += stickV;
@@ -1277,7 +1267,7 @@ void CCameraPcs::calcChara()
         if (Pad.m_debugPadLock != 0) {
             padButtons = 0;
         } else {
-            padButtons = CameraDebugPadInput().button[0];
+            padButtons = CameraPadInput(4).button[0];
         }
 
         stick = ((padButtons & 4) != 0) ? kCameraHalfF : kCameraZeroF;
@@ -1286,16 +1276,16 @@ void CCameraPcs::calcChara()
         stick = ((padButtons & 8) != 0) ? kCameraHalfF : kCameraZeroF;
         m_viewer.m_position.y -= stick;
 
-        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickXF;
+        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(4).stickXF;
         m_viewer.m_rotY = kCameraDebugRotateStep * stick + m_viewer.m_rotY;
 
-        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().stickYF;
+        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(4).stickYF;
         m_viewer.m_rotX = -((kCameraDebugRotateStep * stick) - m_viewer.m_rotX);
 
-        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerLeftF;
+        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(4).triggerLeftF;
         m_viewer.m_distance = -((kCameraDebugZoomStep * stick) - m_viewer.m_distance);
 
-        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraDebugPadInput().triggerRightF;
+        stick = (Pad.m_debugPadLock != 0) ? kCameraZeroF : CameraPadInput(4).triggerRightF;
         m_viewer.m_distance = kCameraDebugZoomStep * stick + m_viewer.m_distance;
     }
 
@@ -1578,7 +1568,7 @@ void CCameraPcs::calc()
     if (useDebugPad) {
         buttons = 0;
     } else {
-        buttons = CameraRawPadInput()._pad36;
+        buttons = CameraPadInput(0).lockedButton[1];
     }
 
     if ((buttons & 0x20) != 0) {
@@ -1588,27 +1578,27 @@ void CCameraPcs::calc()
     if (m_isAbsolute == 0) {
         float stickH = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                            ? kCameraZeroF
-                           : CameraRawPadInput().substickYF;
+                           : CameraPadInput(0).substickXF;
         m_yaw += kCameraDegToRad * (kCameraDefaultNearZ * stickH);
 
         float stickV = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                            ? kCameraZeroF
-                           : *reinterpret_cast<float*>(&CameraRawPadInput().lockedButton[0]);
+                           : CameraPadInput(0).substickYF;
         m_pitch += kCameraDegToRad * (kCameraDebugZoomStep * stickV);
 
         float triggerL = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                              ? kCameraZeroF
-                             : CameraRawPadInput().stickYF;
+                             : CameraPadInput(0).stickXF;
         m_distance += kCameraDebugZoomStep * triggerL;
 
         float triggerR = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                              ? kCameraZeroF
-                             : CameraRawPadInput().triggerRightF;
+                             : CameraPadInput(0).triggerLeftF;
         float lateral = kCameraDebugZoomStep * triggerR;
 
         float moveInOut = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                               ? kCameraZeroF
-                              : CameraRawPadInput().stickXF;
+                              : CameraPadInput(0).triggerRightF;
         lateral -= kCameraDebugZoomStep * moveInOut;
 
         float sinY;
@@ -1621,7 +1611,7 @@ void CCameraPcs::calc()
 
         float panStick = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
                              ? kCameraZeroF
-                             : CameraRawPadInput().substickXF;
+                             : CameraPadInput(0).stickYF;
         const float camMove = kCameraDefaultNearZ * panStick;
 
         m_targetX = sinXCosY * camMove + m_targetX;

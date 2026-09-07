@@ -232,4 +232,144 @@ inline unsigned short CPad::GetButton(long padIndex)
     return static_cast<unsigned short>(result);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x800B9A20
+ * PAL Size: 96b
+ * EN Address: 0x80043E94
+ * EN Size: 172b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float CPad::GetLeftStickY(long padIndex)
+{
+    bool shouldZero = false;
+    float result;
+
+    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
+        shouldZero = true;
+    }
+
+    if (shouldZero) {
+        result = 0.0f;
+    } else {
+        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
+        result = GetPadInputs()[resolvedIndex].stickYF;
+    }
+
+    return result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9A80
+ * PAL Size: 96b
+ * EN Address: 0x80044098
+ * EN Size: 172b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float CPad::GetLeftStickX(long padIndex)
+{
+    bool shouldZero = false;
+    float result;
+
+    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
+        shouldZero = true;
+    }
+
+    if (shouldZero) {
+        result = 0.0f;
+    } else {
+        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
+        result = GetPadInputs()[resolvedIndex].stickXF;
+    }
+
+    return result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9960
+ * PAL Size: 96b
+ * EN Address: 0x80044144
+ * EN Size: 172b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float CPad::GetRightStickY(long padIndex)
+{
+    bool shouldZero = false;
+    float result;
+
+    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
+        shouldZero = true;
+    }
+
+    if (shouldZero) {
+        result = 0.0f;
+    } else {
+        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
+        result = GetPadInputs()[resolvedIndex].substickYF;
+    }
+
+    return result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B99C0
+ * PAL Size: 96b
+ * EN Address: 0x800441F0
+ * EN Size: 172b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float CPad::GetRightStickX(long padIndex)
+{
+    bool shouldZero = false;
+    float result;
+
+    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
+        shouldZero = true;
+    }
+
+    if (shouldZero) {
+        result = 0.0f;
+    } else {
+        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
+        result = GetPadInputs()[resolvedIndex].substickXF;
+    }
+
+    return result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9330
+ * PAL Size: 100b
+ * EN Address: 0x8002CE10
+ * EN Size: 164b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline unsigned short CPad::GetGbaButtonDown(long padIndex)
+{
+    bool shouldZero = false;
+    unsigned int result;
+
+    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
+        shouldZero = true;
+    }
+
+    if (shouldZero) {
+        result = 0;
+    } else {
+        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
+        result = GetPadInputs()[resolvedIndex].buttonDown[1];
+    }
+
+    return static_cast<unsigned short>(result);
+}
+
 #endif

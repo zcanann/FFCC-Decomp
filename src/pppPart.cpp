@@ -835,20 +835,15 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 				{
 					prev->m_next = next;
 
-					s32 stageIndex;
-					_pppProgSetDef* ownerSet;
 					_pppPDataVal* owner = obj->m_owner;
-					_pppProgSetDef* stageSet;
-					ownerSet = owner->m_programSetDef;
-					stageSet = ownerSet;
-					for (stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
+					_pppProgSetDef* ownerSet = owner->m_programSetDef;
+					for (s32 stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
 					{
-						_pppCtrlTable* entry = stageSet->m_stages;
+						_pppCtrlTable* entry = &ownerSet->m_stages[stageIndex];
 						if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
 						{
-							((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
+							((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, entry);
 						}
-						stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 					}
 
 					if (--owner->m_activeCount == 0)
@@ -933,17 +928,15 @@ allocated:
 		dataVal->m_activeCount++;
 		_pppProgSetDef* freshSet = newObject->m_link.m_owner->m_programSetDef;
 		u32* initWork = (u32*)(((u8*)newObject) + freshSet->m_workBaseOffset);
-		_pppProgSetDef* stageSet = freshSet;
 		for (s32 stageIndex = 0; stageIndex < freshSet->m_numStages; stageIndex++)
 		{
-			_pppCtrlTable* entry = stageSet->m_stages;
+			_pppCtrlTable* entry = &freshSet->m_stages[stageIndex];
 			pppProg* prog = entry->m_prog;
 			*initWork++ = entry->m_unk8;
 			if (prog != 0 && prog->m_pppFunctionConstructor != 0)
 			{
-				((pppProgConstructCallback)prog->m_pppFunctionConstructor)(&newObject->m_link, (_pppCtrlTable*)entry);
+				((pppProgConstructCallback)prog->m_pppFunctionConstructor)(&newObject->m_link, entry);
 			}
-			stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 		}
 		return newObject;
 	}

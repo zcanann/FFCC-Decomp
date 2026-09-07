@@ -768,45 +768,16 @@ void CPartMng::pppGetFreePppMngSt()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 int CPartMng::pppGetNumFreePppMngSt()
 {
     int freeCount = 0;
-    int mngIndex = 0;
-
-    int i = 0x30;
-    do {
-        if (m_pppMng[mngIndex + 0].m_baseTime == -0x1000) {
+    for (int i = 0; i < 0x180; i++) {
+        if (m_pppMng[i].m_baseTime == -0x1000) {
             freeCount++;
         }
-        if (m_pppMng[mngIndex + 1].m_baseTime == -0x1000) {
-            freeCount++;
-        }
-        if (m_pppMng[mngIndex + 2].m_baseTime == -0x1000) {
-            freeCount++;
-        }
-        if (m_pppMng[mngIndex + 3].m_baseTime == -0x1000) {
-            freeCount++;
-        }
-        if (m_pppMng[mngIndex + 4].m_baseTime == -0x1000) {
-            freeCount++;
-        }
-        if (m_pppMng[mngIndex + 5].m_baseTime == -0x1000) {
-            freeCount++;
-        }
-        if (m_pppMng[mngIndex + 6].m_baseTime == -0x1000) {
-            freeCount++;
-        }
-        if (m_pppMng[mngIndex + 7].m_baseTime == -0x1000) {
-            freeCount++;
-        }
-        mngIndex += 8;
-        i--;
-    } while (i != 0);
-
+    }
     return freeCount;
 }
-#pragma opt_propagation reset
 
 /*
  * --INFO--

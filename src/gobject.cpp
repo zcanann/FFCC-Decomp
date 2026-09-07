@@ -480,7 +480,7 @@ void CGObject::PutDropItem()
     s32 dropCount = 0;
 
     for (int i = 0; i < 4; i++) {
-        s16 rawDropCode = *reinterpret_cast<s16*>(&m_dropItemCodes[i]);
+        s16 rawDropCode = m_dropItemCodes[i];
         if (rawDropCode > 0) {
             s32 dropCode = rawDropCode;
             int createMode;

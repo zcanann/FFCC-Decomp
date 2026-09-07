@@ -137,8 +137,6 @@ static const char s_unknown_mapobj_type_error[] = "Error:Unknown mapobj type(%d)
 static const char s_npc_max_over[] = "%s(%d): Error: NPC max over!!\n";
 static const char s_subject_max_over[] = "%s(%d): Error: Subject max over!!\n";
 static const char s_letter_data_error[] = "%s(%d): Error: Letter data error(chan:%d  idx:%d)\n";
-extern const float kGbaQueueQuarter;
-extern const float kGbaQueueMapCoordScale;
 
 namespace GbaQueConst {
 extern const unsigned int ITEM_USE;
@@ -331,7 +329,7 @@ void GbaQueue::LoadAll()
 		OSSignalSemaphore(&accessSemaphores[i]);
 	}
 
-	cflatFlag = reinterpret_cast<int*>(&CFlat)[0x4101];
+	cflatFlag = CFlat.m_initAllFinishedFlag;
 
 	LoadPlayerStat();
 	LoadEnemyStat();
@@ -986,36 +984,36 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 			int groups;
 
 			for (groups = 0; groups < 8; groups++) {
-				char* invBase = static_cast<char*>(reinterpret_cast<void*>(*scriptFoodBase));
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
+				CCaravanWork* materialWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
+				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
+				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
+				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
+				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
+				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
+				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
+				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
 					break;
 				}
 				foundSlot++;
-				if (static_cast<int>(*reinterpret_cast<short*>(invBase + foundSlot * 2 + 0xB6)) == materialId) {
+				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
 					break;
 				}
 				foundSlot++;
@@ -1310,7 +1308,7 @@ void GbaQueue::LoadPlayerStat()
 		memcpy(localNames + (i * 0x10), Game.m_caravanWorkArr[i].m_name, 0x10);
 	}
 
-	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
+	if (CFlat.m_initAllFinishedFlag != 0) {
 		unsigned char* entry = localPlayerStat;
 		outOfShoukiMask = 0;
 		for (i = 0; i < 4; i++) {
@@ -1450,8 +1448,8 @@ void GbaQueue::LoadPlayerStat()
 
 			if (Game.m_partyObjArr[i] != 0) {
 				entry[1] = 1;
-				short posX = static_cast<short>(Game.m_partyObjArr[i]->m_worldPosition.x / kGbaQueueMapCoordScale);
-				short posZ = static_cast<short>(Game.m_partyObjArr[i]->m_worldPosition.z / kGbaQueueMapCoordScale);
+				short posX = static_cast<short>(Game.m_partyObjArr[i]->m_worldPosition.x / 3.0f);
+				short posZ = static_cast<short>(Game.m_partyObjArr[i]->m_worldPosition.z / 3.0f);
 				*reinterpret_cast<short*>(entry + 0x36) = posX;
 				*reinterpret_cast<short*>(entry + 0x38) = posZ;
 			}
@@ -1541,7 +1539,7 @@ void GbaQueue::LoadEnemyStat()
 
 	memset(localEnemyData, 0, sizeof(localEnemyData));
 
-	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
+	if (CFlat.m_initAllFinishedFlag != 0) {
 		GbaQueueMapEntity* enemyEntry = localEnemyData;
 
 		for (i = 0; i < 0x40; i++) {
@@ -1569,8 +1567,8 @@ void GbaQueue::LoadEnemyStat()
 				for (int item = 0; item < 4; item++) {
 					enemyEntry->m_dropItemCodes[item] = enemyObj->m_dropItemCodes[item];
 				}
-				int posX = static_cast<int>(enemyObj->m_worldPosition.x / kGbaQueueMapCoordScale);
-				int posZ = static_cast<int>(enemyObj->m_worldPosition.z / kGbaQueueMapCoordScale);
+				int posX = static_cast<int>(enemyObj->m_worldPosition.x / 3.0f);
+				int posZ = static_cast<int>(enemyObj->m_worldPosition.z / 3.0f);
 				enemyEntry->m_posX = static_cast<short>(posX);
 				enemyEntry->m_posZ = static_cast<short>(posZ);
 			}
@@ -1613,14 +1611,14 @@ void GbaQueue::LoadMapItemStat()
 	memset(localMapItems, 0, sizeof(localMapItems));
 	numMapItems = 0;
 
-	if (reinterpret_cast<int*>(&CFlat)[0x4101] != 0) {
+	if (CFlat.m_initAllFinishedFlag != 0) {
 		GbaQueueMapEntity* mapItemEntry;
 		object = CFlat.FindGObjFirst();
 		mapItemEntry = localMapItems;
 
 		while (object != 0) {
 			if ((object->m_objectFlags & 0x100) != 0) {
-				const int dropItemCode = *reinterpret_cast<short*>(&object->m_dropItemCodes[0]);
+				const int dropItemCode = object->m_dropItemCodes[0];
 				if ((dropItemCode & 0xC000) == 0x4000) {
 					mapItemEntry->m_kind = 4;
 				} else {
@@ -1638,8 +1636,8 @@ void GbaQueue::LoadMapItemStat()
 				numMapItems++;
 				mapItemEntry->m_radarEnabled = isDispRader != 0;
 				{
-					short posX = static_cast<short>(object->m_worldPosition.x / kGbaQueueMapCoordScale);
-					short posZ = static_cast<short>(object->m_worldPosition.z / kGbaQueueMapCoordScale);
+					short posX = static_cast<short>(object->m_worldPosition.x / 3.0f);
+					short posZ = static_cast<short>(object->m_worldPosition.z / 3.0f);
 					mapItemEntry->m_posX = posX;
 					mapItemEntry->m_posZ = posZ;
 				}
@@ -2596,10 +2594,10 @@ void GbaQueue::LoadMapObj()
 					unsigned int sign = mask & ((-drawFlag | drawFlag) >> 31);
 					mask = ~mask;
 					mapObjWork.m_entries[count].m_type = static_cast<unsigned char>(mapObj->m_type);
-					mapObjWork.m_entries[count].m_x = static_cast<short>((int)(x / kGbaQueueMapCoordScale));
-					mapObjWork.m_entries[count].m_y = static_cast<short>((int)(y / kGbaQueueMapCoordScale));
-					mapObjWork.m_entries[count].m_z = static_cast<short>((int)(z / kGbaQueueMapCoordScale));
-					mapObjWork.m_entries[count].m_radius = static_cast<short>((int)(r / kGbaQueueMapCoordScale));
+					mapObjWork.m_entries[count].m_x = static_cast<short>((int)(x / 3.0f));
+					mapObjWork.m_entries[count].m_y = static_cast<short>((int)(y / 3.0f));
+					mapObjWork.m_entries[count].m_z = static_cast<short>((int)(z / 3.0f));
+					mapObjWork.m_entries[count].m_radius = static_cast<short>((int)(r / 3.0f));
 
 					mapObjWork.m_drawFlags = (mapObjWork.m_drawFlags & mask) | sign;
 					mapObjWork.m_count = static_cast<unsigned char>(mapObjWork.m_count + 1);
@@ -3414,58 +3412,6 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 
 /*
  * --INFO--
- * PAL Address: 0x800cb818
- * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void GbaQueue::SetSmithFlg(int channel)
-{
-	OSSemaphore* semaphore = accessSemaphores + channel;
-
-	OSWaitSemaphore(semaphore);
-	int mask = 0x10;
-	mask <<= channel;
-	m_shopFlags = static_cast<u8>(m_shopFlags | mask);
-	OSSignalSemaphore(semaphore);
-
-	if (Joybus.SetMType(channel, 3) != 0) {
-		m_shopStatusFlags = static_cast<u8>(m_shopStatusFlags | mask);
-	} else {
-		m_shopStatusFlags = static_cast<u8>(m_shopStatusFlags & ~mask);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800cb8c0
- * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void GbaQueue::SetShopFlg(int channel)
-{
-	OSSemaphore* semaphore = accessSemaphores + channel;
-
-	OSWaitSemaphore(semaphore);
-	int mask = 1;
-	mask <<= channel;
-	m_shopFlags = static_cast<u8>(m_shopFlags | mask);
-	OSSignalSemaphore(semaphore);
-
-	if (Joybus.SetMType(channel, 2) != 0) {
-		m_shopStatusFlags = static_cast<u8>(m_shopStatusFlags | mask);
-	} else {
-		m_shopStatusFlags = static_cast<u8>(m_shopStatusFlags & ~mask);
-	}
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800CB968
  * PAL Size: 412b
  * EN Address: TODO
@@ -3539,6 +3485,58 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	return dataSize;
 }
 #pragma optimize_for_size off
+
+/*
+ * --INFO--
+ * PAL Address: 0x800cb8c0
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void GbaQueue::SetShopFlg(int channel)
+{
+	OSSemaphore* semaphore = accessSemaphores + channel;
+
+	OSWaitSemaphore(semaphore);
+	int mask = 1;
+	mask <<= channel;
+	m_shopFlags = static_cast<u8>(m_shopFlags | mask);
+	OSSignalSemaphore(semaphore);
+
+	if (Joybus.SetMType(channel, 2) != 0) {
+		m_shopStatusFlags = static_cast<u8>(m_shopStatusFlags | mask);
+	} else {
+		m_shopStatusFlags = static_cast<u8>(m_shopStatusFlags & ~mask);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800cb818
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void GbaQueue::SetSmithFlg(int channel)
+{
+	OSSemaphore* semaphore = accessSemaphores + channel;
+
+	OSWaitSemaphore(semaphore);
+	int mask = 0x10;
+	mask <<= channel;
+	m_shopFlags = static_cast<u8>(m_shopFlags | mask);
+	OSSignalSemaphore(semaphore);
+
+	if (Joybus.SetMType(channel, 3) != 0) {
+		m_shopStatusFlags = static_cast<u8>(m_shopStatusFlags | mask);
+	} else {
+		m_shopStatusFlags = static_cast<u8>(m_shopStatusFlags & ~mask);
+	}
+}
 
 /*
  * --INFO--
@@ -3766,7 +3764,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	totalSize += 0x200;
 
 	const float userRate =
-		kGbaQueueQuarter *
+		0.25f *
 		static_cast<float>(
 			static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0);
 	for (i = 0; i < 0x40; i++) {
@@ -5259,16 +5257,13 @@ void GbaQueue::ClrStartBonusFlg(int channel)
 	OSSignalSemaphore(semaphore);
 }
 
-__declspec(section ".sdata2") extern const float kGbaQueueQuarter = 0.25f;
-__declspec(section ".sdata2") extern const float kGbaQueueMapCoordScale = 3.0f;
-
 namespace GbaQueConst {
-__declspec(section ".sdata2") extern const unsigned int ITEM_USE = 1;
-__declspec(section ".sdata2") extern const unsigned int ITEM_PUT = 2;
-__declspec(section ".sdata2") extern const unsigned int MONEY_ATTACH = 4;
-__declspec(section ".sdata2") extern const unsigned int OPEN_LETTER = 0x20;
-__declspec(section ".sdata2") extern const unsigned int MOVE_ATTACH = 8;
-__declspec(section ".sdata2") extern const unsigned int REPLY_LETTER = 0x10;
-__declspec(section ".sdata2") extern const unsigned int CAN_REPLY = 1;
-__declspec(section ".sdata2") extern const unsigned int ITEM_ATTACH = 2;
+extern const unsigned int ITEM_USE = 1;
+extern const unsigned int ITEM_PUT = 2;
+extern const unsigned int MONEY_ATTACH = 4;
+extern const unsigned int OPEN_LETTER = 0x20;
+extern const unsigned int MOVE_ATTACH = 8;
+extern const unsigned int REPLY_LETTER = 0x10;
+extern const unsigned int CAN_REPLY = 1;
+extern const unsigned int ITEM_ATTACH = 2;
 }

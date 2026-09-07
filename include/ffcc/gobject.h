@@ -275,7 +275,7 @@ public:
     int m_worldParamB;                // 0x504
     float m_lookAtAccumYaw;           // 0x508
     float m_lookAtAccumPitch;         // 0x50C
-    unsigned short m_dropItemCodes[4]; // 0x510
+    short m_dropItemCodes[4];          // 0x510
 
     Vec& HitFaceNormal() { return *reinterpret_cast<Vec*>(&m_hitNormal.y); }
     const Vec& HitFaceNormal() const { return *reinterpret_cast<const Vec*>(&m_hitNormal.y); }

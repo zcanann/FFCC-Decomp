@@ -1321,6 +1321,33 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 
 /*
  * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 208b
+ * EN Address: 0x80063EA4
+ * EN Size: 248b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void pppCacheLoadModel(short* modelList, _pppDataHead* head)
+{
+	short modelCount = *modelList++;
+	for (short i = 0; i < modelCount; i++)
+	{
+		pppModelSt* mapMesh = ((pppModelSt**)head->m_modelNames)[*modelList++];
+		if (ppvAmemCacheSet.IsEnable(mapMesh->m_cacheId) == 0)
+		{
+			mapMesh->Ptr2Off();
+			mapMesh->m_meshData =
+			    reinterpret_cast<void*>(ppvAmemCacheSet.GetData(mapMesh->m_cacheId, (char*)s_pppPart_cpp, 0x4E5));
+			mapMesh->Off2Ptr();
+		}
+		ppvAmemCacheSet.AddRef(mapMesh->m_cacheId);
+		mapMesh->pppCacheLoadModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 80055868
  * PAL Size: 108b
  * EN Address: TODO
@@ -1346,6 +1373,28 @@ void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 
 /*
  * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 120b
+ * EN Address: 0x80062BD8
+ * EN Size: 120b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline void callInitProg(_pppMngSt* pppMngSt)
+{
+	for (int i = 0; i < pppMngSt->m_numControlPrograms; i++)
+	{
+		pppProg* prog = ((pppProg**)pppMngSt->m_pppPObjLinkHead.m_owner)[i];
+		pppProgInitCallback fn = prog->m_pppFunctionInit;
+		if (fn != 0)
+		{
+			fn(pppMngSt);
+		}
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 80055308
  * PAL Size: 1376b
  * EN Address: TODO
@@ -1355,7 +1404,6 @@ void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
  */
 void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 {
-	int volatile runControl = runControlPrograms;
 	_pppProgSetDef* programSet = (_pppProgSetDef*)(pdt + 6);
 	ppvMng = pppMngSt;
 	pppMngSt->m_lifeEnd = (int)pdt[0];
@@ -1367,34 +1415,9 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	if (Game.m_currentSceneId != 7)
 	{
-		short modelCount = *modelIndices;
-		short* modelList = modelIndices + 1;
-		u32 pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
-
-		for (short i = 0; i < modelCount; i++)
-		{
-			pppModelSt* mapMesh = *(pppModelSt**)(*(u32*)(pppResSet + 0x14) + *modelList++ * 4);
-
-			if (ppvAmemCacheSet.IsEnable(mapMesh->m_cacheId) == 0)
-			{
-				mapMesh->Ptr2Off();
-				mapMesh->m_meshData =
-				    reinterpret_cast<void*>(ppvAmemCacheSet.GetData(mapMesh->m_cacheId, (char*)s_pppPart_cpp, 0x4E5));
-				mapMesh->Off2Ptr();
-			}
-
-			ppvAmemCacheSet.AddRef(mapMesh->m_cacheId);
-			mapMesh->pppCacheLoadModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
-		}
-
-		short shapeCount = *shapeIndices;
-		short* shapeList = shapeIndices + 1;
-		pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
-
-		for (short i = 0; i < shapeCount; i++)
-		{
-			pppCacheLoadShapeTexture(*(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + *shapeList++ * 4), PartMng.m_materialSet);
-		}
+		CPartMng::PppPdtSlot* slot = (CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet;
+		pppCacheLoadModel(modelIndices, slot->m_pppDataHead);
+		pppCacheLoadShape(shapeIndices, slot->m_pppDataHead);
 
 		pppMngSt->m_mapTexLoaded = 1;
 	}
@@ -1407,12 +1430,12 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	if (pppMngSt->m_numPrograms != 0)
 	{
-		u32 allocSize = (u32)pppMngSt->m_numPrograms << 4;
+		u32 allocSize = pppMngSt->m_numPrograms * sizeof(_pppPDataVal);
 		CMemory::CStage* stage = ppvEnv->m_stagePtr;
 		int firstAllocFailure = 1;
 		int canRetry;
 		_pppPDataVal* pDataVals = 0;
-		s8 denied[0x180];
+		char denied[0x180];
 
 		ppvMemAllocErrorF = 0;
 		do
@@ -1432,96 +1455,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 				denied[currentIdx] = 1;
 			}
 
-			_pppMngSt* selectedMngSt = 0;
-			_pppMngSt* candidate;
-			int selectedPrio = 1;
-			s32 i;
-			s8* deniedPtr = (s8*)denied;
-			u8* mngBase = (u8*)&PartMng;
-			int selectedPrioTime;
-
-			for (i = 0; i < 0x180; i++)
-			{
-				if (deniedPtr[0] == 0)
-				{
-					candidate = (_pppMngSt*)(mngBase + 0x2a18);
-					if (candidate->m_baseTime != -0x1000 && candidate->m_kind != 0)
-					{
-						u8 prio = candidate->m_prio;
-						if (prio > 1)
-						{
-							if (selectedPrio < prio)
-							{
-								selectedPrioTime = candidate->m_prioTime;
-								selectedPrio = prio;
-								selectedMngSt = candidate;
-							}
-							else if (selectedPrio == prio && selectedPrioTime < candidate->m_prioTime)
-							{
-								selectedPrioTime = candidate->m_prioTime;
-								selectedMngSt = candidate;
-							}
-						}
-					}
-				}
-				deniedPtr++;
-				mngBase += sizeof(_pppMngSt);
-			}
-
-
-			if (selectedMngSt == 0)
-			{
-				canRetry = 0;
-			}
-			else
-			{
-				int deniedIdx = selectedMngSt - PartMng.m_pppMng;
-				denied[deniedIdx] = 1;
-
-				_pppPObjLink* prev = &selectedMngSt->m_pppPObjLinkHead;
-				_pppPObjLink* obj = selectedMngSt->m_pppPObjLinkHead.m_next;
-				while (obj != 0)
-				{
-					_pppPObjLink* next = obj->m_next;
-					if ((s8)((s32)((u32)obj->m_owner->m_programSetDef->m_drawFlags << 30) >> 31) == 0)
-					{
-						prev->m_next = next;
-
-						_pppPDataVal* owner = obj->m_owner;
-						_pppProgSetDef* ownerSet = owner->m_programSetDef;
-						_pppProgSetDef* stageSet = ownerSet;
-						for (int stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
-						{
-							_pppCtrlTable* entry = stageSet->m_stages;
-							if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
-							{
-								((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)entry);
-							}
-							stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
-						}
-
-						if (--owner->m_activeCount == 0)
-						{
-							owner->m_pppPObjLink = 0;
-						}
-						else if (owner->m_pppPObjLink == obj)
-						{
-							owner->m_pppPObjLink = obj->m_next;
-						}
-
-						if (obj != 0)
-						{
-							Memory.Free(obj);
-						}
-					}
-					else
-					{
-						prev = obj;
-					}
-					obj = next;
-				}
-				canRetry = 1;
-			}
+			canRetry = pppFreeMngStPrioForHeap(denied);
 		}
 		while (canRetry);
 
@@ -1568,19 +1502,9 @@ DataValsAllocated:
 		pDataVals++;
 	}
 
-	if (runControl != 0)
+	if (runControlPrograms != 0)
 	{
-		int i = 0;
-		int entryOffset = i;
-		for (; i < pppMngSt->m_numControlPrograms; i++)
-		{
-			void (*fn)(_pppMngSt*) = *(void (**)(_pppMngSt*))(*(int*)(reinterpret_cast<u8*>(pppMngSt->m_pppPObjLinkHead.m_owner) + entryOffset) + 0x10);
-			if (fn != 0)
-			{
-				fn(pppMngSt);
-			}
-			entryOffset += 4;
-		}
+		callInitProg(pppMngSt);
 	}
 }
 

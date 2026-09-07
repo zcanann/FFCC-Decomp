@@ -19,6 +19,8 @@ class CTexture;
 class CTextureSet;
 class CProfile;
 
+struct _pppMngSt;
+
 struct _PARTICLE_WMAT
 {
     Mtx value;
@@ -202,6 +204,7 @@ struct _pppPObject
 };
 
 typedef void (*pppProgAnyCallback)(void);
+typedef void (*pppProgInitCallback)(_pppMngSt*);
 typedef void (*pppProgOperationCallback)(_pppPObject*, void*, _pppCtrlTable*);
 typedef void (*pppProgOperation2Callback)(_pppPObject*, void*);
 typedef void (*pppProgRenderCallback)(_pppPObject*, void*, _pppCtrlTable*);
@@ -241,7 +244,9 @@ struct pppProg
     char* m_unkPtr;                             // 0x4
     pppProgAnyCallback m_pppFunctionOperation;  // 0x8
     pppProgAnyCallback m_pppFunctionRender;     // 0xC
-    CGObject* m_objects[3];                     // 0x10
+    pppProgInitCallback m_pppFunctionInit;        // 0x10
+    void* m_unk14;                              // 0x14
+    void* m_unk18;                              // 0x18
     pppProgAnyCallback m_pppFunctionConstructor;  // 0x1C
     pppProgAnyCallback m_pppFunctionConstructor2; // 0x20
     pppProgAnyCallback m_pppFunctionConstructor3; // 0x24

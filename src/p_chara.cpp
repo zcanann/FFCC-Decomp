@@ -461,11 +461,6 @@ static inline CMemory::CStage* HandleTextureStage(int charaKind)
     return GET_CHARA_ALLOC_STAGE_S(allocStageMode, (&CharaPcs.m_viewerModelStage)[index]);
 }
 
-static inline Mtx* ModelLocalMtx(CChara::CModel* model)
-{
-    return reinterpret_cast<Mtx*>(Ptr(model, 8));
-}
-
 static inline _GXColor BlendColor(const _GXColor& a, const _GXColor& b, float t)
 {
     _GXColor out;
@@ -1202,7 +1197,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
                     GX_FALSE);
 
                 Mtx modelMtx;
-                PSMTXCopy(*ModelLocalMtx(handle->m_model), modelMtx);
+                PSMTXCopy(handle->m_model->m_matrix, modelMtx);
                 worldPositions[outIndex].x = modelMtx[0][3];
                 worldPositions[outIndex].y = modelMtx[1][3];
                 worldPositions[outIndex].z = modelMtx[2][3];
@@ -2751,18 +2746,15 @@ static inline void GetCameraClipPlanes(float* nearOut, float* farOut)
     }
 }
 
-#pragma opt_common_subs off
-
-#pragma opt_dead_assignments off
-
-#pragma opt_lifetimes off
-
-#pragma opt_propagation off
-
-#pragma global_optimizer off
-
-#pragma optimization_level 3
-
+/*
+ * --INFO--
+ * PAL Address: 0x80074598
+ * PAL Size: 3556b
+ * EN Address: 0x80088F08
+ * EN Size: 3248b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 {
     if (m_model == 0) {
@@ -2795,8 +2787,8 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     if (immediatePass != 0 && drawPass == 0 && (m_model->m_lightAlpha < kCharaOne || (flags & 0x40000) != 0)) {
         if (immediatePass != 0) {
             ppvDrawMng.AddPrim(-m_sortZ, this);
-            return;
         }
+        return;
     }
 
     if (drawPass == 3 && (flags & 0x81C) == 0) {
@@ -2806,44 +2798,17 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         return;
     }
 
+    const unsigned int lightBank = (flags >> 19) & 1;
     if (drawPass != 1 && drawPass != 2 && (flags & 0x200000) == 0) {
-        const unsigned int lightBank = (flags >> 19) & 1;
         const float phase = m_colorPhase * FLOAT_80330290;
         unsigned int phaseIndex = static_cast<int>(phase);
         const float blendT = static_cast<float>(fmod(static_cast<double>(phase), DOUBLE_80330298));
         CColor shade;
         if ((m_flags & 0x20000) != 0 && drawPass != 3) {
-            CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-            shade.color.r = white.color.r;
-            shade.color.g = white.color.g;
-            shade.color.b = white.color.b;
-            shade.color.a = white.color.a;
+            shade = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         } else {
-            CColor next;
-            next.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.r) * blendT));
-            next.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.g) * blendT));
-            next.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.b) * blendT));
-            next.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color.a) * blendT));
-            CColor nextCopy(next);
-
-            CColor cur;
-            const float inv = kCharaOne - blendT;
-            cur.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.r) * inv));
-            cur.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.g) * inv));
-            cur.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.b) * inv));
-            cur.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(CharaPcs.m_viewerChoiceColor[phaseIndex].color.a) * inv));
-            CColor curCopy(cur);
-
-            CColor blended;
-            blended.color.r = static_cast<unsigned char>(curCopy.color.r + nextCopy.color.r);
-            blended.color.g = static_cast<unsigned char>(curCopy.color.g + nextCopy.color.g);
-            blended.color.b = static_cast<unsigned char>(curCopy.color.b + nextCopy.color.b);
-            blended.color.a = static_cast<unsigned char>(curCopy.color.a + nextCopy.color.a);
-            CColor blendedCopy(blended);
-            shade.color.r = blendedCopy.color.r;
-            shade.color.g = blendedCopy.color.g;
-            shade.color.b = blendedCopy.color.b;
-            shade.color.a = blendedCopy.color.a;
+            shade = CharaPcs.m_viewerChoiceColor[phaseIndex] * (kCharaOne - blendT) +
+                    CharaPcs.m_viewerChoiceColor[phaseIndex + 1] * blendT;
         }
 
         const CColor3& ambientBase = CColor3(CharaPcs.m_viewerAmbientColor[lightBank]);
@@ -2870,7 +2835,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         Vec lightPos;
         Mtx modelMtx;
-        PSMTXCopy(*ModelLocalMtx(m_model), modelMtx);
+        PSMTXCopy(m_model->m_matrix, modelMtx);
         lightPos.x = modelMtx[0][3];
         lightPos.y = modelMtx[1][3];
         lightPos.z = modelMtx[2][3];
@@ -2895,71 +2860,28 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     } else if (drawPass == 2) {
         CVector modelPos;
         Mtx modelMtx;
-        Vec delta;
-        PSMTXCopy(*ModelLocalMtx(m_model), modelMtx);
+        PSMTXCopy(m_model->m_matrix, modelMtx);
         modelPos.x = modelMtx[0][3];
         modelPos.y = modelMtx[1][3];
         modelPos.z = modelMtx[2][3];
 
-        const CVector& focusPos = CVector(CharaPcs.m_texShadowPos);
-        Vec shadowPos;
-        Vec shadowBase;
-        Vec scaledDeltaCopy;
-        Vec eye;
-        CVector deltaTmp;
-        PSVECSubtract((Vec*)&focusPos, modelPos, deltaTmp);
-        delta.x = deltaTmp.x;
-        delta.y = deltaTmp.y;
-        delta.z = deltaTmp.z;
+        CVector delta = CVector(CharaPcs.m_texShadowPos) - modelPos;
         if (delta.x == kCharaZero && delta.z == kCharaZero) {
             return;
         }
 
-        const float distRatio = PSVECMag(&delta) / CharaPcs.m_texShadowRadius;
+        const float distRatio = PSVECMag(delta) / CharaPcs.m_texShadowRadius;
         if (distRatio > kCharaOne) {
             return;
         }
         const float shadowFade = kCharaOne - distRatio;
+        delta.Normalize();
 
-        reinterpret_cast<CVector*>(&delta)->Normalize();
-
-        {
-            CVector up(kCharaZero, FLOAT_803302A8, kCharaZero);
-            CVector eyeTmp;
-            PSVECAdd(modelPos, up, eyeTmp);
-            eye.x = eyeTmp.x;
-            eye.y = eyeTmp.y;
-            eye.z = eyeTmp.z;
-        }
-
+        CVector eye = modelPos + CVector(kCharaZero, FLOAT_803302A8, kCharaZero);
         CVector lookAtUp(kCharaZero, kCharaOne, kCharaZero);
-        CVector shadowUp(kCharaZero, FLOAT_803302A8, kCharaZero);
-
-        const float shadowDistance = static_cast<float>(CharaPcs.m_texShadowDistance);
-        CVector scaledDelta;
-        PSVECScale(&delta, scaledDelta, shadowDistance);
-
-        {
-            scaledDeltaCopy.x = scaledDelta.x;
-            scaledDeltaCopy.y = scaledDelta.y;
-            scaledDeltaCopy.z = scaledDelta.z;
-            CVector baseTmp;
-            PSVECAdd(modelPos, &scaledDeltaCopy, baseTmp);
-            shadowBase.x = baseTmp.x;
-            shadowBase.y = baseTmp.y;
-            shadowBase.z = baseTmp.z;
-        }
-
-        {
-            CVector posTmp;
-            PSVECAdd(&shadowBase, shadowUp, posTmp);
-            shadowPos.x = posTmp.x;
-            shadowPos.y = posTmp.y;
-            shadowPos.z = posTmp.z;
-        }
-
-        C_MTXLookAt(m_shadowViewMtx, reinterpret_cast<Point3d*>(&shadowPos),
-                    static_cast<Vec*>(lookAtUp), reinterpret_cast<Point3d*>(&eye));
+        CVector shadowPos = modelPos + delta * static_cast<float>(CharaPcs.m_texShadowDistance) +
+                            CVector(kCharaZero, FLOAT_803302A8, kCharaZero);
+        C_MTXLookAt(m_shadowViewMtx, shadowPos, lookAtUp, eye);
         PSMTXCopy(m_shadowViewMtx, viewMtx);
 
         float nearZ;
@@ -3031,15 +2953,14 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         if (drawPass == 2) {
             const unsigned short shadowSize = static_cast<unsigned short>(CharaPcs.m_texShadowSize);
             GXSetTexCopySrc(0, 0, shadowSize, shadowSize);
-            GXSetTexCopyDst(static_cast<unsigned short>(CharaPcs.m_texShadowSize),
-                            static_cast<unsigned short>(CharaPcs.m_texShadowSize), GX_CTF_R4, GX_FALSE);
+            GXSetTexCopyDst(CharaPcs.m_texShadowSize, CharaPcs.m_texShadowSize, GX_CTF_R4, GX_FALSE);
             m_shadowTexturePtr = reinterpret_cast<unsigned char*>(CharaPcs.m_texShadowTextureBase) +
                                  CharaPcs.m_texShadowTextureOffset;
             DCInvalidateRange(m_shadowTexturePtr, (CharaPcs.m_texShadowSize * CharaPcs.m_texShadowSize) / 2);
             GXCopyTex(m_shadowTexturePtr, GX_TRUE);
         }
 
-        const int shadowMode = static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(1 - drawPass))) >> 5;
+        const int shadowMode = drawPass == 1;
         m_model->DrawShadow(viewMtx, shadowMode);
 
         if (drawPass == 2) {

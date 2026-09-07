@@ -903,8 +903,8 @@ void CGMonObj::frameStatFuncMeteoParasite()
  * --INFO--
  * PAL Address: 0x8012fcc8
  * PAL Size: 796b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80152868
+ * EN Size: 592b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -925,9 +925,9 @@ void CGMonObj::alwaysFuncMeteoParasite()
 
 			MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
 			for (int i = 0; i < 12; i++) {
-				work->m_rotObjects[i]->m_rotTargetY =
-				    kMonObjBossTwo * (kMonObjBossPi * static_cast<float>(i + 3)) / kMonObjBossTwelve +
-				    aaa;
+				float angle = kMonObjBossTwo * (kMonObjBossPi * static_cast<float>(i + 3)) / kMonObjBossTwelve;
+				angle += aaa;
+				work->m_rotObjects[i]->m_rotTargetY = angle;
 			}
 
 			aaa += kMonObjBossScaleStep;

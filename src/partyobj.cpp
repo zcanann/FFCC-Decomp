@@ -162,6 +162,42 @@ static inline PartyObjOverlay& PartyData(CGPartyObj* self)
 	return self->m_partyData;
 }
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 304b
+ * EN Address: 0x801418DC
+ * EN Size: 268b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGPartyObj::changeWeapon(int weaponIndex, int itemId, int forceImmediate)
+{
+	PartyObjOverlay& party = PartyData(this);
+	if (forceImmediate || !m_weaponNodeFlagBits.m_prg ||
+	    !m_weaponNodeFlagAll.m_bits1.m_shield || party.carryObject != 0 ||
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0 ||
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[12] != 0 ||
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[6] != 0) {
+		if (itemId <= 0) {
+			LoadWeapon(-1, 0);
+		} else {
+			SItemFlatRow* rows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+			unsigned short model = rows[itemId].m_model;
+			LoadWeapon(model & 0xFFF, model >> 12);
+		}
+		party.weaponIndex = weaponIndex;
+		party.weaponItemId = itemId;
+		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponIndex);
+		party.commandFlagBits.flag20 = 0;
+	} else {
+		party.pendingWeaponIndex = weaponIndex;
+		party.pendingWeaponItemId = itemId;
+		party.commandFlagBits.flag20 = 1;
+		changeStat(0x0F, 0, 0);
+	}
+}
+
 static inline int& CharaGhostValue(int offset)
 {
 	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + offset);
@@ -392,8 +428,8 @@ void CGPartyObj::onCreate()
 
 	party.flags.commandActive = 0;
 	party.flags.flag08 = 0;
-	party.weaponItem = 0;
-	party.pendingWeaponItem = 0;
+	party.weaponIndex = 0;
+	party.weaponItemId = 0;
 	party.flags.flag40 = 0;
 	party.flags.flag20 = 0;
 	party.flags.flag10 = 0;
@@ -531,7 +567,7 @@ void CGPartyObj::onChangeStat(int state)
 		*reinterpret_cast<int*>(self + 0x68C) = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		if (Game.m_gameWork.m_menuStageMode != 0) {
 			int cmdListItem =
-			    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetWeaponAttrib(PartyData(this).weaponItem);
+			    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetWeaponAttrib(PartyData(this).weaponIndex);
 			if (cmdListItem >= 0) {
 				m_comboItemState = cmdListItem;
 			}
@@ -567,19 +603,7 @@ void CGPartyObj::onCancelStat(int state)
 		break;
 	case 0x0F:
 		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x6C4]) << 26) & 0xC0000000) >> 31) != 0) {
-			int weaponB = *reinterpret_cast<int*>(self + 0x6D4);
-			int weaponA = *reinterpret_cast<int*>(self + 0x6D8);
-			if (weaponA <= 0) {
-				LoadWeapon(-1, 0);
-			} else {
-				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-				unsigned short packedItem = rows[weaponA].m_model;
-				LoadWeapon(packedItem & 0xFFF, packedItem >> 12);
-			}
-			*reinterpret_cast<int*>(self + 0x6DC) = weaponB;
-			*reinterpret_cast<int*>(self + 0x6E0) = weaponA;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(*reinterpret_cast<int*>(self + 0x6DC));
-			party.commandFlagBits.flag20 = 0;
+			changeWeapon(party.pendingWeaponIndex, party.pendingWeaponItemId, 1);
 		}
 		break;
 	case 0x15:
@@ -924,19 +948,7 @@ void CGPartyObj::onFrameAlways()
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0 &&
 	    (m_motionMode == 1)) {
 		if (m_weaponModelHandle == nullptr) {
-			int weaponItem = party.pendingWeaponItem;
-			int weaponRef = party.weaponItem;
-			if (weaponItem <= 0) {
-				LoadWeapon(-1, 0);
-			} else {
-				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-				unsigned short packedItem = rows[weaponItem].m_model;
-				LoadWeapon(packedItem & 0xFFF, packedItem >> 12);
-			}
-			party.weaponItem = weaponRef;
-			party.pendingWeaponItem = weaponItem;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponItem);
-			party.commandFlagBits.flag20 = 0;
+			changeWeapon(party.weaponIndex, party.weaponItemId, 1);
 		}
 
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
@@ -1055,8 +1067,8 @@ void CGPartyObj::CheckMenu()
  * --INFO--
  * PAL Address: 0x801230a0
  * PAL Size: 844b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013B6F4
+ * EN Size: 688b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1069,52 +1081,26 @@ void CGPartyObj::onFramePreCalc()
 	CGCharaObj::onFramePreCalc();
 
 	PartyObjOverlay& party = PartyData(this);
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (Game.unk_flat3_0xc7d0 != 0) {
 		const Vec* chalicePos = reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C);
-		*reinterpret_cast<float*>(self + 0x5BC) = PSVECDistance(&m_worldPosition, chalicePos);
+		m_targetDist = PSVECDistance(&m_worldPosition, chalicePos);
 	}
 
-	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(party.partyFlags) << 24) & 0xC0000000) >> 31) == 0) &&
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 25) & 0xC0000000) >> 31) == 0)) {
-		unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
-		if (held != 0) {
-			changeStat(0, 0, 0);
-		}
-	}
-
-	int weaponItem;
-	int weaponRef;
-	if (static_cast<int>(CFlatCenterState()) == 0) {
-		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
-		if (party.weaponItem != weaponItem || party.pendingWeaponItem != weaponRef) {
-		bool canImmediateSwap =
-		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
-		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) != 0) &&
-		    (party.carryObject == nullptr) &&
-		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) &&
-		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
-		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0);
-
-		if (canImmediateSwap) {
-			if (weaponItem <= 0) {
-				LoadWeapon(-1, 0);
-			} else {
-				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-				unsigned short packedItem = rows[weaponItem].m_model;
-				LoadWeapon(packedItem & 0x0FFF, packedItem >> 12);
+	if (m_unk63CBits.m_bit80 != 0 && party.flags.commandActive == 0) {
+		if (m_weaponNodeFlagAll.m_bits1.m_menuReady == 0) {
+			unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
+			if (held != 0) {
+				changeStat(0, 0, 0);
 			}
-			party.weaponItem = weaponItem;
-			party.pendingWeaponItem = weaponRef;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponItem);
-			party.commandFlagBits.flag20 = 0;
-		} else {
-			*reinterpret_cast<int*>(self + 0x6D4) = weaponItem;
-			party.weaponRef = weaponRef;
-			party.commandFlagBits.flag20 = 1;
-			changeStat(0x0F, 0, 0);
 		}
+
+		int weaponIndex;
+		int itemId;
+		if (CFlatCenterState() == 0) {
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponIndex, itemId);
+			if (party.weaponIndex != weaponIndex || party.weaponItemId != itemId) {
+				changeWeapon(weaponIndex, itemId, 0);
+			}
 		}
 	}
 
@@ -1122,7 +1108,7 @@ void CGPartyObj::onFramePreCalc()
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
 		if (party.carryObject != nullptr ||
-		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+		    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_hp == 0) {
 			float speedScale;
 			if (static_cast<int>(CFlatCenterState()) == 0) {
 				speedScale = FLOAT_80331b08;
@@ -1133,7 +1119,7 @@ void CGPartyObj::onFramePreCalc()
 		} else {
 			m_moveBaseSpeed = FLOAT_80331ad4;
 		}
-		m_moveBaseSpeed *= *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x690);
+		m_moveBaseSpeed *= m_pushScale;
 	}
 }
 
@@ -1461,8 +1447,8 @@ targetJoin: ;
 			if (weaponItem != party.unk6BC ||
 			    weaponRef != getEquipWeaponInventoryItem(caravan)) {
 				int newWeaponRef = getEquipWeaponInventoryItem(caravan);
-				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = party.unk6BC;
-				party.weaponRef = newWeaponRef;
+				party.pendingWeaponIndex = party.unk6BC;
+				party.pendingWeaponItemId = newWeaponRef;
 				party.commandFlagBits.flag20 = 1;
 				changeStat(0x0F, 0, 0);
 				return;
@@ -1524,8 +1510,8 @@ targetJoin: ;
 			int weaponRef;
 			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 			if (weaponItem != caravan->GetIdxCmdList() || weaponRef != itemId) {
-				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) = caravan->GetIdxCmdList();
-				party.weaponRef = itemId;
+				party.pendingWeaponIndex = caravan->GetIdxCmdList();
+				party.pendingWeaponItemId = itemId;
 				party.commandFlagBits.flag20 = 1;
 				changeStat(0x0F, 0, 0);
 				return;
@@ -1962,19 +1948,7 @@ void CGPartyObj::onFrameStat()
 			reqAnim(0x29, 0, 0);
 		}
 		if (m_stateFrame == 4) {
-			int weaponItem = party.weaponRef;
-			int weaponRef = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D4);
-			if (weaponItem <= 0) {
-				LoadWeapon(-1, 0);
-			} else {
-				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
-				unsigned short itemKind = rows[weaponItem].m_model;
-				LoadWeapon(itemKind & 0xFFF, itemKind >> 12);
-			}
-			party.weaponItem = weaponRef;
-			party.pendingWeaponItem = weaponItem;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponItem);
-			party.commandFlagBits.flag20 = 0;
+			changeWeapon(party.pendingWeaponIndex, party.pendingWeaponItemId, 1);
 		}
 		if (isLoopAnim() != 0) {
 			changeStat(0, 0, 0);
@@ -3999,36 +3973,10 @@ inline void CGPartyObj::statJump()
 inline void CGPartyObj::statWeaponChange()
 {
 	PartyObjOverlay& party = PartyData(this);
-	changeWeapon(party.weaponItem, party.pendingWeaponItem, 0);
+	changeWeapon(party.weaponIndex, party.weaponItemId, 0);
 
 	if (m_subFrame > 1) {
 		changeStat(0, 0, 0);
-	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void CGPartyObj::changeWeapon(int weaponRef, int weaponItem, int forceIdle)
-{
-	PartyObjOverlay& party = PartyData(this);
-	party.weaponItem = weaponRef;
-	party.pendingWeaponItem = weaponItem;
-
-	if (weaponItem <= 0) {
-		LoadWeapon(-1, 0);
-	} else {
-		LoadWeapon(weaponItem & 0xFFF, weaponItem >> 12);
-	}
-
-	if (m_scriptHandle != nullptr) {
-		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
-	}
-
-	if (forceIdle != 0 || m_lastStateId != 0) {
-		setIdleMotion();
 	}
 }
 
@@ -4164,8 +4112,8 @@ void CGPartyObj::InitFinished()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(
-	    PartyData(this).weaponItem,
-	    PartyData(this).pendingWeaponItem);
+	    PartyData(this).weaponIndex,
+	    PartyData(this).weaponItemId);
 	enableDamageCol(1);
 	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD0) = 0;
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
@@ -4261,8 +4209,8 @@ inline void CGPartyObj::checkAndSetWeapon()
 	int weaponItem;
 	int weaponRef;
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
-	PartyData(this).weaponRef = weaponRef;
-	PartyData(this).weaponItem = weaponItem;
+	PartyData(this).pendingWeaponItemId = weaponRef;
+	PartyData(this).weaponIndex = weaponItem;
 	if (weaponItem <= 0) {
 		LoadWeapon(-1, 0);
 	} else {

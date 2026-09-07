@@ -86,21 +86,6 @@ static inline CmakeMenuState* CmakeVillageState(CMenuPcs* menu)
     return static_cast<CmakeMenuState*>(CmakeVillageWork(menu));
 }
 
-struct CFontRenderFlagBits
-{
-    signed char shadow : 1;
-    signed char zCompare : 1;
-    signed char zUpdate : 1;
-    signed char fixedWidth : 1;
-    signed char snapPosition : 1;
-    signed char pad : 3;
-};
-
-static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
-{
-    return reinterpret_cast<CFontRenderFlagBits&>(flags);
-}
-
 static inline short& CmakeSlot(CMenuPcs* menu)
 {
     return menu->m_singleCmakeSlot;
@@ -851,7 +836,7 @@ void CMenuPcs::CmakeVillageDraw()
     font->SetShadow(0);
     font->SetScale(1.0f);
     font->DrawInit();
-    GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
+    font->renderFlags.fixedWidth = 1;
     font->SetMargin(4.9f);
     SetCmakeFontColor(font, alpha);
 
@@ -866,7 +851,7 @@ void CMenuPcs::CmakeVillageDraw()
         font->Draw(rowText);
     }
 
-    GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
+    font->renderFlags.fixedWidth = 0;
 
     DrawInit();
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
@@ -2519,7 +2504,7 @@ void CMenuPcs::CmakeNameDraw()
     font->SetShadow(0);
     font->SetScale(1.0f);
     font->DrawInit();
-    GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
+    font->renderFlags.fixedWidth = 1;
     font->SetMargin(4.9f);
     SetCmakeFontColor(font, alpha);
 
@@ -2531,7 +2516,7 @@ void CMenuPcs::CmakeNameDraw()
         font->Draw(rowText);
     }
 
-    GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
+    font->renderFlags.fixedWidth = 0;
     DrawInit();
 
     if ((CmakeState(this)->m_mode == 1) && (CmakeState(this)->m_row < 5)) {
@@ -3118,7 +3103,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     font->SetShadow(1);
     font->SetScale(1.0f);
     font->DrawInit();
-    GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
+    font->renderFlags.fixedWidth = 1;
     font->SetMargin(1.0f);
 
     alpha = 255.0f * alpha;
@@ -3129,7 +3114,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     font->SetPosX(static_cast<float>(nameX));
     font->SetPosY(static_cast<float>(baseY - 4));
     font->Draw(text);
-    GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
+    font->renderFlags.fixedWidth = 0;
     DrawInit();
 
     if (y != 0) {

@@ -34,21 +34,6 @@ static const char s_mesEmpty[] = "";
 static char* sTag54Source;
 static char sTag54Init;
 
-struct CFontRenderFlagBits
-{
-	signed char shadow : 1;
-	signed char zCompare : 1;
-	signed char zUpdate : 1;
-	signed char fixedWidth : 1;
-	signed char snapPosition : 1;
-	signed char pad : 3;
-};
-
-static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
-{
-	return reinterpret_cast<CFontRenderFlagBits&>(flags);
-}
-
 // One drawn character record inside CMes (this+0xC, stride 0x14).
 struct CMesCharCell
 {
@@ -775,9 +760,9 @@ void CMes::Draw()
 					float glyphScaleY = kMesTagScaleStep * (float)*(unsigned char*)((char*)glyph + 0x11);
 					font->SetScaleX(kMesTagScaleStep * (float)*(unsigned char*)((char*)glyph + 0x0A));
 					font->SetScaleY(glyphScaleY);
-					GetRenderFlagBits(font->renderFlags).snapPosition = 1;
+					font->renderFlags.snapPosition = 1;
 					font->Draw((unsigned short)*(unsigned char*)(glyph + 4));
-					GetRenderFlagBits(font->renderFlags).snapPosition = 0;
+					font->renderFlags.snapPosition = 0;
 				}
 			}
 		}
@@ -1496,7 +1481,7 @@ void CMes::addString(char** text, int branchMode)
 			glyph->m_x = mCurrentX;
 			glyph->m_y = (short)(int)mCurrentY;
 
-			GetRenderFlagBits(font->renderFlags).snapPosition = 1;
+			font->renderFlags.snapPosition = 1;
 			float width;
 			if (uch < 0x20)
 			{
@@ -1508,7 +1493,7 @@ void CMes::addString(char** text, int branchMode)
 			}
 			glyph->m_width = width;
 			float packedScale = kMesPackedScaleFactor;
-			GetRenderFlagBits(font->renderFlags).snapPosition = 0;
+			font->renderFlags.snapPosition = 0;
 
 			glyph->m_reveal = (short)mRevealCursor;
 			glyph->m_textAlign = mTextAlign;

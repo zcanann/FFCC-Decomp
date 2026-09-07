@@ -71,21 +71,6 @@ extern const float kSingStatPanelH;
 extern const float kSingStatScreenPadX;
 extern const float kSingStatScreenY;
 
-struct CFontRenderFlagBits
-{
-    signed char shadow : 1;
-    signed char zCompare : 1;
-    signed char zUpdate : 1;
-    signed char fixedWidth : 1;
-    signed char snapPosition : 1;
-    signed char pad : 3;
-};
-
-static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
-{
-    return reinterpret_cast<CFontRenderFlagBits&>(flags);
-}
-
 struct SingMenuStaticMessageInfo
 {
     int lineCount;
@@ -1869,7 +1854,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
         }
         font->Draw(label);
 
-        GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
+        font->renderFlags.fixedWidth = 1;
         if (languageId == 2) {
             font->SetMargin(-5.0f);
             font->SetScaleX(0.7199999690055847f);
@@ -1896,7 +1881,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
         font->SetPosX(statPosX0 - valueW);
         font->Draw(valueText);
 
-        GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
+        font->renderFlags.fixedWidth = 0;
         font->SetMargin(1.0f);
         y += statYStep;
         labelsDe++;
@@ -1906,7 +1891,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
         labelsEn++;
     }
 
-    GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
+    font->renderFlags.fixedWidth = 0;
     font->SetMargin(1.0f);
     DrawInit();
 }

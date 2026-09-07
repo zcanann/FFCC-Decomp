@@ -67,7 +67,7 @@ void pppParHitSphMat(_pppPObject* pObject, pppParHitSphMatStep* step, _pppCtrlTa
         PSVECSubtract(&pppMngSt->m_position, ParHitSphMatPreviousPosition(pppMngSt), &local_88);
     }
 
-    radius = pppMngSt->m_previousPosition.z * step->m_radiusScale;
+    radius = pppMngSt->m_hitScale * step->m_radiusScale;
     pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, step->m_height);
 
     if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {

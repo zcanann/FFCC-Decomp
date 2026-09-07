@@ -262,7 +262,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 			GXSetZMode(1, GX_LEQUAL, 0);
 
 			if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
-				float radius = ppvMng->m_previousPosition.z * step->m_laser.m_hitScale;
+				float radius = ppvMng->m_hitScale * step->m_laser.m_hitScale;
 				float distance = PSVECDistance(work->m_points, &work->m_origin);
 				debugSource.x = LoadLaserFloat(kPppYmLaserZero);
 				debugSource.y = LoadLaserFloat(kPppYmLaserZero);
@@ -428,7 +428,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 		if (step->m_laser.m_disableHitCylinder == 0) {
 			pppHitCylinderSendSystem(
 				ppvMng, &work->m_origin, &localA,
-				ppvMng->m_previousPosition.z * step->m_laser.m_hitScale,
+				ppvMng->m_hitScale * step->m_laser.m_hitScale,
 				step->m_laser.m_hitRadius);
 		}
 

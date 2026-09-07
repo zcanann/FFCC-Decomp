@@ -272,11 +272,39 @@ struct _pppDataHead
     unsigned int m_shapeGroups;       // 0x1c
 }; // Size 0x20
 
+struct pppIVECTOR3
+{
+    s32 x;
+    s32 y;
+    s32 z;
+};
+
 struct _pppFieldParticleData
 {
-    unsigned char m_pad00[0x2C];
-    int m_autoCreateMarker;           // 0x2c
-    unsigned char m_pad30[0x60 - 0x30];
+    Vec m_position;                        // 0x00
+    unsigned char m_pad0C[4];
+    pppIVECTOR3 m_rotation;                // 0x10
+    unsigned char m_pad1C[4];
+    Vec m_scale;                           // 0x20
+    int m_autoCreateMarker;                // 0x2C
+    int m_partIndex;                       // 0x30
+    float m_cullDistance;                  // 0x34
+    float m_cullRadius;                    // 0x38
+    float m_cullYOffset;                   // 0x3C
+    unsigned short m_fieldId;              // 0x40
+    unsigned short m_field118;             // 0x42
+    unsigned char m_drawPass;              // 0x44
+    unsigned char m_matrixMode;            // 0x45
+    unsigned char m_drawVariant;           // 0x46
+    unsigned char m_rotationOrder;         // 0x47
+    short m_mapObjIndex;                   // 0x48
+    unsigned char m_fpBillboard;           // 0x4A
+    unsigned char m_prio;                  // 0x4B
+    signed char m_drawSubType;             // 0x4C
+    unsigned char m_ownerFlagsInitialized; // 0x4D
+    unsigned char m_nodeScaleInitialized;  // 0x4E
+    unsigned char m_fieldF2;               // 0x4F
+    char m_nodeName[0x10];                 // 0x50
 }; // Size 0x60
 typedef int _pppFieldParticleData_size_mismatch[(sizeof(_pppFieldParticleData) == 0x60) ? 1 : -1];
 
@@ -286,13 +314,6 @@ struct pppShapeGroupRaw
     s16 m_shapeCount;  // 0x2
     s16* m_shapeList;  // 0x4
 }; // Size 0x8
-
-struct pppIVECTOR3
-{
-    s32 x;
-    s32 y;
-    s32 z;
-};
 
 struct pppIVECTOR4
 {
@@ -347,10 +368,10 @@ struct _pppMngSt
     float m_userFloat1;                // 0x3C
     float m_scaleFactor;               // 0x40
     float m_ownerScale;                // 0x44
-    float m_userPositionX;             // 0x48
-    float m_userPositionY;             // 0x4C
-    Vec m_savedPosition;               // 0x50
-    Vec m_previousPosition;            // 0x5C (third float doubles as a generic param)
+    Vec m_userPosition;                // 0x48
+    float m_movementScale;             // 0x54
+    Vec m_basePosition;                // 0x58
+    float m_hitScale;                  // 0x64
     Vec m_paramVec0;                   // 0x68
     short m_kind;                      // 0x74
     short m_nodeIndex;                 // 0x76
@@ -403,10 +424,10 @@ struct _pppMngSt
     PPPIFPARAM m_hitParams;            // 0x130
     short m_hitObjectIds[0x10];        // 0x138
 
-    Vec& UserPosition() { return *reinterpret_cast<Vec*>(&m_userPositionX); }
-    Vec& BasePosition() { return *reinterpret_cast<Vec*>(&m_savedPosition.z); }
-    const Vec& UserPosition() const { return *reinterpret_cast<const Vec*>(&m_userPositionX); }
-    const Vec& BasePosition() const { return *reinterpret_cast<const Vec*>(&m_savedPosition.z); }
+    Vec& UserPosition() { return m_userPosition; }
+    Vec& BasePosition() { return m_basePosition; }
+    const Vec& UserPosition() const { return m_userPosition; }
+    const Vec& BasePosition() const { return m_basePosition; }
 }; // Size: 0x158
 
 void Screen2world(Vec&, Vec&);

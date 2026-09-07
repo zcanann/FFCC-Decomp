@@ -295,7 +295,7 @@ extern "C" void pppFrameLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCtr
         if (step->m_laser.m_disableHitCylinder == 0) {
             pppHitCylinderSendSystem(
                 ppvMng, &work->m_origin, &localA,
-                ppvMng->m_previousPosition.z * step->m_laser.m_hitScale,
+                ppvMng->m_hitScale * step->m_laser.m_hitScale,
                 step->m_laser.m_hitRadius);
         }
 
@@ -550,7 +550,7 @@ extern "C" void pppRenderLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCt
             GXSetZMode(1, GX_LEQUAL, 0);
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
-                float radius = ppvMng->m_previousPosition.z * step->m_laser.m_hitScale;
+                float radius = ppvMng->m_hitScale * step->m_laser.m_hitScale;
                 float distance = PSVECDistance(work->m_points, &work->m_origin);
                 debugSource.x = LaserConst(kPppLaserZero);
                 debugSource.y = LaserConst(kPppLaserZero);

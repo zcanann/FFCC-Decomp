@@ -582,7 +582,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         slotCount = pBreathModel->m_slotCount;
         if (IsExistGroupParticle(pBreathModel, work, (short)groupIndex)) {
             firstParticle = -1;
-            scaledOwner = mngSt->m_previousPosition.z * pBreathModel->m_groupOwnerScale;
+            scaledOwner = mngSt->m_hitScale * pBreathModel->m_groupOwnerScale;
             for (particleSlot = 0; particleSlot < slotCount; particleSlot++) {
                 if (groupData->particleStates[particleSlot] != -1) {
                     firstParticle = groupData->particleIndices[particleSlot];

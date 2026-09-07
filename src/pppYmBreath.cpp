@@ -596,7 +596,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
         slotCount = params->m_slotCount;
         if (IsExistGroupParticle(params, work, (short)groupIndex)) {
             firstParticle = -1;
-            scaledOwner = mngSt->m_previousPosition.z * params->m_groupOwnerScale;
+            scaledOwner = mngSt->m_hitScale * params->m_groupOwnerScale;
             for (particleSlot = 0; particleSlot < slotCount; particleSlot++) {
                 if (groupData->particleStates[particleSlot] != -1) {
                     firstParticle = groupData->particleIndices[particleSlot];

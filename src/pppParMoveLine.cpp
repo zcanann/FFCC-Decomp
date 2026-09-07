@@ -46,7 +46,7 @@ void pppParMoveLine(_pppPObject* param_1, ParMoveLineParams* params)
 
     if ((fVar1 != local_1c.x) || (fVar1 != local_1c.y) || (fVar1 != local_1c.z)) {
         PSVECNormalize(&local_1c, &VStack_28);
-        PSVECScale(&VStack_28, &local_1c, params->m_speed * pppMngSt->m_savedPosition.y);
+        PSVECScale(&VStack_28, &local_1c, params->m_speed * pppMngSt->m_movementScale);
         PSVECAdd(&local_1c, &pppMngSt->m_position, &pppMngSt->m_position);
     }
 

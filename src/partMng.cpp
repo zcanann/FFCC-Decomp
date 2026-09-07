@@ -47,7 +47,14 @@ STATIC_ASSERT(offsetof(_pppMngSt, m_lifeEnd) == 0x24);
 STATIC_ASSERT(offsetof(_pppMngSt, m_scale) == 0x28);
 STATIC_ASSERT(offsetof(_pppMngSt, m_matrix) == 0x78);
 STATIC_ASSERT(sizeof(_pppMngSt) == 0x158);
+STATIC_ASSERT(offsetof(_pppFieldParticleData, m_autoCreateMarker) == 0x2C);
+STATIC_ASSERT(offsetof(_pppFieldParticleData, m_matrixMode) == 0x45);
+STATIC_ASSERT(offsetof(_pppFieldParticleData, m_nodeName) == 0x50);
 STATIC_ASSERT(offsetof(_pppMngSt, m_deltaTime) == 0xA8);
+STATIC_ASSERT(offsetof(_pppMngSt, m_userPosition) == 0x48);
+STATIC_ASSERT(offsetof(_pppMngSt, m_movementScale) == 0x54);
+STATIC_ASSERT(offsetof(_pppMngSt, m_basePosition) == 0x58);
+STATIC_ASSERT(offsetof(_pppMngSt, m_hitScale) == 0x64);
 
 STATIC_ASSERT(sizeof(CPartMng) == 0x23FD8);
 STATIC_ASSERT(offsetof(CPartMng, m_cursorRequest) == 0x10);
@@ -1121,154 +1128,85 @@ void CPartMng::allFreeFPrim()
  */
 void CPartMng::SetFp()
 {
-    struct PppMngSetFpRaw {
-        void* m_pppResSet;                   // 0x00
-        unsigned char m_pad04[0x08 - 0x04];
-        Vec m_position;                      // 0x08
-        int m_baseTime;                      // 0x14
-        pppIVECTOR3 m_rotation;              // 0x18
-        unsigned char m_pad24[0x28 - 0x24];
-        Vec m_scale;                         // 0x28
-        unsigned char m_pad34[0x38 - 0x34];
-        float m_userFloat0;                  // 0x38
-        float m_userFloat1;                  // 0x3C
-        float m_scaleFactor;                 // 0x40
-        float m_ownerScale;                  // 0x44
-        unsigned char m_pad48[0x76 - 0x48];
-        short m_nodeIndex;                   // 0x76
-        unsigned char m_pad78[0xBC - 0x78];
-        unsigned int m_objHitMask;           // 0xBC
-        unsigned int m_cylinderAttribute;    // 0xC0
-        unsigned char m_padC4[0xD8 - 0xC4];
-        CGObject* m_owner;                   // 0xD8
-        CGObject* m_lookTarget;              // 0xDC
-        void* m_bindNode;                    // 0xE0
-        unsigned char m_padE4[0xE7 - 0xE4];
-        unsigned char m_matrixMode;          // 0xE7
-        unsigned char m_fieldE8;             // 0xE8
-        unsigned char m_ownerFlagsInitialized; // 0xE9
-        unsigned char m_ownerFlagA;          // 0xEA
-        unsigned char m_drawVariant;         // 0xEB
-        unsigned char m_rotationOrder;       // 0xEC
-        unsigned char m_drawPass;            // 0xED
-        unsigned char m_drawSubType;         // 0xEE
-        unsigned char m_useOwnerScaleSign;   // 0xEF
-        unsigned char m_ownerFlagB;          // 0xF0
-        unsigned char m_ownerFlagC;          // 0xF1
-        unsigned char m_fieldF2;             // 0xF2
-        unsigned char m_padF3[0xF7 - 0xF3];
-        unsigned char m_fpBillboard;         // 0xF7
-        unsigned char m_prio;                // 0xF8
-        unsigned char m_padF9[0x100 - 0xF9];
-        int m_paramA;                        // 0x100
-        unsigned int m_paramB;               // 0x104
-        float m_cullRadiusSq;                // 0x108
-        float m_cullRadius;                  // 0x10C
-        float m_cullYOffset;                 // 0x110
-        unsigned char m_pad114[0x11A - 0x114];
-        short m_mapObjIndex;                 // 0x11A
-    };
-
-    // Overlay view: pins the element fields at baked 0x2A18+field displacements
-    // off a base register that starts at `this` and walks by sizeof(_pppMngSt).
-    struct PppMngSetFpView {
-        unsigned char m_head[0x2A18];
-        PppMngSetFpRaw m_mng;                // 0x2A18
-    };
-
-    static const int kUsbEditOffset = 0x7F0;
     static const int kResSetOffset = 0x23518;
-    static const int kRecvBuffOffset = 0x1C8;
     static const int kEditCountOffset = 0x4;
-    static const int kPacketStride = 0x60;
 
-    PppMngSetFpView* view = reinterpret_cast<PppMngSetFpView*>(this);
     int i;
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-#define mng (&view->m_mng)
     for (i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
-        unsigned char* fpBytes = *reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + i * kPacketStride;
-        float* recvBuff = reinterpret_cast<float*>(fpBytes);
-        mng->m_pppResSet = self + kResSetOffset;
+        _pppFieldParticleData* fp = &reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer)[i];
+        m_pppMng[i].m_pppResSet = self + kResSetOffset;
 
-        if (mng->m_baseTime < 0) {
-            mng->m_baseTime = reinterpret_cast<int*>(recvBuff)[0x0B];
+        if (m_pppMng[i].m_baseTime < 0) {
+            m_pppMng[i].m_baseTime = fp->m_autoCreateMarker;
         } else {
-            mng->m_baseTime = reinterpret_cast<int*>(recvBuff)[0x0B] * 0x19 / 0x1E;
+            m_pppMng[i].m_baseTime = fp->m_autoCreateMarker * 0x19 / 0x1E;
         }
 
-        mng->m_cullRadiusSq = recvBuff[0x0D];
-        if (mng->m_cullRadiusSq > 0.0) {
-            mng->m_cullRadiusSq *= mng->m_cullRadiusSq;
+        m_pppMng[i].m_cullRadiusSq = fp->m_cullDistance;
+        if (m_pppMng[i].m_cullRadiusSq > 0.0) {
+            m_pppMng[i].m_cullRadiusSq *= m_pppMng[i].m_cullRadiusSq;
         }
-        mng->m_nodeIndex = static_cast<short>(i);
-        mng->m_cullRadius = recvBuff[0x0E];
-        mng->m_cullYOffset = recvBuff[0x0F];
-        mng->m_position.x = recvBuff[0];
-        mng->m_position.y = recvBuff[1];
-        mng->m_position.z = recvBuff[2];
-        mng->m_rotation.x = reinterpret_cast<int*>(recvBuff)[4];
-        mng->m_rotation.y = reinterpret_cast<int*>(recvBuff)[5];
-        mng->m_rotation.z = reinterpret_cast<int*>(recvBuff)[6];
-        mng->m_scale.x = recvBuff[8];
-        mng->m_scale.y = recvBuff[9];
-        mng->m_scale.z = recvBuff[0x0A];
-        mng->m_ownerScale = kPartMngOne;
-        mng->m_scaleFactor = kPartMngOne;
-        mng->m_userFloat1 = kPartMngOne;
-        mng->m_userFloat0 = kPartMngOne;
-        mng->m_useOwnerScaleSign = 0;
-        mng->m_matrixMode = *reinterpret_cast<unsigned char*>(fpBytes + 0x45);
-        mng->m_drawVariant = *reinterpret_cast<unsigned char*>(fpBytes + 0x46);
-        mng->m_rotationOrder = *reinterpret_cast<unsigned char*>(fpBytes + 0x47);
-        mng->m_drawPass = *reinterpret_cast<unsigned char*>(fpBytes + 0x44);
-        mng->m_drawSubType = *reinterpret_cast<unsigned char*>(fpBytes + 0x4C);
-        mng->m_ownerFlagB = *reinterpret_cast<unsigned char*>(fpBytes + 0x4D);
-        mng->m_ownerFlagC = *reinterpret_cast<unsigned char*>(fpBytes + 0x4E);
-        mng->m_fieldF2 = 1;
-        mng->m_fpBillboard = *reinterpret_cast<unsigned char*>(fpBytes + 0x4A);
-        mng->m_prio = *reinterpret_cast<unsigned char*>(fpBytes + 0x4B);
-        mng->m_mapObjIndex = *reinterpret_cast<short*>(fpBytes + 0x48);
-        mng->m_bindNode = 0;
-        mng->m_objHitMask = 0xFFFFFFFF;
-        mng->m_cylinderAttribute = 0xFFFFFFFF;
-        mng->m_paramA = 0;
-        mng->m_fieldE8 = 0;
-        mng->m_ownerFlagsInitialized = 1;
-        mng->m_ownerFlagA = 1;
-        mng->m_owner = 0;
+        m_pppMng[i].m_nodeIndex = static_cast<short>(i);
+        m_pppMng[i].m_cullRadius = fp->m_cullRadius;
+        m_pppMng[i].m_cullYOffset = fp->m_cullYOffset;
+        m_pppMng[i].m_position.x = fp->m_position.x;
+        m_pppMng[i].m_position.y = fp->m_position.y;
+        m_pppMng[i].m_position.z = fp->m_position.z;
+        m_pppMng[i].m_rotation.x = fp->m_rotation.x;
+        m_pppMng[i].m_rotation.y = fp->m_rotation.y;
+        m_pppMng[i].m_rotation.z = fp->m_rotation.z;
+        m_pppMng[i].m_scale.x = fp->m_scale.x;
+        m_pppMng[i].m_scale.y = fp->m_scale.y;
+        m_pppMng[i].m_scale.z = fp->m_scale.z;
+        m_pppMng[i].m_ownerScale = kPartMngOne;
+        m_pppMng[i].m_scaleFactor = kPartMngOne;
+        m_pppMng[i].m_userFloat1 = kPartMngOne;
+        m_pppMng[i].m_userFloat0 = kPartMngOne;
+        m_pppMng[i].m_useOwnerScaleSign = 0;
+        m_pppMng[i].m_matrixMode = fp->m_matrixMode;
+        m_pppMng[i].m_drawVariant = fp->m_drawVariant;
+        m_pppMng[i].m_rotationOrder = fp->m_rotationOrder;
+        m_pppMng[i].m_drawPass = fp->m_drawPass;
+        m_pppMng[i].m_drawSubType = fp->m_drawSubType;
+        m_pppMng[i].m_ownerFlagsInitialized = fp->m_ownerFlagsInitialized;
+        m_pppMng[i].m_nodeScaleInitialized = fp->m_nodeScaleInitialized;
+        m_pppMng[i].m_fieldF2 = 1;
+        m_pppMng[i].m_fpBillboard = fp->m_fpBillboard;
+        m_pppMng[i].m_prio = fp->m_prio;
+        m_pppMng[i].m_mapObjIndex = fp->m_mapObjIndex;
+        m_pppMng[i].m_bindNode = 0;
+        m_pppMng[i].m_objHitMask = 0xFFFFFFFF;
+        m_pppMng[i].m_cylinderAttribute = 0xFFFFFFFF;
+        m_pppMng[i].m_paramA = 0;
+        m_pppMng[i].m_hitBgFlag = 0;
+        m_pppMng[i].m_slotVisible = 1;
+        m_pppMng[i].m_ownerFacing = 1;
+        m_pppMng[i].m_owner = 0;
 
-        unsigned char mode = mng->m_matrixMode;
+        unsigned char mode = m_pppMng[i].m_matrixMode;
         switch (mode) {
         case 2:
         case 4:
-            mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<short*>(fpBytes + 0x48)));
+            m_pppMng[i].m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(fp->m_mapObjIndex));
             break;
         case 3:
         case 5:
         case 6:
         case 7:
         case 8:
-#define owner (*reinterpret_cast<CGObject**>(self + kUsbEditOffset + 0x1C))
-            mng->m_ownerFlagA = 0;
-            mng->m_owner = owner;
-            mng->m_lookTarget = owner;
-            if (owner != 0) {
-                int node = owner->m_charaModelHandle->m_model->SearchNodeSk(reinterpret_cast<char*>(fpBytes + 0x50));
+            m_pppMng[i].m_ownerFacing = 0;
+            m_pppMng[i].m_owner = m_editorObject;
+            m_pppMng[i].m_lookTarget = m_editorObject;
+            if (m_editorObject != 0) {
+                int node = m_editorObject->m_charaModelHandle->m_model->SearchNodeSk(fp->m_nodeName);
                 if (node >= 0) {
-                    mng->m_bindNode = reinterpret_cast<void*>(
-                        *reinterpret_cast<int*>(
-                            reinterpret_cast<unsigned char*>(owner->m_charaModelHandle->m_model) + 0xA8) +
-                        node * 0xC0);
+                    m_pppMng[i].m_bindNode = &m_editorObject->m_charaModelHandle->m_model->m_nodes[node];
                 }
             }
-#undef owner
             break;
         }
-
-        view = reinterpret_cast<PppMngSetFpView*>(reinterpret_cast<unsigned char*>(view) + sizeof(_pppMngSt));
     }
-#undef mng
 }
 
 /*
@@ -4140,7 +4078,8 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     }
     _pppDataHead* pdt = slot->m_pppDataHead;
 
-    unsigned char* fpData = reinterpret_cast<unsigned char*>(pdt) + 0x20 + fpNo * 0x60;
+    _pppFieldParticleData* fp = reinterpret_cast<_pppFieldParticleData*>(
+        reinterpret_cast<unsigned char*>(pdt) + sizeof(_pppDataHead) + fpNo * sizeof(_pppFieldParticleData));
 
     _pppMngSt* mng = pppGetFreePppMngSt();
     if (mng == 0) {
@@ -4152,9 +4091,6 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
                       mng - m_pppMng,
                       m_pdtSlots[pdtSlotIndex].m_name);
     }
-
-    unsigned char* fpData1 = fpData + 0x20;
-    unsigned char* fpData2 = fpData + 0x40;
 
     mng->m_paramB = -1;
     mng->m_prioTime = 0;
@@ -4184,7 +4120,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_slotVisible = 1;
     mng->m_ownerFacing = 1;
 
-    const int initialTime = *reinterpret_cast<int*>(fpData1 + 0x0C);
+    const int initialTime = fp->m_autoCreateMarker;
     if (initialTime == -0x1000) {
         mng->m_baseTime = 0;
     } else {
@@ -4192,30 +4128,29 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     }
 
     mng->m_pppResSet = slot;
-    mng->m_partIndex = *reinterpret_cast<int*>(fpData1 + 0x10);
-    mng->m_cullRadiusSq = *reinterpret_cast<float*>(fpData1 + 0x14);
+    mng->m_partIndex = fp->m_partIndex;
+    mng->m_cullRadiusSq = fp->m_cullDistance;
     if (mng->m_cullRadiusSq > 0.0) {
         mng->m_cullRadiusSq *= mng->m_cullRadiusSq;
     }
-    mng->m_cullRadius = *reinterpret_cast<float*>(fpData1 + 0x18);
-    mng->m_cullYOffset = *reinterpret_cast<float*>(fpData1 + 0x1C);
+    mng->m_cullRadius = fp->m_cullRadius;
+    mng->m_cullYOffset = fp->m_cullYOffset;
     mng->m_pppPObjLinkHead.m_next = 0;
     mng->m_pppPDataVals = 0;
 
     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(mng) + 0xFC) =
-        *reinterpret_cast<unsigned short*>(fpData2 + 0x0);
-    mng->m_field118 = *reinterpret_cast<unsigned short*>(fpData2 + 0x2);
-    mng->m_matrixMode = *reinterpret_cast<unsigned char*>(fpData2 + 0x5);
-    mng->m_drawVariant = *reinterpret_cast<unsigned char*>(fpData2 + 0x6);
-    mng->m_rotationOrder = *reinterpret_cast<unsigned char*>(fpData2 + 0x7);
-    mng->m_drawPass =
-        *reinterpret_cast<unsigned char*>(fpData2 + 0x4);
-    mng->m_drawSubType = *reinterpret_cast<signed char*>(fpData2 + 0x0C);
-    mng->m_ownerFlagsInitialized = *reinterpret_cast<unsigned char*>(fpData2 + 0x0D);
-    mng->m_nodeScaleInitialized = *reinterpret_cast<unsigned char*>(fpData2 + 0x0E);
+        fp->m_fieldId;
+    mng->m_field118 = fp->m_field118;
+    mng->m_matrixMode = fp->m_matrixMode;
+    mng->m_drawVariant = fp->m_drawVariant;
+    mng->m_rotationOrder = fp->m_rotationOrder;
+    mng->m_drawPass = fp->m_drawPass;
+    mng->m_drawSubType = fp->m_drawSubType;
+    mng->m_ownerFlagsInitialized = fp->m_ownerFlagsInitialized;
+    mng->m_nodeScaleInitialized = fp->m_nodeScaleInitialized;
     mng->m_fieldF2 = 1;
     if (allowFpOverride != 0) {
-        const int mode = *reinterpret_cast<unsigned char*>(fpData2 + 0x05);
+        const int mode = fp->m_matrixMode;
         switch (mode) {
         case 3:
         case 5:
@@ -4224,44 +4159,43 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         case 8:
             break;
         default:
-            mng->m_fieldF2 = *reinterpret_cast<unsigned char*>(fpData2 + 0x0F);
+            mng->m_fieldF2 = fp->m_fieldF2;
             break;
         }
     }
 
-    mng->m_fpBillboard = *reinterpret_cast<unsigned char*>(fpData2 + 0x0A);
-    mng->m_prio = *reinterpret_cast<unsigned char*>(fpData2 + 0x0B);
-    mng->m_mapObjIndex = *reinterpret_cast<short*>(fpData2 + 0x08);
+    mng->m_fpBillboard = fp->m_fpBillboard;
+    mng->m_prio = fp->m_prio;
+    mng->m_mapObjIndex = fp->m_mapObjIndex;
 
     mng->m_bindNode = 0;
     mng->m_objHitMask = createParam->m_objectHitMask;
     mng->m_cylinderAttribute = createParam->m_cylinderAttribute;
     mng->m_paramA = createParam->m_paramA;
-    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(mng) + 0x54) = createParam->m_paramC;
-    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(mng) + 0x64) = createParam->m_paramD;
+    mng->m_movementScale = createParam->m_paramC;
+    mng->m_hitScale = createParam->m_paramD;
 
     {
-        unsigned char* mngBytes = reinterpret_cast<unsigned char*>(mng);
         if (createParam->m_positionOffsetPtr == 0) {
-            mng->m_position.x = *reinterpret_cast<float*>(fpData + 0x00);
-            mng->m_position.y = *reinterpret_cast<float*>(fpData + 0x04);
-            mng->m_position.z = *reinterpret_cast<float*>(fpData + 0x08);
-            *reinterpret_cast<float*>(mngBytes + 0x58) = mng->m_position.x;
-            *reinterpret_cast<float*>(mngBytes + 0x5c) = mng->m_position.y;
-            *reinterpret_cast<float*>(mngBytes + 0x60) = mng->m_position.z;
-            *reinterpret_cast<float*>(mngBytes + 0x48) = *reinterpret_cast<float*>(mngBytes + 0x58);
-            *reinterpret_cast<float*>(mngBytes + 0x4c) = *reinterpret_cast<float*>(mngBytes + 0x5c);
-            *reinterpret_cast<float*>(mngBytes + 0x50) = *reinterpret_cast<float*>(mngBytes + 0x60);
+            mng->m_position.x = fp->m_position.x;
+            mng->m_position.y = fp->m_position.y;
+            mng->m_position.z = fp->m_position.z;
+            mng->m_basePosition.x = mng->m_position.x;
+            mng->m_basePosition.y = mng->m_position.y;
+            mng->m_basePosition.z = mng->m_position.z;
+            mng->m_userPosition.x = mng->m_basePosition.x;
+            mng->m_userPosition.y = mng->m_basePosition.y;
+            mng->m_userPosition.z = mng->m_basePosition.z;
         } else {
-            mng->m_position.x = createParam->m_positionOffsetPtr->x + *reinterpret_cast<float*>(fpData + 0x00);
-            mng->m_position.y = createParam->m_positionOffsetPtr->y + *reinterpret_cast<float*>(fpData + 0x04);
-            mng->m_position.z = createParam->m_positionOffsetPtr->z + *reinterpret_cast<float*>(fpData + 0x08);
-            *reinterpret_cast<float*>(mngBytes + 0x58) = mng->m_position.x;
-            *reinterpret_cast<float*>(mngBytes + 0x5c) = mng->m_position.y;
-            *reinterpret_cast<float*>(mngBytes + 0x60) = mng->m_position.z;
-            *reinterpret_cast<float*>(mngBytes + 0x48) = *reinterpret_cast<float*>(mngBytes + 0x58);
-            *reinterpret_cast<float*>(mngBytes + 0x4c) = *reinterpret_cast<float*>(mngBytes + 0x5c);
-            *reinterpret_cast<float*>(mngBytes + 0x50) = *reinterpret_cast<float*>(mngBytes + 0x60);
+            mng->m_position.x = createParam->m_positionOffsetPtr->x + fp->m_position.x;
+            mng->m_position.y = createParam->m_positionOffsetPtr->y + fp->m_position.y;
+            mng->m_position.z = createParam->m_positionOffsetPtr->z + fp->m_position.z;
+            mng->m_basePosition.x = mng->m_position.x;
+            mng->m_basePosition.y = mng->m_position.y;
+            mng->m_basePosition.z = mng->m_position.z;
+            mng->m_userPosition.x = mng->m_basePosition.x;
+            mng->m_userPosition.y = mng->m_basePosition.y;
+            mng->m_userPosition.z = mng->m_basePosition.z;
         }
     }
 
@@ -4270,15 +4204,15 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         mng->m_paramVec0.x = extraPos->x;
         mng->m_paramVec0.y = extraPos->y;
         mng->m_paramVec0.z = extraPos->z;
-        mng->m_paramVec0.x = mng->m_paramVec0.x + *reinterpret_cast<float*>(fpData + 0x00);
-        mng->m_paramVec0.y = mng->m_paramVec0.y + *reinterpret_cast<float*>(fpData + 0x04);
-        mng->m_paramVec0.z = mng->m_paramVec0.z + *reinterpret_cast<float*>(fpData + 0x08);
+        mng->m_paramVec0.x = mng->m_paramVec0.x + fp->m_position.x;
+        mng->m_paramVec0.y = mng->m_paramVec0.y + fp->m_position.y;
+        mng->m_paramVec0.z = mng->m_paramVec0.z + fp->m_position.z;
     }
 
     if (createParam->m_rotationPtr == 0) {
-        mng->m_rotation.x = *reinterpret_cast<int*>(fpData + 0x10);
-        mng->m_rotation.y = *reinterpret_cast<int*>(fpData + 0x14);
-        mng->m_rotation.z = *reinterpret_cast<int*>(fpData + 0x18);
+        mng->m_rotation.x = fp->m_rotation.x;
+        mng->m_rotation.y = fp->m_rotation.y;
+        mng->m_rotation.z = fp->m_rotation.z;
     } else {
         mng->m_rotation.x =
             static_cast<int>(32768.0f * createParam->m_rotationPtr->x / 180.0f);
@@ -4289,13 +4223,13 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     }
 
     if (createParam->m_scalePtr == 0) {
-        mng->m_scale.x = *reinterpret_cast<float*>(fpData1 + 0x00);
-        mng->m_scale.y = *reinterpret_cast<float*>(fpData1 + 0x04);
-        mng->m_scale.z = *reinterpret_cast<float*>(fpData1 + 0x08);
+        mng->m_scale.x = fp->m_scale.x;
+        mng->m_scale.y = fp->m_scale.y;
+        mng->m_scale.z = fp->m_scale.z;
     } else {
-        mng->m_scale.x = createParam->m_scalePtr->x * *reinterpret_cast<float*>(fpData1 + 0x00);
-        mng->m_scale.y = createParam->m_scalePtr->y * *reinterpret_cast<float*>(fpData1 + 0x04);
-        mng->m_scale.z = createParam->m_scalePtr->z * *reinterpret_cast<float*>(fpData1 + 0x08);
+        mng->m_scale.x = createParam->m_scalePtr->x * fp->m_scale.x;
+        mng->m_scale.y = createParam->m_scalePtr->y * fp->m_scale.y;
+        mng->m_scale.z = createParam->m_scalePtr->z * fp->m_scale.z;
     }
 
     mng->m_lookTarget = createParam->m_lookTargetPtr;
@@ -4306,11 +4240,11 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_useOwnerScaleSign = 0;
     mng->m_owner = 0;
 
-    const unsigned char mode = *reinterpret_cast<unsigned char*>(fpData2 + 0x05);
+    const unsigned char mode = fp->m_matrixMode;
     switch (mode) {
     case 2:
     case 4:
-        mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<short*>(fpData2 + 0x08)));
+        mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(fp->m_mapObjIndex));
         break;
     case 3:
     case 5:
@@ -4323,7 +4257,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
             mng->m_lookTarget = createParam->m_lookTargetPtr;
             if (reinterpret_cast<CGObject*>(createParam->m_paramB) != 0) {
                 int node = reinterpret_cast<CGObject*>(createParam->m_paramB)->m_charaModelHandle->m_model->SearchNodeSk(
-                    reinterpret_cast<char*>(fpData2 + 0x10));
+                    fp->m_nodeName);
                 if (node >= 0) {
                     mng->m_bindNode =
                         &reinterpret_cast<CGObject*>(createParam->m_paramB)->m_charaModelHandle->m_model->m_nodes[node];

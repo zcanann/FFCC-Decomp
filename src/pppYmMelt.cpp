@@ -402,7 +402,7 @@ void CalcPolygonHeight(
 
     pointCount = ctrl->m_gridSize + 1;
     pointCount *= pointCount;
-    previousY = ppvMng->m_previousPosition.x;
+    previousY = ppvMng->m_basePosition.y;
     zero = 0.0f;
     for (i = 0; i < pointCount; i++) {
         vertex = &vertexBuffer[i];

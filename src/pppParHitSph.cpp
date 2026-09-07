@@ -36,7 +36,7 @@ void pppParHitSph(_pppPObject* param_1, ParHitSphParams* params)
     local_94.x = ppvMng->m_matrix.value[0][3];
     local_94.y = ppvMng->m_matrix.value[1][3];
     local_94.z = ppvMng->m_matrix.value[2][3];
-    radius = pppMngSt->m_previousPosition.z * params->m_radiusScale;
+    radius = pppMngSt->m_hitScale * params->m_radiusScale;
 
     if (((kPppParHitSphZero == local_88.x) && (kPppParHitSphZero == local_88.y)) &&
         (kPppParHitSphZero == local_88.z)) {

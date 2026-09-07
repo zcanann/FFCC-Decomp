@@ -19,10 +19,6 @@ static const char s_funnyShapeSpinner[5] = "|/-\\";
 
 #include <string.h>
 
-extern "C" void createViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
-extern "C" void destroyViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
-extern "C" void calcViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
-extern "C" void drawViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 static const char s_CFunnyShapePcsViewer[] = "CFunnyShapePcs(VIEWER)";
 extern "C" const Vec s_funnyEye = {0.0f, 0.0f, 4.0f};
 extern "C" const Vec s_funnyAt = {0.0f, 0.0f, 0.0f};
@@ -271,23 +267,13 @@ CFunnyShapePcs::~CFunnyShapePcs()
 }
 
 #pragma pool_data off
-static CProcessTableCallback s_funnyShapeCreateViewer =
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
-static CProcessTableCallback s_funnyShapeDestroyViewer =
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
-static CProcessTableCallback s_funnyShapeCalcViewer =
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
-static CProcessTableCallback s_funnyShapeDrawViewer =
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
 CFunnyShapePcs FunnyShapePcs;
-CProcessTable CFunnyShapePcs::m_table = {
+CProcessCallbackTable CFunnyShapePcs::m_table = {
     const_cast<char*>(s_CFunnyShapePcsViewer),
+    static_cast<CProcessCallback>(&CFunnyShapePcs::createViewer),
+    static_cast<CProcessCallback>(&CFunnyShapePcs::destroyViewer),
     {
-        s_funnyShapeCreateViewer,
-        s_funnyShapeDestroyViewer,
-        {
-            {s_funnyShapeCalcViewer, 0x21, 0},
-            {s_funnyShapeDrawViewer, 0x42, 1},
-        },
+        {static_cast<CProcessCallback>(&CFunnyShapePcs::calcViewer), 0x21, 0},
+        {static_cast<CProcessCallback>(&CFunnyShapePcs::drawViewer), 0x42, 1},
     },
 };

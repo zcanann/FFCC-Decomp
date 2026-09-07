@@ -11,7 +11,7 @@ struct Vec;
 class CMapPcs : public CProcess
 {
 public:
-    static CProcessTable m_table[3];
+    static CProcessCallbackTable m_table[3];
 
     CMapPcs();
 

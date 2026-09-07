@@ -12,10 +12,6 @@ static const float kMaterialEditorControlMinInit = -10000.0f;
 #include <dolphin/os/OSCache.h>
 #include <string.h>
 
-extern "C" void createViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
-extern "C" void destroyViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
-extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
-extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 static const char s_CMaterialEditorPcsViewer[] = "CMaterialEditorPcs(VIEWER)";
 static const char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 static const char sMaterialEditorCManagerName[] = "CManager";
@@ -27,25 +23,15 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
-static CProcessTableCallback s_materialEditorCreateViewer =
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
-static CProcessTableCallback s_materialEditorDestroyViewer =
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
-static CProcessTableCallback s_materialEditorCalcViewer =
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
-static CProcessTableCallback s_materialEditorDrawViewer =
-    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
 CMaterialEditorPcs MaterialEditorPcs;
 
-CProcessTable CMaterialEditorPcs::m_table = {
+CProcessCallbackTable CMaterialEditorPcs::m_table = {
     const_cast<char*>(s_CMaterialEditorPcsViewer),
+    static_cast<CProcessCallback>(&CMaterialEditorPcs::createViewer),
+    static_cast<CProcessCallback>(&CMaterialEditorPcs::destroyViewer),
     {
-        s_materialEditorCreateViewer,
-        s_materialEditorDestroyViewer,
-        {
-            {s_materialEditorCalcViewer, 0x20, 0},
-            {s_materialEditorDrawViewer, 0x41, 1},
-        },
+        {static_cast<CProcessCallback>(&CMaterialEditorPcs::calcViewer), 0x20, 0},
+        {static_cast<CProcessCallback>(&CMaterialEditorPcs::drawViewer), 0x41, 1},
     },
 };
 static const double kMaterialEditorOneF64 = 1.0;

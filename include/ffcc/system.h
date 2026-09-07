@@ -13,6 +13,23 @@ struct OSThread;
 typedef void (CProcess::*CProcessCallback)();
 typedef int CProcessCallback_size_mismatch[(sizeof(CProcessCallback) == 0xC) ? 1 : -1];
 
+struct CProcessCallbackTable
+{
+    struct Entry
+    {
+        CProcessCallback m_callback;
+        u32 m_priority;
+        u32 m_flags;
+    };
+
+    char* m_name;
+    CProcessCallback m_create;
+    CProcessCallback m_destroy;
+    Entry m_entries[16];
+};
+typedef int CProcessCallbackTable_entry_size_mismatch[(sizeof(CProcessCallbackTable::Entry) == 0x14) ? 1 : -1];
+typedef int CProcessCallbackTable_size_mismatch[(sizeof(CProcessCallbackTable) == 0x15C) ? 1 : -1];
+
 struct CProcessTableCallback
 {
     u32 m_thisOffset;

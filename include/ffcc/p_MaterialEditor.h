@@ -79,7 +79,7 @@ typedef int MaterialEditorUsbTransform_size_mismatch[(sizeof(MaterialEditorUsbTr
 class CMaterialEditorPcs : public CProcess
 {
 public:
-    static CProcessTable m_table;
+    static CProcessCallbackTable m_table;
 
     CMaterialEditorPcs() {}
     void Init();

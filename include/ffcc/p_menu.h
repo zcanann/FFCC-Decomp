@@ -90,6 +90,14 @@ struct SingleFadeState
     SingleFadeEntry entries[64];
 };
 
+struct WinMessEntry
+{
+    int m_lineCount;
+    short m_messageIds[8];
+};
+STATIC_ASSERT(sizeof(WinMessEntry) == 0x14);
+STATIC_ASSERT(offsetof(WinMessEntry, m_messageIds) == 0x04);
+
 struct MenuWindowInfo
 {
     short x;
@@ -706,7 +714,7 @@ public:
     int GetSlotABXPos(int);
     const char* GetMcStr(int);
     const char* const* GetMcWinMessBuff(int);
-    int GetWinMess(int);
+    WinMessEntry* GetWinMess(int);
     int GetYesNoXPos(int);
     void SetTextureLoc(int);
     float GetMaxAnimWait();

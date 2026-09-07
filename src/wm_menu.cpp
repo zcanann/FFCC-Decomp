@@ -11204,15 +11204,14 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 	const char* const* msgTable = GetMcWinMessBuff(messType);
 	const int languageIndex = Game.m_gameWork.m_languageId - 1;
-	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
+	const WinMessEntry* const winMess = GetWinMess(winType);
 
 	float lineHeight;
 	float posX;
 	if (winType != 0) {
 		int maxWidth = 0;
-		const unsigned char* entry = winMess;
-		for (int i = 0; i < *reinterpret_cast<const int*>(winMess); i++) {
-			const short msgId = *reinterpret_cast<const short*>(entry + 4);
+		for (int i = 0; i < winMess->m_lineCount; i++) {
+			const short msgId = winMess->m_messageIds[i];
 			const char* text = msgTable[msgId];
 			if (text != 0) {
 				if (text[0] == '$') {
@@ -11223,7 +11222,6 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 					maxWidth = width;
 				}
 			}
-			entry += 2;
 		}
 		const double* pHalfW = &DOUBLE_803313F8;
 		posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->width - maxWidth) * *pHalfW +
@@ -11235,9 +11233,8 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	lineHeight = *pLineH;
 
 	char textBuf[128];
-	const unsigned char* entry = winMess;
-	for (int i = 0; i < *reinterpret_cast<const int*>(winMess); i++) {
-		const short msgId = *reinterpret_cast<const short*>(entry + 4);
+	for (int i = 0; i < winMess->m_lineCount; i++) {
+		const short msgId = winMess->m_messageIds[i];
 		int isDollar = 0;
 		if ((int)strlen(msgTable[msgId]) != 0) {
 			if (msgTable[msgId][0] == '$') {
@@ -11283,7 +11280,6 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			font->Draw(textBuf);
 		}
 		y += lineHeight;
-		entry += 2;
 	}
 
 	DrawInit();
@@ -11308,12 +11304,10 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 
 	const char* const* msgTable = GetMcWinMessBuff(messType);
 	int maxWidth = 0;
-	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
-#define count (*reinterpret_cast<const int*>(winMess))
+	const WinMessEntry* const winMess = GetWinMess(winType);
 
-	const unsigned char* entry = winMess;
-	for (int i = 0; i < count; i++) {
-		const short msgId = *reinterpret_cast<const short*>(entry + 4);
+	for (int i = 0; i < winMess->m_lineCount; i++) {
+		const short msgId = winMess->m_messageIds[i];
 		const char* text = msgTable[msgId];
 		if (text != 0) {
 			if (text[0] == '$') {
@@ -11324,7 +11318,6 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 				maxWidth = textWidth;
 			}
 		}
-		entry += 2;
 	}
 
 	int cols = maxWidth / 0x16;
@@ -11333,8 +11326,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 	}
 
 	*w = static_cast<short>((cols + 2) * 0x16 + 0x40);
-	*h = static_cast<short>(count * 0x1E + 0x40);
-#undef count
+	*h = static_cast<short>(winMess->m_lineCount * 0x1E + 0x40);
 }
 
 /*

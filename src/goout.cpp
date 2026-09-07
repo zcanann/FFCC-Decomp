@@ -883,22 +883,17 @@ void CGoOutMenu::SetMenu(short message, long timer)
 void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
 {
     va_list args;
-    unsigned int leadingZeros;
     int i;
     int indexBase;
-    int mask;
-    int* winMessage;
+    WinMessEntry* winMessage;
     const char** winMessageBuffer;
     short messageIndex;
 
     m_menuStringSlot ^= 1;
-    winMessage = (int*)MenuPcs.GetWinMess(m_menuStringSlot + 0x22);
-    *winMessage = lineCount;
+    winMessage = MenuPcs.GetWinMess(m_menuStringSlot + 0x22);
+    winMessage->m_lineCount = lineCount;
 
-    leadingZeros = (unsigned int)__cntlzw((unsigned int)m_menuStringSlot);
-    mask = -static_cast<int>(leadingZeros >> 5 & 1U);
-    indexBase = 10;
-    indexBase &= ~mask;
+    indexBase = m_menuStringSlot == 0 ? 0 : 10;
     va_start(args, lineCount);
     winMessageBuffer = (const char**)MenuPcs.GetMcWinMessBuff(2);
     for (i = 0; i < lineCount; i++) {
@@ -2660,28 +2655,16 @@ void CGoOutMenu::Calc()
         MenuPcs.m_goOutUnknown888 = 0;
         MenuPcs.m_goOutSaveLoadMode = 0;
         MenuPcs.m_goOutUnknown88A = 0;
-        int* winMessage = reinterpret_cast<int*>(MenuPcs.GetWinMess(0x22));
-        *winMessage = 0;
-        short* winMessageEntries = reinterpret_cast<short*>(winMessage + 1);
-        winMessageEntries[0] = 0;
-        winMessageEntries[1] = 1;
-        winMessageEntries[2] = 2;
-        winMessageEntries[3] = 3;
-        winMessageEntries[4] = 4;
-        winMessageEntries[5] = 5;
-        winMessageEntries[6] = 6;
-        winMessageEntries[7] = 7;
-        winMessage = reinterpret_cast<int*>(MenuPcs.GetWinMess(0x23));
-        *winMessage = 0;
-        winMessageEntries = reinterpret_cast<short*>(winMessage + 1);
-        winMessageEntries[0] = 10;
-        winMessageEntries[1] = 11;
-        winMessageEntries[2] = 12;
-        winMessageEntries[3] = 13;
-        winMessageEntries[4] = 14;
-        winMessageEntries[5] = 15;
-        winMessageEntries[6] = 16;
-        winMessageEntries[7] = 17;
+        WinMessEntry* winMessage = MenuPcs.GetWinMess(0x22);
+        winMessage->m_lineCount = 0;
+        for (int i = 0; i < 8; i++) {
+            winMessage->m_messageIds[i] = i;
+        }
+        winMessage = MenuPcs.GetWinMess(0x23);
+        winMessage->m_lineCount = 0;
+        for (int i = 0; i < 8; i++) {
+            winMessage->m_messageIds[i] = i + 10;
+        }
         MenuPcs.m_menuWindowInfo->state = 3;
         m_messageState = 1;
     }

@@ -139,8 +139,8 @@ void CFlatRuntime::ResetPerformance()
  * --INFO--
  * PAL Address: 0x80065d1c
  * PAL Size: 1760b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8007940C
+ * EN Size: 2188b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -340,12 +340,11 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				engineObject->m_previous->m_next = engineObject->m_next;
 				engineObject->m_next->m_previous = engineObject->m_previous;
 
-				*reinterpret_cast<void**>(reinterpret_cast<u8*>(*engineObject->m_freeListNode) + 0x04) =
-				    engineObject->m_freeListNode[1];
-				*reinterpret_cast<void**>(engineObject->m_freeListNode[1]) = *engineObject->m_freeListNode;
+				engineObject->m_freeListNode->m_previous->m_next = engineObject->m_freeListNode->m_next;
+				engineObject->m_freeListNode->m_next->m_previous = engineObject->m_freeListNode->m_previous;
 
-				engineObject->m_freeListNode[1] = m_objectFreeListHead;
-				m_objectFreeListHead = engineObject->m_freeListNode;
+				engineObject->m_freeListNode->m_next = m_freeStackBlocks.m_next;
+				m_freeStackBlocks.m_next = engineObject->m_freeListNode;
 				engineObject->m_flagBits.m_constructFlag = 0;
 
 				onDeleteObject(engineObject);
@@ -1339,14 +1338,13 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
  * --INFO--
  * PAL Address: 0x800684c8
  * PAL Size: 724b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80076420
+ * EN Size: 1032b
  * JP Address: TODO
  * JP Size: TODO
  */
 CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 {
-	u8* const self = reinterpret_cast<u8*>(this);
 	CClass* classBase;
 	if (classIndex == -1) {
 		classBase = 0;
@@ -1380,37 +1378,37 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	const int classLocalCount = (classIndex == -1) ? 0 : classBase->m_localCount;
 
 	const int requiredWords = classLocalCount + 0x60;
-	u8* scanNode = reinterpret_cast<u8*>(m_freeListNext);
-	const int noScan = static_cast<u8>(scanNode == self + 0x978);
-	u8* selectedNode;
+	CStackBlock* scanNode = m_stackBlocks.m_next;
+	const int noScan = static_cast<u8>(scanNode == &m_stackBlocks);
+	CStackBlock* selectedNode;
 	do {
 		selectedNode = scanNode;
 		if (noScan != 0) {
 			break;
 		}
-		scanNode = *reinterpret_cast<u8**>(selectedNode + 4);
-	} while ((*reinterpret_cast<int*>(selectedNode + 8) + requiredWords) +
-	             *reinterpret_cast<int*>(selectedNode + 0xC) >
-	         *reinterpret_cast<int*>(scanNode + 8));
+		scanNode = selectedNode->m_next;
+	} while ((selectedNode->m_offset + requiredWords) +
+	             selectedNode->m_size >
+	         scanNode->m_offset);
 
-	void** const freeNode = m_objectFreeListHead;
-	m_objectFreeListHead = reinterpret_cast<void**>(freeNode[1]);
-	freeNode[0] = selectedNode;
-	freeNode[1] = *reinterpret_cast<void**>(selectedNode + 4);
-	*reinterpret_cast<void***>(freeNode[1]) = freeNode;
-	*reinterpret_cast<void**>(selectedNode + 4) = freeNode;
+	CStackBlock* const freeNode = m_freeStackBlocks.m_next;
+	m_freeStackBlocks.m_next = freeNode->m_next;
+	freeNode->m_previous = selectedNode;
+	freeNode->m_next = selectedNode->m_next;
+	freeNode->m_next->m_previous = freeNode;
+	selectedNode->m_next = freeNode;
 
-	const int scanOffset = *reinterpret_cast<int*>(selectedNode + 0xC);
-	const int baseWords = (noScan != 0) ? 0 : *reinterpret_cast<int*>(selectedNode + 8);
-	freeNode[2] = reinterpret_cast<void*>(static_cast<int>(scanOffset + baseWords));
-	freeNode[3] = reinterpret_cast<void*>(requiredWords);
+	const int scanOffset = selectedNode->m_size;
+	const int baseWords = (noScan != 0) ? 0 : selectedNode->m_offset;
+	freeNode->m_offset = scanOffset + baseWords;
+	freeNode->m_size = requiredWords;
 
 	object->m_freeListNode = freeNode;
-	object->m_id = reinterpret_cast<u32>(*reinterpret_cast<u8**>(self + 0x10) + (reinterpret_cast<s32>(freeNode[2]) * 4));
+	object->m_id = reinterpret_cast<u32>(m_stackStorage + freeNode->m_offset);
 
 	unsigned int* varBase = 0;
 	if (classIndex == -1) {
-		varBase = *reinterpret_cast<unsigned int**>(self + 0x0C);
+		varBase = reinterpret_cast<unsigned int*>(m_permanentVarValues);
 	} else {
 		varBase = reinterpret_cast<unsigned int*>(object->m_id);
 	}
@@ -1454,8 +1452,8 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
  * --INFO--
  * PAL Address: 0x8006879c
  * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80076320
+ * EN Size: 256b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1464,11 +1462,11 @@ void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 	object->m_previous->m_next = object->m_next;
 	object->m_next->m_previous = object->m_previous;
 
-	*(void**)((char*)*object->m_freeListNode + 4) = object->m_freeListNode[1];
-	*(void**)object->m_freeListNode[1] = *object->m_freeListNode;
+	object->m_freeListNode->m_previous->m_next = object->m_freeListNode->m_next;
+	object->m_freeListNode->m_next->m_previous = object->m_freeListNode->m_previous;
 
-	object->m_freeListNode[1] = m_objectFreeListHead;
-	m_objectFreeListHead = object->m_freeListNode;
+	object->m_freeListNode->m_next = m_freeStackBlocks.m_next;
+	m_freeStackBlocks.m_next = object->m_freeListNode;
 
 	object->m_flagBits.m_constructFlag = 0;
 
@@ -1479,8 +1477,8 @@ void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
  * --INFO--
  * PAL Address: 0x80068824
  * PAL Size: 236b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80076298
+ * EN Size: 136b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1492,18 +1490,7 @@ void CFlatRuntime::AfterFrame(int mode)
 		CObject* const next = object->m_next;
 
 		if ((mode != 0) || (object->m_flagBits.m_deleteFlag != 0)) {
-			object->m_previous->m_next = object->m_next;
-			object->m_next->m_previous = object->m_previous;
-
-			*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
-			*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
-
-			object->m_freeListNode[1] = m_objectFreeListHead;
-			m_objectFreeListHead = object->m_freeListNode;
-
-			object->m_flagBits.m_constructFlag = 0;
-
-			onDeleteObject(object);
+			deleteObject(object);
 		}
 
 		object = next;
@@ -1514,8 +1501,8 @@ void CFlatRuntime::AfterFrame(int mode)
  * --INFO--
  * PAL Address: 0x80068910
  * PAL Size: 756b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80076140
+ * EN Size: 344b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1552,18 +1539,7 @@ processObject:
 		CObject* const next = object->m_next;
 
 		if (object->m_flagBits.m_deleteFlag != 0) {
-			object->m_previous->m_next = object->m_next;
-			object->m_next->m_previous = object->m_previous;
-
-			*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
-			*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
-
-			object->m_freeListNode[1] = m_objectFreeListHead;
-			m_objectFreeListHead = object->m_freeListNode;
-
-			object->m_flagBits.m_constructFlag = 0;
-
-			onDeleteObject(object);
+			deleteObject(object);
 		}
 
 		object = next;
@@ -1896,8 +1872,8 @@ CFlatRuntime::CClass::CClass()
  * --INFO--
  * PAL Address: 0x80069608
  * PAL Size: 452b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8007542C
+ * EN Size: 396b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1927,20 +1903,16 @@ void CFlatRuntime::clear()
 	m_objectSentinel.m_next = &m_objectSentinel;
 	m_objectSentinel.m_0x32 = 0x10;
 
-	m_freeListPrev = reinterpret_cast<void**>(self + 0x978);
-	m_freeListNext = reinterpret_cast<void**>(self + 0x978);
-	m_freeListCount = 0x5220;
-	m_0x984 = 0;
-	m_objectFreeListHead = reinterpret_cast<void**>(self + 0x998);
-	m_objectPoolBase = self + 0x1288;
+	m_stackBlocks.m_previous = &m_stackBlocks;
+	m_stackBlocks.m_next = &m_stackBlocks;
+	m_stackBlocks.m_offset = 0x5220;
+	m_stackBlocks.m_size = 0;
+	m_freeStackBlocks.m_next = &m_stackBlockPool[0];
+	m_freeStackBlocks.m_previous = &m_stackBlockPool[143];
 
-	u8* node = self;
-	for (int idx = 0; idx < 0x90; idx++) {
-		*reinterpret_cast<void**>(node + 0x998) =
-		    (idx == 0) ? (self + 0x988) : (self + ((idx - 1) * 0x10) + 0x998);
-		*reinterpret_cast<void**>(node + 0x99C) =
-		    (idx == 0x8F) ? (self + 0x988) : (self + ((idx + 1) * 0x10) + 0x998);
-		node += 0x10;
+	for (int idx = 0; idx < 144; idx++) {
+		m_stackBlockPool[idx].m_previous = (idx == 0) ? &m_freeStackBlocks : &m_stackBlockPool[idx - 1];
+		m_stackBlockPool[idx].m_next = (idx == 143) ? &m_freeStackBlocks : &m_stackBlockPool[idx + 1];
 	}
 
 	memset(&m_performanceTotalTime, 0, sizeof(m_performanceTotalTime) + sizeof(m_performanceBlock));
@@ -1966,11 +1938,11 @@ void CFlatRuntime::Destroy()
 		object->m_previous->m_next = next;
 		object->m_next->m_previous = object->m_previous;
 
-		*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
-		*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
+		object->m_freeListNode->m_previous->m_next = object->m_freeListNode->m_next;
+		object->m_freeListNode->m_next->m_previous = object->m_freeListNode->m_previous;
 
-		object->m_freeListNode[1] = m_objectFreeListHead;
-		m_objectFreeListHead = object->m_freeListNode;
+		object->m_freeListNode->m_next = m_freeStackBlocks.m_next;
+		m_freeStackBlocks.m_next = object->m_freeListNode;
 
 		object->m_flagBits.m_constructFlag = 0;
 
@@ -2034,28 +2006,32 @@ void CFlatRuntime::Destroy()
  * --INFO--
  * PAL Address: 0x8006996c
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800752A4
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CFlatRuntime::Quit()
 {
 	delete[] (char*)m_permanentVarValues;
-	delete[] (char*)m_initScratchA;
+	delete[] m_stackStorage;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800699A4
+ * PAL Size: 136b
+ * EN Address: 0x80075218
+ * EN Size: 140b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime::Init()
 {
 	m_permanentVarValues =
 	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2A) u8[0x3000];
-	m_initScratchA =
-	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2B) u8[0x14880];
+	m_stackStorage =
+	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2B) u32[0x5220];
 }
 
 /*

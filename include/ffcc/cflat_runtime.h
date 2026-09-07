@@ -37,6 +37,14 @@ public:
 		s32 m_variableCount;      // 0x228
 	};
 
+	struct CStackBlock
+	{
+		CStackBlock* m_previous; // 0x00
+		CStackBlock* m_next;     // 0x04
+		int m_offset;           // 0x08, words
+		int m_size;             // 0x0C, words
+	};
+
 	class CObject
 	{
 	public:
@@ -46,7 +54,7 @@ public:
 		}
 
 		unsigned int m_id;         // 0x0
-		void** m_freeListNode;     // 0x4
+		CStackBlock* m_freeListNode; // 0x4
 		unsigned int* m_sp;        // 0x8
 		unsigned int* m_localBase; // 0xC
 		unsigned int* m_thisBase;  // 0x10
@@ -175,7 +183,7 @@ public:
     int m_permanentVarCount;        // 0x0004
     u8* m_permanentVarDefs;         // 0x0008
     u8* m_permanentVarValues;       // 0x000C
-    void* m_initScratchA;           // 0x0010
+    u32* m_stackStorage;           // 0x0010
     int m_classCount;              // 0x0014
     CClass* m_classes;              // 0x0018
     int m_funcCount;                // 0x001C
@@ -205,18 +213,16 @@ public:
     u8 m_pad_096C[4];               // 0x096C
     int m_0x970;                    // 0x0970
     int m_0x974;                    // 0x0974
-    void** m_freeListPrev;          // 0x0978
-    void** m_freeListNext;          // 0x097C
-    int m_freeListCount;            // 0x0980
-    void* m_0x984;                  // 0x0984
-    void* m_objectPoolBase;         // 0x0988
-    void** m_objectFreeListHead;    // 0x098C
-    u8 m_pad_0990[0x904];           // 0x0990
-    u8 m_0x1294;                    // 0x1294
-    u8 m_pad_1295[3];               // 0x1295
+    CStackBlock m_stackBlocks;        // 0x0978
+    CStackBlock m_freeStackBlocks;    // 0x0988
+    CStackBlock m_stackBlockPool[144]; // 0x0998
     int m_0x1298;                   // 0x1298
 };
 
+STATIC_ASSERT(sizeof(CFlatRuntime::CStackBlock) == 0x10);
+STATIC_ASSERT(offsetof(CFlatRuntime, m_stackBlocks) == 0x978);
+STATIC_ASSERT(offsetof(CFlatRuntime, m_freeStackBlocks) == 0x988);
+STATIC_ASSERT(offsetof(CFlatRuntime, m_stackBlockPool) == 0x998);
 STATIC_ASSERT(sizeof(CFlatRuntime::CCodeIndex) == 4);
 STATIC_ASSERT(sizeof(CFlatRuntime::CStack) == 4);
 STATIC_ASSERT(offsetof(CFlatRuntime::CObject, m_requestPending) == 0x2C);

@@ -87,13 +87,6 @@ extern Mtx ppvUnitMatrix;
 extern Vec ppvZeroVector;
 }
 extern char g_StrTmp[0x400];
-extern "C" int LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(
-    void* self, int, unsigned long, unsigned long, unsigned long, int, int, int);
-static inline int pppLoadModelRet(
-    CCharaPcs::CHandle* h, int a, unsigned long b, unsigned long c,
-    unsigned long d, int e, int f, int g) {
-    return LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(h, a, b, c, d, e, f, g);
-}
 
 inline CGBaseObj::CGBaseObj()
 {
@@ -239,12 +232,12 @@ pppShapeSt::pppShapeSt()
  * --INFO--
  * PAL Address: 0x800591A4
  * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8006DCF8
+ * EN Size: 132b
  * JP Address: TODO
  * JP Size: TODO
  */
-pppShapeSt::~pppShapeSt()
+inline pppShapeSt::~pppShapeSt()
 {
     if (m_animData != 0) {
         delete reinterpret_cast<u8*>(m_animData);
@@ -261,12 +254,12 @@ pppShapeSt::~pppShapeSt()
  * --INFO--
  * PAL Address: 0x8005961C
  * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8006E02C
+ * EN Size: 60b
  * JP Address: TODO
  * JP Size: TODO
  */
-pppModelSt::pppModelSt()
+inline pppModelSt::pppModelSt()
 {
     m_refCount = 0;
     m_isUsed = 0;
@@ -276,12 +269,12 @@ pppModelSt::pppModelSt()
  * --INFO--
  * PAL Address: 0x800595C8
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8006DEAC
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
-pppModelSt::~pppModelSt()
+inline pppModelSt::~pppModelSt()
 {
 }
 
@@ -290,9 +283,8 @@ pppModelSt::~pppModelSt()
  * Address:	TODO
  * Size:	TODO
  */
-CPartMng::CPartMng()
+inline CPartMng::CPartMng()
 {
-	// TODO
 }
 
 /*
@@ -2148,9 +2140,8 @@ void CPartMng::pppEditBeforeCalc()
         (*editorObj)->m_charaModelHandle =
             new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b7) CCharaPcs::CHandle;
         (*editorObj)->m_charaModelHandle->Add();
-        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>((*editorObj)->m_charaModelHandle) + 0x8) = 3;
-        if (pppLoadModelRet(
-                (*editorObj)->m_charaModelHandle,
+        (*editorObj)->m_charaModelHandle->m_flags = 3;
+        if ((*editorObj)->m_charaModelHandle->LoadModel(
                 *reinterpret_cast<int*>(self + 0x190),
                 *reinterpret_cast<unsigned long*>(self + 0x194),
                 *reinterpret_cast<unsigned long*>(self + 0x198),

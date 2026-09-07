@@ -49,7 +49,7 @@ public:
         void Add();
 
         void ChangeTexture(int, unsigned long, unsigned long, int, int);
-        void LoadModel(int, unsigned long, unsigned long, unsigned long, int, int, int);
+        int LoadModel(int, unsigned long, unsigned long, unsigned long, int, int, int);
         int LoadAnim(char*, int, int, int, int, int, int);
         int IsModelLoaded(int checkModelField);
         void FreeModel();

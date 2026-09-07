@@ -586,7 +586,7 @@ config.libs = [
             Object(NonMatching, "p_tina.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline auto,deferred"]),
             Object(Matching, "p_usb.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "pad.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "partMng.cpp"),
+            Object(NonMatching, "partMng.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "pppsintbl.cpp"),
             Object(NonMatching, "partyobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(Matching, "pppAccele.cpp"),

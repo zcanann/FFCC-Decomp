@@ -2361,10 +2361,14 @@ attach:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80075E34
+ * PAL Size: 2352b
+ * EN Address: 0x800881D4
+ * EN Size: 1624b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCharaPcs::CHandle::LoadModel(
+int CCharaPcs::CHandle::LoadModel(
     int charaKind, unsigned long charaNo, unsigned long textureVariant, unsigned long unusedArg, int mergeFileId,
     int mergeFlags, int specialModelStage)
 {
@@ -2455,7 +2459,7 @@ foundModel:
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle == 0) {
-            return;
+            return 0;
         }
 
         File.Read(fileHandle);
@@ -2533,6 +2537,7 @@ foundModel:
             m_pdtLoadRef->AddRef();
         }
     }
+    return 1;
 }
 
 /*

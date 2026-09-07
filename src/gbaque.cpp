@@ -4,6 +4,7 @@
 #include "ffcc/game.h"
 #include "ffcc/gobject.h"
 #include "ffcc/gobjwork.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/joybus.h"
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"
@@ -1596,8 +1597,8 @@ void GbaQueue::LoadEnemyStat()
  * --INFO--
  * PAL Address: 0x800cebe4
  * PAL Size: 436b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800E3050
+ * EN Size: 608b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1622,9 +1623,9 @@ void GbaQueue::LoadMapItemStat()
 				if ((dropItemCode & 0xC000) == 0x4000) {
 					mapItemEntry->m_kind = 4;
 				} else {
-					const int itemDataBase = Game.unkCFlatData0[2];
+					const SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 					const int bossStageLimit = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex] + 2;
-					const int itemStage = *reinterpret_cast<unsigned short*>(itemDataBase + dropItemCode * 0x48 + 0xC);
+					const int itemStage = itemRows[dropItemCode].m_stage;
 					if (itemStage >= bossStageLimit) {
 						mapItemEntry->m_kind = 5;
 					} else {

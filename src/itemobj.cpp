@@ -80,20 +80,10 @@ static inline CFlatRuntime2* ItemCFlatRuntime()
 	return &CFlat;
 }
 
-struct SItemFlatRow {
-	unsigned char m_pad00[8];
-	unsigned short m_attribute;
-	unsigned char m_pad0A[6];
-	unsigned short m_fineValue;
-	unsigned char m_pad2[0x36];
-};
 STATIC_ASSERT(offsetof(LastBossWork, m_capsules) == 0x08);
 STATIC_ASSERT(offsetof(LastBossWork, m_targetPosition) == 0x18);
 STATIC_ASSERT(offsetof(LastBossWork, m_phaseTimer) == 0x24);
 STATIC_ASSERT(offsetof(CGObject, m_lifeTimer) == 0x94);
-STATIC_ASSERT(sizeof(SItemFlatRow) == 0x48);
-STATIC_ASSERT(offsetof(SItemFlatRow, m_attribute) == 0x08);
-STATIC_ASSERT(offsetof(SItemFlatRow, m_fineValue) == 0x10);
 
 /*
  * --INFO--
@@ -269,8 +259,8 @@ void CGItemObj::onNewFinished()
  * --INFO--
  * PAL Address: 0x80124FE0
  * PAL Size: 700b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80146A20
+ * EN Size: 892b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -312,8 +302,8 @@ void CGItemObj::loadModel()
 	case 0x20:
 	case 0x21:
 	case 0x24: {
-		int itemEntryOffset = m_worldParamB * 0x48 + 2;
-		int itemEntry = *(unsigned short*)(Game.unkCFlatData0[2] + itemEntryOffset);
+		const SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+		int itemEntry = itemRows[m_worldParamB].m_model;
 
 		m_ownerSlot = 1;
 		modelNo = itemEntry & 0xFFF;
@@ -344,14 +334,14 @@ void CGItemObj::loadModel()
 	if (useParticleTable != 0) {
 		for (int i = 0; i < 3; i++) {
 			if (i != 0 || m_createFlags != 1) {
-				int entryBase = Game.unkCFlatData0[2] + m_worldParamB * 0x48;
-				int particleNo = *(unsigned short*)(entryBase + i * 2 + 0x14);
+				const SItemFlatRow* itemRow = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[m_worldParamB];
+				int particleNo = itemRow->m_particles[i];
 
 				if (particleNo != 0xFFFF) {
 					const float& particleScaleStep = kItemObjFineStep;
 					const float& particleScaleBase = kItemObjParticleScaleBase;
 					float particleScale =
-					    particleScaleStep * (float)(unsigned short)*(unsigned short*)(entryBase + 0x10) + particleScaleBase;
+					    particleScaleStep * static_cast<float>(itemRow->m_fineValue) + particleScaleBase;
 					putParticle(particleNo | 0x100, m_particleSlot, this, particleScale, 0);
 				}
 			}

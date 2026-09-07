@@ -149,7 +149,77 @@ public:
 
     void calcViewerCameraMatrix(float (*)[4], const SRT*);
     void SetViewerSRT(const SRT*);
-    void GetViewMatrix(float (*)[4]);
+    /*
+     * --INFO--
+     * PAL Address: 0x800B965C
+     * PAL Size: 36b
+     * EN Address: 0x80022E94
+     * EN Size: 132b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void GetViewMatrix(Mtx out)
+    {
+        PSMTXCopy(m_cameraMatrix, out);
+    }
+
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: 0x80022F3C
+     * EN Size: 132b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void GetPosition(Vec* out)
+    {
+        out->x = m_positionX;
+        out->y = m_positionY;
+        out->z = m_positionZ;
+    }
+
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: 0x80022FC0
+     * EN Size: 132b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void GetProjectionMatrix(Mtx44 out)
+    {
+        PSMTX44Copy(m_screenMatrix, out);
+    }
+
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: 0x80023044
+     * EN Size: 8b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    MtxPtr GetProjectionMatrix()
+    {
+        return m_screenMatrix;
+    }
+
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: 0x8002304C
+     * EN Size: 8b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    MtxPtr GetViewMatrix()
+    {
+        return m_cameraMatrix;
+    }
 
     // Chara
     void createChara();

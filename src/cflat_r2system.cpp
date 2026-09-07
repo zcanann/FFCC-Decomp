@@ -1213,20 +1213,6 @@ void CCameraPcs::SetFullScreenShadowEnable(unsigned char enable)
 
 /*
  * --INFO--
- * PAL Address: 0x800B965C
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCameraPcs::GetViewMatrix(float (*matrix)[4])
-{
-    PSMTXCopy((MtxPtr)((char*)this + 4), matrix);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B9680
  * PAL Size: 120b
  * EN Address: TODO

@@ -9,7 +9,6 @@ struct Vec;
 struct pppIVECTOR3;
 struct pppFVECTOR4;
 
-void LoadFieldPdt0(int, int);
 unsigned char pppNotAllocAmemCacheRmem(unsigned long);
 unsigned int pppFreeMngStPrioForData();
 unsigned char pppAmemDeletePmng(unsigned long);

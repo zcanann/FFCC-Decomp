@@ -46,13 +46,7 @@ extern const float kLightAnimPhaseStep;
 extern const float kLightRadToDeg;
 float sLightAnimPhase;
 
-static inline float CameraPosX() { return CameraPcs.m_positionX; }
-static inline float CameraPosY() { return CameraPcs.m_positionY; }
-static inline float CameraPosZ() { return CameraPcs.m_positionZ; }
-static inline float CameraDirX() { return CameraPcs.m_directionX; }
-static inline float CameraDirY() { return CameraPcs.m_directionY; }
-static inline float CameraDirZ() { return CameraPcs.m_directionZ; }
-static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
+static inline void setchanctrl(CLightPcs::TARGET, unsigned long);
 
 static const char sLightPcsClassName[] = "CLightPcs";
 static const char sLightManagerClassName[] = "CManager";
@@ -103,71 +97,6 @@ CProcessTable CLightPcs::m_table = {
 _GXColor s_ambientAlphaColor;
 static const char s_p_light_cpp[] = "p_light.cpp";
 
-static inline float LightSqrtF(float x)
-{
-    union {
-        float f;
-        unsigned long bits;
-    } bits;
-    int fpclass;
-
-    float result;
-
-    if (x > kLightZero) {
-        double guess = __frsqrte((double)x);
-        guess = kLightHalfD * guess * (kLightThreeD - guess * guess * x);
-        guess = kLightHalfD * guess * (kLightThreeD - guess * guess * x);
-        guess = kLightHalfD * guess * (kLightThreeD - guess * guess * x);
-        result = (float)(x * guess);
-        return result;
-    }
-
-    if ((double)x < kLightZeroD) {
-        result = NAN;
-        return result;
-    }
-
-    bits.f = x;
-    switch (bits.bits & 0x7f800000) {
-    case 0x7f800000:
-        if ((bits.bits & 0x7fffff) != 0) {
-            fpclass = 1;
-        } else {
-            fpclass = 2;
-        }
-        break;
-    case 0:
-        if ((bits.bits & 0x7fffff) != 0) {
-            fpclass = 5;
-        } else {
-            fpclass = 3;
-        }
-        break;
-    default:
-        fpclass = 4;
-        break;
-    }
-
-    if (fpclass == 1) {
-        result = NAN;
-    } else {
-        result = x;
-    }
-
-    return result;
-}
-
-static inline double U32ToDouble(unsigned int value)
-{
-    union {
-        unsigned long long u;
-        double d;
-    } conv;
-
-    conv.u = 0x4330000000000000ULL | (unsigned long long)value;
-    return conv.d - kLightU32ToDoubleBias;
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -210,10 +139,10 @@ inline void CLightPcs::CLight::Set(CLightPcs::CLight* light)
 
 /*
  * --INFO--
- * PAL Address: 0x8004a294
+ * PAL Address: 0x8004A294
  * PAL Size: 180b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800542B0
+ * EN Size: 236b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -233,9 +162,9 @@ void CLightPcs::Init()
         m_mapLightColor[i + 1].g = color;
         m_mapLightColor[i + 1].b = color;
         m_mapLightColor[i + 1].a = 0xFF;
-        m_mapLightParams[i * 3 + 0] = lightParam;
-        m_mapLightParams[i * 3 + 1] = lightParam;
-        m_mapLightParams[i * 3 + 2] = lightRange;
+        m_mapLightParams[i].x = lightParam;
+        m_mapLightParams[i].y = lightParam;
+        m_mapLightParams[i].z = lightRange;
     }
 }
 
@@ -333,10 +262,10 @@ void CLightPcs::calc()
 
 /*
  * --INFO--
- * PAL Address: 0x80049ed4
+ * PAL Address: 0x80049ED4
  * PAL Size: 420b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80054580
+ * EN Size: 476b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -345,18 +274,18 @@ void CLightPcs::draw()
     Mtx mtx;
     Vec vec;
 
-    PSMTXCopy(CameraMatrix(), mtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, mtx);
     CLight* light = m_sceneLights;
     for (u32 i = 0; i < m_sceneLightCount; i++, light++) {
         if (light->m_specularMode == 0) {
             if (light->m_directionMode != 0) {
-                PSMTXMultVec(mtx, reinterpret_cast<Vec*>(&light->m_position), &vec);
+                PSMTXMultVec(mtx, &light->m_position, &vec);
                 GXInitLightPos(&light->m_gxLightObj, vec.x, vec.y, vec.z);
                 GXInitLightDir(&light->m_gxLightObj, light->m_direction.x, light->m_direction.y, light->m_direction.z);
             } else {
-                PSMTXMultVec(mtx, reinterpret_cast<Vec*>(&light->m_position), &vec);
+                PSMTXMultVec(mtx, &light->m_position, &vec);
                 GXInitLightPos(&light->m_gxLightObj, vec.x, vec.y, vec.z);
-                PSMTXMultVecSR(mtx, reinterpret_cast<Vec*>(&light->m_direction), &vec);
+                PSMTXMultVecSR(mtx, &light->m_direction, &vec);
                 GXInitLightDir(&light->m_gxLightObj, vec.x, vec.y, vec.z);
             }
 
@@ -371,7 +300,7 @@ void CLightPcs::draw()
             GXInitLightAttnK(&light->m_gxLightObj, kLightAttnScale / light->m_attenFalloff,
                              kLightAttnScale / light->m_attenRadius, kLightAttnScale / light->m_attenRadius);
         } else {
-            PSMTXMultVecSR(mtx, reinterpret_cast<Vec*>(&light->m_direction), &vec);
+            PSMTXMultVecSR(mtx, &light->m_direction, &vec);
             GXInitSpecularDir(&light->m_gxLightObj, vec.x, vec.y, vec.z);
             GXInitLightAttn(&light->m_gxLightObj, kLightZero, kLightZero, kLightOne,
                             light->m_specularScale * kLightHalf, kLightZero,
@@ -403,10 +332,10 @@ void CLightPcs::Add(CLightPcs::CLight* light)
 
 /*
  * --INFO--
- * PAL Address: 0x8004975c
+ * PAL Address: 0x8004975C
  * PAL Size: 880b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80054A94
+ * EN Size: 376b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -432,11 +361,9 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
     bumpLight->m_textureData =
         static_cast<u8*>(Memory._Alloc(texSize * count, stage, const_cast<char*>(s_p_light_cpp), 0x13b, 0));
 
-    int texOffset = 0;
     for (int i = 0; i < count; i++) {
-        GXInitTexObj(&bumpLight->m_textures[i], bumpLight->m_textureData + texOffset, (u16)0x40, (u16)0x40,
+        GXInitTexObj(&bumpLight->m_textures[i], bumpLight->m_textureData + i * texSize, (u16)0x40, (u16)0x40,
                      (GXTexFmt)3, (GXTexWrapMode)0, (GXTexWrapMode)0, (u8)0);
-        texOffset += texSize;
     }
 
     return bumpLight;
@@ -481,10 +408,10 @@ inline void CLightPcs::Clear()
 
 /*
  * --INFO--
- * PAL Address: 0x800494a4
+ * PAL Address: 0x800494A4
  * PAL Size: 696b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80054C0C
+ * EN Size: 784b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -503,14 +430,14 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
         Vec transformedPos;
         Vec transformedDir;
 
-        PSMTXCopy(CameraMatrix(), cam);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cam);
 
-        eyePos.x = CameraPosX();
-        eyePos.y = CameraPosY();
-        eyePos.z = CameraPosZ();
-        eyeDir.x = CameraDirX();
-        eyeDir.y = CameraDirY();
-        eyeDir.z = CameraDirZ();
+        eyePos.x = CameraPcs.m_positionX;
+        eyePos.y = CameraPcs.m_positionY;
+        eyePos.z = CameraPcs.m_positionZ;
+        eyeDir.x = CameraPcs.m_directionX;
+        eyeDir.y = CameraPcs.m_directionY;
+        eyeDir.z = CameraPcs.m_directionZ;
 
         PSMTXMultVec(cam, &eyePos, &transformedPos);
         GXInitLightPos(&m_mapLightObj, transformedPos.x, transformedPos.y, transformedPos.z);
@@ -634,10 +561,10 @@ void CLightPcs::EnableLight(int param_1, int param_2)
 
 /*
  * --INFO--
- * PAL Address: 0x800491f8
+ * PAL Address: 0x800491F8
  * PAL Size: 340b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8005515C
+ * EN Size: 412b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -651,9 +578,9 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
     float dirZ;
 
     if (mode != 0) {
-        dirX = CameraDirX();
-        dirY = CameraDirY();
-        dirZ = CameraDirZ();
+        dirX = CameraPcs.m_directionX;
+        dirY = CameraPcs.m_directionY;
+        dirZ = CameraPcs.m_directionZ;
     } else {
         dirX = dir->x;
         dirY = dir->y;
@@ -661,7 +588,7 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
     }
 
     GXInitLightColor(&light->m_gxLightObj, color);
-    PSMTXCopy(CameraMatrix(), cam);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cam);
 
     lightDir.x = kDiffuseLightDistanceScale * -dirX;
     lightDir.y = kDiffuseLightDistanceScale * -dirY;
@@ -681,10 +608,10 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
 
 /*
  * --INFO--
- * PAL Address: 0x80048fe0
+ * PAL Address: 0x80048FE0
  * PAL Size: 536b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800552F8
+ * EN Size: 432b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -694,14 +621,7 @@ void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long ma
     m_loadedLightMask = 0;
 
     if (mask == 0) {
-        unsigned long chanMask = m_loadedLightMask;
-        GXSetNumChans((u8)1);
-        if ((int)target != 1) {
-            GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)0, (GXColorSrc)1, chanMask, (GXDiffuseFn)2, (GXAttnFn)1);
-            GXSetChanCtrl((GXChannelID)2, (u8)1, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
-
-            GXSetChanMatColor((GXChannelID)4, kLightDefaultMaterialColor);
-        }
+        setchanctrl(target, m_loadedLightMask);
         return;
     }
 
@@ -716,7 +636,7 @@ void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long ma
         CLight* sceneLight = m_sceneLights;
         for (u32 i = 0; i < m_sceneLightCount; i++, sceneLight++) {
             if ((sceneLight->m_targetEnable[target] != 0) && ((sceneLight->m_partMask & mask) != 0) &&
-                ((double)PSVECSquareDistance(pos, reinterpret_cast<Vec*>(&sceneLight->m_position)) <
+                ((double)PSVECSquareDistance(pos, &sceneLight->m_position) <
                  (double)sceneLight->m_unkAC)) {
                 GXInitLightColor(&sceneLight->m_gxLightObj, sceneLight->m_targetColor[target]);
                 GXLoadLightObjImm(&sceneLight->m_gxLightObj, (GXLightID)(1 << m_loadedLightCount));
@@ -729,13 +649,26 @@ void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long ma
         }
     }
 
-    unsigned long chanMask = m_loadedLightMask;
-    GXSetNumChans((u8)1);
-    if ((int)target != 1) {
-        GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)0, (GXColorSrc)1, chanMask, (GXDiffuseFn)2, (GXAttnFn)1);
-        GXSetChanCtrl((GXChannelID)2, (u8)1, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
+    setchanctrl(target, m_loadedLightMask);
+}
 
-        GXSetChanMatColor((GXChannelID)4, kLightDefaultMaterialColor);
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x800554A8
+ * EN Size: 208b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline void setchanctrl(CLightPcs::TARGET target, unsigned long chanMask)
+{
+    GXSetNumChans(1);
+    if ((int)target != 1) {
+        GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, chanMask, GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
+
+        GXSetChanMatColor(GX_COLOR0A0, kLightDefaultMaterialColor);
     }
 }
 
@@ -823,10 +756,10 @@ void CLightPcs::SetPart(CLightPcs::TARGET target, void* part, unsigned char mode
 
 /*
  * --INFO--
- * PAL Address: 0x80048cbc
+ * PAL Address: 0x80048CBC
  * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8005587C
+ * EN Size: 140b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -836,7 +769,7 @@ void CLightPcs::InsertOctTree(CLightPcs::TARGET target, COctTree& octTree)
     CLight* light = m_sceneLights;
     for (u32 i = 0; i < m_sceneLightCount; i++, light++) {
         if (light->m_targetEnable[target] != 0) {
-            octTree.InsertLight(i, *reinterpret_cast<Vec*>(&light->m_position), light->m_range, light->m_partMask);
+            octTree.InsertLight(i, light->m_position, light->m_range, light->m_partMask);
         }
     }
 }
@@ -883,8 +816,8 @@ inline void CLightPcs::SetForEmissionModel(CLightPcs::TARGET target, void* part)
  * --INFO--
  * PAL Address: 0x80048644
  * PAL Size: 1656b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80055908
+ * EN Size: 1608b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -946,19 +879,19 @@ void CLightPcs::CBumpLight::MakeLightMap()
         up.z = kLightZero;
 
         Mtx lookAt;
-        C_MTXLookAt(lookAt, &eye, &up, reinterpret_cast<Vec*>(&m_direction));
+        C_MTXLookAt(lookAt, &eye, &up, &m_direction);
 
         Vec camPos;
-        camPos.x = CameraPosX();
-        camPos.y = CameraPosY();
-        camPos.z = CameraPosZ();
+        camPos.x = CameraPcs.m_positionX;
+        camPos.y = CameraPcs.m_positionY;
+        camPos.z = CameraPcs.m_positionZ;
 
         Vec lightPos;
-        PSVECSubtract(reinterpret_cast<Vec*>(&m_targetPosition), &camPos, &lightPos);
+        PSVECSubtract(&m_targetPosition, &camPos, &lightPos);
         PSVECNormalize(&lightPos, &lightPos);
 
         Vec nrm;
-        PSVECNormalize(reinterpret_cast<Vec*>(&m_direction), &nrm);
+        PSVECNormalize(&m_direction, &nrm);
 
         Vec diff;
         PSVECSubtract(&lightPos, &nrm, &diff);
@@ -986,11 +919,9 @@ void CLightPcs::CBumpLight::MakeLightMap()
 
     int copySize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
     static float tParam[4] = {48.0f, 128.0f, 256.0f, 512.0f};
-    int offset = 0;
-    float* lightScale = tParam;
 
     for (int i = 0; i < (int)(unsigned int)m_textureCount; i++) {
-        u8* texDst = m_textureData + offset;
+        u8* texDst = m_textureData + i * copySize;
         GXLightObj lightObj;
         GXInitSpecularDir(&lightObj, eyeDir.x, eyeDir.y, eyeDir.z);
 
@@ -1001,7 +932,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
             GXInitLightAttn(&lightObj, kLightZero, kLightZero, kLightOne, d1, kLightZero,
                             kLightOne - d1);
         } else {
-            float d1 = *lightScale * kLightHalf;
+            float d1 = tParam[i] * kLightHalf;
             GXInitLightAttn(&lightObj, kLightZero, kLightZero, kLightOne, d1, kLightZero,
                             kLightOne - d1);
         }
@@ -1012,7 +943,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
         float dW = kBumpLightMapVertexZ;
         u32 y = 0;
         do {
-            GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);
+            GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 0x42);
 
             float fy = (float)y;
             float dFactor = kBumpLightMapCoordScale;
@@ -1030,31 +961,23 @@ void CLightPcs::CBumpLight::MakeLightMap()
                 float xd1 = x1 / dInv;
                 float dist0 = z0 * z0 + x0 * x0;
                 if (dist0 < dHalf) {
-                    dist0 = LightSqrtF(dHalf - dist0);
+                    dist0 = sqrtf(dHalf - dist0);
                 } else {
                     dist0 = kLightZero;
                 }
 
-                GXWGFifo.f32 = x0;
                 float dist1 = z0 * z0 + x1 * x1;
-                GXWGFifo.f32 = z0;
-                GXWGFifo.f32 = dW;
-                GXWGFifo.f32 = xd0;
-                GXWGFifo.f32 = zd;
-                GXWGFifo.f32 = dist0;
+                GXPosition3f32(x0, z0, dW);
+                GXNormal3f32(xd0, zd, dist0);
 
                 if (dist1 < dHalf) {
-                    dist1 = LightSqrtF(dHalf - dist1);
+                    dist1 = sqrtf(dHalf - dist1);
                 } else {
                     dist1 = kLightZero;
                 }
 
-                GXWGFifo.f32 = x1;
-                GXWGFifo.f32 = z0;
-                GXWGFifo.f32 = dW;
-                GXWGFifo.f32 = xd1;
-                GXWGFifo.f32 = zd;
-                GXWGFifo.f32 = dist1;
+                GXPosition3f32(x1, z0, dW);
+                GXNormal3f32(xd1, zd, dist1);
             }
 
             y++;
@@ -1064,9 +987,6 @@ void CLightPcs::CBumpLight::MakeLightMap()
         GXSetTexCopyDst((unsigned short)0x40, (unsigned short)0x40, (GXTexFmt)3, (unsigned char)0);
         GXCopyTex(texDst, 1);
         GXPixModeSync();
-
-        offset += copySize;
-        lightScale++;
     }
 }
 
@@ -1132,17 +1052,17 @@ void CLightPcs::MakeLightMap()
 
 /*
  * --INFO--
- * PAL Address: 0x80047ee0
+ * PAL Address: 0x80047EE0
  * PAL Size: 1180b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80056270
+ * EN Size: 1324b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, Vec* vec, unsigned char mode)
 {
     Mtx cam;
-    PSMTXCopy(CameraMatrix(), cam);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cam);
     Mtx texMtx;
     Mtx out;
     Mtx nrm;
@@ -1200,9 +1120,9 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             Mtx tmp;
             PSMTXCopy(mat, tmp);
             Vec camPos;
-            camPos.x = CameraPosX();
-            camPos.y = CameraPosY();
-            camPos.z = CameraPosZ();
+            camPos.x = CameraPcs.m_positionX;
+            camPos.y = CameraPcs.m_positionY;
+            camPos.z = CameraPcs.m_positionZ;
             Vec objPos;
             objPos.x = tmp[0][3];
             objPos.y = tmp[1][3];
@@ -1255,30 +1175,29 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
             PSMTXScale(texMtx, kBumpTexMtxScale, kBumpTexMtxScale, kBumpTexMtxScale);
             PSMTXConcat(m_bumpTexMtx0, texMtx, m_bumpTexMtx0);
 
-            float camX = CameraPosX();
-            float camZ = CameraPosZ();
-            PSMTXIdentity(reinterpret_cast<float(*)[4]>(m_bumpTexScratch));
-            float* scratch = m_bumpTexScratch;
+            float camX = CameraPcs.m_positionX;
+            float camZ = CameraPcs.m_positionZ;
+            PSMTXIdentity(m_bumpTexMtx2);
 
             float half = kLightHalf;
             float zero = kLightZero;
             float scrollScale = kBumpTexScrollScale;
-            scratch[0] = scrollScale;
-            scratch[6] = scrollScale;
-            scratch[10] = zero;
-            scratch[5] = zero;
-            scratch[9] = zero;
-            scratch[3] =
+            m_bumpTexMtx2[0][0] = scrollScale;
+            m_bumpTexMtx2[1][2] = scrollScale;
+            m_bumpTexMtx2[2][2] = zero;
+            m_bumpTexMtx2[1][1] = zero;
+            m_bumpTexMtx2[2][1] = zero;
+            m_bumpTexMtx2[0][3] =
                 -(scrollScale * (camX + bump->m_offsetX) - half);
-            scratch[7] =
+            m_bumpTexMtx2[1][3] =
                 -(scrollScale * (camZ + bump->m_offsetZ) - half);
-            scratch[11] = zero;
-            scratch[16] = kBumpTexMtxScale;
-            scratch[12] = kBumpTexMtxScale;
-            scratch[17] = zero;
-            scratch[15] = zero;
-            scratch[14] = zero;
-            scratch[13] = zero;
+            m_bumpTexMtx2[2][3] = zero;
+            m_bumpIndTexMtx[1][1] = kBumpTexMtxScale;
+            m_bumpIndTexMtx[0][0] = kBumpTexMtxScale;
+            m_bumpIndTexMtx[1][2] = zero;
+            m_bumpIndTexMtx[1][0] = zero;
+            m_bumpIndTexMtx[0][2] = zero;
+            m_bumpIndTexMtx[0][1] = zero;
         }
     }
 }

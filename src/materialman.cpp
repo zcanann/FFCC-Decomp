@@ -945,7 +945,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 scaleMtx[0][3] = material->m_textureData.m_texScroll[1].m_u0;
                 scaleMtx[1][3] = material->m_textureData.m_texScroll[1].m_v0;
                 GXLoadTexMtxImm(scaleMtx, m_bumpTexMtxIds[0], GX_MTX2x4);
-                GXLoadTexMtxImm(reinterpret_cast<float(*)[4]>(LightPcs.m_bumpTexScratch), m_bumpTexMtxIds[3], GX_MTX2x4);
+                GXLoadTexMtxImm(LightPcs.m_bumpTexMtx2, m_bumpTexMtxIds[3], GX_MTX2x4);
 
                 if ((tevBit & 0x20) != 0) {
                     GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCurShadow), GX_TG_MTX2x4, GX_TG_TEX0, m_texScroll0TexMtx, GX_FALSE, 0x7D);
@@ -1113,7 +1113,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 scaleMtx[0][3] = material->m_textureData.m_texScroll[1].m_u0;
                 scaleMtx[1][3] = material->m_textureData.m_texScroll[1].m_v0;
                 GXLoadTexMtxImm(scaleMtx, m_bumpTexMtxIds[0], GX_MTX2x4);
-                GXLoadTexMtxImm(reinterpret_cast<float(*)[4]>(LightPcs.m_bumpTexScratch), m_bumpTexMtxIds[3], GX_MTX2x4);
+                GXLoadTexMtxImm(LightPcs.m_bumpTexMtx2, m_bumpTexMtxIds[3], GX_MTX2x4);
                 GXLoadTexMtxImm(m_underWaterTexMtx, m_bumpTexMtxIds[4], GX_MTX3x4);
 
                 if ((tevBit & 0x20) != 0) {

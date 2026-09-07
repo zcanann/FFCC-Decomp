@@ -1520,8 +1520,6 @@ void CMenuPcs::CalcSelectWait()
 #undef delay
 #pragma pop
 
-#pragma push
-#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 0x80135258
@@ -1647,9 +1645,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 
 		{
 			int i = 0;
-			int markOff = i;
-			int __p3 = i;
-			for (; __p3 < 8; i++, markOff += 8) {
+			for (; i < 8; i++) {
 				if ((activeMask & (1 << i)) == 0) {
 					continue;
 				}
@@ -1673,8 +1669,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	{
 		int i = 0;
 		int off2 = textIndex << 6;
-		int __p21 = textIndex;
-		for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count && __p21 < activePartyCount; off2 += 0x40, i++) {
+		for (; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count && textIndex < activePartyCount; off2 += 0x40, i++) {
 			sprite = (CMenuPcs::Sprt2*)(this->m_bonusAnimPtr + off2 + 8);
 			if (sprite->kind != -1) {
 				continue;
@@ -1780,7 +1775,6 @@ void CMenuPcs::DrawSelectOpenAnim()
 		DrawCursor((int)cursorX, (int)cursorY, FLOAT_80331EB0);
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -3064,7 +3058,7 @@ void CMenuPcs::CalcResultCountAnim()
 	Mtx rotXMtx;
 	Mtx rotYMtx;
 	int tribeId;
-	for (int i = 0; activePartyCount > i * 2; i++) {
+	for (int i = 0; i < activePartyCount * 2; i++) {
 		CCharaPcs::CHandle* handle;
 		if (i < activePartyCount) {
 			handle = s_Rinfo->m_party[i].m_partyHandle;
@@ -3111,21 +3105,9 @@ void CMenuPcs::CalcResultCountAnim()
 	}
 
 	if (*(short*)(this->m_bonusStatePtr + 0x10) != 0) {
-		unsigned short buttons = 0;
-		int padRemap = Pad.m_debugPadPort;
-		int padLock = Pad.m_debugPadLock;
+		unsigned int buttons = 0;
 		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-			int padIndex = s_Rinfo->m_party[i].m_partySlot;
-			unsigned short down;
-			unsigned char padLocked = (padLock != 0 || (padIndex == 0 && padRemap != -1));
-			if (padLocked) {
-				down = 0;
-			} else {
-				unsigned int resolvedIndex = (padRemap == (int)padIndex) ? 0 : padIndex;
-				down = Pad.m_padInputs[resolvedIndex].buttonDown[0];
-			}
-			unsigned int __p28 = buttons;
-			buttons = (unsigned short)(__p28 | down);
+			buttons |= Pad.GetButtonDown(s_Rinfo->m_party[i].m_partySlot);
 		}
 		if ((buttons & 0x300) != 0) {
 			Sound.PlaySe(2, 0x40, 0x7f, 0);

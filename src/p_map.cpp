@@ -35,7 +35,7 @@ private:
  * JP Address: TODO
  * JP Size: TODO
  */
-CRelProfile::~CRelProfile()
+inline CRelProfile::~CRelProfile()
 {
 }
 
@@ -278,7 +278,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         CPtrArray<CMapLightHolder*>& mapLightHolderArr = MapMng.GetMapLightHolderArray(1);
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) > mapLightHolderIndex) {
-            mapLightHolderArr[mapLightHolderIndex]->GetLightHolder(
+            mapLightHolderArr.GetAt(mapLightHolderIndex)->GetLightHolder(
                 &MapMng.m_mapColor, static_cast<Vec*>(0));
         }
     }
@@ -417,7 +417,7 @@ void CMapPcs::calc()
         CPtrArray<CMapLightHolder*>* mapLightHolderArr = &MapMng.GetMapLightHolderArray(1);
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
-            (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(
+            mapLightHolderArr->GetAt(mapLightHolderIndex)->GetLightHolder(
                 &MapMng.m_mapColor, static_cast<Vec*>(0));
         }
 

@@ -108,6 +108,27 @@ struct MenuWindowInfo
     short state;
 };
 
+struct WmWorldObjInfo
+{
+    int m_active;
+    int m_frameCounter;
+    short m_viewportX;
+    short m_viewportY;
+    short m_viewportWidth;
+    short m_viewportHeight;
+    Vec m_cameraPosition;
+    SRT m_transform;
+    unsigned int m_scissorX;
+    unsigned int m_scissorY;
+    unsigned int m_scissorWidth;
+    unsigned int m_scissorHeight;
+};
+STATIC_ASSERT(sizeof(WmWorldObjInfo) == 0x50);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_viewportX) == 0x08);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_cameraPosition) == 0x10);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_transform) == 0x1C);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_scissorX) == 0x40);
+
 struct WmCharaModelInfo
 {
     int m_unknown00;
@@ -743,7 +764,7 @@ public:
     {
         Mtx m_savedCameraMatrix;
         CCharaPcs::CHandle* m_handles[0x28];
-        unsigned char* m_worldObjData;
+        WmWorldObjInfo* m_worldObjData;
         unsigned char* m_bubbleData;
         unsigned char* m_frameData;
         WmFrameInfo* m_frameInfo;

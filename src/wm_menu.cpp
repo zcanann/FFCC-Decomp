@@ -686,35 +686,25 @@ void CMenuPcs::loadData()
 	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[6]->m_model) + 0x9C) =
 	    FLOAT_803314B0;
 
-	m_wm.m_worldObjData = static_cast<unsigned char*>(operator new[](0xC80, MenuPcs.m_menuStage, srcFile, 0x214));
+	m_wm.m_worldObjData = new (MenuPcs.m_menuStage, srcFile, 0x214) WmWorldObjInfo[40];
 	{
 		const float bigF = FLOAT_80331598;
-		const float oneF = FLOAT_803313e8;
 		const float zeroF = FLOAT_803313dc;
 		for (int i = 0; i < 0x28; i++) {
-			unsigned char* const entry = m_wm.m_worldObjData + i * 0x50 + 0x1C;
-			*reinterpret_cast<float*>(entry + 0x08) = zeroF;
-			*reinterpret_cast<float*>(entry + 0x04) = zeroF;
-			*reinterpret_cast<float*>(entry + 0x00) = zeroF;
-			*reinterpret_cast<float*>(entry + 0x14) = zeroF;
-			*reinterpret_cast<float*>(entry + 0x10) = zeroF;
-			*reinterpret_cast<float*>(entry + 0x0C) = zeroF;
-			*reinterpret_cast<float*>(entry + 0x20) = oneF;
-			*reinterpret_cast<float*>(entry + 0x1C) = oneF;
-			*reinterpret_cast<float*>(entry + 0x18) = oneF;
-			*reinterpret_cast<int*>(m_wm.m_worldObjData + i * 0x50 + 0x00) = 0;
-			*reinterpret_cast<int*>(m_wm.m_worldObjData + i * 0x50 + 0x04) = 0;
-			*reinterpret_cast<short*>(m_wm.m_worldObjData + i * 0x50 + 0x08) = 0;
-			*reinterpret_cast<short*>(m_wm.m_worldObjData + i * 0x50 + 0x0A) = 0;
-			*reinterpret_cast<short*>(m_wm.m_worldObjData + i * 0x50 + 0x0C) = 0x280;
-			*reinterpret_cast<short*>(m_wm.m_worldObjData + i * 0x50 + 0x0E) = 0x1C0;
-			*reinterpret_cast<float*>(m_wm.m_worldObjData + i * 0x50 + 0x10) = zeroF;
-			*reinterpret_cast<float*>(m_wm.m_worldObjData + i * 0x50 + 0x14) = zeroF;
-			*reinterpret_cast<float*>(m_wm.m_worldObjData + i * 0x50 + 0x18) = bigF;
-			*reinterpret_cast<int*>(m_wm.m_worldObjData + i * 0x50 + 0x40) = 0;
-			*reinterpret_cast<int*>(m_wm.m_worldObjData + i * 0x50 + 0x44) = 0;
-			*reinterpret_cast<int*>(m_wm.m_worldObjData + i * 0x50 + 0x48) = 0x280;
-			*reinterpret_cast<int*>(m_wm.m_worldObjData + i * 0x50 + 0x4C) = 0x1C0;
+			m_wm.m_worldObjData[i].m_transform.Identity();
+			m_wm.m_worldObjData[i].m_active = 0;
+			m_wm.m_worldObjData[i].m_frameCounter = 0;
+			m_wm.m_worldObjData[i].m_viewportX = 0;
+			m_wm.m_worldObjData[i].m_viewportY = 0;
+			m_wm.m_worldObjData[i].m_viewportWidth = 0x280;
+			m_wm.m_worldObjData[i].m_viewportHeight = 0x1C0;
+			m_wm.m_worldObjData[i].m_cameraPosition.x = zeroF;
+			m_wm.m_worldObjData[i].m_cameraPosition.y = zeroF;
+			m_wm.m_worldObjData[i].m_cameraPosition.z = bigF;
+			m_wm.m_worldObjData[i].m_scissorX = 0;
+			m_wm.m_worldObjData[i].m_scissorY = 0;
+			m_wm.m_worldObjData[i].m_scissorWidth = 0x280;
+			m_wm.m_worldObjData[i].m_scissorHeight = 0x1C0;
 		}
 	}
 
@@ -1161,7 +1151,6 @@ void CMenuPcs::InitFrame0Info()
 	m_wm.m_frameInfo->m_sprites[1].m_flags = 8;
 }
 
-
 /*
  * --INFO--
  * PAL Address: 0x80101444
@@ -1190,24 +1179,22 @@ void CMenuPcs::InitCharaInfo()
 	baseSlot = 0x20;
 	baseY = 0x66;
 	while (row < 2) {
-		slot = (baseSlot + 0);
+		slot = baseSlot;
 		col = 0;
 		baseX = 0x68;
 		for (; col < 4; col++) {
-			int __p15 = slot;
-			int slotOffset = __p15 * 0x50;
 			y = baseY;
 			if (row != 0) {
 				y = baseY + 8;
 			}
 
-			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 8) = static_cast<short>(baseX - 0xA0);
-			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0xA) = static_cast<short>(y - 0x70);
-			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0xC) = 0x140;
-			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0xE) = 0xE0;
-			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x10) = zero;
-			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x14) = zero;
-			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x18) = z;
+			m_wm.m_worldObjData[slot].m_viewportX = static_cast<short>(baseX - 0xA0);
+			m_wm.m_worldObjData[slot].m_viewportY = static_cast<short>(y - 0x70);
+			m_wm.m_worldObjData[slot].m_viewportWidth = 0x140;
+			m_wm.m_worldObjData[slot].m_viewportHeight = 0xE0;
+			m_wm.m_worldObjData[slot].m_cameraPosition.x = zero;
+			m_wm.m_worldObjData[slot].m_cameraPosition.y = zero;
+			m_wm.m_worldObjData[slot].m_cameraPosition.z = z;
 
 			slot += 1;
 			baseX = baseX + 0x90;
@@ -1217,23 +1204,18 @@ void CMenuPcs::InitCharaInfo()
 		baseY = baseY + 0xB8;
 	}
 
-	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
-	int i = 0;
-	int invalidModel = -1;
-	for (; i < 8; i++) {
-		unsigned char* src0 = gameData + 0x13F0;
-		WmCharaModelInfo* entry0 = &m_wm.m_charaModelData[i];
-		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
-			entry0->m_modelNo = GetModelNo(*reinterpret_cast<unsigned short*>(src0 + 0x3E0),
-			                             *reinterpret_cast<unsigned short*>(src0 + 0x3E4),
-			                             *reinterpret_cast<unsigned short*>(src0 + 0x3E2));
+	for (int i = 0; i < kWmMenuPlayerCount; i++) {
+		CCaravanWork& caravan = Game.m_caravanWorkArr[i];
+		WmCharaModelInfo* entry = &m_wm.m_charaModelData[i];
+		if (caravan.m_shopState != 0) {
+			entry->m_modelNo = GetModelNo(caravan.m_tribeId, caravan.m_appearanceVariant,
+			                            caravan.m_genderFlag);
 		} else {
-			entry0->m_modelNo = invalidModel;
+			entry->m_modelNo = -1;
 		}
-
-		gameData += 0xC30;
 	}
 }
+
 #pragma opt_propagation on
 
 /*
@@ -1700,39 +1682,39 @@ void CMenuPcs::calcWorld()
 		}
 	}
 
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	reinterpret_cast<short*>(worldObj + 0x58)[0] = 0;
+	WmWorldObjInfo* const worldObj = m_wm.m_worldObjData;
+	worldObj[1].m_viewportX = 0;
 	const float fVar1 = FLOAT_803313dc;
-	reinterpret_cast<short*>(worldObj + 0x5A)[0] = 0;
+	worldObj[1].m_viewportY = 0;
 	float fVar3 = FLOAT_80331598;
-	reinterpret_cast<short*>(worldObj + 0x5C)[0] = 0x280;
+	worldObj[1].m_viewportWidth = 0x280;
 	const float fVar4 = FLOAT_803315d4;
-	reinterpret_cast<short*>(worldObj + 0x5E)[0] = 0x1C0;
+	worldObj[1].m_viewportHeight = 0x1C0;
 	const float fVar5 = FLOAT_803317e0;
-	reinterpret_cast<float*>(worldObj + 0x60)[0] = fVar1;
+	worldObj[1].m_cameraPosition.x = fVar1;
 	const float fVar6 = FLOAT_803317e4;
-	reinterpret_cast<float*>(worldObj + 0x64)[0] = fVar1;
+	worldObj[1].m_cameraPosition.y = fVar1;
 	const float fVar7 = FLOAT_803317e8;
-	reinterpret_cast<float*>(worldObj + 0x68)[0] = fVar3;
+	worldObj[1].m_cameraPosition.z = fVar3;
 	fVar3 = FLOAT_803314bc;
-	*reinterpret_cast<unsigned int*>(worldObj + 0x50) = 1;
-	reinterpret_cast<float*>(worldObj + 0x84)[0] = fVar4;
-	reinterpret_cast<float*>(worldObj + 0x88)[0] = fVar4;
-	reinterpret_cast<float*>(worldObj + 0x8C)[0] = fVar4;
-	reinterpret_cast<float*>(worldObj + 0x6C)[0] = fVar1;
-	reinterpret_cast<float*>(worldObj + 0x70)[0] = fVar5;
-	reinterpret_cast<float*>(worldObj + 0x74)[0] = fVar6;
-	reinterpret_cast<float*>(worldObj + 0x78)[0] = fVar7;
-	reinterpret_cast<float*>(worldObj + 0x7C)[0] = fVar1;
-	reinterpret_cast<float*>(worldObj + 0x80)[0] = fVar1;
+	worldObj[1].m_active = 1;
+	worldObj[1].m_transform.m_scale.x = fVar4;
+	worldObj[1].m_transform.m_scale.y = fVar4;
+	worldObj[1].m_transform.m_scale.z = fVar4;
+	worldObj[1].m_transform.m_position.x = fVar1;
+	worldObj[1].m_transform.m_position.y = fVar5;
+	worldObj[1].m_transform.m_position.z = fVar6;
+	worldObj[1].m_transform.m_rotation.x = fVar7;
+	worldObj[1].m_transform.m_rotation.y = fVar1;
+	worldObj[1].m_transform.m_rotation.z = fVar1;
 
 	Mtx matrix;
-	PSMTXRotRad(matrix, 'x', fVar3 * reinterpret_cast<float*>(worldObj + 0x78)[0]);
-	matrix[0][3] = reinterpret_cast<float*>(worldObj + 0x6C)[0];
-	matrix[1][3] = reinterpret_cast<float*>(worldObj + 0x70)[0];
-	matrix[2][3] = reinterpret_cast<float*>(worldObj + 0x74)[0];
-	PSMTXScaleApply(matrix, matrix, reinterpret_cast<float*>(worldObj + 0x84)[0], reinterpret_cast<float*>(worldObj + 0x88)[0],
-	                reinterpret_cast<float*>(worldObj + 0x8C)[0]);
+	PSMTXRotRad(matrix, 'x', fVar3 * worldObj[1].m_transform.m_rotation.x);
+	matrix[0][3] = worldObj[1].m_transform.m_position.x;
+	matrix[1][3] = worldObj[1].m_transform.m_position.y;
+	matrix[2][3] = worldObj[1].m_transform.m_position.z;
+	PSMTXScaleApply(matrix, matrix, worldObj[1].m_transform.m_scale.x, worldObj[1].m_transform.m_scale.y,
+	                worldObj[1].m_transform.m_scale.z);
 
 	model->SetMatrix(matrix);
 	model->CalcMatrix();
@@ -3760,11 +3742,11 @@ void CMenuPcs::DrawMCardMenu()
 		DrawCursor((int)cursorY, (int)cursorX, 1.0f);
 
 		// 3D character viewports (4 slots)
-		int* piVar12 = reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_worldObjData) + 0x550);
+		WmWorldObjInfo* view = &m_wm.m_worldObjData[17];
 
 		int i = 0;
 		do {
-			if (*piVar12 != 0) {
+			if (view->m_active != 0) {
 				SetProjection(i + 17);
 				SetLight(0);
 				m_wm.m_handles[i + 17]->Draw(5);
@@ -3778,7 +3760,7 @@ void CMenuPcs::DrawMCardMenu()
 				}
 			}
 			i++;
-			piVar12 += 0x14;
+			view++;
 		} while (i < 4);
 		DrawInit();
 		RestoreProjection();
@@ -4489,11 +4471,11 @@ void CMenuPcs::DrawLoadMenu()
 		DrawCursor((int)cursorY0, (int)cursorXbase, 1.0f);
 
 		// 3D character model viewports
-		int* piVar13 = reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_worldObjData) + 0x550);
+		WmWorldObjInfo* view = &m_wm.m_worldObjData[17];
 
 		int i = 0;
 		do {
-			if (*piVar13 != 0) {
+			if (view->m_active != 0) {
 				SetProjection(i + 17);
 				SetLight(0);
 				m_wm.m_handles[17 + i]->Draw(5);
@@ -4504,7 +4486,7 @@ void CMenuPcs::DrawLoadMenu()
 					PartPcs.DrawMenuIdx(m_effectWork[21 + i].m_partNo);
 				}
 			}
-			piVar13 += 0x14;
+			view++;
 
 			i++;
 		} while (i < 4);
@@ -5526,14 +5508,14 @@ float CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
  */
 void CMenuPcs::SetProjection(int mode)
 {
-	unsigned char* const slot = m_wm.m_worldObjData + mode * 0x50;
+	WmWorldObjInfo* const slot = &m_wm.m_worldObjData[mode];
 	Mtx44 projectionMtx;
 	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
 
 	Mtx lookAtMtx;
-	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10),
+	C_MTXLookAt(lookAtMtx, &slot->m_cameraPosition,
 	    CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
 	    CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
 	PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
@@ -5547,17 +5529,17 @@ void CMenuPcs::SetProjection(int mode)
 	GXSetAlphaUpdate(1);
 
 	GXSetViewport(
-	    static_cast<float>(*reinterpret_cast<short*>(slot + 8)),
-	    static_cast<float>(*reinterpret_cast<short*>(slot + 0xA)),
-	    static_cast<float>(*reinterpret_cast<short*>(slot + 0xC)),
-	    static_cast<float>(*reinterpret_cast<short*>(slot + 0xE)),
+	    static_cast<float>(slot->m_viewportX),
+	    static_cast<float>(slot->m_viewportY),
+	    static_cast<float>(slot->m_viewportWidth),
+	    static_cast<float>(slot->m_viewportHeight),
 	    FLOAT_803313dc,
 	    FLOAT_803313e8);
 	GXSetScissor(
-	    *reinterpret_cast<unsigned int*>(slot + 0x40),
-	    *reinterpret_cast<unsigned int*>(slot + 0x44),
-	    *reinterpret_cast<unsigned int*>(slot + 0x48),
-	    *reinterpret_cast<unsigned int*>(slot + 0x4C));
+	    slot->m_scissorX,
+	    slot->m_scissorY,
+	    slot->m_scissorWidth,
+	    slot->m_scissorHeight);
 }
 
 /*
@@ -5620,7 +5602,7 @@ void CMenuPcs::CalcPitcher()
 		return;
 	}
 
-	unsigned char* worldObj = m_wm.m_worldObjData;
+	WmWorldObjInfo* worldObj = m_wm.m_worldObjData;
 
 	const float one = FLOAT_803313e8;
 	const float pb8 = FLOAT_803315d0;
@@ -5628,30 +5610,30 @@ void CMenuPcs::CalcPitcher()
 	const float pb0 = FLOAT_8033174c;
 	const float pac = FLOAT_80331748;
 	const float pa8 = FLOAT_803314A4;
-	reinterpret_cast<unsigned int*>(worldObj + 0x190)[0] = 1;
-	reinterpret_cast<short*>(worldObj + 0x198)[0] = 0x140;
-	reinterpret_cast<short*>(worldObj + 0x19A)[0] = 0xE0;
-	reinterpret_cast<short*>(worldObj + 0x19C)[0] = 0x140;
-	reinterpret_cast<short*>(worldObj + 0x19E)[0] = 0xE0;
-	reinterpret_cast<float*>(worldObj + 0x1A0)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x1A4)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x1A8)[0] = pa8;
-	reinterpret_cast<float*>(worldObj + 0x1AC)[0] = pac;
-	reinterpret_cast<float*>(worldObj + 0x1B0)[0] = pb0;
-	reinterpret_cast<float*>(worldObj + 0x1B4)[0] = pb4;
-	reinterpret_cast<float*>(worldObj + 0x1B8)[0] = pb8;
-	reinterpret_cast<float*>(worldObj + 0x1BC)[0] += FLOAT_80331754;
+	worldObj[5].m_active = 1;
+	worldObj[5].m_viewportX = 0x140;
+	worldObj[5].m_viewportY = 0xE0;
+	worldObj[5].m_viewportWidth = 0x140;
+	worldObj[5].m_viewportHeight = 0xE0;
+	worldObj[5].m_cameraPosition.x = FLOAT_803313dc;
+	worldObj[5].m_cameraPosition.y = FLOAT_803313dc;
+	worldObj[5].m_cameraPosition.z = pa8;
+	worldObj[5].m_transform.m_position.x = pac;
+	worldObj[5].m_transform.m_position.y = pb0;
+	worldObj[5].m_transform.m_position.z = pb4;
+	worldObj[5].m_transform.m_rotation.x = pb8;
+	worldObj[5].m_transform.m_rotation.y += FLOAT_80331754;
 
 	Mtx scaleMtx;
 	Mtx rotXMtx;
 	Mtx rotYMtx;
 	PSMTXScale(scaleMtx, one, one, one);
-	PSMTXRotRad(rotXMtx, 'x', reinterpret_cast<float*>(worldObj + 0x1B8)[0]);
-	PSMTXRotRad(rotYMtx, 'y', reinterpret_cast<float*>(worldObj + 0x1BC)[0]);
+	PSMTXRotRad(rotXMtx, 'x', worldObj[5].m_transform.m_rotation.x);
+	PSMTXRotRad(rotYMtx, 'y', worldObj[5].m_transform.m_rotation.y);
 	PSMTXConcat(rotXMtx, rotYMtx, rotXMtx);
-	rotXMtx[0][3] = reinterpret_cast<float*>(worldObj + 0x1AC)[0];
-	rotXMtx[1][3] = reinterpret_cast<float*>(worldObj + 0x1B0)[0];
-	rotXMtx[2][3] = reinterpret_cast<float*>(worldObj + 0x1B4)[0];
+	rotXMtx[0][3] = worldObj[5].m_transform.m_position.x;
+	rotXMtx[1][3] = worldObj[5].m_transform.m_position.y;
+	rotXMtx[2][3] = worldObj[5].m_transform.m_position.z;
 	PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
 	short step = m_wmWorldState->m_frameCounter;
@@ -5686,7 +5668,6 @@ void CMenuPcs::CalcPitcher()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimize_for_size on
 void CMenuPcs::CalcFukidashi()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
@@ -5694,7 +5675,6 @@ void CMenuPcs::CalcFukidashi()
 		return;
 	}
 	int bitIdx;
-#define WOBJ() reinterpret_cast<int>(m_wm.m_worldObjData)
 
 #define BUB() reinterpret_cast<int>(m_wm.m_bubbleData)
 	*reinterpret_cast<unsigned short*>(BUB()) = *reinterpret_cast<short*>(bytes + 0x1C);
@@ -5850,8 +5830,6 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	// Set text position
-	int iVar11 = 6;
-	int iVar9 = 0x1E0;
 	*reinterpret_cast<short*>(BUB() + 0x72) =
 	    *reinterpret_cast<short*>(BUB() + 2) + sVar15;
 	*reinterpret_cast<short*>(BUB() + 0x72) =
@@ -5860,74 +5838,16 @@ void CMenuPcs::CalcFukidashi()
 	// Setup model viewport slots
 	int sVar15b = *reinterpret_cast<short*>(BUB()) - 0x28;
 	int sVar22 = *reinterpret_cast<short*>(BUB() + 2) - 0x0E;
-	int iVar13;
-	for (iVar13 = 2; iVar13 > 0; iVar13--) {
-		int* puVar20 = reinterpret_cast<int*>(WOBJ() + iVar9);
-		int iVar19 = iVar9 + 0x50;
-		puVar20[0] = 0;
-		int iVar18 = iVar9 + 0xA0;
-		int iVar17 = iVar9 + 0xF0;
-		int iVar16 = iVar9 + 0x140;
-		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
-		iVar9 = iVar9 + 400;
-		iVar11 = iVar11 + 5;
-		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
-		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
-		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
-		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
-		iVar19 += WOBJ();
-		*reinterpret_cast<int*>(iVar19) = 0;
-		*reinterpret_cast<short*>(iVar19 + 8) = sVar15b;
-		*reinterpret_cast<short*>(iVar19 + 0xA) = sVar22;
-		*reinterpret_cast<short*>(iVar19 + 0xC) = 0x140;
-		*reinterpret_cast<short*>(iVar19 + 0xE) = 0xE0;
-		*reinterpret_cast<float*>(iVar19 + 0x10) = fVar1;
-		*reinterpret_cast<float*>(iVar19 + 0x14) = fVar1;
-		*reinterpret_cast<float*>(iVar19 + 0x18) = fVar2;
-		iVar18 += WOBJ();
-		*reinterpret_cast<int*>(iVar18) = 0;
-		*reinterpret_cast<short*>(iVar18 + 8) = sVar15b;
-		*reinterpret_cast<short*>(iVar18 + 0xA) = sVar22;
-		*reinterpret_cast<short*>(iVar18 + 0xC) = 0x140;
-		*reinterpret_cast<short*>(iVar18 + 0xE) = 0xE0;
-		*reinterpret_cast<float*>(iVar18 + 0x10) = fVar1;
-		*reinterpret_cast<float*>(iVar18 + 0x14) = fVar1;
-		*reinterpret_cast<float*>(iVar18 + 0x18) = fVar2;
-		iVar17 += WOBJ();
-		*reinterpret_cast<int*>(iVar17) = 0;
-		*reinterpret_cast<short*>(iVar17 + 8) = sVar15b;
-		*reinterpret_cast<short*>(iVar17 + 0xA) = sVar22;
-		*reinterpret_cast<short*>(iVar17 + 0xC) = 0x140;
-		*reinterpret_cast<short*>(iVar17 + 0xE) = 0xE0;
-		*reinterpret_cast<float*>(iVar17 + 0x10) = fVar1;
-		*reinterpret_cast<float*>(iVar17 + 0x14) = fVar1;
-		*reinterpret_cast<float*>(iVar17 + 0x18) = fVar2;
-		iVar16 += WOBJ();
-		*reinterpret_cast<int*>(iVar16) = 0;
-		*reinterpret_cast<short*>(iVar16 + 8) = sVar15b;
-		*reinterpret_cast<short*>(iVar16 + 0xA) = sVar22;
-		*reinterpret_cast<short*>(iVar16 + 0xC) = 0x140;
-		*reinterpret_cast<short*>(iVar16 + 0xE) = 0xE0;
-		*reinterpret_cast<float*>(iVar16 + 0x10) = fVar1;
-		*reinterpret_cast<float*>(iVar16 + 0x14) = fVar1;
-		*reinterpret_cast<float*>(iVar16 + 0x18) = fVar2;
-		fVar2 = FLOAT_803314A4;
-		fVar1 = FLOAT_803313dc;
-	}
-
-	// Fill remaining viewport slots
-	for (; iVar11 <= 0x10; iVar11++) {
-		int* puVar20 = reinterpret_cast<int*>(WOBJ() + iVar11 * 0x50);
-		puVar20[0] = 0;
-		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
-		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
-		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
-		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
-		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+	for (int i = 6; i <= 16; i++) {
+		WmWorldObjInfo* slot = &m_wm.m_worldObjData[i];
+		slot->m_active = 0;
+		slot->m_viewportX = sVar15b;
+		slot->m_viewportY = sVar22;
+		slot->m_viewportWidth = 0x140;
+		slot->m_viewportHeight = 0xE0;
+		slot->m_cameraPosition.x = fVar1;
+		slot->m_cameraPosition.y = fVar1;
+		slot->m_cameraPosition.z = fVar2;
 	}
 
 	// Setup tribe/character model slot
@@ -5943,75 +5863,72 @@ void CMenuPcs::CalcFukidashi()
 				modelIdx = 6;
 			}
 		} else {
-			bitIdx = 0;
-			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx++;
-			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx++;
-			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx++;
-			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx++;
-			if ((sFlags & (0x10 << bitIdx)) == 0) { bitIdx++; }}}}}
+			for (bitIdx = 0; bitIdx < 5; bitIdx++) {
+				if ((sFlags & (0x10 << bitIdx)) != 0) {
+					break;
+				}
+			}
 			modelIdx = bitIdx + 0x0C;
 		}
 
-		int* puVar20 = reinterpret_cast<int*>(WOBJ() + modelIdx * 0x50);
-		puVar20[0] = 1;
-		*reinterpret_cast<float*>(puVar20 + 7) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 8) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 9) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 0xD) = fVar2;
-		*reinterpret_cast<float*>(puVar20 + 0xE) = fVar2;
-		*reinterpret_cast<float*>(puVar20 + 0xF) = fVar2;
+		WmWorldObjInfo* worldObj = &m_wm.m_worldObjData[modelIdx];
+		worldObj->m_active = 1;
+		worldObj->m_transform.m_position.x = fVar1;
+		worldObj->m_transform.m_position.y = fVar1;
+		worldObj->m_transform.m_position.z = fVar1;
+		worldObj->m_transform.m_scale.x = fVar2;
+		worldObj->m_transform.m_scale.y = fVar2;
+		worldObj->m_transform.m_scale.z = fVar2;
 		if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
-			*reinterpret_cast<float*>(puVar20 + 8) = FLOAT_80331710;
+			worldObj->m_transform.m_position.y = FLOAT_80331710;
 		}
 		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) != 0) {
-			*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331714;
-			*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
-			    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331420);
+			worldObj->m_transform.m_position.x = FLOAT_80331714;
+			worldObj->m_transform.m_position.y = static_cast<float>(
+			    static_cast<double>(worldObj->m_transform.m_position.y) + DOUBLE_80331420);
 		} else if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) != 0) {
-			*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
-			    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331420);
+			worldObj->m_transform.m_position.x = FLOAT_803313dc;
+			worldObj->m_transform.m_position.y = static_cast<float>(
+			    static_cast<double>(worldObj->m_transform.m_position.y) + DOUBLE_80331420);
 		} else {
-			*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331718;
-			*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
-			    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331720);
+			worldObj->m_transform.m_position.x = FLOAT_80331718;
+			worldObj->m_transform.m_position.y = static_cast<float>(
+			    static_cast<double>(worldObj->m_transform.m_position.y) + DOUBLE_80331720);
 		}
 
 		// Spline evaluation for Y position
-		*reinterpret_cast<float*>(puVar20 + 8) =
-		    *reinterpret_cast<float*>(puVar20 + 8) +
+		worldObj->m_transform.m_position.y =
+		    worldObj->m_transform.m_position.y +
 		    static_cast<float>(GetFcvValue(s_WoodTrns,
-		                                   static_cast<float>(puVar20[1])));
+		                                   static_cast<float>(worldObj->m_frameCounter)));
 
 		// Spline evaluation for rotation
-		*reinterpret_cast<float*>(puVar20 + 0xB) =
+		worldObj->m_transform.m_rotation.y =
 		    FLOAT_803314bc *
 		    static_cast<float>(GetFcvValue(s_WoodRot,
-		                                   static_cast<float>(puVar20[1])));
-		*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_803315d0;
+		                                   static_cast<float>(worldObj->m_frameCounter)));
+		worldObj->m_transform.m_rotation.x = FLOAT_803315d0;
 
 		// Matrix setup
 		Mtx rotXMtx, rotYMtx;
-		PSMTXScale(scaleMtx, *reinterpret_cast<float*>(puVar20 + 0xD), *reinterpret_cast<float*>(puVar20 + 0xE), *reinterpret_cast<float*>(puVar20 + 0xF));
-		PSMTXRotRad(rotXMtx, 'x', *reinterpret_cast<float*>(puVar20 + 0xA));
-		PSMTXRotRad(rotYMtx, 'y', *reinterpret_cast<float*>(puVar20 + 0xB));
+		PSMTXScale(scaleMtx, worldObj->m_transform.m_scale.x, worldObj->m_transform.m_scale.y, worldObj->m_transform.m_scale.z);
+		PSMTXRotRad(rotXMtx, 'x', worldObj->m_transform.m_rotation.x);
+		PSMTXRotRad(rotYMtx, 'y', worldObj->m_transform.m_rotation.y);
 		PSMTXConcat(rotXMtx, rotYMtx, rotXMtx);
-		rotXMtx[0][3] = *reinterpret_cast<float*>(puVar20 + 7);
-		rotXMtx[1][3] = *reinterpret_cast<float*>(puVar20 + 8);
-		rotXMtx[2][3] = *reinterpret_cast<float*>(puVar20 + 9);
+		rotXMtx[0][3] = worldObj->m_transform.m_position.x;
+		rotXMtx[1][3] = worldObj->m_transform.m_position.y;
+		rotXMtx[2][3] = worldObj->m_transform.m_position.z;
 		PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
-#define modelPtr (*reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + modelIdx * 4) + 0x168))
-		modelPtr->SetMatrix(scaleMtx);
-		modelPtr->CalcMatrix();
-		modelPtr->CalcSkin();
-#undef modelPtr
+		m_wm.m_handles[modelIdx]->m_model->SetMatrix(scaleMtx);
+		m_wm.m_handles[modelIdx]->m_model->CalcMatrix();
+		m_wm.m_handles[modelIdx]->m_model->CalcSkin();
 
-		puVar20[1] = puVar20[1] + 1;
-		if (static_cast<double>(static_cast<float>(puVar20[1])) >=
+		worldObj->m_frameCounter = worldObj->m_frameCounter + 1;
+		if (static_cast<double>(static_cast<float>(worldObj->m_frameCounter)) >=
 		    DOUBLE_803314A8 * static_cast<double>(
 		        s_WoodTrns.keys[s_WoodTrns.keyCount * 4 - 4])) {
-			puVar20[1] = 0;
+			worldObj->m_frameCounter = 0;
 		}
 	}
 
@@ -6028,80 +5945,75 @@ void CMenuPcs::CalcFukidashi()
 		for (int padIdx = 0; padIdx < 4; padIdx++) {
 			if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << padIdx)) != 0) {
 				int slot8 = padIdx + 8;
-				int* puVar20 = reinterpret_cast<int*>(WOBJ() + slot8 * 0x50);
-				puVar20[0] = 1;
-				*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331728;
+				WmWorldObjInfo* worldObj = &m_wm.m_worldObjData[slot8];
+				worldObj->m_active = 1;
+				worldObj->m_transform.m_position.x = FLOAT_80331728;
 				if (slotIdx == 0) {
 					if (playerCount == 2) {
-						*reinterpret_cast<float*>(puVar20 + 8) = FLOAT_8033172C;
+						worldObj->m_transform.m_position.y = FLOAT_8033172C;
 					} else {
-						*reinterpret_cast<float*>(puVar20 + 8) = FLOAT_80331668;
+						worldObj->m_transform.m_position.y = FLOAT_80331668;
 					}
 				} else {
-					*reinterpret_cast<float*>(puVar20 + 8) = FLOAT_80331710;
+					worldObj->m_transform.m_position.y = FLOAT_80331710;
 				}
 				if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
 					if (padIdx == 0 && playerCount == 1) {
-						*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
-						    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) - DOUBLE_80331730);
+						worldObj->m_transform.m_position.y = static_cast<float>(
+						    static_cast<double>(worldObj->m_transform.m_position.y) - DOUBLE_80331730);
 					} else {
-						*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
-						    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) - DOUBLE_80331738);
+						worldObj->m_transform.m_position.y = static_cast<float>(
+						    static_cast<double>(worldObj->m_transform.m_position.y) - DOUBLE_80331738);
 					}
 				}
-				*reinterpret_cast<float*>(puVar20 + 9) = FLOAT_803313dc;
+				worldObj->m_transform.m_position.z = FLOAT_803313dc;
 				float f740 = FLOAT_80331740;
-				*reinterpret_cast<float*>(puVar20 + 0xD) = f740;
-				*reinterpret_cast<float*>(puVar20 + 0xE) = f740;
-				*reinterpret_cast<float*>(puVar20 + 0xF) = f740;
+				worldObj->m_transform.m_scale.x = f740;
+				worldObj->m_transform.m_scale.y = f740;
+				worldObj->m_transform.m_scale.z = f740;
 
 				// Spline Y for player models
-				*reinterpret_cast<float*>(puVar20 + 8) =
-				    *reinterpret_cast<float*>(puVar20 + 8) +
+				worldObj->m_transform.m_position.y =
+				    worldObj->m_transform.m_position.y +
 				    static_cast<float>(GetFcvValue(s_WoodTrns,
-				                                   static_cast<float>(puVar20[1])));
+				                                   static_cast<float>(worldObj->m_frameCounter)));
 
 				// Spline rotation for player models
-				*reinterpret_cast<float*>(puVar20 + 0xB) =
+				worldObj->m_transform.m_rotation.y =
 				    FLOAT_803314bc *
 				    static_cast<float>(GetFcvValue(s_WoodRot,
-				                                   static_cast<float>(puVar20[1])));
+				                                   static_cast<float>(worldObj->m_frameCounter)));
 				if (playerCount == 1) {
-					*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_80331744;
+					worldObj->m_transform.m_rotation.x = FLOAT_80331744;
 				} else {
-					*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_803315d0;
+					worldObj->m_transform.m_rotation.x = FLOAT_803315d0;
 				}
 
 				Mtx rxMtx, ryMtx;
-				PSMTXScale(scaleMtx, *reinterpret_cast<float*>(puVar20 + 0xD), *reinterpret_cast<float*>(puVar20 + 0xE), *reinterpret_cast<float*>(puVar20 + 0xF));
-				PSMTXRotRad(rxMtx, 'x', *reinterpret_cast<float*>(puVar20 + 0xA));
-				PSMTXRotRad(ryMtx, 'y', *reinterpret_cast<float*>(puVar20 + 0xB));
+				PSMTXScale(scaleMtx, worldObj->m_transform.m_scale.x, worldObj->m_transform.m_scale.y, worldObj->m_transform.m_scale.z);
+				PSMTXRotRad(rxMtx, 'x', worldObj->m_transform.m_rotation.x);
+				PSMTXRotRad(ryMtx, 'y', worldObj->m_transform.m_rotation.y);
 				PSMTXConcat(rxMtx, ryMtx, rxMtx);
-				rxMtx[0][3] = *reinterpret_cast<float*>(puVar20 + 7);
-				rxMtx[1][3] = *reinterpret_cast<float*>(puVar20 + 8);
-				rxMtx[2][3] = *reinterpret_cast<float*>(puVar20 + 9);
+				rxMtx[0][3] = worldObj->m_transform.m_position.x;
+				rxMtx[1][3] = worldObj->m_transform.m_position.y;
+				rxMtx[2][3] = worldObj->m_transform.m_position.z;
 				PSMTXConcat(rxMtx, scaleMtx, scaleMtx);
 
-#define mdl (*reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + slot8 * 4) + 0x168))
-				mdl->SetMatrix(scaleMtx);
-				mdl->CalcMatrix();
-				mdl->CalcSkin();
-#undef mdl
+				m_wm.m_handles[slot8]->m_model->SetMatrix(scaleMtx);
+				m_wm.m_handles[slot8]->m_model->CalcMatrix();
+				m_wm.m_handles[slot8]->m_model->CalcSkin();
 
-				puVar20[1] = puVar20[1] + 1;
-				if (static_cast<double>(static_cast<float>(puVar20[1])) >=
+				worldObj->m_frameCounter = worldObj->m_frameCounter + 1;
+				if (static_cast<double>(static_cast<float>(worldObj->m_frameCounter)) >=
 				    DOUBLE_803314A8 * static_cast<double>(yTbl->keys[s_WoodTrns.keyCount * 4 - 4])) {
-					puVar20[1] = 0;
+					worldObj->m_frameCounter = 0;
 				}
 				slotIdx++;
 			}
 		}
 	}
 #undef BUB
-#undef WOBJ
 }
-
-#pragma optimize_for_size off
 
 /*
  * --INFO--
@@ -6266,11 +6178,9 @@ void CMenuPcs::DrawFukidashi()
 	// 3D viewport rendering
 	int viewportSetup = 0;
 	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
-		int viewOff = 0x1E0;
-		int effOff = 0x1ED8;
 		for (int slot = 6; slot <= 0x10; slot++) {
-			int* piVar10 = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + viewOff);
-			if (*piVar10 != 0) {
+			WmWorldObjInfo* view = &m_wm.m_worldObjData[slot];
+			if (view->m_active != 0) {
 				if (viewportSetup == 0) {
 					SetProjection(slot);
 					viewportSetup = 1;
@@ -6278,16 +6188,14 @@ void CMenuPcs::DrawFukidashi()
 				SetLight(0);
 				m_wm.m_handles[slot]->Draw(5);
 				if (slot != 6) {
-					int* effData = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + effOff);
-					int a = effData[0];
-					int b = effData[2];
+					EffectInfo* effect = &m_effectWork[slot];
+					int a = effect->m_effectNo;
+					int b = effect->m_slotNo;
 					if (a >= 0 && b >= 0) {
 						PartPcs.DrawMenu(a);
 					}
 				}
 			}
-			viewOff += 0x50;
-			effOff += 0x524;
 		}
 	}
 
@@ -6975,7 +6883,7 @@ inline void CMenuPcs::DrawMainMenuBase(float baseAlpha)
 inline void CMenuPcs::CalcCharaBase()
 {
 	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const worldObj = m_wm.m_worldObjData;
+	WmWorldObjInfo* const worldObj = m_wm.m_worldObjData;
 	if (worldState == 0 || worldObj == 0) {
 		return;
 	}
@@ -6983,15 +6891,15 @@ inline void CMenuPcs::CalcCharaBase()
 	const short state = worldState->m_mainState;
 	for (int row = 0; row < 2; row++) {
 		for (int col = 0; col < 4; col++) {
-			unsigned char* const slot = worldObj + 0x1E0 + (row * 4 + col) * 0x50;
-			*reinterpret_cast<unsigned int*>(slot + 0x00) = (state > 0 && state < 4) ? 1u : 0u;
-			*reinterpret_cast<short*>(slot + 0x08) = static_cast<short>(0x1C + col * 0x90);
-			*reinterpret_cast<short*>(slot + 0x0A) = static_cast<short>((row == 0 ? 0x22 : 0xCA) + (row != 0 ? 8 : 0));
-			*reinterpret_cast<unsigned short*>(slot + 0x0C) = 0x140;
-			*reinterpret_cast<unsigned short*>(slot + 0x0E) = 0xE0;
-			*reinterpret_cast<float*>(slot + 0x10) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(slot + 0x14) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(slot + 0x18) = FLOAT_80331598;
+			WmWorldObjInfo* const slot = &worldObj[6 + row * 4 + col];
+			slot->m_active = (state > 0 && state < 4) ? 1u : 0u;
+			slot->m_viewportX = static_cast<short>(0x1C + col * 0x90);
+			slot->m_viewportY = static_cast<short>((row == 0 ? 0x22 : 0xCA) + (row != 0 ? 8 : 0));
+			slot->m_viewportWidth = 0x140;
+			slot->m_viewportHeight = 0xE0;
+			slot->m_cameraPosition.x = FLOAT_803313dc;
+			slot->m_cameraPosition.y = FLOAT_803313dc;
+			slot->m_cameraPosition.z = FLOAT_80331598;
 		}
 	}
 }
@@ -7061,7 +6969,7 @@ void CMenuPcs::DrawCharaBase()
  */
 void CMenuPcs::CalcChara()
 {
-	int* charaWork = reinterpret_cast<int*>(m_wm.m_worldObjData + 0xA00);
+	WmWorldObjInfo* charaWork = &m_wm.m_worldObjData[32];
 	unsigned int selectedMask = 0;
 
 	for (int i = 0; i < kWmMenuControllerCount; i++) {
@@ -7110,72 +7018,72 @@ void CMenuPcs::CalcChara()
 		}
 	}
 
-	for (int i = 0; i < kWmMenuPlayerCount; i++, charaWork += 0x14) {
+	for (int i = 0; i < kWmMenuPlayerCount; i++, charaWork++) {
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
 		if (!handle->IsModelLoaded(1)) {
-			charaWork[0] = 0;
+			charaWork->m_active = 0;
 			continue;
 		}
 
 		WmCharaModelInfo* const modelData = &m_wm.m_charaModelData[i];
 		if (modelData->m_modelChanged == 1) {
-			reinterpret_cast<float*>(charaWork)[0x0B] = FLOAT_80331664;
+			charaWork->m_transform.m_rotation.y = FLOAT_80331664;
 			SetAnim(i);
 			modelData->m_modelChanged = 0;
 		}
 
-		charaWork[0] = 1;
+		charaWork->m_active = 1;
 		CCharaPcs::CHandle* const charaHandle = GetWmCharaHandles(this)[i];
 		if (charaHandle->m_charaKind == 3) {
 			if ((selectedMask & (1u << i)) != 0) {
 				const float zero = FLOAT_803313dc;
 				float normalX = FLOAT_803316A4;
-				reinterpret_cast<float*>(charaWork)[7] = zero;
+				charaWork->m_transform.m_position.x = zero;
 				const float scale = FLOAT_803316A8;
-				reinterpret_cast<float*>(charaWork)[8] = normalX;
+				charaWork->m_transform.m_position.y = normalX;
 				normalX = FLOAT_803316AC;
-				reinterpret_cast<float*>(charaWork)[9] = zero;
-				reinterpret_cast<float*>(charaWork)[0x0D] = scale;
-				reinterpret_cast<float*>(charaWork)[0x0E] = scale;
-				reinterpret_cast<float*>(charaWork)[0x0F] = scale;
-				reinterpret_cast<float*>(charaWork)[10] = normalX;
-				reinterpret_cast<float*>(charaWork)[0x0B] = zero;
+				charaWork->m_transform.m_position.z = zero;
+				charaWork->m_transform.m_scale.x = scale;
+				charaWork->m_transform.m_scale.y = scale;
+				charaWork->m_transform.m_scale.z = scale;
+				charaWork->m_transform.m_rotation.x = normalX;
+				charaWork->m_transform.m_rotation.y = zero;
 			} else {
 				const float zero = FLOAT_803313dc;
 				const float scale = FLOAT_803313e8;
-				reinterpret_cast<float*>(charaWork)[7] = zero;
-				reinterpret_cast<float*>(charaWork)[8] = zero;
-				reinterpret_cast<float*>(charaWork)[9] = zero;
-				reinterpret_cast<float*>(charaWork)[0x0D] = scale;
-				reinterpret_cast<float*>(charaWork)[0x0E] = scale;
-				reinterpret_cast<float*>(charaWork)[0x0F] = scale;
-				reinterpret_cast<float*>(charaWork)[10] = zero;
-				reinterpret_cast<float*>(charaWork)[0x0B] = zero;
+				charaWork->m_transform.m_position.x = zero;
+				charaWork->m_transform.m_position.y = zero;
+				charaWork->m_transform.m_position.z = zero;
+				charaWork->m_transform.m_scale.x = scale;
+				charaWork->m_transform.m_scale.y = scale;
+				charaWork->m_transform.m_scale.z = scale;
+				charaWork->m_transform.m_rotation.x = zero;
+				charaWork->m_transform.m_rotation.y = zero;
 			}
 		} else if ((selectedMask & (1u << i)) != 0) {
 			const float zero = FLOAT_803313dc;
 			float normalX = FLOAT_803316B0;
-			reinterpret_cast<float*>(charaWork)[7] = zero;
+			charaWork->m_transform.m_position.x = zero;
 			const float scale = FLOAT_803316B4;
-			reinterpret_cast<float*>(charaWork)[8] = normalX;
+			charaWork->m_transform.m_position.y = normalX;
 			normalX = FLOAT_803316B8;
-			reinterpret_cast<float*>(charaWork)[9] = zero;
-			reinterpret_cast<float*>(charaWork)[0x0D] = scale;
-			reinterpret_cast<float*>(charaWork)[0x0E] = scale;
-			reinterpret_cast<float*>(charaWork)[0x0F] = scale;
-			reinterpret_cast<float*>(charaWork)[10] = normalX;
+			charaWork->m_transform.m_position.z = zero;
+			charaWork->m_transform.m_scale.x = scale;
+			charaWork->m_transform.m_scale.y = scale;
+			charaWork->m_transform.m_scale.z = scale;
+			charaWork->m_transform.m_rotation.x = normalX;
 		} else {
 			const float zero = FLOAT_803313dc;
 			float normalX = FLOAT_803316BC;
-			reinterpret_cast<float*>(charaWork)[7] = zero;
+			charaWork->m_transform.m_position.x = zero;
 			const float scale = FLOAT_80331434;
-			reinterpret_cast<float*>(charaWork)[8] = normalX;
+			charaWork->m_transform.m_position.y = normalX;
 			normalX = FLOAT_803315d0;
-			reinterpret_cast<float*>(charaWork)[9] = zero;
-			reinterpret_cast<float*>(charaWork)[0x0D] = scale;
-			reinterpret_cast<float*>(charaWork)[0x0E] = scale;
-			reinterpret_cast<float*>(charaWork)[0x0F] = scale;
-			reinterpret_cast<float*>(charaWork)[10] = normalX;
+			charaWork->m_transform.m_position.z = zero;
+			charaWork->m_transform.m_scale.x = scale;
+			charaWork->m_transform.m_scale.y = scale;
+			charaWork->m_transform.m_scale.z = scale;
+			charaWork->m_transform.m_rotation.x = normalX;
 		}
 
 		WmWorldState* const ws = m_wmWorldState;
@@ -7196,14 +7104,14 @@ void CMenuPcs::CalcChara()
 		Mtx scaleMtx;
 		Mtx rotXMtx;
 		Mtx rotYMtx;
-		PSMTXScale(scaleMtx, reinterpret_cast<float*>(charaWork)[0x0D], reinterpret_cast<float*>(charaWork)[0x0E],
-		           reinterpret_cast<float*>(charaWork)[0x0F]);
-		PSMTXRotRad(rotXMtx, 'x', reinterpret_cast<float*>(charaWork)[10]);
-		PSMTXRotRad(rotYMtx, 'y', reinterpret_cast<float*>(charaWork)[0x0B]);
+		PSMTXScale(scaleMtx, charaWork->m_transform.m_scale.x, charaWork->m_transform.m_scale.y,
+		           charaWork->m_transform.m_scale.z);
+		PSMTXRotRad(rotXMtx, 'x', charaWork->m_transform.m_rotation.x);
+		PSMTXRotRad(rotYMtx, 'y', charaWork->m_transform.m_rotation.y);
 		PSMTXConcat(rotXMtx, rotYMtx, rotXMtx);
-		rotXMtx[0][3] = reinterpret_cast<float*>(charaWork)[7];
-		rotXMtx[1][3] = reinterpret_cast<float*>(charaWork)[8];
-		rotXMtx[2][3] = reinterpret_cast<float*>(charaWork)[9];
+		rotXMtx[0][3] = charaWork->m_transform.m_position.x;
+		rotXMtx[1][3] = charaWork->m_transform.m_position.y;
+		rotXMtx[2][3] = charaWork->m_transform.m_position.z;
 		PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 		GetWmCharaHandles(this)[i]->m_model->SetMatrix(scaleMtx);
 		GetWmCharaHandles(this)[i]->m_model->CalcMatrix();
@@ -7339,8 +7247,8 @@ void CMenuPcs::DrawChara()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		unsigned char* const view = m_wm.m_worldObjData + (0xA00 + i * 0x50);
-		if (*reinterpret_cast<int*>(view) == 0) {
+		WmWorldObjInfo* const view = &m_wm.m_worldObjData[32 + i];
+		if (view->m_active == 0) {
 			continue;
 		}
 
@@ -8464,11 +8372,11 @@ void CMenuPcs::WMChgMenu()
 	case 3: {
 			double dVar16b = (double)FLOAT_80331664;
 			int iVar12 = 0;
-			int iVar13 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0xA00;
+			WmWorldObjInfo* worldObj = &m_wm.m_worldObjData[32];
 			do {
 				const int handleIdx = iVar12 + 0x20;
 				m_wm.m_charaModelData[iVar12].m_modelChanged = 1;
-				*reinterpret_cast<float*>(iVar13 + 0x2C) = (float)dVar16b;
+				worldObj->m_transform.m_rotation.y = (float)dVar16b;
 				WmCharaSelectEntry* const selectData = &m_wm.m_charaSelectData[iVar12];
 				selectData->m_displaySlot = selectData->m_currentSlot;
 				if (m_wm.m_handles[handleIdx]->IsModelLoaded(1)) {
@@ -8479,7 +8387,7 @@ void CMenuPcs::WMChgMenu()
 					m_wm.m_handles[handleIdx]->m_model->CalcSkin();
 				}
 				iVar12 = iVar12 + 1;
-				iVar13 = iVar13 + 0x50;
+				worldObj++;
 			} while (iVar12 < 8);
 
 			iVar8 = 0;
@@ -8939,7 +8847,7 @@ void CMenuPcs::CalcMainMenuSub()
 			}
 		}
 
-		unsigned char* const worldObj = m_wm.m_worldObjData;
+		WmWorldObjInfo* const worldObj = m_wm.m_worldObjData;
 		Mtx baseMtx;
 		Mtx workMtx;
 		Mtx modelMtx;
@@ -8984,27 +8892,27 @@ void CMenuPcs::CalcMainMenuSub()
 				continue;
 			}
 
-			unsigned char* const panel = worldObj + i * 0x50;
-			*reinterpret_cast<int*>(panel) = 1;
+			WmWorldObjInfo* const panel = &worldObj[i];
+			panel->m_active = 1;
 			int frame = 0;
 			float modelScale = FLOAT_803315d4;
 			if (i == 0) {
 				modelScale = static_cast<float>(static_cast<double>(modelScale) * DOUBLE_803315D8);
 			}
 
-			*reinterpret_cast<float*>(panel + 0x34) = modelScale;
+			panel->m_transform.m_scale.x = modelScale;
 			float zero = FLOAT_803313dc;
-			*reinterpret_cast<float*>(panel + 0x38) = modelScale;
-			*reinterpret_cast<float*>(panel + 0x3C) = modelScale;
-			*reinterpret_cast<float*>(panel + 0x1C) = zero;
-			*reinterpret_cast<float*>(panel + 0x20) = zero;
-			*reinterpret_cast<float*>(panel + 0x24) = FLOAT_803315E0;
-			*reinterpret_cast<float*>(panel + 0x28) = zero;
-			*reinterpret_cast<float*>(panel + 0x2C) = FLOAT_803315E4 * static_cast<float>(i);
-			*reinterpret_cast<float*>(panel + 0x30) = zero;
+			panel->m_transform.m_scale.y = modelScale;
+			panel->m_transform.m_scale.z = modelScale;
+			panel->m_transform.m_position.x = zero;
+			panel->m_transform.m_position.y = zero;
+			panel->m_transform.m_position.z = FLOAT_803315E0;
+			panel->m_transform.m_rotation.x = zero;
+			panel->m_transform.m_rotation.y = FLOAT_803315E4 * static_cast<float>(i);
+			panel->m_transform.m_rotation.z = zero;
 
-			PSMTXRotRad(workMtx, 'y', FLOAT_803314bc * *reinterpret_cast<float*>(panel + 0x2C));
-			PSMTXMultVecSR(workMtx, reinterpret_cast<Vec*>(panel + 0x1C), &modelPos);
+			PSMTXRotRad(workMtx, 'y', FLOAT_803314bc * panel->m_transform.m_rotation.y);
+			PSMTXMultVecSR(workMtx, &panel->m_transform.m_position, &modelPos);
 			PSMTXTransApply(workMtx, modelMtx, modelPos.x, modelPos.y, modelPos.z);
 			PSMTXConcat(baseMtx, modelMtx, workMtx);
 			{
@@ -9059,8 +8967,8 @@ void CMenuPcs::CalcMainMenuSub()
 			s_MMenuPos[i].y = static_cast<float>(static_cast<double>(modelPos.y) + DOUBLE_80331418);
 			s_MMenuPos[i].z = modelPos.z;
 			PSMTXTransApply(modelMtx, workMtx, FLOAT_803313dc, FLOAT_803313dc, modelPos.z);
-			PSMTXScaleApply(workMtx, modelMtx, *reinterpret_cast<float*>(panel + 0x34),
-			                *reinterpret_cast<float*>(panel + 0x38), *reinterpret_cast<float*>(panel + 0x3C));
+			PSMTXScaleApply(workMtx, modelMtx, panel->m_transform.m_scale.x,
+			                panel->m_transform.m_scale.y, panel->m_transform.m_scale.z);
 			if (i == 0) {
 				PSMTXTransApply(modelMtx, modelMtx, FLOAT_80331618, FLOAT_8033161C, FLOAT_803313dc);
 			} else if (i == 1) {
@@ -9160,8 +9068,6 @@ inline void CMenuPcs::ChkSelectParty()
  */
 void CMenuPcs::DrawMainMenuSub()
 {
-	int worldObj = reinterpret_cast<int>(m_wm.m_worldObjData);
-
 	Mtx modelMtx;
 	Mtx44 screenMtx;
 	GXColor white;
@@ -9179,7 +9085,6 @@ void CMenuPcs::DrawMainMenuSub()
 	const float subX = FLOAT_803315B0;
 	const float subY = FLOAT_803315B4;
 	const float zero = FLOAT_803313dc;
-	int viewOff = 0;
 	for (int i = 0; i < 5; i++) {
 		Vec viewPos;
 		Vec4d clipPos;
@@ -9195,26 +9100,22 @@ void CMenuPcs::DrawMainMenuSub()
 		double negY = -static_cast<double>(clipPos.y);
 		clipPos.x = static_cast<float>(scaleX * (one + static_cast<double>(clipPos.x)));
 		clipPos.y = static_cast<float>(scaleY * (one + negY));
-		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 8) =
+		m_wm.m_worldObjData[i].m_viewportX =
 		    static_cast<short>(static_cast<int>(clipPos.x - subX));
-		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0xA) =
+		m_wm.m_worldObjData[i].m_viewportY =
 		    static_cast<short>(static_cast<int>(clipPos.y - subY));
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0xC) = 0x280;
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0xE) = 0x1C0;
-		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0x10) = zero;
-		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0x14) = zero;
-		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0x18) = zSub;
-		viewOff += 0x50;
+		m_wm.m_worldObjData[i].m_viewportWidth = 0x280;
+		m_wm.m_worldObjData[i].m_viewportHeight = 0x1C0;
+		m_wm.m_worldObjData[i].m_cameraPosition.x = zero;
+		m_wm.m_worldObjData[i].m_cameraPosition.y = zero;
+		m_wm.m_worldObjData[i].m_cameraPosition.z = zSub;
 	}
 
 	float* depthPtr = depthValues;
 	unsigned int* orderPtr = drawOrder;
-	unsigned char* handlePtr = reinterpret_cast<unsigned char*>(this);
 	for (unsigned int i = 0; static_cast<int>(i) < 5; i++) {
-		PSMTXCopy(reinterpret_cast<MtxPtr>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(handlePtr + 0x774) + 0x168) + 8),
-		          modelMtx);
+		PSMTXCopy(m_wm.m_handles[i]->m_model->m_matrix, modelMtx);
 		*orderPtr = i;
-		handlePtr += 4;
 		orderPtr++;
 		*depthPtr = modelMtx[2][3];
 		depthPtr++;
@@ -9250,67 +9151,23 @@ void CMenuPcs::DrawMainMenuSub()
 	white.b = 0xFF;
 	white.a = 0xFF;
 	for (int orderIndex = 0; orderIndex < 5; orderIndex++) {
-		short state = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wmWorldState) + 0x10);
+		short state = m_wmWorldState->m_mainState;
 		if (state < 1 || state > 3) {
-			if (*reinterpret_cast<short*>(reinterpret_cast<int>(m_wmWorldState) + 0x26) != 1 || orderIndex != 1) {
+			if (m_wmWorldState->m_cardChannel != 1 || orderIndex != 1) {
 				continue;
 			}
 			drawOrder[orderIndex] = 1;
 		}
 
-		int view = reinterpret_cast<int>(m_wm.m_worldObjData) + drawOrder[orderIndex] * 0x50;
-		Mtx lookAtMtx0;
-		Mtx44 projectionMtx0;
-		C_MTXPerspective(projectionMtx0, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
-		GXSetProjection(projectionMtx0, GX_PERSPECTIVE);
-		PSMTX44Copy(projectionMtx0, CameraPcs.m_screenMatrix);
-		C_MTXLookAt(lookAtMtx0, reinterpret_cast<Point3d*>(view + 0x10),
-		            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
-		            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
-		PSMTXCopy(lookAtMtx0, CameraPcs.m_cameraMatrix);
-		CharaPcs.InitEnv(5);
-		GXSetColorUpdate(0);
-		GXSetAlphaUpdate(0);
-		GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
-		GXSetColorUpdate(1);
-		GXSetAlphaUpdate(1);
-		GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)), static_cast<float>(*reinterpret_cast<short*>(view + 0xA)),
-		              static_cast<float>(*reinterpret_cast<short*>(view + 0xC)), static_cast<float>(*reinterpret_cast<short*>(view + 0xE)),
-		              FLOAT_803313dc, FLOAT_803313e8);
-		GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40), *reinterpret_cast<unsigned int*>(view + 0x44),
-		             *reinterpret_cast<unsigned int*>(view + 0x48), *reinterpret_cast<unsigned int*>(view + 0x4C));
+		SetProjection(drawOrder[orderIndex]);
 		SetLight(0);
-		reinterpret_cast<CCharaPcs::CHandle*>(
-		    *reinterpret_cast<int*>(reinterpret_cast<int>(this) + drawOrder[orderIndex] * 4 + 0x774))
-		    ->Draw(5);
+		m_wm.m_handles[drawOrder[orderIndex]]->Draw(5);
 		DrawInit();
 
 		GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
-		view = reinterpret_cast<int>(m_wm.m_worldObjData) + drawOrder[orderIndex] * 0x50;
-		Mtx lookAtMtx1;
-		Mtx44 projectionMtx1;
-		C_MTXPerspective(projectionMtx1, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
-		GXSetProjection(projectionMtx1, GX_PERSPECTIVE);
-		PSMTX44Copy(projectionMtx1, CameraPcs.m_screenMatrix);
-		C_MTXLookAt(lookAtMtx1, reinterpret_cast<Point3d*>(view + 0x10),
-		            CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
-		            CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
-		PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
-		PSMTXCopy(lookAtMtx1, CameraPcs.m_cameraMatrix);
-		CharaPcs.InitEnv(5);
-		GXSetColorUpdate(0);
-		GXSetAlphaUpdate(0);
-		GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
-		GXSetColorUpdate(1);
-		GXSetAlphaUpdate(1);
-		GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)), static_cast<float>(*reinterpret_cast<short*>(view + 0xA)),
-		              static_cast<float>(*reinterpret_cast<short*>(view + 0xC)), static_cast<float>(*reinterpret_cast<short*>(view + 0xE)),
-		              FLOAT_803313dc, FLOAT_803313e8);
-		GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40), *reinterpret_cast<unsigned int*>(view + 0x44),
-		             *reinterpret_cast<unsigned int*>(view + 0x48), *reinterpret_cast<unsigned int*>(view + 0x4C));
+		SetProjection(drawOrder[orderIndex]);
 
-		if (*reinterpret_cast<short*>(reinterpret_cast<int>(m_wmWorldState) + 0x10) == 2) {
+		if (m_wmWorldState->m_mainState == 2) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);
@@ -10106,7 +9963,7 @@ void CMenuPcs::CalcMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const charaBase = bytes + 0x44;
-	unsigned char* const worldObj = m_wm.m_worldObjData;
+	WmWorldObjInfo* const worldObj = m_wm.m_worldObjData;
 
 	const float* pPanelF = &FLOAT_80331480;
 	const float panelStateFloat = *pPanelF;
@@ -10120,30 +9977,30 @@ void CMenuPcs::CalcMcObj()
 	const double* p25 = &DOUBLE_803314A8;
 
 	int i;
-	unsigned int* panelState = reinterpret_cast<unsigned int*>(worldObj + 0x550);
-	for (i = 0; i < 4; i++, panelState = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(panelState) + 0x50)) {
-		*reinterpret_cast<short*>(panelState + 2) = static_cast<short>(panelStateFloat);
+	WmWorldObjInfo* panelState = &worldObj[17];
+	for (i = 0; i < 4; i++, panelState++) {
+		panelState->m_viewportX = static_cast<short>(panelStateFloat);
 
 		const int y = static_cast<int>(
 		    static_cast<float>(*pY48 + (*pY88 * static_cast<double>(i) + *pY24)) -
 		    *pY112);
-		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(panelState) + 0xA) = static_cast<short>(y);
-		*reinterpret_cast<unsigned short*>(panelState + 3) = 0x140;
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(panelState) + 0xE) = 0xE0;
-		reinterpret_cast<float*>(panelState)[4] = *pZeroP;
-		reinterpret_cast<float*>(panelState)[5] = *pZeroP;
-		reinterpret_cast<float*>(panelState)[6] = *p50;
+		panelState->m_viewportY = static_cast<short>(y);
+		panelState->m_viewportWidth = 0x140;
+		panelState->m_viewportHeight = 0xE0;
+		panelState->m_cameraPosition.x = *pZeroP;
+		panelState->m_cameraPosition.y = *pZeroP;
+		panelState->m_cameraPosition.z = *p50;
 
 		unsigned char* const charaState = m_wmCharaState + i * 0x48;
 		CMenuPcs::FCV* const yTbl = &s_WoodTrns;
-		panelState[1]++;
-		if (static_cast<float>(static_cast<int>(panelState[1])) >=
+		panelState->m_frameCounter++;
+		if (static_cast<float>(static_cast<int>(panelState->m_frameCounter)) >=
 		    *p25 * static_cast<double>(yTbl->keys[s_WoodTrns.keyCount * 4 - 4])) {
-			panelState[1] = 0;
+			panelState->m_frameCounter = 0;
 		}
 
 		if (*reinterpret_cast<int*>(charaState + 8) <= 0) {
-			panelState[0] = 0;
+			panelState->m_active = 0;
 		} else {
 			Mtx scaleMtx;
 			Mtx rotXMtx;
@@ -10155,34 +10012,34 @@ void CMenuPcs::CalcMcObj()
 			const float* pHalfB = &FLOAT_80331434;
 			const float* pB8 = &FLOAT_803314B8;
 			const float* pBC = &FLOAT_803314bc;
-			panelState[0] = 1;
-			reinterpret_cast<float*>(panelState)[7] = *pB0;
-			reinterpret_cast<float*>(panelState)[8] = *pB4;
-			reinterpret_cast<float*>(panelState)[9] = *pZeroB;
-			reinterpret_cast<float*>(panelState)[0xD] = *pHalfB;
-			reinterpret_cast<float*>(panelState)[0xE] = *pHalfB;
-			reinterpret_cast<float*>(panelState)[0xF] = *pHalfB;
-			reinterpret_cast<float*>(panelState)[10] = *pB8;
-			reinterpret_cast<float*>(panelState)[0xB] = reinterpret_cast<float*>(panelState)[0xB] + *pBC;
+			panelState->m_active = 1;
+			panelState->m_transform.m_position.x = *pB0;
+			panelState->m_transform.m_position.y = *pB4;
+			panelState->m_transform.m_position.z = *pZeroB;
+			panelState->m_transform.m_scale.x = *pHalfB;
+			panelState->m_transform.m_scale.y = *pHalfB;
+			panelState->m_transform.m_scale.z = *pHalfB;
+			panelState->m_transform.m_rotation.x = *pB8;
+			panelState->m_transform.m_rotation.y = panelState->m_transform.m_rotation.y + *pBC;
 
-			reinterpret_cast<float*>(panelState)[8] =
-			    reinterpret_cast<float*>(panelState)[8] +
+			panelState->m_transform.m_position.y =
+			    panelState->m_transform.m_position.y +
 			    static_cast<float>(GetFcvValue(s_WoodTrns,
-			                                   static_cast<float>(static_cast<int>(panelState[1]))));
+			                                   static_cast<float>(static_cast<int>(panelState->m_frameCounter))));
 
 			const float rotVal =
 			    static_cast<float>(GetFcvValue(s_WoodRot,
-			                                   static_cast<float>(static_cast<int>(panelState[1]))));
+			                                   static_cast<float>(static_cast<int>(panelState->m_frameCounter))));
 			const float* pBC2 = &FLOAT_803314bc;
-			reinterpret_cast<float*>(panelState)[0xB] = *pBC2 * rotVal;
-			PSMTXScale(scaleMtx, reinterpret_cast<float*>(panelState)[0xD], reinterpret_cast<float*>(panelState)[0xE],
-			           reinterpret_cast<float*>(panelState)[0xF]);
-			PSMTXRotRad(rotXMtx, 'x', reinterpret_cast<float*>(panelState)[10]);
-			PSMTXRotRad(rotYMtx, 'y', reinterpret_cast<float*>(panelState)[0xB]);
+			panelState->m_transform.m_rotation.y = *pBC2 * rotVal;
+			PSMTXScale(scaleMtx, panelState->m_transform.m_scale.x, panelState->m_transform.m_scale.y,
+			           panelState->m_transform.m_scale.z);
+			PSMTXRotRad(rotXMtx, 'x', panelState->m_transform.m_rotation.x);
+			PSMTXRotRad(rotYMtx, 'y', panelState->m_transform.m_rotation.y);
 			PSMTXConcat(rotXMtx, rotYMtx, rotXMtx);
-			rotXMtx[0][3] = reinterpret_cast<float*>(panelState)[7];
-			rotXMtx[1][3] = reinterpret_cast<float*>(panelState)[8];
-			rotXMtx[2][3] = reinterpret_cast<float*>(panelState)[9];
+			rotXMtx[0][3] = panelState->m_transform.m_position.x;
+			rotXMtx[1][3] = panelState->m_transform.m_position.y;
+			rotXMtx[2][3] = panelState->m_transform.m_position.z;
 			PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
 			reinterpret_cast<CChara::CModel*>(
@@ -10210,7 +10067,7 @@ void CMenuPcs::CalcMcObj()
 inline void CMenuPcs::DrawMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = m_wm.m_worldObjData;
+	WmWorldObjInfo* const worldObj = m_wm.m_worldObjData;
 	WmWorldState* const worldState = m_wmWorldState;
 	float alpha = FLOAT_803313e8;
 
@@ -10232,8 +10089,8 @@ inline void CMenuPcs::DrawMcObj()
 	if (worldObj != 0 && worldState != 0 && worldState->m_subState != 0) {
 		const GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
 		for (int i = 0; i < 4; i++) {
-			unsigned char* const panel = worldObj + 0x550 + i * 0x50;
-			if (*reinterpret_cast<unsigned int*>(panel) == 0) {
+			WmWorldObjInfo* const panel = &worldObj[17 + i];
+			if (panel->m_active == 0) {
 				continue;
 			}
 
@@ -10241,7 +10098,7 @@ inline void CMenuPcs::DrawMcObj()
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x24));
-			DrawRect3d(0xFFFFFFFF, FLOAT_803313dc, FLOAT_803313dc, *reinterpret_cast<float*>(panel + 0x1C), FLOAT_80331554,
+			DrawRect3d(0xFFFFFFFF, FLOAT_803313dc, FLOAT_803313dc, panel->m_transform.m_position.x, FLOAT_80331554,
 			           FLOAT_80331554, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 		}
 		RestoreProjection();

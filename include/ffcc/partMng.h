@@ -436,7 +436,6 @@ void pppEditGetViewMatrix(float (*)[4]);
 void pppEditGetProjectionMatrix(float (*)[4]);
 void pppEditSetProjection2D();
 void pppSetProjection();
-void CheckSum(char*, unsigned long, unsigned long);
 void pppSetFog(unsigned char, unsigned char, unsigned char, unsigned char, float, float);
 
 class CPartMng
@@ -546,7 +545,9 @@ public:
     void pppDeleteAll();
     void pppDestroyAll();
 
-    unsigned char m_unk0[0x10];
+    int m_editProgramCount;             // 0x00
+    int m_editParticleCount;            // 0x04
+    unsigned char m_unk8[8];
     int m_cursorRequest;                // 0x10
     unsigned char m_unk14[4];
     Vec m_editorCursorPosition;          // 0x18
@@ -555,7 +556,7 @@ public:
     int m_editorCursorY;                // 0x2C
     unsigned char m_unk30[0x1C8 - 0x30];
     unsigned char* m_editNodeNameBuffer;  // 0x1C8
-    unsigned int m_editReceiveOffset;   // 0x1CC
+    unsigned char* m_editReceiveCursor; // 0x1CC
     unsigned char m_unk1D0[4];
     void* m_editDataBuffers[0x80];       // 0x1D4
     unsigned char m_unk3D4[4];
@@ -569,7 +570,7 @@ public:
     CParShapeSet* m_shapeSet;          // 0x7F0
     pppModelSt** m_editModelSlots;       // 0x7F4
     pppShapeSt** m_editShapeSlots;       // 0x7F8
-    void* m_editTextTable;              // 0x7FC
+    pppShapeGroupRaw* m_editShapeGroups; // 0x7FC
     unsigned char m_unk800[8];
     unsigned char m_editorFlags[3];     // 0x808
     unsigned char m_unk80B;

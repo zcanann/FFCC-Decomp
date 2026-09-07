@@ -299,26 +299,10 @@ static bool isFrameInterval(int frame, int interval)
 
 static inline bool isGhostPartyTargetMode(CGPartyObj* self)
 {
-	bool result = false;
-	bool cidMatch = false;
-	bool stageOk = false;
-
-	if (Game.m_gameWork.m_menuStageMode != 0) {
-		if (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) {
-			stageOk = true;
-		}
-	}
-	if (stageOk) {
-		if ((__cntlzw(0x6D - (static_cast<unsigned short>(self->GetCID()) & 0x6D)) >> 5 & 0xFF) != 0) {
-			cidMatch = true;
-		}
-	}
-	if (cidMatch) {
-		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(self->m_scriptHandle) + 0x3B4) != 0) {
-			result = true;
-		}
-	}
-	return result;
+	return Game.m_gameWork.m_menuStageMode != 0 &&
+	       Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	       self->IsKindOf(0x6D) &&
+	       reinterpret_cast<CCaravanWork*>(self->m_scriptHandle)->m_joybusCaravanId != 0;
 }
 
 static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
@@ -2674,21 +2658,9 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		rayDir.x = sinf(m_rotTargetY) * FLOAT_80331A98;
 		rayDir.y = FLOAT_80331a78;
 		rayDir.z = cosf(m_rotTargetY) * FLOAT_80331A98;
-		bool bossTarget = false;
-		bool bossStage = bossTarget;
-		bool bossCid = bossTarget;
-		if ((Game.m_gameWork.m_menuStageMode != 0) &&
-		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
-			bossStage = true;
-		}
-		if (bossStage && IsKindOf(0x6D)) {
-			bossCid = true;
-		}
-		if (bossCid && (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0)) {
-			bossTarget = true;
-		}
+
 		float radius;
-		if (bossTarget) {
+		if (isGhostPartyTargetMode(this)) {
 			radius = FLOAT_80331AB0;
 		} else {
 			radius = FLOAT_80331A88;
@@ -2756,17 +2728,16 @@ void CGPartyObj::endTargetParticle()
  * --INFO--
  * PAL Address: 0x8011F574
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013EBC0
+ * EN Size: 96b
  * JP Address: TODO
  * JP Size: TODO
  */
 int CGPartyObj::isDispTarget()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	unsigned char result = 0;
 	if ((m_lastStateId == 2 || m_lastStateId == 6) &&
-	    (*reinterpret_cast<int*>(self + 0x668) != 0)) {
+	    (m_comboState != 0)) {
 		result = 1;
 	}
 
@@ -2777,32 +2748,17 @@ int CGPartyObj::isDispTarget()
  * --INFO--
  * PAL Address: 0x8011F520
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013EC20
+ * EN Size: 100b
  * JP Address: TODO
  * JP Size: TODO
  */
 int CGPartyObj::isRideTarget()
 {
-	PartyObjOverlay& party = PartyData(this);
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	bool hasTarget;
 	unsigned char result = 0;
-	hasTarget = result;
-
-	if (m_lastStateId == 2 || m_lastStateId == 6) {
-		if (*reinterpret_cast<int*>(self + 0x668) != 0) {
-			hasTarget = true;
-		}
+	if (isDispTarget() && m_partyData.flags.flag40) {
+		result = 1;
 	}
-
-	if (hasTarget) {
-		unsigned char flags = party.partyFlags;
-		if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31) != 0) {
-			result = 1;
-		}
-	}
-
 	return result;
 }
 
@@ -2810,8 +2766,8 @@ int CGPartyObj::isRideTarget()
  * --INFO--
  * PAL Address:	8011ead4
  * PAL Size:	2636b
- * EN Address:	TODO
- * EN Size:	TODO
+ * EN Address:	0x8013EC84
+ * EN Size:	2464b
  * JP Address:	TODO
  * JP Size:	TODO
  */
@@ -2949,21 +2905,8 @@ void CGPartyObj::checkTargetParticle()
 		move.z = moveResult.z;
 		int iter = 4;
 		do {
-			bool loopBossStage = false;
-			bool loopBossCid = false;
-			bool loopBossTarget = false;
-			if ((Game.m_gameWork.m_menuStageMode != 0) &&
-			    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
-				loopBossStage = true;
-			}
-			if (loopBossStage && ((__cntlzw(0x6D - (static_cast<unsigned short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0)) {
-				loopBossCid = true;
-			}
-			if (loopBossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {
-				loopBossTarget = true;
-			}
 			float radius;
-			if (loopBossTarget) {
+			if (isGhostPartyTargetMode(this)) {
 				radius = FLOAT_80331AB0;
 			} else {
 				radius = FLOAT_80331A88;
@@ -3120,8 +3063,8 @@ void CGPartyObj::moveCenterTargetParticle()
  * --INFO--
  * PAL Address: 0x8011e32c
  * PAL Size: 1348b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013F7E4
+ * EN Size: 1200b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3188,23 +3131,9 @@ void CGPartyObj::onStatMagic()
 		return;
 	}
 
-	const int magicReady = static_cast<int>(static_cast<unsigned int>(__cntlzw(0x103 - m_itemId)) >> 5);
-	bool ghostTargetActive = false;
-	bool canTargetMagic = false;
-	bool menuStageGhost = false;
-	if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) {
-		menuStageGhost = true;
-	}
-	if (menuStageGhost) {
-		if ((__cntlzw(0x6D - (static_cast<unsigned short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0) {
-			canTargetMagic = true;
-		}
-	}
-	if (canTargetMagic && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
-		ghostTargetActive = true;
-	}
+	const bool magicReady = m_itemId == 0x103;
 
-	if (!ghostTargetActive) {
+	if (!isGhostPartyTargetMode(this)) {
 		unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
 		if ((held & 0x100) == 0) {
 			if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {
@@ -3362,8 +3291,8 @@ void CGPartyObj::commandFinished()
  * --INFO--
  * PAL Address: 0x8011da84
  * PAL Size: 1620b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013FFA4
+ * EN Size: 980b
  * JP Address: TODO
  * JP Size: TODO
  */

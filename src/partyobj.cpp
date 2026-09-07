@@ -2774,10 +2774,9 @@ int CGPartyObj::isRideTarget()
 void CGPartyObj::checkTargetParticle()
 {
 	PartyObjOverlay& party = PartyData(this);
-	unsigned char flags = party.partyFlags;
 
-	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(flags) << 27) & 0xC0000000) >> 31) != 0) {
-		putTargetParticle(static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31, 0);
+	if (party.flags.flag10) {
+		putTargetParticle(party.flags.flag40, 0);
 		party.flags.flag10 = 0;
 	}
 
@@ -2812,15 +2811,8 @@ void CGPartyObj::checkTargetParticle()
 		CGPartyObj* leader = Game.m_partyObjArr[0];
 		if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
 		    leader->m_comboState != 0) {
-			CVector leaderCenter(leader->m_comboCenter);
-			const CVector& selfCenter = CVector(m_comboCenter);
-			CVector subResult;
-			PSVECSubtract((Vec*)&selfCenter, reinterpret_cast<Vec*>(&leaderCenter), reinterpret_cast<Vec*>(&subResult));
-			Vec toLeaderTarget;
-			toLeaderTarget.x = subResult.x;
-			toLeaderTarget.y = subResult.y;
-			toLeaderTarget.z = subResult.z;
-			if (PSVECMag(&toLeaderTarget) > FLOAT_80331A98) {
+			CVector toLeaderTarget = CVector(m_comboCenter) - CVector(leader->m_comboCenter);
+			if (PSVECMag(toLeaderTarget) > FLOAT_80331A98) {
 				input.x = toLeaderTarget.x;
 				input.z = toLeaderTarget.z;
 			}
@@ -2881,28 +2873,14 @@ void CGPartyObj::checkTargetParticle()
 			maxRange = zero + (base + static_cast<float>(vFlag));
 		}
 
-		CVector worldPosV(m_worldPosition);
-		const CVector& targetCenterV = CVector(*targetPos);
-		CVector fromCenterResult;
-		PSVECSubtract((Vec*)&targetCenterV, reinterpret_cast<Vec*>(&worldPosV), reinterpret_cast<Vec*>(&fromCenterResult));
-		Vec fromCenter;
-		fromCenter.x = fromCenterResult.x;
-		fromCenter.y = fromCenterResult.y;
-		fromCenter.z = fromCenterResult.z;
+		CVector fromCenter = CVector(*targetPos) - CVector(m_worldPosition);
 		if (dist > maxRange) {
 			Vec scaled;
-			PSVECScale(&fromCenter, &scaled, maxRange / dist);
+			PSVECScale(fromCenter, &scaled, maxRange / dist);
 			PSVECAdd(&m_worldPosition, &scaled, targetPos);
 		}
 
-		CVector targetCenterV2(*targetPos);
-		const CVector& centerTargetV = CVector(*centerPos);
-		CVector moveResult;
-		PSVECSubtract(reinterpret_cast<Vec*>(&targetCenterV2), (Vec*)&centerTargetV, reinterpret_cast<Vec*>(&moveResult));
-		Vec move;
-		move.x = moveResult.x;
-		move.y = moveResult.y;
-		move.z = moveResult.z;
+		CVector move = CVector(*targetPos) - CVector(*centerPos);
 		int iter = 4;
 		do {
 			float radius;
@@ -2912,21 +2890,14 @@ void CGPartyObj::checkTargetParticle()
 				radius = FLOAT_80331A88;
 			}
 
-			CVector up(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-			const CVector& centerForBottom = CVector(*centerPos);
-			CVector bottomResult;
-			PSVECAdd((Vec*)&centerForBottom, reinterpret_cast<Vec*>(&up), reinterpret_cast<Vec*>(&bottomResult));
-			Vec bottom;
-			bottom.x = bottomResult.x;
-			bottom.y = bottomResult.y;
-			bottom.z = bottomResult.z;
+			CVector bottom = CVector(*centerPos) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
 
 			CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 			hitCylinder.m_bottom = bottom;
 			hitCylinder.m_top = move;
 			hitCylinder.m_radius = radius;
 
-			if (MapMng.CheckHitCylinderNear(&hitCylinder, &move, 0x30) == 0) {
+			if (MapMng.CheckHitCylinderNear(&hitCylinder, move, 0x30) == 0) {
 				break;
 			}
 			if (iter == 1) {
@@ -2934,20 +2905,13 @@ void CGPartyObj::checkTargetParticle()
 				move.y = FLOAT_80331a78;
 				move.z = FLOAT_80331a78;
 			} else {
-				getMapHitObject()->CalcHitSlide(&move, FLOAT_80331A98);
+				getMapHitObject()->CalcHitSlide(move, FLOAT_80331A98);
 			}
 			iter--;
 		} while (iter > 0);
 
-		CVector upFinal(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-		const CVector& centerFinal = CVector(*centerPos);
-		CVector addUpResult;
-		PSVECAdd((Vec*)&centerFinal, reinterpret_cast<Vec*>(&upFinal), reinterpret_cast<Vec*>(&addUpResult));
-		Vec centerPlusUp;
-		centerPlusUp.x = addUpResult.x;
-		centerPlusUp.y = addUpResult.y;
-		centerPlusUp.z = addUpResult.z;
-		PSVECAdd(&centerPlusUp, &move, targetPos);
+		CVector centerPlusUp = CVector(*centerPos) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
+		PSVECAdd(centerPlusUp, move, targetPos);
 
 		const CVector& down = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
@@ -2974,33 +2938,24 @@ void CGPartyObj::checkTargetParticle()
 		party.flags.flag20 = 0;
 	}
 
-	CVector worldPosFinal(m_worldPosition);
-	const CVector& comboCenterFinal = CVector(m_comboCenter);
-	CVector deltaResult;
-	PSVECSubtract((Vec*)&comboCenterFinal, reinterpret_cast<Vec*>(&worldPosFinal), reinterpret_cast<Vec*>(&deltaResult));
-	Vec delta;
-	delta.x = deltaResult.x;
-	delta.y = deltaResult.y;
-	delta.z = deltaResult.z;
-	if (FLOAT_80331a78 < PSVECMag(&delta)) {
+	CVector delta = CVector(m_comboCenter) - CVector(m_worldPosition);
+	if (FLOAT_80331a78 < PSVECMag(delta)) {
 		m_rotTargetY = atan2(delta.x, delta.z);
 	}
 }
 
-#pragma push
-#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8011E870
  * PAL Size: 612b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8013F624
+ * EN Size: 448b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGPartyObj::moveCenterTargetParticle()
 {
-	int step = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x530);
+	int step = m_subFrame;
 
 	if (step >= 5) {
 		return;
@@ -3008,36 +2963,13 @@ void CGPartyObj::moveCenterTargetParticle()
 
 	float wave = static_cast<float>(sin(FLOAT_80331ac8 * ((float)(step + 1) / FLOAT_80331ac4)));
 
-	CVector centerPos(m_comboTarget);
-	const CVector& targetPos = CVector(m_comboCenter);
-	CVector subResult;
-	PSVECSubtract((Vec*)&targetPos, reinterpret_cast<Vec*>(&centerPos), reinterpret_cast<Vec*>(&subResult));
-	Vec toTarget;
-	toTarget.x = subResult.x;
-	toTarget.y = subResult.y;
-	toTarget.z = subResult.z;
-
-	CVector scaleResult;
-	PSVECScale(&toTarget, reinterpret_cast<Vec*>(&scaleResult), wave);
-	Vec movement;
-	movement.x = scaleResult.x;
-	movement.y = scaleResult.y;
-	movement.z = scaleResult.z;
-
-	const CVector& centerPos2 = CVector(m_comboTarget);
-	CVector addResult;
-	PSVECAdd((Vec*)&centerPos2, &movement, reinterpret_cast<Vec*>(&addResult));
-	Vec hitPos;
-	hitPos.x = addResult.x;
-	hitPos.y = addResult.y;
-	hitPos.z = addResult.z;
+	CVector hitPos = CVector(m_comboTarget) + (CVector(m_comboCenter) - CVector(m_comboTarget)) * wave;
 
 	const CVector& moveVec = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 	CVector yOffset(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
 	Vec hitNormal;
 
-	CVector bottomResult;
-	PSVECAdd(&hitPos, reinterpret_cast<Vec*>(&yOffset), reinterpret_cast<Vec*>(&bottomResult));
+	CVector bottomResult = hitPos + yOffset;
 
 	CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 	hitCylinder.m_bottom.x = bottomResult.x;
@@ -3047,7 +2979,7 @@ void CGPartyObj::moveCenterTargetParticle()
 	hitCylinder.m_radius = FLOAT_80331a78;
 
 	if (MapMng.CheckHitCylinderNear(&hitCylinder, (Vec*)&moveVec, 0x30) != 0) {
-		getMapHitObject()->CalcHitPosition(&hitPos);
+		getMapHitObject()->CalcHitPosition(hitPos);
 		getMapHitObject()->GetHitFaceNormal(&hitNormal);
 
 		CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
@@ -3057,7 +2989,6 @@ void CGPartyObj::moveCenterTargetParticle()
 	CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 	work->m_targetCursorPosA = hitPos;
 }
-#pragma pop
 
 /*
  * --INFO--

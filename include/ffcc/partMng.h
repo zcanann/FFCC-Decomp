@@ -430,13 +430,11 @@ struct _pppMngSt
     const Vec& BasePosition() const { return m_basePosition; }
 }; // Size: 0x158
 
-void Screen2world(Vec&, Vec&);
 void pppEditGetViewPos(Vec*);
 void pppEditGetViewMatrix(float (*)[4]);
 void pppEditGetProjectionMatrix(float (*)[4]);
 void pppEditSetProjection2D();
 void pppSetProjection();
-void pppSetFog(unsigned char, unsigned char, unsigned char, unsigned char, float, float);
 
 class CPartMng
 {

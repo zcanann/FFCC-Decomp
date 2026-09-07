@@ -994,12 +994,23 @@ void CPartMng::render3Dcursor()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: 152b
+ * EN Address: 0x80067344
+ * EN Size: 192b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void Screen2world(Vec&, Vec&)
+static inline void Screen2world(Vec& screenPos, Vec& worldPos)
 {
-	// TODO
+    Mtx invCamera;
+    Vec viewPos;
+    float viewZ = ppvScreenMatrix0[2][3] / (screenPos.z + ppvScreenMatrix0[2][2]);
+    viewPos.x = viewZ * (screenPos.x / ppvScreenMatrix0[0][0]);
+    viewPos.y = viewZ * (screenPos.y / ppvScreenMatrix0[1][1]);
+    viewPos.z = -viewZ;
+    PSMTXInverse(ppvCameraMatrix0, invCamera);
+    PSMTXMultVec(invCamera, &viewPos, &worldPos);
 }
 
 /*
@@ -1015,8 +1026,7 @@ void CPartMng::pppGet2Dpos()
 {
     u32 zAtPixel;
     Vec worldPos;
-    Vec viewPos;
-    Mtx invCamera;
+    Vec screenPos;
 
     if (m_cursorRequest != 0) {
         int x = m_editorCursorX + 0x140;
@@ -1025,19 +1035,10 @@ void CPartMng::pppGet2Dpos()
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x2A2);
             GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), &zAtPixel);
 
-            const float* screenHalfHeight = &kPartMngScreenHalfHeight;
-            const float* depthUnit = &kPartMngDepthUnit;
-            const float* screenHalfWidth = &kPartMngScreenHalfWidth;
-            float normY = -(float)m_editorCursorY / *screenHalfHeight / ppvScreenMatrix0[1][1];
-            float viewZ = ppvScreenMatrix0[2][3]
-                          / ((float)((int)zAtPixel - 0xFFFFFF) / *depthUnit + ppvScreenMatrix0[2][2]);
-            float normX = (float)m_editorCursorX / *screenHalfWidth / ppvScreenMatrix0[0][0];
-            viewPos.x = viewZ * normX;
-            viewPos.y = viewZ * normY;
-            viewPos.z = -viewZ;
-
-            PSMTXInverse(ppvCameraMatrix0, invCamera);
-            PSMTXMultVec(invCamera, &viewPos, &worldPos);
+            screenPos.x = (float)m_editorCursorX / kPartMngScreenHalfWidth;
+            screenPos.y = -(float)m_editorCursorY / kPartMngScreenHalfHeight;
+            screenPos.z = (float)((int)zAtPixel - 0xFFFFFF) / kPartMngDepthUnit;
+            Screen2world(screenPos, worldPos);
             USBPcs.SendDataCode(0x60, &worldPos, 1, 0xC);
         }
         m_cursorRequest = 0;
@@ -2013,25 +2014,15 @@ void pppEditSetProjection2D()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppSetFog(unsigned char, unsigned char, unsigned char, unsigned char, float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005bbc0
- * PAL Size: 1648b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: TODO
+ * PAL Size: 208b
+ * EN Address: 0x80069094
+ * EN Size: 308b
  * JP Address: TODO
  * JP Size: TODO
  */
-static void pppEditApplyFog(unsigned char fogEnable, unsigned char fogR, unsigned char fogG, unsigned char fogB,
-                            float fogNear, float fogFar)
+static inline void pppSetFog(unsigned char fogEnable, unsigned char fogR, unsigned char fogG, unsigned char fogB,
+                             float fogNear, float fogFar)
 {
     _GXColor fogColor;
     if (fogEnable != 0) {
@@ -2051,6 +2042,15 @@ static void pppEditApplyFog(unsigned char fogEnable, unsigned char fogR, unsigne
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8005BBC0
+ * PAL Size: 1648b
+ * EN Address: 0x800691C8
+ * EN Size: 1452b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void CPartMng::pppEditBeforeCalc()
 {
     char* self = reinterpret_cast<char*>(this);
@@ -2089,7 +2089,7 @@ void CPartMng::pppEditBeforeCalc()
         unsigned char fogB = *reinterpret_cast<unsigned char*>(self + 0x15f);
         fogG = *reinterpret_cast<unsigned char*>(self + 0x15e);
         unsigned char fogR = *reinterpret_cast<unsigned char*>(self + 0x15d);
-        pppEditApplyFog(fogEnable, fogR, fogG, fogB, fogNear, fogFar);
+        pppSetFog(fogEnable, fogR, fogG, fogB, fogNear, fogFar);
 
         ppvSysGoPartF = 1;
         break;
@@ -2125,7 +2125,7 @@ void CPartMng::pppEditBeforeCalc()
         unsigned char fogB = *reinterpret_cast<unsigned char*>(self + 0x15f);
         fogG = *reinterpret_cast<unsigned char*>(self + 0x15e);
         unsigned char fogR = *reinterpret_cast<unsigned char*>(self + 0x15d);
-        pppEditApplyFog(fogEnable, fogR, fogG, fogB, fogNear, fogFar);
+        pppSetFog(fogEnable, fogR, fogG, fogB, fogNear, fogFar);
 
         ppvSysGoPartF = 1;
         break;
@@ -2600,10 +2600,6 @@ void CPartMng::pppEditDraw()
  */
 void CPartMng::pppEditPartDrawAfter()
 {
-    static const int kPppMngCount = 0x180;
-    static const int kEditDrawModeOffset = 0x23570;
-    static const int kHeapCheckIntervalOffset = 0x16C;
-
     if (ppvSysStopPartF == 0) {
         m_pppEnvSt.m_debugCounter = 0;
         if (*reinterpret_cast<long**>(reinterpret_cast<unsigned char*>(this) + 0x5dc) != 0
@@ -2626,15 +2622,7 @@ void CPartMng::pppEditPartDrawAfter()
         }
     }
 
-    gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(ppvEnv->m_stagePtr);
-    {
-        int prevInterval = gPppHeapUseRateWords[2];
-        gPppHeapUseRateWords[2] = prevInterval - 1;
-        if (prevInterval == 0 || gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1]) {
-            gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
-            gPppHeapUseRateWords[2] = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kHeapCheckIntervalOffset) << 1;
-        }
-    }
+    drawEnd();
 }
 
 /*
@@ -2892,62 +2880,28 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
  */
 void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short nodeIndex)
 {
-    struct PppMngStDrawPdtRaw {
-        void* m_pppResSet;                   // 0x00
-        int m_partIndex;                     // 0x04
-        Vec m_position;                      // 0x08
-        int m_baseTime;                      // 0x14
-        unsigned char m_pad18[0x74 - 0x18]; // 0x18
-        short m_kind;                        // 0x74
-        short m_nodeIndex;                   // 0x76
-        pppFMATRIX m_matrix;                 // 0x78
-        unsigned char m_padA8[0xE4 - 0xA8]; // 0xA8
-        unsigned char m_mode;                // 0xE4
-        unsigned char m_stopRequested;       // 0xE5
-        unsigned char m_isFinished;          // 0xE6
-        unsigned char m_matrixMode;          // 0xE7
-        unsigned char m_endRequested;        // 0xE8
-        unsigned char m_slotVisible;         // 0xE9
-        unsigned char m_ownerFacing;         // 0xEA
-        unsigned char m_drawVariant;         // 0xEB
-        unsigned char m_rotationOrder;       // 0xEC
-        signed char m_drawMode;            // 0xED
-        signed char m_drawSubType;           // 0xEE
-        unsigned char m_useOwnerScaleSign;   // 0xEF
-        unsigned char m_ownerVisible;        // 0xF0
-        unsigned char m_nodeScaleInitialized; // 0xF1
-        unsigned char m_fieldF2;             // 0xF2
-        unsigned char m_padF3[0x108 - 0xF3]; // 0xF3
-        float m_cullRadiusSq;                // 0x108
-        float m_cullRadius;                  // 0x10C
-        float m_cullYOffset;                 // 0x110
-        float m_sortDepth;                   // 0x114
-        unsigned char m_pad118[0x158 - 0x118]; // 0x118
-    };
-
     Mtx invCamera;
     Vec cameraPos;
     Vec cameraDelta;
     Vec partPos;
     Vec viewPos;
-    PppMngStDrawPdtRaw* mng;
-    int remaining;
+    _pppMngSt* mng;
+    int i;
 
     PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    unsigned char* base = reinterpret_cast<unsigned char*>(this);
-    for (remaining = 0x180; remaining != 0; remaining--) {
-        mng = reinterpret_cast<PppMngStDrawPdtRaw*>(base + 0x2A18);
-        if (mng->m_nodeIndex == nodeIndex && mng->m_kind == kind && mng->m_endRequested == 0
-            && mng->m_baseTime != -0x1000 && mng->m_drawMode == drawMode && mng->m_baseTime < 0) {
+    for (i = 0; i < 0x180; i++) {
+        mng = &m_pppMng[i];
+        if (mng->m_nodeIndex == nodeIndex && mng->m_kind == kind && mng->m_hitBgFlag == 0
+            && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass == drawMode && mng->m_baseTime < 0) {
             if (mng->m_slotVisible == 0) {
                 break;
             }
 
-            ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+            ppvMng = mng;
             partPos.x = mng->m_matrix.value[0][3];
             partPos.y = mng->m_matrix.value[1][3];
             partPos.z = mng->m_matrix.value[2][3];
@@ -2963,9 +2917,9 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
                 PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
                 mng->m_sortDepth = viewPos.z;
                 ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-                ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-                pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
-                _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));
+                ppvMng = mng;
+                pppSetFpMatrix(mng);
+                _pppDrawPart(mng);
                 break;
 
             checkCull:
@@ -2990,7 +2944,6 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
                 break;
             }
         }
-        base += 0x158;
     }
     if (drawMode < 8) {
         return;

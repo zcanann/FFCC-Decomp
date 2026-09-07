@@ -677,106 +677,69 @@ static inline void callConProg(_pppPObject* object)
  * --INFO--
  * PAL Address: 0x800566ac
  * PAL Size: 1120b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80062FBC
+ * EN Size: 328b
  * JP Address: TODO
  * JP Size: TODO
  */
 _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 {
-	char denied[0x180];
-	_pppProgSetDef* programSet;
-	char* fmt = const_cast<char*>(s_pppPart_cpp);
-	_pppPObjLink* newObj = 0;
-	int firstFailure = 1;
-	CMemory::CStage* stage;
-	u32 totalSize;
-	int canRetry;
 	_pppPDataVal* dataVal = pppPDataVal;
+	_pppProgSetDef* programSet = dataVal->m_programSetDef;
+	_pppPObject* newObject = (_pppPObject*)pppMemAlloc(
+		programSet->m_workBaseOffset + programSet->m_numStages * sizeof(u32),
+		ppvEnv->m_stagePtr, const_cast<char*>(s_pppPart_cpp), 0x305);
 
-	programSet = dataVal->m_programSetDef;
-	stage = ppvEnv->m_stagePtr;
-	totalSize = programSet->m_workBaseOffset + ((u32)dataVal->m_programSetDef->m_numStages * sizeof(u32));
-	ppvMemAllocErrorF = 0;
-	do
+	if (newObject == 0)
 	{
-		newObj = (_pppPObjLink*)Memory._Alloc(totalSize, stage, fmt, 0x305, 1);
-		if (newObj != 0)
-		{
-			goto allocated;
-		}
-
-		if (firstFailure)
-		{
-			firstFailure = 0;
-			memset(denied, 0, sizeof(denied));
-
-			s32 currentIdx = ppvMng - PartMng.m_pppMng;
-			denied[currentIdx] = 1;
-		}
-
-		canRetry = pppFreeMngStPrioForHeap(denied);
+		return 0;
 	}
-	while (canRetry);
 
-	ppvEnv->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
-	PartMng.pppDumpMngSt();
-	ppvMemAllocErrorF = 1;
+	newObject->m_graphId = 0;
+	newObject->m_drawMatrixPtr = 0;
+	newObject->m_field74 = 0;
+	newObject->m_link.m_owner = pppPDataVal;
+	newObject->m_field7C = 1;
 
-allocated:
+	_pppPObjLink* firstObj = pppMngSt->m_pppPObjLinkHead.m_next;
+	if (firstObj == 0)
 	{
-		_pppPObject* newObject = (_pppPObject*)newObj;
-		if (newObj == 0)
+		dataVal->m_pppPObjLink = &newObject->m_link;
+		pppMngSt->m_pppPObjLinkHead.m_next = &newObject->m_link;
+		newObject->m_link.m_next = 0;
+	}
+	else if (dataVal->m_pppPObjLink != 0)
+	{
+		newObject->m_link.m_next = dataVal->m_pppPObjLink->m_next;
+		dataVal->m_pppPObjLink->m_next = &newObject->m_link;
+	}
+	else
+	{
+		_pppPObjLink* prev = &pppMngSt->m_pppPObjLinkHead;
+		s16 sortKey = programSet->m_sortKey;
+		_pppPObjLink* iter = firstObj;
+		do
 		{
-			return 0;
-		}
-
-		((_pppPObject*)newObj)->m_graphId = 0;
-		((_pppPObject*)newObj)->m_drawMatrixPtr = 0;
-		((_pppPObject*)newObj)->m_field74 = 0;
-		((_pppPObject*)newObj)->m_link.m_owner = pppPDataVal;
-		((_pppPObject*)newObj)->m_field7C = 1;
-
-		_pppPObjLink* firstObj = pppMngSt->m_pppPObjLinkHead.m_next;
-		if (firstObj == 0)
-		{
-			dataVal->m_pppPObjLink = newObj;
-			pppMngSt->m_pppPObjLinkHead.m_next = newObj;
-			newObj->m_next = 0;
-		}
-		else if (dataVal->m_pppPObjLink != 0)
-		{
-			newObj->m_next = dataVal->m_pppPObjLink->m_next;
-			dataVal->m_pppPObjLink->m_next = newObj;
-		}
-		else
-		{
-			_pppPObjLink* prev = &pppMngSt->m_pppPObjLinkHead;
-			s16 sortKey = programSet->m_sortKey;
-			_pppPObjLink* iter = firstObj;
-			do
+			_pppProgSetDef* iterSet = iter->m_owner->m_programSetDef;
+			if (iterSet->m_sortKey >= sortKey)
 			{
-				_pppProgSetDef* iterSet = iter->m_owner->m_programSetDef;
-				if (iterSet->m_sortKey >= sortKey)
-				{
-					dataVal->m_pppPObjLink = &newObject->m_link;
-					prev->m_next = &newObject->m_link;
-					newObject->m_link.m_next = iter;
-					goto done_insert;
-				}
-				prev = iter;
-				iter = iter->m_next;
-			} while (iter != 0);
-			dataVal->m_pppPObjLink = &newObject->m_link;
-			prev->m_next = &newObject->m_link;
-			newObject->m_link.m_next = 0;
-		}
-
-	done_insert:
-		dataVal->m_activeCount++;
-		callConProg(newObject);
-		return newObject;
+				dataVal->m_pppPObjLink = &newObject->m_link;
+				prev->m_next = &newObject->m_link;
+				newObject->m_link.m_next = iter;
+				goto done_insert;
+			}
+			prev = iter;
+			iter = iter->m_next;
+		} while (iter != 0);
+		dataVal->m_pppPObjLink = &newObject->m_link;
+		prev->m_next = &newObject->m_link;
+		newObject->m_link.m_next = 0;
 	}
+
+done_insert:
+	dataVal->m_activeCount++;
+	callConProg(newObject);
+	return newObject;
 }
 
 /*

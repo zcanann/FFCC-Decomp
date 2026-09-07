@@ -427,11 +427,6 @@ static inline unsigned char* GetWmMenuCharaState(CMenuPcs* menu)
 	return menu->m_wmCharaState;
 }
 
-static inline unsigned char* GetWmCharaModelData(CMenuPcs* menu)
-{
-	return menu->m_wm.m_charaModelData;
-}
-
 static inline CCharaPcs::CHandle** GetWmCharaHandles(CMenuPcs* menu)
 {
 	return menu->m_wm.m_handles + 0x20;
@@ -582,10 +577,10 @@ inline void CMenuPcs::ChkNumItemAll()
 	}
 
 	int selected = 0;
-	unsigned char* const modelData = m_wm.m_charaModelData;
+	WmCharaModelInfo* const modelData = m_wm.m_charaModelData;
 	if (modelData != 0) {
 		for (int i = 0; i < kWmMenuPlayerCount; i++) {
-			if (modelData[i * 0x34 + 0xC] != 0) {
+			if (modelData[i].m_modelChanged != 0) {
 				selected++;
 			}
 		}
@@ -780,25 +775,14 @@ void CMenuPcs::loadData()
 	InitFrame0Info();
 
 	m_wm.m_charaModelData =
-	    static_cast<unsigned char*>(operator new[](0x1A0, MenuPcs.m_menuStage, srcFile, 0x237));
+	    new (MenuPcs.m_menuStage, srcFile, 0x237) WmCharaModelInfo[kWmMenuPlayerCount];
 	{
-		const float zeroF = FLOAT_803313dc;
-		const float oneF = FLOAT_803313e8;
-		for (int i = 0, count = 8; count != 0; count--, i += 0x34) {
-			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x00) = 0;
-			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x04) = 0;
-			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x08) = 0;
-			*reinterpret_cast<unsigned char*>(m_wm.m_charaModelData + i + 0x0C) = 0;
-			float* const a = reinterpret_cast<float*>(m_wm.m_charaModelData + i + 0x10);
-			a[2] = zeroF;
-			a[1] = zeroF;
-			a[0] = zeroF;
-			a[5] = zeroF;
-			a[4] = zeroF;
-			a[3] = zeroF;
-			a[8] = oneF;
-			a[7] = oneF;
-			a[6] = oneF;
+		for (int i = 0; i < kWmMenuPlayerCount; i++) {
+			m_wm.m_charaModelData[i].m_unknown00 = 0;
+			m_wm.m_charaModelData[i].m_unknown04 = 0;
+			m_wm.m_charaModelData[i].m_modelNo = 0;
+			m_wm.m_charaModelData[i].m_modelChanged = 0;
+			m_wm.m_charaModelData[i].m_transform.Identity();
 		}
 	}
 
@@ -1235,25 +1219,19 @@ void CMenuPcs::InitCharaInfo()
 
 	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
 	int i = 0;
-	int modelOffset = 0;
-	unsigned int invalidModel = 0xFFFFFFFF;
+	int invalidModel = -1;
 	for (; i < 8; i++) {
 		unsigned char* src0 = gameData + 0x13F0;
-		unsigned char* entry0 = m_wm.m_charaModelData + modelOffset;
+		WmCharaModelInfo* entry0 = &m_wm.m_charaModelData[i];
 		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
-			int modelNo = *reinterpret_cast<unsigned short*>(src0 + 0x3E0) * 200 + 100;
-			int flag0 = *reinterpret_cast<unsigned short*>(src0 + 0x3E2);
-			unsigned short add0  = *reinterpret_cast<unsigned short*>(src0 + 0x3E4);
-			if (flag0 != 0) {
-				modelNo += 100;
-			}
-			*reinterpret_cast<unsigned int*>(entry0 + 8) = modelNo + add0;
+			entry0->m_modelNo = GetModelNo(*reinterpret_cast<unsigned short*>(src0 + 0x3E0),
+			                             *reinterpret_cast<unsigned short*>(src0 + 0x3E4),
+			                             *reinterpret_cast<unsigned short*>(src0 + 0x3E2));
 		} else {
-			*reinterpret_cast<unsigned int*>(entry0 + 8) = invalidModel;
+			entry0->m_modelNo = invalidModel;
 		}
 
 		gameData += 0xC30;
-		modelOffset += 0x34;
 	}
 }
 #pragma opt_propagation on
@@ -1545,14 +1523,9 @@ void CMenuPcs::CalcDiaryMenu()
 	case 3:
 		if (m_singleCmakeMode == 0) {
 			if (m_wmWorldState->m_modelFlagsInitialized == 0) {
-				m_wm.m_charaModelData[0x0C] = 1;
-				m_wm.m_charaModelData[0x40] = 1;
-				m_wm.m_charaModelData[0x74] = 1;
-				m_wm.m_charaModelData[0xA8] = 1;
-				m_wm.m_charaModelData[0xDC] = 1;
-				m_wm.m_charaModelData[0x110] = 1;
-				m_wm.m_charaModelData[0x144] = 1;
-				m_wm.m_charaModelData[0x178] = 1;
+				for (int i = 0; i < kWmMenuPlayerCount; i++) {
+					m_wm.m_charaModelData[i].m_modelChanged = 1;
+				}
 				m_wmWorldState->m_modelFlagsInitialized = 1;
 			}
 			if (m_wmWorldState->m_mainState <= 4) {
@@ -3026,53 +2999,47 @@ void CMenuPcs::CalcLoadMenu()
 						gWmMenuCursorY[0] = (unsigned char)m_mcCtrl.m_cardChannel;
 						gWmMenuCursorY[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 					}
-					iVar10 = 0;
 					int iVar25 = reinterpret_cast<int>(&Game);
 					int iVar23 = 0;
 					iVar14 = 0;
 					int pOff = 0;
 					do {
-						int iVar17 = reinterpret_cast<int>(m_wm.m_charaModelData) + iVar10;
+						WmCharaModelInfo* modelInfo = &m_wm.m_charaModelData[iVar14];
 						if (m_wmWorldState->m_menuMode == 8
 						    && m_cmakeWork != 0) {
 							int iVar6 = reinterpret_cast<int>(m_cmakeWork) + iVar23 + 0x14D0;
 							if (*reinterpret_cast<int*>(iVar6 + 0x5B4) != 0) {
-								unsigned int uVar15b = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x2E);
-								unsigned int uVar11 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x30);
-								unsigned int uVar16 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x32);
-								int cost = uVar15b * 200 + 100;
-								if (uVar11 != 0) cost = uVar15b * 200 + 200;
-								*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
+								unsigned int tribe = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x2E);
+								unsigned int gender = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x30);
+								unsigned int appearance = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x32);
+								modelInfo->m_modelNo = GetModelNo(tribe, appearance, gender);
 							} else {
-								*reinterpret_cast<int*>(iVar17 + 8) = -1;
+								modelInfo->m_modelNo = -1;
 							}
 						} else if (*reinterpret_cast<int*>(iVar25 + 0x1794) != 0) {
-							unsigned int uVar15b = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D0);
-							unsigned int uVar11 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D2);
-							unsigned int uVar16 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D4);
-							int cost = uVar15b * 200 + 100;
-							if (uVar11 != 0) cost = uVar15b * 200 + 200;
-							*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
+							unsigned int tribe = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D0);
+							unsigned int gender = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D2);
+							unsigned int appearance = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D4);
+							modelInfo->m_modelNo = GetModelNo(tribe, appearance, gender);
 						} else {
-							*reinterpret_cast<int*>(iVar17 + 8) = -1;
+							modelInfo->m_modelNo = -1;
 						}
-						iVar17 = reinterpret_cast<int>(m_wm.m_charaModelData) + iVar10;
-						int charaId = *reinterpret_cast<int*>(iVar17 + 8);
+						modelInfo = &m_wm.m_charaModelData[iVar14];
+						int charaId = modelInfo->m_modelNo;
 						int uVar22;
 						if (charaId < 0) {
 							uVar22 = 3;
-							*reinterpret_cast<unsigned char*>(iVar17 + 0xC) = 0;
+							modelInfo->m_modelChanged = 0;
 							charaId = 0x43;
 						} else {
 							uVar22 = 0;
-							*reinterpret_cast<unsigned char*>(iVar17 + 0xC) = 1;
+							modelInfo->m_modelChanged = 1;
 						}
 						GetWmCharaHandles(this)[iVar14]->LoadModelASync(uVar22, charaId, 0);
 						iVar14++;
 						iVar23 += 0x9C0;
 						iVar25 += 0xC30;
 						pOff += 4;
-						iVar10 += 0x34;
 					} while (iVar14 < 8);
 
 					if (m_wmWorldState->m_menuMode != 8) {
@@ -7709,38 +7676,18 @@ void CMenuPcs::CalcChara()
 		}
 	}
 
-	int modelIndex = 0;
-	for (int i = 0; i < kWmMenuPlayerCount; i++, charaWork += 0x14, modelIndex += 0x34) {
+	for (int i = 0; i < kWmMenuPlayerCount; i++, charaWork += 0x14) {
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
 		if (!handle->IsModelLoaded(1)) {
 			charaWork[0] = 0;
 			continue;
 		}
 
-		unsigned char* const modelData = m_wm.m_charaModelData + modelIndex;
-		if (modelData[0x0C] == 1) {
+		WmCharaModelInfo* const modelData = &m_wm.m_charaModelData[i];
+		if (modelData->m_modelChanged == 1) {
 			reinterpret_cast<float*>(charaWork)[0x0B] = FLOAT_80331664;
-			if ((*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_charaKind != 3) {
-				const unsigned int charaBase = static_cast<unsigned int>((*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_charaNo) / 100;
-				const int modelNo = charaBase * 100;
-				int anim = (charaBase - 1) * 6;
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(const_cast<char*>(s_wmCharaAnimStand), anim++, 1, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(const_cast<char*>(s_wmCharaAnimWalk), anim++, 1, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(const_cast<char*>(s_wmCharaAnimRun), anim++, 1, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(const_cast<char*>(s_wmCharaAnimGlad), anim++, 3, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(const_cast<char*>(s_wmCharaAnimSleep), anim++, 1, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->LoadAnim(const_cast<char*>(s_wmCharaAnimAngry), anim, 1, 0, modelNo, -1, 0);
-				GetWmCharaAnimState(this)[i].m_animIndex = 0;
-				GetWmCharaAnimState(this)[i].m_nextAnimIndex = -1;
-				GetWmCharaAnimState(this)[i].m_timer = rand() % 250;
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->SetAnim(anim - 5, -1, -1,
-				    static_cast<int>(static_cast<unsigned int>((*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_currentAnimIndex) >> 31) - 1, 1);
-				GetWmCharaAnimState(this)[i].m_frame =
-				    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>((*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_model) + 0xB4)[0];
-				GetWmCharaAnimState(this)[i].m_endFrame =
-				    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>((*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_model) + 0xC0)[0];
-			}
-			modelData[0x0C] = 0;
+			SetAnim(i);
+			modelData->m_modelChanged = 0;
 		}
 
 		charaWork[0] = 1;
@@ -8260,7 +8207,7 @@ void CMenuPcs::CalcCharaSelect()
 						              static_cast<int>(entry.m_currentSlot));
 					}
 					const int loadSlot =  (s32)(static_cast<int>(entry.m_currentSlot));
-					GetWmCharaModelData(this)[loadSlot * 0x34 + 0x0C] = 0;
+					m_wm.m_charaModelData[loadSlot].m_modelChanged = 0;
 					GetWmCharaHandles(this)[loadSlot]->LoadModelASync(3, 0x43, 0);
 				}
 			} else if (entry.m_cmakePending == 0 && static_cast<int>(Joybus.GetMType(i)) == 1) {
@@ -8281,7 +8228,7 @@ void CMenuPcs::CalcCharaSelect()
 			    Game.m_caravanWorkArr[slot].m_shopState == 0 &&
 			    GetWmCharaHandles(this)[slot]->IsModelLoaded(1) &&
 			    GetWmCharaHandles(this)[slot]->m_charaKind != 3) {
-				GetWmCharaModelData(this)[slot * 0x34 + 0x0C] = 0;
+				m_wm.m_charaModelData[slot].m_modelChanged = 0;
 				GetWmCharaHandles(this)[slot]->LoadModelASync(3, 0x43, 0);
 			}
 		}
@@ -8359,13 +8306,9 @@ void CMenuPcs::CalcCharaSelect()
 
 				const int caravanSlot = static_cast<int>(info.m_channelSlot);
 				const int gender = (info.m_charaType >> 7) != 0;
-				int modelNo = static_cast<int>(info.m_charaType & 3) * 200 + 100;
-				if (gender) {
-					modelNo += 100;
-				}
-				modelNo += (info.m_charaType >> 2) & 3;
+				int modelNo = GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, gender);
 
-				*reinterpret_cast<int*>(GetWmCharaModelData(this) + caravanSlot * 0x34 + 8) = modelNo;
+				m_wm.m_charaModelData[caravanSlot].m_modelNo = modelNo;
 
 				CCaravanWork& caravanWork = Game.m_caravanWorkArr[caravanSlot];
 				caravanWork.LoadInit();
@@ -8474,7 +8417,7 @@ void CMenuPcs::CalcCharaSelect()
 				if ((trig & 0x0100) != 0 && work.m_shopBusyFlag != 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else if ((trig & 0x0100) != 0 && entry.m_confirmed == 0) {
-					const int charaId = *reinterpret_cast<int*>(GetWmCharaModelData(this) + currentSlot * 0x34 + 8);
+					const int charaId = m_wm.m_charaModelData[currentSlot].m_modelNo;
 					if (charaId < 0) {
 						if (Game.m_gameWork.m_menuStageMode == 0 &&
 						    (entry.m_padType == 0x09000000 || entry.m_padType == -0x74F00000)) {
@@ -9203,7 +9146,7 @@ void CMenuPcs::WMChgMenu()
 			int iVar13 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0xA00;
 			do {
 				const int handleIdx = iVar12 + 0x20;
-				*reinterpret_cast<unsigned char*>(m_wm.m_charaModelData + iVar8 + 0xC) = 1;
+				m_wm.m_charaModelData[iVar12].m_modelChanged = 1;
 				*reinterpret_cast<float*>(iVar13 + 0x2C) = (float)dVar16b;
 				WmCharaSelectEntry* const selectData = &m_wm.m_charaSelectData[iVar12];
 				selectData->m_displaySlot = selectData->m_currentSlot;
@@ -9216,7 +9159,6 @@ void CMenuPcs::WMChgMenu()
 				}
 				iVar12 = iVar12 + 1;
 				iVar13 = iVar13 + 0x50;
-				iVar8 = iVar8 + 0x34;
 			} while (iVar12 < 8);
 
 			iVar8 = 0;
@@ -9308,13 +9250,13 @@ void CMenuPcs::WMChgMenu()
 inline void CMenuPcs::SetParty()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const modelData = m_wm.m_charaModelData;
+	WmCharaModelInfo* const modelData = m_wm.m_charaModelData;
 	unsigned char* const mcList = m_wmWorkBuffer;
 	int partyCount = 0;
 
 	if (modelData != 0) {
 		for (int i = 0; i < kWmCharaSelectCount; i++) {
-			if (modelData[i * 0x34 + 0x0C] != 0) {
+			if (modelData[i].m_modelChanged != 0) {
 				partyCount++;
 			}
 		}
@@ -9365,8 +9307,8 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390), channel, current);
 	}
-	unsigned char* modelData = m_wm.m_charaModelData + current * 0x34;
-	modelData[0xC] = 0;
+	WmCharaModelInfo* modelData = &m_wm.m_charaModelData[current];
+	modelData->m_modelChanged = 0;
 	GetWmCharaHandles(this)[current]->LoadModelASync(3, 0x43, 0);
 }
 
@@ -9382,7 +9324,7 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 void CMenuPcs::ChgAllModel()
 {
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		unsigned char* modelData = m_wm.m_charaModelData + i * 0x34;
+		WmCharaModelInfo* modelData = &m_wm.m_charaModelData[i];
 		int tribe;
 		int appearance;
 		int isFemale;
@@ -9393,15 +9335,11 @@ void CMenuPcs::ChgAllModel()
 			tribe = caravan->m_tribeId;
 			isFemale = caravan->m_genderFlag;
 			appearance = caravan->m_appearanceVariant;
-			modelId = tribe * 200 + 100;
-			if (isFemale != 0) {
-				modelId += 100;
-			}
-			modelId += appearance;
-			*reinterpret_cast<int*>(modelData + 8) = modelId;
+			modelId = GetModelNo(tribe, appearance, isFemale);
+			modelData->m_modelNo = modelId;
 		} else {
 			tribe = -1;
-			*reinterpret_cast<int*>(modelData + 8) = -1;
+			modelData->m_modelNo = -1;
 			appearance = -1;
 			isFemale = -1;
 		}
@@ -9424,7 +9362,7 @@ void CMenuPcs::ChgAllModel2()
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* pdtData =
 		    m_cmakeWork + i * 0x9C0 + 0x14D0;
-		unsigned char* modelData = m_wm.m_charaModelData + i * 0x34;
+		WmCharaModelInfo* modelData = &m_wm.m_charaModelData[i];
 		int tribe;
 		int isFemale;
 		int appearance;
@@ -9435,7 +9373,7 @@ void CMenuPcs::ChgAllModel2()
 			isFemale = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
 		} else {
 			tribe = -1;
-			*reinterpret_cast<int*>(modelData + 8) = -1;
+			modelData->m_modelNo = -1;
 			appearance = -1;
 			isFemale = -1;
 		}
@@ -9457,7 +9395,7 @@ inline void CMenuPcs::SetMakeChara(int slot)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmCharaSelectEntry* const selectData = m_wm.m_charaSelectData;
-	unsigned char* const modelData = m_wm.m_charaModelData;
+	WmCharaModelInfo* const modelData = m_wm.m_charaModelData;
 	WmWorldState* const worldState = m_wmWorldState;
 
 	if (slot < 0) {
@@ -9480,7 +9418,7 @@ inline void CMenuPcs::SetMakeChara(int slot)
 		gWmMenuWorkB = entry->m_currentSlot;
 	}
 
-	if (modelData != 0 && modelData[slot * 0x34 + 0x0C] != 0) {
+	if (modelData != 0 && modelData[slot].m_modelChanged != 0) {
 		SetMenuCharaAnim(slot, 1);
 	} else {
 		SetMenuCharaAnim(slot, 0);
@@ -9507,22 +9445,17 @@ inline void CMenuPcs::SetMakeChara(int slot)
 void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* modelData = m_wm.m_charaModelData;
-	modelData += slot * 0x34;
+	WmCharaModelInfo* modelData = &m_wm.m_charaModelData[slot];
 	int modelNo;
 	int charaKind;
 
 	if (tribe >= 0) {
 		charaKind = 0;
-		modelNo = tribe * 200 + 100;
-		if (isFemale != 0) {
-			modelNo += 100;
-		}
-		modelNo += job;
-		modelData[0xC] = 1;
+		modelNo = GetModelNo(tribe, job, isFemale);
+		modelData->m_modelChanged = 1;
 	} else {
 		charaKind = 3;
-		modelData[0xC] = 0;
+		modelData->m_modelChanged = 0;
 		modelNo = 0x43;
 	}
 
@@ -9877,7 +9810,7 @@ void CMenuPcs::CalcMainMenuSub()
 inline void CMenuPcs::ChkSelectParty()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const modelData = m_wm.m_charaModelData;
+	WmCharaModelInfo* const modelData = m_wm.m_charaModelData;
 	int selected = 0;
 
 	if (modelData == 0) {
@@ -9886,7 +9819,7 @@ inline void CMenuPcs::ChkSelectParty()
 	}
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		if (modelData[i * 0x34 + 0xC] != 0) {
+		if (modelData[i].m_modelChanged != 0) {
 			selected++;
 		}
 	}

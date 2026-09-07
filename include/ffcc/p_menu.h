@@ -2,6 +2,7 @@
 #define _FFCC_P_MENU_H_
 
 #include "ffcc/memory.h"
+#include "ffcc/math.h"
 #include "ffcc/memorycard.h"
 #include "ffcc/mcctrl.h"
 #include "ffcc/gobject.h"
@@ -98,6 +99,20 @@ struct MenuWindowInfo
     short frame;
     short state;
 };
+
+struct WmCharaModelInfo
+{
+    int m_unknown00;
+    int m_unknown04;
+    int m_modelNo;
+    unsigned char m_modelChanged;
+    unsigned char m_pad0D[3];
+    SRT m_transform;
+};
+STATIC_ASSERT(sizeof(WmCharaModelInfo) == 0x34);
+STATIC_ASSERT(offsetof(WmCharaModelInfo, m_modelNo) == 0x08);
+STATIC_ASSERT(offsetof(WmCharaModelInfo, m_modelChanged) == 0x0C);
+STATIC_ASSERT(offsetof(WmCharaModelInfo, m_transform) == 0x10);
 
 struct WmCharaSelectEntry
 {
@@ -724,7 +739,7 @@ public:
         unsigned char* m_bubbleData;
         unsigned char* m_frameData;
         WmFrameInfo* m_frameInfo;
-        unsigned char* m_charaModelData;
+        WmCharaModelInfo* m_charaModelData;
         WmCharaSelectEntry* m_charaSelectData;
     };
 

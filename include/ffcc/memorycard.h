@@ -4,6 +4,7 @@
 #include <Dolphin/types.h>
 #include <Dolphin/card.h>
 #include "ffcc/manager.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/memory.h"
 
 namespace Mc
@@ -38,9 +39,12 @@ struct CharaDat
     int m_gil;                                     // 0xEC
     char m_name[16];                               // 0xF0
     int m_letterCount;                             // 0x100
-    unsigned char m_unknown104[0x5B4 - 0x104];
+    CCaravanWork::CLetterWork m_letters[100];        // 0x104
     int m_exists;                                  // 0x5B4
-    unsigned char m_unknown5B8[0x8C0 - 0x5B8];
+    u8 m_evtFlags[256];                            // 0x5B8
+    s16 m_evtWordArr[256];                         // 0x6B8
+    int m_unknown8B8;                              // 0x8B8
+    int m_unknown8BC;                              // 0x8BC
     unsigned char m_isAway;                         // 0x8C0
     unsigned char m_isGuest;                        // 0x8C1
     unsigned char m_hasCharacterId;                 // 0x8C2

@@ -156,6 +156,11 @@ STATIC_ASSERT(offsetof(Mc::CharaDat, m_joybusCaravanId) == 0xE8);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_gil) == 0xEC);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_name) == 0xF0);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_letterCount) == 0x100);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_letters) == 0x104);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_evtFlags) == 0x5B8);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_evtWordArr) == 0x6B8);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_unknown8B8) == 0x8B8);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_unknown8BC) == 0x8BC);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_exists) == 0x5B4);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_isAway) == 0x8C0);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_isGuest) == 0x8C1);
@@ -1066,7 +1071,6 @@ void CMemoryCardMan::MakeSaveData()
     {
         int letter;
         Mc::CharaDat& savedCharacter = saveDat->m_characters[c];
-        u8* dst = reinterpret_cast<u8*>(&savedCharacter);
         CCaravanWork* caravanWork = &g->m_caravanWorkArr[c];
 
         int shopState = caravanWork->m_shopState;
@@ -1114,23 +1118,24 @@ void CMemoryCardMan::MakeSaveData()
         savedCharacter.m_letterCount = caravanWork->m_letterCount;
         for (letter = 0; letter < 100; letter++)
         {
-            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->FlagsBits().m_attachmentIsGil =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->FlagsBits().m_attachmentIsGil;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->HeaderBitsRef().m_messageType =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->HeaderBitsRef().m_messageType;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->WordBitsRef().m_senderId =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->WordBitsRef().m_senderId;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->AttachmentBitsRef().m_value =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->AttachmentBitsRef().m_value;
-            memcpy(dst + letter * 0xC + 0x108, reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3F0, 8);
-            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->FlagsBits().m_opened =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->FlagsBits().m_opened;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->FlagsBits().m_attachmentClaimed =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->FlagsBits().m_attachmentClaimed;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->FlagsBits().m_replySent =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->FlagsBits().m_replySent;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(dst + letter * 0xC + 0x104)->FlagsBits().m_hasReply =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + letter * 0xC + 0x3EC)->FlagsBits().m_hasReply;
+            savedCharacter.m_letters[letter].FlagsBits().m_attachmentIsGil =
+                caravanWork->m_letters[letter].FlagsBits().m_attachmentIsGil;
+            savedCharacter.m_letters[letter].HeaderBitsRef().m_messageType =
+                caravanWork->m_letters[letter].HeaderBitsRef().m_messageType;
+            savedCharacter.m_letters[letter].WordBitsRef().m_senderId =
+                caravanWork->m_letters[letter].WordBitsRef().m_senderId;
+            savedCharacter.m_letters[letter].AttachmentBitsRef().m_value =
+                caravanWork->m_letters[letter].AttachmentBitsRef().m_value;
+            memcpy(savedCharacter.m_letters[letter].m_half.m_tempVars, caravanWork->m_letters[letter].m_half.m_tempVars,
+                   sizeof(savedCharacter.m_letters[letter].m_half.m_tempVars));
+            savedCharacter.m_letters[letter].FlagsBits().m_opened =
+                caravanWork->m_letters[letter].FlagsBits().m_opened;
+            savedCharacter.m_letters[letter].FlagsBits().m_attachmentClaimed =
+                caravanWork->m_letters[letter].FlagsBits().m_attachmentClaimed;
+            savedCharacter.m_letters[letter].FlagsBits().m_replySent =
+                caravanWork->m_letters[letter].FlagsBits().m_replySent;
+            savedCharacter.m_letters[letter].FlagsBits().m_hasReply =
+                caravanWork->m_letters[letter].FlagsBits().m_hasReply;
         }
 
         for (int artifact = 0; artifact < 96; artifact++)
@@ -1148,18 +1153,18 @@ void CMemoryCardMan::MakeSaveData()
             savedCharacter.m_commandListExtra[i] = caravanWork->m_commandListExtra[i];
         }
 
-        *reinterpret_cast<int*>(dst + 0x5B4) = caravanWork->m_shopState;
-        memcpy(dst + 0x5B8, caravanWork->m_evtFlags, 0x100);
-        memcpy(dst + 0x6B8, caravanWork->m_evtWordArr, 0x200);
-        *reinterpret_cast<int*>(dst + 0x8B8) = caravanWork->unk_0x3a8;
-        *reinterpret_cast<int*>(dst + 0x8BC) = caravanWork->unk_0x3ac;
-        dst[0x8C0] = caravanWork->m_shopBusyFlag;
-        dst[0x8C1] = caravanWork->m_caravanLocalFlags;
-        dst[0x8C2] = caravanWork->unk_0xc1e;
-        *reinterpret_cast<int*>(dst + 0x8C4) = caravanWork->m_shopRandSeed;
-        *reinterpret_cast<int*>(dst + 0x8D0) = caravanWork->m_shopData0;
-        *reinterpret_cast<u64*>(dst + 0x8C8) = *reinterpret_cast<u64*>(&caravanWork->m_shopData1);
-        *reinterpret_cast<int*>(dst + 0x8D4) = caravanWork->m_baseDataIndex;
+        savedCharacter.m_exists = caravanWork->m_shopState;
+        memcpy(savedCharacter.m_evtFlags, caravanWork->m_evtFlags, sizeof(savedCharacter.m_evtFlags));
+        memcpy(savedCharacter.m_evtWordArr, caravanWork->m_evtWordArr, sizeof(savedCharacter.m_evtWordArr));
+        savedCharacter.m_unknown8B8 = caravanWork->unk_0x3a8;
+        savedCharacter.m_unknown8BC = caravanWork->unk_0x3ac;
+        savedCharacter.m_isAway = caravanWork->m_shopBusyFlag;
+        savedCharacter.m_isGuest = caravanWork->m_caravanLocalFlags;
+        savedCharacter.m_hasCharacterId = caravanWork->unk_0xc1e;
+        savedCharacter.m_characterId = caravanWork->m_shopRandSeed;
+        savedCharacter.m_originRandom = caravanWork->m_shopData0;
+        savedCharacter.m_originSerial = *reinterpret_cast<u64*>(&caravanWork->m_shopData1);
+        savedCharacter.m_baseDataIndex = caravanWork->m_baseDataIndex;
     }
 
     Game.SaveScript(reinterpret_cast<char*>(save + 0x62D0));
@@ -1254,7 +1259,6 @@ void CMemoryCardMan::SetLoadData()
     for (int c = 0; c < 8; c++)
     {
         Mc::CharaDat& savedCharacter = saveDat->m_characters[c];
-        u8* src = reinterpret_cast<u8*>(&savedCharacter);
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
 
         for (i = count = 0; i < 64; i++)
@@ -1306,23 +1310,24 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->m_letterCount = savedCharacter.m_letterCount;
         for (count = 0; count < 100; count++)
         {
-            reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + count * 0xC + 0x3EC)->FlagsBits().m_attachmentIsGil =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(src + count * 0xC + 0x104)->FlagsBits().m_attachmentIsGil;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + count * 0xC + 0x3EC)->HeaderBitsRef().m_messageType =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(src + count * 0xC + 0x104)->HeaderBitsRef().m_messageType;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + count * 0xC + 0x3EC)->WordBitsRef().m_senderId =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(src + count * 0xC + 0x104)->WordBitsRef().m_senderId;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + count * 0xC + 0x3EC)->AttachmentBitsRef().m_value =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(src + count * 0xC + 0x104)->AttachmentBitsRef().m_value;
-            memcpy(reinterpret_cast<u8*>(caravanWork) + count * 0xC + 0x3F0, src + count * 0xC + 0x108, 8);
-            reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + count * 0xC + 0x3EC)->FlagsBits().m_opened =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(src + count * 0xC + 0x104)->FlagsBits().m_opened;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + count * 0xC + 0x3EC)->FlagsBits().m_attachmentClaimed =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(src + count * 0xC + 0x104)->FlagsBits().m_attachmentClaimed;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + count * 0xC + 0x3EC)->FlagsBits().m_replySent =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(src + count * 0xC + 0x104)->FlagsBits().m_replySent;
-            reinterpret_cast<CCaravanWork::CLetterWork*>(reinterpret_cast<u8*>(caravanWork) + count * 0xC + 0x3EC)->FlagsBits().m_hasReply =
-                reinterpret_cast<CCaravanWork::CLetterWork*>(src + count * 0xC + 0x104)->FlagsBits().m_hasReply;
+            caravanWork->m_letters[count].FlagsBits().m_attachmentIsGil =
+                savedCharacter.m_letters[count].FlagsBits().m_attachmentIsGil;
+            caravanWork->m_letters[count].HeaderBitsRef().m_messageType =
+                savedCharacter.m_letters[count].HeaderBitsRef().m_messageType;
+            caravanWork->m_letters[count].WordBitsRef().m_senderId =
+                savedCharacter.m_letters[count].WordBitsRef().m_senderId;
+            caravanWork->m_letters[count].AttachmentBitsRef().m_value =
+                savedCharacter.m_letters[count].AttachmentBitsRef().m_value;
+            memcpy(caravanWork->m_letters[count].m_half.m_tempVars, savedCharacter.m_letters[count].m_half.m_tempVars,
+                   sizeof(savedCharacter.m_letters[count].m_half.m_tempVars));
+            caravanWork->m_letters[count].FlagsBits().m_opened =
+                savedCharacter.m_letters[count].FlagsBits().m_opened;
+            caravanWork->m_letters[count].FlagsBits().m_attachmentClaimed =
+                savedCharacter.m_letters[count].FlagsBits().m_attachmentClaimed;
+            caravanWork->m_letters[count].FlagsBits().m_replySent =
+                savedCharacter.m_letters[count].FlagsBits().m_replySent;
+            caravanWork->m_letters[count].FlagsBits().m_hasReply =
+                savedCharacter.m_letters[count].FlagsBits().m_hasReply;
         }
 
         for (int artifact = 0; artifact < 96; artifact++)
@@ -1344,18 +1349,18 @@ void CMemoryCardMan::SetLoadData()
             caravanWork->m_commandListExtra[i] = savedCharacter.m_commandListExtra[i];
         }
 
-        caravanWork->m_shopState = *reinterpret_cast<int*>(src + 0x5B4);
-        memcpy(caravanWork->m_evtFlags, src + 0x5B8, 0x100);
-        memcpy(caravanWork->m_evtWordArr, src + 0x6B8, 0x200);
-        caravanWork->unk_0x3a8 = *reinterpret_cast<int*>(src + 0x8B8);
-        caravanWork->unk_0x3ac = *reinterpret_cast<int*>(src + 0x8BC);
-        caravanWork->m_shopBusyFlag = src[0x8C0];
-        caravanWork->m_caravanLocalFlags = src[0x8C1];
-        caravanWork->unk_0xc1e = src[0x8C2];
-        caravanWork->m_shopRandSeed = *reinterpret_cast<int*>(src + 0x8C4);
-        caravanWork->m_shopData0 = *reinterpret_cast<int*>(src + 0x8D0);
-        *reinterpret_cast<u64*>(&caravanWork->m_shopData1) = *reinterpret_cast<u64*>(src + 0x8C8);
-        caravanWork->m_baseDataIndex = *reinterpret_cast<int*>(src + 0x8D4);
+        caravanWork->m_shopState = savedCharacter.m_exists;
+        memcpy(caravanWork->m_evtFlags, savedCharacter.m_evtFlags, sizeof(savedCharacter.m_evtFlags));
+        memcpy(caravanWork->m_evtWordArr, savedCharacter.m_evtWordArr, sizeof(savedCharacter.m_evtWordArr));
+        caravanWork->unk_0x3a8 = savedCharacter.m_unknown8B8;
+        caravanWork->unk_0x3ac = savedCharacter.m_unknown8BC;
+        caravanWork->m_shopBusyFlag = savedCharacter.m_isAway;
+        caravanWork->m_caravanLocalFlags = savedCharacter.m_isGuest;
+        caravanWork->unk_0xc1e = savedCharacter.m_hasCharacterId;
+        caravanWork->m_shopRandSeed = savedCharacter.m_characterId;
+        caravanWork->m_shopData0 = savedCharacter.m_originRandom;
+        *reinterpret_cast<u64*>(&caravanWork->m_shopData1) = savedCharacter.m_originSerial;
+        caravanWork->m_baseDataIndex = savedCharacter.m_baseDataIndex;
         caravanWork->m_maxHp = caravanWork->GetArtifactIncludeHpMax();
 
     }
@@ -2071,10 +2076,10 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         dstCharacter.m_joybusCaravanId = srcCharacter.m_joybusCaravanId;
         memcpy(dstCharacter.m_name, srcCharacter.m_name, sizeof(dstCharacter.m_name));
         dstCharacter.m_exists = srcCharacter.m_exists;
-        memcpy(dstCharData + 0x5B8, srcCharData + 0x5B8, 0x100);
-        memcpy(dstCharData + 0x6B8, srcCharData + 0x6B8, 0x200);
-        *reinterpret_cast<u32*>(dstCharData + 0x8B8) = *reinterpret_cast<u32*>(srcCharData + 0x8B8);
-        *reinterpret_cast<u32*>(dstCharData + 0x8BC) = *reinterpret_cast<u32*>(srcCharData + 0x8BC);
+        memcpy(dstCharacter.m_evtFlags, srcCharacter.m_evtFlags, sizeof(dstCharacter.m_evtFlags));
+        memcpy(dstCharacter.m_evtWordArr, srcCharacter.m_evtWordArr, sizeof(dstCharacter.m_evtWordArr));
+        dstCharacter.m_unknown8B8 = srcCharacter.m_unknown8B8;
+        dstCharacter.m_unknown8BC = srcCharacter.m_unknown8BC;
         dstCharacter.m_hasCharacterId = srcCharacter.m_hasCharacterId;
         dstCharacter.m_characterId = srcCharacter.m_characterId;
         dstCharacter.m_originSerial = srcSave.m_mcSerial;
@@ -2127,7 +2132,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
 
         srcCharacter.m_isAway = 1;
         dstCharacter.m_isGuest = 1;
-        *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 3;
+        dstCharacter.m_evtWordArr[5] = 3;
     }
     else
     {
@@ -2144,7 +2149,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         dstCharacter.m_isAway = 0;
         srcCharacter.m_hasCharacterId = 0;
         memset(&srcCharacter, 0, sizeof(srcCharacter));
-        *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 0x0C;
+        dstCharacter.m_evtWordArr[5] = 0x0C;
     }
 
     srcSave.m_random = Math.Rand(0x7FFFFFFF);

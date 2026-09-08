@@ -883,7 +883,7 @@ public:
     };
     union {
         EffectEntry* m_effectEntries;
-        unsigned char* m_wmCharaState;
+        McListInfo* m_wmCharaState;
     };
     unsigned char* m_wmWorldParams;
     EffectInfo* m_effectWork;

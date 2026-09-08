@@ -236,6 +236,76 @@ public:
 		u8 _padBD[3];
 	};
 
+	class CMesh : public CRef
+	{
+	public:
+		CMesh();
+		~CMesh();
+
+		class CDisplayList
+		{
+		public:
+			CDisplayList();
+			~CDisplayList();
+
+			s32 m_size;
+			void* m_data;
+			u16 m_material;
+			u16 _padA;
+		};
+
+		class CRefData
+		{
+		public:
+			CRefData();
+			~CRefData();
+
+			char m_name[0x10];
+			union
+			{
+				u8 m_flags;
+				struct
+				{
+					s8 m_flag_80 : 1;
+					s8 m_flag_40 : 1;
+					s8 m_flag_lo : 6;
+				} m_flagsBits;
+			};
+			u8 _pad11[3];
+			u32 m_vertexCount;
+			S16Vec* m_vertices;
+			u32 m_normalCount;
+			S16Vec* m_normals;
+			u32 m_colorCount;
+			u8* m_colors;
+			u32 m_uvCount;
+			u8* m_uvs;
+			u32 m_oneWeightCountOrSize;
+			void* m_oneWeightData;
+			u32 m_twoWeightCountOrSize;
+			void* m_twoWeightData;
+			u32 m_threeWeightCountOrSize;
+			void* m_threeWeightData;
+			u32 m_displayListCount;
+			CDisplayList* m_displayLists;
+			u32 m_skinCount;
+			CSkin* m_skins;
+			u32 m_nodeIndex;
+			u32 m_infoWord1;
+		};
+
+		void Create(CChara::CModel*, CChunkFile&, CMemory::CStage*);
+		void Duplicate(CChara::CMesh*, CMemory::CStage*);
+		void skin(int, int, int, CChara::CSkin*, void*, void*, void*, S16Vec*, S16Vec*, S16Vec*, S16Vec*);
+		void Calc(CChara::CModel*);
+		CRefData* GetRefData();
+		S16Vec* GetVertex();
+
+		CRefData* m_data;
+		S16Vec* m_workPositions;
+		S16Vec* m_workNormals;
+	};
+
 	class CModel : public CRef
 	{
 	public:
@@ -257,8 +327,8 @@ public:
 
 			u32 m_nodeCount;            // 0x08
 			u32 m_meshCount;           // 0x0C
-			void* m_nodeRefData;       // 0x10
-			void* m_meshRefData;       // 0x14
+			CNode::CRefData* m_nodeRefData; // 0x10
+			CMesh::CRefData* m_meshRefData; // 0x14
 			void* m_bank;              // 0x18
 			s16 m_headNodeIndex;       // 0x1C
 			s16 m_chest3NodeIndex;     // 0x1E
@@ -393,76 +463,7 @@ public:
 		float m_twistAngle;
 	};
 
-	class CMesh : public CRef
-	{
-	public:
-		CMesh();
-		~CMesh();
 
-		class CDisplayList
-		{
-		public:
-			CDisplayList();
-			~CDisplayList();
-
-			s32 m_size;
-			void* m_data;
-			u16 m_material;
-			u16 _padA;
-		};
-
-		class CRefData
-		{
-		public:
-			CRefData();
-			~CRefData();
-
-			char m_name[0x10];
-			union
-			{
-				u8 m_flags;
-				struct
-				{
-					s8 m_flag_80 : 1;
-					s8 m_flag_40 : 1;
-					s8 m_flag_lo : 6;
-				} m_flagsBits;
-			};
-			u8 _pad11[3];
-			u32 m_vertexCount;
-			S16Vec* m_vertices;
-			u32 m_normalCount;
-			S16Vec* m_normals;
-			u32 m_colorCount;
-			u8* m_colors;
-			u32 m_uvCount;
-			u8* m_uvs;
-			u32 m_oneWeightCountOrSize;
-			void* m_oneWeightData;
-			u32 m_twoWeightCountOrSize;
-			void* m_twoWeightData;
-			u32 m_threeWeightCountOrSize;
-			void* m_threeWeightData;
-			u32 m_displayListCount;
-			CDisplayList* m_displayLists;
-			u32 m_skinCount;
-			CSkin* m_skins;
-			u32 m_nodeIndex;
-			u32 m_infoWord1;
-		};
-
-		void Create(CChara::CModel*, CChunkFile&, CMemory::CStage*);
-		void Duplicate(CChara::CMesh*, CMemory::CStage*);
-		void skin(int, int, int, CChara::CSkin*, void*, void*, void*, S16Vec*, S16Vec*, S16Vec*, S16Vec*);
-		void Calc(CChara::CModel*);
-		CRefData* GetRefData();
-		S16Vec* GetVertex();
-
-		CRefData* m_data;
-		S16Vec* m_workPositions;
-		S16Vec* m_workNormals;
-	};
-	
 	CChara() {}
 
 	void Init();

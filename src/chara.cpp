@@ -694,11 +694,11 @@ CChara::CModel::CRefData::~CRefData()
 		m_dynParams = 0;
 	}
 	if (m_nodeRefData != 0) {
-		delete[] static_cast<CNode::CRefData*>(m_nodeRefData);
+		delete[] m_nodeRefData;
 		m_nodeRefData = 0;
 	}
 	if (m_meshRefData != 0) {
-		delete[] static_cast<CMesh::CRefData*>(m_meshRefData);
+		delete[] m_meshRefData;
 		m_meshRefData = 0;
 	}
 	if (m_bank != 0) {
@@ -2431,17 +2431,11 @@ int CChara::CModel::GetDispIndex(CChara::CNode* node)
  */
 CChara::CNode::CNode()
 {
-	struct Flags {
-		u8 active : 1;
-		u8 _pad : 7;
-	};
-	int active = 1;
-
 	m_refData = 0;
 	m_displayMesh = 0;
 	m_animNodes[0] = 0;
 	m_animNodes[1] = 0;
-	reinterpret_cast<Flags*>(&m_flags)->active = active;
+	m_flagsBits.m_flag_80 = 1;
 }
 
 /*
@@ -2469,8 +2463,7 @@ CChara::CNode::~CNode()
 void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNode::TYPE type, CMemory::CStage* stage)
 {
 	(void)stage;
-	m_refData = reinterpret_cast<CChara::CNode::CRefData*>(
-	    reinterpret_cast<u8*>(model->m_data->m_nodeRefData) + model->m_data->m_nodeCount * 0x94);
+	m_refData = &model->m_data->m_nodeRefData[model->m_data->m_nodeCount];
 	m_refData->m_index = static_cast<u16>(model->m_data->m_nodeCount);
 	m_refData->m_type = static_cast<u8>(type);
 	m_refData->m_dynParamIndex = -1;
@@ -2548,16 +2541,12 @@ void CChara::CNode::CalcBind(CChara::CModel* model)
  */
 CChara::CNode::CRefData::CRefData()
 {
-	u8* raw = reinterpret_cast<u8*>(this);
-	s8* signedRaw = reinterpret_cast<s8*>(this);
-	s32 invalidIndex = -1;
-
-	signedRaw[0x8D] = invalidIndex;
-	raw[0x8E] = 0;
-	raw[0x8A] = 0;
-	memset(raw + 0x6A, 0, 0x20);
-	*reinterpret_cast<float*>(raw + 0x60) = FLOAT_803301b0;
-	signedRaw[0x90] = invalidIndex;
+	m_displayIndex = -1;
+	m_miscFlags = 0;
+	m_childCount = 0;
+	memset(m_names, 0, sizeof(m_names));
+	m_boneLen = FLOAT_803301b0;
+	m_dynParamIndex = -1;
 }
 
 /*
@@ -2613,8 +2602,7 @@ CChara::CMesh::~CMesh()
  */
 void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CStage* stage)
 {
-	CCharaMeshRefRaw* meshRef = reinterpret_cast<CCharaMeshRefRaw*>(
-	    reinterpret_cast<u8*>(model->m_data->m_meshRefData) + model->m_data->m_meshCount * 0x64);
+	CCharaMeshRefRaw* meshRef = &model->m_data->m_meshRefData[model->m_data->m_meshCount];
 	m_data = meshRef;
 
 	CChunkFile::CChunk chunkInfo;

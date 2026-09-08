@@ -48,29 +48,29 @@ struct GbaQueueMapObjWork
 struct GbaQueuePlayerDataView
 {
     signed char m_saveSlot;
-    unsigned char _pad01;
+    unsigned char m_hasPartyObj;
     unsigned char m_appearance;
-    unsigned char _pad03;
-    unsigned int _pad04[4];
+    char m_active;
+    unsigned char m_compatibility[16];
     unsigned short m_progress;
     signed char m_maxHp;
     signed char m_hp;
     unsigned char m_letterMeta[8];
     unsigned char m_strength[3];
-    unsigned char _pad23;
+    unsigned char m_useItem;
     unsigned int m_gil;
     unsigned int m_artifacts[3];
     unsigned short _pad34;
-    unsigned char _pad36[4];
+    short m_mapPosition[2];
     short m_items[0x40];
     unsigned short m_tmpArtifacts[4];
-    unsigned short m_artifactList[8];
-    unsigned char _padD2;
-    unsigned char m_artifactCount;
-    unsigned char _padD4;
+    unsigned short m_commandSlots[8];
+    unsigned char m_bonusCondition;
+    unsigned char m_commandSlotCount;
+    unsigned char m_radarVisible;
     unsigned char _padD5;
-    unsigned char _padD6;
-    unsigned char m_commandData[4];
+    unsigned char m_itemFlags;
+    unsigned char m_equipment[4];
 };
 
 struct GbaPInfo

@@ -277,12 +277,10 @@ void CUtil::ConvI2FVector(Vec& out, S16Vec in, long shift)
 void CUtil::ConvF2IVector(S16Vec& out, Vec in, long shift)
 {
     int scaleInt = 1 << shift;
-    float y = in.y;
-    float z = in.z;
 
     out.x = (short)(int)(in.x * (float)scaleInt);
-    out.y = (short)(int)(y * (float)scaleInt);
-    out.z = (short)(int)(z * (float)scaleInt);
+    out.y = (short)(int)(in.y * (float)scaleInt);
+    out.z = (short)(int)(in.z * (float)scaleInt);
 }
 
 /*
@@ -297,10 +295,9 @@ void CUtil::ConvF2IVector(S16Vec& out, Vec in, long shift)
 void CUtil::ConvF2IVector2d(S16Vec2d& out, Vec2d in, long shift)
 {
     int scaleInt = 1 << shift;
-    float y = in.y;
 
     out.x = (short)(int)(in.x * (float)scaleInt);
-    out.y = (short)(int)(y * (float)scaleInt);
+    out.y = (short)(int)(in.y * (float)scaleInt);
 }
 
 /*
@@ -1066,27 +1063,10 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 	while (current < end) {
 		u8 cmd = *current;
 		int count = *(u16*)(current + 1);
-		u8 primitive = cmd & 0xF8;
 		u8 indexFormat = cmd & 7;
-		int isPrimitive;
 		current += 3;
 
-		switch (primitive) {
-			case 0x80:
-			case 0x90:
-			case 0x98:
-			case 0xA0:
-			case 0xA8:
-			case 0xB0:
-			case 0xB8:
-				isPrimitive = true;
-				break;
-			default:
-				isPrimitive = false;
-				break;
-		}
-
-		if (!isPrimitive) {
+		if (!IsHasDrawFmtDL(cmd)) {
 			break;
 		}
 
@@ -1181,27 +1161,10 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
         int count = vertexCount;
         u32 vertexFormat = opcode & 7;
         u32 primitive = opcode & 0xF8;
-        int isPrimitive;
 
         data += 3;
 
-        switch (primitive) {
-        case 0x80:
-        case 0x90:
-        case 0x98:
-        case 0xA0:
-        case 0xA8:
-        case 0xB0:
-        case 0xB8:
-            isPrimitive = true;
-            break;
-
-        default:
-            isPrimitive = false;
-            break;
-        }
-
-        if (!isPrimitive) {
+        if (!IsHasDrawFmtDL(opcode)) {
             running = false;
             continue;
         }

@@ -9,6 +9,4 @@ class CFont;
 class CGraphic;
 class CCameraPcs;
 
-extern int gWmMenuWorkA;
-
 #endif // _FFCC_PPP_WM_MENU_H_

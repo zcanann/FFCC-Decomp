@@ -478,6 +478,15 @@ public:
     void CreateSmithMenu();
     void SingMenuEnd();
     void destroyVillageMenu();
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: 312b
+     * EN Address: 0x801047A8
+     * EN Size: 364b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
     void ChkNumItemAll();
     void loadData();
     void InitFrameInfo();
@@ -555,7 +564,16 @@ public:
     void DrawCharaBase();
     void CalcChara();
     void PCAnimCtrl();
-    void GetAnimNo(int, int);
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: 180b
+     * EN Address: 0x80113EAC
+     * EN Size: 244b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    int GetAnimNo(int, int);
     void DrawChara();
     int GetModelNo(int, int, int);
     void CalcCharaSelect();

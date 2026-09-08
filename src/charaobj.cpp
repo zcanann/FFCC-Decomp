@@ -74,50 +74,6 @@ static __inline float CharaObjGetRotateY(const Vec& vector)
 	return static_cast<float>(atan2(vector.x, vector.z));
 }
 
-static int CharaObjGetPadSlotIndex(unsigned char slot)
-{
-	return slot & ~((~(Pad.m_debugPadPort - static_cast<int>(slot) | static_cast<int>(slot) - Pad.m_debugPadPort) >> 31));
-}
-
-static bool CharaObjUseDebugPad(unsigned char slot)
-{
-	return (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
-}
-
-static unsigned short CharaObjGetPadState(unsigned char slot, int baseOffset)
-{
-	if (CharaObjUseDebugPad(slot)) {
-		return 0;
-	}
-
-	int idx = CharaObjGetPadSlotIndex(slot);
-	const CPad::PadInput& input = Pad.GetPadInputs()[idx];
-	if (baseOffset == 0x4) {
-		return input.button[0];
-	}
-	if (baseOffset == 0x8) {
-		return input.buttonDown[0];
-	}
-
-	return input.repeatButton;
-}
-
-static unsigned short CharaObjGetPadHeld(unsigned char slot)
-{
-	return CharaObjGetPadState(slot, 0x4);
-}
-
-static unsigned short CharaObjGetPadStatusReduceMask(unsigned char slot)
-{
-	unsigned short mask = CharaObjGetPadState(slot, 0x8);
-	unsigned int miniGameFlags = MiniGamePcs.m_flags;
-	if ((miniGameFlags & 0x100) != 0) {
-		mask |= CharaObjGetPadState(slot, 0x10);
-	}
-
-	return mask;
-}
-
 static __inline void CharaObjEndSlots(CGCharaObj* charaObj, unsigned int slotMask)
 {
 	for (int i = 0; i < 0x16; i++) {
@@ -3378,13 +3334,13 @@ void CGCharaObj::onFramePreCalc()
 			padHeld = 0;
 		} else {
 			int activePad = Pad.m_debugPadPort;
-			int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
+			int idx = slot == activePad ? 0 : slot;
 			padHeld = Pad.GetPadInputs()[idx].gbaMode;
 		}
 		if (padHeld != 0) {
 			push += 0x19;
 		}
-		if (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9B]) << 24 >> 30) << 30 >> 31) == 0) {
+		if (m_weaponNodeFlagAll.m_bits1.m_shield == 0) {
 			push += 0x19;
 		}
 	}
@@ -3397,7 +3353,7 @@ void CGCharaObj::onFramePreCalc()
 	if ((AStar.m_flags & 1) != 0) {
 		m_aStarGroupId = static_cast<unsigned short>(AStar.calcSpecialPolygonGroup(&m_worldPosition));
 	} else {
-		m_aStarGroupId = static_cast<unsigned short>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0xE8));
+		m_aStarGroupId = static_cast<unsigned char>(m_lastBgGroup);
 	}
 }
 
@@ -3433,23 +3389,15 @@ void CGCharaObj::onFramePostCalc()
 		    (i == 0 || i == 4 || i == 9 || i == 3) &&
 		    statusValue > 0) {
 			int slot = static_cast<signed char>(m_animStateMisc);
-			unsigned short padMask;
-			bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
-			if (useDebugPad) {
-				padMask = 0;
-			} else {
-				int activePad = Pad.m_debugPadPort;
-				int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
-				padMask = Pad.GetPadInputs()[idx].buttonDown[0];
-			}
+			unsigned short padMask = Pad.GetButtonDown(slot);
 			if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
-				useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
+				bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 				unsigned short heldMask;
 				if (useDebugPad) {
 					heldMask = 0;
 				} else {
 					int activePad = Pad.m_debugPadPort;
-					int idx = slot & ~(static_cast<int>(~((activePad - slot) | (slot - activePad))) >> 31);
+					int idx = slot == activePad ? 0 : slot;
 					heldMask = Pad.GetPadInputs()[idx].stickBitsDown;
 				}
 				padMask |= heldMask;

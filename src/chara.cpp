@@ -690,10 +690,10 @@ void CChara::FlipDBuffer()
 
 /*
  * --INFO--
- * PAL Address: 0x8006eb04
+ * PAL Address: 0x80075380
  * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8007eafc
+ * EN Size: 16b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1316,10 +1316,10 @@ void CChara::CModel::CalcMatrix()
 
 /*
  * --INFO--
- * PAL Address: 0x800722f4
+ * PAL Address: 0x80078bd8
  * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8007ff54
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2787,33 +2787,39 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 
 /*
  * --INFO--
- * PAL Address: 0x8006efe8
+ * PAL Address: 0x80075864
  * PAL Size: 1244b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80082fe8
+ * EN Size: 1308b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CMesh::skin(int meshIndex, int start, int count, CChara::CSkin* skinRef, void* srcPos, void* srcNrm, void* srcWgt, S16Vec* dstPos, S16Vec* dstNrm, S16Vec* dstTan, S16Vec* dstBinorm)
+void CChara::CMesh::skin(register int oneWeightSize, register int twoWeightSize, register int threeWeightSize,
+                        register CChara::CSkin* skinRef, register void* oneWeightData,
+                        register void* twoWeightData, register void* threeWeightData,
+                        S16Vec* srcPositions, S16Vec* dstPositions, S16Vec* srcNormals, S16Vec* dstNormals)
 {
-	u8 framePad[0x20];
+	struct {
+		int sizes[3];
+		CChara::CSkin* skin;
+		void* streams[3];
+	} saved;
 	asm {
-		lwz r0, framePad
-		mr. r3, r4
-		stw r4, 0x8(r1)
-		stw r5, 0xc(r1)
-		stw r6, 0x10(r1)
-		stw r7, 0x14(r1)
-		stw r8, 0x18(r1)
-		stw r9, 0x1c(r1)
-		stw r10, 0x20(r1)
+		mr. r3, oneWeightSize
+		stw oneWeightSize, saved.sizes[0]
+		stw twoWeightSize, saved.sizes[1]
+		stw threeWeightSize, saved.sizes[2]
+		stw skinRef, saved.skin
+		stw oneWeightData, saved.streams[0]
+		stw twoWeightData, saved.streams[1]
+		stw threeWeightData, saved.streams[2]
 		beq _chk2
 		mr r4, r7
 		mr r5, r8
-		lwz r6, 0x158(r1)
-		lwz r7, 0x15c(r1)
-		lwz r8, 0x160(r1)
-		lwz r9, 0x164(r1)
+		lwz r6, srcPositions
+		lwz r7, dstPositions
+		lwz r8, srcNormals
+		lwz r9, dstNormals
 	_loop1:
 		lhz r10, 0x0(r5)
 		lhz r11, 0x2(r5)
@@ -2870,10 +2876,10 @@ void CChara::CMesh::skin(int meshIndex, int start, int count, CChara::CSkin* ski
 		addi r5, r5, 0x6
 		bne _loop1
 	_chk2:
-		lwz r3, 0xc(r1)
+		lwz r3, saved.sizes[1]
 		cmpwi r3, 0x0
 		beq _chk3
-		lwz r5, 0x1c(r1)
+		lwz r5, saved.streams[1]
 	_loop2:
 		lhz r10, 0x0(r5)
 		mulli r10, r10, 0x64
@@ -2971,10 +2977,10 @@ void CChara::CMesh::skin(int meshIndex, int start, int count, CChara::CSkin* ski
 		addi r5, r5, 0xc
 		bne _loop2
 	_chk3:
-		lwz r3, 0x10(r1)
+		lwz r3, saved.sizes[2]
 		cmpwi r3, 0x0
 		beq _end
-		lwz r5, 0x20(r1)
+		lwz r5, saved.streams[2]
 	_loop3:
 		lhz r10, 0x0(r5)
 		mulli r10, r10, 0x64

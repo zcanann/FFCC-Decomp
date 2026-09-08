@@ -39,10 +39,6 @@ GXRenderModeObj _GXPal528IntDf = {
 extern "C" {
 OSThread m_thread;
 u8 m_threadStack[0x4000] ATTRIBUTE_ALIGN(8);
-int gGraphicDrawDoneRequest = 0;
-signed char gGraphicDrawDoneRequestInit = 0;
-int gGraphicDrawDonePartControlRequest = 0;
-signed char gGraphicDrawDonePartControlInit = 0;
 }
 
 enum GraphicCppStringOffset {
@@ -409,12 +405,11 @@ void CGraphic::BeginFrame()
     if (useDebugPad) {
         buttons = 0;
     } else {
-        int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
-        buttons = Pad.GetPadInputs()[padIndex].lockedButton[1];
+        buttons = Pad.GetPadInputs()[0].lockedButton[1];
     }
 
     if ((buttons & 2) != 0) {
-        m_debugStringVisible = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(m_debugStringVisible))) >> 5) & 0xFF;
+        m_debugStringVisible = !m_debugStringVisible;
     }
 }
 
@@ -479,12 +474,23 @@ void wakeup(OSAlarm* alarm, OSContext*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 140b
+ * EN Address: 0x8001e988
+ * EN Size: 140b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void sleep()
 {
-	// TODO
+    GraphicSleepAlarm sleepAlarm;
+    sleepAlarm.thread = OSGetCurrentThread();
+    OSCreateAlarm(&sleepAlarm.alarm);
+    OSSetAlarmTag(&sleepAlarm.alarm, 1);
+    BOOL interrupts = OSDisableInterrupts();
+    OSSetAlarm(&sleepAlarm.alarm, (OS_TIMER_CLOCK / 1000) * 0x32, wakeup);
+    OSSuspendThread(sleepAlarm.thread);
+    OSRestoreInterrupts(interrupts);
 }
 
 /*
@@ -556,24 +562,18 @@ void CGraphic::Thread()
             debugCountdown = 5;
         }
 
-        if (gGraphicDrawDoneRequestInit == 0) {
-            gGraphicDrawDoneRequest = 0;
-            gGraphicDrawDoneRequestInit = 1;
-        }
-        if (gGraphicDrawDonePartControlInit == 0) {
-            gGraphicDrawDonePartControlRequest = 0;
-            gGraphicDrawDonePartControlInit = 1;
-        }
+        static int bDown = 0;
+        static int bReset = 0;
 
         if (OSGetResetButtonState() != 0) {
-            gGraphicDrawDoneRequest = 1;
+            bDown = 1;
         } else {
-            if (gGraphicDrawDoneRequest != 0) {
-                gGraphicDrawDonePartControlRequest = 1;
+            if (bDown != 0) {
+                bReset = 1;
             }
         }
 
-        if ((gGraphicDrawDonePartControlRequest != 0) && (File.m_fatalDiskErrorFlag == 0) && (MemoryCardMan.m_currentSlot == -1)) {
+        if ((bReset != 0) && (File.m_fatalDiskErrorFlag == 0) && (MemoryCardMan.m_currentSlot == -1)) {
             VISetBlack(TRUE);
             VIFlush();
             VIWaitForRetrace();
@@ -582,14 +582,7 @@ void CGraphic::Thread()
             while (true) {}
         }
 
-        GraphicSleepAlarm sleepAlarm;
-        sleepAlarm.thread = OSGetCurrentThread();
-        OSCreateAlarm(&sleepAlarm.alarm);
-        OSSetAlarmTag(&sleepAlarm.alarm, 1);
-        BOOL interrupts = OSDisableInterrupts();
-        OSSetAlarm(&sleepAlarm.alarm, (OS_TIMER_CLOCK / 1000) * 0x32, wakeup);
-        OSSuspendThread(sleepAlarm.thread);
-        OSRestoreInterrupts(interrupts);
+        sleep();
     }
 }
 
@@ -1193,15 +1186,7 @@ void CGraphic::DrawBound(CBound& bound, _GXColor color)
  */
 void CGraphic::SetFogColor(_GXColor color)
 {
-    const u8* colorBytes = reinterpret_cast<const u8*>(&color);
-    u8 c0 = colorBytes[0];
-    u8 c1 = colorBytes[1];
-    m_fogColor.r = c0;
-    c0 = colorBytes[2];
-    m_fogColor.g = c1;
-    c1 = colorBytes[3];
-    m_fogColor.b = c0;
-    m_fogColor.a = c1;
+    m_fogColor = color;
 }
 
 /*

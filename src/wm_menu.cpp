@@ -450,7 +450,6 @@ static const int kWmMenuPlayerCount = 8;
 static const int kWmMenuControllerCount = 4;
 static const int kWmCharaSelectCount = kWmMenuPlayerCount;
 static const int kWmCharaSelectBytes = sizeof(WmCharaSelectEntry) * kWmCharaSelectCount;
-static const int kWmMenuCharaStateBytes = kMcListEntrySize * kMcListCount;
 
 struct GbaCMakeInfoRaw
 {
@@ -468,11 +467,6 @@ struct GbaCMakeInfoRaw
 };
 
 STATIC_ASSERT(sizeof(GbaCMakeInfoRaw) == 0x20);
-
-static inline McListInfo* GetWmMenuCharaState(CMenuPcs* menu)
-{
-	return menu->m_wmCharaState;
-}
 
 static inline CCharaPcs::CHandle** GetWmCharaHandles(CMenuPcs* menu)
 {
@@ -888,7 +882,7 @@ void CMenuPcs::loadData()
 
 	m_wmCharaState =
 	    new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x24A) McListInfo[kMcListCount];
-	memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
+	ClrMcList();
 
 	m_wmWorldParams =
 	    static_cast<unsigned char*>(operator new(0x10, MenuPcs.m_menuStage, "wm_menu.cpp", 0x24E));
@@ -1744,7 +1738,7 @@ void CMenuPcs::CalcMCardMenu()
 		} else {
 			m_mcCtrl.m_saveIndex = 0;
 		}
-		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
+		ClrMcList();
 		for (int i = 0; i < kWmMenuControllerCount; i++) {
 			Game.m_gameWork.m_wmBackupParams[i] = m_wmWorldState->m_originalBackupParams[i];
 		}
@@ -1781,7 +1775,7 @@ void CMenuPcs::CalcMCardMenu()
 			GetWinSize(0, &windowWidth, &windowHeight, 0);
 			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
-			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
+			ClrMcList();
 			m_wmWorldState->m_flag09 = 1;
 			m_wmWorldState->m_flag0A = 0;
 		}
@@ -2100,7 +2094,7 @@ void CMenuPcs::CalcMCardMenu()
 	case 0xC: {
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			m_wmWorldState->m_flag09 = 1;
-			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
+			ClrMcList();
 			m_mcCtrl.m_previousState = 0;
 			m_mcCtrl.m_state = 0;
 			m_mcCtrl.m_lastResult = 0;
@@ -2121,17 +2115,7 @@ void CMenuPcs::CalcMCardMenu()
 				break;
 			}
 			if (m_wmWorldState->m_menuMode == 8) {
-				int iVar21 = 0;
-				McListInfo* pState = m_wmCharaState;
-				int cnt = 4;
-				do {
-					if (pState->m_isBroken == 0
-					    && static_cast<int>(pState->m_scriptSysVal0) > 0) {
-						iVar21++;
-					}
-					pState++;
-					cnt--;
-				} while (cnt != 0);
+				const int iVar21 = ChkMcDataCnt();
 				if (iVar21 == 0) {
 					m_wmWorldState->m_mcResult = (short)0xFC19;
 				}
@@ -2341,7 +2325,7 @@ void CMenuPcs::CalcLoadMenu()
 		InitFrame0Info();
 
 		m_mcCtrl.Init();
-		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
+		ClrMcList();
 
 		for (int i = 0; i < kWmMenuControllerCount; i++) {
 			Game.m_gameWork.m_wmBackupParams[i] = m_wmWorldState->m_originalBackupParams[i];
@@ -2384,7 +2368,7 @@ void CMenuPcs::CalcLoadMenu()
 			GetWinSize(0, &windowWidth, &windowHeight, 0);
 			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
-			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
+			ClrMcList();
 			m_wmWorldState->m_flag09 = 1;
 			m_wmWorldState->m_flag0A = 0;
 		}
@@ -2736,7 +2720,7 @@ void CMenuPcs::CalcLoadMenu()
 	case 0xC: {
 		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			m_wmWorldState->m_flag09 = 1;
-			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
+			ClrMcList();
 			m_mcCtrl.m_previousState = 0;
 			m_mcCtrl.m_state = 0;
 			m_mcCtrl.m_lastResult = 0;
@@ -2757,13 +2741,7 @@ void CMenuPcs::CalcLoadMenu()
 			} else {
 				int iVar23 = 0;
 				if (m_wmWorldState->m_menuMode == 8) {
-					for (int i = iVar23; i < 4; i++) {
-						const McListInfo& entry = m_wmCharaState[i];
-						if (entry.m_isBroken == 0
-						    && static_cast<int>(entry.m_scriptSysVal0) > 0) {
-							iVar23++;
-						}
-					}
+					iVar23 = ChkMcDataCnt();
 					if (iVar23 == 0) {
 						m_wmWorldState->m_mcResult = (short)0xFC19;
 					}
@@ -3666,7 +3644,7 @@ void CMenuPcs::DrawMCardMenu()
 			break;
 		case 3:
 			if (m_wmWorldState->m_mcResult != 1) {
-				memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
+				ClrMcList();
 				short mcResult = m_wmWorldState->m_mcResult;
 				if (mcResult == -1) m_wmWorldState->m_subState = 5;
 				else if (mcResult == -2) m_wmWorldState->m_subState = 8;
@@ -3710,7 +3688,7 @@ void CMenuPcs::DrawMCardMenu()
 				if (m_wmWorldState->m_state0E < 0 || ss == 0x14 || ss == 0x1c || ss == 0x1b) {
 					m_wmWorldState->m_subState = 3;
 				} else if (ss == 0x0E) {
-					memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
+					ClrMcList();
 					m_wmWorldState->m_subState = 0x11;
 					m_wmWorldState->m_cardChannel = 0;
 				} else if (ss == 0x15) {
@@ -4383,7 +4361,7 @@ void CMenuPcs::DrawLoadMenu()
 			break;
 		case 3:
 			if (m_wmWorldState->m_mcResult != 1) {
-				memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
+				ClrMcList();
 				short mcResult = m_wmWorldState->m_mcResult;
 				if (mcResult == -1) {
 					m_wmWorldState->m_subState = 5;
@@ -4513,7 +4491,7 @@ void CMenuPcs::DrawLoadMenu()
 					} else if (m_wmWorldState->m_menuMode == 8 && m_goOutSaveLoadMode != 0) {
 						m_wmWorldState->m_nextMenuMode = 1;
 						m_wmWorldState->m_delay = 1;
-						memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
+						ClrMcList();
 						m_wmTransitionCode = 1;
 					} else {
 						m_wmWorldState->m_subState = 2;
@@ -4604,7 +4582,7 @@ void CMenuPcs::DrawLoadMenu()
 					if (m_wmWorldState->m_menuMode == 8 && m_goOutSaveLoadMode != 0) {
 						m_wmWorldState->m_nextMenuMode = 1;
 						m_wmWorldState->m_delay = 1;
-						memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
+						ClrMcList();
 						m_wmTransitionCode = 1;
 					} else {
 						m_wmWorldState->m_subState = 2;
@@ -8970,25 +8948,16 @@ void CMenuPcs::GetMcOdekakePos(int* x, int* y)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::ChkMcDataCnt()
+inline int CMenuPcs::ChkMcDataCnt()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const list = m_wmWorkBuffer;
 	int count = 0;
-
-	if (list == 0) {
-		gWmMenuWorkA = 0;
-		return;
-	}
-
 	for (int i = 0; i < kMcListCount; i++) {
-		unsigned char* const entry = list + i * kMcListEntrySize;
-		if (entry[0x43] == 0 && entry[0x41] != 0 && entry[0x42] == 0) {
+		const McListInfo& entry = m_wmCharaState[i];
+		if (entry.m_isBroken == 0 && static_cast<int>(entry.m_scriptSysVal0) > 0) {
 			count++;
 		}
 	}
-
-	gWmMenuWorkA = count;
+	return count;
 }
 
 /*
@@ -9866,14 +9835,7 @@ inline void CMenuPcs::DrawMcObj()
  */
 inline void CMenuPcs::SetMcList(int index, McListInfo* info)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const list = m_wmWorkBuffer;
-	if (list == 0 || info == 0 || index < 0 || index >= kMcListCount) {
-		return;
-	}
-	unsigned char* const dst = list + index * kMcListEntrySize;
-	memcpy(dst, info, kMcListEntrySize);
-	dst[0x43] = 0;
+	m_wmCharaState[index] = *info;
 }
 
 /*
@@ -9887,17 +9849,7 @@ inline void CMenuPcs::SetMcList(int index, McListInfo* info)
  */
 inline void CMenuPcs::ClrMcList()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const list = m_wmWorkBuffer;
-	if (list != 0) {
-		memset(list, 0, kMcListEntrySize * kMcListCount);
-	}
-	gWmMenuCursorX[0] = 0xFF;
-	gWmMenuCursorX[1] = 0xFF;
-	gWmMenuCursorY[0] = 0xFF;
-	gWmMenuCursorY[1] = 0xFF;
-	gWmMenuWorkA = 0;
-	gWmMenuWorkB = 0;
+	memset(m_wmCharaState, 0, sizeof(McListInfo) * kMcListCount);
 }
 
 /*
@@ -10831,7 +10783,7 @@ int McCtrl::LoadMcList()
 
 	switch (m_state) {
 	case 0:
-		memset(MenuPcs.m_wmCharaState, 0, kMcListEntrySize * kMcListCount);
+		MenuPcs.ClrMcList();
 		MemoryCardMan.McMount(m_cardChannel);
 		m_lastResult = MemoryCardMan.GetResult();
 		m_state = 1;
@@ -10903,12 +10855,7 @@ int McCtrl::LoadMcList()
 			} else {
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
-				McListInfo entry;
-				memset(&entry, 0, sizeof(entry));
-				entry.m_isBroken = 1;
-				for (int i = 0; i < kMcListCount; i++) {
-					MenuPcs.m_wmCharaState[i] = entry;
-				}
+				SetBrokenFile(1);
 				m_state = 7;
 			}
 		} else {
@@ -11040,7 +10987,7 @@ void McCtrl::SetListDat(int slot, int clearScriptSysVal0)
 		entry.m_hasData = 0;
 	}
 
-	MenuPcs.m_wmCharaState[slot] = entry;
+	MenuPcs.SetMcList(slot, &entry);
 }
 
 /*
@@ -11054,9 +11001,11 @@ void McCtrl::SetListDat(int slot, int clearScriptSysVal0)
  */
 inline void McCtrl::SetBrokenFile(int isBroken)
 {
-	m_createFlag = isBroken;
-	if (isBroken != 0) {
-		m_lastResult = -1;
+	McListInfo entry;
+	memset(&entry, 0, sizeof(entry));
+	entry.m_isBroken = isBroken;
+	for (int i = 0; i < kMcListCount; i++) {
+		MenuPcs.SetMcList(i, &entry);
 	}
 }
 
@@ -11167,12 +11116,7 @@ int McCtrl::SaveDat()
 					m_state = -1;
 				}
 			} else {
-				McListInfo entry;
-				memset(&entry, 0, sizeof(entry));
-				entry.m_isBroken = 0;
-				for (int i = 0; i < kMcListCount; i++) {
-					MenuPcs.m_wmCharaState[i] = entry;
-				}
+				SetBrokenFile(0);
 				m_state = 10;
 			}
 		}
@@ -12275,12 +12219,7 @@ int McCtrl::EraseDat()
 					m_state = -1;
 				}
 			} else {
-				McListInfo entry;
-				memset(&entry, 0, sizeof(entry));
-				entry.m_isBroken = 0;
-				for (int i = 0; i < kMcListCount; i++) {
-					MenuPcs.m_wmCharaState[i] = entry;
-				}
+				SetBrokenFile(0);
 				m_state = 10;
 			}
 		}

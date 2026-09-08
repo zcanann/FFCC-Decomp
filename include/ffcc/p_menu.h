@@ -761,7 +761,7 @@ public:
     void DrawMainMenuSub();
     void GetMcAccessPos(int*, int*);
     void GetMcOdekakePos(int*, int*);
-    void ChkMcDataCnt();
+    int ChkMcDataCnt();
     void DrawMCList();
     void DrawHelpBase(int, float);
     void CalcMcObj();

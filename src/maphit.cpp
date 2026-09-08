@@ -39,13 +39,6 @@ Vec g_hit_mvec_min;
 Vec g_hit_hpv;
 Vec g_hit_hpv_min;
 
-namespace {
-static inline unsigned char* Ptr(void* p, unsigned int offset)
-{
-    return reinterpret_cast<unsigned char*>(p) + offset;
-}
-}
-
 int g_hit_edge_idx_min;
 float g_hit_t;
 float g_hit_t_min;
@@ -76,28 +69,24 @@ void CMapHit::DrawNormal()
  */
 void CMapHit::DrawWire()
 {
-    static const u32 kFaceStride = 0x50;
-
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 
-    unsigned char* face = reinterpret_cast<unsigned char*>(m_faces);
+    CMapHitFace* face = m_faces;
     int faceIndex = 0;
     while (faceIndex < static_cast<int>(m_faceCount)) {
         GXBegin(static_cast<GXPrimitive>(0xB0), GX_VTXFMT7, static_cast<u16>(4));
 
-        unsigned char* index = face;
         int i = 0;
-        while (i < static_cast<int>(face[0x46])) {
-            Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index + 0x48);
+        while (i < static_cast<int>(face->m_vertexCount)) {
+            Vec* vertex = m_vertices + face->m_vertexIndices[i];
             GXPosition3f32(vertex->x, vertex->y, vertex->z);
             i++;
-            index += sizeof(unsigned short);
         }
 
-        const unsigned short firstIndex = *reinterpret_cast<unsigned short*>(face + 0x48);
-        face += kFaceStride;
+        const unsigned short firstIndex = face->m_vertexIndices[0];
+        face++;
         faceIndex++;
 
         Vec* firstVertex = m_vertices + firstIndex;
@@ -133,15 +122,13 @@ void CMapHit::Draw()
             GXColor colorBBytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            unsigned char* index = reinterpret_cast<unsigned char*>(face);
             int i = 0;
             while (i < static_cast<int>(face->m_vertexCount)) {
-                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index + 0x48);
+                Vec* vertex = m_vertices + face->m_vertexIndices[i];
                 GXPosition3f32(vertex->x, vertex->y, vertex->z);
                 GXNormal3f32(face->m_normal.x, face->m_normal.y, face->m_normal.z);
                 GXColor4u8(colorABytes.r, colorABytes.g, colorABytes.b, colorABytes.a);
                 i++;
-                index += sizeof(unsigned short);
             }
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
@@ -214,7 +201,7 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
     g_hit_mvec = *position;
 
     while (static_cast<int>(faceIndex) < endFace) {
-        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceIndex * sizeof(CMapHitFace)));
+        g_hit_lpface = &m_faces[faceIndex];
         CheckHitFaceCylinder(mask);
         faceIndex++;
     }
@@ -230,11 +217,9 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
 
-    int faceOffset = 0;
     for (int i = 0; i < m_faceCount; i++) {
-        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
+        g_hit_lpface = &m_faces[i];
         CheckHitFaceCylinder(mask);
-        faceOffset += 0x50;
     }
 }
 
@@ -246,14 +231,13 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
 int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
 {
     unsigned int faceIndex = startFace;
-    unsigned int faceOffset = faceIndex * sizeof(CMapHitFace);
     int endFace = static_cast<unsigned short>(faceCount + startFace);
 
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
 
     while (static_cast<int>(faceIndex) < endFace) {
-        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceIndex * sizeof(CMapHitFace)));
+        g_hit_lpface = &m_faces[faceIndex];
         g_hit_t_min = kMapHitInitialTMin;
 
         if (CheckHitFaceCylinder(mask) != 0) {
@@ -280,17 +264,14 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
 
-    int faceOffset;
     int faceIndex;
     faceIndex = 0;
-    faceOffset = 0;
     while (faceIndex < static_cast<int>(m_faceCount)) {
-        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
+        g_hit_lpface = &m_faces[faceIndex];
         g_hit_t_min = kMapHitInitialTMin;
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;
         }
-        faceOffset += 0x50;
         faceIndex++;
     }
 
@@ -418,10 +399,7 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
  */
 void CMapHit::GetHitFaceNormal(Vec* out)
 {
-    float* const normal = reinterpret_cast<float*>(gMapHitFace);
-    out->x = normal[0];
-    out->y = normal[1];
-    out->z = normal[2];
+    *out = gMapHitFace->m_normal;
 }
 
 /*
@@ -484,7 +462,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    Vec* hitDirection = reinterpret_cast<Vec*>(Ptr(&g_hit_cyl, 0x18));
+    Vec* hitDirection = &cyl.m_axis;
     float dot = PSVECDotProduct(hitDirection, &g_hit_lpface->m_normal);
     if (dot >= kMapHitZero) {
         return 0;
@@ -653,7 +631,7 @@ edge_loop:
                 Vec edge;
                 PSVECSubtract(&current, &previous, &edge);
 
-                Vec rayDirection = *reinterpret_cast<Vec*>(Ptr(&g_hit_cyl, 0x18));
+                Vec rayDirection = cyl.m_axis;
                 Vec rayStart = cyl.m_bottom;
 
                 CMapCylinder edgeCylinder;

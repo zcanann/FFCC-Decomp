@@ -1,6 +1,7 @@
 #include "ffcc/memorycard.h"
 #include "ffcc/file.h"
 #include "ffcc/chara.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/game.h"
@@ -2093,41 +2094,19 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
             }
         }
 
-        memset(dstCharData + 0xC8, 0xFF, 0x10);
-        memset(dstCharData + 0xD8, 0, 0x10);
+        memset(dstCharacter.m_commandListInventorySlotRef, 0xFF, sizeof(dstCharacter.m_commandListInventorySlotRef));
+        memset(dstCharacter.m_commandListExtra, 0, sizeof(dstCharacter.m_commandListExtra));
         dstCharacter.m_inventoryItemCount = 0;
-        memset(dstCharData + 0x3C, 0xFF, 0x80);
+        memset(dstCharacter.m_inventoryItems, 0xFF, sizeof(dstCharacter.m_inventoryItems));
 
-        int artifact = static_cast<int>(dstCharacter.m_equipment[0]);
-        if (artifact >= 0 && artifact < 0x40)
+        for (int i = 0; i < 4; i++)
         {
-            artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<s16*>(srcCharData + artifact);
-            dstCharacter.m_inventoryItemCount = dstCharacter.m_inventoryItemCount + 1;
-        }
-
-        artifact = static_cast<int>(dstCharacter.m_equipment[1]);
-        if (artifact >= 0 && artifact < 0x40)
-        {
-            artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<s16*>(srcCharData + artifact);
-            dstCharacter.m_inventoryItemCount = dstCharacter.m_inventoryItemCount + 1;
-        }
-
-        artifact = static_cast<int>(dstCharacter.m_equipment[2]);
-        if (artifact >= 0 && artifact < 0x40)
-        {
-            artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<s16*>(srcCharData + artifact);
-            dstCharacter.m_inventoryItemCount = dstCharacter.m_inventoryItemCount + 1;
-        }
-
-        artifact = static_cast<int>(dstCharacter.m_equipment[3]);
-        if (artifact >= 0 && artifact < 0x40)
-        {
-            artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<s16*>(srcCharData + artifact);
-            dstCharacter.m_inventoryItemCount = dstCharacter.m_inventoryItemCount + 1;
+            const int itemSlot = dstCharacter.m_equipment[i];
+            if (itemSlot >= 0 && itemSlot < 64)
+            {
+                dstCharacter.m_inventoryItems[itemSlot] = srcCharacter.m_inventoryItems[itemSlot];
+                dstCharacter.m_inventoryItemCount++;
+            }
         }
 
         srcCharacter.m_isAway = 1;
@@ -2170,15 +2149,12 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
  */
 void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
 {
-    u8* save = reinterpret_cast<u8*>(saveDat);
-    int charSlot = 0;
-
-    do
+    for (int charSlot = 0; charSlot < 8; charSlot++)
     {
-        u8* charData = save + 0x14D0;
-        if (*reinterpret_cast<int*>(charData + 0x5B4) != 0)
+        Mc::CharaDat& character = saveDat->m_characters[charSlot];
+        if (character.m_exists != 0)
         {
-            short equippedItems[4];
+            short hpArtifacts[4];
 
             for (int itemSlot = 0; itemSlot < 0x49; itemSlot++)
             {
@@ -2186,38 +2162,28 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
                 {
                     const int word = itemSlot >> 5;
                     const int bit = itemSlot % 32;
-                    if ((*reinterpret_cast<u32*>(charData + 0xBC + word * 4) & (1 << bit)) != 0)
+                    if ((character.m_artifactFlags[word] & (1 << bit)) != 0)
                     {
-                        int equippedSlot = itemSlot - 0x45;
-                        equippedItems[equippedSlot] = static_cast<short>(itemSlot + 0x9F);
+                        int artifactSlot = itemSlot - 0x45;
+                        hpArtifacts[artifactSlot] = static_cast<short>(itemSlot + 0x9F);
                     }
                     else
                     {
-                        int equippedSlot = itemSlot - 0x45;
-                        equippedItems[equippedSlot] = -1;
+                        int artifactSlot = itemSlot - 0x45;
+                        hpArtifacts[artifactSlot] = -1;
                     }
                 }
-
             }
 
-            int itemData = Game.unkCFlatData0[2];
+            const SItemFlatRow* itemData = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2]);
             int totalHpBonus = 0;
 
-            if (equippedItems[0] >= 0)
+            for (int i = 0; i < 4; i++)
             {
-                totalHpBonus = (unsigned int)*(unsigned short*)(itemData + equippedItems[0] * 0x48 + 6);
-            }
-            if (equippedItems[1] >= 0)
-            {
-                totalHpBonus += *(unsigned short*)(itemData + equippedItems[1] * 0x48 + 6);
-            }
-            if (equippedItems[2] >= 0)
-            {
-                totalHpBonus += *(unsigned short*)(itemData + equippedItems[2] * 0x48 + 6);
-            }
-            if (equippedItems[3] >= 0)
-            {
-                totalHpBonus += *(unsigned short*)(itemData + equippedItems[3] * 0x48 + 6);
+                if (hpArtifacts[i] >= 0)
+                {
+                    totalHpBonus += itemData[hpArtifacts[i]].m_value;
+                }
             }
 
             int finalHpMax = 0x10;
@@ -2226,11 +2192,7 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
                 finalHpMax = totalHpBonus + 8;
             }
 
-            *reinterpret_cast<short*>(charData + 0x06) = finalHpMax;
+            character.m_maxHp = finalHpMax;
         }
-
-        charSlot++;
-        save += 0x9C0;
     }
-    while (charSlot < 8);
 }

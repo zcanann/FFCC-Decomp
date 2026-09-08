@@ -38,7 +38,6 @@ CPtrArray<T>::~CPtrArray()
     m_numItems = 0;
 }
 
-#ifndef FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 template <class T>
 int CPtrArray<T>::GetSize()
 {
@@ -56,7 +55,6 @@ T CPtrArray<T>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
-#endif
 
 template <class T>
 void CPtrArray<T>::SetAt(unsigned long index, T item)

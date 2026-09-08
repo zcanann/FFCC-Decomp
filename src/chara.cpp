@@ -697,13 +697,14 @@ void CChara::FlipDBuffer()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
+asm void CChara::gqrInit(register unsigned long posGqr, register unsigned long normGqr,
+                        register unsigned long texGqr)
 {
-	asm {
-		mtspr GQR5, r4
-		mtspr GQR6, r5
-		mtspr GQR7, r6
-	}
+	nofralloc
+	mtspr GQR5, posGqr
+	mtspr GQR6, normGqr
+	mtspr GQR7, texGqr
+	blr
 }
 
 /*

@@ -330,6 +330,143 @@ inline void CMenuPcs::LetterInit4()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 384b
+ * EN Address: 0x80187678
+ * EN Size: 536b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::LetterLstOpen()
+{
+	int done = 0;
+	m_letterMenuState->frame =
+		m_letterMenuState->frame + 1;
+	int count = static_cast<int>(m_singleFadeState->count);
+	SingleFadeEntry* panel = m_singleFadeState->entries;
+	int frame = static_cast<int>(m_letterMenuState->frame);
+	for (int i = 0; i < count; ++i) {
+		{
+			float progress = FLOAT_803330bc;
+			if (frame >= panel->startFrame) {
+				if (panel->startFrame + panel->duration <= frame) {
+					done = done + 1;
+					panel->alpha = FLOAT_803330f8;
+					panel->dx = progress;
+					panel->dy = progress;
+				} else {
+					panel->elapsed = panel->elapsed + 1;
+					panel->alpha =
+						static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
+						                   static_cast<double>(static_cast<float>(panel->elapsed)));
+					if ((panel->flags & 2) == 0) {
+						progress = static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
+						                           static_cast<double>(static_cast<float>(panel->elapsed)));
+						float dx = (panel->targetX - static_cast<float>(panel->x)) * progress;
+						float dy = (panel->targetY - static_cast<float>(panel->y)) * progress;
+						panel->dx = dx;
+						panel->dy = dy;
+					}
+				}
+			}
+		}
+		panel++;
+	}
+	int finished = 0;
+	if (count == done) {
+		finished = 1;
+	}
+	return finished;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 380b
+ * EN Address: 0x80187890
+ * EN Size: 552b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::LetterLstClose()
+{
+	int finished = 0;
+
+	LetterMenuState* state = m_letterMenuState;
+	state->frame = state->frame + 1;
+
+	int panelCount = static_cast<int>(m_singleFadeState->count);
+	SingleFadeEntry* entry = m_singleFadeState->entries;
+	int frame = static_cast<int>(m_letterMenuState->frame);
+
+	for (int i = 0; i < panelCount; ++i, ++entry) {
+		float f = FLOAT_803330bc;
+		if (frame >= entry->startFrame) {
+			if (entry->startFrame + entry->duration <= frame) {
+				++finished;
+				entry->alpha = FLOAT_803330bc;
+				entry->dx = f;
+				entry->dy = f;
+			} else {
+				entry->elapsed = entry->elapsed + 1;
+				entry->alpha =
+				    static_cast<float>(DOUBLE_803330e8 -
+				                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(entry->duration))) *
+				                           static_cast<double>(static_cast<float>(entry->elapsed)));
+				if ((entry->flags & 2) == 0) {
+					f = static_cast<float>(DOUBLE_803330e8 -
+					                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(entry->duration))) *
+					                           static_cast<double>(static_cast<float>(entry->elapsed)));
+					float dx = (entry->targetX - static_cast<float>(entry->x)) * f;
+					float dy = (entry->targetY - static_cast<float>(entry->y)) * f;
+					entry->dx = dx;
+					entry->dy = dy;
+				}
+			}
+		}
+	}
+
+	int allFinished = 0;
+	if (panelCount == finished) {
+		allFinished = 1;
+	}
+	return allFinished;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 436b
+ * EN Address: 0x80187AB8
+ * EN Size: 124b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::LetterMessOpen()
+{
+	CCaravanWork::CLetterWork* letter = &GetLetterCaravanWork()->m_letters[s_SelLetter];
+	if (!letter->IsOpened()) {
+		letter->SetOpened();
+	}
+	return LetterLstOpen();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 380b
+ * EN Address: 0x80187B34
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::LetterMessClose()
+{
+	return LetterLstClose();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80167844
  * PAL Size: 1016b
  * EN Address: 0x80186DD0
@@ -339,18 +476,13 @@ inline void CMenuPcs::LetterInit4()
  */
 bool CMenuPcs::LetterOpen()
 {
-	int iVar4;
-	int iVar5;
-	int iVar6;
-	int iVar8;
-	float fVar1;
-	SingleFadeEntry* panel;
+	int attachMode;
 
 	s_OpenClose = 1;
 	if (m_letterMenuState->initialized == '\0') {
 		LetterInit();
-		iVar4 = SingGetLetterAttachflg();
-		if (iVar4 >= 0) {
+		attachMode = SingGetLetterAttachflg();
+		if (attachMode >= 0) {
 			LetterInit3();
 			m_letterMenuState->listCursor = static_cast<s16>(s_BackUpCur[0]);
 			m_letterMenuState->choiceCursor = static_cast<s16>(s_BackUpCur[1]);
@@ -370,43 +502,10 @@ bool CMenuPcs::LetterOpen()
 		s_BackUpTopPos = 0;
 		SetSingWinScl(FLOAT_803330f8);
 	}
-	iVar6 = 0;
-	m_letterMenuState->frame =
-		m_letterMenuState->frame + 1;
-	iVar5 = static_cast<int>(m_singleFadeState->count);
-	panel = m_singleFadeState->entries;
-	iVar8 = static_cast<int>(m_letterMenuState->frame);
-	for (iVar4 = 0; iVar4 < iVar5; ++iVar4) {
-		{
-			fVar1 = FLOAT_803330bc;
-			if (iVar8 >= panel->startFrame) {
-				if (panel->startFrame + panel->duration <= iVar8) {
-					iVar6 = iVar6 + 1;
-					panel->alpha = FLOAT_803330f8;
-					panel->dx = fVar1;
-					panel->dy = fVar1;
-				} else {
-					panel->elapsed = panel->elapsed + 1;
-					panel->alpha =
-						static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-						                   static_cast<double>(static_cast<float>(panel->elapsed)));
-					if ((panel->flags & 2) == 0) {
-						fVar1 = static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-						                           static_cast<double>(static_cast<float>(panel->elapsed)));
-						float dx = (panel->targetX - static_cast<float>(panel->x)) * fVar1;
-						float dy = (panel->targetY - static_cast<float>(panel->y)) * fVar1;
-						panel->dx = dx;
-						panel->dy = dy;
-					}
-				}
-			}
-		}
-		panel++;
-	}
-	bool allFinished = iVar5 == iVar6;
+	bool allFinished = LetterLstOpen() != 0;
 	if (allFinished) {
-		iVar4 = SingGetLetterAttachflg();
-		if (iVar4 >= 0) {
+		attachMode = SingGetLetterAttachflg();
+		if (attachMode >= 0) {
 			m_letterMenuState->step = 0;
 			m_letterMenuState->mode = 1;
 			LetterInit1();
@@ -415,6 +514,173 @@ bool CMenuPcs::LetterOpen()
 		}
 	}
 	return allFinished;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 636b
+ * EN Address: 0x80187B5C
+ * EN Size: 544b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::LetterItemWinOpen()
+{
+	int lang = Game.m_gameWork.m_languageId;
+	CCaravanWork* caravanWork = GetLetterCaravanWork();
+	if (m_letterMenuState->dialogInitialized == '\0') {
+		char info[0x80];
+		char right[0x10];
+		char left[0x10];
+		s16 winH;
+		s16 winW;
+		CCaravanWork::CLetterWork* selectedLetter = &caravanWork->m_letters[s_SelLetter];
+		if (selectedLetter->AttachmentIsGil()) {
+			int gil = static_cast<int>(selectedLetter->AttachmentValue()) * 100;
+			if (lang == 2) {
+				sprintf(info, s_fmt_pctd_sp_pcts_pcts,
+				        gil,
+				        GetMenuStr(4),
+				        GetMenuStr(0x22));
+			} else {
+				sprintf(info, s_pctspctd_pcts_801DEE20,
+				        GetMenuStr(0x22),
+				        gil,
+				        GetMenuStr(4));
+			}
+		} else {
+			int value = selectedLetter->AttachmentValue();
+			if (lang == 2) {
+				sprintf(info, s_letterItemInfoFmt,
+				        GetMenuStr(0x23),
+				        GetLetterItemName(value * 5 + 4),
+				        GetMenuStr(0x24),
+				        GetMenuStr(0x22));
+			} else {
+				sprintf(info, s_fmt_pcts_pcts_q, GetMenuStr(0x22), GetLetterItemName(value * 5 + 4));
+			}
+		}
+		strcpy(left, "  ");
+		strcat(left, GetMenuStr(1));
+		strcpy(right, "  ");
+		strcat(right, GetMenuStr(2));
+		SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
+		GetSingWinSize(0, &winW, &winH, 1);
+		SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
+		m_menuWindowInfo->state = 0;
+		m_letterMenuState->choiceCursor = 0;
+		m_letterMenuState->dialogInitialized = 1;
+	}
+	int done = 0;
+	if (m_menuWindowInfo->state == 1) {
+		done = 1;
+	}
+	return done;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 160b
+ * EN Address: 0x80188110
+ * EN Size: 184b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::LetterAttachWinOpen()
+{
+	if (m_letterMenuState->dialogInitialized == '\0') {
+		s16 winH;
+		s16 winW;
+		GetSingWinSize(2, &winW, &winH, 0);
+		SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
+		m_menuWindowInfo->state = 0;
+		m_letterMenuState->choiceCursor = 0;
+		m_letterMenuState->messageMask = -1;
+		m_letterMenuState->dialogInitialized = 1;
+	}
+	int done = 0;
+	if (m_menuWindowInfo->state == 1) {
+		done = 1;
+	}
+	return done;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: 0x80187D7C
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::LetterItemWinClose()
+{
+	int done = 0;
+	if (m_menuWindowInfo->state == 3) {
+		m_letterMenuState->dialogInitialized = 0;
+		done = 1;
+	}
+	return done;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: 0x801880D4
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::LetterReplyWinClose()
+{
+	int done = 0;
+	if (m_menuWindowInfo->state == 3) {
+		m_letterMenuState->dialogInitialized = 0;
+		done = 1;
+	}
+	return done;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: 0x801881C8
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::LetterAttachWinClose()
+{
+	int done = 0;
+	if (m_menuWindowInfo->state == 3) {
+		m_letterMenuState->dialogInitialized = 0;
+		done = 1;
+	}
+	return done;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: 0x8018856C
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::LetterConfirmClose()
+{
+	int done = 0;
+	if (m_menuWindowInfo->state == 3) {
+		m_letterMenuState->dialogInitialized = 0;
+		done = 1;
+	}
+	return done;
 }
 
 /*
@@ -438,81 +704,13 @@ int CMenuPcs::LetterCtrl()
 	if (phase == 0) {
 		s16 mode = state->mode;
 		if (mode == 0) {
-			state->frame = state->frame + 1;
-			int panelCount = m_singleFadeState->count;
-			SingleFadeEntry* panel = m_singleFadeState->entries;
-			int frame = static_cast<int>(m_letterMenuState->frame);
-			for (int i = 0; i < panelCount; ++i, ++panel) {
-				float f = FLOAT_803330bc;
-				if (frame >= panel->startFrame) {
-					if (panel->startFrame + panel->duration <= frame) {
-						++done;
-						panel->alpha = FLOAT_803330f8;
-						panel->dx = f;
-						panel->dy = f;
-					} else {
-						panel->elapsed = panel->elapsed + 1;
-						panel->alpha =
-						    static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-						                       static_cast<double>(static_cast<float>(panel->elapsed)));
-						if ((panel->flags & 2) == 0) {
-							f = static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-							                       static_cast<double>(static_cast<float>(panel->elapsed)));
-							float dx = (panel->targetX - static_cast<float>(panel->x)) * f;
-							float dy = (panel->targetY - static_cast<float>(panel->y)) * f;
-							panel->dx = dx;
-							panel->dy = dy;
-						}
-					}
-				}
-			}
-			int listOpenFinished = 0;
-			if (panelCount == done) {
-				listOpenFinished = 1;
-			}
+			int listOpenFinished = LetterLstOpen();
 			if (listOpenFinished) {
 				m_letterMenuState->topIndex = s_SelLetter - m_letterMenuState->listCursor;
 				m_letterMenuState->step = 1;
 			}
 		} else if (mode == 1) {
-			CCaravanWork::CLetterWork* letter = &GetLetterCaravanWork()->m_letters[s_SelLetter];
-			if (!letter->FlagsBits().m_opened) {
-				letter->FlagsBits().m_opened = 1;
-			}
-
-			m_letterMenuState->frame = m_letterMenuState->frame + 1;
-			int panelCount = static_cast<int>(m_singleFadeState->count);
-			SingleFadeEntry* panel = m_singleFadeState->entries;
-			int frame = static_cast<int>(m_letterMenuState->frame);
-			int messOpenDone = 0;
-			for (int i = 0; i < panelCount; ++i, ++panel) {
-				float f = FLOAT_803330bc;
-				if (frame >= panel->startFrame) {
-					if (panel->startFrame + panel->duration <= frame) {
-						++messOpenDone;
-						panel->alpha = FLOAT_803330f8;
-						panel->dx = f;
-						panel->dy = f;
-					} else {
-						panel->elapsed = panel->elapsed + 1;
-						panel->alpha =
-						    static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-						                       static_cast<double>(static_cast<float>(panel->elapsed)));
-						if ((panel->flags & 2) == 0) {
-							f = static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-							                       static_cast<double>(static_cast<float>(panel->elapsed)));
-							float dx = (panel->targetX - static_cast<float>(panel->x)) * f;
-							float dy = (panel->targetY - static_cast<float>(panel->y)) * f;
-							panel->dx = dx;
-							panel->dy = dy;
-						}
-					}
-				}
-			}
-			int messOpenFinished = 0;
-			if (panelCount == messOpenDone) {
-				messOpenFinished = 1;
-			}
+			int messOpenFinished = LetterMessOpen();
 			if (messOpenFinished) {
 				if (SingGetLetterAttachflg() >= 0) {
 					if (s_AttachMode > 0) {
@@ -530,55 +728,7 @@ int CMenuPcs::LetterCtrl()
 				}
 			}
 		} else if (mode == 2) {
-			int lang = Game.m_gameWork.m_languageId;
-			CCaravanWork* caravanWork = GetLetterCaravanWork();
-			if (m_letterMenuState->dialogInitialized == '\0') {
-				char info[0x80];
-				char right[0x10];
-				char left[0x10];
-				s16 winH;
-				s16 winW;
-				CCaravanWork::CLetterWork* selectedLetter = &caravanWork->m_letters[s_SelLetter];
-				if (selectedLetter->AttachmentIsGil()) {
-					int gil = static_cast<int>(selectedLetter->AttachmentValue()) * 100;
-					if (lang == 2) {
-						sprintf(info, s_fmt_pctd_sp_pcts_pcts,
-						        gil,
-						        GetMenuStr(4),
-						        GetMenuStr(0x22));
-					} else {
-						sprintf(info, s_pctspctd_pcts_801DEE20,
-						        GetMenuStr(0x22),
-						        gil,
-						        GetMenuStr(4));
-					}
-				} else {
-					int value = selectedLetter->AttachmentValue();
-					if (lang == 2) {
-						sprintf(info, s_letterItemInfoFmt,
-						        GetMenuStr(0x23),
-						        GetLetterItemName(value * 5 + 4),
-						        GetMenuStr(0x24),
-						        GetMenuStr(0x22));
-					} else {
-						sprintf(info, s_fmt_pcts_pcts_q, GetMenuStr(0x22), GetLetterItemName(value * 5 + 4));
-					}
-				}
-				strcpy(left, "  ");
-				strcat(left, GetMenuStr(1));
-				strcpy(right, "  ");
-				strcat(right, GetMenuStr(2));
-				SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
-				GetSingWinSize(0, &winW, &winH, 1);
-				SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
-				m_menuWindowInfo->state = 0;
-				m_letterMenuState->choiceCursor = 0;
-				m_letterMenuState->dialogInitialized = 1;
-			}
-			done = 0;
-			if (m_menuWindowInfo->state == 1) {
-				done = 1;
-			}
+			done = LetterItemWinOpen();
 			if (done != 0) {
 				m_letterMenuState->step = 1;
 			}
@@ -587,20 +737,7 @@ int CMenuPcs::LetterCtrl()
 				m_letterMenuState->step = 1;
 			}
 		} else if (mode == 4) {
-			if (m_letterMenuState->dialogInitialized == '\0') {
-				s16 winH;
-				s16 winW;
-				GetSingWinSize(2, &winW, &winH, 0);
-				SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
-				m_menuWindowInfo->state = 0;
-				m_letterMenuState->choiceCursor = 0;
-				m_letterMenuState->messageMask = -1;
-				m_letterMenuState->dialogInitialized = 1;
-			}
-			done = 0;
-			if (m_menuWindowInfo->state == 1) {
-				done = 1;
-			}
+			done = LetterAttachWinOpen();
 			if (done != 0) {
 				m_letterMenuState->step = 1;
 			}
@@ -614,40 +751,7 @@ int CMenuPcs::LetterCtrl()
 	} else if (phase == 2) {
 		s16 mode = state->mode;
 		if (mode == 0) {
-			state->frame = state->frame + 1;
-			int panelCount = static_cast<int>(m_singleFadeState->count);
-			SingleFadeEntry* panel = m_singleFadeState->entries;
-			int frame = static_cast<int>(m_letterMenuState->frame);
-			for (int i = 0; i < panelCount; ++i, ++panel) {
-				float f = FLOAT_803330bc;
-				if (frame >= panel->startFrame) {
-					if (panel->startFrame + panel->duration <= frame) {
-						++done;
-						panel->alpha = FLOAT_803330bc;
-						panel->dx = f;
-						panel->dy = f;
-					} else {
-						panel->elapsed = panel->elapsed + 1;
-						panel->alpha =
-						    static_cast<float>(DOUBLE_803330e8 -
-						                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-						                           static_cast<double>(static_cast<float>(static_cast<unsigned int>(panel->elapsed))));
-						if ((panel->flags & 2) == 0) {
-							f = static_cast<float>(DOUBLE_803330e8 -
-							                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-							                           static_cast<double>(static_cast<float>(panel->elapsed)));
-							float dx = (panel->targetX - static_cast<float>(panel->x)) * f;
-							float dy = (panel->targetY - static_cast<float>(panel->y)) * f;
-							panel->dx = dx;
-							panel->dy = dy;
-						}
-					}
-				}
-			}
-			int uniteFinished = 0;
-			if (panelCount == done) {
-				uniteFinished = 1;
-			}
+			int uniteFinished = LetterLstClose();
 			if (uniteFinished) {
 				LetterInit1();
 				m_letterMenuState->mode = 1;
@@ -666,40 +770,7 @@ int CMenuPcs::LetterCtrl()
 				m_letterMenuState->action = 0;
 				m_letterMenuState->dialogInitialized = 0;
 			} else {
-				state->frame = state->frame + 1;
-				int panelCount = static_cast<int>(m_singleFadeState->count);
-				SingleFadeEntry* panel = m_singleFadeState->entries;
-				int frame = static_cast<int>(m_letterMenuState->frame);
-				for (int i = 0; i < panelCount; ++i, ++panel) {
-					float f = FLOAT_803330bc;
-					if (frame >= panel->startFrame) {
-						if (panel->startFrame + panel->duration <= frame) {
-							++done;
-							panel->alpha = FLOAT_803330bc;
-							panel->dx = f;
-							panel->dy = f;
-						} else {
-							panel->elapsed = panel->elapsed + 1;
-							panel->alpha =
-							    static_cast<float>(DOUBLE_803330e8 -
-							                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-							                           static_cast<double>(static_cast<float>(panel->elapsed)));
-							if ((panel->flags & 2) == 0) {
-								f = static_cast<float>(DOUBLE_803330e8 -
-								                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-								                           static_cast<double>(static_cast<float>(panel->elapsed)));
-								float dx = (panel->targetX - static_cast<float>(panel->x)) * f;
-								float dy = (panel->targetY - static_cast<float>(panel->y)) * f;
-								panel->dx = dx;
-								panel->dy = dy;
-							}
-						}
-					}
-				}
-				int replyFinished = 0;
-				if (panelCount == done) {
-					replyFinished = 1;
-				}
+				int replyFinished = LetterMessClose();
 				if (replyFinished) {
 					if (s_Attach != 2) {
 						ret = 1;
@@ -712,10 +783,7 @@ int CMenuPcs::LetterCtrl()
 			}
 			m_letterMenuState->action = 0;
 		} else if (mode == 2) {
-			if (m_menuWindowInfo->state == 3) {
-				state->dialogInitialized = static_cast<char>(done);
-				done = 1;
-			}
+			done = LetterItemWinClose();
 			if (done != 0) {
 				LetterMenuState* st = m_letterMenuState;
 				if (st->action > 0) {
@@ -729,10 +797,7 @@ int CMenuPcs::LetterCtrl()
 				m_letterMenuState->choiceCursor = 0;
 			}
 		} else if (mode == 3) {
-			if (m_menuWindowInfo->state == 3) {
-				state->dialogInitialized = static_cast<char>(done);
-				done = 1;
-			}
+			done = LetterReplyWinClose();
 			if (done != 0) {
 				LetterMenuState* st = m_letterMenuState;
 				if (st->action < 1) {
@@ -745,10 +810,7 @@ int CMenuPcs::LetterCtrl()
 				m_letterMenuState->dialogInitialized = 0;
 			}
 		} else if (mode == 4) {
-			if (m_menuWindowInfo->state == 3) {
-				state->dialogInitialized = static_cast<char>(done);
-				done = 1;
-			}
+			done = LetterAttachWinClose();
 			if (done != 0) {
 				LetterMenuState* st = m_letterMenuState;
 				if (st->action < 1) {
@@ -775,10 +837,7 @@ int CMenuPcs::LetterCtrl()
 				}
 			}
 		} else if (mode == 5) {
-			if (m_menuWindowInfo->state == 3) {
-				state->dialogInitialized = static_cast<char>(done);
-				done = 1;
-			}
+			done = LetterConfirmClose();
 			if (done != 0) {
 				LetterMenuState* st = m_letterMenuState;
 				if (st->action < 1) {
@@ -820,46 +879,7 @@ int CMenuPcs::LetterCtrl()
 int CMenuPcs::LetterClose()
 {
 	s_OpenClose = 1;
-	int finished = 0;
-
-	LetterMenuState* state = m_letterMenuState;
-	state->frame = state->frame + 1;
-
-	int panelCount = static_cast<int>(m_singleFadeState->count);
-	SingleFadeEntry* entry = m_singleFadeState->entries;
-	int frame = static_cast<int>(m_letterMenuState->frame);
-
-	for (int i = 0; i < panelCount; ++i, ++entry) {
-		float f = FLOAT_803330bc;
-		if (frame >= entry->startFrame) {
-			if (entry->startFrame + entry->duration <= frame) {
-				++finished;
-				entry->alpha = FLOAT_803330bc;
-				entry->dx = f;
-				entry->dy = f;
-			} else {
-				entry->elapsed = entry->elapsed + 1;
-				entry->alpha =
-				    static_cast<float>(DOUBLE_803330e8 -
-				                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(entry->duration))) *
-				                           static_cast<double>(static_cast<float>(entry->elapsed)));
-				if ((entry->flags & 2) == 0) {
-					f = static_cast<float>(DOUBLE_803330e8 -
-					                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(entry->duration))) *
-					                           static_cast<double>(static_cast<float>(entry->elapsed)));
-					float dx = (entry->targetX - static_cast<float>(entry->x)) * f;
-					float dy = (entry->targetY - static_cast<float>(entry->y)) * f;
-					entry->dx = dx;
-					entry->dy = dy;
-				}
-			}
-		}
-	}
-
-	int allFinished = 0;
-	if (panelCount == finished) {
-		allFinished = 1;
-	}
+	int allFinished = LetterLstClose();
 	if (allFinished && SingGetLetterAttachflg() >= 0) {
 		LetterMenuState* state2 = m_letterMenuState;
 		s_BackUpCur[0] = state2->listCursor;
@@ -868,261 +888,6 @@ int CMenuPcs::LetterClose()
 	}
 
 	return allFinished;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 384b
- * EN Address: 0x80187678
- * EN Size: 536b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::LetterLstOpen()
-{
-	LetterMenuState* state = m_letterMenuState;
-	state->frame = state->frame + 1;
-
-	int panelCount = static_cast<int>(m_singleFadeState->count);
-	SingleFadeEntry* panel = m_singleFadeState->entries;
-	int frame = static_cast<int>(state->frame);
-	int done = 0;
-
-	for (int i = 0; i < panelCount; ++i, ++panel) {
-		float f = FLOAT_803330bc;
-		if (frame >= panel->startFrame) {
-			if (panel->startFrame + panel->duration > frame) {
-				panel->elapsed = panel->elapsed + 1;
-				panel->alpha =
-				    static_cast<float>(panel->elapsed) / static_cast<float>(panel->duration);
-				if ((panel->flags & 2) == 0) {
-					f = static_cast<float>(panel->elapsed) / static_cast<float>(panel->duration);
-					float dx = (panel->targetX - static_cast<float>(panel->x)) * f;
-					float dy = (panel->targetY - static_cast<float>(panel->y)) * f;
-					panel->dx = dx;
-					panel->dy = dy;
-				}
-			} else {
-				++done;
-				panel->alpha = FLOAT_803330f8;
-				panel->dx = f;
-				panel->dy = f;
-			}
-		}
-	}
-
-	if (panelCount == done) {
-		state->topIndex = s_SelLetter - state->listCursor;
-		state->step = 1;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 380b
- * EN Address: 0x80187890
- * EN Size: 552b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::LetterLstClose()
-{
-	LetterMenuState* state = m_letterMenuState;
-	state->frame = state->frame + 1;
-
-	int panelCount = static_cast<int>(m_singleFadeState->count);
-	SingleFadeEntry* panel = m_singleFadeState->entries;
-	int frame = static_cast<int>(state->frame);
-	int done = 0;
-
-	for (int i = 0; i < panelCount; ++i, ++panel) {
-		float f = FLOAT_803330bc;
-		if (frame >= panel->startFrame) {
-			if (panel->startFrame + panel->duration > frame) {
-				panel->elapsed = panel->elapsed + 1;
-				panel->alpha =
-				    static_cast<float>(DOUBLE_803330e8 -
-				                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-				                           static_cast<double>(static_cast<float>(panel->elapsed)));
-				if ((panel->flags & 2) == 0) {
-					f = static_cast<float>(DOUBLE_803330e8 -
-					                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-					                           static_cast<double>(static_cast<float>(panel->elapsed)));
-					float dx = (panel->targetX - static_cast<float>(panel->x)) * f;
-					float dy = (panel->targetY - static_cast<float>(panel->y)) * f;
-					panel->dx = dx;
-					panel->dy = dy;
-				}
-			} else {
-				++done;
-				panel->alpha = FLOAT_803330bc;
-				panel->dx = f;
-				panel->dy = f;
-			}
-		}
-	}
-
-	if (panelCount == done) {
-		LetterInit1();
-		state->mode = 1;
-		state->step = 0;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 436b
- * EN Address: 0x80187AB8
- * EN Size: 124b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::LetterMessOpen()
-{
-	LetterMenuState* state = m_letterMenuState;
-	CCaravanWork::CLetterWork* letter = &GetLetterCaravanWork()->m_letters[s_SelLetter];
-	if (!letter->IsOpened()) {
-		letter->SetOpened();
-	}
-
-	state->frame = state->frame + 1;
-	int panelCount = static_cast<int>(m_singleFadeState->count);
-	SingleFadeEntry* panel = m_singleFadeState->entries;
-	int frame = static_cast<int>(state->frame);
-	int done = 0;
-
-	for (int i = 0; i < panelCount; ++i, ++panel) {
-		float f = FLOAT_803330bc;
-		if (frame >= panel->startFrame) {
-			if (panel->startFrame + panel->duration > frame) {
-				panel->elapsed = panel->elapsed + 1;
-				panel->alpha =
-				    static_cast<float>(panel->elapsed) / static_cast<float>(panel->duration);
-				if ((panel->flags & 2) == 0) {
-					f = static_cast<float>(panel->elapsed) / static_cast<float>(panel->duration);
-					float dx = (panel->targetX - static_cast<float>(panel->x)) * f;
-					float dy = (panel->targetY - static_cast<float>(panel->y)) * f;
-					panel->dx = dx;
-					panel->dy = dy;
-				}
-			} else {
-				++done;
-				panel->alpha = FLOAT_803330f8;
-				panel->dx = f;
-				panel->dy = f;
-			}
-		}
-	}
-
-	if (panelCount == done) {
-		if (SingGetLetterAttachflg() < 0) {
-			state->step = 1;
-		} else {
-			if (s_AttachMode < 1) {
-				s_Attach = 2;
-				state->mode = 3;
-				state->choiceCursor = static_cast<s16>(s_ReplyPos);
-			} else {
-				state->mode = 5;
-			}
-			state->step = 0;
-			state->dialogInitialized = 0;
-			SingSetLetterAttachflg(-1);
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 636b
- * EN Address: 0x80187B5C
- * EN Size: 544b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::LetterItemWinOpen()
-{
-	LetterMenuState* state = m_letterMenuState;
-	if (state->dialogInitialized == '\0') {
-		char info[0x80];
-		char left[0x10];
-		char right[0x10];
-		s16 winW;
-		s16 winH;
-
-		CCaravanWork::CLetterWork* letter = &GetLetterCaravanWork()->m_letters[s_SelLetter];
-		if (!letter->AttachmentIsGil()) {
-			int itemId = letter->AttachmentValue() * 5 + 4;
-			char* value = GetLetterItemName(itemId);
-			if (Game.m_gameWork.m_languageId == 2) {
-				sprintf(info, s_letterItemInfoFmt,
-				        GetMenuStr(0x23),
-				        value,
-				        GetMenuStr(0x24),
-				        GetMenuStr(0x22));
-			} else {
-				sprintf(info, "%s%s", GetMenuStr(0x22), value);
-			}
-		} else {
-			int gil = static_cast<int>(letter->AttachmentValue()) * 100;
-			if (Game.m_gameWork.m_languageId == 2) {
-				sprintf(info, "%d%s%s",
-				        gil,
-				        GetMenuStr(4),
-				        GetMenuStr(0x22));
-			} else {
-				sprintf(info, "%s%d%s",
-				        GetMenuStr(0x22),
-				        gil,
-				        GetMenuStr(4));
-			}
-		}
-
-		strcpy(left, "");
-		strcat(left, GetMenuStr(1), 0x10);
-		strcpy(right, "");
-		strcat(right, GetMenuStr(2), 0x10);
-		SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
-		GetSingWinSize(0, &winW, &winH, 1);
-		SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
-		m_menuWindowInfo->state = 0;
-		state->choiceCursor = 0;
-		state->dialogInitialized = 1;
-	}
-
-	if (m_menuWindowInfo->state == 1) {
-		state->step = 1;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: 0x80187D7C
- * EN Size: 60b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::LetterItemWinClose()
-{
-	LetterMenuState* state = m_letterMenuState;
-	if (m_menuWindowInfo->state == 3) {
-		state->dialogInitialized = 0;
-		if (state->action <= 0) {
-			state->mode = 1;
-		} else {
-			state->mode = 3;
-		}
-		state->action = 0;
-		state->step = 0;
-		state->dialogInitialized = 0;
-		state->choiceCursor = 0;
-	}
 }
 
 /*
@@ -1206,98 +971,6 @@ int CMenuPcs::LetterReplyWinOpen()
 		opened = 1;
 	}
 	return opened;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: 0x801880D4
- * EN Size: 60b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::LetterReplyWinClose()
-{
-	LetterMenuState* state = m_letterMenuState;
-	if (m_menuWindowInfo->state == 3) {
-		state->dialogInitialized = 0;
-		if (state->action <= 0) {
-			state->mode = 1;
-			state->step = 1;
-		} else {
-			state->mode = 4;
-			state->step = 0;
-		}
-		state->dialogInitialized = 0;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 160b
- * EN Address: 0x80188110
- * EN Size: 184b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::LetterAttachWinOpen()
-{
-	LetterMenuState* state = m_letterMenuState;
-	if (state->dialogInitialized == '\0') {
-		s16 winW;
-		s16 winH;
-		GetSingWinSize(2, &winW, &winH, 0);
-		SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
-		m_menuWindowInfo->state = 0;
-		state->choiceCursor = 0;
-		state->messageMask = -1;
-		state->dialogInitialized = 1;
-	}
-
-	if (m_menuWindowInfo->state == 1) {
-		state->step = 1;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: 0x801881C8
- * EN Size: 60b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::LetterAttachWinClose()
-{
-	LetterMenuState* state = m_letterMenuState;
-	if (m_menuWindowInfo->state == 3) {
-		state->dialogInitialized = 0;
-		if (state->action <= 0) {
-			state->mode = 3;
-			state->step = 0;
-			state->dialogInitialized = 0;
-			state->choiceCursor = static_cast<s16>(s_ReplyPos);
-		} else {
-			if (s_Attach == 2) {
-				state->mode = 5;
-				state->step = 0;
-			} else {
-				if (s_Attach == 0) {
-					SingSetLetterAttachflg(1);
-				} else {
-					SingSetLetterAttachflg(5);
-				}
-				state->mode = 1;
-				state->step = 2;
-				state->action = -1;
-				LetterInit0();
-			}
-			state->dialogInitialized = 0;
-		}
-	}
 }
 
 /*
@@ -1420,36 +1093,6 @@ int CMenuPcs::LetterConfirmOpen()
 		opened = 1;
 	}
 	return opened;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: 0x8018856C
- * EN Size: 60b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::LetterConfirmClose()
-{
-	LetterMenuState* state = m_letterMenuState;
-	if (m_menuWindowInfo->state == 3) {
-		state->dialogInitialized = 0;
-		if (state->action <= 0) {
-			state->mode = 3;
-			state->step = 0;
-			state->dialogInitialized = 0;
-			state->choiceCursor = static_cast<s16>(s_ReplyPos);
-		} else {
-			s_Attach = 2;
-			state->mode = 1;
-			state->step = 2;
-			state->action = -1;
-			LetterInit0();
-			state->dialogInitialized = 0;
-		}
-	}
 }
 
 /*

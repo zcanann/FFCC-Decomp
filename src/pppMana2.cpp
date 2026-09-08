@@ -129,14 +129,14 @@ static inline double LoadDouble(const double& value)
 static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
-    model->m_afterMeshDrawCallback = 0;
+    model->m_beforeDrawModelCallback = 0;
     model->SetDrawMeshDLCallback(0);
 }
 
 static inline void SetMana2ModelCallbacks(CChara::CModel* model, void* work, pppMana2Step* step)
 {
     model->SetCallbackContext(work, step);
-    model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana2_BeforeDrawCallback;
+    model->m_beforeDrawModelCallback = Mana2_BeforeDrawCallback;
     model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
 }
 
@@ -909,7 +909,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
 
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
-    model->m_afterMeshDrawCallback = 0;
+    model->m_beforeDrawModelCallback = 0;
     model->SetDrawMeshDLCallback(0);
 
     if ((int)Game.m_currentSceneId == 7) {
@@ -1060,7 +1060,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
-    model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana2_BeforeDrawCallback;
+    model->m_beforeDrawModelCallback = Mana2_BeforeDrawCallback;
     model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
 }
 
@@ -1423,7 +1423,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
     gObject = (CGObject*)ppvMng->m_lookTarget;
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
-    model->m_afterMeshDrawCallback = 0;
+    model->m_beforeDrawModelCallback = 0;
     model->SetDrawMeshDLCallback(0);
     mesh = model->m_meshes;
     step = work->m_step;

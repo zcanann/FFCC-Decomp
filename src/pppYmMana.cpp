@@ -112,14 +112,14 @@ static inline float LoadFloat(const float& value)
 static inline void ClearManaModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
-    model->m_afterMeshDrawCallback = 0;
+    model->m_beforeDrawModelCallback = 0;
     model->SetDrawMeshDLCallback(0);
 }
 
 static inline void SetManaModelCallbacks(CChara::CModel* model, void* work, pppYmManaStep* step)
 {
     model->SetCallbackContext(work, step);
-    model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana_BeforeDrawCallback;
+    model->m_beforeDrawModelCallback = Mana_BeforeDrawCallback;
     model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
 }
 
@@ -988,7 +988,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
-    model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana_BeforeDrawCallback;
+    model->m_beforeDrawModelCallback = Mana_BeforeDrawCallback;
     model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
 
     if (Game.m_currentMapId == 0x21) {

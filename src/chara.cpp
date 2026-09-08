@@ -103,18 +103,14 @@ STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_miscFlags) == 0x8E);
 STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_usesParentLenX) == 0x8F);
 STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_dynParamIndex) == 0x90);
 
-typedef void (*BeforeDrawModelCallback)(CChara::CModel*, void*, void*, float (*)[4], unsigned int);
-typedef void (*AfterDrawModelCallback)(CChara::CModel*, void*, void*);
-typedef int (*BeforeCalcMatrixCallback)(CChara::CModel*, void*, void*);
-typedef void (*BeforeMeshCallback)(CChara::CModel*, void*, void*, unsigned int);
-typedef void (*AfterMeshDrawCallback)(CChara::CModel*, void*, void*, unsigned int, unsigned int, float (*)[4]);
-typedef void (*AfterMeshEnvCallback)(CChara::CModel*, void*, void*, unsigned int, float (*)[4]);
-typedef void (*CustomMeshDrawCallback)(CChara::CModel*, void*, void*, unsigned int);
-
-static inline u8* ModelRaw(CChara::CModel* model)
-{
-	return reinterpret_cast<u8*>(model);
-}
+STATIC_ASSERT(offsetof(CChara::CModel, m_beforeCalcMatrixCallback) == 0xec);
+STATIC_ASSERT(offsetof(CChara::CModel, m_beforeDrawModelCallback) == 0xf0);
+STATIC_ASSERT(offsetof(CChara::CModel, m_beforeMeshLockEnvCallback) == 0xf4);
+STATIC_ASSERT(offsetof(CChara::CModel, m_beforeDrawShadowLockEnvCallback) == 0xf8);
+STATIC_ASSERT(offsetof(CChara::CModel, m_drawMeshDLCallback) == 0xfc);
+STATIC_ASSERT(offsetof(CChara::CModel, m_drawShadowMeshDLCallback) == 0x100);
+STATIC_ASSERT(offsetof(CChara::CModel, m_afterDrawMeshCallback) == 0x104);
+STATIC_ASSERT(offsetof(CChara::CModel, m_afterDrawModelCallback) == 0x108);
 
 static inline CChara::CModel::CRefData* ModelRef(CChara::CModel* model)
 {
@@ -244,41 +240,6 @@ static inline void* ModelCalcCbUser0(CChara::CModel* model)
 static inline void* ModelCalcCbUser1(CChara::CModel* model)
 {
 	return model->m_callbackParam;
-}
-
-static inline BeforeDrawModelCallback ModelBeforeDrawCallback(CChara::CModel* model)
-{
-	return *reinterpret_cast<BeforeDrawModelCallback*>(ModelRaw(model) + 0xF0);
-}
-
-static inline AfterDrawModelCallback ModelAfterDrawCallback(CChara::CModel* model)
-{
-	return *reinterpret_cast<AfterDrawModelCallback*>(ModelRaw(model) + 0x108);
-}
-
-static inline BeforeMeshCallback ModelBeforeMeshCallback(CChara::CModel* model)
-{
-	return *reinterpret_cast<BeforeMeshCallback*>(ModelRaw(model) + 0xF4);
-}
-
-static inline AfterMeshDrawCallback ModelAfterMeshDrawCallback(CChara::CModel* model)
-{
-	return *reinterpret_cast<AfterMeshDrawCallback*>(ModelRaw(model) + 0xFC);
-}
-
-static inline AfterMeshEnvCallback ModelAfterMeshEnvCallback(CChara::CModel* model)
-{
-	return *reinterpret_cast<AfterMeshEnvCallback*>(ModelRaw(model) + 0x104);
-}
-
-static inline CustomMeshDrawCallback ModelCustomMeshDrawCallback(CChara::CModel* model)
-{
-	return *reinterpret_cast<CustomMeshDrawCallback*>(ModelRaw(model) + 0xF8);
-}
-
-static inline AfterMeshDrawCallback ModelShadowDisplayListCallback(CChara::CModel* model)
-{
-	return *reinterpret_cast<AfterMeshDrawCallback*>(ModelRaw(model) + 0x100);
 }
 
 static inline void* ModelCbUser0(CChara::CModel* model)
@@ -870,7 +831,7 @@ inline void CChara::CModel::Init()
 	m_lightAlpha = 1.0f;
 	m_callbackContext = 0;
 	m_callbackParam = 0;
-	m_afterMeshDrawCallback = 0;
+	m_beforeDrawModelCallback = 0;
 	m_beforeCalcMatrixCallback = 0;
 	m_beforeMeshLockEnvCallback = 0;
 	m_beforeDrawShadowLockEnvCallback = 0;
@@ -2040,10 +2001,10 @@ foundPlain:
 
 /*
  * --INFO--
- * PAL Address: 0x8007096c
+ * PAL Address: 0x80077250
  * PAL Size: 1192b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80081438
+ * EN Size: 1380b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2058,7 +2019,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	const int materialAlpha = (flags >> 2) & 1;
 	const int shadowCullEnabled = (flags >> 3) & 1;
 	const int skipShadowPosition = ((flags >> 4) & 1) ^ 1;
-	BeforeDrawModelCallback beforeDrawModel = ModelBeforeDrawCallback(this);
+	BeforeDrawModelCallback beforeDrawModel = m_beforeDrawModelCallback;
 	if (beforeDrawModel != 0 && pass == 0) {
 		beforeDrawModel(this, m_callbackContext, m_callbackParam, view, cullFlag);
 	}
@@ -2087,11 +2048,11 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	int lastLightEnable = 0;
 	int lastZWrite = 0;
 
-	for (u32 meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
+	for (int meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
 			continue;
 		}
-		if (static_cast<int>(meshIndex) < 0x20 && ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
+		if (meshIndex < 0x20 && ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
 			continue;
 		}
 
@@ -2130,8 +2091,8 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 			GXSetZMode((u8)1, (GXCompare)3, (GXBool)zOff);
 		}
 
-		if (ModelBeforeMeshCallback(this) != 0) {
-			ModelBeforeMeshCallback(this)(this, m_callbackContext, m_callbackParam, meshIndex);
+		if (m_beforeMeshLockEnvCallback != 0) {
+			m_beforeMeshLockEnvCallback(this, m_callbackContext, m_callbackParam, meshIndex);
 		}
 
 		CopyCharaMaterialEnv();
@@ -2147,20 +2108,20 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 		CCharaDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (int displayListIndex = static_cast<int>(mesh->m_data->m_displayListCount) - 1; displayListIndex >= 0; displayListIndex--, displayList++) {
-			if (ModelAfterMeshDrawCallback(this) != 0) {
-				ModelAfterMeshDrawCallback(this)(this, m_callbackContext, m_callbackParam, meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
+			if (m_drawMeshDLCallback != 0) {
+				m_drawMeshDLCallback(this, m_callbackContext, m_callbackParam, meshIndex, displayListIndex, meshMtx);
 			} else {
 				MaterialMan.SetMaterial(ModelMaterialSet(this), displayList->m_material, materialAlpha, (_GXTevScale)0);
 				GXCallDisplayList(displayList->m_data, displayList->m_size);
 			}
 		}
 
-		if (ModelAfterMeshEnvCallback(this) != 0) {
-			ModelAfterMeshEnvCallback(this)(this, m_callbackContext, m_callbackParam, meshIndex, meshMtx);
+		if (m_afterDrawMeshCallback != 0) {
+			m_afterDrawMeshCallback(this, m_callbackContext, m_callbackParam, meshIndex, meshMtx);
 		}
 	}
 
-	AfterDrawModelCallback afterDrawModel = ModelAfterDrawCallback(this);
+	AfterDrawModelCallback afterDrawModel = m_afterDrawModelCallback;
 	if (afterDrawModel != 0) {
 		afterDrawModel(this, m_callbackContext, m_callbackParam);
 	}
@@ -2168,10 +2129,10 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 /*
  * --INFO--
- * PAL Address: 0x80070690
+ * PAL Address: 0x80076f74
  * PAL Size: 732b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8008199c
+ * EN Size: 684b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2206,8 +2167,8 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 			PSMTXConcat(ModelDrawMtx(this), ModelNodes(this)[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		}
 
-		if (ModelCustomMeshDrawCallback(this) != 0) {
-			ModelCustomMeshDrawCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
+		if (m_beforeDrawShadowLockEnvCallback != 0) {
+			m_beforeDrawShadowLockEnvCallback(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
 		}
 
 		CopyCharaMaterialEnv();
@@ -2220,8 +2181,8 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 
 		CCharaDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (int displayListIndex = static_cast<int>(mesh->m_data->m_displayListCount) - 1; displayListIndex >= 0; displayListIndex--, displayList++) {
-			if (ModelShadowDisplayListCallback(this) != 0) {
-				ModelShadowDisplayListCallback(this)(this, ModelCalcCbUser0(this), ModelCalcCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
+			if (m_drawShadowMeshDLCallback != 0) {
+				m_drawShadowMeshDLCallback(this, ModelCalcCbUser0(this), ModelCalcCbUser1(this), meshIndex, displayListIndex, meshMtx);
 			} else {
 				MaterialMan.SetMaterial(ModelMaterialSet(this), displayList->m_material, 1, (_GXTevScale)0);
 				GXCallDisplayList(displayList->m_data, displayList->m_size);

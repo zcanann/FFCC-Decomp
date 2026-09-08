@@ -240,7 +240,8 @@ public:
 	{
 	public:
 		typedef int (*BeforeCalcMatrixCallback)(CChara::CModel*, void*, void*);
-		typedef void (*AfterMeshDrawCallback)(CChara::CModel*, void*, void*, unsigned int, unsigned int, float (*)[4]);
+		typedef void (*BeforeDrawModelCallback)(CChara::CModel*, void*, void*, float (*)[4], int);
+		typedef void (*AfterDrawModelCallback)(CChara::CModel*, void*, void*);
 		typedef void (*BeforeMeshLockEnvCallback)(CChara::CModel*, void*, void*, int);
 		typedef void (*DrawMeshDLCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 		typedef void (*AfterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
@@ -367,13 +368,13 @@ public:
 		void* m_callbackContext;
 		void* m_callbackParam;
 		BeforeCalcMatrixCallback m_beforeCalcMatrixCallback;
-		AfterMeshDrawCallback m_afterMeshDrawCallback;
+		BeforeDrawModelCallback m_beforeDrawModelCallback;
 		BeforeMeshLockEnvCallback m_beforeMeshLockEnvCallback;
 		BeforeMeshLockEnvCallback m_beforeDrawShadowLockEnvCallback;
 		DrawMeshDLCallback m_drawMeshDLCallback;
 		DrawMeshDLCallback m_drawShadowMeshDLCallback;
 		AfterDrawMeshCallback m_afterDrawMeshCallback;
-		void (*m_afterDrawModelCallback)(CChara::CModel*, void*, void*);
+		AfterDrawModelCallback m_afterDrawModelCallback;
 		union
 		{
 			u8 m_flags10C;

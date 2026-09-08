@@ -29,16 +29,6 @@
 extern const Vec DAT_801D9B88;
 extern const Vec DAT_801D9B94;
 
-struct CModelAnimState {
-    u8 _padB4[0xB4];
-    float m_time;
-    u8 _padB8[4];
-    float m_animStart;
-    float m_animEnd;
-    u8 _padC4[0xC];
-    CChara::CAnim* m_anim;
-};
-
 struct ModelFlagsA0Signed {
     s8 m_bit80 : 1;
     s8 m_bit40 : 1;
@@ -70,11 +60,6 @@ STATIC_ASSERT(offsetof(CGObject, m_weaponNodeFlagBits) == 0x9A);
 STATIC_ASSERT(offsetof(CGObject, m_weaponNodeFlagBytes) == 0x9A);
 STATIC_ASSERT(sizeof(CGObject::WeaponNodeFlagBits) == 1);
 STATIC_ASSERT(sizeof(CGObject::WeaponNodeFlagBytes) == 2);
-
-static inline CModelAnimState& ModelAnimState(CChara::CModel* model)
-{
-    return *reinterpret_cast<CModelAnimState*>(model);
-}
 
 static inline Mtx& FlatPosMtx()
 {
@@ -937,7 +922,7 @@ int CGObject::IsAnimFinished(int mode)
                 if (!hasModel || (slot == -1)) {
                     result = 1;
                 } else {
-                    CModelAnimState& model = ModelAnimState(handle->m_model);
+                    CChara::CModel& model = *handle->m_model;
                     if (model.m_anim != 0) {
                         animSpan = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
                         if (sAnimFrameOffset == animSpan) {
@@ -977,8 +962,12 @@ int CGObject::IsAnimFinished(int mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007C950
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CGObject::IsLoopAnim(int mode)
 {
@@ -993,7 +982,7 @@ int CGObject::IsLoopAnim(int mode)
         return 1;
     }
 
-    CModelAnimState& model = ModelAnimState(handle->m_model);
+    CChara::CModel& model = *handle->m_model;
     if (model.m_anim != 0) {
         const float span = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
 
@@ -1017,14 +1006,11 @@ int CGObject::IsLoopAnim(int mode)
         const float lastAttr = m_lastBgAttr;
 
         if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat)) {
-            return (static_cast<u32>(static_cast<u8>(
-                        (static_cast<double>(sZeroFloat) >= threshold) << 1))
-                    << 0x1C)
-                   >> 0x1D;
+            return static_cast<double>(sZeroFloat) >= threshold;
         }
 
         const double diff = static_cast<double>(span - sAnimFrameOffset);
-        return (static_cast<u32>(static_cast<u8>((diff < threshold) << 3)) << 0x1C) >> 0x1F;
+        return diff < threshold;
     }
 
     return 1;
@@ -1134,24 +1120,27 @@ void CGObject::LoadModel(int kind, unsigned long modelId, unsigned long variant,
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007CD14
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::InitWork(int index)
 {
-    typedef void (*InitWorkFn)(void**, int, unsigned int, int);
     char ownerType;
 
     ownerType = m_ownerType;
     switch (ownerType) {
     case 0: {
-        InitWorkFn initWork = reinterpret_cast<InitWorkFn>(reinterpret_cast<void**>(*m_scriptHandle)[3]);
-        initWork(m_scriptHandle, index, Game.unkCFlatData0[0] + index * 0x1D0, 0);
+        reinterpret_cast<CGObjWork*>(m_scriptHandle)->Init(
+            index, &reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0])[index], 0);
         break;
     }
     case 1: {
-        InitWorkFn initWork = reinterpret_cast<InitWorkFn>(reinterpret_cast<void**>(*m_scriptHandle)[3]);
-        initWork(m_scriptHandle, index, Game.unkCFlatData0[1] + index * 0x1D0, 0);
+        reinterpret_cast<CGObjWork*>(m_scriptHandle)->Init(
+            index, &reinterpret_cast<CRomWork*>(Game.unkCFlatData0[1])[index], 0);
         break;
     }
     }

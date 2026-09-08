@@ -4396,68 +4396,52 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
  * --INFO--
  * PAL Address: 0x800AB24C
  * PAL Size: 420b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800c1d78
+ * EN Size: 336b
  * JP Address: TODO
  * JP Size: TODO
  */
 int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
 {
-    unsigned char* param_2 = reinterpret_cast<unsigned char*>(src);
-    unsigned char* param_4 = reinterpret_cast<unsigned char*>(outBuffer);
-    unsigned int uVar5;
-    int chunkCount;
-    unsigned char* pbVar4;
-    unsigned char* pbVar1;
-    int iVar3;
-    unsigned char* puVar6;
-    unsigned int uVar8;
+    unsigned char* data = reinterpret_cast<unsigned char*>(src);
+    unsigned char* packet = reinterpret_cast<unsigned char*>(outBuffer);
+    unsigned int crc = 0xFFFF;
+    unsigned char* cursor = data;
+    int remaining = length;
 
-    uVar5 = 0xFFFF;
-    chunkCount = length;
-    pbVar4 = param_2;
-
-    while (--chunkCount >= 0) {
-        uVar5 = (((uVar5 & 0xFFFF) << 8) ^ static_cast<unsigned int>(JoyBusCrcTable[((uVar5 >> 8) & 0xFF) ^ static_cast<unsigned int>(*pbVar4)])) & 0xFFFF;
-        pbVar4 = pbVar4 + 1;
+    while (--remaining >= 0) {
+        crc = (((crc & 0xFFFF) << 8) ^ JoyBusCrcTable[((crc >> 8) & 0xFF) ^ *cursor++]) & 0xFFFF;
     }
 
-    unsigned short inv = static_cast<unsigned short>(~static_cast<unsigned short>(uVar5));
-    param_4[0] = 5;
-    chunkCount = (length - 1) / 3;
-
-    if ((length - 1) - (chunkCount * 3) != 0) {
-        chunkCount = chunkCount + 1;
+    unsigned short checksum = static_cast<unsigned short>(~static_cast<unsigned short>(crc));
+    packet[0] = 5;
+    int chunkCount = (length - 1) / 3;
+    if ((length - 1) % 3 != 0) {
+        chunkCount++;
     }
 
-    iVar3 = chunkCount + 2;
-
-    if (iVar3 > 0xFF) {
-        iVar3 = -1;
-    } else {
-        param_4[1] = static_cast<unsigned char>(iVar3);
-
-        *reinterpret_cast<unsigned short*>(param_4 + 2) = __lhbrx(&inv, 0);
-
-        puVar6 = param_4 + 8;
-        param_4[4] = 0x45;
-        pbVar4 = param_2 + 1;
-        param_4[5] = static_cast<unsigned char>(length);
-        param_4[6] = static_cast<unsigned char>(static_cast<unsigned int>(length) >> 8);
-        param_4[7] = *param_2;
-
-        if (1 < iVar3) {
-            int i;
-            for (i = 1; i < iVar3; i++) {
-                *puVar6++ = 0x85;
-                *puVar6++ = *pbVar4++;
-                *puVar6++ = *pbVar4++;
-                *puVar6++ = *pbVar4++;
-            }
-        }
+    int wordCount = chunkCount + 2;
+    if (wordCount > 0xFF) {
+        return -1;
     }
 
-    return iVar3;
+    packet[1] = static_cast<unsigned char>(wordCount);
+    *reinterpret_cast<unsigned short*>(packet + 2) = __lhbrx(&checksum, 0);
+    unsigned char* output = packet + 8;
+    packet[4] = 0x45;
+    cursor = data + 1;
+    packet[5] = static_cast<unsigned char>(length);
+    packet[6] = static_cast<unsigned char>(static_cast<unsigned int>(length) >> 8);
+    packet[7] = *data;
+
+    for (int i = wordCount - 1; i > 0; i--) {
+        *output++ = 0x85;
+        *output++ = *cursor++;
+        *output++ = *cursor++;
+        *output++ = *cursor++;
+    }
+
+    return wordCount;
 }
 
 
@@ -6739,36 +6723,19 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
  * --INFO--
  * PAL Address: 0x800b26d8
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800bb308
+ * EN Size: 100b
  * JP Address: TODO
  * JP Size: TODO
  */
 unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 {
-    unsigned int idx;
-    unsigned int hi;
-
-    goto check_len;
-
-loop:
-    idx = *crc;
-    hi = idx << 8;
-    idx = (unsigned int)((int)idx >> 8);
-    idx = (unsigned char)idx;
-    idx = idx ^ (unsigned int)*data;
-    data = data + 1;
-    *crc = (unsigned short)(hi ^ JoyBusCrcTable[idx]);
-
-check_len:
-    len = len - 1;
-
-    if (len >= 0)
-    {
-        goto loop;
+    while (--len >= 0) {
+        int value = *crc;
+        *crc = static_cast<unsigned short>((value << 8) ^ JoyBusCrcTable[static_cast<unsigned char>(value >> 8) ^ *data++]);
     }
 
-    return (unsigned short)~(*crc);
+    return static_cast<unsigned short>(~*crc);
 }
 
 /*

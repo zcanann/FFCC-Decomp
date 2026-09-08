@@ -132,51 +132,6 @@ static __inline void CharaObjPutMonsterScaledParticle(CGCharaObj* charaObj, int 
 	charaObj->putParticle(particleNo, slot, static_cast<CGObject*>(charaObj), FLOAT_803319AC * charaObj->m_attackColRadius * scale, 0);
 }
 
-static Vec& CharaObjComboCenter(CGCharaObj* charaObj)
-{
-	return charaObj->m_comboCenter;
-}
-
-static Vec& CharaObjComboTarget(CGCharaObj* charaObj)
-{
-	return charaObj->m_comboTarget;
-}
-
-static int& CharaObjComboItemState(CGCharaObj* charaObj)
-{
-	return charaObj->m_comboItemState;
-}
-
-static int& CharaObjComboScriptArg(CGCharaObj* charaObj)
-{
-	return charaObj->m_comboScriptArg;
-}
-
-static int& CharaObjComboItemId(CGCharaObj* charaObj)
-{
-	return charaObj->m_itemId;
-}
-
-static unsigned int& CharaObjComboScriptMode(CGCharaObj* charaObj)
-{
-	return charaObj->m_comboScriptMode;
-}
-
-static int& CharaObjComboLinkCount(CGCharaObj* charaObj)
-{
-	return charaObj->m_comboLinkCount;
-}
-
-static CGPrgObj** CharaObjComboLinks(CGCharaObj* charaObj)
-{
-	return charaObj->m_comboLinks;
-}
-
-static unsigned char& CharaObjComboFlags(CGPartyObj* party)
-{
-	return party->m_partyData.partyFlags;
-}
-
 static __inline bool CharaObjSkipComboScript(CGPrgObj* obj)
 {
 	if (obj == 0) {
@@ -224,15 +179,6 @@ struct CharaObjPartyFlag04
 	unsigned char m_pad_hi : 5;
 	unsigned char m_bit04 : 1;
 	unsigned char m_pad_lo : 2;
-};
-
-struct CharaObjComboFlagBits
-{
-	signed char m_bit80 : 1;
-	signed char m_nearby : 1;
-	signed char m_bit20 : 1;
-	signed char m_active : 1;
-	signed char m_lo : 4;
 };
 
 static __inline bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
@@ -589,8 +535,8 @@ done:
 
 /*
  * --INFO--
- * PAL Address: 0x8010B674
- * PAL Size: 4b
+ * PAL Address: 0x8010B8B8
+ * PAL Size: 256b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -599,20 +545,20 @@ done:
 void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 {
 	int entry = 0;
-	while (entry < CharaObjComboLinkCount(this)) {
-		if (CharaObjComboLinks(this)[entry] != 0) {
+	while (entry < m_comboLinkCount) {
+		if (m_comboLinks[entry] != 0) {
 			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-			    (static_cast<unsigned short>(CharaObjComboLinks(this)[entry]->GetCID()) & 0x6D) == 0x6D &&
-			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(CharaObjComboLinks(this)[entry]->m_scriptHandle) + 0x3B4) != 0) {
+			    (static_cast<unsigned short>(m_comboLinks[entry]->GetCID()) & 0x6D) == 0x6D &&
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_comboLinks[entry]->m_scriptHandle) + 0x3B4) != 0) {
 				goto next_link;
-			} else if (CharaObjComboLinks(this)[entry]->m_lastStateId != 6 && CharaObjComboLinks(this)[entry]->m_lastStateId != 2) {
+			} else if (m_comboLinks[entry]->m_lastStateId != 6 && m_comboLinks[entry]->m_lastStateId != 2) {
 				break;
 			}
 		}
 next_link:
 		entry++;
 	}
-	if (entry == CharaObjComboLinkCount(this)) {
+	if (entry == m_comboLinkCount) {
 		int stackArgs[2];
 		stackArgs[0] = reinterpret_cast<int>(target);
 		stackArgs[1] = scriptArg;
@@ -624,8 +570,8 @@ next_link:
 
 /*
  * --INFO--
- * PAL Address: N/A (not in Ghidra export)
- * PAL Size: N/A
+ * PAL Address: 0x8010B9B8
+ * PAL Size: 1804b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -669,24 +615,24 @@ void CGCharaObj::combi2()
 				continue;
 			}
 
-			if (PSVECDistance(&CharaObjComboCenter(candidates[i]), &CharaObjComboCenter(other)) < 20.0f) {
+			if (PSVECDistance(&candidates[i]->m_comboCenter, &other->m_comboCenter) < 20.0f) {
 				hasNearbyPartner = 1;
 				break;
 			}
 		}
 
-		CharaObjComboFlagBits* comboFlags = reinterpret_cast<CharaObjComboFlagBits*>(&CharaObjComboFlags(party));
-		if (hasNearbyPartner && comboFlags->m_nearby == 0) {
+		PartyObjFlags& comboFlags = party->m_partyData.flags;
+		if (hasNearbyPartner && comboFlags.flag40 == 0) {
 			goto changed;
 		}
-		if (!hasNearbyPartner && comboFlags->m_nearby != 0) {
+		if (!hasNearbyPartner && comboFlags.flag40 != 0) {
 			goto changed;
 		}
 		continue;
 	changed:
-		comboFlags->m_nearby = static_cast<signed char>(hasNearbyPartner);
-		comboFlags->m_active = 1;
-		party->playSe3D((static_cast<int>(-static_cast<int>(hasNearbyPartner) | static_cast<int>(hasNearbyPartner)) >> 31) + 0x3D, 0x32, 0x96, 0, 0);
+		comboFlags.flag40 = static_cast<signed char>(hasNearbyPartner);
+		comboFlags.flag10 = 1;
+		party->playSe3D(hasNearbyPartner ? 0x3C : 0x3D, 0x32, 0x96, 0, 0);
 	}
 
 	for (int i = 0; i < candidateCount - 1; i++) {
@@ -701,7 +647,7 @@ void CGCharaObj::combi2()
 
 	for (int i = 1; i < candidateCount; i++) {
 		CGPartyObj** slot = &candidates[i];
-		if (20.0f < PSVECDistance(&CharaObjComboCenter(candidates[0]), &CharaObjComboCenter(*slot))) {
+		if (20.0f < PSVECDistance(&candidates[0]->m_comboCenter, &(*slot)->m_comboCenter)) {
 			for (int k = i; k < candidateCount - 1; k++) {
 				slot[0] = slot[1];
 				slot++;
@@ -729,7 +675,7 @@ void CGCharaObj::combi2()
 	if (isShared1F8 == 0) {
 		comboCenter.Identity();
 		for (int i = 0; i < participantCount; i++) {
-			CVector candidateCenter(CharaObjComboCenter(candidates[i]));
+			CVector candidateCenter(candidates[i]->m_comboCenter);
 			PSVECAdd(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&candidateCenter), reinterpret_cast<Vec*>(&comboCenter));
 		}
 		PSVECScale(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&comboCenter), 1.0f / static_cast<float>(participantCount));
@@ -757,23 +703,23 @@ void CGCharaObj::combi2()
 			}
 
 			if (party == leadParty) {
-				CharaObjComboItemState(party) = static_cast<int>(comboMode);
+				party->m_comboItemState = static_cast<int>(comboMode);
 				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
 			} else {
-				CharaObjComboCenter(party) = leadParty->m_worldPosition;
-				CharaObjComboItemId(party) = 0;
+				party->m_comboCenter = leadParty->m_worldPosition;
+				party->m_itemId = 0;
 			}
 		} else {
-			CharaObjComboCenter(party) = comboCenter;
+			party->m_comboCenter = comboCenter;
 			if (playedComboSe == 0 &&
 			    (Game.m_gameWork.m_menuStageMode == 0 || Game.m_gameWork.m_bossArtifactStageIndex >= 0xF ||
 			     (static_cast<unsigned short>(party->GetCID()) & 0x6D) != 0x6D ||
 			     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x3B4) == 0)) {
-				CharaObjComboItemId(party) = comboData->m_command;
+				party->m_itemId = comboData->m_command;
 				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
 				playedComboSe = 1;
 			} else {
-				CharaObjComboItemId(party) = 0;
+				party->m_itemId = 0;
 			}
 		}
 
@@ -782,16 +728,16 @@ void CGCharaObj::combi2()
 		party->addSubStat();
 		party->putComboParticle();
 
-		CharaObjComboScriptArg(party) = comboData->m_command;
-		CharaObjComboScriptMode(party) = comboMode;
-		CharaObjComboLinkCount(party) = 0;
+		party->m_comboScriptArg = comboData->m_command;
+		party->m_comboScriptMode = comboMode;
+		party->m_comboLinkCount = 0;
 
 		for (int j = 0; j < participantCount; j++) {
 			CGPartyObj* other = candidates[j];
 			if (party == other) {
 				continue;
 			}
-			CharaObjComboLinks(party)[CharaObjComboLinkCount(party)++] = other;
+			party->m_comboLinks[party->m_comboLinkCount++] = other;
 		}
 	}
 
@@ -3100,8 +3046,8 @@ void CGCharaObj::onFrameStat()
 								}
 							}
 						}
-						putParticleFromItem(m_itemId, 2, m_particleSlots[1], &CharaObjComboCenter(this));
-						putParticleFromItem(m_itemId, 3, m_particleSlots[1], &CharaObjComboCenter(this));
+						putParticleFromItem(m_itemId, 2, m_particleSlots[1], &m_comboCenter);
+						putParticleFromItem(m_itemId, 3, m_particleSlots[1], &m_comboCenter);
 					}
 					break;
 			}

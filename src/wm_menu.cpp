@@ -849,7 +849,7 @@ void CMenuPcs::loadData()
 		} else if (i + 8 >= 0x11 && i + 8 <= 0x14 && i + 5 > 0x19) {
 			effect += 4;
 		}
-		const int group = (effect->m_effectNo = i + 5) > 100;
+		const bool group = (effect->m_effectNo = i + 5) > 100;
 		CGObject* const object = &effect->m_object;
 		effect->m_slotNo = slot;
 		object->Create();
@@ -868,7 +868,7 @@ void CMenuPcs::loadData()
 		} else if (i + 0xC >= 0x11 && i + 0xC <= 0x14 && i > 0x19) {
 			effect += 4;
 		}
-		const int group = (effect->m_effectNo = i) > 100;
+		const bool group = (effect->m_effectNo = i) > 100;
 		CGObject* const object = &effect->m_object;
 		effect->m_slotNo = slot;
 		object->Create();
@@ -887,7 +887,7 @@ void CMenuPcs::loadData()
 		} else if (i + 0x20 >= 0x11 && i + 0x20 <= 0x14 && i + 0xA > 0x19) {
 			effect += 4;
 		}
-		const int group = (effect->m_effectNo = i + 0xA) > 100;
+		const bool group = (effect->m_effectNo = i + 0xA) > 100;
 		CGObject* const object = &effect->m_object;
 		effect->m_slotNo = slot;
 		object->Create();
@@ -10062,8 +10062,7 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 		effect += 4;
 	}
 
-	effect->m_effectNo = effectNo;
-	const int group = effectNo > 100;
+	const bool group = (effect->m_effectNo = effectNo) > 100;
 	CGObject* const object = &effect->m_object;
 	effect->m_slotNo = slot;
 	object->Create();
@@ -10744,7 +10743,7 @@ void CMenuPcs::BindMcObj()
 				effect += 4;
 			}
 
-			const int group = (effect->m_effectNo = modelNo + 0x16) > 100;
+			const bool group = (effect->m_effectNo = modelNo + 0x16) > 100;
 			CGObject* const object = &effect->m_object;
 			effect->m_slotNo = i + 0x11;
 			object->Create();
@@ -10779,7 +10778,7 @@ void CMenuPcs::BindMcObj()
 			effect += 4;
 		}
 
-		const int group = (effect->m_effectNo = weaponModel + 0x1A) > 100;
+		const bool group = (effect->m_effectNo = weaponModel + 0x1A) > 100;
 		CGObject* const object = &effect->m_object;
 		effect->m_slotNo = i + 0x11;
 		object->Create();

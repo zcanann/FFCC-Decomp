@@ -225,6 +225,7 @@ struct SingMenuState
 
 struct FavoListStorage;
 struct CompaMenuState;
+struct LetterMenuState;
 struct CompaOpenAnimList;
 struct TmpArtiState;
 struct TmpArtiList;
@@ -860,6 +861,7 @@ public:
         MenuLstState* m_menuLstState;
         ItemMenuState* m_itemMenuState;
         SingMenuState* m_singMenuState;
+        LetterMenuState* m_letterMenuState;
         CompaMenuState* m_compaMenuState;
         TmpArtiState* m_tmpArtiState;
         CmakeMenuState* m_cmakeState;

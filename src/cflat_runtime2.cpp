@@ -36,7 +36,6 @@ inline void* operator new(unsigned long, void* ptr)
 	return ptr;
 }
 
-extern "C" void StaticFrame__10CGCharaObjFv();
 extern const float kCFlatAngleHalfTurnDeg;
 extern const float kCFlatAnglePi;
 extern "C" const float FLOAT_80330140;
@@ -840,7 +839,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 	CStopWatch watch("no name");
 
 	if (mode == 0) {
-		StaticFrame__10CGCharaObjFv();
+		CGCharaObj::StaticFrame();
 		CGPartyObj::CheckGameOver();
 		reinterpret_cast<CFlatRuntime*>(this)->CFlatRuntime::Frame(arg0, mode);
 

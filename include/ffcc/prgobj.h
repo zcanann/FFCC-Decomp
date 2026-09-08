@@ -42,7 +42,7 @@ public:
     void putParticleBindTrace(int, int, CGObject*, float, int);
     float getTargetRot(CGPrgObj*);
     void rotTarget(CGPrgObj*);
-    void dstTargetRot(CGPrgObj*);
+    float dstTargetRot(CGPrgObj*);
     int m_stateFrameGate;      // 0x518
     int m_subFrameGate;        // 0x51C
     int m_lastStateId;         // 0x520

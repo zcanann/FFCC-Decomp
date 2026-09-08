@@ -48,6 +48,10 @@ typedef CChara::CMesh::CDisplayList CCharaDisplayListRaw;
 typedef CChara::CMesh::CRefData CCharaMeshRefRaw;
 typedef CChara::CMesh CCharaMeshRaw;
 
+STATIC_ASSERT(sizeof(CChara::CSkin) == 0x64);
+STATIC_ASSERT(offsetof(CChara::CSkin, m_matrix) == 0x00);
+STATIC_ASSERT(offsetof(CChara::CSkin, m_bindMtx) == 0x30);
+STATIC_ASSERT(offsetof(CChara::CSkin, m_nodeIndex) == 0x60);
 STATIC_ASSERT(sizeof(CCharaDisplayListRaw) == 0xC);
 STATIC_ASSERT(offsetof(CCharaDisplayListRaw, m_size) == 0x00);
 STATIC_ASSERT(offsetof(CCharaDisplayListRaw, m_data) == 0x04);
@@ -1075,15 +1079,11 @@ void CChara::CModel::setup()
 
 	CCharaMeshRaw* meshRaw = ModelMeshes(this);
 	for (u32 i = 0; i < ModelRef(this)->m_meshCount; i++, meshRaw++) {
-		int skinOffset;
-		u32 j = 0;
-		skinOffset = 0;
-		for (; j < meshRaw->m_data->m_skinCount; j++) {
-			u8* skin = reinterpret_cast<u8*>(meshRaw->m_data->m_skins) + skinOffset;
-			u32 skinNodeIndex = *reinterpret_cast<u32*>(skin + 0x60);
-			PSMTXInverse(NodeRefBindMtx(&ModelNodes(this)[skinNodeIndex]), reinterpret_cast<MtxPtr>(skin + 0x30));
-			PSMTXConcat(reinterpret_cast<MtxPtr>(skin + 0x30), NodeRefBindMtx(&ModelNodes(this)[meshRaw->m_data->m_nodeIndex]), reinterpret_cast<MtxPtr>(skin + 0x30));
-			skinOffset += 100;
+		for (u32 j = 0; j < meshRaw->m_data->m_skinCount; j++) {
+			CSkin* skin = &meshRaw->m_data->m_skins[j];
+			u32 skinNodeIndex = skin->m_nodeIndex;
+			PSMTXInverse(NodeRefBindMtx(&ModelNodes(this)[skinNodeIndex]), skin->m_bindMtx);
+			PSMTXConcat(skin->m_bindMtx, NodeRefBindMtx(&ModelNodes(this)[meshRaw->m_data->m_nodeIndex]), skin->m_bindMtx);
 		}
 	}
 
@@ -2676,12 +2676,11 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			    new (stage, const_cast<char*>(s_chara_cpp), 0x7F8) CChara::CSkin[m_data->m_skinCount];
 
 			chunk.PushChunk();
-			unsigned int skinOffset = 0;
+			unsigned int skinIndex = 0;
 			while (chunk.GetNextChunk(chunkInfo)) {
 				if (chunkInfo.m_id == 0x4E4F4445) {
-					u8* skinEntry = reinterpret_cast<u8*>(m_data->m_skins) + skinOffset;
-					skinOffset += 0x64;
-					*reinterpret_cast<u32*>(skinEntry + 0x60) = chunk.Get4();
+					CSkin* skinEntry = &m_data->m_skins[skinIndex++];
+					skinEntry->m_nodeIndex = chunk.Get4();
 				} else if (chunkInfo.m_id == 0x4F4E4520) {
 					m_data->m_oneWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_oneWeightData =
@@ -3047,13 +3046,13 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 	mesh->m_workNormals = reinterpret_cast<S16Vec*>(drawBuffer.m_base + cursor);
 	cursor += AlignCharaWorkBytes(mesh->m_data->m_normalCount * 6);
 
-	float* skinData = reinterpret_cast<float*>(mesh->m_data->m_skins);
-	for (u32 i = 0; i < mesh->m_data->m_skinCount; i++, skinData += 0x19) {
-		int nodeIndex = reinterpret_cast<int*>(skinData + 0x18)[0];
+	CSkin* skinData = mesh->m_data->m_skins;
+	for (u32 i = 0; i < mesh->m_data->m_skinCount; i++, skinData++) {
+		u32 nodeIndex = skinData->m_nodeIndex;
 		PSMTXConcat(
 		    ModelNodes(model)[nodeIndex].m_mtx,
-		    reinterpret_cast<float(*)[4]>(skinData + 0x0C),
-		    reinterpret_cast<float(*)[4]>(skinData));
+		    skinData->m_bindMtx,
+		    skinData->m_matrix);
 	}
 
 	if (mesh->m_data->m_infoWord1 != 0) {
@@ -3072,7 +3071,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 	    meshRef->m_oneWeightCountOrSize,
 	    meshRef->m_twoWeightCountOrSize,
 	    meshRef->m_threeWeightCountOrSize,
-	    reinterpret_cast<CChara::CSkin*>(meshRef->m_skins),
+	    meshRef->m_skins,
 	    meshRef->m_oneWeightData,
 	    meshRef->m_twoWeightData,
 	    meshRef->m_threeWeightData,
@@ -3242,7 +3241,7 @@ void CChara::CSkin::Create(CChunkFile& chunk, CMemory::CStage* stage)
 {
 	(void)chunk;
 	(void)stage;
-	memset(this, 0, 0x64);
+	memset(this, 0, sizeof(*this));
 }
 
 /*

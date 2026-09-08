@@ -35,7 +35,9 @@ public:
 
 		void Create(CChunkFile&, CMemory::CStage*);
 
-		u8 _pad[0x64];
+		Mtx m_matrix;
+		Mtx m_bindMtx;
+		u32 m_nodeIndex;
 	};
 
 	class CAnim : public CRef

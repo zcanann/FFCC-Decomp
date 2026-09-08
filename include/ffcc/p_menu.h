@@ -432,6 +432,12 @@ public:
     void DrawSelectOpenAnim();
     void CalcSelectWait();
     void CalcSelectCloseAnim();
+    inline void DrawSelectWait();
+    inline void DrawSelectCloseAnim();
+    inline unsigned int GetAllPadOn();
+    inline unsigned int GetAllPadRep();
+    inline void DrawBonusChkMark(float);
+    inline void DrawBonusCnt(CMenuPcs::Sprt2*, int);
 
     void DrawBonusFrame(float, float, float, float, float);
     void DrawArtiBase(CMenuPcs::Sprt2*, float);

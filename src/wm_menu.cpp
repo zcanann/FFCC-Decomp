@@ -155,9 +155,7 @@ extern int DAT_8032ef08;
 extern int DAT_80238028;
 extern char cRam8032ee21;
 extern "C" unsigned char lbl_801DC294[];
-extern "C" const char* lbl_80210D10[];
-extern "C" const char* lbl_80210D54[];
-extern "C" const char* lbl_80210D68[];
+static const char* s_port[] = {"Port ", "-Hafen", "Porto ", "Port ", "Puerto "};
 extern "C" char* lbl_80210750[];
 
 inline CGBaseObj::CGBaseObj()
@@ -182,17 +180,11 @@ extern unsigned char lbl_8032EE38[8];
 
 extern const char lbl_80331208[5] = "1.00";
 extern const char lbl_80331380[4] = {'?','?','?','?'};
-extern const char lbl_80331384[6] = "Port ";
-extern const char lbl_8033138C[7] = "-Hafen";
-extern const char lbl_80331394[7] = "Porto ";
-extern const char lbl_8033139C[8] = "Puerto ";
 extern const char s_Empty_803313A4[6] = "Empty";
 extern const char s_Frei_803313AC[5] = "Frei";
 extern const char s_Vuoto_803313B4[6] = "Vuoto";
 extern const char s_Vide_803313BC[5] = "Vide";
 extern const char s_Vacio_803313C4[8] = "Vac\355o\0\0";
-extern const char lbl_803313CC[7] = "Slot A";
-extern const char lbl_803313D4[7] = "Data 1";
 extern const float FLOAT_803313dc = 0.0f;
 extern const float FLOAT_803313e0 = 640.0f;
 extern const float FLOAT_803313e4 = 448.0f;
@@ -5686,9 +5678,9 @@ void CMenuPcs::CalcFukidashi()
 		int languageId = Game.m_gameWork.m_languageId;
 		if (languageId == 2) {
 			strcpy(nameBuffer, Game.m_gameWork.m_townName);
-			strcat(nameBuffer, lbl_80210D10[languageId - 1]);
+			strcat(nameBuffer, s_port[languageId - 1]);
 		} else {
-			strcpy(nameBuffer, lbl_80210D10[languageId - 1]);
+			strcpy(nameBuffer, s_port[languageId - 1]);
 			strcat(nameBuffer, Game.m_gameWork.m_townName);
 		}
 	} else {
@@ -6018,9 +6010,9 @@ void CMenuPcs::DrawFukidashi()
 		const int language = Game.m_gameWork.m_languageId;
 		if (language == 2) {
 			strcpy(nameBuffer, Game.m_gameWork.m_townName);
-			strcat(nameBuffer, lbl_80210D10[language - 1]);
+			strcat(nameBuffer, s_port[language - 1]);
 		} else {
-			strcpy(nameBuffer, lbl_80210D10[language - 1]);
+			strcpy(nameBuffer, s_port[language - 1]);
 			strcat(nameBuffer, Game.m_gameWork.m_townName);
 		}
 	} else {
@@ -9697,9 +9689,9 @@ LAB_next:
 					const int lang2 = Game.m_gameWork.m_languageId;
 					if (lang2 == 2) {
 						strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
-						strcat(locationStr, lbl_80210D10[lang2 - 1]);
+						strcat(locationStr, s_port[lang2 - 1]);
 					} else {
-						strcpy(locationStr, lbl_80210D10[lang2 - 1]);
+						strcpy(locationStr, s_port[lang2 - 1]);
 						strcat(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
 					}
 				} else {
@@ -10496,6 +10488,9 @@ void CMenuPcs::DrawMcWin(short state, short kind)
  */
 void CMenuPcs::DrawMcWinMess(int winType, int messType)
 {
+	static const char* s_SlotStr[] = {"Slot A", "Steckplatz A", "Slot A", "Slot A", "Ranura A"};
+	static const char* s_DataStr[] = {"Data 1", "Datenblock 1", "Salvataggio 1", "sauvegarde 1", "Archivo 1"};
+
 	CFont* const font = m_fonts[0];
 
 	const float* pOneM = &FLOAT_803313e8;
@@ -10558,27 +10553,21 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			font->SetPosX(posX);
 			font->SetPosY(y);
 			if (messType == 0) {
-				if (winType != 0) {
-					char* slotText = strstr(textBuf, lbl_80210D54[languageIndex]);
-					if (slotText != 0) {
-						int len = strlen(lbl_80210D54[languageIndex]);
-						slotText[len - 1] += GetMcCtrl()->m_cardChannel;
-					} else {
-						goto markerBranch;
-					}
+				char* slotText;
+				if (winType != 0 && (slotText = strstr(textBuf, s_SlotStr[languageIndex])) != 0) {
+					int len = strlen(s_SlotStr[languageIndex]);
+					slotText[len - 1] += GetMcCtrl()->m_cardChannel;
 				} else {
-				markerBranch: {
 					char* marker = strstr(textBuf, lbl_80331400);
 					if (marker != 0) {
 						marker[0] += 2;
 						marker[1] += 2;
 					}
 				}
-				}
 			} else {
-				char* dataText = strstr(textBuf, lbl_80210D68[languageIndex]);
+				char* dataText = strstr(textBuf, s_DataStr[languageIndex]);
 				if (dataText != 0) {
-					int len = strlen(lbl_80210D68[languageIndex]);
+					int len = strlen(s_DataStr[languageIndex]);
 					dataText[len - 1] += GetMcCtrl()->m_saveIndex;
 				}
 			}

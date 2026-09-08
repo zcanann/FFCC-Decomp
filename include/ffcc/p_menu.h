@@ -22,6 +22,7 @@ class CMesMenu;
 class CShopMenu;
 struct ArtiState;
 struct BonusMenuState;
+struct BonusAnimList;
 struct ArtiOpenAnimList;
 struct CmdState;
 struct CmdListStorage;
@@ -888,7 +889,7 @@ public:
     MenuWindowInfo* m_menuWindowInfo;
     union {
         int m_pad84C;
-        int m_bonusAnimPtr;
+        BonusAnimList* m_bonusAnim;
     };
     union {
         ArtiOpenAnimList* m_artiList;
@@ -1021,7 +1022,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorldParams) == 0x83C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaAnimState) == 0x844);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuWindowInfo) == 0x848);
-STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAnimPtr) == 0x84C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAnim) == 0x84C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemList) == 0x850);

@@ -751,8 +751,6 @@ int CCaravanWork::CanAddTmpArtifact(int numItems)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 int CCaravanWork::FindItem(int itemId)
 {
 	CCaravanWork* cur = this;
@@ -805,7 +803,6 @@ int CCaravanWork::FindItem(int itemId)
 
 	return -1;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -967,8 +964,6 @@ int CCaravanWork::GetFoodRank(int playerIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_lifetimes off
 void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxResults)
 {
 	int bit0;
@@ -1592,7 +1587,6 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 	}
 }
 
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x800a0628
@@ -2594,8 +2588,6 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdListIdx)
 {
 	int extraOff = cmdListIdx * 2;
@@ -2630,7 +2622,6 @@ int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdL
 
 	return 0;
 }
-#pragma pop
 
 /*
  * --INFO--

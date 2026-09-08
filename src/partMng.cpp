@@ -191,12 +191,10 @@ enum PppChunkId {
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 void CPtrArray<CTexture*>::SetGrow(int growCapacity)
 {
     m_growCapacity = growCapacity;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--

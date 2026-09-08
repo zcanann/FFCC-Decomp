@@ -209,13 +209,11 @@ float CMapKeyFrame::Get()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 template <>
 int CPtrArray<CMaterial*>::GetSize()
 {
     return m_numItems;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -227,12 +225,10 @@ int CPtrArray<CMaterial*>::GetSize()
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 void CPtrArray<CMaterial*>::SetDefaultSize(unsigned long defaultSize)
 {
     m_defaultSize = defaultSize;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -244,12 +240,10 @@ void CPtrArray<CMaterial*>::SetDefaultSize(unsigned long defaultSize)
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 void CPtrArray<CMaterial*>::SetGrow(int growCapacity)
 {
     m_growCapacity = growCapacity;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -305,7 +299,6 @@ int CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize);
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 int CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
 {
     if (setSize(m_numItems + 1) == 0) {
@@ -315,7 +308,6 @@ int CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
     m_numItems++;
     return 1;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -327,7 +319,6 @@ int CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 void CPtrArray<CMapLightHolder*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -337,20 +328,17 @@ void CPtrArray<CMapLightHolder*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma dont_inline on
 template <>
 void CPtrArray<CMapLightHolder*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -409,7 +397,6 @@ int CPtrArray<CMapAnim*>::setSize(unsigned long newSize);
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 int CPtrArray<CMapAnim*>::Add(CMapAnim* item)
 {
     if (setSize(m_numItems + 1) == 0) {
@@ -419,7 +406,6 @@ int CPtrArray<CMapAnim*>::Add(CMapAnim* item)
     m_numItems++;
     return 1;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -431,12 +417,10 @@ int CPtrArray<CMapAnim*>::Add(CMapAnim* item)
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 int CPtrArray<CMapAnim*>::GetSize()
 {
     return m_numItems;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -448,7 +432,6 @@ int CPtrArray<CMapAnim*>::GetSize()
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 void CPtrArray<CMapAnim*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -458,7 +441,6 @@ void CPtrArray<CMapAnim*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -470,12 +452,10 @@ void CPtrArray<CMapAnim*>::RemoveAll()
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 CMapAnim* CPtrArray<CMapAnim*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -532,12 +512,10 @@ CMapAnimNode* CPtrArray<CMapAnimNode*>::GetAt(unsigned long index)
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 int CPtrArray<CMapAnimKeyDt*>::GetSize()
 {
     return m_numItems;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -549,12 +527,10 @@ int CPtrArray<CMapAnimKeyDt*>::GetSize()
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -580,13 +556,11 @@ CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::GetAt(unsigned long index)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 template <>
 void CPtrArray<CMapAnimKeyDt*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -598,7 +572,6 @@ void CPtrArray<CMapAnimKeyDt*>::SetStage(CMemory::CStage* stage)
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -608,7 +581,6 @@ void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -619,13 +591,11 @@ void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 template <>
 void CPtrArray<CMapAnim*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -681,7 +651,6 @@ int CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 CPtrArray<CMapAnimRun*>::CPtrArray()
 {
     m_size = 0;
@@ -691,7 +660,6 @@ CPtrArray<CMapAnimRun*>::CPtrArray()
     m_stage = 0;
     m_growCapacity = 1;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -723,7 +691,6 @@ CPtrArray<CMapAnimRun*>::~CPtrArray()
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 CPtrArray<CMapAnim*>::CPtrArray()
 {
     m_size = 0;
@@ -733,7 +700,6 @@ CPtrArray<CMapAnim*>::CPtrArray()
     m_stage = 0;
     m_growCapacity = 1;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -766,7 +732,6 @@ CPtrArray<CMapAnim*>::~CPtrArray()
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 CPtrArray<CMapAnimKeyDt*>::CPtrArray()
 {
     m_size = 0;
@@ -776,7 +741,6 @@ CPtrArray<CMapAnimKeyDt*>::CPtrArray()
     m_stage = 0;
     m_growCapacity = 1;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -809,7 +773,6 @@ CPtrArray<CMapAnimKeyDt*>::~CPtrArray()
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 CPtrArray<CMapShadow*>::CPtrArray()
 {
     m_size = 0;
@@ -819,7 +782,6 @@ CPtrArray<CMapShadow*>::CPtrArray()
     m_stage = 0;
     m_growCapacity = 1;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -863,12 +825,10 @@ CMapAnim* CPtrArray<CMapAnim*>::GetAt(unsigned long index)
  * Size:	TODO
  */
 template <>
-#pragma dont_inline on
 int CPtrArray<CMapAnimRun*>::GetSize()
 {
     return m_numItems;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -880,7 +840,6 @@ int CPtrArray<CMapAnimRun*>::GetSize()
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 void CPtrArray<CMapAnimRun*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -890,7 +849,6 @@ void CPtrArray<CMapAnimRun*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -902,12 +860,10 @@ void CPtrArray<CMapAnimRun*>::RemoveAll()
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 CMapAnimRun* CPtrArray<CMapAnimRun*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -918,13 +874,11 @@ CMapAnimRun* CPtrArray<CMapAnimRun*>::operator[](unsigned long index)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 template <>
 void CPtrArray<CMapAnimRun*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -951,12 +905,10 @@ CMapAnimRun* CPtrArray<CMapAnimRun*>::GetAt(unsigned long index)
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 int CPtrArray<CMapShadow*>::GetSize()
 {
     return m_numItems;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -968,7 +920,6 @@ int CPtrArray<CMapShadow*>::GetSize()
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 void CPtrArray<CMapShadow*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -978,7 +929,6 @@ void CPtrArray<CMapShadow*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -990,12 +940,10 @@ void CPtrArray<CMapShadow*>::RemoveAll()
  * JP Size: TODO
  */
 template <>
-#pragma dont_inline on
 CMapShadow* CPtrArray<CMapShadow*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1006,13 +954,11 @@ CMapShadow* CPtrArray<CMapShadow*>::operator[](unsigned long index)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 template <>
 void CPtrArray<CMapShadow*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -2585,7 +2531,6 @@ void CMapMng::Calc()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma dont_inline on
 void CMapMng::DrawMapShadow()
 {
     if (m_mapObjCount != 0) {
@@ -2596,7 +2541,6 @@ void CMapMng::DrawMapShadow()
         }
     }
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -3382,7 +3326,6 @@ void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int loop)
 {
     int mapAnimNodeIndex;
@@ -3412,7 +3355,6 @@ void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int l
 startMapObjAnim:
     mapAnimRun->Start(startFrame, endFrame, loop);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -3423,7 +3365,6 @@ startMapObjAnim:
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
     CMapAnimRun* mapAnimRun;
@@ -3442,7 +3383,6 @@ void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 startMapAnim:
     mapAnimRun->Start(startFrame, endFrame, loop);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--

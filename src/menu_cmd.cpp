@@ -533,8 +533,6 @@ void CMenuPcs::CmdInit2()
 	}
 }
 
-#pragma push
-#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8014fa78
@@ -592,7 +590,6 @@ void CMenuPcs::CmdOpen()
 		UniteOpenAnim(-1);
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -802,8 +799,6 @@ int CMenuPcs::CmdClose()
 	return ret;
 }
 
-#pragma push
-#pragma opt_lifetimes off
 /*
  * --INFO--
  * PAL Address: 0x8014dd88
@@ -1309,10 +1304,7 @@ void CMenuPcs::CmdDraw()
 	    CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10,
 	    kCmdMenuOne, kCmdMenuThree);
 }
-#pragma pop
 
-#pragma push
-#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: TODO
@@ -1629,7 +1621,6 @@ unsigned int CMenuPcs::CmdCtrlCur()
 
 	return 0;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1758,8 +1749,6 @@ unsigned int CMenuPcs::CmdClose0()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CMenuPcs::GetCmdItem()
 {
 	s32 count;
@@ -1823,7 +1812,6 @@ void CMenuPcs::GetCmdItem()
 	s16* out = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	*out = count + 2;
 }
-#pragma pop
 
 /*
  * --INFO--

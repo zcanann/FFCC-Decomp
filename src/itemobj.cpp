@@ -367,8 +367,6 @@ void CGItemObj::loadModel()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 2
 void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* hitParam)
 {
 	int worldParamA = m_worldParamA;
@@ -428,7 +426,6 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 
 	ItemCFlatRuntime()->IgnoreParticle(effectIndex, this);
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -439,8 +436,6 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CGItemObj::onFrameAlways()
 {
 	unsigned char* self = (unsigned char*)this;
@@ -479,7 +474,6 @@ void CGItemObj::onFrameAlways()
 		}
 	}
 }
-#pragma pop
 
 /*
  * --INFO--

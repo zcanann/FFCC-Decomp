@@ -896,8 +896,6 @@ void CGObject::CancelAnim(int keepFacing)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 int CGObject::IsAnimFinished(int mode)
 {
     float frame;
@@ -976,15 +974,12 @@ int CGObject::IsAnimFinished(int mode)
         }
     }
 }
-#pragma pop
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_common_subs off
 int CGObject::IsLoopAnim(int mode)
 {
     CCharaPcs::CHandle* handle = m_charaModelHandle;
@@ -1034,7 +1029,6 @@ int CGObject::IsLoopAnim(int mode)
 
     return 1;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1143,8 +1137,6 @@ void CGObject::LoadModel(int kind, unsigned long modelId, unsigned long variant,
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CGObject::InitWork(int index)
 {
     typedef void (*InitWorkFn)(void**, int, unsigned int, int);
@@ -1164,7 +1156,6 @@ void CGObject::InitWork(int index)
     }
     }
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -2618,8 +2609,6 @@ nextObject:;
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma global_optimizer off
 void CGObject::bgAttribCollision()
 {
     if (!HasLoadedModel(m_charaModelHandle)) {
@@ -2675,7 +2664,6 @@ void CGObject::bgAttribCollision()
         }
     }
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -2890,8 +2878,6 @@ stepMiss:
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void CGObject::bgCollision()
 {
     m_stateFlags0Bits.unk0 = 0;
@@ -2918,7 +2904,6 @@ void CGObject::bgCollision()
         s_bitMaskDrawFlags = 0;
     }
 }
-#pragma pop
 
 /*
  * --INFO--

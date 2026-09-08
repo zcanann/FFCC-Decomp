@@ -304,7 +304,6 @@ int CMenuPcs::ItemCtrlCur()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_strength_reduction off
 void CMenuPcs::ItemDraw()
 {
     int foundSelected = 0;
@@ -554,7 +553,6 @@ void CMenuPcs::ItemDraw()
         LoadFloat(kItemOne),
         LoadFloat(kItemHelpScale));
 }
-#pragma opt_strength_reduction reset
 
 /*
  * --INFO--

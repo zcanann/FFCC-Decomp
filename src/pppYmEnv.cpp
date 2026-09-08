@@ -42,7 +42,6 @@ extern const char s_Exiting_803311CC[8];
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_common_subs off
 void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displayList, unsigned long displayListSize,
                        _GXTexObj* blendTexObj, unsigned char mode)
 {
@@ -221,7 +220,6 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_common_subs on
 void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize, unsigned short detail, _GXVtxFmt vtxFmt)
 {
     static const char s_display_list_alloc_error[] = "Error allocating display list (%d, %d)\n";

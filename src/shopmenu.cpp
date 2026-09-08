@@ -1176,8 +1176,6 @@ inline void CShopMenu::Destroy()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma peephole on
 void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 {
     (void)index;
@@ -1229,7 +1227,6 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     font->Draw(helpText);
     delete[] helpText;
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801507e0
@@ -1239,8 +1236,6 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, int unused1, int unused2, int unused3)
 {
     (void)unused0;
@@ -1356,7 +1351,6 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         MenuPcs.DrawInit();
     }
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80150e50
@@ -1366,9 +1360,6 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma peephole on
-#pragma opt_propagation off
 void CShopMenu::DrawItemInfo0()
 {
     if (m_selectedIndex == -1) {
@@ -1488,7 +1479,6 @@ void CShopMenu::DrawItemInfo0()
         }
     }
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x8015173c
@@ -1498,8 +1488,6 @@ void CShopMenu::DrawItemInfo0()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CShopMenu::DrawBuySellInfo()
 {
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
@@ -1601,7 +1589,6 @@ void CShopMenu::DrawBuySellInfo()
     MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightMoney)), FLOAT_80332d98, 0x19, 0x12);
     MenuPcs.DrawInit();
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80151F98
@@ -1718,8 +1705,6 @@ void CShopMenu::DrawItemList()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_lifetimes off
 void CShopMenu::DrawSoubiBase()
 {
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
@@ -1768,7 +1753,6 @@ void CShopMenu::DrawSoubiBase()
     }
     drawShapeSeqScale(3, 0, x, 0xA4, FLOAT_80332DD0, FLOAT_80332DCC, 0xFF);
 }
-#pragma pop
 /*
  * --INFO--
  * Address:	TODO
@@ -1793,8 +1777,6 @@ inline void CShopMenu::DrawObi(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 4
 void CShopMenu::DrawMakeBase()
 {
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
@@ -1844,7 +1826,6 @@ void CShopMenu::DrawMakeBase()
     }
     drawShapeSeq(3, 0, x, 0x8C, 0xFF, 1, 0, FLOAT_80332D9C, 0);
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80152B2C
@@ -1986,8 +1967,6 @@ void CShopMenu::DrawShopBase()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma peephole on
 void CShopMenu::Draw()
 {
     if (reinterpret_cast<int>(m_unk00) == 0) {
@@ -2099,14 +2078,11 @@ void CShopMenu::Draw()
     }
     Graphic.SetDrawDoneDebugData(0x3C);
 }
-#pragma pop
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CShopMenu::DrawSoubi()
 {
     DrawSoubiBase();
@@ -2168,14 +2144,11 @@ void CShopMenu::DrawSoubi()
 
     MenuPcs.DrawCursor(cancelTextX - 0x24, m_yesNo * 0x18 + 0x13C, FLOAT_80332d28);
 }
-#pragma pop
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CShopMenu::DrawMake()
 {
     DrawMakeBase();
@@ -2398,7 +2371,6 @@ void CShopMenu::DrawMake()
 
     MenuPcs.DrawCursor(x - 0x24, m_yesNo * 0x18 + 0x14C, FLOAT_80332d28);
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80154E98
@@ -2408,8 +2380,6 @@ void CShopMenu::DrawMake()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CShopMenu::DrawSmith0()
 {
     DrawShopBase();
@@ -2440,7 +2410,6 @@ void CShopMenu::DrawSmith0()
     MenuPcs.DrawInit();
     MenuPcs.DrawInit();
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80155058
@@ -3453,8 +3422,6 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma peephole off
 void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, unsigned char alpha)
 {
     Mtx44 projectionMtx;
@@ -3511,7 +3478,6 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
         displayList += 8;
     }
 }
-#pragma pop
 /*
  * --INFO--
  * Address:	TODO

@@ -1252,45 +1252,26 @@ void CMenuPcs::CalcOptionMenu()
 	}
 }
 
-#pragma push
-#pragma optimization_level 4
 /*
  * --INFO--
  * PAL Address: 0x80179d28
  * PAL Size: 256b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8019B444
+ * EN Size: 284b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMenuPcs::GetOptionData()
 {
-	signed char& gameInitMode = m_gameInitMode;
-	signed char& stereoMode = m_stereoMode;
-	signed char& bgmVolume = m_bgmVolume;
-	signed char& seVolume = m_seVolume;
+	m_gameInitMode = Game.m_gameWork.m_gameInitFlag == 0;
+	m_stereoMode = !Sound.IsStereo();
+	m_bgmVolume = Sound.GetBgmMasterVolume() / 10;
+	m_seVolume = Sound.GetSeMasterVolume() / 10;
 
-	gameInitMode =
-	    static_cast<signed char>(static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_gameInitFlag))) >> 5);
-
-	stereoMode = Sound.IsStereo() ? 0 : 1;
-
-	int value = Sound.GetBgmMasterVolume();
-	bgmVolume = static_cast<signed char>(value / 10);
-
-	value = Sound.GetSeMasterVolume();
-	seVolume = static_cast<signed char>(value / 10);
-
-	unsigned int flag = Game.m_gameWork.m_spModeFlags[0];
-	m_specialModeFlags[0] = static_cast<signed char>((-flag | flag) >> 31);
-	flag = Game.m_gameWork.m_spModeFlags[1];
-	m_specialModeFlags[1] = static_cast<signed char>((-flag | flag) >> 31);
-	flag = Game.m_gameWork.m_spModeFlags[2];
-	m_specialModeFlags[2] = static_cast<signed char>((-flag | flag) >> 31);
-	flag = Game.m_gameWork.m_spModeFlags[3];
-	m_specialModeFlags[3] = static_cast<signed char>((-flag | flag) >> 31);
+	for (int i = 0; i < 4; i++) {
+		m_specialModeFlags[i] = Game.m_gameWork.m_spModeFlags[i] != 0;
+	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1355,23 +1336,18 @@ void CMenuPcs::SetCrystalCageAttr()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma dont_inline on
 void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXColor color, int tlut, float margin, float scaleY)
 {
 	if (msgNo >= 0) {
 		DrawHelpMessageUS(msgNo, font, posX, posY, color, tlut, margin, scaleY);
 	}
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma optimization_level 4
-#pragma opt_propagation off
 void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor color, int tlut, float margin, float scale)
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
@@ -1659,7 +1635,6 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1670,7 +1645,6 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* text, float scaleX, float scaleY, float margin)
 {
 	CFont* font = m_fonts[0];
@@ -1686,14 +1660,12 @@ void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* tex
 	font->SetPosY((float)posY);
 	font->Draw(text);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma dont_inline on
 void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text, float scale, float margin)
 {
 	CFont* font = m_fonts[0];
@@ -1708,7 +1680,6 @@ void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text
 	font->SetPosY((float)posY);
 	font->Draw(text);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--

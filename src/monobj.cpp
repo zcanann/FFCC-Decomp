@@ -1167,8 +1167,6 @@ void CGMonObj::statMove(int* targetIndex)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void CGMonObj::statWatch()
 {
 	CGMonObj* monObj = this;
@@ -1456,7 +1454,6 @@ void CGMonObj::statWatch()
 #undef object
 #undef mon
 }
-#pragma pop
 
 
 
@@ -1490,7 +1487,6 @@ void CGMonObj::mlAttack()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 /*
  * --INFO--
  * PAL Address: 0x8011548C
@@ -1714,8 +1710,6 @@ mlDone:
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void CGMonObj::statAround()
 {
 	CGMonObj* monObj = this;
@@ -1913,9 +1907,7 @@ body:
 #undef script
 #undef actionState
 }
-#pragma pop
 
-#pragma dont_inline off
 
 /*
  * --INFO--
@@ -2067,8 +2059,6 @@ void CGMonObj::resetWork()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void CGMonObj::isValidTarget()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
@@ -2167,7 +2157,6 @@ check_home:
 	}
 #undef script9
 }
-#pragma pop
 
 /*
  * --INFO--

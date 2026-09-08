@@ -19,6 +19,8 @@ Goal: maximize real progress by improving C/C++ source, linkage, headers, types,
 
 Game code uses **GC/2.5** as its shared compiler baseline. This is a working assumption supported by comparison, not proof of the exact retail compiler. Prefer recovering plausible source and removing temporary tuning over adding per-unit compiler overrides. Revisit existing optimization overrides against this baseline. If a previously `Matching` unit stops linking exactly, mark it `NonMatching` while repairing it; do not preserve the label with compiler exceptions. SDK and middleware compiler choices are independent.
 
+Do not restore temporary function-local optimization, scheduling, or forced-inlining pragmas to recover scores. Repair the source using normal C/C++ and retail evidence. Exception handling, ABI, and data-placement settings require their own evidence and are not interchangeable with optimizer tuning.
+
 Useful references:
 - Ghidra decomp: `resources/ghidra-decomp-1-31-2026/`
 - PAL map: `orig/GCCP01/game.MAP`

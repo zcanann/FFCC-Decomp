@@ -1821,7 +1821,6 @@ void CMenuPcs::CmakeJobOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_lifetimes off
 void CMenuPcs::CmakeTribeDraw()
 {
     CmakeMenuState* state = CmakeState(this);
@@ -1962,7 +1961,6 @@ void CMenuPcs::CmakeTribeDraw()
         }
     }
 }
-#pragma opt_lifetimes on
 
 /*
  * --INFO--
@@ -2843,8 +2841,6 @@ void CMenuPcs::CmakeOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -2912,8 +2908,6 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
         DrawCursor(cursorBase, 0x175, alpha);
     }
 }
-#pragma opt_lifetimes on
-#pragma opt_propagation on
 
 /*
  * --INFO--
@@ -3296,8 +3290,6 @@ inline void CMenuPcs::DrawCrystal(int type, int frame, float alpha)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -3340,8 +3332,6 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
         0, static_cast<float>(baseX), static_cast<float>(offsU), 208.0f, 24.0f,
         0.0f, static_cast<float>(page * 0x18), 1.0f, 1.0f, 0.0f);
 }
-#pragma opt_lifetimes on
-#pragma opt_propagation on
 
 /*
  * --INFO--

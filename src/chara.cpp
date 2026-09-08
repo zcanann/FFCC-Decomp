@@ -697,7 +697,6 @@ void CChara::FlipDBuffer()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
 {
 	asm {
@@ -706,7 +705,6 @@ void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
 		mtspr GQR7, r6
 	}
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1590,8 +1588,6 @@ void CChara::CModel::calcMatrix()
 	this->m_flags10CBits.m_flag10C_80 = 0;
 }
 
-#pragma push
-#pragma opt_common_subs off
 /*
  * --INFO--
  * PAL Address: 0x800716C4
@@ -1728,11 +1724,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 	PSMTXConcat(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(this) + 0x08), out, out);
 }
-#pragma pop
 
-#pragma push
-#pragma opt_common_subs off
-#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x80071078
@@ -1944,7 +1936,6 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		NodeDynPosition(node).z = pz;
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -2793,8 +2784,6 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 	chunk.PopChunk();
 }
 
-#pragma push
-#pragma scheduling off
 /*
  * --INFO--
  * PAL Address: 0x8006efe8
@@ -3056,7 +3045,6 @@ void CChara::CMesh::skin(int meshIndex, int start, int count, CChara::CSkin* ski
 	_end:
 	}
 }
-#pragma pop
 
 /*
  * --INFO--

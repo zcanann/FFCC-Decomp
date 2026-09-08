@@ -109,8 +109,6 @@ void pppKeShpTail2XCon(_pppPObject* obj, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 3
 void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _pppCtrlTable* param_3)
 {
     KeShpTail2XWork* work;
@@ -327,7 +325,6 @@ move_next_segment:
     segRemain += segLen;
     goto advance_segment;
 }
-#pragma pop
 
 /*
  * --INFO--

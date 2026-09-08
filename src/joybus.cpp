@@ -2911,7 +2911,6 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma opt_dead_assignments off
 int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 {
 
@@ -3238,7 +3237,6 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
     return static_cast<int>(recvBit | sendBit);
 }
 
-#pragma opt_dead_assignments on
 /*
  * --INFO--
  * PAL Address: 0x800acf48
@@ -3606,8 +3604,6 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 int JoyBus::InitialCode(ThreadParam* threadParam)
 {
     int result;
@@ -3755,7 +3751,6 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
     return result;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -4397,8 +4392,6 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 }
 
 
-#pragma push
-#pragma opt_unroll_loops off
 /*
  * --INFO--
  * PAL Address: 0x800AB24C
@@ -4466,7 +4459,6 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
 
     return iVar3;
 }
-#pragma pop
 
 
 /*
@@ -5273,8 +5265,6 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
     return result;
 }
 
-#pragma push
-#pragma opt_propagation off
 /*
  * --INFO--
  * Address:	TODO
@@ -5376,7 +5366,6 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
 
     return result;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -6040,8 +6029,6 @@ int JoyBus::GetGBAStat(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_lifetimes off
 int JoyBus::ChgCtrlMode(int portIndex)
 {
     unsigned int word = 0;
@@ -6091,7 +6078,6 @@ int JoyBus::ChgCtrlMode(int portIndex)
 
     return ret;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -6291,8 +6277,6 @@ int JoyBus::GBAReady(int portIndex)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_propagation off
 int JoyBus::SendAllStat(int portIndex)
 {
     m_threadParams[portIndex].m_state = 0;
@@ -6331,7 +6315,6 @@ int JoyBus::SendAllStat(int portIndex)
 
     return 0;
 }
-#pragma pop
 
 
 /*
@@ -6472,7 +6455,6 @@ int JoyBus::SendMask(int, unsigned short)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma opt_dead_assignments off
 int JoyBus::SetMoney(int portIndex, unsigned int money)
 {
     int result = 0;
@@ -6507,7 +6489,6 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
     return result;
 }
 
-#pragma opt_dead_assignments on
 /*
  * --INFO--
  * Address:	TODO

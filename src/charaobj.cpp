@@ -1053,8 +1053,6 @@ int la(CGObject* object)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 3
 void CGCharaObj::statAttack()
 {
 	unsigned short cid = GetCID();
@@ -1120,7 +1118,6 @@ void CGCharaObj::statAttack()
 	onStatAttack(1);
 }
 
-#pragma pop
 
 /*
  * --INFO--
@@ -2017,8 +2014,6 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 2
 void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int& outC, int forceNormal)
 {
 	bool normFlag = false;
@@ -2096,7 +2091,6 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma pop
 void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 {
 	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (DbgMenuPcs.GetDbgFlagsRaw() & 4) != 0) {
@@ -2191,9 +2185,6 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 2
-#pragma opt_propagation off
 int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
 	if (staIndex == 0 || staIndex == 4) {
@@ -2329,7 +2320,6 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma pop
 void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& outValue)
 {
 	switch (staIndex) {

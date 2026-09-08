@@ -49,7 +49,6 @@ static inline float LoadFloat(float value)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 void CMenuPcs::CompaDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -314,7 +313,6 @@ void CMenuPcs::CompaDraw()
 
 	DrawInit();
 }
-#pragma opt_propagation reset
 /*
  * --INFO--
  * PAL Address: 80161aac
@@ -527,7 +525,6 @@ int CMenuPcs::CompaOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 void CMenuPcs::CompaInit()
 {
 	CompaOpenAnimList* compaList;
@@ -627,4 +624,3 @@ void CMenuPcs::CompaInit()
 	this->m_compaMenuState->selectedIndex = 0;
 	this->m_compaMenuState->initialized = 1;
 }
-#pragma opt_propagation reset

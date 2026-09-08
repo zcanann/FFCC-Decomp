@@ -4135,8 +4135,6 @@ unsigned int CGPartyObj::IsDispRader()
 	return result;
 }
 
-#pragma push
-#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8011c59c
@@ -4173,7 +4171,6 @@ void CGPartyObj::ChangeCommandMode(int mode)
 		}
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -4667,8 +4664,6 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void CGPartyObj::gpmCol()
 {
 	CGPartyObj* leader = Game.m_partyObjArr[0];
@@ -4721,7 +4716,6 @@ void CGPartyObj::gpmCol()
 	lastTrailIndex = lastTrailIndex < 0 ? 0 : lastTrailIndex;
 	m_ghostWork.trailIndex = m_ghostWork.trailIndex < lastTrailIndex ? m_ghostWork.trailIndex : lastTrailIndex;
 }
-#pragma pop
 
 /*
  * --INFO--

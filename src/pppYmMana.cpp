@@ -585,9 +585,6 @@ static int RenderWaterMesh(VYmMana* mana)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_dead_assignments off
-#pragma opt_common_subs off
 static int UpdateWaterMesh(VYmMana* mana)
 {
     float* waterHeightA;
@@ -680,8 +677,6 @@ static int UpdateWaterMesh(VYmMana* mana)
                               mana->m_waterMtx, mana->m_colors, mana->m_texCoord1);
     return 1;
 }
-#pragma opt_common_subs reset
-#pragma pop
 
 /*
  * --INFO--
@@ -1029,8 +1024,6 @@ void pppRenderYmMana(PYmMana*, pppYmManaStep*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_lifetimes off
 void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* param_3)
 {
     u32 texBufferSize;
@@ -1289,10 +1282,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
         }
     }
 }
-#pragma pop
 
-#pragma push
-#pragma opt_lifetimes off
 /*
  * --INFO--
  * PAL Address: 0x800d7440
@@ -1449,7 +1439,6 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
     }
 }
 
-#pragma pop
 
 /*
  * --INFO--
@@ -1545,9 +1534,6 @@ void pppConstructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
-#pragma opt_common_subs off
 void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
     CChara::CMesh::CRefData* mesh = model->m_meshes[partIndex].m_data;
@@ -1694,7 +1680,6 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_SET);
     GXCallDisplayList(displayList->m_data, displayList->m_size);
 }
-#pragma pop
 
 /*
  * --INFO--

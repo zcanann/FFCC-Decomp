@@ -1714,8 +1714,6 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_dead_assignments off
-#pragma opt_propagation off
 void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
 {
     char localEnemyData[0x508];
@@ -1891,8 +1889,6 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
-#pragma opt_dead_assignments on
-#pragma opt_propagation on
 /*
  * --INFO--
  * PAL Address: 0x800CE3F8
@@ -3328,7 +3324,6 @@ void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 {
 	unsigned char localPlayerData[0xDC];
@@ -3376,7 +3371,6 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	outData[0] = count;
 	return size;
 }
-#pragma opt_propagation on
 
 /*
  * --INFO--
@@ -3387,7 +3381,6 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimize_for_size on
 int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 {
 	unsigned char localPlayerData[0xDC];
@@ -3452,7 +3445,6 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 
 	return dataSize;
 }
-#pragma optimize_for_size off
 
 /*
  * --INFO--
@@ -3587,7 +3579,6 @@ inline void GbaQueue::SmithEnd(int channel)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_dead_assignments off
 int GbaQueue::MakeBuyData(int channel, char* outData)
 {
 char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD79) char[kGbaQueueScratchTextSize];
@@ -3678,7 +3669,6 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	return totalSize;
 }
 
-#pragma opt_dead_assignments on
 /*
  * --INFO--
  * PAL Address: 0x800cb0d0
@@ -4724,8 +4714,6 @@ void GbaQueue::SetControllerMode(int controllerMode)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_dead_assignments off
-#pragma opt_lifetimes off
 unsigned int GbaQueue::GetControllerMode()
 {
 	char mode;
@@ -4843,8 +4831,6 @@ void GbaQueue::OpenMenu(int channel, int menuId, int controlMode)
 	}
 }
 
-#pragma opt_dead_assignments on
-#pragma opt_lifetimes on
 /*
  * --INFO--
  * PAL Address: 0x800C9184
@@ -4888,8 +4874,6 @@ void GbaQueue::SetPauseMode(int mode)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_dead_assignments off
-#pragma opt_lifetimes off
 unsigned int GbaQueue::GetPauseMode()
 {
 	char mode;
@@ -4914,8 +4898,6 @@ unsigned int GbaQueue::GetPauseMode()
 	return result;
 }
 
-#pragma opt_dead_assignments on
-#pragma opt_lifetimes on
 /*
  * --INFO--
  * PAL Address: 0x800c9090

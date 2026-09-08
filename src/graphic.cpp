@@ -516,7 +516,6 @@ void CGraphic::_WaitDrawDone(char* file, int line)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_dead_assignments off
 void CGraphic::Thread()
 {
     char* debugFmtBase = const_cast<char*>(sGraphicInitData);
@@ -593,7 +592,6 @@ void CGraphic::Thread()
         OSRestoreInterrupts(interrupts);
     }
 }
-#pragma opt_dead_assignments on
 
 /*
  * --INFO--
@@ -1053,9 +1051,6 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
-#pragma opt_strength_reduction off
 void CGraphic::makeSphere()
 {
     float vertices[126];
@@ -1125,7 +1120,6 @@ void CGraphic::makeSphere()
     m_sphereDisplayListSize = GXEndDisplayList();
     DCFlushRange(m_sphereDisplayList, m_sphereDisplayListSize);
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1415,7 +1409,6 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
     }
 }
 
-#pragma scheduling off
 /*
  * --INFO--
  * PAL Address: 800178a4
@@ -1483,7 +1476,6 @@ void CGraphic::RenderTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor
 	GXWGFifo.f32 = tex1;
 }
 
-#pragma scheduling on
 /*
  * --INFO--
  * PAL Address: 800177f0

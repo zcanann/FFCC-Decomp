@@ -1229,8 +1229,6 @@ LocalOnly:
  */
 static inline float LoadFloat(const float& f) { return f; }
 
-#pragma push
-#pragma opt_common_subs off
 void pppSetFpMatrix(_pppMngSt* pppMngSt)
 {
 	Vec local_a8;
@@ -1307,7 +1305,6 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	ppvWorldMatrixWood[1][3] = ppvWorldMatrix[1][3];
 	ppvWorldMatrixWood[2][3] = ppvWorldMatrix[2][3];
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1476,8 +1473,6 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 {
 	_pppProgSetDef* table = (_pppProgSetDef*)(progOffsetReconstructionTable + 6);
@@ -1515,7 +1510,6 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 		pdtRelocs[i] += (int)progOffsetReconstructionTable;
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1758,8 +1752,6 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 3
 void _pppDeadPart(_pppMngSt* pppMngSt)
 {
 	_pppMngSt* mng = pppMngSt;
@@ -1862,7 +1854,6 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 		mng->m_isFinished = (mng->m_currentFrame >= mng->m_lifeEnd) ? 1 : 0;
 	}
 }
-#pragma pop
 
 /*
  * --INFO--

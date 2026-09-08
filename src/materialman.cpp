@@ -788,7 +788,6 @@ void CMaterialMan::addtev_full_shadow(long index)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_common_subs off
 void CMaterialMan::SetUnderWaterTex()
 {
     int x = 0;
@@ -825,7 +824,6 @@ void CMaterialMan::SetUnderWaterTex()
 
     PSMTXConcat(matrixA, matrixB, m_underWaterTexMtx);
 }
-#pragma opt_common_subs reset
 
 /*
  * --INFO--
@@ -2376,7 +2374,6 @@ void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shad
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_common_subs off
 void CMaterialMan::SetPosition(
     CMapShadow::TARGET target,
     Vec* position,
@@ -2503,7 +2500,6 @@ void CMaterialMan::SetPosition(
         }
     }
 }
-#pragma opt_common_subs reset
 
 /*
  * --INFO--

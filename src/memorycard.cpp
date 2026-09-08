@@ -1990,7 +1990,6 @@ void CMemoryCardMan::DecodeData()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::SaveDat& dstSave, int dstChar)
 {
     if (static_cast<unsigned int>(System.m_execParam) >= 3)
@@ -2121,7 +2120,6 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
     dstSave.m_random = Math.Rand(0x7FFFFFFF);
     dstSave.m_crc = CalcCrc(&dstSave);
 }
-#pragma opt_propagation reset
 
 /*
  * --INFO--

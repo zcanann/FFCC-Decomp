@@ -937,8 +937,6 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	MenuPcs.DrawRect(0, xCorner, yCorner, (float)((double)w - 16.0), innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 }
 
-#pragma push
-#pragma opt_propagation off
 void CMenuPcs::CalcSelectCloseAnim()
 {
 	int activePartyCount = s_Rinfo->m_partyCount;
@@ -1222,10 +1220,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 1;
 	}
 }
-#pragma pop
 
-#pragma push
-#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 0x8013473c
@@ -1508,7 +1503,6 @@ void CMenuPcs::CalcSelectWait()
 	}
 }
 
-#pragma pop
 
 /*
  * --INFO--
@@ -1775,11 +1769,6 @@ void CMenuPcs::DrawSelectOpenAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_strength_reduction off
-#pragma opt_propagation off
-#pragma push
-#pragma opt_lifetimes off
 void CMenuPcs::CalcSelectOpenAnim()
 {
 	int activePartyCount = s_Rinfo->m_partyCount;
@@ -2245,7 +2234,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 		((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 1;
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -2256,8 +2244,6 @@ void CMenuPcs::CalcSelectOpenAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CMenuPcs::DrawResultCloseAnim()
 {
 	if (this->m_bonusState->m_initialized == 0) {
@@ -2480,10 +2466,8 @@ void CMenuPcs::DrawResultCloseAnim()
 	}
 	DrawInit();
 }
-#pragma pop
 #undef s_BonusModelYPos
 #undef s_BonusModelScale
-#pragma pop
 
 /*
  * --INFO--
@@ -2494,11 +2478,6 @@ void CMenuPcs::DrawResultCloseAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_loop_invariants off
-#pragma opt_strength_reduction off
-#pragma opt_dead_assignments off
-#pragma opt_propagation off
 void CMenuPcs::CalcResultCloseAnim()
 {
 	int doneCount;
@@ -2782,10 +2761,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		((short*)this->m_bonusAnimPtr)[3] = 1;
 	}
 }
-#pragma pop
 
-#pragma push
-#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 0x80139b14
@@ -2950,7 +2926,6 @@ void CMenuPcs::DrawResultCountAnim()
 	}
 	DrawInit();
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -3108,8 +3083,6 @@ void CMenuPcs::CalcResultCountAnim()
 	}
 }
 
-#pragma push
-#pragma opt_propagation off
 /*
  * --INFO--
  * PAL Address: 0x8013a8f4
@@ -3311,7 +3284,6 @@ void CMenuPcs::DrawResultOpenAnim()
 		DrawInit();
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -3322,8 +3294,6 @@ void CMenuPcs::DrawResultOpenAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CMenuPcs::CalcResultOpenAnim()
 {
 	const int activePartyCount = s_Rinfo->m_partyCount;
@@ -3742,7 +3712,6 @@ void CMenuPcs::CalcResultOpenAnim()
 		((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 1;
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -3911,8 +3880,6 @@ void CMenuPcs::destroyBonus()
 	freeTexture(2, 1, 0x16, 0x12);
 }
 
-#pragma push
-#pragma optimization_level 3
 /*
  * --INFO--
  * PAL Address: 0x8013d59c
@@ -4208,7 +4175,6 @@ void CMenuPcs::createBonus()
 	this->m_bonusAlpha = 0;
 	this->m_bonusCursorFlag = 0;
 }
-#pragma pop
 
 /*
  * --INFO--

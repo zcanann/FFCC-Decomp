@@ -944,7 +944,6 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma inline_max_size(10000)
 void CMapObj::SetShow_r(int show)
 {
     CMapObj* obj = this;

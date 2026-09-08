@@ -703,7 +703,6 @@ void CGMonObj::logicFuncRamoe()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 void CGMonObj::damagedFuncDuct()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
@@ -721,7 +720,6 @@ void CGMonObj::damagedFuncDuct()
 		model->m_meshVisibleMask &= ~(1 << dispIndex);
 	}
 }
-#pragma opt_propagation reset
 
 /*
  * --INFO--

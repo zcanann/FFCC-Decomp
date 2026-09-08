@@ -816,8 +816,6 @@ static inline int FurTexelIndex(int x, int y, int tileRowStride)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_loop_invariants off
 static void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
 {
 	_GXColor defaultColor = CColor(0x0f, 0x0f, 0x0f, 0).color;
@@ -892,7 +890,6 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 	DCFlushRange(pixels, texelCountBytes);
 	GXInvalidateTexAll();
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1179,9 +1176,6 @@ nextVertex:
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
-#pragma opt_propagation off
 void CChara::CModel::InitMogFurTex()
 {
 	CTextureSet* textureSet = m_texSet;
@@ -1209,7 +1203,6 @@ void CChara::CModel::InitMogFurTex()
 		m_flagsA0Bits.m_flagA0_40 = 1;
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1619,8 +1612,6 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void CChara::CalcMogScore()
 {
 	unsigned short* texels = m_sharedState.m_mogFur.m_texels;
@@ -1764,7 +1755,6 @@ void CChara::CalcMogScore()
 		    radarLabel[Game.m_gameWork.m_mogScoreRadarType]);
 	}
 }
-#pragma pop
 
 /*
  * --INFO--

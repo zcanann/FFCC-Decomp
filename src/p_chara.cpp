@@ -219,7 +219,6 @@ static const char s_charaDumpAnimHdr2[] = "no  t num name           lv  mask    
 static const char s_charaDumpAnimSep[] = "--- - --- -------------- --- -------- -------- -------- -------- --------\n";
 static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %14s %3d %08x %08x %8d %8d %8d\n";
 
-#pragma dont_inline on
 template class CPtrArray<CCharaPcs::CLoadPdt*>;
 template class CPtrArray<CCharaPcs::CLoadTexture*>;
 template class CPtrArray<CCharaPcs::CLoadAnim*>;
@@ -249,7 +248,6 @@ STATIC_ASSERT(offsetof(CCharaPcs, m_weaponModelStage) == 0xDC);
 STATIC_ASSERT(offsetof(CCharaPcs, m_familyModelStage) == 0xE0);
 STATIC_ASSERT(offsetof(CCharaPcs, m_charaAllocStage) == 0xE4);
 
-#pragma dont_inline reset
 
 static inline float LoadFloat(const float& value)
 {
@@ -1155,7 +1153,6 @@ int CCharaPcs::GetNumTexShadow()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma opt_dead_assignments off
 void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, Vec* worldPositions, float (*shadowMatrices)[3][4])
 {
     CHandle* handle = m_handleList->m_next;
@@ -1188,7 +1185,6 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
         handle = handle->m_next;
     }
 }
-#pragma opt_dead_assignments reset
 
 /*
  * --INFO--

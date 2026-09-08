@@ -937,7 +937,6 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 void CCameraPcs::destroyFullShadow()
 {
     u8* zero;
@@ -954,7 +953,6 @@ void CCameraPcs::destroyFullShadow()
         m_fullScreenShadow.m_rampTexture = zero;
     }
 }
-#pragma opt_propagation on
 
 /*
  * --INFO--
@@ -965,7 +963,6 @@ void CCameraPcs::destroyFullShadow()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 void CCameraPcs::createFullShadow()
 {
     unsigned int rampTexSize;
@@ -1028,7 +1025,6 @@ void CCameraPcs::createFullShadow()
     m_fullScreenShadow.m_rotY = zero;
     m_fullScreenShadow.m_scale = shadowAlpha;
 }
-#pragma opt_propagation on
 
 /*
  * --INFO--
@@ -1545,7 +1541,6 @@ void CCameraPcs::SetStdProjectionMatrix()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_lifetimes off
 void CCameraPcs::calc()
 {
     Mtx zRotMtx;
@@ -1673,7 +1668,6 @@ void CCameraPcs::calc()
     PSMTXMultVecSR(invMtx, &DirectionVec(), &DirectionVec());
     m_fromScript = 0;
 }
-#pragma opt_lifetimes on
 
 /*
  * --INFO--

@@ -1296,8 +1296,6 @@ void CLine<64>::CalcBound()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long* nearestSegment,
                     float* nearestSegmentRatio, Vec* targetPosition, float maxDistance)
 {
@@ -1384,7 +1382,6 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
 
     return found;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -4084,8 +4081,6 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_dead_assignments off
 void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack, int setMode)
 {
     CGame::CGameWork* gameWork = &Game.m_gameWork;
@@ -4378,4 +4373,3 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
         }
     }
 }
-#pragma pop

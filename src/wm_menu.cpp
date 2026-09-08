@@ -3417,8 +3417,6 @@ void CMenuPcs::drawWorld()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 void CMenuPcs::DrawMainMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
@@ -3601,8 +3599,6 @@ void CMenuPcs::DrawMainMenu()
 		}
 	}
 }
-#pragma opt_lifetimes on
-#pragma opt_propagation on
 
 /*
  * --INFO--
@@ -4073,9 +4069,6 @@ void CMenuPcs::DrawMCardMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 void CMenuPcs::DrawCMakeMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
@@ -4271,7 +4264,6 @@ void CMenuPcs::DrawCMakeMenu()
 		}
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -7761,8 +7753,6 @@ void CMenuPcs::CalcCharaSelect()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_loop_invariants off
-#pragma opt_strength_reduction off
 void CMenuPcs::DrawCharaName()
 {
 	CFont* const font = GetWmFont(this);
@@ -7975,8 +7965,6 @@ void CMenuPcs::DrawCharaName()
 	DrawInit();
 }
 
-#pragma opt_strength_reduction on
-#pragma opt_loop_invariants on
 /*
  * --INFO--
  * PAL Address: 0x800efc38
@@ -10138,8 +10126,6 @@ inline void CMenuPcs::ClrMcList()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 {
 	PPPCREATEPARAM createParam;
@@ -10169,7 +10155,6 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	effect->m_partNo = partId;
 	return effect->m_partNo;
 }
-#pragma pop
 
 /*
  * --INFO--

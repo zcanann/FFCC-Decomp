@@ -39,7 +39,6 @@ static inline double LoadDouble(const double& value)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_lifetimes off
 void CMenuPcs::FavoDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -234,7 +233,6 @@ void CMenuPcs::FavoDraw()
 
 	DrawInit();
 }
-#pragma opt_lifetimes reset
 /*
  * --INFO--
  * PAL Address: 0x80162d18
@@ -475,7 +473,6 @@ void CMenuPcs::FavoInit0()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_strength_reduction off
 void CMenuPcs::FavoInit()
 {
 	float fVar4;
@@ -644,4 +641,3 @@ void CMenuPcs::FavoInit()
 	m_singMenuState->selectedIndex = 0;
 	m_singMenuState->initialized = 1;
 }
-#pragma opt_strength_reduction reset

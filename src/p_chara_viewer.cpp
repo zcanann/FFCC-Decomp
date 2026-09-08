@@ -1,4 +1,3 @@
-#pragma optimization_level 3
 #include "ffcc/ptrarray.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/chara.h"
@@ -304,8 +303,6 @@ void CCharaPcs::drawViewer()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void CCharaPcs::calcViewer()
 {
     CCharaPcs* self = this;
@@ -669,7 +666,6 @@ void CCharaPcs::calcViewer()
         }
     }
 }
-#pragma pop
 
 /*
  * --INFO--

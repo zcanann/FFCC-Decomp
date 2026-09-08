@@ -395,151 +395,134 @@ void CMapMng::Create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyOctTree()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMapHit()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMapObj()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMapMesh()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyTextureSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMaterialSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMapTexAnimSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyAnimation()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMapShadow()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMapLightHolder()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80033254
- * PAL Size: 892b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 108b
+ * EN Address: 0x80039054
+ * EN Size: 100b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::DestroyMap()
+inline void CMapMng::DestroyOctTree()
 {
-    int i;
-    for (i = 0; i < m_octTreeCount; i++) {
+    for (int i = 0; i < m_octTreeCount; i++) {
         m_octTreeArray[i].~COctTree();
     }
     m_octTreeCount = 0;
+}
 
-    for (i = 0; i < m_mapHitCount; i++) {
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 108b
+ * EN Address: 0x800390b8
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMapHit()
+{
+    for (int i = 0; i < m_mapHitCount; i++) {
         m_mapHitArray[i].~CMapHit();
     }
     m_mapHitCount = 0;
+}
 
-    for (i = 0; i < m_mapObjCount; i++) {
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 108b
+ * EN Address: 0x8003911c
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMapObj()
+{
+    for (int i = 0; i < m_mapObjCount; i++) {
         m_mapObjArray[i].~CMapObj();
     }
     m_mapObjCount = 0;
+}
 
-    for (i = 0; i < m_mapMeshCount; i++) {
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 112b
+ * EN Address: 0x80039180
+ * EN Size: 104b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMapMesh()
+{
+    for (int i = 0; i < m_mapMeshCount; i++) {
         m_mapMeshArray[i].~CMapMesh();
     }
     m_mapMeshCount = 0;
+}
 
-    if (m_materialSet != 0) {
-        delete m_materialSet;
-        m_materialSet = 0;
-    }
-
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 92b
+ * EN Address: 0x800391e8
+ * EN Size: 120b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyTextureSet()
+{
     if (m_textureSet != 0) {
         delete m_textureSet;
         m_textureSet = 0;
     }
+}
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 92b
+ * EN Address: 0x80039260
+ * EN Size: 120b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMaterialSet()
+{
+    if (m_materialSet != 0) {
+        delete m_materialSet;
+        m_materialSet = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 92b
+ * EN Address: 0x800392d8
+ * EN Size: 120b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMapTexAnimSet()
+{
     if (m_mapTexAnimSet != 0) {
         delete m_mapTexAnimSet;
         m_mapTexAnimSet = 0;
     }
+}
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 320b
+ * EN Address: 0x80039350
+ * EN Size: 336b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyAnimation()
+{
     for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapAnimArray().GetSize()); i++) {
         if (GetMapAnimArray()[i] != 0) {
             delete GetMapAnimArray()[i];
@@ -556,26 +539,73 @@ void CMapMng::DestroyMap()
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapAnimRunArray().GetSize()); i++) {
         if (GetMapAnimRunArray()[i] != 0) {
-            operator delete(GetMapAnimRunArray()[i]);
+            delete GetMapAnimRunArray()[i];
         }
     }
     GetMapAnimRunArray().RemoveAll();
+}
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 136b
+ * EN Address: 0x800394a0
+ * EN Size: 136b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMapShadow()
+{
     for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
         if (GetMapShadowArray()[i] != 0) {
-            operator delete(GetMapShadowArray()[i]);
+            delete GetMapShadowArray()[i];
         }
     }
     GetMapShadowArray().RemoveAll();
+}
 
-    for (i = 0; i < 2; i++) {
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 168b
+ * EN Address: 0x80039528
+ * EN Size: 196b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMapLightHolder()
+{
+    for (int i = 0; i < 2; i++) {
         for (unsigned int j = 0; j < static_cast<unsigned int>(GetMapLightHolderArray(i).GetSize()); j++) {
             if (GetMapLightHolderArray(i)[j] != 0) {
-                operator delete(GetMapLightHolderArray(i)[j]);
+                delete GetMapLightHolderArray(i)[j];
             }
         }
         GetMapLightHolderArray(i).RemoveAll();
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80033254
+ * PAL Size: 892b
+ * EN Address: 0x800395ec
+ * EN Size: 148b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMng::DestroyMap()
+{
+    DestroyOctTree();
+    DestroyMapHit();
+    DestroyMapObj();
+    DestroyMapMesh();
+    DestroyMaterialSet();
+    DestroyTextureSet();
+    DestroyMapTexAnimSet();
+    DestroyAnimation();
+    DestroyMapShadow();
+    DestroyMapLightHolder();
 
     LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
     m_rootMapObj = 0;
@@ -2271,22 +2301,50 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 260b
+ * EN Address: 0x8003ce38
+ * EN Size: 288b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::GetAnimRunMapObj(CMapObj*)
+inline CMapAnimRun* CMapMng::GetAnimRunMapObj(CMapObj* mapObj)
 {
-	// TODO
+    int mapAnimRunCount = m_mapAnimRunArray.GetSize();
+    for (int i = 0; i < mapAnimRunCount; i++) {
+        CMapAnimRun* mapAnimRun = m_mapAnimRunArray[i];
+        CPtrArray<CMapAnimNode*>* mapAnimNodeArray =
+            &m_mapAnimArray[mapAnimRun->m_mapAnimIndex]->mapAnimNodes;
+        int mapAnimNodeCount = mapAnimNodeArray->GetSize();
+        for (int j = 0; j < mapAnimNodeCount; j++) {
+            CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[j];
+            if (mapAnimNode->m_node == mapObj) {
+                return mapAnimRun;
+            }
+        }
+    }
+    return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 148b
+ * EN Address: 0x8003cf58
+ * EN Size: 188b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::GetAnimRunID(int)
+inline CMapAnimRun* CMapMng::GetAnimRunID(int animId)
 {
-	// TODO
+    int mapAnimRunCount = m_mapAnimRunArray.GetSize();
+    for (int i = 0; i < mapAnimRunCount; i++) {
+        CMapAnimRun* mapAnimRun = m_mapAnimRunArray[i];
+        if (mapAnimRun->m_animId == static_cast<unsigned char>(animId)) {
+            return mapAnimRun;
+        }
+    }
+    return 0;
 }
 
 /*
@@ -2543,38 +2601,15 @@ void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
  * --INFO--
  * PAL Address: 0x8002f7a4
  * PAL Size: 220b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8003d8ac
+ * EN Size: 196b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int loop)
 {
-    int mapAnimNodeIndex;
-    CPtrArray<CMapAnimNode*>* mapAnimNodeArray;
-    CMapAnimRun* mapAnimRun;
-    int mapAnimRunIndex;
-    CMapObj* mapObj = m_mapObjArray + mapObjIndex;
-    int mapAnimRunCount = m_mapAnimRunArray.GetSize();
-    int mapAnimNodeCount;
-
-    for (mapAnimRunIndex = 0; mapAnimRunIndex < mapAnimRunCount; mapAnimRunIndex++) {
-        mapAnimRun = m_mapAnimRunArray[mapAnimRunIndex];
-        mapAnimNodeArray =
-            reinterpret_cast<CPtrArray<CMapAnimNode*>*>(m_mapAnimArray[mapAnimRun->m_mapAnimIndex]);
-        mapAnimNodeCount = mapAnimNodeArray->GetSize();
-
-        for (mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
-            CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[mapAnimNodeIndex];
-            if (mapAnimNode->m_node == mapObj) {
-                goto startMapObjAnim;
-            }
-        }
-    }
-
-    mapAnimRun = 0;
-
-startMapObjAnim:
+    CMapObj* mapObj = &m_mapObjArray[mapObjIndex];
+    CMapAnimRun* mapAnimRun = GetAnimRunMapObj(mapObj);
     mapAnimRun->Start(startFrame, endFrame, loop);
 }
 
@@ -2582,28 +2617,14 @@ startMapObjAnim:
  * --INFO--
  * PAL Address: 0x8002f710
  * PAL Size: 148b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8003d970
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
-    CMapAnimRun* mapAnimRun;
-    int mapAnimRunCount = m_mapAnimRunArray.GetSize();
-
-    for (int i = 0; i < mapAnimRunCount; i++) {
-        CMapAnimRun* current = m_mapAnimRunArray[i];
-        if (current->m_animId == static_cast<unsigned char>(animId)) {
-            mapAnimRun = current;
-            goto startMapAnim;
-        }
-    }
-
-    mapAnimRun = 0;
-
-startMapAnim:
-    mapAnimRun->Start(startFrame, endFrame, loop);
+    GetAnimRunID(animId)->Start(startFrame, endFrame, loop);
 }
 
 /*

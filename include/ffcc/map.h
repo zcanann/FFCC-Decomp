@@ -192,8 +192,8 @@ public:
     void DrawAfter();
     int CheckHitCylinder(CMapCylinder*, Vec*, unsigned long);
     int CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
-    void GetAnimRunMapObj(CMapObj*);
-    void GetAnimRunID(int);
+    CMapAnimRun* GetAnimRunMapObj(CMapObj*);
+    CMapAnimRun* GetAnimRunID(int);
     void SetViewMtx(float (*)[4], float (*)[4]);
     void SetIdGrpMask(int, unsigned long);
     void SetIdGrpColor(int, int, _GXColor);

@@ -3223,8 +3223,6 @@ void CMenuPcs::DrawMainMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	float x;
-	float y;
 	short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
@@ -3257,50 +3255,7 @@ void CMenuPcs::DrawMainMenu()
 		}
 		const double* pHmm1 = &DOUBLE_803313F8;
 		tileAlpha = static_cast<float>(static_cast<double>(tileAlpha) * *pHmm1);
-		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		GXColor tileColor;
-		tileColor.r = 0xFF;
-		tileColor.g = 0xFF;
-		tileColor.b = 0xFF;
-		const double* pAmm2 = &DOUBLE_80331508;
-		tileColor.a = static_cast<unsigned char>(static_cast<int>(*pAmm2 * static_cast<double>(tileAlpha)));
-		GXSetChanMatColor(static_cast<GXChannelID>(4), tileColor);
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x33));
-		const float* pXmm1 = &FLOAT_80331410;
-		x = *pXmm1;
-		const float* pYmm1 = &FLOAT_80331440;
-		y = *pYmm1;
-		y = y - x;
-		const float* pZmm2 = &FLOAT_803313dc;
-		const float* pOmm4 = &FLOAT_803313e8;
-		const float* pWmm1 = &FLOAT_803316D0;
-		const float* pHmm2 = &FLOAT_80331500;
-		MenuPcs.DrawRect(0, x, y, *pWmm1, *pHmm2, *pZmm2, *pZmm2, *pOmm4,
-		                 *pOmm4, *pZmm2);
-		const float* pZmm3 = &FLOAT_803313dc;
-		const float* pOmm5 = &FLOAT_803313e8;
-		const float* pWmm2 = &FLOAT_803316D0;
-		const float* pHmm3 = &FLOAT_80331500;
-		MenuPcs.DrawRect(8, x + *pWmm2, y,
-		                 *pWmm2, *pHmm3, *pZmm3, *pZmm3, *pOmm5, *pOmm5, *pZmm3);
-		const float* pHmm4 = &FLOAT_80331500;
-		y = y + *pHmm4;
-		const float* pXmm2 = &FLOAT_80331410;
-		x = *pXmm2;
-		const float* pZmm4 = &FLOAT_803313dc;
-		const float* pOmm6 = &FLOAT_803313e8;
-		const float* pWmm3 = &FLOAT_803316D0;
-		const float* pHmm5 = &FLOAT_80331500;
-		MenuPcs.DrawRect(4, x, y, *pWmm3, *pHmm5, *pZmm4, *pZmm4, *pOmm6,
-		                 *pOmm6, *pZmm4);
-		const float* pWmm4 = &FLOAT_803316D0;
-		x += *pWmm4;
-		const float* pZmm5 = &FLOAT_803313dc;
-		const float* pOmm7 = &FLOAT_803313e8;
-		const float* pWmm5 = &FLOAT_803316D0;
-		const float* pHmm6 = &FLOAT_80331500;
-		MenuPcs.DrawRect(0xC, x, y,
-		                 *pWmm5, *pHmm6, *pZmm5, *pZmm5, *pOmm7, *pOmm7, *pZmm5);
+		DrawMainMenuBase(tileAlpha);
 	}
 
 	DrawMainMenuSub();
@@ -6513,51 +6468,26 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::DrawMainMenuBase(float baseAlpha)
+inline void CMenuPcs::DrawMainMenuBase(float alpha)
 {
-	WmWorldState* const worldState = m_wmWorldState;
-	WmFrameInfo* const frame = m_wm.m_frameInfo;
-	float alpha = baseAlpha;
-
-	if (alpha <= 0.0f) {
-		alpha = 1.0f;
-	}
-
-	if (worldState != 0) {
-		const short state = worldState->m_mainState;
-		const short step = worldState->m_frameCounter;
-		if (state == 0) {
-			alpha *= static_cast<float>(step) * 0.1f;
-		} else if (state >= 3) {
-			alpha *= 1.0f - static_cast<float>(step) * 0.1f;
-		}
-	}
-	if (alpha < 0.0f) {
-		alpha = 0.0f;
-	} else if (alpha > 1.0f) {
-		alpha = 1.0f;
-	}
-
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
-	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(static_cast<int>(255.0 * alpha));
+	GXSetChanMatColor(GX_COLOR0A0, color);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x33));
 
-	if (frame != 0) {
-		for (int i = 0; i < 2; i++) {
-			Sprt* const entry = &frame->m_sprites[i];
-			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(entry->m_x),
-			         static_cast<float>(entry->m_y), static_cast<float>(entry->m_width),
-			         static_cast<float>(entry->m_height), entry->m_u,
-			         entry->m_v, 1.0f, 1.0f, static_cast<float>(entry->m_flags));
-		}
-	}
-
-	if (alpha > 0.0f) {
-		DrawMainMenuSub();
-		DrawPageMark();
-		DrawHelpBase(0, alpha);
-	}
+	float x = 32.0f;
+	float y = 40.0f - x;
+	MenuPcs.DrawRect(0, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	MenuPcs.DrawRect(8, x + 288.0f, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	y += 184.0f;
+	x = 32.0f;
+	MenuPcs.DrawRect(4, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	x += 288.0f;
+	MenuPcs.DrawRect(12, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*

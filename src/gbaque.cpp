@@ -27,6 +27,9 @@ STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_hp) == 4);
 STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_posX) == 8);
 STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_dropItemCodes) == 0xC);
 STATIC_ASSERT(sizeof(GbaQueuePlayerDataView) == 0xDC);
+STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_appearance) == 2);
+STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_items) == 0x3A);
+STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_commandData) == 0xD7);
 
 struct GbaQueuePlayerPosView
 {
@@ -3326,8 +3329,7 @@ void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
  */
 int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 {
-	unsigned char localPlayerData[0xDC];
-	unsigned char* itemPtr;
+	GbaQueuePlayerDataView localPlayerData;
 	unsigned short cmdData[4];
 	int i;
 	int size;
@@ -3335,22 +3337,21 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	unsigned char* writePtr;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x454, sizeof(localPlayerData));
+	memcpy(&localPlayerData, &m_playerData[channel], sizeof(localPlayerData));
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	count = 0;
 	outData[0] = 0;
 	outData[1] = 0;
-	itemPtr = localPlayerData + count * 2;
 	outData[2] = 0;
 	writePtr = outData + 4;
 	outData[3] = 0;
 	size = 4;
 
 	for (i = 0; i < 0x40; i++) {
-		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
+		int itemId = localPlayerData.m_items[i];
 		if (MenuPcs.GetItemType(itemId, 1) == 1) {
-			const int iconMask = localPlayerData[2] & 3;
+			const int iconMask = localPlayerData.m_appearance & 3;
 			const int icon = MenuPcs.GetItemIcon(itemId);
 			if (icon == iconMask) {
 				SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
@@ -3365,7 +3366,6 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 				count++;
 			}
 		}
-		itemPtr += 2;
 	}
 
 	outData[0] = count;
@@ -3383,37 +3383,30 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
  */
 int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 {
-	unsigned char localPlayerData[0xDC];
+	GbaQueuePlayerDataView localPlayerData;
 	char equipIndices[0x40];
 	unsigned int indexBytes;
 	int dataSize;
 	int equipCount;
 	unsigned short equipData[4];
-	unsigned char* itemPtr;
 	char* indexPtr;
-	char itemIndex;
-	int remaining;
 	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(localPlayerData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x454, sizeof(localPlayerData));
-	memcpy(outData, reinterpret_cast<unsigned char*>(this) + channel * 0xDC + 0x52B, 4);
+	memcpy(&localPlayerData, &m_playerData[channel], sizeof(localPlayerData));
+	memcpy(outData, m_playerData[channel].m_commandData, sizeof(m_playerData[channel].m_commandData));
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	memset(equipIndices, 0xFF, sizeof(equipIndices));
 	equipCount = 0;
-	itemIndex = 0;
-	itemPtr = localPlayerData;
 	indexPtr = equipIndices;
 	for (i = 0; i < 0x40; i++) {
-		short itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
+		short itemId = localPlayerData.m_items[i];
 		if ((itemId >= 0) && (itemId <= 0x9E)) {
-			*indexPtr = itemIndex;
+			*indexPtr = i;
 			equipCount++;
 			indexPtr++;
 		}
-		itemPtr += 2;
-		itemIndex++;
 	}
 
 	int indexBytesS = equipCount + 1;
@@ -3431,7 +3424,7 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	outData -= 1;
 	indexPtr = equipIndices;
 	for (i = 0; i < equipCount; i++) {
-		int itemId = *reinterpret_cast<short*>(localPlayerData + 0x3A + *indexPtr * 2);
+		int itemId = localPlayerData.m_items[*indexPtr];
 		SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
 
 		equipData[0] = __lhbrx(&itemBase->m_equipFlags, 0);

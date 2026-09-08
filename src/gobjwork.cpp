@@ -96,22 +96,9 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 
 	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
-	m_statusValues[0] = 0xFFFF;
-	m_statusValues[1] = 0xFFFF;
-	m_statusValues[2] = 0xFFFF;
-	m_statusValues[3] = 0xFFFF;
-	m_statusValues[4] = 0xFFFF;
-	m_statusValues[5] = 0xFFFF;
-	m_statusValues[6] = 0xFFFF;
-	m_statusValues[7] = 0xFFFF;
-	m_statusValues[8] = 0xFFFF;
-	m_statusValues[9] = 0xFFFF;
-	m_statusValues[10] = 0xFFFF;
-	m_statusValues[11] = 0xFFFF;
-	m_statusValues[12] = 0xFFFF;
-	m_statusValues[13] = 0xFFFF;
-	m_statusValues[14] = 0xFFFF;
-	m_statusValues[15] = 0xFFFF;
+	for (int i = 0; i < 16; i++) {
+		m_statusValues[i] = 0xFFFF;
+	}
 	m_hp = m_maxHp;
 }
 
@@ -301,22 +288,9 @@ void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_romWork = romWork->Data();
 	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
-	m_statusValues[0] = 0xFFFF;
-	m_statusValues[1] = 0xFFFF;
-	m_statusValues[2] = 0xFFFF;
-	m_statusValues[3] = 0xFFFF;
-	m_statusValues[4] = 0xFFFF;
-	m_statusValues[5] = 0xFFFF;
-	m_statusValues[6] = 0xFFFF;
-	m_statusValues[7] = 0xFFFF;
-	m_statusValues[8] = 0xFFFF;
-	m_statusValues[9] = 0xFFFF;
-	m_statusValues[10] = 0xFFFF;
-	m_statusValues[11] = 0xFFFF;
-	m_statusValues[12] = 0xFFFF;
-	m_statusValues[13] = 0xFFFF;
-	m_statusValues[14] = 0xFFFF;
-	m_statusValues[15] = 0xFFFF;
+	for (int i = 0; i < 16; i++) {
+		m_statusValues[i] = 0xFFFF;
+	}
 	m_hp = m_maxHp;
 	m_shopState = 1;
 
@@ -2194,12 +2168,12 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
 void CCaravanWork::DelCmdListAndItem(int cmdListIdx, int updateJoybus)
 {
 	int nextCmdIdx = 0;
-	short* slotRefPtr = (short*)((char*)this + cmdListIdx * 2);
+	short* slotRef = &m_commandListInventorySlotRef[cmdListIdx];
 	if (m_currentCmdListIndex == cmdListIdx) {
 		nextCmdIdx = GetNextCmdListIdx(cmdListIdx, 1);
 	}
 
-	short inventorySlot = *(short*)((char*)slotRefPtr + 0x204);
+	short inventorySlot = *slotRef;
 	if (m_inventoryItems[inventorySlot] != -1) {
 		m_inventoryItems[inventorySlot] = 0xFFFF;
 		m_inventoryItemCount = static_cast<short>(m_inventoryItemCount - 1);
@@ -2208,7 +2182,7 @@ void CCaravanWork::DelCmdListAndItem(int cmdListIdx, int updateJoybus)
 		}
 	}
 
-	*(short*)((char*)slotRefPtr + 0x204) = 0xFFFF;
+	*slotRef = 0xFFFF;
 	if (updateJoybus != 0) {
 		Joybus.SetCmdLst(m_joybusCaravanId, cmdListIdx, -1);
 	}
@@ -2285,14 +2259,14 @@ void CCaravanWork::GetCurrentWeaponItem(int& weaponItem, int& weaponRef)
 	short weaponIdx = m_weaponIdx;
 	if (weaponIdx == 0) {
 		weaponItem = 0;
-		CCaravanWork* ownerWork = *reinterpret_cast<CCaravanWork**>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x58);
+		CCaravanWork* ownerWork = reinterpret_cast<CCaravanWork*>(static_cast<CGPartyObj*>(m_ownerObj)->m_scriptHandle);
 		int equippedSlot = ownerWork->m_equipment[0];
 		if (equippedSlot >= 0) {
 			weaponRef = ownerWork->m_inventoryItems[equippedSlot];
 		}
 	} else if (weaponIdx != 1) {
 		weaponItem = weaponIdx;
-		CCaravanWork* ownerWork = *reinterpret_cast<CCaravanWork**>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x58);
+		CCaravanWork* ownerWork = reinterpret_cast<CCaravanWork*>(static_cast<CGPartyObj*>(m_ownerObj)->m_scriptHandle);
 		weaponRef = ownerWork->GetCmdListItem(m_weaponIdx);
 	}
 }
@@ -2526,17 +2500,13 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
  */
 int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdListIdx)
 {
-	int extraOff = cmdListIdx * 2;
 	int groupedCount = GetNumCombi(cmdListIdx);
 
 	if (groupedCount > 1) {
-		short* cur2 = (short*)((char*)this + extraOff);
-		for (int n = cmdListIdx; n >= 0; n--) {
-			if (*(short*)((char*)cur2 + 0x214) != -1) {
+		for (; cmdListIdx >= 0; cmdListIdx--) {
+			if (m_commandListExtra[cmdListIdx] != -1) {
 				break;
 			}
-			cur2--;
-			cmdListIdx--;
 		}
 
 		short cmdId = m_commandListExtra[cmdListIdx];
@@ -2653,22 +2623,9 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 
 	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
-	m_statusValues[0] = 0xFFFF;
-	m_statusValues[1] = 0xFFFF;
-	m_statusValues[2] = 0xFFFF;
-	m_statusValues[3] = 0xFFFF;
-	m_statusValues[4] = 0xFFFF;
-	m_statusValues[5] = 0xFFFF;
-	m_statusValues[6] = 0xFFFF;
-	m_statusValues[7] = 0xFFFF;
-	m_statusValues[8] = 0xFFFF;
-	m_statusValues[9] = 0xFFFF;
-	m_statusValues[10] = 0xFFFF;
-	m_statusValues[11] = 0xFFFF;
-	m_statusValues[12] = 0xFFFF;
-	m_statusValues[13] = 0xFFFF;
-	m_statusValues[14] = 0xFFFF;
-	m_statusValues[15] = 0xFFFF;
+	for (int i = 0; i < 16; i++) {
+		m_statusValues[i] = 0xFFFF;
+	}
 	m_hp = m_maxHp;
 
 	memcpy(unk_0xac, romWork->MonsterParams0(), 8);

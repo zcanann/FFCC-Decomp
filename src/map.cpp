@@ -3167,8 +3167,8 @@ void CMapMng::SetIdGrpMask(int mapIdGrpIndex, unsigned long mask)
  * --INFO--
  * PAL Address: 0x8002fcb4
  * PAL Size: 232b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8003D170
+ * EN Size: 368b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3176,41 +3176,17 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
 {
     switch (channelIndex) {
     case 0:
-    {
-        u8 b = color.b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.r = color.r;
-        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.g = color.g;
-        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.b = b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.a = color.a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor = color;
         return;
-    }
     case 1:
-    {
-        u8 b = color.b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.r = color.r;
-        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.g = color.g;
-        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.b = b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.a = color.a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor = color;
         return;
-    }
     case 2:
-    {
-        u8 b = color.b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.r = color.r;
-        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.g = color.g;
-        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.b = b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.a = color.a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor = color;
         return;
-    }
     case 3:
-    {
-        u8 b = color.b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.r = color.r;
-        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.g = color.g;
-        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.b = b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.a = color.a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor = color;
         return;
-    }
     }
 }
 

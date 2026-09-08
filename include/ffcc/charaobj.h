@@ -18,9 +18,6 @@ class CVector;
 int la(CGObject*);
 void SAFE_CAST_WORK(CGObjWork*);
 
-extern int gCGCharaObjCreateSerial;
-extern char gCGCharaObjCreateSerialInit;
-
 class CGCharaObj : public CGPrgObj
 {
 public:
@@ -95,6 +92,7 @@ public:
 	static int searchCombi(int, CGPartyObj **, int&);
 	int GetCID();
 
+	int m_updateCounter; // 0x54C
 	int m_attackAnimId;
 	int m_unk554;
 	int m_unk558;
@@ -163,6 +161,10 @@ public:
 	};
 };
 
+STATIC_ASSERT(offsetof(CGCharaObj, m_partyRank) == 0x620);
+STATIC_ASSERT(offsetof(CGCharaObj, m_updateCounter) == 0x54C);
+STATIC_ASSERT(offsetof(CGCharaObj, m_unk63C) == 0x63C);
+STATIC_ASSERT(offsetof(CGCharaObj, m_ignoreHit) == 0x640);
 STATIC_ASSERT(offsetof(CGCharaObj, m_targetAngle) == 0x5CC);
 STATIC_ASSERT(offsetof(CGCharaObj, m_comboCenter) == 0x66C);
 STATIC_ASSERT(offsetof(CGCharaObj, m_comboTarget) == 0x678);

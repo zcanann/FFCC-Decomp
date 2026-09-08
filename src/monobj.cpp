@@ -1215,7 +1215,7 @@ void CGMonObj::statWatch()
 			// Pass 1: count valid party members.
 			int validCount = 0;
 			for (int slot = 0; slot < 4; slot++) {
-				CGPartyObj* party = Game.m_partyObjArr[*reinterpret_cast<int*>(mon + slot * 4 + 0x620)];
+				CGPartyObj* party = Game.m_partyObjArr[m_partyRank[slot]];
 				if ((party != NULL) &&
 					(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
 					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 9) &&
@@ -1238,7 +1238,7 @@ void CGMonObj::statWatch()
 			// Pass 2: select target.
 			selectedTarget = -1;
 			for (int slot = 0; slot < 4; slot++) {
-				int partyIndex = *reinterpret_cast<int*>(mon + slot * 4 + 0x620);
+				int partyIndex = m_partyRank[slot];
 				CGPartyObj* party = Game.m_partyObjArr[partyIndex];
 				if ((party != NULL) &&
 					(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
@@ -2392,11 +2392,11 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 
 		int didHit = 0;
 		for (int rank = 0; rank < 4; rank++) {
-			if (((flags & 4) != 0) && (((*reinterpret_cast<int*>(mon + 0x54C) + rank) % 4) != 0)) {
+			if (((flags & 4) != 0) && (((m_updateCounter + rank) % 4) != 0)) {
 				continue;
 			}
 
-			int partyIndex = *reinterpret_cast<int*>(mon + 0x620 + rank * 4);
+			int partyIndex = m_partyRank[rank];
 			CGPartyObj* partyObj = Game.m_partyObjArr[partyIndex];
 			if (partyObj == NULL) {
 				continue;

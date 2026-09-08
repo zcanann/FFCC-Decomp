@@ -38,8 +38,6 @@ STATIC_ASSERT(offsetof(CCombi2, m_command) == 0x18);
 
 static Vec* l_pHitCross = 0;
 static int l_idxAttackCol = 0;
-int gCGCharaObjCreateSerial = 0;
-char gCGCharaObjCreateSerialInit = 0;
 extern "C" {
 extern const float kCharaObjZero;
 extern const float FLOAT_803319A8;
@@ -208,12 +206,6 @@ static bool CharaObjIsBreakStatus(int staType)
 {
 	return static_cast<unsigned int>(staType - 0x24) <= 1 || staType == 0x69 || staType == 0x6A;
 }
-
-struct CharaObjIgnoreFlagBits
-{
-	unsigned char m_active : 1;
-	unsigned char m_pad : 7;
-};
 
 struct CharaObjSignedTopBit
 {
@@ -1048,8 +1040,8 @@ int la(CGObject* object)
  * --INFO--
  * PAL Address: 0x8010C704
  * PAL Size: 1004b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801310f0
+ * EN Size: 880b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3014,20 +3006,19 @@ void CGCharaObj::decIgnoreHit()
 
 /*
  * --INFO--
- * PAL Address: 0x80111858
- * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x801118E4
+ * PAL Size: 56b
+ * EN Address: 0x8012bb84
+ * EN Size: 64b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGCharaObj::resetIgnoreHit()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x640)->m_active = 0;
-	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x648)->m_active = 0;
-	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x650)->m_active = 0;
-	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x658)->m_active = 0;
+	m_ignoreHit[0].m_flagBits.m_flag_80 = 0;
+	m_ignoreHit[1].m_flagBits.m_flag_80 = 0;
+	m_ignoreHit[2].m_flagBits.m_flag_80 = 0;
+	m_ignoreHit[3].m_flagBits.m_flag_80 = 0;
 }
 
 /*
@@ -3311,8 +3302,8 @@ void CGCharaObj::endPSlotBit(int slotMask)
  * --INFO--
  * PAL Address: 0x801120C0
  * PAL Size: 296b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8012b890
+ * EN Size: 336b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3326,7 +3317,7 @@ float CGCharaObj::onAlphaUpdate()
 		    ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 		     (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 1) != 0 &&
 		     static_cast<CGMonObj*>(this)->m_unk6BA == 0)) {
-			int createSerial = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x54C);
+			int createSerial = m_updateCounter;
 			float alphaWave = static_cast<float>(sin(static_cast<double>(FLOAT_803319B0 * static_cast<float>(createSerial))));
 			float alphaDelta = FLOAT_803319B4 * alphaWave;
 			alpha = alpha + alphaDelta;
@@ -3468,8 +3459,8 @@ void CGCharaObj::onFramePreCalc()
  * --INFO--
  * PAL Address: 0x80112618
  * PAL Size: 952b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8012b190
+ * EN Size: 624b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3530,12 +3521,12 @@ void CGCharaObj::onFramePostCalc()
 	    reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[12] != 0 ||
 	    reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[6] != 0) {
 		m_displayFlags &= ~2;
-		reinterpret_cast<CharaObjIgnoreFlagBits*>(reinterpret_cast<unsigned char*>(this) + 0x63C)->m_active = 0;
+		m_unk63CBits.m_bit80 = 0;
 	} else {
 		m_displayFlags |= 2;
 	}
 
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x54C) += 1;
+	m_updateCounter += 1;
 
 	for (int i = 0; i < 4; i++) {
 		if (m_ignoreHit[i].m_flagBits.m_flag_80) {
@@ -3611,10 +3602,10 @@ void CGCharaObj::onCancelStat(int)
 
 /*
  * --INFO--
- * PAL Address: 0x80112618
- * PAL Size: 952b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x80112B1C
+ * PAL Size: 168b
+ * EN Address: 0x8012b054
+ * EN Size: 136b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3636,7 +3627,7 @@ void CGCharaObj::onChangeStat(int state)
 			break;
 	}
 
-	reinterpret_cast<CharaObjIgnoreFlagBits*>(reinterpret_cast<unsigned char*>(this) + 0x63C)->m_active = 0;
+	m_unk63CBits.m_bit80 = 0;
 }
 
 /*
@@ -3672,10 +3663,10 @@ void CGCharaObj::onDestroy()
 
 /*
  * --INFO--
- * PAL Address: 0x80112BC4
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x80112C40
+ * PAL Size: 276b
+ * EN Address: 0x8012aec0
+ * EN Size: 268b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3683,21 +3674,11 @@ void CGCharaObj::onCreate()
 {
 	CGPrgObj::onCreate();
 
-	if (gCGCharaObjCreateSerialInit == 0) {
-		gCGCharaObjCreateSerial = 0;
-		gCGCharaObjCreateSerialInit = 1;
-	}
+	static int monCounter = 0;
+	m_updateCounter = monCounter++;
 
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	int createSerial = gCGCharaObjCreateSerial;
-	gCGCharaObjCreateSerial = createSerial + 1;
-	*reinterpret_cast<int*>(self + 0x54C) = createSerial;
-
-	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x63C)->m_active = 0;
-	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x640)->m_active = 0;
-	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x648)->m_active = 0;
-	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x650)->m_active = 0;
-	reinterpret_cast<CharaObjIgnoreFlagBits*>(self + 0x658)->m_active = 0;
+	m_unk63CBits.m_bit80 = 0;
+	resetIgnoreHit();
 	m_comboFrame = 0;
 	m_comboFramePrev = 0;
 	m_comboState = 0;

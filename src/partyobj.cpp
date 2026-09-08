@@ -1713,7 +1713,7 @@ void CGPartyObj::shouki()
 	} else {
 		deletePSlotBit(0x200);
 		if (FLOAT_80331a74 * Game.unkFloat_0xca10 <= chaliceDist) {
-			int flagFrame = *reinterpret_cast<int*>(&m_flagBits);
+			int flagFrame = m_updateCounter;
 			if (flagFrame % 4 == 0) {
 				playSe3D(0x1E, 0x32, 0x96, 0, 0);
 				CFlat.ResetParticleWork(2, 0);
@@ -1732,16 +1732,16 @@ void CGPartyObj::shouki()
 	    static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 27) & 0xC0000000) >> 31) == 0) {
 		int healCount = 0;
 		if (PartyData(this).carryObject == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
-			if (isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4))) {
+			if (isFrameInterval(m_updateCounter, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4))) {
 				healCount = 1;
 			}
 		} else {
-			if (isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 6))) {
+			if (isFrameInterval(m_updateCounter, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 6))) {
 				healCount = 1;
 			}
 		}
 		const unsigned int periodicHeal = script[0xBDC];
-		if (periodicHeal != 0 && isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), periodicHeal)) {
+		if (periodicHeal != 0 && isFrameInterval(m_updateCounter, periodicHeal)) {
 			healCount += 1;
 		}
 		if (healCount != 0) {
@@ -1753,7 +1753,7 @@ void CGPartyObj::shouki()
 		if ((*reinterpret_cast<unsigned int*>(script + 0x3B0) & 0x2000) != 0) {
 			damageInterval += *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 8);
 		}
-		if (isFrameInterval(*reinterpret_cast<int*>(&m_flagBits), damageInterval)) {
+		if (isFrameInterval(m_updateCounter, damageInterval)) {
 			playSe3D(0x19, 0x32, 0x96, 0, 0);
 			if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 26) & 0xC0000000) >> 31) == 0) {
 				addHp(-1, static_cast<CGPrgObj*>(0));

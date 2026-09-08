@@ -127,6 +127,20 @@ public:
 	static void DispAllFieldItem(int);
 	int GetCID();
 
+	union Flags {
+		unsigned char m_flags;
+		struct Bits {
+			unsigned char unk0 : 1;
+			unsigned char unk1 : 1;
+			unsigned char unk2 : 1;
+			unsigned char unk3 : 1;
+			unsigned char unk4 : 1;
+			unsigned char unk5 : 1;
+			unsigned char unk6 : 1;
+			unsigned char unk7 : 1;
+		} bits;
+	} m_flagBits;          // 0x54C
+
 	CGObject* m_owner;             // 0x550
 	int m_carryFrame;              // 0x554
 	int m_scriptArg;               // 0x558
@@ -140,6 +154,9 @@ public:
 	u32 m_pendingAnimFlags;        // 0x574
 	char* m_pendingAnimName;       // 0x578
 };
+
+STATIC_ASSERT(offsetof(CGItemObj, m_flagBits) == 0x54C);
+STATIC_ASSERT(offsetof(CGItemObj, m_owner) == 0x550);
 
 typedef int CGItemObj_size_mismatch[(sizeof(CGItemObj) == 0x57C) ? 1 : -1];
 

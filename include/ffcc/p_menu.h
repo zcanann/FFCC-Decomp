@@ -37,24 +37,6 @@ struct ItemMenuAnimList;
 struct CmakeMenuState;
 struct GoOutMenuState;
 
-struct MenuBoardEntry
-{
-    int m_modelHandle;
-    int m_effectHandle;
-    short m_centerX;
-    short m_centerY;
-    short m_width;
-    short m_height;
-    float m_posX;
-    float m_posY;
-    float m_depth;
-    SRT m_transform;
-    int m_screenX;
-    int m_screenY;
-    int m_screenWidth;
-    int m_screenHeight;
-};
-
 struct SingleFadeEntry
 {
     short x;
@@ -114,16 +96,24 @@ struct WmWorldObjInfo
     short m_viewportHeight;
     Vec m_cameraPosition;
     SRT m_transform;
-    unsigned int m_scissorX;
-    unsigned int m_scissorY;
-    unsigned int m_scissorWidth;
-    unsigned int m_scissorHeight;
+    int m_scissorX;
+    int m_scissorY;
+    int m_scissorWidth;
+    int m_scissorHeight;
 };
 STATIC_ASSERT(sizeof(WmWorldObjInfo) == 0x50);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_active) == 0x00);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_frameCounter) == 0x04);
 STATIC_ASSERT(offsetof(WmWorldObjInfo, m_viewportX) == 0x08);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_viewportY) == 0x0A);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_viewportWidth) == 0x0C);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_viewportHeight) == 0x0E);
 STATIC_ASSERT(offsetof(WmWorldObjInfo, m_cameraPosition) == 0x10);
 STATIC_ASSERT(offsetof(WmWorldObjInfo, m_transform) == 0x1C);
 STATIC_ASSERT(offsetof(WmWorldObjInfo, m_scissorX) == 0x40);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_scissorY) == 0x44);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_scissorWidth) == 0x48);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_scissorHeight) == 0x4C);
 
 struct WmCharaModelInfo
 {
@@ -783,13 +773,6 @@ public:
     void AlphaAdd();
     void GetFontWorld();
 
-    struct BonusStorage
-    {
-        unsigned char m_pad744[0x814 - 0x744];
-        int m_bonusBoardPtr;
-        unsigned char m_pad818[0x82C - 0x818];
-    };
-
     struct WmStorage
     {
         Mtx m_savedCameraMatrix;
@@ -852,10 +835,7 @@ public:
     unsigned char m_pad330[0x340 - 0x330];
     unsigned char m_externalFontTlut[0x740 - 0x340];
     int m_mode;
-    union {
-        BonusStorage m_bonus;
-        WmStorage m_wm;
-    };
+    WmStorage m_wm;
     union {
         ArtiState* m_artiState;
         EquipMenuState* m_equipState;
@@ -971,9 +951,6 @@ extern CMenuPcs MenuPcs;
 extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];
 
-STATIC_ASSERT(sizeof(MenuBoardEntry) == 0x50);
-STATIC_ASSERT(offsetof(MenuBoardEntry, m_transform) == 0x1C);
-STATIC_ASSERT(offsetof(MenuBoardEntry, m_screenX) == 0x40);
 STATIC_ASSERT(sizeof(CMenuPcs::BattleHudState) == 0x28);
 STATIC_ASSERT(sizeof(MenuWindowInfo) == 0x0C);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
@@ -996,7 +973,6 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeFlags) == 0xB5);
 STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeWorkHead) == 0xBC);
 STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeWork) == 0xC0);
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
-STATIC_ASSERT(offsetof(CMenuPcs, m_bonus) == 0x744);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm) == 0x744);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_savedCameraMatrix) == 0x744);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_worldObjData) == 0x814);

@@ -793,7 +793,7 @@ public:
     void SetCaravanWork(Mc::SaveDat*);
     int GetSameCharaData(Mc::SaveDat*, Mc::SaveDat*, int, int);
     int CheckSameMcFormatID(Mc::SaveDat*, Mc::SaveDat*);
-    void IsAsyncCharaLoadFinish();
+    int IsAsyncCharaLoadFinish();
     void AlphaNormal();
     void AlphaAdd();
     CFont* GetFontWorld();

@@ -9,6 +9,8 @@
 #include "ffcc/linkage.h"
 #include "ffcc/mes.h"
 #include "ffcc/pad.h"
+#include "ffcc/partyobj.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
@@ -83,15 +85,17 @@ static BonusSummaryData* s_Rinfo = 0;
 static unsigned char s_CntTop = 0;
 static unsigned char s_ArtiTop = 0;
 static unsigned char s_PlayerTop = 0;
-static float* s_Base[1];
-
-namespace {
-
-struct BonusBaseRaw {
-	float values[18];
+struct BonusBaseInfo {
+	Vec2d m_center;
+	Vec2d m_artifactPositions[BonusSummaryData::kArtifactCount];
 };
 
-STATIC_ASSERT(sizeof(BonusBaseRaw) == 0x48);
+STATIC_ASSERT(sizeof(BonusBaseInfo) == 0x48);
+STATIC_ASSERT(offsetof(BonusBaseInfo, m_artifactPositions) == 0x08);
+
+static BonusBaseInfo* s_Base;
+
+namespace {
 
 static inline void InitBonusEffectSlots(CMenuPcs* menu)
 {
@@ -137,7 +141,7 @@ void CMenuPcs::BonusInit()
 {
 	s_Rinfo = 0;
 	m_bonusAnim = 0;
-	s_Base[0] = 0;
+	s_Base = 0;
 }
 /*
  * --INFO--
@@ -206,8 +210,8 @@ void CMenuPcs::createBonus()
 
 	InitBonusEffectSlots(this);
 	memset(this->m_bonusState, 0, sizeof(*this->m_bonusState));
-	s_Base[0] = reinterpret_cast<float*>(new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xF1) BonusBaseRaw);
-	memset(s_Base[0], 0, sizeof(float) * 18);
+	s_Base = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xF1) BonusBaseInfo;
+	memset(s_Base, 0, sizeof(*s_Base));
 	m_bonusAnim = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xF5) BonusAnimList;
 	memset(m_bonusAnim, 0, sizeof(BonusAnimList));
 	m_wm.m_worldObjData = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xF8) WmWorldObjInfo[24];
@@ -248,7 +252,7 @@ void CMenuPcs::createBonus()
 
 			s_Rinfo->m_party[activeCount].m_partySlot = i;
 			s_Rinfo->m_party[activeCount].m_partyHandle =
-			    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8);
+			    Game.m_partyObjArr[i]->m_charaModelHandle;
 			s_Rinfo->m_party[activeCount].m_partyHandle->m_model->m_lightAlpha = 0.0f;
 			s_Rinfo->m_party[activeCount].m_bonusCondition = (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_bonusCondition;
 			int foodValue =  (int)(unsigned int)((int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[3] + (int)reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_artifactRelated[4]);
@@ -284,21 +288,11 @@ void CMenuPcs::createBonus()
 			activeCount++;
 
 			unsigned int* slot = &Game.m_scriptFoodBase[i];
-			int treasure0 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[CCaravanWork::kPermanentArtifactCount + 0];
-			if (treasure0 > 0) {
-				s_Rinfo->m_artifacts[tempArtifactCount++] = (short)treasure0;
-			}
-			int treasure1 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[CCaravanWork::kPermanentArtifactCount + 1];
-			if (treasure1 > 0) {
-				s_Rinfo->m_artifacts[tempArtifactCount++] = (short)treasure1;
-			}
-			int treasure2 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[CCaravanWork::kPermanentArtifactCount + 2];
-			if (treasure2 > 0) {
-				s_Rinfo->m_artifacts[tempArtifactCount++] = (short)treasure2;
-			}
-			int treasure3 = (int)reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[CCaravanWork::kPermanentArtifactCount + 3];
-			if (treasure3 > 0) {
-				s_Rinfo->m_artifacts[tempArtifactCount++] = (short)treasure3;
+			for (int artifactIndex = 0; artifactIndex < BonusSummaryData::kTemporaryArtifactCount; artifactIndex++) {
+				int itemId = reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[CCaravanWork::kPermanentArtifactCount + artifactIndex];
+				if (itemId > 0) {
+					s_Rinfo->m_artifacts[tempArtifactCount++] = (short)itemId;
+				}
 			}
 		}
 
@@ -503,9 +497,9 @@ void CMenuPcs::destroyBonus()
 		m_bonusAnim = 0;
 	}
 
-	if (s_Base[0] != 0) {
-		delete reinterpret_cast<BonusBaseRaw*>(s_Base[0]);
-		s_Base[0] = 0;
+	if (s_Base != 0) {
+		delete s_Base;
+		s_Base = 0;
 	}
 
 	WmWorldObjInfo* board = m_wm.m_worldObjData;
@@ -2777,9 +2771,9 @@ void CMenuPcs::CalcSelectWait()
 	{
 		CMenuPcs::Sprt2* spr2 = &m_bonusAnim->sprites[2];
 		count2 = m_bonusAnim->header.count;
-		spr2->x = (short)(int)s_Base[0][this->m_bonusState->m_selection * 2 + 2];
+		spr2->x = (short)(int)s_Base->m_artifactPositions[this->m_bonusState->m_selection].x;
 		spr2 = &m_bonusAnim->sprites[2];
-		spr2->y = (short)(int)s_Base[0][this->m_bonusState->m_selection * 2 + 3];
+		spr2->y = (short)(int)s_Base->m_artifactPositions[this->m_bonusState->m_selection].y;
 		if (spr2->timer < spr2->duration) {
 			spr2->alpha = (float)spr2->timer / (float)spr2->duration;
 			spr2->timer++;
@@ -3343,7 +3337,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 			color.a = (unsigned char)(alpha * 255.0f);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
-		MenuPcs.DrawRect(0, s_Base[0][i * 2 + 2], s_Base[0][i * 2 + 3], width, height,
+		MenuPcs.DrawRect(0, s_Base->m_artifactPositions[i].x, s_Base->m_artifactPositions[i].y, width, height,
 		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 }
@@ -3384,8 +3378,8 @@ inline void CMenuPcs::DrawBonusChkMark(float artiAlpha)
 				if ((activeMask & (1 << i)) == 0) {
 					continue;
 				}
-				float x = s_Base[0][i * 2 + 2] + 28.0f;
-				float y = s_Base[0][i * 2 + 3] + 20.0f;
+				float x = s_Base->m_artifactPositions[i].x + 28.0f;
+				float y = s_Base->m_artifactPositions[i].y + 20.0f;
 				MenuPcs.DrawRect(0, x, y, 56.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 			}
 		}
@@ -3406,39 +3400,39 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 	Sprt2* board = a;
 	Sprt2* icon = b;
 
-	s_Base[0][0] = (float)(board->x + board->w * 0.5);
-	s_Base[0][1] = (float)(board->y + board->h * 0.5);
+	s_Base->m_center.x = (float)(board->x + board->w * 0.5);
+	s_Base->m_center.y = (float)(board->y + board->h * 0.5);
 
 	float iconW = (float)icon->w;
 	float iconH = (float)icon->h;
 
-	float v14 = (float)((double)s_Base[0][0] - (double)iconW * 0.5);
-	float v15 = (float)board->y;
-	for (int r0 = 0; r0 < 2; r0++) {
-		if (r0 != 0) {
-			v15 = v15 + ((float)board->h - iconH);
+	float centerX = (float)((double)s_Base->m_center.x - (double)iconW * 0.5);
+	float edgeY = (float)board->y;
+	for (int edge = 0; edge < 2; edge++) {
+		if (edge != 0) {
+			edgeY = edgeY + ((float)board->h - iconH);
 		}
-		if (r0 == 0) {
-			s_Base[0][14] = v14;
-			s_Base[0][15] = v15;
+		if (edge == 0) {
+			s_Base->m_artifactPositions[6].x = centerX;
+			s_Base->m_artifactPositions[6].y = edgeY;
 		} else {
-			s_Base[0][6] = v14;
-			s_Base[0][7] = v15;
+			s_Base->m_artifactPositions[2].x = centerX;
+			s_Base->m_artifactPositions[2].y = edgeY;
 		}
 	}
 
-	float v10 = (float)board->x;
-	float v11 = (float)((double)s_Base[0][1] - (double)iconH * 0.5);
-	for (int r1 = 0; r1 < 2; r1++) {
-		if (r1 != 0) {
-			v10 = v10 + ((float)board->w - iconW);
+	float edgeX = (float)board->x;
+	float centerY = (float)((double)s_Base->m_center.y - (double)iconH * 0.5);
+	for (int edge = 0; edge < 2; edge++) {
+		if (edge != 0) {
+			edgeX = edgeX + ((float)board->w - iconW);
 		}
-		if (r1 == 0) {
-			s_Base[0][10] = v10;
-			s_Base[0][11] = v11;
+		if (edge == 0) {
+			s_Base->m_artifactPositions[4].x = edgeX;
+			s_Base->m_artifactPositions[4].y = centerY;
 		} else {
-			s_Base[0][2] = v10;
-			s_Base[0][3] = v11;
+			s_Base->m_artifactPositions[0].x = edgeX;
+			s_Base->m_artifactPositions[0].y = centerY;
 		}
 	}
 
@@ -3447,19 +3441,21 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 		float slotY = (float)((double)(float)(board->y + board->h * 0.25) - (double)iconH * 0.5);
 		if (row != 0) {
 			slotY = (float)(board->h * 0.5 + slotY);
-			s_Base[0][8] = slotX;
-			s_Base[0][9] = slotY;
-		} else {
-			s_Base[0][12] = slotX;
-			s_Base[0][13] = slotY;
 		}
-		float nextX = (float)(board->w * 0.5 + slotX);
 		if (row == 0) {
-			s_Base[0][16] = nextX;
-			s_Base[0][17] = slotY;
+			s_Base->m_artifactPositions[5].x = slotX;
+			s_Base->m_artifactPositions[5].y = slotY;
 		} else {
-			s_Base[0][4] = nextX;
-			s_Base[0][5] = slotY;
+			s_Base->m_artifactPositions[3].x = slotX;
+			s_Base->m_artifactPositions[3].y = slotY;
+		}
+		slotX = (float)(board->w * 0.5 + slotX);
+		if (row == 0) {
+			s_Base->m_artifactPositions[7].x = slotX;
+			s_Base->m_artifactPositions[7].y = slotY;
+		} else {
+			s_Base->m_artifactPositions[1].x = slotX;
+			s_Base->m_artifactPositions[1].y = slotY;
 		}
 	}
 }

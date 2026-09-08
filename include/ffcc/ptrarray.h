@@ -2,6 +2,7 @@
 #define _FFCC_PTRARRAY_H_
 
 #include "global.h"
+#include "ffcc/ptrarray_decl.h"
 #include "ffcc/memory.h"
 #include "ffcc/ref.h"
 #include "ffcc/system.h"
@@ -13,39 +14,6 @@
 
 #ifndef FFCC_PTRARRAY_FILE
 #define FFCC_PTRARRAY_FILE "collection_ptrarray.h"
-#endif
-
-#ifndef _FFCC_PTRARRAY_DECL_H_
-template <class T>
-class CPtrArray
-{
-public:
-    CPtrArray();
-    virtual ~CPtrArray();
-
-    int GetSize();
-    int Add(T item);
-    void RemoveAll();
-    void ReleaseAndRemoveAll();
-    void DeleteAndRemoveAll();
-    void RemoveAt(unsigned long index);
-    T GetAt(unsigned long index);
-    T operator[](unsigned long index);
-    void SetAt(unsigned long index, T item);
-    void SetStage(CMemory::CStage* stage);
-    void SetDefaultSize(unsigned long defaultSize);
-    void SetGrow(int growCapacity);
-
-private:
-    int setSize(unsigned long newSize);
-
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-};
 #endif
 
 template <class T>

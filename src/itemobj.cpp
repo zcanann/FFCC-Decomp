@@ -126,8 +126,7 @@ void CGItemObj::DispAllFieldItem(int show)
 	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
 	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
 		if (itemObj->m_owner == 0 &&
-		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
+		    itemObj->m_stateFlags0Bits.unk4 != 0) {
 			if (show != 0) {
 				itemObj->m_displayFlags &= 0xffbfffff;
 			} else {
@@ -151,9 +150,8 @@ void CGItemObj::DeleteAllFieldItem()
 	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
 	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
 		if (itemObj->m_owner == 0 &&
-		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
-			itemObj->m_flags = static_cast<unsigned char>(__rlwimi(itemObj->m_flags, 1, 7, 24, 24));
+		    itemObj->m_stateFlags0Bits.unk4 != 0) {
+			itemObj->CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
 		}
 	}
 }
@@ -208,28 +206,26 @@ void CGItemObj::ItemJump(int state, float jump)
  */
 void CGItemObj::DrawOmoideName(CFont* font)
 {
-	unsigned char* self = (unsigned char*)this;
-
-	if ((signed char)((int)(((unsigned int)*(unsigned char*)(self + 0x9A) << 0x1A) & 0xC0000000) >> 31) != 0) {
-		void* charaHandle = *(void**)(self + 0xF8);
+	if (m_weaponNodeFlagBits.m_unk20 != 0) {
+		CCharaPcs::CHandle* charaHandle = m_charaModelHandle;
 		bool hasModel = false;
-		if (charaHandle != 0 && *(void**)((unsigned char*)charaHandle + 0x168) != 0) {
+		if (charaHandle != 0 && charaHandle->m_model != 0) {
 			hasModel = true;
 		}
 
-		if (hasModel && *(int*)(self + 0x500) == 0xCB && 0.0f < *(float*)(self + 0x74) &&
-		    0.0f != *(float*)(self + 0x4B0)) {
+		if (hasModel && m_worldParamA == 0xCB && 0.0f < m_screenDepth &&
+		    0.0f != m_lookAtTimer) {
 			font->SetTlut(7);
 
-			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * *(float*)(self + 0x4B0)).color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * m_lookAtTimer).color);
 
-			const char* name = Game.m_cFlatDataArr[1].TableStrings(2)[*(int*)(self + 0x570)];
+			const char* name = Game.m_cFlatDataArr[1].TableStrings(2)[m_memoryCapsuleNameIndex];
 			float width = font->GetWidth(name);
-			float depthScale = kItemObjUnitScale / (*(float*)(self + 0x74) - kItemObjHeightOffset);
-			float posY = 224.0f - 224.0f * *(float*)(self + 0x6C) * depthScale;
-			float posZ = *(float*)(self + 0x70) * depthScale;
+			float depthScale = kItemObjUnitScale / (m_screenDepth - kItemObjHeightOffset);
+			float posY = 224.0f - 224.0f * m_projection.z * depthScale;
+			float posZ = m_projection.w * depthScale;
 			float posX =
-			    -(0.5f * width - (320.0f * *(float*)(self + 0x68) * depthScale + 320.0f));
+			    -(0.5f * width - (320.0f * m_projection.y * depthScale + 320.0f));
 
 			font->SetPosX(posX);
 			font->SetPosY(posY - 11.0f);
@@ -438,13 +434,12 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
  */
 void CGItemObj::onFrameAlways()
 {
-	unsigned char* self = (unsigned char*)this;
 	int countdown = m_itemJumpCountdown;
 
 	if (countdown != 0) {
 		const float& scale = kItemObjWobblePhaseScale;
 		int next = countdown - 1;
-		m_itemJumpCountdown = next & ~(next >> 0x1F);
+		m_itemJumpCountdown = next < 0 ? 0 : next;
 		float radius = m_savedBodyRadius * (float)(8 - m_itemJumpCountdown);
 		m_bodyEllipsoidRadius = radius * scale;
 	}
@@ -457,9 +452,8 @@ void CGItemObj::onFrameAlways()
 		        static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) != 0 &&
 		    static_cast<signed char>(
 		        static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) != 0 &&
-		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(self + 0x9A)) << 24) & 0xC0000000) >> 31) != 0 &&
-		    static_cast<int>(CFlatCenterState()) == 0 && *(void**)(self + 0x550) == 0) {
+		    m_weaponNodeFlagBits.m_prg != 0 &&
+		    static_cast<int>(CFlatCenterState()) == 0 && m_owner == 0) {
 			canUseTrace = true;
 		} else {
 			canUseTrace = false;
@@ -646,8 +640,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			 itemObj != 0;
 		     itemObj = runtime->FindGItemObjNext(itemObj)) {
 			if (itemObj->m_owner == 0 &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0 &&
+			    itemObj->m_stateFlags0Bits.unk4 != 0 &&
 			    (itemObj->m_ownerSlot & 1) != 0 && itemObj->m_lifeTimer < shortestLifetime) {
 				shortestLifetime = itemObj->m_lifeTimer;
 				bestItemObj = itemObj;
@@ -682,7 +675,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	inStack[1].m_word = createFlags;
 	inStack[2].m_word = scriptArg;
 	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
-	*reinterpret_cast<float*>(&inStack[4].m_word) = launchAngle;
+	inStack[4].m_float = launchAngle;
 	g_tempFlag = createFlags;
 	gCFlatRuntime().SystemCall(0, 1, 7, 5, inStack, &outStack);
 
@@ -769,9 +762,9 @@ CGPrgObj* CGItemObj::CreateFromScript(
  */
 unsigned int CGItemObj::CanCreateFromScript()
 {
-	unsigned int numFreeObjects = ItemCFlatRuntime()->getNumFreeObject(5);
+	int numFreeObjects = ItemCFlatRuntime()->getNumFreeObject(5);
 
-	return (-numFreeObjects & ~numFreeObjects) >> 31;
+	return numFreeObjects > 0;
 }
 
 /*
@@ -795,8 +788,7 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 			 itemObj != 0;
 			 itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
 			if (itemObj->m_owner == 0 &&
-				static_cast<signed char>(
-				    static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0 &&
+				itemObj->m_stateFlags0Bits.unk4 != 0 &&
 				(((int)(char)itemObj->m_ownerSlot & deleteMask) != 0) && itemObj->m_lifeTimer < shortestLifetime) {
 				shortestLifetime = itemObj->m_lifeTimer;
 				bestItemObj = itemObj;
@@ -851,8 +843,7 @@ void CGItemObj::onFrameStat()
 		break;
 	case 0: {
 		if (m_owner == 0 &&
-		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
+		    m_stateFlags0Bits.unk4 != 0) {
 			float distance = kItemObjZero;
 
 			if (Game.unk_flat3_0xc7d0 != 0) {
@@ -971,12 +962,10 @@ void CGItemObj::onFrameStat()
 			int worldParamA = m_worldParamA;
 
 			if (worldParamA == 0xD || worldParamA == 0xE) {
-				if (static_cast<signed char>(
-				        static_cast<int>((static_cast<unsigned int>(self[0x50]) << 24) & 0xC0000000) >> 31) != 0) {
+				if (m_stateFlags0Bits.unk0 != 0) {
 					changeStat(0x1F, 0, 0);
 				}
-			} else if (static_cast<signed char>(
-			               static_cast<int>((static_cast<unsigned int>(self[0x50]) << 24) & 0xC0000000) >> 31) != 0) {
+			} else if (m_stateFlags0Bits.unk0 != 0) {
 				changeStat(0, 0, 0);
 			}
 		}
@@ -984,8 +973,7 @@ void CGItemObj::onFrameStat()
 	case 0xE:
 		if (m_stateFrame == 0) {
 			prgObj->m_bgColMask = 0;
-			*reinterpret_cast<unsigned char*>(&prgObj->m_weaponNodeFlags) =
-			    static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&prgObj->m_weaponNodeFlags), 0, 4, 27, 27));
+			prgObj->m_weaponNodeFlagBits.m_unk10 = 0;
 			prgObj->m_groundHitOffset.z = zero;
 			prgObj->m_groundHitOffset.y = zero;
 			prgObj->m_groundHitOffset.x = zero;
@@ -994,7 +982,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			ItemCFlatRuntime()->EndParticle(prgObj->m_charaModelHandle);
 		} else if (m_stateFrame == 0xC) {
-			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
+			CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
 		}
 
 		if (7 < m_stateFrame) {
@@ -1013,7 +1001,7 @@ void CGItemObj::onFrameStat()
 		break;
 	case 9:
 		if (m_stateFrame == 8) {
-			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
+			CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
 		}
 		break;
 	case 0x1F:
@@ -1054,8 +1042,7 @@ void CGItemObj::onFrameStat()
 		if (m_subState != 0 && m_subState == 1) {
 			CCharaPcs::CHandle* handle = prgObj->m_charaModelHandle;
 			if (handle != 0 && handle->m_model != 0) {
-				unsigned char* model = reinterpret_cast<unsigned char*>(handle->m_model);
-				model[0x10C] = static_cast<unsigned char>(__rlwimi(model[0x10C], 1, 7, 24, 24));
+				handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
 			}
 
 			if (m_subFrame <= 8) {
@@ -1155,7 +1142,7 @@ void CGItemObj::onFrameStat()
 			gCFlatRuntime().SystemCall(
 			    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
 
-			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
+			CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
 		}
 		break;
 	}
@@ -1204,7 +1191,7 @@ void CGItemObj::onFrameStat()
 				}
 			}
 
-			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
+			CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
 		}
 		break;
 	}
@@ -1306,8 +1293,7 @@ void CGItemObj::onChangeStat(int state)
  */
 void CGItemObj::onFramePostCalc()
 {
-	if (static_cast<signed char>(
-	        static_cast<int>((static_cast<unsigned int>(m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0 &&
+	if (m_stateFlags0Bits.unk4 != 0 &&
 	    m_owner == 0) {
 		m_lifeTimer = m_lifeTimer - 1;
 	}
@@ -1338,13 +1324,11 @@ void CGItemObj::onFramePreCalc()
  */
 void CGItemObj::onDestroy()
 {
-	unsigned char* self = (unsigned char*)this;
-
-	if (*(void**)(self + 0x564) != 0) {
-		delete reinterpret_cast<CCharaPcs::CHandle*>(*(void**)(self + 0x564));
+	if (m_pendingModelHandle != 0) {
+		delete m_pendingModelHandle;
 	}
 
-	ItemCFlatRuntime()->DeleteParticleSlot(*(int*)(self + 0x55c), 0);
+	ItemCFlatRuntime()->DeleteParticleSlot(m_particleSlot, 0);
 	CGPrgObj::onDestroy();
 }
 

@@ -39,6 +39,12 @@ STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_commandSlotCount) == 0xD3);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_equipment) == 0xD7);
 
 STATIC_ASSERT(sizeof(GbaCMakeInfo) == 0x20);
+STATIC_ASSERT(offsetof(GbaCMakeInfo, m_packetCount) == 2);
+STATIC_ASSERT(offsetof(GbaCMakeInfo, m_crc) == 4);
+STATIC_ASSERT(offsetof(GbaCMakeInfo, m_name) == 7);
+STATIC_ASSERT(offsetof(GbaCMakeInfo, m_charaType) == 0x18);
+STATIC_ASSERT(offsetof(GbaCMakeInfo, m_favorite) == 0x1B);
+STATIC_ASSERT(offsetof(GbaCMakeInfo, m_jobType) == 0x1F);
 
 STATIC_ASSERT(sizeof(GbaQueueMapObjEntry) == 0xC);
 STATIC_ASSERT(sizeof(GbaQueueMapObjWork) == 0x188);
@@ -2782,14 +2788,13 @@ void GbaQueue::ClrScrInitEnd()
  */
 void GbaQueue::InitCmakeInfo(int channel, int value)
 {
-	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	memset(&cmakeInfo[channel], 0, sizeof(cmakeInfo[channel]));
 	cmakeInfo[channel].m_active = 1;
-	obj[channel * 0x20 + 0x2CCA] = 0xFF;
-	obj[channel * 0x20 + 0x2CD1] = 0xFF;
-	obj[channel * 0x20 + 0x2CB8] = static_cast<unsigned char>(value);
+	cmakeInfo[channel].m_charaType = 0xFF;
+	cmakeInfo[channel].m_jobType = 0xFF;
+	cmakeInfo[channel].m_playerSlot = static_cast<unsigned char>(value);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	Joybus.SetMType(channel, 1);
@@ -2824,19 +2829,18 @@ void GbaQueue::ClrCmakeInfo(int param_2)
  */
 void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 {
-	unsigned short crc[2];
+	unsigned short crc;
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
-	char* obj = reinterpret_cast<char*>(this);
 
 	if ((static_cast<int>(valueBytes[0]) >> 6) == 0) {
 		OSWaitSemaphore(accessSemaphores + channel);
-		obj[0x2CB3 + channel * 0x20] = static_cast<char>(valueBytes[0]);
-		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + channel * 0x20) = 1;
-		*reinterpret_cast<unsigned short*>(obj + 0x2CB6 + channel * 0x20) =
+		cmakeInfo[channel].m_resultCode = valueBytes[0];
+		cmakeInfo[channel].m_packetCount = 1;
+		cmakeInfo[channel].m_crc =
 		    static_cast<unsigned short>((valueBytes[1] << 8) | valueBytes[2]);
 		memset(cmakeInfo[channel].m_name, 0, 0x11);
-		obj[0x2CB9 + channel * 0x20] = static_cast<char>(valueBytes[3]);
+		cmakeInfo[channel].m_name[0] = static_cast<char>(valueBytes[3]);
 		OSSignalSemaphore(accessSemaphores + channel);
 		return;
 	}
@@ -2845,33 +2849,30 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	{
-		char* cmakeBase = obj + channel * 0x20;
-		short packetCount = *reinterpret_cast<short*>(cmakeBase + 0x2CB4);
-		char* writeBase = cmakeBase + 0x2CB9;
-		*reinterpret_cast<short*>(cmakeBase + 0x2CB4) = static_cast<short>(packetCount + 1);
-		int writeIndex = static_cast<int>(packetCount) * 3 - 2;
+		int writeIndex = cmakeInfo[channel].m_packetCount++ * 3 - 2;
+		char* writeBase = cmakeInfo[channel].m_name;
 		writeBase[writeIndex++] = static_cast<char>(valueBytes[1]);
 		writeBase[writeIndex++] = static_cast<char>(valueBytes[2]);
 		writeBase[writeIndex] = static_cast<char>(valueBytes[3]);
 
-		if (*reinterpret_cast<short*>(cmakeBase + 0x2CB4) >= 6) {
+		if (cmakeInfo[channel].m_packetCount >= 6) {
 			localInfo = cmakeInfo[channel];
 		}
 	}
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	if (*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) < 6) {
+	if (cmakeInfo[channel].m_packetCount < 6) {
 		return;
 	}
 
-	if (strlen(reinterpret_cast<char*>(obj + 0x2CB9 + channel * 0x20)) == 0) {
-		reinterpret_cast<unsigned char*>(obj)[0x2CCA + channel * 0x20] = 0xFF;
-		reinterpret_cast<unsigned char*>(obj)[0x2CD1 + channel * 0x20] = 0xFF;
+	if (strlen(cmakeInfo[channel].m_name) == 0) {
+		cmakeInfo[channel].m_charaType = 0xFF;
+		cmakeInfo[channel].m_jobType = 0xFF;
 		return;
 	}
 
-	crc[0] = 0xFFFF;
-	const unsigned short crcValue = Joybus.Crc16(0x10, reinterpret_cast<unsigned char*>(localInfo.m_name), crc);
+	crc = 0xFFFF;
+	const unsigned short crcValue = Joybus.Crc16(0x10, reinterpret_cast<unsigned char*>(localInfo.m_name), &crc);
 	if (crcValue != localInfo.m_crc) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(s_cmake_name_crc_error), const_cast<char*>(s_gbaque_cpp), 0xAD3);
@@ -2882,12 +2883,10 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 			OSWaitSemaphore(accessSemaphores + i);
 		}
 
-		const unsigned char* walk;
-		int i;
-		for (i = 0, walk = reinterpret_cast<unsigned char*>(obj); i < 4; i++, walk += 0x20) {
-			if ((channel != i) && (walk[0x2CB2] != 0) &&
-			    (strcmp(reinterpret_cast<const char*>(walk + 0x2CB9), localInfo.m_name) == 0)) {
-				memset(obj + 0x2CB9 + channel * 0x20, 0, 0x11);
+		for (int i = 0; i < 4; i++) {
+			if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
+			    (strcmp(cmakeInfo[i].m_name, localInfo.m_name) == 0)) {
+				memset(cmakeInfo[channel].m_name, 0, 0x11);
 				for (int j = 0; j < 4; j++) {
 					OSSignalSemaphore(accessSemaphores + j);
 				}
@@ -2909,10 +2908,9 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		}
 
 		for (int i = 0; i < 8; i++) {
-			CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
-			if ((i != localInfo.m_playerSlot) && (caravanWork->m_shopState != 0) &&
-			    (caravanWork->m_caravanLocalFlags == '\0') &&
-			    (strcmp(reinterpret_cast<char*>(caravanWork->m_name), localInfo.m_name) == 0)) {
+			if ((i != static_cast<signed char>(localInfo.m_playerSlot)) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
+			    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == '\0') &&
+			    (strcmp(reinterpret_cast<char*>(Game.m_caravanWorkArr[i].m_name), localInfo.m_name) == 0)) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
 			}
@@ -2920,9 +2918,9 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 
 		Joybus.SendResult(channel, 0, localInfo.m_resultCode, 0);
 		OSWaitSemaphore(accessSemaphores + channel);
-		obj[0x2CB3 + channel * 0x20] = 0;
-		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + channel * 0x20) = 0;
-		*reinterpret_cast<unsigned short*>(obj + 0x2CB6 + channel * 0x20) = 0;
+		cmakeInfo[channel].m_resultCode = 0;
+		cmakeInfo[channel].m_packetCount = 0;
+		cmakeInfo[channel].m_crc = 0;
 		OSSignalSemaphore(accessSemaphores + channel);
 	}
 }
@@ -2940,7 +2938,6 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 {
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
-	char* obj = reinterpret_cast<char*>(this);
 
 	if (valueBytes[2] == 0xFF) {
 		OSWaitSemaphore(accessSemaphores + channel);
@@ -3011,7 +3008,6 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 {
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
-	char* obj = reinterpret_cast<char*>(this);
 
 	if (valueBytes[2] == 0xFF) {
 		OSWaitSemaphore(accessSemaphores + channel);
@@ -3020,7 +3016,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 		return;
 	}
 
-	int foundDuplicate = 0;
+	bool foundDuplicate = false;
 	for (int i = 0; i < 4; i++) {
 		OSWaitSemaphore(accessSemaphores + i);
 	}
@@ -3030,7 +3026,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
 		    (cmakeInfo[i].m_jobType == valueBytes[2])) {
 			Joybus.SendResult(channel, 1, valueBytes[1], 0);
-			foundDuplicate = 1;
+			foundDuplicate = true;
 			break;
 		}
 	}
@@ -3089,16 +3085,15 @@ inline void GbaQueue::CMakeBarthday(int, unsigned int)
  */
 void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&value);
 
 	if ((static_cast<int>(valueBytes[0]) >> 6) == 0) {
 		OSWaitSemaphore(accessSemaphores + channel);
-		obj[0x2CB3 + channel * 0x20] = static_cast<char>(valueBytes[0]);
-		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + channel * 0x20) = 1;
-		*reinterpret_cast<short*>(obj + 0x2CB6 + channel * 0x20) = static_cast<short>((valueBytes[1] << 8) | valueBytes[2]);
-		memset(obj + 0x2CCD + channel * 0x20, 0, 4);
-		obj[0x2CCD + channel * 0x20] = static_cast<char>(valueBytes[3]);
+		cmakeInfo[channel].m_resultCode = valueBytes[0];
+		cmakeInfo[channel].m_packetCount = 1;
+		cmakeInfo[channel].m_crc = static_cast<unsigned short>((valueBytes[1] << 8) | valueBytes[2]);
+		memset(cmakeInfo[channel].m_favorite, 0, 4);
+		cmakeInfo[channel].m_favorite[0] = valueBytes[3];
 		OSSignalSemaphore(accessSemaphores + channel);
 		return;
 	}
@@ -3107,22 +3102,19 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	{
-		int writeOffset = static_cast<int>(*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20)) * 3;
-		*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) =
-			static_cast<short>(*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) + 1);
-		char* favBase = obj + 0x2CCD + channel * 0x20;
-		int writeIndex = writeOffset - 2;
-		favBase[writeIndex++] = static_cast<char>(valueBytes[1]);
-		favBase[writeIndex++] = static_cast<char>(valueBytes[2]);
-		favBase[writeIndex] = static_cast<char>(valueBytes[3]);
+		int writeIndex = cmakeInfo[channel].m_packetCount++ * 3 - 2;
+		unsigned char* favBase = cmakeInfo[channel].m_favorite;
+		favBase[writeIndex++] = valueBytes[1];
+		favBase[writeIndex++] = valueBytes[2];
+		favBase[writeIndex] = valueBytes[3];
 
-		if (*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) >= 2) {
+		if (cmakeInfo[channel].m_packetCount >= 2) {
 			localInfo = cmakeInfo[channel];
 		}
 	}
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	if (*reinterpret_cast<short*>(obj + 0x2CB4 + channel * 0x20) < 2) {
+	if (cmakeInfo[channel].m_packetCount < 2) {
 		return;
 	}
 
@@ -3136,9 +3128,9 @@ System.Printf(const_cast<char*>(s_cmake_favorite_crc_error), const_cast<char*>(s
 	} else {
 		Joybus.SendResult(channel, 0, localInfo.m_resultCode, 0);
 		OSWaitSemaphore(accessSemaphores + channel);
-		obj[0x2CB3 + channel * 0x20] = 0;
-		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + channel * 0x20) = 0;
-		*reinterpret_cast<unsigned short*>(obj + 0x2CB6 + channel * 0x20) = 0;
+		cmakeInfo[channel].m_resultCode = 0;
+		cmakeInfo[channel].m_packetCount = 0;
+		cmakeInfo[channel].m_crc = 0;
 		OSSignalSemaphore(accessSemaphores + channel);
 	}
 }

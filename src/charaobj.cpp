@@ -774,7 +774,7 @@ int CGCharaObj::calcCastTime(int itemId)
 		Game.m_gameWork.m_menuStageMode != 0 &&
 		Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
 		(static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
+		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		return 0;
 	}
 
@@ -796,7 +796,7 @@ int CGCharaObj::calcCastTime(int itemId)
 	int result;
 
 	if (itemNo != 0x1F8 && itemType == 2) {
-		unsigned int castBonus = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCA];
+		int castBonus = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCA];
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 			int stageLevel;
 			if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
@@ -810,17 +810,16 @@ int CGCharaObj::calcCastTime(int itemId)
 			}
 			if (stageLevel > 0) {
 				castBonus -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x58 + (stageLevel * 2));
-				castBonus &= ~((int)castBonus >> 31);
+				castBonus = castBonus < 0 ? 0 : castBonus;
 			}
 		}
 
 		unsigned int playerCid = (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D;
-		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD8)) : 0;
+		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_equipEffectParams[0]) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
-		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
-		cast &= ~(cast >> 31);
-		result = cast;
-		System.Printf(fmt + 0x74, baseCast, castBonus, castScale);
+		result = static_cast<int>(castScale * static_cast<float>(totalCast));
+		result = result < 0 ? 0 : result;
+		System.Printf(fmt + 0x74, baseCast, castBonus, castReduction, castScale, result);
 	} else if (itemType == 3) {
 		result = static_cast<int>(baseCast);
 		System.Printf(fmt + 0x9C, baseCast);
@@ -828,14 +827,13 @@ int CGCharaObj::calcCastTime(int itemId)
 		result = static_cast<int>(baseCast);
 		System.Printf(fmt + 0xB0, baseCast);
 	} else if (itemNo == 0x1F8) {
-		unsigned int castBonus = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCB];
+		int castBonus = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCB];
 		unsigned int playerCid = (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D;
-		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD9)) : 0;
+		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_equipEffectParams[1]) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
-		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
-		cast &= ~(cast >> 31);
-		result = cast;
-		System.Printf(fmt + 0xC4, baseCast, castBonus, castScale);
+		result = static_cast<int>(castScale * static_cast<float>(totalCast));
+		result = result < 0 ? 0 : result;
+		System.Printf(fmt + 0xC4, baseCast, castBonus, castReduction, castScale, result);
 	} else {
 		result = static_cast<int>(baseCast);
 	}
@@ -2120,9 +2118,9 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		itemType = 1;
 	}
 
-	CGPrgObj* sourceObj = reinterpret_cast<CGPrgObj*>(source);
+	CGPrgObj* sourceObj = static_cast<CGPrgObj*>(source);
 	unsigned short powerValue;
-	if ((((static_cast<unsigned int>(__cntlzw(0x2D - (static_cast<unsigned short>(source->GetCID()) & 0x2D)))) >> 5) & 0xFFU) != 0) {
+	if (source->IsKindOf(0x2D)) {
 		unsigned char usePartyLeader = 0;
 		unsigned char usePartySource = usePartyLeader;
 		unsigned char stageModeActive = usePartyLeader;
@@ -2131,11 +2129,11 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 			stageModeActive = 1;
 		}
 		if (stageModeActive != 0) {
-			if ((((static_cast<unsigned int>(__cntlzw(0x6D - (static_cast<unsigned short>(source->GetCID()) & 0x6D)))) >> 5) & 0xFFU) != 0) {
+			if (source->IsKindOf(0x6D)) {
 				usePartySource = 1;
 			}
 		}
-		if (usePartySource != 0 && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x3B4) != 0) {
+		if (usePartySource != 0 && reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_joybusCaravanId != 0) {
 			usePartyLeader = 1;
 		}
 
@@ -2170,17 +2168,17 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	}
 
 	unsigned int affinity = 0;
-	if ((static_cast<unsigned short>(source->GetCID()) & 0x6D) == 0x6D && (itemType == 1 || itemType == 9)) {
-		affinity = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDA));
+	if (source->IsKindOf(0x6D) && (itemType == 1 || itemType == 9)) {
+		affinity = static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_equipEffectParams[2]);
 	}
 
 	int selfCid = static_cast<unsigned short>(GetCID());
 	if ((selfCid & 0x6D) == 0x6D && (itemType == 8 || itemType == 9)) {
-		affinity -= *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBDB);
+		affinity -= static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_equipEffectParams[3]);
 	}
 
 	unsigned int next = affinity + (base * power);
-	next &= ~((static_cast<int>(next)) >> 31);
+	next = static_cast<int>(next) < 0 ? 0 : next;
 	System.Printf(const_cast<char*>(sCharaObjEffectTimeCalcFmt), base, power, affinity, next);
 	return static_cast<int>(next);
 }

@@ -7,6 +7,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
 #include "ffcc/gobjwork.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
@@ -505,51 +506,6 @@ static inline int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
     return -1;
 }
 
-static inline int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)
-{
-    if (itemId <= 0) {
-        return 0;
-    }
-
-    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
-    int gilValue = caravanWork->m_shopParam *
-                   *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x24 + itemId * 0x48);
-    return gilValue / 100;
-}
-
-static inline int CalcShopMenuGilRatio(CShopMenu* shopMenu, int baseGil)
-{
-    if (baseGil <= 0) {
-        return 0;
-    }
-
-    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
-    int gil = caravanWork->m_shopParam * baseGil;
-    gil = gil / 100 + (gil >> 0x1F);
-    return gil - (gil >> 0x1F);
-}
-
-static inline int GetShopMenuItemBaseGil(int itemNo, int offset)
-{
-    if (itemNo < 1) {
-        return 0;
-    }
-
-    return *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + offset);
-}
-
-static inline int CalcShopMenuTradeGil(CShopMenu* shopMenu, int itemNo)
-{
-    int gilValue = CalcShopMenuGilRatio(shopMenu, GetShopMenuItemBaseGil(itemNo, 0x20));
-    if (shopMenu->m_listType == 1) {
-        return static_cast<int>(FLOAT_80332d60 * static_cast<float>(gilValue));
-    }
-    if ((shopMenu->m_listType != 0) && (shopMenu->m_listType != 1)) {
-        return -1;
-    }
-    return gilValue;
-}
-
 static inline int CountShopMenuOwnedItems(CCaravanWork* caravanWork, int itemNo)
 {
     if (itemNo < 1) {
@@ -834,12 +790,16 @@ inline int CShopMenu::getItemCnt()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: 0x801740DC
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::calcGilRatio(int baseGil)
 {
-    return CalcShopMenuGilRatio(this, baseGil);
+    return m_caravanWork->m_shopParam * baseGil / 100;
 }
 
 /*
@@ -867,52 +827,76 @@ inline int CShopMenu::getItemNo(int index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 84b
+ * EN Address: 0x801741FC
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::getBuyGil(int itemNo)
 {
-    return calcGilRatio(GetShopMenuItemBaseGil(itemNo, 0x20));
+    if (itemNo <= 0) {
+        return 0;
+    }
+    return calcGilRatio(reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_price);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 140b
+ * EN Address: 0x8017425C
+ * EN Size: 144b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::getSellGil(int itemNo)
 {
-    return static_cast<int>(FLOAT_80332d60 * static_cast<float>(getBuyGil(itemNo)));
+    if (itemNo <= 0) {
+        return 0;
+    }
+    return static_cast<int>(FLOAT_80332d60 * static_cast<float>(calcGilRatio(
+        reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_price)));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 84b
+ * EN Address: 0x801742EC
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::getMakeGil(int itemNo)
 {
-    return calcGilRatio(GetShopMenuItemBaseGil(itemNo, 0x24));
+    if (itemNo <= 0) {
+        return 0;
+    }
+    return calcGilRatio(reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_smithPrice);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 296b
+ * EN Address: 0x8017434C
+ * EN Size: 168b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::getBuySellGil(int itemNo)
 {
-    int listType = m_listType;
-    if (listType == 0) {
-        return getBuyGil(itemNo);
+    int gil;
+    if (m_listType == 0) {
+        gil = getBuyGil(itemNo);
+    } else if (m_listType == 1) {
+        gil = getSellGil(itemNo);
+    } else {
+        gil = -1;
     }
-    if (listType == 1) {
-        return getSellGil(itemNo);
-    }
-    if (listType == 2) {
-        return getMakeGil(itemNo);
-    }
-    return -1;
+    return gil;
 }
 
 /*
@@ -932,69 +916,48 @@ inline char* CShopMenu::GetItemName(int itemNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 16b
+ * EN Address: 0x8017443C
+ * EN Size: 16b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::GetMaxExchange()
 {
-    int itemNo = getItemNo(m_selectedIndex);
-    if (itemNo < 1) {
-        return 0;
-    }
-
-    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-    int listType = m_listType;
-    if (listType == 0) {
-        int maxCount = 0x40 - caravanWork->m_inventoryItemCount;
-        int unitGil = getBuyGil(itemNo);
-        if (unitGil > 0) {
-            int byMoney = caravanWork->m_gil / unitGil;
-            if (byMoney < maxCount) {
-                maxCount = byMoney;
-            }
-        }
-        return maxCount;
-    }
-    if (listType == 1) {
-        return getItemHaveCnt(itemNo);
-    }
-    if (listType == 2) {
-        return 1;
-    }
-    return 0;
+    return 0x40 - m_caravanWork->m_inventoryItemCount;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 484b
+ * EN Address: 0x8017444C
+ * EN Size: 92b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::GetTotalGil()
 {
-    int unitGil = getBuySellGil(getItemNo(m_selectedIndex));
-    if (unitGil < 0) {
-        return unitGil;
+    if (m_selectedIndex == -1) {
+        return 0;
     }
-
-    return m_quantity * unitGil;
+    return m_quantity * getBuySellGil(getItemNo(m_selectedIndex));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 496b
+ * EN Address: 0x801744A8
+ * EN Size: 72b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::CanAddGil()
 {
     int totalGil = GetTotalGil();
-    if (totalGil < 0) {
-        return 0;
-    }
-
-    if (m_listType != 1) {
-        totalGil = -totalGil;
-    }
-    return ShopMenuCaravanWork(this)->CanAddGil(totalGil);
+    return m_caravanWork->CanAddGil(-totalGil);
 }
 
 /*
@@ -1367,7 +1330,7 @@ void CShopMenu::DrawItemInfo0()
     }
 
     int itemNo = getItemNo(m_selectedIndex);
-    register int itemNoReg = itemNo; itemNo = itemNoReg;
+
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     MenuPcs.DrawInit();
@@ -1527,34 +1490,7 @@ void CShopMenu::DrawBuySellInfo()
 
     int totalGil;
     if (canTrade) {
-        int saleGil;
-        if (m_selectedIndex == -1) {
-            saleGil = 0;
-        } else {
-            int gilItemNo = getItemNo(m_selectedIndex);
-            int gil;
-            if (m_listType == 0) {
-                if (gilItemNo <= 0) {
-                    gil = 0;
-                } else {
-                    int value = static_cast<int>(ShopMenuCaravanWork(this)->m_shopParam) *
-                                *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + gilItemNo * 0x48);
-                    gil = value / 100;
-                }
-            } else if (m_listType == 1) {
-                if (gilItemNo <= 0) {
-                    gil = 0;
-                } else {
-                    int value = static_cast<int>(ShopMenuCaravanWork(this)->m_shopParam) *
-                                *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + gilItemNo * 0x48);
-                    gil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(value / 100));
-                }
-            } else {
-                gil = -1;
-            }
-            saleGil = m_quantity * gil;
-        }
-        totalGil = saleGil;
+        totalGil = GetTotalGil();
     } else {
         totalGil = 0;
     }
@@ -2185,7 +2121,7 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawInit();
 
     font->SetMargin(FLOAT_80332d28);
-    int makeGil = CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex));
+    int makeGil = getMakeGil(getItemNo(m_selectedIndex));
     SetupShopMenuUnitFont(font);
     float gilUnitWidth = font->GetWidth(ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL));
 
@@ -2196,7 +2132,7 @@ void CShopMenu::DrawMake()
     DrawShopMenuAmountTrunc(amountFont, makeGil, makeAmountX, FLOAT_80332E18, 0x13);
 
     int gilAmountX = static_cast<int>(FLOAT_80332E1C - gilUnitWidth - FLOAT_80332d5c);
-    int makeGil2 = CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex));
+    int makeGil2 = getMakeGil(getItemNo(m_selectedIndex));
     int gilTlut = 2;
     if (ShopMenuCaravanWork(this)->m_gil >= makeGil2) {
         gilTlut = 0x14;
@@ -2498,7 +2434,7 @@ void CShopMenu::DrawShop0()
 void CShopMenu::SelectMake()
 {
     int canSelect = static_cast<unsigned char>(MenuPcs.ChkEquipPossible(m_resultItem)) &&
-                     (m_caravanWork->m_gil >= CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)));
+                     (m_caravanWork->m_gil >= getMakeGil(getItemNo(m_selectedIndex)));
 
     int selected = getItemNo(m_selectedIndex);
     short recipeMaterial[8];
@@ -2536,15 +2472,7 @@ void CShopMenu::SelectMake()
                 return;
             }
 
-            int itemId = getItemNo(m_selectedIndex);
-            int makeGil;
-            if (itemId <= 0) {
-                makeGil = 0;
-            } else {
-                int gil = m_caravanWork->m_shopParam *
-                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x24 + itemId * 0x48);
-                makeGil = gil / 100;
-            }
+            int makeGil = getMakeGil(getItemNo(m_selectedIndex));
             if (m_caravanWork->CanAddGil(-makeGil) != 0) {
                 Sound.PlaySe(0x52, 0x40, 0x7F, 0);
                 m_nextMode = 0xF;
@@ -2775,39 +2703,8 @@ void CShopMenu::SelectFigure()
         switch (m_figureMode) {
         case 0: {
             ++m_quantity;
-            CCaravanWork* caravanWork = m_caravanWork;
-            if (m_quantity <= (0x40 - caravanWork->m_inventoryItemCount)) {
-                short totalGil;
-                if (m_selectedIndex == -1) {
-                    totalGil = 0;
-                } else {
-                    int itemId = getItemNo(m_selectedIndex);
-                    int unitGil;
-                    if (m_listType == 0) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int costBase = itemId * 0x48;
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
-                            unitGil = gil / 100;
-                        }
-                    } else if (1 == m_listType) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int costBase = itemId * 0x48;
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
-                            register int gilReg = gil; gil = gilReg;
-                            unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
-                        }
-                    } else {
-                        unitGil = -1;
-                    }
-                    totalGil = m_quantity * unitGil;
-                }
-                if (caravanWork->CanAddGil(-totalGil) != 0) {
+            if (m_quantity <= GetMaxExchange()) {
+                if (CanAddGil() != 0) {
                     goto cancelInc1;
                 }
             }
@@ -2822,38 +2719,8 @@ void CShopMenu::SelectFigure()
         }
         case 1: {
             m_quantity += 10;
-            CCaravanWork* caravanWork = m_caravanWork;
-            if (m_quantity <= (0x40 - caravanWork->m_inventoryItemCount)) {
-                int totalGil;
-                if (m_selectedIndex == -1) {
-                    totalGil = 0;
-                } else {
-                    int itemId = getItemNo(m_selectedIndex);
-                    int unitGil;
-                    if (m_listType == 0) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int costBase = itemId * 0x48;
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
-                            unitGil = gil / 100;
-                        }
-                    } else if (m_listType == 1) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int costBase = itemId * 0x48;
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
-                            unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
-                        }
-                    } else {
-                        unitGil = -1;
-                    }
-                    totalGil = m_quantity * unitGil;
-                }
-                if (caravanWork->CanAddGil(-totalGil) != 0) {
+            if (m_quantity <= GetMaxExchange()) {
+                if (CanAddGil() != 0) {
                     goto cancelInc10;
                 }
             }
@@ -2944,30 +2811,8 @@ void CShopMenu::SelectItemIdx()
             }
             if (canSelect != 0) {
                 CCaravanWork* caravanWork = m_caravanWork;
-                if (m_quantity <= (0x40 - caravanWork->m_inventoryItemCount)) {
-                    int itemId = getItemNo(m_selectedIndex);
-                    int unitGil;
-                    if (m_listType == 0) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + itemId * 0x48);
-                            unitGil = gil / 100;
-                        }
-                    } else if (m_listType == 1) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + itemId * 0x48);
-                            unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
-                        }
-                    } else {
-                        unitGil = -1;
-                    }
-                    int totalGil = m_quantity * unitGil;
-                    if (caravanWork->CanAddGil(-totalGil) != 0) {
+                if (m_quantity <= GetMaxExchange()) {
+                    if (CanAddGil() != 0) {
                         m_subMode = 1;
                         Sound.PlaySe(2, 0x40, 0x7F, 0);
                         goto updateWindow;
@@ -3258,7 +3103,7 @@ void CShopMenu::Calc()
             short recipeMaterial[8];
 
             MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
-            ShopMenuCaravanWork(this)->AddGil(-CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)));
+            ShopMenuCaravanWork(this)->AddGil(-getMakeGil(getItemNo(m_selectedIndex)));
             ShopMenuCaravanWork(this)->DeleteItem(getItemNo(m_selectedIndex), 0);
 
             for (int i = 0; i < 3; i++) {

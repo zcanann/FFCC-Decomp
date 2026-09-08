@@ -13,12 +13,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern const float kGObjWorkStatusScaleBase;
-extern const float kGObjWorkStatusScaleStep;
-extern const float kCaravanShoukiLimitScale[2] = {0.95f, 0.0f};
-extern const double DOUBLE_803309A0;
-__declspec(section ".sdata2") static const char lbl_803309B0[] = "CRef";
-
 namespace {
 static inline SItemFlatRow* GetItemDataPtr(int itemIdx)
 {
@@ -33,8 +27,8 @@ struct ShoukiByteFlags {
 
 static inline float GetStatusMultiplier(int offset)
 {
-	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * kGObjWorkStatusScaleStep) +
-		   kGObjWorkStatusScaleBase;
+	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * 0.01f) +
+		   0.0000001f;
 }
 }
 
@@ -330,38 +324,6 @@ void CCaravanWork::SetBonusCondition(int bonusCondition)
 	m_artifactRelated[4] =
 		Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entries[bonusCondition + 8]
 			.m_values[2];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800A269C
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CCaravanWork::IsOutOfShouki()
-{
-	unsigned char result = 0;
-	void* ownerObj = m_ownerObj;
-
-	if (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(ownerObj) + 0x5BC) >
-		kCaravanShoukiLimitScale[0] * Game.unkFloat_0xca10) {
-		if (m_hp != 0) {
-			unsigned char cflatFlag = CFlatGameFlags();
-			if (((char)(((int)(((unsigned int)cflatFlag << 24) & 0xC0000000)) >> 31) != 0 ||
-				 (char)(((int)(((unsigned int)cflatFlag << 27) & 0xC0000000)) >> 31) != 0) &&
-				(char)(((int)((((unsigned int) * (unsigned char*)(reinterpret_cast<unsigned char*>(ownerObj) + 0x9B))
-							   << 24) &
-							  0xC0000000)) >>
-					   31) != 0) {
-				result = 1;
-			}
-		}
-	}
-
-	return result;
 }
 
 /*
@@ -2677,7 +2639,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 	if ((*reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) == 1) &&
 		(Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
 		m_maxHp = (unsigned short)((float)m_maxHp *
-								   ((((float)Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entries[8].m_values[0]) * kGObjWorkStatusScaleStep) + kGObjWorkStatusScaleBase));
+								   ((((float)Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entries[8].m_values[0]) * 0.01f) + 0.0000001f));
 	}
 
 	m_hp = m_maxHp;
@@ -2732,4 +2694,36 @@ void CMonWork::CalcStatus()
 	if (m_statusTimers[6] != 0) {
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
 	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800A269C
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CCaravanWork::IsOutOfShouki()
+{
+	unsigned char result = 0;
+	void* ownerObj = m_ownerObj;
+
+	if (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(ownerObj) + 0x5BC) >
+		0.95f * Game.unkFloat_0xca10) {
+		if (m_hp != 0) {
+			unsigned char cflatFlag = CFlatGameFlags();
+			if (((char)(((int)(((unsigned int)cflatFlag << 24) & 0xC0000000)) >> 31) != 0 ||
+				 (char)(((int)(((unsigned int)cflatFlag << 27) & 0xC0000000)) >> 31) != 0) &&
+				(char)(((int)((((unsigned int) * (unsigned char*)(reinterpret_cast<unsigned char*>(ownerObj) + 0x9B))
+							   << 24) &
+							  0xC0000000)) >>
+					   31) != 0) {
+				result = 1;
+			}
+		}
+	}
+
+	return result;
 }

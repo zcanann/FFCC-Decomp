@@ -1109,7 +1109,7 @@ gobjwork.cpp:
 	.rodata     start:0x801D9F64 end:0x801DA010
 	.data       start:0x8020FA00 end:0x8020FAB8
 	.sdata      start:0x8032E800 end:0x8032E818
-	.sdata2     start:0x803309A8 end:0x803309B8
+	.sdata2     start:0x80330998 end:0x803309B0
 
 ringmenu.cpp:
 	extab       start:0x80007F78 end:0x80007FC8
@@ -1118,7 +1118,7 @@ ringmenu.cpp:
 	.rodata     start:0x801DA010 end:0x801DA048
 	.data       start:0x8020FAB8 end:0x8020FB0C
 	.sdata      start:0x8032E818 end:0x8032E830
-	.sdata2     start:0x803309C0 end:0x80330AF0
+	.sdata2     start:0x803309B0 end:0x80330AF0
 
 pppYmMelt.cpp:
 	extab       start:0x80007FC8 end:0x80007FE8

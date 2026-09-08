@@ -13,6 +13,7 @@
 #include "ffcc/game.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
+#include "ffcc/materialman.h"
 #include "ffcc/sound.h"
 #include "ffcc/p_light.h"
 #include "ffcc/partMng.h"
@@ -39,8 +40,6 @@
 
 extern "C" char* strstr(const char*, const char*);
 extern "C" char* strcat(char*, const char*);
-extern "C" int DAT_801dc118[];
-extern "C" int DAT_801dc140;
 extern const char s_Creating_801DC250[];
 extern const char s_Wird_kreiert_801DC25C[];
 extern const char s_Creazione_801DC26C[];
@@ -126,6 +125,8 @@ char* g_strWMMenuMes[5][11] = {
 		"Selecciona el personaje a eliminar.",
 	},
 };
+
+static const int s_YearWTbl[] = {21, 12, 19, 18, 22, 20, 19, 19, 19, 18, 35};
 
 static WmMenuLightTable s_Light[] = {
 	{
@@ -222,7 +223,6 @@ static CMenuPcs::FCV s_MenuObjScl = {7, s_MenuObjSclSpl};
 extern int DAT_8032ef08;
 extern int DAT_80238028;
 extern char cRam8032ee21;
-extern "C" unsigned char lbl_801DC294[];
 static const char* s_port[] = {"Port ", "-Hafen", "Porto ", "Port ", "Puerto "};
 
 inline CGBaseObj::CGBaseObj()
@@ -479,7 +479,6 @@ static const unsigned short s_wmLoadCharaModels[] = {
     0x005D, 0x0064, 0x0064, 0x0064, 0x0064, 0x0043, 0x0012, 0x0013,
     0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001A, 0x0064,
 };
-static const float s_MainMenuSubFrameWidths[5] = {264.0f, 264.0f, 264.0f, 264.0f, 264.0f};
 static Vec s_RingOrgPos;
 static Vec s_MMenuPos[5];
 
@@ -6344,7 +6343,7 @@ void CMenuPcs::CalcWMFrame()
 	m_wm.m_frameData->m_yearSprites[1].m_scale = fE8;
 
 	if (uVar14 == 3) {
-		int iVar16 = DAT_801dc118[10];
+		int iVar16 = s_YearWTbl[10];
 		const float fV1 = FLOAT_80331524;
 		const float fV4 = FLOAT_80331528;
 		m_wm.m_frameData->m_yearSprites[0].m_x = (0x2B - iVar16) / 2 + 0x2C;
@@ -6359,9 +6358,9 @@ void CMenuPcs::CalcWMFrame()
 		if (1 < uVar14) {
 			digits[1] = (int)uVar13 / 10;
 		}
-		int iVar16 = DAT_801dc118[(int)uVar13 % 10];
+		int iVar16 = s_YearWTbl[(int)uVar13 % 10];
 		if (1 < uVar14) {
-			iVar16 = iVar16 + DAT_801dc118[(int)uVar13 / 10];
+			iVar16 = iVar16 + s_YearWTbl[(int)uVar13 / 10];
 		}
 		int iVar19 = uVar14 - 1;
 		int iVar15 = (0x2B - iVar16) / 2 + 0x2C;
@@ -6372,7 +6371,7 @@ void CMenuPcs::CalcWMFrame()
 		for (wmDigitIdx = iVar19; wmDigitIdx >= 0; wmDigitIdx--) {
 				int digit = digits[wmDigitIdx];
 				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_x = (short)iVar15;
-				int digitW = DAT_801dc118[digit];
+				int digitW = s_YearWTbl[digit];
 				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_y = 0x43;
 				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_width = (short)digitW;
 				m_wm.m_frameData->m_yearSprites[wmDigitIdx].m_height = 0x20;
@@ -8998,6 +8997,7 @@ inline void CMenuPcs::ChkSelectParty()
  */
 void CMenuPcs::DrawMainMenuSub()
 {
+	static const float s_sprt_w[] = {264.0f, 264.0f, 264.0f, 264.0f, 264.0f};
 	Mtx modelMtx;
 	Mtx44 screenMtx;
 	GXColor white;
@@ -9102,7 +9102,7 @@ void CMenuPcs::DrawMainMenuSub()
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);
 			unsigned int idx = drawOrder[orderIndex];
-			float frameWidth = reinterpret_cast<float*>(lbl_801DC294)[idx];
+			float frameWidth = s_sprt_w[idx];
 			MenuPcs.DrawRect3d(0, -(FLOAT_80331414 * (frameWidth / FLOAT_803315B8) - FLOAT_803313dc), FLOAT_803315BC,
 			           static_cast<float>(DOUBLE_80331418 + static_cast<double>(s_MMenuPos[idx].z) - DOUBLE_803315C0),
 			           frameWidth, FLOAT_80331554, FLOAT_803313dc,
@@ -9184,7 +9184,34 @@ inline void CMenuPcs::ChkMcDataCnt()
 void CMenuPcs::DrawMCList()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	char* const rodataBase = lbl_801DB7F8;
+	static const int s_TimeWTbl[] = {17, 10, 16, 16, 19, 17, 16, 16, 16, 15, 8};
+	static const unsigned char s_LocTex[][4] = {
+		{1, 1, 0, 0},
+		{1, 2, 0, 0},
+		{1, 3, 0, 0},
+		{1, 0, 1, 0},
+		{1, 2, 1, 0},
+		{1, 3, 1, 0},
+		{1, 2, 3, 0},
+		{1, 3, 2, 0},
+		{2, 0, 1, 0},
+		{1, 1, 2, 0},
+		{2, 3, 0, 0},
+		{1, 1, 3, 0},
+		{1, 0, 3, 0},
+		{2, 2, 0, 0},
+		{2, 2, 0, 0},
+		{1, 0, 0, 0},
+		{1, 1, 1, 0},
+		{1, 0, 2, 0},
+		{1, 2, 2, 0},
+		{2, 2, 1, 0},
+		{2, 0, 0, 0},
+		{1, 2, 3, 0},
+		{1, 2, 3, 0},
+		{1, 3, 3, 0},
+		{2, 1, 0, 0},
+	};
 	CFont* fontF8 = m_fonts[0];
 	int slot;
 	int slotOff;
@@ -9357,8 +9384,8 @@ LAB_next:
 		double rowSlopeD;
 		mapX = *pOff2 + static_cast<double>(*p518a);
 		const int language = Game.m_gameWork.m_languageId;
-		int* digitWidths = reinterpret_cast<int*>(rodataBase + 0x920);
-		int* playWidths = reinterpret_cast<int*>(rodataBase + 0xab0);
+		const int* digitWidths = s_YearWTbl;
+		const int* playWidths = s_TimeWTbl;
 		rowSlopeD = *pSl2;
 		rowBaseD = *pBa2;
 		for (slot = 0, slotOff = slot; slot < kMcListCount; slot++, slotOff += kMcListEntrySize) {
@@ -9470,7 +9497,7 @@ LAB_next:
 					colSlope = *pCs1;
 					rowSlope = *pRs1;
 					rowBase = *pRb1;
-					int* const dw = reinterpret_cast<int*>(rodataBase + 0x920);
+					const int* const dw = s_YearWTbl;
 					for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
 						int digit;
 						if (digitCount == 1) {
@@ -9668,10 +9695,9 @@ LAB_next:
 					}
 				}
 
-				unsigned char* mapInfo = reinterpret_cast<unsigned char*>(rodataBase + 0xadc);
-				mapInfo += *reinterpret_cast<int*>(slotData + 0x10) * 4;
+				const unsigned char* mapInfo = s_LocTex[*reinterpret_cast<int*>(slotData + 0x10)];
 				CMaterial* material = MapMng.GetMaterialID(mapInfo[0]);
-				CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
+				CTexture* texture = material->GetTexture(0);
 				TextureMan.SetTexture(static_cast<_GXTexMapID>(0), texture);
 				Mtx texMtx;
 				const float* pOe7 = &FLOAT_803313e8;

@@ -114,6 +114,7 @@ STATIC_ASSERT(offsetof(Mc::SaveDat, m_region) == 0x10);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_rotateKey) == 0x11);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_random) == 0x18);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_crc) == 0x1C);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_linkTable) == 0xC0);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_mcSerial) == 0x13D0);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_mcRandom) == 0x13D8);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_characters) == 0x14D0);
@@ -1016,13 +1017,13 @@ void CMemoryCardMan::MakeSaveData()
     memcpy(save + 0x40, Game.m_gameWork.m_bossArtifactStageTable, 0x3C);
     memcpy(save + 0x7C, Game.m_gameWork.m_unkStageTable, 0x3C);
     *reinterpret_cast<int*>(save + 0xB8) = Game.m_gameWork.m_chaliceElement;
-    memcpy(save + 0xC0, Game.m_gameWork.m_linkTable, 0x1000);
+    memcpy(saveDat->m_linkTable, Game.m_gameWork.m_linkTable, sizeof(saveDat->m_linkTable));
     memcpy(save + 0x10C0, Game.m_gameWork.m_townName, 0x10);
     memcpy(save + 0x10D0, Game.m_gameWork.m_eventFlags, 0x100);
     memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
     memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
-    *reinterpret_cast<u64*>(save + 0x13D0) = *reinterpret_cast<u64*>(&Game.m_gameWork.m_mcSerial0);
-    *reinterpret_cast<u32*>(save + 0x13D8) = Game.m_gameWork.m_mcRandom;
+    saveDat->m_mcSerial = *reinterpret_cast<u64*>(&Game.m_gameWork.m_mcSerial0);
+    saveDat->m_mcRandom = Game.m_gameWork.m_mcRandom;
     save[0x13DC] = Game.m_gameWork.m_mcHasSerial;
     save[0x13DD] = static_cast<u8>(Sound.GetBgmMasterVolume());
     save[0x13DE] = static_cast<u8>(Sound.GetSeMasterVolume());
@@ -1201,12 +1202,12 @@ void CMemoryCardMan::SetLoadData()
     memcpy(Game.m_gameWork.m_bossArtifactStageTable, save + 0x40, 0x3C);
     memcpy(Game.m_gameWork.m_unkStageTable, save + 0x7C, 0x3C);
     Game.m_gameWork.m_chaliceElement = *reinterpret_cast<int*>(save + 0xB8);
-    memcpy(Game.m_gameWork.m_linkTable, save + 0xC0, 0x1000);
+    memcpy(Game.m_gameWork.m_linkTable, GetSaveDat(save)->m_linkTable, sizeof(GetSaveDat(save)->m_linkTable));
     memcpy(Game.m_gameWork.m_townName, save + 0x10C0, 0x10);
     memcpy(Game.m_gameWork.m_eventFlags, save + 0x10D0, 0x100);
     memcpy(Game.m_gameWork.m_eventWork, save + 0x11D0, 0x200);
-    *reinterpret_cast<u64*>(&Game.m_gameWork.m_mcSerial0) = *reinterpret_cast<u64*>(save + 0x13D0);
-    Game.m_gameWork.m_mcRandom = *reinterpret_cast<u32*>(save + 0x13D8);
+    *reinterpret_cast<u64*>(&Game.m_gameWork.m_mcSerial0) = GetSaveDat(save)->m_mcSerial;
+    Game.m_gameWork.m_mcRandom = GetSaveDat(save)->m_mcRandom;
     Game.m_gameWork.m_mcHasSerial = save[0x13DC];
     Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));
     Sound.SetSeMasterVolume(static_cast<s8>(save[0x13DE]));
@@ -2009,12 +2010,14 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         System.Printf("CMemoryCardMan.Odekake: \203L\203\203\203\211\203o\203\223%d\202\251\202\347\203L\203\203\203\211\203o\203\223%d\202\311%s\202\265\202\334\202\267\201B\012", srcChar, dstChar, mode != 0 ? "\202\250\217o\202\251\202\257" : sMcOdekakeReturn);
     }
 
-    u8* srcCharData = reinterpret_cast<u8*>(&srcSave) + srcChar * 0x9C0 + 0x14D0;
-    u8* dstCharData = reinterpret_cast<u8*>(&dstSave) + dstChar * 0x9C0 + 0x14D0;
+    Mc::CharaDat& srcCharacter = srcSave.m_characters[srcChar];
+    Mc::CharaDat& dstCharacter = dstSave.m_characters[dstChar];
+    u8* srcCharData = reinterpret_cast<u8*>(&srcCharacter);
+    u8* dstCharData = reinterpret_cast<u8*>(&dstCharacter);
 
     if (mode != 0)
     {
-        memset(dstCharData, 0, 0x9C0);
+        memset(&dstCharacter, 0, sizeof(dstCharacter));
 
         *reinterpret_cast<u16*>(dstCharData + 0x00) = *reinterpret_cast<u16*>(srcCharData + 0x00);
         *reinterpret_cast<u16*>(dstCharData + 0x02) = *reinterpret_cast<u16*>(srcCharData + 0x02);
@@ -2037,33 +2040,23 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
         *reinterpret_cast<u32*>(dstCharData + 0xE8) = *reinterpret_cast<u32*>(srcCharData + 0xE8);
         memcpy(dstCharData + 0xF0, srcCharData + 0xF0, 0x10);
-        *reinterpret_cast<u32*>(dstCharData + 0x5B4) = *reinterpret_cast<u32*>(srcCharData + 0x5B4);
+        dstCharacter.m_exists = srcCharacter.m_exists;
         memcpy(dstCharData + 0x5B8, srcCharData + 0x5B8, 0x100);
         memcpy(dstCharData + 0x6B8, srcCharData + 0x6B8, 0x200);
         *reinterpret_cast<u32*>(dstCharData + 0x8B8) = *reinterpret_cast<u32*>(srcCharData + 0x8B8);
         *reinterpret_cast<u32*>(dstCharData + 0x8BC) = *reinterpret_cast<u32*>(srcCharData + 0x8BC);
-        dstCharData[0x8C2] = srcCharData[0x8C2];
-        *reinterpret_cast<u32*>(dstCharData + 0x8C4) = *reinterpret_cast<u32*>(srcCharData + 0x8C4);
-        *reinterpret_cast<u64*>(dstCharData + 0x8C8) = *reinterpret_cast<u64*>(reinterpret_cast<u8*>(&srcSave) + 0x13D0);
-        *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&srcSave) + 0x13D8);
+        dstCharacter.m_hasCharacterId = srcCharacter.m_hasCharacterId;
+        dstCharacter.m_characterId = srcCharacter.m_characterId;
+        dstCharacter.m_originSerial = srcSave.m_mcSerial;
+        dstCharacter.m_originRandom = srcSave.m_mcRandom;
 
-        u8* dstWork = reinterpret_cast<u8*>(&dstSave) + dstChar * 0x200;
-        int itemOfs = dstChar * 8;
-        int i = 0;
-        do
+        for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
-                u8 flag = 0;
-                if ((i == 0) && (j == 0))
-                {
-                    flag = 1;
-                }
-                dstWork[itemOfs + 0xC0 + j] = flag != 0 ? 0x32 : 0;
+                dstSave.m_linkTable[dstChar][i][dstChar][j] = (i == 0 && j == 0) ? 0x32 : 0;
             }
-            i++;
-            dstWork += 0x40;
-        } while (i < 8);
+        }
 
         memset(dstCharData + 0xC8, 0xFF, 0x10);
         memset(dstCharData + 0xD8, 0, 0x10);
@@ -2102,27 +2095,25 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
             *reinterpret_cast<u16*>(dstCharData + 0x28) = *reinterpret_cast<u16*>(dstCharData + 0x28) + 1;
         }
 
-        srcCharData[0x8C0] = 1;
-        dstCharData[0x8C1] = 1;
+        srcCharacter.m_isAway = 1;
+        dstCharacter.m_isGuest = 1;
         *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 3;
     }
     else
     {
         memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
 
-        u8* srcWork = reinterpret_cast<u8*>(&srcSave) + (srcChar << 9) + (srcChar << 3);
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
-                srcWork[0xC0 + j] = 0;
+                srcSave.m_linkTable[srcChar][i][srcChar][j] = 0;
             }
-            srcWork += 0x40;
         }
 
-        dstCharData[0x8C0] = 0;
-        srcCharData[0x8C2] = 0;
-        memset(srcCharData, 0, 0x9C0);
+        dstCharacter.m_isAway = 0;
+        srcCharacter.m_hasCharacterId = 0;
+        memset(&srcCharacter, 0, sizeof(srcCharacter));
         *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 0x0C;
     }
 

@@ -37,7 +37,9 @@ public:
     unsigned char m_pad_13[0x18 - 0x13];
     u32 m_random;
     u32 m_crc;
-    unsigned char m_unknown0020[0x13D0 - 0x20];
+    unsigned char m_unknown0020[0xC0 - 0x20];
+    unsigned char m_linkTable[8][8][8][8];           // 0xC0
+    unsigned char m_unknown10C0[0x13D0 - 0x10C0];
     u64 m_mcSerial;                                // 0x13D0
     u32 m_mcRandom;                                // 0x13D8
     unsigned char m_unknown13DC[0x14D0 - 0x13DC];

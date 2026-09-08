@@ -329,12 +329,15 @@ public:
     };
     struct SPL
     {
-
+        float time;
+        float value;
+        float inTangent;
+        float outTangent;
     };
     struct FCV
     {
         int keyCount;
-        float* keys;
+        SPL* keys;
     };
     struct EffectInfo
     {
@@ -529,7 +532,7 @@ public:
     void SetWorldParam(int, int);
     unsigned int GetWorldParam(int);
     void CallWorldParam(int, int, int);
-    void CalcSpl(SPL*, SPL*, float);
+    float CalcSpl(SPL*, SPL*, float);
     float GetFcvValue(FCV, float);
     void SetProjection(int);
     void RestoreProjection();

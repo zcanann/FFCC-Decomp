@@ -41,33 +41,90 @@ extern "C" char* strstr(const char*, const char*);
 extern "C" char* strcat(char*, const char*);
 extern "C" int DAT_801dc118[];
 extern "C" int DAT_801dc140;
-extern float gWmModelYOffsetSplinePoints[];
-extern float gWmModelRotationSplinePoints[];
-extern float lbl_802109B4[];
-extern float lbl_80210A04[];
-extern float lbl_80210A34[];
-extern float lbl_80210A74[];
-extern float lbl_80210AB4[];
-extern float lbl_80210B04[];
 extern const char s_Creating_801DC250[];
 extern const char s_Wird_kreiert_801DC25C[];
 extern const char s_Creazione_801DC26C[];
 extern const char s_Creation_801DC27C[];
 extern const char s_Creando_801DC288[];
-extern float gWmLifeYOffsetSplinePoints[];
 
 extern const char lbl_80331208[5];
 
 char* DAT_8032E8A8 = const_cast<char*>(lbl_80331208);
 unsigned char lbl_8032E8AC = 1;
-static CMenuPcs::FCV s_WoodTrns = {9, gWmModelYOffsetSplinePoints};
-static CMenuPcs::FCV s_WoodRot = {5, gWmModelRotationSplinePoints};
-static CMenuPcs::FCV s_YearTrns = {5, lbl_802109B4};
-static CMenuPcs::FCV s_YearAlpha = {3, lbl_80210A04};
-static CMenuPcs::FCV s_MenuObjYRot = {4, lbl_80210A34};
-static CMenuPcs::FCV s_MenuObjZRot = {4, lbl_80210A74};
-static CMenuPcs::FCV s_MenuObjYTrs = {5, lbl_80210AB4};
-static CMenuPcs::FCV s_MenuObjScl = {7, lbl_80210B04};
+static CMenuPcs::SPL s_WoodTrnsY[] = {
+	{0.0f, 0.0f, 0.0f, 0.0f},
+	{0.5f, 0.12f, 0.0f, 0.0f},
+	{1.0f, 0.0f, 0.0f, 0.0f},
+	{1.5f, 0.12f, 0.0f, 0.0f},
+	{2.0f, 0.0f, 0.0f, 0.0f},
+	{2.5f, 0.12f, 0.0f, 0.0f},
+	{3.0f, 0.0f, 0.0f, 0.0f},
+	{3.5f, 0.12f, 0.0f, 0.0f},
+	{4.0f, 0.0f, 0.0f, 0.0f},
+};
+
+static CMenuPcs::SPL s_WoodRotY[] = {
+	{0.0f, 0.0f, 0.0f, 0.0f},
+	{1.0f, -7.5f, 0.0f, 0.0f},
+	{2.0f, 0.0f, 0.0f, 0.0f},
+	{3.0f, 7.5f, 0.0f, 0.0f},
+	{4.0f, 0.0f, 0.0f, 0.0f},
+};
+
+static CMenuPcs::SPL s_YearTrnsY[] = {
+	{0.0f, -5.0f, 0.0f, 0.0f},
+	{0.3f, 5.0f, 0.0f, 0.0f},
+	{0.4f, -2.0f, 0.0f, 0.0f},
+	{0.47f, 2.0f, 0.0f, 0.0f},
+	{0.5f, 0.0f, 0.0f, 0.0f},
+};
+
+static CMenuPcs::SPL s_YearTransparent[] = {
+	{0.0f, 0.0f, 0.0f, 0.0f},
+	{0.3f, 1.0f, 0.0f, 0.0f},
+	{0.5f, 1.0f, 0.0f, 0.0f},
+};
+
+static CMenuPcs::SPL s_MenuObjYRotSpl[] = {
+	{0.0f, 0.0f, -22.0647f, -22.0647f},
+	{0.966667f, -15.0f, 0.0f, 0.0f},
+	{2.966667f, 15.0f, 0.0f, 0.0f},
+	{3.966667f, 0.0f, -22.0647f, -22.0647f},
+};
+
+static CMenuPcs::SPL s_MenuObjZRotSpl[] = {
+	{0.0f, 0.0f, -11.0907f, -11.0907f},
+	{0.966667f, -8.0f, 0.0f, 0.0f},
+	{2.966667f, 8.0f, 0.0f, 0.0f},
+	{3.966667f, 0.0f, -11.0907f, -11.0907f},
+};
+
+static CMenuPcs::SPL s_MenuObjYTrsSpl[] = {
+	{0.0f, 0.25f, 0.0f, 0.0f},
+	{0.966667f, -0.25f, 0.0f, 0.0f},
+	{1.966667f, 0.25f, 0.0f, 0.0f},
+	{2.966667f, -0.25f, 0.0f, 0.0f},
+	{3.966667f, 0.25f, 0.0f, 0.0f},
+};
+
+static CMenuPcs::SPL s_MenuObjSclSpl[] = {
+	{0.0f, 1.0f, 0.0f, 0.0f},
+	{0.08888858f, 1.15f, 0.0f, 0.0f},
+	{0.1999998f, 1.0f, 0.0f, 0.0f},
+	{0.31111103f, 1.2f, 0.0f, 0.0f},
+	{0.42222157f, 1.0f, 0.0f, 0.0f},
+	{0.5333328f, 1.25f, 0.0f, 0.0f},
+	{0.64444405f, 1.0f, 0.0f, 0.0f},
+};
+
+static CMenuPcs::FCV s_WoodTrns = {9, s_WoodTrnsY};
+static CMenuPcs::FCV s_WoodRot = {5, s_WoodRotY};
+static CMenuPcs::FCV s_YearTrns = {5, s_YearTrnsY};
+static CMenuPcs::FCV s_YearAlpha = {3, s_YearTransparent};
+static CMenuPcs::FCV s_MenuObjYRot = {4, s_MenuObjYRotSpl};
+static CMenuPcs::FCV s_MenuObjZRot = {4, s_MenuObjZRotSpl};
+static CMenuPcs::FCV s_MenuObjYTrs = {5, s_MenuObjYTrsSpl};
+static CMenuPcs::FCV s_MenuObjScl = {7, s_MenuObjSclSpl};
 extern int DAT_8032ef08;
 extern int DAT_80238028;
 extern char cRam8032ee21;
@@ -5273,18 +5330,18 @@ void CMenuPcs::CallWorldParam(int p0, int p1, int p2)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CalcSpl(CMenuPcs::SPL* out, CMenuPcs::SPL* in, float t)
+inline float CMenuPcs::CalcSpl(CMenuPcs::SPL* prev, CMenuPcs::SPL* next, float t)
 {
-	if (out == 0 || in == 0) {
-		return;
-	}
-	if (t < 0.0f) {
-		t = 0.0f;
-	}
-	if (t > 1.0f) {
-		t = 1.0f;
-	}
-	memcpy(out, in, sizeof(CMenuPcs::SPL));
+	float span = next->time - prev->time;
+	float u = (t - prev->time) / span;
+	float u2 = u * u;
+	float u3 = u2 * u;
+	float threeU2 = FLOAT_803314c4 * u2;
+	float negTerm = -(FLOAT_803314c8 * u2 - u3);
+
+	return span * (prev->outTangent * (u + negTerm) + next->inTangent * (u3 - u2)) +
+	       (prev->value * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - threeU2)) +
+	           next->value * (FLOAT_803314cc * u3 + threeU2));
 }
 
 /*
@@ -5298,9 +5355,9 @@ inline void CMenuPcs::CalcSpl(CMenuPcs::SPL* out, CMenuPcs::SPL* in, float t)
  */
 float CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 {
-	float* cur;
+	SPL* cur;
 	int idx;
-	float* keys;
+	SPL* keys;
 	float result;
 	int keyCount;
 	keyCount = fcv.keyCount;
@@ -5308,28 +5365,17 @@ float CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 	keys = fcv.keys;
 	result = FLOAT_803313dc;
 
-	if (t >= keys[keyCount * 4 - 4]) {
-		return keys[keyCount * 4 - 3];
+	if (t >= keys[keyCount - 1].time) {
+		return keys[keyCount - 1].value;
 	}
 
 	cur = keys;
-	for (idx = 0; idx < keyCount; cur += 4, idx++) {
-		if (t <= *cur) {
+	for (idx = 0; idx < keyCount; cur++, idx++) {
+		if (t <= cur->time) {
 			if (idx == 0) {
-				result = (keys + idx * 4)[1];
+				result = keys[idx].value;
 			} else {
-				float* next = keys + idx * 4;
-				float* prev = keys + (idx - 1) * 4;
-				float span = *next - *prev;
-				float u = (t - *prev) / span;
-				float u2 = u * u;
-				float u3 = u2 * u;
-				float c4u2 = FLOAT_803314c4 * u2;
-				float negTerm = -(FLOAT_803314c8 * u2 - u3);
-
-				result = span * (prev[3] * (u + negTerm) + next[2] * (u3 - u2)) +
-				         (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - c4u2)) +
-				             next[1] * (FLOAT_803314cc * u3 + c4u2));
+				result = CalcSpl(&keys[idx - 1], &keys[idx], t);
 			}
 			break;
 		}
@@ -5756,7 +5802,7 @@ void CMenuPcs::CalcFukidashi()
 		worldObj->m_frameCounter = worldObj->m_frameCounter + 1;
 		if (static_cast<double>(static_cast<float>(worldObj->m_frameCounter)) >=
 		    DOUBLE_803314A8 * static_cast<double>(
-		        s_WoodTrns.keys[s_WoodTrns.keyCount * 4 - 4])) {
+		        s_WoodTrns.keys[s_WoodTrns.keyCount - 1].time)) {
 			worldObj->m_frameCounter = 0;
 		}
 	}
@@ -5834,7 +5880,7 @@ void CMenuPcs::CalcFukidashi()
 
 				worldObj->m_frameCounter = worldObj->m_frameCounter + 1;
 				if (static_cast<double>(static_cast<float>(worldObj->m_frameCounter)) >=
-				    DOUBLE_803314A8 * static_cast<double>(yTbl->keys[s_WoodTrns.keyCount * 4 - 4])) {
+				    DOUBLE_803314A8 * static_cast<double>(yTbl->keys[s_WoodTrns.keyCount - 1].time)) {
 					worldObj->m_frameCounter = 0;
 				}
 				slotIdx++;
@@ -6300,7 +6346,7 @@ void CMenuPcs::CalcWMFrame()
 		WmFrameData* base = m_wm.m_frameData;
 		unsigned int uVar = (unsigned int)base->m_yearFrame;
 		if (static_cast<float>(static_cast<int>(uVar - 5)) <
-		    static_cast<float>(DOUBLE_803314A8 * static_cast<double>(s_YearTrns.keys[s_YearTrns.keyCount * 4 - 4]))) {
+		    static_cast<float>(DOUBLE_803314A8 * static_cast<double>(s_YearTrns.keys[s_YearTrns.keyCount - 1].time))) {
 			float t = static_cast<float>(static_cast<int>(uVar));
 			float fVar5;
 			fVar5 = GetFcvValue(s_YearTrns, t);
@@ -7819,7 +7865,12 @@ void CMenuPcs::DrawCharaName()
  */
 void CMenuPcs::DrawCMLife()
 {
-	static FCV s_LifePos = {3, gWmLifeYOffsetSplinePoints};
+	static CMenuPcs::SPL s_LifeY[] = {
+		{0.0f, 0.0f, 65.0f, 65.0f},
+		{0.1166666f, 6.0f, 0.0f, 0.0f},
+		{0.25f, 0.0f, -65.0f, -65.0f},
+	};
+	static FCV s_LifePos = {3, s_LifeY};
 #define worldState GetWmWorldState(this)
 #define selectEntries m_wm.m_charaSelectData
 
@@ -9784,7 +9835,7 @@ void CMenuPcs::CalcMcObj()
 		CMenuPcs::FCV* const yTbl = &s_WoodTrns;
 		panelState->m_frameCounter++;
 		if (static_cast<float>(static_cast<int>(panelState->m_frameCounter)) >=
-		    *p25 * static_cast<double>(yTbl->keys[s_WoodTrns.keyCount * 4 - 4])) {
+		    *p25 * static_cast<double>(yTbl->keys[s_WoodTrns.keyCount - 1].time)) {
 			panelState->m_frameCounter = 0;
 		}
 

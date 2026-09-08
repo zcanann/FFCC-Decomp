@@ -26,6 +26,7 @@
 #include "ffcc/cflat_runtime2.h"
 
 #include <stddef.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include <string.h>
 
 extern "C" {
@@ -74,24 +75,15 @@ static inline int nearColor(CColor src, CColor ref)
 {
 	int hits = 0;
 
-	int dr = static_cast<int>(src.color.r) - static_cast<int>(ref.color.r);
-	if (dr < 0) {
-		dr = -dr;
-	}
+	int dr = abs(static_cast<int>(src.color.r) - static_cast<int>(ref.color.r));
 	dr += 7 - static_cast<int>(src.color.a);
 	hits += dr <= 5 ? 1 : 0;
 
-	int dg = static_cast<int>(src.color.g) - static_cast<int>(ref.color.g);
-	if (dg < 0) {
-		dg = -dg;
-	}
+	int dg = abs(static_cast<int>(src.color.g) - static_cast<int>(ref.color.g));
 	dg += 7 - static_cast<int>(src.color.a);
 	hits += dg <= 5 ? 1 : 0;
 
-	int db = static_cast<int>(src.color.b) - static_cast<int>(ref.color.b);
-	if (db < 0) {
-		db = -db;
-	}
+	int db = abs(static_cast<int>(src.color.b) - static_cast<int>(ref.color.b));
 	db += 7 - static_cast<int>(src.color.a);
 	hits += db <= 5 ? 1 : 0;
 
@@ -846,7 +838,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 				continue;
 			}
 
-			distance = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
+			distance = abs(dx) + abs(dy);
 			tileIndex = FurTexelIndex(px, py, rowStride);
 			packed = pixels[tileIndex];
 

@@ -324,18 +324,25 @@ inline void CChara::CAnimNode::mapping(CChara::CAnim*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800BF8B4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CAnimNode::~CAnimNode()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800BF620
+ * PAL Size: 660b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 {
@@ -368,9 +375,8 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 
 	register int flags = static_cast<int>(m_flagsBits.m_channelModes);
 	register unsigned int dataOffset = m_dataOffset;
-	frameInt *= 2;
 	register unsigned short* inData =
-	    reinterpret_cast<unsigned short*>(dataOffset + reinterpret_cast<unsigned int>(anim->m_bank));
+	    reinterpret_cast<unsigned short*>(static_cast<unsigned char*>(anim->m_bank) + dataOffset);
 	register float* outData = reinterpret_cast<float*>(srt);
 
 	for (int i = 0; i < 3; i++) {
@@ -379,8 +385,8 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 				i2f_5(outData, inData);
 				inData++;
 			} else {
-				i2f2_5(outData, reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + frameInt), frameFrac);
-				inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (anim->m_frameCount + 1) * 2);
+				i2f2_5(outData, inData + frameInt, frameFrac);
+				inData += anim->m_frameCount + 1;
 			}
 		} else {
 			*outData = 0.0f;
@@ -395,8 +401,8 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 				i2f_6(outData, inData);
 				inData++;
 			} else {
-				i2f2_6(outData, reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + frameInt), frameFrac);
-				inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (anim->m_frameCount + 1) * 2);
+				i2f2_6(outData, inData + frameInt, frameFrac);
+				inData += anim->m_frameCount + 1;
 			}
 		} else {
 			*outData = 0.0f;
@@ -411,8 +417,8 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 				i2f_7(outData, inData);
 				inData++;
 			} else {
-				i2f2_7(outData, reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + frameInt), frameFrac);
-				inData = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(inData) + (anim->m_frameCount + 1) * 2);
+				i2f2_7(outData, inData + frameInt, frameFrac);
+				inData += anim->m_frameCount + 1;
 			}
 		} else {
 			*outData = 1.0f;

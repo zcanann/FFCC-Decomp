@@ -10854,71 +10854,40 @@ void CMenuPcs::SetCaravanWork(Mc::SaveDat* saveDat)
  */
 int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int memberIndex, int strictMode)
 {
-	unsigned char* src = reinterpret_cast<unsigned char*>(source);
-	unsigned char* const dst = reinterpret_cast<unsigned char*>(target);
-
 	if (strictMode == 0) {
-		unsigned char* const targetHeader = dst + memberIndex * 0x9C0;
-		unsigned int s0 = *reinterpret_cast<unsigned int*>(src + 0x13D0);
-		unsigned int t0 = *reinterpret_cast<unsigned int*>(targetHeader + 0x1D98);
-		unsigned int s1 = *reinterpret_cast<unsigned int*>(src + 0x13D4);
-		unsigned int t1 = *reinterpret_cast<unsigned int*>(targetHeader + 0x1D9C);
-		unsigned int diff = (s0 ^ t0) | (s1 ^ t1);
-		if (diff != 0 ||
-		    *reinterpret_cast<unsigned int*>(src + 0x13D8) != *reinterpret_cast<unsigned int*>(targetHeader + 0x1DA0)) {
+		if (source->m_mcSerial != target->m_characters[memberIndex].m_originSerial ||
+		    source->m_mcRandom != target->m_characters[memberIndex].m_originRandom) {
 			return -2;
 		}
 	}
 
-	unsigned int result = 0;
-	const int cmpOffset = memberIndex * 0x9C0 + 0x1D94;
-	for (int count = 4; count != 0; count--) {
-		if (*reinterpret_cast<int*>(src + 0x1A84) != 0) {
+	int result;
+	for (result = 0; result < 8; result++) {
+		const Mc::CharaDat& character = source->m_characters[result];
+		if (character.m_exists != 0) {
 			if (strictMode == 0) {
-				if (src[0x1D90] != 0 &&
-				    *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
+				if (character.m_isAway != 0 &&
+				    character.m_characterId == target->m_characters[memberIndex].m_characterId) {
 					break;
 				}
-			} else if (src[0x1D91] != 0 &&
-			           *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
-				unsigned int e0 = *reinterpret_cast<unsigned int*>(src + 0x1D98) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D0);
-				unsigned int e1 = *reinterpret_cast<unsigned int*>(src + 0x1D9C) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D4);
-				if ((e0 | e1) == 0 &&
-				    *reinterpret_cast<unsigned int*>(src + 0x1DA0) == *reinterpret_cast<unsigned int*>(dst + 0x13D8)) {
+			} else if (character.m_isGuest != 0 &&
+			           character.m_characterId == target->m_characters[memberIndex].m_characterId) {
+				if (character.m_originSerial == target->m_mcSerial &&
+				    character.m_originRandom == target->m_mcRandom) {
 					break;
 				}
 			}
 		}
-		result++;
-
-		if (*reinterpret_cast<int*>(src + 0x2444) != 0) {
-			if (strictMode == 0) {
-				if (src[0x2750] != 0 &&
-				    *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
-					break;
-				}
-			} else if (src[0x2751] != 0 &&
-			           *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
-				unsigned int e0 = *reinterpret_cast<unsigned int*>(src + 0x2758) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D0);
-				unsigned int e1 = *reinterpret_cast<unsigned int*>(src + 0x275C) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D4);
-				if ((e0 | e1) == 0 &&
-				    *reinterpret_cast<unsigned int*>(src + 0x2760) == *reinterpret_cast<unsigned int*>(dst + 0x13D8)) {
-					break;
-				}
-			}
-		}
-		src += 0x1380;
-		result++;
 	}
 
 	if (strictMode == 0) {
-		if (static_cast<int>(result) < 8) {
+		if (result < 8) {
 			return result;
 		}
 		return -1;
 	}
 
-	return (static_cast<int>(result) < 8) - 4;
+	return result < 8 ? -3 : -4;
 }
 
 /*
@@ -10932,14 +10901,7 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
  */
 int CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
 {
-	unsigned char* const a = reinterpret_cast<unsigned char*>(lhs);
-	unsigned char* const b = reinterpret_cast<unsigned char*>(rhs);
-	unsigned int lhs0 = *reinterpret_cast<unsigned int*>(a + 0x13D0);
-	unsigned int rhs0 = *reinterpret_cast<unsigned int*>(b + 0x13D0);
-	unsigned int lhs1 = *reinterpret_cast<unsigned int*>(a + 0x13D4);
-	unsigned int rhs1 = *reinterpret_cast<unsigned int*>(b + 0x13D4);
-	unsigned int diff = (lhs0 ^ rhs0) | (lhs1 ^ rhs1);
-	if (diff == 0 && *reinterpret_cast<unsigned int*>(a + 0x13D8) == *reinterpret_cast<unsigned int*>(b + 0x13D8)) {
+	if (lhs->m_mcSerial == rhs->m_mcSerial && lhs->m_mcRandom == rhs->m_mcRandom) {
 		return 1;
 	}
 	return 0;

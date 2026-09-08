@@ -114,6 +114,18 @@ STATIC_ASSERT(offsetof(Mc::SaveDat, m_region) == 0x10);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_rotateKey) == 0x11);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_random) == 0x18);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_crc) == 0x1C);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_mcSerial) == 0x13D0);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_mcRandom) == 0x13D8);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_characters) == 0x14D0);
+STATIC_ASSERT(sizeof(Mc::CharaDat) == 0x9C0);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_exists) == 0x5B4);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_isAway) == 0x8C0);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_isGuest) == 0x8C1);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_hasCharacterId) == 0x8C2);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_characterId) == 0x8C4);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_originSerial) == 0x8C8);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_originRandom) == 0x8D0);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_baseDataIndex) == 0x8D4);
 STATIC_ASSERT(sizeof(Mc::SaveDat) == 0x8BD0);
 
 static inline CChara* GetCharaGlobal()

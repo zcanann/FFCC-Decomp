@@ -8,6 +8,22 @@
 
 namespace Mc
 {
+struct CharaDat
+{
+    unsigned char m_unknown000[0x5B4];
+    int m_exists;                                  // 0x5B4
+    unsigned char m_unknown5B8[0x8C0 - 0x5B8];
+    unsigned char m_isAway;                         // 0x8C0
+    unsigned char m_isGuest;                        // 0x8C1
+    unsigned char m_hasCharacterId;                 // 0x8C2
+    unsigned char m_unknown8C3;
+    u32 m_characterId;                              // 0x8C4
+    u64 m_originSerial;                             // 0x8C8
+    u32 m_originRandom;                             // 0x8D0
+    int m_baseDataIndex;                            // 0x8D4
+    unsigned char m_unknown8D8[0x9C0 - 0x8D8];
+};
+
 class SaveDat
 {
 public:
@@ -21,7 +37,12 @@ public:
     unsigned char m_pad_13[0x18 - 0x13];
     u32 m_random;
     u32 m_crc;
-    unsigned char m_body[0x8BD0 - 0x20];
+    unsigned char m_unknown0020[0x13D0 - 0x20];
+    u64 m_mcSerial;                                // 0x13D0
+    u32 m_mcRandom;                                // 0x13D8
+    unsigned char m_unknown13DC[0x14D0 - 0x13DC];
+    CharaDat m_characters[8];                       // 0x14D0
+    unsigned char m_unknown62D0[0x8BD0 - 0x62D0];
 };
 }
 

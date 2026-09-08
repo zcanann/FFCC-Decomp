@@ -399,96 +399,14 @@ static inline CCaravanWork* ShopMenuCaravanWork(CShopMenu* shopMenu)
     return shopMenu->m_caravanWork;
 }
 
-static inline int CountShopMenuInventoryItems(CShopMenu* shopMenu, short itemNo)
-{
-    int total = 0;
-    for (int slot = 0; slot < 0x40; slot++) {
-        if (ShopMenuCaravanWork(shopMenu)->m_inventoryItems[slot] == itemNo) {
-            ++total;
-        }
-    }
-    return total;
-}
-
 static inline float CalcCenteredShopMenuX(CFont* font, const char* text, int centerX)
 {
     return static_cast<float>(static_cast<int>((FLOAT_80332DD4 - font->GetWidth(text)) * FLOAT_80332d78 + centerX));
 }
 
-static inline int ResolveShopMenuItemCount(CShopMenu* shopMenu)
-{
-    int listType = shopMenu->m_listType;
-    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
-    if (listType == 0) {
-        return caravanWork->m_shopListCount;
-    }
-    if (listType == 1) {
-        return 0x40;
-    }
-    if (listType == 2) {
-        return shopMenu->m_itemCount;
-    }
-    return 0;
-}
 
-static inline int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
-{
-    int listType = shopMenu->m_listType;
-    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
-    if (listType == 0) {
-        return caravanWork->m_shopList[index];
-    }
-    if (listType == 1) {
-        return caravanWork->m_inventoryItems[index];
-    }
-    if (listType == 2) {
-        int mapped = shopMenu->m_itemTable[index];
-        if (mapped == -1) {
-            return -1;
-        }
-        return caravanWork->m_inventoryItems[mapped];
-    }
-    return -1;
-}
 
-static inline int CountShopMenuOwnedItems(CCaravanWork* caravanWork, int itemNo)
-{
-    if (itemNo < 1) {
-        return 0;
-    }
 
-    int count = 0;
-    for (int i = 0; i < 0x40; i++) {
-        if (caravanWork->m_inventoryItems[i] == itemNo) {
-            ++count;
-        }
-    }
-    return count;
-}
-
-static inline int CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
-{
-    int listType = shopMenu->m_listType;
-    int canTrade;
-    if (itemNo <= 0) {
-        canTrade = 0;
-    } else if (listType == 0) {
-        canTrade = 1;
-    } else if (listType == 2) {
-        canTrade = 1;
-        if ((shopMenu->m_caravanWork->m_shopArgs[((int)(itemNo - 0x191U) >> 5)] &
-             (1 << ((itemNo - 0x191U) & 0x1F))) == 0) {
-            canTrade = 0;
-        }
-    } else if (static_cast<unsigned char>(MenuPcs.EquipChk(index)) != 0) {
-        canTrade = 0;
-    } else if (itemNo > 0x9E) {
-        canTrade = 1;
-    } else {
-        canTrade = 0;
-    }
-    return canTrade;
-}
 
 struct ShopMenuFontRenderFlags {
     unsigned char m_top3 : 3;
@@ -500,7 +418,6 @@ static inline void SetShopMenuFontRenderBit(CFont* font)
 {
     reinterpret_cast<ShopMenuFontRenderFlags*>(reinterpret_cast<unsigned char*>(font) + 0x24)->m_bit4 = 1;
 }
-
 
 static inline void SetupShopMenuInfoFont(CFont* font)
 {
@@ -893,22 +810,64 @@ inline int CShopMenu::CanAddGil()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 380b
+ * EN Address: 0x801744F0
+ * EN Size: 316b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::CheckSell(int index)
 {
-    return CanTradeShopMenuItem(this, index, getItemNo(index)) ? 1 : 0;
+    if (index == -1) {
+        return 0;
+    }
+
+    int itemNo = getItemNo(index);
+    int listType = m_listType;
+    int canTrade;
+    if (itemNo <= 0) {
+        canTrade = 0;
+    } else if (listType == 0) {
+        canTrade = 1;
+    } else if (listType == 2) {
+        int recipeNo = itemNo - 0x191;
+        canTrade = 1;
+        if ((m_caravanWork->m_shopArgs[recipeNo >> 5] & (1U << (recipeNo & 0x1F))) == 0) {
+            canTrade = 0;
+        }
+    } else if (static_cast<unsigned char>(MenuPcs.EquipChk(index)) != 0) {
+        canTrade = 0;
+    } else if (itemNo > 0x9E) {
+        canTrade = 1;
+    } else {
+        canTrade = 0;
+    }
+    return canTrade;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 232b
+ * EN Address: 0x8017462C
+ * EN Size: 84b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::getItemHaveCnt(int itemNo)
 {
-    return CountShopMenuOwnedItems(ShopMenuCaravanWork(this), itemNo);
+    if (itemNo <= 0) {
+        return 0;
+    }
+
+    int count = 0;
+    for (int i = 0; i < 0x40; i++) {
+        if (m_caravanWork->m_inventoryItems[i] == itemNo) {
+            ++count;
+        }
+    }
+    return count;
 }
 
 static inline long* GetShopMenuShapeAnimData(int shapeNo)
@@ -1082,12 +1041,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
         return;
     }
 
-    int canSelect;
-    if (sel == -1) {
-        canSelect = 0;
-    } else {
-        canSelect = CanTradeShopMenuItem(this, sel, getItemNo(sel));
-    }
+    int canSelect = CheckSell(sel);
     if (canSelect) {
         sourceText = reinterpret_cast<const char*>(GetShopMenuHelpMsgTable()[itemNo]);
     } else {
@@ -1286,12 +1240,7 @@ void CShopMenu::DrawItemInfo0()
         font->SetMargin(FLOAT_80332d28);
     }
 
-    int canTrade;
-    if (m_selectedIndex == -1) {
-        canTrade = 0;
-    } else {
-        canTrade = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
-    }
+    int canTrade = CheckSell(m_selectedIndex);
 
     if (canTrade) {
         font->SetMargin(FLOAT_80332d28);
@@ -1412,12 +1361,7 @@ void CShopMenu::DrawBuySellInfo()
     char* unitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
     float unitWidth = font->GetWidth(unitText);
 
-    int canTrade;
-    if (m_selectedIndex == -1) {
-        canTrade = 0;
-    } else {
-        canTrade = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
-    }
+    int canTrade = CheckSell(m_selectedIndex);
 
     int totalGil;
     if (canTrade) {
@@ -2136,13 +2080,12 @@ void CShopMenu::DrawMake()
 
     int rowY = 300;
     int ownedRightX = 452;
-    short recipeMaterial[6];
-    MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
+    CMenuPcs::MaterialInfo recipeMaterial;
+    MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), &recipeMaterial);
     float makeMarginScale = FLOAT_80332d28;
     float makeMarginBase = FLOAT_80332D10;
-    short* material = recipeMaterial;
-    for (int i = 0; i < 3; i++, rowY += 0x1E, material++) {
-        if (*material <= 0) {
+    for (int i = 0; i < 3; i++, rowY += 0x1E) {
+        if (recipeMaterial.m_itemNo[i] <= 0) {
             break;
         }
 
@@ -2156,7 +2099,7 @@ void CShopMenu::DrawMake()
 
         CFont* makeAmountFont = MenuPcs.m_fonts[0];
         x = 372;
-        int neededCount = material[3];
+        int neededCount = recipeMaterial.m_count[i];
         SetupShopMenuMakeFont(makeAmountFont, makeMarginW * makeMarginScale + makeMarginBase);
         char neededBuffer[64];
         sprintf(neededBuffer, s_DecimalFormat_80332d14, neededCount);
@@ -2175,24 +2118,17 @@ void CShopMenu::DrawMake()
         MenuPcs.DrawInit();
 
         x -= 8;
-        char* materialName = GetItemName(*material);
+        char* materialName = GetItemName(recipeMaterial.m_itemNo[i]);
         x = static_cast<int>(x - headerFont->GetWidth(materialName));
         headerFont->DrawInit();
         MenuPcs.DrawNoShadowFont(headerFont, materialName, x, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
-        int ownedCount = 0;
-        int ownedCountAux = ownedCount; ownedCount = ownedCountAux;
-        short materialItem = *material;
-        for (int slot = 0; slot < 0x40; slot++) {
-            if (ShopMenuCaravanWork(this)->m_inventoryItems[slot] == materialItem) {
-                ++ownedCount;
-            }
-        }
+        int ownedCount = getItemHaveCnt(recipeMaterial.m_itemNo[i]);
 
         int ownedTlut = 2;
         makeMarginW = FLOAT_80332E10;
-        if (ownedCount >= material[3]) {
+        if (ownedCount >= recipeMaterial.m_count[i]) {
             ownedTlut = 0x1B;
         }
         CFont* ownedFont = MenuPcs.m_fonts[0];
@@ -2368,17 +2304,16 @@ void CShopMenu::SelectMake()
                      (m_caravanWork->m_gil >= getMakeGil(getItemNo(m_selectedIndex)));
 
     int selected = getItemNo(m_selectedIndex);
-    short recipeMaterial[8];
-    MenuPcs.GetRecipeMaterial(selected, reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
+    CMenuPcs::MaterialInfo recipeMaterial;
+    MenuPcs.GetRecipeMaterial(selected, &recipeMaterial);
 
-    short* material = recipeMaterial;
-    for (int i = 0; i < 3; i++, material++) {
-        short itemNo = *material;
+    for (int i = 0; i < 3; i++) {
+        short itemNo = recipeMaterial.m_itemNo[i];
         if (itemNo <= 0) {
             break;
         }
 
-        canSelect = canSelect && (material[3] <= CountShopMenuInventoryItems(this, itemNo));
+        canSelect = canSelect && (recipeMaterial.m_count[i] <= getItemHaveCnt(itemNo));
     }
 
     if (!canSelect) {
@@ -2735,11 +2670,7 @@ void CShopMenu::SelectItemIdx()
 
         int listType = m_listType;
         if (listType == 0) {
-            if (m_selectedIndex == -1) {
-                canSelect = 0;
-            } else {
-                canSelect = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
-            }
+            canSelect = CheckSell(m_selectedIndex);
             if (canSelect != 0) {
                 CCaravanWork* caravanWork = m_caravanWork;
                 if (m_quantity <= GetMaxExchange()) {
@@ -2752,11 +2683,7 @@ void CShopMenu::SelectItemIdx()
             }
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else if (listType == 1) {
-            if (m_selectedIndex == -1) {
-                canSelect = 0;
-            } else {
-                canSelect = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
-            }
+            canSelect = CheckSell(m_selectedIndex);
             if (canSelect != 0) {
                 m_subMode = 2;
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -2764,11 +2691,7 @@ void CShopMenu::SelectItemIdx()
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
             }
         } else if (listType == 2) {
-            if (m_selectedIndex == -1) {
-                canSelect = 0;
-            } else {
-                canSelect = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
-            }
+            canSelect = CheckSell(m_selectedIndex);
             if (canSelect != 0) {
                 m_nextMode = 0xC;
                 m_resultItem = MenuPcs.GetSmithItem(getItemNo(m_selectedIndex));
@@ -3031,18 +2954,18 @@ void CShopMenu::Calc()
         }
         m_fade = static_cast<float>(timer) * FLOAT_80332E50;
         if (timer == 8) {
-            short recipeMaterial[8];
+            CMenuPcs::MaterialInfo recipeMaterial;
 
-            MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
+            MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), &recipeMaterial);
             ShopMenuCaravanWork(this)->AddGil(-getMakeGil(getItemNo(m_selectedIndex)));
             ShopMenuCaravanWork(this)->DeleteItem(getItemNo(m_selectedIndex), 0);
 
             for (int i = 0; i < 3; i++) {
-                if (recipeMaterial[i] <= 0) {
+                if (recipeMaterial.m_itemNo[i] <= 0) {
                     break;
                 }
-                for (int count = 0; count < recipeMaterial[i + 3]; count++) {
-                    ShopMenuCaravanWork(this)->DeleteItem(recipeMaterial[i], 0);
+                for (int count = 0; count < recipeMaterial.m_count[i]; count++) {
+                    ShopMenuCaravanWork(this)->DeleteItem(recipeMaterial.m_itemNo[i], 0);
                 }
             }
 

@@ -223,8 +223,24 @@ struct TmpArtiList;
 
 struct McListInfo
 {
-    void operator=(const McListInfo&);
+    u64 m_saveTime;              // 0x00
+    u32 m_playTime;              // 0x08
+    int m_timerA;                // 0x0C
+    int m_scriptGlobalTime;      // 0x10
+    int m_frameCounter;          // 0x14
+    int m_characterIds[4];       // 0x18
+    int m_chaliceElement;        // 0x28
+    char m_townName[0x15];       // 0x2C
+    unsigned char m_hasData;     // 0x41
+    unsigned char m_isBroken;    // 0x42
+    unsigned char m_unknown43;   // 0x43
 };
+
+STATIC_ASSERT(sizeof(McListInfo) == 0x48);
+STATIC_ASSERT(offsetof(McListInfo, m_characterIds) == 0x18);
+STATIC_ASSERT(offsetof(McListInfo, m_townName) == 0x2C);
+STATIC_ASSERT(offsetof(McListInfo, m_hasData) == 0x41);
+STATIC_ASSERT(offsetof(McListInfo, m_isBroken) == 0x42);
 
 class CMenuPcs : public CProcess
 {

@@ -377,7 +377,7 @@ static const char s__s__d___Error_function_code_not_f_801dc3ec[] = "%s(%d): Erro
 static const char s_dvd_movie_ffcc_op_thp_801dc448[] = "dvd_movie/ffcc_op.thp";
 static const char s_mount____s_801dc460[] = "mount : %s";
 
-static const int kMcListEntrySize = 0x48;
+static const int kMcListEntrySize = sizeof(McListInfo);
 static const int kMcListCount = 4;
 static const unsigned short s_wmLoadCharaModels[] = {
     0x006E, 0x0034, 0x007F, 0x0043, 0x0042, 0x0049, 0x002A, 0x0025,
@@ -403,7 +403,7 @@ static const int kWmMenuPlayerCount = 8;
 static const int kWmMenuControllerCount = 4;
 static const int kWmCharaSelectCount = kWmMenuPlayerCount;
 static const int kWmCharaSelectBytes = sizeof(WmCharaSelectEntry) * kWmCharaSelectCount;
-static const int kWmMenuCharaStateBytes = 0x120;
+static const int kWmMenuCharaStateBytes = kMcListEntrySize * kMcListCount;
 
 struct GbaCMakeInfoRaw
 {
@@ -9984,20 +9984,6 @@ inline void CMenuPcs::SetMcList(int index, McListInfo* info)
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: UNUSED
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void McListInfo::operator= (const McListInfo& src)
-{
-	memcpy(this, &src, kMcListEntrySize);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
  * PAL Size: 44b
  * EN Address: 0x8011A838
  * EN Size: 56b
@@ -11038,18 +11024,11 @@ int McCtrl::LoadMcList()
 			} else {
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
-				struct McListEntry {
-					int m_words[11];
-					char m_name[0x15];
-					char m_byte41;
-					char m_byte42;
-					char m_byte43;
-				};
-				McListEntry entry;
-				memset(&entry, 0, 0x48);
-				entry.m_byte42 = 1;
+				McListInfo entry;
+				memset(&entry, 0, sizeof(entry));
+				entry.m_isBroken = 1;
 				for (int i = 0; i < kMcListCount; i++) {
-					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;
+					reinterpret_cast<McListInfo*>(MenuPcs.m_wmCharaState)[i] = entry;
 				}
 				m_state = 7;
 			}
@@ -11134,23 +11113,23 @@ int McCtrl::LoadMcList()
  */
 void McCtrl::SetListDat(int slot, int clearPlayTime)
 {
-	unsigned char entry[kMcListEntrySize];
+	McListInfo entry;
 	unsigned char* const save = reinterpret_cast<unsigned char*>(MemoryCardMan.m_saveBuffer);
-	memset(entry, 0, sizeof(entry));
+	memset(&entry, 0, sizeof(entry));
 
 	if (*reinterpret_cast<signed char*>(save + 0x10C0) != 0) {
 		const int formatMatch = memcmp(save + 0x0C, DAT_8032E8A8, 4);
 		const unsigned char crcOk = MemoryCardMan.ChkCrc(0);
 		if (crcOk == 1 && formatMatch == 0) {
 			if (clearPlayTime == 0) {
-				*reinterpret_cast<unsigned int*>(entry + 0x08) = *reinterpret_cast<unsigned int*>(save + 0x20);
+				entry.m_playTime = *reinterpret_cast<unsigned int*>(save + 0x20);
 			} else {
-				*reinterpret_cast<unsigned int*>(entry + 0x08) = 0;
+				entry.m_playTime = 0;
 			}
-			memcpy(entry + 0x00, save + 0x8AD0, 8);
-			*reinterpret_cast<unsigned int*>(entry + 0x0C) = *reinterpret_cast<unsigned int*>(save + 0x24);
-			*reinterpret_cast<unsigned int*>(entry + 0x10) = *reinterpret_cast<unsigned int*>(save + 0x28);
-			*reinterpret_cast<unsigned int*>(entry + 0x14) = *reinterpret_cast<unsigned int*>(save + 0x2C);
+			memcpy(&entry.m_saveTime, save + 0x8AD0, sizeof(entry.m_saveTime));
+			entry.m_timerA = *reinterpret_cast<unsigned int*>(save + 0x24);
+			entry.m_scriptGlobalTime = *reinterpret_cast<unsigned int*>(save + 0x28);
+			entry.m_frameCounter = *reinterpret_cast<unsigned int*>(save + 0x2C);
 
 			unsigned char* base = save;
 			for (int i = 0; i < 4; i++) {
@@ -11167,38 +11146,23 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 
 			for (int i = 0; i < 4; i++) {
 				if (reinterpret_cast<int*>(save + 0x30)[i] >= 0) {
-					reinterpret_cast<unsigned int*>(entry + 0x18)[i] = *reinterpret_cast<unsigned short*>(save + reinterpret_cast<int*>(save + 0x30)[i] * 0x9C0 + 0x14D0);
+					entry.m_characterIds[i] = *reinterpret_cast<unsigned short*>(save + reinterpret_cast<int*>(save + 0x30)[i] * 0x9C0 + 0x14D0);
 				} else {
-					reinterpret_cast<unsigned int*>(entry + 0x18)[i] = -1;
+					entry.m_characterIds[i] = -1;
 				}
 			}
-			*reinterpret_cast<unsigned int*>(entry + 0x28) = *reinterpret_cast<unsigned int*>(save + 0xB8);
-			memcpy(entry + 0x2C, save + 0x10C0, 0x10);
-			entry[0x41] = 1;
+			entry.m_chaliceElement = *reinterpret_cast<unsigned int*>(save + 0xB8);
+			memcpy(entry.m_townName, save + 0x10C0, 0x10);
+			entry.m_hasData = 1;
 		} else {
-			entry[0x42] = 1;
+			entry.m_isBroken = 1;
 		}
 	} else {
-		entry[0x42] = 0;
-		entry[0x41] = 0;
+		entry.m_isBroken = 0;
+		entry.m_hasData = 0;
 	}
 
-	unsigned char* const dst = MenuPcs.m_wmCharaState + slot * kMcListEntrySize;
-	unsigned int* const dstWords = reinterpret_cast<unsigned int*>(dst);
-	unsigned int* const entryWords = reinterpret_cast<unsigned int*>(entry);
-	struct Quad16 { unsigned int w[4]; };
-	*reinterpret_cast<unsigned long long*>(dst) = *reinterpret_cast<unsigned long long*>(entry);
-	dstWords[2] = entryWords[2];
-	dstWords[3] = entryWords[3];
-	dstWords[4] = entryWords[4];
-	dstWords[5] = entryWords[5];
-	*reinterpret_cast<Quad16*>(dst + 0x18) = *reinterpret_cast<Quad16*>(entry + 0x18);
-	dstWords[10] = entryWords[10];
-	struct Tail15 { unsigned char b[0x15]; };
-	*reinterpret_cast<Tail15*>(dst + 0x2C) = *reinterpret_cast<Tail15*>(entry + 0x2C);
-	dst[0x41] = entry[0x41];
-	dst[0x42] = entry[0x42];
-	dst[0x43] = entry[0x43];
+	reinterpret_cast<McListInfo*>(MenuPcs.m_wmCharaState)[slot] = entry;
 }
 
 /*
@@ -11325,18 +11289,11 @@ int McCtrl::SaveDat()
 					m_state = -1;
 				}
 			} else {
-				struct McListEntry {
-					int m_words[11];
-					char m_name[0x15];
-					char m_byte41;
-					char m_byte42;
-					char m_byte43;
-				};
-				McListEntry entry;
-				memset(&entry, 0, 0x48);
-				entry.m_byte42 = 0;
+				McListInfo entry;
+				memset(&entry, 0, sizeof(entry));
+				entry.m_isBroken = 0;
 				for (int i = 0; i < kMcListCount; i++) {
-					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;
+					reinterpret_cast<McListInfo*>(MenuPcs.m_wmCharaState)[i] = entry;
 				}
 				m_state = 10;
 			}
@@ -12440,18 +12397,11 @@ int McCtrl::EraseDat()
 					m_state = -1;
 				}
 			} else {
-				struct McListEntry {
-					int m_words[11];
-					char m_name[0x15];
-					char m_byte41;
-					char m_byte42;
-					char m_byte43;
-				};
-				McListEntry entry;
-				memset(&entry, 0, 0x48);
-				entry.m_byte42 = 0;
+				McListInfo entry;
+				memset(&entry, 0, sizeof(entry));
+				entry.m_isBroken = 0;
 				for (int i = 0; i < kMcListCount; i++) {
-					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;
+					reinterpret_cast<McListInfo*>(MenuPcs.m_wmCharaState)[i] = entry;
 				}
 				m_state = 10;
 			}

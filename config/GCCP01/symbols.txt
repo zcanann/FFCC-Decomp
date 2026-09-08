@@ -17436,4 +17436,4 @@ sFurShadowMaterialsInit = .sbss2:0x80333DE8; // type:object size:0x8 scope:local
 sFurShadowMatricesInit = .sbss2:0x80333DF0; // type:object size:0x8 scope:local data:4byte
 @894 = .sbss2:0x80333DF8; // type:object size:0x4 scope:local data:4byte
 @895 = .sbss2:0x80333DFC; // type:object size:0x4 scope:local data:4byte
-g_shopMenu = .sbss2:0x80333E00; // type:object size:0x4 data:4byte
+@1178 = .sbss2:0x80333E00; // type:object size:0x4 data:4byte

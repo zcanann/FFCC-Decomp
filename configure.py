@@ -551,7 +551,7 @@ config.libs = [
             Object(NonMatching, "memorycard.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
             Object(Matching, "menu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "menu_arti.cpp"),
-            Object(NonMatching, "menu_cmd.cpp", extra_cflags=["-str reuse,pool,readonly", "-inline auto,deferred", "-pool off"]),
+            Object(NonMatching, "menu_cmd.cpp", extra_cflags=["-str reuse,nopool,readonly", "-inline auto,deferred", "-pool off"]),
             Object(NonMatching, "menu_compa.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "menu_equip.cpp"),
             Object(NonMatching, "menu_favo.cpp", extra_cflags=["-str reuse,readonly"]),

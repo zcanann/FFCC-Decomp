@@ -11,7 +11,6 @@
 #include <math.h>
 #include <string.h>
 
-static const char sEmptySkillName[] = "";
 static s32 s_unitePanelCount;
 static s32 s_UniteTop[3];
 
@@ -56,107 +55,46 @@ static const UniteRecipe s_Unite[] = {
     { -1, -1, -1, { -1, -1, -1 } },
 };
 
-static const char s_Flamestrike_801DEA6C[] = "Flamestrike";
-static const char s_Icestrike_801DEA78[] = "Icestrike";
-static const char s_Thunderstrike_801DEA84[] = "Thunderstrike";
-static const char s_Feuer_Hieb_801DEA94[] = "Feuer-Hieb";
-static const char s_Eis_Hieb_801DEAA0[] = "Eis-Hieb";
-static const char s_Blitz_Hieb_801DEAAC[] = "Blitz-Hieb";
-static const char s_Colpo_Fire_801DEAB8[] = "Colpo Fire";
-static const char s_Colpo_Blizzard_801DEAC4[] = "Colpo Blizzard";
-static const char s_Colpo_Thunder_801DEAD4[] = "Colpo Thunder";
-static const char s_Pyro_Frappe_801DEAE4[] = "Pyro-Frappe";
-static const char s_Cryo_Frappe_801DEAF0[] = "Cryo-Frappe";
-static const char s_Rheo_Frappe_801DEAFC[] = "Rh\351o-Frappe";
-static const char s_Efecto_Fuego_801DEB08[] = "Efecto Fuego";
-static const char s_Efecto_Hielo_801DEB18[] = "Efecto Hielo";
-static const char s_Efecto_Electro_801DEB28[] = "Efecto Electro";
+static const char* s_SkillStr_us[] = {
+    "Flamestrike",
+    "Icestrike",
+    "Thunderstrike",
+    "",
+    "",
+};
 
-extern "C" const char* s_SkillStr_us[];
-extern "C" const char* s_SkillStr_ge[];
-extern "C" const char* s_SkillStr_it[];
-extern "C" const char* s_SkillStr_fr[];
-extern "C" const char* s_SkillStr_sp[];
+static const char* s_SkillStr_ge[] = {
+    "Feuer-Hieb",
+    "Eis-Hieb",
+    "Blitz-Hieb",
+    "",
+    "",
+};
 
+static const char* s_SkillStr_it[] = {
+    "Colpo Fire",
+    "Colpo Blizzard",
+    "Colpo Thunder",
+    "",
+    "",
+};
+
+static const char* s_SkillStr_fr[] = {
+    "Pyro-Frappe",
+    "Cryo-Frappe",
+    "Rh\351o-Frappe",
+    "",
+    "",
+};
+
+static const char* s_SkillStr_sp[] = {
+    "Efecto Fuego",
+    "Efecto Hielo",
+    "Efecto Electro",
+    "",
+    "",
+};
 namespace {
-
-static inline const char* GetStrikeListName(int itemId)
-{
-	if (itemId == 0x207) {
-		switch (Game.m_gameWork.m_languageId) {
-		case 2:
-			return s_SkillStr_ge[0];
-		case 3:
-			return s_SkillStr_it[0];
-		case 4:
-			return s_SkillStr_fr[0];
-		case 5:
-			return s_SkillStr_sp[0];
-		case 1:
-		default:
-			return s_SkillStr_us[0];
-		}
-	} else if (itemId == 0x20B) {
-		switch (Game.m_gameWork.m_languageId) {
-		case 2:
-			return s_SkillStr_ge[1];
-		case 3:
-			return s_SkillStr_it[1];
-		case 4:
-			return s_SkillStr_fr[1];
-		case 5:
-			return s_SkillStr_sp[1];
-		case 1:
-		default:
-			return s_SkillStr_us[1];
-		}
-	} else if (itemId == 0x20F) {
-		switch (Game.m_gameWork.m_languageId) {
-		case 2:
-			return s_SkillStr_ge[2];
-		case 3:
-			return s_SkillStr_it[2];
-		case 4:
-			return s_SkillStr_fr[2];
-		case 5:
-			return s_SkillStr_sp[2];
-		case 1:
-		default:
-			return s_SkillStr_us[2];
-		}
-	} else if (itemId == 0x222) {
-		switch (Game.m_gameWork.m_languageId) {
-		case 2:
-			return s_SkillStr_ge[3];
-		case 3:
-			return s_SkillStr_it[3];
-		case 4:
-			return s_SkillStr_fr[3];
-		case 5:
-			return s_SkillStr_sp[3];
-		case 1:
-		default:
-			return s_SkillStr_us[3];
-		}
-	} else if (itemId == 0x227) {
-		switch (Game.m_gameWork.m_languageId) {
-		case 2:
-			return s_SkillStr_ge[4];
-		case 3:
-			return s_SkillStr_it[4];
-		case 4:
-			return s_SkillStr_fr[4];
-		case 5:
-			return s_SkillStr_sp[4];
-		case 1:
-		default:
-			return s_SkillStr_us[4];
-		}
-	} else {
-		char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
-		return flatText[itemId * 5 + 4];
-	}
-}
 
 STATIC_ASSERT(offsetof(CmdListEntry, u) == 0x08);
 STATIC_ASSERT(offsetof(CmdListEntry, v) == 0x0C);
@@ -212,12 +150,10 @@ static inline CmdState* GetCmdStateView(CMenuPcs* menu)
 	return menu->m_cmdState;
 }
 
-
 static inline s16* GetCmdStateSelections(CmdState* cmd)
 {
 	return cmd->selected;
 }
-
 
 static inline s16 GetCmdLayoutFlag(CMenuPcs* menu)
 {
@@ -428,7 +364,6 @@ void CMenuPcs::CmdInit1()
 		fillEntry++;
 	}
 }
-
 
 /*
  * --INFO--
@@ -2225,7 +2160,20 @@ void CMenuPcs::DrawUniteList()
 		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)).color);
 
 		const int itemId = caravan->m_commandListExtra[s_UniteTop[i]];
-		const char* text = GetStrikeListName(itemId);
+		const char* text;
+		if (itemId == 0x207) {
+			text = GetSkillStr(0);
+		} else if (itemId == 0x20B) {
+			text = GetSkillStr(1);
+		} else if (itemId == 0x20F) {
+			text = GetSkillStr(2);
+		} else if (itemId == 0x222) {
+			text = GetSkillStr(3);
+		} else if (itemId == 0x227) {
+			text = GetSkillStr(4);
+		} else {
+			text = Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
+		}
 		const float width = static_cast<float>(font->GetWidth(text));
 		drawY = static_cast<float>(
 		    (static_cast<double>(unitePanels->height) - 19.8) * 0.5 +
@@ -2329,7 +2277,6 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 
 	return 0;
 }
-
 
 /*
  * --INFO--
@@ -2747,7 +2694,7 @@ unsigned int CMenuPcs::CmdClose2()
 
 /*
  * --INFO--
- * PAL Address: 0x8016233c
+ * PAL Address: 0x8014a940
  * PAL Size: 156b
  * EN Address: TODO
  * EN Size: TODO
@@ -2770,46 +2717,6 @@ const char* CMenuPcs::GetSkillStr(int index)
 		return s_SkillStr_us[index];
 	}
 }
-
-extern "C" const char* s_SkillStr_us[] = {
-    s_Flamestrike_801DEA6C,
-    s_Icestrike_801DEA78,
-    s_Thunderstrike_801DEA84,
-    sEmptySkillName,
-    sEmptySkillName,
-};
-
-extern "C" const char* s_SkillStr_ge[] = {
-    s_Feuer_Hieb_801DEA94,
-    s_Eis_Hieb_801DEAA0,
-    s_Blitz_Hieb_801DEAAC,
-    sEmptySkillName,
-    sEmptySkillName,
-};
-
-extern "C" const char* s_SkillStr_it[] = {
-    s_Colpo_Fire_801DEAB8,
-    s_Colpo_Blizzard_801DEAC4,
-    s_Colpo_Thunder_801DEAD4,
-    sEmptySkillName,
-    sEmptySkillName,
-};
-
-extern "C" const char* s_SkillStr_fr[] = {
-    s_Pyro_Frappe_801DEAE4,
-    s_Cryo_Frappe_801DEAF0,
-    s_Rheo_Frappe_801DEAFC,
-    sEmptySkillName,
-    sEmptySkillName,
-};
-
-extern "C" const char* s_SkillStr_sp[] = {
-    s_Efecto_Fuego_801DEB08,
-    s_Efecto_Hielo_801DEB18,
-    s_Efecto_Electro_801DEB28,
-    sEmptySkillName,
-    sEmptySkillName,
-};
 
 /*
  * --INFO--

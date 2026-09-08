@@ -22,7 +22,9 @@
 GbaQueue GbaQue;
 
 STATIC_ASSERT(sizeof(GbaQueueMapEntity) == 0x14);
+STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_visible) == 0);
 STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_kind) == 1);
+STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_radarEnabled) == 2);
 STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_hp) == 4);
 STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_posX) == 8);
 STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_dropItemCodes) == 0xC);
@@ -1694,85 +1696,74 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
  */
 void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
 {
-    char localEnemyData[0x508];
-    char* obj;
-    char radarMode;
+    GbaQueueMapEntity localEnemyData[64];
+    int radarMode;
     short baseX;
     short baseZ;
     int count;
     unsigned int i;
     int j;
-    char* localEntry;
-    char* prevEntry;
-    char* prevWalk;
+    GbaQueueMapEntity* localEntry;
+    GbaQueueMapEntity* prevEntry;
+    GbaQueueMapEntity* prevWalk;
     unsigned char* outPtr;
 
-    obj = reinterpret_cast<char*>(this);
-
     OSWaitSemaphore(accessSemaphores + channel);
-    unsigned int singleMode = (unsigned int)__cntlzw(1 - static_cast<int>(m_singleMode)) >> 5;
+    bool singleMode = m_singleMode == 1;
     OSSignalSemaphore(accessSemaphores + channel);
-    if ((singleMode & 0xFFU) != 0U) {
+    if (singleMode) {
         channel = 0;
     }
 
     OSWaitSemaphore(accessSemaphores + channel);
 
-    baseX = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48A);
-    baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48C);
-    memcpy(localEnemyData, obj + 0xB34, kGbaQueueEnemyDataBytes);
+    baseX = m_playerData[channel].m_mapPosition[0];
+    baseZ = m_playerData[channel].m_mapPosition[1];
+    memcpy(localEnemyData, m_enemies, sizeof(localEnemyData));
 
-    count = 0;
-    prevEntry = obj + channel * kGbaQueueEnemyDataBytes + 0x1034;
+    prevEntry = m_enemyHistory[channel];
     radarMode = m_radarType[channel];
-    localEntry = localEnemyData;
     for (i = 0; i < 0x40; i++) {
-        *reinterpret_cast<short*>(localEntry + 8) = *reinterpret_cast<short*>(localEntry + 8) - baseX;
-        *reinterpret_cast<short*>(localEntry + 10) = *reinterpret_cast<short*>(localEntry + 10) - baseZ;
+        localEntry = &localEnemyData[i];
+        localEntry->m_posX = localEntry->m_posX - baseX;
+        localEntry->m_posZ = localEntry->m_posZ - baseZ;
 
-        int enemyX = *reinterpret_cast<short*>(localEntry + 8);
-        int enemyZ;
-        if ((enemyX < 0 ? -enemyX : enemyX) >= 0x50 ||
-            ((enemyZ = *reinterpret_cast<short*>(localEntry + 10)), (enemyZ < 0 ? -enemyZ : enemyZ) >= 0x40)) {
-            *reinterpret_cast<short*>(localEntry + 8) = -1;
-            *reinterpret_cast<short*>(localEntry + 10) = -1;
-            localEntry[0] = 0;
+        if (abs(localEntry->m_posX) >= 0x50 || abs(localEntry->m_posZ) >= 0x40) {
+            localEntry->m_posX = -1;
+            localEntry->m_posZ = -1;
+            localEntry->m_visible = 0;
         } else {
-            localEntry[0] = 1;
+            localEntry->m_visible = 1;
         }
 
-        if (*reinterpret_cast<unsigned short*>(localEntry + 4) == 0 || localEntry[2] == 0) {
-            localEntry[0] = 0;
+        if (localEntry->m_hp == 0 || localEntry->m_radarEnabled == 0) {
+            localEntry->m_visible = 0;
         }
 
         if (radarMode == 2 || radarMode == 0) {
-            localEntry[0] = 0;
-        } else if (radarMode == 3 && localEntry[1] == 1) {
-            localEntry[0] = 0;
+            localEntry->m_visible = 0;
+        } else if (radarMode == 3 && localEntry->m_kind == 1) {
+            localEntry->m_visible = 0;
         }
-
-        localEntry += 0x14;
     }
 
-    localEntry = localEnemyData + count * 0x14;
-    prevWalk = prevEntry + count * 0x14;
+    count = 0;
     outPtr = reinterpret_cast<unsigned char*>(outData);
-    for (j = count; j < 0x40; j++) {
-        if ((localEntry[0] != 0 || prevWalk[0] != localEntry[0]) && memcmp(localEntry, prevWalk, 0x14) != 0) {
+    for (j = 0; j < 0x40; j++) {
+        localEntry = &localEnemyData[j];
+        prevWalk = &prevEntry[j];
+        if ((localEntry->m_visible != 0 || prevWalk->m_visible != localEntry->m_visible) && memcmp(localEntry, prevWalk, sizeof(*localEntry)) != 0) {
             count++;
             outPtr[0] = 0x12;
-            outPtr[1] = j | (localEntry[0] << 7);
-            outPtr[2] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 8));
-            outPtr[3] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 10));
+            outPtr[1] = j | (localEntry->m_visible << 7);
+            outPtr[2] = static_cast<unsigned char>(localEntry->m_posX);
+            outPtr[3] = static_cast<unsigned char>(localEntry->m_posZ);
             outPtr += 4;
         }
-
-        localEntry += 0x14;
-        prevWalk += 0x14;
     }
 
     *outCount = count;
-    memcpy(prevEntry, localEnemyData, kGbaQueueEnemyDataBytes);
+    memcpy(prevEntry, localEnemyData, sizeof(localEnemyData));
     OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -1787,18 +1778,15 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
  */
 void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 {
-	char localMapItems[kGbaQueueMapItemDataBytes];
-	char* obj;
-	char* localEntry;
-	char* prevEntry;
-	char* prevWalk;
+	GbaQueueMapEntity localMapItems[16];
+	GbaQueueMapEntity* localEntry;
+	GbaQueueMapEntity* prevEntry;
+	GbaQueueMapEntity* prevWalk;
 	unsigned char* outPtr;
 	short baseX;
 	short baseZ;
-	int count;
+	int count = 0;
 	int i;
-
-	obj = reinterpret_cast<char*>(this);
 
 	if (m_singleMode != 0) {
 		channel = 0;
@@ -1806,60 +1794,49 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 
-	baseX = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48A);
-	baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x48C);
-	memcpy(localMapItems, obj + 0x2434, sizeof(localMapItems));
+	baseX = m_playerData[channel].m_mapPosition[0];
+	baseZ = m_playerData[channel].m_mapPosition[1];
+	memcpy(localMapItems, m_mapItems, sizeof(localMapItems));
 
-	count = 0;
-	prevEntry = obj + channel * kGbaQueueMapItemDataBytes + 0x2574;
+	prevEntry = m_mapItemHistory[channel];
 	localEntry = localMapItems;
-	i = 0;
-	while (i < m_mapItemCount) {
-		*reinterpret_cast<short*>(localEntry + 8) =
-			static_cast<short>(*reinterpret_cast<short*>(localEntry + 8) - baseX);
-		*reinterpret_cast<short*>(localEntry + 10) =
-			static_cast<short>(*reinterpret_cast<short*>(localEntry + 10) - baseZ);
+	for (i = 0; i < m_mapItemCount; i++) {
+		localEntry->m_posX = static_cast<short>(localEntry->m_posX - baseX);
+		localEntry->m_posZ = static_cast<short>(localEntry->m_posZ - baseZ);
 
-		int localX = *reinterpret_cast<short*>(localEntry + 8);
-		int localZ;
-
-		if ((localX < 0 ? -localX : localX) >= 0x50 ||
-		    ((localZ = *reinterpret_cast<short*>(localEntry + 10)), (localZ < 0 ? -localZ : localZ) >= 0x40)) {
-			*reinterpret_cast<short*>(localEntry + 8) = -1;
-			*reinterpret_cast<short*>(localEntry + 10) = -1;
-			localEntry[0] = 0;
+		if (abs(localEntry->m_posX) >= 0x50 || abs(localEntry->m_posZ) >= 0x40) {
+			localEntry->m_posX = -1;
+			localEntry->m_posZ = -1;
+			localEntry->m_visible = 0;
 		} else {
-			localEntry[0] = 1;
+			localEntry->m_visible = 1;
 		}
 
-		if (localEntry[2] == 0) {
-			localEntry[0] = 0;
+		if (localEntry->m_radarEnabled == 0) {
+			localEntry->m_visible = 0;
 		}
 		if (m_radarType[channel] != 3) {
-			localEntry[0] = 0;
+			localEntry->m_visible = 0;
 		}
 
-		localEntry += 0x14;
-		i++;
+		localEntry++;
 	}
 
-	localEntry = localMapItems + count * 0x14;
-	prevWalk = prevEntry + count * 0x14;
+	localEntry = localMapItems;
+	prevWalk = prevEntry;
 	outPtr = reinterpret_cast<unsigned char*>(outData);
-	i = count;
-	while (i < m_mapItemCount) {
-		if ((localEntry[0] != 0 || prevWalk[0] != localEntry[0]) && memcmp(localEntry, prevWalk, 0x14) != 0) {
+	for (i = 0; i < m_mapItemCount; i++) {
+		if ((localEntry->m_visible != 0 || prevWalk->m_visible != localEntry->m_visible) && memcmp(localEntry, prevWalk, sizeof(*localEntry)) != 0) {
 			count++;
 			outPtr[0] = 0x21;
-			outPtr[1] = (i + 0x40) | (localEntry[0] << 7);
-			outPtr[2] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 8));
-			outPtr[3] = static_cast<unsigned char>(*reinterpret_cast<short*>(localEntry + 10));
+			outPtr[1] = (i + 0x40) | (localEntry->m_visible << 7);
+			outPtr[2] = static_cast<unsigned char>(localEntry->m_posX);
+			outPtr[3] = static_cast<unsigned char>(localEntry->m_posZ);
 			outPtr += 4;
 		}
 
-		localEntry += 0x14;
-		prevWalk += 0x14;
-		i++;
+		localEntry++;
+		prevWalk++;
 	}
 
 	*outCount = count;

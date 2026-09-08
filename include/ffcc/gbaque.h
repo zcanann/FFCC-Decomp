@@ -80,9 +80,9 @@ struct GbaPInfo
 
 struct GbaQueueMapEntity
 {
-    unsigned char m_visible;
-    unsigned char m_kind;
-    unsigned char m_radarEnabled;
+    char m_visible;
+    char m_kind;
+    char m_radarEnabled;
     unsigned char m_baseDataIndex;
     unsigned short m_hp;
     unsigned short m_maxHp;

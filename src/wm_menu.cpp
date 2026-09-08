@@ -1842,7 +1842,7 @@ void CMenuPcs::CalcMCardMenu()
 		}
 		break;
 	case 3:
-		m_wmWorldState->m_mcResult = static_cast<short>(MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel));
+		m_wmWorldState->m_mcResult = static_cast<short>(MemoryCardMan.McChkConnect(m_mcCtrl.GetDno()));
 		break;
 	case 5:
 	case 6:
@@ -1885,10 +1885,10 @@ void CMenuPcs::CalcMCardMenu()
 		    && m_wmWorldState->m_counter1A == 0) {
 			sVar7 = m_wmWorldState->m_subState;
 			if (sVar7 == 0xE || sVar7 == 0x15) {
-				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetDno());
 				if (m_wmWorldState->m_mcResult < 0) goto LAB_chk;
 			} else if (sVar7 == 5) {
-				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetDno());
 			LAB_chk:
 				sVar7 = m_wmWorldState->m_subState;
 				short sVar16;
@@ -2003,7 +2003,7 @@ void CMenuPcs::CalcMCardMenu()
 					m_wmWorldState->m_counter1A = 0x5A;
 					break;
 				}
-				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.GetDno());
 				m_wmWorldState->m_mcResult = (short)chkRes;
 				if (m_wmWorldState->m_mcResult != 0) {
 					m_wmWorldState->m_state0E = -1;
@@ -2036,7 +2036,7 @@ void CMenuPcs::CalcMCardMenu()
 		if (m_menuWindowInfo->state == 1
 		    && m_wmWorldState->m_counter1A != 0) {
 			if (m_wmWorldState->m_subState == 0x19) {
-				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetDno());
 			}
 			m_wmWorldState->m_counter1A--;
 			if (m_wmWorldState->m_counter1A == 0) {
@@ -2098,8 +2098,8 @@ void CMenuPcs::CalcMCardMenu()
 			if (m_wmWorldState->m_mcResult == 0) break;
 			if (m_wmWorldState->m_subState == 0x13) {
 				if (m_wmWorldState->m_menuMode != 8) {
-					gWmMenuWorkB = static_cast<unsigned int>(m_mcCtrl.m_serial);
-					gWmMenuWorkA = static_cast<unsigned int>(m_mcCtrl.m_serial >> 32);
+					gWmMenuWorkB = static_cast<unsigned int>(m_mcCtrl.GetSerial());
+					gWmMenuWorkA = static_cast<unsigned int>(m_mcCtrl.GetSerial() >> 32);
 					gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.m_cardChannel;
 					gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 				}
@@ -2170,8 +2170,8 @@ void CMenuPcs::CalcMCardMenu()
 				m_mcCtrl.m_saveIndex = sel < kMcListCount ? sel : 0;
 				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
 			} else {
-				if ((gWmMenuWorkA ^ static_cast<int>(m_mcCtrl.m_serial >> 32)) |
-				    (gWmMenuWorkB ^ static_cast<int>(m_mcCtrl.m_serial))) goto LAB_saveIdx;
+				if ((gWmMenuWorkA ^ static_cast<int>(m_mcCtrl.GetSerial() >> 32)) |
+				    (gWmMenuWorkB ^ static_cast<int>(m_mcCtrl.GetSerial()))) goto LAB_saveIdx;
 				m_mcCtrl.m_saveIndex = (int)gWmMenuCursorX[1];
 				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
 			}
@@ -2199,7 +2199,7 @@ void CMenuPcs::CalcMCardMenu()
 		break;
 	}
 	case 0x11:
-		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetDno());
 		if (m_wmWorldState->m_mcResult == 0 && uVar6 != 0) {
 			if ((uVar6 & 8) != 0) {
 				if (m_wmWorldState->m_cardChannel < 1) {
@@ -2438,7 +2438,7 @@ void CMenuPcs::CalcLoadMenu()
 		}
 		break;
 	case 3:
-		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetDno());
 		break;
 	case 5:
 	case 6:
@@ -2480,10 +2480,10 @@ void CMenuPcs::CalcLoadMenu()
 		if (m_menuWindowInfo->state == 1
 		    && m_wmWorldState->m_counter1A == 0) {
 			if (m_wmWorldState->m_subState == 0xE) {
-				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetDno());
 				if (m_wmWorldState->m_mcResult < 0) goto LAB_chkLoad;
 			} else if (m_wmWorldState->m_subState == 5) {
-				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.GetDno());
 			LAB_chkLoad:
 				sVar8 = m_wmWorldState->m_subState;
 				short sVar18;
@@ -2588,7 +2588,7 @@ void CMenuPcs::CalcLoadMenu()
 					m_wmWorldState->m_counter1A = 0x5A;
 					break;
 				}
-				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.GetDno());
 				m_wmWorldState->m_mcResult = (short)chkRes;
 				if (m_wmWorldState->m_mcResult != 0) {
 					m_wmWorldState->m_state0E = -1;
@@ -2621,7 +2621,7 @@ void CMenuPcs::CalcLoadMenu()
 		if (m_menuWindowInfo->state == 1
 		    && m_wmWorldState->m_counter1A != 0) {
 			if (m_wmWorldState->m_subState == 0x19) {
-				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.GetDno());
 				m_wmWorldState->m_mcResult = (short)chkRes;
 			}
 			m_wmWorldState->m_counter1A--;
@@ -2686,8 +2686,8 @@ void CMenuPcs::CalcLoadMenu()
 				}
 				if (m_wmWorldState->m_subState == 0x16) {
 					if (m_wmWorldState->m_menuMode != 8 && m_wmWorldState->m_mcResult == 1) {
-						gWmMenuWorkB = static_cast<unsigned int>(m_mcCtrl.m_serial);
-						gWmMenuWorkA = static_cast<unsigned int>(m_mcCtrl.m_serial >> 32);
+						gWmMenuWorkB = static_cast<unsigned int>(m_mcCtrl.GetSerial());
+						gWmMenuWorkA = static_cast<unsigned int>(m_mcCtrl.GetSerial() >> 32);
 						gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.m_cardChannel;
 						gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 					} else {
@@ -2848,7 +2848,7 @@ void CMenuPcs::CalcLoadMenu()
 		break;
 	}
 	case 0x11: {
-		int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+		int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.GetDno());
 		m_wmWorldState->m_mcResult = (short)chkRes;
 		if (m_wmWorldState->m_mcResult == 0 && uVar7 != 0) {
 			if ((uVar7 & 8) != 0) {
@@ -3641,7 +3641,7 @@ void CMenuPcs::DrawMCardMenu()
 		if (m_wmWorldState->m_subState == 0x11) {
 			saveIdx = (unsigned int)m_wmWorldState->m_cardChannel;
 		} else {
-			saveIdx = (unsigned int)m_mcCtrl.m_saveIndex;
+			saveIdx = (unsigned int)m_mcCtrl.GetSlot();
 		}
 		const double* pStride = &DOUBLE_80331498;
 		cursorX = (float)(*pStride * (double)(int)saveIdx + (double)cursorXbase);
@@ -5634,7 +5634,7 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	// Font name text processing
-	CFont* fontFC = m_fonts[1];
+	CFont* fontFC = GetFontWorld();
 	fontFC->SetMargin(FLOAT_803313e8);
 	fontFC->SetShadow(0);
 	fontFC->SetScale(FLOAT_803313e8);
@@ -5663,7 +5663,7 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	unsigned int textWidth = 0xD8;
-	CFont* font = m_fonts[1];
+	CFont* font = GetFontWorld();
 	if (*reinterpret_cast<short*>(bytes + 0x1A) != 0) {
 		textWidth = 0xA2;
 	}
@@ -5896,7 +5896,7 @@ void CMenuPcs::CalcFukidashi()
 void CMenuPcs::DrawFukidashi()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	CFont* const fontFC = m_fonts[1];
+	CFont* const fontFC = GetFontWorld();
 	if (static_cast<signed char>(bytes[0x09]) != 1) {
 		return;
 	}
@@ -5998,7 +5998,7 @@ void CMenuPcs::DrawFukidashi()
 	char tempBuf[64];
 	char secondLine[64];
 	secondLine[0] = 0;
-	CFont* const font = m_fonts[1];
+	CFont* const font = GetFontWorld();
 	if (*reinterpret_cast<short*>(bytes + 0x1A) != 0) {
 		textW = 0xA2;
 	}
@@ -12584,34 +12584,7 @@ int McCtrl::EraseDat()
 	return result;
 }
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: UNUSED
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void McCtrl::GetDno()
-{
-	gWmMenuWorkA = m_cardChannel;
-}
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: UNUSED
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void McCtrl::GetSerial()
-{
-	gWmMenuWorkA = static_cast<int>(m_serial >> 32);
-	gWmMenuWorkB = static_cast<int>(m_serial);
-}
 
 /*
  * --INFO--
@@ -12627,19 +12600,6 @@ void McCtrl::SetDataBuff(char* buffer)
 	m_userBuffer = buffer;
 }
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: UNUSED
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void McCtrl::GetSlot()
-{
-	gWmMenuWorkA = m_saveIndex;
-}
 
 /*
  * --INFO--
@@ -12695,18 +12655,4 @@ void CMenuPcs::AlphaNormal()
 void CMenuPcs::AlphaAdd()
 {
 	s_MaxAnimWait = FLOAT_803315d4;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: UNUSED
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::GetFontWorld()
-{
-	gWmMenuWorkA = static_cast<int>(reinterpret_cast<unsigned int>(m_fonts[1]));
 }

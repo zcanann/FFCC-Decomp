@@ -796,7 +796,7 @@ public:
     void IsAsyncCharaLoadFinish();
     void AlphaNormal();
     void AlphaAdd();
-    void GetFontWorld();
+    CFont* GetFontWorld();
 
     struct WmStorage
     {
@@ -1089,5 +1089,19 @@ STATIC_ASSERT(offsetof(CMenuPcs::WmFrameData, m_titleSprite) == 0x98);
 STATIC_ASSERT(offsetof(CMenuPcs::WmFrameData, m_yearSprites) == 0xB4);
 STATIC_ASSERT(sizeof(CMenuPcs::WmFrameInfo) == 0x3C);
 STATIC_ASSERT(offsetof(CMenuPcs::WmFrameInfo, m_sprites) == 0x4);
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CFont* CMenuPcs::GetFontWorld()
+{
+    return m_fonts[1];
+}
 
 #endif // _FFCC_P_MENU_H_

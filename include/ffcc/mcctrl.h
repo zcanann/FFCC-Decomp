@@ -21,10 +21,10 @@ public:
     int SaveDataBuffer(char*);
     void ChkParty(char*);
     int EraseDat();
-    void GetDno();
-    void GetSerial();
+    int GetDno();
+    u64 GetSerial();
     void SetDataBuff(char*);
-    void GetSlot();
+    int GetSlot();
     void SetDno(int);
     void SetSlot(int);
 
@@ -88,6 +88,48 @@ inline void McCtrl::Init()
     m_createFlag = 0;
     m_cardChannel = 0;
     m_saveIndex = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int McCtrl::GetDno()
+{
+    return m_cardChannel;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline u64 McCtrl::GetSerial()
+{
+    return m_serial;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int McCtrl::GetSlot()
+{
+    return m_saveIndex;
 }
 
 #endif // _FFCC_MCCTRL_H_

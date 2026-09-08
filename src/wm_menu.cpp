@@ -794,33 +794,10 @@ void CMenuPcs::loadData()
 	memset(m_wmWorldParams, 0, 0x10);
 
 	m_effectWork = new (MenuPcs.m_menuStage, srcFile, 0x252) EffectInfo[0x28];
-	{
-		for (int i = 0, count = 5; count != 0; count--, i += 0x2920) {
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 4) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 8) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x524) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x528) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x52C) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA48) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA4C) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA50) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF6C) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF70) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF74) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1490) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1494) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1498) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19B4) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19B8) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19BC) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1ED8) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1EDC) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1EE0) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x23FC) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x2400) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x2404) = -1;
-		}
+	for (int i = 0; i < 0x28; i++) {
+		m_effectWork[i].m_effectNo = -1;
+		m_effectWork[i].m_partNo = -1;
+		m_effectWork[i].m_slotNo = -1;
 	}
 
 	m_wmCharaAnimState =
@@ -831,33 +808,10 @@ void CMenuPcs::loadData()
 	memset(m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 
 	// Re-initialize the effect work entries.
-	{
-		for (int i = 0, count = 5; count != 0; count--, i += 0x2920) {
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 4) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 8) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x528) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x52C) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x524) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA4C) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA50) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA48) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF70) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF74) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF6C) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1494) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1498) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1490) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19B8) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19BC) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19B4) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1EDC) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1EE0) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1ED8) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x2400) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x2404) = -1;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x23FC) = -1;
-		}
+	for (int i = 0; i < 0x28; i++) {
+		m_effectWork[i].m_partNo = -1;
+		m_effectWork[i].m_slotNo = -1;
+		m_effectWork[i].m_effectNo = -1;
 	}
 
 	bytes[0x86E] = 0;
@@ -873,79 +827,76 @@ void CMenuPcs::loadData()
 	// Crystal cage effect (effect slot 7, effect no 9).
 	{
 		PPPCREATEPARAM titleParam;
-		unsigned char* const effectBase = reinterpret_cast<unsigned char*>(m_effectWork);
-		*reinterpret_cast<int*>(effectBase + 0x23FC) = 9;
-		CGObject* const titleObject = reinterpret_cast<CGObject*>(effectBase + 0x2408);
-		*reinterpret_cast<int*>(effectBase + 0x2404) = 7;
+		EffectInfo* const effect = &m_effectWork[7];
+		effect->m_effectNo = 9;
+		CGObject* const titleObject = &effect->m_object;
+		effect->m_slotNo = 7;
 		titleObject->Create();
 		titleObject->m_charaModelHandle =
-		    *reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x790);
+		    m_wm.m_handles[7];
 		titleParam.m_paramB = reinterpret_cast<unsigned int>(titleObject);
 		titleParam.m_lookTargetPtr = titleObject;
-		*reinterpret_cast<unsigned int*>(effectBase + 0x2400) =
+		effect->m_partNo =
 		    PartMng.pppCreate(0, 9, &titleParam, 1);
 	}
 
 	for (int i = 0; i < 4; i++) {
 		PPPCREATEPARAM param;
 		const int slot = i + 8;
-		unsigned int* effect =
-		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + slot * 0x524);
+		EffectInfo* effect = &m_effectWork[slot];
 		if (slot == 5 && i + 5 < 0x13) {
-			effect += 0x149;
+			effect++;
 		} else if (i + 8 >= 0x11 && i + 8 <= 0x14 && i + 5 > 0x19) {
-			effect += 0x149 * 4;
+			effect += 4;
 		}
-		const int group = static_cast<int>(effect[0] = i + 5) > 100;
-		CGObject* const object = reinterpret_cast<CGObject*>(effect + 3);
-		effect[2] = i + 8;
+		const int group = (effect->m_effectNo = i + 5) > 100;
+		CGObject* const object = &effect->m_object;
+		effect->m_slotNo = slot;
 		object->Create();
 		object->m_charaModelHandle = m_wm.m_handles[slot];
 		param.m_paramB = reinterpret_cast<unsigned int>(object);
 		param.m_lookTargetPtr = object;
-		effect[1] = PartMng.pppCreate(group, i + 5, &param, 1);
+		effect->m_partNo = PartMng.pppCreate(group, i + 5, &param, 1);
 	}
 
 	for (int i = 0; i < 5; i++) {
 		PPPCREATEPARAM param;
 		const int slot = i + 0xC;
-		unsigned int* effect =
-		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + slot * 0x524);
+		EffectInfo* effect = &m_effectWork[slot];
 		if (slot == 5 && i < 0x13) {
-			effect += 0x149;
+			effect++;
 		} else if (i + 0xC >= 0x11 && i + 0xC <= 0x14 && i > 0x19) {
-			effect += 0x149 * 4;
+			effect += 4;
 		}
-		const int group = static_cast<int>(effect[0] = i) > 100;
-		CGObject* const object = reinterpret_cast<CGObject*>(effect + 3);
-		effect[2] = i + 0xC;
+		const int group = (effect->m_effectNo = i) > 100;
+		CGObject* const object = &effect->m_object;
+		effect->m_slotNo = slot;
 		object->Create();
 		object->m_charaModelHandle = m_wm.m_handles[slot];
 		param.m_paramB = reinterpret_cast<unsigned int>(object);
 		param.m_lookTargetPtr = object;
-		effect[1] = PartMng.pppCreate(group, i, &param, 1);
+		effect->m_partNo = PartMng.pppCreate(group, i, &param, 1);
 	}
 
 	for (int i = 0; i < 4; i++) {
 		PPPCREATEPARAM param;
-		const int slot =  (int)(unsigned int)(i + 0x20);
-		unsigned int* effect =
-		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + slot * 0x524);
+		const int slot = i + 0x20;
+		EffectInfo* effect = &m_effectWork[slot];
 		if (slot == 5 && i + 0xA < 0x13) {
-			effect += 0x149;
+			effect++;
 		} else if (i + 0x20 >= 0x11 && i + 0x20 <= 0x14 && i + 0xA > 0x19) {
-			effect += 0x149 * 4;
+			effect += 4;
 		}
-		const int group = static_cast<int>(effect[0] = i + 0xA) > 100;
-		CGObject* const object = reinterpret_cast<CGObject*>(effect + 3);
-		effect[2] = i + 0x20;
+		const int group = (effect->m_effectNo = i + 0xA) > 100;
+		CGObject* const object = &effect->m_object;
+		effect->m_slotNo = slot;
 		object->Create();
 		object->m_charaModelHandle = m_wm.m_handles[slot];
 		param.m_paramB = reinterpret_cast<unsigned int>(object);
 		param.m_lookTargetPtr = object;
-		effect[1] = PartMng.pppCreate(group, i + 0xA, &param, 1);
+		effect->m_partNo = PartMng.pppCreate(group, i + 0xA, &param, 1);
 		if (i == 0) {
-			PartPcs.GetParLocIdx(effect[1], s_RingOrgPos);
+			PartPcs.GetParLocIdx(effect->m_partNo, s_RingOrgPos);
 		}
 	}
 

@@ -88,7 +88,7 @@ struct GbaQueueMapEntity
     unsigned short m_maxHp;
     short m_posX;
     short m_posZ;
-    unsigned short m_dropItemCodes[4];
+    short m_dropItemCodes[4];
 };
 
 class GbaQueue

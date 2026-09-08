@@ -10,6 +10,8 @@ struct CRomWork
     {
         DataHalfwordCount = (0x1D0 - 0x10) / sizeof(unsigned short),
         ElementResistanceOffset = 0x6F,
+        EnemyKindOffset = 0x7E,
+        EnemyFlagsOffset = 0x7F,
         ShoukiDamageIntervalOffset = 0x7A,
         MonsterParams0Offset = 0x4E,
         MonsterParams1Offset = 0x52,

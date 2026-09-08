@@ -1494,9 +1494,9 @@ void GbaQueue::LoadEnemyStat()
 			if (Game.m_monObjects[i] == 0) {
 				enemyEntry->m_baseDataIndex = 0;
 			} else {
-				const int enemyDataBase = Game.unkCFlatData0[1] +
-				    Game.m_monWorkRefs[i]->m_baseDataIndex * 0x1D0;
-				const unsigned int enemyKind = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10C);
+				const CRomWork* enemyData = &reinterpret_cast<const CRomWork*>(Game.unkCFlatData0[1])[
+				    Game.m_monWorkRefs[i]->m_baseDataIndex];
+				const unsigned int enemyKind = enemyData->m_data[CRomWork::EnemyKindOffset];
 
 				if (enemyKind == 10) {
 					enemyEntry->m_kind = 1;
@@ -4355,105 +4355,114 @@ void GbaQueue::ClrChgRadarMode(int channel)
  */
 int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 {
-	unsigned char localScouterInfo[0x200];
+	struct ScouterEntry
+	{
+		unsigned char m_baseDataIndex;
+		unsigned char m_traits[3];
+		unsigned short m_maxHp;
+		unsigned short m_dropItemCode;
+	};
+	STATIC_ASSERT(sizeof(ScouterEntry) == 8);
+	STATIC_ASSERT(offsetof(ScouterEntry, m_maxHp) == 4);
+	ScouterEntry localScouterInfo[64];
 	short work;
 
 	memset(localScouterInfo, 0xFF, sizeof(localScouterInfo));
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	{
-		unsigned char* scouterEntry = localScouterInfo;
-		unsigned char* enemyEntry = reinterpret_cast<unsigned char*>(this);
+		ScouterEntry* scouterEntry = localScouterInfo;
+		GbaQueueMapEntity* enemyEntry = m_enemies;
 
 		for (int i = 0; i < 0x40; i++) {
-			scouterEntry[0] = enemyEntry[0xB37];
-			if (scouterEntry[0] != 0) {
+			scouterEntry->m_baseDataIndex = enemyEntry->m_baseDataIndex;
+			if (scouterEntry->m_baseDataIndex != 0) {
 				CMonWork* enemyWork = Game.m_monWorkRefs[i];
-				const int enemyDataBase = Game.unkCFlatData0[1] + enemyEntry[0xB37] * 0x1D0;
+				const CRomWork* enemyData = &reinterpret_cast<const CRomWork*>(Game.unkCFlatData0[1])[enemyEntry->m_baseDataIndex];
 
 				work = enemyWork->m_maxHp;
-				*reinterpret_cast<unsigned short*>(scouterEntry + 4) = __lhbrx(reinterpret_cast<unsigned short*>(&work), 0);
+				scouterEntry->m_maxHp = __lhbrx(&work, 0);
 
-				if (*reinterpret_cast<short*>(enemyEntry + 0xB42) > 0) {
+				if (enemyEntry->m_dropItemCodes[1] > 0) {
 					work = -1;
-					*reinterpret_cast<unsigned short*>(scouterEntry + 6) = __lhbrx(reinterpret_cast<unsigned short*>(&work), 0);
+					scouterEntry->m_dropItemCode = __lhbrx(&work, 0);
 				} else {
-					const short scouterValue = *reinterpret_cast<short*>(enemyEntry + 0xB40);
+					const short scouterValue = enemyEntry->m_dropItemCodes[0];
 					if (scouterValue <= 0) {
-						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
+						scouterEntry->m_dropItemCode = 0;
 					} else if ((scouterValue & 0xC000) == 0x4000) {
-						*reinterpret_cast<unsigned short*>(scouterEntry + 6) = 0;
+						scouterEntry->m_dropItemCode = 0;
 					} else {
-						*reinterpret_cast<unsigned short*>(scouterEntry + 6) =
-							__lhbrx(reinterpret_cast<unsigned short*>(enemyEntry + 0xB40), 0);
+						scouterEntry->m_dropItemCode =
+							__lhbrx(&enemyEntry->m_dropItemCodes[0], 0);
 					}
 				}
 
-				const unsigned short enemyFlags = *reinterpret_cast<unsigned short*>(enemyDataBase + 0x10E);
+				const unsigned short enemyFlags = enemyData->m_data[CRomWork::EnemyFlagsOffset];
 				if ((enemyFlags & 5) == 5) {
-					scouterEntry[1] = 0;
+					scouterEntry->m_traits[0] = 0;
 				} else if ((enemyFlags & 4) != 0) {
-					scouterEntry[1] = 1;
+					scouterEntry->m_traits[0] = 1;
 				} else if ((enemyFlags & 1) != 0) {
-					scouterEntry[1] = 2;
+					scouterEntry->m_traits[0] = 2;
 				} else {
 					{
-						const unsigned short form0 = *reinterpret_cast<unsigned short*>(enemyDataBase + 0xF0);
-						if ((form0 == 0) && (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF2) == 0) &&
-						    (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF4) == 0)) {
-							scouterEntry[1] = 3;
-						} else if ((form0 == 3) && (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF2) == 3) &&
-						           (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF4) == 3)) {
-							if (*reinterpret_cast<unsigned short*>(enemyDataBase + 0xC) == 0x10) {
-								scouterEntry[1] = 0xE;
+						const unsigned short form0 = enemyData->ElementResistances()[1];
+						if ((form0 == 0) && (enemyData->ElementResistances()[2] == 0) &&
+						    (enemyData->ElementResistances()[3] == 0)) {
+							scouterEntry->m_traits[0] = 3;
+						} else if ((form0 == 3) && (enemyData->ElementResistances()[2] == 3) &&
+						           (enemyData->ElementResistances()[3] == 3)) {
+							if (enemyData->m_defense == 0x10) {
+								scouterEntry->m_traits[0] = 0xE;
 							} else {
-								scouterEntry[1] = 4;
+								scouterEntry->m_traits[0] = 4;
 							}
 						} else {
 							int statusCount = 0;
 
 							if (form0 == 0) {
-								scouterEntry[1] = 5;
+								scouterEntry->m_traits[0] = 5;
 								statusCount = 1;
 							}
-							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF0) == 3) && (statusCount < 3)) {
-								scouterEntry[statusCount + 1] = 6;
+							if ((enemyData->ElementResistances()[1] == 3) && (statusCount < 3)) {
+								scouterEntry->m_traits[statusCount] = 6;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF2) == 0) && (statusCount < 3)) {
-								scouterEntry[statusCount + 1] = 7;
+							if ((enemyData->ElementResistances()[2] == 0) && (statusCount < 3)) {
+								scouterEntry->m_traits[statusCount] = 7;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF2) == 3) && (statusCount < 3)) {
-								scouterEntry[statusCount + 1] = 8;
+							if ((enemyData->ElementResistances()[2] == 3) && (statusCount < 3)) {
+								scouterEntry->m_traits[statusCount] = 8;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF4) == 0) && (statusCount < 3)) {
-								scouterEntry[statusCount + 1] = 9;
+							if ((enemyData->ElementResistances()[3] == 0) && (statusCount < 3)) {
+								scouterEntry->m_traits[statusCount] = 9;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF4) == 3) && (statusCount < 3)) {
-								scouterEntry[statusCount + 1] = 10;
+							if ((enemyData->ElementResistances()[3] == 3) && (statusCount < 3)) {
+								scouterEntry->m_traits[statusCount] = 10;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF6) == 0) && (statusCount < 3)) {
-								scouterEntry[statusCount + 1] = 11;
+							if ((enemyData->ElementResistances()[4] == 0) && (statusCount < 3)) {
+								scouterEntry->m_traits[statusCount] = 11;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xF8) == 0) && (statusCount < 3)) {
-								scouterEntry[statusCount + 1] = 12;
+							if ((enemyData->ElementResistances()[5] == 0) && (statusCount < 3)) {
+								scouterEntry->m_traits[statusCount] = 12;
 								statusCount++;
 							}
-							if ((*reinterpret_cast<unsigned short*>(enemyDataBase + 0xFA) == 3) && (statusCount < 3)) {
-								scouterEntry[statusCount + 1] = 13;
+							if ((enemyData->ElementResistances()[6] == 3) && (statusCount < 3)) {
+								scouterEntry->m_traits[statusCount] = 13;
 							}
 						}
 					}
 				}
 			}
 
-			enemyEntry += 0x14;
-			scouterEntry += 8;
+			enemyEntry++;
+			scouterEntry++;
 		}
 	}
 	OSSignalSemaphore(accessSemaphores + channel);

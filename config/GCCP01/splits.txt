@@ -1647,7 +1647,7 @@ bonus_menu.cpp:
 	.data       start:0x80212820 end:0x802129B0
 	.sdata      start:0x8032EA68 end:0x8032EA78
 	.sbss       start:0x8032EEA8 end:0x8032EEB8
-	.sdata2     start:0x80331DE0 end:0x80331FC0
+	.sdata2     start:0x80331DE0 end:0x80331FC8
 
 pppScreenBlur.cpp:
 	extab       start:0x80009AC4 end:0x80009ADC
@@ -1658,6 +1658,7 @@ pppScreenQuake.cpp:
 	extab       start:0x80009ADC end:0x80009AEC
 	extabindex  start:0x80010D14 end:0x80010D2C
 	.text       start:0x8013E3BC end:0x8013E584
+	.sdata2     start:0x80331FC8 end:0x80331FD0
 
 pppCharaZEnvCtrl.cpp:
 	extab       start:0x80009AEC end:0x80009B0C
@@ -1669,7 +1670,7 @@ pppCrystal2.cpp:
 	extabindex  start:0x80010D5C end:0x80010D80
 	.text       start:0x8013E694 end:0x8013EF94
 	.rodata     start:0x801DD608 end:0x801DD660
-	.sdata2     start:0x80331FC0 end:0x80332020
+	.sdata2     start:0x80331FD0 end:0x80332020
 
 pppChangeTex.cpp:
 	extab       start:0x80009B24 end:0x80009B4C

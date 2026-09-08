@@ -49,6 +49,20 @@ public:
         unsigned short button;
 	};
 
+    struct ReplayFrame
+    {
+        PADStatus pad[4];
+        Gba gba[4];
+    };
+
+    struct ReplayBuffer
+    {
+        u32 cursor;
+        s32 recordMode;
+        s32 frameCount;
+        ReplayFrame frames[0x1A5E0];
+    };
+
     struct PadInputRawView
     {
         short _4_2_;
@@ -123,10 +137,10 @@ public:
     };
     unsigned int _1a8_4_;
     void* _1ac_4_;
-    unsigned char* _1b0_4_;
+    ReplayBuffer* m_replayBuffer;
     int _1b4_4_;
     int _1b8_4_;
-    int _1bc_4_;
+    int m_replayFrame;
     union {
         unsigned int _1c0_4_;
         int _448_4_;

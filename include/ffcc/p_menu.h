@@ -619,7 +619,7 @@ public:
     int UniteCloseAnim(int);
     unsigned int CmdOpen1();
     unsigned int CmdClose1();
-    void CmdOpen2();
+    unsigned int CmdOpen2();
     unsigned int CmdClose2();
     void GetFontItem();
     char* GetAttrStr(int);

@@ -495,7 +495,7 @@ static inline bool AnimNodeUsesScale(CChara::CAnimNode* node)
 
 static inline u8 ModelAttachMode(CChara::CModel* model)
 {
-	return *(reinterpret_cast<u8*>(model) + 0xA1);
+	return model->m_attachMode;
 }
 
 static void CalcOneBindNode(CChara::CNode* node, CChara::CModel* model)
@@ -1908,7 +1908,7 @@ inline void CChara::CModel::calcSkin()
  */
 void CChara::CModel::SetMatrix(float (*mtx) [4])
 {
-	PSMTXCopy(mtx, (float(*)[4])((u8*)this + 0x8));
+	PSMTXCopy(mtx, m_matrix);
 }
 
 /*
@@ -1968,16 +1968,7 @@ int CChara::CModel::SearchNodeSk(char* name)
 			}
 		}
 	} else {
-		CNode* node = ModelNodes(this);
-		u32 i = 0;
-		for (; i < ModelNodeCount(this); i++, node++) {
-			if (strcmp(NodeRefName(node), name) == 0) {
-				goto foundPlain;
-			}
-		}
-		i = (u32)-1;
-foundPlain:
-		return (int)i;
+		return SearchNode(name);
 	}
 
 	return -1;

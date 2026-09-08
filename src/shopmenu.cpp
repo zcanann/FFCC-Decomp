@@ -394,61 +394,6 @@ static inline float& ShopMenuFloat(CShopMenu* shopMenu, int offset)
     return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(shopMenu) + offset);
 }
 
-static inline unsigned short GetPadButtons()
-{
-    bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    unsigned short buttons;
-    if (hasInput) {
-        buttons = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        buttons = Pad.GetPadInputs()[padIndex].buttonDown[0];
-    }
-    return buttons;
-}
-
-static inline unsigned short GetShopMenuListButtons(unsigned short mask)
-{
-    unsigned short buttons;
-    unsigned short latch = gShopMenuInputLatch;
-    if (latch == 0) {
-        bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-        if (hasInput) {
-            buttons = 0;
-        } else {
-            int padIndex = 0;
-            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-            buttons = Pad.GetPadInputs()[padIndex].repeatButton & mask;
-        }
-        return buttons;
-    }
-
-    int lock = Pad.m_debugPadLock;
-    bool hasInput = (lock != 0) || (Pad.m_debugPadPort != -1);
-    if (hasInput) {
-        buttons = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        buttons = Pad.GetPadInputs()[padIndex].button[0];
-    }
-
-    if ((latch & buttons) == 0) {
-        gShopMenuInputLatch = 0;
-    }
-
-    hasInput = (lock != 0) || (Pad.m_debugPadPort != -1);
-    if (hasInput) {
-        buttons = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        buttons = Pad.GetPadInputs()[padIndex].buttonDown[0] & mask;
-    }
-    return buttons;
-}
-
 static inline CCaravanWork* ShopMenuCaravanWork(CShopMenu* shopMenu)
 {
     return shopMenu->m_caravanWork;
@@ -713,54 +658,40 @@ inline void _drawShadowFont(CFont* font, char* text, float x, float y, int tlut,
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 384b
+ * EN Address: 0x80173D70
+ * EN Size: 160b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-inline unsigned short getButtonRepeat(int, unsigned short noRepeatMask)
+inline unsigned short getButtonRepeat(int padIndex, unsigned short noRepeatMask)
 {
     unsigned short buttons;
 
     if (gShopMenuInputLatch == 0) {
-        bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-        if (hasInput) {
-            buttons = 0;
-        } else {
-            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-            buttons = Pad.GetPadInputs()[0].repeatButton;
-        }
+        buttons = Pad.GetButtonRepeat(padIndex);
     } else {
-        bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-        if (hasInput) {
-            buttons = 0;
-        } else {
-            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-            buttons = Pad.GetPadInputs()[0].button[0];
-        }
-
-        if ((buttons & gShopMenuInputLatch) == 0) {
+        if ((Pad.GetButton(padIndex) & gShopMenuInputLatch) == 0) {
             gShopMenuInputLatch = 0;
         }
-
-        hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-        if (hasInput) {
-            buttons = 0;
-        } else {
-            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-            buttons = Pad.GetPadInputs()[0].buttonDown[0];
-        }
+        buttons = Pad.GetButtonDown(padIndex);
     }
 
     if ((buttons & noRepeatMask) != 0) {
         gShopMenuInputLatch = noRepeatMask;
     }
-
     return buttons;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: 0x80173E10
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void bButtonNoRepeat(unsigned short button)
 {
@@ -2454,7 +2385,7 @@ void CShopMenu::SelectMake()
         m_yesNo = 1;
     }
 
-    if ((GetPadButtons() & 0xC) != 0) {
+    if ((Pad.GetButtonDown(0) & 0xC) != 0) {
         m_yesNo ^= 1;
         if (canSelect == 1) {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -2462,7 +2393,7 @@ void CShopMenu::SelectMake()
             m_yesNo = 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         }
-    } else if ((GetPadButtons() & 0x100) != 0) {
+    } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
         int yesNo = m_yesNo;
         if (yesNo != 1) {
             if (yesNo > 0) {
@@ -2497,13 +2428,13 @@ void CShopMenu::SelectMake()
  */
 void CShopMenu::SelectYesNo()
 {
-    if ((GetPadButtons() & 0xC) != 0) {
+    if ((Pad.GetButtonDown(0) & 0xC) != 0) {
         m_yesNo ^= 1;
         Sound.PlaySe(1, 0x40, 0x7F, 0);
         return;
     }
 
-    if ((GetPadButtons() & 0x100) == 0) {
+    if ((Pad.GetButtonDown(0) & 0x100) == 0) {
         return;
     }
 
@@ -2678,7 +2609,7 @@ yesBlock:
  */
 void CShopMenu::SelectFigure()
 {
-    if ((GetPadButtons() & 1) != 0) {
+    if ((Pad.GetButtonDown(0) & 1) != 0) {
         ++m_figureMode;
         if (m_figureMode > 1) {
             m_figureMode = 1;
@@ -2686,7 +2617,7 @@ void CShopMenu::SelectFigure()
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if ((GetPadButtons() & 2) != 0) {
+    } else if ((Pad.GetButtonDown(0) & 2) != 0) {
         --m_figureMode;
         if (m_figureMode < 0) {
             m_figureMode = 0;
@@ -2694,12 +2625,12 @@ void CShopMenu::SelectFigure()
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if ((GetPadButtons() & 0x100) != 0) {
+    } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
         Sound.PlaySe(2, 0x40, 0x7F, 0);
         m_subMode = 2;
     }
 
-    if (GetShopMenuListButtons(8) != 0) {
+    if ((getButtonRepeat(0, 0) & 8) != 0) {
         switch (m_figureMode) {
         case 0: {
             ++m_quantity;
@@ -2709,7 +2640,7 @@ void CShopMenu::SelectFigure()
                 }
             }
 
-            gShopMenuInputLatch = 8;
+            bButtonNoRepeat(8);
             --m_quantity;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
             break;
@@ -2736,7 +2667,7 @@ void CShopMenu::SelectFigure()
         return;
     }
 
-    if (GetShopMenuListButtons(4) == 0) {
+    if ((getButtonRepeat(0, 0) & 4) == 0) {
         return;
     }
 
@@ -2744,7 +2675,7 @@ void CShopMenu::SelectFigure()
     case 0:
         --m_quantity;
         if (m_quantity < 1) {
-            gShopMenuInputLatch = 4;
+            bButtonNoRepeat(4);
             m_quantity = 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else {
@@ -2779,25 +2710,25 @@ void CShopMenu::SelectItemIdx()
         m_selectedIndex = getItemCnt() - 1;
     }
 
-    if (GetShopMenuListButtons(8) != 0) {
+    if ((getButtonRepeat(0, 0) & 8) != 0) {
         --m_selectedIndex;
         if (m_selectedIndex < 0) {
-            gShopMenuInputLatch = 8;
+            bButtonNoRepeat(8);
             m_selectedIndex = 0;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if (GetShopMenuListButtons(4) != 0) {
+    } else if ((getButtonRepeat(0, 0) & 4) != 0) {
         ++m_selectedIndex;
         if (m_selectedIndex >= getItemCnt()) {
-            gShopMenuInputLatch = 4;
+            bButtonNoRepeat(4);
             m_selectedIndex = getItemCnt() - 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if ((GetPadButtons() & 0x100) != 0) {
+    } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
         int canSelect;
         m_figureMode = 0;
         m_yesNo = 0;
@@ -2874,10 +2805,10 @@ updateWindow:
  */
 inline void CShopMenu::SelectSOUBI()
 {
-    if ((GetPadButtons() & 0xC) != 0) {
+    if ((Pad.GetButtonDown(0) & 0xC) != 0) {
         m_yesNo ^= 1;
         Sound.PlaySe(1, 0x40, 0x7F, 0);
-    } else if ((GetPadButtons() & 0x100) != 0) {
+    } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
         m_nextMode = 9;
         SetMode(0x11);
 
@@ -2894,7 +2825,7 @@ inline void CShopMenu::SelectSOUBI()
         }
     }
 
-    if ((GetPadButtons() & 0x200) != 0) {
+    if ((Pad.GetButtonDown(0) & 0x200) != 0) {
         m_nextMode = 9;
         Sound.PlaySe(3, 0x40, 0x7F, 0);
         SetMode(0x11);
@@ -2927,24 +2858,24 @@ void CShopMenu::Calc()
         }
         break;
     case 1:
-        if ((GetPadButtons() & 4) != 0) {
+        if ((Pad.GetButtonDown(0) & 4) != 0) {
             ++choice;
             if (choice >= 3) {
                 choice = 0;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
-        } else if ((GetPadButtons() & 8) != 0) {
+        } else if ((Pad.GetButtonDown(0) & 8) != 0) {
             --choice;
             if (choice >= 3) {
                 choice = 2;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
-        } else if ((GetPadButtons() & 0x100) != 0) {
+        } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
             Sound.PlaySe(2, 0x40, 0x7F, 0);
             this->SetMode(2);
         }
 
-        if ((GetPadButtons() & 0x200) != 0) {
+        if ((Pad.GetButtonDown(0) & 0x200) != 0) {
             Sound.PlaySe(3, 0x40, 0x7F, 0);
             this->SetMode(2);
             choice = 2;
@@ -2983,21 +2914,21 @@ void CShopMenu::Calc()
         switch (subMode) {
         case 0:
             this->SelectItemIdx();
-            if ((GetPadButtons() & 0x200) != 0) {
+            if ((Pad.GetButtonDown(0) & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 this->SetMode(5);
             }
             break;
         case 1:
             this->SelectFigure();
-            if ((GetPadButtons() & 0x200) != 0) {
+            if ((Pad.GetButtonDown(0) & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 0;
             }
             break;
         case 2:
             this->SelectYesNo();
-            if ((GetPadButtons() & 0x200) != 0) {
+            if ((Pad.GetButtonDown(0) & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 1;
             }
@@ -3024,7 +2955,7 @@ void CShopMenu::Calc()
         switch (subMode) {
         case 0:
             this->SelectItemIdx();
-            if ((GetPadButtons() & 0x200) != 0) {
+            if ((Pad.GetButtonDown(0) & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 this->SetMode(8);
             }
@@ -3033,7 +2964,7 @@ void CShopMenu::Calc()
             break;
         case 2:
             this->SelectYesNo();
-            if ((GetPadButtons() & 0x200) != 0) {
+            if ((Pad.GetButtonDown(0) & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 0;
             }
@@ -3051,7 +2982,7 @@ void CShopMenu::Calc()
         break;
     case 10:
         this->SelectItemIdx();
-        if ((GetPadButtons() & 0x200) != 0) {
+        if ((Pad.GetButtonDown(0) & 0x200) != 0) {
             m_nextMode = -1;
             Sound.PlaySe(3, 0x40, 0x7F, 0);
             this->SetMode(0xB);
@@ -3082,7 +3013,7 @@ void CShopMenu::Calc()
         break;
     case 13:
         this->SelectMake();
-        if ((GetPadButtons() & 0x200) != 0) {
+        if ((Pad.GetButtonDown(0) & 0x200) != 0) {
             m_nextMode = 9;
             Sound.PlaySe(3, 0x40, 0x7F, 0);
             this->SetMode(0xE);

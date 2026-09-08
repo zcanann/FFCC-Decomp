@@ -69,9 +69,19 @@ public:
     unsigned char m_pad_13[0x18 - 0x13];
     u32 m_random;
     u32 m_crc;
-    unsigned char m_unknown0020[0xC0 - 0x20];
+    u32 m_scriptSysVal0;                           // 0x20
+    int m_timerA;                                 // 0x24
+    int m_scriptGlobalTime;                        // 0x28
+    int m_frameCounter;                            // 0x2C
+    int m_partySlots[4];                           // 0x30
+    int m_bossArtifactStageTable[15];               // 0x40
+    int m_unkStageTable[15];                        // 0x7C
+    int m_chaliceElement;                          // 0xB8
+    unsigned char m_unknown00BC[4];
     unsigned char m_linkTable[8][8][8][8];           // 0xC0
-    unsigned char m_unknown10C0[0x13D0 - 0x10C0];
+    char m_townName[16];                           // 0x10C0
+    signed char m_eventFlags[256];                  // 0x10D0
+    short m_eventWork[256];                        // 0x11D0
     u64 m_mcSerial;                                // 0x13D0
     u32 m_mcRandom;                                // 0x13D8
     unsigned char m_mcHasSerial;                    // 0x13DC
@@ -82,7 +92,10 @@ public:
     signed char m_spModeFlags[4];                 // 0x13E1
     unsigned char m_unknown13E5[0x14D0 - 0x13E5];
     CharaDat m_characters[8];                       // 0x14D0
-    unsigned char m_unknown62D0[0x8BD0 - 0x62D0];
+    char m_scriptData[0x800];                      // 0x62D0
+    unsigned short m_furTexels[0x1000];             // 0x6AD0
+    u64 m_saveTime;                                // 0x8AD0
+    unsigned char m_unknown8AD8[0x8BD0 - 0x8AD8];
 };
 }
 

@@ -464,7 +464,7 @@ void CGame::Create()
     memset(&m_gameWork.m_gameDataStartMarker, 0, kGameWorkDataClearSize);
     memset(m_gameWork.m_wmBackupParams, 0xFF, sizeof(m_gameWork.m_wmBackupParams));
 
-    *reinterpret_cast<u32*>(&m_gameWork.m_scriptSysVal0) = 1;
+    m_gameWork.m_scriptSysVal0 = 1;
     m_gameWork.m_chaliceElement = 1;
     strcpy(m_gameWork.m_townName, m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
 
@@ -528,7 +528,7 @@ void CGame::InitNewGame()
     memset(&work->m_gameDataStartMarker, 0, kGameWorkDataClearSize);
     memset(work->m_wmBackupParams, 0xFF, sizeof(work->m_wmBackupParams));
 
-    *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
+    game->m_gameWork.m_scriptSysVal0 = 1;
     game->m_gameWork.m_chaliceElement = 1;
     strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
     CFlatRuntime2Storage().ResetNewGame();
@@ -712,7 +712,7 @@ void CGame::CheckScriptChange()
         memset(&work->m_gameDataStartMarker, 0, kGameWorkDataClearSize);
         memset(work->m_wmBackupParams, 0xFF, sizeof(work->m_wmBackupParams));
 
-        *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
+        game->m_gameWork.m_scriptSysVal0 = 1;
         game->m_gameWork.m_chaliceElement = 1;
         strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
         CFlatRuntime2Storage().ResetNewGame();
@@ -1556,7 +1556,7 @@ inline void CGame::CGameWork::Init()
     memset(&m_gameDataStartMarker, 0, kGameWorkDataClearSize);
     memset(m_wmBackupParams, 0xFF, sizeof(m_wmBackupParams));
 
-    *reinterpret_cast<unsigned int*>(&m_scriptSysVal0) = 1;
+    m_scriptSysVal0 = 1;
     m_chaliceElement = 1;
     strcpy(m_townName, m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
     m_gameInitFlag = 1;
@@ -1607,7 +1607,7 @@ inline void CGame::CGameWork::InitNewGame()
  */
 inline void CGame::CGameWork::ClearScriptChange()
 {
-    *reinterpret_cast<unsigned int*>(&m_scriptSysVal0) = 1;
+    m_scriptSysVal0 = 1;
 }
 
 /*
@@ -1740,7 +1740,7 @@ inline CGame::CGameWork::CGameWork()
     memset(&m_gameDataStartMarker, 0, kGameWorkDataClearSize);
     memset(m_wmBackupParams, 0xFF, sizeof(m_wmBackupParams));
 
-    *reinterpret_cast<unsigned int*>(&m_scriptSysVal0) = 1;
+    m_scriptSysVal0 = 1;
     m_chaliceElement = 1;
     strcpy(m_townName, m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
     m_gameInitFlag = 1;

@@ -159,12 +159,12 @@ static inline const unsigned int* GetGameWorkLinkTableWords(const CGame::CGameWo
 
 static inline unsigned int* GetGameWorkScriptSysVals(CGame::CGameWork& gameWork)
 {
-    return reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0);
+    return &gameWork.m_scriptSysVal0;
 }
 
 static inline const unsigned int* GetGameWorkScriptSysVals(const CGame::CGameWork& gameWork)
 {
-    return reinterpret_cast<const unsigned int*>(&gameWork.m_scriptSysVal0);
+    return &gameWork.m_scriptSysVal0;
 }
 
 static inline unsigned int& FlatLastResult(CFlatRuntime2* self)
@@ -3895,7 +3895,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
     } else {
         switch (systemValue) {
         case -0x40:
-            FlatLastResult(this) = *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0);
+            FlatLastResult(this) = gameWork.m_scriptSysVal0;
             break;
         case -0x41:
             FlatLastResult(this) = gameWork.m_timerA;
@@ -4087,18 +4087,16 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
         } else {
             switch (systemValue) {
             case -0x40:
-                stack[-1].m_word = *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0);
+                stack[-1].m_word = gameWork->m_scriptSysVal0;
                 switch (setMode) {
                 case -1:
-                    *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) =
-                        *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) - stack->m_word;
+                    gameWork->m_scriptSysVal0 = gameWork->m_scriptSysVal0 - stack->m_word;
                     break;
                 case 0:
-                    *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) = stack->m_word;
+                    gameWork->m_scriptSysVal0 = stack->m_word;
                     break;
                 case 1:
-                    *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) =
-                        *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) + stack->m_word;
+                    gameWork->m_scriptSysVal0 = gameWork->m_scriptSysVal0 + stack->m_word;
                     break;
                 }
                 break;

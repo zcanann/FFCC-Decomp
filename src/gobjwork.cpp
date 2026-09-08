@@ -1268,7 +1268,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 	PassedLinkValueConditions:
 
 		int cmpValue = 0;
-		int sysVal0 = *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0);
+		int sysVal0 = static_cast<int>(Game.m_gameWork.m_scriptSysVal0);
 		int sysVal1 = Game.m_gameWork.m_timerA;
 		int sysVal2 = Game.m_gameWork.m_scriptGlobalTime;
 		int sysVal3 = Game.m_gameWork.m_frameCounter;
@@ -2630,7 +2630,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier((int)(scaledMemberCount * 2 + 0x5E)));
 	}
 
-	if ((*reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) == 1) &&
+	if ((static_cast<int>(Game.m_gameWork.m_scriptSysVal0) == 1) &&
 		(Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
 		m_maxHp = (unsigned short)((float)m_maxHp *
 								   ((((float)Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entries[8].m_values[0]) * 0.01f) + 0.0000001f));

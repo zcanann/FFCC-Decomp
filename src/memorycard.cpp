@@ -115,6 +115,22 @@ STATIC_ASSERT(offsetof(Mc::SaveDat, m_region) == 0x10);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_rotateKey) == 0x11);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_random) == 0x18);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_crc) == 0x1C);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_scriptSysVal0) == 0x20);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_timerA) == 0x24);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_scriptGlobalTime) == 0x28);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_frameCounter) == 0x2C);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_partySlots) == 0x30);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_bossArtifactStageTable) == 0x40);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_unkStageTable) == 0x7C);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_chaliceElement) == 0xB8);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_townName) == 0x10C0);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_eventFlags) == 0x10D0);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_eventWork) == 0x11D0);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_scriptData) == 0x62D0);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_furTexels) == 0x6AD0);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_saveTime) == 0x8AD0);
+STATIC_ASSERT(offsetof(CGame::CGameWork, m_scriptSysVal0) == 0x08);
+STATIC_ASSERT(sizeof(((CGame::CGameWork*)0)->m_scriptSysVal0) == 4);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_linkTable) == 0xC0);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_mcSerial) == 0x13D0);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_mcRandom) == 0x13D8);
@@ -1013,11 +1029,10 @@ void CMemoryCardMan::MakeSaveData()
         memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
     }
 
-    u8* save = reinterpret_cast<u8*>(m_saveBuffer);
-    Mc::SaveDat* saveDat = GetSaveDat(save);
+    Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);
 
     const u64 now = OSGetTime();
-    memcpy(save + 0x8AD0, &now, sizeof(now));
+    memcpy(&saveDat->m_saveTime, &now, sizeof(now));
 
     memcpy(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER));
     memcpy(saveDat->m_title, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE));
@@ -1042,19 +1057,19 @@ void CMemoryCardMan::MakeSaveData()
         }
     }
 
-    *reinterpret_cast<u32*>(save + 0x20) = *reinterpret_cast<u32*>(&Game.m_gameWork.m_scriptSysVal0);
-    *reinterpret_cast<int*>(save + 0x24) = Game.m_gameWork.m_timerA;
-    *reinterpret_cast<int*>(save + 0x28) = Game.m_gameWork.m_scriptGlobalTime;
-    *reinterpret_cast<int*>(save + 0x2C) = Game.m_gameWork.m_frameCounter;
-    memcpy(save + 0x30, Game.m_gameWork.m_wmBackupParams, 0x10);
-    memcpy(save + 0x40, Game.m_gameWork.m_bossArtifactStageTable, 0x3C);
-    memcpy(save + 0x7C, Game.m_gameWork.m_unkStageTable, 0x3C);
-    *reinterpret_cast<int*>(save + 0xB8) = Game.m_gameWork.m_chaliceElement;
+    saveDat->m_scriptSysVal0 = Game.m_gameWork.m_scriptSysVal0;
+    saveDat->m_timerA = Game.m_gameWork.m_timerA;
+    saveDat->m_scriptGlobalTime = Game.m_gameWork.m_scriptGlobalTime;
+    saveDat->m_frameCounter = Game.m_gameWork.m_frameCounter;
+    memcpy(saveDat->m_partySlots, Game.m_gameWork.m_wmBackupParams, sizeof(saveDat->m_partySlots));
+    memcpy(saveDat->m_bossArtifactStageTable, Game.m_gameWork.m_bossArtifactStageTable, sizeof(saveDat->m_bossArtifactStageTable));
+    memcpy(saveDat->m_unkStageTable, Game.m_gameWork.m_unkStageTable, sizeof(saveDat->m_unkStageTable));
+    saveDat->m_chaliceElement = Game.m_gameWork.m_chaliceElement;
     memcpy(saveDat->m_linkTable, Game.m_gameWork.m_linkTable, sizeof(saveDat->m_linkTable));
-    memcpy(save + 0x10C0, Game.m_gameWork.m_townName, 0x10);
-    memcpy(save + 0x10D0, Game.m_gameWork.m_eventFlags, 0x100);
-    memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
-    memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
+    memcpy(saveDat->m_townName, Game.m_gameWork.m_townName, sizeof(saveDat->m_townName));
+    memcpy(saveDat->m_eventFlags, Game.m_gameWork.m_eventFlags, sizeof(saveDat->m_eventFlags));
+    memcpy(saveDat->m_eventWork, Game.m_gameWork.m_eventWork, sizeof(saveDat->m_eventWork));
+    memcpy(saveDat->m_eventWork, Game.m_gameWork.m_eventWork, sizeof(saveDat->m_eventWork));
     saveDat->m_mcSerial = Game.m_gameWork.m_mcSerial;
     saveDat->m_mcRandom = Game.m_gameWork.m_mcRandom;
     saveDat->m_mcHasSerial = Game.m_gameWork.m_mcHasSerial;
@@ -1168,8 +1183,8 @@ void CMemoryCardMan::MakeSaveData()
         savedCharacter.m_baseDataIndex = caravanWork->m_baseDataIndex;
     }
 
-    Game.SaveScript(reinterpret_cast<char*>(save + 0x62D0));
-    GetCharaGlobal()->SaveFurTexBuffer(reinterpret_cast<unsigned short*>(save + 0x6AD0));
+    Game.SaveScript(saveDat->m_scriptData);
+    GetCharaGlobal()->SaveFurTexBuffer(saveDat->m_furTexels);
     saveDat->m_crc = CalcCrc(0);
     EncodeData();
 }
@@ -1185,8 +1200,7 @@ void CMemoryCardMan::MakeSaveData()
  */
 void CMemoryCardMan::SetLoadData()
 {
-    u8* save = reinterpret_cast<u8*>(m_saveBuffer);
-    Mc::SaveDat* saveDat = GetSaveDat(save);
+    Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);
 
     if (memcmp(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
     {
@@ -1229,18 +1243,18 @@ void CMemoryCardMan::SetLoadData()
         return;
     }
 
-    *reinterpret_cast<u32*>(&Game.m_gameWork.m_scriptSysVal0) = *reinterpret_cast<u32*>(save + 0x20);
-    Game.m_gameWork.m_timerA = *reinterpret_cast<int*>(save + 0x24);
-    Game.m_gameWork.m_scriptGlobalTime = *reinterpret_cast<int*>(save + 0x28);
-    Game.m_gameWork.m_frameCounter = *reinterpret_cast<int*>(save + 0x2C);
-    memcpy(Game.m_gameWork.m_wmBackupParams, save + 0x30, 0x10);
-    memcpy(Game.m_gameWork.m_bossArtifactStageTable, save + 0x40, 0x3C);
-    memcpy(Game.m_gameWork.m_unkStageTable, save + 0x7C, 0x3C);
-    Game.m_gameWork.m_chaliceElement = *reinterpret_cast<int*>(save + 0xB8);
+    Game.m_gameWork.m_scriptSysVal0 = saveDat->m_scriptSysVal0;
+    Game.m_gameWork.m_timerA = saveDat->m_timerA;
+    Game.m_gameWork.m_scriptGlobalTime = saveDat->m_scriptGlobalTime;
+    Game.m_gameWork.m_frameCounter = saveDat->m_frameCounter;
+    memcpy(Game.m_gameWork.m_wmBackupParams, saveDat->m_partySlots, sizeof(saveDat->m_partySlots));
+    memcpy(Game.m_gameWork.m_bossArtifactStageTable, saveDat->m_bossArtifactStageTable, sizeof(saveDat->m_bossArtifactStageTable));
+    memcpy(Game.m_gameWork.m_unkStageTable, saveDat->m_unkStageTable, sizeof(saveDat->m_unkStageTable));
+    Game.m_gameWork.m_chaliceElement = saveDat->m_chaliceElement;
     memcpy(Game.m_gameWork.m_linkTable, saveDat->m_linkTable, sizeof(saveDat->m_linkTable));
-    memcpy(Game.m_gameWork.m_townName, save + 0x10C0, 0x10);
-    memcpy(Game.m_gameWork.m_eventFlags, save + 0x10D0, 0x100);
-    memcpy(Game.m_gameWork.m_eventWork, save + 0x11D0, 0x200);
+    memcpy(Game.m_gameWork.m_townName, saveDat->m_townName, sizeof(saveDat->m_townName));
+    memcpy(Game.m_gameWork.m_eventFlags, saveDat->m_eventFlags, sizeof(saveDat->m_eventFlags));
+    memcpy(Game.m_gameWork.m_eventWork, saveDat->m_eventWork, sizeof(saveDat->m_eventWork));
     Game.m_gameWork.m_mcSerial = saveDat->m_mcSerial;
     Game.m_gameWork.m_mcRandom = saveDat->m_mcRandom;
     Game.m_gameWork.m_mcHasSerial = saveDat->m_mcHasSerial;
@@ -1379,8 +1393,8 @@ void CMemoryCardMan::SetLoadData()
         }
     }
 
-    Game.LoadScript(reinterpret_cast<char*>(save + 0x62D0));
-    GetCharaGlobal()->LoadFurTexBuffer(reinterpret_cast<unsigned short*>(save + 0x6AD0));
+    Game.LoadScript(saveDat->m_scriptData);
+    GetCharaGlobal()->LoadFurTexBuffer(saveDat->m_furTexels);
 
 }
 

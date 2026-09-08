@@ -531,7 +531,7 @@ void CMenuPcs::WmInit()
 	gWmMenuCursorY[1] = 0xFF;
 	gWmMenuWorkB = -1;
 	gWmMenuWorkA = -1;
-	int scriptValue = *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0);
+	int scriptValue = static_cast<int>(Game.m_gameWork.m_scriptSysVal0);
 	gWmMenuScriptValueCache = scriptValue;
 	if (scriptValue > 99) {
 		gWmMenuScriptValueCache = 100;
@@ -2702,7 +2702,7 @@ void CMenuPcs::CalcLoadMenu()
 					for (int i = iVar23; i < 4; i++) {
 						const McListInfo& entry = reinterpret_cast<McListInfo*>(m_wmCharaState)[i];
 						if (entry.m_isBroken == 0
-						    && static_cast<int>(entry.m_playTime) > 0) {
+						    && static_cast<int>(entry.m_scriptSysVal0) > 0) {
 							iVar23++;
 						}
 					}
@@ -2724,7 +2724,7 @@ void CMenuPcs::CalcLoadMenu()
 				for (; iVar23 < 4; iVar23++) {
 					const McListInfo& entry = reinterpret_cast<McListInfo*>(m_wmCharaState)[iVar23];
 					if (entry.m_isBroken == 0
-					    && static_cast<int>(entry.m_playTime) > 0) {
+					    && static_cast<int>(entry.m_scriptSysVal0) > 0) {
 						if (bestIdx < 0) {
 							bestIdx = iVar23;
 						} else if (saveTimes[bestIdx].year <= currentTime->year
@@ -6488,8 +6488,8 @@ void CMenuPcs::DrawWMFrame()
 			unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 			int dispValue =
 			    bytes[0xA] & 2
-			        ? *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) + static_cast<signed char>(bytes[0xB])
-			        : *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) + static_cast<signed char>(bytes[0xC]);
+			        ? static_cast<int>(Game.m_gameWork.m_scriptSysVal0) + static_cast<signed char>(bytes[0xB])
+			        : static_cast<int>(Game.m_gameWork.m_scriptSysVal0) + static_cast<signed char>(bytes[0xC]);
 			int digitCnt;
 			digitCnt = (dispValue > 9) + 1;
 			if (dispValue > 99) {
@@ -11105,48 +11105,47 @@ int McCtrl::LoadMcList()
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::SetListDat(int slot, int clearPlayTime)
+void McCtrl::SetListDat(int slot, int clearScriptSysVal0)
 {
 	McListInfo entry;
-	unsigned char* const save = reinterpret_cast<unsigned char*>(MemoryCardMan.m_saveBuffer);
+	Mc::SaveDat* const save = reinterpret_cast<Mc::SaveDat*>(MemoryCardMan.m_saveBuffer);
 	memset(&entry, 0, sizeof(entry));
 
-	if (*reinterpret_cast<signed char*>(save + 0x10C0) != 0) {
-		const int formatMatch = memcmp(save + 0x0C, DAT_8032E8A8, 4);
+	if (save->m_townName[0] != 0) {
+		const int formatMatch = memcmp(save->m_version, DAT_8032E8A8, 4);
 		const unsigned char crcOk = MemoryCardMan.ChkCrc(0);
 		if (crcOk == 1 && formatMatch == 0) {
-			if (clearPlayTime == 0) {
-				entry.m_playTime = *reinterpret_cast<unsigned int*>(save + 0x20);
+			if (clearScriptSysVal0 == 0) {
+				entry.m_scriptSysVal0 = save->m_scriptSysVal0;
 			} else {
-				entry.m_playTime = 0;
+				entry.m_scriptSysVal0 = 0;
 			}
-			memcpy(&entry.m_saveTime, save + 0x8AD0, sizeof(entry.m_saveTime));
-			entry.m_timerA = *reinterpret_cast<unsigned int*>(save + 0x24);
-			entry.m_scriptGlobalTime = *reinterpret_cast<unsigned int*>(save + 0x28);
-			entry.m_frameCounter = *reinterpret_cast<unsigned int*>(save + 0x2C);
-
-			unsigned char* base = save;
-			for (int i = 0; i < 4; i++) {
-				unsigned char* party = base + reinterpret_cast<int*>(save + 0x30)[i] * 0x9C0;
-				if (*reinterpret_cast<int*>(party + 0x1A84) == 0) {
-					reinterpret_cast<int*>(save + 0x30)[i] = -1;
-				}
-				if (party[0x1D90] != 0) {
-					reinterpret_cast<int*>(save + 0x30)[i] = -1;
-				}
-			}
-
-			*reinterpret_cast<unsigned int*>(base + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(base));
+			memcpy(&entry.m_saveTime, &save->m_saveTime, sizeof(entry.m_saveTime));
+			entry.m_timerA = save->m_timerA;
+			entry.m_scriptGlobalTime = save->m_scriptGlobalTime;
+			entry.m_frameCounter = save->m_frameCounter;
 
 			for (int i = 0; i < 4; i++) {
-				if (reinterpret_cast<int*>(save + 0x30)[i] >= 0) {
-					entry.m_characterIds[i] = *reinterpret_cast<unsigned short*>(save + reinterpret_cast<int*>(save + 0x30)[i] * 0x9C0 + 0x14D0);
+				const int partySlot = save->m_partySlots[i];
+				if (save->m_characters[partySlot].m_exists == 0) {
+					save->m_partySlots[i] = -1;
+				}
+				if (save->m_characters[partySlot].m_isAway != 0) {
+					save->m_partySlots[i] = -1;
+				}
+			}
+
+			save->m_crc = MemoryCardMan.CalcCrc(save);
+
+			for (int i = 0; i < 4; i++) {
+				if (save->m_partySlots[i] >= 0) {
+					entry.m_characterIds[i] = save->m_characters[save->m_partySlots[i]].m_id;
 				} else {
 					entry.m_characterIds[i] = -1;
 				}
 			}
-			entry.m_chaliceElement = *reinterpret_cast<unsigned int*>(save + 0xB8);
-			memcpy(entry.m_townName, save + 0x10C0, 0x10);
+			entry.m_chaliceElement = save->m_chaliceElement;
+			memcpy(entry.m_townName, save->m_townName, sizeof(save->m_townName));
 			entry.m_hasData = 1;
 		} else {
 			entry.m_isBroken = 1;

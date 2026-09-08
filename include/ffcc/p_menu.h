@@ -224,7 +224,7 @@ struct TmpArtiList;
 struct McListInfo
 {
     u64 m_saveTime;              // 0x00
-    u32 m_playTime;              // 0x08
+    u32 m_scriptSysVal0;              // 0x08
     int m_timerA;                // 0x0C
     int m_scriptGlobalTime;      // 0x10
     int m_frameCounter;          // 0x14

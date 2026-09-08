@@ -649,16 +649,12 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 		if (bestItemObj != 0) {
 			runtime->deleteObject(bestItemObj);
-			goto markDeleted;
+			deletedCount++;
 		} else {
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrNoDeletableObjectMsg);
 			}
-			goto skipMark;
 		}
-	markDeleted:
-		deletedCount = 1;
-	skipMark:
 
 		System.Printf(itemObjStrings + kItemObjStrNumDeleteItemFmt, deletedCount);
 		if (deletedCount == 0) {

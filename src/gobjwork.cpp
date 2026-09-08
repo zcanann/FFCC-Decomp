@@ -1932,7 +1932,7 @@ int CCaravanWork::IsUseCmdList(int cmdListIdx)
 	if ((cmdListIdx >= 2) && (slotRef == -1)) {
 		isInvalid = 1;
 	}
-	return !isInvalid;
+	return isInvalid ? 0 : 1;
 }
 
 inline int CCaravanWork::GetNumCombi(int cmdListIdx)
@@ -1991,12 +1991,12 @@ unsigned int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 			cmdListIdx--;
 		}
 
-		unsigned int selected = 0;
+		unsigned char selected = 0;
 		short currentCmdListIndex = m_currentCmdListIndex;
 		if ((currentCmdListIndex >= cmdListIdx) && (currentCmdListIndex <= (cmdListIdx + groupedCountLocal - 1))) {
 			selected = 1;
 		}
-		return selected & 0xFF;
+		return selected;
 	}
 }
 

@@ -231,9 +231,9 @@ struct McListInfo
     int m_characterIds[4];       // 0x18
     int m_chaliceElement;        // 0x28
     char m_townName[0x15];       // 0x2C
-    unsigned char m_hasData;     // 0x41
-    unsigned char m_isBroken;    // 0x42
-    unsigned char m_unknown43;   // 0x43
+    signed char m_hasData;       // 0x41
+    signed char m_isBroken;      // 0x42
+    signed char m_unknown43;     // 0x43
 };
 
 STATIC_ASSERT(sizeof(McListInfo) == 0x48);

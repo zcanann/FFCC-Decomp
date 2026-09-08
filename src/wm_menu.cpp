@@ -2708,8 +2708,9 @@ void CMenuPcs::CalcLoadMenu()
 				int iVar23 = 0;
 				if (m_wmWorldState->m_menuMode == 8) {
 					for (int i = iVar23; i < 4; i++) {
-						if (*reinterpret_cast<char*>(m_wmCharaState + i * 0x48 + 0x42) == 0
-						    && *reinterpret_cast<int*>(m_wmCharaState + i * 0x48 + 8) > 0) {
+						const McListInfo& entry = reinterpret_cast<McListInfo*>(m_wmCharaState)[i];
+						if (entry.m_isBroken == 0
+						    && static_cast<int>(entry.m_playTime) > 0) {
 							iVar23++;
 						}
 					}
@@ -2717,45 +2718,47 @@ void CMenuPcs::CalcLoadMenu()
 						m_wmWorldState->m_mcResult = (short)0xFC19;
 					}
 				}
-				int calTimes[40];
-				int* piVar20 = calTimes;
+				OSCalendarTime saveTimes[kMcListCount];
+				OSCalendarTime* currentTime = saveTimes;
 				iVar10 = 0;
 				do {
-					OSTicksToCalendarTime(*reinterpret_cast<long long*>(m_wmCharaState + iVar10 * 0x48),
-					                      reinterpret_cast<OSCalendarTime*>(piVar20 + iVar10 * 10));
+					OSTicksToCalendarTime(reinterpret_cast<McListInfo*>(m_wmCharaState)[iVar10].m_saveTime,
+					                      &currentTime[iVar10]);
 					iVar10++;
 				} while (iVar10 < 4);
 
 				iVar23 = 0;
-				int bestIdx =  (int)(long)(-1);
+				int bestIdx = -1;
 				for (; iVar23 < 4; iVar23++) {
-					if (*reinterpret_cast<char*>(m_wmCharaState + iVar23 * 0x48 + 0x42) == 0
-					    && *reinterpret_cast<int*>(m_wmCharaState + iVar23 * 0x48 + 8) > 0) {
+					const McListInfo& entry = reinterpret_cast<McListInfo*>(m_wmCharaState)[iVar23];
+					if (entry.m_isBroken == 0
+					    && static_cast<int>(entry.m_playTime) > 0) {
 						if (bestIdx < 0) {
 							bestIdx = iVar23;
-						} else if (calTimes[bestIdx * 10 + 5] <= piVar20[5]
-						           && (calTimes[bestIdx * 10 + 5] < piVar20[5]
-						               || (calTimes[bestIdx * 10 + 7] <= piVar20[7]
-						                   && (calTimes[bestIdx * 10 + 7] < piVar20[7]
-						                       || (calTimes[bestIdx * 10 + 2] <= piVar20[2]
-						                           && (calTimes[bestIdx * 10 + 2] < piVar20[2]
-						                               || (calTimes[bestIdx * 10 + 1] <= piVar20[1]
-						                                   && (calTimes[bestIdx * 10 + 1] < piVar20[1]
-						                                       || (calTimes[bestIdx * 10] <= *piVar20
-						                                           && (calTimes[bestIdx * 10] < *piVar20
-						                                               || (calTimes[bestIdx * 10 + 8] <= piVar20[8]
-						                                                   && (calTimes[bestIdx * 10 + 8] < piVar20[8]
-						                                                       || calTimes[bestIdx * 10 + 9] < piVar20[9])))))))))))) {
+						} else if (saveTimes[bestIdx].year <= currentTime->year
+						           && (saveTimes[bestIdx].year < currentTime->year
+						               || (saveTimes[bestIdx].yday <= currentTime->yday
+						                   && (saveTimes[bestIdx].yday < currentTime->yday
+						                       || (saveTimes[bestIdx].hour <= currentTime->hour
+						                           && (saveTimes[bestIdx].hour < currentTime->hour
+						                               || (saveTimes[bestIdx].min <= currentTime->min
+						                                   && (saveTimes[bestIdx].min < currentTime->min
+						                                       || (saveTimes[bestIdx].sec <= currentTime->sec
+						                                           && (saveTimes[bestIdx].sec < currentTime->sec
+						                                               || (saveTimes[bestIdx].msec <= currentTime->msec
+						                                                   && (saveTimes[bestIdx].msec < currentTime->msec
+						                                                       || saveTimes[bestIdx].usec < currentTime->usec)))))))))))) {
 							bestIdx = iVar23;
 						}
 					}
-					piVar20 += 10;
+					currentTime++;
 				}
 				if (bestIdx < 0) bestIdx = 0;
 
 				m_wmWorldState->m_cardChannel = (short)bestIdx;
 				for (iVar10 = 0; iVar10 < 4; iVar10++) {
-					if (*reinterpret_cast<char*>(m_wmCharaState + iVar10 * 0x48 + 0x42) != 0) {
+					const McListInfo& entry = reinterpret_cast<McListInfo*>(m_wmCharaState)[iVar10];
+					if (entry.m_isBroken != 0) {
 						m_mcCtrl.m_saveIndex = iVar10;
 						m_wmWorldState->m_cardChannel = (short)iVar10;
 						break;
@@ -2801,10 +2804,9 @@ void CMenuPcs::CalcLoadMenu()
 				if ((uVar4 & 0x100) != 0) {
 					sVar8 = m_wmWorldState->m_state0E;
 					if (sVar8 != -1 && sVar8 != 1) {
-						int unk838 = reinterpret_cast<int>(m_wmCharaState);
 						iVar14 = (int)m_wmWorldState->m_cardChannel;
-						if (*reinterpret_cast<char*>(unk838 + iVar14 * 0x48 + 0x41) == 0
-						    || *reinterpret_cast<char*>(unk838 + iVar14 * 0x48 + 0x42) != 0) {
+						const McListInfo& entry = reinterpret_cast<McListInfo*>(m_wmCharaState)[iVar14];
+						if (entry.m_hasData == 0 || entry.m_isBroken != 0) {
 							Sound.PlaySe(4, 0x40, 0x7F, 0);
 						} else {
 							m_mcCtrl.m_saveIndex = iVar14;

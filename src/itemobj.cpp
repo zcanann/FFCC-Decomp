@@ -723,11 +723,11 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			newItem->m_worldPosition.z = owner->m_worldPosition.z;
 			newItem->m_owner = owner;
 
-			void* ownerScriptSlot = owner->m_scriptHandle[0xED];
+			int ownerScriptSlot = reinterpret_cast<CCaravanWork*>(owner->m_scriptHandle)->m_joybusCaravanId;
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleCreateFmt, ownerScriptSlot);
 			}
-			reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_capsules[(int)ownerScriptSlot] = newItem;
+			reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_capsules[ownerScriptSlot] = newItem;
 
 			CCharaPcs::CHandle* handle =
 			    new (Game.m_mainStage, itemObjStrings + kItemObjStrItemobjCpp, 0x28E) CCharaPcs::CHandle;
@@ -821,8 +821,6 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
  */
 void CGItemObj::onFrameStat()
 {
-	unsigned char* self = (unsigned char*)this;
-	CGPrgObj* prgObj = (CGPrgObj*)this;
 	int stateId = m_lastStateId;
 	char* itemObjStrings = const_cast<char*>(sItemObjStringTableBase);
 	float zero = kItemObjZero;
@@ -847,7 +845,7 @@ void CGItemObj::onFrameStat()
 			float distance = kItemObjZero;
 
 			if (Game.unk_flat3_0xc7d0 != 0) {
-				distance = PSVECDistance((Vec*)(self + 0x15c), (Vec*)(Game.unk_flat3_0xc7d0 + 0x15c));
+				distance = PSVECDistance(&m_worldPosition, &reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition);
 			} else {
 				if (static_cast<int>(CFlatCenterState()) == 1) {
 					Vec partyCenter;
@@ -855,7 +853,7 @@ void CGItemObj::onFrameStat()
 					partyCenter.x = (Game.m_partyMinX + Game.m_partyMaxX) * kItemObjHalf;
 					partyCenter.y = (Game.m_partyMinY + Game.m_partyMaxY) * kItemObjHalf;
 					partyCenter.z = (Game.m_partyMinZ + Game.m_partyMaxZ) * kItemObjHalf;
-					distance = PSVECDistance((Vec*)(self + 0x15c), &partyCenter);
+					distance = PSVECDistance(&m_worldPosition, &partyCenter);
 				}
 			}
 
@@ -893,7 +891,7 @@ void CGItemObj::onFrameStat()
 					}
 				}
 				if (condB &&
-				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3B4) != 0) {
+				    reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId != 0) {
 					condA = true;
 				}
 				if (condA) {
@@ -917,12 +915,12 @@ void CGItemObj::onFrameStat()
 			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_menuStageMode != 0 &&
 			    Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
 			    (static_cast<unsigned short>(m_owner->GetCID()) & 0x6D) == 0x6D &&
-			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3B4) != 0) {
+			    reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId != 0) {
 				launchSpeed = kItemObjUnitScale;
 			} else if (static_cast<int>(CFlatCenterState()) == 1) {
 				int carryCid = static_cast<unsigned short>(m_owner->GetCID());
 				if ((carryCid & 0x6D) == 0x6D &&
-				    2 <= *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3E0)) {
+				    2 <= reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_tribeId) {
 					launchSpeed = kItemObjUnitScale;
 				} else {
 					launchSpeed = kItemObjDouble;
@@ -972,31 +970,31 @@ void CGItemObj::onFrameStat()
 		break;
 	case 0xE:
 		if (m_stateFrame == 0) {
-			prgObj->m_bgColMask = 0;
-			prgObj->m_weaponNodeFlagBits.m_unk10 = 0;
-			prgObj->m_groundHitOffset.z = zero;
-			prgObj->m_groundHitOffset.y = zero;
-			prgObj->m_groundHitOffset.x = zero;
+			m_bgColMask = 0;
+			m_weaponNodeFlagBits.m_unk10 = 0;
+			m_groundHitOffset.z = zero;
+			m_groundHitOffset.y = zero;
+			m_groundHitOffset.x = zero;
 		} else if (m_stateFrame == 4) {
-			prgObj->m_bgDownDist = kItemObjWobblePhaseScale;
-			prgObj->m_stepSlopeLimit = zero;
-			ItemCFlatRuntime()->EndParticle(prgObj->m_charaModelHandle);
+			m_bgDownDist = kItemObjWobblePhaseScale;
+			m_stepSlopeLimit = zero;
+			ItemCFlatRuntime()->EndParticle(m_charaModelHandle);
 		} else if (m_stateFrame == 0xC) {
 			CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
 		}
 
 		if (7 < m_stateFrame) {
-			prgObj->m_rotTargetY += kItemObjMotionStep;
-			prgObj->m_worldPosition.x =
-			    kItemObjMotionStep * (m_owner->m_worldPosition.x - prgObj->m_worldPosition.x) + prgObj->m_worldPosition.x;
-			prgObj->m_worldPosition.y =
-			    kItemObjMotionStep * (kItemObjHalf * m_owner->unk_0x188 + m_owner->m_worldPosition.y - prgObj->m_worldPosition.y) +
-			    prgObj->m_worldPosition.y;
-			prgObj->m_worldPosition.z =
-			    kItemObjMotionStep * (m_owner->m_worldPosition.z - prgObj->m_worldPosition.z) + prgObj->m_worldPosition.z;
-			prgObj->m_rotationX = prgObj->m_rotationX * kItemObjRotationDamping;
-			prgObj->m_rotationY = prgObj->m_rotationY * kItemObjRotationDamping;
-			prgObj->m_rotationZ = prgObj->m_rotationZ * kItemObjRotationDamping;
+			m_rotTargetY += kItemObjMotionStep;
+			m_worldPosition.x =
+			    kItemObjMotionStep * (m_owner->m_worldPosition.x - m_worldPosition.x) + m_worldPosition.x;
+			m_worldPosition.y =
+			    kItemObjMotionStep * (kItemObjHalf * m_owner->unk_0x188 + m_owner->m_worldPosition.y - m_worldPosition.y) +
+			    m_worldPosition.y;
+			m_worldPosition.z =
+			    kItemObjMotionStep * (m_owner->m_worldPosition.z - m_worldPosition.z) + m_worldPosition.z;
+			m_rotationX = m_rotationX * kItemObjRotationDamping;
+			m_rotationY = m_rotationY * kItemObjRotationDamping;
+			m_rotationZ = m_rotationZ * kItemObjRotationDamping;
 		}
 		break;
 	case 9:
@@ -1005,7 +1003,7 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	case 0x1F:
-		PartMng.pppSetLocSlot(m_particleSlot, &prgObj->m_worldPosition);
+		PartMng.pppSetLocSlot(m_particleSlot, &m_worldPosition);
 
 		if (m_subState != 1) {
 			if (m_subState < 1 && 0 <= m_subState && m_subFrame == 0) {
@@ -1020,19 +1018,19 @@ void CGItemObj::onFrameStat()
 				particleNoB = 0x1D;
 			}
 
-			putParticle(particleNoA | 0x100, 0, &prgObj->m_worldPosition, kItemObjUnitScale, 0);
-			putParticle(particleNoB | 0x100, m_particleSlot, &prgObj->m_worldPosition, kItemObjUnitScale, 0);
+			putParticle(particleNoA | 0x100, 0, &m_worldPosition, kItemObjUnitScale, 0);
+			putParticle(particleNoB | 0x100, m_particleSlot, &m_worldPosition, kItemObjUnitScale, 0);
 			playSe3D(0x1A, 0x32, 0x96, 0, 0);
-			prgObj->m_displayFlags &= ~1;
-			prgObj->m_bgColMask &= 0xFFFFFFF1;
-			prgObj->m_moveOffset.z = zero;
-			prgObj->m_moveOffset.x = zero;
-			prgObj->m_bgColMask |= 0x80000;
+			m_displayFlags &= ~1;
+			m_bgColMask &= 0xFFFFFFF1;
+			m_moveOffset.z = zero;
+			m_moveOffset.x = zero;
+			m_bgColMask |= 0x80000;
 
 			const CVector& damageOffset = CVector(zero, zero, zero);
 			SetDamageCol(0, itemObjStrings + kItemObjStrF051Root, kItemObjDamageRadius, kItemObjDamageRadius,
 			             reinterpret_cast<Vec*>(const_cast<CVector*>(&damageOffset)));
-			prgObj->m_damageColliders[0].m_hitMask = 9;
+			m_damageColliders[0].m_hitMask = 9;
 			}
 		} else if (m_subFrame == 0x7D) {
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
@@ -1040,7 +1038,7 @@ void CGItemObj::onFrameStat()
 		break;
 	case 0x23:
 		if (m_subState != 0 && m_subState == 1) {
-			CCharaPcs::CHandle* handle = prgObj->m_charaModelHandle;
+			CCharaPcs::CHandle* handle = m_charaModelHandle;
 			if (handle != 0 && handle->m_model != 0) {
 				handle->m_model->m_flags10CBits.m_flag10C_80 = 1;
 			}
@@ -1048,31 +1046,31 @@ void CGItemObj::onFrameStat()
 			if (m_subFrame <= 8) {
 				float wobble = (float)sin((double)(kItemObjHalfPi * (float)m_subFrame * kItemObjWobblePhaseScale));
 
-				prgObj->m_rotationZ = wobble;
-				prgObj->m_rotationY = wobble;
-				prgObj->m_rotationX = wobble;
+				m_rotationZ = wobble;
+				m_rotationY = wobble;
+				m_rotationX = wobble;
 
 				if (m_subFrame == 8) {
-					prgObj->m_bgColMask |= 0x80000;
+					m_bgColMask |= 0x80000;
 					changeStat(0x24, 0, 0);
 				}
 			}
 		}
 		break;
 	case 0x24:
-		prgObj->m_moveOffset.x = kItemObjMoveOffsetXZ;
-		prgObj->m_moveOffset.y = kItemObjUnitScale;
-		prgObj->m_moveOffset.z = kItemObjMoveOffsetXZ;
+		m_moveOffset.x = kItemObjMoveOffsetXZ;
+		m_moveOffset.y = kItemObjUnitScale;
+		m_moveOffset.z = kItemObjMoveOffsetXZ;
 
-		if (prgObj->m_worldPosition.y < kItemObjHeightOffset) {
-			prgObj->m_groundHitOffset.y += kItemObjBounceAccel * prgObj->m_moveTimer;
-		} else if (prgObj->m_worldPosition.y > kItemObjMemoryRadius) {
-			prgObj->m_groundHitOffset.y = -(kItemObjBounceAccel * prgObj->m_moveTimer - prgObj->m_groundHitOffset.y);
+		if (m_worldPosition.y < kItemObjHeightOffset) {
+			m_groundHitOffset.y += kItemObjBounceAccel * m_moveTimer;
+		} else if (m_worldPosition.y > kItemObjMemoryRadius) {
+			m_groundHitOffset.y = -(kItemObjBounceAccel * m_moveTimer - m_groundHitOffset.y);
 		}
 
 		{
-			float timer = prgObj->m_moveTimer;
-			float current = prgObj->m_groundHitOffset.y;
+			float timer = m_moveTimer;
+			float current = m_groundHitOffset.y;
 			float clamped = kItemObjDouble * -timer;
 
 			if (!(current < clamped)) {
@@ -1082,46 +1080,46 @@ void CGItemObj::onFrameStat()
 					clamped = maxClamp;
 				}
 			}
-			prgObj->m_groundHitOffset.y = clamped;
+			m_groundHitOffset.y = clamped;
 		}
 
-		prgObj->m_rotTargetY += kItemObjFineStep;
-		prgObj->m_groundHitOffset.x =
-		    kItemObjFineStep * -(prgObj->m_worldPosition.x - *(float*)(*(unsigned char**)(self + 0x550) + 0x15C));
-		prgObj->m_groundHitOffset.z =
-		    kItemObjFineStep * -(prgObj->m_worldPosition.z - *(float*)(*(unsigned char**)(self + 0x550) + 0x164));
+		m_rotTargetY += kItemObjFineStep;
+		m_groundHitOffset.x =
+		    kItemObjFineStep * -(m_worldPosition.x - m_owner->m_worldPosition.x);
+		m_groundHitOffset.z =
+		    kItemObjFineStep * -(m_worldPosition.z - m_owner->m_worldPosition.z);
 		break;
 	case 0x25: {
-		prgObj->m_moveOffset.y = kItemObjMoveOffsetXZ;
-		prgObj->m_rotTargetY += kItemObjMemoryTurnStep;
+		m_moveOffset.y = kItemObjMoveOffsetXZ;
+		m_rotTargetY += kItemObjMemoryTurnStep;
 
 		CVector delta(reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_targetPosition);
-		delta = delta - CVector(prgObj->m_worldPosition);
+		delta = delta - CVector(m_worldPosition);
 		float distance = PSVECMag(delta);
 		if (distance < kItemObjMemoryRadius) {
 			changeStat(0x27, 0, 0);
 		} else if (distance > zero) {
-			float moveScale = kItemObjMemoryChaseAccel * prgObj->m_moveTimer;
+			float moveScale = kItemObjMemoryChaseAccel * m_moveTimer;
 
-			prgObj->m_groundHitOffset.x += kItemObjMemoryChaseScale * delta.x * moveScale;
-			prgObj->m_groundHitOffset.y += kItemObjMemoryChaseScale * delta.y * moveScale;
-			prgObj->m_groundHitOffset.z += kItemObjMemoryChaseScale * delta.z * moveScale;
+			m_groundHitOffset.x += kItemObjMemoryChaseScale * delta.x * moveScale;
+			m_groundHitOffset.y += kItemObjMemoryChaseScale * delta.y * moveScale;
+			m_groundHitOffset.z += kItemObjMemoryChaseScale * delta.z * moveScale;
 		} else {
-			prgObj->m_groundHitOffset.z = zero;
-			prgObj->m_groundHitOffset.y = zero;
-			prgObj->m_groundHitOffset.x = zero;
+			m_groundHitOffset.z = zero;
+			m_groundHitOffset.y = zero;
+			m_groundHitOffset.x = zero;
 		}
 		break;
 	}
 	case 0x27: {
 		int pdtNo = -1;
 
-		prgObj->m_groundHitOffset.z = zero;
-		prgObj->m_groundHitOffset.y = zero;
-		prgObj->m_groundHitOffset.x = zero;
+		m_groundHitOffset.z = zero;
+		m_groundHitOffset.y = zero;
+		m_groundHitOffset.x = zero;
 
 		if (m_stateFrame == 0) {
-			prgObj->m_stepSlopeLimit = zero;
+			m_stepSlopeLimit = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
 			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
@@ -1130,7 +1128,7 @@ void CGItemObj::onFrameStat()
 			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
 			putParticle((pdtNo << 8) | 0x13, m_particleSlot, this, particleScale, 0x12903);
 		} else if (m_stateFrame == 0xD) {
-			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
+			int ownerSlot = reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId;
 
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleFailedFmt, ownerSlot);
@@ -1140,7 +1138,7 @@ void CGItemObj::onFrameStat()
 			stack.m_word = 0;
 			reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_capsules[ownerSlot] = 0;
 			gCFlatRuntime().SystemCall(
-			    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
+			    m_owner, 2, 0x16, 1, &stack, 0);
 
 			CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
 		}
@@ -1149,12 +1147,12 @@ void CGItemObj::onFrameStat()
 	case 0x26: {
 		int pdtNo = -1;
 
-		prgObj->m_groundHitOffset.z = zero;
-		prgObj->m_groundHitOffset.y = zero;
-		prgObj->m_groundHitOffset.x = zero;
+		m_groundHitOffset.z = zero;
+		m_groundHitOffset.y = zero;
+		m_groundHitOffset.x = zero;
 
 		if (m_stateFrame == 0) {
-			prgObj->m_stepSlopeLimit = zero;
+			m_stepSlopeLimit = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
 			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
@@ -1163,7 +1161,7 @@ void CGItemObj::onFrameStat()
 			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
 			putParticle((pdtNo << 8) | 4, m_particleSlot, this, particleScale, 0x12908);
 		} else if (m_stateFrame == 0xD) {
-			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
+			int ownerSlot = reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId;
 
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleSuccessFmt, ownerSlot);
@@ -1172,19 +1170,17 @@ void CGItemObj::onFrameStat()
 			reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_capsules[ownerSlot] = 0;
 			CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, kItemObjZero, 0);
 			if (newItem != 0) {
-				unsigned char* newItemSelf = reinterpret_cast<unsigned char*>(newItem);
-
-				*reinterpret_cast<float*>(newItemSelf + 0x168) = prgObj->m_worldPosition.x;
-				*reinterpret_cast<float*>(newItemSelf + 0x16C) = prgObj->m_worldPosition.y;
-				*reinterpret_cast<float*>(newItemSelf + 0x170) = prgObj->m_worldPosition.z;
-				newItem->m_worldPosition.x = *reinterpret_cast<float*>(newItemSelf + 0x168);
-				newItem->m_worldPosition.y = *reinterpret_cast<float*>(newItemSelf + 0x16C);
-				newItem->m_worldPosition.z = *reinterpret_cast<float*>(newItemSelf + 0x170);
+				newItem->unk_0x168 = m_worldPosition.x;
+				newItem->unk_0x16C = m_worldPosition.y;
+				newItem->unk_0x170 = m_worldPosition.z;
+				newItem->m_worldPosition.x = newItem->unk_0x168;
+				newItem->m_worldPosition.y = newItem->unk_0x16C;
+				newItem->m_worldPosition.z = newItem->unk_0x170;
 
 				CFlatRuntime::CStack stack;
 				stack.m_word = 1;
 				gCFlatRuntime().SystemCall(
-				    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
+				    m_owner, 2, 0x16, 1, &stack, 0);
 			} else {
 				if ((unsigned int)System.m_execParam >= 2U) {
 					System.Printf(itemObjStrings + kItemObjStrMemoryMagiciteCreateFailedMsg);
@@ -1226,12 +1222,12 @@ void CGItemObj::onFrame()
 			SetAnimSlot(0, 0);
 			PlayAnim(0, 1, 0, -1, -1, 0);
 
-			unsigned char* ownerData = reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle);
+			CCaravanWork* ownerData = reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle);
 			int soundEntry = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
 
 			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
-			putParticle((soundEntry << 8) | *(int*)(ownerData + 0x3B4), m_particleSlot, this, particleScale, 0x12909);
+			putParticle((soundEntry << 8) | ownerData->m_joybusCaravanId, m_particleSlot, this, particleScale, 0x12909);
 
 			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), kItemObjMemoryRadius, kItemObjMemoryRadius,
 			             CVector(kItemObjZero, kItemObjZero, kItemObjZero));
@@ -1254,13 +1250,11 @@ void CGItemObj::onFrame()
  */
 void CGItemObj::onCancelStat(int)
 {
-	unsigned char* self = (unsigned char*)this;
-
-	if (*(int*)(self + 0x520) == 0x1b) {
-		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) | 2;
-		*(float*)(self + 0x17c) = kItemObjUnitScale;
-		*(float*)(self + 0x178) = kItemObjUnitScale;
-		*(float*)(self + 0x174) = kItemObjUnitScale;
+	if (m_lastStateId == 0x1b) {
+		m_bgColMask |= 2;
+		m_rotationZ = kItemObjUnitScale;
+		m_rotationY = kItemObjUnitScale;
+		m_rotationX = kItemObjUnitScale;
 	}
 }
 
@@ -1275,10 +1269,8 @@ void CGItemObj::onCancelStat(int)
  */
 void CGItemObj::onChangeStat(int state)
 {
-	unsigned char* self = (unsigned char*)this;
-
 	if (state < 0x28 && state >= 0x26) {
-		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) & 0xfff7fffe;
+		m_bgColMask &= 0xfff7fffe;
 	}
 }
 

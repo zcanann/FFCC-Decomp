@@ -237,8 +237,6 @@ int gWmMenuWorkB;
 unsigned char gWmMenuScriptValueCache;
 unsigned char s_wmMenuLastMountState;
 unsigned char s_wmMenuMountStateInitialized;
-extern char* DAT_8032EE34;
-extern unsigned char lbl_8032EE38[8];
 
 extern const char lbl_80331208[5] = "1.00";
 extern const char lbl_80331380[4] = {'?','?','?','?'};
@@ -446,14 +444,6 @@ extern float FLOAT_80331490;
 extern float FLOAT_80331498;
 extern float FLOAT_803314e8;
 extern float FLOAT_803314f0;
-extern "C" const char s_wm_menu_cpp[] = "wm_menu.cpp";
-static const char s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
-static const char s_chan_pctd_cur_pctd_801DC3D8[] = "chan = %d  cur = %d\n";
-static const char s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390[] = "ClrCMakeFlg : chan = %d  cur = %d\n";
-static const char s__s__d___Error_WM_menu_no_error___801dc424[] = "%s(%d): Error:WM menu no error(%d)\n";
-static const char s__s__d___Error_function_code_not_f_801dc3ec[] = "%s(%d): Error:function code not found(%d)\n";
-static const char s_dvd_movie_ffcc_op_thp_801dc448[] = "dvd_movie/ffcc_op.thp";
-static const char s_mount____s_801dc460[] = "mount : %s";
 
 static const int kMcListEntrySize = sizeof(McListInfo);
 static const int kMcListCount = 4;
@@ -1477,7 +1467,7 @@ void CMenuPcs::CalcDiaryMenu()
 			if (mounted != 0) {
 				text = s_TRUE_803317EC;
 			}
-			System.Printf(const_cast<char*>(s_mount____s_801dc460), text);
+			System.Printf("mount = %s\n", text);
 		}
 		s_wmMenuLastMountState = static_cast<unsigned char>(mounted);
 	}
@@ -1574,7 +1564,7 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	default:
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-			System.Printf(const_cast<char*>(s__s__d___Error_WM_menu_no_error___801dc424), s_wm_menu_cpp, 0x4c0);
+			System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0x4c0);
 		}
 		break;
 	}
@@ -2951,10 +2941,7 @@ void CMenuPcs::CalcLoadMenu()
 void CMenuPcs::CalcTitleMenu()
 {
 
-	if (static_cast<signed char>(lbl_8032EE38[0]) == 0) {
-		DAT_8032EE34 = const_cast<char*>(s_dvd_movie_ffcc_op_thp_801dc448);
-		lbl_8032EE38[0] = 1;
-	}
+	static char* OPMOVIE_FNAME = "dvd/movie/ffcc_op.thp";
 
 	int down = Pad.GetButtonDown(0);
 	const unsigned short repeat = GetButtonRepeat(0);
@@ -2990,10 +2977,10 @@ void CMenuPcs::CalcTitleMenu()
 			}
 			lbl_8032E8AC = 0;
 			THPSimpleInit(1);
-			THPSimpleOpen(DAT_8032EE34);
+			THPSimpleOpen(OPMOVIE_FNAME);
 			int thpMemory = THPSimpleCalcNeedMemory();
 			m_wmWorkBuffer =
-			    static_cast<unsigned char*>(Memory._Alloc(thpMemory, CharaPcs.m_viewerAnimStage, const_cast<char*>(s_wm_menu_cpp), 0xABA, 0));
+			    static_cast<unsigned char*>(Memory._Alloc(thpMemory, CharaPcs.m_viewerAnimStage, "wm_menu.cpp", 0xABA, 0));
 			THPSimpleSetBuffer(m_wmWorkBuffer);
 			THPSimplePreLoad(0);
 			THPSimpleAudioStart();
@@ -3359,7 +3346,7 @@ void CMenuPcs::drawWorld()
 			break;
 		default:
 			if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-				System.Printf(const_cast<char*>(s__s__d___Error_WM_menu_no_error___801dc424), s_wm_menu_cpp, 0xC59);
+				System.Printf("%s(%d): Error:WM menu no error(%d)\n", "wm_menu.cpp", 0xC59);
 			}
 			break;
 		}
@@ -4749,7 +4736,7 @@ void CMenuPcs::DrawTitleMenu()
 		if (state == 0 && static_cast<signed char>(m_wmWorldState->m_worldReady) != 0) {
 			if (static_cast<signed char>(m_wmThpActive) != 0) {
 				THPSimpleDrawCurrentFrame((_GXRenderModeObj*)Graphic.m_renderMode, 0, 0, 0x280, 0x1C0);
-				Graphic._WaitDrawDone(const_cast<char*>(s_wm_menu_cpp), 0x12A2);
+				Graphic._WaitDrawDone("wm_menu.cpp", 0x12A2);
 			}
 		short sVarE = m_wmWorldState->m_state0E;
 		if (sVarE != 0 || m_wmWorldState->m_frameCounter >= 0xB43) {
@@ -5205,7 +5192,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		break;
 	default:
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1482, code);
+			System.Printf("%s(%d): Error:function code not found(%d)\n", "wm_menu.cpp", 0x1482, code);
 		}
 		break;
 	}
@@ -5330,7 +5317,7 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 	case 0x1b:
 	default:
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1521, code);
+			System.Printf("%s(%d): Error:function code not found(%d)\n", "wm_menu.cpp", 0x1521, code);
 		}
 		break;
 	}
@@ -7353,7 +7340,7 @@ void CMenuPcs::CalcCharaSelect()
 				    (*reinterpret_cast<CCharaPcs::CHandle**>(bytes + hOff))->m_charaKind != 3 &&
 				    entry.m_cmakeReady != 1) {
 					if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-						System.Printf(const_cast<char*>(s_chan_pctd_cur_pctd_801DC3D8), i,
+						System.Printf("chan = %d cur = %d\n", i,
 						              static_cast<int>(entry.m_currentSlot));
 					}
 					const int loadSlot =  (s32)(static_cast<int>(entry.m_currentSlot));
@@ -8398,7 +8385,7 @@ void CMenuPcs::SetCMakeEnd(int channel)
 {
 	m_wm.m_charaSelectData[channel].m_cmakeReady = 1;
 	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), channel,
+		System.Printf("SetCMakeEnd : chan = %d  cur = %d\n", channel,
 		               (int)m_wm.m_charaSelectData[channel].m_currentSlot);
 	}
 }
@@ -8417,7 +8404,7 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 	m_wm.m_charaSelectData[channel].m_cmakePending = 0;
 	const int current = m_wm.m_charaSelectData[channel].m_currentSlot;
 	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(const_cast<char*>(s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390), channel, current);
+		System.Printf("ClrCMakeFlg : chan = %d  cur = %d\n", channel, current);
 	}
 	WmCharaModelInfo* modelData = &m_wm.m_charaModelData[current];
 	modelData->m_modelChanged = 0;

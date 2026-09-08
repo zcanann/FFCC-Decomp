@@ -1444,7 +1444,7 @@ wm_menu.cpp:
 	.data       start:0x80210750 end:0x802111E8
 	.bss        start:0x802FF408 end:0x802FF450
 	.sdata      start:0x8032E8A8 end:0x8032E920
-	.sbss       start:0x8032EE18 end:0x8032EE34
+	.sbss       start:0x8032EE18 end:0x8032EE40
 	.sdata2     start:0x80331208 end:0x80331840
 
 gxfunc.cpp:

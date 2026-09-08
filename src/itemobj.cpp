@@ -500,7 +500,6 @@ void CGItemObj::onChangePrg(int)
  */
 void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 {
-	unsigned char* self = (unsigned char*)this;
 	CFlatRuntime::CStack stack[3];
 	int canSystemCall;
 	unsigned char canSystemCall8;
@@ -521,7 +520,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 				isStageCarry = true;
 			}
 		}
-		if (isStageCarry && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x3B4) != 0) {
+		if (isStageCarry && reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId != 0) {
 			canSystemCall = 1;
 		}
 
@@ -550,7 +549,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 						condB = true;
 					}
 				}
-				if (condB && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x3B4) != 0) {
+				if (condB && reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId != 0) {
 					condA = true;
 				}
 				if (condA) {
@@ -582,7 +581,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 				isStageCarry = true;
 			}
 		}
-		if (isStageCarry && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3B4) != 0) {
+		if (isStageCarry && reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId != 0) {
 			canSystemCall = 1;
 		}
 
@@ -607,7 +606,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			m_itemJumpCountdown = 8;
 			m_bodyEllipsoidRadius = kItemObjZero;
 		} else {
-			changeStat(((int)~(carryState - 1 | 1 - carryState) >> 0x1F) + 0xD, 0, 0);
+			changeStat(carryState == 1 ? 0xC : 0xD, 0, 0);
 		}
 
 		m_lifeTimer = 0x1194;
@@ -615,7 +614,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 
 	if ((m_objectFlags & 0x10) != 0 && canSystemCall8 != 0) {
 		stack[0].m_word = 3;
-		stack[1].m_word = static_cast<unsigned int>(-carryState | carryState) >> 0x1F;
+		stack[1].m_word = carryState != 0;
 		stack[2].m_word = 0;
 		gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 	}

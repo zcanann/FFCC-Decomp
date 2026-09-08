@@ -59,6 +59,74 @@ struct WmMenuLightTable
 	Vec m_diffuseDirs[3];
 };
 
+char* g_strWMMenuMes[5][11] = {
+	{
+		"Select party members and create new characters.",
+		"View diary entries.",
+		"Import character from another Memory Card.",
+		"Configure game settings.",
+		"Save game data to a Memory Card.",
+		"Select party members.",
+		"Select \"Empty\" to create a new character.",
+		"Press START when finished.",
+		"Select game data to load.",
+		"Select character to import.",
+		"Select character to delete.",
+	},
+	{
+		"Charaktere kreieren und Gruppenmitglieder bestimmen.",
+		"Die niedergeschriebenen Tagebucheintr\344ge lesen.",
+		"Charaktere von anderen Memory Cards einladen.",
+		"Einstellungen zum Spiel vornehmen.",
+		"Aktuelle Spielst\344nde auf die Memory Card speichern.",
+		"Bitte die Gruppenmitglieder bestimmen.",
+		"\204Frei\" w\344hlen, um einen neuen Charakter zu kreieren.",
+		"START dr\374cken, um auf Reisen zu gehen.",
+		"Bitte einen Spielstand w\344hlen.",
+		"Zu bewegenden Charakter w\344hlen.",
+		"Zu l\366schenden Charakter w\344hlen.",
+	},
+	{
+		"Seleziona i membri del gruppo e crea nuovi personaggi.",
+		"Leggi il diario.",
+		"Importa personaggi da un'altra Memory Card (Scheda Memoria).",
+		"Modifica le impostazioni di gioco.",
+		"Salva la partita su Memory Card (Scheda Memoria).",
+		"Seleziona i membri del gruppo.",
+		"Seleziona Vuoto per creare un nuovo personaggio.",
+		"Premi START quando hai finito.",
+		"Seleziona i dati da caricare.",
+		"Seleziona il personaggio che vuoi trasferire.",
+		"Seleziona il personaggio che vuoi cancellare.",
+	},
+	{
+		"Composez votre \351quipe et cr\351ez de nouveaux personnages",
+		"Consultez le journal",
+		"Importez un personnage d'une autre Memory Card (carte m\351moire)",
+		"Modifiez les options du jeu",
+		"Sauvegardez la partie sur une Memory Card (carte m\351moire)",
+		"Composez votre \351quipe",
+		"S\351lectionnez \"Vide\" pour cr\351er un nouveau personnage",
+		"Appuyez sur START quand vous avez termin\351",
+		"S\351lectionnez les donn\351es de jeu \340 charger",
+		"S\351lectionnez le personnage \340 importer",
+		"S\351lectionnez le personnage \340 effacer",
+	},
+	{
+		"Selecciona los miembros del grupo y crea nuevos personajes.",
+		"Ver las anotaciones del diario.",
+		"Transferir un personaje de otra Memory Card al juego actual.",
+		"Configurar las opciones del juego.",
+		"Guardar los datos del juego en la Memory Card.",
+		"Selecciona los miembros del grupo.",
+		"Selecciona \"Vac\355o\" para crear un nuevo personaje.",
+		"Pulsa START cuando termines.",
+		"Seleccionar los datos del juego a cargar.",
+		"Selecciona el personaje a transferir.",
+		"Selecciona el personaje a eliminar.",
+	},
+};
+
 static WmMenuLightTable s_Light[] = {
 	{
 		2, {112, 112, 108, 255},
@@ -156,7 +224,6 @@ extern int DAT_80238028;
 extern char cRam8032ee21;
 extern "C" unsigned char lbl_801DC294[];
 static const char* s_port[] = {"Port ", "-Hafen", "Porto ", "Port ", "Puerto "};
-extern "C" char* lbl_80210750[];
 
 inline CGBaseObj::CGBaseObj()
 {
@@ -3482,7 +3549,7 @@ void CMenuPcs::DrawMainMenu()
 			textList[4] = DAT_801DC230[4];
 			const int languageIndex = Game.m_gameWork.m_languageId - 1;
 			unsigned int ti;
-			char** const langText = &lbl_80210750[languageIndex * 0x0B];
+			char** const langText = g_strWMMenuMes[languageIndex];
 			ti = 0;
 			textList[0] = langText[ti];
 			ti = 1;
@@ -4099,7 +4166,7 @@ void CMenuPcs::DrawCMakeMenu()
 			textList[0] = DAT_801DC244[0];
 			textList[1] = DAT_801DC244[1];
 			textList[2] = DAT_801DC244[2];
-			char** const langText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
+			char** const langText = g_strWMMenuMes[Game.m_gameWork.m_languageId - 1];
 			unsigned int ti = 5;
 			textList[0] = langText[ti];
 			ti = 6;
@@ -4123,7 +4190,7 @@ void CMenuPcs::DrawCMakeMenu()
 			case 2:
 				switch (g_pGoOutMenu->m_goOutMode) {
 				case 0x0E: {
-					char** const caseText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
+					char** const caseText = g_strWMMenuMes[Game.m_gameWork.m_languageId - 1];
 				unsigned int ci = 8;
 				char* const text = caseText[ci];
 					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
@@ -4138,7 +4205,7 @@ void CMenuPcs::DrawCMakeMenu()
 					break;
 				}
 				case 0x0F: {
-					char** const caseText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
+					char** const caseText = g_strWMMenuMes[Game.m_gameWork.m_languageId - 1];
 				unsigned int ci = 9;
 				char* const text = caseText[ci];
 					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
@@ -4157,7 +4224,7 @@ void CMenuPcs::DrawCMakeMenu()
 			case 3:
 				switch (g_pGoOutMenu->m_deleteMode) {
 				case 2: {
-					char** const caseText = &lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B];
+					char** const caseText = g_strWMMenuMes[Game.m_gameWork.m_languageId - 1];
 				unsigned int ci = 10;
 				char* const text = caseText[ci];
 					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
@@ -4363,8 +4430,8 @@ void CMenuPcs::DrawLoadMenu()
 
 	// Header text
 	if (*reinterpret_cast<char*>(reinterpret_cast<int>(g_pGoOutMenu) + 0x18) == 0x0E) {
-		const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
-		char* text = lbl_80210750[languageIndex + 8];
+		const int languageIndex = Game.m_gameWork.m_languageId - 1;
+		char* text = g_strWMMenuMes[languageIndex][8];
 		_GXColor color = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(uAlpha)).color;
 		const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
 		MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), color, 7, text,

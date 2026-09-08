@@ -2618,27 +2618,23 @@ void CMenuPcs::CalcLoadMenu()
 						gWmMenuCursorY[0] = (unsigned char)m_mcCtrl.m_cardChannel;
 						gWmMenuCursorY[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 					}
-					int iVar25 = reinterpret_cast<int>(&Game);
-					int iVar23 = 0;
-					iVar14 = 0;
-					int pOff = 0;
-					do {
+					for (iVar14 = 0; iVar14 < kWmMenuPlayerCount; iVar14++) {
 						WmCharaModelInfo* modelInfo = &m_wm.m_charaModelData[iVar14];
 						if (m_wmWorldState->m_menuMode == 8
 						    && m_cmakeWork != 0) {
-							int iVar6 = reinterpret_cast<int>(m_cmakeWork) + iVar23 + 0x14D0;
-							if (*reinterpret_cast<int*>(iVar6 + 0x5B4) != 0) {
-								unsigned int tribe = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x2E);
-								unsigned int gender = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x30);
-								unsigned int appearance = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x32);
+							const Mc::CharaDat& character = reinterpret_cast<Mc::SaveDat*>(m_cmakeWork)->m_characters[iVar14];
+							if (character.m_exists != 0) {
+								unsigned int tribe = character.m_tribeId;
+								unsigned int gender = character.m_genderFlag;
+								unsigned int appearance = character.m_appearanceVariant;
 								modelInfo->m_modelNo = GetModelNo(tribe, appearance, gender);
 							} else {
 								modelInfo->m_modelNo = -1;
 							}
-						} else if (*reinterpret_cast<int*>(iVar25 + 0x1794) != 0) {
-							unsigned int tribe = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D0);
-							unsigned int gender = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D2);
-							unsigned int appearance = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D4);
+						} else if (Game.m_caravanWorkArr[iVar14].m_shopState != 0) {
+							unsigned int tribe = Game.m_caravanWorkArr[iVar14].m_tribeId;
+							unsigned int gender = Game.m_caravanWorkArr[iVar14].m_genderFlag;
+							unsigned int appearance = Game.m_caravanWorkArr[iVar14].m_appearanceVariant;
 							modelInfo->m_modelNo = GetModelNo(tribe, appearance, gender);
 						} else {
 							modelInfo->m_modelNo = -1;
@@ -2655,11 +2651,7 @@ void CMenuPcs::CalcLoadMenu()
 							modelInfo->m_modelChanged = 1;
 						}
 						GetWmCharaHandles(this)[iVar14]->LoadModelASync(uVar22, charaId, 0);
-						iVar14++;
-						iVar23 += 0x9C0;
-						iVar25 += 0xC30;
-						pOff += 4;
-					} while (iVar14 < 8);
+					}
 
 					if (m_wmWorldState->m_menuMode != 8) {
 						for (int i = 0; i < kWmMenuControllerCount; i++) {

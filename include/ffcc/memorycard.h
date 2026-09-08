@@ -10,7 +10,11 @@ namespace Mc
 {
 struct CharaDat
 {
-    unsigned char m_unknown000[0x5B4];
+    unsigned char m_unknown000[0x2E];
+    u16 m_tribeId;                                  // 0x2E
+    u16 m_genderFlag;                               // 0x30
+    u16 m_appearanceVariant;                        // 0x32
+    unsigned char m_unknown034[0x5B4 - 0x34];
     int m_exists;                                  // 0x5B4
     unsigned char m_unknown5B8[0x8C0 - 0x5B8];
     unsigned char m_isAway;                         // 0x8C0

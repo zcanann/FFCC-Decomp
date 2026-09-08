@@ -128,6 +128,9 @@ STATIC_ASSERT(offsetof(Mc::SaveDat, m_spModeFlags[2]) == 0x13E3);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_spModeFlags[3]) == 0x13E4);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_characters) == 0x14D0);
 STATIC_ASSERT(sizeof(Mc::CharaDat) == 0x9C0);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_tribeId) == 0x2E);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_genderFlag) == 0x30);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_appearanceVariant) == 0x32);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_exists) == 0x5B4);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_isAway) == 0x8C0);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_isGuest) == 0x8C1);
@@ -1037,7 +1040,8 @@ void CMemoryCardMan::MakeSaveData()
     for (int c = 0; c < 8; c++)
     {
         int letter;
-        u8* dst = save + 0x14D0 + c * 0x9C0;
+        Mc::CharaDat& savedCharacter = saveDat->m_characters[c];
+        u8* dst = reinterpret_cast<u8*>(&savedCharacter);
         CCaravanWork* caravanWork = &g->m_caravanWorkArr[c];
 
         int shopState = caravanWork->m_shopState;
@@ -1068,9 +1072,9 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<u16*>(dst + 0x28) = caravanWork->m_inventoryItemCount;
         *reinterpret_cast<u16*>(dst + 0x2A) = caravanWork->unk_0x3dc;
         *reinterpret_cast<u16*>(dst + 0x2C) = caravanWork->m_progressValue;
-        *reinterpret_cast<u16*>(dst + 0x2E) = caravanWork->m_tribeId;
-        *reinterpret_cast<u16*>(dst + 0x30) = caravanWork->m_genderFlag;
-        *reinterpret_cast<u16*>(dst + 0x32) = caravanWork->m_appearanceVariant;
+        savedCharacter.m_tribeId = caravanWork->m_tribeId;
+        savedCharacter.m_genderFlag = caravanWork->m_genderFlag;
+        savedCharacter.m_appearanceVariant = caravanWork->m_appearanceVariant;
         *reinterpret_cast<s16*>(dst + 0x34) = caravanWork->m_equipment[0];
         *reinterpret_cast<s16*>(dst + 0x36) = caravanWork->m_equipment[1];
         *reinterpret_cast<s16*>(dst + 0x38) = caravanWork->m_equipment[2];
@@ -1224,7 +1228,8 @@ void CMemoryCardMan::SetLoadData()
     int i;
     for (int c = 0; c < 8; c++)
     {
-        u8* src = save + 0x14D0 + c * 0x9C0;
+        Mc::CharaDat& savedCharacter = saveDat->m_characters[c];
+        u8* src = reinterpret_cast<u8*>(&savedCharacter);
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
 
         for (i = count = 0; i < 64; i++)
@@ -1259,9 +1264,9 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->m_inventoryItemCount = *reinterpret_cast<u16*>(src + 0x28);
         caravanWork->unk_0x3dc = *reinterpret_cast<u16*>(src + 0x2A);
         caravanWork->m_progressValue = *reinterpret_cast<u16*>(src + 0x2C);
-        caravanWork->m_tribeId = *reinterpret_cast<u16*>(src + 0x2E);
-        caravanWork->m_genderFlag = *reinterpret_cast<u16*>(src + 0x30);
-        caravanWork->m_appearanceVariant = *reinterpret_cast<u16*>(src + 0x32);
+        caravanWork->m_tribeId = savedCharacter.m_tribeId;
+        caravanWork->m_genderFlag = savedCharacter.m_genderFlag;
+        caravanWork->m_appearanceVariant = savedCharacter.m_appearanceVariant;
         caravanWork->m_equipment[0] = *reinterpret_cast<s16*>(src + 0x34);
         caravanWork->m_equipment[1] = *reinterpret_cast<s16*>(src + 0x36);
         caravanWork->m_equipment[2] = *reinterpret_cast<s16*>(src + 0x38);
@@ -2033,9 +2038,9 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         *reinterpret_cast<u16*>(dstCharData + 0x26) = *reinterpret_cast<u16*>(srcCharData + 0x26);
         *reinterpret_cast<u16*>(dstCharData + 0x2A) = *reinterpret_cast<u16*>(srcCharData + 0x2A);
         *reinterpret_cast<u16*>(dstCharData + 0x2C) = *reinterpret_cast<u16*>(srcCharData + 0x2C);
-        *reinterpret_cast<u16*>(dstCharData + 0x2E) = *reinterpret_cast<u16*>(srcCharData + 0x2E);
-        *reinterpret_cast<u16*>(dstCharData + 0x30) = *reinterpret_cast<u16*>(srcCharData + 0x30);
-        *reinterpret_cast<u16*>(dstCharData + 0x32) = *reinterpret_cast<u16*>(srcCharData + 0x32);
+        dstCharacter.m_tribeId = srcCharacter.m_tribeId;
+        dstCharacter.m_genderFlag = srcCharacter.m_genderFlag;
+        dstCharacter.m_appearanceVariant = srcCharacter.m_appearanceVariant;
         memcpy(dstCharData + 0x34, srcCharData + 0x34, 8);
         memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
         *reinterpret_cast<u32*>(dstCharData + 0xE8) = *reinterpret_cast<u32*>(srcCharData + 0xE8);

@@ -1752,7 +1752,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		CGCharaObj* sourceChara = reinterpret_cast<CGCharaObj*>(sourceObj);
 		if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x2D) == 0x2D && sourceChara->m_comboItemState >= 0 &&
 		    sourceChara->m_comboLinkCount != 0) {
-			System.Printf(dbg + 0x2F8);
+			System.Printf(dbg + 0x2F8, sourceChara->m_comboLinkCount);
 			damageAmount *= sourceChara->m_comboLinkCount;
 		}
 

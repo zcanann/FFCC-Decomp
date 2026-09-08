@@ -117,6 +117,15 @@ STATIC_ASSERT(offsetof(Mc::SaveDat, m_crc) == 0x1C);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_linkTable) == 0xC0);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_mcSerial) == 0x13D0);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_mcRandom) == 0x13D8);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_mcHasSerial) == 0x13DC);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_bgmVolume) == 0x13DD);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_seVolume) == 0x13DE);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_stereoFlag) == 0x13DF);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_gameInitFlag) == 0x13E0);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_spModeFlags[0]) == 0x13E1);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_spModeFlags[1]) == 0x13E2);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_spModeFlags[2]) == 0x13E3);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_spModeFlags[3]) == 0x13E4);
 STATIC_ASSERT(offsetof(Mc::SaveDat, m_characters) == 0x14D0);
 STATIC_ASSERT(sizeof(Mc::CharaDat) == 0x9C0);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_exists) == 0x5B4);
@@ -132,16 +141,6 @@ STATIC_ASSERT(sizeof(Mc::SaveDat) == 0x8BD0);
 static inline CChara* GetCharaGlobal()
 {
     return &Chara;
-}
-
-static inline u8 MakeSaveBool(u8 value)
-{
-    return value != 0;
-}
-
-static inline u8 MakeLoadBool(s8 value)
-{
-    return value != 0;
 }
 
 static inline Mc::SaveDat* GetSaveDat(char* saveBuffer)
@@ -1024,16 +1023,16 @@ void CMemoryCardMan::MakeSaveData()
     memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
     saveDat->m_mcSerial = *reinterpret_cast<u64*>(&Game.m_gameWork.m_mcSerial0);
     saveDat->m_mcRandom = Game.m_gameWork.m_mcRandom;
-    save[0x13DC] = Game.m_gameWork.m_mcHasSerial;
-    save[0x13DD] = static_cast<u8>(Sound.GetBgmMasterVolume());
-    save[0x13DE] = static_cast<u8>(Sound.GetSeMasterVolume());
-    save[0x13DE] = static_cast<u8>(Sound.GetSeMasterVolume());
-    save[0x13DF] = Sound.IsStereo() != 0;
-    save[0x13E0] = MakeSaveBool(Game.m_gameWork.m_gameInitFlag);
-    save[0x13E1] = MakeSaveBool(g->m_gameWork.m_spModeFlags[0]);
-    save[0x13E2] = MakeSaveBool(g->m_gameWork.m_spModeFlags[1]);
-    save[0x13E3] = MakeSaveBool(g->m_gameWork.m_spModeFlags[2]);
-    save[0x13E4] = MakeSaveBool(g->m_gameWork.m_spModeFlags[3]);
+    saveDat->m_mcHasSerial = Game.m_gameWork.m_mcHasSerial;
+    saveDat->m_bgmVolume = static_cast<s8>(Sound.GetBgmMasterVolume());
+    saveDat->m_seVolume = static_cast<s8>(Sound.GetSeMasterVolume());
+    saveDat->m_seVolume = static_cast<s8>(Sound.GetSeMasterVolume());
+    saveDat->m_stereoFlag = Sound.IsStereo() != 0;
+    saveDat->m_gameInitFlag = Game.m_gameWork.m_gameInitFlag != 0;
+    for (int i = 0; i < 4; i++)
+    {
+        saveDat->m_spModeFlags[i] = g->m_gameWork.m_spModeFlags[i] != 0;
+    }
 
     for (int c = 0; c < 8; c++)
     {
@@ -1152,8 +1151,9 @@ void CMemoryCardMan::MakeSaveData()
 void CMemoryCardMan::SetLoadData()
 {
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
+    Mc::SaveDat* saveDat = GetSaveDat(save);
 
-    if (memcmp(GetSaveDat(save)->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
+    if (memcmp(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1161,7 +1161,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(GetSaveDat(save)->m_title, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE)) != 0)
+    if (memcmp(saveDat->m_title, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1169,7 +1169,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(GetSaveDat(save)->m_machine, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE)) != 0)
+    if (memcmp(saveDat->m_machine, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1177,7 +1177,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(GetSaveDat(save)->m_version, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION)) != 0)
+    if (memcmp(saveDat->m_version, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1185,7 +1185,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (GetSaveDat(save)->m_region != 'E')
+    if (saveDat->m_region != 'E')
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1202,23 +1202,23 @@ void CMemoryCardMan::SetLoadData()
     memcpy(Game.m_gameWork.m_bossArtifactStageTable, save + 0x40, 0x3C);
     memcpy(Game.m_gameWork.m_unkStageTable, save + 0x7C, 0x3C);
     Game.m_gameWork.m_chaliceElement = *reinterpret_cast<int*>(save + 0xB8);
-    memcpy(Game.m_gameWork.m_linkTable, GetSaveDat(save)->m_linkTable, sizeof(GetSaveDat(save)->m_linkTable));
+    memcpy(Game.m_gameWork.m_linkTable, saveDat->m_linkTable, sizeof(saveDat->m_linkTable));
     memcpy(Game.m_gameWork.m_townName, save + 0x10C0, 0x10);
     memcpy(Game.m_gameWork.m_eventFlags, save + 0x10D0, 0x100);
     memcpy(Game.m_gameWork.m_eventWork, save + 0x11D0, 0x200);
-    *reinterpret_cast<u64*>(&Game.m_gameWork.m_mcSerial0) = GetSaveDat(save)->m_mcSerial;
-    Game.m_gameWork.m_mcRandom = GetSaveDat(save)->m_mcRandom;
-    Game.m_gameWork.m_mcHasSerial = save[0x13DC];
-    Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));
-    Sound.SetSeMasterVolume(static_cast<s8>(save[0x13DE]));
+    *reinterpret_cast<u64*>(&Game.m_gameWork.m_mcSerial0) = saveDat->m_mcSerial;
+    Game.m_gameWork.m_mcRandom = saveDat->m_mcRandom;
+    Game.m_gameWork.m_mcHasSerial = saveDat->m_mcHasSerial;
+    Sound.SetBgmMasterVolume(saveDat->m_bgmVolume);
+    Sound.SetSeMasterVolume(saveDat->m_seVolume);
     Sound.SetStereo(Sound.IsStereo());
 
     CGame* g = &Game;
-    g->m_gameWork.m_gameInitFlag = MakeLoadBool(static_cast<s8>(save[0x13E0]));
-    g->m_gameWork.m_spModeFlags[0] = MakeLoadBool(static_cast<s8>(save[0x13E1]));
-    g->m_gameWork.m_spModeFlags[1] = MakeLoadBool(static_cast<s8>(save[0x13E2]));
-    g->m_gameWork.m_spModeFlags[2] = MakeLoadBool(static_cast<s8>(save[0x13E3]));
-    g->m_gameWork.m_spModeFlags[3] = MakeLoadBool(static_cast<s8>(save[0x13E4]));
+    g->m_gameWork.m_gameInitFlag = saveDat->m_gameInitFlag != 0;
+    for (int i = 0; i < 4; i++)
+    {
+        g->m_gameWork.m_spModeFlags[i] = saveDat->m_spModeFlags[i] != 0;
+    }
 
     int count;
     int i;

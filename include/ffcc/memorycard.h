@@ -42,7 +42,13 @@ public:
     unsigned char m_unknown10C0[0x13D0 - 0x10C0];
     u64 m_mcSerial;                                // 0x13D0
     u32 m_mcRandom;                                // 0x13D8
-    unsigned char m_unknown13DC[0x14D0 - 0x13DC];
+    unsigned char m_mcHasSerial;                    // 0x13DC
+    signed char m_bgmVolume;                        // 0x13DD
+    signed char m_seVolume;                         // 0x13DE
+    unsigned char m_stereoFlag;                     // 0x13DF
+    signed char m_gameInitFlag;                   // 0x13E0
+    signed char m_spModeFlags[4];                 // 0x13E1
+    unsigned char m_unknown13E5[0x14D0 - 0x13E5];
     CharaDat m_characters[8];                       // 0x14D0
     unsigned char m_unknown62D0[0x8BD0 - 0x62D0];
 };

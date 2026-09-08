@@ -8070,25 +8070,7 @@ void CMenuPcs::WMChgMenu()
 	sVar2 = m_wmWorldState->m_menuMode;
 	switch (sVar2) {
 	case 0: {
-			unsigned char* gameBytes = reinterpret_cast<unsigned char*>(&Game);
-			for (int count = 0; count < 4; count++) {
-				const int paramIndex = iVar8 / 2;
-				if (Game.m_caravanWorkArr[m_wmWorldState->m_originalBackupParams[paramIndex]].m_shopState == 0) {
-					m_wmWorldState->m_originalBackupParams[paramIndex] = (short)0xFFFF;
-				}
-				if (Game.m_caravanWorkArr[m_wmWorldState->m_backupParams[paramIndex]].m_shopState == 0) {
-					m_wmWorldState->m_backupParams[paramIndex] = (short)0xFFFF;
-				}
-				int iVar13 = *reinterpret_cast<int*>(gameBytes + 0x20);
-				if (Game.m_caravanWorkArr[iVar13].m_shopState == 0) {
-					*reinterpret_cast<int*>(gameBytes + 0x20) = -1;
-				}
-				if (Game.m_caravanWorkArr[iVar13].m_shopBusyFlag != 0) {
-					*reinterpret_cast<int*>(gameBytes + 0x20) = -1;
-				}
-				iVar8 = iVar8 + 2;
-				gameBytes += 4;
-			}
+			ChkSelectParty();
 
 			const float scrollStep = FLOAT_8033151c;
 			*reinterpret_cast<float*>(bytes + 0x78) = -(scrollStep * (float)(int)m_wmWorldState->m_cardChannel);
@@ -8152,12 +8134,7 @@ void CMenuPcs::WMChgMenu()
 		break;
 	case 3: {
 		if (m_wmWorldState->m_menuMode == 4) {
-			for (int i = 0; i < kWmMenuControllerCount; i++) {
-				const int slot = m_wm.m_charaSelectData[i].m_confirmed != 0
-				    ? m_wm.m_charaSelectData[i].m_currentSlot : -1;
-				Game.m_gameWork.m_wmBackupParams[i] = slot;
-				m_wmWorldState->m_backupParams[i] = static_cast<short>(slot);
-			}
+			SetParty();
 
 			bytes[0x10] = 1;
 			bytes[0x12] = 0;
@@ -8205,28 +8182,12 @@ void CMenuPcs::WMChgMenu()
  */
 inline void CMenuPcs::SetParty()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmCharaModelInfo* const modelData = m_wm.m_charaModelData;
-	unsigned char* const mcList = m_wmWorkBuffer;
-	int partyCount = 0;
-
-	if (modelData != 0) {
-		for (int i = 0; i < kWmCharaSelectCount; i++) {
-			if (modelData[i].m_modelChanged != 0) {
-				partyCount++;
-			}
-		}
+	for (int i = 0; i < kWmMenuControllerCount; i++) {
+		const int slot = m_wm.m_charaSelectData[i].m_confirmed != 0
+		    ? m_wm.m_charaSelectData[i].m_currentSlot : -1;
+		Game.m_gameWork.m_wmBackupParams[i] = slot;
+		m_wmWorldState->m_backupParams[i] = static_cast<short>(slot);
 	}
-	if (partyCount == 0 && mcList != 0) {
-		for (int i = 0; i < kMcListCount; i++) {
-			unsigned char* const entry = mcList + i * kMcListEntrySize;
-			if (entry[0x41] != 0 && entry[0x42] == 0 && entry[0x43] == 0) {
-				partyCount++;
-			}
-		}
-	}
-	gWmMenuWorkA = partyCount;
-	bytes[0x10] = static_cast<unsigned char>(partyCount > 0);
 }
 
 /*
@@ -8764,23 +8725,21 @@ void CMenuPcs::CalcMainMenuSub()
  */
 inline void CMenuPcs::ChkSelectParty()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmCharaModelInfo* const modelData = m_wm.m_charaModelData;
-	int selected = 0;
-
-	if (modelData == 0) {
-		gWmMenuWorkA = 0;
-		return;
-	}
-
-	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		if (modelData[i].m_modelChanged != 0) {
-			selected++;
+	for (int i = 0; i < kWmMenuControllerCount; i++) {
+		if (Game.m_caravanWorkArr[m_wmWorldState->m_originalBackupParams[i]].m_shopState == 0) {
+			m_wmWorldState->m_originalBackupParams[i] = -1;
+		}
+		if (Game.m_caravanWorkArr[m_wmWorldState->m_backupParams[i]].m_shopState == 0) {
+			m_wmWorldState->m_backupParams[i] = -1;
+		}
+		const int slot = Game.m_gameWork.m_wmBackupParams[i];
+		if (Game.m_caravanWorkArr[slot].m_shopState == 0) {
+			Game.m_gameWork.m_wmBackupParams[i] = -1;
+		}
+		if (Game.m_caravanWorkArr[slot].m_shopBusyFlag != 0) {
+			Game.m_gameWork.m_wmBackupParams[i] = -1;
 		}
 	}
-
-	gWmMenuWorkA = selected;
-	reinterpret_cast<unsigned char*>(this)[0x10] = static_cast<unsigned char>(selected != 0);
 }
 
 /*

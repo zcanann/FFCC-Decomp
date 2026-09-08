@@ -11442,8 +11442,7 @@ int McCtrl::SaveDat()
 		unsigned long long serial;
 		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
 			if (Game.m_gameWork.m_mcHasSerial == 0) {
-				Game.m_gameWork.m_mcSerial1 = static_cast<unsigned int>(serial);
-				Game.m_gameWork.m_mcSerial0 = static_cast<unsigned int>(serial >> 32);
+				Game.m_gameWork.m_mcSerial = serial;
 				Game.m_gameWork.m_mcRandom = Math.Rand(0x7FFFFFFF);
 				Game.m_gameWork.m_mcHasSerial = 1;
 			}
@@ -11599,17 +11598,18 @@ int McCtrl::LoadDat()
 		break;
 
 	case 5: {
-		unsigned int serialLo;
-		unsigned int serialHi;
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
+		unsigned long long serial;
+		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
+			m_serialHi = static_cast<unsigned int>(serial);
+			m_serialLo = static_cast<unsigned int>(serial >> 32);
+		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			return -1;
 		}
-		m_serialHi = *(&serialLo + 1);
-		m_serialLo = serialLo;
+
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McRead(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);
 		m_state = 6;
@@ -11957,8 +11957,7 @@ int McCtrl::ChkConnect(int chan)
  */
 int McCtrl::ChkNowData()
 {
-	unsigned int serialLo;
-	unsigned int serialHi;
+	unsigned long long serial;
 
 	if (m_state < 0)
 	{
@@ -12068,17 +12067,16 @@ int McCtrl::ChkNowData()
 		break;
 
 	case 5:
-		if (CARDGetSerialNo(m_cardChannel, (unsigned long long*)&serialLo) != 0)
-		{
+		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
+			m_serialHi = static_cast<unsigned int>(serial);
+			m_serialLo = static_cast<unsigned int>(serial >> 32);
+		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			return -999;
 		}
-
-		m_serialHi = serialHi;
-		m_serialLo = serialLo;
 
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McRead(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);
@@ -12116,9 +12114,9 @@ int McCtrl::ChkNowData()
 				{
 					MemoryCardMan.McUnmount(m_cardChannel);
 
-					if (((*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D0) ^ Game.m_gameWork.m_mcSerial0) |
-						 (*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D4) ^ Game.m_gameWork.m_mcSerial1)) == 0 &&
-						(*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D8) == Game.m_gameWork.m_mcRandom))
+					Mc::SaveDat* saveDat = reinterpret_cast<Mc::SaveDat*>(MemoryCardMan.m_saveBuffer);
+					if (saveDat->m_mcSerial == Game.m_gameWork.m_mcSerial &&
+					    saveDat->m_mcRandom == Game.m_gameWork.m_mcRandom)
 					{
 						r = 1;
 					}

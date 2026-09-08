@@ -1564,8 +1564,12 @@ inline void CGame::CGameWork::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void CGame::CGameWork::InitNewGame()
 {
@@ -1579,8 +1583,7 @@ inline void CGame::CGameWork::InitNewGame()
     const unsigned char bgmVolume = m_bgmVolume;
     const unsigned char seVolume = m_seVolume;
     const unsigned char stereoFlag = m_stereoFlag;
-    const unsigned int mcSerial0 = m_mcSerial0;
-    const unsigned int mcSerial1 = m_mcSerial1;
+    const u64 mcSerial = m_mcSerial;
 
     Init();
 
@@ -1594,8 +1597,7 @@ inline void CGame::CGameWork::InitNewGame()
     m_bgmVolume = bgmVolume;
     m_seVolume = seVolume;
     m_stereoFlag = stereoFlag;
-    m_mcSerial0 = mcSerial0;
-    m_mcSerial1 = mcSerial1;
+    m_mcSerial = mcSerial;
 }
 
 /*

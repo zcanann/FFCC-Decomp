@@ -75,8 +75,7 @@ public:
         unsigned char m_bgmVolume;                       // 0x13DD
         unsigned char m_seVolume;                        // 0x13DE
         unsigned char m_stereoFlag;                      // 0x13DF
-        unsigned int m_mcSerial0;                        // 0x13E0
-        unsigned int m_mcSerial1;                        // 0x13E4
+        u64 m_mcSerial;                                  // 0x13E0
     }; // Size 0x13E8
 
     struct CBossArtifactEntry
@@ -204,6 +203,8 @@ public:
 }; // Size 0x11F88
 
 STATIC_ASSERT(sizeof(CGame::CGameWork) == 0x13E8);
+STATIC_ASSERT(offsetof(CGame::CGameWork, m_mcSerial) == 0x13E0);
+STATIC_ASSERT(offsetof(CGame, m_gameWork) == 0x08);
 STATIC_ASSERT(sizeof(CGame::CBossArtifactEntry) == 0x08);
 STATIC_ASSERT(sizeof(CGame::CBossArtifactStage) == 0x168);
 STATIC_ASSERT(offsetof(CGame::CBossArtifactStage, m_entries) == 0x20);

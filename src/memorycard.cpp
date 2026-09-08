@@ -1021,7 +1021,7 @@ void CMemoryCardMan::MakeSaveData()
     memcpy(save + 0x10D0, Game.m_gameWork.m_eventFlags, 0x100);
     memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
     memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
-    saveDat->m_mcSerial = *reinterpret_cast<u64*>(&Game.m_gameWork.m_mcSerial0);
+    saveDat->m_mcSerial = Game.m_gameWork.m_mcSerial;
     saveDat->m_mcRandom = Game.m_gameWork.m_mcRandom;
     saveDat->m_mcHasSerial = Game.m_gameWork.m_mcHasSerial;
     saveDat->m_bgmVolume = static_cast<s8>(Sound.GetBgmMasterVolume());
@@ -1206,7 +1206,7 @@ void CMemoryCardMan::SetLoadData()
     memcpy(Game.m_gameWork.m_townName, save + 0x10C0, 0x10);
     memcpy(Game.m_gameWork.m_eventFlags, save + 0x10D0, 0x100);
     memcpy(Game.m_gameWork.m_eventWork, save + 0x11D0, 0x200);
-    *reinterpret_cast<u64*>(&Game.m_gameWork.m_mcSerial0) = saveDat->m_mcSerial;
+    Game.m_gameWork.m_mcSerial = saveDat->m_mcSerial;
     Game.m_gameWork.m_mcRandom = saveDat->m_mcRandom;
     Game.m_gameWork.m_mcHasSerial = saveDat->m_mcHasSerial;
     Sound.SetBgmMasterVolume(saveDat->m_bgmVolume);

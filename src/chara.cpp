@@ -84,6 +84,8 @@ STATIC_ASSERT(offsetof(CChara::CNode, m_refData) == 0x00);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);
 STATIC_ASSERT(offsetof(CChara::CNode, m_previousQuat) == 0x44);
 STATIC_ASSERT(offsetof(CChara::CNode, m_mtx) == 0x6C);
+STATIC_ASSERT(offsetof(CChara::CNode, m_animNodes[0]) == 0x9C);
+STATIC_ASSERT(offsetof(CChara::CNode, m_animNodes[1]) == 0xA0);
 STATIC_ASSERT(offsetof(CChara::CNode, m_dynPosition) == 0xA4);
 STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
 STATIC_ASSERT(sizeof(CChara::CNode::CRefData) == 0x94);
@@ -93,8 +95,8 @@ STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_boneLen) == 0x60);
 STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_childBankOffset) == 0x64);
 STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_index) == 0x66);
 STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_parentIndex) == 0x68);
-STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_name) == 0x6A);
-STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_altName) == 0x7A);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_names[0]) == 0x6A);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_names[1]) == 0x7A);
 STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_childCount) == 0x8A);
 STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_type) == 0x8B);
 STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_bindFlags) == 0x8C);
@@ -299,12 +301,12 @@ static inline u32 CharaFourCC(char a, char b, char c, char d)
 
 static inline char* NodeRefName(CChara::CNode* node)
 {
-	return node->m_refData->m_name;
+	return node->m_refData->m_names[0];
 }
 
 static inline char* NodeRefAltName(CChara::CNode* node)
 {
-	return node->m_refData->m_altName;
+	return node->m_refData->m_names[1];
 }
 
 static inline s8& NodeDynParamIndex(CChara::CNode* node)
@@ -424,12 +426,12 @@ static inline Vec& NodePreviousScale(CChara::CNode* node)
 
 static inline CChara::CAnimNode*& NodeAnimNode0(CChara::CNode* node)
 {
-	return node->m_animNode0;
+	return node->m_animNodes[0];
 }
 
 static inline CChara::CAnimNode*& NodeAnimNode1(CChara::CNode* node)
 {
-	return node->m_animNode1;
+	return node->m_animNodes[1];
 }
 
 static inline u8& NodeRuntimeFlags(CChara::CNode* node)
@@ -490,30 +492,6 @@ static inline bool AnimNodeUsesScale(CChara::CAnimNode* node)
 static inline u8 ModelAttachMode(CChara::CModel* model)
 {
 	return *(reinterpret_cast<u8*>(model) + 0xA1);
-}
-
-static inline void ReleaseRefCountedNonNull(void* refObject)
-{
-	CRef* ref = reinterpret_cast<CRef*>(refObject);
-	if (ref->DecRef() == 0) {
-		delete ref;
-	}
-}
-
-static inline void ReleaseRefCounted(void* refObject)
-{
-	if (refObject == 0) {
-		return;
-	}
-
-	ReleaseRefCountedNonNull(refObject);
-}
-
-static inline void RetainRefCounted(void* refObject)
-{
-	if (refObject != 0) {
-		reinterpret_cast<CRef*>(refObject)->AddRef();
-	}
 }
 
 static void CalcOneBindNode(CChara::CNode* node, CChara::CModel* model)
@@ -651,10 +629,10 @@ void CChara::FlipDBuffer()
 
 /*
  * --INFO--
- * PAL Address: 0x80075380
+ * PAL Address: 0x8006eb04
  * PAL Size: 16b
- * EN Address: 0x8007eafc
- * EN Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -768,40 +746,46 @@ CChara::CModel::CModel()
  */
 CChara::CModel::~CModel()
 {
-	void*& texSet = reinterpret_cast<void*&>(m_texSet);
+	CTextureSet* texSet = m_texSet;
 	if (texSet != 0) {
-		ReleaseRefCountedNonNull(texSet);
-		texSet = 0;
+		if (texSet->DecRef() == 0) {
+			delete texSet;
+		}
+		m_texSet = 0;
 	}
 
-	void*& anim = reinterpret_cast<void*&>(m_anim);
+	CAnim* anim = m_anim;
 	if (anim != 0) {
-		ReleaseRefCountedNonNull(anim);
-		anim = 0;
+		if (anim->DecRef() == 0) {
+			delete anim;
+		}
+		m_anim = 0;
 	}
 
-	void*& texAnimSet = reinterpret_cast<void*&>(m_texAnimSet);
+	CTexAnimSet* texAnimSet = m_texAnimSet;
 	if (texAnimSet != 0) {
-		ReleaseRefCountedNonNull(texAnimSet);
-		texAnimSet = 0;
+		if (texAnimSet->DecRef() == 0) {
+			delete texAnimSet;
+		}
+		m_texAnimSet = 0;
 	}
 
-	void*& refData = reinterpret_cast<void*&>(m_data);
+	CRefData* refData = m_data;
 	if (refData != 0) {
-		ReleaseRefCountedNonNull(refData);
-		refData = 0;
+		if (refData->DecRef() == 0) {
+			delete refData;
+		}
+		m_data = 0;
 	}
 
-	void*& nodes = reinterpret_cast<void*&>(m_nodes);
-	if (nodes != 0) {
-		delete[] static_cast<CChara::CNode*>(nodes);
-		nodes = 0;
+	if (m_nodes != 0) {
+		delete[] m_nodes;
+		m_nodes = 0;
 	}
 
-	void*& meshes = reinterpret_cast<void*&>(m_meshes);
-	if (meshes != 0) {
-		delete[] static_cast<CChara::CMesh*>(meshes);
-		meshes = 0;
+	if (m_meshes != 0) {
+		delete[] m_meshes;
+		m_meshes = 0;
 	}
 }
 
@@ -1277,10 +1261,10 @@ void CChara::CModel::CalcMatrix()
 
 /*
  * --INFO--
- * PAL Address: 0x80078bd8
+ * PAL Address: 0x800722f4
  * PAL Size: 176b
- * EN Address: 0x8007ff54
- * EN Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1969,7 +1953,7 @@ int CChara::CModel::SearchNodeSk(char* name)
 			CNode* node = ModelNodes(this);
 			for (; i < ModelNodeCount(this); i++, node++) {
 				int tail = strlen(NodeRefName(node)) - 3;
-				if (tail > 0 && strcmp(&node->m_refData->m_name[tail], name) == 0) {
+				if (tail > 0 && strcmp(&node->m_refData->m_names[0][tail], name) == 0) {
 					return (int)i;
 				}
 			}
@@ -1978,7 +1962,7 @@ int CChara::CModel::SearchNodeSk(char* name)
 			u32 i = 0;
 			for (; i < ModelNodeCount(this); i++, node++) {
 				int tail = strlen(NodeRefName(node)) - 5;
-				if (tail > 0 && strcmp(&node->m_refData->m_name[tail], name) == 0) {
+				if (tail > 0 && strcmp(&node->m_refData->m_names[0][tail], name) == 0) {
 					return (int)i;
 				}
 			}
@@ -2001,10 +1985,10 @@ foundPlain:
 
 /*
  * --INFO--
- * PAL Address: 0x80077250
+ * PAL Address: 0x8007096c
  * PAL Size: 1192b
- * EN Address: 0x80081438
- * EN Size: 1380b
+ * EN Address: TODO
+ * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2129,10 +2113,10 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 /*
  * --INFO--
- * PAL Address: 0x80076f74
+ * PAL Address: 0x80070690
  * PAL Size: 732b
- * EN Address: 0x8008199c
- * EN Size: 684b
+ * EN Address: TODO
+ * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2270,15 +2254,20 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 	}
 
 	if (anim != m_anim) {
-		ReleaseRefCounted(m_anim);
+		CAnim* oldAnim = m_anim;
+		if (oldAnim != 0 && oldAnim->DecRef() == 0) {
+			delete oldAnim;
+		}
 		m_anim = 0;
 		m_anim = anim;
-		RetainRefCounted(m_anim);
+		if (m_anim != 0) {
+			m_anim->AddRef();
+		}
 	}
 
 	CNode* nodes = ModelNodes(this);
 	for (u32 i = 0; i < ModelNodeCount(this); i++) {
-		CNode* node = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(nodes) + i * 0xC0);
+		CNode* node = &nodes[i];
 
 		NodeAnimNode0(node) = 0;
 		NodeAnimNode1(node) = 0;
@@ -2298,9 +2287,9 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 			char* animName = AnimNodeName(animNode);
 
 			for (unsigned int slot = 0; slot < 2; slot++) {
-				char* name = node->m_refData->m_name + slot * 0x10;
+				char* name = node->m_refData->m_names[slot];
 				if (name[0] != '\0' && strcmp(animName, name) == 0) {
-					(&NodeAnimNode0(node))[slot] = animNode;
+					node->m_animNodes[slot] = animNode;
 					break;
 				}
 			}
@@ -2450,8 +2439,8 @@ CChara::CNode::CNode()
 
 	m_refData = 0;
 	m_displayMesh = 0;
-	m_animNode0 = 0;
-	m_animNode1 = 0;
+	m_animNodes[0] = 0;
+	m_animNodes[1] = 0;
 	reinterpret_cast<Flags*>(&m_flags)->active = active;
 }
 
@@ -2499,9 +2488,9 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 			m_refData->m_bindFlags = static_cast<u8>(chunk.Get4());
 			m_refData->m_boneLen = chunk.GetF4();
 		} else if (chunkInfo.m_id == 0x4E414D45) {
-			strcpy(m_refData->m_name, chunk.GetString());
+			strcpy(m_refData->m_names[0], chunk.GetString());
 		} else if (chunkInfo.m_id == 0x4E414D32) {
-			strcpy(m_refData->m_altName, chunk.GetString());
+			strcpy(m_refData->m_names[1], chunk.GetString());
 		} else if (chunkInfo.m_id == 0x5446524D) {
 			chunk.Get(m_refData->m_localMtx, 0x30);
 			if (m_refData->m_parentIndex == -1) {
@@ -2748,10 +2737,10 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 
 /*
  * --INFO--
- * PAL Address: 0x80075864
+ * PAL Address: 0x8006efe8
  * PAL Size: 1244b
- * EN Address: 0x80082fe8
- * EN Size: 1308b
+ * EN Address: TODO
+ * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */

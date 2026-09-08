@@ -27,6 +27,8 @@ Useful references:
 - EN map: `orig/GCCE01/game.MAP`
 - Symbol extractor: `python3 tools/extract_symbols.py <object>.o`
 
+Do not assume MAP addresses and sizes match the retail images. The PAL MAP comes from an older build, as noted in `config/GCCP01/config.yml`; EN MAP addresses also need verification. Use MAPs for symbol and ownership evidence, but verify addresses and sizes against the relevant retail image and symbol configuration before changing INFO headers or symbol claims.
+
 Useful tooling:
 - `python3 tools/agent_select_target.py` picks code/data targets and shows PAL/EN symbol hints.
 - `python3 tools/map/claim_doctor.py [source.cpp]` compares current compiled section sizes, current claims, and PAL/EN MAP ownership hints.

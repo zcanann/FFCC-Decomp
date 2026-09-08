@@ -196,8 +196,7 @@ public:
 			s16 m_childBankOffset;          // 0x64
 			s16 m_index;                    // 0x66
 			s16 m_parentIndex;              // 0x68
-			char m_name[0x10];              // 0x6A
-			char m_altName[0x10];           // 0x7A
+			char m_names[2][0x10];          // 0x6A
 			u8 m_childCount;                // 0x8A
 			u8 m_type;                      // 0x8B
 			u8 m_bindFlags;                 // 0x8C
@@ -220,8 +219,7 @@ public:
 		Vec m_previousPosition;
 		Vec m_previousScale;
 		Mtx m_mtx;
-		CAnimNode* m_animNode0;
-		CAnimNode* m_animNode1;
+		CAnimNode* m_animNodes[2];
 		CVector m_dynPosition;
 		CVector m_dynVel;
 		union

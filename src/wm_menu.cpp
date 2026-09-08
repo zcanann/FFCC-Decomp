@@ -51,6 +51,32 @@ extern const char lbl_80331208[5];
 
 char* DAT_8032E8A8 = const_cast<char*>(lbl_80331208);
 unsigned char lbl_8032E8AC = 1;
+struct WmMenuLightTable
+{
+	int m_diffuseCount;
+	_GXColor m_ambient;
+	_GXColor m_diffuseColors[3];
+	Vec m_diffuseDirs[3];
+};
+
+static WmMenuLightTable s_Light[] = {
+	{
+		2, {112, 112, 108, 255},
+		{{148, 148, 148, 255}, {16, 11, 51, 255}, {0, 0, 0, 255}},
+		{{0.679108f, -0.559193f, -0.475516f}, {-0.079979f, 0.965926f, -0.246152f}, {0.0f, 0.0f, 0.0f}},
+	},
+	{
+		1, {119, 107, 103, 255},
+		{{171, 171, 171, 255}, {0, 0, 0, 255}, {0, 0, 0, 255}},
+		{{0.579484f, -0.5f, -0.643582f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
+	},
+	{
+		2, {128, 128, 128, 255},
+		{{148, 148, 148, 255}, {16, 11, 51, 255}, {0, 0, 0, 255}},
+		{{-0.479108f, -0.559193f, -0.475516f}, {0.079979f, 0.965926f, -0.246152f}, {0.0f, 0.0f, 0.0f}},
+	},
+};
+
 static CMenuPcs::SPL s_WoodTrnsY[] = {
 	{0.0f, 0.0f, 0.0f, 0.0f},
 	{0.5f, 0.12f, 0.0f, 0.0f},
@@ -133,8 +159,6 @@ extern "C" const char* lbl_80210D10[];
 extern "C" const char* lbl_80210D54[];
 extern "C" const char* lbl_80210D68[];
 extern "C" char* lbl_80210750[];
-extern "C" char* lbl_80210B74[];
-extern "C" CMenuPcs::CTmp lbl_80210B98[];
 
 inline CGBaseObj::CGBaseObj()
 {
@@ -157,52 +181,6 @@ extern char* DAT_8032EE34;
 extern unsigned char lbl_8032EE38[8];
 
 extern const char lbl_80331208[5] = "1.00";
-extern const char lbl_80331210[6] = "world";
-extern const char lbl_80331218[7] = "world2";
-extern const char lbl_80331220[8] = "cc_logo";
-extern const char lbl_80331228[7] = "world1";
-extern const char lbl_80331230[7] = "world3";
-extern const char lbl_80331238[7] = "world4";
-extern const char lbl_80331240[7] = "world5";
-extern const char lbl_80331248[7] = "world6";
-extern const char lbl_80331250[7] = "world7";
-extern const char lbl_80331258[7] = "world8";
-extern const char lbl_80331260[7] = "world9";
-extern const char lbl_80331268[8] = "world10";
-extern const char lbl_80331270[8] = "world11";
-extern const char lbl_80331278[8] = "world12";
-extern const char lbl_80331280[8] = "world13";
-extern const char lbl_80331288[8] = "world14";
-extern const char lbl_80331290[8] = "world15";
-extern const char lbl_80331298[8] = "world16";
-extern const char lbl_803312A0[8] = "world17";
-extern const char lbl_803312A8[8] = "world18";
-extern const char lbl_803312B0[8] = "world19";
-extern const char lbl_803312B8[8] = "world20";
-extern const char lbl_803312C0[8] = "world21";
-extern const char lbl_803312C8[8] = "world22";
-extern const char lbl_803312D0[8] = "world23";
-extern const char lbl_803312D8[8] = "world24";
-extern const char lbl_803312E0[8] = "world25";
-extern const char lbl_803312E8[8] = "world26";
-extern const char lbl_803312F0[8] = "world30";
-extern const char lbl_803312F8[8] = "world40";
-extern const char lbl_80331300[8] = "world46";
-extern const char lbl_80331308[8] = "world47";
-extern const char lbl_80331310[8] = "world50";
-extern const char lbl_80331318[7] = "diary1";
-extern const char lbl_80331320[7] = "diary2";
-extern const char lbl_80331328[5] = "face";
-extern const char lbl_80331330[8] = "odekake";
-extern const char lbl_80331338[8] = "crystal";
-extern const char lbl_80331340[8] = "world27";
-extern const char lbl_80331348[8] = "world28";
-extern const char lbl_80331350[8] = "world29";
-extern const char lbl_80331358[8] = "world44";
-extern const char lbl_80331360[8] = "world45";
-extern const char lbl_80331368[8] = "world48";
-extern const char lbl_80331370[8] = "world49";
-extern const char lbl_80331378[8] = "world51";
 extern const char lbl_80331380[4] = {'?','?','?','?'};
 extern const char lbl_80331384[6] = "Port ";
 extern const char lbl_8033138C[7] = "-Hafen";
@@ -446,16 +424,6 @@ static const float s_MainMenuSubFrameWidths[5] = {264.0f, 264.0f, 264.0f, 264.0f
 static Vec s_RingOrgPos;
 static Vec s_MMenuPos[5];
 
-struct WmMenuLightTable
-{
-	int m_diffuseCount;
-	_GXColor m_ambient;
-	_GXColor m_diffuseColors[3];
-	Vec m_diffuseDirs[3];
-};
-
-extern "C" WmMenuLightTable gWmMenuLightTables[];
-
 static const int kWmMenuPlayerCount = 8;
 static const int kWmMenuControllerCount = 4;
 static const int kWmCharaSelectCount = kWmMenuPlayerCount;
@@ -663,7 +631,70 @@ void CMenuPcs::loadData()
 #define srcFile (rodataBase + 0xC20)
 	m_menuResultCode = 0;
 	GbaQue.SetControllerMode(1);
-	loadTexture(lbl_80210B74, 2, 3, lbl_80210B98, 0x16, 0x2F, 0);
+
+	static char* tName[] = {
+		"world",
+		"world2",
+		"cc_logo",
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+	};
+
+	static CTmp tTmp[] = {
+		{2, "world1"},
+		{2, "world2"},
+		{2, "world3"},
+		{2, "world4"},
+		{2, "world5"},
+		{2, "world6"},
+		{2, "world7"},
+		{2, "world8"},
+		{2, "world9"},
+		{2, "world10"},
+		{2, "world11"},
+		{2, "world12"},
+		{2, "world13"},
+		{2, "world14"},
+		{2, "world15"},
+		{2, "world16"},
+		{2, "world17"},
+		{2, "world18"},
+		{2, "world19"},
+		{2, "world20"},
+		{2, "world21"},
+		{2, "world22"},
+		{2, "world23"},
+		{2, "world24"},
+		{2, "world25"},
+		{2, "world26"},
+		{2, "world30"},
+		{2, "world40"},
+		{2, "world46"},
+		{2, "world47"},
+		{2, "world50"},
+		{2, "diary1"},
+		{2, "diary2"},
+		{2, "face"},
+		{2, "odekake"},
+		{3, "crystal"},
+		{3, "world27"},
+		{3, "world28"},
+		{3, "world29"},
+		{3, "world44"},
+		{3, "world45"},
+		{3, "world48"},
+		{3, "world49"},
+		{3, "world51"},
+		{4, "cc_logo01"},
+		{4, "cc_logo02"},
+		{4, "cc_logo03"},
+	};
+
+	loadTexture(tName, 2, 3, tTmp, 0x16, 0x2F, 0);
 
 	m_wm.m_handles[0x00] = 0;
 	m_wm.m_handles[0x01] = 0;
@@ -10045,13 +10076,13 @@ void CMenuPcs::SetLight(int mode)
 {
 	Graphic.SetFog(1, 0);
 
-	LightPcs.SetAmbient(gWmMenuLightTables[mode].m_ambient);
-	LightPcs.SetNumDiffuse(static_cast<unsigned long>(gWmMenuLightTables[mode].m_diffuseCount));
+	LightPcs.SetAmbient(s_Light[mode].m_ambient);
+	LightPcs.SetNumDiffuse(static_cast<unsigned long>(s_Light[mode].m_diffuseCount));
 
-	for (int i = 0; i < gWmMenuLightTables[mode].m_diffuseCount; i++) {
+	for (int i = 0; i < s_Light[mode].m_diffuseCount; i++) {
 		LightPcs.SetDiffuse(
-			static_cast<unsigned long>(i), gWmMenuLightTables[mode].m_diffuseColors[i],
-			&gWmMenuLightTables[mode].m_diffuseDirs[i], 0);
+			static_cast<unsigned long>(i), s_Light[mode].m_diffuseColors[i],
+			&s_Light[mode].m_diffuseDirs[i], 0);
 	}
 
 	LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);

@@ -2836,7 +2836,7 @@ void CGPartyObj::checkTargetParticle()
 
 			CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 			hitCylinder.m_bottom = bottom;
-			hitCylinder.m_top = move;
+			hitCylinder.m_axis = move;
 			hitCylinder.m_radius = radius;
 
 			if (MapMng.CheckHitCylinderNear(&hitCylinder, move, 0x30) == 0) {
@@ -2860,7 +2860,7 @@ void CGPartyObj::checkTargetParticle()
 		floorCylinder.m_bottom.x = targetPos->x;
 		floorCylinder.m_bottom.y = targetPos->y;
 		floorCylinder.m_bottom.z = targetPos->z;
-		floorCylinder.m_top = *(Vec*)&down;
+		floorCylinder.m_axis = *(Vec*)&down;
 		floorCylinder.m_radius = FLOAT_80331a78;
 
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, (Vec*)&down, 0x30) != 0) {
@@ -2917,7 +2917,7 @@ void CGPartyObj::moveCenterTargetParticle()
 	hitCylinder.m_bottom.x = bottomResult.x;
 	hitCylinder.m_bottom.y = bottomResult.y;
 	hitCylinder.m_bottom.z = bottomResult.z;
-	hitCylinder.m_top = *(Vec*)&moveVec;
+	hitCylinder.m_axis = *(Vec*)&moveVec;
 	hitCylinder.m_radius = FLOAT_80331a78;
 
 	if (MapMng.CheckHitCylinderNear(&hitCylinder, (Vec*)&moveVec, 0x30) != 0) {

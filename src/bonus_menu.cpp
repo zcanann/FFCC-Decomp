@@ -4,6 +4,7 @@
 #include "ffcc/gbaque.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/game.h"
 #include "ffcc/linkage.h"
@@ -82,9 +83,9 @@ STATIC_ASSERT(offsetof(BonusSummaryData, m_artifacts) + BonusSummaryData::kTempo
 STATIC_ASSERT(offsetof(BonusSummaryData, m_party) == 0x1C);
 
 static BonusSummaryData* s_Rinfo = 0;
-static unsigned char s_CntTop = 0;
-static unsigned char s_ArtiTop = 0;
-static unsigned char s_PlayerTop = 0;
+static signed char s_CntTop = 0;
+static signed char s_ArtiTop = 0;
+static signed char s_PlayerTop = 0;
 struct BonusBaseInfo {
 	Vec2d m_center;
 	Vec2d m_artifactPositions[BonusSummaryData::kArtifactCount];
@@ -103,14 +104,6 @@ static inline void InitBonusEffectSlots(CMenuPcs* menu)
 		menu->m_effectWork[i].m_effectNo = -1;
 		menu->m_effectWork[i].m_partNo = -1;
 		menu->m_effectWork[i].m_slotNo = -1;
-	}
-}
-
-static inline void ReleaseBonusRefObject(void* object)
-{
-	CRef* ref = reinterpret_cast<CRef*>(object);
-	if (ref->DecRef() == 0) {
-		delete ref;
 	}
 }
 
@@ -405,7 +398,7 @@ void CMenuPcs::createBonus()
 				m_wm.m_handles[handleIndex] = itemHandle;
 				m_wm.m_handles[handleIndex]->Add();
 				unsigned short itemModelCode =
-				    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2);
+				    reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_model;
 				int modelNo = itemModelCode & 0x0FFF;
 				m_wm.m_handles[handleIndex]->LoadModel(3, modelNo, (itemModelCode >> 12) & 0xF, 0, -1, 0, 0);
 				m_wm.m_handles[handleIndex]->m_flags = 0x300543;
@@ -463,7 +456,10 @@ void CMenuPcs::destroyBonus()
 	Pad.m_stickDigitalThreshold = 1;
 
 	if (this->m_fonts[1] != 0) {
-		ReleaseBonusRefObject(this->m_fonts[1]);
+		CFont* font = m_fonts[1];
+		if (font->DecRef() == 0) {
+			delete font;
+		}
 		this->m_fonts[1] = 0;
 	}
 
@@ -805,7 +801,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			count->depth = 1.0f;
 		}
 		int countTop = base + 1;
-		s_CntTop = (signed char)countTop;
+		s_CntTop = countTop;
 
 		{
 			for (int i = 0; i < activePartyCount; i++) {
@@ -883,9 +879,9 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		{
-			unsigned int i = 0;
+			int i = 0;
 			for (; i < activePartyCount; i++) {
-				CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[(unsigned char)s_CntTop + i];
+				CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[s_CntTop + i];
 				int w3 = sprite->w * 3;
 				int extent = w3 + 0x20;
 				int centerX = (int)(float)((double)(float)((double)w3 * 0.5 + (double)sprite->x) - 320.0);
@@ -1165,7 +1161,7 @@ void CMenuPcs::DrawResultOpenAnim()
 							    fillWidth, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
 						}
 					} else {
-						if ((signed char)i >= s_CntTop && i < (signed char)s_CntTop + activePartyCount) {
+						if (i >= s_CntTop && i < s_CntTop + activePartyCount) {
 							DrawBonusCnt(sprite, 0);
 						} else {
 							MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
@@ -1446,8 +1442,8 @@ void CMenuPcs::DrawResultCountAnim()
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->kind));
 
-				if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
-					int total = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
+				if (s_CntTop <= i && i < s_CntTop + activePartyCount) {
+					int total = s_Rinfo->m_party[i - s_CntTop].m_totalValue;
 					int value;
 					if (this->m_bonusState->m_countFinished == 0) {
 						double frame = (double)this->m_bonusState->m_frame - 8.333333134651184;
@@ -1612,7 +1608,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->startFrame = m_bonusAnim->sprites[1].startFrame;
 		}
 		base += 1;
-		s_CntTop = (signed char)base;
+		s_CntTop = base;
 
 		for (int i = 0; i < activePartyCount; i++) {
 			Sprt2* sprite = &m_bonusAnim->sprites[base + i];
@@ -1920,8 +1916,8 @@ void CMenuPcs::DrawResultCloseAnim()
 						}
 					}
 				} else {
-					if ((signed char)s_CntTop <= i && i < (signed char)s_CntTop + activePartyCount) {
-						int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
+					if (s_CntTop <= i && i < s_CntTop + activePartyCount) {
+						int value = s_Rinfo->m_party[i - s_CntTop].m_totalValue;
 						DrawBonusCnt(sprite, value);
 					} else {
 						MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
@@ -2107,7 +2103,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 
 		top = activePartyCount + 4;
-		s_PlayerTop = (unsigned char)top;
+		s_PlayerTop = top;
 		for (int i = 0; i < activePartyCount; i++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[top + i];
 			spr->kind = -2;
@@ -2128,7 +2124,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 
 		top += activePartyCount;
-		s_ArtiTop = (unsigned char)top;
+		s_ArtiTop = top;
 		{
 			int start = 10;
 			for (int i = 0; i < 8; i++) {
@@ -2313,7 +2309,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		twice = activePartyCount * 2;
 		total = activePartyCount + 8;
 		for (; i < total; i++) {
-			iconSprite = &m_bonusAnim->sprites[(int)(signed char)s_PlayerTop + i];
+			iconSprite = &m_bonusAnim->sprites[s_PlayerTop + i];
 			if (i < activePartyCount) {
 				tribeId = s_Rinfo->m_party[i].m_tribeId;
 				handle = s_Rinfo->m_party[i].m_partyHandle;
@@ -2806,7 +2802,7 @@ void CMenuPcs::CalcSelectWait()
 	{
 		int doubleCount = activePartyCount * 2;
 		for (i = 0; i < activePartyCount + 8; i++) {
-			CMenuPcs::Sprt2* alphaSprite = &m_bonusAnim->sprites[(int)(signed char)s_PlayerTop + i];
+			CMenuPcs::Sprt2* alphaSprite = &m_bonusAnim->sprites[s_PlayerTop + i];
 			CCharaPcs::CHandle* handle;
 			int tribeOrSlot;
 			if (i < activePartyCount) {
@@ -2982,14 +2978,14 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 		int base;
 		base = activePartyCount + 4;
-		s_PlayerTop = (unsigned char)base;
+		s_PlayerTop = base;
 		for (int i = 0; i < activePartyCount; i++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
 			SetupSelectCloseSpriteMotion(spr);
 		}
 
 		base += activePartyCount;
-		s_ArtiTop = (unsigned char)base;
+		s_ArtiTop = base;
 		for (int i = 0; i < 8; i++) {
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
 			spr->startFrame = 0;
@@ -3102,7 +3098,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		twice = activePartyCount * 2;
 		total = activePartyCount + 8;
 		for (; i < total; i++) {
-			alphaSprite = &m_bonusAnim->sprites[(int)(signed char)s_PlayerTop + i];
+			alphaSprite = &m_bonusAnim->sprites[s_PlayerTop + i];
 			if (i < activePartyCount) {
 				tribeId = s_Rinfo->m_party[i].m_tribeId;
 				handle = s_Rinfo->m_party[i].m_partyHandle;

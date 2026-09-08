@@ -11060,14 +11060,15 @@ int McCtrl::LoadMcList()
 
 	case 5: {
 		unsigned long long serial;
-		if (CARDGetSerialNo(m_cardChannel, &serial) != 0) {
+		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
+			m_serial = serial;
+		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			return -1;
 		}
-		m_serial = serial;
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McRead(0, 0xA000, m_iteration * 0xA000 + 0x4000);
 		m_state = 6;
@@ -11111,12 +11112,13 @@ int McCtrl::LoadMcList()
 		break;
 	}
 
+	int result;
 	if (m_state == -1) {
-		return -1;
-	}
-	int result = 0;
-	if (m_state == 7) {
+		result = -1;
+	} else if (m_state == 7) {
 		result = 1;
+	} else {
+		result = 0;
 	}
 	return result;
 }
@@ -11498,12 +11500,13 @@ int McCtrl::SaveDat()
 		break;
 	}
 
+	int result;
 	if (m_state == -1) {
-		return -1;
-	}
-	int result = 0;
-	if (m_state == 0x14) {
+		result = -1;
+	} else if (m_state == 0x14) {
 		result = 1;
+	} else {
+		result = 0;
 	}
 	return result;
 }
@@ -12247,33 +12250,14 @@ int McCtrl::SaveDataBuffer(char* buffer)
 		unsigned char* const save = reinterpret_cast<unsigned char*>(MemoryCardMan.m_saveBuffer);
 		memcpy(save, buffer, 0x8BD0);
 
-		unsigned char* entry = save + *reinterpret_cast<int*>(save + 0x30) * 0x9C0;
-		if (*reinterpret_cast<int*>(entry + 0x1A84) == 0) {
-			*reinterpret_cast<int*>(save + 0x30) = -1;
-		}
-		if (entry[0x1D90] != 0) {
-			*reinterpret_cast<int*>(save + 0x30) = -1;
-		}
-		entry = save + *reinterpret_cast<int*>(save + 0x34) * 0x9C0;
-		if (*reinterpret_cast<int*>(entry + 0x1A84) == 0) {
-			*reinterpret_cast<int*>(save + 0x34) = -1;
-		}
-		if (entry[0x1D90] != 0) {
-			*reinterpret_cast<int*>(save + 0x34) = -1;
-		}
-		entry = save + *reinterpret_cast<int*>(save + 0x38) * 0x9C0;
-		if (*reinterpret_cast<int*>(entry + 0x1A84) == 0) {
-			*reinterpret_cast<int*>(save + 0x38) = -1;
-		}
-		if (entry[0x1D90] != 0) {
-			*reinterpret_cast<int*>(save + 0x38) = -1;
-		}
-		entry = save + *reinterpret_cast<int*>(save + 0x3C) * 0x9C0;
-		if (*reinterpret_cast<int*>(entry + 0x1A84) == 0) {
-			*reinterpret_cast<int*>(save + 0x3C) = -1;
-		}
-		if (entry[0x1D90] != 0) {
-			*reinterpret_cast<int*>(save + 0x3C) = -1;
+		for (int i = 0; i < 4; i++) {
+			unsigned char* entry = save + reinterpret_cast<int*>(save + 0x30)[i] * 0x9C0;
+			if (*reinterpret_cast<int*>(entry + 0x1A84) == 0) {
+				reinterpret_cast<int*>(save + 0x30)[i] = -1;
+			}
+			if (entry[0x1D90] != 0) {
+				reinterpret_cast<int*>(save + 0x30)[i] = -1;
+			}
 		}
 
 		*reinterpret_cast<unsigned int*>(save + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(save));
@@ -12313,13 +12297,13 @@ int McCtrl::SaveDataBuffer(char* buffer)
 		break;
 	}
 
-	if (m_state == -1) {
-		return -999;
-	}
 	int result;
-	result = 0;
-	if (m_state == 0x12) {
+	if (m_state == -1) {
+		result = -999;
+	} else if (m_state == 0x12) {
 		result = 1;
+	} else {
+		result = 0;
 	}
 	return result;
 }
@@ -12467,8 +12451,7 @@ int McCtrl::EraseDat()
 				memset(&entry, 0, 0x48);
 				entry.m_byte42 = 0;
 				for (int i = 0; i < kMcListCount; i++) {
-					int __p8 =   (int)(unsigned int)((0 + i));
-					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + __p8 * kMcListEntrySize) = entry;
+					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;
 				}
 				m_state = 10;
 			}
@@ -12627,12 +12610,13 @@ int McCtrl::EraseDat()
 		break;
 	}
 
+	int result;
 	if (m_state == -1) {
-		return -1;
-	}
-	int result = 0;
-	if (m_state == 0x14) {
+		result = -1;
+	} else if (m_state == 0x14) {
 		result = 1;
+	} else {
+		result = 0;
 	}
 	return result;
 }

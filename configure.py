@@ -501,6 +501,7 @@ config.libs = [
             Object(
                 NonMatching,
                 "cflat_r2system.cpp",
+                mw_version="GC/2.5",
                 extra_cflags=["-inline auto,deferred", "-str reuse,pool,readonly", "-use_lmw_stmw on"],
             ),
             Object(NonMatching, "cflat_runtime.cpp"),
@@ -776,7 +777,7 @@ config.libs = [
             Object(Matching, "USBStreamData.cpp"),
             Object(NonMatching, "util.cpp", mw_version="GC/2.5", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline auto,deferred"]),
             Object(Matching, "vector.cpp", mw_version="GC/2.6"),
-            Object(NonMatching, "wind.cpp"),
+            Object(NonMatching, "wind.cpp", mw_version="GC/2.5"),
             Object(NonMatching, "wm_menu.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "wmm_str.cpp"),
             Object(Matching, "zlist.cpp"),

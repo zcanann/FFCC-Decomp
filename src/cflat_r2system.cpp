@@ -621,22 +621,14 @@ void CMes::SetTempValue(int index, int value)
  * --INFO--
  * PAL Address: 0x800B9394
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CF1AC
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CCharaPcs::SetMapShadeColor(int shadeIndex, CColor color)
 {
-    const unsigned char* src = &color.color.r;
-    unsigned char r = *src++;
-    unsigned char g = *src++;
-    m_viewerChoiceColor[shadeIndex].color.r = r;
-    unsigned char b = *src++;
-    m_viewerChoiceColor[shadeIndex].color.g = g;
-    unsigned char a = *src;
-    m_viewerChoiceColor[shadeIndex].color.b = b;
-    m_viewerChoiceColor[shadeIndex].color.a = a;
+    m_viewerChoiceColor[shadeIndex] = color;
 }
 
 /*

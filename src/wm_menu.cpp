@@ -1056,13 +1056,11 @@ void CMenuPcs::loadData()
 	lbl_8032EE1C = 1;
 	lbl_8032E8AC = 1;
 
-	CMesMenu** const mesMenus = reinterpret_cast<CMesMenu**>(bytes + 0x11C);
 	for (int i = 4; i < 6; i++) {
-		mesMenus[i - 4] = new (MenuPcs.m_menuStage, srcFile, 0x2EA) CMesMenu;
-		CMesMenu* const cur = mesMenus[i - 4];
-		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(cur) + 0x18) = i;
-		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(cur) + 0x1C) = i;
-		(*reinterpret_cast<void (***)(CMesMenu*)>(cur))[3](cur);
+		m_battleMesMenus[i] = new (MenuPcs.m_menuStage, srcFile, 0x2EA) CMesMenu;
+		CMesMenu* const cur = m_battleMesMenus[i];
+		cur->SetBattleIndex(i);
+		cur->Create();
 	}
 
 	char optionPath[256];
@@ -1073,23 +1071,14 @@ void CMenuPcs::loadData()
 		File.SyncCompleted(fileHandle);
 		CTextureSet* texSet =
 		    new (MenuPcs.m_menuStage, srcFile, 0x300) CTextureSet;
-		*reinterpret_cast<CTextureSet**>(bytes + 0xBC) = texSet;
-		(*reinterpret_cast<CTextureSet**>(bytes + 0xBC))
-		    ->Create(File.m_readBuffer, m_menuStage, 0, 0, 0, 0);
+		m_wmOptionTextureSet = texSet;
+		m_wmOptionTextureSet->Create(File.m_readBuffer, m_menuStage, 0, 0, 0, 0);
 		File.Close(fileHandle);
 	}
 
-	{
-		unsigned char* dst = bytes;
-		for (unsigned int i = 0;
-		     i < static_cast<unsigned int>(
-		             reinterpret_cast<CTextureSet*>(*reinterpret_cast<CTextureSet**>(bytes + 0xBC))
-		                 ->m_textureArray.GetSize());
-		     i++, dst += 4) {
-			*reinterpret_cast<CTexture**>(dst + 0xC0) =
-			    reinterpret_cast<CTextureSet*>(*reinterpret_cast<CTextureSet**>(bytes + 0xBC))
-			        ->GetTexture(i);
-		}
+	for (unsigned int i = 0;
+	     i < static_cast<unsigned int>(m_wmOptionTextureSet->m_textureArray.GetSize()); i++) {
+		m_wmOptionTextures[i] = m_wmOptionTextureSet->GetTexture(i);
 	}
 
 	GetOptionData();
@@ -1281,31 +1270,23 @@ inline void CMenuPcs::InitCSelCurPos()
  */
 void CMenuPcs::destroyWorld()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-
-	unsigned char* puVar5 = bytes + 0x10;
-	int iVar4 = 4;
-	do {
-		void** piVar2 = reinterpret_cast<void**>(puVar5 + 0x10C);
-		CRef* const obj = reinterpret_cast<CRef*>(*piVar2);
+	for (int i = 4; i < 6; i++) {
+		CRef* const obj = m_battleMesMenus[i];
 		if (obj != 0) {
 			if (obj->DecRef() == 0) {
 				delete obj;
 			}
-			*piVar2 = 0;
+			m_battleMesMenus[i] = 0;
 		}
-		iVar4 = iVar4 + 1;
-		puVar5 = puVar5 + 4;
-	} while (iVar4 < 6);
+	}
 
 	{
-		void** piVar2 = reinterpret_cast<void**>(&m_fonts[1]);
-		CRef* const obj = reinterpret_cast<CRef*>(*piVar2);
+		CRef* const obj = m_fonts[1];
 		if (obj != 0) {
 			if (obj->DecRef() == 0) {
 				delete obj;
 			}
-			*piVar2 = 0;
+			m_fonts[1] = 0;
 		}
 	}
 
@@ -1316,12 +1297,9 @@ void CMenuPcs::destroyWorld()
 
 	freeTexture(2, 3, 0x16, 0x2F);
 
-	{
-		CMenu** menu = reinterpret_cast<CMenu**>(bytes + 0xBC);
-		if (*menu != 0) {
-			delete *menu;
-			*menu = 0;
-		}
+	if (m_wmOptionTextureSet != 0) {
+		delete m_wmOptionTextureSet;
+		m_wmOptionTextureSet = 0;
 	}
 
 	if (m_wm.m_worldObjData != 0) {
@@ -1364,14 +1342,9 @@ void CMenuPcs::destroyWorld()
 		delete m_wmWorldParams;
 		m_wmWorldParams = 0;
 	}
-	{
-		EffectInfo* const effectWork = m_effectWork;
-		if (effectWork != 0) {
-			if (effectWork != 0) {
-				operator delete[](reinterpret_cast<unsigned char*>(effectWork) - 0x10);
-			}
-			m_effectWork = 0;
-		}
+	if (m_effectWork != 0) {
+		delete[] m_effectWork;
+		m_effectWork = 0;
 	}
 	if (m_menuWindowInfo != 0) {
 		delete m_menuWindowInfo;

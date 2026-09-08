@@ -443,8 +443,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
  */
 void CCaravanWork::FGLetterOpen(int letterIdx)
 {
-	CCaravanWork* shifted = reinterpret_cast<CCaravanWork*>(reinterpret_cast<char*>(this) + letterIdx * 12);
-#define letter (&shifted->m_letters[0])
+	CLetterWork* letter = &m_letters[letterIdx];
 	CFlatRuntime::CStack stack[2];
 
 	stack[0].m_word = letter->MessageType();
@@ -477,7 +476,6 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	CMes::m_tempVar[8] = m_saveSlot;
 
 	letter->SetOpened();
-#undef letter
 }
 
 /*
@@ -616,7 +614,7 @@ int CCaravanWork::CanAddComList(int count)
 		}
 	}
 
-	return (((unsigned int)__cntlzw(count)) >> 5) & 0xFF;
+	return count == 0;
 }
 
 /*
@@ -753,54 +751,12 @@ int CCaravanWork::CanAddTmpArtifact(int numItems)
  */
 int CCaravanWork::FindItem(int itemId)
 {
-	CCaravanWork* cur = this;
-	int itemIdx = 0;
-
-	for (int row = 0; row < 8; row++) {
-		short item = cur->m_inventoryItems[0];
+	for (int itemIdx = 0; itemIdx < kInventoryCapacity; itemIdx++) {
+		short item = m_inventoryItems[itemIdx];
 		if (item != -1 && item == itemId) {
 			return itemIdx;
 		}
-		item = cur->m_inventoryItems[1];
-		itemIdx++;
-		if (item != -1 && item == itemId) {
-			return itemIdx;
-		}
-		item = cur->m_inventoryItems[2];
-		itemIdx++;
-		if (item != -1 && item == itemId) {
-			return itemIdx;
-		}
-		item = cur->m_inventoryItems[3];
-		itemIdx++;
-		if (item != -1 && item == itemId) {
-			return itemIdx;
-		}
-		item = cur->m_inventoryItems[4];
-		itemIdx++;
-		if (item != -1 && item == itemId) {
-			return itemIdx;
-		}
-		item = cur->m_inventoryItems[5];
-		itemIdx++;
-		if (item != -1 && item == itemId) {
-			return itemIdx;
-		}
-		item = cur->m_inventoryItems[6];
-		itemIdx++;
-		if (item != -1 && item == itemId) {
-			return itemIdx;
-		}
-		item = cur->m_inventoryItems[7];
-		itemIdx++;
-		if (item != -1 && item == itemId) {
-			return itemIdx;
-		}
-
-		cur = (CCaravanWork*)&cur->m_baseDataIndex;
-		itemIdx++;
 	}
-
 	return -1;
 }
 
@@ -930,28 +886,14 @@ int CCaravanWork::AddGil(int gilToAdd)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::GetFoodRank(int playerIdx)
+int CCaravanWork::GetFoodRank(int foodIdx)
 {
-	CCaravanWork* cur = this;
-	unsigned short* target = &m_letterMeta[playerIdx];
 	int rank = 0;
-	int baseIdx = 0;
-
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < 3; j++) {
-			if ((playerIdx != baseIdx) && (cur->m_letterMeta[j] > *target)) {
-				rank++;
-			}
-			baseIdx++;
-		}
-
-		if ((playerIdx != baseIdx) && (cur->m_letterMeta[3] > *target)) {
+	for (int i = 0; i < 8; i++) {
+		if ((foodIdx != i) && (m_letterMeta[i] > m_letterMeta[foodIdx])) {
 			rank++;
 		}
-		cur = (CCaravanWork*)&cur->m_saveSlot;
-		baseIdx++;
 	}
-
 	return rank;
 }
 
@@ -2054,13 +1996,13 @@ void CCaravanWork::SetIdxCmdList(int cmdListIdx)
  */
 int CCaravanWork::IsUseCmdList(int cmdListIdx)
 {
-	unsigned int isInvalid = 0;
+	unsigned char isInvalid = 0;
 	short slotRef = m_commandListInventorySlotRef[cmdListIdx];
 
 	if ((cmdListIdx >= 2) && (slotRef == -1)) {
 		isInvalid = 1;
 	}
-	return ((unsigned int)__cntlzw((unsigned char)isInvalid)) >> 5;
+	return !isInvalid;
 }
 
 inline int CCaravanWork::GetNumCombi(int cmdListIdx)
@@ -2103,20 +2045,14 @@ inline int CCaravanWork::GetNumCombi(int cmdListIdx)
  */
 unsigned int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 {
-	unsigned int isInvalid = 0;
-	short slotRef = m_commandListInventorySlotRef[cmdListIdx];
-	if ((cmdListIdx >= 2) && (slotRef == -1)) {
-		isInvalid = 1;
-	}
-
-	if ((((unsigned int)__cntlzw((unsigned char)isInvalid)) >> 5) == 0) {
+	if (!IsUseCmdList(cmdListIdx)) {
 		return 0;
 	}
 
 	int groupedCountLocal = GetNumCombi(cmdListIdx);
 
 	if (groupedCountLocal == 1) {
-		return (((unsigned int)__cntlzw(cmdListIdx - static_cast<short>(m_currentCmdListIndex))) >> 5) & 0xFF;
+		return cmdListIdx == m_currentCmdListIndex;
 	} else {
 		for (int n = cmdListIdx; n >= 0; n--) {
 			if (m_commandListExtra[cmdListIdx] != -1) {

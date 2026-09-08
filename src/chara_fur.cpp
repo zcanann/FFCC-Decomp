@@ -1799,13 +1799,3 @@ void CChara::TimeMogFur()
 }
 
 MogWorkState m_mogWork;
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void GXSetTexCoordGen(void)
-{
-	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-}

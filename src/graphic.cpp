@@ -843,16 +843,6 @@ void CGraphic::InitDebugString()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void GXSetTexCoordGen(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80018a50
  * PAL Size: 416b
  * EN Address: TODO

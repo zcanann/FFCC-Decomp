@@ -9608,18 +9608,7 @@ LAB_next:
 				}
 
 				const unsigned char* mapInfo = s_LocTex[slotData->m_scriptGlobalTime];
-				CMaterial* material = MapMng.GetMaterialID(mapInfo[0]);
-				CTexture* texture = material->GetTexture(0);
-				TextureMan.SetTexture(static_cast<_GXTexMapID>(0), texture);
-				Mtx texMtx;
-				const float* pOe7 = &FLOAT_803313e8;
-				PSMTXScale(texMtx, *pOe7 / static_cast<float>(texture->m_width),
-				           *pOe7 / static_cast<float>(texture->m_height), *pOe7);
-				GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
-				GXSetNumTexGens(1);
-				GXSetTexCoordGen2(static_cast<GXTexCoordID>(0), static_cast<GXTexGenType>(1),
-				                  static_cast<GXTexGenSrc>(4), 0x1E, GX_FALSE, 0x7D);
-				TextureMan.SetTextureTev(texture);
+				SetTextureLoc(mapInfo[0]);
 				MenuPcs.DrawRect(0,
 				         static_cast<float>(mapX),
 				         static_cast<float>(DOUBLE_80331510 + static_cast<double>(slotY)),
@@ -10637,31 +10626,18 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::SetTextureLoc(int index)
+inline void CMenuPcs::SetTextureLoc(int materialId)
 {
-	if (index < 0) {
-		index = 0;
-	}
-	if (index > 0xFF) {
-		index = 0xFF;
-	}
-	m_textureLocIndex = static_cast<unsigned char>(index);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(index));
-	gWmMenuWorkA = index;
-}
+	CMaterial* material = MapMng.GetMaterialID(materialId);
+	CTexture* texture = material->GetTexture(0);
+	TextureMan.SetTexture(GX_TEXMAP0, texture);
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: UNUSED
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void GXSetTexCoordGen(void)
-{
-	return;
+	Mtx texMtx;
+	PSMTXScale(texMtx, 1.0f / texture->m_width, 1.0f / texture->m_height, 1.0f);
+	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+	GXSetNumTexGens(1);
+	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
+	TextureMan.SetTextureTev(texture);
 }
 
 /*

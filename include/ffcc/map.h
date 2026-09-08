@@ -36,7 +36,6 @@ template <class T>
 class CPtrArray;
 
 void setDbgLight(int, Vec&, _GXColor&);
-void GXSetTexCoordGen();
 
 class CMapIdGrp
 {

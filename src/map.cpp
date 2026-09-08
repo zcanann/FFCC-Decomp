@@ -2145,16 +2145,6 @@ void CMapMng::Draw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80030280
  * PAL Size: 276b
  * EN Address: TODO

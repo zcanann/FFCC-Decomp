@@ -2001,8 +2001,8 @@ void CMenuPcs::CalcMCardMenu()
 			if (m_wmWorldState->m_mcResult == 0) break;
 			if (m_wmWorldState->m_subState == 0x13) {
 				if (m_wmWorldState->m_menuMode != 8) {
-					gWmMenuWorkB = m_mcCtrl.m_serialHi;
-					gWmMenuWorkA = m_mcCtrl.m_serialLo;
+					gWmMenuWorkB = static_cast<unsigned int>(m_mcCtrl.m_serial);
+					gWmMenuWorkA = static_cast<unsigned int>(m_mcCtrl.m_serial >> 32);
 					gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.m_cardChannel;
 					gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 				}
@@ -2092,7 +2092,8 @@ void CMenuPcs::CalcMCardMenu()
 				}
 				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
 			} else {
-				if ((gWmMenuWorkA ^ (int)m_mcCtrl.m_serialLo) | (gWmMenuWorkB ^ (int)m_mcCtrl.m_serialHi)) goto LAB_saveIdx;
+				if ((gWmMenuWorkA ^ static_cast<int>(m_mcCtrl.m_serial >> 32)) |
+				    (gWmMenuWorkB ^ static_cast<int>(m_mcCtrl.m_serial))) goto LAB_saveIdx;
 				m_mcCtrl.m_saveIndex = (int)gWmMenuCursorX[1];
 				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
 			}
@@ -2609,8 +2610,8 @@ void CMenuPcs::CalcLoadMenu()
 				}
 				if (m_wmWorldState->m_subState == 0x16) {
 					if (m_wmWorldState->m_menuMode != 8 && m_wmWorldState->m_mcResult == 1) {
-						gWmMenuWorkB = m_mcCtrl.m_serialHi;
-						gWmMenuWorkA = m_mcCtrl.m_serialLo;
+						gWmMenuWorkB = static_cast<unsigned int>(m_mcCtrl.m_serial);
+						gWmMenuWorkA = static_cast<unsigned int>(m_mcCtrl.m_serial >> 32);
 						gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.m_cardChannel;
 						gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.m_saveIndex;
 					} else {
@@ -11066,8 +11067,7 @@ int McCtrl::LoadMcList()
 			m_state = -1;
 			return -1;
 		}
-		m_serialHi = static_cast<unsigned int>(serial);
-		m_serialLo = static_cast<unsigned int>(serial >> 32);
+		m_serial = serial;
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McRead(0, 0xA000, m_iteration * 0xA000 + 0x4000);
 		m_state = 6;
@@ -11446,8 +11446,7 @@ int McCtrl::SaveDat()
 				Game.m_gameWork.m_mcRandom = Math.Rand(0x7FFFFFFF);
 				Game.m_gameWork.m_mcHasSerial = 1;
 			}
-			m_serialHi = static_cast<unsigned int>(serial);
-			m_serialLo = static_cast<unsigned int>(serial >> 32);
+			m_serial = serial;
 			MemoryCardMan.CreateMcBuff();
 			if (m_userBuffer == 0) {
 				MemoryCardMan.MakeSaveData();
@@ -11600,8 +11599,7 @@ int McCtrl::LoadDat()
 	case 5: {
 		unsigned long long serial;
 		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
-			m_serialHi = static_cast<unsigned int>(serial);
-			m_serialLo = static_cast<unsigned int>(serial >> 32);
+			m_serial = serial;
 		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
@@ -12068,8 +12066,7 @@ int McCtrl::ChkNowData()
 
 	case 5:
 		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
-			m_serialHi = static_cast<unsigned int>(serial);
-			m_serialLo = static_cast<unsigned int>(serial >> 32);
+			m_serial = serial;
 		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
@@ -12137,14 +12134,18 @@ int McCtrl::ChkNowData()
 		break;
 	}
 
+	int result;
 	if (m_state == -1)
 	{
-		return -999;
+		result = -999;
 	}
-	int result = 0;
-	if (m_state == 7)
+	else if (m_state == 7)
 	{
 		result = 1;
+	}
+	else
+	{
+		result = 0;
 	}
 	return result;
 }
@@ -12234,8 +12235,7 @@ int McCtrl::SaveDataBuffer(char* buffer)
 	case 0x10: {
 		unsigned long long serial;
 		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
-			m_serialHi = static_cast<unsigned int>(serial);
-			m_serialLo = static_cast<unsigned int>(serial >> 32);
+			m_serial = serial;
 		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
@@ -12580,8 +12580,7 @@ int McCtrl::EraseDat()
 	case 0x12: {
 		unsigned long long serial;
 		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
-			m_serialHi = static_cast<unsigned int>(serial);
-			m_serialLo = static_cast<unsigned int>(serial >> 32);
+			m_serial = serial;
 		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
@@ -12663,8 +12662,8 @@ void McCtrl::GetDno()
  */
 void McCtrl::GetSerial()
 {
-	gWmMenuWorkA = static_cast<int>(m_serialLo);
-	gWmMenuWorkB = static_cast<int>(m_serialHi);
+	gWmMenuWorkA = static_cast<int>(m_serial >> 32);
+	gWmMenuWorkB = static_cast<int>(m_serial);
 }
 
 /*

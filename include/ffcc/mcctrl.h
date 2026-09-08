@@ -1,6 +1,8 @@
 #ifndef _FFCC_MCCTRL_H_
 #define _FFCC_MCCTRL_H_
 
+#include "global.h"
+
 class McCtrl
 {
 public:
@@ -34,10 +36,10 @@ public:
     int m_iteration;
     int m_createFlag;
     void* m_userBuffer;
-    unsigned int m_serialLo;
-    unsigned int m_serialHi;
+    u64 m_serial; // 0x20
 };
-typedef int McCtrl_size_mismatch[(sizeof(McCtrl) == 0x28) ? 1 : -1];
+STATIC_ASSERT(sizeof(McCtrl) == 0x28);
+STATIC_ASSERT(offsetof(McCtrl, m_serial) == 0x20);
 
 /*
  * --INFO--

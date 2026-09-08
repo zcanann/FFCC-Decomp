@@ -2781,10 +2781,7 @@ void CMenuPcs::CalcSelectWait()
 		CMenuPcs::Sprt2* cursor = &m_bonusAnim->sprites[count2 - 1];
 		if (this->m_bonusState->m_currentRank < activePartyCount) {
 			CMenuPcs::Sprt2* partySprite = cursor - (activePartyCount * 2 - this->m_bonusState->m_currentRank);
-			int pulseFrame = frame % 20 - 10;
-			if (pulseFrame < 0) {
-				pulseFrame = -pulseFrame;
-			}
+			int pulseFrame = abs(frame % 20 - 10);
 			cursor->x = (short)(partySprite->x - 3);
 			cursor->y = (short)(partySprite->y - 8);
 			cursor->alpha = (float)((double)pulseFrame / 10.0);

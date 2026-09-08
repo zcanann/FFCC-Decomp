@@ -16,6 +16,7 @@
 #include "ffcc/mes.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_tina.h"
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
@@ -1363,11 +1364,7 @@ void CShopMenu::DrawItemList()
         y += 0x1C;
     }
 
-    int pulseFrame = static_cast<int>(System.m_frameCounter) % 0x14;
-    int pulse = pulseFrame - 10;
-    if (pulse < 0) {
-        pulse = -pulse;
-    }
+    int pulse = abs(static_cast<int>(System.m_frameCounter) % 0x14 - 10);
     unsigned char alpha = static_cast<unsigned char>(DOUBLE_80332DA0 * (DOUBLE_80332DB0 * static_cast<double>(pulse) + DOUBLE_80332DA8));
     float scale = static_cast<float>(DOUBLE_80332DA8 * (DOUBLE_80332DC0 * static_cast<double>(pulse) + DOUBLE_80332DB8));
 

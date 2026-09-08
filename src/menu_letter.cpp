@@ -10,6 +10,7 @@
 #include "ffcc/mes.h"
 #include "ffcc/linkage.h"
 
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
@@ -1208,7 +1209,7 @@ void CMenuPcs::LetterListDraw()
 	if (pageMark != 0) {
 		const int frame = static_cast<int>(System.m_frameCounter);
 		const int phase = (frame % 0x14) - 10;
-		const int absPhase = static_cast<unsigned int>(phase < 0 ? -phase : phase);
+		const int absPhase = abs(phase);
 		const float markScale =
 		    static_cast<float>(DOUBLE_80333098 * static_cast<double>(absPhase) + DOUBLE_80333090);
 

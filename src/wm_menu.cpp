@@ -4922,10 +4922,7 @@ void CMenuPcs::DrawTitleMenu()
 				                         static_cast<double>(fX));
 			} else if ((state == 2 && m_wmWorldState->m_delay == 0) ||
 			           (state == 3 && m_wmWorldState->m_state0E == 0)) {
-				int pulse = (int)m_wmWorldState->m_titleState % 0x28 - 0x14;
-				if (pulse < 0) {
-					pulse = -pulse;
-				}
+				int pulse = abs((int)m_wmWorldState->m_titleState % 0x28 - 0x14);
 				secondAlpha = static_cast<float>(-(DOUBLE_803317A0 * static_cast<double>(pulse) -
 				                                  DOUBLE_80331420));
 			} else {
@@ -6714,9 +6711,9 @@ void CMenuPcs::CalcWMFrame0(int param)
 		float offset = static_cast<float>(static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_width) +
 		                                  static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_x));
 		if (param >= -10) {
-			int absRaw = (param < 0 ? -param : param);
+			int absRaw = abs(param);
 			offset = static_cast<float>(static_cast<double>(offset) * (DOUBLE_803314E8 * static_cast<double>(absRaw)));
-			int absParam = (param < 0 ? -param : param);
+			int absParam = abs(param);
 			if (absParam < 0) {
 				absParam = 0;
 			}
@@ -7931,7 +7928,7 @@ void CMenuPcs::DrawCharaName()
 				text = emptyText[1];
 				const int phase = static_cast<int>(sys->m_frameCounter) % 20 - 10;
 				if (this->m_wmWorldState->m_mainState == 2) {
-					const int absPhase = phase < 0 ? -phase : phase;
+					const int absPhase = abs(phase);
 					fade = static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(absPhase) - DOUBLE_80331420));
 					restoreColor = 1;
 				}

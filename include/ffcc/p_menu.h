@@ -963,7 +963,7 @@ public:
         unsigned char m_goOutUnknown88B;
     };
     union {
-        unsigned char* m_cmakeWork;
+        Mc::SaveDat* m_cmakeWork;
         void* m_goOutTransferWorkActive;
     };
     unsigned char m_pad890[0x8A0 - 0x890];

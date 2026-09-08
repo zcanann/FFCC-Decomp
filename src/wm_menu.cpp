@@ -447,7 +447,7 @@ static inline WmWorldState* GetWmWorldState(CMenuPcs* menu)
 	return menu->m_wmWorldState;
 }
 
-static inline unsigned char* GetWmCmakeWork(CMenuPcs* menu)
+static inline Mc::SaveDat* GetWmCmakeWork(CMenuPcs* menu)
 {
 	return menu->m_cmakeWorkActive == 1 ? menu->m_cmakeWork : 0;
 }
@@ -2622,7 +2622,7 @@ void CMenuPcs::CalcLoadMenu()
 						WmCharaModelInfo* modelInfo = &m_wm.m_charaModelData[iVar14];
 						if (m_wmWorldState->m_menuMode == 8
 						    && m_cmakeWork != 0) {
-							const Mc::CharaDat& character = reinterpret_cast<Mc::SaveDat*>(m_cmakeWork)->m_characters[iVar14];
+							const Mc::CharaDat& character = m_cmakeWork->m_characters[iVar14];
 							if (character.m_exists != 0) {
 								unsigned int tribe = character.m_tribeId;
 								unsigned int gender = character.m_genderFlag;
@@ -2979,18 +2979,13 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	int validCount = 0;
 	if (m_cmakeWorkActive == 1) {
 		for (int ci = 0; ci < 8; ci++) {
-			if (*reinterpret_cast<int*>(m_cmakeWork + 0x1A84 + ci * 0x9C0) != 0) {
+			if (m_cmakeWork->m_characters[ci].m_exists != 0) {
 				validCount++;
 			}
 		}
 	} else {
-		unsigned char* caravan = reinterpret_cast<unsigned char*>(&Game);
-		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
-			validCount = 1;
-		}
-		for (int ci = 0; ci < 7; ci++) {
-			caravan += 0xC30;
-			if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+		for (int ci = 0; ci < 8; ci++) {
+			if (Game.m_caravanWorkArr[ci].m_shopState != 0) {
 				validCount++;
 			}
 		}
@@ -3025,44 +3020,8 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	unsigned short repeat;
 	unsigned short down;
 	if (entry.m_connected == 1 && entry.m_cmakePending == 0) {
-		const int port = 0;
-		bool noRepeatInput = true;
-		if (Pad.m_debugPadLock == 0) {
-			bool hasPort = false;
-			if (port == 0 && Pad.m_debugPadPort != -1) {
-				hasPort = noRepeatInput;
-			}
-			if (!hasPort) {
-				noRepeatInput = false;
-			}
-		}
-		int repeatTmp;
-		if (noRepeatInput) {
-			repeatTmp = 0;
-		} else {
-			u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
-			repeatTmp = Pad.GetPadInputs()[clamped].repeatButton;
-		}
-		repeat = static_cast<unsigned short>(repeatTmp);
-
-		bool noDownInput = true;
-		if (Pad.m_debugPadLock == 0) {
-			bool hasPort = false;
-			if (port == 0 && Pad.m_debugPadPort != -1) {
-				hasPort = noDownInput;
-			}
-			if (!hasPort) {
-				noDownInput = false;
-			}
-		}
-		int downTmp;
-		if (noDownInput) {
-			downTmp = 0;
-		} else {
-			u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
-			downTmp = Pad.GetPadInputs()[clamped].buttonDown[0];
-		}
-		down = static_cast<unsigned short>(downTmp);
+		repeat = Pad.GetButtonRepeat(0);
+		down = Pad.GetButtonDown(0);
 	} else {
 		repeat = 0;
 		down = repeat;
@@ -3110,20 +3069,16 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 	}
 
 	if ((down & 0x100) != 0) {
+		int exists;
 		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
-				unsigned char* cmakeSlot = m_cmakeWork;
-			cmakeSlot += curEntry.m_currentSlot * 0x9C0;
-			if (*reinterpret_cast<int*>(cmakeSlot + 0x1A84) == 0) {
-				goto se_empty;
-			}
-			goto se_full;
+			exists = m_cmakeWork->m_characters[curEntry.m_currentSlot].m_exists;
+		} else {
+			exists = Game.m_caravanWorkArr[curEntry.m_currentSlot].m_shopState;
 		}
 
-		if (Game.m_caravanWorkArr[curEntry.m_currentSlot].m_shopState == 0) {
-		se_empty:
+		if (exists == 0) {
 			Sound.PlaySe(4, 0x40, 0x7F, 0);
 		} else {
-		se_full:
 			curEntry.m_confirmed = 1;
 			Sound.PlaySe(0x33, 0x40, 0x7F, 0);
 			if (state != 0) {
@@ -7683,7 +7638,7 @@ void CMenuPcs::DrawCharaName()
 	} else {
 		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 	}
-	unsigned int activeMask =  (int)(long)(0);
+	unsigned int activeMask = 0;
 	unsigned int confirmedMask = 0;
 	unsigned int pendingMask = 0;
 	const WmCharaSelectEntry* entry = selectEntries;
@@ -7725,17 +7680,15 @@ void CMenuPcs::DrawCharaName()
 	for (; row < 2; row++) {
 		float y = yBase1 + static_cast<float>(yCounter);
 		y += yExtra1;
-		int __p2 = row;
-		if (__p2 != 0) {
+		if (row != 0) {
 			y += FLOAT_80331548;
 		}
-		int caravanOffset = slotBase * 0xC30;
 		int xCounter = 0;
 		int slot = slotBase;
 		for (int col = 0; col < 4; col++) {
 			if ((confirmedMask & (1u << slot)) != 0) {
 				const char* const text = reinterpret_cast<const char*>(
-				    Game.m_caravanWorkArr[0].m_name + caravanOffset);
+				    Game.m_caravanWorkArr[slot].m_name);
 				float xBase = FLOAT_80331410 + static_cast<float>(xCounter);
 				const float width = font->GetWidth(text);
 				float scale = FLOAT_803313e8;
@@ -7755,7 +7708,6 @@ void CMenuPcs::DrawCharaName()
 				                                FLOAT_80331680, FLOAT_80331410, FLOAT_803313dc, FLOAT_803313dc,
 				                                scale, FLOAT_803313e8, FLOAT_803313dc);
 			}
-			caravanOffset += 0xC30;
 			xCounter += 0x90;
 			slot++;
 		}
@@ -7788,10 +7740,8 @@ void CMenuPcs::DrawCharaName()
 			y += FLOAT_80331548;
 		}
 		y = static_cast<float>(y - ySub2);
-		int cmakeOffset = slotBase2 * 0x9C0;
 		int col = 0;
 		int slot = slotBase2;
-		int caravanOffset = slotBase2 * 0xC30;
 		int xCounter2 = col;
 		for (; col < 4; col++) {
 			int restoreColor;
@@ -7803,19 +7753,18 @@ void CMenuPcs::DrawCharaName()
 			const int menuMode = this->m_wmWorldState->m_menuMode;
 			bool hasName;
 			if (menuMode == 8 && this->m_cmakeWork != 0) {
-				hasName = *reinterpret_cast<unsigned int*>(this->m_cmakeWork + cmakeOffset + 0x1A84) != 0;
+				hasName = m_cmakeWork->m_characters[slot].m_exists != 0;
 			} else {
-				hasName = *reinterpret_cast<unsigned int*>(
-				              reinterpret_cast<unsigned char*>(&Game) + caravanOffset + 0x1794) != 0;
+				hasName = Game.m_caravanWorkArr[slot].m_shopState != 0;
 			}
 
 			if (hasName) {
 				if (menuMode == 8 && this->m_cmakeWorkActive == 1 && this->m_cmakeWork != 0) {
 					memset(nameBuf, 0, 0x20);
-					memcpy(nameBuf, this->m_cmakeWork + cmakeOffset + 0x15C0, 0x10);
+					memcpy(nameBuf, m_cmakeWork->m_characters[slot].m_name, sizeof(m_cmakeWork->m_characters[slot].m_name));
 					text = reinterpret_cast<const char*>(nameBuf);
 				} else {
-					text = reinterpret_cast<const char*>(reinterpret_cast<unsigned char*>(&Game) + caravanOffset + 0x17BA);
+					text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].m_name);
 				}
 				if ((activeMask & (1u << slot)) != 0) {
 					font->SetTlut(6);
@@ -7849,8 +7798,6 @@ void CMenuPcs::DrawCharaName()
 			if (restoreColor) {
 				font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 			}
-			caravanOffset += 0xC30;
-			cmakeOffset += 0x9C0;
 			xCounter2 += 0x90;
 			slot++;
 		}
@@ -7907,10 +7854,10 @@ void CMenuPcs::DrawCMLife()
 
 		int count;
 		if (worldState->m_menuMode == 8 && m_cmakeWorkActive == 1 && m_cmakeWork != 0 &&
-		    *reinterpret_cast<int*>(m_cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
-			count = static_cast<int>(*reinterpret_cast<unsigned short*>(m_cmakeWork + slot * 0x9C0 + 0x14D6)) >> 1;
+		    m_cmakeWork->m_characters[slot].m_exists != 0) {
+			count = static_cast<int>(m_cmakeWork->m_characters[slot].m_maxHp) >> 1;
 		} else if (Game.m_caravanWorkArr[slot].m_shopState != 0) {
-			count = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Game.m_caravanWorkArr[slot]) + 0x1A)) >> 1;
+			count = static_cast<int>(Game.m_caravanWorkArr[slot].m_maxHp) >> 1;
 		} else {
 			continue;
 		}
@@ -7980,13 +7927,11 @@ void CMenuPcs::DrawCMLife()
 		unsigned char flagA;
 		unsigned char flagB;
 		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
-			const unsigned char* const work = m_cmakeWork + slot * 0x9C0;
-			flagB = work[0x1D91];
-			flagA = work[0x1D90];
+			flagB = m_cmakeWork->m_characters[slot].m_isGuest;
+			flagA = m_cmakeWork->m_characters[slot].m_isAway;
 		} else {
-			const CCaravanWork& caravanWork = Game.m_caravanWorkArr[slot];
-			flagB = caravanWork.m_caravanLocalFlags;
-			flagA = caravanWork.m_shopBusyFlag;
+			flagB = Game.m_caravanWorkArr[slot].m_caravanLocalFlags;
+			flagA = Game.m_caravanWorkArr[slot].m_shopBusyFlag;
 		}
 		if (flagA != 0 || flagB != 0) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
@@ -8434,17 +8379,16 @@ void CMenuPcs::ChgAllModel()
 void CMenuPcs::ChgAllModel2()
 {
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		unsigned char* pdtData =
-		    m_cmakeWork + i * 0x9C0 + 0x14D0;
+		const Mc::CharaDat& character = m_cmakeWork->m_characters[i];
 		WmCharaModelInfo* modelData = &m_wm.m_charaModelData[i];
 		int tribe;
 		int isFemale;
 		int appearance;
 
-		if (*reinterpret_cast<int*>(pdtData + 0x5B4) != 0) {
-			tribe = *reinterpret_cast<unsigned short*>(pdtData + 0x2E);
-			appearance = *reinterpret_cast<unsigned short*>(pdtData + 0x32);
-			isFemale = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
+		if (character.m_exists != 0) {
+			tribe = character.m_tribeId;
+			appearance = character.m_appearanceVariant;
+			isFemale = character.m_genderFlag;
 		} else {
 			tribe = -1;
 			modelData->m_modelNo = -1;
@@ -12197,20 +12141,20 @@ int McCtrl::SaveDataBuffer(char* buffer)
 			return -999;
 		}
 
-		unsigned char* const save = reinterpret_cast<unsigned char*>(MemoryCardMan.m_saveBuffer);
-		memcpy(save, buffer, 0x8BD0);
+		Mc::SaveDat* const save = reinterpret_cast<Mc::SaveDat*>(MemoryCardMan.m_saveBuffer);
+		memcpy(save, buffer, sizeof(*save));
 
 		for (int i = 0; i < 4; i++) {
-			unsigned char* entry = save + reinterpret_cast<int*>(save + 0x30)[i] * 0x9C0;
-			if (*reinterpret_cast<int*>(entry + 0x1A84) == 0) {
-				reinterpret_cast<int*>(save + 0x30)[i] = -1;
+			const int partySlot = save->m_partySlots[i];
+			if (save->m_characters[partySlot].m_exists == 0) {
+				save->m_partySlots[i] = -1;
 			}
-			if (entry[0x1D90] != 0) {
-				reinterpret_cast<int*>(save + 0x30)[i] = -1;
+			if (save->m_characters[partySlot].m_isAway != 0) {
+				save->m_partySlots[i] = -1;
 			}
 		}
 
-		*reinterpret_cast<unsigned int*>(save + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(save));
+		save->m_crc = MemoryCardMan.CalcCrc(save);
 		MemoryCardMan.EncodeData();
 		MemoryCardMan.McWrite(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);
 		m_state = 0x11;
@@ -12274,10 +12218,10 @@ inline void McCtrl::ChkParty(char*)
 		return;
 	}
 
-	unsigned char* const save = reinterpret_cast<unsigned char*>(m_userBuffer);
+	const Mc::SaveDat* const save = static_cast<const Mc::SaveDat*>(m_userBuffer);
 	for (int i = 0; i < 4; i++) {
-		const int party = *reinterpret_cast<int*>(save + 0x30 + i * 4);
-		if (party >= 0 && party < 8 && *reinterpret_cast<int*>(save + party * 0x9C0 + 0x1A84) != 0 && save[party * 0x9C0 + 0x1D90] == 0) {
+		const int party = save->m_partySlots[i];
+		if (party >= 0 && party < 8 && save->m_characters[party].m_exists != 0 && save->m_characters[party].m_isAway == 0) {
 			m_lastResult++;
 		}
 	}

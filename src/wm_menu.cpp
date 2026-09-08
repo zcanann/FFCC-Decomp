@@ -235,8 +235,6 @@ char gWmMenuCursorY[2];
 int gWmMenuWorkA;
 int gWmMenuWorkB;
 unsigned char gWmMenuScriptValueCache;
-unsigned char s_wmMenuLastMountState;
-unsigned char s_wmMenuMountStateInitialized;
 
 extern const char lbl_80331208[5] = "1.00";
 extern const char lbl_80331380[4] = {'?','?','?','?'};
@@ -428,8 +426,6 @@ extern const double DOUBLE_803317D8 = 16.0;
 extern const float FLOAT_803317e0 = -0.20000000298023224f;
 extern const float FLOAT_803317e4 = 51.5f;
 extern const float FLOAT_803317e8 = 35.79999923706055f;
-extern const char s_TRUE_803317EC[5] = "TRUE";
-extern const char s_FALSE_803317F4[6] = "FALSE";
 extern const float FLOAT_803317FC = 78.0f;
 extern const char lbl_80331800[7] = "w_open";
 extern const char lbl_80331808[7] = "idle_o";
@@ -1455,21 +1451,18 @@ void CMenuPcs::CalcDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	if (static_cast<signed char>(s_wmMenuMountStateInitialized) == 0) {
-		s_wmMenuLastMountState = 0;
-		s_wmMenuMountStateInitialized = 1;
-	}
+	static bool s_wmMenuLastMountState = false;
 
-	const unsigned int mounted = MemoryCardMan.m_currentSlot != -1 ? 1 : 0;
+	const bool mounted = MemoryCardMan.m_currentSlot != -1;
 	if (mounted != s_wmMenuLastMountState) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 3) {
-			const char* text = s_FALSE_803317F4;
+			const char* text = "FALSE";
 			if (mounted != 0) {
-				text = s_TRUE_803317EC;
+				text = "TRUE";
 			}
 			System.Printf("mount = %s\n", text);
 		}
-		s_wmMenuLastMountState = static_cast<unsigned char>(mounted);
+		s_wmMenuLastMountState = mounted;
 	}
 
 	WMChgMenu();

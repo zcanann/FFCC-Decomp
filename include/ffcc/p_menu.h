@@ -727,12 +727,14 @@ public:
     void FavoInit();
     void FavoInit0();
     int FavoOpen();
+    int FavoCtrlCur();
     int FavoCtrl();
     int FavoClose();
     void FavoDraw();
     void CompaInit();
     void CompaInit0();
     int CompaOpen();
+    int CompaCtrlCur();
     void CompaCtrl();
     int CompaClose();
     void CompaDraw();

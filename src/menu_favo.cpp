@@ -20,16 +20,6 @@ STATIC_ASSERT(sizeof(FavoListStorage) == 0x1008);
 STATIC_ASSERT(sizeof(FoodRank) == 4);
 STATIC_ASSERT(sizeof(s_rank) == 0x20);
 
-static inline float LoadFloat(const float& value)
-{
-	return value;
-}
-
-static inline double LoadDouble(const double& value)
-{
-	return value;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80162360
@@ -287,46 +277,52 @@ int CMenuPcs::FavoClose()
 
 /*
  * --INFO--
- * PAL Address: 0x80162e94
+ * PAL Address: UNUSED
+ * PAL Size: 360b
+ * EN Address: 0x801866AC
+ * EN Size: 328b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::FavoCtrlCur()
+{
+	short press = Pad.GetButtonDown(0);
+
+	if (press == 0) {
+		return 0;
+	} else if ((press & 0x20) != 0) {
+		m_singMenuState->cursorMove = 1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		return 1;
+	} else if ((press & 0x40) != 0) {
+		m_singMenuState->cursorMove = -1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		return 1;
+	} else if ((press & 0x100) != 0) {
+		Sound.PlaySe(4, 0x40, 0x7f, 0);
+	} else if ((press & 0x200) != 0) {
+		m_singMenuState->closeRequested = 1;
+		Sound.PlaySe(3, 0x40, 0x7f, 0);
+		return 1;
+	}
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80162E94
  * PAL Size: 400b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8018580C
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
 int CMenuPcs::FavoCtrl()
 {
-	short press = Pad.GetButtonDown(0);
-	int doReset;
-
-	if (press == 0) {
-		doReset = 0;
-	} else if ((press & 0x20) != 0) {
-		m_singMenuState->cursorMove = 1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = 1;
-	} else if ((press & 0x40) != 0) {
-		m_singMenuState->cursorMove = -1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = 1;
-	} else {
-		if ((press & 0x100) != 0) {
-			Sound.PlaySe(4, 0x40, 0x7f, 0);
-			goto noReset;
-		} else if ((press & 0x200) != 0) {
-			m_singMenuState->closeRequested = 1;
-			Sound.PlaySe(3, 0x40, 0x7f, 0);
-			doReset = 1;
-		} else {
-noReset:
-			doReset = 0;
-		}
-	}
-
-	if (doReset != 0) {
+	int doReset = FavoCtrlCur();
+	if (doReset) {
 		FavoInit0();
 	}
-
 	return doReset;
 }
 

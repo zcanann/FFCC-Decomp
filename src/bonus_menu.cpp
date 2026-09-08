@@ -282,7 +282,7 @@ void CMenuPcs::createBonus()
 
 			unsigned int* slot = &Game.m_scriptFoodBase[i];
 			for (int artifactIndex = 0; artifactIndex < BonusSummaryData::kTemporaryArtifactCount; artifactIndex++) {
-				int itemId = reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[CCaravanWork::kPermanentArtifactCount + artifactIndex];
+				int itemId = reinterpret_cast<CCaravanWork*>(*slot)->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + artifactIndex];
 				if (itemId > 0) {
 					s_Rinfo->m_artifacts[tempArtifactCount++] = (short)itemId;
 				}
@@ -318,7 +318,7 @@ void CMenuPcs::createBonus()
 
 					if (GetItemType(itemId, 1) == 2) {
 						int artifactSlot = s_Rinfo->m_artifacts[artifactIndex] - 0x9F;
-						if (reinterpret_cast<CCaravanWork*>(*slot)->m_artifacts[artifactSlot] == s_Rinfo->m_artifacts[artifactIndex]) {
+						if (reinterpret_cast<CCaravanWork*>(*slot)->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactSlot] == s_Rinfo->m_artifacts[artifactIndex]) {
 							s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 						}
 					} else if (reinterpret_cast<CCaravanWork*>(*slot)->m_inventoryItemCount + 1 > 0x40) {
@@ -2866,7 +2866,7 @@ void CMenuPcs::CalcSelectWait()
 					if (itemId < 0xff) {
 						int artIdx = itemId - 0x9f;
 						CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
-						caravanWork->m_artifacts[artIdx] = static_cast<unsigned short>(itemId);
+						caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artIdx] = static_cast<unsigned short>(itemId);
 					} else {
 						CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[partySlot]);
 						caravanWork->AddItem(itemId, 0);

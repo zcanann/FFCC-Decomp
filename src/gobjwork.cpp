@@ -188,7 +188,7 @@ void CCaravanWork::clearCaravanWork()
 	m_equipment[2] = -1;
 	m_equipment[3] = -1;
 	m_inventoryItemCount = 0;
-	memset(m_inventoryItems, 0xFF, sizeof(m_backupInventoryBlock));
+	memset(m_inventoryItems, 0xFF, sizeof(m_inventoryItems));
 	memset(m_evtWorkArr, 0, sizeof(m_evtWorkArr));
 	memset(m_evtWordArr, 0, sizeof(m_evtWordArr));
 	m_tempStatBuffTimer = 0;
@@ -203,7 +203,7 @@ void CCaravanWork::clearCaravanWork()
 	memset(&m_shopBusyFlag, 0, 1);
 	memset(&m_caravanLocalFlags, 0, 1);
 	m_inventoryItemCount = 0;
-	memset(m_inventoryItems, 0xFF, sizeof(m_backupInventoryBlock));
+	memset(m_inventoryItems, 0xFF, sizeof(m_inventoryItems));
 	m_progressValue = 0;
 	m_numCmdListSlots = 4;
 	m_baseCmdListSlots = 4;
@@ -710,7 +710,7 @@ void CCaravanWork::SetArtifact(int artifactIndex, int enabled)
 	if (enabled != 0) {
 		artifact = artifactIndex + 0x9F;
 	}
-	m_artifacts[artifactIndex] = (unsigned short)artifact;
+	m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactIndex] = (unsigned short)artifact;
 }
 
 /*
@@ -726,16 +726,16 @@ int CCaravanWork::CanAddTmpArtifact(int numItems)
 {
 	int emptySlots = 0;
 
-	if (m_artifacts[CCaravanWork::kPermanentArtifactCount + 0] == -1) {
+	if (m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 0] == -1) {
 		emptySlots++;
 	}
-	if (m_artifacts[CCaravanWork::kPermanentArtifactCount + 1] == -1) {
+	if (m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 1] == -1) {
 		emptySlots++;
 	}
-	if (m_artifacts[CCaravanWork::kPermanentArtifactCount + 2] == -1) {
+	if (m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 2] == -1) {
 		emptySlots++;
 	}
-	if (m_artifacts[CCaravanWork::kPermanentArtifactCount + 3] == -1) {
+	if (m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 3] == -1) {
 		emptySlots++;
 	}
 
@@ -863,8 +863,8 @@ int CCaravanWork::DeleteItem(int itemIndex, int updateJoybus)
 int CCaravanWork::AddTmpArtifact(int itemId, int* outIndex)
 {
     for (int i = 0; i < 4; i++) {
-        if (m_artifacts[CCaravanWork::kPermanentArtifactCount + i] == -1) {
-            m_artifacts[CCaravanWork::kPermanentArtifactCount + i] = (short)itemId;
+        if (m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] == -1) {
+            m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] = (short)itemId;
             Joybus.SetTmpArti(m_joybusCaravanId, i, itemId);
             if (outIndex != 0) {
                 *outIndex = i;
@@ -1697,7 +1697,7 @@ void CCaravanWork::SafeDeleteTempItem()
 	int totalSlots = 0;
 	for (int artifactIndex = 0; artifactIndex < kArtifactCount; artifactIndex++) {
 		if (artifactIndex < kPermanentArtifactCount) {
-			int artifactId = m_artifacts[artifactIndex];
+			int artifactId = m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactIndex];
 			if (artifactId > 0) {
 				SItemFlatRow* artifactData = GetItemDataPtr(artifactId);
 				unsigned short slots = artifactData->m_value;
@@ -1728,10 +1728,10 @@ void CCaravanWork::SafeDeleteTempItem()
 	}
 
 	short invalidItem = -1;
-	m_artifacts[CCaravanWork::kPermanentArtifactCount + 0] = invalidItem;
-	m_artifacts[CCaravanWork::kPermanentArtifactCount + 1] = invalidItem;
-	m_artifacts[CCaravanWork::kPermanentArtifactCount + 2] = invalidItem;
-	m_artifacts[CCaravanWork::kPermanentArtifactCount + 3] = invalidItem;
+	m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 0] = invalidItem;
+	m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 1] = invalidItem;
+	m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 2] = invalidItem;
+	m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + 3] = invalidItem;
 
 	for (int i = 0; i < 64; i++) {
 		short item = m_inventoryItems[i];
@@ -1833,7 +1833,7 @@ void CCaravanWork::CalcStatus()
 	int magBonus = 0;
 	int defBonus = 0;
 	for (int i = 0; i < kArtifactCount; i++) {
-		int artifactId = m_artifacts[i];
+		int artifactId = m_inventoryItems[CCaravanWork::kPermanentArtifactStart + i];
 		if (artifactId > 0) {
 			SItemFlatRow* artifactData = GetItemDataPtr(artifactId);
 			int artifactEffect = artifactData->m_kind;
@@ -2503,8 +2503,8 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 void CCaravanWork::BackupTutorialItem(int mode)
 {
 	if (mode != 0) {
-		memcpy(m_backupInventoryBlock, m_inventoryItems, sizeof(m_backupInventoryBlock));
-		memset(m_inventoryItems, 0xFF, sizeof(m_backupInventoryBlock));
+		memcpy(m_backupItems, m_inventoryItems, sizeof(m_backupItems));
+		memset(m_inventoryItems, 0xFF, sizeof(m_inventoryItems));
 		m_backupInventoryItemCount = m_inventoryItemCount;
 		m_inventoryItemCount = 0;
 		memcpy(m_backupCommandListInventorySlotRef, m_commandListInventorySlotRef, sizeof(m_backupCommandListInventorySlotRef));
@@ -2520,7 +2520,7 @@ void CCaravanWork::BackupTutorialItem(int mode)
 		m_backupWeaponIdx = m_weaponIdx;
 		m_weaponIdx = 0;
 	} else {
-		memcpy(m_inventoryItems, m_backupInventoryBlock, sizeof(m_backupInventoryBlock));
+		memcpy(m_inventoryItems, m_backupItems, sizeof(m_backupItems));
 		m_inventoryItemCount = m_backupInventoryItemCount;
 		memcpy(m_commandListInventorySlotRef, m_backupCommandListInventorySlotRef, sizeof(m_backupCommandListInventorySlotRef));
 		memcpy(m_commandListExtra, m_backupCmdlistExtra, sizeof(m_backupCmdlistExtra));
@@ -2640,7 +2640,7 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 
 	for (int artifactIndex = 0; artifactIndex < kArtifactCount; artifactIndex++) {
 		if (artifactIndex < kPermanentArtifactCount) {
-			int artifactId = m_artifacts[artifactIndex];
+			int artifactId = m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactIndex];
 			if (artifactId > 0) {
 				SItemFlatRow* artifactData = &artifactDataBase[artifactId];
 				unsigned short artifactType = artifactData->m_kind;

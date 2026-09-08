@@ -1601,7 +1601,7 @@ void CMenuPcs::GetCmdItem()
 	count = 0;
 	s32 i = count;
 
-	for (; i < 0x40; i++) {
+	for (; i < CCaravanWork::kInventoryCapacity; i++) {
 		s32 itemType = GetItemType(i, 0);
 		if ((itemType != 0) && (itemType != 5) && (itemType != 6) && (itemType != 8) && (itemType != 9)) {
 			if (itemType == 1) {
@@ -1620,21 +1620,21 @@ void CMenuPcs::GetCmdItem()
 	s16* write2 = list + count;
 	for (s32 i = 0; i < 0x49; i++) {
 		s32 arti = i + 0x9f;
-		if (caravanWork->m_artifacts[i] == arti) {
+		if (caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + i] == arti) {
 			if (IsMagicArti(arti)) {
 				count++;
 				write2++;
-				*write2 = static_cast<s16>(i + 0x40);
+				*write2 = static_cast<s16>(i + CCaravanWork::kPermanentArtifactStart);
 			}
 		}
 	}
 
 	write2 = list + count;
 	for (s32 i = 0; i < CCaravanWork::kTemporaryArtifactCount; i++) {
-		if (IsMagicArti(caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + i])) {
+		if (IsMagicArti(caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i])) {
 			count++;
 			write2++;
-			*write2 = static_cast<s16>(0xa0 + i);
+			*write2 = static_cast<s16>(CCaravanWork::kTemporaryArtifactStart + i);
 		}
 	}
 

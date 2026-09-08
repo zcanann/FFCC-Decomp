@@ -285,10 +285,12 @@ public:
 
     short m_equipment[4];                       // 0x00AC weapon[0], armor[1], tribal[2], accessory[3]
     unsigned short m_inventoryItemCount;        // 0x00B4
-    short m_inventoryItems[64];                 // 0x00B6
-    enum { kPermanentArtifactCount = 96, kTemporaryArtifactCount = 4,
-           kArtifactCount = kPermanentArtifactCount + kTemporaryArtifactCount };
-    short m_artifacts[kArtifactCount];          // 0x0136, temporary artifacts start at 0x01F6
+    enum { kInventoryCapacity = 64, kPermanentArtifactCount = 96, kTemporaryArtifactCount = 4,
+           kArtifactCount = kPermanentArtifactCount + kTemporaryArtifactCount,
+           kPermanentArtifactStart = kInventoryCapacity,
+           kTemporaryArtifactStart = kPermanentArtifactStart + kPermanentArtifactCount,
+           kItemSlotCount = kInventoryCapacity + kArtifactCount };
+    short m_inventoryItems[kItemSlotCount];     // 0x00B6: inventory, permanent artifacts, temporary artifacts
     unsigned char m_treasureFlags;              // 0x01FE
     unsigned char m_moneyFlags;                 // 0x01FF
     int m_gil;                                  // 0x0200
@@ -298,7 +300,7 @@ public:
     short m_weaponIdx;                          // 0x0226
     short m_backupEquipment[4];                 // 0x0228
     unsigned short m_backupInventoryItemCount;  // 0x0230
-    unsigned char m_backupInventoryBlock[328];  // 0x0232
+    short m_backupItems[kItemSlotCount];        // 0x0232
     unsigned char m_backupTreasureFlags;        // 0x037A
     unsigned char m_backupMoneyFlags;           // 0x037B
     int m_backupGil;                            // 0x037C
@@ -360,8 +362,11 @@ public:
 }; // Size 0xC30
 
 STATIC_ASSERT(sizeof(CCaravanWork) == 0xC30);
-STATIC_ASSERT(offsetof(CCaravanWork, m_artifacts) == 0x136);
-STATIC_ASSERT(offsetof(CCaravanWork, m_artifacts) + CCaravanWork::kPermanentArtifactCount * sizeof(short) == 0x1F6);
+STATIC_ASSERT(offsetof(CCaravanWork, m_inventoryItems) == 0xB6);
+STATIC_ASSERT(offsetof(CCaravanWork, m_inventoryItems) + CCaravanWork::kPermanentArtifactStart * sizeof(short) == 0x136);
+STATIC_ASSERT(offsetof(CCaravanWork, m_inventoryItems) + CCaravanWork::kTemporaryArtifactStart * sizeof(short) == 0x1F6);
+STATIC_ASSERT(offsetof(CCaravanWork, m_backupItems) == 0x232);
+STATIC_ASSERT(sizeof(((CCaravanWork*)0)->m_inventoryItems) == 328);
 STATIC_ASSERT(offsetof(CCaravanWork, m_treasureFlags) == 0x1FE);
 STATIC_ASSERT(sizeof(CCaravanWork::CLetterWork) == 0x0C);
 STATIC_ASSERT(sizeof(CRomLetterWork) == 0x3E);

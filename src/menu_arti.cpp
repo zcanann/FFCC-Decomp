@@ -233,7 +233,7 @@ void CMenuPcs::ArtiDraw()
 				int texId = tex;
 				float itemAlpha = animAlpha;
 				if (tex == 0x37) {
-					int itemCount = caravanWork->m_artifacts[drawIndex + m_artiState->scrollOffset];
+					int itemCount = caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + (drawIndex + m_artiState->scrollOffset)];
 					if (itemCount > 0) {
 					} else {
 						texId = 0x34;
@@ -282,7 +282,7 @@ void CMenuPcs::ArtiDraw()
 		int menuIndex = i + m_artiState->scrollOffset;
 		listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, alpha).color);
 
-		short itemCount = caravanWork->m_artifacts[menuIndex];
+		short itemCount = caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + menuIndex];
 		const char* text;
 		if (itemCount <= 0) {
 			text = GetMenuStr(0x14);
@@ -307,7 +307,7 @@ void CMenuPcs::ArtiDraw()
 
 	ArtiOpenAnim* iconEntry = entry;
 	for (int i = 0; i < 8; i++) {
-		short itemCount = caravanWork->m_artifacts[i + m_artiState->scrollOffset];
+		short itemCount = caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + (i + m_artiState->scrollOffset)];
 		if (itemCount > 0) {
 			int iconY = (int)((float)(iconEntry->y + 6) - kArtiOne);
 			int iconX = (int)((float)(iconEntry->x + iconEntry->w - 0x10));

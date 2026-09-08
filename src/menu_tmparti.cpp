@@ -166,7 +166,7 @@ void CMenuPcs::TmpArtiDraw()
 			float rawAlpha = entry->alpha;
 			float alpha = rawAlpha;
 
-			if (caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + i] < 0) {
+			if (caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] < 0) {
 				tex = 0x34;
 				alpha = (float)(kTmpArtiHalfDouble * (double)rawAlpha);
 			}
@@ -188,7 +188,7 @@ void CMenuPcs::TmpArtiDraw()
 
 	entry = m_tmpArtiList->entries;
 	for (int i = 0; i < 4; i++) {
-		short icon = caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + i];
+		short icon = caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i];
 		if (icon >= 0) {
 			int posX = (int)static_cast<float>(entry->x + entry->width - 0x10);
 			int posY = (int)(static_cast<float>(entry->y + 6) - kTmpArtiOne);
@@ -205,12 +205,12 @@ void CMenuPcs::TmpArtiDraw()
 
 	entry = m_tmpArtiList->entries;
 	for (int i = 0; i < 4; i++) {
-		if (caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + i] >= 0) {
+		if (caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] >= 0) {
 			float alpha = entry->alpha;
 			CColor textColor(0xFF, 0xFF, 0xFF, kTmpArtiColorMax * alpha);
 			font->SetColor(textColor.color);
 
-			const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + i] * 5 + 4];
+			const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] * 5 + 4];
 			float width = font->GetWidth(text);
 			float posX = (float)((((float)entry->width - width) * kTmpArtiHalfDouble) + (float)entry->x);
 			float posY = (float)(entry->y + 11);

@@ -15,15 +15,9 @@ static const float kTmpArtiZero = 0.0f;
 static const float kTmpArtiOne = 1.0f;
 static const float kTmpArtiFontScale = 0.9f;
 static const float kTmpArtiTextYOffset = 4.0f;
-static const double kTmpArtiIntToDoubleBias = 4503601774854144.0;
 static const double kTmpArtiOneDouble = 1.0;
 static const double kTmpArtiZeroDouble = 0.0;
 static const double kTmpArtiCenterX = 216.0;
-
-static inline float TmpArtiIntToFloat(int value)
-{
-    return (float)value;
-}
 
 STATIC_ASSERT(offsetof(TmpArtiState, initialized) == 0xB);
 STATIC_ASSERT(offsetof(TmpArtiState, closeRequested) == 0xD);
@@ -41,29 +35,12 @@ STATIC_ASSERT(offsetof(TmpArtiEntry, duration) == 0x28);
 STATIC_ASSERT(sizeof(TmpArtiEntry) == 0x40);
 STATIC_ASSERT(sizeof(TmpArtiList) == 0x1008);
 
-namespace {
-static inline TmpArtiList* GetTmpArtiList(CMenuPcs* menu)
-{
-    return menu->m_tmpArtiList;
-}
-
-static inline TmpArtiEntry* GetTmpArtiEntries(CMenuPcs* menu)
-{
-    return GetTmpArtiList(menu)->entries;
-}
-
-static inline CFont* GetTmpArtiFont(CMenuPcs* menu)
-{
-    return menu->m_fonts[4];
-}
-} // namespace
-
 /*
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 360b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801803BC
+ * EN Size: 328b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -102,17 +79,17 @@ inline int CMenuPcs::TmpArtiCtrlCur()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 356b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8017FA84
+ * EN Size: 188b
  * JP Address: TODO
  * JP Size: TODO
  */
 inline void CMenuPcs::TmpArtiInit0()
 {
-    TmpArtiEntry* entry = GetTmpArtiEntries(this);
+    TmpArtiEntry* entry = m_tmpArtiList->entries;
     float alpha = kTmpArtiOne;
 
-    for (int count = GetTmpArtiList(this)->count; count > 0; count--) {
+    for (int count = m_tmpArtiList->count; count > 0; count--) {
         entry->startFrame = 0;
         entry->duration = 1;
         entry->alpha = alpha;
@@ -124,8 +101,8 @@ inline void CMenuPcs::TmpArtiInit0()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 408b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8017F928
+ * EN Size: 348b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -134,46 +111,25 @@ inline void CMenuPcs::TmpArtiInit()
     memset(m_tmpArtiList, 0, sizeof(TmpArtiList));
 
     float one = kTmpArtiOne;
-    TmpArtiEntry* entry = GetTmpArtiEntries(this);
-    int i = 8;
-    do {
-        entry[0].z = one;
-        entry[1].z = one;
-        entry[2].z = one;
-        entry[3].z = one;
-        entry[4].z = one;
-        entry[5].z = one;
-        entry[6].z = one;
-        entry[7].z = one;
-        entry += 8;
-        i--;
-    } while (i != 0);
+    TmpArtiEntry* entry = m_tmpArtiList->entries;
+    for (int i = 0; i < 64; i++, entry++) {
+        entry->z = one;
+    }
 
     double center = kTmpArtiCenterX;
     double half = kTmpArtiHalfDouble;
     float zero = kTmpArtiZero;
-    int row = 0;
-    entry = GetTmpArtiEntries(this);
-    for (int pairCount = 0; pairCount < 2; pairCount++) {
-        entry[0].tex = 0x37;
-        entry[0].width = 200;
-        entry[0].height = 0x28;
-        entry[0].x = (short)(int)-(((double)entry[0].width * half) - center);
-        entry[0].y = row * (entry[0].height - 8) + 0x60;
-        entry[0].s = zero;
-        entry[0].t = zero;
-        entry[0].startFrame = row++;
-        entry[0].duration = 3;
-        entry[1].tex = 0x37;
-        entry[1].width = 200;
-        entry[1].height = 0x28;
-        entry[1].x = (short)(int)-(((double)entry[1].width * half) - center);
-        entry[1].y = row * (entry[1].height - 8) + 0x60;
-        entry[1].s = zero;
-        entry[1].t = zero;
-        entry[1].startFrame = row++;
-        entry[1].duration = 3;
-        entry += 2;
+    entry = m_tmpArtiList->entries;
+    for (int row = 0; row < 4; row++, entry++) {
+        entry->tex = 0x37;
+        entry->width = 200;
+        entry->height = 0x28;
+        entry->x = (short)(int)(center - (double)entry->width * half);
+        entry->y = row * (entry->height - 8) + 0x60;
+        entry->s = zero;
+        entry->t = zero;
+        entry->startFrame = row;
+        entry->duration = 3;
     }
 
     m_tmpArtiList->count = 4;
@@ -185,8 +141,8 @@ inline void CMenuPcs::TmpArtiInit()
  * --INFO--
  * PAL Address: 0x8015d798
  * PAL Size: 1056b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8017FE9C
+ * EN Size: 1312b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -195,10 +151,10 @@ void CMenuPcs::TmpArtiDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	TmpArtiEntry* entry = GetTmpArtiEntries(this);
+	TmpArtiEntry* entry = m_tmpArtiList->entries;
 	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
-	for (int i = 0; i < GetTmpArtiList(this)->count; i++) {
+	for (int i = 0; i < m_tmpArtiList->count; i++) {
 		if (entry->tex >= 0) {
 			int tex = entry->tex;
 			float left = (float)entry->x;
@@ -230,24 +186,24 @@ void CMenuPcs::TmpArtiDraw()
 		entry++;
 	}
 
-	entry = GetTmpArtiEntries(this);
+	entry = m_tmpArtiList->entries;
 	for (int i = 0; i < 4; i++) {
 		short icon = caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + i];
 		if (icon >= 0) {
-			int posX = (int)TmpArtiIntToFloat(entry->x + entry->width - 0x10);
-			int posY = (int)(TmpArtiIntToFloat(entry->y + 6) - kTmpArtiOne);
+			int posX = (int)static_cast<float>(entry->x + entry->width - 0x10);
+			int posY = (int)(static_cast<float>(entry->y + 6) - kTmpArtiOne);
 			DrawSingleIcon(icon, posX, posY, entry->alpha, 0, kTmpArtiZero);
 		}
 		entry++;
 	}
 
-	CFont* font = GetTmpArtiFont(this);
+	CFont* font = m_fonts[4];
 	font->SetMargin(kTmpArtiOne);
 	font->SetShadow(0);
 	font->SetScale(kTmpArtiFontScale);
 	font->DrawInit();
 
-	entry = GetTmpArtiEntries(this);
+	entry = m_tmpArtiList->entries;
 	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_artifacts[CCaravanWork::kPermanentArtifactCount + i] >= 0) {
 			float alpha = entry->alpha;
@@ -273,8 +229,8 @@ void CMenuPcs::TmpArtiDraw()
  * --INFO--
  * PAL Address: 0x8015dbb8
  * PAL Size: 428b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8017FD20
+ * EN Size: 380b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -283,16 +239,16 @@ unsigned int CMenuPcs::TmpArtiClose()
 	float zero;
 	TmpArtiEntry* entry;
 	int completedItems;
-	unsigned int itemCount;
+	int itemCount;
 	int currentFrame;
-	unsigned int count;
+	int count;
 	unsigned int result;
 
 	completedItems = 0;
 	this->m_tmpArtiState->frame = this->m_tmpArtiState->frame + 1;
-	itemCount = (unsigned int)this->m_tmpArtiList->count;
+	itemCount = this->m_tmpArtiList->count;
 	entry = this->m_tmpArtiList->entries;
-	currentFrame = (int)this->m_tmpArtiState->frame;
+	currentFrame = this->m_tmpArtiState->frame;
 	for (int remaining = itemCount; remaining > 0; remaining--) {
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
@@ -314,7 +270,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 	if (this->m_tmpArtiList->count == completedItems) {
 		zero = kTmpArtiZero;
 		entry = this->m_tmpArtiList->entries;
-		for (count = itemCount; (int)count > 0; count--) {
+		for (count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;
 			entry->duration = 1;
 			entry->alpha = zero;
@@ -330,8 +286,8 @@ unsigned int CMenuPcs::TmpArtiClose()
  * --INFO--
  * PAL Address: 0x8015dd64
  * PAL Size: 744b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8017FCBC
+ * EN Size: 100b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -339,29 +295,28 @@ int CMenuPcs::TmpArtiCtrl()
 {
 	int hasInput;
 	int itemCount;
-	int iVar7;
-	unsigned int blockCount;
+	int startFrame;
 
 	this->m_tmpArtiState->selection = this->m_tmpArtiState->prevSelection;
 	hasInput = TmpArtiCtrlCur();
 
 	if (hasInput) {
-		float fVar2 = kTmpArtiOne;
+		float alpha = kTmpArtiOne;
 		const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 		TmpArtiEntry* entry = this->m_tmpArtiList->entries;
 		for (int i = 0; i < this->m_tmpArtiList->count; i = i + 1) {
-			entry->alpha = fVar2;
-			entry->z = fVar2;
+			entry->alpha = alpha;
+			entry->z = alpha;
 			entry++;
 		}
 
 		itemCount = caravanWork->m_numCmdListSlots;
-		iVar7 = 0;
+		startFrame = 0;
 		for (int setupIndex = itemCount - 1; setupIndex >= 0; setupIndex--) {
 			TmpArtiEntry* setupEntry = &this->m_tmpArtiList->entries[setupIndex];
-			setupEntry->startFrame = iVar7;
-			iVar7 = iVar7 + 1;
+			setupEntry->startFrame = startFrame;
+			startFrame = startFrame + 1;
 			setupEntry->duration = 3;
 		}
 	}
@@ -373,8 +328,8 @@ int CMenuPcs::TmpArtiCtrl()
  * --INFO--
  * PAL Address: 0x8015e04c
  * PAL Size: 816b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8017FB40
+ * EN Size: 380b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -382,7 +337,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 {
 	int completedItems;
 	TmpArtiEntry* entry;
-	unsigned int itemCount;
+	int itemCount;
 	int currentFrame;
 	unsigned int result;
 
@@ -392,9 +347,9 @@ unsigned int CMenuPcs::TmpArtiOpen()
 
 	completedItems = 0;
 	this->m_tmpArtiState->frame = this->m_tmpArtiState->frame + 1;
-	itemCount = (unsigned int)this->m_tmpArtiList->count;
+	itemCount = this->m_tmpArtiList->count;
 	entry = this->m_tmpArtiList->entries;
-	currentFrame = (int)this->m_tmpArtiState->frame;
+	currentFrame = this->m_tmpArtiState->frame;
 	for (int remaining = itemCount; remaining > 0; remaining--) {
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {

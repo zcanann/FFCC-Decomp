@@ -10,11 +10,35 @@ namespace Mc
 {
 struct CharaDat
 {
-    unsigned char m_unknown000[0x2E];
-    u16 m_tribeId;                                  // 0x2E
-    u16 m_genderFlag;                               // 0x30
-    u16 m_appearanceVariant;                        // 0x32
-    unsigned char m_unknown034[0x5B4 - 0x34];
+    u16 m_id;                                      // 0x00
+    u16 m_param1;                                  // 0x02
+    u16 m_param2;                                  // 0x04
+    u16 m_maxHp;                                   // 0x06
+    u16 m_hp;                                      // 0x08
+    u16 m_strength;                                // 0x0A
+    u16 m_magic;                                   // 0x0C
+    u16 m_defense;                                 // 0x0E
+    u16 m_unknown010;                              // 0x10
+    u16 m_letterMeta[8];                           // 0x12
+    u16 m_unknown022;                              // 0x22
+    u16 m_unknown024;                              // 0x24
+    u16 m_unknown026;                              // 0x26
+    u16 m_inventoryItemCount;                      // 0x28
+    u16 m_unknown02A;                              // 0x2A
+    u16 m_progressValue;                           // 0x2C
+    u16 m_tribeId;                                 // 0x2E
+    u16 m_genderFlag;                              // 0x30
+    u16 m_appearanceVariant;                       // 0x32
+    s16 m_equipment[4];                            // 0x34
+    s16 m_inventoryItems[64];                      // 0x3C
+    u32 m_artifactFlags[3];                        // 0xBC
+    s16 m_commandListInventorySlotRef[8];          // 0xC8
+    s16 m_commandListExtra[8];                     // 0xD8
+    int m_joybusCaravanId;                         // 0xE8
+    int m_gil;                                     // 0xEC
+    char m_name[16];                               // 0xF0
+    int m_letterCount;                             // 0x100
+    unsigned char m_unknown104[0x5B4 - 0x104];
     int m_exists;                                  // 0x5B4
     unsigned char m_unknown5B8[0x8C0 - 0x5B8];
     unsigned char m_isAway;                         // 0x8C0

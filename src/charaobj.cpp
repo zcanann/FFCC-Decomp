@@ -1833,7 +1833,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				}
 			} else {
 				if (((DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0 ||
-				     static_cast<CGMonObj*>(sourceObj)->m_unk6CC == 2) &&
+				     static_cast<CGPartyObj*>(sourceObj)->m_partyData.unk6CC == 2) &&
 				    (calcRegist(0x69, resolvedItemId, resistType, counterAllow, effectResult, 0), counterAllow != 0)) {
 					int chance;
 					if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {

@@ -1241,8 +1241,8 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
  * --INFO--
  * PAL Address: 0x800842e4
  * PAL Size: 3896b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80098294
+ * EN Size: 4168b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1286,12 +1286,12 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     switch (params->m_spawnMode) {
     default:
         if (particleWMat == NULL) {
-            pppMulMatrix(mtxB, *(pppFMATRIX*)&pObject->m_localMatrix, mtxB);
+            pppMulMatrix(mtxB, pObject->m_localMatrix, mtxB);
             pppMulMatrix(mtxB, ppvMng->m_matrix, mtxB);
             pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix, mtxB);
             pppCopyMatrix(pObject->m_drawMatrix, mtxB);
         } else {
-            pppMulMatrix(mtxB, *(pppFMATRIX*)&pObject->m_localMatrix, mtxB);
+            pppMulMatrix(mtxB, pObject->m_localMatrix, mtxB);
             pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, mtxB);
             pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix, mtxB);
             pppCopyMatrix(pObject->m_drawMatrix, mtxB);

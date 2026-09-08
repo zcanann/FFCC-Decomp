@@ -309,13 +309,17 @@ void CGraphic::ChangeProgressive(int mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80019960
+ * PAL Size: 84b
+ * EN Address: 0x8001E5B8
+ * EN Size: 120b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::SetCopyClear(_GXColor color, int)
 {
     m_defaultCopyClearColor = color;
-    GXSetCopyClear(m_defaultCopyClearColor, 0xFFFFFF);
+    GXSetCopyClear(color, 0xFFFFFF);
 }
 
 /*

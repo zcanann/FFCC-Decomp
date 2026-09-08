@@ -122,8 +122,8 @@ void pppRenderEmission(pppEmission*, PEmission*, _pppCtrlTable*) {
  * --INFO--
  * PAL Address: 0x800E6080
  * PAL Size: 1040b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80103FE4
+ * EN Size: 1444b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -205,10 +205,8 @@ void pppFrameEmission(pppEmission* pppEmission_, PEmission* param_2, _pppCtrlTab
                 }
             }
 
-            s16 life = particle->m_fieldA;
             int alpha = (int)((float)particle->m_alpha * alphaScale);
-            life--;
-            particle->m_fieldA = life;
+            particle->m_fieldA--;
 
             if (particle->m_fieldA <= 0) {
                 int jitter = 0;

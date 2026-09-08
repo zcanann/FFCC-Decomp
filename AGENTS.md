@@ -17,6 +17,8 @@ Goal: maximize real progress by improving C/C++ source, linkage, headers, types,
 - **Ghidra is a guide**, mainly for addresses, sizes, and rough function shape.
 - Function names from shipped Metrowerks symbols are usually correct. Parameters from Ghidra may not be.
 
+Game code uses **GC/2.5** as its shared compiler baseline. This is a working assumption supported by comparison, not proof of the exact retail compiler. Prefer recovering plausible source and removing temporary tuning over adding per-unit compiler overrides. Revisit existing optimization overrides against this baseline. If a previously `Matching` unit stops linking exactly, mark it `NonMatching` while repairing it; do not preserve the label with compiler exceptions. SDK and middleware compiler choices are independent.
+
 Useful references:
 - Ghidra decomp: `resources/ghidra-decomp-1-31-2026/`
 - PAL map: `orig/GCCP01/game.MAP`

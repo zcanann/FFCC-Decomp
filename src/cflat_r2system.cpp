@@ -559,51 +559,6 @@ int CCaravanWork::GetEvtWord(int evtWordIndex)
 
 /*
  * --INFO--
- * PAL Address: 0x800B9264
- * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCaravanWork::SetEvtFlag(int evtFlagIndex, int value)
-{
-    if (value != 0) {
-        int byteIndex = evtFlagIndex / 8;
-        int bit = 1 << (evtFlagIndex % 8);
-        reinterpret_cast<unsigned char*>(m_evtWorkArr)[byteIndex] |= bit;
-        return;
-    }
-
-    {
-        int byteIndex = evtFlagIndex / 8;
-        int bit = 1 << (evtFlagIndex % 8);
-        reinterpret_cast<unsigned char*>(m_evtWorkArr)[byteIndex] &= ~bit;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B92DC
- * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CCaravanWork::GetEvtFlag(int evtFlagIndex)
-{
-    unsigned char* evtFlags = reinterpret_cast<unsigned char*>(m_evtWorkArr);
-    int byteIndex = evtFlagIndex / 8;
-    unsigned char value = evtFlags[byteIndex];
-    int mask = 1 << (evtFlagIndex % 8);
-    unsigned int flag = value & mask;
-
-    return (-flag | flag) >> 31;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B931C
  * PAL Size: 20b
  * EN Address: TODO

@@ -326,7 +326,7 @@ public:
     CLetterWork m_letters[100];                 // 0x03EC
     unsigned int m_evtState0;                   // 0x089C
     unsigned int m_evtState1;                   // 0x08A0
-    unsigned short m_evtWorkArr[128];           // 0x08A4
+    unsigned char m_evtFlags[256];           // 0x08A4
     short m_evtWordArr[256];                    // 0x09A4
     unsigned char m_bonusCondition;             // 0x0BA4
     unsigned char m_shopBusyFlag;               // 0x0BA5
@@ -361,12 +361,58 @@ public:
     int m_shopData2;                            // 0x0C2C
 }; // Size 0xC30
 
+/*
+ * --INFO--
+ * PAL Address: 0x800B9264
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CCaravanWork::SetEvtFlag(int evtFlagIndex, int value)
+{
+    if (value != 0) {
+        int byteIndex = evtFlagIndex / 8;
+        int bit = 1 << (evtFlagIndex % 8);
+        m_evtFlags[byteIndex] |= bit;
+        return;
+    }
+
+    {
+        int byteIndex = evtFlagIndex / 8;
+        int bit = 1 << (evtFlagIndex % 8);
+        m_evtFlags[byteIndex] &= ~bit;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B92DC
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CCaravanWork::GetEvtFlag(int evtFlagIndex)
+{
+    int byteIndex = evtFlagIndex / 8;
+    unsigned char value = m_evtFlags[byteIndex];
+    int mask = 1 << (evtFlagIndex % 8);
+    unsigned int flag = value & mask;
+
+    return flag != 0;
+}
+
 STATIC_ASSERT(sizeof(CCaravanWork) == 0xC30);
 STATIC_ASSERT(offsetof(CCaravanWork, m_inventoryItems) == 0xB6);
 STATIC_ASSERT(offsetof(CCaravanWork, m_inventoryItems) + CCaravanWork::kPermanentArtifactStart * sizeof(short) == 0x136);
 STATIC_ASSERT(offsetof(CCaravanWork, m_inventoryItems) + CCaravanWork::kTemporaryArtifactStart * sizeof(short) == 0x1F6);
 STATIC_ASSERT(offsetof(CCaravanWork, m_backupItems) == 0x232);
 STATIC_ASSERT(sizeof(((CCaravanWork*)0)->m_inventoryItems) == 328);
+STATIC_ASSERT(offsetof(CCaravanWork, m_evtFlags) == 0x8A4);
+STATIC_ASSERT(offsetof(CCaravanWork, m_evtWordArr) == 0x9A4);
 STATIC_ASSERT(offsetof(CCaravanWork, m_treasureFlags) == 0x1FE);
 STATIC_ASSERT(sizeof(CCaravanWork::CLetterWork) == 0x0C);
 STATIC_ASSERT(sizeof(CRomLetterWork) == 0x3E);

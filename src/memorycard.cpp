@@ -1108,7 +1108,7 @@ void CMemoryCardMan::MakeSaveData()
         }
 
         *reinterpret_cast<int*>(dst + 0x5B4) = caravanWork->m_shopState;
-        memcpy(dst + 0x5B8, caravanWork->m_evtWorkArr, 0x100);
+        memcpy(dst + 0x5B8, caravanWork->m_evtFlags, 0x100);
         memcpy(dst + 0x6B8, caravanWork->m_evtWordArr, 0x200);
         *reinterpret_cast<int*>(dst + 0x8B8) = caravanWork->unk_0x3a8;
         *reinterpret_cast<int*>(dst + 0x8BC) = caravanWork->unk_0x3ac;
@@ -1302,7 +1302,7 @@ void CMemoryCardMan::SetLoadData()
         }
 
         caravanWork->m_shopState = *reinterpret_cast<int*>(src + 0x5B4);
-        memcpy(caravanWork->m_evtWorkArr, src + 0x5B8, 0x100);
+        memcpy(caravanWork->m_evtFlags, src + 0x5B8, 0x100);
         memcpy(caravanWork->m_evtWordArr, src + 0x6B8, 0x200);
         caravanWork->unk_0x3a8 = *reinterpret_cast<int*>(src + 0x8B8);
         caravanWork->unk_0x3ac = *reinterpret_cast<int*>(src + 0x8BC);

@@ -19,12 +19,6 @@ static inline SItemFlatRow* GetItemDataPtr(int itemIdx)
 	return &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemIdx];
 }
 
-struct ShoukiByteFlags {
-	int upper : 1;
-	unsigned int pad0 : 2;
-	int middle : 1;
-};
-
 static inline float GetStatusMultiplier(int offset)
 {
 	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * 0.01f) +
@@ -170,7 +164,7 @@ void CCaravanWork::clearCaravanWork()
 	m_equipment[3] = -1;
 	m_inventoryItemCount = 0;
 	memset(m_inventoryItems, 0xFF, sizeof(m_inventoryItems));
-	memset(m_evtWorkArr, 0, sizeof(m_evtWorkArr));
+	memset(m_evtFlags, 0, sizeof(m_evtFlags));
 	memset(m_evtWordArr, 0, sizeof(m_evtWordArr));
 	m_tempStatBuffTimer = 0;
 	m_tempStatBuffId = 0;
@@ -234,7 +228,7 @@ void CCaravanWork::LoadInit()
  */
 void CCaravanWork::ClearEvtWork()
 {
-	memset(m_evtWorkArr, 0, sizeof(m_evtWorkArr));
+	memset(m_evtFlags, 0, sizeof(m_evtFlags));
 	memset(m_evtWordArr, 0, sizeof(m_evtWordArr));
 }
 
@@ -1367,9 +1361,9 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 							 (1 << ((sourceIdx + 2) % 8))) != 0);
 					break;
 				case 2:
-					bit0 = ((reinterpret_cast<unsigned char*>(this)[sourceIdx / 8 + 0x8A4] & (1 << (sourceIdx % 8))) != 0);
-					bit1 = ((reinterpret_cast<unsigned char*>(this)[(sourceIdx + 1) / 8 + 0x8A4] & (1 << ((sourceIdx + 1) % 8))) != 0);
-					bit2 = ((reinterpret_cast<unsigned char*>(this)[(sourceIdx + 2) / 8 + 0x8A4] & (1 << ((sourceIdx + 2) % 8))) != 0);
+					bit0 = GetEvtFlag(sourceIdx);
+					bit1 = GetEvtFlag(sourceIdx + 1);
+					bit2 = GetEvtFlag(sourceIdx + 2);
 					break;
 				}
 
@@ -2708,18 +2702,13 @@ void CMonWork::CalcStatus()
 int CCaravanWork::IsOutOfShouki()
 {
 	unsigned char result = 0;
-	void* ownerObj = m_ownerObj;
+	CGPartyObj* ownerObj = static_cast<CGPartyObj*>(m_ownerObj);
 
-	if (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(ownerObj) + 0x5BC) >
-		0.95f * Game.unkFloat_0xca10) {
+	if (ownerObj->m_targetDist > 0.95f * Game.unkFloat_0xca10) {
 		if (m_hp != 0) {
-			unsigned char cflatFlag = CFlatGameFlags();
-			if (((char)(((int)(((unsigned int)cflatFlag << 24) & 0xC0000000)) >> 31) != 0 ||
-				 (char)(((int)(((unsigned int)cflatFlag << 27) & 0xC0000000)) >> 31) != 0) &&
-				(char)(((int)((((unsigned int) * (unsigned char*)(reinterpret_cast<unsigned char*>(ownerObj) + 0x9B))
-							   << 24) &
-							  0xC0000000)) >>
-					   31) != 0) {
+			if ((CFlatRuntime2Storage().m_gameFlagBits.m_flagBit7 != 0 ||
+				 CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 != 0) &&
+				ownerObj->m_weaponNodeFlagAll.m_bits1.m_shield != 0) {
 				result = 1;
 			}
 		}

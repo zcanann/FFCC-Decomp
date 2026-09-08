@@ -965,49 +965,19 @@ void CCameraPcs::destroyFullShadow()
  */
 void CCameraPcs::createFullShadow()
 {
-    unsigned int rampTexSize;
-    unsigned int i;
-    unsigned char* rampTex;
-    CMapMng* map;
-    char* fileName;
-
-    fileName = const_cast<char*>(s_p_camera_cpp);
-    map = &MapMng;
     m_fullScreenShadow.m_shadowTexture = 0;
     m_fullScreenShadow.m_shadowTexture =
-        new (map->m_stage, fileName, 0x3A5)
+        new (MapMng.m_stage, const_cast<char*>(s_p_camera_cpp), 0x3A5)
             u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
-    fileName = const_cast<char*>(s_p_camera_cpp);
-    map = &MapMng;
+
     m_fullScreenShadow.m_rampTexture = 0;
-    rampTex = new (map->m_stage, fileName, 0x361)
-        u8[rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0)];
+    unsigned int rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
+    unsigned char* rampTex = new (MapMng.m_stage, const_cast<char*>(s_p_camera_cpp), 0x361) u8[rampTexSize];
     m_fullScreenShadow.m_rampTexture = rampTex;
 
-    for (i = 0; i < 0x100; i += 8) {
-        u32 v3 = i + 3;
-        u32 v4 = i + 4;
-        u32 v6 = i + 6;
-        u32 v7 = i + 7;
-        u32 v5 = i + 5;
-        u32 v2 = i + 2;
-        u32 v1 = i + 1;
+    for (unsigned int i = 0; i < 0x100; i++) {
         rampTex[((i & 0x80) >> 2) + ((i >> 4) & 7) + ((i & 0xC) << 4) + ((i & 3) << 3)] =
             static_cast<unsigned char>(i);
-        rampTex[((v1 & 0x80) >> 2) + ((v1 >> 4) & 7) + ((v1 & 0xC) << 4) + ((v1 & 3) << 3)] =
-            static_cast<unsigned char>(v1);
-        rampTex[((v2 & 0x80) >> 2) + ((v2 >> 4) & 7) + ((v2 & 0xC) << 4) + ((v2 & 3) << 3)] =
-            static_cast<unsigned char>(v2);
-        rampTex[((v3 & 0x80) >> 2) + ((v3 >> 4) & 7) + ((v3 & 0xC) << 4) + ((v3 & 3) << 3)] =
-            static_cast<unsigned char>(v3);
-        rampTex[((v4 & 0x80) >> 2) + ((v4 >> 4) & 7) + ((v4 & 0xC) << 4) + ((v4 & 3) << 3)] =
-            static_cast<unsigned char>(v4);
-        rampTex[((v5 & 0x80) >> 2) + ((v5 >> 4) & 7) + ((v5 & 0xC) << 4) + ((v5 & 3) << 3)] =
-            static_cast<unsigned char>(v5);
-        rampTex[((v6 & 0x80) >> 2) + ((v6 >> 4) & 7) + ((v6 & 0xC) << 4) + ((v6 & 3) << 3)] =
-            static_cast<unsigned char>(v6);
-        rampTex[((v7 & 0x80) >> 2) + ((v7 >> 4) & 7) + ((v7 & 0xC) << 4) + ((v7 & 3) << 3)] =
-            static_cast<unsigned char>(v7);
     }
 
     GXInitTexObj(&m_fullScreenShadow.m_texObjs[1], rampTex, 0x10, 0x10, GX_TF_I8,
@@ -1017,13 +987,10 @@ void CCameraPcs::createFullShadow()
                     GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(rampTex, rampTexSize);
 
-    f32 shadowAlpha = kCameraQuarterPi;
     m_fullScreenShadowEnabled = 1;
-    f32 zero = kCameraZeroF;
-    m_fullScreenShadow.m_rotX = shadowAlpha;
-    shadowAlpha = kCameraOneThirdApprox;
-    m_fullScreenShadow.m_rotY = zero;
-    m_fullScreenShadow.m_scale = shadowAlpha;
+    m_fullScreenShadow.m_rotX = kCameraQuarterPi;
+    m_fullScreenShadow.m_rotY = kCameraZeroF;
+    m_fullScreenShadow.m_scale = kCameraOneThirdApprox;
 }
 
 /*

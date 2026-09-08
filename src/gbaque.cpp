@@ -1100,7 +1100,7 @@ unsigned int GbaQueue::GetStageFlg(int channel)
 	OSWaitSemaphore(accessSemaphores + channel);
 	stageFlg = static_cast<char>(m_stageFlags);
 	flag = static_cast<int>(stageFlg) & (1 << channel);
-	flag = static_cast<unsigned int>(-flag | flag) >> 31;
+	flag = (flag != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	return static_cast<unsigned int>(flag);
@@ -2305,7 +2305,7 @@ unsigned int GbaQueue::GetLetterLstFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(m_letterDatFlg)) & (1 << channel);
-	value = (-value | value) >> 31;
+	value = (value != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value;
 }
@@ -2338,7 +2338,7 @@ unsigned int GbaQueue::GetLetterDatFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(m_letterDatFlg)) & (0x10 << channel);
-	value = (-value | value) >> 31;
+	value = (value != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value;
 }
@@ -2657,7 +2657,7 @@ unsigned int GbaQueue::GetFavoriteFlg(int channel)
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<char>(m_favoriteFlags);
 	flag = static_cast<int>(value) & (1 << channel);
-	flag = static_cast<unsigned int>(-flag | flag) >> 31;
+	flag = (flag != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	return static_cast<unsigned int>(flag);
@@ -2716,7 +2716,7 @@ unsigned int GbaQueue::GetMoneyFlg(int channel)
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<char>(m_moneyFlags);
 	flag = static_cast<int>(value) & (1 << channel);
-	flag = static_cast<unsigned int>(-flag | flag) >> 31;
+	flag = (flag != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	return static_cast<unsigned int>(flag);
@@ -3159,7 +3159,7 @@ unsigned int GbaQueue::GetCompatibilityFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<char>(m_compatibilityFlg[channel]);
-	value = static_cast<unsigned int>(-value | value) >> 31;
+	value = (value != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return static_cast<unsigned int>(value);
 }
@@ -3842,7 +3842,7 @@ unsigned int GbaQueue::GetSellFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(m_sellFlg)) & (1 << channel);
-	value = (-value | value) >> 31;
+	value = (value != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value;
 }
@@ -3879,7 +3879,7 @@ unsigned int GbaQueue::GetBuyFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(m_buyFlg)) & (1 << channel);
-	value = (-value | value) >> 31;
+	value = (value != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value;
 }
@@ -3916,7 +3916,7 @@ unsigned int GbaQueue::GetMkSmithFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(m_mkSmithFlg)) & (1 << channel);
-	value = (-value | value) >> 31;
+	value = (value != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value;
 }
@@ -3989,7 +3989,7 @@ unsigned int GbaQueue::GetArtifactFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(m_artifactFlags)) & (1 << channel);
-	value = static_cast<unsigned int>(-value | value) >> 31;
+	value = (value != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return static_cast<unsigned int>(value);
 }
@@ -4059,13 +4059,12 @@ int GbaQueue::GetUseItemFlg(int channel)
 unsigned int GbaQueue::GetChgUseItemFlg(int channel)
 {
 	int value;
-	unsigned int result;
+	bool result;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(m_chgUseItemFlags)) & (1 << channel);
-	result = static_cast<unsigned int>(-value | value) >> 31;
+	result = (value != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
-	result = static_cast<unsigned int>(-result | result) >> 31;
 	return result;
 }
 
@@ -4104,7 +4103,7 @@ unsigned int GbaQueue::GetStrengthFlg(int channel)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(m_strengthFlags)) & (1 << channel);
-	value = static_cast<unsigned int>(-value | value) >> 31;
+	value = (value != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 	return static_cast<unsigned int>(value);
 }
@@ -4149,13 +4148,12 @@ void GbaQueue::GetStrengthData(int channel, unsigned char* strengthData)
 unsigned int GbaQueue::GetArtiDatFlg(int channel)
 {
 	int value;
-	unsigned int result;
+	bool result;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(m_artiDatFlags)) & (1 << channel);
-	result = static_cast<unsigned int>(-value | value) >> 31;
+	result = (value != 0);
 	OSSignalSemaphore(accessSemaphores + channel);
-	result = static_cast<unsigned int>(-result | result) >> 31;
 	return result;
 }
 
@@ -4481,10 +4479,7 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 unsigned int GbaQueue::GetChgHitFlg(int channel)
 {
 	char* obj = reinterpret_cast<char*>(this);
-	signed char singleModeByte = m_singleMode;
-	int singleMode = singleModeByte;
-	unsigned int actualChannel = static_cast<unsigned int>(channel) &
-	                             ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
+	unsigned int actualChannel = m_singleMode != 0 ? 0 : channel;
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;
 	OSWaitSemaphore(semaphore);
 	int flag = obj[0x2D54];
@@ -4500,10 +4495,7 @@ unsigned int GbaQueue::GetChgHitFlg(int channel)
  */
 void GbaQueue::ClrChgHitFlg(int channel)
 {
-	unsigned char flag = static_cast<unsigned char>(m_singleMode);
-	unsigned int actualChannel =
-	    static_cast<unsigned int>(channel) &
-	    ~static_cast<unsigned int>((-static_cast<signed char>(flag) | static_cast<signed char>(flag)) >> 31);
+	unsigned int actualChannel = m_singleMode != 0 ? 0 : channel;
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;
 	OSWaitSemaphore(semaphore);
 	m_chgHitFlags = static_cast<unsigned char>(m_chgHitFlags & ~(1U << actualChannel));
@@ -4579,10 +4571,7 @@ void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
  */
 int GbaQueue::GetHitEInfo(int channel)
 {
-	signed char singleModeByte = m_singleMode;
-	int singleMode = singleModeByte;
-	unsigned int actualChannel = static_cast<unsigned int>(channel) &
-	                             ~static_cast<unsigned int>((-singleMode | singleMode) >> 31);
+	unsigned int actualChannel = m_singleMode != 0 ? 0 : channel;
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;
 	OSWaitSemaphore(semaphore);
 	int hitInfo;
@@ -4854,10 +4843,9 @@ unsigned int GbaQueue::GetPauseMode()
  */
 int GbaQueue::GetItemUse(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	char value = obj[channel * 0xDC + 0x52A];
+	char value = m_playerData[channel].m_itemFlags;
 	int result = (int)value;
 	OSSignalSemaphore(semaphore);
 	return result;
@@ -4968,11 +4956,9 @@ void GbaQueue::ClrMemorysFlg(int channel)
  */
 unsigned int GbaQueue::GetMemorys(int channel)
 {
-	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	unsigned short value =
-		*reinterpret_cast<unsigned short*>(compatibilityStr + channel * 0xDC + 0x10);
+	unsigned short value = m_playerData[channel].m_progress;
 	OSSignalSemaphore(semaphore);
 	return value;
 }
@@ -4988,10 +4974,9 @@ unsigned int GbaQueue::GetMemorys(int channel)
  */
 unsigned int GbaQueue::GetCmdNumFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	int value = obj[0x2D5F];
+	int value = m_cmdNumFlags;
 	OSSignalSemaphore(semaphore);
 	return (value >> (channel << 1)) & 3;
 }
@@ -5024,10 +5009,9 @@ void GbaQueue::ClrCmdNumFlg(int channel)
  */
 int GbaQueue::GetCmdNum(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	char value = obj[channel * 0xDC + 0x527];
+	char value = m_playerData[channel].m_commandSlotCount;
 	int result = (int)value;
 	OSSignalSemaphore(semaphore);
 	return result;

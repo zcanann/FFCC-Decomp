@@ -66,10 +66,10 @@ struct GbaQueuePlayerDataView
     unsigned short m_tmpArtifacts[4];
     unsigned short m_commandSlots[8];
     unsigned char m_bonusCondition;
-    unsigned char m_commandSlotCount;
+    char m_commandSlotCount;
     unsigned char m_radarVisible;
     unsigned char _padD5;
-    unsigned char m_itemFlags;
+    char m_itemFlags;
     unsigned char m_equipment[4];
 };
 
@@ -291,7 +291,7 @@ private:
     unsigned char m_spModeBits;       // 0x2D5C
     unsigned char m_spModeFlags;      // 0x2D5D
     unsigned char m_memorysFlags;     // 0x2D5E
-    unsigned char m_cmdNumFlags;      // 0x2D5F
+    char m_cmdNumFlags;               // 0x2D5F
     unsigned char m_playModeFlags;    // 0x2D60
     unsigned char m_startBonusFlags;  // 0x2D61
     unsigned char _pad2D62[0x2];      // 0x2D62

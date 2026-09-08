@@ -5662,24 +5662,12 @@ void CMenuPcs::CalcFukidashi()
 		nameBuffer[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(nameBuffer[0])));
 	}
 
-	unsigned int textWidth = 0xD8;
-	CFont* font = GetFontWorld();
+	int textWidth = 0xD8;
 	if (*reinterpret_cast<short*>(bytes + 0x1A) != 0) {
 		textWidth = 0xA2;
 	}
-	font->SetMargin(FLOAT_803313e8);
-	font->SetShadow(0);
-	font->SetScale(FLOAT_803313e8);
-	double dVar23 = (double)font->GetWidth(nameBuffer);
-	if (dVar23 > static_cast<double>(static_cast<float>(static_cast<int>(textWidth)))) {
-		strcpy(tempBuf, nameBuffer);
-		char* spacePos = strrchr(tempBuf, 0x20);
-		if (spacePos != NULL) {
-			*spacePos = 0;
-			strcpy(secondLine, spacePos + 1);
-		} else {
-			secondLine[0] = 0;
-		}
+	if (ChkPlaceLength(nameBuffer, textWidth)) {
+		SplitPlace(nameBuffer, tempBuf, secondLine);
 		strcpy(nameBuffer, tempBuf);
 	}
 	float nameWidthF = fontFC->GetWidth(nameBuffer);
@@ -6082,22 +6070,13 @@ void CMenuPcs::DrawFukidashi()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::ChkPlaceLength(char* text)
+inline int CMenuPcs::ChkPlaceLength(char* text, int width)
 {
-	if (text == 0) {
-		gWmMenuWorkA = 0;
-		return;
-	}
-
-	int len = static_cast<int>(strlen(text));
-	while (len > 0) {
-		const char c = text[len - 1];
-		if (c != ' ' && c != '\t' && c != '\n' && c != '\r') {
-			break;
-		}
-		len--;
-	}
-	gWmMenuWorkA = len;
+	CFont* font = GetFontWorld();
+	font->SetMargin(1.0f);
+	font->SetShadow(0);
+	font->SetScale(1.0f);
+	return font->GetWidth(text) > width;
 }
 
 /*
@@ -6111,28 +6090,14 @@ inline void CMenuPcs::ChkPlaceLength(char* text)
  */
 inline void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
 {
-	if (left != 0) {
-		left[0] = '\0';
-	}
-	if (right != 0) {
+	strcpy(left, text);
+	char* space = strrchr(left, ' ');
+	if (space != 0) {
+		*space = '\0';
+		strcpy(right, space + 1);
+	} else {
 		right[0] = '\0';
 	}
-	if (text == 0 || left == 0 || right == 0) {
-		return;
-	}
-	const char* const sep = strchr(text, ',');
-	if (sep == 0) {
-		strcpy(left, text);
-		return;
-	}
-	const int len = static_cast<int>(sep - text);
-	strncpy(left, text, len);
-	left[len] = '\0';
-	const char* rhs = sep + 1;
-	while (*rhs == ' ' || *rhs == '\t') {
-		rhs++;
-	}
-	strcpy(right, rhs);
 }
 
 /*
@@ -6144,22 +6109,26 @@ inline void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFont*, int)
+inline void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFont* font, int width)
 {
-	SplitPlace(text, left, right);
-	if (left != 0) {
-		for (char* p = left; *p != '\0'; p++) {
-			if (*p == '\t') {
-				*p = ' ';
-			}
+	char part[64];
+	strcpy(left, text);
+	right[0] = '\0';
+	const char* searchPos = text;
+	for (;;) {
+		const char* space = strchr(searchPos, ' ');
+		if (space == 0) {
+			break;
 		}
-	}
-	if (right != 0) {
-		for (char* p = right; *p != '\0'; p++) {
-			if (*p == '\t') {
-				*p = ' ';
-			}
+		const int firstLen = space - text;
+		memcpy(part, text, firstLen);
+		part[firstLen] = '\0';
+		if (static_cast<int>(font->GetWidth(part)) > width) {
+			break;
 		}
+		strcpy(left, part);
+		strcpy(right, space + 1);
+		searchPos = space + 1;
 	}
 }
 
@@ -9625,7 +9594,6 @@ LAB_next:
 		const double* pBa3 = &DOUBLE_80331490;
 		const double tBase = *pBa3;
 		for (slot = 0; slot < kMcListCount; slot++) {
-			char part[64];
 			char locationStr[64];
 			char line1[64];
 			char line2[64];
@@ -9706,24 +9674,7 @@ LAB_next:
 				} else {
 					const float* p550a = &FLOAT_80331550;
 					locationY = locationY + *p550a;
-					strcpy(line1, locationStr);
-					line2[0] = 0;
-					char* searchPos = locationStr;
-					for (;;) {
-						char* space = strchr(searchPos, ' ');
-						if (space == 0) {
-							break;
-						}
-						const int firstLen = space - locationStr;
-						memcpy(part, locationStr, firstLen);
-						part[firstLen] = 0;
-						if (static_cast<int>(fontF8->GetWidth(part)) > 0x90) {
-							break;
-						}
-						strcpy(line1, part);
-						strcpy(line2, space + 1);
-						searchPos = space + 1;
-					}
+					SplitPlace2(locationStr, line1, line2, fontF8, 0x90);
 					const float w1 = fontF8->GetWidth(line1);
 					const float* p518d = &FLOAT_80331518;
 					fontF8->SetPosX(*p518d - w1);

@@ -543,7 +543,7 @@ public:
     void SetCrystalCageAttr();
     void SetManaWaterEffect();
     void DrawFukidashi();
-    void ChkPlaceLength(char*);
+    int ChkPlaceLength(char*, int);
     void SplitPlace(const char*, char*, char*);
     void SplitPlace2(const char*, char*, char*, CFont*, int);
     void CalcWMFrame();

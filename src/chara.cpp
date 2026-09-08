@@ -48,6 +48,10 @@ typedef CChara::CMesh::CDisplayList CCharaDisplayListRaw;
 typedef CChara::CMesh::CRefData CCharaMeshRefRaw;
 typedef CChara::CMesh CCharaMeshRaw;
 
+STATIC_ASSERT(sizeof(_GXColor) == 4);
+STATIC_ASSERT(sizeof(S16Vec2d) == 4);
+STATIC_ASSERT(offsetof(CChara::CMesh::CRefData, m_colors) == 0x28);
+STATIC_ASSERT(offsetof(CChara::CMesh::CRefData, m_uvs) == 0x30);
 STATIC_ASSERT(sizeof(CChara::CSkin) == 0x64);
 STATIC_ASSERT(offsetof(CChara::CSkin, m_matrix) == 0x00);
 STATIC_ASSERT(offsetof(CChara::CSkin, m_bindMtx) == 0x30);
@@ -2077,9 +2081,9 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		MaterialMan.SetObjMatrix(view, meshMtx);
 		GXSetArray((GXAttr)9, mesh->m_workPositions, 6);
 		SetMaterialManNormalArray(mesh->m_workNormals);
-		GXSetArray((GXAttr)0xB, mesh->m_data->m_colors, 4);
-		GXSetArray((GXAttr)0xD, mesh->m_data->m_uvs, 4);
-		GXSetArray((GXAttr)0xE, mesh->m_data->m_uvs, 4);
+		GXSetArray((GXAttr)0xB, mesh->m_data->m_colors, sizeof(_GXColor));
+		GXSetArray((GXAttr)0xD, mesh->m_data->m_uvs, sizeof(S16Vec2d));
+		GXSetArray((GXAttr)0xE, mesh->m_data->m_uvs, sizeof(S16Vec2d));
 
 		CCharaDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (int displayListIndex = static_cast<int>(mesh->m_data->m_displayListCount) - 1; displayListIndex >= 0; displayListIndex--, displayList++) {
@@ -2150,9 +2154,9 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 		MaterialMan.SetObjMatrix(view, meshMtx);
 		GXSetArray((GXAttr)9, mesh->m_workPositions, 6);
 		SetMaterialManNormalArray(mesh->m_workNormals);
-		GXSetArray((GXAttr)0xB, mesh->m_data->m_colors, 4);
-		GXSetArray((GXAttr)0xD, mesh->m_data->m_uvs, 4);
-		GXSetArray((GXAttr)0xE, mesh->m_data->m_uvs, 4);
+		GXSetArray((GXAttr)0xB, mesh->m_data->m_colors, sizeof(_GXColor));
+		GXSetArray((GXAttr)0xD, mesh->m_data->m_uvs, sizeof(S16Vec2d));
+		GXSetArray((GXAttr)0xE, mesh->m_data->m_uvs, sizeof(S16Vec2d));
 
 		CCharaDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (int displayListIndex = static_cast<int>(mesh->m_data->m_displayListCount) - 1; displayListIndex >= 0; displayListIndex--, displayList++) {
@@ -2632,21 +2636,21 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			break;
 		}
 		case 0x434F4C52: {
-			m_data->m_colorCount = chunkInfo.m_size >> 2;
-			u8* colors = static_cast<u8*>(
+			m_data->m_colorCount = chunkInfo.m_size / sizeof(_GXColor);
+			_GXColor* colors = static_cast<_GXColor*>(
 			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7E6, 0));
 			m_data->m_colors = colors;
 			memcpy(m_data->m_colors, chunk.GetAddress(), chunkInfo.m_size);
-			DCFlushRange(m_data->m_colors, m_data->m_colorCount << 2);
+			DCFlushRange(m_data->m_colors, m_data->m_colorCount * sizeof(_GXColor));
 			break;
 		}
 		case 0x55562020: {
-			m_data->m_uvCount = chunkInfo.m_size >> 2;
-			u8* uvs = static_cast<u8*>(
+			m_data->m_uvCount = chunkInfo.m_size / sizeof(S16Vec2d);
+			S16Vec2d* uvs = static_cast<S16Vec2d*>(
 			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7EE, 0));
 			m_data->m_uvs = uvs;
 			memcpy(m_data->m_uvs, chunk.GetAddress(), chunkInfo.m_size);
-			DCFlushRange(m_data->m_uvs, m_data->m_uvCount << 2);
+			DCFlushRange(m_data->m_uvs, m_data->m_uvCount * sizeof(S16Vec2d));
 			break;
 		}
 		case 0x534B494E: {

@@ -539,7 +539,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		normalMtx[2][3] = 0.0f;
 		GXLoadNrmMtxImm(normalMtx, GX_PNMTX0);
 		GXSetArray(GX_VA_NRM, mesh->m_workNormals, 6);
-		GXSetArray(GX_VA_TEX0, mesh->m_data->m_uvs, 4);
+		GXSetArray(GX_VA_TEX0, mesh->m_data->m_uvs, sizeof(S16Vec2d));
 
 		unsigned int posGqr = m_data->m_posQuant;
 		int normGqr = m_data->m_normQuant;
@@ -977,8 +977,8 @@ int CChara::CModel::PickFur(
 					if (primitive == GX_TRIANGLES || primitive == GX_TRIANGLESTRIP) {
 						for (; count--; vertexIndex++) {
 							register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];
-							register const unsigned char* uvPtr = mesh->m_data->m_uvs;
-							register int uvOff = static_cast<unsigned int>(indices[3]) << 2;
+							register const S16Vec2d* uvPtr = mesh->m_data->m_uvs;
+							register int uvOff = indices[3] * sizeof(*uvPtr);
 							Vec localPos;
 							Vec2d curUV;
 							register Vec* localPosPtr = &localPos;

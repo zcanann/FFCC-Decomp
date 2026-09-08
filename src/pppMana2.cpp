@@ -1622,9 +1622,9 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
         if (draw == 1 && strcmp(meshData->m_name, s_manaShapeObj) != 0) {
             PSMTXCopy(mtx, mana2->m_reflectionMtx);
             if (mana2->m_paraboloidReady != 0) {
-                mana2->m_runtimeColor.r = meshData->m_colors[0];
-                mana2->m_runtimeColor.g = meshData->m_colors[1];
-                mana2->m_runtimeColor.b = meshData->m_colors[2];
+                mana2->m_runtimeColor.r = meshData->m_colors[0].r;
+                mana2->m_runtimeColor.g = meshData->m_colors[0].g;
+                mana2->m_runtimeColor.b = meshData->m_colors[0].b;
                 mana2->m_runtimeColor.a = 0x80;
                 DCFlushRange(&mana2->m_runtimeColor, 4);
                 GXSetArray((GXAttr)0xB, mana2->m_meshColors, 4);

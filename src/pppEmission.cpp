@@ -435,10 +435,10 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
     displayList += displayListIndex;
 
     if (strcmp(meshData->m_name, "obj2") == 0) {
-        meshData->m_colors[0] = 0;
-        meshData->m_colors[1] = 0;
-        meshData->m_colors[2] = 0;
-        meshData->m_colors[3] = 0;
+        meshData->m_colors[0].r = 0;
+        meshData->m_colors[0].g = 0;
+        meshData->m_colors[0].b = 0;
+        meshData->m_colors[0].a = 0;
     } else {
         MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
         GXCallDisplayList(displayList->m_data, displayList->m_size);

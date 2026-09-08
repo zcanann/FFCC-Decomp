@@ -277,9 +277,9 @@ public:
 			u32 m_normalCount;
 			S16Vec* m_normals;
 			u32 m_colorCount;
-			u8* m_colors;
+			_GXColor* m_colors;
 			u32 m_uvCount;
-			u8* m_uvs;
+			S16Vec2d* m_uvs;
 			u32 m_oneWeightCountOrSize;
 			void* m_oneWeightData;
 			u32 m_twoWeightCountOrSize;

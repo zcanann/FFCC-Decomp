@@ -1352,19 +1352,19 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		System.Printf(dbg + 0x138);
 		return;
 	}
-	if (static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24 >> 30) << 30 >> 31) == 0) {
+	if (m_weaponNodeFlagBits.m_prg == 0) {
 		System.Printf(dbg + 0x160);
 		return;
 	}
 
-	staType = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + resolvedItemId * 0x48 + 8);
+	staType = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[resolvedItemId].m_staType;
 	if (static_cast<int>(staType) != 0x67 && static_cast<int>(staType) != 0x65 && static_cast<int>(staType) != 0x66 && CharaObjGameFlagBit5Set()) {
 		System.Printf(dbg + 0x17C);
 		return;
 	}
 
-	int particleLife = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + resolvedItemId * 0x48 + 0xE);
-	int itemEffect = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + resolvedItemId * 0x48);
+	int particleLife = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[resolvedItemId].m_actionType;
+	int itemEffect = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[resolvedItemId].m_effect;
 	int scriptDefense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0];
 	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, effectResult, 0);
 
@@ -1376,14 +1376,14 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			putParticle(0x200, 0, hitPos, FLOAT_803319A8 * (FLOAT_803319AC * m_attackColRadius), 0x1D);
 		}
 	} else if ((resistType > 1 || (resistType == 1 &&
-	           ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x32) & 1) == 0))) &&
+	           ((reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[resolvedItemId].m_flags32 & 1) == 0))) &&
 	           (static_cast<unsigned int>(staType - 8) <= 1 || staType == 6 || staType == 3)) {
 		putParticle(0x201, 0, hitPos, FLOAT_803319A8 * (FLOAT_803319AC * m_attackColRadius), 0x65);
 	}
 
 	damageClamp = 0;
 	if (m_lastStateId == 8 && m_subState == 1 &&
-	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x2C) & 8) == 0)) {
+	    ((reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[resolvedItemId].m_flags2C & 8) == 0)) {
 		CVector selfPos(m_worldPosition);
 		const CVector& sourcePos = CVector(sourceObj->m_worldPosition);
 		CVector deltaVec;
@@ -1411,7 +1411,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				}
 				if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
 					changeSubStat(2);
-					if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) == 0) {
+					if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId == 0) {
 						effectResult = 0;
 					} else {
 						damageClamp = 1;
@@ -1425,7 +1425,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	}
 
 	if (m_lastStateId == 6 &&
-	    static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 26 >> 30) << 30 >> 31) != 0) {
+	    m_weaponNodeFlagAll.m_bits1.m_bit20 != 0) {
 		SCharaItemRow* kindRows1556 = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 		int currentKind = kindRows1556[m_itemId].m_status & 0xFF;
 		if (currentKind == 2) {
@@ -1449,8 +1449,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	}
 
 	if (itemEffect == 0x1F8 &&
-	    static_cast<signed char>(static_cast<int>(static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&sourceObj->m_weaponNodeFlags) + 1)) << 26 >> 30) << 30 >> 31) != 0 &&
-	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF) == 3)) {
+	    sourceObj->m_weaponNodeFlagAll.m_bits1.m_bit20 != 0 &&
+	    ((reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId].m_status & 0xFF) == 3)) {
 		CVector sourcePos(sourceObj->m_worldPosition);
 		const CVector& selfPos = CVector(m_worldPosition);
 		CVector deltaVec;
@@ -1515,8 +1515,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 				unsigned int basePower = (itemEffect == 0x1F8) ? powerRows[resolvedItemId].m_basePower : 0;
 				if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && resolvedItemId == 0x206) {
-					int castCurrent = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x68C);
-					int castEnd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x664);
+					int castCurrent = static_cast<CGCharaObj*>(sourceObj)->m_unk68C;
+					int castEnd = static_cast<CGCharaObj*>(sourceObj)->m_comboFramePrev;
 					if (castCurrent * 3 <= castEnd) {
 						basePower <<= 2;
 					} else if (castCurrent * 2 <= castEnd) {
@@ -1524,8 +1524,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					}
 				}
 
-				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
-					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x1E);
+				unsigned int sourcePower = reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_strength;
 				int clampedDamage = 1;
 				float multiplier = CharaObjGetStatusMultiplier(0x2C);
 				unsigned int defense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_defense;
@@ -1537,8 +1536,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if ((((static_cast<unsigned int>(__cntlzw(0x6D - (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D))) >> 5) & 0xFFU) != 0) && itemEffect == 0x1F8) {
 					hasBonus = 1;
 				}
-				unsigned int bonus = hasBonus ? static_cast<int>(*reinterpret_cast<unsigned char*>(
-					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDD)) : 0;
+				unsigned int bonus = hasBonus ? static_cast<int>(static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_equipEffectParams[5])) : 0;
 				damageAmount = clampedDamage + bonus;
 				if (scriptDefense != 0) {
 					damageAmount = static_cast<int>(static_cast<float>(damageAmount) * CharaObjGetStatusMultiplier(0x42));
@@ -1548,9 +1546,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (staType != 0x6A && (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 				    (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0x7F] & 0x100) != 0 &&
 				    (Game.m_gameWork.m_chaliceElement & 4U) == 0 &&
-				    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x2E) == 0) {
+				    reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_elementResistances[3] == 0) {
 					unsigned int srcEntryKind =
-						*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x560) * 0x48 + 10) & 0xFF;
+						reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[static_cast<CGCharaObj*>(sourceObj)->m_itemId].m_status & 0xFF;
 					if (sourceObj->m_lastStateId == 6 && srcEntryKind <= 1) {
 						break;
 					}
@@ -1578,7 +1576,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					}
 				}
 				if (condB != 0) {
-					if (sourceObj->m_scriptHandle[0xED] != 0) {
+					if (reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_joybusCaravanId != 0) {
 						condC = 1;
 					}
 				}
@@ -1589,8 +1587,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					powerSource = sourceObj;
 				}
 
-				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
-					reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle) + 0x20);
+				unsigned int sourcePower = reinterpret_cast<CGObjWork*>(powerSource->m_scriptHandle)->m_magic;
 				int clampedDamage = 1;
 				float multiplier = CharaObjGetStatusMultiplier(0x2E);
 				unsigned int defense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_defense;
@@ -1599,23 +1596,21 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					clampedDamage = rawDamage;
 				}
 				unsigned int bonus = ((((static_cast<unsigned int>(__cntlzw(0x6D - (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D))) >> 5) & 0xFFU) != 0)) ?
-					static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
-						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDE)) : 0;
+					static_cast<unsigned int>(static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_equipEffectParams[6])) : 0;
 				damageAmount = clampedDamage + bonus;
 				System.Printf(dbg + 0x1DC, basePower, sourcePower, multiplier, defense, bonus, damageAmount);
 				break;
 			}
 			case 10: {
 				int recoilDamage;
-				unsigned char* selfReactive = reinterpret_cast<unsigned char*>(this) + 0x6C2;
-				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && *selfReactive != 0) {
+				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && static_cast<CGMonObj*>(this)->m_unk6C2 != 0) {
 					recoilDamage = 1;
 				} else {
 					float recoilRate = (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x26 + resistType * 2)) * 0.01f) + 1.0e-07f;
 					int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_hp)) * recoilRate);
 					recoilDamage = (raw < 1) ? 1 : raw;
 					if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
-						*selfReactive = 1;
+						static_cast<CGMonObj*>(this)->m_unk6C2 = 1;
 					}
 				}
 				System.Printf(dbg + 0x218, recoilDamage);
@@ -1637,8 +1632,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				int defense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_defense;
 				SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 				unsigned int basePower = powerRows[resolvedItemId].m_basePower;
-				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
-					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x1E);
+				unsigned int sourcePower = reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_strength;
 				float multiplier = CharaObjGetStatusMultiplier(0x30);
 				int guardValue = static_cast<int>(defense * multiplier);
 				int computed30 = static_cast<int>(basePower + sourcePower) - guardValue;
@@ -1660,8 +1654,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				int defense = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_defense;
 				SCharaItemRow* powerRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 				unsigned int basePower = powerRows[resolvedItemId].m_basePower;
-				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
-					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x20);
+				unsigned int sourcePower = reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_magic;
 				float multiplier = CharaObjGetStatusMultiplier(0x32);
 				int guardValue = static_cast<int>(defense * multiplier);
 				int computed32 = static_cast<int>(basePower + sourcePower) - guardValue;
@@ -1674,7 +1667,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			}
 			case 10: {
 				float recoilRate = (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x26 + resistType * 2)) * 0.01f) + 1.0e-07f;
-				int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x1C))) * recoilRate);
+				int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_hp)) * recoilRate);
 				damageAmount = (raw < 1) ? 1 : raw;
 				System.Printf(dbg + 0x2A4, damageAmount);
 				break;
@@ -1693,7 +1686,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				unsigned int basePower = powerRows[resolvedItemId].m_basePower;
 				unsigned short rawSourcePower;
 				if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {
-					rawSourcePower = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x20);
+					rawSourcePower = reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_magic;
 				} else {
 					SCharaItemRow* srcPowerRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 					rawSourcePower = srcPowerRows[resolvedItemId].m_sourcePower;
@@ -1723,7 +1716,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 
 		if (staType != 4 &&
-		    !((static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x10) == 6 && staType == 0x6A) &&
+		    !((static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD && reinterpret_cast<CGObjWork*>(sourceObj->m_scriptHandle)->m_baseDataIndex == 6 && staType == 0x6A) &&
 		    reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[4] != 0) {
 			setSta(4, 0);
 		}
@@ -1840,7 +1833,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				}
 			} else {
 				if (((DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0 ||
-				     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x6CC) == 2) &&
+				     static_cast<CGMonObj*>(sourceObj)->m_unk6CC == 2) &&
 				    (calcRegist(0x69, resolvedItemId, resistType, counterAllow, effectResult, 0), counterAllow != 0)) {
 					int chance;
 					if ((((static_cast<unsigned int>(__cntlzw(0xAD - (static_cast<unsigned short>(GetCID()) & 0xAD))) >> 5) & 0xFFU) != 0)) {

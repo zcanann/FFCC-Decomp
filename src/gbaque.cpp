@@ -2465,12 +2465,15 @@ void GbaQueue::ReplyLetter(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CCFA8
+ * PAL Size: 548b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::LoadMapObj()
 {
-	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
 	int i;
 
 	if (m_scrInitEnd == 0) {
@@ -2504,21 +2507,17 @@ void GbaQueue::LoadMapObj()
 						System.Printf(const_cast<char*>(s_unknown_mapobj_type_error), objType);
 					}
 				} else {
-					float x = mapObj->m_x;
 					unsigned int mask = 1U << count;
-					float y = mapObj->m_y;
-					float z = mapObj->m_z;
-					float r = mapObj->m_radius;
 					int drawFlag = static_cast<int>(mapObj->m_drawFlag);
-					unsigned int sign = mask & ((-drawFlag | drawFlag) >> 31);
+					unsigned int drawMask = drawFlag != 0 ? mask : 0;
 					mask = ~mask;
 					mapObjWork.m_entries[count].m_type = static_cast<unsigned char>(mapObj->m_type);
-					mapObjWork.m_entries[count].m_x = static_cast<short>((int)(x / 3.0f));
-					mapObjWork.m_entries[count].m_y = static_cast<short>((int)(y / 3.0f));
-					mapObjWork.m_entries[count].m_z = static_cast<short>((int)(z / 3.0f));
-					mapObjWork.m_entries[count].m_radius = static_cast<short>((int)(r / 3.0f));
+					mapObjWork.m_entries[count].m_x = static_cast<short>(static_cast<int>(mapObj->m_x / 3.0f));
+					mapObjWork.m_entries[count].m_y = static_cast<short>(static_cast<int>(mapObj->m_y / 3.0f));
+					mapObjWork.m_entries[count].m_z = static_cast<short>(static_cast<int>(mapObj->m_z / 3.0f));
+					mapObjWork.m_entries[count].m_radius = static_cast<short>(static_cast<int>(mapObj->m_radius / 3.0f));
 
-					mapObjWork.m_drawFlags = (mapObjWork.m_drawFlags & mask) | sign;
+					mapObjWork.m_drawFlags = (mapObjWork.m_drawFlags & mask) | drawMask;
 					mapObjWork.m_count = static_cast<unsigned char>(mapObjWork.m_count + 1);
 				}
 			}
@@ -2610,7 +2609,7 @@ int GbaQueue::GetMapObj(unsigned char* outData)
  */
 void GbaQueue::GetMapObjDrawFlg(unsigned int* drawFlags)
 {
-	OSSemaphore* semaphoreQueue = reinterpret_cast<OSSemaphore*>(this);
+	OSSemaphore* semaphoreQueue = accessSemaphores;
 
 	for (int i = 0; i < 4; i++) {
 		OSWaitSemaphore(semaphoreQueue);
@@ -2619,7 +2618,7 @@ void GbaQueue::GetMapObjDrawFlg(unsigned int* drawFlags)
 
 	*drawFlags = m_mapObjWork.m_drawFlags;
 
-	semaphoreQueue = reinterpret_cast<OSSemaphore*>(this);
+	semaphoreQueue = accessSemaphores;
 	for (int i = 0; i < 4; i++) {
 		OSSignalSemaphore(semaphoreQueue);
 		semaphoreQueue++;

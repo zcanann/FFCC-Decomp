@@ -16,7 +16,7 @@ struct GbaCMakeInfo
     unsigned char m_playerSlot;
     char m_name[0x11];
     unsigned char m_charaType;
-    unsigned char m_favoriteLead[2];
+    unsigned char m_birthDate[2]; // month, day
     unsigned char m_favorite[4];
     unsigned char m_jobType;
 };

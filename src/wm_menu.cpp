@@ -451,23 +451,6 @@ static const int kWmMenuControllerCount = 4;
 static const int kWmCharaSelectCount = kWmMenuPlayerCount;
 static const int kWmCharaSelectBytes = sizeof(WmCharaSelectEntry) * kWmCharaSelectCount;
 
-struct GbaCMakeInfoRaw
-{
-	unsigned char m_active;        // 0x00
-	unsigned char m_commandType;   // 0x01
-	unsigned short m_packetCount;  // 0x02
-	short m_crc;                   // 0x04
-	signed char m_channelSlot;     // 0x06
-	char m_name[17];               // 0x07
-	unsigned char m_charaType;     // 0x18
-	unsigned char m_birthMonth;    // 0x19
-	unsigned char m_birthDay;      // 0x1A
-	unsigned char m_favoriteBits[4]; // 0x1B
-	unsigned char m_jobType;       // 0x1F
-};
-
-STATIC_ASSERT(sizeof(GbaCMakeInfoRaw) == 0x20);
-
 static inline CCharaPcs::CHandle** GetWmCharaHandles(CMenuPcs* menu)
 {
 	return menu->m_wm.m_handles + 0x20;
@@ -7257,60 +7240,10 @@ void CMenuPcs::CalcCharaSelect()
 		for (; i >= 0; i--, pRep--, pTrig--) {
 			WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
 			if (entry.m_cmakeReady == 1) {
-				GbaCMakeInfoRaw info;
 				entry.m_confirmed = 1;
 				entry.m_cmakePending = 0;
 				entry.m_cmakeReady = 0;
-				GbaQue.GetCMakeInfo(i, reinterpret_cast<GbaCMakeInfo*>(&info));
-
-				const int caravanSlot = static_cast<int>(info.m_channelSlot);
-				const int gender = (info.m_charaType >> 7) != 0;
-				int modelNo = GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, gender);
-
-				m_wm.m_charaModelData[caravanSlot].m_modelNo = modelNo;
-
-				CCaravanWork& caravanWork = Game.m_caravanWorkArr[caravanSlot];
-				caravanWork.LoadInit();
-				caravanWork.m_shopState = 1;
-				caravanWork.unk_0x3a8 =
-				    (static_cast<unsigned int>(info.m_birthMonth) << 8) | static_cast<unsigned int>(info.m_birthDay);
-				caravanWork.unk_0x3ac = static_cast<int>(info.m_jobType);
-				memset(caravanWork.m_name, 0, 0x11);
-				strcpy(reinterpret_cast<char*>(caravanWork.m_name), info.m_name);
-				caravanWork.m_tribeId = static_cast<unsigned short>(info.m_charaType & 3);
-				caravanWork.m_appearanceVariant = static_cast<unsigned short>((info.m_charaType >> 2) & 3);
-				caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
-				{
-					int modelNo2 = static_cast<int>(info.m_charaType & 3) * 200 + 100;
-					if ((info.m_charaType >> 7) != 0) {
-						modelNo2 += 100;
-					}
-					caravanWork.m_id = static_cast<unsigned short>(modelNo2 + ((info.m_charaType >> 2) & 3));
-				}
-				for (int favorite = 0; favorite < 8; favorite++) {
-					unsigned char nibble = info.m_favoriteBits[favorite >> 1];
-					int v;
-					if ((favorite & 1) != 0) {
-						v = (nibble >> 4) & 0x0F;
-					} else {
-						v = nibble & 0x0F;
-					}
-					caravanWork.m_letterMeta[favorite] = static_cast<unsigned short>((10 - v) * 10 - 5);
-				}
-
-				const int baseDataIndex =
-				    static_cast<int>(caravanWork.m_genderFlag) + static_cast<int>(caravanWork.m_tribeId) * 2;
-				int __p20 = baseDataIndex;
-				caravanWork.Init(__p20,
-				                 reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + baseDataIndex * 0x1D0),
-				                 static_cast<int>(caravanWork.m_appearanceVariant));
-				caravanWork.LoadFinished();
-
-				CFlatRuntime::CStack stackArgs[3];
-				stackArgs[0].m_word = 0;
-				stackArgs[1].m_word = caravanSlot;
-				stackArgs[2].m_word = 0;
-				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackArgs, 0);
+				SetMakeChara(i);
 				Sound.PlaySe(0x33, 0x40, 0x7F, 0);
 				GetWmCharaAnimState(this)[entry.m_currentSlot].m_nextAnimIndex = 3;
 			}
@@ -8307,46 +8240,58 @@ void CMenuPcs::ChgAllModel2()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::SetMakeChara(int slot)
+inline void CMenuPcs::SetMakeChara(int channel)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmCharaSelectEntry* const selectData = m_wm.m_charaSelectData;
-	WmCharaModelInfo* const modelData = m_wm.m_charaModelData;
-	WmWorldState* const worldState = m_wmWorldState;
+	GbaCMakeInfo info;
+	GbaQue.GetCMakeInfo(channel, &info);
 
-	if (slot < 0) {
-		slot = 0;
-	}
-	if (slot > 3) {
-		slot = 3;
-	}
+	const int caravanSlot = static_cast<int>(static_cast<signed char>(info.m_playerSlot));
+	const int gender = (info.m_charaType >> 7) != 0;
+	int modelNo = GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, gender);
 
-	if (selectData != 0) {
-		WmCharaSelectEntry* const entry = &selectData[slot];
-		entry->m_displaySlot = entry->m_currentSlot;
-		if (entry->m_connected == 0) {
-			entry->m_confirmed = 0;
-			entry->m_cmakePending = 0;
-		} else if (entry->m_cmakePending == 0) {
-			entry->m_cmakePending = 1;
+	m_wm.m_charaModelData[caravanSlot].m_modelNo = modelNo;
+
+	CCaravanWork& caravanWork = Game.m_caravanWorkArr[caravanSlot];
+	caravanWork.LoadInit();
+	caravanWork.m_shopState = 1;
+	caravanWork.unk_0x3a8 =
+	    (static_cast<unsigned int>(info.m_birthDate[0]) << 8) | static_cast<unsigned int>(info.m_birthDate[1]);
+	caravanWork.unk_0x3ac = static_cast<int>(info.m_jobType);
+	memset(caravanWork.m_name, 0, 0x11);
+	strcpy(reinterpret_cast<char*>(caravanWork.m_name), info.m_name);
+	caravanWork.m_tribeId = static_cast<unsigned short>(info.m_charaType & 3);
+	caravanWork.m_appearanceVariant = static_cast<unsigned short>((info.m_charaType >> 2) & 3);
+	caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
+	{
+		int modelNo2 = static_cast<int>(info.m_charaType & 3) * 200 + 100;
+		if ((info.m_charaType >> 7) != 0) {
+			modelNo2 += 100;
 		}
-		bytes[0x17] = entry->m_confirmed;
-		gWmMenuWorkB = entry->m_currentSlot;
+		caravanWork.m_id = static_cast<unsigned short>(modelNo2 + ((info.m_charaType >> 2) & 3));
+	}
+	for (int favorite = 0; favorite < 8; favorite++) {
+		unsigned char nibble = info.m_favorite[favorite >> 1];
+		int v;
+		if ((favorite & 1) != 0) {
+			v = (nibble >> 4) & 0x0F;
+		} else {
+			v = nibble & 0x0F;
+		}
+		caravanWork.m_letterMeta[favorite] = static_cast<unsigned short>((10 - v) * 10 - 5);
 	}
 
-	if (modelData != 0 && modelData[slot].m_modelChanged != 0) {
-		SetMenuCharaAnim(slot, 1);
-	} else {
-		SetMenuCharaAnim(slot, 0);
-	}
+	const int baseDataIndex =
+	    static_cast<int>(caravanWork.m_genderFlag) + static_cast<int>(caravanWork.m_tribeId) * 2;
+	caravanWork.Init(baseDataIndex,
+	                 reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0]) + baseDataIndex,
+	                 static_cast<int>(caravanWork.m_appearanceVariant));
+	caravanWork.LoadFinished();
 
-	if (worldState != 0) {
-		worldState->m_cardChannel = static_cast<short>(slot);
-	}
-
-	gWmMenuWorkA = slot;
-	ChkSelectParty();
-	bytes[0x16] = static_cast<unsigned char>(slot);
+	CFlatRuntime::CStack stackArgs[3];
+	stackArgs[0].m_word = 0;
+	stackArgs[1].m_word = caravanSlot;
+	stackArgs[2].m_word = 0;
+	gCFlatRuntime().SystemCall(0, 1, 4, 3, stackArgs, 0);
 }
 
 /*

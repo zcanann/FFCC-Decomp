@@ -812,8 +812,8 @@ void GbaQueue::ExecutQueue()
 						unsigned int cmdWord = queueWords[i];
 						unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
 						OSWaitSemaphore(accessSemaphores + channel);
-						cmakeInfo[channel].m_favoriteLead[0] = bytes[2];
-						cmakeInfo[channel].m_favoriteLead[1] = bytes[3];
+						cmakeInfo[channel].m_birthDate[0] = bytes[2];
+						cmakeInfo[channel].m_birthDate[1] = bytes[3];
 						OSSignalSemaphore(accessSemaphores + channel);
 						Joybus.SendResult(channel, 0, bytes[1], 0);
 					} else if (cmdBytes[1] == 7) {

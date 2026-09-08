@@ -912,52 +912,32 @@ void CMenuPcs::loadData()
 
 	{
 		for (int i = 0; i < 8; i++) {
-			if ((*reinterpret_cast<CCharaPcs::CHandle**>(
-			        reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_charaKind != 3) {
+			if (m_wm.m_handles[i + 0x20]->m_charaKind != 3) {
 				const unsigned int charaBase =
-				    static_cast<unsigned int>((*reinterpret_cast<CCharaPcs::CHandle**>(
-				        reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))->m_charaNo) /
+				    static_cast<unsigned int>(m_wm.m_handles[i + 0x20]->m_charaNo) /
 				    100;
 				const int modelNo = charaBase * 100;
 				int anim = (charaBase - 1) * 6;
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->LoadAnim(const_cast<char*>(s_wmCharaAnimStand), anim++, 1, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->LoadAnim(const_cast<char*>(s_wmCharaAnimWalk), anim++, 1, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->LoadAnim(const_cast<char*>(s_wmCharaAnimRun), anim++, 1, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->LoadAnim(const_cast<char*>(s_wmCharaAnimGlad), anim++, 3, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->LoadAnim(const_cast<char*>(s_wmCharaAnimSleep), anim++, 1, 0, modelNo, -1, 0);
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->LoadAnim(const_cast<char*>(s_wmCharaAnimAngry), anim++, 1, 0, modelNo, -1, 0);
+				m_wm.m_handles[i + 0x20]->LoadAnim(
+				    const_cast<char*>(s_wmCharaAnimStand), anim++, 1, 0, modelNo, -1, 0);
+				m_wm.m_handles[i + 0x20]->LoadAnim(
+				    const_cast<char*>(s_wmCharaAnimWalk), anim++, 1, 0, modelNo, -1, 0);
+				m_wm.m_handles[i + 0x20]->LoadAnim(
+				    const_cast<char*>(s_wmCharaAnimRun), anim++, 1, 0, modelNo, -1, 0);
+				m_wm.m_handles[i + 0x20]->LoadAnim(
+				    const_cast<char*>(s_wmCharaAnimGlad), anim++, 3, 0, modelNo, -1, 0);
+				m_wm.m_handles[i + 0x20]->LoadAnim(
+				    const_cast<char*>(s_wmCharaAnimSleep), anim++, 1, 0, modelNo, -1, 0);
+				m_wm.m_handles[i + 0x20]->LoadAnim(
+				    const_cast<char*>(s_wmCharaAnimAngry), anim++, 1, 0, modelNo, -1, 0);
 				m_wmCharaAnimState[i].m_animIndex = 0;
 				m_wmCharaAnimState[i].m_nextAnimIndex = -1;
 				m_wmCharaAnimState[i].m_timer = rand() % 250;
-				(*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				    ->SetAnim(anim - 6, -1, -1, 0, 0);
-				m_wmCharaAnimState[i].m_frame = *reinterpret_cast<float*>(
-				    reinterpret_cast<unsigned char*>(
-				        (*reinterpret_cast<CCharaPcs::CHandle**>(
-				             reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				            ->m_model) +
-				    0xB4);
-				m_wmCharaAnimState[i].m_endFrame = *reinterpret_cast<float*>(
-				    reinterpret_cast<unsigned char*>(
-				        (*reinterpret_cast<CCharaPcs::CHandle**>(
-				             reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774))
-				            ->m_model) +
-				    0xC0);
-				float maxWait = static_cast<float>(*reinterpret_cast<unsigned short*>(
-				    *reinterpret_cast<int*>(
-				        *reinterpret_cast<int*>(
-				            reinterpret_cast<unsigned char*>(
-				                *reinterpret_cast<CCharaPcs::CHandle**>(
-				                    reinterpret_cast<unsigned char*>(this) + (i + 0x20) * 4 + 0x774)) +
-				            anim * 4 + 0xC) +
-				        0x28) +
-				    0x10));
+				m_wm.m_handles[i + 0x20]->SetAnim(anim - 6, -1, -1, 0, 0);
+				m_wmCharaAnimState[i].m_frame = m_wm.m_handles[i + 0x20]->m_model->m_time;
+				m_wmCharaAnimState[i].m_endFrame = m_wm.m_handles[i + 0x20]->m_model->m_animEnd;
+				float maxWait = static_cast<float>(
+				    m_wm.m_handles[i + 0x20]->m_animSlot[anim - 1]->m_anim->m_frameCount);
 				if (s_MaxAnimWait < maxWait) {
 					s_MaxAnimWait = maxWait;
 				}

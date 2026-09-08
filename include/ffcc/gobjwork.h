@@ -94,13 +94,15 @@ public:
     unsigned short m_defense;               // 0x0022
     unsigned short* m_romWork;              // 0x0024
     unsigned short* RomStatusBlock() { return m_elementResistances; }
-    unsigned short m_elementResistances[8]; // 0x0028 physical, fire, freeze, stun, slow, stop, gravity, holy
-    unsigned short m_statusTimers[42];      // 0x0038
+    unsigned short m_elementResistances[RomStatusBlockHalfwordCount]; // 0x0028
+    unsigned short m_statusTimers[39];      // 0x003E
     unsigned short m_statusValues[16];      // 0x008C-0xAB
 }; // Size: 0xAC
 
 STATIC_ASSERT(sizeof(CGObjWork) == 0xAC);
-STATIC_ASSERT(offsetof(CGObjWork, m_statusTimers) == 0x38);
+STATIC_ASSERT(offsetof(CGObjWork, m_elementResistances) == 0x28);
+STATIC_ASSERT(offsetof(CGObjWork, m_statusTimers) == 0x3E);
+STATIC_ASSERT(offsetof(CGObjWork, m_statusValues) == 0x8C);
 
 class CMonWork : public CGObjWork
 {

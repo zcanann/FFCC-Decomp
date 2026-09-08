@@ -3821,7 +3821,7 @@ int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float ma
 						!party->IsKindOf(0x6D) ||
 						(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId == 0)))) &&
 			(((flags & 0x10) == 0) ||
-				(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_statusTimers[11] != 0)) &&
+				(reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_statusTimers[8] != 0)) &&
 			(((flags & 0x20) == 0) ||
 				(((party->m_lastStateId == 6) || (party->m_lastStateId == 2)) &&
 					(party->m_subState == 1))) &&

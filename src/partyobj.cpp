@@ -189,9 +189,9 @@ inline void CGPartyObj::changeWeapon(int weaponIndex, int itemId, int forceImmed
 	PartyObjOverlay& party = PartyData(this);
 	if (forceImmediate || !m_weaponNodeFlagBits.m_prg ||
 	    !m_weaponNodeFlagAll.m_bits1.m_shield || party.carryObject != 0 ||
-	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0 ||
-	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[12] != 0 ||
-	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[6] != 0) {
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[0] != 0 ||
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[9] != 0 ||
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0) {
 		if (itemId <= 0) {
 			LoadWeapon(-1, 0);
 		} else {

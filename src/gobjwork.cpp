@@ -83,7 +83,7 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_romWork = romWork->Data();
 
 	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
-	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
+	memset(m_statusTimers, 0, sizeof(m_statusTimers));
 	for (int i = 0; i < 16; i++) {
 		m_statusValues[i] = 0xFFFF;
 	}
@@ -275,7 +275,7 @@ void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_defense = romWork->m_defense;
 	m_romWork = romWork->Data();
 	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
-	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
+	memset(m_statusTimers, 0, sizeof(m_statusTimers));
 	for (int i = 0; i < 16; i++) {
 		m_statusValues[i] = 0xFFFF;
 	}
@@ -1694,8 +1694,8 @@ void CCaravanWork::CalcStatus()
 		m_elementResistances[3]++;
 		break;
 	case 8:
-		m_statusTimers[0]++;
-		m_statusTimers[2]++;
+		m_elementResistances[8]++;
+		m_elementResistances[10]++;
 		break;
 	}
 
@@ -1806,13 +1806,13 @@ void CCaravanWork::CalcStatus()
 				m_elementResistances[5]++;
 				break;
 			case 6:
-				m_statusTimers[0]++;
+				m_elementResistances[8]++;
 				break;
 			case 7:
-				m_statusTimers[1]++;
+				m_elementResistances[9]++;
 				break;
 			case 8:
-				m_statusTimers[2]++;
+				m_elementResistances[10]++;
 				break;
 			case 0x13:
 				m_elementResistances[0]++;
@@ -1853,15 +1853,15 @@ void CCaravanWork::CalcStatus()
 		m_hp = m_maxHp;
 	}
 
-	if (m_statusTimers[9] != 0) {
+	if (m_statusTimers[6] != 0) {
 		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x38));
 		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x38));
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x38));
 	}
-	if (m_statusTimers[4] != 0) {
+	if (m_statusTimers[1] != 0) {
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x3E));
 	}
-	if (m_statusTimers[6] != 0) {
+	if (m_statusTimers[3] != 0) {
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
 	}
 
@@ -2578,7 +2578,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 	m_romWork = romWork->Data();
 
 	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
-	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
+	memset(m_statusTimers, 0, sizeof(m_statusTimers));
 	for (int i = 0; i < 16; i++) {
 		m_statusValues[i] = 0xFFFF;
 	}
@@ -2675,17 +2675,17 @@ void CMonWork::CalcStatus()
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(stageRank * 2 + 0x50));
 	}
 
-	if (m_statusTimers[9] != 0) {
+	if (m_statusTimers[6] != 0) {
 		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x38));
 		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x38));
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x38));
 	}
 
-	if (m_statusTimers[4] != 0) {
+	if (m_statusTimers[1] != 0) {
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x3E));
 	}
 
-	if (m_statusTimers[6] != 0) {
+	if (m_statusTimers[3] != 0) {
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
 	}
 }

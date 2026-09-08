@@ -40,11 +40,6 @@
 
 extern "C" char* strstr(const char*, const char*);
 extern "C" char* strcat(char*, const char*);
-extern const char s_Creating_801DC250[];
-extern const char s_Wird_kreiert_801DC25C[];
-extern const char s_Creazione_801DC26C[];
-extern const char s_Creation_801DC27C[];
-extern const char s_Creando_801DC288[];
 
 extern const char lbl_80331208[5];
 
@@ -247,11 +242,6 @@ extern unsigned char lbl_8032EE38[8];
 
 extern const char lbl_80331208[5] = "1.00";
 extern const char lbl_80331380[4] = {'?','?','?','?'};
-extern const char s_Empty_803313A4[6] = "Empty";
-extern const char s_Frei_803313AC[5] = "Frei";
-extern const char s_Vuoto_803313B4[6] = "Vuoto";
-extern const char s_Vide_803313BC[5] = "Vide";
-extern const char s_Vacio_803313C4[8] = "Vac\355o\0\0";
 extern const float FLOAT_803313dc = 0.0f;
 extern const float FLOAT_803313e0 = 640.0f;
 extern const float FLOAT_803313e4 = 448.0f;
@@ -456,11 +446,6 @@ extern float FLOAT_80331490;
 extern float FLOAT_80331498;
 extern float FLOAT_803314e8;
 extern float FLOAT_803314f0;
-const char* s_wmEmptyCreatingTextEn_8032E8F0[] = {s_Empty_803313A4, s_Creating_801DC250};
-const char* s_wmEmptyCreatingTextDe_8032E8F8[] = {s_Frei_803313AC, s_Wird_kreiert_801DC25C};
-const char* s_wmEmptyCreatingTextIt_8032E900[] = {s_Vuoto_803313B4, s_Creazione_801DC26C};
-const char* s_wmEmptyCreatingTextFr_8032E908[] = {s_Vide_803313BC, s_Creation_801DC27C};
-const char* s_wmEmptyCreatingTextEs_8032E910[] = {s_Vacio_803313C4, s_Creando_801DC288};
 extern "C" const char s_wm_menu_cpp[] = "wm_menu.cpp";
 static const char s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
 static const char s_chan_pctd_cur_pctd_801DC3D8[] = "chan = %d  cur = %d\n";
@@ -3522,26 +3507,12 @@ void CMenuPcs::DrawMainMenu()
 			MenuPcs.DrawRect(0, *pZmm6, static_cast<float>(*pBmm1 - static_cast<double>(*p440mm)),
 			                 *pWmm6, *p440mm, *pZmm6, *pZmm6, *pOmm9, *pOmm9, *pZmm6);
 
-			extern char* DAT_801DC230[5];
-			char* textList[5];
-			textList[0] = DAT_801DC230[0];
-			textList[1] = DAT_801DC230[1];
-			textList[2] = DAT_801DC230[2];
-			textList[3] = DAT_801DC230[3];
-			textList[4] = DAT_801DC230[4];
+			char* textList[5] = {0};
 			const int languageIndex = Game.m_gameWork.m_languageId - 1;
-			unsigned int ti;
 			char** const langText = g_strWMMenuMes[languageIndex];
-			ti = 0;
-			textList[0] = langText[ti];
-			ti = 1;
-			textList[1] = langText[ti];
-			ti = 2;
-			textList[2] = langText[ti];
-			ti = 3;
-			textList[3] = langText[ti];
-			ti = 4;
-			textList[4] = langText[ti];
+			for (int i = 0; i < 5; i++) {
+				textList[i] = langText[i];
+			}
 			unsigned int textAlpha;
 			if (helpAlpha > FLOAT_803313e8) {
 				textAlpha = 0xFF;
@@ -4142,19 +4113,12 @@ void CMenuPcs::DrawCMakeMenu()
 		         *pWideR, *pFortyR, *pZeroR, *pZeroR, *pOneR, *pOneR, *pZeroR);
 		if (m_wmWorldState->m_menuMode == 3) {
 			if (m_wmWorldState->m_menuMode == 3) {
-			extern char* DAT_801DC244[3];
 			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
-			char* textList[3];
-			textList[0] = DAT_801DC244[0];
-			textList[1] = DAT_801DC244[1];
-			textList[2] = DAT_801DC244[2];
+			char* textList[3] = {0};
 			char** const langText = g_strWMMenuMes[Game.m_gameWork.m_languageId - 1];
-			unsigned int ti = 5;
-			textList[0] = langText[ti];
-			ti = 6;
-			textList[1] = langText[ti];
-			ti = 7;
-			textList[2] = langText[ti];
+			for (int i = 0; i < 3; i++) {
+				textList[i] = langText[i + 5];
+			}
 			const _GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<signed char>(textAlpha & 0xFF)).color;
 			char* const text = textList[textIndex];
 			const float* pW1 = &FLOAT_80331594;
@@ -7724,6 +7688,12 @@ void CMenuPcs::CalcCharaSelect()
  */
 void CMenuPcs::DrawCharaName()
 {
+	static const char* STR_TBL_us[] = {"Empty", "Creating..."};
+	static const char* STR_TBL_ge[] = {"Frei", "Wird kreiert"};
+	static const char* STR_TBL_it[] = {"Vuoto", "Creazione..."};
+	static const char* STR_TBL_fr[] = {"Vide", "Cr\351ation..."};
+	static const char* STR_TBL_sp[] = {"Vac\355o", "Creando..."};
+
 	CFont* const font = GetWmFont(this);
 	WmCharaSelectEntry* const selectEntries = m_wm.m_charaSelectData;
 	unsigned char nameBuf[0x20];
@@ -7731,20 +7701,20 @@ void CMenuPcs::DrawCharaName()
 	const char** emptyText;
 	switch (Game.m_gameWork.m_languageId) {
 	case 2:
-		emptyText = s_wmEmptyCreatingTextDe_8032E8F8;
+		emptyText = STR_TBL_ge;
 		break;
 	case 3:
-		emptyText = s_wmEmptyCreatingTextIt_8032E900;
+		emptyText = STR_TBL_it;
 		break;
 	case 4:
-		emptyText = s_wmEmptyCreatingTextFr_8032E908;
+		emptyText = STR_TBL_fr;
 		break;
 	case 5:
-		emptyText = s_wmEmptyCreatingTextEs_8032E910;
+		emptyText = STR_TBL_sp;
 		break;
 	case 1:
 	default:
-		emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
+		emptyText = STR_TBL_us;
 		break;
 	}
 

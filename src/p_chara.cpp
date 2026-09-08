@@ -219,11 +219,6 @@ static const char s_charaDumpAnimHdr2[] = "no  t num name           lv  mask    
 static const char s_charaDumpAnimSep[] = "--- - --- -------------- --- -------- -------- -------- -------- --------\n";
 static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %14s %3d %08x %08x %8d %8d %8d\n";
 
-template class CPtrArray<CCharaPcs::CLoadPdt*>;
-template class CPtrArray<CCharaPcs::CLoadTexture*>;
-template class CPtrArray<CCharaPcs::CLoadAnim*>;
-template class CPtrArray<CCharaPcs::CLoadModel*>;
-
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadModel) == 0x28);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadAnim) == 0x74);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadTexture) == 0x2C);
@@ -337,7 +332,7 @@ static inline CMemory::CStage* SelectLoadStage(CCharaPcs* self, CMemory::CStage*
 template <typename T>
 static inline void ReleaseSharedNonNull(T* ptr)
 {
-    CRef* ref = reinterpret_cast<CRef*>(ptr);
+    CRef* ref = ptr;
     if (ref->DecRef() == 0) {
         delete ref;
     }
@@ -356,7 +351,7 @@ template <typename T>
 static inline void AddSharedRef(T* ptr)
 {
     if (ptr != 0) {
-        reinterpret_cast<CRef*>(ptr)->AddRef();
+        ptr->AddRef();
     }
 }
 

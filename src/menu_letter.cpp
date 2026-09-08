@@ -126,25 +126,6 @@ static inline CCaravanWork* GetLetterCaravanWork()
 	return reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 }
 
-static inline void ResetLetterPanelProgress(CMenuPcs* menu)
-{
-	int panelCount = static_cast<int>(menu->m_singleFadeState->count);
-	SingleFadeEntry* panel = menu->m_singleFadeState->entries;
-	for (int i = 0; i < panelCount; ++i, ++panel) {
-		panel->elapsed = 0;
-		panel->alpha = FLOAT_803330f8;
-	}
-}
-
-static inline void ClearLetterAnimStorage(CMenuPcs* menu)
-{
-	memset(menu->m_singleFadeState, 0, sizeof(*menu->m_singleFadeState));
-	SingleFadeEntry* panel = menu->m_singleFadeState->entries;
-	for (int i = 0; i < 64; ++i, ++panel) {
-		panel->uvScale = FLOAT_803330f8;
-	}
-}
-
 static inline CMemory::CStage* GetLetterMenuStage(CMenuPcs* menu)
 {
 	(void)menu;
@@ -166,33 +147,24 @@ static inline CMemory::CStage* GetLetterMenuStage(CMenuPcs* menu)
  */
 inline void CMenuPcs::LetterInit()
 {
-	LetterMenuState* state = m_letterMenuState;
-	ClearLetterAnimStorage(this);
+	memset(m_singleFadeState, 0, sizeof(*m_singleFadeState));
+	SingleFadeEntry* entry = m_singleFadeState->entries;
+	for (int i = 0; i < 64; ++i, ++entry) {
+		entry->uvScale = FLOAT_803330f8;
+	}
 
-	SingleFadeState* anim = m_singleFadeState;
-	anim->entries[0].tex = 0;
-	anim->entries[0].startFrame = 0;
-	anim->entries[0].duration = 10;
-	anim->entries[1].tex = 0;
-	anim->entries[1].startFrame = m_singleMenuCtrlResetFlag ? 0 : 10;
-	anim->entries[1].duration = 10;
-	m_singleFadeState->count = 2;
-
-	state->frame = 0;
-	state->listCursor = 0;
-	state->choiceCursor = 0;
-	state->topIndex = 0;
-	state->initialized = 1;
-
-	s_AttachItem = 0;
-	s_AttachMode = 0;
-	s_Attach = 2;
-	s_SelLetter = 0;
-	s_BackUpCur[0] = 0;
-	s_BackUpCur[1] = 0;
-	s_BackUpTopPos = 0;
-
-	SetSingWinScl(FLOAT_803330f8);
+	int index = 0;
+	entry = &m_singleFadeState->entries[index++];
+	entry->tex = 0;
+	entry->startFrame = 0;
+	entry->duration = 10;
+	entry = &m_singleFadeState->entries[index++];
+	entry->tex = 0;
+	entry->startFrame = m_singleMenuCtrlResetFlag ? 0 : 10;
+	entry->duration = 10;
+	m_singleFadeState->count = index;
+	m_letterMenuState->frame = 0;
+	m_letterMenuState->initialized = 1;
 }
 
 /*
@@ -206,26 +178,21 @@ inline void CMenuPcs::LetterInit()
  */
 inline void CMenuPcs::LetterInit0()
 {
-	LetterMenuState* state = m_letterMenuState;
-	ClearLetterAnimStorage(this);
+	int index = 0;
+	SingleFadeEntry* entry = &m_singleFadeState->entries[index++];
+	entry->startFrame = 0;
+	entry->duration = 10;
+	entry = &m_singleFadeState->entries[index++];
+	entry->startFrame = 0;
+	entry->duration = 10;
 
-	SingleFadeState* anim = m_singleFadeState;
-	anim->entries[0].tex = 0;
-	anim->entries[0].startFrame = 0;
-	anim->entries[0].duration = 10;
-	m_singleFadeState->count = 1;
-
-	state->frame = 0;
-	state->listCursor = static_cast<s16>(s_BackUpCur[0]);
-	state->choiceCursor = static_cast<s16>(s_BackUpCur[1]);
-	state->topIndex = static_cast<s16>(s_BackUpTopPos);
-	s_SelLetter = static_cast<s16>(s_BackUpCur[0] + s_BackUpTopPos);
-
-	s_BackUpCur[0] = 0;
-	s_BackUpCur[1] = 0;
-	s_BackUpTopPos = 0;
-
-	SetSingWinScl(FLOAT_803330f8);
+	int count = m_singleFadeState->count;
+	entry = m_singleFadeState->entries;
+	for (int i = 0; i < count; ++i, ++entry) {
+		entry->elapsed = 0;
+		entry->alpha = FLOAT_803330f8;
+	}
+	m_letterMenuState->frame = 0;
 }
 
 /*
@@ -289,50 +256,23 @@ void CMenuPcs::LetterInit1()
  */
 inline void CMenuPcs::LetterInit2()
 {
-	LetterMenuState* state = m_letterMenuState;
-	if (state->dialogInitialized != '\0') {
-		return;
+	int index = 0;
+	SingleFadeEntry* entry = &m_singleFadeState->entries[index++];
+	entry->tex = 0;
+	entry->startFrame = 10;
+	entry->duration = 10;
+	entry = &m_singleFadeState->entries[index++];
+	entry->tex = 0;
+	entry->startFrame = 0;
+	entry->duration = 10;
+
+	int count = m_singleFadeState->count;
+	entry = m_singleFadeState->entries;
+	for (int i = 0; i < count; ++i, ++entry) {
+		entry->elapsed = 0;
+		entry->alpha = FLOAT_803330f8;
 	}
-
-	char info[0x80];
-	char left[0x10];
-	char right[0x10];
-	s16 winW;
-	s16 winH;
-
-	CCaravanWork* caravanWork = GetLetterCaravanWork();
-	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
-	if (!letter->AttachmentIsGil()) {
-		int itemId = letter->AttachmentValue() * 5 + 4;
-		char* value = GetLetterItemName(itemId);
-		if (Game.m_gameWork.m_languageId == 2) {
-			sprintf(info, s_letterItemInfoFmt,
-			        GetMenuStr(0x23),
-			        value,
-			        GetMenuStr(0x24),
-			        GetMenuStr(0x22));
-		} else {
-			sprintf(info, "%s%s", GetMenuStr(0x22), value);
-		}
-	} else {
-		int gil = static_cast<int>(letter->AttachmentValue()) * 100;
-		if (Game.m_gameWork.m_languageId == 2) {
-			sprintf(info, "%d%s%s", gil, GetMenuStr(4), GetMenuStr(0x22));
-		} else {
-			sprintf(info, "%s%d%s", GetMenuStr(0x22), gil, GetMenuStr(4));
-		}
-	}
-
-	strcpy(left, "");
-	strcat(left, GetMenuStr(1), 0x10);
-	strcpy(right, "");
-	strcat(right, GetMenuStr(2), 0x10);
-	SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
-	GetSingWinSize(0, &winW, &winH, 1);
-	SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
-	m_menuWindowInfo->state = 0;
-	state->choiceCursor = 0;
-	state->dialogInitialized = 1;
+	m_letterMenuState->frame = 0;
 }
 
 /*
@@ -346,63 +286,19 @@ inline void CMenuPcs::LetterInit2()
  */
 inline void CMenuPcs::LetterInit3()
 {
-	LetterMenuState* state = m_letterMenuState;
-	if (state->dialogInitialized != '\0') {
-		return;
+	memset(m_singleFadeState, 0, sizeof(*m_singleFadeState));
+	SingleFadeEntry* entry = m_singleFadeState->entries;
+	for (int i = 0; i < 64; ++i, ++entry) {
+		entry->uvScale = FLOAT_803330f8;
 	}
 
-	CCaravanWork* caravanWork = GetLetterCaravanWork();
-	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
-	char lines[8][0x80];
-	char unused0[0x80];
-	char unused1[0x80];
-	char unused2[0x80];
-	char unused3[0x80];
-	char unused4[0x80];
-	char unused5[0x80];
-	char unused6[0x88];
-	memset(lines, 0, sizeof(lines));
-
-	char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x323) char[kLetterTextScratchSize];
-	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x325) char[kLetterTextScratchSize];
-	memset(srcText, 0, kLetterTextScratchSize);
-	memset(workText, 0, kLetterTextScratchSize);
-
-	unsigned short msgIndex = letter->HeaderWord();
-	strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
-	CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
-
-	s_ReplyMax = 0;
-	char* curLine = workText;
-	for (int i = 0; i < 8; ++i) {
-		char* newline = strchr(curLine, '\n');
-		if (newline != 0) {
-			*newline = '\0';
-		}
-
-		sprintf(lines[i], "%s%s%s", GetMenuStr(0x23), curLine, GetMenuStr(0x24));
-		s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
-		if (newline == 0) {
-			break;
-		}
-		curLine = newline + 1;
-	}
-
-	delete[] srcText;
-	delete[] workText;
-
-	int closeLine = s_ReplyMax;
-	s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
-	strcat(lines[closeLine], GetMenuStr(3), 0x80);
-	SetSingDynamicWinMessInfo(s_ReplyMax, lines[0], unused0, unused1, unused2, unused3, unused4, unused5, unused6);
-
-	s16 winW;
-	s16 winH;
-	GetSingWinSize(0, &winW, &winH, 1);
-	SetMcWinInfo(winW, winH);
-	m_menuWindowInfo->state = 0;
-	state->messageMask = -1;
-	state->dialogInitialized = 1;
+	int index = 0;
+	entry = &m_singleFadeState->entries[index++];
+	entry->tex = 0;
+	entry->startFrame = 0;
+	entry->duration = 10;
+	m_singleFadeState->count = index;
+	m_letterMenuState->frame = 0;
 }
 
 /*
@@ -416,73 +312,20 @@ inline void CMenuPcs::LetterInit3()
  */
 inline void CMenuPcs::LetterInit4()
 {
-	LetterMenuState* state = m_letterMenuState;
-	if (state->dialogInitialized != '\0') {
-		return;
+	int index = 0;
+	SingleFadeEntry* entry = &m_singleFadeState->entries[index++];
+	entry->tex = 0;
+	entry->startFrame = 0;
+	entry->duration = 10;
+	m_singleFadeState->count = index;
+
+	int count = m_singleFadeState->count;
+	entry = m_singleFadeState->entries;
+	for (int i = 0; i < count; ++i, ++entry) {
+		entry->elapsed = 0;
+		entry->alpha = FLOAT_803330f8;
 	}
-
-	CCaravanWork* caravanWork = GetLetterCaravanWork();
-	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
-	unsigned char languageId = Game.m_gameWork.m_languageId;
-	char lines[8][0x80];
-	memset(lines, 0, sizeof(lines));
-	unsigned int letterWord = letter->Word0();
-	char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(2);
-	char** itemTable = Game.m_cFlatDataArr[1].TableStrings(0);
-
-	const char* title = subjectTable[(letterWord >> 9) & 0x1FF];
-	if (languageId == 3) {
-		sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
-	} else if (languageId == 2) {
-		sprintf(lines[0], "%s%s", title, GetMenuStr(0x26));
-	} else if (languageId == 5) {
-		sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
-	} else if (languageId == 4) {
-		sprintf(lines[0], "%s%s%s", GetMenuStr(0x26), title, GetMenuStr(0x25));
-	} else {
-		sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
-	}
-
-	sprintf(lines[1], "%s%s%s", GetMenuStr(0x23), s_ReplyStr, GetMenuStr(0x24));
-
-	int lineCount = 2;
-	if (s_Attach != 2) {
-		if (languageId == 2) {
-			if (s_Attach == 0) {
-				sprintf(lines[2], "%s%s%s", GetMenuStr(0x23),
-				        GetLetterItemName(s_AttachItem * 5 + 4),
-				        GetMenuStr(0x24));
-			} else if (s_Attach == 1) {
-				sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr(4));
-			}
-			strcat(lines[2], GetMenuStr(0x28), 0x80);
-		} else {
-			strcpy(lines[2], GetMenuStr(0x28));
-			if (s_Attach == 0) {
-				strcat(lines[2], itemTable[s_AttachItem * 5 + 4], 0x80);
-			} else if (s_Attach == 1) {
-				int offs = strlen(lines[2]);
-				sprintf(lines[2] + offs, "%d%s", s_AttachItem, GetMenuStr(4));
-			}
-		}
-		lineCount = 3;
-	}
-
-	strcat(lines[lineCount], GetMenuStr(0x21), 0x80);
-	strcpy(lines[lineCount + 1], "");
-	strcat(lines[lineCount + 1], GetMenuStr(1), 0x80);
-	strcpy(lines[lineCount + 2], "");
-	strcat(lines[lineCount + 2], GetMenuStr(2), 0x80);
-	SetSingDynamicWinMessInfo(lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
-
-	s16 winW;
-	s16 winH;
-	GetSingWinSize(0, &winW, &winH, 1);
-	SetMcWinInfo(winW, winH);
-	m_menuWindowInfo->state = 0;
-	state->choiceCursor = 0;
-	state->messageMask = -1;
-	state->dialogInitialized = 1;
+	m_letterMenuState->frame = 0;
 }
 
 /*
@@ -505,30 +348,10 @@ bool CMenuPcs::LetterOpen()
 
 	s_OpenClose = 1;
 	if (m_letterMenuState->initialized == '\0') {
-		ClearLetterAnimStorage(this);
-		int dur = 10;
-		int n = 0;
-		SingleFadeEntry* entry = &m_singleFadeState->entries[n++];
-		entry->tex = 0;
-		entry->startFrame = 0;
-		entry->duration = dur;
-		entry = &m_singleFadeState->entries[n++];
-		entry->tex = 0;
-		entry->startFrame = m_singleMenuCtrlResetFlag ? 0 : dur;
-		entry->duration = dur;
-		m_singleFadeState->count = static_cast<s16>(n);
-		m_letterMenuState->frame = 0;
-		m_letterMenuState->initialized = 1;
+		LetterInit();
 		iVar4 = SingGetLetterAttachflg();
 		if (iVar4 >= 0) {
-			ClearLetterAnimStorage(this);
-			int n2 = 0;
-			SingleFadeEntry* entry = &m_singleFadeState->entries[n2++];
-			entry->tex = 0;
-			entry->startFrame = 0;
-			entry->duration = 10;
-			m_singleFadeState->count = static_cast<s16>(n2);
-			m_letterMenuState->frame = 0;
+			LetterInit3();
 			m_letterMenuState->listCursor = static_cast<s16>(s_BackUpCur[0]);
 			m_letterMenuState->choiceCursor = static_cast<s16>(s_BackUpCur[1]);
 			m_letterMenuState->topIndex = static_cast<s16>(s_BackUpTopPos);
@@ -881,25 +704,7 @@ int CMenuPcs::LetterCtrl()
 					if (s_Attach != 2) {
 						ret = 1;
 					} else {
-						memset(m_singleFadeState, 0, sizeof(*m_singleFadeState));
-						float resetAlpha = FLOAT_803330f8;
-						SingleFadeEntry* animEntry = m_singleFadeState->entries;
-						for (int i = 0; i < 64; ++i, ++animEntry) {
-							animEntry->uvScale = resetAlpha;
-						}
-						int n = 0;
-						int dur = 10;
-						SingleFadeEntry* p = &m_singleFadeState->entries[n++];
-						p->tex = 0;
-						p->startFrame = 0;
-						p->duration = dur;
-						p = &m_singleFadeState->entries[n++];
-						p->tex = 0;
-						p->startFrame = m_singleMenuCtrlResetFlag ? 0 : dur;
-						p->duration = dur;
-						m_singleFadeState->count = static_cast<s16>(n);
-						m_letterMenuState->frame = 0;
-						m_letterMenuState->initialized = 1;
+						LetterInit();
 					}
 					m_letterMenuState->step = 0;
 					m_letterMenuState->mode = 0;
@@ -959,23 +764,9 @@ int CMenuPcs::LetterCtrl()
 							SingSetLetterAttachflg(5);
 						}
 						m_letterMenuState->mode = 1;
-						float resetAlpha = FLOAT_803330f8;
 						m_letterMenuState->step = 2;
 						m_letterMenuState->action = -1;
-						int n = 0;
-						SingleFadeEntry* p = &m_singleFadeState->entries[n++];
-						p->startFrame = 0;
-						p->duration = 10;
-						p = &m_singleFadeState->entries[n++];
-						p->startFrame = 0;
-						p->duration = 10;
-						int panelCount = static_cast<int>(m_singleFadeState->count);
-						SingleFadeEntry* panel = m_singleFadeState->entries;
-						for (int i = 0; i < panelCount; ++i, ++panel) {
-							panel->elapsed = 0;
-							panel->alpha = resetAlpha;
-						}
-						m_letterMenuState->frame = 0;
+						LetterInit0();
 					} else {
 						st->mode = 5;
 						m_letterMenuState->step = 0;
@@ -998,23 +789,9 @@ int CMenuPcs::LetterCtrl()
 				} else {
 					s_Attach = 2;
 					m_letterMenuState->mode = 1;
-					float resetAlpha = FLOAT_803330f8;
 					m_letterMenuState->step = 2;
 					m_letterMenuState->action = -1;
-					int n = 0;
-					SingleFadeEntry* p = &m_singleFadeState->entries[n++];
-					p->startFrame = 0;
-					p->duration = 10;
-					p = &m_singleFadeState->entries[n++];
-					p->startFrame = 0;
-					p->duration = 10;
-					int panelCount = static_cast<int>(m_singleFadeState->count);
-					SingleFadeEntry* panel = m_singleFadeState->entries;
-					for (int i = 0; i < panelCount; ++i, ++panel) {
-						panel->elapsed = 0;
-						panel->alpha = resetAlpha;
-					}
-					m_letterMenuState->frame = 0;
+					LetterInit0();
 					m_letterMenuState->dialogInitialized = 0;
 				}
 			}
@@ -1023,38 +800,9 @@ int CMenuPcs::LetterCtrl()
 
 	if (ret != 0) {
 		if (s_Attach == 2) {
-			float f = FLOAT_803330f8;
-			int n = 0;
-			SingleFadeEntry* p = &m_singleFadeState->entries[n++];
-			p->tex = 0;
-			p->startFrame = 10;
-			p->duration = 10;
-			p = &m_singleFadeState->entries[n++];
-			p->tex = 0;
-			p->startFrame = 0;
-			p->duration = 10;
-			int panelCount = static_cast<int>(m_singleFadeState->count);
-			SingleFadeEntry* panel = m_singleFadeState->entries;
-			for (int i = 0; i < panelCount; ++i, ++panel) {
-				panel->elapsed = 0;
-				panel->alpha = f;
-			}
-			m_letterMenuState->frame = 0;
+			LetterInit2();
 		} else {
-			float f = FLOAT_803330f8;
-			int n = 0;
-			SingleFadeEntry* p = &m_singleFadeState->entries[n++];
-			p->tex = 0;
-			p->startFrame = 0;
-			p->duration = 10;
-			m_singleFadeState->count = static_cast<s16>(n);
-			int panelCount = static_cast<int>(m_singleFadeState->count);
-			SingleFadeEntry* panel = m_singleFadeState->entries;
-			for (int i = 0; i < panelCount; ++i, ++panel) {
-				panel->elapsed = 0;
-				panel->alpha = f;
-			}
-			m_letterMenuState->frame = 0;
+			LetterInit4();
 		}
 	}
 	return ret;
@@ -1286,7 +1034,6 @@ inline void CMenuPcs::LetterMessOpen()
 		}
 	}
 }
-
 
 /*
  * --INFO--
@@ -1546,13 +1293,7 @@ inline void CMenuPcs::LetterAttachWinClose()
 				state->mode = 1;
 				state->step = 2;
 				state->action = -1;
-				SingleFadeState* anim = m_singleFadeState;
-				anim->entries[0].startFrame = 0;
-				anim->entries[0].duration = 10;
-				anim->entries[1].startFrame = 0;
-				anim->entries[1].duration = 10;
-				ResetLetterPanelProgress(this);
-				state->frame = 0;
+				LetterInit0();
 			}
 			state->dialogInitialized = 0;
 		}
@@ -1705,13 +1446,7 @@ inline void CMenuPcs::LetterConfirmClose()
 			state->mode = 1;
 			state->step = 2;
 			state->action = -1;
-			SingleFadeState* anim = m_singleFadeState;
-			anim->entries[0].startFrame = 0;
-			anim->entries[0].duration = 10;
-			anim->entries[1].startFrame = 0;
-			anim->entries[1].duration = 10;
-			ResetLetterPanelProgress(this);
-			state->frame = 0;
+			LetterInit0();
 			state->dialogInitialized = 0;
 		}
 	}
@@ -2107,34 +1842,16 @@ int CMenuPcs::LetterCtrlCur()
 				if (letterCount == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-			int n = 0;
-			float f = FLOAT_803330f8;
-			m_letterMenuState->step = m_letterMenuState->step + 1;
-			s_SelLetter = m_letterMenuState->topIndex + m_letterMenuState->listCursor;
-			CCaravanWork::CLetterWork* selectedLetter = &caravanWork->m_letters[s_SelLetter];
-			CMes::m_tempVar[0] = selectedLetter->TempVar(0);
-			CMes::m_tempVar[1] = selectedLetter->TempVar(1);
-			CMes::m_tempVar[2] = selectedLetter->TempVar(2);
-			CMes::m_tempVar[3] = selectedLetter->TempVar(3);
+					m_letterMenuState->step = m_letterMenuState->step + 1;
+					s_SelLetter = m_letterMenuState->topIndex + m_letterMenuState->listCursor;
+					CCaravanWork::CLetterWork* selectedLetter = &caravanWork->m_letters[s_SelLetter];
+					CMes::m_tempVar[0] = selectedLetter->TempVar(0);
+					CMes::m_tempVar[1] = selectedLetter->TempVar(1);
+					CMes::m_tempVar[2] = selectedLetter->TempVar(2);
+					CMes::m_tempVar[3] = selectedLetter->TempVar(3);
 
-			SingleFadeEntry* p = &m_singleFadeState->entries[n++];
-			p->tex = 0;
-			p->startFrame = 10;
-			p->duration = 10;
-			p = &m_singleFadeState->entries[n++];
-			p->tex = 0;
-			p->startFrame = 0;
-			p->duration = 10;
-
-			int panelCount = m_singleFadeState->count;
-			SingleFadeEntry* panel = m_singleFadeState->entries;
-			for (int i = 0; i < panelCount; ++i, ++panel) {
-				panel->elapsed = 0;
-				panel->alpha = f;
-			}
-
-			m_letterMenuState->frame = 0;
-			Sound.PlaySe(2, 0x40, 0x7F, 0);
+					LetterInit2();
+					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
 			} else if ((press & 0x200) != 0) {
 				m_letterMenuState->closeRequested = 1;
@@ -2174,23 +1891,7 @@ int CMenuPcs::LetterCtrlCur()
 		} else if ((press & 0x200) != 0) {
 			m_letterMenuState->action = -1;
 			m_letterMenuState->step = m_letterMenuState->step + 1;
-			int n = 0;
-			SingleFadeEntry* p = &m_singleFadeState->entries[n++];
-			p->startFrame = 0;
-			p->duration = 10;
-			p = &m_singleFadeState->entries[n++];
-			p->startFrame = 0;
-			p->duration = 10;
-
-			float f = FLOAT_803330f8;
-			int panelCount = static_cast<int>(m_singleFadeState->count);
-			SingleFadeEntry* panel = m_singleFadeState->entries;
-			for (int i = 0; i < panelCount; ++i, ++panel) {
-				panel->elapsed = 0;
-				panel->alpha = f;
-			}
-
-			m_letterMenuState->frame = 0;
+			LetterInit0();
 			Sound.PlaySe(3, 0x40, 0x7F, 0);
 		}
 	} else if (menuMode == 2) {

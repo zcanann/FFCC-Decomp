@@ -522,7 +522,7 @@ config.libs = [
             Object(NonMatching, "FS_USB_Process.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "FunnyShape.cpp"),
             Object(NonMatching, "game.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline noauto,deferred"]),
-            Object(NonMatching, "gbaque.cpp", extra_cflags=["-inline noauto,deferred"]),
+            Object(NonMatching, "gbaque.cpp"),
             Object(NonMatching, "gobject.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "gobjwork.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "goout.cpp", extra_cflags=["-inline noauto,deferred"]),

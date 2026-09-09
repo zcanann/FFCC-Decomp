@@ -32,6 +32,7 @@ STATIC_ASSERT(sizeof(GbaQueuePlayerDataView) == 0xDC);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_appearance) == 2);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_items) == 0x3A);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_active) == 3);
+STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_hp) == 0x17);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_compatibility) == 4);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_mapPosition) == 0x36);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_commandSlots) == 0xC2);
@@ -145,14 +146,14 @@ static const char s_subject_max_over[] = "%s(%d): Error: Subject max over!!\n";
 static const char s_letter_data_error[] = "%s(%d): Error: Letter data error(chan:%d  idx:%d)\n";
 
 namespace GbaQueConst {
-extern const unsigned int ITEM_USE;
-extern const unsigned int ITEM_PUT;
-extern const unsigned int MONEY_ATTACH;
-extern const unsigned int OPEN_LETTER;
-extern const unsigned int MOVE_ATTACH;
-extern const unsigned int REPLY_LETTER;
-extern const unsigned int CAN_REPLY;
-extern const unsigned int ITEM_ATTACH;
+const unsigned int ITEM_USE = 1;
+const unsigned int ITEM_PUT = 2;
+const unsigned int MONEY_ATTACH = 4;
+const unsigned int OPEN_LETTER = 0x20;
+const unsigned int MOVE_ATTACH = 8;
+const unsigned int REPLY_LETTER = 0x10;
+const unsigned int CAN_REPLY = 1;
+const unsigned int ITEM_ATTACH = 2;
 }
 
 /*
@@ -952,8 +953,8 @@ inline void GbaQueue::SetBuyData(int, unsigned int)
  * --INFO--
  * PAL Address: 0x800CFCB8
  * PAL Size: 640b
- * EN Address: 0x800E17A0
- * EN Size: 856b
+ * EN Address: 0x800CF504
+ * EN Size: 640b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1004,7 +1005,7 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 	const float smithRate = static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->m_shopParam) / 100.0);
 	const int gilCost = -static_cast<int>(static_cast<float>(itemRow->m_smithPrice) * smithRate);
 	const int addGilResult = reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(gilCost);
-	if ((static_cast<unsigned int>(-addGilResult | addGilResult) >> 31) == 0) {
+	if (addGilResult == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 
@@ -1992,14 +1993,13 @@ unsigned int GbaQueue::GetScrFlg()
  * --INFO--
  * PAL Address: 0x800CDDEC
  * PAL Size: 332b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CD650
+ * EN Size: 332b
  * JP Address: TODO
  * JP Size: TODO
  */
 int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	char hpFlags = 0;
 	char prevHpFlags = 0;
 	char prevHp;
@@ -2008,24 +2008,21 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	for (int i = 0; i < 4; i++) {
 		OSWaitSemaphore(accessSemaphores + i);
 
-		char* playerData = obj + i * 0xDC;
 		if (i == channel) {
-			hp = playerData[0x46B];
-			prevHp = playerData[0x7DB];
+			hp = m_playerData[i].m_hp;
+			prevHp = m_playerHistory[i].m_hp;
 		}
-		if (playerData[0x46B] != 0) {
+		if (m_playerData[i].m_hp != 0) {
 			hpFlags = static_cast<char>(hpFlags | (1 << i));
 		}
-		if (playerData[0x7DB] != 0) {
+		if (m_playerHistory[i].m_hp != 0) {
 			prevHpFlags = static_cast<char>(prevHpFlags | (1 << i));
 		}
 
 		OSSignalSemaphore(accessSemaphores + i);
 	}
 
-	unsigned int changed = static_cast<unsigned int>(
-	    (static_cast<unsigned int>(prevHpFlags) - static_cast<int>(hpFlags)) |
-	    (static_cast<int>(hpFlags) - static_cast<int>(prevHpFlags))) >> 31;
+	unsigned int changed = prevHpFlags != hpFlags;
 
 	if (hp != prevHp) {
 		changed = 1;
@@ -4276,8 +4273,12 @@ void GbaQueue::ClrRadarTypeFlg()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C9D6C
+ * PAL Size: 116b
+ * EN Address: 0x800C95D0
+ * EN Size: 116b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned int GbaQueue::GetRadarMode(int channel)
 {
@@ -4285,7 +4286,7 @@ unsigned int GbaQueue::GetRadarMode(int channel)
 	int radarMode = m_radarMode;
 	OSSignalSemaphore(accessSemaphores + channel);
 	unsigned int value = radarMode & (1 << channel);
-	return (-value | value) >> 31;
+	return value != 0;
 }
 
 /*
@@ -4313,8 +4314,12 @@ void GbaQueue::SetRadarMode(int channel, int mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C9C58
+ * PAL Size: 116b
+ * EN Address: 0x800C94BC
+ * EN Size: 116b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned int GbaQueue::GetChgRadarMode(int channel)
 {
@@ -4322,7 +4327,7 @@ unsigned int GbaQueue::GetChgRadarMode(int channel)
 	int radarMode = m_chgRadarMode;
 	OSSignalSemaphore(accessSemaphores + channel);
 	unsigned int value = radarMode & (1 << channel);
-	return (-value | value) >> 31;
+	return value != 0;
 }
 
 /*
@@ -4467,28 +4472,22 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-/*
- * --INFO--
  * PAL Address: 0x800C9838
  * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C909C
+ * EN Size: 136b
  * JP Address: TODO
  * JP Size: TODO
  */
 unsigned int GbaQueue::GetChgHitFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	unsigned int actualChannel = m_singleMode != 0 ? 0 : channel;
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;
 	OSWaitSemaphore(semaphore);
-	int flag = obj[0x2D54];
+	int flag = m_chgHitFlags;
 	OSSignalSemaphore(semaphore);
 	unsigned int value = flag & (1U << actualChannel);
-	return (-value | value) >> 31U;
+	return value != 0;
 }
 
 /*
@@ -4507,18 +4506,21 @@ void GbaQueue::ClrChgHitFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C9748
+ * PAL Size: 116b
+ * EN Address: 0x800C8FAC
+ * EN Size: 116b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned int GbaQueue::GetChgScouFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	int flag = obj[0x2D55];
+	int flag = m_chgScouFlags;
 	OSSignalSemaphore(semaphore);
 	unsigned int value = flag & (1U << channel);
-	return (-value | value) >> 31U;
+	return value != 0;
 }
 
 /*
@@ -4586,8 +4588,12 @@ int GbaQueue::GetHitEInfo(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C955C
+ * PAL Size: 96b
+ * EN Address: 0x800C8DC0
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 bool GbaQueue::IsSingleMode(int channel)
 {
@@ -4646,8 +4652,8 @@ void GbaQueue::SetControllerMode(int controllerMode)
  * --INFO--
  * PAL Address: 0x800C93E8
  * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C8C4C
+ * EN Size: 140b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -4664,7 +4670,7 @@ unsigned int GbaQueue::GetControllerMode()
 	} while (i < 4);
 
 	mode = m_controllerMode;
-	result = static_cast<unsigned int>(-static_cast<unsigned int>(mode) | static_cast<int>(mode)) >> 31;
+	result = mode != 0;
 
 	i = 0;
 	do {
@@ -4677,10 +4683,10 @@ unsigned int GbaQueue::GetControllerMode()
 
 /*
  * --INFO--
- * PAL Address: 0x800D4E50
- * PAL Size: 532b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: 0x800C920C
+ * PAL Size: 476b
+ * EN Address: 0x800C8A70
+ * EN Size: 476b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -4730,14 +4736,7 @@ void GbaQueue::OpenMenu(int channel, int menuId, int controlMode)
 		retries++;
 	} while (retries < 10);
 
-	OSSemaphore* semaphore = GbaQue.accessSemaphores + channel;
-	OSWaitSemaphore(semaphore);
-	char menuStageMode = GbaQue.m_singleMode;
-	isSingleMode =
-		(static_cast<unsigned int>(__cntlzw(1 - static_cast<int>(menuStageMode))) >>
-		 5) &
-		0xFFU;
-	OSSignalSemaphore(semaphore);
+	isSingleMode = GbaQue.IsSingleMode(channel);
 
 	if (isSingleMode == 0) {
 		retries = 0;
@@ -4750,13 +4749,7 @@ void GbaQueue::OpenMenu(int channel, int menuId, int controlMode)
 		return;
 	}
 
-	OSWaitSemaphore(semaphore);
-	menuStageMode = GbaQue.m_singleMode;
-	isSingleMode =
-		(static_cast<unsigned int>(__cntlzw(1 - static_cast<int>(menuStageMode))) >>
-		 5) &
-		0xFFU;
-	OSSignalSemaphore(semaphore);
+	isSingleMode = GbaQue.IsSingleMode(channel);
 	if (isSingleMode == 0 && channel == 1 && menuId == 0) {
 		retries = 0;
 		do {
@@ -4806,8 +4799,8 @@ void GbaQueue::SetPauseMode(int mode)
  * --INFO--
  * PAL Address: 0x800C90F8
  * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C895C
+ * EN Size: 140b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -4824,7 +4817,7 @@ unsigned int GbaQueue::GetPauseMode()
 	} while (i < 4);
 
 	mode = m_pauseMode;
-	result = static_cast<unsigned int>(-static_cast<unsigned int>(mode) | static_cast<int>(mode)) >> 31;
+	result = mode != 0;
 
 	i = 0;
 	do {
@@ -4856,22 +4849,21 @@ int GbaQueue::GetItemUse(int channel)
 
 /*
  * --INFO--
- * PAL Address: 0x800c901c
+ * PAL Address: 0x800C901C
  * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C8880
+ * EN Size: 116b
  * JP Address: TODO
  * JP Size: TODO
  */
 unsigned int GbaQueue::GetSPModeFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	int value = obj[0x2D5D];
+	int value = m_spModeFlags;
 	OSSignalSemaphore(semaphore);
 	unsigned int mask = value & (1U << channel);
-	return (-mask | mask) >> 31;
+	return mask != 0;
 }
 
 /*
@@ -4893,42 +4885,40 @@ void GbaQueue::ClrSPModeFlg(int channel)
 
 /*
  * --INFO--
- * PAL Address: 0x800c8f40
+ * PAL Address: 0x800C8F40
  * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C87A4
+ * EN Size: 116b
  * JP Address: TODO
  * JP Size: TODO
  */
 unsigned int GbaQueue::GetSPMode(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	int value = obj[0x2D5C];
+	int value = m_spModeBits;
 	OSSignalSemaphore(semaphore);
 	unsigned int mask = value & (1U << channel);
-	return (-mask | mask) >> 31;
+	return mask != 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800c8ecc
+ * PAL Address: 0x800C8ECC
  * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C8730
+ * EN Size: 116b
  * JP Address: TODO
  * JP Size: TODO
  */
 unsigned int GbaQueue::GetMemorysFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	int value = obj[0x2D5E];
+	int value = m_memorysFlags;
 	OSSignalSemaphore(semaphore);
 	unsigned int mask = value & (1U << channel);
-	return (-mask | mask) >> 31;
+	return mask != 0;
 }
 
 /*
@@ -5022,22 +5012,21 @@ int GbaQueue::GetCmdNum(int channel)
 
 /*
  * --INFO--
- * PAL Address: 0x800c8c50
+ * PAL Address: 0x800C8C50
  * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C84B4
+ * EN Size: 116b
  * JP Address: TODO
  * JP Size: TODO
  */
 unsigned int GbaQueue::GetPlayModeFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	int value = obj[0x2D60];
+	int value = m_playModeFlags;
 	OSSignalSemaphore(semaphore);
 	unsigned int mask = value & (1U << channel);
-	return (-mask | mask) >> 31;
+	return mask != 0;
 }
 
 /*
@@ -5085,22 +5074,21 @@ void GbaQueue::SetStartBonusFlg()
 
 /*
  * --INFO--
- * PAL Address: 0x800c8af4
+ * PAL Address: 0x800C8AF4
  * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C8358
+ * EN Size: 116b
  * JP Address: TODO
  * JP Size: TODO
  */
 unsigned int GbaQueue::GetStartBonusFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	int value = obj[0x2D61];
+	int value = m_startBonusFlags;
 	OSSignalSemaphore(semaphore);
 	unsigned int mask = value & (1U << channel);
-	return (-mask | mask) >> 31;
+	return mask != 0;
 }
 
 /*
@@ -5118,15 +5106,4 @@ void GbaQueue::ClrStartBonusFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	m_startBonusFlags = static_cast<unsigned char>(m_startBonusFlags & ~(1 << channel));
 	OSSignalSemaphore(semaphore);
-}
-
-namespace GbaQueConst {
-extern const unsigned int ITEM_USE = 1;
-extern const unsigned int ITEM_PUT = 2;
-extern const unsigned int MONEY_ATTACH = 4;
-extern const unsigned int OPEN_LETTER = 0x20;
-extern const unsigned int MOVE_ATTACH = 8;
-extern const unsigned int REPLY_LETTER = 0x10;
-extern const unsigned int CAN_REPLY = 1;
-extern const unsigned int ITEM_ATTACH = 2;
 }

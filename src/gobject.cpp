@@ -702,18 +702,7 @@ void CGObject::DrawDebug(CFont* font)
  */
 void CGObject::SetDispItemName(int showName)
 {
-    struct ShieldNodeFlagBits {
-        signed char unk0 : 1;
-        signed char unk1 : 1;
-        signed char unk2 : 1;
-        signed char dispItemName : 1;
-        signed char unk4 : 1;
-        signed char unk5 : 1;
-        signed char unk6 : 1;
-        signed char unk7 : 1;
-    };
-
-    reinterpret_cast<ShieldNodeFlagBits*>(&m_shieldNodeFlags)->dispItemName = showName;
+    m_shieldNodeFlagBits.m_bit10 = showName;
     m_dispItemTimer = 13;
 }
 
@@ -762,34 +751,16 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
  */
 void CGObject::CancelAnim(int keepFacing)
 {
-	struct ShieldNodeFlagBits {
-	    unsigned char unk0 : 1;
-	    unsigned char unk1 : 1;
-	    unsigned char unk2 : 1;
-	    unsigned char unk3 : 1;
-	    unsigned char unk4 : 1;
-	    unsigned char unk5 : 1;
-	    unsigned char unk6 : 1;
-	    unsigned char unk7 : 1;
-	};
+    m_currentAnimSlot = -1;
+    m_shieldNodeFlagBits.m_bit40 = 0;
+    m_turnSpeed = sZeroFloat;
 
-	m_currentAnimSlot = -1;
+    if (keepFacing != 0) {
+        m_rotTargetY = m_rotBaseY;
+    }
 
-	reinterpret_cast<ShieldNodeFlagBits*>(&m_shieldNodeFlags)->unk1 = 0;
-
-	const float& zero = sZeroFloat;
-	m_turnSpeed = zero;
-
-	if (keepFacing != 0)
-	{
-		m_rotTargetY = m_rotBaseY;
-	}
-
-	*((u8*)&m_shieldNodeFlags) =
-	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 3, 28, 28));
-
-	*((u8*)&m_shieldNodeFlags) =
-	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 7, 24, 24));
+    m_shieldNodeFlagBits.m_bit08 = 0;
+    m_shieldNodeFlagBits.m_bit80 = 0;
 }
 
 /*
@@ -1198,7 +1169,7 @@ void CGObject::boundCheck()
             }
         } while ((clipMask != 0) && (++i < 8));
 
-        m_weaponNodeFlagBits.m_unk20 = static_cast<signed char>(static_cast<u32>(__cntlzw(clipMask)) >> 5);
+        m_weaponNodeFlagBits.m_unk20 = clipMask == 0;
     }
 
     Math.MTX44MultVec4(screenMtx, &m_worldPosition, reinterpret_cast<Vec4d*>(&m_projection.y));
@@ -1445,17 +1416,16 @@ void CGObject::moveVectorHRot(float rotX, float rotY, float moveTimer, int turnF
     const float cosY1 = static_cast<float>(cos(rotY));
     const float cosX = static_cast<float>(cos(rotX));
 
-    u8* const weaponFlagsHi = &m_weaponNodeFlagBytes.m_flags1;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
+    m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
+    m_weaponNodeFlagAll.m_bits1.m_bit10 = 1;
     m_turnFrames = static_cast<u32>(turnFrames);
     m_moveTarget.x = sinX * cosY0;
     m_moveTarget.y = sinY;
     m_moveTarget.z = cosX * cosY1;
     m_moveTimer = moveTimer;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 2, 29, 29));
+    m_weaponNodeFlagAll.m_bits1.m_bit08 = 0;
+    m_weaponNodeFlagAll.m_bits1.m_bit02 = 0;
+    m_weaponNodeFlagAll.m_bits1.m_bit04 = 0;
 }
 
 /*
@@ -1508,15 +1478,14 @@ void CGObject::moveVectorH(Vec* moveVec, float moveTimer, int turnFrames)
         PSVECScale(moveVec, &unitVec, sAnimFrameOffset / mag);
     }
 
-    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
+    m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
+    m_weaponNodeFlagAll.m_bits1.m_bit10 = 1;
     m_turnFrames = static_cast<u32>(turnFrames);
     m_moveTarget = unitVec;
     m_moveTimer = moveTimer;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 2, 29, 29));
+    m_weaponNodeFlagAll.m_bits1.m_bit08 = 0;
+    m_weaponNodeFlagAll.m_bits1.m_bit02 = 0;
+    m_weaponNodeFlagAll.m_bits1.m_bit04 = 0;
 }
 
 /*
@@ -1853,7 +1822,7 @@ void CGObject::copy()
 void CGObject::update()
 {
     const unsigned int dbgFlags = DbgMenuPcs.GetDbgFlagsRaw();
-    const int miniGameModelPass = (static_cast<unsigned int>(__cntlzw(dbgFlags & 0x8000)) >> 5) & 0xFF;
+    const int miniGameModelPass = (dbgFlags & 0x8000) == 0;
     unsigned char& weaponFlagsLo = m_weaponNodeFlagBytes.m_flags0;
     unsigned char& weaponFlagsHi = m_weaponNodeFlagBytes.m_flags1;
 
@@ -2969,7 +2938,7 @@ void CGObject::move()
             || (m_weaponNodeFlagAll.m_bits1.m_bit10 && (scriptMoveEnd == 2))) {
             m_weaponNodeFlagAll.m_bits1.m_bit20 = 0;
             CFlatRuntime::CStack stack;
-            stack.m_word = static_cast<u32>(__cntlzw(static_cast<u32>(2 - scriptMoveEnd))) >> 5;
+            stack.m_word = scriptMoveEnd == 2;
             gCFlatRuntime().SystemCall(this, 2, 7, 1, &stack, 0);
         }
 

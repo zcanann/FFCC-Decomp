@@ -1253,9 +1253,8 @@ void CMenuPcs::LetterListDraw()
 	const int iconTopRow = static_cast<int>(m_letterMenuState->topIndex);
 	int iconLetterIndex;
 	for (int row = 0; row < 9 && (iconLetterIndex = iconTopRow + row) < caravanWork->m_letterCount; ++row) {
-		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[iconLetterIndex];
-		if (letter->AttachmentValue() != 0) {
-			const int icon = 0x26 + (letter->IsAttachmentClaimed() ? 1 : 0);
+		if (caravanWork->m_letters[iconLetterIndex].AttachmentValue() != 0) {
+			const int icon = 0x26 + (caravanWork->m_letters[iconLetterIndex].IsAttachmentClaimed() ? 1 : 0);
 			DrawSingleIcon(icon, iconX, static_cast<int>(static_cast<float>(iconY)), FLOAT_803330f8, 1, FLOAT_803330f8);
 		}
 		iconY += 0x20;

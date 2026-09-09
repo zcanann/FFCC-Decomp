@@ -2777,7 +2777,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         delta.Normalize();
 
         CVector eye = modelPos + CVector(0.0f, 10.0f, 0.0f);
-        CVector lookAtUp(0.0f, 1.0f, 0.0f);
+        Vec* lookAtUp = CVector(0.0f, 1.0f, 0.0f);
         CVector shadowPos = modelPos + delta * static_cast<float>(CharaPcs.m_texShadowDistance) +
                             CVector(0.0f, 10.0f, 0.0f);
         C_MTXLookAt(m_shadowViewMtx, shadowPos, lookAtUp, eye);
@@ -2822,9 +2822,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     if (drawPass == 1 || drawPass == 2) {
         if (drawPass == 2) {
-            const unsigned short shadowSize = static_cast<unsigned short>(CharaPcs.m_texShadowSize);
-            GXSetTexCopySrc(0, 0, shadowSize, shadowSize);
-            GXSetTexCopyDst(CharaPcs.m_texShadowSize, CharaPcs.m_texShadowSize, GX_CTF_R4, GX_FALSE);
+            GXSetTexCopySrc(0, 0, static_cast<unsigned short>(CharaPcs.m_texShadowSize),
+                            static_cast<unsigned short>(CharaPcs.m_texShadowSize));
+            GXSetTexCopyDst(static_cast<unsigned short>(CharaPcs.m_texShadowSize),
+                            static_cast<unsigned short>(CharaPcs.m_texShadowSize), GX_CTF_R4, GX_FALSE);
             m_shadowTexturePtr = reinterpret_cast<unsigned char*>(CharaPcs.m_texShadowTextureBase) +
                                  CharaPcs.m_texShadowTextureOffset;
             DCInvalidateRange(m_shadowTexturePtr, (CharaPcs.m_texShadowSize * CharaPcs.m_texShadowSize) / 2);

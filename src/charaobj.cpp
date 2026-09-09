@@ -1880,11 +1880,12 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
  */
 void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int& outC, int forceNormal)
 {
-	bool normFlag = false;
+	int normFlag = 0;
 	SCharaItemRow* itemData = &reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[itemId];
 	if ((itemData->m_flags32 & 1) != 0 || forceNormal != 0) {
-		normFlag = true;
+		normFlag = 1;
 	}
+	int isNormal = normFlag & 0xFF;
 
 	outA = 3;
 	switch (staIndex) {
@@ -1937,7 +1938,7 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		outB = 1;
 		break;
 	case 1:
-		outB = (normFlag != 0) ? 1 : 0;
+		outB = (isNormal != 0) ? 1 : 0;
 		break;
 	default:
 		outB = 0;

@@ -1163,7 +1163,7 @@ void CMenuPcs::LetterListDraw()
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
 	const int topRow = static_cast<int>(m_letterMenuState->topIndex);
 
-	int y = 0x60;
+	unsigned int y = 0x60;
 	int letterIndex;
 	float yf;
 	for (int row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {

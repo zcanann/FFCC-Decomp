@@ -2110,7 +2110,6 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		itemType = 1;
 	}
 
-	CGPrgObj* sourceObj = static_cast<CGPrgObj*>(source);
 	unsigned short powerValue;
 	if (source->IsKindOf(0x2D)) {
 		unsigned char usePartyLeader = 0;
@@ -2125,7 +2124,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 				usePartySource = 1;
 			}
 		}
-		if (usePartySource != 0 && reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_joybusCaravanId != 0) {
+		if (usePartySource != 0 && reinterpret_cast<CCaravanWork*>(static_cast<CGPrgObj*>(source)->m_scriptHandle)->m_joybusCaravanId != 0) {
 			usePartyLeader = 1;
 		}
 
@@ -2133,7 +2132,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		if (usePartyLeader != 0) {
 			powerSource = Game.m_partyObjArr[0];
 		} else {
-			powerSource = sourceObj;
+			powerSource = static_cast<CGPrgObj*>(source);
 		}
 		powerValue = reinterpret_cast<CGObjWork*>(powerSource->m_scriptHandle)->m_romWork[0xCC];
 	} else {
@@ -2161,7 +2160,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 
 	unsigned int affinity = 0;
 	if (source->IsKindOf(0x6D) && (itemType == 1 || itemType == 9)) {
-		affinity = static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_equipEffectParams[2]);
+		affinity = static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(static_cast<CGPrgObj*>(source)->m_scriptHandle)->m_equipEffectParams[2]);
 	}
 
 	int selfCid = static_cast<unsigned short>(GetCID());
@@ -2169,8 +2168,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		affinity -= static_cast<unsigned char>(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_equipEffectParams[3]);
 	}
 
-	unsigned int next = affinity + (base * power);
-	next = static_cast<int>(next) < 0 ? 0 : next;
+	unsigned int total = affinity + (base * power);
+	unsigned int next = static_cast<int>(total) < 0 ? 0 : total;
 	System.Printf(const_cast<char*>(sCharaObjEffectTimeCalcFmt), base, power, affinity, next);
 	return static_cast<int>(next);
 }

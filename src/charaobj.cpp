@@ -2056,7 +2056,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		CGObjWork* work = reinterpret_cast<CGObjWork*>(m_scriptHandle);
 		if (work->m_statusTimers[staIndex] != 0) {
 			System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
-			return reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[staIndex];
+			return work->m_statusTimers[staIndex];
 		}
 	}
 
@@ -2111,7 +2111,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	}
 
 	unsigned short powerValue;
-	if (source->IsKindOf(0x2D)) {
+	bool isPrgObj = source->IsKindOf(0x2D);
+	if (isPrgObj) {
 		unsigned char usePartyLeader = 0;
 		unsigned char usePartySource = usePartyLeader;
 		unsigned char stageModeActive = usePartyLeader;
@@ -2120,7 +2121,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 			stageModeActive = 1;
 		}
 		if (stageModeActive != 0) {
-			if (source->IsKindOf(0x6D)) {
+			bool isPartyObj = source->IsKindOf(0x6D);
+			if (isPartyObj) {
 				usePartySource = 1;
 			}
 		}

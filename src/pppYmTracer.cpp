@@ -28,7 +28,7 @@ STATIC_ASSERT(sizeof(YmTracerWork) == 0x30);
 STATIC_ASSERT(offsetof(YmTracerWork, initWork) == 0x20);
 STATIC_ASSERT(offsetof(YmTracerWork, entries) == 0x28);
 STATIC_ASSERT(offsetof(YmTracerWork, count) == 0x2c);
-STATIC_ASSERT(offsetof(YmTracerColorBlock, color) == 0x8);
+STATIC_ASSERT(offsetof(VColor, m_color) == 0x8);
 
 static inline YmTracerDataOffsets* GetYmTracerDataOffsets(pppYmTracerCtrl* ctrl)
 {
@@ -95,7 +95,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
 {
     YmTracerWork* work;
     CMapMesh* mapMesh;
-    YmTracerColorBlock* colorData;
+    VColor* colorData;
     TRACE_POLYGON* poly;
     CTexture* texture;
     s32 i;
@@ -111,12 +111,12 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
     colorOffset = GetYmTracerDataOffsets(param_3)->m_colorOffset;
     poly = work->entries;
     mapMesh = ppvEnv->m_mapMeshPtr[dataValIndex];
-    colorData = reinterpret_cast<YmTracerColorBlock*>(pppYmTracer->m_workArea + colorOffset);
+    colorData = reinterpret_cast<VColor*>(pppYmTracer->m_workArea + colorOffset);
 
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_tracer.m_blendMode);
         pppSetDrawEnv(
-            &colorData->color, reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
+            &colorData->m_color, reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
             0.0f,
             param_2->m_tracer.m_drawEnvColor1, param_2->m_tracer.m_drawEnvColor0,
             param_2->m_tracer.m_blendMode, 0, 1, 1, 0);

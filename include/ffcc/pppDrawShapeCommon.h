@@ -16,9 +16,4 @@ struct ShapeState {
     u16 currentId;
 };
 
-struct ShapePositionData {
-    u8 _pad0[8];
-    pppCVECTOR color;
-};
-
 #endif // _FFCC_PPPDRAWSHAPECOMMON_H_

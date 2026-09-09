@@ -330,10 +330,10 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
         params->m_drawEnvColor1, params->m_drawEnvColor0, params->m_blendMode,
         params->m_drawEnvColor2, params->m_drawEnvColor3, static_cast<u8>(1), params->m_drawEnvColor4);
 
-    colorR = color->m_red;
-    colorG = color->m_green;
-    colorB = color->m_blue;
-    colorA = color->m_alpha;
+    colorR = color->m_color.rgba[0];
+    colorG = color->m_color.rgba[1];
+    colorB = color->m_color.rgba[2];
+    colorA = color->m_color.rgba[3];
 
     for (i = 0; i < groupCount; i++) {
         if (0 < particleData->m_life) {
@@ -759,7 +759,7 @@ void UpdateParticle(
 {
     PBreathModel* params = pBreathModel;
     PARTICLE_DATA* particle = particleData;
-    int alpha = vColor->m_alpha;
+    int alpha = vColor->m_color.rgba[3];
     Vec step;
 
     if (particleColor != NULL) {
@@ -771,7 +771,7 @@ void UpdateParticle(
         particleColor->m_colorFrameDeltas[1] += params->m_colorFrameAccel1;
         particleColor->m_colorFrameDeltas[2] += params->m_colorFrameAccel2;
         particleColor->m_colorFrameDeltas[3] += params->m_colorFrameAccel3;
-        alpha = (int)vColor->m_alpha + (int)particleColor->m_color[3];
+        alpha = (int)vColor->m_color.rgba[3] + (int)particleColor->m_color[3];
         if (alpha > 0xFF) {
             alpha = 0xFF;
         }
@@ -870,7 +870,7 @@ void BirthParticle(
     Math.RandF();
 
     if (params->m_fadeOutFrames != 0) {
-        particle->m_alpha = (float)(unsigned int)vColor->m_alpha;
+        particle->m_alpha = (float)(unsigned int)vColor->m_color.rgba[3];
         particle->m_fadeOutFrames = params->m_fadeOutFrames;
     }
     if (params->m_fadeInFrames != 0) {

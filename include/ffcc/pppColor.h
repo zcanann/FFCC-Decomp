@@ -4,6 +4,7 @@
 #include <dolphin/types.h>
 
 #include "ffcc/ppp_linkage.h"
+#include "ffcc/pppTypes.h"
 
 struct _pppPObject;
 struct _pppCtrlTable;
@@ -12,21 +13,13 @@ struct PppColorDataOffsets {
     s32 m_workOffset;
 };
 
-struct _pppColor
+struct VColor
 {
-    unsigned char r;  // 0x0
-    unsigned char g;  // 0x1
-    unsigned char b;  // 0x2
-    unsigned char a;  // 0x3
-}; // Size 0x4
-
-struct _pppColorWork
-{
-    short r;  // 0x0
-    short g;  // 0x2
-    short b;  // 0x4
-    short a;  // 0x6
-    _pppColor result; // 0x8
+    s16 m_red;          // 0x0
+    s16 m_green;        // 0x2
+    s16 m_blue;         // 0x4
+    s16 m_alpha;        // 0x6
+    pppCVECTOR m_color; // 0x8
 }; // Size 0xC
 
 struct pppColorStep {
@@ -37,7 +30,6 @@ struct pppColorStep {
 
 struct _pppMngSt;
 extern _pppMngSt* ppvMng;
-extern const double kPppColorScale;
 
 #ifdef __cplusplus
 extern "C" {

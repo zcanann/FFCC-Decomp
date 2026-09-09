@@ -38,11 +38,6 @@ struct pppBlurCharaWork {
     float m_savedModelField;
 };
 
-struct BlurCharaColorData {
-    u8 _pad0[8];
-    pppCVECTOR m_color;
-};
-
 struct BlurCharaTexData {
     u8 _pad0[4];
     CGObject* m_objPosBase;
@@ -54,7 +49,7 @@ STATIC_ASSERT(offsetof(pppBlurCharaWork, m_captureBuffer) == 0x00);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_ownerObj) == 0x04);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_smallTexObj) == 0x08);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_savedModelField) == 0x0C);
-STATIC_ASSERT(offsetof(BlurCharaColorData, m_color) == 0x08);
+STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
 STATIC_ASSERT(offsetof(BlurCharaTexData, m_objPosBase) == 0x04);
 STATIC_ASSERT(offsetof(BlurCharaTexData, m_texObj) == 0x08);
 STATIC_ASSERT(sizeof(BlurCharaDataOffsets) == 0xC);
@@ -76,9 +71,9 @@ static inline BlurCharaTexData* GetBlurTexData(pppBlurChara* blurChara, const _p
         blurChara->m_workArea + GetBlurCharaDataOffsets(data)->m_texDataOffset);
 }
 
-static inline BlurCharaColorData* GetBlurColorData(pppBlurChara* blurChara, const _pppCtrlTable* data)
+static inline VColor* GetBlurColorData(pppBlurChara* blurChara, const _pppCtrlTable* data)
 {
-    return reinterpret_cast<BlurCharaColorData*>(
+    return reinterpret_cast<VColor*>(
         blurChara->m_workArea + GetBlurCharaDataOffsets(data)->m_colorDataOffset);
 }
 
@@ -97,7 +92,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
 void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* param_2, _pppCtrlTable* param_3)
 {
     BlurCharaTexData* texData = GetBlurTexData(blurChara, param_3);
-    BlurCharaColorData* colorData = GetBlurColorData(blurChara, param_3);
+    VColor* colorData = GetBlurColorData(blurChara, param_3);
     CTexture* texture = 0;
     CGObject* objPosBase;
     _GXTexObj smallBackTex;

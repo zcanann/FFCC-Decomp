@@ -11,11 +11,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 static const char s_pppRain_cpp[] = "pppRain.cpp";
 
-struct RainColorData {
-    u8 pad[8];
-    pppCVECTOR color;
-};
-
 struct RAIN_DATA {
     Vec position;
     Vec direction;
@@ -36,7 +31,7 @@ STATIC_ASSERT(offsetof(VRain, moveY) == 0x4);
 STATIC_ASSERT(offsetof(VRain, accelY) == 0x8);
 STATIC_ASSERT(offsetof(VRain, accelZ) == 0xC);
 STATIC_ASSERT(sizeof(VRain) == 0x10);
-STATIC_ASSERT(offsetof(RainColorData, color) == 0x8);
+STATIC_ASSERT(offsetof(VColor, m_color) == 0x8);
 STATIC_ASSERT(sizeof(RAIN_DATA) == 0x20);
 STATIC_ASSERT(sizeof(_pppCtrlTable) == 0x10);
 STATIC_ASSERT(offsetof(_pppCtrlTable, m_serializedDataOffsets) == 0xC);
@@ -54,9 +49,9 @@ static inline VRain* GetRainWork(pppRain* rain, _pppCtrlTable* data)
     return reinterpret_cast<VRain*>(rain->m_workArea + GetRainDataOffsets(data)->m_workOffset);
 }
 
-static inline RainColorData* GetRainColorData(pppRain* rain, _pppCtrlTable* data)
+static inline VColor* GetRainColorData(pppRain* rain, _pppCtrlTable* data)
 {
-    return reinterpret_cast<RainColorData*>(rain->m_workArea + GetRainDataOffsets(data)->m_colorDataOffset);
+    return reinterpret_cast<VColor*>(rain->m_workArea + GetRainDataOffsets(data)->m_colorDataOffset);
 }
 
 /*
@@ -142,7 +137,7 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
 {
     int i;
     VRain* work;
-    RainColorData* colorData;
+    VColor* colorData;
     RAIN_DATA* drop;
     float tex1;
     float tex0;
@@ -155,7 +150,7 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
     colorData = GetRainColorData(pppRain, param_3);
     pppSetBlendMode(param_2->m_blendMode);
     pppSetDrawEnv(
-        &colorData->color,
+        &colorData->m_color,
         reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
         0.0f,
         param_2->m_lightTarget,
@@ -193,14 +188,14 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
             GXWGFifo.f32 = x;
             GXWGFifo.f32 = y;
             GXWGFifo.f32 = z;
-            GXWGFifo.u32 = *(u32*)&colorData->color;
+            GXWGFifo.u32 = *(u32*)&colorData->m_color;
             GXWGFifo.f32 = tex0;
             GXWGFifo.f32 = tex0;
 
             GXWGFifo.f32 = x + segment.x;
             GXWGFifo.f32 = y + segment.y;
             GXWGFifo.f32 = z + segment.z;
-            GXWGFifo.u32 = *(u32*)&colorData->color;
+            GXWGFifo.u32 = *(u32*)&colorData->m_color;
             GXWGFifo.f32 = tex1;
             GXWGFifo.f32 = tex1;
         }

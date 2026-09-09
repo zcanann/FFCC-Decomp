@@ -757,7 +757,7 @@ join_position:
     }
 
     if (params->m_fadeOutFrames != 0) {
-        *f32_at(particleData, 0x98) = static_cast<float>(color->m_alpha);
+        *f32_at(particleData, 0x98) = static_cast<float>(color->m_color.rgba[3]);
         *u8_at(particleData, 0x9D) = params->m_fadeOutFrames;
     }
     if (params->m_fadeInFrames != 0) {
@@ -973,7 +973,7 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
 {
     (void)pppPObject;
 
-    int alpha = vColor->m_alpha;
+    int alpha = vColor->m_color.rgba[3];
     u8* payload = (u8*)pRyjMegaBirthModel;
     u8* p = (u8*)particleData;
     Vec direction;
@@ -989,7 +989,7 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
         particleColor->m_colorFrameDeltas[1] = particleColor->m_colorFrameDeltas[1] + pRyjMegaBirthModel->m_colorDeltaAdds[1];
         particleColor->m_colorFrameDeltas[2] = particleColor->m_colorFrameDeltas[2] + pRyjMegaBirthModel->m_colorDeltaAdds[2];
         particleColor->m_colorFrameDeltas[3] = particleColor->m_colorFrameDeltas[3] + pRyjMegaBirthModel->m_colorDeltaAdds[3];
-        alpha = (int)vColor->m_alpha + (int)particleColor->m_color[3];
+        alpha = (int)vColor->m_color.rgba[3] + (int)particleColor->m_color[3];
         if (alpha > 0xFF) {
             alpha = 0xFF;
         }
@@ -1154,10 +1154,10 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
 
     init_matrix(obj, emitterMatrix, params, particleWorldMatrix);
 
-    int baseRed = baseColor->m_red;
-    int baseGreen = baseColor->m_green;
-    int baseBlue = baseColor->m_blue;
-    int baseAlpha = baseColor->m_alpha;
+    int baseRed = baseColor->m_color.rgba[0];
+    int baseGreen = baseColor->m_color.rgba[1];
+    int baseBlue = baseColor->m_color.rgba[2];
+    int baseAlpha = baseColor->m_color.rgba[3];
 
     for (int i = 0; i < numParticles; i++) {
         if (*u16_at(particle, 0x30) != 0) {

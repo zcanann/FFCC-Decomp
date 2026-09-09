@@ -133,7 +133,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
                 tagOAN3_SHAPE* shape;
                 u32 particleShapeFrame;
                 u32 shapeFrameStep;
-                const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / 16384.0f;
+                const float alphaScale = (float)colorWork->m_alpha / 16384.0f;
                 const float stepDivisor = (float)(s32)(frameCountRaw - 1);
                 s32 trailNextIndex;
                 const s32 trailMaxIndex = *(u8*)(particle + 0x37) - 1;
@@ -543,7 +543,7 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
           PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, _PARTICLE_DATA* particleData,
           VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
-    int alpha = vColor->m_alpha;
+    int alpha = vColor->m_color.rgba[3];
     u8* particleBytes = (u8*)particleData;
     float* blend = (float*)(particleBytes + 0x30);
     float* velocityScale = (float*)(particleBytes + 0x28);
@@ -556,7 +556,7 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         particleColor->m_color[2] = particleColor->m_color[2] + particleColor->m_colorFrameDeltas[2];
         particleColor->m_color[3] = particleColor->m_color[3] + particleColor->m_colorFrameDeltas[3];
 
-        alpha = vColor->m_alpha + (int)particleColor->m_color[3];
+        alpha = vColor->m_color.rgba[3] + (int)particleColor->m_color[3];
         if (alpha > 0xff) {
             alpha = 0xff;
         }
@@ -919,7 +919,7 @@ path:
 done:
 
     if (pYmMegaBirthShpTail3->m_fadeInFrames != 0) {
-        *(float*)(particleBytes + 0x30) = (float)vColor->m_alpha;
+        *(float*)(particleBytes + 0x30) = (float)vColor->m_color.rgba[3];
         particleBytes[0x35] = pYmMegaBirthShpTail3->m_fadeInFrames;
     }
     if (pYmMegaBirthShpTail3->m_fadeOutFrames != 0) {

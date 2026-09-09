@@ -26,8 +26,8 @@ STATIC_ASSERT(offsetof(YmMeltWork, m_phase) == 0x0C);
 STATIC_ASSERT(offsetof(YmMeltWork, m_phaseVelocity) == 0x10);
 STATIC_ASSERT(offsetof(YmMeltWork, m_phaseAccel) == 0x14);
 STATIC_ASSERT(sizeof(YmMeltWork) == 0x18);
-STATIC_ASSERT(offsetof(YmMeltColorWork, m_color) == 0x08);
-STATIC_ASSERT(sizeof(YmMeltColorWork) == 0x0C);
+STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
+STATIC_ASSERT(sizeof(VColor) == 0x0C);
 STATIC_ASSERT(sizeof(Vec2d) == 0x08);
 STATIC_ASSERT(sizeof(PYmMelt) == 0x34);
 STATIC_ASSERT(offsetof(PYmMelt, m_drawEnvColor0) == 0x30);
@@ -56,9 +56,9 @@ static inline YmMeltWork* GetYmMeltWork(pppYmMelt* ymMelt, PYmMeltDataOffsets* o
     return reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + GetYmMeltDataOffsets(offsets)->m_workOffset);
 }
 
-static inline YmMeltColorWork* GetYmMeltColorWork(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
+static inline VColor* GetYmMeltColorWork(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
-    return reinterpret_cast<YmMeltColorWork*>(ymMelt->m_workArea + GetYmMeltDataOffsets(offsets)->m_colorWorkOffset);
+    return reinterpret_cast<VColor*>(ymMelt->m_workArea + GetYmMeltDataOffsets(offsets)->m_colorWorkOffset);
 }
 
 void CalcPolygonHeight(PYmMelt*, VERTEX_DATA*, _GXColor*, float);
@@ -76,7 +76,7 @@ void pppRenderYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offse
 {
     YmMeltWork* work;
     VERTEX_DATA* vertexData;
-    YmMeltColorWork* colorWork;
+    VColor* colorWork;
     pppShapeSt* shape;
     CTexture* texture;
     int textureIndex;
@@ -290,7 +290,7 @@ void pppFrameYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offset
     int vertexCount;
     int angleSeed;
     YmMeltWork* work;
-    YmMeltColorWork* colorWork;
+    VColor* colorWork;
     VERTEX_DATA* vertexBase;
     float matrixY;
 

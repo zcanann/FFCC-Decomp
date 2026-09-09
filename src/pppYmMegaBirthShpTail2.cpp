@@ -133,7 +133,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
             const s32 trailMaxIndex = *(u8*)(particle + 0x37) - 1;
             s32 trailNextIndex;
             const float stepDivisor = (float)((s32)drawCount - 1);
-            const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / 16384.0f;
+            const float alphaScale = (float)colorWork->m_alpha / 16384.0f;
             float fadeA = (float)step->m_colorStart.a * alphaScale;
             const float fadeANum = fadeA - (float)step->m_colorEnd.a * alphaScale;
             float fadeRGB[3];
@@ -468,7 +468,7 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
           PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, _PARTICLE_DATA* particleData,
           VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
-    s32 alpha = ((u8*)vColor)[0xb];
+    s32 alpha = vColor->m_color.rgba[3];
     u8* color = (u8*)particleData;
     float* blend = (float*)(color + 0x30);
     float* velocityScale = (float*)(color + 0x28);
@@ -519,7 +519,7 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
     historyIndex = frameState[8];
 
     PSMTXMultVec(pppPObject->m_localMatrix.value, (Vec*)(color + 0x0),
-                 (Vec*)(color + historyIndex * sizeof(VColor) + 0x40));
+                 (Vec*)(color + historyIndex * sizeof(Vec) + 0x40));
 
     frameIndex = *(u16*)(color + 0x1e);
     shapeAnim =
@@ -840,7 +840,7 @@ path:
 
 done:
     if (param->m_fadeInFrames != 0) {
-        *(float*)(particleBytes + 0x30) = (float)vColor->m_alpha;
+        *(float*)(particleBytes + 0x30) = (float)vColor->m_color.rgba[3];
         particleBytes[0x35] = param->m_fadeInFrames;
     }
     if (param->m_fadeOutFrames != 0) {

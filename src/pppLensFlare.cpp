@@ -30,9 +30,9 @@ static inline LensFlareWork* GetLensFlareWork(pppColum* obj, _pppCtrlTable* ctrl
 	return reinterpret_cast<LensFlareWork*>(obj->m_workArea + GetLensFlareDataOffsets(ctrlTable)->m_workOffset);
 }
 
-static inline _pppColorWork* GetLensFlareColorWork(pppColum* obj, _pppCtrlTable* ctrlTable)
+static inline VColor* GetLensFlareColorWork(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
-	return reinterpret_cast<_pppColorWork*>(obj->m_workArea + GetLensFlareDataOffsets(ctrlTable)->m_colorWorkOffset);
+	return reinterpret_cast<VColor*>(obj->m_workArea + GetLensFlareDataOffsets(ctrlTable)->m_colorWorkOffset);
 }
 
 /*
@@ -47,7 +47,7 @@ static inline _pppColorWork* GetLensFlareColorWork(pppColum* obj, _pppCtrlTable*
 void pppRenderLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTable)
 {
 	LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);
-	_pppColorWork* colorWork = GetLensFlareColorWork(obj, ctrlTable);
+	VColor* colorWork = GetLensFlareColorWork(obj, ctrlTable);
 	s32 dataValIndex = unkB->m_dataValIndex;
 
 	if (dataValIndex != 0xFFFF) {
@@ -78,9 +78,9 @@ void pppRenderLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTa
 
 			GXLoadPosMtxImm(local_54, 0);
 
-			local_70.rgba[0] = colorWork->result.r;
-			local_70.rgba[1] = colorWork->result.g;
-			local_70.rgba[2] = colorWork->result.b;
+			local_70.rgba[0] = colorWork->m_color.rgba[0];
+			local_70.rgba[1] = colorWork->m_color.rgba[1];
+			local_70.rgba[2] = colorWork->m_color.rgba[2];
 			local_70.rgba[3] = work->m_alpha;
 
 			pppSetDrawEnv(
@@ -108,8 +108,8 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTab
 {
 	if (ppvUserStopPartF == 0) {
 		LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);
-		_pppColorWork* colorWork = GetLensFlareColorWork(obj, ctrlTable);
-		u8 sourceAlpha = colorWork->result.a;
+		VColor* colorWork = GetLensFlareColorWork(obj, ctrlTable);
+		u8 sourceAlpha = colorWork->m_color.rgba[3];
 		float projX = ppvMng->m_matrix.value[0][3];
 		float projY = ppvMng->m_matrix.value[1][3];
 		float projZ = ppvMng->m_matrix.value[2][3];

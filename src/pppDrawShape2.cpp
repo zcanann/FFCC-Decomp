@@ -11,7 +11,7 @@ STATIC_ASSERT(offsetof(pppShapeAnimData, m_frameCount) == 0x6);
 STATIC_ASSERT(offsetof(pppShapeAnimData, m_frames) == 0x10);
 STATIC_ASSERT(offsetof(ShapeRuntimeData, shapeDataOffset) == 0x0);
 STATIC_ASSERT(offsetof(ShapeRuntimeData, posDataOffset) == 0x4);
-STATIC_ASSERT(offsetof(ShapePositionData, color) == 0x8);
+STATIC_ASSERT(offsetof(VColor, m_color) == 0x8);
 
 static inline ShapeRuntimeData* GetDrawShape2RuntimeData(_pppCtrlTable* ctrlTable)
 {
@@ -30,7 +30,7 @@ static inline ShapeRuntimeData* GetDrawShape2RuntimeData(_pppCtrlTable* ctrlTabl
 void pppDrawShape2(_pppPObject* object, Shape2ControlData* controlData, _pppCtrlTable* ctrlTable){
     ShapeRuntimeData* runtimeData = GetDrawShape2RuntimeData(ctrlTable);
     ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
-    ShapePositionData* posData = (ShapePositionData*)(object->m_workArea + runtimeData->posDataOffset);
+    VColor* posData = (VColor*)(object->m_workArea + runtimeData->posDataOffset);
     s32 type = controlData->type;
 
     if (type == 0xFFFF) {
@@ -43,7 +43,7 @@ void pppDrawShape2(_pppPObject* object, Shape2ControlData* controlData, _pppCtrl
     void* drawShape = (u8*)shapeSpec + shape->m_shapeOffset;
 
     pppSetDrawEnv(
-        &posData->color,
+        &posData->m_color,
         &object->m_drawMatrix,
         controlData->scale,
         controlData->param15,

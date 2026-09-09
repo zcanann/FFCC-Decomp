@@ -65,11 +65,6 @@ struct YmTracer2Work {
     u16 pad32;
 };
 
-struct YmTracer2ColorBlock {
-    u8 pad[8];
-    pppCVECTOR color;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

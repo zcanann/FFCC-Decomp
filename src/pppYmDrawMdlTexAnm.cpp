@@ -26,11 +26,6 @@ struct pppYmDrawMdlTexAnmWork {
     f32 m_perV;
 };
 
-struct pppYmDrawMdlTexAnmColorBlock {
-    u8 _pad0[8];
-    pppCVECTOR m_color;
-};
-
 STATIC_ASSERT(sizeof(pppYmDrawMdlTexAnmDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(pppYmDrawMdlTexAnmDataOffsets, m_colorBlockOffset) == 0x0);
 STATIC_ASSERT(offsetof(pppYmDrawMdlTexAnmDataOffsets, m_workOffset) == 0x8);
@@ -56,10 +51,9 @@ static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(_pppPObjLink* objec
     return GetYmDrawMdlTexAnmWork(reinterpret_cast<_pppPObject*>(object), ctrl);
 }
 
-static inline pppYmDrawMdlTexAnmColorBlock* GetYmDrawMdlTexAnmColorBlock(_pppPObject* object,
-                                                                         _pppCtrlTable* ctrl)
+static inline VColor* GetYmDrawMdlTexAnmColorBlock(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<pppYmDrawMdlTexAnmColorBlock*>(
+    return reinterpret_cast<VColor*>(
         object->m_workArea + GetYmDrawMdlTexAnmDataOffsets(ctrl)->m_colorBlockOffset);
 }
 
@@ -98,15 +92,15 @@ extern "C" {
  * --INFO--
  * PAL Address: 8008a38c
  * PAL Size: 632b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80089D28
+ * EN Size: 632b
  * JP Address: TODO
  * JP Size: TODO
  */
 void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, _pppCtrlTable* ctrl)
 {
     pppModelSt* model;
-    u8* colorBase;
+    VColor* color;
     pppFMATRIX matrix;
     u8* initBytes;
     u8* stepBytes;
@@ -116,7 +110,7 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
         return;
     }
 
-    colorBase = reinterpret_cast<u8*>(GetYmDrawMdlTexAnmColorBlock(object, ctrl));
+    color = GetYmDrawMdlTexAnmColorBlock(object, ctrl);
 
     pppUnitMatrix(matrix);
     matrix.value[2][2] *= kYmDrawMdlTexAnmMirrorZScale;
@@ -127,7 +121,7 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
     initBytes = (u8*)&step->m_initWOrk;
     stepBytes = (u8*)&step->m_stepValue;
     pppSetDrawEnv(
-        reinterpret_cast<pppCVECTOR*>(colorBase + 8), &object->m_drawMatrix, step->m_arg3,
+        &color->m_color, &object->m_drawMatrix, step->m_arg3,
         step->m_texAnm.m_drawEnvColor0, initBytes[2], initBytes[1], initBytes[3], stepBytes[0], stepBytes[1],
         stepBytes[2]);
 

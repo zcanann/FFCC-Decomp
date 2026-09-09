@@ -3,6 +3,11 @@
 
 #include <Dolphin/mtx.h>
 
+struct pppCVECTOR
+{
+    unsigned char rgba[4];
+};
+
 struct pppFMATRIX
 {
     Mtx value;

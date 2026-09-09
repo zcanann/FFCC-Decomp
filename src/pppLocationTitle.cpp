@@ -19,7 +19,7 @@ STATIC_ASSERT(sizeof(LocationTitleParticle) == 0x1C);
 STATIC_ASSERT(offsetof(LocationTitleParticle, m_color) == 0x0C);
 STATIC_ASSERT(offsetof(LocationTitleParticle, m_frame) == 0x10);
 STATIC_ASSERT(offsetof(LocationTitleParticle, m_shapeB) == 0x18);
-STATIC_ASSERT(offsetof(LocationTitleColorBlock, m_color) == 0x08);
+STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
 STATIC_ASSERT(sizeof(LocationTitleDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(LocationTitleDataOffsets, m_workOffset) == 0x00);
 STATIC_ASSERT(offsetof(LocationTitleDataOffsets, m_colorOffset) == 0x04);
@@ -37,10 +37,10 @@ static inline LocationTitleWork* GetLocationTitleWork(pppLocationTitle* location
         locationTitle->m_workArea + GetLocationTitleDataOffsets(offsets)->m_workOffset);
 }
 
-static inline LocationTitleColorBlock* GetLocationTitleColorBlock(
+static inline VColor* GetLocationTitleColorBlock(
     pppLocationTitle* locationTitle, pppLocationTitleOffsets* offsets)
 {
-    return reinterpret_cast<LocationTitleColorBlock*>(
+    return reinterpret_cast<VColor*>(
         locationTitle->m_workArea + GetLocationTitleDataOffsets(offsets)->m_colorOffset);
 }
 
@@ -156,7 +156,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
     int startIndex;
     LocationTitleParticle* dst;
     LocationTitleWork* work;
-    LocationTitleColorBlock* colorData;
+    VColor* colorData;
     int graphFrame;
     pppShapeAnimData* shapeAnim;
     LocationTitleParticle* particles;

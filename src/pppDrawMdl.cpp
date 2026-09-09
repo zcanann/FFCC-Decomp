@@ -9,7 +9,7 @@ STATIC_ASSERT(offsetof(PDrawMdl, m_modelIndex) == 0x04);
 STATIC_ASSERT(offsetof(PDrawMdl, m_blendMode) == 0x09);
 STATIC_ASSERT(offsetof(PDrawMdl, m_texScale) == 0x10);
 STATIC_ASSERT(offsetof(PDrawMdl, m_drawA) == 0x14);
-STATIC_ASSERT(offsetof(_pppColorWork, result) == 0x08);
+STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
 
 STATIC_ASSERT(sizeof(DrawMdlDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(DrawMdlDataOffsets, m_colorWorkOffset) == 0x0);
@@ -21,10 +21,10 @@ static inline DrawMdlDataOffsets* PppDrawMdlDataOffsets(_pppCtrlTable* ctrl)
 
 static inline pppCVECTOR* PppDrawMdlColor(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    _pppColorWork* colorWork =
-        reinterpret_cast<_pppColorWork*>(obj->m_workArea + PppDrawMdlDataOffsets(ctrl)->m_colorWorkOffset);
+    VColor* colorWork =
+        reinterpret_cast<VColor*>(obj->m_workArea + PppDrawMdlDataOffsets(ctrl)->m_colorWorkOffset);
 
-    return reinterpret_cast<pppCVECTOR*>(&colorWork->result);
+    return &colorWork->m_color;
 }
 
 /*

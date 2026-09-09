@@ -28,11 +28,6 @@ struct MiasmaFrameWork {
     s16 m_accel[4];
 };
 
-struct MiasmaColorWork {
-    u8 m_pad[8];
-    GXColor m_color;
-};
-
 struct MiasmaRadiusWork {
     float m_scale;
 };
@@ -41,7 +36,7 @@ STATIC_ASSERT(offsetof(MiasmaFrameWork, m_position) == 0x00);
 STATIC_ASSERT(offsetof(MiasmaFrameWork, m_velocity) == 0x08);
 STATIC_ASSERT(offsetof(MiasmaFrameWork, m_accel) == 0x10);
 STATIC_ASSERT(sizeof(MiasmaFrameWork) == 0x18);
-STATIC_ASSERT(offsetof(MiasmaColorWork, m_color) == 0x08);
+STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
 STATIC_ASSERT(sizeof(MiasmaRadiusWork) == 0x04);
 
 STATIC_ASSERT(sizeof(MiasmaDataOffsets) == 0x10);
@@ -59,9 +54,9 @@ static inline MiasmaFrameWork* GetMiasmaFrameWork(pppMiasma* miasma, _pppCtrlTab
     return reinterpret_cast<MiasmaFrameWork*>(miasma->m_workArea + GetMiasmaDataOffsets(ctrl)->m_frameWorkOffset);
 }
 
-static inline MiasmaColorWork* GetMiasmaColorWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
+static inline VColor* GetMiasmaColorWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<MiasmaColorWork*>(miasma->m_workArea + GetMiasmaDataOffsets(ctrl)->m_colorWorkOffset);
+    return reinterpret_cast<VColor*>(miasma->m_workArea + GetMiasmaDataOffsets(ctrl)->m_colorWorkOffset);
 }
 
 static inline MiasmaRadiusWork* GetMiasmaRadiusWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
@@ -233,7 +228,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
 {
     pppModelSt* model;
     MiasmaFrameWork* work;
-    MiasmaColorWork* colorWork;
+    VColor* colorWork;
     MiasmaRadiusWork* radiusWork;
     pppCVECTOR drawColor;
     PackedMiasmaColor packedWork;
@@ -287,7 +282,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         param_2->m_miasma.m_alphaScale = 0xFE;
     }
 
-    packedColor.color = colorWork->m_color;
+    packedColor.color.r = colorWork->m_color.rgba[0];
+    packedColor.color.g = colorWork->m_color.rgba[1];
+    packedColor.color.b = colorWork->m_color.rgba[2];
+    packedColor.color.a = colorWork->m_color.rgba[3];
     packedWork.bytes[0] = (u8)(work->m_position[0] >> 7);
     packedWork.bytes[1] = (u8)(work->m_position[1] >> 7);
     packedWork.bytes[2] = (u8)(work->m_position[2] >> 7);

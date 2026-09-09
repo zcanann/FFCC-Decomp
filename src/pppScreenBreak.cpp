@@ -36,11 +36,6 @@ struct ScreenBreakPiece {
     u8 m_pad39[3];
 };
 
-struct ScreenBreakColorData {
-    u8 m_pad0[8];
-    GXColor m_color;
-};
-
 STATIC_ASSERT(offsetof(ScreenBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);
 STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
@@ -53,7 +48,7 @@ STATIC_ASSERT(offsetof(VScreenBreak, m_backBufferTexObj) == 0x10);
 STATIC_ASSERT(offsetof(VScreenBreak, m_extent) == 0x18);
 STATIC_ASSERT(offsetof(VScreenBreak, m_backBufferReady) == 0x24);
 STATIC_ASSERT(offsetof(VScreenBreak, m_color) == 0x28);
-STATIC_ASSERT(offsetof(ScreenBreakColorData, m_color) == 0x08);
+STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
 STATIC_ASSERT(offsetof(PScreenBreak, m_graphPayload) == 0x14);
 STATIC_ASSERT(offsetof(PScreenBreak, m_gravityScale) == 0x18);
 STATIC_ASSERT(offsetof(PScreenBreak, m_gravityDir) == 0x20);
@@ -86,7 +81,7 @@ static inline u32 ScreenBreakMeshNodeIndex(ScreenBreakMeshData* meshData) { retu
 static inline ScreenBreakDataOffsets* GetScreenBreakDataOffsets(_pppCtrlTable* ctrl) { return reinterpret_cast<ScreenBreakDataOffsets*>(ctrl->m_serializedDataOffsets); }
 static inline u8* GetScreenBreakWork(pppScreenBreak* screenBreak, s32 offset) { return screenBreak->m_workArea + offset; }
 static inline VScreenBreak* GetScreenBreakValue(pppScreenBreak* screenBreak, s32 offset) { return reinterpret_cast<VScreenBreak*>(GetScreenBreakWork(screenBreak, offset)); }
-static inline ScreenBreakColorData* GetScreenBreakColorData(pppScreenBreak* screenBreak, s32 offset) { return reinterpret_cast<ScreenBreakColorData*>(GetScreenBreakWork(screenBreak, offset)); }
+static inline VColor* GetScreenBreakColorData(pppScreenBreak* screenBreak, s32 offset) { return reinterpret_cast<VColor*>(GetScreenBreakWork(screenBreak, offset)); }
 
 static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive; }
 
@@ -141,14 +136,17 @@ void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* param_2, _pp
 
     ScreenBreakDataOffsets* offsets = GetScreenBreakDataOffsets(param_3);
     VScreenBreak* value = GetScreenBreakValue(screenBreak, offsets->m_valueOffset);
-    ScreenBreakColorData* colorSource = GetScreenBreakColorData(screenBreak, offsets->m_colorDataOffset);
+    VColor* colorSource = GetScreenBreakColorData(screenBreak, offsets->m_colorDataOffset);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
     model->SetCallbackContext(value, param_2);
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-    value->m_color = colorSource->m_color;
+    value->m_color.r = colorSource->m_color.rgba[0];
+    value->m_color.g = colorSource->m_color.rgba[1];
+    value->m_color.b = colorSource->m_color.rgba[2];
+    value->m_color.a = colorSource->m_color.rgba[3];
     DCFlushRange(&value->m_color, sizeof(value->m_color));
 
     CalcGraphValue(screenBreak, param_2->m_graphId, value->m_graphValue0, value->m_graphValue1, value->m_graphValue2,

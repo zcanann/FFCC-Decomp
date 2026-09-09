@@ -16,12 +16,6 @@
 
 STATIC_ASSERT(offsetof(_pppPObject, m_workArea) == 0x80);
 
-struct YmDeformationMdlColorInfo {
-    u32 m_unk0;
-    u32 m_unk4;
-    pppCVECTOR m_color;
-};
-
 typedef VYmDeformationMdl YmDeformationMdlState;
 
 STATIC_ASSERT(offsetof(YmDeformationMdlDataOffsets, m_colorInfoOffset) == 0x4);
@@ -39,9 +33,9 @@ static inline YmDeformationMdlState* DeformationMdlState(pppYmDeformationMdl* ob
         object->m_workArea + DeformationMdlDataOffsets(ctrl)->m_stateOffset);
 }
 
-static inline YmDeformationMdlColorInfo* DeformationMdlColorInfo(pppYmDeformationMdl* object, _pppCtrlTable* ctrl)
+static inline VColor* DeformationMdlColorInfo(pppYmDeformationMdl* object, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<YmDeformationMdlColorInfo*>(
+    return reinterpret_cast<VColor*>(
         object->m_workArea + DeformationMdlDataOffsets(ctrl)->m_colorInfoOffset);
 }
 
@@ -145,7 +139,7 @@ inline void DisableIndWarp()
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* param_2, _pppCtrlTable* param_3)
 {
     YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl, param_3);
-    YmDeformationMdlColorInfo* colorInfo;
+    VColor* colorInfo;
     CMapMesh* model;
     Mtx indWarpMtx;
     Mtx44 screenMtx;

@@ -54,9 +54,9 @@ static inline ChangeTexWork* GetChangeTexWork(pppChangeTex* changeTex, _pppCtrlT
 	return reinterpret_cast<ChangeTexWork*>(changeTex->m_workArea + GetChangeTexDataOffsets(data)->m_workOffset);
 }
 
-static inline ChangeTexColorBlock* GetChangeTexColorBlock(pppChangeTex* changeTex, _pppCtrlTable* data)
+static inline VColor* GetChangeTexColorBlock(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
-	return reinterpret_cast<ChangeTexColorBlock*>(
+	return reinterpret_cast<VColor*>(
 	    changeTex->m_workArea + GetChangeTexDataOffsets(data)->m_colorBlockOffset);
 }
 
@@ -99,7 +99,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 	}
 
 	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
-	ChangeTexColorBlock* colorBlock = GetChangeTexColorBlock(changeTex, data);
+	VColor* colorBlock = GetChangeTexColorBlock(changeTex, data);
 	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 

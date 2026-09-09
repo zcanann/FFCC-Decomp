@@ -59,17 +59,6 @@ public:
 		m_min.y = position->y;
 		m_max.y = position->y + rangeY;
 	}
-	CBound(float min, float max)
-	{
-		float lo = min;
-		float hi = max;
-		m_min.z = lo;
-		m_min.y = lo;
-		m_min.x = lo;
-		m_max.z = hi;
-		m_max.y = hi;
-		m_max.x = hi;
-	}
 	static void SetFrustum(Vec&, float(*)[4]);
 	int CheckFrustum0(CBound&);
 	int CheckFrustum0(float);

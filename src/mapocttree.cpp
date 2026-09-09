@@ -10,13 +10,11 @@
 #include "ffcc/p_light.h"
 #include "ffcc/system.h"
 
-static const float kMapOctTreeBoundMinInit = 10000000000.0f;
-static const float kMapOctTreeBoundMaxInit = -10000000000.0f;
 static const float kMapOctTreeRadiusPad = 1.0f;
 static const float kMapOctTreeDefaultOffsetZ = 0.0f;
 
 static CBound s_bound;
-static CMapCylinder s_cyl(kMapOctTreeBoundMinInit, kMapOctTreeBoundMaxInit);
+static CMapCylinder s_cyl;
 static Vec s_mvec;
 static unsigned long s_insertLightBitIndex = 0;
 static unsigned long s_insertShadowBitIndex = 0;

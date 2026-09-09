@@ -25,8 +25,6 @@ static const f32 kPppLaserOne = 1.0f;
 static const f32 kPppLaserDebugPointScale = 2.0f;
 static const f32 kPppLaserMaxLengthDisabled = -1.0f;
 static const f32 kPppLaserAxisScale = 1.2f;
-static const f32 kPppLaserBoundsMax = 10000000000.0f;
-static const f32 kPppLaserBoundsMin = -10000000000.0f;
 static const f32 kPppLaserMaxLengthMargin = 15.5f;
 static const f32 kPppLaserTau = 6.2831855f;
 
@@ -255,9 +253,7 @@ extern "C" void pppFrameLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCtr
         pppSubVector(localA, work->m_points[i], work->m_origin);
         PSVECScale(&localA, &localA, LaserConst(kPppLaserAxisScale));
 
-        f32 boundsMax = LaserConst(kPppLaserBoundsMax);
-        f32 boundsMin = LaserConst(kPppLaserBoundsMin);
-        CMapCylinder cyl(boundsMax, boundsMin);
+        CMapCylinder cyl;
         cyl.m_bottom = work->m_origin;
         cyl.m_axis = localA;
         cyl.m_radius = LaserConst(kPppLaserZero);

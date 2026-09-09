@@ -32,8 +32,8 @@ extern "C" const char sOldMidFormat[] = {
     (char)0xC5, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
 };
 
-CMapCylinder g_hit_cyl(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
-CMapCylinder g_hit_cyl_min(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
+CMapCylinder g_hit_cyl;
+CMapCylinder g_hit_cyl_min;
 Vec g_hit_mvec;
 Vec g_hit_mvec_min;
 Vec g_hit_hpv;
@@ -850,7 +850,6 @@ CMapHit::~CMapHit()
  * JP Size: TODO
  */
 CMapHit::CMapHit()
-    : m_bound(kMapHitBoundsMinInit, kMapHitBoundsMaxInit)
 {
     m_vertexCount = 0;
     m_faceCount = 0;

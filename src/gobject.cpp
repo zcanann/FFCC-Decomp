@@ -211,8 +211,6 @@ static const char s_noTurnMotion[36] =
     "\203\136\201\133\203\223\203\202\201\133\203\126\203\207\203\223"
     "\202\315\202\240\202\350\202\334\202\271\202\361\201\102\012";
 extern "C" const float sAnimFrameOffset;                    // FLOAT_80330338
-extern "C" const float sHugeCylinderExtent; // FLOAT_8033033c
-extern "C" const float sNegHugeCylinderExtent; // FLOAT_80330340
 extern "C" const float sQuarterTurn;         // FLOAT_80330344
 extern "C" const double sLoopBias;                    // DOUBLE_80330378
 extern "C" const float sZeroFloat;                    // FLOAT_80330350
@@ -414,8 +412,8 @@ void CGObject::PutDropItem()
  * --INFO--
  * PAL Address: 0x8007bf34
  * PAL Size: 644b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8007B8E8
+ * EN Size: 644b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -438,7 +436,7 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     hitMove.y = sZeroFloat;
 
     const float hitRadius = m_capsuleHalfHeight;
-    CMapCylinder hitCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
+    CMapCylinder hitCylinder;
     hitCylinder.m_bottom = centerPos;
     hitCylinder.m_axis.x = hitMove.x;
     hitCylinder.m_axis.y = sZeroFloat;
@@ -458,7 +456,7 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
         const float safeRadius = m_capsuleHalfHeight;
         hitMove.z = (safeRadius + other->m_capsuleHalfHeight) * cosRot;
 
-        CMapCylinder safeCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
+        CMapCylinder safeCylinder;
         safeCylinder.m_bottom = centerPos;
         safeCylinder.m_axis = hitMove;
         safeCylinder.m_radius = safeRadius;
@@ -627,7 +625,7 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             direction.y = sDownUnitY;
             direction.z = sZeroFloat;
             const u32 hitMask = m_bgHitMask;
-            CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
+            CMapCylinder bodyCylinder;
             bodyCylinder.m_bottom.x = bottom.x;
             bodyCylinder.m_bottom.y = bottomY;
             bodyCylinder.m_bottom.z = bottom.z;
@@ -648,7 +646,7 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             hasModel = true;
         }
         if (hasModel) {
-            if (checkProbeHit(&CMapCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent),
+            if (checkProbeHit(&CMapCylinder(),
                     &CVector(m_worldPosition.x, sStepProbeHeight + m_worldPosition.y, m_worldPosition.z),
                     &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat), 0x78000000) != 0) {
                 switch (gMapHitFace->m_groupIndex - 0x28) {
@@ -2453,7 +2451,7 @@ void CGObject::bgAttribCollision()
     m_shieldNodeFlagBits.m_bit20 = 0;
 
     if ((m_displayFlags & 4) != 0) {
-        if (checkProbeHit(&CMapCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent),
+        if (checkProbeHit(&CMapCylinder(),
                 &CVector(m_worldPosition.x, sHitProbeHeight + m_worldPosition.y, m_worldPosition.z),
                 &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat),
                 0x80000000) != 0) {
@@ -2473,7 +2471,7 @@ void CGObject::bgAttribCollision()
         const float cmpZero = sZeroFloat;
         if ((cmpZero != m_groundHitOffset.x) || (cmpZero != m_groundHitOffset.z)) {
             if (HasLoadedModel(m_charaModelHandle)) {
-                if (checkProbeHit(&CMapCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent),
+                if (checkProbeHit(&CMapCylinder(),
                         &CVector(m_worldPosition.x, sStepProbeHeight + m_worldPosition.y, m_worldPosition.z),
                         &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat), 0x78000000) != 0) {
                     switch (gMapHitFace->m_groupIndex - 0x28) {
@@ -2504,8 +2502,8 @@ void CGObject::bgAttribCollision()
  * --INFO--
  * PAL Address: 0x800804a4
  * PAL Size: 560b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8007FE40
+ * EN Size: 560b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2522,7 +2520,7 @@ void CGObject::bgWorldCollision()
     CVector hitMove = vecScale(CVector(-radial.x, -radial.y, -radial.z), sHitMoveScale);
 
     const u32 hitMask = m_bgHitMask;
-    CMapCylinder bodyCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
+    CMapCylinder bodyCylinder;
     bodyCylinder.m_bottom = radial;
     bodyCylinder.m_axis.x = hitMove.x;
     bodyCylinder.m_axis.y = hitMove.y;
@@ -2551,8 +2549,8 @@ void CGObject::bgWorldCollision()
  * --INFO--
  * PAL Address: 0x800806d4
  * PAL Size: 1428b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80080070
+ * EN Size: 1428b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2580,15 +2578,11 @@ void CGObject::bgNormalCollision()
 
     unsigned int retry = 4;
     double epsilon;
-    float boundMax;
-    float boundMin;
-    boundMin = sHugeCylinderExtent;
-    boundMax = sNegHugeCylinderExtent;
     epsilon = DOUBLE_80330400;
     do {
         const unsigned long hitMask = m_bgHitMask;
         const float radius = m_capsuleHalfHeight;
-        CMapCylinder bodyCylinder(boundMin, boundMax);
+        CMapCylinder bodyCylinder;
         bodyCylinder.m_bottom = pos;
         bodyCylinder.m_axis = move;
         bodyCylinder.m_radius = radius;
@@ -2631,7 +2625,7 @@ void CGObject::bgNormalCollision()
     {
         const unsigned long stepHitMask = m_bgHitMask;
         const float stepRadius = m_capsuleHalfHeight;
-        CMapCylinder stepCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
+        CMapCylinder stepCylinder;
         stepCylinder.m_bottom = pos;
         stepCylinder.m_axis.x = sZeroFloat;
         stepCylinder.m_axis.y = move.y;
@@ -2657,7 +2651,7 @@ void CGObject::bgNormalCollision()
     if (MapMng.m_hitMapObj->CalcHitSlide(&move, sBgAttrNormal) != 0) {
         const unsigned long slideHitMask = m_bgHitMask;
         const float slideRadius = m_capsuleHalfHeight;
-        CMapCylinder hitCylinder(sHugeCylinderExtent, sNegHugeCylinderExtent);
+        CMapCylinder hitCylinder;
         hitCylinder.m_bottom = pos;
         hitCylinder.m_axis = move;
         hitCylinder.m_radius = slideRadius;

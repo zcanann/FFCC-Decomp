@@ -21,8 +21,6 @@ extern const float kItemObjUnitScale = 1.0f;
 extern const float kItemObjHeightOffset = 10.0f;
 extern const float kItemObjZero = 0.0f;
 extern const float kItemObjGroundProbeDown = -2000.0f;
-extern const float kItemObjBoundsInitMin = 10000000000.0f;
-extern const float kItemObjBoundsInitMax = -10000000000.0f;
 extern const float kItemObjFontAlphaMax = 255.0f;
 extern const float kItemObjScreenHalfHeight = 224.0f;
 extern const float kItemObjScreenHalfWidth = 320.0f;
@@ -180,7 +178,7 @@ void CGItemObj::ItemJump(int state, float jump)
 			move.z = kItemObjZero;
 			move.y = kItemObjGroundProbeDown;
 			unsigned int mapMask = object->m_bgHitMask;
-			CMapCylinder cylinder(kItemObjBoundsInitMin, kItemObjBoundsInitMax);
+			CMapCylinder cylinder;
 			cylinder.m_bottom = bottom;
 			cylinder.m_axis.x = kItemObjZero;
 			cylinder.m_axis.y = kItemObjGroundProbeDown;

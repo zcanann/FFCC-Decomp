@@ -421,7 +421,7 @@ void CalcPolygonHeight(
         rayDirection.z = zero;
         pppAddVector(vertex->m_position, vertex->m_position, worldBase);
 
-        CMapCylinder cylinder(10000000000.0f, -10000000000.0f);
+        CMapCylinder cylinder;
         cylinder.m_bottom = vertex->m_position;
         cylinder.m_axis.x = rayDirection.x;
         cylinder.m_axis.y = rayDirection.y;

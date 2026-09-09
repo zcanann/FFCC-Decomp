@@ -317,16 +317,14 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 
 static const f32 kPppYmLaserHistoryBackstep = -1.0f;
 static const f32 kPppYmLaserHitRayScale = 1.2f;
-static const f32 kPppYmLaserCylinderMax = 10000000000.0f;
-static const f32 kPppYmLaserCylinderMin = -10000000000.0f;
 static const f32 kPppYmLaserFullTurn = 6.2831855f;
 
 /*
  * --INFO--
  * PAL Address: 0x800d31d4
  * PAL Size: 1308b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800D29A0
+ * EN Size: 1308b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -401,7 +399,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 		pppSubVector(localA, work->m_points[i], work->m_origin);
 		PSVECScale(&localA, &localA, LoadLaserFloat(kPppYmLaserHitRayScale));
 
-		CMapCylinder cyl(LoadLaserFloat(kPppYmLaserCylinderMin), LoadLaserFloat(kPppYmLaserCylinderMax));
+		CMapCylinder cyl;
 		cyl.m_bottom = work->m_origin;
 		cyl.m_axis = localA;
 		cyl.m_radius = LoadLaserFloat(kPppYmLaserZero);

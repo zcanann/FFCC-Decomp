@@ -96,7 +96,7 @@ public:
         float m_scale;
     };
 
-    CCameraPcs() : m_shadowRectBound(10000000000.0f, -10000000000.0f)
+    CCameraPcs()
     {
     }
 

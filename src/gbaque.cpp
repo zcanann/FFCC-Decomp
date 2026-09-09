@@ -4624,7 +4624,7 @@ void GbaQueue::SetControllerMode(int controllerMode)
 unsigned int GbaQueue::GetControllerMode()
 {
 	char mode;
-	unsigned int result;
+	bool result;
 	int i;
 
 	i = 0;
@@ -4771,7 +4771,7 @@ void GbaQueue::SetPauseMode(int mode)
 unsigned int GbaQueue::GetPauseMode()
 {
 	char mode;
-	unsigned int result;
+	bool result;
 	int i;
 
 	i = 0;

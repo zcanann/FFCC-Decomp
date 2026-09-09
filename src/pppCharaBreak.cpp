@@ -165,7 +165,6 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTab
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_lifetimes off
 void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtrlTable* data)
 {
     CharaBreakWork* work;
@@ -331,7 +330,6 @@ fail:
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_lifetimes on
 void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_pppCharaBreak_cpp), 0x319);

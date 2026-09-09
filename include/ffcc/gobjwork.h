@@ -10,6 +10,9 @@ struct CRomWork
     {
         DataHalfwordCount = (0x1D0 - 0x10) / sizeof(unsigned short),
         ElementResistanceOffset = 0x6F,
+        EnemyKindOffset = 0x7E,
+        EnemyFlagsOffset = 0x7F,
+        ShoukiDamageIntervalOffset = 0x7A,
         MonsterParams0Offset = 0x4E,
         MonsterParams1Offset = 0x52,
     };
@@ -91,13 +94,15 @@ public:
     unsigned short m_defense;               // 0x0022
     unsigned short* m_romWork;              // 0x0024
     unsigned short* RomStatusBlock() { return m_elementResistances; }
-    unsigned short m_elementResistances[8]; // 0x0028 physical, fire, freeze, stun, slow, stop, gravity, holy
-    unsigned short m_statusTimers[42];      // 0x0038
+    unsigned short m_elementResistances[RomStatusBlockHalfwordCount]; // 0x0028
+    unsigned short m_statusTimers[39];      // 0x003E
     unsigned short m_statusValues[16];      // 0x008C-0xAB
 }; // Size: 0xAC
 
 STATIC_ASSERT(sizeof(CGObjWork) == 0xAC);
-STATIC_ASSERT(offsetof(CGObjWork, m_statusTimers) == 0x38);
+STATIC_ASSERT(offsetof(CGObjWork, m_elementResistances) == 0x28);
+STATIC_ASSERT(offsetof(CGObjWork, m_statusTimers) == 0x3E);
+STATIC_ASSERT(offsetof(CGObjWork, m_statusValues) == 0x8C);
 
 class CMonWork : public CGObjWork
 {
@@ -285,10 +290,12 @@ public:
 
     short m_equipment[4];                       // 0x00AC weapon[0], armor[1], tribal[2], accessory[3]
     unsigned short m_inventoryItemCount;        // 0x00B4
-    short m_inventoryItems[64];                 // 0x00B6
-    enum { kPermanentArtifactCount = 96, kTemporaryArtifactCount = 4,
-           kArtifactCount = kPermanentArtifactCount + kTemporaryArtifactCount };
-    short m_artifacts[kArtifactCount];          // 0x0136, temporary artifacts start at 0x01F6
+    enum { kInventoryCapacity = 64, kPermanentArtifactCount = 96, kTemporaryArtifactCount = 4,
+           kArtifactCount = kPermanentArtifactCount + kTemporaryArtifactCount,
+           kPermanentArtifactStart = kInventoryCapacity,
+           kTemporaryArtifactStart = kPermanentArtifactStart + kPermanentArtifactCount,
+           kItemSlotCount = kInventoryCapacity + kArtifactCount };
+    short m_inventoryItems[kItemSlotCount];     // 0x00B6: inventory, permanent artifacts, temporary artifacts
     unsigned char m_treasureFlags;              // 0x01FE
     unsigned char m_moneyFlags;                 // 0x01FF
     int m_gil;                                  // 0x0200
@@ -298,7 +305,7 @@ public:
     short m_weaponIdx;                          // 0x0226
     short m_backupEquipment[4];                 // 0x0228
     unsigned short m_backupInventoryItemCount;  // 0x0230
-    unsigned char m_backupInventoryBlock[328];  // 0x0232
+    short m_backupItems[kItemSlotCount];        // 0x0232
     unsigned char m_backupTreasureFlags;        // 0x037A
     unsigned char m_backupMoneyFlags;           // 0x037B
     int m_backupGil;                            // 0x037C
@@ -324,7 +331,7 @@ public:
     CLetterWork m_letters[100];                 // 0x03EC
     unsigned int m_evtState0;                   // 0x089C
     unsigned int m_evtState1;                   // 0x08A0
-    unsigned short m_evtWorkArr[128];           // 0x08A4
+    unsigned char m_evtFlags[256];           // 0x08A4
     short m_evtWordArr[256];                    // 0x09A4
     unsigned char m_bonusCondition;             // 0x0BA4
     unsigned char m_shopBusyFlag;               // 0x0BA5
@@ -359,9 +366,58 @@ public:
     int m_shopData2;                            // 0x0C2C
 }; // Size 0xC30
 
+/*
+ * --INFO--
+ * PAL Address: 0x800B9264
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CCaravanWork::SetEvtFlag(int evtFlagIndex, int value)
+{
+    if (value != 0) {
+        int byteIndex = evtFlagIndex / 8;
+        int bit = 1 << (evtFlagIndex % 8);
+        m_evtFlags[byteIndex] |= bit;
+        return;
+    }
+
+    {
+        int byteIndex = evtFlagIndex / 8;
+        int bit = 1 << (evtFlagIndex % 8);
+        m_evtFlags[byteIndex] &= ~bit;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B92DC
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CCaravanWork::GetEvtFlag(int evtFlagIndex)
+{
+    int byteIndex = evtFlagIndex / 8;
+    unsigned char value = m_evtFlags[byteIndex];
+    int mask = 1 << (evtFlagIndex % 8);
+    unsigned int flag = value & mask;
+
+    return flag != 0;
+}
+
 STATIC_ASSERT(sizeof(CCaravanWork) == 0xC30);
-STATIC_ASSERT(offsetof(CCaravanWork, m_artifacts) == 0x136);
-STATIC_ASSERT(offsetof(CCaravanWork, m_artifacts) + CCaravanWork::kPermanentArtifactCount * sizeof(short) == 0x1F6);
+STATIC_ASSERT(offsetof(CCaravanWork, m_inventoryItems) == 0xB6);
+STATIC_ASSERT(offsetof(CCaravanWork, m_inventoryItems) + CCaravanWork::kPermanentArtifactStart * sizeof(short) == 0x136);
+STATIC_ASSERT(offsetof(CCaravanWork, m_inventoryItems) + CCaravanWork::kTemporaryArtifactStart * sizeof(short) == 0x1F6);
+STATIC_ASSERT(offsetof(CCaravanWork, m_backupItems) == 0x232);
+STATIC_ASSERT(sizeof(((CCaravanWork*)0)->m_inventoryItems) == 328);
+STATIC_ASSERT(offsetof(CCaravanWork, m_evtFlags) == 0x8A4);
+STATIC_ASSERT(offsetof(CCaravanWork, m_evtWordArr) == 0x9A4);
 STATIC_ASSERT(offsetof(CCaravanWork, m_treasureFlags) == 0x1FE);
 STATIC_ASSERT(sizeof(CCaravanWork::CLetterWork) == 0x0C);
 STATIC_ASSERT(sizeof(CRomLetterWork) == 0x3E);

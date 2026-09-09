@@ -112,14 +112,14 @@ static inline float LoadFloat(const float& value)
 static inline void ClearManaModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
-    model->m_afterMeshDrawCallback = 0;
+    model->m_beforeDrawModelCallback = 0;
     model->SetDrawMeshDLCallback(0);
 }
 
 static inline void SetManaModelCallbacks(CChara::CModel* model, void* work, pppYmManaStep* step)
 {
     model->SetCallbackContext(work, step);
-    model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana_BeforeDrawCallback;
+    model->m_beforeDrawModelCallback = Mana_BeforeDrawCallback;
     model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
 }
 
@@ -585,9 +585,6 @@ static int RenderWaterMesh(VYmMana* mana)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_dead_assignments off
-#pragma opt_common_subs off
 static int UpdateWaterMesh(VYmMana* mana)
 {
     float* waterHeightA;
@@ -680,8 +677,6 @@ static int UpdateWaterMesh(VYmMana* mana)
                               mana->m_waterMtx, mana->m_colors, mana->m_texCoord1);
     return 1;
 }
-#pragma opt_common_subs reset
-#pragma pop
 
 /*
  * --INFO--
@@ -993,7 +988,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
-    model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana_BeforeDrawCallback;
+    model->m_beforeDrawModelCallback = Mana_BeforeDrawCallback;
     model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
 
     if (Game.m_currentMapId == 0x21) {
@@ -1029,8 +1024,6 @@ void pppRenderYmMana(PYmMana*, pppYmManaStep*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_lifetimes off
 void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* param_3)
 {
     u32 texBufferSize;
@@ -1070,9 +1063,9 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
 
     SetManaModelCallbacks(model, mana, param_2);
 
-    u8 manaAlpha = (u8)((float)*(setupArea + 0xB) * gObject->m_lookAtTimer);
+    u8 manaAlpha = (u8)((float)*(setupArea + 0xB) * gObject->m_currentAlpha);
     if (Game.m_currentMapId == 0x21) {
-        manaAlpha = (u8)(gObject->m_lookAtTimer * (float)*(setupArea + 0xB));
+        manaAlpha = (u8)(gObject->m_currentAlpha * (float)*(setupArea + 0xB));
     }
     MaterialMan.SetManaAlpha(manaAlpha);
     mana->m_manaAlpha = manaAlpha;
@@ -1289,10 +1282,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
         }
     }
 }
-#pragma pop
 
-#pragma push
-#pragma opt_lifetimes off
 /*
  * --INFO--
  * PAL Address: 0x800d7440
@@ -1449,7 +1439,6 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
     }
 }
 
-#pragma pop
 
 /*
  * --INFO--
@@ -1470,11 +1459,11 @@ void pppConstructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
     CChara::CModel* model;
 
     if ((s32)Game.m_currentSceneId == 7) {
-        gObject->m_lookAtTimer = kYmManaOne;
+        gObject->m_currentAlpha = kYmManaOne;
     }
 
     if (Game.m_currentMapId != 0x21) {
-        gObject->m_stepSlopeLimit = LoadFloat(kYmManaSlopeLimit);
+        gObject->m_alphaTarget = LoadFloat(kYmManaSlopeLimit);
     }
 
     handle = GetCharaHandlePtr(gObject, 0);
@@ -1545,9 +1534,6 @@ void pppConstructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
-#pragma opt_common_subs off
 void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
     CChara::CMesh::CRefData* mesh = model->m_meshes[partIndex].m_data;
@@ -1613,9 +1599,9 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
         if (strcmp(mesh->m_name, s_ymManaShapeObj) != 0) {
             PSMTXCopy(mtx, mana->m_reflectionMtx);
             if (mana->m_paraboloidReady != 0) {
-                mana->m_runtimeColor.r = mesh->m_colors[0];
-                mana->m_runtimeColor.g = mesh->m_colors[1];
-                mana->m_runtimeColor.b = mesh->m_colors[2];
+                mana->m_runtimeColor.r = mesh->m_colors[0].r;
+                mana->m_runtimeColor.g = mesh->m_colors[0].g;
+                mana->m_runtimeColor.b = mesh->m_colors[0].b;
                 mana->m_runtimeColor.a = 0x80;
                 DCFlushRange(&mana->m_runtimeColor, 4);
                 GXSetArray((GXAttr)0xB, mana->m_meshColors, 4);
@@ -1665,7 +1651,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     }
 
     if (Game.m_currentMapId == 0x21) {
-        float alphaScale = kYmManaLookAtAlphaScale[0] * object->m_lookAtTimer;
+        float alphaScale = kYmManaLookAtAlphaScale[0] * object->m_currentAlpha;
         int alpha = (int)alphaScale;
         mana->m_baseColor.r = 0xFF;
         mana->m_baseColor.g = 0xFF;
@@ -1694,7 +1680,6 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_SET);
     GXCallDisplayList(displayList->m_data, displayList->m_size);
 }
-#pragma pop
 
 /*
  * --INFO--

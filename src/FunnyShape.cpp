@@ -144,8 +144,6 @@ inline void CFunnyShape::SetDefaultStage()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle)
 {
     const u8* shapeData = reinterpret_cast<const u8*>(shape);
@@ -361,7 +359,6 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         packedStride += 0x24;
     }
 }
-#pragma pop
 
 /*
  * --INFO--

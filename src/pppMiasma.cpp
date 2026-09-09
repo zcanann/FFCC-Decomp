@@ -10,8 +10,6 @@
 
 #include <string.h>
 
-extern const float kPppAlignmentScaleScreenWidth;
-extern const float kPppAlignmentScaleScreenHalfHeight;
 static const float kPppMiasmaMinRadius = -1000.0f;
 static const float kPppMiasmaDefaultRadius = 1200.0f;
 static const float kPppMiasmaCameraInsidePadding = 10.0f;
@@ -295,9 +293,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     packedWork.bytes[2] = (u8)(work->m_position[2] >> 7);
     packedWork.bytes[3] = (u8)(work->m_position[3] >> 7);
 
-    i4TexSize = GXGetTexBufferSize(kPppAlignmentScaleScreenWidth, kPppAlignmentScaleScreenHalfHeight,
+    i4TexSize = GXGetTexBufferSize(640, 224,
                                    (GXTexFmt)6, GX_FALSE, 0);
-    rgba8TexSize = GXGetTexBufferSize(kPppAlignmentScaleScreenWidth, kPppAlignmentScaleScreenHalfHeight,
+    rgba8TexSize = GXGetTexBufferSize(640, 224,
                                       (GXTexFmt)0x28, GX_FALSE, 0);
 
     managerPos.x = ppvMng->m_matrix.value[0][3];
@@ -328,11 +326,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         isCameraInside = 1;
     }
 
-    texHeight = (int)kPppAlignmentScaleScreenHalfHeight;
-    texWidth = (int)kPppAlignmentScaleScreenWidth;
-    scissorHeight = (u32)kPppAlignmentScaleScreenHalfHeight;
-    scissorWidth = (u32)kPppAlignmentScaleScreenWidth;
-    const float& yStep = kPppAlignmentScaleScreenHalfHeight;
+    texHeight = 224;
+    texWidth = 640;
+    scissorHeight = 224;
+    scissorWidth = 640;
+    const float yStep = 224.0f;
     graphicPtr = &Graphic;
     do {
         yPos = (float)slice * yStep;
@@ -353,8 +351,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             drawColor.rgba[2] = 0;
             drawColor.rgba[3] = 0xFF;
         }
-        gUtil.RenderColorQuad(kPppMiasmaZero, yPos, kPppAlignmentScaleScreenWidth,
-                              kPppAlignmentScaleScreenHalfHeight, *(GXColor*)drawColor.rgba);
+        gUtil.RenderColorQuad(kPppMiasmaZero, yPos, 640.0f,
+                              224.0f, *(GXColor*)drawColor.rgba);
 
         pppSetDrawEnv(
             &drawColor, &pppMiasma->m_drawMatrix, kPppMiasmaZero, 0, 0, 1, 0, 1, 1, 1);
@@ -437,8 +435,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
                 drawColor.rgba[2] = 0;
                 drawColor.rgba[3] = 0xFF;
             }
-            gUtil.RenderColorQuad(kPppMiasmaZero, yPos, kPppAlignmentScaleScreenWidth,
-                                  kPppAlignmentScaleScreenHalfHeight, *(GXColor*)drawColor.rgba);
+            gUtil.RenderColorQuad(kPppMiasmaZero, yPos, 640.0f,
+                                  224.0f, *(GXColor*)drawColor.rgba);
             GXClearVtxDesc();
             GXSetVtxDesc((GXAttr)9, GX_INDEX16);
             GXSetVtxDesc((GXAttr)10, GX_INDEX16);
@@ -501,8 +499,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         }
 
         Graphic.SetViewport();
-        gUtil.RenderTextureQuad(kPppMiasmaZero, yPos, kPppAlignmentScaleScreenWidth,
-                                kPppAlignmentScaleScreenHalfHeight, &backI4Tex, 0, 0,
+        gUtil.RenderTextureQuad(kPppMiasmaZero, yPos, 640.0f,
+                                224.0f, &backI4Tex, 0, 0,
                                 0, (GXBlendFactor)4, (GXBlendFactor)5);
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
@@ -582,8 +580,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             quadA.x = kPppMiasmaZero;
             quadA.y = yPos;
             quadA.z = kPppMiasmaZero;
-            quadB.x = kPppAlignmentScaleScreenWidth;
-            quadB.y = yPos + kPppAlignmentScaleScreenHalfHeight;
+            quadB.x = 640.0f;
+            quadB.y = yPos + 224.0f;
             quadB.z = kPppMiasmaZero;
 
             pppInitBlendMode();
@@ -693,8 +691,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             quadA.x = kPppMiasmaZero;
             quadA.y = yPos;
             quadA.z = kPppMiasmaZero;
-            quadB.x = kPppAlignmentScaleScreenWidth;
-            quadB.y = yPos + kPppAlignmentScaleScreenHalfHeight;
+            quadB.x = 640.0f;
+            quadB.y = yPos + 224.0f;
             quadB.z = kPppMiasmaZero;
             gUtil.RenderQuad(quadA, quadB, packedWork.color, 0, 0);
         }

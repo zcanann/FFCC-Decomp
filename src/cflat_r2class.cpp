@@ -20,16 +20,12 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 
-extern const char sCFlatRuntime2SetClassSystemValWarn[];
-extern const char sCFlatRuntime2AnimStateWarn[];
-extern const float kCFlatRuntime2Zero;
-extern const float kCFlatRuntime2SystemValScale;
-
-extern "C" const double kCharaViewerColorCenterBias = 4503601774854144.0;
-extern "C" const float kCharaViewerZero = 0.0f;
-extern "C" const float kCharaViewerBackOrthoRight = 448.0f;
-extern "C" const float kCharaViewerBackOrthoBottom = 640.0f;
-extern "C" const float kCharaViewerGridMax = -100.0f;
+static const char sCFlatRuntime2SetClassSystemValWarn[] =
+    "!!!!!!!!!!!!!!!charUpdate"
+    "\202\252\203x\201[\203X\203N\203\211\203X\202\310\202\307\202\305\216g\227p\202\263\202\352\202\304\202\334\202\267\201B"
+    "!!!!!!!!!!!!!!!!!!!!\n";
+static const char sCFlatRuntime2AnimStateWarn[] =
+    "\203|\201[\203g\224\324\215\206\202\252\210\331\217\355\202\305\202\267\201B";
 
 namespace {
 
@@ -185,17 +181,17 @@ static inline void StoreU32(CFlatRuntime::CStack* stack, u8* base, int offset, i
 static inline void StoreF32(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
 {
 	float* value = reinterpret_cast<float*>(base + offset);
-	*reinterpret_cast<float*>(&stack[-1].m_word) = *value;
+	stack[-1].m_float = *value;
 
 	switch (setMode) {
 	case -1:
-		*value -= *reinterpret_cast<float*>(&stack->m_word);
+		*value -= stack->m_float;
 		break;
 	case 0:
-		*value = *reinterpret_cast<float*>(&stack->m_word);
+		*value = stack->m_float;
 		break;
 	case 1:
-		*value += *reinterpret_cast<float*>(&stack->m_word);
+		*value += stack->m_float;
 		break;
 	}
 }
@@ -233,14 +229,14 @@ static inline unsigned int LoadU32(u8* base, int offset)
 
 /*
  * --INFO--
- * PAL Address: 0x800C7FE8
+ * PAL Address: UNUSED
  * PAL Size: 104b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void VECNormalizeZero(Vec* src, Vec* dst)
+inline void VECNormalizeZero(Vec* src, Vec* dst)
 {
 	float magnitude = PSVECMag(src);
 	if (magnitude == 0.0f) {
@@ -254,14 +250,14 @@ void VECNormalizeZero(Vec* src, Vec* dst)
 
 /*
  * --INFO--
- * PAL Address: 0x800C8050
+ * PAL Address: UNUSED
  * PAL Size: 96b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CPad::IsGba(long padNo)
+inline int CPad::IsGba(long padNo)
 {
 	if (padNo < 0 || padNo >= 4) {
 		return 0;
@@ -271,14 +267,14 @@ int CPad::IsGba(long padNo)
 
 /*
  * --INFO--
- * PAL Address: 0x800C80B0
+ * PAL Address: UNUSED
  * PAL Size: 124b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CMonWork* SAFE_CAST_MON_WORK(CGObjWork* work)
+inline CMonWork* SAFE_CAST_MON_WORK(CGObjWork* work)
 {
 	if (work == 0 || work->m_objType != 1) {
 		return 0;
@@ -288,14 +284,14 @@ CMonWork* SAFE_CAST_MON_WORK(CGObjWork* work)
 
 /*
  * --INFO--
- * PAL Address: 0x800C812C
+ * PAL Address: UNUSED
  * PAL Size: 124b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork* work)
+inline CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork* work)
 {
 	if (work == 0 || work->m_objType != 0) {
 		return 0;
@@ -307,14 +303,14 @@ CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork* work)
 
 /*
  * --INFO--
- * PAL Address: 0x800C8220
+ * PAL Address: UNUSED
  * PAL Size: 44b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGObject::IsFall(int, int)
+inline int CGObject::IsFall(int, int)
 {
 	return (m_stateFlags0 & 0x80) != 0;
 }
@@ -344,6 +340,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 		if (systemVal <= -0x40) {
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
 
+			if (systemVal <= -0xD80) {
 				switch (systemVal) {
 				case -0xDA7:
 				case -0xDA6:
@@ -391,158 +388,161 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					StoreU32Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_controlMask, setMode);
 					break;
 				default:
-					if (systemVal <= -1000 && systemVal >= -0xBE7) {
-						const int bit = systemVal + 0xBE7;
-						u8* const byteRef = classData + (bit / 8);
-						const int mask = 1 << (bit % 8);
-						const int oldValue = (byteRef[0x8A4] & mask) != 0;
-
-						stack[-1].m_word = oldValue;
-						int newValue = oldValue;
-
-						switch (setMode) {
-						case -1:
-							newValue -= stack->m_word;
-							break;
-						case 0:
-							newValue = stack->m_word;
-							break;
-						case 1:
-							newValue += stack->m_word;
-							break;
-						}
-
-						if (newValue != 0) {
-							byteRef[0x8A4] |= mask;
-						} else {
-							byteRef[0x8A4] &= ~mask;
-						}
-					} else if (systemVal <= -0x1F4 && systemVal >= -0x2F3) {
-						StoreS16Idx<0x9A4>(stack, classData, (systemVal + 0x2F3) * 2, setMode);
-					} else {
-						switch (systemVal) {
-						case -0x199:
-						case -0x198:
-						case -0x197:
-						case -0x196:
-						case -0x195:
-						case -0x194:
-						case -0x193:
-						case -0x192:
-							StoreU16Idx<0x3B8>(stack, classData, (systemVal + 0x199) * 2, setMode);
-							break;
-						case -0x19C:
-							StoreU32(stack, classData, 0x200, setMode);
-							break;
-						case -0x19D:
-							StoreU16(stack, classData, 0x3C8, setMode);
-							break;
-						case -0x1A9:
-						case -0x1A8:
-						case -0x1A7:
-						case -0x1A6:
-							StoreS16Idx<0xAC>(stack, classData, (systemVal + 0x1A9) * 2, setMode);
-							break;
-						case -0x1B6:
-							StoreU16(stack, classData, 0x3DE, setMode);
-							break;
-						default:
-							if (systemVal <= -0x96 && systemVal >= -0x175) {
-								const int itemOffset = (systemVal + 0x175) * 2;
-								stack[-1].m_word =
-								    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset);
-								switch (setMode) {
-								case -1:
-									*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
-									    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) -
-									    stack->m_word;
-									break;
-								case 0:
-									*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
-									    stack->m_word;
-									break;
-								case 1:
-									*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
-									    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) +
-									    stack->m_word;
-									break;
-								}
-							} else {
-								switch (systemVal) {
-								case -0x40:
-									StoreU16(stack, classData, 0x1A, setMode);
-									break;
-								case -0x41:
-									StoreU16(stack, classData, 0x1C, setMode);
-									break;
-								case -0x79:
-								case -0x78:
-								case -0x77:
-								case -0x76:
-								case -0x75:
-								case -0x74:
-								case -0x73:
-								case -0x72:
-								case -0x71:
-								case -0x70:
-								case -0x6F:
-								case -0x6E:
-								case -0x6D:
-								case -0x6C:
-								case -0x6B:
-								case -0x6A:
-								case -0x69:
-								case -0x68:
-								case -0x67:
-								case -0x66:
-								case -0x65:
-								case -0x64:
-								case -0x63:
-								case -0x62:
-								case -0x61:
-								case -0x60:
-								case -0x5F:
-								case -0x5E:
-								case -0x5D:
-								case -0x5C:
-								case -0x5B:
-								case -0x5A:
-								case -0x59:
-								case -0x58:
-								case -0x57:
-								case -0x56:
-								case -0x55:
-								case -0x54:
-								case -0x53:
-									StoreU16Idx<0x3E>(stack, classData, (-0x53 - systemVal) * 2, setMode);
-									break;
-								case -0x94:
-								case -0x93:
-								case -0x92:
-								case -0x91:
-								case -0x90:
-								case -0x8F:
-								case -0x8E:
-								case -0x8D:
-								case -0x8C:
-								case -0x8B:
-								case -0x8A:
-								case -0x89:
-								case -0x88:
-								case -0x87:
-								case -0x86:
-								case -0x85:
-									StoreU16Idx<0x8C>(stack, classData, (systemVal + 0x94) * 2, setMode);
-									break;
-								default:
-									break;
-								}
-							}
-							break;
-						}
-					}
 					break;
 				}
+			} else if (systemVal <= -0x190) {
+				if (systemVal <= -1000 && systemVal >= -0xBE7) {
+					const int bit = systemVal + 0xBE7;
+					u8* const byteRef = classData + (bit / 8);
+					const int mask = 1 << (bit % 8);
+					const int oldValue = (byteRef[0x8A4] & mask) != 0;
+
+					stack[-1].m_word = oldValue;
+					int newValue = oldValue;
+
+					switch (setMode) {
+					case -1:
+						newValue -= stack->m_word;
+						break;
+					case 0:
+						newValue = stack->m_word;
+						break;
+					case 1:
+						newValue += stack->m_word;
+						break;
+					}
+
+					if (newValue != 0) {
+						byteRef[0x8A4] |= mask;
+					} else {
+						byteRef[0x8A4] &= ~mask;
+					}
+				} else if (systemVal <= -0x1F4 && systemVal >= -0x2F3) {
+					StoreS16Idx<0x9A4>(stack, classData, (systemVal + 0x2F3) * 2, setMode);
+				} else {
+					switch (systemVal) {
+					case -0x199:
+					case -0x198:
+					case -0x197:
+					case -0x196:
+					case -0x195:
+					case -0x194:
+					case -0x193:
+					case -0x192:
+						StoreU16Idx<0x3B8>(stack, classData, (systemVal + 0x199) * 2, setMode);
+						break;
+					case -0x19C:
+						StoreU32(stack, classData, 0x200, setMode);
+						break;
+					case -0x19D:
+						StoreU16(stack, classData, 0x3C8, setMode);
+						break;
+					case -0x1A9:
+					case -0x1A8:
+					case -0x1A7:
+					case -0x1A6:
+						StoreS16Idx<0xAC>(stack, classData, (systemVal + 0x1A9) * 2, setMode);
+						break;
+					case -0x1B6:
+						StoreU16(stack, classData, 0x3DE, setMode);
+						break;
+					default:
+						break;
+					}
+				}
+			} else {
+				if (systemVal <= -0x96 && systemVal >= -0x175) {
+					const int itemOffset = (systemVal + 0x175) * 2;
+					stack[-1].m_word =
+					    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset);
+					switch (setMode) {
+					case -1:
+						*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
+						    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) -
+						    stack->m_word;
+						break;
+					case 0:
+						*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
+						    stack->m_word;
+						break;
+					case 1:
+						*reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) =
+						    *reinterpret_cast<unsigned short*>(*reinterpret_cast<u8**>(classData + 0x24) + itemOffset) +
+						    stack->m_word;
+						break;
+					}
+				} else {
+					switch (systemVal) {
+					case -0x40:
+						StoreU16(stack, classData, 0x1A, setMode);
+						break;
+					case -0x41:
+						StoreU16(stack, classData, 0x1C, setMode);
+						break;
+					case -0x79:
+					case -0x78:
+					case -0x77:
+					case -0x76:
+					case -0x75:
+					case -0x74:
+					case -0x73:
+					case -0x72:
+					case -0x71:
+					case -0x70:
+					case -0x6F:
+					case -0x6E:
+					case -0x6D:
+					case -0x6C:
+					case -0x6B:
+					case -0x6A:
+					case -0x69:
+					case -0x68:
+					case -0x67:
+					case -0x66:
+					case -0x65:
+					case -0x64:
+					case -0x63:
+					case -0x62:
+					case -0x61:
+					case -0x60:
+					case -0x5F:
+					case -0x5E:
+					case -0x5D:
+					case -0x5C:
+					case -0x5B:
+					case -0x5A:
+					case -0x59:
+					case -0x58:
+					case -0x57:
+					case -0x56:
+					case -0x55:
+					case -0x54:
+					case -0x53:
+						StoreU16Idx<0x3E>(stack, classData, (-0x53 - systemVal) * 2, setMode);
+						break;
+					case -0x94:
+					case -0x93:
+					case -0x92:
+					case -0x91:
+					case -0x90:
+					case -0x8F:
+					case -0x8E:
+					case -0x8D:
+					case -0x8C:
+					case -0x8B:
+					case -0x8A:
+					case -0x89:
+					case -0x88:
+					case -0x87:
+					case -0x86:
+					case -0x85:
+						StoreU16Idx<0x8C>(stack, classData, (systemVal + 0x94) * 2, setMode);
+						break;
+					default:
+						break;
+					}
+				}
+			}
 
 			LastResult(this) = 0;
 		} else {
@@ -614,23 +614,24 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 				case -0x18:
 					StoreF32(stack, engineObject, 0x1BC, setMode);
 					break;
-					case -0x1A: {
-						int value = 0;
-						*reinterpret_cast<float*>(&stack[-1].m_word) = kCFlatRuntime2Zero;
-						switch (setMode) {
-						case -1:
-							value = static_cast<int>(kCFlatRuntime2Zero - static_cast<float>(stack->m_word));
-							break;
-						case 0:
-							value = static_cast<int>(*reinterpret_cast<float*>(&stack->m_word));
-							break;
-						case 1:
-							value = static_cast<int>(kCFlatRuntime2Zero + static_cast<float>(stack->m_word));
-							break;
-						}
-						*(engineObject + 0x56) = static_cast<u8>(static_cast<int>(kCFlatRuntime2SystemValScale * static_cast<float>(value)));
+				case -0x1A: {
+					int value = 0;
+					stack[-1].m_float = 0.0f;
+					switch (setMode) {
+					case -1:
+						value -= stack->m_float;
+						break;
+					case 0:
+						value = static_cast<int>(stack->m_float);
+						break;
+					case 1:
+						value += stack->m_float;
 						break;
 					}
+					reinterpret_cast<CGObject*>(engineObject)->m_field_0x56 =
+					    static_cast<u8>(static_cast<int>(1000.0f * static_cast<float>(value)));
+					break;
+				}
 				case -0x1B:
 					StoreU32(stack, engineObject, 0x60, setMode);
 					break;
@@ -666,83 +667,87 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
 			unsigned int value = 0;
 
-			switch (systemVal) {
-			case -0xD83:
-			case -0xD82:
-			case -0xD81:
-			case -0xD80:
-				value = LoadU16Idx<0xAC>(classData, (systemVal + 0xD83) * 2);
-				break;
-			case -0xD91:
-			case -0xD90:
-			case -0xD8F:
-			case -0xD8E:
-			case -0xD8D:
-			case -0xD8C:
-			case -0xD8B:
-			case -0xD8A:
-			case -0xD89:
-			case -0xD88:
-			case -0xD87:
-			case -0xD86:
-			case -0xD85:
-			case -0xD84:
-				value = LoadU16Idx<0xB4>(classData, (systemVal + 0xD91) * 2);
-				break;
-			case -0xD92: {
-				u8* p = *reinterpret_cast<u8**>(engineObject + 0xF8);
-				if (p != 0) {
-					p = *reinterpret_cast<u8**>(p + 0x178);
+			if (systemVal <= -0xD80) {
+				switch (systemVal) {
+				case -0xD83:
+				case -0xD82:
+				case -0xD81:
+				case -0xD80:
+					value = LoadU16Idx<0xAC>(classData, (systemVal + 0xD83) * 2);
+					break;
+				case -0xD91:
+				case -0xD90:
+				case -0xD8F:
+				case -0xD8E:
+				case -0xD8D:
+				case -0xD8C:
+				case -0xD8B:
+				case -0xD8A:
+				case -0xD89:
+				case -0xD88:
+				case -0xD87:
+				case -0xD86:
+				case -0xD85:
+				case -0xD84:
+					value = LoadU16Idx<0xB4>(classData, (systemVal + 0xD91) * 2);
+					break;
+				case -0xD92: {
+					u8* p = *reinterpret_cast<u8**>(engineObject + 0xF8);
 					if (p != 0) {
-						value = *reinterpret_cast<unsigned int*>(p + 0x14);
+						p = *reinterpret_cast<u8**>(p + 0x178);
+						if (p != 0) {
+							value = *reinterpret_cast<unsigned int*>(p + 0x14);
+						} else {
+							value = static_cast<unsigned int>(-1);
+						}
 					} else {
 						value = static_cast<unsigned int>(-1);
 					}
-				} else {
-					value = static_cast<unsigned int>(-1);
+					break;
 				}
-				break;
-			}
-			case -0xDA7:
-			case -0xDA6:
-			case -0xDA5:
-			case -0xDA4:
-			case -0xDA3:
-			case -0xDA2:
-			case -0xDA1:
-			case -0xDA0:
-			case -0xD9F:
-			case -0xD9E:
-			case -0xD9D:
-			case -0xD9C:
-			case -0xD9B:
-			case -0xD9A:
-			case -0xD99:
-			case -0xD98:
-				value = LoadU16Idx<0xD0>(classData, (systemVal + 0xDA7) * 2);
-				break;
-			case -0xDB7:
-			case -0xDB6:
-			case -0xDB5:
-			case -0xDB4:
-			case -0xDB3:
-			case -0xDB2:
-			case -0xDB1:
-			case -0xDB0:
-			case -0xDAF:
-			case -0xDAE:
-			case -0xDAD:
-			case -0xDAC:
-			case -0xDAB:
-			case -0xDAA:
-			case -0xDA9:
-			case -0xDA8:
-				value = LoadU16Idx<0xF0>(classData, (systemVal + 0xDB7) * 2);
-				break;
-			case -0xDBA:
-				value = reinterpret_cast<CGMonObj*>(engineObject)->m_controlMask;
-				break;
-			default:
+				case -0xDA7:
+				case -0xDA6:
+				case -0xDA5:
+				case -0xDA4:
+				case -0xDA3:
+				case -0xDA2:
+				case -0xDA1:
+				case -0xDA0:
+				case -0xD9F:
+				case -0xD9E:
+				case -0xD9D:
+				case -0xD9C:
+				case -0xD9B:
+				case -0xD9A:
+				case -0xD99:
+				case -0xD98:
+					value = LoadU16Idx<0xD0>(classData, (systemVal + 0xDA7) * 2);
+					break;
+				case -0xDB7:
+				case -0xDB6:
+				case -0xDB5:
+				case -0xDB4:
+				case -0xDB3:
+				case -0xDB2:
+				case -0xDB1:
+				case -0xDB0:
+				case -0xDAF:
+				case -0xDAE:
+				case -0xDAD:
+				case -0xDAC:
+				case -0xDAB:
+				case -0xDAA:
+				case -0xDA9:
+				case -0xDA8:
+					value = LoadU16Idx<0xF0>(classData, (systemVal + 0xDB7) * 2);
+					break;
+				case -0xDBA:
+					value = reinterpret_cast<CGMonObj*>(engineObject)->m_controlMask;
+					break;
+				default:
+					break;
+				}
+			} else if (systemVal <= -0x190) {
 				if (systemVal <= -1000 && systemVal >= -0xBE7) {
 					const int bit = systemVal + 0xBE7;
 					const u8 byteValue = *(classData + (bit / 8) + 0x8A4);
@@ -793,102 +798,102 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 						value = LoadU16(classData, 0xBC8);
 						break;
 					default:
-						if (systemVal <= -0x96 && systemVal >= -0x175) {
-							u8* itemTable = *reinterpret_cast<u8**>(classData + 0x24);
-							value = LoadU16(itemTable, (systemVal + 0x175) * 2);
-						} else {
-							switch (systemVal) {
-							case -0x82:
-								value = LoadU16(classData, 0x14);
-								break;
-							case -0x83:
-								value = LoadU16(classData, 0x16);
-								break;
-							case -0x84:
-								value = LoadU16(classData, 0x18);
-								break;
-							case -0x40:
-								value = LoadU16(classData, 0x1A);
-								break;
-							case -0x41:
-								value = LoadU16(classData, 0x1C);
-								break;
-							case -0x43:
-								value = LoadU16(classData, 0x1E);
-								break;
-							case -0x44:
-								value = LoadU16(classData, 0x20);
-								break;
-							case -0x45:
-								value = LoadU16(classData, 0x22);
-								break;
-							case -0x79:
-							case -0x78:
-							case -0x77:
-							case -0x76:
-							case -0x75:
-							case -0x74:
-							case -0x73:
-							case -0x72:
-							case -0x71:
-							case -0x70:
-							case -0x6F:
-							case -0x6E:
-							case -0x6D:
-							case -0x6C:
-							case -0x6B:
-							case -0x6A:
-							case -0x69:
-							case -0x68:
-							case -0x67:
-							case -0x66:
-							case -0x65:
-							case -0x64:
-							case -0x63:
-							case -0x62:
-							case -0x61:
-							case -0x60:
-							case -0x5F:
-							case -0x5E:
-							case -0x5D:
-							case -0x5C:
-							case -0x5B:
-							case -0x5A:
-							case -0x59:
-							case -0x58:
-							case -0x57:
-							case -0x56:
-							case -0x55:
-							case -0x54:
-							case -0x53:
-								value = LoadU16Idx<0x3E>(classData, (-0x53 - systemVal) * 2);
-								break;
-							case -0x94:
-							case -0x93:
-							case -0x92:
-							case -0x91:
-							case -0x90:
-							case -0x8F:
-							case -0x8E:
-							case -0x8D:
-							case -0x8C:
-							case -0x8B:
-							case -0x8A:
-							case -0x89:
-							case -0x88:
-							case -0x87:
-							case -0x86:
-							case -0x85:
-								value = LoadU16Idx<0x8C>(classData, (systemVal + 0x94) * 2);
-								break;
-							default:
-								break;
-							}
-						}
 						break;
 					}
 				}
-				break;
+			} else {
+				if (systemVal <= -0x96 && systemVal >= -0x175) {
+					u8* itemTable = *reinterpret_cast<u8**>(classData + 0x24);
+					value = LoadU16(itemTable, (systemVal + 0x175) * 2);
+				} else {
+					switch (systemVal) {
+					case -0x82:
+						value = LoadU16(classData, 0x14);
+						break;
+					case -0x83:
+						value = LoadU16(classData, 0x16);
+						break;
+					case -0x84:
+						value = LoadU16(classData, 0x18);
+						break;
+					case -0x40:
+						value = LoadU16(classData, 0x1A);
+						break;
+					case -0x41:
+						value = LoadU16(classData, 0x1C);
+						break;
+					case -0x43:
+						value = LoadU16(classData, 0x1E);
+						break;
+					case -0x44:
+						value = LoadU16(classData, 0x20);
+						break;
+					case -0x45:
+						value = LoadU16(classData, 0x22);
+						break;
+					case -0x79:
+					case -0x78:
+					case -0x77:
+					case -0x76:
+					case -0x75:
+					case -0x74:
+					case -0x73:
+					case -0x72:
+					case -0x71:
+					case -0x70:
+					case -0x6F:
+					case -0x6E:
+					case -0x6D:
+					case -0x6C:
+					case -0x6B:
+					case -0x6A:
+					case -0x69:
+					case -0x68:
+					case -0x67:
+					case -0x66:
+					case -0x65:
+					case -0x64:
+					case -0x63:
+					case -0x62:
+					case -0x61:
+					case -0x60:
+					case -0x5F:
+					case -0x5E:
+					case -0x5D:
+					case -0x5C:
+					case -0x5B:
+					case -0x5A:
+					case -0x59:
+					case -0x58:
+					case -0x57:
+					case -0x56:
+					case -0x55:
+					case -0x54:
+					case -0x53:
+						value = LoadU16Idx<0x3E>(classData, (-0x53 - systemVal) * 2);
+						break;
+					case -0x94:
+					case -0x93:
+					case -0x92:
+					case -0x91:
+					case -0x90:
+					case -0x8F:
+					case -0x8E:
+					case -0x8D:
+					case -0x8C:
+					case -0x8B:
+					case -0x8A:
+					case -0x89:
+					case -0x88:
+					case -0x87:
+					case -0x86:
+					case -0x85:
+						value = LoadU16Idx<0x8C>(classData, (systemVal + 0x94) * 2);
+						break;
+					default:
+						break;
+					}
+				}
 			}
 
 			LastResult(this) = value;
@@ -1111,9 +1116,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x15:
 			engineObject->m_weaponNodeFlagBits.m_unk10 = static_cast<signed char>(object->m_localBase[0]);
-			engineObject->m_groundHitOffset.z = kCFlatRuntime2Zero;
-			engineObject->m_groundHitOffset.y = kCFlatRuntime2Zero;
-			engineObject->m_groundHitOffset.x = kCFlatRuntime2Zero;
+			engineObject->m_groundHitOffset.z = 0.0f;
+			engineObject->m_groundHitOffset.y = 0.0f;
+			engineObject->m_groundHitOffset.x = 0.0f;
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1229,7 +1234,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitStart.y = engineObject->m_worldPosition.y + params[1];
 			hitStart.z = engineObject->m_worldPosition.z;
 			hitMove.x = static_cast<float>(sin(angle)) * length;
-			hitMove.y = kCFlatRuntime2Zero;
+			hitMove.y = 0.0f;
 			hitMove.z = static_cast<float>(cos(angle)) * length;
 			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, radius, 1, 0);
@@ -1300,9 +1305,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitStart.x = engineObject->m_worldPosition.x + static_cast<float>(sin(angle)) * distance;
 			hitStart.y = engineObject->m_worldPosition.y + reinterpret_cast<float*>(object->m_localBase)[1];
 			hitStart.z = engineObject->m_worldPosition.z + static_cast<float>(cos(angle)) * distance;
-			hitMove.x = kCFlatRuntime2Zero;
+			hitMove.x = 0.0f;
 			hitMove.y = -height;
-			hitMove.z = kCFlatRuntime2Zero;
+			hitMove.z = 0.0f;
 			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, radius, 1, 0);
 			if (hit != 0) {
@@ -1515,9 +1520,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x48:
-			engineObject->m_stepSlopeLimit = reinterpret_cast<float*>(object->m_localBase)[1];
+			engineObject->m_alphaTarget = reinterpret_cast<float*>(object->m_localBase)[1];
 			if (static_cast<int>(object->m_localBase[0]) != 0) {
-				engineObject->m_lookAtTimer = engineObject->m_stepSlopeLimit;
+				engineObject->m_currentAlpha = engineObject->m_alphaTarget;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1709,14 +1714,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			moveVector.x = params[0];
 			moveVector.y = params[1];
 			moveVector.z = params[2];
-			float magnitude = PSVECMag(&moveVector);
-			if (magnitude == 0.0f) {
-				moveVector.x = 0.0f;
-				moveVector.y = 0.0f;
-				moveVector.z = 0.0f;
-			} else {
-				PSVECScale(&moveVector, &moveVector, 0.5f / magnitude);
-			}
+			VECNormalizeZero(&moveVector, &moveVector);
 			engineObject->MoveVector(&moveVector, reinterpret_cast<float*>(object->m_localBase)[3], static_cast<int>(object->m_localBase[4]), 1, 1, 1);
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1856,7 +1854,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x41:
-			engineObject->m_bgDownDist = 0.5f / static_cast<float>(static_cast<int>(object->m_localBase[0]));
+			engineObject->m_alphaStep = 1.0f / static_cast<float>(static_cast<int>(object->m_localBase[0]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

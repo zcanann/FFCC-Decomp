@@ -7,6 +7,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
 #include "ffcc/gobjwork.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
@@ -15,6 +16,7 @@
 #include "ffcc/mes.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_tina.h"
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
@@ -23,7 +25,6 @@
 extern char s_shopmenu_cpp[];
 extern char s_pcts_pctd_Error_memory_allocation_error_801DED9C[];
 unsigned short gShopMenuInputLatch;
-extern CShopMenu* g_shopMenu;
 extern const unsigned int gShopMenuAmbientWhite;
 extern const unsigned int gShopMenuMaterialWhiteBase;
 extern const unsigned int DAT_80332D04;
@@ -373,233 +374,15 @@ enum ShopMenuTextIndex {
 
 #define ShopMenuMes(languageIndex, textIndex) (g_strShopMenuMes[(languageIndex) * 0x15 + (textIndex)])
 
-static inline void* PartPcsVoid()
-{
-    return &PartPcs;
-}
-
-static inline int& ShopMenuInt(CShopMenu* shopMenu, int offset)
-{
-    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + offset);
-}
-
-static inline int* GetShopMenuHelpMsgTable()
-{
-    return reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(6));
-}
-
-static inline float& ShopMenuFloat(CShopMenu* shopMenu, int offset)
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(shopMenu) + offset);
-}
-
-static inline unsigned short GetPadButtons()
-{
-    bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    unsigned short buttons;
-    if (hasInput) {
-        buttons = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        buttons = Pad.GetPadInputs()[padIndex].buttonDown[0];
-    }
-    return buttons;
-}
-
-static inline unsigned short GetShopMenuListButtons(unsigned short mask)
-{
-    unsigned short buttons;
-    unsigned short latch = gShopMenuInputLatch;
-    if (latch == 0) {
-        bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-        if (hasInput) {
-            buttons = 0;
-        } else {
-            int padIndex = 0;
-            padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-            buttons = Pad.GetPadInputs()[padIndex].repeatButton & mask;
-        }
-        return buttons;
-    }
-
-    int lock = Pad.m_debugPadLock;
-    bool hasInput = (lock != 0) || (Pad.m_debugPadPort != -1);
-    if (hasInput) {
-        buttons = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        buttons = Pad.GetPadInputs()[padIndex].button[0];
-    }
-
-    if ((latch & buttons) == 0) {
-        gShopMenuInputLatch = 0;
-    }
-
-    hasInput = (lock != 0) || (Pad.m_debugPadPort != -1);
-    if (hasInput) {
-        buttons = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        buttons = Pad.GetPadInputs()[padIndex].buttonDown[0] & mask;
-    }
-    return buttons;
-}
-
 static inline CCaravanWork* ShopMenuCaravanWork(CShopMenu* shopMenu)
 {
     return shopMenu->m_caravanWork;
-}
-
-static inline int CountShopMenuInventoryItems(CShopMenu* shopMenu, short itemNo)
-{
-    int total = 0;
-    for (int slot = 0; slot < 0x40; slot++) {
-        if (ShopMenuCaravanWork(shopMenu)->m_inventoryItems[slot] == itemNo) {
-            ++total;
-        }
-    }
-    return total;
 }
 
 static inline float CalcCenteredShopMenuX(CFont* font, const char* text, int centerX)
 {
     return static_cast<float>(static_cast<int>((FLOAT_80332DD4 - font->GetWidth(text)) * FLOAT_80332d78 + centerX));
 }
-
-static inline int ResolveShopMenuItemCount(CShopMenu* shopMenu)
-{
-    int listType = shopMenu->m_listType;
-    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
-    if (listType == 0) {
-        return caravanWork->m_shopListCount;
-    }
-    if (listType == 1) {
-        return 0x40;
-    }
-    if (listType == 2) {
-        return shopMenu->m_itemCount;
-    }
-    return 0;
-}
-
-static inline int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
-{
-    int listType = shopMenu->m_listType;
-    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
-    if (listType == 0) {
-        return caravanWork->m_shopList[index];
-    }
-    if (listType == 1) {
-        return caravanWork->m_inventoryItems[index];
-    }
-    if (listType == 2) {
-        int mapped = shopMenu->m_itemTable[index];
-        if (mapped == -1) {
-            return -1;
-        }
-        return caravanWork->m_inventoryItems[mapped];
-    }
-    return -1;
-}
-
-static inline int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)
-{
-    if (itemId <= 0) {
-        return 0;
-    }
-
-    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
-    int gilValue = caravanWork->m_shopParam *
-                   *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x24 + itemId * 0x48);
-    return gilValue / 100;
-}
-
-static inline int CalcShopMenuGilRatio(CShopMenu* shopMenu, int baseGil)
-{
-    if (baseGil <= 0) {
-        return 0;
-    }
-
-    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
-    int gil = caravanWork->m_shopParam * baseGil;
-    gil = gil / 100 + (gil >> 0x1F);
-    return gil - (gil >> 0x1F);
-}
-
-static inline int GetShopMenuItemBaseGil(int itemNo, int offset)
-{
-    if (itemNo < 1) {
-        return 0;
-    }
-
-    return *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + offset);
-}
-
-static inline int CalcShopMenuTradeGil(CShopMenu* shopMenu, int itemNo)
-{
-    int gilValue = CalcShopMenuGilRatio(shopMenu, GetShopMenuItemBaseGil(itemNo, 0x20));
-    if (shopMenu->m_listType == 1) {
-        return static_cast<int>(FLOAT_80332d60 * static_cast<float>(gilValue));
-    }
-    if ((shopMenu->m_listType != 0) && (shopMenu->m_listType != 1)) {
-        return -1;
-    }
-    return gilValue;
-}
-
-static inline int CountShopMenuOwnedItems(CCaravanWork* caravanWork, int itemNo)
-{
-    if (itemNo < 1) {
-        return 0;
-    }
-
-    int count = 0;
-    for (int i = 0; i < 0x40; i++) {
-        if (caravanWork->m_inventoryItems[i] == itemNo) {
-            ++count;
-        }
-    }
-    return count;
-}
-
-static inline int CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
-{
-    int listType = shopMenu->m_listType;
-    int canTrade;
-    if (itemNo <= 0) {
-        canTrade = 0;
-    } else if (listType == 0) {
-        canTrade = 1;
-    } else if (listType == 2) {
-        canTrade = 1;
-        if ((shopMenu->m_caravanWork->m_shopArgs[((int)(itemNo - 0x191U) >> 5)] &
-             (1 << ((itemNo - 0x191U) & 0x1F))) == 0) {
-            canTrade = 0;
-        }
-    } else if (static_cast<unsigned char>(MenuPcs.EquipChk(index)) != 0) {
-        canTrade = 0;
-    } else if (itemNo > 0x9E) {
-        canTrade = 1;
-    } else {
-        canTrade = 0;
-    }
-    return canTrade;
-}
-
-struct ShopMenuFontRenderFlags {
-    unsigned char m_top3 : 3;
-    unsigned char m_bit4 : 1;
-    unsigned char m_low4 : 4;
-};
-
-static inline void SetShopMenuFontRenderBit(CFont* font)
-{
-    reinterpret_cast<ShopMenuFontRenderFlags*>(reinterpret_cast<unsigned char*>(font) + 0x24)->m_bit4 = 1;
-}
-
 
 static inline void SetupShopMenuInfoFont(CFont* font)
 {
@@ -625,7 +408,7 @@ static inline void SetupShopMenuAmountFont(CFont* font)
     font->SetScaleY(FLOAT_80332d8c);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
-    SetShopMenuFontRenderBit(font);
+    font->renderFlags.fixedWidth = 1;
     font->SetMargin(FLOAT_80332d64);
 }
 
@@ -635,7 +418,7 @@ static inline void SetupShopMenuMakeFont(CFont* font, float margin)
     font->SetScale(FLOAT_80332d28);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
-    SetShopMenuFontRenderBit(font);
+    font->renderFlags.fixedWidth = 1;
     font->SetMargin(margin);
 }
 
@@ -645,7 +428,7 @@ static inline void SetupShopMenuValueFont(CFont* font)
     font->SetScale(FLOAT_80332d28);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
-    SetShopMenuFontRenderBit(font);
+    font->renderFlags.fixedWidth = 1;
     font->SetMargin(FLOAT_80332d34);
 }
 
@@ -655,17 +438,8 @@ static inline void SetupShopMenuGilFont(CFont* font)
     font->SetScale(FLOAT_80332d28);
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     font->DrawInit();
-    SetShopMenuFontRenderBit(font);
+    font->renderFlags.fixedWidth = 1;
     font->SetMargin(FLOAT_80332d64);
-}
-
-static inline void DrawShopMenuAmount(CFont* font, int value, float rightEdge, float y, int tlut)
-{
-    char amountBuffer[64];
-    sprintf(amountBuffer, s_DecimalFormat_80332d14, value);
-    float amountWidth = font->GetWidth(amountBuffer);
-    MenuPcs.DrawNoShadowFont(font, amountBuffer, rightEdge - amountWidth, y, tlut, 0x12);
-    MenuPcs.DrawInit();
 }
 
 #define DrawShopMenuAmountTrunc(font, value, rightEdge, y, tlut)                                                       \
@@ -677,62 +451,6 @@ static inline void DrawShopMenuAmount(CFont* font, int value, float rightEdge, f
             static_cast<float>(static_cast<int>(static_cast<float>(rightEdge) - amountWidth)), (y), (tlut), 0x12);     \
         MenuPcs.DrawInit();                                                                                            \
     } while (0)
-
-static inline void DrawShopMenuRightAlignedText(CFont* font, const char* text, float rightEdge, float y, int tlut)
-{
-    if (text == 0) {
-        return;
-    }
-
-    float textWidth = font->GetWidth(text);
-    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(text), rightEdge - textWidth, y, tlut, 0x12);
-    MenuPcs.DrawInit();
-}
-
-static inline void DrawShopMenuRightAlignedTextTrunc(CFont* font, const char* text, float rightEdge, float y, int tlut)
-{
-    if (text == 0) {
-        return;
-    }
-
-    float textWidth = font->GetWidth(text);
-    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(text), static_cast<float>(static_cast<int>(rightEdge - textWidth)), y, tlut, 0x12);
-    MenuPcs.DrawInit();
-}
-
-static inline void SetupShopMenuLabelFont(CFont* font)
-{
-    font->DrawInit();
-    font->SetMargin(FLOAT_80332d28);
-    font->SetShadow(0);
-    font->SetScaleX(FLOAT_80332d2c);
-    font->SetScaleY(FLOAT_80332d28);
-    font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-}
-
-static inline CFont* GetShopMenuInfoPanelFont()
-{
-    return MenuPcs.m_fonts[0];
-}
-
-static inline void DrawShopMenuCenteredText(CFont* font, const char* text, float centerX, float y)
-{
-    if (text == 0) {
-        return;
-    }
-
-    float textX = centerX - font->GetWidth(text) * FLOAT_80332d78;
-    font->DrawInit();
-    font->SetPosX(textX);
-    font->SetPosY(y);
-    font->Draw(text);
-}
-
-static inline int GetShopMenuFigureStep(CShopMenu* shopMenu)
-{
-    return (shopMenu->m_figureMode == 1) ? 10 : 1;
-}
-
 
 
 /*
@@ -757,54 +475,40 @@ inline void _drawShadowFont(CFont* font, char* text, float x, float y, int tlut,
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 384b
+ * EN Address: 0x80173D70
+ * EN Size: 160b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-inline unsigned short getButtonRepeat(int, unsigned short noRepeatMask)
+inline unsigned short getButtonRepeat(int padIndex, unsigned short noRepeatMask)
 {
     unsigned short buttons;
 
     if (gShopMenuInputLatch == 0) {
-        bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-        if (hasInput) {
-            buttons = 0;
-        } else {
-            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-            buttons = Pad.GetPadInputs()[0].repeatButton;
-        }
+        buttons = Pad.GetButtonRepeat(padIndex);
     } else {
-        bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-        if (hasInput) {
-            buttons = 0;
-        } else {
-            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-            buttons = Pad.GetPadInputs()[0].button[0];
-        }
-
-        if ((buttons & gShopMenuInputLatch) == 0) {
+        if ((Pad.GetButton(padIndex) & gShopMenuInputLatch) == 0) {
             gShopMenuInputLatch = 0;
         }
-
-        hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-        if (hasInput) {
-            buttons = 0;
-        } else {
-            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-            buttons = Pad.GetPadInputs()[0].buttonDown[0];
-        }
+        buttons = Pad.GetButtonDown(padIndex);
     }
 
     if ((buttons & noRepeatMask) != 0) {
         gShopMenuInputLatch = noRepeatMask;
     }
-
     return buttons;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: 0x80173E10
+ * EN Size: 8b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void bButtonNoRepeat(unsigned short button)
 {
@@ -834,12 +538,16 @@ inline int CShopMenu::getItemCnt()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: 0x801740DC
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::calcGilRatio(int baseGil)
 {
-    return CalcShopMenuGilRatio(this, baseGil);
+    return m_caravanWork->m_shopParam * baseGil / 100;
 }
 
 /*
@@ -867,58 +575,86 @@ inline int CShopMenu::getItemNo(int index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 84b
+ * EN Address: 0x801741FC
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::getBuyGil(int itemNo)
 {
-    return calcGilRatio(GetShopMenuItemBaseGil(itemNo, 0x20));
+    if (itemNo <= 0) {
+        return 0;
+    }
+    return calcGilRatio(reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_price);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 140b
+ * EN Address: 0x8017425C
+ * EN Size: 144b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::getSellGil(int itemNo)
 {
-    return static_cast<int>(FLOAT_80332d60 * static_cast<float>(getBuyGil(itemNo)));
+    if (itemNo <= 0) {
+        return 0;
+    }
+    return static_cast<int>(FLOAT_80332d60 * static_cast<float>(calcGilRatio(
+        reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_price)));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 84b
+ * EN Address: 0x801742EC
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::getMakeGil(int itemNo)
 {
-    return calcGilRatio(GetShopMenuItemBaseGil(itemNo, 0x24));
+    if (itemNo <= 0) {
+        return 0;
+    }
+    return calcGilRatio(reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_smithPrice);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 296b
+ * EN Address: 0x8017434C
+ * EN Size: 168b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::getBuySellGil(int itemNo)
 {
-    int listType = m_listType;
-    if (listType == 0) {
-        return getBuyGil(itemNo);
+    int gil;
+    if (m_listType == 0) {
+        gil = getBuyGil(itemNo);
+    } else if (m_listType == 1) {
+        gil = getSellGil(itemNo);
+    } else {
+        gil = -1;
     }
-    if (listType == 1) {
-        return getSellGil(itemNo);
-    }
-    if (listType == 2) {
-        return getMakeGil(itemNo);
-    }
-    return -1;
+    return gil;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: 0x801743F4
+ * EN Size: 72b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline char* CShopMenu::GetItemName(int itemNo)
 {
@@ -926,125 +662,115 @@ inline char* CShopMenu::GetItemName(int itemNo)
         return 0;
     }
 
-    return *reinterpret_cast<char**>(
-        reinterpret_cast<int>(Game.m_cFlatDataArr[1].TableStrings(0)) + 0x10 + itemNo * 0x14);
+    return Game.m_cFlatDataArr[1].TableStrings(0)[itemNo * 5 + 4];
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 16b
+ * EN Address: 0x8017443C
+ * EN Size: 16b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::GetMaxExchange()
 {
-    int itemNo = getItemNo(m_selectedIndex);
-    if (itemNo < 1) {
-        return 0;
-    }
-
-    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-    int listType = m_listType;
-    if (listType == 0) {
-        int maxCount = 0x40 - caravanWork->m_inventoryItemCount;
-        int unitGil = getBuyGil(itemNo);
-        if (unitGil > 0) {
-            int byMoney = caravanWork->m_gil / unitGil;
-            if (byMoney < maxCount) {
-                maxCount = byMoney;
-            }
-        }
-        return maxCount;
-    }
-    if (listType == 1) {
-        return getItemHaveCnt(itemNo);
-    }
-    if (listType == 2) {
-        return 1;
-    }
-    return 0;
+    return 0x40 - m_caravanWork->m_inventoryItemCount;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 484b
+ * EN Address: 0x8017444C
+ * EN Size: 92b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::GetTotalGil()
 {
-    int unitGil = getBuySellGil(getItemNo(m_selectedIndex));
-    if (unitGil < 0) {
-        return unitGil;
+    if (m_selectedIndex == -1) {
+        return 0;
     }
-
-    return m_quantity * unitGil;
+    return m_quantity * getBuySellGil(getItemNo(m_selectedIndex));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 496b
+ * EN Address: 0x801744A8
+ * EN Size: 72b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::CanAddGil()
 {
     int totalGil = GetTotalGil();
-    if (totalGil < 0) {
-        return 0;
-    }
-
-    if (m_listType != 1) {
-        totalGil = -totalGil;
-    }
-    return ShopMenuCaravanWork(this)->CanAddGil(totalGil);
+    return m_caravanWork->CanAddGil(-totalGil);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 380b
+ * EN Address: 0x801744F0
+ * EN Size: 316b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::CheckSell(int index)
 {
-    return CanTradeShopMenuItem(this, index, getItemNo(index)) ? 1 : 0;
+    if (index == -1) {
+        return 0;
+    }
+
+    int itemNo = getItemNo(index);
+    int listType = m_listType;
+    int canTrade;
+    if (itemNo <= 0) {
+        canTrade = 0;
+    } else if (listType == 0) {
+        canTrade = 1;
+    } else if (listType == 2) {
+        int recipeNo = itemNo - 0x191;
+        canTrade = 1;
+        if ((m_caravanWork->m_shopArgs[recipeNo >> 5] & (1U << (recipeNo & 0x1F))) == 0) {
+            canTrade = 0;
+        }
+    } else if (MenuPcs.EquipChk(index)) {
+        canTrade = 0;
+    } else if (itemNo > 0x9E) {
+        canTrade = 1;
+    } else {
+        canTrade = 0;
+    }
+    return canTrade;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 232b
+ * EN Address: 0x8017462C
+ * EN Size: 84b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline int CShopMenu::getItemHaveCnt(int itemNo)
 {
-    return CountShopMenuOwnedItems(ShopMenuCaravanWork(this), itemNo);
-}
-
-static inline long* GetShopMenuShapeAnimData(int shapeNo)
-{
-    pppShapeSt** shapeTable = ppvEnv->m_shapeTablePtr;
-    if (shapeTable == 0) {
+    if (itemNo <= 0) {
         return 0;
     }
 
-    pppShapeSt* shape = shapeTable[shapeNo];
-    if ((shape == 0) || (shape->m_animData == 0)) {
-        return 0;
+    int count = 0;
+    for (int i = 0; i < 0x40; i++) {
+        if (m_caravanWork->m_inventoryItems[i] == itemNo) {
+            ++count;
+        }
     }
-
-    return reinterpret_cast<long*>(shape->m_animData);
-}
-
-static inline tagOAN3_SHAPE* GetShopMenuFrameShape(long* animData, int groupNo)
-{
-    if ((animData == 0) || (groupNo < 0)) {
-        return 0;
-    }
-
-    pppShapeAnimData* shapeAnim = reinterpret_cast<pppShapeAnimData*>(animData);
-    if (groupNo >= shapeAnim->m_frameCount) {
-        return 0;
-    }
-
-    int shapeOffset = shapeAnim->m_frames[groupNo].m_shapeOffset;
-    return reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + shapeOffset);
+    return count;
 }
 
 static inline void SetupShopMenuShapeDrawColor(unsigned char alpha)
@@ -1091,8 +817,12 @@ inline void setOrtho(int x, int y, float scaleX, float scaleY, float zOffset)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 224b
+ * EN Address: 0x80174768
+ * EN Size: 204b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void drawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char alpha)
 {
@@ -1104,16 +834,14 @@ inline void drawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned ch
     GXSetCullMode(GX_CULL_NONE);
     GXSetColorUpdate(GX_TRUE);
     MaterialMan.SetMaterialMenu(
-        materialSet, static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
+        materialSet, shape->m_entries[0].m_textureIndex, 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
-    unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
-    int shapeCount = *reinterpret_cast<unsigned short*>(shapeBytes + 2);
-    for (int i = 0; i < shapeCount; i++) {
-        GXCallDisplayList(*reinterpret_cast<void**>(shapeBytes + 0xC + i * 8), 0x60);
+    for (int i = 0; i < shape->m_shapeCount; i++) {
+        GXCallDisplayList(shape->m_entries[i].m_displayList, 0x60);
     }
 }
 
@@ -1126,9 +854,6 @@ inline void drawShapeSeq0(int shapeNo, int groupNo, unsigned char alpha, unsigne
 {
     drawShapeSeq(shapeNo, groupNo, 0, 0, alpha, 0, 0, FLOAT_80332D9C, tlut);
 }
-
-
-
 
 /*
  * --INFO--
@@ -1176,8 +901,6 @@ inline void CShopMenu::Destroy()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma peephole on
 void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 {
     (void)index;
@@ -1190,14 +913,9 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
         return;
     }
 
-    int canSelect;
-    if (sel == -1) {
-        canSelect = 0;
-    } else {
-        canSelect = CanTradeShopMenuItem(this, sel, getItemNo(sel));
-    }
+    int canSelect = CheckSell(sel);
     if (canSelect) {
-        sourceText = reinterpret_cast<const char*>(GetShopMenuHelpMsgTable()[itemNo]);
+        sourceText = Game.m_cFlatDataArr[1].TableStrings(6)[itemNo];
     } else {
         sourceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_CRAFT_HERE);
     }
@@ -1229,7 +947,6 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     font->Draw(helpText);
     delete[] helpText;
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801507e0
@@ -1239,8 +956,6 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, int unused1, int unused2, int unused3)
 {
     (void)unused0;
@@ -1278,9 +993,9 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         }
     }
 
-    int itemData = Game.unkCFlatData0[2] + itemNo * 0x48;
-    unsigned short statValue = *reinterpret_cast<unsigned short*>(itemData + 6);
-    int attr = *reinterpret_cast<unsigned short*>(itemData + 8);
+    SItemFlatRow* item = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo];
+    unsigned short statValue = item->m_value;
+    int attr = item->m_attribute;
     char textBuffer[256];
 
     if (label != 0) {
@@ -1356,7 +1071,6 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         MenuPcs.DrawInit();
     }
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80150e50
@@ -1366,9 +1080,6 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma peephole on
-#pragma opt_propagation off
 void CShopMenu::DrawItemInfo0()
 {
     if (m_selectedIndex == -1) {
@@ -1376,7 +1087,7 @@ void CShopMenu::DrawItemInfo0()
     }
 
     int itemNo = getItemNo(m_selectedIndex);
-    register int itemNoReg = itemNo; itemNo = itemNoReg;
+
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     MenuPcs.DrawInit();
@@ -1401,12 +1112,7 @@ void CShopMenu::DrawItemInfo0()
         font->SetMargin(FLOAT_80332d28);
     }
 
-    int canTrade;
-    if (m_selectedIndex == -1) {
-        canTrade = 0;
-    } else {
-        canTrade = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
-    }
+    int canTrade = CheckSell(m_selectedIndex);
 
     if (canTrade) {
         font->SetMargin(FLOAT_80332d28);
@@ -1488,7 +1194,6 @@ void CShopMenu::DrawItemInfo0()
         }
     }
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x8015173c
@@ -1498,8 +1203,6 @@ void CShopMenu::DrawItemInfo0()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CShopMenu::DrawBuySellInfo()
 {
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
@@ -1530,43 +1233,11 @@ void CShopMenu::DrawBuySellInfo()
     char* unitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
     float unitWidth = font->GetWidth(unitText);
 
-    int canTrade;
-    if (m_selectedIndex == -1) {
-        canTrade = 0;
-    } else {
-        canTrade = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
-    }
+    int canTrade = CheckSell(m_selectedIndex);
 
     int totalGil;
     if (canTrade) {
-        int saleGil;
-        if (m_selectedIndex == -1) {
-            saleGil = 0;
-        } else {
-            int gilItemNo = getItemNo(m_selectedIndex);
-            int gil;
-            if (m_listType == 0) {
-                if (gilItemNo <= 0) {
-                    gil = 0;
-                } else {
-                    int value = static_cast<int>(ShopMenuCaravanWork(this)->m_shopParam) *
-                                *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + gilItemNo * 0x48);
-                    gil = value / 100;
-                }
-            } else if (m_listType == 1) {
-                if (gilItemNo <= 0) {
-                    gil = 0;
-                } else {
-                    int value = static_cast<int>(ShopMenuCaravanWork(this)->m_shopParam) *
-                                *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + gilItemNo * 0x48);
-                    gil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(value / 100));
-                }
-            } else {
-                gil = -1;
-            }
-            saleGil = m_quantity * gil;
-        }
-        totalGil = saleGil;
+        totalGil = GetTotalGil();
     } else {
         totalGil = 0;
     }
@@ -1601,7 +1272,6 @@ void CShopMenu::DrawBuySellInfo()
     MenuPcs.DrawNoShadowFont(font, unitText, static_cast<float>(static_cast<int>(rightMoney)), FLOAT_80332d98, 0x19, 0x12);
     MenuPcs.DrawInit();
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80151F98
@@ -1646,7 +1316,7 @@ void CShopMenu::DrawItemList()
                      (1 << ((tradeItemNo - 0x191U) & 0x1F))) == 0) {
                     canTrade = 0;
                 }
-            } else if (static_cast<unsigned char>(MenuPcs.EquipChk(itemIndex)) != 0) {
+            } else if (MenuPcs.EquipChk(itemIndex)) {
                 canTrade = 0;
             } else if (tradeItemNo > 0x9E) {
                 canTrade = 1;
@@ -1694,11 +1364,7 @@ void CShopMenu::DrawItemList()
         y += 0x1C;
     }
 
-    int pulseFrame = static_cast<int>(System.m_frameCounter) % 0x14;
-    int pulse = pulseFrame - 10;
-    if (pulse < 0) {
-        pulse = -pulse;
-    }
+    int pulse = abs(static_cast<int>(System.m_frameCounter) % 0x14 - 10);
     unsigned char alpha = static_cast<unsigned char>(DOUBLE_80332DA0 * (DOUBLE_80332DB0 * static_cast<double>(pulse) + DOUBLE_80332DA8));
     float scale = static_cast<float>(DOUBLE_80332DA8 * (DOUBLE_80332DC0 * static_cast<double>(pulse) + DOUBLE_80332DB8));
 
@@ -1718,8 +1384,6 @@ void CShopMenu::DrawItemList()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_lifetimes off
 void CShopMenu::DrawSoubiBase()
 {
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
@@ -1768,7 +1432,6 @@ void CShopMenu::DrawSoubiBase()
     }
     drawShapeSeqScale(3, 0, x, 0xA4, FLOAT_80332DD0, FLOAT_80332DCC, 0xFF);
 }
-#pragma pop
 /*
  * --INFO--
  * Address:	TODO
@@ -1793,8 +1456,6 @@ inline void CShopMenu::DrawObi(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 4
 void CShopMenu::DrawMakeBase()
 {
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
@@ -1844,7 +1505,6 @@ void CShopMenu::DrawMakeBase()
     }
     drawShapeSeq(3, 0, x, 0x8C, 0xFF, 1, 0, FLOAT_80332D9C, 0);
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80152B2C
@@ -1986,8 +1646,6 @@ void CShopMenu::DrawShopBase()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma peephole on
 void CShopMenu::Draw()
 {
     if (reinterpret_cast<int>(m_unk00) == 0) {
@@ -2099,14 +1757,11 @@ void CShopMenu::Draw()
     }
     Graphic.SetDrawDoneDebugData(0x3C);
 }
-#pragma pop
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CShopMenu::DrawSoubi()
 {
     DrawSoubiBase();
@@ -2168,14 +1823,11 @@ void CShopMenu::DrawSoubi()
 
     MenuPcs.DrawCursor(cancelTextX - 0x24, m_yesNo * 0x18 + 0x13C, FLOAT_80332d28);
 }
-#pragma pop
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CShopMenu::DrawMake()
 {
     DrawMakeBase();
@@ -2206,13 +1858,13 @@ void CShopMenu::DrawMake()
     x = static_cast<int>(x + (FLOAT_80332d5c + font->GetWidth(raceText)));
     char raceBuffer[132];
     MenuPcs.GetRaceStr(m_resultItem, raceBuffer);
-    const int raceColor = (static_cast<unsigned char>(MenuPcs.ChkEquipPossible(m_resultItem)) != 0) ? 0x18 : 2;
+    const int raceColor = MenuPcs.ChkEquipPossible(m_resultItem) ? 0x18 : 2;
     font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, raceBuffer, x, FLOAT_80332d58, raceColor, 0x12);
     MenuPcs.DrawInit();
 
     font->SetMargin(FLOAT_80332d28);
-    int makeGil = CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex));
+    int makeGil = getMakeGil(getItemNo(m_selectedIndex));
     SetupShopMenuUnitFont(font);
     float gilUnitWidth = font->GetWidth(ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL));
 
@@ -2223,7 +1875,7 @@ void CShopMenu::DrawMake()
     DrawShopMenuAmountTrunc(amountFont, makeGil, makeAmountX, FLOAT_80332E18, 0x13);
 
     int gilAmountX = static_cast<int>(FLOAT_80332E1C - gilUnitWidth - FLOAT_80332d5c);
-    int makeGil2 = CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex));
+    int makeGil2 = getMakeGil(getItemNo(m_selectedIndex));
     int gilTlut = 2;
     if (ShopMenuCaravanWork(this)->m_gil >= makeGil2) {
         gilTlut = 0x14;
@@ -2296,13 +1948,12 @@ void CShopMenu::DrawMake()
 
     int rowY = 300;
     int ownedRightX = 452;
-    short recipeMaterial[6];
-    MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
+    CMenuPcs::MaterialInfo recipeMaterial;
+    MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), &recipeMaterial);
     float makeMarginScale = FLOAT_80332d28;
     float makeMarginBase = FLOAT_80332D10;
-    short* material = recipeMaterial;
-    for (int i = 0; i < 3; i++, rowY += 0x1E, material++) {
-        if (*material <= 0) {
+    for (int i = 0; i < 3; i++, rowY += 0x1E) {
+        if (recipeMaterial.m_itemNo[i] <= 0) {
             break;
         }
 
@@ -2316,7 +1967,7 @@ void CShopMenu::DrawMake()
 
         CFont* makeAmountFont = MenuPcs.m_fonts[0];
         x = 372;
-        int neededCount = material[3];
+        int neededCount = recipeMaterial.m_count[i];
         SetupShopMenuMakeFont(makeAmountFont, makeMarginW * makeMarginScale + makeMarginBase);
         char neededBuffer[64];
         sprintf(neededBuffer, s_DecimalFormat_80332d14, neededCount);
@@ -2335,24 +1986,17 @@ void CShopMenu::DrawMake()
         MenuPcs.DrawInit();
 
         x -= 8;
-        char* materialName = GetItemName(*material);
+        char* materialName = GetItemName(recipeMaterial.m_itemNo[i]);
         x = static_cast<int>(x - headerFont->GetWidth(materialName));
         headerFont->DrawInit();
         MenuPcs.DrawNoShadowFont(headerFont, materialName, x, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
-        int ownedCount = 0;
-        int ownedCountAux = ownedCount; ownedCount = ownedCountAux;
-        short materialItem = *material;
-        for (int slot = 0; slot < 0x40; slot++) {
-            if (ShopMenuCaravanWork(this)->m_inventoryItems[slot] == materialItem) {
-                ++ownedCount;
-            }
-        }
+        int ownedCount = getItemHaveCnt(recipeMaterial.m_itemNo[i]);
 
         int ownedTlut = 2;
         makeMarginW = FLOAT_80332E10;
-        if (ownedCount >= material[3]) {
+        if (ownedCount >= recipeMaterial.m_count[i]) {
             ownedTlut = 0x1B;
         }
         CFont* ownedFont = MenuPcs.m_fonts[0];
@@ -2398,7 +2042,6 @@ void CShopMenu::DrawMake()
 
     MenuPcs.DrawCursor(x - 0x24, m_yesNo * 0x18 + 0x14C, FLOAT_80332d28);
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80154E98
@@ -2408,8 +2051,6 @@ void CShopMenu::DrawMake()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CShopMenu::DrawSmith0()
 {
     DrawShopBase();
@@ -2440,7 +2081,6 @@ void CShopMenu::DrawSmith0()
     MenuPcs.DrawInit();
     MenuPcs.DrawInit();
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x80155058
@@ -2528,28 +2168,27 @@ void CShopMenu::DrawShop0()
  */
 void CShopMenu::SelectMake()
 {
-    int canSelect = static_cast<unsigned char>(MenuPcs.ChkEquipPossible(m_resultItem)) &&
-                     (m_caravanWork->m_gil >= CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)));
+    int canSelect = MenuPcs.ChkEquipPossible(m_resultItem) &&
+                     (m_caravanWork->m_gil >= getMakeGil(getItemNo(m_selectedIndex)));
 
     int selected = getItemNo(m_selectedIndex);
-    short recipeMaterial[8];
-    MenuPcs.GetRecipeMaterial(selected, reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
+    CMenuPcs::MaterialInfo recipeMaterial;
+    MenuPcs.GetRecipeMaterial(selected, &recipeMaterial);
 
-    short* material = recipeMaterial;
-    for (int i = 0; i < 3; i++, material++) {
-        short itemNo = *material;
+    for (int i = 0; i < 3; i++) {
+        short itemNo = recipeMaterial.m_itemNo[i];
         if (itemNo <= 0) {
             break;
         }
 
-        canSelect = canSelect && (material[3] <= CountShopMenuInventoryItems(this, itemNo));
+        canSelect = canSelect && (recipeMaterial.m_count[i] <= getItemHaveCnt(itemNo));
     }
 
     if (!canSelect) {
         m_yesNo = 1;
     }
 
-    if ((GetPadButtons() & 0xC) != 0) {
+    if ((Pad.GetButtonDown(0) & 0xC) != 0) {
         m_yesNo ^= 1;
         if (canSelect == 1) {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -2557,7 +2196,7 @@ void CShopMenu::SelectMake()
             m_yesNo = 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         }
-    } else if ((GetPadButtons() & 0x100) != 0) {
+    } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
         int yesNo = m_yesNo;
         if (yesNo != 1) {
             if (yesNo > 0) {
@@ -2567,15 +2206,7 @@ void CShopMenu::SelectMake()
                 return;
             }
 
-            int itemId = getItemNo(m_selectedIndex);
-            int makeGil;
-            if (itemId <= 0) {
-                makeGil = 0;
-            } else {
-                int gil = m_caravanWork->m_shopParam *
-                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x24 + itemId * 0x48);
-                makeGil = gil / 100;
-            }
+            int makeGil = getMakeGil(getItemNo(m_selectedIndex));
             if (m_caravanWork->CanAddGil(-makeGil) != 0) {
                 Sound.PlaySe(0x52, 0x40, 0x7F, 0);
                 m_nextMode = 0xF;
@@ -2600,13 +2231,13 @@ void CShopMenu::SelectMake()
  */
 void CShopMenu::SelectYesNo()
 {
-    if ((GetPadButtons() & 0xC) != 0) {
+    if ((Pad.GetButtonDown(0) & 0xC) != 0) {
         m_yesNo ^= 1;
         Sound.PlaySe(1, 0x40, 0x7F, 0);
         return;
     }
 
-    if ((GetPadButtons() & 0x100) == 0) {
+    if ((Pad.GetButtonDown(0) & 0x100) == 0) {
         return;
     }
 
@@ -2699,7 +2330,7 @@ sellBlock:
             } else {
                 canTrade = 0;
             }
-        } else if (static_cast<unsigned char>(MenuPcs.EquipChk(itemIndex)) != 0) {
+        } else if (MenuPcs.EquipChk(itemIndex)) {
             canTrade = 0;
         } else if (tradeItem > 0x9E) {
             canTrade = 1;
@@ -2781,7 +2412,7 @@ yesBlock:
  */
 void CShopMenu::SelectFigure()
 {
-    if ((GetPadButtons() & 1) != 0) {
+    if ((Pad.GetButtonDown(0) & 1) != 0) {
         ++m_figureMode;
         if (m_figureMode > 1) {
             m_figureMode = 1;
@@ -2789,7 +2420,7 @@ void CShopMenu::SelectFigure()
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if ((GetPadButtons() & 2) != 0) {
+    } else if ((Pad.GetButtonDown(0) & 2) != 0) {
         --m_figureMode;
         if (m_figureMode < 0) {
             m_figureMode = 0;
@@ -2797,53 +2428,22 @@ void CShopMenu::SelectFigure()
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if ((GetPadButtons() & 0x100) != 0) {
+    } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
         Sound.PlaySe(2, 0x40, 0x7F, 0);
         m_subMode = 2;
     }
 
-    if (GetShopMenuListButtons(8) != 0) {
+    if ((getButtonRepeat(0, 0) & 8) != 0) {
         switch (m_figureMode) {
         case 0: {
             ++m_quantity;
-            CCaravanWork* caravanWork = m_caravanWork;
-            if (m_quantity <= (0x40 - caravanWork->m_inventoryItemCount)) {
-                short totalGil;
-                if (m_selectedIndex == -1) {
-                    totalGil = 0;
-                } else {
-                    int itemId = getItemNo(m_selectedIndex);
-                    int unitGil;
-                    if (m_listType == 0) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int costBase = itemId * 0x48;
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
-                            unitGil = gil / 100;
-                        }
-                    } else if (1 == m_listType) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int costBase = itemId * 0x48;
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
-                            register int gilReg = gil; gil = gilReg;
-                            unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
-                        }
-                    } else {
-                        unitGil = -1;
-                    }
-                    totalGil = m_quantity * unitGil;
-                }
-                if (caravanWork->CanAddGil(-totalGil) != 0) {
+            if (m_quantity <= GetMaxExchange()) {
+                if (CanAddGil() != 0) {
                     goto cancelInc1;
                 }
             }
 
-            gShopMenuInputLatch = 8;
+            bButtonNoRepeat(8);
             --m_quantity;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
             break;
@@ -2853,38 +2453,8 @@ void CShopMenu::SelectFigure()
         }
         case 1: {
             m_quantity += 10;
-            CCaravanWork* caravanWork = m_caravanWork;
-            if (m_quantity <= (0x40 - caravanWork->m_inventoryItemCount)) {
-                int totalGil;
-                if (m_selectedIndex == -1) {
-                    totalGil = 0;
-                } else {
-                    int itemId = getItemNo(m_selectedIndex);
-                    int unitGil;
-                    if (m_listType == 0) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int costBase = itemId * 0x48;
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
-                            unitGil = gil / 100;
-                        }
-                    } else if (m_listType == 1) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int costBase = itemId * 0x48;
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + costBase);
-                            unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
-                        }
-                    } else {
-                        unitGil = -1;
-                    }
-                    totalGil = m_quantity * unitGil;
-                }
-                if (caravanWork->CanAddGil(-totalGil) != 0) {
+            if (m_quantity <= GetMaxExchange()) {
+                if (CanAddGil() != 0) {
                     goto cancelInc10;
                 }
             }
@@ -2900,7 +2470,7 @@ void CShopMenu::SelectFigure()
         return;
     }
 
-    if (GetShopMenuListButtons(4) == 0) {
+    if ((getButtonRepeat(0, 0) & 4) == 0) {
         return;
     }
 
@@ -2908,7 +2478,7 @@ void CShopMenu::SelectFigure()
     case 0:
         --m_quantity;
         if (m_quantity < 1) {
-            gShopMenuInputLatch = 4;
+            bButtonNoRepeat(4);
             m_quantity = 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else {
@@ -2943,62 +2513,36 @@ void CShopMenu::SelectItemIdx()
         m_selectedIndex = getItemCnt() - 1;
     }
 
-    if (GetShopMenuListButtons(8) != 0) {
+    if ((getButtonRepeat(0, 0) & 8) != 0) {
         --m_selectedIndex;
         if (m_selectedIndex < 0) {
-            gShopMenuInputLatch = 8;
+            bButtonNoRepeat(8);
             m_selectedIndex = 0;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if (GetShopMenuListButtons(4) != 0) {
+    } else if ((getButtonRepeat(0, 0) & 4) != 0) {
         ++m_selectedIndex;
         if (m_selectedIndex >= getItemCnt()) {
-            gShopMenuInputLatch = 4;
+            bButtonNoRepeat(4);
             m_selectedIndex = getItemCnt() - 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if ((GetPadButtons() & 0x100) != 0) {
+    } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
         int canSelect;
         m_figureMode = 0;
         m_yesNo = 0;
 
         int listType = m_listType;
         if (listType == 0) {
-            if (m_selectedIndex == -1) {
-                canSelect = 0;
-            } else {
-                canSelect = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
-            }
+            canSelect = CheckSell(m_selectedIndex);
             if (canSelect != 0) {
                 CCaravanWork* caravanWork = m_caravanWork;
-                if (m_quantity <= (0x40 - caravanWork->m_inventoryItemCount)) {
-                    int itemId = getItemNo(m_selectedIndex);
-                    int unitGil;
-                    if (m_listType == 0) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + itemId * 0x48);
-                            unitGil = gil / 100;
-                        }
-                    } else if (m_listType == 1) {
-                        if (itemId <= 0) {
-                            unitGil = 0;
-                        } else {
-                            int gil = caravanWork->m_shopParam *
-                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + 0x20 + itemId * 0x48);
-                            unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil / 100));
-                        }
-                    } else {
-                        unitGil = -1;
-                    }
-                    int totalGil = m_quantity * unitGil;
-                    if (caravanWork->CanAddGil(-totalGil) != 0) {
+                if (m_quantity <= GetMaxExchange()) {
+                    if (CanAddGil() != 0) {
                         m_subMode = 1;
                         Sound.PlaySe(2, 0x40, 0x7F, 0);
                         goto updateWindow;
@@ -3007,11 +2551,7 @@ void CShopMenu::SelectItemIdx()
             }
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         } else if (listType == 1) {
-            if (m_selectedIndex == -1) {
-                canSelect = 0;
-            } else {
-                canSelect = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
-            }
+            canSelect = CheckSell(m_selectedIndex);
             if (canSelect != 0) {
                 m_subMode = 2;
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -3019,11 +2559,7 @@ void CShopMenu::SelectItemIdx()
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
             }
         } else if (listType == 2) {
-            if (m_selectedIndex == -1) {
-                canSelect = 0;
-            } else {
-                canSelect = CanTradeShopMenuItem(this, m_selectedIndex, getItemNo(m_selectedIndex));
-            }
+            canSelect = CheckSell(m_selectedIndex);
             if (canSelect != 0) {
                 m_nextMode = 0xC;
                 m_resultItem = MenuPcs.GetSmithItem(getItemNo(m_selectedIndex));
@@ -3060,10 +2596,10 @@ updateWindow:
  */
 inline void CShopMenu::SelectSOUBI()
 {
-    if ((GetPadButtons() & 0xC) != 0) {
+    if ((Pad.GetButtonDown(0) & 0xC) != 0) {
         m_yesNo ^= 1;
         Sound.PlaySe(1, 0x40, 0x7F, 0);
-    } else if ((GetPadButtons() & 0x100) != 0) {
+    } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
         m_nextMode = 9;
         SetMode(0x11);
 
@@ -3080,7 +2616,7 @@ inline void CShopMenu::SelectSOUBI()
         }
     }
 
-    if ((GetPadButtons() & 0x200) != 0) {
+    if ((Pad.GetButtonDown(0) & 0x200) != 0) {
         m_nextMode = 9;
         Sound.PlaySe(3, 0x40, 0x7F, 0);
         SetMode(0x11);
@@ -3113,24 +2649,24 @@ void CShopMenu::Calc()
         }
         break;
     case 1:
-        if ((GetPadButtons() & 4) != 0) {
+        if ((Pad.GetButtonDown(0) & 4) != 0) {
             ++choice;
             if (choice >= 3) {
                 choice = 0;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
-        } else if ((GetPadButtons() & 8) != 0) {
+        } else if ((Pad.GetButtonDown(0) & 8) != 0) {
             --choice;
             if (choice >= 3) {
                 choice = 2;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
-        } else if ((GetPadButtons() & 0x100) != 0) {
+        } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
             Sound.PlaySe(2, 0x40, 0x7F, 0);
             this->SetMode(2);
         }
 
-        if ((GetPadButtons() & 0x200) != 0) {
+        if ((Pad.GetButtonDown(0) & 0x200) != 0) {
             Sound.PlaySe(3, 0x40, 0x7F, 0);
             this->SetMode(2);
             choice = 2;
@@ -3169,21 +2705,21 @@ void CShopMenu::Calc()
         switch (subMode) {
         case 0:
             this->SelectItemIdx();
-            if ((GetPadButtons() & 0x200) != 0) {
+            if ((Pad.GetButtonDown(0) & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 this->SetMode(5);
             }
             break;
         case 1:
             this->SelectFigure();
-            if ((GetPadButtons() & 0x200) != 0) {
+            if ((Pad.GetButtonDown(0) & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 0;
             }
             break;
         case 2:
             this->SelectYesNo();
-            if ((GetPadButtons() & 0x200) != 0) {
+            if ((Pad.GetButtonDown(0) & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 1;
             }
@@ -3210,7 +2746,7 @@ void CShopMenu::Calc()
         switch (subMode) {
         case 0:
             this->SelectItemIdx();
-            if ((GetPadButtons() & 0x200) != 0) {
+            if ((Pad.GetButtonDown(0) & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 this->SetMode(8);
             }
@@ -3219,7 +2755,7 @@ void CShopMenu::Calc()
             break;
         case 2:
             this->SelectYesNo();
-            if ((GetPadButtons() & 0x200) != 0) {
+            if ((Pad.GetButtonDown(0) & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 subMode = 0;
             }
@@ -3237,7 +2773,7 @@ void CShopMenu::Calc()
         break;
     case 10:
         this->SelectItemIdx();
-        if ((GetPadButtons() & 0x200) != 0) {
+        if ((Pad.GetButtonDown(0) & 0x200) != 0) {
             m_nextMode = -1;
             Sound.PlaySe(3, 0x40, 0x7F, 0);
             this->SetMode(0xB);
@@ -3268,7 +2804,7 @@ void CShopMenu::Calc()
         break;
     case 13:
         this->SelectMake();
-        if ((GetPadButtons() & 0x200) != 0) {
+        if ((Pad.GetButtonDown(0) & 0x200) != 0) {
             m_nextMode = 9;
             Sound.PlaySe(3, 0x40, 0x7F, 0);
             this->SetMode(0xE);
@@ -3286,18 +2822,18 @@ void CShopMenu::Calc()
         }
         m_fade = static_cast<float>(timer) * FLOAT_80332E50;
         if (timer == 8) {
-            short recipeMaterial[8];
+            CMenuPcs::MaterialInfo recipeMaterial;
 
-            MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
-            ShopMenuCaravanWork(this)->AddGil(-CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)));
+            MenuPcs.GetRecipeMaterial(getItemNo(m_selectedIndex), &recipeMaterial);
+            ShopMenuCaravanWork(this)->AddGil(-getMakeGil(getItemNo(m_selectedIndex)));
             ShopMenuCaravanWork(this)->DeleteItem(getItemNo(m_selectedIndex), 0);
 
             for (int i = 0; i < 3; i++) {
-                if (recipeMaterial[i] <= 0) {
+                if (recipeMaterial.m_itemNo[i] <= 0) {
                     break;
                 }
-                for (int count = 0; count < recipeMaterial[i + 3]; count++) {
-                    ShopMenuCaravanWork(this)->DeleteItem(recipeMaterial[i], 0);
+                for (int count = 0; count < recipeMaterial.m_count[i]; count++) {
+                    ShopMenuCaravanWork(this)->DeleteItem(recipeMaterial.m_itemNo[i], 0);
                 }
             }
 
@@ -3346,8 +2882,8 @@ void CMenuPcs::CreateSmithMenu()
     cacheChunks = reinterpret_cast<pppCacheChunk*>(slot->m_pppDataHead->m_cacheChunks);
     cacheChunks->m_pdt = reinterpret_cast<long*>(
         ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, s_shopmenu_cpp, 0x32A));
-    int cacheData = reinterpret_cast<int>(cacheChunks->m_pdt);
-    pppCacheLoadShape(reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)),
+    long* pdt = cacheChunks->m_pdt;
+    pppCacheLoadShape(reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(pdt) + pdt[5]),
         slot->m_pppDataHead);
 }
 /*
@@ -3378,14 +2914,18 @@ void CMenuPcs::CreateShopMenu()
     cacheChunks = reinterpret_cast<pppCacheChunk*>(slot->m_pppDataHead->m_cacheChunks);
     cacheChunks->m_pdt = reinterpret_cast<long*>(
         ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, s_shopmenu_cpp, 0x32A));
-    int cacheData = reinterpret_cast<int>(cacheChunks->m_pdt);
-    pppCacheLoadShape(reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)),
+    long* pdt = cacheChunks->m_pdt;
+    pppCacheLoadShape(reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(pdt) + pdt[5]),
         slot->m_pppDataHead);
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80158AF4
+ * PAL Size: 848b
+ * EN Address: 0x80174B10
+ * EN Size: 848b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, _GXColor colorA,
                         _GXColor colorB, _GXColor colorC, _GXColor colorD)
@@ -3407,12 +2947,11 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     projectionMtx[2][3] += FLOAT_80332D9C;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-    _GXColor matColor;
-    *reinterpret_cast<unsigned int*>(&matColor) = reinterpret_cast<unsigned int>(g_shopMenu);
+    _GXColor matColor = {0, 0, 0, 0};
 
-    int shapeData = reinterpret_cast<int>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
-    tagOAN3_SHAPE* shape =
-        reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
+    pppShapeAnimData* shapeData = reinterpret_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
+    tagOAN3_SHAPE* shape = reinterpret_cast<tagOAN3_SHAPE*>(
+        reinterpret_cast<unsigned char*>(shapeData) + shapeData->m_frames[groupNo].m_shapeOffset);
 
     MaterialMan.SetDefaultStdDrawEnv(0xACE0F);
 
@@ -3427,7 +2966,7 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     MaterialMan.LockEnvInline();
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
-        static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
+        shape->m_entries[0].m_textureIndex, 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
@@ -3435,7 +2974,7 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
 
     Vec minPos;
     Vec maxPos;
-    int vertexData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shape) + 0xC);
+    unsigned char* vertexData = shape->m_entries[0].m_displayList;
     *reinterpret_cast<unsigned int*>(&minPos.x) = *reinterpret_cast<unsigned int*>(vertexData + 3);
     *reinterpret_cast<unsigned int*>(&minPos.y) = *reinterpret_cast<unsigned int*>(vertexData + 7);
     minPos.z = FLOAT_80332D9C;
@@ -3450,11 +2989,13 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80158E44
+ * PAL Size: 720b
+ * EN Address: 0x80174AA8
+ * EN Size: 104b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-#pragma push
-#pragma peephole off
 void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, unsigned char alpha)
 {
     Mtx44 projectionMtx;
@@ -3474,9 +3015,9 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     projectionMtx[2][3] += FLOAT_80332D9C;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-    int shapeData = reinterpret_cast<int>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
-    tagOAN3_SHAPE* shape =
-        reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
+    pppShapeAnimData* shapeData = reinterpret_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
+    tagOAN3_SHAPE* shape = reinterpret_cast<tagOAN3_SHAPE*>(
+        reinterpret_cast<unsigned char*>(shapeData) + shapeData->m_frames[groupNo].m_shapeOffset);
 
     _GXColor mat;
     *reinterpret_cast<unsigned int*>(&mat) = gShopMenuMaterialWhiteBase;
@@ -3497,25 +3038,24 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     MaterialMan.LockEnvInline();
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
-        static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
+        shape->m_entries[0].m_textureIndex, 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
-    unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
-    int i = 0;
-    unsigned char* displayList = shapeBytes;
-    for (; i < *reinterpret_cast<short*>(shapeBytes + 2); i++) {
-        GXCallDisplayList(*reinterpret_cast<void**>(displayList + 0xC), 0x60);
-        displayList += 8;
+    for (int i = 0; i < shape->m_shapeCount; i++) {
+        GXCallDisplayList(shape->m_entries[i].m_displayList, 0x60);
     }
 }
-#pragma pop
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80159114
+ * PAL Size: 740b
+ * EN Address: 0x801749EC
+ * EN Size: 188b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, unsigned char flipX, unsigned char flipY,
                   float zOffset, unsigned char tlut)
@@ -3552,9 +3092,9 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     projectionMtx[2][3] += zOffset;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-    int shapeData = reinterpret_cast<int>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
-    tagOAN3_SHAPE* shape =
-        reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
+    pppShapeAnimData* shapeData = reinterpret_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[shapeNo]->m_animData);
+    tagOAN3_SHAPE* shape = reinterpret_cast<tagOAN3_SHAPE*>(
+        reinterpret_cast<unsigned char*>(shapeData) + shapeData->m_frames[groupNo].m_shapeOffset);
 
     _GXColor mat;
     *reinterpret_cast<unsigned int*>(&mat) = gShopMenuMaterialWhiteBase;
@@ -3575,18 +3115,14 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     MaterialMan.LockEnvInline();
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
-        static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
+        shape->m_entries[0].m_textureIndex, 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
-    unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
-    int i = 0;
-    unsigned char* displayList = shapeBytes;
-    for (; i < *reinterpret_cast<short*>(shapeBytes + 2); i++) {
-        GXCallDisplayList(*reinterpret_cast<void**>(displayList + 0xC), 0x60);
-        displayList += 8;
+    for (int i = 0; i < shape->m_shapeCount; i++) {
+        GXCallDisplayList(shape->m_entries[i].m_displayList, 0x60);
     }
 }
 /*
@@ -3682,9 +3218,6 @@ mode_3_6_common:
 
 
 
-
-
-
 /*
  * --INFO--
  * Address:	TODO
@@ -3712,9 +3245,6 @@ inline void CShopMenu::DrawSell()
 }
 
 
-
-
-
 /*
  * --INFO--
  * Address:	TODO
@@ -3724,9 +3254,6 @@ inline void CShopMenu::InitDrawEnvShape()
 {
     pppInitDrawEnv(0);
 }
-
-
-
 
 
 

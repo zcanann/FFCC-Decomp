@@ -416,16 +416,8 @@ void CFont::SetShadow(int enabled)
  */
 void CFont::SetColor(_GXColor color)
 {
-	unsigned char red = color.r;
-	m_color.r = red;
-	unsigned char blue = color.b;
-	unsigned char green = color.g;
-	m_color.g = green;
-	unsigned char alpha = color.a;
-	m_color.b = blue;
-	m_color.a = alpha;
-	_GXColor localColor = m_color;
-	GXSetChanMatColor(GX_COLOR0A0, localColor);
+	m_color = color;
+	GXSetChanMatColor(GX_COLOR0A0, m_color);
 }
 
 /*

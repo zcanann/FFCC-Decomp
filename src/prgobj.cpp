@@ -375,9 +375,9 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPrgObj::dstTargetRot(CGPrgObj* target)
+float CGPrgObj::dstTargetRot(CGPrgObj* target)
 {
-	Math.DstRot(m_rotBaseY, 3.1415927f + getTargetRot(target));
+	return Math.DstRot(m_rotBaseY, 3.1415927f + getTargetRot(target));
 }
 
 /*

@@ -1079,7 +1079,7 @@ timeout_expiry:
 
             if (m_stateCodeArr[threadParam->m_portIndex] == 2)
             {
-                if ((GbaQue.GetChgUseItemFlg(threadParam->m_portIndex) & 0xFF) != 0)
+                if (GbaQue.GetChgUseItemFlg(threadParam->m_portIndex))
                 {
                     char useItem = (char)GbaQue.GetUseItemFlg(threadParam->m_portIndex);
                     if (SendUseItem(threadParam->m_portIndex, useItem) < 0)
@@ -2183,7 +2183,7 @@ timeout_expiry:
         case 0x41:
         {
             int res = GBARecvSend(threadParam, &localBuf);
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (GbaQue.GetArtiDatFlg(threadParam->m_portIndex) & 0xFF) != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetArtiDatFlg(threadParam->m_portIndex))
             {
                 threadParam->m_state = 'B';
                 memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));
@@ -2911,7 +2911,6 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma opt_dead_assignments off
 int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 {
 
@@ -3238,7 +3237,6 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
     return static_cast<int>(recvBit | sendBit);
 }
 
-#pragma opt_dead_assignments on
 /*
  * --INFO--
  * PAL Address: 0x800acf48
@@ -3606,8 +3604,6 @@ inline int JoyBus::WriteContext(ThreadParam* threadParam)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 int JoyBus::InitialCode(ThreadParam* threadParam)
 {
     int result;
@@ -3755,7 +3751,6 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
     return result;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -4397,76 +4392,57 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 }
 
 
-#pragma push
-#pragma opt_unroll_loops off
 /*
  * --INFO--
  * PAL Address: 0x800AB24C
  * PAL Size: 420b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800c1d78
+ * EN Size: 336b
  * JP Address: TODO
  * JP Size: TODO
  */
 int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
 {
-    unsigned char* param_2 = reinterpret_cast<unsigned char*>(src);
-    unsigned char* param_4 = reinterpret_cast<unsigned char*>(outBuffer);
-    unsigned int uVar5;
-    int chunkCount;
-    unsigned char* pbVar4;
-    unsigned char* pbVar1;
-    int iVar3;
-    unsigned char* puVar6;
-    unsigned int uVar8;
+    unsigned char* data = reinterpret_cast<unsigned char*>(src);
+    unsigned char* packet = reinterpret_cast<unsigned char*>(outBuffer);
+    unsigned int crc = 0xFFFF;
+    unsigned char* cursor = data;
+    int remaining = length;
 
-    uVar5 = 0xFFFF;
-    chunkCount = length;
-    pbVar4 = param_2;
-
-    while (--chunkCount >= 0) {
-        uVar5 = (((uVar5 & 0xFFFF) << 8) ^ static_cast<unsigned int>(JoyBusCrcTable[((uVar5 >> 8) & 0xFF) ^ static_cast<unsigned int>(*pbVar4)])) & 0xFFFF;
-        pbVar4 = pbVar4 + 1;
+    while (--remaining >= 0) {
+        crc = (((crc & 0xFFFF) << 8) ^ JoyBusCrcTable[((crc >> 8) & 0xFF) ^ *cursor++]) & 0xFFFF;
     }
 
-    unsigned short inv = static_cast<unsigned short>(~static_cast<unsigned short>(uVar5));
-    param_4[0] = 5;
-    chunkCount = (length - 1) / 3;
-
-    if ((length - 1) - (chunkCount * 3) != 0) {
-        chunkCount = chunkCount + 1;
+    unsigned short checksum = static_cast<unsigned short>(~static_cast<unsigned short>(crc));
+    packet[0] = 5;
+    int chunkCount = (length - 1) / 3;
+    if ((length - 1) % 3 != 0) {
+        chunkCount++;
     }
 
-    iVar3 = chunkCount + 2;
-
-    if (iVar3 > 0xFF) {
-        iVar3 = -1;
-    } else {
-        param_4[1] = static_cast<unsigned char>(iVar3);
-
-        *reinterpret_cast<unsigned short*>(param_4 + 2) = __lhbrx(&inv, 0);
-
-        puVar6 = param_4 + 8;
-        param_4[4] = 0x45;
-        pbVar4 = param_2 + 1;
-        param_4[5] = static_cast<unsigned char>(length);
-        param_4[6] = static_cast<unsigned char>(static_cast<unsigned int>(length) >> 8);
-        param_4[7] = *param_2;
-
-        if (1 < iVar3) {
-            int i;
-            for (i = 1; i < iVar3; i++) {
-                *puVar6++ = 0x85;
-                *puVar6++ = *pbVar4++;
-                *puVar6++ = *pbVar4++;
-                *puVar6++ = *pbVar4++;
-            }
-        }
+    int wordCount = chunkCount + 2;
+    if (wordCount > 0xFF) {
+        return -1;
     }
 
-    return iVar3;
+    packet[1] = static_cast<unsigned char>(wordCount);
+    *reinterpret_cast<unsigned short*>(packet + 2) = __lhbrx(&checksum, 0);
+    unsigned char* output = packet + 8;
+    packet[4] = 0x45;
+    cursor = data + 1;
+    packet[5] = static_cast<unsigned char>(length);
+    packet[6] = static_cast<unsigned char>(static_cast<unsigned int>(length) >> 8);
+    packet[7] = *data;
+
+    for (int i = wordCount - 1; i > 0; i--) {
+        *output++ = 0x85;
+        *output++ = *cursor++;
+        *output++ = *cursor++;
+        *output++ = *cursor++;
+    }
+
+    return wordCount;
 }
-#pragma pop
 
 
 /*
@@ -4901,8 +4877,12 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800AA0AC
+ * PAL Size: 612b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 {
@@ -4917,9 +4897,9 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
     {
         GbaQue.GetMapObjDrawFlg(&flgWord);
 
-        volatile unsigned char* data = (volatile unsigned char*)&flgWord;
+        unsigned char* data = reinterpret_cast<unsigned char*>(&flgWord);
         unsigned char crcBytes[4];
-        volatile unsigned char* q = crcBytes;
+        unsigned char* q = crcBytes;
         q[3] = data[0];
         q[2] = data[1];
         q[1] = data[2];
@@ -5273,8 +5253,6 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
     return result;
 }
 
-#pragma push
-#pragma opt_propagation off
 /*
  * --INFO--
  * Address:	TODO
@@ -5376,7 +5354,6 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
 
     return result;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -6040,8 +6017,6 @@ int JoyBus::GetGBAStat(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_lifetimes off
 int JoyBus::ChgCtrlMode(int portIndex)
 {
     unsigned int word = 0;
@@ -6091,7 +6066,6 @@ int JoyBus::ChgCtrlMode(int portIndex)
 
     return ret;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -6291,8 +6265,6 @@ int JoyBus::GBAReady(int portIndex)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_propagation off
 int JoyBus::SendAllStat(int portIndex)
 {
     m_threadParams[portIndex].m_state = 0;
@@ -6331,7 +6303,6 @@ int JoyBus::SendAllStat(int portIndex)
 
     return 0;
 }
-#pragma pop
 
 
 /*
@@ -6472,7 +6443,6 @@ int JoyBus::SendMask(int, unsigned short)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma opt_dead_assignments off
 int JoyBus::SetMoney(int portIndex, unsigned int money)
 {
     int result = 0;
@@ -6507,7 +6477,6 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
     return result;
 }
 
-#pragma opt_dead_assignments on
 /*
  * --INFO--
  * Address:	TODO
@@ -6758,36 +6727,19 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
  * --INFO--
  * PAL Address: 0x800b26d8
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800bb308
+ * EN Size: 100b
  * JP Address: TODO
  * JP Size: TODO
  */
 unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 {
-    unsigned int idx;
-    unsigned int hi;
-
-    goto check_len;
-
-loop:
-    idx = *crc;
-    hi = idx << 8;
-    idx = (unsigned int)((int)idx >> 8);
-    idx = (unsigned char)idx;
-    idx = idx ^ (unsigned int)*data;
-    data = data + 1;
-    *crc = (unsigned short)(hi ^ JoyBusCrcTable[idx]);
-
-check_len:
-    len = len - 1;
-
-    if (len >= 0)
-    {
-        goto loop;
+    while (--len >= 0) {
+        int value = *crc;
+        *crc = static_cast<unsigned short>((value << 8) ^ JoyBusCrcTable[static_cast<unsigned char>(value >> 8) ^ *data++]);
     }
 
-    return (unsigned short)~(*crc);
+    return static_cast<unsigned short>(~*crc);
 }
 
 /*

@@ -20,8 +20,8 @@ static Mtx s_f_lvmtx;
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void* self, register float (*mtx)[4], register Vec* src,
-                                                              register Vec4d* dst) {
+asm void CMath::MTX44MultVec4(register float (*mtx)[4], register Vec* src, register Vec4d* dst)
+{
     nofralloc
     psq_l f0, 0x0(src), 0, 0
     psq_l f1, 0x8(src), 1, 0
@@ -59,8 +59,8 @@ extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void* self,
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" asm void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(register void* self, register float (*mtx)[4],
-                                                                register Vec4d* src, register Vec4d* dst) {
+asm void CMath::MTX44MultVec4(register float (*mtx)[4], register Vec4d* src, register Vec4d* dst)
+{
     nofralloc
     psq_l f0, 0x0(src), 0, 0
     psq_l f1, 0x8(src), 0, 0
@@ -640,8 +640,7 @@ int CBound::CheckFrustum0(float farPlane)
         return 0;
     }
 
-    insideMask = (unsigned int)__cntlzw((unsigned char)outsideMask);
-    return (int)(insideMask >> 5) + 1;
+    return (unsigned char)outsideMask == 0 ? 2 : 1;
 }
 
 /*
@@ -765,8 +764,7 @@ int CBound::CheckFrustum0(CBound& outBound)
         return 0;
     }
 
-    insideMask = (unsigned int)__cntlzw((unsigned char)outsideMask);
-    return (int)(insideMask >> 5) + 1;
+    return (unsigned char)outsideMask == 0 ? 2 : 1;
 }
 
 /*

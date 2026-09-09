@@ -310,9 +310,6 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirth
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma optimization_level 3
-#pragma global_optimizer off
 void birth(
     _pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirthModel* params, VColor* color,
     _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, _PARTICLE_COLOR* particleColor)
@@ -960,7 +957,6 @@ join_position:
         particleColor->m_colorFrameDeltas[3] = *(float*)(payload + 0x38);
     }
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1241,13 +1237,11 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
  * --INFO--
  * PAL Address: 0x800842e4
  * PAL Size: 3896b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80098294
+ * EN Size: 4168b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMegaBirthModel* params,
                 _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, pppFMATRIX& out, unsigned char copyOut)
 {
@@ -1286,12 +1280,12 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     switch (params->m_spawnMode) {
     default:
         if (particleWMat == NULL) {
-            pppMulMatrix(mtxB, *(pppFMATRIX*)&pObject->m_localMatrix, mtxB);
+            pppMulMatrix(mtxB, pObject->m_localMatrix, mtxB);
             pppMulMatrix(mtxB, ppvMng->m_matrix, mtxB);
             pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix, mtxB);
             pppCopyMatrix(pObject->m_drawMatrix, mtxB);
         } else {
-            pppMulMatrix(mtxB, *(pppFMATRIX*)&pObject->m_localMatrix, mtxB);
+            pppMulMatrix(mtxB, pObject->m_localMatrix, mtxB);
             pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, mtxB);
             pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix, mtxB);
             pppCopyMatrix(pObject->m_drawMatrix, mtxB);
@@ -1353,7 +1347,6 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         pObject->m_drawMatrix.value[2][3] = endPos.z;
     }
 }
-#pragma pop
 
 /*
  * --INFO--

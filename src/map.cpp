@@ -94,9 +94,6 @@ static const char s_mapReadMtxFmt[] = "ReadMtx fn=%s\n";
 static const char s_map_manager_label[] = "CMapMng.mapmng";
 extern const char s_CMapObjAtrName[] = "CMapObjAtr";
 extern const char s_CMapTexAnimSet[] = "CMapTexAnimSet";
-static const char s_map_ptrarray_grow_error[] =
-    "\x83\x6f\x83\x62\x83\x74\x83\x40\x90\xac\x92\xb7\x82\xaa\x95\x73\x8b\x96\x89\xc2\x82\xc5\x82\xb7\x81\x42\n";
-static const char s_map_collection_ptrarray_h[] = "collection_ptrarray.h";
 
 namespace {
 static inline float MapObjWorldX(CMapObj* mapObj)
@@ -198,835 +195,6 @@ float CMapKeyFrame::Get()
     default:
         return kMapZero;
     }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80033d0c
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma dont_inline on
-template <>
-int CPtrArray<CMaterial*>::GetSize()
-{
-    return m_numItems;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80033d14
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-void CPtrArray<CMaterial*>::SetDefaultSize(unsigned long defaultSize)
-{
-    m_defaultSize = defaultSize;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80033d1c
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-void CPtrArray<CMaterial*>::SetGrow(int growCapacity)
-{
-    m_growCapacity = growCapacity;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x800343e0
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CPtrArray<CMapLightHolder*>::CPtrArray()
-{
-    m_size = 0;
-    m_numItems = 0;
-    m_defaultSize = 0x10;
-    m_items = 0;
-    m_stage = 0;
-    m_growCapacity = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034414
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CPtrArray<CMapLightHolder*>::~CPtrArray()
-{
-    if (m_items != 0) {
-        delete[] m_items;
-        m_items = 0;
-    }
-
-    m_size = 0;
-    m_numItems = 0;
-}
-
-template <>
-int CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize);
-
-/*
- * --INFO--
- * PAL Address: 0x80033d24
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-int CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
-{
-    if (setSize(m_numItems + 1) == 0) {
-        return 0;
-    }
-    m_items[m_numItems] = item;
-    m_numItems++;
-    return 1;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80033d94
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-void CPtrArray<CMapLightHolder*>::RemoveAll()
-{
-    if (m_items != 0) {
-        delete[] m_items;
-        m_items = 0;
-    }
-    m_size = 0;
-    m_numItems = 0;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-#pragma dont_inline on
-template <>
-void CPtrArray<CMapLightHolder*>::SetStage(CMemory::CStage* stage)
-{
-    m_stage = stage;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80033de8
- * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-int CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize)
-{
-    CMapLightHolder** newItems;
-
-    if (m_size < newSize) {
-        if (m_size == 0) {
-            m_size = m_defaultSize;
-        } else {
-            if (m_growCapacity == 0) {
-                System.Printf(const_cast<char*>(s_map_ptrarray_grow_error));
-            }
-            m_size = m_size << 1;
-        }
-
-        newItems = static_cast<CMapLightHolder**>(
-            Memory._Alloc(m_size << 2, m_stage, const_cast<char*>(s_map_collection_ptrarray_h), 0xFA, 0));
-        if (newItems == 0) {
-            return 0;
-        }
-
-        if (m_items != 0) {
-            memcpy(newItems, m_items, m_numItems << 2);
-        }
-        if (m_items != 0) {
-            delete[] m_items;
-            m_items = 0;
-        }
-
-        m_items = newItems;
-    }
-
-    return 1;
-}
-
-template <>
-int CPtrArray<CMapAnim*>::setSize(unsigned long newSize);
-
-/*
- * --INFO--
- * PAL Address: 0x80033f54
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-int CPtrArray<CMapAnim*>::Add(CMapAnim* item)
-{
-    if (setSize(m_numItems + 1) == 0) {
-        return 0;
-    }
-    m_items[m_numItems] = item;
-    m_numItems++;
-    return 1;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80033fc4
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-int CPtrArray<CMapAnim*>::GetSize()
-{
-    return m_numItems;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80033fcc
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-void CPtrArray<CMapAnim*>::RemoveAll()
-{
-    if (m_items != 0) {
-        delete[] m_items;
-        m_items = 0;
-    }
-    m_size = 0;
-    m_numItems = 0;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034018
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-CMapAnim* CPtrArray<CMapAnim*>::operator[](unsigned long index)
-{
-    return GetAt(index);
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034130
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-int CPtrArray<CMapAnimNode*>::GetSize()
-{
-    return m_numItems;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034138
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CMapAnimNode* CPtrArray<CMapAnimNode*>::operator[](unsigned long index)
-{
-    return GetAt(index);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034270
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CMapAnimNode* CPtrArray<CMapAnimNode*>::GetAt(unsigned long index)
-{
-    return m_items[index];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034158
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-int CPtrArray<CMapAnimKeyDt*>::GetSize()
-{
-    return m_numItems;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x800341ac
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::operator[](unsigned long index)
-{
-    return GetAt(index);
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034280
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::GetAt(unsigned long index)
-{
-    return m_items[index];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800341cc
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma dont_inline on
-template <>
-void CPtrArray<CMapAnimKeyDt*>::SetStage(CMemory::CStage* stage)
-{
-    m_stage = stage;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034160
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
-{
-    if (m_items != 0) {
-        delete[] m_items;
-        m_items = 0;
-    }
-    m_size = 0;
-    m_numItems = 0;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034038
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma dont_inline on
-template <>
-void CPtrArray<CMapAnim*>::SetStage(CMemory::CStage* stage)
-{
-    m_stage = stage;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034040
- * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-int CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
-{
-    CMapAnim** newItems;
-
-    if (m_size < newSize) {
-        if (m_size == 0) {
-            m_size = m_defaultSize;
-        } else {
-            if (m_growCapacity == 0) {
-                System.Printf(const_cast<char*>(s_map_ptrarray_grow_error));
-            }
-            m_size = m_size << 1;
-        }
-
-        newItems = static_cast<CMapAnim**>(
-            Memory._Alloc(m_size << 2, m_stage, const_cast<char*>(s_map_collection_ptrarray_h), 0xFA, 0));
-        if (newItems == 0) {
-            return 0;
-        }
-
-        if (m_items != 0) {
-            memcpy(newItems, m_items, m_numItems << 2);
-        }
-        if (m_items != 0) {
-            delete[] m_items;
-            m_items = 0;
-        }
-
-        m_items = newItems;
-    }
-
-    return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034490
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-CPtrArray<CMapAnimRun*>::CPtrArray()
-{
-    m_size = 0;
-    m_numItems = 0;
-    m_defaultSize = 0x10;
-    m_items = 0;
-    m_stage = 0;
-    m_growCapacity = 1;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x800344c4
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CPtrArray<CMapAnimRun*>::~CPtrArray()
-{
-    if (m_items != 0) {
-        delete[] m_items;
-        m_items = 0;
-    }
-    m_size = 0;
-    m_numItems = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034540
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-CPtrArray<CMapAnim*>::CPtrArray()
-{
-    m_size = 0;
-    m_numItems = 0;
-    m_defaultSize = 0x10;
-    m_items = 0;
-    m_stage = 0;
-    m_growCapacity = 1;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034574
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CPtrArray<CMapAnim*>::~CPtrArray()
-{
-    if (m_items != 0) {
-        delete[] m_items;
-        m_items = 0;
-    }
-
-    m_size = 0;
-    m_numItems = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800345f0
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-CPtrArray<CMapAnimKeyDt*>::CPtrArray()
-{
-    m_size = 0;
-    m_numItems = 0;
-    m_defaultSize = 0x10;
-    m_items = 0;
-    m_stage = 0;
-    m_growCapacity = 1;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034624
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CPtrArray<CMapAnimKeyDt*>::~CPtrArray()
-{
-    if (m_items != 0) {
-        delete[] m_items;
-        m_items = 0;
-    }
-
-    m_size = 0;
-    m_numItems = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800346a0
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-CPtrArray<CMapShadow*>::CPtrArray()
-{
-    m_size = 0;
-    m_numItems = 0;
-    m_defaultSize = 0x10;
-    m_items = 0;
-    m_stage = 0;
-    m_growCapacity = 1;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x800346d4
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CPtrArray<CMapShadow*>::~CPtrArray()
-{
-    if (m_items != 0) {
-        delete[] m_items;
-        m_items = 0;
-    }
-
-    m_size = 0;
-    m_numItems = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034260
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CMapAnim* CPtrArray<CMapAnim*>::GetAt(unsigned long index)
-{
-    return m_items[index];
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-template <>
-#pragma dont_inline on
-int CPtrArray<CMapAnimRun*>::GetSize()
-{
-    return m_numItems;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x800340f0
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-void CPtrArray<CMapAnimRun*>::RemoveAll()
-{
-    if (m_items != 0) {
-        delete[] m_items;
-        m_items = 0;
-    }
-    m_size = 0;
-    m_numItems = 0;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x8003413c
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-CMapAnimRun* CPtrArray<CMapAnimRun*>::operator[](unsigned long index)
-{
-    return GetAt(index);
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034170
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma dont_inline on
-template <>
-void CPtrArray<CMapAnimRun*>::SetStage(CMemory::CStage* stage)
-{
-    m_stage = stage;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034a44
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CMapAnimRun* CPtrArray<CMapAnimRun*>::GetAt(unsigned long index)
-{
-    return m_items[index];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800341d4
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-int CPtrArray<CMapShadow*>::GetSize()
-{
-    return m_numItems;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x800341dc
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-void CPtrArray<CMapShadow*>::RemoveAll()
-{
-    if (m_items != 0) {
-        delete[] m_items;
-        m_items = 0;
-    }
-    m_size = 0;
-    m_numItems = 0;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034228
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-#pragma dont_inline on
-CMapShadow* CPtrArray<CMapShadow*>::operator[](unsigned long index)
-{
-    return GetAt(index);
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034248
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma dont_inline on
-template <>
-void CPtrArray<CMapShadow*>::SetStage(CMemory::CStage* stage)
-{
-    m_stage = stage;
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80034290
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CMapShadow* CPtrArray<CMapShadow*>::GetAt(unsigned long index)
-{
-    return m_items[index];
 }
 
 /*
@@ -1227,151 +395,134 @@ void CMapMng::Create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyOctTree()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMapHit()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMapObj()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMapMesh()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyTextureSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMaterialSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMapTexAnimSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyAnimation()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMapShadow()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::DestroyMapLightHolder()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80033254
- * PAL Size: 892b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 108b
+ * EN Address: 0x80039054
+ * EN Size: 100b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::DestroyMap()
+inline void CMapMng::DestroyOctTree()
 {
-    int i;
-    for (i = 0; i < m_octTreeCount; i++) {
+    for (int i = 0; i < m_octTreeCount; i++) {
         m_octTreeArray[i].~COctTree();
     }
     m_octTreeCount = 0;
+}
 
-    for (i = 0; i < m_mapHitCount; i++) {
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 108b
+ * EN Address: 0x800390b8
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMapHit()
+{
+    for (int i = 0; i < m_mapHitCount; i++) {
         m_mapHitArray[i].~CMapHit();
     }
     m_mapHitCount = 0;
+}
 
-    for (i = 0; i < m_mapObjCount; i++) {
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 108b
+ * EN Address: 0x8003911c
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMapObj()
+{
+    for (int i = 0; i < m_mapObjCount; i++) {
         m_mapObjArray[i].~CMapObj();
     }
     m_mapObjCount = 0;
+}
 
-    for (i = 0; i < m_mapMeshCount; i++) {
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 112b
+ * EN Address: 0x80039180
+ * EN Size: 104b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMapMesh()
+{
+    for (int i = 0; i < m_mapMeshCount; i++) {
         m_mapMeshArray[i].~CMapMesh();
     }
     m_mapMeshCount = 0;
+}
 
-    if (m_materialSet != 0) {
-        delete m_materialSet;
-        m_materialSet = 0;
-    }
-
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 92b
+ * EN Address: 0x800391e8
+ * EN Size: 120b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyTextureSet()
+{
     if (m_textureSet != 0) {
         delete m_textureSet;
         m_textureSet = 0;
     }
+}
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 92b
+ * EN Address: 0x80039260
+ * EN Size: 120b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMaterialSet()
+{
+    if (m_materialSet != 0) {
+        delete m_materialSet;
+        m_materialSet = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 92b
+ * EN Address: 0x800392d8
+ * EN Size: 120b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMapTexAnimSet()
+{
     if (m_mapTexAnimSet != 0) {
         delete m_mapTexAnimSet;
         m_mapTexAnimSet = 0;
     }
+}
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 320b
+ * EN Address: 0x80039350
+ * EN Size: 336b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyAnimation()
+{
     for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapAnimArray().GetSize()); i++) {
         if (GetMapAnimArray()[i] != 0) {
             delete GetMapAnimArray()[i];
@@ -1388,26 +539,73 @@ void CMapMng::DestroyMap()
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapAnimRunArray().GetSize()); i++) {
         if (GetMapAnimRunArray()[i] != 0) {
-            operator delete(GetMapAnimRunArray()[i]);
+            delete GetMapAnimRunArray()[i];
         }
     }
     GetMapAnimRunArray().RemoveAll();
+}
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 136b
+ * EN Address: 0x800394a0
+ * EN Size: 136b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMapShadow()
+{
     for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
         if (GetMapShadowArray()[i] != 0) {
-            operator delete(GetMapShadowArray()[i]);
+            delete GetMapShadowArray()[i];
         }
     }
     GetMapShadowArray().RemoveAll();
+}
 
-    for (i = 0; i < 2; i++) {
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 168b
+ * EN Address: 0x80039528
+ * EN Size: 196b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMapMng::DestroyMapLightHolder()
+{
+    for (int i = 0; i < 2; i++) {
         for (unsigned int j = 0; j < static_cast<unsigned int>(GetMapLightHolderArray(i).GetSize()); j++) {
             if (GetMapLightHolderArray(i)[j] != 0) {
-                operator delete(GetMapLightHolderArray(i)[j]);
+                delete GetMapLightHolderArray(i)[j];
             }
         }
         GetMapLightHolderArray(i).RemoveAll();
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80033254
+ * PAL Size: 892b
+ * EN Address: 0x800395ec
+ * EN Size: 148b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMng::DestroyMap()
+{
+    DestroyOctTree();
+    DestroyMapHit();
+    DestroyMapObj();
+    DestroyMapMesh();
+    DestroyMaterialSet();
+    DestroyTextureSet();
+    DestroyMapTexAnimSet();
+    DestroyAnimation();
+    DestroyMapShadow();
+    DestroyMapLightHolder();
 
     LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
     m_rootMapObj = 0;
@@ -2585,7 +1783,6 @@ void CMapMng::Calc()
  * Address:	TODO
  * Size:	TODO
  */
-#pragma dont_inline on
 void CMapMng::DrawMapShadow()
 {
     if (m_mapObjCount != 0) {
@@ -2596,7 +1793,6 @@ void CMapMng::DrawMapShadow()
         }
     }
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -2949,16 +2145,6 @@ void CMapMng::Draw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80030280
  * PAL Size: 276b
  * EN Address: TODO
@@ -3105,22 +2291,50 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 260b
+ * EN Address: 0x8003ce38
+ * EN Size: 288b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::GetAnimRunMapObj(CMapObj*)
+inline CMapAnimRun* CMapMng::GetAnimRunMapObj(CMapObj* mapObj)
 {
-	// TODO
+    int mapAnimRunCount = m_mapAnimRunArray.GetSize();
+    for (int i = 0; i < mapAnimRunCount; i++) {
+        CMapAnimRun* mapAnimRun = m_mapAnimRunArray[i];
+        CPtrArray<CMapAnimNode*>* mapAnimNodeArray =
+            &m_mapAnimArray[mapAnimRun->m_mapAnimIndex]->mapAnimNodes;
+        int mapAnimNodeCount = mapAnimNodeArray->GetSize();
+        for (int j = 0; j < mapAnimNodeCount; j++) {
+            CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[j];
+            if (mapAnimNode->m_node == mapObj) {
+                return mapAnimRun;
+            }
+        }
+    }
+    return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 148b
+ * EN Address: 0x8003cf58
+ * EN Size: 188b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::GetAnimRunID(int)
+inline CMapAnimRun* CMapMng::GetAnimRunID(int animId)
 {
-	// TODO
+    int mapAnimRunCount = m_mapAnimRunArray.GetSize();
+    for (int i = 0; i < mapAnimRunCount; i++) {
+        CMapAnimRun* mapAnimRun = m_mapAnimRunArray[i];
+        if (mapAnimRun->m_animId == static_cast<unsigned char>(animId)) {
+            return mapAnimRun;
+        }
+    }
+    return 0;
 }
 
 /*
@@ -3167,8 +2381,8 @@ void CMapMng::SetIdGrpMask(int mapIdGrpIndex, unsigned long mask)
  * --INFO--
  * PAL Address: 0x8002fcb4
  * PAL Size: 232b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8003D170
+ * EN Size: 368b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3176,41 +2390,17 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
 {
     switch (channelIndex) {
     case 0:
-    {
-        u8 b = color.b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.r = color.r;
-        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.g = color.g;
-        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.b = b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor.a = color.a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_primaryColor = color;
         return;
-    }
     case 1:
-    {
-        u8 b = color.b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.r = color.r;
-        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.g = color.g;
-        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.b = b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor.a = color.a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_secondaryColor = color;
         return;
-    }
     case 2:
-    {
-        u8 b = color.b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.r = color.r;
-        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.g = color.g;
-        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.b = b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor.a = color.a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_tertiaryColor = color;
         return;
-    }
     case 3:
-    {
-        u8 b = color.b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.r = color.r;
-        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.g = color.g;
-        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.b = b;
-        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor.a = color.a;
+        m_mapIdGrpArray[mapIdGrpIndex].m_quaternaryColor = color;
         return;
-    }
     }
 }
 
@@ -3401,72 +2591,31 @@ void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
  * --INFO--
  * PAL Address: 0x8002f7a4
  * PAL Size: 220b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8003d8ac
+ * EN Size: 196b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int loop)
 {
-    int mapAnimNodeIndex;
-    CPtrArray<CMapAnimNode*>* mapAnimNodeArray;
-    CMapAnimRun* mapAnimRun;
-    int mapAnimRunIndex;
-    CMapObj* mapObj = m_mapObjArray + mapObjIndex;
-    int mapAnimRunCount = m_mapAnimRunArray.GetSize();
-    int mapAnimNodeCount;
-
-    for (mapAnimRunIndex = 0; mapAnimRunIndex < mapAnimRunCount; mapAnimRunIndex++) {
-        mapAnimRun = m_mapAnimRunArray[mapAnimRunIndex];
-        mapAnimNodeArray =
-            reinterpret_cast<CPtrArray<CMapAnimNode*>*>(m_mapAnimArray[mapAnimRun->m_mapAnimIndex]);
-        mapAnimNodeCount = mapAnimNodeArray->GetSize();
-
-        for (mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
-            CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[mapAnimNodeIndex];
-            if (mapAnimNode->m_node == mapObj) {
-                goto startMapObjAnim;
-            }
-        }
-    }
-
-    mapAnimRun = 0;
-
-startMapObjAnim:
+    CMapObj* mapObj = &m_mapObjArray[mapObjIndex];
+    CMapAnimRun* mapAnimRun = GetAnimRunMapObj(mapObj);
     mapAnimRun->Start(startFrame, endFrame, loop);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
  * PAL Address: 0x8002f710
  * PAL Size: 148b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8003d970
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
-    CMapAnimRun* mapAnimRun;
-    int mapAnimRunCount = m_mapAnimRunArray.GetSize();
-
-    for (int i = 0; i < mapAnimRunCount; i++) {
-        CMapAnimRun* current = m_mapAnimRunArray[i];
-        if (current->m_animId == static_cast<unsigned char>(animId)) {
-            mapAnimRun = current;
-            goto startMapAnim;
-        }
-    }
-
-    mapAnimRun = 0;
-
-startMapAnim:
-    mapAnimRun->Start(startFrame, endFrame, loop);
+    GetAnimRunID(animId)->Start(startFrame, endFrame, loop);
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--

@@ -3,9 +3,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/pppYmEnv.h"
-extern "C" {
-extern const float kPppScreenQuakeZero[2];
-}
 
 STATIC_ASSERT(sizeof(ScreenQuakeDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(ScreenQuakeDataOffsets, m_workOffset) == 0x0);
@@ -77,7 +74,7 @@ void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeStep *param2, _ppp
  */
 void pppDesScreenQuake(pppScreenQuake*, _pppCtrlTable*)
 {
-    float val = kPppScreenQuakeZero[0];
+    float val = 0.0f;
 
     CameraPcs.SetQuakeParameter(
         0,
@@ -104,7 +101,7 @@ void pppDesScreenQuake(pppScreenQuake*, _pppCtrlTable*)
  */
 void pppCon2ScreenQuake(pppScreenQuake *quake, _pppCtrlTable *param2)
 {
-    float val = kPppScreenQuakeZero[0];
+    float val = 0.0f;
     float *data = GetScreenQuakeWork(quake, param2);
 
     data[2] = val;
@@ -129,7 +126,7 @@ void pppCon2ScreenQuake(pppScreenQuake *quake, _pppCtrlTable *param2)
  */
 void pppConScreenQuake(pppScreenQuake *quake, _pppCtrlTable *param2)
 {
-    float val = kPppScreenQuakeZero[0];
+    float val = 0.0f;
     float *data = GetScreenQuakeWork(quake, param2);
 
     data[2] = val;

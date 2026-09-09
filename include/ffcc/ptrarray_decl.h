@@ -3,7 +3,6 @@
 
 #include "ffcc/memory.h"
 
-#ifndef _FFCC_PTRARRAY_H_
 template <class T>
 class CPtrArray
 {
@@ -34,6 +33,5 @@ private:
     CMemory::CStage* m_stage;
     int m_growCapacity;
 };
-#endif
 
 #endif // _FFCC_PTRARRAY_DECL_H_

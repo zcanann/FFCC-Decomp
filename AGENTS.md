@@ -17,11 +17,17 @@ Goal: maximize real progress by improving C/C++ source, linkage, headers, types,
 - **Ghidra is a guide**, mainly for addresses, sizes, and rough function shape.
 - Function names from shipped Metrowerks symbols are usually correct. Parameters from Ghidra may not be.
 
+Game code uses **GC/2.5** as its shared compiler baseline. This is a working assumption supported by comparison, not proof of the exact retail compiler. Prefer recovering plausible source and removing temporary tuning over adding per-unit compiler overrides. Revisit existing optimization overrides against this baseline. If a previously `Matching` unit stops linking exactly, mark it `NonMatching` while repairing it; do not preserve the label with compiler exceptions. SDK and middleware compiler choices are independent.
+
+Do not restore temporary function-local optimization, scheduling, or forced-inlining pragmas to recover scores. Repair the source using normal C/C++ and retail evidence. Exception handling, ABI, and data-placement settings require their own evidence and are not interchangeable with optimizer tuning.
+
 Useful references:
 - Ghidra decomp: `resources/ghidra-decomp-1-31-2026/`
 - PAL map: `orig/GCCP01/game.MAP`
 - EN map: `orig/GCCE01/game.MAP`
 - Symbol extractor: `python3 tools/extract_symbols.py <object>.o`
+
+Do not assume MAP addresses and sizes match the retail images. The PAL MAP comes from an older build, as noted in `config/GCCP01/config.yml`; EN MAP addresses also need verification. Use MAPs for symbol and ownership evidence, but verify addresses and sizes against the relevant retail image and symbol configuration before changing INFO headers or symbol claims.
 
 Useful tooling:
 - `python3 tools/agent_select_target.py` picks code/data targets and shows PAL/EN symbol hints.

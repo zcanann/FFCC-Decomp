@@ -306,7 +306,6 @@ int CMenuPcs::MLstCtrl()
  * JP Address: TODO  
  * JP Size: TODO
  */
-#pragma opt_strength_reduction off
 int CMenuPcs::MLstOpen()
 {
 	float one;
@@ -389,4 +388,3 @@ int CMenuPcs::MLstOpen()
 	}
 	return result;
 }
-#pragma opt_strength_reduction reset

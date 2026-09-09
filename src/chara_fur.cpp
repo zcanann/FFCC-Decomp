@@ -26,6 +26,7 @@
 #include "ffcc/cflat_runtime2.h"
 
 #include <stddef.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include <string.h>
 
 extern "C" {
@@ -74,24 +75,15 @@ static inline int nearColor(CColor src, CColor ref)
 {
 	int hits = 0;
 
-	int dr = static_cast<int>(src.color.r) - static_cast<int>(ref.color.r);
-	if (dr < 0) {
-		dr = -dr;
-	}
+	int dr = abs(static_cast<int>(src.color.r) - static_cast<int>(ref.color.r));
 	dr += 7 - static_cast<int>(src.color.a);
 	hits += dr <= 5 ? 1 : 0;
 
-	int dg = static_cast<int>(src.color.g) - static_cast<int>(ref.color.g);
-	if (dg < 0) {
-		dg = -dg;
-	}
+	int dg = abs(static_cast<int>(src.color.g) - static_cast<int>(ref.color.g));
 	dg += 7 - static_cast<int>(src.color.a);
 	hits += dg <= 5 ? 1 : 0;
 
-	int db = static_cast<int>(src.color.b) - static_cast<int>(ref.color.b);
-	if (db < 0) {
-		db = -db;
-	}
+	int db = abs(static_cast<int>(src.color.b) - static_cast<int>(ref.color.b));
 	db += 7 - static_cast<int>(src.color.a);
 	hits += db <= 5 ? 1 : 0;
 
@@ -547,7 +539,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		normalMtx[2][3] = 0.0f;
 		GXLoadNrmMtxImm(normalMtx, GX_PNMTX0);
 		GXSetArray(GX_VA_NRM, mesh->m_workNormals, 6);
-		GXSetArray(GX_VA_TEX0, mesh->m_data->m_uvs, 4);
+		GXSetArray(GX_VA_TEX0, mesh->m_data->m_uvs, sizeof(S16Vec2d));
 
 		unsigned int posGqr = m_data->m_posQuant;
 		int normGqr = m_data->m_normQuant;
@@ -816,8 +808,6 @@ static inline int FurTexelIndex(int x, int y, int tileRowStride)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_loop_invariants off
 static void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
 {
 	_GXColor defaultColor = CColor(0x0f, 0x0f, 0x0f, 0).color;
@@ -848,7 +838,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 				continue;
 			}
 
-			distance = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
+			distance = abs(dx) + abs(dy);
 			tileIndex = FurTexelIndex(px, py, rowStride);
 			packed = pixels[tileIndex];
 
@@ -892,7 +882,6 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 	DCFlushRange(pixels, texelCountBytes);
 	GXInvalidateTexAll();
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -988,8 +977,8 @@ int CChara::CModel::PickFur(
 					if (primitive == GX_TRIANGLES || primitive == GX_TRIANGLESTRIP) {
 						for (; count--; vertexIndex++) {
 							register const S16Vec* posPtr = &mesh->m_workPositions[indices[0]];
-							register const unsigned char* uvPtr = mesh->m_data->m_uvs;
-							register int uvOff = static_cast<unsigned int>(indices[3]) << 2;
+							register const S16Vec2d* uvPtr = mesh->m_data->m_uvs;
+							register int uvOff = indices[3] * sizeof(*uvPtr);
 							Vec localPos;
 							Vec2d curUV;
 							register Vec* localPosPtr = &localPos;
@@ -1179,9 +1168,6 @@ nextVertex:
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
-#pragma opt_propagation off
 void CChara::CModel::InitMogFurTex()
 {
 	CTextureSet* textureSet = m_texSet;
@@ -1209,7 +1195,6 @@ void CChara::CModel::InitMogFurTex()
 		m_flagsA0Bits.m_flagA0_40 = 1;
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1619,8 +1604,6 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void CChara::CalcMogScore()
 {
 	unsigned short* texels = m_sharedState.m_mogFur.m_texels;
@@ -1764,7 +1747,6 @@ void CChara::CalcMogScore()
 		    radarLabel[Game.m_gameWork.m_mogScoreRadarType]);
 	}
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1817,13 +1799,3 @@ void CChara::TimeMogFur()
 }
 
 MogWorkState m_mogWork;
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void GXSetTexCoordGen(void)
-{
-	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-}

@@ -159,12 +159,12 @@ static inline const unsigned int* GetGameWorkLinkTableWords(const CGame::CGameWo
 
 static inline unsigned int* GetGameWorkScriptSysVals(CGame::CGameWork& gameWork)
 {
-    return reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0);
+    return &gameWork.m_scriptSysVal0;
 }
 
 static inline const unsigned int* GetGameWorkScriptSysVals(const CGame::CGameWork& gameWork)
 {
-    return reinterpret_cast<const unsigned int*>(&gameWork.m_scriptSysVal0);
+    return &gameWork.m_scriptSysVal0;
 }
 
 static inline unsigned int& FlatLastResult(CFlatRuntime2* self)
@@ -559,51 +559,6 @@ int CCaravanWork::GetEvtWord(int evtWordIndex)
 
 /*
  * --INFO--
- * PAL Address: 0x800B9264
- * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCaravanWork::SetEvtFlag(int evtFlagIndex, int value)
-{
-    if (value != 0) {
-        int byteIndex = evtFlagIndex / 8;
-        int bit = 1 << (evtFlagIndex % 8);
-        reinterpret_cast<unsigned char*>(m_evtWorkArr)[byteIndex] |= bit;
-        return;
-    }
-
-    {
-        int byteIndex = evtFlagIndex / 8;
-        int bit = 1 << (evtFlagIndex % 8);
-        reinterpret_cast<unsigned char*>(m_evtWorkArr)[byteIndex] &= ~bit;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B92DC
- * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CCaravanWork::GetEvtFlag(int evtFlagIndex)
-{
-    unsigned char* evtFlags = reinterpret_cast<unsigned char*>(m_evtWorkArr);
-    int byteIndex = evtFlagIndex / 8;
-    unsigned char value = evtFlags[byteIndex];
-    int mask = 1 << (evtFlagIndex % 8);
-    unsigned int flag = value & mask;
-
-    return (-flag | flag) >> 31;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B931C
  * PAL Size: 20b
  * EN Address: TODO
@@ -621,22 +576,14 @@ void CMes::SetTempValue(int index, int value)
  * --INFO--
  * PAL Address: 0x800B9394
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CF1AC
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CCharaPcs::SetMapShadeColor(int shadeIndex, CColor color)
 {
-    const unsigned char* src = &color.color.r;
-    unsigned char r = *src++;
-    unsigned char g = *src++;
-    m_viewerChoiceColor[shadeIndex].color.r = r;
-    unsigned char b = *src++;
-    m_viewerChoiceColor[shadeIndex].color.g = g;
-    unsigned char a = *src;
-    m_viewerChoiceColor[shadeIndex].color.b = b;
-    m_viewerChoiceColor[shadeIndex].color.a = a;
+    m_viewerChoiceColor[shadeIndex] = color;
 }
 
 /*
@@ -1304,8 +1251,6 @@ void CLine<64>::CalcBound()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long* nearestSegment,
                     float* nearestSegmentRatio, Vec* targetPosition, float maxDistance)
 {
@@ -1392,7 +1337,6 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
 
     return found;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -3951,7 +3895,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
     } else {
         switch (systemValue) {
         case -0x40:
-            FlatLastResult(this) = *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0);
+            FlatLastResult(this) = gameWork.m_scriptSysVal0;
             break;
         case -0x41:
             FlatLastResult(this) = gameWork.m_timerA;
@@ -4092,8 +4036,6 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_dead_assignments off
 void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack, int setMode)
 {
     CGame::CGameWork* gameWork = &Game.m_gameWork;
@@ -4145,18 +4087,16 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
         } else {
             switch (systemValue) {
             case -0x40:
-                stack[-1].m_word = *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0);
+                stack[-1].m_word = gameWork->m_scriptSysVal0;
                 switch (setMode) {
                 case -1:
-                    *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) =
-                        *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) - stack->m_word;
+                    gameWork->m_scriptSysVal0 = gameWork->m_scriptSysVal0 - stack->m_word;
                     break;
                 case 0:
-                    *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) = stack->m_word;
+                    gameWork->m_scriptSysVal0 = stack->m_word;
                     break;
                 case 1:
-                    *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) =
-                        *reinterpret_cast<unsigned int*>(&gameWork->m_scriptSysVal0) + stack->m_word;
+                    gameWork->m_scriptSysVal0 = gameWork->m_scriptSysVal0 + stack->m_word;
                     break;
                 }
                 break;
@@ -4386,4 +4326,3 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
         }
     }
 }
-#pragma pop

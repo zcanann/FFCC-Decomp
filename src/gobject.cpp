@@ -29,23 +29,6 @@
 extern const Vec DAT_801D9B88;
 extern const Vec DAT_801D9B94;
 
-struct CModelAnimState {
-    u8 _padB4[0xB4];
-    float m_time;
-    u8 _padB8[4];
-    float m_animStart;
-    float m_animEnd;
-    u8 _padC4[0xC];
-    CChara::CAnim* m_anim;
-};
-
-struct ModelFlagsA0Signed {
-    s8 m_bit80 : 1;
-    s8 m_bit40 : 1;
-    s8 m_bit20 : 1;
-    s8 m_lo : 5;
-};
-
 STATIC_ASSERT(sizeof(CGObject::AttackCol) == 0x30);
 STATIC_ASSERT(sizeof(CGObject::DamageCol) == 0x28);
 STATIC_ASSERT(offsetof(CGObject::AttackCol, m_hitMask) == 0x2C);
@@ -70,11 +53,6 @@ STATIC_ASSERT(offsetof(CGObject, m_weaponNodeFlagBits) == 0x9A);
 STATIC_ASSERT(offsetof(CGObject, m_weaponNodeFlagBytes) == 0x9A);
 STATIC_ASSERT(sizeof(CGObject::WeaponNodeFlagBits) == 1);
 STATIC_ASSERT(sizeof(CGObject::WeaponNodeFlagBytes) == 2);
-
-static inline CModelAnimState& ModelAnimState(CChara::CModel* model)
-{
-    return *reinterpret_cast<CModelAnimState*>(model);
-}
 
 static inline Mtx& FlatPosMtx()
 {
@@ -151,51 +129,6 @@ static inline float GObjSqrtf(float x)
     return x;
 }
 
-static inline unsigned char* ModelBytes(CChara::CModel* model)
-{
-    return reinterpret_cast<unsigned char*>(model);
-}
-
-static inline unsigned char* ModelNodes(CChara::CModel* model)
-{
-    return reinterpret_cast<unsigned char*>(model->m_nodes);
-}
-
-static inline MtxPtr ModelNodeMtx(CChara::CModel* model, int nodeIndex)
-{
-    return reinterpret_cast<MtxPtr>(ModelNodes(model) + nodeIndex * 0xC0 + 0x6C);
-}
-
-static inline float& ModelLightAlpha(CChara::CModel* model)
-{
-    return model->m_lightAlpha;
-}
-
-static inline CChara::CAnim*& ModelAnim(CChara::CModel* model)
-{
-    return model->m_anim;
-}
-
-static inline float& ModelTime(CChara::CModel* model)
-{
-    return model->m_curFrame;
-}
-
-static inline float& ModelAnimStart(CChara::CModel* model)
-{
-    return model->m_animStart;
-}
-
-static inline float& ModelAnimEnd(CChara::CModel* model)
-{
-    return model->m_animEnd;
-}
-
-static inline unsigned char& ModelFlagsA0(CChara::CModel* model)
-{
-    return model->m_flagsA0;
-}
-
 static inline int RemapPadSlot(CPad* pad, int padIndex)
 {
     int activePad = pad->m_debugPadPort;
@@ -221,34 +154,6 @@ static inline float GetMovePadStickY(int player)
     return (Pad.m_debugPadLock != 0 || (player == 0 && Pad.m_debugPadPort != -1))
         ? 0.0f
         : Pad.GetPadInputs()[RemapPadSlot(&Pad, player)].stickYF;
-}
-
-static inline float& ModelChestAmp(CChara::CModel* model)
-{
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0xDC);
-}
-
-static inline float& ModelChestTilt(CChara::CModel* model)
-{
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0xE0);
-}
-
-static inline float& ModelTwistAngle(CChara::CModel* model)
-{
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0x120);
-}
-
-static inline Vec& ModelWindVector(CChara::CModel* model)
-{
-    return *reinterpret_cast<Vec*>(ModelBytes(model) + 0xC4);
-}
-
-static inline void SetModelWindVector(CChara::CModel* model, const Vec& wind)
-{
-    CVector windCopy(wind);
-    ModelWindVector(model).x = windCopy.x;
-    ModelWindVector(model).y = windCopy.y;
-    ModelWindVector(model).z = windCopy.z;
 }
 
 static inline float ClampFloat(float value, float minValue, float maxValue)
@@ -896,8 +801,6 @@ void CGObject::CancelAnim(int keepFacing)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 int CGObject::IsAnimFinished(int mode)
 {
     float frame;
@@ -939,7 +842,7 @@ int CGObject::IsAnimFinished(int mode)
                 if (!hasModel || (slot == -1)) {
                     result = 1;
                 } else {
-                    CModelAnimState& model = ModelAnimState(handle->m_model);
+                    CChara::CModel& model = *handle->m_model;
                     if (model.m_anim != 0) {
                         animSpan = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
                         if (sAnimFrameOffset == animSpan) {
@@ -976,15 +879,16 @@ int CGObject::IsAnimFinished(int mode)
         }
     }
 }
-#pragma pop
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007C950
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 int CGObject::IsLoopAnim(int mode)
 {
     CCharaPcs::CHandle* handle = m_charaModelHandle;
@@ -998,7 +902,7 @@ int CGObject::IsLoopAnim(int mode)
         return 1;
     }
 
-    CModelAnimState& model = ModelAnimState(handle->m_model);
+    CChara::CModel& model = *handle->m_model;
     if (model.m_anim != 0) {
         const float span = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
 
@@ -1022,19 +926,15 @@ int CGObject::IsLoopAnim(int mode)
         const float lastAttr = m_lastBgAttr;
 
         if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat)) {
-            return (static_cast<u32>(static_cast<u8>(
-                        (static_cast<double>(sZeroFloat) >= threshold) << 1))
-                    << 0x1C)
-                   >> 0x1D;
+            return static_cast<double>(sZeroFloat) >= threshold;
         }
 
         const double diff = static_cast<double>(span - sAnimFrameOffset);
-        return (static_cast<u32>(static_cast<u8>((diff < threshold) << 3)) << 0x1C) >> 0x1F;
+        return diff < threshold;
     }
 
     return 1;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1140,31 +1040,31 @@ void CGObject::LoadModel(int kind, unsigned long modelId, unsigned long variant,
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007CD14
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
 void CGObject::InitWork(int index)
 {
-    typedef void (*InitWorkFn)(void**, int, unsigned int, int);
     char ownerType;
 
     ownerType = m_ownerType;
     switch (ownerType) {
     case 0: {
-        InitWorkFn initWork = reinterpret_cast<InitWorkFn>(reinterpret_cast<void**>(*m_scriptHandle)[3]);
-        initWork(m_scriptHandle, index, Game.unkCFlatData0[0] + index * 0x1D0, 0);
+        reinterpret_cast<CGObjWork*>(m_scriptHandle)->Init(
+            index, &reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0])[index], 0);
         break;
     }
     case 1: {
-        InitWorkFn initWork = reinterpret_cast<InitWorkFn>(reinterpret_cast<void**>(*m_scriptHandle)[3]);
-        initWork(m_scriptHandle, index, Game.unkCFlatData0[1] + index * 0x1D0, 0);
+        reinterpret_cast<CGObjWork*>(m_scriptHandle)->Init(
+            index, &reinterpret_cast<CRomWork*>(Game.unkCFlatData0[1])[index], 0);
         break;
     }
     }
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -2041,8 +1941,8 @@ void CGObject::update()
             m_currentAnimSlot != -1) {
             float frame = sZeroFloat;
             if (m_lastBgAttr < sZeroFloat) {
-                frame = ModelAnimStart(m_charaModelHandle->m_model);
-                frame = ModelAnimEnd(m_charaModelHandle->m_model) - frame;
+                frame = m_charaModelHandle->m_model->m_animStart;
+                frame = m_charaModelHandle->m_model->m_animEnd - frame;
             }
             m_turnSpeed = frame;
             m_charaModelHandle->m_model->SetFrame(m_turnSpeed);
@@ -2196,7 +2096,7 @@ void CGObject::update()
 
     if (m_weaponNodeFlagBits.m_attached) {
         CChara::CModel* ownerModel = m_attachOwner->m_charaModelHandle->m_model;
-        PSMTXCopy(ModelNodeMtx(ownerModel, m_attachNode), modelMtx);
+        PSMTXCopy(ownerModel->m_nodes[m_attachNode].m_mtx, modelMtx);
 
         if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             PSMTXRotRad(ecScratch, 'y', -m_attachOwner->m_rotBaseY);
@@ -2246,7 +2146,7 @@ void CGObject::update()
             if (m_lookAtTargetNodeIndex == -1) {
                 targetNodeY = m_lookAtTarget->unk_0x184;
             } else {
-                targetNodeY = ModelNodeMtx(m_lookAtTarget->m_charaModelHandle->m_model, m_lookAtTargetNodeIndex)[1][3];
+                targetNodeY = m_lookAtTarget->m_charaModelHandle->m_model->m_nodes[m_lookAtTargetNodeIndex].m_mtx[1][3];
             }
             lookDelta.y += unk_0x184 - targetNodeY;
 
@@ -2264,18 +2164,18 @@ void CGObject::update()
             }
         }
 
-        const unsigned char lookBlendByte = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x56);
+        const unsigned char lookBlendByte = m_field_0x56;
         CChara::CModel* chestModel = m_charaModelHandle->m_model;
         float lookBlend = sLookBlendScale * static_cast<float>(lookBlendByte);
-        float chestAmp = ModelChestAmp(chestModel);
-        float chestTilt = ModelChestTilt(chestModel);
-        chestAmp = lookBlend * (lookYaw - chestAmp) + chestAmp;
-        chestTilt = lookBlend * (lookPitch - chestTilt) + chestTilt;
-        ModelChestAmp(chestModel) = chestAmp;
-        ModelChestTilt(chestModel) = chestTilt;
+        float currentYaw = chestModel->m_chestTilt;
+        float currentPitch = chestModel->m_chestAmp;
+        currentYaw = lookBlend * (lookYaw - currentYaw) + currentYaw;
+        currentPitch = lookBlend * (lookPitch - currentPitch) + currentPitch;
+        chestModel->m_chestTilt = currentYaw;
+        chestModel->m_chestAmp = currentPitch;
         CChara::CModel* twistModel = m_charaModelHandle->m_model;
-        const float twistAngle = ModelTwistAngle(twistModel);
-        ModelTwistAngle(twistModel) = sBgAttrFast * (m_twistTarget - twistAngle) + twistAngle;
+        const float twistAngle = twistModel->m_twistAngle;
+        twistModel->m_twistAngle = sBgAttrFast * (m_twistTarget - twistAngle) + twistAngle;
 
         m_charaModelHandle->m_model->SetMatrix(modelMtx);
 
@@ -2284,7 +2184,7 @@ void CGObject::update()
         windVec.x = -(m_groundHitOffset.x * Math.RandF() - windVec.x);
         windVec.z = -(m_groundHitOffset.z * Math.RandF() - windVec.z);
         CChara::CModel* windModel = m_charaModelHandle->m_model;
-        SetModelWindVector(windModel, windVec);
+        windModel->m_dynJitter = CVector(windVec);
 
         boundCheck();
 
@@ -2295,17 +2195,17 @@ void CGObject::update()
             visibleScale = m_screenDepth > sNearVisibleDepth ? sZeroFloat : sAnimFrameOffset;
         }
 
-        const float alphaTarget = m_stepSlopeLimit * onAlphaUpdate();
-        const float alphaStep = ClampFloat(alphaTarget * visibleScale - m_lookAtTimer, -m_bgDownDist, m_bgDownDist);
-        m_lookAtTimer += alphaStep;
-        m_lookAtTimer = ClampFloat(m_lookAtTimer, sZeroFloat, sAnimFrameOffset);
+        const float alphaTarget = m_alphaTarget * onAlphaUpdate();
+        const float alphaStep = ClampFloat(alphaTarget * visibleScale - m_currentAlpha, -m_alphaStep, m_alphaStep);
+        m_currentAlpha += alphaStep;
+        m_currentAlpha = ClampFloat(m_currentAlpha, sZeroFloat, sAnimFrameOffset);
         const float worldParamStep = m_worldParam - sWobbleBiasSmall;
         m_worldParam = worldParamStep < sZeroFloat ? sZeroFloat : worldParamStep;
         if ((m_displayFlags & 0x1000) != 0) {
-            m_lookAtTimer = alphaTarget;
+            m_currentAlpha = alphaTarget;
         }
 
-        if (sZeroFloat == m_lookAtTimer) {
+        if (sZeroFloat == m_currentAlpha) {
             m_weaponNodeFlagBits.m_unk20 = 0;
         }
         m_weaponNodeFlagBits.m_unk40 |= m_weaponNodeFlagBits.m_unk20;
@@ -2321,10 +2221,10 @@ void CGObject::update()
                 m_charaModelHandle->m_model->CalcSkin();
             }
 
-            ModelLightAlpha(m_charaModelHandle->m_model) = m_lookAtTimer;
-            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_charaModelHandle->m_model))->m_bit20 =
+            m_charaModelHandle->m_model->m_lightAlpha = m_currentAlpha;
+            m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
                 m_weaponNodeFlagBits.m_unk20;
-            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_charaModelHandle->m_model))->m_bit80 = (m_displayFlags & 0x20) != 0;
+            m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
         }
 
         m_charaModelHandle->m_model->CalcFurColor();
@@ -2332,9 +2232,8 @@ void CGObject::update()
         if ((m_displayFlags & 2) != 0) {
             float frameStep;
             if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
-                if (ModelAnim(m_charaModelHandle->m_model) != 0) {
-                    const unsigned short frameCount = *reinterpret_cast<unsigned short*>(
-                        reinterpret_cast<unsigned char*>(ModelAnim(m_charaModelHandle->m_model)) + 0x10);
+                if (m_charaModelHandle->m_model->m_anim != 0) {
+                    const unsigned short frameCount = m_charaModelHandle->m_model->m_anim->m_frameCount;
                     frameStep = static_cast<float>(frameCount) /
                                  static_cast<float>(m_turnAnimFrames) + m_turnSpeed;
                 } else {
@@ -2364,7 +2263,7 @@ void CGObject::update()
                 const unsigned short pointCount = animRef->m_pointCount;
                 if (pointCount > 0) {
                     const float animSpan =
-                        sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
+                        sAnimFrameOffset + (m_charaModelHandle->m_model->m_animEnd - m_charaModelHandle->m_model->m_animStart);
                     float prevWrapped = WrapAnimFrame(prevTime, animSpan);
                     float nextWrapped = WrapAnimFrame(frameStep, animSpan);
                     if (frameStep < prevTime) {
@@ -2374,7 +2273,7 @@ void CGObject::update()
 
                     for (int i = 0; i < animRef->m_pointCount; i++) {
                         const unsigned short pointFrame = animRef->m_points[i].m_frame;
-                        const float eventFrame = static_cast<float>(pointFrame) + ModelAnimStart(m_charaModelHandle->m_model);
+                        const float eventFrame = static_cast<float>(pointFrame) + m_charaModelHandle->m_model->m_animStart;
                         if (prevWrapped < eventFrame && (eventFrame <= nextWrapped || nextWrapped < prevWrapped)) {
                             CFlatRuntime::CStack stackIn[2];
                             stackIn[0].m_word = static_cast<unsigned int>(m_animSlotSel);
@@ -2395,8 +2294,8 @@ void CGObject::update()
             int animFinished;
             if (!hasAnimModel || animSlotNow == -1) {
                 animFinished = 1;
-            } else if (ModelAnim(m_charaModelHandle->m_model) != 0) {
-                const float animSpan = sAnimFrameOffset + (ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model));
+            } else if (m_charaModelHandle->m_model->m_anim != 0) {
+                const float animSpan = sAnimFrameOffset + (m_charaModelHandle->m_model->m_animEnd - m_charaModelHandle->m_model->m_animStart);
                 if (sAnimFrameOffset == animSpan) {
                     animFinished = 1;
                 } else {
@@ -2446,7 +2345,7 @@ void CGObject::update()
         }
 
         if (HasLoadedModel(m_weaponModelHandle) && (m_displayFlags & 1) != 0 && m_weaponAttachNode >= 0) {
-            PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_weaponAttachNode), modelMtx);
+            PSMTXCopy(m_charaModelHandle->m_model->m_nodes[m_weaponAttachNode].m_mtx, modelMtx);
             PSMTXTransApply(modelMtx, ecScratch, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
             m_weaponModelHandle->m_model->SetMatrix(ecScratch);
             m_weaponModelHandle->m_model->CalcMatrix();
@@ -2454,22 +2353,22 @@ void CGObject::update()
                 m_weaponModelHandle->m_model->CalcSkin();
             }
 
-            ModelLightAlpha(m_weaponModelHandle->m_model) = m_lookAtTimer;
-            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_weaponModelHandle->m_model))->m_bit20 =
+            m_weaponModelHandle->m_model->m_lightAlpha = m_currentAlpha;
+            m_weaponModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
                 m_weaponNodeFlagBits.m_unk20;
-            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_weaponModelHandle->m_model))->m_bit80 = (m_displayFlags & 0x20) != 0;
+            m_weaponModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
         }
 
         if (HasLoadedModel(m_shieldModelHandle) && (m_displayFlags & 1) != 0 && m_shieldAttachNodeIndex >= 0) {
-            PSMTXCopy(ModelNodeMtx(m_charaModelHandle->m_model, m_shieldAttachNodeIndex), modelMtx);
+            PSMTXCopy(m_charaModelHandle->m_model->m_nodes[m_shieldAttachNodeIndex].m_mtx, modelMtx);
             PSMTXTransApply(modelMtx, ecScratch, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
             m_shieldModelHandle->m_model->SetMatrix(ecScratch);
             m_shieldModelHandle->m_model->CalcMatrix();
 
-            ModelLightAlpha(m_shieldModelHandle->m_model) = m_lookAtTimer;
-            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_shieldModelHandle->m_model))->m_bit20 =
+            m_shieldModelHandle->m_model->m_lightAlpha = m_currentAlpha;
+            m_shieldModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
                 m_weaponNodeFlagBits.m_unk20;
-            reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_shieldModelHandle->m_model))->m_bit80 = (m_displayFlags & 0x20) != 0;
+            m_shieldModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
             if (m_weaponNodeFlagBits.m_unk20) {
                 m_shieldModelHandle->m_model->CalcSkin();
             }
@@ -2496,7 +2395,7 @@ void CGObject::update()
     }
 
     if (HasLoadedModel(m_charaModelHandle) && CFlat.m_gameFlagBits.m_flagBit1
-        && reinterpret_cast<ModelFlagsA0Signed*>(&ModelFlagsA0(m_charaModelHandle->m_model))->m_bit40) {
+        && m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_40) {
         m_charaModelHandle->m_model->MogFurFrame(this);
     }
 }
@@ -2618,8 +2517,6 @@ nextObject:;
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma global_optimizer off
 void CGObject::bgAttribCollision()
 {
     if (!HasLoadedModel(m_charaModelHandle)) {
@@ -2675,7 +2572,6 @@ void CGObject::bgAttribCollision()
         }
     }
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -2890,8 +2786,6 @@ stepMiss:
  * Address:	TODO
  * Size:	TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void CGObject::bgCollision()
 {
     m_stateFlags0Bits.unk0 = 0;
@@ -2918,7 +2812,6 @@ void CGObject::bgCollision()
         s_bitMaskDrawFlags = 0;
     }
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -3455,8 +3348,8 @@ void CGObject::onCreate()
     m_shieldNodeFlagBits.m_bit40 = 0;
     m_frontHitAngle = FLOAT_8033043C;
     m_lookAtTarget = 0;
-    m_stepSlopeLimit = sAnimFrameOffset;
-    m_lookAtTimer = sAnimFrameOffset;
+    m_alphaTarget = sAnimFrameOffset;
+    m_currentAlpha = sAnimFrameOffset;
     m_shieldNodeFlagBits.m_bit20 = 0;
     m_animBlend = sAnimFrameOffset;
     m_bgAttrValue = sAnimFrameOffset;
@@ -3493,7 +3386,7 @@ void CGObject::onCreate()
     m_swayDirection.z = m_swayTarget.z;
 
     m_turnFactor = sBgAttrFast;
-    m_bgDownDist = sDefaultBgDownDist;
+    m_alphaStep = sDefaultBgDownDist;
     m_moveMode = 0;
     m_moveModePrevious = 4;
     m_hitFaceNormal.z = sZeroFloat;

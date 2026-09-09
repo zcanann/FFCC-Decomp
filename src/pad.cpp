@@ -13,19 +13,13 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/direct_io.h"
 
 #include <string.h>
+#include <stddef.h>
 
 CPad Pad;
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
 
 static const char s_CPad[] = "CPad";
-extern const float kPadAnalogZero = 0.0f;
-extern const float kPadAnalogScale = 0.0078125f;
-extern const float kPadTriggerMax = 255.0f;
-extern const double kPadS32ToDoubleBias = 4503601774854144.0;
-extern const double kPadU32ToDoubleBias = 4503599627370496.0;
-static const char s_pad_cpp[] = { 'p', 'a', 'd', '.', 'c', 'p', 'p', 0 };
-static const char s_rb[] = { 'r', 'b', 0 };
 static const char s_replay_dat[] = "/replay.dat";
 static const char s_replay_host_msg[] = {
     0x43, 0x50, 0x61, 0x64, 0x2E, 0x49, 0x6E, 0x69, 0x74, 0x3A, 0x20, 0x68, 0x6F,
@@ -39,24 +33,12 @@ extern "C" {
 PADStatus g_pad[4];
 }
 
-namespace {
-struct ReplayFrame
-{
-    PADStatus pad[4];
-    CPad::Gba gba[4];
-};
-
-struct ReplayBuffer
-{
-    u32 cursor;
-    u32 recordMode;
-    s32 frameCount;
-    ReplayFrame frames[0x1A5E0];
-};
-
-typedef char ReplayFrame_size_check[(sizeof(ReplayFrame) == 0x40) ? 1 : -1];
-typedef char ReplayBuffer_size_check[(sizeof(ReplayBuffer) == 0x69780C) ? 1 : -1];
-}
+typedef char ReplayFrame_size_check[(sizeof(CPad::ReplayFrame) == 0x40) ? 1 : -1];
+typedef char ReplayBuffer_size_check[(sizeof(CPad::ReplayBuffer) == 0x69780C) ? 1 : -1];
+typedef char CPad_ReplayFrame_gba_offset_check[(offsetof(CPad::ReplayFrame, gba) == 0x30) ? 1 : -1];
+typedef char CPad_ReplayBuffer_frames_offset_check[(offsetof(CPad::ReplayBuffer, frames) == 0xC) ? 1 : -1];
+typedef char CPad_m_replayBuffer_offset_check[(offsetof(CPad, m_replayBuffer) == 0x1B0) ? 1 : -1];
+typedef char CPad_m_replayFrame_offset_check[(offsetof(CPad, m_replayFrame) == 0x1BC) ? 1 : -1];
 
 /*
  * --INFO--
@@ -69,7 +51,7 @@ typedef char ReplayBuffer_size_check[(sizeof(ReplayBuffer) == 0x69780C) ? 1 : -1
  */
 inline void CPad::SaveReplayData()
 {
-    ReplayBuffer* replay = reinterpret_cast<ReplayBuffer*>(_1b0_4_);
+    ReplayBuffer* replay = m_replayBuffer;
 
     if ((replay != 0) && (replay->recordMode != 0) && (replay->cursor <= sizeof(ReplayBuffer)) &&
         (replay->frameCount != 0)) {
@@ -81,27 +63,93 @@ inline void CPad::SaveReplayData()
     }
 }
 
-#pragma always_inline on
-#pragma inline_max_total_size(100000)
-static inline void MergePadInputs(CPad* pad, u16* puVar13, u16*& puVar18, u16* puVar10)
-{
-	int iVar14;
-	u8* p12;
-	u32 uVar17;
-	int iVar6;
-	u16* puVar7;
-	u16* puVar12;
-	u32 uVar15;
-	s8 cVar9;
-	u32 uVar16;
-	float fVar2;
-	float fVar3;
 
-	const float* analogZero = &kPadAnalogZero;
-	fVar2 = *analogZero;
-	CPad::PadInput* merged = reinterpret_cast<CPad::PadInput*>(puVar10);
+/*
+ * --INFO--
+ * PAL Address: 0x80020494
+ * PAL Size: 2844b
+ * EN Address: 0x8002A444
+ * EN Size: 3472b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPad::Frame()
+{
+	Gba gbaStatus[4];
+	PADStatus padStatus[4];
+
+	PADRead(padStatus);
+	PADClamp(padStatus);
+	memcpy(g_pad, padStatus, sizeof(g_pad));
+	m_debugPadLock = 0;
+
+	for (u32 port = 0; port < 4; port++) {
+		Gba* gba = &gbaStatus[port];
+		gba->connected = SIProbe(port) == SI_GBA;
+		gba->ctrlMode = Joybus.GetCtrlMode(port);
+		gba->noController = gba->connected && gba->ctrlMode == 0;
+		gba->button = 0;
+		if (gba->connected) {
+			gba->button = Joybus.GetPadData(port);
+		}
+	}
+
+	int replayFrame = m_replayFrame;
+	if (m_replayBuffer != 0 && replayFrame >= 0) {
+		if (m_replayBuffer->recordMode != 0) {
+			if (m_replayBuffer->frameCount < 0x1A5E0) {
+				for (int port = 0; port < 4; port++) {
+					m_replayBuffer->frames[m_replayBuffer->frameCount].pad[port] = padStatus[port];
+					m_replayBuffer->frames[m_replayBuffer->frameCount].gba[port] = gbaStatus[port];
+				}
+				m_replayBuffer->frameCount++;
+				m_replayBuffer->cursor += sizeof(ReplayFrame);
+			}
+		} else if (replayFrame < 0x1A5E0) {
+			for (int port = 0; port < 4; port++) {
+				u16 buttons = padStatus[port].button;
+				padStatus[port] = m_replayBuffer->frames[replayFrame].pad[port];
+				gbaStatus[port] = m_replayBuffer->frames[replayFrame].gba[port];
+				if ((buttons & PAD_TRIGGER_Z) != 0) {
+					padStatus[port].button |= buttons;
+				}
+			}
+		}
+	}
+
+	u32 resetMask = 0;
+	for (u32 port = 0; port < 4; port++) {
+		u32 mask = 0x80000000 >> port;
+		switch (padStatus[port].err) {
+		case PAD_ERR_NONE:
+		case PAD_ERR_NOT_READY:
+			_1a8_4_ |= mask;
+			break;
+		case PAD_ERR_NO_CONTROLLER:
+			if (static_cast<u8>(Joybus.GBAReady(port)) == 0) {
+				resetMask |= mask;
+			}
+			_1a8_4_ &= ~mask;
+			break;
+		case PAD_ERR_TRANSFER:
+			_1a8_4_ &= ~mask;
+			break;
+		}
+	}
+	if ((resetMask & 0xF0000000) != 0) {
+		PADReset(resetMask & 0xF0000000);
+	}
+
+	PADStatus* rawPad = padStatus;
+	Gba* gba = gbaStatus;
+	u32 port;
+	PadInput* input;
+	s8 axisValue;
+
+	const float zero = 0.0f;
+	PadInput* merged = &m_padInputs[4];
 	merged->buttonPrev[0] = merged->button[0];
-	uVar17 = 0;
+	port = 0;
 	merged->buttonDown[0] = 0;
 	merged->button[0] = 0;
 	merged->buttonPrev[1] = merged->button[1];
@@ -120,482 +168,253 @@ static inline void MergePadInputs(CPad* pad, u16* puVar13, u16*& puVar18, u16* p
 	merged->stickX = 0;
 	merged->triggerRight = 0;
 	merged->triggerLeft = 0;
-	merged->substickYF = fVar2;
-	merged->substickXF = fVar2;
-	merged->stickYF = fVar2;
-	merged->stickXF = fVar2;
-	merged->triggerRightF = fVar2;
-	merged->triggerLeftF = fVar2;
+	merged->substickYF = zero;
+	merged->substickXF = zero;
+	merged->stickYF = zero;
+	merged->stickXF = zero;
+	merged->triggerRightF = zero;
+	merged->triggerLeftF = zero;
 	merged->lockedButton[2] = 0;
 	merged->lockedButton[1] = 0;
 	merged->lockedButton[0] = 0;
 	merged->activeMask = 0;
-	iVar6 = reinterpret_cast<int>(pad);
+	input = m_padInputs;
 	do
 	{
-		p12 = reinterpret_cast<u8*>(iVar6 + 4);
-		puVar12 = reinterpret_cast<u16*>(p12);
-		puVar7 = puVar10;
-		for (iVar14 = 0; iVar14 < 2; iVar14++)
+		for (int channel = 0; channel < 2; channel++)
 		{
-			if ((iVar14 != 0) || (*reinterpret_cast<s8*>(puVar13 + 5) != -3))
+			if ((channel != 0) || (rawPad->err != PAD_ERR_NOT_READY))
 			{
-				puVar12[0x26] = static_cast<u16>(*reinterpret_cast<u16*>(p12 + 0x30) | *puVar12);
-				if (iVar14 == 0)
+				input->buttonPrev[channel] = static_cast<u16>(input->lockedButton[0] | input->button[channel]);
+				if (channel == 0)
 				{
-					*reinterpret_cast<u16*>(p12 + 0x08) = *reinterpret_cast<u16*>(p12 + 0x0A);
-					cVar9 = *reinterpret_cast<s8*>(puVar13 + 5);
-					*reinterpret_cast<s8*>(p12 + 0x40) = cVar9;
-					*reinterpret_cast<u32*>(p12 + 0x50) = (__cntlzw(1 - (*puVar18 & 0x3FFF)) >> 5) & 0xFF;
-					*reinterpret_cast<u32*>(p12 + 0x44) = 0;
-					*reinterpret_cast<u32*>(p12 + 0x38) = 0;
-					*reinterpret_cast<u32*>(p12 + 0x3C) = 0;
-					if ((*reinterpret_cast<s8*>(p12 + 0x40) == 0) || reinterpret_cast<CPad::Gba*>(puVar18)->noController)
+					input->stickBitsPrev = input->stickBits;
+					input->err = rawPad->err;
+					input->gbaMode = gba->ctrlMode == 1;
+					input->activeMask = 0;
+					input->holdOverride = 0;
+					input->digitalStickOverride = 0;
+					if ((input->err == PAD_ERR_NONE) || gba->noController)
 					{
-						if (reinterpret_cast<CPad::Gba*>(puVar18)->noController)
+						if (gba->noController)
 						{
-							*puVar12 = puVar18[1];
+							input->button[channel] = gba->button;
 						}
 						else
 						{
-							*puVar12 = *puVar13;
+							input->button[channel] = rawPad->button;
 						}
-						if (*reinterpret_cast<u8*>(puVar13 + 3) >= 100)
+						if (rawPad->triggerLeft >= 100)
 						{
-							*puVar12 = static_cast<u16>(*puVar12 | PAD_TRIGGER_L);
+							input->button[channel] = static_cast<u16>(input->button[channel] | PAD_TRIGGER_L);
 						}
-						if (*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar13) + 7) >= 100)
+						if (rawPad->triggerRight >= 100)
 						{
-							*puVar12 = static_cast<u16>(*puVar12 | PAD_TRIGGER_R);
+							input->button[channel] = static_cast<u16>(input->button[channel] | PAD_TRIGGER_R);
 						}
 						if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0)
 						{
-							uVar16 = static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x14)) >> 0x1F;
-							if ((static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x14))) - uVar16) >= pad->m_stickDigitalThreshold) ||
-								((uVar16 = static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x15)) >> 0x1F),
-								 (static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x15))) - uVar16) >= pad->m_stickDigitalThreshold)))
+							if (__abs(input->stickX) >= m_stickDigitalThreshold ||
+							    __abs(input->stickY) >= m_stickDigitalThreshold)
 							{
-								*puVar12 = static_cast<u16>(*puVar12 & 0xFFF0);
-								*reinterpret_cast<u32*>(p12 + 0x3C) = 1;
-								if (pad->m_stickDigitalThreshold <= static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x14)))
+								input->button[channel] = static_cast<u16>(input->button[channel] & 0xFFF0);
+								input->digitalStickOverride = 1;
+								if (m_stickDigitalThreshold <= static_cast<int>(input->stickX))
 								{
-									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_RIGHT);
+									input->button[channel] = static_cast<u16>(input->button[channel] | PAD_BUTTON_RIGHT);
 								}
-								if (-static_cast<int>(pad->m_stickDigitalThreshold) >= static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x14)))
+								if (-static_cast<int>(m_stickDigitalThreshold) >= static_cast<int>(input->stickX))
 								{
-									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_LEFT);
+									input->button[channel] = static_cast<u16>(input->button[channel] | PAD_BUTTON_LEFT);
 								}
-								if (pad->m_stickDigitalThreshold <= static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x15)))
+								if (m_stickDigitalThreshold <= static_cast<int>(input->stickY))
 								{
-									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_UP);
+									input->button[channel] = static_cast<u16>(input->button[channel] | PAD_BUTTON_UP);
 								}
-								if (-static_cast<int>(pad->m_stickDigitalThreshold) >= static_cast<int>(*reinterpret_cast<s8*>(p12 + 0x15)))
+								if (-static_cast<int>(m_stickDigitalThreshold) >= static_cast<int>(input->stickY))
 								{
-									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_DOWN);
+									input->button[channel] = static_cast<u16>(input->button[channel] | PAD_BUTTON_DOWN);
 								}
 							}
 						}
-						*reinterpret_cast<u32*>(p12 + 0x44) = *reinterpret_cast<u32*>(p12 + 0x44) | 1;
-						*reinterpret_cast<u8*>(p12 + 0x14) = *reinterpret_cast<u8*>(puVar13 + 1);
-						*reinterpret_cast<u16*>(p12 + 0x0A) = 0;
-						if (*reinterpret_cast<s8*>(p12 + 0x14) < 0)
+						input->activeMask = input->activeMask | 1;
+						input->stickX = rawPad->stickX;
+						input->stickBits = 0;
+						if (input->stickX < 0)
 						{
-							*reinterpret_cast<u16*>(p12 + 0x0A) = *reinterpret_cast<u16*>(p12 + 0x0A) | 1;
+							input->stickBits = input->stickBits | 1;
 						}
-						if (0 < *reinterpret_cast<s8*>(p12 + 0x14))
+						if (0 < input->stickX)
 						{
-							*reinterpret_cast<u16*>(p12 + 0x0A) = *reinterpret_cast<u16*>(p12 + 0x0A) | 2;
+							input->stickBits = input->stickBits | 2;
 						}
-						*reinterpret_cast<u8*>(p12 + 0x15) = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar13) + 3);
-						if (*reinterpret_cast<s8*>(p12 + 0x15) < 0)
+						input->stickY = rawPad->stickY;
+						if (input->stickY < 0)
 						{
-							*reinterpret_cast<u16*>(p12 + 0x0A) = *reinterpret_cast<u16*>(p12 + 0x0A) | 4;
+							input->stickBits = input->stickBits | 4;
 						}
-						if (0 < *reinterpret_cast<s8*>(p12 + 0x15))
+						if (0 < input->stickY)
 						{
-							*reinterpret_cast<u16*>(p12 + 0x0A) = *reinterpret_cast<u16*>(p12 + 0x0A) | 8;
+							input->stickBits = input->stickBits | 8;
 						}
-						fVar2 = kPadAnalogScale;
-						fVar3 = kPadTriggerMax;
-						*reinterpret_cast<u8*>(p12 + 0x16) = *reinterpret_cast<u8*>(puVar13 + 2);
-						*reinterpret_cast<u8*>(p12 + 0x17) = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar13) + 5);
-						*reinterpret_cast<u8*>(p12 + 0x12) = *reinterpret_cast<u8*>(puVar13 + 3);
-						*reinterpret_cast<u8*>(p12 + 0x13) = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar13) + 7);
-						*reinterpret_cast<float*>(p12 + 0x20) =
-							static_cast<float>(*reinterpret_cast<s8*>(p12 + 0x14)) * fVar2;
-						*reinterpret_cast<float*>(p12 + 0x24) =
-							static_cast<float>(*reinterpret_cast<s8*>(p12 + 0x15)) * fVar2;
-						*reinterpret_cast<float*>(p12 + 0x28) =
-							static_cast<float>(*reinterpret_cast<s8*>(p12 + 0x16)) * fVar2;
-						*reinterpret_cast<float*>(p12 + 0x2C) =
-							static_cast<float>(*reinterpret_cast<s8*>(p12 + 0x17)) * fVar2;
-						*reinterpret_cast<float*>(p12 + 0x18) =
-							static_cast<float>(*reinterpret_cast<u8*>(p12 + 0x12)) / fVar3;
-						*reinterpret_cast<float*>(p12 + 0x1C) =
-							static_cast<float>(*reinterpret_cast<u8*>(p12 + 0x13)) / fVar3;
+						const float analogScale = 0.0078125f;
+						const float triggerMax = 255.0f;
+						input->substickX = rawPad->substickX;
+						input->substickY = rawPad->substickY;
+						input->triggerLeft = rawPad->triggerLeft;
+						input->triggerRight = rawPad->triggerRight;
+						input->stickXF =
+							static_cast<float>(input->stickX) * analogScale;
+						input->stickYF =
+							static_cast<float>(input->stickY) * analogScale;
+						input->substickXF =
+							static_cast<float>(input->substickX) * analogScale;
+						input->substickYF =
+							static_cast<float>(input->substickY) * analogScale;
+						input->triggerLeftF =
+							static_cast<float>(input->triggerLeft) / triggerMax;
+						input->triggerRightF =
+							static_cast<float>(input->triggerRight) / triggerMax;
 					}
 					else
 					{
-						*puVar12 = 0;
-						const float* fallbackZero = &kPadAnalogZero;
-						fVar2 = *fallbackZero;
-						*reinterpret_cast<u8*>(p12 + 0x14) = 0;
-						*reinterpret_cast<u8*>(p12 + 0x15) = 0;
-						*reinterpret_cast<u8*>(p12 + 0x16) = 0;
-						*reinterpret_cast<u8*>(p12 + 0x17) = 0;
-						*reinterpret_cast<u8*>(p12 + 0x12) = 0;
-						*reinterpret_cast<u8*>(p12 + 0x13) = 0;
-						*reinterpret_cast<float*>(p12 + 0x20) = fVar2;
-						*reinterpret_cast<float*>(p12 + 0x24) = fVar2;
-						*reinterpret_cast<float*>(p12 + 0x28) = fVar2;
-						*reinterpret_cast<float*>(p12 + 0x2C) = fVar2;
-						*reinterpret_cast<float*>(p12 + 0x18) = fVar2;
-						*reinterpret_cast<float*>(p12 + 0x1C) = fVar2;
+						input->button[channel] = 0;
+						input->stickX = 0;
+						input->stickY = 0;
+						input->substickX = 0;
+						input->substickY = 0;
+						input->triggerLeft = 0;
+						input->triggerRight = 0;
+						input->stickXF = zero;
+						input->stickYF = zero;
+						input->substickXF = zero;
+						input->substickYF = zero;
+						input->triggerLeftF = zero;
+						input->triggerRightF = zero;
 					}
 				}
-				else if (reinterpret_cast<CPad::Gba*>(puVar18)->connected)
+				else if (gba->connected)
 				{
-					*reinterpret_cast<u32*>(p12 + 0x44) = *reinterpret_cast<u32*>(p12 + 0x44) | 1;
-					*puVar12 = puVar18[1];
+					input->activeMask = input->activeMask | 1;
+					input->button[channel] = gba->button;
 				}
-				puVar12[2] = static_cast<u16>(*puVar12 & (puVar12[0x26] ^ *puVar12));
-				if (iVar14 == 0)
+				input->buttonDown[channel] = static_cast<u16>(input->button[channel] & (input->buttonPrev[channel] ^ input->button[channel]));
+				if (channel == 0)
 				{
-					*reinterpret_cast<u16*>(p12 + 0x0E) =
-						static_cast<u16>(puVar12[0x26] & (puVar12[0x26] ^ *puVar12));
-					*reinterpret_cast<u16*>(p12 + 0x0C) =
-						static_cast<u16>(*reinterpret_cast<u16*>(p12 + 0x0A) &
-						                 (*reinterpret_cast<u16*>(p12 + 0x08) ^ *reinterpret_cast<u16*>(p12 + 0x0A)));
-					*reinterpret_cast<u16*>(p12 + 0x10) = static_cast<u16>(puVar12[0x26] & *puVar12 & 0x1F7F);
-					if (*reinterpret_cast<u16*>(p12 + 0x10) != 0)
+					input->buttonUp =
+						static_cast<u16>(input->buttonPrev[channel] & (input->buttonPrev[channel] ^ input->button[channel]));
+					input->stickBitsDown =
+						static_cast<u16>(input->stickBits &
+						                 (input->stickBitsPrev ^ input->stickBits));
+					input->repeatButton = static_cast<u16>(input->buttonPrev[channel] & input->button[channel] & 0x1F7F);
+					if (input->repeatButton != 0)
 					{
-						*reinterpret_cast<int*>(p12 + 0x48) = *reinterpret_cast<int*>(p12 + 0x48) + 1;
-						if (*reinterpret_cast<u32*>(p12 + 0x48) < 0x10)
+						input->hasInputMask++;
+						if (input->hasInputMask < 0x10)
 						{
-							*reinterpret_cast<u16*>(p12 + 0x10) = 0;
+							input->repeatButton = 0;
 						}
-						else if ((*reinterpret_cast<u32*>(p12 + 0x48) & 1) != 0)
+						else if ((input->hasInputMask & 1) != 0)
 						{
-							*reinterpret_cast<u16*>(p12 + 0x10) = 0;
+							input->repeatButton = 0;
 						}
 					}
 					else
 					{
-						*reinterpret_cast<u32*>(p12 + 0x48) = 0;
+						input->hasInputMask = 0;
 					}
-					*reinterpret_cast<u16*>(p12 + 0x10) =
-						static_cast<u16>(*reinterpret_cast<u16*>(p12 + 0x10) | puVar12[2]);
-					if (*reinterpret_cast<int*>(p12 + 0x38) != 0)
+					input->repeatButton =
+						static_cast<u16>(input->repeatButton | input->buttonDown[channel]);
+					if (input->holdOverride != 0)
 					{
-						*reinterpret_cast<u16*>(p12 + 0x30) = *puVar12;
-						*reinterpret_cast<u16*>(p12 + 0x32) = puVar12[2];
-						*reinterpret_cast<u16*>(p12 + 0x34) = *reinterpret_cast<u16*>(p12 + 0x10);
-						*reinterpret_cast<u16*>(p12 + 0x0A) = 0;
-						*reinterpret_cast<u16*>(p12 + 0x0C) = 0;
-						*reinterpret_cast<u16*>(p12 + 0x10) = 0;
-						puVar12[2] = 0;
-						*reinterpret_cast<u16*>(p12 + 0x0E) = 0;
-						*puVar12 = 0;
+						input->lockedButton[0] = input->button[channel];
+						input->lockedButton[1] = input->buttonDown[channel];
+						input->lockedButton[2] = input->repeatButton;
+						input->stickBits = 0;
+						input->stickBitsDown = 0;
+						input->repeatButton = 0;
+						input->buttonDown[channel] = 0;
+						input->buttonUp = 0;
+						input->button[channel] = 0;
 					}
 					else
 					{
-						*reinterpret_cast<u16*>(p12 + 0x34) = 0;
-						*reinterpret_cast<u16*>(p12 + 0x32) = 0;
-						*reinterpret_cast<u16*>(p12 + 0x30) = 0;
+						input->lockedButton[2] = 0;
+						input->lockedButton[1] = 0;
+						input->lockedButton[0] = 0;
 					}
 				}
-				puVar7[2] = static_cast<u16>(puVar7[2] | puVar12[2]);
-				*puVar7 = static_cast<u16>(*puVar7 | *puVar12);
-				if (iVar14 == 0)
+				merged->buttonDown[channel] = static_cast<u16>(merged->buttonDown[channel] | input->buttonDown[channel]);
+				merged->button[channel] = static_cast<u16>(merged->button[channel] | input->button[channel]);
+				if (channel == 0)
 				{
-					u8* p10 = reinterpret_cast<u8*>(puVar10);
-					*reinterpret_cast<u32*>(p10 + 0x38) =
-						*reinterpret_cast<u32*>(p10 + 0x38) | *reinterpret_cast<u32*>(p12 + 0x38);
-					*reinterpret_cast<u32*>(p10 + 0x3C) =
-						*reinterpret_cast<u32*>(p10 + 0x3C) | *reinterpret_cast<u32*>(p12 + 0x3C);
-					*reinterpret_cast<u16*>(p10 + 0x0E) =
-						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x0E) | *reinterpret_cast<u16*>(p12 + 0x0E));
-					*reinterpret_cast<u16*>(p10 + 0x0A) =
-						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x0A) | *reinterpret_cast<u16*>(p12 + 0x0A));
-					*reinterpret_cast<u16*>(p10 + 0x0C) =
-						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x0C) | *reinterpret_cast<u16*>(p12 + 0x0C));
-					*reinterpret_cast<s16*>(p10 + 0x10) =
-						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x10) | *reinterpret_cast<u16*>(p12 + 0x10));
-					*reinterpret_cast<u16*>(p10 + 0x32) =
-						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x32) | *reinterpret_cast<u16*>(p12 + 0x32));
-					*reinterpret_cast<u16*>(p10 + 0x30) =
-						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x30) | *reinterpret_cast<u16*>(p12 + 0x30));
-					*reinterpret_cast<u16*>(p10 + 0x34) =
-						static_cast<u16>(*reinterpret_cast<u16*>(p10 + 0x34) | *reinterpret_cast<u16*>(p12 + 0x34));
-					cVar9 = *reinterpret_cast<s8*>(p12 + 0x14);
-					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x14)) >> 0x1F;
-					uVar16 = static_cast<int>(cVar9) >> 0x1F;
-					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x14))) - uVar15) <
-					    static_cast<int>((uVar16 ^ static_cast<int>(cVar9)) - uVar16))
+					merged->holdOverride =
+						merged->holdOverride | input->holdOverride;
+					merged->digitalStickOverride =
+						merged->digitalStickOverride | input->digitalStickOverride;
+					merged->buttonUp =
+						static_cast<u16>(merged->buttonUp | input->buttonUp);
+					merged->stickBits =
+						static_cast<u16>(merged->stickBits | input->stickBits);
+					merged->stickBitsDown =
+						static_cast<u16>(merged->stickBitsDown | input->stickBitsDown);
+					merged->repeatButton =
+						static_cast<u16>(merged->repeatButton | input->repeatButton);
+					merged->lockedButton[1] =
+						static_cast<u16>(merged->lockedButton[1] | input->lockedButton[1]);
+					merged->lockedButton[0] =
+						static_cast<u16>(merged->lockedButton[0] | input->lockedButton[0]);
+					merged->lockedButton[2] =
+						static_cast<u16>(merged->lockedButton[2] | input->lockedButton[2]);
+					axisValue = input->stickX;
+					if (__abs(merged->stickX) < __abs(axisValue))
 					{
-						*reinterpret_cast<s8*>(p10 + 0x14) = cVar9;
-						*reinterpret_cast<float*>(p10 + 0x20) = *reinterpret_cast<float*>(p12 + 0x20);
+						merged->stickX = axisValue;
+						merged->stickXF = input->stickXF;
 					}
-					cVar9 = *reinterpret_cast<s8*>(p12 + 0x15);
-					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x15)) >> 0x1F;
-					uVar16 = static_cast<int>(cVar9) >> 0x1F;
-					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x15))) - uVar15) <
-					    static_cast<int>((uVar16 ^ static_cast<int>(cVar9)) - uVar16))
+					axisValue = input->stickY;
+					if (__abs(merged->stickY) < __abs(axisValue))
 					{
-						*reinterpret_cast<s8*>(p10 + 0x15) = cVar9;
-						*reinterpret_cast<float*>(p10 + 0x24) = *reinterpret_cast<float*>(p12 + 0x24);
+						merged->stickY = axisValue;
+						merged->stickYF = input->stickYF;
 					}
-					cVar9 = *reinterpret_cast<s8*>(p12 + 0x16);
-					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x16)) >> 0x1F;
-					uVar16 = static_cast<int>(cVar9) >> 0x1F;
-					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x16))) - uVar15) <
-					    static_cast<int>((uVar16 ^ static_cast<int>(cVar9)) - uVar16))
+					axisValue = input->substickX;
+					if (__abs(merged->substickX) < __abs(axisValue))
 					{
-						*reinterpret_cast<s8*>(p10 + 0x16) = cVar9;
-						*reinterpret_cast<float*>(p10 + 0x28) = *reinterpret_cast<float*>(p12 + 0x28);
+						merged->substickX = axisValue;
+						merged->substickXF = input->substickXF;
 					}
-					cVar9 = *reinterpret_cast<s8*>(p12 + 0x17);
-					uVar15 = static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x17)) >> 0x1F;
-					uVar16 = static_cast<int>(cVar9) >> 0x1F;
-					if (static_cast<int>((uVar15 ^ static_cast<int>(*reinterpret_cast<s8*>(p10 + 0x17))) - uVar15) <
-					    static_cast<int>((uVar16 ^ static_cast<int>(cVar9)) - uVar16))
+					axisValue = input->substickY;
+					if (__abs(merged->substickY) < __abs(axisValue))
 					{
-						*reinterpret_cast<s8*>(p10 + 0x17) = cVar9;
-						*reinterpret_cast<float*>(p10 + 0x2C) = *reinterpret_cast<float*>(p12 + 0x2C);
+						merged->substickY = axisValue;
+						merged->substickYF = input->substickYF;
 					}
-					if (*reinterpret_cast<u8*>(p10 + 0x12) < *reinterpret_cast<u8*>(p12 + 0x12))
+					if (merged->triggerLeft < input->triggerLeft)
 					{
-						*reinterpret_cast<u8*>(p10 + 0x12) = *reinterpret_cast<u8*>(p12 + 0x12);
-						*reinterpret_cast<float*>(p10 + 0x18) = *reinterpret_cast<float*>(p12 + 0x18);
+						merged->triggerLeft = input->triggerLeft;
+						merged->triggerLeftF = input->triggerLeftF;
 					}
-					if (*reinterpret_cast<u8*>(p10 + 0x13) < *reinterpret_cast<u8*>(p12 + 0x13))
+					if (merged->triggerRight < input->triggerRight)
 					{
-						*reinterpret_cast<u8*>(p10 + 0x13) = *reinterpret_cast<u8*>(p12 + 0x13);
-						*reinterpret_cast<float*>(p10 + 0x1C) = *reinterpret_cast<float*>(p12 + 0x1C);
+						merged->triggerRight = input->triggerRight;
+						merged->triggerRightF = input->triggerRightF;
 					}
 				}
 			}
-			puVar12 = puVar12 + 1;
-			puVar7 = puVar7 + 1;
-		}
-		uVar17 = uVar17 + 1;
-		iVar6 = iVar6 + 0x54;
-		puVar13 = puVar13 + 6;
-		puVar18 = puVar18 + 2;
-	} while (uVar17 < 4);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80022168
- * PAL Size: 2876b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPad::Frame()
-{
-	int iVar6;
-	u16 uVar1;
-	u16 uVar8;
-	s8 cVar9;
-	u16* puVar10;
-	int iVar11;
-	u16* puVar7;
-	u16* puVar13;
-	u16* puVar12;
-	int iVar14;
-	u32 port;
-	u32 uVar16;
-	u32 gbaIdx;
-	u32 uVar15;
-	u16* puVar18;
-	int iVar19;
-	u16 uVar2;
-	CPad::Gba local_98[4];
-	PADStatus local_88[4];
-	u8* self = reinterpret_cast<u8*>(this);
-
-	PADRead(local_88);
-	PADClamp(local_88);
-	memcpy(g_pad, local_88, sizeof(g_pad));
-	*reinterpret_cast<u32*>(self + 0x1C4) = 0;
-	port = 0;
-	puVar18 = reinterpret_cast<u16*>(local_98);
-	do
-	{
-		CPad::Gba* gba = &local_98[port];
-		iVar6 = SIProbe(port);
-		gba->connected = (0x40000 - iVar6) == 0;
-		gba->ctrlMode = Joybus.GetCtrlMode(port);
-		gba->noController = gba->connected && (gba->ctrlMode == 0);
-		gba->button = 0;
-		if (gba->connected)
-		{
-			gba->button = Joybus.GetPadData(port);
 		}
 		port = port + 1;
+		input++;
+		rawPad++;
+		gba++;
 	} while (port < 4);
 
-	if ((_1b0_4_ != 0) && ((iVar14 = _1bc_4_), iVar14 >= 0))
+	if (m_replayFrame >= 0)
 	{
-		if (*reinterpret_cast<int*>(_1b0_4_ + 4) != 0)
-		{
-			if (*reinterpret_cast<int*>(_1b0_4_ + 8) < 0x1A5E0)
-			{
-				iVar6 = 0;
-				iVar14 = 0;
-				puVar7 = reinterpret_cast<u16*>(local_88);
-				puVar13 = reinterpret_cast<u16*>(local_98);
-				for (iVar19 = 0; iVar19 < 4; iVar19++)
-				{
-					iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar6;
-					iVar6 = iVar6 + 0x0C;
-					puVar12 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar11 + 0x0C);
-					uVar2 = *puVar7;
-					*puVar12 = uVar2;
-					uVar2 = *reinterpret_cast<u8*>(puVar7 + 1);
-					*reinterpret_cast<u8*>(puVar12 + 1) = static_cast<u8>(uVar2);
-					uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 3) = static_cast<u8>(uVar2);
-					uVar2 = *reinterpret_cast<u8*>(puVar7 + 2);
-					*reinterpret_cast<u8*>(puVar12 + 2) = static_cast<u8>(uVar2);
-					uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 5) = static_cast<u8>(uVar2);
-					uVar2 = *reinterpret_cast<u8*>(puVar7 + 3);
-					*reinterpret_cast<u8*>(puVar12 + 3) = static_cast<u8>(uVar2);
-					uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 7) = static_cast<u8>(uVar2);
-					uVar2 = *reinterpret_cast<u8*>(puVar7 + 4);
-					*reinterpret_cast<u8*>(puVar12 + 4) = static_cast<u8>(uVar2);
-					uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9);
-					*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar12) + 9) = static_cast<u8>(uVar2);
-					puVar10 = puVar7 + 5;
-					puVar7 = puVar7 + 6;
-					uVar2 = *reinterpret_cast<u8*>(puVar10);
-					*reinterpret_cast<u8*>(puVar12 + 5) = static_cast<u8>(uVar2);
-					iVar11 = *reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) * 0x40 + iVar14;
-					iVar14 = iVar14 + 4;
-					puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar11 + 0x3C);
-					*puVar10 = *puVar13;
-					puVar10[1] = puVar13[1];
-					puVar13 = puVar13 + 2;
-				}
-				*reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) =
-					*reinterpret_cast<int*>(reinterpret_cast<int>(_1b0_4_) + 8) + 1;
-				*reinterpret_cast<int*>(_1b0_4_) = *reinterpret_cast<int*>(_1b0_4_) + 0x40;
-			}
-		}
-		else if (iVar14 < 0x1A5E0)
-		{
-			iVar6 = 0;
-			iVar19 = 0;
-			puVar7 = reinterpret_cast<u16*>(local_88);
-			puVar13 = reinterpret_cast<u16*>(local_98);
-			for (iVar11 = 0; iVar11 < 4; iVar11++)
-			{
-				uVar8 = *puVar7;
-				puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar6 + iVar14 * 0x40 + 0x0C);
-				uVar2 = *puVar10;
-				*puVar7 = uVar2;
-				uVar2 = *reinterpret_cast<u8*>(puVar10 + 1);
-				*reinterpret_cast<u8*>(puVar7 + 1) = static_cast<u8>(uVar2);
-				uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 3);
-				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 3) = static_cast<u8>(uVar2);
-				uVar2 = *reinterpret_cast<u8*>(puVar10 + 2);
-				*reinterpret_cast<u8*>(puVar7 + 2) = static_cast<u8>(uVar2);
-				uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 5);
-				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 5) = static_cast<u8>(uVar2);
-				uVar2 = *reinterpret_cast<u8*>(puVar10 + 3);
-				*reinterpret_cast<u8*>(puVar7 + 3) = static_cast<u8>(uVar2);
-				uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 7);
-				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 7) = static_cast<u8>(uVar2);
-				uVar2 = *reinterpret_cast<u8*>(puVar10 + 4);
-				*reinterpret_cast<u8*>(puVar7 + 4) = static_cast<u8>(uVar2);
-				uVar2 = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar10) + 9);
-				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(puVar7) + 9) = static_cast<u8>(uVar2);
-				uVar2 = *reinterpret_cast<u8*>(puVar10 + 5);
-				*reinterpret_cast<u8*>(puVar7 + 5) = static_cast<u8>(uVar2);
-				puVar10 = reinterpret_cast<u16*>(reinterpret_cast<int>(_1b0_4_) + iVar14 * 0x40 + iVar19 + 0x3C);
-				uVar1 = puVar10[1];
-				*puVar13 = *puVar10;
-				puVar13[1] = uVar1;
-				if ((uVar8 & PAD_TRIGGER_Z) != 0)
-				{
-					*puVar7 = static_cast<u16>(*puVar7 | uVar8);
-				}
-				puVar7 = puVar7 + 6;
-				iVar6 = iVar6 + 0x0C;
-				iVar19 = iVar19 + 4;
-				puVar13 = puVar13 + 2;
-			}
-		}
-	}
-
-	puVar7 = reinterpret_cast<u16*>(local_88);
-	puVar10 = reinterpret_cast<u16*>(self + 0x154);
-	uVar16 = 0;
-	gbaIdx = 0;
-	puVar13 = puVar7;
-	do
-	{
-		cVar9 = *reinterpret_cast<s8*>(puVar13 + 5);
-		uVar15 = 0x80000000 >> gbaIdx;
-		if (cVar9 == -1)
-		{
-			goto gba_ready;
-		}
-		if (cVar9 >= -1)
-		{
-			goto flag_set_low;
-		}
-		if (cVar9 == -3)
-		{
-			goto flag_set_neg3;
-		}
-		if (cVar9 >= -3)
-		{
-			goto flag_clear;
-		}
-		goto flag_done;
-	flag_set_low:
-		if (cVar9 < 1)
-		{
-			_1a8_4_ = _1a8_4_ | uVar15;
-		}
-		goto flag_done;
-	flag_set_neg3:
-		_1a8_4_ = _1a8_4_ | uVar15;
-		goto flag_done;
-	gba_ready:
-		if (static_cast<u8>(Joybus.GBAReady(gbaIdx)) == 0)
-		{
-			uVar16 = uVar16 | uVar15;
-		}
-		_1a8_4_ = _1a8_4_ & ~uVar15;
-		goto flag_done;
-	flag_clear:
-		_1a8_4_ = _1a8_4_ & ~uVar15;
-	flag_done:
-		gbaIdx = gbaIdx + 1;
-		puVar13 = puVar13 + 6;
-	} while (gbaIdx < 4);
-
-	if ((uVar16 & 0xF0000000) != 0)
-	{
-		PADReset(uVar16 & 0xF0000000);
-	}
-
-	MergePadInputs(this, puVar7, puVar18, puVar10);
-
-	if (_1bc_4_ >= 0)
-	{
-		_1bc_4_ = _1bc_4_ + 1;
+		m_replayFrame++;
 	}
 }
 
-#pragma always_inline off
 
 /*
  * --INFO--
@@ -608,10 +427,10 @@ void CPad::Frame()
  */
 void CPad::Quit()
 {
-	if (_1b0_4_ != 0)
+	if (m_replayBuffer != 0)
 	{
-		delete[] _1b0_4_;
-		_1b0_4_ = 0;
+		delete[] reinterpret_cast<unsigned char*>(m_replayBuffer);
+		m_replayBuffer = 0;
 	}
 
 	CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(_1ac_4_);
@@ -640,8 +459,8 @@ void CPad::Init()
 	memset(m_padInputs, 0, sizeof(m_padInputs));
 	_1a8_4_ = 0;
 	_1ac_4_ = 0;
-	_1b0_4_ = 0;
-	_1bc_4_ = 0;
+	m_replayBuffer = 0;
+	m_replayFrame = 0;
 	m_debugPadPort = 0xFFFFFFFF;
 	m_stickDigitalThreshold = 1;
 
@@ -650,24 +469,24 @@ void CPad::Init()
 		_1ac_4_ = Memory.CreateStage(0x800000, const_cast<char*>(s_CPad), 1);
 		if (_1ac_4_ != 0)
 		{
-			_1b0_4_ = new (reinterpret_cast<CMemory::CStage*>(_1ac_4_), const_cast<char*>(s_pad_cpp), 0x54)
-				unsigned char[0x69780C];
-			if ((_1b4_4_ != 0) && ((fp = fopen(s_replay_dat, s_rb)) != 0))
+			m_replayBuffer = reinterpret_cast<ReplayBuffer*>(new (reinterpret_cast<CMemory::CStage*>(_1ac_4_), "pad.cpp", 0x54)
+				unsigned char[sizeof(ReplayBuffer)]);
+			if ((_1b4_4_ != 0) && ((fp = fopen(s_replay_dat, "rb")) != 0))
 			{
 				fseek(fp, 0, 2);
 				size = ftell(fp);
 				fseek(fp, 0, 0);
-				fread(_1b0_4_, 1, size, fp);
+				fread(m_replayBuffer, 1, size, fp);
 				fclose(fp);
-				*reinterpret_cast<unsigned int*>(_1b0_4_ + 4) = 0;
-				frames = *reinterpret_cast<int*>(_1b0_4_ + 8);
+				m_replayBuffer->recordMode = 0;
+				frames = m_replayBuffer->frameCount;
 				System.Printf(const_cast<char*>(s_replay_host_msg), frames / 30);
 			}
 			else
 			{
-				*reinterpret_cast<unsigned int*>(_1b0_4_) = 0xC;
-				*reinterpret_cast<unsigned int*>(_1b0_4_ + 8) = 0;
-				*reinterpret_cast<unsigned int*>(_1b0_4_ + 4) = 1;
+				m_replayBuffer->cursor = 0xC;
+				m_replayBuffer->frameCount = 0;
+				m_replayBuffer->recordMode = 1;
 			}
 		}
 	}

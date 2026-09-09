@@ -1,4 +1,3 @@
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppGetRotMatrixX.h"
 #include "ffcc/pppsintbl.h"
 

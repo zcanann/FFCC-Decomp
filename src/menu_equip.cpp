@@ -68,7 +68,7 @@ static inline CFont* GetEquipFont(CMenuPcs* menu)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMenuPcs::ChkEquipActive(int index)
+bool CMenuPcs::ChkEquipActive(int index)
 {
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
@@ -80,19 +80,20 @@ int CMenuPcs::ChkEquipActive(int index)
 		return 0;
 	}
 
+	bool active;
 	if (index == 0) {
 		if (equipIndex < 3) {
-			return 0;
+			active = false;
+		} else {
+			active = caravanWork->m_equipment[equipIndex] >= 0;
 		}
+	} else {
+		int item = caravanWork->m_inventoryItems[itemEntries[index - 1]];
+		active = ChkEquipPossible(item);
 
-		return caravanWork->m_equipment[equipIndex] < 0 ? 0 : 1;
-	}
-
-	int item = caravanWork->m_inventoryItems[itemEntries[index - 1]];
-	int active = ChkEquipPossible(item);
-
-	if (((active & 0xff) != 0) && (GetEquipType(item) != equipIndex)) {
-		active = 0;
+		if (active && (GetEquipType(item) != equipIndex)) {
+			active = false;
+		}
 	}
 
 	return active;
@@ -327,9 +328,9 @@ int CMenuPcs::EquipCtrlCur()
 				int index = static_cast<int>(GetEquipMenuState(this)->scroll) +
 				            static_cast<int>(GetEquipMenuState(this)->selected[mode]);
 				s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-				unsigned int valid = ChkEquipActive(index);
+				bool valid = ChkEquipActive(index);
 
-				if (((valid & 0xff) == 0) || ((index != 0) && ((EquipChk((int)entries[index]) & 0xff) != 0))) {
+				if (!valid || ((index != 0) && EquipChk((int)entries[index]))) {
 					Sound.PlaySe(4, 0x40, 0x7f, 0);
 				} else {
 					caravanWork->ChgEquipPos(GetEquipMenuState(this)->selected[0],
@@ -361,7 +362,6 @@ int CMenuPcs::EquipCtrlCur()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_lifetimes off
 void CMenuPcs::EquipDraw()
 {
 	int helpItem;
@@ -506,15 +506,15 @@ void CMenuPcs::EquipDraw()
 					if (tex == 0x37) {
 						int idx = drawIndex + GetEquipMenuState(this)->scroll;
 						if ((idx < 1) || (idx >= letterCount)) {
-							if ((idx >= letterCount) || (ChkEquipActive(idx) == 0)) {
+							if ((idx >= letterCount) || !ChkEquipActive(idx)) {
 								tex = 0x34;
 								alpha = (float)(0.5 * (double)listItem->alpha);
 							}
 						} else {
 							unsigned int chk = idx - 1;
-							int equipped = EquipChk((int)letter[chk + 1]);
-							if (((chk + 1) >= letterCount) || ((equipped & 0xff) != 0) || ((ChkEquipActive(chk + 1) & 0xff) == 0)) {
-								if ((equipped & 0xff) != 0) {
+							bool equipped = EquipChk((int)letter[chk + 1]);
+							if (((chk + 1) >= letterCount) || equipped || !ChkEquipActive(chk + 1)) {
+								if (equipped) {
 									int markX = (int)(x - 12.0f);
 									int markY = (int)((double)(h - 24.0f) * 0.5 + (double)y);
 									DrawEquipMark(markX, markY, listItem->alpha);
@@ -683,7 +683,6 @@ void CMenuPcs::EquipDraw()
 		}
 	}
 }
-#pragma opt_lifetimes reset
 
 /*
  * --INFO--
@@ -906,7 +905,6 @@ int CMenuPcs::EquipOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_dead_assignments off
 void CMenuPcs::EquipInit1()
 {
 	int i = (int)GetEquipListStorage(this)->count;
@@ -987,4 +985,3 @@ void CMenuPcs::EquipInit1()
 		psVar10++;
 	}
 }
-#pragma opt_dead_assignments reset

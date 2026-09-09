@@ -273,8 +273,8 @@ int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
  * --INFO--
  * PAL Address: 0x800d9538
  * PAL Size: 416b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800F56F8
+ * EN Size: 292b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -287,16 +287,10 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 		return -1;
 	}
 
-	int type = 1;
 	float centerX = pos->x;
-	obj->type = type;
-	float radiusSq = radius * radius;
+	obj->type = 1;
 	float centerZ = pos->z;
-	float minX = centerX - radius;
-	float minZ = centerZ - radius;
 	obj->flagBits.active = 1;
-	float maxX = centerX + radius;
-	float maxZ = centerZ + radius;
 
 	int id = m_nextId;
 	m_nextId = id + 1;
@@ -311,14 +305,14 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 	obj->basePower = speed;
 
 	obj->radius = radius;
-	obj->radiusSq = radiusSq;
+	obj->radiusSq = radius * radius;
 
 	obj->centerX = centerX;
 	obj->centerZ = centerZ;
-	obj->minX = minX;
-	obj->minZ = minZ;
-	obj->maxX = maxX;
-	obj->maxZ = maxZ;
+	obj->minX = centerX - radius;
+	obj->minZ = centerZ - radius;
+	obj->maxX = centerX + radius;
+	obj->maxZ = centerZ + radius;
 
 	return obj->id;
 }

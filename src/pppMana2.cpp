@@ -45,29 +45,6 @@ struct Mana2SetupBlock
 STATIC_ASSERT(sizeof(Mana2DataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(Mana2DataOffsets, m_setupOffset) == 0x4);
 STATIC_ASSERT(offsetof(Mana2DataOffsets, m_workOffset) == 0x8);
-extern const float kMana2Zero = 0.0f;
-extern const float kMana2NegativeOne = -1.0f;
-extern const float kMana2One = 1.0f;
-extern const float kMana2Half = 0.5f;
-extern const float kMana2MeshUvStep = 0.0625f;
-extern const double kMana2SignedIntBias = 4503601774854144.0;
-extern const float kMana2Two = 2.0f;
-extern const float kMana2Quarter = 0.25f;
-extern const float kMana2ThreeQuarter = 0.75f;
-extern const float kMana2ParaboloidCenterYOffset = 5.0f;
-extern const float kMana2ParaboloidTexSize = 128.0f;
-extern const float kMana2ParaboloidFov = 90.0f;
-extern const float kMana2ParaboloidFar = 10000.0f;
-static const char s_manaShapeObj5[] = "obj5";
-static const char s_manaShapeObj3[] = "obj3";
-static const char s_manaShapeObj1[] = "obj1";
-static const char s_manaShapeObj4[] = "obj4";
-static const char s_manaShapeObj2[] = "obj2";
-extern const float kMana2StepSlopeLimit = 0.99999f;
-static const char s_manaShapeObj[] = "obj";
-extern const float kMana2WaterRotZRad = -1.5707964f;
-extern const float kPppConformBgNormalZero = 0.0f;
-extern const float kPppConformBgNormalOne = 1.0f;
 
 static inline float CameraWorldX()
 {
@@ -111,32 +88,17 @@ static inline Mana2SetupBlock* GetMana2SetupBlock(pppMana2* mana, _pppCtrlTable*
         reinterpret_cast<_pppPObject*>(mana)->m_workArea + GetMana2DataOffsets(ctrl)->m_setupOffset);
 }
 
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
-
-static inline float LoadFloatFresh(const volatile float& value)
-{
-    return value;
-}
-
-static inline double LoadDouble(const double& value)
-{
-    return value;
-}
-
 static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
-    model->m_afterMeshDrawCallback = 0;
+    model->m_beforeDrawModelCallback = 0;
     model->SetDrawMeshDLCallback(0);
 }
 
 static inline void SetMana2ModelCallbacks(CChara::CModel* model, void* work, pppMana2Step* step)
 {
     model->SetCallbackContext(work, step);
-    model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana2_BeforeDrawCallback;
+    model->m_beforeDrawModelCallback = Mana2_BeforeDrawCallback;
     model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
 }
 
@@ -194,9 +156,9 @@ static void CalcWaterReflectionVector(
         cameraPos.z = CameraWorldZ();
     }
 
-    transformedCameraPos.x = LoadFloat(kMana2Zero);
-    transformedCameraPos.y = LoadFloat(kMana2Zero);
-    transformedCameraPos.z = LoadFloat(kMana2Zero);
+    transformedCameraPos.x = 0.0f;
+    transformedCameraPos.y = 0.0f;
+    transformedCameraPos.z = 0.0f;
 
     PSMTXCopy(matrix, matrixNoTranslate);
     objPos.x = matrixNoTranslate[0][3];
@@ -208,12 +170,12 @@ static void CalcWaterReflectionVector(
     PSMTXInverse(matrixNoTranslate, inverseMtx);
 
     PSVECSubtract(&objPos, &cameraPos, &cameraPos);
-    PSVECScale(&cameraPos, &cameraPos, LoadFloat(kMana2NegativeOne));
+    PSVECScale(&cameraPos, &cameraPos, -1.0f);
     PSMTXMultVec(inverseMtx, &cameraPos, &transformedCameraPos);
 
-    zero = LoadFloat(kMana2Zero);
+    zero = 0.0f;
     positionIt = positions;
-    half = LoadFloat(kMana2Half);
+    half = 0.5f;
     reflectionIt = reflectionVec;
     normalIt = normals;
     colorBytes = (unsigned char*)color;
@@ -233,7 +195,7 @@ static void CalcWaterReflectionVector(
             colorBytes[1] = 0x80;
             colorBytes[2] = 0xff;
             colorBytes[3] = 0xbc;
-            denomBase = LoadFloat(kMana2One);
+            denomBase = 1.0f;
             *texCoordFloat = -reflectionIt->x / (denomBase + reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (denomBase + reflectionIt->z);
         } else {
@@ -243,7 +205,7 @@ static void CalcWaterReflectionVector(
             colorBytes[1] = 0xff;
             colorBytes[2] = 0x80;
             colorBytes[3] = 0x7f;
-            denomBase = LoadFloat(kMana2One);
+            denomBase = 1.0f;
             *texCoordFloat = -reflectionIt->x / (denomBase - reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (denomBase - reflectionIt->z);
         }
@@ -466,9 +428,6 @@ static int RenderWaterMesh(VMana2* mana2)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_dead_assignments off
-#pragma opt_common_subs off
 static int UpdateWaterMesh(VMana2* mana2)
 {
     float neighborScale;
@@ -485,64 +444,18 @@ static int UpdateWaterMesh(VMana2* mana2)
         return 0;
     }
 
-    int row = 1;
-    int rowBase = 0x11;
-    do {
-        currentScale = kMana2Zero;
-        neighborScale = kMana2Half;
-        unsigned int col = 1;
-        unsigned int index = rowBase + 1;
-        while (col < 0x10) {
-            int above0 = index - 0x11;
-            int below0 = index + 0x11;
-            float* center0 = &waterHeightA[index];
-
-            waterHeightB[index] = currentScale * center0[0] +
-                                  neighborScale * (waterHeightA[above0] + waterHeightA[below0] +
-                                                   center0[-1] + center0[1]) -
+    for (int row = 1; row < 0x10; row++) {
+        currentScale = 0.0f;
+        neighborScale = 0.5f;
+        for (int col = 1; col < 0x10; col++) {
+            int index = row * 0x11 + col;
+            float* center = &waterHeightA[index];
+            waterHeightB[index] = currentScale * center[0] +
+                                  neighborScale * (waterHeightA[index - 0x11] + waterHeightA[index + 0x11] +
+                                                   center[-1] + center[1]) -
                                   waterHeightB[index];
-
-            int index1 = col + rowBase + 1;
-            int above1 = col + rowBase + 1 - 0x11;
-            int below1 = col + rowBase + 1 + 0x11;
-            float* center1 = &waterHeightA[index1];
-            waterHeightB[index1] = currentScale * center1[0] +
-                                   neighborScale * (waterHeightA[above1] + waterHeightA[below1] +
-                                                    center1[-1] + center1[1]) -
-                                   waterHeightB[index1];
-
-            int index2 = col + rowBase + 2;
-            int above2 = col + rowBase + 2 - 0x11;
-            int below2 = col + rowBase + 2 + 0x11;
-            float* center2 = &waterHeightA[index2];
-            waterHeightB[index2] = currentScale * center2[0] +
-                                   neighborScale * (waterHeightA[above2] + waterHeightA[below2] +
-                                                    center2[-1] + center2[1]) -
-                                   waterHeightB[index2];
-
-            int index3 = col + rowBase + 3;
-            int above3 = col + rowBase + 3 - 0x11;
-            int below3 = col + rowBase + 3 + 0x11;
-            float* center3 = &waterHeightA[index3];
-            waterHeightB[index3] = currentScale * center3[0] +
-                                   neighborScale * (waterHeightA[above3] + waterHeightA[below3] +
-                                                    center3[-1] + center3[1]) -
-                                   waterHeightB[index3];
-
-            unsigned int index4 = index + 4;
-            int above4 = index4 - 0x11;
-            int below4 = index4 + 0x11;
-            float* center4 = &waterHeightA[index4];
-            waterHeightB[index4] = currentScale * center4[0] +
-                                   neighborScale * (waterHeightA[above4] + waterHeightA[below4] +
-                                                    center4[-1] + center4[1]) -
-                                   waterHeightB[index4];
-            col += 5;
-            index += 5;
         }
-        row++;
-        rowBase += 0x11;
-    } while (row < 0x10);
+    }
 
     for (int i = 0; i < 0x121; i++) {
         float tmp = waterHeightA[i];
@@ -561,7 +474,6 @@ static int UpdateWaterMesh(VMana2* mana2)
                               mana2->m_waterMtx, mana2->m_colors, mana2->m_texCoord1);
     return 1;
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -584,38 +496,38 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     int indexOffset;
     int quadIndex;
     int rowBase;
-    float* positions;
+    Vec* positions;
     int rowCount;
-    float* normals;
-    float* uvs;
+    Vec* normals;
+    Vec2d* uvs;
     int colCount;
 
-    normalY = LoadFloat(kMana2One);
-    zero = LoadFloat(kMana2Zero);
+    normalY = 1.0f;
+    zero = 0.0f;
     rowCount = 0;
-    uvStep = LoadFloat(kMana2MeshUvStep);
-    radius = param_5 * LoadFloat(kMana2Half);
+    uvStep = 0.0625f;
+    radius = param_5 * 0.5f;
     step = param_5 * uvStep;
     for (z = radius; z >= -radius; z -= step) {
         colCount = 0;
-        positions = reinterpret_cast<float*>(param_1);
-        normals = reinterpret_cast<float*>(param_2);
-        uvs = reinterpret_cast<float*>(param_3);
+        positions = param_1;
+        normals = param_2;
+        uvs = param_3;
         for (x = -radius; x <= radius; x += step) {
-            *positions = x;
-            param_1 = reinterpret_cast<Vec*>(positions + 3);
-            positions[1] = zero;
-            param_2 = reinterpret_cast<Vec*>(normals + 3);
-            param_3 = reinterpret_cast<Vec2d*>(uvs + 2);
-            positions[2] = z;
-            positions = positions + 3;
-            *normals = zero;
-            normals[1] = normalY;
-            normals[2] = zero;
-            normals = normals + 3;
-            *uvs = static_cast<float>(colCount) * uvStep;
-            uvs[1] = static_cast<float>(rowCount) * uvStep;
-            uvs = uvs + 2;
+            positions->x = x;
+            param_1 = positions + 1;
+            positions->y = zero;
+            param_2 = normals + 1;
+            param_3 = uvs + 1;
+            positions->z = z;
+            positions++;
+            normals->x = zero;
+            normals->y = normalY;
+            normals->z = zero;
+            normals++;
+            uvs->x = static_cast<float>(colCount) * uvStep;
+            uvs->y = static_cast<float>(rowCount) * uvStep;
+            uvs++;
             colCount = colCount + 1;
         }
         rowCount = rowCount + 1;
@@ -711,14 +623,14 @@ void CalcReflectionVector2(
     matrix[2][3] = worldPos.z;
 
     PSMTXCopy(matrix, nodeRotMtx);
-    nodeRotMtx[0][3] = LoadFloat(kMana2Zero);
-    nodeRotMtx[1][3] = LoadFloat(kMana2Zero);
-    nodeRotMtx[2][3] = LoadFloat(kMana2Zero);
+    nodeRotMtx[0][3] = 0.0f;
+    nodeRotMtx[1][3] = 0.0f;
+    nodeRotMtx[2][3] = 0.0f;
 
     PSMTXCopy(CameraMatrix(), cameraMtx);
     PSMTXConcat(cameraMtx, matrix, cameraModelMtx);
 
-    const float half = LoadFloat(kMana2Half);
+    const float half = 0.5f;
 
     dlEnd = (u16*)((u8*)displayList + displayListSize);
     while (dl < dlEnd) {
@@ -785,69 +697,69 @@ void CalcReflectionVector2(
             switch (axis) {
             case 0:
                 {
-                    float two = LoadFloat(kMana2Two);
+                    float two = 2.0f;
                     invAxis = two * reflected.x;
                 }
-                if (outVec->x >= LoadFloat(kMana2Zero)) {
+                if (outVec->x >= 0.0f) {
                     clr[0] = (u8)(clr[0] + 0x7F);
                     uv.x = half - reflected.z / invAxis;
                     uv.y = half - reflected.y / invAxis;
-                    uv.x = uv.x * LoadFloat(kMana2Quarter);
-                    uv.y = uv.y * LoadFloat(kMana2Quarter);
-                    uv.x = uv.x + LoadFloat(kMana2Quarter);
-                    uv.y = uv.y + LoadFloat(kMana2Quarter);
+                    uv.x = uv.x * 0.25f;
+                    uv.y = uv.y * 0.25f;
+                    uv.x = uv.x + 0.25f;
+                    uv.y = uv.y + 0.25f;
                 } else {
                     clr[0] = (u8)(clr[0] - 0x7F);
                     uv.x = half - reflected.z / invAxis;
                     uv.y = half + reflected.y / invAxis;
-                    uv.x = uv.x * LoadFloat(kMana2Quarter);
-                    uv.y = uv.y * LoadFloat(kMana2Quarter);
-                    uv.x = uv.x + LoadFloat(kMana2ThreeQuarter);
-                    uv.y = uv.y + LoadFloat(kMana2Quarter);
+                    uv.x = uv.x * 0.25f;
+                    uv.y = uv.y * 0.25f;
+                    uv.x = uv.x + 0.75f;
+                    uv.y = uv.y + 0.25f;
                 }
                 break;
             case 1:
                 {
-                    float two = LoadFloat(kMana2Two);
+                    float two = 2.0f;
                     invAxis = two * reflected.y;
                 }
-                if (outVec->y >= LoadFloat(kMana2Zero)) {
+                if (outVec->y >= 0.0f) {
                     clr[1] = (u8)(clr[1] + 0x7F);
                     uv.x = half + reflected.x / invAxis;
                     uv.y = half + reflected.z / invAxis;
-                    uv.x = uv.x * LoadFloat(kMana2Quarter);
-                    uv.y = uv.y * LoadFloat(kMana2Quarter);
+                    uv.x = uv.x * 0.25f;
+                    uv.y = uv.y * 0.25f;
                     uv.x = uv.x + half;
                 } else {
                     clr[1] = (u8)(clr[1] - 0x7F);
                     uv.x = half - reflected.x / invAxis;
                     uv.y = half + reflected.z / invAxis;
-                    uv.x = uv.x * LoadFloat(kMana2Quarter);
-                    uv.y = uv.y * LoadFloat(kMana2Quarter);
-                    uv.x = uv.x + LoadFloat(kMana2Quarter);
+                    uv.x = uv.x * 0.25f;
+                    uv.y = uv.y * 0.25f;
+                    uv.x = uv.x + 0.25f;
                     uv.y = uv.y + half;
                 }
                 break;
             case 2:
                 {
-                    float two = LoadFloat(kMana2Two);
+                    float two = 2.0f;
                     invAxis = two * reflected.z;
                 }
-                if (outVec->z >= LoadFloat(kMana2Zero)) {
+                if (outVec->z >= 0.0f) {
                     clr[2] = (u8)(clr[2] + 0x7F);
                     uv.x = half + reflected.x / invAxis;
                     uv.y = half - reflected.y / invAxis;
-                    uv.y = uv.y * LoadFloat(kMana2Quarter);
-                    uv.x = uv.x * LoadFloat(kMana2Quarter);
-                    uv.y = uv.y + LoadFloat(kMana2Quarter);
+                    uv.y = uv.y * 0.25f;
+                    uv.x = uv.x * 0.25f;
+                    uv.y = uv.y + 0.25f;
                 } else {
                     clr[2] = (u8)(clr[2] - 0x7F);
                     uv.x = half + reflected.x / invAxis;
                     uv.y = half + reflected.y / invAxis;
-                    uv.x = uv.x * LoadFloat(kMana2Quarter);
-                    uv.y = uv.y * LoadFloat(kMana2Quarter);
+                    uv.x = uv.x * 0.25f;
+                    uv.y = uv.y * 0.25f;
                     uv.x = uv.x + half;
-                    uv.y = uv.y + LoadFloat(kMana2Quarter);
+                    uv.y = uv.y + 0.25f;
                 }
                 break;
             }
@@ -869,9 +781,6 @@ void CalcReflectionVector2(
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_propagation off
-#pragma opt_dead_assignments off
 void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, float (*) [4], int)
 {
     VMana2* work;
@@ -916,19 +825,19 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
 
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
-    model->m_afterMeshDrawCallback = 0;
+    model->m_beforeDrawModelCallback = 0;
     model->SetDrawMeshDLCallback(0);
 
     if ((int)Game.m_currentSceneId == 7) {
-        centerPos.z = LoadFloat(kMana2Zero);
-        centerPos.y = LoadFloat(kMana2Zero);
-        centerPos.x = LoadFloat(kMana2Zero);
+        centerPos.z = 0.0f;
+        centerPos.y = 0.0f;
+        centerPos.x = 0.0f;
     } else {
         centerPos.x = gObject->m_worldPosition.x;
         centerPos.y = gObject->m_worldPosition.y;
         centerPos.z = gObject->m_worldPosition.z;
     }
-    centerPos.y = LoadFloat(kMana2ParaboloidCenterYOffset) + centerPos.y;
+    centerPos.y = 5.0f + centerPos.y;
     centerPos.x = centerPos.x;
     centerPos.z = centerPos.z;
 
@@ -939,14 +848,14 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     if (step->m_rippleLevel != 0) {
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_NEAR,
                                    (_GXTexFmt)0x16, 1);
-        GXSetViewport(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
-                      LoadFloat(kMana2ParaboloidTexSize), LoadFloat(kMana2Zero), LoadFloat(kMana2One));
-        float fov = LoadFloat(kMana2ParaboloidFov);
-        C_MTXPerspective(projectionMtx, fov, LoadFloat(kMana2One),
-                         LoadFloat(kMana2One), LoadFloat(kMana2ParaboloidFar));
+        GXSetViewport(0.0f, 0.0f, 128.0f,
+                      128.0f, 0.0f, 1.0f);
+        float fov = 90.0f;
+        C_MTXPerspective(projectionMtx, fov, 1.0f,
+                         1.0f, 10000.0f);
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
-        float one = LoadFloat(kMana2One);
-        float zero = LoadFloat(kMana2Zero);
+        float one = 1.0f;
+        float zero = 0.0f;
 
         for (i = 0; i < 6; i++) {
             cameraPos.x = centerPos.x;
@@ -973,7 +882,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
                 cameraPos.y = centerPos.y + one;
                 cameraUp.x = zero;
                 cameraUp.y = zero;
-                cameraUp.z = LoadFloat(kMana2NegativeOne);
+                cameraUp.z = -1.0f;
                 break;
             case 3:
                 cameraPos.y = centerPos.y - one;
@@ -986,8 +895,8 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x280, 0x1C0);
-            float texQuadZero = LoadFloatFresh(kMana2Zero);
-            float texQuadSize = LoadFloatFresh(kMana2ParaboloidTexSize);
+            float texQuadZero = 0.0f;
+            float texQuadSize = 128.0f;
             gUtil.RenderTextureQuad(texQuadZero, texQuadZero, texQuadSize,
                                     texQuadSize, baseParaboloidTexObjs, 0, 0, 0,
                                     (_GXBlendFactor)4, (_GXBlendFactor)5);
@@ -1012,12 +921,12 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
         GXLoadTexObj(&depthTexObj, GX_TEXMAP0);
 
-        quadMin.x = LoadFloat(kMana2Zero);
-        quadMin.y = LoadFloat(kMana2Zero);
-        quadMin.z = LoadFloat(kMana2Zero);
-        quadMax.x = LoadFloat(kMana2ParaboloidTexSize);
-        quadMax.y = LoadFloat(kMana2ParaboloidTexSize);
-        quadMax.z = LoadFloat(kMana2Zero);
+        quadMin.x = 0.0f;
+        quadMin.y = 0.0f;
+        quadMin.z = 0.0f;
+        quadMax.x = 128.0f;
+        quadMax.y = 128.0f;
+        quadMax.z = 0.0f;
         quadColor.r = 0xFF;
         quadColor.g = 0xFF;
         quadColor.b = 0xFF;
@@ -1028,11 +937,11 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_TRUE);
         GXSetZCompLoc(GX_TRUE);
-        quadMin.x = LoadFloat(kMana2Zero);
-        quadMin.y = LoadFloat(kMana2Zero);
-        quadMin.z = LoadFloat(kMana2Zero);
-        gUtil.RenderTextureQuad(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
-                                LoadFloat(kMana2ParaboloidTexSize), &sceneTexObj, 0, 0, 0, (_GXBlendFactor)4,
+        quadMin.x = 0.0f;
+        quadMin.y = 0.0f;
+        quadMin.z = 0.0f;
+        gUtil.RenderTextureQuad(0.0f, 0.0f, 128.0f,
+                                128.0f, &sceneTexObj, 0, 0, 0, (_GXBlendFactor)4,
                                 (_GXBlendFactor)5);
         work->m_paraboloidReady = 1;
     }
@@ -1067,10 +976,9 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
-    model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana2_BeforeDrawCallback;
+    model->m_beforeDrawModelCallback = Mana2_BeforeDrawCallback;
     model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1100,8 +1008,6 @@ void pppRenderMana2(pppMana2*, pppMana2Step*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_lifetimes off
 void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* param_3)
 {
     u32 texBufferSize;
@@ -1206,15 +1112,15 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++) {
             meshData = mesh->m_data;
 
-            if (((param_2->m_type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
-                ((param_2->m_type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
-                ((param_2->m_type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshData->m_name, "obj5") == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshData->m_name, "obj3") == 0) ||
+                ((param_2->m_type == 3) && strcmp(meshData->m_name, "obj1") == 0)) {
                 if (mana2Work->m_meshReflectionVec == 0) {
                     mana2Work->m_meshReflectionVec =
                         static_cast<Vec*>(pppMemAlloc(meshData->m_vertexCount * sizeof(Vec), ppvEnv->m_stagePtr,
                                                       const_cast<char*>(s_pppMana2_cpp), 0x232));
                     Vec* reflectionVec = mana2Work->m_meshReflectionVec;
-                    float zero = kMana2Zero;
+                    float zero = 0.0f;
                     for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
                         reflectionVec->z = zero;
                         reflectionVec->y = zero;
@@ -1267,8 +1173,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
                 }
             }
 
-            if (((param_2->m_type == 1) && strcmp(meshData->m_name, s_manaShapeObj4) == 0) ||
-                ((param_2->m_type == 2) && strcmp(meshData->m_name, s_manaShapeObj2) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshData->m_name, "obj4") == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshData->m_name, "obj2") == 0)) {
                 mana2Work->m_positions = static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26A));
                 mana2Work->m_normals = static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26B));
                 mana2Work->m_colors = static_cast<GXColor*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26C));
@@ -1281,7 +1187,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
 
                 float* waterHeightA = mana2Work->m_waterHeightA;
                 float* waterHeightB = mana2Work->m_waterHeightB;
-                float zero = kMana2Zero;
+                float zero = 0.0f;
                 for (vertexIndex = 0; vertexIndex < 0x121; vertexIndex++) {
                     waterHeightA[vertexIndex] = zero;
                     waterHeightB[vertexIndex] = zero;
@@ -1313,9 +1219,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++) {
             meshData = mesh->m_data;
 
-            if (((param_2->m_type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
-                ((param_2->m_type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
-                ((param_2->m_type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshData->m_name, "obj5") == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshData->m_name, "obj3") == 0) ||
+                ((param_2->m_type == 3) && strcmp(meshData->m_name, "obj1") == 0)) {
                 for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     CalcReflectionVector2(
                         mana2Work->m_meshReflectionVec, meshData->m_vertices, meshData->m_normals,
@@ -1331,7 +1237,6 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
         }
     }
 }
-#pragma pop
 /*
  * --INFO--
  * PAL Address: 0x801088a0
@@ -1341,8 +1246,6 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_lifetimes off
 void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
 {
     VMana2* work;
@@ -1436,7 +1339,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
     gObject = (CGObject*)ppvMng->m_lookTarget;
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
-    model->m_afterMeshDrawCallback = 0;
+    model->m_beforeDrawModelCallback = 0;
     model->SetDrawMeshDLCallback(0);
     mesh = model->m_meshes;
     step = work->m_step;
@@ -1445,7 +1348,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
         CChara::CMesh::CRefData* meshData = mesh->m_data;
 
         if (stepType == 1) {
-            if (strcmp(meshData->m_name, s_manaShapeObj5) == 0) {
+            if (strcmp(meshData->m_name, "obj5") == 0) {
                 for (j = 0; j < meshData->m_displayListCount; j++) {
                     if (work->m_displayListCopies != NULL && work->m_displayListCopies[j] != NULL) {
                         pppMemFree(work->m_displayListCopies[j]);
@@ -1458,7 +1361,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
                 }
             }
         } else if (stepType == 2) {
-            if (strcmp(meshData->m_name, s_manaShapeObj3) == 0) {
+            if (strcmp(meshData->m_name, "obj3") == 0) {
                 for (j = 0; j < meshData->m_displayListCount; j++) {
                     if (work->m_displayListCopies != NULL && work->m_displayListCopies[j] != NULL) {
                         pppMemFree(work->m_displayListCopies[j]);
@@ -1470,7 +1373,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
                     work->m_displayListCopies = 0;
                 }
             }
-        } else if (stepType == 3 && strcmp(meshData->m_name, s_manaShapeObj1) == 0) {
+        } else if (stepType == 3 && strcmp(meshData->m_name, "obj1") == 0) {
             for (j = 0; j < meshData->m_displayListCount; j++) {
                 if (work->m_displayListCopies != NULL && work->m_displayListCopies[j] != NULL) {
                     pppMemFree(work->m_displayListCopies[j]);
@@ -1484,7 +1387,6 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
         }
     }
 }
-#pragma pop
 
 /*
  * --INFO--
@@ -1504,7 +1406,7 @@ void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
 
     work = GetMana2Work(pppMana2, param_2);
     gObject = (CGObject*)ppvMng->m_lookTarget;
-    gObject->m_stepSlopeLimit = LoadFloat(kMana2StepSlopeLimit);
+    gObject->m_alphaTarget = 0.99999f;
 
     handle = GetCharaHandlePtr(gObject, 0);
     GetCharaModelPtr(handle);
@@ -1575,47 +1477,47 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
 
     switch (type) {
     case 0:
-        if (strcmp(meshData->m_name, s_manaShapeObj) == 0) {
+        if (strcmp(meshData->m_name, "obj") == 0) {
             draw = 1;
         }
         break;
     case 1:
-        if (strcmp(meshData->m_name, s_manaShapeObj) == 0 || strcmp(meshData->m_name, s_manaShapeObj5) == 0) {
+        if (strcmp(meshData->m_name, "obj") == 0 || strcmp(meshData->m_name, "obj5") == 0) {
             draw = 1;
         }
         break;
     case 2:
-        if (strcmp(meshData->m_name, s_manaShapeObj) == 0 || strcmp(meshData->m_name, s_manaShapeObj3) == 0) {
+        if (strcmp(meshData->m_name, "obj") == 0 || strcmp(meshData->m_name, "obj3") == 0) {
             draw = 1;
         }
         break;
     case 3:
-        if (strcmp(meshData->m_name, s_manaShapeObj) == 0 || strcmp(meshData->m_name, s_manaShapeObj1) == 0) {
+        if (strcmp(meshData->m_name, "obj") == 0 || strcmp(meshData->m_name, "obj1") == 0) {
             draw = 1;
         }
         break;
     }
 
-    int waterCmp = strcmp(meshData->m_name, s_manaShapeObj4);
-    if ((waterCmp == 0 && stepData->m_type == 1) || (strcmp(meshData->m_name, s_manaShapeObj2) == 0 && stepData->m_type == 2)) {
+    int waterCmp = strcmp(meshData->m_name, "obj4");
+    if ((waterCmp == 0 && stepData->m_type == 1) || (strcmp(meshData->m_name, "obj2") == 0 && stepData->m_type == 2)) {
         Mtx cameraMtx;
         Mtx posMtx;
         Mtx rotMtx;
         Vec offset;
 
         PSMTXCopy(CameraMatrix(), cameraMtx);
-        PSMTXRotRad(rotMtx, 'z', LoadFloat(kMana2WaterRotZRad));
+        PSMTXRotRad(rotMtx, 'z', -1.5707964f);
         float x = mtx[0][3];
         float y = mtx[1][3];
         float z = mtx[2][3];
-        mtx[0][3] = LoadFloat(kMana2Zero);
-        mtx[1][3] = LoadFloat(kMana2Zero);
-        mtx[2][3] = LoadFloat(kMana2Zero);
+        mtx[0][3] = 0.0f;
+        mtx[1][3] = 0.0f;
+        mtx[2][3] = 0.0f;
         PSMTXConcat(mtx, rotMtx, mtx);
 
-        offset.z = LoadFloat(kMana2Zero);
-        offset.y = LoadFloat(kMana2Zero);
-        offset.x = LoadFloat(kMana2Zero);
+        offset.z = 0.0f;
+        offset.y = 0.0f;
+        offset.x = 0.0f;
         offset.y = stepData->m_waterScale;
         PSMTXMultVec(mtx, &offset, &offset);
 
@@ -1633,12 +1535,12 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     }
 
     if (draw) {
-        if (draw == 1 && strcmp(meshData->m_name, s_manaShapeObj) != 0) {
+        if (draw == 1 && strcmp(meshData->m_name, "obj") != 0) {
             PSMTXCopy(mtx, mana2->m_reflectionMtx);
             if (mana2->m_paraboloidReady != 0) {
-                mana2->m_runtimeColor.r = meshData->m_colors[0];
-                mana2->m_runtimeColor.g = meshData->m_colors[1];
-                mana2->m_runtimeColor.b = meshData->m_colors[2];
+                mana2->m_runtimeColor.r = meshData->m_colors[0].r;
+                mana2->m_runtimeColor.g = meshData->m_colors[0].g;
+                mana2->m_runtimeColor.b = meshData->m_colors[0].b;
                 mana2->m_runtimeColor.a = 0x80;
                 DCFlushRange(&mana2->m_runtimeColor, 4);
                 GXSetArray((GXAttr)0xB, mana2->m_meshColors, 4);
@@ -1675,7 +1577,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
                 GXCallDisplayList(mana2->m_displayListCopies[dlIndex], displayList->m_size);
             }
         } else {
-            if (strcmp(meshData->m_name, s_manaShapeObj) == 0) {
+            if (strcmp(meshData->m_name, "obj") == 0) {
                 GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
                 MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
                 GXCallDisplayList(displayList->m_data, displayList->m_size);

@@ -61,8 +61,6 @@ static inline float LoadFloat(const float& value)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirthShpTail3RenderStep* stepData, pppYmMegaBirthShpTail3Offsets* offsets)
 {
     u8* step = (u8*)stepData;
@@ -326,7 +324,6 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         particle += 0x1F8;
     }
 }
-#pragma pop
 
 /*
  * --INFO--

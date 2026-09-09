@@ -42,7 +42,7 @@ public:
     void putParticleBindTrace(int, int, CGObject*, float, int);
     float getTargetRot(CGPrgObj*);
     void rotTarget(CGPrgObj*);
-    void dstTargetRot(CGPrgObj*);
+    float dstTargetRot(CGPrgObj*);
     int m_stateFrameGate;      // 0x518
     int m_subFrameGate;        // 0x51C
     int m_lastStateId;         // 0x520
@@ -61,19 +61,8 @@ public:
         } bits;
     } m_animFlagBits;
     int m_reqAnimId;       // 0x548
-    union Flags {
-        unsigned char m_flags;
-        struct Bits {
-            unsigned char unk0 : 1;
-            unsigned char unk1 : 1;
-            unsigned char unk2 : 1;
-            unsigned char unk3 : 1;
-            unsigned char unk4 : 1;
-            unsigned char unk5 : 1;
-            unsigned char unk6 : 1;
-            unsigned char unk7 : 1;
-        } bits;
-    } m_flagBits;          // 0x54C
 };
+
+STATIC_ASSERT(sizeof(CGPrgObj) == 0x54C);
 
 #endif // _FFCC_PPP_PRGOBJ_H_

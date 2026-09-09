@@ -13,7 +13,6 @@ typedef unsigned char u8;
 static const float kCompaZero = 0.0f;
 static const float kCompaTileHeight = 24.0f;
 static const float kCompaOne = 1.0f;
-static const double kCompaOneDouble = 1.0;
 static const float kCompaColorMax = 255.0f;
 static const float kCompaFoodIconWidth = 328.0f;
 static const float kCompaFoodIconHeight = 40.0f;
@@ -21,7 +20,6 @@ static const float kCompaNameFontScaleX = 0.8f;
 static const float kCompaTextYOffset = 4.0f;
 static const float kCompaJobFontScale = 1.2f;
 static const float kCompaJobYOffset = 2.0f;
-static const double kCompaIntToDoubleBias = 4503601774854144.0;
 static const float kCompaFoodIconUvScale = 0.75f;
 static const float kCompaFrameU = 72.0f;
 
@@ -30,32 +28,21 @@ static const char s_menu_compa_cpp[] = "menu_compa.cpp";
 
 STATIC_ASSERT(sizeof(CompaOpenAnimList) == 0x1008);
 
-static inline double LoadDouble(double value)
-{
-	return value;
-}
-
-static inline float LoadFloat(float value)
-{
-	return value;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80160edc
  * PAL Size: 3024b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80183DF4
+ * EN Size: 3816b
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 void CMenuPcs::CompaDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	GXColor colors[4];
 	CompaOpenAnimList* compaList;
 	int familyCount;
@@ -77,22 +64,12 @@ void CMenuPcs::CompaDraw()
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
-				colors[0].r = 0xFF;
-				colors[0].g = 0xFF;
-				colors[0].b = 0xFF;
-				colors[0].a = 0xFF;
-				colors[1].r = 0xFF;
-				colors[1].g = 0xFF;
-				colors[1].b = 0xFF;
-				colors[1].a = 0xFF;
-				colors[2].r = 0xFF;
-				colors[2].g = 0xFF;
-				colors[2].b = 0xFF;
-				colors[2].a = 0xFF;
-				colors[3].r = 0xFF;
-				colors[3].g = 0xFF;
-				colors[3].b = 0xFF;
-				colors[3].a = 0xFF;
+				for (int j = 0; j < 4; j++) {
+					colors[j].r = 0xFF;
+					colors[j].g = 0xFF;
+					colors[j].b = 0xFF;
+					colors[j].a = 0xFF;
+				}
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 				fillW = entry->alpha * w;
@@ -167,7 +144,7 @@ void CMenuPcs::CompaDraw()
 	colors[0].r = 0xFF;
 	colors[0].g = 0xFF;
 	colors[0].b = 0xFF;
-	colors[0].a = static_cast<signed char>(this->m_compaList->entries[0].alpha * kCompaColorMax);
+	colors[0].a = static_cast<unsigned char>(this->m_compaList->entries[0].alpha * kCompaColorMax);
 	GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
@@ -259,7 +236,7 @@ void CMenuPcs::CompaDraw()
 
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
 
-	const CCaravanWork* nameWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	drawIndex = 0;
 	shown = 0;
 	yOffset = drawIndex * 0x28;
@@ -267,7 +244,7 @@ void CMenuPcs::CompaDraw()
 		if (i >= 2) {
 			int scan = drawIndex;
 			for (; scan < 7; scan++) {
-				if (nameWork->m_evtWordArr[19 + scan] > 0) {
+				if (caravanWork->m_evtWordArr[19 + scan] > 0) {
 					drawIndex = scan;
 					break;
 				}
@@ -286,7 +263,7 @@ void CMenuPcs::CompaDraw()
 		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(name);
 
-		short food = nameWork->m_evtWordArr[19 + drawIndex];
+		short food = caravanWork->m_evtWordArr[19 + drawIndex];
 		const char* value = Game.m_cFlatDataArr[1].TableStrings(2)[food];
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
 		font->SetPosY(y - kCompaTextYOffset);
@@ -305,7 +282,7 @@ void CMenuPcs::CompaDraw()
 	compaList = this->m_compaList;
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
 
-	const char* job = GetJobStr(nameWork->unk_0x3ac);
+	const char* job = GetJobStr(caravanWork->unk_0x3ac);
 	font->GetWidth(job);
 	float jobY = static_cast<float>(compaList->entries[0].y + 0x20);
 	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
@@ -314,13 +291,12 @@ void CMenuPcs::CompaDraw()
 
 	DrawInit();
 }
-#pragma opt_propagation reset
 /*
  * --INFO--
  * PAL Address: 80161aac
  * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80183BCC
+ * EN Size: 552b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -340,9 +316,9 @@ int CMenuPcs::CompaClose()
         if (frame >= entry->startFrame) {
             if (entry->startFrame + entry->duration <= frame) {
                 finishedCount = finishedCount + 1;
-                entry->alpha = LoadFloat(kCompaZero);
-                entry->dx = LoadFloat(kCompaZero);
-                entry->dy = LoadFloat(kCompaZero);
+                entry->alpha = kCompaZero;
+                entry->dx = kCompaZero;
+                entry->dy = kCompaZero;
             } else {
                 entry->frame = entry->frame + 1;
                 entry->alpha =
@@ -410,7 +386,7 @@ inline void CMenuPcs::CompaInit0()
 	CompaOpenAnim* entry = animList->entries;
 	while (entryCount > 0) {
 		entry->frame = 0;
-		entry->alpha = LoadFloat(kCompaOne);
+		entry->alpha = kCompaOne;
 		entry++;
 		entryCount--;
 	}
@@ -418,59 +394,60 @@ inline void CMenuPcs::CompaInit0()
 
 /*
  * --INFO--
- * PAL Address: 80161c28
+ * PAL Address: UNUSED
+ * PAL Size: 464b
+ * EN Address: 0x80184CDC
+ * EN Size: 356b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::CompaCtrlCur()
+{
+	short press = Pad.GetButtonDown(0);
+	short hold = Pad.GetButtonRepeat(0);
+
+	if (hold == 0) {
+		return 0;
+	} else if ((press & 0x20) != 0) {
+		m_compaMenuState->cursorMove = 1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		return 1;
+	} else if ((press & 0x40) != 0) {
+		m_compaMenuState->cursorMove = -1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		return 1;
+	} else if ((press & 0x100) != 0) {
+		Sound.PlaySe(4, 0x40, 0x7f, 0);
+	} else if ((press & 0x200) != 0) {
+		m_compaMenuState->closeRequested = 1;
+		Sound.PlaySe(3, 0x40, 0x7f, 0);
+		return 1;
+	}
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80161C28
  * PAL Size: 800b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80183B7C
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CMenuPcs::CompaCtrl()
 {
-	short press;
-	short hold;
-	int doReset;
-
-	press = Pad.GetButtonDown(0);
-	hold = Pad.GetButtonRepeat(0);
-
-	if (hold == 0) {
-		doReset = 0;
-	} else if ((press & 0x20) != 0) {
-		this->m_compaMenuState->cursorMove = 1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = 1;
-	} else if ((press & 0x40) != 0) {
-		this->m_compaMenuState->cursorMove = -1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = 1;
-	} else {
-		if ((press & 0x100) != 0) {
-			Sound.PlaySe(4, 0x40, 0x7f, 0);
-			goto noReset;
-		} else if ((press & 0x200) != 0) {
-			this->m_compaMenuState->closeRequested = 1;
-			Sound.PlaySe(3, 0x40, 0x7f, 0);
-			doReset = 1;
-		} else {
-noReset:
-			doReset = 0;
-		}
-	}
-
-	if (doReset != 0) {
+	if (CompaCtrlCur()) {
 		CompaInit0();
 	}
-
-	return;
 }
 
 /*
  * --INFO--
  * PAL Address: 80161f48
  * PAL Size: 432b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80183944
+ * EN Size: 568b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -494,9 +471,9 @@ int CMenuPcs::CompaOpen()
         if (frame >= entry->startFrame) {
             if (entry->startFrame + entry->duration <= frame) {
                 finishedCount = finishedCount + 1;
-                entry->alpha = LoadFloat(kCompaOne);
-                entry->dx = LoadFloat(kCompaZero);
-                entry->dy = LoadFloat(kCompaZero);
+                entry->alpha = kCompaOne;
+                entry->dx = kCompaZero;
+                entry->dy = kCompaZero;
             } else {
                 entry->frame = entry->frame + 1;
                 entry->alpha = (float)((1.0 / (double)entry->duration) * (double)entry->frame);
@@ -527,7 +504,6 @@ int CMenuPcs::CompaOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
 void CMenuPcs::CompaInit()
 {
 	CompaOpenAnimList* compaList;
@@ -627,4 +603,3 @@ void CMenuPcs::CompaInit()
 	this->m_compaMenuState->selectedIndex = 0;
 	this->m_compaMenuState->initialized = 1;
 }
-#pragma opt_propagation reset

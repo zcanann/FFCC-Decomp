@@ -231,7 +231,6 @@ void CMesMenu::onScriptChanging(char*)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_common_subs off
 void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 {
     (void)z;
@@ -294,7 +293,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
                     fillAmount = heartValue;
                 }
 
-                float u = (float)((scriptFood->m_statusTimers[5] != 0) ? 0 : 0x18);
+                float u = (float)((scriptFood->m_statusTimers[2] != 0) ? 0 : 0x18);
                 float v = (float)((0x0C - fillAmount) * 0x18);
                 MenuPcs.DrawRect(
                     3, heartX, heartY, 24.0f, 24.0f, u, v, heartPulse, heartPulse,
@@ -305,7 +304,6 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         }
     }
 }
-#pragma opt_common_subs reset
 
 /*
  * --INFO--
@@ -665,7 +663,7 @@ void CMesMenu::onDraw()
                             fillAmount = heartValue;
                         }
 
-                        float u = (float)((heartFood->m_statusTimers[5] != 0) ? 0 : 0x18);
+                        float u = (float)((heartFood->m_statusTimers[2] != 0) ? 0 : 0x18);
                         float v = (float)((0x0C - fillAmount) * 0x18);
                         MenuPcs.DrawRect(
                             3, heartX, heartY, 24.0f, 24.0f, u, v, heartPulse, heartPulse,

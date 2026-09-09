@@ -35,7 +35,9 @@ public:
 
 		void Create(CChunkFile&, CMemory::CStage*);
 
-		u8 _pad[0x64];
+		Mtx m_matrix;
+		Mtx m_bindMtx;
+		u32 m_nodeIndex;
 	};
 
 	class CAnim : public CRef
@@ -196,8 +198,7 @@ public:
 			s16 m_childBankOffset;          // 0x64
 			s16 m_index;                    // 0x66
 			s16 m_parentIndex;              // 0x68
-			char m_name[0x10];              // 0x6A
-			char m_altName[0x10];           // 0x7A
+			char m_names[2][0x10];          // 0x6A
 			u8 m_childCount;                // 0x8A
 			u8 m_type;                      // 0x8B
 			u8 m_bindFlags;                 // 0x8C
@@ -220,8 +221,7 @@ public:
 		Vec m_previousPosition;
 		Vec m_previousScale;
 		Mtx m_mtx;
-		CAnimNode* m_animNode0;
-		CAnimNode* m_animNode1;
+		CAnimNode* m_animNodes[2];
 		CVector m_dynPosition;
 		CVector m_dynVel;
 		union
@@ -236,11 +236,82 @@ public:
 		u8 _padBD[3];
 	};
 
+	class CMesh : public CRef
+	{
+	public:
+		CMesh();
+		~CMesh();
+
+		class CDisplayList
+		{
+		public:
+			CDisplayList();
+			~CDisplayList();
+
+			s32 m_size;
+			void* m_data;
+			u16 m_material;
+			u16 _padA;
+		};
+
+		class CRefData
+		{
+		public:
+			CRefData();
+			~CRefData();
+
+			char m_name[0x10];
+			union
+			{
+				u8 m_flags;
+				struct
+				{
+					s8 m_flag_80 : 1;
+					s8 m_flag_40 : 1;
+					s8 m_flag_lo : 6;
+				} m_flagsBits;
+			};
+			u8 _pad11[3];
+			u32 m_vertexCount;
+			S16Vec* m_vertices;
+			u32 m_normalCount;
+			S16Vec* m_normals;
+			u32 m_colorCount;
+			_GXColor* m_colors;
+			u32 m_uvCount;
+			S16Vec2d* m_uvs;
+			u32 m_oneWeightCountOrSize;
+			void* m_oneWeightData;
+			u32 m_twoWeightCountOrSize;
+			void* m_twoWeightData;
+			u32 m_threeWeightCountOrSize;
+			void* m_threeWeightData;
+			u32 m_displayListCount;
+			CDisplayList* m_displayLists;
+			u32 m_skinCount;
+			CSkin* m_skins;
+			u32 m_nodeIndex;
+			u32 m_infoWord1;
+		};
+
+		void Create(CChara::CModel*, CChunkFile&, CMemory::CStage*);
+		void Duplicate(CChara::CMesh*, CMemory::CStage*);
+		void skin(int, int, int, CChara::CSkin*, void*, void*, void*, S16Vec*, S16Vec*, S16Vec*, S16Vec*);
+		void Calc(CChara::CModel*);
+		CRefData* GetRefData();
+		S16Vec* GetVertex();
+
+		CRefData* m_data;
+		S16Vec* m_workPositions;
+		S16Vec* m_workNormals;
+	};
+
 	class CModel : public CRef
 	{
 	public:
 		typedef int (*BeforeCalcMatrixCallback)(CChara::CModel*, void*, void*);
-		typedef void (*AfterMeshDrawCallback)(CChara::CModel*, void*, void*, unsigned int, unsigned int, float (*)[4]);
+		typedef void (*BeforeDrawModelCallback)(CChara::CModel*, void*, void*, float (*)[4], int);
+		typedef void (*AfterDrawModelCallback)(CChara::CModel*, void*, void*);
 		typedef void (*BeforeMeshLockEnvCallback)(CChara::CModel*, void*, void*, int);
 		typedef void (*DrawMeshDLCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 		typedef void (*AfterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
@@ -256,8 +327,8 @@ public:
 
 			u32 m_nodeCount;            // 0x08
 			u32 m_meshCount;           // 0x0C
-			void* m_nodeRefData;       // 0x10
-			void* m_meshRefData;       // 0x14
+			CNode::CRefData* m_nodeRefData; // 0x10
+			CMesh::CRefData* m_meshRefData; // 0x14
 			void* m_bank;              // 0x18
 			s16 m_headNodeIndex;       // 0x1C
 			s16 m_chest3NodeIndex;     // 0x1E
@@ -367,13 +438,13 @@ public:
 		void* m_callbackContext;
 		void* m_callbackParam;
 		BeforeCalcMatrixCallback m_beforeCalcMatrixCallback;
-		AfterMeshDrawCallback m_afterMeshDrawCallback;
+		BeforeDrawModelCallback m_beforeDrawModelCallback;
 		BeforeMeshLockEnvCallback m_beforeMeshLockEnvCallback;
 		BeforeMeshLockEnvCallback m_beforeDrawShadowLockEnvCallback;
 		DrawMeshDLCallback m_drawMeshDLCallback;
 		DrawMeshDLCallback m_drawShadowMeshDLCallback;
 		AfterDrawMeshCallback m_afterDrawMeshCallback;
-		void (*m_afterDrawModelCallback)(CChara::CModel*, void*, void*);
+		AfterDrawModelCallback m_afterDrawModelCallback;
 		union
 		{
 			u8 m_flags10C;
@@ -392,76 +463,7 @@ public:
 		float m_twistAngle;
 	};
 
-	class CMesh : public CRef
-	{
-	public:
-		CMesh();
-		~CMesh();
 
-		class CDisplayList
-		{
-		public:
-			CDisplayList();
-			~CDisplayList();
-
-			s32 m_size;
-			void* m_data;
-			u16 m_material;
-			u16 _padA;
-		};
-
-		class CRefData
-		{
-		public:
-			CRefData();
-			~CRefData();
-
-			char m_name[0x10];
-			union
-			{
-				u8 m_flags;
-				struct
-				{
-					s8 m_flag_80 : 1;
-					s8 m_flag_40 : 1;
-					s8 m_flag_lo : 6;
-				} m_flagsBits;
-			};
-			u8 _pad11[3];
-			u32 m_vertexCount;
-			S16Vec* m_vertices;
-			u32 m_normalCount;
-			S16Vec* m_normals;
-			u32 m_colorCount;
-			u8* m_colors;
-			u32 m_uvCount;
-			u8* m_uvs;
-			u32 m_oneWeightCountOrSize;
-			void* m_oneWeightData;
-			u32 m_twoWeightCountOrSize;
-			void* m_twoWeightData;
-			u32 m_threeWeightCountOrSize;
-			void* m_threeWeightData;
-			u32 m_displayListCount;
-			CDisplayList* m_displayLists;
-			u32 m_skinCount;
-			CSkin* m_skins;
-			u32 m_nodeIndex;
-			u32 m_infoWord1;
-		};
-
-		void Create(CChara::CModel*, CChunkFile&, CMemory::CStage*);
-		void Duplicate(CChara::CMesh*, CMemory::CStage*);
-		void skin(int, int, int, CChara::CSkin*, void*, void*, void*, S16Vec*, S16Vec*, S16Vec*, S16Vec*);
-		void Calc(CChara::CModel*);
-		CRefData* GetRefData();
-		S16Vec* GetVertex();
-
-		CRefData* m_data;
-		S16Vec* m_workPositions;
-		S16Vec* m_workNormals;
-	};
-	
 	CChara() {}
 
 	void Init();

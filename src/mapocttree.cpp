@@ -402,9 +402,6 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma inline_depth(6)
-#pragma inline_max_size(10000)
-#pragma inline_max_total_size(10000)
 void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode* octNode)
 {
 	int i;
@@ -620,7 +617,6 @@ void COctTree::SetDrawFlag()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma inline_depth(6)
 void ClearLight_r(COctNode* octNode)
 {
 	int i;
@@ -660,7 +656,6 @@ void COctTree::ClearLight()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma inline_depth(2)
 void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 {
 	int i;
@@ -692,7 +687,6 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma inline_depth(2)
 int COctTree::CheckHitCylinder_r(COctNode* node)
 {
 	int i;
@@ -720,7 +714,6 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 	return 0;
 }
 
-#pragma inline_depth(2)
 /*
  * --INFO--
  * PAL Address: 0x8002dca8
@@ -783,7 +776,6 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
 	InsertLight_r(m_nodePool);
 }
 
-#pragma inline_depth(6)
 /*
  * --INFO--
  * PAL Address: 0x8002da40
@@ -859,7 +851,6 @@ inline void COctTree::SetShadow(long bitIndex)
 	SetShadow_r(m_nodePool);
 }
 
-#pragma inline_depth(2)
 /*
  * --INFO--
  * PAL Address: 0x8002d628
@@ -927,7 +918,6 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma inline_depth(8)
 void ClearFlag_r(COctNode* node)
 {
 	int i;

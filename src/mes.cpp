@@ -13,17 +13,12 @@
 // PAL map: CMes::m_tempVar in mes.o, .bss size 0x50.
 int CMes::m_tempVar[0x14];
 
-static const char s_Not_corresponding_TAG_is_used_pct02x_801D9E30[] = "Not corresponding TAG is used.[%02x]\n";
 static const char s_This_TAG_is_not_created_pct02x_801D9E10[] = "This TAG is not created.[%02x]\n";
-static char s_MessageSpeedTagUsed[] =
-	"\x83\x81\x83\x62\x83\x5A\x81\x5B\x83\x57\x88\xEA\x8F\x9F\x95\x5C\x8E\xA6"
+static const char s_Not_corresponding_TAG_is_used_pct02x_801D9E30[] = "Not corresponding TAG is used.[%02x]\n";
+static const char s_MessageSpeedTagUsed[] =
+	"\x83\x81\x83\x62\x83\x5A\x81\x5B\x83\x57\x88\xEA\x8F\x75\x95\x8E\xA6"
 	"\x83\x82\x81\x5B\x83\x68\x82\xC5<speed>\x83\x5E\x83\x4F\x82\xAA\x8E\x67"
 	"\x97\x70\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD\x81\x42\n";
-static const char s_mesNumFmt[] = "%d";
-static const char s_mesFallback[] = "---";
-static const char s_mesEmpty[] = "";
-static char* sTag54Source;
-static char sTag54Init;
 
 static inline char GetMesNibbleValue(const char* data)
 {
@@ -179,15 +174,9 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOnLineBreak)
 {
-	if (sTag54Init == 0)
-	{
-		sTag54Source = (char*)s_mesEmpty;
-		sTag54Init = 1;
-	}
+	static char* ELLIPSIS_STR = "...";
 
 	unsigned char caseMode = 0;
 	unsigned char branchMode = 0;
@@ -363,7 +352,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x30:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
-			sprintf(out, s_mesNumFmt, CMes::m_tempVar[varIndex]);
+			sprintf(out, "%d", CMes::m_tempVar[varIndex]);
 			out += strlen(out);
 			src += 2;
 			break;
@@ -433,7 +422,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			branchMode = 0;
 			break;
 		case 0x54:
-			strcpy(out, sTag54Source);
+			strcpy(out, ELLIPSIS_STR);
 			out += strlen(out);
 			break;
 		case 0x0C:
@@ -484,8 +473,6 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		src++;
 	}
 }
-#pragma opt_lifetimes reset
-#pragma opt_propagation reset
 
 /*
  * --INFO--
@@ -868,7 +855,6 @@ int CMes::GetWait()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_lifetimes off
 void CMes::addString(char** text, int branchMode)
 {
 	CFont* font = getFont(mFontIndex, 0);
@@ -1133,7 +1119,7 @@ void CMes::addString(char** text, int branchMode)
 		{
 			char number[256];
 			char* numberPtr;
-			sprintf(numberPtr = number, s_mesNumFmt, mFlagVars[GET_1(text)]);
+			sprintf(numberPtr = number, "%d", mFlagVars[GET_1(text)]);
 			addString(&numberPtr, branchMode);
 			break;
 		}
@@ -1201,7 +1187,7 @@ void CMes::addString(char** text, int branchMode)
 			{
 				if ((unsigned int)System.m_execParam >= 1U)
 				{
-					System.Printf(s_MessageSpeedTagUsed);
+					System.Printf(const_cast<char*>(s_MessageSpeedTagUsed));
 				}
 			}
 			else if (value == 0x7F)
@@ -1403,7 +1389,7 @@ void CMes::addString(char** text, int branchMode)
 			goto renderTag;
 		case 0x54:
 		{
-			char* src = (char*)s_mesEmpty;
+			char* src = "...";
 			addString(&src, branchMode);
 			break;
 		}
@@ -1470,7 +1456,6 @@ void CMes::addString(char** text, int branchMode)
 		mLineHeight = (mCurrentY < mLineHeight) ? mLineHeight : mCurrentY;
 	}
 }
-#pragma opt_lifetimes reset
 
 /*
  * --INFO--

@@ -16,7 +16,7 @@ struct GbaCMakeInfo
     unsigned char m_playerSlot;
     char m_name[0x11];
     unsigned char m_charaType;
-    unsigned char m_favoriteLead[2];
+    unsigned char m_birthDate[2]; // month, day
     unsigned char m_favorite[4];
     unsigned char m_jobType;
 };
@@ -48,29 +48,29 @@ struct GbaQueueMapObjWork
 struct GbaQueuePlayerDataView
 {
     signed char m_saveSlot;
-    unsigned char _pad01;
+    unsigned char m_hasPartyObj;
     unsigned char m_appearance;
-    unsigned char _pad03;
-    unsigned int _pad04[4];
+    char m_active;
+    unsigned char m_compatibility[16];
     unsigned short m_progress;
     signed char m_maxHp;
     signed char m_hp;
     unsigned char m_letterMeta[8];
     unsigned char m_strength[3];
-    unsigned char _pad23;
+    unsigned char m_useItem;
     unsigned int m_gil;
     unsigned int m_artifacts[3];
     unsigned short _pad34;
-    unsigned char _pad36[4];
-    unsigned short m_items[0x40];
+    short m_mapPosition[2];
+    short m_items[0x40];
     unsigned short m_tmpArtifacts[4];
-    unsigned short m_artifactList[8];
-    unsigned char _padD2;
-    unsigned char m_artifactCount;
-    unsigned char _padD4;
+    unsigned short m_commandSlots[8];
+    unsigned char m_bonusCondition;
+    char m_commandSlotCount;
+    unsigned char m_radarVisible;
     unsigned char _padD5;
-    unsigned char _padD6;
-    unsigned char m_commandData[4];
+    char m_itemFlags;
+    unsigned char m_equipment[4];
 };
 
 struct GbaPInfo
@@ -80,15 +80,15 @@ struct GbaPInfo
 
 struct GbaQueueMapEntity
 {
-    unsigned char m_visible;
-    unsigned char m_kind;
-    unsigned char m_radarEnabled;
+    char m_visible;
+    char m_kind;
+    char m_radarEnabled;
     unsigned char m_baseDataIndex;
     unsigned short m_hp;
     unsigned short m_maxHp;
     short m_posX;
     short m_posZ;
-    unsigned short m_dropItemCodes[4];
+    short m_dropItemCodes[4];
 };
 
 class GbaQueue
@@ -186,13 +186,13 @@ public:
     void ClrArtifactFlg(int);
     int GetArtifactData(int, unsigned char*);
     int GetUseItemFlg(int);
-    unsigned int GetChgUseItemFlg(int);
+    bool GetChgUseItemFlg(int);
     void ClrChgUseItemFlg(int);
     void SetChgUseItemFlg(int);
     unsigned int GetStrengthFlg(int);
     void ClrStrengthFlg(int);
     void GetStrengthData(int, unsigned char*);
-    unsigned int GetArtiDatFlg(int);
+    bool GetArtiDatFlg(int);
     void ClrArtiDatFlg(int);
     int MakeArtiData(int, char*);
     int GetTmpArtifactData(int, unsigned char*);
@@ -291,7 +291,7 @@ private:
     unsigned char m_spModeBits;       // 0x2D5C
     unsigned char m_spModeFlags;      // 0x2D5D
     unsigned char m_memorysFlags;     // 0x2D5E
-    unsigned char m_cmdNumFlags;      // 0x2D5F
+    char m_cmdNumFlags;               // 0x2D5F
     unsigned char m_playModeFlags;    // 0x2D60
     unsigned char m_startBonusFlags;  // 0x2D61
     unsigned char _pad2D62[0x2];      // 0x2D62

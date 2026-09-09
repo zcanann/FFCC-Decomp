@@ -15,9 +15,6 @@ class CGObject;
 class CPad;
 class CColor;
 
-extern const float kCameraBoundsMinInitial;
-extern const float kCameraBoundsMaxInitial;
-
 void dbgDrawSphere(float, float, float, float, unsigned char, unsigned char, unsigned char);
 
 class CFullScreenShadow
@@ -99,7 +96,7 @@ public:
         float m_scale;
     };
 
-    CCameraPcs() : m_shadowRectBound(kCameraBoundsMinInitial, kCameraBoundsMaxInitial)
+    CCameraPcs() : m_shadowRectBound(10000000000.0f, -10000000000.0f)
     {
     }
 

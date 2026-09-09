@@ -234,9 +234,9 @@ void CMenuPcs::Init()
     m_specialModeFlags[1] = 0;
     m_specialModeFlags[2] = 0;
     m_specialModeFlags[3] = 0;
-    m_specialModeWorkHead = 0;
+    m_wmOptionTextureSet = 0;
     for (int workIndex = 0; workIndex < 11; workIndex++) {
-        m_specialModeWork[workIndex] = 0;
+        m_wmOptionTextures[workIndex] = 0;
     }
 
     m_shopMenu = 0;

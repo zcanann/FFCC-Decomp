@@ -998,7 +998,6 @@ static inline double SingWinUIntToDouble(unsigned int value)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma auto_inline off
 void CMenuPcs::createSingleMenu()
 {
     u8* self = reinterpret_cast<u8*>(this);
@@ -1036,7 +1035,7 @@ void CMenuPcs::createSingleMenu()
 
         if (Game.m_gameWork.m_menuStageMode != 0) {
             loadTexture(PTR_s_solo2.entries, 4, 1, s_singleMenuTextureTable, 0x20, 0xD, 1);
-            m_bonus.m_bonusBoardPtr = 0;
+            m_wm.m_worldObjData = 0;
             m_singleFadeState = 0;
             m_singMenuState = 0;
             m_menuWindowInfo = 0;
@@ -1044,7 +1043,6 @@ void CMenuPcs::createSingleMenu()
         }
     }
 }
-#pragma auto_inline reset
 
 /*
  * --INFO--
@@ -1080,10 +1078,10 @@ void CMenuPcs::destroySingleMenu()
     m_singleMenuStageActive = 0;
     gSingMenuForcedSelection = -1;
 
-    void* ptr = reinterpret_cast<void*>(m_bonus.m_bonusBoardPtr);
+    void* ptr = m_wm.m_worldObjData;
     if (ptr != 0) {
-        delete[] static_cast<u8*>(ptr);
-        m_bonus.m_bonusBoardPtr = 0;
+        delete[] static_cast<WmWorldObjInfo*>(ptr);
+        m_wm.m_worldObjData = 0;
     }
 
     ptr = m_singleFadeState;
@@ -1142,35 +1140,35 @@ void CMenuPcs::SingMenuInit()
     (*handlePtr)->LoadAnim((char*)s_stand_80332a24, 0, 1, 0, (static_cast<unsigned int>((*handlePtr)->m_charaNo) / 100) * 100, -1, 0);
     (*handlePtr)->SetAnim(0, -1, -1, -1, 0);
 
-    m_bonus.m_bonusBoardPtr = reinterpret_cast<int>(new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5DD) u8[sizeof(MenuBoardEntry)]);
+    m_wm.m_worldObjData = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5DD) WmWorldObjInfo[1];
 
-    MenuBoardEntry* boardEntry = reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr);
+    WmWorldObjInfo* boardEntry = m_wm.m_worldObjData;
     int screenY = static_cast<int>(kSingStatScreenY);
     boardEntry->m_transform.Identity();
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_modelHandle = 0;
+    m_wm.m_worldObjData->m_active = 0;
     float centerY = static_cast<float>(static_cast<double>(static_cast<float>(kSingStatPanelH * 0.5
                 + kSingStatPanelH)) - 224.0);
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_effectHandle = 0;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerX = 0;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerY = 0;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_width = 0x280;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_height = 0x1C0;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_posX = 0.0f;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_posY = 0.0f;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_depth = 100.0f;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenX = 0;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenY = 0;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenWidth = 0x280;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenHeight = 0x1C0;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerX = static_cast<s16>(static_cast<int>(
+    m_wm.m_worldObjData->m_frameCounter = 0;
+    m_wm.m_worldObjData->m_viewportX = 0;
+    m_wm.m_worldObjData->m_viewportY = 0;
+    m_wm.m_worldObjData->m_viewportWidth = 0x280;
+    m_wm.m_worldObjData->m_viewportHeight = 0x1C0;
+    m_wm.m_worldObjData->m_cameraPosition.x = 0.0f;
+    m_wm.m_worldObjData->m_cameraPosition.y = 0.0f;
+    m_wm.m_worldObjData->m_cameraPosition.z = 100.0f;
+    m_wm.m_worldObjData->m_scissorX = 0;
+    m_wm.m_worldObjData->m_scissorY = 0;
+    m_wm.m_worldObjData->m_scissorWidth = 0x280;
+    m_wm.m_worldObjData->m_scissorHeight = 0x1C0;
+    m_wm.m_worldObjData->m_viewportX = static_cast<s16>(static_cast<int>(
         static_cast<double>(static_cast<float>(static_cast<double>(static_cast<float>(4.0 + (kSingStatPanelW * 0.5
                 + (kSingStatBaseX + kSingStatPanelPad)))) - 320.0)) - 4.0));
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_centerY = static_cast<s16>(static_cast<int>(centerY));
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenX = static_cast<int>(kSingStatScreenPadX
+    m_wm.m_worldObjData->m_viewportY = static_cast<s16>(static_cast<int>(centerY));
+    m_wm.m_worldObjData->m_scissorX = static_cast<int>(kSingStatScreenPadX
                                              + (kSingStatBaseX + kSingStatPanelPad));
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenY = screenY;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenWidth = 0x48;
-    reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr)->m_screenHeight = 0x58;
+    m_wm.m_worldObjData->m_scissorY = screenY;
+    m_wm.m_worldObjData->m_scissorWidth = 0x48;
+    m_wm.m_worldObjData->m_scissorHeight = 0x58;
 
     m_singleFadeState = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x605) SingleFadeState;
     memset(m_singleFadeState, 0, sizeof(SingleFadeState));
@@ -2603,7 +2601,7 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMenuPcs::EquipChk(int itemNo)
+bool CMenuPcs::EquipChk(int itemNo)
 {
     CCaravanWork* w = SingleCaravanWork();
     int item;
@@ -2883,7 +2881,6 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_dead_assignments off
 void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, int useDynamic)
 {
     CFont* font = m_fonts[0];
@@ -2938,7 +2935,6 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     *outWidth = static_cast<short>(widthLines * lineHeight + 0x40);
     *outHeight = static_cast<short>(lineCount * (lineHeight + 2) + 0x40);
 }
-#pragma opt_dead_assignments reset
 
 
 /*
@@ -3066,8 +3062,7 @@ int CMenuPcs::SingWinMessHeight()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_common_subs off
-int CMenuPcs::ChkEquipPossible(int itemNo)
+bool CMenuPcs::ChkEquipPossible(int itemNo)
 {
     unsigned int genderMask = 0x10;
     int flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
@@ -3093,7 +3088,6 @@ int CMenuPcs::ChkEquipPossible(int itemNo)
     }
     return result != 0;
 }
-#pragma opt_common_subs reset
 
 /*
  * --INFO--
@@ -3431,7 +3425,6 @@ inline void CMenuPcs::CalcSingLife()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma opt_common_subs off
 void CMenuPcs::DrawSingLife()
 {
     int lifeTimer = m_singleLifeTimer;
@@ -3477,7 +3470,6 @@ void CMenuPcs::DrawSingLife()
     xBase += static_cast<float>(((8 - halfHearts) * 0x18) / 2);
     MenuPcs.m_battleMesMenus[0]->DrawHeart(xBase, y - FLOAT_80332930, FLOAT_80332934, FLOAT_80332934);
 }
-#pragma opt_common_subs reset
 
 /*
  * --INFO--

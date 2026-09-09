@@ -245,7 +245,7 @@ void pppDesScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* param_2)
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
     if (model != 0) {
-        model->m_afterMeshDrawCallback = 0;
+        model->m_beforeDrawModelCallback = 0;
         model->SetDrawMeshDLCallback(0);
         model->SetBeforeMeshLockEnvCallback(0);
         model->SetCallbackContext(0, 0);
@@ -297,7 +297,7 @@ void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* param_2)
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(gObject, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
     gObject->m_displayFlags |= 0x40;
-    model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)SB_BeforeDrawCallback;
+    model->m_beforeDrawModelCallback = SB_BeforeDrawCallback;
     float f = kScreenBreakZero;
     model->SetDrawMeshDLCallback(SB_DrawMeshDLCallback);
     model->SetBeforeMeshLockEnvCallback(SB_BeforeMeshLockEnvCallback);

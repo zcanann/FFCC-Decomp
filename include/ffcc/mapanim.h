@@ -53,6 +53,7 @@ public:
 class CMapAnim
 {
     friend class CMapAnimNode;
+    friend class CMapMng;
 
     CPtrArray<CMapAnimNode*> mapAnimNodes;
     int m_startFrame;

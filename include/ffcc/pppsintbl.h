@@ -16394,18 +16394,12 @@ extern float ppvSinTbl[];
 
 static inline float pppSinFromTable(unsigned int angle)
 {
-    const unsigned char* base = (const unsigned char*)ppvSinTbl;
-    const float* p = (const float*)(base + (angle & 0xFFFC));
-    
-    return *p;
+    return ppvSinTbl[(angle >> 2) & 0x3FFF];
 }
 
 static inline float pppCosFromTable(unsigned int angle)
 {
-    const unsigned char* base = (const unsigned char*)ppvSinTbl;
-    const float* p = (const float*)(base + ((angle + 0x4000) & 0xFFFC));
-
-    return *p;
+    return ppvSinTbl[((angle + 0x4000) >> 2) & 0x3FFF];
 }
 
 

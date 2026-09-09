@@ -135,7 +135,6 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
     pppDrawMesh(model, object->m_drawMatrixPtr, 1);
 }
 
-#pragma opt_common_subs off
 /*
  * --INFO--
  * PAL Address: 8008a604
@@ -238,7 +237,6 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     work->m_tilesU = 0;
     work->m_wait = 0x200;
 }
-#pragma opt_common_subs reset
 
 /*
  * --INFO--

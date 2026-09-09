@@ -22,6 +22,7 @@ class CMesMenu;
 class CShopMenu;
 struct ArtiState;
 struct BonusMenuState;
+struct BonusAnimList;
 struct ArtiOpenAnimList;
 struct CmdState;
 struct CmdListStorage;
@@ -35,24 +36,6 @@ struct ItemMenuState;
 struct ItemMenuAnimList;
 struct CmakeMenuState;
 struct GoOutMenuState;
-
-struct MenuBoardEntry
-{
-    int m_modelHandle;
-    int m_effectHandle;
-    short m_centerX;
-    short m_centerY;
-    short m_width;
-    short m_height;
-    float m_posX;
-    float m_posY;
-    float m_depth;
-    SRT m_transform;
-    int m_screenX;
-    int m_screenY;
-    int m_screenWidth;
-    int m_screenHeight;
-};
 
 struct SingleFadeEntry
 {
@@ -113,16 +96,24 @@ struct WmWorldObjInfo
     short m_viewportHeight;
     Vec m_cameraPosition;
     SRT m_transform;
-    unsigned int m_scissorX;
-    unsigned int m_scissorY;
-    unsigned int m_scissorWidth;
-    unsigned int m_scissorHeight;
+    int m_scissorX;
+    int m_scissorY;
+    int m_scissorWidth;
+    int m_scissorHeight;
 };
 STATIC_ASSERT(sizeof(WmWorldObjInfo) == 0x50);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_active) == 0x00);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_frameCounter) == 0x04);
 STATIC_ASSERT(offsetof(WmWorldObjInfo, m_viewportX) == 0x08);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_viewportY) == 0x0A);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_viewportWidth) == 0x0C);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_viewportHeight) == 0x0E);
 STATIC_ASSERT(offsetof(WmWorldObjInfo, m_cameraPosition) == 0x10);
 STATIC_ASSERT(offsetof(WmWorldObjInfo, m_transform) == 0x1C);
 STATIC_ASSERT(offsetof(WmWorldObjInfo, m_scissorX) == 0x40);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_scissorY) == 0x44);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_scissorWidth) == 0x48);
+STATIC_ASSERT(offsetof(WmWorldObjInfo, m_scissorHeight) == 0x4C);
 
 struct WmCharaModelInfo
 {
@@ -225,14 +216,31 @@ struct SingMenuState
 
 struct FavoListStorage;
 struct CompaMenuState;
+struct LetterMenuState;
 struct CompaOpenAnimList;
 struct TmpArtiState;
 struct TmpArtiList;
 
 struct McListInfo
 {
-    void operator=(const McListInfo&);
+    u64 m_saveTime;              // 0x00
+    u32 m_scriptSysVal0;              // 0x08
+    int m_timerA;                // 0x0C
+    int m_scriptGlobalTime;      // 0x10
+    int m_frameCounter;          // 0x14
+    int m_characterIds[4];       // 0x18
+    int m_chaliceElement;        // 0x28
+    char m_townName[0x15];       // 0x2C
+    signed char m_hasData;       // 0x41
+    signed char m_isBroken;      // 0x42
+    signed char m_unknown43;     // 0x43
 };
+
+STATIC_ASSERT(sizeof(McListInfo) == 0x48);
+STATIC_ASSERT(offsetof(McListInfo, m_characterIds) == 0x18);
+STATIC_ASSERT(offsetof(McListInfo, m_townName) == 0x2C);
+STATIC_ASSERT(offsetof(McListInfo, m_hasData) == 0x41);
+STATIC_ASSERT(offsetof(McListInfo, m_isBroken) == 0x42);
 
 class CMenuPcs : public CProcess
 {
@@ -321,12 +329,15 @@ public:
     };
     struct SPL
     {
-
+        float time;
+        float value;
+        float inTangent;
+        float outTangent;
     };
     struct FCV
     {
         int keyCount;
-        float* keys;
+        SPL* keys;
     };
     struct EffectInfo
     {
@@ -440,6 +451,12 @@ public:
     void DrawSelectOpenAnim();
     void CalcSelectWait();
     void CalcSelectCloseAnim();
+    inline void DrawSelectWait();
+    inline void DrawSelectCloseAnim();
+    inline unsigned int GetAllPadOn();
+    inline unsigned int GetAllPadRep();
+    inline void DrawBonusChkMark(float);
+    inline void DrawBonusCnt(CMenuPcs::Sprt2*, int);
 
     void DrawBonusFrame(float, float, float, float, float);
     void DrawArtiBase(CMenuPcs::Sprt2*, float);
@@ -461,6 +478,15 @@ public:
     void CreateSmithMenu();
     void SingMenuEnd();
     void destroyVillageMenu();
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: 312b
+     * EN Address: 0x801047A8
+     * EN Size: 364b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
     void ChkNumItemAll();
     void loadData();
     void InitFrameInfo();
@@ -515,7 +541,7 @@ public:
     void SetWorldParam(int, int);
     unsigned int GetWorldParam(int);
     void CallWorldParam(int, int, int);
-    void CalcSpl(SPL*, SPL*, float);
+    float CalcSpl(SPL*, SPL*, float);
     float GetFcvValue(FCV, float);
     void SetProjection(int);
     void RestoreProjection();
@@ -526,7 +552,7 @@ public:
     void SetCrystalCageAttr();
     void SetManaWaterEffect();
     void DrawFukidashi();
-    void ChkPlaceLength(char*);
+    int ChkPlaceLength(char*, int);
     void SplitPlace(const char*, char*, char*);
     void SplitPlace2(const char*, char*, char*, CFont*, int);
     void CalcWMFrame();
@@ -538,7 +564,16 @@ public:
     void DrawCharaBase();
     void CalcChara();
     void PCAnimCtrl();
-    void GetAnimNo(int, int);
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: 180b
+     * EN Address: 0x80113EAC
+     * EN Size: 244b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    int GetAnimNo(int, int);
     void DrawChara();
     int GetModelNo(int, int, int);
     void CalcCharaSelect();
@@ -568,10 +603,10 @@ public:
     int EquipCtrlCur();
     int EquipOpen0();
     int EquipClose0();
-    int ChkEquipActive(int);
-    int ChkEquipPossible(int);
+    bool ChkEquipActive(int);
+    bool ChkEquipPossible(int);
     int GetEquipType(int);
-    int EquipChk(int);
+    bool EquipChk(int);
     void TmpArtiInit();
     void TmpArtiInit0();
     unsigned int TmpArtiOpen();
@@ -621,7 +656,7 @@ public:
     int UniteCloseAnim(int);
     unsigned int CmdOpen1();
     unsigned int CmdClose1();
-    void CmdOpen2();
+    unsigned int CmdOpen2();
     unsigned int CmdClose2();
     void GetFontItem();
     char* GetAttrStr(int);
@@ -706,17 +741,18 @@ public:
     bool LetterOpen();
     int LetterCtrl();
     int LetterClose();
-    inline void LetterLstOpen();
-    inline void LetterLstClose();
-    inline void LetterMessOpen();
-    inline void LetterItemWinOpen();
-    inline void LetterItemWinClose();
+    inline int LetterLstOpen();
+    inline int LetterLstClose();
+    inline int LetterMessOpen();
+    inline int LetterMessClose();
+    inline int LetterItemWinOpen();
+    inline int LetterItemWinClose();
     int LetterReplyWinOpen();
-    inline void LetterReplyWinClose();
-    inline void LetterAttachWinOpen();
-    inline void LetterAttachWinClose();
+    inline int LetterReplyWinClose();
+    inline int LetterAttachWinOpen();
+    inline int LetterAttachWinClose();
     int LetterConfirmOpen();
-    inline void LetterConfirmClose();
+    inline int LetterConfirmClose();
     void LetterDraw();
     void LetterListDraw();
     void LetterMessDraw();
@@ -727,12 +763,14 @@ public:
     void FavoInit();
     void FavoInit0();
     int FavoOpen();
+    int FavoCtrlCur();
     int FavoCtrl();
     int FavoClose();
     void FavoDraw();
     void CompaInit();
     void CompaInit0();
     int CompaOpen();
+    int CompaCtrlCur();
     void CompaCtrl();
     int CompaClose();
     void CompaDraw();
@@ -741,7 +779,7 @@ public:
     void DrawMainMenuSub();
     void GetMcAccessPos(int*, int*);
     void GetMcOdekakePos(int*, int*);
-    void ChkMcDataCnt();
+    int ChkMcDataCnt();
     void DrawMCList();
     void DrawHelpBase(int, float);
     void CalcMcObj();
@@ -773,17 +811,10 @@ public:
     void SetCaravanWork(Mc::SaveDat*);
     int GetSameCharaData(Mc::SaveDat*, Mc::SaveDat*, int, int);
     int CheckSameMcFormatID(Mc::SaveDat*, Mc::SaveDat*);
-    void IsAsyncCharaLoadFinish();
+    int IsAsyncCharaLoadFinish();
     void AlphaNormal();
     void AlphaAdd();
-    void GetFontWorld();
-
-    struct BonusStorage
-    {
-        unsigned char m_pad744[0x814 - 0x744];
-        int m_bonusBoardPtr;
-        unsigned char m_pad818[0x82C - 0x818];
-    };
+    CFont* GetFontWorld();
 
     struct WmStorage
     {
@@ -797,7 +828,9 @@ public:
         WmCharaSelectEntry* m_charaSelectData;
     };
 
-    unsigned char m_pad04[0x14 - 0x04];
+    unsigned char m_pad04[0x0F - 0x04];
+    unsigned char m_pageMarkFlags;
+    unsigned char m_pad10[0x14 - 0x10];
     unsigned char m_mcRequestLocked;
     unsigned char m_pad15[0x18 - 0x15];
     signed char m_mcRequest;
@@ -805,7 +838,10 @@ public:
     McCtrl m_mcCtrl;
     BattleHudState m_battleHud;
     int m_manaWaterTimerA;
-    unsigned char m_pad74[0x80 - 0x74];
+    short m_wmHelpTimer;
+    unsigned char m_pad76[0x78 - 0x76];
+    float m_wmMenuTargetRotation;
+    float m_wmMenuRotation;
     unsigned char m_effectTimer;
     unsigned char m_pad81[0x84 - 0x81];
     int m_crystalElem;
@@ -834,8 +870,8 @@ public:
     signed char m_specialModeCursor;
     signed char m_specialModeFlags[4];
     unsigned char m_padB9[0xBC - 0xB9];
-    int m_specialModeWorkHead;
-    int m_specialModeWork[11];
+    CTextureSet* m_wmOptionTextureSet;
+    CTexture* m_wmOptionTextures[11];
     CMemory::CStage* m_menuStage;
     CMemory::CStage* m_stageF0;
     CMemory::CStage* m_stageF4;
@@ -847,10 +883,7 @@ public:
     unsigned char m_pad330[0x340 - 0x330];
     unsigned char m_externalFontTlut[0x740 - 0x340];
     int m_mode;
-    union {
-        BonusStorage m_bonus;
-        WmStorage m_wm;
-    };
+    WmStorage m_wm;
     union {
         ArtiState* m_artiState;
         EquipMenuState* m_equipState;
@@ -858,6 +891,7 @@ public:
         MenuLstState* m_menuLstState;
         ItemMenuState* m_itemMenuState;
         SingMenuState* m_singMenuState;
+        LetterMenuState* m_letterMenuState;
         CompaMenuState* m_compaMenuState;
         TmpArtiState* m_tmpArtiState;
         CmakeMenuState* m_cmakeState;
@@ -872,7 +906,7 @@ public:
     };
     union {
         EffectEntry* m_effectEntries;
-        unsigned char* m_wmCharaState;
+        McListInfo* m_wmCharaState;
     };
     unsigned char* m_wmWorldParams;
     EffectInfo* m_effectWork;
@@ -883,7 +917,7 @@ public:
     MenuWindowInfo* m_menuWindowInfo;
     union {
         int m_pad84C;
-        int m_bonusAnimPtr;
+        BonusAnimList* m_bonusAnim;
     };
     union {
         ArtiOpenAnimList* m_artiList;
@@ -955,7 +989,7 @@ public:
         unsigned char m_goOutUnknown88B;
     };
     union {
-        unsigned char* m_cmakeWork;
+        Mc::SaveDat* m_cmakeWork;
         void* m_goOutTransferWorkActive;
     };
     unsigned char m_pad890[0x8A0 - 0x890];
@@ -965,16 +999,21 @@ extern CMenuPcs MenuPcs;
 extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];
 
-STATIC_ASSERT(sizeof(MenuBoardEntry) == 0x50);
-STATIC_ASSERT(offsetof(MenuBoardEntry, m_transform) == 0x1C);
-STATIC_ASSERT(offsetof(MenuBoardEntry, m_screenX) == 0x40);
 STATIC_ASSERT(sizeof(CMenuPcs::BattleHudState) == 0x28);
 STATIC_ASSERT(sizeof(MenuWindowInfo) == 0x0C);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
+STATIC_ASSERT(offsetof(CMenuPcs::EffectInfo, m_object) == 0x0C);
+STATIC_ASSERT(offsetof(CGObject, m_currentAlpha) == 0x4B0);
+STATIC_ASSERT(offsetof(CGObject, m_alphaTarget) == 0x4B4);
+STATIC_ASSERT(offsetof(CGObject, m_alphaStep) == 0x4B8);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectEntry) == 0x48);
 STATIC_ASSERT(sizeof(CMenuPcs::MaterialInfo) == 0x0C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_pageMarkFlags) == 0x0F);
 STATIC_ASSERT(offsetof(CMenuPcs, m_mcCtrl) == 0x20);
 STATIC_ASSERT(offsetof(CMenuPcs, m_manaWaterTimerA) == 0x70);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmHelpTimer) == 0x74);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmMenuTargetRotation) == 0x78);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmMenuRotation) == 0x7C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectTimer) == 0x80);
 STATIC_ASSERT(offsetof(CMenuPcs, m_crystalElem) == 0x84);
 STATIC_ASSERT(offsetof(CMenuPcs, m_crystalPart) == 0x88);
@@ -987,10 +1026,10 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_optionOpenAnim) == 0x98);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionRowAnim) == 0xA0);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionColumnAnim) == 0xA8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeFlags) == 0xB5);
-STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeWorkHead) == 0xBC);
-STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeWork) == 0xC0);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmOptionTextureSet) == 0xBC);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmOptionTextures) == 0xC0);
+STATIC_ASSERT(offsetof(CMenuPcs, m_battleMesMenus) == 0x10C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
-STATIC_ASSERT(offsetof(CMenuPcs, m_bonus) == 0x744);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm) == 0x744);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_savedCameraMatrix) == 0x744);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_worldObjData) == 0x814);
@@ -1016,7 +1055,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorldParams) == 0x83C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaAnimState) == 0x844);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuWindowInfo) == 0x848);
-STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAnimPtr) == 0x84C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAnim) == 0x84C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemList) == 0x850);
@@ -1081,5 +1120,19 @@ STATIC_ASSERT(offsetof(CMenuPcs::WmFrameData, m_titleSprite) == 0x98);
 STATIC_ASSERT(offsetof(CMenuPcs::WmFrameData, m_yearSprites) == 0xB4);
 STATIC_ASSERT(sizeof(CMenuPcs::WmFrameInfo) == 0x3C);
 STATIC_ASSERT(offsetof(CMenuPcs::WmFrameInfo, m_sprites) == 0x4);
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CFont* CMenuPcs::GetFontWorld()
+{
+    return m_fonts[1];
+}
 
 #endif // _FFCC_P_MENU_H_

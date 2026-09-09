@@ -2,6 +2,7 @@
 #define _FFCC_PTRARRAY_H_
 
 #include "global.h"
+#include "ffcc/ptrarray_decl.h"
 #include "ffcc/memory.h"
 #include "ffcc/ref.h"
 #include "ffcc/system.h"
@@ -13,39 +14,6 @@
 
 #ifndef FFCC_PTRARRAY_FILE
 #define FFCC_PTRARRAY_FILE "collection_ptrarray.h"
-#endif
-
-#ifndef _FFCC_PTRARRAY_DECL_H_
-template <class T>
-class CPtrArray
-{
-public:
-    CPtrArray();
-    virtual ~CPtrArray();
-
-    int GetSize();
-    int Add(T item);
-    void RemoveAll();
-    void ReleaseAndRemoveAll();
-    void DeleteAndRemoveAll();
-    void RemoveAt(unsigned long index);
-    T GetAt(unsigned long index);
-    T operator[](unsigned long index);
-    void SetAt(unsigned long index, T item);
-    void SetStage(CMemory::CStage* stage);
-    void SetDefaultSize(unsigned long defaultSize);
-    void SetGrow(int growCapacity);
-
-private:
-    int setSize(unsigned long newSize);
-
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-};
 #endif
 
 template <class T>
@@ -70,7 +38,6 @@ CPtrArray<T>::~CPtrArray()
     m_numItems = 0;
 }
 
-#ifndef FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 template <class T>
 int CPtrArray<T>::GetSize()
 {
@@ -88,7 +55,6 @@ T CPtrArray<T>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
-#endif
 
 template <class T>
 void CPtrArray<T>::SetAt(unsigned long index, T item)
@@ -144,7 +110,7 @@ void CPtrArray<T>::ReleaseAndRemoveAll()
         T item = m_items[i];
         if (item != 0) {
             CRef* ref = item;
-            if (--ref->refCount == 0) {
+            if (ref->DecRef() == 0) {
                 delete ref;
             }
             m_items[i] = 0;

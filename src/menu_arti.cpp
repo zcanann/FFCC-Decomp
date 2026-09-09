@@ -164,7 +164,7 @@ void CMenuPcs::ArtiDraw()
 
 	short artiState = m_artiState->state;
 	ArtiOpenAnim* entry = m_artiList->entries;
-	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	const CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
 	int drawIndex = 0;
 	float x;
 	float y;

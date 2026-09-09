@@ -50,7 +50,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadState) == 0x860);
 
 static inline CCaravanWork* SingleCaravanWork()
 {
-    return reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+    return Game.m_scriptFoodBase[0];
 }
 
 extern const double DOUBLE_80332968;

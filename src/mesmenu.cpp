@@ -235,7 +235,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 {
     (void)z;
 
-    CCaravanWork* scriptFood = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
+    CCaravanWork* scriptFood = Game.m_scriptFoodBase[m_menuIndex];
     if (scriptFood == 0) {
         return;
     }
@@ -316,7 +316,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
  */
 void CMesMenu::CalcHeart()
 {
-    CCaravanWork* scriptFood = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
+    CCaravanWork* scriptFood = Game.m_scriptFoodBase[m_menuIndex];
     if (scriptFood == 0) {
         return;
     }
@@ -474,7 +474,7 @@ void CMesMenu::onDraw()
     float drawY;
 
     if (m_menuIndex < 4) {
-        CCaravanWork* scriptFood = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
+        CCaravanWork* scriptFood = Game.m_scriptFoodBase[m_menuIndex];
         if (scriptFood == 0) {
             return;
         }
@@ -608,7 +608,7 @@ void CMesMenu::onDraw()
 
         {
             CCaravanWork* heartFood =
-                reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
+                Game.m_scriptFoodBase[m_menuIndex];
             if ((heartFood != 0) && (0.0f < stageBlend)) {
                 MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).Ref());
                 MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
@@ -882,7 +882,7 @@ void CMesMenu::onCalc()
     }
 
     if (m_menuIndex < 4) {
-        CCaravanWork* scriptFood = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
+        CCaravanWork* scriptFood = Game.m_scriptFoodBase[m_menuIndex];
         if (scriptFood != 0) {
             unsigned int foodCount = (unsigned int)scriptFood->m_hp;
             int targetValue = (int)(foodCount * 6);

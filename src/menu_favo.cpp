@@ -479,7 +479,7 @@ void CMenuPcs::FavoInit()
 	int iVar16;
 	int iVar17;
 
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	memset(m_favoList, 0, sizeof(*m_favoList));
 	FavoEntry* entry = m_favoList->entries;
 	for (iVar16 = 64; iVar16 > 0; iVar16--) {

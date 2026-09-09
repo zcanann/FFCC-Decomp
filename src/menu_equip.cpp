@@ -70,7 +70,7 @@ static inline CFont* GetEquipFont(CMenuPcs* menu)
  */
 bool CMenuPcs::ChkEquipActive(int index)
 {
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	int entryCount = entries[0];
 	s16* itemEntries = entries + 1;
@@ -234,7 +234,7 @@ int CMenuPcs::EquipOpen0()
  */
 int CMenuPcs::EquipCtrlCur()
 {
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	int press = static_cast<s16>(Pad.GetButtonDown(0));
 	int hold = static_cast<s16>(Pad.GetButtonRepeat(0));
 
@@ -374,7 +374,7 @@ void CMenuPcs::EquipDraw()
 
 	int mode = static_cast<int>(GetEquipMenuState(this)->mode);
 	unsigned int listState = static_cast<int>(GetEquipMenuState(this)->listState);
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	EquipOpenAnim* item = GetEquipListStorage(this)->entries;
 
 	for (int i = 0; i < GetEquipListStorage(this)->count; i++) {
@@ -766,7 +766,7 @@ int CMenuPcs::EquipCtrl()
 
 	if (state) {
 		float one = 1.0f;
-		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+		CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 
 		EquipOpenAnim* entry = GetEquipListStorage(this)->entries;
 		for (int i = 0; i < GetEquipListStorage(this)->count; i++) {

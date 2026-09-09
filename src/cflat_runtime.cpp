@@ -1233,10 +1233,10 @@ void CFlatRuntime::push(CFlatRuntime::CObject* object, int value)
 
 /*
  * --INFO--
- * PAL Address: 0x80067bf8
+ * PAL Address: 0x80067BF8
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80067560
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1245,9 +1245,8 @@ void CFlatRuntime::ClearParmanent()
 	int varIndex = 0;
 
 	while (varIndex < m_permanentVarCount) {
-		int valueOffset = varIndex * 4;
-		if ((m_permanentVarDefs[valueOffset + 1] & 0x20) != 0) {
-			*reinterpret_cast<u32*>(m_permanentVarValues + valueOffset) = 0;
+		if ((m_permanentVarDefs[varIndex].m_flags & 0x20) != 0) {
+			m_permanentVarValues[varIndex] = 0;
 		}
 		varIndex += 1;
 	}
@@ -1336,10 +1335,10 @@ int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind,
 
 /*
  * --INFO--
- * PAL Address: 0x800684c8
+ * PAL Address: 0x800684C8
  * PAL Size: 724b
- * EN Address: 0x80076420
- * EN Size: 1032b
+ * EN Address: 0x80067E30
+ * EN Size: 724b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1408,7 +1407,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 
 	unsigned int* varBase = 0;
 	if (classIndex == -1) {
-		varBase = reinterpret_cast<unsigned int*>(m_permanentVarValues);
+		varBase = m_permanentVarValues;
 	} else {
 		varBase = reinterpret_cast<unsigned int*>(object->m_id);
 	}
@@ -1428,13 +1427,13 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	const int allowKeep = (classIndex == -1) ? static_cast<u8>(m_0x970 == 0) : 1;
 
 	unsigned int* write = object->m_thisBase;
-	u8* defs = (classIndex == -1) ? m_permanentVarDefs : 0;
+	CVal* defs = (classIndex == -1) ? m_permanentVarDefs : 0;
 	int clearCount = (classIndex == -1) ? m_permanentVarCount : classBase->m_localCount;
 	while (clearCount > 0) {
-		if ((allowKeep != 0) || ((defs[1] & 0x20) == 0)) {
+		if ((allowKeep != 0) || ((defs->m_flags & 0x20) == 0)) {
 			*write = 0;
 		}
-		defs += 4;
+		defs++;
 		write++;
 		clearCount--;
 	}
@@ -1627,8 +1626,12 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80068DF8
+ * PAL Size: 2052b
+ * EN Address: 0x80068760
+ * EN Size: 2052b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime::Create(void* filePtr)
 {
@@ -1653,15 +1656,15 @@ void CFlatRuntime::Create(void* filePtr)
 				m_permanentVarCount = chunk.m_arg0;
 				m_permanentVarDefs =
 				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x96)
-				        u8[m_permanentVarCount << 2];
+				        CVal[m_permanentVarCount];
 
 				int i = 0;
-				u8* variableDef = m_permanentVarDefs;
+				CVal* variableDef = m_permanentVarDefs;
 				const int variableCount = m_permanentVarCount;
-				for (; i < variableCount; i++, variableDef += 4) {
-					variableDef[0] = chunkFile.Get1();
-					variableDef[1] = chunkFile.Get1();
-					*reinterpret_cast<u16*>(variableDef + 2) = chunkFile.Get2();
+				for (; i < variableCount; i++, variableDef++) {
+					variableDef->m_type = chunkFile.Get1();
+					variableDef->m_flags = chunkFile.Get1();
+					variableDef->m_value = chunkFile.Get2();
 				}
 				break;
 			}
@@ -2004,16 +2007,16 @@ void CFlatRuntime::Destroy()
 
 /*
  * --INFO--
- * PAL Address: 0x8006996c
+ * PAL Address: 0x8006996C
  * PAL Size: 56b
- * EN Address: 0x800752A4
+ * EN Address: 0x800692D4
  * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CFlatRuntime::Quit()
 {
-	delete[] (char*)m_permanentVarValues;
+	delete[] m_permanentVarValues;
 	delete[] m_stackStorage;
 }
 
@@ -2021,15 +2024,15 @@ void CFlatRuntime::Quit()
  * --INFO--
  * PAL Address: 0x800699A4
  * PAL Size: 136b
- * EN Address: 0x80075218
- * EN Size: 140b
+ * EN Address: 0x8006930C
+ * EN Size: 136b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CFlatRuntime::Init()
 {
 	m_permanentVarValues =
-	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2A) u8[0x3000];
+	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2A) unsigned int[0xC00];
 	m_stackStorage =
 	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2B) u32[0x5220];
 }

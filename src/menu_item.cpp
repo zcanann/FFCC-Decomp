@@ -101,7 +101,7 @@ STATIC_ASSERT(sizeof(ItemMenuAnimList) == 0x1008);
  */
 int CMenuPcs::ItemCtrlCur()
 {
-    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+    CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
     s16 press = Pad.GetButtonDown(0);
     s16 hold = Pad.GetButtonRepeat(0);
 
@@ -293,7 +293,7 @@ void CMenuPcs::ItemDraw()
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+    CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
     s16 listState = this->m_itemMenuState->listState;
     int mode = this->m_itemMenuState->mode;
     MenuItemOpenAnim* entry = this->m_itemList->anims;

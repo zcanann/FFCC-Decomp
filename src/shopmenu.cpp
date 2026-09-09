@@ -2684,7 +2684,7 @@ void CShopMenu::Calc()
                 break;
             case 2:
                 PartPcs.ReleasePdt(m_pdtSlot);
-                reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
+                Game.m_scriptFoodBase[0]->CallShop(0, 0, 0, 0, 0);
                 MenuPcs.m_singleFadeState->done = 1;
                 operator delete(MenuPcs.m_shopMenu);
                 MenuPcs.m_shopMenu = 0;
@@ -2784,7 +2784,7 @@ void CShopMenu::Calc()
         if (timer == 8) {
             if (m_nextMode == -1) {
                 PartPcs.ReleasePdt(m_pdtSlot);
-                reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
+                Game.m_scriptFoodBase[0]->CallShop(0, 0, 0, 0, 0);
                 MenuPcs.m_singleFadeState->done = 1;
                 operator delete(MenuPcs.m_shopMenu);
                 MenuPcs.m_shopMenu = 0;
@@ -2874,7 +2874,7 @@ void CMenuPcs::CreateSmithMenu()
 
     Graphic._WaitDrawDone(s_shopmenu_cpp, 0x2FE);
     shopMenu->m_unk00 = nullptr;
-    shopMenu->m_caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+    shopMenu->m_caravanWork = Game.m_scriptFoodBase[0];
     shopMenu->SetMode(9);
     shopMenu->m_pdtSlot = PartPcs.LoadMenuPdt(const_cast<char*>(s_shop_80332e54));
 
@@ -2906,7 +2906,7 @@ void CMenuPcs::CreateShopMenu()
 
     Graphic._WaitDrawDone(s_shopmenu_cpp, 0x2FE);
     shopMenu->m_unk00 = nullptr;
-    shopMenu->m_caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+    shopMenu->m_caravanWork = Game.m_scriptFoodBase[0];
     shopMenu->SetMode(0);
     shopMenu->m_pdtSlot = PartPcs.LoadMenuPdt(const_cast<char*>(s_shop_80332e54));
 

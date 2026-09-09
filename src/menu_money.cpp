@@ -28,7 +28,7 @@ static signed char s_place[16];
  */
 inline void CMenuPcs::MoneySetPlace(int row)
 {
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	int digitPlace = 1;
 	int digitIndex;
 	int started;
@@ -113,7 +113,7 @@ int CMenuPcs::MoneyCtrlCur()
 		return 0;
 	}
 
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	int maxDigits = 1;
 	int mode = this->m_moneyState->mode;
 	int maxGil = caravanWork->m_gil;

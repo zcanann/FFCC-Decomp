@@ -78,7 +78,7 @@ void CRingMenu::DrawIcon()
 		return;
 	}
 
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[m_menuIndex];
 	Mtx cameraMtx;
 	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
@@ -291,7 +291,7 @@ void CRingMenu::drawGBA()
 		return;
 	}
 
-	const unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
+	CCaravanWork* const scriptFood = Game.m_scriptFoodBase[m_menuIndex];
 	if (scriptFood == 0) {
 		return;
 	}
@@ -399,7 +399,7 @@ void CRingMenu::onDraw()
 		return;
 	}
 
-	unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
+	CCaravanWork* scriptFood = Game.m_scriptFoodBase[m_menuIndex];
 	if (scriptFood == 0) {
 		return;
 	}

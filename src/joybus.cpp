@@ -684,7 +684,7 @@ loop_body:
             statusIndex = (unsigned int)threadParam->m_portIndex;
         }
 
-        unsigned int gamePadState = (int)Game.m_scriptFoodBase[statusIndex];
+        CCaravanWork* gamePadState = Game.m_scriptFoodBase[statusIndex];
 
         if (gamePadState == 0 && padType == 0x00040000)
         {

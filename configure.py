@@ -560,7 +560,7 @@ config.libs = [
             Object(NonMatching, "menu_lst.cpp"),
             Object(NonMatching, "menu_money.cpp"),
             Object(NonMatching, "menu_tmparti.cpp"),
-            Object(NonMatching, "MenuUtil.cpp", extra_cflags=["-O3,p", "-sdata2 16", "-char unsigned"]),
+            Object(NonMatching, "MenuUtil.cpp", extra_cflags=["-sdata2 16", "-char unsigned"]),
             Object(NonMatching, "mes.cpp"),
             Object(NonMatching, "mesmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "monobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),

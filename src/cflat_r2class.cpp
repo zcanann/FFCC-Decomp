@@ -20,8 +20,12 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 
-extern const char sCFlatRuntime2SetClassSystemValWarn[];
-extern const char sCFlatRuntime2AnimStateWarn[];
+static const char sCFlatRuntime2SetClassSystemValWarn[] =
+    "!!!!!!!!!!!!!!!charUpdate"
+    "\202\252\203x\201[\203X\203N\203\211\203X\202\310\202\307\202\305\216g\227p\202\263\202\352\202\304\202\334\202\267\201B"
+    "!!!!!!!!!!!!!!!!!!!!\n";
+static const char sCFlatRuntime2AnimStateWarn[] =
+    "\203|\201[\203g\224\324\215\206\202\252\210\331\217\355\202\305\202\267\201B";
 extern const float kCFlatRuntime2Zero;
 extern const float kCFlatRuntime2SystemValScale;
 

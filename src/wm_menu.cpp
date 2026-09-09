@@ -10595,17 +10595,7 @@ void McCtrl::SetListDat(int slot, int clearScriptSysVal0)
 			entry.m_scriptGlobalTime = save->m_scriptGlobalTime;
 			entry.m_frameCounter = save->m_frameCounter;
 
-			for (int i = 0; i < 4; i++) {
-				const int partySlot = save->m_partySlots[i];
-				if (save->m_characters[partySlot].m_exists == 0) {
-					save->m_partySlots[i] = -1;
-				}
-				if (save->m_characters[partySlot].m_isAway != 0) {
-					save->m_partySlots[i] = -1;
-				}
-			}
-
-			save->m_crc = MemoryCardMan.CalcCrc(save);
+			ChkParty(reinterpret_cast<char*>(save));
 
 			for (int i = 0; i < 4; i++) {
 				if (save->m_partySlots[i] >= 0) {
@@ -11667,17 +11657,7 @@ int McCtrl::SaveDataBuffer(char* buffer)
 		Mc::SaveDat* const save = reinterpret_cast<Mc::SaveDat*>(MemoryCardMan.m_saveBuffer);
 		memcpy(save, buffer, sizeof(*save));
 
-		for (int i = 0; i < 4; i++) {
-			const int partySlot = save->m_partySlots[i];
-			if (save->m_characters[partySlot].m_exists == 0) {
-				save->m_partySlots[i] = -1;
-			}
-			if (save->m_characters[partySlot].m_isAway != 0) {
-				save->m_partySlots[i] = -1;
-			}
-		}
-
-		save->m_crc = MemoryCardMan.CalcCrc(save);
+		ChkParty(reinterpret_cast<char*>(save));
 		MemoryCardMan.EncodeData();
 		MemoryCardMan.McWrite(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);
 		m_state = 0x11;
@@ -11734,20 +11714,19 @@ int McCtrl::SaveDataBuffer(char* buffer)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void McCtrl::ChkParty(char*)
+inline void McCtrl::ChkParty(char* buffer)
 {
-	m_lastResult = 0;
-	if (m_userBuffer == 0) {
-		return;
-	}
-
-	const Mc::SaveDat* const save = static_cast<const Mc::SaveDat*>(m_userBuffer);
+	Mc::SaveDat* const save = reinterpret_cast<Mc::SaveDat*>(buffer);
 	for (int i = 0; i < 4; i++) {
-		const int party = save->m_partySlots[i];
-		if (party >= 0 && party < 8 && save->m_characters[party].m_exists != 0 && save->m_characters[party].m_isAway == 0) {
-			m_lastResult++;
+		const int partySlot = save->m_partySlots[i];
+		if (save->m_characters[partySlot].m_exists == 0) {
+			save->m_partySlots[i] = -1;
+		}
+		if (save->m_characters[partySlot].m_isAway != 0) {
+			save->m_partySlots[i] = -1;
 		}
 	}
+	save->m_crc = MemoryCardMan.CalcCrc(save);
 }
 
 /*

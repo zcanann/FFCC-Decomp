@@ -112,8 +112,10 @@ public:
 
 	class CVal
 	{
-		CVal();
-		~CVal();
+	public:
+		u8 m_type;
+		u8 m_flags;
+		u16 m_value;
 	};
 	
 	CFlatRuntime();
@@ -181,8 +183,8 @@ public:
 
 public:
     int m_permanentVarCount;        // 0x0004
-    u8* m_permanentVarDefs;         // 0x0008
-    u8* m_permanentVarValues;       // 0x000C
+    CVal* m_permanentVarDefs;       // 0x0008
+    unsigned int* m_permanentVarValues; // 0x000C
     u32* m_stackStorage;           // 0x0010
     int m_classCount;              // 0x0014
     CClass* m_classes;              // 0x0018
@@ -239,6 +241,9 @@ STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_reqFlagIndex) == 0x48);
 STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_useCallerArgs) == 0x4C);
 STATIC_ASSERT(sizeof(CFlatRuntime::CObject) == 0x4C);
 STATIC_ASSERT(sizeof(CFlatRuntime) == 0x129C);
+STATIC_ASSERT(sizeof(CFlatRuntime::CVal) == 4);
+STATIC_ASSERT(offsetof(CFlatRuntime::CVal, m_flags) == 1);
+STATIC_ASSERT(offsetof(CFlatRuntime::CVal, m_value) == 2);
 STATIC_ASSERT(offsetof(CFlatRuntime, m_permanentVarCount) == 0x04);
 STATIC_ASSERT(offsetof(CFlatRuntime, m_permanentVarDefs) == 0x08);
 STATIC_ASSERT(offsetof(CFlatRuntime, m_permanentVarValues) == 0x0C);

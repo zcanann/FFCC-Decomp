@@ -971,8 +971,8 @@ void CGame::Draw3()
  * --INFO--
  * PAL Address: 0x800147F8
  * PAL Size: 116b
- * EN Address: 0x8001C4D4
- * EN Size: 164b
+ * EN Address: 0x80014690
+ * EN Size: 116b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -982,9 +982,9 @@ void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PP
 	stack[0].m_word = (u32)effectIndex;
 	stack[1].m_word = (u32)kind;
 	stack[2].m_word = (u32)nodeIndex;
-	*(float*)&stack[3].m_word = pos->x;
-	*(float*)&stack[4].m_word = pos->y;
-	*(float*)&stack[5].m_word = pos->z;
+	stack[3].m_float = pos->x;
+	stack[4].m_float = pos->y;
+	stack[5].m_float = pos->z;
 	stack[6].m_word = (u32)hitParam->m_particleIndex;
 	stack[7].m_word = (u32)hitParam->m_classId;
 	gCFlatRuntime().SystemCall(0, 1, 1, 8, stack, 0);
@@ -1024,54 +1024,23 @@ void CGame::ParticleFrameCallback(int effectIndex, int scriptLine, int scriptSte
 	}
 }
 
-static inline void savePermanentScriptVars(char* scriptData)
-{
-    int scriptOffset = 0;
-    int i = 0;
-    int entryOffset = 0;
-
-    while (i < CFlatPermanentVarCount()) {
-        int flagIndex = entryOffset + 1;
-        if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
-            reinterpret_cast<u32*>(scriptData)[scriptOffset / 4] = CFlatPermanentVarWord(entryOffset);
-            scriptOffset += 4;
-        }
-
-        entryOffset += 4;
-        i++;
-    }
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8001462C
  * PAL Size: 136b
- * EN Address: 0x8001C71C
- * EN Size: 236b
+ * EN Address: 0x800144C4
+ * EN Size: 136b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGame::SaveScript(char* scriptData)
 {
     memset(scriptData, 0, kGameScriptSaveDataSize);
-    savePermanentScriptVars(scriptData);
-}
-
-static inline void loadPermanentScriptVars(char* scriptData)
-{
-    int scriptOffset = 0;
-    int i = 0;
-    int entryOffset = 0;
-
-    while (i < CFlatPermanentVarCount()) {
-        int flagIndex = entryOffset + 1;
-        if ((CFlatPermanentVarDefs()[flagIndex] & 0x20) != 0) {
-            CFlatPermanentVarWord(entryOffset) = reinterpret_cast<u32*>(scriptData)[scriptOffset / 4];
-            scriptOffset += 4;
+    int savedCount = 0;
+    for (int i = 0; i < CFlat.m_permanentVarCount; i++) {
+        if ((CFlat.m_permanentVarDefs[i].m_flags & 0x20) != 0) {
+            reinterpret_cast<unsigned int*>(scriptData)[savedCount++] = CFlat.m_permanentVarValues[i];
         }
-
-        entryOffset += 4;
-        i++;
     }
 }
 
@@ -1079,14 +1048,19 @@ static inline void loadPermanentScriptVars(char* scriptData)
  * --INFO--
  * PAL Address: 0x800145D8
  * PAL Size: 84b
- * EN Address: 0x8001C808
- * EN Size: 224b
+ * EN Address: 0x80014470
+ * EN Size: 84b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGame::LoadScript(char* scriptData)
 {
-    loadPermanentScriptVars(scriptData);
+    int savedCount = 0;
+    for (int i = 0; i < CFlat.m_permanentVarCount; i++) {
+        if ((CFlat.m_permanentVarDefs[i].m_flags & 0x20) != 0) {
+            CFlat.m_permanentVarValues[i] = reinterpret_cast<unsigned int*>(scriptData)[savedCount++];
+        }
+    }
 }
 
 /*

@@ -91,32 +91,7 @@ static inline u32& CFlatRuntimeDebugFlags()
 
 static inline CFlatRuntime& gCFlatRuntime()
 {
-    return *reinterpret_cast<CFlatRuntime*>(&CFlat);
-}
-
-static inline int& CFlatPermanentVarCount()
-{
-    return gCFlatRuntime().m_permanentVarCount;
-}
-
-static inline unsigned char*& CFlatPermanentVarDefs()
-{
-    return gCFlatRuntime().m_permanentVarDefs;
-}
-
-static inline unsigned char*& CFlatPermanentVarValues()
-{
-    return gCFlatRuntime().m_permanentVarValues;
-}
-
-static inline u8& CFlatPermanentVarFlagByte(int offset)
-{
-    return CFlatPermanentVarDefs()[offset + 1];
-}
-
-static inline u32& CFlatPermanentVarWord(int offset)
-{
-    return *reinterpret_cast<u32*>(CFlatPermanentVarValues() + offset);
+    return CFlat;
 }
 
 static inline float& CFlatPerformanceTotalTime()

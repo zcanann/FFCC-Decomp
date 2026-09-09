@@ -200,19 +200,6 @@ void CPtrArray<CTexture*>::SetGrow(int growCapacity)
 
 /*
  * --INFO--
- * PAL Address: 0x8005f618
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CFlatRuntime::CObject::onNewFinished()
-{
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80059220
  * PAL Size: 24b
  * EN Address: TODO

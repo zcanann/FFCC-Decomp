@@ -503,8 +503,8 @@ config.libs = [
                 "cflat_r2system.cpp",
                 extra_cflags=["-str reuse,nopool,readonly", "-use_lmw_stmw on"],
             ),
-            Object(NonMatching, "cflat_runtime.cpp"),
-            Object(NonMatching, "cflat_runtime2.cpp"),
+            Object(NonMatching, "cflat_runtime.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
+            Object(NonMatching, "cflat_runtime2.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
             Object(
                 NonMatching,
                 "chara_anim.cpp",
@@ -586,7 +586,7 @@ config.libs = [
             Object(NonMatching, "p_tina.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "p_usb.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "pad.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
-            Object(NonMatching, "partMng.cpp"),
+            Object(NonMatching, "partMng.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
             Object(Matching, "pppsintbl.cpp"),
             Object(NonMatching, "partyobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(Matching, "pppAccele.cpp"),
@@ -777,7 +777,7 @@ config.libs = [
             Object(NonMatching, "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(Matching, "vector.cpp"),
             Object(NonMatching, "wind.cpp"),
-            Object(NonMatching, "wm_menu.cpp", extra_cflags=["-str reuse,readonly"]),
+            Object(NonMatching, "wm_menu.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
             # Retail addresses local message tables separately and stores literals read-only.
             Object(NonMatching, "wmm_str.cpp", extra_cflags=["-str reuse,readonly", "-pooldata off"]),
             Object(Matching, "zlist.cpp"),

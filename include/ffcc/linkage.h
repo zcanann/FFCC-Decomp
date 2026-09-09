@@ -96,7 +96,7 @@ static inline CFlatRuntime& gCFlatRuntime()
 
 static inline float& CFlatPerformanceTotalTime()
 {
-    return gCFlatRuntime().m_performanceTotalTime;
+    return gCFlatRuntime().m_performance.m_totalTime;
 }
 
 static inline u32& CFlatEventFlags()

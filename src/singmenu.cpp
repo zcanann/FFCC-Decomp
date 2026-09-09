@@ -41,6 +41,8 @@ extern const char* gSingMenuAttrTableEs[];
 typedef signed short s16;
 typedef unsigned char u8;
 
+STATIC_ASSERT(offsetof(CCaravanWork, m_tribeId) == 0x3E0);
+STATIC_ASSERT(offsetof(CCaravanWork, m_genderFlag) == 0x3E2);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuStageActive) == 0x859);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuInitialized) == 0x85A);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadIndex) == 0x85C);
@@ -3125,17 +3127,17 @@ int CMenuPcs::GetEquipType(int itemNo)
  * --INFO--
  * PAL Address: 0x80145ff4
  * PAL Size: 412b
- * EN Address: 0x8016C6D4
- * EN Size: 332b
+ * EN Address: 0x80145164
+ * EN Size: 412b
  * JP Address: TODO
  * JP Size: TODO
  */
 int CMenuPcs::GetSmithItem(int itemNo)
 {
-    unsigned int caravanWork = reinterpret_cast<unsigned int>(SingleCaravanWork());
+    CCaravanWork* caravanWork = SingleCaravanWork();
 
     GetItemType(itemNo, 1);
-    u16 race = *reinterpret_cast<u16*>(caravanWork + 0x3e0);
+    u16 race = caravanWork->m_tribeId;
     int raceType = race & 3;
     SItemFlatRow* rec = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo];
     int smithItem = rec->m_smithResults[race & 3];
@@ -3144,8 +3146,8 @@ int CMenuPcs::GetSmithItem(int itemNo)
         int flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[smithItem].m_equipFlags;
         int raceFlags = flags & 0xF;
         int genderFlags = flags & 0x30;
-        unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e0) & 3);
-        if (*reinterpret_cast<u16*>(reinterpret_cast<unsigned int>(SingleCaravanWork()) + 0x3e2) != 0) {
+        unsigned int raceMask = 1 << (SingleCaravanWork()->m_tribeId & 3);
+        if (SingleCaravanWork()->m_genderFlag != 0) {
             genderMask = 0x20;
         }
 

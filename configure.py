@@ -504,7 +504,7 @@ config.libs = [
                 extra_cflags=["-str reuse,nopool,readonly", "-use_lmw_stmw on"],
             ),
             Object(NonMatching, "cflat_runtime.cpp"),
-            Object(NonMatching, "cflat_runtime2.cpp", extra_cflags=["-inline auto,deferred"]),
+            Object(NonMatching, "cflat_runtime2.cpp"),
             Object(
                 NonMatching,
                 "chara_anim.cpp",

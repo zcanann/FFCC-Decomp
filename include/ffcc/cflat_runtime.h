@@ -37,6 +37,15 @@ public:
 		s32 m_variableCount;      // 0x228
 	};
 
+	struct CPerformance
+	{
+		float m_totalTime;
+		float m_systemFuncTime[128];
+		float m_classSystemFuncTime[128];
+		int m_systemFuncCount[128];
+		int m_classSystemFuncCount[128];
+	};
+
 	struct CStackBlock
 	{
 		CStackBlock* m_previous; // 0x00
@@ -208,8 +217,7 @@ public:
     int m_vstrCount;                // 0x003C
     char* m_vstrBlob;               // 0x0040
     u16* m_vstrOffsets;             // 0x0044
-    float m_performanceTotalTime;   // 0x0048
-    u8 m_performanceBlock[0x800];   // 0x004C
+    CPerformance m_performance;    // 0x0048
     char m_name[0x80];              // 0x084C
     CObject m_objectSentinel;       // 0x08CC
     CObject m_freeObjectSentinel;   // 0x0918
@@ -256,7 +264,11 @@ STATIC_ASSERT(offsetof(CFlatRuntime::CVal, m_value) == 2);
 STATIC_ASSERT(offsetof(CFlatRuntime, m_permanentVarCount) == 0x04);
 STATIC_ASSERT(offsetof(CFlatRuntime, m_permanentVarDefs) == 0x08);
 STATIC_ASSERT(offsetof(CFlatRuntime, m_permanentVarValues) == 0x0C);
-STATIC_ASSERT(offsetof(CFlatRuntime, m_performanceTotalTime) == 0x48);
-STATIC_ASSERT(offsetof(CFlatRuntime, m_performanceBlock) == 0x4C);
+STATIC_ASSERT(offsetof(CFlatRuntime, m_performance) == 0x48);
+STATIC_ASSERT(sizeof(CFlatRuntime::CPerformance) == 0x804);
+STATIC_ASSERT(offsetof(CFlatRuntime::CPerformance, m_systemFuncTime) == 0x04);
+STATIC_ASSERT(offsetof(CFlatRuntime::CPerformance, m_classSystemFuncTime) == 0x204);
+STATIC_ASSERT(offsetof(CFlatRuntime::CPerformance, m_systemFuncCount) == 0x404);
+STATIC_ASSERT(offsetof(CFlatRuntime::CPerformance, m_classSystemFuncCount) == 0x604);
 
 #endif // _FFCC_CFLAT_RUNTIME_H_

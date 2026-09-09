@@ -131,7 +131,7 @@ void CFlatRuntime::reqFinished(int, CFlatRuntime::CObject*)
  */
 void CFlatRuntime::ResetPerformance()
 {
-	memset(&m_performanceTotalTime, 0, sizeof(m_performanceTotalTime) + sizeof(m_performanceBlock));
+	memset(&m_performance, 0, sizeof(m_performance));
 }
 
 /*
@@ -158,7 +158,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			}
 			break;
 		case -2:
-			if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1298) != 0) {
+			if (m_0x1298 != 0) {
 				char* format = m_strBlob + m_strOffsets[*object->m_localBase];
 
 				if (object->m_argCount == 1) {
@@ -257,8 +257,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			watch.Start();
 			ret = onSystemFunc(object, systemKind, systemIndex, result);
 			watch.Stop();
-			*reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x4C) += watch.Get();
-			*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x44C) += 1;
+			m_performance.m_systemFuncTime[-systemIndex] += watch.Get();
+			m_performance.m_systemFuncCount[-systemIndex] += 1;
 			break;
 		}
 		}
@@ -368,8 +368,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		watch.Start();
 		ret = onClassSystemFunc(object, systemKind, systemIndex, result);
 		watch.Stop();
-		*reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x24C) += watch.Get();
-		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x64C) += 1;
+		m_performance.m_classSystemFuncTime[-systemIndex] += watch.Get();
+		m_performance.m_classSystemFuncCount[-systemIndex] += 1;
 	}
 
 done:
@@ -537,7 +537,6 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 
 	int watchdog = 100000;
 	u8* code;
-	u8* const self = reinterpret_cast<u8*>(this);
 	int systemResult;
 
 	if (object->m_waitCounter != 0) {
@@ -548,8 +547,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 	    + object->m_codeIndex.m_codeOffset;
 
 	while (true) {
-		*reinterpret_cast<u32*>(self + 0x968) = *reinterpret_cast<u32*>(self + 0x964);
-		*reinterpret_cast<u32*>(self + 0x964) = object->m_codePos;
+		m_previousCodePos = m_currentCodePos;
+		m_currentCodePos = object->m_codePos;
 
 		switch (code[0]) {
 		case 0: {
@@ -564,7 +563,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 					if ((arg & 0x10) != 0) {
 						value = object->m_thisBase + index;
 					} else {
-						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+						value = m_permanentVarValues + index;
 					}
 				} else {
 					value = object->m_localBase + index;
@@ -589,7 +588,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 						CStack offset;
 						object->m_sp--;
 						offset.m_word = *object->m_sp;
-						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + ((index + offset.m_int) * 4));
+						value = m_permanentVarValues + (index + offset.m_int);
 					}
 				} else {
 					CStack offset;
@@ -608,7 +607,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 					if ((arg & 0x10) != 0) {
 						value = object->m_thisBase + index;
 					} else {
-						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+						value = m_permanentVarValues + index;
 					}
 				} else {
 					value = object->m_localBase + index;
@@ -632,7 +631,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 					if ((arg & 0x10) != 0) {
 						value = object->m_thisBase + index;
 					} else {
-						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+						value = m_permanentVarValues + index;
 					}
 				} else {
 					value = object->m_localBase + index;
@@ -657,7 +656,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 						CStack offset;
 						object->m_sp--;
 						offset.m_word = *object->m_sp;
-						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + ((index + offset.m_int) * 4));
+						value = m_permanentVarValues + (index + offset.m_int);
 					}
 				} else {
 					CStack offset;
@@ -676,7 +675,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 					if ((arg & 0x10) != 0) {
 						value = object->m_thisBase + index;
 					} else {
-						value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x0C) + (index * 4));
+						value = m_permanentVarValues + index;
 					}
 				} else {
 					value = object->m_localBase + index;
@@ -788,7 +787,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			CFunc* func = m_funcs + (arg & 0xFFFF);
 
 			if ((static_cast<int>(arg) >> 16) >= 0) {
-				const int funcIndex = *reinterpret_cast<int*>(*reinterpret_cast<u8**>(self + 0x18) + (object->m_classIndex * 0x22C) + 0x24 + (func->m_systemIndex * 4));
+				const int funcIndex = m_classes[object->m_classIndex].m_functionTable[func->m_systemIndex];
 				if (funcIndex < 0) {
 					continue;
 				}
@@ -827,7 +826,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		case 0x0B: {
 			CObject* newObject = createObject(*reinterpret_cast<int*>(code + 1));
 			CFunc* func = m_funcs
-			              + *reinterpret_cast<int*>(*reinterpret_cast<u8**>(self + 0x18) + (newObject->m_activeClassIndex * 0x22C) + 0x24);
+			              + m_classes[newObject->m_activeClassIndex].m_functionTable[0];
 
 			for (int i = 0; i < func->m_argCount; i++) {
 				newObject->m_sp[i] = object->m_sp[i - func->m_argCount];
@@ -1114,7 +1113,7 @@ addWait:
 	}
 suspend:
 	watch.Stop();
-	*reinterpret_cast<float*>(self + 0x48) += watch.Get();
+	m_performance.m_totalTime += watch.Get();
 	return 0;
 }
 
@@ -1881,9 +1880,8 @@ CFlatRuntime::CClass::CClass()
  */
 void CFlatRuntime::clear()
 {
-	u8* const self = reinterpret_cast<u8*>(this);
 
-	*reinterpret_cast<void**>(self + 0x08) = 0;
+	m_permanentVarDefs = 0;
 	m_funcs = 0;
 	m_funcCount = 0;
 	m_classes = 0;
@@ -1917,7 +1915,7 @@ void CFlatRuntime::clear()
 		m_stackBlockPool[idx].m_next = (idx == 143) ? &m_freeStackBlocks : &m_stackBlockPool[idx + 1];
 	}
 
-	memset(&m_performanceTotalTime, 0, sizeof(m_performanceTotalTime) + sizeof(m_performanceBlock));
+	memset(&m_performance, 0, sizeof(m_performance));
 }
 
 /*
@@ -1931,7 +1929,6 @@ void CFlatRuntime::clear()
  */
 void CFlatRuntime::Destroy()
 {
-	u8* const self = reinterpret_cast<u8*>(this);
 	CObject* object = m_objectSentinel.m_next;
 
 	while (object != &m_objectSentinel) {
@@ -1953,9 +1950,8 @@ void CFlatRuntime::Destroy()
 		object = next;
 	}
 
-	void* ptr = *reinterpret_cast<void**>(self + 0x08);
-	if (ptr != 0) {
-		delete[] reinterpret_cast<u8*>(ptr);
+	if (m_permanentVarDefs != 0) {
+		delete[] m_permanentVarDefs;
 	}
 
 	for (int i = 0; i < m_funcCount; i++) {
@@ -1971,34 +1967,28 @@ void CFlatRuntime::Destroy()
 		delete[] m_classes;
 	}
 
-	ptr = m_strBlob;
-	if (ptr != 0) {
-		delete[] reinterpret_cast<u8*>(ptr);
+	if (m_strBlob != 0) {
+		delete[] m_strBlob;
 	}
 
-	ptr = m_strOffsets;
-	if (ptr != 0) {
-		delete[] reinterpret_cast<u8*>(ptr);
+	if (m_strOffsets != 0) {
+		delete[] m_strOffsets;
 	}
 
-	ptr = m_fstrBlob;
-	if (ptr != 0) {
-		delete[] reinterpret_cast<u8*>(ptr);
+	if (m_fstrBlob != 0) {
+		delete[] m_fstrBlob;
 	}
 
-	ptr = m_fstrOffsets;
-	if (ptr != 0) {
-		delete[] reinterpret_cast<u8*>(ptr);
+	if (m_fstrOffsets != 0) {
+		delete[] m_fstrOffsets;
 	}
 
-	ptr = m_vstrBlob;
-	if (ptr != 0) {
-		delete[] reinterpret_cast<u8*>(ptr);
+	if (m_vstrBlob != 0) {
+		delete[] m_vstrBlob;
 	}
 
-	ptr = m_vstrOffsets;
-	if (ptr != 0) {
-		delete[] reinterpret_cast<u8*>(ptr);
+	if (m_vstrOffsets != 0) {
+		delete[] m_vstrOffsets;
 	}
 
 	clear();

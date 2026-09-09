@@ -373,7 +373,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 		if (meshColorArrays != 0) {
 			meshColorArray = meshColorArrays[meshIdx];
 			if (meshColorArray != 0) {
-				MaterialMan.SetGeometryArraySource(meshData->m_normals);
+				MaterialMan.SetNRM(meshData->m_normals);
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
 
 				if ((step->m_changeTex.m_mode == 2) || (step->m_changeTex.m_mode == 3)) {

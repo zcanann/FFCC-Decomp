@@ -1003,8 +1003,8 @@ void pppRenderMana2(pppMana2*, pppMana2Step*, _pppCtrlTable*)
  * --INFO--
  * PAL Address: 0x80107ea4
  * PAL Size: 2556b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801072B4
+ * EN Size: 2556b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1043,8 +1043,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
 
     SetMana2ModelCallbacks(model, mana2Work, param_2);
 
-    MaterialMan.SetManaAlpha(setupBlock->m_color.rgba[3]);
-    mana2Work->m_waterAlpha = MaterialMan.GetManaAlpha();
+    unsigned char reflectionAlpha = setupBlock->m_color.rgba[3];
+    MaterialMan.SetReflectionAlpha(reflectionAlpha);
+    mana2Work->m_waterAlpha = reflectionAlpha;
 
     if (reinterpret_cast<_pppPObject*>(pppMana2)->m_graphId == 0) {
     mana2Work->m_object = gObject;

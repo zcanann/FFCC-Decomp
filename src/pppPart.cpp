@@ -1966,8 +1966,8 @@ void _pppDrawPart(_pppMngSt* pppMngSt)
  * --INFO--
  * PAL Address: 80054588
  * PAL Size: 236b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80054270
+ * EN Size: 236b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1987,11 +1987,11 @@ void pppDrawMesh(pppModelSt* model, Vec* positions, int usePartMaterial)
 	GXSetArray((GXAttr)0xB, model->m_colors, 4);
 	GXSetArray((GXAttr)0xD, model->m_uvPairs, 4);
 	GXSetArray((GXAttr)0xE, model->m_uvPairs, 4);
-	MaterialMan.SetGeometryArraySource(model->m_normals);
+	MaterialMan.SetNRM(model->m_normals);
 
 	if (usePartMaterial == 0)
 	{
-		GXSetArray((GXAttr)10, MaterialMan.GetGeometryArraySource(), 6);
+		GXSetArray((GXAttr)10, model->m_normals, 6);
 	}
 
 	model->DrawPart(ppvEnv->m_materialSetPtr, usePartMaterial);

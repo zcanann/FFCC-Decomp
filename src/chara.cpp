@@ -297,11 +297,6 @@ static inline void CopyCharaMaterialEnv()
 	MaterialMan.LockEnv();
 }
 
-static inline void SetMaterialManNormalArray(void* normals)
-{
-	MaterialMan.SetGeometryArraySource(normals);
-}
-
 static inline u32 CharaFourCC(char a, char b, char c, char d)
 {
 	return (static_cast<u32>(a) << 24) | (static_cast<u32>(b) << 16) | (static_cast<u32>(c) << 8) | static_cast<u32>(d);
@@ -1982,8 +1977,8 @@ int CChara::CModel::SearchNodeSk(char* name)
  * --INFO--
  * PAL Address: 0x8007096c
  * PAL Size: 1192b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800702D4
+ * EN Size: 1192b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2080,7 +2075,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		}
 		MaterialMan.SetObjMatrix(view, meshMtx);
 		GXSetArray((GXAttr)9, mesh->m_workPositions, 6);
-		SetMaterialManNormalArray(mesh->m_workNormals);
+		MaterialMan.SetNRM(mesh->m_workNormals);
 		GXSetArray((GXAttr)0xB, mesh->m_data->m_colors, sizeof(_GXColor));
 		GXSetArray((GXAttr)0xD, mesh->m_data->m_uvs, sizeof(S16Vec2d));
 		GXSetArray((GXAttr)0xE, mesh->m_data->m_uvs, sizeof(S16Vec2d));
@@ -2110,8 +2105,8 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
  * --INFO--
  * PAL Address: 0x80070690
  * PAL Size: 732b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8006FFF8
+ * EN Size: 732b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2153,7 +2148,7 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 		CopyCharaMaterialEnv();
 		MaterialMan.SetObjMatrix(view, meshMtx);
 		GXSetArray((GXAttr)9, mesh->m_workPositions, 6);
-		SetMaterialManNormalArray(mesh->m_workNormals);
+		MaterialMan.SetNRM(mesh->m_workNormals);
 		GXSetArray((GXAttr)0xB, mesh->m_data->m_colors, sizeof(_GXColor));
 		GXSetArray((GXAttr)0xD, mesh->m_data->m_uvs, sizeof(S16Vec2d));
 		GXSetArray((GXAttr)0xE, mesh->m_data->m_uvs, sizeof(S16Vec2d));

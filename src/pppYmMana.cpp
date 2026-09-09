@@ -1019,8 +1019,8 @@ void pppRenderYmMana(PYmMana*, pppYmManaStep*, _pppCtrlTable*)
  * --INFO--
  * PAL Address: 0x800d694c
  * PAL Size: 2804b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800D6118
+ * EN Size: 2804b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1067,7 +1067,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     if (Game.m_currentMapId == 0x21) {
         manaAlpha = (u8)(gObject->m_currentAlpha * (float)*(setupArea + 0xB));
     }
-    MaterialMan.SetManaAlpha(manaAlpha);
+    MaterialMan.SetReflectionAlpha(manaAlpha);
     mana->m_manaAlpha = manaAlpha;
 
     if (reinterpret_cast<_pppPObject*>(pppYmMana)->m_graphId == 0) {

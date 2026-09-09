@@ -3,6 +3,8 @@
 #include "ffcc/astar.h"
 #include "ffcc/baseobj.h"
 #include "ffcc/cflat_data.h"
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
 #include "ffcc/color.h"
 #include "ffcc/game.h"
 #include "ffcc/goout.h"
@@ -79,12 +81,6 @@ STATIC_ASSERT(sizeof(m_objMon) == sizeof(CGMonObj) * kFlatMonObjCount);
 
 int gCFlatRuntime2DebugDrawOverflowFrame = 0;
 char gCFlatRuntime2DebugDrawOverflowInit = 0;
-static const char sCFlatRuntime2GbaStringBlock[] =
-	"dvd/gba/\0\0\0\0"
-	"ffcc_cli.bin\0\0\0\0"
-	"objdat.spt\0\0"
-	"icon.dat\0\0\0\0"
-	"FF Crystal Chronicles\0\0";
 static const float sCFlatRuntime2ForwardVec[] = { 0.0f, 0.0f, 1.0f };
 static const char sCFlatRuntime2LayerMissingMsg[] =
 	"layer\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42%s\n";

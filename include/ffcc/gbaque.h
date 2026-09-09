@@ -280,20 +280,20 @@ private:
     char m_chgRadarMode;              // 0x2D42
     unsigned char _pad2D43;           // 0x2D43
     GbaQueueHitInfo m_hitInfo[4];      // 0x2D44
-    unsigned char m_chgHitFlags;      // 0x2D54
-    unsigned char m_chgScouFlags;     // 0x2D55
+    char m_chgHitFlags;               // 0x2D54
+    char m_chgScouFlags;              // 0x2D55
     char m_singleMode;                // 0x2D56
     char m_controllerMode;            // 0x2D57
     unsigned char _pad2D58;           // 0x2D58
     unsigned char m_prevOutOfShoukiFlags; // 0x2D59
     unsigned char m_outOfShoukiFlags;     // 0x2D5A
     char m_pauseMode;                 // 0x2D5B
-    unsigned char m_spModeBits;       // 0x2D5C
-    unsigned char m_spModeFlags;      // 0x2D5D
-    unsigned char m_memorysFlags;     // 0x2D5E
+    char m_spModeBits;                // 0x2D5C
+    char m_spModeFlags;               // 0x2D5D
+    char m_memorysFlags;              // 0x2D5E
     char m_cmdNumFlags;               // 0x2D5F
-    unsigned char m_playModeFlags;    // 0x2D60
-    unsigned char m_startBonusFlags;  // 0x2D61
+    char m_playModeFlags;             // 0x2D60
+    char m_startBonusFlags;           // 0x2D61
     unsigned char _pad2D62[0x2];      // 0x2D62
 };
 

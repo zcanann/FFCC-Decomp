@@ -1,5 +1,7 @@
 #include "ffcc/combi.h"
 #include "ffcc/game.h"
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
 
 #include "ffcc/ptrarray.h"
 #include "ffcc/partyobj.h"

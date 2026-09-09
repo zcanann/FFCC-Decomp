@@ -314,8 +314,8 @@ void pppConstructEmission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
  * --INFO--
  * PAL Address: 0x800E65F4
  * PAL Size: 1216b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800E5DC0
+ * EN Size: 1216b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -360,7 +360,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     if (step->m_emission.m_texGenMode == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
-                        PSMTXCopy(MaterialMan.GetObjTextureMtx(), texMtx0);
+                        MaterialMan.GetModelViewITMtx(texMtx0);
                         GXLoadTexMtxImm(texMtx0, 0x1E, GX_MTX3x4);
                         if (step->m_emission.m_texGenMode == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
@@ -397,7 +397,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     if (step->m_emission.m_texGenMode == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
-                        PSMTXCopy(MaterialMan.GetObjTextureMtx(), texMtx1);
+                        MaterialMan.GetModelViewITMtx(texMtx1);
                         GXLoadTexMtxImm(texMtx1, 0x1E, GX_MTX3x4);
                         if (step->m_emission.m_texGenMode == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);

@@ -433,13 +433,13 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
 
         int lightIdMask = 1 << m_loadedLightCount;
         GXLoadLightObjImm(&m_mapLightObj, (GXLightID)lightIdMask);
-        MaterialMan.SetBlendOverrideMode(0);
+        MaterialMan.SetForceBlendAlpha(0);
         GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)1, (GXColorSrc)0, m_loadedLightMask, (GXDiffuseFn)2,
                       (GXAttnFn)1);
         GXSetChanCtrl((GXChannelID)2, (u8)1, (GXColorSrc)0, (GXColorSrc)1, lightIdMask, (GXDiffuseFn)0, (GXAttnFn)1);
         m_loadedLightCount += 1;
     } else {
-        MaterialMan.SetBlendOverrideMode(ambColor.a);
+        MaterialMan.SetForceBlendAlpha(ambColor.a);
         GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)1, (GXColorSrc)0, m_loadedLightMask, (GXDiffuseFn)2,
                       (GXAttnFn)1);
         if (ambColor.a == 0xFF) {

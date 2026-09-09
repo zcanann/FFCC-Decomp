@@ -10,6 +10,7 @@
 #include "ffcc/ref.h"
 
 #include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
 class CChunkFile;
 class CMaterial;
@@ -157,29 +158,21 @@ public:
         m_manaParaboloidTexObj0 = 0;
         m_manaParaboloidTexObj1 = 0;
     }
-    void SetManaAlpha(unsigned char alpha)
+    void SetReflectionAlpha(unsigned char alpha)
     {
-        m_manaAlpha = alpha;
+        m_reflectionAlpha = alpha;
     }
-    void SetBlendOverrideMode(unsigned char mode)
+    void SetForceBlendAlpha(unsigned char alpha)
     {
-        m_blendOverrideMode = mode;
+        m_forceBlendAlpha = alpha;
     }
-    unsigned char GetManaAlpha()
+    void SetNRM(S16Vec* normals)
     {
-        return m_manaAlpha;
+        m_normals = normals;
     }
-    void SetGeometryArraySource(void* arraySource)
+    void GetModelViewITMtx(Mtx mtx)
     {
-        m_geometryArraySource = arraySource;
-    }
-    void* GetGeometryArraySource()
-    {
-        return m_geometryArraySource;
-    }
-    float (*GetObjTextureMtx()) [4]
-    {
-        return m_objTextureMtx;
+        PSMTXCopy(m_modelViewITMtx, mtx);
     }
     /*
      * --INFO--
@@ -195,7 +188,7 @@ public:
         m_manaParaboloidTexObj0 = texObj;
     }
 private:
-    void* m_geometryArraySource;        // 0x04
+    S16Vec* m_normals;                  // 0x04
     Vec* m_manaReflectionVec;           // 0x08
     _GXTexObj* m_underWaterTexture;      // 0x0C
     Mtx m_underWaterTexMtx;              // 0x10
@@ -216,9 +209,9 @@ private:
     unsigned char m_pad0D4[0x08];
     _GXTexObj* m_manaParaboloidTexObj1;  // 0xDC
     unsigned char m_pad0E0[0x04];
-    unsigned char m_manaAlpha;           // 0xE4
+    unsigned char m_reflectionAlpha;    // 0xE4
     unsigned char m_pad0E5[0x03];
-    Mtx m_objTextureMtx;                  // 0xE8
+    Mtx m_modelViewITMtx;               // 0xE8
     unsigned char m_pad118[0x04];
     int m_texMapIdCur;                   // 0x11C
     int m_texMtxCur;                     // 0x120
@@ -250,7 +243,7 @@ private:
     unsigned char m_fullShadowTevColor;  // 0x204
     unsigned char m_blendMode;           // 0x205
     unsigned char m_fogEnable;           // 0x206
-    unsigned char m_blendOverrideMode;   // 0x207
+    unsigned char m_forceBlendAlpha;     // 0x207
     unsigned char m_shadowKColorMask;    // 0x208
     unsigned char m_shadowKColorIds[5];  // 0x209
     unsigned char m_shadowIndices[5];    // 0x20E

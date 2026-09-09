@@ -268,6 +268,8 @@ struct pppCacheChunk
     long* m_pdt;      // 0x4
 }; // Size 0x8
 
+struct pppShapeGroupRaw;
+
 struct _pppDataHead
 {
     unsigned int m_version;           // 0x0
@@ -280,7 +282,7 @@ struct _pppDataHead
     unsigned int m_cacheChunks;       // 0x10
     unsigned int m_modelNames;        // 0x14
     unsigned int m_shapeNames;        // 0x18
-    unsigned int m_shapeGroups;       // 0x1c
+    pppShapeGroupRaw* m_shapeGroups;  // 0x1c
 }; // Size 0x20
 
 struct pppIVECTOR3
@@ -321,9 +323,9 @@ typedef int _pppFieldParticleData_size_mismatch[(sizeof(_pppFieldParticleData) =
 
 struct pppShapeGroupRaw
 {
-    s16 m_groupId;     // 0x0
-    s16 m_shapeCount;  // 0x2
-    s16* m_shapeList;  // 0x4
+    s16 m_meshIndex;       // 0x0
+    s16 m_vertexCount;     // 0x2
+    u16* m_vertexIndices;  // 0x4
 }; // Size 0x8
 
 struct pppIVECTOR4
@@ -536,14 +538,17 @@ public:
 
     int m_editProgramCount;             // 0x00
     int m_editParticleCount;            // 0x04
-    unsigned char m_unk8[8];
+    unsigned char m_unk8[4];
+    int m_editCursorEnabled;            // 0x0C
     int m_cursorRequest;                // 0x10
     unsigned char m_unk14[4];
     Vec m_editorCursorPosition;          // 0x18
     unsigned char m_unk24[4];
     int m_editorCursorX;                // 0x28
     int m_editorCursorY;                // 0x2C
-    unsigned char m_unk30[0x1C8 - 0x30];
+    unsigned char m_unk30[0x174 - 0x30];
+    int m_editDrawMode;                 // 0x174
+    unsigned char m_unk178[0x1C8 - 0x178];
     unsigned char* m_editNodeNameBuffer;  // 0x1C8
     unsigned char* m_editReceiveCursor; // 0x1CC
     unsigned char m_unk1D0[4];

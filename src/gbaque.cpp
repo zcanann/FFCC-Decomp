@@ -6,6 +6,7 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/itemobj.h"
 #include "ffcc/joybus.h"
+#include "ffcc/joybusconst.h"
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"
 #include "ffcc/mes.h"
@@ -117,20 +118,14 @@ static inline unsigned int SwapU32Value(unsigned int value)
 	return (value << 24) | ((value >> 8) & 0xFF00) | ((value << 8) & 0xFF0000) | (value >> 24);
 }
 
-// First objects in gbaque.o's .rodata (0x801DB2E0).  They anchor the rodata
-// pool base used by MakeLetterList and friends; the letter item tables are the
-// FFFF-terminated {type,variant} pair lists shipped to the GBA client.
-__declspec(section ".rodata") static const char s_gba_dvd_dir[] = "dvd/gba/";
-__declspec(section ".rodata") static const char s_gba_ffcc_cli_bin[] = "ffcc_cli.bin";
-__declspec(section ".rodata") static const char s_gba_objdat_spt[] = "objdat.spt";
-__declspec(section ".rodata") static const char s_gba_icon_dat[] = "icon.dat";
-__declspec(section ".rodata") static const char s_gba_game_title[] = "FF Crystal Chronicles";
-__declspec(section ".rodata") static const unsigned short sGbaLetterItemTable0[] = {
+static const char s_gba_icon_dat[] = "icon.dat";
+static const char s_gba_game_title[] = "FF Crystal Chronicles";
+static const unsigned short sGbaLetterItemTable0[] = {
 	0x0100, 0x0101, 0x0102, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800,
 	0x0900, 0x0A00, 0x0B00, 0x0B01, 0x0C00, 0x0D00, 0x2000, 0x2001,
 	0x2002, 0x2003, 0x2004, 0x2100, 0xFFFF,
 };
-__declspec(section ".rodata") static const unsigned short sGbaLetterItemTable1[] = {
+static const unsigned short sGbaLetterItemTable1[] = {
 	0x0100, 0x0102, 0x0C00, 0x0D00, 0x2000, 0x2001, 0x2002, 0x2003,
 	0x2004, 0x2100, 0xFFFF,
 };

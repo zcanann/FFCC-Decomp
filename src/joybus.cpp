@@ -1,4 +1,5 @@
 #include "ffcc/joybus.h"
+#include "ffcc/joybusconst.h"
 
 #include "ffcc/file.h"
 #include "ffcc/gbaque.h"
@@ -22,9 +23,6 @@ JoyBus Joybus;
 
 int gJoyBusThreadExitValue = 0;
 
-static const char s_dvd_gba_dir[] = "dvd/gba/";
-static const char s_ffcc_cli_bin[] = "ffcc_cli.bin";
-static const char s_objdat_spt[] = "objdat.spt";
 static const char s_icon_dat[] = "icon.dat";
 static const char s_game_name[] = "FF Crystal Chronicles";
 
@@ -122,10 +120,6 @@ static const char s_map_filename_fmt[] = "m%02d_%d.mcd";
 static const char s_mem_alloc_error_fmt[] = "%s(%d): Error: memory allocation error\n";
 
 namespace JoyBusConst {
-static char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
-static char* CLIENT_FILE = const_cast<char*>(s_ffcc_cli_bin);
-static char* OBJ_FILE = const_cast<char*>(s_objdat_spt);
-static char* ICON_FILE = const_cast<char*>(s_icon_dat);
 extern const unsigned int CTRL_GBA;
 extern const unsigned int JOY_CODE_MASK;
 }

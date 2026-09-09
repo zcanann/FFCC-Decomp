@@ -1,6 +1,7 @@
 #include "ffcc/p_minigame.h"
 #include "global.h"
 #include "ffcc/joybus.h"
+#include "ffcc/joybusconst.h"
 #include "ffcc/file.h"
 #include "ffcc/game.h"
 #include "ffcc/linkage.h"
@@ -43,9 +44,6 @@ inline CMiniGamePcs::CMiniGamePcs()
     STATIC_ASSERT(sizeof(CMiniGamePcs) == 0x64A0);
 }
 
-extern const char sMiniGameGbaDvdDir[] = "dvd/gba/";
-extern const char sMiniGameClientBinaryName[] = "ffcc_cli.bin";
-extern const char sMiniGameObjDataScriptName[] = "objdat.spt";
 extern const char sMiniGamePcsGameProcessName[] = "CMiniGamePcs(GAME)";
 extern const char sMiniGamePcsProcessName[] = "CMiniGamePcs";
 extern const char sMiniGameManagerClassName[] = "CManager";

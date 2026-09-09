@@ -400,13 +400,7 @@ void CGraphic::BeginFrame()
     GXInvalidateVtxCache();
     GXInvalidateTexAll();
 
-    const bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    u16 buttons;
-    if (useDebugPad) {
-        buttons = 0;
-    } else {
-        buttons = Pad.GetPadInputs()[0].lockedButton[1];
-    }
+    u16 buttons = Pad.GetDebugButtonDown(0);
 
     if ((buttons & 2) != 0) {
         m_debugStringVisible = !m_debugStringVisible;

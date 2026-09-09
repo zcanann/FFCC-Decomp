@@ -1475,16 +1475,10 @@ void CCameraPcs::calc()
     Mtx worldMapMtx;
     Vec up;
 
-    bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    unsigned short buttons;
-    if (useDebugPad) {
-        buttons = 0;
-    } else {
-        buttons = CameraPadInput(0).lockedButton[1];
-    }
+    unsigned short buttons = Pad.GetDebugButtonDown(0);
 
     if ((buttons & 0x20) != 0) {
-        m_isAbsolute = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(m_isAbsolute))) >> 5) & 0xFF;
+        m_isAbsolute = !m_isAbsolute;
     }
 
     if (m_isAbsolute == 0) {

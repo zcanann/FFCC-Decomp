@@ -486,29 +486,10 @@ void CMemory::Quit()
  */
 void CMemory::Frame()
 {
-    bool activeInput;
-    unsigned short trigger;
-
-    activeInput = false;
-    if (Pad.m_debugPadLock == 0) {
-        if (Pad.m_debugPadPort == -1) {
-            goto frame_input_done;
-        }
-    }
-    activeInput = true;
-
-frame_input_done:
-
-    if (activeInput) {
-        trigger = 0;
-    } else {
-        int port = 0;
-        trigger = Pad.GetPadInputs()[(Pad.m_debugPadPort == 0) ? 0 : port].lockedButton[1];
-    }
+    unsigned short trigger = Pad.GetDebugButtonDown(0);
 
     if ((trigger & 0x200) != 0) {
-        unsigned int showHeap = static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(m_heapWalkerVisible)));
-        m_heapWalkerVisible = static_cast<int>((showHeap >> 5) & 0xFF);
+        m_heapWalkerVisible = !m_heapWalkerVisible;
     }
 }
 

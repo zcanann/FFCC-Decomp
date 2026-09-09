@@ -510,7 +510,7 @@ config.libs = [
                 "chara_anim.cpp",
                 extra_cflags=["-RTTI on", "-str reuse,readonly"],
             ),
-            Object(NonMatching, "chara_fur.cpp", extra_cflags=["-str reuse,nopool,readonly", "-inline auto,deferred"]),
+            Object(NonMatching, "chara_fur.cpp", extra_cflags=["-str reuse,nopool,readonly"]),
             Object(NonMatching, "chara.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "charaobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "chunkfile.cpp"),

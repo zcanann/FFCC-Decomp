@@ -1554,7 +1554,7 @@ partyobj.cpp:
 	.data       start:0x80211958 end:0x80211D88
 	.bss        start:0x803001D8 end:0x80300268
 	.sdata      start:0x8032E9A0 end:0x8032E9D0
-	.sbss       start:0x8032EE78 end:0x8032EE88
+	.sbss       start:0x8032EE70 end:0x8032EE88
 	.sdata2     start:0x80331A58 end:0x80331B10
 
 p_mc.cpp:

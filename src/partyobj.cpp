@@ -81,12 +81,6 @@ extern const float FLOAT_80331b00 = 1.1f;
 extern const float FLOAT_80331b04 = 1.2f;
 extern const float FLOAT_80331b08 = 1.25f;
 extern const char lbl_80331B0C[] = "%d\n";
-float FLOAT_8032EE78;
-float FLOAT_8032EE7C;
-float FLOAT_8032EE80;
-float FLOAT_8032EE84;
-extern int s_partyObjCreated_8032EE70;
-extern char s_partyObjCreatedInit_8032EE74;
 
 GhostPartyWork CGPartyObj::m_ghostWork;
 
@@ -404,10 +398,10 @@ int CATEGOLY2TYPE(int value)
 
 /*
  * --INFO--
- * PAL Address: 0x801248a4
+ * PAL Address: 0x801248A4
  * PAL Size: 244b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80123BD4
+ * EN Size: 244b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -440,13 +434,9 @@ void CGPartyObj::onCreate()
 	party.unk6C0 = -1;
 	party.commandMode = 0;
 
-	if (s_partyObjCreatedInit_8032EE74 == 0) {
-		s_partyObjCreated_8032EE70 = 0;
-		s_partyObjCreatedInit_8032EE74 = 1;
-	}
-
-	if (s_partyObjCreated_8032EE70 == 0) {
-		s_partyObjCreated_8032EE70 = 1;
+	static int q = 0;
+	if (q == 0) {
+		q = 1;
 	}
 }
 
@@ -1872,18 +1862,20 @@ void CGPartyObj::onFrameStat()
 		    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
 		    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 		    reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0) {
-			unsigned int chalice = Game.unk_flat3_0xc7d0;
+			static float d;
+			static float h;
+			CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
 			if (m_stateFrame == 0) {
 				CancelMove(1);
-				FLOAT_8032EE78 = m_targetDist - FLOAT_80331ac4;
-				FLOAT_8032EE7C = *reinterpret_cast<float*>(chalice + 0x160) - m_worldPosition.y;
+				d = m_targetDist - FLOAT_80331ac4;
+				h = chalice->m_worldPosition.y - m_worldPosition.y;
 			}
 
 			if (m_stateFrame <= 0x0B) {
 				const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
-				m_extraMoveVec.x = FLOAT_8032EE78 * (phase * sinf(m_rotBaseY));
-				m_extraMoveVec.z = FLOAT_8032EE78 * (phase * cosf(m_rotBaseY));
-				m_extraMoveVec.y = FLOAT_8032EE7C * phase + FLOAT_80331A98;
+				m_extraMoveVec.x = d * (phase * sinf(m_rotBaseY));
+				m_extraMoveVec.z = d * (phase * cosf(m_rotBaseY));
+				m_extraMoveVec.y = h * phase + FLOAT_80331A98;
 			}
 		}
 		if (m_stateFrame == 0) {
@@ -3300,18 +3292,20 @@ void CGPartyObj::statPut()
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
 	    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 	    reinterpret_cast<int*>(m_scriptHandle)[0xED] != 0) {
-		unsigned int chalice = Game.unk_flat3_0xc7d0;
+		static float d;
+		static float h;
+		CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
 		if (m_stateFrame == 0) {
 			CancelMove(1);
-			FLOAT_8032EE80 = FLOAT_80331AB0;
-			FLOAT_8032EE84 = *reinterpret_cast<float*>(chalice + 0x160) - m_worldPosition.y;
+			d = FLOAT_80331AB0;
+			h = chalice->m_worldPosition.y - m_worldPosition.y;
 		}
 
 		if (m_stateFrame <= 0x0B) {
 			const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
-			m_extraMoveVec.x = FLOAT_8032EE80 * (phase * sinf(m_rotBaseY));
-			m_extraMoveVec.z = FLOAT_8032EE80 * (phase * cosf(m_rotBaseY));
-			m_extraMoveVec.y = FLOAT_8032EE84 * phase + FLOAT_80331A98;
+			m_extraMoveVec.x = d * (phase * sinf(m_rotBaseY));
+			m_extraMoveVec.z = d * (phase * cosf(m_rotBaseY));
+			m_extraMoveVec.y = h * phase + FLOAT_80331A98;
 		}
 	}
 

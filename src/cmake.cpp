@@ -15,9 +15,7 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" char* strcat(char*, const char*);
-
-extern "C" int gCmakePreviousStep;
+static int s_OldMenu;
 extern "C" char s_menuSubfontPathFmt[];
 static const char s_cmake_cpp[] = "cmake.cpp";
 
@@ -2342,7 +2340,7 @@ void CMenuPcs::CmakeNameDraw()
         0, 192.0f, 56.0f, 416.0f, 264.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    if ((gCmakePreviousStep == 2) && (CmakeState(this)->m_mode == 0)) {
+    if ((s_OldMenu == 2) && (CmakeState(this)->m_mode == 0)) {
         DrawNamePreviewChara(this, 1.0f, 0xFF);
         DrawCmakeTitle(1, alpha, 1.0f);
     } else if ((CmakeState(this)->m_mode != 2) ||
@@ -2782,7 +2780,7 @@ void CMenuPcs::CmakeCtrl()
         return;
     }
 
-    gCmakePreviousStep = static_cast<int>(step);
+    s_OldMenu = static_cast<int>(step);
 
     if (step == 6) {
         step = static_cast<short>(state->m_select + 1);
@@ -3521,7 +3519,7 @@ void CMenuPcs::DrawSingCMake()
         goto resetFrame;
     }
 
-    gCmakePreviousStep = static_cast<int>(CmakeState(this)->m_step);
+    s_OldMenu = static_cast<int>(CmakeState(this)->m_step);
 
     if (CmakeState(this)->m_step == 6) {
         CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_select + 1);
@@ -3574,7 +3572,7 @@ void CMenuPcs::CalcSingCMake()
         memset(&s_CmakeInfo, 0, sizeof(s_CmakeInfo));
         CmakeState(this)->m_initialized = 1;
         CmakeState(this)->m_selectionInitialized = 0;
-        gCmakePreviousStep = -1;
+        s_OldMenu = -1;
         CmakeMcState(this) = 3;
     }
 

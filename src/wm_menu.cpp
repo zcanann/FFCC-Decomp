@@ -39,7 +39,6 @@
 #include "ffcc/fontman.h"
 
 extern "C" char* strstr(const char*, const char*);
-extern "C" char* strcat(char*, const char*);
 
 extern const char lbl_80331208[5];
 

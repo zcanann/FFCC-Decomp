@@ -17,6 +17,7 @@ char* strchr(const char* str, int c);
 int strncmp(const char* str1, const char* str2, size_t n);
 int strcmp(const char* str1, const char* str2);
 int memcmp(const void* ptr1, const void* ptr2, size_t n);
+char* strcat(char* dst, const char* src);
 char* strncat(char* dst, const char* src, size_t n);
 char* strncpy(char* dst, const char* src, size_t n);
 char* strcpy(char* dst, const char* src);
@@ -26,7 +27,5 @@ char* strtok(char* str, const char* delim);
 #ifdef __cplusplus
 }
 #endif
-
-char* strcat(char* dst, const char* src, size_t n);
 
 #endif

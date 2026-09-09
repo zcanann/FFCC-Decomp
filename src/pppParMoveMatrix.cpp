@@ -1,20 +1,11 @@
 #include "ffcc/pppParMoveMatrix.h"
 #include "ffcc/pppPart.h"
-#include "ffcc/ppp_constants.h"
 
 #include <dolphin/mtx.h>
 
-extern const float gPppParMoveMatrixZero = 0.0f;
-extern const float gPppParMoveMatrixOne = 1.0f;
-
-static inline float LoadFloat(const float& value)
-{
-	return value;
-}
-
 /*
  * --INFO--
- * PAL Address: 0x800e092c
+ * PAL Address: 0x800D467C
  * PAL Size: 428b
  * EN Address: TODO
  * EN Size: TODO
@@ -38,21 +29,21 @@ void pppParMoveMatrix(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrl
 	Vec* position = &pppMngSt->m_position;
 	PSVECSubtract(previousPosition, position, &local_44);
 	
-	f32 initialZero = LoadFloat(gPppParMoveMatrixZero);
+	f32 initialZero = 0.0f;
 	if (((initialZero != local_44.x) || (initialZero != local_44.y)) || (initialZero != local_44.z)) {
 		PSVECNormalize(&local_44, &local_68);
 		local_50.x = local_68.z;
-		local_50.y = LoadFloat(gPppParMoveMatrixZero);
+		local_50.y = 0.0f;
 		local_50.z = -local_68.x;
-		f32 zero = LoadFloat(gPppParMoveMatrixZero);
+		f32 zero = 0.0f;
 		f32 axisZ = local_68.z;
 		if ((zero == axisZ) && (zero == local_50.z)) {
-			local_50.y = LoadFloat(gPppParMoveMatrixZero);
-			local_50.x = LoadFloat(gPppParMoveMatrixOne);
-			local_50.z = LoadFloat(gPppParMoveMatrixZero);
-			local_5c.x = LoadFloat(gPppParMoveMatrixZero);
-			local_5c.y = LoadFloat(gPppParMoveMatrixZero);
-			local_5c.z = LoadFloat(gPppParMoveMatrixOne);
+			local_50.y = 0.0f;
+			local_50.x = 1.0f;
+			local_50.z = 0.0f;
+			local_5c.x = 0.0f;
+			local_5c.y = 0.0f;
+			local_5c.z = 1.0f;
 		}
 		else {
 			PSVECNormalize(&local_50, &local_50);

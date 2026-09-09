@@ -3,9 +3,6 @@
 
 extern float ppvSinTbl[];
 
-extern const float gPppParMoveMatrixZero;
-extern const float gPppParMoveMatrixOne;
-
 extern float gPppYmLookOnZero;
 extern float gPppYmLookOnOne;
 

@@ -664,7 +664,7 @@ config.libs = [
             Object(NonMatching, "pppMiasma.cpp"),
             Object(Matching, "pppMove.cpp"),
             Object(Matching, "pppParHitSph.cpp"),
-            Object(Matching, "pppParHitSphMat.cpp"),
+            Object(NonMatching, "pppParHitSphMat.cpp"),
             Object(Matching, "pppParMatrix.cpp"),
             Object(Matching, "pppParMoveLine.cpp"),
             Object(Matching, "pppParMoveMatrix.cpp", cflags=cflags_game_cpp_exceptions),

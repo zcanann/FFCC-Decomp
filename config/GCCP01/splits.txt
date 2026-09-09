@@ -1699,6 +1699,7 @@ pppParHitSphMat.cpp:
 	extab       start:0x80009B94 end:0x80009B9C
 	extabindex  start:0x80010E28 end:0x80010E34
 	.text       start:0x8014139C end:0x80141550
+	.sdata2     start:0x80332080 end:0x80332084
 
 astar.cpp:
 	extab       start:0x80009B9C end:0x80009BFC

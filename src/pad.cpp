@@ -123,16 +123,16 @@ void CPad::Frame()
 		switch (padStatus[port].err) {
 		case PAD_ERR_NONE:
 		case PAD_ERR_NOT_READY:
-			_1a8_4_ |= mask;
+			m_padConnectedMask |= mask;
 			break;
 		case PAD_ERR_NO_CONTROLLER:
 			if (static_cast<u8>(Joybus.GBAReady(port)) == 0) {
 				resetMask |= mask;
 			}
-			_1a8_4_ &= ~mask;
+			m_padConnectedMask &= ~mask;
 			break;
 		case PAD_ERR_TRANSFER:
-			_1a8_4_ &= ~mask;
+			m_padConnectedMask &= ~mask;
 			break;
 		}
 	}
@@ -433,7 +433,7 @@ void CPad::Quit()
 		m_replayBuffer = 0;
 	}
 
-	CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(_1ac_4_);
+	CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(m_replayStage);
 	if (stage != 0)
 	{
 		Memory.DestroyStage(stage);
@@ -457,8 +457,8 @@ void CPad::Init()
 
 	PADInit();
 	memset(m_padInputs, 0, sizeof(m_padInputs));
-	_1a8_4_ = 0;
-	_1ac_4_ = 0;
+	m_padConnectedMask = 0;
+	m_replayStage = 0;
 	m_replayBuffer = 0;
 	m_replayFrame = 0;
 	m_debugPadPort = 0xFFFFFFFF;
@@ -466,12 +466,12 @@ void CPad::Init()
 
 	if (System.IsGdev())
 	{
-		_1ac_4_ = Memory.CreateStage(0x800000, const_cast<char*>(s_CPad), 1);
-		if (_1ac_4_ != 0)
+		m_replayStage = Memory.CreateStage(0x800000, const_cast<char*>(s_CPad), 1);
+		if (m_replayStage != 0)
 		{
-			m_replayBuffer = reinterpret_cast<ReplayBuffer*>(new (reinterpret_cast<CMemory::CStage*>(_1ac_4_), "pad.cpp", 0x54)
+			m_replayBuffer = reinterpret_cast<ReplayBuffer*>(new (reinterpret_cast<CMemory::CStage*>(m_replayStage), "pad.cpp", 0x54)
 				unsigned char[sizeof(ReplayBuffer)]);
-			if ((_1b4_4_ != 0) && ((fp = fopen(s_replay_dat, "rb")) != 0))
+			if ((m_replayPlayback != 0) && ((fp = fopen(s_replay_dat, "rb")) != 0))
 			{
 				fseek(fp, 0, 2);
 				size = ftell(fp);

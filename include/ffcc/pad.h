@@ -63,21 +63,10 @@ public:
         ReplayFrame frames[0x1A5E0];
     };
 
-    struct PadInputRawView
-    {
-        short _4_2_;
-        short _6_2_;
-        short _8_2_;
-        short _a_2_;
-        unsigned char _c_1_[0x14];
-        short _20_2_;
-        unsigned char _22_1_[0x186];
-    };
-
     CPad()
     {
-        _1b4_4_ = 0;
-        _1b8_4_ = 0;
+        m_replayPlayback = 0;
+        m_replayWrite = 0;
     }
 
     void Init();
@@ -135,31 +124,16 @@ public:
     const PadInput* GetPadInputs() const { return m_padInputs; }
     PadInput* GetMergedPad() { return &GetPadInputs()[4]; }
     const PadInput* GetMergedPad() const { return &GetPadInputs()[4]; }
-    union {
-        PadInput m_padInputs[5];
-        PadInputRawView m_padInputsRaw;
-    };
-    unsigned int _1a8_4_;
-    void* _1ac_4_;
-    ReplayBuffer* m_replayBuffer;
-    int _1b4_4_;
-    int _1b8_4_;
-    int m_replayFrame;
-    union {
-        unsigned int _1c0_4_;
-        int _448_4_;
-        int m_debugPadPort;
-    };
-    union {
-        unsigned int _1c4_4_;
-        int _452_4_;
-        int m_debugPadLock;
-    };
-    union {
-        int _1c8_4_;
-        int _456_4_;
-        int m_stickDigitalThreshold;
-    };
+    PadInput m_padInputs[5];         // [0..3] per port, [4] = merged
+    unsigned int m_padConnectedMask; // one high bit per port; set on PAD_ERR_NONE/NOT_READY, cleared on NO_CONTROLLER/TRANSFER
+    void* m_replayStage;             // CMemory::CStage* backing the replay buffer (gdev only)
+    ReplayBuffer* m_replayBuffer;    // 0 when replay is disabled
+    int m_replayPlayback;            // set by -r: play back /replay.dat instead of recording
+    int m_replayWrite;               // set by -w
+    int m_replayFrame;               // playback frame index; < 0 disables the replay path
+    int m_debugPadPort;
+    int m_debugPadLock;
+    int m_stickDigitalThreshold;
 };
 
 typedef char CPad_PadInput_size_check[(sizeof(CPad::PadInput) == 0x54) ? 1 : -1];

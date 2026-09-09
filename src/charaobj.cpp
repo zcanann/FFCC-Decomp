@@ -2675,7 +2675,6 @@ void CGCharaObj::setSta(int staIndex, int value)
 void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 {
 	int particleOffset = 0;
-	int particleBank;
 	int particleSpec;
 	unsigned short particleFlags;
 	unsigned short seSpec;
@@ -2685,7 +2684,7 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 	}
 
 	SCharaItemRow* items = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
-	particleBank = items[itemId].m_particleBank;
+	int particleBank = items[itemId].m_particleBank;
 	if (particleBank != 0xFFFF && particleBank != 0xFF) {
 		if (particleBank == 0xFE) {
 			particleBank = sourceObj->m_charaModelHandle->GetPdtSlot();

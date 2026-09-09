@@ -767,35 +767,7 @@ void CMenuPcs::loadData()
 	m_wm.m_frameData =
 	    new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x22B) WmFrameData;
 	memset(m_wm.m_frameData, 0, sizeof(WmFrameData));
-	{
-		int frameBounds[5][4] = {
-			{0, 0, 128, 160},
-			{128, 0, 120, 64},
-			{608, 248, 32, 64},
-			{568, 312, 64, 56},
-			{416, 368, 200, 80},
-		};
-		float frameUV[5][2] = {
-			{0.0f, 0.0f},
-			{128.0f, 0.0f},
-			{256.0f, 0.0f},
-			{216.0f, 64.0f},
-			{64.0f, 120.0f},
-		};
-		const float oneF = FLOAT_803313e8;
-
-		for (int i = 0; i < 5; i++) {
-			m_wm.m_frameData->m_frameSprites[i].m_x = static_cast<short>(frameBounds[i][0]);
-			m_wm.m_frameData->m_frameSprites[i].m_y = static_cast<short>(frameBounds[i][1]);
-			m_wm.m_frameData->m_frameSprites[i].m_width = static_cast<short>(frameBounds[i][2]);
-			m_wm.m_frameData->m_frameSprites[i].m_height = static_cast<short>(frameBounds[i][3]);
-			m_wm.m_frameData->m_frameSprites[i].m_u = frameUV[i][0];
-			m_wm.m_frameData->m_frameSprites[i].m_v = frameUV[i][1];
-			m_wm.m_frameData->m_frameSprites[i].m_alpha = oneF;
-			m_wm.m_frameData->m_frameSprites[i].m_scale = oneF;
-			m_wm.m_frameData->m_frameSprites[i].m_flags = 0;
-		}
-	}
+	InitFrameInfo();
 
 	m_wm.m_frameInfo =
 	    new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x231) WmFrameInfo;
@@ -1070,11 +1042,32 @@ void CMenuPcs::loadData()
  */
 inline void CMenuPcs::InitFrameInfo()
 {
-	WmFrameInfo* const frame = m_wm.m_frameInfo;
-	if (frame != 0) {
-		memset(frame, 0, sizeof(WmFrameInfo));
+	int frameBounds[5][4] = {
+		{0, 0, 128, 160},
+		{128, 0, 120, 64},
+		{608, 248, 32, 64},
+		{568, 312, 64, 56},
+		{416, 368, 200, 80},
+	};
+	float frameUV[5][2] = {
+		{0.0f, 0.0f},
+		{128.0f, 0.0f},
+		{256.0f, 0.0f},
+		{216.0f, 64.0f},
+		{64.0f, 120.0f},
+	};
+
+	for (int i = 0; i < 5; i++) {
+		m_wm.m_frameData->m_frameSprites[i].m_x = static_cast<short>(frameBounds[i][0]);
+		m_wm.m_frameData->m_frameSprites[i].m_y = static_cast<short>(frameBounds[i][1]);
+		m_wm.m_frameData->m_frameSprites[i].m_width = static_cast<short>(frameBounds[i][2]);
+		m_wm.m_frameData->m_frameSprites[i].m_height = static_cast<short>(frameBounds[i][3]);
+		m_wm.m_frameData->m_frameSprites[i].m_u = frameUV[i][0];
+		m_wm.m_frameData->m_frameSprites[i].m_v = frameUV[i][1];
+		m_wm.m_frameData->m_frameSprites[i].m_alpha = 1.0f;
+		m_wm.m_frameData->m_frameSprites[i].m_scale = 1.0f;
+		m_wm.m_frameData->m_frameSprites[i].m_flags = 0;
 	}
-	InitFrame0Info();
 }
 
 /*

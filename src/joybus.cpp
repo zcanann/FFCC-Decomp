@@ -231,8 +231,6 @@ JoyBus::~JoyBus()
 	// TODO
 }
 
-
-
 /*
  * --INFO--
  * Address:	TODO
@@ -362,7 +360,6 @@ void JoyBus::CreateInit()
     }
 }
 
-
 /*
  * --INFO--
  * Address:	TODO
@@ -467,8 +464,6 @@ int JoyBus::LoadBin()
     return 0;
 }
 
-
-
 /*
  * --INFO--
  * Address:	TODO
@@ -525,7 +520,6 @@ int JoyBus::LoadMap(int stageId, int mapId)
 
     return 0;
 }
-
 
 /*
  * --INFO--
@@ -2544,7 +2538,6 @@ timeout_expiry:
     }
 }
 
-
 /*
  * --INFO--
  * Address:	TODO
@@ -2641,14 +2634,6 @@ void JoyBus::ThreadSleep(long long ticks)
     OSSuspendThread(alarm.thread);
     OSRestoreInterrupts(level);
 }
-
-
-
-
-
-
-
-
 
 /*
  * --INFO--
@@ -2819,7 +2804,6 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
     return 2;
 }
 
-
 /*
  * --INFO--
  * Address:	TODO
@@ -2896,6 +2880,58 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
     OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
     return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800b26d8
+ * PAL Size: 80b
+ * EN Address: 0x800bb308
+ * EN Size: 100b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
+{
+    while (--len >= 0) {
+        int value = *crc;
+        *crc = static_cast<unsigned short>((value << 8) ^ JoyBusCrcTable[static_cast<unsigned char>(value >> 8) ^ *data++]);
+    }
+
+    return static_cast<unsigned short>(~*crc);
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
+{
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        return 0;
+    }
+
+    OSWaitSemaphore(m_accessSemaphores + threadParam->m_portIndex);
+
+    int result = 0;
+    unsigned int port = threadParam->m_portIndex;
+    if ((int)m_cmdCount[port] >= 0x40)
+    {
+        OSSignalSemaphore(m_accessSemaphores + port);
+        result = -1;
+    }
+    else
+    {
+        m_cmdQueueData[port][m_cmdCount[port]] = command;
+        m_cmdCount[threadParam->m_portIndex]++;
+
+        OSSignalSemaphore(m_accessSemaphores + threadParam->m_portIndex);
+        result = 0;
+    }
+
+    return result;
 }
 
 /*
@@ -3254,41 +3290,6 @@ void JoyBus::ResetQueue(ThreadParam* threadParam)
     OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 }
 
-
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
-{
-    if (static_cast<signed char>(m_threadRunningMask) == 0)
-    {
-        return 0;
-    }
-
-    OSWaitSemaphore(m_accessSemaphores + threadParam->m_portIndex);
-
-    int result = 0;
-    unsigned int port = threadParam->m_portIndex;
-    if ((int)m_cmdCount[port] >= 0x40)
-    {
-        OSSignalSemaphore(m_accessSemaphores + port);
-        result = -1;
-    }
-    else
-    {
-        m_cmdQueueData[port][m_cmdCount[port]] = command;
-        m_cmdCount[threadParam->m_portIndex]++;
-
-        OSSignalSemaphore(m_accessSemaphores + threadParam->m_portIndex);
-        result = 0;
-    }
-
-    return result;
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -3318,7 +3319,6 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
 
     return result != 0 ? -1 : 0;
 }
-
 
 /*
  * --INFO--
@@ -3796,7 +3796,6 @@ int JoyBus::SendGBAStop(ThreadParam* threadParam)
     return result;
 }
 
-
 /*
  * --INFO--
  * Address:	TODO
@@ -3829,7 +3828,6 @@ int JoyBus::SendCancel(ThreadParam* threadParam)
 
     return SetSendQueue(threadParam, cmd);
 }
-
 
 /*
  * --INFO--
@@ -4182,10 +4180,6 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
     return result != 0 ? -1 : 0;
 }
 
-
-
-
-
 /*
  * --INFO--
  * Address:	TODO
@@ -4383,7 +4377,6 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     return result;
 }
 
-
 /*
  * --INFO--
  * PAL Address: 0x800AB24C
@@ -4435,7 +4428,6 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
 
     return wordCount;
 }
-
 
 /*
  * --INFO--
@@ -4604,7 +4596,6 @@ int JoyBus::SendPlayerHP(ThreadParam* threadParam)
     unsigned int cmd = hpData[0];
     return SetSendQueue(threadParam, cmd);
 }
-
 
 /*
  * --INFO--
@@ -4811,7 +4802,6 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
 
     return result;
 }
-
 
 /*
  * --INFO--
@@ -5030,9 +5020,6 @@ int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
     cmdBytes[2] = static_cast<unsigned char>(b);
     return SetSendQueue(threadParam, cmd);
 }
-
-
-
 
 /*
  * --INFO--
@@ -5574,7 +5561,6 @@ int JoyBus::SendStrength(ThreadParam* threadParam)
     return SetSendQueue(threadParam, word);
 }
 
-
 /*
  * --INFO--
  * Address:	TODO
@@ -5771,7 +5757,6 @@ int JoyBus::SendOpenMenu(ThreadParam* threadParam, char menuId)
     return result;
 }
 
-
 /*
  * --INFO--
  * Address:	TODO
@@ -5952,7 +5937,6 @@ int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
 
     return result;
 }
-
 
 /*
  * --INFO--
@@ -6296,7 +6280,6 @@ int JoyBus::SendAllStat(int portIndex)
     return 0;
 }
 
-
 /*
  * --INFO--
  * Address:	TODO
@@ -6368,8 +6351,6 @@ int JoyBus::SendAddLetter(int portIndex)
 
     return SetSendQueue(&m_threadParams[portIndex], cmd);
 }
-
-
 
 /*
  * --INFO--
@@ -6570,7 +6551,6 @@ void JoyBus::RestartThread()
     Joybus.ThreadInit();
 }
 
-
 /*
  * --INFO--
  * PAL Address: 0x800af830
@@ -6628,7 +6608,6 @@ int JoyBus::SendUseItem(int portIndex, char itemId)
 
     return SetSendQueue(&m_threadParams[portIndex], cmd);
 }
-
 
 /*
  * --INFO--
@@ -6711,27 +6690,6 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
     }
 
     return result;
-}
-
-
-
-/*
- * --INFO--
- * PAL Address: 0x800b26d8
- * PAL Size: 80b
- * EN Address: 0x800bb308
- * EN Size: 100b
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
-{
-    while (--len >= 0) {
-        int value = *crc;
-        *crc = static_cast<unsigned short>((value << 8) ^ JoyBusCrcTable[static_cast<unsigned char>(value >> 8) ^ *data++]);
-    }
-
-    return static_cast<unsigned short>(~*crc);
 }
 
 /*

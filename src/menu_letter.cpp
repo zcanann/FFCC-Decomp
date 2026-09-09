@@ -1212,6 +1212,9 @@ void CMenuPcs::LetterListDraw()
 		const float markScale =
 		    static_cast<float>(DOUBLE_80333098 * static_cast<double>(absPhase) + DOUBLE_80333090);
 
+		float markX = FLOAT_80333088;
+		float markY = FLOAT_8033308c;
+
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 		const int alpha = static_cast<int>(
@@ -1224,8 +1227,6 @@ void CMenuPcs::LetterListDraw()
 		GXSetChanMatColor(GX_COLOR0A0, markColor);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x43));
 
-		float markY = FLOAT_8033308c;
-		float markX = FLOAT_80333088;
 		const float iconSize = FLOAT_803330b8;
 		const double iconOffset = (iconSize - iconSize * markScale) * DOUBLE_803330a8;
 		markX += iconOffset;

@@ -395,8 +395,8 @@ inline int CMenuPcs::LetterLstClose()
 	LetterMenuState* state = m_letterMenuState;
 	state->frame = state->frame + 1;
 
-	int panelCount = static_cast<int>(m_singleFadeState->count);
 	SingleFadeEntry* entry = m_singleFadeState->entries;
+	int panelCount = static_cast<int>(m_singleFadeState->count);
 	int frame = static_cast<int>(m_letterMenuState->frame);
 
 	for (int i = 0; i < panelCount; ++i, ++entry) {
@@ -1212,8 +1212,8 @@ void CMenuPcs::LetterListDraw()
 		const float markScale =
 		    static_cast<float>(DOUBLE_80333098 * static_cast<double>(absPhase) + DOUBLE_80333090);
 
-		float markX = FLOAT_80333088;
 		float markY = FLOAT_8033308c;
+		float markX = FLOAT_80333088;
 
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 

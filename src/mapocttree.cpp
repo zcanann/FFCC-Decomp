@@ -15,7 +15,7 @@ static const float kMapOctTreeBoundMaxInit = -10000000000.0f;
 static const float kMapOctTreeRadiusPad = 1.0f;
 static const float kMapOctTreeDefaultOffsetZ = 0.0f;
 
-static CBound s_bound(kMapOctTreeBoundMinInit, kMapOctTreeBoundMaxInit);
+static CBound s_bound;
 static CMapCylinder s_cyl(kMapOctTreeBoundMinInit, kMapOctTreeBoundMaxInit);
 static Vec s_mvec;
 static unsigned long s_insertLightBitIndex = 0;
@@ -978,7 +978,7 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
  * Address:	TODO
  * Size:	TODO
  */
-COctNode::COctNode() : m_bound(kMapOctTreeBoundMinInit, kMapOctTreeBoundMaxInit)
+COctNode::COctNode()
 {
 	m_lightFlags = 0;
 	m_shadowFlags = 0;

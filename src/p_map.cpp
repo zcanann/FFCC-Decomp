@@ -735,7 +735,7 @@ void CMapPcs::drawAfter()
             MapMng.DrawAfter();
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
-                CBound bound(kPMapBoundMinInit, kPMapBoundMaxInit);
+                CBound bound;
                 bound = CameraPcs.m_shadowRectBound;
                 Graphic.DrawBound(bound, CColor(0xFF, 0xFF, 0x80, 0xFF).color);
             }
@@ -785,7 +785,7 @@ void CMapPcs::drawAfterViewer()
             MapMng.DrawAfter();
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
-                CBound bound(kPMapBoundMinInit, kPMapBoundMaxInit);
+                CBound bound;
                 bound = CameraPcs.m_shadowRectBound;
                 const CColor& colorObj = CColor(0xFF, 0xFF, 0x80, 0xFF);
                 GXColor color = colorObj.color;

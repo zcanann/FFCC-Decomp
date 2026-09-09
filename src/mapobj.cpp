@@ -34,28 +34,6 @@ inline void* operator new(unsigned long, void* ptr)
 
 /*
  * --INFO--
- * PAL Address: 0x8002BE10
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CBound::CBound()
-{
-    float max = -10000000000.0f;
-    float min = 10000000000.0f;
-
-    m_min.z = min;
-    m_min.y = min;
-    m_min.x = min;
-    m_max.z = max;
-    m_max.y = max;
-    m_max.x = max;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8002BE34
  * PAL Size: 72b
  * EN Address: 0x800364A4

@@ -781,8 +781,8 @@ void CCameraPcs::drawShadowBegin()
  * --INFO--
  * PAL Address: 0x80038050
  * PAL Size: 680b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80037E44
+ * EN Size: 680b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -811,15 +811,10 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         bool include = false;
         if (gObject->m_charaModelHandle != 0) {
             displayFlags = gObject->m_displayFlags;
-            if ((displayFlags & 1) != 0 && (displayFlags & 0x40) == 0) {
-                if (static_cast<signed char>(
-                        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<signed char*>(
-                                             &gObject->m_weaponNodeFlags)) << 26) &
-                                         0xC0000000) >>
-                        31) != 0) {
-                    if ((displayFlags & 0x80) != 0 || 1.0f == gObject->m_currentAlpha) {
-                        include = true;
-                    }
+            if ((displayFlags & 1) != 0 && (displayFlags & 0x40) == 0 &&
+                gObject->m_weaponNodeFlagBits.m_unk20 != 0) {
+                if ((displayFlags & 0x80) != 0 || 1.0f == gObject->m_currentAlpha) {
+                    include = true;
                 }
             }
         }
@@ -833,32 +828,18 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
             radius = 30.0f;
         }
 
-        float worldBoundData[6];
-        CBound* worldBound = reinterpret_cast<CBound*>(worldBoundData);
-        float clipBoundData[6];
-        CBound* clipBound = reinterpret_cast<CBound*>(clipBoundData);
-        worldBoundData[0] = gObject->m_worldPosition.x - radius;
-        worldBoundData[3] = gObject->m_worldPosition.x + radius;
-        worldBoundData[2] = gObject->m_worldPosition.z - radius;
-        worldBoundData[5] = gObject->m_worldPosition.z + radius;
-        worldBoundData[1] = gObject->m_worldPosition.y;
-        clipBoundData[2] = 10000000000.0f;
-        worldBoundData[4] = gObject->m_worldPosition.y + radius;
-        clipBoundData[1] = 10000000000.0f;
-        clipBoundData[0] = 10000000000.0f;
-        clipBoundData[5] = -10000000000.0f;
-        clipBoundData[4] = -10000000000.0f;
-        clipBoundData[3] = -10000000000.0f;
+        CBound worldBound(&gObject->m_worldPosition, radius, radius);
+        CBound clipBound;
 
-        if (worldBound->CheckFrustum0(*clipBound) == 0) {
+        if (worldBound.CheckFrustum0(clipBound) == 0) {
             continue;
         }
-        if (!(clipBoundData[2] > -400.0f)) {
+        if (!(clipBound.m_min.z > -400.0f)) {
             continue;
         }
-        float negMinZ = -clipBoundData[2];
-        float ratioX = (clipBoundData[3] - clipBoundData[0]) / negMinZ;
-        float ratioY = (clipBoundData[4] - clipBoundData[1]) / negMinZ;
+        float negMinZ = -clipBound.m_min.z;
+        float ratioX = (clipBound.m_max.x - clipBound.m_min.x) / negMinZ;
+        float ratioY = (clipBound.m_max.y - clipBound.m_min.y) / negMinZ;
         if (ratioX > 0.2f) {
             // proceed
         } else if (!(ratioY > 0.2f)) {
@@ -866,17 +847,17 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         }
 
         shadowRectBound.m_min.x =
-            (shadowRectBound.m_min.x < worldBoundData[0]) ? shadowRectBound.m_min.x : worldBoundData[0];
+            (shadowRectBound.m_min.x < worldBound.m_min.x) ? shadowRectBound.m_min.x : worldBound.m_min.x;
         shadowRectBound.m_min.y =
-            (shadowRectBound.m_min.y < worldBoundData[1]) ? shadowRectBound.m_min.y : worldBoundData[1];
+            (shadowRectBound.m_min.y < worldBound.m_min.y) ? shadowRectBound.m_min.y : worldBound.m_min.y;
         shadowRectBound.m_min.z =
-            (shadowRectBound.m_min.z < worldBoundData[2]) ? shadowRectBound.m_min.z : worldBoundData[2];
+            (shadowRectBound.m_min.z < worldBound.m_min.z) ? shadowRectBound.m_min.z : worldBound.m_min.z;
         shadowRectBound.m_max.x =
-            (shadowRectBound.m_max.x > worldBoundData[3]) ? shadowRectBound.m_max.x : worldBoundData[3];
+            (shadowRectBound.m_max.x > worldBound.m_max.x) ? shadowRectBound.m_max.x : worldBound.m_max.x;
         shadowRectBound.m_max.y =
-            (shadowRectBound.m_max.y > worldBoundData[4]) ? shadowRectBound.m_max.y : worldBoundData[4];
+            (shadowRectBound.m_max.y > worldBound.m_max.y) ? shadowRectBound.m_max.y : worldBound.m_max.y;
         shadowRectBound.m_max.z =
-            (shadowRectBound.m_max.z > worldBoundData[5]) ? shadowRectBound.m_max.z : worldBoundData[5];
+            (shadowRectBound.m_max.z > worldBound.m_max.z) ? shadowRectBound.m_max.z : worldBound.m_max.z;
         count += 1;
     }
 

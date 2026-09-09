@@ -3223,8 +3223,8 @@ void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
  * --INFO--
  * PAL Address: 0x800CBB04
  * PAL Size: 328b
- * EN Address: 0x800E71BC
- * EN Size: 380b
+ * EN Address: 0x800CB368
+ * EN Size: 328b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3241,7 +3241,6 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	memcpy(&localPlayerData, &m_playerData[channel], sizeof(localPlayerData));
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	count = 0;
 	outData[0] = 0;
 	outData[1] = 0;
 	outData[2] = 0;
@@ -3249,7 +3248,7 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 	outData[3] = 0;
 	size = 4;
 
-	for (i = 0; i < 0x40; i++) {
+	for (i = count = 0; i < 0x40; i++) {
 		int itemId = localPlayerData.m_items[i];
 		if (MenuPcs.GetItemType(itemId, 1) == 1) {
 			const int iconMask = localPlayerData.m_appearance & 3;
@@ -3277,8 +3276,8 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
  * --INFO--
  * PAL Address: 0x800CB968
  * PAL Size: 412b
- * EN Address: 0x800E7338
- * EN Size: 476b
+ * EN Address: 0x800CB1CC
+ * EN Size: 412b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3286,7 +3285,7 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 {
 	GbaQueuePlayerDataView localPlayerData;
 	char equipIndices[0x40];
-	unsigned int indexBytes;
+	int indexBytes;
 	int dataSize;
 	int equipCount;
 	unsigned short equipData[4];
@@ -3299,9 +3298,8 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	memset(equipIndices, 0xFF, sizeof(equipIndices));
-	equipCount = 0;
 	indexPtr = equipIndices;
-	for (i = 0; i < 0x40; i++) {
+	for (i = equipCount = 0; i < 0x40; i++) {
 		short itemId = localPlayerData.m_items[i];
 		if ((itemId >= 0) && (itemId <= 0x9E)) {
 			*indexPtr = i;
@@ -3310,11 +3308,10 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 		}
 	}
 
-	int indexBytesS = equipCount + 1;
-	if ((indexBytesS & 3) != 0) {
-		indexBytesS = (((indexBytesS >> 2) + 1) * 4);
+	indexBytes = equipCount + 1;
+	if ((indexBytes & 3) != 0) {
+		indexBytes = (((indexBytes >> 2) + 1) * 4);
 	}
-	indexBytes = static_cast<unsigned int>(indexBytesS);
 
 	outData[4] = equipCount;
 	outData += 5;

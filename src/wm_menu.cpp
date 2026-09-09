@@ -735,8 +735,7 @@ void CMenuPcs::loadData()
 		m_wm.m_handles[i]->m_flags |= 0x141;
 	}
 	CharaPcs.m_charaAllocStage = 0;
-	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[6]->m_model) + 0x9C) =
-	    FLOAT_803314B0;
+	m_wm.m_handles[6]->m_model->m_lightAlpha = FLOAT_803314B0;
 
 	m_wm.m_worldObjData = new (MenuPcs.m_menuStage, "wm_menu.cpp", 0x214) WmWorldObjInfo[40];
 	{
@@ -5233,24 +5232,19 @@ void CMenuPcs::CalcPitcher()
 	short step = m_wmWorldState->m_frameCounter;
 	float blendStep = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(step));
 	if (m_wmWorldState->m_mainState == 1 && step < 10) {
-		reinterpret_cast<float*>(
-			reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x9C)[0] = blendStep;
+		m_wm.m_handles[5]->m_model->m_lightAlpha = blendStep;
 	} else if (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0) {
-		reinterpret_cast<float*>(
-			reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x9C)[0] =
+		m_wm.m_handles[5]->m_model->m_lightAlpha =
 			static_cast<float>(DOUBLE_80331420 - static_cast<double>(blendStep));
 	} else {
-		reinterpret_cast<float*>(
-			reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x9C)[0] =
-			FLOAT_803313e8;
+		m_wm.m_handles[5]->m_model->m_lightAlpha = FLOAT_803313e8;
 	}
 
-	reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model->SetMatrix(scaleMtx);
-	reinterpret_cast<int*>(
-		reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x98)[0] =
+	m_wm.m_handles[5]->m_model->SetMatrix(scaleMtx);
+	m_wm.m_handles[5]->m_model->m_meshVisibleMask =
 		static_cast<char>(lbl_80331380[Game.m_gameWork.m_timerA]);
-	reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model->CalcMatrix();
-	reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model->CalcSkin();
+	m_wm.m_handles[5]->m_model->CalcMatrix();
+	m_wm.m_handles[5]->m_model->CalcSkin();
 }
 
 /*
@@ -6746,7 +6740,7 @@ void CMenuPcs::DrawChara()
 				const float* pOneAl = &FLOAT_803313e8;
 				alpha = *pOneAl;
 			} else {
-				alpha = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C);
+				alpha = handle->m_model->m_lightAlpha;
 			}
 			const float* pRgbMul = &FLOAT_80331458;
 			const float rgbMul = *pRgbMul;
@@ -8388,20 +8382,20 @@ void CMenuPcs::CalcMainMenuSub()
 			}
 
 			if (m_wmWorldState->m_mainState == 1) {
-				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) =
+				GetWmWorldHandles(this)[i]->m_model->m_lightAlpha =
 				    static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 			} else if (m_wmWorldState->m_mainState == 2) {
-				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313e8;
+				GetWmWorldHandles(this)[i]->m_model->m_lightAlpha = FLOAT_803313e8;
 			} else if (m_wmWorldState->m_mainState == 3) {
-				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) =
+				GetWmWorldHandles(this)[i]->m_model->m_lightAlpha =
 				    static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                         DOUBLE_80331420));
 			} else {
-				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313dc;
+				GetWmWorldHandles(this)[i]->m_model->m_lightAlpha = FLOAT_803313dc;
 			}
 			if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == 1 &&
 			    i == 1) {
-				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313e8;
+				GetWmWorldHandles(this)[i]->m_model->m_lightAlpha = FLOAT_803313e8;
 			}
 			GetWmWorldHandles(this)[i]->m_model->SetMatrix(modelMtx);
 			GetWmWorldHandles(this)[i]->m_model->CalcMatrix();

@@ -42,16 +42,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern const char sGameStatusExit[] = "SN_EXIT";
-extern const char sGameStatusMap[] = "SN_MAP";
-extern const char sGameStatusGame[] = "SN_GAME";
-extern const char s_localLangDirJp[] = "jp/";
-extern const char s_localLangDirUk[] = "uk/";
-extern const char s_localLangDirGr[] = "gr/";
-extern const char s_localLangDirIt[] = "it/";
-extern const char s_localLangDirFr[] = "fr/";
-extern const char s_localLangDirSp[] = "sp/";
-extern const char sGameClassName[] = "CGame";
 static const char s_numNameFmt[] = "%d %s";
 static const char s_nameSep[] = " ";
 static const char s_nameNoSep[4] = "";
@@ -68,10 +58,6 @@ const char s_townNameTepa[] = "Tepa";
 const char s_townNameTipa[] = "Tipa";
 const char sGameStageName[] = "Game";
 }
-extern const char sGameParamCfdPathFmt[];
-extern const char sGameSystemCfdPathFmt[];
-extern const char sGameMailTableCfdPathFmt[];
-extern const char sGameNewBattleCfdPathFmt[];
 enum {
 	kGameWorkDataClearSize =
 	    sizeof(CGame::CGameWork) - offsetof(CGame::CGameWork, m_gameDataStartMarker),
@@ -79,37 +65,6 @@ enum {
 };
 
 STATIC_ASSERT(kGameWorkDataClearSize == 0x13E1);
-
-extern const char sGameExecSceneFmt[];
-extern const char sGameInvalidSceneFmt[];
-extern const char sGameDebugStageName[];
-extern const char sGameStatusExit[];
-extern const char sGameStatusDummy[];
-extern const char sGameStatusChara[];
-extern const char sGameStatusMap[];
-extern const char sGameStatusGame[];
-extern const char sGameStatusMaterialEditor[];
-extern const char sGameStatusFunnyShape[];
-extern const char sGameStatusPartView[];
-extern const char* s_localLangDirs[];
-static const char* m_tStatus[] = {
-    sGameStatusExit,
-    sGameStatusDummy,
-    sGameStatusChara,
-    sGameStatusMap,
-    sGameStatusGame,
-    sGameStatusMaterialEditor,
-    sGameStatusFunnyShape,
-    sGameStatusPartView,
-    0,
-};
-const char* sGameCfdPathFmts[] = {
-    sGameParamCfdPathFmt,
-    sGameSystemCfdPathFmt,
-    sGameMailTableCfdPathFmt,
-    sGameNewBattleCfdPathFmt,
-};
-float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
 
 struct GameNameRow
 {
@@ -174,8 +129,8 @@ inline CGame::CGame()
  * --INFO--
  * PAL Address: 0x8001600C
  * PAL Size: 476b
- * EN Address: 0x8001AA90
- * EN Size: 508b
+ * EN Address: TODO
+ * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -223,7 +178,7 @@ void CGame::Init()
 
     m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(sGameStageName), 0);
     if (OSGetConsoleSimulatedMemSize() == 0x3000000) {
-        m_debugStage = Memory.CreateStage(0x220000, const_cast<char*>(sGameDebugStageName), 1);
+        m_debugStage = Memory.CreateStage(0x220000, "GameDebug", 1);
     }
 
     m_sceneId = 4;
@@ -297,13 +252,25 @@ void CGame::LoadLogoWaitingData()
  * --INFO--
  * PAL Address: 0x800157A8
  * PAL Size: 1764b
- * EN Address: 0x8001AE1C
- * EN Size: 1876b
+ * EN Address: 0x800155F4
+ * EN Size: 1764b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGame::Exec()
 {
+	static const char* m_tStatus[] = {
+	    "SN_EXIT",
+	    "SN_DUMMY",
+	    "SN_CHARA",
+	    "SN_MAP",
+	    "SN_GAME",
+	    "SN_MATERIALEDITOR",
+	    "SN_FUNNYSHAPE",
+	    "SN_PARTVIEW",
+	    0,
+	};
+
 	System.AddScenegraph(reinterpret_cast<CProcess*>(&SystemPcs), 0);
 	System.AddScenegraph(reinterpret_cast<CProcess*>(&GraphicPcs), 0);
 	System.AddScenegraph(reinterpret_cast<CProcess*>(&LightPcs), 0);
@@ -322,9 +289,9 @@ void CGame::Exec()
 
 		int sceneId = m_currentSceneId;
 		if (sceneId >= 0 && sceneId < 9) {
-			System.Printf(const_cast<char*>(sGameExecSceneFmt), m_tStatus[sceneId]);
+			System.Printf("CGame.Exec: scene = %s\n", m_tStatus[sceneId]);
 		} else {
-			System.Printf(const_cast<char*>(sGameInvalidSceneFmt));
+			System.Printf("シーンが異常です。%d\n", sceneId);
 		}
 
 		switch (m_currentSceneId) {
@@ -834,28 +801,46 @@ void CGame::MapChanged(int, int, int)
 
 /*
  * --INFO--
+ * PAL Address: 0x80013E70
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+const char* CGame::GetLangString()
+{
+    const char* localLangDirs[] = {
+        "jp/", "uk/", "gr/",
+        "it/", "fr/", "sp/",
+    };
+
+    return localLangDirs[m_gameWork.m_languageId];
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80014B90
  * PAL Size: 364b
- * EN Address: 0x8001BDF4
- * EN Size: 1108b
+ * EN Address: TODO
+ * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGame::loadCfd()
 {
+    static const char* tName[] = {
+        "dvd/%scft/param.cfd",
+        "dvd/%scft/c_system.cfd",
+        "dvd/%scft/mail_tbl.cfd",
+        "dvd/%scft/newbattle.cfd",
+    };
+
     char path[0xFC];
 
     for (int i = 0; i < 4; i++)
     {
-        const char* localLangDirs[6];
-        localLangDirs[0] = s_localLangDirs[0];
-        localLangDirs[1] = s_localLangDirs[1];
-        localLangDirs[2] = s_localLangDirs[2];
-        localLangDirs[3] = s_localLangDirs[3];
-        localLangDirs[4] = s_localLangDirs[4];
-        localLangDirs[5] = s_localLangDirs[5];
-
-        sprintf(path, sGameCfdPathFmts[i], localLangDirs[Game.m_gameWork.m_languageId]);
+        sprintf(path, tName[i], Game.GetLangString());
         CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
 
         if (handle != nullptr)
@@ -1164,14 +1149,15 @@ void CGame::LoadFinished()
  * --INFO--
  * PAL Address: 0x8001440C
  * PAL Size: 308b
- * EN Address: 0x8001C988
- * EN Size: 452b
+ * EN Address: 0x800142A4
+ * EN Size: 308b
  * JP Address: TODO
  * JP Size: TODO
  */
 CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
 {
     static s16 s_top[] = {0, 2, 4, 0};
+    static float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
 
     int stage =
         Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
@@ -1486,29 +1472,6 @@ char* CGame::MakeNumMonName(char* out, int monIndex, int count)
 
     sprintf(out, s_numNameFmt, count, monName);
     return out;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80013E70
- * PAL Size: 80b
- * EN Address: 0x8001D0EC
- * EN Size: 8b
- * JP Address: TODO
- * JP Size: TODO
- */
-const char* CGame::GetLangString()
-{
-    const char* localLangDirs[6];
-
-    localLangDirs[0] = s_localLangDirs[0];
-    localLangDirs[1] = s_localLangDirs[1];
-    localLangDirs[2] = s_localLangDirs[2];
-    localLangDirs[3] = s_localLangDirs[3];
-    localLangDirs[4] = s_localLangDirs[4];
-    localLangDirs[5] = s_localLangDirs[5];
-
-    return localLangDirs[m_gameWork.m_languageId];
 }
 
 /*

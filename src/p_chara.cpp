@@ -434,6 +434,14 @@ static inline _GXColor BlendColor(const _GXColor& a, const _GXColor& b, float t)
     return out;
 }
 
+static inline void CopyColor(_GXColor* dst, _GXColor src)
+{
+    dst->r = src.r;
+    dst->g = src.g;
+    dst->b = src.b;
+    dst->a = src.a;
+}
+
 static inline _GXColor ModulateColor(const _GXColor& src, const _GXColor& shade)
 {
     _GXColor out;
@@ -2789,48 +2797,26 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     int restoreFog = 0;
     if (0.0f < m_fogBlend && (drawPass == 0 || drawPass == 4)) {
+        float fogStart;
+        float fogEnd;
         float invBlend = 1.0f - m_fogBlend;
         invBlend *= invBlend;
         float fogBlend = 1.0f - invBlend;
 
+        _GXColor graphicFogColor;
         float nearZ;
         float farZ;
         GetCameraClipPlanes(&nearZ, &farZ);
-        const float fogStart = Graphic.m_fogStart;
-        _GXColor graphicFogColor = Graphic.m_fogColor;
-        const float fogEnd = Graphic.m_fogEnd;
+        fogStart = Graphic.m_fogStart;
+        CopyColor(&graphicFogColor, Graphic.m_fogColor);
+        fogEnd = Graphic.m_fogEnd;
 
-        const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
-        CColor whitePart;
-        whitePart.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * fogBlend));
-        whitePart.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * fogBlend));
-        whitePart.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * fogBlend));
-        whitePart.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * fogBlend));
-        CColor whitePartCopy(whitePart);
-
-        const CColor& fogBase = CColor(graphicFogColor);
-        CColor fogPart;
-        const float fogRemainder = 1.0f - fogBlend;
-        fogPart.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.r) * fogRemainder));
-        fogPart.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.g) * fogRemainder));
-        fogPart.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.b) * fogRemainder));
-        fogPart.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.a) * fogRemainder));
-        CColor fogPartCopy(fogPart);
-
-        CColor blendedFog;
-        blendedFog.color.r = fogPartCopy.color.r + whitePartCopy.color.r;
-        blendedFog.color.g = fogPartCopy.color.g + whitePartCopy.color.g;
-        blendedFog.color.b = fogPartCopy.color.b + whitePartCopy.color.b;
-        blendedFog.color.a = fogPartCopy.color.a + whitePartCopy.color.a;
-        CColor blendedFogCopy(blendedFog);
-
-        _GXColor fogColor = blendedFogCopy.color;
         GXSetFog(GX_FOG_PERSP_LIN,
-                 fogStart * fogRemainder + nearZ * fogBlend,
-                 (fogEnd + 1.0f) * fogRemainder + (nearZ + 1.0f) * fogBlend,
+                 fogStart * (1.0f - fogBlend) + nearZ * fogBlend,
+                 (fogEnd + 1.0f) * (1.0f - fogBlend) + (nearZ + 1.0f) * fogBlend,
                  nearZ,
                  farZ,
-                 fogColor);
+                 (CColor(graphicFogColor) * (1.0f - fogBlend) + CColor(0xFF, 0xFF, 0xFF, 0xFF) * fogBlend).color);
         restoreFog = 1;
     }
 

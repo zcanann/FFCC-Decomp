@@ -1023,7 +1023,7 @@ void CMenuPcs::createSingleMenu()
         }
     } else {
         if (m_singleMenuStageActive == 0) {
-            m_stageF0 = CharaPcs.m_viewerAnimStage;
+            m_stageF0 = CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_ANIM];
             m_singleMenuStageActive = 1;
         }
 

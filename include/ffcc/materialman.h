@@ -60,8 +60,48 @@ public:
     
     void Init();
     void Quit();
-    void InitEnv();
-    void LockEnv();
+    /*
+     * --INFO--
+     * PAL Address: 0x8002EF48
+     * PAL Size: 84b
+     * EN Address: 0x8002ED3C
+     * EN Size: 84b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void InitEnv()
+    {
+        m_curEnvTevBit = 0x000ACE0F;
+        m_activeEnvTevBit = 0xFFFFFFFF;
+        m_vtxDescMode = 0xFF;
+        m_stdTexMapId = 0;
+        m_texMapIdCur = 0;
+        m_stdTexMtx = 0x1E;
+        m_texMtxCur = 0x1E;
+        m_stdTexCoordId = 0;
+        m_texCoordIdCur = 0;
+        m_blendMode = 0xFF;
+        m_fogEnable = 0xFF;
+        m_shadowMaterialCount = 0;
+        m_shadowTextureCount = 0;
+        m_shadowKColorMask = 0;
+    }
+    /*
+     * --INFO--
+     * PAL Address: 0x8002EF24
+     * PAL Size: 36b
+     * EN Address: 0x8002ED18
+     * EN Size: 36b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void LockEnv()
+    {
+        m_stdTexMapId = m_texMapIdCur;
+        m_stdTexMtx = m_texMtxCur;
+        m_stdTexCoordId = m_texCoordIdCur;
+        m_stdEnvTevBit = m_curEnvTevBit;
+    }
     void SetBlendMode(CMaterialSet*, int);
     void addtev_bump_st(int, _GXTevScale);
     void addtev_bump_water(_GXTevScale);
@@ -95,7 +135,19 @@ public:
     int GetTexMapIdCur();
     void SetStdEnv();
     void DecTexCoordIdCur();
-    void SetTevBit(CMaterialMan::TEV_BIT);
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: TODO
+     * EN Size: TODO
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void SetTevBit(CMaterialMan::TEV_BIT tevBit)
+    {
+        m_curEnvTevBit |= tevBit;
+    }
     void ErrorTexCoordIdCur();
     void ErrorTexMtxCur();
     void ErrorTexMapIdCur();
@@ -113,58 +165,9 @@ public:
     {
         m_blendOverrideMode = mode;
     }
-    void OrCurrentEnvTevBit(unsigned int tevBit)
-    {
-        m_curEnvTevBit |= tevBit;
-    }
     unsigned char GetManaAlpha()
     {
         return m_manaAlpha;
-    }
-    void SetDefaultDrawEnv(unsigned int tevBit)
-    {
-        m_curEnvTevBit = tevBit;
-        m_activeEnvTevBit = 0xFFFFFFFF;
-        m_vtxDescMode = 0xFF;
-        m_stdTexMapId = 0;
-        m_texMapIdCur = 0;
-        m_stdTexMtx = 0x1E;
-        m_texMtxCur = 0x1E;
-        m_stdTexCoordId = 0;
-        m_texCoordIdCur = 0;
-        m_blendMode = 0xFF;
-        m_fogEnable = 0xFF;
-        m_shadowMaterialCount = 0;
-        m_shadowTextureCount = 0;
-        m_shadowKColorMask = 0;
-    }
-    void LockEnvInline()
-    {
-        m_stdTexMapId = m_texMapIdCur;
-        m_stdTexMtx = m_texMtxCur;
-        m_stdTexCoordId = m_texCoordIdCur;
-        m_stdEnvTevBit = m_curEnvTevBit;
-    }
-    void SetDefaultStdDrawEnv(unsigned int tevBit)
-    {
-        m_stdTexMapId = 0;
-        m_stdTexMtx = 0x1E;
-        m_stdTexCoordId = 0;
-        m_curEnvTevBit = tevBit;
-        m_activeEnvTevBit = 0xFFFFFFFF;
-        m_vtxDescMode = 0xFF;
-        m_texMapIdCur = 0;
-        m_texMtxCur = 0x1E;
-        m_texCoordIdCur = 0;
-        m_blendMode = 0xFF;
-        m_fogEnable = 0xFF;
-        m_shadowMaterialCount = 0;
-        m_shadowTextureCount = 0;
-        m_shadowKColorMask = 0;
-        m_stdTexMapId = 0;
-        m_stdTexMtx = 0x1E;
-        m_stdTexCoordId = 0;
-        m_stdEnvTevBit = tevBit;
     }
     void SetGeometryArraySource(void* arraySource)
     {
@@ -178,150 +181,19 @@ public:
     {
         return m_objTextureMtx;
     }
-    void SetManaReflectionEnv(Vec* reflectionVec, _GXTexObj* paraboloidTexObj0, _GXTexObj* paraboloidTexObj1, unsigned int tevBit)
-    {
-        m_manaReflectionVec = reflectionVec;
-        m_activeEnvTevBit = 0xFFFFFFFF;
-        m_vtxDescMode = 0xFF;
-        m_texMapIdCur = 0;
-        m_texMtxCur = 0x1E;
-        m_texCoordIdCur = 0;
-        m_blendMode = 0xFF;
-        m_fogEnable = 0xFF;
-        m_shadowMaterialCount = 0;
-        m_shadowTextureCount = 0;
-        m_shadowKColorMask = 0;
-        m_curEnvTevBit = tevBit;
-        m_stdTexMapId = 0;
-        m_stdTexMtx = 0x1E;
-        m_stdTexCoordId = 0;
-        m_stdEnvTevBit = tevBit;
-        m_manaParaboloidTexObj0 = paraboloidTexObj0;
-        m_manaParaboloidTexObj1 = paraboloidTexObj1;
-    }
-    void SetManaReflectionEnv(Vec* reflectionVec, _GXTexObj* paraboloidTexObj0, unsigned int tevBit)
-    {
-        m_manaReflectionVec = reflectionVec;
-        m_activeEnvTevBit = 0xFFFFFFFF;
-        m_vtxDescMode = 0xFF;
-        m_texMapIdCur = 0;
-        m_texMtxCur = 0x1E;
-        m_texCoordIdCur = 0;
-        m_blendMode = 0xFF;
-        m_fogEnable = 0xFF;
-        m_shadowMaterialCount = 0;
-        m_shadowTextureCount = 0;
-        m_shadowKColorMask = 0;
-        m_curEnvTevBit = tevBit;
-        m_stdTexMapId = 0;
-        m_stdTexMtx = 0x1E;
-        m_stdTexCoordId = 0;
-        m_stdEnvTevBit = tevBit;
-        m_manaParaboloidTexObj0 = paraboloidTexObj0;
-    }
-    void SetChangeTexReflectionEnv(void* arraySource, _GXTexObj* texObj, unsigned int tevBit)
-    {
-        m_geometryArraySource = arraySource;
-        m_activeEnvTevBit = 0xFFFFFFFF;
-        m_vtxDescMode = 0xFF;
-        m_texMapIdCur = 0;
-        m_texMtxCur = 0x1E;
-        m_texCoordIdCur = 0;
-        m_blendMode = 0xFF;
-        m_fogEnable = 0xFF;
-        m_shadowMaterialCount = 0;
-        m_shadowTextureCount = 0;
-        m_shadowKColorMask = 0;
-        m_curEnvTevBit = tevBit;
-        m_stdTexMapId = 0;
-        m_stdTexMtx = 0x1E;
-        m_stdTexCoordId = 0;
-        m_stdEnvTevBit = tevBit;
-        m_manaParaboloidTexObj0 = texObj;
-    }
-    void SetChangeTexReflectionArray(void* arraySource)
-    {
-        SetGeometryArraySource(arraySource);
-    }
-    void SetChangeTexReflectionTexture(_GXTexObj* texObj)
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: TODO
+     * EN Size: TODO
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void SetEnvTexObj(_GXTexObj* texObj)
     {
         m_manaParaboloidTexObj0 = texObj;
     }
-    void SaveCurrentEnvAsStd()
-    {
-        m_stdTexMapId = m_texMapIdCur;
-        m_stdTexMtx = m_texMtxCur;
-        m_stdTexCoordId = m_texCoordIdCur;
-        m_stdEnvTevBit = m_curEnvTevBit;
-    }
-    void SetChangeTexReflectionState(unsigned int tevBit, unsigned int stdTevBit)
-    {
-        m_activeEnvTevBit = 0xFFFFFFFF;
-        m_vtxDescMode = 0xFF;
-        m_texMapIdCur = 0;
-        m_texMtxCur = 0x1E;
-        m_texCoordIdCur = 0;
-        m_blendMode = 0xFF;
-        m_fogEnable = 0xFF;
-        m_shadowMaterialCount = 0;
-        m_shadowTextureCount = 0;
-        m_shadowKColorMask = 0;
-        m_curEnvTevBit = tevBit;
-        m_stdTexMapId = 0;
-        m_stdTexMtx = 0x1E;
-        m_stdTexCoordId = 0;
-        m_curEnvTevBit |= 0x1000;
-        m_stdTexMapId = 0;
-        m_stdTexMtx = 0x1E;
-        m_stdTexCoordId = 0;
-        m_stdEnvTevBit = m_curEnvTevBit;
-    }
-    void SetChangeTexReflectionState(_GXTexObj* texObj, unsigned int tevBit, unsigned int stdTevBit)
-    {
-        m_stdTexMapId = 0;
-        m_curEnvTevBit = tevBit;
-        m_stdTexMtx = 0x1E;
-        m_stdTexCoordId = 0;
-        m_activeEnvTevBit = 0xFFFFFFFF;
-        m_vtxDescMode = 0xFF;
-        m_texMapIdCur = 0;
-        m_texMtxCur = 0x1E;
-        m_texCoordIdCur = 0;
-        m_blendMode = 0xFF;
-        m_fogEnable = 0xFF;
-        m_shadowMaterialCount = 0;
-        m_shadowTextureCount = 0;
-        m_shadowKColorMask = 0;
-        m_curEnvTevBit |= 0x1000;
-        m_manaParaboloidTexObj0 = texObj;
-        m_stdTexMapId = 0;
-        m_stdTexMtx = 0x1E;
-        m_stdTexCoordId = 0;
-        m_stdEnvTevBit = m_curEnvTevBit;
-    }
-    void SetEmissionTextureEnv(unsigned int tevBit)
-    {
-        m_activeEnvTevBit = 0xFFFFFFFF;
-        m_vtxDescMode = 0xFF;
-        m_curEnvTevBit = tevBit;
-        m_texMapIdCur = 0;
-        m_texMtxCur = 0x1E;
-        m_texCoordIdCur = 0;
-        m_stdTexMapId = 0;
-        m_stdTexMtx = 0x1E;
-        m_stdTexCoordId = 0;
-        m_blendMode = 0xFF;
-        m_fogEnable = 0xFF;
-        m_shadowMaterialCount = 0;
-        m_shadowTextureCount = 0;
-        m_shadowKColorMask = 0;
-        m_curEnvTevBit |= 0x40000;
-        m_stdTexMapId = 0;
-        m_stdTexMtx = 0x1E;
-        m_stdTexCoordId = 0;
-        m_stdEnvTevBit = m_curEnvTevBit;
-    }
-
 private:
     void* m_geometryArraySource;        // 0x04
     Vec* m_manaReflectionVec;           // 0x08

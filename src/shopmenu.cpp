@@ -2953,7 +2953,8 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     tagOAN3_SHAPE* shape = reinterpret_cast<tagOAN3_SHAPE*>(
         reinterpret_cast<unsigned char*>(shapeData) + shapeData->m_frames[groupNo].m_shapeOffset);
 
-    MaterialMan.SetDefaultStdDrawEnv(0xACE0F);
+    MaterialMan.InitEnv();
+    MaterialMan.LockEnv();
 
     _GXColor drawColor = {0xFF, 0xFF, 0xFF, 0xFF};
     GXSetChanAmbColor(GX_COLOR0A0, drawColor);
@@ -2963,7 +2964,7 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
     GXSetZCompLoc(GX_TRUE);
 
-    MaterialMan.LockEnvInline();
+    MaterialMan.LockEnv();
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
         shape->m_entries[0].m_textureIndex, 0);
@@ -3023,7 +3024,8 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     *reinterpret_cast<unsigned int*>(&mat) = gShopMenuMaterialWhiteBase;
     mat.a = alpha;
 
-    MaterialMan.SetDefaultStdDrawEnv(0xACE0F);
+    MaterialMan.InitEnv();
+    MaterialMan.LockEnv();
 
     GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(const_cast<unsigned int*>(&gShopMenuAmbientWhite)));
     GXSetChanMatColor(GX_COLOR0A0, mat);
@@ -3035,7 +3037,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
-    MaterialMan.LockEnvInline();
+    MaterialMan.LockEnv();
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
         shape->m_entries[0].m_textureIndex, 0);
@@ -3100,7 +3102,8 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     *reinterpret_cast<unsigned int*>(&mat) = gShopMenuMaterialWhiteBase;
     mat.a = alpha;
 
-    MaterialMan.SetDefaultStdDrawEnv(0xACE0F);
+    MaterialMan.InitEnv();
+    MaterialMan.LockEnv();
 
     GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(const_cast<unsigned int*>(&gShopMenuAmbientWhite)));
     GXSetChanMatColor(GX_COLOR0A0, mat);
@@ -3112,7 +3115,7 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
-    MaterialMan.LockEnvInline();
+    MaterialMan.LockEnv();
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
         shape->m_entries[0].m_textureIndex, 0);

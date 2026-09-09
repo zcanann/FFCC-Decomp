@@ -2855,20 +2855,6 @@ inline void CMaterialMan::DecTexCoordIdCur()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: TODO
- * EN Address: 0x8004EC54
- * EN Size: 44b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMaterialMan::SetTevBit(CMaterialMan::TEV_BIT)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: TODO
  * EN Address: 0x8004EC80
  * EN Size: 44b
  * JP Address: TODO

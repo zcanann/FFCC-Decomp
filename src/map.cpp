@@ -1924,7 +1924,7 @@ void CMapMng::Draw()
         if (Game.m_currentSceneId == 4) {
             CharaPcs.drawMakeTexShadow();
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_S16, 0xE, GX_S16, 10);
-            MaterialMan.SetDefaultDrawEnv(0x000ACE0F);
+            MaterialMan.InitEnv();
             Graphic.SetFog(MapMng.m_fogEnable, 0);
 
             GXSetColorUpdate(1);

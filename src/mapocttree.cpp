@@ -301,42 +301,6 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 
 /*
  * --INFO--
- * PAL Address: 8002ef48
- * PAL Size: 84b
- */
-void CMaterialMan::InitEnv()
-{
-	m_curEnvTevBit = 0x000ACE0F;
-	m_activeEnvTevBit = 0xFFFFFFFF;
-	m_vtxDescMode = 0xFF;
-	m_stdTexMapId = 0;
-	m_texMapIdCur = 0;
-	m_stdTexMtx = 0x1E;
-	m_texMtxCur = 0x1E;
-	m_stdTexCoordId = 0;
-	m_texCoordIdCur = 0;
-	m_blendMode = 0xFF;
-	m_fogEnable = 0xFF;
-	m_shadowMaterialCount = 0;
-	m_shadowTextureCount = 0;
-	m_shadowKColorMask = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 8002ef24
- * PAL Size: 36b
- */
-void CMaterialMan::LockEnv()
-{
-	m_stdTexMapId = m_texMapIdCur;
-	m_stdTexMtx = m_texMtxCur;
-	m_stdTexCoordId = m_texCoordIdCur;
-	m_stdEnvTevBit = m_curEnvTevBit;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8002ebc0
  * PAL Size: 868b
  * EN Address: TODO

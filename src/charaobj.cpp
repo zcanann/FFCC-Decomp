@@ -1880,9 +1880,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
  */
 void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int& outC, int forceNormal)
 {
+	SCharaItemRow* itemRows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
 	int normFlag = 0;
-	SCharaItemRow* itemData = &reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[itemId];
-	if ((itemData->m_flags32 & 1) != 0 || forceNormal != 0) {
+	if ((itemRows[itemId].m_flags32 & 1) != 0 || forceNormal != 0) {
 		normFlag = 1;
 	}
 	int isNormal = normFlag & 0xFF;

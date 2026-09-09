@@ -1976,19 +1976,14 @@ unsigned int GbaQueue::GetScrFlg()
 	int i;
 	unsigned int flag;
 
-	i = 0;
-	do {
+	for (i = 0; i < 4; i++) {
 		OSWaitSemaphore(accessSemaphores + i);
-		i++;
-	} while (i < 4);
+	}
 
-	flag = m_scrInitEnd;
-	i = 0;
-	flag = (-flag | flag) >> 31;
-	do {
+	flag = (m_scrInitEnd != 0);
+	for (i = 0; i < 4; i++) {
 		OSSignalSemaphore(accessSemaphores + i);
-		i++;
-	} while (i < 4);
+	}
 
 	return flag;
 }

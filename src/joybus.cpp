@@ -4877,8 +4877,12 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800AA0AC
+ * PAL Size: 612b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 {
@@ -4893,9 +4897,9 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
     {
         GbaQue.GetMapObjDrawFlg(&flgWord);
 
-        volatile unsigned char* data = (volatile unsigned char*)&flgWord;
+        unsigned char* data = reinterpret_cast<unsigned char*>(&flgWord);
         unsigned char crcBytes[4];
-        volatile unsigned char* q = crcBytes;
+        unsigned char* q = crcBytes;
         q[3] = data[0];
         q[2] = data[1];
         q[1] = data[2];

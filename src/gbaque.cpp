@@ -667,10 +667,65 @@ inline void GbaQueue::ChgCmdLstData(int channel, unsigned int data)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void GbaQueue::SetSellData(int channel, unsigned int value)
+{
+	unsigned char* bytes = reinterpret_cast<unsigned char*>(&value);
+	const int itemId =
+		Game.m_scriptFoodBase[channel]->m_inventoryItems[static_cast<int>(bytes[2])];
+	Game.m_scriptFoodBase[channel]->DeleteItemIdx(bytes[2], 1);
+	const unsigned short baseGil =
+		reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_price;
+	const float shopRate = static_cast<float>(static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
+	int gil = static_cast<int>(shopRate * 0.25f * static_cast<float>(baseGil));
+	if (gil < 1) {
+		gil = 1;
+	}
+	Game.m_scriptFoodBase[channel]->AddGil(gil);
+	Joybus.SendResult(channel, 0, bytes[0], bytes[1]);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void GbaQueue::SetBuyData(int channel, unsigned int value)
+{
+	unsigned char* bytes = reinterpret_cast<unsigned char*>(&value);
+	int n;
+	const int quantity = bytes[3];
+	unsigned int shopItem = Game.m_scriptFoodBase[channel]->m_shopList[bytes[2]];
+	for (n = 0; n < quantity; n++) {
+		bool added = Game.m_scriptFoodBase[channel]->AddItem(shopItem, 0);
+		if (added == false) {
+			Joybus.SendResult(channel, 1, bytes[0], bytes[1]);
+		}
+	}
+	const unsigned short baseGil =
+		reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[shopItem].m_price;
+	const float shopRate = static_cast<float>(static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
+	const int gil = static_cast<int>(shopRate * static_cast<float>(baseGil));
+	Game.m_scriptFoodBase[channel]->AddGil(-(gil * quantity));
+	Joybus.SendResult(channel, 0, bytes[0], bytes[1]);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800CFF38
  * PAL Size: 2972b
- * EN Address: 0x800E08B8
- * EN Size: 2004b
+ * EN Address: 0x800CF784
+ * EN Size: 2844b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -812,44 +867,11 @@ void GbaQueue::ExecutQueue()
 						Game.m_scriptFoodBase[channel]->CallShop(0, 0, 0, 0, 0);
 					} else if (cmdBytes[1] == 8) {
 						if (Game.m_scriptFoodBase[channel] != 0) {
-							unsigned int cmdWord = queueWords[i];
-							unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
-							const int itemId =
-								Game.m_scriptFoodBase[channel]->m_inventoryItems[static_cast<int>(bytes[2])];
-							Game.m_scriptFoodBase[channel]->DeleteItemIdx(bytes[2], 1);
-							const unsigned short baseGil =
-								reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_price;
-							int gil = static_cast<int>(
-								static_cast<float>(
-									static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0)
-								* 0.25f * static_cast<float>(baseGil));
-							if (gil < 1) {
-								gil = 1;
-							}
-							Game.m_scriptFoodBase[channel]->AddGil(gil);
-							Joybus.SendResult(channel, 0, bytes[0], bytes[1]);
+							SetSellData(channel, queueWords[i]);
 						}
 					} else if (cmdBytes[1] == 9) {
 						if (Game.m_scriptFoodBase[channel] != 0) {
-							unsigned int cmdWord = queueWords[i];
-							unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
-							int n;
-							const int quantity = bytes[3];
-							unsigned int shopItem = Game.m_scriptFoodBase[channel]->m_shopList[bytes[2]];
-							for (n = 0; n < quantity; n++) {
-								bool added = Game.m_scriptFoodBase[channel]->AddItem(shopItem, 0);
-								if (added == false) {
-									Joybus.SendResult(channel, 1, bytes[0], bytes[1]);
-								}
-							}
-							const unsigned short baseGil =
-								reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[shopItem].m_price;
-							const int gil = static_cast<int>(
-								static_cast<float>(
-									static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0)
-								* static_cast<float>(baseGil));
-							Game.m_scriptFoodBase[channel]->AddGil(-(gil * quantity));
-							Joybus.SendResult(channel, 0, bytes[0], bytes[1]);
+							SetBuyData(channel, queueWords[i]);
 						}
 					} else if (cmdBytes[1] == 10) {
 						if (Game.m_scriptFoodBase[channel] != 0) {
@@ -909,26 +931,6 @@ void GbaQueue::ExecutQueue()
 			}
 		}
 	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void GbaQueue::SetSellData(int, unsigned int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void GbaQueue::SetBuyData(int, unsigned int)
-{
-	// TODO
 }
 
 /*

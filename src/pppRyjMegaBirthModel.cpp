@@ -304,9 +304,9 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirth
 /*
  * --INFO--
  * PAL Address: 0x80085fd0
- * PAL Size: 7128b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Size: 7132b
+ * EN Address: 0x8008596C
+ * EN Size: 7132b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -645,7 +645,7 @@ mesh_block:
         Vec* pathBase = pObject->m_drawMatrixPtr;
 
         if (pathIndex >= 0) {
-            s16* pathInfo = reinterpret_cast<s16*>(ppvEnv->m_shapeGroupPtr + (pathIndex));
+            pppShapeGroupRaw* pathInfo = &ppvEnv->m_shapeGroupPtr[pathIndex];
             float t;
             float vx;
             float vy;
@@ -656,16 +656,16 @@ mesh_block:
             float m4;
 
             if (!pathBase) {
-                pathBase = (Vec*)ppvEnv->m_mapMeshPtr[pathInfo[0]]->m_vertices;
+                pathBase = ppvEnv->m_mapMeshPtr[pathInfo->m_meshIndex]->m_vertices;
             }
 
             switch (params->m_speedMode) {
             default: {
-                if ((s32)work->m_unused1E >= (s32)pathInfo[1]) {
+                if ((s32)work->m_unused1E >= (s32)pathInfo->m_vertexCount) {
                     work->m_unused1E = 0;
                 }
                 u16 sampleIndex = work->m_unused1E;
-                u16* indices = (u16*)*(int*)(pathInfo + 2);
+                u16* indices = pathInfo->m_vertexIndices;
                 work->m_unused1E = sampleIndex + 1;
                 Vec* pathVec = pathBase + indices[sampleIndex];
                 vx = pathVec->x;
@@ -702,11 +702,11 @@ mesh_block:
                 break;
             }
             {
-                if ((s32)work->m_unused1E >= (s32)pathInfo[1]) {
+                if ((s32)work->m_unused1E >= (s32)pathInfo->m_vertexCount) {
                     work->m_unused1E = 0;
                 }
-                s32 sampleIndex = (s32)(t * (float)pathInfo[1]);
-                Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];
+                s32 sampleIndex = (s32)(t * (float)pathInfo->m_vertexCount);
+                Vec* pathVec = pathBase + pathInfo->m_vertexIndices[sampleIndex];
                 vx = pathVec->x;
                 vy = pathVec->y;
                 vz = pathVec->z;

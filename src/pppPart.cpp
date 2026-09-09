@@ -31,6 +31,12 @@ extern float ppvScreenMatrixZbuff;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+STATIC_ASSERT(sizeof(pppShapeGroupRaw) == 0x8);
+STATIC_ASSERT(offsetof(pppShapeGroupRaw, m_meshIndex) == 0x0);
+STATIC_ASSERT(offsetof(pppShapeGroupRaw, m_vertexCount) == 0x2);
+STATIC_ASSERT(offsetof(pppShapeGroupRaw, m_vertexIndices) == 0x4);
+STATIC_ASSERT(sizeof(_pppDataHead) == 0x20);
+STATIC_ASSERT(offsetof(_pppDataHead, m_shapeGroups) == 0x1C);
 STATIC_ASSERT(offsetof(_pppProgSetDef, m_drawFlags) == 0xC);
 STATIC_ASSERT(offsetof(_pppProgSetDef, m_startFrame) == 0x10);
 STATIC_ASSERT(offsetof(_pppProgSetDef, m_stages) == 0x28);
@@ -1527,7 +1533,8 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	pppDataHead->m_cacheChunks = pppDataHead->m_cacheChunks + reinterpret_cast<u32>(dataBase);
 	pppDataHead->m_modelNames = pppDataHead->m_modelNames + reinterpret_cast<u32>(dataBase);
 	pppDataHead->m_shapeNames = pppDataHead->m_shapeNames + reinterpret_cast<u32>(dataBase);
-	pppDataHead->m_shapeGroups = pppDataHead->m_shapeGroups + reinterpret_cast<u32>(dataBase);
+	pppDataHead->m_shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(
+	    dataBase + reinterpret_cast<u32>(pppDataHead->m_shapeGroups));
 
 	int* chunkOffsets = reinterpret_cast<int*>(pppDataHead->m_cacheChunks);
 	pppCacheChunk* cacheChunks = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620)
@@ -1596,19 +1603,18 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i]->AddRef();
 	}
 
-	pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups);
-	pppShapeGroupRaw* shapeGroupRefs = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x651)
+	pppShapeGroupRaw* shapeGroups = pppDataHead->m_shapeGroups;
+	pppDataHead->m_shapeGroups = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x651)
 	    pppShapeGroupRaw[pppDataHead->m_shapeGroupCount];
-	pppDataHead->m_shapeGroups = reinterpret_cast<u32>(shapeGroupRefs);
 
 	for (int i = 0; i < pppDataHead->m_shapeGroupCount; i++) {
-		reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups)[i].m_groupId = shapeGroups->m_groupId;
-		reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups)[i].m_shapeCount = shapeGroups->m_shapeCount;
-		reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups)[i].m_shapeList =
-		    new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x656) s16[shapeGroups->m_shapeCount];
+		pppDataHead->m_shapeGroups[i].m_meshIndex = shapeGroups->m_meshIndex;
+		pppDataHead->m_shapeGroups[i].m_vertexCount = shapeGroups->m_vertexCount;
+		pppDataHead->m_shapeGroups[i].m_vertexIndices =
+		    new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x656) u16[shapeGroups->m_vertexCount];
 
-		shapeGroups->m_shapeList = reinterpret_cast<s16*>(reinterpret_cast<u8*>(shapeGroups->m_shapeList) + reinterpret_cast<u32>(dataBase));
-		memcpy(reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups)[i].m_shapeList, shapeGroups->m_shapeList, static_cast<int>(shapeGroups->m_shapeCount) << 1);
+		shapeGroups->m_vertexIndices = reinterpret_cast<u16*>(reinterpret_cast<u8*>(shapeGroups->m_vertexIndices) + reinterpret_cast<u32>(dataBase));
+		memcpy(pppDataHead->m_shapeGroups[i].m_vertexIndices, shapeGroups->m_vertexIndices, shapeGroups->m_vertexCount * sizeof(u16));
 		shapeGroups++;
 	}
 }

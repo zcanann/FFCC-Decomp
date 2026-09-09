@@ -596,8 +596,8 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
  * --INFO--
  * PAL Address: 8008dcc8
  * PAL Size: 3704b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8008D664
+ * EN Size: 3704b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -804,13 +804,13 @@ mode_4_5:
 
 path:
     {
-        float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
+        Vec* pathBase = pppPObject->m_drawMatrixPtr;
 
         if (*(s16*)(paramBytes + 0x6a) >= 0) {
-            short* pathInfo = reinterpret_cast<short*>(ppvEnv->m_shapeGroupPtr + (*(s16*)(paramBytes + 0x6a)));
+            pppShapeGroupRaw* pathInfo = &ppvEnv->m_shapeGroupPtr[*(s16*)(paramBytes + 0x6a)];
 
             if (pathBase == 0) {
-                pathBase = *(float**)((u8*)ppvEnv->m_mapMeshPtr[*pathInfo] + 0x2C);
+                pathBase = ppvEnv->m_mapMeshPtr[pathInfo->m_meshIndex]->m_vertices;
             }
 
             {
@@ -822,18 +822,18 @@ path:
                 switch (pYmMegaBirthShpTail3->m_randType) {
                 default:
                 {
-                    if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (s16)pathInfo[1]) {
+                    if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (s16)pathInfo->m_vertexCount) {
                         vYmMegaBirthShpTail3->m_pathIndex = 0;
                     }
 
                     u16 sampleIndex = vYmMegaBirthShpTail3->m_pathIndex;
-                    u16* indices = (u16*)*(int*)(pathInfo + 2);
+                    u16* indices = pathInfo->m_vertexIndices;
                     vYmMegaBirthShpTail3->m_pathIndex = sampleIndex + 1;
 
-                    float* pathVec = (float*)((u8*)pathBase + indices[sampleIndex] * sizeof(Vec));
-                    vx = pathVec[0];
-                    vy = pathVec[1];
-                    vz = pathVec[2];
+                    Vec* pathVec = &pathBase[indices[sampleIndex]];
+                    vx = pathVec->x;
+                    vy = pathVec->y;
+                    vz = pathVec->z;
                     goto path_store;
                 }
                 case 1:
@@ -878,15 +878,15 @@ path:
                 }
 
                 {
-                    if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (s16)pathInfo[1]) {
+                    if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (s16)pathInfo->m_vertexCount) {
                         vYmMegaBirthShpTail3->m_pathIndex = 0;
                     }
 
-                    int sampleIndex = (int)(sampleT * (float)pathInfo[1]);
-                    float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
-                    vx = pathVec[0];
-                    vy = pathVec[1];
-                    vz = pathVec[2];
+                    int sampleIndex = (int)(sampleT * (float)pathInfo->m_vertexCount);
+                    Vec* pathVec = &pathBase[pathInfo->m_vertexIndices[sampleIndex]];
+                    vx = pathVec->x;
+                    vy = pathVec->y;
+                    vz = pathVec->z;
                 }
                 path_store:
 

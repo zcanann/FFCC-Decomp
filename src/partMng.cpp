@@ -666,8 +666,8 @@ inline void CPartMng::pppReleasePmng(int pdtSlotIndex)
  * --INFO--
  * PAL Address: 0x8005ea20
  * PAL Size: 732b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8005E388
+ * EN Size: 732b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -711,15 +711,15 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         }
 
         for (int i = 0; i < pdt->m_shapeGroupCount; i++) {
-            pppShapeGroupRaw* shapeGroup = &reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups)[i];
-            if (shapeGroup->m_shapeList != 0) {
-                delete shapeGroup->m_shapeList;
-                shapeGroup->m_shapeList = 0;
+            pppShapeGroupRaw* shapeGroup = &pdt->m_shapeGroups[i];
+            if (shapeGroup->m_vertexIndices != 0) {
+                delete shapeGroup->m_vertexIndices;
+                shapeGroup->m_vertexIndices = 0;
             }
         }
 
-        if (reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups) != 0) {
-            delete[] reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
+        if (pdt->m_shapeGroups != 0) {
+            delete[] pdt->m_shapeGroups;
             pdt->m_shapeGroups = 0;
         }
 
@@ -1549,8 +1549,8 @@ static inline void CheckSum(char* packet, unsigned long code, unsigned long pack
  * --INFO--
  * PAL Address: 0x8005c230
  * PAL Size: 5168b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8005BBD0
+ * EN Size: 5168b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1816,9 +1816,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             memcpy(m_editTextBuffers[slotIndex], payload, packetSize - 0x20);
             int* groupData = reinterpret_cast<int*>(m_editTextBuffers[slotIndex]);
             pppShapeGroupRaw* group = &m_editShapeGroups[slotIndex];
-            group->m_groupId = static_cast<short>(groupData[1]);
-            group->m_shapeCount = static_cast<short>(groupData[2]);
-            group->m_shapeList = reinterpret_cast<short*>(groupData + 3);
+            group->m_meshIndex = static_cast<short>(groupData[1]);
+            group->m_vertexCount = static_cast<short>(groupData[2]);
+            group->m_vertexIndices = reinterpret_cast<u16*>(groupData + 3);
         }
         return;
     case 0x0B:
@@ -3094,7 +3094,7 @@ inline void CPartMng::pppInitEnv(_pppEnvSt* env, _pppDataHead* dataHead, unsigne
     if (dataHead != 0) {
         env->m_mapMeshPtr = reinterpret_cast<CMapMesh**>(dataHead->m_modelNames);
         env->m_shapeTablePtr = reinterpret_cast<pppShapeSt**>(dataHead->m_shapeNames);
-        env->m_shapeGroupPtr = reinterpret_cast<pppShapeGroupRaw*>(dataHead->m_shapeGroups);
+        env->m_shapeGroupPtr = dataHead->m_shapeGroups;
     }
     if (heapSize != 0) {
         pppCreateHeap(env, heapSize);

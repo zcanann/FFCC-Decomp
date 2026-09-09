@@ -268,6 +268,8 @@ struct pppCacheChunk
     long* m_pdt;      // 0x4
 }; // Size 0x8
 
+struct pppShapeGroupRaw;
+
 struct _pppDataHead
 {
     unsigned int m_version;           // 0x0
@@ -280,7 +282,7 @@ struct _pppDataHead
     unsigned int m_cacheChunks;       // 0x10
     unsigned int m_modelNames;        // 0x14
     unsigned int m_shapeNames;        // 0x18
-    unsigned int m_shapeGroups;       // 0x1c
+    pppShapeGroupRaw* m_shapeGroups;  // 0x1c
 }; // Size 0x20
 
 struct pppIVECTOR3
@@ -321,9 +323,9 @@ typedef int _pppFieldParticleData_size_mismatch[(sizeof(_pppFieldParticleData) =
 
 struct pppShapeGroupRaw
 {
-    s16 m_groupId;     // 0x0
-    s16 m_shapeCount;  // 0x2
-    s16* m_shapeList;  // 0x4
+    s16 m_meshIndex;       // 0x0
+    s16 m_vertexCount;     // 0x2
+    u16* m_vertexIndices;  // 0x4
 }; // Size 0x8
 
 struct pppIVECTOR4

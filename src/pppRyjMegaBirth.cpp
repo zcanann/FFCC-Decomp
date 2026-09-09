@@ -767,8 +767,8 @@ void calc(
  * --INFO--
  * PAL Address: 0x80083070
  * PAL Size: 4468b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80082A0C
+ * EN Size: 4468b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -980,10 +980,10 @@ spawn_block:
 mesh_block:
 	{
 		s16 pathIndex = *s16_at(payload, 0xF0);
-		Vec* pathBase = reinterpret_cast<Vec*>(pObject->m_drawMatrixPtr);
+		Vec* pathBase = pObject->m_drawMatrixPtr;
 
 		if (pathIndex >= 0) {
-			s16* pathInfo = reinterpret_cast<s16*>(ppvEnv->m_shapeGroupPtr + (pathIndex));
+			pppShapeGroupRaw* pathInfo = &ppvEnv->m_shapeGroupPtr[pathIndex];
 			float sampleT;
 			float m1;
 			float m2;
@@ -991,17 +991,17 @@ mesh_block:
 			float m4;
 
 			if (pathBase == NULL) {
-				pathBase = (Vec*)ppvEnv->m_mapMeshPtr[pathInfo[0]]->m_vertices;
+				pathBase = ppvEnv->m_mapMeshPtr[pathInfo->m_meshIndex]->m_vertices;
 			}
 
 			switch (payload[0xE8]) {
 			default: {
-				if ((int)(u16)work->m_meshEmitIndex >= (int)pathInfo[1]) {
+				if ((int)(u16)work->m_meshEmitIndex >= (int)pathInfo->m_vertexCount) {
 					work->m_meshEmitIndex = 0;
 				}
 				if (pathBase != NULL) {
 					u16 sampleIndex = work->m_meshEmitIndex;
-					u16* indices = (u16*)*(int*)(pathInfo + 2);
+					u16* indices = pathInfo->m_vertexIndices;
 					work->m_meshEmitIndex = sampleIndex + 1;
 					Vec* pathVec = pathBase + indices[sampleIndex];
 					vx = pathVec->x;
@@ -1039,12 +1039,12 @@ mesh_block:
 				break;
 			}
 
-			if ((int)(u16)work->m_meshEmitIndex >= (int)pathInfo[1]) {
+			if ((int)(u16)work->m_meshEmitIndex >= (int)pathInfo->m_vertexCount) {
 				work->m_meshEmitIndex = 0;
 			}
 			if (pathBase != NULL) {
-				s32 sampleIndex = (s32)(sampleT * (float)pathInfo[1]);
-				Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];
+				s32 sampleIndex = (s32)(sampleT * (float)pathInfo->m_vertexCount);
+				Vec* pathVec = pathBase + pathInfo->m_vertexIndices[sampleIndex];
 				vx = pathVec->x;
 				vy = pathVec->y;
 				vz = pathVec->z;

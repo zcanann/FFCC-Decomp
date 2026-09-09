@@ -747,13 +747,13 @@ mode_4_5:
 
 path:
     {
-        float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
+        Vec* pathBase = pppPObject->m_drawMatrixPtr;
 
         if (param->m_pathIndex >= 0) {
-            short* pathInfo = reinterpret_cast<short*>(ppvEnv->m_shapeGroupPtr + (param->m_pathIndex));
+            pppShapeGroupRaw* pathInfo = &ppvEnv->m_shapeGroupPtr[param->m_pathIndex];
 
             if (pathBase == 0) {
-                pathBase = (float*)ppvEnv->m_mapMeshPtr[*pathInfo]->m_vertices;
+                pathBase = ppvEnv->m_mapMeshPtr[pathInfo->m_meshIndex]->m_vertices;
             }
 
             {
@@ -764,19 +764,19 @@ path:
 
                 switch (param->m_randType) {
                 default:
-                    if ((int)work->m_pathIndex >= pathInfo[1]) {
+                    if ((int)work->m_pathIndex >= pathInfo->m_vertexCount) {
                         work->m_pathIndex = 0;
                     }
 
                     if (pathBase != 0) {
                         int sampleIndex = work->m_pathIndex;
-                        u16* indices = (u16*)*(int*)(pathInfo + 2);
+                        u16* indices = pathInfo->m_vertexIndices;
                         work->m_pathIndex = sampleIndex + 1;
 
-                        float* pathVec = (float*)((u8*)pathBase + indices[(u16)sampleIndex] * sizeof(Vec));
-                        vx = pathVec[0];
-                        vy = pathVec[1];
-                        vz = pathVec[2];
+                        Vec* pathVec = &pathBase[indices[(u16)sampleIndex]];
+                        vx = pathVec->x;
+                        vy = pathVec->y;
+                        vz = pathVec->z;
                     }
                     goto path_apply;
                 case 1:
@@ -812,16 +812,16 @@ path:
                 }
                 }
 
-                if ((int)work->m_pathIndex >= pathInfo[1]) {
+                if ((int)work->m_pathIndex >= pathInfo->m_vertexCount) {
                     work->m_pathIndex = 0;
                 }
 
                 if (pathBase != 0) {
-                    int sampleIndex = (int)(sampleT * (float)pathInfo[1]);
-                    float* pathVec = (float*)((u8*)pathBase + *(u16*)(*(int*)(pathInfo + 2) + sampleIndex * 2) * sizeof(Vec));
-                    vx = pathVec[0];
-                    vy = pathVec[1];
-                    vz = pathVec[2];
+                    int sampleIndex = (int)(sampleT * (float)pathInfo->m_vertexCount);
+                    Vec* pathVec = &pathBase[pathInfo->m_vertexIndices[sampleIndex]];
+                    vx = pathVec->x;
+                    vy = pathVec->y;
+                    vz = pathVec->z;
                 }
 
             path_apply:

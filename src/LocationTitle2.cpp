@@ -35,7 +35,6 @@ STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_workOffset) == 0x00);
 STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_colorOffset) == 0x04);
 
 static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
-extern float kLocationTitle2WorkZero;
 
 static inline LocationTitle2DataOffsets* GetLocationTitle2DataOffsets(pppLocationTitle2Offsets* offsets)
 {
@@ -221,7 +220,7 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
     Vec stepDir;
     Vec scaled;
     Vec interp[21];
-    Vec* startPos;
+    LocationTitle2Particle* startParticle;
     Vec* interpRead;
     Vec* interpWrite;
     LocationTitle2Particle* dst;
@@ -307,9 +306,9 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
             if (work->m_count > 1) {
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
-                startPos = &particles[startIndex].m_pos;
+                startParticle = &particles[startIndex];
                 stepScale = 1.0f / (float)(unkB->m_stepCount + 1);
-                PSVECSubtract(&particles[startIndex + 1].m_pos, startPos, &stepDir);
+                PSVECSubtract(&particles[startIndex + 1].m_pos, &startParticle->m_pos, &stepDir);
                 interpRead = interp;
                 interpWrite = interpRead;
 
@@ -317,7 +316,7 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
                     float t = stepScale * (float)(i + 1);
 
                     PSVECScale(&stepDir, &scaled, t);
-                    PSVECAdd(startPos, &scaled, interpWrite);
+                    PSVECAdd(&startParticle->m_pos, &scaled, interpWrite);
                     inserted++;
                     work->m_count++;
 
@@ -332,7 +331,7 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
                     interpWrite++;
                 }
 
-                pppCopyVector(particles[startIndex + 1 + inserted].m_pos, startPos[3]);
+                pppCopyVector(particles[startIndex + 1 + inserted].m_pos, startParticle[1].m_pos);
 
                 for (i = 0; i < inserted; i++) {
                     dst = &particles[startIndex + (i + 1)];
@@ -351,7 +350,7 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
             }
         }
 
-        model->SetFrame(kLocationTitle2WorkZero);
+        model->SetFrame(0.0f);
     }
 }
 
@@ -388,7 +387,7 @@ extern "C" void pppConstructLocationTitle2(pppLocationTitle2* locationTitle, ppp
     LocationTitle2Work* work;
     f32 value;
 
-    value = kLocationTitle2WorkZero;
+    value = 0.0f;
     work = GetLocationTitle2Work(locationTitle, unkC);
     work->m_particles = 0;
     work->m_count = 0;

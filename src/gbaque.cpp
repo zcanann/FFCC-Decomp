@@ -1607,8 +1607,8 @@ void GbaQueue::LoadMapItemStat()
  * --INFO--
  * PAL Address: 0x800CE9AC
  * PAL Size: 568b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CE210
+ * EN Size: 568b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1659,8 +1659,8 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 		player++;
 	}
 
-	baseX = basePlayer->m_mapPosition[0];
-	baseZ = basePlayer->m_mapPosition[1];
+	baseX = localPlayerData[channel].m_mapPosition[0];
+	baseZ = localPlayerData[channel].m_mapPosition[1];
 
 	packet[1] = nearbyMask;
 	packet[2] = static_cast<unsigned char>(localPlayerData[0].m_mapPosition[0] - baseX);
@@ -1679,8 +1679,8 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
  * --INFO--
  * PAL Address: 0x800CE76C
  * PAL Size: 576b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CDFD0
+ * EN Size: 576b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1737,9 +1737,8 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
         }
     }
 
-    count = 0;
     outPtr = reinterpret_cast<unsigned char*>(outData);
-    for (j = 0; j < 0x40; j++) {
+    for (j = count = 0; j < 0x40; j++) {
         localEntry = &localEnemyData[j];
         prevWalk = &prevEntry[j];
         if ((localEntry->m_visible != 0 || prevWalk->m_visible != localEntry->m_visible) && memcmp(localEntry, prevWalk, sizeof(*localEntry)) != 0) {
@@ -1761,8 +1760,8 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
  * --INFO--
  * PAL Address: 0x800CE56C
  * PAL Size: 512b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CDDD0
+ * EN Size: 512b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1772,10 +1771,10 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	GbaQueueMapEntity* localEntry;
 	GbaQueueMapEntity* prevEntry;
 	GbaQueueMapEntity* prevWalk;
-	unsigned char* outPtr;
+	unsigned char* outPtr = reinterpret_cast<unsigned char*>(outData);
 	short baseX;
 	short baseZ;
-	int count = 0;
+	int count;
 	int i;
 
 	if (m_singleMode != 0) {
@@ -1812,10 +1811,9 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 		localEntry++;
 	}
 
-	localEntry = localMapItems;
-	prevWalk = prevEntry;
-	outPtr = reinterpret_cast<unsigned char*>(outData);
-	for (i = 0; i < m_mapItemCount; i++) {
+	for (i = count = 0; i < m_mapItemCount; i++) {
+		localEntry = &localMapItems[i];
+		prevWalk = &prevEntry[i];
 		if ((localEntry->m_visible != 0 || prevWalk->m_visible != localEntry->m_visible) && memcmp(localEntry, prevWalk, sizeof(*localEntry)) != 0) {
 			count++;
 			outPtr[0] = 0x21;
@@ -1824,9 +1822,6 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 			outPtr[3] = static_cast<unsigned char>(localEntry->m_posZ);
 			outPtr += 4;
 		}
-
-		localEntry++;
-		prevWalk++;
 	}
 
 	*outCount = count;

@@ -6,10 +6,6 @@
 #include "ffcc/game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
-extern "C" {
-extern const float kPppDrawDepthScaleNear;
-extern const float kPppDrawDepthScaleFar;
-}
 
 /*
  * --INFO--
@@ -169,8 +165,12 @@ void pppDrawMng::DrawOt()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007BDEC
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppDrawMng::ClearOt()
 {
@@ -179,11 +179,11 @@ void pppDrawMng::ClearOt()
 
 	if (Game.m_currentMapId == 0x21)
 	{
-		m_depthScale = kPppDrawDepthScaleNear;
+		m_depthScale = 0.0512f;
 	}
 	else
 	{
-		m_depthScale = kPppDrawDepthScaleFar;
+		m_depthScale = 0.512f;
 	}
 
 	do

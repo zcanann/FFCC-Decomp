@@ -26,8 +26,6 @@ static const char sCFlatRuntime2SetClassSystemValWarn[] =
     "!!!!!!!!!!!!!!!!!!!!\n";
 static const char sCFlatRuntime2AnimStateWarn[] =
     "\203|\201[\203g\224\324\215\206\202\252\210\331\217\355\202\305\202\267\201B";
-extern const float kCFlatRuntime2Zero;
-extern const float kCFlatRuntime2SystemValScale;
 
 namespace {
 
@@ -183,17 +181,17 @@ static inline void StoreU32(CFlatRuntime::CStack* stack, u8* base, int offset, i
 static inline void StoreF32(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
 {
 	float* value = reinterpret_cast<float*>(base + offset);
-	*reinterpret_cast<float*>(&stack[-1].m_word) = *value;
+	stack[-1].m_float = *value;
 
 	switch (setMode) {
 	case -1:
-		*value -= *reinterpret_cast<float*>(&stack->m_word);
+		*value -= stack->m_float;
 		break;
 	case 0:
-		*value = *reinterpret_cast<float*>(&stack->m_word);
+		*value = stack->m_float;
 		break;
 	case 1:
-		*value += *reinterpret_cast<float*>(&stack->m_word);
+		*value += stack->m_float;
 		break;
 	}
 }
@@ -231,14 +229,14 @@ static inline unsigned int LoadU32(u8* base, int offset)
 
 /*
  * --INFO--
- * PAL Address: 0x800C7FE8
+ * PAL Address: UNUSED
  * PAL Size: 104b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void VECNormalizeZero(Vec* src, Vec* dst)
+inline void VECNormalizeZero(Vec* src, Vec* dst)
 {
 	float magnitude = PSVECMag(src);
 	if (magnitude == 0.0f) {
@@ -252,14 +250,14 @@ void VECNormalizeZero(Vec* src, Vec* dst)
 
 /*
  * --INFO--
- * PAL Address: 0x800C8050
+ * PAL Address: UNUSED
  * PAL Size: 96b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CPad::IsGba(long padNo)
+inline int CPad::IsGba(long padNo)
 {
 	if (padNo < 0 || padNo >= 4) {
 		return 0;
@@ -269,14 +267,14 @@ int CPad::IsGba(long padNo)
 
 /*
  * --INFO--
- * PAL Address: 0x800C80B0
+ * PAL Address: UNUSED
  * PAL Size: 124b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CMonWork* SAFE_CAST_MON_WORK(CGObjWork* work)
+inline CMonWork* SAFE_CAST_MON_WORK(CGObjWork* work)
 {
 	if (work == 0 || work->m_objType != 1) {
 		return 0;
@@ -286,14 +284,14 @@ CMonWork* SAFE_CAST_MON_WORK(CGObjWork* work)
 
 /*
  * --INFO--
- * PAL Address: 0x800C812C
+ * PAL Address: UNUSED
  * PAL Size: 124b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork* work)
+inline CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork* work)
 {
 	if (work == 0 || work->m_objType != 0) {
 		return 0;
@@ -305,14 +303,14 @@ CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork* work)
 
 /*
  * --INFO--
- * PAL Address: 0x800C8220
+ * PAL Address: UNUSED
  * PAL Size: 44b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGObject::IsFall(int, int)
+inline int CGObject::IsFall(int, int)
 {
 	return (m_stateFlags0 & 0x80) != 0;
 }
@@ -612,23 +610,24 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 				case -0x18:
 					StoreF32(stack, engineObject, 0x1BC, setMode);
 					break;
-					case -0x1A: {
-						int value = 0;
-						*reinterpret_cast<float*>(&stack[-1].m_word) = kCFlatRuntime2Zero;
-						switch (setMode) {
-						case -1:
-							value = static_cast<int>(kCFlatRuntime2Zero - static_cast<float>(stack->m_word));
-							break;
-						case 0:
-							value = static_cast<int>(*reinterpret_cast<float*>(&stack->m_word));
-							break;
-						case 1:
-							value = static_cast<int>(kCFlatRuntime2Zero + static_cast<float>(stack->m_word));
-							break;
-						}
-						*(engineObject + 0x56) = static_cast<u8>(static_cast<int>(kCFlatRuntime2SystemValScale * static_cast<float>(value)));
+				case -0x1A: {
+					int value = 0;
+					stack[-1].m_float = 0.0f;
+					switch (setMode) {
+					case -1:
+						value -= stack->m_float;
+						break;
+					case 0:
+						value = static_cast<int>(stack->m_float);
+						break;
+					case 1:
+						value += stack->m_float;
 						break;
 					}
+					reinterpret_cast<CGObject*>(engineObject)->m_field_0x56 =
+					    static_cast<u8>(static_cast<int>(1000.0f * static_cast<float>(value)));
+					break;
+				}
 				case -0x1B:
 					StoreU32(stack, engineObject, 0x60, setMode);
 					break;
@@ -1109,9 +1108,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x15:
 			engineObject->m_weaponNodeFlagBits.m_unk10 = static_cast<signed char>(object->m_localBase[0]);
-			engineObject->m_groundHitOffset.z = kCFlatRuntime2Zero;
-			engineObject->m_groundHitOffset.y = kCFlatRuntime2Zero;
-			engineObject->m_groundHitOffset.x = kCFlatRuntime2Zero;
+			engineObject->m_groundHitOffset.z = 0.0f;
+			engineObject->m_groundHitOffset.y = 0.0f;
+			engineObject->m_groundHitOffset.x = 0.0f;
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1227,7 +1226,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitStart.y = engineObject->m_worldPosition.y + params[1];
 			hitStart.z = engineObject->m_worldPosition.z;
 			hitMove.x = static_cast<float>(sin(angle)) * length;
-			hitMove.y = kCFlatRuntime2Zero;
+			hitMove.y = 0.0f;
 			hitMove.z = static_cast<float>(cos(angle)) * length;
 			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, radius, 1, 0);
@@ -1298,9 +1297,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitStart.x = engineObject->m_worldPosition.x + static_cast<float>(sin(angle)) * distance;
 			hitStart.y = engineObject->m_worldPosition.y + reinterpret_cast<float*>(object->m_localBase)[1];
 			hitStart.z = engineObject->m_worldPosition.z + static_cast<float>(cos(angle)) * distance;
-			hitMove.x = kCFlatRuntime2Zero;
+			hitMove.x = 0.0f;
 			hitMove.y = -height;
-			hitMove.z = kCFlatRuntime2Zero;
+			hitMove.z = 0.0f;
 			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, radius, 1, 0);
 			if (hit != 0) {
@@ -1707,14 +1706,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			moveVector.x = params[0];
 			moveVector.y = params[1];
 			moveVector.z = params[2];
-			float magnitude = PSVECMag(&moveVector);
-			if (magnitude == 0.0f) {
-				moveVector.x = 0.0f;
-				moveVector.y = 0.0f;
-				moveVector.z = 0.0f;
-			} else {
-				PSVECScale(&moveVector, &moveVector, 0.5f / magnitude);
-			}
+			VECNormalizeZero(&moveVector, &moveVector);
 			engineObject->MoveVector(&moveVector, reinterpret_cast<float*>(object->m_localBase)[3], static_cast<int>(object->m_localBase[4]), 1, 1, 1);
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1854,7 +1846,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x41:
-			engineObject->m_alphaStep = 0.5f / static_cast<float>(static_cast<int>(object->m_localBase[0]));
+			engineObject->m_alphaStep = 1.0f / static_cast<float>(static_cast<int>(object->m_localBase[0]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

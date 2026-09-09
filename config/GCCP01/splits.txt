@@ -1160,6 +1160,7 @@ cflat_r2class.cpp:
 	.text       start:0x800BA2FC end:0x800BD848
 	.rodata     start:0x801DA778 end:0x801DA7E8
 	.data       start:0x802101F0 end:0x80210528
+	.sdata2     start:0x80330BC8 end:0x80330BE0
 
 p_chara_viewer.cpp:
 	extab       start:0x80008350 end:0x80008390

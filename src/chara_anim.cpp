@@ -131,6 +131,63 @@ CChara::CAnim::~CAnim()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CChara::CAnimNode::Create(CChunkFile& chunkFile)
+{
+	CChunkFile::CChunk chunk;
+
+	chunkFile.PushChunk();
+	while (chunkFile.GetNextChunk(chunk)) {
+		int chunkId = static_cast<int>(chunk.m_id);
+		switch (chunkId) {
+		case 0x4E414D45:
+			strcpy(m_name, chunkFile.GetString());
+			break;
+		case 0x44415441: {
+			int type;
+			int mode;
+			int i = 0;
+			int shift = 0;
+			do {
+				type = chunkFile.Get4();
+
+				if (type == 0) {
+					mode = 0;
+				} else if (type == 1) {
+					mode = 1;
+				} else {
+					mode = 2;
+				}
+
+				unsigned int dataOffset = chunkFile.Get4();
+				if (i == 0) {
+					m_dataOffset = dataOffset;
+				}
+
+				m_flagsBits.m_channelModes |= static_cast<unsigned int>(mode) << shift;
+
+				if ((i >= 6) && (type != 0)) {
+					m_flagsBits.m_hasScale = 1;
+				}
+
+				i++;
+				shift += 2;
+			} while (i < 9);
+			break;
+		}
+		}
+	}
+	chunkFile.PopChunk();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800BF984
  * PAL Size: 960b
  * EN Address: TODO
@@ -250,63 +307,6 @@ CChara::CAnimNode::CAnimNode()
 {
 	m_flagsBits.m_hasScale = 0;
 	m_flagsBits.m_channelModes = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 296b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CChara::CAnimNode::Create(CChunkFile& chunkFile)
-{
-	CChunkFile::CChunk chunk;
-
-	chunkFile.PushChunk();
-	while (chunkFile.GetNextChunk(chunk)) {
-		int chunkId = static_cast<int>(chunk.m_id);
-		switch (chunkId) {
-		case 0x4E414D45:
-			strcpy(m_name, chunkFile.GetString());
-			break;
-		case 0x44415441: {
-			int type;
-			int mode;
-			int i = 0;
-			int shift = 0;
-			do {
-				type = chunkFile.Get4();
-
-				if (type == 0) {
-					mode = 0;
-				} else if (type == 1) {
-					mode = 1;
-				} else {
-					mode = 2;
-				}
-
-				unsigned int dataOffset = chunkFile.Get4();
-				if (i == 0) {
-					m_dataOffset = dataOffset;
-				}
-
-				m_flagsBits.m_channelModes |= static_cast<unsigned int>(mode) << shift;
-
-				if ((i >= 6) && (type != 0)) {
-					m_flagsBits.m_hasScale = 1;
-				}
-
-				i++;
-				shift += 2;
-			} while (i < 9);
-			break;
-		}
-		}
-	}
-	chunkFile.PopChunk();
 }
 
 /*

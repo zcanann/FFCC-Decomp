@@ -508,7 +508,7 @@ config.libs = [
             Object(
                 NonMatching,
                 "chara_anim.cpp",
-                extra_cflags=["-inline auto,deferred", "-RTTI on", "-str reuse,readonly"],
+                extra_cflags=["-RTTI on", "-str reuse,readonly"],
             ),
             Object(NonMatching, "chara_fur.cpp", extra_cflags=["-str reuse,nopool,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "chara.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
@@ -518,7 +518,7 @@ config.libs = [
             Object(Matching, "color.cpp"),
             Object(NonMatching, "file.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(Matching, "strcase.c"),
-            Object(NonMatching, "fontman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
+            Object(NonMatching, "fontman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "FS_USB_Process.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "FunnyShape.cpp"),
             Object(NonMatching, "game.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
@@ -761,8 +761,8 @@ config.libs = [
             Object(NonMatching, "sound.cpp", extra_cflags=["-RTTI on", "-inline auto,deferred", "-str reuse,nopool,readonly", "-sdata 8"]),
             Object(NonMatching, "stopwatch.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "system.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
-            Object(NonMatching, "texanim.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
-            Object(NonMatching, "textureman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
+            Object(NonMatching, "texanim.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
+            Object(NonMatching, "textureman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
             Object(
                 Matching,
                 "THPDraw.cpp",

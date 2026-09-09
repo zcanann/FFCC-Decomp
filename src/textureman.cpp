@@ -760,20 +760,6 @@ void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
 
 /*
  * --INFO--
- * PAL Address: 0x8003AEEC
- * PAL Size: 120b
- * EN Address: 0x80045BD0
- * EN Size: 68b
- * JP Address: TODO
- * JP Size: TODO
- */
-_GXColor CTexture::GetTlutColor(int index)
-{
-    return GetExternalTlutColor(m_tlutData, GetNumTlut(), index);
-}
-
-/*
- * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 76b
  * EN Address: 0x80045C14
@@ -797,16 +783,16 @@ inline _GXColor CTexture::GetExternalTlutColor(void* tlutData, int tlutOffset, i
 
 /*
  * --INFO--
- * PAL Address: 0x8003AE78
- * PAL Size: 116b
- * EN Address: 0x80045C80
- * EN Size: 76b
+ * PAL Address: 0x8003AEEC
+ * PAL Size: 120b
+ * EN Address: 0x80045BD0
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CTexture::SetTlutColor(int index, _GXColor color)
+_GXColor CTexture::GetTlutColor(int index)
 {
-    SetExternalTlutColor(m_tlutData, GetNumTlut(), index, color);
+    return GetExternalTlutColor(m_tlutData, GetNumTlut(), index);
 }
 
 /*
@@ -830,6 +816,20 @@ void CTexture::SetExternalTlutColor(void* tlutData, int tlutOffset, int index, _
     unsigned short* tlut = reinterpret_cast<unsigned short*>(tlutData);
     tlut[index + tlutOffset] = static_cast<unsigned short>(packedColor >> 16);
     tlut[index] = static_cast<unsigned short>(packedColor);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003AE78
+ * PAL Size: 116b
+ * EN Address: 0x80045C80
+ * EN Size: 76b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexture::SetTlutColor(int index, _GXColor color)
+{
+    SetExternalTlutColor(m_tlutData, GetNumTlut(), index, color);
 }
 
 /*
@@ -940,35 +940,22 @@ void* CTextureSet::operator new(unsigned long size, CMemory::CStage*, char* file
 
 /*
  * --INFO--
- * PAL Address: 0x8003A9AC
- * PAL Size: 712b
- * EN Address: 0x80045EF0
- * EN Size: 316b
+ * PAL Address: 0x8003A6F0
+ * PAL Size: 140b
+ * EN Address: 0x800461D4
+ * EN Size: 144b
  * JP Address: TODO
  * JP Size: TODO
  */
-void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
+int CTextureSet::Find(char* name)
 {
-    CChunkFile::CChunk chunk;
-    CChunkFile chunkFile(filePtr);
-
-    while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id != 0x54455820) {
-            continue;
-        }
-
-        chunkFile.PushChunk();
-        while (chunkFile.GetNextChunk(chunk)) {
-            if (chunk.m_id == 0x5343454E) {
-                chunkFile.PushChunk();
-                while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id == 0x54534554) {
-                        Create(chunkFile, stage, append, amemCacheSet, cacheTag, useAddress);
-                    }
-                }
-            }
+    for (unsigned long i = 0; i < static_cast<unsigned long>(m_textureArray.GetSize()); i++) {
+        CTexture* texture = m_textureArray[i];
+        if ((texture != 0) && (strcmp(texture->m_name, name) == 0)) {
+            return static_cast<int>(i);
         }
     }
+    return -1;
 }
 
 /*
@@ -1032,22 +1019,35 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
 
 /*
  * --INFO--
- * PAL Address: 0x8003A6F0
- * PAL Size: 140b
- * EN Address: 0x800461D4
- * EN Size: 144b
+ * PAL Address: 0x8003A9AC
+ * PAL Size: 712b
+ * EN Address: 0x80045EF0
+ * EN Size: 316b
  * JP Address: TODO
  * JP Size: TODO
  */
-int CTextureSet::Find(char* name)
+void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
 {
-    for (unsigned long i = 0; i < static_cast<unsigned long>(m_textureArray.GetSize()); i++) {
-        CTexture* texture = m_textureArray[i];
-        if ((texture != 0) && (strcmp(texture->m_name, name) == 0)) {
-            return static_cast<int>(i);
+    CChunkFile::CChunk chunk;
+    CChunkFile chunkFile(filePtr);
+
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id != 0x54455820) {
+            continue;
+        }
+
+        chunkFile.PushChunk();
+        while (chunkFile.GetNextChunk(chunk)) {
+            if (chunk.m_id == 0x5343454E) {
+                chunkFile.PushChunk();
+                while (chunkFile.GetNextChunk(chunk)) {
+                    if (chunk.m_id == 0x54534554) {
+                        Create(chunkFile, stage, append, amemCacheSet, cacheTag, useAddress);
+                    }
+                }
+            }
         }
     }
-    return -1;
 }
 
 /*

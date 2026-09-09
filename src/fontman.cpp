@@ -95,6 +95,51 @@ CFontMan::~CFontMan()
 
 /*
  * --INFO--
+ * PAL Address: 0x80092E3C
+ * PAL Size: 176b
+ * EN Address: 0x800A4AB0
+ * EN Size: 224b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CFont::CFont()
+{
+	m_glyphData = 0;
+	texturePtr = 0;
+	margin = 0.0f;
+	posZ = 0.0f;
+	posY = 0.0f;
+	posX = 0.0f;
+	CFontRenderFlagBits& bits = renderFlags;
+	bits.shadow = 0;
+	scaleY = 1.0f;
+	scaleX = 1.0f;
+	bits.snapPosition = 0;
+	m_color.r = 0xFF;
+	m_color.g = 0xFF;
+	m_color.b = 0xFF;
+	m_color.a = 0xFF;
+	bits.zCompare = 0;
+	bits.zUpdate = 0;
+	m_usesEmbeddedData = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80092D2C
+ * PAL Size: 72b
+ * EN Address: 0x800A4C38
+ * EN Size: 80b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* CFont::operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
+{
+	return Memory._Alloc(size, FontMan.m_stage, file, line, 0);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80092F70
  * PAL Size: 296b
  * EN Address: 0x800A4A00
@@ -153,37 +198,6 @@ unsigned long CFontMan::GetInternal22Size()
 
 /*
  * --INFO--
- * PAL Address: 0x80092E3C
- * PAL Size: 176b
- * EN Address: 0x800A4AB0
- * EN Size: 224b
- * JP Address: TODO
- * JP Size: TODO
- */
-CFont::CFont()
-{
-	m_glyphData = 0;
-	texturePtr = 0;
-	margin = 0.0f;
-	posZ = 0.0f;
-	posY = 0.0f;
-	posX = 0.0f;
-	CFontRenderFlagBits& bits = renderFlags;
-	bits.shadow = 0;
-	scaleY = 1.0f;
-	scaleX = 1.0f;
-	bits.snapPosition = 0;
-	m_color.r = 0xFF;
-	m_color.g = 0xFF;
-	m_color.b = 0xFF;
-	m_color.a = 0xFF;
-	bits.zCompare = 0;
-	bits.zUpdate = 0;
-	m_usesEmbeddedData = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80092D74
  * PAL Size: 200b
  * EN Address: 0x800A4B90
@@ -205,20 +219,6 @@ CFont::~CFont()
 		delete[] static_cast<unsigned char*>(m_glyphData);
 		m_glyphData = 0;
 	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80092D2C
- * PAL Size: 72b
- * EN Address: 0x800A4C38
- * EN Size: 80b
- * JP Address: TODO
- * JP Size: TODO
- */
-void* CFont::operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
-{
-	return Memory._Alloc(size, FontMan.m_stage, file, line, 0);
 }
 
 /*
@@ -677,26 +677,6 @@ void CFont::Draw(unsigned short ch)
 
 /*
  * --INFO--
- * PAL Address: 0x80091F88
- * PAL Size: 404b
- * EN Address: 0x800A59E8
- * EN Size: 120b
- * JP Address: TODO
- * JP Size: TODO
- */
-float CFont::GetWidth(char* text)
-{
-	char* textPtr = text;
-	float width = 0.0f;
-	unsigned short ch;
-	while (getNextChar(&textPtr, &ch)) {
-		width += GetWidth(ch);
-	}
-	return width;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80091E58
  * PAL Size: 304b
  * EN Address: 0x800A5A60
@@ -739,4 +719,24 @@ find_fallback:
 		goto found_fallback;
 	}
 	return 0.0f;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80091F88
+ * PAL Size: 404b
+ * EN Address: 0x800A59E8
+ * EN Size: 120b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+float CFont::GetWidth(char* text)
+{
+	char* textPtr = text;
+	float width = 0.0f;
+	unsigned short ch;
+	while (getNextChar(&textPtr, &ch)) {
+		width += GetWidth(ch);
+	}
+	return width;
 }

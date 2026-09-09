@@ -1290,7 +1290,8 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
             tremoloVolume >>= REDSOUND_FIXED_SHIFT;
 
             if (voice->m_volumeModFrames != 0) {
-                tremoloVolume = tremoloVolume * voice->m_volumeModFrame / voice->m_volumeModFrames;
+                tremoloVolume *= voice->m_volumeModFrame;
+                tremoloVolume /= voice->m_volumeModFrames;
                 voice->m_volumeModFrame = voice->m_volumeModFrame + 1;
                 if (voice->m_volumeModFrame >= voice->m_volumeModFrames) {
                     voice->m_volumeModFrames = 0;
@@ -1387,7 +1388,8 @@ static void _PitchExecute(RedVoiceDATA* voice)
         pitchWork >>= REDSOUND_FIXED_SHIFT;
 
         if (voice->m_pitchModFrames != 0) {
-            pitchWork = pitchWork * voice->m_pitchModFrame / voice->m_pitchModFrames;
+            pitchWork *= voice->m_pitchModFrame;
+            pitchWork /= voice->m_pitchModFrames;
             voice->m_pitchModFrame = voice->m_pitchModFrame + 1;
             if (voice->m_pitchModFrame >= voice->m_pitchModFrames) {
                 voice->m_pitchModFrames = 0;

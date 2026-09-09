@@ -261,6 +261,35 @@ inline CSound::~CSound()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: 0x800DF41C
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CSound::IsDebugPrint(int enabled)
+{
+    m_debugPrint = enabled;
+    m_redSound.ReportPrint(enabled != 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800c7f20
+ * PAL Size: 44b
+ * EN Address: 0x800DCCB8
+ * EN Size: 84b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CSound::SetStereo(int stereo)
+{
+    m_redSound.SetSoundMode(stereo ? 0 : 1);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800c810c
  * PAL Size: 372b
  * EN Address: TODO
@@ -368,20 +397,6 @@ void CSound::Quit()
     }
 
     Memory.DestroyStage(m_stage);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800c7f20
- * PAL Size: 44b
- * EN Address: 0x800DCCB8
- * EN Size: 84b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CSound::SetStereo(int stereo)
-{
-    m_redSound.SetSoundMode(stereo ? 0 : 1);
 }
 
 /*
@@ -1748,26 +1763,6 @@ void CSound::SetSe3DGroup(int se3dHandle, int group)
 
 /*
  * --INFO--
- * PAL Address: 0x800c5a08
- * PAL Size: 372b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CSound::StopSe3DGroup(int group)
-{
-    CSe3D* se = m_seWork;
-    for (u32 i = 0; i < 128; i++, se++) {
-        if (se->m_bits.m_active && se->m_group >= 0 && se->m_group == group) {
-            StopSe3D(se->m_handle);
-            se->m_bits.m_active = 0;
-        }
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800c58e8
  * PAL Size: 288b
  * EN Address: TODO
@@ -1783,6 +1778,26 @@ void CSound::StopSe3D(int se3dHandle)
         CSe3D* se = searchSe3D(se3dHandle);
         if (se != 0) {
             StopSe(se->m_playId);
+            se->m_bits.m_active = 0;
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800c5a08
+ * PAL Size: 372b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CSound::StopSe3DGroup(int group)
+{
+    CSe3D* se = m_seWork;
+    for (u32 i = 0; i < 128; i++, se++) {
+        if (se->m_bits.m_active && se->m_group >= 0 && se->m_group == group) {
+            StopSe3D(se->m_handle);
             se->m_bits.m_active = 0;
         }
     }
@@ -2068,22 +2083,6 @@ void CSound::SetStreamVolume(int volume, int frames)
 inline void CSound::IsPlayStream()
 {
 	// TODO
-}
-
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 52b
- * EN Address: 0x800DF41C
- * EN Size: 96b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CSound::IsDebugPrint(int enabled)
-{
-    m_debugPrint = enabled;
-    m_redSound.ReportPrint(enabled != 0);
 }
 
 /*

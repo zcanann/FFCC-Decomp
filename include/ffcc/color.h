@@ -38,10 +38,10 @@ public:
 	CColor operator*(float scale) const
 	{
 		CColor out;
-		out.color.r = static_cast<unsigned char>(static_cast<int>(color.r * scale));
-		out.color.g = static_cast<unsigned char>(static_cast<int>(color.g * scale));
-		out.color.b = static_cast<unsigned char>(static_cast<int>(color.b * scale));
-		out.color.a = static_cast<unsigned char>(static_cast<int>(color.a * scale));
+		out.color.r = static_cast<unsigned char>(color.r * scale);
+		out.color.g = static_cast<unsigned char>(color.g * scale);
+		out.color.b = static_cast<unsigned char>(color.b * scale);
+		out.color.a = static_cast<unsigned char>(color.a * scale);
 		return out;
 	}
 	/*

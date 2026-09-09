@@ -2858,22 +2858,20 @@ void CGMonObj::onStatDie()
  * --INFO--
  * PAL Address: 0x801179BC
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80116D1C
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGMonObj::onStatShield()
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
-	if (*reinterpret_cast<int*>(mon + 0x52C) == 1) {
-		int subFrame = *reinterpret_cast<int*>(mon + 0x530);
-		int action = *reinterpret_cast<int*>(mon + 0x560);
-		int waitFrame = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (action * 0x48 + 0x2E));
+	if (m_subState == 1) {
+		int subFrame = m_subFrame;
+		int action = m_itemId;
+		int waitFrame = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[action].m_power;
 
 		if (subFrame == waitFrame) {
-			reinterpret_cast<CGPrgObj*>(this)->changeSubStat(3);
+			changeSubStat(3);
 		}
 	}
 }
@@ -3642,37 +3640,34 @@ void CGMonObj::onFrameStat()
  * --INFO--
  * PAL Address: 0x80119278
  * PAL Size: 432b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801185D8
+ * EN Size: 432b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGMonObj::onCancelStat(int state)
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
 	(this->*m_funcs->cancelStat)();
 
-	switch (*reinterpret_cast<int*>(mon + 0x520)) {
+	switch (m_lastStateId) {
 	case 0x1D:
-		object->CancelMove(1);
+		CancelMove(1);
 		break;
 
 	case 0x16:
 		m_unk6B9 = 0;
-		object->SetAnimSlot(0, 0);
-		object->SetAnimSlot(1, 1);
-		object->SetAnimSlot(4, 4);
-		object->SetAnimSlot(6, 6);
+		SetAnimSlot(0, 0);
+		SetAnimSlot(1, 1);
+		SetAnimSlot(4, 4);
+		SetAnimSlot(6, 6);
 		break;
 
 	case 0x17:
 		m_unk6B9 = 1;
-		object->SetAnimSlot(0x28, 0);
-		object->SetAnimSlot(0x29, 1);
-		object->SetAnimSlot(0x2A, 4);
-		object->SetAnimSlot(0x2B, 6);
+		SetAnimSlot(0x28, 0);
+		SetAnimSlot(0x29, 1);
+		SetAnimSlot(0x2A, 4);
+		SetAnimSlot(0x2B, 6);
 		break;
 
 	case 0x21:
@@ -3685,11 +3680,11 @@ void CGMonObj::onCancelStat(int state)
 
 	case 0x18:
 		m_actionBranch = 1;
-		object->SetAnimSlot(0, 0);
-		object->SetAnimSlot(4, 4);
-		object->m_bgColMask |= 0x50000;
-		object->m_bgColMask &= 0xFFFFFFF7;
-		object->m_objectFlags &= 0xFFFFFFEF;
+		SetAnimSlot(0, 0);
+		SetAnimSlot(4, 4);
+		m_bgColMask |= 0x50000;
+		m_bgColMask &= 0xFFFFFFF7;
+		m_objectFlags &= 0xFFFFFFEF;
 		break;
 	}
 
@@ -3700,8 +3695,8 @@ void CGMonObj::onCancelStat(int state)
  * --INFO--
  * PAL Address: 0x80119428
  * PAL Size: 256b
- * EN Address: 0x80133B84
- * EN Size: 352b
+ * EN Address: 0x80118788
+ * EN Size: 256b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3738,8 +3733,8 @@ void CGMonObj::setActionParam(int state)
  * --INFO--
  * PAL Address: 0x80119528
  * PAL Size: 332b
- * EN Address: 0x80133AFC
- * EN Size: 136b
+ * EN Address: 0x80118888
+ * EN Size: 332b
  * JP Address: TODO
  * JP Size: TODO
  */

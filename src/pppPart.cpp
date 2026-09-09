@@ -50,17 +50,6 @@ static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
 	return pppMngSt->m_owner->m_charaModelHandle->m_model;
 }
 
-static const float kPppLocalZero = 0.0f;
-extern "C" const unsigned int gPppFixedWhite;
-extern "C" const float kPppPartZero = 0.0f;
-extern "C" const float kPppPartHugePositive = 10000000000.0f;
-extern "C" const float kPppPartHugeNegative = -10000000000.0f;
-extern "C" const float kPppPartZOffsetMin = -1000000000000.0f;
-extern "C" const double kPppPartZeroDouble = 0.0;
-extern "C" const float kPppPartDepthScale;
-extern "C" const float kPppPartOne = 1.0f;
-extern "C" const double kPppPartOneDouble = 1.0;
-
 _pppMngSt* ppvMng;
 _pppEnvSt* ppvEnv;
 extern "C" {
@@ -256,7 +245,7 @@ void pppSetRowVector(pppFMATRIX& pppFMtx, Vec& vecA, Vec& vecB, Vec& vecC, Vec& 
  */
 void pppNormalize(Vec& dest, Vec source)
 { 
-	float zero = kPppPartZero;
+	float zero = 0.0f;
 	if ((source.x == zero) && (source.y == zero) && (source.z == zero)) {
 		return;
 	}
@@ -336,9 +325,9 @@ float pppVectorLength(Vec vec)
 {
 	Vec zeroVec;
 
-	zeroVec.x = kPppPartZero;
-	zeroVec.y = kPppPartZero;
-	zeroVec.z = kPppPartZero;
+	zeroVec.x = 0.0f;
+	zeroVec.y = 0.0f;
+	zeroVec.z = 0.0f;
 
 	return PSVECDistance(&vec, &zeroVec);
 }
@@ -963,7 +952,7 @@ ApplyRotatedMatrix:
 	PSMTXConcat(nodeMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 
 ScaleOnly:
-	if (kPppPartOne != pppMngSt->m_scale.x) {
+	if (1.0f != pppMngSt->m_scale.x) {
 		scaleAxis0.x = ppvMng->m_matrix.value[0][0];
 		scaleAxis0.y = ppvMng->m_matrix.value[1][0];
 		scaleAxis0.z = ppvMng->m_matrix.value[2][0];
@@ -973,7 +962,7 @@ ScaleOnly:
 		ppvMng->m_matrix.value[2][0] = scaleAxis0.z;
 	}
 
-	if (kPppPartOne != pppMngSt->m_scale.y) {
+	if (1.0f != pppMngSt->m_scale.y) {
 		scaleAxis1.x = ppvMng->m_matrix.value[0][1];
 		scaleAxis1.y = ppvMng->m_matrix.value[1][1];
 		scaleAxis1.z = ppvMng->m_matrix.value[2][1];
@@ -983,7 +972,7 @@ ScaleOnly:
 		ppvMng->m_matrix.value[2][1] = scaleAxis1.z;
 	}
 
-	if (kPppPartOne == pppMngSt->m_scale.z) {
+	if (1.0f == pppMngSt->m_scale.z) {
 		return;
 	}
 
@@ -1029,9 +1018,9 @@ MatrixMode3:
 			ownerScale = pppMngSt->m_owner->m_currentAlpha;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
-		if (kPppPartZeroDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
+		if (0.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (kPppPartOneDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
+		} else if (1.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 0;
 		} else {
 			pppMngSt->m_useOwnerScaleSign = 1;
@@ -1085,9 +1074,9 @@ MatrixMode5:
 			ownerScale = pppMngSt->m_owner->m_currentAlpha;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
-		if (kPppPartZeroDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
+		if (0.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (kPppPartOneDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
+		} else if (1.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 0;
 		} else {
 			pppMngSt->m_useOwnerScaleSign = 1;
@@ -1131,9 +1120,9 @@ MatrixMode6:
 			ownerScale = pppMngSt->m_owner->m_currentAlpha;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
-		if (kPppPartZeroDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
+		if (0.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (kPppPartOneDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
+		} else if (1.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 0;
 		} else {
 			pppMngSt->m_useOwnerScaleSign = 1;
@@ -1180,9 +1169,9 @@ MatrixMode7:
 			ownerScale = pppMngSt->m_owner->m_currentAlpha;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
-		if (kPppPartZeroDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
+		if (0.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (kPppPartOneDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
+		} else if (1.0 == static_cast<double>(pppMngSt->m_ownerScale)) {
 			pppMngSt->m_useOwnerScaleSign = 0;
 		} else {
 			pppMngSt->m_useOwnerScaleSign = 1;
@@ -1236,8 +1225,6 @@ LocalOnly:
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline float LoadFloat(const float& f) { return f; }
-
 void pppSetFpMatrix(_pppMngSt* pppMngSt)
 {
 	Vec local_a8;
@@ -1274,24 +1261,20 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	local_70.x = ppvWorldMatrix[0][1];
 	local_70.y = ppvWorldMatrix[1][1];
 	local_70.z = ppvWorldMatrix[2][1];
-	((u32*)&local_90)[0] = ((u32*)&local_70)[0];
-	((u32*)&local_90)[1] = ((u32*)&local_70)[1];
-	((u32*)&local_90)[2] = ((u32*)&local_70)[2];
-	if ((local_90.x != LoadFloat(kPppPartZero)) || (local_90.y != LoadFloat(kPppPartZero)) || (local_90.z != LoadFloat(kPppPartZero))) {
+	local_90 = local_70;
+	if ((local_90.x != 0.0f) || (local_90.y != 0.0f) || (local_90.z != 0.0f)) {
 		PSVECNormalize(&local_90, &local_70);
 	}
 
 	local_9c.x = local_70.y;
 	local_9c.y = -local_70.x;
-	local_9c.z = LoadFloat(kPppPartZero);
+	local_9c.z = 0.0f;
 	ppvWorldMatrixWood[0][1] = local_70.x;
 	ppvWorldMatrixWood[1][1] = local_70.y;
 	ppvWorldMatrixWood[2][1] = local_70.z;
-	((u32*)&local_60)[0] = ((u32*)&local_9c)[0];
-	((u32*)&local_60)[1] = ((u32*)&local_9c)[1];
-	((u32*)&local_60)[2] = ((u32*)&local_9c)[2];
+	local_60 = local_9c;
 
-	if ((local_60.x != LoadFloat(kPppPartZero)) || (local_60.y != LoadFloat(kPppPartZero)) || (local_60.z != LoadFloat(kPppPartZero))) {
+	if ((local_60.x != 0.0f) || (local_60.y != 0.0f) || (local_60.z != 0.0f)) {
 		PSVECNormalize(&local_60, &local_9c);
 	}
 
@@ -1299,11 +1282,9 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	ppvWorldMatrixWood[1][0] = local_9c.y;
 	ppvWorldMatrixWood[2][0] = local_9c.z;
 	PSVECCrossProduct(&local_9c, &local_70, &local_80);
-	((u32*)&local_a8)[0] = ((u32*)&local_80)[0];
-	((u32*)&local_a8)[1] = ((u32*)&local_80)[1];
-	((u32*)&local_a8)[2] = ((u32*)&local_80)[2];
+	local_a8 = local_80;
 
-	if ((local_a8.x != LoadFloat(kPppPartZero)) || (local_a8.y != LoadFloat(kPppPartZero)) || (local_a8.z != LoadFloat(kPppPartZero))) {
+	if ((local_a8.x != 0.0f) || (local_a8.y != 0.0f) || (local_a8.z != 0.0f)) {
 		PSVECNormalize(&local_a8, &local_80);
 	}
 
@@ -2067,8 +2048,8 @@ void pppSetBlendMode(unsigned char blendMode)
  */
 void pppClearDrawEnv()
 {
-	if (kPppPartZero != s_zoff) {
-		s_zoff = kPppPartZero;
+	if (0.0f != s_zoff) {
+		s_zoff = 0.0f;
 		ppvScreenMatrix[2][3] = ppvScreenMatrixZbuff;
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
@@ -2085,9 +2066,9 @@ void pppClearDrawEnv()
  */
 void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsigned char lightTarget, unsigned char fogIndex, unsigned char fogParam, unsigned char cullMode, unsigned char zEnable, unsigned char colorUpdate, unsigned char zWrite)
 {
-	if (kPppPartZeroDouble != (double)depth) {
+	if (0.0 != (double)depth) {
 		float sortDepth = ppvMng->m_sortDepth;
-		depth = (depth * kPppPartDepthScale) / -sortDepth;
+		depth = (depth * 5000.0f) / -sortDepth;
 	}
 
 	if ((double)s_zoff != (double)depth) {
@@ -2117,15 +2098,14 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 			nrmMtx[0][2] = pppMtx->value[0][2];
 			nrmMtx[1][2] = pppMtx->value[1][2];
 			nrmMtx[2][2] = pppMtx->value[2][2];
-			nrmMtx[0][3] = kPppLocalZero;
-			nrmMtx[1][3] = kPppLocalZero;
-			nrmMtx[2][3] = kPppLocalZero;
+			nrmMtx[0][3] = 0.0f;
+			nrmMtx[1][3] = 0.0f;
+			nrmMtx[2][3] = 0.0f;
 			GXLoadNrmMtxImm(nrmMtx, GX_PNMTX0);
 		}
 	}
 
-	_GXColor fixedColor;
-	*(u32*)&fixedColor = gPppFixedWhite;
+	_GXColor fixedColor = {255, 255, 255, 255};
 	if (lightTarget <= 1) {
 		if (pppColor != 0) {
 			GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)pppColor->rgba);
@@ -2197,11 +2177,11 @@ void pppInitDrawEnv(unsigned char useZeroDepth)
 
 	if (useZeroDepth != 0)
 	{
-		s_zoff = kPppPartZero;
+		s_zoff = 0.0f;
 	}
 	else
 	{
-		s_zoff = kPppPartZOffsetMin;
+		s_zoff = -1000000000000.0f;
 	}
 
 	LightPcs.SetNumDiffuse(0);
@@ -2220,7 +2200,7 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 {
 	int hadHit = 0;
 
-	if (kPppPartZero != cylScale)
+	if (0.0f != cylScale)
 	{
 		u32 cylinderAttribute = pppMngSt->m_cylinderAttribute;
 		CMapCylinder cylinder;
@@ -2281,8 +2261,8 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 						continue;
 					}
 
-					if ((kPppPartZero == damageCol->m_horizontalRadius) &&
-						(kPppPartZero == damageCol->m_verticalRadius))
+					if ((0.0f == damageCol->m_horizontalRadius) &&
+						(0.0f == damageCol->m_verticalRadius))
 					{
 						continue;
 					}
@@ -2332,6 +2312,3 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 
 	return hadHit;
 }
-
-extern "C" const unsigned int gPppFixedWhite = 0xffffffff;
-extern "C" const float kPppPartDepthScale = 5000.0f;

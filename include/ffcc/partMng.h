@@ -393,7 +393,8 @@ struct _pppMngSt
     unsigned char m_prio;              // 0xF8
     unsigned char m_padF9;             // 0xF9
     unsigned short m_prioTime;         // 0xFA
-    unsigned char m_padFC[4];          // 0xFC
+    unsigned short m_fieldId;          // 0xFC
+    unsigned char m_padFE[2];          // 0xFE
     int m_paramA;                      // 0x100
     unsigned int m_paramB;             // 0x104
     float m_cullRadiusSq;              // 0x108
@@ -526,7 +527,7 @@ public:
 
     int m_editProgramCount;             // 0x00
     int m_editParticleCount;            // 0x04
-    unsigned char m_unk8[4];
+    int m_unk8;                        // 0x08
     int m_editCursorEnabled;            // 0x0C
     int m_cursorRequest;                // 0x10
     unsigned char m_unk14[4];

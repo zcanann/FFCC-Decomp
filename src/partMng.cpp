@@ -46,6 +46,8 @@ STATIC_ASSERT(offsetof(PPPCREATEPARAM, m_soundEffectParams) == 0x30);
 STATIC_ASSERT(offsetof(PPPCREATEPARAM, m_hitParams) == 0x44);
 STATIC_ASSERT(sizeof(_pppMngSt) == 0x158);
 STATIC_ASSERT(offsetof(_pppMngSt, m_hitParams) == 0x130);
+STATIC_ASSERT(offsetof(_pppMngSt, m_fieldId) == 0xFC);
+STATIC_ASSERT(offsetof(CPartMng, m_unk8) == 0x08);
 STATIC_ASSERT(sizeof(CParModelSet) == 0x6C00);
 STATIC_ASSERT(sizeof(CParShapeSet) == 0x2C00);
 STATIC_ASSERT(sizeof(pppIVECTOR3) == 0xC);
@@ -3011,7 +3013,7 @@ void CPartMng::pppPartDrawAfter()
 
 /*
  * --INFO--
- * PAL Address: 0x80059cac
+ * PAL Address: 0x80059CAC
  * PAL Size: 184b
  * EN Address: TODO
  * EN Size: TODO
@@ -3022,36 +3024,25 @@ void CPartMng::pppPartDead()
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0xb3d);
 
-#define base (reinterpret_cast<char*>(this))
     for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + i * 0x158 + 0x2A18);
+        _pppMngSt* pppMngSt = &m_pppMng[i];
         int baseTime = pppMngSt->m_baseTime;
         if (baseTime != -0x1000 && baseTime < 0) {
-            unsigned char isFinished = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE6);
-            if (isFinished != 0 || *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) != 0) {
+            unsigned char isFinished = pppMngSt->m_isFinished;
+            if (isFinished != 0 || pppMngSt->m_hitBgFlag != 0) {
                 ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(pppMngSt->m_pppResSet) + 4);
                 ppvMng = pppMngSt;
                 _pppAllFreePObject(pppMngSt);
             }
         }
     }
-#undef base
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0xb5d);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8005992c
- * PAL Size: 252b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-/*
- * --INFO--
- * PAL Address: 0x80059c44
+ * PAL Address: 0x80059C44
  * PAL Size: 104b
  * EN Address: TODO
  * EN Size: TODO
@@ -3060,17 +3051,15 @@ void CPartMng::pppPartDead()
  */
 void CPartMng::pppPartInit()
 {
-    char* base = reinterpret_cast<char*>(this);
     int i = 0;
 
-    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x8) = 0;
+    m_unk8 = 0;
     do {
-        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        _pppMngSt* pppMngSt = &m_pppMng[i];
         int baseTime = pppMngSt->m_baseTime;
         if (baseTime != -0x1000 && baseTime < 0) {
             _pppInitPart(pppMngSt);
         }
-        base += 0x158;
         i++;
     } while (i < 0x180);
 }
@@ -3159,8 +3148,12 @@ void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readB
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005992C
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::LoadPartNoSyncCalc()
 {
@@ -3763,8 +3756,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_pppPObjLinkHead.m_next = 0;
     mng->m_pppPDataVals = 0;
 
-    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(mng) + 0xFC) =
-        fp->m_fieldId;
+    mng->m_fieldId = fp->m_fieldId;
     mng->m_field118 = fp->m_field118;
     mng->m_matrixMode = fp->m_matrixMode;
     mng->m_drawVariant = fp->m_drawVariant;
@@ -4227,7 +4219,7 @@ void CPartMng::pppEndCHandle(CCharaPcs::CHandle* handle)
 
 /*
  * --INFO--
- * PAL Address: 0x800578b0
+ * PAL Address: 0x800578B0
  * PAL Size: 272b
  * EN Address: TODO
  * EN Size: TODO
@@ -4237,40 +4229,41 @@ void CPartMng::pppEndCHandle(CCharaPcs::CHandle* handle)
 int CPartMng::pppIsDeadCHandle(CCharaPcs::CHandle* handle)
 {
     unsigned char mode;
-    void* owner;
-    int mngIndex = 0;
+    CGObject* owner;
 
     for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* pppMngSt = &m_pppMng[mngIndex];
-        if (m_pppMng[mngIndex].m_baseTime != -0x1000) {
-            mode = m_pppMng[mngIndex].m_matrixMode;
+        _pppMngSt* pppMngSt = &m_pppMng[i];
+        if (m_pppMng[i].m_baseTime != -0x1000) {
+            mode = m_pppMng[i].m_matrixMode;
             if (mode == 3 || static_cast<unsigned char>(mode - 5) <= 2 || mode == 8) {
                 owner = pppMngSt->m_owner;
                 if (owner != 0 &&
-                    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(owner) + 0xf8) == handle) {
+                    owner->m_charaModelHandle == handle) {
                     return 0;
                 }
             }
         }
-        mngIndex++;
     }
     return 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057828
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppDeleteAll()
 {
-    char* base = reinterpret_cast<char*>(this);
     for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        _pppMngSt* pppMngSt = &m_pppMng[i];
         int baseTime = pppMngSt->m_baseTime;
         if (baseTime != -0x1000) {
             if (baseTime < 0) {
-                *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) = 1;
+                pppMngSt->m_hitBgFlag = 1;
                 pppStopSe(
                     pppMngSt,
                     &pppMngSt->m_soundEffectData);
@@ -4278,7 +4271,6 @@ void CPartMng::pppDeleteAll()
                 pppMngSt->m_baseTime = -0x1000;
             }
         }
-        base += 0x158;
     }
 }
 
@@ -4295,13 +4287,11 @@ void CPartMng::pppDestroyAll()
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x116f);
 
-    int mngIndex = 0;
     for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* pppMngSt = &m_pppMng[mngIndex];
+        _pppMngSt* pppMngSt = &m_pppMng[i];
         if (pppMngSt->m_baseTime != -0x1000 && pppMngSt->m_pppResSet != 0) {
             _pppAllFreePObject(pppMngSt);
         }
-        mngIndex++;
     }
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x117b);

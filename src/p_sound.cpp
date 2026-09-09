@@ -2,51 +2,30 @@
 #include "ffcc/linkage.h"
 #include "ffcc/sound.h"
 
-extern "C" {
-void create__9CSoundPcsFv(CSoundPcs*);
-void destroy__9CSoundPcsFv(CSoundPcs*);
-void calc__9CSoundPcsFv(CSoundPcs*);
-void draw__9CSoundPcsFv(CSoundPcs*);
-}
-
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 inline CSoundPcs::CSoundPcs()
 {
-    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CSoundPcsFv)};
-    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CSoundPcsFv)};
-    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CSoundPcsFv)};
-    static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CSoundPcsFv)};
-
-    CProcessTable* table = &m_table;
-
-    table->m_fields.m_create = desc0;
-    table->m_fields.m_destroy = desc1;
-    table->m_fields.m_entries[0].m_callback = desc2;
-    table->m_fields.m_entries[1].m_callback = desc3;
 }
 
-CProcessTable CSoundPcs::m_table = {
+CSoundPcs SoundPcs;
+
+CProcessCallbackTable CSoundPcs::m_table = {
     "CSoundPcs",
+    static_cast<CProcessCallback>(&CSoundPcs::create),
+    static_cast<CProcessCallback>(&CSoundPcs::destroy),
     {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0x25,
-        0,
-        0,
-        0,
-        0,
-        0x44,
-        1,
+        {static_cast<CProcessCallback>(&CSoundPcs::calc), 0x25, 0},
+        {static_cast<CProcessCallback>(&CSoundPcs::draw), 0x44, 1},
     },
 };
-
-CSoundPcs SoundPcs;
 
 /*
  * --INFO--

@@ -6,7 +6,7 @@
 class CSamplePcs : public CProcess
 {
 public:
-    static CProcessTable m_table;
+    static CProcessCallbackTable m_table;
 
     CSamplePcs();
     void Init();

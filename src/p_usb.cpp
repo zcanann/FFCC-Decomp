@@ -15,48 +15,29 @@ typedef int CUSBDataHeader_payload_size_offset_mismatch
 typedef int CUSBDataHeader_packet_code_offset_mismatch
     [(((u32)&((CUSBPcs::CDataHeader*)0)->m_packetCode) == 0x24) ? 1 : -1];
 
-extern "C" {
-void create__7CUSBPcsFv(CUSBPcs*);
-void destroy__7CUSBPcsFv(CUSBPcs*);
-void func__7CUSBPcsFv(CUSBPcs*);
-}
-
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 inline CUSBPcs::CUSBPcs()
 {
-    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
-    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
-    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
-
-    CProcessTable* table = &m_table;
-
-    table->m_fields.m_create = desc0;
-    table->m_fields.m_destroy = desc1;
-    table->m_fields.m_entries[0].m_callback = desc2;
 }
 
-CProcessTable CUSBPcs::m_table = {
+CUSBPcs USBPcs;
+
+CProcessCallbackTable CUSBPcs::m_table = {
     "CUSBPcs",
+    static_cast<CProcessCallback>(&CUSBPcs::create),
+    static_cast<CProcessCallback>(&CUSBPcs::destroy),
     {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0x12,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        {static_cast<CProcessCallback>(&CUSBPcs::func), 0x12, 0},
     },
 };
-
-CUSBPcs USBPcs;
 
 static inline unsigned int Swap32(unsigned int x)
 {

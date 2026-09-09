@@ -4,34 +4,30 @@
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x800128F8
+ * PAL Size: 20b
+ * EN Address: 0x800128D8
+ * EN Size: 20b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CChunkFile::CChunkFile()
+unsigned int CChunkFile::Get4()
 {
-}
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-CChunkFile::CChunkFile(void* filePtr)
-{
-    unsigned int header = *reinterpret_cast<unsigned int*>((unsigned char*)(filePtr) + 4);
-    unsigned int scopeSize = header & 0x00FFFFFF;
+    unsigned int* value = (unsigned int*)m_cursor;
 
-    m_base = (unsigned char*)(filePtr);
-    m_headerPtr = (unsigned char*)(filePtr);
-    m_scopeSize = scopeSize;
-    m_scopeOffset = 0;
-    m_lastChunkSize = -1;
-    m_stackDepth = 0;
+    m_cursor += sizeof(unsigned int);
+
+    return *value;
 }
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x80012B50
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChunkFile::SetBuf(void* filePtr)
 {
@@ -44,6 +40,28 @@ void CChunkFile::SetBuf(void* filePtr)
     m_scopeOffset = 0;
     m_lastChunkSize = -1;
     m_stackDepth = 0;
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+CChunkFile::CChunkFile()
+{
+}
+/*
+ * --INFO--
+ * PAL Address: 0x80012B7C
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CChunkFile::CChunkFile(void* filePtr)
+{
+    SetBuf(filePtr);
 }
 
 /*
@@ -82,10 +100,10 @@ void CChunkFile::PopChunk()
 
 /*
  * --INFO--
- * PAL Address: 80012988
+ * PAL Address: 0x80012988
  * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80012968
+ * EN Size: 192b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -107,21 +125,10 @@ int CChunkFile::GetNextChunk(CChunk& outChunk)
         return false;
     }
 
-    unsigned int* word = reinterpret_cast<unsigned int*>(m_cursor);
-    m_cursor = reinterpret_cast<unsigned char*>(word + 1);
-    outChunk.m_id = *word;
-
-    unsigned char* raw = m_cursor;
-    m_cursor = raw + 4;
-    outChunk.m_size = *reinterpret_cast<unsigned int*>(raw);
-
-    int* value = reinterpret_cast<int*>(m_cursor);
-    m_cursor = reinterpret_cast<unsigned char*>(value + 1);
-    outChunk.m_arg0 = *value;
-
-    value = reinterpret_cast<int*>(m_cursor);
-    m_cursor = reinterpret_cast<unsigned char*>(value + 1);
-    outChunk.m_version = *value;
+    outChunk.m_id = Get4();
+    outChunk.m_size = Get4();
+    outChunk.m_arg0 = Get4();
+    outChunk.m_version = Get4();
 
     m_lastChunkSize = static_cast<int>(outChunk.m_size);
 
@@ -173,20 +180,6 @@ unsigned short CChunkFile::Get2()
     unsigned short* value = (unsigned short*)m_cursor;
 
     m_cursor += sizeof(unsigned short);
-
-    return *value;
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-unsigned int CChunkFile::Get4()
-{
-    unsigned int* value = (unsigned int*)m_cursor;
-
-    m_cursor += sizeof(unsigned int);
 
     return *value;
 }

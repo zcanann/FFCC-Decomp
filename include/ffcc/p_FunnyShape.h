@@ -39,7 +39,7 @@ public:
      * --INFO--
      * PAL Address: 0x8004E964
      * PAL Size: 136b
-     * EN Address: 0x8005BEDC
+     * EN Address: 0x8004E758
      * EN Size: 136b
      * JP Address: TODO
      * JP Size: TODO

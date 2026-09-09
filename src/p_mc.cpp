@@ -3,42 +3,29 @@
 #include "ffcc/math.h"
 #include "ffcc/wm_menu.h"
 
-extern "C" {
-void create__6CMcPcsFv(CMcPcs*);
-void destroy__6CMcPcsFv(CMcPcs*);
-void calc__6CMcPcsFv(CMcPcs*);
-}
-
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 inline CMcPcs::CMcPcs()
 {
-    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__6CMcPcsFv)};
-    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__6CMcPcsFv)};
-    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__6CMcPcsFv)};
-
-    CProcessTable* table = &m_table;
-
-    table->m_fields.m_create = desc0;
-    table->m_fields.m_destroy = desc1;
-    table->m_fields.m_entries[0].m_callback = desc2;
 }
 
-CProcessTable CMcPcs::m_table = {
+CMcPcs McPcs;
+
+CProcessCallbackTable CMcPcs::m_table = {
     "CMcPcs",
+    static_cast<CProcessCallback>(&CMcPcs::create),
+    static_cast<CProcessCallback>(&CMcPcs::destroy),
     {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0x1B,
+        {static_cast<CProcessCallback>(&CMcPcs::calc), 0x1b, 0},
     },
 };
-
-CMcPcs McPcs;
 
 /*
  * --INFO--

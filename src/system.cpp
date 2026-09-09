@@ -210,7 +210,7 @@ void CSystem::ScriptChanging(char* script)
  */
 void CSystem::RemoveScenegraph(CProcess* process, int arg)
 {
-    CScenegraphDesc* descBlock = (CScenegraphDesc*)process->GetTable(arg);
+    CProcessCallbackTable* descBlock = (CProcessCallbackTable*)process->GetTable(arg);
     COrder* current = m_orderSentinel.m_next;
 
     do
@@ -227,28 +227,32 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
         current = next;
     } while (current != &m_orderSentinel);
 
-    if (descBlock->m_destroyCallback.callback())
+    if (descBlock->m_destroy)
     {
-        (process->*descBlock->m_destroyCallback.callback())();
+        (process->*descBlock->m_destroy)();
     }
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002182C
+ * PAL Size: 264b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
 {
-    CScenegraphDesc* description = (CScenegraphDesc*)process->GetTable(arg);
+    CProcessCallbackTable* description = (CProcessCallbackTable*)process->GetTable(arg);
 
-    if (description->m_createCallback.callback())
+    if (description->m_create)
     {
-        (process->*description->m_createCallback.callback())();
+        (process->*description->m_create)();
     }
 
-    CScenegraphEntry* entry = description->m_entries;
+    CProcessCallbackTable::Entry* entry = description->m_entries;
     int insertIndex = 0;
-    while (entry->m_callback.callback())
+    while (entry->m_callback)
     {
         COrder* first = m_orderSentinel.m_next;
         COrder* current = first;
@@ -268,7 +272,7 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
                 order->m_descBlock = description;
                 order->m_owner = process;
                 order->m_priority = entry->m_priority;
-                order->m_debugName = description->m_debugName;
+                order->m_debugName = description->m_name;
                 m_orderCount++;
                 break;
             }
@@ -467,7 +471,7 @@ void CSystem::ExecScenegraph()
                 {
                     Graphic.SetDrawDoneDebugData(-1);
                 }
-                (order->m_owner->*order->m_entry->m_callback.callback())();
+                (order->m_owner->*order->m_entry->m_callback)();
                 watch.Stop();
                 order->m_lastTime = watch.Get();
 

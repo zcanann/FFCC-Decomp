@@ -1,16 +1,9 @@
 #include "ffcc/p_sample.h"
 
-extern "C" {
-void create__10CSamplePcsFv(CSamplePcs*);
-void destroy__10CSamplePcsFv(CSamplePcs*);
-void func0__10CSamplePcsFv(CSamplePcs*);
-void func1__10CSamplePcsFv(CSamplePcs*);
-}
-
 /*
  * --INFO--
- * PAL Address: 0x8001FEB0
- * PAL Size: 188b
+ * PAL Address: UNUSED
+ * PAL Size: TODO
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -18,42 +11,19 @@ void func1__10CSamplePcsFv(CSamplePcs*);
  */
 inline CSamplePcs::CSamplePcs()
 {
-	static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSamplePcsFv)};
-	static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSamplePcsFv)};
-	static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func0__10CSamplePcsFv)};
-	static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func1__10CSamplePcsFv)};
-
-	CProcessTable* table = &m_table;
-
-	table->m_fields.m_create = desc0;
-	table->m_fields.m_destroy = desc1;
-	table->m_fields.m_entries[0].m_callback = desc2;
-	table->m_fields.m_entries[1].m_callback = desc3;
 }
 
-CProcessTable CSamplePcs::m_table = {
-    const_cast<char*>("CSamplePcs"),
+CSamplePcs SamplePcs;
+
+CProcessCallbackTable CSamplePcs::m_table = {
+    "CSamplePcs",
+    static_cast<CProcessCallback>(&CSamplePcs::create),
+    static_cast<CProcessCallback>(&CSamplePcs::destroy),
     {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0x10,
-        0,
-        0,
-        0,
-        0,
-        0x10,
-        1,
+        {static_cast<CProcessCallback>(&CSamplePcs::func0), 0x10, 0},
+        {static_cast<CProcessCallback>(&CSamplePcs::func1), 0x10, 1},
     },
 };
-
-CSamplePcs SamplePcs;
 
 /*
  * --INFO--

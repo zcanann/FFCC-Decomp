@@ -30,50 +30,6 @@ struct CProcessCallbackTable
 typedef int CProcessCallbackTable_entry_size_mismatch[(sizeof(CProcessCallbackTable::Entry) == 0x14) ? 1 : -1];
 typedef int CProcessCallbackTable_size_mismatch[(sizeof(CProcessCallbackTable) == 0x15C) ? 1 : -1];
 
-struct CProcessTableCallback
-{
-    u32 m_thisOffset;
-    u32 m_virtualOffset;
-    u32 m_function;
-
-    CProcessCallback& callback() { return *reinterpret_cast<CProcessCallback*>(this); }
-    const CProcessCallback& callback() const { return *reinterpret_cast<const CProcessCallback*>(this); }
-};
-typedef int CProcessTableCallback_size_mismatch[(sizeof(CProcessTableCallback) == 0xC) ? 1 : -1];
-
-struct CScenegraphEntry
-{
-    CProcessTableCallback m_callback;
-    u32 m_priority;
-    u32 m_flags;
-};
-typedef CScenegraphEntry CProcessTableEntry;
-typedef int CProcessTableEntry_size_mismatch[(sizeof(CProcessTableEntry) == 0x14) ? 1 : -1];
-
-struct CProcessTable
-{
-    char* m_name;
-    union
-    {
-        struct Fields
-        {
-            CProcessTableCallback m_create;
-            CProcessTableCallback m_destroy;
-            CProcessTableEntry m_entries[16];
-        } m_fields;
-        u32 m_words[(0x15C - sizeof(char*)) / sizeof(u32)];
-    };
-};
-typedef int CProcessTable_size_mismatch[(sizeof(CProcessTable) == 0x15C) ? 1 : -1];
-
-struct CScenegraphDesc
-{
-    const char* m_debugName;
-    CProcessTableCallback m_createCallback;
-    CProcessTableCallback m_destroyCallback;
-    CScenegraphEntry m_entries[1];
-};
-
 class CProcess : public CManager
 {
 public:
@@ -104,8 +60,8 @@ public:
         COrder* m_previous;      // 0x10
         COrder* m_next;          // 0x14
         CProcess* m_owner;       // 0x18
-        CScenegraphDesc* m_descBlock; // 0x1C
-        CScenegraphEntry* m_entry;    // 0x20
+        CProcessCallbackTable* m_descBlock; // 0x1C
+        CProcessCallbackTable::Entry* m_entry;    // 0x20
         // sizeof = 0x24
     };
 

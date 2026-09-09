@@ -52,15 +52,6 @@ STATIC_ASSERT(offsetof(GbaCMakeInfo, m_jobType) == 0x1F);
 STATIC_ASSERT(sizeof(GbaQueueMapObjEntry) == 0xC);
 STATIC_ASSERT(sizeof(GbaQueueMapObjWork) == 0x188);
 
-struct GbaQueueSetQueueView
-{
-	unsigned char _pad00[0x30];
-	unsigned int m_queue[4][0x40];
-	int m_queueCount[4];
-	char m_queueFull[4];
-};
-STATIC_ASSERT(sizeof(GbaQueueSetQueueView) == 0x444);
-
 enum {
 	kGbaQueueScratchTextSize = 0x400,
 	kGbaQueuePlayerDataChannelCount = 4,
@@ -88,11 +79,6 @@ STATIC_ASSERT(kGbaQueueMapItemHistoryBlockBytes == 0x500);
 STATIC_ASSERT(sizeof(GbaQueueMapObjWork) == kGbaQueueMapObjWorkBytes);
 STATIC_ASSERT(sizeof(GbaQueue) == 0x2D64);
 
-
-static inline GbaQueueSetQueueView* GetSetQueueView(GbaQueue* gbaQueue)
-{
-	return reinterpret_cast<GbaQueueSetQueueView*>(gbaQueue);
-}
 
 static inline unsigned short SwapU16(unsigned short value)
 {
@@ -288,13 +274,16 @@ inline void GbaQueue::ReleaseSem(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800D0DEC
+ * PAL Size: 1384b
+ * EN Address: 0x800D05B8
+ * EN Size: 1384b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::LoadAll()
 {
 	int i;
-	char* obj;
 	char prevMenuStageMode;
 	char spModeBits;
 	char spModeChangeBits;
@@ -304,7 +293,6 @@ void GbaQueue::LoadAll()
 		OSWaitSemaphore(&accessSemaphores[i]);
 	}
 
-	obj = reinterpret_cast<char*>(this);
 	prevMenuStageMode = m_singleMode;
 	m_singleMode = static_cast<char>(Game.m_gameWork.m_menuStageMode != 0);
 	if (prevMenuStageMode != m_singleMode) {
@@ -340,8 +328,8 @@ void GbaQueue::LoadAll()
 		SetRadarType();
 	}
 	if (cflatFlag == 0) {
-		memset(obj + 0x2D44, 0xFF, 0x10);
-		obj[0x2D54] = 0;
+		memset(m_hitInfo, 0xFF, sizeof(m_hitInfo));
+		m_chgHitFlags = 0;
 	}
 
 	for (i = 0; i < 4; i++) {
@@ -374,11 +362,11 @@ void GbaQueue::LoadAll()
 		OSWaitSemaphore(&accessSemaphores[i]);
 	}
 	{
-		unsigned char resetMask = static_cast<unsigned char>(obj[0x2D30]);
-		obj[0x2D30] = 0;
+		char resetMask = static_cast<char>(m_resetFlags);
 		for (i = 0; i < 4; i++) {
 			OSSignalSemaphore(&accessSemaphores[i]);
 		}
+		m_resetFlags = 0;
 
 		for (i = 0; i < 4; i++) {
 			if (Game.m_scriptFoodBase[i] == 0) {
@@ -447,18 +435,16 @@ void GbaQueue::LoadAll()
  * --INFO--
  * PAL Address: 0x800D0B98
  * PAL Size: 596b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800D0364
+ * EN Size: 596b
  * JP Address: TODO
  * JP Size: TODO
  */
 void GbaQueue::ClrShopMode()
 {
 	int i;
-	char* obj;
 	CCaravanWork* caravanWork;
 
-	obj = reinterpret_cast<char*>(this);
 	for (i = 0; i < 4; i++) {
 		caravanWork = Game.m_scriptFoodBase[i];
 		if (caravanWork == 0) {
@@ -556,28 +542,27 @@ inline void GbaQueue::LoadMask()
  * --INFO--
  * PAL Address: 0x800D0AD4
  * PAL Size: 196b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800D02A0
+ * EN Size: 196b
  * JP Address: TODO
  * JP Size: TODO
  */
 int GbaQueue::SetQueue(int channel, unsigned int value)
 {
-	GbaQueueSetQueueView* queue = reinterpret_cast<GbaQueueSetQueueView*>(this);
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	int ret;
 
 	OSWaitSemaphore(semaphore);
-	if (queue->m_queueFull[channel] != 0) {
+	if (m_queueFull[channel] != 0) {
 		ret = -1;
 	} else {
-		if (queue->m_queueCount[channel] >= 0x40) {
+		if (m_queueCount[channel] >= 0x40) {
 			ret = -1;
-			queue->m_queueFull[channel] = 1;
+			m_queueFull[channel] = 1;
 		} else {
 			ret = 0;
-			queue->m_queue[channel][queue->m_queueCount[channel]] = value;
-			queue->m_queueCount[channel] = queue->m_queueCount[channel] + 1;
+			m_queue[channel][m_queueCount[channel]] = value;
+			m_queueCount[channel] = m_queueCount[channel] + 1;
 		}
 	}
 	OSSignalSemaphore(semaphore);
@@ -586,18 +571,20 @@ int GbaQueue::SetQueue(int channel, unsigned int value)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 inline void GbaQueue::ResetQueue()
 {
-	GbaQueueSetQueueView* queue = GetSetQueueView(this);
-
 	for (int channel = 0; channel < 4; channel++) {
 		OSWaitSemaphore(accessSemaphores + channel);
-		memset(queue->m_queue[channel], 0, sizeof(queue->m_queue[channel]));
-		queue->m_queueCount[channel] = 0;
-		queue->m_queueFull[channel] = 0;
+		memset(m_queue[channel], 0, sizeof(m_queue[channel]));
+		m_queueCount[channel] = 0;
+		m_queueFull[channel] = 0;
 		OSSignalSemaphore(accessSemaphores + channel);
 	}
 }
@@ -1130,14 +1117,13 @@ void GbaQueue::ClrStageFlg(int channel)
  * --INFO--
  * PAL Address: 0x800CF764
  * PAL Size: 684b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CEFC8
+ * EN Size: 684b
  * JP Address: TODO
  * JP Size: TODO
  */
 void GbaQueue::SetRadarType()
 {
-	char* obj = reinterpret_cast<char*>(this);
 	unsigned int validMemberCount;
 	int assignedCount;
 	unsigned int activeMask;
@@ -1195,7 +1181,7 @@ void GbaQueue::SetRadarType()
 		m_radarType[3] = Game.m_gameWork.m_mogScoreRadarType;
 	}
 
-	obj[0x2D40] = 1;
+	m_radarTypeFlags = 1;
 	if (Game.m_gameWork.m_bossArtifactStageIndex >= 0xF) {
 		m_radarType[0] = 0;
 		m_radarType[1] = 0;
@@ -1888,8 +1874,8 @@ void GbaQueue::GetPlayerStat(int channel, GbaPInfo* outInfo)
  * --INFO--
  * PAL Address: 0x800CE300
  * PAL Size: 148b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CDB64
+ * EN Size: 148b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1899,7 +1885,7 @@ void GbaQueue::GetCaravanName(char* outName)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	memcpy(outName, reinterpret_cast<char*>(this) + 0x2A74, kGbaQueueCaravanNameBlockBytes);
+	memcpy(outName, m_caravanName, sizeof(m_caravanName));
 
 	for (int i = 0; i < 4; i++) {
 		OSSignalSemaphore(accessSemaphores + i);
@@ -2662,19 +2648,17 @@ void GbaQueue::ClrFavoriteFlg(int channel)
 
 /*
  * --INFO--
- * PAL Address: 0x800ccc38
+ * PAL Address: 0x800CCC38
  * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CC49C
+ * EN Size: 124b
  * JP Address: TODO
  * JP Size: TODO
  */
 int GbaQueue::GetFavorite(int channel, char* favorite)
 {
-	char* obj = reinterpret_cast<char*>(this);
-
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(favorite, obj + channel * 0xDC + 0x46C, 8);
+	memcpy(favorite, m_playerData[channel].m_letterMeta, sizeof(m_playerData[channel].m_letterMeta));
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	return 8;
@@ -2721,19 +2705,17 @@ void GbaQueue::ClrMoneyFlg(int channel)
 
 /*
  * --INFO--
- * PAL Address: 0x800ccaf4
+ * PAL Address: 0x800CCAF4
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CC358
+ * EN Size: 100b
  * JP Address: TODO
  * JP Size: TODO
  */
 int GbaQueue::GetMoney(int channel)
 {
-	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
-
 	OSWaitSemaphore(accessSemaphores + channel);
-	int value = *reinterpret_cast<int*>(compatibilityStr + channel * 0xDC + 0x20);
+	int value = m_playerData[channel].m_gil;
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	return value;
@@ -4093,21 +4075,19 @@ void GbaQueue::ClrStrengthFlg(int channel)
 
 /*
  * --INFO--
- * PAL Address: 0x800ca2bc
+ * PAL Address: 0x800CA2BC
  * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C9B20
+ * EN Size: 128b
  * JP Address: TODO
  * JP Size: TODO
  */
 void GbaQueue::GetStrengthData(int channel, unsigned char* strengthData)
 {
-	char* obj = reinterpret_cast<char*>(this);
-
 	OSWaitSemaphore(accessSemaphores + channel);
-	strengthData[0] = static_cast<unsigned char>(obj[channel * 0xDC + 0x474]);
-	strengthData[1] = static_cast<unsigned char>(obj[channel * 0xDC + 0x475]);
-	strengthData[2] = static_cast<unsigned char>(obj[channel * 0xDC + 0x476]);
+	strengthData[0] = m_playerData[channel].m_strength[0];
+	strengthData[1] = m_playerData[channel].m_strength[1];
+	strengthData[2] = m_playerData[channel].m_strength[2];
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 

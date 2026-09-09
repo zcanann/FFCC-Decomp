@@ -2267,9 +2267,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
     CMes::m_tempVar[2] = caravanWork->m_letters[letterIndex].TempVar(2);
     CMes::m_tempVar[3] = caravanWork->m_letters[letterIndex].TempVar(3);
 
-    unsigned short msgIndex = *reinterpret_cast<unsigned short*>(
-        reinterpret_cast<char*>(caravanWork) + letterIndex * 0xC + 0x3EC);
-    int mesIndex = (msgIndex & 0x7FC) >> 1;
+    int mesIndex = caravanWork->m_letters[letterIndex].MessageType() * 2;
 
     strcpy(srcText, Game.m_cFlatDataArr[1].Message(mesIndex + 0x10));
     CMes::MakeAgbString(workText, srcText, (*foodBasePtr)->m_genderFlag, 0);
@@ -2362,8 +2360,8 @@ void GbaQueue::ClrLetterDatFlg(int channel)
  * --INFO--
  * PAL Address: 0x800CD2DC
  * PAL Size: 316b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CCB40
+ * EN Size: 316b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2373,33 +2371,26 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
 	CCaravanWork** foodBaseArr = Game.m_scriptFoodBase;
 	CCaravanWork** foodBasePtr = foodBaseArr + channel;
-	int letterOffset = valueBytes[2] * 0xC;
-	char* letter = reinterpret_cast<char*>(*foodBasePtr) + letterOffset;
-	int hasGil = reinterpret_cast<CCaravanWork::CLetterWork*>(letter + 0x3EC)->FlagsBits().m_attachmentIsGil;
+	int letterIndex = valueBytes[2];
+	unsigned int hasGil = (*foodBasePtr)->m_letters[letterIndex].FlagsBits().m_attachmentIsGil;
 	int result;
 
-	if (hasGil == 0) {
-		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
-		if (item != 0) {
-			if ((item < 1) || (item > 0x9E)) {
-				if ((*foodBasePtr)->AddItem(item, 0) == 0) {
-					result = 1;
-				} else {
-					result = 0;
-				}
-			}
-		}
-	} else {
-		letter = reinterpret_cast<char*>(*foodBasePtr) + letterOffset;
-		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
-		if (item != 0) {
-			int gil = item * 100;
-			if ((*foodBasePtr)->CanAddGil(gil) == 0) {
+	if ((hasGil == 0) && ((*foodBasePtr)->m_letters[letterIndex].AttachmentValue() != 0)) {
+		int item = (*foodBasePtr)->m_letters[letterIndex].AttachmentValue();
+		if ((item < 1) || (item > 0x9E)) {
+			if ((*foodBasePtr)->AddItem(item, 0) == 0) {
 				result = 1;
 			} else {
-				(*foodBasePtr)->AddGil(gil);
 				result = 0;
 			}
+		}
+	} else if ((hasGil != 0) && ((*foodBasePtr)->m_letters[letterIndex].AttachmentValue() != 0)) {
+		int gil = (*foodBasePtr)->m_letters[letterIndex].AttachmentValue() * 100;
+		if ((*foodBasePtr)->CanAddGil(gil) == 0) {
+			result = 1;
+		} else {
+			(*foodBasePtr)->AddGil(gil);
+			result = 0;
 		}
 	}
 
@@ -2412,8 +2403,7 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	} while (i < 10);
 
 	if ((result == 0) && (i < 10)) {
-		char* base = reinterpret_cast<char*>(*foodBasePtr);
-		reinterpret_cast<CCaravanWork::CLetterWork*>(base + letterOffset + 0x3EC)->FlagsBits().m_attachmentClaimed = 1;
+		(*foodBasePtr)->m_letters[letterIndex].FlagsBits().m_attachmentClaimed = 1;
 	}
 }
 

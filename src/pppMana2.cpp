@@ -66,8 +66,6 @@ static const char s_manaShapeObj2[] = "obj2";
 extern const float kMana2StepSlopeLimit = 0.99999f;
 static const char s_manaShapeObj[] = "obj";
 extern const float kMana2WaterRotZRad = -1.5707964f;
-extern const float kPppConformBgNormalZero = 0.0f;
-extern const float kPppConformBgNormalOne = 1.0f;
 
 static inline float CameraWorldX()
 {

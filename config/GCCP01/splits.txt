@@ -1490,25 +1490,25 @@ pppMana2.cpp:
 	extabindex  start:0x8000FE8C end:0x8000FF1C
 	.text       start:0x8010617C end:0x801091D4
 	.rodata     start:0x801DC4D0 end:0x801DC4F0
-	.sdata2     start:0x80331898 end:0x80331910
+	.sdata2     start:0x80331898 end:0x80331908
 
 pppConformBGNormal.cpp:
 	extab       start:0x8000918C end:0x80009194
 	extabindex  start:0x8000FF1C end:0x8000FF28
 	.text       start:0x801091D4 end:0x80109810
-	.sdata2     start:0x80331910 end:0x80331928
+	.sdata2     start:0x80331908 end:0x80331920
 
 pppAlignmentScale.cpp:
 	extab       start:0x80009194 end:0x8000919C
 	extabindex  start:0x8000FF28 end:0x8000FF34
 	.text       start:0x80109810 end:0x80109930
-	.sdata2     start:0x80331928 end:0x80331930
+	.sdata2     start:0x80331920 end:0x80331928
 
 pppMiasma.cpp:
 	extab       start:0x8000919C end:0x800091B4
 	extabindex  start:0x8000FF34 end:0x8000FF58
 	.text       start:0x80109930 end:0x8010B150
-	.sdata2     start:0x80331930 end:0x80331950
+	.sdata2     start:0x80331928 end:0x80331950
 
 baseobj.cpp:
 	extab       start:0x800091B4 end:0x800091E4

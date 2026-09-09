@@ -8,10 +8,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/gobject.h"
-extern "C" {
-extern const f32 kPppConformBgNormalZero;
-extern const f32 kPppConformBgNormalOne;
-}
 
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
@@ -108,17 +104,17 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
                 if ((s8)((s32)((u32)(owner->m_stateFlags0 & 0xc0) << 24) >> 31) != 0) {
                     local_164 = *ConformBgNormalHitNormal(owner);
                 } else {
-                    local_164.x = kPppConformBgNormalZero;
-                    local_164.y = kPppConformBgNormalOne;
-                    local_164.z = kPppConformBgNormalZero;
+                    local_164.x = 0.0f;
+                    local_164.y = 1.0f;
+                    local_164.z = 0.0f;
                 }
             } else if (mode == 1) {
                 hitFound = 1;
                 Game.GetTargetCursor(ppvMng->m_hitParams.m_particleIndex, local_170, local_164);
             } else if (mode == 2) {
-                firstRayDirection.x = kPppConformBgNormalZero;
+                firstRayDirection.x = 0.0f;
                 firstRayDirection.y = -2000.0f;
-                firstRayDirection.z = kPppConformBgNormalZero;
+                firstRayDirection.z = 0.0f;
 
                 cylinderY = matrixY + param2->m_arg3;
                 firstCylinder.m_boundsMin.z = 10000000000.0f;
@@ -130,10 +126,10 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
                 firstCylinder.m_bottom.x = matrixX;
                 firstCylinder.m_bottom.y = cylinderY;
                 firstCylinder.m_bottom.z = matrixZ;
-                firstCylinder.m_axis.x = kPppConformBgNormalZero;
+                firstCylinder.m_axis.x = 0.0f;
                 firstCylinder.m_axis.y = -2000.0f;
-                firstCylinder.m_axis.z = kPppConformBgNormalZero;
-                firstCylinder.m_radius = kPppConformBgNormalZero;
+                firstCylinder.m_axis.z = 0.0f;
+                firstCylinder.m_radius = 0.0f;
 
                 checkResult = MapMng.CheckHitCylinderNear((CMapCylinder*)&firstCylinder, &firstRayDirection, 0xffffffff);
                 hitFound = checkResult;
@@ -144,9 +140,9 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
                         local_170.y = matrixY;
                     }
                 } else {
-                    local_164.x = kPppConformBgNormalZero;
-                    local_164.y = kPppConformBgNormalOne;
-                    local_164.z = kPppConformBgNormalZero;
+                    local_164.x = 0.0f;
+                    local_164.y = 1.0f;
+                    local_164.z = 0.0f;
                     local_170.x = matrixX;
                     local_170.y = matrixY;
                     local_170.z = matrixZ;
@@ -163,7 +159,7 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
             local_18c.x = state->m_normal.x;
             local_18c.y = state->m_normal.y;
             local_18c.z = state->m_normal.z;
-            local_18c.w = kPppConformBgNormalOne;
+            local_18c.w = 1.0f;
             local_19c.x = local_164.x;
             local_19c.y = local_164.y;
             local_19c.z = local_164.z;
@@ -178,7 +174,7 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
             if ((param2->m_stepValue == 0) && (owner != NULL)) {
                 trigValue = sin((f64)owner->m_rotBaseY);
                 local_14c.x = (f32)trigValue;
-                local_14c.y = kPppConformBgNormalZero;
+                local_14c.y = 0.0f;
                 trigValue = cos((f64)owner->m_rotBaseY);
                 local_14c.z = (f32)trigValue;
                 PSVECCrossProduct(&local_14c, &local_158, &local_140);
@@ -186,8 +182,8 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
                 PSVECCrossProduct(&local_158, &local_140, &local_14c);
                 PSVECNormalize(&local_14c, &local_14c);
             } else {
-                local_140.x = kPppConformBgNormalOne;
-                local_140.z = local_140.y = kPppConformBgNormalZero;
+                local_140.x = 1.0f;
+                local_140.z = local_140.y = 0.0f;
                 PSVECCrossProduct(&local_158, &local_140, &local_14c);
                 PSVECNormalize(&local_14c, &local_14c);
                 PSVECCrossProduct(&local_14c, &local_158, &local_140);
@@ -226,9 +222,9 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
                     bottomX = owner->m_worldPosition.x;
                     bottomY = owner->m_worldPosition.y;
                     bottomZ = owner->m_worldPosition.z;
-                    secondRayDirection.x = kPppConformBgNormalZero;
+                    secondRayDirection.x = 0.0f;
                     secondRayDirection.y = -2000.0f;
-                    secondRayDirection.z = kPppConformBgNormalZero;
+                    secondRayDirection.z = 0.0f;
 
                     secondCylinder.m_boundsMin.z = 10000000000.0f;
                     secondCylinder.m_boundsMin.y = 10000000000.0f;
@@ -239,10 +235,10 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
                     secondCylinder.m_bottom.x = bottomX;
                     secondCylinder.m_bottom.y = bottomY;
                     secondCylinder.m_bottom.z = bottomZ;
-                    secondCylinder.m_axis.x = kPppConformBgNormalZero;
+                    secondCylinder.m_axis.x = 0.0f;
                     secondCylinder.m_axis.y = -2000.0f;
-                    secondCylinder.m_axis.z = kPppConformBgNormalZero;
-                    secondCylinder.m_radius = kPppConformBgNormalZero;
+                    secondCylinder.m_axis.z = 0.0f;
+                    secondCylinder.m_radius = 0.0f;
 
                     hitFound = MapMng.CheckHitCylinderNear((CMapCylinder*)&secondCylinder, &secondRayDirection, 0xffffffff);
                     if (hitFound != 0) {
@@ -294,12 +290,9 @@ void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlT
     f32 scale;
 
     state = (ConformBgNormalState*)(conformBG->m_workArea + GetConformBgNormalDataOffsets(param2)->m_stateOffset);
-    scale = kPppConformBgNormalZero;
+    scale = 0.0f;
     state->m_normal.z = scale;
     state->m_normal.y = scale;
     state->m_normal.x = scale;
     state->m_initialized = 0;
 }
-
-extern const f32 kPppAlignmentScaleOne = 1.0f;
-extern const f32 kPppAlignmentScaleZero = 0.0f;

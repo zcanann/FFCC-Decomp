@@ -42,12 +42,6 @@ extern u32 CFlatFlags;
 class CFlatRuntime2 : public CFlatRuntime
 {
 public:
-	struct CSpawnBits
-	{
-		u32 m_lo;
-		u32 m_hi;
-	};
-
 	struct CDebugDrawCC
 	{
 		union {
@@ -239,7 +233,7 @@ public:
 	u8 m_pad_12E5_12E8[0x3];        // 0x12E5
 	int m_bossState;                // 0x12E8
 	int m_bossSubState;             // 0x12EC
-	CSpawnBits m_spawnBits[9];      // 0x12F0
+	u64 m_spawnBits[9];             // 0x12F0
 	float m_moveTime;               // 0x1338
 	float m_bgCollisionTime;        // 0x133C
 	float m_objectCollisionTime;    // 0x1340

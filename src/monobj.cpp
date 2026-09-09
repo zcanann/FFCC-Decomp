@@ -478,9 +478,8 @@ void CGMonObj::setRepop(int mode)
 
 	int option;
 	if ((mode != 0) && (option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue)), option < 9)) {
-		unsigned long long bit = 1ULL << reinterpret_cast<int>(scriptHandle[2]);
-		unsigned long long spawnBits =
-			(static_cast<unsigned long long>(CFlatSpawnBitLo(option)) << 32) | CFlatSpawnBitHi(option);
+		u64 bit = 1ULL << reinterpret_cast<int>(scriptHandle[2]);
+		u64 spawnBits = CFlatSpawnBits(option);
 		if ((spawnBits & bit) != 0) {
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) = 0;
 			object->m_bgColMask = 0;
@@ -2776,10 +2775,7 @@ void CGMonObj::onStatDie()
 			int option = *reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue);
 			if (option < 9 && m_repop.delay == 0) {
 				int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
-				long long bit = 1ULL << shift;
-				unsigned int loVal = CFlatSpawnBitLo(option);
-				CFlatSpawnBitHi(option) |= static_cast<unsigned int>(bit);
-				CFlatSpawnBitLo(option) = loVal | static_cast<unsigned int>(bit >> 32);
+				CFlatSpawnBits(option) |= 1ULL << shift;
 			}
 			return;
 		}

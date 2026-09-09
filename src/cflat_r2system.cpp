@@ -3689,7 +3689,7 @@ renderedDone:
     case -0xF0: {
         this->push(
             object,
-            m_spawnBits[*object->m_localBase].m_hi & static_cast<unsigned int>(1ULL << object->m_localBase[1]));
+            static_cast<int>(m_spawnBits[*object->m_localBase] & (1ULL << object->m_localBase[1])));
         outResult = 0;
         break;
     }

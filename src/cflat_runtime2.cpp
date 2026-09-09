@@ -2429,7 +2429,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 
 /*
  * --INFO--
- * PAL Address: 0x8006FAC4
+ * PAL Address: 0x80069D7C
  * PAL Size: 36b
  * EN Address: TODO
  * EN Size: TODO
@@ -2438,14 +2438,9 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
  */
 int CFlatRuntime2::GetSysControl(int controlNo)
 {
-	struct RuntimeSysControlView {
-		u8 m_padding[0x12E8];
-		int m_control;
-	};
-
 	switch (controlNo) {
 	case 3:
-		return reinterpret_cast<RuntimeSysControlView*>(&CFlat)->m_control;
+		return CFlat.m_bossState;
 	default:
 		return 0;
 	}
@@ -2453,7 +2448,7 @@ int CFlatRuntime2::GetSysControl(int controlNo)
 
 /*
  * --INFO--
- * PAL Address: 0x8006FA68
+ * PAL Address: 0x80069D20
  * PAL Size: 92b
  * EN Address: TODO
  * EN Size: TODO
@@ -2472,8 +2467,7 @@ void CFlatRuntime2::resetSpawnBit(int spawnBit)
 	}
 
 	if (spawnBit <= 8) {
-		m_spawnBits[spawnBit].m_hi = 0;
-		m_spawnBits[spawnBit].m_lo = 0;
+		m_spawnBits[spawnBit] = 0;
 	}
 }
 

@@ -149,14 +149,9 @@ static inline int& CFlatBossSubState()
     return CFlatRuntime2Storage().m_bossSubState;
 }
 
-static inline u32& CFlatSpawnBitLo(int index)
+static inline u64& CFlatSpawnBits(int index)
 {
-    return CFlatRuntime2Storage().m_spawnBits[index].m_lo;
-}
-
-static inline u32& CFlatSpawnBitHi(int index)
-{
-    return CFlatRuntime2Storage().m_spawnBits[index].m_hi;
+    return CFlatRuntime2Storage().m_spawnBits[index];
 }
 
 static inline int& CFlatItemCarryMode()

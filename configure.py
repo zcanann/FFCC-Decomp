@@ -566,7 +566,7 @@ config.libs = [
             Object(NonMatching, "monobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "monobj_boss.cpp"),
             Object(Matching, "monobj_table.cpp", extra_cflags=["-pooldata off"]),
-            Object(NonMatching, "p_camera.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "p_camera.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "p_chara.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "p_chara_viewer.cpp", extra_cflags=["-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "p_dbgmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-inline auto,deferred", "-str reuse,pool,readonly"]),

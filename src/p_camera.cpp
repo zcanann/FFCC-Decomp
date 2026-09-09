@@ -82,8 +82,6 @@ extern const float kCameraDebugZoomStep;
 extern const float kCameraNegativeTenF;
 extern const float kCameraFiftyF;
 extern const float kCameraMinFov;
-extern const char s_p_camera_cpp[];
-extern const char sCameraInvalidFovFmt[0x40];
 unsigned char g_IsDbgDrawShadowPos;
 
 inline void* operator new(unsigned long, void* ptr)
@@ -967,7 +965,7 @@ inline void CCameraPcs::createRampTex8()
 {
     m_fullScreenShadow.m_rampTexture = 0;
     unsigned int rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
-    unsigned char* rampTex = new (MapMng.m_stage, const_cast<char*>(s_p_camera_cpp), 0x361) u8[rampTexSize];
+    unsigned char* rampTex = new (MapMng.m_stage, "p_camera.cpp", 0x361) u8[rampTexSize];
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (unsigned int i = 0; i < 0x100; i++) {
@@ -996,7 +994,7 @@ void CCameraPcs::createFullShadow()
 {
     m_fullScreenShadow.m_shadowTexture = 0;
     m_fullScreenShadow.m_shadowTexture =
-        new (MapMng.m_stage, const_cast<char*>(s_p_camera_cpp), 0x3A5)
+        new (MapMng.m_stage, "p_camera.cpp", 0x3A5)
             u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
 
     createRampTex8();
@@ -1494,7 +1492,7 @@ void CCameraPcs::SetStdProjectionMatrix()
 
     if (fov < kCameraMinFov) {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-            System.Printf(const_cast<char*>(sCameraInvalidFovFmt), fov);
+            System.Printf("!!!!!!!!!!!!!!!!!!FOV\202\314\222l\202\252\210\331\217\355\202\305\202\267\201B%f!!!!!!!!!!!!!!!!!!!!\n", fov);
         }
         fov = kCameraDefaultFov;
     }
@@ -1588,7 +1586,7 @@ void CCameraPcs::calc()
     float fov = m_fov;
     if (fov < kCameraMinFov) {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-            System.Printf(const_cast<char*>(sCameraInvalidFovFmt), fov);
+            System.Printf("!!!!!!!!!!!!!!!!!!FOV\202\314\222l\202\252\210\331\217\355\202\305\202\267\201B%f!!!!!!!!!!!!!!!!!!!!\n", fov);
         }
         fov = kCameraDefaultFov;
     }

@@ -8,12 +8,6 @@ extern float gPppYmLookOnOne;
 
 extern float kPppZero;
 extern float kPppOne;
-extern const float kPppGetRotMatrixXOne;
-extern const float kPppGetRotMatrixXZero;
-extern const float kPppGetRotMatrixYZero;
-extern const float kPppGetRotMatrixYOne;
-extern const float kPppGetRotMatrixZZero;
-extern const float kPppGetRotMatrixZOne;
 extern const float kPppAcceleZero;
 extern float kPppBreathModelZero;
 extern const float kPppKeLnsZero;

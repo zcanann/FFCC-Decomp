@@ -122,7 +122,3 @@ void pppConstructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl)
     Vec** work = GetLerpPosHistory(object, ctrl);
     *work = 0;
 }
-
-extern const float kPppLerpPosZero = 0.0f;
-extern const float kPppLerpPosOne = 1.0f;
-extern const double kPppLerpPosIntToDoubleBias = 4503599627370496.0;

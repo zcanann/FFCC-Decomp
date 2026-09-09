@@ -186,13 +186,13 @@ public:
     void ClrArtifactFlg(int);
     int GetArtifactData(int, unsigned char*);
     int GetUseItemFlg(int);
-    unsigned int GetChgUseItemFlg(int);
+    bool GetChgUseItemFlg(int);
     void ClrChgUseItemFlg(int);
     void SetChgUseItemFlg(int);
     unsigned int GetStrengthFlg(int);
     void ClrStrengthFlg(int);
     void GetStrengthData(int, unsigned char*);
-    unsigned int GetArtiDatFlg(int);
+    bool GetArtiDatFlg(int);
     void ClrArtiDatFlg(int);
     int MakeArtiData(int, char*);
     int GetTmpArtifactData(int, unsigned char*);

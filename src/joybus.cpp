@@ -1079,7 +1079,7 @@ timeout_expiry:
 
             if (m_stateCodeArr[threadParam->m_portIndex] == 2)
             {
-                if ((GbaQue.GetChgUseItemFlg(threadParam->m_portIndex) & 0xFF) != 0)
+                if (GbaQue.GetChgUseItemFlg(threadParam->m_portIndex))
                 {
                     char useItem = (char)GbaQue.GetUseItemFlg(threadParam->m_portIndex);
                     if (SendUseItem(threadParam->m_portIndex, useItem) < 0)
@@ -2183,7 +2183,7 @@ timeout_expiry:
         case 0x41:
         {
             int res = GBARecvSend(threadParam, &localBuf);
-            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && (GbaQue.GetArtiDatFlg(threadParam->m_portIndex) & 0xFF) != 0)
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetArtiDatFlg(threadParam->m_portIndex))
             {
                 threadParam->m_state = 'B';
                 memset(m_perThreadTemp[threadParam->m_portIndex], 0, sizeof(m_perThreadTemp[threadParam->m_portIndex]));

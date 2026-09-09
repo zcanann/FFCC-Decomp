@@ -4044,13 +4044,17 @@ int GbaQueue::GetUseItemFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CA4EC
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-unsigned int GbaQueue::GetChgUseItemFlg(int channel)
+bool GbaQueue::GetChgUseItemFlg(int channel)
 {
 	int value;
-	bool result;
+	int result;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(m_chgUseItemFlags)) & (1 << channel);
@@ -4133,13 +4137,17 @@ void GbaQueue::GetStrengthData(int channel, unsigned char* strengthData)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CA23C
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-unsigned int GbaQueue::GetArtiDatFlg(int channel)
+bool GbaQueue::GetArtiDatFlg(int channel)
 {
 	int value;
-	bool result;
+	int result;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	value = static_cast<int>(static_cast<char>(m_artiDatFlags)) & (1 << channel);

@@ -2212,24 +2212,28 @@ System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CD600
+ * PAL Size: 592b
+ * EN Address: 0x800CCE64
+ * EN Size: 592b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 {
-char* srcText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x859) char[kGbaQueueScratchTextSize];
+    char* srcText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x859) char[kGbaQueueScratchTextSize];
     if (srcText == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x85B);
+            System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x85B);
         }
         return -1;
     }
     memset(srcText, 0, kGbaQueueScratchTextSize);
 
-char* workText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x862) char[kGbaQueueScratchTextSize];
+    char* workText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x862) char[kGbaQueueScratchTextSize];
     if (workText == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x864);
+            System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x864);
         }
         return -1;
     }
@@ -2249,17 +2253,18 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
     CMes::MakeAgbString(workText, srcText, (*foodBasePtr)->m_genderFlag, 0);
     int totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
+    outData += totalSize;
 
     memset(srcText, 0, kGbaQueueScratchTextSize);
     memset(workText, 0, kGbaQueueScratchTextSize);
     strcpy(srcText, Game.m_cFlatDataArr[1].Message(mesIndex + 0x11));
     CMes::MakeAgbString(workText, srcText, (*foodBasePtr)->m_genderFlag, 0);
-    int line2Size = static_cast<int>(strlen(workText));
-    memcpy(outData + totalSize, workText, line2Size + 1);
-    totalSize += line2Size + 1;
+    int line2Size = static_cast<int>(strlen(workText) + 1);
+    memcpy(outData, workText, line2Size);
+    totalSize += line2Size;
 
-	delete[] workText;
-	delete[] srcText;
+    delete[] workText;
+    delete[] srcText;
 
     m_letterDatFlg = static_cast<unsigned char>(m_letterDatFlg | (0x10 << channel));
     Joybus.SetLetterSize(channel, totalSize);
@@ -4624,7 +4629,7 @@ void GbaQueue::SetControllerMode(int controllerMode)
 unsigned int GbaQueue::GetControllerMode()
 {
 	char mode;
-	unsigned int result;
+	bool result;
 	int i;
 
 	i = 0;
@@ -4771,7 +4776,7 @@ void GbaQueue::SetPauseMode(int mode)
 unsigned int GbaQueue::GetPauseMode()
 {
 	char mode;
-	unsigned int result;
+	bool result;
 	int i;
 
 	i = 0;

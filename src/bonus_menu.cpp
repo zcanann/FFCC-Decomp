@@ -21,8 +21,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern char lbl_801DD5D4[];
-
 static const float s_PCYpos[4] = {-11.14f, -7.1f, -11.55f, -11.14f};
 static const float s_PCScl[4] = {0.87f, 0.78f, 0.78f, 0.87f};
 static const float s_AnimX[3] = {9.1f, 13.7f, 27.9f};
@@ -123,6 +121,143 @@ static inline void SetupSelectCloseSpriteMotion(CMenuPcs::Sprt2* sprite)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 572b
+ * EN Address: 0x8015CE84
+ * EN Size: 672b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprite, int value)
+{
+	int digits[3];
+	int digitCount;
+
+	if (value >= 100) {
+		digitCount = 3;
+		digits[0] = value / 100;
+		value %= 100;
+		digits[1] = value / 10;
+		digits[2] = value % 10;
+	} else if (value >= 10) {
+		digitCount = 2;
+		digits[0] = value / 10;
+		digits[1] = value % 10;
+	} else {
+		digitCount = 1;
+		digits[0] = value;
+	}
+
+	float digitX = (float)((3.0 * (double)sprite->w - (float)(digitCount * sprite->w)) * 0.5 + (double)sprite->x);
+	float digitW = (float)sprite->w;
+	int* dp = digits;
+	for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
+		MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
+		    (float)(sprite->w * *dp), sprite->mulY,
+		    sprite->depth, sprite->depth, 0.0f);
+		digitX += digitW;
+		dp++;
+	}
+}
+
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 372b
+ * EN Address: 0x8015D868
+ * EN Size: 560b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::DrawBonusChkMark(float artiAlpha)
+{
+	if (!((double)artiAlpha <= 0.0)) {
+		_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+		GXColor markColor;
+		markColor.r = 0xFF;
+		markColor.g = 0xFF;
+		markColor.b = 0xFF;
+		markColor.a = (unsigned char)(255.0f * artiAlpha);
+		GXSetChanMatColor(GX_COLOR0A0, markColor);
+		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
+
+		unsigned int activeMask = 0;
+		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
+			int selection = s_Rinfo->m_party[i].m_selectedSlot;
+			if (selection >= 0) {
+				activeMask |= 1 << selection;
+			}
+		}
+
+		{
+			int i = 0;
+			for (; i < 8; i++) {
+				if ((activeMask & (1 << i)) == 0) {
+					continue;
+				}
+				float x = s_Base->m_artifactPositions[i].x + 28.0f;
+				float y = s_Base->m_artifactPositions[i].y + 20.0f;
+				MenuPcs.DrawRect(0, x, y, 56.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+			}
+		}
+	}
+}
+
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 32b
+ * EN Address: 0x8015CE5C
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::DrawSelectCloseAnim()
+{
+	DrawSelectOpenAnim();
+}
+
+
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 32b
+ * EN Address: 0x8015C0C4
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::DrawSelectWait()
+{
+	DrawSelectOpenAnim();
+}
+
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 152b
+ * EN Address: 0x8015DED0
+ * EN Size: 132b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline unsigned int CMenuPcs::GetAllPadOn()
+{
+	unsigned int buttons = 0;
+	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
+		buttons |= Pad.GetButtonDown(s_Rinfo->m_party[i].m_partySlot);
+	}
+	return buttons;
+}
+
+
+/*
+ * --INFO--
  * PAL Address: 0x8013E280
  * PAL Size: 20b
  * EN Address: 0x801541E8
@@ -189,7 +324,7 @@ void CMenuPcs::createBonus()
 	};
 
 	loadTexture(tName, 2, 1, tTmp, 0x16, 0x12, 0);
-	sprintf(fontPath, lbl_801DD5D4, Game.GetLangString());
+	sprintf(fontPath, "dvd/%smenu/subfont.fnt", Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
 
 	s_Rinfo = new (MenuPcs.m_menuStage, "bonus_menu.cpp", 0xDD) BonusSummaryData;
@@ -515,6 +650,48 @@ void CMenuPcs::destroyBonus()
 
 /*
  * --INFO--
+ * PAL Address: 0x8013D1C8
+ * PAL Size: 216b
+ * EN Address: 0x80155704
+ * EN Size: 232b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::drawBonus()
+{
+	gUtil.ClearZBufferRect(0.0f, 0.0f, 640.0f, 448.0f);
+
+	if ((unsigned int)System.m_execParam >= 1) {
+		System.Printf("draw Bonus (%d)\n", (int)this->m_bonusState->m_phase);
+	}
+
+	switch (this->m_bonusState->m_phase) {
+	case 0:
+		DrawResultOpenAnim();
+		break;
+	case 1:
+		DrawResultCountAnim();
+		break;
+	case 2:
+		DrawResultCloseAnim();
+		break;
+	case 3:
+		DrawSelectOpenAnim();
+		break;
+	case 4:
+		DrawSelectWait();
+		break;
+	case 5:
+		DrawSelectCloseAnim();
+		break;
+	case 6:
+		break;
+	}
+}
+
+
+/*
+ * --INFO--
  * PAL Address: 0x8013D2A0
  * PAL Size: 368b
  * EN Address: 0x8015558C
@@ -571,46 +748,6 @@ void CMenuPcs::calcBonus()
 	}
 }
 
-/*
- * --INFO--
- * PAL Address: 0x8013D1C8
- * PAL Size: 216b
- * EN Address: 0x80155704
- * EN Size: 232b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::drawBonus()
-{
-	gUtil.ClearZBufferRect(0.0f, 0.0f, 640.0f, 448.0f);
-
-	if ((unsigned int)System.m_execParam >= 1) {
-		System.Printf("draw Bonus (%d)\n", (int)this->m_bonusState->m_phase);
-	}
-
-	switch (this->m_bonusState->m_phase) {
-	case 0:
-		DrawResultOpenAnim();
-		break;
-	case 1:
-		DrawResultCountAnim();
-		break;
-	case 2:
-		DrawResultCloseAnim();
-		break;
-	case 3:
-		DrawSelectOpenAnim();
-		break;
-	case 4:
-		DrawSelectWait();
-		break;
-	case 5:
-		DrawSelectCloseAnim();
-		break;
-	case 6:
-		break;
-	}
-}
 
 /*
  * --INFO--
@@ -634,7 +771,7 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		idx = 0;
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->kind = 0x16;
 			spr->y = 0;
 			spr->x = 0;
@@ -649,7 +786,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[i + 1];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[i + idx];
 			spr->kind = 0x17;
 			spr->x = 0x80;
 			spr->y = (short)(i * 0x60 + 0x38);
@@ -660,13 +797,13 @@ void CMenuPcs::CalcResultOpenAnim()
 			spr->duration = 8;
 			spr->depth = 1.0f;
 		}
-		int base = activePartyCount + 1;
+		idx += activePartyCount;
 		{
 			int i = 0;
-			int backOffset = base;
+			int backOffset = idx;
 			int y = 0x28;
 			for (; i < activePartyCount; i++) {
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				int partySlot = s_Rinfo->m_party[i].m_partySlot;
 				spr->kind = 0x18;
 				spr->x = ((1 <= i) && (i <= 2)) ? 0x30 : 0x48;
@@ -689,11 +826,11 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// model sprites: startFrame chained from icons
-		base += activePartyCount;
+		idx += activePartyCount;
 		{
 			for (int i = 0; i < activePartyCount; i++) {
-				int delta = base - (activePartyCount + 1);
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				int delta = idx - (activePartyCount + 1);
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -2;
 				CMenuPcs::Sprt2* src = spr - delta;
 				spr->x = 0;
@@ -709,11 +846,11 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// zeroed model sprites; startFrame fixed up later
-		base += activePartyCount;
-		int zeroBase = base;
+		idx += activePartyCount;
+		int zeroBase = idx;
 		if (0 < activePartyCount) {
 			for (int i = 0; i < activePartyCount; i++) {
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -2;
 				spr->x = 0;
 				spr->y = 0;
@@ -727,13 +864,13 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// staggered model sprites
-		base += activePartyCount;
+		idx += activePartyCount;
 		{
 			int i = 0;
 			int bump = i;
 			for (; i < activePartyCount; i++) {
-				int delta = base;
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				int delta = idx;
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -2;
 				CMenuPcs::Sprt2* src = spr - delta;
 				spr->x = 0;
@@ -753,11 +890,11 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// icon echo sprites (copies shifted down)
-		base += activePartyCount;
+		idx += activePartyCount;
 		{
 			for (int i = 0; i < activePartyCount; i++) {
-				int delta = base - (activePartyCount + 1);
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				int delta = idx - (activePartyCount + 1);
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				CMenuPcs::Sprt2* src = spr - delta;
 				*spr = *src;
 				spr->y = (short)(spr->y + 0x20);
@@ -768,7 +905,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		base += activePartyCount;
+		idx += activePartyCount;
 
 		// frame rows start after their icons
 		if (0 < activePartyCount) {
@@ -787,7 +924,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		{
-			CMenuPcs::Sprt2* count = &m_bonusAnim->sprites[base];
+			CMenuPcs::Sprt2* count = &m_bonusAnim->sprites[idx];
 			count->kind = 0x19;
 			count->y = 0x10;
 			count->w = 0x140;
@@ -800,12 +937,12 @@ void CMenuPcs::CalcResultOpenAnim()
 			count->duration = 10;
 			count->depth = 1.0f;
 		}
-		int countTop = base + 1;
+		int countTop = idx + 1;
 		s_CntTop = countTop;
 
 		{
 			for (int i = 0; i < activePartyCount; i++) {
-				int delta = base;
+				int delta = idx;
 				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[countTop + i];
 				spr->kind = 0x19;
 				CMenuPcs::Sprt2* src = spr - delta;
@@ -822,11 +959,11 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// name sprites
-		base = countTop + activePartyCount;
+		idx = countTop + activePartyCount;
 		{
 			for (int i = 0; i < activePartyCount; i++) {
-				int delta = base - (activePartyCount + 1);
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				int delta = idx - (activePartyCount + 1);
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -1;
 				CMenuPcs::Sprt2* src = spr - delta;
 				spr->x = (short)(src->x + 0x50);
@@ -842,11 +979,11 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// value text sprites
-		base += activePartyCount;
+		idx += activePartyCount;
 		{
 			for (int i = 0; i < activePartyCount; i++) {
-				int delta = base - 1;
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				int delta = idx - 1;
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -1;
 				spr->x = 0xb8;
 				CMenuPcs::Sprt2* src = spr - delta;
@@ -861,7 +998,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		base += activePartyCount;
+		idx += activePartyCount;
 
 		{
 			int i = 0;
@@ -915,7 +1052,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		m_bonusAnim->header.count = (short)base;
+		m_bonusAnim->header.count = (short)idx;
 		m_bonusAnim->header.finished = 0;
 		this->m_bonusState->m_initialized = 1;
 		return;
@@ -2879,19 +3016,6 @@ void CMenuPcs::CalcSelectWait()
 	}
 }
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 32b
- * EN Address: 0x8015C0C4
- * EN Size: 40b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::DrawSelectWait()
-{
-	DrawSelectOpenAnim();
-}
 
 /*
  * --INFO--
@@ -3151,60 +3275,6 @@ void CMenuPcs::CalcSelectCloseAnim()
 	}
 }
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 32b
- * EN Address: 0x8015CE5C
- * EN Size: 40b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::DrawSelectCloseAnim()
-{
-	DrawSelectOpenAnim();
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 572b
- * EN Address: 0x8015CE84
- * EN Size: 672b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprite, int value)
-{
-	int digits[3];
-	int digitCount;
-
-	if (value >= 100) {
-		digitCount = 3;
-		digits[0] = value / 100;
-		value %= 100;
-		digits[1] = value / 10;
-		digits[2] = value % 10;
-	} else if (value >= 10) {
-		digitCount = 2;
-		digits[0] = value / 10;
-		digits[1] = value % 10;
-	} else {
-		digitCount = 1;
-		digits[0] = value;
-	}
-
-	float digitX = (float)((3.0 * (double)sprite->w - (float)(digitCount * sprite->w)) * 0.5 + (double)sprite->x);
-	float digitW = (float)sprite->w;
-	int* dp = digits;
-	for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
-		MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
-		    (float)(sprite->w * *dp), sprite->mulY,
-		    sprite->depth, sprite->depth, 0.0f);
-		digitX += digitW;
-		dp++;
-	}
-}
 
 /*
  * --INFO--
@@ -3335,49 +3405,6 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	}
 }
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 372b
- * EN Address: 0x8015D868
- * EN Size: 560b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::DrawBonusChkMark(float artiAlpha)
-{
-	if (!((double)artiAlpha <= 0.0)) {
-		_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-		GXColor markColor;
-		markColor.r = 0xFF;
-		markColor.g = 0xFF;
-		markColor.b = 0xFF;
-		markColor.a = (unsigned char)(255.0f * artiAlpha);
-		GXSetChanMatColor(GX_COLOR0A0, markColor);
-		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
-
-		unsigned int activeMask = 0;
-		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-			int selection = s_Rinfo->m_party[i].m_selectedSlot;
-			if (selection >= 0) {
-				activeMask |= 1 << selection;
-			}
-		}
-
-		{
-			int i = 0;
-			for (; i < 8; i++) {
-				if ((activeMask & (1 << i)) == 0) {
-					continue;
-				}
-				float x = s_Base->m_artifactPositions[i].x + 28.0f;
-				float y = s_Base->m_artifactPositions[i].y + 20.0f;
-				MenuPcs.DrawRect(0, x, y, 56.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-			}
-		}
-	}
-}
 
 /*
  * --INFO--
@@ -3453,23 +3480,6 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 	}
 }
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 152b
- * EN Address: 0x8015DED0
- * EN Size: 132b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline unsigned int CMenuPcs::GetAllPadOn()
-{
-	unsigned int buttons = 0;
-	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-		buttons |= Pad.GetButtonDown(s_Rinfo->m_party[i].m_partySlot);
-	}
-	return buttons;
-}
 
 /*
  * --INFO--

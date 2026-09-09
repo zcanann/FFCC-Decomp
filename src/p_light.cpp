@@ -188,21 +188,6 @@ void CLightPcs::create()
 
 /*
  * --INFO--
- * PAL Address: 0x8004a11c
- * PAL Size: 200b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CLightPcs::destroy()
-{
-    DestroyBumpLightAll(static_cast<TARGET>(1));
-    DestroyBumpLightAll(static_cast<TARGET>(0));
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8004a094
  * PAL Size: 136b
  * EN Address: TODO
@@ -224,6 +209,21 @@ void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
             m_bumpLights[target][i].m_useViewSpace = 0;
         }
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004a11c
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CLightPcs::destroy()
+{
+    DestroyBumpLightAll(static_cast<TARGET>(1));
+    DestroyBumpLightAll(static_cast<TARGET>(0));
 }
 
 /*
@@ -288,6 +288,33 @@ void CLightPcs::draw()
 
 /*
  * --INFO--
+ * PAL Address: 0x80047e00
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CLightPcs::CLight::CLight()
+{
+    m_radius = kLightOne;
+    m_offsetZ = kLightZero;
+    m_offsetX = kLightZero;
+    m_attenFalloff = kLightDefaultAttenFalloff;
+    m_directionMode = 0;
+    m_spotFn = 0;
+    m_unk4D = 4;
+    m_specularMode = 0;
+    m_partMask = -1;
+    m_part = 0;
+    *(u32*)&m_targetColor[0] = 0;
+    *(u32*)&m_targetColor[1] = 0;
+    *(u32*)&m_targetColor[2] = 0;
+    *(u32*)&m_targetColor[3] = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80049acc
  * PAL Size: 1032b
  * EN Address: TODO
@@ -305,6 +332,26 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     m_sceneLightCount = idx + 1;
     CLight* dst = &m_sceneLights[idx];
     *dst = sceneLight;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: 0x80054a34
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CLightPcs::CBumpLight* CLightPcs::GetFreeBumpLight(CLightPcs::TARGET target)
+{
+    for (int i = 0; i < 8; i++) {
+        if (m_bumpLights[target][i].m_hasTexture == 0) {
+            return &m_bumpLights[target][i];
+        }
+    }
+
+    return 0;
 }
 
 /*
@@ -344,26 +391,6 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
     }
 
     return bumpLight;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 72b
- * EN Address: 0x80054a34
- * EN Size: 96b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CLightPcs::CBumpLight* CLightPcs::GetFreeBumpLight(CLightPcs::TARGET target)
-{
-    for (int i = 0; i < 8; i++) {
-        if (m_bumpLights[target][i].m_hasTexture == 0) {
-            return &m_bumpLights[target][i];
-        }
-    }
-
-    return 0;
 }
 
 /*
@@ -585,6 +612,26 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: 0x800554A8
+ * EN Size: 208b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline void setchanctrl(CLightPcs::TARGET target, unsigned long chanMask)
+{
+    GXSetNumChans(1);
+    if ((int)target != 1) {
+        GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, chanMask, GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
+
+        GXSetChanMatColor(GX_COLOR0A0, kLightDefaultMaterialColor);
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80048FE0
  * PAL Size: 536b
  * EN Address: 0x800552F8
@@ -627,26 +674,6 @@ void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long ma
     }
 
     setchanctrl(target, m_loadedLightMask);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: TODO
- * EN Address: 0x800554A8
- * EN Size: 208b
- * JP Address: TODO
- * JP Size: TODO
- */
-static inline void setchanctrl(CLightPcs::TARGET target, unsigned long chanMask)
-{
-    GXSetNumChans(1);
-    if ((int)target != 1) {
-        GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, chanMask, GX_DF_CLAMP, GX_AF_SPOT);
-        GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
-
-        GXSetChanMatColor(GX_COLOR0A0, kLightDefaultMaterialColor);
-    }
 }
 
 /*
@@ -1209,32 +1236,7 @@ void CLightPcs::CBumpLight::SetTexture(_GXTexMapID texMapID, int textureIdx)
     GXLoadTexObj(&m_textures[textureIdx], texMapID);
 }
 
-/*
- * --INFO--
- * PAL Address: 0x80047e00
- * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CLightPcs::CLight::CLight()
-{
-    m_radius = kLightOne;
-    m_offsetZ = kLightZero;
-    m_offsetX = kLightZero;
-    m_attenFalloff = kLightDefaultAttenFalloff;
-    m_directionMode = 0;
-    m_spotFn = 0;
-    m_unk4D = 4;
-    m_specularMode = 0;
-    m_partMask = -1;
-    m_part = 0;
-    *(u32*)&m_targetColor[0] = 0;
-    *(u32*)&m_targetColor[1] = 0;
-    *(u32*)&m_targetColor[2] = 0;
-    *(u32*)&m_targetColor[3] = 0;
-}
+
 
 extern const _GXColor kLightDefaultMaterialColor = {0xFF, 0xFF, 0xFF, 0xFF};
 extern const _GXColor kBumpLightMapColor = {0x88, 0x88, 0x88, 0xFF};

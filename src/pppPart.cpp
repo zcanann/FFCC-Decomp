@@ -1584,20 +1584,18 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 /*
  * --INFO--
- * PAL Address: 80054c58
+ * PAL Address: 0x80054C58
  * PAL Size: 304b
  * EN Address: 0x80064BE4
  * EN Size: 1228b
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCalcPartStd(_pppMngSt* pppMngSt)
+static void pppCalcPartStd(_pppMngSt* pppMngSt)
 {
-	s32 i = 0;
-	s32 pDataValOffset = 0;
-	for (; i < pppMngSt->m_numPrograms; i++)
+	for (s32 i = 0; i < pppMngSt->m_numPrograms; i++)
 	{
-		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pppMngSt->m_pppPDataVals + pDataValOffset);
+		_pppPDataVal* pDataVal = &pppMngSt->m_pppPDataVals[i];
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0)
 		{
 			_pppProgSetDef* progSet = pDataVal->m_programSetDef;
@@ -1605,8 +1603,6 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 
 			if (pDataVal->m_activeCount != 0)
 			{
-				s32 workOffsetStep = 0;
-
 				for (s32 stage = 0; stage < progSet->m_numStages; stage++)
 				{
 					_pppCtrlTable* stageIter = &progSet->m_stages[stage];
@@ -1625,7 +1621,7 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 								{
 									_pppPObjLink* next = obj->m_next;
 									fn((_pppPObject*)obj,
-									   *(void**)(((u8*)obj) + progSet->m_workBaseOffset + workOffsetStep),
+									   ((void**)((u8*)obj + progSet->m_workBaseOffset))[stage],
 									   stageIter);
 									obj = next;
 								}
@@ -1641,12 +1637,9 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 					{
 						printf("\nERROR!!!! prog=NULL\n\n");
 					}
-
-					workOffsetStep += 4;
 				}
 			}
 		}
-		pDataValOffset += sizeof(_pppPDataVal);
 	}
 
 	if (pppMngSt->m_prioTime < 0xFFFF)
@@ -1657,19 +1650,18 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 
 /*
  * --INFO--
- * PAL Address: 80054b30
+ * PAL Address: 0x80054B30
  * PAL Size: 296b
  * EN Address: 0x800650B0
  * EN Size: 464b
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawPartStd(_pppMngSt* pppMngSt)
+static void pppDrawPartStd(_pppMngSt* pppMngSt)
 {
-	s32 pDataValOffset = 0;
 	for (s32 i = 0; i < pppMngSt->m_numPrograms; i++)
 	{
-		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pppMngSt->m_pppPDataVals + pDataValOffset);
+		_pppPDataVal* pDataVal = &pppMngSt->m_pppPDataVals[i];
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0 &&
 		    pDataVal->m_programSetDef->m_drawFlagBits.m_skipDraw == 0 && pDataVal->m_activeCount > 0)
 		{
@@ -1709,7 +1701,6 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 				}
 			}
 		}
-		pDataValOffset += sizeof(_pppPDataVal);
 	}
 }
 /*
@@ -1916,7 +1907,7 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 
 /*
  * --INFO--
- * PAL Address: 80054674
+ * PAL Address: 0x80054674
  * PAL Size: 36b
  * EN Address: TODO
  * EN Size: TODO

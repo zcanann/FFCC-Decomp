@@ -794,94 +794,6 @@ void CGObject::CancelAnim(int keepFacing)
 
 /*
  * --INFO--
- * PAL Address: 0x8007c808
- * PAL Size: 328b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGObject::IsAnimFinished(int mode)
-{
-    float frame;
-    float animSpan;
-    bool hasModel = false;
-    u32 result;
-    u32 shieldFlagClz;
-    signed char shieldFlag;
-    CCharaPcs::CHandle* handle;
-    double threshold;
-
-    char slot;
-
-    handle = m_charaModelHandle;
-    if ((handle != 0) && (handle->m_model != 0)) {
-        hasModel = true;
-    }
-
-    if (!hasModel) {
-        goto returnOne;
-    }
-    {
-        slot = m_currentAnimSlot;
-        if (slot == -1) {
-        returnOne:
-            return 1;
-        }
-        {
-            shieldFlag = static_cast<signed char>(m_shieldNodeFlagBits.m_bit08);
-            shieldFlagClz = static_cast<u32>(__cntlzw(static_cast<u32>(shieldFlag)));
-            result = shieldFlagClz >> 5;
-
-            if (((shieldFlagClz >> 5) & 0xFF) != 0) {
-                hasModel = false;
-                if ((handle != 0) && (handle->m_model != 0)) {
-                    hasModel = true;
-                }
-
-                if (!hasModel || (slot == -1)) {
-                    result = 1;
-                } else {
-                    CChara::CModel& model = *handle->m_model;
-                    if (model.m_anim != 0) {
-                        animSpan = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
-                        if (sAnimFrameOffset == animSpan) {
-                            result = 1;
-                        } else {
-                            if (mode != 0) {
-                                frame = m_turnSpeed;
-                            } else {
-                                frame = model.m_time;
-                            }
-
-                            threshold = static_cast<double>(frame);
-                            if (mode == 2) {
-                                threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
-                            }
-
-                            const float lastAttr = m_lastBgAttr;
-                            if (static_cast<double>(lastAttr)
-                                < static_cast<double>(sZeroFloat)) {
-                                result = static_cast<double>(sZeroFloat) >= threshold;
-                            } else {
-                                result = static_cast<double>(animSpan - sAnimFrameOffset) < threshold;
-                            }
-                        }
-                    } else {
-                        result = 1;
-                    }
-                }
-
-                return static_cast<unsigned char>(result != 0);
-            }
-
-            return result & 0xFF;
-        }
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8007C950
  * PAL Size: 224b
  * EN Address: TODO
@@ -935,6 +847,33 @@ int CGObject::IsLoopAnim(int mode)
 
     return 1;
 }
+
+
+/*
+ * --INFO--
+ * PAL Address: 0x8007c808
+ * PAL Size: 328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGObject::IsAnimFinished(int mode)
+{
+    CCharaPcs::CHandle* handle = m_charaModelHandle;
+    bool hasModel = false;
+    if ((handle != 0) && (handle->m_model != 0)) {
+        hasModel = true;
+    }
+
+    if (!hasModel || m_currentAnimSlot == -1) {
+        return 1;
+    }
+
+    return !m_shieldNodeFlagBits.m_bit08 && IsLoopAnim(mode);
+}
+
+
 
 /*
  * --INFO--

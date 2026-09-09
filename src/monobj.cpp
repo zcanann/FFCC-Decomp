@@ -3707,30 +3707,24 @@ void CGMonObj::onCancelStat(int state)
  */
 void CGMonObj::setActionParam(int state)
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
-
-	int scriptOffset = (state + 0xE) * 2;
-	unsigned int action = *reinterpret_cast<unsigned short*>(script + scriptOffset + 0xD0);
-	m_itemId = action;
-
-	unsigned int motion = *reinterpret_cast<unsigned short*>(script + scriptOffset + 0xF0);
-	m_attackAnimId = motion;
+	m_itemId = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_actionItems[state + 0xE];
+	m_attackAnimId = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_actionAnimations[state + 0xE];
 	m_unk554 = m_attackAnimId + 1;
 	m_unk558 = m_unk554 + 1;
 	m_unk55C = m_unk558 + 1;
 
-	int actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0xE);
+	int actionType =
+		reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId].m_actionType;
 	switch (actionType) {
 	case 0:
 	case 1:
 	case 3:
 		m_castFrameStart =
-			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x20);
+			reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId].m_attackStartFrame;
 		m_castFrameEnd =
-			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (m_itemId * 0x48 + 0x22));
+			reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId].m_attackEndFrame;
 		m_castFrameCurrent =
-			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (m_itemId * 0x48 + 0x22));
+			reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId].m_attackEndFrame;
 		break;
 	case 2:
 		m_unk68C = CGCharaObj::calcCastTime(m_itemId);
@@ -3751,40 +3745,10 @@ void CGMonObj::setActionParam(int state)
  */
 void CGMonObj::onChangeStat(int state)
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
 	(this->*m_funcs->changeStat)(state);
 
 	if ((state < 3) && (state < -4) && (state >= -14)) {
-		int scriptOffset = (state + 0xE) * 2;
-		int actionType;
-
-		unsigned int action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (scriptOffset + 0xD0));
-		m_itemId = action;
-		unsigned int motion = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (scriptOffset + 0xF0));
-		m_attackAnimId = motion;
-		m_unk554 = m_attackAnimId + 1;
-		m_unk558 = m_unk554 + 1;
-		m_unk55C = m_unk558 + 1;
-
-		actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0xE);
-		switch (actionType) {
-		case 0:
-		case 1:
-		case 3:
-			m_castFrameStart =
-				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x20);
-			m_castFrameEnd =
-				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (m_itemId * 0x48 + 0x22));
-			m_castFrameCurrent =
-				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (m_itemId * 0x48 + 0x22));
-			break;
-		case 2:
-			m_unk68C =
-				CGCharaObj::calcCastTime(m_itemId);
-			break;
-		case 4:
-			break;
-		}
+		setActionParam(state);
 	}
 
 	CGCharaObj::onChangeStat(state);

@@ -2029,9 +2029,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x9F: {
-			unsigned int finished = static_cast<unsigned int>(engineObject->IsAnimFinished(0));
-			int topBit = __cntlzw(finished);
-			PushValue(this, object, (topBit >> 5) & 0xFF);
+			PushValue(this, object, !engineObject->IsAnimFinished(0));
 			outResult = 0;
 			break;
 		}

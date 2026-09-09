@@ -836,7 +836,7 @@ pppShape.cpp:
 	extab       start:0x80007208 end:0x80007248
 	extabindex  start:0x8000D1BC end:0x8000D21C
 	.text       start:0x80065678 end:0x80065CAC
-	.sdata2     start:0x80330110 end:0x80330118
+	.sdata2     start:0x80330108 end:0x80330118
 
 cflat_runtime.cpp:
 	extab       start:0x80007248 end:0x80007310

@@ -49,17 +49,7 @@ CProcessTable CSystemPcs::m_table = {
  */
 void CSystemPcs::calc()
 {
-    int debugPad;
-    int stepPad;
-    unsigned short buttons;
-
-    if (Pad.m_debugPadLock != 0) {
-        buttons = 0;
-    } else {
-        debugPad = Pad.m_debugPadPort;
-        stepPad = (debugPad == 4) ? 0 : 4;
-        buttons = Pad.GetPadInputs()[stepPad].lockedButton[1];
-    }
+    unsigned short buttons = Pad.GetDebugButtonDown(4);
 
     if ((buttons & 0x1000) != 0) {
         return;

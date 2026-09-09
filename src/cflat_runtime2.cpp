@@ -1325,13 +1325,7 @@ void CFlatRuntime2::Calc()
 		}
 	}
 
-	u16 button;
-	if (Pad.m_debugPadLock != 0) {
-		button = 0;
-	} else {
-		const u32 padIndex = static_cast<u32>((1 - Pad.m_debugPadPort) | (Pad.m_debugPadPort - 1)) >> 31;
-		button = Pad.GetPadInputs()[padIndex].lockedButton[1];
-	}
+	u16 button = Pad.GetDebugButtonDown(1);
 
 	if (((button & 0x400) != 0) && (m_saveSceneEnabled != 0)) {
 		m_saveSceneEnabled = 0;

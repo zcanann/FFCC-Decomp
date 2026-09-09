@@ -317,33 +317,15 @@ void CSystem::ExecScenegraph()
         File.Frame();
         Memory.Frame();
 
-        if (Pad.m_debugPadLock != 0)
-        {
-            stepTrigger = 0;
-        }
-        else
-        {
-            unsigned int stepPad = (Pad.m_debugPadPort == 4) ? 0 : 4;
-            stepTrigger = Pad.GetPadInputs()[stepPad].lockedButton[1];
-        }
-        stepTrigger = (unsigned short)stepTrigger;
+        stepTrigger = Pad.GetDebugButtonDown(4);
 
-        if (Pad.m_debugPadLock != 0)
-        {
-            perfTrigger = 0;
-        }
-        else
-        {
-            unsigned int perfPad = (Pad.m_debugPadPort == 4) ? 0 : 4;
-            perfTrigger = Pad.GetPadInputs()[perfPad].lockedButton[0];
-        }
-        perfTrigger = (unsigned short)perfTrigger;
+        perfTrigger = Pad.GetDebugButton(4);
 
         if ((stepTrigger & 0xC) != 0)
         {
             if ((stepTrigger & 8) != 0)
             {
-                m_scenegraphStepMode = (unsigned int)__cntlzw((unsigned int)m_scenegraphStepMode) >> 5;
+                m_scenegraphStepMode = !m_scenegraphStepMode;
             }
             else if ((stepTrigger & 4) != 0)
             {
@@ -399,7 +381,7 @@ void CSystem::ExecScenegraph()
         int drawToggle;
         if (scenegraphStepMode == 1)
         {
-            drawToggle = ((unsigned int)__cntlzw(m_frameCounter & 3) >> 5) & 0xFF;
+            drawToggle = (m_frameCounter & 3) == 0;
         }
         else
         {

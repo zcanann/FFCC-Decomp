@@ -4,6 +4,8 @@
 #include "ffcc/cflat_runtime.h"
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/color.h"
+#include "ffcc/charaobj.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/game.h"
 #include "ffcc/graphic.h"
 #include "ffcc/itemobj.h"
@@ -28,6 +30,18 @@
 
 extern const Vec DAT_801D9B88;
 extern const Vec DAT_801D9B94;
+
+STATIC_ASSERT(offsetof(CCaravanWork, m_genderFlag) == 0x3E2);
+STATIC_ASSERT(offsetof(CGObjWork, m_saveSlot) == 0x08);
+STATIC_ASSERT(offsetof(CGObjWork, m_ownerObj) == 0x0C);
+STATIC_ASSERT(offsetof(CChara::CModel, m_meshVisibleMask) == 0x98);
+STATIC_ASSERT(offsetof(CChara::CModel, m_nodes) == 0xA8);
+STATIC_ASSERT(offsetof(CChara::CModel, m_texAnimSet) == 0xD4);
+STATIC_ASSERT(offsetof(CChara::CModel, m_flags10CBits) == 0x10C);
+STATIC_ASSERT(sizeof(CChara::CNode) == 0xC0);
+STATIC_ASSERT(offsetof(CChara::CNode, m_mtx) == 0x6C);
+STATIC_ASSERT(offsetof(CGCharaObj, m_itemId) == 0x560);
+STATIC_ASSERT(offsetof(CCameraPcs, m_yaw) == 0xF8);
 
 STATIC_ASSERT(sizeof(CGObject::AttackCol) == 0x30);
 STATIC_ASSERT(sizeof(CGObject::DamageCol) == 0x28);
@@ -578,10 +592,6 @@ void CGObject::CalcSphereNearPos(float scale, float angleOffset, Vec& outPos)
  */
 void CGObject::ResetDynamics()
 {
-    struct ModelFlagBits {
-        signed char m_dynamics : 1;
-        signed char m_unused : 7;
-    };
     bool hasModel = false;
     CCharaPcs::CHandle* handle = m_charaModelHandle;
 
@@ -590,8 +600,7 @@ void CGObject::ResetDynamics()
     }
 
     if (hasModel) {
-        u8* modelBytes = reinterpret_cast<u8*>(handle->m_model);
-        reinterpret_cast<ModelFlagBits*>(modelBytes + 0x10C)->m_dynamics = true;
+        handle->m_model->m_flags10CBits.m_flag10C_80 = true;
     }
 }
 
@@ -702,18 +711,7 @@ void CGObject::DrawDebug(CFont* font)
  */
 void CGObject::SetDispItemName(int showName)
 {
-    struct ShieldNodeFlagBits {
-        signed char unk0 : 1;
-        signed char unk1 : 1;
-        signed char unk2 : 1;
-        signed char dispItemName : 1;
-        signed char unk4 : 1;
-        signed char unk5 : 1;
-        signed char unk6 : 1;
-        signed char unk7 : 1;
-    };
-
-    reinterpret_cast<ShieldNodeFlagBits*>(&m_shieldNodeFlags)->dispItemName = showName;
+    m_shieldNodeFlagBits.m_bit10 = showName;
     m_dispItemTimer = 13;
 }
 
@@ -762,122 +760,16 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
  */
 void CGObject::CancelAnim(int keepFacing)
 {
-	struct ShieldNodeFlagBits {
-	    unsigned char unk0 : 1;
-	    unsigned char unk1 : 1;
-	    unsigned char unk2 : 1;
-	    unsigned char unk3 : 1;
-	    unsigned char unk4 : 1;
-	    unsigned char unk5 : 1;
-	    unsigned char unk6 : 1;
-	    unsigned char unk7 : 1;
-	};
+    m_currentAnimSlot = -1;
+    m_shieldNodeFlagBits.m_bit40 = 0;
+    m_turnSpeed = sZeroFloat;
 
-	m_currentAnimSlot = -1;
-
-	reinterpret_cast<ShieldNodeFlagBits*>(&m_shieldNodeFlags)->unk1 = 0;
-
-	const float& zero = sZeroFloat;
-	m_turnSpeed = zero;
-
-	if (keepFacing != 0)
-	{
-		m_rotTargetY = m_rotBaseY;
-	}
-
-	*((u8*)&m_shieldNodeFlags) =
-	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 3, 28, 28));
-
-	*((u8*)&m_shieldNodeFlags) =
-	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 7, 24, 24));
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8007c808
- * PAL Size: 328b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGObject::IsAnimFinished(int mode)
-{
-    float frame;
-    float animSpan;
-    bool hasModel = false;
-    u32 result;
-    u32 shieldFlagClz;
-    signed char shieldFlag;
-    CCharaPcs::CHandle* handle;
-    double threshold;
-
-    char slot;
-
-    handle = m_charaModelHandle;
-    if ((handle != 0) && (handle->m_model != 0)) {
-        hasModel = true;
+    if (keepFacing != 0) {
+        m_rotTargetY = m_rotBaseY;
     }
 
-    if (!hasModel) {
-        goto returnOne;
-    }
-    {
-        slot = m_currentAnimSlot;
-        if (slot == -1) {
-        returnOne:
-            return 1;
-        }
-        {
-            shieldFlag = static_cast<signed char>(m_shieldNodeFlagBits.m_bit08);
-            shieldFlagClz = static_cast<u32>(__cntlzw(static_cast<u32>(shieldFlag)));
-            result = shieldFlagClz >> 5;
-
-            if (((shieldFlagClz >> 5) & 0xFF) != 0) {
-                hasModel = false;
-                if ((handle != 0) && (handle->m_model != 0)) {
-                    hasModel = true;
-                }
-
-                if (!hasModel || (slot == -1)) {
-                    result = 1;
-                } else {
-                    CChara::CModel& model = *handle->m_model;
-                    if (model.m_anim != 0) {
-                        animSpan = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
-                        if (sAnimFrameOffset == animSpan) {
-                            result = 1;
-                        } else {
-                            if (mode != 0) {
-                                frame = m_turnSpeed;
-                            } else {
-                                frame = model.m_time;
-                            }
-
-                            threshold = static_cast<double>(frame);
-                            if (mode == 2) {
-                                threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
-                            }
-
-                            const float lastAttr = m_lastBgAttr;
-                            if (static_cast<double>(lastAttr)
-                                < static_cast<double>(sZeroFloat)) {
-                                result = static_cast<double>(sZeroFloat) >= threshold;
-                            } else {
-                                result = static_cast<double>(animSpan - sAnimFrameOffset) < threshold;
-                            }
-                        }
-                    } else {
-                        result = 1;
-                    }
-                }
-
-                return static_cast<unsigned char>(result != 0);
-            }
-
-            return result & 0xFF;
-        }
-    }
+    m_shieldNodeFlagBits.m_bit08 = 0;
+    m_shieldNodeFlagBits.m_bit80 = 0;
 }
 
 /*
@@ -936,6 +828,33 @@ int CGObject::IsLoopAnim(int mode)
     return 1;
 }
 
+
+/*
+ * --INFO--
+ * PAL Address: 0x8007c808
+ * PAL Size: 328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGObject::IsAnimFinished(int mode)
+{
+    CCharaPcs::CHandle* handle = m_charaModelHandle;
+    bool hasModel = false;
+    if ((handle != 0) && (handle->m_model != 0)) {
+        hasModel = true;
+    }
+
+    if (!hasModel || m_currentAnimSlot == -1) {
+        return 1;
+    }
+
+    return !m_shieldNodeFlagBits.m_bit08 && IsLoopAnim(mode);
+}
+
+
+
 /*
  * --INFO--
  * PAL Address: 0x8007ca30
@@ -981,7 +900,7 @@ void CGObject::LoadShield(int itemId)
         m_shieldModelHandle->Add();
 
         const unsigned long textureVariant = (m_ownerType == 0)
-            ? *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2)
+            ? reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag
             : 0;
 
         m_shieldModelHandle->LoadModel(4, static_cast<unsigned long>(itemId), 0, textureVariant, -1, 0, 1);
@@ -1011,7 +930,7 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
         m_weaponModelHandle->Add();
 
         const unsigned long textureVariant = (m_ownerType == 0)
-            ? *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2)
+            ? reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag
             : 0;
 
         m_weaponModelHandle->LoadModel(
@@ -1090,8 +1009,12 @@ void CGObject::LookAt(CGObject* target, char* nodeName)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007CE04
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::SetTexAnim(char* name)
 {
@@ -1106,7 +1029,7 @@ void CGObject::SetTexAnim(char* name)
     }
 
     if (hasModel) {
-        texAnimSet = *reinterpret_cast<CTexAnimSet**>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xD4);
+        texAnimSet = handle->m_model->m_texAnimSet;
         if (texAnimSet != (CTexAnimSet*)0) {
             const float& zero = sZeroFloat;
             texAnimSet->Change(name, zero, (CTexAnimSet::ANIM_TYPE)-2);
@@ -1116,8 +1039,12 @@ void CGObject::SetTexAnim(char* name)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007CE64
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::SetClassWork(int ownerType, int workIndex)
 {
@@ -1127,16 +1054,16 @@ void CGObject::SetClassWork(int ownerType, int workIndex)
     switch (ownerType) {
     case 0: {
         m_scriptHandle = reinterpret_cast<void**>(&Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[workIndex]]);
-        m_scriptHandle[2] = reinterpret_cast<void*>(Game.m_gameWork.m_wmBackupParams[workIndex]);
-        m_scriptHandle[3] = this;
+        reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_saveSlot = Game.m_gameWork.m_wmBackupParams[workIndex];
+        reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_ownerObj = this;
         Game.m_scriptFoodBase[workIndex] = reinterpret_cast<u32>(m_scriptHandle);
         return;
     }
 
     case 1:
         m_scriptHandle = reinterpret_cast<void**>(&Game.m_monWorkArr[workIndex]);
-        m_scriptHandle[3] = this;
-        m_scriptHandle[2] = reinterpret_cast<void*>(workIndex);
+        reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_ownerObj = this;
+        reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_saveSlot = workIndex;
         Game.m_monObjects[workIndex] = this;
         Game.m_monWorkRefs[workIndex] = reinterpret_cast<CMonWork*>(m_scriptHandle);
         return;
@@ -1259,7 +1186,7 @@ void CGObject::boundCheck()
             }
         } while ((clipMask != 0) && (++i < 8));
 
-        m_weaponNodeFlagBits.m_unk20 = static_cast<signed char>(static_cast<u32>(__cntlzw(clipMask)) >> 5);
+        m_weaponNodeFlagBits.m_unk20 = clipMask == 0;
     }
 
     Math.MTX44MultVec4(screenMtx, &m_worldPosition, reinterpret_cast<Vec4d*>(&m_projection.y));
@@ -1318,8 +1245,12 @@ void CGObject::SetAttackCol(int hitIndex, char* nodeName, float radius, Vec* pos
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007D488
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::DispCharaParts(int showParts)
 {
@@ -1331,7 +1262,7 @@ void CGObject::DispCharaParts(int showParts)
     if (!hasModel) {
         return;
     }
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x98) = showParts;
+    handle->m_model->m_meshVisibleMask = showParts;
 }
 
 /*
@@ -1506,17 +1437,16 @@ void CGObject::moveVectorHRot(float rotX, float rotY, float moveTimer, int turnF
     const float cosY1 = static_cast<float>(cos(rotY));
     const float cosX = static_cast<float>(cos(rotX));
 
-    u8* const weaponFlagsHi = &m_weaponNodeFlagBytes.m_flags1;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
+    m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
+    m_weaponNodeFlagAll.m_bits1.m_bit10 = 1;
     m_turnFrames = static_cast<u32>(turnFrames);
     m_moveTarget.x = sinX * cosY0;
     m_moveTarget.y = sinY;
     m_moveTarget.z = cosX * cosY1;
     m_moveTimer = moveTimer;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 2, 29, 29));
+    m_weaponNodeFlagAll.m_bits1.m_bit08 = 0;
+    m_weaponNodeFlagAll.m_bits1.m_bit02 = 0;
+    m_weaponNodeFlagAll.m_bits1.m_bit04 = 0;
 }
 
 /*
@@ -1569,15 +1499,14 @@ void CGObject::moveVectorH(Vec* moveVec, float moveTimer, int turnFrames)
         PSVECScale(moveVec, &unitVec, sAnimFrameOffset / mag);
     }
 
-    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
+    m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
+    m_weaponNodeFlagAll.m_bits1.m_bit10 = 1;
     m_turnFrames = static_cast<u32>(turnFrames);
     m_moveTarget = unitVec;
     m_moveTimer = moveTimer;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 2, 29, 29));
+    m_weaponNodeFlagAll.m_bits1.m_bit08 = 0;
+    m_weaponNodeFlagAll.m_bits1.m_bit02 = 0;
+    m_weaponNodeFlagAll.m_bits1.m_bit04 = 0;
 }
 
 /*
@@ -1914,7 +1843,7 @@ void CGObject::copy()
 void CGObject::update()
 {
     const unsigned int dbgFlags = DbgMenuPcs.GetDbgFlagsRaw();
-    const int miniGameModelPass = (static_cast<unsigned int>(__cntlzw(dbgFlags & 0x8000)) >> 5) & 0xFF;
+    const int miniGameModelPass = (dbgFlags & 0x8000) == 0;
     unsigned char& weaponFlagsLo = m_weaponNodeFlagBytes.m_flags0;
     unsigned char& weaponFlagsHi = m_weaponNodeFlagBytes.m_flags1;
 
@@ -2419,9 +2348,8 @@ void CGObject::hit()
     }
     for (int i = 0; i < 8; i++) {
         const int node = m_attackColliders[i].m_nodeIndex;
-        u8* const modelNodes =
-            *reinterpret_cast<u8**>(reinterpret_cast<u8*>(m_charaModelHandle->m_model) + 0xA8);
-        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0x6C),
+        CChara::CNode* const modelNodes = m_charaModelHandle->m_model->m_nodes;
+        PSMTXMultVec(modelNodes[node].m_mtx,
                      &m_attackColliders[i].m_localPosition,
                      &m_attackColliders[i].m_worldPosition);
         PSVECAdd(&m_attackColliders[i].m_worldPosition, &m_worldPosition,
@@ -2430,9 +2358,8 @@ void CGObject::hit()
 
     for (int i = 0; i < 8; i++) {
         const int node = m_damageColliders[i].m_nodeIndex;
-        u8* const modelNodes =
-            *reinterpret_cast<u8**>(reinterpret_cast<u8*>(m_charaModelHandle->m_model) + 0xA8);
-        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0x6C),
+        CChara::CNode* const modelNodes = m_charaModelHandle->m_model->m_nodes;
+        PSMTXMultVec(modelNodes[node].m_mtx,
                      &m_damageColliders[i].m_localPosition,
                      &m_damageColliders[i].m_worldPosition);
         PSVECAdd(&m_damageColliders[i].m_worldPosition, &m_worldPosition,
@@ -2488,10 +2415,10 @@ void CGObject::hit()
                     stackIn[0].m_word = static_cast<u32>(attackIndex);
                     stackIn[1].m_word = static_cast<u32>(other->m_particleId);
                     stackIn[2].m_word = static_cast<u32>(damageIndex);
-                    *reinterpret_cast<float*>(&stackIn[3].m_word) = hitPos.x;
-                    *reinterpret_cast<float*>(&stackIn[4].m_word) = hitPos.y;
-                    *reinterpret_cast<float*>(&stackIn[5].m_word) = hitPos.z;
-                    stackIn[6].m_word = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x560);
+                    stackIn[3].m_float = hitPos.x;
+                    stackIn[4].m_float = hitPos.y;
+                    stackIn[5].m_float = hitPos.z;
+                    stackIn[6].m_word = static_cast<CGCharaObj*>(this)->m_itemId;
                     CFlatRuntime::CStack stackOut;
                     gCFlatRuntime().SystemCall(this, 2, 0x13, 7, stackIn, &stackOut);
                     const int hitResult = onHit(attackIndex, other, damageIndex, &hitPos);
@@ -3030,7 +2957,7 @@ void CGObject::move()
             || (m_weaponNodeFlagAll.m_bits1.m_bit10 && (scriptMoveEnd == 2))) {
             m_weaponNodeFlagAll.m_bits1.m_bit20 = 0;
             CFlatRuntime::CStack stack;
-            stack.m_word = static_cast<u32>(__cntlzw(static_cast<u32>(2 - scriptMoveEnd))) >> 5;
+            stack.m_word = scriptMoveEnd == 2;
             gCFlatRuntime().SystemCall(this, 2, 7, 1, &stack, 0);
         }
 
@@ -3105,7 +3032,7 @@ void CGObject::move()
         if (movingWithScript) {
             cameraYaw = 0.0f;
         } else {
-            cameraYaw = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xf8);
+            cameraYaw = CameraPcs.m_yaw;
         }
 
         const double inputYaw = atan2(static_cast<double>(moveVec.x), static_cast<double>(moveVec.z));

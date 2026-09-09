@@ -668,7 +668,7 @@ config.libs = [
             Object(Matching, "pppParMatrix.cpp"),
             Object(Matching, "pppParMoveLine.cpp"),
             Object(Matching, "pppParMoveMatrix.cpp", cflags=cflags_game_cpp_exceptions),
-            Object(NonMatching, "pppPart.cpp"),
+            Object(NonMatching, "pppPart.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(Matching, "pppPObjPoint.cpp"),
             Object(Matching, "pppPoint.cpp"),
             Object(Matching, "pppPointAp.cpp"),

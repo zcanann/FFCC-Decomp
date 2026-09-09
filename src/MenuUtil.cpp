@@ -261,21 +261,6 @@ static inline char** GetMenuHelpMsgTable()
 	return reinterpret_cast<char**>(Game.m_cFlatDataArr[1].TableStrings(6));
 }
 
-static inline CTexture* GetMenuTexture(CMenuPcs* menu, int offset)
-{
-	return *reinterpret_cast<CTexture**>(reinterpret_cast<unsigned char*>(menu) + offset);
-}
-
-static inline CTextureSet* GetMenuTextureSet(CMenuPcs* menu, int offset)
-{
-	return *reinterpret_cast<CTextureSet**>(reinterpret_cast<unsigned char*>(menu) + offset);
-}
-
-static inline CTexture* GetTextureSetTexture(CTextureSet* set, int index)
-{
-	return set->GetTexture(index);
-}
-
 static inline void SetUv(Vec2d& uv, float u, float v)
 {
 	uv.x = u;
@@ -403,7 +388,7 @@ void CMenuPcs::DrawOptionMenu()
 		helpText[n] = mes[idx++];
 	}
 
-	CTexture* banner = GetMenuTexture(this, 0xD4);
+	CTexture* banner = m_wmOptionTextures[5];
 	float bannerWidth = static_cast<float>(banner->m_width);
 	float bannerHeight = static_cast<float>(banner->m_height);
 	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
@@ -411,10 +396,10 @@ void CMenuPcs::DrawOptionMenu()
 	             static_cast<unsigned int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
 	gUtil.RenderTextureQuad(kOptionAnimMin,
 	                        -(bannerHeight * kMenuCenteringHalfWidth - kOptionBannerCenterY) - kOptionBannerYOffset,
-	                        kOptionScreenWidth, bannerHeight, GetMenuTexture(this, 0xD4), &uv0, &uv1, &color, GX_BL_SRCALPHA,
+	                        kOptionScreenWidth, bannerHeight, m_wmOptionTextures[5], &uv0, &uv1, &color, GX_BL_SRCALPHA,
 	                        GX_BL_INVSRCALPHA);
 
-	CTexture* panel = GetMenuTexture(this, 0xE8);
+	CTexture* panel = m_wmOptionTextures[10];
 	float panelWidth = static_cast<float>(panel->m_width);
 	float panelHeight = static_cast<float>(panel->m_height);
 	gUtil.RenderTextureQuad(kOptionPanelLeft, kOptionPanelTop, panelWidth, panelHeight, panel, 0, 0, &color,
@@ -424,23 +409,23 @@ void CMenuPcs::DrawOptionMenu()
 	uv0.y = kOptionAnimMax;
 	uv1.x = kOptionAnimMax;
 	uv1.y = kOptionAnimMin;
-	gUtil.RenderTextureQuad(kOptionPanelLeft, panelBottom, panelWidth, panelHeight, GetMenuTexture(this, 0xE8), &uv0, &uv1, &color,
+	gUtil.RenderTextureQuad(kOptionPanelLeft, panelBottom, panelWidth, panelHeight, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	float panelRight = kOptionPanelLeft + panelWidth;
 	uv0.x = kOptionAnimMax;
 	uv0.y = kOptionAnimMin;
 	uv1.x = kOptionAnimMin;
 	uv1.y = kOptionAnimMax;
-	gUtil.RenderTextureQuad(panelRight, kOptionPanelTop, panelWidth, panelHeight, GetMenuTexture(this, 0xE8), &uv0, &uv1, &color,
+	gUtil.RenderTextureQuad(panelRight, kOptionPanelTop, panelWidth, panelHeight, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	uv0.x = kOptionAnimMax;
 	uv0.y = kOptionAnimMax;
 	uv1.x = kOptionAnimMin;
 	uv1.y = kOptionAnimMin;
-	gUtil.RenderTextureQuad(panelRight, panelBottom, panelWidth, panelHeight, GetMenuTexture(this, 0xE8), &uv0, &uv1, &color,
+	gUtil.RenderTextureQuad(panelRight, panelBottom, panelWidth, panelHeight, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-	CTexture* cursor = GetMenuTexture(this, 0x18C);
+	CTexture* cursor = m_textures[0];
 	float cursorWidth = static_cast<float>(cursor->m_width);
 	float cursorHeight = static_cast<float>(cursor->m_height);
 	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(cursorWidth),
@@ -449,10 +434,10 @@ void CMenuPcs::DrawOptionMenu()
 	             static_cast<unsigned int>(cursorHeight));
 	gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(System.m_frameCounter) % 8 + 0x1C),
 	                        static_cast<float>(m_optionIndex * 0x28 + 0x70), kOptionCursorSize,
-	                        kOptionCursorSize, GetMenuTexture(this, 0x18C), &uv0, &uv1, &color, GX_BL_SRCALPHA,
+	                        kOptionCursorSize, m_textures[0], &uv0, &uv1, &color, GX_BL_SRCALPHA,
 	                        GX_BL_INVSRCALPHA);
 
-	CTexture* marker = GetMenuTexture(this, 0xC8);
+	CTexture* marker = m_wmOptionTextures[2];
 	rowWidth = static_cast<float>(marker->m_width);
 	gUtil.RenderTextureQuad(kOptionMarkerLeft, static_cast<float>(m_optionIndex * 0x28 + 0x70),
 	                        rowWidth, static_cast<float>(marker->m_height), marker, 0, 0,
@@ -465,7 +450,7 @@ void CMenuPcs::DrawOptionMenu()
 	int selectedY = 0x73;
 	int normalY = 0x75;
 	for (; i < 5; i++, rowY += 0x28, selectedY += 0x28, normalY += 0x28, option++) {
-		CTexture* row = GetMenuTexture(this, 0xC0);
+		CTexture* row = m_wmOptionTextures[0];
 		rowWidth = static_cast<float>(row->m_width);
 		float rowHeight = static_cast<float>(row->m_height);
 		uv0.x = (i == m_optionIndex) ? kOptionAnimMin : kMenuCenteringHalfWidth;
@@ -473,7 +458,7 @@ void CMenuPcs::DrawOptionMenu()
 		uv1.x = (i == m_optionIndex) ? kMenuCenteringHalfWidth : kOptionAnimMax;
 		uv1.y = kOptionAnimMax;
 		gUtil.RenderTextureQuad(kOptionRowLeft, static_cast<float>(rowY),
-		                        rowWidth * kMenuCenteringHalfWidth, rowHeight, GetMenuTexture(this, 0xC0), &uv0,
+		                        rowWidth * kMenuCenteringHalfWidth, rowHeight, m_wmOptionTextures[0], &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		if (i == m_optionIndex) {
@@ -487,7 +472,7 @@ void CMenuPcs::DrawOptionMenu()
 
 	font->SetScaleX(kOptionAnimMax);
 	gUtil.RenderTextureQuad(kOptionAnimMin, kOptionHelpBarTop, kOptionScreenWidth, kOptionLargeIconSize,
-	                        GetMenuTexture(this, 0x208), 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+	                        m_textures[31], 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 	{
 		float helpTextY = kOptionHelpTextY;
@@ -527,7 +512,7 @@ void CMenuPcs::DrawOptionMenu()
 		int rightXi = static_cast<int>(rowWidth * kMenuCenteringHalfWidth + row.rightIcon.x - kOptionIconWaveTargetX);
 		row.leftText.y = kOptionSelectorTextY;
 		row.rightText.y = kOptionSelectorTextY;
-		CTexture* sideTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 1);
+		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
 
@@ -545,7 +530,7 @@ void CMenuPcs::DrawOptionMenu()
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
-		CTexture* selectorTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 4);
+		CTexture* selectorTexture = m_wmOptionTextureSet->GetTexture(4);
 		unsigned int selectorHeight = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_height));
 		unsigned int selectorWidth = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_width));
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
@@ -616,7 +601,7 @@ void CMenuPcs::DrawOptionMenu()
 		int rightXi = static_cast<int>(rowWidth * kMenuCenteringHalfWidth + row.rightIcon.x - kOptionIconWaveTargetX);
 		row.leftText.y = kOptionSelectorTextY;
 		row.rightText.y = kOptionSelectorTextY;
-		CTexture* sideTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 1);
+		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
 
@@ -634,7 +619,7 @@ void CMenuPcs::DrawOptionMenu()
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
-		CTexture* selectorTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 4);
+		CTexture* selectorTexture = m_wmOptionTextureSet->GetTexture(4);
 		unsigned int selectorHeight = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_height));
 		unsigned int selectorWidth = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_width));
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
@@ -712,7 +697,7 @@ void CMenuPcs::DrawOptionMenu()
 		pos.minLabel.x = kOptionMeterBarBaseX;
 		pos.minLabel.y = kOptionMeterLabelY;
 		pos.maxLabel.y = kOptionMeterLabelY;
-		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
+		CTexture* meterTexture = m_wmOptionTextureSet->GetTexture(3);
 		int leftXi = static_cast<int>(kOptionIconWaveTargetX - pos.leftIcon.x);
 		int rightXi = static_cast<int>((kOptionSmallIconSize + pos.rightIcon.x) - kOptionIconWaveTargetX);
 		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
@@ -788,7 +773,7 @@ void CMenuPcs::DrawOptionMenu()
 		pos.minLabel.x = kOptionMeterBarBaseX;
 		pos.minLabel.y = kOptionMeterLabelY;
 		pos.maxLabel.y = kOptionMeterLabelY;
-		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
+		CTexture* meterTexture = m_wmOptionTextureSet->GetTexture(3);
 		int leftXi = static_cast<int>(kOptionIconWaveTargetX - pos.leftIcon.x);
 		int rightXi = static_cast<int>((kOptionSmallIconSize + pos.rightIcon.x) - kOptionIconWaveTargetX);
 		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
@@ -865,7 +850,7 @@ void CMenuPcs::DrawOptionMenu()
 		int uvY2 = 0x18;
 		int modeU = 0x280;
 		for (int i = 0; i < 4; i++, y += 0x28, uvY += 0x20, uvY2 += 0x20, modeU += 0x40, k = 0) {
-			CTexture* cursorPanel = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 4);
+			CTexture* cursorPanel = m_wmOptionTextureSet->GetTexture(4);
 			float cursorWidth = static_cast<float>(cursorPanel->m_width);
 			float cursorHeight = static_cast<float>(cursorPanel->m_height);
 			if ((m_specialModeEdit != 0) && (m_specialModeCursor == i)) {
@@ -898,7 +883,7 @@ void CMenuPcs::DrawOptionMenu()
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 
-			CTexture* modePanel = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 7);
+			CTexture* modePanel = m_wmOptionTextureSet->GetTexture(7);
 			float modeW = static_cast<float>(modePanel->m_width);
 			float modeH = static_cast<float>(modePanel->m_height);
 			unsigned int modeHeight = static_cast<unsigned int>(modeH);

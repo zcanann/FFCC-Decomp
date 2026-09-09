@@ -88,8 +88,6 @@ void pppCacheLoadShape(short*, _pppDataHead*);
 void _pppStartPart(_pppMngSt*, long*, int);
 void pppInitPdt(long*, pppProg*);
 void pppInitData(_pppDataHead*, pppProg*, int);
-void pppCalcPartStd(_pppMngSt*);
-void pppDrawPartStd(_pppMngSt*);
 void _pppDeadPart(_pppMngSt*);
 void _pppInitPart(_pppMngSt*);
 void _pppCalcPart(_pppMngSt*);

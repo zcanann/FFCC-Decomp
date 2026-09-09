@@ -25,7 +25,6 @@
 
 CSystem System;
 
-static const char s_cSystem[] = {'C', 'S', 'y', 's', 't', 'e', 'm', '\0'};
 extern const unsigned char s_systemDebugResources[0x194] = {
     0x64, 0x76, 0x64, 0x2F, 0x67, 0x62, 0x61, 0x2F, 0x00, 0x00, 0x00, 0x00,
     0x66, 0x66, 0x63, 0x63, 0x5F, 0x63, 0x6C, 0x69, 0x2E, 0x62, 0x69, 0x6E,
@@ -62,7 +61,6 @@ extern const unsigned char s_systemDebugResources[0x194] = {
     0x00, 0x00, 0x00, 0x00, 0x95, 0x82, 0x93, 0xAE, 0x8F, 0xAC, 0x90, 0x94,
     0x93, 0x5F, 0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00,
 };
-extern const char sSystemManagerClassName[] = {'C', 'M', 'a', 'n', 'a', 'g', 'e', 'r', '\0'};
 static const char s_system_cpp[12] = "system.cpp";
 static const char s_gamePalM_map[16] = "gamePalM.map";
 static const char s_compilerMapLoaded[] =
@@ -71,7 +69,6 @@ static const char s_compilerMapLoaded[] =
     "\251\202\347\223\307\202\335\215\236\202\335\202\334\202\265\202\275"
     "\201\102\012";
 extern const char s_systemTemplateDebug[28] = "systemTemplateDebug\n";
-extern const char s_systemStopwatchName[8];
 
 /*
  * --INFO--
@@ -431,7 +428,7 @@ void CSystem::ExecScenegraph()
 
         float totalTime = 0.0f;
         int perfEnabled = perfTrigger & 1;
-        CStopWatch watch(const_cast<char*>(s_systemStopwatchName));
+        CStopWatch watch;
 
         COrder* order = m_orderSentinel.m_next;
         int index = 0;
@@ -629,7 +626,7 @@ void CSystem::Init()
 
     if (OSGetConsoleSimulatedMemSize() == 0x3000000)
     {
-        m_mapStage = (CStage*)Memory.CreateStage(0x400000, const_cast<char*>(s_cSystem), 1);
+        m_mapStage = (CStage*)Memory.CreateStage(0x400000, "CSystem", 1);
         unsigned int count;
         CFile::CHandle* fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)

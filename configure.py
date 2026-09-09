@@ -760,7 +760,7 @@ config.libs = [
             Object(NonMatching, "singmenu.cpp", extra_cflags=["-inline noauto,deferred", "-pool off"]),
             Object(NonMatching, "sound.cpp", extra_cflags=["-RTTI on", "-inline auto,deferred", "-str reuse,nopool,readonly", "-sdata 8"]),
             Object(Matching, "stopwatch.cpp", extra_cflags=["-inline auto,deferred", "-str reuse,readonly"]),
-            Object(NonMatching, "system.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "system.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "texanim.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "textureman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
             Object(

@@ -1023,11 +1023,7 @@ void CMenuPcs::loadData()
 	}
 
 	GetOptionData();
-	bytes[0x80] = 0;
-	float zeroF = FLOAT_803313dc;
-	*reinterpret_cast<float*>(bytes + 0x7C) = FLOAT_803313dc;
-	*reinterpret_cast<float*>(bytes + 0x78) = zeroF;
-	*reinterpret_cast<short*>(bytes + 0x74) = 0;
+	WMSubMenuInit();
 	g_pGoOutMenu = &g_GoOutMenu;
 }
 
@@ -3817,7 +3813,7 @@ void CMenuPcs::DrawCMakeMenu()
 		         *pWideR, *pFortyR, *pZeroR, *pZeroR, *pOneR, *pOneR, *pZeroR);
 		if (m_wmWorldState->m_menuMode == 3) {
 			if (m_wmWorldState->m_menuMode == 3) {
-			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
+			const int textIndex = static_cast<int>(m_wmHelpTimer / 0x4B);
 			char* textList[3] = {0};
 			char** const langText = g_strWMMenuMes[Game.m_gameWork.m_languageId - 1];
 			for (int i = 0; i < 3; i++) {
@@ -6839,10 +6835,10 @@ void CMenuPcs::CalcCharaSelect()
 	int requestCancel;
 	int requestFinalize;
 
-	*reinterpret_cast<short*>(bytes + 0x74) = static_cast<short>(*reinterpret_cast<short*>(bytes + 0x74) + 1);
+	m_wmHelpTimer = static_cast<short>(m_wmHelpTimer + 1);
 	const unsigned int modeIsZero = Game.m_gameWork.m_menuStageMode == 0;
-	if (static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74)) >= static_cast<int>((modeIsZero + 2) * 0x4B)) {
-		*reinterpret_cast<short*>(bytes + 0x74) = 0;
+	if (static_cast<int>(m_wmHelpTimer) >= static_cast<int>((modeIsZero + 2) * 0x4B)) {
+		m_wmHelpTimer = 0;
 	}
 
 	requestCancel = 0;
@@ -7584,11 +7580,10 @@ void CMenuPcs::DrawCMLife()
  */
 inline void CMenuPcs::WMSubMenuInit()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	bytes[0x14] = 0;
-	bytes[0x15] = 0;
-	bytes[0x16] = 0;
-	bytes[0x17] = 0;
+	m_effectTimer = 0;
+	m_wmMenuRotation = 0.0f;
+	m_wmMenuTargetRotation = 0.0f;
+	m_wmHelpTimer = 0;
 }
 
 /*
@@ -7762,8 +7757,8 @@ void CMenuPcs::WMChgMenu()
 			ChkSelectParty();
 
 			const float scrollStep = FLOAT_8033151c;
-			*reinterpret_cast<float*>(bytes + 0x78) = -(scrollStep * (float)(int)m_wmWorldState->m_cardChannel);
-			*reinterpret_cast<float*>(bytes + 0x7C) = -(scrollStep * (float)(int)m_wmWorldState->m_cardChannel);
+			m_wmMenuTargetRotation = -(scrollStep * (float)(int)m_wmWorldState->m_cardChannel);
+			m_wmMenuRotation = -(scrollStep * (float)(int)m_wmWorldState->m_cardChannel);
 			m_effectTimer = 0;
 		break;
 	}
@@ -8160,11 +8155,11 @@ void CMenuPcs::CalcMainMenuSub()
 		if (state == 2 && m_wmWorldState->m_delay == 0) {
 			if ((btn & 1) != 0) {
 				float zero = FLOAT_803313dc;
-				*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_8033151c;
-				if (*reinterpret_cast<float*>(bytes + 0x78) < zero) {
+				m_wmMenuTargetRotation -= FLOAT_8033151c;
+				if (m_wmMenuTargetRotation < zero) {
 					float wrap = FLOAT_80331528;
-					*reinterpret_cast<float*>(bytes + 0x78) += wrap;
-					*reinterpret_cast<float*>(bytes + 0x7C) += wrap;
+					m_wmMenuTargetRotation += wrap;
+					m_wmMenuRotation += wrap;
 				}
 				m_wmWorldState->m_frameCounter = 0xE;
 				if (m_wmWorldState->m_cardChannel >= 4) {
@@ -8175,10 +8170,10 @@ void CMenuPcs::CalcMainMenuSub()
 				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			} else if ((btn & 2) != 0) {
 				float wrap2 = FLOAT_80331528;
-				*reinterpret_cast<float*>(bytes + 0x78) += FLOAT_8033151c;
-				if (*reinterpret_cast<float*>(bytes + 0x78) > wrap2) {
-					*reinterpret_cast<float*>(bytes + 0x78) -= wrap2;
-					*reinterpret_cast<float*>(bytes + 0x7C) -= wrap2;
+				m_wmMenuTargetRotation += FLOAT_8033151c;
+				if (m_wmMenuTargetRotation > wrap2) {
+					m_wmMenuTargetRotation -= wrap2;
+					m_wmMenuRotation -= wrap2;
 				}
 				m_wmWorldState->m_frameCounter = 0xE;
 				if (m_wmWorldState->m_cardChannel <= 0) {
@@ -8189,15 +8184,15 @@ void CMenuPcs::CalcMainMenuSub()
 				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			}
 
-			const float selA = *reinterpret_cast<float*>(bytes + 0x78);
-			const float selB = *reinterpret_cast<float*>(bytes + 0x7C);
+			const float selA = m_wmMenuTargetRotation;
+			const float selB = m_wmMenuRotation;
 			const float hi = (selB < selA) ? selA : selB;
 			const float lo = (selB < selA) ? selB : selA;
 			const float delta = FLOAT_803315cc * (hi - lo);
 			if (selB <= selA) {
-				*reinterpret_cast<float*>(bytes + 0x7C) += delta;
+				m_wmMenuRotation += delta;
 			} else {
-				*reinterpret_cast<float*>(bytes + 0x7C) -= delta;
+				m_wmMenuRotation -= delta;
 			}
 
 			if (m_wmWorldState->m_frameCounter > 0) {
@@ -8206,13 +8201,13 @@ void CMenuPcs::CalcMainMenuSub()
 
 			if (m_wmWorldState->m_frameCounter == 0 && (btn & 3) == 0) {
 				if ((btn & 0x100) != 0) {
-					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
+					m_wmMenuRotation = m_wmMenuTargetRotation;
 					m_wmWorldState->m_delay = 0x14;
 					m_wmWorldState->m_nextMenuMode = 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				} else if ((btn & 0x200) != 0) {
 					int valid = 0;
-					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
+					m_wmMenuRotation = m_wmMenuTargetRotation;
 					const unsigned char stageMode = Game.m_gameWork.m_menuStageMode;
 					int i = 0;
 					do {
@@ -8245,7 +8240,7 @@ void CMenuPcs::CalcMainMenuSub()
 		Vec modelPos;
 
 		PSMTXRotRad(baseMtx, 'x', FLOAT_803315d0);
-		PSMTXRotRad(rotMtx, 'y', FLOAT_803314bc * -*reinterpret_cast<float*>(bytes + 0x7C));
+		PSMTXRotRad(rotMtx, 'y', FLOAT_803314bc * -m_wmMenuRotation);
 		PSMTXConcat(baseMtx, rotMtx, baseMtx);
 
 		float selectedRotY = GetFcvValue(s_MenuObjYRot,

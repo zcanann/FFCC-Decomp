@@ -647,7 +647,7 @@ void CCharaPcs::create()
         sentinel->m_asyncFileHandle = 0;
         sentinel->m_fogBlend = 0.0f;
         sentinel->m_unk0x158 = 0;
-        sentinel->m_drawListFlags |= 0x80;
+        sentinel->m_drawListFlagsBits.m_drawListVisible = 1;
     }
 
     m_handleList = sentinel;
@@ -2113,7 +2113,7 @@ CCharaPcs::CHandle::CHandle()
 
 	m_fogBlend = 0.0f;
 	m_unk0x158 = 0;
-	m_drawListFlags |= 0x80;
+	m_drawListFlagsBits.m_drawListVisible = 1;
 }
 
 /*

@@ -521,7 +521,7 @@ config.libs = [
             Object(NonMatching, "fontman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "FS_USB_Process.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "FunnyShape.cpp"),
-            Object(NonMatching, "game.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline noauto,deferred"]),
+            Object(NonMatching, "game.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline noauto,deferred"]),
             Object(NonMatching, "gbaque.cpp"),
             Object(NonMatching, "gobject.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "gobjwork.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
@@ -778,7 +778,8 @@ config.libs = [
             Object(Matching, "vector.cpp"),
             Object(NonMatching, "wind.cpp"),
             Object(NonMatching, "wm_menu.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
-            Object(Matching, "wmm_str.cpp"),
+            # Retail addresses local message tables separately and stores literals read-only.
+            Object(NonMatching, "wmm_str.cpp", extra_cflags=["-str reuse,readonly", "-pooldata off"]),
             Object(Matching, "zlist.cpp"),
         ]
     },

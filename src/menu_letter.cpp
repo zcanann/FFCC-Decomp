@@ -14,7 +14,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" char* strcat(char*, const char*);
 
 typedef signed short s16;
 typedef unsigned char u8;

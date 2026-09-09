@@ -102,12 +102,10 @@ char* strncpy(char* dst, const char* src, size_t n)
 	return dst;
 }
 
-char* strcat(char* dst, const char* src, size_t n)
+char* strcat(char* dst, const char* src)
 {
 	const unsigned char* srcPtr = (const unsigned char*)src - 1;
 	unsigned char* dstPtr       = (unsigned char*)dst - 1;
-
-	(void)n;
 
 	while (*++dstPtr) {
 	}

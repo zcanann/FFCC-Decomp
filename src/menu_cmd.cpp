@@ -481,6 +481,62 @@ void CMenuPcs::CmdOpen()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 392b
+ * EN Address: 0x801735F8
+ * EN Size: 428b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline unsigned int CMenuPcs::CmdOpen2()
+{
+	unsigned int done;
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
+
+	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
+
+	s32 selected = static_cast<s32>(GetCmdStateView(this)->selected[0]);
+	s32 prev;
+	for (prev = selected - 1; prev > 2; prev--) {
+		if (caravanWork->m_commandListExtra[prev] >= 0) {
+			break;
+		}
+	}
+
+	s32 limit = static_cast<s32>(caravanWork->m_numCmdListSlots);
+	s32 next;
+	for (next = selected + 1; next < limit; next++) {
+		if (caravanWork->m_commandListExtra[next] >= 0) {
+			break;
+		}
+	}
+
+	CmdListEntry* fadeEntry;
+	s32 i;
+	for (i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++) {
+		if ((i < prev) || (i > next)) {
+			fadeEntry = &GetCmdListStorage(this)->entries[i];
+			fadeEntry->alpha = static_cast<float>(
+			    -((0.1 * static_cast<double>(static_cast<s32>(GetCmdStateView(this)->transitionTimer))) - 1.0));
+			if (static_cast<double>(fadeEntry->alpha) < 0.5) {
+				fadeEntry->alpha = 0.5f;
+			}
+		}
+	}
+
+	if (static_cast<double>(static_cast<s32>(GetCmdStateView(this)->transitionTimer)) >= 5.0) {
+		done = 1;
+	} else {
+		done = 0;
+	}
+	if (done != 0) {
+		GetCmdStateSelections(GetCmdStateView(this))[GetCmdStateView(this)->mode] = static_cast<s16>(prev);
+	}
+	return done;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8014f4e8
  * PAL Size: 1424b
  * EN Address: TODO
@@ -1922,6 +1978,32 @@ inline void CMenuPcs::CmdDismantle(int selected)
 
 /*
  * --INFO--
+ * PAL Address: 0x8014a940
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+const char* CMenuPcs::GetSkillStr(int index)
+{
+	switch (Game.m_gameWork.m_languageId) {
+	case 2:
+		return s_SkillStr_ge[index];
+	case 3:
+		return s_SkillStr_it[index];
+	case 4:
+		return s_SkillStr_fr[index];
+	case 5:
+		return s_SkillStr_sp[index];
+	case 1:
+	default:
+		return s_SkillStr_us[index];
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8014ba20
  * PAL Size: 3228b
  * EN Address: TODO
@@ -2536,62 +2618,6 @@ unsigned int CMenuPcs::CmdClose1()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 392b
- * EN Address: 0x801735F8
- * EN Size: 428b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline unsigned int CMenuPcs::CmdOpen2()
-{
-	unsigned int done;
-	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
-
-	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
-
-	s32 selected = static_cast<s32>(GetCmdStateView(this)->selected[0]);
-	s32 prev;
-	for (prev = selected - 1; prev > 2; prev--) {
-		if (caravanWork->m_commandListExtra[prev] >= 0) {
-			break;
-		}
-	}
-
-	s32 limit = static_cast<s32>(caravanWork->m_numCmdListSlots);
-	s32 next;
-	for (next = selected + 1; next < limit; next++) {
-		if (caravanWork->m_commandListExtra[next] >= 0) {
-			break;
-		}
-	}
-
-	CmdListEntry* fadeEntry;
-	s32 i;
-	for (i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++) {
-		if ((i < prev) || (i > next)) {
-			fadeEntry = &GetCmdListStorage(this)->entries[i];
-			fadeEntry->alpha = static_cast<float>(
-			    -((0.1 * static_cast<double>(static_cast<s32>(GetCmdStateView(this)->transitionTimer))) - 1.0));
-			if (static_cast<double>(fadeEntry->alpha) < 0.5) {
-				fadeEntry->alpha = 0.5f;
-			}
-		}
-	}
-
-	if (static_cast<double>(static_cast<s32>(GetCmdStateView(this)->transitionTimer)) >= 5.0) {
-		done = 1;
-	} else {
-		done = 0;
-	}
-	if (done != 0) {
-		GetCmdStateSelections(GetCmdStateView(this))[GetCmdStateView(this)->mode] = static_cast<s16>(prev);
-	}
-	return done;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8014a9dc
  * PAL Size: 948b
  * EN Address: TODO
@@ -2689,32 +2715,6 @@ unsigned int CMenuPcs::CmdClose2()
 			}
 		}
 		return (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= 5.0) ? 1 : 0;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8014a940
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-const char* CMenuPcs::GetSkillStr(int index)
-{
-	switch (Game.m_gameWork.m_languageId) {
-	case 2:
-		return s_SkillStr_ge[index];
-	case 3:
-		return s_SkillStr_it[index];
-	case 4:
-		return s_SkillStr_fr[index];
-	case 5:
-		return s_SkillStr_sp[index];
-	case 1:
-	default:
-		return s_SkillStr_us[index];
 	}
 }
 

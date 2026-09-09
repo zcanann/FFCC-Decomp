@@ -983,6 +983,64 @@ bool CMemoryCardMan::IsBrokenFile()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: 0x800DC094
+ * EN Size: 92b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMemoryCardMan::Crc32(int count, unsigned char* data, unsigned int* crc)
+{
+    while (--count >= 0) {
+        *crc = (*crc << 8) ^ s_CrcTable[(*crc >> 24) ^ *data++];
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800C2D28
+ * PAL Size: 148b
+ * EN Address: 0x800DB7E0
+ * EN Size: 144b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
+{
+    unsigned char* data = saveData == 0 ? reinterpret_cast<unsigned char*>(m_saveBuffer)
+                                       : reinterpret_cast<unsigned char*>(saveData);
+    unsigned int crc = 0xFFFFFFFF;
+    Crc32(0x1C, data, &crc);
+    Crc32(0x8BB0, data + 0x20, &crc);
+    return ~crc;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800C1FF0
+ * PAL Size: 204b
+ * EN Address: 0x800DC0F0
+ * EN Size: 148b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMemoryCardMan::EncodeData()
+{
+    Mc::SaveDat* const save = GetSaveDat(m_saveBuffer);
+    const int rotAmount = save->m_rotateKey % 0x20;
+    u32* ptr = GetSaveEncodedWords(save);
+
+    const int wordCount = (kMemoryCardSaveBufferSize - offsetof(Mc::SaveDat, m_random)) / sizeof(u32);
+    for (int count = 0; count < wordCount; count++)
+    {
+        u32 rotated = __rlwnm(*ptr, rotAmount, 0, 31);
+        *ptr++ = LoadSwapped(&rotated);
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800C369C
  * PAL Size: 2576b
  * EN Address: 0x800DA5B8
@@ -1377,25 +1435,6 @@ void CMemoryCardMan::SetLoadData()
     Game.LoadScript(saveDat->m_scriptData);
     GetCharaGlobal()->LoadFurTexBuffer(saveDat->m_furTexels);
 
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800C2D28
- * PAL Size: 148b
- * EN Address: 0x800DB7E0
- * EN Size: 144b
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
-{
-    unsigned char* data = saveData == 0 ? reinterpret_cast<unsigned char*>(m_saveBuffer)
-                                       : reinterpret_cast<unsigned char*>(saveData);
-    unsigned int crc = 0xFFFFFFFF;
-    Crc32(0x1C, data, &crc);
-    Crc32(0x8BB0, data + 0x20, &crc);
-    return ~crc;
 }
 
 /*
@@ -1961,45 +2000,6 @@ int CMemoryCardMan::McChkConnect(int chan)
     }
 
     return result;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 72b
- * EN Address: 0x800DC094
- * EN Size: 92b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMemoryCardMan::Crc32(int count, unsigned char* data, unsigned int* crc)
-{
-    while (--count >= 0) {
-        *crc = (*crc << 8) ^ s_CrcTable[(*crc >> 24) ^ *data++];
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800C1FF0
- * PAL Size: 204b
- * EN Address: 0x800DC0F0
- * EN Size: 148b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMemoryCardMan::EncodeData()
-{
-    Mc::SaveDat* const save = GetSaveDat(m_saveBuffer);
-    const int rotAmount = save->m_rotateKey % 0x20;
-    u32* ptr = GetSaveEncodedWords(save);
-
-    const int wordCount = (kMemoryCardSaveBufferSize - offsetof(Mc::SaveDat, m_random)) / sizeof(u32);
-    for (int count = 0; count < wordCount; count++)
-    {
-        u32 rotated = __rlwnm(*ptr, rotAmount, 0, 31);
-        *ptr++ = LoadSwapped(&rotated);
-    }
 }
 
 /*

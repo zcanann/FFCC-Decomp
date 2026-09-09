@@ -67,6 +67,8 @@ STATIC_ASSERT(offsetof(CPartMng, m_mngStCount) == 0x23550);
 STATIC_ASSERT(offsetof(CPartMng, m_soundNearDistance) == 0x23568);
 STATIC_ASSERT(offsetof(CPartMng, m_soundFarDistance) == 0x23588);
 STATIC_ASSERT(offsetof(CPartMng, m_editParticleCount) == 0x4);
+STATIC_ASSERT(offsetof(CPartMng, m_editCursorEnabled) == 0xC);
+STATIC_ASSERT(offsetof(CPartMng, m_editDrawMode) == 0x174);
 STATIC_ASSERT(offsetof(CPartMng, m_editReceiveCursor) == 0x1CC);
 STATIC_ASSERT(offsetof(CPartMng, m_editShapeGroups) == 0x7FC);
 STATIC_ASSERT(offsetof(CPartMng, m_cursorRequest) == 0x10);
@@ -1555,7 +1557,6 @@ static inline void CheckSum(char* packet, unsigned long code, unsigned long pack
 void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packetSize)
 {
     static const int kLastEnvCmdOffset = 0x23560;
-    static const int kEditFrameOffset = 0xC;
     static const int kEditDrawModeOffset = 0x23570;
     static const int kCursorRequestOffset = 0x10;
     static const int kCursorXOffset = 0x178;
@@ -1688,7 +1689,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + 0x168) = *reinterpret_cast<int*>(payload + 0x128);
         *reinterpret_cast<int*>(self + 0x16C) = *reinterpret_cast<int*>(payload + 0x12C);
         *reinterpret_cast<int*>(self + 0x170) = *reinterpret_cast<int*>(payload + 0x130);
-        *reinterpret_cast<int*>(self + 0x174) = *reinterpret_cast<int*>(payload + 0x134);
+        m_editDrawMode = *reinterpret_cast<int*>(payload + 0x134);
 
         m_pppMng[0].m_ownerScale = kPartMngOne;
         m_pppMng[0].m_scaleFactor = kPartMngOne;
@@ -1730,7 +1731,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + 0x168) = *reinterpret_cast<int*>(payload + 0x128);
         *reinterpret_cast<int*>(self + 0x16C) = *reinterpret_cast<int*>(payload + 0x12C);
         *reinterpret_cast<int*>(self + 0x170) = *reinterpret_cast<int*>(payload + 0x130);
-        *reinterpret_cast<int*>(self + 0x174) = *reinterpret_cast<int*>(payload + 0x134);
+        m_editDrawMode = *reinterpret_cast<int*>(payload + 0x134);
 
         ppvChrScl[2] = kPartMngOne;
         ppvChrScl[1] = kPartMngOne;
@@ -1960,14 +1961,14 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + kCursorRequestOffset) = 1;
         return;
     case 0x41:
-        *reinterpret_cast<int*>(self + kEditFrameOffset) = 0;
+        m_editCursorEnabled = 0;
         return;
     case 0x40:
-        *reinterpret_cast<int*>(self + kEditFrameOffset) = 1;
+        m_editCursorEnabled = 1;
         return;
     case 0x42:
         memcpy(self + kCursorPacket42Offset, payload, 0x28);
-        *reinterpret_cast<int*>(self + kEditFrameOffset) = 1;
+        m_editCursorEnabled = 1;
         return;
     case 0x20:
         MapMng.ShowMapObjID(payloadWords[1], payloadWords[0]);
@@ -2233,17 +2234,17 @@ void CPartMng::pppEditPartCalc()
         _pppMngSt* firstMng = m_pppMng;
         firstMng->m_particleEnded = 0;
         firstMng->m_deltaTime = *reinterpret_cast<int*>(self + 0x168);
-        _pppStartPart(firstMng, *reinterpret_cast<long**>(self + 0x5dc), 1);
+        _pppStartPart(firstMng, m_editProgramData[0], 1);
     }
 
     if (ppvSysStopPartF != 0) {
         return;
     }
-    if (*reinterpret_cast<long**>(self + 0x5dc) == 0) {
+    if (m_editProgramData[0] == 0) {
         return;
     }
 
-    if (*reinterpret_cast<int*>(self + 0x174) <= 3) {
+    if (m_editDrawMode <= 3) {
         for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
             _pppMngSt* mng = &m_pppMng[i];
             ppvMng = mng;
@@ -2265,7 +2266,7 @@ void CPartMng::pppEditPartCalc()
                 Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x827);
                 _pppAllFreePObject(mng);
                 Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x82b);
-                if (*reinterpret_cast<int*>(self + 0x174) > 3) {
+                if (m_editDrawMode > 3) {
                     pppHeapCheckLeak(ppvEnv->m_stagePtr);
                 }
                 if (i == 0) {
@@ -2312,7 +2313,7 @@ void CPartMng::pppEditPartCalc()
                 Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x861);
                 _pppAllFreePObject(mng);
                 Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x865);
-                if (*reinterpret_cast<int*>(self + 0x174) > 3) {
+                if (m_editDrawMode > 3) {
                     pppHeapCheckLeak(ppvEnv->m_stagePtr);
                 }
                 if (i == 0) {
@@ -2354,8 +2355,7 @@ void CPartMng::pppEditDrawShadow()
         return;
     }
 
-    char* self = reinterpret_cast<char*>(this);
-    if (*reinterpret_cast<long**>(self + 0x5dc) != 0 && *reinterpret_cast<int*>(self + 0x174) <= 3) {
+    if (m_editProgramData[0] != 0 && m_editDrawMode <= 3) {
         Mtx invCamera;
         Vec cameraPos;
         Vec cameraDelta;
@@ -2406,30 +2406,23 @@ void CPartMng::pppEditDrawShadow()
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 }
 
-/*
- * --INFO--
- * PAL Address: 0x8005ae80
- * PAL Size: 1844b
- * EN Address: 0x8005A820
- * EN Size: 1844b
- * JP Address: TODO
- * JP Size: TODO
- */
-static inline void pppEditDrawPass(unsigned char* base, int drawPass, Vec& cameraPos)
+static inline void pppEditDrawPass(CPartMng* manager, unsigned char drawMode)
 {
-    static const int kPppMngCount = 0x180;
-    static const int kPppMngOffset = 0x2A18;
-    static const int kPppMngStride = 0x158;
-    Vec viewPos;
-    Vec partPos;
+    Mtx invCamera;
+    Vec cameraPos;
     Vec cameraDelta;
+    Vec partPos;
+    Vec viewPos;
 
-    _pppMngSt* mng;
-    int i;
-    for (i = 0; i < kPppMngCount; i++, base += kPppMngStride) {
-        mng = reinterpret_cast<_pppMngSt*>(base + kPppMngOffset);
+    PSMTXInverse(ppvCameraMatrix, invCamera);
+    cameraPos.x = invCamera[0][3];
+    cameraPos.y = invCamera[1][3];
+    cameraPos.z = invCamera[2][3];
+
+    for (int i = 0; i < 0x180; i++) {
+        _pppMngSt* mng = &manager->m_pppMng[i];
         if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000
-            && (signed char)mng->m_drawPass == drawPass && mng->m_baseTime < 0
+            && (signed char)mng->m_drawPass == drawMode && mng->m_baseTime < 0
             && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
             ppvMng = mng;
             partPos.x = mng->m_matrix.value[0][3];
@@ -2443,13 +2436,10 @@ static inline void pppEditDrawPass(unsigned char* base, int drawPass, Vec& camer
         drawPart:
             PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
             mng->m_sortDepth = viewPos.z;
-            {
-                char* resSet = *reinterpret_cast<char**>(mng);
-                ppvMng = mng;
-                ppvEnv = reinterpret_cast<_pppEnvSt*>(resSet + 4);
-            }
-            pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
-            _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));
+            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
+            ppvMng = mng;
+            pppSetFpMatrix(mng);
+            _pppDrawPart(mng);
             continue;
 
         checkCull:
@@ -2465,27 +2455,17 @@ static inline void pppEditDrawPass(unsigned char* base, int drawPass, Vec& camer
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8005ae80
+ * PAL Size: 1844b
+ * EN Address: 0x8005A820
+ * EN Size: 1844b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void CPartMng::pppEditDraw()
 {
-    static const int kPppMngCount = 0x180;
-    static const int kPppMngStride = 0x158;
-    static const int kEditCountOffset = 0x4;
-    static const int kEditDrawModeOffset = 0x23570;
-    static const int kCursorEnableOffset = 0xC;
-    static const int kBaseTimeOffset = 0x14;
-    static const int kLifeEndOffset = 0x24;
-    static const int kCurrentFrameOffset = 0x34;
-    static const int kMatrixOffset = 0x78;
-    static const int kEndRequestedOffset = 0xe8;
-    static const int kDrawPassOffset = 0xed;
-    static const int kStopAtLifeEndOffset = 0xe4;
-    static const int kSlotVisibleOffset = 0xe9;
-    static const int kOwnerVisibleOffset = 0xea;
-    static const int kCullRadiusSqOffset = 0x108;
-    static const int kCullRadiusOffset = 0x10c;
-    static const int kCullYOffsetOffset = 0x110;
-    static const int kSortDepthOffset = 0x114;
-
     if (ppvSysStopPartF != 0) {
         return;
     }
@@ -2494,51 +2474,36 @@ void CPartMng::pppEditDraw()
 
     Vec partPos;
     Vec viewPos;
-    if (*reinterpret_cast<long**>(reinterpret_cast<unsigned char*>(this) + 0x5dc) != 0) {
-        if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x174) <= 3) {
-#define PPP_EDIT_DRAW_PASS(drawPass)                                                                       \
-            {                                                                                              \
-                Mtx invCamera;                                                                             \
-                Vec cameraPos;                                                                             \
-                PSMTXInverse(ppvCameraMatrix, invCamera);                                                  \
-                cameraPos.x = invCamera[0][3];                                                             \
-                cameraPos.y = invCamera[1][3];                                                             \
-                cameraPos.z = invCamera[2][3];                                                             \
-                pppEditDrawPass(reinterpret_cast<unsigned char*>(this), drawPass, cameraPos);                                            \
-            }
-
-            PPP_EDIT_DRAW_PASS(8)
-            PPP_EDIT_DRAW_PASS(4)
+    if (m_editProgramData[0] != 0) {
+        if (m_editDrawMode <= 3) {
+            pppEditDrawPass(this, 8);
+            pppEditDrawPass(this, 4);
             pppDraw();
-            PPP_EDIT_DRAW_PASS(6)
-            PPP_EDIT_DRAW_PASS(7)
-#undef PPP_EDIT_DRAW_PASS
+            pppEditDrawPass(this, 6);
+            pppEditDrawPass(this, 7);
         } else {
-            static const int kPppMngOffset = 0x2A18;
-            char* base = reinterpret_cast<char*>(this);
-            for (int i = 0; i < *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditCountOffset); i++) {
-                _pppMngSt* mng = reinterpret_cast<_pppMngSt*>(base + kPppMngOffset);
+            for (int i = 0; i < m_editParticleCount; i++) {
+                _pppMngSt* mng = &m_pppMng[i];
                 ppvMng = mng;
-                int baseTime = *reinterpret_cast<int*>(base + kPppMngOffset + kBaseTimeOffset);
+                int baseTime = mng->m_baseTime;
                 if (baseTime != -0x1000 && baseTime < 0) {
-                    partPos.x = *reinterpret_cast<float*>(reinterpret_cast<char*>(mng) + kMatrixOffset + 0xc);
-                    partPos.y = *reinterpret_cast<float*>(reinterpret_cast<char*>(mng) + kMatrixOffset + 0x1c);
-                    partPos.z = *reinterpret_cast<float*>(reinterpret_cast<char*>(mng) + kMatrixOffset + 0x2c);
+                    partPos.x = mng->m_matrix.value[0][3];
+                    partPos.y = mng->m_matrix.value[1][3];
+                    partPos.z = mng->m_matrix.value[2][3];
                     PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-                    *reinterpret_cast<float*>(reinterpret_cast<char*>(mng) + kSortDepthOffset) = viewPos.z;
+                    mng->m_sortDepth = viewPos.z;
                     ppvDrawMng.AddPrimOt(0x3ff, mng);
-                    if (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(mng) + kStopAtLifeEndOffset) != 0
-                        && *reinterpret_cast<int*>(reinterpret_cast<char*>(mng) + kCurrentFrameOffset) == *reinterpret_cast<int*>(reinterpret_cast<char*>(mng) + kLifeEndOffset)) {
+                    if (mng->m_mode != 0
+                        && mng->m_currentFrame == mng->m_lifeEnd) {
                         gPppHeapUseRateWords[1] = 0;
                     }
                 }
-                base += kPppMngStride;
             }
             ppvDrawMng.DrawOt();
         }
     }
 
-    if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kCursorEnableOffset) != 0) {
+    if (m_editCursorEnabled != 0) {
         drawCursor();
         render3Dcursor();
     }
@@ -2551,8 +2516,8 @@ void CPartMng::pppEditDraw()
  * --INFO--
  * PAL Address: 0x8005a958
  * PAL Size: 1320b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8005A2F8
+ * EN Size: 1320b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2560,23 +2525,11 @@ void CPartMng::pppEditPartDrawAfter()
 {
     if (ppvSysStopPartF == 0) {
         m_debugCounter = 0;
-        if (*reinterpret_cast<long**>(reinterpret_cast<unsigned char*>(this) + 0x5dc) != 0
-            && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x174) <= 3) {
-#define PPP_DRAW_AFTER_PASS(drawPass)                                                              \
-            {                                                                                              \
-                Mtx invCamera;                                                                             \
-                Vec cameraPos;                                                                             \
-                PSMTXInverse(ppvCameraMatrix, invCamera);                                                  \
-                cameraPos.x = invCamera[0][3];                                                             \
-                cameraPos.y = invCamera[1][3];                                                             \
-                cameraPos.z = invCamera[2][3];                                                             \
-                pppEditDrawPass(reinterpret_cast<unsigned char*>(this), drawPass, cameraPos);              \
-            }
-
-            PPP_DRAW_AFTER_PASS(5)
-            PPP_DRAW_AFTER_PASS(6)
-            PPP_DRAW_AFTER_PASS(7)
-#undef PPP_DRAW_AFTER_PASS
+        if (m_editProgramData[0] != 0
+            && m_editDrawMode <= 3) {
+            pppEditDrawPass(this, 5);
+            pppEditDrawPass(this, 6);
+            pppEditDrawPass(this, 7);
         }
     }
 

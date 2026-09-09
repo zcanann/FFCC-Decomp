@@ -1218,7 +1218,7 @@ LocalOnly:
 
 /*
  * --INFO--
- * PAL Address: 800558d4
+ * PAL Address: 0x800558D4
  * PAL Size: 684b
  * EN Address: TODO
  * EN Size: TODO
@@ -1227,12 +1227,9 @@ LocalOnly:
  */
 void pppSetFpMatrix(_pppMngSt* pppMngSt)
 {
-	Vec local_a8;
 	Vec local_9c;
-	Vec local_90;
 	Vec local_80;
 	Vec local_70;
-	Vec local_60;
 	Vec local_50;
 	Mtx local_44;
 
@@ -1261,10 +1258,7 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	local_70.x = ppvWorldMatrix[0][1];
 	local_70.y = ppvWorldMatrix[1][1];
 	local_70.z = ppvWorldMatrix[2][1];
-	local_90 = local_70;
-	if ((local_90.x != 0.0f) || (local_90.y != 0.0f) || (local_90.z != 0.0f)) {
-		PSVECNormalize(&local_90, &local_70);
-	}
+	pppNormalize(local_70, local_70);
 
 	local_9c.x = local_70.y;
 	local_9c.y = -local_70.x;
@@ -1272,21 +1266,13 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	ppvWorldMatrixWood[0][1] = local_70.x;
 	ppvWorldMatrixWood[1][1] = local_70.y;
 	ppvWorldMatrixWood[2][1] = local_70.z;
-	local_60 = local_9c;
-
-	if ((local_60.x != 0.0f) || (local_60.y != 0.0f) || (local_60.z != 0.0f)) {
-		PSVECNormalize(&local_60, &local_9c);
-	}
+	pppNormalize(local_9c, local_9c);
 
 	ppvWorldMatrixWood[0][0] = local_9c.x;
 	ppvWorldMatrixWood[1][0] = local_9c.y;
 	ppvWorldMatrixWood[2][0] = local_9c.z;
 	PSVECCrossProduct(&local_9c, &local_70, &local_80);
-	local_a8 = local_80;
-
-	if ((local_a8.x != 0.0f) || (local_a8.y != 0.0f) || (local_a8.z != 0.0f)) {
-		PSVECNormalize(&local_a8, &local_80);
-	}
+	pppNormalize(local_80, local_80);
 
 	ppvWorldMatrixWood[0][2] = local_80.x;
 	ppvWorldMatrixWood[1][2] = local_80.y;

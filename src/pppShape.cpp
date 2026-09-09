@@ -1,12 +1,11 @@
 #include "ffcc/pppShape.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
-
-extern const float kPppShapeUvScale;
 
 /*
  * --INFO--
@@ -50,13 +49,11 @@ void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv,
 {
     tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
     unsigned char* displayList = shape->m_entries[shapeIndex].m_displayList;
-    float* minUvF = (float*)&minUv;
-    float* maxUvF = (float*)&maxUv;
 
-    minUvF[0] = (float)*(short*)(displayList + 0x13) * kPppShapeUvScale;
-    minUvF[1] = (float)*(short*)(displayList + 0x15) * kPppShapeUvScale;
-    maxUvF[0] = (float)*(short*)(displayList + 0x3b) * kPppShapeUvScale;
-    maxUvF[1] = (float)*(short*)(displayList + 0x3d) * kPppShapeUvScale;
+    minUv.x = (float)*(short*)(displayList + 0x13) / 1024.0f;
+    minUv.y = (float)*(short*)(displayList + 0x15) / 1024.0f;
+    maxUv.x = (float)*(short*)(displayList + 0x3b) / 1024.0f;
+    maxUv.y = (float)*(short*)(displayList + 0x3d) / 1024.0f;
 }
 
 /*

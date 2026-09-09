@@ -771,7 +771,7 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		idx = 0;
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
 			spr->kind = 0x16;
 			spr->y = 0;
 			spr->x = 0;
@@ -786,7 +786,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[i + 1];
+			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[i + idx];
 			spr->kind = 0x17;
 			spr->x = 0x80;
 			spr->y = (short)(i * 0x60 + 0x38);
@@ -797,13 +797,13 @@ void CMenuPcs::CalcResultOpenAnim()
 			spr->duration = 8;
 			spr->depth = 1.0f;
 		}
-		int base = activePartyCount + 1;
+		idx += activePartyCount;
 		{
 			int i = 0;
-			int backOffset = base;
+			int backOffset = idx;
 			int y = 0x28;
 			for (; i < activePartyCount; i++) {
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				int partySlot = s_Rinfo->m_party[i].m_partySlot;
 				spr->kind = 0x18;
 				spr->x = ((1 <= i) && (i <= 2)) ? 0x30 : 0x48;
@@ -826,11 +826,11 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// model sprites: startFrame chained from icons
-		base += activePartyCount;
+		idx += activePartyCount;
 		{
 			for (int i = 0; i < activePartyCount; i++) {
-				int delta = base - (activePartyCount + 1);
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				int delta = idx - (activePartyCount + 1);
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -2;
 				CMenuPcs::Sprt2* src = spr - delta;
 				spr->x = 0;
@@ -846,11 +846,11 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// zeroed model sprites; startFrame fixed up later
-		base += activePartyCount;
-		int zeroBase = base;
+		idx += activePartyCount;
+		int zeroBase = idx;
 		if (0 < activePartyCount) {
 			for (int i = 0; i < activePartyCount; i++) {
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -2;
 				spr->x = 0;
 				spr->y = 0;
@@ -864,13 +864,13 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// staggered model sprites
-		base += activePartyCount;
+		idx += activePartyCount;
 		{
 			int i = 0;
 			int bump = i;
 			for (; i < activePartyCount; i++) {
-				int delta = base;
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				int delta = idx;
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -2;
 				CMenuPcs::Sprt2* src = spr - delta;
 				spr->x = 0;
@@ -890,11 +890,11 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// icon echo sprites (copies shifted down)
-		base += activePartyCount;
+		idx += activePartyCount;
 		{
 			for (int i = 0; i < activePartyCount; i++) {
-				int delta = base - (activePartyCount + 1);
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				int delta = idx - (activePartyCount + 1);
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				CMenuPcs::Sprt2* src = spr - delta;
 				*spr = *src;
 				spr->y = (short)(spr->y + 0x20);
@@ -905,7 +905,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		base += activePartyCount;
+		idx += activePartyCount;
 
 		// frame rows start after their icons
 		if (0 < activePartyCount) {
@@ -924,7 +924,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		{
-			CMenuPcs::Sprt2* count = &m_bonusAnim->sprites[base];
+			CMenuPcs::Sprt2* count = &m_bonusAnim->sprites[idx];
 			count->kind = 0x19;
 			count->y = 0x10;
 			count->w = 0x140;
@@ -937,12 +937,12 @@ void CMenuPcs::CalcResultOpenAnim()
 			count->duration = 10;
 			count->depth = 1.0f;
 		}
-		int countTop = base + 1;
+		int countTop = idx + 1;
 		s_CntTop = countTop;
 
 		{
 			for (int i = 0; i < activePartyCount; i++) {
-				int delta = base;
+				int delta = idx;
 				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[countTop + i];
 				spr->kind = 0x19;
 				CMenuPcs::Sprt2* src = spr - delta;
@@ -959,11 +959,11 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// name sprites
-		base = countTop + activePartyCount;
+		idx = countTop + activePartyCount;
 		{
 			for (int i = 0; i < activePartyCount; i++) {
-				int delta = base - (activePartyCount + 1);
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				int delta = idx - (activePartyCount + 1);
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -1;
 				CMenuPcs::Sprt2* src = spr - delta;
 				spr->x = (short)(src->x + 0x50);
@@ -979,11 +979,11 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		// value text sprites
-		base += activePartyCount;
+		idx += activePartyCount;
 		{
 			for (int i = 0; i < activePartyCount; i++) {
-				int delta = base - 1;
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[base + i];
+				int delta = idx - 1;
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = -1;
 				spr->x = 0xb8;
 				CMenuPcs::Sprt2* src = spr - delta;
@@ -998,7 +998,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		base += activePartyCount;
+		idx += activePartyCount;
 
 		{
 			int i = 0;
@@ -1052,7 +1052,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		m_bonusAnim->header.count = (short)base;
+		m_bonusAnim->header.count = (short)idx;
 		m_bonusAnim->header.finished = 0;
 		this->m_bonusState->m_initialized = 1;
 		return;

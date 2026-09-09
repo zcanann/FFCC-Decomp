@@ -1490,7 +1490,7 @@ void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
 
     work = GetMana2Work(pppMana2, param_2);
     gObject = (CGObject*)ppvMng->m_lookTarget;
-    gObject->m_stepSlopeLimit = LoadFloat(kMana2StepSlopeLimit);
+    gObject->m_alphaTarget = LoadFloat(kMana2StepSlopeLimit);
 
     handle = GetCharaHandlePtr(gObject, 0);
     GetCharaModelPtr(handle);

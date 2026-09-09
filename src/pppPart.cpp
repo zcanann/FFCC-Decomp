@@ -1017,7 +1017,7 @@ MatrixMode3:
 		if (hasModelScale != 0) {
 			ownerScale = ownerHandle->m_model->m_lightAlpha;
 		} else {
-			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
+			ownerScale = pppMngSt->m_owner->m_currentAlpha;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
 		if (kPppPartZeroDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
@@ -1073,7 +1073,7 @@ MatrixMode5:
 		if (hasModelScale != 0) {
 			ownerScale = ownerHandle->m_model->m_lightAlpha;
 		} else {
-			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
+			ownerScale = pppMngSt->m_owner->m_currentAlpha;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
 		if (kPppPartZeroDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
@@ -1119,7 +1119,7 @@ MatrixMode6:
 		if (hasModelScale != 0) {
 			ownerScale = ownerHandle->m_model->m_lightAlpha;
 		} else {
-			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
+			ownerScale = pppMngSt->m_owner->m_currentAlpha;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
 		if (kPppPartZeroDouble == static_cast<double>(pppMngSt->m_ownerScale)) {
@@ -1168,7 +1168,7 @@ MatrixMode7:
 		if (hasModelScale != 0) {
 			ownerScale = ownerHandle->m_model->m_lightAlpha;
 		} else {
-			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
+			ownerScale = pppMngSt->m_owner->m_currentAlpha;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
 		if (kPppPartZeroDouble == static_cast<double>(pppMngSt->m_ownerScale)) {

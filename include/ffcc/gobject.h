@@ -253,9 +253,9 @@ public:
     float m_turnBaseSpeed;            // 0x4A4
     float m_frontHitAngle;            // 0x4A8
     CGObject* m_lookAtTarget;         // 0x4AC
-    float m_lookAtTimer;              // 0x4B0
-    float m_stepSlopeLimit;           // 0x4B4
-    float m_bgDownDist;               // 0x4B8
+    float m_currentAlpha;            // 0x4B0
+    float m_alphaTarget;             // 0x4B4
+    float m_alphaStep;               // 0x4B8
     float m_bgCharmFactor;            // 0x4BC
     float m_bgAttrValue;              // 0x4C0
     float m_animBlend;                // 0x4C4

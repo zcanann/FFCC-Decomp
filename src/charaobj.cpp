@@ -3194,7 +3194,7 @@ float CGCharaObj::onAlphaUpdate()
 		}
 	}
 
-	float slope = m_stepSlopeLimit;
+	float slope = m_alphaTarget;
 	float clamped;
 	if (alpha < kCharaObjZero) {
 		clamped = kCharaObjZero;

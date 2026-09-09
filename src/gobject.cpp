@@ -2195,17 +2195,17 @@ void CGObject::update()
             visibleScale = m_screenDepth > sNearVisibleDepth ? sZeroFloat : sAnimFrameOffset;
         }
 
-        const float alphaTarget = m_stepSlopeLimit * onAlphaUpdate();
-        const float alphaStep = ClampFloat(alphaTarget * visibleScale - m_lookAtTimer, -m_bgDownDist, m_bgDownDist);
-        m_lookAtTimer += alphaStep;
-        m_lookAtTimer = ClampFloat(m_lookAtTimer, sZeroFloat, sAnimFrameOffset);
+        const float alphaTarget = m_alphaTarget * onAlphaUpdate();
+        const float alphaStep = ClampFloat(alphaTarget * visibleScale - m_currentAlpha, -m_alphaStep, m_alphaStep);
+        m_currentAlpha += alphaStep;
+        m_currentAlpha = ClampFloat(m_currentAlpha, sZeroFloat, sAnimFrameOffset);
         const float worldParamStep = m_worldParam - sWobbleBiasSmall;
         m_worldParam = worldParamStep < sZeroFloat ? sZeroFloat : worldParamStep;
         if ((m_displayFlags & 0x1000) != 0) {
-            m_lookAtTimer = alphaTarget;
+            m_currentAlpha = alphaTarget;
         }
 
-        if (sZeroFloat == m_lookAtTimer) {
+        if (sZeroFloat == m_currentAlpha) {
             m_weaponNodeFlagBits.m_unk20 = 0;
         }
         m_weaponNodeFlagBits.m_unk40 |= m_weaponNodeFlagBits.m_unk20;
@@ -2221,7 +2221,7 @@ void CGObject::update()
                 m_charaModelHandle->m_model->CalcSkin();
             }
 
-            m_charaModelHandle->m_model->m_lightAlpha = m_lookAtTimer;
+            m_charaModelHandle->m_model->m_lightAlpha = m_currentAlpha;
             m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
                 m_weaponNodeFlagBits.m_unk20;
             m_charaModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
@@ -2353,7 +2353,7 @@ void CGObject::update()
                 m_weaponModelHandle->m_model->CalcSkin();
             }
 
-            m_weaponModelHandle->m_model->m_lightAlpha = m_lookAtTimer;
+            m_weaponModelHandle->m_model->m_lightAlpha = m_currentAlpha;
             m_weaponModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
                 m_weaponNodeFlagBits.m_unk20;
             m_weaponModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
@@ -2365,7 +2365,7 @@ void CGObject::update()
             m_shieldModelHandle->m_model->SetMatrix(ecScratch);
             m_shieldModelHandle->m_model->CalcMatrix();
 
-            m_shieldModelHandle->m_model->m_lightAlpha = m_lookAtTimer;
+            m_shieldModelHandle->m_model->m_lightAlpha = m_currentAlpha;
             m_shieldModelHandle->m_model->m_flagsA0Bits.m_flagA0_20 =
                 m_weaponNodeFlagBits.m_unk20;
             m_shieldModelHandle->m_model->m_flagsA0Bits.m_flagA0_80 = (m_displayFlags & 0x20) != 0;
@@ -3348,8 +3348,8 @@ void CGObject::onCreate()
     m_shieldNodeFlagBits.m_bit40 = 0;
     m_frontHitAngle = FLOAT_8033043C;
     m_lookAtTarget = 0;
-    m_stepSlopeLimit = sAnimFrameOffset;
-    m_lookAtTimer = sAnimFrameOffset;
+    m_alphaTarget = sAnimFrameOffset;
+    m_currentAlpha = sAnimFrameOffset;
     m_shieldNodeFlagBits.m_bit20 = 0;
     m_animBlend = sAnimFrameOffset;
     m_bgAttrValue = sAnimFrameOffset;
@@ -3386,7 +3386,7 @@ void CGObject::onCreate()
     m_swayDirection.z = m_swayTarget.z;
 
     m_turnFactor = sBgAttrFast;
-    m_bgDownDist = sDefaultBgDownDist;
+    m_alphaStep = sDefaultBgDownDist;
     m_moveMode = 0;
     m_moveModePrevious = 4;
     m_hitFaceNormal.z = sZeroFloat;

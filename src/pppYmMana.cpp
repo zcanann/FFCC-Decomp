@@ -1063,9 +1063,9 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
 
     SetManaModelCallbacks(model, mana, param_2);
 
-    u8 manaAlpha = (u8)((float)*(setupArea + 0xB) * gObject->m_lookAtTimer);
+    u8 manaAlpha = (u8)((float)*(setupArea + 0xB) * gObject->m_currentAlpha);
     if (Game.m_currentMapId == 0x21) {
-        manaAlpha = (u8)(gObject->m_lookAtTimer * (float)*(setupArea + 0xB));
+        manaAlpha = (u8)(gObject->m_currentAlpha * (float)*(setupArea + 0xB));
     }
     MaterialMan.SetManaAlpha(manaAlpha);
     mana->m_manaAlpha = manaAlpha;
@@ -1459,11 +1459,11 @@ void pppConstructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
     CChara::CModel* model;
 
     if ((s32)Game.m_currentSceneId == 7) {
-        gObject->m_lookAtTimer = kYmManaOne;
+        gObject->m_currentAlpha = kYmManaOne;
     }
 
     if (Game.m_currentMapId != 0x21) {
-        gObject->m_stepSlopeLimit = LoadFloat(kYmManaSlopeLimit);
+        gObject->m_alphaTarget = LoadFloat(kYmManaSlopeLimit);
     }
 
     handle = GetCharaHandlePtr(gObject, 0);
@@ -1651,7 +1651,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     }
 
     if (Game.m_currentMapId == 0x21) {
-        float alphaScale = kYmManaLookAtAlphaScale[0] * object->m_lookAtTimer;
+        float alphaScale = kYmManaLookAtAlphaScale[0] * object->m_currentAlpha;
         int alpha = (int)alphaScale;
         mana->m_baseColor.r = 0xFF;
         mana->m_baseColor.g = 0xFF;

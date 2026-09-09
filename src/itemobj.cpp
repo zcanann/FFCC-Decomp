@@ -214,10 +214,10 @@ void CGItemObj::DrawOmoideName(CFont* font)
 		}
 
 		if (hasModel && m_worldParamA == 0xCB && 0.0f < m_screenDepth &&
-		    0.0f != m_lookAtTimer) {
+		    0.0f != m_currentAlpha) {
 			font->SetTlut(7);
 
-			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * m_lookAtTimer).color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * m_currentAlpha).color);
 
 			const char* name = Game.m_cFlatDataArr[1].TableStrings(2)[m_memoryCapsuleNameIndex];
 			float width = font->GetWidth(name);
@@ -855,8 +855,8 @@ void CGItemObj::onFrameStat()
 
 			if (m_lifeTimer <= 0 || distance > kItemObjExpireDistance) {
 				System.Printf(itemObjStrings + kItemObjStrExpireByTimeOrDistanceMsg);
-				m_bgDownDist = kItemObjMotionStep;
-				m_stepSlopeLimit = zero;
+				m_alphaStep = kItemObjMotionStep;
+				m_alphaTarget = zero;
 				m_bgColMask = 1;
 				ItemCFlatRuntime()->EndParticle(m_charaModelHandle);
 				changeStat(9, 0, 0);
@@ -972,8 +972,8 @@ void CGItemObj::onFrameStat()
 			m_groundHitOffset.y = zero;
 			m_groundHitOffset.x = zero;
 		} else if (m_stateFrame == 4) {
-			m_bgDownDist = kItemObjWobblePhaseScale;
-			m_stepSlopeLimit = zero;
+			m_alphaStep = kItemObjWobblePhaseScale;
+			m_alphaTarget = zero;
 			ItemCFlatRuntime()->EndParticle(m_charaModelHandle);
 		} else if (m_stateFrame == 0xC) {
 			CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
@@ -1115,7 +1115,7 @@ void CGItemObj::onFrameStat()
 		m_groundHitOffset.x = zero;
 
 		if (m_stateFrame == 0) {
-			m_stepSlopeLimit = zero;
+			m_alphaTarget = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
 			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
@@ -1148,7 +1148,7 @@ void CGItemObj::onFrameStat()
 		m_groundHitOffset.x = zero;
 
 		if (m_stateFrame == 0) {
-			m_stepSlopeLimit = zero;
+			m_alphaTarget = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
 			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();

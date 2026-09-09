@@ -1515,9 +1515,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x48:
-			engineObject->m_stepSlopeLimit = reinterpret_cast<float*>(object->m_localBase)[1];
+			engineObject->m_alphaTarget = reinterpret_cast<float*>(object->m_localBase)[1];
 			if (static_cast<int>(object->m_localBase[0]) != 0) {
-				engineObject->m_lookAtTimer = engineObject->m_stepSlopeLimit;
+				engineObject->m_currentAlpha = engineObject->m_alphaTarget;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1856,7 +1856,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x41:
-			engineObject->m_bgDownDist = 0.5f / static_cast<float>(static_cast<int>(object->m_localBase[0]));
+			engineObject->m_alphaStep = 0.5f / static_cast<float>(static_cast<int>(object->m_localBase[0]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

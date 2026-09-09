@@ -2153,8 +2153,9 @@ CCharaPcs::CHandle::~CHandle()
 
     CharaPcs.releaseUnuseLoadModel(0);
     {
-        CLoadAnim** slotPtr = &m_animSlot[0];
-        for (int i = 0; i < 64; i++, slotPtr++) {
+        int i;
+        CLoadAnim** slotPtr;
+        for (i = 0, slotPtr = &m_animSlot[0]; i < 64; i++, slotPtr++) {
             CRef* animRef = *slotPtr;
             if (animRef != 0) {
                 ReleaseShared(*slotPtr);

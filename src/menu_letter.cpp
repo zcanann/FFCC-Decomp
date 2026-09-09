@@ -390,12 +390,12 @@ inline int CMenuPcs::LetterLstOpen()
  */
 inline int CMenuPcs::LetterLstClose()
 {
-	int finished = 0;
 
 	LetterMenuState* state = m_letterMenuState;
 	state->frame = state->frame + 1;
 
 	SingleFadeEntry* entry = m_singleFadeState->entries;
+	int finished = 0;
 	int panelCount = static_cast<int>(m_singleFadeState->count);
 	int frame = static_cast<int>(m_letterMenuState->frame);
 
@@ -1161,9 +1161,9 @@ void CMenuPcs::LetterListDraw()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
-	const int topRow = static_cast<int>(m_letterMenuState->topIndex);
 
 	unsigned int y = 0x60;
+	const int topRow = static_cast<int>(m_letterMenuState->topIndex);
 	int letterIndex;
 	float yf;
 	for (int row = 0; row < 9 && (letterIndex = topRow + row) < caravanWork->m_letterCount; ++row) {

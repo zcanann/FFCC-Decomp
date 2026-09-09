@@ -187,6 +187,9 @@ STATIC_ASSERT(offsetof(CCharaPcs::CLoadAnim, m_points) == 0x2E);
 STATIC_ASSERT(offsetof(CCharaPcs::CLoadAnim, m_playbackFlags) == 0x70);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadPdt) == 0x20);
 STATIC_ASSERT(sizeof(CCharaPcs::CCameraFrame) == 0x20);
+STATIC_ASSERT(sizeof(CCharaPcs::CCameraFrame::Value) == 4);
+STATIC_ASSERT(offsetof(CCharaPcs::CCameraFrame, m_values) == 0);
+STATIC_ASSERT(offsetof(CCharaPcs::CHandle, m_drawListFlags) == 0x190);
 STATIC_ASSERT(offsetof(CCharaPcs, m_cameraFrameCount) == 0x04);
 STATIC_ASSERT(offsetof(CCharaPcs, m_cameraData) == 0x14);
 STATIC_ASSERT(offsetof(CCharaPcs, m_overlapEyePos) == 0x2C);
@@ -205,11 +208,6 @@ STATIC_ASSERT(offsetof(CCharaPcs, m_charaAllocStage) == 0xE4);
 
 
 namespace {
-static inline unsigned char* Ptr(void* p, unsigned int offset)
-{
-    return reinterpret_cast<unsigned char*>(p) + offset;
-}
-
 static inline CPtrArray<CCharaPcs::CLoadModel*>* LoadModelArray(CCharaPcs* self)
 {
     return &self->m_loadModels;
@@ -554,10 +552,9 @@ void CCharaPcs::Init()
     m_texShadowColor = baseColor.color;
 
     CVector baseVec(0.0f, 100.0f, 0.0f);
-    Vec* constructedVec = reinterpret_cast<Vec*>(&baseVec);
-    m_texShadowPos.x = constructedVec->x;
-    m_texShadowPos.y = constructedVec->y;
-    m_texShadowPos.z = constructedVec->z;
+    m_texShadowPos.x = baseVec.x;
+    m_texShadowPos.y = baseVec.y;
+    m_texShadowPos.z = baseVec.z;
     m_texShadowRadius = 500.0f;
     m_texShadowSize = 0x80;
     m_texShadowDistance = 100;
@@ -628,7 +625,7 @@ void CCharaPcs::create()
         sentinel->m_asyncFileHandle = 0;
         sentinel->m_fogBlend = 0.0f;
         sentinel->m_unk0x158 = 0;
-        sentinel->m_drawListFlags = static_cast<unsigned char>(__rlwimi(sentinel->m_drawListFlags, 1, 7, 24, 24));
+        sentinel->m_drawListFlags |= 0x80;
     }
 
     m_handleList = sentinel;
@@ -1487,10 +1484,10 @@ void CCharaPcs::searchPdt(int, int, int)
 
 /*
  * --INFO--
- * PAL Address: 800783d0
+ * PAL Address: 0x800783D0
  * PAL Size: 488b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80077DB0
+ * EN Size: 488b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1499,11 +1496,9 @@ void CCharaPcs::LoadCam(int index, char* fileName)
     char path[0x104];
     CChunkFile::CChunk chunk;
 
-#define cameraBuffer m_cameraData[index]
-
-    if (cameraBuffer != 0) {
-        delete[] cameraBuffer;
-        cameraBuffer = 0;
+    if (m_cameraData[index] != 0) {
+        delete[] m_cameraData[index];
+        m_cameraData[index] = 0;
     }
 
     sprintf(path, "dvd/cft/%s.cmd", fileName);
@@ -1521,20 +1516,18 @@ void CCharaPcs::LoadCam(int index, char* fileName)
         case 'CAM ': {
             m_cameraFrameCount[index] = static_cast<int>(chunk.m_arg0);
 
-            cameraBuffer = new (CharaPcs.m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x4D4)
+            m_cameraData[index] = new (CharaPcs.m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x4D4)
                 CCameraFrame[static_cast<unsigned long>(m_cameraFrameCount[index])];
 
-            int byteOffset = 0;
             for (int frame = 0; frame < m_cameraFrameCount[index]; frame++) {
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x00) = chunkFile.GetF4();
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x04) = chunkFile.GetF4();
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x08) = chunkFile.GetF4();
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x0C) = chunkFile.GetF4();
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x10) = chunkFile.GetF4();
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x14) = chunkFile.GetF4();
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x18) = chunkFile.GetF4();
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(cameraBuffer) + byteOffset + 0x1C) = chunkFile.GetF4();
-                byteOffset += 0x20;
+                m_cameraData[index][frame].m_values[0].m_float = chunkFile.GetF4();
+                m_cameraData[index][frame].m_values[1].m_float = chunkFile.GetF4();
+                m_cameraData[index][frame].m_values[2].m_float = chunkFile.GetF4();
+                m_cameraData[index][frame].m_values[3].m_float = chunkFile.GetF4();
+                m_cameraData[index][frame].m_values[4].m_float = chunkFile.GetF4();
+                m_cameraData[index][frame].m_values[5].m_float = chunkFile.GetF4();
+                m_cameraData[index][frame].m_values[6].m_float = chunkFile.GetF4();
+                m_cameraData[index][frame].m_values[7].m_float = chunkFile.GetF4();
             }
             break;
         }
@@ -1542,7 +1535,6 @@ void CCharaPcs::LoadCam(int index, char* fileName)
     }
 
     File.Close(fileHandle);
-#undef cameraBuffer
 }
 
 /*
@@ -2095,7 +2087,7 @@ CCharaPcs::CHandle::CHandle()
 
 	m_fogBlend = 0.0f;
 	m_unk0x158 = 0;
-	m_drawListFlags = static_cast<unsigned char>(__rlwimi(m_drawListFlags, 1, 7, 24, 24));
+	m_drawListFlags |= 0x80;
 }
 
 /*
@@ -2805,14 +2797,8 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         float farZ;
         GetCameraClipPlanes(&nearZ, &farZ);
         const float fogStart = Graphic.m_fogStart;
-        const unsigned int fogColorWord = *reinterpret_cast<unsigned int*>(&Graphic.m_fogColor);
+        _GXColor graphicFogColor = Graphic.m_fogColor;
         const float fogEnd = Graphic.m_fogEnd;
-        const unsigned char* fogColorBytes = reinterpret_cast<const unsigned char*>(&fogColorWord);
-        _GXColor graphicFogColor;
-        graphicFogColor.r = fogColorBytes[0];
-        graphicFogColor.g = fogColorBytes[1];
-        graphicFogColor.b = fogColorBytes[2];
-        graphicFogColor.a = fogColorBytes[3];
 
         const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         CColor whitePart;

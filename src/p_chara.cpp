@@ -2392,44 +2392,44 @@ foundModel:
         strcat(path, s_charaModelSuffix);
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-        if (fileHandle == 0) {
-            return 0;
-        }
-
-        File.Read(fileHandle);
-        File.SyncCompleted(fileHandle);
-
-        void* readBuffer = File.m_readBuffer;
-        loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
-        loadModel->m_keyTag = charaKind;
-        loadModel->m_keyId = static_cast<int>(charaNo);
-        loadModel->m_mergeFileId = mergeFileId;
-        loadModel->m_mergeFlags = mergeFlags;
-        LoadModelArray(&CharaPcs)->Add(loadModel);
-
-        CChara::CModel* model =
-            new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
-        model->Create(readBuffer, HandleModelStage(charaKind, 0));
-        loadModel->m_model = model;
-
-        m_modelLoadRef = loadModel;
-        File.Close(fileHandle);
-        m_modelLoadRef->AddRef();
-        m_model = m_modelLoadRef->m_model;
-        m_model->AddRef();
-
-        strcpy(path, basePath);
-        strcat(path, s_charaDynamicsSuffix);
-        fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
-            void* dynamicsBuffer = File.m_readBuffer;
-            m_model->CreateDynamics(dynamicsBuffer, HandleModelStage(charaKind, 0));
+
+            void* readBuffer = File.m_readBuffer;
+            loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
+            loadModel->m_keyTag = charaKind;
+            loadModel->m_keyId = static_cast<int>(charaNo);
+            loadModel->m_mergeFileId = mergeFileId;
+            loadModel->m_mergeFlags = mergeFlags;
+            LoadModelArray(&CharaPcs)->Add(loadModel);
+
+            CChara::CModel* model =
+                new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
+            model->Create(readBuffer, HandleModelStage(charaKind, 0));
+            loadModel->m_model = model;
+
+            m_modelLoadRef = loadModel;
             File.Close(fileHandle);
-            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                System.Printf(const_cast<char*>(s_charaDynamicsLoadDvdFmt), charaKind, static_cast<int>(charaNo));
+            m_modelLoadRef->AddRef();
+            m_model = m_modelLoadRef->m_model;
+            m_model->AddRef();
+
+            strcpy(path, basePath);
+            strcat(path, s_charaDynamicsSuffix);
+            fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+            if (fileHandle != 0) {
+                File.Read(fileHandle);
+                File.SyncCompleted(fileHandle);
+                void* dynamicsBuffer = File.m_readBuffer;
+                m_model->CreateDynamics(dynamicsBuffer, HandleModelStage(charaKind, 0));
+                File.Close(fileHandle);
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                    System.Printf(const_cast<char*>(s_charaDynamicsLoadDvdFmt), charaKind, static_cast<int>(charaNo));
+                }
             }
+        } else {
+            return 0;
         }
     }
 

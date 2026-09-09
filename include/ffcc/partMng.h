@@ -93,6 +93,15 @@ public:
     pppShapeSt m_shapes[0x100];
 };
 
+struct PPPIFPARAM
+{
+    int m_particleIndex;            // 0x0
+    short m_classId;                // 0x4
+    unsigned char m_hitObjectCount; // 0x6
+    unsigned char m_hitFlags;       // 0x7
+    short m_hitObjectIds[16];       // 0x8
+}; // Size 0x28
+
 struct PPPCREATEPARAM
 {
     PPPCREATEPARAM();
@@ -102,19 +111,16 @@ struct PPPCREATEPARAM
     Vec* m_scalePtr;                  // 0x8
     Vec* m_extraPositionPtr;          // 0xc
     int m_paramA;                     // 0x10
-    unsigned int m_paramB;            // 0x14
+    CGObject* m_bindObject;           // 0x14
     CGObject* m_lookTargetPtr;        // 0x18
     unsigned int m_objectHitMask;     // 0x1c
     unsigned int m_cylinderAttribute; // 0x20
     float m_paramC;                   // 0x24
     float m_paramD;                   // 0x28
-    void* m_owner;                    // 0x2c
+    unsigned char m_enable;           // 0x2c
+    unsigned char m_reserved[3];      // 0x2d
     PPPSEST m_soundEffectParams;      // 0x30
-    int m_hitParamA;                  // 0x44
-    short m_hitParamB;                // 0x48
-    unsigned char m_hitObjectCount;   // 0x4a
-    unsigned char m_hitFlags;         // 0x4b
-    int m_hitObjectIds[8];            // 0x4c
+    PPPIFPARAM m_hitParams;           // 0x44
 }; // Size 0x6c
 
 inline PPPCREATEPARAM::PPPCREATEPARAM()
@@ -126,22 +132,22 @@ inline PPPCREATEPARAM::PPPCREATEPARAM()
     m_soundEffectParams.m_soundEffectStartFrame = 0;
     m_soundEffectParams.m_soundEffectStartedOnce = 0;
     m_soundEffectParams.m_soundEffectFadeFrames = 30;
-    m_hitParamA = 0;
-    m_hitParamB = 0;
-    m_hitObjectCount = 0;
-    m_hitFlags = 0;
+    m_hitParams.m_particleIndex = 0;
+    m_hitParams.m_classId = 0;
+    m_hitParams.m_hitObjectCount = 0;
+    m_hitParams.m_hitFlags = 0;
     m_positionOffsetPtr = 0;
     m_rotationPtr = 0;
     m_scalePtr = 0;
     m_extraPositionPtr = 0;
     m_paramA = 0;
-    m_paramB = 0;
+    m_bindObject = 0;
     m_lookTargetPtr = 0;
     m_objectHitMask = 0;
     m_cylinderAttribute = 0;
     m_paramC = 1.0f;
     m_paramD = 1.0f;
-    *reinterpret_cast<unsigned char*>(&m_owner) = 0;
+    m_enable = 0;
 }
 
 extern CProfile g_par_calc_prof;
@@ -221,14 +227,6 @@ struct pppFVECTOR4
     float w;
 };
 
-struct PPPIFPARAM
-{
-    int m_particleIndex;            // 0x0
-    short m_classId;                // 0x4
-    unsigned char m_hitObjectCount; // 0x6
-    unsigned char m_hitFlags;       // 0x7
-}; // Size 0x8
-
 struct pppProg
 {
     char* m_pppName;                            // 0x0
@@ -270,9 +268,9 @@ struct _pppDataHead
     unsigned short m_shapeCount;      // 0xa
     unsigned short m_shapeGroupCount; // 0xc
     // Padding                        // 0xe
-    unsigned int m_cacheChunks;       // 0x10
-    unsigned int m_modelNames;        // 0x14
-    unsigned int m_shapeNames;        // 0x18
+    pppCacheChunk* m_cacheChunks;     // 0x10
+    pppModelSt** m_models;            // 0x14
+    pppShapeSt** m_shapes;            // 0x18
     pppShapeGroupRaw* m_shapeGroups;  // 0x1c
 }; // Size 0x20
 
@@ -395,7 +393,8 @@ struct _pppMngSt
     unsigned char m_prio;              // 0xF8
     unsigned char m_padF9;             // 0xF9
     unsigned short m_prioTime;         // 0xFA
-    unsigned char m_padFC[4];          // 0xFC
+    unsigned short m_fieldId;          // 0xFC
+    unsigned char m_padFE[2];          // 0xFE
     int m_paramA;                      // 0x100
     unsigned int m_paramB;             // 0x104
     float m_cullRadiusSq;              // 0x108
@@ -406,7 +405,6 @@ struct _pppMngSt
     short m_mapObjIndex;               // 0x11A
     PPPSEST m_soundEffectData;         // 0x11C
     PPPIFPARAM m_hitParams;            // 0x130
-    short m_hitObjectIds[0x10];        // 0x138
 
     Vec& UserPosition() { return m_userPosition; }
     Vec& BasePosition() { return m_basePosition; }
@@ -529,7 +527,7 @@ public:
 
     int m_editProgramCount;             // 0x00
     int m_editParticleCount;            // 0x04
-    unsigned char m_unk8[4];
+    int m_unk8;                        // 0x08
     int m_editCursorEnabled;            // 0x0C
     int m_cursorRequest;                // 0x10
     unsigned char m_unk14[4];

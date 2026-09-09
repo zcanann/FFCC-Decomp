@@ -2879,7 +2879,7 @@ void CMenuPcs::CreateSmithMenu()
     shopMenu->m_pdtSlot = PartPcs.LoadMenuPdt(const_cast<char*>(s_shop_80332e54));
 
     CPartMng::PppPdtSlot* slot = &PartMng.m_pdtSlots[shopMenu->m_pdtSlot];
-    cacheChunks = reinterpret_cast<pppCacheChunk*>(slot->m_pppDataHead->m_cacheChunks);
+    cacheChunks = slot->m_pppDataHead->m_cacheChunks;
     cacheChunks->m_pdt = reinterpret_cast<long*>(
         ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, s_shopmenu_cpp, 0x32A));
     long* pdt = cacheChunks->m_pdt;
@@ -2911,7 +2911,7 @@ void CMenuPcs::CreateShopMenu()
     shopMenu->m_pdtSlot = PartPcs.LoadMenuPdt(const_cast<char*>(s_shop_80332e54));
 
     CPartMng::PppPdtSlot* slot = &PartMng.m_pdtSlots[shopMenu->m_pdtSlot];
-    cacheChunks = reinterpret_cast<pppCacheChunk*>(slot->m_pppDataHead->m_cacheChunks);
+    cacheChunks = slot->m_pppDataHead->m_cacheChunks;
     cacheChunks->m_pdt = reinterpret_cast<long*>(
         ppvAmemCacheSet.GetData(cacheChunks->m_cacheIndex, s_shopmenu_cpp, 0x32A));
     long* pdt = cacheChunks->m_pdt;

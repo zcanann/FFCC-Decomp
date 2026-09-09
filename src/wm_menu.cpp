@@ -1037,7 +1037,7 @@ void CMenuPcs::loadData()
 		titleObject->Create();
 		titleObject->m_charaModelHandle =
 		    m_wm.m_handles[7];
-		titleParam.m_paramB = reinterpret_cast<unsigned int>(titleObject);
+		titleParam.m_bindObject = titleObject;
 		titleParam.m_lookTargetPtr = titleObject;
 		effect->m_partNo =
 		    PartMng.pppCreate(0, 9, &titleParam, 1);
@@ -1057,7 +1057,7 @@ void CMenuPcs::loadData()
 		effect->m_slotNo = slot;
 		object->Create();
 		object->m_charaModelHandle = m_wm.m_handles[slot];
-		param.m_paramB = reinterpret_cast<unsigned int>(object);
+		param.m_bindObject = object;
 		param.m_lookTargetPtr = object;
 		effect->m_partNo = PartMng.pppCreate(group, i + 5, &param, 1);
 	}
@@ -1076,7 +1076,7 @@ void CMenuPcs::loadData()
 		effect->m_slotNo = slot;
 		object->Create();
 		object->m_charaModelHandle = m_wm.m_handles[slot];
-		param.m_paramB = reinterpret_cast<unsigned int>(object);
+		param.m_bindObject = object;
 		param.m_lookTargetPtr = object;
 		effect->m_partNo = PartMng.pppCreate(group, i, &param, 1);
 	}
@@ -1095,7 +1095,7 @@ void CMenuPcs::loadData()
 		effect->m_slotNo = slot;
 		object->Create();
 		object->m_charaModelHandle = m_wm.m_handles[slot];
-		param.m_paramB = reinterpret_cast<unsigned int>(object);
+		param.m_bindObject = object;
 		param.m_lookTargetPtr = object;
 		effect->m_partNo = PartMng.pppCreate(group, i + 0xA, &param, 1);
 		if (i == 0) {
@@ -3014,7 +3014,7 @@ void CMenuPcs::CalcTitleMenu()
 				titleObject->Create();
 				titleObject->m_charaModelHandle = m_wm.m_handles[23];
 				param.m_lookTargetPtr = titleObject;
-				param.m_paramB = reinterpret_cast<unsigned int>(titleObject);
+				param.m_bindObject = titleObject;
 				titleEffect->m_partNo = PartMng.pppCreate(0, 0x1F, &param, 1);
 				m_wmWorldState->m_delay = 0;
 				m_wmWorldState->m_worldReady = 1;
@@ -3049,7 +3049,7 @@ void CMenuPcs::CalcTitleMenu()
 			titleObject->Create();
 			titleObject->m_charaModelHandle = m_wm.m_handles[23];
 			param.m_lookTargetPtr = titleObject;
-			param.m_paramB = reinterpret_cast<unsigned int>(titleObject);
+			param.m_bindObject = titleObject;
 			titleEffect->m_partNo = PartMng.pppCreate(0, 0x1F, &param, 1);
 			m_wmThpActive = 1;
 			m_wmWorldState->m_cardChannel = 0;
@@ -9687,7 +9687,7 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	object->m_charaModelHandle = m_wm.m_handles[cameraSlot];
 
 	createParam.m_lookTargetPtr = object;
-	createParam.m_paramB = reinterpret_cast<unsigned int>(object);
+	createParam.m_bindObject = object;
 
 	const unsigned int partId = PartMng.pppCreate(group, effectNo, &createParam, 1);
 	effect->m_partNo = partId;
@@ -10174,7 +10174,7 @@ void CMenuPcs::BindMcObj()
 			object->Create();
 			object->m_charaModelHandle = m_wm.m_handles[slot];
 			createParam.m_lookTargetPtr = object;
-			createParam.m_paramB = reinterpret_cast<unsigned int>(object);
+			createParam.m_bindObject = object;
 			effect->m_partNo =
 			    PartMng.pppCreate(group, modelNo + 0x16, &createParam, 1);
 		}
@@ -10209,7 +10209,7 @@ void CMenuPcs::BindMcObj()
 		object->Create();
 		object->m_charaModelHandle = m_wm.m_handles[slot];
 		createParam.m_lookTargetPtr = object;
-		createParam.m_paramB = reinterpret_cast<unsigned int>(object);
+		createParam.m_bindObject = object;
 		effect->m_partNo =
 		    PartMng.pppCreate(group, weaponModel + 0x1A, &createParam, 1);
 	}

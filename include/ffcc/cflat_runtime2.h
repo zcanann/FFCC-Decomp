@@ -42,12 +42,6 @@ extern u32 CFlatFlags;
 class CFlatRuntime2 : public CFlatRuntime
 {
 public:
-	struct CSpawnBits
-	{
-		u32 m_lo;
-		u32 m_hi;
-	};
-
 	struct CDebugDrawCC
 	{
 		union {
@@ -75,61 +69,6 @@ public:
 		float m_radius;
 	};
 
-	class CParticleWork
-	{
-	public:
-		struct CHitParam
-		{
-			int m_paramNo;
-			short m_paramId;
-			u8 m_pad[2];
-		};
-
-		CParticleWork()
-		{
-			m_soundEffectParams.m_soundEffectHandle = -1;
-			m_soundEffectParams.m_soundEffectSlot = -1;
-			m_soundEffectParams.m_soundEffectStopFlag = 0;
-			m_soundEffectParams.m_soundEffectKind = 1;
-			m_soundEffectParams.m_soundEffectStartFrame = 0;
-			m_soundEffectParams.m_soundEffectStartedOnce = 0;
-			m_soundEffectParams.m_soundEffectFadeFrames = 0x1E;
-			m_hitParam.m_paramNo = 0;
-			m_hitParam.m_paramId = 0;
-			m_hitParam.m_pad[0] = 0;
-			m_hitParam.m_pad[1] = 0;
-			m_pos = 0;
-			m_posVec = 0;
-			m_scale = 0;
-			m_target = 0;
-			m_arg = 0;
-			m_bind = 0;
-			m_trace = 0;
-			m_color0 = 0;
-			m_color1 = 0;
-			m_speed = 1.0f;
-			m_colorLerp = 1.0f;
-			m_enable = 0;
-		}
-
-		float* m_pos;
-		float* m_posVec;
-		float* m_scale;
-		float* m_target;
-		int m_arg;
-		CFlatRuntime::CObject* m_bind;
-		CFlatRuntime::CObject* m_trace;
-		int m_color0;
-		int m_color1;
-		float m_speed;
-		float m_colorLerp;
-		u8 m_enable;
-		u8 m_pad2D[3];
-		PPPSEST m_soundEffectParams;
-		CHitParam m_hitParam;
-		int m_extra[8];
-	};
-	
 	CFlatRuntime2();
 	~CFlatRuntime2();
 
@@ -239,7 +178,7 @@ public:
 	u8 m_pad_12E5_12E8[0x3];        // 0x12E5
 	int m_bossState;                // 0x12E8
 	int m_bossSubState;             // 0x12EC
-	CSpawnBits m_spawnBits[9];      // 0x12F0
+	u64 m_spawnBits[9];             // 0x12F0
 	float m_moveTime;               // 0x1338
 	float m_bgCollisionTime;        // 0x133C
 	float m_objectCollisionTime;    // 0x1340
@@ -247,13 +186,11 @@ public:
 	float m_hitTime;                // 0x1348
 	CMapObjectInfo m_mapObjectInfo[32]; // 0x134C
 	char m_savedNextScript[0x100];  // 0x15CC
-	CParticleWork m_particleWork;
+	PPPCREATEPARAM m_particleWork;
 	int m_particleWorkNoHi;         // 0x1738
 	u32 m_particleWorkNoLo;         // 0x173C
 	Vec m_particleWorkPos;          // 0x1740
-	float m_particleWorkPosVecBase; // 0x174C
-	float m_particleWorkPosAngle;   // 0x1750
-	float m_particleWorkPosPad;     // 0x1754
+	Vec m_particleWorkRotation;     // 0x174C
 	Vec m_particleWorkScale;        // 0x1758
 	Vec m_particleWorkTarget;       // 0x1764
 	CFlatLayerResource m_layerResources[8]; // 0x1770
@@ -297,6 +234,7 @@ STATIC_ASSERT(offsetof(CFlatRuntime2, m_savedNextScript) == 0x15CC);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWork) == 0x16CC);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkNoHi) == 0x1738);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkPos) == 0x1740);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkRotation) == 0x174C);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkScale) == 0x1758);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkTarget) == 0x1764);
 STATIC_ASSERT(sizeof(CLine<64>) == 0xB14);

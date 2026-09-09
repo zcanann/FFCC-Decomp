@@ -25,12 +25,6 @@ extern const char sCFlatRuntime2AnimStateWarn[];
 extern const float kCFlatRuntime2Zero;
 extern const float kCFlatRuntime2SystemValScale;
 
-extern "C" const double kCharaViewerColorCenterBias = 4503601774854144.0;
-extern "C" const float kCharaViewerZero = 0.0f;
-extern "C" const float kCharaViewerBackOrthoRight = 448.0f;
-extern "C" const float kCharaViewerBackOrthoBottom = 640.0f;
-extern "C" const float kCharaViewerGridMax = -100.0f;
-
 namespace {
 
 typedef unsigned char u8;

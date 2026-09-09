@@ -1159,7 +1159,6 @@ cflat_r2class.cpp:
 	extabindex  start:0x8000E9EC end:0x8000EA10
 	.text       start:0x800BA2FC end:0x800BD848
 	.data       start:0x802101F0 end:0x80210528
-	.sdata2     start:0x80330BE0 end:0x80330BF8
 
 p_chara_viewer.cpp:
 	extab       start:0x80008350 end:0x80008390
@@ -1168,7 +1167,7 @@ p_chara_viewer.cpp:
 	.rodata     start:0x801DA7E8 end:0x801DA970
 	.bss        start:0x802F2600 end:0x802F2628
 	.sbss       start:0x8032EDC4 end:0x8032EDE0
-	.sdata2     start:0x80330BF8 end:0x80330C60
+	.sdata2     start:0x80330BE0 end:0x80330C60
 
 chara_anim.cpp:
 	extab       start:0x80008390 end:0x800083C0

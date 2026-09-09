@@ -17,33 +17,6 @@
 #include "ffcc/system.h"
 #include "ffcc/texanim.h"
 
-extern "C" const double kCharaViewerColorCenterBias;
-extern "C" const float kCharaViewerZero;
-extern "C" const float kCharaViewerBackOrthoRight;
-extern "C" const float kCharaViewerBackOrthoBottom;
-extern "C" const float kCharaViewerGridMax;
-
-extern const float kCharaViewerUnitStep = 1.0f;
-extern const float kCharaViewerGridSpacing = 10.0f;
-extern const float kCharaViewerGridMin = 100.0f;
-static const char kCharaViewerNoName[] = "no name";
-extern const double kCharaViewerColorWhiteBias = 4503599627370496.0;
-static const char kCharaViewerSpinner[] = "|/-\\";
-static const char kCharaViewerChoiceFmt[] = "[%c] %s";
-extern const float kCharaViewerFineStep = -1.0f;
-extern const float kCharaViewerLerpScale = 0.25f;
-static const char kCharaViewerOrg[] = "ORG";
-static const char kCharaViewerKeep[] = "KEEP";
-static const char kCharaViewerOn[] = "ON";
-static const char kCharaViewerOff[] = "OFF";
-static const char kCharaViewerDefaultModelPath[] = "m1";
-extern const float kCharaViewerLightPosX = -533.0f;
-extern const float kCharaViewerLightPosY = -131.0f;
-extern const float kCharaViewerLightPosZ = -117.0f;
-extern const float kCharaViewerLightTargetX = 4391.0f;
-extern const float kCharaViewerLightTargetY = -1864.0f;
-extern const float kCharaViewerLightTargetZ = 7194.0f;
-
 CLightPcs::CBumpLight* g_pLight = 0;
 
 #include "ffcc/textureman.h"
@@ -111,11 +84,6 @@ static inline int ViewerModelPosQuant(CChara::CModel* model)
     return model->m_data->m_posQuant;
 }
 
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
-
 static const char s_no_texture[] = "no texture...";
 static const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
 static const char s_gpu_profile_fmt[] = "GPU = %f.5%%(C = %.5f%% G = %.5f%%)";
@@ -168,9 +136,7 @@ void CCharaPcs::drawViewer()
 
     if ((self->m_viewerBackTextureSet != 0) &&
         (static_cast<unsigned int>(self->m_viewerBackTextureSet->GetNumTexture()) != 0)) {
-        C_MTXOrtho(projMtx, LoadFloat(kCharaViewerZero), LoadFloat(kCharaViewerBackOrthoRight),
-                   LoadFloat(kCharaViewerZero), LoadFloat(kCharaViewerBackOrthoBottom), LoadFloat(kCharaViewerZero),
-                   LoadFloat(kCharaViewerGridMax));
+        C_MTXOrtho(projMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, -100.0f);
         GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
         PSMTXIdentity(backCameraMtx);
         GXLoadPosMtxImm(backCameraMtx, 0);
@@ -188,9 +154,7 @@ void CCharaPcs::drawViewer()
         TextureMan.SetTexture(GX_TEXMAP0, texture);
         unsigned int width = texture->m_width;
         unsigned int height = texture->m_height;
-        PSMTXScale(texMtx, LoadFloat(kCharaViewerUnitStep) / static_cast<float>(width),
-                   LoadFloat(kCharaViewerUnitStep) / static_cast<float>(height),
-                   LoadFloat(kCharaViewerUnitStep));
+        PSMTXScale(texMtx, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
         GXSetNumTexGens(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -237,19 +201,19 @@ void CCharaPcs::drawViewer()
         color.b = 0x80;
         color.a = 0x20;
         GXLoadPosMtxImm(cameraMtx, 0);
-        float gridSpacing = LoadFloat(kCharaViewerGridSpacing);
-        float gridMin = LoadFloat(kCharaViewerGridMin);
-        float gridMax = LoadFloat(kCharaViewerGridMax);
+        float gridSpacing = 10.0f;
+        float gridMin = 100.0f;
+        float gridMax = -100.0f;
 
         for (int i = -10; i <= 10; i++) {
             color.a = (i == 0) ? 0x60 : 0x20;
             GXSetChanMatColor(GX_COLOR0A0, color);
             GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 4);
             float x = gridSpacing * (float)i;
-            GXPosition3f32(x, LoadFloat(kCharaViewerZero), gridMin);
-            GXPosition3f32(x, LoadFloat(kCharaViewerZero), gridMax);
-            GXPosition3f32(gridMax, LoadFloat(kCharaViewerZero), x);
-            GXPosition3f32(gridMin, LoadFloat(kCharaViewerZero), x);
+            GXPosition3f32(x, 0.0f, gridMin);
+            GXPosition3f32(x, 0.0f, gridMax);
+            GXPosition3f32(gridMax, 0.0f, x);
+            GXPosition3f32(gridMin, 0.0f, x);
         }
     }
 
@@ -259,7 +223,7 @@ void CCharaPcs::drawViewer()
             if (ViewerModelTextureSet(model) == 0) {
                 Graphic.Printf(const_cast<char*>(s_no_texture));
             } else {
-                CStopWatch watch(const_cast<char*>(kCharaViewerNoName));
+                CStopWatch watch;
                 watch.Reset();
                 watch.Start();
                 Graphic.SetFog(0, 0);
@@ -308,7 +272,6 @@ void CCharaPcs::calcViewer()
     CCharaPcs* self = this;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
-    (void)kCharaViewerColorCenterBias;
 
     if (self->m_viewerStoreSavedAnim != 0) {
         ReleaseShared(self->m_viewerSavedAnim);
@@ -433,23 +396,11 @@ void CCharaPcs::calcViewer()
         }
     }
 
-    static const char* pFan;
-    static char init;
-    if (init == 0) {
-        pFan = kCharaViewerSpinner;
-        init = 1;
-    }
+    static const char* pFan = "|/-\\";
     {
-        static int alive;
-        static char init;
-        if (init == 0) {
-            alive = 0;
-            init = 1;
-        }
+        static int alive = 0;
         alive++;
-        Graphic.Printf(const_cast<char*>(kCharaViewerChoiceFmt),
-                       (int)(char)pFan[(alive >> 4) % 4],
-                       USBPcs.m_rootPath);
+        Graphic.Printf("[%c] %s", (int)(char)pFan[(alive >> 4) % 4], USBPcs.m_rootPath);
     }
 
     unsigned int heldButtons;
@@ -509,32 +460,32 @@ void CCharaPcs::calcViewer()
 
     float frameAdvance;
     if (self->m_viewerStepMode != 0) {
-        frameAdvance = LoadFloat(kCharaViewerZero);
+        frameAdvance = 0.0f;
         float step;
         if ((triggerButtons & 0x100) != 0) {
-            step = LoadFloat(kCharaViewerUnitStep);
+            step = 1.0f;
         } else {
             step = frameAdvance;
         }
         frameAdvance += step;
         if ((triggerButtons & 0x200) != 0) {
-            step = LoadFloat(kCharaViewerFineStep);
+            step = -1.0f;
         } else {
-            step = LoadFloat(kCharaViewerZero);
+            step = 0.0f;
         }
         frameAdvance += step;
     } else {
         float deltaY;
         if ((heldButtons & 0x200) != 0) {
-            deltaY = LoadFloat(kCharaViewerFineStep);
+            deltaY = -1.0f;
         } else {
-            deltaY = LoadFloat(kCharaViewerUnitStep);
+            deltaY = 1.0f;
         }
         float speedScale;
         if ((heldButtons & 0x100) != 0) {
-            speedScale = LoadFloat(kCharaViewerLerpScale);
+            speedScale = 0.25f;
         } else {
-            speedScale = LoadFloat(kCharaViewerUnitStep);
+            speedScale = 1.0f;
         }
         frameAdvance = deltaY * speedScale;
     }
@@ -544,7 +495,7 @@ void CCharaPcs::calcViewer()
             continue;
         }
 
-        float translateX = LoadFloat(kCharaViewerZero);
+        float translateX = 0.0f;
         if ((i != 0) && (self->m_viewerModel[0] != 0)) {
             int posQuant = ViewerModelPosQuant(self->m_viewerModel[0]);
             translateX = static_cast<float>((1 << (15 - posQuant)) / 8);
@@ -599,12 +550,7 @@ void CCharaPcs::calcViewer()
         }
 
         static SRT srt;
-        static int bFirst;
-        static char init;
-        if (init == 0) {
-            bFirst = 1;
-            init = 1;
-        }
+        static int bFirst = 1;
         if (bFirst != 0) {
             srt.Identity();
             bFirst = 0;
@@ -612,7 +558,7 @@ void CCharaPcs::calcViewer()
 
         float rotY;
         if (Pad.m_debugPadLock != 0) {
-            rotY = LoadFloat(kCharaViewerZero);
+            rotY = 0.0f;
         } else {
             unsigned int padIndex = 4;
             padIndex &= ~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 31);
@@ -625,7 +571,7 @@ void CCharaPcs::calcViewer()
         Math.SRTToMatrix(modelMtx, &srt);
         self->m_viewerModel[i]->SetMatrix(modelMtx);
 
-        CStopWatch matrixWatch(const_cast<char*>(kCharaViewerNoName));
+        CStopWatch matrixWatch;
         matrixWatch.Reset();
         matrixWatch.Start();
         self->m_viewerModel[i]->CalcMatrix();
@@ -646,15 +592,15 @@ void CCharaPcs::calcViewer()
                 Graphic.Printf(const_cast<char*>(s_frame_speed_fmt), frame, frameAdvance);
             }
             if (self->m_viewerSavedAnim != 0) {
-                const char* iframeState = kCharaViewerKeep;
+                const char* iframeState = "KEEP";
                 if (self->m_viewerSavedAnimState == 0) {
-                    iframeState = kCharaViewerOrg;
+                    iframeState = "ORG";
                 }
                 CGraphic* graphic = &Graphic;
                 const char* iframeFmt = s_iframe_fmt;
-                const char* iframeMode = kCharaViewerOff;
+                const char* iframeMode = "OFF";
                 if (self->m_viewerIFrameEnabled != 0) {
-                    iframeMode = kCharaViewerOn;
+                    iframeMode = "ON";
                 }
                 graphic->Printf(const_cast<char*>(iframeFmt), iframeMode, self->m_viewerSavedFrame, iframeState);
             }
@@ -743,15 +689,15 @@ void CCharaPcs::createViewer()
         self->m_viewerDiffuseColor[0][i].g = c;
         self->m_viewerDiffuseColor[0][i].b = c;
         self->m_viewerDiffuseColor[0][i].a = 0xFF;
-        self->m_viewerDiffusePos[i].x = LoadFloat(kCharaViewerZero);
-        self->m_viewerDiffusePos[i].y = LoadFloat(kCharaViewerZero);
-        self->m_viewerDiffusePos[i].z = LoadFloat(kCharaViewerFineStep);
+        self->m_viewerDiffusePos[i].x = 0.0f;
+        self->m_viewerDiffusePos[i].y = 0.0f;
+        self->m_viewerDiffusePos[i].z = -1.0f;
     }
 
     for (int colorIndex = 0; colorIndex < 5; colorIndex++) {
         const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         CColor colorTmp;
-        float scale = static_cast<float>(colorIndex) * LoadFloat(kCharaViewerLerpScale);
+        float scale = static_cast<float>(colorIndex) * 0.25f;
         colorTmp.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
         colorTmp.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
         colorTmp.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
@@ -785,7 +731,7 @@ void CCharaPcs::createViewer()
     self->m_viewerStepMode = 0;
     self->m_viewerDrawGrid = 1;
     self->m_viewerStoreSavedAnim = 0;
-    self->m_viewerSavedFrame = LoadFloat(kCharaViewerZero);
+    self->m_viewerSavedFrame = 0.0f;
     self->m_viewerSavedAnimState = 0;
     self->m_viewerIFrameEnabled = 0;
     self->m_viewerResetIFrame = 0;
@@ -805,7 +751,7 @@ void CCharaPcs::createViewer()
     self->m_viewerLoadAnim = 1;
     strcpy(self->m_viewerTexturePath, s_default_tex_path);
     self->m_viewerLoadTexture = 1;
-    strcpy(self->m_viewerTexAnimName, kCharaViewerDefaultModelPath);
+    strcpy(self->m_viewerTexAnimName, "m1");
     self->m_viewerTexAnimFrame = -1;
     self->m_viewerTexAnimDirty = 1;
 
@@ -820,12 +766,12 @@ void CCharaPcs::createViewer()
 
     CLightPcs::CBumpLight bumpLight;
     bumpLight.m_type = 1;
-    bumpLight.m_position.x = LoadFloat(kCharaViewerLightPosX);
-    bumpLight.m_position.y = LoadFloat(kCharaViewerLightPosY);
-    bumpLight.m_position.z = LoadFloat(kCharaViewerLightPosZ);
-    bumpLight.m_targetPosition.x = LoadFloat(kCharaViewerLightTargetX);
-    bumpLight.m_targetPosition.y = LoadFloat(kCharaViewerLightTargetY);
-    bumpLight.m_targetPosition.z = LoadFloat(kCharaViewerLightTargetZ);
+    bumpLight.m_position.x = -533.0f;
+    bumpLight.m_position.y = -131.0f;
+    bumpLight.m_position.z = -117.0f;
+    bumpLight.m_targetPosition.x = 4391.0f;
+    bumpLight.m_targetPosition.y = -1864.0f;
+    bumpLight.m_targetPosition.z = 7194.0f;
     PSVECSubtract(reinterpret_cast<Vec*>(&bumpLight.m_targetPosition), reinterpret_cast<Vec*>(&bumpLight.m_position),
                   reinterpret_cast<Vec*>(&bumpLight.m_direction));
     PSVECNormalize(reinterpret_cast<Vec*>(&bumpLight.m_direction), reinterpret_cast<Vec*>(&bumpLight.m_direction));
@@ -833,8 +779,8 @@ void CCharaPcs::createViewer()
     bumpLight.m_bumpShade[1] = 0x80;
     bumpLight.m_bumpShade[2] = 0;
     bumpLight.m_bumpShade[3] = 0xFF;
-    bumpLight.m_offsetX = LoadFloat(kCharaViewerZero);
-    bumpLight.m_offsetZ = LoadFloat(kCharaViewerZero);
+    bumpLight.m_offsetX = 0.0f;
+    bumpLight.m_offsetZ = 0.0f;
     gCharaPartWorkPtr = LightPcs.AddBump(&bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4);
 
     Chara.Create();

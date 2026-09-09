@@ -1387,9 +1387,8 @@ static void _PitchExecute(RedVoiceDATA* voice)
         pitchWork >>= REDSOUND_FIXED_SHIFT;
 
         if (voice->m_pitchModFrames != 0) {
-            pitchWork *= voice->m_pitchModFrame;
+            pitchWork = pitchWork * voice->m_pitchModFrame / voice->m_pitchModFrames;
             voice->m_pitchModFrame = voice->m_pitchModFrame + 1;
-            pitchWork /= voice->m_pitchModFrames;
             if (voice->m_pitchModFrame >= voice->m_pitchModFrames) {
                 voice->m_pitchModFrames = 0;
             }

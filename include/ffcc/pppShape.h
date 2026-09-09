@@ -41,16 +41,24 @@ struct tagOAN3_SHAPE
     tagOAN3_SHAPE_ENTRY m_entries[1]; // 0x8
 };
 
+typedef char pppShapeAnimFrame_size_check[(sizeof(pppShapeAnimFrame) == 8) ? 1 : -1];
+typedef char pppShapeAnimFrame_duration_check[(offsetof(pppShapeAnimFrame, m_duration) == 2) ? 1 : -1];
+typedef char pppShapeAnimData_count_check[(offsetof(pppShapeAnimData, m_frameCount) == 6) ? 1 : -1];
+typedef char pppShapeAnimData_frames_check[(offsetof(pppShapeAnimData, m_frames) == 0x10) ? 1 : -1];
+typedef char tagOAN3_SHAPE_ENTRY_size_check[(sizeof(tagOAN3_SHAPE_ENTRY) == 8) ? 1 : -1];
+typedef char tagOAN3_SHAPE_ENTRY_texture_check[(offsetof(tagOAN3_SHAPE_ENTRY, m_textureIndex) == 2) ? 1 : -1];
+typedef char tagOAN3_SHAPE_ENTRY_displayList_check[(offsetof(tagOAN3_SHAPE_ENTRY, m_displayList) == 4) ? 1 : -1];
+typedef char tagOAN3_SHAPE_count_check[(offsetof(tagOAN3_SHAPE, m_shapeCount) == 2) ? 1 : -1];
+typedef char tagOAN3_SHAPE_entries_check[(offsetof(tagOAN3_SHAPE, m_entries) == 8) ? 1 : -1];
+
 static inline pppShapeAnimData* pppShapeAnim(long* animData)
 {
     return reinterpret_cast<pppShapeAnimData*>(animData);
 }
 
-static inline tagOAN3_SHAPE* pppShapeFrame(pppShapeAnimData* animData, short frameIndex)
+static inline tagOAN3_SHAPE* pppShapeFrame(pppShapeAnimData* animData, int frameIndex)
 {
-    short shapeOffset = *reinterpret_cast<short*>(
-        reinterpret_cast<int>(animData) + frameIndex * sizeof(pppShapeAnimFrame) +
-        offsetof(pppShapeAnimData, m_frames));
+    short shapeOffset = animData->m_frames[frameIndex].m_shapeOffset;
     return reinterpret_cast<tagOAN3_SHAPE*>(
         reinterpret_cast<unsigned char*>(animData) + shapeOffset);
 }

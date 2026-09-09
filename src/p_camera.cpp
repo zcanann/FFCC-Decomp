@@ -947,8 +947,8 @@ void CCameraPcs::createFullShadow()
  * --INFO--
  * PAL Address: 0x800385c8
  * PAL Size: 1360b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800383BC
+ * EN Size: 1360b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -967,16 +967,6 @@ void CCameraPcs::calcMap()
     Vec sideVec;
     Vec upVec;
     int i;
-
-    struct HitCylinder {
-        Vec m_bottom;  // 0x00
-        Vec m_top;     // 0x0c
-        Vec m_axis;    // 0x18
-        float m_radius; // 0x24
-        Vec m_min;     // 0x28
-        Vec m_max;     // 0x34
-    };
-    HitCylinder hitCylinder;
 
     buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraPadInput(0).button[0];
 
@@ -1043,24 +1033,15 @@ void CCameraPcs::calcMap()
     if ((0.0f != moveDelta.x) || (0.0f != moveDelta.y) || (0.0f != moveDelta.z)) {
         i = 4;
         while (i-- != 0) {
-            float radius, boundsMax, boundsMin;
-            boundsMin = 10000000000.0f;
-            boundsMax = -10000000000.0f;
-            radius = 10.0f;
-            hitCylinder.m_min.z = boundsMin;
-            hitCylinder.m_min.y = boundsMin;
-            hitCylinder.m_min.x = boundsMin;
-            hitCylinder.m_max.z = boundsMax;
-            hitCylinder.m_max.y = boundsMax;
-            hitCylinder.m_max.x = boundsMax;
+            CMapCylinder hitCylinder;
             hitCylinder.m_bottom.x = PositionVec().x;
             hitCylinder.m_bottom.y = PositionVec().y;
             hitCylinder.m_bottom.z = PositionVec().z;
             hitCylinder.m_axis.x = moveDelta.x;
             hitCylinder.m_axis.y = moveDelta.y;
             hitCylinder.m_axis.z = moveDelta.z;
-            hitCylinder.m_radius = radius;
-            if (MapMng.CheckHitCylinder(reinterpret_cast<CMapCylinder*>(&hitCylinder), &moveDelta, 0xFFFFFFFF) != 0) {
+            hitCylinder.m_radius = 10.0f;
+            if (MapMng.CheckHitCylinder(&hitCylinder, &moveDelta, 0xFFFFFFFF) != 0) {
                 MapMng.m_hitMapObj->CalcHitSlide(&moveDelta, 2.0f);
             } else {
                 PositionVec().x += moveDelta.x;

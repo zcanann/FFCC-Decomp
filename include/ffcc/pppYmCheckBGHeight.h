@@ -21,7 +21,7 @@ extern "C" {
 #endif
 
 void pppConstructYmCheckBGHeight(pppYmCheckBGHeight* param1, _pppCtrlTable* param2);
-pppYmCheckBGHeight* pppFrameYmCheckBGHeight(pppYmCheckBGHeight* param1, pppYmCheckBGHeightStep* param2);
+void pppFrameYmCheckBGHeight(pppYmCheckBGHeight* param1, pppYmCheckBGHeightStep* param2);
 
 #ifdef __cplusplus
 }

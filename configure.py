@@ -652,7 +652,7 @@ config.libs = [
             Object(Matching, "pppLerpPos.cpp"),
             Object(Matching, "pppLight.cpp"),
             Object(NonMatching, "pppLocationTitle.cpp"),
-            Object(NonMatching, "pppMana2.cpp"),
+            Object(NonMatching, "pppMana2.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(Matching, "pppMatrixLoc.cpp"),
             Object(Matching, "pppMatrixScl.cpp"),
             Object(Matching, "pppMatrixXYZ.cpp"),

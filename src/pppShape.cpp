@@ -11,8 +11,8 @@
  * --INFO--
  * PAL Address: 0x80065678
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80064FE0
+ * EN Size: 100b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -40,8 +40,8 @@ void pppCalcFrameShape(long* animData, short& currentFrame, short& drawFrame, sh
  * --INFO--
  * PAL Address: 0x800656dc
  * PAL Size: 184b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80065044
+ * EN Size: 184b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -60,8 +60,8 @@ void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv,
  * --INFO--
  * PAL Address: 0x80065794
  * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800650FC
+ * EN Size: 120b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -78,138 +78,80 @@ void pppGetShapePos(long* animData, short frameIndex, Vec& minPos, Vec& maxPos, 
  * --INFO--
  * PAL Address: 0x8006580c
  * PAL Size: 240b
- * EN Address: 0x80074CB0
- * EN Size: 184b
+ * EN Address: 0x80065174
+ * EN Size: 240b
  * JP Address: TODO
  * JP Size: TODO
  */
 void pppCacheUnLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
-    short shapeOffset;
-    unsigned char* shapeEntry;
-    int shapeIndex;
-    int shapeStep;
-    char* currentFrame;
-    int frameIndex;
-    unsigned char* texturePtr;
-    char* animData;
-    unsigned int textureIndex;
-    char* shapeBase;
+    pppShapeAnimData* animData = static_cast<pppShapeAnimData*>(shapeSt->m_animData);
     unsigned char textureUsed[0x100];
-
-    animData = (char*)shapeSt->m_animData;
     memset(textureUsed, 0, sizeof(textureUsed));
 
-    currentFrame = animData;
-    for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
-        shapeOffset = *(short*)((int)currentFrame + 0x10);
-        shapeBase = animData + shapeOffset;
-        shapeIndex = 0;
-        shapeStep = shapeIndex;
-        while (shapeIndex < *(short*)(shapeBase + 2)) {
-            shapeEntry = (unsigned char*)(shapeBase + 8);
-            shapeEntry += shapeStep;
-            shapeIndex += 1;
-            shapeStep += 8;
-            textureUsed[shapeEntry[2]] = 1;
+    for (int frameIndex = 0; frameIndex < animData->m_frameCount; frameIndex++) {
+        tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
+        for (int shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
+            textureUsed[shape->m_entries[shapeIndex].m_textureIndex] = 1;
         }
-        currentFrame += 8;
     }
 
-    texturePtr = textureUsed;
-    textureIndex = 0;
-    do {
-        if (*texturePtr != 0) {
+    for (unsigned int textureIndex = 0; textureIndex < sizeof(textureUsed); textureIndex++) {
+        if (textureUsed[textureIndex] != 0) {
             materialSet->CacheUnLoadTexture(textureIndex, &ppvAmemCacheSet);
         }
-        textureIndex++;
-        texturePtr++;
-    } while (textureIndex < 0x100);
+    }
 }
 
 /*
  * --INFO--
  * PAL Address: 0x800658fc
  * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80065264
+ * EN Size: 240b
  * JP Address: TODO
  * JP Size: TODO
  */
 void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
-    short shapeOffset;
-    unsigned char* shapeEntry;
-    int shapeIndex;
-    int shapeStep;
-    char* currentFrame;
-    int frameIndex;
-    unsigned char* texturePtr;
-    char* animData;
-    unsigned int textureIndex;
-    char* shapeBase;
+    pppShapeAnimData* animData = static_cast<pppShapeAnimData*>(shapeSt->m_animData);
     unsigned char textureUsed[0x100];
-
-    animData = (char*)shapeSt->m_animData;
     memset(textureUsed, 0, sizeof(textureUsed));
 
-    currentFrame = animData;
-    for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
-        shapeOffset = *(short*)((int)currentFrame + 0x10);
-        shapeBase = animData + shapeOffset;
-        shapeIndex = 0;
-        shapeStep = shapeIndex;
-        while (shapeIndex < *(short*)(shapeBase + 2)) {
-            shapeEntry = (unsigned char*)(shapeBase + 8);
-            shapeEntry += shapeStep;
-            shapeIndex += 1;
-            shapeStep += 8;
-            textureUsed[shapeEntry[2]] = 1;
+    for (int frameIndex = 0; frameIndex < animData->m_frameCount; frameIndex++) {
+        tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
+        for (int shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
+            textureUsed[shape->m_entries[shapeIndex].m_textureIndex] = 1;
         }
-        currentFrame += 8;
     }
 
-    texturePtr = textureUsed;
-    textureIndex = 0;
-    do {
-        if (*texturePtr != 0) {
+    for (unsigned int textureIndex = 0; textureIndex < sizeof(textureUsed); textureIndex++) {
+        if (textureUsed[textureIndex] != 0) {
             materialSet->CacheLoadTexture(textureIndex, &ppvAmemCacheSet);
         }
-        textureIndex++;
-        texturePtr++;
-    } while (textureIndex < 0x100);
+    }
 }
 
 /*
  * --INFO--
  * PAL Address: 0x800659ec
  * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80065354
+ * EN Size: 168b
  * JP Address: TODO
  * JP Size: TODO
  */
 void pppSetShapeMaterial(pppShapeSt* shapeSt, CMaterialSet* materialSet, char** textureNames)
 {
-    int shapeIndex;
-    int shapeEntry;
-    char* currentFrame;
-    char* animData;
-    int frameIndex;
-    int shapeBase;
-
-    animData = (char*)shapeSt->m_animData;
-    currentFrame = animData;
-    for (frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex = frameIndex + 1) {
-        shapeBase = (int)animData + (int)*(short*)((int)currentFrame + 0x10);
-        shapeEntry = shapeBase;
-        for (shapeIndex = 0; shapeIndex < *(short*)(shapeBase + 2); shapeIndex = shapeIndex + 1) {
-            *(unsigned char*)(shapeEntry + 10) =
-                materialSet->FindTexName(textureNames[*(unsigned char*)(shapeEntry + 10)], 0);
-            *(int*)(shapeEntry + 0xc) = (int)shapeSt->m_displayListData + *(int*)(shapeEntry + 0xc);
-            shapeEntry = shapeEntry + 8;
+    pppShapeAnimData* animData = static_cast<pppShapeAnimData*>(shapeSt->m_animData);
+    for (int frameIndex = 0; frameIndex < animData->m_frameCount; frameIndex++) {
+        tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
+        for (int shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
+            tagOAN3_SHAPE_ENTRY* entry = &shape->m_entries[shapeIndex];
+            entry->m_textureIndex = materialSet->FindTexName(textureNames[entry->m_textureIndex], 0);
+            entry->m_displayList = static_cast<unsigned char*>(shapeSt->m_displayListData) +
+                reinterpret_cast<unsigned int>(entry->m_displayList);
         }
-        currentFrame += 8;
     }
 }
 
@@ -217,32 +159,27 @@ void pppSetShapeMaterial(pppShapeSt* shapeSt, CMaterialSet* materialSet, char** 
  * --INFO--
  * PAL Address: 0x80065a94
  * PAL Size: 224b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800653FC
+ * EN Size: 224b
  * JP Address: TODO
  * JP Size: TODO
  */
 void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char blendMode)
 {
-    int shapePtr;
-    int shapeCount;
-
     MaterialMan.LockEnv();
-
-    MaterialMan.SetMaterialPart(materialSet, *(unsigned char*)((int)shape + 10), 0);
+    MaterialMan.SetMaterialPart(materialSet, shape->m_entries[0].m_textureIndex, 0);
 
     GXClearVtxDesc();
-    GXSetVtxDesc((GXAttr)9, GX_DIRECT);
-    GXSetVtxDesc((GXAttr)11, GX_DIRECT);
-    GXSetVtxDesc((GXAttr)13, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
-    shapePtr = (int)shape;
-    for (shapeCount = 0; shapeCount < *(short*)((int)shape + 2); shapeCount = shapeCount + 1) {
+    for (int shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
+        tagOAN3_SHAPE_ENTRY* entry = &shape->m_entries[shapeIndex];
         if (blendMode == 0xFF) {
-            pppSetBlendMode(*(unsigned char*)(shapePtr + 8));
+            pppSetBlendMode(entry->m_blendMode);
         }
-        GXCallDisplayList(*(void**)(shapePtr + 0xc), 0x60);
-        shapePtr = shapePtr + 8;
+        GXCallDisplayList(entry->m_displayList, 0x60);
     }
 }
 
@@ -250,35 +187,29 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
  * --INFO--
  * PAL Address: 0x80065b74
  * PAL Size: 248b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800654DC
+ * EN Size: 248b
  * JP Address: TODO
  * JP Size: TODO
  */
 void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, unsigned char blendMode)
 {
-    int iVar1;
-    int iVar2;
-
-    int shapePtr = (int)animData;
-    shapePtr = shapePtr + *(short*)(shapePtr + frameIndex * 8 + 0x10);
+    tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
 
     MaterialMan.LockEnv();
-
-    MaterialMan.SetMaterialPart(materialSet, *(unsigned char*)(shapePtr + 10), 0);
+    MaterialMan.SetMaterialPart(materialSet, shape->m_entries[0].m_textureIndex, 0);
 
     GXClearVtxDesc();
-    GXSetVtxDesc((GXAttr)9, GX_DIRECT);
-    GXSetVtxDesc((GXAttr)11, GX_DIRECT);
-    GXSetVtxDesc((GXAttr)13, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
-    iVar2 = shapePtr;
-    for (iVar1 = 0; iVar1 < *(short*)(shapePtr + 2); iVar1 = iVar1 + 1) {
+    for (int shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
+        tagOAN3_SHAPE_ENTRY* entry = &shape->m_entries[shapeIndex];
         if (blendMode == 0xFF) {
-            pppSetBlendMode(*(unsigned char*)(iVar2 + 8));
+            pppSetBlendMode(entry->m_blendMode);
         }
-        GXCallDisplayList(*(void**)(iVar2 + 0xc), 0x60);
-        iVar2 = iVar2 + 8;
+        GXCallDisplayList(entry->m_displayList, 0x60);
     }
 }
 
@@ -286,8 +217,8 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
  * --INFO--
  * PAL Address: 0x80065c6c
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800655D4
+ * EN Size: 64b
  * JP Address: TODO
  * JP Size: TODO
  */

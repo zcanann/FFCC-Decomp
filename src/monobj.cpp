@@ -57,8 +57,6 @@ extern "C" const float kMonObjRadToDeg = 57.29578f;
 static const char s_monObjPassThroughText[] = "\x92\xca\x89\xdf\x81\x42\n";
 extern "C" const float kMonObjHalfPi = 1.5707964f;
 extern "C" const float kMonObjHalf = 0.5f;
-extern "C" const float kMonObjMaxBound = 10000000000.0f;
-extern "C" const float kMonObjMinBound = -10000000000.0f;
 extern "C" const float kMonObjConeSideRadius = 20.0f;
 extern "C" const float kMonObjParticleRadiusScale = 0.1f;
 extern "C" const float kMonObjTwoThirdsPi = 2.0943952f;
@@ -2336,7 +2334,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	if ((flags & 1) != 0) {
 		unsigned short cylHitArg = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B2);
 		float cylRadius = kMonObjHalf * object->m_bodyEllipsoidRadius;
-		CMapCylinder hitCylinder(kMonObjMaxBound, kMonObjMinBound);
+		CMapCylinder hitCylinder;
 		hitCylinder.m_bottom.x = startPos.x;
 		hitCylinder.m_bottom.y = startPos.y;
 		hitCylinder.m_bottom.z = startPos.z;
@@ -2466,7 +2464,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				cylTop.y = delta.y;
 				cylTop.z = delta.z;
 			}
-			CMapCylinder hitCylinder(kMonObjMaxBound, kMonObjMinBound);
+			CMapCylinder hitCylinder;
 			hitCylinder.m_bottom.x = startPos.x;
 			hitCylinder.m_bottom.y = startPos.y;
 			hitCylinder.m_bottom.z = startPos.z;

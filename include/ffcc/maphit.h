@@ -11,19 +11,19 @@ class CBound;
 
 int FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&);
 
-extern "C" const float kMapHitBoundsMinInit;
-extern "C" const float kMapHitBoundsMaxInit;
-
 class CMapCylinder
 {
 public:
+    /*
+     * --INFO--
+     * PAL Address: UNUSED
+     * PAL Size: TODO
+     * EN Address: TODO
+     * EN Size: TODO
+     * JP Address: TODO
+     * JP Size: TODO
+     */
     CMapCylinder()
-        : m_bound(kMapHitBoundsMinInit, kMapHitBoundsMaxInit)
-    {
-    }
-
-    CMapCylinder(float min, float max)
-        : m_bound(min, max)
     {
     }
 

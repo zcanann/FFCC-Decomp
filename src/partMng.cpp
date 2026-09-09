@@ -2343,18 +2343,13 @@ void CPartMng::pppEditPartCalc()
  * --INFO--
  * PAL Address: 0x8005b5b4
  * PAL Size: 488b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8005AF54
+ * EN Size: 488b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CPartMng::pppEditDrawShadow()
 {
-    struct PppCullBound {
-        Vec m_min;
-        Vec m_max;
-    };
-
     if (ppvSysStopPartF != 0) {
         return;
     }
@@ -2397,16 +2392,8 @@ void CPartMng::pppEditDrawShadow()
             checkCull:
                 PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
                 if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                    PppCullBound bound;
-                    float yOffset = mng->m_cullYOffset;
-                    float radius = mng->m_cullRadius;
-                    bound.m_min.x = partPos.x - radius;
-                    bound.m_max.x = partPos.x + radius;
-                    bound.m_min.z = partPos.z - radius;
-                    bound.m_min.y = partPos.y;
-                    bound.m_max.z = partPos.z + radius;
-                    bound.m_max.y = partPos.y + yOffset;
-                    if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
+                    CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
+                    if (bound.CheckFrustum(
                             cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                         goto drawPart;
                     }
@@ -2423,8 +2410,8 @@ void CPartMng::pppEditDrawShadow()
  * --INFO--
  * PAL Address: 0x8005ae80
  * PAL Size: 1844b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8005A820
+ * EN Size: 1844b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2436,7 +2423,6 @@ static inline void pppEditDrawPass(unsigned char* base, int drawPass, Vec& camer
     Vec viewPos;
     Vec partPos;
     Vec cameraDelta;
-    struct PppCullBound { Vec m_min; Vec m_max; };
 
     _pppMngSt* mng;
     int i;
@@ -2469,16 +2455,8 @@ static inline void pppEditDrawPass(unsigned char* base, int drawPass, Vec& camer
         checkCull:
             PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
             if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                PppCullBound bound;
-                float yOffset = mng->m_cullYOffset;
-                float radius = mng->m_cullRadius;
-                bound.m_min.x = partPos.x - radius;
-                bound.m_max.x = partPos.x + radius;
-                bound.m_min.z = partPos.z - radius;
-                bound.m_min.y = partPos.y;
-                bound.m_max.z = partPos.z + radius;
-                bound.m_max.y = partPos.y + yOffset;
-                if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
+                CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
+                if (bound.CheckFrustum(
                         cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                     goto drawPart;
                 }
@@ -2750,18 +2728,13 @@ void CPartMng::pppDrawPppMngSt(Vec&, _pppMngSt*)
  * --INFO--
  * PAL Address: 0x8005a4f4
  * PAL Size: 456b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80059E94
+ * EN Size: 456b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CPartMng::pppDrawPrio(unsigned char drawMode)
 {
-    struct PppCullBound {
-        Vec m_min;
-        Vec m_max;
-    };
-
     Mtx invCamera;
     Vec cameraPos;
     Vec cameraDelta;
@@ -2799,16 +2772,8 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
         checkCull:
             PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
             if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                PppCullBound bound;
-                float yOffset = mng->m_cullYOffset;
-                float radius = mng->m_cullRadius;
-                bound.m_min.x = partPos.x - radius;
-                bound.m_max.x = partPos.x + radius;
-                bound.m_min.z = partPos.z - radius;
-                bound.m_min.y = partPos.y;
-                bound.m_max.z = partPos.z + radius;
-                bound.m_max.y = partPos.y + yOffset;
-                if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
+                CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
+                if (bound.CheckFrustum(
                         cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                     goto drawPart;
                 }
@@ -2821,8 +2786,8 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
  * --INFO--
  * PAL Address: 0x8005a308
  * PAL Size: 492b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80059CA8
+ * EN Size: 492b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2855,7 +2820,6 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
             partPos.z = mng->m_matrix.value[2][3];
 
             {
-                struct PppCullBound { Vec m_min; Vec m_max; };
 
                 if ((double)mng->m_cullRadiusSq != -1.0) {
                     goto checkCull;
@@ -2876,16 +2840,8 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
                     break;
                 }
 
-                PppCullBound bound;
-                float yOffset = mng->m_cullYOffset;
-                float radius = mng->m_cullRadius;
-                bound.m_min.y = partPos.y;
-                bound.m_max.y = partPos.y + yOffset;
-                bound.m_min.x = partPos.x - radius;
-                bound.m_max.x = partPos.x + radius;
-                bound.m_min.z = partPos.z - radius;
-                bound.m_max.z = partPos.z + radius;
-                if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
+                CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
+                if (bound.CheckFrustum(
                         cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                     goto drawPart;
                 }
@@ -2902,18 +2858,13 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
  * --INFO--
  * PAL Address: 0x8005a18c
  * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80059B2C
+ * EN Size: 380b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CPartMng::pppDrawIdx(int partIndex)
 {
-    struct PppCullBound {
-        Vec m_min;
-        Vec m_max;
-    };
-
     Mtx invCamera;
     Vec cameraPos;
     Vec cameraDelta;
@@ -2961,16 +2912,8 @@ checkCull:
     }
 
     {
-        PppCullBound bound;
-        float yOffset = mng->m_cullYOffset;
-        float radius = mng->m_cullRadius;
-        bound.m_min.y = partPos.y;
-        bound.m_max.y = partPos.y + yOffset;
-        bound.m_min.x = partPos.x - radius;
-        bound.m_max.x = partPos.x + radius;
-        bound.m_min.z = partPos.z - radius;
-        bound.m_max.z = partPos.z + radius;
-        if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
+        CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
+        if (bound.CheckFrustum(cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
             goto drawPart;
         }
     }
@@ -2980,18 +2923,13 @@ checkCull:
  * --INFO--
  * PAL Address: 0x80059f6c
  * PAL Size: 544b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8005990C
+ * EN Size: 544b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CPartMng::pppDraw()
 {
-    struct PppCullBound {
-        Vec m_min;
-        Vec m_max;
-    };
-
     Mtx invCamera;
     Vec cameraPos;
     Vec viewPos;
@@ -3038,16 +2976,8 @@ void CPartMng::pppDraw()
             {
                 PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
                 if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                    PppCullBound bound;
-                    float yOffset = mng->m_cullYOffset;
-                    float radius = mng->m_cullRadius;
-                    bound.m_min.x = partPos.x - radius;
-                    bound.m_max.x = partPos.x + radius;
-                    bound.m_min.z = partPos.z - radius;
-                    bound.m_min.y = partPos.y;
-                    bound.m_max.z = partPos.z + radius;
-                    bound.m_max.y = partPos.y + yOffset;
-                    if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) == 0) {
+                    CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
+                    if (bound.CheckFrustum(cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) == 0) {
                         goto nextPart;
                     }
                     goto drawPart;
@@ -3066,18 +2996,13 @@ void CPartMng::pppDraw()
  * --INFO--
  * PAL Address: 0x80059d64
  * PAL Size: 520b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80059704
+ * EN Size: 520b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CPartMng::pppPartDrawAfter()
 {
-    struct PppCullBound {
-        Vec m_min;
-        Vec m_max;
-    };
-
     Mtx invCamera;
     Vec cameraPos;
     Vec cameraDelta;
@@ -3114,16 +3039,8 @@ void CPartMng::pppPartDrawAfter()
         checkCull:
             PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
             if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                PppCullBound bound;
-                float yOffset = mng->m_cullYOffset;
-                float radius = mng->m_cullRadius;
-                bound.m_min.x = partPos.x - radius;
-                bound.m_max.x = partPos.x + radius;
-                bound.m_min.z = partPos.z - radius;
-                bound.m_min.y = partPos.y;
-                bound.m_max.z = partPos.z + radius;
-                bound.m_max.y = partPos.y + yOffset;
-                if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
+                CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
+                if (bound.CheckFrustum(
                         cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                     goto drawPart;
                 }

@@ -162,7 +162,7 @@ void CMaterialMan::Quit()
 void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
 {
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
-    CMaterial* material = materials->GetAt(materialIndex);
+    CMaterial* material = (*materials)[materialIndex];
 
     unsigned char fogEnable = material->m_fogEnable;
     if ((static_cast<int>(Game.m_currentSceneId) == 3) && (MapMng.m_fogEnable == 0)) {
@@ -843,7 +843,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
 
     SetStdEnv();
 
-    CMaterial* material = materialSet->m_materials.GetAt(materialIndex);
+    CMaterial* material = materialSet->m_materials[materialIndex];
     g_drawMaterial = material;
     int isStd1000 = 0;
 
@@ -1782,7 +1782,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
     m_curEnvTevBit = m_stdEnvTevBit;
 
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
-    CMaterial* material = materials->GetAt(materialIndex);
+    CMaterial* material = (*materials)[materialIndex];
     material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
 
     unsigned int tevBit = m_curEnvTevBit;
@@ -2067,7 +2067,7 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
     SetStdEnv();
 
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
-    CMaterial* material = materials->GetAt(materialIndex);
+    CMaterial* material = (*materials)[materialIndex];
     material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
 
     unsigned int tevBit = m_curEnvTevBit;
@@ -2288,7 +2288,7 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
 {
     CMaterialSet* materialSet = MapMng.m_materialSet;
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
-    CMaterial* material = materials->GetAt(shadow.m_materialIndex);
+    CMaterial* material = (*materials)[shadow.m_materialIndex];
 
     unsigned long useShadowBit32 = materialFlag & (material->m_tevBit & 0x8000);
     if (useShadowBit32 != 0) {
@@ -2353,7 +2353,7 @@ void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shad
     unsigned int i = 0;
     CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
     for (; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        CMapShadow* shadow = mapShadowArray->GetAt(i);
+        CMapShadow* shadow = (*mapShadowArray)[i];
 
         if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
             continue;
@@ -2369,8 +2369,8 @@ void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shad
  * --INFO--
  * PAL Address: 0x8003E394
  * PAL Size: 716b
- * EN Address: 0x8004C200
- * EN Size: 860b
+ * EN Address: 0x8003E188
+ * EN Size: 716b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2382,14 +2382,7 @@ void CMaterialMan::SetPosition(
     float (*viewMtx)[4],
     int ignoreFrustumCheck)
 {
-    float searchBoundStorage[6];
-    CBound& searchBound = *reinterpret_cast<CBound*>(searchBoundStorage);
-    searchBound.m_min.x = position->x - rangeXZ;
-    searchBound.m_max.x = position->x + rangeXZ;
-    searchBound.m_min.z = position->z - rangeXZ;
-    searchBound.m_max.z = position->z + rangeXZ;
-    searchBound.m_min.y = position->y;
-    searchBound.m_max.y = position->y + rangeY;
+    CBound searchBound(position, rangeXZ, rangeY);
 
     if (target == static_cast<CMapShadow::TARGET>(0)) {
         ShadowCandidate shadowCandidates[128];
@@ -2399,7 +2392,7 @@ void CMaterialMan::SetPosition(
 
         int idx;
         for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-            CMapShadow* shadow = mapShadowArray->GetAt(idx);
+            CMapShadow* shadow = (*mapShadowArray)[idx];
 
             if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
                 continue;
@@ -2444,8 +2437,7 @@ void CMaterialMan::SetPosition(
             if ((shadow->m_yFilterMode == 2) && (position->y > shadowPos.y)) {
                 continue;
             }
-            if (reinterpret_cast<CBound*>(searchBoundStorage)
-                    ->CheckFrustum(shadowPos, scaledShadowMtx, -100000000.0f) != 0) {
+            if (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, -100000000.0f) != 0) {
                 goto writeCandidate;
             }
         }
@@ -2473,7 +2465,7 @@ void CMaterialMan::SetPosition(
         int idx;
         CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
         for (; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-            CMapShadow* shadow = mapShadowArray->GetAt(idx);
+            CMapShadow* shadow = (*mapShadowArray)[idx];
 
             if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
                 continue;
@@ -2493,8 +2485,7 @@ void CMaterialMan::SetPosition(
                 1.0f);
 
             if ((shadow->m_materialMode == 1) ||
-                (reinterpret_cast<CBound*>(searchBoundStorage)
-                     ->CheckFrustum(shadowPos, scaledShadowMtx, -100000000.0f) != 0)) {
+                (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, -100000000.0f) != 0)) {
                 SetShadow(*shadow, viewMtx, i, 0);
             }
         }
@@ -2505,8 +2496,8 @@ void CMaterialMan::SetPosition(
  * --INFO--
  * PAL Address: 0x8003E14C
  * PAL Size: 584b
- * EN Address: 0x8004C55C
- * EN Size: 708b
+ * EN Address: 0x8003DF40
+ * EN Size: 584b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2519,14 +2510,7 @@ int CMaterialMan::GetCharaShadow(
     float rangeY,
     int ignoreFrustumCheck)
 {
-    float searchBoundStorage[6];
-    CBound& searchBound = *reinterpret_cast<CBound*>(searchBoundStorage);
-    searchBound.m_min.x = position->x - rangeXZ;
-    searchBound.m_max.x = position->x + rangeXZ;
-    searchBound.m_min.z = position->z - rangeXZ;
-    searchBound.m_max.z = position->z + rangeXZ;
-    searchBound.m_min.y = position->y;
-    searchBound.m_max.y = position->y + rangeY;
+    CBound searchBound(position, rangeXZ, rangeY);
 
     CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
 
@@ -2537,7 +2521,7 @@ int CMaterialMan::GetCharaShadow(
 
     int idx;
     for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        CMapShadow* shadow = mapShadowArray->GetAt(idx);
+        CMapShadow* shadow = (*mapShadowArray)[idx];
         if (shadow->m_targetEnabled[0] == 0) {
             continue;
         }
@@ -2557,7 +2541,7 @@ int CMaterialMan::GetCharaShadow(
 
         if (shadow->m_materialMode == 1) {
             if (outputCount < maxShadows) {
-                materialsOut[outputCount] = MapMng.m_materialSet->m_materials.GetAt(shadow->m_materialIndex);
+                materialsOut[outputCount] = MapMng.m_materialSet->m_materials[shadow->m_materialIndex];
                 shadowMtxOut[outputCount++] = shadow->m_shadowMtx;
             }
             continue;
@@ -2586,8 +2570,7 @@ int CMaterialMan::GetCharaShadow(
         if ((shadow->m_yFilterMode == 2) && (position->y > shadowPos.y)) {
             continue;
         }
-        if (reinterpret_cast<CBound*>(searchBoundStorage)
-                ->CheckFrustum(shadowPos, scaledShadowMtx, -100000000.0f) != 0) {
+        if (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, -100000000.0f) != 0) {
             goto writeCandidate;
         }
     }
@@ -2611,7 +2594,7 @@ int CMaterialMan::GetCharaShadow(
     if (nearest != 0) {
         nearest->distance = maxDist;
         if (outputCount < maxShadows) {
-            *reinterpret_cast<CMaterial**>(Ptr(materialsOut, outputOffset)) = MapMng.m_materialSet->m_materials.GetAt(nearest->shadow->m_materialIndex);
+            *reinterpret_cast<CMaterial**>(Ptr(materialsOut, outputOffset)) = MapMng.m_materialSet->m_materials[nearest->shadow->m_materialIndex];
             outputCount++;
             *reinterpret_cast<float (**)[4]>(Ptr(shadowMtxOut, outputOffset)) = nearest->shadow->m_shadowMtx;
         }
@@ -2634,7 +2617,7 @@ void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, floa
     CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
 
     for (long i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        CMapShadow* shadow = mapShadowArray->GetAt(i);
+        CMapShadow* shadow = (*mapShadowArray)[i];
 
         if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
             continue;
@@ -3201,8 +3184,8 @@ CMaterialSet::CMaterialSet()
 CMaterialSet::~CMaterialSet()
 {
     for (unsigned long i = 0; i < static_cast<unsigned long>(m_materials.GetSize()); i++) {
-        if (m_materials.GetAt(i) != 0) {
-            delete m_materials.GetAt(i);
+        if (m_materials[i] != 0) {
+            delete m_materials[i];
         }
     }
     m_materials.RemoveAll();
@@ -3274,7 +3257,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     unsigned long i;
                     int idx;
                     for (i = 0; (idx = i) < static_cast<unsigned long>(m_materials.GetSize()); i++) {
-                        if (m_materials.GetAt(idx) == 0) {
+                        if (m_materials[idx] == 0) {
                             goto slotFound;
                         }
                     }
@@ -3306,11 +3289,11 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 AddMaterial(material, materialIndex);
             } break;
             case CHUNK_NAME: {
-                material = m_materials.GetAt(materialIndex);
+                material = m_materials[materialIndex];
                 strncpy(material->m_name, chunkFile.GetString(), 0x10);
             } break;
             case CHUNK_ATTR: {
-                material = m_materials.GetAt(materialIndex);
+                material = m_materials[materialIndex];
                 unsigned int flags = chunkFile.Get4();
                 if ((flags & 1) != 0) {
                     material->m_tevBit |= 0x80;
@@ -3342,7 +3325,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     bumpLightDirect = 0;
                 }
 
-                material = m_materials.GetAt(materialIndex);
+                material = m_materials[materialIndex];
                 AddTextureIndex(material, chunkFile);
                 AddTextureIndex(material, chunkFile);
                 bumpIndex = chunkFile.Get2();
@@ -3369,7 +3352,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_tevBit |= 4;
             } break;
             case CHUNK_WATR: {
-                material = m_materials.GetAt(materialIndex);
+                material = m_materials[materialIndex];
                 AddTextureIndex(material, chunkFile);
                 AddTextureIndex(material, chunkFile);
                 bumpIndex = chunkFile.Get2();
@@ -3392,7 +3375,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 }
             } break;
             case CHUNK_JIME: {
-                material = m_materials.GetAt(materialIndex);
+                material = m_materials[materialIndex];
                 AddTextureIndex(material, chunkFile);
                 AddTextureIndex(material, chunkFile);
                 bumpIndex = chunkFile.Get2();
@@ -3412,7 +3395,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 material->m_bumpLightDirect = 1;
             } break;
             case CHUNK_FUR: {
-                material = m_materials.GetAt(materialIndex);
+                material = m_materials[materialIndex];
                 AddTextureIndex(material, chunkFile);
                 material->m_singleTextureFlag = 1;
             } break;
@@ -3506,7 +3489,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
     register long materialIndex = 0;
 
     while (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
-        CMaterial* material = m_materials.GetAt(materialIndex);
+        CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
             if (static_cast<int>(material->GetNumTexture()) == 0) {
                 material->SetTevBit(static_cast<CMaterialMan::TEV_BIT>(1));
@@ -3581,7 +3564,7 @@ void CMaterialSet::Calc()
     register long materialIndex = 0;
 
     while (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
-        CMaterial* material = m_materials.GetAt(materialIndex);
+        CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
             int i = 0;
             do {
@@ -3632,7 +3615,7 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
     long materialIndex = 0;
 
     while (materialIndex < static_cast<unsigned int>(m_materials.GetSize())) {
-        CMaterial* material = m_materials.GetAt(materialIndex);
+        CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
             for (int slot = 0; slot < static_cast<int>(material->m_textureCount); slot++) {
                 if (material->m_textureData.m_textures[slot]->CheckName(textureName)) {
@@ -3661,7 +3644,7 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
 void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
     CMaterial* material =
-        m_materials.GetAt(static_cast<unsigned long>(materialIndex));
+        m_materials[static_cast<unsigned long>(materialIndex)];
     if (material != 0) {
         material->CacheLoadTexture(amemCacheSet);
     }
@@ -3679,7 +3662,7 @@ void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheS
 void CMaterialSet::CacheUnLoadTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
     CMaterial* material =
-        m_materials.GetAt(static_cast<unsigned long>(materialIndex));
+        m_materials[static_cast<unsigned long>(materialIndex)];
     if (material != 0) {
         material->CacheUnLoadTexture(amemCacheSet);
     }
@@ -3697,7 +3680,7 @@ void CMaterialSet::CacheUnLoadTexture(int materialIndex, CAmemCacheSet* amemCach
 inline void CMaterialSet::CacheRefCnt0UpTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
     CMaterial* material =
-        m_materials.GetAt(static_cast<unsigned long>(materialIndex));
+        m_materials[static_cast<unsigned long>(materialIndex)];
     if (material != 0) {
         material->CacheRefCnt0UpTexture(amemCacheSet);
     }
@@ -3717,7 +3700,7 @@ unsigned long CMaterialSet::Find(char* name)
     unsigned long index = 0;
 
     while (index < static_cast<unsigned long>(m_materials.GetSize())) {
-        CMaterial* material = m_materials.GetAt(index);
+        CMaterial* material = m_materials[index];
         if ((material != 0) && (strcmp(material->m_name, name) == 0)) {
             return index;
         }
@@ -3745,7 +3728,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
         if (texture != 0) {
             u32 materialCount = static_cast<u32>(m_materials.GetSize());
             u32 materialIndex = textureIndex + 1;
-            if ((materialIndex < materialCount) && (m_materials.GetAt(materialIndex) != 0)) {
+            if ((materialIndex < materialCount) && (m_materials[materialIndex] != 0)) {
                 goto next;
             }
 
@@ -3784,7 +3767,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
     unsigned int index = 0;
 
     while (index < static_cast<unsigned int>(m_materials.GetSize())) {
-        CMaterial* material = m_materials.GetAt(index);
+        CMaterial* material = m_materials[index];
         if ((material != 0) && (material->m_pdtSlotIndex == pdtSlotIndex)) {
             for (int i = 0; i < static_cast<int>(material->m_textureCount); i++) {
                 CTexture* object = material->m_textureData.m_textures[i];

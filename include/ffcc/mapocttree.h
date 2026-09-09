@@ -20,17 +20,44 @@ void setbit32(unsigned long*, unsigned long);
 class CBound
 {
 public:
-	CBound();
-	CBound(float min, float max)
+	/*
+	 * --INFO--
+	 * PAL Address: 0x8002BE10
+	 * PAL Size: 36b
+	 * EN Address: 0x8002BC04
+	 * EN Size: 36b
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	CBound()
 	{
-		float lo = min;
-		float hi = max;
-		m_min.z = lo;
-		m_min.y = lo;
-		m_min.x = lo;
-		m_max.z = hi;
-		m_max.y = hi;
-		m_max.x = hi;
+		float max = -10000000000.0f;
+		float min = 10000000000.0f;
+
+		m_min.z = min;
+		m_min.y = min;
+		m_min.x = min;
+		m_max.z = max;
+		m_max.y = max;
+		m_max.x = max;
+	}
+	/*
+	 * --INFO--
+	 * PAL Address: UNUSED
+	 * PAL Size: TODO
+	 * EN Address: TODO
+	 * EN Size: TODO
+	 * JP Address: TODO
+	 * JP Size: TODO
+	 */
+	CBound(Vec* position, float rangeXZ, float rangeY)
+	{
+		m_min.x = position->x - rangeXZ;
+		m_max.x = position->x + rangeXZ;
+		m_min.z = position->z - rangeXZ;
+		m_max.z = position->z + rangeXZ;
+		m_min.y = position->y;
+		m_max.y = position->y + rangeY;
 	}
 	static void SetFrustum(Vec&, float(*)[4]);
 	int CheckFrustum0(CBound&);

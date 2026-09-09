@@ -34,28 +34,6 @@ inline void* operator new(unsigned long, void* ptr)
 
 /*
  * --INFO--
- * PAL Address: 0x8002BE10
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CBound::CBound()
-{
-    float max = -10000000000.0f;
-    float min = 10000000000.0f;
-
-    m_min.z = min;
-    m_min.y = min;
-    m_min.x = min;
-    m_max.z = max;
-    m_max.y = max;
-    m_max.x = max;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8002BE34
  * PAL Size: 72b
  * EN Address: 0x800364A4
@@ -1388,8 +1366,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         Mtx inverseMtx;
 
         PSMTXInverse(m_worldMtx, inverseMtx);
-        float boundMinInit = 10000000000.0f;
-        CMapCylinder localCylinder(boundMinInit, -10000000000.0f);
+        CMapCylinder localCylinder;
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
@@ -1426,8 +1403,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         Vec localMove;
 
         PSMTXInverse(m_worldMtx, inverseMtx);
-        float boundMinInit = 10000000000.0f;
-        CMapCylinder localCylinder(boundMinInit, -10000000000.0f);
+        CMapCylinder localCylinder;
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 

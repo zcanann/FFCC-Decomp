@@ -17,8 +17,6 @@ extern const char kAStarCostDebugFormat[0x18] = "\x8d\xc5\x92\x5a\x8c\x6f\x98\x4
 extern const float kPolyGroupBaseXZ = 0.0f;
 extern const float kPolyGroupBaseY = -100.0f;
 extern const float kPolyGroupTopOffsetY = 5.0f;
-extern const float kPolyGroupAabbMax = 10000000000.0f;
-extern const float kPolyGroupAabbMin = -10000000000.0f;
 extern const float kAStarEscapeInitialBestDist = -1000000.0f;
 extern const char kAStarGroupDebugLabel[] = "//A*\n";
 extern const float kDrawAStarSphereRadius = 10.0f;
@@ -57,7 +55,7 @@ int CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
 		Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
 		Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
-		CMapCylinder cyl(kPolyGroupAabbMax, kPolyGroupAabbMin);
+		CMapCylinder cyl;
 		cyl.m_bottom = *top;
 		cyl.m_axis = *base;
 		cyl.m_radius = kPolyGroupBaseXZ;
@@ -76,7 +74,7 @@ int CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
 		Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
 		Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
-		CMapCylinder cyl(kPolyGroupAabbMax, kPolyGroupAabbMin);
+		CMapCylinder cyl;
 		cyl.m_bottom = *top;
 		cyl.m_axis = *base;
 		cyl.m_radius = kPolyGroupBaseXZ;
@@ -106,7 +104,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
 	Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
 	Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
-	CMapCylinder cyl(kPolyGroupAabbMax, kPolyGroupAabbMin);
+	CMapCylinder cyl;
 	cyl.m_bottom = *top;
 	cyl.m_axis = *base;
 	cyl.m_radius = kPolyGroupBaseXZ;

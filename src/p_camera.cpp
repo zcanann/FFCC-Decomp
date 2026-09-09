@@ -781,8 +781,8 @@ void CCameraPcs::drawShadowBegin()
  * --INFO--
  * PAL Address: 0x80038050
  * PAL Size: 680b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80037E44
+ * EN Size: 680b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -811,15 +811,10 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         bool include = false;
         if (gObject->m_charaModelHandle != 0) {
             displayFlags = gObject->m_displayFlags;
-            if ((displayFlags & 1) != 0 && (displayFlags & 0x40) == 0) {
-                if (static_cast<signed char>(
-                        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<signed char*>(
-                                             &gObject->m_weaponNodeFlags)) << 26) &
-                                         0xC0000000) >>
-                        31) != 0) {
-                    if ((displayFlags & 0x80) != 0 || 1.0f == gObject->m_currentAlpha) {
-                        include = true;
-                    }
+            if ((displayFlags & 1) != 0 && (displayFlags & 0x40) == 0 &&
+                gObject->m_weaponNodeFlagBits.m_unk20 != 0) {
+                if ((displayFlags & 0x80) != 0 || 1.0f == gObject->m_currentAlpha) {
+                    include = true;
                 }
             }
         }
@@ -833,32 +828,18 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
             radius = 30.0f;
         }
 
-        float worldBoundData[6];
-        CBound* worldBound = reinterpret_cast<CBound*>(worldBoundData);
-        float clipBoundData[6];
-        CBound* clipBound = reinterpret_cast<CBound*>(clipBoundData);
-        worldBoundData[0] = gObject->m_worldPosition.x - radius;
-        worldBoundData[3] = gObject->m_worldPosition.x + radius;
-        worldBoundData[2] = gObject->m_worldPosition.z - radius;
-        worldBoundData[5] = gObject->m_worldPosition.z + radius;
-        worldBoundData[1] = gObject->m_worldPosition.y;
-        clipBoundData[2] = 10000000000.0f;
-        worldBoundData[4] = gObject->m_worldPosition.y + radius;
-        clipBoundData[1] = 10000000000.0f;
-        clipBoundData[0] = 10000000000.0f;
-        clipBoundData[5] = -10000000000.0f;
-        clipBoundData[4] = -10000000000.0f;
-        clipBoundData[3] = -10000000000.0f;
+        CBound worldBound(&gObject->m_worldPosition, radius, radius);
+        CBound clipBound;
 
-        if (worldBound->CheckFrustum0(*clipBound) == 0) {
+        if (worldBound.CheckFrustum0(clipBound) == 0) {
             continue;
         }
-        if (!(clipBoundData[2] > -400.0f)) {
+        if (!(clipBound.m_min.z > -400.0f)) {
             continue;
         }
-        float negMinZ = -clipBoundData[2];
-        float ratioX = (clipBoundData[3] - clipBoundData[0]) / negMinZ;
-        float ratioY = (clipBoundData[4] - clipBoundData[1]) / negMinZ;
+        float negMinZ = -clipBound.m_min.z;
+        float ratioX = (clipBound.m_max.x - clipBound.m_min.x) / negMinZ;
+        float ratioY = (clipBound.m_max.y - clipBound.m_min.y) / negMinZ;
         if (ratioX > 0.2f) {
             // proceed
         } else if (!(ratioY > 0.2f)) {
@@ -866,17 +847,17 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
         }
 
         shadowRectBound.m_min.x =
-            (shadowRectBound.m_min.x < worldBoundData[0]) ? shadowRectBound.m_min.x : worldBoundData[0];
+            (shadowRectBound.m_min.x < worldBound.m_min.x) ? shadowRectBound.m_min.x : worldBound.m_min.x;
         shadowRectBound.m_min.y =
-            (shadowRectBound.m_min.y < worldBoundData[1]) ? shadowRectBound.m_min.y : worldBoundData[1];
+            (shadowRectBound.m_min.y < worldBound.m_min.y) ? shadowRectBound.m_min.y : worldBound.m_min.y;
         shadowRectBound.m_min.z =
-            (shadowRectBound.m_min.z < worldBoundData[2]) ? shadowRectBound.m_min.z : worldBoundData[2];
+            (shadowRectBound.m_min.z < worldBound.m_min.z) ? shadowRectBound.m_min.z : worldBound.m_min.z;
         shadowRectBound.m_max.x =
-            (shadowRectBound.m_max.x > worldBoundData[3]) ? shadowRectBound.m_max.x : worldBoundData[3];
+            (shadowRectBound.m_max.x > worldBound.m_max.x) ? shadowRectBound.m_max.x : worldBound.m_max.x;
         shadowRectBound.m_max.y =
-            (shadowRectBound.m_max.y > worldBoundData[4]) ? shadowRectBound.m_max.y : worldBoundData[4];
+            (shadowRectBound.m_max.y > worldBound.m_max.y) ? shadowRectBound.m_max.y : worldBound.m_max.y;
         shadowRectBound.m_max.z =
-            (shadowRectBound.m_max.z > worldBoundData[5]) ? shadowRectBound.m_max.z : worldBoundData[5];
+            (shadowRectBound.m_max.z > worldBound.m_max.z) ? shadowRectBound.m_max.z : worldBound.m_max.z;
         count += 1;
     }
 
@@ -966,8 +947,8 @@ void CCameraPcs::createFullShadow()
  * --INFO--
  * PAL Address: 0x800385c8
  * PAL Size: 1360b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800383BC
+ * EN Size: 1360b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -986,16 +967,6 @@ void CCameraPcs::calcMap()
     Vec sideVec;
     Vec upVec;
     int i;
-
-    struct HitCylinder {
-        Vec m_bottom;  // 0x00
-        Vec m_top;     // 0x0c
-        Vec m_axis;    // 0x18
-        float m_radius; // 0x24
-        Vec m_min;     // 0x28
-        Vec m_max;     // 0x34
-    };
-    HitCylinder hitCylinder;
 
     buttons = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) ? 0 : CameraPadInput(0).button[0];
 
@@ -1062,24 +1033,15 @@ void CCameraPcs::calcMap()
     if ((0.0f != moveDelta.x) || (0.0f != moveDelta.y) || (0.0f != moveDelta.z)) {
         i = 4;
         while (i-- != 0) {
-            float radius, boundsMax, boundsMin;
-            boundsMin = 10000000000.0f;
-            boundsMax = -10000000000.0f;
-            radius = 10.0f;
-            hitCylinder.m_min.z = boundsMin;
-            hitCylinder.m_min.y = boundsMin;
-            hitCylinder.m_min.x = boundsMin;
-            hitCylinder.m_max.z = boundsMax;
-            hitCylinder.m_max.y = boundsMax;
-            hitCylinder.m_max.x = boundsMax;
+            CMapCylinder hitCylinder;
             hitCylinder.m_bottom.x = PositionVec().x;
             hitCylinder.m_bottom.y = PositionVec().y;
             hitCylinder.m_bottom.z = PositionVec().z;
             hitCylinder.m_axis.x = moveDelta.x;
             hitCylinder.m_axis.y = moveDelta.y;
             hitCylinder.m_axis.z = moveDelta.z;
-            hitCylinder.m_radius = radius;
-            if (MapMng.CheckHitCylinder(reinterpret_cast<CMapCylinder*>(&hitCylinder), &moveDelta, 0xFFFFFFFF) != 0) {
+            hitCylinder.m_radius = 10.0f;
+            if (MapMng.CheckHitCylinder(&hitCylinder, &moveDelta, 0xFFFFFFFF) != 0) {
                 MapMng.m_hitMapObj->CalcHitSlide(&moveDelta, 2.0f);
             } else {
                 PositionVec().x += moveDelta.x;

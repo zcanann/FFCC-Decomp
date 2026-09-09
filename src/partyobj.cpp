@@ -60,8 +60,6 @@ extern const float FLOAT_80331A84 = 1.5f;
 extern const float FLOAT_80331A88 = 4.0f;
 extern const double DOUBLE_80331A90 = 90.0;
 extern const float FLOAT_80331A98 = 10.0f;
-extern const float FLOAT_80331a9c = 10000000000.0f;
-extern const float FLOAT_80331aa0 = -10000000000.0f;
 extern const double DOUBLE_80331AA8 = 300.0;
 extern const float FLOAT_80331AB0 = 3.0f;
 extern const float FLOAT_80331AB4 = 0.15f;
@@ -2611,7 +2609,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		CVector startPosCopy(startPos);
 		Vec* copyPtr = startPosCopy;
 
-		CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
+		CMapCylinder hitCylinder;
 		hitCylinder.m_bottom.x = copyPtr->x;
 		hitCylinder.m_bottom.y = copyPtr->y;
 		hitCylinder.m_bottom.z = copyPtr->z;
@@ -2626,7 +2624,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 			PSVECAdd(startPosVec, &rayDir, &m_comboCenter);
 		}
 		const CVector& down = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
-		CMapCylinder floorCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
+		CMapCylinder floorCylinder;
 		floorCylinder.m_bottom = m_comboCenter;
 		floorCylinder.m_axis = *(Vec*)&down;
 		floorCylinder.m_radius = FLOAT_80331a78;
@@ -2832,7 +2830,7 @@ void CGPartyObj::checkTargetParticle()
 
 			CVector bottom = CVector(*centerPos) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
 
-			CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
+			CMapCylinder hitCylinder;
 			hitCylinder.m_bottom = bottom;
 			hitCylinder.m_axis = move;
 			hitCylinder.m_radius = radius;
@@ -2854,7 +2852,7 @@ void CGPartyObj::checkTargetParticle()
 		PSVECAdd(centerPlusUp, move, targetPos);
 
 		const CVector& down = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
-		CMapCylinder floorCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
+		CMapCylinder floorCylinder;
 		floorCylinder.m_bottom.x = targetPos->x;
 		floorCylinder.m_bottom.y = targetPos->y;
 		floorCylinder.m_bottom.z = targetPos->z;
@@ -2911,7 +2909,7 @@ void CGPartyObj::moveCenterTargetParticle()
 
 	CVector bottomResult = hitPos + yOffset;
 
-	CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
+	CMapCylinder hitCylinder;
 	hitCylinder.m_bottom.x = bottomResult.x;
 	hitCylinder.m_bottom.y = bottomResult.y;
 	hitCylinder.m_bottom.z = bottomResult.z;
@@ -4666,7 +4664,7 @@ void CGPartyObj::gpmCol()
 		float halfHeight = m_capsuleHalfHeight;
 		const CVector& bottom = CVector(pos->x, FLOAT_80331A98 + pos->y, pos->z);
 
-		CMapCylinder cylinder(FLOAT_80331a9c, FLOAT_80331aa0);
+		CMapCylinder cylinder;
 		cylinder.m_bottom.x = bottom.x;
 		cylinder.m_bottom.y = bottom.y;
 		cylinder.m_bottom.z = bottom.z;

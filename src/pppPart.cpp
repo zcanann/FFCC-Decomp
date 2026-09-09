@@ -2213,7 +2213,7 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 	if (kPppPartZero != cylScale)
 	{
 		u32 cylinderAttribute = pppMngSt->m_cylinderAttribute;
-		CMapCylinder cylinder(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
+		CMapCylinder cylinder;
 		cylinder.m_bottom = *origin;
 		cylinder.m_axis = *vector;
 		cylinder.m_radius = cylScale;

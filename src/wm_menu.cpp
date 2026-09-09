@@ -1352,26 +1352,18 @@ void CMenuPcs::destroyWorld()
  */
 inline void CMenuPcs::CalcMainMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
-	if (worldState == 0) {
-		return;
-	}
-
-	CalcMainMenuSub();
-	CalcWMFrame();
-
-	const short state = worldState->m_mainState;
-	const short subState = worldState->m_subState;
-	if (state > 0 && state < 4) {
-		CalcChara();
-		CalcPitcher();
-	}
-	if (subState == 0 || subState == 1 || subState == 4 || state >= 3) {
-		CalcFukidashi();
-	}
-	if (worldState->m_changeRequest != 0) {
-		WMChgMenu();
+	if (m_wmWorldState->m_mainState <= 4) {
+		const short state = m_wmWorldState->m_mainState;
+		int frameStep;
+		if (state == 0) {
+			frameStep = m_wmWorldState->m_frameCounter - 10;
+		} else if (state > 0 && state < 4) {
+			frameStep = 0;
+		} else {
+			frameStep = -m_wmWorldState->m_frameCounter;
+		}
+		CalcWMFrame0(frameStep);
+		CalcMainMenuSub();
 	}
 }
 
@@ -1417,19 +1409,7 @@ void CMenuPcs::CalcDiaryMenu()
 
 	switch (m_wmWorldState->m_menuMode) {
 	case 0:
-		if (m_wmWorldState->m_mainState <= 4) {
-			const short state = m_wmWorldState->m_mainState;
-			int frameStep;
-			if (state == 0) {
-				frameStep = m_wmWorldState->m_frameCounter - 10;
-			} else if (state > 0 && state < 4) {
-				frameStep = 0;
-			} else {
-				frameStep = -m_wmWorldState->m_frameCounter;
-			}
-			CalcWMFrame0(frameStep);
-		}
-		CalcMainMenuSub();
+		CalcMainMenu();
 		break;
 	case 1:
 		calcWorld();
@@ -1445,18 +1425,7 @@ void CMenuPcs::CalcDiaryMenu()
 		}
 		break;
 	case 4:
-		if (((m_wmWorldState->m_mainState != 0) || bytes[0x12] != 0) &&
-		    m_wmWorldState->m_mainState <= 3) {
-			if (Game.m_gameWork.m_chaliceElement != m_crystalElem) {
-				SetCrystalCageAttr();
-			}
-			if (Game.m_gameWork.m_timerA != m_manaWaterTimerA) {
-				SetManaWaterEffect();
-			}
-			CalcFukidashi();
-			CalcPitcher();
-			CalcWMFrame();
-		}
+		CalcMoveMenu();
 		break;
 	case 5:
 		CalcLoadMenu();
@@ -2195,17 +2164,18 @@ inline void CMenuPcs::CalcCMakeMenu()
  */
 inline void CMenuPcs::CalcMoveMenu()
 {
-	WmWorldState* const worldState = m_wmWorldState;
-	if (worldState == 0) {
-		return;
-	}
-
-	CalcMainMenuSub();
-	CalcWMFrame();
-	CalcFukidashi();
-	CalcCharaBase();
-	if (worldState->m_mainState > 0 && worldState->m_mainState < 4) {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	if (((m_wmWorldState->m_mainState != 0) || bytes[0x12] != 0) &&
+	    m_wmWorldState->m_mainState <= 3) {
+		if (Game.m_gameWork.m_chaliceElement != m_crystalElem) {
+			SetCrystalCageAttr();
+		}
+		if (Game.m_gameWork.m_timerA != m_manaWaterTimerA) {
+			SetManaWaterEffect();
+		}
+		CalcFukidashi();
 		CalcPitcher();
+		CalcWMFrame();
 	}
 }
 

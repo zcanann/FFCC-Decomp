@@ -38,20 +38,6 @@ inline void* operator new(unsigned long, void* ptr)
 	return ptr;
 }
 
-extern const float kCFlatAngleHalfTurnDeg;
-extern const float kCFlatAnglePi;
-extern "C" const float FLOAT_80330140;
-extern "C" const float FLOAT_80330144;
-extern "C" const float FLOAT_80330148;
-extern "C" const float FLOAT_8033014C;
-extern "C" const float FLOAT_80330150;
-extern "C" const float FLOAT_80330154;
-extern "C" const float FLOAT_80330180;
-extern "C" const float FLOAT_80330184;
-extern "C" const float FLOAT_80330188;
-extern "C" const float FLOAT_8033018C;
-extern "C" const float FLOAT_80330190;
-
 CFlatRuntime2 CFlat ATTRIBUTE_ALIGN(32);
 CFlatRuntime2& gCFlatRuntime2 = CFlat;
 CGBaseObj m_objBase[0x28];
@@ -1345,7 +1331,7 @@ void CFlatRuntime2::Calc()
 		reinterpret_cast<float*>(header)[4] = SwapToF32(CameraPcs.m_targetY);
 		reinterpret_cast<float*>(header)[5] = SwapToF32(CameraPcs.m_targetZ);
 		reinterpret_cast<float*>(header)[6] = SwapToF32(CameraPcs.m_fov);
-		reinterpret_cast<float*>(header)[7] = SwapToF32((kCFlatAngleHalfTurnDeg * CameraPcs.m_zRotate) / kCFlatAnglePi);
+		reinterpret_cast<float*>(header)[7] = SwapToF32((180.0f * CameraPcs.m_zRotate) / 3.1415927f);
 
 		u32* objectData = saveData + 8;
 
@@ -1416,9 +1402,9 @@ void CFlatRuntime2::Calc()
 void CFlatRuntime2::Draw()
 {
 	CFont* font = MenuPcs.m_fonts[0];
-	font->SetScale(FLOAT_80330180);
+	font->SetScale(0.65f);
 	font->SetShadow(1);
-	font->SetMargin(FLOAT_80330140);
+	font->SetMargin(1.0f);
 	font->SetZMode(0, 0);
 	font->DrawInit();
 	font->SetTlut(7);
@@ -1433,15 +1419,15 @@ void CFlatRuntime2::Draw()
 	}
 
 	font->SetZMode(0, 0);
-	font->SetPosZ(FLOAT_80330144);
+	font->SetPosZ(0.0f);
 	Mtx44 projection;
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 
 	font = MenuPcs.m_fonts[0];
-	font->SetScale(FLOAT_80330184);
+	font->SetScale(0.85f);
 	font->SetShadow(1);
-	font->SetMargin(FLOAT_80330140);
+	font->SetMargin(1.0f);
 	font->SetZMode(1, 1);
 	font->DrawInit();
 
@@ -1454,7 +1440,7 @@ void CFlatRuntime2::Draw()
 	}
 
 	font->SetZMode(0, 0);
-	font->SetPosZ(FLOAT_80330144);
+	font->SetPosZ(0.0f);
 	Mtx44 projection2;
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection2);
 	GXSetProjection(projection2, GX_PERSPECTIVE);
@@ -1536,8 +1522,8 @@ void CFlatRuntime2::Draw()
 			PSVECNormalize(&entry->m_to, &entry->m_to);
 
 			const float dot = PSVECDotProduct(&up, &entry->m_to);
-			if (dot < FLOAT_80330188) {
-				if (dot < FLOAT_8033018C) {
+			if (dot < 0.99999f) {
+				if (dot < -0.99999f) {
 					length = -length;
 				} else {
 					float angle = acosf(dot);
@@ -1556,18 +1542,18 @@ void CFlatRuntime2::Draw()
 			GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 0x20);
 			float* vtx = verts;
 			for (int j = 0; j < 8; j++) {
-				const float angle = FLOAT_80330190 * static_cast<float>(j);
+				const float angle = 0.7853982f * static_cast<float>(j);
 				vtx[0] = entry->m_radius * sinf(angle);
 				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
 				if (entry->m_flagBits.m_bit7 != 0) {
 					GXWGFifo.f32 = vtx[0];
 					GXWGFifo.f32 = vtx[1];
-					GXWGFifo.f32 = FLOAT_80330144;
+					GXWGFifo.f32 = 0.0f;
 				} else {
-					GXWGFifo.f32 = FLOAT_80330144;
-					GXWGFifo.f32 = FLOAT_80330144;
-					GXWGFifo.f32 = FLOAT_80330144;
+					GXWGFifo.f32 = 0.0f;
+					GXWGFifo.f32 = 0.0f;
+					GXWGFifo.f32 = 0.0f;
 				}
 				GXWGFifo.f32 = vtx[0];
 				GXWGFifo.f32 = vtx[1];
@@ -1577,7 +1563,7 @@ void CFlatRuntime2::Draw()
 
 			vtx = verts;
 			for (int j = 0; j < 8; j++) {
-				const float angle = FLOAT_80330190 * static_cast<float>(j);
+				const float angle = 0.7853982f * static_cast<float>(j);
 				vtx[0] = entry->m_radius * sinf(angle);
 				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
@@ -1658,7 +1644,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 				    (center->z + radius >= object->m_worldPosition.z)) {
 					Vec offset;
 					PSVECSubtract(&object->m_worldPosition, center, &offset);
-					offset.y = FLOAT_80330144;
+					offset.y = 0.0f;
 
 					const float distanceSq = PSVECSquareMag(&offset);
 					if ((0.0f < distanceSq) && (distanceSq < radiusSq)) {
@@ -1666,9 +1652,9 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 						if (distance < radius) {
 							if ((flags & 2) != 0) {
 								Vec facing;
-								PSVECScale(&offset, &offset, FLOAT_80330140 / distance);
+								PSVECScale(&offset, &offset, 1.0f / distance);
 								facing.x = sin(angle);
-								facing.y = FLOAT_80330144;
+								facing.y = 0.0f;
 								facing.z = cos(angle);
 								if (PSVECDotProduct(&offset, &facing) <= 0.0f) {
 									goto advance;
@@ -1825,7 +1811,7 @@ void CFlatRuntime2::drawLayer(
 	Mtx texMtx;
 	Mtx44 ortho;
 	Mtx identity;
-	C_MTXOrtho(ortho, FLOAT_80330144, FLOAT_80330148, FLOAT_80330144, FLOAT_8033014C, FLOAT_80330144, FLOAT_80330150);
+	C_MTXOrtho(ortho, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, -100.0f);
 	GXSetProjection(ortho, GX_ORTHOGRAPHIC);
 
 	PSMTXIdentity(identity);
@@ -1850,7 +1836,7 @@ void CFlatRuntime2::drawLayer(
 
 	const float texW = static_cast<float>(static_cast<unsigned int>(texture->m_width));
 	const float texH = static_cast<float>(static_cast<unsigned int>(texture->m_height));
-	PSMTXScale(texMtx, FLOAT_80330140 / texW, FLOAT_80330140 / texH, FLOAT_80330140);
+	PSMTXScale(texMtx, 1.0f / texW, 1.0f / texH, 1.0f);
 	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 	GXSetNumTexGens(1);
 	GXSetTexCoordGen2(
@@ -1869,33 +1855,34 @@ void CFlatRuntime2::drawLayer(
 	int v1 = texV + height;
 	float xAnchor;
 	if ((flags & 1) != 0) {
-		xAnchor = FLOAT_80330154 * scaleX;
+		xAnchor = 0.5f * scaleX;
 	} else {
-		xAnchor = FLOAT_80330144;
+		xAnchor = 0.0f;
 	}
 	const float x0 = static_cast<float>(x) - xAnchor;
 	float yAnchor;
 	if ((flags & 1) != 0) {
-		yAnchor = FLOAT_80330154 * scaleY;
+		yAnchor = 0.5f * scaleY;
 	} else {
-		yAnchor = FLOAT_80330144;
+		yAnchor = 0.0f;
 	}
 	const float y0 = static_cast<float>(y) - yAnchor;
 	const float x1 = x0 + scaleX;
 	const float y1 = y0 + scaleY;
+	float z = 0.0f;
 
 	if (blendMode != 3) {
 		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-		GXPosition3f32(x0, y0, FLOAT_80330144);
+		GXPosition3f32(x0, y0, z);
 		GXTexCoord2s16(texU, texV);
 
-		GXPosition3f32(x1, y0, FLOAT_80330144);
+		GXPosition3f32(x1, y0, z);
 		GXTexCoord2s16(u1, texV);
 
-		GXPosition3f32(x1, y1, FLOAT_80330144);
+		GXPosition3f32(x1, y1, z);
 		GXTexCoord2s16(u1, v1);
 
-		GXPosition3f32(x0, y1, FLOAT_80330144);
+		GXPosition3f32(x0, y1, z);
 		GXTexCoord2s16(texU, v1);
 	} else {
 		GXSetNumTexGens(2);
@@ -1920,8 +1907,8 @@ void CFlatRuntime2::drawLayer(
 			CColor backColor;
 			CColor rectColor;
 
-			int rectW = static_cast<int>(scaleX * FLOAT_80330154);
-			int rectH = static_cast<int>(scaleY * FLOAT_80330154);
+			int rectW = static_cast<int>(scaleX * 0.5f);
+			int rectH = static_cast<int>(scaleY * 0.5f);
 
 			float bx;
 			if ((quad & 1) != 0) {
@@ -1956,19 +1943,19 @@ void CFlatRuntime2::drawLayer(
 
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 
-			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY), FLOAT_80330144);
+			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY), z);
 			GXTexCoord2s16(quadU0, quadV0);
 			GXTexCoord2s16(0, 0);
 
-			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY), FLOAT_80330144);
+			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY), z);
 			GXTexCoord2s16(quadU0 + rectW, quadV0);
 			GXTexCoord2s16(2, 0);
 
-			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY + rectH), FLOAT_80330144);
+			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY + rectH), z);
 			GXTexCoord2s16(quadU0 + rectW, quadV0 + rectH);
 			GXTexCoord2s16(2, 2);
 
-			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY + rectH), FLOAT_80330144);
+			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY + rectH), z);
 			GXTexCoord2s16(quadU0, quadV0 + rectH);
 			GXTexCoord2s16(0, 2);
 		}
@@ -2004,7 +1991,7 @@ void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
 	m_particleWorkPos.x = pos.x;
 	m_particleWorkPos.y = pos.y;
 	m_particleWorkPos.z = pos.z;
-	m_particleWorkPosAngle = FLOAT_80330144;
+	m_particleWorkPosAngle = 0.0f;
 	ParticleWorkPosPtr(this) = ParticleWorkPosValues(this);
 	ParticleWorkPosVecPtr(this) = ParticleWorkPosVecValues(this);
 	m_particleWorkScale.z = scale;
@@ -2078,7 +2065,7 @@ void CFlatRuntime2::SetParticleWorkPos(Vec& vec, float angle)
 	ParticleWorkPosX(this) = vec.x;
 	ParticleWorkPosY(this) = vec.y;
 	ParticleWorkPosZ(this) = vec.z;
-	ParticleWorkPosAngle(this) = kCFlatAngleHalfTurnDeg * angle / kCFlatAnglePi;
+	ParticleWorkPosAngle(this) = 180.0f * angle / 3.1415927f;
 	ParticleWorkPosPtr(this) = &ParticleWorkPosX(this);
 	ParticleWorkPosVecPtr(this) = &ParticleWorkPosVecBase(this);
 }

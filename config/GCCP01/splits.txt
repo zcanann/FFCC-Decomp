@@ -858,7 +858,7 @@ cflat_runtime2.cpp:
 	.bss        start:0x80299F40 end:0x802E78E0
 	.sdata      start:0x8032E6C8 end:0x8032E6D8
 	.sbss       start:0x8032ED98 end:0x8032EDA0
-	.sdata2     start:0x80330194 end:0x803301A4
+	.sdata2     start:0x80330138 end:0x803301A8
 
 chara.cpp:
 	extab       start:0x80007480 end:0x800075E0

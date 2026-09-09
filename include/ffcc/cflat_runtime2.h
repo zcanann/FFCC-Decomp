@@ -13,8 +13,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern "C" const float FLOAT_80330140;
-
 class CGObject;
 class CFlatRuntime;
 class CGBaseObj;
@@ -109,8 +107,8 @@ public:
 			m_trace = 0;
 			m_color0 = 0;
 			m_color1 = 0;
-			m_speed = FLOAT_80330140;
-			m_colorLerp = FLOAT_80330140;
+			m_speed = 1.0f;
+			m_colorLerp = 1.0f;
 			m_enable = 0;
 		}
 

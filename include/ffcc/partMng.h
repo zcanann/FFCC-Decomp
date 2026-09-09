@@ -268,9 +268,9 @@ struct _pppDataHead
     unsigned short m_shapeCount;      // 0xa
     unsigned short m_shapeGroupCount; // 0xc
     // Padding                        // 0xe
-    unsigned int m_cacheChunks;       // 0x10
-    unsigned int m_modelNames;        // 0x14
-    unsigned int m_shapeNames;        // 0x18
+    pppCacheChunk* m_cacheChunks;     // 0x10
+    pppModelSt** m_models;            // 0x14
+    pppShapeSt** m_shapes;            // 0x18
     pppShapeGroupRaw* m_shapeGroups;  // 0x1c
 }; // Size 0x20
 

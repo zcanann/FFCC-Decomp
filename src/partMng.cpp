@@ -688,23 +688,23 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     pdt = pdtSlot->m_pppDataHead;
     if (pdt != 0) {
         for (int i = 0; i < pdt->m_modelCount; i++) {
-            pppModelSt* model = reinterpret_cast<pppModelSt**>(pdt->m_modelNames)[i];
+            pppModelSt* model = pdt->m_models[i];
             model->Release();
         }
 
-        if (reinterpret_cast<pppModelSt**>(pdt->m_modelNames) != 0) {
-            delete[] reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
-            pdt->m_modelNames = 0;
+        if (pdt->m_models != 0) {
+            delete[] pdt->m_models;
+            pdt->m_models = 0;
         }
 
         for (int i = 0; i < pdt->m_shapeCount; i++) {
-            pppShapeSt* shape = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames)[i];
+            pppShapeSt* shape = pdt->m_shapes[i];
             shape->Release();
         }
 
-        if (reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames) != 0) {
-            delete[] reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames);
-            pdt->m_shapeNames = 0;
+        if (pdt->m_shapes != 0) {
+            delete[] pdt->m_shapes;
+            pdt->m_shapes = 0;
         }
 
         for (int i = 0; i < pdt->m_shapeGroupCount; i++) {
@@ -721,11 +721,11 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         }
 
         for (int i = 0; i < pdt->m_cacheChunkCount; i++) {
-            ppvAmemCacheSet.DestroyCache(reinterpret_cast<pppCacheChunk*>(pdt->m_cacheChunks)[i].m_cacheIndex);
+            ppvAmemCacheSet.DestroyCache(pdt->m_cacheChunks[i].m_cacheIndex);
         }
 
         if (pdt->m_cacheChunks != 0) {
-            operator delete(reinterpret_cast<void*>(pdt->m_cacheChunks));
+            operator delete(pdt->m_cacheChunks);
             pdt->m_cacheChunks = 0;
         }
 
@@ -2646,7 +2646,7 @@ void CPartMng::pppPartCalc()
             {
                 _pppDataHead* pdtHead = *reinterpret_cast<_pppDataHead**>(mng->m_pppResSet);
                 pppCacheChunk* partResource =
-                    &reinterpret_cast<pppCacheChunk*>(pdtHead->m_cacheChunks)[mng->m_partIndex];
+                    &pdtHead->m_cacheChunks[mng->m_partIndex];
 
                 if (ppvAmemCacheSet.IsEnable(partResource->m_cacheIndex) == 0) {
                     partResource->m_pdt = reinterpret_cast<long*>(
@@ -3089,8 +3089,8 @@ inline void CPartMng::pppInitEnv(_pppEnvSt* env, _pppDataHead* dataHead, unsigne
     ppvEnv = env;
     env->m_materialSetPtr = m_materialSet;
     if (dataHead != 0) {
-        env->m_mapMeshPtr = reinterpret_cast<CMapMesh**>(dataHead->m_modelNames);
-        env->m_shapeTablePtr = reinterpret_cast<pppShapeSt**>(dataHead->m_shapeNames);
+        env->m_mapMeshPtr = reinterpret_cast<CMapMesh**>(dataHead->m_models);
+        env->m_shapeTablePtr = dataHead->m_shapes;
         env->m_shapeGroupPtr = dataHead->m_shapeGroups;
     }
     if (heapSize != 0) {

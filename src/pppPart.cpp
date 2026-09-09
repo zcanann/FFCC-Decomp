@@ -36,6 +36,9 @@ STATIC_ASSERT(offsetof(pppShapeGroupRaw, m_meshIndex) == 0x0);
 STATIC_ASSERT(offsetof(pppShapeGroupRaw, m_vertexCount) == 0x2);
 STATIC_ASSERT(offsetof(pppShapeGroupRaw, m_vertexIndices) == 0x4);
 STATIC_ASSERT(sizeof(_pppDataHead) == 0x20);
+STATIC_ASSERT(offsetof(_pppDataHead, m_cacheChunks) == 0x10);
+STATIC_ASSERT(offsetof(_pppDataHead, m_models) == 0x14);
+STATIC_ASSERT(offsetof(_pppDataHead, m_shapes) == 0x18);
 STATIC_ASSERT(offsetof(_pppDataHead, m_shapeGroups) == 0x1C);
 STATIC_ASSERT(offsetof(_pppProgSetDef, m_drawFlags) == 0xC);
 STATIC_ASSERT(offsetof(_pppProgSetDef, m_startFrame) == 0x10);
@@ -778,7 +781,7 @@ inline void pppCacheUnLoadModel(short* modelList, _pppDataHead* head)
 	{
 		short modelIndex = *modelList;
 		modelList++;
-		pppModelSt* model = ((pppModelSt**)head->m_modelNames)[modelIndex];
+		pppModelSt* model = head->m_models[modelIndex];
 		ppvAmemCacheSet.Release(model->m_cacheId);
 		model->pppCacheUnLoadModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
 		i++;
@@ -803,7 +806,7 @@ inline void pppCacheUnLoadShape(short* shapeList, _pppDataHead* head)
 	{
 		short shapeIndex = *shapeList;
 		shapeList++;
-		pppShapeSt* shape = ((pppShapeSt**)head->m_shapeNames)[shapeIndex];
+		pppShapeSt* shape = head->m_shapes[shapeIndex];
 		pppCacheUnLoadShapeTexture(shape, PartMng.m_materialSet);
 		i++;
 	}
@@ -852,7 +855,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 		if (pppMngSt->m_hasMapRef != 0)
 		{
 			CPartMng::PppPdtSlot* slot = (CPartMng::PppPdtSlot*)pppMngSt->m_pppResSet;
-			pppCacheChunk* chunk = &((pppCacheChunk*)slot->m_pppDataHead->m_cacheChunks)[pppMngSt->m_partIndex];
+			pppCacheChunk* chunk = &slot->m_pppDataHead->m_cacheChunks[pppMngSt->m_partIndex];
 			if (chunk->m_cacheIndex != -1)
 			{
 				ppvAmemCacheSet.Release(chunk->m_cacheIndex);
@@ -1326,7 +1329,7 @@ inline void pppCacheLoadModel(short* modelList, _pppDataHead* head)
 	short modelCount = *modelList++;
 	for (short i = 0; i < modelCount; i++)
 	{
-		pppModelSt* mapMesh = ((pppModelSt**)head->m_modelNames)[*modelList++];
+		pppModelSt* mapMesh = head->m_models[*modelList++];
 		if (ppvAmemCacheSet.IsEnable(mapMesh->m_cacheId) == 0)
 		{
 			mapMesh->Ptr2Off();
@@ -1358,7 +1361,7 @@ void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 		short shapeIndex = *shapeList;
 		shapeList = shapeList + 1;
 		pppCacheLoadShapeTexture(
-		    *(pppShapeSt**)(pppDataHead->m_shapeNames + shapeIndex * 4),
+		    pppDataHead->m_shapes[shapeIndex],
 		    PartMng.m_materialSet);
 		++i;
 	}
@@ -1519,7 +1522,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 
 /*
  * --INFO--
- * PAL Address: 80054d88
+ * PAL Address: 0x80054D88
  * PAL Size: 804b
  * EN Address: TODO
  * EN Size: TODO
@@ -1530,16 +1533,19 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 {
 	u8* dataBase = reinterpret_cast<u8*>(&pppDataHead->m_version);
 
-	pppDataHead->m_cacheChunks = pppDataHead->m_cacheChunks + reinterpret_cast<u32>(dataBase);
-	pppDataHead->m_modelNames = pppDataHead->m_modelNames + reinterpret_cast<u32>(dataBase);
-	pppDataHead->m_shapeNames = pppDataHead->m_shapeNames + reinterpret_cast<u32>(dataBase);
+	pppDataHead->m_cacheChunks = reinterpret_cast<pppCacheChunk*>(
+	    dataBase + reinterpret_cast<u32>(pppDataHead->m_cacheChunks));
+	pppDataHead->m_models = reinterpret_cast<pppModelSt**>(
+	    dataBase + reinterpret_cast<u32>(pppDataHead->m_models));
+	pppDataHead->m_shapes = reinterpret_cast<pppShapeSt**>(
+	    dataBase + reinterpret_cast<u32>(pppDataHead->m_shapes));
 	pppDataHead->m_shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(
 	    dataBase + reinterpret_cast<u32>(pppDataHead->m_shapeGroups));
 
 	int* chunkOffsets = reinterpret_cast<int*>(pppDataHead->m_cacheChunks);
 	pppCacheChunk* cacheChunks = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620)
 	    pppCacheChunk[pppDataHead->m_cacheChunkCount];
-	pppDataHead->m_cacheChunks = reinterpret_cast<u32>(cacheChunks);
+	pppDataHead->m_cacheChunks = cacheChunks;
 
 	for (int i = 0; i < pppDataHead->m_cacheChunkCount; i++) {
 		u8* chunkSrc = (u8*)(chunkOffsets[0] + (int)dataBase);
@@ -1547,16 +1553,16 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 		u8* chunkData = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x626) u8[chunkSize];
 
 		memcpy(chunkData, chunkSrc, chunkSize);
-		reinterpret_cast<pppCacheChunk*>(pppDataHead->m_cacheChunks)[i].m_cacheIndex =
+		pppDataHead->m_cacheChunks[i].m_cacheIndex =
 		    ppvAmemCacheSet.SetData(chunkData, chunkSize, CAmemCache::PDT, param_3);
 		delete chunkData;
 		chunkOffsets++;
 	}
 
-	char* modelName = reinterpret_cast<char*>(pppDataHead->m_modelNames);
+	char* modelName = reinterpret_cast<char*>(pppDataHead->m_models);
 	pppModelSt** modelRefs = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x636)
 	    pppModelSt*[pppDataHead->m_modelCount];
-	pppDataHead->m_modelNames = reinterpret_cast<u32>(modelRefs);
+	pppDataHead->m_models = modelRefs;
 
 	for (int i = 0; i < pppDataHead->m_modelCount; i++) {
 		u32 j = 0;
@@ -1574,14 +1580,14 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 		model = foundModel;
 
 		modelName += 0x20;
-		reinterpret_cast<pppModelSt**>(pppDataHead->m_modelNames)[i] = model;
-		reinterpret_cast<pppModelSt**>(pppDataHead->m_modelNames)[i]->AddRef();
+		pppDataHead->m_models[i] = model;
+		pppDataHead->m_models[i]->AddRef();
 	}
 
-	char* shapeName = reinterpret_cast<char*>(pppDataHead->m_shapeNames);
+	char* shapeName = reinterpret_cast<char*>(pppDataHead->m_shapes);
 	pppShapeSt** shapeRefs = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x643)
 	    pppShapeSt*[pppDataHead->m_shapeCount];
-	pppDataHead->m_shapeNames = reinterpret_cast<u32>(shapeRefs);
+	pppDataHead->m_shapes = shapeRefs;
 
 	for (int i = 0; i < pppDataHead->m_shapeCount; i++) {
 		u32 j = 0;
@@ -1599,8 +1605,8 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 		shape = foundShape;
 
 		shapeName += 0x20;
-		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i] = shape;
-		reinterpret_cast<pppShapeSt**>(pppDataHead->m_shapeNames)[i]->AddRef();
+		pppDataHead->m_shapes[i] = shape;
+		pppDataHead->m_shapes[i]->AddRef();
 	}
 
 	pppShapeGroupRaw* shapeGroups = pppDataHead->m_shapeGroups;

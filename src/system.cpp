@@ -325,7 +325,7 @@ void CSystem::ExecScenegraph()
         {
             if ((stepTrigger & 8) != 0)
             {
-                m_scenegraphStepMode = (unsigned int)__cntlzw((unsigned int)m_scenegraphStepMode) >> 5;
+                m_scenegraphStepMode = !m_scenegraphStepMode;
             }
             else if ((stepTrigger & 4) != 0)
             {
@@ -381,7 +381,7 @@ void CSystem::ExecScenegraph()
         int drawToggle;
         if (scenegraphStepMode == 1)
         {
-            drawToggle = ((unsigned int)__cntlzw(m_frameCounter & 3) >> 5) & 0xFF;
+            drawToggle = (m_frameCounter & 3) == 0;
         }
         else
         {

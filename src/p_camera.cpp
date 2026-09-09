@@ -282,10 +282,10 @@ void CCameraPcs::calcFunnyShape()
     stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).stickYF;
     m_viewer.m_rotX = -((0.2f * stick) - m_viewer.m_rotX);
 
-    stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).triggerLeftF;
+    stick = Pad.GetTriggerLeft(4);
     m_viewer.m_distance = -((2.0f * stick) - m_viewer.m_distance);
 
-    stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).triggerRightF;
+    stick = Pad.GetTriggerRight(4);
     m_viewer.m_distance = 2.0f * stick + m_viewer.m_distance;
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
@@ -383,10 +383,10 @@ void CCameraPcs::calcMaterialEditor()
     stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).stickYF;
     m_viewer.m_rotX = -((0.2f * stick) - m_viewer.m_rotX);
 
-    stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).triggerLeftF;
+    stick = Pad.GetTriggerLeft(4);
     m_viewer.m_distance = -((2.0f * stick) - m_viewer.m_distance);
 
-    stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).triggerRightF;
+    stick = Pad.GetTriggerRight(4);
     m_viewer.m_distance = 2.0f * stick + m_viewer.m_distance;
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
@@ -1204,10 +1204,10 @@ void CCameraPcs::calcChara()
         stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).stickYF;
         m_viewer.m_rotX = -((0.2f * stick) - m_viewer.m_rotX);
 
-        stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).triggerLeftF;
+        stick = Pad.GetTriggerLeft(4);
         m_viewer.m_distance = -((5.0f * stick) - m_viewer.m_distance);
 
-        stick = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(4).triggerRightF;
+        stick = Pad.GetTriggerRight(4);
         m_viewer.m_distance = 5.0f * stick + m_viewer.m_distance;
     }
 
@@ -1497,14 +1497,10 @@ void CCameraPcs::calc()
                              : CameraPadInput(0).stickXF;
         m_distance += 5.0f * triggerL;
 
-        float triggerR = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
-                             ? 0.0f
-                             : CameraPadInput(0).triggerLeftF;
+        float triggerR = Pad.GetTriggerLeft(0);
         float lateral = 5.0f * triggerR;
 
-        float moveInOut = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
-                              ? 0.0f
-                              : CameraPadInput(0).triggerRightF;
+        float moveInOut = Pad.GetTriggerRight(0);
         lateral -= 5.0f * moveInOut;
 
         float sinY;

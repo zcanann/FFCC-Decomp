@@ -232,7 +232,7 @@ void CCharaPcs::drawViewer()
                 for (unsigned int lightIndex = 0; lightIndex < 3; lightIndex++) {
                     LightPcs.SetDiffuse(lightIndex, self->m_viewerDiffuseColor[0][lightIndex],
                                         &self->m_viewerDiffusePos[lightIndex],
-                                        (__cntlzw(2 - lightIndex) >> 5) & 0xFF);
+                                        lightIndex == 2);
                 }
 
                 Mtx scratchMtx;
@@ -403,35 +403,8 @@ void CCharaPcs::calcViewer()
         Graphic.Printf("[%c] %s", (int)(char)pFan[(alive >> 4) % 4], USBPcs.m_rootPath);
     }
 
-    unsigned int heldButtons;
-    unsigned int triggerButtons;
-    u16 heldButtonsRaw;
-    u16 triggerButtonsRaw;
-    int debugPadLock = Pad.m_debugPadLock;
-    bool padDisabled = false;
-    if ((debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
-        padDisabled = true;
-    }
-    if (padDisabled) {
-        heldButtonsRaw = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-        heldButtonsRaw = Pad.GetPadInputs()[padIndex].button[0];
-    }
-    heldButtons = heldButtonsRaw;
-    padDisabled = false;
-    if ((debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
-        padDisabled = true;
-    }
-    if (padDisabled) {
-        triggerButtonsRaw = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-        triggerButtonsRaw = Pad.GetPadInputs()[padIndex].buttonDown[0];
-    }
-    triggerButtons = triggerButtonsRaw;
+    unsigned int heldButtons = Pad.GetButton(0);
+    unsigned int triggerButtons = Pad.GetButtonDown(0);
 
     if ((self->m_viewerModel[0] != 0) && (self->m_viewerResetIFrame != 0)) {
         if (self->m_viewerIFrameEnabled == 0) {
@@ -452,10 +425,10 @@ void CCharaPcs::calcViewer()
     }
 
     if ((triggerButtons & 0x800) != 0) {
-        self->m_viewerDrawGrid = (__cntlzw(self->m_viewerDrawGrid) >> 5) & 0xFF;
+        self->m_viewerDrawGrid = !self->m_viewerDrawGrid;
     }
     if ((triggerButtons & 0x400) != 0) {
-        self->m_viewerStepMode = (__cntlzw(self->m_viewerStepMode) >> 5) & 0xFF;
+        self->m_viewerStepMode = !self->m_viewerStepMode;
     }
 
     float frameAdvance;

@@ -92,6 +92,8 @@ public:
     float GetRightStickX(long);
     float GetLeftStickY(long);
     float GetLeftStickX(long);
+    float GetTriggerLeft(long);
+    float GetTriggerRight(long);
     unsigned short GetButtonRepeat(long);
     unsigned short GetButton(long);
     int IsGba(long);
@@ -216,6 +218,58 @@ inline unsigned short CPad::GetDebugButtonDown(long padIndex)
     }
 
     return static_cast<unsigned short>(result);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float CPad::GetTriggerLeft(long padIndex)
+{
+    const bool shouldZero = padIndex == 0
+        ? (m_debugPadLock != 0 || m_debugPadPort != -1)
+        : m_debugPadLock != 0;
+    float result;
+
+    if (shouldZero) {
+        result = 0.0f;
+    } else {
+        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
+        result = GetPadInputs()[resolvedIndex].triggerLeftF;
+    }
+
+    return result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline float CPad::GetTriggerRight(long padIndex)
+{
+    const bool shouldZero = padIndex == 0
+        ? (m_debugPadLock != 0 || m_debugPadPort != -1)
+        : m_debugPadLock != 0;
+    float result;
+
+    if (shouldZero) {
+        result = 0.0f;
+    } else {
+        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
+        result = GetPadInputs()[resolvedIndex].triggerRightF;
+    }
+
+    return result;
 }
 
 /*

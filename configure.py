@@ -599,7 +599,7 @@ config.libs = [
             Object(NonMatching, "pppBreathModel.cpp"),
             Object(Matching, "pppCallBackDistance.cpp"),
             Object(Matching, "pppChangeBGColor.cpp"),
-            Object(NonMatching, "pppChangeTex.cpp"),
+            Object(NonMatching, "pppChangeTex.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "pppCharaBreak.cpp"),
             Object(Matching, "pppCharaZEnvCtrl.cpp"),
             Object(Matching, "pppColAccele.cpp"),

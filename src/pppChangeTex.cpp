@@ -32,16 +32,7 @@ STATIC_ASSERT(offsetof(ChangeTexWork, m_bboxMax) == 0x38);
 STATIC_ASSERT(offsetof(ChangeTexWork, m_cachedValue) == 0x44);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 
-static const float kPppChangeTexCachedValueInit = -10000.0f;
-static const unsigned int sPppChangeTexMeshObjectName = 0x6F626A00;
-static const float kPppChangeTexAlphaScale = 255.0f;
-static const float kPppChangeTexInit = 0.0f;
 static const char s_pppChangeTex_cpp[] = "pppChangeTex.cpp";
-
-static inline float LoadFloat(const float& value)
-{
-	return value;
-}
 
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
@@ -146,7 +137,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 
 	ChangeTexMeshRef* meshList = ChangeTexMeshes(model0);
 	if ((work->m_meshColorArrays == 0) && (work->m_displayListArrays == 0)) {
-		work->m_cachedValue = LoadFloat(kPppChangeTexCachedValueInit);
+		work->m_cachedValue = -10000.0f;
 		work->m_meshColorArrays = (GXColor**)pppMemAlloc(
 		    model0->m_data->m_meshCount << 2, ppvEnv->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp), 0x163);
@@ -157,7 +148,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 		GXColor** colorArray = work->m_meshColorArrays;
 		for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++, meshList++) {
 			ChangeTexMeshData* meshData = meshList->m_data;
-			if (strcmp(meshData->m_name, reinterpret_cast<const char*>(&sPppChangeTexMeshObjectName)) == 0) {
+			if (strcmp(meshData->m_name, "obj") == 0) {
 				gUtil.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax, meshList->m_workPositions,
 				    meshData->m_vertexCount, model0->m_data->m_posQuant);
 			}
@@ -205,8 +196,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 	work->m_cachedValue = currentValue;
 
 	double alphaBase =
-	    (double)(LoadFloat(kPppChangeTexAlphaScale) *
-	             ((float)colorBlock->m_color.rgba[3] / LoadFloat(kPppChangeTexAlphaScale)));
+	    (double)(255.0f *
+	             ((float)colorBlock->m_color.rgba[3] / 255.0f));
 
 	meshList = ChangeTexMeshes(model0);
 	for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++, meshList++) {
@@ -325,7 +316,7 @@ freeArrays:
 void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
 	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
-	float init = LoadFloat(kPppChangeTexInit);
+	float init = 0.0f;
 
 	work->m_value0 = init;
 	work->m_value2 = init;
@@ -343,7 +334,7 @@ void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
  */
 void pppConstructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
-	float init = LoadFloat(kPppChangeTexInit);
+	float init = 0.0f;
 	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
 
 	work->m_value0 = init;

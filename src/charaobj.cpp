@@ -2056,7 +2056,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		CGObjWork* work = reinterpret_cast<CGObjWork*>(m_scriptHandle);
 		if (work->m_statusTimers[staIndex] != 0) {
 			System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
-			return work->m_statusTimers[staIndex];
+			CGObjWork* work2 = reinterpret_cast<CGObjWork*>(m_scriptHandle);
+			return work2->m_statusTimers[staIndex];
 		}
 	}
 

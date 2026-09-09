@@ -1106,8 +1106,8 @@ void CGame::LoadFinished()
  */
 CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
 {
-    static s16 s_top[] = {0, 2, 4, 0};
     static float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
+    static s16 s_top[] = {0, 2, 4};
 
     int stage =
         Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
@@ -1115,8 +1115,8 @@ CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
         stage = 2;
     }
 
-    int scaledAmount = (int)((float)amount * s_ratio[ratioIndex - 1]);
     int stageBase = s_top[stage];
+    int scaledAmount = (int)((float)amount * s_ratio[ratioIndex - 1]);
 
     u16 thresholds[4];
     memset(thresholds, 0, sizeof(thresholds));
@@ -1158,23 +1158,15 @@ int CGame::GetFoodLevel(int playerIndex, int foodIndex)
  * --INFO--
  * PAL Address: 0x800143A4
  * PAL Size: 72b
- * EN Address: 0x8001CBF8
- * EN Size: 204b
+ * EN Address: 0x8001423C
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGame::GetTargetCursor(int playerIndex, Vec& posA, Vec& posB)
 {
-    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptFoodBase[playerIndex]);
-
-    posA.x = caravanWork->m_targetCursorPosA.x;
-    posA.y = caravanWork->m_targetCursorPosA.y;
-    posA.z = caravanWork->m_targetCursorPosA.z;
-
-    caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptFoodBase[playerIndex]);
-    posB.x = caravanWork->m_targetCursorPosB.x;
-    posB.y = caravanWork->m_targetCursorPosB.y;
-    posB.z = caravanWork->m_targetCursorPosB.z;
+    posA = reinterpret_cast<CCaravanWork*>(m_scriptFoodBase[playerIndex])->m_targetCursorPosA;
+    posB = reinterpret_cast<CCaravanWork*>(m_scriptFoodBase[playerIndex])->m_targetCursorPosB;
 }
 
 /*

@@ -158,7 +158,7 @@ STATIC_ASSERT(offsetof(Mc::CharaDat, m_letters) == 0x104);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_evtFlags) == 0x5B8);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_evtWordArr) == 0x6B8);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_unknown8B8) == 0x8B8);
-STATIC_ASSERT(offsetof(Mc::CharaDat, m_unknown8BC) == 0x8BC);
+STATIC_ASSERT(offsetof(Mc::CharaDat, m_jobType) == 0x8BC);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_exists) == 0x5B4);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_isAway) == 0x8C0);
 STATIC_ASSERT(offsetof(Mc::CharaDat, m_isGuest) == 0x8C1);
@@ -1154,7 +1154,7 @@ void CMemoryCardMan::MakeSaveData()
         memcpy(savedCharacter.m_evtFlags, caravanWork->m_evtFlags, sizeof(savedCharacter.m_evtFlags));
         memcpy(savedCharacter.m_evtWordArr, caravanWork->m_evtWordArr, sizeof(savedCharacter.m_evtWordArr));
         savedCharacter.m_unknown8B8 = caravanWork->unk_0x3a8;
-        savedCharacter.m_unknown8BC = caravanWork->unk_0x3ac;
+        savedCharacter.m_jobType = caravanWork->m_jobType;
         savedCharacter.m_isAway = caravanWork->m_shopBusyFlag;
         savedCharacter.m_isGuest = caravanWork->m_caravanLocalFlags;
         savedCharacter.m_hasCharacterId = caravanWork->unk_0xc1e;
@@ -1349,7 +1349,7 @@ void CMemoryCardMan::SetLoadData()
         memcpy(caravanWork->m_evtFlags, savedCharacter.m_evtFlags, sizeof(savedCharacter.m_evtFlags));
         memcpy(caravanWork->m_evtWordArr, savedCharacter.m_evtWordArr, sizeof(savedCharacter.m_evtWordArr));
         caravanWork->unk_0x3a8 = savedCharacter.m_unknown8B8;
-        caravanWork->unk_0x3ac = savedCharacter.m_unknown8BC;
+        caravanWork->m_jobType = savedCharacter.m_jobType;
         caravanWork->m_shopBusyFlag = savedCharacter.m_isAway;
         caravanWork->m_caravanLocalFlags = savedCharacter.m_isGuest;
         caravanWork->unk_0xc1e = savedCharacter.m_hasCharacterId;
@@ -2075,7 +2075,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         memcpy(dstCharacter.m_evtFlags, srcCharacter.m_evtFlags, sizeof(dstCharacter.m_evtFlags));
         memcpy(dstCharacter.m_evtWordArr, srcCharacter.m_evtWordArr, sizeof(dstCharacter.m_evtWordArr));
         dstCharacter.m_unknown8B8 = srcCharacter.m_unknown8B8;
-        dstCharacter.m_unknown8BC = srcCharacter.m_unknown8BC;
+        dstCharacter.m_jobType = srcCharacter.m_jobType;
         dstCharacter.m_hasCharacterId = srcCharacter.m_hasCharacterId;
         dstCharacter.m_characterId = srcCharacter.m_characterId;
         dstCharacter.m_originSerial = srcSave.m_mcSerial;

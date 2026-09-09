@@ -116,7 +116,7 @@ CCaravanWork::CCaravanWork()
 {
 	m_shopState = 0;
 	unk_0x3a8 = 0;
-	unk_0x3ac = 0;
+	m_jobType = 0;
 	m_objType = 0;
 	m_joybusCaravanId = -1;
 	sprintf((char*)m_name, const_cast<char*>(sUnnamedItemName));
@@ -202,7 +202,7 @@ void CCaravanWork::LoadInit()
 {
 	m_shopState = 0;
 	unk_0x3a8 = 0;
-	unk_0x3ac = 0;
+	m_jobType = 0;
 	m_objType = 0;
 	m_joybusCaravanId = -1;
 	sprintf((char*)m_name, const_cast<char*>(sUnnamedItemName));
@@ -990,7 +990,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		if ((condBits & 0x7FFF) != 0) {
 			int excludeFlag = condBits & 0x8000;
 			if ((condBits & 0x0001) != 0) {
-				if (unk_0x3ac == 0) {
+				if (m_jobType == 0) {
 					if (excludeFlag == 0) {
 						goto PassedLinkConditions;
 					}
@@ -999,7 +999,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				}
 			}
 			if ((condBits & 0x0002) != 0) {
-				if (unk_0x3ac == 1) {
+				if (m_jobType == 1) {
 					if (excludeFlag == 0) {
 						goto PassedLinkConditions;
 					}
@@ -1008,7 +1008,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				}
 			}
 			if ((condBits & 0x0004) != 0) {
-				if (unk_0x3ac == 2) {
+				if (m_jobType == 2) {
 					if (excludeFlag == 0) {
 						goto PassedLinkConditions;
 					}
@@ -1017,7 +1017,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				}
 			}
 			if ((condBits & 0x0008) != 0) {
-				if (unk_0x3ac == 3) {
+				if (m_jobType == 3) {
 					if (excludeFlag == 0) {
 						goto PassedLinkConditions;
 					}
@@ -1026,7 +1026,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				}
 			}
 			if ((condBits & 0x0010) != 0) {
-				if (unk_0x3ac == 4) {
+				if (m_jobType == 4) {
 					if (excludeFlag == 0) {
 						goto PassedLinkConditions;
 					}
@@ -1035,7 +1035,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				}
 			}
 			if ((condBits & 0x0020) != 0) {
-				if (unk_0x3ac == 5) {
+				if (m_jobType == 5) {
 					if (excludeFlag == 0) {
 						goto PassedLinkConditions;
 					}
@@ -1044,7 +1044,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				}
 			}
 			if ((condBits & 0x0040) != 0) {
-				if (unk_0x3ac == 6) {
+				if (m_jobType == 6) {
 					if (excludeFlag == 0) {
 						goto PassedLinkConditions;
 					}
@@ -1053,7 +1053,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				}
 			}
 			if ((condBits & 0x0080) != 0) {
-				if (unk_0x3ac == 7) {
+				if (m_jobType == 7) {
 					if (excludeFlag == 0) {
 						goto PassedLinkConditions;
 					}

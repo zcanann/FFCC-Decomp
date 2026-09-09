@@ -39,6 +39,7 @@ STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_compatibility) == 4);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_mapPosition) == 0x36);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_commandSlots) == 0xC2);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_commandSlotCount) == 0xD3);
+STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_jobType) == 0xD5);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_equipment) == 0xD7);
 
 STATIC_ASSERT(sizeof(GbaCMakeInfo) == 0x20);
@@ -666,10 +667,65 @@ inline void GbaQueue::ChgCmdLstData(int channel, unsigned int data)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void GbaQueue::SetSellData(int channel, unsigned int value)
+{
+	unsigned char* bytes = reinterpret_cast<unsigned char*>(&value);
+	const int itemId =
+		Game.m_scriptFoodBase[channel]->m_inventoryItems[static_cast<int>(bytes[2])];
+	Game.m_scriptFoodBase[channel]->DeleteItemIdx(bytes[2], 1);
+	const unsigned short baseGil =
+		reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_price;
+	const float shopRate = static_cast<float>(static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
+	int gil = static_cast<int>(shopRate * 0.25f * static_cast<float>(baseGil));
+	if (gil < 1) {
+		gil = 1;
+	}
+	Game.m_scriptFoodBase[channel]->AddGil(gil);
+	Joybus.SendResult(channel, 0, bytes[0], bytes[1]);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void GbaQueue::SetBuyData(int channel, unsigned int value)
+{
+	unsigned char* bytes = reinterpret_cast<unsigned char*>(&value);
+	int n;
+	const int quantity = bytes[3];
+	unsigned int shopItem = Game.m_scriptFoodBase[channel]->m_shopList[bytes[2]];
+	for (n = 0; n < quantity; n++) {
+		bool added = Game.m_scriptFoodBase[channel]->AddItem(shopItem, 0);
+		if (added == false) {
+			Joybus.SendResult(channel, 1, bytes[0], bytes[1]);
+		}
+	}
+	const unsigned short baseGil =
+		reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[shopItem].m_price;
+	const float shopRate = static_cast<float>(static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
+	const int gil = static_cast<int>(shopRate * static_cast<float>(baseGil));
+	Game.m_scriptFoodBase[channel]->AddGil(-(gil * quantity));
+	Joybus.SendResult(channel, 0, bytes[0], bytes[1]);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800CFF38
  * PAL Size: 2972b
- * EN Address: 0x800E08B8
- * EN Size: 2004b
+ * EN Address: 0x800CF784
+ * EN Size: 2844b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -811,44 +867,11 @@ void GbaQueue::ExecutQueue()
 						Game.m_scriptFoodBase[channel]->CallShop(0, 0, 0, 0, 0);
 					} else if (cmdBytes[1] == 8) {
 						if (Game.m_scriptFoodBase[channel] != 0) {
-							unsigned int cmdWord = queueWords[i];
-							unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
-							const int itemId =
-								Game.m_scriptFoodBase[channel]->m_inventoryItems[static_cast<int>(bytes[2])];
-							Game.m_scriptFoodBase[channel]->DeleteItemIdx(bytes[2], 1);
-							const unsigned short baseGil =
-								reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_price;
-							int gil = static_cast<int>(
-								static_cast<float>(
-									static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0)
-								* 0.25f * static_cast<float>(baseGil));
-							if (gil < 1) {
-								gil = 1;
-							}
-							Game.m_scriptFoodBase[channel]->AddGil(gil);
-							Joybus.SendResult(channel, 0, bytes[0], bytes[1]);
+							SetSellData(channel, queueWords[i]);
 						}
 					} else if (cmdBytes[1] == 9) {
 						if (Game.m_scriptFoodBase[channel] != 0) {
-							unsigned int cmdWord = queueWords[i];
-							unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
-							int n;
-							const int quantity = bytes[3];
-							unsigned int shopItem = Game.m_scriptFoodBase[channel]->m_shopList[bytes[2]];
-							for (n = 0; n < quantity; n++) {
-								bool added = Game.m_scriptFoodBase[channel]->AddItem(shopItem, 0);
-								if (added == false) {
-									Joybus.SendResult(channel, 1, bytes[0], bytes[1]);
-								}
-							}
-							const unsigned short baseGil =
-								reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[shopItem].m_price;
-							const int gil = static_cast<int>(
-								static_cast<float>(
-									static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0)
-								* static_cast<float>(baseGil));
-							Game.m_scriptFoodBase[channel]->AddGil(-(gil * quantity));
-							Joybus.SendResult(channel, 0, bytes[0], bytes[1]);
+							SetBuyData(channel, queueWords[i]);
 						}
 					} else if (cmdBytes[1] == 10) {
 						if (Game.m_scriptFoodBase[channel] != 0) {
@@ -908,26 +931,6 @@ void GbaQueue::ExecutQueue()
 			}
 		}
 	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void GbaQueue::SetSellData(int, unsigned int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-inline void GbaQueue::SetBuyData(int, unsigned int)
-{
-	// TODO
 }
 
 /*
@@ -1237,8 +1240,8 @@ inline void GbaQueue::LoadAllStat()
  * --INFO--
  * PAL Address: 0x800CEF70
  * PAL Size: 1916b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CE7D4
+ * EN Size: 1916b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1280,7 +1283,7 @@ void GbaQueue::LoadPlayerStat()
 				}
 
 				entry->m_maxHp = static_cast<signed char>(caravanWork->m_maxHp);
-				entry->m_hp = static_cast<signed char>(caravanWork->m_hp);
+				entry->m_hp = static_cast<char>(caravanWork->m_hp);
 				{
 					int tribeAppearance = (caravanWork->m_tribeId & 3) |
 					                                      ((caravanWork->m_appearanceVariant & 3) << 2);
@@ -1336,7 +1339,7 @@ void GbaQueue::LoadPlayerStat()
 				entry->m_strength[1] = static_cast<unsigned char>(caravanWork->m_defense > 99 ? 99 : caravanWork->m_defense);
 				entry->m_strength[2] = static_cast<unsigned char>(caravanWork->m_magic > 99 ? 99 : caravanWork->m_magic);
 				entry->m_bonusCondition = caravanWork->m_bonusCondition;
-				entry->_padD5 = static_cast<unsigned char>(caravanWork->unk_0x3ac);
+				entry->m_jobType = static_cast<unsigned char>(caravanWork->m_jobType);
 
 				memcpy(entry->m_items, caravanWork->m_inventoryItems, sizeof(entry->m_items));
 				{
@@ -1384,10 +1387,10 @@ void GbaQueue::LoadPlayerStat()
 
 			if (Game.m_partyObjArr[i] != 0) {
 				entry->m_hasPartyObj = 1;
-				short posX = static_cast<short>(Game.m_partyObjArr[i]->m_worldPosition.x / 3.0f);
-				short posZ = static_cast<short>(Game.m_partyObjArr[i]->m_worldPosition.z / 3.0f);
-				entry->m_mapPosition[0] = posX;
-				entry->m_mapPosition[1] = posZ;
+				int posX = static_cast<int>(Game.m_partyObjArr[i]->m_worldPosition.x / 3.0f);
+				int posZ = static_cast<int>(Game.m_partyObjArr[i]->m_worldPosition.z / 3.0f);
+				entry->m_mapPosition[0] = static_cast<short>(posX);
+				entry->m_mapPosition[1] = static_cast<short>(posZ);
 			}
 
 			entry++;
@@ -1429,7 +1432,7 @@ void GbaQueue::LoadPlayerStat()
 			}
 		}
 
-		if (static_cast<char>(oldPlayer.m_useItem) != static_cast<char>(newPlayer.m_useItem)) {
+		if (oldPlayer.m_useItem != newPlayer.m_useItem) {
 			m_chgUseItemFlags = static_cast<unsigned char>(m_chgUseItemFlags | (1 << i));
 		}
 		if (memcmp(oldPlayer.m_strength, newPlayer.m_strength, sizeof(oldPlayer.m_strength)) != 0) {
@@ -1529,10 +1532,10 @@ void GbaQueue::LoadEnemyStat()
 
 /*
  * --INFO--
- * PAL Address: 0x800cebe4
+ * PAL Address: 0x800CEBE4
  * PAL Size: 436b
- * EN Address: 0x800E3050
- * EN Size: 608b
+ * EN Address: 0x800CE448
+ * EN Size: 436b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1557,9 +1560,9 @@ void GbaQueue::LoadMapItemStat()
 				if ((dropItemCode & 0xC000) == 0x4000) {
 					mapItemEntry->m_kind = 4;
 				} else {
-					const SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+					const SItemFlatRow* itemRow = &reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[dropItemCode];
 					const int bossStageLimit = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex] + 2;
-					const int itemStage = itemRows[dropItemCode].m_stage;
+					const int itemStage = itemRow->m_stage;
 					if (itemStage >= bossStageLimit) {
 						mapItemEntry->m_kind = 5;
 					} else {
@@ -1571,10 +1574,10 @@ void GbaQueue::LoadMapItemStat()
 				numMapItems++;
 				mapItemEntry->m_radarEnabled = isDispRader != 0;
 				{
-					short posX = static_cast<short>(object->m_worldPosition.x / 3.0f);
-					short posZ = static_cast<short>(object->m_worldPosition.z / 3.0f);
-					mapItemEntry->m_posX = posX;
-					mapItemEntry->m_posZ = posZ;
+					int posX = static_cast<int>(object->m_worldPosition.x / 3.0f);
+					int posZ = static_cast<int>(object->m_worldPosition.z / 3.0f);
+					mapItemEntry->m_posX = static_cast<short>(posX);
+					mapItemEntry->m_posZ = static_cast<short>(posZ);
 				}
 				mapItemEntry++;
 			}
@@ -1604,8 +1607,8 @@ void GbaQueue::LoadMapItemStat()
  * --INFO--
  * PAL Address: 0x800CE9AC
  * PAL Size: 568b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CE210
+ * EN Size: 568b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1656,8 +1659,8 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 		player++;
 	}
 
-	baseX = basePlayer->m_mapPosition[0];
-	baseZ = basePlayer->m_mapPosition[1];
+	baseX = localPlayerData[channel].m_mapPosition[0];
+	baseZ = localPlayerData[channel].m_mapPosition[1];
 
 	packet[1] = nearbyMask;
 	packet[2] = static_cast<unsigned char>(localPlayerData[0].m_mapPosition[0] - baseX);
@@ -1676,8 +1679,8 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
  * --INFO--
  * PAL Address: 0x800CE76C
  * PAL Size: 576b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CDFD0
+ * EN Size: 576b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1734,9 +1737,8 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
         }
     }
 
-    count = 0;
     outPtr = reinterpret_cast<unsigned char*>(outData);
-    for (j = 0; j < 0x40; j++) {
+    for (j = count = 0; j < 0x40; j++) {
         localEntry = &localEnemyData[j];
         prevWalk = &prevEntry[j];
         if ((localEntry->m_visible != 0 || prevWalk->m_visible != localEntry->m_visible) && memcmp(localEntry, prevWalk, sizeof(*localEntry)) != 0) {
@@ -1758,8 +1760,8 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
  * --INFO--
  * PAL Address: 0x800CE56C
  * PAL Size: 512b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CDDD0
+ * EN Size: 512b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1769,10 +1771,10 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	GbaQueueMapEntity* localEntry;
 	GbaQueueMapEntity* prevEntry;
 	GbaQueueMapEntity* prevWalk;
-	unsigned char* outPtr;
+	unsigned char* outPtr = reinterpret_cast<unsigned char*>(outData);
 	short baseX;
 	short baseZ;
-	int count = 0;
+	int count;
 	int i;
 
 	if (m_singleMode != 0) {
@@ -1809,10 +1811,9 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 		localEntry++;
 	}
 
-	localEntry = localMapItems;
-	prevWalk = prevEntry;
-	outPtr = reinterpret_cast<unsigned char*>(outData);
-	for (i = 0; i < m_mapItemCount; i++) {
+	for (i = count = 0; i < m_mapItemCount; i++) {
+		localEntry = &localMapItems[i];
+		prevWalk = &prevEntry[i];
 		if ((localEntry->m_visible != 0 || prevWalk->m_visible != localEntry->m_visible) && memcmp(localEntry, prevWalk, sizeof(*localEntry)) != 0) {
 			count++;
 			outPtr[0] = 0x21;
@@ -1821,9 +1822,6 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 			outPtr[3] = static_cast<unsigned char>(localEntry->m_posZ);
 			outPtr += 4;
 		}
-
-		localEntry++;
-		prevWalk++;
 	}
 
 	*outCount = count;
@@ -1896,8 +1894,8 @@ void GbaQueue::GetCaravanName(char* outName)
  * --INFO--
  * PAL Address: 0x800CDFC0
  * PAL Size: 832b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CD824
+ * EN Size: 832b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1908,23 +1906,22 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 	unsigned int artifacts[3];
 	unsigned short tmpArtifacts[4];
 	unsigned short commandSlots[8];
-	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	localPlayerData = m_playerData[channel];
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	for (i = 0; i < 0x40; i++) {
+	for (int i = 0; i < 0x40; i++) {
 		itemList[i] = __lhbrx(&localPlayerData.m_items[i], 0);
 	}
 	memcpy(outData, itemList, sizeof(itemList));
 
-	artifacts[0] = __lwbrx(&localPlayerData.m_artifacts[0], 0);
-	artifacts[1] = __lwbrx(&localPlayerData.m_artifacts[1], 0);
-	artifacts[2] = __lwbrx(&localPlayerData.m_artifacts[2], 0);
+	for (int i = 0; i < 3; i++) {
+		artifacts[i] = __lwbrx(&localPlayerData.m_artifacts[i], 0);
+	}
 	memcpy(outData + 0x80, artifacts, sizeof(artifacts));
 
-	for (i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		tmpArtifacts[i] = __lhbrx(&localPlayerData.m_tmpArtifacts[i], 0);
 	}
 	memcpy(outData + 0x8C, tmpArtifacts, sizeof(tmpArtifacts));
@@ -1934,7 +1931,7 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 	outData[0x96] = localPlayerData.m_equipment[2];
 	outData[0x97] = localPlayerData.m_equipment[3];
 
-	for (i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) {
 		commandSlots[i] = __lhbrx(&localPlayerData.m_commandSlots[i], 0);
 	}
 	memcpy(outData + 0x98, commandSlots, sizeof(commandSlots));
@@ -1947,22 +1944,19 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
  * --INFO--
  * PAL Address: 0x800CDF38
  * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CD79C
+ * EN Size: 136b
  * JP Address: TODO
  * JP Size: TODO
  */
 unsigned int GbaQueue::GetScrFlg()
 {
-	int i;
-	unsigned int flag;
-
-	for (i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	flag = (m_scrInitEnd != 0);
-	for (i = 0; i < 4; i++) {
+	bool flag = (m_scrInitEnd != 0);
+	for (int i = 0; i < 4; i++) {
 		OSSignalSemaphore(accessSemaphores + i);
 	}
 
@@ -1980,10 +1974,12 @@ unsigned int GbaQueue::GetScrFlg()
  */
 int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 {
-	char hpFlags = 0;
-	char prevHpFlags = 0;
+	char hpFlags;
+	char prevHpFlags;
 	char prevHp;
 	char hp;
+
+	hpFlags = prevHpFlags = 0;
 
 	for (int i = 0; i < 4; i++) {
 		OSWaitSemaphore(accessSemaphores + i);
@@ -1993,29 +1989,29 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 			prevHp = m_playerHistory[i].m_hp;
 		}
 		if (m_playerData[i].m_hp != 0) {
-			hpFlags = static_cast<char>(hpFlags | (1 << i));
+			hpFlags |= 1 << i;
 		}
 		if (m_playerHistory[i].m_hp != 0) {
-			prevHpFlags = static_cast<char>(prevHpFlags | (1 << i));
+			prevHpFlags |= 1 << i;
 		}
 
 		OSSignalSemaphore(accessSemaphores + i);
 	}
 
-	unsigned int changed = prevHpFlags != hpFlags;
+	bool changed = hpFlags != prevHpFlags;
 
 	if (hp != prevHp) {
-		changed = 1;
+		changed = true;
 	}
 
 	int channelMask = 1 << channel;
 	char curShouki = static_cast<char>(m_outOfShoukiFlags & channelMask);
 	char prevShouki = static_cast<char>(m_prevOutOfShoukiFlags & channelMask);
 	if (hp != prevHp) {
-		changed = 1;
+		changed = true;
 	}
 	if (curShouki != prevShouki) {
-		changed = 1;
+		changed = true;
 	}
 
 	outData[0] = 0x13;
@@ -2023,7 +2019,7 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	outData[2] = static_cast<unsigned char>(hp);
 	outData[3] = ((static_cast<char>(m_outOfShoukiFlags) & channelMask) != 0);
 
-	return static_cast<unsigned char>(changed);
+	return changed;
 }
 
 /*
@@ -3000,7 +2996,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 	for (int i = 0; i < 8; i++) {
 		CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
 		if ((i != playerSlot) && (caravanWork->m_shopState != 0) && (caravanWork->m_caravanLocalFlags == 0) &&
-		    (static_cast<unsigned char>(caravanWork->unk_0x3ac) == valueBytes[2])) {
+		    (static_cast<unsigned char>(caravanWork->m_jobType) == valueBytes[2])) {
 			Joybus.SendResult(channel, 1, valueBytes[1], 0);
 			return;
 		}
@@ -3131,8 +3127,12 @@ void GbaQueue::ClrCompatibilityFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CBCC4
+ * PAL Size: 480b
+ * EN Address: 0x800CB528
+ * EN Size: 480b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 {
@@ -3141,16 +3141,14 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	unsigned char* writePtr;
 	int outSize;
 	int selectedCount;
-	int playerOffset;
 	OSSemaphore* semaphore;
 
 	semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	playerOffset = channel * 0xDC;
-	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + playerOffset + 0x458, sizeof(compatibilityData));
+	memcpy(compatibilityData, m_playerData[channel].m_compatibility, sizeof(compatibilityData));
 	OSSignalSemaphore(semaphore);
 
-	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[playerOffset + 0x529];
+	outCompatibility[0] = m_playerData[channel].m_jobType;
 	count = 2;
 	if (compatibilityData[3] != 0) {
 		count++;
@@ -3904,18 +3902,17 @@ void GbaQueue::SetResetFlg(int channel)
 
 /*
  * --INFO--
- * PAL Address: 0x800ca888
+ * PAL Address: 0x800CA888
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CA0EC
+ * EN Size: 100b
  * JP Address: TODO
  * JP Size: TODO
  */
 int GbaQueue::GetBonus(int channel)
 {
-	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 	OSWaitSemaphore(accessSemaphores + channel);
-	int value = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0xCE]);
+	int value = m_playerData[channel].m_bonusCondition;
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value;
 }
@@ -3960,8 +3957,8 @@ void GbaQueue::ClrArtifactFlg(int channel)
  * --INFO--
  * PAL Address: 0x800CA5D4
  * PAL Size: 468b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C9E38
+ * EN Size: 468b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3974,25 +3971,26 @@ int GbaQueue::GetArtifactData(int channel, unsigned char* outData)
 	localPlayerData = m_playerData[channel];
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	artifactData[0] = __lwbrx(&localPlayerData.m_artifacts[0], 0);
-	artifactData[1] = __lwbrx(&localPlayerData.m_artifacts[1], 0);
-	artifactData[2] = __lwbrx(&localPlayerData.m_artifacts[2], 0);
+	for (int i = 0; i < 3; i++) {
+		artifactData[i] = __lwbrx(&localPlayerData.m_artifacts[i], 0);
+	}
 	memcpy(outData, artifactData, sizeof(artifactData));
 	return 0xC;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CA56C
+ * PAL Size: 104b
+ * EN Address: 0x800C9DD0
+ * EN Size: 104b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int GbaQueue::GetUseItemFlg(int channel)
 {
-	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
-	int result;
 	OSWaitSemaphore(accessSemaphores + channel);
-	char value = compatibilityStr[channel * 0xDC + 0x1F];
-	result = static_cast<int>(value);
+	int result = m_playerData[channel].m_useItem;
 	OSSignalSemaphore(accessSemaphores + channel);
 	return result;
 }
@@ -4126,8 +4124,8 @@ void GbaQueue::ClrArtiDatFlg(int channel)
  * --INFO--
  * PAL Address: 0x800CA030
  * PAL Size: 400b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C9894
+ * EN Size: 400b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -4153,13 +4151,12 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	}
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 	unsigned int artifactData[3];
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	artifactData[0] = __lwbrx(reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x24), 0);
-	artifactData[1] = __lwbrx(reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x28), 0);
-	artifactData[2] = __lwbrx(reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x2C), 0);
+	for (int i = 0; i < 3; i++) {
+		artifactData[i] = __lwbrx(&m_playerData[channel].m_artifacts[i], 0);
+	}
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	memcpy(outData, artifactData, sizeof(artifactData));

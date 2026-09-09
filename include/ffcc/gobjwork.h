@@ -315,7 +315,7 @@ public:
     short m_backupWeaponIdx;                    // 0x03A2
     int m_shopState;                            // 0x03A4
     int unk_0x3a8;                              // 0x03A8
-    int unk_0x3ac;                              // 0x03AC
+    int m_jobType;                              // 0x03AC
     unsigned int m_equipEffectFlags;            // 0x03B0
     int m_joybusCaravanId;                      // 0x03B4
     unsigned short m_letterMeta[8];             // 0x03B8

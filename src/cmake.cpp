@@ -3792,7 +3792,7 @@ void CMenuPcs::CalcSingCMake()
                             caravanWork->LoadInit();
                             caravanWork->m_shopState = 1;
                             caravanWork->unk_0x3a8 = 0x101;
-                            caravanWork->unk_0x3ac = static_cast<int>(s_CmakeInfo.m_job);
+                            caravanWork->m_jobType = static_cast<int>(s_CmakeInfo.m_job);
                             memset(caravanWork->m_name, 0, 0x11);
                             strcpy(reinterpret_cast<char*>(caravanWork->m_name), s_CmakeInfo.m_name);
                             caravanWork->m_tribeId = static_cast<unsigned short>(s_CmakeInfo.m_tribe);

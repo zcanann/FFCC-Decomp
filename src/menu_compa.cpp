@@ -282,7 +282,7 @@ void CMenuPcs::CompaDraw()
 	compaList = this->m_compaList;
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
 
-	const char* job = GetJobStr(caravanWork->unk_0x3ac);
+	const char* job = GetJobStr(caravanWork->m_jobType);
 	font->GetWidth(job);
 	float jobY = static_cast<float>(compaList->entries[0].y + 0x20);
 	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));

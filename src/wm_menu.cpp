@@ -3354,8 +3354,6 @@ void CMenuPcs::DrawMainMenu()
  */
 void CMenuPcs::DrawDiaryMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-
 	GetWmWorldHandles(this)[1]->m_model->m_lightAlpha = FLOAT_803313e8;
 	{
 		SetProjection(1);
@@ -3379,31 +3377,7 @@ void CMenuPcs::DrawDiaryMenu()
 
 	DrawInit();
 
-	const int frame = static_cast<int>(System.m_frameCounter);
-	const int rem = (frame - frame / 0x14 * 0x14) - 10;
-	const int remSign = rem >> 31;
-	const int phase = (rem ^ remSign) - remSign;
-	const float scale = static_cast<float>(DOUBLE_80331450 * static_cast<double>(phase) + DOUBLE_80331448);
-	float x = static_cast<float>(DOUBLE_80331438 - static_cast<double>(FLOAT_80331440));
-	float y = FLOAT_80331444;
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor color;
-	color.r = 0xFF;
-	color.g = 0xFF;
-	color.b = 0xFF;
-	color.a = static_cast<unsigned char>(static_cast<int>(
-	    FLOAT_80331458 * static_cast<float>(DOUBLE_80331460 * static_cast<double>(phase) + DOUBLE_803313F8)));
-	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
-	x = static_cast<float>((FLOAT_80331468 - FLOAT_80331468 * scale) * DOUBLE_803313F8 + static_cast<double>(x));
-	y = static_cast<float>((FLOAT_80331440 - FLOAT_80331440 * scale) * DOUBLE_803313F8 + static_cast<double>(y));
-	if ((bytes[0xF] & 2) != 0) {
-		MenuPcs.DrawRect(8, x, y, FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, FLOAT_803313dc);
-	}
-	x = x + FLOAT_8033146C;
-	if ((bytes[0xF] & 1) != 0) {
-		MenuPcs.DrawRect(0, x, y, FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, FLOAT_803313dc);
-	}
+	DrawPageMark();
 }
 
 /*
@@ -4876,7 +4850,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		bytes[0xE] = static_cast<unsigned char>(value);
 		break;
 	case 13:
-		bytes[0xF] = static_cast<unsigned char>(value) & 3;
+		m_pageMarkFlags = static_cast<unsigned char>(value) & 3;
 		break;
 	case 14:
 		bytes[0x12] = value ? 1 : 0;
@@ -5012,7 +4986,7 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = *reinterpret_cast<signed char*>(bytes + 0xE);
 		break;
 	case 13:
-		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xF]));
+		result = static_cast<unsigned int>(static_cast<signed char>(m_pageMarkFlags));
 		break;
 	case 14:
 		result = bytes[0x12] ? 1 : 0;
@@ -9633,56 +9607,28 @@ void CMenuPcs::SetLight(int mode)
  */
 inline void CMenuPcs::DrawPageMark()
 {
-	int x;
-	int y;
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
-	float alpha = FLOAT_803313e8;
-	float cursorScale = FLOAT_803313e8;
-
-	if (worldState != 0) {
-		const short state = worldState->m_mainState;
-		const short step = worldState->m_frameCounter;
-		if (state == 0) {
-			alpha = static_cast<float>(step) * 0.1f;
-		} else if (state >= 3) {
-			alpha = 1.0f - static_cast<float>(step) * 0.1f;
-		}
-		if (state == 2) {
-			cursorScale += static_cast<float>(step & 3) * 0.1f;
-		}
-	}
-	if (alpha < 0.0f) {
-		alpha = 0.0f;
-	} else if (alpha > 1.0f) {
-		alpha = 1.0f;
-	}
-
+	const int phase = abs(static_cast<int>(System.m_frameCounter) % 20 - 10);
+	const float scale = static_cast<float>(0.03 * phase + 0.7);
+	float x = 220.0 - 40.0f;
+	float y = 369.0f;
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
-	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(static_cast<int>(
+	    255.0f * static_cast<float>(0.05 * phase + 0.5)));
+	GXSetChanMatColor(GX_COLOR0A0, color);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
 
-	const unsigned char cur = bytes[0x14];
-	unsigned char max = bytes[0x15];
-	if (max > 5) {
-		max = 5;
+	x = static_cast<float>((48.0f - 48.0f * scale) * 0.5 + x);
+	y = static_cast<float>((40.0f - 40.0f * scale) * 0.5 + y);
+	if ((m_pageMarkFlags & 2) != 0) {
+		MenuPcs.DrawRect(8, x, y, 48.0f, 40.0f, 0.0f, 0.0f, scale, scale, 0.0f);
 	}
-	for (unsigned int i = 0; i < max; i++) {
-		const float px = 0x20 + static_cast<float>(i * 0x14);
-		const float py = 0x1A0;
-		const float tx = (i == cur) ? 0.0f : 16.0f;
-		const float scale = (i == cur) ? cursorScale : 1.0f;
-		MenuPcs.DrawRect(0xFFFFFFFF, px, py, 16.0f, 16.0f, tx, 0.0f, scale, scale, 0.0f);
-	}
-
-	GetMcAccessPos(&x, &y);
-	if (x != static_cast<signed char>(0xFF) && y != static_cast<signed char>(0xFF) && x >= 0 && x < 0x280 && y >= 0 && y < 0x1C0) {
-		DrawCursor(x, y, cursorScale);
-	}
-	GetMcOdekakePos(&x, &y);
-	if (x != static_cast<signed char>(0xFF) && y != static_cast<signed char>(0xFF) && x >= 0 && x < 0x280 && y >= 0 && y < 0x1C0) {
-		DrawCursor(x, y, cursorScale);
+	x += 248.0f;
+	if ((m_pageMarkFlags & 1) != 0) {
+		MenuPcs.DrawRect(0, x, y, 48.0f, 40.0f, 0.0f, 0.0f, scale, scale, 0.0f);
 	}
 }
 

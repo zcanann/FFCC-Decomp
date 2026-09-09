@@ -828,7 +828,9 @@ public:
         WmCharaSelectEntry* m_charaSelectData;
     };
 
-    unsigned char m_pad04[0x14 - 0x04];
+    unsigned char m_pad04[0x0F - 0x04];
+    unsigned char m_pageMarkFlags;
+    unsigned char m_pad10[0x14 - 0x10];
     unsigned char m_mcRequestLocked;
     unsigned char m_pad15[0x18 - 0x15];
     signed char m_mcRequest;
@@ -999,6 +1001,7 @@ STATIC_ASSERT(sizeof(MenuWindowInfo) == 0x0C);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectEntry) == 0x48);
 STATIC_ASSERT(sizeof(CMenuPcs::MaterialInfo) == 0x0C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_pageMarkFlags) == 0x0F);
 STATIC_ASSERT(offsetof(CMenuPcs, m_mcCtrl) == 0x20);
 STATIC_ASSERT(offsetof(CMenuPcs, m_manaWaterTimerA) == 0x70);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectTimer) == 0x80);

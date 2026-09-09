@@ -571,12 +571,12 @@ void CCharaPcs::Init()
     m_charaAllocStage = 0;
     m_overlapEnabled = 0;
     CColor baseColor(0x00, 0x00, 0x40, 0x40);
-    m_texShadowColor = baseColor.color;
+    CopyColor(&m_texShadowColor, baseColor.color);
 
-    CVector baseVec(0.0f, 100.0f, 0.0f);
-    m_texShadowPos.x = baseVec.x;
-    m_texShadowPos.y = baseVec.y;
-    m_texShadowPos.z = baseVec.z;
+    Vec* constructedVec = CVector(0.0f, 100.0f, 0.0f);
+    m_texShadowPos.x = constructedVec->x;
+    m_texShadowPos.y = constructedVec->y;
+    m_texShadowPos.z = constructedVec->z;
     m_texShadowRadius = 500.0f;
     m_texShadowSize = 0x80;
     m_texShadowDistance = 100;

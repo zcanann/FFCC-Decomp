@@ -86,8 +86,6 @@ static const char sCFlatRuntime2GbaStringBlock[] =
 	"icon.dat\0\0\0\0"
 	"FF Crystal Chronicles\0\0";
 static const float sCFlatRuntime2ForwardVec[] = { 0.0f, 0.0f, 1.0f };
-static const char sCFlatRuntime2ClassName[] = "CFlatRuntime2";
-static const char sCFlatRuntimeClassName[] = "CFlatRuntime";
 static const char sCFlatRuntime2LayerMissingMsg[] =
 	"layer\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42%s\n";
 static const char sCFlatRuntime2TexturePathFmt[] = "dvd/%s%s.tex";
@@ -1071,7 +1069,7 @@ int CFlatRuntime2::Load(char* fileName)
 		do {
 			sprintf(path, sCFlatRuntime2DebugFileNameFmt, fileName);
 			if (debugIndex != 0) {
-				sprintf(path, "%s%d", path, debugIndex);
+				sprintf(path, "%s.%d", path, debugIndex);
 			}
 
 			fileHandle = File.Open(path, 0, CFile::PRI_LOW);

@@ -9,7 +9,6 @@
 
 static const char s_cflat_runtime_newline[] = "\n";
 extern const char lbl_8033011C[8] = "no name";
-extern const char s_CFlatRuntime_801D8EE8[] = "CFlatRuntime";
 static const char s_cflat_runtime_cpp[] = "cflat_runtime.cpp";
 
 /*

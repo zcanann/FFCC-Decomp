@@ -956,20 +956,15 @@ void CCameraPcs::destroyFullShadow()
 
 /*
  * --INFO--
- * PAL Address: 0x80038358
- * PAL Size: 624b
+ * PAL Address: UNUSED
+ * PAL Size: 512b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCameraPcs::createFullShadow()
+inline void CCameraPcs::createRampTex8()
 {
-    m_fullScreenShadow.m_shadowTexture = 0;
-    m_fullScreenShadow.m_shadowTexture =
-        new (MapMng.m_stage, const_cast<char*>(s_p_camera_cpp), 0x3A5)
-            u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
-
     m_fullScreenShadow.m_rampTexture = 0;
     unsigned int rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
     unsigned char* rampTex = new (MapMng.m_stage, const_cast<char*>(s_p_camera_cpp), 0x361) u8[rampTexSize];
@@ -986,21 +981,30 @@ void CCameraPcs::createFullShadow()
                     kCameraZeroF, kCameraZeroF, kCameraZeroF,
                     GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(rampTex, rampTexSize);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80038358
+ * PAL Size: 624b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CCameraPcs::createFullShadow()
+{
+    m_fullScreenShadow.m_shadowTexture = 0;
+    m_fullScreenShadow.m_shadowTexture =
+        new (MapMng.m_stage, const_cast<char*>(s_p_camera_cpp), 0x3A5)
+            u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
+
+    createRampTex8();
 
     m_fullScreenShadowEnabled = 1;
     m_fullScreenShadow.m_rotX = kCameraQuarterPi;
     m_fullScreenShadow.m_rotY = kCameraZeroF;
     m_fullScreenShadow.m_scale = kCameraOneThirdApprox;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::createRampTex8()
-{
-	// TODO
 }
 
 /*

@@ -46,11 +46,6 @@ static const char s_numNameFmt[] = "%d %s";
 static const char s_nameSep[] = " ";
 static const char s_nameNoSep[4] = "";
 static const char s_nameJoinFmt[] = "%s%s%s";
-extern const double kGameIntToDoubleBias = 4503601774854144.0;
-extern const float kGamePartyBoundsMinInit = 1.0E+10;
-extern const float kGamePartyBoundsMaxInit = -1.0E+10;
-extern const float kGameZero = 0.0;
-extern const float kGameSmallDelta = 0.001;
 extern "C" {
 const char s_defaultScriptName[] = "ffcc_0";
 const char s_gameDebugMarker[] = "*\n";
@@ -75,22 +70,7 @@ struct GameNameRow
     char* m_namePlural;
 };
 
-struct GameSoundLayout
-{
-    u8 m_pad[0x22BC];
-    int m_seMaxVolume;
-};
-
-static inline GameSoundLayout& GameSoundData(CSound& sound)
-{
-    return *reinterpret_cast<GameSoundLayout*>(&sound);
-}
-
 CGame Game;
-
-// Uninitialized
-static float sMapObjRotationAngle;
-static s8 sMapObjRotationInitialized;
 
 /*
  * --INFO--
@@ -116,12 +96,12 @@ inline int CGBaseObj::GetCID()
  * JP Size: TODO
  */
 inline CGame::CGame()
-    : m_partyMinX(kGamePartyBoundsMinInit)
-    , m_partyMinY(kGamePartyBoundsMinInit)
-    , m_partyMinZ(kGamePartyBoundsMinInit)
-    , m_partyMaxX(kGamePartyBoundsMaxInit)
-    , m_partyMaxY(kGamePartyBoundsMaxInit)
-    , m_partyMaxZ(kGamePartyBoundsMaxInit)
+    : m_partyMinX(1.0E+10f)
+    , m_partyMinY(1.0E+10f)
+    , m_partyMinZ(1.0E+10f)
+    , m_partyMaxX(-1.0E+10f)
+    , m_partyMaxY(-1.0E+10f)
+    , m_partyMaxZ(-1.0E+10f)
 {
 }
 
@@ -188,7 +168,7 @@ void CGame::Init()
     memset(m_startScriptName, 0, sizeof(m_startScriptName));
     m_frameCounterEnable = 1;
     gCFlatRuntime().CFlatRuntime::Init();
-    unkFloat_0xca10 = kGameSmallDelta;
+    unkFloat_0xca10 = 0.001f;
 }
 
 /*
@@ -489,8 +469,8 @@ void CGame::InitNewGame()
  * --INFO--
  * PAL Address: 0x80015280
  * PAL Size: 668b
- * EN Address: 0x8001B6C0
- * EN Size: 152b
+ * EN Address: 0x800150CC
+ * EN Size: 668b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -531,7 +511,7 @@ void CGame::clearWork()
     Sound.StopAndFreeAllSe(0);
     Wind.ClearAll();
 
-    GameSoundData(Sound).m_seMaxVolume = 0x7F;
+    Sound.SeMaxVolume(0x7F);
 
     CPtrArray<CMapLightHolder*>* mapLightHolderArr = &MapMng.GetMapLightHolderArray(0);
 
@@ -573,7 +553,7 @@ inline void CGame::clearWorkMap()
     Sound.StopAndFreeAllSe(0);
     Wind.ClearAll();
 
-    GameSoundData(Sound).m_seMaxVolume = 0x7F;
+    Sound.SeMaxVolume(0x7F);
 }
 
 /*
@@ -739,8 +719,8 @@ void CGame::ScriptChanging(char*)
  * --INFO--
  * PAL Address: 0x80014D04
  * PAL Size: 320b
- * EN Address: 0x8001BDC4
- * EN Size: 40b
+ * EN Address: 0x80014B50
+ * EN Size: 320b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -768,7 +748,7 @@ void CGame::ScriptChanged(char*, int)
     Sound.StopAndFreeAllSe(0);
     Wind.ClearAll();
 
-    GameSoundData(Sound).m_seMaxVolume = 0x7F;
+    Sound.SeMaxVolume(0x7F);
 }
 
 /*
@@ -867,8 +847,8 @@ void CGame::loadCfd()
  * --INFO--
  * PAL Address: 0x80014994
  * PAL Size: 508b
- * EN Address: 0x8001C248
- * EN Size: 356b
+ * EN Address: 0x8001482C
+ * EN Size: 508b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -881,12 +861,12 @@ void CGame::Calc()
         m_gameWork.m_frameCounter++;
     }
 
-    m_partyMinZ = kGamePartyBoundsMinInit;
-    m_partyMinY = kGamePartyBoundsMinInit;
-    m_partyMinX = kGamePartyBoundsMinInit;
-    m_partyMaxZ = kGamePartyBoundsMaxInit;
-    m_partyMaxY = kGamePartyBoundsMaxInit;
-    m_partyMaxX = kGamePartyBoundsMaxInit;
+    m_partyMinZ = 1.0E+10f;
+    m_partyMinY = 1.0E+10f;
+    m_partyMinX = 1.0E+10f;
+    m_partyMaxZ = -1.0E+10f;
+    m_partyMaxY = -1.0E+10f;
+    m_partyMaxX = -1.0E+10f;
 
     for (int i = 0; i < 4; i++) {
         CGPartyObj* partyObj = m_partyObjArr[i];
@@ -907,14 +887,10 @@ void CGame::Calc()
     CFlatRuntime2Storage().CFlatRuntime2::Frame(1, 0);
 
     if ((m_currentMapId == 0x21) && ((mapObjIdx = MapMng.GetMapObjIdx(0)) >= 0)) {
-            if (!sMapObjRotationInitialized) {
-                sMapObjRotationInitialized = true;
-                sMapObjRotationAngle = kGameZero;
-            }
-
-            sMapObjRotationAngle += kGameSmallDelta;
-            PSMTXRotRad(rotMtx, 'y', sMapObjRotationAngle);
-            MapMng.SetMapObjLMtx(mapObjIdx, rotMtx);
+        static float a = 0.0f;
+        a += 0.001f;
+        PSMTXRotRad(rotMtx, 'y', a);
+        MapMng.SetMapObjLMtx(mapObjIdx, rotMtx);
     }
 }
 

@@ -296,20 +296,6 @@ CFont* CMenuPcs::GetFont22()
 
 /*
  * --INFO--
- * PAL Address: 0x800B8FA0
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CSound::SeMaxVolume(int volume)
-{
-    m_seMaxVolume = volume;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B8FA8
  * PAL Size: 8b
  * EN Address: TODO

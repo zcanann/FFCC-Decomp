@@ -60,7 +60,19 @@ public:
     int DMACheck(int id) { return m_redSound.DMACheck(id); }
     int GetBgmMasterVolume() const { return m_bgmMasterVolume; }
     int GetSeMasterVolume() const { return m_seMasterVolume; }
-    void SeMaxVolume(int);
+    /*
+     * --INFO--
+     * PAL Address: 0x800B8FA0
+     * PAL Size: 8b
+     * EN Address: 0x800B883C
+     * EN Size: 8b
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    void SeMaxVolume(int volume)
+    {
+        m_seMaxVolume = volume;
+    }
     void create(int);
     void destroy();
     void Realloc(int);

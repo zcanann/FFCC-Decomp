@@ -363,8 +363,6 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
 	int displayListIdx;
 	ChangeTexDisplayListCopy* displayListPtr;
-	unsigned int drawTevBits;
-	unsigned int fullTevBits;
 	GXColor** meshColorArrays;
 	GXColor* meshColorArray;
 	ChangeTexMeshData* meshData;
@@ -380,14 +378,13 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2
 			if (meshColorArray != 0) {
 				MaterialMan.SetGeometryArraySource(meshData->m_normals);
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
-				MaterialMan.SetChangeTexReflectionTexture(&texture->m_texObj);
-				drawTevBits = 0xACE0F;
-				fullTevBits = drawTevBits;
-				fullTevBits |= 0x1000;
+				MaterialMan.SetEnvTexObj(&texture->m_texObj);
 				displayListIdx = meshData->m_displayListCount - 1;
 				while (displayListIdx >= 0) {
 					ChangeTexDisplayListCopy** displayListCopies = work->m_displayListArrays[meshIdx];
-					MaterialMan.SetChangeTexReflectionState(drawTevBits, fullTevBits);
+					MaterialMan.InitEnv();
+					MaterialMan.SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x1000));
+					MaterialMan.LockEnv();
 					MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 					displayListPtr = displayListCopies[displayListIdx];
 					GXCallDisplayList(displayListPtr->m_data, displayListPtr->m_size);
@@ -420,11 +417,10 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 	CTexture* texture = work->m_texture;
 
 	if (step->m_changeTex.m_mode == 0) {
-		unsigned int drawTevBits = 0xACE0F;
-		unsigned int fullTevBits = drawTevBits;
-		fullTevBits |= 0x1000;
-		MaterialMan.SetChangeTexReflectionState(
-		    &texture->m_texObj, drawTevBits, fullTevBits);
+		MaterialMan.InitEnv();
+		MaterialMan.SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x1000));
+		MaterialMan.SetEnvTexObj(&texture->m_texObj);
+		MaterialMan.LockEnv();
 	}
 
 	MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);

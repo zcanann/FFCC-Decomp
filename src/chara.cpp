@@ -294,7 +294,7 @@ static inline void InitCharaMaterialState()
 
 static inline void CopyCharaMaterialEnv()
 {
-	MaterialMan.SaveCurrentEnvAsStd();
+	MaterialMan.LockEnv();
 }
 
 static inline void SetMaterialManNormalArray(void* normals)

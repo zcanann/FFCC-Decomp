@@ -227,7 +227,7 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
     int shapePtr;
     int shapeCount;
 
-    MaterialMan.SaveCurrentEnvAsStd();
+    MaterialMan.LockEnv();
 
     MaterialMan.SetMaterialPart(materialSet, *(unsigned char*)((int)shape + 10), 0);
 
@@ -263,7 +263,7 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
     int shapePtr = (int)animData;
     shapePtr = shapePtr + *(short*)(shapePtr + frameIndex * 8 + 0x10);
 
-    MaterialMan.SaveCurrentEnvAsStd();
+    MaterialMan.LockEnv();
 
     MaterialMan.SetMaterialPart(materialSet, *(unsigned char*)(shapePtr + 10), 0);
 

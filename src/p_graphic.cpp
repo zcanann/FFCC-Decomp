@@ -485,7 +485,7 @@ inline void CGraphicPcs::calcScreenFade()
  */
 void CGraphicPcs::stdDrawEnvInit()
 {
-	MaterialMan.SaveCurrentEnvAsStd();
+	MaterialMan.LockEnv();
 }
 
 /*

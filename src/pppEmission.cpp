@@ -331,7 +331,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
 
         pppInitBlendMode();
         pppSetBlendMode(step->m_emission.m_blendMode);
-        MaterialMan.SetChangeTexReflectionTexture(&texture->m_texObj);
+        MaterialMan.SetEnvTexObj(&texture->m_texObj);
 
         Mtx viewMtx0;
         Mtx objMtx0;

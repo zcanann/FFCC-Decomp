@@ -1272,7 +1272,7 @@ void CMapObj::Draw(unsigned char priority)
                                    m_worldMtx);
     }
 
-    MaterialMan.SaveCurrentEnvAsStd();
+    MaterialMan.LockEnv();
 
     SetDrawEnv();
     LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(m_bumpLight),

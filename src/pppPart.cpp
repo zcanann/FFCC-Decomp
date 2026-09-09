@@ -1973,7 +1973,7 @@ void _pppDrawPart(_pppMngSt* pppMngSt)
  */
 void pppDrawMesh(pppModelSt* model, Vec* positions, int usePartMaterial)
 {
-	MaterialMan.SaveCurrentEnvAsStd();
+	MaterialMan.LockEnv();
 
 	if (positions == 0)
 	{

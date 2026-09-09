@@ -27,6 +27,8 @@ class CCharaPcs : public CProcess
 public:
     class CLoadPdt;
     class CLoadAnim;
+    class CLoadModel;
+    class CLoadTexture;
 
     struct CCameraFrame
     {
@@ -84,8 +86,8 @@ public:
         int m_textureVariant;               // 0x164
         CChara::CModel* m_model;            // 0x168
         CTextureSet* m_textureSet;          // 0x16C
-        CRef* m_modelLoadRef;               // 0x170
-        CRef* m_texLoadRef;                 // 0x174
+        CLoadModel* m_modelLoadRef;       // 0x170
+        CLoadTexture* m_texLoadRef;       // 0x174
         CLoadPdt* m_pdtLoadRef;             // 0x178
         int m_asyncCharaKind;               // 0x17C
         int m_asyncCharaNo;                 // 0x180
@@ -106,13 +108,13 @@ public:
         }
         ~CLoadModel();
 
-        void* m_keyTag;                 // 0x08
+        int m_keyTag;                   // 0x08
         int m_keyId;                    // 0x0C
         int m_mergeFileId;              // 0x10
         int m_mergeFlags;               // 0x14
         CChara::CModel* m_model;        // 0x18
         int m_streamMode;               // 0x1C
-        void* m_streamOffset;           // 0x20
+        unsigned int m_streamOffset;    // 0x20
         int m_streamSize;               // 0x24
     };
 
@@ -127,7 +129,7 @@ public:
         }
         ~CLoadAnim();
 
-        void* m_keyTag;                 // 0x08
+        int m_keyTag;                   // 0x08
         int m_keyId;                    // 0x0C
         int m_mergeFileId;              // 0x10
         int m_mergeFlags;               // 0x14
@@ -153,14 +155,14 @@ public:
         }
         ~CLoadTexture();
 
-        void* m_keyTag;                 // 0x08
+        int m_keyTag;                   // 0x08
         int m_keyId;                    // 0x0C
         int m_mergeFileId;              // 0x10
         int m_mergeFlags;               // 0x14
-        void* m_variantTag;             // 0x18
+        int m_variantTag;               // 0x18
         CTextureSet* m_textureSet;      // 0x1C
         int m_streamMode;               // 0x20
-        void* m_streamOffset;           // 0x24
+        unsigned int m_streamOffset;    // 0x24
         int m_streamSize;               // 0x28
     };
 
@@ -174,9 +176,9 @@ public:
         }
         ~CLoadPdt();
 
-        void* m_keyTag;                 // 0x08
+        int m_keyTag;                   // 0x08
         int m_keyId;                    // 0x0C
-        void* m_variantTag;             // 0x10
+        int m_variantTag;               // 0x10
         int m_pdtSlot;                  // 0x14
         int m_mergeFileId;              // 0x18
         int m_mergeFlags;               // 0x1C

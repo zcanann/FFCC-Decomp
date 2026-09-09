@@ -757,7 +757,7 @@ config.libs = [
             Object(Matching, "ref.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "ringmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "shopmenu.cpp"),
-            Object(NonMatching, "singmenu.cpp", extra_cflags=["-inline noauto,deferred", "-pool off"]),
+            Object(NonMatching, "singmenu.cpp", extra_cflags=["-pool off"]),
             Object(NonMatching, "sound.cpp", extra_cflags=["-RTTI on", "-str reuse,nopool,readonly", "-sdata 8"]),
             Object(NonMatching, "stopwatch.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "system.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),

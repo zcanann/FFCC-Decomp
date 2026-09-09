@@ -53,27 +53,6 @@ static inline CCaravanWork* SingleCaravanWork()
     return Game.m_scriptFoodBase[0];
 }
 
-extern const double DOUBLE_80332968;
-extern const double DOUBLE_80332938;
-extern const float FLOAT_80332918;
-extern const float FLOAT_8033291c;
-extern const float FLOAT_80332920;
-extern const float FLOAT_80332924;
-extern const float FLOAT_80332928;
-extern const float FLOAT_8033292c;
-extern const float FLOAT_80332930;
-extern const float FLOAT_80332934;
-extern const float FLOAT_8033294c;
-extern const float FLOAT_80332960;
-extern const float FLOAT_8033299C;
-extern const float FLOAT_803329A0;
-extern const float kSingStatBaseX;
-extern const float kSingStatPanelPad;
-extern const float kSingStatPanelW;
-extern const float kSingStatPanelH;
-extern const float kSingStatScreenPadX;
-extern const float kSingStatScreenY;
-
 struct SingMenuStaticMessageInfo
 {
     int lineCount;
@@ -985,67 +964,6 @@ static inline const char* GetSingWinMessage(int staticText, const char* dynamicT
     }
 }
 
-static inline double SingWinUIntToDouble(unsigned int value)
-{
-    unsigned long long bits = 0x4330000000000000ULL | static_cast<unsigned long long>(value ^ 0x80000000U);
-    return static_cast<double>(bits) - 4503601774854144.0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8014a7cc
- * PAL Size: 372b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::createSingleMenu()
-{
-    u8* self = reinterpret_cast<u8*>(this);
-
-    m_singleMenuPhase = 0;
-    gSingMenuAsyncLoadCompleted = 0;
-    if (Game.m_gameWork.m_menuStageMode == 0) {
-        if (m_singleMenuStageActive != 0) {
-            m_stageF0 = 0;
-
-            CFont* font = m_fonts[4];
-            if (font != 0) {
-                if (font->DecRef() == 0) {
-                    delete font;
-                }
-                m_fonts[4] = 0;
-            }
-
-            m_singleMenuStageActive = 0;
-            m_singleMenuInitialized = 0;
-        }
-    } else {
-        if (m_singleMenuStageActive == 0) {
-            m_stageF0 = CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_ANIM];
-            m_singleMenuStageActive = 1;
-        }
-
-        char path[128];
-        sprintf(path, s_singMenuSubfontPathFmt, Game.GetLangString());
-        loadFont(1, path, 4, -1);
-
-        m_singleMenuInitialized = 0;
-        gSingMenuForcedSelection = -1;
-        gSingMenuAsyncFileHandle = 0;
-
-        if (Game.m_gameWork.m_menuStageMode != 0) {
-            loadTexture(PTR_s_solo2.entries, 4, 1, s_singleMenuTextureTable, 0x20, 0xD, 1);
-            m_wm.m_worldObjData = 0;
-            m_singleFadeState = 0;
-            m_singMenuState = 0;
-            m_menuWindowInfo = 0;
-            m_shopMenu = 0;
-        }
-    }
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8014A67C
@@ -1145,11 +1063,10 @@ void CMenuPcs::SingMenuInit()
     m_wm.m_worldObjData = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x5DD) WmWorldObjInfo[1];
 
     WmWorldObjInfo* boardEntry = m_wm.m_worldObjData;
-    int screenY = static_cast<int>(kSingStatScreenY);
+    int screenY = static_cast<int>(80.0f);
     boardEntry->m_transform.Identity();
     m_wm.m_worldObjData->m_active = 0;
-    float centerY = static_cast<float>(static_cast<double>(static_cast<float>(kSingStatPanelH * 0.5
-                + kSingStatPanelH)) - 224.0);
+    float centerY = 88.0f * 0.5f + 88.0f - 224.0f;
     m_wm.m_worldObjData->m_frameCounter = 0;
     m_wm.m_worldObjData->m_viewportX = 0;
     m_wm.m_worldObjData->m_viewportY = 0;
@@ -1162,12 +1079,9 @@ void CMenuPcs::SingMenuInit()
     m_wm.m_worldObjData->m_scissorY = 0;
     m_wm.m_worldObjData->m_scissorWidth = 0x280;
     m_wm.m_worldObjData->m_scissorHeight = 0x1C0;
-    m_wm.m_worldObjData->m_viewportX = static_cast<s16>(static_cast<int>(
-        static_cast<double>(static_cast<float>(static_cast<double>(static_cast<float>(4.0 + (kSingStatPanelW * 0.5
-                + (kSingStatBaseX + kSingStatPanelPad)))) - 320.0)) - 4.0));
+    m_wm.m_worldObjData->m_viewportX = static_cast<s16>(440.0f + 28.0f + 96.0f * 0.5f - 320.0f);
     m_wm.m_worldObjData->m_viewportY = static_cast<s16>(static_cast<int>(centerY));
-    m_wm.m_worldObjData->m_scissorX = static_cast<int>(kSingStatScreenPadX
-                                             + (kSingStatBaseX + kSingStatPanelPad));
+    m_wm.m_worldObjData->m_scissorX = static_cast<int>(440.0f + 28.0f + 12.0f);
     m_wm.m_worldObjData->m_scissorY = screenY;
     m_wm.m_worldObjData->m_scissorWidth = 0x48;
     m_wm.m_worldObjData->m_scissorHeight = 0x58;
@@ -1334,6 +1248,61 @@ post_texture_load:
             case 2:
                 SingleCalcFadeOut();
                 break;
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8014a7cc
+ * PAL Size: 372b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::createSingleMenu()
+{
+    u8* self = reinterpret_cast<u8*>(this);
+
+    m_singleMenuPhase = 0;
+    gSingMenuAsyncLoadCompleted = 0;
+    if (Game.m_gameWork.m_menuStageMode == 0) {
+        if (m_singleMenuStageActive != 0) {
+            m_stageF0 = 0;
+
+            CFont* font = m_fonts[4];
+            if (font != 0) {
+                if (font->DecRef() == 0) {
+                    delete font;
+                }
+                m_fonts[4] = 0;
+            }
+
+            m_singleMenuStageActive = 0;
+            m_singleMenuInitialized = 0;
+        }
+    } else {
+        if (m_singleMenuStageActive == 0) {
+            m_stageF0 = CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_ANIM];
+            m_singleMenuStageActive = 1;
+        }
+
+        char path[128];
+        sprintf(path, s_singMenuSubfontPathFmt, Game.GetLangString());
+        loadFont(1, path, 4, -1);
+
+        m_singleMenuInitialized = 0;
+        gSingMenuForcedSelection = -1;
+        gSingMenuAsyncFileHandle = 0;
+
+        if (Game.m_gameWork.m_menuStageMode != 0) {
+            loadTexture(PTR_s_solo2.entries, 4, 1, s_singleMenuTextureTable, 0x20, 0xD, 1);
+            m_wm.m_worldObjData = 0;
+            m_singleFadeState = 0;
+            m_singMenuState = 0;
+            m_menuWindowInfo = 0;
+            m_shopMenu = 0;
         }
     }
 }
@@ -1742,7 +1711,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     color.a = static_cast<u8>(a255);
     GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-    MenuPcs.DrawRect(0, kSingStatBaseX + kSingStatPanelPad, 88.0f, 96.0f, 88.0f,
+    MenuPcs.DrawRect(0, 440.0f + 28.0f, 88.0f, 96.0f, 88.0f,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     DrawInit();
@@ -1761,7 +1730,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     color.a = static_cast<u8>(a255);
     GXSetChanMatColor(GX_COLOR0A0, color);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-    MenuPcs.DrawRect(0, kSingStatBaseX + kSingStatPanelPad, 128.0f, 96.0f, 48.0f,
+    MenuPcs.DrawRect(0, 440.0f + 28.0f, 128.0f, 96.0f, 48.0f,
                                      0.0f, 88.0f, 1.0f, 1.0f, 0.0f);
 
     DrawInit();
@@ -1868,56 +1837,6 @@ void CMenuPcs::DrawSingleStat(float alpha)
     font->renderFlags.fixedWidth = 0;
     font->SetMargin(1.0f);
     DrawInit();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801488f0
- * PAL Size: 680b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::DrawSingleHelpWim(float alpha)
-{
-    DrawInit();
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-    int alphaInt = static_cast<int>(255.0f * alpha);
-    _GXColor color;
-    color.r = 0xFF;
-    color.g = 0xFF;
-    color.b = 0xFF;
-    color.a = static_cast<u8>(alphaInt);
-    GXSetChanMatColor(GX_COLOR0A0, color);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
-    MenuPcs.DrawRect(0, 32.0f, 312.0f, 32.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(8, 576.0f, 312.0f, 32.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(4, 32.0f, 384.0f, 32.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(0xC, 576.0f, 384.0f, 32.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x27));
-    MenuPcs.DrawRect(0, 64.0f, 312.0f, 512.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(4, 64.0f, 384.0f, 512.0f, 32.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x24));
-    MenuPcs.DrawRect(0, 32.0f, 344.0f, 32.0f, 40.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-    MenuPcs.DrawRect(8, 576.0f, 344.0f, 32.0f, 40.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
-
-    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
-    MenuPcs.DrawRect(8, 64.0f, 344.0f, 512.0f, 40.0f, 0.0f,
-                                    0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -2477,6 +2396,56 @@ void CMenuPcs::SingleDrawCtrl()
 
 /*
  * --INFO--
+ * PAL Address: 0x801488f0
+ * PAL Size: 680b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::DrawSingleHelpWim(float alpha)
+{
+    DrawInit();
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+    int alphaInt = static_cast<int>(255.0f * alpha);
+    _GXColor color;
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = static_cast<u8>(alphaInt);
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
+    MenuPcs.DrawRect(0, 32.0f, 312.0f, 32.0f, 32.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(8, 576.0f, 312.0f, 32.0f, 32.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(4, 32.0f, 384.0f, 32.0f, 32.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(0xC, 576.0f, 384.0f, 32.0f, 32.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x27));
+    MenuPcs.DrawRect(0, 64.0f, 312.0f, 512.0f, 32.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(4, 64.0f, 384.0f, 512.0f, 32.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x24));
+    MenuPcs.DrawRect(0, 32.0f, 344.0f, 32.0f, 40.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+    MenuPcs.DrawRect(8, 576.0f, 344.0f, 32.0f, 40.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
+    MenuPcs.DrawRect(8, 64.0f, 344.0f, 512.0f, 40.0f, 0.0f,
+                                    0.0f, 1.0f, 1.0f, 0.0f);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80147728
  * PAL Size: 420b
  * EN Address: TODO
@@ -2565,11 +2534,11 @@ float CMenuPcs::CalcListPos(int listPos, int listSize, int mode)
         span = static_cast<float>(listSize - 8);
     }
 
-    if ((span <= FLOAT_8033294c) || (listSize <= 8)) {
-        return FLOAT_8033299C;
+    if ((span <= 0.0f) || (listSize <= 8)) {
+        return (-1.0f);
     }
 
-    return (FLOAT_803329A0 * (static_cast<float>(listPos) / span)) + FLOAT_8033292c;
+    return (192.0f * (static_cast<float>(listPos) / span)) + 32.0f;
 }
 
 /*
@@ -2684,8 +2653,8 @@ void CMenuPcs::DrawSingWin(short mode)
         return;
     }
 
-    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * DOUBLE_80332968);
-    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * DOUBLE_80332968);
+    float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * 0.5);
+    float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * 0.5);
     float width;
     float height;
 
@@ -2839,11 +2808,11 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     }
 
     MenuWindowInfo* win = m_menuWindowInfo;
-    int lineHeight = static_cast<int>(FLOAT_80332960 * FLOAT_8032ea78);
+    int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
     float x = static_cast<float>(static_cast<double>(win->width - maxWidth) * 0.5
             + static_cast<double>(win->x));
     float y = static_cast<float>(win->y + 0x20);
-    if (FLOAT_80332960 * FLOAT_8032ea78 - static_cast<float>(lineHeight) > FLOAT_8033294c) {
+    if (22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight) > 0.0f) {
         lineHeight++;
     }
     int lineStep = lineHeight + 3;
@@ -2920,8 +2889,8 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
         maxWidth -= 0x18;
     }
 
-    int lineHeight = static_cast<int>(FLOAT_80332960 * FLOAT_8032ea78);
-    if (FLOAT_80332960 * FLOAT_8032ea78 - static_cast<float>(lineHeight) > FLOAT_8033294c) {
+    int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
+    if (22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight) > 0.0f) {
         lineHeight++;
     }
 
@@ -2937,7 +2906,6 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     *outWidth = static_cast<short>(widthLines * lineHeight + 0x40);
     *outHeight = static_cast<short>(lineCount * (lineHeight + 2) + 0x40);
 }
-
 
 /*
  * --INFO--
@@ -3046,10 +3014,10 @@ inline float CMenuPcs::GetSingWinScl()
  */
 int CMenuPcs::SingWinMessHeight()
 {
-    float scaled = FLOAT_80332960 * FLOAT_8032ea78;
+    float scaled = 22.0f * FLOAT_8032ea78;
     int lineHeight = static_cast<int>(scaled);
 
-    if (scaled - static_cast<float>(lineHeight) > FLOAT_8033294c) {
+    if (scaled - static_cast<float>(lineHeight) > 0.0f) {
         lineHeight += 1;
     }
     return lineHeight + 3;
@@ -3430,16 +3398,16 @@ inline void CMenuPcs::CalcSingLife()
 void CMenuPcs::DrawSingLife()
 {
     int lifeTimer = m_singleLifeTimer;
-    float xBase = FLOAT_80332918;
-    float y = FLOAT_8033291c;
+    float xBase = 366.0f;
+    float y = (-32.0f);
     const CCaravanWork* const caravanWork = SingleCaravanWork();
     if (lifeTimer < 0) {
         return;
     }
 
     if (lifeTimer < 10) {
-        float phaseScale = FLOAT_80332924;
-        float angleScale = FLOAT_80332920;
+        float phaseScale = 9.0f;
+        float angleScale = 0.01745329238474369f;
         int phase;
         if (lifeTimer < 0) {
             phase = 0;
@@ -3449,12 +3417,12 @@ void CMenuPcs::DrawSingLife()
                 phase = lifeTimer;
             }
         }
-        y += FLOAT_80332928 * static_cast<float>(sin(angleScale * (phaseScale * static_cast<float>(phase))));
+        y += 64.0f * static_cast<float>(sin(angleScale * (phaseScale * static_cast<float>(phase))));
     } else if (lifeTimer < 0x28) {
-        y = FLOAT_8033292c;
+        y = 32.0f;
     } else {
-        float phaseScale = FLOAT_80332924;
-        float angleScale = FLOAT_80332920;
+        float phaseScale = 9.0f;
+        float angleScale = 0.01745329238474369f;
         int phase;
         int t = 10 - (lifeTimer - 0x28);
         if (t < 0) {
@@ -3465,12 +3433,12 @@ void CMenuPcs::DrawSingLife()
                 phase = t;
             }
         }
-        y += FLOAT_80332928 * static_cast<float>(sin(angleScale * (phaseScale * static_cast<float>(phase))));
+        y += 64.0f * static_cast<float>(sin(angleScale * (phaseScale * static_cast<float>(phase))));
     }
 
     int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp) >> 1;
     xBase += static_cast<float>(((8 - halfHearts) * 0x18) / 2);
-    MenuPcs.m_battleMesMenus[0]->DrawHeart(xBase, y - FLOAT_80332930, FLOAT_80332934, FLOAT_80332934);
+    MenuPcs.m_battleMesMenus[0]->DrawHeart(xBase, y - 8.0f, 1.0f, 1.0f);
 }
 
 /*
@@ -3570,24 +3538,3 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
     }
     return 9;
 }
-
-const float FLOAT_80332918 = 366.0f;
-const float FLOAT_8033291c = -32.0f;
-const float FLOAT_80332920 = 0.01745329238474369f;
-const float FLOAT_80332924 = 9.0f;
-const float FLOAT_80332928 = 64.0f;
-const float FLOAT_8033292c = 32.0f;
-const float FLOAT_80332930 = 8.0f;
-const float FLOAT_80332934 = 1.0f;
-const double DOUBLE_80332938 = 4503601774854144.0;
-const float FLOAT_8033294c = 0.0f;
-const float FLOAT_80332960 = 22.0f;
-const double DOUBLE_80332968 = 0.5;
-const float kSingStatBaseX = 440.0f;
-const float kSingStatPanelPad = 28.0f;
-const float kSingStatPanelW = 96.0f;
-const float kSingStatPanelH = 88.0f;
-const float kSingStatScreenPadX = 12.0f;
-const float kSingStatScreenY = 80.0f;
-const float FLOAT_8033299C = -1.0f;
-const float FLOAT_803329A0 = 192.0f;

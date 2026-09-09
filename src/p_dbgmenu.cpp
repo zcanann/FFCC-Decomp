@@ -47,14 +47,7 @@ static const char sDbgMenuCharaInfo[] = "CHARA INFO";
 static const char sDbgMenuItemWeapon[] = "ITEM WEAPON";
 static const char sDbgMenuSmithMaster[] = "SMITH MASTER";
 static const char sDbgMenuChara[] = "CHARA";
-extern const u32 kDbgMenuHighlightAlpha = 0x00000080;
-extern const u32 kDbgMenuFontColor = 0xFFFFFFFF;
 static const char sDbgMenuDebug[] = "Debug";
-extern const float kDbgMenuViewportNear;
-extern const double kDbgMenuSignedIntBias;
-extern const float kDbgMenuViewportWidth;
-extern const float kDbgMenuViewportHeight;
-extern const float kDbgMenuViewportFar;
 static const char sDbgMenuOn[] = "ON";
 static const char sDbgMenuOff[] = "OFF";
 static const char sDbgMenuUnknown[] = "?";
@@ -449,70 +442,6 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 
 /*
  * --INFO--
- * PAL Address: 0x8012c8d8
- * PAL Size: 488b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
-{
-	CDM* head = menu;
-
-	do {
-		m_currentMenu = menu;
-		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, kDbgMenuViewportWidth, kDbgMenuViewportHeight,
-		              kDbgMenuViewportNear, kDbgMenuViewportFar);
-
-		switch (menu->m_type) {
-		case 0:
-			drawWindow(menu->m_y, 0, 0, menu->m_unk18, menu->m_unk1C, menu->m_text);
-			break;
-		case 1:
-			drawFont(menu->m_y, 0, 0, menu->m_text);
-			break;
-		case 2: {
-			drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
-
-			const char* stateText;
-			if (menu->m_state == 1) {
-				stateText = sDbgMenuOn;
-			} else {
-				stateText = sDbgMenuUnknown;
-				if (menu->m_state == 0) {
-					stateText = sDbgMenuOff;
-				}
-			}
-
-			drawFont(9, 0x10, 8, const_cast<char*>(stateText));
-			break;
-		}
-		case 3:
-			drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
-			break;
-		}
-
-		menu = menu->m_next;
-	} while (menu != head);
-
-	menu = head;
-	do {
-		if (menu->m_firstChild != 0) {
-			drawMenu(menu->m_firstChild);
-		}
-		menu = menu->m_next;
-	} while (menu != head);
-}
-
-extern const float kDbgMenuViewportNear = 0.0f;
-extern const double kDbgMenuSignedIntBias = 4503601774854144.0;
-extern const float kDbgMenuViewportWidth = 640.0f;
-extern const float kDbgMenuViewportHeight = 448.0f;
-extern const float kDbgMenuViewportFar = 1.0f;
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -554,7 +483,7 @@ void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
 void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, char* text)
 {
 	changeVtxFmt(1);
-	float z = kDbgMenuViewportNear;
+	float z = 0.0f;
 
 	if ((flags & 1) == 0) {
 		GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT1, 4);
@@ -593,7 +522,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 			alpha = 0xFF;
 		}
 
-		GXColor highlightColor = *reinterpret_cast<const GXColor*>(&kDbgMenuHighlightAlpha);
+		GXColor highlightColor = {0, 0, 0, 0x80};
 		highlightColor.r = alpha;
 		highlightColor.g = alpha;
 		highlightColor.b = alpha;
@@ -629,7 +558,7 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 {
 	changeVtxFmt(0);
 
-	GXColor mainColor = *reinterpret_cast<const GXColor*>(&kDbgMenuFontColor);
+	GXColor mainColor = {0xFF, 0xFF, 0xFF, 0xFF};
 	if ((flags & 2) != 0) {
 		mainColor.b = 0;
 		mainColor.g = 0;
@@ -655,6 +584,63 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 		y -= fontSize / 2;
 	}
 	Graphic.DrawDebugStringDirect(x, y, text, fontSize);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012c8d8
+ * PAL Size: 488b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
+{
+	CDM* head = menu;
+
+	do {
+		m_currentMenu = menu;
+		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, 640.0f, 448.0f, 0.0f, 1.0f);
+
+		switch (menu->m_type) {
+		case 0:
+			drawWindow(menu->m_y, 0, 0, menu->m_unk18, menu->m_unk1C, menu->m_text);
+			break;
+		case 1:
+			drawFont(menu->m_y, 0, 0, menu->m_text);
+			break;
+		case 2: {
+			drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
+
+			const char* stateText;
+			if (menu->m_state == 1) {
+				stateText = sDbgMenuOn;
+			} else {
+				stateText = sDbgMenuUnknown;
+				if (menu->m_state == 0) {
+					stateText = sDbgMenuOff;
+				}
+			}
+
+			drawFont(9, 0x10, 8, const_cast<char*>(stateText));
+			break;
+		}
+		case 3:
+			drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
+			break;
+		}
+
+		menu = menu->m_next;
+	} while (menu != head);
+
+	menu = head;
+	do {
+		if (menu->m_firstChild != 0) {
+			drawMenu(menu->m_firstChild);
+		}
+		menu = menu->m_next;
+	} while (menu != head);
 }
 
 /*

@@ -93,6 +93,15 @@ public:
     pppShapeSt m_shapes[0x100];
 };
 
+struct PPPIFPARAM
+{
+    int m_particleIndex;            // 0x0
+    short m_classId;                // 0x4
+    unsigned char m_hitObjectCount; // 0x6
+    unsigned char m_hitFlags;       // 0x7
+    short m_hitObjectIds[16];       // 0x8
+}; // Size 0x28
+
 struct PPPCREATEPARAM
 {
     PPPCREATEPARAM();
@@ -110,11 +119,7 @@ struct PPPCREATEPARAM
     float m_paramD;                   // 0x28
     void* m_owner;                    // 0x2c
     PPPSEST m_soundEffectParams;      // 0x30
-    int m_hitParamA;                  // 0x44
-    short m_hitParamB;                // 0x48
-    unsigned char m_hitObjectCount;   // 0x4a
-    unsigned char m_hitFlags;         // 0x4b
-    int m_hitObjectIds[8];            // 0x4c
+    PPPIFPARAM m_hitParams;           // 0x44
 }; // Size 0x6c
 
 inline PPPCREATEPARAM::PPPCREATEPARAM()
@@ -126,10 +131,10 @@ inline PPPCREATEPARAM::PPPCREATEPARAM()
     m_soundEffectParams.m_soundEffectStartFrame = 0;
     m_soundEffectParams.m_soundEffectStartedOnce = 0;
     m_soundEffectParams.m_soundEffectFadeFrames = 30;
-    m_hitParamA = 0;
-    m_hitParamB = 0;
-    m_hitObjectCount = 0;
-    m_hitFlags = 0;
+    m_hitParams.m_particleIndex = 0;
+    m_hitParams.m_classId = 0;
+    m_hitParams.m_hitObjectCount = 0;
+    m_hitParams.m_hitFlags = 0;
     m_positionOffsetPtr = 0;
     m_rotationPtr = 0;
     m_scalePtr = 0;
@@ -220,14 +225,6 @@ struct pppFVECTOR4
     float z;
     float w;
 };
-
-struct PPPIFPARAM
-{
-    int m_particleIndex;            // 0x0
-    short m_classId;                // 0x4
-    unsigned char m_hitObjectCount; // 0x6
-    unsigned char m_hitFlags;       // 0x7
-}; // Size 0x8
 
 struct pppProg
 {
@@ -406,7 +403,6 @@ struct _pppMngSt
     short m_mapObjIndex;               // 0x11A
     PPPSEST m_soundEffectData;         // 0x11C
     PPPIFPARAM m_hitParams;            // 0x130
-    short m_hitObjectIds[0x10];        // 0x138
 
     Vec& UserPosition() { return m_userPosition; }
     Vec& BasePosition() { return m_basePosition; }

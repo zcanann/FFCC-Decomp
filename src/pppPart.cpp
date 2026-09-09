@@ -2259,7 +2259,7 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 			int objectSlot;
 			for (objectSlot = 0; objectSlot < previousCount; objectSlot++)
 			{
-				if (pppMngSt->m_hitObjectIds[objectSlot] == gObject->m_particleId)
+				if (pppMngSt->m_hitParams.m_hitObjectIds[objectSlot] == gObject->m_particleId)
 				{
 					break;
 				}
@@ -2310,7 +2310,7 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 							int updatedSlot;
 							for (updatedSlot = 0; updatedSlot < newCount; updatedSlot++)
 							{
-								if (pppMngSt->m_hitObjectIds[updatedSlot] == gObject->m_particleId)
+								if (pppMngSt->m_hitParams.m_hitObjectIds[updatedSlot] == gObject->m_particleId)
 								{
 									break;
 								}

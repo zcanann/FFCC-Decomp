@@ -364,12 +364,12 @@ static inline int& ParticleWorkSeParam(CFlatRuntime2* runtime)
 
 static inline int& ParticleWorkParamNo(CFlatRuntime2* runtime)
 {
-	return ParticleWork(runtime).m_hitParam.m_paramNo;
+	return ParticleWork(runtime).m_hitParam.m_particleIndex;
 }
 
 static inline short& ParticleWorkParamId(CFlatRuntime2* runtime)
 {
-	return ParticleWork(runtime).m_hitParam.m_paramId;
+	return ParticleWork(runtime).m_hitParam.m_classId;
 }
 
 static inline int& ParticleWorkNoHi(CFlatRuntime2* runtime)
@@ -2265,19 +2265,22 @@ void CFlatRuntime2::DeleteParticleSlot(int slotNo, int forceDelete)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A08C
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime2::IgnoreParticle(int slotNo, CFlatRuntime::CObject* object)
 {
-	u8* ifDt = reinterpret_cast<u8*>(PartMng.pppGetIfDt(static_cast<short>(slotNo)));
+	PPPIFPARAM* ifDt = PartMng.pppGetIfDt(static_cast<short>(slotNo));
 	short particleId;
-	u8 count = ifDt[6];
+	u8 count = ifDt->m_hitObjectCount;
 	if (count < 0x10) {
 		particleId = object->m_particleId;
-		ifDt[6] = static_cast<u8>(count + 1);
-		ifDt += count * 2;
-		*reinterpret_cast<short*>(ifDt + 8) = particleId;
+		ifDt->m_hitObjectCount = static_cast<u8>(count + 1);
+		ifDt->m_hitObjectIds[count] = particleId;
 	}
 }
 

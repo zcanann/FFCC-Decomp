@@ -36,6 +36,12 @@ extern float ppvScreenMatrixZbuff;
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
+STATIC_ASSERT(sizeof(PPPIFPARAM) == 0x28);
+STATIC_ASSERT(offsetof(PPPIFPARAM, m_hitObjectIds) == 0x08);
+STATIC_ASSERT(sizeof(PPPCREATEPARAM) == 0x6C);
+STATIC_ASSERT(offsetof(PPPCREATEPARAM, m_hitParams) == 0x44);
+STATIC_ASSERT(sizeof(_pppMngSt) == 0x158);
+STATIC_ASSERT(offsetof(_pppMngSt, m_hitParams) == 0x130);
 STATIC_ASSERT(sizeof(CParModelSet) == 0x6C00);
 STATIC_ASSERT(sizeof(CParShapeSet) == 0x2C00);
 STATIC_ASSERT(sizeof(pppIVECTOR3) == 0xC);
@@ -3681,10 +3687,6 @@ PPPCREATEPARAM* CPartMng::pppGetDefaultCreateParam()
     return &g_dcp;
 }
 
-struct PppHitIdBlock {
-    int m_ids[8];
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80058148
@@ -3721,12 +3723,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_kind = static_cast<short>(pdtSlotIndex);
     mng->m_nodeIndex = static_cast<short>(fpNo);
 
-    mng->m_hitParams.m_particleIndex = createParam->m_hitParamA;
-    mng->m_hitParams.m_classId = createParam->m_hitParamB;
-    mng->m_hitParams.m_hitObjectCount = createParam->m_hitObjectCount;
-    mng->m_hitParams.m_hitFlags = createParam->m_hitFlags;
-    *reinterpret_cast<PppHitIdBlock*>(mng->m_hitObjectIds) =
-        *reinterpret_cast<const PppHitIdBlock*>(createParam->m_hitObjectIds);
+    mng->m_hitParams = createParam->m_hitParams;
 
     mng->m_mapTexLoaded = 0;
     mng->m_hasMapRef = 0;

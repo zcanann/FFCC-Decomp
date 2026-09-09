@@ -72,13 +72,6 @@ public:
 	class CParticleWork
 	{
 	public:
-		struct CHitParam
-		{
-			int m_paramNo;
-			short m_paramId;
-			u8 m_pad[2];
-		};
-
 		CParticleWork()
 		{
 			m_soundEffectParams.m_soundEffectHandle = -1;
@@ -88,10 +81,10 @@ public:
 			m_soundEffectParams.m_soundEffectStartFrame = 0;
 			m_soundEffectParams.m_soundEffectStartedOnce = 0;
 			m_soundEffectParams.m_soundEffectFadeFrames = 0x1E;
-			m_hitParam.m_paramNo = 0;
-			m_hitParam.m_paramId = 0;
-			m_hitParam.m_pad[0] = 0;
-			m_hitParam.m_pad[1] = 0;
+			m_hitParam.m_particleIndex = 0;
+			m_hitParam.m_classId = 0;
+			m_hitParam.m_hitObjectCount = 0;
+			m_hitParam.m_hitFlags = 0;
 			m_pos = 0;
 			m_posVec = 0;
 			m_scale = 0;
@@ -120,8 +113,7 @@ public:
 		u8 m_enable;
 		u8 m_pad2D[3];
 		PPPSEST m_soundEffectParams;
-		CHitParam m_hitParam;
-		int m_extra[8];
+		PPPIFPARAM m_hitParam;
 	};
 	
 	CFlatRuntime2();
@@ -288,6 +280,8 @@ STATIC_ASSERT(offsetof(CFlatRuntime2::CMapObjectInfo, m_x) == 0x04);
 STATIC_ASSERT(offsetof(CFlatRuntime2::CMapObjectInfo, m_radius) == 0x10);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_mapObjectInfo) == 0x134C);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_savedNextScript) == 0x15CC);
+STATIC_ASSERT(sizeof(CFlatRuntime2::CParticleWork) == 0x6C);
+STATIC_ASSERT(offsetof(CFlatRuntime2::CParticleWork, m_hitParam) == 0x44);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWork) == 0x16CC);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkNoHi) == 0x1738);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkPos) == 0x1740);

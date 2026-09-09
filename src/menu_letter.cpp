@@ -941,8 +941,8 @@ int CMenuPcs::LetterReplyWinOpen()
 			curLine = newline + 1;
 		} while (i < 7);
 
-		delete[] srcText;
 		delete[] workText;
+		delete[] srcText;
 
 		const char* closeText = GetMenuStr(3);
 		int lineIndex = static_cast<signed char>(s_ReplyMax++);
@@ -1620,8 +1620,8 @@ int CMenuPcs::LetterCtrlCur()
 			strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x11));
 			CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
 
-			char* line = workText;
 			int i = 0;
+			char* line = workText;
 			do {
 					char* newline = strchr(line, '\n');
 					if (newline != 0) {
@@ -1701,8 +1701,8 @@ int CMenuPcs::LetterCtrlCur()
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) != 0) {
 				if (m_letterMenuState->choiceCursor == 0) {
-					int itemValue = 0;
 					int gilValue = 0;
+					int itemValue = 0;
 					if (s_Attach == 0) {
 						itemValue = s_AttachItem;
 					} else if (s_Attach == 1) {
@@ -1813,8 +1813,8 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 
 	double innerW = w - DOUBLE_803330d8;
 	float y = y0;
-	float innerWf = static_cast<float>(innerW);
 	float innerX = FLOAT_803330f4 + x0;
+	float innerWf = static_cast<float>(innerW);
 	for (i = 0; i < 2; ++i) {
 		int tex = 0x49;
 		if (i != 0) {
@@ -1830,15 +1830,15 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4A));
-	double innerH = h - DOUBLE_803330d8;
 	float innerY = FLOAT_803330f4 + y0;
+	double innerH = h - DOUBLE_803330d8;
 	float x = x0;
 	float innerHf = static_cast<float>(innerH);
 	for (i = 0; i < 2; ++i) {
 		flip = 0;
 		if (i != 0) {
-			x = x1;
 			flip |= 8;
+			x = x1;
 		}
 		MenuPcs.DrawRect(
 		    flip, x, innerY, FLOAT_803330f4, innerHf,

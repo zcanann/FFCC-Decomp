@@ -1240,8 +1240,8 @@ inline void GbaQueue::LoadAllStat()
  * --INFO--
  * PAL Address: 0x800CEF70
  * PAL Size: 1916b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CE7D4
+ * EN Size: 1916b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1387,10 +1387,10 @@ void GbaQueue::LoadPlayerStat()
 
 			if (Game.m_partyObjArr[i] != 0) {
 				entry->m_hasPartyObj = 1;
-				short posX = static_cast<short>(Game.m_partyObjArr[i]->m_worldPosition.x / 3.0f);
-				short posZ = static_cast<short>(Game.m_partyObjArr[i]->m_worldPosition.z / 3.0f);
-				entry->m_mapPosition[0] = posX;
-				entry->m_mapPosition[1] = posZ;
+				int posX = static_cast<int>(Game.m_partyObjArr[i]->m_worldPosition.x / 3.0f);
+				int posZ = static_cast<int>(Game.m_partyObjArr[i]->m_worldPosition.z / 3.0f);
+				entry->m_mapPosition[0] = static_cast<short>(posX);
+				entry->m_mapPosition[1] = static_cast<short>(posZ);
 			}
 
 			entry++;
@@ -1532,10 +1532,10 @@ void GbaQueue::LoadEnemyStat()
 
 /*
  * --INFO--
- * PAL Address: 0x800cebe4
+ * PAL Address: 0x800CEBE4
  * PAL Size: 436b
- * EN Address: 0x800E3050
- * EN Size: 608b
+ * EN Address: 0x800CE448
+ * EN Size: 436b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1560,9 +1560,9 @@ void GbaQueue::LoadMapItemStat()
 				if ((dropItemCode & 0xC000) == 0x4000) {
 					mapItemEntry->m_kind = 4;
 				} else {
-					const SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+					const SItemFlatRow* itemRow = &reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[dropItemCode];
 					const int bossStageLimit = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex] + 2;
-					const int itemStage = itemRows[dropItemCode].m_stage;
+					const int itemStage = itemRow->m_stage;
 					if (itemStage >= bossStageLimit) {
 						mapItemEntry->m_kind = 5;
 					} else {
@@ -1574,10 +1574,10 @@ void GbaQueue::LoadMapItemStat()
 				numMapItems++;
 				mapItemEntry->m_radarEnabled = isDispRader != 0;
 				{
-					short posX = static_cast<short>(object->m_worldPosition.x / 3.0f);
-					short posZ = static_cast<short>(object->m_worldPosition.z / 3.0f);
-					mapItemEntry->m_posX = posX;
-					mapItemEntry->m_posZ = posZ;
+					int posX = static_cast<int>(object->m_worldPosition.x / 3.0f);
+					int posZ = static_cast<int>(object->m_worldPosition.z / 3.0f);
+					mapItemEntry->m_posX = static_cast<short>(posX);
+					mapItemEntry->m_posZ = static_cast<short>(posZ);
 				}
 				mapItemEntry++;
 			}

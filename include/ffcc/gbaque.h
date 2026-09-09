@@ -54,7 +54,7 @@ struct GbaQueuePlayerDataView
     unsigned char m_compatibility[16];
     unsigned short m_progress;
     signed char m_maxHp;
-    signed char m_hp;
+    char m_hp;
     unsigned char m_letterMeta[8];
     unsigned char m_strength[3];
     unsigned char m_useItem;

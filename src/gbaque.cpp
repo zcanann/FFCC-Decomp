@@ -1280,7 +1280,7 @@ void GbaQueue::LoadPlayerStat()
 				}
 
 				entry->m_maxHp = static_cast<signed char>(caravanWork->m_maxHp);
-				entry->m_hp = static_cast<signed char>(caravanWork->m_hp);
+				entry->m_hp = static_cast<char>(caravanWork->m_hp);
 				{
 					int tribeAppearance = (caravanWork->m_tribeId & 3) |
 					                                      ((caravanWork->m_appearanceVariant & 3) << 2);
@@ -1947,22 +1947,19 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
  * --INFO--
  * PAL Address: 0x800CDF38
  * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CD79C
+ * EN Size: 136b
  * JP Address: TODO
  * JP Size: TODO
  */
 unsigned int GbaQueue::GetScrFlg()
 {
-	int i;
-	unsigned int flag;
-
-	for (i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	flag = (m_scrInitEnd != 0);
-	for (i = 0; i < 4; i++) {
+	bool flag = (m_scrInitEnd != 0);
+	for (int i = 0; i < 4; i++) {
 		OSSignalSemaphore(accessSemaphores + i);
 	}
 
@@ -1980,10 +1977,12 @@ unsigned int GbaQueue::GetScrFlg()
  */
 int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 {
-	char hpFlags = 0;
-	char prevHpFlags = 0;
+	char hpFlags;
+	char prevHpFlags;
 	char prevHp;
 	char hp;
+
+	hpFlags = prevHpFlags = 0;
 
 	for (int i = 0; i < 4; i++) {
 		OSWaitSemaphore(accessSemaphores + i);
@@ -1993,29 +1992,29 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 			prevHp = m_playerHistory[i].m_hp;
 		}
 		if (m_playerData[i].m_hp != 0) {
-			hpFlags = static_cast<char>(hpFlags | (1 << i));
+			hpFlags |= 1 << i;
 		}
 		if (m_playerHistory[i].m_hp != 0) {
-			prevHpFlags = static_cast<char>(prevHpFlags | (1 << i));
+			prevHpFlags |= 1 << i;
 		}
 
 		OSSignalSemaphore(accessSemaphores + i);
 	}
 
-	unsigned int changed = prevHpFlags != hpFlags;
+	bool changed = hpFlags != prevHpFlags;
 
 	if (hp != prevHp) {
-		changed = 1;
+		changed = true;
 	}
 
 	int channelMask = 1 << channel;
 	char curShouki = static_cast<char>(m_outOfShoukiFlags & channelMask);
 	char prevShouki = static_cast<char>(m_prevOutOfShoukiFlags & channelMask);
 	if (hp != prevHp) {
-		changed = 1;
+		changed = true;
 	}
 	if (curShouki != prevShouki) {
-		changed = 1;
+		changed = true;
 	}
 
 	outData[0] = 0x13;
@@ -2023,7 +2022,7 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	outData[2] = static_cast<unsigned char>(hp);
 	outData[3] = ((static_cast<char>(m_outOfShoukiFlags) & channelMask) != 0);
 
-	return static_cast<unsigned char>(changed);
+	return changed;
 }
 
 /*

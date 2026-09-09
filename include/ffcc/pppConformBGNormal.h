@@ -25,8 +25,8 @@ struct pppConformBGNormalStep {
 extern "C" {
 #endif
 
-void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlTable* data);
-void pppFrameConformBGNormal(pppConformBGNormal* conformBG, pppConformBGNormalStep* param2, struct _pppCtrlTable* data);
+void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlTable* ctrl);
+void pppFrameConformBGNormal(pppConformBGNormal* conformBG, pppConformBGNormalStep* step, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

@@ -91,7 +91,7 @@ static inline float* GetYmTracerDataValueWork(int dataValueIndex, int offset)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmTracerCtrl* param_3)
+void pppRenderYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtrl* ctrl)
 {
     YmTracerWork* work;
     CMapMesh* mapMesh;
@@ -106,20 +106,20 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
     f32 uvStep;
     int textureIndex[2];
 
-    dataValIndex = param_2->m_dataValIndex;
-    work = GetYmTracerWork(pppYmTracer, param_3);
-    colorOffset = GetYmTracerDataOffsets(param_3)->m_colorOffset;
+    dataValIndex = step->m_dataValIndex;
+    work = GetYmTracerWork(tracer, ctrl);
+    colorOffset = GetYmTracerDataOffsets(ctrl)->m_colorOffset;
     poly = work->entries;
     mapMesh = ppvEnv->m_mapMeshPtr[dataValIndex];
-    colorData = reinterpret_cast<VColor*>(pppYmTracer->m_workArea + colorOffset);
+    colorData = reinterpret_cast<VColor*>(tracer->m_workArea + colorOffset);
 
     if (dataValIndex != 0xFFFF) {
-        pppSetBlendMode(param_2->m_tracer.m_blendMode);
+        pppSetBlendMode(step->m_tracer.m_blendMode);
         pppSetDrawEnv(
             &colorData->m_color, reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
             0.0f,
-            param_2->m_tracer.m_drawEnvColor1, param_2->m_tracer.m_drawEnvColor0,
-            param_2->m_tracer.m_blendMode, 0, 1, 1, 0);
+            step->m_tracer.m_drawEnvColor1, step->m_tracer.m_drawEnvColor0,
+            step->m_tracer.m_blendMode, 0, 1, 1, 0);
         gUtil.SetVtxFmt_POS_CLR_TEX();
 
         textureIndex[0] = 0;
@@ -136,7 +136,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
             _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
             u32 format = (u32)texture->m_format;
-            if ((format == 8) || (format == 9)) {
+            if ((format == GX_TF_C4) || (format == GX_TF_C8)) {
                 SetUpPaletteEnv(texture);
             }
 
@@ -159,7 +159,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
                     pppPackedColor colorBottom = {0xFFFFFF00};
                     colorBottom.bytes[3] = next->alpha;
 
-                    GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
+                    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
                     GXPosition3f32(poly->to.x, poly->to.y, poly->to.z);
                     GXColor1u32(*(u32*)&colorTop);
                     GXTexCoord2f32(uTop, 1.0f);
@@ -191,13 +191,13 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmTracerCtrl* param_3)
+void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtrl* ctrl)
 {
     TRACE_POLYGON* entries;
     TRACE_POLYGON* entry;
     TRACE_POLYGON* poly;
     YmTracerWork* work;
-    f32 fVar3;
+    f32 val;
     s32 i;
     TRACE_POLYGON* entriesPtr;
 
@@ -205,67 +205,67 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
         return;
     }
 
-    work = GetYmTracerWork(pppYmTracer, param_3);
+    work = GetYmTracerWork(tracer, ctrl);
     entriesPtr = work->entries;
     entries = entriesPtr;
     if (entriesPtr == 0) {
         work->entries = (TRACE_POLYGON*)pppMemAlloc(
-            (u32)param_2->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), ppvEnv->m_stagePtr,
+            (u32)step->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmTracer_cpp), 0xEB);
         entries = work->entries;
         entry = entries;
-        for (i = 0; i < (s32)(u32)param_2->m_tracer.m_entryCount; i++) {
-            initTracePolygon(param_2, *entry);
+        for (i = 0; i < (s32)(u32)step->m_tracer.m_entryCount; i++) {
+            initTracePolygon(step, *entry);
             entry++;
         }
     }
 
-    if (param_2->m_graphId == pppYmTracer->m_graphId) {
+    if (step->m_graphId == tracer->m_graphId) {
         work->initWork =
-            (param_2->m_initWOrk == -1)
+            (step->m_initWOrk == -1)
                 ? reinterpret_cast<float*>(gPppDefaultValueBuffer)
-                : GetYmTracerDataValueWork(param_2->m_initWOrk, param_2->m_stepValue);
+                : GetYmTracerDataValueWork(step->m_initWOrk, step->m_stepValue);
 
         work->arg3Work =
-            (param_2->m_arg3 == -1)
+            (step->m_arg3 == -1)
                 ? reinterpret_cast<float*>(gPppDefaultValueBuffer)
-                : GetYmTracerDataValueWork(param_2->m_arg3, param_2->m_tracer.m_arg3WorkOffset);
+                : GetYmTracerDataValueWork(step->m_arg3, step->m_tracer.m_arg3WorkOffset);
     }
 
-    if (work->count + 1 < param_2->m_tracer.m_entryCount) {
-        for (i = param_2->m_tracer.m_entryCount - 2; i >= 0; i--) {
+    if (work->count + 1 < step->m_tracer.m_entryCount) {
+        for (i = step->m_tracer.m_entryCount - 2; i >= 0; i--) {
             copyPolygonData(&entries[i + 1], &entries[i]);
         }
 
         entries = work->entries;
-        initTracePolygon(param_2, entries[0]);
+        initTracePolygon(step, entries[0]);
 
-        fVar3 = work->initWork[0];
-        work->from.x = fVar3;
-        entries[0].from.x = fVar3;
-        fVar3 = work->initWork[1];
-        work->from.y = fVar3;
-        entries[0].from.y = fVar3;
-        fVar3 = work->initWork[2];
-        work->from.z = fVar3;
-        entries[0].from.z = fVar3;
-        fVar3 = work->arg3Work[0];
-        work->to.x = fVar3;
-        entries[0].to.x = fVar3;
-        fVar3 = work->arg3Work[1];
-        work->to.y = fVar3;
-        entries[0].to.y = fVar3;
-        fVar3 = work->arg3Work[2];
-        work->to.z = fVar3;
-        entries[0].to.z = fVar3;
+        val = work->initWork[0];
+        work->from.x = val;
+        entries[0].from.x = val;
+        val = work->initWork[1];
+        work->from.y = val;
+        entries[0].from.y = val;
+        val = work->initWork[2];
+        work->from.z = val;
+        entries[0].from.z = val;
+        val = work->arg3Work[0];
+        work->to.x = val;
+        entries[0].to.x = val;
+        val = work->arg3Work[1];
+        work->to.y = val;
+        entries[0].to.y = val;
+        val = work->arg3Work[2];
+        work->to.z = val;
+        entries[0].to.z = val;
 
-        entries[0].life = param_2->m_tracer.m_entryLife;
-        entries[0].alpha = param_2->m_tracer.m_entryAlpha;
+        entries[0].life = step->m_tracer.m_entryLife;
+        entries[0].alpha = step->m_tracer.m_entryAlpha;
 
         {
             pppFMATRIX result;
 
-            pppMulMatrix(result, ppvMng->m_matrix, pppYmTracer->m_localMatrix);
+            pppMulMatrix(result, ppvMng->m_matrix, tracer->m_localMatrix);
             PSMTXMultVec(result.value, &entries[0].from, &entries[0].from);
             PSMTXMultVec(result.value, &entries[0].to, &entries[0].to);
         }
@@ -277,25 +277,25 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
             Vec splineTo[4];
             s16 splineCount = 0;
             f32 t;
-            f32 stepScale = 1.0f / (f32)(param_2->m_tracer.m_splineCount + 1);
+            f32 stepScale = 1.0f / (f32)(step->m_tracer.m_splineCount + 1);
 
-            for (i = 0; i < (s32)(u32)param_2->m_tracer.m_splineCount; i++) {
+            for (i = 0; i < (s32)(u32)step->m_tracer.m_splineCount; i++) {
                 t = stepScale * (f32)(i + 1);
 
-                gUtil.GetSplinePos(splineFrom[(param_2->m_tracer.m_splineCount - 1) - i], entries[3].from, entries[2].from,
+                gUtil.GetSplinePos(splineFrom[(step->m_tracer.m_splineCount - 1) - i], entries[3].from, entries[2].from,
                                           entries[1].from, entries[0].from, t, 1.0f);
-                gUtil.GetSplinePos(splineTo[(param_2->m_tracer.m_splineCount - 1) - i], entries[3].to, entries[2].to,
+                gUtil.GetSplinePos(splineTo[(step->m_tracer.m_splineCount - 1) - i], entries[3].to, entries[2].to,
                                           entries[1].to, entries[0].to, t, 1.0f);
 
                 splineCount++;
                 work->count++;
-                if (work->count + 1 >= param_2->m_tracer.m_entryCount) {
+                if (work->count + 1 >= step->m_tracer.m_entryCount) {
                     break;
                 }
             }
 
             for (i = 0; i < splineCount; i++) {
-                for (s32 j = param_2->m_tracer.m_entryCount - 2; j >= 2; j--) {
+                for (s32 j = step->m_tracer.m_entryCount - 2; j >= 2; j--) {
                     copyPolygonData(&entries[j + 1], &entries[j]);
                 }
             }
@@ -303,7 +303,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
             TRACE_POLYGON* splineEntry = entries;
             for (i = 0; i < splineCount; i++) {
                 s32 idx = i + 2;
-                splineEntry[2].alpha = param_2->m_tracer.m_entryAlpha - idx * splineEntry[2].decay;
+                splineEntry[2].alpha = step->m_tracer.m_entryAlpha - idx * splineEntry[2].decay;
                 pppCopyVector(entries[idx].from, splineFrom[i]);
                 pppCopyVector(entries[idx].to, splineTo[i]);
                 splineEntry++;
@@ -339,9 +339,9 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
+void pppDestructYmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
 {
-    YmTracerWork* work = GetYmTracerWork(pppYmTracer, param_2);
+    YmTracerWork* work = GetYmTracerWork(tracer, ctrl);
     if (work->entries != 0) {
         pppMemFree(work->entries);
     }
@@ -356,11 +356,11 @@ void pppDestructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
+void pppConstruct2YmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
 {
     YmTracerWork* work;
 
-    work = GetYmTracerWork(pppYmTracer, param_2);
+    work = GetYmTracerWork(tracer, ctrl);
     work->_pad2e = 0;
     work->count = 0;
 }
@@ -374,25 +374,25 @@ void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
+void pppConstructYmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
 {
-    f32 fVar1;
+    f32 zero;
     YmTracerWork* work;
 
-    fVar1 = 0.0f;
-    work = GetYmTracerWork(pppYmTracer, param_2);
+    zero = 0.0f;
+    work = GetYmTracerWork(tracer, ctrl);
 
     work->entries = 0;
     work->arg3Work = 0;
     work->initWork = 0;
     work->count = 0;
-    work->_pad0 = fVar1;
-    work->from.z = fVar1;
-    work->from.y = fVar1;
-    work->from.x = fVar1;
-    work->_pad1c = fVar1;
-    work->to.z = fVar1;
-    work->to.y = fVar1;
-    work->to.x = fVar1;
+    work->_pad0 = zero;
+    work->from.z = zero;
+    work->from.y = zero;
+    work->from.x = zero;
+    work->_pad1c = zero;
+    work->to.z = zero;
+    work->to.y = zero;
+    work->to.x = zero;
     work->_pad2e = 0;
 }

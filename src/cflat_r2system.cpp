@@ -10,6 +10,8 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/itemobj.h"
 #include "ffcc/joybus.h"
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
 #include "ffcc/line.h"
 #include "ffcc/math.h"
 #include "ffcc/map.h"
@@ -73,7 +75,6 @@ extern const float kCFlatHalfPi;
 extern const float kCFlatPi;
 extern const float kCFlatThreeHalfPi;
 
-
 static inline void StoreSetU32(CFlatRuntime::CStack* stack, int setMode, unsigned int* value)
 {
     stack[-1].m_word = *value;
@@ -136,7 +137,6 @@ static inline int ClampIndex(int index, int maxIndex)
     }
     return index;
 }
-
 
 static inline void LerpVec(Vec& out, const Vec& a, const Vec& b, float t)
 {
@@ -390,13 +390,10 @@ int CMiniGamePcs::GetMiniGameParam(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-__declspec(section ".rodata") static const char sMiniGameParamDebugFmt[] =
-    "SetMiniGameParam no 0x%04x data[%d]\n";
-
 inline void CMiniGamePcs::SetMiniGameParam(int id, int value)
 {
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-        System.Printf(const_cast<char*>(sMiniGameParamDebugFmt), id, value);
+        System.Printf("SetMiniGameParam  no=0x%04x  data=%d\n", id, value);
     }
 
     switch (id) {
@@ -552,7 +549,6 @@ void CMes::SetTempValue(int index, int value)
 {
     m_tempVar[index] = value;
 }
-
 
 /*
  * --INFO--
@@ -810,7 +806,6 @@ inline CMesMenu* CMenuPcs::GetMesMenu(int index)
 {
     return m_battleMesMenus[index];
 }
-
 
 /*
  * --INFO--
@@ -1342,7 +1337,6 @@ int CLine<64>::IsInner(Vec* position, float margin)
     return 0;
 }
 
-
 /*
  * --INFO--
  * PAL Address: 0x800B3310
@@ -1352,11 +1346,8 @@ int CLine<64>::IsInner(Vec* position, float margin)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma pool_strings on
 int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFunc, int& outResult)
 {
-    char* gbaPath = const_cast<char*>("dvd/gba/");
-
     switch (systemFunc) {
     case -3:
         this->push(object, getNumFreeObject(5));
@@ -2632,7 +2623,7 @@ renderedDone:
     }
     case -0x58: {
         char filename[0x80];
-        sprintf(filename, "cflat_d%d.bin", *object->m_localBase);
+        sprintf(filename, "cflat%d", *object->m_localBase);
         MemoryCardMan.DebugReadWrite(1, filename, reinterpret_cast<u8*>(m_debugDataBuffer), sizeof(m_debugDataBuffer));
         this->push(object, 0);
         outResult = 0;
@@ -2640,7 +2631,7 @@ renderedDone:
     }
     case -0x59: {
         char filename[0x80];
-        sprintf(filename, "cflat_d%d.bin", *object->m_localBase);
+        sprintf(filename, "cflat%d", *object->m_localBase);
         MemoryCardMan.DebugReadWrite(0, filename, reinterpret_cast<u8*>(m_debugDataBuffer), sizeof(m_debugDataBuffer));
         this->push(object, 0);
         outResult = 0;
@@ -3801,7 +3792,6 @@ renderedDone:
 
     return 1;
 }
-#pragma pool_strings off
 
 /*
  * --INFO--

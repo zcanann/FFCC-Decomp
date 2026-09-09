@@ -1143,7 +1143,7 @@ joybus.cpp:
 	extabindex  start:0x8000E500 end:0x8000E8D8
 	.text       start:0x800A6094 end:0x800B28F0
 	.ctors      start:0x801D5424 end:0x801D5428
-	.rodata     start:0x801DA058 end:0x801DA3E4
+	.rodata     start:0x801DA058 end:0x801DA3B0
 	.data       start:0x8020FB10 end:0x8020FB2C
 	.bss        start:0x802EAAB0 end:0x802F2600
 	.sdata      start:0x8032E830 end:0x8032E840
@@ -1154,6 +1154,7 @@ cflat_r2system.cpp:
 	extab       start:0x80008280 end:0x80008338
 	extabindex  start:0x8000E8D8 end:0x8000E9EC
 	.text       start:0x800B28F0 end:0x800BA2FC
+	.rodata     start:0x801DA3B0 end:0x801DA778
 	.data       start:0x8020FB30 end:0x802101F0
 	.sdata2     start:0x80330B30 end:0x80330B34
 

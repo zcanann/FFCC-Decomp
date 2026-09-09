@@ -366,7 +366,7 @@ void GbaQueue::LoadAll()
 		} else {
 			OSWaitSemaphore(accessSemaphores + i);
 			{
-				unsigned short maskValue = *reinterpret_cast<int*>(Game.m_scriptFoodBase[i] + 0x89C);
+				unsigned short maskValue = Game.m_scriptFoodBase[i]->m_evtState0;
 				if ((maskValue != m_sendMask[i]) && (Joybus.SendMask(i, maskValue) == 0)) {
 					m_sendMask[i] = maskValue;
 					m_maskSendState[i] = 6;
@@ -393,7 +393,7 @@ void GbaQueue::LoadAll()
 
 			unsigned int bit = static_cast<unsigned int>(1U << i);
 			if ((resetMask & bit) != 0) {
-				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i]);
+				CCaravanWork* caravanWork = Game.m_scriptFoodBase[i];
 				if (caravanWork->m_shopRequestState == 1) {
 					const int playerMask = 1 << i;
 					OSWaitSemaphore(accessSemaphores + i);
@@ -405,9 +405,9 @@ void GbaQueue::LoadAll()
 							break;
 						}
 					}
-					reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->CallShop(0, 0, 0, 0, 0);
+					Game.m_scriptFoodBase[i]->CallShop(0, 0, 0, 0, 0);
 				}
-				if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_shopRequestState == 2) {
+				if (Game.m_scriptFoodBase[i]->m_shopRequestState == 2) {
 					const int shopMask = 0x10 << i;
 					OSWaitSemaphore(accessSemaphores + i);
 					m_shopFlags = static_cast<unsigned char>(m_shopFlags & ~shopMask);
@@ -418,7 +418,7 @@ void GbaQueue::LoadAll()
 							break;
 						}
 					}
-					reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->CallShop(1, 0, 0, 0, 0);
+					Game.m_scriptFoodBase[i]->CallShop(1, 0, 0, 0, 0);
 				}
 			}
 
@@ -466,7 +466,7 @@ void GbaQueue::ClrShopMode()
 
 	obj = reinterpret_cast<char*>(this);
 	for (i = 0; i < 4; i++) {
-		caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i]);
+		caravanWork = Game.m_scriptFoodBase[i];
 		if (caravanWork == 0) {
 			continue;
 		}
@@ -485,10 +485,10 @@ void GbaQueue::ClrShopMode()
 					break;
 				}
 			}
-			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->CallShop(0, 0, 0, 0, 0);
+			Game.m_scriptFoodBase[i]->CallShop(0, 0, 0, 0, 0);
 		}
 
-		if (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_shopRequestState == 2) {
+		if (Game.m_scriptFoodBase[i]->m_shopRequestState == 2) {
 			OSWaitSemaphore(accessSemaphores + i);
 			{
 				const int shopMask = 0x10 << i;
@@ -502,7 +502,7 @@ void GbaQueue::ClrShopMode()
 					break;
 				}
 			}
-			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->CallShop(1, 0, 0, 0, 0);
+			Game.m_scriptFoodBase[i]->CallShop(1, 0, 0, 0, 0);
 		}
 
 		if ((m_shopStatusFlags & (1 << i)) != 0) {
@@ -538,7 +538,7 @@ void GbaQueue::ClrShopMode()
  */
 inline void GbaQueue::LoadMask()
 {
-	int* scriptFoodBase = reinterpret_cast<int*>(Game.m_scriptFoodBase);
+	CCaravanWork** scriptFoodBase = Game.m_scriptFoodBase;
 
 	for (int i = 0; i < 4; i++) {
 		if (scriptFoodBase[i] == 0) {
@@ -548,7 +548,7 @@ inline void GbaQueue::LoadMask()
 
 		OSWaitSemaphore(accessSemaphores + i);
 		{
-			unsigned short maskValue = *reinterpret_cast<unsigned short*>(scriptFoodBase[i] + 0x89C);
+			unsigned short maskValue = static_cast<unsigned short>(scriptFoodBase[i]->m_evtState0 >> 16);
 			if ((maskValue != m_sendMask[i]) && (Joybus.SendMask(i, maskValue) == 0)) {
 				m_sendMask[i] = maskValue;
 				m_maskSendState[i] = 6;
@@ -619,11 +619,11 @@ inline void GbaQueue::ChgItemData(int channel, unsigned int data)
 	const int action = dataBytes[1];
 
 	if (action == 1) {
-		reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->FGUseItem(dataBytes[2], 1);
+		Game.m_scriptFoodBase[channel]->FGUseItem(dataBytes[2], 1);
 	} else if (action == 2) {
-		reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->FGPutItem(dataBytes[2], 1);
+		Game.m_scriptFoodBase[channel]->FGPutItem(dataBytes[2], 1);
 	} else if (action == 3) {
-		reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->DeleteItemIdx(dataBytes[2], 1);
+		Game.m_scriptFoodBase[channel]->DeleteItemIdx(dataBytes[2], 1);
 	}
 }
 
@@ -650,7 +650,7 @@ inline void GbaQueue::ChgMoneyData(int channel, unsigned int data)
 		m_pendingMoney[channel] |= dataBytes[2];
 		Joybus.SendResult(channel, 0, dataBytes[0], m_moneyState[channel] & 7);
 		if ((m_moneyState[channel] & 7) == 1) {
-			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->FGPutGil(m_pendingMoney[channel]);
+			Game.m_scriptFoodBase[channel]->FGPutGil(m_pendingMoney[channel]);
 		}
 		m_pendingMoney[channel] = 0;
 		m_moneyState[channel] = 0;
@@ -666,7 +666,7 @@ inline void GbaQueue::ChgEquipPosData(int channel, unsigned int data)
 {
 	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
 
-	reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])
+	Game.m_scriptFoodBase[channel]
 		->ChgEquipPos(static_cast<signed char>(dataBytes[1]), static_cast<signed char>(dataBytes[2]));
 }
 
@@ -679,7 +679,7 @@ inline void GbaQueue::ChgCmdLstData(int channel, unsigned int data)
 {
 	unsigned char* dataBytes = reinterpret_cast<unsigned char*>(&data);
 
-	reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])
+	Game.m_scriptFoodBase[channel]
 		->ChgCmdLst(dataBytes[1], SwapS16(*reinterpret_cast<short*>(dataBytes + 2)));
 }
 
@@ -755,7 +755,7 @@ void GbaQueue::ExecutQueue()
 							m_letterDatFlg &= ~playerBit;
 							OSSignalSemaphore(accessSemaphores + channel);
 							Joybus.SetLetterSize(channel, 0);
-							reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->FGLetterOpen(cmdBytes[2]);
+							Game.m_scriptFoodBase[channel]->FGLetterOpen(cmdBytes[2]);
 							MakeLetterData(channel, Joybus.GetLetterBuffer(channel), cmdBytes[2]);
 						} else if (cmdBytes[1] == 6) {
 							OSWaitSemaphore(accessSemaphores + channel);
@@ -827,24 +827,24 @@ void GbaQueue::ExecutQueue()
 								break;
 							}
 						}
-						reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->CallShop(0, 0, 0, 0, 0);
+						Game.m_scriptFoodBase[channel]->CallShop(0, 0, 0, 0, 0);
 					} else if (cmdBytes[1] == 8) {
 						if (Game.m_scriptFoodBase[channel] != 0) {
 							unsigned int cmdWord = queueWords[i];
 							unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
 							const int itemId =
-								reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_inventoryItems[static_cast<int>(bytes[2])];
-							reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->DeleteItemIdx(bytes[2], 1);
+								Game.m_scriptFoodBase[channel]->m_inventoryItems[static_cast<int>(bytes[2])];
+							Game.m_scriptFoodBase[channel]->DeleteItemIdx(bytes[2], 1);
 							const unsigned short baseGil =
 								reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_price;
 							int gil = static_cast<int>(
 								static_cast<float>(
-									static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0)
+									static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0)
 								* 0.25f * static_cast<float>(baseGil));
 							if (gil < 1) {
 								gil = 1;
 							}
-							reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->AddGil(gil);
+							Game.m_scriptFoodBase[channel]->AddGil(gil);
 							Joybus.SendResult(channel, 0, bytes[0], bytes[1]);
 						}
 					} else if (cmdBytes[1] == 9) {
@@ -853,9 +853,9 @@ void GbaQueue::ExecutQueue()
 							unsigned char* bytes = reinterpret_cast<unsigned char*>(&cmdWord);
 							int n;
 							const int quantity = bytes[3];
-							unsigned int shopItem = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopList[bytes[2]];
+							unsigned int shopItem = Game.m_scriptFoodBase[channel]->m_shopList[bytes[2]];
 							for (n = 0; n < quantity; n++) {
-								bool added = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->AddItem(shopItem, 0);
+								bool added = Game.m_scriptFoodBase[channel]->AddItem(shopItem, 0);
 								if (added == false) {
 									Joybus.SendResult(channel, 1, bytes[0], bytes[1]);
 								}
@@ -864,9 +864,9 @@ void GbaQueue::ExecutQueue()
 								reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[shopItem].m_price;
 							const int gil = static_cast<int>(
 								static_cast<float>(
-									static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0)
+									static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0)
 								* static_cast<float>(baseGil));
-							reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->AddGil(-(gil * quantity));
+							Game.m_scriptFoodBase[channel]->AddGil(-(gil * quantity));
 							Joybus.SendResult(channel, 0, bytes[0], bytes[1]);
 						}
 					} else if (cmdBytes[1] == 10) {
@@ -883,7 +883,7 @@ void GbaQueue::ExecutQueue()
 								break;
 							}
 						}
-						reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->CallShop(1, 0, 0, 0, 0);
+						Game.m_scriptFoodBase[channel]->CallShop(1, 0, 0, 0, 0);
 					} else if (cmdBytes[1] == 0x15) {
 						for (int s = 0; s < 4; s++) {
 							OSWaitSemaphore(accessSemaphores + s);
@@ -899,7 +899,7 @@ void GbaQueue::ExecutQueue()
 					}
 				} else if ((cmd == 6) && (cmdBytes[1] == 0x18)) {
 					if (Game.m_scriptFoodBase[channel] != 0) {
-						reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_evtState1 = 1;
+						Game.m_scriptFoodBase[channel]->m_evtState1 = 1;
 					}
 					m_maskSendState[channel] = static_cast<signed char>(0xFF);
 				} else if (cmd == 0x1C) {
@@ -960,9 +960,9 @@ inline void GbaQueue::SetBuyData(int, unsigned int)
  */
 void GbaQueue::SetSmithData(int channel, unsigned int value)
 {
-	unsigned int* foodBaseArr = Game.m_scriptFoodBase;
-	unsigned int* scriptFoodBase = foodBaseArr + channel;
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
+	CCaravanWork** foodBaseArr = Game.m_scriptFoodBase;
+	CCaravanWork** scriptFoodBase = foodBaseArr + channel;
+	CCaravanWork* caravanWork = (*scriptFoodBase);
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&value);
 	const unsigned int itemSlot = valueBytes[2];
 	const int recipeIndex = valueBytes[3];
@@ -987,24 +987,24 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		for (int materialIdx = 0; materialIdx < static_cast<int>(materialCount); materialIdx++) {
 			int foundSlot;
 			for (foundSlot = 0; foundSlot < 64; foundSlot++) {
-				CCaravanWork* materialWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
+				CCaravanWork* materialWork = (*scriptFoodBase);
 				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
 					break;
 				}
 			}
 
-			reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->DeleteItemIdx(foundSlot, 1);
+			(*scriptFoodBase)->DeleteItemIdx(foundSlot, 1);
 		}
 	}
 
-	const bool addItemResult = reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddItem(smithItem, 0);
+	const bool addItemResult = (*scriptFoodBase)->AddItem(smithItem, 0);
 	if (!addItemResult) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 
-	const float smithRate = static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->m_shopParam) / 100.0);
+	const float smithRate = static_cast<float>(static_cast<double>((*scriptFoodBase)->m_shopParam) / 100.0);
 	const int gilCost = -static_cast<int>(static_cast<float>(itemRow->m_smithPrice) * smithRate);
-	const int addGilResult = reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(gilCost);
+	const int addGilResult = (*scriptFoodBase)->AddGil(gilCost);
 	if (addGilResult == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
@@ -1167,7 +1167,7 @@ void GbaQueue::SetRadarType()
 	for (i = 0; i < 4; i++) {
 		m_radarType[i] = 1;
 		if ((Game.m_scriptFoodBase[i] != 0) &&
-		    (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->m_shopState != 0)) {
+		    (Game.m_scriptFoodBase[i]->m_shopState != 0)) {
 			activeMask |= (1 << i);
 		}
 	}
@@ -1285,10 +1285,10 @@ void GbaQueue::LoadPlayerStat()
 			CGPartyObj* partyObj;
 
 			if ((menuStageMode != 0) && (i == 1)) {
-				caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+				caravanWork = Game.m_scriptFoodBase[0];
 				partyObj = Game.m_partyObjArr[0];
 			} else {
-				caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i]);
+				caravanWork = Game.m_scriptFoodBase[i];
 				partyObj = Game.m_partyObjArr[i];
 			}
 
@@ -2057,7 +2057,7 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
  */
 int GbaQueue::MakeLetterList(int channel, char* outData)
 {
-	const unsigned int scriptFood = Game.m_scriptFoodBase[channel];
+	CCaravanWork* const scriptFood = Game.m_scriptFoodBase[channel];
 
 	if (scriptFood == 0) {
 		const unsigned int channelMask = 1U << channel;
@@ -2098,7 +2098,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 	memset(letterEntryBuf, 0, kGbaQueueLetterEntryBytes);
 
-	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(scriptFood);
+	const CCaravanWork* caravanWork = scriptFood;
 	int letterCount = caravanWork->m_letterCount;
 
 	int npcCount = 0;
@@ -2259,9 +2259,9 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
     }
     memset(workText, 0, kGbaQueueScratchTextSize);
 
-    unsigned int* foodBaseArr = Game.m_scriptFoodBase;
-    unsigned int* foodBasePtr = foodBaseArr + channel;
-    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*foodBasePtr);
+    CCaravanWork** foodBaseArr = Game.m_scriptFoodBase;
+    CCaravanWork** foodBasePtr = foodBaseArr + channel;
+    CCaravanWork* caravanWork = (*foodBasePtr);
     CMes::m_tempVar[0] = caravanWork->m_letters[letterIndex].TempVar(0);
     CMes::m_tempVar[1] = caravanWork->m_letters[letterIndex].TempVar(1);
     CMes::m_tempVar[2] = caravanWork->m_letters[letterIndex].TempVar(2);
@@ -2272,14 +2272,14 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
     int mesIndex = (msgIndex & 0x7FC) >> 1;
 
     strcpy(srcText, Game.m_cFlatDataArr[1].Message(mesIndex + 0x10));
-    CMes::MakeAgbString(workText, srcText, reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_genderFlag, 0);
+    CMes::MakeAgbString(workText, srcText, (*foodBasePtr)->m_genderFlag, 0);
     int totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
 
     memset(srcText, 0, kGbaQueueScratchTextSize);
     memset(workText, 0, kGbaQueueScratchTextSize);
     strcpy(srcText, Game.m_cFlatDataArr[1].Message(mesIndex + 0x11));
-    CMes::MakeAgbString(workText, srcText, reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_genderFlag, 0);
+    CMes::MakeAgbString(workText, srcText, (*foodBasePtr)->m_genderFlag, 0);
     int line2Size = static_cast<int>(strlen(workText));
     memcpy(outData + totalSize, workText, line2Size + 1);
     totalSize += line2Size + 1;
@@ -2371,8 +2371,8 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 {
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
-	unsigned int* foodBaseArr = Game.m_scriptFoodBase;
-	unsigned int* foodBasePtr = foodBaseArr + channel;
+	CCaravanWork** foodBaseArr = Game.m_scriptFoodBase;
+	CCaravanWork** foodBasePtr = foodBaseArr + channel;
 	int letterOffset = valueBytes[2] * 0xC;
 	char* letter = reinterpret_cast<char*>(*foodBasePtr) + letterOffset;
 	int hasGil = reinterpret_cast<CCaravanWork::CLetterWork*>(letter + 0x3EC)->FlagsBits().m_attachmentIsGil;
@@ -2382,7 +2382,7 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
 		if (item != 0) {
 			if ((item < 1) || (item > 0x9E)) {
-				if (reinterpret_cast<CCaravanWork*>(*foodBasePtr)->AddItem(item, 0) == 0) {
+				if ((*foodBasePtr)->AddItem(item, 0) == 0) {
 					result = 1;
 				} else {
 					result = 0;
@@ -2394,10 +2394,10 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
 		if (item != 0) {
 			int gil = item * 100;
-			if (reinterpret_cast<CCaravanWork*>(*foodBasePtr)->CanAddGil(gil) == 0) {
+			if ((*foodBasePtr)->CanAddGil(gil) == 0) {
 				result = 1;
 			} else {
-				reinterpret_cast<CCaravanWork*>(*foodBasePtr)->AddGil(gil);
+				(*foodBasePtr)->AddGil(gil);
 				result = 0;
 			}
 		}
@@ -2448,16 +2448,16 @@ void GbaQueue::ReplyLetter(int channel)
 		itemId = value & 0xffff;
 	}
 
-	unsigned int* foodBaseArr = Game.m_scriptFoodBase;
-	unsigned int* scriptFoodBase = foodBaseArr + channel;
-	reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->FGLetterReply(arg0, arg1, itemId, gil);
+	CCaravanWork** foodBaseArr = Game.m_scriptFoodBase;
+	CCaravanWork** scriptFoodBase = foodBaseArr + channel;
+	(*scriptFoodBase)->FGLetterReply(arg0, arg1, itemId, gil);
 	Joybus.ClrRecvBuffer(channel);
 	Joybus.SendResult(channel, 0, 0x15, 0);
 
 	if (recvBuffer[2] != 0) {
-		reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(-static_cast<int>(gil));
+		(*scriptFoodBase)->AddGil(-static_cast<int>(gil));
 	} else if (itemId != 0) {
-		reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->DeleteItemIdx(static_cast<int>(value) >> 16, 1);
+		(*scriptFoodBase)->DeleteItemIdx(static_cast<int>(value) >> 16, 1);
 	}
 }
 
@@ -3477,7 +3477,7 @@ inline void GbaQueue::ShopEnd(int channel)
 {
 	ClrShopFlg(channel);
 
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[channel];
 	if (caravanWork != 0) {
 		caravanWork->CallShop(0, 0, 0, 0, 0);
 	}
@@ -3492,7 +3492,7 @@ inline void GbaQueue::SmithEnd(int channel)
 {
 	ClrSmithFlg(channel);
 
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[channel];
 	if (caravanWork != 0) {
 		caravanWork->CallShop(1, 0, 0, 0, 0);
 	}
@@ -3527,9 +3527,9 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-	unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
+	CCaravanWork** foodBasePtr = &Game.m_scriptFoodBase[channel];
 	const int itemCount = static_cast<short>(
-		reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopListCount);
+		Game.m_scriptFoodBase[channel]->m_shopListCount);
 
 	int totalSize = 4;
 	int work;
@@ -3541,7 +3541,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	char* writePtr = outData + 4;
 
 	for (i = 0; i < itemCount; i++) {
-		itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopList[i];
+		itemId = (*foodBasePtr)->m_shopList[i];
 		swapped = __lhbrx(&itemId, 0);
 		memcpy(writePtr, &swapped, 2);
 		writePtr += 2;
@@ -3554,10 +3554,10 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 
 	const float userRate = static_cast<float>(
-		static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0);
+		static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
 
 	for (i = 0; i < itemCount; i++) {
-		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopList[i];
+		work = (*foodBasePtr)->m_shopList[i];
 		work = static_cast<int>(
 			static_cast<float>(static_cast<unsigned short>(
 				reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[work].m_price)) *
@@ -3576,7 +3576,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopList[i];
+		work = (*foodBasePtr)->m_shopList[i];
 		strcpy(itemNameScratch, Game.m_cFlatDataArr[1].TableStrings(6)[work]);
 		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 
@@ -3626,7 +3626,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-	unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
+	CCaravanWork** foodBasePtr = &Game.m_scriptFoodBase[channel];
 	int totalSize = 0;
 	int work;
 	unsigned int packed;
@@ -3635,7 +3635,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 
 	for (i = 0; i < 0x40; i++) {
 		unsigned short sellInfo[4];
-		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
+		work = (*foodBasePtr)->m_inventoryItems[i];
 		if ((work < 1) || (work > 0x9E)) {
 			memset(sellInfo, 0, sizeof(sellInfo));
 		} else {
@@ -3652,9 +3652,9 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	const float userRate =
 		0.25f *
 		static_cast<float>(
-			static_cast<double>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel])->m_shopParam) / 100.0);
+			static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
 	for (i = 0; i < 0x40; i++) {
-		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
+		work = (*foodBasePtr)->m_inventoryItems[i];
 		if (work > 0) {
 			work = static_cast<int>(
 				static_cast<float>(static_cast<unsigned short>(
@@ -3677,7 +3677,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		work = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
+		work = (*foodBasePtr)->m_inventoryItems[i];
 		if (work > 0) {
 			strcpy(itemNameScratch, Game.m_cFlatDataArr[1].TableStrings(6)[work]);
 			CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
@@ -3724,11 +3724,11 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 	memset(smithIndices, 0xFF, 0x40);
 
-	unsigned int* foodBasePtr = &Game.m_scriptFoodBase[channel];
+	CCaravanWork** foodBasePtr = &Game.m_scriptFoodBase[channel];
 
 	char smithCount = 0;
 	for (int i = 0; i < 0x40; i++) {
-		if (reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i] >= 401) {
+		if ((*foodBasePtr)->m_inventoryItems[i] >= 401) {
 			smithIndices[smithCount++] = static_cast<unsigned char>(i);
 		}
 	}
@@ -3750,7 +3750,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	totalSize = work + 1;
 
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_inventoryItems[i];
+		const int itemId = (*foodBasePtr)->m_inventoryItems[i];
 		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
 			SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
@@ -3759,7 +3759,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 
 			int price = static_cast<int>(
 				static_cast<float>(itemBase->m_smithPrice) *
-				static_cast<float>(static_cast<double>(reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopParam) / 100.0));
+				static_cast<float>(static_cast<double>((*foodBasePtr)->m_shopParam) / 100.0));
 
 			work = price;
 			itemBuf[0] = __lwbrx(&work, 0);
@@ -3794,7 +3794,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 
 	for (int i = 0; i < 4; i++) {
-		work = __lwbrx(reinterpret_cast<unsigned int*>(&reinterpret_cast<CCaravanWork*>(*foodBasePtr)->m_shopArgs[i]), 0);
+		work = __lwbrx(reinterpret_cast<unsigned int*>(&(*foodBasePtr)->m_shopArgs[i]), 0);
 		memcpy(writePtr, &work, 4);
 		writePtr += 4;
 		totalSize += 4;

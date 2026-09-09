@@ -1331,7 +1331,7 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
  */
 void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor color, int tlut, float margin, float scale)
 {
-	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	const CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
 	u32 lineBaseY[4] = { 0x160, 0x14E, 0x142, 0x13E };
 
 	int languageIndex = Game.m_gameWork.m_languageId - 1;

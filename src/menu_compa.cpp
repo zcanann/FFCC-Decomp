@@ -42,7 +42,7 @@ void CMenuPcs::CompaDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	GXColor colors[4];
 	CompaOpenAnimList* compaList;
 	int familyCount;
@@ -236,7 +236,7 @@ void CMenuPcs::CompaDraw()
 
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
 
-	caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	caravanWork = Game.m_scriptFoodBase[0];
 	drawIndex = 0;
 	shown = 0;
 	yOffset = drawIndex * 0x28;

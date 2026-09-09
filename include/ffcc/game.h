@@ -161,7 +161,7 @@ public:
     unsigned int unkCFlatData0[3];          // 0xC5A0
     unsigned int m_romLetterWorkBase;       // 0xC5AC
     CGPartyObj* m_partyObjArr[4];           // 0xC5B0
-    unsigned int m_scriptFoodBase[4];       // 0xC5C0
+    CCaravanWork* m_scriptFoodBase[4];       // 0xC5C0
     CGObject* m_monObjects[64];             // 0xC5D0
     CMonWork* m_monWorkRefs[64];             // 0xC6D0
     unsigned int unk_flat3_0xc7d0;          // 0xC7D0

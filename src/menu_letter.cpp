@@ -123,7 +123,7 @@ static inline char* GetLetterItemName(int itemId)
 
 static inline CCaravanWork* GetLetterCaravanWork()
 {
-	return reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	return Game.m_scriptFoodBase[0];
 }
 
 static inline CMemory::CStage* GetLetterMenuStage(CMenuPcs* menu)
@@ -1919,7 +1919,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
  */
 void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
 {
-	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
 
 	if (s_Attach == 0) {
 		s_AttachItemIdx = static_cast<signed char>(itemIndex);

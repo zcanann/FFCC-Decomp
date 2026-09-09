@@ -1149,7 +1149,7 @@ CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
  */
 int CGame::GetFoodLevel(int playerIndex, int foodIndex)
 {
-    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptFoodBase[playerIndex]);
+    CCaravanWork* caravanWork = m_scriptFoodBase[playerIndex];
     u16 level = caravanWork->m_letterMeta[foodIndex];
     return level;
 }
@@ -1165,8 +1165,8 @@ int CGame::GetFoodLevel(int playerIndex, int foodIndex)
  */
 void CGame::GetTargetCursor(int playerIndex, Vec& posA, Vec& posB)
 {
-    posA = reinterpret_cast<CCaravanWork*>(m_scriptFoodBase[playerIndex])->m_targetCursorPosA;
-    posB = reinterpret_cast<CCaravanWork*>(m_scriptFoodBase[playerIndex])->m_targetCursorPosB;
+    posA = m_scriptFoodBase[playerIndex]->m_targetCursorPosA;
+    posB = m_scriptFoodBase[playerIndex]->m_targetCursorPosB;
 }
 
 /*

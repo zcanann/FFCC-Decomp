@@ -1054,7 +1054,7 @@ void CGObject::SetClassWork(int ownerType, int workIndex)
         m_scriptHandle = reinterpret_cast<void**>(&Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[workIndex]]);
         reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_saveSlot = Game.m_gameWork.m_wmBackupParams[workIndex];
         reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_ownerObj = this;
-        Game.m_scriptFoodBase[workIndex] = reinterpret_cast<u32>(m_scriptHandle);
+        Game.m_scriptFoodBase[workIndex] = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
         return;
     }
 

@@ -152,7 +152,7 @@ void CMenuPcs::TmpArtiDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	TmpArtiEntry* entry = m_tmpArtiList->entries;
-	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	const CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
 
 	for (int i = 0; i < m_tmpArtiList->count; i++) {
 		if (entry->tex >= 0) {
@@ -302,7 +302,7 @@ int CMenuPcs::TmpArtiCtrl()
 
 	if (hasInput) {
 		float alpha = kTmpArtiOne;
-		const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+		const CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
 
 		TmpArtiEntry* entry = this->m_tmpArtiList->entries;
 		for (int i = 0; i < this->m_tmpArtiList->count; i = i + 1) {

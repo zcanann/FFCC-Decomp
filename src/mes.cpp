@@ -19,11 +19,6 @@ static char s_MessageSpeedTagUsed[] =
 	"\x83\x81\x83\x62\x83\x5A\x81\x5B\x83\x57\x88\xEA\x8F\x9F\x95\x5C\x8E\xA6"
 	"\x83\x82\x81\x5B\x83\x68\x82\xC5<speed>\x83\x5E\x83\x4F\x82\xAA\x8E\x67"
 	"\x97\x70\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD\x81\x42\n";
-static const char s_mesNumFmt[] = "%d";
-static const char s_mesFallback[] = "---";
-static const char s_mesEmpty[] = "";
-static char* sTag54Source;
-static char sTag54Init;
 
 static inline char GetMesNibbleValue(const char* data)
 {
@@ -181,11 +176,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
  */
 void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOnLineBreak)
 {
-	if (sTag54Init == 0)
-	{
-		sTag54Source = (char*)s_mesEmpty;
-		sTag54Init = 1;
-	}
+	static char* ELLIPSIS_STR = "...";
 
 	unsigned char caseMode = 0;
 	unsigned char branchMode = 0;
@@ -361,7 +352,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x30:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
-			sprintf(out, s_mesNumFmt, CMes::m_tempVar[varIndex]);
+			sprintf(out, "%d", CMes::m_tempVar[varIndex]);
 			out += strlen(out);
 			src += 2;
 			break;
@@ -431,7 +422,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			branchMode = 0;
 			break;
 		case 0x54:
-			strcpy(out, sTag54Source);
+			strcpy(out, ELLIPSIS_STR);
 			out += strlen(out);
 			break;
 		case 0x0C:
@@ -1128,7 +1119,7 @@ void CMes::addString(char** text, int branchMode)
 		{
 			char number[256];
 			char* numberPtr;
-			sprintf(numberPtr = number, s_mesNumFmt, mFlagVars[GET_1(text)]);
+			sprintf(numberPtr = number, "%d", mFlagVars[GET_1(text)]);
 			addString(&numberPtr, branchMode);
 			break;
 		}
@@ -1398,7 +1389,7 @@ void CMes::addString(char** text, int branchMode)
 			goto renderTag;
 		case 0x54:
 		{
-			char* src = (char*)s_mesEmpty;
+			char* src = "...";
 			addString(&src, branchMode);
 			break;
 		}

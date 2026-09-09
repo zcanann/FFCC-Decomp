@@ -1084,6 +1084,7 @@ mes.cpp:
 	.data       start:0x8020F4C8 end:0x8020F968
 	.bss        start:0x802EAA60 end:0x802EAAB0
 	.sbss       start:0x8032EDB0 end:0x8032EDB8
+	.sdata2     start:0x80330878 end:0x803308B8
 
 menu.cpp:
 	extab       start:0x80007D78 end:0x80007DA0

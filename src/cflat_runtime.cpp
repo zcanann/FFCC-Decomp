@@ -256,7 +256,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			CStopWatch watch(const_cast<char*>(lbl_8033011C));
 			watch.Reset();
 			watch.Start();
-			ret = onClassSystemFunc(object, systemKind, systemIndex, result);
+			ret = onSystemFunc(object, systemKind, systemIndex, result);
 			watch.Stop();
 			*reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x4C) += watch.Get();
 			*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x44C) += 1;
@@ -367,7 +367,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		CStopWatch watch(const_cast<char*>(lbl_8033011C));
 		watch.Reset();
 		watch.Start();
-		ret = onSystemFunc(object, systemKind, systemIndex, result);
+		ret = onClassSystemFunc(object, systemKind, systemIndex, result);
 		watch.Stop();
 		*reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x24C) += watch.Get();
 		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x64C) += 1;
@@ -560,7 +560,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			if ((arg & 1) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
-					    (arg & 0x10) != 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
+					    (arg & 0x10) != 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
 						value = object->m_thisBase + index;
@@ -578,8 +578,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 					object->m_sp--;
 					offset.m_word = *object->m_sp;
 					value = reinterpret_cast<unsigned int*>((arg & 0x10) != 0
-					                                            ? onSystemVal(object, index + offset.m_int)
-					                                            : onClassSystemVal(object, index + offset.m_int));
+					                                            ? onClassSystemVal(object, index + offset.m_int)
+					                                            : onSystemVal(object, index + offset.m_int));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
 						CStack offset;
@@ -604,7 +604,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				CStack offset;
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
-					    (arg & 0x10) != 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
+					    (arg & 0x10) != 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
 						value = object->m_thisBase + index;
@@ -628,7 +628,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			if ((arg & 1) != 0) {
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
-					    (arg & 0x10) != 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
+					    (arg & 0x10) != 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
 						value = object->m_thisBase + index;
@@ -646,8 +646,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 					object->m_sp--;
 					offset.m_word = *object->m_sp;
 					value = reinterpret_cast<unsigned int*>((arg & 0x10) != 0
-					                                            ? onSystemVal(object, index + offset.m_int)
-					                                            : onClassSystemVal(object, index + offset.m_int));
+					                                            ? onClassSystemVal(object, index + offset.m_int)
+					                                            : onSystemVal(object, index + offset.m_int));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
 						CStack offset;
@@ -672,7 +672,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				CStack offset;
 				if (index < 0) {
 					value = reinterpret_cast<unsigned int*>(
-					    (arg & 0x10) != 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
+					    (arg & 0x10) != 0 ? onClassSystemVal(object, index) : onSystemVal(object, index));
 				} else if ((arg & 8) != 0) {
 					if ((arg & 0x10) != 0) {
 						value = object->m_thisBase + index;

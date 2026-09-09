@@ -3477,29 +3477,7 @@ void CMenuPcs::DrawMCardMenu()
 		cursorX = (float)(*pStride * (double)(int)saveIdx + (double)cursorXbase);
 		DrawCursor((int)cursorY, (int)cursorX, 1.0f);
 
-		// 3D character viewports (4 slots)
-		WmWorldObjInfo* view = &m_wm.m_worldObjData[17];
-
-		int i = 0;
-		do {
-			if (view->m_active != 0) {
-				SetProjection(i + 17);
-				SetLight(0);
-				m_wm.m_handles[i + 17]->Draw(5);
-				int partA = m_effectWork[i + 17].m_partNo;
-				if (partA >= 0) {
-					PartPcs.DrawMenuIdx(partA);
-				}
-				int partB = m_effectWork[i + 21].m_partNo;
-				if (partB >= 0) {
-					PartPcs.DrawMenuIdx(partB);
-				}
-			}
-			i++;
-			view++;
-		} while (i < 4);
-		DrawInit();
-		RestoreProjection();
+		DrawMcObj();
 	}
 
 	// State machine for MC operations
@@ -4195,28 +4173,7 @@ void CMenuPcs::DrawLoadMenu()
 		cursorXbase = static_cast<float>(DOUBLE_80331498 * (rawIdx - DOUBLE_80331408) + static_cast<double>(cursorXbase));
 		DrawCursor((int)cursorY0, (int)cursorXbase, 1.0f);
 
-		// 3D character model viewports
-		WmWorldObjInfo* view = &m_wm.m_worldObjData[17];
-
-		int i = 0;
-		do {
-			if (view->m_active != 0) {
-				SetProjection(i + 17);
-				SetLight(0);
-				m_wm.m_handles[17 + i]->Draw(5);
-				if (m_effectWork[17 + i].m_partNo >= 0) {
-					PartPcs.DrawMenuIdx(m_effectWork[17 + i].m_partNo);
-				}
-				if (m_effectWork[21 + i].m_partNo >= 0) {
-					PartPcs.DrawMenuIdx(m_effectWork[21 + i].m_partNo);
-				}
-			}
-			view++;
-
-			i++;
-		} while (i < 4);
-		DrawInit();
-		RestoreProjection();
+		DrawMcObj();
 	}
 
 	// State machine for MC operations
@@ -9554,47 +9511,24 @@ void CMenuPcs::CalcMcObj()
  */
 inline void CMenuPcs::DrawMcObj()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldObjInfo* const worldObj = m_wm.m_worldObjData;
-	WmWorldState* const worldState = m_wmWorldState;
-	float alpha = FLOAT_803313e8;
-
-	if (worldState != 0) {
-		const short state = worldState->m_mainState;
-		if (state == 1) {
-			alpha = static_cast<float>(worldState->m_frameCounter) * 0.1f;
-		} else if (state >= 3) {
-			alpha = 1.0f - static_cast<float>(worldState->m_frameCounter) * 0.1f;
-		}
-	}
-	if (alpha < 0.0f) {
-		alpha = 0.0f;
-	} else if (alpha > 1.0f) {
-		alpha = 1.0f;
-	}
-
-	CalcMcObj();
-	if (worldObj != 0 && worldState != 0 && worldState->m_subState != 0) {
-		const GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
-		for (int i = 0; i < 4; i++) {
-			WmWorldObjInfo* const panel = &worldObj[17 + i];
-			if (panel->m_active == 0) {
-				continue;
+	WmWorldObjInfo* view = &m_wm.m_worldObjData[17];
+	for (int i = 0; i < 4; i++, view++) {
+		if (view->m_active != 0) {
+			SetProjection(i + 17);
+			SetLight(0);
+			m_wm.m_handles[i + 17]->Draw(5);
+			int partA = m_effectWork[i + 17].m_partNo;
+			if (partA >= 0) {
+				PartPcs.DrawMenuIdx(partA);
 			}
-
-			SetProjection(i + 0x11);
-			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-			GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x24));
-			DrawRect3d(0xFFFFFFFF, FLOAT_803313dc, FLOAT_803313dc, panel->m_transform.m_position.x, FLOAT_80331554,
-			           FLOAT_80331554, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
+			int partB = m_effectWork[i + 21].m_partNo;
+			if (partB >= 0) {
+				PartPcs.DrawMenuIdx(partB);
+			}
 		}
-		RestoreProjection();
 	}
-	DrawMCList();
-	DrawMcWin(m_menuWindowInfo->state, 0);
-	DrawPageMark();
-	DrawHelpBase(0, alpha);
+	DrawInit();
+	RestoreProjection();
 }
 
 /*

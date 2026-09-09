@@ -87,7 +87,16 @@ public:
 		int m_0x40;                // 0x40
 		int m_0x44;                // 0x44
 
-		virtual void onNewFinished();
+		/*
+		 * --INFO--
+		 * PAL Address: 0x8005f618
+		 * PAL Size: 4b
+		 * EN Address: TODO
+		 * EN Size: TODO
+		 * JP Address: TODO
+		 * JP Size: TODO
+		 */
+		virtual void onNewFinished() {}
 	};
 
 	class CFunc

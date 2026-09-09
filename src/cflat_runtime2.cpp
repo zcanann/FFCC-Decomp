@@ -97,7 +97,6 @@ static const char sCFlatRuntime2DebugFileNameFmt[] = "dvd/cft/%s.cft.dbg";
 static const char sCFlatRuntime2LoadMsg[] =
 	"\x83\x58\x83\x4e\x83\x8a\x83\x76\x83\x67\x93\xc7\x82\xdd\x8d\x9e"
 	"\x82\xdd\x8f\x49\x97\xb9\n";
-static const char sCFlatRuntimeObjectClassName[] = "CFlatRuntime::CObject\0\0";
 
 STATIC_ASSERT(sizeof(CFlatLayerResource) * kFlatLayerResourceCount == 0x60);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_layerResources) == 0x1770);

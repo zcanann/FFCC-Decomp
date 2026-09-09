@@ -4450,21 +4450,24 @@ unsigned int GbaQueue::GetChgHitFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int flag = m_chgHitFlags;
 	OSSignalSemaphore(semaphore);
-	unsigned int value = flag & (1U << actualChannel);
-	return value != 0;
+	return (flag & (1 << actualChannel)) != 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C97BC
+ * PAL Size: 124b
+ * EN Address: 0x800C9020
+ * EN Size: 124b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::ClrChgHitFlg(int channel)
 {
 	unsigned int actualChannel = m_singleMode != 0 ? 0 : channel;
 	OSSemaphore* semaphore = accessSemaphores + actualChannel;
 	OSWaitSemaphore(semaphore);
-	m_chgHitFlags = static_cast<unsigned char>(m_chgHitFlags & ~(1U << actualChannel));
+	m_chgHitFlags &= ~(1 << actualChannel);
 	OSSignalSemaphore(semaphore);
 }
 
@@ -4483,20 +4486,23 @@ unsigned int GbaQueue::GetChgScouFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int flag = m_chgScouFlags;
 	OSSignalSemaphore(semaphore);
-	unsigned int value = flag & (1U << channel);
-	return value != 0;
+	return (flag & (1 << channel)) != 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C96E0
+ * PAL Size: 104b
+ * EN Address: 0x800C8F44
+ * EN Size: 104b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::ClrChgScouFlg(int channel)
 {
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	m_chgScouFlags = static_cast<unsigned char>(m_chgScouFlags & ~(1U << channel));
+	m_chgScouFlags &= ~(1 << channel);
 	OSSignalSemaphore(semaphore);
 }
 
@@ -4826,8 +4832,7 @@ unsigned int GbaQueue::GetSPModeFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_spModeFlags;
 	OSSignalSemaphore(semaphore);
-	unsigned int mask = value & (1U << channel);
-	return mask != 0;
+	return (value & (1 << channel)) != 0;
 }
 
 /*
@@ -4862,8 +4867,7 @@ unsigned int GbaQueue::GetSPMode(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_spModeBits;
 	OSSignalSemaphore(semaphore);
-	unsigned int mask = value & (1U << channel);
-	return mask != 0;
+	return (value & (1 << channel)) != 0;
 }
 
 /*
@@ -4881,8 +4885,7 @@ unsigned int GbaQueue::GetMemorysFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_memorysFlags;
 	OSSignalSemaphore(semaphore);
-	unsigned int mask = value & (1U << channel);
-	return mask != 0;
+	return (value & (1 << channel)) != 0;
 }
 
 /*
@@ -4989,8 +4992,7 @@ unsigned int GbaQueue::GetPlayModeFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_playModeFlags;
 	OSSignalSemaphore(semaphore);
-	unsigned int mask = value & (1U << channel);
-	return mask != 0;
+	return (value & (1 << channel)) != 0;
 }
 
 /*
@@ -5051,8 +5053,7 @@ unsigned int GbaQueue::GetStartBonusFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_startBonusFlags;
 	OSSignalSemaphore(semaphore);
-	unsigned int mask = value & (1U << channel);
-	return mask != 0;
+	return (value & (1 << channel)) != 0;
 }
 
 /*

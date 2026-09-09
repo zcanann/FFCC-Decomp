@@ -2114,8 +2114,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	unsigned short powerValue;
 	bool isPrgObj = source->IsKindOf(0x2D);
 	if (isPrgObj) {
+		unsigned char usePartySource = 0;
 		unsigned char usePartyLeader = 0;
-		unsigned char usePartySource = usePartyLeader;
 		unsigned char stageModeActive = usePartyLeader;
 
 		if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {

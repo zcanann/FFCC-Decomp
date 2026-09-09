@@ -5,30 +5,15 @@
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_usb.h"
-extern "C" {
-extern const f32 kFunnyShapeNdcMax = 1.0f;
-extern const f32 kFunnyShapeNdcMin = -1.0f;
-extern const f32 kFunnyShapeOrthoFarZ = 100.0f;
-extern const f32 kFunnyShapeViewportOrigin = 0.0f;
-extern const f32 kFunnyShapeViewportWidth = 640.0f;
-extern const f32 kFunnyShapeViewportHeight = 448.0f;
-}
-static const char s_funnyShapeSpinner[5] = "|/-\\";
 #include "dolphin/gx/GXFrameBuffer.h"
 #include "dolphin/mtx.h"
 
 #include <string.h>
 
+static const char s_funnyShapeSpinner[5] = "|/-\\";
 static const char s_CFunnyShapePcsViewer[] = "CFunnyShapePcs(VIEWER)";
-extern "C" const Vec s_funnyEye = {0.0f, 0.0f, 4.0f};
-extern "C" const Vec s_funnyAt = {0.0f, 0.0f, 0.0f};
-extern "C" const Vec s_funnyUp = {0.0f, 1.0f, 0.0f};
 static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
-extern "C" const char sFunnyShapePcsManagerClassName[] = "CManager";
-extern "C" const char sFunnyShapePcsProcessClassName[] = "CProcess";
 static const char s_funnyShapeFmt[] = "FunnyShape [%c]";
-static const char s_CPtrArray_OSFS_TEXTURE_ST_801D7E44[] = "CPtrArray<OSFS_TEXTURE_ST *>";
-static const char s_CPtrArray_GXTexObj[] = "CPtrArray<_GXTexObj *>";
 
 inline void* operator new(unsigned long, void* ptr)
 {
@@ -39,8 +24,8 @@ inline void* operator new(unsigned long, void* ptr)
  * --INFO--
  * PAL Address: 0x8004E5E4
  * PAL Size: 184b
- * EN Address: 0x8005B6E4
- * EN Size: 236b
+ * EN Address: 0x8004E3D8
+ * EN Size: 184b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -62,9 +47,9 @@ void CFunnyShapePcs::Init()
         colors[i + 1].b = shade;
         colors[i + 1].a = 0xFF;
 
-        positions[i].x = kFunnyShapeViewportOrigin;
-        positions[i].y = kFunnyShapeViewportOrigin;
-        positions[i].z = kFunnyShapeNdcMin;
+        positions[i].x = 0.0f;
+        positions[i].y = 0.0f;
+        positions[i].z = -1.0f;
     }
 }
 
@@ -176,8 +161,8 @@ void CFunnyShapePcs::calcViewer()
  * --INFO--
  * PAL Address: 0x8004E210
  * PAL Size: 528b
- * EN Address: 0x8005BA0C
- * EN Size: 564b
+ * EN Address: 0x8004E004
+ * EN Size: 528b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -188,9 +173,7 @@ void CFunnyShapePcs::drawViewer()
     Point3d eye = {0.0f, 0.0f, 4.0f};
     Point3d at = {0.0f, 0.0f, 0.0f};
     Vec up = {0.0f, 1.0f, 0.0f};
-    C_MTXOrtho(projection, kFunnyShapeNdcMax, kFunnyShapeNdcMin,
-               kFunnyShapeNdcMin, kFunnyShapeNdcMax,
-               kFunnyShapeNdcMax, kFunnyShapeOrthoFarZ);
+    C_MTXOrtho(projection, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 100.0f);
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     C_MTXLookAt(view, &eye, &up, &at);
     GXLoadPosMtxImm(view, GX_PNMTX0);
@@ -219,9 +202,7 @@ void CFunnyShapePcs::drawViewer()
         alive = 0;
     }
 
-    GXSetViewport(kFunnyShapeViewportOrigin, kFunnyShapeViewportOrigin,
-                  kFunnyShapeViewportWidth, kFunnyShapeViewportHeight,
-                  kFunnyShapeViewportOrigin, kFunnyShapeNdcMax);
+    GXSetViewport(0.0f, 0.0f, 640.0f, 448.0f, 0.0f, 1.0f);
     {
         int frame = alive >> 4;
         Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), pFan[frame % 4]);

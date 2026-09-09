@@ -763,7 +763,7 @@ int CMenuPcs::LetterCtrl()
 				if (action == 1) {
 					state->mode = 2;
 				} else if (action == 2) {
-					state->choiceCursor = static_cast<s16>(done);
+					state->choiceCursor = static_cast<u16>(done);
 					m_letterMenuState->mode = 3;
 				}
 				m_letterMenuState->step = 0;

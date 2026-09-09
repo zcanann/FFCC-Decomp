@@ -326,7 +326,6 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     PEmission* step = (PEmission*)param_3;
     EmissionMeshData* meshData = EmissionMeshAt(model, meshIndex);
     if ((strcmp(meshData->m_name, "obj2") == 0) && (state->m_colorA != 0)) {
-        u32 drawTevBits = 0xACE0F;
         CTexture* texture = state->m_texture;
 
         pppInitBlendMode();
@@ -353,7 +352,9 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 displayList = meshData->m_displayLists;
                 int remaining = meshData->m_displayListCount - 1;
                 while (remaining >= 0) {
-                    MaterialMan.SetEmissionTextureEnv(drawTevBits);
+                    MaterialMan.InitEnv();
+                    MaterialMan.SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x40000));
+                    MaterialMan.LockEnv();
                     MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
                     if (step->m_emission.m_texGenMode == 0) {
@@ -388,7 +389,9 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 int remaining = meshData->m_displayListCount - 1;
                 EmissionDisplayList* displayList = meshData->m_displayLists;
                 while (remaining >= 0) {
-                    MaterialMan.SetEmissionTextureEnv(drawTevBits);
+                    MaterialMan.InitEnv();
+                    MaterialMan.SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x40000));
+                    MaterialMan.LockEnv();
                     MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
                     if (step->m_emission.m_texGenMode == 0) {

@@ -1261,7 +1261,7 @@ void CMapObj::Draw(unsigned char priority)
     lightPos.z = m_worldMtx[2][3];
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(1), &lightPos, m_lightSetIndex);
 
-    MaterialMan.SetDefaultDrawEnv(0xACE0F);
+    MaterialMan.InitEnv();
 
     if (m_enableFullScreenShadow != 0) {
         CameraPcs.SetFullScreenShadow(m_worldMtx, 0);

@@ -453,7 +453,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    MaterialMan.OrCurrentEnvTevBit(0x10000);
+    MaterialMan.SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x10000));
 }
 
 extern const float kPppBlurZero = 0.0f;

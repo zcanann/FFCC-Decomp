@@ -499,7 +499,7 @@ void CGraphicPcs::stdDrawEnvInit()
  */
 void CGraphicPcs::preDrawEnvInit()
 {
-    MaterialMan.SetDefaultDrawEnv(0x000ACE0F);
+    MaterialMan.InitEnv();
 }
 
 /*

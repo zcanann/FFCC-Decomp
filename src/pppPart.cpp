@@ -2086,7 +2086,8 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
 
-	MaterialMan.SetDefaultStdDrawEnv(0x000ACE0F);
+	MaterialMan.InitEnv();
+	MaterialMan.LockEnv();
 
 	if (s_light_mode != lightTarget) {
 		s_light_mode = lightTarget;

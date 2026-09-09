@@ -289,7 +289,7 @@ static inline u32 AlignCharaWorkBytes(u32 size)
 
 static inline void InitCharaMaterialState()
 {
-	MaterialMan.SetDefaultDrawEnv(0x000ACE0F);
+	MaterialMan.InitEnv();
 }
 
 static inline void CopyCharaMaterialEnv()

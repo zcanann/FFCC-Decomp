@@ -29,12 +29,6 @@ static const float kPppYmDeformationShpHalf = 0.5f;
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-struct YmDeformationShpColorInfo {
-	u32 m_unk0;
-	u32 m_unk4;
-	pppCVECTOR m_color;
-};
-
 int RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
 
 STATIC_ASSERT(offsetof(YmDeformationShpDataOffsets, m_colorInfoOffset) == 0x4);
@@ -52,9 +46,9 @@ static inline VYmDeformationShp* DeformationShpState(pppYmDeformationShp* object
 		object->m_workArea + DeformationShpDataOffsets(ctrl)->m_stateOffset);
 }
 
-static inline YmDeformationShpColorInfo* DeformationShpColorInfo(pppYmDeformationShp* object, _pppCtrlTable* ctrl)
+static inline VColor* DeformationShpColorInfo(pppYmDeformationShp* object, _pppCtrlTable* ctrl)
 {
-	return reinterpret_cast<YmDeformationShpColorInfo*>(
+	return reinterpret_cast<VColor*>(
 		object->m_workArea + DeformationShpDataOffsets(ctrl)->m_colorInfoOffset);
 }
 
@@ -282,7 +276,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 	Vec vertices[4];
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
-		YmDeformationShpColorInfo* colorInfo = DeformationShpColorInfo(pppYmDeformationShp_, param_3);
+		VColor* colorInfo = DeformationShpColorInfo(pppYmDeformationShp_, param_3);
 		_pppEnvSt* env = ppvEnv;
 		CTexture* texture =
 			env->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(env->m_materialSetPtr, textureIndex);

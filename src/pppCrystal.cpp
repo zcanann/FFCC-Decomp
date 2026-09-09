@@ -32,11 +32,6 @@ struct CrystalTexMtx {
     float value[3][4];
 };
 
-struct pppCrystalColorBlock {
-    u8 _pad0[8];
-    pppCVECTOR m_color;
-};
-
 struct CrystalWork {
     HSD_ImageBuffer* m_refractionMap;
     GXTexObj* m_refractionTexObj;
@@ -59,9 +54,9 @@ static inline CrystalWork* GetCrystalWork(pppCrystal* crystal, _pppCtrlTable* ct
     return reinterpret_cast<CrystalWork*>(crystal->m_workArea + GetCrystalDataOffsets(ctrl)->m_workOffset);
 }
 
-static inline pppCrystalColorBlock* GetCrystalColorBlock(pppCrystal* crystal, _pppCtrlTable* ctrl)
+static inline VColor* GetCrystalColorBlock(pppCrystal* crystal, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<pppCrystalColorBlock*>(crystal->m_workArea + GetCrystalDataOffsets(ctrl)->m_colorBlockOffset);
+    return reinterpret_cast<VColor*>(crystal->m_workArea + GetCrystalDataOffsets(ctrl)->m_colorBlockOffset);
 }
 
 union CrystalFloatBits {
@@ -124,7 +119,7 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlT
 	float texH;
 	s32 dataValIndex = param_2->m_dataValIndex;
 	CrystalWork* work = GetCrystalWork(pppCrystal, param_3);
-	pppCrystalColorBlock* colorBlock = GetCrystalColorBlock(pppCrystal, param_3);
+	VColor* colorBlock = GetCrystalColorBlock(pppCrystal, param_3);
 
 	if (dataValIndex == 0xFFFF) {
 		return;

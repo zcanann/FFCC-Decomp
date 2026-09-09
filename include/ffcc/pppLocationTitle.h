@@ -35,11 +35,6 @@ struct LocationTitleWork {
     float m_acc;
 };
 
-struct LocationTitleColorBlock {
-    u8 m_pad[8];
-    GXColor m_color;
-};
-
 struct pppLocationTitleStep {
     s32 m_graphId;
     s32 m_dataValIndex;

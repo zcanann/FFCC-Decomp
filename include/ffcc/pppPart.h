@@ -49,11 +49,6 @@ struct _pppProgSetDef
     _pppCtrlTable m_stages[1];   // 0x28
 };
 
-struct pppCVECTOR
-{
-    unsigned char rgba[4];
-};
-
 union pppPackedColor
 {
     u32 value;

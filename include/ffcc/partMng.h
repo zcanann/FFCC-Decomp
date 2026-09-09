@@ -4,7 +4,7 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara.h"
-#include "ffcc/pppcolor.h"
+#include "ffcc/pppColor.h"
 #include "ffcc/pppTypes.h"
 
 #include <dolphin/gx.h>
@@ -220,15 +220,6 @@ struct pppFVECTOR4
     float z;
     float w;
 };
-
-struct VColor
-{
-    unsigned char m_unknown[8]; // 0x0
-    unsigned char m_red;        // 0x8
-    unsigned char m_green;      // 0x9
-    unsigned char m_blue;       // 0xa
-    unsigned char m_alpha;      // 0xb
-}; // Size 0xC
 
 struct PPPIFPARAM
 {

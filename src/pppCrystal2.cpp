@@ -25,11 +25,6 @@ struct Crystal2TexMtx {
     f32 value[3][4];
 };
 
-struct pppCrystal2ColorBlock {
-    u8 _pad0[8];
-    pppCVECTOR m_color;
-};
-
 struct Crystal2Work {
     HSD_ImageBuffer* m_refractionMap;
     GXTexObj* m_refractionTexObj;
@@ -50,9 +45,9 @@ static inline Crystal2Work* GetCrystal2Work(pppCrystal2* crystal, _pppCtrlTable*
     return reinterpret_cast<Crystal2Work*>(crystal->m_workArea + GetCrystal2DataOffsets(ctrl)->m_workOffset);
 }
 
-static inline pppCrystal2ColorBlock* GetCrystal2ColorBlock(pppCrystal2* crystal, _pppCtrlTable* ctrl)
+static inline VColor* GetCrystal2ColorBlock(pppCrystal2* crystal, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<pppCrystal2ColorBlock*>(crystal->m_workArea + GetCrystal2DataOffsets(ctrl)->m_colorBlockOffset);
+    return reinterpret_cast<VColor*>(crystal->m_workArea + GetCrystal2DataOffsets(ctrl)->m_colorBlockOffset);
 }
 
 union Crystal2FloatBits {
@@ -113,7 +108,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* param_2, _pppC
 {
     s32 dataValIndex = param_2->m_dataValIndex;
     Crystal2Work* work = GetCrystal2Work(pppCrystal2, param_3);
-    pppCrystal2ColorBlock* colorBlock = GetCrystal2ColorBlock(pppCrystal2, param_3);
+    VColor* colorBlock = GetCrystal2ColorBlock(pppCrystal2, param_3);
     pppModelSt* model;
     CTexture* sourceTex;
     _GXTexObj backTexObj;

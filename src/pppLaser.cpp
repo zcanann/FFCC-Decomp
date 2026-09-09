@@ -31,7 +31,6 @@ static const f32 kPppLaserTau = 6.2831855f;
 static const char s_pppLaser_cpp[] = "pppLaser.cpp";
 
 typedef pppLaserWork LaserWork;
-typedef pppLaserColorBlock LaserColorData;
 
 STATIC_ASSERT(offsetof(pppLaserDataOffsets, m_colorBlockOffset) == 0x4);
 STATIC_ASSERT(offsetof(pppLaserDataOffsets, m_workOffset) == 0x8);
@@ -55,9 +54,9 @@ static inline LaserWork* GetLaserWork(pppLaser* laser, _pppCtrlTable* ctrlTable)
     return reinterpret_cast<LaserWork*>(laser->m_workArea + GetLaserDataOffsets(ctrlTable)->m_workOffset);
 }
 
-static inline LaserColorData* GetLaserColorData(pppLaser* laser, _pppCtrlTable* ctrlTable)
+static inline VColor* GetLaserColorData(pppLaser* laser, _pppCtrlTable* ctrlTable)
 {
-    return reinterpret_cast<LaserColorData*>(laser->m_workArea + GetLaserDataOffsets(ctrlTable)->m_colorBlockOffset);
+    return reinterpret_cast<VColor*>(laser->m_workArea + GetLaserDataOffsets(ctrlTable)->m_colorBlockOffset);
 }
 
 STATIC_ASSERT(offsetof(pppLaser, m_workArea) == 0x80);
@@ -349,7 +348,7 @@ extern "C" void pppRenderLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCt
 {
     pppLaserStep* step = param_2;
     LaserWork* work = GetLaserWork(pppLaser, param_3);
-    LaserColorData* colorData = GetLaserColorData(pppLaser, param_3);
+    VColor* colorData = GetLaserColorData(pppLaser, param_3);
     s32 dataValIndex = step->m_dataValIndex;
     u32 count;
     s32 i;

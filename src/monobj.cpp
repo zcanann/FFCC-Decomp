@@ -2956,23 +2956,20 @@ void CGMonObj::enableDamageCol(int enabled)
  * --INFO--
  * PAL Address: 0x80117B30
  * PAL Size: 256b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80116E90
+ * EN Size: 256b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGMonObj::enableAttackCol(int enabled, int, int)
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
 	if (enabled != 0) {
-		int attackKind = *reinterpret_cast<int*>(mon + 0x560);
-		unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) +
-			attackKind * 0x48;
-		int colMask = *reinterpret_cast<unsigned short*>(attackData + 0xC);
+		int attackKind = m_itemId;
+		const SCharaItemRow* attackData = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[attackKind];
+		int colMask = attackData->m_particleFlags;
 		int colValue;
 		if (attackKind >= 0x1F5) {
-			colValue = *reinterpret_cast<unsigned short*>(attackData + 2);
+			colValue = attackData->m_kind;
 		} else {
 			colValue = 1;
 		}
@@ -3700,8 +3697,9 @@ void CGMonObj::onCancelStat(int state)
  */
 void CGMonObj::setActionParam(int state)
 {
-	m_itemId = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_actionItems[state + 0xE];
-	m_attackAnimId = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_actionAnimations[state + 0xE];
+	state += 0xE;
+	m_itemId = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_actionItems[state];
+	m_attackAnimId = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_actionAnimations[state];
 	m_unk554 = m_attackAnimId + 1;
 	m_unk558 = m_unk554 + 1;
 	m_unk55C = m_unk558 + 1;

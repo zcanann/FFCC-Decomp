@@ -40,11 +40,6 @@ struct YmMeltWork {
     f32 m_phaseAccel;
 };
 
-struct YmMeltColorWork {
-    u8 _pad0[8];
-    pppCVECTOR m_color;
-};
-
 struct PYmMelt {
     s32 m_graphId;
     s32 m_dataValIndex;

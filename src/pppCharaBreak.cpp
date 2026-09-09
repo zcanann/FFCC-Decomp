@@ -133,13 +133,13 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTab
 {
     int colorOffset = GetCharaBreakDataOffsets(data)->m_colorWorkOffset;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
-    _pppColorWork* colorWork = reinterpret_cast<_pppColorWork*>(charaBreak->m_workArea + colorOffset);
+    VColor* colorWork = reinterpret_cast<VColor*>(charaBreak->m_workArea + colorOffset);
 
     if (work->m_enabled != 0) {
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
         pppInitBlendMode();
         pppSetDrawEnv(
-            reinterpret_cast<pppCVECTOR*>(&colorWork->result),
+            &colorWork->m_color,
             &charaBreak->m_drawMatrix,
             kPppCharaBreakZero,
             0,
@@ -153,7 +153,7 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTab
         work->m_color.r = 0xFF;
         work->m_color.g = 0xFF;
         work->m_color.b = 0xFF;
-        work->m_color.a = colorWork->result.a;
+        work->m_color.a = colorWork->m_color.rgba[3];
     }
 }
 /*

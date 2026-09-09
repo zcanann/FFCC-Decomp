@@ -283,10 +283,10 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 		0);
 
 	long* animData = static_cast<long*>(shape->m_animData);
-	int baseRed = baseColor->m_red;
-	int baseGreen = baseColor->m_green;
-	int baseBlue = baseColor->m_blue;
-	int baseAlpha = baseColor->m_alpha;
+	int baseRed = baseColor->m_color.rgba[0];
+	int baseGreen = baseColor->m_color.rgba[1];
+	int baseBlue = baseColor->m_color.rgba[2];
+	int baseAlpha = baseColor->m_color.rgba[3];
 
 	for (int i = 0; i < numParticles; i++) {
 		if (*u16_at(particle, 0x22) != 0) {
@@ -644,7 +644,7 @@ void calc(
 	u32 frameCount;
 	Vec step;
 
-	alpha = vColor->m_alpha;
+	alpha = vColor->m_color.rgba[3];
 	paramPayload = (u8*)param;
 	particlePayload = (u8*)particle;
 
@@ -658,7 +658,7 @@ void calc(
 		colorData->m_colorFrameDeltas[1] = colorData->m_colorFrameDeltas[1] + *f32_at(paramPayload, 0x40);
 		colorData->m_colorFrameDeltas[2] = colorData->m_colorFrameDeltas[2] + *f32_at(paramPayload, 0x44);
 		colorData->m_colorFrameDeltas[3] = colorData->m_colorFrameDeltas[3] + *f32_at(paramPayload, 0x48);
-		alpha = (int)vColor->m_alpha + (int)colorData->m_color[3];
+		alpha = (int)vColor->m_color.rgba[3] + (int)colorData->m_color[3];
 		if (alpha > 0xFF)
 		{
 			alpha = 0xFF;
@@ -1068,7 +1068,7 @@ join_position:
 	*u8_at(particlePayload, 0x27) = random_signed_byte_span(payload[0x4F]);
 
 	if (payload[0x28] != 0) {
-		*f32_at(particlePayload, 0x54) = (float)color->m_alpha;
+		*f32_at(particlePayload, 0x54) = (float)color->m_color.rgba[3];
 		*u8_at(particlePayload, 0x59) = payload[0x28];
 	}
 	if (payload[0x29] != 0) {

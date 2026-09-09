@@ -333,10 +333,10 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
         0, 0, params->m_drawEnvScale, params->m_drawEnvColor1, params->m_drawEnvColor0,
         params->m_blendMode, 0, 1, 1, 0);
 
-    colorR = color->m_red;
-    colorG = color->m_green;
-    colorB = color->m_blue;
-    colorA = color->m_alpha;
+    colorR = color->m_color.rgba[0];
+    colorG = color->m_color.rgba[1];
+    colorB = color->m_color.rgba[2];
+    colorA = color->m_color.rgba[3];
 
     for (i = 0; i < groupCount; i++) {
         if (particle->m_life > 0) {
@@ -774,7 +774,7 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
                     PARTICLE_COLOR* particleColor)
 {
     PYmBreath* params = pYmBreath;
-    int alpha = vColor->m_alpha;
+    int alpha = vColor->m_color.rgba[3];
     PARTICLE_DATA* particle = particleData;
     Vec step;
 
@@ -789,7 +789,7 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
         particleColor->m_colorFrameDeltas[1] += params->m_colorFrameAccel1;
         particleColor->m_colorFrameDeltas[2] += params->m_colorFrameAccel2;
         particleColor->m_colorFrameDeltas[3] += params->m_colorFrameAccel3;
-        alpha = (int)vColor->m_alpha + (int)particleColor->m_color[3];
+        alpha = (int)vColor->m_color.rgba[3] + (int)particleColor->m_color[3];
         if (alpha > 0xFF) {
             alpha = 0xFF;
         }
@@ -910,7 +910,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     }
 
     if (params->m_fadeOutFrames != 0) {
-        particle->m_alpha = (float)(unsigned int)vColor->m_alpha;
+        particle->m_alpha = (float)(unsigned int)vColor->m_color.rgba[3];
         particle->m_fadeOutFrames = params->m_fadeOutFrames;
     }
     if (params->m_fadeInFrames != 0) {

@@ -4,6 +4,13 @@
 #include "types.h"
 #include "ffcc/ppp_linkage.h"
 
+STATIC_ASSERT(sizeof(VColor) == 0xC);
+STATIC_ASSERT(offsetof(VColor, m_red) == 0x0);
+STATIC_ASSERT(offsetof(VColor, m_green) == 0x2);
+STATIC_ASSERT(offsetof(VColor, m_blue) == 0x4);
+STATIC_ASSERT(offsetof(VColor, m_alpha) == 0x6);
+STATIC_ASSERT(offsetof(VColor, m_color) == 0x8);
+
 STATIC_ASSERT(sizeof(PppColorDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(PppColorDataOffsets, m_workOffset) == 0x0);
 
@@ -12,40 +19,42 @@ static inline PppColorDataOffsets* GetPppColorDataOffsets(_pppCtrlTable* ctrl)
     return reinterpret_cast<PppColorDataOffsets*>(ctrl->m_serializedDataOffsets);
 }
 
-static inline _pppColorWork* GetPppColorWork(_pppPObject* obj, _pppCtrlTable* ctrl)
+static inline VColor* GetPppColorWork(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<_pppColorWork*>(obj->m_workArea + GetPppColorDataOffsets(ctrl)->m_workOffset);
+    return reinterpret_cast<VColor*>(obj->m_workArea + GetPppColorDataOffsets(ctrl)->m_workOffset);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8005FF8C  
+ * PAL Address: 0x8005FF8C
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8005F8F4
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppColorCon(_pppPObject* param1, _pppCtrlTable* param2){
-    _pppColorWork* work = GetPppColorWork(param1, param2);
-    
-    work->a = 0;
-    work->b = 0;
-    work->g = 0;
-    work->r = 0;
+void pppColorCon(_pppPObject* param1, _pppCtrlTable* param2)
+{
+    VColor* work = GetPppColorWork(param1, param2);
+
+    work->m_alpha = 0;
+    work->m_blue = 0;
+    work->m_green = 0;
+    work->m_red = 0;
 }
 
 /*
  * --INFO--
  * PAL Address: 0x8005FFB4
  * PAL Size: 416b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8005F91C
+ * EN Size: 416b
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppColor(_pppPObject* param1, pppColorStep* step, _pppCtrlTable* param3){
-    _pppColorWork* work = GetPppColorWork(param1, param3);
+void pppColor(_pppPObject* param1, pppColorStep* step, _pppCtrlTable* param3)
+{
+    VColor* work = GetPppColorWork(param1, param3);
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -55,22 +64,22 @@ void pppColor(_pppPObject* param1, pppColorStep* step, _pppCtrlTable* param3){
     s32 id2 = param1->m_graphId;
 
     if (id1 == id2) {
-        work->r += step->m_colors[0];
-        work->g += step->m_colors[1];
-        work->b += step->m_colors[2];
-        work->a += step->m_colors[3];
+        work->m_red += step->m_colors[0];
+        work->m_green += step->m_colors[1];
+        work->m_blue += step->m_colors[2];
+        work->m_alpha += step->m_colors[3];
     }
 
     if (ppvMng->m_useOwnerScaleSign != 0) {
-        work->result.r = (u8)((float)(work->r >> 7) * ((float*)ppvMng)[14]);
-        work->result.g = (u8)((float)(work->g >> 7) * ((float*)ppvMng)[15]);
-        work->result.b = (u8)((float)(work->b >> 7) * ((float*)ppvMng)[16]);
-        work->result.a = (u8)((float)(work->a >> 7) * ((float*)ppvMng)[17]);
+        work->m_color.rgba[0] = (u8)((float)(work->m_red >> 7) * ppvMng->m_userFloat0);
+        work->m_color.rgba[1] = (u8)((float)(work->m_green >> 7) * ppvMng->m_userFloat1);
+        work->m_color.rgba[2] = (u8)((float)(work->m_blue >> 7) * ppvMng->m_scaleFactor);
+        work->m_color.rgba[3] = (u8)((float)(work->m_alpha >> 7) * ppvMng->m_ownerScale);
         return;
     }
 
-    work->result.r = (u8)(work->r >> 7);
-    work->result.g = (u8)(work->g >> 7);
-    work->result.b = (u8)(work->b >> 7);
-    work->result.a = (u8)(work->a >> 7);
+    work->m_color.rgba[0] = (u8)(work->m_red >> 7);
+    work->m_color.rgba[1] = (u8)(work->m_green >> 7);
+    work->m_color.rgba[2] = (u8)(work->m_blue >> 7);
+    work->m_color.rgba[3] = (u8)(work->m_alpha >> 7);
 }

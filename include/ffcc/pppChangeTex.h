@@ -31,11 +31,6 @@ struct ChangeTexWork {
     float m_cachedValue;
 };
 
-struct ChangeTexColorBlock {
-    u8 m_pad0[8];
-    pppCVECTOR m_color;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -78,10 +78,10 @@ static inline EmissionState* GetEmissionState(pppEmission* emission, _pppCtrlTab
     return reinterpret_cast<EmissionState*>(emission->m_workArea + offsets->m_stateOffset);
 }
 
-static inline u8* GetEmissionColorData(pppEmission* emission, _pppCtrlTable* ctrl)
+static inline VColor* GetEmissionColorData(pppEmission* emission, _pppCtrlTable* ctrl)
 {
     EmissionDataOffsets* offsets = GetEmissionDataOffsets(ctrl);
-    return emission->m_workArea + offsets->m_colorDataOffset;
+    return reinterpret_cast<VColor*>(emission->m_workArea + offsets->m_colorDataOffset);
 }
 
 static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIndex)
@@ -133,17 +133,17 @@ void pppFrameEmission(pppEmission* pppEmission_, PEmission* param_2, _pppCtrlTab
     }
 
     EmissionState* state = GetEmissionState(pppEmission_, param_3);
-    u8* dataSet = GetEmissionColorData(pppEmission_, param_3);
+    VColor* color = GetEmissionColorData(pppEmission_, param_3);
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
     SetEmissionModelCallbacks(model, state, param_2);
 
-    float alphaScale = (float)dataSet[0xB] / 255.0f;
-    state->m_colorR = dataSet[8];
-    state->m_colorG = dataSet[9];
-    state->m_colorB = dataSet[0xA];
-    state->m_colorA = dataSet[0xB];
+    float alphaScale = (float)color->m_color.rgba[3] / 255.0f;
+    state->m_colorR = color->m_color.rgba[0];
+    state->m_colorG = color->m_color.rgba[1];
+    state->m_colorB = color->m_color.rgba[2];
+    state->m_colorA = color->m_color.rgba[3];
 
     CalcGraphValue(
         pppEmission_, param_2->m_graphId,
@@ -221,9 +221,9 @@ void pppFrameEmission(pppEmission* pppEmission_, PEmission* param_2, _pppCtrlTab
                 particle->m_fieldE = payload.m_targetAlpha / payload.m_fadeOutFrames;
             }
 
-            particle->m_colorR = dataSet[8];
-            particle->m_colorG = dataSet[9];
-            particle->m_colorB = dataSet[0xA];
+            particle->m_colorR = color->m_color.rgba[0];
+            particle->m_colorG = color->m_color.rgba[1];
+            particle->m_colorB = color->m_color.rgba[2];
             particle->m_colorA = (u8)alpha;
             particle++;
         }

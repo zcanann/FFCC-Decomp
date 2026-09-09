@@ -46,7 +46,7 @@ void pppColAccele(_pppPObject* object, pppColAcceleStep* data, _pppCtrlTable* ct
     pppColAcceleDataOffsets* offsets = GetColAcceleDataOffsets(ctrlTable);
     int offset0 = offsets->m_colorOffset;
     int offset1 = offsets->m_accelerationOffset;
-    pppColorDelta* accel1 = (pppColorDelta*)(object->m_workArea + offset0);
+    VColor* color = (VColor*)(object->m_workArea + offset0);
     int frameData;
     pppColorDelta* accel2 = (pppColorDelta*)(object->m_workArea + offset1);
 
@@ -64,8 +64,8 @@ void pppColAccele(_pppPObject* object, pppColAcceleStep* data, _pppCtrlTable* ct
     accel2->a += data->m_acceleration.a;
 
 accumulate:
-    accel1->r += accel2->r;
-    accel1->g += accel2->g;
-    accel1->b += accel2->b;
-    accel1->a += accel2->a;
+    color->m_red += accel2->r;
+    color->m_green += accel2->g;
+    color->m_blue += accel2->b;
+    color->m_alpha += accel2->a;
 }

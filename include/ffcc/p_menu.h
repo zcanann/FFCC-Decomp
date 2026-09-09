@@ -603,10 +603,10 @@ public:
     int EquipCtrlCur();
     int EquipOpen0();
     int EquipClose0();
-    int ChkEquipActive(int);
-    int ChkEquipPossible(int);
+    bool ChkEquipActive(int);
+    bool ChkEquipPossible(int);
     int GetEquipType(int);
-    int EquipChk(int);
+    bool EquipChk(int);
     void TmpArtiInit();
     void TmpArtiInit0();
     unsigned int TmpArtiOpen();

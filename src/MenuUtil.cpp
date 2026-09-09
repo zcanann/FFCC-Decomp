@@ -1524,8 +1524,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 						int equipmentSlot = caravanWork->m_equipment[currentItem];
 						currentItem = caravanWork->m_inventoryItems[equipmentSlot];
 
-						if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(m_artiState->selections[sel]) +
-						                                              static_cast<int>(m_artiState->scrollOffset))) != 0) {
+						if (ChkEquipActive(static_cast<int>(m_artiState->selections[sel]) +
+						                   static_cast<int>(m_artiState->scrollOffset))) {
 							unsigned int currentValue;
 							if (currentItem == -1) {
 								currentValue = 0;

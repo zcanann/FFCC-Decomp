@@ -853,7 +853,7 @@ void CMenuPcs::CmdDraw()
 								canUse = static_cast<u32>(
 								    ChkUnite(m_cmdState->selected[0], combo) != 0);
 							} else {
-								canUse = static_cast<u32>(static_cast<u8>(EquipChk(static_cast<int>(canItems[sel - 2]))) == 0);
+								canUse = !EquipChk(static_cast<int>(canItems[sel - 2]));
 							}
 
 							if (canUse == 0) {
@@ -866,12 +866,12 @@ void CMenuPcs::CmdDraw()
 								itemIdx -= itemCount;
 							}
 
-							int equippable = 1;
+							bool equippable = true;
 							if (itemIdx + 2 < itemCount) {
 								equippable = EquipChk(static_cast<int>(letterBuf[itemIdx + 1]));
 							}
 
-							if (static_cast<u8>(equippable) != 0) {
+							if (equippable) {
 								if (itemIdx + 2 < itemCount) {
 									DrawEquipMark(static_cast<s32>(x - 12.0f),
 									    static_cast<s32>(((rowH - 24.0f) * 0.5) + y),
@@ -1320,7 +1320,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				} else if (selected == 1) {
 					canUse = (ChkUnite(GetCmdStateView(this)->selected[0], combo) != 0);
 				} else {
-					canUse = static_cast<u8>(EquipChk(static_cast<int>(items[selected - 2]))) == 0;
+					canUse = !EquipChk(static_cast<int>(items[selected - 2]));
 				}
 
 				if (canUse) {
@@ -1669,7 +1669,7 @@ inline void CMenuPcs::ChkCmdActive(int itemIndex)
 		s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		const int index = itemIndex - 1;
 		if ((index >= 0) && (index < list[0])) {
-			active = EquipChk(static_cast<int>(list[index])) != 0;
+			active = EquipChk(static_cast<int>(list[index]));
 		}
 	}
 

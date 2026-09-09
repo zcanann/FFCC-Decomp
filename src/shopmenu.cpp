@@ -739,7 +739,7 @@ inline int CShopMenu::CheckSell(int index)
         if ((m_caravanWork->m_shopArgs[recipeNo >> 5] & (1U << (recipeNo & 0x1F))) == 0) {
             canTrade = 0;
         }
-    } else if (static_cast<unsigned char>(MenuPcs.EquipChk(index)) != 0) {
+    } else if (MenuPcs.EquipChk(index)) {
         canTrade = 0;
     } else if (itemNo > 0x9E) {
         canTrade = 1;
@@ -1316,7 +1316,7 @@ void CShopMenu::DrawItemList()
                      (1 << ((tradeItemNo - 0x191U) & 0x1F))) == 0) {
                     canTrade = 0;
                 }
-            } else if (static_cast<unsigned char>(MenuPcs.EquipChk(itemIndex)) != 0) {
+            } else if (MenuPcs.EquipChk(itemIndex)) {
                 canTrade = 0;
             } else if (tradeItemNo > 0x9E) {
                 canTrade = 1;
@@ -1858,7 +1858,7 @@ void CShopMenu::DrawMake()
     x = static_cast<int>(x + (FLOAT_80332d5c + font->GetWidth(raceText)));
     char raceBuffer[132];
     MenuPcs.GetRaceStr(m_resultItem, raceBuffer);
-    const int raceColor = (static_cast<unsigned char>(MenuPcs.ChkEquipPossible(m_resultItem)) != 0) ? 0x18 : 2;
+    const int raceColor = MenuPcs.ChkEquipPossible(m_resultItem) ? 0x18 : 2;
     font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, raceBuffer, x, FLOAT_80332d58, raceColor, 0x12);
     MenuPcs.DrawInit();
@@ -2168,7 +2168,7 @@ void CShopMenu::DrawShop0()
  */
 void CShopMenu::SelectMake()
 {
-    int canSelect = static_cast<unsigned char>(MenuPcs.ChkEquipPossible(m_resultItem)) &&
+    int canSelect = MenuPcs.ChkEquipPossible(m_resultItem) &&
                      (m_caravanWork->m_gil >= getMakeGil(getItemNo(m_selectedIndex)));
 
     int selected = getItemNo(m_selectedIndex);
@@ -2330,7 +2330,7 @@ sellBlock:
             } else {
                 canTrade = 0;
             }
-        } else if (static_cast<unsigned char>(MenuPcs.EquipChk(itemIndex)) != 0) {
+        } else if (MenuPcs.EquipChk(itemIndex)) {
             canTrade = 0;
         } else if (tradeItem > 0x9E) {
             canTrade = 1;

@@ -2601,7 +2601,7 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMenuPcs::EquipChk(int itemNo)
+bool CMenuPcs::EquipChk(int itemNo)
 {
     CCaravanWork* w = SingleCaravanWork();
     int item;
@@ -3062,7 +3062,7 @@ int CMenuPcs::SingWinMessHeight()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMenuPcs::ChkEquipPossible(int itemNo)
+bool CMenuPcs::ChkEquipPossible(int itemNo)
 {
     unsigned int genderMask = 0x10;
     int flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;

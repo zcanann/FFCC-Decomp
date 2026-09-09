@@ -175,7 +175,7 @@ int CMenuPcs::ItemCtrlCur()
                     idx -= 0x40;
                 }
 
-                if ((caravanWork->m_inventoryItems[idx] <= 0) || ((u8)EquipChk(idx) != 0) ||
+                if ((caravanWork->m_inventoryItems[idx] <= 0) || EquipChk(idx) ||
                     ((letterAttachFlg >= 0) && (caravanWork->m_inventoryItems[idx] < 0x125))) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else if (letterAttachFlg >= 0) {
@@ -369,9 +369,9 @@ void CMenuPcs::ItemDraw()
                     menuIndex -= 0x40;
                 }
 
-                if ((caravanWork->m_inventoryItems[menuIndex] <= 0) || ((u8)EquipChk(menuIndex) != 0) ||
+                if ((caravanWork->m_inventoryItems[menuIndex] <= 0) || EquipChk(menuIndex) ||
                     (hasLetterAttach && (caravanWork->m_inventoryItems[menuIndex] < 0x125))) {
-                    if ((u8)EquipChk(menuIndex) != 0) {
+                    if (EquipChk(menuIndex)) {
                         int markX = (int)(x - kItemMarkXOffset);
                         int markY = (int)((h - kItemMarkHeight) * kItemHalfDouble + y);
                         DrawEquipMark(markX, markY, entry->alpha);

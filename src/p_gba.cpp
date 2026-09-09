@@ -5,17 +5,10 @@
 #include "ffcc/system.h"
 #include <dolphin/gba/GBA.h>
 
-extern "C" {
-void create__7CGbaPcsFv(CGbaPcs*);
-void destroy__7CGbaPcsFv(CGbaPcs*);
-void calc__7CGbaPcsFv(CGbaPcs*);
-void draw__7CGbaPcsFv(CGbaPcs*);
-}
-
 /*
  * --INFO--
- * PAL Address: 0x800979f4
- * PAL Size: 212b
+ * PAL Address: UNUSED
+ * PAL Size: TODO
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -23,42 +16,19 @@ void draw__7CGbaPcsFv(CGbaPcs*);
  */
 inline CGbaPcs::CGbaPcs()
 {
-	static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CGbaPcsFv)};
-	static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CGbaPcsFv)};
-	static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CGbaPcsFv)};
-	static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CGbaPcsFv)};
-
-	CProcessTable* table = &m_table;
-
-	table->m_fields.m_create = desc0;
-	table->m_fields.m_destroy = desc1;
-	table->m_fields.m_entries[0].m_callback = desc2;
-	table->m_fields.m_entries[1].m_callback = desc3;
 }
 
-CProcessTable CGbaPcs::m_table = {
+CGbaPcs GbaPcs;
+
+CProcessCallbackTable CGbaPcs::m_table = {
     "CGbaPcs",
+    static_cast<CProcessCallback>(&CGbaPcs::create),
+    static_cast<CProcessCallback>(&CGbaPcs::destroy),
     {
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000023,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000045,
-        0x00000001,
+        {static_cast<CProcessCallback>(&CGbaPcs::calc), 0x23, 0},
+        {static_cast<CProcessCallback>(&CGbaPcs::draw), 0x45, 1},
     },
 };
-
-CGbaPcs GbaPcs;
 
 /*
  * --INFO--

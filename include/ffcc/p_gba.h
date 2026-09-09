@@ -26,7 +26,7 @@ public:
 
     CMemory::CStage* m_stage;
 
-    static CProcessTable m_table;
+    static CProcessCallbackTable m_table;
 };
 
 extern CGbaPcs GbaPcs;

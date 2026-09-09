@@ -22,7 +22,7 @@ public:
         u8 m_reserved34[0xC];
     };
 
-    static CProcessTable m_table;
+    static CProcessCallbackTable m_table;
 
     CUSBPcs();
 

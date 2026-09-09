@@ -2,40 +2,27 @@
 #include "ffcc/pad.h"
 #include "ffcc/p_dbgmenu.h"
 
-extern "C" {
-void create__10CSystemPcsFv(CSystemPcs*);
-void destroy__10CSystemPcsFv(CSystemPcs*);
-void calc__10CSystemPcsFv(CSystemPcs*);
-}
-
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 inline CSystemPcs::CSystemPcs()
 {
-    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSystemPcsFv)};
-    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSystemPcsFv)};
-    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CSystemPcsFv)};
-
-    CProcessTable* table = &m_table;
-
-    table->m_fields.m_create = desc0;
-    table->m_fields.m_destroy = desc1;
-    table->m_fields.m_entries[0].m_callback = desc2;
 }
 
 CSystemPcs SystemPcs;
-CProcessTable CSystemPcs::m_table = {
+
+CProcessCallbackTable CSystemPcs::m_table = {
     "CSystemPcs",
+    static_cast<CProcessCallback>(&CSystemPcs::create),
+    static_cast<CProcessCallback>(&CSystemPcs::destroy),
     {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0x16,
-        0x8,
+        {static_cast<CProcessCallback>(&CSystemPcs::calc), 0x16, 8},
     },
 };
 /*

@@ -1,51 +1,34 @@
 #include "ffcc/p_game.h"
 
-extern "C" {
-void create__8CGamePcsFv(CGamePcs*);
-void destroy__8CGamePcsFv(CGamePcs*);
-void calcInit__8CGamePcsFv(CGamePcs*);
-void calc0__8CGamePcsFv(CGamePcs*);
-void calc1__8CGamePcsFv(CGamePcs*);
-void calc2__8CGamePcsFv(CGamePcs*);
-void draw0__8CGamePcsFv(CGamePcs*);
-void draw1__8CGamePcsFv(CGamePcs*);
-void draw2__8CGamePcsFv(CGamePcs*);
-}
-
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 inline CGamePcs::CGamePcs()
 {
-    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CGamePcsFv)};
-    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CGamePcsFv)};
-    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CGamePcsFv)};
-    static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc0__8CGamePcsFv)};
-    static CProcessTableCallback desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc1__8CGamePcsFv)};
-    static CProcessTableCallback desc5 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw0__8CGamePcsFv)};
-    static CProcessTableCallback desc6 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw1__8CGamePcsFv)};
-    static CProcessTableCallback desc7 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw2__8CGamePcsFv)};
-    static CProcessTableCallback desc8 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc2__8CGamePcsFv)};
-
-    CProcessTable* table = &m_table;
-
-    table->m_fields.m_create = desc0;
-    table->m_fields.m_destroy = desc1;
-    table->m_fields.m_entries[0].m_callback = desc2;
-    table->m_fields.m_entries[1].m_callback = desc3;
-    table->m_fields.m_entries[2].m_callback = desc4;
-    table->m_fields.m_entries[3].m_callback = desc5;
-    table->m_fields.m_entries[4].m_callback = desc6;
-    table->m_fields.m_entries[5].m_callback = desc7;
-    table->m_fields.m_entries[6].m_callback = desc8;
 }
 
-CProcessTable CGamePcs::m_table = {
+CGamePcs GamePcs;
+
+CProcessCallbackTable CGamePcs::m_table = {
     "CGamePcs",
+    static_cast<CProcessCallback>(&CGamePcs::create),
+    static_cast<CProcessCallback>(&CGamePcs::destroy),
     {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,
-        0, 0x19, 0, 0, 0, 0, 0x3A, 1, 0, 0, 0, 0x3C, 1, 0, 0, 0, 0x47, 1, 0, 0, 0, 0x4C,
+        {static_cast<CProcessCallback>(&CGamePcs::calcInit), 0x13, 0},
+        {static_cast<CProcessCallback>(&CGamePcs::calc0), 0x17, 0},
+        {static_cast<CProcessCallback>(&CGamePcs::calc1), 0x19, 0},
+        {static_cast<CProcessCallback>(&CGamePcs::draw0), 0x3a, 1},
+        {static_cast<CProcessCallback>(&CGamePcs::draw1), 0x3c, 1},
+        {static_cast<CProcessCallback>(&CGamePcs::draw2), 0x47, 1},
+        {static_cast<CProcessCallback>(&CGamePcs::calc2), 0x4c, 0},
     },
 };
-
-CGamePcs GamePcs;
 
 /*
  * --INFO--

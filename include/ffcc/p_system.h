@@ -6,7 +6,7 @@
 class CSystemPcs : public CProcess
 {
 public:
-    static CProcessTable m_table;
+    static CProcessCallbackTable m_table;
 
     CSystemPcs();
 

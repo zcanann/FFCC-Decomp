@@ -2810,7 +2810,7 @@ void CMenuPcs::CalcTitleMenu()
 			THPSimpleOpen(OPMOVIE_FNAME);
 			int thpMemory = THPSimpleCalcNeedMemory();
 			m_wmWorkBuffer =
-			    static_cast<unsigned char*>(Memory._Alloc(thpMemory, CharaPcs.m_viewerAnimStage, "wm_menu.cpp", 0xABA, 0));
+			    static_cast<unsigned char*>(Memory._Alloc(thpMemory, CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_ANIM], "wm_menu.cpp", 0xABA, 0));
 			THPSimpleSetBuffer(m_wmWorkBuffer);
 			THPSimplePreLoad(0);
 			THPSimpleAudioStart();

@@ -209,12 +209,13 @@ STATIC_ASSERT(offsetof(CCharaPcs, m_handleList) == 0x4C);
 STATIC_ASSERT(offsetof(CCharaPcs, m_stage) == 0xC0);
 STATIC_ASSERT(offsetof(CCharaPcs, m_amemStage) == 0xC4);
 STATIC_ASSERT(offsetof(CCharaPcs, m_amemWorkStage) == 0xC8);
-STATIC_ASSERT(offsetof(CCharaPcs, m_viewerModelStage) == 0xCC);
-STATIC_ASSERT(offsetof(CCharaPcs, m_viewerTextureStage) == 0xD0);
-STATIC_ASSERT(offsetof(CCharaPcs, m_viewerAnimStage) == 0xD4);
-STATIC_ASSERT(offsetof(CCharaPcs, m_weaponTextureStage) == 0xD8);
-STATIC_ASSERT(offsetof(CCharaPcs, m_weaponModelStage) == 0xDC);
-STATIC_ASSERT(offsetof(CCharaPcs, m_familyModelStage) == 0xE0);
+STATIC_ASSERT(sizeof(((CCharaPcs*)0)->m_loadStages) == 0x18);
+STATIC_ASSERT(offsetof(CCharaPcs, m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]) == 0xCC);
+STATIC_ASSERT(offsetof(CCharaPcs, m_loadStages[CCharaPcs::LOAD_STAGE_TEXTURE]) == 0xD0);
+STATIC_ASSERT(offsetof(CCharaPcs, m_loadStages[CCharaPcs::LOAD_STAGE_ANIM]) == 0xD4);
+STATIC_ASSERT(offsetof(CCharaPcs, m_loadStages[CCharaPcs::LOAD_STAGE_WEAPON_TEXTURE]) == 0xD8);
+STATIC_ASSERT(offsetof(CCharaPcs, m_loadStages[CCharaPcs::LOAD_STAGE_WEAPON_MODEL]) == 0xDC);
+STATIC_ASSERT(offsetof(CCharaPcs, m_loadStages[CCharaPcs::LOAD_STAGE_FAMILY_MODEL]) == 0xE0);
 STATIC_ASSERT(offsetof(CCharaPcs, m_charaAllocStage) == 0xE4);
 
 
@@ -347,7 +348,7 @@ static int LoadAnimFromDisk(
 
         void* animBuffer = File.m_readBuffer;
         CChara::CAnim* anim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
-        anim->Create(animBuffer, self->m_viewerAnimStage);
+        anim->Create(animBuffer, self->m_loadStages[CCharaPcs::LOAD_STAGE_ANIM]);
 
         CCharaPcs::CLoadAnim* loadAnim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CCharaPcs::CLoadAnim;
         loadAnim->m_keyId = charaNo;
@@ -407,9 +408,10 @@ static inline void BuildCharaBasePath(int charaKind, unsigned long charaNo, char
 
 static inline CMemory::CStage* HandleModelStage(int charaKind, int specialModelStage)
 {
-    CMemory::CStage* stage = CharaPcs.m_viewerModelStage;
+    CMemory::CStage* stage = CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_MODEL];
     if (specialModelStage != 0) {
-        stage = charaKind == 3 ? CharaPcs.m_familyModelStage : CharaPcs.m_weaponModelStage;
+        stage = charaKind == 3 ? CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_FAMILY_MODEL]
+                              : CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_WEAPON_MODEL];
     }
     return SelectLoadStage(&CharaPcs, stage);
 }
@@ -417,8 +419,9 @@ static inline CMemory::CStage* HandleModelStage(int charaKind, int specialModelS
 static inline CMemory::CStage* HandleTextureStage(int charaKind)
 {
     int allocStageMode = CharaPcs.m_charaAllocStage;
-    CMemory::CStage* stage = charaKind == 4 ? CharaPcs.m_weaponTextureStage : CharaPcs.m_viewerTextureStage;
-    return GET_CHARA_ALLOC_STAGE_S(allocStageMode, stage);
+    CCharaPcs::LoadStage stageIndex =
+        charaKind == 4 ? CCharaPcs::LOAD_STAGE_WEAPON_TEXTURE : CCharaPcs::LOAD_STAGE_TEXTURE;
+    return GET_CHARA_ALLOC_STAGE_S(allocStageMode, CharaPcs.m_loadStages[stageIndex]);
 }
 
 static inline _GXColor BlendColor(const _GXColor& a, const _GXColor& b, float t)
@@ -462,7 +465,7 @@ CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int stageIndex, CMemory::CStage* stage)
     case 3:
         return PartMng.m_pppEnvSt.m_stagePtr;
     case 4:
-        return CharaPcs.m_viewerAnimStage;
+        return CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_ANIM];
     default:
         return stage;
     }
@@ -603,12 +606,12 @@ void CCharaPcs::create()
 {
     FreeMergeMask(this) = 0;
 
-    m_viewerModelStage = Memory.CreateStage(0x177000, const_cast<char*>(s_CCharaPcs_loadModel), 0);
-    m_viewerTextureStage = Memory.CreateStage(0x130000, const_cast<char*>(s_CCharaPcs_loadTex), 0);
-    m_weaponTextureStage = Memory.CreateStage(0x8400, const_cast<char*>(s_CCharaPcs_loadWepTex), 0);
-    m_weaponModelStage = Memory.CreateStage(0x18000, const_cast<char*>(s_CCharaPcs_loadWepModel), 0);
-    m_familyModelStage = Memory.CreateStage(0x10000, const_cast<char*>(s_CCharaPcs_loadFaModel), 0);
-    m_viewerAnimStage =
+    m_loadStages[CCharaPcs::LOAD_STAGE_MODEL] = Memory.CreateStage(0x177000, const_cast<char*>(s_CCharaPcs_loadModel), 0);
+    m_loadStages[CCharaPcs::LOAD_STAGE_TEXTURE] = Memory.CreateStage(0x130000, const_cast<char*>(s_CCharaPcs_loadTex), 0);
+    m_loadStages[CCharaPcs::LOAD_STAGE_WEAPON_TEXTURE] = Memory.CreateStage(0x8400, const_cast<char*>(s_CCharaPcs_loadWepTex), 0);
+    m_loadStages[CCharaPcs::LOAD_STAGE_WEAPON_MODEL] = Memory.CreateStage(0x18000, const_cast<char*>(s_CCharaPcs_loadWepModel), 0);
+    m_loadStages[CCharaPcs::LOAD_STAGE_FAMILY_MODEL] = Memory.CreateStage(0x10000, const_cast<char*>(s_CCharaPcs_loadFaModel), 0);
+    m_loadStages[CCharaPcs::LOAD_STAGE_ANIM] =
         Memory.CreateStage(static_cast<s32>(CurrentSceneId()) == 4 ? 0x190000UL : 0x1E0000UL,
                            const_cast<char*>(s_CCharaPcs_loadAnim), 0);
 
@@ -708,12 +711,12 @@ void CCharaPcs::destroy()
         m_handleList = 0;
     }
 
-    Memory.DestroyStage(m_viewerModelStage);
-    Memory.DestroyStage(m_viewerTextureStage);
-    Memory.DestroyStage(m_weaponTextureStage);
-    Memory.DestroyStage(m_weaponModelStage);
-    Memory.DestroyStage(m_familyModelStage);
-    Memory.DestroyStage(m_viewerAnimStage);
+    Memory.DestroyStage(m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]);
+    Memory.DestroyStage(m_loadStages[CCharaPcs::LOAD_STAGE_TEXTURE]);
+    Memory.DestroyStage(m_loadStages[CCharaPcs::LOAD_STAGE_WEAPON_TEXTURE]);
+    Memory.DestroyStage(m_loadStages[CCharaPcs::LOAD_STAGE_WEAPON_MODEL]);
+    Memory.DestroyStage(m_loadStages[CCharaPcs::LOAD_STAGE_FAMILY_MODEL]);
+    Memory.DestroyStage(m_loadStages[CCharaPcs::LOAD_STAGE_ANIM]);
     Chara.Destroy();
 }
 
@@ -817,7 +820,7 @@ int CCharaPcs::correctLoadAnimAmem()
     }
 
     unsigned char* tempBuffer = reinterpret_cast<unsigned char*>(
-        Memory._Alloc(0x80000, m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x162, 1));
+        Memory._Alloc(0x80000, m_loadStages[CCharaPcs::LOAD_STAGE_ANIM], const_cast<char*>(s_p_chara_cpp), 0x162, 1));
     if (tempBuffer == 0) {
         if (static_cast<unsigned int>(System.m_execParam) >= 2U) {
             System.Printf(const_cast<char*>(s_charaAmemAnimCompactAllocFailed));
@@ -1108,11 +1111,16 @@ int CCharaPcs::GetNumTexShadow()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80079494
+ * PAL Size: 252b
+ * EN Address: 0x80078E74
+ * EN Size: 252b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, Vec* worldPositions, float (*shadowMatrices)[3][4])
 {
+    maxCount = startIndex + maxCount;
     CHandle* handle = m_handleList->m_next;
     int shadowIndex = 0;
 
@@ -1120,11 +1128,10 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
         if ((handle->m_flags & 0x200) != 0 && handle->m_shadowTexturePtr != 0) {
             if (startIndex <= shadowIndex) {
                 const int outIndex = shadowIndex - startIndex;
-                PSMTXConcat(m_texShadowProjectionMtx, handle->m_shadowViewMtx, reinterpret_cast<MtxPtr>(shadowMatrices[outIndex]));
+                PSMTXConcat(m_texShadowProjectionMtx, handle->m_shadowViewMtx, shadowMatrices[outIndex]);
 
-                const unsigned short texSize = static_cast<unsigned short>(m_texShadowSize);
                 GXInitTexObj(
-                    &texObjs[outIndex], handle->m_shadowTexturePtr, texSize, texSize, GX_TF_I4, GX_CLAMP, GX_CLAMP,
+                    &texObjs[outIndex], handle->m_shadowTexturePtr, m_texShadowSize, m_texShadowSize, GX_TF_I4, GX_CLAMP, GX_CLAMP,
                     GX_FALSE);
 
                 Mtx modelMtx;
@@ -1135,7 +1142,7 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
             }
 
             shadowIndex++;
-            if (startIndex + maxCount <= shadowIndex) {
+            if (maxCount <= shadowIndex) {
                 return;
             }
         }
@@ -1275,15 +1282,20 @@ void CCharaPcs::drawShadow()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80078C8C
+ * PAL Size: 284b
+ * EN Address: 0x8007866C
+ * EN Size: 284b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CTextureSet* CCharaPcs::createTextureSet(void* textureData, int useWeaponStage)
 {
     CTextureSet* textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
 
     int allocStageMode = CharaPcs.m_charaAllocStage;
-    textureSet->Create(textureData, GET_CHARA_ALLOC_STAGE_S(allocStageMode, (&CharaPcs.m_viewerModelStage)[useWeaponStage != 0 ? 3 : 1]), 0, 0, 0, 0);
+    LoadStage stageIndex = useWeaponStage != 0 ? LOAD_STAGE_WEAPON_TEXTURE : LOAD_STAGE_TEXTURE;
+    textureSet->Create(textureData, GET_CHARA_ALLOC_STAGE_S(allocStageMode, CharaPcs.m_loadStages[stageIndex]), 0, 0, 0, 0);
 
     return textureSet;
 }
@@ -1527,7 +1539,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
         case 'CAM ': {
             m_cameraFrameCount[index] = static_cast<int>(chunk.m_arg0);
 
-            m_cameraData[index] = new (CharaPcs.m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x4D4)
+            m_cameraData[index] = new (CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_ANIM], const_cast<char*>(s_p_chara_cpp), 0x4D4)
                 CCameraFrame[static_cast<unsigned long>(m_cameraFrameCount[index])];
 
             for (int frame = 0; frame < m_cameraFrameCount[index]; frame++) {
@@ -1688,7 +1700,7 @@ checkLoaded:
                                 if (streamToAmem == 0) {
                                     CChara::CModel* model =
                                         new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
-                                    model->Create(rawAddr, SelectLoadStage(&CharaPcs, CharaPcs.m_viewerModelStage));
+                                    model->Create(rawAddr, SelectLoadStage(&CharaPcs, CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]));
                                     loadModel->m_model = model;
                                 } else {
                                     loadModel->m_streamOffset = LoadStreamCursor(this);
@@ -1704,7 +1716,7 @@ checkLoaded:
 
                                 if (hasDynamics != 0) {
                                     chunkFile.GetNextChunk(chunk);
-                                    CMemory::CStage* dynStage = SelectLoadStage(&CharaPcs, CharaPcs.m_viewerModelStage);
+                                    CMemory::CStage* dynStage = SelectLoadStage(&CharaPcs, CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]);
                                     loadModel->m_model->CreateDynamics(chunkFile.GetAddress(), dynStage);
                                 }
                             }
@@ -1770,7 +1782,7 @@ checkLoaded:
                                 void* rawAddr = chunkFile.GetAddress();
                                 CChara::CAnim* anim =
                                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
-                                anim->Create(rawAddr, CharaPcs.m_viewerAnimStage);
+                                anim->Create(rawAddr, CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_ANIM]);
 
                                 loadAnim = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CLoadAnim;
                                 loadAnim->m_keyId = keyId;
@@ -2322,17 +2334,16 @@ foundModel:
     if (loadModel != 0) {
         m_modelLoadRef = loadModel;
 
-        int modelStageIndex;
+        LoadStage modelStageIndex;
         if (specialModelStage != 0) {
-            int specialIndex = 4;
+            LoadStage specialIndex = LOAD_STAGE_WEAPON_MODEL;
             if (m_charaKind == 3) {
-                specialIndex = 5;
+                specialIndex = LOAD_STAGE_FAMILY_MODEL;
             }
             modelStageIndex = specialIndex;
         } else {
-            modelStageIndex = 0;
+            modelStageIndex = LOAD_STAGE_MODEL;
         }
-#define modelStage ((&CharaPcs.m_viewerModelStage)[modelStageIndex])
 
         if (loadModel->GetRef() == 1) {
             if (loadModel->m_streamMode != 0) {
@@ -2346,7 +2357,7 @@ foundModel:
                 CChara::CModel* model =
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;
                 void* amemBuffer = File.m_readBuffer;
-                model->Create(amemBuffer, SelectLoadStage(&CharaPcs, modelStage));
+                model->Create(amemBuffer, SelectLoadStage(&CharaPcs, CharaPcs.m_loadStages[modelStageIndex]));
                 loadModel->m_model = model;
                 File.UnlockBuffer();
             }
@@ -2361,9 +2372,8 @@ foundModel:
             m_model->Init();
         } else {
             loadModel->AddRef();
-            m_model = loadModel->m_model->Duplicate(SelectLoadStage(&CharaPcs, modelStage));
+            m_model = loadModel->m_model->Duplicate(SelectLoadStage(&CharaPcs, CharaPcs.m_loadStages[modelStageIndex]));
         }
-#undef modelStage
     } else {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
             System.Printf(const_cast<char*>(s_charaModelLoadDvdFmt), charaKind, static_cast<int>(charaNo));

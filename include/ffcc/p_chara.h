@@ -25,6 +25,17 @@ CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*);
 class CCharaPcs : public CProcess
 {
 public:
+    enum LoadStage
+    {
+        LOAD_STAGE_MODEL = 0,
+        LOAD_STAGE_TEXTURE = 1,
+        LOAD_STAGE_ANIM = 2,
+        LOAD_STAGE_WEAPON_TEXTURE = 3,
+        LOAD_STAGE_WEAPON_MODEL = 4,
+        LOAD_STAGE_FAMILY_MODEL = 5,
+        LOAD_STAGE_COUNT = 6
+    };
+
     class CLoadPdt;
     class CLoadAnim;
     class CLoadModel;
@@ -264,12 +275,7 @@ public:
     CMemory::CStage* m_stage;                 // 0x0C0
     CMemory::CStage* m_amemStage;             // 0x0C4
     CMemory::CStage* m_amemWorkStage;         // 0x0C8
-    CMemory::CStage* m_viewerModelStage;      // 0x0CC
-    CMemory::CStage* m_viewerTextureStage;    // 0x0D0
-    CMemory::CStage* m_viewerAnimStage;       // 0x0D4
-    CMemory::CStage* m_weaponTextureStage;    // 0x0D8
-    CMemory::CStage* m_weaponModelStage;      // 0x0DC
-    CMemory::CStage* m_familyModelStage;      // 0x0E0
+    CMemory::CStage* m_loadStages[LOAD_STAGE_COUNT]; // 0x0CC-0x0E4
     int m_charaAllocStage;                    // 0x0E4
     GXColor m_viewerAmbientColor[2];          // 0x0E8
     GXColor m_viewerDiffuseColor[2][3];       // 0x0F0

@@ -288,7 +288,7 @@ void CChara::makeFurTex()
 	PSMTX44Identity(projection);
 	GXSetProjection(projection, GX_ORTHOGRAPHIC);
 
-	m_pTexBuf = Memory._Alloc(0x20000, CharaPcs.m_viewerAnimStage, "chara_fur.cpp", 0xE9, 0);
+	m_pTexBuf = Memory._Alloc(0x20000, CharaPcs.m_loadStages[CCharaPcs::LOAD_STAGE_ANIM], "chara_fur.cpp", 0xE9, 0);
 	DCInvalidateRange(m_pTexBuf, 0x20000);
 
 	float weightScale2 = 0.5f;

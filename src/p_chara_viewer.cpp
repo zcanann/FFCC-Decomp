@@ -303,7 +303,7 @@ void CCharaPcs::calcViewer()
                 CChara::CModel* model =
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0xEA) CChara::CModel;
                 self->m_viewerModel[0] = model;
-                self->m_viewerModel[0]->Create(File.m_readBuffer, self->m_viewerModelStage);
+                self->m_viewerModel[0]->Create(File.m_readBuffer, self->m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]);
                 self->m_viewerModel[0]->m_flags10CBits.m_flag10C_40 = 1;
                 File.Close(fileHandle);
             }
@@ -316,7 +316,7 @@ void CCharaPcs::calcViewer()
             if (fileHandle != 0) {
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                self->m_viewerModel[0]->CreateDynamics(File.m_readBuffer, self->m_viewerModelStage);
+                self->m_viewerModel[0]->CreateDynamics(File.m_readBuffer, self->m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]);
                 File.Close(fileHandle);
             }
             self->m_viewerLoadDynamics = 0;
@@ -340,7 +340,7 @@ void CCharaPcs::calcViewer()
                     CChara::CAnim* anim =
                         new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x111) CChara::CAnim;
                     self->m_viewerAnim[0] = anim;
-                    self->m_viewerAnim[0]->Create(File.m_readBuffer, self->m_viewerAnimStage);
+                    self->m_viewerAnim[0]->Create(File.m_readBuffer, self->m_loadStages[CCharaPcs::LOAD_STAGE_ANIM]);
                     File.Close(fileHandle);
                 }
                 self->m_viewerLoadAnim = 0;
@@ -364,7 +364,7 @@ void CCharaPcs::calcViewer()
                             new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x124) CChara::CAnim;
                         self->m_viewerAnimBank[self->m_viewerAnimLoadedCount] = anim;
                         self->m_viewerAnimBank[self->m_viewerAnimLoadedCount]->Create(File.m_readBuffer,
-                                                                                      self->m_viewerAnimStage);
+                                                                                      self->m_loadStages[CCharaPcs::LOAD_STAGE_ANIM]);
                         File.Close(fileHandle);
                         if (self->m_viewerAnimLoadedCount == 0) {
                             self->m_viewerAnim[0] = self->m_viewerAnimBank[self->m_viewerAnimLoadedCount];
@@ -622,9 +622,9 @@ void CCharaPcs::destroyViewer()
         j++;
     } while (j < 0x40);
 
-    Memory.DestroyStage(m_viewerModelStage);
-    Memory.DestroyStage(m_viewerTextureStage);
-    Memory.DestroyStage(m_viewerAnimStage);
+    Memory.DestroyStage(m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]);
+    Memory.DestroyStage(m_loadStages[CCharaPcs::LOAD_STAGE_TEXTURE]);
+    Memory.DestroyStage(m_loadStages[CCharaPcs::LOAD_STAGE_ANIM]);
 }
 
 /*
@@ -643,12 +643,10 @@ void CCharaPcs::createViewer()
     char pathBuf[256];
     CFile::CHandle* fileHandle;
 
-    memset(&self->m_viewerModelStage, 0,
-           sizeof(self->m_viewerModelStage) + sizeof(self->m_viewerTextureStage) + sizeof(self->m_viewerAnimStage) +
-               sizeof(self->m_weaponTextureStage) + sizeof(self->m_weaponModelStage) + sizeof(self->m_familyModelStage));
-    self->m_viewerModelStage = Memory.CreateStage(0x177000, const_cast<char*>(s_load_model), 0);
-    self->m_viewerTextureStage = Memory.CreateStage(0x200000, const_cast<char*>(s_load_texture), 0);
-    self->m_viewerAnimStage = Memory.CreateStage(0x190000, const_cast<char*>(s_load_anim), 0);
+    memset(self->m_loadStages, 0, sizeof(self->m_loadStages));
+    self->m_loadStages[CCharaPcs::LOAD_STAGE_MODEL] = Memory.CreateStage(0x177000, const_cast<char*>(s_load_model), 0);
+    self->m_loadStages[CCharaPcs::LOAD_STAGE_TEXTURE] = Memory.CreateStage(0x200000, const_cast<char*>(s_load_texture), 0);
+    self->m_loadStages[CCharaPcs::LOAD_STAGE_ANIM] = Memory.CreateStage(0x190000, const_cast<char*>(s_load_anim), 0);
 
     self->m_viewerAmbientColor[0].r = 0x3F;
     self->m_viewerAmbientColor[0].g = 0x3F;

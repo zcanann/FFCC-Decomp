@@ -1003,8 +1003,8 @@ void CGCharaObj::statAttack()
  */
 void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg1, Vec* pos)
 {
-	SCharaItemRow* itemData = &reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[effectId];
-	int particleBank = itemData->m_particleBank;
+	SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+	int particleBank = rows[effectId].m_particleBank;
 	int particleEntry;
 	int particleNo;
 	int seNo;
@@ -1014,13 +1014,15 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	switch (particleBank) {
 	default:
 		break;
+	case 0xFD:
+		particleBank = -1;
+		break;
 	case 0xFE:
 		particleBank = m_charaModelHandle->GetPdtSlot();
 		break;
-	case 0xFD:
 	case 0xFF:
-		particleBank = -1;
-		break;
+		hasParticle = 0;
+		goto checkParticle;
 	}
 
 	if (particleBank == -1) {
@@ -1055,7 +1057,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 checkParticle:
 	if (hasParticle == 0) {
 		if (effectArg0 == 2) {
-			unsigned short seSpec = itemData->m_se2;
+			unsigned short seSpec = rows[effectId].m_se2;
 			seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));
 			if (seNo != 0) {
 				int seHandle = playSe3D(seNo, 0x32, 0x96, 0, pos);
@@ -1179,8 +1181,8 @@ checkParticle:
 					angleOffset = kCharaObjNegativeHalfPi;
 				}
 				float angle = baseAngle + angleOffset;
-				CFlatParticleWorkPosition().x = kCharaObjSideParticleRadius * sinf(angle) + m_worldPosition.x;
-				CFlatParticleWorkPosition().z = kCharaObjSideParticleRadius * cosf(angle) + m_worldPosition.z;
+				CFlatRuntime2Storage().m_particleWorkPos.x = kCharaObjSideParticleRadius * sinf(angle) + m_worldPosition.x;
+				CFlatRuntime2Storage().m_particleWorkPos.z = kCharaObjSideParticleRadius * cosf(angle) + m_worldPosition.z;
 				CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, kCharaObjZero);
 				CFlatRuntime2Storage().PutParticleWork();
 				emittedCustom = 1;
@@ -1252,9 +1254,9 @@ checkParticle:
 				int a = m_unk68C;
 				int b = m_comboFramePrev;
 				if (a * 3 <= b) {
-					CFlatRuntime2Storage().SetParticleWorkNo(particleNo | (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) + 0x75));
+					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) + 0x75));
 				} else if (a * 2 <= b) {
-					CFlatRuntime2Storage().SetParticleWorkNo(particleNo | (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) + 0x73));
+					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) + 0x73));
 				}
 			}
 			break;
@@ -1274,8 +1276,9 @@ checkParticle:
 			if (effectArg0 == 2) {
 				Mtx rotMtx;
 				CFlatRuntime2& flatStorage = CFlatRuntime2Storage();
-				PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
-				for (int i = 0; i < 2; i++) {
+				int i = 0;
+				for (; i < 2; i++) {
+					PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
 					int side = (i == 0) ? 76 : -76;
 					const CVector& sidePos = CVector(static_cast<float>(side), kCharaObjZero, kCharaObjForwardParticleOffset);
 					Vec offsetPos;
@@ -1284,7 +1287,7 @@ checkParticle:
 					flatStorage.m_particleWorkPos.y = m_worldPosition.y + offsetPos.y;
 					flatStorage.m_particleWorkPos.z = m_worldPosition.z + offsetPos.z;
 					flatStorage.SetParticleWorkVector(m_rotTargetY, kCharaObjZero);
-					flatStorage.PutParticleWork();
+					CFlatRuntime2Storage().PutParticleWork();
 				}
 				emittedCustom = 1;
 			}

@@ -4,6 +4,8 @@
 #include "ffcc/cflat_runtime.h"
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/color.h"
+#include "ffcc/charaobj.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/game.h"
 #include "ffcc/graphic.h"
 #include "ffcc/itemobj.h"
@@ -28,6 +30,18 @@
 
 extern const Vec DAT_801D9B88;
 extern const Vec DAT_801D9B94;
+
+STATIC_ASSERT(offsetof(CCaravanWork, m_genderFlag) == 0x3E2);
+STATIC_ASSERT(offsetof(CGObjWork, m_saveSlot) == 0x08);
+STATIC_ASSERT(offsetof(CGObjWork, m_ownerObj) == 0x0C);
+STATIC_ASSERT(offsetof(CChara::CModel, m_meshVisibleMask) == 0x98);
+STATIC_ASSERT(offsetof(CChara::CModel, m_nodes) == 0xA8);
+STATIC_ASSERT(offsetof(CChara::CModel, m_texAnimSet) == 0xD4);
+STATIC_ASSERT(offsetof(CChara::CModel, m_flags10CBits) == 0x10C);
+STATIC_ASSERT(sizeof(CChara::CNode) == 0xC0);
+STATIC_ASSERT(offsetof(CChara::CNode, m_mtx) == 0x6C);
+STATIC_ASSERT(offsetof(CGCharaObj, m_itemId) == 0x560);
+STATIC_ASSERT(offsetof(CCameraPcs, m_yaw) == 0xF8);
 
 STATIC_ASSERT(sizeof(CGObject::AttackCol) == 0x30);
 STATIC_ASSERT(sizeof(CGObject::DamageCol) == 0x28);
@@ -578,10 +592,6 @@ void CGObject::CalcSphereNearPos(float scale, float angleOffset, Vec& outPos)
  */
 void CGObject::ResetDynamics()
 {
-    struct ModelFlagBits {
-        signed char m_dynamics : 1;
-        signed char m_unused : 7;
-    };
     bool hasModel = false;
     CCharaPcs::CHandle* handle = m_charaModelHandle;
 
@@ -590,8 +600,7 @@ void CGObject::ResetDynamics()
     }
 
     if (hasModel) {
-        u8* modelBytes = reinterpret_cast<u8*>(handle->m_model);
-        reinterpret_cast<ModelFlagBits*>(modelBytes + 0x10C)->m_dynamics = true;
+        handle->m_model->m_flags10CBits.m_flag10C_80 = true;
     }
 }
 
@@ -891,7 +900,7 @@ void CGObject::LoadShield(int itemId)
         m_shieldModelHandle->Add();
 
         const unsigned long textureVariant = (m_ownerType == 0)
-            ? *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2)
+            ? reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag
             : 0;
 
         m_shieldModelHandle->LoadModel(4, static_cast<unsigned long>(itemId), 0, textureVariant, -1, 0, 1);
@@ -921,7 +930,7 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
         m_weaponModelHandle->Add();
 
         const unsigned long textureVariant = (m_ownerType == 0)
-            ? *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2)
+            ? reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag
             : 0;
 
         m_weaponModelHandle->LoadModel(
@@ -1000,8 +1009,12 @@ void CGObject::LookAt(CGObject* target, char* nodeName)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007CE04
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::SetTexAnim(char* name)
 {
@@ -1016,7 +1029,7 @@ void CGObject::SetTexAnim(char* name)
     }
 
     if (hasModel) {
-        texAnimSet = *reinterpret_cast<CTexAnimSet**>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xD4);
+        texAnimSet = handle->m_model->m_texAnimSet;
         if (texAnimSet != (CTexAnimSet*)0) {
             const float& zero = sZeroFloat;
             texAnimSet->Change(name, zero, (CTexAnimSet::ANIM_TYPE)-2);
@@ -1026,8 +1039,12 @@ void CGObject::SetTexAnim(char* name)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007CE64
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::SetClassWork(int ownerType, int workIndex)
 {
@@ -1037,16 +1054,16 @@ void CGObject::SetClassWork(int ownerType, int workIndex)
     switch (ownerType) {
     case 0: {
         m_scriptHandle = reinterpret_cast<void**>(&Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[workIndex]]);
-        m_scriptHandle[2] = reinterpret_cast<void*>(Game.m_gameWork.m_wmBackupParams[workIndex]);
-        m_scriptHandle[3] = this;
+        reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_saveSlot = Game.m_gameWork.m_wmBackupParams[workIndex];
+        reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_ownerObj = this;
         Game.m_scriptFoodBase[workIndex] = reinterpret_cast<u32>(m_scriptHandle);
         return;
     }
 
     case 1:
         m_scriptHandle = reinterpret_cast<void**>(&Game.m_monWorkArr[workIndex]);
-        m_scriptHandle[3] = this;
-        m_scriptHandle[2] = reinterpret_cast<void*>(workIndex);
+        reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_ownerObj = this;
+        reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_saveSlot = workIndex;
         Game.m_monObjects[workIndex] = this;
         Game.m_monWorkRefs[workIndex] = reinterpret_cast<CMonWork*>(m_scriptHandle);
         return;
@@ -1228,8 +1245,12 @@ void CGObject::SetAttackCol(int hitIndex, char* nodeName, float radius, Vec* pos
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007D488
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::DispCharaParts(int showParts)
 {
@@ -1241,7 +1262,7 @@ void CGObject::DispCharaParts(int showParts)
     if (!hasModel) {
         return;
     }
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x98) = showParts;
+    handle->m_model->m_meshVisibleMask = showParts;
 }
 
 /*
@@ -2327,9 +2348,8 @@ void CGObject::hit()
     }
     for (int i = 0; i < 8; i++) {
         const int node = m_attackColliders[i].m_nodeIndex;
-        u8* const modelNodes =
-            *reinterpret_cast<u8**>(reinterpret_cast<u8*>(m_charaModelHandle->m_model) + 0xA8);
-        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0x6C),
+        CChara::CNode* const modelNodes = m_charaModelHandle->m_model->m_nodes;
+        PSMTXMultVec(modelNodes[node].m_mtx,
                      &m_attackColliders[i].m_localPosition,
                      &m_attackColliders[i].m_worldPosition);
         PSVECAdd(&m_attackColliders[i].m_worldPosition, &m_worldPosition,
@@ -2338,9 +2358,8 @@ void CGObject::hit()
 
     for (int i = 0; i < 8; i++) {
         const int node = m_damageColliders[i].m_nodeIndex;
-        u8* const modelNodes =
-            *reinterpret_cast<u8**>(reinterpret_cast<u8*>(m_charaModelHandle->m_model) + 0xA8);
-        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0x6C),
+        CChara::CNode* const modelNodes = m_charaModelHandle->m_model->m_nodes;
+        PSMTXMultVec(modelNodes[node].m_mtx,
                      &m_damageColliders[i].m_localPosition,
                      &m_damageColliders[i].m_worldPosition);
         PSVECAdd(&m_damageColliders[i].m_worldPosition, &m_worldPosition,
@@ -2396,10 +2415,10 @@ void CGObject::hit()
                     stackIn[0].m_word = static_cast<u32>(attackIndex);
                     stackIn[1].m_word = static_cast<u32>(other->m_particleId);
                     stackIn[2].m_word = static_cast<u32>(damageIndex);
-                    *reinterpret_cast<float*>(&stackIn[3].m_word) = hitPos.x;
-                    *reinterpret_cast<float*>(&stackIn[4].m_word) = hitPos.y;
-                    *reinterpret_cast<float*>(&stackIn[5].m_word) = hitPos.z;
-                    stackIn[6].m_word = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x560);
+                    stackIn[3].m_float = hitPos.x;
+                    stackIn[4].m_float = hitPos.y;
+                    stackIn[5].m_float = hitPos.z;
+                    stackIn[6].m_word = static_cast<CGCharaObj*>(this)->m_itemId;
                     CFlatRuntime::CStack stackOut;
                     gCFlatRuntime().SystemCall(this, 2, 0x13, 7, stackIn, &stackOut);
                     const int hitResult = onHit(attackIndex, other, damageIndex, &hitPos);
@@ -3013,7 +3032,7 @@ void CGObject::move()
         if (movingWithScript) {
             cameraYaw = 0.0f;
         } else {
-            cameraYaw = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xf8);
+            cameraYaw = CameraPcs.m_yaw;
         }
 
         const double inputYaw = atan2(static_cast<double>(moveVec.x), static_cast<double>(moveVec.z));

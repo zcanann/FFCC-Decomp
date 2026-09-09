@@ -26,12 +26,6 @@ static const char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
 #include "ffcc/util.h"
 #include "ffcc/vector.h"
 
-extern const float kCharaBumpLightPosX;
-extern const float kCharaBumpLightPosY;
-extern const float kCharaBumpLightPosZ;
-extern const float kCharaBumpLightTargetX;
-extern const float kCharaBumpLightTargetY;
-extern const float kCharaBumpLightTargetZ;
 extern const char lbl_80330228[];
 extern const char lbl_8033022C[];
 extern const char lbl_80330230[];
@@ -144,24 +138,7 @@ static const char s_charaModelSuffix[] = ".chm";
 static const char s_charaDynamicsSuffix[] = ".chd";
 static const char s_charaTextureVariantFmt[] = "%s_%c";
 static const char s_charaTextureSuffix[] = ".tex";
-extern const float kCharaZero = 0.0f;
-extern const float kCharaOne = 1.0f;
-extern const float FLOAT_80330290 = 4.0f;
-extern const double DOUBLE_80330298 = 1.0;
-extern const float FLOAT_803302A0 = 2.0f;
-extern const float FLOAT_803302A4 = -1.0f;
-extern const float FLOAT_803302A8 = 10.0f;
-extern const float FLOAT_803302AC = 255.0f;
-extern const double DOUBLE_803302B0 = 4503599627370496.0;
-extern const double DOUBLE_803302B8 = 4503601774854144.0;
 static const char s_mogFurTextureName[] = "n915m_2";
-extern const float FLOAT_803302C8 = 448.0f;
-extern const float FLOAT_803302CC = 640.0f;
-extern const float FLOAT_803302D0 = 100010.0f;
-extern const float FLOAT_803302D4 = -100000.0f;
-extern const float FLOAT_803302D8 = -100.0f;
-extern const float FLOAT_803302DC = 0.0015625f;
-extern const float FLOAT_803302E0 = 0.0022321429569274187f;
 static const char s_charaSetAnimMissingFmt[] =
     "\x83\x41\x83\x6a\x83\x81\x81\x5b\x83\x56\x83\x87\x83\x93\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42"
     "\x74\x79\x70\x65\x3d\x25\x64\x20\x6e\x75\x6d\x62\x65\x72\x3d\x25\x64\x20\x61\x6e\x69\x6d\x6e\x6f\x3d\x25\x64\x0a";
@@ -198,18 +175,6 @@ static const char s_charaDumpPdtFmt[] = "%3d %1d %3d %1d %8d %3d %08x\n";
 static const char s_charaDumpModelHdr1[] = "model\n";
 static const char s_charaDumpPdtHdr1[] = "pdt\n";
 static const char s_charaDumpAnimHdr1[] = "anim\n";
-extern const float FLOAT_803302FC = 1.3333333730697632f;
-extern const float FLOAT_80330300 = 0.5f;
-extern const float FLOAT_80330304 = -0.5f;
-extern const float FLOAT_80330308 = 0.25f;
-extern const float kCharaBumpLightPosX = -533.0f;
-extern const float kCharaBumpLightPosY = -131.0f;
-extern const float kCharaBumpLightPosZ = -117.0f;
-extern const float kCharaBumpLightTargetX = 4391.0f;
-extern const float kCharaBumpLightTargetY = -1864.0f;
-extern const float kCharaBumpLightTargetZ = 7194.0f;
-extern const float FLOAT_80330324 = 100.0f;
-extern const float FLOAT_80330328[2] = {500.0f, 0.0f};
 static const char s_charaDumpAnimHdr2[] = "no  t num name           lv  mask     addr     banksize banksum  histroy\n";
 static const char s_charaDumpAnimSep[] = "--- - --- -------------- --- -------- -------- -------- -------- --------\n";
 static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %14s %3d %08x %08x %8d %8d %8d\n";
@@ -238,11 +203,6 @@ STATIC_ASSERT(offsetof(CCharaPcs, m_weaponModelStage) == 0xDC);
 STATIC_ASSERT(offsetof(CCharaPcs, m_familyModelStage) == 0xE0);
 STATIC_ASSERT(offsetof(CCharaPcs, m_charaAllocStage) == 0xE4);
 
-
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -564,9 +524,9 @@ void CCharaPcs::Init()
             lightColor.b = intensity;
             lightColor.a = 0xFF;
             if (i == 0) {
-                m_viewerDiffusePos[lightIndex].x = kCharaZero;
-                m_viewerDiffusePos[lightIndex].y = kCharaZero;
-                m_viewerDiffusePos[lightIndex].z = FLOAT_803302A4;
+                m_viewerDiffusePos[lightIndex].x = 0.0f;
+                m_viewerDiffusePos[lightIndex].y = 0.0f;
+                m_viewerDiffusePos[lightIndex].z = -1.0f;
             }
         }
     }
@@ -575,7 +535,7 @@ void CCharaPcs::Init()
         const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         CColor shade;
 
-        float scale = static_cast<float>(i) * FLOAT_80330308;
+        float scale = static_cast<float>(i) * 0.25f;
         shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
         shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
         shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
@@ -593,12 +553,12 @@ void CCharaPcs::Init()
     CColor baseColor(0x00, 0x00, 0x40, 0x40);
     m_texShadowColor = baseColor.color;
 
-    CVector baseVec(kCharaZero, FLOAT_80330324, kCharaZero);
+    CVector baseVec(0.0f, 100.0f, 0.0f);
     Vec* constructedVec = reinterpret_cast<Vec*>(&baseVec);
     m_texShadowPos.x = constructedVec->x;
     m_texShadowPos.y = constructedVec->y;
     m_texShadowPos.z = constructedVec->z;
-    m_texShadowRadius = FLOAT_80330328[0];
+    m_texShadowRadius = 500.0f;
     m_texShadowSize = 0x80;
     m_texShadowDistance = 100;
 }
@@ -661,12 +621,12 @@ void CCharaPcs::create()
         sentinel->m_pdtLoadRef = 0;
         sentinel->m_currentAnimIndex = -1;
         sentinel->m_flags = 0;
-        sentinel->m_colorPhase = kCharaOne;
-        sentinel->m_sortZ = kCharaZero;
+        sentinel->m_colorPhase = 1.0f;
+        sentinel->m_sortZ = 0.0f;
         sentinel->m_shadowTexturePtr = 0;
         sentinel->m_asyncState = 0;
         sentinel->m_asyncFileHandle = 0;
-        sentinel->m_fogBlend = kCharaZero;
+        sentinel->m_fogBlend = 0.0f;
         sentinel->m_unk0x158 = 0;
         sentinel->m_drawListFlags = static_cast<unsigned char>(__rlwimi(sentinel->m_drawListFlags, 1, 7, 24, 24));
     }
@@ -683,12 +643,12 @@ void CCharaPcs::create()
     CLightPcs::CBumpLight bumpLight;
 
     bumpLight.m_type = 1;
-    bumpLight.m_position.x = kCharaBumpLightPosX;
-    bumpLight.m_position.y = kCharaBumpLightPosY;
-    bumpLight.m_position.z = kCharaBumpLightPosZ;
-    bumpLight.m_targetPosition.x = kCharaBumpLightTargetX;
-    bumpLight.m_targetPosition.y = kCharaBumpLightTargetY;
-    bumpLight.m_targetPosition.z = kCharaBumpLightTargetZ;
+    bumpLight.m_position.x = -533.0f;
+    bumpLight.m_position.y = -131.0f;
+    bumpLight.m_position.z = -117.0f;
+    bumpLight.m_targetPosition.x = 4391.0f;
+    bumpLight.m_targetPosition.y = -1864.0f;
+    bumpLight.m_targetPosition.z = 7194.0f;
     PSVECSubtract(reinterpret_cast<Vec*>(&bumpLight.m_targetPosition), reinterpret_cast<Vec*>(&bumpLight.m_position),
                   reinterpret_cast<Vec*>(&bumpLight.m_direction));
     PSVECNormalize(reinterpret_cast<Vec*>(&bumpLight.m_direction), reinterpret_cast<Vec*>(&bumpLight.m_direction));
@@ -696,8 +656,8 @@ void CCharaPcs::create()
     bumpLight.m_bumpShade[1] = 0x80;
     bumpLight.m_bumpShade[2] = 0x00;
     bumpLight.m_bumpShade[3] = 0xFF;
-    bumpLight.m_offsetX = kCharaZero;
-    bumpLight.m_offsetZ = kCharaZero;
+    bumpLight.m_offsetX = 0.0f;
+    bumpLight.m_offsetZ = 0.0f;
 
     gCharaPartWorkPtr = LightPcs.AddBump(&bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4);
     Chara.Create();
@@ -945,7 +905,7 @@ int CCharaPcs::correctLoadAnimAmem()
 void CCharaPcs::onScriptChanging(char*)
 {
     for (int i = 0; i < 5; i++) {
-        m_viewerChoiceColor[i] = CColor(0xFF, 0xFF, 0xFF, 0xFF) * (static_cast<float>(i) * FLOAT_80330308);
+        m_viewerChoiceColor[i] = CColor(0xFF, 0xFF, 0xFF, 0xFF) * (static_cast<float>(i) * 0.25f);
     }
 
     m_overlapEnabled = 0;
@@ -1248,7 +1208,7 @@ void CCharaPcs::drawMakeTexShadow()
     GXSetPixelFmt((GXPixelFmt)1, GX_ZC_LINEAR);
     _GXColor savedCopyClearColor = Graphic.m_defaultCopyClearColor;
     GXSetAlphaUpdate(GX_TRUE);
-    GXSetViewport(kCharaZero, kCharaZero, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), kCharaZero, kCharaOne);
+    GXSetViewport(0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), 0.0f, 1.0f);
     GXSetScissor(0, 0, static_cast<unsigned int>(m_texShadowSize), static_cast<unsigned int>(m_texShadowSize));
     CColor clearColor(0x00, 0x00, 0x00, 0x00);
     Graphic.SetCopyClear(clearColor.color, 0xFFFFFF);
@@ -1257,8 +1217,8 @@ void CCharaPcs::drawMakeTexShadow()
     m_texShadowTextureBase = Graphic.m_scratchTextureBuffer;
     m_texShadowTextureSize = 0xD2000;
     m_texShadowTextureOffset += m_texShadowSize * m_texShadowSize * 4;
-    C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, FLOAT_803302FC, FLOAT_80330300,
-                          FLOAT_80330304, FLOAT_80330300, FLOAT_80330300);
+    C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, 4.0f / 3.0f, 0.5f,
+                          -0.5f, 0.5f, 0.5f);
 
     handle = m_handleList->m_next;
     while (m_handleList != handle) {
@@ -1272,7 +1232,7 @@ void CCharaPcs::drawMakeTexShadow()
     Graphic.SetStdPixelFmt();
     Graphic.SetCopyClear(savedCopyClearColor, 0xFFFFFF);
     gUtil.RenderTextureQuad(
-        kCharaZero, kCharaZero, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), &backBufferTexObj, 0, 0, 0,
+        0.0f, 0.0f, static_cast<float>(m_texShadowSize), static_cast<float>(m_texShadowSize), &backBufferTexObj, 0, 0, 0,
         GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
 
@@ -1956,7 +1916,7 @@ void CCharaPcs::drawOverlap()
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
 
-    C_MTXOrtho(projectionMtx, kCharaZero, FLOAT_803302C8, kCharaZero, FLOAT_803302CC, FLOAT_803302A8, FLOAT_803302D0);
+    C_MTXOrtho(projectionMtx, 0.0f, 448.0f, 0.0f, 640.0f, 10.0f, 100010.0f);
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
@@ -1980,10 +1940,10 @@ void CCharaPcs::drawOverlap()
     GXSetCullMode(GX_CULL_NONE);
 
     {
-        float zero = kCharaZero;
-        float depth = FLOAT_803302D4;
-        float width = FLOAT_803302CC;
-        float height = FLOAT_803302C8;
+        float zero = 0.0f;
+        float depth = -100000.0f;
+        float width = 640.0f;
+        float height = 448.0f;
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
         GXPosition3f32(zero, zero, depth);
         GXPosition3f32(width, zero, depth);
@@ -1995,9 +1955,9 @@ void CCharaPcs::drawOverlap()
     GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 
     Vec up;
-    up.x = kCharaZero;
-    up.y = kCharaOne;
-    up.z = kCharaZero;
+    up.x = 0.0f;
+    up.y = 1.0f;
+    up.z = 0.0f;
     C_MTXLookAt(lookAtMtx, &m_overlapEyePos, &up, &m_overlapTargetPos);
     PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 
@@ -2020,7 +1980,7 @@ void CCharaPcs::drawOverlap()
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
     GXSetCullMode(GX_CULL_NONE);
-    C_MTXOrtho(projectionMtx, kCharaZero, FLOAT_803302C8, kCharaZero, FLOAT_803302CC, kCharaZero, FLOAT_803302D8);
+    C_MTXOrtho(projectionMtx, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, -100.0f);
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
@@ -2038,9 +1998,9 @@ void CCharaPcs::drawOverlap()
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     {
-        float zero = kCharaZero;
-        float width = FLOAT_803302CC;
-        float height = FLOAT_803302C8;
+        float zero = 0.0f;
+        float width = 640.0f;
+        float height = 448.0f;
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
         GXPosition3f32(zero, zero, zero);
         GXPosition3f32(width, zero, zero);
@@ -2051,7 +2011,7 @@ void CCharaPcs::drawOverlap()
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
     GXSetChanMatColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     GXLoadTexObj(backBufferTex, GX_TEXMAP0);
-    PSMTXScale(texMtx, FLOAT_803302DC, FLOAT_803302E0, kCharaOne);
+    PSMTXScale(texMtx, 1.0f / 640.0f, 1.0f / 448.0f, 1.0f);
     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -2063,9 +2023,9 @@ void CCharaPcs::drawOverlap()
     _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 
     {
-        float zero = kCharaZero;
-        float width = FLOAT_803302CC;
-        float height = FLOAT_803302C8;
+        float zero = 0.0f;
+        float width = 640.0f;
+        float height = 448.0f;
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
         GXPosition3f32(zero, zero, zero);
         GXTexCoord2u16(0, 0);
@@ -2126,14 +2086,14 @@ CCharaPcs::CHandle::CHandle()
 	m_currentAnimIndex = -1;
 	m_flags = 0;
 
-	m_colorPhase = LoadFloat(kCharaOne);
-	m_sortZ = LoadFloat(kCharaZero);
+	m_colorPhase = 1.0f;
+	m_sortZ = 0.0f;
 	m_shadowTexturePtr = nullptr;
 
 	m_asyncState = 0;
 	m_asyncFileHandle = (CFile::CHandle*)nullptr;
 
-	m_fogBlend = LoadFloat(kCharaZero);
+	m_fogBlend = 0.0f;
 	m_unk0x158 = 0;
 	m_drawListFlags = static_cast<unsigned char>(__rlwimi(m_drawListFlags, 1, 7, 24, 24));
 }
@@ -2707,7 +2667,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     if ((flags & 0x400000) != 0) {
         return;
     }
-    if (kCharaZero == m_model->m_lightAlpha && (flags & 0x80) == 0) {
+    if (0.0f == m_model->m_lightAlpha && (flags & 0x80) == 0) {
         return;
     }
     if ((flags & 0x100) != 0 && drawPass != 5) {
@@ -2723,7 +2683,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         return;
     }
 
-    if (immediatePass != 0 && drawPass == 0 && (m_model->m_lightAlpha < kCharaOne || (flags & 0x40000) != 0)) {
+    if (immediatePass != 0 && drawPass == 0 && (m_model->m_lightAlpha < 1.0f || (flags & 0x40000) != 0)) {
         if (immediatePass != 0) {
             ppvDrawMng.AddPrim(-m_sortZ, this);
         }
@@ -2739,14 +2699,14 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     const unsigned int lightBank = (flags >> 19) & 1;
     if (drawPass != 1 && drawPass != 2 && (flags & 0x200000) == 0) {
-        const float phase = m_colorPhase * FLOAT_80330290;
+        const float phase = m_colorPhase * 4.0f;
         unsigned int phaseIndex = static_cast<int>(phase);
-        const float blendT = static_cast<float>(fmod(static_cast<double>(phase), DOUBLE_80330298));
+        const float blendT = static_cast<float>(fmod(static_cast<double>(phase), 1.0));
         CColor shade;
         if ((m_flags & 0x20000) != 0 && drawPass != 3) {
             shade = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         } else {
-            shade = CharaPcs.m_viewerChoiceColor[phaseIndex] * (kCharaOne - blendT) +
+            shade = CharaPcs.m_viewerChoiceColor[phaseIndex] * (1.0f - blendT) +
                     CharaPcs.m_viewerChoiceColor[phaseIndex + 1] * blendT;
         }
 
@@ -2786,13 +2746,13 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     if (drawPass == 3) {
         if ((m_flags & 4) != 0) {
-            const float offsetY = FLOAT_803302A0 * (m_worldPosY - m_bgCharmPlaneY);
+            const float offsetY = 2.0f * (m_worldPosY - m_bgCharmPlaneY);
             viewMtx[0][3] += viewMtx[0][1] * offsetY;
             viewMtx[1][3] += viewMtx[1][1] * offsetY;
             viewMtx[2][3] += viewMtx[2][1] * offsetY;
-            viewMtx[1][1] *= FLOAT_803302A4;
-            viewMtx[0][1] *= FLOAT_803302A4;
-            viewMtx[2][1] *= FLOAT_803302A4;
+            viewMtx[1][1] *= -1.0f;
+            viewMtx[0][1] *= -1.0f;
+            viewMtx[2][1] *= -1.0f;
         } else if ((m_flags & 8) != 0) {
             PSMTXConcat(viewMtx, CFlatCenterMatrix(), viewMtx);
         }
@@ -2805,21 +2765,21 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         modelPos.z = modelMtx[2][3];
 
         CVector delta = CVector(CharaPcs.m_texShadowPos) - modelPos;
-        if (delta.x == kCharaZero && delta.z == kCharaZero) {
+        if (delta.x == 0.0f && delta.z == 0.0f) {
             return;
         }
 
         const float distRatio = PSVECMag(delta) / CharaPcs.m_texShadowRadius;
-        if (distRatio > kCharaOne) {
+        if (distRatio > 1.0f) {
             return;
         }
-        const float shadowFade = kCharaOne - distRatio;
+        const float shadowFade = 1.0f - distRatio;
         delta.Normalize();
 
-        CVector eye = modelPos + CVector(kCharaZero, FLOAT_803302A8, kCharaZero);
-        CVector lookAtUp(kCharaZero, kCharaOne, kCharaZero);
+        CVector eye = modelPos + CVector(0.0f, 10.0f, 0.0f);
+        CVector lookAtUp(0.0f, 1.0f, 0.0f);
         CVector shadowPos = modelPos + delta * static_cast<float>(CharaPcs.m_texShadowDistance) +
-                            CVector(kCharaZero, FLOAT_803302A8, kCharaZero);
+                            CVector(0.0f, 10.0f, 0.0f);
         C_MTXLookAt(m_shadowViewMtx, shadowPos, lookAtUp, eye);
         PSMTXCopy(m_shadowViewMtx, viewMtx);
 
@@ -2828,18 +2788,18 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         GetCameraClipPlanes(&nearZ, &farZ);
         CColor shadowFog;
         shadowFog.color.a = 0xFF;
-        shadowFog.color.b = static_cast<unsigned char>(static_cast<int>(FLOAT_803302AC * shadowFade));
+        shadowFog.color.b = static_cast<unsigned char>(static_cast<int>(255.0f * shadowFade));
         shadowFog.color.g = shadowFog.color.b;
         shadowFog.color.r = shadowFog.color.b;
         _GXColor shadowFogGX = shadowFog.color;
-        GXSetFog(GX_FOG_PERSP_LIN, nearZ, nearZ + kCharaOne, nearZ, farZ, shadowFogGX);
+        GXSetFog(GX_FOG_PERSP_LIN, nearZ, nearZ + 1.0f, nearZ, farZ, shadowFogGX);
     }
 
     int restoreFog = 0;
-    if (kCharaZero < m_fogBlend && (drawPass == 0 || drawPass == 4)) {
-        float invBlend = kCharaOne - m_fogBlend;
+    if (0.0f < m_fogBlend && (drawPass == 0 || drawPass == 4)) {
+        float invBlend = 1.0f - m_fogBlend;
         invBlend *= invBlend;
-        float fogBlend = kCharaOne - invBlend;
+        float fogBlend = 1.0f - invBlend;
 
         float nearZ;
         float farZ;
@@ -2864,7 +2824,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         const CColor& fogBase = CColor(graphicFogColor);
         CColor fogPart;
-        const float fogRemainder = kCharaOne - fogBlend;
+        const float fogRemainder = 1.0f - fogBlend;
         fogPart.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.r) * fogRemainder));
         fogPart.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.g) * fogRemainder));
         fogPart.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.b) * fogRemainder));
@@ -2881,7 +2841,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         _GXColor fogColor = blendedFogCopy.color;
         GXSetFog(GX_FOG_PERSP_LIN,
                  fogStart * fogRemainder + nearZ * fogBlend,
-                 (fogEnd + kCharaOne) * fogRemainder + (nearZ + kCharaOne) * fogBlend,
+                 (fogEnd + 1.0f) * fogRemainder + (nearZ + 1.0f) * fogBlend,
                  nearZ,
                  farZ,
                  fogColor);

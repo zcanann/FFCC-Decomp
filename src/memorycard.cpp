@@ -1,4 +1,6 @@
 #include "ffcc/memorycard.h"
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
 #include "ffcc/file.h"
 #include "ffcc/chara.h"
 #include "ffcc/itemobj.h"
@@ -12,27 +14,6 @@
 #include "dolphin/card.h"
 #include "string.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
-
-static const char sCardGameCode[] = "FFCC";
-static const char sCardMakerCode[] = "GDS";
-static const char sCardMachineCode[] = "GC";
-static const char sCardVersion[] = "1.00";
-
-static const char sMemoryCardGbaDvdDir[] = "dvd/gba/";
-static const char sMemoryCardGbaClientBinaryName[] = "ffcc_cli.bin";
-static const char sMemoryCardObjDataScriptName[] = "objdat.spt";
-static const char sMemoryCardIconFileName[] = "icon.dat";
-static const char sMemoryCardCommentText[] = "FF Crystal Chronicles";
-
-namespace CardConst {
-static char* MC_ICONIMG_FNAME = const_cast<char*>(sMemoryCardIconFileName);
-static char* MC_FNAME = const_cast<char*>(sCardGameCode);
-static char* MC_COMMENT = const_cast<char*>(sMemoryCardCommentText);
-static char* MCDAT_MAKER = const_cast<char*>(sCardMakerCode);
-static char* MCDAT_TITLE = const_cast<char*>(sCardGameCode);
-static char* MCDAT_MACHINE = const_cast<char*>(sCardMachineCode);
-static char* MCDAT_VERSION = const_cast<char*>(sCardVersion);
-}
 
 CMemoryCardMan MemoryCardMan;
 

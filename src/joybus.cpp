@@ -1,5 +1,6 @@
 #include "ffcc/joybus.h"
 #include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
 
 #include "ffcc/file.h"
 #include "ffcc/gbaque.h"
@@ -22,9 +23,6 @@
 JoyBus Joybus;
 
 int gJoyBusThreadExitValue = 0;
-
-static const char s_icon_dat[] = "icon.dat";
-static const char s_game_name[] = "FF Crystal Chronicles";
 
 extern const unsigned short JoyBusCrcTable[256] =
 {

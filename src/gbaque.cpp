@@ -7,6 +7,7 @@
 #include "ffcc/itemobj.h"
 #include "ffcc/joybus.h"
 #include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"
 #include "ffcc/mes.h"
@@ -118,8 +119,6 @@ static inline unsigned int SwapU32Value(unsigned int value)
 	return (value << 24) | ((value >> 8) & 0xFF00) | ((value << 8) & 0xFF0000) | (value >> 24);
 }
 
-static const char s_gba_icon_dat[] = "icon.dat";
-static const char s_gba_game_title[] = "FF Crystal Chronicles";
 static const unsigned short sGbaLetterItemTable0[] = {
 	0x0100, 0x0101, 0x0102, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800,
 	0x0900, 0x0A00, 0x0B00, 0x0B01, 0x0C00, 0x0D00, 0x2000, 0x2001,

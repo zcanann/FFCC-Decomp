@@ -1885,7 +1885,7 @@ void _pppInitPart(_pppMngSt* pppMngSt)
 
 /*
  * --INFO--
- * PAL Address: 80054698
+ * PAL Address: 0x80054698
  * PAL Size: 340b
  * EN Address: TODO
  * EN Size: TODO
@@ -1934,19 +1934,17 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 	for (s32 i = 0; i < pppMngSt->m_numPrograms; i++)
 	{
 		_pppPDataVal* pDataVals = pppMngSt->m_pppPDataVals;
-		if (pDataVals != 0)
+		_pppPDataVal* pDataVal = &pDataVals[i];
+		if (pDataVals != 0 && pDataVal != 0 &&
+			pppMngSt->m_currentFrame >= pDataVal->m_nextSpawnTime)
 		{
-			_pppPDataVal* pDataVal = &pDataVals[i];
-			if (pDataVal != 0 && pppMngSt->m_currentFrame >= pDataVal->m_nextSpawnTime)
+			pDataVal->m_nextSpawnTime = 0x7FFFFFFF;
+			_pppPObject* pObject = pppCreatePObject(pppMngSt, pDataVal);
+			if (pObject == 0)
 			{
-				pDataVal->m_nextSpawnTime = 0x7FFFFFFF;
-				_pppPObject* pObject = pppCreatePObject(pppMngSt, pDataVal);
-				if (pObject == 0)
-				{
-					break;
-				}
-				pObject->m_field7C = 0;
+				break;
 			}
+			pObject->m_field7C = 0;
 		}
 	}
 

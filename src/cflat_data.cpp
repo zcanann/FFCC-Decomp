@@ -1,12 +1,10 @@
 #include "ffcc/cflat_data.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/game.h"
+#include "ffcc/memory.h"
 
 #include <dolphin/types.h>
 #include <string.h>
-
-void* operator new[](unsigned long, CMemory::CStage*, char*, int);
-extern "C" char s_cflat_data_cpp[];
 
 /*
  * --INFO--
@@ -88,7 +86,7 @@ void CFlatData::Create(void* filePtr)
 				case 0x44415441: // 'DATA'
 				{
 					m_data[m_dataCount].m_size = chunk.m_arg0;
-					m_data[m_dataCount].m_data = new (Game.m_mainStage, s_cflat_data_cpp, 0x45) unsigned char[chunk.m_arg0];
+					m_data[m_dataCount].m_data = new (Game.m_mainStage, "cflat_data.cpp", 0x45) unsigned char[chunk.m_arg0];
 					chunkFile.Get(m_data[m_dataCount].m_data, chunk.m_arg0);
 
 					if (chunk.m_version >= 1)
@@ -100,8 +98,8 @@ void CFlatData::Create(void* filePtr)
 
 						numStrings = chunkFile.Get4();
 						m_data[m_dataCount].m_numStrings = numStrings;
-						m_data[m_dataCount].m_strings = new (Game.m_mainStage, s_cflat_data_cpp, 0x4C) char*[numStrings];
-						m_data[m_dataCount].m_stringBuf = new (Game.m_mainStage, s_cflat_data_cpp, 0x4D) char[numStrings];
+						m_data[m_dataCount].m_strings = new (Game.m_mainStage, "cflat_data.cpp", 0x4C) char*[numStrings];
+						m_data[m_dataCount].m_stringBuf = new (Game.m_mainStage, "cflat_data.cpp", 0x4D) char[numStrings];
 
 						memcpy(m_data[m_dataCount].m_stringBuf, chunkFile.GetAddress(), numStrings);
 						stringBase = (char*)chunkFile.GetAddress();
@@ -131,9 +129,9 @@ void CFlatData::Create(void* filePtr)
 					char* stringBase;
 
 					m_tabl[m_tableCount].m_numEntries = chunk.m_arg0;
-					stringIndex = (char**)new (Game.m_mainStage, s_cflat_data_cpp, 0x65) unsigned char[chunk.m_arg0 << 2];
+					stringIndex = (char**)new (Game.m_mainStage, "cflat_data.cpp", 0x65) unsigned char[chunk.m_arg0 << 2];
 					m_tabl[m_tableCount].m_strings = stringIndex;
-					m_tabl[m_tableCount].m_stringBuf = new (Game.m_mainStage, s_cflat_data_cpp, 0x66) char[chunk.m_size];
+					m_tabl[m_tableCount].m_stringBuf = new (Game.m_mainStage, "cflat_data.cpp", 0x66) char[chunk.m_size];
 
 					memcpy(m_tabl[m_tableCount].m_stringBuf, chunkFile.GetAddress(), chunk.m_size);
 
@@ -153,7 +151,7 @@ void CFlatData::Create(void* filePtr)
 					char* stringBase;
 
 					m_mesCount = chunk.m_arg0;
-					m_mesBuffer = new (Game.m_mainStage, s_cflat_data_cpp, 0x76) char[chunk.m_size];
+					m_mesBuffer = new (Game.m_mainStage, "cflat_data.cpp", 0x76) char[chunk.m_size];
 					memcpy(m_mesBuffer, chunkFile.GetAddress(), chunk.m_size);
 
 					stringBase = (char*)chunkFile.GetAddress();

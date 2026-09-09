@@ -1065,7 +1065,7 @@ p_gba.cpp:
 	extabindex  start:0x8000E0A4 end:0x8000E104
 	.text       start:0x800977D8 end:0x80097AC8
 	.ctors      start:0x801D5420 end:0x801D5424
-	.rodata     start:0x801D9DC8 end:0x801D9DFC
+	.rodata     start:0x801D9DC8 end:0x801D9E00
 	.data       start:0x8020F2F8 end:0x8020F4C8
 	.sdata      start:0x8032E7C0 end:0x8032E7D8
 	.sbss       start:0x8032EDA8 end:0x8032EDB0
@@ -1075,6 +1075,7 @@ cflat_data.cpp:
 	extab       start:0x80007D20 end:0x80007D38
 	extabindex  start:0x8000E104 end:0x8000E128
 	.text       start:0x80097AC8 end:0x800981F0
+	.rodata     start:0x801D9E00 end:0x801D9E10
 
 mes.cpp:
 	extab       start:0x80007D38 end:0x80007D78

@@ -939,8 +939,8 @@ void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
  * --INFO--
  * PAL Address: 0x80052764
  * PAL Size: 504b
- * EN Address: 0x80060e08
- * EN Size: 592b
+ * EN Address: 0x80052558
+ * EN Size: 504b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -975,12 +975,12 @@ void CPartPcs::drawAfterViewer()
 	g_par_draw_prof.ProfEnd();
 	Graphic.Printf(
 		const_cast<char*>(sPartPcsCalcProfileFmt),
-		(double)g_par_calc_prof.m_lastTime,
-		(double)g_par_calc_prof.m_maxTime);
+		(double)g_par_calc_prof.GetTime(),
+		(double)g_par_calc_prof.GetMax());
 	Graphic.Printf(
 		const_cast<char*>(sPartPcsDrawProfileFmt),
-		(double)g_par_draw_prof.m_lastTime,
-		(double)g_par_draw_prof.m_maxTime);
+		(double)g_par_draw_prof.GetTime(),
+		(double)g_par_draw_prof.GetMax());
 	Graphic.Printf(
 		const_cast<char*>(sPartPcsHeapProfileFmt),
 		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),

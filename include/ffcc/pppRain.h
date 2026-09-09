@@ -16,11 +16,11 @@ struct RainDataOffsets {
 
 struct PRain {
     s32 m_graphId;
-    u16 m_dataValIndex;
+    u16 m_dropCount;
     u8 _pad0[2];
-    f32 m_initWOrk;
+    f32 m_fallDirX;
     f32 m_stepValue;
-    f32 m_arg3;
+    f32 m_fallDirZ;
     f32 m_unk14;
     f32 m_moveYDelta;
     f32 m_accelYDelta;

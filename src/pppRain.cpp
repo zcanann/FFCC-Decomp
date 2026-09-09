@@ -86,9 +86,9 @@ inline void InitRainData(VRain*, PRain* rain, RAIN_DATA* drop)
     drop->position.x = unitA * (maxX - minX) + minX;
     drop->position.y = rain->m_maxY;
     drop->position.z = unitB * zRange + rain->m_minZ;
-    drop->direction.x = -rain->m_initWOrk;
+    drop->direction.x = -rain->m_fallDirX;
     drop->direction.y = rain->m_driftY;
-    drop->direction.z = -rain->m_arg3;
+    drop->direction.z = -rain->m_fallDirZ;
     PSVECNormalize(&drop->direction, &drop->direction);
 
     lengthDelta = unitA * rain->m_lengthRand;
@@ -133,7 +133,7 @@ inline void UpdateRain(VRain* work, PRain* rain, RAIN_DATA* drop)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
+void pppRenderRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
 {
     int i;
     VRain* work;
@@ -146,16 +146,16 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
     float baseZ;
     Vec segment;
 
-    work = GetRainWork(pppRain, param_3);
-    colorData = GetRainColorData(pppRain, param_3);
-    pppSetBlendMode(param_2->m_blendMode);
+    work = GetRainWork(rain, data);
+    colorData = GetRainColorData(rain, data);
+    pppSetBlendMode(pRain->m_blendMode);
     pppSetDrawEnv(
         &colorData->m_color,
         reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
         0.0f,
-        param_2->m_lightTarget,
-        param_2->m_fogIndex,
-        param_2->m_blendMode,
+        pRain->m_lightTarget,
+        pRain->m_fogIndex,
+        pRain->m_blendMode,
         0,
         1,
         1,
@@ -166,7 +166,7 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
     GXSetTevDirect(GX_TEVSTAGE0);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-    GXSetLineWidth(param_2->m_lineWidth, GX_TO_ZERO);
+    GXSetLineWidth(pRain->m_lineWidth, GX_TO_ZERO);
     gUtil.SetVtxFmt_POS_CLR_TEX();
 
     drop = work->drops;
@@ -174,12 +174,12 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
     baseY = ppvMng->m_matrix.value[1][3];
     baseZ = ppvMng->m_matrix.value[2][3];
     tex0 = 0.0f;
-    GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
+    GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((pRain->m_dropCount & 0x7fff) << 1));
     tex0 = 0.0f;
     tex1 = 1.0f;
     {
         RAIN_DATA* currentDrop = drop;
-        for (i = 0; i < (int)(u32)param_2->m_dataValIndex; i++, currentDrop++) {
+        for (i = 0; i < (int)(u32)pRain->m_dropCount; i++, currentDrop++) {
             float x = baseX + currentDrop->position.x;
             float y = baseY + currentDrop->position.y;
             float z = baseZ + currentDrop->position.z;
@@ -212,7 +212,7 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
+void pppFrameRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
 {
     VRain* work;
     RAIN_DATA* drop;
@@ -221,33 +221,33 @@ void pppFrameRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
         return;
     }
 
-    work = GetRainWork(pppRain, param_3);
+    work = GetRainWork(rain, data);
     if (work->drops == 0) {
         work->drops = (RAIN_DATA*)pppMemAlloc(
-            param_2->m_dataValIndex * sizeof(RAIN_DATA),
+            pRain->m_dropCount * sizeof(RAIN_DATA),
             ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppRain_cpp),
             0x7f);
         drop = work->drops;
-        for (i = 0; i < (int)param_2->m_dataValIndex; i++) {
-            InitRainData(work, param_2, drop);
+        for (i = 0; i < (int)pRain->m_dropCount; i++) {
+            InitRainData(work, pRain, drop);
             drop++;
         }
     }
 
     work->accelY += work->accelZ;
     work->moveY += work->accelY;
-    if (param_2->m_graphId == pppRain->m_graphId) {
-        work->moveY += param_2->m_moveYDelta;
-        work->accelY += param_2->m_accelYDelta;
-        work->accelZ += param_2->m_accelZDelta;
+    if (pRain->m_graphId == rain->m_graphId) {
+        work->moveY += pRain->m_moveYDelta;
+        work->accelY += pRain->m_accelYDelta;
+        work->accelZ += pRain->m_accelZDelta;
     }
 
     drop = work->drops;
-    for (i = 0; i < (int)param_2->m_dataValIndex; i++) {
-        UpdateRain(work, param_2, drop);
+    for (i = 0; i < (int)pRain->m_dropCount; i++) {
+        UpdateRain(work, pRain, drop);
         if (drop->life <= 0) {
-            InitRainData(work, param_2, drop);
+            InitRainData(work, pRain, drop);
         }
         drop++;
     }
@@ -282,11 +282,11 @@ void pppFrameRain(pppRain* pppRain, PRain* param_2, _pppCtrlTable* param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructRain(pppRain* pppRain, _pppCtrlTable* param_2)
+void pppDestructRain(pppRain* rain, _pppCtrlTable* data)
 {
     VRain* work;
 
-    work = GetRainWork(pppRain, param_2);
+    work = GetRainWork(rain, data);
     if (work->drops != 0) {
         pppMemFree(work->drops);
         work->drops = 0;
@@ -302,15 +302,15 @@ void pppDestructRain(pppRain* pppRain, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructRain(pppRain* pppRain, _pppCtrlTable* param_2)
+void pppConstructRain(pppRain* rain, _pppCtrlTable* data)
 {
-    float fVar1;
+    float zero;
     VRain* work;
 
-    fVar1 = 0.0f;
-    work = GetRainWork(pppRain, param_2);
+    zero = 0.0f;
+    work = GetRainWork(rain, data);
     work->drops = 0;
-    work->accelZ = fVar1;
-    work->accelY = fVar1;
-    work->moveY = fVar1;
+    work->accelZ = zero;
+    work->accelY = zero;
+    work->moveY = zero;
 }

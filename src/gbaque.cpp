@@ -1894,8 +1894,8 @@ void GbaQueue::GetCaravanName(char* outName)
  * --INFO--
  * PAL Address: 0x800CDFC0
  * PAL Size: 832b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CD824
+ * EN Size: 832b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1906,23 +1906,22 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 	unsigned int artifacts[3];
 	unsigned short tmpArtifacts[4];
 	unsigned short commandSlots[8];
-	int i;
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	localPlayerData = m_playerData[channel];
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	for (i = 0; i < 0x40; i++) {
+	for (int i = 0; i < 0x40; i++) {
 		itemList[i] = __lhbrx(&localPlayerData.m_items[i], 0);
 	}
 	memcpy(outData, itemList, sizeof(itemList));
 
-	artifacts[0] = __lwbrx(&localPlayerData.m_artifacts[0], 0);
-	artifacts[1] = __lwbrx(&localPlayerData.m_artifacts[1], 0);
-	artifacts[2] = __lwbrx(&localPlayerData.m_artifacts[2], 0);
+	for (int i = 0; i < 3; i++) {
+		artifacts[i] = __lwbrx(&localPlayerData.m_artifacts[i], 0);
+	}
 	memcpy(outData + 0x80, artifacts, sizeof(artifacts));
 
-	for (i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		tmpArtifacts[i] = __lhbrx(&localPlayerData.m_tmpArtifacts[i], 0);
 	}
 	memcpy(outData + 0x8C, tmpArtifacts, sizeof(tmpArtifacts));
@@ -1932,7 +1931,7 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 	outData[0x96] = localPlayerData.m_equipment[2];
 	outData[0x97] = localPlayerData.m_equipment[3];
 
-	for (i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) {
 		commandSlots[i] = __lhbrx(&localPlayerData.m_commandSlots[i], 0);
 	}
 	memcpy(outData + 0x98, commandSlots, sizeof(commandSlots));
@@ -3958,8 +3957,8 @@ void GbaQueue::ClrArtifactFlg(int channel)
  * --INFO--
  * PAL Address: 0x800CA5D4
  * PAL Size: 468b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C9E38
+ * EN Size: 468b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3972,9 +3971,9 @@ int GbaQueue::GetArtifactData(int channel, unsigned char* outData)
 	localPlayerData = m_playerData[channel];
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	artifactData[0] = __lwbrx(&localPlayerData.m_artifacts[0], 0);
-	artifactData[1] = __lwbrx(&localPlayerData.m_artifacts[1], 0);
-	artifactData[2] = __lwbrx(&localPlayerData.m_artifacts[2], 0);
+	for (int i = 0; i < 3; i++) {
+		artifactData[i] = __lwbrx(&localPlayerData.m_artifacts[i], 0);
+	}
 	memcpy(outData, artifactData, sizeof(artifactData));
 	return 0xC;
 }
@@ -4155,9 +4154,9 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	unsigned int artifactData[3];
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	artifactData[0] = __lwbrx(&m_playerData[channel].m_artifacts[0], 0);
-	artifactData[1] = __lwbrx(&m_playerData[channel].m_artifacts[1], 0);
-	artifactData[2] = __lwbrx(&m_playerData[channel].m_artifacts[2], 0);
+	for (int i = 0; i < 3; i++) {
+		artifactData[i] = __lwbrx(&m_playerData[channel].m_artifacts[i], 0);
+	}
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	memcpy(outData, artifactData, sizeof(artifactData));

@@ -342,8 +342,8 @@ inline int CMenuPcs::LetterLstOpen()
 	int done = 0;
 	m_letterMenuState->frame =
 		m_letterMenuState->frame + 1;
-	int count = static_cast<int>(m_singleFadeState->count);
 	SingleFadeEntry* panel = m_singleFadeState->entries;
+	int count = static_cast<int>(m_singleFadeState->count);
 	int frame = static_cast<int>(m_letterMenuState->frame);
 	for (int i = 0; i < count; ++i) {
 		{

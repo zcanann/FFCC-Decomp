@@ -39,6 +39,10 @@ extern float ppvScreenMatrixZbuff;
 STATIC_ASSERT(sizeof(PPPIFPARAM) == 0x28);
 STATIC_ASSERT(offsetof(PPPIFPARAM, m_hitObjectIds) == 0x08);
 STATIC_ASSERT(sizeof(PPPCREATEPARAM) == 0x6C);
+STATIC_ASSERT(offsetof(PPPCREATEPARAM, m_bindObject) == 0x14);
+STATIC_ASSERT(offsetof(PPPCREATEPARAM, m_enable) == 0x2C);
+STATIC_ASSERT(offsetof(PPPCREATEPARAM, m_reserved) == 0x2D);
+STATIC_ASSERT(offsetof(PPPCREATEPARAM, m_soundEffectParams) == 0x30);
 STATIC_ASSERT(offsetof(PPPCREATEPARAM, m_hitParams) == 0x44);
 STATIC_ASSERT(sizeof(_pppMngSt) == 0x158);
 STATIC_ASSERT(offsetof(_pppMngSt, m_hitParams) == 0x130);
@@ -3671,12 +3675,12 @@ PPPCREATEPARAM* CPartMng::pppGetDefaultCreateParam()
     g_dcp.m_scalePtr = 0;
     g_dcp.m_extraPositionPtr = 0;
     g_dcp.m_paramA = 0;
-    g_dcp.m_paramB = 0;
+    g_dcp.m_bindObject = 0;
     g_dcp.m_objectHitMask = 0;
     g_dcp.m_cylinderAttribute = 0;
     g_dcp.m_paramC = kPartMngOne;
     g_dcp.m_paramD = kPartMngOne;
-    *reinterpret_cast<unsigned char*>(&g_dcp.m_owner) = 0;
+    g_dcp.m_enable = 0;
     g_dcp.m_soundEffectParams.m_soundEffectHandle = -1;
     g_dcp.m_soundEffectParams.m_soundEffectSlot = -1;
     g_dcp.m_soundEffectParams.m_soundEffectStopFlag = 0;
@@ -3874,14 +3878,14 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     case 8:
         mng->m_ownerFacing = 0;
         {
-            mng->m_owner = reinterpret_cast<CGObject*>(createParam->m_paramB);
+            mng->m_owner = createParam->m_bindObject;
             mng->m_lookTarget = createParam->m_lookTargetPtr;
-            if (reinterpret_cast<CGObject*>(createParam->m_paramB) != 0) {
-                int node = reinterpret_cast<CGObject*>(createParam->m_paramB)->m_charaModelHandle->m_model->SearchNodeSk(
+            if (createParam->m_bindObject != 0) {
+                int node = createParam->m_bindObject->m_charaModelHandle->m_model->SearchNodeSk(
                     fp->m_nodeName);
                 if (node >= 0) {
                     mng->m_bindNode =
-                        &reinterpret_cast<CGObject*>(createParam->m_paramB)->m_charaModelHandle->m_model->m_nodes[node];
+                        &createParam->m_bindObject->m_charaModelHandle->m_model->m_nodes[node];
                 }
             }
         }

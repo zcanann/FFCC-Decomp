@@ -111,13 +111,14 @@ struct PPPCREATEPARAM
     Vec* m_scalePtr;                  // 0x8
     Vec* m_extraPositionPtr;          // 0xc
     int m_paramA;                     // 0x10
-    unsigned int m_paramB;            // 0x14
+    CGObject* m_bindObject;           // 0x14
     CGObject* m_lookTargetPtr;        // 0x18
     unsigned int m_objectHitMask;     // 0x1c
     unsigned int m_cylinderAttribute; // 0x20
     float m_paramC;                   // 0x24
     float m_paramD;                   // 0x28
-    void* m_owner;                    // 0x2c
+    unsigned char m_enable;           // 0x2c
+    unsigned char m_reserved[3];      // 0x2d
     PPPSEST m_soundEffectParams;      // 0x30
     PPPIFPARAM m_hitParams;           // 0x44
 }; // Size 0x6c
@@ -140,13 +141,13 @@ inline PPPCREATEPARAM::PPPCREATEPARAM()
     m_scalePtr = 0;
     m_extraPositionPtr = 0;
     m_paramA = 0;
-    m_paramB = 0;
+    m_bindObject = 0;
     m_lookTargetPtr = 0;
     m_objectHitMask = 0;
     m_cylinderAttribute = 0;
     m_paramC = 1.0f;
     m_paramD = 1.0f;
-    *reinterpret_cast<unsigned char*>(&m_owner) = 0;
+    m_enable = 0;
 }
 
 extern CProfile g_par_calc_prof;

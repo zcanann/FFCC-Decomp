@@ -217,169 +217,9 @@ static inline CFlatRuntime2::CDebugDrawCC* DebugDrawCCEntries(u8* runtime)
 	return reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries;
 }
 
-static inline CFlatRuntime2::CParticleWork& ParticleWork(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWork;
-}
-
-static inline float& ParticleWorkSpeed(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_speed;
-}
-
-static inline float* &ParticleWorkScalePtr(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_scale;
-}
-
-static inline float& ParticleWorkScaleX(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkScale.x;
-}
-
-static inline float* ParticleWorkScaleValues(CFlatRuntime2* runtime)
-{
-	return reinterpret_cast<float*>(&runtime->m_particleWorkScale);
-}
-
-static inline float& ParticleWorkScaleY(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkScale.y;
-}
-
-static inline float& ParticleWorkScaleZ(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkScale.z;
-}
-
-static inline float* &ParticleWorkTargetPtr(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_target;
-}
-
-static inline float& ParticleWorkTargetX(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkTarget.x;
-}
-
-static inline float& ParticleWorkTargetY(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkTarget.y;
-}
-
-static inline float& ParticleWorkTargetZ(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkTarget.z;
-}
-
-static inline float*& ParticleWorkPosPtr(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_pos;
-}
-
-static inline float*& ParticleWorkPosVecPtr(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_posVec;
-}
-
-static inline float& ParticleWorkPosX(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkPos.x;
-}
-
-static inline float* ParticleWorkPosValues(CFlatRuntime2* runtime)
-{
-	return reinterpret_cast<float*>(&runtime->m_particleWorkPos);
-}
-
-static inline float& ParticleWorkPosY(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkPos.y;
-}
-
-static inline float& ParticleWorkPosZ(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkPos.z;
-}
-
-static inline float& ParticleWorkPosAngle(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkPosAngle;
-}
-
-static inline float& ParticleWorkPosVecBase(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkPosVecBase;
-}
-
-static inline float* ParticleWorkPosVecValues(CFlatRuntime2* runtime)
-{
-	return &runtime->m_particleWorkPosVecBase;
-}
-
-static inline CFlatRuntime::CObject*& ParticleWorkBind(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_bind;
-}
-
-static inline CFlatRuntime::CObject*& ParticleWorkTrace(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_trace;
-}
-
 static inline CFlatRuntime::CObject* FlatObjectFirst(CFlatRuntime2* runtime)
 {
 	return runtime->m_objectSentinel.m_next;
-}
-
-static inline int& ParticleWorkColor0(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_color0;
-}
-
-static inline int& ParticleWorkColor1(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_color1;
-}
-
-static inline float& ParticleWorkColorLerp(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_colorLerp;
-}
-
-static inline int& ParticleWorkSeNo(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_soundEffectParams.m_soundEffectSlot;
-}
-
-static inline u8& ParticleWorkSeKind(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_soundEffectParams.m_soundEffectKind;
-}
-
-static inline int& ParticleWorkSeParam(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_soundEffectParams.m_soundEffectStartFrame;
-}
-
-static inline int& ParticleWorkParamNo(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_hitParam.m_particleIndex;
-}
-
-static inline short& ParticleWorkParamId(CFlatRuntime2* runtime)
-{
-	return ParticleWork(runtime).m_hitParam.m_classId;
-}
-
-static inline int& ParticleWorkNoHi(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkNoHi;
-}
-
-static inline u32& ParticleWorkNoLo(CFlatRuntime2* runtime)
-{
-	return runtime->m_particleWorkNoLo;
 }
 
 static inline u32 Swap32(u32 value)
@@ -1982,26 +1822,26 @@ void CFlatRuntime2::drawLayer(
  */
 void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
 {
-	ParticleWork(this) = CParticleWork();
+	m_particleWork = PPPCREATEPARAM();
 
-	ParticleWork(this).m_enable = 1;
+	m_particleWork.m_enable = 1;
 	m_particleWorkNoHi = workNo >> 8;
-	ParticleWork(this).m_arg = 0;
+	m_particleWork.m_paramA = 0;
 	m_particleWorkNoLo = static_cast<unsigned int>(workNo) & 0xFF;
 	m_particleWorkPos.x = pos.x;
 	m_particleWorkPos.y = pos.y;
 	m_particleWorkPos.z = pos.z;
-	m_particleWorkPosAngle = 0.0f;
-	ParticleWorkPosPtr(this) = ParticleWorkPosValues(this);
-	ParticleWorkPosVecPtr(this) = ParticleWorkPosVecValues(this);
+	m_particleWorkRotation.y = 0.0f;
+	m_particleWork.m_positionOffsetPtr = &m_particleWorkPos;
+	m_particleWork.m_rotationPtr = &m_particleWorkRotation;
 	m_particleWorkScale.z = scale;
 	m_particleWorkScale.y = scale;
 	m_particleWorkScale.x = scale;
-	ParticleWorkScalePtr(this) = ParticleWorkScaleValues(this);
+	m_particleWork.m_scalePtr = &m_particleWorkScale;
 
 	PartMng.pppCreate(
 		m_particleWorkNoHi, m_particleWorkNoLo,
-		reinterpret_cast<PPPCREATEPARAM*>(&m_particleWork), 1);
+		&m_particleWork, 1);
 }
 
 /*
@@ -2016,8 +1856,8 @@ void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
 int CFlatRuntime2::PutParticleWork()
 {
 	return PartMng.pppCreate(
-		ParticleWorkNoHi(this), ParticleWorkNoLo(this),
-		reinterpret_cast<PPPCREATEPARAM*>(&m_particleWork), 1);
+		m_particleWorkNoHi, m_particleWorkNoLo,
+		&m_particleWork, 1);
 }
 
 /*
@@ -2031,24 +1871,27 @@ int CFlatRuntime2::PutParticleWork()
  */
 void CFlatRuntime2::ResetParticleWork(int workNo, int arg)
 {
-	u8* runtime = reinterpret_cast<u8*>(this);
-	ParticleWork(this) = CParticleWork();
+	m_particleWork = PPPCREATEPARAM();
 
-	ParticleWork(this).m_enable = 1;
-	ParticleWorkNoHi(this) = workNo >> 8;
-	ParticleWork(this).m_arg = arg;
-	ParticleWorkNoLo(this) = static_cast<unsigned int>(workNo) & 0xFF;
+	m_particleWork.m_enable = 1;
+	m_particleWorkNoHi = workNo >> 8;
+	m_particleWork.m_paramA = arg;
+	m_particleWorkNoLo = static_cast<unsigned int>(workNo) & 0xFF;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A33C
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime2::SetParticleWorkNo(int workNo)
 {
-	ParticleWorkNoHi(this) = workNo >> 8;
-	ParticleWorkNoLo(this) = static_cast<unsigned int>(workNo) & 0xFF;
+	m_particleWorkNoHi = workNo >> 8;
+	m_particleWorkNoLo = static_cast<unsigned int>(workNo) & 0xFF;
 }
 
 /*
@@ -2062,12 +1905,12 @@ void CFlatRuntime2::SetParticleWorkNo(int workNo)
  */
 void CFlatRuntime2::SetParticleWorkPos(Vec& vec, float angle)
 {
-	ParticleWorkPosX(this) = vec.x;
-	ParticleWorkPosY(this) = vec.y;
-	ParticleWorkPosZ(this) = vec.z;
-	ParticleWorkPosAngle(this) = 180.0f * angle / 3.1415927f;
-	ParticleWorkPosPtr(this) = &ParticleWorkPosX(this);
-	ParticleWorkPosVecPtr(this) = &ParticleWorkPosVecBase(this);
+	m_particleWorkPos.x = vec.x;
+	m_particleWorkPos.y = vec.y;
+	m_particleWorkPos.z = vec.z;
+	m_particleWorkRotation.y = 180.0f * angle / 3.1415927f;
+	m_particleWork.m_positionOffsetPtr = &m_particleWorkPos;
+	m_particleWork.m_rotationPtr = &m_particleWorkRotation;
 }
 
 /*
@@ -2081,20 +1924,24 @@ void CFlatRuntime2::SetParticleWorkPos(Vec& vec, float angle)
  */
 void CFlatRuntime2::SetParticleWorkTarget(Vec& vec)
 {
-	ParticleWorkTargetX(this) = vec.x;
-	ParticleWorkTargetY(this) = vec.y;
-	ParticleWorkTargetZ(this) = vec.z;
-	ParticleWorkTargetPtr(this) = reinterpret_cast<float*>(&m_particleWorkTarget);
+	m_particleWorkTarget.x = vec.x;
+	m_particleWorkTarget.y = vec.y;
+	m_particleWorkTarget.z = vec.z;
+	m_particleWork.m_extraPositionPtr = &m_particleWorkTarget;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A210
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime2::SetParticleWorkVector(float angle1, float angle2)
 {
-	float* target = reinterpret_cast<float*>(&m_particleWorkTarget);
+	Vec* target = &m_particleWorkTarget;
 	float cosAngle2 = static_cast<float>(cos(angle2));
 	float sinAngle1 = static_cast<float>(sin(angle1));
 	m_particleWorkTarget.x = sinAngle1 * cosAngle2 + m_particleWorkPos.x;
@@ -2105,7 +1952,7 @@ void CFlatRuntime2::SetParticleWorkVector(float angle1, float angle2)
 	cosAngle2 = static_cast<float>(cos(angle2));
 	float cosAngle1 = static_cast<float>(cos(angle1));
 	m_particleWorkTarget.z = cosAngle1 * cosAngle2 + m_particleWorkPos.z;
-	ParticleWorkTargetPtr(this) = target;
+	m_particleWork.m_extraPositionPtr = target;
 }
 
 /*
@@ -2119,10 +1966,10 @@ void CFlatRuntime2::SetParticleWorkVector(float angle1, float angle2)
  */
 void CFlatRuntime2::SetParticleWorkScale(float scale)
 {
-	ParticleWorkScaleZ(this) = scale;
-	ParticleWorkScaleY(this) = scale;
-	ParticleWorkScaleX(this) = scale;
-	ParticleWorkScalePtr(this) = reinterpret_cast<float*>(&m_particleWorkScale);
+	m_particleWorkScale.z = scale;
+	m_particleWorkScale.y = scale;
+	m_particleWorkScale.x = scale;
+	m_particleWork.m_scalePtr = &m_particleWorkScale;
 }
 
 /*
@@ -2136,19 +1983,23 @@ void CFlatRuntime2::SetParticleWorkScale(float scale)
  */
 void CFlatRuntime2::SetParticleWorkCol(int color0, int color1, float lerp)
 {
-	ParticleWorkColor0(this) = color0;
-	ParticleWorkColor1(this) = color1;
-	ParticleWorkColorLerp(this) = lerp;
+	m_particleWork.m_objectHitMask = color0;
+	m_particleWork.m_cylinderAttribute = color1;
+	m_particleWork.m_paramD = lerp;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A1E0
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime2::SetParticleWorkTrace(CFlatRuntime::CObject* object)
 {
-	ParticleWorkTrace(this) = object;
+	m_particleWork.m_lookTargetPtr = static_cast<CGObject*>(object);
 }
 
 /*
@@ -2162,7 +2013,7 @@ void CFlatRuntime2::SetParticleWorkTrace(CFlatRuntime::CObject* object)
  */
 void CFlatRuntime2::SetParticleWorkSpeed(float speed)
 {
-	ParticleWorkSpeed(this) = speed;
+	m_particleWork.m_paramC = speed;
 }
 
 /*
@@ -2176,7 +2027,7 @@ void CFlatRuntime2::SetParticleWorkSpeed(float speed)
  */
 void CFlatRuntime2::SetParticleWorkBind(CFlatRuntime::CObject* object)
 {
-	ParticleWorkBind(this) = object;
+	m_particleWork.m_bindObject = static_cast<CGObject*>(object);
 }
 
 /*
@@ -2192,13 +2043,13 @@ void CFlatRuntime2::SetParticleWorkParam(int paramNo, CFlatRuntime::CObject* obj
 {
 	short paramId;
 
-	ParticleWorkParamNo(this) = paramNo;
+	m_particleWork.m_hitParams.m_particleIndex = paramNo;
 	if (object != 0) {
-		paramId = *reinterpret_cast<short*>(reinterpret_cast<u8*>(object) + 0x30);
+		paramId = object->m_particleId;
 	} else {
 		paramId = 0;
 	}
-	ParticleWorkParamId(this) = paramId;
+	m_particleWork.m_hitParams.m_classId = paramId;
 }
 
 /*
@@ -2212,9 +2063,9 @@ void CFlatRuntime2::SetParticleWorkParam(int paramNo, CFlatRuntime::CObject* obj
  */
 void CFlatRuntime2::SetParticleWorkSe(int seNo, int seKind, int seParam)
 {
-	ParticleWorkSeNo(this) = seNo;
-	ParticleWorkSeKind(this) = static_cast<u8>(seKind);
-	ParticleWorkSeParam(this) = seParam;
+	m_particleWork.m_soundEffectParams.m_soundEffectSlot = seNo;
+	m_particleWork.m_soundEffectParams.m_soundEffectKind = static_cast<u8>(seKind);
+	m_particleWork.m_soundEffectParams.m_soundEffectStartFrame = seParam;
 }
 
 /*

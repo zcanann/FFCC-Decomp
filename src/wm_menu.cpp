@@ -575,6 +575,201 @@ void CMenuPcs::createWorld()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 352b
+ * EN Address: 0x80105EAC
+ * EN Size: 456b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::InitFrameInfo()
+{
+	int frameBounds[5][4] = {
+		{0, 0, 128, 160},
+		{128, 0, 120, 64},
+		{608, 248, 32, 64},
+		{568, 312, 64, 56},
+		{416, 368, 200, 80},
+	};
+	float frameUV[5][2] = {
+		{0.0f, 0.0f},
+		{128.0f, 0.0f},
+		{256.0f, 0.0f},
+		{216.0f, 64.0f},
+		{64.0f, 120.0f},
+	};
+
+	for (int i = 0; i < 5; i++) {
+		m_wm.m_frameData->m_frameSprites[i].m_x = static_cast<short>(frameBounds[i][0]);
+		m_wm.m_frameData->m_frameSprites[i].m_y = static_cast<short>(frameBounds[i][1]);
+		m_wm.m_frameData->m_frameSprites[i].m_width = static_cast<short>(frameBounds[i][2]);
+		m_wm.m_frameData->m_frameSprites[i].m_height = static_cast<short>(frameBounds[i][3]);
+		m_wm.m_frameData->m_frameSprites[i].m_u = frameUV[i][0];
+		m_wm.m_frameData->m_frameSprites[i].m_v = frameUV[i][1];
+		m_wm.m_frameData->m_frameSprites[i].m_alpha = 1.0f;
+		m_wm.m_frameData->m_frameSprites[i].m_scale = 1.0f;
+		m_wm.m_frameData->m_frameSprites[i].m_flags = 0;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80101658
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::InitFrame0Info()
+{
+	m_wm.m_frameInfo->m_sprites[0].m_x = 0x10;
+	float one = FLOAT_803313e8;
+	float zero = FLOAT_803313dc;
+	m_wm.m_frameInfo->m_sprites[0].m_y = 0x10;
+	m_wm.m_frameInfo->m_sprites[0].m_width = 0xE8;
+	m_wm.m_frameInfo->m_sprites[0].m_height = 0x168;
+	m_wm.m_frameInfo->m_sprites[0].m_u = zero;
+	m_wm.m_frameInfo->m_sprites[0].m_v = zero;
+	m_wm.m_frameInfo->m_sprites[0].m_alpha = one;
+	m_wm.m_frameInfo->m_sprites[0].m_scale = one;
+	m_wm.m_frameInfo->m_sprites[0].m_flags = 0;
+
+	WmFrameInfo* frame = m_wm.m_frameInfo;
+	frame->m_sprites[1] = frame->m_sprites[0];
+
+	frame = m_wm.m_frameInfo;
+	frame->m_sprites[1].m_x = 0x280 - (frame->m_sprites[0].m_width + frame->m_sprites[0].m_x);
+	m_wm.m_frameInfo->m_sprites[1].m_flags = 8;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 560b
+ * EN Address: 0x80106364
+ * EN Size: 428b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::InitCSelCurPos()
+{
+	signed char usedMask = 0;
+	for (int i = 0; i < kWmMenuControllerCount; i++) {
+		m_wm.m_charaSelectData[i].m_cmakeReady = 0;
+		m_wm.m_charaSelectData[i].m_cmakePending = 0;
+		m_wm.m_charaSelectData[i].m_confirmed = 0;
+		int slot = m_wmWorldState->m_backupParams[i];
+		if (slot < 0) {
+			m_wm.m_charaSelectData[i].m_currentSlot = -1;
+		} else {
+			m_wm.m_charaSelectData[i].m_currentSlot = static_cast<short>(slot);
+			usedMask |= 1 << slot;
+		}
+	}
+
+	for (int i = 0; i < kWmMenuControllerCount; i++) {
+		if (m_wm.m_charaSelectData[i].m_currentSlot < 0) {
+			int slot;
+			for (slot = 0; slot < kWmMenuPlayerCount; slot++) {
+				if ((usedMask & (1 << slot)) == 0) {
+					break;
+				}
+			}
+			m_wm.m_charaSelectData[i].m_currentSlot = static_cast<short>(slot);
+			usedMask |= 1 << slot;
+		}
+		m_wm.m_charaSelectData[i].m_displaySlot = m_wm.m_charaSelectData[i].m_currentSlot;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 576b
+ * EN Address: 0x80106324
+ * EN Size: 64b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::InitCharaSelectInfo()
+{
+	memset(m_wm.m_charaSelectData, 0, kWmCharaSelectBytes);
+	InitCSelCurPos();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 32b
+ * EN Address: 0x80116144
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::WMSubMenuInit()
+{
+	m_effectTimer = 0;
+	m_wmMenuRotation = 0.0f;
+	m_wmMenuTargetRotation = 0.0f;
+	m_wmHelpTimer = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800ee928
+ * PAL Size: 500b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::SetAnim(int anim)
+{
+	const int handleIdx = anim + 0x20;
+	if (m_wm.m_handles[handleIdx]->m_charaKind == 3) {
+		return;
+	}
+
+	const unsigned int charaNo = m_wm.m_handles[handleIdx]->m_charaNo;
+	int animBase = static_cast<int>(charaNo / 100) - 1;
+	animBase *= 6;
+	const int modelBase =  (s32)(static_cast<int>(charaNo / 100) * 100);
+
+	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimStand), animBase++, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimWalk), animBase++, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimRun), animBase++, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimGlad), animBase++, 3, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimSleep), animBase++, 1, 0, modelBase, -1, 0);
+	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimAngry), animBase, 1, 0, modelBase, -1, 0);
+
+	m_wmCharaAnimState[anim].m_animIndex = 0;
+	m_wmCharaAnimState[anim].m_nextAnimIndex = -1;
+	m_wmCharaAnimState[anim].m_timer = rand() % 250;
+
+	m_wm.m_handles[handleIdx]->SetAnim(animBase - 5, -1, -1,
+	    m_wm.m_handles[handleIdx]->m_currentAnimIndex < 0 ? 0 : -1, 1);
+
+	m_wmCharaAnimState[anim].m_frame = m_wm.m_handles[handleIdx]->m_model->m_time;
+	m_wmCharaAnimState[anim].m_endFrame = m_wm.m_handles[handleIdx]->m_model->m_animEnd;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: 0x8011A838
+ * EN Size: 56b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::ClrMcList()
+{
+	memset(m_wmCharaState, 0, sizeof(McListInfo) * kMcListCount);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8010172c
  * PAL Size: 6000b
  * EN Address: TODO
@@ -1027,72 +1222,20 @@ void CMenuPcs::loadData()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 352b
- * EN Address: 0x80105EAC
- * EN Size: 456b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::InitFrameInfo()
-{
-	int frameBounds[5][4] = {
-		{0, 0, 128, 160},
-		{128, 0, 120, 64},
-		{608, 248, 32, 64},
-		{568, 312, 64, 56},
-		{416, 368, 200, 80},
-	};
-	float frameUV[5][2] = {
-		{0.0f, 0.0f},
-		{128.0f, 0.0f},
-		{256.0f, 0.0f},
-		{216.0f, 64.0f},
-		{64.0f, 120.0f},
-	};
-
-	for (int i = 0; i < 5; i++) {
-		m_wm.m_frameData->m_frameSprites[i].m_x = static_cast<short>(frameBounds[i][0]);
-		m_wm.m_frameData->m_frameSprites[i].m_y = static_cast<short>(frameBounds[i][1]);
-		m_wm.m_frameData->m_frameSprites[i].m_width = static_cast<short>(frameBounds[i][2]);
-		m_wm.m_frameData->m_frameSprites[i].m_height = static_cast<short>(frameBounds[i][3]);
-		m_wm.m_frameData->m_frameSprites[i].m_u = frameUV[i][0];
-		m_wm.m_frameData->m_frameSprites[i].m_v = frameUV[i][1];
-		m_wm.m_frameData->m_frameSprites[i].m_alpha = 1.0f;
-		m_wm.m_frameData->m_frameSprites[i].m_scale = 1.0f;
-		m_wm.m_frameData->m_frameSprites[i].m_flags = 0;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80101658
- * PAL Size: 212b
+ * PAL Address: 0x800f2018
+ * PAL Size: 28b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::InitFrame0Info()
+int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
 {
-	m_wm.m_frameInfo->m_sprites[0].m_x = 0x10;
-	float one = FLOAT_803313e8;
-	float zero = FLOAT_803313dc;
-	m_wm.m_frameInfo->m_sprites[0].m_y = 0x10;
-	m_wm.m_frameInfo->m_sprites[0].m_width = 0xE8;
-	m_wm.m_frameInfo->m_sprites[0].m_height = 0x168;
-	m_wm.m_frameInfo->m_sprites[0].m_u = zero;
-	m_wm.m_frameInfo->m_sprites[0].m_v = zero;
-	m_wm.m_frameInfo->m_sprites[0].m_alpha = one;
-	m_wm.m_frameInfo->m_sprites[0].m_scale = one;
-	m_wm.m_frameInfo->m_sprites[0].m_flags = 0;
-
-	WmFrameInfo* frame = m_wm.m_frameInfo;
-	frame->m_sprites[1] = frame->m_sprites[0];
-
-	frame = m_wm.m_frameInfo;
-	frame->m_sprites[1].m_x = 0x280 - (frame->m_sprites[0].m_width + frame->m_sprites[0].m_x);
-	m_wm.m_frameInfo->m_sprites[1].m_flags = 8;
+	int result = modelNo * 200 + 100;
+	if (baseType != 0) {
+		result += 100;
+	}
+	return result + offset;
 }
 
 /*
@@ -1156,61 +1299,6 @@ void CMenuPcs::InitCharaInfo()
 		} else {
 			entry->m_modelNo = -1;
 		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 576b
- * EN Address: 0x80106324
- * EN Size: 64b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::InitCharaSelectInfo()
-{
-	memset(m_wm.m_charaSelectData, 0, kWmCharaSelectBytes);
-	InitCSelCurPos();
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 560b
- * EN Address: 0x80106364
- * EN Size: 428b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::InitCSelCurPos()
-{
-	signed char usedMask = 0;
-	for (int i = 0; i < kWmMenuControllerCount; i++) {
-		m_wm.m_charaSelectData[i].m_cmakeReady = 0;
-		m_wm.m_charaSelectData[i].m_cmakePending = 0;
-		m_wm.m_charaSelectData[i].m_confirmed = 0;
-		int slot = m_wmWorldState->m_backupParams[i];
-		if (slot < 0) {
-			m_wm.m_charaSelectData[i].m_currentSlot = -1;
-		} else {
-			m_wm.m_charaSelectData[i].m_currentSlot = static_cast<short>(slot);
-			usedMask |= 1 << slot;
-		}
-	}
-
-	for (int i = 0; i < kWmMenuControllerCount; i++) {
-		if (m_wm.m_charaSelectData[i].m_currentSlot < 0) {
-			int slot;
-			for (slot = 0; slot < kWmMenuPlayerCount; slot++) {
-				if ((usedMask & (1 << slot)) == 0) {
-					break;
-				}
-			}
-			m_wm.m_charaSelectData[i].m_currentSlot = static_cast<short>(slot);
-			usedMask |= 1 << slot;
-		}
-		m_wm.m_charaSelectData[i].m_displaySlot = m_wm.m_charaSelectData[i].m_currentSlot;
 	}
 }
 
@@ -1330,6 +1418,47 @@ void CMenuPcs::destroyWorld()
 
 /*
  * --INFO--
+ * PAL Address: 0x800f3500
+ * PAL Size: 428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::CalcWMFrame0(int param)
+{
+	int value;
+
+	m_wm.m_frameInfo->m_sprites[0].m_x = 0x10;
+	int frameSum = static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_width) +
+	               static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_x);
+	value = static_cast<int>(FLOAT_803313e0 - static_cast<float>(frameSum));
+	m_wm.m_frameInfo->m_sprites[1].m_x = static_cast<short>(value);
+
+	if (param < 0) {
+		float offset = static_cast<float>(static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_width) +
+		                                  static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_x));
+		if (param >= -10) {
+			int absRaw = abs(param);
+			offset = static_cast<float>(static_cast<double>(offset) * (DOUBLE_803314E8 * static_cast<double>(absRaw)));
+			int absParam = abs(param);
+			if (absParam < 0) {
+				absParam = 0;
+			}
+			if (absParam > 10) {
+				absParam = 10;
+			}
+			offset *= static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * (static_cast<float>(absParam) * FLOAT_803316D4))));
+		}
+		value = static_cast<int>(static_cast<float>(static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_x)) - offset);
+		m_wm.m_frameInfo->m_sprites[0].m_x = static_cast<short>(value);
+		value = static_cast<int>(static_cast<float>(static_cast<int>(m_wm.m_frameInfo->m_sprites[1].m_x)) + offset);
+		m_wm.m_frameInfo->m_sprites[1].m_x = static_cast<short>(value);
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 504b
  * EN Address: 0x80106AB8
@@ -1351,6 +1480,82 @@ inline void CMenuPcs::CalcMainMenu()
 		}
 		CalcWMFrame0(frameStep);
 		CalcMainMenuSub();
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 4b
+ * EN Address: 0x801132D0
+ * EN Size: 4b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::CalcCharaBase()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 636b
+ * EN Address: 0x801084A0
+ * EN Size: 304b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::CalcCMakeMenu()
+{
+	if (m_wmWorldState->m_modelFlagsInitialized == 0) {
+		for (int i = 0; i < kWmMenuPlayerCount; i++) {
+			m_wm.m_charaModelData[i].m_modelChanged = 1;
+		}
+		m_wmWorldState->m_modelFlagsInitialized = 1;
+	}
+	if (m_wmWorldState->m_mainState <= 4) {
+		CalcCharaSelect();
+		CalcCharaBase();
+		const short state = m_wmWorldState->m_mainState;
+		int frameStep;
+		if (state == 0) {
+			frameStep = m_wmWorldState->m_frameCounter - 10;
+		} else if (state > 0 && state < 4) {
+			frameStep = 0;
+		} else {
+			frameStep = -m_wmWorldState->m_frameCounter;
+		}
+		CalcWMFrame0(frameStep);
+		const short animState = m_wmWorldState->m_mainState;
+		if (animState > 0 && animState < 4) {
+			CalcChara();
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 164b
+ * EN Address: 0x801085D0
+ * EN Size: 172b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::CalcMoveMenu()
+{
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	if (((m_wmWorldState->m_mainState != 0) || bytes[0x12] != 0) &&
+	    m_wmWorldState->m_mainState <= 3) {
+		if (Game.m_gameWork.m_chaliceElement != m_crystalElem) {
+			SetCrystalCageAttr();
+		}
+		if (Game.m_gameWork.m_timerA != m_manaWaterTimerA) {
+			SetManaWaterEffect();
+		}
+		CalcFukidashi();
+		CalcPitcher();
+		CalcWMFrame();
 	}
 }
 
@@ -1601,6 +1806,92 @@ void CMenuPcs::calcWorld()
 #undef worldParams
 #undef model
 #undef handle
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: 0x80118790
+ * EN Size: 108b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::ChkMcDataCnt()
+{
+	int count = 0;
+	for (int i = 0; i < kMcListCount; i++) {
+		const McListInfo& entry = m_wmCharaState[i];
+		if (entry.m_isBroken == 0 && static_cast<int>(entry.m_scriptSysVal0) > 0) {
+			count++;
+		}
+	}
+	return count;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800eaaec
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::SetMcWinInfo(int x, int y)
+{
+    const short newX = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<float>(0x280 - x) * DOUBLE_803313F8)));
+    const short newY = static_cast<short>(static_cast<int>(static_cast<float>((FLOAT_80331430 - static_cast<float>(y)) * DOUBLE_803313F8)));
+    m_menuWindowInfo->x = newX;
+    m_menuWindowInfo->y = newY;
+    m_menuWindowInfo->width = static_cast<short>(x);
+    m_menuWindowInfo->height = static_cast<short>(y);
+    m_menuWindowInfo->frame = 0;
+    m_menuWindowInfo->state = 3;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800ea014
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
+{
+	CFont* const font = m_fonts[0];
+
+	font->SetMargin(FLOAT_803313e8);
+	font->SetShadow(0);
+	font->SetScale(FLOAT_803313e8);
+
+	const char* const* msgTable = GetMcWinMessBuff(messType);
+	int maxWidth = 0;
+	const WinMessEntry* const winMess = GetWinMess(winType);
+
+	for (int i = 0; i < winMess->m_lineCount; i++) {
+		const short msgId = winMess->m_messageIds[i];
+		const char* text = msgTable[msgId];
+		if (text != 0) {
+			if (text[0] == '$') {
+				text++;
+			}
+			const int textWidth = font->GetWidth(text);
+			if (textWidth > maxWidth) {
+				maxWidth = textWidth;
+			}
+		}
+	}
+
+	int cols = maxWidth / 0x16;
+	if ((maxWidth % 0x16) != 0) {
+		cols++;
+	}
+
+	*w = static_cast<short>((cols + 2) * 0x16 + 0x40);
+	*h = static_cast<short>(winMess->m_lineCount * 0x1E + 0x40);
 }
 
 /*
@@ -2100,69 +2391,6 @@ void CMenuPcs::CalcMCardMenu()
 
 	if (m_wmWorldState->m_subState != 0) {
 		CalcMcObj();
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 636b
- * EN Address: 0x801084A0
- * EN Size: 304b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::CalcCMakeMenu()
-{
-	if (m_wmWorldState->m_modelFlagsInitialized == 0) {
-		for (int i = 0; i < kWmMenuPlayerCount; i++) {
-			m_wm.m_charaModelData[i].m_modelChanged = 1;
-		}
-		m_wmWorldState->m_modelFlagsInitialized = 1;
-	}
-	if (m_wmWorldState->m_mainState <= 4) {
-		CalcCharaSelect();
-		CalcCharaBase();
-		const short state = m_wmWorldState->m_mainState;
-		int frameStep;
-		if (state == 0) {
-			frameStep = m_wmWorldState->m_frameCounter - 10;
-		} else if (state > 0 && state < 4) {
-			frameStep = 0;
-		} else {
-			frameStep = -m_wmWorldState->m_frameCounter;
-		}
-		CalcWMFrame0(frameStep);
-		const short animState = m_wmWorldState->m_mainState;
-		if (animState > 0 && animState < 4) {
-			CalcChara();
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 164b
- * EN Address: 0x801085D0
- * EN Size: 172b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::CalcMoveMenu()
-{
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	if (((m_wmWorldState->m_mainState != 0) || bytes[0x12] != 0) &&
-	    m_wmWorldState->m_mainState <= 3) {
-		if (Game.m_gameWork.m_chaliceElement != m_crystalElem) {
-			SetCrystalCageAttr();
-		}
-		if (Game.m_gameWork.m_timerA != m_manaWaterTimerA) {
-			SetManaWaterEffect();
-		}
-		CalcFukidashi();
-		CalcPitcher();
-		CalcWMFrame();
 	}
 }
 
@@ -2892,6 +3120,44 @@ void CMenuPcs::CalcTitleMenu()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 520b
+ * EN Address: 0x8011CA28
+ * EN Size: 340b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::IsAsyncCharaLoadFinish()
+{
+	int validCount = 0;
+	if (m_cmakeWorkActive == 1) {
+		for (int ci = 0; ci < kWmMenuPlayerCount; ci++) {
+			if (m_cmakeWork->m_characters[ci].m_exists != 0) {
+				validCount++;
+			}
+		}
+	} else {
+		for (int ci = 0; ci < kWmMenuPlayerCount; ci++) {
+			if (Game.m_caravanWorkArr[ci].m_shopState != 0) {
+				validCount++;
+			}
+		}
+	}
+
+	int loadedCount = 0;
+	for (int i = 0; i < kWmMenuPlayerCount; i++) {
+		const int handleIdx = i + 0x20;
+		CCharaPcs::CHandle* const handle = m_wm.m_handles[handleIdx];
+		if (handle->m_charaKind != 3 && handle->IsLoadModelASyncCompleted() != 0) {
+			loadedCount++;
+		}
+	}
+
+	return loadedCount == validCount;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800fc4bc
  * PAL Size: 1392b
  * EN Address: TODO
@@ -3169,6 +3435,94 @@ void CMenuPcs::drawWorld()
 
 /*
  * --INFO--
+ * PAL Address: 0x800f673c
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::RestoreProjection()
+{
+	PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
+	GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0x00FFFFFF);
+	Mtx44 projectionMtx;
+	PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
+	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+	Graphic.SetViewport();
+	GXSetScissor(0, 0, 0x280, 0x1C0);
+	DrawInit();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800f3384
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::DrawWMFrame0(int mask, float alpha)
+{
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(alpha)));
+	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+
+	int i;
+	i = 0;
+	do {
+		if ((static_cast<unsigned int>(mask) & (1 << i)) != 0) {
+			Sprt* sprite = &m_wm.m_frameInfo->m_sprites[i];
+			MenuPcs.DrawRect(sprite->m_flags, static_cast<float>(static_cast<int>(sprite->m_x)), static_cast<float>(static_cast<int>(sprite->m_y)),
+			         static_cast<float>(static_cast<int>(sprite->m_width)), static_cast<float>(static_cast<int>(sprite->m_height)),
+			         sprite->m_u, sprite->m_v,
+			         1.0f, 1.0f, 0.0f);
+		}
+		i = i + 1;
+	} while (i < 2);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 388b
+ * EN Address: 0x801130AC
+ * EN Size: 548b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::DrawMainMenuBase(float alpha)
+{
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(static_cast<int>(255.0 * alpha));
+	GXSetChanMatColor(GX_COLOR0A0, color);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x33));
+
+	float x = 32.0f;
+	float y = 40.0f - x;
+	MenuPcs.DrawRect(0, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	MenuPcs.DrawRect(8, x + 288.0f, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	y += 184.0f;
+	x = 32.0f;
+	MenuPcs.DrawRect(4, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	x += 288.0f;
+	MenuPcs.DrawRect(12, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800fb910
  * PAL Size: 1952b
  * EN Address: TODO
@@ -3302,6 +3656,87 @@ void CMenuPcs::DrawMainMenu()
 
 /*
  * --INFO--
+ * PAL Address: 0x800f67e0
+ * PAL Size: 456b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::SetProjection(int mode)
+{
+	WmWorldObjInfo* const slot = &m_wm.m_worldObjData[mode];
+	Mtx44 projectionMtx;
+	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
+
+	Mtx lookAtMtx;
+	C_MTXLookAt(lookAtMtx, &slot->m_cameraPosition,
+	    CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
+	    CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
+	PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
+	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+
+	CharaPcs.InitEnv(5);
+	GXSetColorUpdate(0);
+	GXSetAlphaUpdate(0);
+	GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
+	GXSetColorUpdate(1);
+	GXSetAlphaUpdate(1);
+
+	GXSetViewport(
+	    static_cast<float>(slot->m_viewportX),
+	    static_cast<float>(slot->m_viewportY),
+	    static_cast<float>(slot->m_viewportWidth),
+	    static_cast<float>(slot->m_viewportHeight),
+	    FLOAT_803313dc,
+	    FLOAT_803313e8);
+	GXSetScissor(
+	    slot->m_scissorX,
+	    slot->m_scissorY,
+	    slot->m_scissorWidth,
+	    slot->m_scissorHeight);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 524b
+ * EN Address: 0x8011AACC
+ * EN Size: 680b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::DrawPageMark()
+{
+	const int phase = abs(static_cast<int>(System.m_frameCounter) % 20 - 10);
+	const float scale = static_cast<float>(0.03 * phase + 0.7);
+	float x = 220.0 - 40.0f;
+	float y = 369.0f;
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(static_cast<int>(
+	    255.0f * static_cast<float>(0.05 * phase + 0.5)));
+	GXSetChanMatColor(GX_COLOR0A0, color);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
+
+	x = static_cast<float>((48.0f - 48.0f * scale) * 0.5 + x);
+	y = static_cast<float>((40.0f - 40.0f * scale) * 0.5 + y);
+	if ((m_pageMarkFlags & 2) != 0) {
+		MenuPcs.DrawRect(8, x, y, 48.0f, 40.0f, 0.0f, 0.0f, scale, scale, 0.0f);
+	}
+	x += 248.0f;
+	if ((m_pageMarkFlags & 1) != 0) {
+		MenuPcs.DrawRect(0, x, y, 48.0f, 40.0f, 0.0f, 0.0f, scale, scale, 0.0f);
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800fb440
  * PAL Size: 1232b
  * EN Address: TODO
@@ -3335,6 +3770,85 @@ void CMenuPcs::DrawDiaryMenu()
 	DrawInit();
 
 	DrawPageMark();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800ee828
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::DrawCursor(int x, int y, float scale)
+{
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	unsigned char alpha = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * scale));
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = alpha;
+	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
+	MenuPcs.DrawRect(0, static_cast<float>(x), static_cast<float>(y), FLOAT_80331410, FLOAT_80331410, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800eafa0
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::SetLight(int mode)
+{
+	Graphic.SetFog(1, 0);
+
+	LightPcs.SetAmbient(s_Light[mode].m_ambient);
+	LightPcs.SetNumDiffuse(static_cast<unsigned long>(s_Light[mode].m_diffuseCount));
+
+	for (int i = 0; i < s_Light[mode].m_diffuseCount; i++) {
+		LightPcs.SetDiffuse(
+			static_cast<unsigned long>(i), s_Light[mode].m_diffuseColors[i],
+			&s_Light[mode].m_diffuseDirs[i], 0);
+	}
+
+	LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 804b
+ * EN Address: 0x8011A654
+ * EN Size: 228b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::DrawMcObj()
+{
+	WmWorldObjInfo* view = &m_wm.m_worldObjData[17];
+	for (int i = 0; i < 4; i++, view++) {
+		if (view->m_active != 0) {
+			SetProjection(i + 17);
+			SetLight(0);
+			m_wm.m_handles[i + 17]->Draw(5);
+			int partA = m_effectWork[i + 17].m_partNo;
+			if (partA >= 0) {
+				PartPcs.DrawMenuIdx(partA);
+			}
+			int partB = m_effectWork[i + 21].m_partNo;
+			if (partB >= 0) {
+				PartPcs.DrawMenuIdx(partB);
+			}
+		}
+	}
+	DrawInit();
+	RestoreProjection();
 }
 
 /*
@@ -5091,72 +5605,6 @@ float CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 
 /*
  * --INFO--
- * PAL Address: 0x800f67e0
- * PAL Size: 456b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::SetProjection(int mode)
-{
-	WmWorldObjInfo* const slot = &m_wm.m_worldObjData[mode];
-	Mtx44 projectionMtx;
-	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
-	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-
-	Mtx lookAtMtx;
-	C_MTXLookAt(lookAtMtx, &slot->m_cameraPosition,
-	    CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc),
-	    CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc));
-	PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_savedCameraMatrix);
-	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-
-	CharaPcs.InitEnv(5);
-	GXSetColorUpdate(0);
-	GXSetAlphaUpdate(0);
-	GXSetCopyClear(CColor(0, 0, 0, 0).color, 0x00FFFFFF);
-	GXSetColorUpdate(1);
-	GXSetAlphaUpdate(1);
-
-	GXSetViewport(
-	    static_cast<float>(slot->m_viewportX),
-	    static_cast<float>(slot->m_viewportY),
-	    static_cast<float>(slot->m_viewportWidth),
-	    static_cast<float>(slot->m_viewportHeight),
-	    FLOAT_803313dc,
-	    FLOAT_803313e8);
-	GXSetScissor(
-	    slot->m_scissorX,
-	    slot->m_scissorY,
-	    slot->m_scissorWidth,
-	    slot->m_scissorHeight);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800f673c
- * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::RestoreProjection()
-{
-	PSMTXCopy(m_wm.m_savedCameraMatrix, CameraPcs.m_cameraMatrix);
-	GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0x00FFFFFF);
-	Mtx44 projectionMtx;
-	PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
-	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-	Graphic.SetViewport();
-	GXSetScissor(0, 0, 0x280, 0x1C0);
-	DrawInit();
-}
-
-/*
- * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 112b
  * EN Address: TODO
@@ -5244,6 +5692,45 @@ void CMenuPcs::CalcPitcher()
 		static_cast<char>(lbl_80331380[Game.m_gameWork.m_timerA]);
 	m_wm.m_handles[5]->m_model->CalcMatrix();
 	m_wm.m_handles[5]->m_model->CalcSkin();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::ChkPlaceLength(char* text, int width)
+{
+	CFont* font = GetFontWorld();
+	font->SetMargin(1.0f);
+	font->SetShadow(0);
+	font->SetScale(1.0f);
+	return font->GetWidth(text) > width;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 112b
+ * EN Address: 0x80111588
+ * EN Size: 132b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
+{
+	strcpy(left, text);
+	char* space = strrchr(left, ' ');
+	if (space != 0) {
+		*space = '\0';
+		strcpy(right, space + 1);
+	} else {
+		right[0] = '\0';
+	}
 }
 
 /*
@@ -5770,45 +6257,6 @@ void CMenuPcs::DrawFukidashi()
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline int CMenuPcs::ChkPlaceLength(char* text, int width)
-{
-	CFont* font = GetFontWorld();
-	font->SetMargin(1.0f);
-	font->SetShadow(0);
-	font->SetScale(1.0f);
-	return font->GetWidth(text) > width;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 112b
- * EN Address: 0x80111588
- * EN Size: 132b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
-{
-	strcpy(left, text);
-	char* space = strrchr(left, ' ');
-	if (space != 0) {
-		*space = '\0';
-		strcpy(right, space + 1);
-	} else {
-		right[0] = '\0';
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
  * PAL Size: 188b
  * EN Address: 0x8011163C
  * EN Size: 216b
@@ -6260,127 +6708,6 @@ void CMenuPcs::DrawWMFrame()
 
 /*
  * --INFO--
- * PAL Address: 0x800f3500
- * PAL Size: 428b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::CalcWMFrame0(int param)
-{
-	int value;
-
-	m_wm.m_frameInfo->m_sprites[0].m_x = 0x10;
-	int frameSum = static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_width) +
-	               static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_x);
-	value = static_cast<int>(FLOAT_803313e0 - static_cast<float>(frameSum));
-	m_wm.m_frameInfo->m_sprites[1].m_x = static_cast<short>(value);
-
-	if (param < 0) {
-		float offset = static_cast<float>(static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_width) +
-		                                  static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_x));
-		if (param >= -10) {
-			int absRaw = abs(param);
-			offset = static_cast<float>(static_cast<double>(offset) * (DOUBLE_803314E8 * static_cast<double>(absRaw)));
-			int absParam = abs(param);
-			if (absParam < 0) {
-				absParam = 0;
-			}
-			if (absParam > 10) {
-				absParam = 10;
-			}
-			offset *= static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * (static_cast<float>(absParam) * FLOAT_803316D4))));
-		}
-		value = static_cast<int>(static_cast<float>(static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_x)) - offset);
-		m_wm.m_frameInfo->m_sprites[0].m_x = static_cast<short>(value);
-		value = static_cast<int>(static_cast<float>(static_cast<int>(m_wm.m_frameInfo->m_sprites[1].m_x)) + offset);
-		m_wm.m_frameInfo->m_sprites[1].m_x = static_cast<short>(value);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800f3384
- * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::DrawWMFrame0(int mask, float alpha)
-{
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-	GXColor color;
-	color.r = 0xFF;
-	color.g = 0xFF;
-	color.b = 0xFF;
-	color.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(alpha)));
-	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-
-	int i;
-	i = 0;
-	do {
-		if ((static_cast<unsigned int>(mask) & (1 << i)) != 0) {
-			Sprt* sprite = &m_wm.m_frameInfo->m_sprites[i];
-			MenuPcs.DrawRect(sprite->m_flags, static_cast<float>(static_cast<int>(sprite->m_x)), static_cast<float>(static_cast<int>(sprite->m_y)),
-			         static_cast<float>(static_cast<int>(sprite->m_width)), static_cast<float>(static_cast<int>(sprite->m_height)),
-			         sprite->m_u, sprite->m_v,
-			         1.0f, 1.0f, 0.0f);
-		}
-		i = i + 1;
-	} while (i < 2);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 388b
- * EN Address: 0x801130AC
- * EN Size: 548b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::DrawMainMenuBase(float alpha)
-{
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor color;
-	color.r = 0xFF;
-	color.g = 0xFF;
-	color.b = 0xFF;
-	color.a = static_cast<unsigned char>(static_cast<int>(255.0 * alpha));
-	GXSetChanMatColor(GX_COLOR0A0, color);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x33));
-
-	float x = 32.0f;
-	float y = 40.0f - x;
-	MenuPcs.DrawRect(0, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	MenuPcs.DrawRect(8, x + 288.0f, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	y += 184.0f;
-	x = 32.0f;
-	MenuPcs.DrawRect(4, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	x += 288.0f;
-	MenuPcs.DrawRect(12, x, y, 288.0f, 184.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 4b
- * EN Address: 0x801132D0
- * EN Size: 4b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::CalcCharaBase()
-{
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800f31b8
  * PAL Size: 460b
  * EN Address: TODO
@@ -6794,20 +7121,65 @@ void CMenuPcs::DrawChara()
 
 /*
  * --INFO--
- * PAL Address: 0x800f2018
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 660b
+ * EN Address: 0x80116C58
+ * EN Size: 576b
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
+inline void CMenuPcs::SetMakeChara(int channel)
 {
-	int result = modelNo * 200 + 100;
-	if (baseType != 0) {
-		result += 100;
+	GbaCMakeInfo info;
+	GbaQue.GetCMakeInfo(channel, &info);
+
+	const int caravanSlot = static_cast<int>(static_cast<signed char>(info.m_playerSlot));
+	const int gender = (info.m_charaType >> 7) != 0;
+	int modelNo = GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, gender);
+
+	m_wm.m_charaModelData[caravanSlot].m_modelNo = modelNo;
+
+	CCaravanWork& caravanWork = Game.m_caravanWorkArr[caravanSlot];
+	caravanWork.LoadInit();
+	caravanWork.m_shopState = 1;
+	caravanWork.unk_0x3a8 =
+	    (static_cast<unsigned int>(info.m_birthDate[0]) << 8) | static_cast<unsigned int>(info.m_birthDate[1]);
+	caravanWork.m_jobType = static_cast<int>(info.m_jobType);
+	memset(caravanWork.m_name, 0, 0x11);
+	strcpy(reinterpret_cast<char*>(caravanWork.m_name), info.m_name);
+	caravanWork.m_tribeId = static_cast<unsigned short>(info.m_charaType & 3);
+	caravanWork.m_appearanceVariant = static_cast<unsigned short>((info.m_charaType >> 2) & 3);
+	caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
+	{
+		int modelNo2 = static_cast<int>(info.m_charaType & 3) * 200 + 100;
+		if ((info.m_charaType >> 7) != 0) {
+			modelNo2 += 100;
+		}
+		caravanWork.m_id = static_cast<unsigned short>(modelNo2 + ((info.m_charaType >> 2) & 3));
 	}
-	return result + offset;
+	for (int favorite = 0; favorite < 8; favorite++) {
+		unsigned char nibble = info.m_favorite[favorite >> 1];
+		int v;
+		if ((favorite & 1) != 0) {
+			v = (nibble >> 4) & 0x0F;
+		} else {
+			v = nibble & 0x0F;
+		}
+		caravanWork.m_letterMeta[favorite] = static_cast<unsigned short>((10 - v) * 10 - 5);
+	}
+
+	const int baseDataIndex =
+	    static_cast<int>(caravanWork.m_genderFlag) + static_cast<int>(caravanWork.m_tribeId) * 2;
+	caravanWork.Init(baseDataIndex,
+	                 reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0]) + baseDataIndex,
+	                 static_cast<int>(caravanWork.m_appearanceVariant));
+	caravanWork.LoadFinished();
+
+	CFlatRuntime::CStack stackArgs[3];
+	stackArgs[0].m_word = 0;
+	stackArgs[1].m_word = caravanSlot;
+	stackArgs[2].m_word = 0;
+	gCFlatRuntime().SystemCall(0, 1, 4, 3, stackArgs, 0);
 }
 
 /*
@@ -7565,18 +7937,48 @@ void CMenuPcs::DrawCMLife()
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 32b
- * EN Address: 0x80116144
- * EN Size: 40b
+ * PAL Size: 184b
+ * EN Address: 0x801169D4
+ * EN Size: 132b
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::WMSubMenuInit()
+inline void CMenuPcs::SetParty()
 {
-	m_effectTimer = 0;
-	m_wmMenuRotation = 0.0f;
-	m_wmMenuTargetRotation = 0.0f;
-	m_wmHelpTimer = 0;
+	for (int i = 0; i < kWmMenuControllerCount; i++) {
+		const int slot = m_wm.m_charaSelectData[i].m_confirmed != 0
+		    ? m_wm.m_charaSelectData[i].m_currentSlot : -1;
+		Game.m_gameWork.m_wmBackupParams[i] = slot;
+		m_wmWorldState->m_backupParams[i] = static_cast<short>(slot);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 172b
+ * EN Address: 0x80118104
+ * EN Size: 300b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::ChkSelectParty()
+{
+	for (int i = 0; i < kWmMenuControllerCount; i++) {
+		if (Game.m_caravanWorkArr[m_wmWorldState->m_originalBackupParams[i]].m_shopState == 0) {
+			m_wmWorldState->m_originalBackupParams[i] = -1;
+		}
+		if (Game.m_caravanWorkArr[m_wmWorldState->m_backupParams[i]].m_shopState == 0) {
+			m_wmWorldState->m_backupParams[i] = -1;
+		}
+		const int slot = Game.m_gameWork.m_wmBackupParams[i];
+		if (Game.m_caravanWorkArr[slot].m_shopState == 0) {
+			Game.m_gameWork.m_wmBackupParams[i] = -1;
+		}
+		if (Game.m_caravanWorkArr[slot].m_shopBusyFlag != 0) {
+			Game.m_gameWork.m_wmBackupParams[i] = -1;
+		}
+	}
 }
 
 /*
@@ -7850,25 +8252,6 @@ void CMenuPcs::WMChgMenu()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 184b
- * EN Address: 0x801169D4
- * EN Size: 132b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::SetParty()
-{
-	for (int i = 0; i < kWmMenuControllerCount; i++) {
-		const int slot = m_wm.m_charaSelectData[i].m_confirmed != 0
-		    ? m_wm.m_charaSelectData[i].m_currentSlot : -1;
-		Game.m_gameWork.m_wmBackupParams[i] = slot;
-		m_wmWorldState->m_backupParams[i] = static_cast<short>(slot);
-	}
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800eee34
  * PAL Size: 108b
  * EN Address: TODO
@@ -7904,6 +8287,35 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 	WmCharaModelInfo* modelData = &m_wm.m_charaModelData[current];
 	modelData->m_modelChanged = 0;
 	GetWmCharaHandles(this)[current]->LoadModelASync(3, 0x43, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800eeb1c
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
+{
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	WmCharaModelInfo* modelData = &m_wm.m_charaModelData[slot];
+	int modelNo;
+	int charaKind;
+
+	if (tribe >= 0) {
+		charaKind = 0;
+		modelNo = GetModelNo(tribe, job, isFemale);
+		modelData->m_modelChanged = 1;
+	} else {
+		charaKind = 3;
+		modelData->m_modelChanged = 0;
+		modelNo = 0x43;
+	}
+
+	GetWmCharaHandles(this)[slot]->LoadModelASync(charaKind, static_cast<unsigned long>(modelNo), 0);
 }
 
 /*
@@ -7973,160 +8385,6 @@ void CMenuPcs::ChgAllModel2()
 
 		ChgModel(i, tribe, appearance, isFemale);
 	}
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 660b
- * EN Address: 0x80116C58
- * EN Size: 576b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::SetMakeChara(int channel)
-{
-	GbaCMakeInfo info;
-	GbaQue.GetCMakeInfo(channel, &info);
-
-	const int caravanSlot = static_cast<int>(static_cast<signed char>(info.m_playerSlot));
-	const int gender = (info.m_charaType >> 7) != 0;
-	int modelNo = GetModelNo(info.m_charaType & 3, (info.m_charaType >> 2) & 3, gender);
-
-	m_wm.m_charaModelData[caravanSlot].m_modelNo = modelNo;
-
-	CCaravanWork& caravanWork = Game.m_caravanWorkArr[caravanSlot];
-	caravanWork.LoadInit();
-	caravanWork.m_shopState = 1;
-	caravanWork.unk_0x3a8 =
-	    (static_cast<unsigned int>(info.m_birthDate[0]) << 8) | static_cast<unsigned int>(info.m_birthDate[1]);
-	caravanWork.m_jobType = static_cast<int>(info.m_jobType);
-	memset(caravanWork.m_name, 0, 0x11);
-	strcpy(reinterpret_cast<char*>(caravanWork.m_name), info.m_name);
-	caravanWork.m_tribeId = static_cast<unsigned short>(info.m_charaType & 3);
-	caravanWork.m_appearanceVariant = static_cast<unsigned short>((info.m_charaType >> 2) & 3);
-	caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
-	{
-		int modelNo2 = static_cast<int>(info.m_charaType & 3) * 200 + 100;
-		if ((info.m_charaType >> 7) != 0) {
-			modelNo2 += 100;
-		}
-		caravanWork.m_id = static_cast<unsigned short>(modelNo2 + ((info.m_charaType >> 2) & 3));
-	}
-	for (int favorite = 0; favorite < 8; favorite++) {
-		unsigned char nibble = info.m_favorite[favorite >> 1];
-		int v;
-		if ((favorite & 1) != 0) {
-			v = (nibble >> 4) & 0x0F;
-		} else {
-			v = nibble & 0x0F;
-		}
-		caravanWork.m_letterMeta[favorite] = static_cast<unsigned short>((10 - v) * 10 - 5);
-	}
-
-	const int baseDataIndex =
-	    static_cast<int>(caravanWork.m_genderFlag) + static_cast<int>(caravanWork.m_tribeId) * 2;
-	caravanWork.Init(baseDataIndex,
-	                 reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0]) + baseDataIndex,
-	                 static_cast<int>(caravanWork.m_appearanceVariant));
-	caravanWork.LoadFinished();
-
-	CFlatRuntime::CStack stackArgs[3];
-	stackArgs[0].m_word = 0;
-	stackArgs[1].m_word = caravanSlot;
-	stackArgs[2].m_word = 0;
-	gCFlatRuntime().SystemCall(0, 1, 4, 3, stackArgs, 0);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800eeb1c
- * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
-{
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmCharaModelInfo* modelData = &m_wm.m_charaModelData[slot];
-	int modelNo;
-	int charaKind;
-
-	if (tribe >= 0) {
-		charaKind = 0;
-		modelNo = GetModelNo(tribe, job, isFemale);
-		modelData->m_modelChanged = 1;
-	} else {
-		charaKind = 3;
-		modelData->m_modelChanged = 0;
-		modelNo = 0x43;
-	}
-
-	GetWmCharaHandles(this)[slot]->LoadModelASync(charaKind, static_cast<unsigned long>(modelNo), 0);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800ee928
- * PAL Size: 500b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::SetAnim(int anim)
-{
-	const int handleIdx = anim + 0x20;
-	if (m_wm.m_handles[handleIdx]->m_charaKind == 3) {
-		return;
-	}
-
-	const unsigned int charaNo = m_wm.m_handles[handleIdx]->m_charaNo;
-	int animBase = static_cast<int>(charaNo / 100) - 1;
-	animBase *= 6;
-	const int modelBase =  (s32)(static_cast<int>(charaNo / 100) * 100);
-
-	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimStand), animBase++, 1, 0, modelBase, -1, 0);
-	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimWalk), animBase++, 1, 0, modelBase, -1, 0);
-	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimRun), animBase++, 1, 0, modelBase, -1, 0);
-	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimGlad), animBase++, 3, 0, modelBase, -1, 0);
-	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimSleep), animBase++, 1, 0, modelBase, -1, 0);
-	m_wm.m_handles[handleIdx]->LoadAnim(const_cast<char*>(s_wmCharaAnimAngry), animBase, 1, 0, modelBase, -1, 0);
-
-	m_wmCharaAnimState[anim].m_animIndex = 0;
-	m_wmCharaAnimState[anim].m_nextAnimIndex = -1;
-	m_wmCharaAnimState[anim].m_timer = rand() % 250;
-
-	m_wm.m_handles[handleIdx]->SetAnim(animBase - 5, -1, -1,
-	    m_wm.m_handles[handleIdx]->m_currentAnimIndex < 0 ? 0 : -1, 1);
-
-	m_wmCharaAnimState[anim].m_frame = m_wm.m_handles[handleIdx]->m_model->m_time;
-	m_wmCharaAnimState[anim].m_endFrame = m_wm.m_handles[handleIdx]->m_model->m_animEnd;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800ee828
- * PAL Size: 256b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::DrawCursor(int x, int y, float scale)
-{
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	unsigned char alpha = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * scale));
-	GXColor color;
-	color.r = 0xFF;
-	color.g = 0xFF;
-	color.b = 0xFF;
-	color.a = alpha;
-	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
-	MenuPcs.DrawRect(0, static_cast<float>(x), static_cast<float>(y), FLOAT_80331410, FLOAT_80331410, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -8405,34 +8663,6 @@ void CMenuPcs::CalcMainMenuSub()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 172b
- * EN Address: 0x80118104
- * EN Size: 300b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::ChkSelectParty()
-{
-	for (int i = 0; i < kWmMenuControllerCount; i++) {
-		if (Game.m_caravanWorkArr[m_wmWorldState->m_originalBackupParams[i]].m_shopState == 0) {
-			m_wmWorldState->m_originalBackupParams[i] = -1;
-		}
-		if (Game.m_caravanWorkArr[m_wmWorldState->m_backupParams[i]].m_shopState == 0) {
-			m_wmWorldState->m_backupParams[i] = -1;
-		}
-		const int slot = Game.m_gameWork.m_wmBackupParams[i];
-		if (Game.m_caravanWorkArr[slot].m_shopState == 0) {
-			Game.m_gameWork.m_wmBackupParams[i] = -1;
-		}
-		if (Game.m_caravanWorkArr[slot].m_shopBusyFlag != 0) {
-			Game.m_gameWork.m_wmBackupParams[i] = -1;
-		}
-	}
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800ecff0
  * PAL Size: 2396b
  * EN Address: TODO
@@ -8590,22 +8820,24 @@ void CMenuPcs::GetMcOdekakePos(int* x, int* y)
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 76b
- * EN Address: 0x80118790
- * EN Size: 108b
+ * PAL Size: 204b
+ * EN Address: 0x8011C2E8
+ * EN Size: 316b
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CMenuPcs::ChkMcDataCnt()
+inline void CMenuPcs::SetTextureLoc(int materialId)
 {
-	int count = 0;
-	for (int i = 0; i < kMcListCount; i++) {
-		const McListInfo& entry = m_wmCharaState[i];
-		if (entry.m_isBroken == 0 && static_cast<int>(entry.m_scriptSysVal0) > 0) {
-			count++;
-		}
-	}
-	return count;
+	CMaterial* material = MapMng.GetMaterialID(materialId);
+	CTexture* texture = material->GetTexture(0);
+	TextureMan.SetTexture(GX_TEXMAP0, texture);
+
+	Mtx texMtx;
+	PSMTXScale(texMtx, 1.0f / texture->m_width, 1.0f / texture->m_height, 1.0f);
+	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+	GXSetNumTexGens(1);
+	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
+	TextureMan.SetTextureTev(texture);
 }
 
 /*
@@ -9413,37 +9645,6 @@ void CMenuPcs::CalcMcObj()
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 804b
- * EN Address: 0x8011A654
- * EN Size: 228b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::DrawMcObj()
-{
-	WmWorldObjInfo* view = &m_wm.m_worldObjData[17];
-	for (int i = 0; i < 4; i++, view++) {
-		if (view->m_active != 0) {
-			SetProjection(i + 17);
-			SetLight(0);
-			m_wm.m_handles[i + 17]->Draw(5);
-			int partA = m_effectWork[i + 17].m_partNo;
-			if (partA >= 0) {
-				PartPcs.DrawMenuIdx(partA);
-			}
-			int partB = m_effectWork[i + 21].m_partNo;
-			if (partB >= 0) {
-				PartPcs.DrawMenuIdx(partB);
-			}
-		}
-	}
-	DrawInit();
-	RestoreProjection();
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
  * PAL Size: 188b
  * EN Address: 0x8011A738
  * EN Size: 72b
@@ -9453,20 +9654,6 @@ inline void CMenuPcs::DrawMcObj()
 inline void CMenuPcs::SetMcList(int index, McListInfo* info)
 {
 	m_wmCharaState[index] = *info;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: 0x8011A838
- * EN Size: 56b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::ClrMcList()
-{
-	memset(m_wmCharaState, 0, sizeof(McListInfo) * kMcListCount);
 }
 
 /*
@@ -9505,67 +9692,6 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	const unsigned int partId = PartMng.pppCreate(group, effectNo, &createParam, 1);
 	effect->m_partNo = partId;
 	return effect->m_partNo;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800eafa0
- * PAL Size: 232b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::SetLight(int mode)
-{
-	Graphic.SetFog(1, 0);
-
-	LightPcs.SetAmbient(s_Light[mode].m_ambient);
-	LightPcs.SetNumDiffuse(static_cast<unsigned long>(s_Light[mode].m_diffuseCount));
-
-	for (int i = 0; i < s_Light[mode].m_diffuseCount; i++) {
-		LightPcs.SetDiffuse(
-			static_cast<unsigned long>(i), s_Light[mode].m_diffuseColors[i],
-			&s_Light[mode].m_diffuseDirs[i], 0);
-	}
-
-	LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 524b
- * EN Address: 0x8011AACC
- * EN Size: 680b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::DrawPageMark()
-{
-	const int phase = abs(static_cast<int>(System.m_frameCounter) % 20 - 10);
-	const float scale = static_cast<float>(0.03 * phase + 0.7);
-	float x = 220.0 - 40.0f;
-	float y = 369.0f;
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor color;
-	color.r = 0xFF;
-	color.g = 0xFF;
-	color.b = 0xFF;
-	color.a = static_cast<unsigned char>(static_cast<int>(
-	    255.0f * static_cast<float>(0.05 * phase + 0.5)));
-	GXSetChanMatColor(GX_COLOR0A0, color);
-	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
-
-	x = static_cast<float>((48.0f - 48.0f * scale) * 0.5 + x);
-	y = static_cast<float>((40.0f - 40.0f * scale) * 0.5 + y);
-	if ((m_pageMarkFlags & 2) != 0) {
-		MenuPcs.DrawRect(8, x, y, 48.0f, 40.0f, 0.0f, 0.0f, scale, scale, 0.0f);
-	}
-	x += 248.0f;
-	if ((m_pageMarkFlags & 1) != 0) {
-		MenuPcs.DrawRect(0, x, y, 48.0f, 40.0f, 0.0f, 0.0f, scale, scale, 0.0f);
-	}
 }
 
 /*
@@ -9740,27 +9866,6 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 		}
 		GXTexCoord2f32(uu, vv);
 	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800eaaec
- * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::SetMcWinInfo(int x, int y)
-{
-    const short newX = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<float>(0x280 - x) * DOUBLE_803313F8)));
-    const short newY = static_cast<short>(static_cast<int>(static_cast<float>((FLOAT_80331430 - static_cast<float>(y)) * DOUBLE_803313F8)));
-    m_menuWindowInfo->x = newX;
-    m_menuWindowInfo->y = newY;
-    m_menuWindowInfo->width = static_cast<short>(x);
-    m_menuWindowInfo->height = static_cast<short>(y);
-    m_menuWindowInfo->frame = 0;
-    m_menuWindowInfo->state = 3;
 }
 
 /*
@@ -10001,73 +10106,6 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	}
 
 	DrawInit();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800ea014
- * PAL Size: 316b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
-{
-	CFont* const font = m_fonts[0];
-
-	font->SetMargin(FLOAT_803313e8);
-	font->SetShadow(0);
-	font->SetScale(FLOAT_803313e8);
-
-	const char* const* msgTable = GetMcWinMessBuff(messType);
-	int maxWidth = 0;
-	const WinMessEntry* const winMess = GetWinMess(winType);
-
-	for (int i = 0; i < winMess->m_lineCount; i++) {
-		const short msgId = winMess->m_messageIds[i];
-		const char* text = msgTable[msgId];
-		if (text != 0) {
-			if (text[0] == '$') {
-				text++;
-			}
-			const int textWidth = font->GetWidth(text);
-			if (textWidth > maxWidth) {
-				maxWidth = textWidth;
-			}
-		}
-	}
-
-	int cols = maxWidth / 0x16;
-	if ((maxWidth % 0x16) != 0) {
-		cols++;
-	}
-
-	*w = static_cast<short>((cols + 2) * 0x16 + 0x40);
-	*h = static_cast<short>(winMess->m_lineCount * 0x1E + 0x40);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 204b
- * EN Address: 0x8011C2E8
- * EN Size: 316b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::SetTextureLoc(int materialId)
-{
-	CMaterial* material = MapMng.GetMaterialID(materialId);
-	CTexture* texture = material->GetTexture(0);
-	TextureMan.SetTexture(GX_TEXMAP0, texture);
-
-	Mtx texMtx;
-	PSMTXScale(texMtx, 1.0f / texture->m_width, 1.0f / texture->m_height, 1.0f);
-	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
-	GXSetNumTexGens(1);
-	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
-	TextureMan.SetTextureTev(texture);
 }
 
 /*
@@ -10317,41 +10355,21 @@ int CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
 /*
  * --INFO--
  * PAL Address: UNUSED
- * PAL Size: 520b
- * EN Address: 0x8011CA28
- * EN Size: 340b
+ * PAL Size: 232b
+ * EN Address: 0x8011D25C
+ * EN Size: 108b
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CMenuPcs::IsAsyncCharaLoadFinish()
+inline void McCtrl::SetBrokenFile(int isBroken)
 {
-	int validCount = 0;
-	if (m_cmakeWorkActive == 1) {
-		for (int ci = 0; ci < kWmMenuPlayerCount; ci++) {
-			if (m_cmakeWork->m_characters[ci].m_exists != 0) {
-				validCount++;
-			}
-		}
-	} else {
-		for (int ci = 0; ci < kWmMenuPlayerCount; ci++) {
-			if (Game.m_caravanWorkArr[ci].m_shopState != 0) {
-				validCount++;
-			}
-		}
+	McListInfo entry;
+	memset(&entry, 0, sizeof(entry));
+	entry.m_isBroken = isBroken;
+	for (int i = 0; i < kMcListCount; i++) {
+		MenuPcs.SetMcList(i, &entry);
 	}
-
-	int loadedCount = 0;
-	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		const int handleIdx = i + 0x20;
-		CCharaPcs::CHandle* const handle = m_wm.m_handles[handleIdx];
-		if (handle->m_charaKind != 3 && handle->IsLoadModelASyncCompleted() != 0) {
-			loadedCount++;
-		}
-	}
-
-	return loadedCount == validCount;
 }
-
 
 /*
  * --INFO--
@@ -10519,6 +10537,30 @@ int McCtrl::LoadMcList()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 244b
+ * EN Address: 0x8011F050
+ * EN Size: 184b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void McCtrl::ChkParty(char* buffer)
+{
+	Mc::SaveDat* const save = reinterpret_cast<Mc::SaveDat*>(buffer);
+	for (int i = 0; i < 4; i++) {
+		const int partySlot = save->m_partySlots[i];
+		if (save->m_characters[partySlot].m_exists == 0) {
+			save->m_partySlots[i] = -1;
+		}
+		if (save->m_characters[partySlot].m_isAway != 0) {
+			save->m_partySlots[i] = -1;
+		}
+	}
+	save->m_crc = MemoryCardMan.CalcCrc(save);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800e902c
  * PAL Size: 796b
  * EN Address: TODO
@@ -10567,25 +10609,6 @@ void McCtrl::SetListDat(int slot, int clearScriptSysVal0)
 	}
 
 	MenuPcs.SetMcList(slot, &entry);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 232b
- * EN Address: 0x8011D25C
- * EN Size: 108b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void McCtrl::SetBrokenFile(int isBroken)
-{
-	McListInfo entry;
-	memset(&entry, 0, sizeof(entry));
-	entry.m_isBroken = isBroken;
-	for (int i = 0; i < kMcListCount; i++) {
-		MenuPcs.SetMcList(i, &entry);
-	}
 }
 
 /*
@@ -11658,30 +11681,6 @@ int McCtrl::SaveDataBuffer(char* buffer)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 244b
- * EN Address: 0x8011F050
- * EN Size: 184b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void McCtrl::ChkParty(char* buffer)
-{
-	Mc::SaveDat* const save = reinterpret_cast<Mc::SaveDat*>(buffer);
-	for (int i = 0; i < 4; i++) {
-		const int partySlot = save->m_partySlots[i];
-		if (save->m_characters[partySlot].m_exists == 0) {
-			save->m_partySlots[i] = -1;
-		}
-		if (save->m_characters[partySlot].m_isAway != 0) {
-			save->m_partySlots[i] = -1;
-		}
-	}
-	save->m_crc = MemoryCardMan.CalcCrc(save);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800e6b98
  * PAL Size: 2200b
  * EN Address: TODO
@@ -11956,8 +11955,6 @@ int McCtrl::EraseDat()
 	return result;
 }
 
-
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -11971,7 +11968,6 @@ void McCtrl::SetDataBuff(char* buffer)
 {
 	m_userBuffer = buffer;
 }
-
 
 /*
  * --INFO--

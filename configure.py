@@ -501,10 +501,10 @@ config.libs = [
             Object(
                 NonMatching,
                 "cflat_r2system.cpp",
-                extra_cflags=["-inline auto,deferred", "-str reuse,pool,readonly", "-use_lmw_stmw on"],
+                extra_cflags=["-str reuse,nopool,readonly", "-use_lmw_stmw on"],
             ),
             Object(NonMatching, "cflat_runtime.cpp"),
-            Object(NonMatching, "cflat_runtime2.cpp", extra_cflags=["-inline auto,deferred"]),
+            Object(NonMatching, "cflat_runtime2.cpp"),
             Object(
                 NonMatching,
                 "chara_anim.cpp",
@@ -757,7 +757,7 @@ config.libs = [
             Object(Matching, "ref.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "ringmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "shopmenu.cpp"),
-            Object(NonMatching, "singmenu.cpp", extra_cflags=["-inline noauto,deferred", "-pool off"]),
+            Object(NonMatching, "singmenu.cpp", extra_cflags=["-pool off"]),
             Object(NonMatching, "sound.cpp", extra_cflags=["-RTTI on", "-str reuse,nopool,readonly", "-sdata 8"]),
             Object(NonMatching, "stopwatch.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "system.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
@@ -777,7 +777,7 @@ config.libs = [
             Object(NonMatching, "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(Matching, "vector.cpp"),
             Object(NonMatching, "wind.cpp"),
-            Object(NonMatching, "wm_menu.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
+            Object(NonMatching, "wm_menu.cpp", extra_cflags=["-str reuse,readonly"]),
             # Retail addresses local message tables separately and stores literals read-only.
             Object(NonMatching, "wmm_str.cpp", extra_cflags=["-str reuse,readonly", "-pooldata off"]),
             Object(Matching, "zlist.cpp"),

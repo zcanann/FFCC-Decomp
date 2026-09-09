@@ -238,7 +238,6 @@ static inline CFlatRuntime2::CDebugDrawCC* DebugDrawCCEntries(u8* runtime)
 	return reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries;
 }
 
-
 static inline CFlatRuntime2::CParticleWork& ParticleWork(CFlatRuntime2* runtime)
 {
 	return runtime->m_particleWork;
@@ -507,6 +506,45 @@ CFlatRuntime2::~CFlatRuntime2()
 
 /*
  * --INFO--
+ * PAL Address: 0x8006EAD8
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CGBaseObj::CGBaseObj()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8006EA68
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CGObject::CGObject()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CGPrgObj::CGPrgObj()
+{
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8006E960
  * PAL Size: 92b
  * EN Address: TODO
@@ -546,19 +584,6 @@ CGItemObj::CGItemObj()
 
 /*
  * --INFO--
- * PAL Address: 0x8006EA68
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CGPrgObj::CGPrgObj()
-{
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8006EAA0
  * PAL Size: 56b
  * EN Address: TODO
@@ -566,24 +591,7 @@ CGPrgObj::CGPrgObj()
  * JP Address: TODO
  * JP Size: TODO
  */
-CGObject::CGObject()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8006EAD8
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
 CGQuadObj::CGQuadObj()
-{
-}
-
-CGBaseObj::CGBaseObj()
 {
 }
 
@@ -827,6 +835,118 @@ void* CFlatRuntime2::intToClass(int classId)
 
 /*
  * --INFO--
+ * PAL Address: 0x8006CADC
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CGObject* CFlatRuntime2::FindGObjFirst()
+{
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
+	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
+
+	while (object != root) {
+		if (object->m_classIndex >= 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
+					return reinterpret_cast<CGObject*>(object);
+				}
+			}
+		}
+		object = object->m_next;
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8006CA38
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
+{
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
+	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
+
+	while (object != root) {
+		if (object->m_classIndex >= 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
+					return reinterpret_cast<CGObject*>(object);
+				}
+			}
+		}
+		object = object->m_next;
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 164b
+ * EN Address: 0x8007B204
+ * EN Size: 168b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CGBaseObj* CFlatRuntime2::FindGBaseObjFirst()
+{
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
+	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
+
+	while (object != root) {
+		if (object->m_classIndex >= 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 1) == 1) {
+					return reinterpret_cast<CGBaseObj*>(object);
+				}
+			}
+		}
+		object = object->m_next;
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 160b
+ * EN Address: 0x8007B2AC
+ * EN Size: 172b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CGBaseObj* CFlatRuntime2::FindGBaseObjNext(CGBaseObj* gObject)
+{
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
+	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
+
+	while (object != root) {
+		if (object->m_classIndex >= 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 1) == 1) {
+					return reinterpret_cast<CGBaseObj*>(object);
+				}
+			}
+		}
+		object = object->m_next;
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8006CD40
  * PAL Size: 2652b
  * EN Address: TODO
@@ -973,118 +1093,6 @@ int CFlatRuntime2::Load(char* fileName)
 		System.Printf(const_cast<char*>(sCFlatRuntime2LoadMsg));
 	}
 	return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8006CADC
- * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CGObject* CFlatRuntime2::FindGObjFirst()
-{
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
-	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
-
-	while (object != root) {
-		if (object->m_classIndex >= 0) {
-			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
-					return reinterpret_cast<CGObject*>(object);
-				}
-			}
-		}
-		object = object->m_next;
-	}
-
-	return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8006CA38
- * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
-{
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
-	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
-
-	while (object != root) {
-		if (object->m_classIndex >= 0) {
-			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
-					return reinterpret_cast<CGObject*>(object);
-				}
-			}
-		}
-		object = object->m_next;
-	}
-
-	return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 164b
- * EN Address: 0x8007B204
- * EN Size: 168b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CGBaseObj* CFlatRuntime2::FindGBaseObjFirst()
-{
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
-	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
-
-	while (object != root) {
-		if (object->m_classIndex >= 0) {
-			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 1) == 1) {
-					return reinterpret_cast<CGBaseObj*>(object);
-				}
-			}
-		}
-		object = object->m_next;
-	}
-
-	return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 160b
- * EN Address: 0x8007B2AC
- * EN Size: 172b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CGBaseObj* CFlatRuntime2::FindGBaseObjNext(CGBaseObj* gObject)
-{
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
-	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
-
-	while (object != root) {
-		if (object->m_classIndex >= 0) {
-			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 1) == 1) {
-					return reinterpret_cast<CGBaseObj*>(object);
-				}
-			}
-		}
-		object = object->m_next;
-	}
-
-	return 0;
 }
 
 /*

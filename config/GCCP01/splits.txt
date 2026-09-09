@@ -415,6 +415,7 @@ pppPart.cpp:
 	extab       start:0x80006D48 end:0x80006E80
 	extabindex  start:0x8000CA9C end:0x8000CC70
 	.text       start:0x80053D04 end:0x80057794
+	.rodata     start:0x801D81F8 end:0x801D8230
 	.bss        start:0x80273A68 end:0x80275EE8
 	.sbss       start:0x8032ED50 end:0x8032ED90
 	.sdata2     start:0x8032FDD8 end:0x8032FE08

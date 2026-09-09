@@ -90,10 +90,6 @@ Mtx ppvUnitMatrix;
 Vec ppvZeroVector;
 CAmemCacheSet ppvAmemCacheSet;
 
-extern "C" const char s_pppPart_cpp[] = "pppPart.cpp";
-extern "C" const char sPppProgNullErrorMsg[] = "\nERROR!!!! prog=NULL\n\n";
-extern "C" const char sPartPcsHeapStageName[] = "CPartPcs.heap";
-
 /*
  * --INFO--
  * PAL Address: 0x8005773C
@@ -284,7 +280,7 @@ void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX a, pppFMATRIX b)
 
 /*
  * --INFO--
- * PAL Address: 0x800573f0
+ * PAL Address: 0x800573F0
  * PAL Size: 28b
  * EN Address: TODO
  * EN Size: TODO
@@ -292,14 +288,8 @@ void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX a, pppFMATRIX b)
  * JP Size: TODO
  */
 void pppCopyVector(Vec& dest, Vec source)
-{ 
-	float* src = &source.x;
-	float x = *src++;
-	float y = *src++;
-	dest.x = x;
-	float z = *src;
-	dest.y = y;
-	dest.z = z;
+{
+	dest = source;
 }
 
 /*
@@ -339,7 +329,7 @@ float pppVectorLength(Vec vec)
  */
 void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long param_2)
 {
-	pppEnvSt->m_stagePtr = Memory.CreateStage(param_2, const_cast<char*>(sPartPcsHeapStageName), 0);
+	pppEnvSt->m_stagePtr = Memory.CreateStage(param_2, "CPartPcs.heap", 0);
 }
 
 /*
@@ -698,7 +688,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	_pppProgSetDef* programSet = dataVal->m_programSetDef;
 	_pppPObject* newObject = (_pppPObject*)pppMemAlloc(
 		programSet->m_workBaseOffset + programSet->m_numStages * sizeof(u32),
-		ppvEnv->m_stagePtr, const_cast<char*>(s_pppPart_cpp), 0x305);
+		ppvEnv->m_stagePtr, "pppPart.cpp", 0x305);
 
 	if (newObject == 0)
 	{
@@ -812,7 +802,7 @@ inline void pppCacheUnLoadShape(short* shapeList, _pppDataHead* head)
  */
 void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
-	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x362);
+	Graphic._WaitDrawDone("pppPart.cpp", 0x362);
 
 	_pppMngSt* oldMngSt = ppvMng;
 	ppvMng = pppMngSt;
@@ -864,7 +854,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 		pppMngSt->m_hasMapRef = 0;
 	}
 
-	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x3A1);
+	Graphic._WaitDrawDone("pppPart.cpp", 0x3A1);
 	ppvMng = oldMngSt;
 }
 
@@ -1301,7 +1291,7 @@ inline void pppCacheLoadModel(short* modelList, _pppDataHead* head)
 		{
 			mapMesh->Ptr2Off();
 			mapMesh->m_meshData =
-			    reinterpret_cast<void*>(ppvAmemCacheSet.GetData(mapMesh->m_cacheId, (char*)s_pppPart_cpp, 0x4E5));
+			    reinterpret_cast<void*>(ppvAmemCacheSet.GetData(mapMesh->m_cacheId, "pppPart.cpp", 0x4E5));
 			mapMesh->Off2Ptr();
 		}
 		ppvAmemCacheSet.AddRef(mapMesh->m_cacheId);
@@ -1395,7 +1385,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	{
 		pppMngSt->m_pppPDataVals = (_pppPDataVal*)pppMemAlloc(
 			pppMngSt->m_numPrograms * sizeof(_pppPDataVal), ppvEnv->m_stagePtr,
-			const_cast<char*>(s_pppPart_cpp), 0x585);
+			"pppPart.cpp", 0x585);
 	}
 	else
 	{
@@ -1510,14 +1500,14 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	    dataBase + reinterpret_cast<u32>(pppDataHead->m_shapeGroups));
 
 	int* chunkOffsets = reinterpret_cast<int*>(pppDataHead->m_cacheChunks);
-	pppCacheChunk* cacheChunks = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620)
+	pppCacheChunk* cacheChunks = new (PartPcs.m_usbStreamState.m_stageLoad, "pppPart.cpp", 0x620)
 	    pppCacheChunk[pppDataHead->m_cacheChunkCount];
 	pppDataHead->m_cacheChunks = cacheChunks;
 
 	for (int i = 0; i < pppDataHead->m_cacheChunkCount; i++) {
 		u8* chunkSrc = (u8*)(chunkOffsets[0] + (int)dataBase);
 		int chunkSize = chunkOffsets[1] - chunkOffsets[0];
-		u8* chunkData = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x626) u8[chunkSize];
+		u8* chunkData = new (PartPcs.m_usbStreamState.m_stageLoad, "pppPart.cpp", 0x626) u8[chunkSize];
 
 		memcpy(chunkData, chunkSrc, chunkSize);
 		pppDataHead->m_cacheChunks[i].m_cacheIndex =
@@ -1527,7 +1517,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	}
 
 	char* modelName = reinterpret_cast<char*>(pppDataHead->m_models);
-	pppModelSt** modelRefs = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x636)
+	pppModelSt** modelRefs = new (PartPcs.m_usbStreamState.m_stageLoad, "pppPart.cpp", 0x636)
 	    pppModelSt*[pppDataHead->m_modelCount];
 	pppDataHead->m_models = modelRefs;
 
@@ -1552,7 +1542,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	}
 
 	char* shapeName = reinterpret_cast<char*>(pppDataHead->m_shapes);
-	pppShapeSt** shapeRefs = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x643)
+	pppShapeSt** shapeRefs = new (PartPcs.m_usbStreamState.m_stageLoad, "pppPart.cpp", 0x643)
 	    pppShapeSt*[pppDataHead->m_shapeCount];
 	pppDataHead->m_shapes = shapeRefs;
 
@@ -1577,14 +1567,14 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	}
 
 	pppShapeGroupRaw* shapeGroups = pppDataHead->m_shapeGroups;
-	pppDataHead->m_shapeGroups = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x651)
+	pppDataHead->m_shapeGroups = new (PartPcs.m_usbStreamState.m_stageLoad, "pppPart.cpp", 0x651)
 	    pppShapeGroupRaw[pppDataHead->m_shapeGroupCount];
 
 	for (int i = 0; i < pppDataHead->m_shapeGroupCount; i++) {
 		pppDataHead->m_shapeGroups[i].m_meshIndex = shapeGroups->m_meshIndex;
 		pppDataHead->m_shapeGroups[i].m_vertexCount = shapeGroups->m_vertexCount;
 		pppDataHead->m_shapeGroups[i].m_vertexIndices =
-		    new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x656) u16[shapeGroups->m_vertexCount];
+		    new (PartPcs.m_usbStreamState.m_stageLoad, "pppPart.cpp", 0x656) u16[shapeGroups->m_vertexCount];
 
 		shapeGroups->m_vertexIndices = reinterpret_cast<u16*>(reinterpret_cast<u8*>(shapeGroups->m_vertexIndices) + reinterpret_cast<u32>(dataBase));
 		memcpy(pppDataHead->m_shapeGroups[i].m_vertexIndices, shapeGroups->m_vertexIndices, shapeGroups->m_vertexCount * sizeof(u16));
@@ -1649,7 +1639,7 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 					}
 					else
 					{
-						printf(sPppProgNullErrorMsg);
+						printf("\nERROR!!!! prog=NULL\n\n");
 					}
 
 					workOffsetStep += 4;
@@ -1715,7 +1705,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 				}
 				else
 				{
-					printf(sPppProgNullErrorMsg);
+					printf("\nERROR!!!! prog=NULL\n\n");
 				}
 			}
 		}
@@ -2265,9 +2255,9 @@ int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, floa
 
 					if (Game.m_currentSceneId == 7)
 					{
-						Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0xADB);
+						Graphic._WaitDrawDone("pppPart.cpp", 0xADB);
 						_pppAllFreePObject(pppMngSt);
-						Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0xADD);
+						Graphic._WaitDrawDone("pppPart.cpp", 0xADD);
 					}
 					else
 					{

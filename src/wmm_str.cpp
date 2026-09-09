@@ -16,19 +16,6 @@ extern const char sWmmSlotB[] = "Slot B";
 extern const char sWmmSteckplatzB[];
 extern const char sWmmRanuraB[];
 
-extern const float kWmmWindowTextScale = 1.0f;
-extern const double kWmmCenteringHalf = 0.5;
-
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
-
-static inline double LoadDouble(const double& value)
-{
-    return value;
-}
-
 extern const char* s_McStr_en[];
 extern const char* s_McStr_de[];
 extern const char* s_McStr_it[];
@@ -56,10 +43,10 @@ extern char* s_SlotBTextByLanguage[];
 
 /*
  * --INFO--
- * PAL Address: 0x8017af14
+ * PAL Address: 0x8017AF14
  * PAL Size: 396b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80179E64
+ * EN Size: 396b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -89,16 +76,16 @@ int CMenuPcs::GetSlotABXPos(int right)
     }
 
     font = m_fonts[0];
-    font->SetMargin(LoadFloat(kWmmWindowTextScale));
+    font->SetMargin(1.0f);
     font->SetShadow(0);
-    font->SetScale(LoadFloat(kWmmWindowTextScale));
+    font->SetScale(1.0f);
     font->SetTlut(0x23);
 
     const int slotAWidth = (int)font->GetWidth((char*)(slotAText + 1));
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - slotAWidth);
     double windowLeft = (double)windowInfo->x;
-    double half = LoadDouble(kWmmCenteringHalf);
+    double half = 0.5;
     int x = (int)(centeredWidth * half + windowLeft);
     if (right != 0) {
         const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
@@ -109,10 +96,10 @@ int CMenuPcs::GetSlotABXPos(int right)
 
 /*
  * --INFO--
- * PAL Address: 0x8017b0a0
+ * PAL Address: 0x8017B0A0
  * PAL Size: 384b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80179FF0
+ * EN Size: 384b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -142,15 +129,15 @@ int CMenuPcs::GetYesNoXPos(int right)
     }
 
     font = m_fonts[0];
-    font->SetMargin(LoadFloat(kWmmWindowTextScale));
+    font->SetMargin(1.0f);
     font->SetShadow(0);
-    font->SetScale(LoadFloat(kWmmWindowTextScale));
+    font->SetScale(1.0f);
 
     const int yesWidth = (int)font->GetWidth((char*)(yesText + 1));
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - yesWidth);
     double windowLeft = (double)windowInfo->x;
-    double half = LoadDouble(kWmmCenteringHalf);
+    double half = 0.5;
     int x = (int)(centeredWidth * half + windowLeft);
     if (right != 0) {
         const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
@@ -161,10 +148,10 @@ int CMenuPcs::GetYesNoXPos(int right)
 
 /*
  * --INFO--
- * PAL Address: 0x8017b220
+ * PAL Address: 0x8017B220
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8017A170
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -172,10 +159,16 @@ WinMessEntry* CMenuPcs::GetWinMess(int index)
 {
     int languageId = Game.m_gameWork.m_languageId;
 
-    if ((languageId != 1) && (languageId >= 1) && (languageId < 6)) {
+    switch (languageId) {
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        return &s_WinMessTable[index];
+    case 1:
+    default:
         return &s_WinMessTable[index];
     }
-    return &s_WinMessTable[index];
 }
 
 /*

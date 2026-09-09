@@ -3228,11 +3228,11 @@ renderedDone:
         break;
     }
     case -0xB7:
-        this->push(object, Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ac);
+        this->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_jobType);
         outResult = 0;
         break;
     case -0xB6:
-        Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ac = object->m_localBase[1];
+        Game.m_caravanWorkArr[*object->m_localBase].m_jobType = object->m_localBase[1];
         this->push(object, 0);
         outResult = 0;
         break;

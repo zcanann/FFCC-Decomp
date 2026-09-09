@@ -8000,7 +8000,7 @@ inline void CMenuPcs::SetMakeChara(int channel)
 	caravanWork.m_shopState = 1;
 	caravanWork.unk_0x3a8 =
 	    (static_cast<unsigned int>(info.m_birthDate[0]) << 8) | static_cast<unsigned int>(info.m_birthDate[1]);
-	caravanWork.unk_0x3ac = static_cast<int>(info.m_jobType);
+	caravanWork.m_jobType = static_cast<int>(info.m_jobType);
 	memset(caravanWork.m_name, 0, 0x11);
 	strcpy(reinterpret_cast<char*>(caravanWork.m_name), info.m_name);
 	caravanWork.m_tribeId = static_cast<unsigned short>(info.m_charaType & 3);

@@ -39,6 +39,7 @@ STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_compatibility) == 4);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_mapPosition) == 0x36);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_commandSlots) == 0xC2);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_commandSlotCount) == 0xD3);
+STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_jobType) == 0xD5);
 STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_equipment) == 0xD7);
 
 STATIC_ASSERT(sizeof(GbaCMakeInfo) == 0x20);
@@ -1336,7 +1337,7 @@ void GbaQueue::LoadPlayerStat()
 				entry->m_strength[1] = static_cast<unsigned char>(caravanWork->m_defense > 99 ? 99 : caravanWork->m_defense);
 				entry->m_strength[2] = static_cast<unsigned char>(caravanWork->m_magic > 99 ? 99 : caravanWork->m_magic);
 				entry->m_bonusCondition = caravanWork->m_bonusCondition;
-				entry->_padD5 = static_cast<unsigned char>(caravanWork->unk_0x3ac);
+				entry->m_jobType = static_cast<unsigned char>(caravanWork->m_jobType);
 
 				memcpy(entry->m_items, caravanWork->m_inventoryItems, sizeof(entry->m_items));
 				{
@@ -1429,7 +1430,7 @@ void GbaQueue::LoadPlayerStat()
 			}
 		}
 
-		if (static_cast<char>(oldPlayer.m_useItem) != static_cast<char>(newPlayer.m_useItem)) {
+		if (oldPlayer.m_useItem != newPlayer.m_useItem) {
 			m_chgUseItemFlags = static_cast<unsigned char>(m_chgUseItemFlags | (1 << i));
 		}
 		if (memcmp(oldPlayer.m_strength, newPlayer.m_strength, sizeof(oldPlayer.m_strength)) != 0) {
@@ -2999,7 +3000,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 	for (int i = 0; i < 8; i++) {
 		CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
 		if ((i != playerSlot) && (caravanWork->m_shopState != 0) && (caravanWork->m_caravanLocalFlags == 0) &&
-		    (static_cast<unsigned char>(caravanWork->unk_0x3ac) == valueBytes[2])) {
+		    (static_cast<unsigned char>(caravanWork->m_jobType) == valueBytes[2])) {
 			Joybus.SendResult(channel, 1, valueBytes[1], 0);
 			return;
 		}
@@ -3130,8 +3131,12 @@ void GbaQueue::ClrCompatibilityFlg(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CBCC4
+ * PAL Size: 480b
+ * EN Address: 0x800CB528
+ * EN Size: 480b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 {
@@ -3140,16 +3145,14 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	unsigned char* writePtr;
 	int outSize;
 	int selectedCount;
-	int playerOffset;
 	OSSemaphore* semaphore;
 
 	semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	playerOffset = channel * 0xDC;
-	memcpy(compatibilityData, reinterpret_cast<unsigned char*>(this) + playerOffset + 0x458, sizeof(compatibilityData));
+	memcpy(compatibilityData, m_playerData[channel].m_compatibility, sizeof(compatibilityData));
 	OSSignalSemaphore(semaphore);
 
-	outCompatibility[0] = reinterpret_cast<unsigned char*>(this)[playerOffset + 0x529];
+	outCompatibility[0] = m_playerData[channel].m_jobType;
 	count = 2;
 	if (compatibilityData[3] != 0) {
 		count++;
@@ -3903,18 +3906,17 @@ void GbaQueue::SetResetFlg(int channel)
 
 /*
  * --INFO--
- * PAL Address: 0x800ca888
+ * PAL Address: 0x800CA888
  * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800CA0EC
+ * EN Size: 100b
  * JP Address: TODO
  * JP Size: TODO
  */
 int GbaQueue::GetBonus(int channel)
 {
-	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 	OSWaitSemaphore(accessSemaphores + channel);
-	int value = static_cast<unsigned char>(compatibilityStr[channel * 0xDC + 0xCE]);
+	int value = m_playerData[channel].m_bonusCondition;
 	OSSignalSemaphore(accessSemaphores + channel);
 	return value;
 }
@@ -3982,16 +3984,17 @@ int GbaQueue::GetArtifactData(int channel, unsigned char* outData)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CA56C
+ * PAL Size: 104b
+ * EN Address: 0x800C9DD0
+ * EN Size: 104b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int GbaQueue::GetUseItemFlg(int channel)
 {
-	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
-	int result;
 	OSWaitSemaphore(accessSemaphores + channel);
-	char value = compatibilityStr[channel * 0xDC + 0x1F];
-	result = static_cast<int>(value);
+	int result = m_playerData[channel].m_useItem;
 	OSSignalSemaphore(accessSemaphores + channel);
 	return result;
 }
@@ -4125,8 +4128,8 @@ void GbaQueue::ClrArtiDatFlg(int channel)
  * --INFO--
  * PAL Address: 0x800CA030
  * PAL Size: 400b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800C9894
+ * EN Size: 400b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -4152,13 +4155,12 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	}
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 	unsigned int artifactData[3];
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	artifactData[0] = __lwbrx(reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x24), 0);
-	artifactData[1] = __lwbrx(reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x28), 0);
-	artifactData[2] = __lwbrx(reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x2C), 0);
+	artifactData[0] = __lwbrx(&m_playerData[channel].m_artifacts[0], 0);
+	artifactData[1] = __lwbrx(&m_playerData[channel].m_artifacts[1], 0);
+	artifactData[2] = __lwbrx(&m_playerData[channel].m_artifacts[2], 0);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	memcpy(outData, artifactData, sizeof(artifactData));

@@ -44,7 +44,7 @@ struct CharaDat
     u8 m_evtFlags[256];                            // 0x5B8
     s16 m_evtWordArr[256];                         // 0x6B8
     int m_unknown8B8;                              // 0x8B8
-    int m_unknown8BC;                              // 0x8BC
+    int m_jobType;                              // 0x8BC
     unsigned char m_isAway;                         // 0x8C0
     unsigned char m_isGuest;                        // 0x8C1
     unsigned char m_hasCharacterId;                 // 0x8C2

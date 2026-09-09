@@ -57,7 +57,7 @@ struct GbaQueuePlayerDataView
     char m_hp;
     unsigned char m_letterMeta[8];
     unsigned char m_strength[3];
-    unsigned char m_useItem;
+    char m_useItem;
     unsigned int m_gil;
     unsigned int m_artifacts[3];
     unsigned short _pad34;
@@ -68,7 +68,7 @@ struct GbaQueuePlayerDataView
     unsigned char m_bonusCondition;
     char m_commandSlotCount;
     unsigned char m_radarVisible;
-    unsigned char _padD5;
+    unsigned char m_jobType;
     char m_itemFlags;
     unsigned char m_equipment[4];
 };

@@ -72,20 +72,6 @@ extern const char sGameParamCfdPathFmt[];
 extern const char sGameSystemCfdPathFmt[];
 extern const char sGameMailTableCfdPathFmt[];
 extern const char sGameNewBattleCfdPathFmt[];
-extern const char sGameAssetNameBlock[];
-
-enum GameAssetNameBlockOffset {
-	kParticleCallbackType0Fmt = 0x114,
-	kParticleCallbackType1Fmt = 0x154,
-	kParticleCallbackType3Fmt = 0x194,
-	kGameCpp = 0x1D0,
-	kScriptWillChangeMsg = 0x1DC,
-	kScriptResidentLoadedMsg = 0x1F8,
-	kCoreResidentLoadedMsg = 0x21C,
-	kNewGameInitMsg = 0x254,
-	kScriptChangedMsg = 0x274,
-};
-
 enum {
 	kGameWorkDataClearSize =
 	    sizeof(CGame::CGameWork) - offsetof(CGame::CGameWork, m_gameDataStartMarker),
@@ -94,9 +80,6 @@ enum {
 
 STATIC_ASSERT(kGameWorkDataClearSize == 0x13E1);
 
-extern "C" const char s_game_cpp[];
-extern const char sCoreResidentLoadedMsg[];
-extern const char sNewGameInitMsg[];
 extern const char sGameExecSceneFmt[];
 extern const char sGameInvalidSceneFmt[];
 extern const char sGameDebugStageName[];
@@ -290,8 +273,8 @@ void CGame::Quit()
  * --INFO--
  * PAL Address: 0x80015E8C
  * PAL Size: 136b
- * EN Address: 0x8001AD8C
- * EN Size: 144b
+ * EN Address: 0x80015CD8
+ * EN Size: 136b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -306,7 +289,7 @@ void CGame::LoadLogoWaitingData()
 			return;
 		}
 
-		System.Printf(const_cast<char*>(sCoreResidentLoadedMsg));
+		System.Printf("サウンド・キャラ・パーティクルの常駐を読み込みました。\n");
 	}
 }
 
@@ -447,8 +430,8 @@ void CGame::Exec()
  * --INFO--
  * PAL Address: 0x80015610
  * PAL Size: 408b
- * EN Address: 0x8001B570
- * EN Size: 164b
+ * EN Address: 0x8001545C
+ * EN Size: 408b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -480,7 +463,7 @@ void CGame::Create()
         mapVariant = m_currentMapVariantId;
         mapId = m_currentMapId;
 
-        Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp), 0x24E);
+        Graphic._WaitDrawDone("game.cpp", 0x24E);
         System.MapChanging(mapId, mapVariant);
 
         m_currentMapId = mapId;
@@ -511,15 +494,15 @@ void CGame::Destroy()
  * --INFO--
  * PAL Address: 0x8001551C
  * PAL Size: 212b
- * EN Address: 0x8001B63C
- * EN Size: 132b
+ * EN Address: 0x80015368
+ * EN Size: 212b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGame::InitNewGame()
 {
     System.Printf(const_cast<char*>(s_gameDebugMarker));
-    System.Printf(const_cast<char*>(sNewGameInitMsg));
+    System.Printf("*ニューゲーム初期化します。\n");
     System.Printf(const_cast<char*>(s_gameDebugMarker));
 
     CGame* game = &Game;
@@ -653,24 +636,22 @@ inline void CGame::clearWorkScript()
  * --INFO--
  * PAL Address: 0x80014FF8
  * PAL Size: 648b
- * EN Address: 0x8001B934
- * EN Size: 436b
+ * EN Address: 0x80014E44
+ * EN Size: 648b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGame::CheckScriptChange()
 {
-    const char* assetNameBlock = sGameAssetNameBlock;
-
     if (m_newGameFlag == 0) {
         return;
     }
 
     m_newGameFlag = 0;
-    Graphic._WaitDrawDone(const_cast<char*>(assetNameBlock + kGameCpp), 0x205);
+    Graphic._WaitDrawDone("game.cpp", 0x205);
 
     if ((u32)System.m_execParam >= 3) {
-        System.Printf(const_cast<char*>(assetNameBlock + kScriptWillChangeMsg));
+        System.Printf("スクリプトが切り替わります\n");
     }
 
     System.ScriptChanging(m_nextScript.m_name);
@@ -682,7 +663,7 @@ void CGame::CheckScriptChange()
             m_cfdLoadedFlag = 1;
 
             if ((u32)System.m_execParam >= 3) {
-                System.Printf(const_cast<char*>(assetNameBlock + kScriptResidentLoadedMsg));
+                System.Printf("スクリプトの常駐を読み込みました。\n");
             }
         }
 
@@ -693,7 +674,7 @@ void CGame::CheckScriptChange()
             m_assetsLoadedFlag = 1;
 
             if ((u32)System.m_execParam >= 3) {
-                System.Printf(const_cast<char*>(assetNameBlock + kCoreResidentLoadedMsg));
+                System.Printf("サウンド・キャラ・パーティクルの常駐を読み込みました。\n");
             }
         }
     }
@@ -703,7 +684,7 @@ void CGame::CheckScriptChange()
 
     if ((int)m_nextScriptFlags != 0) {
         System.Printf(const_cast<char*>(s_gameDebugMarker));
-        System.Printf(const_cast<char*>(assetNameBlock + kNewGameInitMsg));
+        System.Printf("*ニューゲーム初期化します。\n");
         System.Printf(const_cast<char*>(s_gameDebugMarker));
 
         CGame* game = &Game;
@@ -723,7 +704,7 @@ void CGame::CheckScriptChange()
     System.ScriptChanged(m_nextScript.m_name, scriptResult);
 
     if ((u32)System.m_execParam >= 3) {
-        System.Printf(const_cast<char*>(assetNameBlock + kScriptChangedMsg));
+        System.Printf("スクリプトが切り替わりました\n");
     }
 }
 
@@ -731,15 +712,15 @@ void CGame::CheckScriptChange()
  * --INFO--
  * PAL Address: 0x80014E78
  * PAL Size: 384b
- * EN Address: 0x8001BAE8
- * EN Size: 680b
+ * EN Address: 0x80014CC4
+ * EN Size: 384b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
 {
     if (param5 != 0) {
-        Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp), 0x24E);
+        Graphic._WaitDrawDone("game.cpp", 0x24E);
         System.MapChanging(mapId, mapVariant);
 
         m_currentMapId = mapId;
@@ -1052,33 +1033,32 @@ void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PP
  * --INFO--
  * PAL Address: 0x800146B4
  * PAL Size: 324b
- * EN Address: 0x8001C578
- * EN Size: 420b
+ * EN Address: 0x8001454C
+ * EN Size: 324b
  * JP Address: TODO
  * JP Size: TODO
  */
 void CGame::ParticleFrameCallback(int effectIndex, int scriptLine, int scriptStep, int callbackType, int graphFrame, Vec*)
 {
-	char* callbackFmtBase = const_cast<char*>(sGameAssetNameBlock);
 	PPPIFPARAM* ifData = PartMng.pppGetIfDt(static_cast<short>(effectIndex));
 	ifData->m_hitFlags |= 1 << callbackType;
 
 	if (callbackType == 0) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-			System.Printf(callbackFmtBase + kParticleCallbackType0Fmt, scriptLine, scriptStep, effectIndex, graphFrame);
+			System.Printf("pdtid=%d fpno=%d id=%d frame=%d パーティクル削除禁止フラグon\n", scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	} else if (callbackType == 1) {
 		ifData->m_hitFlags &= ~2;
 		PartMng.pppEndPart(effectIndex);
 
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-			System.Printf(callbackFmtBase + kParticleCallbackType1Fmt, scriptLine, scriptStep, effectIndex, graphFrame);
+			System.Printf("pdtid=%d fpno=%d id=%d frame=%d パーティクル自動削除フラグon\n", scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	} else if (callbackType == 3) {
 		PartMng.pppEndPart(effectIndex);
 
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-			System.Printf(callbackFmtBase + kParticleCallbackType3Fmt, scriptLine, scriptStep, effectIndex, graphFrame);
+			System.Printf("pdtid=%d fpno=%d id=%d frame=%dパーティクルチャージ終了on\n", scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	}
 }

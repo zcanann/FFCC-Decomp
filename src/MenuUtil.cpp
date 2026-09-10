@@ -23,167 +23,116 @@ static const char s_objdat_spt_801E3070[] = "objdat.spt";
 static const char s_icon_dat_801E307C[] = "icon.dat";
 static const char s_FF_Crystal_Chronicles_801E3088[] = "FF Crystal Chronicles";
 
-extern "C" const char s_MenuOptionMusic[] = "Music";
-extern "C" const char s_MenuOptionOn[] = "On";
-extern "C" const char s_MenuOptionOff[] = "Off";
-extern "C" const char s_MenuOptionStereo[] = "Stereo";
-extern "C" const char s_MenuOptionMin[] = "Min";
-extern "C" const char s_MenuOptionMax[] = "Max";
-extern "C" const char s_MenuOptionStrengthDe[] = {'S', 't', '\xe4', 'r', 'k', 'e', '\0', '\0'};
-extern "C" const char s_MenuOptionDefenceDe[] = "Abwehr";
-extern "C" const char s_MenuOptionMusicDe[] = "Musik";
-extern "C" const char s_MenuOptionOnDe[] = "AN";
-extern "C" const char s_MenuOptionOffDe[] = "AUS";
-extern "C" const char s_MenuOptionStereoDe[] = "STEREO";
-extern "C" const char s_MenuOptionMonoUpper[] = "MONO";
-extern "C" const char s_MenuOptionNormalIt[] = "Normal";
-extern "C" const char s_MenuOptionForza[] = "Forza";
-extern "C" const char s_MenuOptionDifesa[] = "Difesa";
-extern "C" const char s_MenuOptionSonoro[] = "Sonoro";
-extern "C" const char s_MenuOptionMusicaIt[] = "Musica";
-extern "C" const char s_MenuOptionMonoIt[] = "Mono";
-extern "C" const char s_MenuOptionContr[] = "Contr.";
-extern "C" const char s_MenuOptionNorm[] = "Norm.";
-extern "C" const char s_MenuOptionForceFr[] = "Force";
-extern "C" const char s_MenuOptionMusiqueFr[] = "Musique";
-extern "C" const char s_MenuOptionActiveFr[8] = "Activ\351";
-extern "C" const char s_MenuOptionStereoFr[8] = "St\351r\351o";
-extern "C" const char s_MenuOptionFuerzaEs[] = "Fuerza";
-extern "C" const char s_MenuOptionDefensaEs[] = "Defensa";
-extern "C" const char s_MenuOptionMusicaEs[8] = "M\372sica";
-extern "C" const char s_MenuOptionApagadoEs[] = "Apagado";
-extern "C" const char s_MenuOptionEstereoEs[8] = "Est\351reo";
-extern "C" const char s_MenuOptionMinEs[8] = "M\355n.";
-extern "C" const char s_MenuOptionMaxEs[8] = "M\341x.";
-static const char s_Strength[] = "Strength:";
-static const char s_Defence[] = "Defence:";
-static const char s_Position_Markers[] = "Position Markers";
-static const char s_Sound_Mode[] = "Sound Mode";
-static const char s_Sound_Effects[] = "Sound Effects";
-static const char s_GBA_Colour_Balance[] = "GBA Colour Balance";
-static const char s_Show_or_hide_position_marker_under_each_character_s_feet[] = "Show or hide position marker under each character's feet.";
-static const char s_Select_stereo_or_monaural_sound[] = "Select stereo or monaural sound.";
-static const char s_Adjust_volume_of_background_music[] = "Adjust volume of background music.";
-static const char s_Adjust_volume_of_sound_effects[] = "Adjust volume of sound effects.";
-static const char s_Adjust_colour_balance_of_Game_Boy_Advance[] = "Adjust colour balance of Game Boy Advance.";
-static const char s_Monaural[] = "Monaural";
-static const char s_Enhanced[] = "Enhanced";
-static const char s_Standard[] = "Standard";
-static const char s_Erkennungskreisel[] = "Erkennungskreisel";
-static const char s_Tonausgabe[] = "Tonausgabe";
-static const char s_MenuOptionSoundEffectsDe[] = "Ger\344uscheffekte";
-static const char s_Farbeinstellung[] = "Farbeinstellung";
-static const char s_Erkennungskreisel_des_Charakters_AN_AUS_schalten[] = "Erkennungskreisel des Charakters AN/AUS schalten.";
-static const char s_Tonausgabe_auf_Stereo_oder_Mono_schalten[] = "Tonausgabe auf Stereo oder Mono schalten.";
-static const char s_Lautstaerke_der_Musik_aendern[] = "Lautst\344rke der Musik \344ndern.";
-static const char s_Lautstaerke_der_Geraeuscheffekte_aendern[] = "Lautst\344rke der Ger\344uscheffekte \344ndern.";
-static const char s_Farbeinstellung_des_Game_Boy_Advance_aendern[] = "Farbeinstellung des Game Boy Advance \344ndern.";
-static const char s_Erweitert[] = "Erweitert";
-static const char s_Indicatori_di_posizione[] = "Indicatori di posizione";
-static const char s_Effetti_sonori[] = "Effetti sonori";
-static const char s_Bilanc_colore_GBA[] = "Bilanc. colore GBA";
-static const char s_Attiva_o_disattiva_l_indicatore_ai_piedi_dei_personaggi[] = "Attiva o disattiva l'indicatore ai piedi dei personaggi.";
-static const char s_Scegli_tra_sonoro_mono_o_stereo[] = "Scegli tra sonoro mono o stereo.";
-static const char s_Regola_il_volume_della_musica[] = "Regola il volume della musica";
-static const char s_Regola_il_volume_degli_effetti_sonori[] = "Regola il volume degli effetti sonori";
-static const char s_Regola_il_colore_sul_Game_Boy_Advance[] = "Regola il colore sul Game Boy Advance.";
-static const char s_ResistanceFr[] = "R\351sistance";
-static const char s_Sceau_de_position[] = "Sceau de position";
-static const char s_Signal_sonore[] = "Signal sonore";
-static const char s_Effets_sonores[] = "Effets sonores";
-static const char s_Affichage_du_GBA[] = "Affichage du GBA";
-static const char s_Affichage_du_sceau_de_position_aux_pieds_des_personnages[] = "Affichage du sceau de position aux pieds des personnages";
-static const char s_Choisissez_le_signal_sonore_stereo_ou_mono[] = "Choisissez le signal sonore st\351r\351o ou mono";
-static const char s_Reglez_le_volume_de_la_musique[] = "R\351glez le volume de la musique";
-static const char s_Reglez_le_volume_des_effets_sonores[] = "R\351glez le volume des effets sonores";
-static const char s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance[] = "R\351glez le contraste des couleurs du Game Boy Advance";
-static const char s_MenuOptionDesactiveFr[] = "D\351sactiv\351";
-static const char s_MenuOptionAmelioreFr[] = "Am\351lior\351";
-static const char s_Aro_de_posicion[] = "Aro de posici\363n";
-static const char s_Tipo_de_sonido[] = "Tipo de sonido";
-static const char s_Efectos_de_sonido[] = "Efectos de sonido";
-static const char s_Color_de_la_GBA[] = "Color de la GBA";
-static const char s_Senala_la_posicion_bajo_los_pies_de_cada_personaje[] = "Se\361ala la posici\363n bajo los pies de cada personaje.";
-static const char s_Selecciona_sonido_estereo_o_monoaural[] = "Selecciona sonido est\351reo o monoaural.";
-static const char s_Ajusta_el_volumen_de_la_musica_de_fondo[] = "Ajusta el volumen de la m\372sica de fondo.";
-static const char s_Ajusta_el_volumen_de_los_efectos_de_sonido[] = "Ajusta el volumen de los efectos de sonido.";
-static const char s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance[] = "Ajusta el balance del color de la Game Boy Advance.";
-static const char s_Encendido[] = "Encendido";
-static const char s_Monoaural[] = "Monoaural";
-static const char s_Mejorado[] = "Mejorado";
+char* g_strMenuUtilMes[] = {
+	"Strength:",
+	"Defence:",
+	"Position Markers",
+	"Sound Mode",
+	"Music",
+	"Sound Effects",
+	"GBA Colour Balance",
+	"Show or hide position marker under each character's feet.",
+	"Select stereo or monaural sound.",
+	"Adjust volume of background music.",
+	"Adjust volume of sound effects.",
+	"Adjust colour balance of Game Boy Advance.",
+	"On",
+	"Off",
+	"Stereo",
+	"Monaural",
+	"Min",
+	"Max",
+	"Enhanced",
+	"Standard",
 
-static const char s_MenuOptionEstandarEs[] = "Est\341ndar";
+	"St\344rke",
+	"Abwehr",
+	"Erkennungskreisel",
+	"Tonausgabe",
+	"Musik",
+	"Ger\344uscheffekte",
+	"Farbeinstellung",
+	"Erkennungskreisel des Charakters AN/AUS schalten.",
+	"Tonausgabe auf Stereo oder Mono schalten.",
+	"Lautst\344rke der Musik \344ndern.",
+	"Lautst\344rke der Ger\344uscheffekte \344ndern.",
+	"Farbeinstellung des Game Boy Advance \344ndern.",
+	"AN",
+	"AUS",
+	"STEREO",
+	"MONO",
+	"Min",
+	"Max",
+	"Erweitert",
+	"Normal",
+
+	"Forza",
+	"Difesa",
+	"Indicatori di posizione",
+	"Sonoro",
+	"Musica",
+	"Effetti sonori",
+	"Bilanc. colore GBA",
+	"Attiva o disattiva l'indicatore ai piedi dei personaggi.",
+	"Scegli tra sonoro mono o stereo.",
+	"Regola il volume della musica",
+	"Regola il volume degli effetti sonori",
+	"Regola il colore sul Game Boy Advance.",
+	"On",
+	"Off",
+	"Stereo",
+	"Mono",
+	"Min",
+	"Max",
+	"Contr.",
+	"Norm.",
+
+	"Force",
+	"R\351sistance",
+	"Sceau de position",
+	"Signal sonore",
+	"Musique",
+	"Effets sonores",
+	"Affichage du GBA",
+	"Affichage du sceau de position aux pieds des personnages",
+	"Choisissez le signal sonore st\351r\351o ou mono",
+	"R\351glez le volume de la musique",
+	"R\351glez le volume des effets sonores",
+	"R\351glez le contraste des couleurs du Game Boy Advance",
+	"Activ\351",
+	"D\351sactiv\351",
+	"St\351r\351o",
+	"Mono",
+	"Min",
+	"Max",
+	"Am\351lior\351",
+	"Standard",
+
+	"Fuerza",
+	"Defensa",
+	"Aro de posici\363n",
+	"Tipo de sonido",
+	"M\372sica",
+	"Efectos de sonido",
+	"Color de la GBA",
+	"Se\361ala la posici\363n bajo los pies de cada personaje.",
+	"Selecciona sonido est\351reo o monoaural.",
+	"Ajusta el volumen de la m\372sica de fondo.",
+	"Ajusta el volumen de los efectos de sonido.",
+	"Ajusta el balance del color de la Game Boy Advance.",
+	"Encendido",
+	"Apagado",
+	"Est\351reo",
+	"Monoaural",
+	"M\355n.",
+	"M\341x.",
+	"Mejorado",
+	"Est\341ndar",
+};
+
 static const int sHelpLineBaseY3[3] = { 0x160, 0x154, 0x146 };
-
 static const char s_MenuUtil_cpp_801e37fc[] = "MenuUtil.cpp";
 static const char s_MenuUtilAllocErrorFmt[] = "%s(%d): Error: memory allocation error\n";
-
-extern const char s_MenuOptionMusic[];
-extern const char s_MenuOptionOn[];
-extern const char s_MenuOptionOff[];
-extern const char s_MenuOptionStereo[];
-extern const char s_MenuOptionMin[];
-extern const char s_MenuOptionMax[];
-extern const char s_MenuOptionStrengthDe[];
-extern const char s_MenuOptionDefenceDe[];
-extern const char s_MenuOptionMusicDe[];
-extern const char s_MenuOptionOnDe[];
-extern const char s_MenuOptionOffDe[];
-extern const char s_MenuOptionStereoDe[];
-extern const char s_MenuOptionMonoUpper[];
-extern const char s_MenuOptionNormalIt[];
-extern const char s_MenuOptionForza[];
-extern const char s_MenuOptionDifesa[];
-extern const char s_MenuOptionSonoro[];
-extern const char s_MenuOptionMusicaIt[];
-extern const char s_MenuOptionMonoIt[];
-extern const char s_MenuOptionContr[];
-extern const char s_MenuOptionNorm[];
-extern const char s_MenuOptionForceFr[];
-extern const char s_MenuOptionMusiqueFr[];
-extern const char s_MenuOptionActiveFr[];
-extern const char s_MenuOptionStereoFr[];
-extern const char s_MenuOptionFuerzaEs[];
-extern const char s_MenuOptionDefensaEs[];
-extern const char s_MenuOptionMusicaEs[];
-extern const char s_MenuOptionApagadoEs[];
-extern const char s_MenuOptionEstereoEs[];
-extern const char s_MenuOptionMinEs[];
-extern const char s_MenuOptionMaxEs[];
-char* g_strMenuUtilMes[] = {
-	const_cast<char*>(s_Strength), const_cast<char*>(s_Defence), const_cast<char*>(s_Position_Markers), const_cast<char*>(s_Sound_Mode),
-	const_cast<char*>(s_MenuOptionMusic), const_cast<char*>(s_Sound_Effects), const_cast<char*>(s_GBA_Colour_Balance),
-	const_cast<char*>(s_Show_or_hide_position_marker_under_each_character_s_feet),
-	const_cast<char*>(s_Select_stereo_or_monaural_sound), const_cast<char*>(s_Adjust_volume_of_background_music),
-	const_cast<char*>(s_Adjust_volume_of_sound_effects), const_cast<char*>(s_Adjust_colour_balance_of_Game_Boy_Advance),
-	const_cast<char*>(s_MenuOptionOn), const_cast<char*>(s_MenuOptionOff), const_cast<char*>(s_MenuOptionStereo), const_cast<char*>(s_Monaural),
-	const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax), const_cast<char*>(s_Enhanced), const_cast<char*>(s_Standard),
-	const_cast<char*>(s_MenuOptionStrengthDe), const_cast<char*>(s_MenuOptionDefenceDe), const_cast<char*>(s_Erkennungskreisel), const_cast<char*>(s_Tonausgabe),
-	const_cast<char*>(s_MenuOptionMusicDe), const_cast<char*>(s_MenuOptionSoundEffectsDe), const_cast<char*>(s_Farbeinstellung),
-	const_cast<char*>(s_Erkennungskreisel_des_Charakters_AN_AUS_schalten),
-	const_cast<char*>(s_Tonausgabe_auf_Stereo_oder_Mono_schalten), const_cast<char*>(s_Lautstaerke_der_Musik_aendern), const_cast<char*>(s_Lautstaerke_der_Geraeuscheffekte_aendern),
-	const_cast<char*>(s_Farbeinstellung_des_Game_Boy_Advance_aendern), const_cast<char*>(s_MenuOptionOnDe), const_cast<char*>(s_MenuOptionOffDe), const_cast<char*>(s_MenuOptionStereoDe), const_cast<char*>(s_MenuOptionMonoUpper),
-	const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax), const_cast<char*>(s_Erweitert), const_cast<char*>(s_MenuOptionNormalIt),
-	const_cast<char*>(s_MenuOptionForza), const_cast<char*>(s_MenuOptionDifesa), const_cast<char*>(s_Indicatori_di_posizione), const_cast<char*>(s_MenuOptionSonoro),
-	const_cast<char*>(s_MenuOptionMusicaIt), const_cast<char*>(s_Effetti_sonori), const_cast<char*>(s_Bilanc_colore_GBA),
-	const_cast<char*>(s_Attiva_o_disattiva_l_indicatore_ai_piedi_dei_personaggi),
-	const_cast<char*>(s_Scegli_tra_sonoro_mono_o_stereo), const_cast<char*>(s_Regola_il_volume_della_musica),
-	const_cast<char*>(s_Regola_il_volume_degli_effetti_sonori), const_cast<char*>(s_Regola_il_colore_sul_Game_Boy_Advance),
-	const_cast<char*>(s_MenuOptionOn), const_cast<char*>(s_MenuOptionOff), const_cast<char*>(s_MenuOptionStereo), const_cast<char*>(s_MenuOptionMonoIt), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
-	const_cast<char*>(s_MenuOptionContr), const_cast<char*>(s_MenuOptionNorm),
-	const_cast<char*>(s_MenuOptionForceFr), const_cast<char*>(s_ResistanceFr), const_cast<char*>(s_Sceau_de_position), const_cast<char*>(s_Signal_sonore),
-	const_cast<char*>(s_MenuOptionMusiqueFr), const_cast<char*>(s_Effets_sonores), const_cast<char*>(s_Affichage_du_GBA),
-	const_cast<char*>(s_Affichage_du_sceau_de_position_aux_pieds_des_personnages),
-	const_cast<char*>(s_Choisissez_le_signal_sonore_stereo_ou_mono), const_cast<char*>(s_Reglez_le_volume_de_la_musique), const_cast<char*>(s_Reglez_le_volume_des_effets_sonores), const_cast<char*>(s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance), const_cast<char*>(s_MenuOptionActiveFr),
-	const_cast<char*>(s_MenuOptionDesactiveFr), const_cast<char*>(s_MenuOptionStereoFr), const_cast<char*>(s_MenuOptionMonoIt), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
-	const_cast<char*>(s_MenuOptionAmelioreFr), const_cast<char*>(s_Standard),
-	const_cast<char*>(s_MenuOptionFuerzaEs), const_cast<char*>(s_MenuOptionDefensaEs), const_cast<char*>(s_Aro_de_posicion), const_cast<char*>(s_Tipo_de_sonido),
-	const_cast<char*>(s_MenuOptionMusicaEs), const_cast<char*>(s_Efectos_de_sonido), const_cast<char*>(s_Color_de_la_GBA),
-	const_cast<char*>(s_Senala_la_posicion_bajo_los_pies_de_cada_personaje), const_cast<char*>(s_Selecciona_sonido_estereo_o_monoaural), const_cast<char*>(s_Ajusta_el_volumen_de_la_musica_de_fondo), const_cast<char*>(s_Ajusta_el_volumen_de_los_efectos_de_sonido),
-	const_cast<char*>(s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance), const_cast<char*>(s_Encendido),
-	const_cast<char*>(s_MenuOptionApagadoEs), const_cast<char*>(s_MenuOptionEstereoEs), const_cast<char*>(s_Monoaural), const_cast<char*>(s_MenuOptionMinEs), const_cast<char*>(s_MenuOptionMaxEs),
-	const_cast<char*>(s_Mejorado), const_cast<char*>(s_MenuOptionEstandarEs),
-};
 
 namespace {
 static inline char** GetMenuHelpMsgTable()

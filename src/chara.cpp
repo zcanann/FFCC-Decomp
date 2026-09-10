@@ -794,51 +794,6 @@ CChara::CModel::~CModel()
 
 /*
  * --INFO--
- * PAL Address: 0x80073480
- * PAL Size: 192b
- * EN Address: 0x8007ee6c
- * EN Size: 316b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CChara::CModel::Init()
-{
-	m_time = 0.0f;
-	m_curFrame = 0.0f;
-	m_dynJitter.x = 0.0f;
-	m_dynJitter.y = 0.0f;
-	m_dynJitter.z = 0.0f;
-	m_blendCur = 0;
-	m_blendMax = 0;
-	m_meshVisibleMask = 0xFFFFFFFF;
-	m_animStart = 0.0f;
-	m_animEnd = 0.0f;
-	m_chestAmp = 0.0f;
-	m_chestTilt = 0.0f;
-	m_lightAlpha = 1.0f;
-	m_callbackContext = 0;
-	m_callbackParam = 0;
-	m_beforeDrawModelCallback = 0;
-	m_beforeCalcMatrixCallback = 0;
-	m_beforeMeshLockEnvCallback = 0;
-	m_beforeDrawShadowLockEnvCallback = 0;
-	m_drawMeshDLCallback = 0;
-	m_drawShadowMeshDLCallback = 0;
-	m_afterDrawMeshCallback = 0;
-	m_afterDrawModelCallback = 0;
-	m_flags10CBits.m_flag10C_80 = 1;
-	m_flagsA0Bits.m_flagA0_80 = 0;
-	m_flagsA0Bits.m_flagA0_40 = 0;
-	m_flagsA0Bits.m_flagA0_20 = 1;
-	m_flags10CBits.m_flag10C_40 = 0;
-	m_furTarget = 1.0f;
-	m_furCur = 1.0f;
-	m_attachMode = 0;
-	m_twistAngle = 0.0f;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80072ea8
  * PAL Size: 1496b
  * EN Address: TODO

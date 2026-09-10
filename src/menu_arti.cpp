@@ -26,21 +26,6 @@ static const float kArtiInitX = 128.0f;
 static const float kArtiInitYOffset = 8.0f;
 static const float kArtiInitScale = 0.75f;
 
-extern "C" {
-extern const char s_MenuOptionMusic[];
-extern const char s_MenuOptionOn[];
-extern const char s_MenuOptionOff[];
-extern const char s_MenuOptionStereo[];
-extern const char s_MenuOptionMin[];
-extern const char s_MenuOptionMax[];
-extern const char s_MenuOptionStrengthDe[];
-extern const char s_MenuOptionDefenceDe[];
-extern const char s_MenuOptionMusicDe[];
-extern const char s_MenuOptionOnDe[];
-extern const char s_MenuOptionOffDe[];
-extern const char s_MenuOptionStereoDe[];
-}
-
 namespace {
 STATIC_ASSERT(offsetof(CMenuPcs, m_artiState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_artiList) == 0x850);

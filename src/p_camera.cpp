@@ -17,7 +17,6 @@
 #include "ffcc/p_graphic.h"
 #include "ffcc/game.h"
 #include "ffcc/partMng.h"
-#include "ffcc/math.h"
 #include "ffcc/vector.h"
 
 #include <math.h>
@@ -49,12 +48,6 @@ inline void* operator new(unsigned long, void* ptr)
 static inline CPad::PadInput& CameraPadInput(int port)
 {
     return Pad.GetPadInputs()[(Pad.m_debugPadPort == port) ? 0 : port];
-}
-
-extern "C" {
-void pppEditGetViewPos__FP3Vec(Vec*);
-void pppEditGetViewMatrix__FPA4_f(float (*)[4]);
-void pppEditGetProjectionMatrix__FPA4_f(float (*)[4]);
 }
 
 namespace {
@@ -98,16 +91,6 @@ STATIC_ASSERT(offsetof(CCameraPcs::QuakeState, m_jitterAmplitude) == 0x20);
 STATIC_ASSERT(offsetof(CCameraPcs::QuakeState, m_startTimer) == 0x2C);
 STATIC_ASSERT(sizeof(CCameraPcs::QuakeState) == 0x34);
 STATIC_ASSERT(sizeof(CCameraPcs) == 0x4C4);
-
-static inline void CopyCameraState(CCameraPcs::CameraState& dst, const CCameraPcs::CameraState& src)
-{
-    dst = src;
-}
-
-static inline Vec* AsVec(CVector& vec)
-{
-    return reinterpret_cast<Vec*>(&vec);
-}
 
 }
 
@@ -199,9 +182,9 @@ void CCameraPcs::calcPart()
 
     m_fov = 33.3f;
 
-    pppEditGetViewPos__FP3Vec(&PositionVec());
-    pppEditGetViewMatrix__FPA4_f(m_cameraMatrix);
-    pppEditGetProjectionMatrix__FPA4_f(m_screenMatrix);
+    pppEditGetViewPos(&PositionVec());
+    pppEditGetViewMatrix(m_cameraMatrix);
+    pppEditGetProjectionMatrix(m_screenMatrix);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     PSMTXInverse(m_cameraMatrix, invCamera);
@@ -461,7 +444,7 @@ void CCameraPcs::drawShadowEndAll()
         return;
     }
 
-    CopyCameraState(CurrentCameraState(), m_savedCamera);
+    CurrentCameraState() = m_savedCamera;
 }
 
 /*
@@ -491,8 +474,6 @@ void CCameraPcs::SetFullScreenShadow(float (*matrix)[4], long flags)
  */
 void CCameraPcs::drawShadowChrBegin()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
     if (m_fullScreenShadowEnabled != 0) {
         float shadowX = m_fullScreenShadow.m_depthScaleMtx[0][3];
         m_fullScreenShadow.m_depthScaleMtx[0][3] = shadowX * 1.5f;
@@ -510,7 +491,6 @@ void CCameraPcs::drawShadowChrBegin()
  */
 void CCameraPcs::drawShadowEnd()
 {
-    u8* self = reinterpret_cast<u8*>(this);
     Mtx44 proj;
     Mtx ident;
     float z;
@@ -620,7 +600,7 @@ void CCameraPcs::drawShadowEnd()
     GXInitTexObjLOD(&m_fullScreenShadow.m_texObjs[0], GX_NEAR, GX_NEAR, 0.0f,
                     0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 
-    CopyCameraState(CurrentCameraState(), m_savedCamera);
+    CurrentCameraState() = m_savedCamera;
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
     GraphicPcs.setViewport();
 }
@@ -636,7 +616,6 @@ void CCameraPcs::drawShadowEnd()
  */
 void CCameraPcs::drawShadowBegin()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     Mtx rotY;
     Mtx rotX;
     Mtx rotXY;
@@ -651,8 +630,8 @@ void CCameraPcs::drawShadowBegin()
 
     GXInvalidateTexAll();
 
-    CopyCameraState(m_savedCamera, CurrentCameraState());
-    CopyCameraState(m_shadowCamera, CurrentCameraState());
+    m_savedCamera = CurrentCameraState();
+    m_shadowCamera = CurrentCameraState();
 
     if (Game.m_currentSceneId == 3) {
         float stickX = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(1).stickXF;
@@ -755,7 +734,7 @@ void CCameraPcs::drawShadowBegin()
     g_shadow_refpos.y = m_shadowCamera.m_target.y;
     g_shadow_refpos.z = m_shadowCamera.m_target.z;
 
-    CopyCameraState(CurrentCameraState(), m_shadowCamera);
+    CurrentCameraState() = m_shadowCamera;
     GXSetProjection(m_screenMatrix, GX_ORTHOGRAPHIC);
     GXSetColorUpdate(GX_FALSE);
     GXSetCullMode(GX_CULL_BACK);
@@ -875,18 +854,14 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
  */
 void CCameraPcs::destroyFullShadow()
 {
-    u8* zero;
-
-    zero = 0;
     if (m_fullScreenShadow.m_shadowTexture != 0) {
         delete static_cast<u8*>(m_fullScreenShadow.m_shadowTexture);
-        m_fullScreenShadow.m_shadowTexture = zero;
+        m_fullScreenShadow.m_shadowTexture = 0;
     }
 
-    zero = 0;
     if (m_fullScreenShadow.m_rampTexture != 0) {
         delete m_fullScreenShadow.m_rampTexture;
-        m_fullScreenShadow.m_rampTexture = zero;
+        m_fullScreenShadow.m_rampTexture = 0;
     }
 }
 
@@ -1096,7 +1071,6 @@ void CCameraPcs::destroyMap()
  */
 void CCameraPcs::createMap()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     float fVar6;
     float fVar5;
     float fVar4;
@@ -1306,8 +1280,6 @@ static inline void sCameraSetMatColor(u8 r, u8 g, u8 b, u8 a)
 
 void CCameraPcs::draw()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
     if ((m_isAbsolute == 0) ||
         ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Camera) != 0)) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);

@@ -668,11 +668,6 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
  * JP Address: TODO
  * JP Size: TODO
  */
-struct YmManaWeaponFlagByte {
-    s8 m_pad : 7;
-    s8 m_lockFlag : 1;
-};
-
 void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (*)[4], int pass)
 {
     VYmMana* mana = static_cast<VYmMana*>(workPtr);
@@ -813,7 +808,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
             GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
-            if ((reinterpret_cast<YmManaWeaponFlagByte*>(&gObject->m_weaponNodeFlags)->m_lockFlag != 0 || gObject->m_attachOwner != NULL) &&
+            if ((gObject->m_weaponNodeFlagBits.m_attached != 0 || gObject->m_attachOwner != NULL) &&
                 gObject->m_attachOwner->m_charaModelHandle != NULL) {
                 CCharaPcs::CHandle* owner = gObject->m_attachOwner->m_charaModelHandle;
                 CChara::CModel* ownerModel = owner->m_model;
@@ -980,9 +975,9 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     {
         CTexture* envTex0 = mana->m_envTexture0;
         CTexture* envTex1 = mana->m_envTexture1;
-        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(envTex0) + 0x6c) = 0;
+        envTex0->m_wrapMode = GX_CLAMP;
         envTex0->InitTexObj();
-        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(envTex1) + 0x6c) = 0;
+        envTex1->m_wrapMode = GX_CLAMP;
         envTex1->InitTexObj();
     }
 
@@ -1021,7 +1016,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     dstTexObj = mana->m_baseParaboloidTexObjs;
     for (i = 0; i < 6; i++) {
         CTexture* srcTex = mana->m_sourceTextures[i];
-        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(srcTex) + 0x6c) = 0;
+        srcTex->m_wrapMode = GX_CLAMP;
         srcTex->InitTexObj();
         memcpy(dstTexObj, &srcTex->m_texObj, sizeof(GXTexObj));
         dstTexObj++;
@@ -1030,9 +1025,9 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     {
         CTexture* envTex0b = mana->m_envTexture0;
         CTexture* envTex1b = mana->m_envTexture1;
-        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(envTex0b) + 0x6c) = 0;
+        envTex0b->m_wrapMode = GX_CLAMP;
         envTex0b->InitTexObj();
-        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(envTex1b) + 0x6c) = 0;
+        envTex1b->m_wrapMode = GX_CLAMP;
         envTex1b->InitTexObj();
     }
 
@@ -1500,31 +1495,11 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
                 GXSetArray((GXAttr)0xB, mana->m_meshColors, 4);
                 GXSetArray((GXAttr)0xD, mana->m_meshTexCoords0, 4);
                 GXSetArray((GXAttr)0xE, mana->m_meshTexCoords1, 4);
-                u8* materialMan = reinterpret_cast<u8*>(&MaterialMan);
-                u32 tevBit = 0xACE0F;
-                Vec* reflVec = mana->m_meshReflectionVec;
-                *reinterpret_cast<u32*>(materialMan + 0x48) = tevBit;
-                *reinterpret_cast<u32*>(materialMan + 0x128) = 0;
-                *reinterpret_cast<u32*>(materialMan + 0x12C) = 0x1E;
-                *reinterpret_cast<u32*>(materialMan + 0x130) = 0;
-                *reinterpret_cast<Vec**>(materialMan + 0x8) = reflVec;
-                *reinterpret_cast<u32*>(materialMan + 0x44) = 0xFFFFFFFF;
-                *reinterpret_cast<u8*>(materialMan + 0x4C) = 0xFF;
-                *reinterpret_cast<u32*>(materialMan + 0x11C) = 0;
-                *reinterpret_cast<u32*>(materialMan + 0x120) = 0x1E;
-                *reinterpret_cast<u32*>(materialMan + 0x124) = 0;
-                *reinterpret_cast<u8*>(materialMan + 0x205) = 0xFF;
-                *reinterpret_cast<u8*>(materialMan + 0x206) = 0xFF;
-                *reinterpret_cast<u32*>(materialMan + 0x58) = 0;
-                *reinterpret_cast<u32*>(materialMan + 0x5C) = 0;
-                *reinterpret_cast<u8*>(materialMan + 0x208) = 0;
-                *reinterpret_cast<u32*>(materialMan + 0x48) = tevBit | 0x2000;
-                *reinterpret_cast<u32*>(materialMan + 0x128) = 0;
-                *reinterpret_cast<u32*>(materialMan + 0x12C) = 0x1E;
-                *reinterpret_cast<u32*>(materialMan + 0x130) = 0;
-                *reinterpret_cast<u32*>(materialMan + 0x40) = tevBit | 0x2000;
-                *reinterpret_cast<_GXTexObj**>(materialMan + 0xD0) = mana->m_generatedTexObj0;
-                *reinterpret_cast<_GXTexObj**>(materialMan + 0xDC) = mana->m_generatedTexObj1;
+                MaterialMan.SetManaReflectionVec(mana->m_meshReflectionVec);
+                MaterialMan.InitEnv();
+                MaterialMan.SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x2000));
+                MaterialMan.LockEnv();
+                MaterialMan.SetManaParaboloidTexObjs(mana->m_generatedTexObj0, mana->m_generatedTexObj1);
                 GXSetCullMode((GXCullMode)1);
                 GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
                 MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);

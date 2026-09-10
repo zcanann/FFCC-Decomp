@@ -153,6 +153,15 @@ public:
     void ErrorTexMtxCur();
     void ErrorTexMapIdCur();
     CMemory::CStage* GetMemoryStage();
+    void SetManaReflectionVec(Vec* reflectionVec)
+    {
+        m_manaReflectionVec = reflectionVec;
+    }
+    void SetManaParaboloidTexObjs(_GXTexObj* texObj0, _GXTexObj* texObj1)
+    {
+        m_manaParaboloidTexObj0 = texObj0;
+        m_manaParaboloidTexObj1 = texObj1;
+    }
     void ClearManaParaboloidTexObjs()
     {
         m_manaParaboloidTexObj0 = 0;

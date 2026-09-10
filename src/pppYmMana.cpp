@@ -44,6 +44,12 @@ STATIC_ASSERT(offsetof(pppYmManaStep, m_rippleLevel) == 0x34);
 STATIC_ASSERT(offsetof(pppYmManaStep, m_map21Flag) == 0x38);
 STATIC_ASSERT(offsetof(pppYmManaStep, m_baseColor) == 0x3C);
 
+static void SetEnvMap(PYmMana*, VYmMana*);
+static void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int);
+static void Chara_DrawShadowMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+static void Mana_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+static void Mana_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
+
 static inline YmManaDataOffsets* GetYmManaDataOffsets(_pppCtrlTable* ctrl)
 {
     return reinterpret_cast<YmManaDataOffsets*>(ctrl->m_serializedDataOffsets);
@@ -63,11 +69,6 @@ static inline void SetManaModelCallbacks(CChara::CModel* model, void* work, pppY
     model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
 }
 
-void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4]);
-void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int);
-void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYmMana, int meshIndex, int dlIndex, float (*) [4]);
-void SetEnvMap(PYmMana*, VYmMana* vYmMana);
-
 /*
  * --INFO--
  * PAL Address: 0x800d4c7c
@@ -77,7 +78,7 @@ void SetEnvMap(PYmMana*, VYmMana* vYmMana);
  * JP Address: TODO
  * JP Size: TODO
  */
-void CalcReflectionVector2(
+static void CalcReflectionVector2(
     Vec* reflectionVec,
     S16Vec* positions,
     S16Vec* normals,
@@ -668,7 +669,7 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
  * JP Address: TODO
  * JP Size: TODO
  */
-void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (*)[4], int pass)
+static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (*)[4], int pass)
 {
     VYmMana* mana = static_cast<VYmMana*>(workPtr);
     pppYmManaStep* stepData = static_cast<pppYmManaStep*>(step);
@@ -1422,7 +1423,7 @@ void pppConstructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
+static void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
     CChara::CMesh::CRefData* mesh = model->m_meshes[partIndex].m_data;
     VYmMana* mana = static_cast<VYmMana*>(work);
@@ -1558,7 +1559,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
  * JP Address: TODO
  * JP Size: TODO
  */
-void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYmMana, int meshIndex, int dlIndex, float (*) [4])
+static void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYmMana, int meshIndex, int dlIndex, float (*) [4])
 {
     VYmMana* mana = static_cast<VYmMana*>(work);
     VYmMana* sourceMana = static_cast<VYmMana*>(vYmMana);
@@ -1596,7 +1597,7 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
  * JP Address: TODO
  * JP Size: TODO
  */
-void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int)
+static void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
 	GXSetZMode((GXBool)0, (GXCompare)3, (GXBool)0);
 }
@@ -1610,7 +1611,7 @@ void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void SetEnvMap(PYmMana*, VYmMana* vYmMana)
+static void SetEnvMap(PYmMana*, VYmMana* vYmMana)
 {
     GXSetNumChans(1);
     GXSetChanCtrl((GXChannelID)4, (GXBool)0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);

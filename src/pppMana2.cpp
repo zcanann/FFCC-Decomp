@@ -46,6 +46,9 @@ STATIC_ASSERT(sizeof(Mana2DataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(Mana2DataOffsets, m_setupOffset) == 0x4);
 STATIC_ASSERT(offsetof(Mana2DataOffsets, m_workOffset) == 0x8);
 
+static void Mana2_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+static void Mana2_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
+
 static inline float CameraWorldX()
 {
     return CameraPcs.m_positionX;
@@ -572,7 +575,7 @@ void MakeWave(Vec*, unsigned short*, float*, Vec, float, float)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CalcReflectionVector2(
+static void CalcReflectionVector2(
     Vec* reflectionVec,
     S16Vec* positions,
     S16Vec* normals,
@@ -781,7 +784,7 @@ void CalcReflectionVector2(
  * JP Address: TODO
  * JP Size: TODO
  */
-void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, float (*) [4], int)
+static void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, float (*) [4], int)
 {
     VMana2* work;
     CChara::CModel* model;
@@ -1467,7 +1470,7 @@ void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
+static void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
     CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
     VMana2* mana2 = (VMana2*)work;

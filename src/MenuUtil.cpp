@@ -55,14 +55,6 @@ extern "C" const char s_MenuOptionApagadoEs[] = "Apagado";
 extern "C" const char s_MenuOptionEstereoEs[8] = "Est\351reo";
 extern "C" const char s_MenuOptionMinEs[8] = "M\355n.";
 extern "C" const char s_MenuOptionMaxEs[8] = "M\341x.";
-extern const char sMenuUtilEmptyText[4] = "";
-extern const char sMenuUtilStringFormat[] = "%s";
-extern const char sMenuUtilPlusOneText[] = "+1";
-extern const char sMenuUtilSignedValueFormat[] = "%c%d";
-extern const char sMenuUtilSpaceText[] = " ";
-extern const char sMenuUtilValueSuffixFormat[] = " %d";
-extern const char sMenuUtilSignedDeltaFormat[] = " %+d";
-extern const char sMenuUtilAttrBonusFormat[] = " %s";
 static const char s_Strength[] = "Strength:";
 static const char s_Defence[] = "Defence:";
 static const char s_Position_Markers[] = "Position Markers";
@@ -192,9 +184,6 @@ char* g_strMenuUtilMes[] = {
 	const_cast<char*>(s_MenuOptionApagadoEs), const_cast<char*>(s_MenuOptionEstereoEs), const_cast<char*>(s_Monoaural), const_cast<char*>(s_MenuOptionMinEs), const_cast<char*>(s_MenuOptionMaxEs),
 	const_cast<char*>(s_Mejorado), const_cast<char*>(s_MenuOptionEstandarEs),
 };
-
-#define PTR_s_Strength__80215a48 g_strMenuUtilMes
-#define PTR_s_Defence__80215a4c (g_strMenuUtilMes + 1)
 
 namespace {
 static inline char** GetMenuHelpMsgTable()
@@ -1319,7 +1308,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		} else if (msgNo == 0x211) {
 			suffix = GetSkillStr(2);
 		} else {
-			suffix = sMenuUtilEmptyText;
+			suffix = "";
 		}
 
 		if ((msgNo == 0x209) || (msgNo == 0x20D) || (msgNo == 0x211)) {
@@ -1371,17 +1360,17 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	const SItemFlatRow* item = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2]) + msgNo;
 	u16 flags = item->m_equipFlags;
 	if ((flags & 0x100) != 0) {
-		strcpy(scratch, PTR_s_Strength__80215a48[languageIndex * 20]);
+		strcpy(scratch, g_strMenuUtilMes[languageIndex * 20]);
 	} else if ((flags & 0x200) != 0) {
-		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
+		strcpy(scratch, g_strMenuUtilMes[languageIndex * 20 + 1]);
 	} else if ((flags & 0x400) != 0) {
-		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
+		strcpy(scratch, g_strMenuUtilMes[languageIndex * 20 + 1]);
 	} else if ((flags & 0x800) != 0) {
-		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
+		strcpy(scratch, g_strMenuUtilMes[languageIndex * 20 + 1]);
 	} else if ((flags & 0x1000) != 0) {
-		strcpy(scratch, sMenuUtilEmptyText);
+		strcpy(scratch, "");
 	} else if ((flags & 0x2000) != 0) {
-		strcpy(scratch, sMenuUtilEmptyText);
+		strcpy(scratch, "");
 	}
 
 	int x = 0x38;
@@ -1403,11 +1392,11 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 					unsigned int attr = item->m_attribute;
 					if ((attr >= 1) && (attr <= 8)) {
-						sprintf(scratch, sMenuUtilStringFormat, sMenuUtilPlusOneText);
+						sprintf(scratch, "%s", "+1");
 					} else if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
-						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2B, item->m_value);
+						sprintf(scratch, "%c%d", 0x2B, item->m_value);
 					} else if ((static_cast<unsigned short>(attr - 9) <= 1) || (attr == 0xC)) {
-						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2D, item->m_value);
+						sprintf(scratch, "%c%d", 0x2D, item->m_value);
 						font->SetTlut(3);
 					} else {
 						return;
@@ -1417,13 +1406,13 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				}
 			}
 		} else {
-			strcat(scratch, sMenuUtilSpaceText);
+			strcat(scratch, " ");
 			font->Draw(scratch);
 
 			x = static_cast<int>(static_cast<float>(x) + (2.0f + font->GetWidth(scratch)));
 			font->SetTlut(1);
 			font->SetPosX(static_cast<float>(x));
-			sprintf(scratch, sMenuUtilValueSuffixFormat, item->m_value);
+			sprintf(scratch, " %d", item->m_value);
 			font->Draw(scratch);
 
 			if (m_battleStateFlag == 2) {
@@ -1467,7 +1456,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 							} else {
 								font->SetTlut(3);
 							}
-							sprintf(scratch, sMenuUtilSignedDeltaFormat, delta);
+							sprintf(scratch, " %+d", delta);
 							if (delta != 0) {
 								font->Draw(scratch);
 							}
@@ -1477,7 +1466,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			}
 
 			float attrPosX = font->posX;
-			int attrX = static_cast<int>(attrPosX + font->GetWidth(sMenuUtilSpaceText));
+			int attrX = static_cast<int>(attrPosX + font->GetWidth(" "));
 			font->SetPosX(static_cast<float>(attrX));
 
 			if ((item->m_equipFlags & 0x1000) == 0) {
@@ -1488,7 +1477,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					font->SetTlut(9);
 					unsigned int attr = item->m_attribute;
 					if ((attr >= 1) && (attr <= 8)) {
-						sprintf(scratch, sMenuUtilAttrBonusFormat, sMenuUtilPlusOneText);
+						sprintf(scratch, " %s", "+1");
 					} else {
 						return;
 					}

@@ -594,12 +594,8 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     int indexOffset;
     int quadIndex;
     int rowBase;
-    float* positions;
-    float* normals;
-    float* uvs;
     int colCount;
     int rowCount;
-    int pairCount;
 
     normalY = 1.0f;
     zero = 0.0f;
@@ -609,24 +605,18 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     step = size * uvStep;
     for (z = radius; z >= -radius; z -= step) {
         colCount = 0;
-        positions = reinterpret_cast<float*>(positionsInOut);
-        normals = reinterpret_cast<float*>(normalsOut);
-        uvs = reinterpret_cast<float*>(uvOut);
         for (x = -radius; x <= radius; x += step) {
-            *positions = x;
-            positionsInOut = reinterpret_cast<Vec*>(positions + 3);
-            positions[1] = zero;
-            normalsOut = reinterpret_cast<Vec*>(normals + 3);
-            uvOut = reinterpret_cast<Vec2d*>(uvs + 2);
-            positions[2] = z;
-            positions = positions + 3;
-            *normals = zero;
-            normals[1] = normalY;
-            normals[2] = zero;
-            normals = normals + 3;
-            *uvs = static_cast<float>(colCount) * uvStep;
-            uvs[1] = static_cast<float>(rowCount) * uvStep;
-            uvs = uvs + 2;
+            positionsInOut->x = x;
+            positionsInOut->y = zero;
+            positionsInOut->z = z;
+            positionsInOut++;
+            normalsOut->x = zero;
+            normalsOut->y = normalY;
+            normalsOut->z = zero;
+            normalsOut++;
+            uvOut->x = static_cast<float>(colCount) * uvStep;
+            uvOut->y = static_cast<float>(rowCount) * uvStep;
+            uvOut++;
             colCount = colCount + 1;
         }
         rowCount = rowCount + 1;
@@ -636,23 +626,13 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     rowBase = 0;
     do {
         quadIndex = rowBase;
-        for (pairCount = 0; pairCount < 8; pairCount++) {
-            int nextIndex = quadIndex + 1;
-            int lowerIndex = quadIndex + 0x11;
-            int lowerNextIndex = quadIndex + 0x12;
-
-            indicesOut[indexOffset++] = quadIndex;
-            indicesOut[indexOffset++] = nextIndex;
-            indicesOut[indexOffset++] = lowerNextIndex;
-            indicesOut[indexOffset++] = lowerNextIndex;
-            indicesOut[indexOffset++] = lowerIndex;
-            indicesOut[indexOffset++] = quadIndex++;
+        for (int col = 0; col < 16; col++, quadIndex++) {
             indicesOut[indexOffset++] = quadIndex;
             indicesOut[indexOffset++] = quadIndex + 1;
-            indicesOut[indexOffset++] = quadIndex + 0x12;
-            indicesOut[indexOffset++] = quadIndex + 0x12;
-            indicesOut[indexOffset++] = quadIndex + 0x11;
-            indicesOut[indexOffset++] = quadIndex++;
+            indicesOut[indexOffset++] = quadIndex + 18;
+            indicesOut[indexOffset++] = quadIndex + 18;
+            indicesOut[indexOffset++] = quadIndex + 17;
+            indicesOut[indexOffset++] = quadIndex;
         }
         rowCount = rowCount + 1;
         rowBase = rowBase + 0x11;

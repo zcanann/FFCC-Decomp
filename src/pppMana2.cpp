@@ -499,10 +499,7 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     int indexOffset;
     int quadIndex;
     int rowBase;
-    Vec* positions;
     int rowCount;
-    Vec* normals;
-    Vec2d* uvs;
     int colCount;
 
     normalY = 1.0f;
@@ -513,24 +510,18 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     step = param_5 * uvStep;
     for (z = radius; z >= -radius; z -= step) {
         colCount = 0;
-        positions = param_1;
-        normals = param_2;
-        uvs = param_3;
         for (x = -radius; x <= radius; x += step) {
-            positions->x = x;
-            param_1 = positions + 1;
-            positions->y = zero;
-            param_2 = normals + 1;
-            param_3 = uvs + 1;
-            positions->z = z;
-            positions++;
-            normals->x = zero;
-            normals->y = normalY;
-            normals->z = zero;
-            normals++;
-            uvs->x = static_cast<float>(colCount) * uvStep;
-            uvs->y = static_cast<float>(rowCount) * uvStep;
-            uvs++;
+            param_1->x = x;
+            param_1->y = zero;
+            param_1->z = z;
+            param_1++;
+            param_2->x = zero;
+            param_2->y = normalY;
+            param_2->z = zero;
+            param_2++;
+            param_3->x = static_cast<float>(colCount) * uvStep;
+            param_3->y = static_cast<float>(rowCount) * uvStep;
+            param_3++;
             colCount = colCount + 1;
         }
         rowCount = rowCount + 1;

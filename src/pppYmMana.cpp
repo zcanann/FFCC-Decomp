@@ -15,33 +15,14 @@
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
 
-
-
-extern const float kPppYmMoveParabolaNegHalfPi = -1.5707964f;
-extern const float kPppYmMoveParabolaZero = 0.0f;
 extern const char s_ymManaRuin2Name[] = "ruin_2";
-extern const float kYmManaOne = 1.0f;
-static const float kYmManaReflectionDenomBias = 1.0f;
-extern const float kYmManaHalf = 0.5f;
 
-extern const float kYmManaReflectionUvWarp = 2.0f;
-extern const float kYmManaReflectionUvWarpScale = 0.015625f;
-extern const float kYmManaNegOne = -1.0f;
-extern const float kYmManaWaterUvStep = 0.0625f;
-extern const double kYmManaS32FloatBias = 4503601774854144.0;
-extern const float kYmManaCaptureHeightOffset = 5.0f;
-extern const float kYmManaCaptureFovY = 90.0f;
-extern const float kYmManaCaptureFarClip = 100000.0f;
-extern const float kYmManaCaptureTextureSize = 128.0f;
 static const char s_ymManaShapeObj5[] = "obj5";
 static const char s_ymManaShapeObj3[] = "obj3";
 static const char s_ymManaShapeObj1[] = "obj1";
 static const char s_ymManaShapeObj4[] = "obj4";
 static const char s_ymManaShapeObj2[] = "obj2";
-extern const double kYmManaU32FloatBias = 4503599627370496.0;
-extern const float kYmManaSlopeLimit = 0.99999f;
 static const char s_ymManaShapeObj[] = "obj";
-extern const float kYmManaLookAtAlphaScale[2] = {255.0f, 0.0f};
 
 static inline float CameraWorldX()
 {
@@ -104,11 +85,6 @@ static inline YmManaDataOffsets* GetYmManaDataOffsets(_pppCtrlTable* ctrl)
     return reinterpret_cast<YmManaDataOffsets*>(ctrl->m_serializedDataOffsets);
 }
 
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
-
 static inline void ClearManaModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
@@ -169,11 +145,11 @@ void CalcReflectionVector2(
     Mtx nodeOffsetMtx;
     Mtx workMtx;
     u16* dl = (u16*)displayList;
-    const float zero = kPppYmMoveParabolaZero;
-    const float denomBias = kYmManaOne;
-    const float half = kYmManaHalf;
-    const float warp = kYmManaReflectionUvWarp;
-    const float scale = kYmManaReflectionUvWarpScale;
+    const float zero = 0.0f;
+    const float denomBias = 1.0f;
+    const float half = 0.5f;
+    const float warp = 2.0f;
+    const float scale = 0.015625f;
 
     cameraPos.x = CameraWorldX();
     cameraPos.y = CameraWorldY();
@@ -193,15 +169,15 @@ void CalcReflectionVector2(
     PSVECAdd(&nodePos, &matrixPos, &worldPos);
 
     PSMTXCopy(workMtx, nodeRotMtx);
-    PSMTXRotRad(rotateMtx, 'y', LoadFloat(kPppYmMoveParabolaNegHalfPi));
+    PSMTXRotRad(rotateMtx, 'y', -1.5707964f);
     nodeRotMtx[0][3] = worldPos.x;
     nodeRotMtx[1][3] = worldPos.y;
     nodeRotMtx[2][3] = worldPos.z;
 
     PSMTXCopy(nodeRotMtx, normalMtx);
-    normalMtx[0][3] = kPppYmMoveParabolaZero;
-    normalMtx[1][3] = kPppYmMoveParabolaZero;
-    normalMtx[2][3] = kPppYmMoveParabolaZero;
+    normalMtx[0][3] = 0.0f;
+    normalMtx[1][3] = 0.0f;
+    normalMtx[2][3] = 0.0f;
 
     u16* dlEnd = (u16*)((u8*)displayList + displayListSize);
     while (dl < dlEnd) {
@@ -314,9 +290,9 @@ static void CalcWaterReflectionVector(
         cameraPos.z = CameraWorldZ();
     }
 
-    transformedCameraPos.x = LoadFloat(kPppYmMoveParabolaZero);
-    transformedCameraPos.y = LoadFloat(kPppYmMoveParabolaZero);
-    transformedCameraPos.z = LoadFloat(kPppYmMoveParabolaZero);
+    transformedCameraPos.x = 0.0f;
+    transformedCameraPos.y = 0.0f;
+    transformedCameraPos.z = 0.0f;
 
     PSMTXCopy(matrix, matrixNoTranslate);
     objPos.x = matrixNoTranslate[0][3];
@@ -328,7 +304,7 @@ static void CalcWaterReflectionVector(
     PSMTXInverse(matrixNoTranslate, inverseMtx);
 
     PSVECSubtract(&objPos, &cameraPos, &cameraPos);
-    PSVECScale(&cameraPos, &cameraPos, LoadFloat(kYmManaNegOne));
+    PSVECScale(&cameraPos, &cameraPos, -1.0f);
     PSMTXMultVec(inverseMtx, &cameraPos, &transformedCameraPos);
 
     positionIt = positions;
@@ -336,8 +312,8 @@ static void CalcWaterReflectionVector(
     normalIt = normals;
     colorBytes = (unsigned char*)color;
     texCoordFloat = (float*)texCoord;
-    zero = LoadFloat(kPppYmMoveParabolaZero);
-    half = LoadFloat(kYmManaHalf);
+    zero = 0.0f;
+    half = 0.5f;
 
     for (i = 0; i < count;) {
         PSVECSubtract(positionIt, &transformedCameraPos, &reflected);
@@ -351,7 +327,7 @@ static void CalcWaterReflectionVector(
             colorBytes[1] = 0x80;
             colorBytes[2] = 0xff;
             colorBytes[3] = 0xbc;
-            denomBase = LoadFloat(kYmManaOne);
+            denomBase = 1.0f;
             *texCoordFloat = -reflectionIt->x / (denomBase + reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (denomBase + reflectionIt->z);
         } else {
@@ -361,7 +337,7 @@ static void CalcWaterReflectionVector(
             colorBytes[1] = 0xff;
             colorBytes[2] = 0x80;
             colorBytes[3] = 0x7f;
-            denomBase = LoadFloat(kYmManaOne);
+            denomBase = 1.0f;
             *texCoordFloat = -reflectionIt->x / (denomBase - reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (denomBase - reflectionIt->z);
         }
@@ -405,7 +381,7 @@ static void CalculateNormal(VYmMana* mana)
     normals = mana->m_normals;
     indices = mana->m_indices;
 
-    float zero = kPppYmMoveParabolaZero;
+    float zero = 0.0f;
     for (i = 0; i < 0x121; i++) {
         normals[i].z = zero;
         normals[i].y = zero;
@@ -602,8 +578,8 @@ static int UpdateWaterMesh(VYmMana* mana)
     }
 
     for (int row = 1; row < 0x10; row++) {
-        currentScale = kPppYmMoveParabolaZero;
-        neighborScale = kYmManaHalf;
+        currentScale = 0.0f;
+        neighborScale = 0.5f;
         for (int col = 1; col < 0x10; col++) {
             int index = row * 0x11 + col;
             float* center = &waterHeightA[index];
@@ -660,11 +636,11 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     int rowCount;
     int pairCount;
 
-    normalY = LoadFloat(kYmManaOne);
-    zero = LoadFloat(kPppYmMoveParabolaZero);
+    normalY = 1.0f;
+    zero = 0.0f;
     rowCount = 0;
-    uvStep = LoadFloat(kYmManaWaterUvStep);
-    radius = size * LoadFloat(kYmManaHalf);
+    uvStep = 0.0625f;
+    radius = size * 0.5f;
     step = size * uvStep;
     for (z = radius; z >= -radius; z -= step) {
         colCount = 0;
@@ -777,7 +753,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     PSMTXIdentity(identityMtx);
     PSMTXCopy(CameraMatrix(), savedCameraMtx);
     PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
-    int zeroInt = (int)LoadFloat(kPppYmMoveParabolaZero);
+    int zeroInt = 0;
     Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, zeroInt,
                                zeroInt, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
@@ -790,44 +766,44 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     model = GetCharaModelPtr(handle);
 
     if ((int)Game.m_currentSceneId == 7) {
-        centerPos.z = LoadFloat(kPppYmMoveParabolaZero);
-        centerPos.y = LoadFloat(kPppYmMoveParabolaZero);
-        centerPos.x = LoadFloat(kPppYmMoveParabolaZero);
+        centerPos.z = 0.0f;
+        centerPos.y = 0.0f;
+        centerPos.x = 0.0f;
     } else {
         centerPos = gObject->m_worldPosition;
     }
-    centerPos.y += LoadFloat(kYmManaCaptureHeightOffset);
+    centerPos.y += 5.0f;
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
     texBufferStride = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB565, GX_FALSE, 0);
     captureTexObjs = mana->m_captureTexObjs;
 
     if (stepData->m_map21Flag != 0) {
-        C_MTXPerspective(projectionMtx, LoadFloat(kYmManaCaptureFovY), LoadFloat(kYmManaOne), LoadFloat(kYmManaOne),
-                         LoadFloat(kYmManaCaptureFarClip));
+        C_MTXPerspective(projectionMtx, 90.0f, 1.0f, 1.0f,
+                         100000.0f);
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
         GXTexObj* sourceIter = sourceTexObjs;
         char* compareName = Game.m_currentScriptName;
         GXTexObj* captureIter = captureTexObjs;
         i = 0;
-        u32 scissorZero = (u32)LoadFloat(kPppYmMoveParabolaZero);
+        u32 scissorZero = 0;
 
         for (; i < 6; i++) {
             cameraPos = centerPos;
-            cameraUp.x = LoadFloat(kPppYmMoveParabolaZero);
-            cameraUp.y = LoadFloat(kYmManaOne);
-            cameraUp.z = LoadFloat(kPppYmMoveParabolaZero);
+            cameraUp.x = 0.0f;
+            cameraUp.y = 1.0f;
+            cameraUp.z = 0.0f;
 
             s32 nameCompare = strcmp(s_ymManaRuin2Name, compareName);
             if (nameCompare == 0) {
                 if (i == 0) {
-                    cameraPos.z -= LoadFloat(kYmManaOne);
+                    cameraPos.z -= 1.0f;
                 } else if (i == 1) {
-                    cameraPos.x += LoadFloat(kYmManaOne);
+                    cameraPos.x += 1.0f;
                 } else if (i == 2) {
-                    cameraPos.z += LoadFloat(kYmManaOne);
+                    cameraPos.z += 1.0f;
                 } else if (i == 3) {
-                    cameraPos.x -= LoadFloat(kYmManaOne);
+                    cameraPos.x -= 1.0f;
                 }
                 if (i == 4 || i == 5) {
                     goto runCaptureSwitch;
@@ -836,28 +812,28 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             runCaptureSwitch:
                 switch (i) {
                 case 0:
-                    cameraPos.x += LoadFloat(kYmManaOne);
+                    cameraPos.x += 1.0f;
                     break;
                 case 1:
-                    cameraPos.z += LoadFloat(kYmManaOne);
+                    cameraPos.z += 1.0f;
                     break;
                 case 2:
-                    cameraPos.x -= LoadFloat(kYmManaOne);
+                    cameraPos.x -= 1.0f;
                     break;
                 case 3:
-                    cameraPos.z -= LoadFloat(kYmManaOne);
+                    cameraPos.z -= 1.0f;
                     break;
                 case 4:
-                    cameraPos.y += LoadFloat(kYmManaOne);
-                    cameraUp.x = LoadFloat(kPppYmMoveParabolaZero);
-                    cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
-                    cameraUp.z = LoadFloat(kYmManaNegOne);
+                    cameraPos.y += 1.0f;
+                    cameraUp.x = 0.0f;
+                    cameraUp.y = 0.0f;
+                    cameraUp.z = -1.0f;
                     break;
                 case 5:
-                    cameraPos.y -= LoadFloat(kYmManaOne);
-                    cameraUp.z = LoadFloat(kYmManaOne);
-                    cameraUp.x = LoadFloat(kPppYmMoveParabolaZero);
-                    cameraUp.y = LoadFloat(kPppYmMoveParabolaZero);
+                    cameraPos.y -= 1.0f;
+                    cameraUp.z = 1.0f;
+                    cameraUp.x = 0.0f;
+                    cameraUp.y = 0.0f;
                     break;
                 }
             }
@@ -865,10 +841,10 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(scissorZero, scissorZero, 0x80, 0x80);
-            gUtil.RenderTextureQuad(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize,
+            gUtil.RenderTextureQuad(0.0f, 0.0f, 128.0f, 128.0f,
                                     sourceIter, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
 
-            GXSetViewport(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize, kPppYmMoveParabolaZero, kYmManaOne);
+            GXSetViewport(0.0f, 0.0f, 128.0f, 128.0f, 0.0f, 1.0f);
             GXSetScissor(scissorZero, scissorZero, 0x80, 0x80);
             PSMTXCopy(lookAtMtx, CameraMatrix());
             GXSetProjection(projectionMtx, (_GXProjectionType)0);
@@ -909,12 +885,12 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     targetTexObj = mana->m_envTexture0;
     if (stepData->m_map21Flag != 0) {
         GXInitTexObj(mana->m_generatedTexObj0, mana->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(mana->m_generatedTexObj0, GX_LINEAR, GX_LINEAR, LoadFloat(kPppYmMoveParabolaZero),
-                        LoadFloat(kPppYmMoveParabolaZero), LoadFloat(kPppYmMoveParabolaZero), GX_FALSE, GX_FALSE,
+        GXInitTexObjLOD(mana->m_generatedTexObj0, GX_LINEAR, GX_LINEAR, 0.0f,
+                        0.0f, 0.0f, GX_FALSE, GX_FALSE,
                         GX_ANISO_1);
         GXInitTexObj(mana->m_generatedTexObj1, mana->m_generatedTexture1, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(mana->m_generatedTexObj1, GX_LINEAR, GX_LINEAR, LoadFloat(kPppYmMoveParabolaZero),
-                        LoadFloat(kPppYmMoveParabolaZero), LoadFloat(kPppYmMoveParabolaZero), GX_FALSE, GX_FALSE,
+        GXInitTexObjLOD(mana->m_generatedTexObj1, GX_LINEAR, GX_LINEAR, 0.0f,
+                        0.0f, 0.0f, GX_FALSE, GX_FALSE,
                         GX_ANISO_1);
         drawParaboloidMap(captureTexObjs, mana->m_generatedTexObj1, mana->m_paraboloidMap, mana->m_paraboloidMapSize,
                           &targetTexObj->m_texObj, 1);
@@ -923,7 +899,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
         PSMTXCopy(savedCameraMtx, CameraMatrix());
-        gUtil.RenderTextureQuad(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize, &sceneTexObj,
+        gUtil.RenderTextureQuad(0.0f, 0.0f, 128.0f, 128.0f, &sceneTexObj,
                                 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
     } else {
         if (mana->m_paraboloidReady == 0) {
@@ -933,7 +909,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                               mana->m_paraboloidMapSize, &targetTexObj->m_texObj, 1);
             drawParaboloidMap(sourceTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap,
                               mana->m_paraboloidMapSize, &targetTexObj->m_texObj, 0);
-            gUtil.RenderTextureQuad(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize, &sceneTexObj,
+            gUtil.RenderTextureQuad(0.0f, 0.0f, 128.0f, 128.0f, &sceneTexObj,
                                     0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
             mana->m_paraboloidReady = 1;
         }
@@ -1114,7 +1090,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
                         pppMemAlloc(meshShape->m_vertexCount * sizeof(Vec), ppvEnv->m_stagePtr,
                                     const_cast<char*>(s_pppYmMana_cpp), 1000));
                     Vec* reflectionVec = mana->m_meshReflectionVec;
-                    float zero = kPppYmMoveParabolaZero;
+                    float zero = 0.0f;
                     for (vertexIndex = 0; vertexIndex < meshShape->m_vertexCount; vertexIndex++) {
                         reflectionVec->z = zero;
                         reflectionVec->y = zero;
@@ -1191,7 +1167,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
                     static_cast<GXColor*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42F));
                 float* waterHeightA = mana->m_waterHeightA;
                 float* waterHeightB = mana->m_waterHeightB;
-                float zero = kPppYmMoveParabolaZero;
+                float zero = 0.0f;
                 for (vertexIndex = 0; vertexIndex < 0x121; vertexIndex++) {
                     waterHeightA[vertexIndex] = zero;
                     waterHeightB[vertexIndex] = zero;
@@ -1393,7 +1369,6 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
     }
 }
 
-
 /*
  * --INFO--
  * PAL Address: 0x800d7864
@@ -1413,11 +1388,11 @@ void pppConstructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
     CChara::CModel* model;
 
     if ((s32)Game.m_currentSceneId == 7) {
-        gObject->m_currentAlpha = kYmManaOne;
+        gObject->m_currentAlpha = 1.0f;
     }
 
     if (Game.m_currentMapId != 0x21) {
-        gObject->m_alphaTarget = LoadFloat(kYmManaSlopeLimit);
+        gObject->m_alphaTarget = 0.99999f;
     }
 
     handle = GetCharaHandlePtr(gObject, 0);
@@ -1533,8 +1508,8 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
         PSMTXCopy(mtx, mana->m_waterMtx);
         GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
         GXSetCullMode(GX_CULL_NONE);
-        PSMTXRotRad(rotXMtx, 'x', LoadFloat(kPppYmMoveParabolaNegHalfPi));
-        PSMTXRotRad(rotZMtx, 'z', LoadFloat(kPppYmMoveParabolaNegHalfPi));
+        PSMTXRotRad(rotXMtx, 'x', -1.5707964f);
+        PSMTXRotRad(rotZMtx, 'z', -1.5707964f);
         PSMTXIdentity(offsetMtx);
         offsetMtx[1][3] = -stepData->m_waterOffset;
         PSMTXConcat(rotZMtx, offsetMtx, offsetMtx);
@@ -1605,7 +1580,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     }
 
     if (Game.m_currentMapId == 0x21) {
-        float alphaScale = kYmManaLookAtAlphaScale[0] * object->m_currentAlpha;
+        float alphaScale = 255.0f * object->m_currentAlpha;
         int alpha = (int)alphaScale;
         mana->m_baseColor.r = 0xFF;
         mana->m_baseColor.g = 0xFF;

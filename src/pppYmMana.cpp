@@ -601,64 +601,18 @@ static int UpdateWaterMesh(VYmMana* mana)
         return 0;
     }
 
-    int row = 1;
-    int rowBase = 0x11;
-    do {
+    for (int row = 1; row < 0x10; row++) {
         currentScale = kPppYmMoveParabolaZero;
         neighborScale = kYmManaHalf;
-        unsigned int col = 1;
-        unsigned int index = rowBase + 1;
-        while (col < 0x10) {
-            int above0 = index - 0x11;
-            int below0 = index + 0x11;
-            float* center0 = &waterHeightA[index];
-
-            waterHeightB[index] = currentScale * center0[0] +
-                                  neighborScale * (waterHeightA[above0] + waterHeightA[below0] +
-                                                   center0[-1] + center0[1]) -
+        for (int col = 1; col < 0x10; col++) {
+            int index = row * 0x11 + col;
+            float* center = &waterHeightA[index];
+            waterHeightB[index] = currentScale * center[0] +
+                                  neighborScale * (waterHeightA[index - 0x11] + waterHeightA[index + 0x11] +
+                                                   center[-1] + center[1]) -
                                   waterHeightB[index];
-
-            int index1 = col + rowBase + 1;
-            int above1 = col + rowBase + 1 - 0x11;
-            int below1 = col + rowBase + 1 + 0x11;
-            float* center1 = &waterHeightA[index1];
-            waterHeightB[index1] = currentScale * center1[0] +
-                                   neighborScale * (waterHeightA[above1] + waterHeightA[below1] +
-                                                    center1[-1] + center1[1]) -
-                                   waterHeightB[index1];
-
-            int index2 = col + rowBase + 2;
-            int above2 = col + rowBase + 2 - 0x11;
-            int below2 = col + rowBase + 2 + 0x11;
-            float* center2 = &waterHeightA[index2];
-            waterHeightB[index2] = currentScale * center2[0] +
-                                   neighborScale * (waterHeightA[above2] + waterHeightA[below2] +
-                                                    center2[-1] + center2[1]) -
-                                   waterHeightB[index2];
-
-            int index3 = col + rowBase + 3;
-            int above3 = col + rowBase + 3 - 0x11;
-            int below3 = col + rowBase + 3 + 0x11;
-            float* center3 = &waterHeightA[index3];
-            waterHeightB[index3] = currentScale * center3[0] +
-                                   neighborScale * (waterHeightA[above3] + waterHeightA[below3] +
-                                                    center3[-1] + center3[1]) -
-                                   waterHeightB[index3];
-
-            unsigned int index4 = index + 4;
-            int above4 = index4 - 0x11;
-            int below4 = index4 + 0x11;
-            float* center4 = &waterHeightA[index4];
-            waterHeightB[index4] = currentScale * center4[0] +
-                                   neighborScale * (waterHeightA[above4] + waterHeightA[below4] +
-                                                    center4[-1] + center4[1]) -
-                                   waterHeightB[index4];
-            col += 5;
-            index += 5;
         }
-        row++;
-        rowBase += 0x11;
-    } while (row < 0x10);
+    }
 
     for (int i = 0; i < 0x121; i++) {
         float tmp = waterHeightA[i];

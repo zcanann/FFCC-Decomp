@@ -55,65 +55,6 @@ extern "C" const char s_MenuOptionApagadoEs[] = "Apagado";
 extern "C" const char s_MenuOptionEstereoEs[8] = "Est\351reo";
 extern "C" const char s_MenuOptionMinEs[8] = "M\355n.";
 extern "C" const char s_MenuOptionMaxEs[8] = "M\341x.";
-// .sdata2 float/double pool, emitted in the target's first-use order.
-extern const float kOptionMenuFontScale = 0.88f;
-extern const float kOptionAnimMin = 0.0f;
-extern const float kOptionMenuAlphaMax = 255.0f;
-extern const float kOptionBannerCenterY = 224.0f;
-extern const float kMenuCenteringHalfWidth = 0.5f;
-extern const float kOptionBannerYOffset = 14.0f;
-extern const float kOptionScreenWidth = 640.0f;
-extern const float kOptionPanelLeft = 336.0f;
-extern const float kOptionPanelTop = 88.0f;
-extern const float kOptionAnimMax = 1.0f;
-extern const float kOptionCursorSize = 32.0f;
-extern const float kOptionMarkerLeft = 64.0f;
-extern const float kOptionListTextScaleX = 0.8f;
-extern const float kOptionRowLeft = 56.0f;
-extern const float kOptionTextYOffset = -4.0f;
-extern const float kOptionHelpBarTop = 384.0f;
-extern const float kOptionLargeIconSize = 40.0f;
-extern const float kMenuCenteringOffset = 320.0f;
-extern const float kOptionHelpTextY = 387.0f;
-extern const float kOptionDegToRad = 0.017453292f;
-extern const float kOptionRowAnimStep = 0.125f;
-extern const float kOptionRowAngleStep = 11.25f;
-extern const float kOptionTextNudge = 2.0f;
-extern const float kOptionSelectorTextY = 185.0f;
-extern const float kOptionIconWaveTargetX = 472.0f;
-extern const float kOptionGameInitTextOffset = 96.0f;
-extern const float kOptionSelectorWidth = 120.0f;
-extern const float kOptionSelectorHeight = 48.0f;
-extern const double kOptionAltLanguageTextScale = 0.8;
-extern const double kOptionDefaultTextScale = 1.0;
-extern const double kOptionSelectorBaseX64 = 368.0;
-extern const double kOptionHalf64 = 0.5;
-extern const double kOptionSelectorRightX64 = 464.0;
-extern const float kOptionStereoTextOffset = 112.0f;
-extern const double kOptionStereoSelectorX64 = 360.0;
-extern const double kOptionIconWaveTargetX64 = 472.0;
-extern const float kOptionIconWaveOriginX = 348.0f;
-extern const float kOptionLeftIconBaseY = 192.0f;
-extern const float kOptionRightIconBaseX = 556.0f;
-extern const float kOptionRightIconBaseY = 184.0f;
-extern "C" const float kOptionMeterArrowY = 190.0f;
-extern "C" const float kOptionMeterRightArrowX = 587.0f;
-extern "C" const float kOptionMeterBarBaseX = 372.0f;
-extern "C" const float kOptionMeterAnchor196 = 196.0f;
-extern "C" const float kOptionMeterLabelY = 168.0f;
-extern "C" const float kOptionSmallIconSize = 24.0f;
-extern "C" const float kOptionUiTwenty = 20.0f;
-extern "C" const float kOptionMeterSegmentSize = 16.0f;
-extern "C" const float kOptionMeterMaxLabelRight = 564.0f;
-extern "C" const float kOptionSpecialRowFrameStep = 0.07692308f;
-extern "C" const float kOptionSpecialRowAngleStep = 6.923077f;
-extern "C" const float kOptionModeTextYOffset = 4.0f;
-extern "C" const unsigned int kMenuUtilUnsignedIntToDoubleBiasBits[2] = {0x43300000, 0x00000000};
-extern "C" const unsigned int kMenuUtilSignedIntToDoubleBiasBits[2] = {0x43300000, 0x80000000};
-extern "C" const float kOptionOpenAnimStep = 0.04f;
-extern "C" const float kOptionColumnAnimStep = 0.2f;
-extern "C" const float kOptionVolumeScale = 10.583333f;
-extern "C" const float kHelpMessageLineStep = 25.0f;
 extern const char sMenuUtilEmptyText[4] = "";
 extern const char sMenuUtilStringFormat[] = "%s";
 extern const char sMenuUtilPlusOneText[] = "+1";
@@ -369,13 +310,13 @@ void CMenuPcs::DrawOptionMenu()
 	Vec2d uv0;
 	Vec2d uv1;
 
-	font->SetScale(kOptionMenuFontScale);
-	font->SetMargin(kOptionAnimMin);
+	font->SetScale(0.88f);
+	font->SetMargin(0.0f);
 
 	color.r = 0xFF;
 	color.g = 0xFF;
 	color.b = 0xFF;
-	color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionOpenAnim));
+	color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionOpenAnim));
 
 	char* optionText[5] = { 0, 0, 0, 0, 0 };
 	char** mes = &g_strMenuUtilMes[langRow * 20];
@@ -394,34 +335,34 @@ void CMenuPcs::DrawOptionMenu()
 	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
 	gUtil.CalcUV(uv1.x, uv1.y, 0x280, static_cast<unsigned int>(bannerHeight),
 	             static_cast<unsigned int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
-	gUtil.RenderTextureQuad(kOptionAnimMin,
-	                        -(bannerHeight * kMenuCenteringHalfWidth - kOptionBannerCenterY) - kOptionBannerYOffset,
-	                        kOptionScreenWidth, bannerHeight, m_wmOptionTextures[5], &uv0, &uv1, &color, GX_BL_SRCALPHA,
+	gUtil.RenderTextureQuad(0.0f,
+	                        -(bannerHeight * 0.5f - 224.0f) - 14.0f,
+	                        640.0f, bannerHeight, m_wmOptionTextures[5], &uv0, &uv1, &color, GX_BL_SRCALPHA,
 	                        GX_BL_INVSRCALPHA);
 
 	CTexture* panel = m_wmOptionTextures[10];
 	float panelWidth = static_cast<float>(panel->m_width);
 	float panelHeight = static_cast<float>(panel->m_height);
-	gUtil.RenderTextureQuad(kOptionPanelLeft, kOptionPanelTop, panelWidth, panelHeight, panel, 0, 0, &color,
+	gUtil.RenderTextureQuad(336.0f, 88.0f, panelWidth, panelHeight, panel, 0, 0, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-	float panelBottom = kOptionPanelTop + panelHeight;
-	uv0.x = kOptionAnimMin;
-	uv0.y = kOptionAnimMax;
-	uv1.x = kOptionAnimMax;
-	uv1.y = kOptionAnimMin;
-	gUtil.RenderTextureQuad(kOptionPanelLeft, panelBottom, panelWidth, panelHeight, m_wmOptionTextures[10], &uv0, &uv1, &color,
+	float panelBottom = 88.0f + panelHeight;
+	uv0.x = 0.0f;
+	uv0.y = 1.0f;
+	uv1.x = 1.0f;
+	uv1.y = 0.0f;
+	gUtil.RenderTextureQuad(336.0f, panelBottom, panelWidth, panelHeight, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-	float panelRight = kOptionPanelLeft + panelWidth;
-	uv0.x = kOptionAnimMax;
-	uv0.y = kOptionAnimMin;
-	uv1.x = kOptionAnimMin;
-	uv1.y = kOptionAnimMax;
-	gUtil.RenderTextureQuad(panelRight, kOptionPanelTop, panelWidth, panelHeight, m_wmOptionTextures[10], &uv0, &uv1, &color,
+	float panelRight = 336.0f + panelWidth;
+	uv0.x = 1.0f;
+	uv0.y = 0.0f;
+	uv1.x = 0.0f;
+	uv1.y = 1.0f;
+	gUtil.RenderTextureQuad(panelRight, 88.0f, panelWidth, panelHeight, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-	uv0.x = kOptionAnimMax;
-	uv0.y = kOptionAnimMax;
-	uv1.x = kOptionAnimMin;
-	uv1.y = kOptionAnimMin;
+	uv0.x = 1.0f;
+	uv0.y = 1.0f;
+	uv1.x = 0.0f;
+	uv1.y = 0.0f;
 	gUtil.RenderTextureQuad(panelRight, panelBottom, panelWidth, panelHeight, m_wmOptionTextures[10], &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -433,17 +374,17 @@ void CMenuPcs::DrawOptionMenu()
 	gUtil.CalcUV(uv1.x, uv1.y, 0x20, 0x20, static_cast<unsigned int>(cursorWidth),
 	             static_cast<unsigned int>(cursorHeight));
 	gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(System.m_frameCounter) % 8 + 0x1C),
-	                        static_cast<float>(m_optionIndex * 0x28 + 0x70), kOptionCursorSize,
-	                        kOptionCursorSize, m_textures[0], &uv0, &uv1, &color, GX_BL_SRCALPHA,
+	                        static_cast<float>(m_optionIndex * 0x28 + 0x70), 32.0f,
+	                        32.0f, m_textures[0], &uv0, &uv1, &color, GX_BL_SRCALPHA,
 	                        GX_BL_INVSRCALPHA);
 
 	CTexture* marker = m_wmOptionTextures[2];
 	rowWidth = static_cast<float>(marker->m_width);
-	gUtil.RenderTextureQuad(kOptionMarkerLeft, static_cast<float>(m_optionIndex * 0x28 + 0x70),
+	gUtil.RenderTextureQuad(64.0f, static_cast<float>(m_optionIndex * 0x28 + 0x70),
 	                        rowWidth, static_cast<float>(marker->m_height), marker, 0, 0,
 	                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-	font->SetScaleX(kOptionListTextScaleX);
+	font->SetScaleX(0.8f);
 	char** option = optionText;
 	int i = 0;
 	int rowY = 0x70;
@@ -453,39 +394,39 @@ void CMenuPcs::DrawOptionMenu()
 		CTexture* row = m_wmOptionTextures[0];
 		rowWidth = static_cast<float>(row->m_width);
 		float rowHeight = static_cast<float>(row->m_height);
-		uv0.x = (i == m_optionIndex) ? kOptionAnimMin : kMenuCenteringHalfWidth;
-		uv0.y = kOptionAnimMin;
-		uv1.x = (i == m_optionIndex) ? kMenuCenteringHalfWidth : kOptionAnimMax;
-		uv1.y = kOptionAnimMax;
-		gUtil.RenderTextureQuad(kOptionRowLeft, static_cast<float>(rowY),
-		                        rowWidth * kMenuCenteringHalfWidth, rowHeight, m_wmOptionTextures[0], &uv0,
+		uv0.x = (i == m_optionIndex) ? 0.0f : 0.5f;
+		uv0.y = 0.0f;
+		uv1.x = (i == m_optionIndex) ? 0.5f : 1.0f;
+		uv1.y = 1.0f;
+		gUtil.RenderTextureQuad(56.0f, static_cast<float>(rowY),
+		                        rowWidth * 0.5f, rowHeight, m_wmOptionTextures[0], &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		if (i == m_optionIndex) {
-			DrawFont(0x5E, static_cast<int>(kOptionTextYOffset + static_cast<float>(selectedY)), color, 0x16,
-			         *option, kOptionAnimMax, kOptionAnimMax);
+			DrawFont(0x5E, static_cast<int>(-4.0f + static_cast<float>(selectedY)), color, 0x16,
+			         *option, 1.0f, 1.0f);
 		} else {
-			DrawFont(0x60, static_cast<int>(kOptionTextYOffset + static_cast<float>(normalY)), color, 6,
-			         *option, kOptionAnimMax, kOptionAnimMax);
+			DrawFont(0x60, static_cast<int>(-4.0f + static_cast<float>(normalY)), color, 6,
+			         *option, 1.0f, 1.0f);
 		}
 	}
 
-	font->SetScaleX(kOptionAnimMax);
-	gUtil.RenderTextureQuad(kOptionAnimMin, kOptionHelpBarTop, kOptionScreenWidth, kOptionLargeIconSize,
+	font->SetScaleX(1.0f);
+	gUtil.RenderTextureQuad(0.0f, 384.0f, 640.0f, 40.0f,
 	                        m_textures[31], 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 	{
-		float helpTextY = kOptionHelpTextY;
+		float helpTextY = 387.0f;
 		char* help = helpText[m_optionIndex];
 		CFont* fnt = m_fonts[0];
 		fnt->SetShadow(1);
-		fnt->SetMargin(kOptionAnimMax);
-		fnt->SetScaleX(kOptionListTextScaleX);
-		fnt->SetScaleY(kOptionAnimMax);
-		DrawFont2(static_cast<int>(-(fnt->GetWidth(help) * kMenuCenteringHalfWidth -
-		                            kMenuCenteringOffset)),
-		          static_cast<int>(helpTextY), color, 7, helpText[m_optionIndex], kOptionListTextScaleX,
-		          kOptionAnimMax, kOptionAnimMax);
+		fnt->SetMargin(1.0f);
+		fnt->SetScaleX(0.8f);
+		fnt->SetScaleY(1.0f);
+		DrawFont2(static_cast<int>(-(fnt->GetWidth(help) * 0.5f -
+		                            320.0f)),
+		          static_cast<int>(helpTextY), color, 7, helpText[m_optionIndex], 0.8f,
+		          1.0f, 1.0f);
 	}
 
 	int leftHintOn = 0;
@@ -497,185 +438,185 @@ void CMenuPcs::DrawOptionMenu()
 		rightHintOn = 1;
 	}
 
-	int rowAnimStep = static_cast<int>(m_optionRowAnim / kOptionRowAnimStep);
-	color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionRowAnim));
+	int rowAnimStep = static_cast<int>(m_optionRowAnim / 0.125f);
+	color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionRowAnim));
 	int __p13 = rowAnimStep;
-	float rowAngle = static_cast<float>(__p13) * kOptionRowAngleStep;
-	const float kDegToRadF = kOptionDegToRad;
-	float rowSin = static_cast<float>(sin(static_cast<double>(kDegToRadF * (kOptionTextNudge * rowAngle))));
+	float rowAngle = static_cast<float>(__p13) * 11.25f;
+	const float kDegToRadF = 0.017453292f;
+	float rowSin = static_cast<float>(sin(static_cast<double>(kDegToRadF * (2.0f * rowAngle))));
 	float rowCos = static_cast<float>(cos(static_cast<double>(kDegToRadF * rowAngle)));
 
 	switch (m_optionIndex) {
 	case 0: {
 		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 544.0f, 186.0f }, { 368.0f, 176.0f }, { 400.0f, 0.0f }, { 496.0f, 0.0f } };
-		int leftXi = static_cast<int>(kOptionIconWaveTargetX - row.leftIcon.x);
-		int rightXi = static_cast<int>(rowWidth * kMenuCenteringHalfWidth + row.rightIcon.x - kOptionIconWaveTargetX);
-		row.leftText.y = kOptionSelectorTextY;
-		row.rightText.y = kOptionSelectorTextY;
+		int leftXi = static_cast<int>(472.0f - row.leftIcon.x);
+		int rightXi = static_cast<int>(rowWidth * 0.5f + row.rightIcon.x - 472.0f);
+		row.leftText.y = 185.0f;
+		row.rightText.y = 185.0f;
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
 
-		SetUv(uv0, kOptionAnimMin, kOptionAnimMin);
-		SetUv(uv1, kMenuCenteringHalfWidth, kOptionAnimMax);
-		float sideW = static_cast<float>(sideWidth) * kMenuCenteringHalfWidth;
+		SetUv(uv0, 0.0f, 0.0f);
+		SetUv(uv1, 0.5f, 1.0f);
+		float sideW = static_cast<float>(sideWidth) * 0.5f;
 		float sideH = static_cast<float>(sideHeight);
 		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
 		                        row.leftIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-		SetUv(uv0, kMenuCenteringHalfWidth, kOptionAnimMin);
-		SetUv(uv1, kOptionAnimMax, kOptionAnimMax);
+		SetUv(uv0, 0.5f, 0.0f);
+		SetUv(uv1, 1.0f, 1.0f);
 		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - row.rightIcon.x))),
 		                        row.rightIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
+		color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionColumnAnim));
 		CTexture* selectorTexture = m_wmOptionTextureSet->GetTexture(4);
 		unsigned int selectorHeight = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_height));
 		unsigned int selectorWidth = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_width));
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
-		gUtil.RenderTextureQuad((m_gameInitMode == 0) ? row.selector.x : kOptionGameInitTextOffset + row.selector.x, row.selector.y,
-		                        kOptionSelectorWidth, kOptionSelectorHeight, selectorTexture, &uv0, &uv1, &color,
+		gUtil.RenderTextureQuad((m_gameInitMode == 0) ? row.selector.x : 96.0f + row.selector.x, row.selector.y,
+		                        120.0f, 48.0f, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		unsigned char isAlt = (langRow + 1 == 4) || (langRow + 1 == 5);
-		float scale = isAlt ? kOptionAltLanguageTextScale : kOptionDefaultTextScale;
+		float scale = isAlt ? 0.8 : 1.0;
 
 		if (m_gameInitMode == 0) {
 			{
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(12);
-				fnt->SetMargin(kOptionAnimMax);
+				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
-				float oneF = kOptionAnimMax;
+				float oneF = 1.0f;
 				float firstScale = oneF * scale;
 				fnt->SetScale(firstScale);
-				DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - fnt->GetWidth(txt)) *
-				                           kOptionHalf64 + kOptionSelectorBaseX64)),
-				          static_cast<int>(row.leftText.y - kOptionTextNudge), color, 0x17, txt, firstScale,
-				          kOptionAnimMax, kOptionAnimMax);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - fnt->GetWidth(txt)) *
+				                           0.5 + 368.0)),
+				          static_cast<int>(row.leftText.y - 2.0f), color, 0x17, txt, firstScale,
+				          1.0f, 1.0f);
 			}
 			{
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(13);
-				fnt->SetMargin(kOptionAnimMax);
+				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
 				fnt->SetScale(scale);
-				DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - fnt->GetWidth(txt)) *
-				                           kOptionHalf64 + kOptionSelectorRightX64)),
-				          static_cast<int>(row.rightText.y), color, 6, txt, scale, kOptionAnimMax,
-				          kOptionAnimMax);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - fnt->GetWidth(txt)) *
+				                           0.5 + 464.0)),
+				          static_cast<int>(row.rightText.y), color, 6, txt, scale, 1.0f,
+				          1.0f);
 			}
 		} else {
 			{
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(12);
-				fnt->SetMargin(kOptionAnimMax);
+				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
 				fnt->SetScale(scale);
-				DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - fnt->GetWidth(txt)) *
-				                           kOptionHalf64 + kOptionSelectorBaseX64)),
-				          static_cast<int>(row.leftText.y), color, 6, txt, scale, kOptionAnimMax,
-				          kOptionAnimMax);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - fnt->GetWidth(txt)) *
+				                           0.5 + 368.0)),
+				          static_cast<int>(row.leftText.y), color, 6, txt, scale, 1.0f,
+				          1.0f);
 			}
 			{
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(13);
-				fnt->SetMargin(kOptionAnimMax);
+				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
-				float oneF = kOptionAnimMax;
+				float oneF = 1.0f;
 				scale = oneF * scale;
 				fnt->SetScale(scale);
-				DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - fnt->GetWidth(txt)) *
-				                           kOptionHalf64 + kOptionSelectorRightX64)),
-				          static_cast<int>(row.rightText.y - kOptionTextNudge), color, 0x17, txt, scale,
-				          kOptionAnimMax, kOptionAnimMax);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - fnt->GetWidth(txt)) *
+				                           0.5 + 464.0)),
+				          static_cast<int>(row.rightText.y - 2.0f), color, 0x17, txt, scale,
+				          1.0f, 1.0f);
 			}
 		}
 		break;
 	}
 	case 1: {
 		MenuOptionChoiceLayout row = { { 328.0f, 172.0f }, { 552.0f, 186.0f }, { 360.0f, 176.0f }, { 376.0f, 0.0f }, { 488.0f, 0.0f } };
-		int leftXi = static_cast<int>(kOptionIconWaveTargetX - row.leftIcon.x);
-		int rightXi = static_cast<int>(rowWidth * kMenuCenteringHalfWidth + row.rightIcon.x - kOptionIconWaveTargetX);
-		row.leftText.y = kOptionSelectorTextY;
-		row.rightText.y = kOptionSelectorTextY;
+		int leftXi = static_cast<int>(472.0f - row.leftIcon.x);
+		int rightXi = static_cast<int>(rowWidth * 0.5f + row.rightIcon.x - 472.0f);
+		row.leftText.y = 185.0f;
+		row.rightText.y = 185.0f;
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
 		unsigned int sideWidth = sideTexture->m_width;
 		unsigned int sideHeight = sideTexture->m_height;
 
-		SetUv(uv0, kOptionAnimMin, kOptionAnimMin);
-		SetUv(uv1, kMenuCenteringHalfWidth, kOptionAnimMax);
-		float sideW = static_cast<float>(sideWidth) * kMenuCenteringHalfWidth;
+		SetUv(uv0, 0.0f, 0.0f);
+		SetUv(uv1, 0.5f, 1.0f);
+		float sideW = static_cast<float>(sideWidth) * 0.5f;
 		float sideH = static_cast<float>(sideHeight);
 		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + row.leftIcon.x)),
 		                        row.leftIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-		SetUv(uv0, kMenuCenteringHalfWidth, kOptionAnimMin);
-		SetUv(uv1, kOptionAnimMax, kOptionAnimMax);
+		SetUv(uv0, 0.5f, 0.0f);
+		SetUv(uv1, 1.0f, 1.0f);
 		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - row.rightIcon.x))),
 		                        row.rightIcon.y, sideW, sideH, sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
+		color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionColumnAnim));
 		CTexture* selectorTexture = m_wmOptionTextureSet->GetTexture(4);
 		unsigned int selectorHeight = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_height));
 		unsigned int selectorWidth = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_width));
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
-		gUtil.RenderTextureQuad((m_stereoMode == 0) ? row.selector.x : kOptionStereoTextOffset + row.selector.x, row.selector.y,
-		                        kOptionSelectorWidth, kOptionSelectorHeight, selectorTexture, &uv0, &uv1, &color,
+		gUtil.RenderTextureQuad((m_stereoMode == 0) ? row.selector.x : 112.0f + row.selector.x, row.selector.y,
+		                        120.0f, 48.0f, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		double stereoScale = kOptionAltLanguageTextScale;
+		double stereoScale = 0.8;
 		if (m_stereoMode == 0) {
 			{
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(14);
-				fnt->SetMargin(kOptionAnimMax);
+				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
-				float oneF = kOptionAnimMax;
+				float oneF = 1.0f;
 				fnt->SetScale(stereoScale * oneF);
-				DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - fnt->GetWidth(txt)) *
-				                           kOptionHalf64 + kOptionStereoSelectorX64)),
-				          static_cast<int>(row.leftText.y - kOptionTextNudge), color, 0x17, txt,
-				          stereoScale * oneF, kOptionAnimMax, kOptionAnimMax);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - fnt->GetWidth(txt)) *
+				                           0.5 + 360.0)),
+				          static_cast<int>(row.leftText.y - 2.0f), color, 0x17, txt,
+				          stereoScale * oneF, 1.0f, 1.0f);
 			}
 			{
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(15);
-				fnt->SetMargin(kOptionAnimMax);
+				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
-				fnt->SetScale(kOptionListTextScaleX);
-				DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - fnt->GetWidth(txt)) *
-				                           kOptionHalf64 + kOptionIconWaveTargetX64)),
-				          static_cast<int>(row.rightText.y), color, 6, txt, kOptionListTextScaleX, kOptionAnimMax,
-				          kOptionAnimMax);
+				fnt->SetScale(0.8f);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - fnt->GetWidth(txt)) *
+				                           0.5 + 472.0)),
+				          static_cast<int>(row.rightText.y), color, 6, txt, 0.8f, 1.0f,
+				          1.0f);
 			}
 		} else {
 			{
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(14);
-				fnt->SetMargin(kOptionAnimMax);
+				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
-				fnt->SetScale(kOptionListTextScaleX);
-				DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - fnt->GetWidth(txt)) *
-				                           kOptionHalf64 + kOptionStereoSelectorX64)),
-				          static_cast<int>(row.leftText.y), color, 6, txt, kOptionListTextScaleX, kOptionAnimMax,
-				          kOptionAnimMax);
+				fnt->SetScale(0.8f);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - fnt->GetWidth(txt)) *
+				                           0.5 + 360.0)),
+				          static_cast<int>(row.leftText.y), color, 6, txt, 0.8f, 1.0f,
+				          1.0f);
 			}
 			{
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(15);
-				fnt->SetMargin(kOptionAnimMax);
+				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
-				float oneF = kOptionAnimMax;
+				float oneF = 1.0f;
 				fnt->SetScale(stereoScale * oneF);
-				DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - fnt->GetWidth(txt)) *
-				                           kOptionHalf64 + kOptionIconWaveTargetX64)),
-				          static_cast<int>(row.rightText.y - kOptionTextNudge), color, 0x17, txt,
-				          stereoScale * oneF, kOptionAnimMax, kOptionAnimMax);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - fnt->GetWidth(txt)) *
+				                           0.5 + 472.0)),
+				          static_cast<int>(row.rightText.y - 2.0f), color, 0x17, txt,
+				          stereoScale * oneF, 1.0f, 1.0f);
 			}
 		}
 		break;
@@ -684,39 +625,39 @@ void CMenuPcs::DrawOptionMenu()
 		MenuOptionMeterLayout pos = { { 0.0f, 0.0f }, { 0.0f, 0.0f },
 		                             { 0.0f, 0.0f }, { 0.0f, 0.0f },
 		                             { 0.0f, 0.0f }, { 0.0f, 0.0f }, { 508.0f, 0.0f } };
-		pos.leftIcon.x = kOptionIconWaveOriginX;
-		pos.leftIcon.y = kOptionLeftIconBaseY;
-		pos.rightIcon.x = kOptionRightIconBaseX;
-		pos.rightIcon.y = kOptionRightIconBaseY;
-		pos.leftArrow.x = kOptionPanelLeft;
-		pos.leftArrow.y = kOptionMeterArrowY;
-		pos.rightArrow.x = kOptionMeterRightArrowX;
-		pos.rightArrow.y = kOptionMeterArrowY;
-		pos.bar.x = kOptionMeterBarBaseX;
-		pos.bar.y = kOptionMeterAnchor196;
-		pos.minLabel.x = kOptionMeterBarBaseX;
-		pos.minLabel.y = kOptionMeterLabelY;
-		pos.maxLabel.y = kOptionMeterLabelY;
+		pos.leftIcon.x = 348.0f;
+		pos.leftIcon.y = 192.0f;
+		pos.rightIcon.x = 556.0f;
+		pos.rightIcon.y = 184.0f;
+		pos.leftArrow.x = 336.0f;
+		pos.leftArrow.y = 190.0f;
+		pos.rightArrow.x = 587.0f;
+		pos.rightArrow.y = 190.0f;
+		pos.bar.x = 372.0f;
+		pos.bar.y = 196.0f;
+		pos.minLabel.x = 372.0f;
+		pos.minLabel.y = 168.0f;
+		pos.maxLabel.y = 168.0f;
 		CTexture* meterTexture = m_wmOptionTextureSet->GetTexture(3);
-		int leftXi = static_cast<int>(kOptionIconWaveTargetX - pos.leftIcon.x);
-		int rightXi = static_cast<int>((kOptionSmallIconSize + pos.rightIcon.x) - kOptionIconWaveTargetX);
+		int leftXi = static_cast<int>(472.0f - pos.leftIcon.x);
+		int rightXi = static_cast<int>((24.0f + pos.rightIcon.x) - 472.0f);
 		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
 		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0x28, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x18, 0x40, meterWidth, meterHeight);
-		float iconWave = kOptionUiTwenty * rowSin;
+		float iconWave = 20.0f * rowSin;
 		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + pos.leftIcon.x)),
-		                        pos.leftIcon.y - iconWave, kOptionSmallIconSize, kOptionSmallIconSize, meterTexture, &uv0, &uv1,
+		                        pos.leftIcon.y - iconWave, 24.0f, 24.0f, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x28, meterWidth, meterHeight);
 		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - pos.rightIcon.x))),
-		                        pos.rightIcon.y + iconWave, kOptionLargeIconSize, kOptionLargeIconSize, meterTexture, &uv0, &uv1,
+		                        pos.rightIcon.y + iconWave, 40.0f, 40.0f, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
+		color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionColumnAnim));
 		if (leftHintOn != 0) {
 			gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x58, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x70, meterWidth, meterHeight);
@@ -724,7 +665,7 @@ void CMenuPcs::DrawOptionMenu()
 			gUtil.CalcUV(uv0.x, uv0.y, 0, 0x58, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x10, 0x70, meterWidth, meterHeight);
 		}
-		gUtil.RenderTextureQuad(pos.leftArrow.x, pos.leftArrow.y, kOptionMeterSegmentSize, kOptionSmallIconSize, meterTexture, &uv0,
+		gUtil.RenderTextureQuad(pos.leftArrow.x, pos.leftArrow.y, 16.0f, 24.0f, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		if (rightHintOn != 0) {
@@ -734,65 +675,65 @@ void CMenuPcs::DrawOptionMenu()
 			gUtil.CalcUV(uv0.x, uv0.y, 0x48, 0x5C, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x7C, meterWidth, meterHeight);
 		}
-		gUtil.RenderTextureQuad(pos.rightArrow.x, pos.rightArrow.y, kOptionSmallIconSize, kOptionCursorSize, meterTexture, &uv0,
+		gUtil.RenderTextureQuad(pos.rightArrow.x, pos.rightArrow.y, 24.0f, 32.0f, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0x40, 0x28, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x50, 0x38, meterWidth, meterHeight);
 		float barBaseX = pos.bar.x;
 		for (int i = 0, x = 0; i < 12; i++, x += 0x10) {
-			gUtil.RenderTextureQuad(barBaseX + static_cast<float>(x), pos.bar.y, kOptionMeterSegmentSize, kOptionMeterSegmentSize, meterTexture, &uv0,
+			gUtil.RenderTextureQuad(barBaseX + static_cast<float>(x), pos.bar.y, 16.0f, 16.0f, meterTexture, &uv0,
 			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			if ((m_optionMenuState != 2) && (i + 1 <= m_bgmVolume)) {
-				gUtil.RenderTextureQuad(pos.bar.x + static_cast<float>(x), pos.bar.y, kOptionMeterSegmentSize, kOptionMeterSegmentSize, meterTexture, &uv0,
+				gUtil.RenderTextureQuad(pos.bar.x + static_cast<float>(x), pos.bar.y, 16.0f, 16.0f, meterTexture, &uv0,
 				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
 			}
 		}
 
 		DrawFont(static_cast<int>(pos.minLabel.x), static_cast<int>(pos.minLabel.y), color, 7,
-		         OPT_MES(16), kOptionAnimMax, kOptionAnimMax);
-		pos.maxLabel.x = kOptionMeterMaxLabelRight - font->GetWidth(OPT_MES(17));
-		DrawFont(static_cast<int>(pos.maxLabel.x), static_cast<int>(pos.maxLabel.y), color, 7, OPT_MES(17), kOptionAnimMax,
-		         kOptionAnimMax);
+		         OPT_MES(16), 1.0f, 1.0f);
+		pos.maxLabel.x = 564.0f - font->GetWidth(OPT_MES(17));
+		DrawFont(static_cast<int>(pos.maxLabel.x), static_cast<int>(pos.maxLabel.y), color, 7, OPT_MES(17), 1.0f,
+		         1.0f);
 		break;
 	}
 	case 3: {
 		MenuOptionMeterLayout pos = { { 0.0f, 0.0f }, { 0.0f, 0.0f },
 		                             { 0.0f, 0.0f }, { 0.0f, 0.0f },
 		                             { 0.0f, 0.0f }, { 0.0f, 0.0f }, { 508.0f, 0.0f } };
-		pos.leftIcon.x = kOptionIconWaveOriginX;
-		pos.leftIcon.y = kOptionLeftIconBaseY;
-		pos.rightIcon.x = kOptionRightIconBaseX;
-		pos.rightIcon.y = kOptionRightIconBaseY;
-		pos.leftArrow.x = kOptionPanelLeft;
-		pos.leftArrow.y = kOptionMeterArrowY;
-		pos.rightArrow.x = kOptionMeterRightArrowX;
-		pos.rightArrow.y = kOptionMeterArrowY;
-		pos.bar.x = kOptionMeterBarBaseX;
-		pos.bar.y = kOptionMeterAnchor196;
-		pos.minLabel.x = kOptionMeterBarBaseX;
-		pos.minLabel.y = kOptionMeterLabelY;
-		pos.maxLabel.y = kOptionMeterLabelY;
+		pos.leftIcon.x = 348.0f;
+		pos.leftIcon.y = 192.0f;
+		pos.rightIcon.x = 556.0f;
+		pos.rightIcon.y = 184.0f;
+		pos.leftArrow.x = 336.0f;
+		pos.leftArrow.y = 190.0f;
+		pos.rightArrow.x = 587.0f;
+		pos.rightArrow.y = 190.0f;
+		pos.bar.x = 372.0f;
+		pos.bar.y = 196.0f;
+		pos.minLabel.x = 372.0f;
+		pos.minLabel.y = 168.0f;
+		pos.maxLabel.y = 168.0f;
 		CTexture* meterTexture = m_wmOptionTextureSet->GetTexture(3);
-		int leftXi = static_cast<int>(kOptionIconWaveTargetX - pos.leftIcon.x);
-		int rightXi = static_cast<int>((kOptionSmallIconSize + pos.rightIcon.x) - kOptionIconWaveTargetX);
+		int leftXi = static_cast<int>(472.0f - pos.leftIcon.x);
+		int rightXi = static_cast<int>((24.0f + pos.rightIcon.x) - 472.0f);
 		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
 		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x28, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x40, meterWidth, meterHeight);
-		float iconWave = kOptionUiTwenty * rowSin;
+		float iconWave = 20.0f * rowSin;
 		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(leftXi) * rowCos + pos.leftIcon.x)),
-		                        pos.leftIcon.y + iconWave, kOptionSmallIconSize, kOptionSmallIconSize, meterTexture, &uv0, &uv1,
+		                        pos.leftIcon.y + iconWave, 24.0f, 24.0f, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0x28, 0, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x50, 0x28, meterWidth, meterHeight);
 		gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(-(static_cast<float>(rightXi) * rowCos - pos.rightIcon.x))),
-		                        pos.rightIcon.y - iconWave, kOptionLargeIconSize, kOptionLargeIconSize, meterTexture, &uv0, &uv1,
+		                        pos.rightIcon.y - iconWave, 40.0f, 40.0f, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
+		color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionColumnAnim));
 		if (leftHintOn != 0) {
 			gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x40, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x58, meterWidth, meterHeight);
@@ -800,7 +741,7 @@ void CMenuPcs::DrawOptionMenu()
 			gUtil.CalcUV(uv0.x, uv0.y, 0, 0x40, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x10, 0x58, meterWidth, meterHeight);
 		}
-		gUtil.RenderTextureQuad(pos.leftArrow.x, pos.leftArrow.y, kOptionMeterSegmentSize, kOptionSmallIconSize, meterTexture, &uv0,
+		gUtil.RenderTextureQuad(pos.leftArrow.x, pos.leftArrow.y, 16.0f, 24.0f, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		if (rightHintOn != 0) {
@@ -810,39 +751,39 @@ void CMenuPcs::DrawOptionMenu()
 			gUtil.CalcUV(uv0.x, uv0.y, 0x48, 0x3C, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x5C, meterWidth, meterHeight);
 		}
-		gUtil.RenderTextureQuad(pos.rightArrow.x, pos.rightArrow.y, kOptionSmallIconSize, kOptionCursorSize, meterTexture, &uv0,
+		gUtil.RenderTextureQuad(pos.rightArrow.x, pos.rightArrow.y, 24.0f, 32.0f, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0x30, 0x28, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x40, 0x38, meterWidth, meterHeight);
 		float barBaseX = pos.bar.x;
 		for (int i = 0, x = 0; i < 12; i++, x += 0x10) {
-			gUtil.RenderTextureQuad(barBaseX + static_cast<float>(x), pos.bar.y, kOptionMeterSegmentSize, kOptionMeterSegmentSize, meterTexture, &uv0,
+			gUtil.RenderTextureQuad(barBaseX + static_cast<float>(x), pos.bar.y, 16.0f, 16.0f, meterTexture, &uv0,
 			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			if ((m_optionMenuState != 2) && (i + 1 <= m_seVolume)) {
-				gUtil.RenderTextureQuad(pos.bar.x + static_cast<float>(x), pos.bar.y, kOptionMeterSegmentSize, kOptionMeterSegmentSize, meterTexture, &uv0,
+				gUtil.RenderTextureQuad(pos.bar.x + static_cast<float>(x), pos.bar.y, 16.0f, 16.0f, meterTexture, &uv0,
 				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
 			}
 		}
 
 		DrawFont(static_cast<int>(pos.minLabel.x), static_cast<int>(pos.minLabel.y), color, 7,
-		         OPT_MES(16), kOptionAnimMax, kOptionAnimMax);
-		pos.maxLabel.x = kOptionMeterMaxLabelRight - font->GetWidth(OPT_MES(17));
-		DrawFont(static_cast<int>(pos.maxLabel.x), static_cast<int>(pos.maxLabel.y), color, 7, OPT_MES(17), kOptionAnimMax,
-		         kOptionAnimMax);
+		         OPT_MES(16), 1.0f, 1.0f);
+		pos.maxLabel.x = 564.0f - font->GetWidth(OPT_MES(17));
+		DrawFont(static_cast<int>(pos.maxLabel.x), static_cast<int>(pos.maxLabel.y), color, 7, OPT_MES(17), 1.0f,
+		         1.0f);
 		break;
 	}
 	case 4: {
 		Vec2d pts[5] = { { 326.0f, 128.0f }, { 300.0f, 160.0f },
 		                       { 330.0f, 138.0f }, { 372.0f, 132.0f }, { 492.0f, 132.0f } };
 		int rowAnimFrame;
-		if (static_cast<double>(m_optionRowAnim) < kOptionDefaultTextScale) {
-			rowAnimFrame = static_cast<int>(m_optionRowAnim / kOptionSpecialRowFrameStep);
+		if (static_cast<double>(m_optionRowAnim) < 1.0) {
+			rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.07692308f);
 		} else {
 			rowAnimFrame = 0xD;
 		}
 		const float specialRowCos = static_cast<float>(
-			cos(static_cast<double>(kOptionDegToRad * (static_cast<float>(rowAnimFrame) * kOptionSpecialRowAngleStep))));
+			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 6.923077f))));
 
 		int k = 0;
 		int y = k;
@@ -854,13 +795,13 @@ void CMenuPcs::DrawOptionMenu()
 			float cursorWidth = static_cast<float>(cursorPanel->m_width);
 			float cursorHeight = static_cast<float>(cursorPanel->m_height);
 			if ((m_specialModeEdit != 0) && (m_specialModeCursor == i)) {
-				gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(cursorWidth - kOptionSelectorHeight), 0,
+				gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(cursorWidth - 48.0f), 0,
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
 				gUtil.CalcUV(uv1.x, uv1.y, static_cast<unsigned int>(cursorWidth), 0x28,
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
 				const Vec2d* pp = &pts[k];
-				gUtil.RenderTextureQuad(pp->x, pp->y + static_cast<float>(y), kOptionSelectorHeight,
-				                        kOptionLargeIconSize, cursorPanel, &uv0, &uv1, &color, GX_BL_SRCALPHA,
+				gUtil.RenderTextureQuad(pp->x, pp->y + static_cast<float>(y), 48.0f,
+				                        40.0f, cursorPanel, &uv0, &uv1, &color, GX_BL_SRCALPHA,
 				                        GX_BL_INVSRCALPHA);
 			}
 
@@ -871,7 +812,7 @@ void CMenuPcs::DrawOptionMenu()
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
 				const Vec2d* pp1 = &pts[k + 1];
 				gUtil.RenderTextureQuad(pp1->x, pp1->y + static_cast<float>(y),
-				                        cursorWidth, kOptionMeterSegmentSize, cursorPanel,
+				                        cursorWidth, 16.0f, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 				gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(cursorWidth), 0x30,
@@ -879,7 +820,7 @@ void CMenuPcs::DrawOptionMenu()
 				gUtil.CalcUV(uv1.x, uv1.y, 0, static_cast<unsigned int>(cursorHeight),
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
 				gUtil.RenderTextureQuad(cursorWidth + pp1->x, pp1->y + static_cast<float>(y),
-				                        cursorWidth, kOptionMeterSegmentSize, cursorPanel,
+				                        cursorWidth, 16.0f, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 
@@ -888,54 +829,54 @@ void CMenuPcs::DrawOptionMenu()
 			float modeH = static_cast<float>(modePanel->m_height);
 			unsigned int modeHeight = static_cast<unsigned int>(modeH);
 			unsigned int modeWidth = static_cast<unsigned int>(modeW);
-			gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(modeW - kOptionSelectorHeight),
+			gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(modeW - 48.0f),
 			             uvY, modeWidth, modeHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, modeWidth, uvY2, modeWidth, modeHeight);
 			const Vec2d* pp2 = &pts[k + 2];
 			int modeXi = static_cast<int>(static_cast<float>(modeU) - pp2->x);
 			gUtil.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(modeXi) *
 			                                           specialRowCos + pp2->x)),
-			                        pp2->y + static_cast<float>(y), kOptionLargeIconSize, kOptionSmallIconSize,
+			                        pp2->y + static_cast<float>(y), 40.0f, 24.0f,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 			const Vec2d* pp3 = &pts[k + 3];
-			int step1 = static_cast<int>(kOptionSmallIconSize + (static_cast<float>(modeU) - pp3->x));
+			int step1 = static_cast<int>(24.0f + (static_cast<float>(modeU) - pp3->x));
 			int textXi = static_cast<int>(pp3->x + static_cast<float>(step1) * specialRowCos);
 			if (m_specialModeFlags[i] == 0) {
 				gUtil.CalcUV(uv0.x, uv0.y, 0, uvY, modeWidth, modeHeight);
 				gUtil.CalcUV(uv1.x, uv1.y, 0x78, (i + 1) * 0x20, modeWidth, modeHeight);
 				gUtil.RenderTextureQuad(static_cast<float>(textXi), pp3->y + static_cast<float>(y),
-				                        kOptionSelectorWidth, kOptionCursorSize,
+				                        120.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(18);
 				const Vec2d* pp4 = &pts[k + 4];
 				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
-				fnt->SetMargin(kOptionAnimMax);
+				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
-				fnt->SetScale(kOptionAnimMax);
-				DrawFont(static_cast<int>(static_cast<float>((kOptionSelectorWidth - fnt->GetWidth(txt)) *
-				                          kOptionHalf64 + textXi2)),
-				         static_cast<int>(kOptionTextYOffset + (kOptionModeTextYOffset +
+				fnt->SetScale(1.0f);
+				DrawFont(static_cast<int>(static_cast<float>((120.0f - fnt->GetWidth(txt)) *
+				                          0.5 + textXi2)),
+				         static_cast<int>(-4.0f + (4.0f +
 				                          (pp4->y + static_cast<float>(y)))), color, 7,
-				         txt, kOptionAnimMax, kOptionAnimMax);
+				         txt, 1.0f, 1.0f);
 			} else {
 				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(19);
-				fnt->SetMargin(kOptionAnimMax);
+				fnt->SetMargin(1.0f);
 				fnt->SetShadow(1);
-				fnt->SetScale(kOptionAnimMax);
-				DrawFont(static_cast<int>(static_cast<float>((kOptionSelectorWidth - fnt->GetWidth(txt)) *
-				                          kOptionHalf64 + textXi)),
-				         static_cast<int>(kOptionTextYOffset + (kOptionModeTextYOffset +
+				fnt->SetScale(1.0f);
+				DrawFont(static_cast<int>(static_cast<float>((120.0f - fnt->GetWidth(txt)) *
+				                          0.5 + textXi)),
+				         static_cast<int>(-4.0f + (4.0f +
 				                          (pp3->y + static_cast<float>(y)))), color, 7,
-				         txt, kOptionAnimMax, kOptionAnimMax);
+				         txt, 1.0f, 1.0f);
 				const Vec2d* pp4e = &pts[k + 4];
 				int panelXi = static_cast<int>(pp4e->x + static_cast<float>(step1) * specialRowCos);
 				gUtil.CalcUV(uv0.x, uv0.y, 0x78, uvY, modeWidth, modeHeight);
 				gUtil.CalcUV(uv1.x, uv1.y, 0xE0, (i + 1) * 0x20, modeWidth, modeHeight);
 				gUtil.RenderTextureQuad(static_cast<float>(panelXi),
-				                        pp4e->y + static_cast<float>(y), kOptionStereoTextOffset, kOptionCursorSize,
+				                        pp4e->y + static_cast<float>(y), 112.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 		}
@@ -959,43 +900,43 @@ void CMenuPcs::CalcOptionMenu()
 	int optionChanged = 0;
 
 	if (m_optionMenuState == 0) {
-		m_optionOpenAnim += kOptionOpenAnimStep;
-		if (!(m_optionOpenAnim >= kOptionAnimMax)) {
+		m_optionOpenAnim += 0.04f;
+		if (!(m_optionOpenAnim >= 1.0f)) {
 			return;
 		}
 
 		m_optionMenuState = 1;
-		m_optionOpenAnim = kOptionAnimMax;
+		m_optionOpenAnim = 1.0f;
 		return;
 	}
 
 	if (m_optionMenuState == 2) {
-		m_optionOpenAnim -= kOptionOpenAnimStep;
-		m_optionRowAnim -= kOptionRowAnimStep;
-		m_optionColumnAnim -= kOptionColumnAnimStep;
+		m_optionOpenAnim -= 0.04f;
+		m_optionRowAnim -= 0.125f;
+		m_optionColumnAnim -= 0.2f;
 
-		if (m_optionRowAnim <= kOptionAnimMin) {
-			m_optionRowAnim = kOptionAnimMin;
+		if (m_optionRowAnim <= 0.0f) {
+			m_optionRowAnim = 0.0f;
 		}
-		if (m_optionColumnAnim <= kOptionAnimMin) {
-			m_optionColumnAnim = kOptionAnimMin;
+		if (m_optionColumnAnim <= 0.0f) {
+			m_optionColumnAnim = 0.0f;
 		}
 		{
-			const float& divStep = kOptionOpenAnimStep;
+			float divStep = 0.04f;
 			if (static_cast<int>(m_optionOpenAnim / divStep) == 5) {
 				Sound.PlaySe(0x32, 0x40, 0x7F, 0);
 			}
 		}
-		if (!(m_optionOpenAnim <= kOptionAnimMin)) {
+		if (!(m_optionOpenAnim <= 0.0f)) {
 			return;
 		}
 
 		m_artiState->optionCloseReady = 1;
 		m_optionIndex = 0;
 		m_optionMenuState = 0;
-		m_optionOpenAnim = kOptionAnimMin;
-		m_optionRowAnim = kOptionAnimMin;
-		m_optionColumnAnim = kOptionAnimMin;
+		m_optionOpenAnim = 0.0f;
+		m_optionRowAnim = 0.0f;
+		m_optionColumnAnim = 0.0f;
 		m_optionAnimCounter = 0;
 		m_optionAnimPhase = 0;
 		return;
@@ -1006,17 +947,17 @@ void CMenuPcs::CalcOptionMenu()
 	}
 
 	if (m_optionAnimPhase == 0) {
-		m_optionRowAnim += kOptionRowAnimStep;
+		m_optionRowAnim += 0.125f;
 		m_optionAnimCounter++;
-		if (m_optionRowAnim >= kOptionAnimMax) {
+		if (m_optionRowAnim >= 1.0f) {
 			m_optionAnimPhase = 1;
-			m_optionRowAnim = kOptionAnimMax;
+			m_optionRowAnim = 1.0f;
 		}
 	} else if (m_optionAnimPhase == 1) {
-		m_optionColumnAnim += kOptionColumnAnimStep;
-		if (m_optionColumnAnim >= kOptionAnimMax) {
+		m_optionColumnAnim += 0.2f;
+		if (m_optionColumnAnim >= 1.0f) {
 			m_optionAnimPhase = 2;
-			m_optionColumnAnim = kOptionAnimMax;
+			m_optionColumnAnim = 1.0f;
 		}
 	}
 
@@ -1035,7 +976,7 @@ void CMenuPcs::CalcOptionMenu()
 			m_optionIndex = 4;
 		}
 		{
-			const float& leftMin = kOptionAnimMin;
+			float leftMin = 0.0f;
 			m_optionRowAnim = leftMin;
 			m_optionColumnAnim = leftMin;
 		}
@@ -1050,7 +991,7 @@ void CMenuPcs::CalcOptionMenu()
 			m_optionIndex = 0;
 		}
 		{
-			const float& rightMin = kOptionAnimMin;
+			float rightMin = 0.0f;
 			m_optionRowAnim = rightMin;
 			m_optionColumnAnim = rightMin;
 		}
@@ -1204,11 +1145,11 @@ void CMenuPcs::CalcOptionMenu()
 		    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(static_cast<int>(m_gameInitMode))) >> 5);
 		Sound.SetStereo(static_cast<unsigned int>(__cntlzw(static_cast<int>(m_stereoMode))) >> 5);
 		{
-			const float& seScale = kOptionVolumeScale;
+			float seScale = 10.583333f;
 			Sound.SetSeMasterVolume(static_cast<int>(seScale * static_cast<float>(m_seVolume)));
 		}
 		{
-			const float& bgmScale = kOptionVolumeScale;
+			float bgmScale = 10.583333f;
 			Sound.SetBgmMasterVolume(static_cast<int>(bgmScale * static_cast<float>(m_bgmVolume)));
 		}
 	}
@@ -1321,18 +1262,18 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 	int languageIndex = Game.m_gameWork.m_languageId - 1;
 	int drawPrefix = 1;
-	float lineStep = kHelpMessageLineStep;
+	float lineStep = 25.0f;
 	const char* suffix = 0;
 	char itemName[260];
 	char scratch[0x100];
 
-	font->SetMargin(kOptionTextNudge);
+	font->SetMargin(2.0f);
 	font->SetShadow(1);
 	font->SetScale(margin);
 	font->DrawInit();
 	font->SetTlut(tlut);
 	font->SetColor(color);
-	font->SetScale(kOptionMenuFontScale);
+	font->SetScale(0.88f);
 
 	int maxWidth;
 	int firstLine = 500;
@@ -1392,7 +1333,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 		int four = drawPrefix + 3;
 		if (four == 4) {
-			lineStep = kOptionUiTwenty;
+			lineStep = 20.0f;
 		}
 	}
 
@@ -1412,7 +1353,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		u32 baseY = lineBaseY[baseIndex];
 		int y = baseY;
 		if (drawPrefix != 0) {
-			font->SetPosX(kOptionRowLeft);
+			font->SetPosX(56.0f);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
@@ -1444,7 +1385,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 
 	int x = 0x38;
-	font->SetPosX(kOptionRowLeft);
+	font->SetPosX(56.0f);
 	int detailY = static_cast<int>(lineStep + static_cast<float>(static_cast<int>(baseY)));
 	font->SetPosY(static_cast<float>(detailY));
 
@@ -1456,7 +1397,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					strcpy(scratch, GetAttrStr(item->m_attribute));
 					font->SetTlut(4);
 					font->Draw(scratch);
-					x = static_cast<int>(static_cast<float>(x) + (kOptionTextNudge + font->GetWidth(scratch)));
+					x = static_cast<int>(static_cast<float>(x) + (2.0f + font->GetWidth(scratch)));
 					font->SetPosX(static_cast<float>(x));
 					font->SetTlut(9);
 
@@ -1479,7 +1420,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			strcat(scratch, sMenuUtilSpaceText);
 			font->Draw(scratch);
 
-			x = static_cast<int>(static_cast<float>(x) + (kOptionTextNudge + font->GetWidth(scratch)));
+			x = static_cast<int>(static_cast<float>(x) + (2.0f + font->GetWidth(scratch)));
 			font->SetTlut(1);
 			font->SetPosX(static_cast<float>(x));
 			sprintf(scratch, sMenuUtilValueSuffixFormat, item->m_value);
@@ -1519,7 +1460,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 							}
 
 							int delta = static_cast<int>(item->m_value) - static_cast<int>(currentValue);
-							int deltaX = static_cast<int>(static_cast<float>(x) + (kOptionTextNudge + font->GetWidth(scratch)));
+							int deltaX = static_cast<int>(static_cast<float>(x) + (2.0f + font->GetWidth(scratch)));
 							font->SetPosX(static_cast<float>(deltaX));
 							if (delta >= 0) {
 								font->SetTlut(9);
@@ -1579,7 +1520,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		int idx = lineCount + drawPrefix - 1;
 		int y = lineBaseY[idx];
 		if (drawPrefix != 0) {
-			font->SetPosX(kOptionRowLeft);
+			font->SetPosX(56.0f);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
@@ -1648,8 +1589,8 @@ void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text
  */
 float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
 {
-    const float& halfWidth = kMenuCenteringHalfWidth;
-    const float& offset = kMenuCenteringOffset;
+    float halfWidth = 0.5f;
+    float offset = 320.0f;
     float width = font->GetWidth(text);
     return offset - width * halfWidth;
 }
@@ -1663,9 +1604,9 @@ float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 {
 	CFont* font = m_fonts[0];
 	float width;
-	const float& scaleY = kOptionAnimMax;
-	const float& halfWidth = kMenuCenteringHalfWidth;
-	const float& offset = kMenuCenteringOffset;
+	float scaleY = 1.0f;
+	float halfWidth = 0.5f;
+	float offset = 320.0f;
 
 	font->SetShadow(1);
 	font->SetMargin(margin);

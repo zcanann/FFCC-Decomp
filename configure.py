@@ -742,7 +742,7 @@ config.libs = [
             Object(NonMatching, "pppYmEnv.cpp"),
             Object(NonMatching, "pppYmLaser.cpp"),
             Object(Matching, "pppYmLookOn.cpp"),
-            Object(NonMatching, "pppYmMana.cpp"),
+            Object(NonMatching, "pppYmMana.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "pppYmMegaBirthShpTail2.cpp"),
             Object(NonMatching, "pppYmMegaBirthShpTail3.cpp"),
             Object(NonMatching, "pppYmMelt.cpp", cflags=cflags_game),

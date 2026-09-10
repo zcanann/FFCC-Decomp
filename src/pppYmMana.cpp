@@ -15,42 +15,6 @@
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
 
-extern const char s_ymManaRuin2Name[] = "ruin_2";
-
-static const char s_ymManaShapeObj5[] = "obj5";
-static const char s_ymManaShapeObj3[] = "obj3";
-static const char s_ymManaShapeObj1[] = "obj1";
-static const char s_ymManaShapeObj4[] = "obj4";
-static const char s_ymManaShapeObj2[] = "obj2";
-static const char s_ymManaShapeObj[] = "obj";
-
-static inline float CameraWorldX()
-{
-    return CameraPcs.m_positionX;
-}
-
-static inline float CameraWorldY()
-{
-    return CameraPcs.m_positionY;
-}
-
-static inline float CameraWorldZ()
-{
-    return CameraPcs.m_positionZ;
-}
-
-static inline Mtx& CameraMatrix()
-{
-    return CameraPcs.m_cameraMatrix;
-}
-
-static inline Mtx44& CameraScreenMatrix()
-{
-    return CameraPcs.m_screenMatrix;
-}
-
-static const char s_pppYmMana_cpp[] = "pppYmMana.cpp";
-
 STATIC_ASSERT(sizeof(YmManaDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(YmManaDataOffsets, m_setupOffset) == 0x4);
 STATIC_ASSERT(offsetof(YmManaDataOffsets, m_workOffset) == 0x8);
@@ -151,9 +115,9 @@ void CalcReflectionVector2(
     const float warp = 2.0f;
     const float scale = 0.015625f;
 
-    cameraPos.x = CameraWorldX();
-    cameraPos.y = CameraWorldY();
-    cameraPos.z = CameraWorldZ();
+    cameraPos.x = CameraPcs.m_positionX;
+    cameraPos.y = CameraPcs.m_positionY;
+    cameraPos.z = CameraPcs.m_positionZ;
 
     PSMTXCopy(matrix, matrixCopy);
     PSMTXCopy(node->m_localRuntimeMtx, nodeOffsetMtx);
@@ -207,7 +171,7 @@ void CalcReflectionVector2(
             PSVECSubtract(&position, &cameraPos, &eyeToPos);
             C_VECReflect(&eyeToPos, &normal, &reflectionVec[posIndex]);
 
-            if (strcmp(s_ymManaRuin2Name, Game.m_currentScriptName) == 0) {
+            if (strcmp("ruin_2", Game.m_currentScriptName) == 0) {
                 PSMTXMultVec(rotateMtx, &reflectionVec[posIndex], &reflectionVec[posIndex]);
             }
 
@@ -285,9 +249,9 @@ static void CalcWaterReflectionVector(
         cameraPos.y = ppvCameraMatrix[1][3];
         cameraPos.z = ppvCameraMatrix[2][3];
     } else {
-        cameraPos.x = CameraWorldX();
-        cameraPos.y = CameraWorldY();
-        cameraPos.z = CameraWorldZ();
+        cameraPos.x = CameraPcs.m_positionX;
+        cameraPos.y = CameraPcs.m_positionY;
+        cameraPos.z = CameraPcs.m_positionZ;
     }
 
     transformedCameraPos.x = 0.0f;
@@ -751,8 +715,8 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 
     Graphic.SetViewport();
     PSMTXIdentity(identityMtx);
-    PSMTXCopy(CameraMatrix(), savedCameraMtx);
-    PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, savedScreenMtx);
     int zeroInt = 0;
     Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, zeroInt,
                                zeroInt, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
@@ -794,7 +758,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             cameraUp.y = 1.0f;
             cameraUp.z = 0.0f;
 
-            s32 nameCompare = strcmp(s_ymManaRuin2Name, compareName);
+            s32 nameCompare = strcmp("ruin_2", compareName);
             if (nameCompare == 0) {
                 if (i == 0) {
                     cameraPos.z -= 1.0f;
@@ -846,7 +810,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 
             GXSetViewport(0.0f, 0.0f, 128.0f, 128.0f, 0.0f, 1.0f);
             GXSetScissor(scissorZero, scissorZero, 0x80, 0x80);
-            PSMTXCopy(lookAtMtx, CameraMatrix());
+            PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
             GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
             if ((reinterpret_cast<YmManaWeaponFlagByte*>(&gObject->m_weaponNodeFlags)->m_lockFlag != 0 || gObject->m_attachOwner != NULL) &&
@@ -871,7 +835,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             captureIter++;
         }
 
-        PSMTXCopy(savedCameraMtx, CameraMatrix());
+        PSMTXCopy(savedCameraMtx, CameraPcs.m_cameraMatrix);
         Graphic.SetViewport();
         GXSetScissor(0, 0, 0x280, 0x1C0);
         for (i = 0; i < 0x10; i++) {
@@ -898,7 +862,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                           &targetTexObj->m_texObj, 0);
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
-        PSMTXCopy(savedCameraMtx, CameraMatrix());
+        PSMTXCopy(savedCameraMtx, CameraPcs.m_cameraMatrix);
         gUtil.RenderTextureQuad(0.0f, 0.0f, 128.0f, 128.0f, &sceneTexObj,
                                 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
     } else {
@@ -1024,25 +988,25 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
 
     if (mana->m_captureTexObjs == 0) {
         mana->m_captureTexObjs =
-            static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x38F));
+            static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x38F));
     }
     if (mana->m_generatedTexObj0 == 0) {
         mana->m_generatedTexObj0 =
-            static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x395));
+            static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x395));
     }
     if (mana->m_generatedTexObj1 == 0) {
         mana->m_generatedTexObj1 =
-            static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x399));
+            static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x399));
     }
 
     texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB565, GX_FALSE, 0);
     if (mana->m_generatedTexture0 == 0) {
         mana->m_generatedTexture0 =
-            pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3A1);
+            pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x3A1);
     }
     if (mana->m_generatedTexture1 == 0) {
         mana->m_generatedTexture1 =
-            pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3A3);
+            pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x3A3);
     }
 
     GXInitTexObj(mana->m_generatedTexObj0, mana->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, (GXTexWrapMode)1,
@@ -1052,7 +1016,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
 
     if (mana->m_baseParaboloidTexObjs == 0) {
         mana->m_baseParaboloidTexObjs =
-            static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3B0));
+            static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x3B0));
     }
     dstTexObj = mana->m_baseParaboloidTexObjs;
     for (i = 0; i < 6; i++) {
@@ -1073,7 +1037,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
     }
 
     if (mana->m_paraboloidMap == 0) {
-        mana->m_paraboloidMap = pppMemAlloc(0xA5E8, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3CB);
+        mana->m_paraboloidMap = pppMemAlloc(0xA5E8, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x3CB);
         genParaboloidMap(mana->m_paraboloidMap, &mana->m_paraboloidMapSize, 0x1E, GX_VTXFMT7);
     }
 
@@ -1082,13 +1046,13 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++, mesh++) {
             CChara::CMesh::CRefData* meshShape = mesh->m_data;
 
-            if (((param_2->m_type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj5) == 0) ||
-                ((param_2->m_type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj3) == 0) ||
-                ((param_2->m_type == 3) && strcmp(meshShape->m_name, s_ymManaShapeObj1) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshShape->m_name, "obj5") == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshShape->m_name, "obj3") == 0) ||
+                ((param_2->m_type == 3) && strcmp(meshShape->m_name, "obj1") == 0)) {
                 if (mana->m_meshReflectionVec == 0) {
                     mana->m_meshReflectionVec = static_cast<Vec*>(
                         pppMemAlloc(meshShape->m_vertexCount * sizeof(Vec), ppvEnv->m_stagePtr,
-                                    const_cast<char*>(s_pppYmMana_cpp), 1000));
+                                    "pppYmMana.cpp", 1000));
                     Vec* reflectionVec = mana->m_meshReflectionVec;
                     float zero = 0.0f;
                     for (vertexIndex = 0; vertexIndex < meshShape->m_vertexCount; vertexIndex++) {
@@ -1101,7 +1065,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
                 if (mana->m_meshColors == 0) {
                     mana->m_meshColors = static_cast<GXColor*>(
                         pppMemAlloc(meshShape->m_vertexCount * sizeof(GXColor), ppvEnv->m_stagePtr,
-                                    const_cast<char*>(s_pppYmMana_cpp), 0x3F1));
+                                    "pppYmMana.cpp", 0x3F1));
                     u8* color = reinterpret_cast<u8*>(mana->m_meshColors);
                     for (vertexIndex = 0; vertexIndex < meshShape->m_vertexCount; vertexIndex++) {
                         color[0] = 0xFF;
@@ -1113,9 +1077,9 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
                 }
                 if (mana->m_meshTexCoords0 == 0) {
                     mana->m_meshTexCoords0 = static_cast<S16Vec2d*>(
-                        pppMemAlloc(meshShape->m_vertexCount * 6, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FA));
+                        pppMemAlloc(meshShape->m_vertexCount * 6, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x3FA));
                     mana->m_meshTexCoords1 = static_cast<S16Vec2d*>(
-                        pppMemAlloc(meshShape->m_vertexCount * 6, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FB));
+                        pppMemAlloc(meshShape->m_vertexCount * 6, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x3FB));
                     u16* texCoordA = reinterpret_cast<u16*>(mana->m_meshTexCoords0);
                     u16* texCoordB = reinterpret_cast<u16*>(mana->m_meshTexCoords1);
                     for (vertexIndex = 0; vertexIndex < meshShape->m_vertexCount; vertexIndex++) {
@@ -1130,11 +1094,11 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
 
                 mana->m_displayListCopies = static_cast<void**>(
                     pppMemAlloc(meshShape->m_displayListCount * sizeof(void*), ppvEnv->m_stagePtr,
-                                const_cast<char*>(s_pppYmMana_cpp), 0x407));
+                                "pppYmMana.cpp", 0x407));
                 CChara::CMesh::CDisplayList* displayList = meshShape->m_displayLists;
                 for (s32 dlIndex = meshShape->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     mana->m_displayListCopies[dlIndex] =
-                        pppMemAlloc(displayList->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x411);
+                        pppMemAlloc(displayList->m_size, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x411);
                     mana->m_displayListCopies[dlIndex] = reinterpret_cast<void*>(
                         (reinterpret_cast<u32>(mana->m_displayListCopies[dlIndex]) + 0x1F) & 0xFFFFFFE0);
                     mana->m_displayListSize = displayList->m_size;
@@ -1145,26 +1109,26 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
                 }
             }
 
-            if (((param_2->m_type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj4) == 0) ||
-                ((param_2->m_type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj2) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshShape->m_name, "obj4") == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshShape->m_name, "obj2") == 0)) {
                 mana->m_positions =
-                    static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x427));
+                    static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x427));
                 mana->m_normals =
-                    static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x428));
+                    static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x428));
                 mana->m_reflectionVec =
-                    static_cast<Vec*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x429));
+                    static_cast<Vec*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x429));
                 mana->m_texCoord0 =
-                    static_cast<Vec2d*>(pppMemAlloc(0x908, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42A));
+                    static_cast<Vec2d*>(pppMemAlloc(0x908, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x42A));
                 mana->m_texCoord1 =
-                    static_cast<Vec2d*>(pppMemAlloc(0x908, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42B));
+                    static_cast<Vec2d*>(pppMemAlloc(0x908, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x42B));
                 mana->m_waterHeightA =
-                    static_cast<float*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42C));
+                    static_cast<float*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x42C));
                 mana->m_waterHeightB =
-                    static_cast<float*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42D));
+                    static_cast<float*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x42D));
                 mana->m_indices =
-                    static_cast<u16*>(pppMemAlloc(0xC00, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42E));
+                    static_cast<u16*>(pppMemAlloc(0xC00, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x42E));
                 mana->m_colors =
-                    static_cast<GXColor*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42F));
+                    static_cast<GXColor*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, "pppYmMana.cpp", 0x42F));
                 float* waterHeightA = mana->m_waterHeightA;
                 float* waterHeightB = mana->m_waterHeightB;
                 float zero = 0.0f;
@@ -1197,9 +1161,9 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* p
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++, mesh++) {
             CChara::CMesh::CRefData* meshShape = mesh->m_data;
 
-            if (((param_2->m_type == 1) && strcmp(meshShape->m_name, s_ymManaShapeObj5) == 0) ||
-                ((param_2->m_type == 2) && strcmp(meshShape->m_name, s_ymManaShapeObj3) == 0) ||
-                ((param_2->m_type == 3) && strcmp(meshShape->m_name, s_ymManaShapeObj1) == 0)) {
+            if (((param_2->m_type == 1) && strcmp(meshShape->m_name, "obj5") == 0) ||
+                ((param_2->m_type == 2) && strcmp(meshShape->m_name, "obj3") == 0) ||
+                ((param_2->m_type == 3) && strcmp(meshShape->m_name, "obj1") == 0)) {
                 for (s32 dlIndex = meshShape->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     CalcReflectionVector2(
                         mana->m_meshReflectionVec, meshShape->m_vertices, meshShape->m_normals, meshShape->m_vertexCount,
@@ -1238,7 +1202,7 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
     ClearManaModelCallbacks(model);
-    Graphic._WaitDrawDone(const_cast<char*>(s_pppYmMana_cpp), 0x2CE);
+    Graphic._WaitDrawDone("pppYmMana.cpp", 0x2CE);
     MaterialMan.ClearManaParaboloidTexObjs();
 
     if (work->m_generatedTexObj0 != 0) {
@@ -1329,7 +1293,7 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
         CChara::CMesh::CRefData* shape = mesh->m_data;
 
         if (stepType == 1) {
-            if (strcmp(shape->m_name, s_ymManaShapeObj5) == 0) {
+            if (strcmp(shape->m_name, "obj5") == 0) {
                 for (j = 0; j < shape->m_displayListCount; j++) {
                     if (work->m_displayListCopies != 0 && work->m_displayListCopies[j] != NULL) {
                         pppMemFree(work->m_displayListCopies[j]);
@@ -1342,7 +1306,7 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
                 }
             }
         } else if (stepType == 2) {
-            if (strcmp(shape->m_name, s_ymManaShapeObj3) == 0) {
+            if (strcmp(shape->m_name, "obj3") == 0) {
                 for (j = 0; j < shape->m_displayListCount; j++) {
                     if (work->m_displayListCopies != 0 && work->m_displayListCopies[j] != NULL) {
                         pppMemFree(work->m_displayListCopies[j]);
@@ -1354,7 +1318,7 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
                     work->m_displayListCopies = 0;
                 }
             }
-        } else if (stepType == 3 && strcmp(shape->m_name, s_ymManaShapeObj1) == 0) {
+        } else if (stepType == 3 && strcmp(shape->m_name, "obj1") == 0) {
             for (j = 0; j < shape->m_displayListCount; j++) {
                 if (work->m_displayListCopies != 0 && work->m_displayListCopies[j] != NULL) {
                     pppMemFree(work->m_displayListCopies[j]);
@@ -1475,36 +1439,36 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
 
     switch (type) {
     case 0:
-        if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0) {
+        if (strcmp(mesh->m_name, "obj") == 0) {
             draw = 1;
         }
         break;
     case 1:
-        if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj5) == 0) {
+        if (strcmp(mesh->m_name, "obj") == 0 || strcmp(mesh->m_name, "obj5") == 0) {
             draw = 1;
         }
         break;
     case 2:
-        if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj3) == 0) {
+        if (strcmp(mesh->m_name, "obj") == 0 || strcmp(mesh->m_name, "obj3") == 0) {
             draw = 1;
         }
         break;
     case 3:
-        if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj1) == 0) {
+        if (strcmp(mesh->m_name, "obj") == 0 || strcmp(mesh->m_name, "obj1") == 0) {
             draw = 1;
         }
         break;
     }
 
-    int waterCmp = strcmp(mesh->m_name, s_ymManaShapeObj4);
-    if ((waterCmp == 0 && stepData->m_type == 1) || (strcmp(mesh->m_name, s_ymManaShapeObj2) == 0 && stepData->m_type == 2)) {
+    int waterCmp = strcmp(mesh->m_name, "obj4");
+    if ((waterCmp == 0 && stepData->m_type == 1) || (strcmp(mesh->m_name, "obj2") == 0 && stepData->m_type == 2)) {
         Mtx offsetMtx;
         Mtx cameraMtx;
         Mtx worldMtx;
         Mtx rotZMtx;
         Mtx rotXMtx;
 
-        PSMTXCopy(CameraMatrix(), cameraMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTXCopy(mtx, mana->m_waterMtx);
         GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
         GXSetCullMode(GX_CULL_NONE);
@@ -1525,7 +1489,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     }
 
     if (draw == 1) {
-        if (strcmp(mesh->m_name, s_ymManaShapeObj) != 0) {
+        if (strcmp(mesh->m_name, "obj") != 0) {
             PSMTXCopy(mtx, mana->m_reflectionMtx);
             if (mana->m_paraboloidReady != 0) {
                 mana->m_runtimeColor.r = mesh->m_colors[0].r;
@@ -1575,7 +1539,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
         }
     }
 
-    if (strcmp(mesh->m_name, s_ymManaShapeObj) != 0) {
+    if (strcmp(mesh->m_name, "obj") != 0) {
         return;
     }
 

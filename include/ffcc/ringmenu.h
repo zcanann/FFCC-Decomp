@@ -3,13 +3,6 @@
 
 #include "ffcc/menu.h"
 
-class CFont;
-class CCaravanWork;
-class CGame;
-class CMenuPcs;
-
-void drawCommand(int, CFont*, float, float, CCaravanWork*, int, float, float);
-
 class CRingMenu : public CMenu
 {
 public:

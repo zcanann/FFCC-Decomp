@@ -30,10 +30,7 @@ static const char sRingMenuDisplayToggleChangedFmt[] = {
 	0x0A, 0x00, 0x00, 0x00
 };
 
-static inline unsigned char* MenuPcsRaw()
-{
-    return reinterpret_cast<unsigned char*>(&MenuPcs);
-}
+static void drawCommand(int, CFont*, float, float, CCaravanWork*, int, float, float);
 
 static inline int clampDecToZero(int value)
 {
@@ -72,9 +69,7 @@ void CRingMenu::DrawIcon()
 	if (partyObj == 0) {
 		return;
 	}
-	unsigned char weaponFlagsHi = partyObj->m_weaponNodeFlagBytes.m_flags1;
-	if (static_cast<signed char>(
-	        static_cast<int>((static_cast<unsigned int>(weaponFlagsHi) << 24) & 0xC0000000) >> 31) == 0) {
+	if (partyObj->m_weaponNodeFlagAll.m_bits1.m_shield == 0) {
 		return;
 	}
 
@@ -717,7 +712,7 @@ void CRingMenu::onDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
-void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* caravanWork, int cmdIndex, float angle, float alphaScale)
+static void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* caravanWork, int cmdIndex, float angle, float alphaScale)
 {
 	float fVar1;
 	float alphaProduct;

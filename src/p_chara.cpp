@@ -573,10 +573,10 @@ void CCharaPcs::Init()
     CColor baseColor(0x00, 0x00, 0x40, 0x40);
     CopyColor(&m_texShadowColor, baseColor.color);
 
-    Vec* constructedVec = CVector(0.0f, 100.0f, 0.0f);
-    m_texShadowPos.x = constructedVec->x;
-    m_texShadowPos.y = constructedVec->y;
-    m_texShadowPos.z = constructedVec->z;
+    CVector baseVec(0.0f, 100.0f, 0.0f);
+    m_texShadowPos.x = baseVec.x;
+    m_texShadowPos.y = baseVec.y;
+    m_texShadowPos.z = baseVec.z;
     m_texShadowRadius = 500.0f;
     m_texShadowSize = 0x80;
     m_texShadowDistance = 100;
@@ -2778,7 +2778,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         delta.Normalize();
 
         CVector eye = modelPos + CVector(0.0f, 10.0f, 0.0f);
-        Vec* lookAtUp = CVector(0.0f, 1.0f, 0.0f);
+        CVector lookAtUp(0.0f, 1.0f, 0.0f);
         CVector shadowPos = modelPos + delta * static_cast<float>(CharaPcs.m_texShadowDistance) +
                             CVector(0.0f, 10.0f, 0.0f);
         C_MTXLookAt(m_shadowViewMtx, shadowPos, lookAtUp, eye);

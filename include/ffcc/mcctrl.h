@@ -15,7 +15,7 @@ public:
     int SaveDat();
     int LoadDat();
     int Format(int);
-    int ChkEmpty(int param_2);
+    int ChkEmpty(int requireFile);
     int ChkConnect(int chan);
     int ChkNowData();
     int SaveDataBuffer(char*);

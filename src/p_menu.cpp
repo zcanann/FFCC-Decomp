@@ -363,7 +363,6 @@ void CMenuPcs::destroy()
     }
 }
 
-#pragma pool_data off
 /*
  * --INFO--
  * PAL Address: 0x80096d98
@@ -508,7 +507,6 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         m_fonts[slot]->FlushTlutColor();
     }
 }
-#pragma pool_data on
 
 const char* sMenuTextureRegionNameTable[] = {
     sMenuRegionShibuya, sMenuRegionFace, 0, 0, 0, 0, 0, 0, 0
@@ -1496,12 +1494,8 @@ void CMenuPcs::createBattle()
 {
     char path[0x104];
     char fontPath[0x80];
-    CMenuPcs* menu;
-    int i;
 
-    i = 0;
-    menu = this;
-    do {
+    for (int i = 0; i < 2; i++) {
         const char* language = Game.GetLangString();
         sprintf(path, const_cast<char*>(sMenuTexturePathFmt), language, sMenuTextureRegionNameTable[i]);
 
@@ -1513,49 +1507,35 @@ void CMenuPcs::createBattle()
             void* stage = m_mode == 1 ? MapMng.m_stage : m_menuStage;
 
             CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
-            menu->m_textureSets[2] = textureSet;
-            menu->m_textureSets[2]->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
+            m_textureSets[i + 2] = textureSet;
+            m_textureSets[i + 2]->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
 
             File.Close(fileHandle);
         }
-        i++;
-        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-    } while (i < 2);
+    }
 
-    i = 0;
-    menu = this;
-    do {
+    for (int i = 0; i < 10; i++) {
         const unsigned long textureIndex = static_cast<unsigned long>(
             m_textureSets[sMenuTextureInfoTable[i].m_textureSetIndex]->Find(sMenuTextureInfoTable[i].m_textureName));
         CTexture* texture =
             m_textureSets[sMenuTextureInfoTable[i].m_textureSetIndex]->GetTexture(textureIndex);
         texture->AddRef();
-        menu->m_textures[0x16] = texture;
-        i++;
-        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-    } while (i < 10);
+        m_textures[i + 0x16] = texture;
+    }
 
-    i = 0;
-    menu = this;
-    do {
-        CMesMenu* mesMenu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x48B) CMesMenu;
-        menu->m_battleMesMenus[0] = mesMenu;
-        menu->m_battleMesMenus[0]->SetBattleIndex(i);
-        menu->m_battleMesMenus[0]->Create();
-        i++;
-        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-    } while (i < 12);
+    for (int i = 0; i < 12; i++) {
+        CMesMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x48B) CMesMenu;
+        m_battleMesMenus[i] = menu;
+        m_battleMesMenus[i]->SetBattleIndex(i);
+        m_battleMesMenus[i]->Create();
+    }
 
-    i = 0;
-    menu = this;
-    do {
-        CRingMenu* ringMenu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x492) CRingMenu;
-        menu->m_battleRingMenus[0] = ringMenu;
-        menu->m_battleRingMenus[0]->m_menuIndex = i;
-        menu->m_battleRingMenus[0]->Create();
-        i++;
-        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-    } while (i < 4);
+    for (int i = 0; i < 4; i++) {
+        CRingMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x492) CRingMenu;
+        m_battleRingMenus[i] = menu;
+        m_battleRingMenus[i]->m_menuIndex = i;
+        m_battleRingMenus[i]->Create();
+    }
 
     sprintf(fontPath, const_cast<char*>(sMenuGc23FontPathFmt), Game.GetLangString());
     loadFont(0, fontPath, 1, 1);
@@ -1763,32 +1743,15 @@ void CMenuPcs::drawBattle()
         }
     }
 
-    CMenuPcs* menu;
-    int i;
-
-    i = 0;
-    menu = this;
-    do {
-        menu->m_battleRingMenus[0]->Draw();
-        i++;
-        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-    } while (i < 4);
-
-    i = 0;
-    menu = this;
-    do {
-        reinterpret_cast<CMenu*>(menu->m_battleMesMenus[0])->Draw();
-        i++;
-        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-    } while (i < 12);
-
-    i = 0;
-    menu = this;
-    do {
-        menu->m_battleRingMenus[0]->DrawIcon();
-        i++;
-        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-    } while (i < 4);
+    for (int i = 0; i < 4; i++) {
+        m_battleRingMenus[i]->Draw();
+    }
+    for (int i = 0; i < 12; i++) {
+        reinterpret_cast<CMenu*>(m_battleMesMenus[i])->Draw();
+    }
+    for (int i = 0; i < 4; i++) {
+        m_battleRingMenus[i]->DrawIcon();
+    }
 }
 
 /*

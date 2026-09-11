@@ -390,7 +390,6 @@ inline int CMenuPcs::LetterLstOpen()
  */
 inline int CMenuPcs::LetterLstClose()
 {
-
 	LetterMenuState* state = m_letterMenuState;
 	state->frame = state->frame + 1;
 
@@ -1333,10 +1332,10 @@ void CMenuPcs::LetterMessDraw()
 	u16 msgIndex = letter->HeaderWord();
 	strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
 	CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
-
-	char* curLine = workText;
-	int i = 0;
 	int y = 0x58;
+
+	int i = 0;
+	char* curLine = workText;
 	for (; i < 7; ++i) {
 		char* newline = strchr(curLine, '\n');
 		y0 = static_cast<float>(y);
@@ -1811,10 +1810,10 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, FLOAT_803330bc);
 	}
 
-	double innerW = w - DOUBLE_803330d8;
-	float y = y0;
 	float innerX = FLOAT_803330f4 + x0;
+	double innerW = w - DOUBLE_803330d8;
 	float innerWf = static_cast<float>(innerW);
+	float y = y0;
 	for (i = 0; i < 2; ++i) {
 		int tex = 0x49;
 		if (i != 0) {

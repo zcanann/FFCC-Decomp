@@ -1223,7 +1223,7 @@ void CSound::LoadSe(int seId)
  */
 void CSound::LoadSe(void* seData)
 {
-    if (m_redSound.ReentrySeSepData(*reinterpret_cast<s32*>((u8*)seData + 8)) == -1) {
+    if (m_redSound.ReentrySeSepData(RedSeSepHeadFromData(seData)->m_seNo) == -1) {
         m_redSound.SetSeSepData(seData);
     }
 }
@@ -1295,7 +1295,7 @@ void CSound::LoadWave(void* waveData)
 {
     CFile::CHandle*& waveFile = m_waveFile;
 
-    if (m_redSound.ReentryWaveData(reinterpret_cast<s16*>(waveData)[1]) == -1) {
+    if (m_redSound.ReentryWaveData(RedWaveHeadFromData(waveData)->m_waveNo) == -1) {
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
@@ -1470,38 +1470,40 @@ inline void CSound::ChangeSePan(int seId, int pan, int frames)
  */
 void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
 {
-    float fVar1;
-    float fVar2;
-    float fVar3;
-    int iVar4;
-    int iVar5;
+    float distScale;
+    float scaledFarSq;
+    float scaledDistSq;
+    float nearDist;
+    int lineHit;
+    int panX;
+    int clampedPanX;
     float nearestDistance;
     float nearestT;
     Vec nearestPoint;
 
     if (se3D->m_lineIndex >= 0) {
-        iVar4 = m_lines[se3D->m_lineIndex].Calc(
+        lineHit = m_lines[se3D->m_lineIndex].Calc(
             &nearestPoint, &nearestDistance, (u32*)0, &nearestT, reinterpret_cast<Vec*>(&CameraPcs.m_targetX),
             se3D->m_farDistance);
-        if (iVar4 != 0) {
+        if (lineHit != 0) {
             PSMTXMultVec(CameraPcs.m_cameraMatrix, &nearestPoint, &nearestPoint);
             if (nearestDistance < se3D->m_nearDistance) {
                 outVolume = 0x7F;
             } else {
-                fVar3 = se3D->m_nearDistance;
-                outVolume = 0x7F - (int)(127.0f * ((nearestDistance - fVar3) / (se3D->m_farDistance - fVar3)));
+                nearDist = se3D->m_nearDistance;
+                outVolume = 0x7F - (int)(127.0f * ((nearestDistance - nearDist) / (se3D->m_farDistance - nearDist)));
             }
 
-            iVar4 = (int)nearestPoint.x;
-            if (iVar4 < -0x38) {
-                iVar5 = -0x38;
+            panX = (int)nearestPoint.x;
+            if (panX < -0x38) {
+                clampedPanX = -0x38;
             } else {
-                iVar5 = 0x38;
-                if (iVar4 <= 0x38) {
-                    iVar5 = iVar4;
+                clampedPanX = 0x38;
+                if (panX <= 0x38) {
+                    clampedPanX = panX;
                 }
             }
-            outPan = iVar5 + 0x40;
+            outPan = clampedPanX + 0x40;
         } else {
             outVolume = 0;
             outPan = 0x40;
@@ -1510,59 +1512,59 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
         outVolume = 0x7F;
         outPan = 0x40;
     } else {
-        fVar1 = 1.0f;
+        distScale = 1.0f;
         if (static_cast<int>(Game.m_gameWork.m_soundOptionFlag) != 0) {
             switch (Game.m_gameWork.m_bossArtifactStageIndex) {
             case 8:
             case 0xE:
-                fVar1 = 5.0f;
+                distScale = 5.0f;
                 break;
             default:
-                fVar1 = 3.0f;
+                distScale = 3.0f;
                 break;
             }
         }
 
         PSMTXMultVec(CameraPcs.m_cameraMatrix, &se3D->m_position, &nearestPoint);
-        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs.m_targetX), &se3D->m_position);
-        fVar2 = se3D->m_farDistance * fVar1;
-        fVar2 = se3D->m_farDistance * fVar2;
-        fVar2 = fVar1 * fVar2;
-        if (fVar3 < fVar2) {
-            float nearScaled = se3D->m_nearDistance * fVar1;
-            nearScaled = se3D->m_nearDistance * nearScaled;
-            nearScaled = fVar1 * nearScaled;
-            if (fVar3 < nearScaled) {
+        scaledDistSq = distScale * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs.m_targetX), &se3D->m_position);
+        scaledFarSq = se3D->m_farDistance * distScale;
+        scaledFarSq = se3D->m_farDistance * scaledFarSq;
+        scaledFarSq = distScale * scaledFarSq;
+        if (scaledDistSq < scaledFarSq) {
+            float scaledNearSq = se3D->m_nearDistance * distScale;
+            scaledNearSq = se3D->m_nearDistance * scaledNearSq;
+            scaledNearSq = distScale * scaledNearSq;
+            if (scaledDistSq < scaledNearSq) {
                 outVolume = 0x7F;
             } else {
-                outVolume = 0x7F - (int)(127.0f * ((fVar3 - nearScaled) / (fVar2 - nearScaled)));
+                outVolume = 0x7F - (int)(127.0f * ((scaledDistSq - scaledNearSq) / (scaledFarSq - scaledNearSq)));
             }
         } else {
             outVolume = 0;
         }
 
         if (Game.m_currentMapId == 0x21) {
-            iVar4 = (int)(nearestPoint.x / 2.5f);
-            if (iVar4 < -0x38) {
-                iVar5 = -0x38;
+            panX = (int)(nearestPoint.x / 2.5f);
+            if (panX < -0x38) {
+                clampedPanX = -0x38;
             } else {
-                iVar5 = 0x38;
-                if (iVar4 <= 0x38) {
-                    iVar5 = iVar4;
+                clampedPanX = 0x38;
+                if (panX <= 0x38) {
+                    clampedPanX = panX;
                 }
             }
-            outPan = iVar5 + 0x40;
+            outPan = clampedPanX + 0x40;
         } else {
-            iVar4 = (int)nearestPoint.x;
-            if (iVar4 < -0x38) {
-                iVar5 = -0x38;
+            panX = (int)nearestPoint.x;
+            if (panX < -0x38) {
+                clampedPanX = -0x38;
             } else {
-                iVar5 = 0x38;
-                if (iVar4 <= 0x38) {
-                    iVar5 = iVar4;
+                clampedPanX = 0x38;
+                if (panX <= 0x38) {
+                    clampedPanX = panX;
                 }
             }
-            outPan = iVar5 + 0x40;
+            outPan = clampedPanX + 0x40;
         }
     }
 

@@ -1086,9 +1086,7 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         return;
     }
     {
-        float u0;
         float u1;
-        float v0;
         float v1;
         float x0;
         float y0;
@@ -1100,18 +1098,18 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
 
         if ((attr & 8) != 0) {
             u1 = u + 0.5f;
-            u0 = (u + w) - 0.5f;
+            u = (u + w) - 0.5f;
         } else {
-            u0 = u + 0.5f;
             u1 = (u + w) - 0.5f;
+            u = u + 0.5f;
         }
 
         if ((attr & 4) != 0) {
             v1 = v + 0.5f;
-            v0 = (v1 + h) - 0.5f;
+            v = (v1 + h) - 0.5f;
         } else {
-            v0 = v + 0.5f;
             v1 = (v + h) - 0.5f;
+            v = v + 0.5f;
         }
 
         scaledW = w * us;
@@ -1127,35 +1125,40 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         if (0.0f != angle) {
             float s = static_cast<float>(sin(angle));
             float c = static_cast<float>(cos(angle));
-            float xtl = ((x0 - x) * c) + x;
-            float ytl = ((x0 - x) * s) + y;
-            float tx0 = (y0 - y) * s;
-            float ty0 = (y0 - y) * c;
-            float xtr = ((x1 - x) * c) + x;
-            float ytr = ((x1 - x) * s) + y;
-            float tx1 = (y1 - y) * s;
-            float ty1 = (y1 - y) * c;
+            x0 -= x;
+            y0 -= y;
+            x1 -= x;
+            y1 -= y;
+
+            float xtl = (x0 * c) + x;
+            float ytl = (x0 * s) + y;
+            float tx0 = y0 * s;
+            float ty0 = y0 * c;
+            float xtr = (x1 * c) + x;
+            float ytr = (x1 * s) + y;
+            float tx1 = y1 * s;
+            float ty1 = y1 * c;
 
             GXPosition3f32(xtl - tx0, ytl + ty0, z);
-            GXTexCoord2f32(u0, v0);
+            GXTexCoord2f32(u, v);
 
             GXPosition3f32(xtr - tx0, ytr + ty0, z);
-            GXTexCoord2f32(u1, v0);
+            GXTexCoord2f32(u1, v);
 
             GXPosition3f32(xtl - tx1, ytl + ty1, z);
-            GXTexCoord2f32(u0, v1);
+            GXTexCoord2f32(u, v1);
 
             GXPosition3f32(xtr - tx1, ytr + ty1, z);
             GXTexCoord2f32(u1, v1);
         } else {
             GXPosition3f32(x0, y0, z);
-            GXTexCoord2f32(u0, v0);
+            GXTexCoord2f32(u, v);
 
             GXPosition3f32(x1, y0, z);
-            GXTexCoord2f32(u1, v0);
+            GXTexCoord2f32(u1, v);
 
             GXPosition3f32(x0, y1, z);
-            GXTexCoord2f32(u0, v1);
+            GXTexCoord2f32(u, v1);
 
             GXPosition3f32(x1, y1, z);
             GXTexCoord2f32(u1, v1);
@@ -1178,9 +1181,7 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         return;
     }
     {
-        float u0;
         float u1;
-        float v0;
         float v1;
         float x0;
         float y0;
@@ -1192,18 +1193,18 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
 
         if ((attr & 8) != 0) {
             u1 = u + 0.5f;
-            u0 = (u + w) - 0.5f;
+            u = (u + w) - 0.5f;
         } else {
-            u0 = u + 0.5f;
             u1 = (u + w) - 0.5f;
+            u = u + 0.5f;
         }
 
         if ((attr & 4) != 0) {
             v1 = v + 0.5f;
-            v0 = (v1 + h) - 0.5f;
+            v = (v1 + h) - 0.5f;
         } else {
-            v0 = v + 0.5f;
             v1 = (v + h) - 0.5f;
+            v = v + 0.5f;
         }
 
         scaledW = w * us;
@@ -1219,26 +1220,31 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         if (0.0f != angle) {
             float s = static_cast<float>(sin(angle));
             float c = static_cast<float>(cos(angle));
-            float xtl = ((x0 - x) * c) + x;
-            float ytl = ((x0 - x) * s) + y;
-            float tx0 = (y0 - y) * s;
-            float ty0 = (y0 - y) * c;
-            float xtr = ((x1 - x) * c) + x;
-            float ytr = ((x1 - x) * s) + y;
-            float tx1 = (y1 - y) * s;
-            float ty1 = (y1 - y) * c;
+            x0 -= x;
+            y0 -= y;
+            x1 -= x;
+            y1 -= y;
+
+            float xtl = (x0 * c) + x;
+            float ytl = (x0 * s) + y;
+            float tx0 = y0 * s;
+            float ty0 = y0 * c;
+            float xtr = (x1 * c) + x;
+            float ytr = (x1 * s) + y;
+            float tx1 = y1 * s;
+            float ty1 = y1 * c;
 
             GXPosition3f32(xtl - tx0, ytl + ty0, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[0]));
-            GXTexCoord2f32(u0, v0);
+            GXTexCoord2f32(u, v);
 
             GXPosition3f32(xtr - tx0, ytr + ty0, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[1]));
-            GXTexCoord2f32(u1, v0);
+            GXTexCoord2f32(u1, v);
 
             GXPosition3f32(xtl - tx1, ytl + ty1, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[2]));
-            GXTexCoord2f32(u0, v1);
+            GXTexCoord2f32(u, v1);
 
             GXPosition3f32(xtr - tx1, ytr + ty1, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[3]));
@@ -1246,15 +1252,15 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         } else {
             GXPosition3f32(x0, y0, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[0]));
-            GXTexCoord2f32(u0, v0);
+            GXTexCoord2f32(u, v);
 
             GXPosition3f32(x1, y0, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[1]));
-            GXTexCoord2f32(u1, v0);
+            GXTexCoord2f32(u1, v);
 
             GXPosition3f32(x0, y1, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[2]));
-            GXTexCoord2f32(u0, v1);
+            GXTexCoord2f32(u, v1);
 
             GXPosition3f32(x1, y1, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[3]));

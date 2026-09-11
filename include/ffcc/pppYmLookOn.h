@@ -21,8 +21,8 @@ struct YmLookOnDataOffsets {
 extern "C" {
 #endif
 
-void pppConstructYmLookOn(pppYmLookOn* pppYmLookOn, struct _pppCtrlTable* param_2);
-void pppFrameYmLookOn(pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* param_2, struct _pppCtrlTable* param_3);
+void pppConstructYmLookOn(pppYmLookOn* lookOn, struct _pppCtrlTable* ctrl);
+void pppFrameYmLookOn(pppYmLookOn* lookOn, struct pppYmLookOnStep* step, struct _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

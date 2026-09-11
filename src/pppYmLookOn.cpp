@@ -28,17 +28,17 @@ static inline CGObject** GetYmLookOnWork(pppYmLookOn* lookOn, _pppCtrlTable* ctr
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmLookOn(pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* param_2, struct _pppCtrlTable* param_3)
+void pppFrameYmLookOn(pppYmLookOn* lookOn, struct pppYmLookOnStep* step, struct _pppCtrlTable* ctrl)
 {
     struct _pppMngSt* pppMngSt;
     CGObject* owner;
     CGObject** work;
-    Vec local_44;
-    Vec local_28;
-    Vec local_34;
-    Vec local_40;
-    Vec local_4c;
-    Vec local_58;
+    Vec toEffect;
+    Vec axisX;
+    Vec axisY;
+    Vec axisZ;
+    Vec targetPos;
+    Vec effectPos;
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -46,7 +46,7 @@ void pppFrameYmLookOn(pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* param_2,
 
     pppMngSt = ppvMng;
     owner = pppMngSt->m_lookTarget;
-    work = GetYmLookOnWork(pppYmLookOn, param_3);
+    work = GetYmLookOnWork(lookOn, ctrl);
     if (owner == nullptr) {
         if (*work == nullptr) {
             return;
@@ -57,40 +57,40 @@ void pppFrameYmLookOn(pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* param_2,
         owner = *work;
     }
 
-    local_4c = owner->m_worldPosition;
-    local_4c.y += param_2->m_dataValIndex;
-    local_58.x = ppvMng->m_matrix.value[0][3];
-    local_58.y = ppvMng->m_matrix.value[1][3];
-    local_58.z = ppvMng->m_matrix.value[2][3];
-    PSVECSubtract(&local_58, &local_4c, &local_44);
+    targetPos = owner->m_worldPosition;
+    targetPos.y += step->m_dataValIndex;
+    effectPos.x = ppvMng->m_matrix.value[0][3];
+    effectPos.y = ppvMng->m_matrix.value[1][3];
+    effectPos.z = ppvMng->m_matrix.value[2][3];
+    PSVECSubtract(&effectPos, &targetPos, &toEffect);
 
-    if (((gPppYmLookOnZero != local_44.x) || (gPppYmLookOnZero != local_44.y)) || (gPppYmLookOnZero != local_44.z)) {
-        PSVECNormalize(&local_44, &local_40);
-        local_28.x = local_40.z;
-        local_28.y = gPppYmLookOnZero;
-        local_28.z = -local_40.x;
+    if (((gPppYmLookOnZero != toEffect.x) || (gPppYmLookOnZero != toEffect.y)) || (gPppYmLookOnZero != toEffect.z)) {
+        PSVECNormalize(&toEffect, &axisZ);
+        axisX.x = axisZ.z;
+        axisX.y = gPppYmLookOnZero;
+        axisX.z = -axisZ.x;
         f32 zero = gPppYmLookOnZero;
-        if ((zero == local_40.z) && (zero == local_28.z)) {
-            local_28.x = gPppYmLookOnOne;
-            local_28.y = gPppYmLookOnZero;
-            local_28.z = gPppYmLookOnZero;
-            local_34.x = gPppYmLookOnZero;
-            local_34.y = gPppYmLookOnZero;
-            local_34.z = gPppYmLookOnOne;
+        if ((zero == axisZ.z) && (zero == axisX.z)) {
+            axisX.x = gPppYmLookOnOne;
+            axisX.y = gPppYmLookOnZero;
+            axisX.z = gPppYmLookOnZero;
+            axisY.x = gPppYmLookOnZero;
+            axisY.y = gPppYmLookOnZero;
+            axisY.z = gPppYmLookOnOne;
         } else {
-            PSVECNormalize(&local_28, &local_28);
-            PSVECCrossProduct(&local_40, &local_28, &local_34);
-            PSVECNormalize(&local_34, &local_34);
+            PSVECNormalize(&axisX, &axisX);
+            PSVECCrossProduct(&axisZ, &axisX, &axisY);
+            PSVECNormalize(&axisY, &axisY);
         }
-        ppvMng->m_matrix.value[0][0] = local_28.x;
-        ppvMng->m_matrix.value[1][0] = local_28.y;
-        ppvMng->m_matrix.value[2][0] = local_28.z;
-        ppvMng->m_matrix.value[0][1] = local_34.x;
-        ppvMng->m_matrix.value[1][1] = local_34.y;
-        ppvMng->m_matrix.value[2][1] = local_34.z;
-        ppvMng->m_matrix.value[0][2] = local_40.x;
-        ppvMng->m_matrix.value[1][2] = local_40.y;
-        ppvMng->m_matrix.value[2][2] = local_40.z;
+        ppvMng->m_matrix.value[0][0] = axisX.x;
+        ppvMng->m_matrix.value[1][0] = axisX.y;
+        ppvMng->m_matrix.value[2][0] = axisX.z;
+        ppvMng->m_matrix.value[0][1] = axisY.x;
+        ppvMng->m_matrix.value[1][1] = axisY.y;
+        ppvMng->m_matrix.value[2][1] = axisY.z;
+        ppvMng->m_matrix.value[0][2] = axisZ.x;
+        ppvMng->m_matrix.value[1][2] = axisZ.y;
+        ppvMng->m_matrix.value[2][2] = axisZ.z;
         pppSetFpMatrix(pppMngSt);
     }
 }
@@ -104,7 +104,7 @@ void pppFrameYmLookOn(pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* param_2,
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmLookOn(pppYmLookOn* pppYmLookOn, struct _pppCtrlTable* param_2)
+void pppConstructYmLookOn(pppYmLookOn* lookOn, struct _pppCtrlTable* ctrl)
 {
-    *GetYmLookOnWork(pppYmLookOn, param_2) = 0;
+    *GetYmLookOnWork(lookOn, ctrl) = 0;
 }

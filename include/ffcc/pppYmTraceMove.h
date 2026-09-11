@@ -25,8 +25,8 @@ typedef _pppPObject pppYmTraceMove;
 extern "C" {
 #endif
 
-void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, _pppCtrlTable* param_2);
-void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* param_2, _pppCtrlTable* param_3);
+void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, _pppCtrlTable* ctrl);
+void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* step, _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

@@ -840,8 +840,6 @@ int CGCharaObj::calcCastTime(int itemId)
 		result = static_cast<int>(castScale * static_cast<float>(totalCast));
 		result = result < 0 ? 0 : result;
 		System.Printf(fmt + 0xC4, baseCast, castBonus, castReduction, castScale, result);
-	} else {
-		result = static_cast<int>(baseCast);
 	}
 
 	return result;
@@ -3371,14 +3369,7 @@ void CGCharaObj::onFramePostCalc()
 			unsigned short padMask = Pad.GetButtonDown(slot);
 			if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
 				bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
-				unsigned short heldMask;
-				if (useDebugPad) {
-					heldMask = 0;
-				} else {
-					int activePad = Pad.m_debugPadPort;
-					int idx = slot == activePad ? 0 : slot;
-					heldMask = Pad.GetPadInputs()[idx].stickBitsDown;
-				}
+				unsigned short heldMask = useDebugPad ? 0 : Pad.GetPadInputs()[(slot == Pad.m_debugPadPort) ? 0 : slot].stickBitsDown;
 				padMask |= heldMask;
 			}
 			if ((padMask & 0xF) != 0) {

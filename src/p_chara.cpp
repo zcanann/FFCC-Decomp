@@ -2962,8 +2962,8 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
 
     if (m_asyncState == 2) {
         void* readBuffer = File.m_readBuffer;
-        int keyId = m_asyncCharaNo;
         int keyTag = m_asyncCharaKind;
+        int keyId = m_asyncCharaNo;
         CLoadModel* loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
         loadModel->m_keyTag = keyTag;
         loadModel->m_keyId = keyId;

@@ -55,7 +55,7 @@ public:
 	void drawAStar();
 	void addRealTime(CGPartyObj* gPartyObj);
 	CAPos* getEscapePos(Vec& from, Vec& base, int startGroup, int forbiddenGroup);
-	unsigned char calcSpecialPolygonGroup(Vec* pos);
+	int calcSpecialPolygonGroup(Vec* pos);
 	int calcPolygonGroup(Vec* pos, int hitAttributeMask);
 
 	unsigned int m_flags;                   // 0x00

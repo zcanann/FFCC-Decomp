@@ -2225,7 +2225,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 				changeStat(0x19, 0, 0);
 			}
 			break;
-		case 0x68:
+		case 0x69:
 			if (reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_statusTimers[0] != 0) {
 				setSta(0, 0);
 			}
@@ -2290,7 +2290,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			outValue = 0;
 			putHitParticleFromItem(sourceObj, amount);
 			break;
-		case 0x69:
+		case 0x67:
 			for (int i = 0; i < 0x27; i++) {
 				setSta(i, 0);
 			}
@@ -2410,7 +2410,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 	int current = work->m_statusTimers[staIndex];
 	clampedValue = value < 0 ? 0 : value;
 
-	if (current != 0 || clampedValue == 0) {
+	if (current != 0 && clampedValue == 0) {
 		switch (staIndex) {
 			case 0x1B:
 				for (int i = 0; i < 0x16; i++) {
@@ -2663,8 +2663,8 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				putParticleBindTrace(0x107, m_particleSlots[20], this, FLOAT_803319AC * m_attackColRadius, 0);
 				break;
-			case 0x67:
-			case 0x68:
+			case 0x65:
+			case 0x66:
 			default:
 				break;
 		}
@@ -3033,23 +3033,27 @@ void CGCharaObj::onFrameStat()
 			break;
 
 		case 9:
-			if (m_subState == 0 && m_subFrame == 0) {
-				Sound.StopSe3DGroup(m_particleId);
-				{
-					unsigned char* slot = reinterpret_cast<unsigned char*>(this);
-					int i = 0;
-					for (; i < 0x16; i++, slot += 4) {
-						if ((0x3BU & (1U << i)) != 0) {
-							CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+			switch (m_subState) {
+			case 0:
+				if (m_subFrame == 0) {
+					Sound.StopSe3DGroup(m_particleId);
+					{
+						unsigned char* slot = reinterpret_cast<unsigned char*>(this);
+						int i = 0;
+						for (; i < 0x16; i++, slot += 4) {
+							if ((0x3BU & (1U << i)) != 0) {
+								CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(slot + 0x564), 1);
+							}
 						}
 					}
-				}
-				reqAnim(6, 1, 0);
+					reqAnim(6, 1, 0);
 
-				if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
-					playSe3D(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) + 0x10,
-					         0x32, 0x96, 0, 0);
+					if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
+						playSe3D(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) + 0x10,
+						         0x32, 0x96, 0, 0);
+					}
 				}
+				break;
 			}
 
 			onStatDie();
@@ -3326,7 +3330,7 @@ void CGCharaObj::onFramePreCalc()
 	}
 
 	if ((AStar.m_flags & 1) != 0) {
-		m_aStarGroupId = static_cast<unsigned short>(AStar.calcSpecialPolygonGroup(&m_worldPosition));
+		m_aStarGroupId = AStar.calcSpecialPolygonGroup(&m_worldPosition);
 	} else {
 		m_aStarGroupId = static_cast<unsigned char>(m_lastBgGroup);
 	}

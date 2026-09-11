@@ -71,7 +71,7 @@ void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX a, pppFMATRIX b);
 void pppCopyVector(Vec& dest, Vec source);
 void pppSubVector(Vec& dest, Vec a, Vec b);
 float pppVectorLength(Vec vec);
-void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long param_2);
+void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long heapSize);
 void pppDestroyHeap(_pppEnvSt* pppEnvSt);
 void* pppMemAlloc(unsigned long, CMemory::CStage*, char*, int);
 void* pppMemAllocNoReport(unsigned long, CMemory::CStage*, char*, int);

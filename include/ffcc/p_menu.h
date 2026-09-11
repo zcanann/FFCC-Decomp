@@ -997,7 +997,7 @@ public:
 
 extern CMenuPcs MenuPcs;
 extern const char* sMenuTextureRegionNameTable[];
-extern int sMenuTextureInfoTable[];
+extern CMenuPcs::CTmp sMenuTextureInfoTable[];
 
 STATIC_ASSERT(sizeof(CMenuPcs::BattleHudState) == 0x28);
 STATIC_ASSERT(sizeof(MenuWindowInfo) == 0x0C);

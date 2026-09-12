@@ -327,9 +327,9 @@ float pppVectorLength(Vec vec)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long param_2)
+void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long heapSize)
 {
-	pppEnvSt->m_stagePtr = Memory.CreateStage(param_2, "CPartPcs.heap", 0);
+	pppEnvSt->m_stagePtr = Memory.CreateStage(heapSize, "CPartPcs.heap", 0);
 }
 
 /*
@@ -1217,56 +1217,56 @@ LocalOnly:
  */
 void pppSetFpMatrix(_pppMngSt* pppMngSt)
 {
-	Vec local_9c;
-	Vec local_80;
-	Vec local_70;
-	Vec local_50;
-	Mtx local_44;
+	Vec axisX;
+	Vec axisZ;
+	Vec axisY;
+	Vec worldPos;
+	Mtx mngMatrix;
 
-	PSMTXCopy(ppvMng->m_matrix.value, local_44);
+	PSMTXCopy(ppvMng->m_matrix.value, mngMatrix);
 	if (pppMngSt->m_fpBillboard != 0) {
 		PSMTXConcat(ppvCameraMatrix, ppvMng->m_matrix.value, ppvWorldMatrix);
-		local_50.x = local_44[0][3];
-		local_50.y = local_44[1][3];
-		local_50.z = local_44[2][3];
-		PSMTXMultVecSR(ppvCameraMatrix, &local_50, &local_50);
-		local_50.y += CameraPcs.m_positionY;
-		ppvWorldMatrix[0][3] = local_50.x;
-		ppvWorldMatrix[1][3] = local_50.y;
-		ppvWorldMatrix[2][3] = local_50.z;
+		worldPos.x = mngMatrix[0][3];
+		worldPos.y = mngMatrix[1][3];
+		worldPos.z = mngMatrix[2][3];
+		PSMTXMultVecSR(ppvCameraMatrix, &worldPos, &worldPos);
+		worldPos.y += CameraPcs.m_positionY;
+		ppvWorldMatrix[0][3] = worldPos.x;
+		ppvWorldMatrix[1][3] = worldPos.y;
+		ppvWorldMatrix[2][3] = worldPos.z;
 	} else {
 		PSMTXConcat(ppvCameraMatrix, ppvMng->m_matrix.value, ppvWorldMatrix);
-		local_50.x = local_44[0][3];
-		local_50.y = local_44[1][3];
-		local_50.z = local_44[2][3];
-		PSMTXMultVec(ppvCameraMatrix, &local_50, &local_50);
-		ppvWorldMatrix[0][3] = local_50.x;
-		ppvWorldMatrix[1][3] = local_50.y;
-		ppvWorldMatrix[2][3] = local_50.z;
+		worldPos.x = mngMatrix[0][3];
+		worldPos.y = mngMatrix[1][3];
+		worldPos.z = mngMatrix[2][3];
+		PSMTXMultVec(ppvCameraMatrix, &worldPos, &worldPos);
+		ppvWorldMatrix[0][3] = worldPos.x;
+		ppvWorldMatrix[1][3] = worldPos.y;
+		ppvWorldMatrix[2][3] = worldPos.z;
 	}
 
-	local_70.x = ppvWorldMatrix[0][1];
-	local_70.y = ppvWorldMatrix[1][1];
-	local_70.z = ppvWorldMatrix[2][1];
-	pppNormalize(local_70, local_70);
+	axisY.x = ppvWorldMatrix[0][1];
+	axisY.y = ppvWorldMatrix[1][1];
+	axisY.z = ppvWorldMatrix[2][1];
+	pppNormalize(axisY, axisY);
 
-	local_9c.x = local_70.y;
-	local_9c.y = -local_70.x;
-	local_9c.z = 0.0f;
-	ppvWorldMatrixWood[0][1] = local_70.x;
-	ppvWorldMatrixWood[1][1] = local_70.y;
-	ppvWorldMatrixWood[2][1] = local_70.z;
-	pppNormalize(local_9c, local_9c);
+	axisX.x = axisY.y;
+	axisX.y = -axisY.x;
+	axisX.z = 0.0f;
+	ppvWorldMatrixWood[0][1] = axisY.x;
+	ppvWorldMatrixWood[1][1] = axisY.y;
+	ppvWorldMatrixWood[2][1] = axisY.z;
+	pppNormalize(axisX, axisX);
 
-	ppvWorldMatrixWood[0][0] = local_9c.x;
-	ppvWorldMatrixWood[1][0] = local_9c.y;
-	ppvWorldMatrixWood[2][0] = local_9c.z;
-	PSVECCrossProduct(&local_9c, &local_70, &local_80);
-	pppNormalize(local_80, local_80);
+	ppvWorldMatrixWood[0][0] = axisX.x;
+	ppvWorldMatrixWood[1][0] = axisX.y;
+	ppvWorldMatrixWood[2][0] = axisX.z;
+	PSVECCrossProduct(&axisX, &axisY, &axisZ);
+	pppNormalize(axisZ, axisZ);
 
-	ppvWorldMatrixWood[0][2] = local_80.x;
-	ppvWorldMatrixWood[1][2] = local_80.y;
-	ppvWorldMatrixWood[2][2] = local_80.z;
+	ppvWorldMatrixWood[0][2] = axisZ.x;
+	ppvWorldMatrixWood[1][2] = axisZ.y;
+	ppvWorldMatrixWood[2][2] = axisZ.z;
 	ppvWorldMatrixWood[0][3] = ppvWorldMatrix[0][3];
 	ppvWorldMatrixWood[1][3] = ppvWorldMatrix[1][3];
 	ppvWorldMatrixWood[2][3] = ppvWorldMatrix[2][3];
@@ -1486,7 +1486,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
+void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int cachePriority)
 {
 	u8* dataBase = reinterpret_cast<u8*>(&pppDataHead->m_version);
 
@@ -1511,7 +1511,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 		memcpy(chunkData, chunkSrc, chunkSize);
 		pppDataHead->m_cacheChunks[i].m_cacheIndex =
-		    ppvAmemCacheSet.SetData(chunkData, chunkSize, CAmemCache::PDT, param_3);
+		    ppvAmemCacheSet.SetData(chunkData, chunkSize, CAmemCache::PDT, cachePriority);
 		delete chunkData;
 		chunkOffsets++;
 	}

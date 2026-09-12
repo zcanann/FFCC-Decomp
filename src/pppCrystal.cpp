@@ -113,13 +113,13 @@ static inline float CrystalSqrtPositive(float value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlTable* param_3)
+void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable* ctrl)
 {
 	float texW;
 	float texH;
-	s32 dataValIndex = param_2->m_dataValIndex;
-	CrystalWork* work = GetCrystalWork(pppCrystal, param_3);
-	VColor* colorBlock = GetCrystalColorBlock(pppCrystal, param_3);
+	s32 dataValIndex = step->m_dataValIndex;
+	CrystalWork* work = GetCrystalWork(pppCrystal, ctrl);
+	VColor* colorBlock = GetCrystalColorBlock(pppCrystal, ctrl);
 
 	if (dataValIndex == 0xFFFF) {
 		return;
@@ -129,12 +129,12 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlT
 	CTexture* indirectTex = 0;
 	int texSlot = 0;
 	CTexture* baseTex = static_cast<CTexture*>(((CMapMesh*)model)->GetTexture(ppvEnv->m_materialSetPtr, texSlot));
-	if (param_2->m_crystal.m_refractionMode == 0) {
-		if (param_2->m_initWOrk == 0xFFFF) {
+	if (step->m_crystal.m_refractionMode == 0) {
+		if (step->m_initWOrk == 0xFFFF) {
 			return;
 		}
 		indirectTex =
-			static_cast<CTexture*>(ppvEnv->m_mapMeshPtr[param_2->m_initWOrk]->GetTexture(ppvEnv->m_materialSetPtr, texSlot));
+			static_cast<CTexture*>(ppvEnv->m_mapMeshPtr[step->m_initWOrk]->GetTexture(ppvEnv->m_materialSetPtr, texSlot));
 	}
 
 	int x = 0;
@@ -146,15 +146,15 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlT
 		return;
 	}
 
-	pppSetBlendMode(param_2->m_crystal.m_blendMode);
+	pppSetBlendMode(step->m_crystal.m_blendMode);
 	pppSetDrawEnv(
-		&colorBlock->m_color, &pppCrystal->m_drawMatrix, param_2->m_arg3,
-		param_2->m_crystal.m_drawEnvColor1, param_2->m_crystal.m_drawEnvColor0, param_2->m_crystal.m_blendMode, param_2->m_crystal.m_drawFlag, 1, 1, param_2->m_crystal.m_zMode);
+		&colorBlock->m_color, &pppCrystal->m_drawMatrix, step->m_arg3,
+		step->m_crystal.m_drawEnvColor1, step->m_crystal.m_drawEnvColor0, step->m_crystal.m_blendMode, step->m_crystal.m_drawFlag, 1, 1, step->m_crystal.m_zMode);
 
 	Mtx lightMtx;
 	CrystalTexMtx texMtx = s_crystalTexMtxBase;
 
-	if (param_2->m_crystal.m_refractionMode == 1) {
+	if (step->m_crystal.m_refractionMode == 1) {
 		texW = CRYSTAL_REFRACTION_SIZE;
 		texH = CRYSTAL_REFRACTION_SIZE;
 	}
@@ -164,8 +164,8 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlT
 	}
 
 	CrystalIndTexMtx indMtx = s_crystalIndTexMtxBase;
-	indMtx.value[0][0] = ((CRYSTAL_HALF_NEGATIVE * texW) / CRYSTAL_SCREEN_WIDTH) * param_2->m_stepValue;
-	indMtx.value[1][1] = ((CRYSTAL_HALF_NEGATIVE * texH) / CRYSTAL_SCREEN_HEIGHT) * param_2->m_stepValue;
+	indMtx.value[0][0] = ((CRYSTAL_HALF_NEGATIVE * texW) / CRYSTAL_SCREEN_WIDTH) * step->m_stepValue;
+	indMtx.value[1][1] = ((CRYSTAL_HALF_NEGATIVE * texH) / CRYSTAL_SCREEN_HEIGHT) * step->m_stepValue;
 
 	_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	GXSetNumTexGens(3);
@@ -200,7 +200,7 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlT
 	_GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 	_GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
 	_GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-	if (param_2->m_crystal.m_refractionMode == 1) {
+	if (step->m_crystal.m_refractionMode == 1) {
 		GXLoadTexObj(work->m_refractionTexObj, GX_TEXMAP1);
 	} else {
 		GXLoadTexObj(&indirectTex->m_texObj, GX_TEXMAP1);
@@ -232,7 +232,7 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlT
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlTable* param_3)
+void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable* ctrl)
 {
 	u32 y;
 	CrystalWork* work;
@@ -257,8 +257,8 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlTa
 		return;
 	}
 
-	work = GetCrystalWork(pppCrystal, param_3);
-	s32 dataValIndex = param_2->m_dataValIndex;
+	work = GetCrystalWork(pppCrystal, ctrl);
+	s32 dataValIndex = step->m_dataValIndex;
 	if (dataValIndex == 0xFFFF) {
 		return;
 	}
@@ -267,16 +267,16 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlTa
 	textureIndex = 0;
 	mapMesh->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
 
-	if (param_2->m_crystal.m_refractionMode == 0) {
-		if (param_2->m_initWOrk == 0xFFFF) {
+	if (step->m_crystal.m_refractionMode == 0) {
+		if (step->m_initWOrk == 0xFFFF) {
 			return;
 		}
 
-		mapMesh = ppvEnv->m_mapMeshPtr[param_2->m_initWOrk];
+		mapMesh = ppvEnv->m_mapMeshPtr[step->m_initWOrk];
 		mapMesh->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
 	}
 
-	if ((param_2->m_crystal.m_refractionMode == 1) && (work->m_refractionMap == 0)) {
+	if ((step->m_crystal.m_refractionMode == 1) && (work->m_refractionMap == 0)) {
 		work->m_refractionMap = (HSD_ImageBuffer*)pppMemAlloc(
 			sizeof(HSD_ImageBuffer), ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystalCpp), 0xA7);
 
@@ -353,9 +353,9 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlTa
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* param_2)
+void pppDestructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* ctrl)
 {
-	CrystalWork* work = GetCrystalWork(pppCrystal, param_2);
+	CrystalWork* work = GetCrystalWork(pppCrystal, ctrl);
 	HSD_ImageBuffer* textureInfo = work->m_refractionMap;
 
 	if ((textureInfo != 0) && (textureInfo->m_imageData != 0)) {
@@ -380,9 +380,9 @@ void pppDestructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* param_2)
+void pppConstructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* ctrl)
 {
-	CrystalWork* work = GetCrystalWork(pppCrystal, param_2);
+	CrystalWork* work = GetCrystalWork(pppCrystal, ctrl);
 
 	work->m_refractionMap = 0;
 	work->m_refractionTexObj = 0;

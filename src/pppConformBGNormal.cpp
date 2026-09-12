@@ -49,7 +49,7 @@ static inline Vec* ConformBgNormalHitNormal(CGObject* owner)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformBGNormalStep* param2, struct _pppCtrlTable* param3)
+void pppFrameConformBGNormal(pppConformBGNormal* conformBG, pppConformBGNormalStep* step, struct _pppCtrlTable* ctrl)
 {
     u8 mode;
     f32 matrixX;
@@ -70,18 +70,18 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
     f64 trigValue;
     Mtx basisMtx;
     Mtx scaleMtx;
-    ConformBgNormalCylinder firstCylinder;
-    ConformBgNormalCylinder secondCylinder;
-    Vec local_140;
-    Vec local_14c;
-    Vec local_158;
-    Vec local_164;
-    Vec local_170;
-    Vec firstRayDirection;
-    Quaternion local_18c;
-    Quaternion local_19c;
-    Quaternion local_1ac;
-    Vec secondRayDirection;
+    ConformBgNormalCylinder emitterProbeCylinder;
+    ConformBgNormalCylinder ownerProbeCylinder;
+    Vec tangentAxis;
+    Vec bitangentAxis;
+    Vec normalAxis;
+    Vec surfaceNormal;
+    Vec hitPosition;
+    Vec emitterProbeRay;
+    Quaternion prevNormalQuat;
+    Quaternion targetNormalQuat;
+    Quaternion blendedNormalQuat;
+    Vec ownerProbeRay;
     s32 dataOffset;
 
     if (ppvUserStopPartF != 0) {
@@ -94,184 +94,184 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
     matrixX = pppMngSt->m_matrix.value[0][3];
     matrixY = pppMngSt->m_matrix.value[1][3];
     matrixZ = pppMngSt->m_matrix.value[2][3];
-    dataOffset = GetConformBgNormalDataOffsets(param3)->m_stateOffset;
-    state = (ConformBgNormalState*)(pppConformBGNormal->m_workArea + dataOffset);
+    dataOffset = GetConformBgNormalDataOffsets(ctrl)->m_stateOffset;
+    state = (ConformBgNormalState*)(conformBG->m_workArea + dataOffset);
 
-    if (((s32)Game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
-            mode = param2->m_stepValue;
+    if (((s32)Game.m_currentSceneId != 7) || (step->m_stepValue == 2)) {
+        mode = step->m_stepValue;
 
-            if (mode == 0) {
-                if ((s8)((s32)((u32)(owner->m_stateFlags0 & 0xc0) << 24) >> 31) != 0) {
-                    local_164 = *ConformBgNormalHitNormal(owner);
-                } else {
-                    local_164.x = 0.0f;
-                    local_164.y = 1.0f;
-                    local_164.z = 0.0f;
-                }
-            } else if (mode == 1) {
-                hitFound = 1;
-                Game.GetTargetCursor(ppvMng->m_hitParams.m_particleIndex, local_170, local_164);
-            } else if (mode == 2) {
-                firstRayDirection.x = 0.0f;
-                firstRayDirection.y = -2000.0f;
-                firstRayDirection.z = 0.0f;
-
-                cylinderY = matrixY + param2->m_arg3;
-                firstCylinder.m_boundsMin.z = 10000000000.0f;
-                firstCylinder.m_boundsMin.y = 10000000000.0f;
-                firstCylinder.m_boundsMin.x = 10000000000.0f;
-                firstCylinder.m_boundsMax.z = -10000000000.0f;
-                firstCylinder.m_boundsMax.y = -10000000000.0f;
-                firstCylinder.m_boundsMax.x = -10000000000.0f;
-                firstCylinder.m_bottom.x = matrixX;
-                firstCylinder.m_bottom.y = cylinderY;
-                firstCylinder.m_bottom.z = matrixZ;
-                firstCylinder.m_axis.x = 0.0f;
-                firstCylinder.m_axis.y = -2000.0f;
-                firstCylinder.m_axis.z = 0.0f;
-                firstCylinder.m_radius = 0.0f;
-
-                checkResult = MapMng.CheckHitCylinderNear((CMapCylinder*)&firstCylinder, &firstRayDirection, 0xffffffff);
-                hitFound = checkResult;
-                if (checkResult != 0) {
-                    MapMng.m_hitMapObj->CalcHitPosition(&local_170);
-                    MapMng.m_hitMapObj->GetHitFaceNormal(&local_164);
-                    if ((matrixY - 10.0f) > local_170.y) {
-                        local_170.y = matrixY;
-                    }
-                } else {
-                    local_164.x = 0.0f;
-                    local_164.y = 1.0f;
-                    local_164.z = 0.0f;
-                    local_170.x = matrixX;
-                    local_170.y = matrixY;
-                    local_170.z = matrixZ;
-                }
-            }
-
-            if (state->m_initialized == 0) {
-                state->m_initialized = 1;
-                state->m_normal.x = local_164.x;
-                state->m_normal.y = local_164.y;
-                state->m_normal.z = local_164.z;
-            }
-
-            local_18c.x = state->m_normal.x;
-            local_18c.y = state->m_normal.y;
-            local_18c.z = state->m_normal.z;
-            local_18c.w = 1.0f;
-            local_19c.x = local_164.x;
-            local_19c.y = local_164.y;
-            local_19c.z = local_164.z;
-            local_19c.w = local_18c.w;
-            C_QUATSlerp(&local_18c, &local_19c, &local_1ac, param2->m_initWOrk);
-            state->m_normal.x = local_1ac.x;
-            state->m_normal.y = local_1ac.y;
-            state->m_normal.z = local_1ac.z;
-
-            PSVECNormalize(&state->m_normal, &local_158);
-
-            if ((param2->m_stepValue == 0) && (owner != NULL)) {
-                trigValue = sin((f64)owner->m_rotBaseY);
-                local_14c.x = (f32)trigValue;
-                local_14c.y = 0.0f;
-                trigValue = cos((f64)owner->m_rotBaseY);
-                local_14c.z = (f32)trigValue;
-                PSVECCrossProduct(&local_14c, &local_158, &local_140);
-                PSVECNormalize(&local_140, &local_140);
-                PSVECCrossProduct(&local_158, &local_140, &local_14c);
-                PSVECNormalize(&local_14c, &local_14c);
+        if (mode == 0) {
+            if ((s8)((s32)((u32)(owner->m_stateFlags0 & 0xc0) << 24) >> 31) != 0) {
+                surfaceNormal = *ConformBgNormalHitNormal(owner);
             } else {
-                local_140.x = 1.0f;
-                local_140.z = local_140.y = 0.0f;
-                PSVECCrossProduct(&local_158, &local_140, &local_14c);
-                PSVECNormalize(&local_14c, &local_14c);
-                PSVECCrossProduct(&local_14c, &local_158, &local_140);
-                PSVECNormalize(&local_140, &local_140);
+                surfaceNormal.x = 0.0f;
+                surfaceNormal.y = 1.0f;
+                surfaceNormal.z = 0.0f;
             }
+        } else if (mode == 1) {
+            hitFound = 1;
+            Game.GetTargetCursor(ppvMng->m_hitParams.m_particleIndex, hitPosition, surfaceNormal);
+        } else if (mode == 2) {
+            emitterProbeRay.x = 0.0f;
+            emitterProbeRay.y = -2000.0f;
+            emitterProbeRay.z = 0.0f;
 
-            PSMTXIdentity(basisMtx);
-            basisMtx[0][0] = local_140.x;
-            basisMtx[0][1] = local_14c.x;
-            basisMtx[0][2] = local_158.x;
-            basisMtx[1][0] = local_140.y;
-            basisMtx[1][1] = local_14c.y;
-            basisMtx[1][2] = local_158.y;
-            basisMtx[2][0] = local_140.z;
-            basisMtx[2][1] = local_14c.z;
-            basisMtx[2][2] = local_158.z;
+            cylinderY = matrixY + step->m_arg3;
+            emitterProbeCylinder.m_boundsMin.z = 10000000000.0f;
+            emitterProbeCylinder.m_boundsMin.y = 10000000000.0f;
+            emitterProbeCylinder.m_boundsMin.x = 10000000000.0f;
+            emitterProbeCylinder.m_boundsMax.z = -10000000000.0f;
+            emitterProbeCylinder.m_boundsMax.y = -10000000000.0f;
+            emitterProbeCylinder.m_boundsMax.x = -10000000000.0f;
+            emitterProbeCylinder.m_bottom.x = matrixX;
+            emitterProbeCylinder.m_bottom.y = cylinderY;
+            emitterProbeCylinder.m_bottom.z = matrixZ;
+            emitterProbeCylinder.m_axis.x = 0.0f;
+            emitterProbeCylinder.m_axis.y = -2000.0f;
+            emitterProbeCylinder.m_axis.z = 0.0f;
+            emitterProbeCylinder.m_radius = 0.0f;
 
-            PSMTXCopy(basisMtx, ppvMng->m_matrix.value);
-            PSMTXScale(scaleMtx, ppvMng->m_scale.x, ppvMng->m_scale.y, ppvMng->m_scale.z);
-            PSMTXConcat(scaleMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
-
-            mode = param2->m_stepValue;
-            if (mode == 0) {
-                if ((s8)((s32)((u32)(owner->m_stateFlags0 & 0xc0) << 24) >> 31) != 0) {
-                    ppvMng->m_matrix.value[0][3] = owner->m_worldPosition.x;
-                    ppvMng->m_matrix.value[1][3] = owner->m_worldPosition.y;
-                    ppvMng->m_matrix.value[2][3] = owner->m_worldPosition.z;
-                } else if ((owner->m_weaponNodeFlagBits.m_attached != 0) && (owner->m_attachOwner != NULL)) {
-                    ownerX = owner->m_worldPosition.x;
-                    ownerY = owner->m_attachOwner->m_worldPosition.y;
-                    ownerZ = owner->m_worldPosition.z;
-                    ppvMng->m_matrix.value[0][3] = ownerX;
-                    ppvMng->m_matrix.value[1][3] = ownerY;
-                    ppvMng->m_matrix.value[2][3] = ownerZ;
-                } else {
-                    bottomX = owner->m_worldPosition.x;
-                    bottomY = owner->m_worldPosition.y;
-                    bottomZ = owner->m_worldPosition.z;
-                    secondRayDirection.x = 0.0f;
-                    secondRayDirection.y = -2000.0f;
-                    secondRayDirection.z = 0.0f;
-
-                    secondCylinder.m_boundsMin.z = 10000000000.0f;
-                    secondCylinder.m_boundsMin.y = 10000000000.0f;
-                    secondCylinder.m_boundsMin.x = 10000000000.0f;
-                    secondCylinder.m_boundsMax.z = -10000000000.0f;
-                    secondCylinder.m_boundsMax.y = -10000000000.0f;
-                    secondCylinder.m_boundsMax.x = -10000000000.0f;
-                    secondCylinder.m_bottom.x = bottomX;
-                    secondCylinder.m_bottom.y = bottomY;
-                    secondCylinder.m_bottom.z = bottomZ;
-                    secondCylinder.m_axis.x = 0.0f;
-                    secondCylinder.m_axis.y = -2000.0f;
-                    secondCylinder.m_axis.z = 0.0f;
-                    secondCylinder.m_radius = 0.0f;
-
-                    hitFound = MapMng.CheckHitCylinderNear((CMapCylinder*)&secondCylinder, &secondRayDirection, 0xffffffff);
-                    if (hitFound != 0) {
-                        MapMng.m_hitMapObj->CalcHitPosition(&local_170);
-                        ppvMng->m_matrix.value[0][3] = local_170.x;
-                        ppvMng->m_matrix.value[1][3] = local_170.y;
-                        ppvMng->m_matrix.value[2][3] = local_170.z;
-                    } else {
-                        ownerZ = owner->m_worldPosition.z;
-                        ownerX = owner->m_worldPosition.x;
-                        ppvMng->m_matrix.value[0][3] = ownerX;
-                        ppvMng->m_matrix.value[1][3] = matrixY;
-                        ppvMng->m_matrix.value[2][3] = ownerZ;
-                    }
+            checkResult = MapMng.CheckHitCylinderNear((CMapCylinder*)&emitterProbeCylinder, &emitterProbeRay, 0xffffffff);
+            hitFound = checkResult;
+            if (checkResult != 0) {
+                MapMng.m_hitMapObj->CalcHitPosition(&hitPosition);
+                MapMng.m_hitMapObj->GetHitFaceNormal(&surfaceNormal);
+                if ((matrixY - 10.0f) > hitPosition.y) {
+                    hitPosition.y = matrixY;
                 }
-            } else if (mode == 1) {
+            } else {
+                surfaceNormal.x = 0.0f;
+                surfaceNormal.y = 1.0f;
+                surfaceNormal.z = 0.0f;
+                hitPosition.x = matrixX;
+                hitPosition.y = matrixY;
+                hitPosition.z = matrixZ;
+            }
+        }
+
+        if (state->m_initialized == 0) {
+            state->m_initialized = 1;
+            state->m_normal.x = surfaceNormal.x;
+            state->m_normal.y = surfaceNormal.y;
+            state->m_normal.z = surfaceNormal.z;
+        }
+
+        prevNormalQuat.x = state->m_normal.x;
+        prevNormalQuat.y = state->m_normal.y;
+        prevNormalQuat.z = state->m_normal.z;
+        prevNormalQuat.w = 1.0f;
+        targetNormalQuat.x = surfaceNormal.x;
+        targetNormalQuat.y = surfaceNormal.y;
+        targetNormalQuat.z = surfaceNormal.z;
+        targetNormalQuat.w = prevNormalQuat.w;
+        C_QUATSlerp(&prevNormalQuat, &targetNormalQuat, &blendedNormalQuat, step->m_initWOrk);
+        state->m_normal.x = blendedNormalQuat.x;
+        state->m_normal.y = blendedNormalQuat.y;
+        state->m_normal.z = blendedNormalQuat.z;
+
+        PSVECNormalize(&state->m_normal, &normalAxis);
+
+        if ((step->m_stepValue == 0) && (owner != NULL)) {
+            trigValue = sin((f64)owner->m_rotBaseY);
+            bitangentAxis.x = (f32)trigValue;
+            bitangentAxis.y = 0.0f;
+            trigValue = cos((f64)owner->m_rotBaseY);
+            bitangentAxis.z = (f32)trigValue;
+            PSVECCrossProduct(&bitangentAxis, &normalAxis, &tangentAxis);
+            PSVECNormalize(&tangentAxis, &tangentAxis);
+            PSVECCrossProduct(&normalAxis, &tangentAxis, &bitangentAxis);
+            PSVECNormalize(&bitangentAxis, &bitangentAxis);
+        } else {
+            tangentAxis.x = 1.0f;
+            tangentAxis.z = tangentAxis.y = 0.0f;
+            PSVECCrossProduct(&normalAxis, &tangentAxis, &bitangentAxis);
+            PSVECNormalize(&bitangentAxis, &bitangentAxis);
+            PSVECCrossProduct(&bitangentAxis, &normalAxis, &tangentAxis);
+            PSVECNormalize(&tangentAxis, &tangentAxis);
+        }
+
+        PSMTXIdentity(basisMtx);
+        basisMtx[0][0] = tangentAxis.x;
+        basisMtx[0][1] = bitangentAxis.x;
+        basisMtx[0][2] = normalAxis.x;
+        basisMtx[1][0] = tangentAxis.y;
+        basisMtx[1][1] = bitangentAxis.y;
+        basisMtx[1][2] = normalAxis.y;
+        basisMtx[2][0] = tangentAxis.z;
+        basisMtx[2][1] = bitangentAxis.z;
+        basisMtx[2][2] = normalAxis.z;
+
+        PSMTXCopy(basisMtx, ppvMng->m_matrix.value);
+        PSMTXScale(scaleMtx, ppvMng->m_scale.x, ppvMng->m_scale.y, ppvMng->m_scale.z);
+        PSMTXConcat(scaleMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
+
+        mode = step->m_stepValue;
+        if (mode == 0) {
+            if ((s8)((s32)((u32)(owner->m_stateFlags0 & 0xc0) << 24) >> 31) != 0) {
+                ppvMng->m_matrix.value[0][3] = owner->m_worldPosition.x;
+                ppvMng->m_matrix.value[1][3] = owner->m_worldPosition.y;
+                ppvMng->m_matrix.value[2][3] = owner->m_worldPosition.z;
+            } else if ((owner->m_weaponNodeFlagBits.m_attached != 0) && (owner->m_attachOwner != NULL)) {
+                ownerX = owner->m_worldPosition.x;
+                ownerY = owner->m_attachOwner->m_worldPosition.y;
+                ownerZ = owner->m_worldPosition.z;
+                ppvMng->m_matrix.value[0][3] = ownerX;
+                ppvMng->m_matrix.value[1][3] = ownerY;
+                ppvMng->m_matrix.value[2][3] = ownerZ;
+            } else {
+                bottomX = owner->m_worldPosition.x;
+                bottomY = owner->m_worldPosition.y;
+                bottomZ = owner->m_worldPosition.z;
+                ownerProbeRay.x = 0.0f;
+                ownerProbeRay.y = -2000.0f;
+                ownerProbeRay.z = 0.0f;
+
+                ownerProbeCylinder.m_boundsMin.z = 10000000000.0f;
+                ownerProbeCylinder.m_boundsMin.y = 10000000000.0f;
+                ownerProbeCylinder.m_boundsMin.x = 10000000000.0f;
+                ownerProbeCylinder.m_boundsMax.z = -10000000000.0f;
+                ownerProbeCylinder.m_boundsMax.y = -10000000000.0f;
+                ownerProbeCylinder.m_boundsMax.x = -10000000000.0f;
+                ownerProbeCylinder.m_bottom.x = bottomX;
+                ownerProbeCylinder.m_bottom.y = bottomY;
+                ownerProbeCylinder.m_bottom.z = bottomZ;
+                ownerProbeCylinder.m_axis.x = 0.0f;
+                ownerProbeCylinder.m_axis.y = -2000.0f;
+                ownerProbeCylinder.m_axis.z = 0.0f;
+                ownerProbeCylinder.m_radius = 0.0f;
+
+                hitFound = MapMng.CheckHitCylinderNear((CMapCylinder*)&ownerProbeCylinder, &ownerProbeRay, 0xffffffff);
                 if (hitFound != 0) {
-                    ppvMng->m_matrix.value[0][3] = local_170.x;
-                    ppvMng->m_matrix.value[1][3] = local_170.y;
-                    ppvMng->m_matrix.value[2][3] = local_170.z;
+                    MapMng.m_hitMapObj->CalcHitPosition(&hitPosition);
+                    ppvMng->m_matrix.value[0][3] = hitPosition.x;
+                    ppvMng->m_matrix.value[1][3] = hitPosition.y;
+                    ppvMng->m_matrix.value[2][3] = hitPosition.z;
                 } else {
-                    ppvMng->m_matrix.value[0][3] = matrixX;
+                    ownerZ = owner->m_worldPosition.z;
+                    ownerX = owner->m_worldPosition.x;
+                    ppvMng->m_matrix.value[0][3] = ownerX;
                     ppvMng->m_matrix.value[1][3] = matrixY;
-                    ppvMng->m_matrix.value[2][3] = matrixZ;
+                    ppvMng->m_matrix.value[2][3] = ownerZ;
                 }
-            } else if (mode == 2) {
-                ppvMng->m_matrix.value[0][3] = local_170.x;
-                ppvMng->m_matrix.value[1][3] = local_170.y;
-                ppvMng->m_matrix.value[2][3] = local_170.z;
             }
+        } else if (mode == 1) {
+            if (hitFound != 0) {
+                ppvMng->m_matrix.value[0][3] = hitPosition.x;
+                ppvMng->m_matrix.value[1][3] = hitPosition.y;
+                ppvMng->m_matrix.value[2][3] = hitPosition.z;
+            } else {
+                ppvMng->m_matrix.value[0][3] = matrixX;
+                ppvMng->m_matrix.value[1][3] = matrixY;
+                ppvMng->m_matrix.value[2][3] = matrixZ;
+            }
+        } else if (mode == 2) {
+            ppvMng->m_matrix.value[0][3] = hitPosition.x;
+            ppvMng->m_matrix.value[1][3] = hitPosition.y;
+            ppvMng->m_matrix.value[2][3] = hitPosition.z;
+        }
 
-            ppvMng->m_matrix.value[1][3] += param2->m_dataValIndex;
-            pppSetFpMatrix(pppMngSt);
+        ppvMng->m_matrix.value[1][3] += step->m_dataValIndex;
+        pppSetFpMatrix(pppMngSt);
     }
 }
 
@@ -284,12 +284,12 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlTable* param2)
+void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlTable* ctrl)
 {
     ConformBgNormalState* state;
     f32 scale;
 
-    state = (ConformBgNormalState*)(conformBG->m_workArea + GetConformBgNormalDataOffsets(param2)->m_stateOffset);
+    state = (ConformBgNormalState*)(conformBG->m_workArea + GetConformBgNormalDataOffsets(ctrl)->m_stateOffset);
     scale = 0.0f;
     state->m_normal.z = scale;
     state->m_normal.y = scale;

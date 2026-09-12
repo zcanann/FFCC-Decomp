@@ -73,7 +73,7 @@ static inline void copyPolygonData(LocationTitleParticle* dst, LocationTitlePart
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleStep* param_2, pppLocationTitleOffsets* param_3)
+void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleStep* step, pppLocationTitleOffsets* offsets)
 {
     int dataValIndex;
     LocationTitleWork* work;
@@ -83,8 +83,8 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     pppShapeSt* shape;
     int fadeDivisor;
 
-    dataValIndex = param_2->m_dataValIndex;
-    work = GetLocationTitleWork(pppLocationTitle, param_3);
+    dataValIndex = step->m_dataValIndex;
+    work = GetLocationTitleWork(pppLocationTitle, offsets);
 
     if (dataValIndex == 0xFFFF) {
         return;
@@ -95,8 +95,8 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     shape = ppvEnv->m_shapeTablePtr[dataValIndex];
     graphFrame = pppLocationTitle->m_graphId / 0x1000;
 
-    if ((int)param_2->m_fadeStartFrame <= graphFrame) {
-        fadeDivisor = (int)param_2->m_fadeLength + (graphFrame - (int)param_2->m_fadeStartFrame);
+    if ((int)step->m_fadeStartFrame <= graphFrame) {
+        fadeDivisor = (int)step->m_fadeLength + (graphFrame - (int)step->m_fadeStartFrame);
     }
 
     particle = particles;
@@ -128,9 +128,9 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
 
         GXSetChanMatColor(GX_COLOR0A0, particle->m_color);
         GXLoadPosMtxImm(model, 0);
-        pppSetBlendMode(param_2->m_blendMode);
+        pppSetBlendMode(step->m_blendMode);
         pppDrawShp(static_cast<long*>(shape->m_animData), particle->m_shapeB, ppvEnv->m_materialSetPtr,
-                   param_2->m_blendMode);
+                   step->m_blendMode);
         particle++;
     }
 }
@@ -144,7 +144,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleStep* param_2, pppLocationTitleOffsets* param_3)
+void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleStep* step, pppLocationTitleOffsets* offsets)
 {
     pppFMATRIX resultMatrix;
     Vec subVec;
@@ -174,32 +174,32 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
         return;
     }
 
-    work = GetLocationTitleWork(pppLocationTitle, param_3);
-    colorData = GetLocationTitleColorBlock(pppLocationTitle, param_3);
+    work = GetLocationTitleWork(pppLocationTitle, offsets);
+    colorData = GetLocationTitleColorBlock(pppLocationTitle, offsets);
     rand();
 
-    if (param_2->m_dataValIndex == 0xFFFF) {
+    if (step->m_dataValIndex == 0xFFFF) {
         return;
     }
 
-    shapeAnim = static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[param_2->m_dataValIndex]->m_animData);
+    shapeAnim = static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[step->m_dataValIndex]->m_animData);
     work->m_vel += work->m_acc;
     work->m_cur += work->m_vel;
 
-    if (param_2->m_graphId == pppLocationTitle->m_graphId) {
-        work->m_cur += param_2->m_arg3;
-        work->m_vel += param_2->m_payload0;
-        work->m_acc += param_2->m_payload1;
+    if (step->m_graphId == pppLocationTitle->m_graphId) {
+        work->m_cur += step->m_arg3;
+        work->m_vel += step->m_payload0;
+        work->m_acc += step->m_payload1;
     }
 
     if (work->m_particles == NULL) {
         work->m_particles = static_cast<LocationTitleParticle*>(pppMemAlloc(
-            param_2->m_maxCount * sizeof(LocationTitleParticle), ppvEnv->m_stagePtr,
+            step->m_maxCount * sizeof(LocationTitleParticle), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppLocationTitle_cpp), 0x6d));
         zero = 0.0f;
         particle = work->m_particles;
 
-        for (int i = 0; i < param_2->m_maxCount; i++) {
+        for (int i = 0; i < step->m_maxCount; i++) {
             particle->m_pos.x = zero;
             particle->m_pos.y = zero;
             particle->m_pos.z = zero;
@@ -218,9 +218,9 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
 
     particles = work->m_particles;
 
-    if (work->m_count + 1 < param_2->m_maxCount) {
+    if (work->m_count + 1 < step->m_maxCount) {
         graphFrame = pppLocationTitle->m_graphId / 0x1000;
-        if (graphFrame >= (int)param_2->m_spawnFrame) {
+        if (graphFrame >= (int)step->m_spawnFrame) {
             pppMulMatrix(resultMatrix, ppvMng->m_matrix, pppLocationTitle->m_localMatrix);
 
             particles[work->m_count].m_pos.x = resultMatrix.value[0][3];
@@ -241,12 +241,12 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startPos = &particles[startIndex].m_pos;
-                stepScale = 1.0f / (float)(param_2->m_stepCount + 1);
+                stepScale = 1.0f / (float)(step->m_stepCount + 1);
                 PSVECSubtract(&particles[startIndex + 1].m_pos, startPos, &subVec);
                 interpRead = interp;
                 interpWrite = interpRead;
 
-                for (int i = 0; i < param_2->m_stepCount; i++) {
+                for (int i = 0; i < step->m_stepCount; i++) {
                     t = stepScale * (float)(i + 1);
                     PSVECScale(&subVec, &scaled, t);
                     PSVECAdd(startPos, &scaled, interpWrite);
@@ -256,7 +256,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
                     {
                         nextCount = work->m_count + 1;
 
-                        if (nextCount >= param_2->m_maxCount) {
+                        if (nextCount >= step->m_maxCount) {
                             break;
                         }
                     }
@@ -289,9 +289,9 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleOffsets* param_2)
+void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleOffsets* offsets)
 {
-    LocationTitleWork* work = GetLocationTitleWork(pppLocationTitle, param_2);
+    LocationTitleWork* work = GetLocationTitleWork(pppLocationTitle, offsets);
 
     if (work->m_particles != NULL) {
         pppMemFree(work->m_particles);
@@ -308,13 +308,13 @@ void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTit
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleOffsets* param_2)
+void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleOffsets* offsets)
 {
     LocationTitleWork* work;
     f32 value;
 
     value = 0.0f;
-    work = GetLocationTitleWork(pppLocationTitle, param_2);
+    work = GetLocationTitleWork(pppLocationTitle, offsets);
     work->m_particles = 0;
     work->m_count = 0;
     work->m_acc = value;

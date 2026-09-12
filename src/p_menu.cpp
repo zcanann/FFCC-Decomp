@@ -26,6 +26,20 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMenuPcs MenuPcs ATTRIBUTE_ALIGN(32);
+
+struct MenuGbaLinkPool
+{
+    char gbaDir[12];
+    char gbaClient[16];
+    char gbaObjData[12];
+    char gbaIcon[12];
+    char gameTitle[24];
+};
+
+static const MenuGbaLinkPool sMenuGbaLinkStrings = {
+    "dvd/gba/", "ffcc_cli.bin", "objdat.spt", "icon.dat", "FF Crystal Chronicles"
+};
+
 extern const char sCMenuPcsProcessName[] = "CMenuPcs";
 
 struct MenuFontTlutPalette
@@ -99,7 +113,7 @@ const char* sMenuCommonTextureNames[] = {
 };
 
 extern const char* sMenuTextureRegionNameTable[];
-extern int sMenuTextureInfoTable[];
+extern CMenuPcs::CTmp sMenuTextureInfoTable[];
 
 static inline void ReleaseRefObject(void* object)
 {
@@ -235,29 +249,29 @@ void CMenuPcs::create()
 {
     char fontPath[0x80];
     char texPath[0x100];
-    static int tTmp[] = {
-        0, reinterpret_cast<int>(const_cast<char*>(sMenuTexKasoru)),
-        0, reinterpret_cast<int>(const_cast<char*>(sMenuTexPause)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin1_0)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin1_1)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin1_2)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin1_3)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin1_4)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin1_5)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin1_6)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin1_7)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin1_8)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin2_0)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin2_1)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin2_2)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin2_3)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin2_4)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin2_5)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin2_6)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin2_7)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWin2_8)),
-        1, reinterpret_cast<int>(const_cast<char*>(sMenuTexWinKazari)),
-        0, reinterpret_cast<int>(const_cast<char*>(sMenuTexButton))
+    static CMenuPcs::CTmp tTmp[] = {
+        { 0, const_cast<char*>(sMenuTexKasoru) },
+        { 0, const_cast<char*>(sMenuTexPause) },
+        { 1, const_cast<char*>(sMenuTexWin1_0) },
+        { 1, const_cast<char*>(sMenuTexWin1_1) },
+        { 1, const_cast<char*>(sMenuTexWin1_2) },
+        { 1, const_cast<char*>(sMenuTexWin1_3) },
+        { 1, const_cast<char*>(sMenuTexWin1_4) },
+        { 1, const_cast<char*>(sMenuTexWin1_5) },
+        { 1, const_cast<char*>(sMenuTexWin1_6) },
+        { 1, const_cast<char*>(sMenuTexWin1_7) },
+        { 1, const_cast<char*>(sMenuTexWin1_8) },
+        { 1, const_cast<char*>(sMenuTexWin2_0) },
+        { 1, const_cast<char*>(sMenuTexWin2_1) },
+        { 1, const_cast<char*>(sMenuTexWin2_2) },
+        { 1, const_cast<char*>(sMenuTexWin2_3) },
+        { 1, const_cast<char*>(sMenuTexWin2_4) },
+        { 1, const_cast<char*>(sMenuTexWin2_5) },
+        { 1, const_cast<char*>(sMenuTexWin2_6) },
+        { 1, const_cast<char*>(sMenuTexWin2_7) },
+        { 1, const_cast<char*>(sMenuTexWin2_8) },
+        { 1, const_cast<char*>(sMenuTexWinKazari) },
+        { 0, const_cast<char*>(sMenuTexButton) }
     };
     u8* self = reinterpret_cast<u8*>(this);
 
@@ -293,13 +307,12 @@ void CMenuPcs::create()
         }
     }
 
-    int* textureInfo = tTmp;
     for (int i = 0; i < 0x16; i++) {
-        const unsigned long textureIndex = static_cast<unsigned long>(m_textureSets[textureInfo[0]]->Find(reinterpret_cast<char*>(textureInfo[1])));
-        CTexture* texture = m_textureSets[textureInfo[0]]->GetTexture(textureIndex);
+        const unsigned long textureIndex = static_cast<unsigned long>(
+            m_textureSets[tTmp[i].m_textureSetIndex]->Find(tTmp[i].m_textureName));
+        CTexture* texture = m_textureSets[tTmp[i].m_textureSetIndex]->GetTexture(textureIndex);
         texture->AddRef();
         m_textures[i] = texture;
-        textureInfo += 2;
     }
 
     changeMode(static_cast<CMenuPcs::MENUMODE>(0));
@@ -499,17 +512,17 @@ const char* sMenuTextureRegionNameTable[] = {
     sMenuRegionShibuya, sMenuRegionFace, 0, 0, 0, 0, 0, 0, 0
 };
 
-int sMenuTextureInfoTable[] = {
-    2, reinterpret_cast<int>(const_cast<char*>(sMenuTexBattle)),
-    2, reinterpret_cast<int>(const_cast<char*>(sMenuTexHeart)),
-    3, reinterpret_cast<int>(const_cast<char*>(sMenuRegionFace)),
-    2, reinterpret_cast<int>(const_cast<char*>(sMenuTexNavi)),
-    2, reinterpret_cast<int>(const_cast<char*>(sMenuTexHp0)),
-    2, reinterpret_cast<int>(const_cast<char*>(sMenuTexHp1)),
-    2, reinterpret_cast<int>(const_cast<char*>(sMenuTexHp2)),
-    2, reinterpret_cast<int>(const_cast<char*>(sMenuTexSuna)),
-    2, reinterpret_cast<int>(const_cast<char*>(sMenuTexGba)),
-    2, reinterpret_cast<int>(const_cast<char*>(sMenuTexBattle2))
+CMenuPcs::CTmp sMenuTextureInfoTable[] = {
+    { 2, const_cast<char*>(sMenuTexBattle) },
+    { 2, const_cast<char*>(sMenuTexHeart) },
+    { 3, const_cast<char*>(sMenuRegionFace) },
+    { 2, const_cast<char*>(sMenuTexNavi) },
+    { 2, const_cast<char*>(sMenuTexHp0) },
+    { 2, const_cast<char*>(sMenuTexHp1) },
+    { 2, const_cast<char*>(sMenuTexHp2) },
+    { 2, const_cast<char*>(sMenuTexSuna) },
+    { 2, const_cast<char*>(sMenuTexGba) },
+    { 2, const_cast<char*>(sMenuTexBattle2) }
 };
 
 /*
@@ -528,7 +541,8 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
     u8* self = reinterpret_cast<u8*>(this);
 
     for (int i = 0; i < textureSetCount; i++) {
-        sprintf(texPath, const_cast<char*>(sMenuTexturePathFmt), Game.GetLangString(), *paths);
+        const char* language = Game.GetLangString();
+        sprintf(texPath, const_cast<char*>(sMenuTexturePathFmt), language, paths[i]);
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
@@ -559,17 +573,14 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
 
             File.Close(fileHandle);
         }
-
-        paths++;
     }
 
     for (int i = 0; i < textureCount; i++) {
-        const unsigned long textureIndex =
-            static_cast<unsigned long>(m_textureSets[tmp->m_textureSetIndex]->Find(tmp->m_textureName));
-        CTexture* texture = m_textureSets[tmp->m_textureSetIndex]->GetTexture(textureIndex);
+        const unsigned long textureIndex = static_cast<unsigned long>(
+            m_textureSets[tmp[i].m_textureSetIndex]->Find(tmp[i].m_textureName));
+        CTexture* texture = m_textureSets[tmp[i].m_textureSetIndex]->GetTexture(textureIndex);
         texture->AddRef();
         m_textures[textureStart + i] = texture;
-        tmp++;
     }
 }
 
@@ -617,13 +628,15 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
 void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
 {
     int currentMode;
-    int i;
     CMenuPcs* menu;
+    int i;
 
     if (m_mode != static_cast<int>(mode)) {
         Graphic._WaitDrawDone(const_cast<char*>(s_p_menu_cpp), 0x1B0);
         currentMode = m_mode;
         switch (currentMode) {
+        case -1:
+            break;
         case 0:
             ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[1]));
 
@@ -673,6 +686,8 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
         m_mode = static_cast<int>(mode);
         currentMode = m_mode;
         switch (currentMode) {
+        case -1:
+            break;
         case 0:
             createBattle();
             createSingleMenu();
@@ -702,8 +717,11 @@ void CMenuPcs::calc()
     switch (m_mode) {
         case 0:
         {
-            int i = 0;
-            CMenuPcs* menu = this;
+            CMenuPcs* menu;
+            int i;
+
+            i = 0;
+            menu = this;
             do {
                 menu->m_battleRingMenus[0]->Calc();
                 i++;
@@ -769,10 +787,7 @@ void CMenuPcs::draw()
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-    {
-        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-        GXSetChanAmbColor(GX_COLOR0A0, white.color);
-    }
+    GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     GXSetZCompLoc(GX_FALSE);
     GXSetCurrentMtx(0);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -808,8 +823,7 @@ void CMenuPcs::draw()
 
         float width = static_cast<float>(texture->m_width);
         float height = static_cast<float>(texture->m_height);
-        PSMTXScale(texMtx, 1.0f / width, 1.0f / height,
-                   1.0f);
+        PSMTXScale(texMtx, 1.0f / width, 1.0f / height, 1.0f);
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
         GXSetNumTexGens(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -817,8 +831,7 @@ void CMenuPcs::draw()
         TextureMan.SetTextureTev(texture);
 
         {
-            int alpha = static_cast<int>(255.0f * (0.5f * (1.0f + sinf(static_cast<int>(System.m_frameCounter) * 0.1f))));
-            CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
+            CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * (0.5f * (1.0f + sinf(static_cast<int>(System.m_frameCounter) * 0.1f)))));
             GXSetChanMatColor(GX_COLOR0A0, color.color);
             DrawRect(3, 320.0f, 224.0f, 120.0f,
                      56.0f, 0.0f, 0.0f,
@@ -1047,8 +1060,7 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
 
         width = *(u32*)((u8*)texture + 0x64);
         height = *(u32*)((u8*)texture + 0x68);
-        PSMTXScale(texMtx, 1.0f / (f32)width, 1.0f / (f32)height,
-                   1.0f);
+        PSMTXScale(texMtx, 1.0f / (f32)width, 1.0f / (f32)height, 1.0f);
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
         GXSetNumTexGens(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -1072,9 +1084,7 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         return;
     }
     {
-        float u0;
         float u1;
-        float v0;
         float v1;
         float x0;
         float y0;
@@ -1086,18 +1096,18 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
 
         if ((attr & 8) != 0) {
             u1 = u + 0.5f;
-            u0 = (u + w) - 0.5f;
+            u = (u + w) - 0.5f;
         } else {
-            u0 = u + 0.5f;
             u1 = (u + w) - 0.5f;
+            u = u + 0.5f;
         }
 
         if ((attr & 4) != 0) {
             v1 = v + 0.5f;
-            v0 = (v1 + h) - 0.5f;
+            v = (v1 + h) - 0.5f;
         } else {
-            v0 = v + 0.5f;
             v1 = (v + h) - 0.5f;
+            v = v + 0.5f;
         }
 
         scaledW = w * us;
@@ -1113,35 +1123,40 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         if (0.0f != angle) {
             float s = static_cast<float>(sin(angle));
             float c = static_cast<float>(cos(angle));
-            float xtl = ((x0 - x) * c) + x;
-            float ytl = ((x0 - x) * s) + y;
-            float tx0 = (y0 - y) * s;
-            float ty0 = (y0 - y) * c;
-            float xtr = ((x1 - x) * c) + x;
-            float ytr = ((x1 - x) * s) + y;
-            float tx1 = (y1 - y) * s;
-            float ty1 = (y1 - y) * c;
+            x0 -= x;
+            y0 -= y;
+            x1 -= x;
+            y1 -= y;
+
+            float xtl = (x0 * c) + x;
+            float ytl = (x0 * s) + y;
+            float tx0 = y0 * s;
+            float ty0 = y0 * c;
+            float xtr = (x1 * c) + x;
+            float ytr = (x1 * s) + y;
+            float tx1 = y1 * s;
+            float ty1 = y1 * c;
 
             GXPosition3f32(xtl - tx0, ytl + ty0, z);
-            GXTexCoord2f32(u0, v0);
+            GXTexCoord2f32(u, v);
 
             GXPosition3f32(xtr - tx0, ytr + ty0, z);
-            GXTexCoord2f32(u1, v0);
+            GXTexCoord2f32(u1, v);
 
             GXPosition3f32(xtl - tx1, ytl + ty1, z);
-            GXTexCoord2f32(u0, v1);
+            GXTexCoord2f32(u, v1);
 
             GXPosition3f32(xtr - tx1, ytr + ty1, z);
             GXTexCoord2f32(u1, v1);
         } else {
             GXPosition3f32(x0, y0, z);
-            GXTexCoord2f32(u0, v0);
+            GXTexCoord2f32(u, v);
 
             GXPosition3f32(x1, y0, z);
-            GXTexCoord2f32(u1, v0);
+            GXTexCoord2f32(u1, v);
 
             GXPosition3f32(x0, y1, z);
-            GXTexCoord2f32(u0, v1);
+            GXTexCoord2f32(u, v1);
 
             GXPosition3f32(x1, y1, z);
             GXTexCoord2f32(u1, v1);
@@ -1164,9 +1179,7 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         return;
     }
     {
-        float u0;
         float u1;
-        float v0;
         float v1;
         float x0;
         float y0;
@@ -1178,18 +1191,18 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
 
         if ((attr & 8) != 0) {
             u1 = u + 0.5f;
-            u0 = (u + w) - 0.5f;
+            u = (u + w) - 0.5f;
         } else {
-            u0 = u + 0.5f;
             u1 = (u + w) - 0.5f;
+            u = u + 0.5f;
         }
 
         if ((attr & 4) != 0) {
             v1 = v + 0.5f;
-            v0 = (v1 + h) - 0.5f;
+            v = (v1 + h) - 0.5f;
         } else {
-            v0 = v + 0.5f;
             v1 = (v + h) - 0.5f;
+            v = v + 0.5f;
         }
 
         scaledW = w * us;
@@ -1205,26 +1218,31 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         if (0.0f != angle) {
             float s = static_cast<float>(sin(angle));
             float c = static_cast<float>(cos(angle));
-            float xtl = ((x0 - x) * c) + x;
-            float ytl = ((x0 - x) * s) + y;
-            float tx0 = (y0 - y) * s;
-            float ty0 = (y0 - y) * c;
-            float xtr = ((x1 - x) * c) + x;
-            float ytr = ((x1 - x) * s) + y;
-            float tx1 = (y1 - y) * s;
-            float ty1 = (y1 - y) * c;
+            x0 -= x;
+            y0 -= y;
+            x1 -= x;
+            y1 -= y;
+
+            float xtl = (x0 * c) + x;
+            float ytl = (x0 * s) + y;
+            float tx0 = y0 * s;
+            float ty0 = y0 * c;
+            float xtr = (x1 * c) + x;
+            float ytr = (x1 * s) + y;
+            float tx1 = y1 * s;
+            float ty1 = y1 * c;
 
             GXPosition3f32(xtl - tx0, ytl + ty0, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[0]));
-            GXTexCoord2f32(u0, v0);
+            GXTexCoord2f32(u, v);
 
             GXPosition3f32(xtr - tx0, ytr + ty0, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[1]));
-            GXTexCoord2f32(u1, v0);
+            GXTexCoord2f32(u1, v);
 
             GXPosition3f32(xtl - tx1, ytl + ty1, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[2]));
-            GXTexCoord2f32(u0, v1);
+            GXTexCoord2f32(u, v1);
 
             GXPosition3f32(xtr - tx1, ytr + ty1, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[3]));
@@ -1232,15 +1250,15 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         } else {
             GXPosition3f32(x0, y0, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[0]));
-            GXTexCoord2f32(u0, v0);
+            GXTexCoord2f32(u, v);
 
             GXPosition3f32(x1, y0, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[1]));
-            GXTexCoord2f32(u1, v0);
+            GXTexCoord2f32(u1, v);
 
             GXPosition3f32(x0, y1, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[2]));
-            GXTexCoord2f32(u0, v1);
+            GXTexCoord2f32(u, v1);
 
             GXPosition3f32(x1, y1, z);
             GXColor1u32(*reinterpret_cast<u32*>(&colors[3]));
@@ -1496,14 +1514,13 @@ void CMenuPcs::createBattle()
         }
     }
 
-    int* textureInfo = sMenuTextureInfoTable;
     for (int i = 0; i < 10; i++) {
-        const unsigned long textureIndex =
-            static_cast<unsigned long>(m_textureSets[textureInfo[0]]->Find(reinterpret_cast<char*>(textureInfo[1])));
-        CTexture* texture = m_textureSets[textureInfo[0]]->GetTexture(textureIndex);
+        const unsigned long textureIndex = static_cast<unsigned long>(
+            m_textureSets[sMenuTextureInfoTable[i].m_textureSetIndex]->Find(sMenuTextureInfoTable[i].m_textureName));
+        CTexture* texture =
+            m_textureSets[sMenuTextureInfoTable[i].m_textureSetIndex]->GetTexture(textureIndex);
         texture->AddRef();
         m_textures[i + 0x16] = texture;
-        textureInfo += 2;
     }
 
     for (int i = 0; i < 12; i++) {
@@ -1658,27 +1675,23 @@ void CMenuPcs::drawBattle()
             float screenX = 320.0f + (320.0f * projected.x) / projected.w;
             float screenY = 224.0f - (224.0f * projected.y) / projected.w;
 
-            if (screenX < static_cast<float>(halfWidth)) {
-                screenX = static_cast<float>(halfWidth);
-            } else if (static_cast<float>(0x280 - halfWidth) < screenX) {
-                screenX = static_cast<float>(0x280 - halfWidth);
-            }
+            const float markerX = (screenX < static_cast<float>(halfWidth))
+                                      ? static_cast<float>(halfWidth)
+                                      : ((static_cast<float>(0x280 - halfWidth) < screenX) ? static_cast<float>(0x280 - halfWidth) : screenX);
 
-            if (screenY < 16.0f) {
-                screenY = 16.0f;
-            } else if (432.0f < screenY) {
-                screenY = 432.0f;
-            }
+            const float markerY = (screenY < 16.0f)
+                                      ? 16.0f
+                                      : ((432.0f < screenY) ? 432.0f : screenY);
+
+            const float alphaF = 255.0f * fade;
+            const float left = markerX - static_cast<float>(halfWidth);
+            const float bodyLeft = left + 8.0f;
 
             int fillWidth = ((totalWidth - 16) * m_battleHud.m_gaugeValue) / m_battleHud.m_gaugeMax;
-
-            const float left = screenX - static_cast<float>(halfWidth);
-            const float bodyLeft = left + 8.0f;
-            const float alphaF = 255.0f * fade;
             const CColor frameColor(0xFF, 0xFF, 0xFF, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
 
-            if (static_cast<float>(totalWidth) > 0.0f) {
+            if (!(static_cast<float>(totalWidth) <= 0.0f)) {
                 float bodyWidth = static_cast<float>(totalWidth) - 16.0f;
                 bodyWidth = (bodyWidth < 0.0f) ? 0.0f : bodyWidth;
 
@@ -1692,7 +1705,7 @@ void CMenuPcs::drawBattle()
                 GXSetNumTexGens(1);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, left, screenY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                MenuPcs.DrawRect(0, left, markerY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
                 tex = MenuPcs.m_textures[0x1B];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
@@ -1704,7 +1717,7 @@ void CMenuPcs::drawBattle()
                 GXSetNumTexGens(1);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, left + 8.0f, screenY, bodyWidth, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                MenuPcs.DrawRect(0, left + 8.0f, markerY, bodyWidth, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
                 tex = MenuPcs.m_textures[0x1C];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
@@ -1716,17 +1729,17 @@ void CMenuPcs::drawBattle()
                 GXSetNumTexGens(1);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - 8.0f, screenY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - 8.0f, markerY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
             }
 
             const CColor fillTop(0xFF, (m_battleHud.m_gaugeCounter * 0xFF) / 16, (m_battleHud.m_gaugeCounter * 0xFF) / 16, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, fillTop.color);
             TextureMan.SetTextureTev(0);
-            DrawRect(0, bodyLeft, (screenY + 3.0f) - 1.0f, static_cast<float>(fillWidth), 4.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+            DrawRect(0, bodyLeft, (markerY + 3.0f) - 1.0f, static_cast<float>(fillWidth), 4.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
             const CColor fillBottom(0xFF, ((m_battleHud.m_gaugeCounter * 0x7F) / 16) + 0x80, (m_battleHud.m_gaugeCounter * 0xFF) / 16, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, fillBottom.color);
-            DrawRect(0, bodyLeft, screenY + 3.0f, static_cast<float>(fillWidth), 2.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+            DrawRect(0, bodyLeft, markerY + 3.0f, static_cast<float>(fillWidth), 2.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
         }
     }
 

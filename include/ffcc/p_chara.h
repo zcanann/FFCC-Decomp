@@ -105,7 +105,13 @@ public:
         int m_asyncTextureVariant;          // 0x184
         int m_asyncState;                   // 0x188
         CFile::CHandle* m_asyncFileHandle;  // 0x18C
-        unsigned char m_drawListFlags;      // 0x190
+        union {
+            unsigned char m_drawListFlags;  // 0x190
+            struct {
+                unsigned char m_flag_80 : 1;
+                unsigned char m_flag_lo : 7;
+            } m_drawListFlagsBits;
+        };
     };
 
     class CLoadModel

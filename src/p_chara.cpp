@@ -434,6 +434,14 @@ static inline _GXColor BlendColor(const _GXColor& a, const _GXColor& b, float t)
     return out;
 }
 
+static inline void CopyColor(_GXColor* dst, _GXColor src)
+{
+    dst->r = src.r;
+    dst->g = src.g;
+    dst->b = src.b;
+    dst->a = src.a;
+}
+
 static inline _GXColor ModulateColor(const _GXColor& src, const _GXColor& shade)
 {
     _GXColor out;
@@ -563,7 +571,7 @@ void CCharaPcs::Init()
     m_charaAllocStage = 0;
     m_overlapEnabled = 0;
     CColor baseColor(0x00, 0x00, 0x40, 0x40);
-    m_texShadowColor = baseColor.color;
+    CopyColor(&m_texShadowColor, baseColor.color);
 
     CVector baseVec(0.0f, 100.0f, 0.0f);
     m_texShadowPos.x = baseVec.x;
@@ -639,7 +647,7 @@ void CCharaPcs::create()
         sentinel->m_asyncFileHandle = 0;
         sentinel->m_fogBlend = 0.0f;
         sentinel->m_unk0x158 = 0;
-        sentinel->m_drawListFlags |= 0x80;
+        sentinel->m_drawListFlagsBits.m_flag_80 = 1;
     }
 
     m_handleList = sentinel;
@@ -2105,7 +2113,7 @@ CCharaPcs::CHandle::CHandle()
 
 	m_fogBlend = 0.0f;
 	m_unk0x158 = 0;
-	m_drawListFlags |= 0x80;
+	m_drawListFlagsBits.m_flag_80 = 1;
 }
 
 /*
@@ -2145,8 +2153,9 @@ CCharaPcs::CHandle::~CHandle()
 
     CharaPcs.releaseUnuseLoadModel(0);
     {
-        CLoadAnim** slotPtr = &m_animSlot[0];
-        for (int i = 0; i < 64; i++, slotPtr++) {
+        int i;
+        CLoadAnim** slotPtr;
+        for (i = 0, slotPtr = &m_animSlot[0]; i < 64; i++, slotPtr++) {
             CRef* animRef = *slotPtr;
             if (animRef != 0) {
                 ReleaseShared(*slotPtr);
@@ -2204,7 +2213,7 @@ void CCharaPcs::CHandle::ChangeTexture(
     for (unsigned int i = 0; i < static_cast<unsigned int>(LoadTextureArray(&CharaPcs)->GetSize()); i++) {
         CLoadTexture* it = (*LoadTextureArray(&CharaPcs))[i];
         if (it->m_keyTag == charaKind && static_cast<unsigned long>(it->m_keyId) == charaNo &&
-            it->m_variantTag == static_cast<int>(textureVariant)) {
+            static_cast<unsigned long>(it->m_variantTag) == textureVariant) {
             loadTexture = it;
             goto foundTexture;
         }
@@ -2383,44 +2392,44 @@ foundModel:
         strcat(path, s_charaModelSuffix);
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-        if (fileHandle == 0) {
-            return 0;
-        }
-
-        File.Read(fileHandle);
-        File.SyncCompleted(fileHandle);
-
-        void* readBuffer = File.m_readBuffer;
-        loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
-        loadModel->m_keyTag = charaKind;
-        loadModel->m_keyId = static_cast<int>(charaNo);
-        loadModel->m_mergeFileId = mergeFileId;
-        loadModel->m_mergeFlags = mergeFlags;
-        LoadModelArray(&CharaPcs)->Add(loadModel);
-
-        CChara::CModel* model =
-            new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
-        model->Create(readBuffer, HandleModelStage(charaKind, 0));
-        loadModel->m_model = model;
-
-        m_modelLoadRef = loadModel;
-        File.Close(fileHandle);
-        m_modelLoadRef->AddRef();
-        m_model = m_modelLoadRef->m_model;
-        m_model->AddRef();
-
-        strcpy(path, basePath);
-        strcat(path, s_charaDynamicsSuffix);
-        fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
-            void* dynamicsBuffer = File.m_readBuffer;
-            m_model->CreateDynamics(dynamicsBuffer, HandleModelStage(charaKind, 0));
+
+            void* readBuffer = File.m_readBuffer;
+            loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
+            loadModel->m_keyTag = charaKind;
+            loadModel->m_keyId = static_cast<int>(charaNo);
+            loadModel->m_mergeFileId = mergeFileId;
+            loadModel->m_mergeFlags = mergeFlags;
+            LoadModelArray(&CharaPcs)->Add(loadModel);
+
+            CChara::CModel* model =
+                new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
+            model->Create(readBuffer, HandleModelStage(charaKind, 0));
+            loadModel->m_model = model;
+
+            m_modelLoadRef = loadModel;
             File.Close(fileHandle);
-            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                System.Printf(const_cast<char*>(s_charaDynamicsLoadDvdFmt), charaKind, static_cast<int>(charaNo));
+            m_modelLoadRef->AddRef();
+            m_model = m_modelLoadRef->m_model;
+            m_model->AddRef();
+
+            strcpy(path, basePath);
+            strcat(path, s_charaDynamicsSuffix);
+            fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+            if (fileHandle != 0) {
+                File.Read(fileHandle);
+                File.SyncCompleted(fileHandle);
+                void* dynamicsBuffer = File.m_readBuffer;
+                m_model->CreateDynamics(dynamicsBuffer, HandleModelStage(charaKind, 0));
+                File.Close(fileHandle);
+                if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                    System.Printf(const_cast<char*>(s_charaDynamicsLoadDvdFmt), charaKind, static_cast<int>(charaNo));
+                }
             }
+        } else {
+            return 0;
         }
     }
 
@@ -2718,26 +2727,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
                     CharaPcs.m_viewerChoiceColor[phaseIndex + 1] * blendT;
         }
 
-        const CColor3& ambientBase = CColor3(CharaPcs.m_viewerAmbientColor[lightBank]);
-        CColor3 ambientShade;
-        ambientShade.color.r = static_cast<signed char>((static_cast<int>(ambientBase.color.r) * shade.color.r) / 255);
-        ambientShade.color.g = static_cast<signed char>((static_cast<int>(ambientBase.color.g) * shade.color.g) / 255);
-        ambientShade.color.b = static_cast<unsigned char>((static_cast<int>(ambientBase.color.b) * shade.color.b) / 255);
-        ambientShade.color.a = ambientBase.color.a;
-        CColor3 ambientColor(ambientShade);
-        _GXColor ambientGX = ambientColor.color;
-        LightPcs.SetAmbient(ambientGX);
+        LightPcs.SetAmbient((CColor3(CharaPcs.m_viewerAmbientColor[lightBank]) * shade).color);
 
         for (unsigned long i = 0; i < 3; i++) {
-            const CColor3& diffuseBase = CColor3(CharaPcs.m_viewerDiffuseColor[lightBank][i]);
-            CColor3 diffuseShade;
-            diffuseShade.color.r = static_cast<signed char>((static_cast<int>(diffuseBase.color.r) * shade.color.r) / 255);
-            diffuseShade.color.g = static_cast<unsigned char>((static_cast<int>(diffuseBase.color.g) * shade.color.g) / 255);
-            diffuseShade.color.b = static_cast<unsigned char>((static_cast<int>(diffuseBase.color.b) * shade.color.b) / 255);
-            diffuseShade.color.a = diffuseBase.color.a;
-            CColor3 diffuseColor(diffuseShade);
-            _GXColor diffuseGX = diffuseColor.color;
-            LightPcs.SetDiffuseColor(i, diffuseGX);
+            LightPcs.SetDiffuseColor(i, (CColor3(CharaPcs.m_viewerDiffuseColor[lightBank][i]) * shade).color);
         }
 
         Vec lightPos;
@@ -2805,56 +2798,35 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     int restoreFog = 0;
     if (0.0f < m_fogBlend && (drawPass == 0 || drawPass == 4)) {
+        float fogStart;
+        float fogEnd;
         float invBlend = 1.0f - m_fogBlend;
         invBlend *= invBlend;
         float fogBlend = 1.0f - invBlend;
 
+        _GXColor graphicFogColor;
         float nearZ;
         float farZ;
         GetCameraClipPlanes(&nearZ, &farZ);
-        const float fogStart = Graphic.m_fogStart;
-        _GXColor graphicFogColor = Graphic.m_fogColor;
-        const float fogEnd = Graphic.m_fogEnd;
+        fogStart = Graphic.m_fogStart;
+        CopyColor(&graphicFogColor, Graphic.m_fogColor);
+        fogEnd = Graphic.m_fogEnd;
 
-        const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
-        CColor whitePart;
-        whitePart.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * fogBlend));
-        whitePart.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * fogBlend));
-        whitePart.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * fogBlend));
-        whitePart.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * fogBlend));
-        CColor whitePartCopy(whitePart);
-
-        const CColor& fogBase = CColor(graphicFogColor);
-        CColor fogPart;
-        const float fogRemainder = 1.0f - fogBlend;
-        fogPart.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.r) * fogRemainder));
-        fogPart.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.g) * fogRemainder));
-        fogPart.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.b) * fogRemainder));
-        fogPart.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.a) * fogRemainder));
-        CColor fogPartCopy(fogPart);
-
-        CColor blendedFog;
-        blendedFog.color.r = fogPartCopy.color.r + whitePartCopy.color.r;
-        blendedFog.color.g = fogPartCopy.color.g + whitePartCopy.color.g;
-        blendedFog.color.b = fogPartCopy.color.b + whitePartCopy.color.b;
-        blendedFog.color.a = fogPartCopy.color.a + whitePartCopy.color.a;
-        CColor blendedFogCopy(blendedFog);
-
-        _GXColor fogColor = blendedFogCopy.color;
         GXSetFog(GX_FOG_PERSP_LIN,
-                 fogStart * fogRemainder + nearZ * fogBlend,
-                 (fogEnd + 1.0f) * fogRemainder + (nearZ + 1.0f) * fogBlend,
+                 fogStart * (1.0f - fogBlend) + nearZ * fogBlend,
+                 (fogEnd + 1.0f) * (1.0f - fogBlend) + (nearZ + 1.0f) * fogBlend,
                  nearZ,
                  farZ,
-                 fogColor);
+                 (CColor(graphicFogColor) * (1.0f - fogBlend) + CColor(0xFF, 0xFF, 0xFF, 0xFF) * fogBlend).color);
         restoreFog = 1;
     }
 
     if (drawPass == 1 || drawPass == 2) {
         if (drawPass == 2) {
-            const unsigned short shadowSize = static_cast<unsigned short>(CharaPcs.m_texShadowSize);
-            GXSetTexCopySrc(0, 0, shadowSize, shadowSize);
-            GXSetTexCopyDst(CharaPcs.m_texShadowSize, CharaPcs.m_texShadowSize, GX_CTF_R4, GX_FALSE);
+            GXSetTexCopySrc(0, 0, static_cast<unsigned short>(CharaPcs.m_texShadowSize),
+                            static_cast<unsigned short>(CharaPcs.m_texShadowSize));
+            GXSetTexCopyDst(static_cast<unsigned short>(CharaPcs.m_texShadowSize),
+                            static_cast<unsigned short>(CharaPcs.m_texShadowSize), GX_CTF_R4, GX_FALSE);
             m_shadowTexturePtr = reinterpret_cast<unsigned char*>(CharaPcs.m_texShadowTextureBase) +
                                  CharaPcs.m_texShadowTextureOffset;
             DCInvalidateRange(m_shadowTexturePtr, (CharaPcs.m_texShadowSize * CharaPcs.m_texShadowSize) / 2);
@@ -2990,8 +2962,8 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
 
     if (m_asyncState == 2) {
         void* readBuffer = File.m_readBuffer;
-        int keyId = m_asyncCharaNo;
         int keyTag = m_asyncCharaKind;
+        int keyId = m_asyncCharaNo;
         CLoadModel* loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
         loadModel->m_keyTag = keyTag;
         loadModel->m_keyId = keyId;

@@ -38,10 +38,10 @@ public:
 	CColor operator*(float scale) const
 	{
 		CColor out;
-		out.color.r = static_cast<unsigned char>(static_cast<int>(color.r * scale));
-		out.color.g = static_cast<unsigned char>(static_cast<int>(color.g * scale));
-		out.color.b = static_cast<unsigned char>(static_cast<int>(color.b * scale));
-		out.color.a = static_cast<unsigned char>(static_cast<int>(color.a * scale));
+		out.color.r = static_cast<unsigned char>(color.r * scale);
+		out.color.g = static_cast<unsigned char>(color.g * scale);
+		out.color.b = static_cast<unsigned char>(color.b * scale);
+		out.color.a = static_cast<unsigned char>(color.a * scale);
 		return out;
 	}
 	/*
@@ -99,6 +99,15 @@ public:
 	}
 	CColor3(CColor3& other);
 	CColor3(_GXColor& other);
+	CColor3 operator*(const CColor& other) const
+	{
+		CColor3 result;
+		result.color.r = static_cast<unsigned char>((static_cast<int>(color.r) * other.color.r) / 255);
+		result.color.g = static_cast<unsigned char>((static_cast<int>(color.g) * other.color.g) / 255);
+		result.color.b = static_cast<unsigned char>((static_cast<int>(color.b) * other.color.b) / 255);
+		result.color.a = color.a;
+		return result;
+	}
 
 	GXColor color;
 };

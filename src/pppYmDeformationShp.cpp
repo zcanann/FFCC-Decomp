@@ -13,8 +13,6 @@
 static const float kPppYmDeformationShpDegToRad = 0.017453292f;
 static const float kPppYmDeformationShpZero = 0.0f;
 static const float kPppYmDeformationShpOne = 1.0f;
-static const double kPppYmDeformationShpIntToDoubleBias = 4503601774854144.0;
-static const double kPppYmDeformationShpUnsignedToDoubleBias = 4503599627370496.0;
 static const float kPppYmDeformationShpScreenCenterX = 320.0f;
 static const float kPppYmDeformationShpInvScreenCenterX = 0.003125f;
 static const float kPppYmDeformationShpScreenCenterY = 224.0f;
@@ -52,20 +50,6 @@ static inline VColor* DeformationShpColorInfo(pppYmDeformationShp* object, _pppC
 		object->m_workArea + DeformationShpDataOffsets(ctrl)->m_colorInfoOffset);
 }
 
-inline void oddToEven(float& value)
-{
-	if (((int)value % 2) != 0) {
-		value += kPppYmDeformationShpOne;
-	}
-}
-
-inline void oddToEven(int& value)
-{
-	if ((value % 2) != 0) {
-		value++;
-	}
-}
-
 inline void calcScreenPos(Vec4d& out, Vec pos, Mtx drawMtx, Mtx44 screenMtx)
 {
 	Vec worldPos;
@@ -84,7 +68,7 @@ inline void calcScreenPos(Vec4d& out, Vec pos, Mtx drawMtx, Mtx44 screenMtx)
 	out.y = kPppYmDeformationShpScreenCenterY - out.y / kPppYmDeformationShpInvScreenCenterY;
 }
 
-inline void calcBoundaryBox(Vec& boundsMin, Vec& boundsMax, Vec4d* projected)
+inline void calcBoundaryBox(Vec& boundsMin, Vec& boundsMax, Vec4d* screenPos)
 {
 	boundsMin.y = kPppYmDeformationShpMaxBound;
 	boundsMax.y = kPppYmDeformationShpMinBound;
@@ -92,17 +76,17 @@ inline void calcBoundaryBox(Vec& boundsMin, Vec& boundsMax, Vec4d* projected)
 	boundsMax.x = boundsMax.y;
 
 	for (int i = 0; i < 4; i++) {
-		if (projected[i].x > boundsMax.x) {
-			boundsMax.x = projected[i].x;
+		if (screenPos[i].x > boundsMax.x) {
+			boundsMax.x = screenPos[i].x;
 		}
-		if (projected[i].y > boundsMax.y) {
-			boundsMax.y = projected[i].y;
+		if (screenPos[i].y > boundsMax.y) {
+			boundsMax.y = screenPos[i].y;
 		}
-		if (projected[i].x < boundsMin.x) {
-			boundsMin.x = projected[i].x;
+		if (screenPos[i].x < boundsMin.x) {
+			boundsMin.x = screenPos[i].x;
 		}
-		if (projected[i].y < boundsMin.y) {
-			boundsMin.y = projected[i].y;
+		if (screenPos[i].y < boundsMin.y) {
+			boundsMin.y = screenPos[i].y;
 		}
 	}
 
@@ -234,7 +218,7 @@ inline void setVertexPos(Vec& v0, Vec& v1, Vec& v2, Vec& v3, float halfX, float 
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void SetUpIndWarp(VYmDeformationShp* work)
+inline void SetUpIndWarp(VYmDeformationShp* state)
 {
 	float indMtx[2][3];
 	Mtx drawMtx;
@@ -243,16 +227,16 @@ inline void SetUpIndWarp(VYmDeformationShp* work)
 	GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD1, GX_TEXMAP1);
 	GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
 
-	if ((work->m_angle == 0) || (work->m_angle == 0x168)) {
-		work->m_angle = 1;
+	if ((state->m_angle == 0) || (state->m_angle == 0x168)) {
+		state->m_angle = 1;
 	}
 
-	PSMTXRotRad(drawMtx, 'z', kPppYmDeformationShpDegToRad * (float)work->m_angle);
-	indMtx[0][0] = drawMtx[0][0] * work->m_scale;
-	indMtx[0][1] = drawMtx[0][1] * work->m_scale;
+	PSMTXRotRad(drawMtx, 'z', kPppYmDeformationShpDegToRad * (float)state->m_angle);
+	indMtx[0][0] = drawMtx[0][0] * state->m_scale;
+	indMtx[0][1] = drawMtx[0][1] * state->m_scale;
 	indMtx[0][2] = kPppYmDeformationShpZero;
-	indMtx[1][0] = drawMtx[1][0] * work->m_scale;
-	indMtx[1][1] = drawMtx[1][1] * work->m_scale;
+	indMtx[1][0] = drawMtx[1][0] * state->m_scale;
+	indMtx[1][1] = drawMtx[1][1] * state->m_scale;
 	indMtx[1][2] = kPppYmDeformationShpZero;
 	GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 }
@@ -266,27 +250,26 @@ inline void SetUpIndWarp(VYmDeformationShp* work)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpStep* param_2, _pppCtrlTable* param_3)
+void pppRenderYmDeformationShp(pppYmDeformationShp* object, pppYmDeformationShpStep* step, _pppCtrlTable* ctrl)
 {
-	_pppPObject* object = pppYmDeformationShp_;
-	VYmDeformationShp* work = DeformationShpState(pppYmDeformationShp_, param_3);
+	VYmDeformationShp* state = DeformationShpState(object, ctrl);
 	int textureIndex = 0;
 	Vec2d uvs[4];
-	Mtx rotMtx;
+	Mtx identityMtx;
 	Vec vertices[4];
 
-	if (param_2->m_dataValIndex != 0xFFFF) {
-		VColor* colorInfo = DeformationShpColorInfo(pppYmDeformationShp_, param_3);
+	if (step->m_dataValIndex != 0xFFFF) {
+		VColor* colorInfo = DeformationShpColorInfo(object, ctrl);
 		_pppEnvSt* env = ppvEnv;
 		CTexture* texture =
-			env->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(env->m_materialSetPtr, textureIndex);
+			env->m_mapMeshPtr[step->m_dataValIndex]->GetTexture(env->m_materialSetPtr, textureIndex);
 
-		PSMTXIdentity(rotMtx);
+		PSMTXIdentity(identityMtx);
 		pppSetBlendMode(1);
 		_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 		pppSetDrawEnv(
-			&colorInfo->m_color, &object->m_drawMatrix, param_2->m_drawZ,
-			param_2->m_alpha, 0, 0, 0, 1, 1, 0);
+			&colorInfo->m_color, &object->m_drawMatrix, step->m_drawZ,
+			step->m_alpha, 0, 0, 0, 1, 1, 0);
 
 		GXSetNumTevStages(1);
 		GXSetNumTexGens(2);
@@ -296,42 +279,43 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
 		gUtil.SetVtxFmt_POS_TEX0_TEX1();
 		GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
-		SetUpIndWarp(work);
+		SetUpIndWarp(state);
 
-		if (param_2->m_splitMode == 0) {
-			s8 orientation = param_2->m_orientation;
-			setVertexPos(vertices[0], vertices[1], vertices[2], vertices[3], (float)(u8)param_2->m_size, orientation);
+		if (step->m_splitMode == 0) {
+			s8 orientation = step->m_orientation;
+			setVertexPos(vertices[0], vertices[1], vertices[2], vertices[3], (float)(u8)step->m_size, orientation);
 			setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, kPppYmDeformationShpOne, kPppYmDeformationShpOne);
-			RenderDeformationShape(object, work, vertices, uvs);
+			RenderDeformationShape(object, state, vertices, uvs);
 		} else {
-			short size = param_2->m_size;
-			short split = param_2->m_splitSize;
+			short size = step->m_size;
+			short split = step->m_splitSize;
 			float uvRemainder;
-			float uvSplit = (kPppYmDeformationShpOne / (float)((u8)param_2->m_size << 1)) * (float)(size - split);
+			float uvSplit = (kPppYmDeformationShpOne / (float)((u8)step->m_size << 1)) * (float)(size - split);
 
-			setVertexPos(vertices, (s8)param_2->m_orientation, -size, -split, -split, split);
+			setVertexPos(vertices, (s8)step->m_orientation, -size, -split, -split, split);
 			setVertexUV(uvs, kPppYmDeformationShpZero, uvSplit, uvSplit, kPppYmDeformationShpOne - uvSplit);
-			RenderDeformationShape(object, work, vertices, uvs);
+			RenderDeformationShape(object, state, vertices, uvs);
 
 			uvRemainder = kPppYmDeformationShpOne - uvSplit;
-			setVertexPos(vertices, (s8)param_2->m_orientation, size, -split, split, split);
+			setVertexPos(vertices, (s8)step->m_orientation, size, -split, split, split);
 			setVertexUV(uvs, kPppYmDeformationShpOne, uvSplit, uvRemainder, uvRemainder);
-			RenderDeformationShape(object, work, vertices, uvs);
+			RenderDeformationShape(object, state, vertices, uvs);
 
-			if (param_2->m_splitMode == 1) {
-				setVertexPos(vertices, (s8)param_2->m_orientation, -size, -size, size, -split);
+			if (step->m_splitMode == 1) {
+				setVertexPos(vertices, (s8)step->m_orientation, -size, -size, size, -split);
 				setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, kPppYmDeformationShpOne, uvSplit);
-				RenderDeformationShape(object, work, vertices, uvs);
+				RenderDeformationShape(object, state, vertices, uvs);
 
-				setVertexPos(vertices, (s8)param_2->m_orientation, -size, split, size, size);
+				setVertexPos(vertices, (s8)step->m_orientation, -size, split, size, size);
 				setVertexUV(uvs, kPppYmDeformationShpZero, uvRemainder, kPppYmDeformationShpOne, kPppYmDeformationShpOne);
-				RenderDeformationShape(object, work, vertices, uvs);
+				RenderDeformationShape(object, state, vertices, uvs);
 			}
 		}
 
 		DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);
 	}
 }
+
 /*
  * --INFO--
  * PAL Address: 0x8008fa20
@@ -341,9 +325,9 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
  * JP Address: TODO
  * JP Size: TODO
  */
-int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vertices, Vec2d* uvs)
+int RenderDeformationShape(_pppPObject* object, VYmDeformationShp* state, Vec* vertices, Vec2d* uvs)
 {
-	Vec4d projected[4];
+	Vec4d screenPos[4];
 	Vec boundsMin;
 	Vec boundsMax;
 	int left = 0;
@@ -352,25 +336,24 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	int height = 0;
 	Mtx texMtx;
 	Mtx tempMtx;
-	Vec cameraPos;
-	Vec projectedObj[4];
-	Vec* projectedObjPtrs[4];
+	Vec projectedOrigin;
+	Vec texPos[4];
+	Vec* texPosPtrs[4];
 	int minXIndex;
 	int minYIndex;
 	float texScaleX;
 	float texScaleY;
-	float projectedOffsetX;
-	float projectedOffsetY;
+	float texOffsetX;
+	float texOffsetY;
 	float offsetX;
 	float offsetY;
-	float one = kPppYmDeformationShpOne;
 	int i;
 
 	for (i = 0; i < 4; i++) {
-		calcScreenPos(projected[i], vertices[i], obj->m_drawMatrix.value, ppvScreenMatrix);
+		calcScreenPos(screenPos[i], vertices[i], object->m_drawMatrix.value, ppvScreenMatrix);
 	}
 
-	calcBoundaryBox(boundsMin, boundsMax, projected);
+	calcBoundaryBox(boundsMin, boundsMax, screenPos);
 
 	left = (int)boundsMin.x;
 	top = (int)boundsMin.y;
@@ -378,8 +361,8 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	height = (int)boundsMax.y - top;
 
 	pppSetBlendMode(3);
-	work->m_backBuffer = Graphic.GetBackBufferRect(left, top, width, height, 0);
-	if (work->m_backBuffer == 0) {
+	state->m_backBuffer = Graphic.GetBackBufferRect(left, top, width, height, 0);
+	if (state->m_backBuffer == 0) {
 		return 0;
 	}
 
@@ -399,55 +382,55 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	texMtx[1][2] = kPppYmDeformationShpTexCenter;
 	texMtx[2][2] = kPppYmDeformationShpNegOne;
 
-	PSMTXConcat(texMtx, obj->m_drawMatrix.value, tempMtx);
-	cameraPos.z = kPppYmDeformationShpZero;
-	cameraPos.y = kPppYmDeformationShpZero;
-	cameraPos.x = kPppYmDeformationShpZero;
-	PSMTXMultVec(tempMtx, &cameraPos, &cameraPos);
-	cameraPos.x = cameraPos.x / cameraPos.z;
-	cameraPos.y = cameraPos.y / cameraPos.z;
-	texMtx[0][2] = kPppYmDeformationShpNegOne + cameraPos.x;
-	texMtx[1][2] = kPppYmDeformationShpNegOne + cameraPos.y;
-	PSMTXConcat(texMtx, obj->m_drawMatrix.value, tempMtx);
+	PSMTXConcat(texMtx, object->m_drawMatrix.value, tempMtx);
+	projectedOrigin.z = kPppYmDeformationShpZero;
+	projectedOrigin.y = kPppYmDeformationShpZero;
+	projectedOrigin.x = kPppYmDeformationShpZero;
+	PSMTXMultVec(tempMtx, &projectedOrigin, &projectedOrigin);
+	projectedOrigin.x = projectedOrigin.x / projectedOrigin.z;
+	projectedOrigin.y = projectedOrigin.y / projectedOrigin.z;
+	texMtx[0][2] = kPppYmDeformationShpNegOne + projectedOrigin.x;
+	texMtx[1][2] = kPppYmDeformationShpNegOne + projectedOrigin.y;
+	PSMTXConcat(texMtx, object->m_drawMatrix.value, tempMtx);
 
 	for (i = 0; i < 4; i++) {
-		Vec* projectedObjPtr = &projectedObj[i];
-		projectedObjPtrs[i] = projectedObjPtr;
-		PSMTXMultVec(tempMtx, &vertices[i], projectedObjPtrs[i]);
-		projectedObjPtr->x = projectedObjPtr->x / projectedObjPtr->z;
-		projectedObjPtr->y = projectedObjPtr->y / projectedObjPtr->z;
+		Vec* texPosPtr = &texPos[i];
+		texPosPtrs[i] = texPosPtr;
+		PSMTXMultVec(tempMtx, &vertices[i], texPosPtrs[i]);
+		texPosPtr->x = texPosPtr->x / texPosPtr->z;
+		texPosPtr->y = texPosPtr->y / texPosPtr->z;
 	}
 
 	minXIndex = 0;
 	minYIndex = 0;
 	for (i = 1; i < 4; i++) {
-		if (projected[minXIndex].x > projected[i].x) {
+		if (screenPos[minXIndex].x > screenPos[i].x) {
 			minXIndex = i;
 		}
-		if (projected[minYIndex].y > projected[i].y) {
+		if (screenPos[minYIndex].y > screenPos[i].y) {
 			minYIndex = i;
 		}
 	}
 
-	texScaleX = one / (float)width;
-	texScaleY = one / (float)height;
-	projectedOffsetX = texScaleX * (projected[minXIndex].x - (float)left);
-	offsetX = projectedObj[minXIndex].x - projectedOffsetX;
-	projectedOffsetY = texScaleY * (projected[minYIndex].y - (float)top);
-	offsetY = projectedObj[minYIndex].y - projectedOffsetY;
+	texScaleX = kPppYmDeformationShpOne / (float)width;
+	texScaleY = kPppYmDeformationShpOne / (float)height;
+	texOffsetX = texScaleX * (screenPos[minXIndex].x - (float)left);
+	offsetX = texPos[minXIndex].x - texOffsetX;
+	texOffsetY = texScaleY * (screenPos[minYIndex].y - (float)top);
+	offsetY = texPos[minYIndex].y - texOffsetY;
 
 	if (left < 0) {
 		if (640 < (left + width)) {
-			texMtx[0][2] = texMtx[0][2] + (kPppYmDeformationShpHalf - cameraPos.x);
+			texMtx[0][2] = texMtx[0][2] + (kPppYmDeformationShpHalf - projectedOrigin.x);
 		} else {
 			int maxIndex = 0;
 			for (i = 1; i < 4; i++) {
-				if (projected[maxIndex].x < projected[i].x) {
+				if (screenPos[maxIndex].x < screenPos[i].x) {
 					maxIndex = i;
 				}
 			}
-			projectedOffsetX = texScaleX * (((float)left + (float)width) - projected[maxIndex].x);
-			texMtx[0][2] = texMtx[0][2] + (projectedObj[maxIndex].x + projectedOffsetX - kPppYmDeformationShpOne);
+			texOffsetX = texScaleX * (((float)left + (float)width) - screenPos[maxIndex].x);
+			texMtx[0][2] = texMtx[0][2] + (texPos[maxIndex].x + texOffsetX - kPppYmDeformationShpOne);
 		}
 	} else if (640 < (left + width)) {
 		texMtx[0][2] = texMtx[0][2] + offsetX;
@@ -457,27 +440,27 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 
 	if (top < 0) {
 		if (448 < (top + height)) {
-			texMtx[1][2] = texMtx[1][2] + (kPppYmDeformationShpHalf - cameraPos.y);
+			texMtx[1][2] = texMtx[1][2] + (kPppYmDeformationShpHalf - projectedOrigin.y);
 		} else {
 			int maxIndex = 0;
 			for (i = 1; i < 4; i++) {
-				if (projected[maxIndex].y < projected[i].y) {
+				if (screenPos[maxIndex].y < screenPos[i].y) {
 					maxIndex = i;
 				}
 			}
-			projectedOffsetY = texScaleY * (((float)top + (float)height) - projected[maxIndex].y);
-			texMtx[1][2] = texMtx[1][2] + (projectedObj[maxIndex].y + projectedOffsetY - kPppYmDeformationShpOne);
+			texOffsetY = texScaleY * (((float)top + (float)height) - screenPos[maxIndex].y);
+			texMtx[1][2] = texMtx[1][2] + (texPos[maxIndex].y + texOffsetY - kPppYmDeformationShpOne);
 		}
 	} else {
 		texMtx[1][2] = texMtx[1][2] + offsetY;
 	}
 
-	PSMTXConcat(texMtx, obj->m_drawMatrix.value, texMtx);
+	PSMTXConcat(texMtx, object->m_drawMatrix.value, texMtx);
 	GXLoadTexMtxImm(texMtx, 0x1e, GX_MTX3x4);
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
 	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
 	GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
-	GXLoadTexObj(work->m_backBuffer, GX_TEXMAP0);
+	GXLoadTexObj(state->m_backBuffer, GX_TEXMAP0);
 
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
 	for (i = 0; i < 4; i++) {
@@ -498,7 +481,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpStep* param_2, _pppCtrlTable* param_3)
+void pppFrameYmDeformationShp(pppYmDeformationShp* object, pppYmDeformationShpStep* step, _pppCtrlTable* ctrl)
 {
 	VYmDeformationShp* state;
 
@@ -506,33 +489,33 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 		return;
 	}
 
-	state = DeformationShpState(pppYmDeformationShp_, param_3);
+	state = DeformationShpState(object, ctrl);
 
 	CalcGraphValue(
-		pppYmDeformationShp_, param_2->m_graphId, state->m_scale, state->m_values[0], state->m_values[1],
-		param_2->m_deformation.m_scale.m_valueAdd, param_2->m_deformation.m_scale.m_velocityAdd,
-		param_2->m_deformation.m_scale.m_accelerationAdd);
+		object, step->m_graphId, state->m_scale, state->m_values[0], state->m_values[1],
+		step->m_deformation.m_scale.m_valueAdd, step->m_deformation.m_scale.m_velocityAdd,
+		step->m_deformation.m_scale.m_accelerationAdd);
 	CalcGraphValue(
-		pppYmDeformationShp_, param_2->m_graphId, state->m_values[2], state->m_values[3], state->m_values[4],
-		param_2->m_deformation.m_angle.m_valueAdd, param_2->m_deformation.m_angle.m_velocityAdd,
-		param_2->m_deformation.m_angle.m_accelerationAdd);
+		object, step->m_graphId, state->m_values[2], state->m_values[3], state->m_values[4],
+		step->m_deformation.m_angle.m_valueAdd, step->m_deformation.m_angle.m_velocityAdd,
+		step->m_deformation.m_angle.m_accelerationAdd);
 
 	if (ppvIsLoopCalc != 0) {
 		return;
 	}
 
 	if (state->m_direction != 0) {
-		int step = (int)state->m_values[2];
+		int angleStep = (int)state->m_values[2];
 
-		state->m_angle = state->m_angle + step;
-		if (state->m_angle > param_2->m_angleLimit) {
+		state->m_angle = state->m_angle + angleStep;
+		if (state->m_angle > step->m_angleLimit) {
 			state->m_direction = 0;
 		}
 	} else {
-		int step = (int)state->m_values[2];
+		int angleStep = (int)state->m_values[2];
 
-		state->m_angle = state->m_angle - step;
-		if ((int)state->m_angle < -(int)param_2->m_angleLimit) {
+		state->m_angle = state->m_angle - angleStep;
+		if ((int)state->m_angle < -(int)step->m_angleLimit) {
 			state->m_direction = 1;
 		}
 	}
@@ -561,17 +544,17 @@ void pppDestructYmDeformationShp(pppYmDeformationShp*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _pppCtrlTable* param_2)
+void pppConstruct2YmDeformationShp(pppYmDeformationShp* object, _pppCtrlTable* ctrl)
 {
-	float value = kPppYmDeformationShpZero;
-	VYmDeformationShp* state = DeformationShpState(pppYmDeformationShp_, param_2);
+	float zero = kPppYmDeformationShpZero;
+	VYmDeformationShp* state = DeformationShpState(object, ctrl);
 
-	state->m_values[1] = value;
-	state->m_values[0] = value;
-	state->m_scale = value;
-	state->m_values[4] = value;
-	state->m_values[3] = value;
-	state->m_values[2] = value;
+	state->m_values[1] = zero;
+	state->m_values[0] = zero;
+	state->m_scale = zero;
+	state->m_values[4] = zero;
+	state->m_values[3] = zero;
+	state->m_values[2] = zero;
 }
 
 /*
@@ -583,20 +566,20 @@ void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _p
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _pppCtrlTable* param_2)
+void pppConstructYmDeformationShp(pppYmDeformationShp* object, _pppCtrlTable* ctrl)
 {
-	float value = kPppYmDeformationShpZero;
-	VYmDeformationShp* state = DeformationShpState(pppYmDeformationShp_, param_2);
+	float zero = kPppYmDeformationShpZero;
+	VYmDeformationShp* state = DeformationShpState(object, ctrl);
 
 	state->m_backBuffer = 0;
 	state->m_pad0 = 0;
 	state->m_pad1 = 0;
 	state->m_angle = 0;
 	state->m_direction = 1;
-	state->m_values[1] = value;
-	state->m_values[0] = value;
-	state->m_scale = value;
-	state->m_values[4] = value;
-	state->m_values[3] = value;
-	state->m_values[2] = value;
+	state->m_values[1] = zero;
+	state->m_values[0] = zero;
+	state->m_scale = zero;
+	state->m_values[4] = zero;
+	state->m_values[3] = zero;
+	state->m_values[2] = zero;
 }

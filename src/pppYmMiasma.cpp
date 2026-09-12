@@ -36,10 +36,10 @@ struct YmMiasmaParticleState {
     u8 m_pad0[0x20];
     YmMiasmaParticleColor m_color;
     s16 m_lifeFrames;
-    s16 m_shapeAngle;
-    u8 m_pad2c[4];
+    u8 m_pad2a[6];
     YmMiasmaParticleColor m_colorStep;
-    u8 m_pad38[4];
+    s16 m_shapeAngle;
+    u8 m_pad3a[2];
     float m_speedDecay;
     float m_speed;
     s16 m_fadeFrames;
@@ -143,16 +143,16 @@ static inline void RenderParticleInline(_pppPObject* pppPObject, PYmMiasma* pYmM
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _pppCtrlTable* param_3)
+void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaRenderStep* step, _pppCtrlTable* ctrl)
 {
-    VYmMiasma* work = YmMiasmaWork(pppYmMiasma_, param_3);
+    VYmMiasma* work = YmMiasmaWork(pppYmMiasma, ctrl);
     PARTICLE_DATA* particleData = work->m_particles;
     int i;
 
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     for (i = 0; i < (int)step->m_particleCount; i++) {
-        RenderParticleInline(pppYmMiasma_, (PYmMiasma*)step, particleData);
+        RenderParticleInline(pppYmMiasma, (PYmMiasma*)step, particleData);
         particleData++;
     }
 }
@@ -166,7 +166,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _ppp
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCtrlTable* param_3)
+void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaFrameStep* step, _pppCtrlTable* ctrl)
 {
     VYmMiasma* work;
     PARTICLE_DATA* particle;
@@ -180,9 +180,9 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
         return;
     }
 
-    work = YmMiasmaWork(pppYmMiasma_, param_3);
+    work = YmMiasmaWork(pppYmMiasma, ctrl);
 
-    if (step->m_graphId == pppYmMiasma_->m_graphId) {
+    if (step->m_graphId == pppYmMiasma->m_graphId) {
         work->m_radius = work->m_radius + step->m_radiusDelta;
         work->m_radiusVelocity = work->m_radiusVelocity + step->m_radiusVelocity;
         work->m_radiusAcceleration = work->m_radiusAcceleration + step->m_radiusAcceleration;
@@ -195,7 +195,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
             0x18d);
         particle = work->m_particles;
         for (i = 0; i < step->m_particleCount; i++) {
-            InitParticleData(work, pppYmMiasma_, step, particle);
+            InitParticleData(work, pppYmMiasma, step, particle);
             particle++;
         }
     }
@@ -217,7 +217,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
         float angleScale;
 
         work->m_emitTimer = 0;
-        work->m_speedDecay = step->m_unk18;
+        work->m_speedDecay = step->m_speedDecayReset;
 
         r = rand();
         angleDelta = (s16)(r % step->m_angleRange);
@@ -241,7 +241,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
     work->m_radius = work->m_radius + work->m_radiusVelocity;
 
     for (i = 0, particle = work->m_particles; i < step->m_particleCount; i++, particle++) {
-        UpdateParticleData(pppYmMiasma_, (_pppCtrlTable*)param_3, step, particle);
+        UpdateParticleData(pppYmMiasma, ctrl, step, particle);
     }
 
     matrixPos.x = ppvMng->m_matrix.value[0][3];
@@ -268,13 +268,13 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
+void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
 {
-    VYmMiasma* work = YmMiasmaWork(pppYmMiasma_, param_2);
-    void* heap = work->m_particles;
+    VYmMiasma* work = YmMiasmaWork(pppYmMiasma, ctrl);
+    PARTICLE_DATA* particles = work->m_particles;
 
-    if (heap != 0) {
-        pppMemFree(heap);
+    if (particles != 0) {
+        pppMemFree(particles);
     }
 }
 
@@ -287,14 +287,14 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
+void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
 {
-    VYmMiasma* work = YmMiasmaWork(pppYmMiasma_, param_2);
-    float fVar1 = 0.0f;
+    VYmMiasma* work = YmMiasmaWork(pppYmMiasma, ctrl);
+    float zero = 0.0f;
 
     work->m_radius = 0.0f;
-    work->m_radiusVelocity = fVar1;
-    work->m_radiusAcceleration = fVar1;
+    work->m_radiusVelocity = zero;
+    work->m_radiusAcceleration = zero;
 }
 
 /*
@@ -306,23 +306,23 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
+void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma, _pppCtrlTable* ctrl)
 {
-    VYmMiasma* work = YmMiasmaWork(pppYmMiasma_, param_2);
-    const float fVar2 = 0.0f;
-    const float fVar1 = 1.0f;
+    VYmMiasma* work = YmMiasmaWork(pppYmMiasma, ctrl);
+    const float zero = 0.0f;
+    const float one = 1.0f;
 
     work->m_particles = 0;
-    work->m_radius = fVar2;
-    work->m_radiusVelocity = fVar2;
-    work->m_radiusAcceleration = fVar2;
+    work->m_radius = zero;
+    work->m_radiusVelocity = zero;
+    work->m_radiusAcceleration = zero;
     work->m_emitTimer = 0;
-    work->m_impulse.x = fVar1;
-    work->m_impulse.y = fVar2;
-    work->m_impulse.z = fVar2;
-    work->m_prevPosition.z = fVar2;
-    work->m_prevPosition.y = fVar2;
-    work->m_prevPosition.x = fVar2;
+    work->m_impulse.x = one;
+    work->m_impulse.y = zero;
+    work->m_impulse.z = zero;
+    work->m_prevPosition.z = zero;
+    work->m_prevPosition.y = zero;
+    work->m_prevPosition.x = zero;
     work->m_prevPositionChanged = 0;
 }
 
@@ -484,7 +484,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     float randomScale;
     float x;
     Vec basePos;
-    u32 angleBase;
+    u32 jitterInt;
     u32 signBit;
     float speedJitter;
     u8 lifeBase;
@@ -504,7 +504,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     state->m_shapeCurrentFrame = shapeCount;
     trigCos = ppvSinTbl[(s32)((angle + 0x4000) & 0xffff) >> 2];
     trigSin = ppvSinTbl[(s32)(angle & 0xffff) >> 2];
-    *(short*)((u8*)&particleData->m_velocity.x + 8) = (short)(randomValue % 0x168);
+    state->m_shapeAngle = (short)(randomValue % 0x168);
     radiusJitter = randomScale * pYmMiasma->m_radiusJitter;
     x = trigCos * (vYmMiasma->m_radius + radiusJitter);
     particleData->m_matrix[0][0] = x;
@@ -544,9 +544,9 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     state->m_colorStep.m_a = state->m_colorStep.m_a / pYmMiasma->m_colorStepFrames;
     state->m_speedDecay = pYmMiasma->m_initialSpeedDecay;
     speedJitter = randomScale * pYmMiasma->m_speedVariance;
-    angleBase = (u32)(int)speedJitter;
-    signBit = angleBase >> 0x1f;
-    if ((((angleBase & 1U) ^ signBit) - signBit) != 0) {
+    jitterInt = (u32)(int)speedJitter;
+    signBit = jitterInt >> 0x1f;
+    if ((((jitterInt & 1U) ^ signBit) - signBit) != 0) {
         speedJitter *= -1.0f;
     }
     state->m_speed = pYmMiasma->m_baseSpeed + speedJitter;

@@ -37,7 +37,7 @@ struct PYmMiasma {
     u16 m_pad0E;
     f32 m_baseSpeed;
     f32 m_speedVariance;
-    f32 m_unk18;
+    f32 m_speedDecayReset;
     f32 m_minDistance;
     f32 m_gravity;
     u8 m_colorStartR;

@@ -36,10 +36,10 @@ void main(int argc, char** argv)
 
             switch (argument[1]) {
             case 'r':
-                Pad._1b4_4_ = 1;
+                Pad.m_replayPlayback = 1;
                 break;
             case 'w':
-                Pad._1b8_4_ = 1;
+                Pad.m_replayWrite = 1;
                 break;
             }
         }

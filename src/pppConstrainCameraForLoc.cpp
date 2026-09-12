@@ -4,9 +4,10 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
-static const float kPppConstrainCameraForLocZero = 0.0f;
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
+
+static const float kPppConstrainCameraForLocZero = 0.0f;
 
 struct pppConstrainCameraForLocWork {
     Vec m_cameraOffset;
@@ -39,7 +40,7 @@ static inline pppConstrainCameraForLocWork* GetConstrainCameraWork(
         constrainCameraForLoc->m_workArea + offsets->m_workOffset);
 }
 
-static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*);
+static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* context, void*);
 
 /*
  * --INFO--
@@ -54,32 +55,36 @@ void pppFrameConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForL
                                    pppConstrainCameraForLocParams* params,
                                    _pppCtrlTable* data)
 {
-	pppConstrainCameraForLocWork* value;
-	CChara::CModel* model;
+    pppConstrainCameraForLocWork* work;
+    CChara::CModel* model;
 
-	if (ppvUserStopPartF == 0) {
-		value = GetConstrainCameraWork(constrainCameraForLoc, data);
-		CGObject* obj = ppvMng->m_owner;
-		model = GetModelPtr(obj);
-		model->SetCallbackContext(value, params);
-		model->SetBeforeCalcMatrixCallback(CC_BeforeCalcMatrixCallback);
+    if (ppvUserStopPartF == 0) {
+        work = GetConstrainCameraWork(constrainCameraForLoc, data);
+        CGObject* obj = ppvMng->m_owner;
+        model = GetModelPtr(obj);
+        model->SetCallbackContext(work, params);
+        model->SetBeforeCalcMatrixCallback(CC_BeforeCalcMatrixCallback);
 
-		CalcGraphValue(constrainCameraForLoc, params->m_graphId, value->m_cameraOffset.x,
-		               value->m_cameraOffset.y, value->m_cameraOffset.z, params->m_dataValIndex,
-		               params->m_initWork, params->m_stepValue);
-	}
+        CalcGraphValue(constrainCameraForLoc, params->m_graphId, work->m_cameraOffset.x,
+                       work->m_cameraOffset.y, work->m_cameraOffset.z, params->m_dataValIndex,
+                       params->m_initWork, params->m_stepValue);
+    }
 }
 
 /*
  * --INFO--
  * PAL Address: 0x80167E70
  * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppDestructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 {
-	CGObject* obj = ppvMng->m_owner;
-	CChara::CModel* model = GetModelPtr(obj);
-	model->SetBeforeCalcMatrixCallback(0);
+    CGObject* obj = ppvMng->m_owner;
+    CChara::CModel* model = GetModelPtr(obj);
+    model->SetBeforeCalcMatrixCallback(0);
 }
 
 /*
@@ -94,16 +99,16 @@ void pppDestructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
                                         _pppCtrlTable* data)
 {
-    float fVar1 = kPppConstrainCameraForLocZero;
-    pppConstrainCameraForLocWork* value = GetConstrainCameraWork(constrainCameraForLoc, data);
-    value->m_cameraOffset.z = fVar1;
-    value->m_cameraOffset.y = fVar1;
-    value->m_cameraOffset.x = fVar1;
+    float zero = kPppConstrainCameraForLocZero;
+    pppConstrainCameraForLocWork* work = GetConstrainCameraWork(constrainCameraForLoc, data);
+    work->m_cameraOffset.z = zero;
+    work->m_cameraOffset.y = zero;
+    work->m_cameraOffset.x = zero;
 }
 
 /*
  * --INFO--
- * PAL Address: 80167ec4  
+ * PAL Address: 0x80167EC4
  * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
@@ -112,93 +117,93 @@ void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCamer
  */
 void pppConstructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
 {
-    float fVar1 = kPppConstrainCameraForLocZero;
-    pppConstrainCameraForLocWork* value = GetConstrainCameraWork(constrainCameraForLoc, data);
-    value->m_cameraOffset.z = fVar1;
-    value->m_cameraOffset.y = fVar1;
-    value->m_cameraOffset.x = fVar1;
-    value->m_owner = constrainCameraForLoc;
+    float zero = kPppConstrainCameraForLocZero;
+    pppConstrainCameraForLocWork* work = GetConstrainCameraWork(constrainCameraForLoc, data);
+    work->m_cameraOffset.z = zero;
+    work->m_cameraOffset.y = zero;
+    work->m_cameraOffset.x = zero;
+    work->m_owner = constrainCameraForLoc;
 }
 
 /*
  * --INFO--
- * PAL Address: 80167eec
+ * PAL Address: 0x80167EEC
  * PAL Size: 580b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
+static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* context, void*)
 {
-    pppConstrainCameraForLocWork* work = (pppConstrainCameraForLocWork*)param_2;
+    pppConstrainCameraForLocWork* work = (pppConstrainCameraForLocWork*)context;
     _pppPObject* owner = work->m_owner;
-    float fVar1;
-    float fVar2;
-    float fVar3;
-    Vec local_a4;
-    Vec local_b0;
-    Vec local_bc;
-    Vec local_c8;
-    Vec local_d4;
-    Vec local_e0;
-    Vec local_ec;
-    Mtx local_68;
-    Mtx local_98;
+    float zero;
+    float offsetY;
+    float offsetX;
+    Vec resultPos;
+    Vec cameraDir;
+    Vec cameraPos;
+    Vec direct0;
+    Vec direct1;
+    Vec localOffset0;
+    Vec localOffset1;
+    Mtx cameraMtx;
+    Mtx invCameraMtx;
 
-    local_b0.x = CameraDirX();
-    local_b0.y = CameraDirY();
-    local_b0.z = CameraDirZ();
-    local_bc.x = CameraPosX();
-    local_bc.y = CameraPosY();
-    local_bc.z = CameraPosZ();
-    PSMTXCopy(CameraMatrix(), local_68);
+    cameraDir.x = CameraDirX();
+    cameraDir.y = CameraDirY();
+    cameraDir.z = CameraDirZ();
+    cameraPos.x = CameraPosX();
+    cameraPos.y = CameraPosY();
+    cameraPos.z = CameraPosZ();
+    PSMTXCopy(CameraMatrix(), cameraMtx);
 
-    fVar3 = work->m_cameraOffset.x;
-    local_a4.x = fVar3 * local_b0.x;
-    local_a4.y = fVar3 * local_b0.y;
-    local_a4.z = fVar3 * local_b0.z;
+    offsetX = work->m_cameraOffset.x;
+    resultPos.x = offsetX * cameraDir.x;
+    resultPos.y = offsetX * cameraDir.y;
+    resultPos.z = offsetX * cameraDir.z;
     if ((s32)Game.m_currentSceneId == 7) {
-        PSMTXInverse(ppvCameraMatrix, local_98);
+        PSMTXInverse(ppvCameraMatrix, invCameraMtx);
     } else {
-        PSMTXInverse(local_68, local_98);
+        PSMTXInverse(cameraMtx, invCameraMtx);
     }
 
     PSMTXIdentity(model->m_drawMtx);
     PSMTXIdentity(model->m_worldBaseMtx);
-    PSMTXConcat(local_98, model->m_worldBaseMtx, model->m_worldBaseMtx);
-    PSVECAdd(&local_bc, &local_a4, &local_a4);
+    PSMTXConcat(invCameraMtx, model->m_worldBaseMtx, model->m_worldBaseMtx);
+    PSVECAdd(&cameraPos, &resultPos, &resultPos);
 
-    fVar3 = owner->m_localMatrix.value[0][3];
-    fVar2 = owner->m_localMatrix.value[1][3];
-    gUtil.GetDirectVector(&local_c8, &local_d4, local_b0);
+    offsetX = owner->m_localMatrix.value[0][3];
+    offsetY = owner->m_localMatrix.value[1][3];
+    gUtil.GetDirectVector(&direct0, &direct1, cameraDir);
 
-    local_e0.x = fVar3 * local_c8.x;
-    local_e0.y = fVar3 * local_c8.y;
-    local_e0.z = fVar3 * local_c8.z;
-    local_ec.x = fVar2 * local_d4.x;
-    local_ec.y = fVar2 * local_d4.y;
-    local_ec.z = fVar2 * local_d4.z;
-    PSVECAdd(&local_a4, &local_e0, &local_a4);
-    PSVECAdd(&local_a4, &local_ec, &local_a4);
+    localOffset0.x = offsetX * direct0.x;
+    localOffset0.y = offsetX * direct0.y;
+    localOffset0.z = offsetX * direct0.z;
+    localOffset1.x = offsetY * direct1.x;
+    localOffset1.y = offsetY * direct1.y;
+    localOffset1.z = offsetY * direct1.z;
+    PSVECAdd(&resultPos, &localOffset0, &resultPos);
+    PSVECAdd(&resultPos, &localOffset1, &resultPos);
 
-    fVar1 = kPppConstrainCameraForLocZero;
-    model->m_worldBaseMtx[0][3] = kPppConstrainCameraForLocZero;
-    model->m_worldBaseMtx[1][3] = fVar1;
-    model->m_worldBaseMtx[2][3] = fVar1;
+    zero = kPppConstrainCameraForLocZero;
+    model->m_worldBaseMtx[0][3] = zero;
+    model->m_worldBaseMtx[1][3] = zero;
+    model->m_worldBaseMtx[2][3] = zero;
     if ((s32)Game.m_currentSceneId == 7) {
-        model->m_drawMtx[0][3] = fVar1;
-        model->m_drawMtx[1][3] = fVar1;
-        model->m_drawMtx[2][3] = fVar1;
+        model->m_drawMtx[0][3] = zero;
+        model->m_drawMtx[1][3] = zero;
+        model->m_drawMtx[2][3] = zero;
     } else {
-        model->m_drawMtx[0][3] = local_a4.x;
-        model->m_drawMtx[1][3] = local_a4.y;
-        model->m_drawMtx[2][3] = local_a4.z;
+        model->m_drawMtx[0][3] = resultPos.x;
+        model->m_drawMtx[1][3] = resultPos.y;
+        model->m_drawMtx[2][3] = resultPos.z;
     }
 
     PSMTXCopy(model->m_worldBaseMtx, work->m_worldBaseMtx);
-    work->m_worldBaseMtx[0][3] = local_a4.x;
-    work->m_worldBaseMtx[1][3] = local_a4.y;
-    work->m_worldBaseMtx[2][3] = local_a4.z;
+    work->m_worldBaseMtx[0][3] = resultPos.x;
+    work->m_worldBaseMtx[1][3] = resultPos.y;
+    work->m_worldBaseMtx[2][3] = resultPos.z;
     return 1;
 }

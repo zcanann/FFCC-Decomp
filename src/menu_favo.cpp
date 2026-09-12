@@ -8,8 +8,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-typedef signed short s16;
-
 static FoodRank s_rank[8];
 
 static const float kFavoWideTextureWidth = 384.0f;
@@ -45,7 +43,7 @@ void CMenuPcs::FavoDraw()
 			float v = entry->v;
 
 			GXColor colors[4];
-			if (static_cast<int>(i) < 3) {
+			if (i < 3) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
@@ -240,19 +238,19 @@ int CMenuPcs::FavoClose()
 	int frame;
 
 	finishedCount = 0;
-	this->m_singMenuState->frame = this->m_singMenuState->frame + 1;
-	count = this->m_favoList->count;
-	entry = this->m_favoList->entries;
-	frame = this->m_singMenuState->frame;
+	m_singMenuState->frame++;
+	count = m_favoList->count;
+	entry = m_favoList->entries;
+	frame = m_singMenuState->frame;
 	for (int i = 0; i < count; i++) {
 		if (frame >= entry->startFrame) {
 			if (entry->startFrame + entry->duration <= frame) {
-				finishedCount = finishedCount + 1;
+				finishedCount++;
 				entry->alpha = 0.0f;
 				entry->dx = 0.0f;
 				entry->dy = 0.0f;
 			} else {
-				entry->step = entry->step + 1;
+				entry->step++;
 				entry->alpha =
 				    (float)(1.0 - (1.0 / (double)entry->duration) * (double)entry->step);
 				if ((entry->flags & 2) == 0) {
@@ -342,24 +340,24 @@ int CMenuPcs::FavoOpen()
 	int count;
 	int frame;
 
-	if (this->m_singMenuState->initialized == '\0') {
+	if (m_singMenuState->initialized == '\0') {
 		FavoInit();
 	}
 
 	finishedCount = 0;
-	this->m_singMenuState->frame = this->m_singMenuState->frame + 1;
-	count = this->m_favoList->count;
-	entry = this->m_favoList->entries;
-	frame = this->m_singMenuState->frame;
+	m_singMenuState->frame++;
+	count = m_favoList->count;
+	entry = m_favoList->entries;
+	frame = m_singMenuState->frame;
 	for (int i = 0; i < count; i++) {
 		if (frame >= entry->startFrame) {
 			if (entry->startFrame + entry->duration <= frame) {
-				finishedCount = finishedCount + 1;
+				finishedCount++;
 				entry->alpha = 1.0f;
 				entry->dx = 0.0f;
 				entry->dy = 0.0f;
 			} else {
-				entry->step = entry->step + 1;
+				entry->step++;
 				entry->alpha = (float)((1.0 / (double)entry->duration) * (double)entry->step);
 				if ((entry->flags & 2) == 0) {
 					float step = (float)((1.0 / (double)entry->duration) * (double)entry->step);
@@ -396,62 +394,62 @@ void CMenuPcs::FavoInit0()
 	FavoListStorage* list;
 	int entryIndex;
 
-	list = this->m_favoList;
+	list = m_favoList;
 	entryIndex = 0;
 	entry = &list->entries[entryIndex++];
 	entry->startFrame = 2;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->startFrame = 2;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->startFrame = 2;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->startFrame = 7;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->startFrame = 7;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 7;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->flags = 2;
 	alpha = 1.0f;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	entry = &this->m_favoList->entries[entryIndex++];
+	entry = &m_favoList->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
 
-	list = this->m_favoList;
+	list = m_favoList;
 	entry = list->entries;
 	for (entryIndex = list->count; entryIndex > 0; entryIndex--) {
 		entry->step = 0;
@@ -471,23 +469,22 @@ void CMenuPcs::FavoInit0()
  */
 void CMenuPcs::FavoInit()
 {
-	float fVar4;
-	float fVar5;
-	int sVar9;
-	int sVar10;
-	int sVar11;
-	int iVar16;
-	int iVar17;
+	float uvZero;
+	float wideTexWidth;
+	int rowOffsetY;
+	int entryCount;
+	int i;
+	int idx;
 
 	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	memset(m_favoList, 0, sizeof(*m_favoList));
 	FavoEntry* entry = m_favoList->entries;
-	for (iVar16 = 64; iVar16 > 0; iVar16--) {
+	for (i = 64; i > 0; i--) {
 		entry->uvScale = 1.0f;
 		entry++;
 	}
 
-	FavoListStorage* list = this->m_favoList;
+	FavoListStorage* list = m_favoList;
 	int entryIndex = 0;
 	FavoEntry* setupEntry = &list->entries[entryIndex++];
 	setupEntry->tex = 0x33;
@@ -496,69 +493,69 @@ void CMenuPcs::FavoInit()
 	setupEntry->y = 0x28;
 	setupEntry->w = 0x158;
 	setupEntry->h = 0x20;
-	fVar4 = 0.0f;
-	fVar5 = kFavoWideTextureWidth;
-	setupEntry->u = fVar4;
-	setupEntry->v = fVar4;
-	setupEntry->uvScale = fVar5 / (float)setupEntry->w;
+	uvZero = 0.0f;
+	wideTexWidth = kFavoWideTextureWidth;
+	setupEntry->u = uvZero;
+	setupEntry->v = uvZero;
+	setupEntry->uvScale = wideTexWidth / (float)setupEntry->w;
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
-	list = this->m_favoList;
+	list = m_favoList;
 	setupEntry = &list->entries[entryIndex++];
 	setupEntry->tex = 0x32;
 	setupEntry->x = 0x30;
 	setupEntry->y = 0x48;
 	setupEntry->w = 0x158;
 	setupEntry->h = 200;
-	setupEntry->u = fVar4;
-	setupEntry->v = fVar4;
-	setupEntry->uvScale = fVar5 / (float)setupEntry->w;
+	setupEntry->u = uvZero;
+	setupEntry->v = uvZero;
+	setupEntry->uvScale = wideTexWidth / (float)setupEntry->w;
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
-	list = this->m_favoList;
+	list = m_favoList;
 	setupEntry = &list->entries[entryIndex++];
 	setupEntry->tex = 0x33;
 	setupEntry->x = 0x30;
 	setupEntry->y = 0x110;
 	setupEntry->w = 0x158;
 	setupEntry->h = 0x20;
-	setupEntry->u = fVar4;
-	setupEntry->v = fVar4;
-	setupEntry->uvScale = fVar5 / (float)setupEntry->w;
+	setupEntry->u = uvZero;
+	setupEntry->v = uvZero;
+	setupEntry->uvScale = wideTexWidth / (float)setupEntry->w;
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
-	sVar9 = 0;
-	sVar11 = 6;
-	list = this->m_favoList;
+	rowOffsetY = 0;
+	entryCount = 6;
+	list = m_favoList;
 	setupEntry = &list->entries[entryIndex++];
 	setupEntry->tex = 0x45;
 	setupEntry->x = 0x18;
 	setupEntry->y = 0xe;
 	setupEntry->w = 0x30;
 	setupEntry->h = 0x30;
-	setupEntry->u = fVar4;
-	setupEntry->v = fVar4;
+	setupEntry->u = uvZero;
+	setupEntry->v = uvZero;
 	setupEntry->uvScale = 1.0f;
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	list = this->m_favoList;
+	list = m_favoList;
 	setupEntry = &list->entries[entryIndex++];
 	setupEntry->tex = 0x45;
 	setupEntry->x = 0x1d;
 	setupEntry->w = 0x30;
 	setupEntry->h = 0x30;
 	setupEntry->y = static_cast<short>(0x150 - setupEntry->h);
-	setupEntry->u = fVar4;
-	setupEntry->v = fVar4;
+	setupEntry->u = uvZero;
+	setupEntry->v = uvZero;
 	setupEntry->uvScale = kFavoIconUvScale;
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	list = this->m_favoList;
+	list = m_favoList;
 	setupEntry = &list->entries[entryIndex++];
 	setupEntry->flags = 2;
 	setupEntry->tex = 0x2e;
@@ -566,29 +563,29 @@ void CMenuPcs::FavoInit()
 	setupEntry->y = 8;
 	setupEntry->w = 0x48;
 	setupEntry->h = 0x140;
-	setupEntry->u = fVar4;
-	setupEntry->v = fVar4;
+	setupEntry->u = uvZero;
+	setupEntry->v = uvZero;
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	FavoEntry* firstEntry = &this->m_favoList->entries[0];
-	for (iVar17 = 6; iVar17 < 14; iVar17++) {
-		setupEntry = &this->m_favoList->entries[iVar17];
+	FavoEntry* firstEntry = &m_favoList->entries[0];
+	for (idx = 6; idx < 14; idx++) {
+		setupEntry = &m_favoList->entries[idx];
 		setupEntry->flags = 2;
 		setupEntry->tex = 0x37;
-		sVar11 = sVar11 + 1;
+		entryCount++;
 		setupEntry->x = firstEntry->x + 0x28;
-		setupEntry->y = firstEntry->y + sVar9;
-		sVar9 = sVar9 + 0x20;
+		setupEntry->y = firstEntry->y + rowOffsetY;
+		rowOffsetY += 0x20;
 		setupEntry->w = 200;
 		setupEntry->h = 0x28;
-		setupEntry->u = fVar4;
-		setupEntry->v = fVar4;
+		setupEntry->u = uvZero;
+		setupEntry->v = uvZero;
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
 	}
 
-	m_favoList->count = sVar11;
+	m_favoList->count = entryCount;
 
 	memset(s_rank, 0, sizeof(s_rank));
 	FoodRank* ranks = s_rank;
@@ -600,9 +597,9 @@ void CMenuPcs::FavoInit()
 	int rankIndex = 0;
 	FoodRank* rank = ranks;
 	do {
-		iVar17 = rankIndex + 1;
-		FoodRank* compareRank = ranks + iVar17;
-		for (iVar16 = iVar17; iVar16 < 8; iVar16++) {
+		idx = rankIndex + 1;
+		FoodRank* compareRank = ranks + idx;
+		for (i = idx; i < 8; i++) {
 			if (rank->score < compareRank->score) {
 				signed char place = rank->place;
 				signed char foodId = rank->foodId;
@@ -623,16 +620,16 @@ void CMenuPcs::FavoInit()
 	} while (rankIndex < 8);
 
 	int place = 0;
-	iVar17 = 0;
+	idx = 0;
 	rank = ranks;
 	do {
-		if ((iVar17 != 0) && (rank[-1].score != rank->score)) {
-			place = iVar17;
+		if ((idx != 0) && (rank[-1].score != rank->score)) {
+			place = idx;
 		}
 		rank->place = place + 1;
 		rank++;
-		iVar17++;
-	} while (iVar17 < 8);
+		idx++;
+	} while (idx < 8);
 
 	m_singMenuState->selectedIndex = 0;
 	m_singMenuState->initialized = 1;

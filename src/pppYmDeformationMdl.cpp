@@ -113,7 +113,7 @@ inline void DisableIndWarp()
     float indMtx[2][3];
     const float zero = 0.0f;
 
-    GXSetTevDirect((GXTevStageID)1);
+    GXSetTevDirect(GX_TEVSTAGE1);
     GXSetNumIndStages(0);
     GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
 
@@ -136,9 +136,9 @@ inline void DisableIndWarp()
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* param_2, _pppCtrlTable* param_3)
+void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* step, _pppCtrlTable* ctrl)
 {
-    YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl, param_3);
+    YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl, ctrl);
     VColor* colorInfo;
     CMapMesh* model;
     Mtx indWarpMtx;
@@ -153,13 +153,13 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXTexObj* backTexture;
     CTexture* texture;
 
-    if (param_2->m_dataValIndex == 0xFFFF) {
+    if (step->m_dataValIndex == 0xFFFF) {
         return;
     }
 
     _pppEnvSt* env = DeformationMdlEnv();
-    model = env->m_mapMeshPtr[param_2->m_dataValIndex];
-    colorInfo = DeformationMdlColorInfo(pppYmDeformationMdl, param_3);
+    model = env->m_mapMeshPtr[step->m_dataValIndex];
+    colorInfo = DeformationMdlColorInfo(pppYmDeformationMdl, ctrl);
     texture = model->GetTexture(env->m_materialSetPtr, textureIndex);
 
     PSMTXIdentity(indWarpMtx);
@@ -167,9 +167,9 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     pppSetDrawEnv(
-        &colorInfo->m_color, &pppYmDeformationMdl->m_drawMatrix, param_2->m_envDepth, param_2->m_lightTarget,
-        param_2->m_fogIndex, param_2->m_blendMode, param_2->m_cullMode,
-        static_cast<u8>(static_cast<u32>(__cntlzw(static_cast<u32>(param_2->m_disableZ))) >> 5), 1, 0);
+        &colorInfo->m_color, &pppYmDeformationMdl->m_drawMatrix, step->m_envDepth, step->m_lightTarget,
+        step->m_fogIndex, step->m_blendMode, step->m_cullMode,
+        static_cast<u8>(static_cast<u32>(__cntlzw(static_cast<u32>(step->m_disableZ))) >> 5), 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);
@@ -183,11 +183,11 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
-    pppSetBlendMode(param_2->m_blendMode);
-    if (param_2->m_blendMode == 0) {
+    pppSetBlendMode(step->m_blendMode);
+    if (step->m_blendMode == 0) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_AND);
     }
-    if (param_2->m_blendMode == 3) {
+    if (step->m_blendMode == 3) {
         _GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_AND);
         _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
     }
@@ -195,10 +195,10 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR_NULL);
     _GXSetTevOp(GX_TEVSTAGE1, GX_REPLACE);
     GXClearVtxDesc();
-    GXSetVtxDesc((GXAttr)9, GX_INDEX16);
-    GXSetVtxDesc((GXAttr)10, GX_INDEX16);
-    GXSetVtxDesc((GXAttr)11, GX_INDEX16);
-    GXSetVtxDesc((GXAttr)13, GX_INDEX16);
+    GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
+    GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
+    GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+    GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
 
     left = 0;
     top = 0;
@@ -251,31 +251,31 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* param_2, _pppCtrlTable* param_3)
+void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* step, _pppCtrlTable* ctrl)
 {
     YmDeformationMdlState* state;
 
     if ((ppvUserStopPartF == 0) &&
-        ((state = DeformationMdlState(pppYmDeformationMdl, param_3)),
-         (param_2->m_dataValIndex != 0xFFFF))) {
+        ((state = DeformationMdlState(pppYmDeformationMdl, ctrl)),
+         (step->m_dataValIndex != 0xFFFF))) {
         CalcGraphValue(
-            pppYmDeformationMdl, param_2->m_graphId, state->m_scale, state->m_values[0],
-            state->m_values[1], param_2->m_scaleValueAdd, param_2->m_scaleVelocityAdd,
-            param_2->m_scaleAccelerationAdd);
+            pppYmDeformationMdl, step->m_graphId, state->m_scale, state->m_values[0],
+            state->m_values[1], step->m_scaleValueAdd, step->m_scaleVelocityAdd,
+            step->m_scaleAccelerationAdd);
         CalcGraphValue(
-            pppYmDeformationMdl, param_2->m_graphId, state->m_values[2], state->m_values[3],
-            state->m_values[4], param_2->m_angleValueAdd, param_2->m_angleVelocityAdd,
-            param_2->m_angleAccelerationAdd);
+            pppYmDeformationMdl, step->m_graphId, state->m_values[2], state->m_values[3],
+            state->m_values[4], step->m_angleValueAdd, step->m_angleVelocityAdd,
+            step->m_angleAccelerationAdd);
 
         if (ppvIsLoopCalc == 0) {
             if (state->m_direction != 0) {
                 state->m_angle = state->m_angle + (int)state->m_values[2];
-                if (state->m_angle > param_2->m_angleLimit) {
+                if (state->m_angle > step->m_angleLimit) {
                     state->m_direction = 0;
                 }
             } else {
                 state->m_angle = state->m_angle - (int)state->m_values[2];
-                if ((int)state->m_angle < -(int)param_2->m_angleLimit) {
+                if ((int)state->m_angle < -(int)step->m_angleLimit) {
                     state->m_direction = 1;
                 }
             }
@@ -306,10 +306,10 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* param_2)
+void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* ctrl)
 {
     float value = 0.0f;
-    YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl_, param_2);
+    YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl_, ctrl);
 
     state->m_values[1] = value;
     state->m_values[0] = value;
@@ -328,10 +328,10 @@ void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _p
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* param_2)
+void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* ctrl)
 {
     float zero = 0.0f;
-    YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl_, param_2);
+    YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl_, ctrl);
 
     state->m_angle = 0;
     state->m_direction = 1;

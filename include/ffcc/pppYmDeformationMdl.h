@@ -49,8 +49,8 @@ extern "C" {
 void pppConstructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*);
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*);
 void pppDestructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*);
-void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* param_2, _pppCtrlTable* param_3);
-void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* param_2, _pppCtrlTable* param_3);
+void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* step, _pppCtrlTable* ctrl);
+void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* step, _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

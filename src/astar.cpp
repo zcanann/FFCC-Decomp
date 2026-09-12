@@ -96,7 +96,7 @@ int CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
+int CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
 	unsigned int mask = m_hitAttributeMask;
 	const CVector& baseVec =

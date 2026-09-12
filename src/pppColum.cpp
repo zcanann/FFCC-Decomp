@@ -37,9 +37,9 @@ static inline pppColumDataOffsets* GetColumDataOffsets(_pppCtrlTable* ctrl)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *param_3)
+void pppRenderColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
 {
-    pppColumDataOffsets* serializedDataOffsets = GetColumDataOffsets(param_3);
+    pppColumDataOffsets* serializedDataOffsets = GetColumDataOffsets(ctrl);
     pppColumValue* values;
     pppColumFrameWork* frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
     pppColumPositionWork* positionWork =
@@ -47,13 +47,12 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
     int textureIndex = 0;
     pppCVECTOR color;
 
-    if (param_2->m_dataValIndex != 0xFFFF) {
-        pppShapeSt* shapeSt = ppvEnv->m_shapeTablePtr[param_2->m_dataValIndex];
-        CTexture* texture;
-
-        texture = shapeSt->GetTexture((long*)shapeSt->m_animData, ppvEnv->m_materialSetPtr, textureIndex);
+    if (step->m_dataValIndex != 0xFFFF) {
+        pppShapeSt* shapeSt = ppvEnv->m_shapeTablePtr[step->m_dataValIndex];
+        CTexture* texture =
+            shapeSt->GetTexture((long*)shapeSt->m_animData, ppvEnv->m_materialSetPtr, textureIndex);
         if (positionWork->m_alpha != 0) {
-            Vec cameraDelta;
+            Vec segmentDir;
             Vec center;
             Vec offset;
             Vec shapePosA;
@@ -78,55 +77,53 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
             baseZ = positionWork->m_position.z;
             deltaX = 320.0f - baseX;
             deltaY = 224.0f - baseY;
-            cameraDelta.x = deltaX;
-            cameraDelta.y = deltaY;
-            cameraDelta.z = -0.5f + baseZ;
+            segmentDir.x = deltaX;
+            segmentDir.y = deltaY;
+            segmentDir.z = -0.5f + baseZ;
 
             deltaX2 = deltaX * deltaX;
             deltaY2 = deltaY * deltaY;
             lengthXY = sqrtf(deltaX2 + deltaY2);
             drawScale = 0.0f;
             if (lengthXY > 0.000001f) {
-                PSVECScale(&cameraDelta, &cameraDelta, 1.0f / lengthXY);
+                PSVECScale(&segmentDir, &segmentDir, 1.0f / lengthXY);
             }
 
             pppInitBlendMode();
             values = frameWork->m_values;
-            segmentStep =
-                (2.0f * lengthXY) / (float)param_2->m_count;
+            segmentStep = (2.0f * lengthXY) / (float)step->m_count;
 
-            for (int i = 0; i < param_2->m_count; i++) {
+            for (int i = 0; i < step->m_count; i++) {
                 float positionScale = segmentStep * values->m_positionScale;
                 float offsetX;
                 float offsetY;
                 u8 alpha;
 
                 center.z = 0.0f;
-                offsetX = cameraDelta.x * (float)(i + 1);
+                offsetX = segmentDir.x * (float)(i + 1);
                 center.x = baseX + positionScale * offsetX;
-                offsetY = cameraDelta.y * (float)(i + 1);
+                offsetY = segmentDir.y * (float)(i + 1);
                 center.y = baseY + positionScale * offsetY;
 
                 PSVECSubtract(&center, &positionWork->m_position, &offset);
                 {
                     float dist = PSVECMag(&offset);
-                    float fadeAmount = dist / param_2->m_colum.m_fadeDistance;
+                    float fadeAmount = dist / step->m_colum.m_fadeDistance;
                     u32 baseAlpha = positionWork->m_alpha;
 
                     alpha = (u8)baseAlpha;
-                    if (dist < param_2->m_colum.m_fadeDistance && fadeAmount > 0.0f) {
+                    if (dist < step->m_colum.m_fadeDistance && fadeAmount > 0.0f) {
                         alpha = (u8)((float)baseAlpha * fadeAmount);
                     }
                 }
-                color.rgba[0] = param_2->m_baseColor[0] + values->m_colorR;
-                color.rgba[1] = param_2->m_baseColor[1] + values->m_colorG;
-                color.rgba[2] = param_2->m_baseColor[2] + values->m_colorB;
+                color.rgba[0] = step->m_baseColor[0] + values->m_colorR;
+                color.rgba[1] = step->m_baseColor[1] + values->m_colorG;
+                color.rgba[2] = step->m_baseColor[2] + values->m_colorB;
                 color.rgba[3] = alpha;
 
                 pppSetDrawEnv(
-                    &color, (pppFMATRIX*)0, 0.0f, param_2->m_colum.m_drawEnvColor1,
-                    param_2->m_colum.m_drawEnvColor0,
-                    param_2->m_arg3, 0, 0, 1, 0);
+                    &color, (pppFMATRIX*)0, 0.0f, step->m_colum.m_drawEnvColor1,
+                    step->m_colum.m_drawEnvColor0, step->m_arg3, 0, 0, 1, 0);
 
                 gUtil.BeginQuadEnv();
                 gUtil.SetVtxFmt_POS_CLR_TEX();
@@ -134,19 +131,18 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
                 _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
                 GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
-                pppSetBlendMode(param_2->m_arg3);
+                pppSetBlendMode(step->m_arg3);
 
                 drawScale += values->m_scaleStep;
                 pppShapeAnimData* shapeAnim = static_cast<pppShapeAnimData*>(shapeSt->m_animData);
                 tagOAN3_SHAPE* frameData =
                     (tagOAN3_SHAPE*)((u8*)shapeAnim + shapeAnim->m_frames[frameWork->m_shapeB].m_shapeOffset);
                 for (int j = 0; j < frameData->m_shapeCount; j++) {
-                    pppGetShapePos((long*)shapeSt->m_animData, frameWork->m_shapeB, shapePosA,
-                                   shapePosB, j);
+                    pppGetShapePos((long*)shapeSt->m_animData, frameWork->m_shapeB, shapePosA, shapePosB, j);
                     pppGetShapeUV((long*)shapeSt->m_animData, frameWork->m_shapeB, uvA, uvB, j);
 
-                    PSVECScale(&shapePosA, &shapePosA, (float)drawScale);
-                    PSVECScale(&shapePosB, &shapePosB, (float)drawScale);
+                    PSVECScale(&shapePosA, &shapePosA, drawScale);
+                    PSVECScale(&shapePosB, &shapePosB, drawScale);
                     PSVECAdd(&shapePosA, &center, &shapePosA);
                     PSVECAdd(&shapePosB, &center, &shapePosB);
 
@@ -170,40 +166,40 @@ void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *para
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *param_3)
+void pppFrameColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
 {
-        pppColumDataOffsets* serializedDataOffsets;
+    pppColumDataOffsets* serializedDataOffsets;
     pppColumValue* values;
-    pppColumFrameWork* work;
+    pppColumFrameWork* frameWork;
     int i;
 
     if (ppvUserStopPartF == 0) {
-        serializedDataOffsets = GetColumDataOffsets(param_3);
-        work = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
-        if (work->m_values == 0) {
-            work->m_values = (pppColumValue*)pppMemAlloc(
-                (unsigned long)param_2->m_count * 0xc, ppvEnv->m_stagePtr,
+        serializedDataOffsets = GetColumDataOffsets(ctrl);
+        frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
+        if (frameWork->m_values == 0) {
+            frameWork->m_values = (pppColumValue*)pppMemAlloc(
+                (unsigned long)step->m_count * 0xc, ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppColum_cpp), 0x7d);
 
-            values = work->m_values;
-            for (i = 0; i < (int)(unsigned int)param_2->m_count; i++) {
-                values->m_scaleStep = Math.RandF(param_2->m_colum.m_scaleStepRange);
-                values->m_scaleStep = values->m_scaleStep + param_2->m_colum.m_scaleStepBase;
-                values->m_positionScale = Math.RandF(param_2->m_colum.m_positionRange);
-                values->m_positionScale = values->m_positionScale + param_2->m_colum.m_positionBase;
-                values->m_colorR = gUtil.GetNoise(param_2->m_colum.m_noiseR);
-                values->m_colorG = gUtil.GetNoise(param_2->m_colum.m_noiseG);
-                values->m_colorB = gUtil.GetNoise(param_2->m_colum.m_noiseB);
+            values = frameWork->m_values;
+            for (i = 0; i < (int)step->m_count; i++) {
+                values->m_scaleStep = Math.RandF(step->m_colum.m_scaleStepRange);
+                values->m_scaleStep = values->m_scaleStep + step->m_colum.m_scaleStepBase;
+                values->m_positionScale = Math.RandF(step->m_colum.m_positionRange);
+                values->m_positionScale = values->m_positionScale + step->m_colum.m_positionBase;
+                values->m_colorR = gUtil.GetNoise(step->m_colum.m_noiseR);
+                values->m_colorG = gUtil.GetNoise(step->m_colum.m_noiseG);
+                values->m_colorB = gUtil.GetNoise(step->m_colum.m_noiseB);
                 values++;
             }
         }
 
-        if (param_2->m_dataValIndex != 0xFFFF) {
-            pppShapeSt* shapeSt = ppvEnv->m_shapeTablePtr[param_2->m_dataValIndex];
+        if (step->m_dataValIndex != 0xFFFF) {
+            pppShapeSt* shapeSt = ppvEnv->m_shapeTablePtr[step->m_dataValIndex];
             long* animData = static_cast<long*>(shapeSt->m_animData);
             pppCalcFrameShape(
                 animData,
-                work->m_shapeA, work->m_shapeB, work->m_shapeC, param_2->m_initWOrk);
+                frameWork->m_shapeA, frameWork->m_shapeB, frameWork->m_shapeC, step->m_initWOrk);
         }
     }
 }
@@ -217,14 +213,14 @@ void pppFrameColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *param
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructColum(pppColum *column, _pppCtrlTable *param_2)
+void pppDestructColum(pppColum *column, _pppCtrlTable *ctrl)
 {
-    pppColumDataOffsets* serializedDataOffsets = GetColumDataOffsets(param_2);
-    pppColumFrameWork* work = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
+    pppColumDataOffsets* serializedDataOffsets = GetColumDataOffsets(ctrl);
+    pppColumFrameWork* frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
 
-    if (work->m_values != 0) {
-        pppMemFree(work->m_values);
-        work->m_values = 0;
+    if (frameWork->m_values != 0) {
+        pppMemFree(frameWork->m_values);
+        frameWork->m_values = 0;
     }
 }
 
@@ -237,12 +233,12 @@ void pppDestructColum(pppColum *column, _pppCtrlTable *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructColum(pppColum *column, _pppCtrlTable *param_2)
+void pppConstructColum(pppColum *column, _pppCtrlTable *ctrl)
 {
-    pppColumDataOffsets* serializedDataOffsets = GetColumDataOffsets(param_2);
-    pppColumFrameWork* work = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
-    work->m_shapeC = 0;
-    work->m_shapeB = 0;
-    work->m_shapeA = 0;
-    work->m_values = 0;
+    pppColumDataOffsets* serializedDataOffsets = GetColumDataOffsets(ctrl);
+    pppColumFrameWork* frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets->m_frameWorkOffset);
+    frameWork->m_shapeC = 0;
+    frameWork->m_shapeB = 0;
+    frameWork->m_shapeA = 0;
+    frameWork->m_values = 0;
 }

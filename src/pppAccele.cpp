@@ -34,14 +34,14 @@ static inline float* GetPppAcceleAccel(_pppPObject* obj, _pppCtrlTable* ctrl)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAcceleCon(_pppPObject* obj, _pppCtrlTable* param)
+void pppAcceleCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-	float* puVar2 = GetPppAcceleAccel(obj, param);
-	float uVar1 = kPppAcceleZero;
+	float* accel = GetPppAcceleAccel(obj, ctrl);
+	float zero = kPppAcceleZero;
 
-	puVar2[2] = uVar1;
-	puVar2[1] = uVar1;
-	*puVar2 = uVar1;
+	accel[2] = zero;
+	accel[1] = zero;
+	accel[0] = zero;
 }
 
 /*
@@ -53,22 +53,22 @@ void pppAcceleCon(_pppPObject* obj, _pppCtrlTable* param)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAccele(_pppPObject* obj, pppAcceleStep* param_2, _pppCtrlTable* param_3)
+void pppAccele(_pppPObject* obj, pppAcceleStep* step, _pppCtrlTable* ctrl)
 {
-	float* pfVar1 = GetPppAcceleValue(obj, param_3);
-	float* pfVar2 = GetPppAcceleAccel(obj, param_3);
+	float* value = GetPppAcceleValue(obj, ctrl);
+	float* accel = GetPppAcceleAccel(obj, ctrl);
 
 	if (ppvUserStopPartF != 0) {
 		return;
 	}
 
-	if (param_2->m_graphId == obj->m_graphId) {
-		*pfVar2 = *pfVar2 + (float)param_2->m_initWOrk;
-		pfVar2[1] = pfVar2[1] + param_2->m_stepValue;
-		pfVar2[2] = pfVar2[2] + (float)param_2->m_arg3;
+	if (step->m_graphId == obj->m_graphId) {
+		accel[0] += step->m_x;
+		accel[1] += step->m_y;
+		accel[2] += step->m_z;
 	}
 
-	*pfVar1 = *pfVar1 + *pfVar2;
-	pfVar1[1] = pfVar1[1] + pfVar2[1];
-	pfVar1[2] = pfVar1[2] + pfVar2[2];
+	value[0] += accel[0];
+	value[1] += accel[1];
+	value[2] += accel[2];
 }

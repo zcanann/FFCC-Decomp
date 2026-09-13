@@ -39,10 +39,10 @@ struct pppCrystal2Step {
 extern "C" {
 #endif
 
-void pppConstructCrystal2(pppCrystal2* crystal, _pppCtrlTable* param_2);
-void pppDestructCrystal2(pppCrystal2* crystal, _pppCtrlTable* param_2);
-void pppFrameCrystal2(pppCrystal2* crystal, pppCrystal2Step* param_2, _pppCtrlTable* param_3);
-void pppRenderCrystal2(pppCrystal2* crystal, pppCrystal2Step* param_2, _pppCtrlTable* param_3);
+void pppConstructCrystal2(pppCrystal2*, _pppCtrlTable*);
+void pppDestructCrystal2(pppCrystal2*, _pppCtrlTable*);
+void pppFrameCrystal2(pppCrystal2*, pppCrystal2Step*, _pppCtrlTable*);
+void pppRenderCrystal2(pppCrystal2*, pppCrystal2Step*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

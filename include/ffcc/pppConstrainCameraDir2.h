@@ -11,8 +11,8 @@ struct ConstrainCameraDir2DataOffsets {
 extern "C" {
 #endif
 
-void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCameraDirStep* param_2,
-                                 _pppCtrlTable* param_3);
+void pppFrameConstrainCameraDir2(pppConstrainCameraDir* constrainCameraDir, pppConstrainCameraDirStep* step,
+                                 _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

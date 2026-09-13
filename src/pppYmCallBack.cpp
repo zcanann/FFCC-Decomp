@@ -13,13 +13,13 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackStep* param_2, pppYmCallBackCtrl*)
+void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackStep* step, pppYmCallBackCtrl*)
 {
     _pppMngSt* mngSt;
     Vec position;
     s32 mngStIndex;
 
-    if (((s32)callbackObj->m_graphId / 0x1000) == (s32)param_2->m_graphId) {
+    if (((s32)callbackObj->m_graphId / 0x1000) == (s32)step->m_graphId) {
         mngSt = ppvMng;
         position.x = mngSt->m_matrix.value[0][3];
         position.y = mngSt->m_matrix.value[1][3];
@@ -28,11 +28,10 @@ void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackStep* param_2, 
 
         mngStIndex = static_cast<s32>(mngSt - PartMng.m_pppMng);
         Game.ParticleFrameCallback(
-            mngStIndex, (s32)mngSt->m_kind, (s32)mngSt->m_nodeIndex, (s32)param_2->m_initWOrk,
-            (s32)param_2->m_graphId, &position);
+            mngStIndex, (s32)mngSt->m_kind, (s32)mngSt->m_nodeIndex, (s32)step->m_initWOrk,
+            (s32)step->m_graphId, &position);
     }
 }
-
 
 /*
  * --INFO--
@@ -41,7 +40,7 @@ void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackStep* param_2, 
  */
 void pppDestructYmCallBack(pppYmCallBack*, pppYmCallBackCtrl*)
 {
-	return;
+    return;
 }
 
 /*
@@ -51,5 +50,5 @@ void pppDestructYmCallBack(pppYmCallBack*, pppYmCallBackCtrl*)
  */
 void pppConstructYmCallBack(pppYmCallBack*, pppYmCallBackCtrl*)
 {
-	return;
+    return;
 }

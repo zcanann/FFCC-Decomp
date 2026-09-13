@@ -19,9 +19,9 @@ struct pppYmCallBackStep {
 extern "C" {
 #endif
 
-void pppConstructYmCallBack(pppYmCallBack* pppYmCallBack, pppYmCallBackCtrl* param_2);
-void pppDestructYmCallBack(pppYmCallBack* pppYmCallBack, pppYmCallBackCtrl* param_2);
-void pppFrameYmCallBack(pppYmCallBack* pppYmCallBack, pppYmCallBackStep* param_2, pppYmCallBackCtrl* param_3);
+void pppConstructYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackCtrl* ctrlTable);
+void pppDestructYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackCtrl* ctrlTable);
+void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackStep* step, pppYmCallBackCtrl* ctrlTable);
 
 #ifdef __cplusplus
 }

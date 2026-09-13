@@ -13,7 +13,7 @@ struct CallBackDistanceDataOffsets {
 struct pppCallBackDistanceStep {
     u32 m_unk0;
     f32 m_dataValIndex;
-    s16 m_initWOrk;
+    s16 m_initWork;
 };
 
 #ifdef __cplusplus

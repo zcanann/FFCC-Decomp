@@ -36,55 +36,48 @@ static const char s_pppLerpPos_cpp[] = "pppLerpPos.cpp";
 void pppFrameLerpPos(_pppPObject* object, pppLerpPosStep* step, _pppCtrlTable* ctrl)
 {
     Vec** historyPtr;
-    _pppMngSt* pppMngSt;
-    s32 iVar5;
-    s32 iVar7;
-    Vec local_2c;
+    _pppMngSt* mng;
+    s32 i;
+    Vec avgPos;
     u32 count;
 
     if (ppvUserStopPartF == 0) {
-        pppMngSt = ppvMng;
+        mng = ppvMng;
         historyPtr = GetLerpPosHistory(object, ctrl);
         if (*historyPtr == 0) {
             *historyPtr = (Vec*)pppMemAlloc(
-                (u32)(u8)step->m_dataValIndex * 0xc, ppvEnv->m_stagePtr,
+                (u32)(u8)step->m_dataValIndex * sizeof(Vec), ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppLerpPos_cpp),
                 0x37);
 
-            for (iVar7 = 0; iVar7 < (s32)(u8)step->m_dataValIndex; iVar7 = iVar7 + 1) {
-                (*historyPtr)[iVar7].x = ppvMng->m_matrix.value[0][3];
-                (*historyPtr)[iVar7].y = ppvMng->m_matrix.value[1][3];
-                (*historyPtr)[iVar7].z = ppvMng->m_matrix.value[2][3];
+            for (i = 0; i < (s32)(u8)step->m_dataValIndex; i++) {
+                (*historyPtr)[i].x = ppvMng->m_matrix.value[0][3];
+                (*historyPtr)[i].y = ppvMng->m_matrix.value[1][3];
+                (*historyPtr)[i].z = ppvMng->m_matrix.value[2][3];
             }
         } else {
-            local_2c.z = 0.0f;
-            local_2c.y = 0.0f;
-            local_2c.x = 0.0f;
+            avgPos.z = 0.0f;
+            avgPos.y = 0.0f;
+            avgPos.x = 0.0f;
 
-            iVar5 = (u8)step->m_dataValIndex - 1;
-            iVar7 = iVar5 * 0xc;
-            while (0 < iVar5) {
-                pppCopyVector(*(Vec*)((u8*)*historyPtr + iVar7), *(Vec*)((u8*)*historyPtr + iVar7 - 0xc));
-                iVar7 = iVar7 - 0xc;
-                iVar5 = iVar5 - 1;
+            for (i = (u8)step->m_dataValIndex - 1; 0 < i; i--) {
+                pppCopyVector((*historyPtr)[i], (*historyPtr)[i - 1]);
             }
 
-            iVar5 = 0;
-            iVar7 = iVar5;
-            (*historyPtr)->x = ppvMng->m_matrix.value[0][3];
-            *(f32*)((u8*)*historyPtr + 4) = ppvMng->m_matrix.value[1][3];
-            *(f32*)((u8*)*historyPtr + 8) = ppvMng->m_matrix.value[2][3];
+            i = 0;
+            (*historyPtr)[0].x = ppvMng->m_matrix.value[0][3];
+            (*historyPtr)[0].y = ppvMng->m_matrix.value[1][3];
+            (*historyPtr)[0].z = ppvMng->m_matrix.value[2][3];
 
-            for (; count = (u32)(u8)step->m_dataValIndex, iVar5 < (s32)count; iVar5 = iVar5 + 1) {
-                PSVECAdd((Vec*)((u8*)*historyPtr + iVar7), &local_2c, &local_2c);
-                iVar7 = iVar7 + 0xc;
+            for (; count = (u32)(u8)step->m_dataValIndex, i < (s32)count; i++) {
+                PSVECAdd(&(*historyPtr)[i], &avgPos, &avgPos);
             }
 
-            PSVECScale(&local_2c, &local_2c, 1.0f / (f32)count);
-            ppvMng->m_matrix.value[0][3] = local_2c.x;
-            ppvMng->m_matrix.value[1][3] = local_2c.y;
-            ppvMng->m_matrix.value[2][3] = local_2c.z;
-            pppSetFpMatrix(pppMngSt);
+            PSVECScale(&avgPos, &avgPos, 1.0f / (f32)count);
+            ppvMng->m_matrix.value[0][3] = avgPos.x;
+            ppvMng->m_matrix.value[1][3] = avgPos.y;
+            ppvMng->m_matrix.value[2][3] = avgPos.z;
+            pppSetFpMatrix(mng);
         }
     }
 }
@@ -100,11 +93,11 @@ void pppFrameLerpPos(_pppPObject* object, pppLerpPosStep* step, _pppCtrlTable* c
  */
 void pppDestructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    void** work = (void**)GetLerpPosHistory(object, ctrl);
+    Vec** historyPtr = GetLerpPosHistory(object, ctrl);
 
-    if (*work != 0) {
-        pppMemFree(*work);
-        *work = 0;
+    if (*historyPtr != 0) {
+        pppMemFree(*historyPtr);
+        *historyPtr = 0;
     }
 }
 
@@ -119,6 +112,6 @@ void pppDestructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl)
  */
 void pppConstructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    Vec** work = GetLerpPosHistory(object, ctrl);
-    *work = 0;
+    Vec** historyPtr = GetLerpPosHistory(object, ctrl);
+    *historyPtr = 0;
 }

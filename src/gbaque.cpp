@@ -2768,13 +2768,13 @@ void GbaQueue::InitCmakeInfo(int channel, int value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void GbaQueue::ClrCmakeInfo(int param_2)
+void GbaQueue::ClrCmakeInfo(int channel)
 {
-	BlockSem(param_2);
-	if (cmakeInfo[param_2].m_active != 0) {
-		memset(&cmakeInfo[param_2], 0, sizeof(cmakeInfo[param_2]));
+	BlockSem(channel);
+	if (cmakeInfo[channel].m_active != 0) {
+		memset(&cmakeInfo[channel], 0, sizeof(cmakeInfo[channel]));
 	}
-	ReleaseSem(param_2);
+	ReleaseSem(channel);
 }
 
 /*

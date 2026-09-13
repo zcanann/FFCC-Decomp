@@ -18,8 +18,8 @@ struct CharaBreakDataOffsets {
 
 struct POLYGON_DATA {
     u8 m_enabled;
-    u8 m_alpha;
-    u16 _pad2;
+    u8 m_rotationDeg;
+    u16 m_fallFrames;
     S16Vec m_normalA;
     S16Vec m_normalB;
     S16Vec m_pos[3];
@@ -40,8 +40,8 @@ struct CharaBreakStep {
     f32 m_payloadGraphInit;
     f32 m_payloadGraphStep;
     f32 m_payloadGraphStepStep;
-    u8 m_alphaBase;
-    u8 m_alphaRange;
+    u8 m_rotationBaseDeg;
+    u8 m_rotationRangeDeg;
     u8 _pad36[0x2];
     f32 m_velocityBase;
     f32 m_velocityRange;
@@ -53,12 +53,12 @@ struct CharaBreakStep {
 
 struct VCharaBreak {
     GXColor m_color;
-    f32 m_value0;
-    f32 m_value1;
-    f32 m_value2;
-    f32 m_value3;
-    f32 m_value4;
-    f32 m_value5;
+    f32 m_graphValue0;
+    f32 m_graphValue1;
+    f32 m_graphValue2;
+    f32 m_payloadGraphValue0;
+    f32 m_payloadGraphValue1;
+    f32 m_payloadGraphValue2;
     CharaBreakDisplayListPair*** m_meshBuffers;
     Vec m_bboxMin;
     u8 _pad2C[0x4];

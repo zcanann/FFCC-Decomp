@@ -984,10 +984,10 @@ done:
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, _pppCtrlTable* param_2)
+void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, _pppCtrlTable* ctrlTable)
 {
-    int offset = GetYmMegaBirthShpTail3DataOffsets(param_2)->m_workOffset;
-    VYmMegaBirthShpTail3* work = reinterpret_cast<VYmMegaBirthShpTail3*>(pppYmMegaBirthShpTail3_->m_workArea + offset);
+    int workOffset = GetYmMegaBirthShpTail3DataOffsets(ctrlTable)->m_workOffset;
+    VYmMegaBirthShpTail3* work = reinterpret_cast<VYmMegaBirthShpTail3*>(object->m_workArea + workOffset);
 
     if (work->m_particles != 0) {
         pppMemFree(work->m_particles);
@@ -1012,10 +1012,10 @@ void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTai
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, _pppCtrlTable* param_2)
+void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, _pppCtrlTable* ctrlTable)
 {
     VYmMegaBirthShpTail3* work = reinterpret_cast<VYmMegaBirthShpTail3*>(
-        pppYmMegaBirthShpTail3_->m_workArea + GetYmMegaBirthShpTail3DataOffsets(param_2)->m_workOffset);
+        object->m_workArea + GetYmMegaBirthShpTail3DataOffsets(ctrlTable)->m_workOffset);
 
     pppUnitMatrix(work->m_emitterMatrix);
     work->m_tailScaleDirection.z = 0.0f;
@@ -1036,5 +1036,4 @@ void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTa
     memset(work->m_colorStartAcceleration, 0, sizeof(work->m_colorStartAcceleration));
     memset(work->m_colorEndStep, 0, sizeof(work->m_colorEndStep));
     memset(work->m_colorEndAcceleration, 0, sizeof(work->m_colorEndAcceleration));
-
 }

@@ -20,7 +20,7 @@ struct ScreenBreakDataOffsets {
 struct PScreenBreak {
     s32 m_graphId;
     s32 m_dataValIndex;
-    u8 m_initWOrk;
+    u8 m_initWork;
     u8 _pad9[3];
     float m_stepValue;
     float m_arg3;
@@ -53,11 +53,11 @@ struct VScreenBreak {
 extern "C" {
 #endif
 
-void pppConScreenBreak(pppScreenBreak*, _pppCtrlTable*);
-void pppCon2ScreenBreak(pppScreenBreak*, _pppCtrlTable*);
-void pppDesScreenBreak(pppScreenBreak*, _pppCtrlTable*);
-void pppFrameScreenBreak(pppScreenBreak*, PScreenBreak*, _pppCtrlTable*);
-void pppRenderScreenBreak(pppScreenBreak*, PScreenBreak*, _pppCtrlTable*);
+void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl);
+void pppCon2ScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl);
+void pppDesScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl);
+void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* step, _pppCtrlTable* ctrl);
+void pppRenderScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* step, _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

@@ -37,32 +37,32 @@ static inline u8* GetEraseCharaPartsWork(pppEraseCharaParts* eraseCharaParts, s3
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCharaPartsStep* param_2,
-                             _pppCtrlTable* param_3)
+void pppFrameEraseCharaParts(pppEraseCharaParts* eraseCharaParts, pppEraseCharaPartsStep* step,
+                             _pppCtrlTable* ctrl)
 {
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
     EraseCharaPartsDataOffsets* offsets;
-    int colorIndex;
-    u8* dstColor;
-    u8* srcColor;
+    int sourceColorOffset;
+    u8* callbackColor;
+    u8* sourceColor;
 
     if (ppvUserStopPartF == 0) {
-        offsets = GetEraseCharaPartsDataOffsets(param_3);
-        colorIndex = offsets->m_sourceColorOffset;
-        dstColor = GetEraseCharaPartsWork(pppEraseCharaParts, offsets->m_callbackColorOffset);
-        srcColor = GetEraseCharaPartsWork(pppEraseCharaParts, colorIndex);
+        offsets = GetEraseCharaPartsDataOffsets(ctrl);
+        sourceColorOffset = offsets->m_sourceColorOffset;
+        callbackColor = GetEraseCharaPartsWork(eraseCharaParts, offsets->m_callbackColorOffset);
+        sourceColor = GetEraseCharaPartsWork(eraseCharaParts, sourceColorOffset);
         handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
         model = GetCharaModelPtr(handle);
 
-        model->SetCallbackContext(dstColor, param_2);
+        model->SetCallbackContext(callbackColor, step);
 
-        dstColor[0] = srcColor[8];
-        dstColor[1] = srcColor[9];
-        dstColor[2] = srcColor[10];
-        dstColor[3] = srcColor[11];
+        callbackColor[0] = sourceColor[8];
+        callbackColor[1] = sourceColor[9];
+        callbackColor[2] = sourceColor[10];
+        callbackColor[3] = sourceColor[11];
 
-        DCFlushRange(dstColor, 4);
+        DCFlushRange(callbackColor, 4);
     }
 }
 
@@ -95,23 +95,23 @@ void pppDestructEraseCharaParts(pppEraseCharaParts*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, _pppCtrlTable* param_2)
+void pppConstructEraseCharaParts(pppEraseCharaParts* eraseCharaParts, _pppCtrlTable* ctrl)
 {
-    EraseCharaPartsDataOffsets* serializedDataOffsets;
+    EraseCharaPartsDataOffsets* offsets;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
-    u8* colorPtr;
-    void* gObject;
+    u8* callbackColor;
+    CGObject* owner;
 
-    serializedDataOffsets = GetEraseCharaPartsDataOffsets(param_2);
-    colorPtr = GetEraseCharaPartsWork(pppEraseCharaParts, serializedDataOffsets->m_callbackColorOffset);
-    gObject = ppvMng->m_owner;
-    colorPtr[0] = 0x80;
-    colorPtr[1] = 0x80;
-    colorPtr[2] = 0x80;
-    colorPtr[3] = 0x80;
+    offsets = GetEraseCharaPartsDataOffsets(ctrl);
+    callbackColor = GetEraseCharaPartsWork(eraseCharaParts, offsets->m_callbackColorOffset);
+    owner = ppvMng->m_owner;
+    callbackColor[0] = 0x80;
+    callbackColor[1] = 0x80;
+    callbackColor[2] = 0x80;
+    callbackColor[3] = 0x80;
 
-    handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(gObject), 0);
+    handle = GetCharaHandlePtr(owner, 0);
     model = GetCharaModelPtr(handle);
     model->SetDrawMeshDLCallback(EraseCharaParts_DrawMeshDLCallback);
 }
@@ -125,22 +125,21 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, _pppCtr
  * JP Address: TODO
  * JP Size: TODO
  */
-void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3,
-                                        int meshIndex, int param_5, float (*) [4])
+void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* callbackContext, void* callbackParam,
+                                        int meshIndex, int displayListIndex, float (*) [4])
 {
-    u8* colorArray = (u8*)param_2;
-    pppEraseCharaPartsStep* callbackData = (pppEraseCharaPartsStep*)param_3;
-    CMaterialMan* materialMan = &MaterialMan;
+    u8* callbackColor = (u8*)callbackContext;
+    pppEraseCharaPartsStep* step = (pppEraseCharaPartsStep*)callbackParam;
     EraseCharaPartsMesh* mesh = model->m_meshes;
     mesh += meshIndex;
     EraseCharaPartsMeshData* meshData = mesh->m_data;
     EraseCharaPartsDisplayList* displayList = meshData->m_displayLists;
 
-    displayList += param_5;
-    materialMan->SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+    displayList += displayListIndex;
+    MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
-    if ((callbackData->m_meshIndex != 0xFF) && (meshIndex == callbackData->m_meshIndex)) {
-        GXSetArray((GXAttr)0xB, colorArray, 4);
+    if ((step->m_meshIndex != 0xFF) && (meshIndex == step->m_meshIndex)) {
+        GXSetArray(GX_VA_CLR0, callbackColor, 4);
     }
 
     GXCallDisplayList(displayList->m_data, displayList->m_size);

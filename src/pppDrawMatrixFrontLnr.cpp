@@ -14,25 +14,24 @@
  */
 void pppDrawMatrixFrontLnr(_pppPObject* object, pppNoStep*, _pppCtrlTable*)
 {
-    Vec local_18;
-    _pppMngSt* mng = (_pppMngSt*)ppvMng;
-    
+    Vec localPos;
+
     PSMTXScaleApply(
         object->m_localMatrix.value,
         object->m_drawMatrix.value,
-        mng->m_scale.x,
-        mng->m_scale.y,
-        mng->m_scale.z
+        ppvMng->m_scale.x,
+        ppvMng->m_scale.y,
+        ppvMng->m_scale.z
     );
-    
-    local_18.x = object->m_localMatrix.value[0][3];
-    local_18.y = object->m_localMatrix.value[1][3];
-    local_18.z = object->m_localMatrix.value[2][3];
-    
-    PSMTXMultVec(ppvCameraMatrix, &local_18, &local_18);
-    
-    object->m_drawMatrix.value[0][3] = local_18.x;
-    object->m_drawMatrix.value[1][3] = local_18.y;
-    object->m_drawMatrix.value[2][3] = local_18.z;
+
+    localPos.x = object->m_localMatrix.value[0][3];
+    localPos.y = object->m_localMatrix.value[1][3];
+    localPos.z = object->m_localMatrix.value[2][3];
+
+    PSMTXMultVec(ppvCameraMatrix, &localPos, &localPos);
+
+    object->m_drawMatrix.value[0][3] = localPos.x;
+    object->m_drawMatrix.value[1][3] = localPos.y;
+    object->m_drawMatrix.value[2][3] = localPos.z;
 }
 

@@ -96,9 +96,9 @@ void CUSBPcs::Quit()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CUSBPcs::GetTable(unsigned long param)
+int CUSBPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(&m_table + param);
+    return reinterpret_cast<int>(&m_table + index);
 }
 
 /*
@@ -110,11 +110,11 @@ int CUSBPcs::GetTable(unsigned long param)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CUSBPcs::IsBigAlloc(int param_2)
+void CUSBPcs::IsBigAlloc(int useBigStage)
 {
-    if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
+    if ((useBigStage != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
         m_bigStage = Memory.CreateStage(0x100000, "CUSBPcs", 0);
-    } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
+    } else if ((useBigStage == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
         Memory.DestroyStage(m_bigStage);
         m_bigStage = (CMemory::CStage*)nullptr;
     }
@@ -215,28 +215,28 @@ void CUSBPcs::mccReadData()
  */
 int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
-    unsigned int count;
+    unsigned int payloadSize;
     int result;
     int connected;
     CDataHeader* packet;
     CDataHeader* dstBuffer;
     CMemory::CStage* stage;
-    unsigned int value;
+    unsigned int packetSize;
 
-    count = elemSize * elemCount;
-    value = (count + 0x5F) & ~0x1F;
+    payloadSize = elemSize * elemCount;
+    packetSize = (payloadSize + 0x5F) & ~0x1F;
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-    unsigned char* raw = new (stage, "p_usb.cpp", 0x1ca) unsigned char[value];
+    unsigned char* raw = new (stage, "p_usb.cpp", 0x1ca) unsigned char[packetSize];
     packet = reinterpret_cast<CDataHeader*>(raw);
-    packet->m_packetSize = value;
+    packet->m_packetSize = packetSize;
     packet->m_packetType = 4;
     packet->m_packetCode = Swap32((unsigned int)code);
     packet->m_elementCount = Swap32((unsigned int)elemCount);
-    packet->m_dataSize = Swap32(count);
+    packet->m_dataSize = Swap32(payloadSize);
     packet->m_reserved2C = Swap32(0);
-    packet->m_payloadSize = Swap32(count);
-    memcpy(packet + 1, src, count);
+    packet->m_payloadSize = Swap32(payloadSize);
+    memcpy(packet + 1, src, payloadSize);
 
     connected = USB.IsConnected();
     if (connected == 0) {

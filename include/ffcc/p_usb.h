@@ -29,7 +29,7 @@ public:
     void Init();
     void Quit();
     int GetTable(unsigned long);
-    void IsBigAlloc(int param_2);
+    void IsBigAlloc(int useBigStage);
     void create();
     void destroy();
     void func();

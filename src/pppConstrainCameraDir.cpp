@@ -27,18 +27,17 @@ static inline ConstrainCameraDirDataOffsets* GetConstrainCameraDirDataOffsets(_p
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pppConstrainCameraDirStep* param_2,
-                                _pppCtrlTable* param_3)
+void pppFrameConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, pppConstrainCameraDirStep* step,
+                                _pppCtrlTable* ctrl)
 {
     if (ppvUserStopPartF == 0) {
         _pppMngSt* pppMngSt = ppvMng;
-        float* value =
-            (float*)(pppConstrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(param_3)->m_workOffset);
+        float* value = (float*)(constrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(ctrl)->m_workOffset);
 
-        CalcGraphValue((_pppPObject*)pppConstrainCameraDir, param_2->m_graphId, value[0], value[1], value[2],
-                       param_2->m_dataValIndex, param_2->m_initWOrk, param_2->m_stepValue);
+        CalcGraphValue(constrainCameraDir, step->m_graphId, value[0], value[1], value[2], step->m_dataValIndex,
+                       step->m_initWOrk, step->m_stepValue);
 
-        if ((ppvIsLoopCalc != 1) && ((param_2->m_applyCameraInverse != 0 || param_2->m_applyPosition != 0))) {
+        if ((ppvIsLoopCalc != 1) && ((step->m_applyCameraInverse != 0 || step->m_applyPosition != 0))) {
             float cameraDirX = CameraPcs.m_directionX;
             float cameraDirY = CameraPcs.m_directionY;
             float cameraDirZ = CameraPcs.m_directionZ;
@@ -62,13 +61,13 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
 
-            if (param_2->m_applyCameraInverse != 0) {
+            if (step->m_applyCameraInverse != 0) {
                 PSMTXInverse(cameraMtx, ppvMng->m_matrix.value);
             }
 
             PSMTXConcat(scaleMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 
-            if (param_2->m_applyPosition != 0) {
+            if (step->m_applyPosition != 0) {
                 float resultZ = cameraDirZ * *value + cameraPosZ;
                 float resultY = cameraDirY * *value + cameraPosY;
                 float resultX = cameraDirX * *value + cameraPosX;
@@ -105,14 +104,13 @@ void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
+void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, _pppCtrlTable* ctrl)
 {
-    float uVar1 = 0.0f;
-    float* puVar2 =
-        (float*)(pppConstrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(param_2)->m_workOffset);
-    puVar2[2] = uVar1;
-    puVar2[1] = uVar1;
-    puVar2[0] = uVar1;
+    float zero = 0.0f;
+    float* value = (float*)(constrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(ctrl)->m_workOffset);
+    value[2] = zero;
+    value[1] = zero;
+    value[0] = zero;
 }
 
 /*
@@ -124,12 +122,11 @@ void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDi
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
+void pppConstructConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, _pppCtrlTable* ctrl)
 {
-    float uVar1 = 0.0f;
-    float* puVar2 =
-        (float*)(pppConstrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(param_2)->m_workOffset);
-    puVar2[2] = uVar1;
-    puVar2[1] = uVar1;
-    puVar2[0] = uVar1;
+    float zero = 0.0f;
+    float* value = (float*)(constrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(ctrl)->m_workOffset);
+    value[2] = zero;
+    value[1] = zero;
+    value[0] = zero;
 }

@@ -15,11 +15,6 @@ static const float kPppKeShpTail3XRandomMax = 65535.0f;
 static const float kPppKeShpTail3XOne = 1.0f;
 static const float kPppKeShpTail3XDegToRad = 0.017453292f;
 
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
-
 STATIC_ASSERT(offsetof(struct pppKeShpTail3X, m_object.m_workArea) == 0x80);
 
 struct KeShpTail3XWork {
@@ -86,10 +81,8 @@ inline void S4ToF32(pppFVECTOR4* dest, s16* src)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3XDes(_pppPObjLink* obj, _pppCtrlTable* ctrlTable)
+void pppKeShpTail3XDes(_pppPObjLink*, _pppCtrlTable*)
 {
-    (void)obj;
-    (void)ctrlTable;
 }
 
 /*
@@ -101,14 +94,14 @@ void pppKeShpTail3XDes(_pppPObjLink* obj, _pppCtrlTable* ctrlTable)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* param_2)
+void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* ctrlTable)
 {
     KeShpTail3XWork* work;
     KeShpTail3XDataOffsets* offsets;
     int i;
-    float scale;
+    float zero;
 
-    offsets = GetKeShpTail3XDataOffsets(param_2);
+    offsets = GetKeShpTail3XDataOffsets(ctrlTable);
     work = reinterpret_cast<KeShpTail3XWork*>(obj->m_object.m_workArea + offsets->m_workOffset);
     work->m_initialized = 0;
     work->m_head = 0;
@@ -122,14 +115,14 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* param_2)
     memset(&work->m_values[16], 0, 8);
     memset(&work->m_values[20], 0, 8);
 
-    scale = kPppKeShpTail3XZero;
+    zero = kPppKeShpTail3XZero;
     i = 0;
     do {
         s32 rnd = rand();
         work->m_angles[i] = (s16)(rnd - (rnd / 0x168) * 0x168);
-        work->m_posHistory[i].z = scale;
-        work->m_posHistory[i].y = scale;
-        work->m_posHistory[i].x = scale;
+        work->m_posHistory[i].z = zero;
+        work->m_posHistory[i].y = zero;
+        work->m_posHistory[i].x = zero;
         i++;
     } while (i < 0x1c);
 }
@@ -143,7 +136,7 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* param_3)
+void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* ctrlTable)
 {
     KeShpTail3XWork* work;
     s32 currentIndex;
@@ -201,7 +194,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     u8 zEnable;
     s32 dataValIndex;
 
-    work = GetKeShpTail3XWork(obj, param_3);
+    work = GetKeShpTail3XWork(obj, ctrlTable);
     dataValIndex = step->m_dataValIndex;
     if (dataValIndex == 0xffff) {
         return;
@@ -210,7 +203,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     count = step->m_drawCount;
 
     invCountMinusOne = (float)(count - 1);
-    alphaMul = (float)GetKeShpTail3XAlphaWork(obj, param_3)->m_alpha /
+    alphaMul = (float)GetKeShpTail3XAlphaWork(obj, ctrlTable)->m_alpha /
                kPppKeShpTail3XAlphaScale;
     S4ToF32(&colorStart, &work->m_values[0]);
     S4ToF32(&colorEnd, &work->m_values[4]);
@@ -411,7 +404,7 @@ advance_segment:
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* param_3)
+void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* ctrlTable)
 {
     KeShpTail3XWork* work;
     pppFMATRIX outMatrix;
@@ -423,7 +416,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step,
         return;
     }
 
-    work = GetKeShpTail3XWork(obj, param_3);
+    work = GetKeShpTail3XWork(obj, ctrlTable);
 
     if ((obj->m_object.m_graphId == 0) && (obj->m_object.m_field7D != 0)) {
         work->m_initialized = 1;

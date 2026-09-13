@@ -4,25 +4,21 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
-static const GXColor kMaterialEditorDefaultColorRgba = {0xFF, 0xFF, 0xFF, 0xFF};
-static const float kMaterialEditorControlMaxInit = 10000.0f;
-static const float kMaterialEditorControlMinInit = -10000.0f;
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
 #include <Dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
 #include <string.h>
 
+static const GXColor kMaterialEditorDefaultColorRgba = {0xFF, 0xFF, 0xFF, 0xFF};
+static const float kMaterialEditorControlMaxInit = 10000.0f;
+static const float kMaterialEditorControlMinInit = -10000.0f;
+
 static const char s_CMaterialEditorPcsViewer[] = "CMaterialEditorPcs(VIEWER)";
 static const char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 static const char sMaterialEditorCManagerName[] = "CManager";
 static const char sMaterialEditorCProcessName[] = "CProcess";
 static const char s_MaterialEditorFmt[] = "MaterialEditor [%c]";
-
-inline void* operator new(unsigned long, void* ptr)
-{
-    return ptr;
-}
 
 CMaterialEditorPcs MaterialEditorPcs;
 
@@ -37,7 +33,6 @@ CProcessCallbackTable CMaterialEditorPcs::m_table = {
 };
 static const double kMaterialEditorOneF64 = 1.0;
 static const float kMaterialEditorOneF = 1.0f;
-static const double kMaterialEditorS16ToDoubleBias = 4503601774854144.0;
 static const float kMaterialEditorZeroF = 0.0f;
 static const float kMaterialEditorNegativeOneF = -1.0f;
 
@@ -49,30 +44,6 @@ static inline float LoadFloat(const float& value)
 static inline double LoadDouble(const double& value)
 {
     return value;
-}
-
-static inline double S16ToDouble(s16 value)
-{
-    union {
-        u32 words[2];
-        double value;
-    } conv;
-
-    conv.words[0] = 0x43300000;
-    conv.words[1] = static_cast<unsigned int>(value ^ 0x80000000U);
-    return conv.value - kMaterialEditorS16ToDoubleBias;
-}
-
-static inline float S16ToFloat(s16 value)
-{
-    union {
-        u32 words[2];
-        double value;
-    } conv;
-
-    conv.words[0] = 0x43300000;
-    conv.words[1] = static_cast<unsigned int>(value ^ 0x80000000U);
-    return conv.value - kMaterialEditorS16ToDoubleBias;
 }
 
 /*
@@ -134,8 +105,8 @@ void CMaterialEditorPcs::drawViewer()
         return;
     }
 
-    GXColor blue;
-    GXColor red;
+    GXColor tevReg2Color;
+    GXColor tevReg1Color;
     ZLIST* zlist = &m_zlist1;
     _ZLISTITEM* it = zlist->m_root.m_previous;
     while (it != 0) {
@@ -173,19 +144,18 @@ void CMaterialEditorPcs::drawViewer()
 
         for (int pass = 0; pass < 2; pass++) {
             for (u32 polyIndex = 0; polyIndex < model->countC; polyIndex++) {
-#define polygon (&model->m_polygons[polyIndex])
-                if ((polygon->flags & 0x200) != 0) {
+                if ((model->m_polygons[polyIndex].flags & 0x200) != 0) {
                     GXSetCullMode(GX_CULL_NONE);
                 } else {
                     GXSetCullMode(GX_CULL_BACK);
                 }
 
                 if (pass == 1) {
-                    if ((polygon->flags & 0x400) == 0) {
+                    if ((model->m_polygons[polyIndex].flags & 0x400) == 0) {
                         continue;
                     }
 
-                    u16 blendMode = polygon->blendMode;
+                    u16 blendMode = model->m_polygons[polyIndex].blendMode;
                     int srcFactor = 1;
                     int dstFactor = 1;
                     int blend = 1;
@@ -211,7 +181,7 @@ void CMaterialEditorPcs::drawViewer()
                     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
                     GXSetCullMode(GX_CULL_NONE);
                 } else if (pass == 0) {
-                    if ((polygon->flags & 0x400) != 0) {
+                    if ((model->m_polygons[polyIndex].flags & 0x400) != 0) {
                         continue;
                     }
 
@@ -219,169 +189,168 @@ void CMaterialEditorPcs::drawViewer()
                     _GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_OR);
                 }
 
-                int flags = polygon->flags & 0xf;
+                int primitiveType = model->m_polygons[polyIndex].flags & 0xf;
                 int vertexCount = 3;
-                switch (static_cast<unsigned char>(polygon->textureMarker)) {
+                switch (static_cast<unsigned char>(model->m_polygons[polyIndex].textureMarker)) {
                 case 'G':
                 default:
                     break;
                 case 'H':
-                if (static_cast<s16>(m_loadedTextureCount) > polygon->textureIndex) {
-                    s16* textureHeader = m_textureHeader[polygon->textureIndex];
-                    float scaleU = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / static_cast<double>(textureHeader[2]));
-                    float scaleV = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / static_cast<double>(textureHeader[3]));
-                    MaterialEditorPolygon* pp = polygon;
-                    s16 u = pp->u0;
+                    if (static_cast<s16>(m_loadedTextureCount) > model->m_polygons[polyIndex].textureIndex) {
+                        s16* textureHeader = m_textureHeader[model->m_polygons[polyIndex].textureIndex];
+                        float scaleU = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / static_cast<double>(textureHeader[2]));
+                        float scaleV = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / static_cast<double>(textureHeader[3]));
+                        MaterialEditorPolygon* poly = &model->m_polygons[polyIndex];
+                        s16 u = poly->u0;
 
-                    if (u < 0) {
-                        pp->texCoord[0][0] = (scaleU * static_cast<float>(u)) + LoadFloat(kMaterialEditorOneF);
-                    } else {
-                        pp->texCoord[0][0] = scaleU * static_cast<float>(u);
-                    }
-                    pp = polygon;
-                    u = pp->u1;
-                    if (u < 0) {
-                        pp->texCoord[1][0] = (scaleU * static_cast<float>(u)) + LoadFloat(kMaterialEditorOneF);
-                    } else {
-                        pp->texCoord[1][0] = scaleU * static_cast<float>(u);
-                    }
-                    pp = polygon;
-                    u = pp->u2;
-                    if (u < 0) {
-                        pp->texCoord[2][0] = (scaleU * static_cast<float>(u)) + LoadFloat(kMaterialEditorOneF);
-                    } else {
-                        pp->texCoord[2][0] = scaleU * static_cast<float>(u);
-                    }
-                    pp = polygon;
-                    u = pp->u3;
-                    if (u < 0) {
-                        pp->texCoord[3][0] = (scaleU * static_cast<float>(u)) + LoadFloat(kMaterialEditorOneF);
-                    } else {
-                        pp->texCoord[3][0] = scaleU * static_cast<float>(u);
-                    }
+                        if (u < 0) {
+                            poly->texCoord[0][0] = (scaleU * static_cast<float>(u)) + LoadFloat(kMaterialEditorOneF);
+                        } else {
+                            poly->texCoord[0][0] = scaleU * static_cast<float>(u);
+                        }
+                        poly = &model->m_polygons[polyIndex];
+                        u = poly->u1;
+                        if (u < 0) {
+                            poly->texCoord[1][0] = (scaleU * static_cast<float>(u)) + LoadFloat(kMaterialEditorOneF);
+                        } else {
+                            poly->texCoord[1][0] = scaleU * static_cast<float>(u);
+                        }
+                        poly = &model->m_polygons[polyIndex];
+                        u = poly->u2;
+                        if (u < 0) {
+                            poly->texCoord[2][0] = (scaleU * static_cast<float>(u)) + LoadFloat(kMaterialEditorOneF);
+                        } else {
+                            poly->texCoord[2][0] = scaleU * static_cast<float>(u);
+                        }
+                        poly = &model->m_polygons[polyIndex];
+                        u = poly->u3;
+                        if (u < 0) {
+                            poly->texCoord[3][0] = (scaleU * static_cast<float>(u)) + LoadFloat(kMaterialEditorOneF);
+                        } else {
+                            poly->texCoord[3][0] = scaleU * static_cast<float>(u);
+                        }
 
-                    int v;
-                    v = polygon->v0;
-                    if (v < 0) {
-                        polygon->v0 = v * -1U;
-                    }
-                    v = polygon->v1;
-                    if (v < 0) {
-                        polygon->v1 = v * -1U;
-                    }
-                    v = polygon->v2;
-                    if (v < 0) {
-                        polygon->v2 = v * -1U;
-                    }
-                    v = polygon->v3;
-                    if (v < 0) {
-                        polygon->v3 = v * -1U;
-                    }
+                        int v;
+                        v = model->m_polygons[polyIndex].v0;
+                        if (v < 0) {
+                            model->m_polygons[polyIndex].v0 = v * -1U;
+                        }
+                        v = model->m_polygons[polyIndex].v1;
+                        if (v < 0) {
+                            model->m_polygons[polyIndex].v1 = v * -1U;
+                        }
+                        v = model->m_polygons[polyIndex].v2;
+                        if (v < 0) {
+                            model->m_polygons[polyIndex].v2 = v * -1U;
+                        }
+                        v = model->m_polygons[polyIndex].v3;
+                        if (v < 0) {
+                            model->m_polygons[polyIndex].v3 = v * -1U;
+                        }
 
-                    pp = polygon;
-                    pp->texCoord[0][1] = -(scaleV * static_cast<float>(pp->v0) - LoadFloat(kMaterialEditorOneF));
-                    pp = polygon;
-                    pp->texCoord[1][1] = -(scaleV * static_cast<float>(pp->v1) - LoadFloat(kMaterialEditorOneF));
-                    pp = polygon;
-                    pp->texCoord[2][1] = -(scaleV * static_cast<float>(pp->v2) - LoadFloat(kMaterialEditorOneF));
-                    pp = polygon;
-                    pp->texCoord[3][1] = -(scaleV * static_cast<float>(pp->v3) - LoadFloat(kMaterialEditorOneF));
-                    DCStoreRange(polygon, sizeof(MaterialEditorPolygon));
+                        poly = &model->m_polygons[polyIndex];
+                        poly->texCoord[0][1] = -(scaleV * static_cast<float>(poly->v0) - LoadFloat(kMaterialEditorOneF));
+                        poly = &model->m_polygons[polyIndex];
+                        poly->texCoord[1][1] = -(scaleV * static_cast<float>(poly->v1) - LoadFloat(kMaterialEditorOneF));
+                        poly = &model->m_polygons[polyIndex];
+                        poly->texCoord[2][1] = -(scaleV * static_cast<float>(poly->v2) - LoadFloat(kMaterialEditorOneF));
+                        poly = &model->m_polygons[polyIndex];
+                        poly->texCoord[3][1] = -(scaleV * static_cast<float>(poly->v3) - LoadFloat(kMaterialEditorOneF));
+                        DCStoreRange(&model->m_polygons[polyIndex], sizeof(MaterialEditorPolygon));
 
-                    if (textureHeader[1] == 0x20) {
-                        GXSetNumTevStages(1);
-                        GXSetNumTexGens(1);
-                        GXLoadTexObj(m_texObj[polygon->textureIndex], static_cast<_GXTexMapID>(polygon->textureIndex));
-                        _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
-                        _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-                        _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
-                        _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
+                        if (textureHeader[1] == 0x20) {
+                            GXSetNumTevStages(1);
+                            GXSetNumTexGens(1);
+                            GXLoadTexObj(m_texObj[model->m_polygons[polyIndex].textureIndex], static_cast<_GXTexMapID>(model->m_polygons[polyIndex].textureIndex));
+                            _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
+                            _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+                            _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_ZERO);
+                            _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
+                        }
+
+                        if ((textureHeader[1] == 4) || (textureHeader[1] == 8)) {
+                            GXSetNumTevStages(3);
+                            GXSetNumTexGens(1);
+
+                            tevReg1Color.r = 0xff;
+                            tevReg1Color.g = 0xff;
+                            tevReg1Color.b = 0;
+                            tevReg1Color.a = 0;
+                            tevReg2Color.r = 0;
+                            tevReg2Color.g = 0;
+                            tevReg2Color.b = 0xff;
+                            tevReg2Color.a = 0xff;
+
+                            GXSetTevColor(GX_TEVREG1, tevReg1Color);
+                            GXSetTevColor(GX_TEVREG2, tevReg2Color);
+                            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+                            _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_ALPHA, GX_CH_ALPHA, GX_CH_ALPHA);
+                            _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_BLUE, GX_CH_BLUE, GX_CH_BLUE, GX_CH_ALPHA);
+                            GXSetTevDirect(GX_TEVSTAGE0);
+                            _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_C1, GX_CC_ZERO);
+                            _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
+                            _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
+                            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+                            GXSetTevDirect(GX_TEVSTAGE1);
+                            _GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_C2, GX_CC_CPREV);
+                            _GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_KONST, GX_CA_TEXA, GX_CA_ZERO);
+                            _GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+                            _GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+                            _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP2);
+                            _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR_NULL);
+                            GXSetTevDirect(GX_TEVSTAGE2);
+                            _GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, GX_CC_RASC, GX_CC_ZERO);
+                            _GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_RASA, GX_CA_ZERO);
+                            _GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
+                            _GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_4, GX_TRUE, GX_TEVPREV);
+                            _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+                            _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+                            GXInitTexObjTlut(m_texObj[model->m_polygons[polyIndex].textureIndex], 0);
+                            GXLoadTexObj(m_texObj[model->m_polygons[polyIndex].textureIndex], GX_TEXMAP0);
+                            GXInitTexObjTlut(m_texObj[model->m_polygons[polyIndex].textureIndex], 1);
+                            GXLoadTexObj(m_texObj[model->m_polygons[polyIndex].textureIndex], GX_TEXMAP1);
+                            GXLoadTlut(m_tlutObj0[model->m_polygons[polyIndex].textureIndex], 0);
+                            GXLoadTlut(m_tlutObj1[model->m_polygons[polyIndex].textureIndex], 1);
+                        }
                     }
-
-                    if ((textureHeader[1] == 4) || (textureHeader[1] == 8)) {
-                        GXSetNumTevStages(3);
-                        GXSetNumTexGens(1);
-
-                        red.r = 0xff;
-                        red.g = 0xff;
-                        red.b = 0;
-                        red.a = 0;
-                        blue.r = 0;
-                        blue.g = 0;
-                        blue.b = 0xff;
-                        blue.a = 0xff;
-
-                        GXSetTevColor(GX_TEVREG1, red);
-                        GXSetTevColor(GX_TEVREG2, blue);
-                        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-                        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_ALPHA, GX_CH_ALPHA, GX_CH_ALPHA);
-                        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_BLUE, GX_CH_BLUE, GX_CH_BLUE, GX_CH_ALPHA);
-                        GXSetTevDirect(GX_TEVSTAGE0);
-                        _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_C1, GX_CC_ZERO);
-                        _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
-                        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
-                        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-                        GXSetTevDirect(GX_TEVSTAGE1);
-                        _GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_C2, GX_CC_CPREV);
-                        _GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_KONST, GX_CA_TEXA, GX_CA_ZERO);
-                        _GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-                        _GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-                        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP2);
-                        _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR_NULL);
-                        GXSetTevDirect(GX_TEVSTAGE2);
-                        _GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, GX_CC_RASC, GX_CC_ZERO);
-                        _GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_RASA, GX_CA_ZERO);
-                        _GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
-                        _GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_4, GX_TRUE, GX_TEVPREV);
-                        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
-                        _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-                        GXInitTexObjTlut(m_texObj[polygon->textureIndex], 0);
-                        GXLoadTexObj(m_texObj[polygon->textureIndex], GX_TEXMAP0);
-                        GXInitTexObjTlut(m_texObj[polygon->textureIndex], 1);
-                        GXLoadTexObj(m_texObj[polygon->textureIndex], GX_TEXMAP1);
-                        GXLoadTlut(m_tlutObj0[polygon->textureIndex], 0);
-                        GXLoadTlut(m_tlutObj1[polygon->textureIndex], 1);
-                    }
-                }
                 }
 
                 GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                GXSetArray(GX_VA_CLR0, polygon->_30, 4);
-                GXSetArray(GX_VA_TEX0, polygon->texCoord, 8);
+                GXSetArray(GX_VA_CLR0, model->m_polygons[polyIndex]._30, 4);
+                GXSetArray(GX_VA_TEX0, model->m_polygons[polyIndex].texCoord, 8);
 
                 u32 posIndex[4];
                 u32 clrIndex[4];
-                posIndex[0] = polygon->index0;
-                posIndex[1] = polygon->index1;
-                posIndex[2] = polygon->index2;
+                posIndex[0] = model->m_polygons[polyIndex].index0;
+                posIndex[1] = model->m_polygons[polyIndex].index1;
+                posIndex[2] = model->m_polygons[polyIndex].index2;
                 clrIndex[0] = 0;
                 clrIndex[1] = 1;
                 clrIndex[2] = 2;
 
-                if (flags == 0) {
+                if (primitiveType == 0) {
                     GXBegin(GX_TRIANGLES, GX_VTXFMT0, 3);
                 }
-                if (flags == 1) {
+                if (primitiveType == 1) {
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                     vertexCount = 4;
-                    posIndex[2] = polygon->index3;
-                    posIndex[3] = polygon->index2;
+                    posIndex[2] = model->m_polygons[polyIndex].index3;
+                    posIndex[3] = model->m_polygons[polyIndex].index2;
                     clrIndex[2] = 3;
                     clrIndex[3] = 2;
                 }
 
-                u32 clr;
+                u32 colorIndex;
                 u8 i = 0;
                 while (i < vertexCount) {
                     GXWGFifo.u16 = static_cast<u16>(posIndex[i]);
                     GXWGFifo.u16 = static_cast<u16>(posIndex[i]);
-                    clr = clrIndex[i];
+                    colorIndex = clrIndex[i];
                     i++;
-                    GXWGFifo.u8 = static_cast<u8>(clr);
-                    GXWGFifo.u16 = static_cast<u16>(clr);
+                    GXWGFifo.u8 = static_cast<u8>(colorIndex);
+                    GXWGFifo.u16 = static_cast<u16>(colorIndex);
                 }
-#undef polygon
             }
         }
     }
@@ -399,7 +368,7 @@ void CMaterialEditorPcs::calcViewer()
 {
     Mtx cameraMatrix;
     SRT srt;
-    Mtx scaleMatrix;
+    Mtx flipMatrix;
 
     USBPcs.mccReadData();
 
@@ -439,13 +408,13 @@ void CMaterialEditorPcs::calcViewer()
     m_unkMatrix.value[2][1] = -m_unkMatrix.value[2][1];
     m_unkMatrix.value[2][2] = -m_unkMatrix.value[2][2];
 
-    PSMTXIdentity(scaleMatrix);
-    scaleMatrix[1][1] = kMaterialEditorNegativeOneF;
-    PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
+    PSMTXIdentity(flipMatrix);
+    flipMatrix[1][1] = kMaterialEditorNegativeOneF;
+    PSMTXConcat(m_unkMatrix.value, flipMatrix, m_unkMatrix.value);
 
-    PSMTXIdentity(scaleMatrix);
-    scaleMatrix[2][2] = kMaterialEditorNegativeOneF;
-    PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
+    PSMTXIdentity(flipMatrix);
+    flipMatrix[2][2] = kMaterialEditorNegativeOneF;
+    PSMTXConcat(m_unkMatrix.value, flipMatrix, m_unkMatrix.value);
 
     PSMTXConcat(cameraMatrix, m_unkMatrix.value, cameraMatrix);
     GXLoadPosMtxImm(cameraMatrix, 0);
@@ -526,10 +495,9 @@ void CMaterialEditorPcs::destroyViewer()
  */
 void CMaterialEditorPcs::createViewer()
 {
-    CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(
-        Memory.CreateStage(0x200000, const_cast<char*>(s_CMaterialEditorPcs), 0));
+    CMemory::CStage* stage = Memory.CreateStage(0x200000, const_cast<char*>(s_CMaterialEditorPcs), 0);
     GXColor clear;
-    float fVar1;
+    float one;
 
     m_stage = stage;
     USBPcs.IsBigAlloc(1);
@@ -544,11 +512,11 @@ void CMaterialEditorPcs::createViewer()
     m_displayTextureEnabled = 0;
     memset(&m_usbTransform, 0, sizeof(m_usbTransform));
 
-    fVar1 = LoadFloat(kMaterialEditorOneF);
-    m_usbTransform.m_modelMatrix[3][3] = fVar1;
-    m_usbTransform.m_modelMatrix[2][2] = fVar1;
-    m_usbTransform.m_modelMatrix[1][1] = fVar1;
-    m_usbTransform.m_modelMatrix[0][0] = fVar1;
+    one = LoadFloat(kMaterialEditorOneF);
+    m_usbTransform.m_modelMatrix[3][3] = one;
+    m_usbTransform.m_modelMatrix[2][2] = one;
+    m_usbTransform.m_modelMatrix[1][1] = one;
+    m_usbTransform.m_modelMatrix[0][0] = one;
 
     PSMTXIdentity(m_unkMatrix.value);
     m_usbStream.CreateBuffer();

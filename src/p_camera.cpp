@@ -673,14 +673,14 @@ void CCameraPcs::drawShadowBegin()
             m_targetX = m_fullScreenShadowPosition.x;
             m_targetY = m_fullScreenShadowPosition.y;
             m_targetZ = m_fullScreenShadowPosition.z;
-            PSVECSubtract(reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_positionX), &delta);
+            PSVECSubtract(&TargetVec(), &PositionVec(), &delta);
             depth = m_fullScreenShadowCamLen;
             m_fullScreenShadow.m_span = 1000.0f * m_fullScreenShadow.m_scale;
         } else {
             m_targetX = m_fullScreenShadowPosition.x;
             m_targetY = m_fullScreenShadowPosition.y;
             m_targetZ = m_fullScreenShadowPosition.z;
-            PSVECSubtract(reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_positionX), &delta);
+            PSVECSubtract(&TargetVec(), &PositionVec(), &delta);
             depth = PSVECMag(&delta);
             m_fullScreenShadow.m_span = depth * m_fullScreenShadow.m_scale;
         }
@@ -706,22 +706,21 @@ void CCameraPcs::drawShadowBegin()
     m_shadowCamera.m_position.x = 0.0f;
     m_shadowCamera.m_position.y = 0.0f;
     m_shadowCamera.m_position.z = m_fullScreenShadowDepth;
-    PSMTXMultVecSR(rotXY, reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x));
+    PSMTXMultVecSR(rotXY, &m_shadowCamera.m_position, &m_shadowCamera.m_position);
 
     if (Game.m_currentMapId == 0x21) {
         PSMTXCopy(CameraPcs.m_cameraWorldMtx, tempMtx);
-        PSMTXMultVecSR(tempMtx, reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x));
+        PSMTXMultVecSR(tempMtx, &m_shadowCamera.m_position, &m_shadowCamera.m_position);
     }
 
-    PSVECAdd(reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x));
+    PSVECAdd(&m_shadowCamera.m_position, &TargetVec(), &m_shadowCamera.m_position);
     m_shadowCamera.m_target.x = m_targetX;
     m_shadowCamera.m_target.y = m_targetY;
     m_shadowCamera.m_target.z = m_targetZ;
     m_shadowCamera.m_nearZ = 10.0f;
     m_shadowCamera.m_farZ = 2.0f * m_fullScreenShadowDepth;
 
-    C_MTXLookAt(m_shadowCamera.m_cameraMatrix, reinterpret_cast<Vec*>(&m_shadowCamera.m_position.x), &up,
-                reinterpret_cast<Vec*>(&m_shadowCamera.m_target.x));
+    C_MTXLookAt(m_shadowCamera.m_cameraMatrix, &m_shadowCamera.m_position, &up, &m_shadowCamera.m_target);
     C_MTXOrtho(m_shadowCamera.m_screenMatrix,
                m_fullScreenShadow.m_span, -m_fullScreenShadow.m_span,
                -m_fullScreenShadow.m_span, m_fullScreenShadow.m_span,
@@ -1071,31 +1070,31 @@ void CCameraPcs::destroyMap()
  */
 void CCameraPcs::createMap()
 {
-    float fVar6;
-    float fVar5;
-    float fVar4;
-    float fVar3;
-    float fVar2;
-    float fVar1;
+    float farZ;
+    float nearZ;
+    float fov;
+    float pitch;
+    float distance;
+    float zero;
 
-    fVar1 = 0.0f;
-    fVar2 = 240.0f;
-    m_mapRotZ = fVar1;
-    fVar3 = 0.61086524f;
-    m_mapRotY = fVar1;
-    fVar4 = 25.0f;
-    m_mapRotX = fVar1;
-    fVar5 = 10.0f;
-    m_positionZ = fVar1;
-    fVar6 = 10000.0f;
-    m_positionY = fVar1;
-    m_positionX = fVar1;
-    m_yaw = fVar1;
-    m_distance = fVar2;
-    m_pitch = fVar3;
-    m_fov = fVar4;
-    m_nearZ = fVar5;
-    m_farZ = fVar6;
+    zero = 0.0f;
+    distance = 240.0f;
+    m_mapRotZ = zero;
+    pitch = 0.61086524f;
+    m_mapRotY = zero;
+    fov = 25.0f;
+    m_mapRotX = zero;
+    nearZ = 10.0f;
+    m_positionZ = zero;
+    farZ = 10000.0f;
+    m_positionY = zero;
+    m_positionX = zero;
+    m_yaw = zero;
+    m_distance = distance;
+    m_pitch = pitch;
+    m_fov = fov;
+    m_nearZ = nearZ;
+    m_farZ = farZ;
 }
 
 /*
@@ -1296,7 +1295,7 @@ void CCameraPcs::draw()
         GXClearVtxDesc();
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-        Graphic.DrawSphere(m_cameraMatrix, reinterpret_cast<Vec*>(&m_targetX), 5.0f, CColor(0xFF, 0xFF, 0xFF, 0xFF));
+        Graphic.DrawSphere(m_cameraMatrix, &TargetVec(), 5.0f, CColor(0xFF, 0xFF, 0xFF, 0xFF));
     }
 
     if (g_map_draw_prof != 0) {
@@ -1735,7 +1734,7 @@ void CCameraPcs::SetQuakeParameter(int quakeState, int keepMoving, short startTi
  */
 void CCameraPcs::onScriptChanged(char*, int fromScript)
 {
-    MtxPtr mathMtx = reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&Math) + 4);
+    MtxPtr mathMtx = Math.GetLocalMtx();
 
     PSMTXCopy(mathMtx, m_worldMapMatrix);
     PSMTXInverse(mathMtx, m_cameraWorldMtx);

@@ -12,11 +12,11 @@ typedef _pppPObject pppLaser;
 extern "C" {
 #endif
 
-void pppConstructLaser(pppLaser* pppLaser, _pppCtrlTable* param_2);
-void pppConstruct2Laser(pppLaser* pppLaser, _pppCtrlTable* param_2);
-void pppDestructLaser(pppLaser* pppLaser, _pppCtrlTable* param_2);
-void pppFrameLaser(pppLaser* pppLaser, pppLaserStep* param_2, _pppCtrlTable* param_3);
-void pppRenderLaser(pppLaser* pppLaser, pppLaserStep* param_2, _pppCtrlTable* param_3);
+void pppConstructLaser(pppLaser* laser, _pppCtrlTable* ctrlTable);
+void pppConstruct2Laser(pppLaser* laser, _pppCtrlTable* ctrlTable);
+void pppDestructLaser(pppLaser* laser, _pppCtrlTable* ctrlTable);
+void pppFrameLaser(pppLaser* laser, pppLaserStep* step, _pppCtrlTable* ctrlTable);
+void pppRenderLaser(pppLaser* laser, pppLaserStep* step, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

@@ -20,8 +20,8 @@ struct pppYmCheckBGHeightStep
 extern "C" {
 #endif
 
-void pppConstructYmCheckBGHeight(pppYmCheckBGHeight* param1, _pppCtrlTable* param2);
-void pppFrameYmCheckBGHeight(pppYmCheckBGHeight* param1, pppYmCheckBGHeightStep* param2);
+void pppConstructYmCheckBGHeight(pppYmCheckBGHeight* obj, _pppCtrlTable* ctrl);
+void pppFrameYmCheckBGHeight(pppYmCheckBGHeight* obj, pppYmCheckBGHeightStep* step);
 
 #ifdef __cplusplus
 }

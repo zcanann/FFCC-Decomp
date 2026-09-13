@@ -1202,14 +1202,14 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CUtil::GetDirectVector(Vec* param_2, Vec* param_3, Vec param_4)
+void CUtil::GetDirectVector(Vec* side, Vec* up, Vec direction)
 {
-    Vec local_vec = {0.0f, 1.0f, 0.0f};
+    Vec worldUp = {0.0f, 1.0f, 0.0f};
 
-    PSVECCrossProduct(&param_4, &local_vec, param_2);
-    PSVECNormalize(param_2, param_2);
-    PSVECCrossProduct(param_2, &param_4, param_3);
-    PSVECNormalize(param_3, param_3);
+    PSVECCrossProduct(&direction, &worldUp, side);
+    PSVECNormalize(side, side);
+    PSVECCrossProduct(side, &direction, up);
+    PSVECNormalize(up, up);
 }
 
 /*

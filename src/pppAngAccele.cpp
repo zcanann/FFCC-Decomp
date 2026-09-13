@@ -31,9 +31,9 @@ static inline int* GetPppAngAcceleAccel(_pppPObject* obj, _pppCtrlTable* ctrl)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAngAcceleCon(_pppPObject* obj, _pppCtrlTable* param)
+void pppAngAcceleCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    int* angularAccel = GetPppAngAcceleAccel(obj, param);
+    int* angularAccel = GetPppAngAcceleAccel(obj, ctrl);
 
     angularAccel[2] = 0;
     angularAccel[1] = 0;
@@ -49,19 +49,19 @@ void pppAngAcceleCon(_pppPObject* obj, _pppCtrlTable* param)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAngAccele(_pppPObject* obj, pppAngAcceleStep* param_2, _pppCtrlTable* param_3)
+void pppAngAccele(_pppPObject* obj, pppAngAcceleStep* step, _pppCtrlTable* ctrl)
 {
-    int* angularVelocity = GetPppAngAcceleVelocity(obj, param_3);
-    int* angularAccel = GetPppAngAcceleAccel(obj, param_3);
+    int* angularVelocity = GetPppAngAcceleVelocity(obj, ctrl);
+    int* angularAccel = GetPppAngAcceleAccel(obj, ctrl);
 
     if (ppvUserStopPartF != 0) {
         return;
     }
 
-    if (param_2->m_graphId == obj->m_graphId) {
-        angularAccel[0] += param_2->m_x;
-        angularAccel[1] += param_2->m_y;
-        angularAccel[2] += param_2->m_z;
+    if (step->m_graphId == obj->m_graphId) {
+        angularAccel[0] += step->m_x;
+        angularAccel[1] += step->m_y;
+        angularAccel[2] += step->m_z;
     }
 
     angularVelocity[0] += angularAccel[0];

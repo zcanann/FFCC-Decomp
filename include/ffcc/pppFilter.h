@@ -19,7 +19,7 @@ extern "C" {
 void pppConstructFilter(_pppPObjLink*, _pppCtrlTable*);
 void pppDestructFilter(_pppPObjLink*, _pppCtrlTable*);
 void pppFrameFilter(_pppPObject*, pppFilterStep*, _pppCtrlTable*);
-void pppRenderFilter(_pppPObject* pppFilter, pppFilterStep* param_2, _pppCtrlTable* param_3);
+void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterStep* step, _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

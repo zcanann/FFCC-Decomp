@@ -47,6 +47,7 @@ struct pppColumStep {
     u16 m_unkA;            // 0x0A
     union {
         u32 m_stepValue;       // 0x0C
+        f32 m_stepFloat;       // 0x0C
         u8 m_baseColor[4];     // 0x0C
     };
     u8 m_arg3;             // 0x10

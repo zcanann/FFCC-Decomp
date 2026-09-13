@@ -110,13 +110,7 @@ float CMath::DstRot(float from, float to)
         return 0.0f;
     }
 
-    if (dot < -1.0f) {
-        dot = -1.0f;
-    } else if (1.0f < dot) {
-        dot = 1.0f;
-    } else {
-        dot = dot;
-    }
+    dot = (dot < -1.0f) ? -1.0f : (1.0f < dot) ? 1.0f : dot;
 
     float angle = (float)acos((double)dot);
     if (s0 * c1 - s1 * c0 < 0.0f) {
@@ -411,60 +405,60 @@ int CMath::CrossCheckEllipseCapsule(Vec* outPos, float* outT, Vec* origin, Vec* 
                                   Vec* ellipseCenter, float horizontalRadius, float verticalRadius)
 {
     int hit;
-    float dVar6;
-    float dVar7;
-    float dVar8;
-    float dVar9;
-    float dVar10;
-    Vec local_60;
-    Vec local_6c;
-    Vec local_78;
-    Vec local_84;
+    float dirDotOrigin;
+    float dirLenSq;
+    float tmp;
+    float originDistSq;
+    float yScale;
+    Vec localOrigin;
+    Vec localDir;
+    Vec centerToOrigin;
+    Vec hitOffset;
 
-    dVar8 = horizontalRadius + radius;
-    dVar10 = dVar8 / (verticalRadius + radius);
-    PSVECSubtract(origin, ellipseCenter, &local_60);
-    dVar8 = dVar8 * dVar8;
-    local_60.y = local_60.y * dVar10;
-    local_6c.x = vector->x;
-    local_6c.y = vector->y * dVar10;
-    local_6c.z = vector->z;
-    local_78.x = local_60.x;
-    local_78.y = local_60.y;
-    local_78.z = local_60.z;
-    dVar9 = PSVECDotProduct(&local_78, &local_78);
-    if (dVar9 < dVar8) {
+    tmp = horizontalRadius + radius;
+    yScale = tmp / (verticalRadius + radius);
+    PSVECSubtract(origin, ellipseCenter, &localOrigin);
+    tmp = tmp * tmp;
+    localOrigin.y = localOrigin.y * yScale;
+    localDir.x = vector->x;
+    localDir.y = vector->y * yScale;
+    localDir.z = vector->z;
+    centerToOrigin.x = localOrigin.x;
+    centerToOrigin.y = localOrigin.y;
+    centerToOrigin.z = localOrigin.z;
+    originDistSq = PSVECDotProduct(&centerToOrigin, &centerToOrigin);
+    if (originDistSq < tmp) {
         if (outT != NULL) {
             *outT = 0.0f;
         }
         if (outPos != NULL) {
-            outPos->x = local_60.x;
-            outPos->y = local_60.y;
-            outPos->z = local_60.z;
+            outPos->x = localOrigin.x;
+            outPos->y = localOrigin.y;
+            outPos->z = localOrigin.z;
         }
         hit = 1;
     } else {
-        dVar6 = PSVECDotProduct(&local_6c, &local_78);
-        if (0.0f < dVar6) {
+        dirDotOrigin = PSVECDotProduct(&localDir, &centerToOrigin);
+        if (0.0f < dirDotOrigin) {
             hit = 0;
         } else {
-            dVar7 = PSVECDotProduct(&local_6c, &local_6c);
-            dVar8 = dVar6 * dVar6 - dVar7 * (dVar9 - dVar8);
-            if (dVar8 < 0.0f) {
+            dirLenSq = PSVECDotProduct(&localDir, &localDir);
+            tmp = dirDotOrigin * dirDotOrigin - dirLenSq * (originDistSq - tmp);
+            if (tmp < 0.0f) {
                 hit = 0;
             } else {
-                dVar8 = sqrtf(dVar8);
-                dVar8 = -dVar6 - dVar8;
-                if ((dVar8 <= 0.0f) || (dVar7 < dVar8)) {
+                tmp = sqrtf(tmp);
+                tmp = -dirDotOrigin - tmp;
+                if ((tmp <= 0.0f) || (dirLenSq < tmp)) {
                     hit = 0;
                 } else {
-                    dVar8 = dVar8 / dVar7;
+                    tmp = tmp / dirLenSq;
                     if (outT != NULL) {
-                        *outT = dVar8;
+                        *outT = tmp;
                     }
                     if (outPos != NULL) {
-                        PSVECScale(&local_6c, &local_84, dVar8);
-                        PSVECAdd(&local_60, &local_84, outPos);
+                        PSVECScale(&localDir, &hitOffset, tmp);
+                        PSVECAdd(&localOrigin, &hitOffset, outPos);
                     }
                     hit = 1;
                 }
@@ -474,8 +468,8 @@ int CMath::CrossCheckEllipseCapsule(Vec* outPos, float* outT, Vec* origin, Vec* 
 
     if (hit) {
         if (outPos != NULL) {
-            PSVECSubtract(outPos, &local_60, outPos);
-            outPos->y = outPos->y / dVar10;
+            PSVECSubtract(outPos, &localOrigin, outPos);
+            outPos->y = outPos->y / yScale;
             PSVECAdd(outPos, origin, outPos);
         }
         return 1;
@@ -624,13 +618,13 @@ int CBound::CheckFrustum0(float farPlane)
                         clipMask = (unsigned char)(clipMask | 8);
                     }
                 }
-                zIndex = zIndex + 1;
+                zIndex++;
                 insideMask = insideMask & clipMask;
                 outsideMask = outsideMask | clipMask;
             } while (zIndex < 2);
-            yIndex = yIndex + 1;
+            yIndex++;
         } while (yIndex < 2);
-        xIndex = xIndex + 1;
+        xIndex++;
     } while (xIndex < 2);
 
     if (farthestZ < farPlane) {
@@ -973,12 +967,15 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001c28c
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMath::Quit()
 {
-	// TODO
 }
 
 /*
@@ -992,6 +989,6 @@ void CMath::Quit()
  */
 void CMath::Init()
 {
-	PSMTXIdentity(m_localMtx);
-	memset(m_scratch, 0, sizeof(m_scratch));
+    PSMTXIdentity(m_localMtx);
+    memset(m_scratch, 0, sizeof(m_scratch));
 }

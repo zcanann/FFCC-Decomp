@@ -23,9 +23,9 @@ struct CoronaParam {
     float m_distMin;
     float m_distMax;
     float m_distRange;
-    float m_addX;
-    float m_addY;
-    float m_addZ;
+    float m_alphaScaleAdd;
+    float m_alphaScaleVelocityAdd;
+    float m_alphaScaleAccelAdd;
     u8 m_blendMode;
     u8 m_drawB;
     u8 m_drawA;

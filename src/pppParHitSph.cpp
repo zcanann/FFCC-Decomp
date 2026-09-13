@@ -3,9 +3,11 @@
 #include "ffcc/linkage.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
-static const float kPppParHitSphZero = 0.0f;
+
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+
+static const float kPppParHitSphZero = 0.0f;
 
 static inline Vec* ParHitSphPreviousPosition(_pppMngSt* mng)
 {
@@ -21,45 +23,45 @@ static inline Vec* ParHitSphPreviousPosition(_pppMngSt* mng)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppParHitSph(_pppPObject* param_1, ParHitSphParams* params)
+void pppParHitSph(_pppPObject* pObject, ParHitSphParams* params)
 {
-    Vec local_88;
-    Vec local_94;
-    Vec local_a0;
+    Vec hitVector;
+    Vec origin;
+    Vec debugPos;
     Mtx sphereMtx;
     Mtx cameraMtx ATTRIBUTE_ALIGN(8);
-    _GXColor local_a8;
+    _GXColor debugColor;
     _pppMngSt* pppMngSt = (_pppMngSt*)ppvMng;
     float radius;
 
-    PSVECSubtract(&ppvMng->m_position, ParHitSphPreviousPosition(ppvMng), &local_88);
-    local_94.x = ppvMng->m_matrix.value[0][3];
-    local_94.y = ppvMng->m_matrix.value[1][3];
-    local_94.z = ppvMng->m_matrix.value[2][3];
+    PSVECSubtract(&ppvMng->m_position, ParHitSphPreviousPosition(ppvMng), &hitVector);
+    origin.x = ppvMng->m_matrix.value[0][3];
+    origin.y = ppvMng->m_matrix.value[1][3];
+    origin.z = ppvMng->m_matrix.value[2][3];
     radius = pppMngSt->m_hitScale * params->m_radiusScale;
 
-    if (((kPppParHitSphZero == local_88.x) && (kPppParHitSphZero == local_88.y)) &&
-        (kPppParHitSphZero == local_88.z)) {
-        pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, kPppParHitSphZero);
+    if (((kPppParHitSphZero == hitVector.x) && (kPppParHitSphZero == hitVector.y)) &&
+        (kPppParHitSphZero == hitVector.z)) {
+        pppHitCylinderSendSystem(pppMngSt, &origin, &hitVector, radius, kPppParHitSphZero);
     } else {
-        pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, params->m_cylinderScale);
+        pppHitCylinderSendSystem(pppMngSt, &origin, &hitVector, radius, params->m_cylinderScale);
     }
 
     if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
-        local_a8.r = 0xFF;
-        local_a8.g = 0xFF;
-        local_a8.b = 0xFF;
-        local_a8.a = 0xFF;
+        debugColor.r = 0xFF;
+        debugColor.g = 0xFF;
+        debugColor.b = 0xFF;
+        debugColor.a = 0xFF;
         PSMTXIdentity(cameraMtx);
         PSMTXIdentity(sphereMtx);
         sphereMtx[0][0] = radius;
         sphereMtx[1][1] = radius;
         sphereMtx[2][2] = radius;
         PSMTXConcat(ppvCameraMatrix, cameraMtx, cameraMtx);
-        PSMTXMultVec(cameraMtx, &local_94, &local_a0);
-        sphereMtx[0][3] = local_a0.x;
-        sphereMtx[1][3] = local_a0.y;
-        sphereMtx[2][3] = local_a0.z;
-        Graphic.DrawSphere(sphereMtx, local_a8);
+        PSMTXMultVec(cameraMtx, &origin, &debugPos);
+        sphereMtx[0][3] = debugPos.x;
+        sphereMtx[1][3] = debugPos.y;
+        sphereMtx[2][3] = debugPos.z;
+        Graphic.DrawSphere(sphereMtx, debugColor);
     }
 }

@@ -240,6 +240,18 @@ static unsigned short getPadTrigForSlot(int slot)
 	return Pad.GetPadInputs()[idx].buttonDown[0];
 }
 
+static unsigned short getPadGbaTrigForSlot(int slot)
+{
+	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
+	if (blocked) {
+		return 0;
+	}
+
+	int selectedPort = Pad.m_debugPadPort;
+	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
+	return Pad.GetPadInputs()[idx].buttonDown[1];
+}
+
 static int getPadConnectedForSlot(int slot)
 {
 	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
@@ -822,14 +834,9 @@ void CGPartyObj::menu()
 		}
 
 		if (Game.m_gameWork.m_menuStageMode == 0) {
-			int slot = static_cast<char>(m_animStateMisc);
-			bool bVar3 = false;
-			if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
-				bVar3 = true;
-			}
-			unsigned short trig = bVar3 ? 0 : Pad.GetPadInputs()[slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 0x1F))].buttonDown[1];
+			unsigned short trig = getPadGbaTrigForSlot(static_cast<char>(m_animStateMisc));
 			if ((trig & 0x10) != 0) {
-				goto LAB_OPEN;
+				goto openMenu;
 			}
 		}
 
@@ -837,26 +844,13 @@ void CGPartyObj::menu()
 			return;
 		}
 
-		{
-			int slot = static_cast<char>(m_animStateMisc);
-			bool bVar3 = false;
-			if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
-				bVar3 = true;
-			}
-			unsigned short trig = bVar3 ? 0 : Pad.GetPadInputs()[slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 0x1F))].buttonDown[0];
-			if ((trig & 0x800) == 0) {
-				return;
-			}
+		if ((getPadTrigForSlot(static_cast<char>(m_animStateMisc)) & 0x800) == 0) {
+			return;
 		}
 
-	LAB_OPEN:
+	openMenu:
 		if (Game.m_gameWork.m_menuStageMode == 0) {
-			int slot = static_cast<char>(m_animStateMisc);
-			bool bVar3 = false;
-			if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
-				bVar3 = true;
-			}
-			int connected = bVar3 ? 0 : Pad.GetPadInputs()[slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 0x1F))].gbaMode;
+			int connected = getPadConnectedForSlot(static_cast<char>(m_animStateMisc));
 			if (connected != 0) {
 				if ((CFlatEventFlags() & CFlatEventFlagByte_GbaSound) != 0) {
 					Sound.PlaySe(8, 0x40, 0x7F, 0);
@@ -869,19 +863,19 @@ void CGPartyObj::menu()
 			return;
 		}
 
-		int bVar3;
+		int canOpenMenu;
 		if ((m_weaponNodeFlagBits.m_prg != 0) &&
 		    ((m_weaponNodeFlagAll.m_bits1.m_shield != 0) ||
 		     ((party.commandMode & 2) != 0) ||
 		     ((party.commandMode & 4) != 0)) &&
 		    (m_unk63CBits.m_bit80 != 0) &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
-			bVar3 = 1;
+			canOpenMenu = 1;
 		} else {
-			bVar3 = 0;
+			canOpenMenu = 0;
 		}
 
-		if (bVar3) {
+		if (canOpenMenu) {
 			Joybus.ChgCtrlMode(portIndex);
 			Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
 		} else {
@@ -894,16 +888,8 @@ void CGPartyObj::menu()
 		return;
 	}
 
-	{
-		int slot = static_cast<char>(m_animStateMisc);
-		bool bVar3 = false;
-		if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
-			bVar3 = true;
-		}
-		int connected = bVar3 ? 0 : Pad.GetPadInputs()[slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 0x1F))].gbaMode;
-		if (connected == 0) {
-			return;
-		}
+	if (getPadConnectedForSlot(static_cast<char>(m_animStateMisc)) == 0) {
+		return;
 	}
 
 	if (static_cast<unsigned int>(System.m_execParam) >= 3) {

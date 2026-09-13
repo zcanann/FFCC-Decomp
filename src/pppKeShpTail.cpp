@@ -6,17 +6,20 @@
 #include "ffcc/ppp_linkage.h"
 
 struct KeShpTailWork {
-    u8 m_count;
-    u8 m_head;
-    u16 m_field2;
-    u16 m_field4;
-    u16 m_field6;
-    Vec m_posHistory[31];
+	u8 m_count;
+	u8 m_head;
+	u16 m_frameAcc;
+	u16 m_shapeFrame;
+	u16 m_shapePrevFrame;
+	Vec m_posHistory[31];
 };
 
 STATIC_ASSERT(sizeof(KeShpTailWork) == 0x17C);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_count) == 0x00);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_head) == 0x01);
+STATIC_ASSERT(offsetof(KeShpTailWork, m_frameAcc) == 0x02);
+STATIC_ASSERT(offsetof(KeShpTailWork, m_shapeFrame) == 0x04);
+STATIC_ASSERT(offsetof(KeShpTailWork, m_shapePrevFrame) == 0x06);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_posHistory) == 0x08);
 STATIC_ASSERT(sizeof(KeShpTailDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(KeShpTailDataOffsets, m_workOffset) == 0x0);
@@ -40,14 +43,9 @@ static inline KeShpTailWork* GetKeShpTailWork(_pppPObject* obj, _pppCtrlTable* c
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTailDraw(_pppPObject* obj, pppKeShpTailStep* stepData, _pppCtrlTable* ctrlTable)
+void pppKeShpTailDraw(_pppPObject*, pppKeShpTailStep*, _pppCtrlTable*)
 {
-	(void)obj;
-	(void)stepData;
-	(void)ctrlTable;
-	return;
 }
-
 
 /*
  * --INFO--
@@ -61,9 +59,9 @@ void pppKeShpTailDraw(_pppPObject* obj, pppKeShpTailStep* stepData, _pppCtrlTabl
 void pppKeShpTailCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
 	KeShpTailWork* work = GetKeShpTailWork(obj, ctrlTable);
-	work->m_field2 = 0;
-	work->m_field4 = 0;
-	work->m_field6 = 0;
+	work->m_frameAcc = 0;
+	work->m_shapeFrame = 0;
+	work->m_shapePrevFrame = 0;
 	work->m_head = 0;
 	work->m_count = 0x1f;
 }
@@ -77,28 +75,28 @@ void pppKeShpTailCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail(_pppPObject* obj, pppKeShpTailStep*, _pppCtrlTable* offsets)
+void pppKeShpTail(_pppPObject* obj, pppKeShpTailStep*, _pppCtrlTable* ctrlTable)
 {
 	KeShpTailWork* work;
 	if (ppvUserStopPartF != 0) {
 		return;
 	}
 
-	work = GetKeShpTailWork(obj, offsets);
+	work = GetKeShpTailWork(obj, ctrlTable);
 	if (obj->m_graphId == 0) {
-		Vec local_14 ATTRIBUTE_ALIGN(8);
-		Vec local_20;
+		Vec historyPos ATTRIBUTE_ALIGN(8);
+		Vec initPos;
 
-		local_20.x = obj->m_localMatrix.value[0][3];
-		local_20.y = obj->m_localMatrix.value[1][3];
-		local_20.z = obj->m_localMatrix.value[2][3];
-		pppCopyVector(local_14, local_20);
+		initPos.x = obj->m_localMatrix.value[0][3];
+		initPos.y = obj->m_localMatrix.value[1][3];
+		initPos.z = obj->m_localMatrix.value[2][3];
+		pppCopyVector(historyPos, initPos);
 
-		Vec* tailVec = work->m_posHistory;
+		Vec* history = work->m_posHistory;
 		s32 count = work->m_count;
 		for (; count > 0; count--) {
-			pppCopyVector(*tailVec, local_14);
-			tailVec++;
+			pppCopyVector(*history, historyPos);
+			history++;
 		}
 	}
 

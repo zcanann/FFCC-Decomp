@@ -3324,8 +3324,8 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x65 : 0x3E));
 
-    baseX = static_cast<int>(baseX + 20.0);
-    offsU = static_cast<int>(static_cast<double>(offsU) + 8.0);
+    baseX += 20.0;
+    offsU += 8.0;
     MenuPcs.DrawRect(
         0, static_cast<float>(baseX), static_cast<float>(offsU), 208.0f, 24.0f,
         0.0f, static_cast<float>(page * 0x18), 1.0f, 1.0f, 0.0f);

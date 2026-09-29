@@ -526,6 +526,8 @@ static int RenderWaterMesh(VYmMana* mana)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 static int UpdateWaterMesh(VYmMana* mana)
 {
     float* waterHeightA;
@@ -572,6 +574,7 @@ static int UpdateWaterMesh(VYmMana* mana)
                               mana->m_waterMtx, mana->m_colors, mana->m_texCoord1);
     return 1;
 }
+#pragma pop
 
 /*
  * --INFO--

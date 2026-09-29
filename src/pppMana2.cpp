@@ -439,6 +439,8 @@ static int RenderWaterMesh(VMana2* mana2)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma opt_common_subs off
 static int UpdateWaterMesh(VMana2* mana2)
 {
     float neighborScale;
@@ -485,6 +487,7 @@ static int UpdateWaterMesh(VMana2* mana2)
                               mana2->m_waterMtx, mana2->m_colors, mana2->m_texCoord1);
     return 1;
 }
+#pragma pop
 
 /*
  * --INFO--

@@ -82,6 +82,7 @@ void CPad::Frame()
 	PADClamp(padStatus);
 	memcpy(g_pad, padStatus, sizeof(g_pad));
 	m_debugPadLock = 0;
+	Gba* gba = gbaStatus;
 
 	for (u32 port = 0; port < 4; port++) {
 		Gba* gba = &gbaStatus[port];
@@ -94,8 +95,8 @@ void CPad::Frame()
 		}
 	}
 
-	int replayFrame = m_replayFrame;
-	if (m_replayBuffer != 0 && replayFrame >= 0) {
+	int replayFrame;
+	if (m_replayBuffer != 0 && (replayFrame = m_replayFrame) >= 0) {
 		if (m_replayBuffer->recordMode != 0) {
 			if (m_replayBuffer->frameCount < 0x1A5E0) {
 				for (int port = 0; port < 4; port++) {
@@ -117,12 +118,16 @@ void CPad::Frame()
 		}
 	}
 
+	PADStatus* rawPad = padStatus;
+	PadInput* merged = &m_padInputs[4];
 	u32 resetMask = 0;
 	for (u32 port = 0; port < 4; port++) {
 		u32 mask = 0x80000000 >> port;
 		switch (padStatus[port].err) {
 		case PAD_ERR_NONE:
-		case PAD_ERR_NOT_READY:
+			m_padConnectedMask |= mask;
+			break;
+		case PAD_ERR_TRANSFER:
 			m_padConnectedMask |= mask;
 			break;
 		case PAD_ERR_NO_CONTROLLER:
@@ -131,7 +136,7 @@ void CPad::Frame()
 			}
 			m_padConnectedMask &= ~mask;
 			break;
-		case PAD_ERR_TRANSFER:
+		case PAD_ERR_NOT_READY:
 			m_padConnectedMask &= ~mask;
 			break;
 		}
@@ -140,14 +145,11 @@ void CPad::Frame()
 		PADReset(resetMask & 0xF0000000);
 	}
 
-	PADStatus* rawPad = padStatus;
-	Gba* gba = gbaStatus;
 	u32 port;
 	PadInput* input;
 	s8 axisValue;
 
 	const float zero = 0.0f;
-	PadInput* merged = &m_padInputs[4];
 	merged->buttonPrev[0] = merged->button[0];
 	port = 0;
 	merged->buttonDown[0] = 0;
@@ -178,12 +180,12 @@ void CPad::Frame()
 	merged->lockedButton[1] = 0;
 	merged->lockedButton[0] = 0;
 	merged->activeMask = 0;
-	input = m_padInputs;
 	do
 	{
+		input = &m_padInputs[port];
 		for (int channel = 0; channel < 2; channel++)
 		{
-			if ((channel != 0) || (rawPad->err != PAD_ERR_NOT_READY))
+			if ((channel != 0) || (rawPad->err != PAD_ERR_TRANSFER))
 			{
 				input->buttonPrev[channel] = static_cast<u16>(input->lockedButton[0] | input->button[channel]);
 				if (channel == 0)
@@ -257,20 +259,20 @@ void CPad::Frame()
 						{
 							input->stickBits = input->stickBits | 8;
 						}
-						const float analogScale = 0.0078125f;
+						const float analogMax = 128.0f;
 						const float triggerMax = 255.0f;
 						input->substickX = rawPad->substickX;
 						input->substickY = rawPad->substickY;
 						input->triggerLeft = rawPad->triggerLeft;
 						input->triggerRight = rawPad->triggerRight;
 						input->stickXF =
-							static_cast<float>(input->stickX) * analogScale;
+							static_cast<float>(input->stickX) / analogMax;
 						input->stickYF =
-							static_cast<float>(input->stickY) * analogScale;
+							static_cast<float>(input->stickY) / analogMax;
 						input->substickXF =
-							static_cast<float>(input->substickX) * analogScale;
+							static_cast<float>(input->substickX) / analogMax;
 						input->substickYF =
-							static_cast<float>(input->substickY) * analogScale;
+							static_cast<float>(input->substickY) / analogMax;
 						input->triggerLeftF =
 							static_cast<float>(input->triggerLeft) / triggerMax;
 						input->triggerRightF =
@@ -404,7 +406,6 @@ void CPad::Frame()
 			}
 		}
 		port = port + 1;
-		input++;
 		rawPad++;
 		gba++;
 	} while (port < 4);

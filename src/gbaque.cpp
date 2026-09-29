@@ -1951,16 +1951,26 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
  */
 unsigned int GbaQueue::GetScrFlg()
 {
-	for (int i = 0; i < 4; i++) {
-		OSWaitSemaphore(accessSemaphores + i);
-	}
+	int state;
+	int result;
+	int i;
 
-	bool flag = (m_scrInitEnd != 0);
-	for (int i = 0; i < 4; i++) {
-		OSSignalSemaphore(accessSemaphores + i);
-	}
+	i = 0;
+	do {
+		OSWaitSemaphore(&accessSemaphores[i]);
+		i++;
+	} while (i < 4);
 
-	return flag;
+	state = m_scrInitEnd;
+	result = state != 0 ? 1 : 0;
+
+	i = 0;
+	do {
+		OSSignalSemaphore(&accessSemaphores[i]);
+		i++;
+	} while (i < 4);
+
+	return result;
 }
 
 /*
@@ -4248,8 +4258,7 @@ unsigned int GbaQueue::GetRadarMode(int channel)
 	OSWaitSemaphore(accessSemaphores + channel);
 	int radarMode = m_radarMode;
 	OSSignalSemaphore(accessSemaphores + channel);
-	unsigned int value = radarMode & (1 << channel);
-	return value != 0;
+	return (radarMode & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -4289,8 +4298,7 @@ unsigned int GbaQueue::GetChgRadarMode(int channel)
 	OSWaitSemaphore(accessSemaphores + channel);
 	int radarMode = m_chgRadarMode;
 	OSSignalSemaphore(accessSemaphores + channel);
-	unsigned int value = radarMode & (1 << channel);
-	return value != 0;
+	return (radarMode & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -4449,7 +4457,7 @@ unsigned int GbaQueue::GetChgHitFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int flag = m_chgHitFlags;
 	OSSignalSemaphore(semaphore);
-	return (flag & (1 << actualChannel)) != 0;
+	return (flag & (1 << actualChannel)) ? 1 : 0;
 }
 
 /*
@@ -4485,7 +4493,7 @@ unsigned int GbaQueue::GetChgScouFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int flag = m_chgScouFlags;
 	OSSignalSemaphore(semaphore);
-	return (flag & (1 << channel)) != 0;
+	return (flag & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -4831,7 +4839,7 @@ unsigned int GbaQueue::GetSPModeFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_spModeFlags;
 	OSSignalSemaphore(semaphore);
-	return (value & (1 << channel)) != 0;
+	return (value & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -4866,7 +4874,7 @@ unsigned int GbaQueue::GetSPMode(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_spModeBits;
 	OSSignalSemaphore(semaphore);
-	return (value & (1 << channel)) != 0;
+	return (value & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -4884,7 +4892,7 @@ unsigned int GbaQueue::GetMemorysFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_memorysFlags;
 	OSSignalSemaphore(semaphore);
-	return (value & (1 << channel)) != 0;
+	return (value & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -4991,7 +4999,7 @@ unsigned int GbaQueue::GetPlayModeFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_playModeFlags;
 	OSSignalSemaphore(semaphore);
-	return (value & (1 << channel)) != 0;
+	return (value & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -5052,7 +5060,7 @@ unsigned int GbaQueue::GetStartBonusFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_startBonusFlags;
 	OSSignalSemaphore(semaphore);
-	return (value & (1 << channel)) != 0;
+	return (value & (1 << channel)) ? 1 : 0;
 }
 
 /*

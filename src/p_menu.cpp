@@ -372,6 +372,9 @@ void CMenuPcs::destroy()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma pool_data off
+#pragma opt_loop_invariants off
 void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 {
     CMemory::CStage* stage = 0;
@@ -388,9 +391,9 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         break;
     }
 
-    if ((slot == 0) && ((static_cast<u32>(-reinterpret_cast<int>(FontMan.m_font) | reinterpret_cast<int>(FontMan.m_font)) >> 31) != 0)) {
+    if ((slot == 0) && (FontMan.m_font != 0 ? 1 : 0)) {
         m_fonts[0] = FontMan.m_font;
-        reinterpret_cast<u32*>(m_fonts[0])[1] = reinterpret_cast<u32*>(m_fonts[0])[1] + 1;
+        m_fonts[0]->AddRef();
     } else {
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         File.Read(fileHandle);
@@ -507,6 +510,8 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         m_fonts[slot]->FlushTlutColor();
     }
 }
+
+#pragma pop
 
 const char* sMenuTextureRegionNameTable[] = {
     sMenuRegionShibuya, sMenuRegionFace, 0, 0, 0, 0, 0, 0, 0

@@ -2876,24 +2876,21 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha255)).color);
 
-    const char* noStr;
-    const char* yesStr = GetMenuStr(1);
-    float yesW = static_cast<float>(font->GetWidth(yesStr));
+    const char* text = GetMenuStr(1);
+    float yesW = static_cast<float>(font->GetWidth(text));
     int yesX = 0x1D0;
-    yesX = static_cast<int>(
-        (48.0f - yesW) / 2.0f + static_cast<float>(yesX));
+    yesX += (48.0f - yesW) / 2.0f;
     font->SetPosX(static_cast<float>(yesX));
     font->SetPosY(369.0f);
-    font->Draw(yesStr);
+    font->Draw(text);
 
-    noStr = GetMenuStr(2);
-    float noW = static_cast<float>(font->GetWidth(noStr));
+    text = GetMenuStr(2);
+    float noW = static_cast<float>(font->GetWidth(text));
     int noX = 0x218;
-    noX = static_cast<int>(
-        (48.0f - noW) / 2.0f + static_cast<float>(noX));
+    noX += (48.0f - noW) / 2.0f;
     font->SetPosX(static_cast<float>(noX));
     font->SetPosY(369.0f);
-    font->Draw(noStr);
+    font->Draw(text);
 
     DrawInit();
     if (yesNoSel != 0) {

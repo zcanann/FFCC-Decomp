@@ -1170,12 +1170,12 @@ void CShopMenu::DrawItemInfo0()
 
     if ((m_subMode == 1) && (m_listType == 0)) {
         CFont* countFont = MenuPcs.m_fonts[0];
-        int countEdge = 0x108;
+        int countRightX = 0x108;
         int amount = m_quantity;
         SetupShopMenuValueFont(countFont);
         char countBuffer[64];
         sprintf(countBuffer, s_TwoDigitFormat_80332d18, amount);
-        int countRightX = static_cast<int>(countEdge - countFont->GetWidth(countBuffer));
+        countRightX -= countFont->GetWidth(countBuffer);
         MenuPcs.DrawNoShadowFont(countFont, countBuffer, static_cast<float>(countRightX), FLOAT_80332d6c, 4, 0x12);
         MenuPcs.DrawInit();
 

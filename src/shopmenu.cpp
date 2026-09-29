@@ -761,10 +761,6 @@ inline int CShopMenu::CheckSell(int index)
  */
 inline int CShopMenu::getItemHaveCnt(int itemNo)
 {
-    if (itemNo <= 0) {
-        return 0;
-    }
-
     int count = 0;
     for (int i = 0; i < 0x40; i++) {
         if (m_caravanWork->m_inventoryItems[i] == itemNo) {
@@ -2169,7 +2165,8 @@ void CShopMenu::DrawShop0()
  */
 void CShopMenu::SelectMake()
 {
-    int canSelect = MenuPcs.ChkEquipPossible(m_resultItem) &&
+    int canSelect = MenuPcs.ChkEquipPossible(m_resultItem);
+    canSelect = canSelect &&
                      (m_caravanWork->m_gil >= getMakeGil(getItemNo(m_selectedIndex)));
 
     int selected = getItemNo(m_selectedIndex);
@@ -2198,27 +2195,23 @@ void CShopMenu::SelectMake()
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         }
     } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
-        int yesNo = m_yesNo;
-        if (yesNo != 1) {
-            if (yesNo > 0) {
-                return;
+        switch (m_yesNo) {
+        case 0:
+            {
+                int makeGil = getMakeGil(getItemNo(m_selectedIndex));
+                if (m_caravanWork->CanAddGil(-makeGil) != 0) {
+                    Sound.PlaySe(0x52, 0x40, 0x7F, 0);
+                    m_nextMode = 0xF;
+                    SetMode(0xE);
+                    break;
+                }
             }
-            if (yesNo < 0) {
-                return;
-            }
-
-            int makeGil = getMakeGil(getItemNo(m_selectedIndex));
-            if (m_caravanWork->CanAddGil(-makeGil) != 0) {
-                Sound.PlaySe(0x52, 0x40, 0x7F, 0);
-                m_nextMode = 0xF;
-                SetMode(0xE);
-                return;
-            }
+        case 1:
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
+            m_nextMode = 9;
+            SetMode(0xE);
+            break;
         }
-
-        Sound.PlaySe(4, 0x40, 0x7F, 0);
-        m_nextMode = 9;
-        SetMode(0xE);
     }
 }
 /*

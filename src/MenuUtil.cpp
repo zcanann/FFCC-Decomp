@@ -1335,7 +1335,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					strcpy(scratch, GetAttrStr(item->m_attribute));
 					font->SetTlut(4);
 					font->Draw(scratch);
-					x = static_cast<int>(static_cast<float>(x) + (2.0f + font->GetWidth(scratch)));
+					x += 2.0f + font->GetWidth(scratch);
 					font->SetPosX(static_cast<float>(x));
 					font->SetTlut(9);
 
@@ -1358,7 +1358,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			strcat(scratch, " ");
 			font->Draw(scratch);
 
-			x = static_cast<int>(static_cast<float>(x) + (2.0f + font->GetWidth(scratch)));
+			x += 2.0f + font->GetWidth(scratch);
 			font->SetTlut(1);
 			font->SetPosX(static_cast<float>(x));
 			sprintf(scratch, " %d", item->m_value);
@@ -1398,7 +1398,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 							}
 
 							int delta = static_cast<int>(item->m_value) - static_cast<int>(currentValue);
-							int deltaX = static_cast<int>(static_cast<float>(x) + (2.0f + font->GetWidth(scratch)));
+							int deltaX = x;
+							deltaX += 2.0f + font->GetWidth(scratch);
 							font->SetPosX(static_cast<float>(deltaX));
 							if (delta >= 0) {
 								font->SetTlut(9);

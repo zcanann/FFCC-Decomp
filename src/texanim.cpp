@@ -490,7 +490,7 @@ inline void CTexAnim::AttachMaterialSet(CMaterialSet* materialSet)
     }
 
     if ((materialSet != 0) && ((materialIndex = materialSet->Find(m_refData->m_name)), materialIndex >= 0)) {
-        material = materialSet->m_materials.GetAt(materialIndex);
+        material = materialSet->m_materials[materialIndex];
         m_refData->m_material = material;
         m_refData->m_material->AddRef();
     }

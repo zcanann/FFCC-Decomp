@@ -23,41 +23,12 @@ struct DbgMenuDef {
     u32 actionFlags;
 };
 
-static const char sCDbgMenuPcs[] = "CDbgMenuPcs";
-static const char sDbgMenuMenu[] = "MENU";
-static const char sDbgMenuShouki[] = "SHOUKI";
-static const char sDbgMenuMark[] = "MARK";
-static const char sDbgMenuBar[] = "BAR";
-static const char sDbgMenuSpeed[] = "SPEED";
-static const char sDbgMenuMuteki[] = "MUTEKI";
-static const char sDbgMenuFollow[] = "FOLLOW";
-static const char sDbgMenuDispPrint[] = "DISPPRINT";
-static const char sDbgMenuCombo[] = "COMBO";
-static const char sDbgMenuPause[] = "PAUSE";
-static const char sDbgMenuBattle[] = "BATTLE";
-static const char sDbgMenuAnalog[] = "ANALOG";
-static const char sDbgMenuColCheck[] = "COLCHECK";
-static const char sDbgMenuAsterisk[] = "A*";
-static const char sDbgMenuParticle[] = "PARTICLE";
-static const char sDbgMenuPrintf[] = "PRINTF";
-static const char sDbgMenuSoundInfo[] = "SOUND INFO";
-static const char sDbgMenuShadow[] = "SHADOW";
-static const char sDbgMenuPartHeap[] = "PART HEAP";
-static const char sDbgMenuCharaInfo[] = "CHARA INFO";
-static const char sDbgMenuItemWeapon[] = "ITEM WEAPON";
-static const char sDbgMenuSmithMaster[] = "SMITH MASTER";
-static const char sDbgMenuChara[] = "CHARA";
-static const char sDbgMenuDebug[] = "Debug";
-static const char sDbgMenuOn[] = "ON";
-static const char sDbgMenuOff[] = "OFF";
-static const char sDbgMenuUnknown[] = "?";
-
 inline CDbgMenuPcs::CDbgMenuPcs()
 {
 }
 
 CProcessCallbackTable CDbgMenuPcs::m_table = {
-    const_cast<char*>(sCDbgMenuPcs),
+    "CDbgMenuPcs",
     static_cast<CProcessCallback>(&CDbgMenuPcs::create),
     static_cast<CProcessCallback>(&CDbgMenuPcs::destroy),
     {
@@ -67,21 +38,19 @@ CProcessCallbackTable CDbgMenuPcs::m_table = {
 };
 
 static DbgMenuDef tWork[] = {
-    { sDbgMenuMenu, 100, 2, 1 },      { sDbgMenuShouki, 101, 2, 1 },
-    { sDbgMenuMark, 102, 2, 1 },      { sDbgMenuBar, 103, 2, 1 },
-    { sDbgMenuSpeed, 104, 2, 1 },     { sDbgMenuMuteki, 105, 2, 1 },
-    { sDbgMenuFollow, 106, 2, 1 },    { sDbgMenuDispPrint, 107, 2, 1 },
-    { sDbgMenuCombo, 108, 2, 1 },     { sDbgMenuPause, 109, 2, 1 },
-    { sDbgMenuBattle, 110, 2, 1 },    { sDbgMenuAnalog, 111, 2, 1 },
-    { sDbgMenuColCheck, 112, 2, 1 },  { sDbgMenuAsterisk, 113, 2, 1 },
-    { sDbgMenuParticle, 114, 2, 1 },  { sDbgMenuPrintf, 115, 2, 1 },
-    { sDbgMenuSoundInfo, 116, 3, 1 }, { sDbgMenuShadow, 117, 2, 1 },
-    { sDbgMenuPartHeap, 118, 2, 1 },  { sDbgMenuCharaInfo, 119, 3, 1 },
-    { sDbgMenuItemWeapon, 120, 2, 1 }, { sDbgMenuSmithMaster, 121, 2, 1 },
-    { sDbgMenuChara, 122, 2, 1 },
+    { "MENU", 100, 2, 1 },      { "SHOUKI", 101, 2, 1 },
+    { "MARK", 102, 2, 1 },      { "BAR", 103, 2, 1 },
+    { "SPEED", 104, 2, 1 },     { "MUTEKI", 105, 2, 1 },
+    { "FOLLOW", 106, 2, 1 },    { "DISPPRINT", 107, 2, 1 },
+    { "COMBO", 108, 2, 1 },     { "PAUSE", 109, 2, 1 },
+    { "BATTLE", 110, 2, 1 },    { "ANALOG", 111, 2, 1 },
+    { "COLCHECK", 112, 2, 1 },  { "A*", 113, 2, 1 },
+    { "PARTICLE", 114, 2, 1 },  { "PRINTF", 115, 2, 1 },
+    { "SOUND INFO", 116, 3, 1 }, { "SHADOW", 117, 2, 1 },
+    { "PART HEAP", 118, 2, 1 },  { "CHARA INFO", 119, 3, 1 },
+    { "ITEM WEAPON", 120, 2, 1 }, { "SMITH MASTER", 121, 2, 1 },
+    { "CHARA", 122, 2, 1 },
 };
-u32 gDbgMenuWindowBorderColors[4] = {0x0000FFC0, 0x4040FFC0, 0x4040FFC0, 0x8080FFC0};
-GXColor gDbgMenuWindowFillColors[2] = {{0xFF, 0xFF, 0xFF, 0x80}, {0, 0, 0, 0x80}};
 
 inline CDbgMenuPcs::CDM* CDbgMenuPcs::searchFreeCDM()
 {
@@ -96,492 +65,77 @@ inline CDbgMenuPcs::CDM* CDbgMenuPcs::searchFreeCDM()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
-{
-    if (m_currentVtxFmt != vtxFmt) {
-        switch (vtxFmt) {
-        case 0:
-            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP,
-                          GX_AF_SPOT);
-            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-            _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-            break;
-
-        case 1:
-            GXClearVtxDesc();
-            GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-            GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-            GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-            GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
-            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-            _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-            break;
-        }
-
-        m_currentVtxFmt = vtxFmt;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012b710
- * PAL Size: 432b
+ * PAL Address: 0x8012d260
+ * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
+void CDbgMenuPcs::Init()
 {
-	CDM* parentMenu = reinterpret_cast<CDM*>(searchID(parentID, m_rootMenuNode));
-	CDM* menu = searchFreeCDM();
-
-	memset(&menu->m_status, 0, sizeof(CDM) - sizeof(CDMParam));
-	menu->m_statusBits.m_used = 1;
-
-	menu->m_type = param.m_type;
-	menu->m_flags = param.m_flags;
-	menu->m_x = param.m_x;
-	menu->m_y = param.m_y;
-	menu->m_width = param.m_width;
-	menu->m_height = param.m_height;
-	menu->m_unk18 = param.m_unk18;
-	menu->m_unk1C = param.m_unk1C;
-	menu->m_unk20 = param.m_unk20;
-	menu->m_text = param.m_text;
-	menu->m_unk28 = param.m_unk28;
-	menu->m_unk2C = param.m_unk2C;
-	menu->m_state = static_cast<s32>(param.m_unk30);
-
-	menu->m_parent = parentMenu;
-	menu->m_prev = menu;
-	menu->m_next = menu;
-	menu->m_id = id;
-
-	if (parentMenu->m_firstChild != 0) {
-		CDM* child = parentMenu->m_firstChild;
-		int found = 0;
-		do {
-			if (found == 0 && ((child->m_flags & 1) != 0)) {
-				found = 1;
-				child->m_statusBits.m_selected = 1;
-				m_selectedMenu = child;
-			}
-			child = child->m_next;
-		} while (child != parentMenu->m_firstChild);
-
-		child->m_prev->m_next = menu;
-		menu->m_prev = child->m_prev;
-		child->m_prev = menu;
-		menu->m_next = child;
-	} else {
-		parentMenu->m_firstChild = menu;
-		if ((menu->m_flags & 1) != 0) {
-			menu->m_statusBits.m_selected = 1;
-			m_selectedMenu = menu;
-		}
-		if ((menu->m_flags & 2) != 0) {
-			m_defaultMenu = menu;
-		}
-	}
+	m_rootMenuNode.m_id = 0;
+	m_rootMenuNode.m_unk18 = 0x280;
+	m_rootMenuNode.m_unk1C = 0x1C0;
+	m_dbgFlags = 0x8940;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012b8c0
- * PAL Size: 588b
+ * PAL Address: 0x8012d25c
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CDbgMenuPcs::Add()
+void CDbgMenuPcs::Quit()
 {
-    CDMParam param;
-    CDMParam rootParam;
-    CDMParam nodeParam;
-    CDMParam actionParam;
-    int y;
-
-    if (m_rootMenuNode.m_firstChild != 0) {
-        return;
-    }
-
-    memset(&param, 0, sizeof(param));
-    memset(&rootParam, 0, sizeof(rootParam));
-    rootParam.m_type = 0;
-    rootParam.m_flags = 0;
-    rootParam.m_width = 100;
-    rootParam.m_height = 0x32;
-    rootParam.m_unk18 = 0xDC;
-    rootParam.m_unk1C = 0x180;
-    rootParam.m_unk20 = 0;
-    rootParam.m_unk28 = 0;
-    rootParam.m_unk2C = 0;
-    param = rootParam;
-    param.m_text = const_cast<char*>(sDbgMenuDebug);
-    Add(0, 10, param);
-
-    y = 10;
-    for (int index = 0; index < static_cast<int>(sizeof(tWork) / sizeof(tWork[0])); index++) {
-        DbgMenuDef* menuDefs = &tWork[index];
-        memset(&nodeParam, 0, sizeof(nodeParam));
-        nodeParam.m_type = 1;
-        nodeParam.m_flags = 0;
-        nodeParam.m_width = 10;
-        nodeParam.m_height = y;
-        nodeParam.m_unk18 = 0;
-        nodeParam.m_unk1C = 0;
-        nodeParam.m_unk20 = 0;
-        nodeParam.m_unk28 = 0;
-        nodeParam.m_unk2C = 0;
-        param = nodeParam;
-        param.m_text = const_cast<char*>(menuDefs->text);
-        Add(10, 1, param);
-
-        u32 actionType;
-        u32 actionFlags = menuDefs->actionFlags;
-        actionType = menuDefs->actionType;
-
-        memset(&actionParam, 0, sizeof(actionParam));
-        actionParam.m_type = (int)actionType;
-        actionParam.m_flags = actionFlags;
-        actionParam.m_width = 0xB4;
-        actionParam.m_height = y;
-        actionParam.m_unk18 = 0;
-        actionParam.m_unk1C = 0;
-        actionParam.m_unk20 = 0;
-        actionParam.m_unk28 = 0;
-        actionParam.m_unk2C = 0;
-
-        param = actionParam;
-        Add(10, (int)menuDefs->id, param);
-
-        y += 0x10;
-    }
+	return;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012bb0c
- * PAL Size: 576b
+ * PAL Address: 0x8012d248
+ * PAL Size: 20b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CDbgMenuPcs::searchID(int id, CDbgMenuPcs::CDM& root)
+int CDbgMenuPcs::GetTable(unsigned long index)
 {
-	CDM* node = &root;
-	do {
-		if (node->m_id == id) {
-			return (int)node;
-		}
-		if (node->m_firstChild != 0) {
-			CDM* found = reinterpret_cast<CDM*>(searchID(id, *node->m_firstChild));
-			if (found != 0) {
-				return reinterpret_cast<int>(found);
-			}
-		}
-		node = node->m_next;
-		if (node == &root) {
-			return 0;
-		}
-	} while (1);
+	return reinterpret_cast<int>(&m_table + index);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012bd4c
- * PAL Size: 1320b
+ * PAL Address: 0x8012d204
+ * PAL Size: 68b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
+void CDbgMenuPcs::create()
 {
-	changeVtxFmt(0);
-
-	GXColor mainColor = {0xFF, 0xFF, 0xFF, 0xFF};
-	if ((flags & 2) != 0) {
-		mainColor.b = 0;
-		mainColor.g = 0;
-		mainColor.r = 0;
-	}
-
-	if ((flags & 4) != 0) {
-		drawFont((flags & ~4) | 2, x - 1, y, text);
-		drawFont((flags & ~4) | 2, x, y + 1, text);
-		drawFont((flags & ~4) | 2, x + 1, y, text);
-		drawFont((flags & ~4) | 2, x, y - 1, text);
-	}
-
-	GXSetChanMatColor(GX_COLOR0A0, mainColor);
-
-	int fontSize = 10;
-	if ((flags & 1) != 0) {
-		fontSize = 8;
-	}
-	if ((flags & 8) != 0) {
-		int textLen = strlen(text);
-		x -= (u32)(fontSize * textLen) >> 1;
-		y -= fontSize / 2;
-	}
-	Graphic.DrawDebugStringDirect(x, y, text, fontSize);
+	memset(m_menuPool, 0, sizeof(m_menuPool));
+	m_defaultMenu = 0;
+	m_selectedMenu = 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012c274
- * PAL Size: 1336b
+ * PAL Address: 0x8012d200
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, char* text)
+void CDbgMenuPcs::destroy()
 {
-	changeVtxFmt(1);
-	float z = 0.0f;
-
-	if ((flags & 1) == 0) {
-		GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT1, 4);
-
-		for (int vertexIndex = 0; vertexIndex < 4; vertexIndex++) {
-			GXPosition3f32((float)(x + ((vertexIndex & 1) ? width : 0)),
-			              (float)(y + ((vertexIndex & 2) ? height : 0)), z);
-			GXColor1u32(gDbgMenuWindowBorderColors[vertexIndex]);
-		}
-	}
-
-	int fillColorIndex = (flags >> 1) & 1;
-
-	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
-	width = x + width;
-	height = y + height;
-	GXPosition3f32((float)width, (float)y, z);
-	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[fillColorIndex]));
-	GXPosition3f32((float)x, (float)y, z);
-	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[fillColorIndex]));
-	GXPosition3f32((float)x, (float)height, z);
-	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[fillColorIndex]));
-
-	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
-	GXPosition3f32((float)width, (float)y, z);
-	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[1 - fillColorIndex]));
-	GXPosition3f32((float)width, (float)height, z);
-	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[1 - fillColorIndex]));
-	GXPosition3f32((float)x, (float)height, z);
-	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[1 - fillColorIndex]));
-
-	if (m_currentMenu->m_statusBits.m_selected != 0) {
-		u8 alpha = 0xC0;
-
-		if ((System.m_frameCounter >> 2 & 1) != 0) {
-			alpha = 0xFF;
-		}
-
-		GXColor highlightColor = {0, 0, 0, 0x80};
-		highlightColor.r = alpha;
-		highlightColor.g = alpha;
-		highlightColor.b = alpha;
-
-		GXBegin(GX_LINESTRIP, GX_VTXFMT1, 5);
-		GXPosition3f32((float)(width + 1), (float)(y - 1), z);
-		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
-		GXPosition3f32((float)(x - 1), (float)(y - 1), z);
-		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
-		GXPosition3f32((float)(x - 1), (float)(height + 1), z);
-		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
-		GXPosition3f32((float)(width + 1), (float)(height + 1), z);
-		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
-		GXPosition3f32((float)(width + 1), (float)(y - 1), z);
-		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
-	}
-
-	if (text != NULL) {
-		drawFont(5, x + 8, y - 6, text);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012c8d8
- * PAL Size: 488b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
-{
-	CDM* head = menu;
-
-	do {
-		m_currentMenu = menu;
-		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, 640.0f, 448.0f, 0.0f, 1.0f);
-
-		switch (menu->m_type) {
-		case 0:
-			drawWindow(menu->m_y, 0, 0, menu->m_unk18, menu->m_unk1C, menu->m_text);
-			break;
-		case 1:
-			drawFont(menu->m_y, 0, 0, menu->m_text);
-			break;
-		case 2: {
-			drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
-
-			const char* stateText;
-			if (menu->m_state == 1) {
-				stateText = sDbgMenuOn;
-			} else {
-				stateText = sDbgMenuUnknown;
-				if (menu->m_state == 0) {
-					stateText = sDbgMenuOff;
-				}
-			}
-
-			drawFont(9, 0x10, 8, const_cast<char*>(stateText));
-			break;
-		}
-		case 3:
-			drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
-			break;
-		}
-
-		menu = menu->m_next;
-	} while (menu != head);
-
-	menu = head;
-	do {
-		if (menu->m_firstChild != 0) {
-			drawMenu(menu->m_firstChild);
-		}
-		menu = menu->m_next;
-	} while (menu != head);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-
-/*
- * --INFO--
- * PAL Address: 0x8012cac0
- * PAL Size: 592b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
-{
-	CDM* head = menu;
-	do {
-		m_currentMenu = menu;
-		switch (menu->m_id) {
-		case 100:
-			menu->m_state = CFlatEventMask() != 0;
-			break;
-		case 0x65:
-			menu->m_state = (s8)((s32)(((u32)(u8)CFlatGameFlags() << 0x18) & 0xC0000000) >> 0x1F) != 0;
-			break;
-		case 0x66:
-			menu->m_state = (s8)((s32)(((u32)(u8)CFlatGameFlags() << 0x1C) & 0xC0000000) >> 0x1F) != 0;
-			break;
-		case 0x67:
-			menu->m_state = (m_dbgFlags >> 0) & 1;
-			break;
-		case 0x68:
-			menu->m_state = (m_dbgFlags >> 1) & 1;
-			break;
-		case 0x69:
-			menu->m_state = (m_dbgFlags >> 2) & 1;
-			break;
-		case 0x6A:
-			menu->m_state = (m_dbgFlags >> 3) & 1;
-			break;
-		case 0x6B:
-			menu->m_state = (m_dbgFlags >> 4) & 1;
-			break;
-		case 0x6C:
-			menu->m_state = (m_dbgFlags >> 5) & 1;
-			break;
-		case 0x6D:
-			menu->m_state = (m_dbgFlags >> 6) & 1;
-			break;
-		case 0x6E:
-			menu->m_state = (m_dbgFlags >> 7) & 1;
-			break;
-		case 0x6F:
-			menu->m_state = (m_dbgFlags >> 8) & 1;
-			break;
-		case 0x70:
-			menu->m_state = (m_dbgFlags >> 9) & 1;
-			break;
-		case 0x71:
-			menu->m_state = (m_dbgFlags >> 10) & 1;
-			break;
-		case 0x72:
-			menu->m_state = (m_dbgFlags >> 11) & 1;
-			break;
-		case 0x73:
-			menu->m_state = (m_dbgFlags >> 12) & 1;
-			break;
-		case 0x75:
-			menu->m_state = g_map_draw_prof != 0;
-			break;
-		case 0x76:
-			menu->m_state = g_IsDrawHeapSize != 0;
-			break;
-		case 0x78:
-			menu->m_state = (m_dbgFlags >> 13) & 1;
-			break;
-		case 0x79:
-			menu->m_state = (m_dbgFlags >> 14) & 1;
-			break;
-		case 0x7A:
-			menu->m_state = (m_dbgFlags >> 15) & 1;
-			break;
-		}
-
-		menu->m_drawX = menu->m_parent->m_width + menu->m_width;
-		menu->m_drawY = menu->m_parent->m_height + menu->m_height;
-
-		if (menu->m_firstChild != 0) {
-			calcMenu(menu->m_firstChild);
-		}
-
-		menu = menu->m_next;
-	} while (menu != head);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012cd10
- * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CDbgMenuPcs::draw()
-{
-	m_currentVtxFmt = -1;
-	Graphic.InitDebugString();
-	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
-	GXSetNumChans(1);
-	if (m_rootMenuNode.m_firstChild != 0) {
-		drawMenu(m_rootMenuNode.m_firstChild);
-	}
-	Graphic.SetViewport();
+	return;
 }
 
 /*
@@ -756,77 +310,486 @@ void CDbgMenuPcs::calc()
 
 /*
  * --INFO--
- * PAL Address: 0x8012d200
- * PAL Size: 4b
+ * PAL Address: 0x8012cd10
+ * PAL Size: 120b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CDbgMenuPcs::destroy()
+void CDbgMenuPcs::draw()
 {
-	return;
+	m_currentVtxFmt = -1;
+	Graphic.InitDebugString();
+	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
+	GXSetNumChans(1);
+	if (m_rootMenuNode.m_firstChild != 0) {
+		drawMenu(m_rootMenuNode.m_firstChild);
+	}
+	Graphic.SetViewport();
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012d204
- * PAL Size: 68b
+ * PAL Address: 0x8012cac0
+ * PAL Size: 592b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CDbgMenuPcs::create()
+void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 {
-	memset(m_menuPool, 0, sizeof(m_menuPool));
-	m_defaultMenu = 0;
-	m_selectedMenu = 0;
+	CDM* head = menu;
+	do {
+		m_currentMenu = menu;
+		switch (menu->m_id) {
+		case 100:
+			menu->m_state = CFlatEventMask() != 0;
+			break;
+		case 0x65:
+			menu->m_state = (s8)((s32)(((u32)(u8)CFlatGameFlags() << 0x18) & 0xC0000000) >> 0x1F) != 0;
+			break;
+		case 0x66:
+			menu->m_state = (s8)((s32)(((u32)(u8)CFlatGameFlags() << 0x1C) & 0xC0000000) >> 0x1F) != 0;
+			break;
+		case 0x67:
+			menu->m_state = (m_dbgFlags >> 0) & 1;
+			break;
+		case 0x68:
+			menu->m_state = (m_dbgFlags >> 1) & 1;
+			break;
+		case 0x69:
+			menu->m_state = (m_dbgFlags >> 2) & 1;
+			break;
+		case 0x6A:
+			menu->m_state = (m_dbgFlags >> 3) & 1;
+			break;
+		case 0x6B:
+			menu->m_state = (m_dbgFlags >> 4) & 1;
+			break;
+		case 0x6C:
+			menu->m_state = (m_dbgFlags >> 5) & 1;
+			break;
+		case 0x6D:
+			menu->m_state = (m_dbgFlags >> 6) & 1;
+			break;
+		case 0x6E:
+			menu->m_state = (m_dbgFlags >> 7) & 1;
+			break;
+		case 0x6F:
+			menu->m_state = (m_dbgFlags >> 8) & 1;
+			break;
+		case 0x70:
+			menu->m_state = (m_dbgFlags >> 9) & 1;
+			break;
+		case 0x71:
+			menu->m_state = (m_dbgFlags >> 10) & 1;
+			break;
+		case 0x72:
+			menu->m_state = (m_dbgFlags >> 11) & 1;
+			break;
+		case 0x73:
+			menu->m_state = (m_dbgFlags >> 12) & 1;
+			break;
+		case 0x75:
+			menu->m_state = g_map_draw_prof != 0;
+			break;
+		case 0x76:
+			menu->m_state = g_IsDrawHeapSize != 0;
+			break;
+		case 0x78:
+			menu->m_state = (m_dbgFlags >> 13) & 1;
+			break;
+		case 0x79:
+			menu->m_state = (m_dbgFlags >> 14) & 1;
+			break;
+		case 0x7A:
+			menu->m_state = (m_dbgFlags >> 15) & 1;
+			break;
+		}
+
+		menu->m_drawX = menu->m_parent->m_width + menu->m_width;
+		menu->m_drawY = menu->m_parent->m_height + menu->m_height;
+
+		if (menu->m_firstChild != 0) {
+			calcMenu(menu->m_firstChild);
+		}
+
+		menu = menu->m_next;
+	} while (menu != head);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012d248
- * PAL Size: 20b
+ * Address:	TODO
+ * Size:	TODO
+ */
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012c8d8
+ * PAL Size: 488b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CDbgMenuPcs::GetTable(unsigned long index)
+void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 {
-	return reinterpret_cast<int>(&m_table + index);
+	CDM* head = menu;
+
+	do {
+		m_currentMenu = menu;
+		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, 640.0f, 448.0f, 0.0f, 1.0f);
+
+		switch (menu->m_type) {
+		case 0:
+			drawWindow(menu->m_y, 0, 0, menu->m_unk18, menu->m_unk1C, menu->m_text);
+			break;
+		case 1:
+			drawFont(menu->m_y, 0, 0, menu->m_text);
+			break;
+		case 2: {
+			drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
+
+			const char* stateText = menu->m_state == 1 ? "ON" : (menu->m_state == 0 ? "OFF" : "?");
+			drawFont(9, 0x10, 8, const_cast<char*>(stateText));
+			break;
+		}
+		case 3:
+			drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
+			break;
+		}
+
+		menu = menu->m_next;
+	} while (menu != head);
+
+	menu = head;
+	do {
+		if (menu->m_firstChild != 0) {
+			drawMenu(menu->m_firstChild);
+		}
+		menu = menu->m_next;
+	} while (menu != head);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012d25c
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * Address:	TODO
+ * Size:	TODO
  */
-void CDbgMenuPcs::Quit()
+void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
 {
-	return;
+    if (m_currentVtxFmt != vtxFmt) {
+        switch (vtxFmt) {
+        case 0:
+            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP,
+                          GX_AF_SPOT);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+            break;
+
+        case 1:
+            GXClearVtxDesc();
+            GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+            GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+            GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+            GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+            break;
+        }
+
+        m_currentVtxFmt = vtxFmt;
+    }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012d260
- * PAL Size: 40b
+ * PAL Address: 0x8012c274
+ * PAL Size: 1336b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CDbgMenuPcs::Init()
+void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, char* text)
 {
-	m_rootMenuNode.m_id = 0;
-	m_rootMenuNode.m_unk18 = 0x280;
-	m_rootMenuNode.m_unk1C = 0x1C0;
-	m_dbgFlags = 0x8940;
+	static GXColor l[2] = {{0xFF, 0xFF, 0xFF, 0x80}, {0, 0, 0, 0x80}};
+	static u32 c[4] = {0x0000FFC0, 0x4040FFC0, 0x4040FFC0, 0x8080FFC0};
+	changeVtxFmt(1);
+	float z = 0.0f;
+
+	if ((flags & 1) == 0) {
+		GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT1, 4);
+
+		for (int vertexIndex = 0; vertexIndex < 4; vertexIndex++) {
+			GXPosition3f32((float)(x + ((vertexIndex & 1) ? width : 0)),
+			              (float)(y + ((vertexIndex & 2) ? height : 0)), z);
+			GXColor1u32(c[vertexIndex]);
+		}
+	}
+
+	int fillColorIndex = (flags >> 1) & 1;
+
+	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
+	int right = x + width;
+	int bottom = y + height;
+	GXPosition3f32((float)right, (float)y, z);
+	GXColor1u32(*reinterpret_cast<u32*>(&l[fillColorIndex]));
+	GXPosition3f32((float)x, (float)y, z);
+	GXColor1u32(*reinterpret_cast<u32*>(&l[fillColorIndex]));
+	GXPosition3f32((float)x, (float)bottom, z);
+	GXColor1u32(*reinterpret_cast<u32*>(&l[fillColorIndex]));
+
+	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
+	GXPosition3f32((float)right, (float)y, z);
+	GXColor1u32(*reinterpret_cast<u32*>(&l[1 - fillColorIndex]));
+	GXPosition3f32((float)right, (float)bottom, z);
+	GXColor1u32(*reinterpret_cast<u32*>(&l[1 - fillColorIndex]));
+	GXPosition3f32((float)x, (float)bottom, z);
+	GXColor1u32(*reinterpret_cast<u32*>(&l[1 - fillColorIndex]));
+
+	if (m_currentMenu->m_statusBits.m_selected != 0) {
+		u8 alpha = 0xC0;
+
+		if ((System.m_frameCounter >> 2 & 1) != 0) {
+			alpha = 0xFF;
+		}
+
+		GXColor highlightColor = {0, 0, 0, 0x80};
+		highlightColor.r = alpha;
+		highlightColor.g = alpha;
+		highlightColor.b = alpha;
+
+		GXBegin(GX_LINESTRIP, GX_VTXFMT1, 5);
+		int left = x - 1;
+		int top = y - 1;
+		int rightEdge = right + 1;
+		int bottomEdge = bottom + 1;
+		GXPosition3f32((float)rightEdge, (float)top, z);
+		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
+		GXPosition3f32((float)left, (float)top, z);
+		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
+		GXPosition3f32((float)left, (float)bottomEdge, z);
+		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
+		GXPosition3f32((float)rightEdge, (float)bottomEdge, z);
+		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
+		GXPosition3f32((float)rightEdge, (float)top, z);
+		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));
+	}
+
+	if (text != NULL) {
+		drawFont(5, x + 8, y - 6, text);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012bd4c
+ * PAL Size: 1320b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
+{
+	changeVtxFmt(0);
+
+	GXColor mainColor = {0xFF, 0xFF, 0xFF, 0xFF};
+	if ((flags & 2) != 0) {
+		mainColor.b = 0;
+		mainColor.g = 0;
+		mainColor.r = 0;
+	}
+
+	if ((flags & 4) != 0) {
+		drawFont((flags & ~4) | 2, x - 1, y, text);
+		drawFont((flags & ~4) | 2, x, y + 1, text);
+		drawFont((flags & ~4) | 2, x + 1, y, text);
+		drawFont((flags & ~4) | 2, x, y - 1, text);
+	}
+
+	GXSetChanMatColor(GX_COLOR0A0, mainColor);
+
+	int fontSize = (flags & 1) ? 8 : 10;
+	if ((flags & 8) != 0) {
+		int textLen = strlen(text);
+		x -= (u32)(fontSize * textLen) >> 1;
+		y -= fontSize / 2;
+	}
+	Graphic.DrawDebugStringDirect(x, y, text, fontSize);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012bb0c
+ * PAL Size: 576b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CDbgMenuPcs::searchID(int id, CDbgMenuPcs::CDM& root)
+{
+	CDM* node = &root;
+	do {
+		if (node->m_id == id) {
+			return (int)node;
+		}
+		if (node->m_firstChild != 0) {
+			CDM* found = reinterpret_cast<CDM*>(searchID(id, *node->m_firstChild));
+			if (found != 0) {
+				return reinterpret_cast<int>(found);
+			}
+		}
+		node = node->m_next;
+		if (node == &root) {
+			return 0;
+		}
+	} while (1);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012b8c0
+ * PAL Size: 588b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CDbgMenuPcs::Add()
+{
+    CDMParam param;
+    CDMParam rootParam;
+    CDMParam nodeParam;
+    CDMParam actionParam;
+    int y;
+
+    if (m_rootMenuNode.m_firstChild != 0) {
+        return;
+    }
+
+    memset(&param, 0, sizeof(param));
+    memset(&rootParam, 0, sizeof(rootParam));
+    rootParam.m_type = 0;
+    rootParam.m_flags = 0;
+    rootParam.m_width = 100;
+    rootParam.m_height = 0x32;
+    rootParam.m_unk18 = 0xDC;
+    rootParam.m_unk1C = 0x180;
+    rootParam.m_unk20 = 0;
+    rootParam.m_unk28 = 0;
+    rootParam.m_unk2C = 0;
+    param = rootParam;
+    param.m_text = "Debug";
+    Add(0, 10, param);
+
+    y = 10;
+    for (int index = 0; index < static_cast<int>(sizeof(tWork) / sizeof(tWork[0])); index++) {
+        DbgMenuDef* menuDefs = &tWork[index];
+        memset(&nodeParam, 0, sizeof(nodeParam));
+        nodeParam.m_type = 1;
+        nodeParam.m_flags = 0;
+        nodeParam.m_width = 10;
+        nodeParam.m_height = y;
+        nodeParam.m_unk18 = 0;
+        nodeParam.m_unk1C = 0;
+        nodeParam.m_unk20 = 0;
+        nodeParam.m_unk28 = 0;
+        nodeParam.m_unk2C = 0;
+        param = nodeParam;
+        param.m_text = const_cast<char*>(menuDefs->text);
+        Add(10, 1, param);
+
+        u32 actionType;
+        u32 actionFlags = menuDefs->actionFlags;
+        actionType = menuDefs->actionType;
+
+        memset(&actionParam, 0, sizeof(actionParam));
+        actionParam.m_type = (int)actionType;
+        actionParam.m_flags = actionFlags;
+        actionParam.m_width = 0xB4;
+        actionParam.m_height = y;
+        actionParam.m_unk18 = 0;
+        actionParam.m_unk1C = 0;
+        actionParam.m_unk20 = 0;
+        actionParam.m_unk28 = 0;
+        actionParam.m_unk2C = 0;
+
+        param = actionParam;
+        Add(10, (int)menuDefs->id, param);
+
+        y += 0x10;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012b710
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
+{
+	CDM* parentMenu = reinterpret_cast<CDM*>(searchID(parentID, m_rootMenuNode));
+	CDM* menu = searchFreeCDM();
+
+	memset(&menu->m_status, 0, sizeof(CDM) - sizeof(CDMParam));
+	menu->m_statusBits.m_used = 1;
+
+	menu->m_type = param.m_type;
+	menu->m_flags = param.m_flags;
+	menu->m_x = param.m_x;
+	menu->m_y = param.m_y;
+	menu->m_width = param.m_width;
+	menu->m_height = param.m_height;
+	menu->m_unk18 = param.m_unk18;
+	menu->m_unk1C = param.m_unk1C;
+	menu->m_unk20 = param.m_unk20;
+	menu->m_text = param.m_text;
+	menu->m_unk28 = param.m_unk28;
+	menu->m_unk2C = param.m_unk2C;
+	menu->m_state = static_cast<s32>(param.m_unk30);
+
+	menu->m_parent = parentMenu;
+	menu->m_prev = menu;
+	menu->m_next = menu;
+	menu->m_id = id;
+
+	if (parentMenu->m_firstChild != 0) {
+		CDM* child = parentMenu->m_firstChild;
+		int found = 0;
+		do {
+			if (found == 0 && ((child->m_flags & 1) != 0)) {
+				found = 1;
+				child->m_statusBits.m_selected = 1;
+				m_selectedMenu = child;
+			}
+			child = child->m_next;
+		} while (child != parentMenu->m_firstChild);
+
+		child->m_prev->m_next = menu;
+		menu->m_prev = child->m_prev;
+		child->m_prev = menu;
+		menu->m_next = child;
+	} else {
+		parentMenu->m_firstChild = menu;
+		if ((menu->m_flags & 1) != 0) {
+			menu->m_statusBits.m_selected = 1;
+			m_selectedMenu = menu;
+		}
+		if ((menu->m_flags & 2) != 0) {
+			m_defaultMenu = menu;
+		}
+	}
 }
 
 /*

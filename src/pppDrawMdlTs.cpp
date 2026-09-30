@@ -45,80 +45,6 @@ static inline pppCVECTOR* PppDrawMdlTsColor(_pppPObject* obj, _pppCtrlTable* ctr
 
 /*
  * --INFO--
- * PAL Address: 0x800880C0
- * PAL Size: 48b
- * EN Address: 0x80087A5C
- * EN Size: 48b
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDrawMdlTsCon(_pppPObject* obj, _pppCtrlTable* ctrl)
-{
-    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
-    f32 zero = 0.0f;
-
-    texCoords[5] = zero;
-    texCoords[4] = zero;
-    texCoords[3] = zero;
-    texCoords[2] = zero;
-    texCoords[1] = zero;
-    texCoords[0] = zero;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800880A0
- * PAL Size: 32b
- * EN Address: 0x80087A3C
- * EN Size: 32b
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDrawMdlTsCon3(_pppPObject* obj, _pppCtrlTable* ctrl)
-{
-    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
-    f32 zero = 0.0f;
-
-    texCoords[5] = zero;
-    texCoords[2] = zero;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80087FD0
- * PAL Size: 208b
- * EN Address: 0x8008796C
- * EN Size: 208b
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl)
-{
-    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
-
-    if (ppvUserStopPartF != 0) {
-        return;
-    }
-
-    texCoords[1] += texCoords[2];
-    texCoords[0] += texCoords[1];
-    texCoords[4] += texCoords[5];
-    texCoords[3] += texCoords[4];
-
-    if (data->m_graphId != obj->m_graphId) {
-        return;
-    }
-
-    texCoords[0] += data->m_texCoordAdd[0];
-    texCoords[1] += data->m_texCoordAdd[1];
-    texCoords[2] += data->m_texCoordAdd[2];
-    texCoords[3] += data->m_texCoordAdd[3];
-    texCoords[4] += data->m_texCoordAdd[4];
-    texCoords[5] += data->m_texCoordAdd[5];
-}
-
-/*
- * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 208b
  * EN Address: TODO
@@ -165,4 +91,77 @@ void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _
     }
 
     pppDrawDrawMdlTs0(obj, data, ctrl);
+}
+/*
+ * --INFO--
+ * PAL Address: 0x80087FD0
+ * PAL Size: 208b
+ * EN Address: 0x8008796C
+ * EN Size: 208b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl)
+{
+    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
+
+    if (ppvUserStopPartF != 0) {
+        return;
+    }
+
+    texCoords[1] += texCoords[2];
+    texCoords[0] += texCoords[1];
+    texCoords[4] += texCoords[5];
+    texCoords[3] += texCoords[4];
+
+    if (data->m_graphId != obj->m_graphId) {
+        return;
+    }
+
+    texCoords[0] += data->m_texCoordAdd[0];
+    texCoords[1] += data->m_texCoordAdd[1];
+    texCoords[2] += data->m_texCoordAdd[2];
+    texCoords[3] += data->m_texCoordAdd[3];
+    texCoords[4] += data->m_texCoordAdd[4];
+    texCoords[5] += data->m_texCoordAdd[5];
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800880A0
+ * PAL Size: 32b
+ * EN Address: 0x80087A3C
+ * EN Size: 32b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDrawMdlTsCon3(_pppPObject* obj, _pppCtrlTable* ctrl)
+{
+    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
+    f32 zero = 0.0f;
+
+    texCoords[5] = zero;
+    texCoords[2] = zero;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800880C0
+ * PAL Size: 48b
+ * EN Address: 0x80087A5C
+ * EN Size: 48b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDrawMdlTsCon(_pppPObject* obj, _pppCtrlTable* ctrl)
+{
+    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
+    f32 zero = 0.0f;
+
+    texCoords[5] = zero;
+    texCoords[4] = zero;
+    texCoords[3] = zero;
+    texCoords[2] = zero;
+    texCoords[1] = zero;
+    texCoords[0] = zero;
 }

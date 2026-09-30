@@ -633,7 +633,7 @@ config.libs = [
             Object(Matching, "pppDrawMatrixNoRot.cpp"),
             Object(Matching, "pppDrawMatrixWood.cpp"),
             Object(Matching, "pppDrawMdl.cpp"),
-            Object(NonMatching, "pppDrawMdlTs.cpp"),
+            Object(Matching, "pppDrawMdlTs.cpp"),
             Object(Matching, "pppDrawMng.cpp"),
             Object(Matching, "pppDrawShape.cpp"),
             Object(Matching, "pppDrawShape2.cpp"),

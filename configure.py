@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Set
 
+from tools.gba_project import configure_gba
 from tools.project import (
     Object,
     ProgressCategory,
@@ -63,6 +64,12 @@ parser.add_argument(
     metavar="BINARY",
     type=Path,
     help="path to binutils (optional)",
+)
+parser.add_argument(
+    "--gba-binutils",
+    metavar="DIR",
+    type=Path,
+    help="directory containing arm-none-eabi binutils for the GBA programs (optional)",
 )
 parser.add_argument(
     "--compilers",
@@ -1317,6 +1324,8 @@ config.progress_report_args = [
 mode = trailing_mode or args.mode
 
 if mode == "configure":
+    # GBA multiboot programs are part of the PAL build and progress report
+    configure_gba(config, args.gba_binutils)
     # Write build.ninja and objdiff.json
     generate_build(config)
 elif mode == "progress":

@@ -221,6 +221,11 @@ class ProjectConfig:
             None  # Flags to `objdiff-cli report generate`
         )
 
+        # Additional build graphs included in build.ninja (e.g. GBA programs)
+        self.subninjas: List[Path] = []  # Ninja files included with `subninja`
+        self.extra_objdiff_units: List[Dict[str, Any]] = []  # Appended to objdiff.json
+        self.extra_source_inputs: List[str] = []  # Outputs added to `all_source`
+
         # Progress fancy printing
         self.progress_use_fancy: bool = False
         self.progress_code_fancy_frac: int = 0
@@ -1305,9 +1310,14 @@ def generate_build_ninja(
         n.build(
             outputs="all_source",
             rule="phony",
-            inputs=source_inputs,
+            inputs=[*source_inputs, *config.extra_source_inputs],
         )
         n.newline()
+
+        for subninja in config.subninjas:
+            n.subninja(str(subninja).replace(os.sep, "/"))
+        if config.subninjas:
+            n.newline()
 
         ###
         # Check hash
@@ -1741,6 +1751,8 @@ def generate_objdiff_config(
             if config.progress_each_module:
                 progress_categories.append(module["name"])
             add_unit(unit, module["name"], progress_categories)
+
+    objdiff_config["units"].extend(config.extra_objdiff_units)
 
     # Add progress categories
     def add_category(id: str, name: str):

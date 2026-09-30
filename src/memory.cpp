@@ -1591,12 +1591,21 @@ void CAmemCacheSet::AmemPrev()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::GetFree()
+inline short CAmemCacheSet::GetFree()
 {
-	// TODO
+    for (int i = 0; i < m_cacheCount; i++) {
+        if (cacheEntryAt(this, i).m_inUse == 0) {
+            return static_cast<short>(i);
+        }
+    }
+    return -1;
 }
 
 /*
@@ -1672,23 +1681,14 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
  */
 int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCopy)
 {
-    short index;
+    short index = GetFree();
 
-    for (int i = 0; i < m_cacheCount; i++) {
-        if (cacheEntryAt(this, i).m_inUse == 0) {
-            index = static_cast<short>(i);
-            goto found;
-        }
-    }
-    index = -1;
-
-found:
     if (index == -1) {
         return -1;
     }
 
     int allocSize = (static_cast<unsigned int>(size) + 0x1F) & ~0x1F;
-    CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + index * sizeof(CAmemCache));
+    CAmemCache& entry = m_cacheTable[index];
     entry.m_inUse = 1;
     entry.m_type = static_cast<unsigned char>(type);
     entry.m_dmaCopy = static_cast<unsigned char>(dmaCopy);

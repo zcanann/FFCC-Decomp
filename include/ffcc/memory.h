@@ -167,7 +167,7 @@ public:
     void AmemGetLock();
     void AmemAlloc(int);
     void AmemPrev();
-    void GetFree();
+    short GetFree();
     int GetData(short, char*, int);
     int SetData(void*, int, CAmemCache::TYPE, int);
     int IsEnable(short);

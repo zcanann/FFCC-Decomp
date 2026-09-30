@@ -1538,7 +1538,6 @@ void GbaQueue::LoadEnemyStat()
 void GbaQueue::LoadMapItemStat()
 {
 	GbaQueueMapEntity localMapItems[16];
-	GbaQueueMapEntity* mapItemEntry;
 	char numMapItems;
 	CGObject* object;
 	int i;
@@ -1548,34 +1547,32 @@ void GbaQueue::LoadMapItemStat()
 
 	if (CFlat.m_initAllFinishedFlag != 0) {
 		object = CFlat.FindGObjFirst();
-		mapItemEntry = localMapItems;
 
 		while (object != 0) {
 			if ((object->m_objectFlags & 0x100) != 0) {
 				const int dropItemCode = object->m_dropItemCodes[0];
 				if ((dropItemCode & 0xC000) == 0x4000) {
-					mapItemEntry->m_kind = 4;
+					localMapItems[numMapItems].m_kind = 4;
 				} else {
 					const SItemFlatRow* itemRow = &reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[dropItemCode];
 					const int bossStageLimit = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex] + 2;
 					const int itemStage = itemRow->m_stage;
 					if (itemStage >= bossStageLimit) {
-						mapItemEntry->m_kind = 5;
+						localMapItems[numMapItems].m_kind = 5;
 					} else {
-						mapItemEntry->m_kind = 4;
+						localMapItems[numMapItems].m_kind = 4;
 					}
 				}
 
 				int isDispRader = object->IsDispRader();
-				numMapItems++;
-				mapItemEntry->m_radarEnabled = isDispRader != 0;
+				localMapItems[numMapItems].m_radarEnabled = isDispRader != 0;
 				{
 					int posX = static_cast<int>(object->m_worldPosition.x / 3.0f);
 					int posZ = static_cast<int>(object->m_worldPosition.z / 3.0f);
-					mapItemEntry->m_posX = static_cast<short>(posX);
-					mapItemEntry->m_posZ = static_cast<short>(posZ);
+					localMapItems[numMapItems].m_posX = static_cast<short>(posX);
+					localMapItems[numMapItems].m_posZ = static_cast<short>(posZ);
 				}
-				mapItemEntry++;
+				numMapItems++;
 			}
 
 			object = CFlat.FindGObjNext(object);

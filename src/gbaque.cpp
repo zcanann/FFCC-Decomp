@@ -3551,8 +3551,8 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		work = (*foodBasePtr)->m_shopList[i];
-		strcpy(itemNameScratch, Game.m_cFlatDataArr[1].TableStrings(6)[work]);
+		const int nameItem = (*foodBasePtr)->m_shopList[i];
+		strcpy(itemNameScratch, Game.m_cFlatDataArr[1].TableStrings(6)[nameItem]);
 		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 
 		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
@@ -3624,10 +3624,9 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 	totalSize += 0x200;
 
-	const float userRate =
-		0.25f *
-		static_cast<float>(
-			static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
+	float userRate = static_cast<float>(
+		static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
+	userRate *= 0.25f;
 	for (i = 0; i < 0x40; i++) {
 		work = (*foodBasePtr)->m_inventoryItems[i];
 		if (work > 0) {

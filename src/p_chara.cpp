@@ -48,7 +48,6 @@ static const char lbl_80330260[] = "CRef";
 #include <math.h>
 
 CCharaPcs CharaPcs;
-CLightPcs::CBumpLight* gCharaPartWorkPtr = 0;
 
 static const char s_CCharaPcs_GAME_801D9128[] = "CCharaPcs(GAME)";
 static const char s_CCharaPcs_VIEWER_801D9138[] = "CCharaPcs(VIEWER)";
@@ -678,7 +677,7 @@ void CCharaPcs::create()
     bumpLight.m_offsetX = 0.0f;
     bumpLight.m_offsetZ = 0.0f;
 
-    gCharaPartWorkPtr = LightPcs.AddBump(&bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4);
+    g_pLight = LightPcs.AddBump(&bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4);
     Chara.Create();
 }
 
@@ -712,7 +711,7 @@ void CCharaPcs::destroy()
 {
     Reset(static_cast<RESET>(1));
     LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(0));
-    gCharaPartWorkPtr = 0;
+    g_pLight = 0;
 
     if (m_handleList != 0) {
         delete m_handleList;
@@ -808,7 +807,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     }
 
 complete:
-    gCharaPartWorkPtr->m_bumpShade[3] = 0xFF;
+    g_pLight->m_bumpShade[3] = 0xFF;
     FreeMergeMask(this) = 0;
 }
 
@@ -1068,7 +1067,7 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
  */
 void CCharaPcs::SetSpecularAlpha(int alpha)
 {
-    gCharaPartWorkPtr->m_bumpShade[3] = (u8)alpha;
+    g_pLight->m_bumpShade[3] = (u8)alpha;
 }
 
 /*

@@ -201,6 +201,7 @@ void CCharaPcs::drawViewer()
         color.b = 0x80;
         color.a = 0x20;
         GXLoadPosMtxImm(cameraMtx, 0);
+        float gridY = 0.0f;
         float gridSpacing = 10.0f;
         float gridMin = 100.0f;
         float gridMax = -100.0f;
@@ -210,10 +211,10 @@ void CCharaPcs::drawViewer()
             GXSetChanMatColor(GX_COLOR0A0, color);
             GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 4);
             float x = gridSpacing * (float)i;
-            GXPosition3f32(x, 0.0f, gridMin);
-            GXPosition3f32(x, 0.0f, gridMax);
-            GXPosition3f32(gridMax, 0.0f, x);
-            GXPosition3f32(gridMin, 0.0f, x);
+            GXPosition3f32(x, gridY, gridMin);
+            GXPosition3f32(x, gridY, gridMax);
+            GXPosition3f32(gridMax, gridY, x);
+            GXPosition3f32(gridMin, gridY, x);
         }
     }
 
@@ -602,7 +603,7 @@ void CCharaPcs::destroyViewer()
 
     Chara.Destroy();
     LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(0));
-    gCharaPartWorkPtr = 0;
+    g_pLight = 0;
 
     ReleaseShared(m_viewerSavedAnim);
 
@@ -666,18 +667,8 @@ void CCharaPcs::createViewer()
     }
 
     for (int colorIndex = 0; colorIndex < 5; colorIndex++) {
-        const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
-        CColor colorTmp;
-        float scale = static_cast<float>(colorIndex) * 0.25f;
-        colorTmp.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
-        colorTmp.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
-        colorTmp.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
-        colorTmp.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
-        CColor colorCopy(colorTmp);
-        self->m_viewerChoiceColor[colorIndex].color.r = colorCopy.color.r;
-        self->m_viewerChoiceColor[colorIndex].color.g = colorCopy.color.g;
-        self->m_viewerChoiceColor[colorIndex].color.b = colorCopy.color.b;
-        self->m_viewerChoiceColor[colorIndex].color.a = colorCopy.color.a;
+        self->m_viewerChoiceColor[colorIndex] =
+            CColor(0xFF, 0xFF, 0xFF, 0xFF) * (static_cast<float>(colorIndex) / 4.0f);
     }
 
     _GXColor clearColor;
@@ -752,7 +743,7 @@ void CCharaPcs::createViewer()
     bumpLight.m_bumpShade[3] = 0xFF;
     bumpLight.m_offsetX = 0.0f;
     bumpLight.m_offsetZ = 0.0f;
-    gCharaPartWorkPtr = LightPcs.AddBump(&bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4);
+    g_pLight = LightPcs.AddBump(&bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4);
 
     Chara.Create();
 }

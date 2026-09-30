@@ -117,6 +117,6 @@ typedef int CBumpLight_size_check[(sizeof(CLightPcs::CBumpLight) == 0x138) ? 1 :
 typedef int CLightPcs_size_check[(sizeof(CLightPcs) == 0x43B0) ? 1 : -1];
 
 extern CLightPcs LightPcs;
-extern CLightPcs::CBumpLight* gCharaPartWorkPtr;
+extern CLightPcs::CBumpLight* g_pLight;
 
 #endif // _FFCC_P_LIGHT_H_

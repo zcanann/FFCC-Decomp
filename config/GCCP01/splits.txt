@@ -1174,7 +1174,7 @@ p_chara_viewer.cpp:
 	.text       start:0x800BD848 end:0x800BF620
 	.rodata     start:0x801DA7E8 end:0x801DA970
 	.bss        start:0x802F2600 end:0x802F2628
-	.sbss       start:0x8032EDC4 end:0x8032EDE0
+	.sbss       start:0x8032EDC0 end:0x8032EDE0
 	.sdata2     start:0x80330BE0 end:0x80330C60
 
 chara_anim.cpp:

@@ -807,7 +807,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				CMaterialSet* createdSet = m_data->m_materialSet;
 				createdSet->m_materials.SetDefaultSize(0x20);
 				createdSet->m_materials.SetGrow(0);
-				m_data->m_materialSet->Create(chunkFile, 0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0), gCharaPartWorkPtr);
+				m_data->m_materialSet->Create(chunkFile, 0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0), g_pLight);
 			} else if (chunk.m_id == 0x54415354) {
 				if (chunk.m_arg0 != 0) {
 					CTexAnimSet* texAnimSet =
@@ -1999,7 +1999,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 		CopyCharaMaterialEnv();
 		if (mesh->m_data->m_infoWord1 != 0) {
-			LightPcs.SetBumpTexMatirx(meshMtx, gCharaPartWorkPtr, 0, 0);
+			LightPcs.SetBumpTexMatirx(meshMtx, g_pLight, 0, 0);
 		}
 		MaterialMan.SetObjMatrix(view, meshMtx);
 		GXSetArray((GXAttr)9, mesh->m_workPositions, 6);

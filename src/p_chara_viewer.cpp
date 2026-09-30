@@ -84,24 +84,6 @@ static inline int ViewerModelPosQuant(CChara::CModel* model)
     return model->m_data->m_posQuant;
 }
 
-static const char s_no_texture[] = "no texture...";
-static const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
-static const char s_gpu_profile_fmt[] = "GPU = %f.5%%(C = %.5f%% G = %.5f%%)";
-static const char s_calc_viewer_fmt[] = "CCharaPcs.calcViewer: %s\n";
-static const char s_anim_path_fmt[] = "%splot%d.cha";
-static const char s_frame_speed_fmt[] = "FRAME = %.2f SPEED=%.2f";
-static const char s_iframe_fmt[] = "I = %s IFRAME = %.2f %s";
-static const char s_cont_fmt[] = "CONT = %d";
-static const char s_cpu_profile_fmt[] = "CPU = %.5f%%(M = %.5f%% S = %.5f%%) %dNODES";
-static const char s_load_model[] = "CCharaPcs LoadModel";
-static const char s_load_texture[] = "CCharaPcs LoadTexture";
-static const char s_load_anim[] = "CCharaPcs LoadAnim";
-static const char s_default_chm_path[] = "plot/kmitsuru/plot.chm";
-static const char s_default_chd_path[] = "plot/kmitsuru/plot.chd";
-static const char s_default_cha_path[] = "plot/kmitsuru/plot.cha";
-static const char s_default_tex_path[] = "plot/kmitsuru/plot.tex";
-static const char s_back_tex_fmt[] = "%sback.tex";
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -222,7 +204,7 @@ void CCharaPcs::drawViewer()
         CChara::CModel* model = self->m_viewerModel[i];
         if (model != 0) {
             if (ViewerModelTextureSet(model) == 0) {
-                Graphic.Printf(const_cast<char*>(s_no_texture));
+                Graphic.Printf("no texture...");
             } else {
                 CStopWatch watch;
                 watch.Reset();
@@ -249,10 +231,10 @@ void CCharaPcs::drawViewer()
                 watch.Stop();
                 float cpuTime = watch.Get();
                 watch.Start();
-                Graphic._WaitDrawDone(const_cast<char*>(s_p_chara_viewer_cpp), 0x2A7);
+                Graphic._WaitDrawDone("p_chara_viewer.cpp", 0x2A7);
                 watch.Stop();
                 if (i == 0) {
-                    Graphic.Printf(const_cast<char*>(s_gpu_profile_fmt), watch.Get(), cpuTime, watch.Get() - cpuTime);
+                    Graphic.Printf("GPU = %f.5%%(C = %.5f%% G = %.5f%%)", watch.Get(), cpuTime, watch.Get() - cpuTime);
                 }
             }
         }
@@ -284,7 +266,7 @@ void CCharaPcs::calcViewer()
     if ((loadModel != 0) || (self->m_viewerLoadAnim != 0) || (self->m_viewerLoadTexture != 0) ||
         (self->m_viewerLoadAnimContinuous != 0)) {
         if (loadModel != 0) {
-            System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerModelPath);
+            System.Printf("CCharaPcs.calcViewer: %s\n", self->m_viewerModelPath);
             CFile::CHandle* fileHandle = File.Open(self->m_viewerModelPath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 ReleaseShared(self->m_viewerModel[1]);
@@ -301,7 +283,7 @@ void CCharaPcs::calcViewer()
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
                 CChara::CModel* model =
-                    new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0xEA) CChara::CModel;
+                    new (CharaPcs.m_stage, "p_chara_viewer.cpp", 0xEA) CChara::CModel;
                 self->m_viewerModel[0] = model;
                 self->m_viewerModel[0]->Create(File.m_readBuffer, self->m_loadStages[CCharaPcs::LOAD_STAGE_MODEL]);
                 self->m_viewerModel[0]->m_flags10CBits.m_flag10C_40 = 1;
@@ -311,7 +293,7 @@ void CCharaPcs::calcViewer()
         }
 
         if ((self->m_viewerLoadDynamics != 0) && (self->m_viewerModel[0] != 0)) {
-            System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerDynamicsPath);
+            System.Printf("CCharaPcs.calcViewer: %s\n", self->m_viewerDynamicsPath);
             CFile::CHandle* fileHandle = File.Open(self->m_viewerDynamicsPath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 File.Read(fileHandle);
@@ -332,13 +314,13 @@ void CCharaPcs::calcViewer()
             self->m_viewerAnimLoadedCount = 0;
 
             if (self->m_viewerLoadAnim != 0) {
-                System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerAnimPath);
+                System.Printf("CCharaPcs.calcViewer: %s\n", self->m_viewerAnimPath);
                 CFile::CHandle* fileHandle = File.Open(self->m_viewerAnimPath, 0, CFile::PRI_LOW);
                 if (fileHandle != 0) {
                     File.Read(fileHandle);
                     File.SyncCompleted(fileHandle);
                     CChara::CAnim* anim =
-                        new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x111) CChara::CAnim;
+                        new (CharaPcs.m_stage, "p_chara_viewer.cpp", 0x111) CChara::CAnim;
                     self->m_viewerAnim[0] = anim;
                     self->m_viewerAnim[0]->Create(File.m_readBuffer, self->m_loadStages[CCharaPcs::LOAD_STAGE_ANIM]);
                     File.Close(fileHandle);
@@ -346,8 +328,8 @@ void CCharaPcs::calcViewer()
                 self->m_viewerLoadAnim = 0;
             } else {
                 for (int animIndex = 0; animIndex < self->m_viewerAnimRequestedCount; animIndex++) {
-                    sprintf(pathBuf, s_anim_path_fmt, self->m_viewerAnimPath, self->m_viewerAnimLoadedCount);
-                    System.Printf(const_cast<char*>(s_calc_viewer_fmt), pathBuf);
+                    sprintf(pathBuf, "%splot%d.cha", self->m_viewerAnimPath, self->m_viewerAnimLoadedCount);
+                    System.Printf("CCharaPcs.calcViewer: %s\n", pathBuf);
                     CFile::CHandle* fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
                     if (fileHandle != 0) {
                         CChara::CAnim* oldAnim = self->m_viewerAnimBank[self->m_viewerAnimLoadedCount];
@@ -361,7 +343,7 @@ void CCharaPcs::calcViewer()
                         File.Read(fileHandle);
                         File.SyncCompleted(fileHandle);
                         CChara::CAnim* anim =
-                            new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x124) CChara::CAnim;
+                            new (CharaPcs.m_stage, "p_chara_viewer.cpp", 0x124) CChara::CAnim;
                         self->m_viewerAnimBank[self->m_viewerAnimLoadedCount] = anim;
                         self->m_viewerAnimBank[self->m_viewerAnimLoadedCount]->Create(File.m_readBuffer,
                                                                                       self->m_loadStages[CCharaPcs::LOAD_STAGE_ANIM]);
@@ -378,7 +360,7 @@ void CCharaPcs::calcViewer()
         }
 
         if (self->m_viewerLoadTexture != 0) {
-            System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerTexturePath);
+            System.Printf("CCharaPcs.calcViewer: %s\n", self->m_viewerTexturePath);
             CFile::CHandle* fileHandle = File.Open(self->m_viewerTexturePath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 ReleaseShared(self->m_viewerTextureSet[0]);
@@ -434,19 +416,8 @@ void CCharaPcs::calcViewer()
     float frameAdvance;
     if (self->m_viewerStepMode != 0) {
         frameAdvance = 0.0f;
-        float step;
-        if ((triggerButtons & 0x100) != 0) {
-            step = 1.0f;
-        } else {
-            step = frameAdvance;
-        }
-        frameAdvance += step;
-        if ((triggerButtons & 0x200) != 0) {
-            step = -1.0f;
-        } else {
-            step = 0.0f;
-        }
-        frameAdvance += step;
+        frameAdvance += (triggerButtons & 0x100) ? 1.0f : 0.0f;
+        frameAdvance += (triggerButtons & 0x200) ? -1.0f : 0.0f;
     } else {
         frameAdvance = ((heldButtons & 0x100) ? 0.25f : 1.0f) *
                        ((heldButtons & 0x200) ? -1.0f : 1.0f);
@@ -549,25 +520,18 @@ void CCharaPcs::calcViewer()
             if (modelAnim != 0) {
                 float animFrames = static_cast<float>(modelAnim->m_frameCount);
                 float frame = (float)fmod((double)ViewerModelTime(self->m_viewerModel[i]), (double)(frameAdvance + animFrames));
-                Graphic.Printf(const_cast<char*>(s_frame_speed_fmt), frame, frameAdvance);
+                Graphic.Printf("FRAME = %.2f SPEED=%.2f", frame, frameAdvance);
             }
             if (self->m_viewerSavedAnim != 0) {
-                const char* iframeState = "KEEP";
-                if (self->m_viewerSavedAnimState == 0) {
-                    iframeState = "ORG";
-                }
-                CGraphic* graphic = &Graphic;
-                const char* iframeFmt = s_iframe_fmt;
-                const char* iframeMode = "OFF";
-                if (self->m_viewerIFrameEnabled != 0) {
-                    iframeMode = "ON";
-                }
-                graphic->Printf(const_cast<char*>(iframeFmt), iframeMode, self->m_viewerSavedFrame, iframeState);
+                Graphic.Printf("I = %s IFRAME = %.2f %s",
+                               self->m_viewerIFrameEnabled ? "ON" : "OFF",
+                               self->m_viewerSavedFrame,
+                               self->m_viewerSavedAnimState == 0 ? "ORG" : "KEEP");
             }
             if (self->m_viewerAnimLoadedCount != 0) {
-                Graphic.Printf(const_cast<char*>(s_cont_fmt), self->m_viewerAnimLoopIndex);
+                Graphic.Printf("CONT = %d", self->m_viewerAnimLoopIndex);
             }
-            Graphic.Printf(const_cast<char*>(s_cpu_profile_fmt), matrixTime + skinTime, matrixTime, skinTime,
+            Graphic.Printf("CPU = %.5f%%(M = %.5f%% S = %.5f%%) %dNODES", matrixTime + skinTime, matrixTime, skinTime,
                            ViewerModelNodeCount(self->m_viewerModel[i]));
         }
     }
@@ -631,9 +595,9 @@ void CCharaPcs::createViewer()
     CFile::CHandle* fileHandle;
 
     memset(self->m_loadStages, 0, sizeof(self->m_loadStages));
-    self->m_loadStages[CCharaPcs::LOAD_STAGE_MODEL] = Memory.CreateStage(0x177000, const_cast<char*>(s_load_model), 0);
-    self->m_loadStages[CCharaPcs::LOAD_STAGE_TEXTURE] = Memory.CreateStage(0x200000, const_cast<char*>(s_load_texture), 0);
-    self->m_loadStages[CCharaPcs::LOAD_STAGE_ANIM] = Memory.CreateStage(0x190000, const_cast<char*>(s_load_anim), 0);
+    self->m_loadStages[CCharaPcs::LOAD_STAGE_MODEL] = Memory.CreateStage(0x177000, "CCharaPcs LoadModel", 0);
+    self->m_loadStages[CCharaPcs::LOAD_STAGE_TEXTURE] = Memory.CreateStage(0x200000, "CCharaPcs LoadTexture", 0);
+    self->m_loadStages[CCharaPcs::LOAD_STAGE_ANIM] = Memory.CreateStage(0x190000, "CCharaPcs LoadAnim", 0);
 
     self->m_viewerAmbientColor[0].r = 0x3F;
     self->m_viewerAmbientColor[0].g = 0x3F;
@@ -691,19 +655,19 @@ void CCharaPcs::createViewer()
         self->m_viewerAnimBank[i] = 0;
     }
 
-    strcpy(self->m_viewerModelPath, s_default_chm_path);
+    strcpy(self->m_viewerModelPath, "plot/kmitsuru/plot.chm");
     self->m_viewerLoadModel = 1;
-    strcpy(self->m_viewerDynamicsPath, s_default_chd_path);
+    strcpy(self->m_viewerDynamicsPath, "plot/kmitsuru/plot.chd");
     self->m_viewerLoadDynamics = 1;
-    strcpy(self->m_viewerAnimPath, s_default_cha_path);
+    strcpy(self->m_viewerAnimPath, "plot/kmitsuru/plot.cha");
     self->m_viewerLoadAnim = 1;
-    strcpy(self->m_viewerTexturePath, s_default_tex_path);
+    strcpy(self->m_viewerTexturePath, "plot/kmitsuru/plot.tex");
     self->m_viewerLoadTexture = 1;
     strcpy(self->m_viewerTexAnimName, "m1");
     self->m_viewerTexAnimFrame = -1;
     self->m_viewerTexAnimDirty = 1;
 
-    sprintf(pathBuf, s_back_tex_fmt, USBPcs.m_rootPath);
+    sprintf(pathBuf, "%sback.tex", USBPcs.m_rootPath);
     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
     if (fileHandle != 0) {
         File.Read(fileHandle);

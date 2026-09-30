@@ -4062,9 +4062,10 @@ void CGMonObj::onFramePreCalc()
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 8) = m_targetPartyIndex;
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0) = -1;
 
+		int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
 		int aiLocal = 0;
-		if ((0x9A <= reinterpret_cast<int>(object->m_scriptHandle[4])) ||
-			(reinterpret_cast<int>(object->m_scriptHandle[4]) < 0x8E)) {
+		if ((0x9A <= classId) ||
+			(classId < 0x8E)) {
 			(this->*m_funcs->logic)();
 		} else {
 			aiAddDuct(aiLocal);

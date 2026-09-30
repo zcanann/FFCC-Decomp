@@ -770,8 +770,8 @@ void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
 inline _GXColor CTexture::GetExternalTlutColor(void* tlutData, int tlutOffset, int index)
 {
     unsigned short* tlut = reinterpret_cast<unsigned short*>(tlutData);
-    _GXColor color;
     unsigned int packed = tlut[index] | (tlut[index + tlutOffset] << 16);
+    _GXColor color;
     unsigned char* bytes = reinterpret_cast<unsigned char*>(&packed);
 
     color.a = bytes[0];
@@ -797,6 +797,20 @@ _GXColor CTexture::GetTlutColor(int index)
 
 /*
  * --INFO--
+ * PAL Address: 0x8003AE78
+ * PAL Size: 116b
+ * EN Address: 0x80045C80
+ * EN Size: 76b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexture::SetTlutColor(int index, _GXColor color)
+{
+    SetExternalTlutColor(m_tlutData, GetNumTlut(), index, color);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8003AE30
  * PAL Size: 72b
  * EN Address: 0x80045CCC
@@ -816,20 +830,6 @@ void CTexture::SetExternalTlutColor(void* tlutData, int tlutOffset, int index, _
     unsigned short* tlut = reinterpret_cast<unsigned short*>(tlutData);
     tlut[index + tlutOffset] = static_cast<unsigned short>(packedColor >> 16);
     tlut[index] = static_cast<unsigned short>(packedColor);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003AE78
- * PAL Size: 116b
- * EN Address: 0x80045C80
- * EN Size: 76b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CTexture::SetTlutColor(int index, _GXColor color)
-{
-    SetExternalTlutColor(m_tlutData, GetNumTlut(), index, color);
 }
 
 /*
@@ -940,85 +940,6 @@ void* CTextureSet::operator new(unsigned long size, CMemory::CStage*, char* file
 
 /*
  * --INFO--
- * PAL Address: 0x8003A6F0
- * PAL Size: 140b
- * EN Address: 0x800461D4
- * EN Size: 144b
- * JP Address: TODO
- * JP Size: TODO
- */
-int CTextureSet::Find(char* name)
-{
-    for (unsigned long i = 0; i < static_cast<unsigned long>(m_textureArray.GetSize()); i++) {
-        CTexture* texture = m_textureArray[i];
-        if ((texture != 0) && (strcmp(texture->m_name, name) == 0)) {
-            return static_cast<int>(i);
-        }
-    }
-    return -1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003A77C
- * PAL Size: 560b
- * EN Address: 0x8004602C
- * EN Size: 424b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
-{
-    CChunkFile::CChunk chunk;
-    CTexture* texture;
-
-    if (append == 0) {
-        m_textureArray.ReleaseAndRemoveAll();
-    }
-
-    chunkFile.PushChunk();
-    while (chunkFile.GetNextChunk(chunk)) {
-        switch (chunk.m_id) {
-        case 0x54585452:
-            texture = new (stage, "textureman.cpp", 0x2ED) CTexture;
-            texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
-
-            if (texture->m_name[0] != 0) {
-                unsigned int duplicateIdx = static_cast<unsigned int>(Find(texture->m_name));
-                if ((int)duplicateIdx >= 0) {
-                    if (amemCacheSet != 0) {
-                        amemCacheSet->DestroyCache(static_cast<int>(texture->m_cacheId));
-                        amemCacheSet->AmemPrev();
-                    }
-
-                    if (texture->DecRef() == 0) {
-                        delete texture;
-                    }
-
-                    texture = m_textureArray[duplicateIdx];
-                    texture->AddRef();
-                }
-            }
-
-            if (append != 0) {
-                for (unsigned int i = 0; i < (unsigned int)m_textureArray.GetSize(); i++) {
-                    if (m_textureArray[i] == 0) {
-                        m_textureArray.SetAt(i, texture);
-                        goto next_chunk;
-                    }
-                }
-            }
-
-            m_textureArray.Add(texture);
-        next_chunk:;
-            break;
-        }
-    }
-    chunkFile.PopChunk();
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8003A9AC
  * PAL Size: 712b
  * EN Address: 0x80045EF0
@@ -1048,6 +969,86 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
             }
         }
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003A77C
+ * PAL Size: 560b
+ * EN Address: 0x8004602C
+ * EN Size: 424b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
+{
+    CChunkFile::CChunk chunk;
+    CTexture* texture;
+    unsigned long index;
+
+    if (append == 0) {
+        m_textureArray.ReleaseAndRemoveAll();
+    }
+
+    chunkFile.PushChunk();
+    while (chunkFile.GetNextChunk(chunk)) {
+        switch (chunk.m_id) {
+        case 0x54585452:
+            texture = new (stage, "textureman.cpp", 0x2ED) CTexture;
+            texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
+
+            if (texture->m_name[0] != 0) {
+                index = Find(texture->m_name);
+                if ((int)index >= 0) {
+                    if (amemCacheSet != 0) {
+                        amemCacheSet->DestroyCache(static_cast<int>(texture->m_cacheId));
+                        amemCacheSet->AmemPrev();
+                    }
+
+                    if (texture->DecRef() == 0) {
+                        delete texture;
+                    }
+
+                    texture = m_textureArray[index];
+                    texture->AddRef();
+                }
+            }
+
+            if (append != 0) {
+                for (index = 0; (unsigned int)index < (unsigned int)m_textureArray.GetSize(); index++) {
+                    if (m_textureArray[index] == 0) {
+                        m_textureArray.SetAt(index, texture);
+                        goto next_chunk;
+                    }
+                }
+            }
+
+            m_textureArray.Add(texture);
+        next_chunk:;
+            break;
+        }
+    }
+    chunkFile.PopChunk();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003A6F0
+ * PAL Size: 140b
+ * EN Address: 0x800461D4
+ * EN Size: 144b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CTextureSet::Find(char* name)
+{
+    for (unsigned long i = 0; i < static_cast<unsigned long>(m_textureArray.GetSize()); i++) {
+        CTexture* texture = m_textureArray[i];
+        if ((texture != 0) && (strcmp(texture->m_name, name) == 0)) {
+            return static_cast<int>(i);
+        }
+    }
+    return -1;
 }
 
 /*

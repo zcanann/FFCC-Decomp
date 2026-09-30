@@ -765,7 +765,7 @@ config.libs = [
             Object(Matching, "pppYmTraceMove.cpp"),
             Object(NonMatching, "pppYmTracer.cpp"),
             Object(Matching, "pppYmTracer2.cpp", cflags=cflags_game),
-            Object(NonMatching, "prgobj.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "prgobj.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-str reuse,pool,readonly"]),
             Object(Matching, "quadobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(Matching, "ref.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "ringmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
@@ -775,7 +775,7 @@ config.libs = [
             Object(Matching, "stopwatch.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "system.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "texanim.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
-            Object(NonMatching, "textureman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
+            Object(NonMatching, "textureman.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
             Object(
                 Matching,
                 "THPDraw.cpp",

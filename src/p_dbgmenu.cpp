@@ -1,3 +1,4 @@
+#include "ffcc/p_camera.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
@@ -231,7 +232,7 @@ void CDbgMenuPcs::calc()
 			Sound.CheckDriver(1);
 			break;
 		case 0x75:
-			g_map_draw_prof = 1 - g_map_draw_prof;
+			g_IsDbgDrawShadowPos = 1 - g_IsDbgDrawShadowPos;
 			break;
 		case 0x76:
 			g_IsDrawHeapSize = 1 - g_IsDrawHeapSize;
@@ -393,7 +394,7 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 			menu->m_state = (m_dbgFlags >> 12) & 1;
 			break;
 		case 0x75:
-			menu->m_state = g_map_draw_prof != 0;
+			menu->m_state = g_IsDbgDrawShadowPos != 0;
 			break;
 		case 0x76:
 			menu->m_state = g_IsDrawHeapSize != 0;

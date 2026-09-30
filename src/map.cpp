@@ -32,8 +32,6 @@ inline void* operator new(unsigned long, void* ptr)
 CMapMng MapMng;
 char g_StrTmp[0x400];
 
-CMapHitDrawMode g_MapHitDrawMode;
-unsigned int s_loadedMapNo__7CMapPcs;
 
 static inline CMapMngAsyncLoadState& GetMapMngAsyncLoadState(CMapMng* mapMng)
 {

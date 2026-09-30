@@ -157,8 +157,7 @@ s32 fn_0200BA90(void)
         fn_020038F4(20);
         fn_02003464(fn_0201A6D4(row), 0);
         fn_020059D4(&tmp, row, 0);
-        p = buf;
-        for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
+        for (i = 0, p = buf; i < sizeof(buf) / sizeof(buf[0]); i++)
             p[i] = 0x3FF;
         tile = tmp.unk14 * (row * 2) + 128;
         pal = 0x7000;
@@ -375,7 +374,8 @@ s32 fn_0200C004(void)
             buf[i] = tile++ | pal;
             buf[i + 30] = tile++ | pal;
         }
-        map = fn_02000A40(tmp.unk5, win->unk10, win->unk12 + (row * 2 + 1));
+        half = row * 2 + 1;
+        map = fn_02000A40(tmp.unk5, win->unk10, win->unk12 + half);
         DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
         DmaSet(DMA3, &buf[30], map + 32, 0x80000000 | win->unk14);
     }

@@ -971,13 +971,13 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		for (int materialIdx = 0; materialIdx < static_cast<int>(materialCount); materialIdx++) {
 			int foundSlot;
 			for (foundSlot = 0; foundSlot < 64; foundSlot++) {
-				CCaravanWork* materialWork = (*scriptFoodBase);
+				CCaravanWork* materialWork = Game.m_scriptFoodBase[channel];
 				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
 					break;
 				}
 			}
 
-			(*scriptFoodBase)->DeleteItemIdx(foundSlot, 1);
+			Game.m_scriptFoodBase[channel]->DeleteItemIdx(foundSlot, 1);
 		}
 	}
 
@@ -988,7 +988,7 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 
 	const float smithRate = static_cast<float>(static_cast<double>((*scriptFoodBase)->m_shopParam) / 100.0);
 	const int gilCost = -static_cast<int>(static_cast<float>(itemRow->m_smithPrice) * smithRate);
-	const int addGilResult = (*scriptFoodBase)->AddGil(gilCost);
+	const int addGilResult = (*scriptFoodBase)->AddGil(gilCost) != 0;
 	if (addGilResult == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}

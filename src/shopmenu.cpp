@@ -1287,8 +1287,7 @@ void CShopMenu::DrawItemList()
         selectableFrame = 0xF;
     }
 
-    for (int row = 0; row < m_visibleRows; ++row) {
-        int listType = m_listType;
+    for (int row = 0; row < m_visibleRows; ++row, y += 0x1C) {
         int itemCount = getItemCnt();
 
         if (itemIndex >= itemCount) {
@@ -1296,31 +1295,8 @@ void CShopMenu::DrawItemList()
         }
 
         int itemNo = getItemNo(itemIndex);
-        unsigned int itemNoU = itemNo; itemNo = itemNoU;
 
-        int canTrade;
-        if (itemIndex == -1) {
-            canTrade = 0;
-        } else {
-            int tradeItemNo = getItemNo(itemIndex);
-            if (tradeItemNo <= 0) {
-                canTrade = 0;
-            } else if (listType == 0) {
-                canTrade = 1;
-            } else if (listType == 2) {
-                canTrade = 1;
-                if ((m_caravanWork->m_shopArgs[((int)(tradeItemNo - 0x191U) >> 5)] &
-                     (1 << ((tradeItemNo - 0x191U) & 0x1F))) == 0) {
-                    canTrade = 0;
-                }
-            } else if (MenuPcs.EquipChk(itemIndex)) {
-                canTrade = 0;
-            } else if (tradeItemNo > 0x9E) {
-                canTrade = 1;
-            } else {
-                canTrade = 0;
-            }
-        }
+        int canTrade = CheckSell(itemIndex);
 
         int frame = 0xE;
         if (canTrade != 0) {
@@ -1358,7 +1334,6 @@ void CShopMenu::DrawItemList()
         }
 
         ++itemIndex;
-        y += 0x1C;
     }
 
     int pulse = abs(static_cast<int>(System.m_frameCounter) % 0x14 - 10);

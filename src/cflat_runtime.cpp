@@ -1377,31 +1377,27 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	const int requiredWords = classLocalCount + 0x60;
 	CStackBlock* scanNode = m_stackBlocks.m_next;
 	const int noScan = static_cast<u8>(scanNode == &m_stackBlocks);
-	CStackBlock* selectedNode;
-	do {
-		selectedNode = scanNode;
-		if (noScan != 0) {
+	for (;;) {
+		if (noScan != 0 ||
+		    scanNode->m_size + requiredWords + scanNode->m_offset <= scanNode->m_next->m_offset) {
+			CStackBlock* const freeNode = m_freeStackBlocks.m_next;
+			m_freeStackBlocks.m_next = freeNode->m_next;
+			freeNode->m_previous = scanNode;
+			freeNode->m_next = scanNode->m_next;
+			freeNode->m_next->m_previous = freeNode;
+			scanNode->m_next = freeNode;
+
+			const int scanOffset = scanNode->m_size;
+			const int baseWords = (noScan != 0) ? 0 : scanNode->m_offset;
+			freeNode->m_offset = scanOffset + baseWords;
+			freeNode->m_size = requiredWords;
+
+			object->m_freeListNode = freeNode;
+			object->m_id = reinterpret_cast<u32>(m_stackStorage + freeNode->m_offset);
 			break;
 		}
-		scanNode = selectedNode->m_next;
-	} while ((selectedNode->m_offset + requiredWords) +
-	             selectedNode->m_size >
-	         scanNode->m_offset);
-
-	CStackBlock* const freeNode = m_freeStackBlocks.m_next;
-	m_freeStackBlocks.m_next = freeNode->m_next;
-	freeNode->m_previous = selectedNode;
-	freeNode->m_next = selectedNode->m_next;
-	freeNode->m_next->m_previous = freeNode;
-	selectedNode->m_next = freeNode;
-
-	const int scanOffset = selectedNode->m_size;
-	const int baseWords = (noScan != 0) ? 0 : selectedNode->m_offset;
-	freeNode->m_offset = scanOffset + baseWords;
-	freeNode->m_size = requiredWords;
-
-	object->m_freeListNode = freeNode;
-	object->m_id = reinterpret_cast<u32>(m_stackStorage + freeNode->m_offset);
+		scanNode = scanNode->m_next;
+	}
 
 	unsigned int* varBase = 0;
 	if (classIndex == -1) {

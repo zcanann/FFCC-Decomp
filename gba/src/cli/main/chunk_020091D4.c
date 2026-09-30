@@ -74,21 +74,21 @@ extern u16 lbl_0300277A;
 extern u16 lbl_0300299C;
 extern u16 lbl_030029AC;
 extern u32 lbl_03002AC8;
-extern u8 lbl_03002ACC;
-extern u16 lbl_03002AEC;
-extern struct Work lbl_03002CA0;
-extern char lbl_03002F20[2][65];
+extern u8 gMenuHasInput;
+extern u16 gDataFlags;
+extern struct Work gSession;
+extern char gBonusStr[2][65];
 extern struct Unk03002FB0 lbl_03002FB0;
-extern s32 lbl_03003090;
-extern s32 lbl_03003094;
-extern s8 lbl_03003098;
+extern s32 gScreen;
+extern s32 gMode;
+extern s8 gScreenStep;
 extern s32 lbl_030030A4;
-extern s32 lbl_030030AC;
-extern struct Window lbl_030030B0[];
-extern s8 lbl_030032E0;
-extern s32 lbl_030032E8;
-extern s8 lbl_030032F8;
-extern u8 lbl_0203A800[];
+extern s32 gScreenInitDone;
+extern struct Window gWindows[];
+extern s8 gOpenMenuReq;
+extern s32 gSavedScreen;
+extern s8 gMsgScreenId;
+extern u8 gListBuf[];
 
 void *memset(void *, int, unsigned long);
 s32 strlen(const char *);
@@ -98,7 +98,7 @@ u32 fn_02000A40(s32, s32, s32);
 void fn_02000A74(void);
 void fn_02000A80(const char *);
 void fn_02000CF0(s32, s32, s32);
-s32 fn_02002FB8(u8, u8);
+s32 Link_SendRequest(u8, u8);
 void fn_02003394(s32, s32);
 void fn_020033F4(void);
 s32 fn_02003464(const char *, s32);
@@ -112,8 +112,8 @@ s32 fn_02004030(s32, s32);
 void fn_02004098(s32, s32, s32, s32);
 void fn_020041D4(s32, s32);
 void fn_02004320(s32);
-void fn_02004E90(u8 *);
-void fn_02005844(void);
+void Session_OnArtifacts(u8 *);
+void Screen_Reset(void);
 void fn_02005968(struct Window *);
 void fn_020059D4(struct Window *, s32, s32);
 s32 fn_02005A0C(s32);
@@ -136,7 +136,7 @@ void fn_0200A57C(void);
 
 void fn_020091D4(void)
 {
-    struct Window *win = &lbl_030030B0[4];
+    struct Window *win = &gWindows[4];
     s32 max;
     s32 n;
     s32 i;
@@ -178,7 +178,7 @@ void fn_020091D4(void)
 s32 fn_02009280(void)
 {
     s32 ret = 0;
-    struct Window *win = &lbl_030030B0[4];
+    struct Window *win = &gWindows[4];
 
     fn_02003394(1, 1);
     fn_020033F4();
@@ -209,7 +209,7 @@ s32 fn_020092C4(void)
 s32 fn_020092E8(void)
 {
     s32 ret = 0;
-    struct Window *win = &lbl_030030B0[4];
+    struct Window *win = &gWindows[4];
 
     fn_02008178(win);
     if ((win->unk1 >> 3) < win->unk16) {
@@ -265,7 +265,7 @@ u32 fn_02009340(struct Window *win, s32 row, s32 half)
 
 void fn_020093B4(s32 idx, s32 bg)
 {
-    struct Window *win = &lbl_030030B0[idx];
+    struct Window *win = &gWindows[idx];
 
     DmaClear32(DMA0, 0, win, sizeof(struct Window));
     win->unk0 = 1;
@@ -284,7 +284,7 @@ void fn_020093B4(s32 idx, s32 bg)
 
 s32 fn_02009414(s32 idx)
 {
-    struct Window *win = &lbl_030030B0[idx];
+    struct Window *win = &gWindows[idx];
     s32 row;
     u32 addr;
 
@@ -297,13 +297,13 @@ s32 fn_02009414(s32 idx)
         row--;
         if (row <= 2) {
             fn_02003464(fn_0201A73C(row + 6), 0);
-            fn_02000CF0(lbl_03002CA0.unk1[row], win->unk14 * 8 - 34, 2);
+            fn_02000CF0(gSession.unk1[row], win->unk14 * 8 - 34, 2);
         } else if (row == 4) {
             addr = fn_02009340(win, 4, 0);
             fn_02003464(fn_0201A73C(1), 0);
             fn_020037A8(addr, win->unk14);
         } else if (row == 5) {
-            fn_02000CF0(lbl_03002CA0.unk62, win->unk14 * 8 - 43, 3);
+            fn_02000CF0(gSession.unk62, win->unk14 * 8 - 43, 3);
         }
         fn_020059D4(win, row, 0);
         row++;
@@ -322,25 +322,25 @@ s32 fn_02009414(s32 idx)
 
 void fn_02009508(s32 idx)
 {
-    struct Window *win = &lbl_030030B0[idx];
+    struct Window *win = &gWindows[idx];
     s32 i;
 
     fn_02003394(1, 0);
     for (i = 0; i <= 2; i++) {
         fn_020033F4();
         fn_02003464(fn_0201A73C(i + 6), 0);
-        fn_02000CF0(lbl_03002CA0.unk1[i], win->unk14 * 8 - 34, 2);
+        fn_02000CF0(gSession.unk1[i], win->unk14 * 8 - 34, 2);
         fn_020037A8(fn_02009340(win, i, 0), win->unk14);
     }
     fn_020033F4();
-    fn_02000CF0(lbl_03002CA0.unk62, win->unk14 * 8 - 43, 3);
+    fn_02000CF0(gSession.unk62, win->unk14 * 8 - 43, 3);
     fn_020059D4(win, 5, 0);
     fn_020037A8(fn_02009340(win, 5, 0), win->unk14);
 }
 
 void fn_020095AC(s32 idx)
 {
-    struct Window *win = &lbl_030030B0[idx];
+    struct Window *win = &gWindows[idx];
     s32 x = win->unk10 + 3;
     s32 y = win->unk12 + win->unk16 - 3;
 
@@ -351,7 +351,7 @@ void fn_020095AC(s32 idx)
 
 void fn_020095FC(s32 idx)
 {
-    struct Window *win = &lbl_030030B0[idx];
+    struct Window *win = &gWindows[idx];
     s32 i;
 
     DmaClear32(DMA0, 0, win, sizeof(struct Window));
@@ -369,14 +369,14 @@ void fn_020095FC(s32 idx)
     for (i = 0; i <= 1; i++) {
         fn_020033F4();
         fn_020038F4(8);
-        fn_02003464(lbl_03002F20[i], 0);
+        fn_02003464(gBonusStr[i], 0);
         fn_020059D4(win, i, 0);
     }
 }
 
 void fn_02009684(s32 idx, s32 pal)
 {
-    struct Window *win = &lbl_030030B0[idx];
+    struct Window *win = &gWindows[idx];
     u16 buf[30];
     s32 i;
     s32 j;
@@ -410,7 +410,7 @@ void fn_0200974C(s32 bg)
 
 void fn_02009764(s32 idx, s32 mode, s32 row)
 {
-    struct Window *win = &lbl_030030B0[idx];
+    struct Window *win = &gWindows[idx];
     u16 buf[30];
     s32 pal;
     s32 y;
@@ -474,7 +474,7 @@ void fn_02009764(s32 idx, s32 mode, s32 row)
 
 void fn_020098B8(s32 idx, s32 row)
 {
-    struct Window *win = &lbl_030030B0[idx];
+    struct Window *win = &gWindows[idx];
     s32 y = win->unk12 + row * 2;
 
     fn_020098F0(win->unk5, win->unk10, y, win->unk14, 2);
@@ -531,7 +531,7 @@ void fn_0200996C(struct Window *win, s32 bg, s32 row, s32 x, s32 y, s32 pal)
 
 void fn_02009A14(s32 dir, s32 idx, s32 bg)
 {
-    struct Window *win = &lbl_030030B0[idx];
+    struct Window *win = &gWindows[idx];
     s32 step;
     s32 y0;
     s32 y1;
@@ -564,7 +564,7 @@ void fn_02009A14(s32 dir, s32 idx, s32 bg)
 
 void fn_02009AB8(s32 idx, s32 bg, s32 row, s32 y, s32 pal)
 {
-    struct Window *win = &lbl_030030B0[idx];
+    struct Window *win = &gWindows[idx];
     u16 buf[30];
     s32 w;
     s32 i;
@@ -604,7 +604,7 @@ void fn_02009B80(struct Window *win, s32 val)
 
 void fn_02009BB0(s32 idx, s32 bg, s32 flags)
 {
-    struct Window *win = &lbl_030030B0[idx];
+    struct Window *win = &gWindows[idx];
     s32 x;
     s32 y;
     s32 cell;
@@ -633,7 +633,7 @@ void fn_02009BB0(s32 idx, s32 bg, s32 flags)
 
 void fn_02009C54(s32 idx, s32 x, s32 w, s32 bg)
 {
-    struct Window *win = &lbl_030030B0[idx];
+    struct Window *win = &gWindows[idx];
 
     DmaClear32(DMA0, 0, win, sizeof(struct Window));
     win->unk0 = 1;
@@ -715,7 +715,7 @@ void fn_02009DA8(s32 bg, s32 idx)
         val = 0x3FF;
     for (i = 0; i < 30; i++)
         buf[i] = val;
-    win = &lbl_030030B0[idx];
+    win = &gWindows[idx];
     val = win->unk5;
     win->unk5 = bg;
     dst = fn_02000A40(bg, 0, 18);
@@ -729,49 +729,49 @@ void fn_02009DA8(s32 bg, s32 idx)
     fn_02009D68(bg, idx);
 }
 
-s32 fn_02009E2C(void)
+s32 MsgScreen_Init(void)
 {
-    if (!(lbl_03002AEC & 1))
+    if (!(gDataFlags & 1))
         return 0;
-    if (lbl_030030AC == 0) {
-        DmaClear32(DMA0, 0, lbl_030030B0, sizeof(struct Window) * 5);
+    if (gScreenInitDone == 0) {
+        DmaClear32(DMA0, 0, gWindows, sizeof(struct Window) * 5);
         fn_02003394(1, 0);
         fn_020037C8(3, 0, 1);
         fn_02004098(12, 4, 0, 0);
         fn_020037C8(15, 0, 1);
         fn_020038D8(0x06006000);
-        lbl_030030B0[4].items[0].unk4 = fn_0201A8A4(lbl_030032F8);
+        gWindows[4].items[0].unk4 = fn_0201A8A4(gMsgScreenId);
         fn_020091D4();
-        lbl_030030AC = 1;
+        gScreenInitDone = 1;
     }
     return fn_02009280();
 }
 
-s32 fn_02009ED0(void)
+s32 MsgScreen_Main(void)
 {
     return 0;
 }
 
-void fn_02009ED4(u32 data)
+void Menu_OnOpen(u32 data)
 {
-    s32 prev = lbl_03003090;
+    s32 prev = gScreen;
     struct Cmd *cmd = (struct Cmd *)&data;
 
-    lbl_03003090 = cmd->unk2;
-    if (lbl_03003090 == 11) {
-        if (lbl_03003094 != 0) {
-            lbl_030032E8 = 0;
-            lbl_03003094 = 0;
+    gScreen = cmd->unk2;
+    if (gScreen == 11) {
+        if (gMode != 0) {
+            gSavedScreen = 0;
+            gMode = 0;
         } else {
-            lbl_030032E8 = prev;
+            gSavedScreen = prev;
         }
-        lbl_030032F8 = 6;
-    } else if (lbl_03003090 == 12) {
-        lbl_03003090 = lbl_030032E8;
+        gMsgScreenId = 6;
+    } else if (gScreen == 12) {
+        gScreen = gSavedScreen;
     } else {
-        lbl_030032E8 = lbl_03003090;
+        gSavedScreen = gScreen;
     }
-    fn_02005844();
+    Screen_Reset();
     fn_02000990();
 }
 
@@ -802,10 +802,10 @@ void fn_02009F68(s32 no, s32 bg, s32 idx)
 void fn_02009FA4(void)
 {
     lbl_030030A4 = 0;
-    DmaClear32(DMA0, 0, lbl_030030B0, sizeof(struct Window) * 5);
+    DmaClear32(DMA0, 0, gWindows, sizeof(struct Window) * 5);
     fn_020093B4(0, 2);
     fn_02009C54(1, 2, 15, 2);
-    fn_02009B80(&lbl_030030B0[1], 1);
+    fn_02009B80(&gWindows[1], 1);
     fn_02003394(1, 0);
     fn_020037C8(4, 0, 0);
     fn_020037C8(5, 0, 0);
@@ -825,26 +825,26 @@ void fn_02009FA4(void)
     lbl_0300277A = 1;
     fn_02009DA8(1, 1);
     fn_02009CBC(1, 1, 8);
-    lbl_03002AEC &= ~0x100;
-    fn_02002FB8(9, 0);
+    gDataFlags &= ~0x100;
+    Link_SendRequest(9, 0);
     lbl_03002779 = 0;
     lbl_03002778 = 0;
-    lbl_030030AC = 1;
+    gScreenInitDone = 1;
 }
 
-s32 fn_0200A0E0(void)
+s32 ArtifactScreen_Init(void)
 {
     struct Window *win;
     s32 ret;
 
     fn_02003394(1, 0);
-    if (lbl_030030AC == 0) {
+    if (gScreenInitDone == 0) {
         fn_02009FA4();
-        if (lbl_030030AC == 0)
+        if (gScreenInitDone == 0)
             return 0;
     }
     fn_02009414(0);
-    win = &lbl_030030B0[1];
+    win = &gWindows[1];
     fn_02005968(win);
     fn_02005A50(win);
     ret = 0;
@@ -857,43 +857,43 @@ s32 fn_0200A0E0(void)
     return ret;
 }
 
-s32 fn_0200A144(void)
+s32 ArtifactScreen_Main(void)
 {
     s32 ret;
     struct Window *win;
 
     fn_020095AC(0);
-    if (!(lbl_03002AEC & 0x100)) {
+    if (!(gDataFlags & 0x100)) {
         if (lbl_030029AC & 1) {
             m4aSongNumStart(0);
         } else if (lbl_030029AC & 2) {
             lbl_03002775 = 1;
-            lbl_030032E0 = 1;
+            gOpenMenuReq = 1;
             m4aSongNumStart(3);
             return 1;
         } else if (lbl_030029AC & 0x300) {
             if (lbl_030029AC & 0x100)
-                lbl_03003098 = 1;
+                gScreenStep = 1;
             else
-                lbl_03003098 = -1;
+                gScreenStep = -1;
             ret = 1;
             lbl_03002775 = ret;
             m4aSongNumStart(6);
             return ret;
         }
         if (++lbl_03002778 >= 60) {
-            fn_02002FB8(9, 0);
+            Link_SendRequest(9, 0);
             lbl_03002778 = 0;
         }
         return 0;
     }
     if (lbl_03002779 == 0) {
-        fn_02004E90(lbl_0203A800);
+        Session_OnArtifacts(gListBuf);
         lbl_03002779 = 1;
     }
     fn_02003394(1, 0);
     fn_020033F4();
-    win = &lbl_030030B0[1];
+    win = &gWindows[1];
     if (lbl_03002776 < win->unkE) {
         fn_0200A700(lbl_03002776, lbl_03002776);
         fn_02009AB8(1, win->unk5, lbl_03002776, lbl_03002776, fn_0200A758(lbl_03002776) ? 5 : 6);
@@ -902,10 +902,10 @@ s32 fn_0200A144(void)
             return 0;
         fn_0200A790();
     }
-    if (lbl_03002ACC)
+    if (gMenuHasInput)
         fn_0200A370();
     fn_0200A57C();
-    if (lbl_03002ACC)
+    if (gMenuHasInput)
         fn_0200A328();
     ret = lbl_03002775 != 0;
     if (ret)
@@ -913,9 +913,9 @@ s32 fn_0200A144(void)
     return ret;
 }
 
-s32 fn_0200A2C4(void)
+s32 ArtifactScreen_Exit(void)
 {
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
     s32 ret = 0;
 
     fn_02003394(1, 0);
@@ -938,7 +938,7 @@ s32 fn_0200A2C4(void)
 void fn_0200A328(void)
 {
     s32 cell = fn_02004030(0, 45);
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
 
     fn_02003C3C((win->unk10 - 1) * 8, (win->unk12 + 1) * 8 + win->unk2 * 16, 0, 45, cell, win->unk5, 0);
 }
@@ -953,7 +953,7 @@ void fn_0200A370(void)
 
     if (lbl_0300299C == 0)
         return;
-    win = &lbl_030030B0[1];
+    win = &gWindows[1];
     prev = lbl_03002774 + win->unk2;
     if (lbl_0300299C & 0x40) {
         if (win->unk2 != 0) {
@@ -991,13 +991,13 @@ void fn_0200A370(void)
             m4aSongNumStart(0);
         } else if (lbl_030029AC & 2) {
             lbl_03002775 = 1;
-            lbl_030032E0 = 1;
+            gOpenMenuReq = 1;
             m4aSongNumStart(3);
         } else if (lbl_030029AC & 0x300) {
             if (lbl_030029AC & 0x100)
-                lbl_03003098 = 1;
+                gScreenStep = 1;
             else
-                lbl_03003098 = -1;
+                gScreenStep = -1;
             m4aSongNumStart(6);
             lbl_03002775 = 1;
         }
@@ -1008,7 +1008,7 @@ void fn_0200A370(void)
 
 void fn_0200A57C(void)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 x = (win->unk10 + 2) * 8;
     s32 y = (win->unk12 + 1) * 8;
     s32 n = win->unkE;

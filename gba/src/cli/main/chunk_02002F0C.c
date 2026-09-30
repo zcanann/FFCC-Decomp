@@ -125,8 +125,8 @@ struct CellInfo {
     u32 tiles;
 };
 
-extern struct Command lbl_030004A8;
-extern struct LinkWork lbl_03000070;
+extern struct Command sMsgXfer;
+extern struct LinkWork gLinkWork;
 extern u8 lbl_030008D8[];
 extern u32 lbl_030010D8;
 extern struct Font *lbl_030010DC;
@@ -134,16 +134,16 @@ extern u8 lbl_030010E0[];
 extern s32 lbl_03001160;
 extern union OamBuffer lbl_03001168[2];
 extern s32 lbl_03001968;
-extern struct CellInfo lbl_03001970[];
+extern struct CellInfo gObjCells[];
 extern u8 lbl_03002070[];
-extern struct ResHeader lbl_03002670;
+extern struct ResHeader gObjHeader;
 extern s8 lbl_03002690;
 extern s16 lbl_03002698[];
 extern s16 lbl_030026D8[];
 extern s8 lbl_03002718[];
 extern u8 lbl_03002738[];
-extern u8 lbl_03002AC4;
-extern u16 lbl_03002AEC;
+extern u8 gSpMode;
+extern u16 gDataFlags;
 extern s16 lbl_0201CC7C[];
 extern u32 lbl_0201CF14[];
 extern s16 lbl_0202FA20[];
@@ -152,26 +152,26 @@ extern struct DataHeader lbl_02036720;
 extern u8 lbl_02036910[];
 extern u16 lbl_02036A30[];
 extern u16 lbl_02036E90[][16];
-extern struct ResHeader lbl_02038000;
+extern struct ResHeader gDownloadBuf;
 extern u8 lbl_02038020[];
 
 void fn_02000C2C(s8 *x, s8 *y);
 s16 fn_02000EC0(s16 a, s16 b);
 s16 fn_02000EE8(s16 a);
-u16 fn_02002130(s32 n, u8 *data, u16 *crc);
-s32 fn_02002698(u32 packet);
-void fn_02004740(u8 *data);
-void fn_02004920(u8 *data);
-void fn_02004A30(u8 *data);
-void fn_02004AA0(u8 *data);
-void fn_02004AC4(u8 *data);
-void fn_02004B68(u8 *data);
-void fn_02004C74(u8 *data);
-void fn_02004E90(u8 *data);
-void fn_02004ED4(u8 *data);
-void fn_02004EE8(u8 *data);
-void fn_02004F8C(u8 *data);
-void fn_02004FE4(u8 *data);
+u16 Crc16(s32 n, u8 *data, u16 *crc);
+s32 Link_Write(u32 packet);
+void Session_OnPlayerStat(u8 *data);
+void Radar_OnMapObj(u8 *data);
+void Session_OnItemAll(u8 *data);
+void Session_OnFavorite(u8 *data);
+void Session_OnCompatibility(u8 *data);
+void Session_OnEquipList(u8 *data);
+void Session_OnBonusStr(u8 *data);
+void Session_OnArtifacts(u8 *data);
+void Session_OnTmpArtifacts(u8 *data);
+void Radar_OnMarkerKinds(u8 *data);
+void Scouter_OnInfo(u8 *data);
+void Session_OnCmdList(u8 *data);
 void fn_02003C00(void);
 void fn_02003D64(void);
 void fn_02003E48(void);
@@ -181,42 +181,42 @@ void *memcpy(void *dst, const void *src, u32 n);
 void *memset(void *dst, s32 c, u32 n);
 u32 strlen(const char *s);
 
-void fn_02002F0C(void)
+void Link_DispatchMessage(void)
 {
-    struct Command *cmd = &lbl_030004A8;
+    struct Command *cmd = &sMsgXfer;
 
     if (cmd->type == 1)
-        fn_02004740(cmd->data);
+        Session_OnPlayerStat(cmd->data);
     else if (cmd->type == 3)
-        fn_02004920(cmd->data);
+        Radar_OnMapObj(cmd->data);
     else if (cmd->type == 2)
-        fn_02004A30(cmd->data);
+        Session_OnItemAll(cmd->data);
     else if (cmd->type == 4)
-        fn_02004AA0(cmd->data);
+        Session_OnFavorite(cmd->data);
     else if (cmd->type == 5)
-        fn_02004AC4(cmd->data);
+        Session_OnCompatibility(cmd->data);
     else if (cmd->type == 6)
-        fn_02004B68(cmd->data);
+        Session_OnEquipList(cmd->data);
     else if (cmd->type == 7)
-        fn_02004C74(cmd->data);
+        Session_OnBonusStr(cmd->data);
     else if (cmd->type == 8)
-        fn_02004E90(cmd->data);
+        Session_OnArtifacts(cmd->data);
     else if (cmd->type == 9)
-        fn_02004ED4(cmd->data);
+        Session_OnTmpArtifacts(cmd->data);
     else if (cmd->type == 10)
-        fn_02004EE8(cmd->data);
+        Radar_OnMarkerKinds(cmd->data);
     else if (cmd->type == 11)
-        fn_02004F8C(cmd->data);
+        Scouter_OnInfo(cmd->data);
     else if (cmd->type == 12)
-        fn_02004FE4(cmd->data);
+        Session_OnCmdList(cmd->data);
 }
 
-u8 fn_02002FAC(void)
+u8 Link_GetPlayerNo(void)
 {
-    return lbl_03000070.unk15;
+    return gLinkWork.unk15;
 }
 
-s32 fn_02002FB8(u8 a, u8 b)
+s32 Link_SendRequest(u8 a, u8 b)
 {
     u32 packet;
     u8 *p;
@@ -226,10 +226,10 @@ s32 fn_02002FB8(u8 a, u8 b)
     p[0] = 12;
     p[1] = a;
     p[2] = b;
-    return fn_02002698(packet);
+    return Link_Write(packet);
 }
 
-s32 fn_02002FE4(u8 a, u8 b, u8 c)
+s32 Link_SendEvent(u8 a, u8 b, u8 c)
 {
     u32 packet;
     u8 *p;
@@ -240,10 +240,10 @@ s32 fn_02002FE4(u8 a, u8 b, u8 c)
     p[1] = a;
     p[2] = b;
     p[3] = c;
-    return fn_02002698(packet);
+    return Link_Write(packet);
 }
 
-s32 fn_02003014(u8 a, u8 b, u8 c, u32 d)
+s32 Link_SendLetterReply(u8 a, u8 b, u8 c, u32 d)
 {
     u8 buf[9];
     u16 crc;
@@ -262,31 +262,31 @@ s32 fn_02003014(u8 a, u8 b, u8 c, u32 d)
     buf[5] = d >> 8;
     buf[6] = d;
     crc = 0xFFFF;
-    sum = fn_02002130(7, buf, &crc);
+    sum = Crc16(7, buf, &crc);
     packet = 0;
     p = (u8 *)&packet;
     p[0] = 21;
     p[1] = sum >> 8;
     p[2] = sum;
     p[3] = buf[0];
-    if (fn_02002698(packet) != 0)
+    if (Link_Write(packet) != 0)
         return -1;
     packet = 0;
     p[0] = 0x55;
     p[1] = buf[1];
     p[2] = buf[2];
     p[3] = buf[3];
-    if (fn_02002698(packet) != 0)
+    if (Link_Write(packet) != 0)
         return -1;
     packet = 0;
     p[0] = 0x95;
     p[1] = buf[4];
     p[2] = buf[5];
     p[3] = buf[6];
-    return fn_02002698(packet);
+    return Link_Write(packet);
 }
 
-void fn_0200311C(u8 a, u8 b, u8 c)
+void Link_SendItemOp(u8 a, u8 b, u8 c)
 {
     u32 packet;
     u8 *p = (u8 *)&packet;
@@ -295,11 +295,11 @@ void fn_0200311C(u8 a, u8 b, u8 c)
     p[1] = a;
     p[2] = b;
     p[3] = c;
-    while (fn_02002698(packet) != 0)
+    while (Link_Write(packet) != 0)
         ;
 }
 
-void fn_0200314C(u8 a, u32 b)
+void Link_SendGil(u8 a, u32 b)
 {
     u32 packet;
     u8 *p = (u8 *)&packet;
@@ -308,17 +308,17 @@ void fn_0200314C(u8 a, u32 b)
     p[1] = a;
     p[2] = b >> 24;
     p[3] = b >> 16;
-    while (fn_02002698(packet) != 0)
+    while (Link_Write(packet) != 0)
         ;
     packet = 0;
     p[0] = 0x5A;
     p[1] = b >> 8;
     p[2] = b;
-    while (fn_02002698(packet) != 0)
+    while (Link_Write(packet) != 0)
         ;
 }
 
-void fn_02003190(u8 *data)
+void Link_SendCMakeName(u8 *data)
 {
     u16 crc;
     u32 packet;
@@ -327,13 +327,13 @@ void fn_02003190(u8 *data)
     s32 i;
 
     crc = 0xFFFF;
-    sum = fn_02002130(16, data, &crc);
+    sum = Crc16(16, data, &crc);
     p = (u8 *)&packet;
     p[0] = 28;
     p[1] = sum >> 8;
     p[2] = sum;
     p[3] = *data++;
-    while (fn_02002698(packet) != 0)
+    while (Link_Write(packet) != 0)
         ;
     for (i = 0; i < 5; i++) {
         packet = 0;
@@ -341,42 +341,42 @@ void fn_02003190(u8 *data)
         p[1] = *data++;
         p[2] = *data++;
         p[3] = *data++;
-        while (fn_02002698(packet) != 0)
+        while (Link_Write(packet) != 0)
             ;
     }
 }
 
-void fn_02003200(u8 a)
+void Link_SendCMakeLook(u8 a)
 {
-    while (fn_02002FE4(2, a, 0) != 0)
+    while (Link_SendEvent(2, a, 0) != 0)
         ;
 }
 
-void fn_0200321C(u8 a)
+void Link_SendCMakeJob(u8 a)
 {
-    while (fn_02002FE4(3, a, 0) != 0)
+    while (Link_SendEvent(3, a, 0) != 0)
         ;
 }
 
-void fn_02003238(void)
+void Link_SendCMakeCancel(void)
 {
-    while (fn_02002FE4(4, 0, 0) != 0)
+    while (Link_SendEvent(4, 0, 0) != 0)
         ;
 }
 
-void fn_0200324C(void)
+void Link_SendCMakeEnd(void)
 {
-    while (fn_02002FE4(5, 0, 0) != 0)
+    while (Link_SendEvent(5, 0, 0) != 0)
         ;
 }
 
-void fn_02003260(s32 a, s32 b)
+void Link_SendCMakeBirthday(s32 a, s32 b)
 {
-    while (fn_02002FE4(6, a, b) != 0)
+    while (Link_SendEvent(6, a, b) != 0)
         ;
 }
 
-void fn_0200327C(u8 *data)
+void Link_SendCMakeFavorite(u8 *data)
 {
     u16 crc;
     u32 packet;
@@ -384,24 +384,24 @@ void fn_0200327C(u8 *data)
     u16 sum;
 
     crc = 0xFFFF;
-    sum = fn_02002130(4, data, &crc);
+    sum = Crc16(4, data, &crc);
     p = (u8 *)&packet;
     p[0] = 29;
     p[1] = sum >> 8;
     p[2] = sum;
     p[3] = *data++;
-    while (fn_02002698(packet) != 0)
+    while (Link_Write(packet) != 0)
         ;
     packet = 0;
     p[0] = 0x5D;
     p[1] = *data++;
     p[2] = data[0];
     p[3] = data[1];
-    while (fn_02002698(packet) != 0)
+    while (Link_Write(packet) != 0)
         ;
 }
 
-void fn_020032DC(u8 a, u8 b)
+void Link_SendEquipSlot(u8 a, u8 b)
 {
     u32 packet;
     u8 *p = (u8 *)&packet;
@@ -410,11 +410,11 @@ void fn_020032DC(u8 a, u8 b)
     p[1] = a;
     p[2] = b;
     p[3] = 0;
-    while (fn_02002698(packet) != 0)
+    while (Link_Write(packet) != 0)
         ;
 }
 
-void fn_0200330C(u8 a, u16 b)
+void Link_SendCmdSlot(u8 a, u16 b)
 {
     u32 packet;
     u8 *p = (u8 *)&packet;
@@ -422,7 +422,7 @@ void fn_0200330C(u8 a, u16 b)
     p[0] = 31;
     p[1] = a;
     *(u16 *)&p[2] = b;
-    while (fn_02002698(packet) != 0)
+    while (Link_Write(packet) != 0)
         ;
 }
 
@@ -630,7 +630,7 @@ void fn_020037C8(s32 no, s32 id, s32 base)
     u8 *src;
     s32 i;
 
-    if (lbl_03002AC4 == 0) {
+    if (gSpMode == 0) {
         tbl = (u16 *)&lbl_02036720;
         tbl += 8;
     } else {
@@ -638,7 +638,7 @@ void fn_020037C8(s32 no, s32 id, s32 base)
     }
     pal = tbl + base * 16;
     dst = (u16 *)(0x05000000 + no * 32);
-    if (lbl_03002AC4 == 0) {
+    if (gSpMode == 0) {
         src = lbl_02034698.palettes + (u8 *)&lbl_02034698;
         src += id * 32;
     } else {
@@ -661,7 +661,7 @@ void fn_02003890(void *dst, s32 no)
 {
     u8 *src;
 
-    if (lbl_03002AC4 == 0) {
+    if (gSpMode == 0) {
         src = lbl_02034698.palettes + (u8 *)&lbl_02034698;
         src += no * 32;
     } else {
@@ -792,24 +792,24 @@ void fn_02003AA0(void)
         lbl_03002718[i] = 0;
     }
     DmaCopy32(DMA3, &lbl_03001168[lbl_03002690], 0x07000000, 0x400);
-    if (lbl_03002AEC & 1) {
+    if (gDataFlags & 1) {
         src = lbl_02038020;
         LZ77UnCompVram(src, (void *)0x06010000);
-        memcpy(&lbl_03002670, &lbl_02038000, 32);
-        CpuFastClear(0, lbl_03001970, 0x700);
-        src = lbl_03002670.unk10 + (u32)&lbl_02038000;
-        size = lbl_03002670.unkD * 32;
+        memcpy(&gObjHeader, &gDownloadBuf, 32);
+        CpuFastClear(0, gObjCells, 0x700);
+        src = gObjHeader.unk10 + (u32)&gDownloadBuf;
+        size = gObjHeader.unkD * 32;
         DmaCopy16(DMA3, src, lbl_03002070, size);
-        src = lbl_03002AC4 == 0 ? lbl_03002070 : (u8 *)lbl_02036A30;
+        src = gSpMode == 0 ? lbl_03002070 : (u8 *)lbl_02036A30;
         DmaCopy16(DMA3, src, 0x05000200, size);
-        src = lbl_03002670.unk14 + (u32)&lbl_02038000;
-        size = lbl_03002670.unk8 >> 1;
-        if (lbl_03002670.unk8 & 1)
+        src = gObjHeader.unk14 + (u32)&gDownloadBuf;
+        size = gObjHeader.unk8 >> 1;
+        if (gObjHeader.unk8 & 1)
             size++;
         if (size & 3)
             size += 4 - size % 4;
-        size += lbl_03002670.unk1C - lbl_03002670.unk14;
-        CpuFastCopy(src, lbl_03001970, size);
+        size += gObjHeader.unk1C - gObjHeader.unk14;
+        CpuFastCopy(src, gObjCells, size);
         memset(lbl_03002738, 0, 18);
     }
 }
@@ -840,9 +840,9 @@ void fn_02003C3C(s32 x, s32 y, s32 id, s32 frame, s32 pal, s32 prio, u32 flags)
     s32 n;
     u32 (*oam)[256];
 
-    if (!(lbl_03002AEC & 1))
+    if (!(gDataFlags & 1))
         return;
-    cell = &lbl_03001970[id];
+    cell = &gObjCells[id];
     if ((u32)(id - 3) <= 17 && cell->unk5 == 0)
         return;
     fn_02000C2C(&dx, &dy);
@@ -877,7 +877,7 @@ void fn_02003D64(void)
     s32 n;
     s32 j;
 
-    if (!(lbl_03002AEC & 1))
+    if (!(gDataFlags & 1))
         return;
     oam = (struct Oam *)&((u8 *)lbl_03001168)[lbl_03002690 * 0x400];
     n = 0;
@@ -955,9 +955,9 @@ u8 fn_02004000(s32 id)
 {
     struct CellInfo *cell;
 
-    if (!(lbl_03002AEC & 1))
+    if (!(gDataFlags & 1))
         return 0;
-    cell = lbl_03001970;
+    cell = gObjCells;
     cell += id;
     return cell->unk1;
 }

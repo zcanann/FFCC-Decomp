@@ -55,27 +55,27 @@ struct Window {
     struct WinItem items[1];
 };
 
-extern u8 lbl_030029A0;
-extern u8 lbl_03002ACC;
-extern u8 lbl_03002C98;
-extern struct Unk03002CA0 lbl_03002CA0;
-extern struct Unk03002FD0 lbl_03002FD0[];
-extern u32 lbl_03003090;
-extern u32 lbl_03003094;
-extern u16 lbl_030032E4;
-extern u32 lbl_030032E8;
+extern u8 gWasConnected;
+extern u8 gMenuHasInput;
+extern u8 gLanguage;
+extern struct Unk03002CA0 gSession;
+extern struct Unk03002FD0 gParty[];
+extern u32 gScreen;
+extern u32 gMode;
+extern u16 gMask;
+extern u32 gSavedScreen;
 extern u8 lbl_030032FC[];
 
 void fn_02000990(void);
 u16 *fn_02000A40(s32 bg, s32 x, s32 y);
 void fn_02000A74(void);
-void fn_02001438(s32, s32);
+void Map_SetStage(s32, s32);
 void fn_0200194C(s32);
-s32 fn_02002FAC(void);
+s32 Link_GetPlayerNo(void);
 s32 fn_02004030(s32, s32);
 s32 fn_020059EC(s32, s32);
 s32 fn_02005A0C(s32);
-void fn_02005844(void);
+void Screen_Reset(void);
 void fn_02009318(void);
 void fn_02019C4C(void);
 void fn_02003C3C(s32, s32, s32, s32, s32, s32, s32);
@@ -124,7 +124,7 @@ void fn_02006670(struct Window *win, s32 tile, s32 pal)
         map = fn_02000A40(win->unk5, win->unk10, win->unk12);
         DmaCopy16(DMA0, buf, map, win->unk14 * 2);
     }
-    if (lbl_03003094 || win->unk1) {
+    if (gMode || win->unk1) {
         if (win->unk1 && win->unkA == 0) {
             for (i = 0; i < win->unk14; i++) {
                 if (i == 0)
@@ -142,9 +142,9 @@ void fn_02006670(struct Window *win, s32 tile, s32 pal)
         }
         k = win->unk1 >> 3;
         k -= win->unk8;
-        if ((lbl_03003094 == 0 ? k > 0 : k >= 0) && k <= win->unkE * 2) {
+        if ((gMode == 0 ? k > 0 : k >= 0) && k <= win->unkE * 2) {
             t = fn_02005A0C(win->unk6);
-            if (lbl_03003094) {
+            if (gMode) {
                 odd = k & 1;
                 n = k >> 1;
             } else {
@@ -418,7 +418,7 @@ void fn_02006F30(struct Window *win, s32 tile, s32 pal)
         map = fn_02000A40(win->unk5, win->unk10, win->unk12);
         DmaCopy16(DMA0, buf, map, win->unk14 * 2);
     }
-    if (lbl_03003094 || win->unk1) {
+    if (gMode || win->unk1) {
         if (win->unk1) {
             for (i = 0; i < win->unk14; i++) {
                 if (i == 0)
@@ -1193,7 +1193,7 @@ void fn_02008540(struct Window *win)
         }
         map = fn_02000A40(win->unk5 - 1, win->unk10, py >> 3);
         DmaCopy16(DMA3, buf, map, win->unk14 * 2);
-        if ((py >> 3) - 1 <= win->unk12 && lbl_03003094)
+        if ((py >> 3) - 1 <= win->unk12 && gMode)
             DmaCopy16(DMA3, buf, map - 32, win->unk14 * 2);
         if ((py >> 3) - 1 > win->unk12) {
             py -= 8;
@@ -1335,7 +1335,7 @@ void fn_020088E0(struct Window *win)
         }
         map = fn_02000A40(win->unk5 - 1, win->unk10, py >> 3);
         DmaCopy16(DMA3, buf, map, win->unk14 * 2);
-        if ((py >> 3) - 1 <= win->unk12 && lbl_03003094)
+        if ((py >> 3) - 1 <= win->unk12 && gMode)
             DmaCopy16(DMA3, buf, map - 32, win->unk14 * 2);
         if ((py >> 3) - 1 > win->unk12) {
             py -= 8;
@@ -1558,17 +1558,17 @@ void fn_02008E88(s32 prio, s32 x, s32 y, s32 n, s32 offset, s32 mode)
     }
 }
 
-void fn_02008F48(struct Cmd cmd)
+void Session_OnMask(struct Cmd cmd)
 {
     u16 v;
 
     v = (cmd.unk[1] << 8) | cmd.unk[2];
-    if ((v & 0xFF) != (lbl_030032E4 & 0xFF)) {
-        lbl_03003090 = 0;
+    if ((v & 0xFF) != (gMask & 0xFF)) {
+        gScreen = 0;
         lbl_030032FC[0] = 0;
         lbl_030032FC[1] = 0xFF;
     }
-    lbl_030032E4 = v;
+    gMask = v;
 }
 
 void fn_02008F8C(s32 x, s32 y, s32 len, s32 pal, u32 value, s32 color)
@@ -1601,7 +1601,7 @@ void fn_02008F8C(s32 x, s32 y, s32 len, s32 pal, u32 value, s32 color)
         }
         fn_02003C3C(x, y, 1, digit, c, pal, 0);
     }
-    if ((lbl_03002C98 & 15) == 1)
+    if ((gLanguage & 15) == 1)
         i = 54;
     else
         i = 44;
@@ -1647,32 +1647,32 @@ void fn_0200907C(s32 x, s32 y, s32 n, s32 pal, s32 fill)
     }
 }
 
-void fn_0200911C(u32 data)
+void Mode_OnSet(u32 data)
 {
     struct Cmd *cmd = (struct Cmd *)&data;
 
-    lbl_03003094 = cmd->unk[1];
-    if (lbl_03003094 != 0) {
-        lbl_03002CA0.unk128 = 0;
-        if (lbl_03003094 == 4) {
-            fn_02001438(33, 0);
-            lbl_03002FD0[fn_02002FAC()].unk7 = 0;
+    gMode = cmd->unk[1];
+    if (gMode != 0) {
+        gSession.unk128 = 0;
+        if (gMode == 4) {
+            Map_SetStage(33, 0);
+            gParty[Link_GetPlayerNo()].unk7 = 0;
         }
     }
-    if (lbl_03003094 == 0 || lbl_03003094 == 4)
-        lbl_03002ACC = 0;
+    if (gMode == 0 || gMode == 4)
+        gMenuHasInput = 0;
     else
-        lbl_03002ACC = 1;
-    if (lbl_03003094 == 1)
+        gMenuHasInput = 1;
+    if (gMode == 1)
         fn_02009318();
     fn_02019C4C();
-    if (lbl_030029A0)
-        lbl_03003090 = 0;
+    if (gWasConnected)
+        gScreen = 0;
     else
-        lbl_030032E8 = 0;
+        gSavedScreen = 0;
     lbl_030032FC[0] = 0;
     lbl_030032FC[1] = 0xFF;
-    fn_02005844();
+    Screen_Reset();
     fn_02000990();
     fn_0200194C(0);
     fn_02000A74();

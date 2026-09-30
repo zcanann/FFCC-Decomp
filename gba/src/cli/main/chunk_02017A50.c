@@ -85,7 +85,7 @@ struct Recipe {
 };
 
 extern const char lbl_0201D050[];
-extern u8 lbl_0203A800[];
+extern u8 gListBuf[];
 extern s16 lbl_0203A804[];
 extern char lbl_0203AB00[];
 extern s8 lbl_03002815;
@@ -107,18 +107,18 @@ extern s8 lbl_0300282B;
 extern s8 lbl_0300282C;
 extern s8 lbl_0300282D;
 extern u32 lbl_03002830[4];
-extern u8 lbl_03002998;
+extern u8 gInputLockFrames;
 extern u16 lbl_0300299C;
 extern u16 lbl_030029AC;
-extern u8 lbl_03002ACC;
-extern u16 lbl_03002AEC;
-extern u8 lbl_03002AF4;
-extern s8 lbl_03002AFC;
-extern struct Work lbl_03002CA0;
-extern s32 lbl_03003090;
+extern u8 gMenuHasInput;
+extern u16 gDataFlags;
+extern u8 gReplyWaiting;
+extern s8 gReplyResult;
+extern struct Work gSession;
+extern s32 gScreen;
 extern s32 lbl_030030A4;
-extern s32 lbl_030030AC;
-extern struct Window lbl_030030B0[];
+extern s32 gScreenInitDone;
+extern struct Window gWindows[];
 extern s32 lbl_030032EC;
 
 void *memcpy(void *, const void *, u32);
@@ -129,11 +129,11 @@ char *strchr(const char *, s32);
 void m4aSongNumStart(u16);
 void fn_02000AD4(s32, s32, s32);
 void fn_02000CF0(s32, s32, s32);
-void fn_02001578(void);
-s32 fn_02001604(void);
-void fn_02002FB8(s32, s32);
-s32 fn_02002FE4(u8, u8, u8);
-void fn_020032DC(u8, u8);
+void Reply_Clear(void);
+s32 Reply_IsTimedOut(void);
+void Link_SendRequest(s32, s32);
+s32 Link_SendEvent(u8, u8, u8);
+void Link_SendEquipSlot(u8, u8);
 void fn_02003394(s32, s32);
 void fn_020033F4(void);
 s32 fn_02003464(const char *, s32);
@@ -149,7 +149,7 @@ void fn_02004098(s32, s32, s32, s32);
 void fn_020041D4(s32, s32);
 void fn_02004320(s32);
 s32 fn_02004CAC(s32);
-s32 fn_02004DA0(u16 *);
+s32 Item_CanEquip(u16 *);
 void fn_02005968(struct Window *);
 void fn_020059D4(struct Window *, s32, s32);
 void fn_02005A50(struct Window *);
@@ -189,25 +189,25 @@ void fn_02018C38(void);
 
 static inline struct Recipe *GetRecipe(void)
 {
-    s32 n = (s8)lbl_0203A800[0];
+    s32 n = (s8)gListBuf[0];
     struct Recipe *p;
 
     n++;
     if (n & 3)
         n = ((n >> 2) + 1) << 2;
-    p = (struct Recipe *)(lbl_0203A800 + n);
+    p = (struct Recipe *)(gListBuf + n);
     return &p[lbl_03002823];
 }
 
 void fn_02017A50(s32 line, char *dst)
 {
-    char *p = (char *)lbl_0203A800;
+    char *p = (char *)gListBuf;
     char *s;
     s32 len;
     s32 idx;
     s32 i;
 
-    if (lbl_03003090 == 1) {
+    if (gScreen == 1) {
         u32 n = *(u8 *)p;
 
         p = (char *)&lbl_0203A804[n];
@@ -254,7 +254,7 @@ s32 fn_02017B1C(s32 delta)
 
     count = 0;
     for (i = 0; i < 64; i++) {
-        if (lbl_03002CA0.unk64[i] == -1)
+        if (gSession.unk64[i] == -1)
             count++;
     }
     old = lbl_0300281B;
@@ -262,7 +262,7 @@ s32 fn_02017B1C(s32 delta)
     if (lbl_0300281B <= 0 || lbl_0300281B > count)
         lbl_0300281B = old;
     if (lbl_0300281B != old) {
-        u8 *buf = lbl_0203A800;
+        u8 *buf = gListBuf;
         s32 n = buf[0];
         s16 *items = (s16 *)(buf + 4);
         u32 *prices;
@@ -270,7 +270,7 @@ s32 fn_02017B1C(s32 delta)
         if (n & 1)
             n++;
         prices = (u32 *)&items[n];
-        if (prices[lbl_03002815] * lbl_0300281B > lbl_03002CA0.unk104.word)
+        if (prices[lbl_03002815] * lbl_0300281B > gSession.unk104.word)
             lbl_0300281B = old;
     }
     return lbl_0300281B != old;
@@ -287,26 +287,26 @@ void fn_02017BC8(void)
     s32 x, y;
     s32 frame;
 
-    if (lbl_03003090 == 1) {
-        u8 *buf = lbl_0203A800;
+    if (gScreen == 1) {
+        u8 *buf = gListBuf;
         s16 *items = (s16 *)(buf + 4);
 
         if (lbl_03002815 >= buf[0])
             return;
         id = items[lbl_03002815];
     } else {
-        id = lbl_03002CA0.unk64[lbl_03002815];
+        id = gSession.unk64[lbl_03002815];
     }
     if (id <= 0)
         return;
-    x = (lbl_030030B0[0].unk10 + 1) << 3;
-    y = (lbl_030030B0[0].unk12 + 1) << 3;
+    x = (gWindows[0].unk10 + 1) << 3;
+    y = (gWindows[0].unk12 + 1) << 3;
     frame = fn_0201AB14(id);
-    fn_02003C3C(x, y, 0, frame, fn_02004030(0, frame), lbl_030030B0[0].unk5, 0);
+    fn_02003C3C(x, y, 0, frame, fn_02004030(0, frame), gWindows[0].unk5, 0);
     if (fn_02017CB8() && lbl_0300281D) {
-        x = (lbl_030030B0[0].unk10 + 12) << 3;
-        y = (lbl_030030B0[0].unk12 + lbl_030030B0[0].unk16 - 1) << 3;
-        fn_02003C3C(x, y, 2, 5, fn_02004030(2, 5), lbl_030030B0[0].unk5, 0);
+        x = (gWindows[0].unk10 + 12) << 3;
+        y = (gWindows[0].unk12 + gWindows[0].unk16 - 1) << 3;
+        fn_02003C3C(x, y, 2, 5, fn_02004030(2, 5), gWindows[0].unk5, 0);
     }
 }
 
@@ -314,7 +314,7 @@ s32 fn_02017CB8(void)
 {
     s32 ret = 0;
 
-    if (lbl_03002819 > lbl_030030B0[0].unkE)
+    if (lbl_03002819 > gWindows[0].unkE)
         ret = 1;
     return ret;
 }
@@ -322,10 +322,10 @@ s32 fn_02017CB8(void)
 void fn_02017CE0(void)
 {
     char buf[32];
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
     s32 ofs = win->unk14 * 64;
     u32 dst = win->unk14 * 256 + 0x06009000;
-    u8 *p = lbl_0203A800;
+    u8 *p = gListBuf;
     u8 n;
     s32 x;
     s32 w;
@@ -359,13 +359,13 @@ void fn_02017CE0(void)
 
 void fn_02017DF0(s32 idx, s32 row)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 id;
     char *str;
 
     fn_02003394(1, 0);
     fn_020033F4();
-    id = lbl_03002CA0.unk64[idx];
+    id = gSession.unk64[idx];
     if (id > 0) {
         fn_020038F4(16);
         str = fn_0201AAAC(id);
@@ -378,13 +378,13 @@ void fn_02017DF0(s32 idx, s32 row)
 
 void fn_02017E48(s32 idx)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 id;
     char *str;
 
     fn_02003394(1, 0);
     fn_020033F4();
-    id = lbl_03002CA0.unk64[idx];
+    id = gSession.unk64[idx];
     if (id > 0) {
         fn_020038F4(16);
         str = fn_0201AAAC(id);
@@ -401,9 +401,9 @@ void fn_02017EAC(void)
     s32 i;
 
     fn_02000AD4(15, 0, 0);
-    fn_02002FB8(8, 0);
+    Link_SendRequest(8, 0);
     lbl_030030A4 = 0;
-    DmaClear32(DMA0, 0, lbl_030030B0, sizeof(struct Window) * 5);
+    DmaClear32(DMA0, 0, gWindows, sizeof(struct Window) * 5);
     fn_02009C54(0, 16, 0, 2);
     lbl_030032EC = 0;
     fn_020037C8(3, 0, 0);
@@ -412,7 +412,7 @@ void fn_02017EAC(void)
     fn_020041D4(3, 0);
     fn_02004098(3, 0, 2, 0);
     fn_020038D8(0x06008000);
-    fn_02009B80(lbl_030030B0, 1);
+    fn_02009B80(gWindows, 1);
     lbl_03002822 = 0;
     lbl_03002821 = 0;
     if (lbl_0300282C == 0) {
@@ -420,8 +420,8 @@ void fn_02017EAC(void)
         lbl_0300282B = 0;
         lbl_0300282C = 1;
     } else {
-        lbl_030030B0[0].unk2 = lbl_03002823 - lbl_03002820;
-        lbl_0300282B = lbl_030030B0[0].unkE - lbl_03002820 % lbl_030030B0[0].unkE;
+        gWindows[0].unk2 = lbl_03002823 - lbl_03002820;
+        lbl_0300282B = gWindows[0].unkE - lbl_03002820 % gWindows[0].unkE;
     }
     lbl_0300282D = 0;
     for (i = 0; i < 4; i++)
@@ -429,7 +429,7 @@ void fn_02017EAC(void)
     fn_02009DA8(1, 1);
     fn_02009CBC(1, 1, 8);
     lbl_03002823 = 0;
-    lbl_030030AC = 1;
+    gScreenInitDone = 1;
 }
 
 s32 fn_02017FEC(void)
@@ -438,9 +438,9 @@ s32 fn_02017FEC(void)
     struct Window *win;
 
     fn_02003394(1, 0);
-    if (lbl_030030AC == 0)
+    if (gScreenInitDone == 0)
         fn_02017EAC();
-    win = lbl_030030B0;
+    win = gWindows;
     fn_02003394(1, 0);
     fn_020033F4();
     fn_02005968(win);
@@ -462,22 +462,22 @@ s32 fn_0201804C(void)
     s32 idx;
     s32 ret;
 
-    if (!(lbl_03002AEC & 0x80)) {
+    if (!(gDataFlags & 0x80)) {
         if (lbl_030029AC & 2) {
             lbl_03002822 = -1;
             m4aSongNumStart(3);
-            fn_02002FE4(11, 0, 0);
+            Link_SendEvent(11, 0, 0);
             return 1;
         }
         return 0;
     }
-    win = lbl_030030B0;
-    count = (s8)lbl_0203A800[0];
+    win = gWindows;
+    count = (s8)gListBuf[0];
     if (lbl_0300282D == 0) {
         idx = ((count + 1) >> 2) * 4;
         if ((count + 1) & 3)
             idx += 4;
-        p = &lbl_0203A800[idx];
+        p = &gListBuf[idx];
         p += count * 56;
         memcpy(lbl_03002830, p, 16);
         lbl_0300282D = 1;
@@ -494,7 +494,7 @@ s32 fn_0201804C(void)
     }
     fn_02003394(1, 0);
     ret = 0;
-    if (lbl_03002ACC) {
+    if (gMenuHasInput) {
         ret = fn_02018230();
         fn_020181E4();
     }
@@ -511,7 +511,7 @@ s32 fn_0201819C(void)
 
     fn_02003394(1, 0);
     fn_020033F4();
-    win = lbl_030030B0;
+    win = gWindows;
     fn_02008178(win);
     if ((win->unk1 >> 3) >= win->unk16 - 2) {
         ret = lbl_03002822;
@@ -523,8 +523,8 @@ s32 fn_0201819C(void)
 
 void fn_020181E4(void)
 {
-    s32 x = (lbl_030030B0[0].unk10 - 1) * 8;
-    s32 y = (lbl_030030B0[0].unk12 + 1) * 8 + lbl_030030B0[0].unk2 * 16;
+    s32 x = (gWindows[0].unk10 - 1) * 8;
+    s32 y = (gWindows[0].unk12 + 1) * 8 + gWindows[0].unk2 * 16;
 
     fn_02003C3C(x, y, 0, 45, fn_02004030(0, 45), 2, 0);
 }
@@ -539,9 +539,9 @@ s32 fn_02018230(void)
 
     if (lbl_0300299C == 0)
         return 0;
-    count = (s8)lbl_0203A800[0];
+    count = (s8)gListBuf[0];
     ret = 0;
-    win = lbl_030030B0;
+    win = gWindows;
     if (lbl_0300299C & 0x40) {
         if (win->unk2 != 0) {
             win->unk2--;
@@ -590,7 +590,7 @@ s32 fn_02018230(void)
     if (!(lbl_0300299C & 0xC0)) {
         if (lbl_030029AC & 1) {
             idx = lbl_03002820 + win->unk2;
-            if (idx >= count || (s8)lbl_0203A800[idx] < 0 || !fn_02019D0C(idx)) {
+            if (idx >= count || (s8)gListBuf[idx] < 0 || !fn_02019D0C(idx)) {
                 m4aSongNumStart(0);
             } else {
                 lbl_03002822 = 1;
@@ -600,10 +600,10 @@ s32 fn_02018230(void)
             }
         }
         if (lbl_030029AC & 2) {
-            lbl_03002998 = 6;
+            gInputLockFrames = 6;
             lbl_03002822 = -1;
             ret = 1;
-            fn_02002FE4(11, 0, 0);
+            Link_SendEvent(11, 0, 0);
             m4aSongNumStart(3);
         }
     }
@@ -612,12 +612,12 @@ s32 fn_02018230(void)
 
 void fn_020184AC(void)
 {
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
     s32 x = (win->unk10 + 1) * 8;
     s32 y = (win->unk12 + 1) * 8;
     s32 frame = 48;
     s32 pal = fn_02004030(0, frame);
-    s32 count = (s8)lbl_0203A800[0];
+    s32 count = (s8)gListBuf[0];
     s32 i;
     s32 flags;
 
@@ -634,31 +634,31 @@ void fn_02018570(void)
     s32 i;
 
     lbl_030030A4 = 0;
-    DmaClear32(DMA0, 0, lbl_030030B0, sizeof(struct Window) * 5);
-    lbl_030030B0[0].unk0 = 1;
-    lbl_030030B0[0].unk2 = 0;
-    lbl_030030B0[0].unk10 = 0;
-    lbl_030030B0[0].unk12 = 0;
-    lbl_030030B0[0].unkE = 8;
-    lbl_030030B0[0].unk14 = 30;
-    lbl_030030B0[0].unk16 = 18;
-    lbl_030030B0[0].unk3 = 13;
-    lbl_030030B0[0].unk4 = 0;
-    lbl_030030B0[0].unk5 = 2;
-    lbl_030030B0[0].unk6 = 0;
-    lbl_030030B0[0].unk7 = 0;
-    lbl_030030B0[1].unk0 = 1;
-    lbl_030030B0[1].unk2 = 0;
-    lbl_030030B0[1].unk10 = 2;
-    lbl_030030B0[1].unk12 = 13;
-    lbl_030030B0[1].unkE = 2;
-    lbl_030030B0[1].unk14 = 9;
-    lbl_030030B0[1].unk16 = 4;
-    lbl_030030B0[1].unk3 = 3;
-    lbl_030030B0[1].unk4 = 0;
-    lbl_030030B0[1].unk5 = 1;
-    lbl_030030B0[1].unk6 = 1;
-    lbl_030030B0[1].unk7 = 0;
+    DmaClear32(DMA0, 0, gWindows, sizeof(struct Window) * 5);
+    gWindows[0].unk0 = 1;
+    gWindows[0].unk2 = 0;
+    gWindows[0].unk10 = 0;
+    gWindows[0].unk12 = 0;
+    gWindows[0].unkE = 8;
+    gWindows[0].unk14 = 30;
+    gWindows[0].unk16 = 18;
+    gWindows[0].unk3 = 13;
+    gWindows[0].unk4 = 0;
+    gWindows[0].unk5 = 2;
+    gWindows[0].unk6 = 0;
+    gWindows[0].unk7 = 0;
+    gWindows[1].unk0 = 1;
+    gWindows[1].unk2 = 0;
+    gWindows[1].unk10 = 2;
+    gWindows[1].unk12 = 13;
+    gWindows[1].unkE = 2;
+    gWindows[1].unk14 = 9;
+    gWindows[1].unk16 = 4;
+    gWindows[1].unk3 = 3;
+    gWindows[1].unk4 = 0;
+    gWindows[1].unk5 = 1;
+    gWindows[1].unk6 = 1;
+    gWindows[1].unk7 = 0;
     fn_020037C8(3, 0, 0);
     fn_020037C8(4, 4, 0);
     fn_020037C8(5, 3, 0);
@@ -669,13 +669,13 @@ void fn_02018570(void)
     fn_02004098(16, 0, 2, 0);
     fn_02004098(6, 1, 1, 0);
     fn_020038D8(0x06008000);
-    fn_02009B80(&lbl_030030B0[0], 1);
-    for (i = 0; i < lbl_030030B0[1].unkE; i++) {
-        lbl_030030B0[1].items[i].unk0 = 1;
+    fn_02009B80(&gWindows[0], 1);
+    for (i = 0; i < gWindows[1].unkE; i++) {
+        gWindows[1].items[i].unk0 = 1;
         if (i == 0)
-            lbl_030030B0[1].items[0].unk4 = fn_0201A73C(25);
+            gWindows[1].items[0].unk4 = fn_0201A73C(25);
         else
-            lbl_030030B0[1].items[i].unk4 = fn_0201A73C(4);
+            gWindows[1].items[i].unk4 = fn_0201A73C(4);
     }
     lbl_030032EC = 0;
     lbl_03002822 = 0;
@@ -684,7 +684,7 @@ void fn_02018570(void)
     lbl_03002825 = 0;
     lbl_03002827 = 0;
     lbl_0300282A = 0;
-    lbl_030030AC = 1;
+    gScreenInitDone = 1;
 }
 
 s32 fn_02018704(void)
@@ -693,9 +693,9 @@ s32 fn_02018704(void)
     struct Window *win;
 
     fn_02003394(1, 0);
-    if (lbl_030030AC == 0)
+    if (gScreenInitDone == 0)
         fn_02018570();
-    win = lbl_030030B0;
+    win = gWindows;
     fn_02003394(1, 0);
     fn_020033F4();
     fn_02005968(win);
@@ -710,7 +710,7 @@ s32 fn_02018704(void)
 
 s32 fn_02018760(void)
 {
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
     s32 id;
     s32 x, y;
     s32 frame;
@@ -728,35 +728,35 @@ s32 fn_02018760(void)
     ret = 0;
     if (lbl_030032EC == 0 || lbl_030030A4 == 1) {
         if (lbl_03002825 == 0) {
-            if (lbl_03002ACC)
+            if (gMenuHasInput)
                 ret = fn_02018A0C();
-        } else if (lbl_03002AEC & 0x8000) {
-            if (lbl_03002AFC) {
+        } else if (gDataFlags & 0x8000) {
+            if (gReplyResult) {
                 m4aSongNumStart(0);
             } else {
                 lbl_030030A4++;
                 lbl_03002822 = 1;
             }
-            fn_02001578();
+            Reply_Clear();
             lbl_03002825 = 0;
-        } else if (fn_02001604()) {
+        } else if (Reply_IsTimedOut()) {
             m4aSongNumStart(0);
             lbl_03002825 = 0;
-            fn_02001578();
-            lbl_03002998 = 6;
+            Reply_Clear();
+            gInputLockFrames = 6;
         }
     } else if (lbl_030030A4 == 0) {
         ret = fn_0201925C();
         if (ret) {
             lbl_030030A4++;
-            lbl_030030B0[1].unk1 = 0;
+            gWindows[1].unk1 = 0;
         }
         ret = 0;
     } else if (lbl_030030A4 == 2) {
         ret = fn_020192D0();
         if (ret) {
             lbl_030030A4 = 0;
-            lbl_030030B0[1].unk1 = 0;
+            gWindows[1].unk1 = 0;
             lbl_030032EC = 0;
             if (lbl_03002822)
                 ret = lbl_03002822;
@@ -764,7 +764,7 @@ s32 fn_02018760(void)
                 ret = 0;
         }
     }
-    if (lbl_030032EC && lbl_03002ACC)
+    if (lbl_030032EC && gMenuHasInput)
         fn_020189A8();
     return ret;
 }
@@ -776,10 +776,10 @@ s32 fn_02018940(void)
 
     fn_02003394(1, 0);
     fn_020033F4();
-    win = lbl_030030B0;
+    win = gWindows;
     fn_02008178(win);
     if ((win->unk1 >> 3) >= win->unk16 - 2) {
-        lbl_03002998 = 6;
+        gInputLockFrames = 6;
         ret = lbl_03002822;
         fn_02004320(16);
         fn_02004320(6);
@@ -796,9 +796,9 @@ void fn_020189A8(void)
     s32 x, y;
 
     if (lbl_030032EC == 1)
-        win = &lbl_030030B0[1];
+        win = &gWindows[1];
     else
-        win = &lbl_030030B0[3];
+        win = &gWindows[3];
     x = (win->unk10 - 1) * 8;
     if (lbl_030032EC == 1)
         y = win->unk12 * 8 + win->unk2 * 16;
@@ -820,9 +820,9 @@ s32 fn_02018A0C(void)
     win = NULL;
     if (lbl_030032EC) {
         if (lbl_030032EC == 1)
-            win = &lbl_030030B0[1];
+            win = &gWindows[1];
         else
-            win = &lbl_030030B0[3];
+            win = &gWindows[3];
         if (lbl_0300299C & 0xC0) {
             win->unk2 ^= 1;
             m4aSongNumStart(1);
@@ -831,10 +831,10 @@ s32 fn_02018A0C(void)
     if (lbl_030032EC == 0 || !(lbl_0300299C & 0xC0)) {
         if (lbl_030029AC & 1) {
             if (lbl_030032EC == 0) {
-                if (lbl_03003090 != 1 && lbl_03002827 == 0) {
+                if (gScreen != 1 && lbl_03002827 == 0) {
                     lbl_03002822 = 1;
                     ret = 1;
-                } else if (lbl_03003090 == 1 && lbl_03002824 == 0) {
+                } else if (gScreen == 1 && lbl_03002824 == 0) {
                     m4aSongNumStart(0);
                     return 0;
                 } else {
@@ -844,14 +844,14 @@ s32 fn_02018A0C(void)
                 sel = win->unk2;
                 switch (sel) {
                 case 0:
-                    if (lbl_03003090 == 1) {
+                    if (gScreen == 1) {
                         if (win->items[sel].unk0 != 0) {
-                            s32 slot = lbl_03002CA0.unk0 & 3;
-                            p = &lbl_0203A800[lbl_03002823];
-                            fn_02002FE4(10, p[1], slot);
+                            s32 slot = gSession.unk0 & 3;
+                            p = &gListBuf[lbl_03002823];
+                            Link_SendEvent(10, p[1], slot);
                             lbl_03002825 = 1;
-                            fn_02001578();
-                            lbl_03002AF4 = 1;
+                            Reply_Clear();
+                            gReplyWaiting = 1;
                         } else {
                             m4aSongNumStart(0);
                             return 0;
@@ -859,7 +859,7 @@ s32 fn_02018A0C(void)
                     } else {
                         if (fn_02019978(lbl_03002826) == 0) {
                             lbl_03002822 = 1;
-                            lbl_03002998 = 6;
+                            gInputLockFrames = 6;
                         } else {
                             lbl_03002828 = sel;
                             lbl_03002829 = 1;
@@ -873,9 +873,9 @@ s32 fn_02018A0C(void)
                     break;
                 }
             } else {
-                lbl_03002CA0.unk5E[win->unk2 + 3] = lbl_03002826;
-                fn_020032DC(win->unk2 + 3, lbl_03002826);
-                lbl_03002998 = 6;
+                gSession.unk5E[win->unk2 + 3] = lbl_03002826;
+                Link_SendEquipSlot(win->unk2 + 3, lbl_03002826);
+                gInputLockFrames = 6;
                 m4aSongNumStart(2);
                 lbl_03002822 = 1;
                 lbl_030030A4++;
@@ -887,7 +887,7 @@ s32 fn_02018A0C(void)
                 lbl_03002822 = -1;
                 ret = 1;
             } else {
-                if (lbl_03003090 == 2)
+                if (gScreen == 2)
                     lbl_03002822 = -1;
                 lbl_030030A4++;
             }
@@ -900,7 +900,7 @@ s32 fn_02018A0C(void)
 void fn_02018C38(void)
 {
     char buf[64];
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
     struct Recipe *recipe;
     s32 sel;
     u32 dst;
@@ -913,7 +913,7 @@ void fn_02018C38(void)
     if (lbl_03002821 >= win->unkE)
         return;
     recipe = GetRecipe();
-    sel = lbl_03002CA0.unk0 & 3;
+    sel = gSession.unk0 & 3;
     fn_02003394(1, 0);
     fn_020033F4();
     dst = win->unk14 * (lbl_03002821 << 6) + 0x06009000;
@@ -932,20 +932,20 @@ void fn_02018C38(void)
         fn_020038F4(16);
         fn_02003464(fn_0201AAAC(id), 0);
         fn_020037A8(dst, win->unk14);
-        if (fn_02004DA0(&recipe->items[lbl_0300282A].flags)) {
+        if (Item_CanEquip(&recipe->items[lbl_0300282A].flags)) {
             lbl_03002827 = 1;
         } else {
             lbl_03002827 = 0;
             lbl_03002824 = 0;
         }
         if (lbl_03002824) {
-            if (recipe->price > lbl_03002CA0.unk104.word)
+            if (recipe->price > gSession.unk104.word)
                 lbl_03002824 = 0;
             if (lbl_03002824) {
                 for (i = 0; i < 3 && recipe->materials[i] != 0; i++) {
                     count = 0;
                     for (j = 0; j < 64; j++) {
-                        if (lbl_03002CA0.unk64[j] == recipe->materials[i])
+                        if (gSession.unk64[j] == recipe->materials[i])
                             count++;
                     }
                     if (recipe->counts[i] > count)
@@ -981,10 +981,10 @@ void fn_02018C38(void)
         fn_02003464(fn_0201A73C(13), 0);
         fn_020038F4(112);
         fn_02003464(fn_0201A73C(18), 0);
-        fn_02000CF0(lbl_03002CA0.unk104.word, (win->unk14 - 2) * 8 - w, 8);
+        fn_02000CF0(gSession.unk104.word, (win->unk14 - 2) * 8 - w, 8);
         fn_02003464(fn_0201A73C(13), 0);
         fn_020037A8(dst, win->unk14);
-        pal = recipe->price > lbl_03002CA0.unk104.word ? 5 : 3;
+        pal = recipe->price > gSession.unk104.word ? 5 : 3;
         fn_02019180(lbl_03002821, pal);
     } else if (lbl_03002821 == 4) {
         w = fn_02003464(fn_0201A73C(23), 2);
@@ -1002,7 +1002,7 @@ void fn_02018C38(void)
         }
         count = 0;
         for (j = 0; j < 64; j++) {
-            if (lbl_03002CA0.unk64[j] == id)
+            if (gSession.unk64[j] == id)
                 count++;
         }
         w = fn_02003464(fn_0201AAAC(id), 2);

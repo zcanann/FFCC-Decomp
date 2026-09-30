@@ -75,14 +75,14 @@ extern u8 lbl_030027BF;
 extern u16 lbl_0300299C;
 extern u16 lbl_030029AC;
 extern u32 lbl_03002AC8;
-extern u16 lbl_03002AEC;
-extern u8 lbl_03002AF4;
-extern s8 lbl_03002AFC;
-extern struct Work lbl_03002CA0;
+extern u16 gDataFlags;
+extern u8 gReplyWaiting;
+extern s8 gReplyResult;
+extern struct Work gSession;
 extern struct Unk03002FB0 lbl_03002FB0;
 extern s32 lbl_030030A4;
-extern s32 lbl_030030AC;
-extern struct Window lbl_030030B0[];
+extern s32 gScreenInitDone;
+extern struct Window gWindows[];
 extern s32 lbl_030032EC;
 extern const char lbl_0201D040[];
 
@@ -93,11 +93,11 @@ char *strcat(char *, const char *);
 void m4aSongNumStart(u16);
 u16 *fn_02000A40(s32, s32, s32);
 void fn_02000A74(void);
-void fn_02001578(void);
-s32 fn_02001604(void);
-void fn_0200321C(u8);
-void fn_0200324C(void);
-void fn_0200327C(u8 *);
+void Reply_Clear(void);
+s32 Reply_IsTimedOut(void);
+void Link_SendCMakeJob(u8);
+void Link_SendCMakeEnd(void);
+void Link_SendCMakeFavorite(u8 *);
 void fn_02003394(s32, s32);
 void fn_020033F4(void);
 s32 fn_02003464(const char *, s32);
@@ -149,7 +149,7 @@ s32 fn_0200DFE0(void);
 
 void fn_0200CEC4(s32 up)
 {
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
     s32 step = 64;
     s32 from;
     s32 to;
@@ -186,7 +186,7 @@ void fn_0200CF54(void)
     lbl_030027A0[lbl_03002782[0]] = lbl_030027A0[lbl_03002782[1]];
     lbl_030027A0[lbl_03002782[1]] = tmp;
     for (i = 0; i < 2; i++) {
-        if (lbl_03002782[i] >= lbl_030027AB && lbl_03002782[i] < lbl_030027AB + lbl_030030B0[0].unkE)
+        if (lbl_03002782[i] >= lbl_030027AB && lbl_03002782[i] < lbl_030027AB + gWindows[0].unkE)
             fn_0200CC5C(lbl_03002782[i] - lbl_030027AB);
     }
 }
@@ -194,7 +194,7 @@ void fn_0200CF54(void)
 void fn_0200CFBC(void)
 {
     s32 frame = 45;
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
     s32 x;
     s32 y;
     s32 blink;
@@ -240,7 +240,7 @@ s32 fn_0200D138(void)
 
     if (lbl_0300299C == 0)
         return 0;
-    win = lbl_030030B0;
+    win = gWindows;
     ret = 0;
     if (lbl_030032EC == 0) {
         if (lbl_0300299C & 0x40) {
@@ -313,11 +313,11 @@ s32 fn_0200D138(void)
                     else
                         buf[v >> 1] |= i & 15;
                 }
-                fn_0200327C(buf);
+                Link_SendCMakeFavorite(buf);
                 lbl_03002780 = 1;
                 lbl_030027AC = 1;
-                fn_02001578();
-                lbl_03002AF4 = 1;
+                Reply_Clear();
+                gReplyWaiting = 1;
             }
             m4aSongNumStart(2);
         } else if (lbl_030029AC & 2) {
@@ -337,27 +337,27 @@ void fn_0200D380(void)
 {
     s32 i;
 
-    DmaClear32(DMA0, 0, lbl_030030B0, sizeof(struct Window) * 5);
+    DmaClear32(DMA0, 0, gWindows, sizeof(struct Window) * 5);
 
-    lbl_030030B0->unk0 = 1;
-    lbl_030030B0->unk10 = 5;
-    lbl_030030B0->unk12 = 5;
-    lbl_030030B0->unkE = 6;
-    lbl_030030B0->unk14 = 21;
-    lbl_030030B0->unk16 = 12;
-    lbl_030030B0->unk3 = 8;
-    lbl_030030B0->unk4 = 0;
-    lbl_030030B0->unk5 = 2;
-    lbl_030030B0->unk6 = 0;
-    lbl_030030B0->unk7 = 0;
-    for (i = 0; i < lbl_030030B0->unkE; i++) {
-        lbl_030030B0->items[i].unk0 = 1;
-        lbl_030030B0->items[i].unk4 = fn_0201A73C(0);
+    gWindows->unk0 = 1;
+    gWindows->unk10 = 5;
+    gWindows->unk12 = 5;
+    gWindows->unkE = 6;
+    gWindows->unk14 = 21;
+    gWindows->unk16 = 12;
+    gWindows->unk3 = 8;
+    gWindows->unk4 = 0;
+    gWindows->unk5 = 2;
+    gWindows->unk6 = 0;
+    gWindows->unk7 = 0;
+    for (i = 0; i < gWindows->unkE; i++) {
+        gWindows->items[i].unk0 = 1;
+        gWindows->items[i].unk4 = fn_0201A73C(0);
     }
-    lbl_030030B0[4].items[0].unk0 = 1;
-    lbl_030030B0[4].items[0].unk4 = fn_0201A8A4(2);
+    gWindows[4].items[0].unk0 = 1;
+    gWindows[4].items[0].unk4 = fn_0201A8A4(2);
     fn_020091D4();
-    lbl_030030B0->unk2 = lbl_03002FB0.unk18[0];
+    gWindows->unk2 = lbl_03002FB0.unk18[0];
 
     lbl_03002780 = 0;
     lbl_030027AB = 0;
@@ -369,17 +369,17 @@ void fn_0200D380(void)
     lbl_03002782[0] = 0;
     lbl_030030A4 = 0;
     lbl_030032EC = 0;
-    lbl_030030AC = 1;
+    gScreenInitDone = 1;
     fn_02000A74();
 }
 
 s32 fn_0200D490(void)
 {
     s32 ret = 0;
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
     s32 x;
 
-    if (lbl_030030AC == 0)
+    if (gScreenInitDone == 0)
         fn_0200D380();
     fn_0200D680();
     fn_02003394(1, 0);
@@ -413,18 +413,18 @@ s32 fn_0200D538(void)
     if (lbl_030030A4 == 0) {
         if (lbl_030027AC == 0) {
             ret = fn_0200D838();
-        } else if (lbl_03002AEC & 0x8000) {
-            if (lbl_03002AFC != 0) {
+        } else if (gDataFlags & 0x8000) {
+            if (gReplyResult != 0) {
                 lbl_030030A4 = 1;
                 m4aSongNumStart(0);
             } else {
                 ret = 1;
             }
             lbl_030027AC = 0;
-            fn_02001578();
-        } else if (fn_02001604()) {
+            Reply_Clear();
+        } else if (Reply_IsTimedOut()) {
             lbl_030027AC = ret;
-            fn_02001578();
+            Reply_Clear();
         }
     } else {
         if (lbl_030030A4 == 1) {
@@ -447,7 +447,7 @@ s32 fn_0200D538(void)
 s32 fn_0200D608(void)
 {
     s32 ret = 0;
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
 
     fn_02003394(1, 0);
     fn_02008178(win);
@@ -472,7 +472,7 @@ void fn_0200D680(void)
     struct Window tmp;
 
     if (lbl_030027A8 <= 7) {
-        memcpy(&tmp, lbl_030030B0, sizeof(struct Window));
+        memcpy(&tmp, gWindows, sizeof(struct Window));
         tmp.unk5--;
         tmp.unk14 = 8;
         fn_02003394(0, 0);
@@ -496,7 +496,7 @@ void fn_0200D6E4(void)
     s32 y;
 
     if (lbl_030027A9 <= 3) {
-        win = lbl_030030B0;
+        win = gWindows;
         for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
             buf[i] = 0x3FF;
         attr = 0x7000;
@@ -528,7 +528,7 @@ void fn_0200D7D0(void)
     s32 y;
 
     if (lbl_030027A9 > 3) {
-        win = lbl_030030B0;
+        win = gWindows;
         x = win->unk10 * 8 - 2;
         x += (win->unk2 >> 2) * 80;
         y = win->unk12 * 8;
@@ -544,7 +544,7 @@ s32 fn_0200D838(void)
 
     if (lbl_0300299C == 0)
         return 0;
-    win = lbl_030030B0;
+    win = gWindows;
     ret = 0;
     if (lbl_0300299C & 0x40) {
         if ((win->unk2 & 3) == 0)
@@ -569,10 +569,10 @@ s32 fn_0200D838(void)
     if (!(lbl_0300299C & 0xF0)) {
         if (lbl_030029AC & 1) {
             lbl_03002780 = 1;
-            fn_0200321C(win->unk2);
+            Link_SendCMakeJob(win->unk2);
             lbl_030027AC = 1;
-            fn_02001578();
-            lbl_03002AF4 = 1;
+            Reply_Clear();
+            gReplyWaiting = 1;
             m4aSongNumStart(2);
         } else if (lbl_030029AC & 2) {
             lbl_03002780 = -1;
@@ -589,39 +589,39 @@ void fn_0200D934(void)
     s32 i;
     s32 save;
 
-    DmaClear32(DMA0, 0, lbl_030030B0, sizeof(struct Window) * 5);
+    DmaClear32(DMA0, 0, gWindows, sizeof(struct Window) * 5);
 
-    lbl_030030B0->unk0 = 1;
-    lbl_030030B0->unk10 = 2;
-    lbl_030030B0->unk12 = 4;
-    lbl_030030B0->unkE = 4;
-    lbl_030030B0->unk14 = 25;
-    lbl_030030B0->unk16 = 12;
-    lbl_030030B0->unk3 = 8;
-    lbl_030030B0->unk4 = 0;
-    lbl_030030B0->unk5 = 2;
-    lbl_030030B0->unk6 = 0;
-    lbl_030030B0->unk7 = 0;
+    gWindows->unk0 = 1;
+    gWindows->unk10 = 2;
+    gWindows->unk12 = 4;
+    gWindows->unkE = 4;
+    gWindows->unk14 = 25;
+    gWindows->unk16 = 12;
+    gWindows->unk3 = 8;
+    gWindows->unk4 = 0;
+    gWindows->unk5 = 2;
+    gWindows->unk6 = 0;
+    gWindows->unk7 = 0;
 
-    lbl_030030B0[1].unk0 = 1;
-    lbl_030030B0[1].unk10 = 18;
-    lbl_030030B0[1].unk12 = 15;
-    lbl_030030B0[1].unkE = 3;
-    lbl_030030B0[1].unk14 = 11;
-    lbl_030030B0[1].unk16 = 4;
-    lbl_030030B0[1].unk3 = 3;
-    lbl_030030B0[1].unk4 = 0;
-    lbl_030030B0[1].unk5 = 1;
-    lbl_030030B0[1].unk6 = 2;
-    lbl_030030B0[1].unk7 = 0;
+    gWindows[1].unk0 = 1;
+    gWindows[1].unk10 = 18;
+    gWindows[1].unk12 = 15;
+    gWindows[1].unkE = 3;
+    gWindows[1].unk14 = 11;
+    gWindows[1].unk16 = 4;
+    gWindows[1].unk3 = 3;
+    gWindows[1].unk4 = 0;
+    gWindows[1].unk5 = 1;
+    gWindows[1].unk6 = 2;
+    gWindows[1].unk7 = 0;
 
-    for (i = 0; i < lbl_030030B0->unkE; i++) {
-        lbl_030030B0->items[i].unk0 = 1;
-        lbl_030030B0->items[i].unk4 = fn_0201A73C(0);
+    for (i = 0; i < gWindows->unkE; i++) {
+        gWindows->items[i].unk0 = 1;
+        gWindows->items[i].unk4 = fn_0201A73C(0);
     }
-    for (i = 0; i < lbl_030030B0[1].unkE; i++) {
-        lbl_030030B0[1].items[i].unk0 = 1;
-        lbl_030030B0[1].items[i].unk4 = fn_0201A73C(0);
+    for (i = 0; i < gWindows[1].unkE; i++) {
+        gWindows[1].items[i].unk0 = 1;
+        gWindows[1].items[i].unk4 = fn_0201A73C(0);
     }
 
     fn_02003394(0, 0);
@@ -637,7 +637,7 @@ void fn_0200D934(void)
 
     fn_02003394(0, 0);
     fn_020033F4();
-    win = &lbl_030030B0[1];
+    win = &gWindows[1];
     save = win->unk5;
     win->unk5 = 0;
     for (i = 2; i >= 0; i--)
@@ -645,17 +645,17 @@ void fn_0200D934(void)
     win->unk5 = save;
 
     lbl_030032EC = 1;
-    lbl_030030AC = 1;
+    gScreenInitDone = 1;
     fn_02000A74();
 }
 
 s32 fn_0200DABC(void)
 {
     s32 ret = 0;
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
     s32 x;
 
-    if (lbl_030030AC == 0)
+    if (gScreenInitDone == 0)
         fn_0200D934();
     fn_0200DD44();
     fn_02003394(1, 0);
@@ -689,7 +689,7 @@ s32 fn_0200DABC(void)
 
 s32 fn_0200DB98(void)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 ret;
     s32 i;
     s32 x;
@@ -705,8 +705,8 @@ s32 fn_0200DB98(void)
     fn_0200DF38();
     fn_02008E88(2, 8, 7, 20, 0, 1);
     if (lbl_030032EC) {
-        x = lbl_030030B0[1].unk10 * 8 + 10;
-        y = lbl_030030B0[1].unk12 * 8 + 7;
+        x = gWindows[1].unk10 * 8 + 10;
+        y = gWindows[1].unk12 * 8 + 7;
         for (i = 0; i <= 8; i++, x += 16)
             fn_02003C3C(x, y, 22, i, 0, 1, 0);
     }
@@ -716,7 +716,7 @@ s32 fn_0200DB98(void)
 s32 fn_0200DC4C(void)
 {
     s32 ret = 0;
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
 
     fn_02003394(1, 0);
     fn_02008178(win);
@@ -735,7 +735,7 @@ s32 fn_0200DC4C(void)
             ret = -1;
             lbl_030030A4 = win->unk2;
         } else {
-            fn_0200324C();
+            Link_SendCMakeEnd();
             ret = 1;
             lbl_030030A4 = 0;
         }
@@ -757,7 +757,7 @@ void fn_0200DD44(void)
     s32 idx;
 
     if (lbl_030027A8 <= 3) {
-        memcpy(&tmp, lbl_030030B0, sizeof(struct Window));
+        memcpy(&tmp, gWindows, sizeof(struct Window));
         tmp.unk5--;
         tmp.unk14 = 23;
         fn_02003394(0, 0);
@@ -804,7 +804,7 @@ void fn_0200DE80(void)
     s32 y;
 
     if (lbl_030027A9 <= 3) {
-        win = lbl_030030B0;
+        win = gWindows;
         for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
             buf[i] = 0x3FF;
         attr = 0x7000;
@@ -833,7 +833,7 @@ void fn_0200DF38(void)
 
     if (lbl_030027A9 > 3) {
         sel = lbl_030032EC;
-        win = &lbl_030030B0[sel];
+        win = &gWindows[sel];
         if (sel) {
             col = win->unk10 - 1;
             y = win->unk12 * 8 + 7;
@@ -857,7 +857,7 @@ s32 fn_0200DFE0(void)
 
     if (lbl_0300299C == 0)
         return 0;
-    win = &lbl_030030B0[lbl_030032EC];
+    win = &gWindows[lbl_030032EC];
     ret = 0;
     if (lbl_030032EC == 0) {
         if (lbl_0300299C & 0x40) {
@@ -922,35 +922,35 @@ s32 fn_0200DFE0(void)
 
 void fn_0200E184(void)
 {
-    DmaClear32(DMA0, 0, lbl_030030B0, sizeof(struct Window) * 5);
+    DmaClear32(DMA0, 0, gWindows, sizeof(struct Window) * 5);
     fn_020093B4(0, 0);
 
-    lbl_030030B0[1].unk0 = 1;
-    lbl_030030B0[1].unk2 = 0;
-    lbl_030030B0[1].unk10 = 5;
-    lbl_030030B0[1].unk12 = 3;
-    lbl_030030B0[1].unkE = 6;
-    lbl_030030B0[1].unk14 = 14;
-    lbl_030030B0[1].unk16 = 14;
-    lbl_030030B0[1].unk3 = 0;
-    lbl_030030B0[1].unk4 = 0;
-    lbl_030030B0[1].unk5 = 0;
-    lbl_030030B0[1].unk6 = 1;
-    lbl_030030B0[1].unk7 = 0;
-    fn_02009B80(&lbl_030030B0[1], 1);
+    gWindows[1].unk0 = 1;
+    gWindows[1].unk2 = 0;
+    gWindows[1].unk10 = 5;
+    gWindows[1].unk12 = 3;
+    gWindows[1].unkE = 6;
+    gWindows[1].unk14 = 14;
+    gWindows[1].unk16 = 14;
+    gWindows[1].unk3 = 0;
+    gWindows[1].unk4 = 0;
+    gWindows[1].unk5 = 0;
+    gWindows[1].unk6 = 1;
+    gWindows[1].unk7 = 0;
+    fn_02009B80(&gWindows[1], 1);
 
-    lbl_030030B0[2].unk0 = 1;
-    lbl_030030B0[2].unk2 = 2;
-    lbl_030030B0[2].unk10 = 2;
-    lbl_030030B0[2].unk12 = 2;
-    lbl_030030B0[2].unkE = lbl_03002CA0.unk5D;
-    lbl_030030B0[2].unk14 = 14;
-    lbl_030030B0[2].unk16 = lbl_030030B0[2].unkE * 2;
-    lbl_030030B0[2].unk3 = 16;
-    lbl_030030B0[2].unk4 = 0;
-    lbl_030030B0[2].unk5 = 2;
-    lbl_030030B0[2].unk6 = 2;
-    lbl_030030B0[2].unk7 = 0;
+    gWindows[2].unk0 = 1;
+    gWindows[2].unk2 = 2;
+    gWindows[2].unk10 = 2;
+    gWindows[2].unk12 = 2;
+    gWindows[2].unkE = gSession.unk5D;
+    gWindows[2].unk14 = 14;
+    gWindows[2].unk16 = gWindows[2].unkE * 2;
+    gWindows[2].unk3 = 16;
+    gWindows[2].unk4 = 0;
+    gWindows[2].unk5 = 2;
+    gWindows[2].unk6 = 2;
+    gWindows[2].unk7 = 0;
 
     fn_02003394(1, 0);
     fn_020033F4();
@@ -973,8 +973,8 @@ void fn_0200E184(void)
     fn_0200EB80();
     fn_02009DA8(2, 1);
     fn_02009CBC(2, 1, 7);
-    lbl_03002AEC &= ~0x200;
+    gDataFlags &= ~0x200;
     lbl_030027BE = 0;
     lbl_030027BF = 0;
-    lbl_030030AC = 1;
+    gScreenInitDone = 1;
 }

@@ -67,17 +67,17 @@ extern u8 lbl_030027E9;
 extern u32 lbl_030027EC;
 extern u16 lbl_0300299C;
 extern u16 lbl_030029AC;
-extern u8 lbl_03002ACC;
-extern u16 lbl_03002AEC;
-extern u8 lbl_03002AF4;
-extern s8 lbl_03002AFC;
-extern u8 lbl_03002C98;
-extern s8 lbl_03003098;
-extern u8 lbl_030032E0;
-extern struct Window lbl_030030B0[];
-extern struct EntryList lbl_0203A800;
+extern u8 gMenuHasInput;
+extern u16 gDataFlags;
+extern u8 gReplyWaiting;
+extern s8 gReplyResult;
+extern u8 gLanguage;
+extern s8 gScreenStep;
+extern u8 gOpenMenuReq;
+extern struct Window gWindows[];
+extern struct EntryList gListBuf;
 extern struct Entry lbl_0203A810[];
-extern char lbl_0203D800[];
+extern char gDetailBuf[];
 extern const char lbl_0201D044[];
 extern const char lbl_0201D048[];
 extern const char lbl_0201D04C[];
@@ -91,11 +91,11 @@ char *strchr(const char *, s32);
 void m4aSongNumStart(u16);
 u16 *fn_02000A40(s32, s32, s32);
 void fn_02000D9C(char *, s32);
-void fn_02001578(void);
-s32 fn_02001604(void);
-s32 fn_02002FB8(u8, u8);
-s32 fn_02002FE4(u8, u8, u8);
-s32 fn_02003014(u8, s8, u8, u32);
+void Reply_Clear(void);
+s32 Reply_IsTimedOut(void);
+s32 Link_SendRequest(u8, u8);
+s32 Link_SendEvent(u8, u8, u8);
+s32 Link_SendLetterReply(u8, s8, u8, u32);
 void fn_02003394(s32, s32);
 void fn_020033F4(void);
 s32 fn_02003464(const char *, s32);
@@ -125,10 +125,10 @@ void fn_0201361C(s32, s32);
 s32 fn_02012364(void)
 {
     struct Entry *entry = &lbl_0203A810[lbl_030027E0];
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
     s32 ret = 0;
 
-    if (lbl_03002ACC) {
+    if (gMenuHasInput) {
         if (lbl_030027E5 == 0) {
             if (lbl_0300299C & 0xC0) {
                 if (win->unk2 == win->unkE - 1)
@@ -142,10 +142,10 @@ s32 fn_02012364(void)
                     if (win->unk2 >= win->unkE - 1) {
                         lbl_030027E5 = -1;
                         ret = 1;
-                    } else if (fn_02003014(lbl_030027E0, lbl_030027E6, (lbl_030027E9 & 0x10) != 0, lbl_030027EC) == 0) {
+                    } else if (Link_SendLetterReply(lbl_030027E0, lbl_030027E6, (lbl_030027E9 & 0x10) != 0, lbl_030027EC) == 0) {
                         lbl_030027E5 = 1;
-                        fn_02001578();
-                        lbl_03002AF4 = 1;
+                        Reply_Clear();
+                        gReplyWaiting = 1;
                     }
                     m4aSongNumStart(2);
                 } else if (lbl_030029AC & 2) {
@@ -156,8 +156,8 @@ s32 fn_02012364(void)
                     m4aSongNumStart(0);
                 }
             }
-        } else if (lbl_03002AEC & 0x8000) {
-            if (lbl_03002AFC == 0) {
+        } else if (gDataFlags & 0x8000) {
+            if (gReplyResult == 0) {
                 entry->unk6 |= 4;
                 lbl_030027E7 = 0;
                 ret = 1;
@@ -165,7 +165,7 @@ s32 fn_02012364(void)
                 lbl_030027E7 = 1;
                 ret = 1;
             }
-        } else if (fn_02001604()) {
+        } else if (Reply_IsTimedOut()) {
             lbl_030027E7 = 1;
             ret = 1;
         }
@@ -181,7 +181,7 @@ s32 fn_0201250C(void)
 
     if (lbl_030027E7)
         return 1;
-    win = lbl_030030B0;
+    win = gWindows;
     fn_02008178(win);
     ret = 0;
     if ((win->unk1 >> 3) < win->unk16) {
@@ -196,7 +196,7 @@ s32 fn_0201250C(void)
 
 s32 fn_02012558(void)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 w;
     s32 i;
     s32 ret;
@@ -247,7 +247,7 @@ s32 fn_02012670(void)
 {
     s32 ret = 0;
 
-    if (lbl_03002ACC && (lbl_030029AC & 3)) {
+    if (gMenuHasInput && (lbl_030029AC & 3)) {
         ret = 1;
         m4aSongNumStart(2);
     }
@@ -256,7 +256,7 @@ s32 fn_02012670(void)
 
 s32 fn_020126A0(void)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 ret;
 
     fn_02008178(win);
@@ -274,8 +274,8 @@ s32 fn_020126A0(void)
 s32 fn_020126D8(void)
 {
     char buf[256];
-    s32 mode = lbl_03002C98 & 15;
-    struct Window *win = &lbl_030030B0[1];
+    s32 mode = gLanguage & 15;
+    struct Window *win = &gWindows[1];
     struct Entry *entry;
     s32 w;
     s32 i;
@@ -354,8 +354,8 @@ s32 fn_020128D0(void)
     struct Entry *entry = &lbl_0203A810[lbl_030027E0];
     struct Window *win;
 
-    if (lbl_03002ACC) {
-        win = &lbl_030030B0[1];
+    if (gMenuHasInput) {
+        win = &gWindows[1];
         if (lbl_0300299C && lbl_030027E5 == 0) {
             if (lbl_0300299C & 0x40) {
                 if (win->unk2 > 1)
@@ -373,10 +373,10 @@ s32 fn_020128D0(void)
             if (!(lbl_0300299C & 0xC0)) {
                 if (lbl_030029AC & 1) {
                     if (win->unk2 == 1) {
-                        if (fn_02002FE4(0, lbl_030027E0, 0) == 0) {
+                        if (Link_SendEvent(0, lbl_030027E0, 0) == 0) {
                             lbl_030027E5 = 1;
-                            fn_02001578();
-                            lbl_03002AF4 = 1;
+                            Reply_Clear();
+                            gReplyWaiting = 1;
                         }
                     } else {
                         lbl_030027E5 = -1;
@@ -392,8 +392,8 @@ s32 fn_020128D0(void)
                     ret = 1;
             }
         } else if (lbl_030027E5) {
-            if (lbl_03002AEC & 0x8000) {
-                if (lbl_03002AFC) {
+            if (gDataFlags & 0x8000) {
+                if (gReplyResult) {
                     lbl_030027E5 = -1;
                     lbl_030027E7 = 1;
                 } else {
@@ -401,7 +401,7 @@ s32 fn_020128D0(void)
                     lbl_030027E7 = 0;
                 }
                 ret = 1;
-            } else if (fn_02001604()) {
+            } else if (Reply_IsTimedOut()) {
                 lbl_030027E5 = -1;
                 lbl_030027E7 = 1;
                 ret = 1;
@@ -410,13 +410,13 @@ s32 fn_020128D0(void)
         fn_0201361C((win->unk10 + 1) * 8 - 2, (win->unk12 + 1) * 8 + win->unk2 * 16);
     }
     if (ret)
-        fn_02001578();
+        Reply_Clear();
     return ret;
 }
 
 s32 fn_02012ABC(void)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 ret;
 
     fn_02008178(win);
@@ -433,7 +433,7 @@ s32 fn_02012ABC(void)
 s32 fn_02012AF0(void)
 {
     char buf[256];
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     struct Entry *entry;
     char *str;
     s32 w;
@@ -445,7 +445,7 @@ s32 fn_02012AF0(void)
         memset(win, 0, sizeof(struct Window));
         memset(buf, 0, sizeof(buf));
         entry = &lbl_0203A810[lbl_030027E0];
-        if (!(lbl_03002C98 & 15))
+        if (!(gLanguage & 15))
             strcat(buf, fn_0201AA44(8));
         if (entry->unk6 & 8) {
             strcat(buf, fn_0201AAAC(entry->unk0));
@@ -455,11 +455,11 @@ s32 fn_02012AF0(void)
             strcat(buf, lbl_0201D044);
             strcat(buf, fn_0201A73C(5));
         }
-        if (!(lbl_03002C98 & 15))
+        if (!(gLanguage & 15))
             strcat(buf, lbl_0201D04C);
         fn_02003394(1, 1);
         fn_020033F4();
-        if (lbl_03002C98 & 15) {
+        if (gLanguage & 15) {
             w2 = fn_02003464(fn_0201AA44(9), 2);
             str = buf;
         } else {
@@ -488,7 +488,7 @@ s32 fn_02012AF0(void)
             win->items[i].unk4 = fn_0201A73C(0);
         }
         fn_020059D4(win, 0, 0);
-        if (!(lbl_03002C98 & 15)) {
+        if (!(gLanguage & 15)) {
             fn_020033F4();
             fn_02003464(buf, 0);
             fn_020059D4(win, 1, 0);
@@ -499,7 +499,7 @@ s32 fn_02012AF0(void)
     }
     fn_02003394(1, 1);
     w = win->unk1 >> 3;
-    if (w == 1 && (lbl_03002C98 & 15)) {
+    if (w == 1 && (gLanguage & 15)) {
         fn_020033F4();
         fn_02003464(fn_0201AA44(9), 0);
         fn_020059D4(win, 1, 0);
@@ -519,7 +519,7 @@ s32 fn_02012D18(void)
 {
     s32 ret = 0;
 
-    if (lbl_03002ACC) {
+    if (gMenuHasInput) {
         if (lbl_030029AC & 3) {
             ret = 1;
             m4aSongNumStart(2);
@@ -532,7 +532,7 @@ s32 fn_02012D18(void)
 
 s32 fn_02012D5C(void)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 ret;
 
     fn_02008178(win);
@@ -549,7 +549,7 @@ s32 fn_02012D5C(void)
 s32 fn_02012D90(void)
 {
     char buf[256];
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     char *str;
     char *nl;
     s32 w;
@@ -560,7 +560,7 @@ s32 fn_02012D90(void)
 
     if (lbl_030027DB == 0) {
         memset(win, 0, sizeof(struct Window));
-        str = lbl_0203D800;
+        str = gDetailBuf;
         len = strlen(str);
         str += len + 1;
         lbl_030027E4 = fn_02013B1C(str);
@@ -624,7 +624,7 @@ s32 fn_02012D90(void)
             fn_02003464(fn_0201A73C(4), 0);
         } else {
             memset(buf, 0, sizeof(buf));
-            str = &lbl_0203D800[strlen(lbl_0203D800) + 1];
+            str = &gDetailBuf[strlen(gDetailBuf) + 1];
             for (i = 0; i < w; i++) {
                 nl = strchr(str, '\n');
                 if (nl != NULL)
@@ -658,10 +658,10 @@ s32 fn_02012D90(void)
 
 s32 fn_0201304C(void)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 ret = 0;
 
-    if (lbl_03002ACC) {
+    if (gMenuHasInput) {
         if (lbl_0300299C) {
             if (lbl_0300299C & 0x40) {
                 if (win->unk2 > 0)
@@ -702,7 +702,7 @@ s32 fn_0201304C(void)
 
 s32 fn_0201316C(void)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 ret;
 
     fn_02008178(win);
@@ -718,7 +718,7 @@ s32 fn_0201316C(void)
 
 s32 fn_020131A0(void)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 w;
     s32 w2;
     s32 i;
@@ -775,10 +775,10 @@ s32 fn_020131A0(void)
 
 s32 fn_020132C8(void)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 ret = 0;
 
-    if (lbl_03002ACC) {
+    if (gMenuHasInput) {
         if (lbl_0300299C) {
             if (lbl_0300299C & 0x40) {
                 if (win->unk2 > 0)
@@ -817,7 +817,7 @@ s32 fn_020132C8(void)
 
 s32 fn_020133DC(void)
 {
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 ret;
 
     fn_02008178(win);
@@ -836,7 +836,7 @@ void fn_02013410(s32 idx, s32 row)
     char buf[64];
     struct Window tmp;
     char *src;
-    struct EntryList *list = &lbl_0203A800;
+    struct EntryList *list = &gListBuf;
     struct Entry *entries = lbl_0203A810;
     char *names = (char *)(entries + list->count);
     char *descs = names + list->unk4 * 24;
@@ -852,7 +852,7 @@ void fn_02013410(s32 idx, s32 row)
     src = descs + entries[idx].unk5 * 16;
     memcpy(buf, src, 16);
     fn_02003464(buf, 0);
-    memcpy(&tmp, lbl_030030B0, sizeof(struct Window));
+    memcpy(&tmp, gWindows, sizeof(struct Window));
     tmp.unk14 = 25;
     tmp.unk5--;
     fn_020059D4(&tmp, row, 0);
@@ -872,7 +872,7 @@ void fn_020134C8(s32 idx, s32 row, s32 n, s32 pal)
         buf[i + 30] = tile++ | pal;
     }
     bot = &buf[30];
-    map = fn_02000A40(lbl_030030B0[0].unk5 - 1, 2, row * 2 + 1);
+    map = fn_02000A40(gWindows[0].unk5 - 1, 2, row * 2 + 1);
     DmaCopy16(DMA3, buf, map, n * 2);
     DmaCopy16(DMA3, bot, map + 32, n * 2);
 }
@@ -902,16 +902,16 @@ void fn_0201357C(s32 up)
     s32 j;
 
     if (up) {
-        srcRow = lbl_030030B0[0].unkE * 2;
+        srcRow = gWindows[0].unkE * 2;
         dstRow = srcRow - 2;
         step = -step;
     } else {
         dstRow = 3;
         srcRow = 1;
     }
-    dst = (u8 *)fn_02000A40(lbl_030030B0[0].unk5 - 1, 2, dstRow);
-    src = (u8 *)fn_02000A40(lbl_030030B0[0].unk5 - 1, 2, srcRow);
-    for (i = 0; i < lbl_030030B0[0].unkE - 1; i++) {
+    dst = (u8 *)fn_02000A40(gWindows[0].unk5 - 1, 2, dstRow);
+    src = (u8 *)fn_02000A40(gWindows[0].unk5 - 1, 2, srcRow);
+    for (i = 0; i < gWindows[0].unkE - 1; i++) {
         for (j = 0; j < 2; j++) {
             DmaSet(DMA0, dst, src, 0x80000019);
             dst += step;
@@ -936,8 +936,8 @@ s32 fn_02013648(void)
 
     if (lbl_0300299C == 0)
         return 0;
-    list = &lbl_0203A800;
-    win = lbl_030030B0;
+    list = &gListBuf;
+    win = gWindows;
     if (lbl_0300299C & 0x40) {
         if (win->unk2) {
             win->unk2--;
@@ -976,7 +976,7 @@ s32 fn_02013648(void)
     if (!(lbl_0300299C & 0xC0)) {
         if (lbl_030029AC & 2) {
             lbl_030027D9 = 1;
-            lbl_030032E0 = 1;
+            gOpenMenuReq = 1;
             m4aSongNumStart(3);
             return 1;
         }
@@ -984,7 +984,7 @@ s32 fn_02013648(void)
             sel = win->unk2 + lbl_030027DC;
             if (sel < list->count) {
                 lbl_030027E0 = sel;
-                fn_02002FB8(2, sel);
+                Link_SendRequest(2, sel);
                 ret = 1;
                 m4aSongNumStart(2);
             } else {
@@ -992,9 +992,9 @@ s32 fn_02013648(void)
             }
         } else if (lbl_030029AC & 0x300) {
             if (lbl_030029AC & 0x100)
-                lbl_03003098 = 1;
+                gScreenStep = 1;
             else
-                lbl_03003098 = -1;
+                gScreenStep = -1;
             ret = 1;
             lbl_030027D9 = 1;
             m4aSongNumStart(6);

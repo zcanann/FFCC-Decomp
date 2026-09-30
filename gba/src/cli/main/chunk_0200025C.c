@@ -87,40 +87,40 @@ extern s8 lbl_0300000D;
 extern s8 lbl_0300000E;
 extern s8 lbl_0300000F;
 extern s8 lbl_03000010;
-extern struct Transfer lbl_03000018;
-extern u16 lbl_03000030[16];
-extern struct MapId lbl_03000050;
+extern struct Transfer sBulkXfer;
+extern u16 gXferCrc[16];
+extern struct MapId gStageNo;
 extern u16 lbl_03002990;
-extern u8 lbl_03002994;
-extern u8 lbl_03002998;
+extern u8 gReconnectPending;
+extern u8 gInputLockFrames;
 extern u16 lbl_0300299C;
-extern u8 lbl_030029A0;
-extern u8 lbl_030029A4;
+extern u8 gWasConnected;
+extern u8 gLinkStarted;
 extern u16 lbl_030029A8;
 extern u16 lbl_030029AC;
 extern u16 lbl_030029B0;
 extern u16 lbl_030029B4;
 extern u8 lbl_030029C0[];
 extern u16 lbl_03002AC0;
-extern u8 lbl_03002AC4;
+extern u8 gSpMode;
 extern u32 lbl_03002AC8;
-extern u8 lbl_03002ACC;
+extern u8 gMenuHasInput;
 extern vu16 lbl_03002AD0[4][2];
-extern u8 lbl_03002AE0;
-extern u8 lbl_03002AE4;
-extern s8 lbl_03002AE8;
-extern u16 lbl_03002AEC;
-extern u8 lbl_03002AF0;
-extern u8 lbl_03002AF4;
-extern u8 lbl_03002AF8;
-extern u8 lbl_03002AFC;
-extern u8 lbl_03002B10[];
-extern struct Unk03002CA0 lbl_03002CA0;
-extern struct Unk03002FD0 lbl_03002FD0[4];
-extern u32 lbl_03003090;
-extern u32 lbl_03003094;
-extern u32 lbl_030032E8;
-extern u8 lbl_030032F8;
+extern u8 gNewLetter;
+extern u8 gReplyTimer;
+extern s8 gXferActive;
+extern u16 gDataFlags;
+extern u8 gXferErrorCount;
+extern u8 gReplyWaiting;
+extern u8 gStageInTable;
+extern u8 gReplyResult;
+extern u8 gMapObjs[];
+extern struct Unk03002CA0 gSession;
+extern struct Unk03002FD0 gParty[4];
+extern u32 gScreen;
+extern u32 gMode;
+extern u32 gSavedScreen;
+extern u8 gMsgScreenId;
 extern u8 lbl_030032FC[];
 extern const char lbl_0201CCE8[10] __attribute__((aligned(4)));
 extern const u8 lbl_0201CCCC[];
@@ -131,10 +131,10 @@ extern const u16 lbl_0202A1BC[];
 extern const u16 *const lbl_02034678[];
 extern const u16 *const lbl_02034688[];
 extern u8 lbl_02037FFF[];
-extern u8 lbl_02038000[];
+extern u8 gDownloadBuf[];
 extern u8 lbl_0203FFFF[];
-extern u8 lbl_0203A800[];
-extern u8 lbl_0203D800[];
+extern u8 gListBuf[];
+extern u8 gDetailBuf[];
 
 void intr_main(void);
 void VBlankIntrWait(void);
@@ -148,13 +148,13 @@ void *memset(void *, int, unsigned long);
 char *strcat(char *, const char *);
 s32 strlen(const char *);
 char *strcpy(char *, const char *);
-u8 fn_02002594(void);
-void fn_020025A0(u16);
-void fn_02002218(void);
-void fn_02002794(void);
-void fn_020023E4(void);
-u16 fn_02002130(u16, u8 *, u16 *);
-s32 fn_02002FAC(void);
+u8 Link_IsConnected(void);
+void Link_SendPad(u16);
+void Link_Init(void);
+void Link_ProcessRecv(void);
+void Link_CheckTimeout(void);
+u16 Crc16(u16, u8 *, u16 *);
+s32 Link_GetPlayerNo(void);
 void fn_02003338(void);
 void fn_02003394(s32, s32);
 void fn_020033F4(void);
@@ -169,16 +169,16 @@ void fn_02003FA0(void);
 s32 fn_02004030(s32, s32);
 void fn_02004384(void);
 void fn_020043B8(void);
-void fn_020043FC(void);
-void fn_02004668(void);
-void fn_020050E8(void);
-void fn_02005194(void);
-void fn_02005844(void);
+void Session_Init(void);
+void Radar_ClearMarkers(void);
+void Mode_Init(void);
+void Mode_Update(void);
+void Screen_Reset(void);
 void fn_0200194C(s32);
-void fn_020015DC(void);
-struct Transfer *fn_02001634(void);
-void fn_0200166C(void);
-void fn_02015E34(s32);
+void Reply_Tick(void);
+struct Transfer *Xfer_GetWork(void);
+void Xfer_OnError(void);
+void Scouter_SetDirty(s32);
 void fn_02019C4C(void);
 
 void fn_020007D8(s32);
@@ -194,7 +194,7 @@ void fn_02000BB0(void);
 void fn_02000F70(void);
 void fn_02000FC8(void);
 void fn_02000FD4(void);
-void fn_02001438(u8, u8);
+void Map_SetStage(u8, u8);
 
 void AgbMain(void)
 {
@@ -210,10 +210,10 @@ void AgbMain(void)
     DmaClear16(DMA0, 0, 0x06000000, 0x18000);
     DmaClear32(DMA0, 32, 0x07000000, 0x400);
     lbl_03002AC8 = 0;
-    lbl_03002ACC = 0;
-    lbl_030029A4 = 0;
-    lbl_03002998 = 0;
-    lbl_03002AC4 = 0;
+    gMenuHasInput = 0;
+    gLinkStarted = 0;
+    gInputLockFrames = 0;
+    gSpMode = 0;
     DmaClear16(DMA0, 0x3FF, 0x0600E000, 0x1000);
     DmaClear16(DMA0, 0x2FF, 0x0600F000, 0x1000);
     DmaCopy32(DMA3, intr_main, lbl_030029C0, 0x100);
@@ -230,7 +230,7 @@ void AgbMain(void)
     REG_BG2CNT = 0x1E0A;
     REG_BG3CNT = 0x1F0B;
     fn_02000AD4(15, 0, 0);
-    fn_020043FC();
+    Session_Init();
     fn_02003AA0();
     fn_02003338();
     fn_02000654();
@@ -239,69 +239,69 @@ void AgbMain(void)
     fn_020007CC();
     fn_02003394(1, 0);
     fn_020033F4();
-    fn_020050E8();
-    lbl_030029A0 = 0;
-    fn_02002218();
+    Mode_Init();
+    gWasConnected = 0;
+    Link_Init();
     m4aSoundInit();
-    fn_02001438(23, 0);
+    Map_SetStage(23, 0);
     fn_02000A74();
     fn_02000B74();
-    lbl_030032E8 = lbl_03003090;
-    lbl_03000008 = lbl_03002ACC;
+    gSavedScreen = gScreen;
+    lbl_03000008 = gMenuHasInput;
     fn_02000FC8();
-    prevMode = lbl_03002AC4;
-    lbl_03002994 = 0;
+    prevMode = gSpMode;
+    gReconnectPending = 0;
     for (;;) {
-        fn_02002794();
-        if (lbl_03000008 != lbl_03002ACC && lbl_03000008 == 1) {
+        Link_ProcessRecv();
+        if (lbl_03000008 != gMenuHasInput && lbl_03000008 == 1) {
             lbl_03000004 = 1;
         }
         fn_02000690();
-        if (prevMode != lbl_03002AC4) {
+        if (prevMode != gSpMode) {
             fn_02000FD4();
         }
-        prevMode = lbl_03002AC4;
+        prevMode = gSpMode;
         fn_02000BB0();
         fn_02000F70();
-        if (lbl_03002AEC & 1) {
+        if (gDataFlags & 1) {
             icon = 35;
-            if (lbl_03002ACC == 0) {
+            if (gMenuHasInput == 0) {
                 icon = 34;
             }
             fn_02003C3C(216, 144, 0, icon, fn_02004030(0, icon), 0, 0);
         }
-        connected = fn_02002594();
-        if (connected && lbl_030029A4 && lbl_03003094 != 0 && lbl_03003094 != 4 && lbl_03002ACC != 1) {
-            lbl_03002ACC = 1;
+        connected = Link_IsConnected();
+        if (connected && gLinkStarted && gMode != 0 && gMode != 4 && gMenuHasInput != 1) {
+            gMenuHasInput = 1;
         }
-        if (lbl_030029A0 != connected) {
+        if (gWasConnected != connected) {
             if (connected) {
-                lbl_03002994 = 1;
+                gReconnectPending = 1;
             } else {
-                lbl_03002CA0.unk128 = 0;
+                gSession.unk128 = 0;
                 for (i = 0; i < 4; i++) {
-                    lbl_03002FD0[i].unk7 = 1;
+                    gParty[i].unk7 = 1;
                 }
-                lbl_03002994 = 0;
+                gReconnectPending = 0;
                 m4aMPlayAllStop();
                 fn_0200194C(0);
                 REG_DISPCNT = 0x9F40;
-                lbl_03003090 = 0;
+                gScreen = 0;
                 fn_02000990();
-                fn_02005844();
-                lbl_03003094 = 0;
-                lbl_030032E8 = 0;
-                lbl_030032F8 = 4;
-                lbl_03003090 = 13;
+                Screen_Reset();
+                gMode = 0;
+                gSavedScreen = 0;
+                gMsgScreenId = 4;
+                gScreen = 13;
             }
-            fn_020007D8(lbl_03002CA0.unk0 & 3);
-            lbl_030029A0 = connected;
+            fn_020007D8(gSession.unk0 & 3);
+            gWasConnected = connected;
         }
-        fn_02005194();
+        Mode_Update();
         fn_02003FA0();
         VBlankIntrWait();
-        fn_020015DC();
-        lbl_03000008 = lbl_03002ACC;
+        Reply_Tick();
+        lbl_03000008 = gMenuHasInput;
         lbl_03002AC8++;
     }
 }
@@ -315,13 +315,13 @@ void fn_020005FC(void)
     fn_02004384();
     fn_02000C64();
     if (REG_IE & 0x80) {
-        fn_020023E4();
+        Link_CheckTimeout();
     }
-    if (lbl_03002998 != 0) {
-        if (lbl_030029A4 != 0) {
-            lbl_03002998--;
+    if (gInputLockFrames != 0) {
+        if (gLinkStarted != 0) {
+            gInputLockFrames--;
         } else {
-            lbl_03002998 = 0;
+            gInputLockFrames = 0;
         }
     }
     m4aSoundVSync();
@@ -357,7 +357,7 @@ void fn_02000690(void)
             lbl_03000004 = keys;
         }
     }
-    if (!fn_02002594() || lbl_03002998 != 0) {
+    if (!Link_IsConnected() || gInputLockFrames != 0) {
         keys = 0;
     }
     lbl_030029B4 = lbl_030029A8;
@@ -378,9 +378,9 @@ void fn_02000690(void)
         if (lbl_03000000 >= 20 && t % 5 == 0)
             lbl_0300299C = pressed | (keys & 0x3F0);
     }
-    if (fn_02002594()) {
-        fn_020025A0(keys);
-        if (!lbl_03002ACC || !lbl_030029A4) {
+    if (Link_IsConnected()) {
+        Link_SendPad(keys);
+        if (!gMenuHasInput || !gLinkStarted) {
             lbl_030029B4 = 0;
             lbl_030029A8 = 0;
             lbl_030029AC = 0;
@@ -410,8 +410,8 @@ void fn_020007D8(s32 no)
     u32 size;
 
     tiles = lbl_02034678[no];
-    pal_no = fn_02002FAC();
-    if (lbl_03002AC4) {
+    pal_no = Link_GetPlayerNo();
+    if (gSpMode) {
         pal_no += 4;
     }
     pal = &lbl_0202A1BC[pal_no * 16];
@@ -465,7 +465,7 @@ void fn_020008D0(void)
 
 void fn_02000990(void)
 {
-    if (fn_02002594() || lbl_03003090 != 13) {
+    if (Link_IsConnected() || gScreen != 13) {
         DmaClear16(DMA0, 0x3FF, 0x0600E000, 0x800);
         DmaClear16(DMA0, 0x3FF, 0x0600E800, 0x800);
         DmaClear16(DMA0, 0x2FF, 0x0600F000, 0x800);
@@ -474,10 +474,10 @@ void fn_02000990(void)
 
 void fn_02000A04(void)
 {
-    s32 pal = fn_02002FAC();
+    s32 pal = Link_GetPlayerNo();
     const u16 *src;
 
-    if (lbl_03002AC4) {
+    if (gSpMode) {
         pal += 4;
     }
     src = &lbl_0202A1BC[pal * 16];
@@ -689,14 +689,14 @@ void fn_02000D9C(char *buf, s32 value)
     buf[i] = 0;
 }
 
-void fn_02000E34(s32 show)
+void Xfer_DrawProgress(s32 show)
 {
     char buf[64];
     struct Transfer *xfer;
     u32 percent;
 
-    xfer = fn_02001634();
-    if (show && lbl_03002AE8) {
+    xfer = Xfer_GetWork();
+    if (show && gXferActive) {
         memset(buf, 0, sizeof(buf));
         if (xfer->type == 1) {
             memcpy(buf, lbl_0201CCE8, sizeof(lbl_0201CCE8));
@@ -770,7 +770,7 @@ s32 fn_02000F60(const char *str)
 
 void fn_02000F70(void)
 {
-    if (fn_02002594() && lbl_03003094 == 0 && lbl_03002CA0.unk128 != 0) {
+    if (Link_IsConnected() && gMode == 0 && gSession.unk128 != 0) {
         if (lbl_03000010 == 0) {
             m4aSongNumStart(5);
         }
@@ -791,42 +791,42 @@ void fn_02000FD4(void)
     REG_DISPCNT = 0x840;
     fn_020043B8();
     fn_02019C4C();
-    lbl_03003090 = 0;
+    gScreen = 0;
     lbl_030032FC[0] = 0;
     lbl_030032FC[1] = 0xFF;
-    fn_02005844();
+    Screen_Reset();
     fn_02000990();
     fn_0200194C(0);
     fn_02000A74();
     REG_DISPCNT = 0x9F40;
 }
 
-void fn_02001028(void)
+void Xfer_Init(void)
 {
     s32 i;
 
-    lbl_03002AEC = 0;
-    lbl_03002AE8 = 0;
+    gDataFlags = 0;
+    gXferActive = 0;
     for (i = 0; i < 16; i++) {
-        lbl_03000030[i] = 0;
+        gXferCrc[i] = 0;
     }
-    memset(&lbl_03000018, 0, sizeof(lbl_03000018));
-    lbl_03000050.area = 0;
-    lbl_03000050.map = 0;
-    lbl_03002AF8 = 1;
-    lbl_03002AE0 = 0;
-    lbl_03002AF0 = 0;
+    memset(&sBulkXfer, 0, sizeof(sBulkXfer));
+    gStageNo.area = 0;
+    gStageNo.map = 0;
+    gStageInTable = 1;
+    gNewLetter = 0;
+    gXferErrorCount = 0;
 }
 
-s32 fn_0200108C(u32 packet)
+s32 Xfer_CheckCrc(u32 packet)
 {
     struct Packet *pkt = (struct Packet *)&packet;
     s32 result;
 
-    if ((lbl_03002AEC >> pkt->cmd) & 1) {
-        result = (lbl_03000030[pkt->cmd] == pkt->val) ? 0 : -1;
+    if ((gDataFlags >> pkt->cmd) & 1) {
+        result = (gXferCrc[pkt->cmd] == pkt->val) ? 0 : -1;
         if (result) {
-            lbl_03002AEC &= ~(1 << pkt->cmd);
+            gDataFlags &= ~(1 << pkt->cmd);
         }
     } else {
         result = -1;
@@ -834,15 +834,15 @@ s32 fn_0200108C(u32 packet)
     return result;
 }
 
-void fn_020010E0(void)
+void Xfer_Begin(void)
 {
-    lbl_03002AE8 = 1;
-    memset(&lbl_03000018, 0, sizeof(lbl_03000018));
-    lbl_03000018.base = lbl_02038000;
-    lbl_03000018.cur = lbl_02038000;
+    gXferActive = 1;
+    memset(&sBulkXfer, 0, sizeof(sBulkXfer));
+    sBulkXfer.base = gDownloadBuf;
+    sBulkXfer.cur = gDownloadBuf;
 }
 
-s32 fn_0200110C(u32 packet, u8 *out)
+s32 Xfer_Receive(u32 packet, u8 *out)
 {
     struct Packet *pkt = (struct Packet *)&packet;
     s32 kind;
@@ -851,173 +851,173 @@ s32 fn_0200110C(u32 packet, u8 *out)
 
     kind = pkt->hdr >> 6;
     if (kind > 2) {
-        *out = lbl_03002AE8 ? lbl_03000018.type : 0xFF;
-        lbl_03002AE8 = 0;
-        fn_0200166C();
+        *out = gXferActive ? sBulkXfer.type : 0xFF;
+        gXferActive = 0;
+        Xfer_OnError();
         return -1;
     }
-    if (lbl_03002AE8 == 0) {
+    if (gXferActive == 0) {
         if (kind != 0) {
             *out = 0xFF;
-            lbl_03002AE8 = 0;
-            fn_0200166C();
+            gXferActive = 0;
+            Xfer_OnError();
             return -1;
         }
-        fn_020010E0();
+        Xfer_Begin();
     }
-    *out = lbl_03000018.type;
-    if (lbl_03000018.state == 0 && kind != 0) {
-        lbl_03002AE8 = 0;
-        fn_0200166C();
+    *out = sBulkXfer.type;
+    if (sBulkXfer.state == 0 && kind != 0) {
+        gXferActive = 0;
+        Xfer_OnError();
         return -1;
     }
-    cur = lbl_03000018.cur;
+    cur = sBulkXfer.cur;
     if ((u32)(cur - (u8 *)0x02038000) > 0x7FFF
-        || (s32)lbl_03000018.base <= 0x02037FFF || (s32)lbl_03000018.base > 0x0203FFFF) {
-        fn_020010E0();
-        lbl_03002AE8 = 0;
-        fn_0200166C();
+        || (s32)sBulkXfer.base <= 0x02037FFF || (s32)sBulkXfer.base > 0x0203FFFF) {
+        Xfer_Begin();
+        gXferActive = 0;
+        Xfer_OnError();
         return -1;
     }
-    lbl_03000018.state = kind;
+    sBulkXfer.state = kind;
     if (kind == 0) {
-        if (lbl_03000018.step == 0) {
-            lbl_03000018.type = pkt->cmd;
-            if (lbl_03000018.type == 3 || lbl_03000018.type == 6 || lbl_03000018.type == 7
-                || lbl_03000018.type == 8 || lbl_03000018.type == 9) {
-                lbl_03000018.cur = lbl_03000018.base = lbl_0203A800;
-            } else if (lbl_03000018.type == 2) {
-                lbl_03000018.cur = lbl_03000018.base = lbl_0203D800;
+        if (sBulkXfer.step == 0) {
+            sBulkXfer.type = pkt->cmd;
+            if (sBulkXfer.type == 3 || sBulkXfer.type == 6 || sBulkXfer.type == 7
+                || sBulkXfer.type == 8 || sBulkXfer.type == 9) {
+                sBulkXfer.cur = sBulkXfer.base = gListBuf;
+            } else if (sBulkXfer.type == 2) {
+                sBulkXfer.cur = sBulkXfer.base = gDetailBuf;
             }
-            if (lbl_03000018.type == 6) {
-                lbl_03002AEC &= ~0x20;
-            } else if (lbl_03000018.type == 7) {
-                lbl_03002AEC &= ~0x40;
-            } else if (lbl_03000018.type == 8) {
-                lbl_03002AEC &= ~0x80;
-            } else if (lbl_03000018.type == 9) {
-                lbl_03002AEC &= ~0x100;
+            if (sBulkXfer.type == 6) {
+                gDataFlags &= ~0x20;
+            } else if (sBulkXfer.type == 7) {
+                gDataFlags &= ~0x40;
+            } else if (sBulkXfer.type == 8) {
+                gDataFlags &= ~0x80;
+            } else if (sBulkXfer.type == 9) {
+                gDataFlags &= ~0x100;
             } else {
-                lbl_03002AEC &= ~(1 << lbl_03000018.type);
+                gDataFlags &= ~(1 << sBulkXfer.type);
             }
-            lbl_03000018.count = pkt->val;
-            lbl_03000018.step++;
-        } else if (lbl_03000018.step == 1) {
-            lbl_03000018.total = pkt->val;
-            lbl_03000018.step++;
-        } else if (lbl_03000018.step == 2) {
-            lbl_03000030[lbl_03000018.type] = pkt->val;
-            lbl_03000018.step = 0;
-            lbl_03000018.state = 1;
+            sBulkXfer.count = pkt->val;
+            sBulkXfer.step++;
+        } else if (sBulkXfer.step == 1) {
+            sBulkXfer.total = pkt->val;
+            sBulkXfer.step++;
+        } else if (sBulkXfer.step == 2) {
+            gXferCrc[sBulkXfer.type] = pkt->val;
+            sBulkXfer.step = 0;
+            sBulkXfer.state = 1;
         } else {
-            lbl_03002AE8 = 0;
-            fn_0200166C();
+            gXferActive = 0;
+            Xfer_OnError();
             return -1;
         }
     } else if (kind == 1) {
-        if (lbl_03000018.step == 0) {
-            lbl_03000018.blocks = pkt->cmd;
-            lbl_03000018.blockSize = pkt->val;
-            lbl_03000018.step++;
-        } else if (lbl_03000018.step == 1) {
-            lbl_03000018.index = pkt->cmd;
-            lbl_03000018.crc = pkt->val;
-            lbl_03000018.step = 0;
-            lbl_03000018.state = 2;
+        if (sBulkXfer.step == 0) {
+            sBulkXfer.blocks = pkt->cmd;
+            sBulkXfer.blockSize = pkt->val;
+            sBulkXfer.step++;
+        } else if (sBulkXfer.step == 1) {
+            sBulkXfer.index = pkt->cmd;
+            sBulkXfer.crc = pkt->val;
+            sBulkXfer.step = 0;
+            sBulkXfer.state = 2;
         }
     } else {
-        *lbl_03000018.cur++ = pkt->cmd;
-        *lbl_03000018.cur++ = ((u8 *)&pkt->val)[0];
-        *lbl_03000018.cur++ = ((u8 *)&pkt->val)[1];
-        if (++lbl_03000018.step >= lbl_03000018.blocks) {
+        *sBulkXfer.cur++ = pkt->cmd;
+        *sBulkXfer.cur++ = ((u8 *)&pkt->val)[0];
+        *sBulkXfer.cur++ = ((u8 *)&pkt->val)[1];
+        if (++sBulkXfer.step >= sBulkXfer.blocks) {
             crc = 0xFFFF;
-            if (fn_02002130(lbl_03000018.blockSize, lbl_03000018.base, &crc) != lbl_03000018.crc) {
-                lbl_03002AE8 = 0;
-                fn_0200166C();
+            if (Crc16(sBulkXfer.blockSize, sBulkXfer.base, &crc) != sBulkXfer.crc) {
+                gXferActive = 0;
+                Xfer_OnError();
                 return -1;
             }
-            lbl_03000018.base += lbl_03000018.blockSize;
-            lbl_03000018.cur = lbl_03000018.base;
-            lbl_03000018.step = 0;
-            lbl_03000018.state = 1;
-            if (lbl_03000018.index + 1 >= lbl_03000018.count) {
-                lbl_03002AE8 = 0;
+            sBulkXfer.base += sBulkXfer.blockSize;
+            sBulkXfer.cur = sBulkXfer.base;
+            sBulkXfer.step = 0;
+            sBulkXfer.state = 1;
+            if (sBulkXfer.index + 1 >= sBulkXfer.count) {
+                gXferActive = 0;
                 fn_02000A74();
-                if (lbl_03000018.type == 6) {
-                    lbl_03002AEC |= 0x20;
-                } else if (lbl_03000018.type == 7) {
-                    lbl_03002AEC |= 0x40;
-                } else if (lbl_03000018.type == 8) {
-                    lbl_03002AEC |= 0x80;
-                } else if (lbl_03000018.type == 9) {
-                    lbl_03002AEC |= 0x100;
+                if (sBulkXfer.type == 6) {
+                    gDataFlags |= 0x20;
+                } else if (sBulkXfer.type == 7) {
+                    gDataFlags |= 0x40;
+                } else if (sBulkXfer.type == 8) {
+                    gDataFlags |= 0x80;
+                } else if (sBulkXfer.type == 9) {
+                    gDataFlags |= 0x100;
                 } else {
-                    lbl_03002AEC |= 1 << lbl_03000018.type;
+                    gDataFlags |= 1 << sBulkXfer.type;
                 }
-                if (lbl_03000018.type == 0) {
+                if (sBulkXfer.type == 0) {
                     fn_02003AA0();
-                } else if (lbl_03000018.type == 1) {
-                    if (lbl_03003090 == 0) {
-                        fn_02005844();
+                } else if (sBulkXfer.type == 1) {
+                    if (gScreen == 0) {
+                        Screen_Reset();
                     }
-                } else if (lbl_03000018.type == 3) {
-                    lbl_03002AE0 = 0;
+                } else if (sBulkXfer.type == 3) {
+                    gNewLetter = 0;
                 }
             }
-            lbl_03002AF0 = 0;
+            gXferErrorCount = 0;
             return 1;
         }
     }
     return 0;
 }
 
-void fn_02001438(u8 area, u8 map)
+void Map_SetStage(u8 area, u8 map)
 {
     s8 table[12][2];
     s32 i;
 
     memcpy(table, lbl_0201CCF8, sizeof(table));
-    lbl_03002AEC &= ~0x400;
-    fn_02015E34(0);
+    gDataFlags &= ~0x400;
+    Scouter_SetDirty(0);
     fn_02000A74();
-    if (lbl_03000050.area != (s8)area && lbl_03003090 != 0) {
-        if (lbl_030029A0) {
-            lbl_03003090 = 0;
+    if (gStageNo.area != (s8)area && gScreen != 0) {
+        if (gWasConnected) {
+            gScreen = 0;
         } else {
-            lbl_030032E8 = 0;
+            gSavedScreen = 0;
         }
     }
     fn_0200194C(0);
     REG_DISPCNT = 0x9F40;
     fn_02000990();
-    fn_02005844();
-    fn_02004668();
-    memset(lbl_03002B10, 0, 0x188);
-    if (lbl_03000050.area != (s8)area || lbl_03000050.map != (s8)map) {
-        lbl_03000050.area = area;
-        lbl_03000050.map = map;
-        lbl_03002AEC &= ~2;
-        lbl_03000030[1] = 0;
-        lbl_03002AF8 = 0;
+    Screen_Reset();
+    Radar_ClearMarkers();
+    memset(gMapObjs, 0, 0x188);
+    if (gStageNo.area != (s8)area || gStageNo.map != (s8)map) {
+        gStageNo.area = area;
+        gStageNo.map = map;
+        gDataFlags &= ~2;
+        gXferCrc[1] = 0;
+        gStageInTable = 0;
         for (i = 0; table[i][0] >= 0; i++) {
             if ((s8)area == table[i][0] && (s8)map == table[i][1]) {
-                lbl_03002AF8 = 1;
+                gStageInTable = 1;
                 break;
             }
         }
     }
 }
 
-void fn_02001568(s8 *area, s8 *map)
+void Map_GetStage(s8 *area, s8 *map)
 {
-    *area = lbl_03000050.area;
-    *map = lbl_03000050.map;
+    *area = gStageNo.area;
+    *map = gStageNo.map;
 }
 
-void fn_02001578(void)
+void Reply_Clear(void)
 {
-    lbl_03002AEC &= 0x7FFF;
-    lbl_03002AFC = 0;
-    lbl_03002AE4 = 0;
-    lbl_03002AF4 = 0;
+    gDataFlags &= 0x7FFF;
+    gReplyResult = 0;
+    gReplyTimer = 0;
+    gReplyWaiting = 0;
 }

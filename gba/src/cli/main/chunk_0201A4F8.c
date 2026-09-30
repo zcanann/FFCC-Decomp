@@ -116,11 +116,11 @@ extern char *lbl_020344B0[];
 extern char *lbl_02034594[];
 extern u8 lbl_0300284D;
 extern u16 lbl_030029AC;
-extern u8 lbl_03002C98;
-extern struct Work lbl_03002CA0;
-extern s8 lbl_03003098;
-extern struct Window lbl_030030B0[];
-extern s8 lbl_030032E0;
+extern u8 gLanguage;
+extern struct Work gSession;
+extern s8 gScreenStep;
+extern struct Window gWindows[];
+extern s8 gOpenMenuReq;
 
 char *strcpy(char *, const char *);
 char *strcat(char *, const char *);
@@ -139,9 +139,9 @@ char *fn_0201A73C(s32);
 char *fn_0201AAAC(s32);
 s32 fn_0201AB14(s32);
 
-s32 fn_0201A4F8(void)
+s32 TmpArtifactScreen_Exit(void)
 {
-    struct Window *win = lbl_030030B0;
+    struct Window *win = gWindows;
     s32 done = 0;
 
     fn_02003394(1, 0);
@@ -171,13 +171,13 @@ void fn_0201A568(void)
         m4aSongNumStart(0);
     } else if (lbl_030029AC & 2) {
         lbl_0300284D = 1;
-        lbl_030032E0 = 1;
+        gOpenMenuReq = 1;
         m4aSongNumStart(3);
     } else if (lbl_030029AC & 0x300) {
         if (lbl_030029AC & 0x100)
-            lbl_03003098 = 1;
+            gScreenStep = 1;
         else
-            lbl_03003098 = -1;
+            gScreenStep = -1;
         m4aSongNumStart(6);
         lbl_0300284D = 1;
     }
@@ -186,13 +186,13 @@ void fn_0201A568(void)
 void fn_0201A5EC(void)
 {
     s32 i;
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win = &gWindows[1];
     s32 x = (win->unk10 + 1) * 8;
     s32 y = (win->unk12 + 1) * 8;
     s32 n = win->unkE;
 
     for (i = 0; i < n; i++, y += 16) {
-        s16 v = lbl_03002CA0.unk120[i];
+        s16 v = gSession.unk120[i];
         if (v > 0) {
             s32 id = fn_0201AB14(v);
             fn_02003C3C(x, y, 0, id, fn_02004030(0, id), 2, 0);
@@ -207,12 +207,12 @@ void fn_0201A664(s32 idx, s32 row)
     fn_02003394(1, 0);
     fn_020033F4();
     fn_020038F4(16);
-    if (lbl_03002CA0.unk120[idx] > 0)
-        str = fn_0201AAAC(lbl_03002CA0.unk120[idx]);
+    if (gSession.unk120[idx] > 0)
+        str = fn_0201AAAC(gSession.unk120[idx]);
     else
         str = fn_0201A73C(0);
     fn_02003464(str, 0);
-    fn_020037A8(fn_02009340(&lbl_030030B0[1], row, 0), lbl_030030B0[1].unk14);
+    fn_020037A8(fn_02009340(&gWindows[1], row, 0), gWindows[1].unk14);
 }
 
 void fn_0201A6C8(s32 row)
@@ -224,7 +224,7 @@ char *fn_0201A6D4(s32 idx)
 {
     char **tbl;
 
-    switch (lbl_03002C98 & 0xF) {
+    switch (gLanguage & 0xF) {
     case 1:
         tbl = lbl_0202FC4C;
         break;
@@ -249,7 +249,7 @@ char *fn_0201A73C(s32 idx)
 {
     char **tbl;
 
-    switch (lbl_03002C98 & 0xF) {
+    switch (gLanguage & 0xF) {
     case 1:
         tbl = lbl_0202FD94;
         break;
@@ -264,7 +264,7 @@ char *fn_0201A73C(s32 idx)
         break;
     case 0:
     default:
-        if (lbl_03002C98 & 0x10) {
+        if (gLanguage & 0x10) {
             if (idx == 51)
                 return lbl_0202FC8C[64];
             if (idx == 63)
@@ -280,7 +280,7 @@ char *fn_0201A7D4(s32 idx)
 {
     char **tbl;
 
-    switch (lbl_03002C98 & 0xF) {
+    switch (gLanguage & 0xF) {
     case 1:
         tbl = lbl_020301B4;
         break;
@@ -305,7 +305,7 @@ char *fn_0201A83C(s32 idx)
 {
     char **tbl;
 
-    switch (lbl_03002C98 & 0xF) {
+    switch (gLanguage & 0xF) {
     case 1:
         tbl = lbl_02030280;
         break;
@@ -330,7 +330,7 @@ char *fn_0201A8A4(s32 idx)
 {
     char **tbl;
 
-    switch (lbl_03002C98 & 0xF) {
+    switch (gLanguage & 0xF) {
     case 1:
         tbl = lbl_020303CC;
         break;
@@ -355,7 +355,7 @@ char *fn_0201A90C(s32 idx)
 {
     char **tbl;
 
-    switch (lbl_03002C98 & 0xF) {
+    switch (gLanguage & 0xF) {
     case 1:
         tbl = lbl_02030484;
         break;
@@ -380,7 +380,7 @@ char *fn_0201A974(s32 idx)
 {
     char **tbl;
 
-    switch (lbl_03002C98 & 0xF) {
+    switch (gLanguage & 0xF) {
     case 1:
         tbl = lbl_02030624;
         break;
@@ -405,7 +405,7 @@ char *fn_0201A9DC(s32 idx)
 {
     char **tbl;
 
-    switch (lbl_03002C98 & 0xF) {
+    switch (gLanguage & 0xF) {
     case 1:
         tbl = lbl_02030890;
         break;
@@ -430,7 +430,7 @@ char *fn_0201AA44(s32 idx)
 {
     char **tbl;
 
-    switch (lbl_03002C98 & 0xF) {
+    switch (gLanguage & 0xF) {
     case 1:
         tbl = lbl_02030A78;
         break;
@@ -455,7 +455,7 @@ char *fn_0201AAAC(s32 idx)
 {
     char **tbl;
 
-    switch (lbl_03002C98 & 0xF) {
+    switch (gLanguage & 0xF) {
     case 1:
         tbl = lbl_0203132C;
         break;
@@ -485,7 +485,7 @@ char *fn_0201AB20(s32 idx)
 {
     char **tbl;
 
-    switch (lbl_03002C98 & 0xF) {
+    switch (gLanguage & 0xF) {
     case 1:
         tbl = lbl_02033594;
         break;
@@ -514,7 +514,7 @@ void fn_0201AB88(s32 idx, char *buf)
     s32 num;
     char digit[2];
 
-    switch (lbl_03002C98 & 0xF) {
+    switch (gLanguage & 0xF) {
     case 1:
         tbl = lbl_020342E8;
         break;
@@ -529,7 +529,7 @@ void fn_0201AB88(s32 idx, char *buf)
         break;
     case 0:
     default:
-        if (lbl_03002C98 & 0x10) {
+        if (gLanguage & 0x10) {
             if (id == 5 || id == 6) {
                 str = lbl_020341F4[id + 52];
                 goto copy;

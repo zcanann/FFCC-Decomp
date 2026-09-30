@@ -115,52 +115,52 @@ struct Window {
     struct WinItem items[1];
 };
 
-extern u8 lbl_03002994;
-extern u8 lbl_030029A0;
-extern u8 lbl_030029A4;
-extern u8 lbl_03002AC4;
-extern u8 lbl_03002ACC;
-extern u16 lbl_03002AEC;
-extern u8 lbl_03002B00;
-extern u8 lbl_03002B04;
-extern u8 lbl_03002C98;
-extern struct Work lbl_03002CA0;
-extern struct Command lbl_03002DCC;
-extern struct Flag3 lbl_03002DD0[64];
-extern u8 lbl_03002ED0;
-extern struct Flag3 lbl_03002EE0[16];
-extern struct Member lbl_03002FD0[4];
-extern u8 lbl_03002FF0;
-extern s32 lbl_03003090;
-extern u32 lbl_03003094;
-extern s8 lbl_03003098;
-extern s8 lbl_0300309C;
+extern u8 gReconnectPending;
+extern u8 gWasConnected;
+extern u8 gLinkStarted;
+extern u8 gSpMode;
+extern u8 gMenuHasInput;
+extern u16 gDataFlags;
+extern u8 gScouterDirty;
+extern u8 gItemUseFlags;
+extern u8 gLanguage;
+extern struct Work gSession;
+extern struct Command gScouterHit;
+extern struct Flag3 gEnemyMarkers[64];
+extern u8 gRadarType;
+extern struct Flag3 gTreasureMarkers[16];
+extern struct Member gParty[4];
+extern u8 gRadarMode;
+extern s32 gScreen;
+extern u32 gMode;
+extern s8 gScreenStep;
+extern s8 gLetterAttachKind;
 extern u8 lbl_030030A0;
 extern s32 lbl_030030A4;
 extern u32 lbl_030030A8;
-extern u32 lbl_030030AC;
-extern struct Task lbl_030030B0[5];
-extern s8 lbl_030032E0;
-extern u16 lbl_030032E4;
-extern s32 lbl_030032E8;
+extern u32 gScreenInitDone;
+extern struct Task gWindows[5];
+extern s8 gOpenMenuReq;
+extern u16 gMask;
+extern s32 gSavedScreen;
 extern u32 lbl_030032EC;
-extern s8 lbl_030032F0;
-extern s32 lbl_030032F4;
-extern u8 lbl_030032F8;
+extern s8 gLinkEstablished;
+extern s32 gScreenPhase;
+extern u8 gMsgScreenId;
 extern s8 lbl_030032FC[2];
 extern const struct State lbl_0202FA38[];
 extern const struct State lbl_0202FAEC[];
 extern const struct State lbl_0202FB34[];
 extern const struct State lbl_0202FB64[];
-extern u8 lbl_0203A800[];
-extern u8 lbl_0203D800[];
+extern u8 gListBuf[];
+extern u8 gDetailBuf[];
 
 void fn_02000990(void);
 void fn_02000AD4(s32, s32, s32);
 u32 fn_02000A40(s32, s32, s32);
-void fn_0200163C(void);
+void Xfer_ClearLetterData(void);
 void fn_0200194C(s32);
-void fn_020025E4(s32);
+void Link_SendScreenId(s32);
 void fn_020033F4(void);
 void fn_02003464(const char *, s32);
 void fn_020037A8(s32, s32);
@@ -168,13 +168,13 @@ void fn_020038F4(s32);
 void fn_02003C3C(s32, s32, s32, s32, s32, s32, s32);
 void fn_02003F74(s32, s32, s32, s32);
 void fn_02004360(void);
-void fn_02005844(void);
-void fn_0200586C(void);
-int fn_020051E4(void);
-int fn_0200543C(void);
-int fn_02005568(void);
-int fn_020056A4(void);
-int fn_020057B8(void);
+void Screen_Reset(void);
+void Screen_Restart(void);
+int FieldMode_Update(void);
+int CMakeMode_Update(void);
+int ShopMode_Update(void);
+int SmithMode_Update(void);
+int CtrlMode_Update(void);
 void fn_02005B84(struct Window *, s32, s32, s32);
 void fn_02006044(struct Window *, s32, s32);
 void fn_020062A8(struct Window *, s32, s32);
@@ -190,479 +190,479 @@ void fn_02007D9C(struct Window *, s32, s32);
 s32 fn_02009340(struct Window *, s32, s32);
 void fn_02009318(void);
 void fn_02009508(s32);
-int fn_02009E2C(void);
-int fn_02009ED0(void);
+int MsgScreen_Init(void);
+int MsgScreen_Main(void);
 void fn_0200F348(void);
-void fn_02014760(s32);
-int fn_02015960(void);
-int fn_020159E4(void);
-int fn_02015B78(void);
-void fn_02015E34(s32);
+void MenuScreen_SetReturn(s32);
+int ScouterScreen_Init(void);
+int ScouterScreen_Main(void);
+int ScouterScreen_Exit(void);
+void Scouter_SetDirty(s32);
 void fn_02019C4C(void);
 
-void fn_02004EE8(u8 *p)
+void Radar_OnMarkerKinds(u8 *p)
 {
     int i;
 
     for (i = 0; i < 64; i++)
-        lbl_03002DD0[i].unk3 = *p++;
+        gEnemyMarkers[i].unk3 = *p++;
     for (i = 0; i < 16; i++)
-        lbl_03002EE0[i].unk3 = *p++;
+        gTreasureMarkers[i].unk3 = *p++;
 }
 
-void fn_02004F1C(u32 data)
+void Radar_OnType(u32 data)
 {
     struct Cmd *cmd = (struct Cmd *)&data;
-    s8 old = lbl_03002ED0;
+    s8 old = gRadarType;
 
-    lbl_03002ED0 = cmd->unk2;
-    if (lbl_03003090 == 0 && lbl_03002ED0 != old) {
-        fn_02005844();
+    gRadarType = cmd->unk2;
+    if (gScreen == 0 && gRadarType != old) {
+        Screen_Reset();
         fn_02000990();
     }
 }
 
-void fn_02004F54(u32 data)
+void Radar_OnMode(u32 data)
 {
     struct Cmd *cmd = (struct Cmd *)&data;
-    s8 old = lbl_03002FF0;
+    s8 old = gRadarMode;
 
-    lbl_03002FF0 = cmd->unk2;
-    if (lbl_03003090 == 0 && lbl_03002FF0 != old) {
-        fn_02005844();
+    gRadarMode = cmd->unk2;
+    if (gScreen == 0 && gRadarMode != old) {
+        Screen_Reset();
         fn_02000990();
     }
 }
 
-void fn_02004F8C(u8 *p)
+void Scouter_OnInfo(u8 *p)
 {
     int size = 0x200;
 
-    memcpy(lbl_0203A800, p, size);
-    memset(&lbl_03002DCC, 0xFF, sizeof(lbl_03002DCC));
-    lbl_03002B00 = 1;
-    fn_02015E34(1);
+    memcpy(gListBuf, p, size);
+    memset(&gScouterHit, 0xFF, sizeof(gScouterHit));
+    gScouterDirty = 1;
+    Scouter_SetDirty(1);
 }
 
-void fn_02004FC0(u32 data)
+void Scouter_OnHitEnemy(u32 data)
 {
     struct Cmd16 *cmd = (struct Cmd16 *)&data;
 
-    lbl_03002DCC.unk0 = cmd->unk1;
-    lbl_03002DCC.unk2 = cmd->unk2;
-    lbl_03002B00 = 1;
+    gScouterHit.unk0 = cmd->unk1;
+    gScouterHit.unk2 = cmd->unk2;
+    gScouterDirty = 1;
 }
 
-void fn_02004FE4(u8 *p)
+void Session_OnCmdList(u8 *p)
 {
     int size = p[0] * 8 + 1;
 
-    memcpy(lbl_0203D800, p, size);
-    lbl_03002AEC |= 0x200;
+    memcpy(gDetailBuf, p, size);
+    gDataFlags |= 0x200;
 }
 
-void fn_02005010(u32 data)
+void Session_OnItemUseFlags(u32 data)
 {
     struct Cmd *cmd = (struct Cmd *)&data;
 
-    lbl_03002B04 = cmd->unk2;
+    gItemUseFlags = cmd->unk2;
 }
 
-void fn_02005024(u32 data)
+void Session_OnSpMode(u32 data)
 {
     struct Cmd *cmd = (struct Cmd *)&data;
 
-    lbl_03002AC4 = cmd->unk2;
+    gSpMode = cmd->unk2;
 }
 
-void fn_02005038(u32 data)
+void Session_OnCmdNum(u32 data)
 {
     struct Cmd *cmd = (struct Cmd *)&data;
-    int old = lbl_03002CA0.unk5D;
+    int old = gSession.unk5D;
 
     if (old == cmd->unk2)
         return;
-    lbl_03002CA0.unk5D = cmd->unk2;
-    lbl_03002CA0.unkF4[lbl_03002CA0.unk5D] = 0xFFFF;
-    if (old < cmd->unk2 && lbl_03003090 == 1)
+    gSession.unk5D = cmd->unk2;
+    gSession.unkF4[gSession.unk5D] = 0xFFFF;
+    if (old < cmd->unk2 && gScreen == 1)
         fn_0200F348();
 }
 
-void fn_0200508C(u32 data)
+void Session_OnMemories(u32 data)
 {
     struct Cmd *cmd = (struct Cmd *)&data;
 
-    lbl_03002CA0.unk62 = (u8)cmd->unk2;
-    if ((u32)lbl_03003090 <= 3)
+    gSession.unk62 = (u8)cmd->unk2;
+    if ((u32)gScreen <= 3)
         fn_02009508(0);
 }
 
-void fn_020050B8(void)
+void Session_OnStartBonus(void)
 {
     int i;
 
     for (i = 0; i < 4; i++)
-        lbl_03002FD0[i].unk7 = 1;
+        gParty[i].unk7 = 1;
 }
 
-void fn_020050D4(u32 data)
+void Session_OnLanguage(u32 data)
 {
     struct Cmd *cmd = (struct Cmd *)&data;
 
-    lbl_03002C98 = cmd->unk2;
+    gLanguage = cmd->unk2;
 }
 
-void fn_020050E8(void)
+void Mode_Init(void)
 {
     vu16 ie;
 
-    lbl_03003094 = 0;
+    gMode = 0;
     fn_02009318();
     fn_02019C4C();
-    lbl_03003090 = 0;
-    fn_02005844();
+    gScreen = 0;
+    Screen_Reset();
     lbl_030032FC[0] = 0;
     lbl_030032FC[1] = -1;
-    lbl_0300309C = 0;
+    gLetterAttachKind = 0;
     lbl_030030A0 = 0;
-    fn_02015E34(0);
+    Scouter_SetDirty(0);
     ie = REG_IE;
     REG_IE = 0;
-    lbl_030032F0 = 0;
+    gLinkEstablished = 0;
     REG_IE = ie;
-    lbl_030032E4 = 0;
-    DmaClear32(DMA0, 0, lbl_030030B0, sizeof(lbl_030030B0));
+    gMask = 0;
+    DmaClear32(DMA0, 0, gWindows, sizeof(gWindows));
     fn_02000990();
-    lbl_030032E8 = lbl_03003090;
-    lbl_030032E0 = 0;
-    fn_02014760(0);
+    gSavedScreen = gScreen;
+    gOpenMenuReq = 0;
+    MenuScreen_SetReturn(0);
 }
 
-int fn_02005194(void)
+int Mode_Update(void)
 {
     int ret;
 
-    switch (lbl_03003094) {
+    switch (gMode) {
     case 0:
-        ret = fn_020051E4();
+        ret = FieldMode_Update();
         break;
     case 1:
-        ret = fn_0200543C();
+        ret = CMakeMode_Update();
         break;
     case 2:
-        ret = fn_02005568();
+        ret = ShopMode_Update();
         break;
     case 3:
-        ret = fn_020056A4();
+        ret = SmithMode_Update();
         break;
     case 4:
     default:
-        ret = fn_020057B8();
+        ret = CtrlMode_Update();
         break;
     }
     return ret;
 }
 
-int fn_020051E4(void)
+int FieldMode_Update(void)
 {
     int ret;
     int i;
 
-    if (lbl_030032F0) {
-        fn_02005844();
+    if (gLinkEstablished) {
+        Screen_Reset();
         fn_02000990();
     }
-    if (lbl_03002994 && lbl_030029A0 && lbl_030029A4) {
-        lbl_03003090 = lbl_030032E8;
+    if (gReconnectPending && gWasConnected && gLinkStarted) {
+        gScreen = gSavedScreen;
         fn_0200194C(0);
         REG_DISPCNT = 0x9F40;
         fn_02000990();
-        fn_02005844();
-        lbl_03002994 = 0;
+        Screen_Reset();
+        gReconnectPending = 0;
     }
 
     ret = 0;
-    if (lbl_030032F4 == 0) {
-        if (lbl_030029A4 || lbl_03003090 == 13) {
-            if (lbl_03003090 == 0 && lbl_03002ED0 == 2)
-                ret = fn_02015960();
+    if (gScreenPhase == 0) {
+        if (gLinkStarted || gScreen == 13) {
+            if (gScreen == 0 && gRadarType == 2)
+                ret = ScouterScreen_Init();
             else
-                ret = lbl_0202FA38[lbl_03003090].init();
+                ret = lbl_0202FA38[gScreen].init();
         }
-    } else if (lbl_030032F4 == 1) {
-        if (lbl_03003090 == 0 && lbl_03002ED0 == 2)
-            ret = fn_020159E4();
+    } else if (gScreenPhase == 1) {
+        if (gScreen == 0 && gRadarType == 2)
+            ret = ScouterScreen_Main();
         else
-            ret = lbl_0202FA38[lbl_03003090].main();
+            ret = lbl_0202FA38[gScreen].main();
     } else {
-        if (lbl_03003090 == 0 && lbl_03002ED0 == 2)
-            ret = fn_02015B78();
+        if (gScreen == 0 && gRadarType == 2)
+            ret = ScouterScreen_Exit();
         else
-            ret = lbl_0202FA38[lbl_03003090].exit();
+            ret = lbl_0202FA38[gScreen].exit();
     }
 
     if (ret) {
-        if (lbl_030032F4 <= 1) {
-            lbl_030032F4++;
+        if (gScreenPhase <= 1) {
+            gScreenPhase++;
         } else {
-            if (lbl_030032E0) {
-                fn_02014760(lbl_03003090);
-                lbl_03003090 = 10;
-            } else if (lbl_03003090 == 10) {
-                lbl_03003090 = lbl_030030B0[0].unk2;
-            } else if (lbl_03003090 == 9 && lbl_0300309C == 2) {
-                lbl_03003090 = 6;
-            } else if (lbl_03003090 != 9 && lbl_0300309C) {
-                lbl_03003090 = 9;
+            if (gOpenMenuReq) {
+                MenuScreen_SetReturn(gScreen);
+                gScreen = 10;
+            } else if (gScreen == 10) {
+                gScreen = gWindows[0].unk2;
+            } else if (gScreen == 9 && gLetterAttachKind == 2) {
+                gScreen = 6;
+            } else if (gScreen != 9 && gLetterAttachKind) {
+                gScreen = 9;
             } else {
-                fn_0200163C();
-                if (lbl_03003098 > 0) {
-                    lbl_03003090++;
-                    if (lbl_0202FA38[lbl_03003090].init == 0)
-                        lbl_03003090++;
-                    if (lbl_03003090 > 9)
-                        lbl_03003090 = 0;
+                Xfer_ClearLetterData();
+                if (gScreenStep > 0) {
+                    gScreen++;
+                    if (lbl_0202FA38[gScreen].init == 0)
+                        gScreen++;
+                    if (gScreen > 9)
+                        gScreen = 0;
                 } else {
-                    lbl_03003090--;
-                    if (lbl_0202FA38[lbl_03003090].init == 0)
-                        lbl_03003090--;
-                    if (lbl_03003090 < 0)
-                        lbl_03003090 = 9;
+                    gScreen--;
+                    if (lbl_0202FA38[gScreen].init == 0)
+                        gScreen--;
+                    if (gScreen < 0)
+                        gScreen = 9;
                 }
             }
-            lbl_03003098 = 0;
+            gScreenStep = 0;
             fn_02000990();
-            fn_02005844();
+            Screen_Reset();
         }
         for (i = 0; i < 5; i++)
-            lbl_030030B0[i].unk1 = 0;
+            gWindows[i].unk1 = 0;
     }
     return ret;
 }
 
-int fn_0200543C(void)
+int CMakeMode_Update(void)
 {
     int ret;
     int i;
 
-    if (lbl_030032F0) {
-        fn_02005844();
+    if (gLinkEstablished) {
+        Screen_Reset();
         fn_02000990();
     }
 
     ret = 0;
-    if (lbl_030032F4 == 0) {
-        if (lbl_030029A4)
-            ret = lbl_0202FAEC[lbl_03003090].init();
-    } else if (lbl_030032F4 == 1) {
-        ret = lbl_0202FAEC[lbl_03003090].main();
+    if (gScreenPhase == 0) {
+        if (gLinkStarted)
+            ret = lbl_0202FAEC[gScreen].init();
+    } else if (gScreenPhase == 1) {
+        ret = lbl_0202FAEC[gScreen].main();
     } else {
-        ret = lbl_0202FAEC[lbl_03003090].exit();
+        ret = lbl_0202FAEC[gScreen].exit();
     }
 
     if (ret) {
-        if (lbl_030032F4 <= 1) {
-            lbl_030032F4++;
+        if (gScreenPhase <= 1) {
+            gScreenPhase++;
         } else {
-            if (lbl_03003090 == 0 && ret < 0) {
-                lbl_030029A4 = 0;
-                lbl_03002ACC = 0;
-                lbl_03003090 = 5;
-            } else if (lbl_03003090 != 4) {
+            if (gScreen == 0 && ret < 0) {
+                gLinkStarted = 0;
+                gMenuHasInput = 0;
+                gScreen = 5;
+            } else if (gScreen != 4) {
                 if (ret > 0)
-                    lbl_03003090++;
+                    gScreen++;
                 else
-                    lbl_03003090--;
+                    gScreen--;
             } else if (ret > 0) {
-                lbl_030029A4 = 0;
-                lbl_03002ACC = 0;
-                lbl_03003090 = 5;
+                gLinkStarted = 0;
+                gMenuHasInput = 0;
+                gScreen = 5;
             } else {
-                lbl_03003090 = lbl_030030A4;
+                gScreen = lbl_030030A4;
             }
-            fn_0200586C();
+            Screen_Restart();
             fn_02000990();
         }
         for (i = 0; i < 5; i++)
-            lbl_030030B0[i].unk1 = 0;
+            gWindows[i].unk1 = 0;
     }
     return ret;
 }
 
-int fn_02005568(void)
+int ShopMode_Update(void)
 {
     int ret;
     int i;
 
-    if (lbl_030032F0) {
-        fn_02005844();
+    if (gLinkEstablished) {
+        Screen_Reset();
         fn_02000990();
         lbl_030030A0 = 0;
         lbl_030032FC[0] = 0;
     }
 
     ret = 0;
-    if (lbl_030032F4 == 0) {
-        if (lbl_030029A4)
-            ret = lbl_0202FB34[lbl_03003090].init();
-    } else if (lbl_030032F4 == 1) {
-        ret = lbl_0202FB34[lbl_03003090].main();
+    if (gScreenPhase == 0) {
+        if (gLinkStarted)
+            ret = lbl_0202FB34[gScreen].init();
+    } else if (gScreenPhase == 1) {
+        ret = lbl_0202FB34[gScreen].main();
     } else {
-        ret = lbl_0202FB34[lbl_03003090].exit();
+        ret = lbl_0202FB34[gScreen].exit();
     }
 
     if (ret) {
-        if (lbl_030032F4 <= 1) {
-            lbl_030032F4++;
+        if (gScreenPhase <= 1) {
+            gScreenPhase++;
         } else {
-            if (lbl_03003090 == 0 && ret < 0) {
-                lbl_030029A4 = 0;
-                lbl_03002ACC = 0;
-                lbl_03003090 = 3;
-            } else if (lbl_03003090 == 0 && ret != 0) {
-                lbl_030032FC[0] = lbl_030030B0[0].unk2;
+            if (gScreen == 0 && ret < 0) {
+                gLinkStarted = 0;
+                gMenuHasInput = 0;
+                gScreen = 3;
+            } else if (gScreen == 0 && ret != 0) {
+                lbl_030032FC[0] = gWindows[0].unk2;
                 switch (lbl_030032FC[0]) {
                 case 0:
-                    lbl_03003090 = 1;
+                    gScreen = 1;
                     break;
                 case 1:
-                    lbl_03003090 = 2;
+                    gScreen = 2;
                     break;
                 }
             } else {
-                lbl_03003090 = 0;
+                gScreen = 0;
             }
-            fn_0200586C();
+            Screen_Restart();
             fn_02000990();
         }
         lbl_030030A0 = 0;
         for (i = 0; i < 5; i++)
-            lbl_030030B0[i].unk1 = 0;
+            gWindows[i].unk1 = 0;
     }
     return ret;
 }
 
-int fn_020056A4(void)
+int SmithMode_Update(void)
 {
     int ret;
     int i;
 
-    if (lbl_030032F0) {
-        fn_02005844();
+    if (gLinkEstablished) {
+        Screen_Reset();
         fn_02000990();
         lbl_030030A0 = 0;
         lbl_030032FC[0] = 0;
     }
 
     ret = 0;
-    if (lbl_030032F4 == 0) {
-        if (lbl_030029A4)
-            ret = lbl_0202FB64[lbl_03003090].init();
-    } else if (lbl_030032F4 == 1) {
-        ret = lbl_0202FB64[lbl_03003090].main();
+    if (gScreenPhase == 0) {
+        if (gLinkStarted)
+            ret = lbl_0202FB64[gScreen].init();
+    } else if (gScreenPhase == 1) {
+        ret = lbl_0202FB64[gScreen].main();
     } else {
-        ret = lbl_0202FB64[lbl_03003090].exit();
+        ret = lbl_0202FB64[gScreen].exit();
     }
 
     if (ret) {
-        if (lbl_030032F4 <= 1) {
-            lbl_030032F4++;
+        if (gScreenPhase <= 1) {
+            gScreenPhase++;
         } else {
-            if (lbl_03003090 == 0) {
+            if (gScreen == 0) {
                 if (ret > 0) {
-                    lbl_03003090 = 1;
+                    gScreen = 1;
                 } else {
-                    lbl_03002ACC = 0;
-                    lbl_03003090 = 3;
+                    gMenuHasInput = 0;
+                    gScreen = 3;
                 }
-            } else if (lbl_03003090 == 1) {
+            } else if (gScreen == 1) {
                 if (ret > 0)
-                    lbl_03003090 = 2;
+                    gScreen = 2;
                 else
-                    lbl_03003090 = 0;
+                    gScreen = 0;
             } else {
-                lbl_03003090 = 0;
+                gScreen = 0;
             }
-            fn_0200586C();
+            Screen_Restart();
             fn_02000990();
         }
         lbl_030030A0 = 0;
         for (i = 0; i < 5; i++)
-            lbl_030030B0[i].unk1 = 0;
+            gWindows[i].unk1 = 0;
     }
     return ret;
 }
 
-int fn_020057B8(void)
+int CtrlMode_Update(void)
 {
     int ret;
     int i;
 
-    if (lbl_030032F0) {
-        fn_02005844();
+    if (gLinkEstablished) {
+        Screen_Reset();
         fn_02000990();
     }
 
     ret = 0;
-    if (lbl_030032F4 == 0) {
-        if (lbl_030029A4) {
-            lbl_030032F8 = 3;
-            ret = fn_02009E2C();
+    if (gScreenPhase == 0) {
+        if (gLinkStarted) {
+            gMsgScreenId = 3;
+            ret = MsgScreen_Init();
         }
     } else {
-        ret = fn_02009ED0();
+        ret = MsgScreen_Main();
     }
 
     if (ret) {
-        if (lbl_030032F4 <= 1) {
-            lbl_030032F4++;
+        if (gScreenPhase <= 1) {
+            gScreenPhase++;
         } else {
-            lbl_030032F4 = 0;
-            fn_0200586C();
+            gScreenPhase = 0;
+            Screen_Restart();
             fn_02000990();
         }
         for (i = 0; i < 5; i++)
-            lbl_030030B0[i].unk1 = 0;
+            gWindows[i].unk1 = 0;
     }
     return ret;
 }
 
-void fn_02005844(void)
+void Screen_Reset(void)
 {
-    if (lbl_030029A0 || lbl_03003090 != 13) {
-        fn_0200586C();
+    if (gWasConnected || gScreen != 13) {
+        Screen_Restart();
         fn_02004360();
     }
 }
 
-void fn_0200586C(void)
+void Screen_Restart(void)
 {
     vu16 ie;
     int i;
     u16 *map;
 
-    if (lbl_030029A0 || lbl_03003090 != 13) {
+    if (gWasConnected || gScreen != 13) {
         lbl_030030A8 = 0;
-        lbl_030032F4 = 0;
-        lbl_030030AC = 0;
+        gScreenPhase = 0;
+        gScreenInitDone = 0;
         lbl_030032EC = 0;
         lbl_030030A4 = 0;
-        lbl_030032E0 = 0;
+        gOpenMenuReq = 0;
         fn_02000AD4(15, 0, 0);
         ie = REG_IE;
         REG_IE = 0;
-        lbl_030032F0 = 0;
+        gLinkEstablished = 0;
         REG_IE = ie;
         fn_0200194C(0);
         for (i = 0; i < 32; i++)
             fn_02003F74(i, 0, 256, 256);
         REG_DISPCNT = 0x9F40;
-        lbl_03002AEC &= 0xFC0F;
+        gDataFlags &= 0xFC0F;
         map = (u16 *)0x06007FE0;
         DmaClear16(DMA0, 0, map, 32);
         map = (u16 *)0x0600DFE0;
         DmaClear16(DMA0, 0, map, 32);
-        fn_020025E4((s8)lbl_03003090);
+        Link_SendScreenId((s8)gScreen);
     }
 }
 

@@ -2789,7 +2789,7 @@ void CGMonObj::onStatDie()
 		}
 		if (subFrame == 0) {
 			int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
-			int particleId = *reinterpret_cast<int*>(mon + 0x560);
+			int particleId;
 			switch (classId) {
 			case 4:
 				particleId = 0x253;

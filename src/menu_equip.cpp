@@ -45,17 +45,19 @@ STATIC_ASSERT(sizeof(EquipOpenAnimList) == 0x1008);
  */
 bool CMenuPcs::ChkEquipActive(int index)
 {
+	int item;
+	int equipIndex;
+	bool active;
 	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	int entryCount = entries[0];
 	s16* itemEntries = entries + 1;
-	int equipIndex = m_equipState->selected[0];
+	equipIndex = m_equipState->selected[0];
 
 	if ((index < 0) || (index >= entryCount)) {
 		return 0;
 	}
 
-	bool active;
 	if (index == 0) {
 		if (equipIndex < 3) {
 			active = false;
@@ -63,11 +65,14 @@ bool CMenuPcs::ChkEquipActive(int index)
 			active = caravanWork->m_equipment[equipIndex] >= 0;
 		}
 	} else {
-		int item = caravanWork->m_inventoryItems[itemEntries[index - 1]];
+		item = caravanWork->m_inventoryItems[itemEntries[index - 1]];
 		active = ChkEquipPossible(item);
 
-		if (active && (GetEquipType(item) != equipIndex)) {
-			active = false;
+		if (active) {
+			int itemType = GetEquipType(item);
+			if (itemType != equipIndex) {
+				active = false;
+			}
 		}
 	}
 

@@ -526,7 +526,7 @@ config.libs = [
             Object(NonMatching, "chara_fur.cpp", extra_cflags=["-str reuse,nopool,readonly"]),
             Object(NonMatching, "chara.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "charaobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "chunkfile.cpp"),
+            Object(Matching, "chunkfile.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "cmake.cpp"),
             Object(Matching, "color.cpp"),
             Object(NonMatching, "file.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),

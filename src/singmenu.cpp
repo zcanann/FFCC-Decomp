@@ -2775,6 +2775,7 @@ void CMenuPcs::DrawSingWin(short mode)
  */
 void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
 {
+    const char* text;
     CFont* font = m_fonts[0];
     font->SetMargin(1.0f);
     font->SetShadow(1);
@@ -2790,11 +2791,10 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     } else {
         lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
     }
-    char* dynamicText = s_DynamicMessStr;
     const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
 
     for (int i = 0; i < lineCount; i++) {
-        const char* text;
+        char* dynamicText = s_DynamicMessStr + i * 0x80;
         if (useDynamic == 0) {
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
         } else {
@@ -2804,7 +2804,6 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
         if (textWidth > maxWidth) {
             maxWidth = textWidth;
         }
-        dynamicText += 0x80;
     }
 
     MenuWindowInfo* win = m_menuWindowInfo;
@@ -2818,11 +2817,10 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     int lineStep = lineHeight + 3;
     float yOffset = 4.0f;
 
-    dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
+        char* dynamicText = s_DynamicMessStr + i * 0x80;
         font->SetTlut((activeMask & (1 << i)) != 0 ? 7 : 8);
 
-        const char* text;
         if (useDynamic == 0) {
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
         } else {
@@ -2836,7 +2834,6 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
             font->Draw(lineBuffer);
         }
 
-        dynamicText += 0x80;
         y += static_cast<float>(lineStep);
     }
 

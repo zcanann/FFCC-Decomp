@@ -507,11 +507,11 @@ static int CreateWaterMesh(Vec* positions, Vec* normals, Vec2d* texCoords, unsig
     float step;
     float radius;
     float uvStep;
-    int indexOffset;
-    int quadIndex;
-    int rowBase;
     int rowCount;
     int colCount;
+    int indexOffset;
+    int rowBase;
+    int quadIndex;
 
     int vertexIndex = 0;
     normalY = 1.0f;

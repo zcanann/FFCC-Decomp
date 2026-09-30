@@ -720,6 +720,7 @@ void fn_0200242C(void)
 s32 fn_02002460(u32 data)
 {
     u8 *recv = (u8 *)&data;
+    u32 *word;
     u32 pkt;
     u8 *p;
 
@@ -735,22 +736,25 @@ s32 fn_02002460(u32 data)
             REG_JOY_TRANS = pkt;
             REG_JOYSTAT = 0x20;
             lbl_03000070.unk1 = 3;
-        } else if (lbl_03000070.unk1 == 5) {
-            if (lbl_03000070.unk18 == data)
-                lbl_03000070.unk17 = 0;
-            else
-                lbl_03000070.unk17 = 1;
-            lbl_03000070.unk18 = *(u32 *)recv;
-            REG_JOYSTAT = 0x20;
-            lbl_03000070.unk1 = 6;
-        } else if (lbl_03000070.unk1 == 6) {
-            lbl_03000070.unk15 = recv[1] & 0xF;
-            REG_JOYSTAT = 0;
-            lbl_03000070.unk0 = 0xFF;
-            lbl_03000070.unk1 = 0;
-            lbl_030032F0 = 1;
         } else {
-            return 0;
+            word = (u32 *)recv;
+            if (lbl_03000070.unk1 == 5) {
+                if (lbl_03000070.unk18 == data)
+                    lbl_03000070.unk17 = 0;
+                else
+                    lbl_03000070.unk17 = 1;
+                lbl_03000070.unk18 = *word;
+                REG_JOYSTAT = 0x20;
+                lbl_03000070.unk1 = 6;
+            } else if (lbl_03000070.unk1 == 6) {
+                lbl_03000070.unk15 = recv[1] & 0xF;
+                REG_JOYSTAT = 0;
+                lbl_03000070.unk0 = 0xFF;
+                lbl_03000070.unk1 = 0;
+                lbl_030032F0 = 1;
+            } else {
+                return 0;
+            }
         }
     } else {
         fn_0200275C();

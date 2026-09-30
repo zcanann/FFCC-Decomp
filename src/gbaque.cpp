@@ -1478,40 +1478,36 @@ void GbaQueue::LoadEnemyStat()
 	memset(localEnemyData, 0, sizeof(localEnemyData));
 
 	if (CFlat.m_initAllFinishedFlag != 0) {
-		GbaQueueMapEntity* enemyEntry = localEnemyData;
-
 		for (i = 0; i < 0x40; i++) {
 			if (Game.m_monObjects[i] == 0 || Game.m_monObjects == 0) {
-				enemyEntry->m_baseDataIndex = 0;
+				localEnemyData[i].m_baseDataIndex = 0;
 			} else {
 				const CRomWork* enemyData = &reinterpret_cast<const CRomWork*>(Game.unkCFlatData0[1])[
 				    Game.m_monWorkRefs[i]->m_baseDataIndex];
 				const unsigned int enemyKind = enemyData->m_data[CRomWork::EnemyKindOffset];
 
 				if (enemyKind == 10) {
-					enemyEntry->m_kind = 1;
+					localEnemyData[i].m_kind = 1;
 				} else if (enemyKind == 0xB) {
-					enemyEntry->m_kind = 3;
+					localEnemyData[i].m_kind = 3;
 				} else {
-					enemyEntry->m_kind = 2;
+					localEnemyData[i].m_kind = 2;
 				}
 
 				CMonWork* enemyWork = Game.m_monWorkRefs[i];
-				enemyEntry->m_baseDataIndex = static_cast<unsigned char>(enemyWork->m_baseDataIndex);
-				enemyEntry->m_hp = enemyWork->m_hp;
-				enemyEntry->m_maxHp = enemyWork->m_maxHp;
-				enemyEntry->m_radarEnabled = Game.m_monObjects[i]->IsDispRader() != 0;
+				localEnemyData[i].m_baseDataIndex = static_cast<unsigned char>(enemyWork->m_baseDataIndex);
+				localEnemyData[i].m_hp = enemyWork->m_hp;
+				localEnemyData[i].m_maxHp = enemyWork->m_maxHp;
+				localEnemyData[i].m_radarEnabled = Game.m_monObjects[i]->IsDispRader() != 0;
 				CGObject* enemyObj = Game.m_monObjects[i];
 				for (int item = 0; item < 4; item++) {
-					enemyEntry->m_dropItemCodes[item] = enemyObj->m_dropItemCodes[item];
+					localEnemyData[i].m_dropItemCodes[item] = enemyObj->m_dropItemCodes[item];
 				}
 				int posX = static_cast<int>(enemyObj->m_worldPosition.x / 3.0f);
 				int posZ = static_cast<int>(enemyObj->m_worldPosition.z / 3.0f);
-				enemyEntry->m_posX = static_cast<short>(posX);
-				enemyEntry->m_posZ = static_cast<short>(posZ);
+				localEnemyData[i].m_posX = static_cast<short>(posX);
+				localEnemyData[i].m_posZ = static_cast<short>(posZ);
 			}
-
-			enemyEntry++;
 		}
 	}
 

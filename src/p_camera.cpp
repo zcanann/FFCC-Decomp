@@ -875,9 +875,11 @@ void CCameraPcs::destroyFullShadow()
  */
 inline void CCameraPcs::createRampTex8()
 {
+    CMapMng* map = &MapMng;
+    char* file = "p_camera.cpp";
     m_fullScreenShadow.m_rampTexture = 0;
     unsigned int rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
-    unsigned char* rampTex = new (MapMng.m_stage, "p_camera.cpp", 0x361) u8[rampTexSize];
+    unsigned char* rampTex = new (map->m_stage, file, 0x361) u8[rampTexSize];
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (unsigned int i = 0; i < 0x100; i++) {
@@ -904,9 +906,11 @@ inline void CCameraPcs::createRampTex8()
  */
 void CCameraPcs::createFullShadow()
 {
+    CMapMng* map = &MapMng;
+    char* file = "p_camera.cpp";
     m_fullScreenShadow.m_shadowTexture = 0;
     m_fullScreenShadow.m_shadowTexture =
-        new (MapMng.m_stage, "p_camera.cpp", 0x3A5)
+        new (map->m_stage, file, 0x3A5)
             u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
 
     createRampTex8();

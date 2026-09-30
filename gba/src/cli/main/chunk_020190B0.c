@@ -94,8 +94,6 @@ extern s8 lbl_03003098;
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
-extern struct Window lbl_03003200;
 extern s8 lbl_030032E0;
 extern s32 lbl_030032EC;
 extern s8 lbl_0203A800;
@@ -238,7 +236,7 @@ void fn_02019180(s32 idx, s32 pal)
 
 s32 fn_0201925C(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 row;
     s32 ret;
 
@@ -264,7 +262,7 @@ s32 fn_0201925C(void)
 s32 fn_020192D0(void)
 {
     s32 ret = 0;
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
 
     fn_02003394(0, 0);
     fn_02008178(win);
@@ -569,7 +567,7 @@ s32 fn_02019978(s32 val)
 
 s32 fn_02019A24(void)
 {
-    struct Window *win = &lbl_03003200;
+    struct Window *win = &lbl_030030B0[3];
     s32 ret;
     s32 i;
 
@@ -610,7 +608,7 @@ s32 fn_02019A24(void)
 
 s32 fn_02019B20(void)
 {
-    struct Window *win = &lbl_03003200;
+    struct Window *win = &lbl_030030B0[3];
     s32 ret;
 
     fn_02008178(win);
@@ -626,7 +624,7 @@ s32 fn_02019B20(void)
 
 void fn_02019B54(void)
 {
-    struct Window *win = &lbl_03003200;
+    struct Window *win = &lbl_030030B0[3];
     s32 x;
     s32 y;
     s32 frame;
@@ -975,7 +973,7 @@ s32 fn_0201A3D4(void)
             return 0;
     }
     ret = fn_02009414(0);
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     fn_02005968(win);
     fn_02005A50(win);
     if ((win->unk1 >> 3) < win->unk16 - 2)
@@ -1000,7 +998,7 @@ s32 fn_0201A45C(void)
     fn_020095AC(0);
     fn_02003394(1, 0);
     fn_020033F4();
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     if (lbl_0300284E < win->unkE) {
         fn_0201A664(lbl_0300284E);
         pal = 5;

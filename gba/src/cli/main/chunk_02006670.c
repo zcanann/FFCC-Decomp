@@ -1020,13 +1020,17 @@ void fn_0200823C(struct Window *win)
 {
     s32 px;
     s32 py;
+    s32 top;
+    s32 last;
     s32 i;
     s32 frame;
     u32 flags;
 
     px = win->unk10 * 8;
-    py = (win->unk12 - 1 + win->unk16) * 8 - win->unk1;
-    if (py >> 3 > win->unk12) {
+    top = win->unk12;
+    last = win->unk16 - 1;
+    py = (last + top) * 8 - win->unk1;
+    if (py >> 3 > top) {
         fn_020098F0(win->unk5, win->unk10, py >> 3, win->unk14, 1);
         if ((py >> 3) - 1 <= win->unk12)
             fn_020098F0(win->unk5, win->unk10, (py >> 3) - 1, win->unk14, 1);
@@ -1101,13 +1105,17 @@ void fn_02008478(struct Window *win)
 {
     s32 px;
     s32 py;
+    s32 top;
+    s32 last;
     s32 i;
     s32 id;
     s32 frame;
 
     px = win->unk10 * 8;
-    py = (win->unk12 - 1 + win->unk16) * 8 - win->unk1;
-    if (py >> 3 > win->unk12) {
+    top = win->unk12;
+    last = win->unk16 - 1;
+    py = (last + top) * 8 - win->unk1;
+    if (py >> 3 > top) {
         fn_020098F0(win->unk5, win->unk10, py >> 3, win->unk14, 1);
         if ((py >> 3) - 1 <= win->unk12)
             fn_020098F0(win->unk5, win->unk10, (py >> 3) - 1, win->unk14, 1);
@@ -1137,15 +1145,18 @@ void fn_02008540(struct Window *win)
     u16 buf[30];
     s32 px;
     s32 py;
+    s32 top;
+    s32 last;
     s32 i;
     u16 tile;
     u16 *map;
     s32 frame;
-    s32 bg;
 
     px = win->unk10 * 8;
-    py = (win->unk12 - 1 + win->unk16) * 8 - win->unk1;
-    if (py >> 3 > win->unk12) {
+    top = win->unk12;
+    last = win->unk16 - 1;
+    py = (last + top) * 8 - win->unk1;
+    if (py >> 3 > top) {
         if (win->unk5 <= 1)
             tile = 0x3FF;
         else
@@ -1156,12 +1167,12 @@ void fn_02008540(struct Window *win)
         DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
         if ((py >> 3) - 1 <= win->unk12)
             DmaSet(DMA3, buf, map - 32, 0x80000000 | win->unk14);
-        bg = win->unk5;
-        if (bg == 2) {
+        if (win->unk5 == 2) {
+            tile = 0x3FF;
             for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
-                buf[i] = 0x3FF;
+                buf[i] = tile;
         }
-        map = fn_02000A40(bg - 1, win->unk10, py >> 3);
+        map = fn_02000A40(win->unk5 - 1, win->unk10, py >> 3);
         DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
         if ((py >> 3) - 1 <= win->unk12 && lbl_03003094)
             DmaSet(DMA3, buf, map - 32, 0x80000000 | win->unk14);
@@ -1185,15 +1196,18 @@ void fn_020086A8(struct Window *win)
     u16 buf[30];
     s32 px;
     s32 py;
+    s32 top;
+    s32 last;
     s32 i;
     u16 tile;
     u16 *map;
     s32 frame;
-    s32 bg;
 
     px = win->unk10 * 8;
-    py = (win->unk12 - 1 + win->unk16) * 8 - win->unk1;
-    if (py >> 3 > win->unk12) {
+    top = win->unk12;
+    last = win->unk16 - 1;
+    py = (last + top) * 8 - win->unk1;
+    if (py >> 3 > top) {
         if (win->unk5 <= 1)
             tile = 0x3FF;
         else
@@ -1204,12 +1218,12 @@ void fn_020086A8(struct Window *win)
         DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
         if ((py >> 3) - 1 <= win->unk12)
             DmaSet(DMA3, buf, map - 32, 0x80000000 | win->unk14);
-        bg = win->unk5;
-        if (bg == 2) {
+        if (win->unk5 == 2) {
+            tile = 0x3FF;
             for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
-                buf[i] = 0x3FF;
+                buf[i] = tile;
         }
-        map = fn_02000A40(bg - 1, win->unk10, py >> 3);
+        map = fn_02000A40(win->unk5 - 1, win->unk10, py >> 3);
         DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
         if ((py >> 3) - 1 > win->unk12) {
             py -= 8;
@@ -1233,14 +1247,18 @@ void fn_020087E8(struct Window *win)
     u16 buf[30];
     s32 px;
     s32 py;
+    s32 top;
+    s32 last;
     s32 i;
     u16 tile;
     u16 *map;
     s32 frame;
 
     px = win->unk10 * 8;
-    py = (win->unk12 - 1 + win->unk16) * 8 - win->unk1;
-    if (py >> 3 > win->unk12) {
+    top = win->unk12;
+    last = win->unk16 - 1;
+    py = (last + top) * 8 - win->unk1;
+    if (py >> 3 > top) {
         if (win->unk5 <= 1)
             tile = 0x3FF;
         else
@@ -1271,15 +1289,18 @@ void fn_020088E0(struct Window *win)
     u16 buf[30];
     s32 px;
     s32 py;
+    s32 top;
+    s32 last;
     s32 i;
     u16 tile;
     u16 *map;
     s32 frame;
-    s32 bg;
 
     px = win->unk10 * 8;
-    py = (win->unk12 - 1 + win->unk16) * 8 - win->unk1;
-    if (py >> 3 > win->unk12) {
+    top = win->unk12;
+    last = win->unk16 - 1;
+    py = (last + top) * 8 - win->unk1;
+    if (py >> 3 > top) {
         if (win->unk5 <= 1)
             tile = 0x3FF;
         else
@@ -1290,12 +1311,12 @@ void fn_020088E0(struct Window *win)
         DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
         if ((py >> 3) - 1 <= win->unk12)
             DmaSet(DMA3, buf, map - 32, 0x80000000 | win->unk14);
-        bg = win->unk5;
-        if (bg == 2) {
+        if (win->unk5 == 2) {
+            tile = 0x3FF;
             for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
-                buf[i] = 0x3FF;
+                buf[i] = tile;
         }
-        map = fn_02000A40(bg - 1, win->unk10, py >> 3);
+        map = fn_02000A40(win->unk5 - 1, win->unk10, py >> 3);
         DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
         if ((py >> 3) - 1 <= win->unk12 && lbl_03003094)
             DmaSet(DMA3, buf, map - 32, 0x80000000 | win->unk14);
@@ -1319,14 +1340,18 @@ void fn_02008A48(struct Window *win)
     u16 buf[30];
     s32 px;
     s32 py;
+    s32 top;
+    s32 last;
     s32 i;
     u16 tile;
     u16 *map;
     s32 frame;
 
     px = win->unk10 * 8;
-    py = (win->unk12 - 1 + win->unk16) * 8 - win->unk1;
-    if (py >> 3 > win->unk12) {
+    top = win->unk12;
+    last = win->unk16 - 1;
+    py = (last + top) * 8 - win->unk1;
+    if (py >> 3 > top) {
         if (win->unk5 <= 1)
             tile = 0x3FF;
         else
@@ -1336,8 +1361,9 @@ void fn_02008A48(struct Window *win)
         map = fn_02000A40(win->unk5, win->unk10, py >> 3);
         DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
         if (win->unk5 == 2) {
+            tile = 0x3FF;
             for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
-                buf[i] = 0x3FF;
+                buf[i] = tile;
         }
         map = fn_02000A40(win->unk5 - 1, win->unk10, py >> 3);
         DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
@@ -1367,14 +1393,18 @@ void fn_02008B8C(struct Window *win)
     u16 buf[30];
     s32 px;
     s32 py;
+    s32 top;
+    s32 last;
     s32 i;
     u16 tile;
     u16 *map;
     s32 frame;
 
     px = win->unk10 * 8;
-    py = (win->unk12 - 1 + win->unk16) * 8 - win->unk1;
-    if (py >> 3 >= win->unk12) {
+    top = win->unk12;
+    last = win->unk16 - 1;
+    py = (last + top) * 8 - win->unk1;
+    if (py >> 3 >= top) {
         tile = win->unk5 <= 1 ? 0x3FF : 0x2FF;
         for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
             buf[i] = tile;
@@ -1411,14 +1441,18 @@ void fn_02008CC0(struct Window *win)
     u16 buf[30];
     s32 px;
     s32 py;
+    s32 top;
+    s32 last;
     s32 i;
     u16 tile;
     u16 *map;
     s32 frame;
 
     px = win->unk10 * 8;
-    py = (win->unk12 - 1 + win->unk16) * 8 - win->unk1;
-    if (py >> 3 > win->unk12) {
+    top = win->unk12;
+    last = win->unk16 - 1;
+    py = (last + top) * 8 - win->unk1;
+    if (py >> 3 > top) {
         if (win->unk5 <= 1)
             tile = 0x3FF;
         else
@@ -1448,13 +1482,17 @@ void fn_02008DB8(struct Window *win)
 {
     s32 px;
     s32 py;
+    s32 top;
+    s32 last;
     s32 i;
     s32 frame;
     u32 flags;
 
     px = win->unk10 * 8;
-    py = (win->unk12 - 1 + win->unk16) * 8 - win->unk1;
-    if (py >> 3 > win->unk12) {
+    top = win->unk12;
+    last = win->unk16 - 1;
+    py = (last + top) * 8 - win->unk1;
+    if (py >> 3 > top) {
         fn_020098F0(win->unk5, win->unk10, py >> 3, win->unk14, 1);
         if ((py >> 3) - 1 <= win->unk12)
             fn_020098F0(win->unk5, win->unk10, (py >> 3) - 1, win->unk14, 1);
@@ -1597,9 +1635,11 @@ void fn_0200907C(s32 x, s32 y, s32 n, s32 pal, s32 fill)
     }
 }
 
-void fn_0200911C(struct Cmd cmd)
+void fn_0200911C(u32 data)
 {
-    lbl_03003094 = cmd.unk[1];
+    struct Cmd *cmd = (struct Cmd *)&data;
+
+    lbl_03003094 = cmd->unk[1];
     if (lbl_03003094 != 0) {
         lbl_03002CA0.unk128 = 0;
         if (lbl_03003094 == 4) {

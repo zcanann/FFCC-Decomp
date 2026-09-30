@@ -434,6 +434,7 @@ void fn_020008D0(void)
     s32 j;
     s32 w;
     u32 ofs;
+    u32 dst;
 
     DmaCopy16(DMA0, 0x0600D7E0, 0x06007060, 0x800);
     w = 12;
@@ -442,7 +443,8 @@ void fn_020008D0(void)
         for (j = 0; j < w; j++) {
             buf[j] += 0xC4;
         }
-        DmaCopy16(DMA0, buf, 0x0600E800 + (i * 32 + 20) * 2, w * 2);
+        dst = 0x0600E800 + (i * 32 + 20) * 2;
+        DmaCopy16(DMA0, buf, dst, w * 2);
     }
     for (i = 16; i < 32; i++) {
         ofs = i * 64;
@@ -450,7 +452,8 @@ void fn_020008D0(void)
         for (j = 0; j < 32; j++) {
             buf[j] += 0xC4;
         }
-        DmaCopy16(DMA0, buf, 0x0600E800 + ofs, 64);
+        dst = 0x0600E800 + ofs;
+        DmaCopy16(DMA0, buf, dst, 64);
     }
 }
 
@@ -561,17 +564,11 @@ void fn_02000B98(void)
 void fn_02000BB0(void)
 {
     s32 idx;
-    s32 ofs;
 
     if (lbl_0300000C > 0) {
         lbl_0300000F = 1;
         idx = 13 - lbl_0300000C;
-        if (lbl_0300000C & 1) {
-            ofs = lbl_0201CCCC[idx];
-        } else {
-            ofs = -lbl_0201CCCC[idx];
-        }
-        lbl_0300000E = ofs;
+        lbl_0300000E = (lbl_0300000C & 1) ? lbl_0201CCCC[idx] : (s8)-lbl_0201CCCC[idx];
         lbl_0300000D = (&lbl_0201CCD8[2])[idx];
         if (lbl_03002AC8 & 1) {
             lbl_0300000C--;

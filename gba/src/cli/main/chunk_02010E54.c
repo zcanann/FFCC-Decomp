@@ -106,8 +106,6 @@ extern s8 lbl_0300309C;
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
-extern struct Window lbl_03003190;
 extern u8 lbl_030032E0;
 extern s32 lbl_030032F4;
 extern const struct State lbl_0202FBD0[];
@@ -179,7 +177,7 @@ void fn_020112CC(void);
 
 void fn_02010E54(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 x;
     s32 y;
     s32 n;
@@ -218,7 +216,7 @@ void fn_02010E54(void)
 
 void fn_02010F88(s32 idx)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 top;
     s32 bottom;
     s32 row;
@@ -244,7 +242,7 @@ void fn_02010F88(s32 idx)
 
 s32 fn_0201106C(void)
 {
-    struct Window *win = &lbl_03003190;
+    struct Window *win = &lbl_030030B0[2];
     s32 row;
     s32 ret;
 
@@ -271,7 +269,7 @@ s32 fn_0201106C(void)
 s32 fn_020110E0(void)
 {
     s32 ret = 0;
-    struct Window *win = &lbl_03003190;
+    struct Window *win = &lbl_030030B0[2];
 
     fn_02003394(0, 0);
     fn_02008178(win);
@@ -291,7 +289,7 @@ void fn_0201111C(s32 idx, s32 row)
     fn_020038F4(24);
     if (lbl_03002CA0.unk64[idx] > 0)
         fn_02003464(fn_0201AAAC(lbl_03002CA0.unk64[idx]), 0);
-    fn_020037A8(fn_02009340(&lbl_03003120, row, 0), lbl_03003120.unk14);
+    fn_020037A8(fn_02009340(&lbl_030030B0[1], row, 0), lbl_030030B0[1].unk14);
 }
 
 void fn_02011170(s32 idx)
@@ -819,7 +817,7 @@ s32 fn_02011E94(void)
         fn_02009CBC(1, 1, 8);
         lbl_030027DA = 1;
     }
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     fn_02003394(1, 0);
     fn_020033F4();
     fn_02005968(win);
@@ -836,7 +834,7 @@ s32 fn_02011E94(void)
 
 s32 fn_02011FBC(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 id;
     s32 attr;
     s32 ret;
@@ -876,7 +874,7 @@ s32 fn_020120D0(void)
 
     fn_02003394(1, 0);
     fn_020033F4();
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     fn_02008178(win);
     if ((win->unk1 >> 3) >= win->unk16 - 2) {
         ret = lbl_030027E5;

@@ -80,7 +80,6 @@ extern struct Unk03002FB0 lbl_03002FB0;
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
 extern s32 lbl_030032EC;
 extern s32 lbl_030032F4;
 
@@ -153,7 +152,7 @@ s32 fn_0200B8C8(void);
 
 void fn_0200A63C(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 i;
     s32 n;
     s32 word;
@@ -184,7 +183,7 @@ void fn_0200A700(s32 idx, s32 row)
     else
         str = fn_0201A73C(41);
     fn_02003464(str, 0);
-    fn_020037A8(fn_02009340(&lbl_03003120, row, 0), lbl_03003120.unk14);
+    fn_020037A8(fn_02009340(&lbl_030030B0[1], row, 0), lbl_030030B0[1].unk14);
 }
 
 s32 fn_0200A758(s32 idx)
@@ -207,7 +206,7 @@ void fn_0200A790(void)
 
     fn_02003394(0, 0);
     fn_020033F4();
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     n = lbl_03002774 + win->unk2;
     if (fn_0200A758(n)) {
         fn_0201AB88(n + 159, buf);
@@ -309,7 +308,7 @@ void fn_0200A7EC(void)
     fn_02003394(0, 0);
     fn_020033F4();
 
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     x = win->unk5;
     win->unk5 = 0;
     for (i = 2; i >= 0; i--)
@@ -434,7 +433,7 @@ s32 fn_0200ACC4(void)
         }
     }
     if (ret == 0) {
-        win = &lbl_03003120;
+        win = &lbl_030030B0[1];
         fn_02008178(win);
         if ((win->unk1 >> 3) < win->unk16 - 1)
             win->unk1 += 8;
@@ -464,7 +463,8 @@ void fn_0200AD90(void)
             x = win[1].unk10 * 8 - 18;
             y = win[1].unk12 * 8 + 5;
         } else {
-            x = (win->unk10 + lbl_03002782[0] * 2) * 8 - 2;
+            x = (win->unk10 + lbl_03002782[0] * 2) * 8;
+            x -= 2;
             y = (win->unk12 + 2 + lbl_03002782[1] * 2) * 8;
         }
         fn_02003C3C(x, y, 0, id, fn_02004030(0, id), 0, 0);
@@ -516,10 +516,14 @@ s32 fn_0200AECC(void)
         }
         m4aSongNumStart(1);
     } else if (lbl_0300299C & 0x80) {
-        if (lbl_03002782[1] < 4 || (lbl_03002782[1] == 4 && lbl_03002782[0] > 9))
+        if (lbl_03002782[1] >= 4) {
+            if (lbl_03002782[1] == 4 && lbl_03002782[0] > 9)
+                lbl_03002782[1]++;
+            else
+                lbl_03002782[1] = 0;
+        } else {
             lbl_03002782[1]++;
-        else
-            lbl_03002782[1] = 0;
+        }
         m4aSongNumStart(1);
     }
     if (lbl_0300299C & 0xF0)
@@ -591,6 +595,8 @@ void fn_0200B164(void)
     s32 tile;
     s32 pal;
     u16 *dst;
+    s32 x;
+    s32 y;
 
     if (lbl_0300279B <= 4) {
         fn_02003394(0, 0);
@@ -613,7 +619,9 @@ void fn_0200B164(void)
             buf[i] = tile++ | pal;
             buf[i + 30] = tile++ | pal;
         }
-        dst = fn_02000A40(win.unk5, win.unk10 + 2, win.unk12 + 2 + lbl_0300279B * 2);
+        x = win.unk10 + 2;
+        y = win.unk12 + 2 + lbl_0300279B * 2;
+        dst = fn_02000A40(win.unk5, x, y);
         DmaSet(DMA3, buf, dst, 0x80000000 | n);
         DmaSet(DMA3, buf + 30, dst + 32, 0x80000000 | n);
         lbl_0300279B++;

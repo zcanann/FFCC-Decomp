@@ -415,8 +415,8 @@ inline int CGCharaObj::scCheckTime(CCombi2Set* set, CGCharaObj* first, CGCharaOb
  */
 int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 {
-	int combiIndex = 0;
 	int found = -1;
+	int combiIndex = 0;
 	int lastSlot = count - 1;
 	outFallback = 0;
 
@@ -431,9 +431,8 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 		int reqLast = reqCount - 1;
 		int slot = 0;
 		CCombi2Set* slotCursor = combiCursor->m_sets;
-		CGPartyObj** slotPtr = partyList;
 		for (; slot < reqCount; slot++) {
-			CGCharaObj* partyObj = *slotPtr;
+			CGCharaObj* partyObj = partyList[slot];
 			if (partyObj->m_comboFrame == 0) {
 				CCombi2Set* fallbackCursor = slotCursor;
 				int lastSlotIn = count - 1;
@@ -467,7 +466,6 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			if (slot == reqLast) {
 				found = combiIndex;
 			}
-			slotPtr++;
 			slotCursor++;
 		}
 	}
@@ -774,6 +772,7 @@ void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
  */
 int CGCharaObj::calcCastTime(int itemId)
 {
+	int result;
 	char* fmt = s_CGCharaObj_801DC548;
 
 	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
@@ -799,7 +798,6 @@ int CGCharaObj::calcCastTime(int itemId)
 	SCharaItemRow* typeRows = castRows;
 	int itemNo = typeRows[itemId].m_effect;
 	int itemType = typeRows[itemId].m_actionType;
-	int result;
 
 	if (itemNo != 0x1F8 && itemType == 2) {
 		int castBonus = reinterpret_cast<CGObjWork*>(m_scriptHandle)->m_romWork[0xCA];

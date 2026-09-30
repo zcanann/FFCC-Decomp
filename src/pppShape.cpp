@@ -86,13 +86,16 @@ void pppGetShapePos(long* animData, short frameIndex, Vec& minPos, Vec& maxPos, 
 void pppCacheUnLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
     pppShapeAnimData* animData = static_cast<pppShapeAnimData*>(shapeSt->m_animData);
+    int shapeIndex;
     unsigned char textureUsed[0x100];
     memset(textureUsed, 0, sizeof(textureUsed));
 
     for (int frameIndex = 0; frameIndex < animData->m_frameCount; frameIndex++) {
         tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
-        for (int shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
-            textureUsed[shape->m_entries[shapeIndex].m_textureIndex] = 1;
+        for (shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
+            tagOAN3_SHAPE_ENTRY* entry = shape->m_entries;
+            entry += shapeIndex;
+            textureUsed[entry->m_textureIndex] = 1;
         }
     }
 
@@ -115,13 +118,16 @@ void pppCacheUnLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
     pppShapeAnimData* animData = static_cast<pppShapeAnimData*>(shapeSt->m_animData);
+    int shapeIndex;
     unsigned char textureUsed[0x100];
     memset(textureUsed, 0, sizeof(textureUsed));
 
     for (int frameIndex = 0; frameIndex < animData->m_frameCount; frameIndex++) {
         tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
-        for (int shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
-            textureUsed[shape->m_entries[shapeIndex].m_textureIndex] = 1;
+        for (shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
+            tagOAN3_SHAPE_ENTRY* entry = shape->m_entries;
+            entry += shapeIndex;
+            textureUsed[entry->m_textureIndex] = 1;
         }
     }
 

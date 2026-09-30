@@ -1864,20 +1864,19 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
     const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
     unsigned int bestPriority = 0x7ffffff1;
     int currentSize = size;
+    int i;
 
     while (true) {
         CAmemCache* bestEntry = 0;
 
-        int offset = 0;
-        for (int i = 0; i < m_cacheCount; i++) {
-            CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
+        for (i = 0; i < m_cacheCount; i++) {
+            CAmemCache& entry = m_cacheTable[i];
             if (entry.m_inUse != 0 && entry.m_refCount == 0 && entry.m_dmaCopy != 0 &&
                 entry.m_cacheData != 0 && entry.m_size >= currentSize &&
                 static_cast<unsigned int>(entry.m_priority) < bestPriority) {
                 bestEntry = &entry;
                 bestPriority = static_cast<unsigned int>(entry.m_priority);
             }
-            offset += sizeof(CAmemCache);
         }
 
         if (bestEntry != 0) {
@@ -1905,7 +1904,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
                 System.Printf(const_cast<char*>(strBase + 0x4c));
             }
 
-            for (int i = 0; i < m_cacheCount; i++) {
+            for (i = 0; i < m_cacheCount; i++) {
                 CAmemCache& entry = cacheEntryAt(this, i);
                 if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                     System.Printf(

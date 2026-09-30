@@ -3595,7 +3595,7 @@ void CMaterialSet::Calc()
                     if (texScroll->m_u0 > 1.0f) {
                         texScroll->m_u0 = texScroll->m_u0 - 1.0f;
                     } else if (texScroll->m_u0 < 0.0f) {
-                        texScroll->m_u0 = texScroll->m_u0 + 1.0f;
+                        texScroll->m_u0 += 1.0f;
                     }
                 } else if (texScroll->m_type0 == 2) {
                     texScroll->m_u0 = texScroll->m_uKeyFrame->Get();
@@ -3607,7 +3607,7 @@ void CMaterialSet::Calc()
                     if (texScroll->m_v0 > 1.0f) {
                         texScroll->m_v0 = texScroll->m_v0 - 1.0f;
                     } else if (texScroll->m_v0 < 0.0f) {
-                        texScroll->m_v0 = texScroll->m_v0 + 1.0f;
+                        texScroll->m_v0 += 1.0f;
                     }
                 } else if (texScroll->m_type1 == 2) {
                     texScroll->m_v0 = texScroll->m_vKeyFrame->Get();
@@ -3742,13 +3742,14 @@ unsigned long CMaterialSet::Find(char* name)
  */
 void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotIndex)
 {
+    u32 materialIndex;
     u32 textureIndex = 0;
 
     while (textureIndex < static_cast<u32>(textureSet->GetNumTexture())) {
         CTexture* texture = textureSet->GetTexture(textureIndex);
         if (texture != 0) {
             u32 materialCount = static_cast<u32>(m_materials.GetSize());
-            u32 materialIndex = textureIndex + 1;
+            materialIndex = textureIndex + 1;
             if ((materialIndex < materialCount) && (m_materials[materialIndex] != 0)) {
                 goto next;
             }

@@ -179,11 +179,12 @@ static inline PartyObjOverlay& PartyData(CGPartyObj* self)
 inline void CGPartyObj::changeWeapon(int weaponIndex, int itemId, int forceImmediate)
 {
 	PartyObjOverlay& party = PartyData(this);
-	if (forceImmediate || !m_weaponNodeFlagBits.m_prg ||
+	bool needsImmediateChange = forceImmediate || !m_weaponNodeFlagBits.m_prg ||
 	    !m_weaponNodeFlagAll.m_bits1.m_shield || party.carryObject != 0 ||
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[0] != 0 ||
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[9] != 0 ||
-	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0) {
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0;
+	if (needsImmediateChange) {
 		if (itemId <= 0) {
 			LoadWeapon(-1, 0);
 		} else {
@@ -1072,7 +1073,7 @@ void CGPartyObj::onFramePreCalc()
 
 		int weaponIndex;
 		int itemId;
-		if (CFlatCenterState() == 0) {
+		if (static_cast<int>(CFlatCenterState()) == 0) {
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponIndex, itemId);
 			if (party.weaponIndex != weaponIndex || party.weaponItemId != itemId) {
 				changeWeapon(weaponIndex, itemId, 0);
@@ -2888,9 +2889,7 @@ void CGPartyObj::moveCenterTargetParticle()
 	CVector bottomResult = hitPos + yOffset;
 
 	CMapCylinder hitCylinder;
-	hitCylinder.m_bottom.x = bottomResult.x;
-	hitCylinder.m_bottom.y = bottomResult.y;
-	hitCylinder.m_bottom.z = bottomResult.z;
+	hitCylinder.m_bottom = bottomResult;
 	hitCylinder.m_axis = *(Vec*)&moveVec;
 	hitCylinder.m_radius = FLOAT_80331a78;
 

@@ -1674,11 +1674,12 @@ static void pppDrawPartStd(_pppMngSt* pppMngSt)
 				pppProg* prog = stageIter->m_prog;
 				if (prog != 0)
 				{
-					pppProgRenderCallback fn = (pppProgRenderCallback)prog->m_pppFunctionRender;
+					u32 count;
 					_pppPObjLink* obj = pDataVal->m_pppPObjLink;
+					pppProgRenderCallback fn = (pppProgRenderCallback)prog->m_pppFunctionRender;
 					if (fn != 0)
 					{
-						u32 count = pDataVal->m_activeCount;
+						count = pDataVal->m_activeCount;
 
 						do
 						{

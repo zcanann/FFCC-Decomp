@@ -80,14 +80,16 @@ def main():
         names = [args.function] if args.function else defined_functions(obj)
         objdiff = str(TOOLS / f"objdiff-cli{EXE}")
         total = 0.0
+        # One objdiff run covers every function in the file.
+        command = [objdiff, "diff", "-1", str(target), "-2", str(obj), "-o", "-"]
+        if args.function:
+            command.append(args.function)
+        result = subprocess.run(command, capture_output=True, text=True)
+        try:
+            data = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            sys.exit(f"objdiff failed: {result.stderr.strip()[:300]}")
         for name in names:
-            result = subprocess.run([objdiff, "diff", "-1", str(target), "-2", str(obj), "-o", "-", name],
-                                    capture_output=True, text=True)
-            try:
-                data = json.loads(result.stdout)
-            except json.JSONDecodeError:
-                print(f"{name}: objdiff failed: {result.stderr.strip()[:200]}")
-                continue
             left = [s for s in data["left"]["symbols"] if s.get("name") == name]
             right = [s for s in data["right"]["symbols"] if s.get("name") == name]
             if not left:

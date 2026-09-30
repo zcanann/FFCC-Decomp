@@ -1387,59 +1387,20 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
 void CGraphic::RenderTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor color2, _GXColor color3, _GXColor color4)
 {
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-
-	float tex1;
-	float x2;
-	float tex0;
-	float x1;
-	float y1;
-	float z1;
-	float y2;
-	u32 rgba1;
-	u32 rgba3;
-	u32 rgba2;
-	u32 rgba4;
-
-	x1 = pos1.x;
-	y1 = pos1.y;
-	GXWGFifo.f32 = x1;
-	z1 = pos1.z;
-	GXWGFifo.f32 = y1;
-	rgba1 = *(u32*)&color1;
-	GXWGFifo.f32 = z1;
-	const float* tex0Ptr = &kGraphicZeroF;
-	tex0 = *tex0Ptr;
-	GXWGFifo.u32 = rgba1;
-	x2 = pos2.x;
-	GXWGFifo.f32 = tex0;
-	rgba2 = *(u32*)&color2;
-	GXWGFifo.f32 = tex0;
-	const float* tex1Ptr = &kGraphicOneF;
-	tex1 = *tex1Ptr;
-
-	GXWGFifo.f32 = x2;
-	y2 = pos2.y;
-	GXWGFifo.f32 = y1;
-	rgba4 = *(u32*)&color4;
-	GXWGFifo.f32 = z1;
-	rgba3 = *(u32*)&color3;
-	GXWGFifo.u32 = rgba2;
-	GXWGFifo.f32 = tex1;
-	GXWGFifo.f32 = tex0;
-
-	GXWGFifo.f32 = x2;
-	GXWGFifo.f32 = y2;
-	GXWGFifo.f32 = z1;
-	GXWGFifo.u32 = rgba4;
-	GXWGFifo.f32 = tex1;
-	GXWGFifo.f32 = tex1;
-
-	GXWGFifo.f32 = x1;
-	GXWGFifo.f32 = y2;
-	GXWGFifo.f32 = z1;
-	GXWGFifo.u32 = rgba3;
-	GXWGFifo.f32 = tex0;
-	GXWGFifo.f32 = tex1;
+	float tex1 = kGraphicOneF;
+	float tex0 = kGraphicZeroF;
+	GXPosition3f32(pos1.x, pos1.y, pos1.z);
+	GXColor1u32(*reinterpret_cast<u32*>(&color1));
+	GXTexCoord2f32(tex0, tex0);
+	GXPosition3f32(pos2.x, pos1.y, pos1.z);
+	GXColor1u32(*reinterpret_cast<u32*>(&color2));
+	GXTexCoord2f32(tex1, tex0);
+	GXPosition3f32(pos2.x, pos2.y, pos1.z);
+	GXColor1u32(*reinterpret_cast<u32*>(&color4));
+	GXTexCoord2f32(tex1, tex1);
+	GXPosition3f32(pos1.x, pos2.y, pos1.z);
+	GXColor1u32(*reinterpret_cast<u32*>(&color3));
+	GXTexCoord2f32(tex0, tex1);
 }
 
 /*
@@ -1454,36 +1415,14 @@ void CGraphic::RenderTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor
 void CGraphic::RenderNoTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor color2, _GXColor color3, _GXColor color4)
 {
 	GXBegin(GX_QUADS, GX_VTXFMT6, 4);
-
-	float x2;
-	float x1 = pos1.x;
-	float y1 = pos1.y;
-
-	GXWGFifo.f32 = x1;
-	float z1 = pos1.z;
-	GXWGFifo.f32 = y1;
-	u32 rgba1 = *(u32*)&color1;
-	GXWGFifo.f32 = z1;
-
-	x2 = pos2.x;
-	GXWGFifo.u32 = rgba1;
-	u32 rgba2 = *(u32*)&color2;
-	GXWGFifo.f32 = x2;
-	float y2 = pos2.y;
-	GXWGFifo.f32 = y1;
-	u32 rgba4 = *(u32*)&color4;
-	GXWGFifo.f32 = z1;
-	u32 rgba3 = *(u32*)&color3;
-	GXWGFifo.u32 = rgba2;
-	GXWGFifo.f32 = x2;
-	GXWGFifo.f32 = y2;
-	GXWGFifo.f32 = z1;
-
-	GXWGFifo.u32 = rgba4;
-	GXWGFifo.f32 = x1;
-	GXWGFifo.f32 = y2;
-	GXWGFifo.f32 = z1;
-	GXWGFifo.u32 = rgba3;
+	GXPosition3f32(pos1.x, pos1.y, pos1.z);
+	GXColor1u32(*reinterpret_cast<u32*>(&color1));
+	GXPosition3f32(pos2.x, pos1.y, pos1.z);
+	GXColor1u32(*reinterpret_cast<u32*>(&color2));
+	GXPosition3f32(pos2.x, pos2.y, pos1.z);
+	GXColor1u32(*reinterpret_cast<u32*>(&color4));
+	GXPosition3f32(pos1.x, pos2.y, pos1.z);
+	GXColor1u32(*reinterpret_cast<u32*>(&color3));
 }
 
 /*

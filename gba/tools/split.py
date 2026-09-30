@@ -192,7 +192,7 @@ class Emitter:
             if s.kind == "function" and s.thumb and value & 1:
                 return s.name
             if not (s.kind == "function" and s.thumb):
-                return s.name if value == s.address else None
+                return s.name if value == s.address else f"{s.name}+0x{value - s.address:X}"
         s = self.containing(value)
         if s is None:
             return None

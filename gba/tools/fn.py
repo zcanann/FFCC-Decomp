@@ -85,7 +85,8 @@ def main():
     address = match[0][0]
     unit = unit_of(args.program, address)
     target = BUILD / args.program / "obj" / f"{unit}.o"
-    subprocess.run(["ninja", str(target.relative_to(ROOT)).replace("\\", "/")], cwd=ROOT, capture_output=True)
+    if not target.exists():
+        subprocess.run(["ninja", str(target.relative_to(ROOT)).replace("\\", "/")], cwd=ROOT, capture_output=True)
     print(f"; {args.function} 0x{address:08X} unit {args.program}/{unit}")
     print(disassemble(str(target), args.function))
     if args.asm:

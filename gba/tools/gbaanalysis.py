@@ -23,6 +23,7 @@ _THUMB = Cs(CS_ARCH_ARM, CS_MODE_THUMB)
 _REG = r"(r\d+|sb|sl|fp|ip|sp|lr|pc)"
 _LDR_PC = re.compile(rf"^{_REG}, \[pc(?:, #(-?0x[0-9a-f]+|-?\d+))?\]$")
 _ADD_PC = re.compile(rf"^{_REG}, pc, #(0x[0-9a-f]+|\d+)$")
+_ADR = re.compile(rf"^{_REG}, #(0x[0-9a-f]+|\d+)$")
 _IMM = re.compile(r"^#(-?0x[0-9a-f]+|-?\d+)$")
 
 
@@ -188,6 +189,8 @@ class Analyzer:
             return True
 
         m = _ADD_PC.match(ops) if base_mnem in ("add", "adr") else None
+        if m is None and base_mnem == "adr":
+            m = _ADR.match(ops)
         if m:
             pc_value = (insn.address + 4) & ~3 if thumb else insn.address + 8
             target = pc_value + _int(m.group(2))

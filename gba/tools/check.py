@@ -35,7 +35,7 @@ def compile_c(source: Path, out_dir: Path) -> Path:
     steps = [
         [binutil("cpp"), *CPPFLAGS, "-iquote", str(source.parent), str(source), "-o", str(pre)],
         [str(TOOLS / "gba-agbcc" / f"agbcc{EXE}"), *CFLAGS, str(pre), "-o", str(asm)],
-        [binutil("as"), "-mcpu=arm7tdmi", "-mthumb-interwork", "-o", str(obj), str(asm)],
+        [binutil("as"), "-mcpu=arm7tdmi", "-mthumb-interwork", "-o", str(obj), str(asm), str(ROOT / "gba" / "lib" / "align.s")],
     ]
     for step in steps:
         result = subprocess.run(step, capture_output=True, text=True)

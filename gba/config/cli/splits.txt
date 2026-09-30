@@ -2,7 +2,16 @@ crt0:
 	.text       start:0x02000000 end:0x0200025C
 
 main:
-	.text       start:0x0200025C end:0x0201C96C
+	.text       start:0x0200025C end:0x0201AC90
+
+m4a/m4a_1:
+	.text       start:0x0201AC90 end:0x0201B258
+
+m4a/m4a:
+	.text       start:0x0201B258 end:0x0201C714
+
+main:
+	.text       start:0x0201C714 end:0x0201C96C
 
 libgcc/_call_via_rX:
 	.text       start:0x0201C96C end:0x0201C9A8

@@ -290,6 +290,13 @@ class Emitter:
                     out.append(f"\t.type {s.name}, %object")
                 out.append(f"{s.name}:")
                 open_symbol = (s, address)
+            # Code entered by mode switch (e.g. a Thumb stub branching to ARM) has no symbol.
+            entry = a.functions.get(address) if is_code else None
+            if entry is not None:
+                want = "thumb" if entry.thumb else "arm"
+                if mode != want:
+                    out.append(f"\t.{want}")
+                    mode = want
             if address in labels:
                 out.append(f".L_{address:08X}:")
 
@@ -369,7 +376,9 @@ class Emitter:
 
     def linker_script(self, objects: Dict[str, str], compiled: Optional[set] = None) -> str:
         compiled = compiled or set()
-        out = ["SECTIONS", "{"]
+        # Absolute symbols, such as link-time constants from configuration tables.
+        out = [f"{s.name} = 0x{s.address:X};" for s in self.symbols if s.section == ".abs"]
+        out += ["SECTIONS", "{"]
         sections: Dict[str, List[Split]] = {}
         for split in self.splits:
             sections.setdefault(split.section, []).append(split)
@@ -383,7 +392,8 @@ class Emitter:
             for split in ordered:
                 name = section if split.unit in compiled else self.input_section(split)
                 out.append(f"\t\t{objects[split.unit]}({name})")
-            out.append("\t}")
+            # Alignment gaps between objects were zero-filled, not nop-filled.
+            out.append("\t} =0" if section in LOAD_SECTIONS else "\t}")
         out.append("\t/DISCARD/ : { *(.ARM.attributes) *(.comment) }")
         out.append("}")
         return "\n".join(out) + "\n"

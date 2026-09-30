@@ -7910,17 +7910,21 @@ void CMenuPcs::DrawCMLife()
 		unsigned char flagA;
 		unsigned char flagB;
 		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
-			flagB = m_cmakeWork->m_characters[slot].m_isGuest;
 			flagA = m_cmakeWork->m_characters[slot].m_isAway;
+			flagB = m_cmakeWork->m_characters[slot].m_isGuest;
 		} else {
-			flagB = Game.m_caravanWorkArr[slot].m_caravanLocalFlags;
 			flagA = Game.m_caravanWorkArr[slot].m_shopBusyFlag;
+			flagB = Game.m_caravanWorkArr[slot].m_caravanLocalFlags;
 		}
 		if (flagA != 0 || flagB != 0) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
+			if (row != 0) {
+				y += FLOAT_80331548;
+			}
+			y += DOUBLE_803315C0;
 			MenuPcs.DrawRect(
 			    0, static_cast<float>(xBase + DOUBLE_80331670),
-			                                static_cast<float>((row != 0 ? y + FLOAT_80331548 : y) + DOUBLE_803315C0), FLOAT_80331524,
+			                                y, FLOAT_80331524,
 			                                FLOAT_80331440, FLOAT_803313dc,
 			                                flagA != 0 ? FLOAT_803313dc : FLOAT_80331440,
 			                                FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);

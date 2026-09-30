@@ -327,16 +327,6 @@ static inline s16 NodeParentIndex(CChara::CNode* node)
 	return node->m_refData->m_parentIndex;
 }
 
-static inline u8 NodeChildCount(CChara::CNode* node)
-{
-	return node->m_refData->m_childCount;
-}
-
-static inline s16 NodeChildBankOffset(CChara::CNode* node)
-{
-	return node->m_refData->m_childBankOffset;
-}
-
 static inline u8 NodeUsesParentLenX(CChara::CNode* node)
 {
 	return node->m_refData->m_usesParentLenX;
@@ -495,25 +485,6 @@ static inline bool AnimNodeUsesScale(CChara::CAnimNode* node)
 static inline u8 ModelAttachMode(CChara::CModel* model)
 {
 	return model->m_attachMode;
-}
-
-static void CalcOneBindNode(CChara::CNode* node, CChara::CModel* model)
-{
-	s16 parent = NodeParentIndex(node);
-	if (parent >= 0) {
-		CChara::CNode* parentNode = ModelNodes(model) + parent;
-		PSMTXConcat(NodeRefBindMtx(parentNode), NodeRefLocalMtx(node), NodeRefBindMtx(node));
-	} else {
-		PSMTXCopy(NodeRefLocalMtx(node), NodeRefBindMtx(node));
-	}
-	PSMTXCopy(NodeRefBindMtx(node), NodeWorldMtx(node));
-}
-
-static CChara::CNode* GetBindChildNode(CChara::CModel* model, CChara::CNode* node, int childIndex)
-{
-	u8* bank = reinterpret_cast<u8*>(ModelBank(model));
-	u16 nodeIndex = *reinterpret_cast<u16*>(bank + NodeChildBankOffset(node) + childIndex * 2);
-	return ModelNodes(model) + nodeIndex;
 }
 
 static const char s_charaMeshWorkOverflow[] = "chara mesh work buffer overflow\n";
@@ -2453,25 +2424,18 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
  */
 void CChara::CNode::CalcBind(CChara::CModel* model)
 {
-	CalcOneBindNode(this, model);
-
-	for (u32 i = 0; i < NodeChildCount(this); i++) {
-		CNode* child = GetBindChildNode(model, this, i);
-		CalcOneBindNode(child, model);
-
-		for (u32 j = 0; j < NodeChildCount(child); j++) {
-			CNode* grandChild = GetBindChildNode(model, child, j);
-			CalcOneBindNode(grandChild, model);
-
-			for (u32 k = 0; k < NodeChildCount(grandChild); k++) {
-				CNode* greatGrandChild = GetBindChildNode(model, grandChild, k);
-				CalcOneBindNode(greatGrandChild, model);
-
-				for (u32 l = 0; l < NodeChildCount(greatGrandChild); l++) {
-					GetBindChildNode(model, greatGrandChild, l)->CalcBind(model);
-				}
-			}
-		}
+	s16 parent = m_refData->m_parentIndex;
+	if (parent >= 0) {
+		PSMTXConcat(model->m_nodes[parent].m_refData->m_bindMtx, m_refData->m_localMtx, m_refData->m_bindMtx);
+	} else {
+		PSMTXCopy(m_refData->m_localMtx, m_refData->m_bindMtx);
+	}
+	PSMTXCopy(m_refData->m_bindMtx, m_mtx);
+	for (u32 i = 0; i < m_refData->m_childCount; i++) {
+		u16 nodeIndex = *reinterpret_cast<u16*>(
+		    reinterpret_cast<u8*>(model->m_data->m_bank) + m_refData->m_childBankOffset + i * 2);
+		CNode* child = &model->m_nodes[nodeIndex];
+		child->CalcBind(model);
 	}
 }
 

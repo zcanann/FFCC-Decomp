@@ -72,6 +72,12 @@ parser.add_argument(
     help="directory containing arm-none-eabi binutils for the GBA programs (optional)",
 )
 parser.add_argument(
+    "--gba-compilers",
+    metavar="DIR",
+    type=Path,
+    help="directory containing agbcc and old_agbcc for the GBA programs (optional)",
+)
+parser.add_argument(
     "--compilers",
     metavar="DIR",
     type=Path,
@@ -1325,7 +1331,7 @@ mode = trailing_mode or args.mode
 
 if mode == "configure":
     # GBA multiboot programs are part of the PAL build and progress report
-    configure_gba(config, args.gba_binutils)
+    configure_gba(config, args.gba_binutils, args.gba_compilers)
     # Write build.ninja and objdiff.json
     generate_build(config)
 elif mode == "progress":

@@ -2,7 +2,27 @@ crt0:
 	.text       start:0x02000000 end:0x0200025C
 
 main:
-	.text       start:0x0200025C end:0x0201CC48
+	.text       start:0x0200025C end:0x0201C96C
+
+libgcc/_call_via_rX:
+	.text       start:0x0201C96C end:0x0201C9A8
+
+libgcc/_divsi3:
+	.text       start:0x0201C9A8 end:0x0201CA3C
+
+libgcc/_dvmd_tls:
+	.text       start:0x0201CA3C end:0x0201CA40
+
+libgcc/_modsi3:
+	.text       start:0x0201CA40 end:0x0201CB10
+
+libgcc/_udivsi3:
+	.text       start:0x0201CB10 end:0x0201CB88
+
+libgcc/_umodsi3:
+	.text       start:0x0201CB88 end:0x0201CC48
+
+main:
 	.rodata     start:0x0201CC48 end:0x02036EF0
 
 bss:

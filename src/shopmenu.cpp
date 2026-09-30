@@ -483,23 +483,15 @@ inline void _drawShadowFont(CFont* font, char* text, float x, float y, int tlut,
  * JP Address: TODO
  * JP Size: TODO
  */
-inline unsigned short getButtonRepeat(int padIndex, unsigned short noRepeatMask)
+inline unsigned short getButtonRepeat(int padIndex, unsigned short buttonMask)
 {
-    unsigned short buttons;
-
     if (gShopMenuInputLatch == 0) {
-        buttons = Pad.GetButtonRepeat(padIndex);
-    } else {
-        if ((Pad.GetButton(padIndex) & gShopMenuInputLatch) == 0) {
-            gShopMenuInputLatch = 0;
-        }
-        buttons = Pad.GetButtonDown(padIndex);
+        return Pad.GetButtonRepeat(padIndex) & buttonMask;
     }
-
-    if ((buttons & noRepeatMask) != 0) {
-        gShopMenuInputLatch = noRepeatMask;
+    if ((Pad.GetButton(padIndex) & gShopMenuInputLatch) == 0) {
+        gShopMenuInputLatch = 0;
     }
-    return buttons;
+    return Pad.GetButtonDown(padIndex) & buttonMask;
 }
 
 /*
@@ -1287,8 +1279,7 @@ void CShopMenu::DrawItemList()
         selectableFrame = 0xF;
     }
 
-    for (int row = 0; row < m_visibleRows; ++row) {
-        int listType = m_listType;
+    for (int row = 0; row < m_visibleRows; ++row, y += 0x1C) {
         int itemCount = getItemCnt();
 
         if (itemIndex >= itemCount) {
@@ -1296,31 +1287,8 @@ void CShopMenu::DrawItemList()
         }
 
         int itemNo = getItemNo(itemIndex);
-        unsigned int itemNoU = itemNo; itemNo = itemNoU;
 
-        int canTrade;
-        if (itemIndex == -1) {
-            canTrade = 0;
-        } else {
-            int tradeItemNo = getItemNo(itemIndex);
-            if (tradeItemNo <= 0) {
-                canTrade = 0;
-            } else if (listType == 0) {
-                canTrade = 1;
-            } else if (listType == 2) {
-                canTrade = 1;
-                if ((m_caravanWork->m_shopArgs[((int)(tradeItemNo - 0x191U) >> 5)] &
-                     (1 << ((tradeItemNo - 0x191U) & 0x1F))) == 0) {
-                    canTrade = 0;
-                }
-            } else if (MenuPcs.EquipChk(itemIndex)) {
-                canTrade = 0;
-            } else if (tradeItemNo > 0x9E) {
-                canTrade = 1;
-            } else {
-                canTrade = 0;
-            }
-        }
+        int canTrade = CheckSell(itemIndex);
 
         int frame = 0xE;
         if (canTrade != 0) {
@@ -1358,7 +1326,6 @@ void CShopMenu::DrawItemList()
         }
 
         ++itemIndex;
-        y += 0x1C;
     }
 
     int pulse = abs(static_cast<int>(System.m_frameCounter) % 0x14 - 10);
@@ -2307,31 +2274,7 @@ void CShopMenu::SelectYesNo()
     return;
 
 sellBlock:
-    int itemIndex = m_selectedIndex;
-    int canTrade;
-    if (itemIndex == -1) {
-        canTrade = 0;
-    } else {
-        int tradeItem = getItemNo(itemIndex);
-        if (tradeItem <= 0) {
-            canTrade = 0;
-        } else if (m_listType == 0) {
-            canTrade = 1;
-        } else if (m_listType == 2) {
-            canTrade = 1;
-            if ((m_caravanWork->m_shopArgs[((int)(tradeItem - 0x191U) >> 5)] &
-                 (1 << ((tradeItem - 0x191U) & 0x1F))) != 0) {
-            } else {
-                canTrade = 0;
-            }
-        } else if (MenuPcs.EquipChk(itemIndex)) {
-            canTrade = 0;
-        } else if (tradeItem > 0x9E) {
-            canTrade = 1;
-        } else {
-            canTrade = 0;
-        }
-    }
+    int canTrade = CheckSell(m_selectedIndex);
 
     if (canTrade != 0) {
         Sound.PlaySe(0x50, 0x40, 0x7F, 0);
@@ -2427,7 +2370,7 @@ void CShopMenu::SelectFigure()
         m_subMode = 2;
     }
 
-    if ((getButtonRepeat(0, 0) & 8) != 0) {
+    if (getButtonRepeat(0, 8) != 0) {
         switch (m_figureMode) {
         case 0: {
             ++m_quantity;
@@ -2464,7 +2407,7 @@ void CShopMenu::SelectFigure()
         return;
     }
 
-    if ((getButtonRepeat(0, 0) & 4) == 0) {
+    if (getButtonRepeat(0, 4) == 0) {
         return;
     }
 
@@ -2507,7 +2450,7 @@ void CShopMenu::SelectItemIdx()
         m_selectedIndex = getItemCnt() - 1;
     }
 
-    if ((getButtonRepeat(0, 0) & 8) != 0) {
+    if (getButtonRepeat(0, 8) != 0) {
         --m_selectedIndex;
         if (m_selectedIndex < 0) {
             bButtonNoRepeat(8);
@@ -2516,7 +2459,7 @@ void CShopMenu::SelectItemIdx()
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if ((getButtonRepeat(0, 0) & 4) != 0) {
+    } else if (getButtonRepeat(0, 4) != 0) {
         ++m_selectedIndex;
         if (m_selectedIndex >= getItemCnt()) {
             bButtonNoRepeat(4);
@@ -3031,9 +2974,10 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
+    CMaterialSet* materialSet = ppvEnv->m_materialSetPtr;
     MaterialMan.LockEnv();
     MaterialMan.SetMaterialMenu(
-        ppvEnv->m_materialSetPtr,
+        materialSet,
         shape->m_entries[0].m_textureIndex, 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -3109,9 +3053,10 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
+    CMaterialSet* materialSet = ppvEnv->m_materialSetPtr;
     MaterialMan.LockEnv();
     MaterialMan.SetMaterialMenu(
-        ppvEnv->m_materialSetPtr,
+        materialSet,
         shape->m_entries[0].m_textureIndex, 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);

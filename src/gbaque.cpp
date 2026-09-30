@@ -2252,12 +2252,11 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
     CCaravanWork** foodBaseArr = Game.m_scriptFoodBase;
     CCaravanWork** foodBasePtr = foodBaseArr + channel;
     CCaravanWork* caravanWork = (*foodBasePtr);
-    CMes::m_tempVar[0] = caravanWork->m_letters[letterIndex].TempVar(0);
-    CMes::m_tempVar[1] = caravanWork->m_letters[letterIndex].TempVar(1);
-    CMes::m_tempVar[2] = caravanWork->m_letters[letterIndex].TempVar(2);
-    CMes::m_tempVar[3] = caravanWork->m_letters[letterIndex].TempVar(3);
+    for (int i = 0; i < 4; i++) {
+        CMes::m_tempVar[i] = caravanWork->m_letters[letterIndex].TempVar(i);
+    }
 
-    int mesIndex = caravanWork->m_letters[letterIndex].MessageType() * 2;
+    int mesIndex = caravanWork->m_letters[letterIndex].HeaderBitsRef().m_messageType * 2;
 
     strcpy(srcText, Game.m_cFlatDataArr[1].Message(mesIndex + 0x10));
     CMes::MakeAgbString(workText, srcText, (*foodBasePtr)->m_genderFlag, 0);

@@ -25,10 +25,22 @@ categories.
 Requirements:
 - Python package `capstone` (`pip install capstone`). Without it, configure prints a
   warning and leaves the GBA programs out.
-- arm-none-eabi binutils: downloaded into `build/tools/gba-binutils` unless
+- arm-none-eabi binutils and cpp: downloaded into `build/tools/gba-binutils` unless
   `--gba-binutils <dir>` is given.
+- `agbcc` and `old_agbcc` from [pret/agbcc](https://github.com/pret/agbcc), in
+  `build/tools/gba-agbcc/` or `--gba-compilers <dir>`. Without them, sources are not
+  compiled and the GBA units stay unmatched.
 - The images are extracted from `orig/GCCP01/FFCC_PAL.iso` into `orig/GCCP01/gba/`;
   pre-extracted images there are used as-is.
+
+## Sources
+
+- `src/<program>/<unit>.c`: game code, compiled with `agbcc -mthumb-interwork -O2`.
+  Add the unit to `COMPLETE` in `tools/gba_project.py` once every function matches,
+  so it links into the checked image.
+- `lib/libgcc/`: agbcc's libgcc, built like agbcc does. Units named `libgcc/<object>`
+  in `splits.txt` build from it and always link.
+- `include/`: shared headers.
 
 ## Layout
 

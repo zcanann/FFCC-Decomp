@@ -179,11 +179,12 @@ static inline PartyObjOverlay& PartyData(CGPartyObj* self)
 inline void CGPartyObj::changeWeapon(int weaponIndex, int itemId, int forceImmediate)
 {
 	PartyObjOverlay& party = PartyData(this);
-	if (forceImmediate || !m_weaponNodeFlagBits.m_prg ||
+	bool needsImmediateChange = forceImmediate || !m_weaponNodeFlagBits.m_prg ||
 	    !m_weaponNodeFlagAll.m_bits1.m_shield || party.carryObject != 0 ||
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[0] != 0 ||
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[9] != 0 ||
-	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0) {
+	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_statusTimers[3] != 0;
+	if (needsImmediateChange) {
 		if (itemId <= 0) {
 			LoadWeapon(-1, 0);
 		} else {
@@ -1072,7 +1073,7 @@ void CGPartyObj::onFramePreCalc()
 
 		int weaponIndex;
 		int itemId;
-		if (CFlatCenterState() == 0) {
+		if (static_cast<int>(CFlatCenterState()) == 0) {
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponIndex, itemId);
 			if (party.weaponIndex != weaponIndex || party.weaponItemId != itemId) {
 				changeWeapon(weaponIndex, itemId, 0);
@@ -2417,9 +2418,8 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
 		    m_worldPosition.z - radius <= obj->m_worldPosition.z &&
 		    m_worldPosition.x + radius >= obj->m_worldPosition.x &&
 		    m_worldPosition.z + radius >= obj->m_worldPosition.z) {
-			float yRange = FLOAT_80331ad4 * obj->m_bodyEllipsoidRadius;
-			if (m_worldPosition.y + yRange >= obj->m_worldPosition.y &&
-			    m_worldPosition.y - yRange <= obj->m_worldPosition.y) {
+			if (m_worldPosition.y + FLOAT_80331ad4 * obj->m_bodyEllipsoidRadius >= obj->m_worldPosition.y &&
+			    m_worldPosition.y - FLOAT_80331ad4 * obj->m_bodyEllipsoidRadius <= obj->m_worldPosition.y) {
 				Vec diff;
 				PSVECSubtract(&obj->m_worldPosition, &m_worldPosition, &diff);
 				diff.y = 0.0f;
@@ -2888,9 +2888,7 @@ void CGPartyObj::moveCenterTargetParticle()
 	CVector bottomResult = hitPos + yOffset;
 
 	CMapCylinder hitCylinder;
-	hitCylinder.m_bottom.x = bottomResult.x;
-	hitCylinder.m_bottom.y = bottomResult.y;
-	hitCylinder.m_bottom.z = bottomResult.z;
+	hitCylinder.m_bottom = bottomResult;
 	hitCylinder.m_axis = *(Vec*)&moveVec;
 	hitCylinder.m_radius = FLOAT_80331a78;
 
@@ -4654,30 +4652,19 @@ void CGPartyObj::gpmCol()
 		cylinder.m_radius = halfHeight;
 
 		if (MapMng.CheckHitCylinderNear(&cylinder, diffVec, flags) != 0) {
-			int capped = i + 1;
-			if (activeTrailCount < capped) {
-				capped = activeTrailCount;
-			}
-			activeTrailCount = capped;
+			activeTrailCount = activeTrailCount < i + 1 ? activeTrailCount : i + 1;
 		} else {
-			trailBase[i].x = leader->m_worldPosition.x;
-			Vec* slot = &trailBase[i];
-			slot->y = leader->m_worldPosition.y;
-			slot->z = leader->m_worldPosition.z;
-			int idx = i;
-			int* trailIdxPtr = &m_ghostWork.trailIndex;
+			trailBase[i] = leader->m_worldPosition;
 			activeTrailCount = i + 1;
-			if (*trailIdxPtr < idx) {
-				idx = *trailIdxPtr;
-			}
-			*trailIdxPtr = idx;
+			m_ghostWork.trailIndex = m_ghostWork.trailIndex < i ? m_ghostWork.trailIndex : i;
 			break;
 		}
 		i++;
 	} while (static_cast<unsigned int>(i) < 5);
-	int lastTrailIndex = activeTrailCount - 1;
-	lastTrailIndex = lastTrailIndex < 0 ? 0 : lastTrailIndex;
-	m_ghostWork.trailIndex = m_ghostWork.trailIndex < lastTrailIndex ? m_ghostWork.trailIndex : lastTrailIndex;
+	int lastTrailIndex = activeTrailCount;
+	lastTrailIndex--;
+	m_ghostWork.trailIndex = m_ghostWork.trailIndex < (lastTrailIndex < 0 ? 0 : lastTrailIndex)
+	    ? m_ghostWork.trailIndex : (lastTrailIndex < 0 ? 0 : lastTrailIndex);
 }
 
 /*

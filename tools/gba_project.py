@@ -3,6 +3,12 @@
 Each program is split into per-unit assembly (gba/tools/split.py), reassembled,
 linked, and checked against the retail image. The target objects are added to
 objdiff.json so the programs count toward the version's progress report.
+
+Units with source are compiled and diffed against their target objects:
+- gba/src/<program>/<unit>.c, built with agbcc
+- libgcc/<object>, built from gba/lib/libgcc like agbcc's own libgcc
+Units listed in COMPLETE, and all library units, link their compiled objects
+into the checked image.
 """
 
 import importlib.util
@@ -16,6 +22,7 @@ from . import ninja_syntax
 from .project import ProgressCategory, ProjectConfig
 
 GBA_DIR = Path("gba")
+LIBGCC_DIR = GBA_DIR / "lib" / "libgcc"
 
 # Programs per game version: category id -> program info.
 PROGRAMS: Dict[str, Dict[str, Dict[str, str]]] = {
@@ -37,6 +44,17 @@ PROGRAMS: Dict[str, Dict[str, Dict[str, str]]] = {
 
 DISC_IMAGES = {"GCCP01": "FFCC_PAL.iso"}
 ASFLAGS = "-mcpu=arm7tdmi -mthumb-interwork"
+CPPFLAGS = "-undef -nostdinc -Wno-trigraphs -I gba/include"
+CFLAGS = "-mthumb-interwork -O2 -fhex-asm"
+
+# Game units whose compiled source links into the checked image, per program.
+COMPLETE: Dict[str, List[str]] = {
+    "cli": [],
+    "mgr": [],
+}
+
+# libgcc routines assembled from lib1thumb.asm; the rest are C.
+LIBGCC_ASM = {"_udivsi3", "_divsi3", "_umodsi3", "_modsi3", "_dvmd_tls", "_call_via_rX"}
 
 
 def _units(config_dir: Path) -> List[str]:
@@ -48,7 +66,7 @@ def _path(path: Any) -> str:
     return str(path).replace(os.sep, "/")
 
 
-def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path]) -> None:
+def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers_dir: Optional[Path]) -> None:
     programs = PROGRAMS.get(config.version)
     if not programs:
         return
@@ -71,6 +89,17 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path]) -> None:
         prefix = config.build_dir / "tools" / "gba-binutils" / "bin" / "arm-none-eabi-"
         binutils_stamp = [_path(config.build_dir / "tools" / "gba-binutils" / ".version")]
     prefix_str = os.path.normpath(prefix)
+    if compilers_dir is None:
+        compilers_dir = config.build_dir / "tools" / "gba-agbcc"
+    agbcc = compilers_dir / f"agbcc{exe}"
+    old_agbcc = compilers_dir / f"old_agbcc{exe}"
+    have_compilers = agbcc.is_file() and old_agbcc.is_file()
+    if not have_compilers:
+        print(
+            f"Warning: agbcc/old_agbcc not found in {compilers_dir}; GBA sources are not "
+            "compiled (build pret/agbcc and pass --gba-compilers)",
+            file=sys.stderr,
+        )
 
     ninja_path = build / "build.ninja"
     ninja_path.parent.mkdir(parents=True, exist_ok=True)
@@ -85,9 +114,12 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path]) -> None:
                description="EXTRACT $out")
         n.rule("gba_split",
                f"$python {_path(tools / 'split.py')} $bin $config --asm-dir $asmdir "
-               "--ldscript $ldscript --object-dir $objdir",
+               "--ldscript $ldscript --object-dir $objdir $overrides",
                description="SPLIT $config")
         n.rule("gba_as", f"{prefix_str}as{exe} $gba_asflags -o $out $in", description="AS $out")
+        n.rule("gba_cpp", f"{prefix_str}cpp{exe} $cppflags -MMD -MT $out -MF $out.d $in -o $out",
+               description="CPP $in", depfile="$out.d", deps="gcc")
+        n.rule("gba_cc", "$cc $cflags $in -o $out", description="AGBCC $out")
         n.rule("gba_ld", f"{prefix_str}ld{exe} -T $ldscript -o $out --no-warn-rwx-segments -Map $map",
                description="LINK $out")
         n.rule("gba_objcopy", f"{prefix_str}objcopy{exe} -O binary -j .text -j .rodata $in $out",
@@ -109,34 +141,88 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path]) -> None:
                                "paths": " ".join(info["disc_path"] for info in programs.values())})
         n.newline()
 
+        def compile_source(unit: str, src_dir: Path, out: Path) -> Optional[str]:
+            """Emit rules for a unit's source; returns the compiled object or None."""
+            base = _path(out / "src" / f"{unit}.o")
+            stem = _path(out / "src" / unit)
+            if unit.startswith("libgcc/"):
+                name = unit.split("/", 1)[1]
+                align = _path(LIBGCC_DIR / "align.s")
+                if name in LIBGCC_ASM:
+                    pre = stem + ".s"
+                    n.build(pre, "gba_cpp", _path(LIBGCC_DIR / "lib1thumb.asm"), implicit=binutils_stamp,
+                            variables={"cppflags": f"-undef -nostdinc -DL{name} -x assembler-with-cpp"})
+                    n.build(base, "gba_as", [pre, align], implicit=binutils_stamp)
+                    return base
+                bit = name in ("fp-bit", "dp-bit")
+                source = LIBGCC_DIR / (f"{name}.c" if bit else "libgcc2.c")
+                defines = "" if bit else f" -DL{name}"
+                pre = stem + ".i"
+                asm = stem + ".s"
+                n.build(pre, "gba_cpp", _path(source), implicit=binutils_stamp,
+                        variables={"cppflags": f"-undef -nostdinc -I {_path(GBA_DIR / 'lib' / 'ginclude')}{defines}"})
+                n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(old_agbcc), "cflags": "-O2"})
+                n.build(base, "gba_as", [asm, align], implicit=binutils_stamp)
+                return base
+            source = src_dir / f"{unit}.c"
+            if not source.is_file():
+                return None
+            pre = stem + ".i"
+            asm = stem + ".s"
+            n.build(pre, "gba_cpp", _path(source), implicit=binutils_stamp,
+                    variables={"cppflags": f"{CPPFLAGS} -iquote {_path(src_dir)}"})
+            n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(agbcc), "cflags": CFLAGS})
+            n.build(base, "gba_as", asm, implicit=binutils_stamp)
+            return base
+
         split_deps = [_path(tools / "split.py"), _path(tools / "gbaanalysis.py")]
         for category, info in programs.items():
             config_dir = GBA_DIR / "config" / info["config"]
+            src_dir = GBA_DIR / "src" / info["config"]
             out = build / info["config"]
             units = _units(config_dir)
+            bases = {}
+            if have_compilers:
+                for unit in units:
+                    base = compile_source(unit, src_dir, out)
+                    if base:
+                        bases[unit] = base
+            complete = {u for u in bases if u.startswith("libgcc/") or u in COMPLETE.get(info["config"], [])}
+
             asm = [_path(out / "asm" / f"{u}.s") for u in units]
             ldscript = _path(out / "ldscript.ld")
+            overrides = " ".join(f"--object {u}={bases[u]}" for u in sorted(complete))
             n.build(asm + [ldscript], "gba_split", _path(bins[category]),
                     implicit=split_deps + [_path(config_dir / "symbols.txt"), _path(config_dir / "splits.txt")],
                     variables={"bin": _path(bins[category]), "config": _path(config_dir),
                                "asmdir": _path(out / "asm"), "ldscript": ldscript,
-                               "objdir": _path(out / "obj")})
+                               "objdir": _path(out / "obj"), "overrides": overrides})
             objects = []
+            linked = []
             for unit in units:
                 obj = _path(out / "obj" / f"{unit}.o")
                 n.build(obj, "gba_as", _path(out / "asm" / f"{unit}.s"), implicit=binutils_stamp)
                 objects.append(obj)
-                config.extra_objdiff_units.append({
+                linked.append(bases[unit] if unit in complete else obj)
+                unit_config: Dict[str, Any] = {
                     "name": f"gba/{info['config']}/{unit}",
                     "target_path": obj,
                     "metadata": {
-                        "complete": False,
+                        "complete": unit in complete,
                         "progress_categories": [category],
-                        "auto_generated": True,
                     },
-                })
+                }
+                if unit in bases:
+                    objects.append(bases[unit])
+                    unit_config["base_path"] = bases[unit]
+                    if not unit.startswith("libgcc/"):
+                        unit_config["metadata"]["source_path"] = _path(src_dir / f"{unit}.c")
+                else:
+                    unit_config["metadata"]["auto_generated"] = True
+                config.extra_objdiff_units.append(unit_config)
+
             elf = _path(out / f"{info['config']}.elf")
-            n.build(elf, "gba_ld", implicit=objects + [ldscript],
+            n.build(elf, "gba_ld", implicit=linked + [ldscript],
                     variables={"ldscript": ldscript, "map": _path(out / f"{info['config']}.map")})
             image = _path(out / bins[category].name)
             n.build(image, "gba_objcopy", elf)
@@ -148,6 +234,8 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path]) -> None:
             config.extra_source_inputs += objects + [ok]
             config.progress_categories.append(ProgressCategory(category, info["name"]))
             config.reconfig_deps = (config.reconfig_deps or []) + [config_dir / "splits.txt"]
+            if src_dir.is_dir():
+                config.reconfig_deps.append(src_dir)
 
     config.subninjas.append(ninja_path)
     config.reconfig_deps = (config.reconfig_deps or []) + [Path(__file__)]

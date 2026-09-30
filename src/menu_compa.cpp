@@ -499,7 +499,6 @@ int CMenuPcs::CompaOpen()
  */
 void CMenuPcs::CompaInit()
 {
-	CompaOpenAnimList* compaList;
 	CompaOpenAnim* setupEntry;
 	int entryIndex;
 
@@ -512,9 +511,8 @@ void CMenuPcs::CompaInit()
 		entry++;
 	}
 
-	compaList = this->m_compaList;
 	entryIndex = 0;
-	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->tex = 0x52;
 	setupEntry->drawFlags = 4;
 	setupEntry->x = 0x28;
@@ -527,8 +525,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->tex = 0x51;
 	setupEntry->x = 0x28;
 	setupEntry->y = 0x48;
@@ -540,8 +537,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->tex = 0x52;
 	setupEntry->x = 0x28;
 	setupEntry->y = 0x110;
@@ -553,8 +549,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->tex = 0x5e;
 	setupEntry->x = 0x10;
 	setupEntry->y = 0xe;
@@ -566,8 +561,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->tex = 0x5e;
 	setupEntry->x = 0x15;
 	setupEntry->w = 0x30;
@@ -579,8 +573,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->flags = 2;
 	setupEntry->tex = 0x2e;
 	setupEntry->x = 0x10;
@@ -592,7 +585,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	this->m_compaList->count = 6;
+	this->m_compaList->count = entryIndex;
 	this->m_compaMenuState->selectedIndex = 0;
 	this->m_compaMenuState->initialized = 1;
 }

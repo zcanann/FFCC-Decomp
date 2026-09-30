@@ -1759,6 +1759,7 @@ void CChara::CalcMogScore()
  */
 void CChara::TimeMogFur()
 {
+	int x, y;
 	const int frameCounter = static_cast<int>(System.m_frameCounter);
 
 	if (MogFur().m_timestamp + 0x1A5E0 < frameCounter) {
@@ -1777,15 +1778,16 @@ void CChara::TimeMogFur()
 	unsigned short* const texels = MogFur().m_texels;
 	memset(MogFur().m_score, 0, 0x40);
 
-	for (int y = 0; y < 0x40; y++) {
-		for (int x = 0; x < 0x40; x++) {
+	for (y = 0; y < 0x40; y++) {
+		for (x = 0; x < 0x40; x++) {
 			int tileIndex = FurTexelIndex(x, y, 0x100);
 			unsigned short packed = texels[tileIndex];
+			int r, g, b;
 			int a = (packed >> 12) & 7;
 			int baseLight = 7 - a;
-			int r = ((packed >> 8) & 0xF) + 4 + baseLight;
-			int g = ((packed >> 4) & 0xF) + 4 + baseLight;
-			int b = (packed & 0xF) + 4 + baseLight;
+			r = ((packed >> 8) & 0xF) + 4 + baseLight;
+			g = ((packed >> 4) & 0xF) + 4 + baseLight;
+			b = (packed & 0xF) + 4 + baseLight;
 			r = r < 0xF ? r : 0xF;
 			g = g < 0xF ? g : 0xF;
 			b = b < 0xF ? b : 0xF;

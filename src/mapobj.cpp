@@ -978,11 +978,9 @@ void CMapObj::SetLink()
     CMapObj* head = 0;
 
     while ((cursor = MapMng.SearchChildMapObj(cursor, this)) != 0) {
-        CMapObj* child = cursor;
-
-        child->m_next = head;
-        head = child;
-        child->SetLink();
+        cursor->m_next = head;
+        head = cursor;
+        cursor->SetLink();
         cursor = cursor + 1;
     }
 

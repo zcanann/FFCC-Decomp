@@ -1066,7 +1066,15 @@ void CMenuPcs::SingMenuInit()
     int screenY = static_cast<int>(80.0f);
     boardEntry->m_transform.Identity();
     m_wm.m_worldObjData->m_active = 0;
-    float centerY = 88.0f * 0.5f + 88.0f - 224.0f;
+    float left = 440.0f;
+    float top = 88.0f;
+    float width = 96.0f;
+    left += 28.0f;
+    double half = 0.5;
+    float centerX = 4.0 + (width * half + left);
+    float centerY = top * half + top;
+    centerX -= 320.0;
+    centerY -= 224.0;
     m_wm.m_worldObjData->m_frameCounter = 0;
     m_wm.m_worldObjData->m_viewportX = 0;
     m_wm.m_worldObjData->m_viewportY = 0;
@@ -1079,9 +1087,9 @@ void CMenuPcs::SingMenuInit()
     m_wm.m_worldObjData->m_scissorY = 0;
     m_wm.m_worldObjData->m_scissorWidth = 0x280;
     m_wm.m_worldObjData->m_scissorHeight = 0x1C0;
-    m_wm.m_worldObjData->m_viewportX = static_cast<s16>(440.0f + 28.0f + 96.0f * 0.5f - 320.0f);
+    m_wm.m_worldObjData->m_viewportX = static_cast<s16>(centerX - 4.0);
     m_wm.m_worldObjData->m_viewportY = static_cast<s16>(static_cast<int>(centerY));
-    m_wm.m_worldObjData->m_scissorX = static_cast<int>(440.0f + 28.0f + 12.0f);
+    m_wm.m_worldObjData->m_scissorX = static_cast<int>(12.0f + left);
     m_wm.m_worldObjData->m_scissorY = screenY;
     m_wm.m_worldObjData->m_scissorWidth = 0x48;
     m_wm.m_worldObjData->m_scissorHeight = 0x58;

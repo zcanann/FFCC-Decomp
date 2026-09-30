@@ -1446,7 +1446,8 @@ void CMenuPcs::CalcWMFrame0(int param)
 			if (absParam > 10) {
 				absParam = 10;
 			}
-			offset *= static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * (static_cast<float>(absParam) * FLOAT_803316D4))));
+			float angleScale = FLOAT_803316D4;
+			offset *= static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * (static_cast<float>(absParam) * angleScale))));
 		}
 		value = static_cast<int>(static_cast<float>(static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_x)) - offset);
 		m_wm.m_frameInfo->m_sprites[0].m_x = static_cast<short>(value);

@@ -431,9 +431,8 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 		int reqLast = reqCount - 1;
 		int slot = 0;
 		CCombi2Set* slotCursor = combiCursor->m_sets;
-		CGPartyObj** slotPtr = partyList;
 		for (; slot < reqCount; slot++) {
-			CGCharaObj* partyObj = *slotPtr;
+			CGCharaObj* partyObj = partyList[slot];
 			if (partyObj->m_comboFrame == 0) {
 				CCombi2Set* fallbackCursor = slotCursor;
 				int lastSlotIn = count - 1;
@@ -467,7 +466,6 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			if (slot == reqLast) {
 				found = combiIndex;
 			}
-			slotPtr++;
 			slotCursor++;
 		}
 	}

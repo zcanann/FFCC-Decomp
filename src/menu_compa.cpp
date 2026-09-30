@@ -354,36 +354,29 @@ int CMenuPcs::CompaClose()
  */
 inline void CMenuPcs::CompaInit0()
 {
-	CompaOpenAnimList* compaList = this->m_compaList;
 	int entryIndex = 0;
-	CompaOpenAnim* setupEntry = &compaList->entries[entryIndex++];
+	CompaOpenAnim* setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->startFrame = 2;
 	setupEntry->duration = 5;
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->startFrame = 2;
 	setupEntry->duration = 5;
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->startFrame = 2;
 	setupEntry->duration = 5;
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->startFrame = 7;
 	setupEntry->duration = 5;
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->startFrame = 7;
 	setupEntry->duration = 5;
-	compaList = this->m_compaList;
-	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry = &m_compaList->entries[entryIndex++];
 	setupEntry->flags = 2;
 	setupEntry->startFrame = 7;
 	setupEntry->duration = 5;
 
-	CompaOpenAnimList* animList = this->m_compaList;
-	int entryCount = animList->count;
-	CompaOpenAnim* entry = animList->entries;
+	int entryCount = m_compaList->count;
+	CompaOpenAnim* entry = m_compaList->entries;
 	while (entryCount > 0) {
 		entry->frame = 0;
 		entry->alpha = kCompaOne;

@@ -924,7 +924,7 @@ int CCharaPcs::correctLoadAnimAmem()
 void CCharaPcs::onScriptChanging(char*)
 {
     for (int i = 0; i < 5; i++) {
-        m_viewerChoiceColor[i] = CColor(0xFF, 0xFF, 0xFF, 0xFF) * (static_cast<float>(i) * 0.25f);
+        m_viewerChoiceColor[i] = CColor(0xFF, 0xFF, 0xFF, 0xFF) * (static_cast<float>(i) / 4.0f);
     }
 
     m_overlapEnabled = 0;

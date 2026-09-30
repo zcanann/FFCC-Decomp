@@ -1874,8 +1874,8 @@ int CChara::CModel::SearchNodeSk(char* name)
 {
 	if (*name == '_') {
 		if (name[1] == 's' && name[2] == 'k') {
-			u32 i = 0;
 			CNode* node = ModelNodes(this);
+			u32 i = 0;
 			for (; i < ModelNodeCount(this); i++, node++) {
 				int tail = strlen(NodeRefName(node)) - 3;
 				if (tail > 0 && strcmp(&node->m_refData->m_names[0][tail], name) == 0) {

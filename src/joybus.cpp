@@ -450,12 +450,11 @@ int JoyBus::LoadBin()
     m_gbaBootImage[0xAE] = m_diskId->gameName[2];
     m_gbaBootImage[0xAF] = m_diskId->gameName[3];
 
-    unsigned char* buf = (unsigned char*)m_gbaBootImage;
     unsigned char sum = 0xE7;
     int idx;
     for (idx = 0xA0; idx < 0xBD; idx++)
     {
-        sum -= buf[idx];
+        sum -= reinterpret_cast<unsigned char*>(m_gbaBootImage)[idx];
     }
     m_gbaBootImage[idx] = sum;
 

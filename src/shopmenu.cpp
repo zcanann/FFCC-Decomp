@@ -2140,8 +2140,9 @@ void CShopMenu::SelectMake()
     CMenuPcs::MaterialInfo recipeMaterial;
     MenuPcs.GetRecipeMaterial(selected, &recipeMaterial);
 
+    short itemNo;
     for (int i = 0; i < 3; i++) {
-        short itemNo = recipeMaterial.m_itemNo[i];
+        itemNo = recipeMaterial.m_itemNo[i];
         if (itemNo <= 0) {
             break;
         }

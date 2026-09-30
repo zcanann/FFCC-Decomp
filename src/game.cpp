@@ -1117,6 +1117,7 @@ CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
         stage = 2;
     }
 
+    CBossArtifactStage* artifactBase;
     int stageBase = s_top[stage];
     int scaledAmount = (int)((float)amount * s_ratio[ratioIndex - 1]);
 
@@ -1124,7 +1125,7 @@ CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
     memset(thresholds, 0, sizeof(thresholds));
 
     int stageIndex = (int)Game.m_gameWork.m_bossArtifactStageIndex;
-    CBossArtifactStage* artifactBase = Game.m_bossArtifactBase;
+    artifactBase = Game.m_bossArtifactBase;
     int artifactRank = 3;
 
     thresholds[1] = artifactBase[stageIndex].m_rankThresholds[1];

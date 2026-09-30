@@ -129,7 +129,7 @@ public:
     CAmemCache();
     ~CAmemCache();
     void Destroy(CMemory::CStage*);
-    void GetData(CMemory::CStage*, char*, int);
+    int GetData(CMemory::CStage*, char*, int);
     void SetData(void*, int);
     void IsEnable();
     void Init();

@@ -2867,12 +2867,12 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
         lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
     }
     char* dynamicText = s_DynamicMessStr;
-    const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
+    const short* textId = s_singleMenuStaticMessages[messageNo].textIds;
 
     for (int i = 0; i < lineCount; i++) {
         const char* text;
         if (useDynamic == 0) {
-            text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
+            text = GetSingWinMessage(*textId, dynamicText, 0);
         } else {
             text = dynamicText;
         }
@@ -2880,6 +2880,7 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
         if (textWidth > maxWidth) {
             maxWidth = textWidth;
         }
+        textId++;
         dynamicText += 0x80;
     }
 

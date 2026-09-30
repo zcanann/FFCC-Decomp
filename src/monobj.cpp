@@ -2962,8 +2962,8 @@ void CGMonObj::enableAttackCol(int enabled, int, int)
 	if (enabled != 0) {
 		int attackKind = m_itemId;
 		const SCharaItemRow* attackData = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[attackKind];
-		int colMask = attackData->m_particleFlags;
 		int colValue;
+		int colMask = attackData->m_particleFlags;
 		if (attackKind >= 0x1F5) {
 			colValue = attackData->m_kind;
 		} else {

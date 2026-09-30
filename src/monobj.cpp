@@ -89,7 +89,8 @@ inline void CGMonObj::setUndeadEffect(int weaponMode, int enabled)
 	if (enabled) {
 		for (int i = 0; i < count; i++) {
 			int dataNo = m_charaModelHandle->GetPdtSlot();
-			putParticleBindTrace((particleBase + i) | (dataNo << 8), m_particleSlots[12], this, kMonObjDefaultScale, 0);
+			int particleId = particleBase + i;
+			putParticleBindTrace(particleId | (dataNo << 8), m_particleSlots[12], this, kMonObjDefaultScale, 0);
 		}
 	} else if (isUndead && count != 0) {
 		int dataNo = m_charaModelHandle->GetPdtSlot();

@@ -1554,7 +1554,8 @@ void GbaQueue::LoadMapItemStat()
 				if ((dropItemCode & 0xC000) == 0x4000) {
 					localMapItems[numMapItems].m_kind = 4;
 				} else {
-					const SItemFlatRow* itemRow = &reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[dropItemCode];
+					const SItemFlatRow* itemRow = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2]);
+					itemRow += dropItemCode;
 					const int bossStageLimit = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex] + 2;
 					const int itemStage = itemRow->m_stage;
 					if (itemStage >= bossStageLimit) {
@@ -3144,6 +3145,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 {
 	unsigned char compatibilityData[0x10];
 	int count;
+	int slot;
 	unsigned char* writePtr;
 	int outSize;
 	int selectedCount;
@@ -3157,20 +3159,10 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	outCompatibility[0] = m_playerData[channel].m_jobType;
 	count = 2;
-	if (compatibilityData[3] != 0) {
-		count++;
-	}
-	if (compatibilityData[4] != 0) {
-		count++;
-	}
-	if (compatibilityData[5] != 0) {
-		count++;
-	}
-	if (compatibilityData[6] != 0) {
-		count++;
-	}
-	if (compatibilityData[7] != 0) {
-		count++;
+	for (slot = 3; slot < 8; slot++) {
+		if (compatibilityData[slot] != 0) {
+			count++;
+		}
 	}
 
 	if ((count > 4) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
@@ -3181,7 +3173,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	writePtr = outCompatibility + 2;
 	selectedCount = 0;
 	outSize = 2;
-	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
+	for (slot = 1; (selectedCount < count) && (slot < 8); slot++) {
 		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
 			writePtr[0] = static_cast<unsigned char>(slot);
 			writePtr[1] = compatibilityData[slot + 8];
@@ -3192,7 +3184,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	}
 
 	selectedCount = 0;
-	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
+	for (slot = 1; (selectedCount < count) && (slot < 8); slot++) {
 		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
 			src = Game.m_cFlatDataArr[1].TableStrings(2)[compatibilityData[slot]];
 			int len = strlen(src);

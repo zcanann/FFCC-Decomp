@@ -88,14 +88,14 @@ struct Unk03000030 {
     u16 unk6;
 };
 
-extern u16 lbl_03002AEC;
-extern u8 lbl_03002AFC;
-extern s8 lbl_03002AE4;
-extern s8 lbl_03002AF4;
-extern s8 lbl_03002AF0;
-extern u8 lbl_03000018[];
-extern struct Unk03000030 lbl_03000030;
-extern struct BgHeader lbl_02038000;
+extern u16 gDataFlags;
+extern u8 gReplyResult;
+extern s8 gReplyTimer;
+extern s8 gReplyWaiting;
+extern s8 gXferErrorCount;
+extern u8 sBulkXfer[];
+extern struct Unk03000030 gXferCrc;
+extern struct BgHeader gDownloadBuf;
 extern u8 lbl_02038008[];
 extern u8 lbl_02038020[];
 extern struct BgHeader *lbl_03000054;
@@ -106,125 +106,125 @@ extern s32 lbl_03000064;
 extern s32 lbl_03000068;
 extern u16 lbl_0300006C;
 extern u16 lbl_0300006E;
-extern struct LinkWork lbl_03000070;
-extern u16 lbl_0201CD10[];
+extern struct LinkWork gLinkWork;
+extern u16 sCrc16Table[];
 extern u32 lbl_0201CF10;
 extern u32 lbl_0300008C;
-extern s32 lbl_03000190;
-extern u32 lbl_03000090[];
-extern s32 lbl_03000298;
-extern u32 lbl_03000198[];
-extern u32 lbl_030002A0[];
-extern s32 lbl_030004A0;
-extern s32 lbl_030004A4;
-extern struct Transfer lbl_030004A8;
-extern u16 lbl_030008B4[];
-extern u8 lbl_030008B8;
-extern u32 lbl_030008C0[];
-extern u32 lbl_030008CC;
-extern u8 lbl_030008D0;
+extern s32 sTxCount;
+extern u32 sTxQueue[];
+extern s32 sRxIsrCount;
+extern u32 sRxIsrQueue[];
+extern u32 sRxBuf[];
+extern s32 sRxCount;
+extern s32 sRxDone;
+extern struct Transfer sMsgXfer;
+extern u16 sBasePosIn[];
+extern u8 sPartyPosSeq;
+extern u32 sPartyPosIn[];
+extern u32 sGilIn;
+extern u8 sGilOp;
 extern u32 lbl_030008D4;
-extern u8 lbl_030029A4;
-extern u8 lbl_03002ACC;
-extern u8 lbl_030032F0;
-extern u8 lbl_030032F8;
-extern u32 lbl_03003090;
-extern u8 lbl_0300309C;
-extern u32 lbl_03003094;
-extern u8 lbl_03002AE8;
-extern u8 lbl_03002AE0;
+extern u8 gLinkStarted;
+extern u8 gMenuHasInput;
+extern u8 gLinkEstablished;
+extern u8 gMsgScreenId;
+extern u32 gScreen;
+extern u8 gLetterAttachKind;
+extern u32 gMode;
+extern u8 gXferActive;
+extern u8 gNewLetter;
 
 void LZ77UnCompVram(const void *src, void *dest);
 void LZ77UnCompWram(const void *src, void *dest);
-void fn_020045F4(s16 *, s16 *);
+void Radar_GetBasePos(s16 *, s16 *);
 void fn_02000AD4(s32, u16, u16);
-void fn_020022BC(void);
-void fn_02001578(void);
+void Link_Reset(void);
+void Reply_Clear(void);
 void fn_0201C734(void);
 void *memset(void *, s32, u32);
 void m4aMPlayAllStop(void);
-s32 fn_02002538(void);
-s32 fn_02002460(u32);
-void fn_0200242C(void);
-void fn_02002620(void);
-s32 fn_02002698(u32);
-void fn_02002714(void);
-void fn_0200275C(void);
-void fn_02002F0C(void);
-s32 fn_0200108C(u32);
-s32 fn_0200110C(u32, u8 *);
-void fn_02001438(s32, s32);
-void fn_020045B4(s32, s32);
+s32 Link_Send(void);
+s32 Link_Recv(u32);
+void Link_JoyReset(void);
+void Link_ClearQueues(void);
+s32 Link_Write(u32);
+void Link_TxPop(void);
+void Link_RxPush(void);
+void Link_DispatchMessage(void);
+s32 Xfer_CheckCrc(u32);
+s32 Xfer_Receive(u32, u8 *);
+void Map_SetStage(s32, s32);
+void Radar_SetBasePos(s32, s32);
 void fn_02000A74(void);
-void fn_0200469C(u32 *);
-s32 fn_02002FE4(s32, s32, s32);
-void fn_020046FC(u32 *);
-void fn_0200471C(u32 *);
-void fn_020048B4(u32 *);
-void fn_020049B8(u32 *);
-void fn_02004D88(u32);
-void fn_02004F1C(u32);
-void fn_02004F54(u32);
-void fn_02009ED4(u32);
-void fn_02005010(u32);
-void fn_02005024(u32);
-void fn_02005038(u32);
-void fn_0200508C(u32);
-void fn_020050B8(void);
-void fn_020050D4(u32);
-void fn_02004514(u32);
-void fn_02004AB4(u32);
-void fn_02008F48(u32);
-void fn_0200911C(u32);
-void fn_02004E38(u32);
-void fn_02004BB8(u32);
-void fn_02004BD4(u32);
-void fn_02004C1C(u32);
-void fn_02004FC0(u32);
+void Radar_OnPartyPos(u32 *);
+s32 Link_SendEvent(s32, s32, s32);
+void Radar_OnEnemyPos(u32 *);
+void Radar_OnTreasurePos(u32 *);
+void Session_OnPartyHp(u32 *);
+void Radar_OnMapObjDrawFlags(u32 *);
+void Session_OnUseItem(u32);
+void Radar_OnType(u32);
+void Radar_OnMode(u32);
+void Menu_OnOpen(u32);
+void Session_OnItemUseFlags(u32);
+void Session_OnSpMode(u32);
+void Session_OnCmdNum(u32);
+void Session_OnMemories(u32);
+void Session_OnStartBonus(void);
+void Session_OnLanguage(u32);
+void Session_OnItemChange(u32);
+void Session_SetGil(u32);
+void Session_OnMask(u32);
+void Mode_OnSet(u32);
+void Session_OnStrength(u32);
+void Session_OnEquipSlot(u32);
+void Session_OnCmdSlot(u32);
+void Session_OnTmpArtifact(u32);
+void Scouter_OnHitEnemy(u32);
 
-void fn_020015A8(arg0)
+void Reply_Set(arg0)
 u8 arg0;
 {
-    lbl_03002AEC |= 0x8000;
-    lbl_03002AFC = arg0;
-    lbl_03002AE4 = 0;
-    lbl_03002AF4 = 0;
+    gDataFlags |= 0x8000;
+    gReplyResult = arg0;
+    gReplyTimer = 0;
+    gReplyWaiting = 0;
 }
 
-void fn_020015DC(void)
+void Reply_Tick(void)
 {
-    if (lbl_03002AF4 != 0 && lbl_03002AF4 < 30)
-        lbl_03002AE4++;
+    if (gReplyWaiting != 0 && gReplyWaiting < 30)
+        gReplyTimer++;
 }
 
-s32 fn_02001604(void)
+s32 Reply_IsTimedOut(void)
 {
     s32 n;
 
-    if (lbl_03002AF4 == 0)
+    if (gReplyWaiting == 0)
         n = 0;
     else
-        n = lbl_03002AE4;
+        n = gReplyTimer;
     return n >= 30;
 }
 
-u8 *fn_02001634(void)
+u8 *Xfer_GetWork(void)
 {
-    return lbl_03000018;
+    return sBulkXfer;
 }
 
-void fn_0200163C(void)
+void Xfer_ClearLetterData(void)
 {
-    lbl_03002AEC &= ~8;
-    lbl_03000030.unk6 = 0;
-    lbl_03002AEC &= ~4;
-    lbl_03000030.unk4 = 0;
+    gDataFlags &= ~8;
+    gXferCrc.unk6 = 0;
+    gDataFlags &= ~4;
+    gXferCrc.unk4 = 0;
 }
 
-void fn_0200166C(void)
+void Xfer_OnError(void)
 {
-    if (++lbl_03002AF0 > 10)
-        fn_020022BC();
+    if (++gXferErrorCount > 10)
+        Link_Reset();
 }
 
 void fn_0200168C(u8 *data, void *tileDest, u16 *mapDest, u16 *palDest, s32 tileBase)
@@ -276,16 +276,16 @@ void fn_020017DC(void)
     DmaFill16(REG_DMA0, 0x1000, (void *)0x0600F000, 0x800);
 }
 
-void fn_02001828(void)
+void Radar_InitMap(void)
 {
     u16 tmp;
     struct BgHeader *hdr;
     struct MapInfo *info;
 
-    if (lbl_03002AEC & 2) {
+    if (gDataFlags & 2) {
         info = (struct MapInfo *)lbl_02038020;
         LZ77UnCompVram(info, (void *)0x06008000);
-        lbl_03000054 = hdr = &lbl_02038000;
+        lbl_03000054 = hdr = &gDownloadBuf;
         info = (struct MapInfo *)((u8 *)hdr + hdr->mapOffset);
         lbl_03000058 = info;
         lbl_0300005C = lbl_02038008 + hdr->mapOffset;
@@ -325,7 +325,7 @@ void fn_0200194C(s32 arg0)
     REG_BLDALPHA = 0x0808;
 }
 
-void fn_0200197C(void)
+void Radar_DrawMap(void)
 {
     u16 out[24];
     u16 line[256];
@@ -351,9 +351,9 @@ void fn_0200197C(void)
     u16 v;
     s16 len;
 
-    if (!(lbl_03002AEC & 2))
+    if (!(gDataFlags & 2))
         return;
-    fn_020045F4(&x, &y);
+    Radar_GetBasePos(&x, &y);
     lbl_03000064 = x - 80;
     lbl_03000068 = y - 64;
     tx = (lbl_03000064 - lbl_03000058->x) >> 3;
@@ -412,7 +412,7 @@ void fn_0200197C(void)
     }
 }
 
-void fn_02001C44(s32 dx, s32 dy)
+void Radar_ScrollMap(s32 dx, s32 dy)
 {
     u16 out[24];
     u16 line[256];
@@ -440,7 +440,7 @@ void fn_02001C44(s32 dx, s32 dy)
     s32 cnt;
     u16 v;
 
-    if (!(lbl_03002AEC & 2))
+    if (!(gDataFlags & 2))
         return;
     if (dx == 0 && dy == 0)
         return;
@@ -562,7 +562,7 @@ void fn_02001C44(s32 dx, s32 dy)
     }
 }
 
-u32 fn_020020C0(u32 data)
+u32 Crc8(u32 data)
 {
     u32 crc = 0;
     u32 bit;
@@ -590,71 +590,71 @@ u32 fn_020020C0(u32 data)
     return crc & 0xFF;
 }
 
-u16 fn_02002130(s32 n, u8 *data, u16 *crc)
+u16 Crc16(s32 n, u8 *data, u16 *crc)
 {
     while (--n >= 0) {
-        *crc = (*crc << 8) ^ lbl_0201CD10[(*crc >> 8) ^ *data++];
+        *crc = (*crc << 8) ^ sCrc16Table[(*crc >> 8) ^ *data++];
     }
     return ~*crc;
 }
 
-void fn_02002170(void)
+void Link_JoyIntr(void)
 {
     u16 stat = REG_JOYCNT;
 
-    if (((stat & 4) && !fn_02002538()) || ((stat & 2) && !fn_02002460(REG_JOY_RECV))) {
+    if (((stat & 4) && !Link_Send()) || ((stat & 2) && !Link_Recv(REG_JOY_RECV))) {
         REG_JOYSTAT = 0;
-        lbl_03000070.unk0 = 0;
-        lbl_03000070.unk1 = 0;
-        fn_0200242C();
+        gLinkWork.unk0 = 0;
+        gLinkWork.unk1 = 0;
+        Link_JoyReset();
     }
     if (stat & 1) {
-        fn_0200242C();
-        if (lbl_03000070.unk6 <= 2 && ++lbl_03000070.unk5 >= 30)
+        Link_JoyReset();
+        if (gLinkWork.unk6 <= 2 && ++gLinkWork.unk5 >= 30)
             fn_0201C734();
-        lbl_03000070.unk6 = 0;
-    } else if (lbl_03000070.unk6 >= 2) {
-        lbl_03000070.unk5 = 0;
+        gLinkWork.unk6 = 0;
+    } else if (gLinkWork.unk6 >= 2) {
+        gLinkWork.unk5 = 0;
     } else {
-        lbl_03000070.unk6++;
+        gLinkWork.unk6++;
     }
     REG_JOYCNT = stat;
-    lbl_03000070.unk2 = 0;
+    gLinkWork.unk2 = 0;
 }
 
-void fn_02002218(void)
+void Link_Init(void)
 {
     u16 ime = REG_IME;
     u32 i;
 
     REG_IME = 0;
-    for (i = 0; i < sizeof(lbl_03000070); i++)
-        ((u8 *)&lbl_03000070)[i] = 0;
-    lbl_03000070.unk4 = 0xFF;
-    fn_020022BC();
+    for (i = 0; i < sizeof(gLinkWork); i++)
+        ((u8 *)&gLinkWork)[i] = 0;
+    gLinkWork.unk4 = 0xFF;
+    Link_Reset();
     REG_IE |= 0x80;
     if (*(u8 *)0x020000C4 != 0) {
-        lbl_03000070.unk10 = lbl_03000070.unk8 = *(u32 *)0x020000AC;
-        lbl_03000070.unk14 = *(u8 *)0x020000C4;
-        lbl_03000070.unk15 = *(u8 *)0x020000C5;
-        lbl_03000070.unk16 = 1;
-        lbl_03000070.unk18 = *(u32 *)0x020000C8;
+        gLinkWork.unk10 = gLinkWork.unk8 = *(u32 *)0x020000AC;
+        gLinkWork.unk14 = *(u8 *)0x020000C4;
+        gLinkWork.unk15 = *(u8 *)0x020000C5;
+        gLinkWork.unk16 = 1;
+        gLinkWork.unk18 = *(u32 *)0x020000C8;
     } else {
-        lbl_03000070.unk8 = *(u32 *)0x080000AC;
-        lbl_03000070.unk10 = lbl_0201CF10;
+        gLinkWork.unk8 = *(u32 *)0x080000AC;
+        gLinkWork.unk10 = lbl_0201CF10;
     }
-    lbl_03002ACC = 0;
-    lbl_030029A4 = 0;
+    gMenuHasInput = 0;
+    gLinkStarted = 0;
     REG_IME = ime;
 }
 
-void fn_020022BC(void)
+void Link_Reset(void)
 {
     u16 ime = REG_IME;
     s32 i;
 
     REG_IME = 0;
-    if (lbl_03000070.unk4 == 0)
+    if (gLinkWork.unk4 == 0)
         REG_RCNT = 0x8000;
     REG_RCNT = 0xC000;
     REG_JOYSTAT = 0;
@@ -662,128 +662,132 @@ void fn_020022BC(void)
     REG_JOY_TRANS = 0;
     REG_JOYCNT = 0x47;
     REG_IF = 0x80;
-    lbl_03000070.unk2 = 0;
-    lbl_03000070.unk0 = 0;
-    lbl_03000070.unk1 = 0;
-    lbl_03000070.unk4 = 0;
-    lbl_03000070.unk5 = 0;
-    lbl_03000070.unk6 = 0;
+    gLinkWork.unk2 = 0;
+    gLinkWork.unk0 = 0;
+    gLinkWork.unk1 = 0;
+    gLinkWork.unk4 = 0;
+    gLinkWork.unk5 = 0;
+    gLinkWork.unk6 = 0;
     lbl_0300008C = 0;
-    fn_02002620();
+    Link_ClearQueues();
     for (i = 0; i < 2; i++)
-        lbl_030008B4[i] = 0;
-    lbl_030008B8 = 0;
+        sBasePosIn[i] = 0;
+    sPartyPosSeq = 0;
     for (i = 0; i < 3; i++)
-        lbl_030008C0[i] = 0;
-    lbl_03002AEC &= ~0xC;
-    lbl_030032F8 = 4;
-    lbl_03003090 = 13;
-    lbl_0300309C = 0;
-    lbl_030008CC = 0;
-    lbl_030008D0 = 0;
+        sPartyPosIn[i] = 0;
+    gDataFlags &= ~0xC;
+    gMsgScreenId = 4;
+    gScreen = 13;
+    gLetterAttachKind = 0;
+    sGilIn = 0;
+    sGilOp = 0;
     lbl_030008D4 = 0;
-    lbl_03002AF0 = 0;
-    fn_02001578();
+    gXferErrorCount = 0;
+    Reply_Clear();
     REG_IME = ime;
     m4aMPlayAllStop();
 }
 
-s32 fn_020023E4(void)
+s32 Link_CheckTimeout(void)
 {
     s32 ret;
     vu16 ime;
 
-    if (lbl_03000070.unk2 > 10) {
-        lbl_03000070.unk3 = 0xFF;
-        fn_020022BC();
+    if (gLinkWork.unk2 > 10) {
+        gLinkWork.unk3 = 0xFF;
+        Link_Reset();
         ret = -1;
     } else {
         ime = REG_IME;
         REG_IME = 0;
-        lbl_03000070.unk2++;
+        gLinkWork.unk2++;
         REG_IME = ime;
         ret = 0;
     }
     return ret;
 }
 
-void fn_0200242C(void)
+void Link_JoyReset(void)
 {
     REG_JOY_RECV;
-    REG_JOY_TRANS = lbl_03000070.unk8;
+    REG_JOY_TRANS = gLinkWork.unk8;
     REG_JOYSTAT = 0x20;
-    lbl_03000070.unk0 = 0;
-    lbl_03000070.unk1 = 1;
-    lbl_030029A4 = 0;
+    gLinkWork.unk0 = 0;
+    gLinkWork.unk1 = 1;
+    gLinkStarted = 0;
 }
 
-s32 fn_02002460(u32 data)
+s32 Link_Recv(u32 data)
 {
     u8 *recv = (u8 *)&data;
+    u32 *word;
     u32 pkt;
     u8 *p;
 
-    if (lbl_03000070.unk0 == 0) {
-        lbl_03002AEC &= ~0xC;
-        if (lbl_03000070.unk1 == 2) {
-            lbl_03000070.unkC = data;
+    if (gLinkWork.unk0 == 0) {
+        gDataFlags &= ~0xC;
+        if (gLinkWork.unk1 == 2) {
+            gLinkWork.unkC = data;
             p = (u8 *)&pkt;
             p[0] = 1;
-            p[1] = (lbl_03000070.unk14 << 6) | (lbl_03000070.unk16 << 4) | lbl_03000070.unk15;
+            p[1] = (gLinkWork.unk14 << 6) | (gLinkWork.unk16 << 4) | gLinkWork.unk15;
             p[2] = 0;
             p[3] = 0;
             REG_JOY_TRANS = pkt;
             REG_JOYSTAT = 0x20;
-            lbl_03000070.unk1 = 3;
-        } else if (lbl_03000070.unk1 == 5) {
-            if (lbl_03000070.unk18 == data)
-                lbl_03000070.unk17 = 0;
-            else
-                lbl_03000070.unk17 = 1;
-            lbl_03000070.unk18 = *(u32 *)recv;
-            REG_JOYSTAT = 0x20;
-            lbl_03000070.unk1 = 6;
-        } else if (lbl_03000070.unk1 == 6) {
-            lbl_03000070.unk15 = recv[1] & 0xF;
-            REG_JOYSTAT = 0;
-            lbl_03000070.unk0 = 0xFF;
-            lbl_03000070.unk1 = 0;
-            lbl_030032F0 = 1;
+            gLinkWork.unk1 = 3;
         } else {
-            return 0;
+            word = (u32 *)recv;
+            if (gLinkWork.unk1 == 5) {
+                if (gLinkWork.unk18 == data)
+                    gLinkWork.unk17 = 0;
+                else
+                    gLinkWork.unk17 = 1;
+                gLinkWork.unk18 = *word;
+                REG_JOYSTAT = 0x20;
+                gLinkWork.unk1 = 6;
+            } else if (gLinkWork.unk1 == 6) {
+                gLinkWork.unk15 = recv[1] & 0xF;
+                REG_JOYSTAT = 0;
+                gLinkWork.unk0 = 0xFF;
+                gLinkWork.unk1 = 0;
+                gLinkEstablished = 1;
+            } else {
+                return 0;
+            }
         }
     } else {
-        fn_0200275C();
+        Link_RxPush();
     }
     return -1;
 }
 
-s32 fn_02002538(void)
+s32 Link_Send(void)
 {
-    if (lbl_03000070.unk0 == 0) {
-        if (lbl_03000070.unk1 == 1) {
-            lbl_03000070.unk1 = 2;
-        } else if (lbl_03000070.unk1 == 3) {
-            REG_JOY_TRANS = lbl_03000070.unk18;
+    if (gLinkWork.unk0 == 0) {
+        if (gLinkWork.unk1 == 1) {
+            gLinkWork.unk1 = 2;
+        } else if (gLinkWork.unk1 == 3) {
+            REG_JOY_TRANS = gLinkWork.unk18;
             REG_JOYSTAT = 0x20;
-            lbl_03000070.unk1 = 4;
-        } else if (lbl_03000070.unk1 == 4) {
-            lbl_03000070.unk1 = 5;
+            gLinkWork.unk1 = 4;
+        } else if (gLinkWork.unk1 == 4) {
+            gLinkWork.unk1 = 5;
         } else {
             return 0;
         }
     } else {
-        fn_02002714();
+        Link_TxPop();
     }
     return -1;
 }
 
-u8 fn_02002594(void)
+u8 Link_IsConnected(void)
 {
-    return lbl_03000070.unk0;
+    return gLinkWork.unk0;
 }
 
-void fn_020025A0(u16 arg0)
+void Link_SendPad(u16 arg0)
 {
     vu16 ie = REG_IE;
     u32 pkt;
@@ -795,11 +799,11 @@ void fn_020025A0(u16 arg0)
     p[0] = 4;
     p[1] = ((u8 *)&arg0)[0];
     p[2] = ((u8 *)&arg0)[1];
-    fn_02002698(pkt);
+    Link_Write(pkt);
     REG_IE = ie;
 }
 
-void fn_020025E4(arg0)
+void Link_SendScreenId(arg0)
 u8 arg0;
 {
     vu16 ie = REG_IE;
@@ -812,76 +816,76 @@ u8 arg0;
     p[0] = 14;
     p[1] = 0;
     p[2] = arg0;
-    fn_02002698(pkt);
+    Link_Write(pkt);
     REG_IE = ie;
 }
 
-void fn_02002620(void)
+void Link_ClearQueues(void)
 {
     s32 i;
 
-    lbl_03000190 = 0;
-    lbl_03000298 = 0;
-    lbl_030004A0 = 0;
-    lbl_030004A4 = 0;
+    sTxCount = 0;
+    sRxIsrCount = 0;
+    sRxCount = 0;
+    sRxDone = 0;
     for (i = 0; i < 128; i++) {
         if (i < 64) {
-            lbl_03000090[i] = 0;
-            lbl_03000198[i] = 0;
+            sTxQueue[i] = 0;
+            sRxIsrQueue[i] = 0;
         }
-        lbl_030002A0[i] = 0;
+        sRxBuf[i] = 0;
     }
-    memset(&lbl_030004A8, 0, sizeof(lbl_030004A8));
-    lbl_030029A4 = 0;
-    lbl_03002ACC = 0;
+    memset(&sMsgXfer, 0, sizeof(sMsgXfer));
+    gLinkStarted = 0;
+    gMenuHasInput = 0;
 }
 
-s32 fn_02002698(u32 data)
+s32 Link_Write(u32 data)
 {
     vu16 ie = REG_IE;
 
     REG_IE = 0;
-    if (lbl_03000190 >= 64) {
+    if (sTxCount >= 64) {
         REG_IE = ie;
         return -1;
     }
-    if (lbl_03000190 == 0 && !(REG_JOYSTAT & 8)) {
+    if (sTxCount == 0 && !(REG_JOYSTAT & 8)) {
         REG_JOY_TRANS = data;
         REG_JOYSTAT = 0;
     } else {
-        lbl_03000090[lbl_03000190++] = data;
+        sTxQueue[sTxCount++] = data;
     }
     REG_IE = ie;
     return 0;
 }
 
-void fn_02002714(void)
+void Link_TxPop(void)
 {
     s32 i;
 
-    if (lbl_03000190 != 0) {
-        REG_JOY_TRANS = lbl_03000090[0];
+    if (sTxCount != 0) {
+        REG_JOY_TRANS = sTxQueue[0];
         REG_JOYSTAT = 0;
-        for (i = 1; i < lbl_03000190; i++)
-            lbl_03000090[i - 1] = lbl_03000090[i];
-        lbl_03000190--;
+        for (i = 1; i < sTxCount; i++)
+            sTxQueue[i - 1] = sTxQueue[i];
+        sTxCount--;
     }
 }
 
-void fn_0200275C(void)
+void Link_RxPush(void)
 {
     s32 n;
     u32 data;
 
-    if ((n = lbl_03000298) < 64) {
+    if ((n = sRxIsrCount) < 64) {
         data = REG_JOY_RECV;
-        lbl_03000198[n] = data;
-        lbl_03000298 = n + 1;
+        sRxIsrQueue[n] = data;
+        sRxIsrCount = n + 1;
         REG_JOYSTAT = 0;
     }
 }
 
-void fn_02002794(void)
+void Link_ProcessRecv(void)
 {
     vu16 ie;
     u16 crc;
@@ -896,90 +900,90 @@ void fn_02002794(void)
 
     ie = REG_IE;
     REG_IE = 0;
-    if (lbl_030004A8.pending != 0 && fn_02002698(lbl_030004A8.pending) == 0) {
-        if (*(s8 *)&lbl_030004A8.pending == 6)
-            fn_02002F0C();
-        memset(&lbl_030004A8, 0, sizeof(lbl_030004A8));
+    if (sMsgXfer.pending != 0 && Link_Write(sMsgXfer.pending) == 0) {
+        if (*(s8 *)&sMsgXfer.pending == 6)
+            Link_DispatchMessage();
+        memset(&sMsgXfer, 0, sizeof(sMsgXfer));
     }
-    if (lbl_03000298 <= 0 && lbl_030004A0 <= 0) {
-        lbl_030004A4 = lbl_030004A0;
+    if (sRxIsrCount <= 0 && sRxCount <= 0) {
+        sRxDone = sRxCount;
         REG_IE = ie;
         return;
     }
-    for (i = 0; i < lbl_03000298; i++)
-        lbl_030002A0[lbl_030004A4 + i] = lbl_03000198[i];
-    lbl_030004A0 += lbl_03000298;
-    lbl_03000298 = 0;
+    for (i = 0; i < sRxIsrCount; i++)
+        sRxBuf[sRxDone + i] = sRxIsrQueue[i];
+    sRxCount += sRxIsrCount;
+    sRxIsrCount = 0;
     REG_IE = ie;
-    if (lbl_030004A0 > 0) {
-        for (i = lbl_030004A0; i != 0; i--)
+    if (sRxCount > 0) {
+        for (i = sRxCount; i != 0; i--)
             ;
     }
     done = 0;
 restart:
-    for (i = lbl_030004A4; i < lbl_030004A0; i++) {
-        msg = (u8 *)&lbl_030002A0[i];
+    for (i = sRxDone; i < sRxCount; i++) {
+        msg = (u8 *)&sRxBuf[i];
         if ((msg[0] & 0x3F) == 8) {
-            for (k = 0; k < lbl_030004A0 - (1 + i); k++)
-                lbl_030002A0[k] = lbl_030002A0[k + i + 1];
-            lbl_030004A0 = lbl_030004A0 - (1 + i);
-            lbl_030004A4 = 0;
+            for (k = 0; k < sRxCount - (1 + i); k++)
+                sRxBuf[k] = sRxBuf[k + i + 1];
+            sRxCount = sRxCount - (1 + i);
+            sRxDone = 0;
             goto restart;
         } else if ((msg[0] & 0x3F) == 9) {
-            if (lbl_03003094 == 0)
-                lbl_03002ACC = msg[1];
+            if (gMode == 0)
+                gMenuHasInput = msg[1];
         } else if ((msg[0] & 0x3F) == 10) {
             if (msg[1] != 0)
-                lbl_030029A4 = 1;
+                gLinkStarted = 1;
             else
-                lbl_030029A4 = 0;
+                gLinkStarted = 0;
         } else if ((msg[0] & 0x3F) == 5) {
             if ((msg[0] & 0xC0) == 0) {
-                memset(&lbl_030004A8, 0, sizeof(lbl_030004A8));
-                lbl_030004A8.count++;
-                lbl_030004A8.total = msg[1];
-                ((u8 *)&lbl_030004A8.crc)[0] = msg[2];
-                ((u8 *)&lbl_030004A8.crc)[1] = msg[3];
-            } else if ((msg[0] >> 6) == 1 && lbl_030004A8.count == 1) {
-                if (lbl_030004A8.pending != 0)
+                memset(&sMsgXfer, 0, sizeof(sMsgXfer));
+                sMsgXfer.count++;
+                sMsgXfer.total = msg[1];
+                ((u8 *)&sMsgXfer.crc)[0] = msg[2];
+                ((u8 *)&sMsgXfer.crc)[1] = msg[3];
+            } else if ((msg[0] >> 6) == 1 && sMsgXfer.count == 1) {
+                if (sMsgXfer.pending != 0)
                     goto resend;
-                lbl_030004A8.count++;
-                lbl_030004A8.size = msg[1] | (msg[2] << 8);
-                lbl_030004A8.data[0] = msg[3];
-                lbl_030004A8.pos = 1;
+                sMsgXfer.count++;
+                sMsgXfer.size = msg[1] | (msg[2] << 8);
+                sMsgXfer.data[0] = msg[3];
+                sMsgXfer.pos = 1;
                 goto check;
-            } else if ((msg[0] >> 6) == 2 && lbl_030004A8.count > 1) {
-                if (lbl_030004A8.pending != 0)
+            } else if ((msg[0] >> 6) == 2 && sMsgXfer.count > 1) {
+                if (sMsgXfer.pending != 0)
                     goto resend;
-                lbl_030004A8.count++;
-                if (lbl_030004A8.pos + 3 > sizeof(lbl_030004A8.data)) {
+                sMsgXfer.count++;
+                if (sMsgXfer.pos + 3 > sizeof(sMsgXfer.data)) {
                     ((u8 *)&pkt)[0] = 7;
                     ((u8 *)&pkt)[1] = 0;
-                    if (fn_02002698(pkt) != 0)
+                    if (Link_Write(pkt) != 0)
                         goto pend;
                 }
-                lbl_030004A8.data[lbl_030004A8.pos++] = msg[1];
-                lbl_030004A8.data[lbl_030004A8.pos++] = msg[2];
-                lbl_030004A8.data[lbl_030004A8.pos++] = msg[3];
+                sMsgXfer.data[sMsgXfer.pos++] = msg[1];
+                sMsgXfer.data[sMsgXfer.pos++] = msg[2];
+                sMsgXfer.data[sMsgXfer.pos++] = msg[3];
             check:
-                if (lbl_030004A8.count == lbl_030004A8.total) {
+                if (sMsgXfer.count == sMsgXfer.total) {
                     crc = 0xFFFF;
-                    if (lbl_030004A8.crc != fn_02002130(lbl_030004A8.size, lbl_030004A8.data, &crc)
-                        || lbl_030004A8.size > lbl_030004A8.pos) {
+                    if (sMsgXfer.crc != Crc16(sMsgXfer.size, sMsgXfer.data, &crc)
+                        || sMsgXfer.size > sMsgXfer.pos) {
                         ((u8 *)&pkt)[0] = 7;
                         ((u8 *)&pkt)[1] = 0;
-                        if (fn_02002698(pkt) != 0)
+                        if (Link_Write(pkt) != 0)
                             goto pend;
                     } else {
                         pkt = 0;
                         ((u8 *)&pkt)[0] = 6;
                         ((u8 *)&pkt)[1] = 0;
-                        if (fn_02002698(pkt) != 0) {
-                            lbl_030004A8.pending = pkt;
+                        if (Link_Write(pkt) != 0) {
+                            sMsgXfer.pending = pkt;
                             done = 1;
                         }
-                        fn_02002F0C();
-                        memset(&lbl_030004A8, 0, sizeof(lbl_030004A8));
+                        Link_DispatchMessage();
+                        memset(&sMsgXfer, 0, sizeof(sMsgXfer));
                     }
                 }
             } else {
@@ -989,18 +993,18 @@ restart:
                 goto send;
             }
         } else if ((msg[0] & 0x3F) == 13) {
-            lbl_03002AE8 = 0;
-            if (fn_0200108C(*(u32 *)msg) != 0) {
+            gXferActive = 0;
+            if (Xfer_CheckCrc(*(u32 *)msg) != 0) {
                 ((u8 *)&pkt)[0] = 7;
                 ((u8 *)&pkt)[1] = 3;
                 goto send;
             }
             ((u8 *)&pkt)[0] = 6;
             ((u8 *)&pkt)[1] = 3;
-            if (fn_02002698(pkt) != 0)
+            if (Link_Write(pkt) != 0)
                 goto pend;
         } else if ((msg[0] & 0x3F) == 11) {
-            n = fn_0200110C(*(u32 *)msg, &result);
+            n = Xfer_Receive(*(u32 *)msg, &result);
             if (n != 0) {
                 pkt = 0;
                 if (n < 0)
@@ -1012,132 +1016,132 @@ restart:
             }
         } else if ((msg[0] & 0x3F) == 14) {
             if (msg[1] == 1) {
-                lbl_030008CC = 0;
-                lbl_030008D0 = 0;
+                sGilIn = 0;
+                sGilOp = 0;
                 lbl_030008D4 = 0;
-                lbl_03002AE8 = 0;
-                fn_02001438((s8)msg[2], (s8)msg[3]);
+                gXferActive = 0;
+                Map_SetStage((s8)msg[2], (s8)msg[3]);
             }
         } else if ((msg[0] & 0x3F) == 15) {
-            lbl_030008B4[msg[0] >> 6] = *(u16 *)&msg[2];
+            sBasePosIn[msg[0] >> 6] = *(u16 *)&msg[2];
             if (msg[0] & 0xC0)
-                fn_020045B4((s16)lbl_030008B4[0], (s16)lbl_030008B4[1]);
+                Radar_SetBasePos((s16)sBasePosIn[0], (s16)sBasePosIn[1]);
         } else if ((msg[0] & 0x3F) == 16) {
-            lbl_03002AE8 = 0;
-            memset(&lbl_030004A8, 0, sizeof(lbl_030004A8));
+            gXferActive = 0;
+            memset(&sMsgXfer, 0, sizeof(sMsgXfer));
             fn_02000A74();
         } else if ((msg[0] & 0x3F) == 8) {
-            memset(&lbl_030004A8, 0, sizeof(lbl_030004A8));
+            memset(&sMsgXfer, 0, sizeof(sMsgXfer));
         } else if ((msg[0] & 0x3F) == 17) {
             n = msg[0] >> 6;
-            if (n != 0 && n - 1 != (s8)lbl_030008B8) {
+            if (n != 0 && n - 1 != (s8)sPartyPosSeq) {
                 ((u8 *)&pkt)[0] = 7;
                 ((u8 *)&pkt)[1] = 0xFF;
-                if (fn_02002698(pkt) != 0)
+                if (Link_Write(pkt) != 0)
                     goto pend;
             }
-            lbl_030008B8 = n;
-            lbl_030008C0[n] = lbl_030002A0[i];
+            sPartyPosSeq = n;
+            sPartyPosIn[n] = sRxBuf[i];
             if (n == 2)
-                fn_0200469C(lbl_030008C0);
+                Radar_OnPartyPos(sPartyPosIn);
         } else if ((msg[0] & 0x3F) == 18) {
-            fn_020046FC(&lbl_030002A0[i]);
+            Radar_OnEnemyPos(&sRxBuf[i]);
         } else if ((msg[0] & 0x3F) == 33) {
-            fn_0200471C(&lbl_030002A0[i]);
+            Radar_OnTreasurePos(&sRxBuf[i]);
         } else if ((msg[0] & 0x3F) == 19) {
-            fn_020048B4(&lbl_030002A0[i]);
+            Session_OnPartyHp(&sRxBuf[i]);
         } else if ((msg[0] & 0x3F) == 12) {
             if (msg[1] == 14 && msg[2] == 0)
-                fn_020025E4((s8)lbl_03003090);
+                Link_SendScreenId((s8)gScreen);
         } else if ((msg[0] & 0x3F) == 6) {
-            fn_020015A8(0);
+            Reply_Set(0);
         } else if ((msg[0] & 0x3F) == 7) {
-            fn_020015A8(-1);
+            Reply_Set(-1);
         } else if ((msg[0] & 0x3F) == 22) {
-            fn_020049B8(&lbl_030002A0[i]);
+            Radar_OnMapObjDrawFlags(&sRxBuf[i]);
         } else if ((msg[0] & 0x3F) == 20) {
             if (msg[1] == 1) {
-                if (lbl_03003090 == 9) {
-                    lbl_03002AE0 = msg[1];
-                    lbl_03002AEC &= ~8;
+                if (gScreen == 9) {
+                    gNewLetter = msg[1];
+                    gDataFlags &= ~8;
                 }
             } else if (msg[1] == 12) {
-                fn_02004D88(lbl_030002A0[i]);
+                Session_OnUseItem(sRxBuf[i]);
             } else if (msg[1] == 13) {
-                fn_02004F1C(lbl_030002A0[i]);
+                Radar_OnType(sRxBuf[i]);
             } else if (msg[1] == 14) {
-                fn_02004F54(lbl_030002A0[i]);
+                Radar_OnMode(sRxBuf[i]);
             } else if (msg[1] == 15) {
-                fn_02009ED4(lbl_030002A0[i]);
+                Menu_OnOpen(sRxBuf[i]);
             } else if (msg[1] == 16) {
-                fn_02005010(lbl_030002A0[i]);
+                Session_OnItemUseFlags(sRxBuf[i]);
             } else if (msg[1] == 17) {
-                fn_02005024(lbl_030002A0[i]);
+                Session_OnSpMode(sRxBuf[i]);
             } else if (msg[1] == 18) {
-                fn_02005038(lbl_030002A0[i]);
+                Session_OnCmdNum(sRxBuf[i]);
             } else if (msg[1] == 19) {
-                fn_0200508C(lbl_030002A0[i]);
+                Session_OnMemories(sRxBuf[i]);
             } else if (msg[1] == 20) {
-                fn_020050B8();
+                Session_OnStartBonus();
             } else if (msg[1] == 22) {
-                fn_020050D4(lbl_030002A0[i]);
+                Session_OnLanguage(sRxBuf[i]);
             }
         } else if ((msg[0] & 0x3F) == 23) {
-            fn_02004514(lbl_030002A0[i]);
+            Session_OnItemChange(sRxBuf[i]);
         } else if ((msg[0] & 0x3F) == 26) {
             if ((msg[0] >> 6) == 0) {
-                lbl_030008D0 = msg[1] | 0x80;
-                lbl_030008CC = msg[2] << 24;
-                lbl_030008CC |= msg[3] << 16;
+                sGilOp = msg[1] | 0x80;
+                sGilIn = msg[2] << 24;
+                sGilIn |= msg[3] << 16;
             } else {
-                v = lbl_030008D0;
-                if ((s8)lbl_030008D0 == 0) {
-                    if (fn_02002FE4(21, 0, 0) != 0)
+                v = sGilOp;
+                if ((s8)sGilOp == 0) {
+                    if (Link_SendEvent(21, 0, 0) != 0)
                         goto pend;
                 } else {
-                    lbl_030008CC |= msg[1] << 8;
-                    lbl_030008CC |= msg[2];
+                    sGilIn |= msg[1] << 8;
+                    sGilIn |= msg[2];
                     if (!(v & 7))
-                        fn_02004AB4(lbl_030008CC);
+                        Session_SetGil(sGilIn);
                 }
-                lbl_030008D0 = 0;
-                lbl_030008CC = 0;
+                sGilOp = 0;
+                sGilIn = 0;
             }
         } else if ((msg[0] & 0x3F) == 24) {
-            fn_02008F48(lbl_030002A0[i]);
+            Session_OnMask(sRxBuf[i]);
             pkt = 0;
             ((u8 *)&pkt)[0] = 6;
             ((u8 *)&pkt)[1] = 24;
         send:
-            if (fn_02002698(pkt) != 0) {
+            if (Link_Write(pkt) != 0) {
             pend:
-                lbl_030004A8.pending = pkt;
+                sMsgXfer.pending = pkt;
                 goto resend;
             }
         } else if ((msg[0] & 0x3F) == 27) {
-            fn_0200911C(lbl_030002A0[i]);
+            Mode_OnSet(sRxBuf[i]);
         } else if ((msg[0] & 0x3F) == 25) {
-            fn_02004E38(lbl_030002A0[i]);
+            Session_OnStrength(sRxBuf[i]);
         } else if ((msg[0] & 0x3F) == 30) {
-            fn_02004BB8(lbl_030002A0[i]);
+            Session_OnEquipSlot(sRxBuf[i]);
         } else if ((msg[0] & 0x3F) == 31) {
-            fn_02004BD4(lbl_030002A0[i]);
+            Session_OnCmdSlot(sRxBuf[i]);
         } else if ((msg[0] & 0x3F) == 32) {
-            fn_02004C1C(lbl_030002A0[i]);
+            Session_OnTmpArtifact(sRxBuf[i]);
         } else if ((msg[0] & 0x3F) == 34) {
-            fn_02004FC0(lbl_030002A0[i]);
+            Scouter_OnHitEnemy(sRxBuf[i]);
         }
     }
     if (done == 0) {
-        memset(lbl_030002A0, 0, 0x200);
-        lbl_030004A0 = done;
-        lbl_030004A4 = done;
+        memset(sRxBuf, 0, 0x200);
+        sRxCount = done;
+        sRxDone = done;
     } else {
     resend:
-        for (k = 0; k < lbl_030004A0 - (1 + i); k++)
-            lbl_030002A0[k] = lbl_030002A0[k + i + 1];
-        lbl_030004A0 = lbl_030004A0 - (1 + i);
-        lbl_030004A4 = 0;
+        for (k = 0; k < sRxCount - (1 + i); k++)
+            sRxBuf[k] = sRxBuf[k + i + 1];
+        sRxCount = sRxCount - (1 + i);
+        sRxDone = 0;
     }
-    lbl_030004A4 = lbl_030004A0;
+    sRxDone = sRxCount;
 }

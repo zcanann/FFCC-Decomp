@@ -110,46 +110,46 @@ struct Flag3 {
     u8 unk3;
 };
 
-extern u16 lbl_03002AEC;
-extern u8 lbl_03002AC4;
-extern struct GfxInfo lbl_03002670;
-extern struct ObjEntry lbl_03001970[];
+extern u16 gDataFlags;
+extern u8 gSpMode;
+extern struct GfxInfo gObjHeader;
+extern struct ObjEntry gObjCells[];
 extern s16 lbl_0202FA20[];
 extern u8 lbl_02036A30[][32];
 extern u8 lbl_03002070[];
 extern u8 lbl_03002738[];
 extern u8 lbl_03002690;
 extern u8 lbl_03001168[2][0x400];
-extern struct Work lbl_03002CA0;
-extern struct Member lbl_03002FD0[4];
-extern struct MemberData lbl_03003000;
-extern struct MarkerList lbl_03002B10;
-extern char lbl_03002F20[2][65];
-extern u8 lbl_03002DCC[4];
+extern struct Work gSession;
+extern struct Member gParty[4];
+extern struct MemberData gCaravanNames;
+extern struct MarkerList gMapObjs;
+extern char gBonusStr[2][65];
+extern u8 gScouterHit[4];
 extern s8 lbl_03002770;
-extern u8 lbl_03002ED0;
-extern u8 lbl_03002FF0;
-extern u8 lbl_03002B00;
-extern u8 lbl_03002C98;
-extern u16 lbl_03002754[2];
-extern u16 lbl_03002758[2];
+extern u8 gRadarType;
+extern u8 gRadarMode;
+extern u8 gScouterDirty;
+extern u8 gLanguage;
+extern u16 gBasePos[2];
+extern u16 gPrevBasePos[2];
 extern u8 lbl_03003080[8];
-extern struct Flag3 lbl_03002760[4];
-extern struct Flag3 lbl_03002DD0[64];
-extern struct Flag3 lbl_03002EE0[16];
-extern u32 lbl_03002750;
-extern u32 lbl_03003090;
-extern u32 lbl_03003094;
-extern u32 lbl_030032F4;
-extern u8 lbl_0203D800[];
+extern struct Flag3 gPartyMarkers[4];
+extern struct Flag3 gEnemyMarkers[64];
+extern struct Flag3 gTreasureMarkers[16];
+extern u32 sMapObjDrawFlagsIn;
+extern u32 gScreen;
+extern u32 gMode;
+extern u32 gScreenPhase;
+extern u8 gDetailBuf[];
 
-int fn_02002FAC(void);
-u16 fn_02002130(s32 n, u8 *data, u16 *crc);
+int Link_GetPlayerNo(void);
+u16 Crc16(s32 n, u8 *data, u16 *crc);
 void *fn_0201A73C(int);
 void fn_020007D8(s32);
 void fn_02000990(void);
 void fn_02000B98(void);
-void fn_02005844(void);
+void Screen_Reset(void);
 void fn_0200EB80(void);
 void fn_0200F010(int);
 void fn_02010F88(int);
@@ -159,10 +159,10 @@ void fn_0201A6C8(int);
 void fn_02009508(int);
 void fn_0200A63C(void);
 
-void fn_02004668(void);
-int fn_02004AC4(u8 *p);
-int fn_02004CC8(int);
-int fn_02004E00(int);
+void Radar_ClearMarkers(void);
+int Session_OnCompatibility(u8 *p);
+int Item_GetCategory(int);
+int Item_IsEquipped(int);
 
 int fn_02004030(int idx, int pos)
 {
@@ -171,11 +171,11 @@ int fn_02004030(int idx, int pos)
     struct ObjEntry *e;
     s8 *p;
 
-    if (!(lbl_03002AEC & 1))
+    if (!(gDataFlags & 1))
         return 0;
 
-    p = (s8 *)((u8 *)lbl_03001970 + (lbl_03002670.unk1C - lbl_03002670.unk14));
-    e = lbl_03001970;
+    p = (s8 *)((u8 *)gObjCells + (gObjHeader.unk1C - gObjHeader.unk14));
+    e = gObjCells;
     sum = 0;
     for (i = 0; i < idx; i++, e++)
         sum += e->unk1;
@@ -196,11 +196,11 @@ void fn_02004098(int idx, int bank, int mode, int frame)
     u8 *src;
 
     if (idx == 17)
-        frame = fn_02002FAC();
-    if (!(lbl_03002AEC & 1))
+        frame = Link_GetPlayerNo();
+    if (!(gDataFlags & 1))
         return;
 
-    e = &lbl_03001970[idx];
+    e = &gObjCells[idx];
     size = lbl_0202FA20[e->unk0] / 32 * 32;
     size *= e->unk1;
     if (bank == 0) {
@@ -228,8 +228,8 @@ void fn_02004098(int idx, int bank, int mode, int frame)
         dest += 0x06008000;
     DmaSet3(e->unk8, dest, 0x80000000 | (size >> 1));
 
-    src = lbl_03002AC4 == 0 ? (u8 *)lbl_03001970 + (lbl_03002670.unk18 - lbl_03002670.unk14)
-                            : lbl_02036A30[lbl_03002670.unkD];
+    src = gSpMode == 0 ? (u8 *)gObjCells + (gObjHeader.unk18 - gObjHeader.unk14)
+                            : lbl_02036A30[gObjHeader.unkD];
     if (frame < 0) {
         size = e->unk4 * 32;
         src += e->unk3 * 32;
@@ -250,11 +250,11 @@ void fn_020041D4(int idx, int frame)
     u32 dest;
 
     if (idx == 17)
-        frame = fn_02002FAC();
-    if (!(lbl_03002AEC & 1))
+        frame = Link_GetPlayerNo();
+    if (!(gDataFlags & 1))
         return;
 
-    e = &lbl_03001970[idx];
+    e = &gObjCells[idx];
     if (e->unk5)
         return;
 
@@ -263,21 +263,21 @@ void fn_020041D4(int idx, int frame)
         count = e->unk4;
 
     used = 0;
-    for (i = 3; i < lbl_03002670.unkC; i++) {
-        if (i != idx && lbl_03001970[i].unk5)
-            used |= 1 << (lbl_03001970[i].unk2 >> 4);
+    for (i = 3; i < gObjHeader.unkC; i++) {
+        if (i != idx && gObjCells[i].unk5)
+            used |= 1 << (gObjCells[i].unk2 >> 4);
     }
 
-    e = &lbl_03001970[idx];
-    for (i = lbl_03002670.unkD; i <= 15; i++) {
+    e = &gObjCells[idx];
+    for (i = gObjHeader.unkD; i <= 15; i++) {
         if (!((used >> i) & 1))
             break;
     }
     e->unk2 = (i << 4) | 1;
     e->unk5 = 1;
 
-    src = lbl_03002AC4 == 0 ? (u8 *)lbl_03001970 + (lbl_03002670.unk18 - lbl_03002670.unk14)
-                            : lbl_02036A30[lbl_03002670.unkD];
+    src = gSpMode == 0 ? (u8 *)gObjCells + (gObjHeader.unk18 - gObjHeader.unk14)
+                            : lbl_02036A30[gObjHeader.unkD];
     if (frame < 0)
         src += e->unk3 * 32;
     else
@@ -291,8 +291,8 @@ void fn_02004320(int idx)
 {
     struct ObjEntry *e;
 
-    if ((lbl_03002AEC & 1) && idx > 2) {
-        e = lbl_03001970;
+    if ((gDataFlags & 1) && idx > 2) {
+        e = gObjCells;
         e += idx;
         e->unk2 = 0xFF;
         e->unk5 = 0;
@@ -319,43 +319,43 @@ void fn_020043B8(void)
     u8 *src;
     int size;
 
-    src = lbl_03002AC4 == 0 ? lbl_03002070 : lbl_02036A30[0];
-    size = lbl_03002670.unkD * 32;
+    src = gSpMode == 0 ? lbl_03002070 : lbl_02036A30[0];
+    size = gObjHeader.unkD * 32;
     DmaSet3(src, 0x05000200, 0x80000000 | (size >> 1));
 }
 
-void fn_020043FC(void)
+void Session_Init(void)
 {
     int i;
 
-    memset(&lbl_03002CA0, 0, sizeof(lbl_03002CA0));
-    memset(lbl_03002FD0, 0, sizeof(lbl_03002FD0));
-    memset(&lbl_03003000, 0, sizeof(lbl_03003000));
-    memset(&lbl_03002B10, 0, sizeof(lbl_03002B10));
-    memset(lbl_03002F20, 0, sizeof(lbl_03002F20));
-    memset(lbl_03002DCC, 0xFF, sizeof(lbl_03002DCC));
+    memset(&gSession, 0, sizeof(gSession));
+    memset(gParty, 0, sizeof(gParty));
+    memset(&gCaravanNames, 0, sizeof(gCaravanNames));
+    memset(&gMapObjs, 0, sizeof(gMapObjs));
+    memset(gBonusStr, 0, sizeof(gBonusStr));
+    memset(gScouterHit, 0xFF, sizeof(gScouterHit));
     lbl_03002770 = 0;
-    lbl_03002ED0 = 1;
-    lbl_03002FF0 = 1;
-    lbl_03002B00 = 0;
-    lbl_03002C98 = 0;
+    gRadarType = 1;
+    gRadarMode = 1;
+    gScouterDirty = 0;
+    gLanguage = 0;
     for (i = 0; i < 2; i++) {
-        lbl_03002754[i] = 0;
-        lbl_03002758[i] = 0;
+        gBasePos[i] = 0;
+        gPrevBasePos[i] = 0;
     }
     for (i = 0; i < 8; i++)
         lbl_03003080[i] |= 0xFF;
     for (i = 0; i < 4; i++)
-        lbl_03002FD0[i].unk0 = fn_0201A73C(0);
+        gParty[i].unk0 = fn_0201A73C(0);
     for (i = 0; i < 8; i++)
-        lbl_03002CA0.unkF4[i] |= 0xFFFF;
-    lbl_03002CA0.unk5D = 8;
+        gSession.unkF4[i] |= 0xFFFF;
+    gSession.unk5D = 8;
     for (i = 0; i < 4; i++)
-        lbl_03002CA0.unk5E[i] |= 0xFF;
-    fn_02004668();
+        gSession.unk5E[i] |= 0xFF;
+    Radar_ClearMarkers();
 }
 
-void fn_02004514(u32 data)
+void Session_OnItemChange(u32 data)
 {
     struct Cmd *cmd = (struct Cmd *)&data;
     u8 type = cmd->unk0 & 0xC0;
@@ -365,65 +365,65 @@ void fn_02004514(u32 data)
     if (type != 0)
         return;
 
-    lbl_03002CA0.unk64[idx] = val;
-    if (lbl_03003094 == 0) {
-        if (lbl_03003090 == 1)
+    gSession.unk64[idx] = val;
+    if (gMode == 0) {
+        if (gScreen == 1)
             fn_0200EB80();
-        else if (lbl_03003090 == 2 && lbl_030032F4 == 1)
+        else if (gScreen == 2 && gScreenPhase == 1)
             fn_02010F88(idx);
-    } else if (lbl_03003094 == 2) {
-        if (lbl_03003090 == 2 && lbl_030032F4 == 1)
+    } else if (gMode == 2) {
+        if (gScreen == 2 && gScreenPhase == 1)
             fn_02017E48(idx);
-    } else if (lbl_03003094 == 3) {
+    } else if (gMode == 3) {
         if (val > 0)
             fn_02019310(idx);
     }
 }
 
-void fn_020045B4(u16 x, u16 y)
+void Radar_SetBasePos(u16 x, u16 y)
 {
-    lbl_03002754[0] = x;
-    lbl_03002754[1] = y;
-    if (!(lbl_03002AEC & 0x400)) {
-        lbl_03002AEC |= 0x400;
-        lbl_03002758[0] = x;
-        lbl_03002758[1] = y;
+    gBasePos[0] = x;
+    gBasePos[1] = y;
+    if (!(gDataFlags & 0x400)) {
+        gDataFlags |= 0x400;
+        gPrevBasePos[0] = x;
+        gPrevBasePos[1] = y;
     }
 }
 
-void fn_020045F4(u16 *x, u16 *y)
+void Radar_GetBasePos(u16 *x, u16 *y)
 {
-    *x = lbl_03002754[0];
-    *y = lbl_03002754[1];
+    *x = gBasePos[0];
+    *y = gBasePos[1];
 }
 
-void fn_02004604(u16 *dx, u16 *dy)
+void Radar_GetBaseDelta(u16 *dx, u16 *dy)
 {
-    u16 flag = lbl_03002AEC & 0x400;
+    u16 flag = gDataFlags & 0x400;
 
     if (!flag) {
         *dx = flag;
         *dy = flag;
-        lbl_03002758[0] = lbl_03002754[0];
-        lbl_03002758[1] = lbl_03002754[1];
+        gPrevBasePos[0] = gBasePos[0];
+        gPrevBasePos[1] = gBasePos[1];
     } else {
-        *dx = lbl_03002754[0] - lbl_03002758[0];
-        *dy = lbl_03002754[1] - lbl_03002758[1];
-        lbl_03002758[0] = lbl_03002754[0];
-        lbl_03002758[1] = lbl_03002754[1];
+        *dx = gBasePos[0] - gPrevBasePos[0];
+        *dy = gBasePos[1] - gPrevBasePos[1];
+        gPrevBasePos[0] = gBasePos[0];
+        gPrevBasePos[1] = gBasePos[1];
     }
 }
 
-void fn_02004668(void)
+void Radar_ClearMarkers(void)
 {
-    memset(lbl_03002760, 0, sizeof(lbl_03002760));
-    memset(lbl_03002DD0, 0, sizeof(lbl_03002DD0));
-    memset(lbl_03002EE0, 0, sizeof(lbl_03002EE0));
+    memset(gPartyMarkers, 0, sizeof(gPartyMarkers));
+    memset(gEnemyMarkers, 0, sizeof(gEnemyMarkers));
+    memset(gTreasureMarkers, 0, sizeof(gTreasureMarkers));
 }
 
-void fn_0200469C(s8 *p)
+void Radar_OnPartyPos(s8 *p)
 {
-    struct Flag3 *e = lbl_03002760;
+    struct Flag3 *e = gPartyMarkers;
     u8 flags = p[1];
 
     e[0].unk0 = p[1] & 1;
@@ -442,98 +442,98 @@ void fn_0200469C(s8 *p)
     e[3].unk2 = p[3];
 }
 
-struct Flag3 *fn_020046F0(int idx)
+struct Flag3 *Radar_GetPartyMarker(int idx)
 {
-    return &lbl_03002760[idx];
+    return &gPartyMarkers[idx];
 }
 
-void fn_020046FC(s8 *p)
+void Radar_OnEnemyPos(s8 *p)
 {
     int idx = p[1] & 0x7F;
 
-    lbl_03002DD0[idx].unk0 = p[1] >> 7;
-    lbl_03002DD0[idx].unk1 = p[2];
-    lbl_03002DD0[idx].unk2 = p[3];
+    gEnemyMarkers[idx].unk0 = p[1] >> 7;
+    gEnemyMarkers[idx].unk1 = p[2];
+    gEnemyMarkers[idx].unk2 = p[3];
 }
 
-void fn_0200471C(s8 *p)
+void Radar_OnTreasurePos(s8 *p)
 {
     int idx = (p[1] & 0x7F) - 64;
 
-    lbl_03002EE0[idx].unk0 = p[1] >> 7;
-    lbl_03002EE0[idx].unk1 = p[2];
-    lbl_03002EE0[idx].unk2 = p[3];
+    gTreasureMarkers[idx].unk0 = p[1] >> 7;
+    gTreasureMarkers[idx].unk1 = p[2];
+    gTreasureMarkers[idx].unk2 = p[3];
 }
 
-void fn_02004740(u8 *p)
+void Session_OnPlayerStat(u8 *p)
 {
     int i;
     int n;
     u8 *dst;
 
-    memset(&lbl_03002CA0, 0, sizeof(lbl_03002CA0));
-    memset(lbl_03002FD0, 0, sizeof(lbl_03002FD0));
-    memset(lbl_03002CA0.unk64, 0xFF, sizeof(lbl_03002CA0.unk64));
-    memset(lbl_03002CA0.unkE4, 0xFF, sizeof(lbl_03002CA0.unkE4));
-    memset(lbl_03002CA0.unk5E, 0xFF, sizeof(lbl_03002CA0.unk5E));
+    memset(&gSession, 0, sizeof(gSession));
+    memset(gParty, 0, sizeof(gParty));
+    memset(gSession.unk64, 0xFF, sizeof(gSession.unk64));
+    memset(gSession.unkE4, 0xFF, sizeof(gSession.unkE4));
+    memset(gSession.unk5E, 0xFF, sizeof(gSession.unk5E));
     for (i = 0; i < 4; i++) {
-        lbl_03002FD0[i].unk4 |= 0xFFFF;
-        lbl_03002FD0[i].unk0 = fn_0201A73C(0);
+        gParty[i].unk4 |= 0xFFFF;
+        gParty[i].unk0 = fn_0201A73C(0);
     }
 
-    memcpy(&lbl_03003000, p, sizeof(lbl_03003000));
-    p += sizeof(lbl_03003000);
+    memcpy(&gCaravanNames, p, sizeof(gCaravanNames));
+    p += sizeof(gCaravanNames);
     for (i = 0; i < 8; i++) {
-        n = lbl_03003000.slots[i >> 1];
+        n = gCaravanNames.slots[i >> 1];
         if (i & 1)
             n &= 15;
         else
             n = (n & 0xF0) >> 4;
         if (n != 15)
-            lbl_03002FD0[n].unk4 = i;
+            gParty[n].unk4 = i;
     }
     for (i = 0; i < 4; i++) {
-        n = (s16)lbl_03002FD0[i].unk4;
+        n = (s16)gParty[i].unk4;
         if (n != -1)
-            lbl_03002FD0[i].unk0 = lbl_03003000.entries[n];
-        lbl_03002FD0[i].unk6 = p[0];
-        lbl_03002FD0[i].unk7 = p[1];
+            gParty[i].unk0 = gCaravanNames.entries[n];
+        gParty[i].unk6 = p[0];
+        gParty[i].unk7 = p[1];
         p += 2;
     }
 
-    lbl_03002CA0.unk0 = *p++;
-    memcpy(lbl_03002CA0.unk1, p, 3);
+    gSession.unk0 = *p++;
+    memcpy(gSession.unk1, p, 3);
     p += 3;
-    dst = lbl_03002CA0.unk62;
+    dst = gSession.unk62;
     for (i = 2; i != 0; i--)
         *dst++ = *p++;
 
-    n = fn_02004AC4(p);
+    n = Session_OnCompatibility(p);
     p += n;
-    memcpy(lbl_03002CA0.unk54, p, 8);
+    memcpy(gSession.unk54, p, 8);
     p += 8;
-    dst = lbl_03002CA0.unk104.bytes;
+    dst = gSession.unk104.bytes;
     for (i = 4; i != 0; i--)
         *dst++ = *p++;
 
-    n = lbl_03002CA0.unk0 & 3;
+    n = gSession.unk0 & 3;
     if (n != lbl_03002770) {
         fn_020007D8(n);
         lbl_03002770 = n;
     }
-    if (lbl_03003090 <= 5) {
-        fn_02005844();
+    if (gScreen <= 5) {
+        Screen_Reset();
         fn_02000990();
     }
 }
 
-void fn_020048B4(s8 *p)
+void Session_OnPartyHp(s8 *p)
 {
     int i;
     struct Member *m;
 
-    for (i = 0, m = lbl_03002FD0; i < 4; m++, i++) {
-        if (i == fn_02002FAC()) {
+    for (i = 0, m = gParty; i < 4; m++, i++) {
+        if (i == Link_GetPlayerNo()) {
             if ((p[1] & 0x80) && m->unk7 > p[2])
                 fn_02000B98();
             m->unk7 = p[2];
@@ -543,25 +543,25 @@ void fn_020048B4(s8 *p)
             m->unk7 = 0;
         }
     }
-    lbl_03002CA0.unk128 = p[3];
+    gSession.unk128 = p[3];
 }
 
-void fn_02004920(u8 *p)
+void Radar_OnMapObj(u8 *p)
 {
     int i;
     u32 val;
     struct MarkerEntry *e;
 
-    memset(&lbl_03002B10, 0, sizeof(lbl_03002B10));
-    lbl_03002B10.count = *p++;
+    memset(&gMapObjs, 0, sizeof(gMapObjs));
+    gMapObjs.count = *p++;
     val = p[0];
     val |= p[1] << 8;
     val |= p[2] << 16;
     val |= p[3] << 24;
     p += 4;
-    lbl_03002B10.unk4 = val;
-    for (i = 0; i < lbl_03002B10.count; i++) {
-        e = &lbl_03002B10.entries[i];
+    gMapObjs.unk4 = val;
+    for (i = 0; i < gMapObjs.count; i++) {
+        e = &gMapObjs.entries[i];
         e->unk0 = *p++;
         e->unk4 = *p++;
         e->unk4 |= *p++ << 8;
@@ -574,7 +574,7 @@ void fn_02004920(u8 *p)
     }
 }
 
-void fn_020049B8(u8 *p)
+void Radar_OnMapObjDrawFlags(u8 *p)
 {
     u8 *prev;
     u16 sum;
@@ -582,140 +582,140 @@ void fn_020049B8(u8 *p)
     u32 val;
 
     if ((p[0] >> 6) == 0) {
-        lbl_03002750 = *(u32 *)p;
+        sMapObjDrawFlagsIn = *(u32 *)p;
         return;
     }
-    prev = (u8 *)&lbl_03002750;
+    prev = (u8 *)&sMapObjDrawFlagsIn;
     sum = prev[1] | (prev[2] << 8);
     val = prev[3];
     val |= p[1] << 8;
     val |= p[2] << 16;
     val |= p[3] << 24;
     crc = 0xFFFF;
-    if (fn_02002130(4, (u8 *)&val, &crc) == sum)
-        lbl_03002B10.unk4 = val;
+    if (Crc16(4, (u8 *)&val, &crc) == sum)
+        gMapObjs.unk4 = val;
 }
 
-void fn_02004A30(u8 *p)
+void Session_OnItemAll(u8 *p)
 {
     int i;
 
-    memcpy(lbl_03002CA0.unk64, p, sizeof(lbl_03002CA0.unk64));
-    p += sizeof(lbl_03002CA0.unk64);
-    memcpy(lbl_03002CA0.unk114, lbl_03002CA0.unk108, 12);
-    memcpy(lbl_03002CA0.unk108, p, 12);
+    memcpy(gSession.unk64, p, sizeof(gSession.unk64));
+    p += sizeof(gSession.unk64);
+    memcpy(gSession.unk114, gSession.unk108, 12);
+    memcpy(gSession.unk108, p, 12);
     p += 12;
-    memcpy(lbl_03002CA0.unk120, p, 8);
+    memcpy(gSession.unk120, p, 8);
     p += 8;
     for (i = 0; i < 4; i++)
-        lbl_03002CA0.unk5E[i] = *p++;
-    memcpy(lbl_03002CA0.unkF4, p, 16);
-    lbl_03002CA0.unk5D = p[16];
+        gSession.unk5E[i] = *p++;
+    memcpy(gSession.unkF4, p, 16);
+    gSession.unk5D = p[16];
 }
 
-void fn_02004AA0(u8 *p)
+void Session_OnFavorite(u8 *p)
 {
-    memcpy(lbl_03002CA0.unk54, p, 8);
+    memcpy(gSession.unk54, p, 8);
 }
 
-void fn_02004AB4(u32 val)
+void Session_SetGil(u32 val)
 {
-    lbl_03002CA0.unk104.word = val;
+    gSession.unk104.word = val;
 }
 
-int fn_02004AC4(u8 *p)
+int Session_OnCompatibility(u8 *p)
 {
     int n;
     int size;
     int i;
     int len;
 
-    lbl_03002CA0.unk129 = *p++;
+    gSession.unk129 = *p++;
     n = *p++;
     size = 2;
-    memset(lbl_03002CA0.unk4, 0, 8);
-    memset(lbl_03002CA0.names, 0, sizeof(lbl_03002CA0.names));
+    memset(gSession.unk4, 0, 8);
+    memset(gSession.names, 0, sizeof(gSession.names));
     for (i = 0; i < n; i++) {
-        lbl_03002CA0.unk4[i] = *p++;
-        lbl_03002CA0.unk8[i] = *p++;
+        gSession.unk4[i] = *p++;
+        gSession.unk8[i] = *p++;
     }
     size += n * 2;
     for (i = 0; i < n; i++) {
         len = strlen(p);
-        strcpy(lbl_03002CA0.names[i], p);
+        strcpy(gSession.names[i], p);
         p += len + 1;
         size += len + 1;
     }
     return size;
 }
 
-void fn_02004B68(u8 *p)
+void Session_OnEquipList(u8 *p)
 {
     int i;
     int size;
     int n;
 
     for (i = 0; i < 4; i++)
-        lbl_03002CA0.unk5E[i] = *p++;
+        gSession.unk5E[i] = *p++;
     n = *p;
     size = n + 1;
     if (size & 3)
         size = ((size >> 2) + 1) << 2;
     size += n * 8;
-    memcpy(lbl_0203D800, p, size);
-    lbl_03002AEC |= 0x10;
+    memcpy(gDetailBuf, p, size);
+    gDataFlags |= 0x10;
 }
 
-void fn_02004BB8(u32 data)
+void Session_OnEquipSlot(u32 data)
 {
     struct Cmd8 *cmd = (struct Cmd8 *)&data;
     u8 idx = cmd->unk1;
     u8 val = cmd->unk2;
 
-    lbl_03002CA0.unk5E[idx] = val;
+    gSession.unk5E[idx] = val;
 }
 
-void fn_02004BD4(u32 data)
+void Session_OnCmdSlot(u32 data)
 {
     struct Cmd *cmd = (struct Cmd *)&data;
     s8 idx = cmd->unk1;
     u16 val = cmd->unk2;
 
-    lbl_03002CA0.unkF4[idx] = val;
-    if (lbl_03003090 == 1)
+    gSession.unkF4[idx] = val;
+    if (gScreen == 1)
         fn_0200F010(idx);
-    else if (lbl_03003090 == 2)
+    else if (gScreen == 2)
         fn_02010F88((s16)val);
 }
 
-void fn_02004C1C(u32 data)
+void Session_OnTmpArtifact(u32 data)
 {
     struct Cmd8 *cmd = (struct Cmd8 *)&data;
     u8 idx = cmd->unk1;
     u8 val = cmd->unk2;
 
-    lbl_03002CA0.unk120[idx] = (val != 0xFF) ? val + 159 : -1;
-    if (lbl_03003090 == 1)
+    gSession.unk120[idx] = (val != 0xFF) ? val + 159 : -1;
+    if (gScreen == 1)
         fn_0200EB80();
-    else if (lbl_03003090 == 5)
+    else if (gScreen == 5)
         fn_0201A6C8(idx);
 }
 
-void fn_02004C74(char *s)
+void Session_OnBonusStr(char *s)
 {
-    memset(lbl_03002F20, 0, sizeof(lbl_03002F20));
-    strcpy(lbl_03002F20[0], s);
+    memset(gBonusStr, 0, sizeof(gBonusStr));
+    strcpy(gBonusStr[0], s);
     s += strlen(s);
     s++;
-    strcpy(lbl_03002F20[1], s);
+    strcpy(gBonusStr[1], s);
 }
 
 int fn_02004CAC(int idx)
 {
-    return fn_02004CC8(lbl_03002CA0.unk64[idx]);
+    return Item_GetCategory(gSession.unk64[idx]);
 }
 
-int fn_02004CC8(int val)
+int Item_GetCategory(int val)
 {
     int level;
 
@@ -746,30 +746,30 @@ int fn_02004D3C(int id)
 {
     int i;
 
-    if (id < 64 && lbl_03002CA0.unk64[id] <= 0)
+    if (id < 64 && gSession.unk64[id] <= 0)
         return 0;
     for (i = 2; i < 8; i++) {
-        if ((s16)lbl_03002CA0.unkF4[i] == id)
+        if ((s16)gSession.unkF4[i] == id)
             return 1;
     }
     if (id < 64)
-        return fn_02004E00(id);
+        return Item_IsEquipped(id);
     return 0;
 }
 
-void fn_02004D88(u32 data)
+void Session_OnUseItem(u32 data)
 {
     struct Cmd8 *cmd = (struct Cmd8 *)&data;
 
-    lbl_03002CA0.unk5C = cmd->unk2;
+    gSession.unk5C = cmd->unk2;
 }
 
-int fn_02004DA0(u16 *p)
+int Item_CanEquip(u16 *p)
 {
     int a = *p & 0xF;
     int b = *p & 0x30;
-    int mask = 1 << (lbl_03002CA0.unk0 & 3);
-    int mask2 = (lbl_03002CA0.unk0 & 0x80) ? 32 : 16;
+    int mask = 1 << (gSession.unk0 & 3);
+    int mask2 = (gSession.unk0 & 0x80) ? 32 : 16;
 
     if (a) {
         if (b) {
@@ -781,26 +781,26 @@ int fn_02004DA0(u16 *p)
     return (b & mask2) != 0;
 }
 
-int fn_02004E00(int id)
+int Item_IsEquipped(int id)
 {
     int i;
 
     for (i = 0; i < 4; i++) {
-        if ((s8)lbl_03002CA0.unk5E[i] == id)
+        if ((s8)gSession.unk5E[i] == id)
             break;
     }
     return i < 4;
 }
 
-void fn_02004E38(u32 data)
+void Session_OnStrength(u32 data)
 {
     struct Cmd8 *cmd = (struct Cmd8 *)&data;
     int i;
     u8 *p = &cmd->unk1;
 
     for (i = 0; i < 3; i++)
-        lbl_03002CA0.unk1[i] = *p++;
-    if (lbl_03003090 <= 3)
+        gSession.unk1[i] = *p++;
+    if (gScreen <= 3)
         fn_02009508(0);
 }
 
@@ -811,17 +811,17 @@ int fn_02004E74(int id)
     return 0;
 }
 
-void fn_02004E90(u8 *p)
+void Session_OnArtifacts(u8 *p)
 {
-    memcpy(lbl_03002CA0.unk114, lbl_03002CA0.unk108, 12);
-    memcpy(lbl_03002CA0.unk108, p, 12);
-    if (lbl_03003090 == 4)
+    memcpy(gSession.unk114, gSession.unk108, 12);
+    memcpy(gSession.unk108, p, 12);
+    if (gScreen == 4)
         fn_0200A63C();
-    else if (lbl_03003090 == 1)
+    else if (gScreen == 1)
         fn_0200EB80();
 }
 
-void fn_02004ED4(u8 *p)
+void Session_OnTmpArtifacts(u8 *p)
 {
-    memcpy(lbl_03002CA0.unk120, p, 8);
+    memcpy(gSession.unk120, p, 8);
 }

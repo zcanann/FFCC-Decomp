@@ -675,12 +675,13 @@ void CMenuPcs::EquipDraw()
  */
 int CMenuPcs::EquipClose()
 {
+	EquipOpenAnim* item;
 	int doneCount = 0;
 
 	m_equipState->frame = m_equipState->frame + 1;
-	int timer = static_cast<int>(m_equipState->frame);
 	int itemCount = static_cast<int>(m_equipList->count);
-	EquipOpenAnim* item = m_equipList->entries;
+	int timer = static_cast<int>(m_equipState->frame);
+	item = m_equipList->entries;
 
 	for (int i = 0; i < itemCount; i++) {
 		if (item->startFrame <= timer) {

@@ -3832,6 +3832,9 @@ void CGMonObj::onStatAttack(int state)
 		if ((prgObj->m_stateFrame == 0) && (m_targetPartyIndex >= 0)) {
 			CGPartyObj* target = Game.m_partyObjArr[m_targetPartyIndex];
 			m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
+			if (state == 3) {
+				return;
+			}
 
 			if ((attackFlags & 2) == 0) {
 				float rotLimit = kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));

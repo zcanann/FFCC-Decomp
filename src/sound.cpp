@@ -47,10 +47,10 @@ int CLine<PointCount>::Calc(Vec* outPos, float* outDistance, u32* outIndex, floa
     float bestPosX;
     float bestPosY;
     float bestPosZ;
-    float bestT = 0.0f;
     const int infiniteRange = (0.0f == maxDistance);
     float bestDistance = infiniteRange ? 10000000.0f : maxDistance;
     const float maxDistanceSq = maxDistance * maxDistance;
+    float bestT;
     u32 bestIndex;
     int found = 0;
     Vec candidatePosition;

@@ -289,9 +289,13 @@ void fn_020041D4(int idx, int frame)
 
 void fn_02004320(int idx)
 {
+    struct ObjEntry *e;
+
     if ((lbl_03002AEC & 1) && idx > 2) {
-        lbl_03001970[idx].unk2 = 0xFF;
-        lbl_03001970[idx].unk5 = 0;
+        e = lbl_03001970;
+        e += idx;
+        e->unk2 = 0xFF;
+        e->unk5 = 0;
         lbl_03002738[idx - 3] = 0;
     }
 }
@@ -417,12 +421,12 @@ void fn_02004668(void)
     memset(lbl_03002EE0, 0, sizeof(lbl_03002EE0));
 }
 
-void fn_0200469C(u8 *p)
+void fn_0200469C(s8 *p)
 {
     struct Flag3 *e = lbl_03002760;
     u8 flags = p[1];
 
-    e[0].unk0 = flags & 1;
+    e[0].unk0 = p[1] & 1;
     e[0].unk1 = p[2];
     e[0].unk2 = p[3];
     p += 4;
@@ -446,21 +450,19 @@ struct Flag3 *fn_020046F0(int idx)
 void fn_020046FC(s8 *p)
 {
     int idx = p[1] & 0x7F;
-    struct Flag3 *e = &lbl_03002DD0[idx];
 
-    e->unk0 = p[1] >> 7;
-    e->unk1 = p[2];
-    e->unk2 = p[3];
+    lbl_03002DD0[idx].unk0 = p[1] >> 7;
+    lbl_03002DD0[idx].unk1 = p[2];
+    lbl_03002DD0[idx].unk2 = p[3];
 }
 
 void fn_0200471C(s8 *p)
 {
     int idx = (p[1] & 0x7F) - 64;
-    struct Flag3 *e = &lbl_03002EE0[idx];
 
-    e->unk0 = p[1] >> 7;
-    e->unk1 = p[2];
-    e->unk2 = p[3];
+    lbl_03002EE0[idx].unk0 = p[1] >> 7;
+    lbl_03002EE0[idx].unk1 = p[2];
+    lbl_03002EE0[idx].unk2 = p[3];
 }
 
 void fn_02004740(u8 *p)

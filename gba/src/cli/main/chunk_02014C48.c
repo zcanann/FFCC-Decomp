@@ -414,9 +414,10 @@ s32 fn_020151C8(void)
                     lbl_03003098 = 1;
                 else
                     lbl_03003098 = -1;
-                lbl_03002808 = 1;
+                ret = 1;
+                lbl_03002808 = ret;
                 m4aSongNumStart(6);
-                return 1;
+                return ret;
             }
             return 0;
         }
@@ -424,41 +425,37 @@ s32 fn_020151C8(void)
     }
     if (lbl_03002CA0.unk104.word < lbl_03002800)
         lbl_03002800 = lbl_03002CA0.unk104.word;
-    if (lbl_030032EC) {
-        if (lbl_030030A4 == 0) {
-            ret = fn_02015788();
-            if (ret) {
-                lbl_030030A4++;
-                lbl_030030B0[1].unk1 = 0;
-            }
-        } else if (lbl_030030A4 == 1) {
-            if (lbl_03002809 == 0) {
-                if (lbl_03002ACC)
-                    fn_020154E0();
-            } else {
-                u16 key = lbl_03002AEC & 0x8000;
+    if (lbl_030032EC && lbl_030030A4 == 0) {
+        ret = fn_02015788();
+        if (ret) {
+            lbl_030030A4++;
+            lbl_030030B0[1].unk1 = 0;
+        }
+    } else if (!lbl_030032EC || (lbl_030030A4 == 1 && lbl_03002809 == 0)) {
+        if (lbl_03002ACC)
+            fn_020154E0();
+    } else if (lbl_030030A4 == 1) {
+        u16 key = lbl_03002AEC & 0x8000;
 
-                if (key) {
-                    if (lbl_03002AFC)
-                        lbl_03002809 = 0;
-                    else
-                        lbl_030030A4 = 2;
-                    lbl_03002800 = 0;
-                    fn_02001578();
-                } else if (fn_02001604()) {
-                    m4aSongNumStart(0);
-                    lbl_03002809 = key;
-                    fn_02001578();
-                    lbl_03002800 = key;
-                }
-            }
-        } else {
-            ret = fn_020157FC();
-            if (ret) {
-                lbl_030030A4 = 0;
-                lbl_030030B0[1].unk1 = 0;
-                lbl_030032EC = 0;
-            }
+        if (key) {
+            if (lbl_03002AFC)
+                lbl_03002809 = 0;
+            else
+                lbl_030030A4 = 2;
+            lbl_03002800 = 0;
+            fn_02001578();
+        } else if (fn_02001604()) {
+            m4aSongNumStart(0);
+            lbl_03002809 = key;
+            fn_02001578();
+            lbl_03002800 = key;
+        }
+    } else {
+        ret = fn_020157FC();
+        if (ret) {
+            lbl_030030A4 = 0;
+            lbl_030030B0[1].unk1 = 0;
+            lbl_030032EC = 0;
         }
     }
     if (lbl_03002ACC)
@@ -977,9 +974,10 @@ s32 fn_02015F84(void)
 
     fn_02003394(1, 0);
     ret = 0;
-    if (lbl_03002ACC)
+    if (lbl_03002ACC) {
         ret = fn_02016044();
-    fn_02015FF8();
+        fn_02015FF8();
+    }
     return ret;
 }
 

@@ -863,6 +863,7 @@ s32 fn_0200A0E0(void)
 s32 fn_0200A144(void)
 {
     s32 ret;
+    struct Window *win;
 
     fn_020095AC(0);
     if (!(lbl_03002AEC & 0x100)) {
@@ -895,11 +896,12 @@ s32 fn_0200A144(void)
     }
     fn_02003394(1, 0);
     fn_020033F4();
-    if (lbl_03003120.unkE > lbl_03002776) {
+    win = &lbl_03003120;
+    if (lbl_03002776 < win->unkE) {
         fn_0200A700(lbl_03002776, lbl_03002776);
-        fn_02009AB8(1, lbl_03003120.unk5, lbl_03002776, lbl_03002776, fn_0200A758(lbl_03002776) ? 5 : 6);
+        fn_02009AB8(1, win->unk5, lbl_03002776, lbl_03002776, fn_0200A758(lbl_03002776) ? 5 : 6);
         lbl_03002776++;
-        if (lbl_03002776 < lbl_03003120.unkE)
+        if (lbl_03002776 < win->unkE)
             return 0;
         fn_0200A790();
     }
@@ -950,13 +952,13 @@ void fn_0200A370(void)
     s32 prev;
     s32 n;
     s32 pal;
-    s32 key = lbl_0300299C;
+    s32 max = 73;
 
-    if (key == 0)
+    if (lbl_0300299C == 0)
         return;
     win = &lbl_03003120;
     prev = lbl_03002774 + win->unk2;
-    if (key & 0x40) {
+    if (lbl_0300299C & 0x40) {
         if (win->unk2 != 0) {
             win->unk2--;
             m4aSongNumStart(1);
@@ -971,11 +973,11 @@ void fn_0200A370(void)
         } else {
             m4aSongNumStart(0);
         }
-    } else if (key & 0x80) {
+    } else if (lbl_0300299C & 0x80) {
         if (win->unk2 < win->unkE - 1) {
             win->unk2++;
             m4aSongNumStart(1);
-        } else if (lbl_03002774 + win->unkE >= 73) {
+        } else if (lbl_03002774 + win->unkE >= max) {
             m4aSongNumStart(0);
         } else {
             fn_02009A14(0, 1, win->unk5);

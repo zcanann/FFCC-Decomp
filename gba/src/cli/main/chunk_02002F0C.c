@@ -706,7 +706,7 @@ void fn_0200391C(s32 which, s32 n, s32 color)
     memset(buf, 0, sizeof(buf));
     size = n * 128;
     if (color != 0) {
-        for (i = 0, p = buf; i < size; i++, p++) {
+        for (i = 0, p = buf; i < size; p++, i++) {
             v = src[i];
             hi = v & 0xF0;
             if (hi != 0)
@@ -950,7 +950,11 @@ void fn_02003FF4(void)
 
 u8 fn_02004000(s32 id)
 {
+    struct CellInfo *cell;
+
     if (!(lbl_03002AEC & 1))
         return 0;
-    return lbl_03001970[id].unk1;
+    cell = lbl_03001970;
+    cell += id;
+    return cell->unk1;
 }

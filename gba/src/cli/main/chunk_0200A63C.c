@@ -464,7 +464,8 @@ void fn_0200AD90(void)
             x = win[1].unk10 * 8 - 18;
             y = win[1].unk12 * 8 + 5;
         } else {
-            x = (win->unk10 + lbl_03002782[0] * 2) * 8 - 2;
+            x = (win->unk10 + lbl_03002782[0] * 2) * 8;
+            x -= 2;
             y = (win->unk12 + 2 + lbl_03002782[1] * 2) * 8;
         }
         fn_02003C3C(x, y, 0, id, fn_02004030(0, id), 0, 0);
@@ -516,10 +517,14 @@ s32 fn_0200AECC(void)
         }
         m4aSongNumStart(1);
     } else if (lbl_0300299C & 0x80) {
-        if (lbl_03002782[1] < 4 || (lbl_03002782[1] == 4 && lbl_03002782[0] > 9))
+        if (lbl_03002782[1] >= 4) {
+            if (lbl_03002782[1] == 4 && lbl_03002782[0] > 9)
+                lbl_03002782[1]++;
+            else
+                lbl_03002782[1] = 0;
+        } else {
             lbl_03002782[1]++;
-        else
-            lbl_03002782[1] = 0;
+        }
         m4aSongNumStart(1);
     }
     if (lbl_0300299C & 0xF0)
@@ -591,6 +596,8 @@ void fn_0200B164(void)
     s32 tile;
     s32 pal;
     u16 *dst;
+    s32 x;
+    s32 y;
 
     if (lbl_0300279B <= 4) {
         fn_02003394(0, 0);
@@ -613,7 +620,9 @@ void fn_0200B164(void)
             buf[i] = tile++ | pal;
             buf[i + 30] = tile++ | pal;
         }
-        dst = fn_02000A40(win.unk5, win.unk10 + 2, win.unk12 + 2 + lbl_0300279B * 2);
+        x = win.unk10 + 2;
+        y = win.unk12 + 2 + lbl_0300279B * 2;
+        dst = fn_02000A40(win.unk5, x, y);
         DmaSet(DMA3, buf, dst, 0x80000000 | n);
         DmaSet(DMA3, buf + 30, dst + 32, 0x80000000 | n);
         lbl_0300279B++;

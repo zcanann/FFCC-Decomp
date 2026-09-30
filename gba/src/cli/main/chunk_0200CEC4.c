@@ -488,17 +488,18 @@ void fn_0200D6E4(void)
 {
     u16 buf[60];
     struct Window *win;
-    u32 n;
     s32 i;
     s32 len;
     s32 attr;
     s32 tile;
     u16 *map;
+    s32 x;
+    s32 y;
 
     if (lbl_030027A9 <= 3) {
         win = lbl_030030B0;
-        for (n = 0; n < 60; n++)
-            buf[n] = 0x3FF;
+        for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
+            buf[i] = 0x3FF;
         attr = 0x7000;
         tile = lbl_030027A9 * 16 + 128;
         len = 8;
@@ -512,7 +513,9 @@ void fn_0200D6E4(void)
             buf[i] = tile++ | attr;
             buf[i + 30] = tile++ | attr;
         }
-        map = fn_02000A40(win->unk5 - 1, win->unk10 + 2, win->unk12 + 2 + lbl_030027A9 * 2);
+        x = win->unk10 + 2;
+        y = win->unk12 + 2 + lbl_030027A9 * 2;
+        map = fn_02000A40(win->unk5 - 1, x, y);
         DmaCopy16(DMA3, buf, map, len * 2);
         DmaCopy16(DMA3, &buf[30], map + 32, len * 2);
         lbl_030027A9++;
@@ -793,17 +796,18 @@ void fn_0200DE80(void)
 {
     u16 buf[60];
     struct Window *win;
-    u32 n;
     s32 i;
     s32 len;
     s32 attr;
     s32 tile;
     u16 *map;
+    s32 x;
+    s32 y;
 
     if (lbl_030027A9 <= 3) {
         win = lbl_030030B0;
-        for (n = 0; n < 60; n++)
-            buf[n] = 0x3FF;
+        for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
+            buf[i] = 0x3FF;
         attr = 0x7000;
         len = 23;
         tile = lbl_030027A9 * 46 + 128;
@@ -811,7 +815,9 @@ void fn_0200DE80(void)
             buf[i] = tile++ | attr;
             buf[i + 30] = tile++ | attr;
         }
-        map = fn_02000A40(win->unk5 - 1, win->unk10 + 2, win->unk12 + 2 + lbl_030027A9 * 2);
+        x = win->unk10 + 2;
+        y = win->unk12 + 2 + lbl_030027A9 * 2;
+        map = fn_02000A40(win->unk5 - 1, x, y);
         DmaCopy16(DMA3, buf, map, len * 2);
         DmaCopy16(DMA3, &buf[30], map + 32, len * 2);
         lbl_030027A9++;

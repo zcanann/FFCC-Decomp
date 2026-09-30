@@ -136,7 +136,6 @@ s32 fn_0200BA90(void)
     s32 tile;
     s32 pal;
     u16 *p;
-    u32 n;
     u16 *map;
 
     if (lbl_030030AC == 0)
@@ -160,8 +159,8 @@ s32 fn_0200BA90(void)
         fn_02003464(fn_0201A6D4(row), 0);
         fn_020059D4(&tmp, row, 0);
         p = buf;
-        for (n = 0; n < 60; n++)
-            p[n] = 0x3FF;
+        for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
+            p[i] = 0x3FF;
         tile = tmp.unk14 * (row * 2) + 128;
         pal = 0x7000;
         for (i = 0; i < tmp.unk14; i++) {
@@ -344,7 +343,6 @@ s32 fn_0200C004(void)
     s32 i;
     s32 tile;
     s32 pal;
-    u32 k;
     u16 *map;
 
     fn_02003394(0, 0);
@@ -370,8 +368,8 @@ s32 fn_0200C004(void)
         fn_02003464(fn_0201A974(n + row), 0);
         line = half + 3;
         fn_020059D4(&tmp, line, 0);
-        for (k = 0; k < 60; k++)
-            buf[k] = 0x3FF;
+        for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
+            buf[i] = 0x3FF;
         tile = tmp.unk14 * (line * 2) + 128;
         pal = 0x7000;
         for (i = 0; i < tmp.unk14; i++) {
@@ -524,7 +522,6 @@ void fn_0200C490(void)
     struct Window tmp;
     u16 buf[60];
     s32 i;
-    u32 k;
     s32 tile;
     s32 pal;
     s32 digit;
@@ -551,8 +548,8 @@ void fn_0200C490(void)
     memcpy(&tmp, lbl_030030B0, sizeof(struct Window));
     tmp.unk5--;
     fn_020059D4(&tmp, 0, 0);
-    for (k = 0; k < 60; k++)
-        buf[k] = 0x3FF;
+    for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
+        buf[i] = 0x3FF;
     tile = 128;
     pal = 0x7000;
     for (i = 0; i < tmp.unk14; i++) {
@@ -833,7 +830,6 @@ void fn_0200CC5C(s32 idx)
 {
     u16 buf[60];
     struct Window *win = lbl_030030B0;
-    u32 k;
     s32 i;
     s32 n;
     s32 tile;
@@ -844,8 +840,8 @@ void fn_0200CC5C(s32 idx)
 
     if (idx >= win->unkE)
         return;
-    for (k = 0; k < 60; k++)
-        buf[k] = 0x3FF;
+    for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
+        buf[i] = 0x3FF;
     n = 2;
     tile = (idx + lbl_030027AB) * 4 + 128;
     pal = 0x7000;
@@ -854,7 +850,7 @@ void fn_0200CC5C(s32 idx)
         buf[i + 30] = tile++ | pal;
     }
     x = win->unk10 + 2;
-    y = win->unk12 + idx * 2 + 2;
+    y = win->unk12 + 2 + idx * 2;
     map = fn_02000A40(win->unk5 - 1, x, y);
     DmaSet(DMA3, buf, map, 0x80000000 | n);
     DmaSet(DMA3, &buf[30], map + 32, 0x80000000 | n);

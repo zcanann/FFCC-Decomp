@@ -922,6 +922,7 @@ void fn_02010A50(void)
             if (win->unk2 != 0) {
                 win->unk2--;
                 fn_02011170(win->unk2 + lbl_030027CC);
+                m4aSongNumStart(1);
             } else {
                 fn_02009A14(1, 1, win->unk5);
                 idx = (lbl_030027CC - 1) % n;
@@ -932,8 +933,8 @@ void fn_02010A50(void)
                 fn_02009AB8(1, win->unk5, idx % win->unkE, 0, pal);
                 lbl_030027CC--;
                 fn_02011170(win->unk2 + lbl_030027CC);
+                m4aSongNumStart(1);
             }
-            m4aSongNumStart(1);
         } else {
             if (win->unk2 != 0)
                 win->unk2--;
@@ -946,6 +947,7 @@ void fn_02010A50(void)
             if (win->unk2 < win->unkE - 1) {
                 win->unk2++;
                 fn_02011170(win->unk2 + lbl_030027CC);
+                m4aSongNumStart(1);
             } else {
                 fn_02009A14(0, 1, win->unk5);
                 idx = (lbl_030027CC + win->unkE) % n;
@@ -956,8 +958,8 @@ void fn_02010A50(void)
                 fn_02009AB8(1, win->unk5, idx % win->unkE, win->unkE - 1, pal);
                 lbl_030027CC++;
                 fn_02011170(win->unk2 + lbl_030027CC);
+                m4aSongNumStart(1);
             }
-            m4aSongNumStart(1);
         } else {
             if (win->unk2 < n - 1)
                 win->unk2++;

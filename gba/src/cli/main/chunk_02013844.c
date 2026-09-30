@@ -513,14 +513,16 @@ void fn_0201409C(s32 idx, s32 row)
 void fn_020140F4(char *buf, s32 type)
 {
     s32 *hdr = lbl_0203A800;
-    struct Entry *entries = lbl_0203A810;
-    char *names = (char *)(entries + hdr[0]) + hdr[1] * 24;
-    struct Entry *entry = &entries[lbl_030027E0];
-    s32 mode = lbl_03002C98 & 15;
+    struct Entry *entry = lbl_0203A810;
+    s32 n = hdr[1] * 24;
+    char *names = (char *)(entry + hdr[0]) + n;
+    s32 mode;
     char *p;
     char *nl;
     s32 len;
 
+    entry += lbl_030027E0;
+    mode = lbl_03002C98 & 15;
     if (type == 0) {
         p = names + entry->unk5 * 16;
         if (mode == 1) {
@@ -713,6 +715,9 @@ s32 fn_020145EC(void)
 {
     struct Window *win;
     s32 cur;
+    s32 lastCol = 4;
+    s32 cols = 5;
+    s32 last = 9;
 
     if (lbl_0300299C) {
         win = lbl_030030B0;
@@ -725,7 +730,7 @@ s32 fn_020145EC(void)
             m4aSongNumStart(1);
         } else if (lbl_0300299C & 0x80) {
             cur = win->unk2;
-            if (cur % 5 < 4)
+            if (cur % 5 < lastCol)
                 win->unk2++;
             else
                 win->unk2 -= 4;
@@ -733,7 +738,7 @@ s32 fn_020145EC(void)
         }
         if (lbl_0300299C & 0x30) {
             cur = win->unk2;
-            if (cur < 5)
+            if (cur < cols)
                 win->unk2 += 5;
             else
                 win->unk2 -= 5;
@@ -748,7 +753,7 @@ s32 fn_020145EC(void)
                 m4aSongNumStart(1);
             } else if (lbl_0300299C & 0x100) {
                 cur = win->unk2;
-                if (cur < 9)
+                if (cur < last)
                     win->unk2++;
                 else
                     win->unk2 = 0;

@@ -1734,11 +1734,9 @@ void CMapMng::Calc()
         mapObj->CalcMtx(identity, 0);
     }
 
-    int& mapLightId = m_mapAnimFrame;
-    mapLightId += 1;
-    int v = (mapLightId += 1);
-    if ((static_cast<unsigned char>((static_cast<long long>(v) + 0xFFFFFFFEu) >> 32) ^ 0x1E) != 0) {
-        mapLightId = 0x1C;
+    m_mapAnimFrame++;
+    if (++m_mapAnimFrame >= 2 ^ 30) {
+        m_mapAnimFrame = 2 ^ 30;
     }
 
     SetLightSource();

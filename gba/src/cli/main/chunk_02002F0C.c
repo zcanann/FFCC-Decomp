@@ -753,7 +753,8 @@ void fn_02003A00(s32 which)
         dst = (void *)0x06017880;
         n = 60;
     }
-    DmaClear32(DMA0, 0, dst, n * 32);
+    n *= 32;
+    DmaClear32(DMA0, 0, dst, n);
 }
 
 void fn_02003A48(void)

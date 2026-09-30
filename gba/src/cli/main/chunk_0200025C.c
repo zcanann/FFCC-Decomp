@@ -122,6 +122,7 @@ extern u32 lbl_03003094;
 extern u32 lbl_030032E8;
 extern u8 lbl_030032F8;
 extern u8 lbl_030032FC[];
+extern const char lbl_0201CCE8[10] __attribute__((aligned(4)));
 extern const u8 lbl_0201CCCC[];
 extern const s8 lbl_0201CCD8[];
 extern const char lbl_0201CCF4[];
@@ -367,10 +368,15 @@ void fn_02000690(void)
     lbl_03002990 = lbl_030029B4 & ~keys;
     lbl_030029B0 ^= pressed;
     lbl_0300299C = pressed;
-    if (lbl_030029B4 != keys || lbl_030029B4 == 0) {
+    if (lbl_030029B4 != lbl_030029A8 || lbl_030029B4 == 0) {
         lbl_03000000 = 0;
-    } else if (++lbl_03000000 >= 20 && (s32)(lbl_03000000 - 20) % 5 == 0) {
-        lbl_0300299C = pressed | (keys & 0x3F0);
+    } else {
+        s32 t;
+
+        lbl_03000000++;
+        t = lbl_03000000 - 20;
+        if (lbl_03000000 >= 20 && t % 5 == 0)
+            lbl_0300299C = pressed | (keys & 0x3F0);
     }
     if (fn_02002594()) {
         fn_020025A0(keys);
@@ -693,7 +699,7 @@ void fn_02000E34(s32 show)
     if (show && lbl_03002AE8) {
         memset(buf, 0, sizeof(buf));
         if (xfer->type == 1) {
-            strcpy(buf, "MAP LOAD ");
+            memcpy(buf, lbl_0201CCE8, sizeof(lbl_0201CCE8));
             percent = (xfer->cur - (u8 *)0x02038000) * 100 / xfer->total;
             if (percent > 99) {
                 fn_02000A74();

@@ -96,6 +96,7 @@ extern s8 lbl_03002AF0;
 extern u8 lbl_03000018[];
 extern struct Unk03000030 lbl_03000030;
 extern struct BgHeader lbl_02038000;
+extern u8 lbl_02038008[];
 extern u8 lbl_02038020[];
 extern struct BgHeader *lbl_03000054;
 extern struct MapInfo *lbl_03000058;
@@ -108,7 +109,6 @@ extern u16 lbl_0300006E;
 extern struct LinkWork lbl_03000070;
 extern u16 lbl_0201CD10[];
 extern u32 lbl_0201CF10;
-extern u8 _start[];
 extern u32 lbl_0300008C;
 extern s32 lbl_03000190;
 extern u32 lbl_03000090[];
@@ -283,12 +283,12 @@ void fn_02001828(void)
     struct MapInfo *info;
 
     if (lbl_03002AEC & 2) {
-        LZ77UnCompVram(lbl_02038020, (void *)0x06008000);
-        hdr = &lbl_02038000;
-        lbl_03000054 = hdr;
+        info = (struct MapInfo *)lbl_02038020;
+        LZ77UnCompVram(info, (void *)0x06008000);
+        lbl_03000054 = hdr = &lbl_02038000;
         info = (struct MapInfo *)((u8 *)hdr + hdr->mapOffset);
         lbl_03000058 = info;
-        lbl_0300005C = info->rowLen;
+        lbl_0300005C = lbl_02038008 + hdr->mapOffset;
         lbl_03000060 = (u16 *)((u8 *)info + info->dataOffset);
         tmp = 0x1000;
         DmaSet(REG_DMA0, &tmp, (void *)0x0600F000, 0x81000400);
@@ -632,12 +632,12 @@ void fn_02002218(void)
     lbl_03000070.unk4 = 0xFF;
     fn_020022BC();
     REG_IE |= 0x80;
-    if (*(_start + 0xC4) != 0) {
-        lbl_03000070.unk10 = lbl_03000070.unk8 = *(u32 *)(_start + 0xAC);
-        lbl_03000070.unk14 = *(_start + 0xC4);
-        lbl_03000070.unk15 = *(_start + 0xC5);
+    if (*(u8 *)0x020000C4 != 0) {
+        lbl_03000070.unk10 = lbl_03000070.unk8 = *(u32 *)0x020000AC;
+        lbl_03000070.unk14 = *(u8 *)0x020000C4;
+        lbl_03000070.unk15 = *(u8 *)0x020000C5;
         lbl_03000070.unk16 = 1;
-        lbl_03000070.unk18 = *(u32 *)(_start + 0xC8);
+        lbl_03000070.unk18 = *(u32 *)0x020000C8;
     } else {
         lbl_03000070.unk8 = *(u32 *)0x080000AC;
         lbl_03000070.unk10 = lbl_0201CF10;

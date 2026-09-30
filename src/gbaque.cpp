@@ -3329,8 +3329,7 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	memcpy(outData, equipIndices, indexBytes - 1);
 
 	dataSize = indexBytes + 4;
-	outData += indexBytes;
-	outData -= 1;
+	outData += indexBytes - 1;
 	indexPtr = equipIndices;
 	for (i = 0; i < equipCount; i++) {
 		int itemId = localPlayerData.m_items[*indexPtr];

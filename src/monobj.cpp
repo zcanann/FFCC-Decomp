@@ -565,10 +565,12 @@ void CGMonObj::setRepop(int mode)
 		}
 	}
 
-	if (classId == 0x55) {
+	switch (classId) {
+	case 0x55:
 		m_chaseState = 4;
 		m_chaseTimer = 0;
 		m_chaseDirty = 1;
+		break;
 	}
 
 	unsigned short countA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A8);
@@ -588,7 +590,8 @@ void CGMonObj::setRepop(int mode)
 		}
 
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), m_particleSlots[16], object, kMonObjDefaultScale, 0);
+		int particleId = i + particleBase + 0x50;
+		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(particleId | (dataNo << 8), m_particleSlots[16], object, kMonObjDefaultScale, 0);
 	}
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);

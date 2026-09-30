@@ -120,7 +120,6 @@ extern u8 lbl_03002C98;
 extern struct Work lbl_03002CA0;
 extern s8 lbl_03003098;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
 extern s8 lbl_030032E0;
 
 char *strcpy(char *, const char *);
@@ -187,9 +186,10 @@ void fn_0201A568(void)
 void fn_0201A5EC(void)
 {
     s32 i;
-    s32 x = (lbl_03003120.unk10 + 1) * 8;
-    s32 y = (lbl_03003120.unk12 + 1) * 8;
-    s32 n = lbl_03003120.unkE;
+    struct Window *win = &lbl_030030B0[1];
+    s32 x = (win->unk10 + 1) * 8;
+    s32 y = (win->unk12 + 1) * 8;
+    s32 n = win->unkE;
 
     for (i = 0; i < n; i++, y += 16) {
         s16 v = lbl_03002CA0.unk120[i];
@@ -212,7 +212,7 @@ void fn_0201A664(s32 idx, s32 row)
     else
         str = fn_0201A73C(0);
     fn_02003464(str, 0);
-    fn_020037A8(fn_02009340(&lbl_03003120, row, 0), lbl_03003120.unk14);
+    fn_020037A8(fn_02009340(&lbl_030030B0[1], row, 0), lbl_030030B0[1].unk14);
 }
 
 void fn_0201A6C8(s32 row)

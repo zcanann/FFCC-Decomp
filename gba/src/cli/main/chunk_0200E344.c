@@ -92,8 +92,6 @@ extern s8 lbl_03003098;
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
-extern struct Window lbl_03003190;
 extern u8 lbl_030032E0;
 extern s32 lbl_030032EC;
 extern const u8 lbl_0201CF38[];
@@ -288,7 +286,7 @@ s32 fn_0200E5E0(void)
     } else {
         win->unk1 += 8;
     }
-    win = &lbl_03003190;
+    win = &lbl_030030B0[2];
     row = win->unk1 >> 3;
     y = win->unk12 + (win->unkE - row - 1) * 2;
     fn_020098F0(win->unk5 - 1, win->unk10, y, win->unk14, 2);
@@ -308,14 +306,14 @@ void fn_0200E67C(void)
     if (lbl_03002ACC) {
         pal = fn_02004030(0, 45);
         if (!lbl_030032EC || (lbl_03002AC8 & 2)) {
-            win = &lbl_03003190;
+            win = &lbl_030030B0[2];
             x = (win->unk10 - 1) * 8;
             y = win->unk12 * 8;
             y += win->unk2 * 16;
             fn_02003C3C(x, y, 0, 45, pal, win->unk5, 0);
         }
         if (lbl_030032EC && lbl_030030A4 == 1) {
-            win = &lbl_03003120;
+            win = &lbl_030030B0[1];
             x = (win->unk10 - 1) * 8;
             y = (win->unk12 + 1) * 8;
             y += win->unk2 * 16;
@@ -336,12 +334,12 @@ void fn_0200E734(void)
         return;
     if (lbl_030032EC) {
         min = 0;
-        win = &lbl_03003120;
+        win = &lbl_030030B0[1];
         n = win->unkE;
     } else {
         min = 2;
         n = lbl_03002CA0.unk5D;
-        win = &lbl_03003190;
+        win = &lbl_030030B0[2];
     }
     if (lbl_0300299C & 0x40) {
         if (win->unk2 > min) {
@@ -441,7 +439,7 @@ void fn_0200E734(void)
 
 s32 fn_0200EA90(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 row;
     s32 idx;
     s32 ret;
@@ -477,7 +475,7 @@ s32 fn_0200EA90(void)
 s32 fn_0200EB44(void)
 {
     s32 ret = 0;
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
 
     fn_02003394(1, 0);
     fn_02008178(win);
@@ -556,7 +554,7 @@ end:
 
 void fn_0200ED08(s32 idx, s32 row)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     const char *str;
     s32 id;
 
@@ -609,7 +607,7 @@ void fn_0200EE24(s32 slot, s32 idx)
 
 void fn_0200EE88(void)
 {
-    struct Window *win = &lbl_03003190;
+    struct Window *win = &lbl_030030B0[2];
     s32 x;
     s32 i;
     s32 id;
@@ -627,7 +625,7 @@ void fn_0200EE88(void)
         }
     }
     if (lbl_030032EC && lbl_030030A4 == 1) {
-        win = &lbl_03003120;
+        win = &lbl_030030B0[1];
         id = (lbl_03002C98 & 15) == 1 ? 24 : 4;
         pal = fn_02004030(2, id);
         x = win->unk10 * 8 + 6;
@@ -651,7 +649,7 @@ void fn_0200EE88(void)
 
 void fn_0200F010(s32 row)
 {
-    struct Window *win = &lbl_03003190;
+    struct Window *win = &lbl_030030B0[2];
 
     fn_02003394(0, 0);
     fn_020033F4();
@@ -774,7 +772,7 @@ void fn_0200F0CC(void)
 
 void fn_0200F348(void)
 {
-    struct Window *win = &lbl_03003190;
+    struct Window *win = &lbl_030030B0[2];
     s32 row;
     s32 y;
 

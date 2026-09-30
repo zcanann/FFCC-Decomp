@@ -85,8 +85,6 @@ extern s8 lbl_03003098;
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
-extern struct Window lbl_03003270;
 extern s8 lbl_030032E0;
 extern s32 lbl_030032E8;
 extern s8 lbl_030032F8;
@@ -138,7 +136,7 @@ void fn_0200A57C(void);
 
 void fn_020091D4(void)
 {
-    struct Window *win = &lbl_03003270;
+    struct Window *win = &lbl_030030B0[4];
     s32 max;
     s32 n;
     s32 i;
@@ -180,7 +178,7 @@ void fn_020091D4(void)
 s32 fn_02009280(void)
 {
     s32 ret = 0;
-    struct Window *win = &lbl_03003270;
+    struct Window *win = &lbl_030030B0[4];
 
     fn_02003394(1, 1);
     fn_020033F4();
@@ -211,7 +209,7 @@ s32 fn_020092C4(void)
 s32 fn_020092E8(void)
 {
     s32 ret = 0;
-    struct Window *win = &lbl_03003270;
+    struct Window *win = &lbl_030030B0[4];
 
     fn_02008178(win);
     if ((win->unk1 >> 3) < win->unk16) {
@@ -847,7 +845,7 @@ s32 fn_0200A0E0(void)
             return 0;
     }
     fn_02009414(0);
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     fn_02005968(win);
     fn_02005A50(win);
     ret = 0;
@@ -896,7 +894,7 @@ s32 fn_0200A144(void)
     }
     fn_02003394(1, 0);
     fn_020033F4();
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     if (lbl_03002776 < win->unkE) {
         fn_0200A700(lbl_03002776, lbl_03002776);
         fn_02009AB8(1, win->unk5, lbl_03002776, lbl_03002776, fn_0200A758(lbl_03002776) ? 5 : 6);
@@ -941,7 +939,7 @@ s32 fn_0200A2C4(void)
 void fn_0200A328(void)
 {
     s32 cell = fn_02004030(0, 45);
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
 
     fn_02003C3C((win->unk10 - 1) * 8, (win->unk12 + 1) * 8 + win->unk2 * 16, 0, 45, cell, win->unk5, 0);
 }
@@ -956,7 +954,7 @@ void fn_0200A370(void)
 
     if (lbl_0300299C == 0)
         return;
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     prev = lbl_03002774 + win->unk2;
     if (lbl_0300299C & 0x40) {
         if (win->unk2 != 0) {
@@ -1011,7 +1009,7 @@ void fn_0200A370(void)
 
 void fn_0200A57C(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 x = (win->unk10 + 2) * 8;
     s32 y = (win->unk12 + 1) * 8;
     s32 n = win->unkE;

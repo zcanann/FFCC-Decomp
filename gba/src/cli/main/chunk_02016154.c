@@ -104,8 +104,6 @@ extern s8 lbl_030030A0;
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
-extern struct Window lbl_03003190;
 extern s32 lbl_030032EC;
 extern struct IdList lbl_0203A800;
 extern s16 lbl_0203A804[];
@@ -239,7 +237,7 @@ s32 fn_020162F0(void)
     fn_02003394(1, 0);
     if (lbl_030030AC == 0)
         fn_02016154();
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     fn_02003394(1, 0);
     fn_020033F4();
     fn_02005968(win);
@@ -265,7 +263,7 @@ s32 fn_0201634C(void)
         }
         return 0;
     }
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     list = &lbl_0203A800;
     if (lbl_03002816 < list->count && lbl_03002816 < win->unkE) {
         fn_02016E88(lbl_03002816, lbl_03002816);
@@ -326,7 +324,7 @@ s32 fn_020164F8(void)
 
     fn_02003394(1, 0);
     fn_020033F4();
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     fn_02008178(win);
     fn_02017360();
     if ((win->unk1 >> 3) >= win->unk16 - 2) {
@@ -540,7 +538,7 @@ s32 fn_02016B28(void)
         }
         return 0;
     }
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     if (lbl_03002816 < win->unkE) {
         id = lbl_03002CA0.unk64[lbl_03002816];
         fn_02003394(1, 0);
@@ -623,7 +621,7 @@ void fn_02016D0C(void)
         list = 0;
         ids = 0;
     }
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     x = (win->unk10 + 1) * 8;
     y = (win->unk12 + 1) * 8;
     for (i = 0; i < win->unkE; i++, y += 16) {
@@ -658,6 +656,7 @@ void fn_02016D0C(void)
 void fn_02016E88(s32 idx, s32 slot)
 {
     s16 *id;
+    struct Window *win;
 
     fn_02003394(1, 0);
     fn_020033F4();
@@ -665,7 +664,8 @@ void fn_02016E88(s32 idx, s32 slot)
     id = &lbl_0203A804[idx];
     if (*id > 0)
         fn_02003464(fn_0201AAAC(*id), 0);
-    fn_020037A8(0x0600AB80 + 2 * 32 * lbl_03003120.unk14 * slot, lbl_03003120.unk14);
+    win = &lbl_030030B0[1];
+    fn_020037A8(0x0600AB80 + 2 * 32 * win->unk14 * slot, win->unk14);
 }
 
 void fn_02016EDC(s32 idx, s32 row, s32 flag)
@@ -680,17 +680,18 @@ void fn_02016EDC(s32 idx, s32 row, s32 flag)
     s32 bg;
     s32 py;
     u16 *map;
+    struct Window *win = &lbl_030030B0[1];
 
     attr = 6;
     if (flag)
         attr = 5;
     attr <<= 12;
-    y = lbl_03003120.unk12 + (row * 2 + 1);
-    w = lbl_03003120.unk14 - 2;
+    y = win->unk12 + (row * 2 + 1);
+    w = win->unk14 - 2;
     for (j = 0; j < 2; j++) {
-        t = lbl_03003120.unk14 * 2;
+        t = win->unk14 * 2;
         t = t * idx + 0x15C + j;
-        bg = lbl_03003120.unk5;
+        bg = win->unk5;
         py = y + j;
         for (i = 0; i < w; i++) {
             if (!(i & 1)) {
@@ -700,14 +701,14 @@ void fn_02016EDC(s32 idx, s32 row, s32 flag)
                 t += 4;
             }
         }
-        map = fn_02000A40(bg, lbl_03003120.unk10 + 1, py);
+        map = fn_02000A40(bg, win->unk10 + 1, py);
         DmaSet(DMA3, buf, map, 0x80000000 | w);
     }
 }
 
 void fn_02016FB0(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 i;
     s32 idx;
 
@@ -752,7 +753,7 @@ s32 fn_02017058(s32 idx)
 
 void fn_02017088(s32 dir)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 from;
     s32 to;
     s32 step;
@@ -783,7 +784,7 @@ void fn_02017088(s32 dir)
 
 s32 fn_0201710C(void)
 {
-    struct Window *win = &lbl_03003190;
+    struct Window *win = &lbl_030030B0[2];
     s32 row;
     s32 ret;
 
@@ -809,7 +810,7 @@ s32 fn_0201710C(void)
 s32 fn_02017180(void)
 {
     s32 ret = 0;
-    struct Window *win = &lbl_03003190;
+    struct Window *win = &lbl_030030B0[2];
 
     fn_02003394(0, 0);
     fn_02008178(win);

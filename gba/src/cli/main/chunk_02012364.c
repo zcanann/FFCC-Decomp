@@ -75,7 +75,6 @@ extern u8 lbl_03002C98;
 extern s8 lbl_03003098;
 extern u8 lbl_030032E0;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
 extern struct EntryList lbl_0203A800;
 extern struct Entry lbl_0203A810[];
 extern char lbl_0203D800[];
@@ -197,7 +196,7 @@ s32 fn_0201250C(void)
 
 s32 fn_02012558(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 w;
     s32 i;
     s32 ret;
@@ -257,7 +256,7 @@ s32 fn_02012670(void)
 
 s32 fn_020126A0(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 ret;
 
     fn_02008178(win);
@@ -276,7 +275,7 @@ s32 fn_020126D8(void)
 {
     char buf[256];
     s32 mode = lbl_03002C98 & 15;
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     struct Entry *entry;
     s32 w;
     s32 i;
@@ -356,7 +355,7 @@ s32 fn_020128D0(void)
     struct Window *win;
 
     if (lbl_03002ACC) {
-        win = &lbl_03003120;
+        win = &lbl_030030B0[1];
         if (lbl_0300299C && lbl_030027E5 == 0) {
             if (lbl_0300299C & 0x40) {
                 if (win->unk2 > 1)
@@ -417,7 +416,7 @@ s32 fn_020128D0(void)
 
 s32 fn_02012ABC(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 ret;
 
     fn_02008178(win);
@@ -434,7 +433,7 @@ s32 fn_02012ABC(void)
 s32 fn_02012AF0(void)
 {
     char buf[256];
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     struct Entry *entry;
     char *str;
     s32 w;
@@ -533,7 +532,7 @@ s32 fn_02012D18(void)
 
 s32 fn_02012D5C(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 ret;
 
     fn_02008178(win);
@@ -550,7 +549,7 @@ s32 fn_02012D5C(void)
 s32 fn_02012D90(void)
 {
     char buf[256];
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     char *str;
     char *nl;
     s32 w;
@@ -659,7 +658,7 @@ s32 fn_02012D90(void)
 
 s32 fn_0201304C(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 ret = 0;
 
     if (lbl_03002ACC) {
@@ -703,7 +702,7 @@ s32 fn_0201304C(void)
 
 s32 fn_0201316C(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 ret;
 
     fn_02008178(win);
@@ -719,7 +718,7 @@ s32 fn_0201316C(void)
 
 s32 fn_020131A0(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 w;
     s32 w2;
     s32 i;
@@ -776,7 +775,7 @@ s32 fn_020131A0(void)
 
 s32 fn_020132C8(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 ret = 0;
 
     if (lbl_03002ACC) {
@@ -818,7 +817,7 @@ s32 fn_020132C8(void)
 
 s32 fn_020133DC(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 ret;
 
     fn_02008178(win);

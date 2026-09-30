@@ -80,7 +80,6 @@ extern struct Unk03002FB0 lbl_03002FB0;
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
 extern s32 lbl_030032EC;
 extern s32 lbl_030032F4;
 
@@ -153,7 +152,7 @@ s32 fn_0200B8C8(void);
 
 void fn_0200A63C(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 i;
     s32 n;
     s32 word;
@@ -184,7 +183,7 @@ void fn_0200A700(s32 idx, s32 row)
     else
         str = fn_0201A73C(41);
     fn_02003464(str, 0);
-    fn_020037A8(fn_02009340(&lbl_03003120, row, 0), lbl_03003120.unk14);
+    fn_020037A8(fn_02009340(&lbl_030030B0[1], row, 0), lbl_030030B0[1].unk14);
 }
 
 s32 fn_0200A758(s32 idx)
@@ -207,7 +206,7 @@ void fn_0200A790(void)
 
     fn_02003394(0, 0);
     fn_020033F4();
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     n = lbl_03002774 + win->unk2;
     if (fn_0200A758(n)) {
         fn_0201AB88(n + 159, buf);
@@ -309,7 +308,7 @@ void fn_0200A7EC(void)
     fn_02003394(0, 0);
     fn_020033F4();
 
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     x = win->unk5;
     win->unk5 = 0;
     for (i = 2; i >= 0; i--)
@@ -434,7 +433,7 @@ s32 fn_0200ACC4(void)
         }
     }
     if (ret == 0) {
-        win = &lbl_03003120;
+        win = &lbl_030030B0[1];
         fn_02008178(win);
         if ((win->unk1 >> 3) < win->unk16 - 1)
             win->unk1 += 8;

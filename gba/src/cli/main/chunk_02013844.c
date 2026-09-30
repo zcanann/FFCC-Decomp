@@ -106,7 +106,6 @@ extern s8 lbl_03003098;
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
 extern s8 lbl_030032E0;
 extern s32 lbl_030032F4;
 extern s32 lbl_0203A800[];
@@ -363,7 +362,7 @@ void fn_02013C04(s32 ok, u32 value, s32 idx)
 
 void fn_02013C54(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 x = (win->unk10 + 1) * 8;
     s32 y = (win->unk12 + 1) * 8;
     s32 i;
@@ -398,7 +397,7 @@ s32 fn_02013D70(void)
     s32 count = 64;
 
     if (lbl_0300299C) {
-        win = &lbl_03003120;
+        win = &lbl_030030B0[1];
         if (lbl_0300299C & 0x40) {
             if (win->unk2) {
                 win->unk2--;
@@ -493,7 +492,7 @@ s32 fn_02014060(s32 idx)
 
 void fn_0201409C(s32 idx, s32 row)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 v;
     char *str;
 

@@ -119,7 +119,6 @@ extern s32 lbl_03003090;
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
 extern s32 lbl_030032EC;
 
 void *memcpy(void *, const void *, u32);
@@ -360,7 +359,7 @@ void fn_02017CE0(void)
 
 void fn_02017DF0(s32 idx, s32 row)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 id;
     char *str;
 
@@ -379,7 +378,7 @@ void fn_02017DF0(s32 idx, s32 row)
 
 void fn_02017E48(s32 idx)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 id;
     char *str;
 

@@ -133,7 +133,6 @@ extern s8 lbl_0300309C;
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
 extern s8 lbl_030032E0;
 extern u16 lbl_030032E4;
 extern s32 lbl_030032EC;
@@ -499,7 +498,7 @@ void fn_02015438(void)
         y = (win->unk12 + win->unk16 - 2) * 8;
         fn_02003C3C(x, y, 2, 5, fn_02004030(2, 5), win->unk5, 0);
     } else if (lbl_030030A4 == 1) {
-        win = &lbl_03003120;
+        win = &lbl_030030B0[1];
         x = win->unk10 * 8 - 8;
         y = (win->unk12 + 1) * 8;
         y += win->unk2 * 16;
@@ -584,7 +583,7 @@ void fn_020154E0(void)
             }
         }
     } else {
-        struct Window *win = &lbl_03003120;
+        struct Window *win = &lbl_030030B0[1];
 
         if (lbl_0300299C & 0xC0) {
             win->unk2 ^= 1;
@@ -613,7 +612,7 @@ void fn_020154E0(void)
 
 s32 fn_02015788(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 row;
     s32 ret;
 
@@ -639,7 +638,7 @@ s32 fn_02015788(void)
 s32 fn_020157FC(void)
 {
     s32 ret = 0;
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
 
     fn_02003394(0, 0);
     fn_02008178(win);
@@ -698,7 +697,7 @@ s32 fn_02015960(void)
             return 0;
     }
     fn_02009414(0);
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     fn_02003394(0, 0);
     fn_020033F4();
     win->unk5--;
@@ -721,7 +720,7 @@ s32 fn_020159E4(void)
     struct Window *win;
 
     fn_020095AC(0);
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     if (lbl_0300280D == 0) {
         if (lbl_030029AC & 0x300) {
             if (lbl_030029AC & 0x100)
@@ -810,7 +809,7 @@ s32 fn_02015B78(void)
 
 void fn_02015BE4(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     struct ItemInfo *item;
     char buf[68];
     s32 idx;
@@ -896,7 +895,7 @@ void fn_02015BE4(void)
 
 void fn_02015DF4(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 i;
 
     fn_02003394(0, 0);

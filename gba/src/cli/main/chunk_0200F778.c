@@ -94,8 +94,6 @@ extern s8 lbl_03003098;
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
-extern struct Window lbl_03003190;
 extern u8 lbl_030032E0;
 extern s32 lbl_030032EC;
 extern u8 lbl_0203D800[];
@@ -225,7 +223,7 @@ s32 fn_0200F8E4(void)
     if (lbl_030030AC == 0)
         fn_0200F778();
     ret = fn_02009414(0);
-    win = &lbl_03003190;
+    win = &lbl_030030B0[2];
     fn_02003394(1, 0);
     fn_020033F4();
     fn_02005968(win);
@@ -245,7 +243,7 @@ s32 fn_0200F950(void)
     s32 ret;
 
     fn_020095AC(0);
-    win = &lbl_03003190;
+    win = &lbl_030030B0[2];
     fn_0200714C(win);
     if (!(lbl_03002AEC & 0x10) && (lbl_030029AC & 2)) {
         lbl_030027C4 = 1;
@@ -324,14 +322,14 @@ void fn_0200FB60(void)
     s32 pal = fn_02004030(0, 45);
 
     if (!lbl_030032EC || (lbl_03002AC8 & 2)) {
-        win = &lbl_03003190;
+        win = &lbl_030030B0[2];
         x = (win->unk10 - 1) * 8;
         y = (win->unk12 + 2) * 8;
         y += win->unk2 * 16;
         fn_02003C3C(x, y, 0, 45, pal, win->unk5, 0);
     }
     if (lbl_030032EC == 1 && lbl_030030A4 == 1) {
-        win = &lbl_03003120;
+        win = &lbl_030030B0[1];
         x = (win->unk10 - 1) * 8;
         y = (win->unk12 + 1) * 8;
         y += win->unk2 * 16;
@@ -352,10 +350,10 @@ void fn_0200FC10(void)
         return;
     list = lbl_0203D800;
     if (lbl_030032EC == 0) {
-        win = &lbl_03003190;
+        win = &lbl_030030B0[2];
         n = win->unkE;
     } else {
-        win = &lbl_03003120;
+        win = &lbl_030030B0[1];
         n = list[0];
         n++;
     }
@@ -461,7 +459,7 @@ void fn_0200FC10(void)
 
 void fn_0200FF54(s32 row)
 {
-    struct Window *win = &lbl_03003190;
+    struct Window *win = &lbl_030030B0[2];
 
     fn_02003394(1, 0);
     fn_020033F4();
@@ -473,7 +471,7 @@ void fn_0200FF54(s32 row)
 
 void fn_0200FFB0(void)
 {
-    struct Window *win = &lbl_03003190;
+    struct Window *win = &lbl_030030B0[2];
     s32 x;
     s32 y;
     s32 i;
@@ -496,7 +494,7 @@ void fn_0200FFB0(void)
         }
     }
     if (lbl_030032EC == 1 && lbl_030030A4 == 1) {
-        win = &lbl_03003120;
+        win = &lbl_030030B0[1];
         x = (win->unk10 + 2) * 8;
         y = (win->unk12 + 1) * 8;
         list = (s8 *)lbl_0203D800;
@@ -537,7 +535,7 @@ void fn_0200FFB0(void)
 
 s32 fn_020101EC(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 row;
     s32 ret;
 
@@ -564,7 +562,7 @@ s32 fn_020101EC(void)
 s32 fn_0201027C(void)
 {
     s32 ret = 0;
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
 
     fn_02008178(win);
     if ((win->unk1 >> 3) >= win->unk16 - 1) {
@@ -579,7 +577,7 @@ s32 fn_0201027C(void)
 void fn_020102B0(s32 idx, s32 row)
 {
     s32 n = lbl_0203D800[0] + 1;
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     const char *str;
     s32 id;
 
@@ -798,7 +796,7 @@ s32 fn_02010770(void)
             return 0;
     }
     fn_02009414(0);
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     fn_02005968(win);
     fn_02005A50(win);
     ret = 0;
@@ -820,7 +818,7 @@ s32 fn_020107F0(void)
     fn_020095AC(0);
     fn_02003394(1, 0);
     fn_020033F4();
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     if (lbl_030027D1 < win->unkE) {
         fn_0201111C(lbl_030027D1, lbl_030027D1);
         pal = fn_02004D3C(lbl_030027D1) ? 6 : 5;
@@ -888,14 +886,14 @@ void fn_020109A0(void)
     s32 pal = fn_02004030(0, 45);
 
     if (!lbl_030032EC || (lbl_03002AC8 & 2)) {
-        win = &lbl_03003120;
+        win = &lbl_030030B0[1];
         x = (win->unk10 - 1) * 8;
         y = (win->unk12 + 1) * 8;
         y += win->unk2 * 16;
         fn_02003C3C(x, y, 0, 45, pal, win->unk5, 0);
     }
     if (lbl_030032EC && lbl_030030A4 == 1) {
-        win = &lbl_03003190;
+        win = &lbl_030030B0[2];
         x = (win->unk10 - 1) * 8;
         y = (win->unk12 + 1) * 8;
         y += win->unk2 * 16;
@@ -913,7 +911,7 @@ void fn_02010A50(void)
 
     if (lbl_0300299C == 0)
         return;
-    win = &lbl_03003120 + lbl_030032EC;
+    win = &lbl_030030B0[1] + lbl_030032EC;
     n = 64;
     if (lbl_030032EC)
         n = win->unkE;

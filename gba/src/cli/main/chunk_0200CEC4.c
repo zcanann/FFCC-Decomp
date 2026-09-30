@@ -83,7 +83,6 @@ extern struct Unk03002FB0 lbl_03002FB0;
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
 extern s32 lbl_030032EC;
 extern const char lbl_0201D040[];
 
@@ -638,7 +637,7 @@ void fn_0200D934(void)
 
     fn_02003394(0, 0);
     fn_020033F4();
-    win = &lbl_03003120;
+    win = &lbl_030030B0[1];
     save = win->unk5;
     win->unk5 = 0;
     for (i = 2; i >= 0; i--)
@@ -690,7 +689,7 @@ s32 fn_0200DABC(void)
 
 s32 fn_0200DB98(void)
 {
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     s32 ret;
     s32 i;
     s32 x;

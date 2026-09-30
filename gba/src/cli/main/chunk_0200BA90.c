@@ -72,7 +72,6 @@ extern u8 lbl_03002FC4[12];
 extern s32 lbl_030030A4;
 extern s32 lbl_030030AC;
 extern struct Window lbl_030030B0[];
-extern struct Window lbl_03003120;
 extern s32 lbl_030032EC;
 extern s32 lbl_030032F4;
 extern const s8 lbl_0201D02D[];
@@ -334,7 +333,7 @@ s32 fn_0200C004(void)
     struct Window tmp;
     u16 buf[60];
     s32 ret = 0;
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
     struct Window *prev;
     s32 row;
     s32 half;
@@ -392,7 +391,7 @@ s32 fn_0200C004(void)
 s32 fn_0200C1A4(void)
 {
     s32 ret = 0;
-    struct Window *win = &lbl_03003120;
+    struct Window *win = &lbl_030030B0[1];
 
     fn_02003394(1, 0);
     fn_02008178(win);

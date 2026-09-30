@@ -16,7 +16,7 @@ extern struct Work lbl_03000000;
 
 void fn_02007148();
 void fn_0200720C(void *);
-void fn_020091C4(void);
+void VBlankIntrWait(void);
 
 void fn_020001A0(s32 arg0, s32 arg1)
 {
@@ -31,6 +31,6 @@ void fn_020001A0(s32 arg0, s32 arg1)
     for (i = 0;; i++) {
         fn_02007148(lbl_0202BB94, 0, 8, lbl_0200ECEC, i % 10);
         fn_0200720C(lbl_0202BB94);
-        fn_020091C4();
+        VBlankIntrWait();
     }
 }

@@ -3391,9 +3391,11 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 
 	for (int i = 0; i < 8; i++) {
 		if (this->m_bonusState->m_phase == 4) {
-			float gray = 255.0f * (((((int)(signed char)s_Rinfo->m_selectedArtifactMask |
-			    (int)(signed char)s_Rinfo->m_missingArtifactMask) |
-			    s_Rinfo->m_party[partyIndex].m_ownedArtifactMask) & (1 << i)) != 0 ? 0.7f : 1.0f);
+			float gray = 255.0f;
+			int mask = (signed char)s_Rinfo->m_selectedArtifactMask;
+			mask |= (signed char)s_Rinfo->m_missingArtifactMask;
+			mask |= s_Rinfo->m_party[partyIndex].m_ownedArtifactMask;
+			gray *= (mask & (1 << i)) != 0 ? 0.7f : 1.0f;
 			color.r = (unsigned char)gray;
 			color.g = (unsigned char)gray;
 			color.b = (unsigned char)gray;

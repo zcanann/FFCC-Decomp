@@ -483,23 +483,15 @@ inline void _drawShadowFont(CFont* font, char* text, float x, float y, int tlut,
  * JP Address: TODO
  * JP Size: TODO
  */
-inline unsigned short getButtonRepeat(int padIndex, unsigned short noRepeatMask)
+inline unsigned short getButtonRepeat(int padIndex, unsigned short buttonMask)
 {
-    unsigned short buttons;
-
     if (gShopMenuInputLatch == 0) {
-        buttons = Pad.GetButtonRepeat(padIndex);
-    } else {
-        if ((Pad.GetButton(padIndex) & gShopMenuInputLatch) == 0) {
-            gShopMenuInputLatch = 0;
-        }
-        buttons = Pad.GetButtonDown(padIndex);
+        return Pad.GetButtonRepeat(padIndex) & buttonMask;
     }
-
-    if ((buttons & noRepeatMask) != 0) {
-        gShopMenuInputLatch = noRepeatMask;
+    if ((Pad.GetButton(padIndex) & gShopMenuInputLatch) == 0) {
+        gShopMenuInputLatch = 0;
     }
-    return buttons;
+    return Pad.GetButtonDown(padIndex) & buttonMask;
 }
 
 /*
@@ -2378,7 +2370,7 @@ void CShopMenu::SelectFigure()
         m_subMode = 2;
     }
 
-    if ((getButtonRepeat(0, 0) & 8) != 0) {
+    if (getButtonRepeat(0, 8) != 0) {
         switch (m_figureMode) {
         case 0: {
             ++m_quantity;
@@ -2415,7 +2407,7 @@ void CShopMenu::SelectFigure()
         return;
     }
 
-    if ((getButtonRepeat(0, 0) & 4) == 0) {
+    if (getButtonRepeat(0, 4) == 0) {
         return;
     }
 
@@ -2458,7 +2450,7 @@ void CShopMenu::SelectItemIdx()
         m_selectedIndex = getItemCnt() - 1;
     }
 
-    if ((getButtonRepeat(0, 0) & 8) != 0) {
+    if (getButtonRepeat(0, 8) != 0) {
         --m_selectedIndex;
         if (m_selectedIndex < 0) {
             bButtonNoRepeat(8);
@@ -2467,7 +2459,7 @@ void CShopMenu::SelectItemIdx()
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if ((getButtonRepeat(0, 0) & 4) != 0) {
+    } else if (getButtonRepeat(0, 4) != 0) {
         ++m_selectedIndex;
         if (m_selectedIndex >= getItemCnt()) {
             bButtonNoRepeat(4);

@@ -2437,6 +2437,7 @@ void CMaterialMan::SetPosition(
     float (*viewMtx)[4],
     int ignoreFrustumCheck)
 {
+    unsigned int i;
     CBound searchBound(position, rangeXZ, rangeY);
 
     if (target == static_cast<CMapShadow::TARGET>(0)) {
@@ -2446,7 +2447,7 @@ void CMaterialMan::SetPosition(
         int candidateCount = 0;
 
         int idx;
-        for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+        for (i = 0; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
             CMapShadow* shadow = (*mapShadowArray)[idx];
 
             if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
@@ -2516,7 +2517,7 @@ void CMaterialMan::SetPosition(
             SetShadow(*nearest->shadow, viewMtx, nearest->index, 0xFFFFFFFF);
         }
     } else {
-        unsigned int i = 0;
+        i = 0;
         int idx;
         CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
         for (; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {

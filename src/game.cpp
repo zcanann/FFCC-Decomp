@@ -500,7 +500,7 @@ void CGame::clearWork()
 
     unk_flat3_0xc7d0 = 0;
 
-    for (int i = 0; i < 64; i++) {
+    for (i = 0; i < 64; i++) {
         m_monObjects[i] = 0;
         m_monWorkRefs[i] = 0;
     }
@@ -517,7 +517,7 @@ void CGame::clearWork()
 
     CPtrArray<CMapLightHolder*>* mapLightHolderArr = &MapMng.GetMapLightHolderArray(0);
 
-    if (mapLightHolderArr->GetSize() != 0) {
+    if (mapLightHolderArr->GetSize() > 0) {
         _GXColor holderColor;
         Vec holderVec;
 
@@ -525,7 +525,7 @@ void CGame::clearWork()
             (*mapLightHolderArr)[0]->GetLightHolder(&holderColor, 0);
         }
 
-        for (int i = 0; i < 2; i++) {
+        for (i = 0; i < 2; i++) {
             CharaPcs.m_viewerAmbientColor[i] = holderColor;
 
             for (u32 j = 0; j < 3; j++) {

@@ -836,13 +836,14 @@ int CCharaPcs::correctLoadAnimAmem()
         return -1;
     }
 
+    int i;
     int loadAnimCount = LoadAnimArray(this)->GetSize();
     int validAnimCount = 0;
     int maxEnd = 0;
     int compactedSize = 0;
     int scanOffset = 0;
     int chunkSize = 0;
-    for (int i = 0; i < loadAnimCount; i++) {
+    for (i = 0; i < loadAnimCount; i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         CChara::CAnim* anim = loadAnim->m_anim;
         const int animEnd = static_cast<int>(anim->GetBankSize()) + anim->GetAmemAddress();
@@ -861,7 +862,7 @@ int CCharaPcs::correctLoadAnimAmem()
         unsigned int nextOffset = 0;
         const unsigned int scanEnd = static_cast<unsigned int>(scanOffset + 0x80000);
 
-        for (int i = 0; i < loadAnimCount; i++) {
+        for (i = 0; i < loadAnimCount; i++) {
             CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
             const unsigned int animOffset = static_cast<unsigned int>(loadAnim->m_anim->GetAmemAddress());
             const int animSize = static_cast<int>(loadAnim->m_anim->GetBankSize());
@@ -924,7 +925,7 @@ int CCharaPcs::correctLoadAnimAmem()
 void CCharaPcs::onScriptChanging(char*)
 {
     for (int i = 0; i < 5; i++) {
-        m_viewerChoiceColor[i] = CColor(0xFF, 0xFF, 0xFF, 0xFF) * (static_cast<float>(i) * 0.25f);
+        m_viewerChoiceColor[i] = CColor(0xFF, 0xFF, 0xFF, 0xFF) * (static_cast<float>(i) / 4.0f);
     }
 
     m_overlapEnabled = 0;

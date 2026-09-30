@@ -2,7 +2,154 @@ crt0:
 	.text       start:0x02000000 end:0x020001A0
 
 main:
-	.text       start:0x020001A0 end:0x0200D218
+	.text       start:0x020001A0 end:0x020076EC
+
+m4a/m4a_1:
+	.text       start:0x020076EC end:0x02007CB4
+
+m4a/m4a:
+	.text       start:0x02007CB4 end:0x02009170
+
+main:
+	.text       start:0x02009170 end:0x02009190
+
+libagbsyscall/ArcTan2:
+	.text       start:0x02009190 end:0x02009194
+
+libagbsyscall/CpuFastSet:
+	.text       start:0x02009194 end:0x02009198
+
+libagbsyscall/CpuSet:
+	.text       start:0x02009198 end:0x0200919C
+
+libagbsyscall/LZ77UnCompVram:
+	.text       start:0x0200919C end:0x020091A0
+
+libagbsyscall/LZ77UnCompWram:
+	.text       start:0x020091A0 end:0x020091A4
+
+libagbsyscall/MidiKey2Freq:
+	.text       start:0x020091A4 end:0x020091A8
+
+libagbsyscall/MusicPlayerContinue:
+	.text       start:0x020091A8 end:0x020091AC
+
+libagbsyscall/RegisterRamReset:
+	.text       start:0x020091AC end:0x020091B0
+
+libagbsyscall/SoundBiasReset:
+	.text       start:0x020091B0 end:0x020091B8
+
+libagbsyscall/SoundBiasSet:
+	.text       start:0x020091B8 end:0x020091C0
+
+libagbsyscall/Sqrt:
+	.text       start:0x020091C0 end:0x020091C4
+
+libagbsyscall/VBlankIntrWait:
+	.text       start:0x020091C4 end:0x020091CC
+
+libc/string/memcpy:
+	.text       start:0x020091CC end:0x0200922C
+
+libc/stdio/vsprintf:
+	.text       start:0x0200922C end:0x02009260
+
+libc/stdio/vfprintf:
+	.text       start:0x02009260 end:0x0200A3CC
+
+libc/stdio/wsetup:
+	.text       start:0x0200A3CC end:0x0200A478
+
+libc/stdlib/dtoa:
+	.text       start:0x0200A478 end:0x0200B2CC
+
+libc/stdio/fflush:
+	.text       start:0x0200B2CC end:0x0200B360
+
+libc/stdio/findfp:
+	.text       start:0x0200B360 end:0x0200B4BC
+
+libc/stdlib/freer:
+	.text       start:0x0200B4BC end:0x0200B73C
+
+libc/stdio/fvwrite:
+	.text       start:0x0200B73C end:0x0200B968
+
+libc/stdio/fwalk:
+	.text       start:0x0200B968 end:0x0200B9A8
+
+libc/locale/locale:
+	.text       start:0x0200B9A8 end:0x0200BA14
+
+libc/stdio/makebuf:
+	.text       start:0x0200BA14 end:0x0200BAF0
+
+libc/stdlib/mallocr:
+	.text       start:0x0200BAF0 end:0x0200C00C
+
+libc/stdlib/mbtowc_r:
+	.text       start:0x0200C00C end:0x0200C038
+
+libc/string/memchr:
+	.text       start:0x0200C038 end:0x0200C0B8
+
+libc/string/memmove:
+	.text       start:0x0200C0B8 end:0x0200C140
+
+libc/string/memset:
+	.text       start:0x0200C140 end:0x0200C194
+
+libc/stdlib/mlock:
+	.text       start:0x0200C194 end:0x0200C19C
+
+libc/stdlib/mprec:
+	.text       start:0x0200C19C end:0x0200CA6C
+
+libc/math/s_isinf:
+	.text       start:0x0200CA6C end:0x0200CA90
+
+libc/math/s_isnan:
+	.text       start:0x0200CA90 end:0x0200CAB0
+
+libc/reent/sbrkr:
+	.text       start:0x0200CAB0 end:0x0200CADC
+
+libc/stdio/stdio:
+	.text       start:0x0200CADC end:0x0200CBA0
+
+libc/string/strcmp:
+	.text       start:0x0200CBA0 end:0x0200CBFC
+
+libc/string/strlen:
+	.text       start:0x0200CBFC end:0x0200CC40
+
+libc/arm/syscalls:
+	.text       start:0x0200CC40 end:0x0200D0A4
+
+libc/reent/writer:
+	.text       start:0x0200D0A4 end:0x0200D0D4
+
+libc/stdlib/callocr:
+	.text       start:0x0200D0D4 end:0x0200D12C
+
+libc/reent/closer:
+	.text       start:0x0200D12C end:0x0200D158
+
+libc/errno/errno:
+	.text       start:0x0200D158 end:0x0200D164
+
+libc/reent/fstatr:
+	.text       start:0x0200D164 end:0x0200D190
+
+libc/arm/libcfunc:
+	.text       start:0x0200D190 end:0x0200D1B8
+
+libc/reent/lseekr:
+	.text       start:0x0200D1B8 end:0x0200D1E8
+
+libc/reent/readr:
+	.text       start:0x0200D1E8 end:0x0200D218
 
 libgcc/_call_via_rX:
 	.text       start:0x0200D218 end:0x0200D254
@@ -38,11 +185,50 @@ libgcc/_negdi2:
 	.text       start:0x0200EC80 end:0x0200EC98
 
 main:
-	.rodata     start:0x0200EC98 end:0x02021F78
+	.rodata     start:0x0200EC98 end:0x020139FC
+
+libc/stdio/vfprintf:
+	.rodata     start:0x020139FC end:0x02013A76
+
+main:
+	.rodata     start:0x02013A76 end:0x02013A78
+
+libc/stdlib/dtoa:
+	.rodata     start:0x02013A78 end:0x02013A8A
+
+main:
+	.rodata     start:0x02013A8A end:0x02013A8C
+
+libc/locale/locale:
+	.rodata     start:0x02013A8C end:0x02013AC6
+
+main:
+	.rodata     start:0x02013AC6 end:0x02013AC8
+
+libc/stdlib/mprec:
+	.rodata     start:0x02013AC8 end:0x02013BEC
+
+libc/arm/syscalls:
+	.rodata     start:0x02013BEC end:0x02013C11
+
+main:
+	.rodata     start:0x02013C11 end:0x02015D44
+
+libc/locale/locale:
+	.data       start:0x02015D44 end:0x02015D58
+
+libc/stdlib/mallocr:
+	.data       start:0x02015D58 end:0x0201619C
+
+main:
+	.rodata     start:0x0201619C end:0x02021F78
 
 bss:
 	.ewram_bss  start:0x02021F78 end:0x0203FF35
-	.bss        start:0x03000000 end:0x030070F8
+	.bss        start:0x03000000 end:0x03007048
+
+libc/arm/syscalls:
+	.bss        start:0x03007048 end:0x030070F8
 
 libgcc/dp-bit:
 	.bss        start:0x030070F8 end:0x0300710C

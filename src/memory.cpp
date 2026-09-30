@@ -1393,16 +1393,6 @@ void CAmemCache::Destroy(CMemory::CStage*)
  * Address:	TODO
  * Size:	TODO
  */
-void CAmemCache::GetData(CMemory::CStage*, char*, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CAmemCache::SetData(void*, int)
 {
 	// TODO
@@ -1591,12 +1581,71 @@ void CAmemCacheSet::AmemPrev()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::GetFree()
+inline short CAmemCacheSet::GetFree()
 {
-	// TODO
+    for (int i = 0; i < m_cacheCount; i++) {
+        if (cacheEntryAt(this, i).m_inUse == 0) {
+            return static_cast<short>(i);
+        }
+    }
+    return -1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CAmemCache::GetData(CMemory::CStage* rStage, char* source, int line)
+{
+    if (m_cacheData == 0) {
+        if (m_dmaCopy != 0) {
+            m_cacheData =
+                rStage->alloc(static_cast<unsigned long>(m_size),
+                                source != 0 ? source : const_cast<char*>(sEmptyAllocSourceName),
+                                static_cast<unsigned long>(line), 1);
+            if (m_cacheData == 0) {
+                return 0;
+            } else {
+                int dmaId = Sound.DMAEntry(0, 1, reinterpret_cast<int>(m_cacheData),
+                                           reinterpret_cast<int>(m_workData), m_size, 0, 0);
+                CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
+                watch.Start();
+                extern const float kMemoryDmaTimeout;
+                float timeout = kMemoryDmaTimeout;
+                while (Sound.DMACheck(dmaId) != 0) {
+                    watch.Stop();
+                    if (watch.Get() >= timeout) {
+                        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+                            System.Printf(const_cast<char*>(sGetDataTimeoutBanner));
+                        }
+                        Sound.CheckDriver(1);
+                        watch.Reset();
+                        watch.Start();
+                    } else {
+                        watch.Start();
+                    }
+                }
+                return reinterpret_cast<int>(m_cacheData);
+            }
+        } else {
+            m_cacheData = m_workData;
+            return reinterpret_cast<int>(m_cacheData);
+        }
+    } else {
+        return 0;
+    }
 }
 
 /*
@@ -1611,47 +1660,7 @@ void CAmemCacheSet::GetFree()
 int CAmemCacheSet::GetData(short index, char* source, int line)
 {
     while (true) {
-        CAmemCache& entry = cacheEntryAt(this, index);
-        CMemory::CStage* rStage = m_rStage;
-        unsigned int data;
-
-        if (entry.m_cacheData == 0) {
-            if (entry.m_dmaCopy != 0) {
-                entry.m_cacheData =
-                    rStage->alloc(static_cast<unsigned long>(entry.m_size),
-                                    source != 0 ? source : const_cast<char*>(sEmptyAllocSourceName),
-                                    static_cast<unsigned long>(line), 1);
-                if (entry.m_cacheData == 0) {
-                    data = 0;
-                } else {
-                    int dmaId = Sound.DMAEntry(0, 1, reinterpret_cast<int>(entry.m_cacheData),
-                                               reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-                    CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
-                    watch.Start();
-                    extern const float kMemoryDmaTimeout;
-                    float timeout = kMemoryDmaTimeout;
-                    while (Sound.DMACheck(dmaId) != 0) {
-                        watch.Stop();
-                        if (watch.Get() >= timeout) {
-                            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                                System.Printf(const_cast<char*>(sGetDataTimeoutBanner));
-                            }
-                            Sound.CheckDriver(1);
-                            watch.Reset();
-                            watch.Start();
-                        } else {
-                            watch.Start();
-                        }
-                    }
-                    data = reinterpret_cast<int>(entry.m_cacheData);
-                }
-            } else {
-                entry.m_cacheData = entry.m_workData;
-                data = reinterpret_cast<int>(entry.m_cacheData);
-            }
-        } else {
-            data = 0;
-        }
+        unsigned int data = cacheEntryAt(this, index).GetData(m_rStage, source, line);
 
         if (data == 0) {
             AmemFreeLowPrio(cacheEntryAt(this, index).m_size);
@@ -1672,23 +1681,14 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
  */
 int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCopy)
 {
-    short index;
+    short index = GetFree();
 
-    for (int i = 0; i < m_cacheCount; i++) {
-        if (cacheEntryAt(this, i).m_inUse == 0) {
-            index = static_cast<short>(i);
-            goto found;
-        }
-    }
-    index = -1;
-
-found:
     if (index == -1) {
         return -1;
     }
 
     int allocSize = (static_cast<unsigned int>(size) + 0x1F) & ~0x1F;
-    CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + index * sizeof(CAmemCache));
+    CAmemCache& entry = m_cacheTable[index];
     entry.m_inUse = 1;
     entry.m_type = static_cast<unsigned char>(type);
     entry.m_dmaCopy = static_cast<unsigned char>(dmaCopy);
@@ -1864,20 +1864,19 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
     const char* strBase = reinterpret_cast<const char*>(sHeapBarColors);
     unsigned int bestPriority = 0x7ffffff1;
     int currentSize = size;
+    int i;
 
     while (true) {
         CAmemCache* bestEntry = 0;
 
-        int offset = 0;
-        for (int i = 0; i < m_cacheCount; i++) {
-            CAmemCache& entry = *reinterpret_cast<CAmemCache*>(reinterpret_cast<char*>(m_cacheTable) + offset);
+        for (i = 0; i < m_cacheCount; i++) {
+            CAmemCache& entry = m_cacheTable[i];
             if (entry.m_inUse != 0 && entry.m_refCount == 0 && entry.m_dmaCopy != 0 &&
                 entry.m_cacheData != 0 && entry.m_size >= currentSize &&
                 static_cast<unsigned int>(entry.m_priority) < bestPriority) {
                 bestEntry = &entry;
                 bestPriority = static_cast<unsigned int>(entry.m_priority);
             }
-            offset += sizeof(CAmemCache);
         }
 
         if (bestEntry != 0) {
@@ -1905,7 +1904,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
                 System.Printf(const_cast<char*>(strBase + 0x4c));
             }
 
-            for (int i = 0; i < m_cacheCount; i++) {
+            for (i = 0; i < m_cacheCount; i++) {
                 CAmemCache& entry = cacheEntryAt(this, i);
                 if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                     System.Printf(

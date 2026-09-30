@@ -18,7 +18,7 @@ void fn_02007148();
 void fn_0200720C(void *);
 void fn_020091C4(void);
 
-void AgbMain(s32 arg0, s32 arg1)
+void fn_020001A0(s32 arg0, s32 arg1)
 {
     s32 i;
 

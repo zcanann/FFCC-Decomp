@@ -584,9 +584,10 @@ void CSound::Realloc(int isMinMemoryMode)
         }
     }
 
+    CFile::CHandle* handle;
     for (int i = 0; i < 4; i++) {
         sprintf(sePath, "dvd/sound/se/block/se%03d.seb", i);
-        CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
+        handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {
             File.Read(handle);
             File.SyncCompleted(handle);
@@ -1471,8 +1472,8 @@ inline void CSound::ChangeSePan(int seId, int pan, int frames)
 void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
 {
     float distScale;
-    float scaledFarSq;
     float scaledDistSq;
+    float scaledFarSq;
     float nearDist;
     int lineHit;
     int panX;
@@ -1527,13 +1528,9 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
 
         PSMTXMultVec(CameraPcs.m_cameraMatrix, &se3D->m_position, &nearestPoint);
         scaledDistSq = distScale * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs.m_targetX), &se3D->m_position);
-        scaledFarSq = se3D->m_farDistance * distScale;
-        scaledFarSq = se3D->m_farDistance * scaledFarSq;
-        scaledFarSq = distScale * scaledFarSq;
+        scaledFarSq = distScale * (se3D->m_farDistance * (se3D->m_farDistance * distScale));
         if (scaledDistSq < scaledFarSq) {
-            float scaledNearSq = se3D->m_nearDistance * distScale;
-            scaledNearSq = se3D->m_nearDistance * scaledNearSq;
-            scaledNearSq = distScale * scaledNearSq;
+            float scaledNearSq = distScale * (se3D->m_nearDistance * (se3D->m_nearDistance * distScale));
             if (scaledDistSq < scaledNearSq) {
                 outVolume = 0x7F;
             } else {

@@ -720,19 +720,14 @@ void CGMonObj::initFinishedFuncDefault()
 	}
 
 	m_forcedAction = -1;
-	int forcedAction = 0;
-	for (int slotBase = 0; slotBase < 0x10; slotBase += 8) {
-		for (int slotOff = 0; slotOff < 8; slotOff += 2) {
-			int attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + slotOff + 0xD0));
-			if ((attackId != 0xFFFF) &&
-				(static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE)) == 4)) {
-				m_forcedAction = forcedAction;
-				goto forcedDone;
-			}
-			forcedAction++;
+	for (int forcedAction = 0; forcedAction < 8; forcedAction++) {
+		int attackId = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_actionItems[forcedAction];
+		if ((attackId != 0xFFFF) &&
+			(static_cast<int>(reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[attackId].m_actionType) == 4)) {
+			m_forcedAction = forcedAction;
+			break;
 		}
 	}
-forcedDone:;
 
 	setRepop(1);
 }
@@ -2794,7 +2789,7 @@ void CGMonObj::onStatDie()
 		}
 		if (subFrame == 0) {
 			int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
-			int particleId = *reinterpret_cast<int*>(mon + 0x560);
+			int particleId;
 			switch (classId) {
 			case 4:
 				particleId = 0x253;
@@ -2962,8 +2957,8 @@ void CGMonObj::enableAttackCol(int enabled, int, int)
 	if (enabled != 0) {
 		int attackKind = m_itemId;
 		const SCharaItemRow* attackData = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[attackKind];
-		int colMask = attackData->m_particleFlags;
 		int colValue;
+		int colMask = attackData->m_particleFlags;
 		if (attackKind >= 0x1F5) {
 			colValue = attackData->m_kind;
 		} else {
@@ -3104,14 +3099,7 @@ void CGMonObj::onStatMagic()
 							object->m_rotTargetY = targetRot;
 						} else {
 							float delta = Math.DstRot(targetRot, object->m_homeRotY);
-							float clamped = -rotLimit;
-							if (!(delta < clamped)) {
-								if (rotLimit < delta) {
-									clamped = rotLimit;
-								} else {
-									clamped = delta;
-								}
-							}
+							float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
 							object->m_rotTargetY = object->m_homeRotY + clamped;
 						}
 					}
@@ -3694,24 +3682,26 @@ void CGMonObj::onCancelStat(int state)
 void CGMonObj::setActionParam(int state)
 {
 	state += 0xE;
-	m_itemId = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_actionItems[state];
-	m_attackAnimId = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_actionAnimations[state];
+	CMonWork* work = reinterpret_cast<CMonWork*>(m_scriptHandle);
+	m_itemId = work->m_actionItems[state];
+	work = reinterpret_cast<CMonWork*>(m_scriptHandle);
+	m_attackAnimId = work->m_actionAnimations[state];
 	m_unk554 = m_attackAnimId + 1;
 	m_unk558 = m_unk554 + 1;
 	m_unk55C = m_unk558 + 1;
 
-	int actionType =
-		reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId].m_actionType;
+	const SCharaItemRow* item = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
+	int actionType = item->m_actionType;
 	switch (actionType) {
 	case 0:
 	case 1:
 	case 3:
-		m_castFrameStart =
-			reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId].m_attackStartFrame;
-		m_castFrameEnd =
-			reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId].m_attackEndFrame;
-		m_castFrameCurrent =
-			reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId].m_attackEndFrame;
+		item = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
+		m_castFrameStart = item->m_attackStartFrame;
+		item = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
+		m_castFrameEnd = item->m_attackEndFrame;
+		item = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
+		m_castFrameCurrent = item->m_attackEndFrame;
 		break;
 	case 2:
 		m_unk68C = CGCharaObj::calcCastTime(m_itemId);
@@ -3842,6 +3832,9 @@ void CGMonObj::onStatAttack(int state)
 		if ((prgObj->m_stateFrame == 0) && (m_targetPartyIndex >= 0)) {
 			CGPartyObj* target = Game.m_partyObjArr[m_targetPartyIndex];
 			m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
+			if (state == 3) {
+				return;
+			}
 
 			if ((attackFlags & 2) == 0) {
 				float rotLimit = kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
@@ -4062,9 +4055,10 @@ void CGMonObj::onFramePreCalc()
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 8) = m_targetPartyIndex;
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 0) = -1;
 
+		int classId = reinterpret_cast<int>(object->m_scriptHandle[4]);
 		int aiLocal = 0;
-		if ((0x9A <= reinterpret_cast<int>(object->m_scriptHandle[4])) ||
-			(reinterpret_cast<int>(object->m_scriptHandle[4]) < 0x8E)) {
+		if ((0x9A <= classId) ||
+			(classId < 0x8E)) {
 			(this->*m_funcs->logic)();
 		} else {
 			aiAddDuct(aiLocal);

@@ -18,7 +18,7 @@ from typing import Dict, List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).parent))
 from gbaanalysis import (  # noqa: E402
-    EWRAM_BASE, EWRAM_END, IWRAM_BASE, Analysis, Analyzer,
+    _ARM, EWRAM_BASE, EWRAM_END, IWRAM_BASE, Analysis, Analyzer,
 )
 
 ENTRY = EWRAM_BASE
@@ -212,7 +212,6 @@ class Emitter:
         a = self.a
         out = [
             "\t.syntax unified",
-            "\t.cpu arm7tdmi",
             "",
         ]
         ranges = [s for s in self.splits if s.unit == unit]
@@ -262,7 +261,7 @@ class Emitter:
                 size = at - start
                 # Alignment padding before the next function is not part of this one.
                 pad = at - 2
-                if (symbol.kind == "function" and size > 2 and at % 4 == 0 and a.half(pad) == 0
+                if (symbol.kind == "function" and symbol.thumb and size > 2 and at % 4 == 0 and a.half(pad) == 0
                         and pad not in a.code and (pad & ~3) not in a.literals and (pad & ~3) not in a.jump_tables):
                     size -= 2
                 out.append(f"\t.size {symbol.name}, 0x{size:X}")
@@ -290,6 +289,13 @@ class Emitter:
                     out.append(f"\t.type {s.name}, %object")
                 out.append(f"{s.name}:")
                 open_symbol = (s, address)
+            # Code entered by mode switch (e.g. a Thumb stub branching to ARM) has no symbol.
+            entry = a.functions.get(address) if is_code else None
+            if entry is not None:
+                want = "thumb" if entry.thumb else "arm"
+                if mode != want:
+                    out.append(f"\t.{want}")
+                    mode = want
             if address in labels:
                 out.append(f".L_{address:08X}:")
 
@@ -317,16 +323,17 @@ class Emitter:
                     address += 2
                     continue
                 if not thumb_code and size == 4 and remaining >= 4:
-                    out.append(f"\t.inst 0x{a.word(address):08X}")
+                    out.append(self.arm_instruction(address, unit))
                     address += 4
                     continue
-            if address % 4 == 0 and remaining >= 4 and not self.overlaps_code(address):
+            inner = [i for i in (1, 2, 3) if address + i in self.by_address or address + i in labels]
+            if address % 4 == 0 and remaining >= 4 and not inner and not self.overlaps_code(address):
                 value = a.word(address)
                 expr = self.pointer(value, unit, address)
                 out.append(f"\t.4byte {expr}" if expr else f"\t.4byte 0x{value:08X}")
                 address += 4
                 continue
-            if address % 2 == 0 and remaining >= 2:
+            if address % 2 == 0 and remaining >= 2 and 1 not in inner:
                 out.append(f"\t.2byte 0x{a.half(address):04X}")
                 address += 2
                 continue
@@ -334,6 +341,19 @@ class Emitter:
             address += 1
         close(address)
         return out
+
+    def arm_instruction(self, address: int, unit: str) -> str:
+        """An ARM instruction; branches to functions are emitted symbolically for relocations."""
+        raw = self.a.word(address)
+        offset = address - self.a.base
+        insn = next(_ARM.disasm(self.a.data[offset:offset + 4], address, 1), None)
+        if insn is not None and re.match(r"^bl?(eq|ne|hs|lo|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|cs|cc)?$", insn.mnemonic) \
+                and insn.op_str.startswith("#"):
+            target = int(insn.op_str[1:], 0)
+            names = [s for s in self.by_address.get(target, []) if s.kind == "function" and not s.thumb]
+            if names and not (names[0].local and self.unit_at(target) != unit):
+                return f"\t{insn.mnemonic} {names[0].name}"
+        return f"\t.inst 0x{raw:08X}"
 
     def is_boundary(self, address: int) -> bool:
         a = self.a
@@ -369,10 +389,14 @@ class Emitter:
 
     def linker_script(self, objects: Dict[str, str], compiled: Optional[set] = None) -> str:
         compiled = compiled or set()
-        out = ["SECTIONS", "{"]
+        # Absolute symbols, such as link-time constants from configuration tables.
+        out = [f"{s.name} = 0x{s.address:X};" for s in self.symbols if s.section == ".abs"]
+        out += ["SECTIONS", "{"]
         sections: Dict[str, List[Split]] = {}
         for split in self.splits:
-            sections.setdefault(split.section, []).append(split)
+            # Initialized data is loaded with the rest of the image after the code.
+            output = ".rodata" if split.section == ".data" else split.section
+            sections.setdefault(output, []).append(split)
         for section in list(LOAD_SECTIONS) + list(BSS_SECTIONS):
             if section not in sections:
                 continue
@@ -381,9 +405,10 @@ class Emitter:
             out.append(f"\t{section} 0x{ordered[0].start:08X}{kind} :")
             out.append("\t{")
             for split in ordered:
-                name = section if split.unit in compiled else self.input_section(split)
+                name = split.section if split.unit in compiled else self.input_section(split)
                 out.append(f"\t\t{objects[split.unit]}({name})")
-            out.append("\t}")
+            # Alignment gaps between objects were zero-filled, not nop-filled.
+            out.append("\t} =0" if section in LOAD_SECTIONS else "\t}")
         out.append("\t/DISCARD/ : { *(.ARM.attributes) *(.comment) }")
         out.append("}")
         return "\n".join(out) + "\n"

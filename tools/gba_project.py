@@ -7,8 +7,9 @@ objdiff.json so the programs count toward the version's progress report.
 Units with source are compiled and diffed against their target objects:
 - gba/src/<program>/<unit>.c, built with agbcc
 - libgcc/<object>, built from gba/lib/libgcc like agbcc's own libgcc
-Units listed in COMPLETE, and all library units, link their compiled objects
-into the checked image.
+- libagbsyscall/<routine>, libc/<dir>/<file>, m4a/<file>: libraries in gba/lib
+Units listed in COMPLETE, and all libgcc, libagbsyscall and libc units, link
+their compiled objects into the checked image.
 """
 
 import importlib.util
@@ -23,6 +24,28 @@ from .project import ProgressCategory, ProjectConfig
 
 GBA_DIR = Path("gba")
 LIBGCC_DIR = GBA_DIR / "lib" / "libgcc"
+M4A_DIR = GBA_DIR / "lib" / "m4a"
+SYSCALL_DIR = GBA_DIR / "lib" / "libagbsyscall"
+LIBC_DIR = GBA_DIR / "lib" / "libc"
+# agbcc's libc (newlib) build: flags, and objects built from another source with defines.
+LIBC_CPPFLAGS = ("-I gba/lib/ginclude -I gba/lib/libc/include -nostdinc -undef -DABORT_PROVIDED "
+                 "-DHAVE_GETTIMEOFDAY -D__thumb__ -DARM_RDI_MONITOR -D__GNUC__ -DINTERNAL_NEWLIB "
+                 "-D__USER_LABEL_PREFIX__=")
+LIBC_VARIANTS = {
+    "stdlib/mallocr": ("stdlib/mallocr.c", "-DDEFINE_MALLOC"),
+    "stdlib/freer": ("stdlib/mallocr.c", "-DDEFINE_FREE"),
+    "stdlib/reallocr": ("stdlib/mallocr.c", "-DDEFINE_REALLOC"),
+    "stdlib/callocr": ("stdlib/mallocr.c", "-DDEFINE_CALLOC"),
+    "stdlib/cfreer": ("stdlib/mallocr.c", "-DDEFINE_CFREE"),
+    "stdlib/malignr": ("stdlib/mallocr.c", "-DDEFINE_MEMALIGN"),
+    "stdlib/vallocr": ("stdlib/mallocr.c", "-DDEFINE_VALLOC"),
+    "stdlib/pvallocr": ("stdlib/mallocr.c", "-DDEFINE_PVALLOC"),
+    "stdlib/mallinfor": ("stdlib/mallocr.c", "-DDEFINE_MALLINFO"),
+    "stdlib/mallstatsr": ("stdlib/mallocr.c", "-DDEFINE_MALLOC_STATS"),
+    "stdlib/msizer": ("stdlib/mallocr.c", "-DDEFINE_MALLOC_USABLE_SIZE"),
+    "stdlib/malloptr": ("stdlib/mallocr.c", "-DDEFINE_MALLOPT"),
+    "stdio/vfiprintf": ("stdio/vfprintf.c", "-DINTEGER_ONLY"),
+}
 
 # Programs per game version: category id -> program info.
 PROGRAMS: Dict[str, Dict[str, Dict[str, str]]] = {
@@ -32,12 +55,14 @@ PROGRAMS: Dict[str, Dict[str, Dict[str, str]]] = {
             "name": "GBA Client",
             "disc_path": "dvd/gba/ffcc_cli.bin",
             "sha1": "ec0579f21b9211f2fec4d17fe5943f23309c5f4c",
+            "m4a_defines": "-DM4A_SOUND_FREQ=SOUND_MODE_FREQ_13379",
         },
         "gba_mgr": {
             "config": "mgr",
             "name": "GBA Minigame",
             "disc_path": "dvd/minigame/mgr/mgr00.bin",
             "sha1": "6ef574cc6ae34e8a05bccb1a28f78e833fde58fa",
+            "m4a_defines": "-DM4A_SOUND_FREQ=SOUND_MODE_FREQ_15768",
         },
     },
 }
@@ -49,8 +74,8 @@ CFLAGS = "-mthumb-interwork -O2 -fhex-asm"
 
 # Game units whose compiled source links into the checked image, per program.
 COMPLETE: Dict[str, List[str]] = {
-    "cli": [],
-    "mgr": [],
+    "cli": ["crt0", "m4a/m4a_1", "m4a/m4a"],
+    "mgr": ["crt0", "m4a/m4a_1", "m4a/m4a"],
 }
 
 # libgcc routines assembled from lib1thumb.asm; the rest are C.
@@ -60,6 +85,26 @@ LIBGCC_ASM = {"_udivsi3", "_divsi3", "_umodsi3", "_modsi3", "_dvmd_tls", "_call_
 def _units(config_dir: Path) -> List[str]:
     text = (config_dir / "splits.txt").read_text(encoding="utf-8")
     return list(dict.fromkeys(re.findall(r"^(\S+):\s*$", text, re.M)))
+
+
+def _arm_units(config_dir: Path) -> set:
+    """Units containing ARM-state functions (symbols without the thumb flag)."""
+    arm = []
+    for m in re.finditer(r"^\S+ = \.text:0x([0-9A-Fa-f]+); // type:function (.*)$",
+                         (config_dir / "symbols.txt").read_text(encoding="utf-8"), re.M):
+        if "thumb" not in m.group(2).split():
+            arm.append(int(m.group(1), 16))
+    units = set()
+    unit = None
+    for line in (config_dir / "splits.txt").read_text(encoding="utf-8").splitlines():
+        m = re.match(r"^(\S+):\s*$", line)
+        if m:
+            unit = m.group(1)
+            continue
+        m = re.match(r"^\s+\.text\s+start:0x([0-9A-Fa-f]+)\s+end:0x([0-9A-Fa-f]+)", line)
+        if m and any(int(m.group(1), 16) <= a < int(m.group(2), 16) for a in arm):
+            units.add(unit)
+    return units
 
 
 def _path(path: Any) -> str:
@@ -116,12 +161,15 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                f"$python {_path(tools / 'split.py')} $bin $config --asm-dir $asmdir "
                "--ldscript $ldscript --object-dir $objdir $overrides",
                description="SPLIT $config")
-        n.rule("gba_as", f"{prefix_str}as{exe} $gba_asflags -o $out $in", description="AS $out")
+        n.rule("gba_as", f"{prefix_str}as{exe} $gba_asflags $asincludes -o $out $in", description="AS $out")
         n.rule("gba_cpp", f"{prefix_str}cpp{exe} $cppflags -MMD -MT $out -MF $out.d $in -o $out",
                description="CPP $in", depfile="$out.d", deps="gcc")
         n.rule("gba_cc", "$cc $cflags $in -o $out", description="AGBCC $out")
         n.rule("gba_ld", f"{prefix_str}ld{exe} -T $ldscript -o $out --no-warn-rwx-segments -Map $map",
                description="LINK $out")
+        n.rule("gba_ld_r", f"{prefix_str}ld{exe} -r -o $out $in", description="LINK $out")
+        n.rule("gba_strip_attributes", f"{prefix_str}objcopy{exe} -R .ARM.attributes $in $out",
+               description="OBJCOPY $out")
         n.rule("gba_objcopy", f"{prefix_str}objcopy{exe} -O binary -j .text -j .rodata $in $out",
                description="OBJCOPY $out")
         n.rule("gba_sha1", f"$python {_path(tools / 'check_sha1.py')} $in $sha1 $out",
@@ -141,13 +189,27 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                                "paths": " ".join(info["disc_path"] for info in programs.values())})
         n.newline()
 
-        def compile_source(unit: str, src_dir: Path, out: Path) -> Optional[str]:
+        def assemble_arm(source: Path, stem: str, base: str) -> str:
+            """Assemble hand-written source that may contain ARM code."""
+            # For ARM-state bx under ARMv4T, as emits R_ARM_V4BX relocations, which
+            # objdiff cannot read. Assembling for v5t gives the same bytes without them;
+            # the v5t attributes are then dropped since objdiff rejects that arch too.
+            v5 = stem + ".v5.o"
+            n.build(v5, "gba_as", _path(source), implicit=binutils_stamp,
+                    variables={"asincludes": f"-I {_path(GBA_DIR / 'lib')} -I {_path(GBA_DIR / 'include')}",
+                               "gba_asflags": "-march=armv5t -mthumb-interwork"})
+            n.build(base, "gba_strip_attributes", v5, implicit=binutils_stamp)
+            return base
+
+        def compile_source(unit: str, src_dir: Path, out: Path, info: Dict[str, str]) -> Optional[str]:
             """Emit rules for a unit's source; returns the compiled object or None."""
             base = _path(out / "src" / f"{unit}.o")
             stem = _path(out / "src" / unit)
+            # Like pret and agbcc's libgcc, compiler output ends with an explicit
+            # zero-filled word alignment, so the section is padded with zeros.
+            align = _path(GBA_DIR / "lib" / "align.s")
             if unit.startswith("libgcc/"):
                 name = unit.split("/", 1)[1]
-                align = _path(LIBGCC_DIR / "align.s")
                 if name in LIBGCC_ASM:
                     pre = stem + ".s"
                     n.build(pre, "gba_cpp", _path(LIBGCC_DIR / "lib1thumb.asm"), implicit=binutils_stamp,
@@ -164,15 +226,64 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(old_agbcc), "cflags": "-O2"})
                 n.build(base, "gba_as", [asm, align], implicit=binutils_stamp)
                 return base
+            if unit.startswith("libagbsyscall/"):
+                # One object per routine, like pret's granular libagbsyscall build.
+                name = unit.split("/", 1)[1]
+                n.build(base, "gba_as", _path(SYSCALL_DIR / "libagbsyscall.s"), implicit=binutils_stamp,
+                        variables={"asincludes": f"-I {_path(GBA_DIR / 'lib')} --defsym L_{name}=1"})
+                return base
+            if unit.startswith("libc/"):
+                name = unit.split("/", 1)[1]
+                source, defines = LIBC_VARIANTS.get(name, (f"{name}.c", ""))
+                extra = " -fshort-enums" if name == "stdlib/mbtowc_r" else ""
+                pre = stem + ".i"
+                asm = stem + ".s"
+                n.build(pre, "gba_cpp", _path(LIBC_DIR / source), implicit=binutils_stamp,
+                        variables={"cppflags": f"{LIBC_CPPFLAGS} {defines} -iquote {_path((LIBC_DIR / source).parent)}"})
+                n.build(asm, "gba_cc", pre,
+                        variables={"cc": os.path.normpath(old_agbcc), "cflags": f"-O2 -fno-builtin{extra}"})
+                n.build(base, "gba_as", [asm, align], implicit=binutils_stamp)
+                return base
+            if unit.startswith("m4a/"):
+                name = unit.split("/", 1)[1]
+                if (M4A_DIR / f"{name}.s").is_file():
+                    return assemble_arm(M4A_DIR / f"{name}.s", stem, base)
+                source = M4A_DIR / f"{name}.c"
+                if not source.is_file():
+                    return None
+                pre = stem + ".i"
+                asm = stem + ".s"
+                n.build(pre, "gba_cpp", _path(source), implicit=binutils_stamp,
+                        variables={"cppflags": f"-undef -nostdinc -I {_path(M4A_DIR / 'include')} "
+                                               f"-I {_path(GBA_DIR / 'lib' / 'ginclude')} "
+                                               f"{info.get('m4a_defines', '')}"})
+                n.build(asm, "gba_cc", pre,
+                        variables={"cc": os.path.normpath(old_agbcc), "cflags": "-mthumb-interwork -O2"})
+                n.build(base, "gba_as", [asm, align], implicit=binutils_stamp)
+                return base
+            asm_source = src_dir / f"{unit}.s"
+            if asm_source.is_file():
+                return assemble_arm(asm_source, stem, base)
+            # A unit's source is <unit>.c, or a directory of C files linked together.
             source = src_dir / f"{unit}.c"
-            if not source.is_file():
+            files = sorted(f for f in (src_dir / unit).glob("*.c") if not f.name.startswith("_")) if (src_dir / unit).is_dir() else []
+            if source.is_file():
+                files = [source]
+            if not files:
                 return None
-            pre = stem + ".i"
-            asm = stem + ".s"
-            n.build(pre, "gba_cpp", _path(source), implicit=binutils_stamp,
-                    variables={"cppflags": f"{CPPFLAGS} -iquote {_path(src_dir)}"})
-            n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(agbcc), "cflags": CFLAGS})
-            n.build(base, "gba_as", asm, implicit=binutils_stamp)
+            objects = []
+            for file in files:
+                file_stem = stem if file == source else _path(out / "src" / unit / file.stem)
+                pre = file_stem + ".i"
+                asm = file_stem + ".s"
+                obj = file_stem + ".o" if file != source else base
+                n.build(pre, "gba_cpp", _path(file), implicit=binutils_stamp,
+                        variables={"cppflags": f"{CPPFLAGS} -iquote {_path(file.parent)}"})
+                n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(agbcc), "cflags": CFLAGS})
+                n.build(obj, "gba_as", [asm, align], implicit=binutils_stamp)
+                objects.append(obj)
+            if files != [source]:
+                n.build(base, "gba_ld_r", objects, implicit=binutils_stamp)
             return base
 
         split_deps = [_path(tools / "split.py"), _path(tools / "gbaanalysis.py")]
@@ -181,13 +292,15 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             src_dir = GBA_DIR / "src" / info["config"]
             out = build / info["config"]
             units = _units(config_dir)
+            arm_units = _arm_units(config_dir)
             bases = {}
             if have_compilers:
                 for unit in units:
-                    base = compile_source(unit, src_dir, out)
+                    base = compile_source(unit, src_dir, out, info)
                     if base:
                         bases[unit] = base
-            complete = {u for u in bases if u.startswith("libgcc/") or u in COMPLETE.get(info["config"], [])}
+            complete = {u for u in bases if u.startswith(("libgcc/", "libagbsyscall/", "libc/"))
+                        or u in COMPLETE.get(info["config"], [])}
 
             asm = [_path(out / "asm" / f"{u}.s") for u in units]
             ldscript = _path(out / "ldscript.ld")
@@ -201,7 +314,11 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             linked = []
             for unit in units:
                 obj = _path(out / "obj" / f"{unit}.o")
-                n.build(obj, "gba_as", _path(out / "asm" / f"{unit}.s"), implicit=binutils_stamp)
+                if unit in arm_units:
+                    # Assembled like hand-written ARM source so branches keep their relocations.
+                    assemble_arm(out / "asm" / f"{unit}.s", _path(out / "obj" / unit), obj)
+                else:
+                    n.build(obj, "gba_as", _path(out / "asm" / f"{unit}.s"), implicit=binutils_stamp)
                 objects.append(obj)
                 linked.append(bases[unit] if unit in complete else obj)
                 unit_config: Dict[str, Any] = {
@@ -215,8 +332,13 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 if unit in bases:
                     objects.append(bases[unit])
                     unit_config["base_path"] = bases[unit]
-                    if not unit.startswith("libgcc/"):
-                        unit_config["metadata"]["source_path"] = _path(src_dir / f"{unit}.c")
+                    source = src_dir / f"{unit}.c"
+                    if not source.is_file():
+                        source = src_dir / f"{unit}.s"
+                    if source.is_file():
+                        unit_config["metadata"]["source_path"] = _path(source)
+                    elif unit.startswith("m4a/"):
+                        unit_config["metadata"]["source_path"] = _path(M4A_DIR / unit.split("/", 1)[1])
                 else:
                     unit_config["metadata"]["auto_generated"] = True
                 config.extra_objdiff_units.append(unit_config)
@@ -236,6 +358,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             config.reconfig_deps = (config.reconfig_deps or []) + [config_dir / "splits.txt"]
             if src_dir.is_dir():
                 config.reconfig_deps.append(src_dir)
+                config.reconfig_deps += [d for d in src_dir.iterdir() if d.is_dir()]
 
     config.subninjas.append(ninja_path)
     config.reconfig_deps = (config.reconfig_deps or []) + [Path(__file__)]

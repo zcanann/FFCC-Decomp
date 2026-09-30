@@ -1481,7 +1481,7 @@ void GbaQueue::LoadEnemyStat()
 		GbaQueueMapEntity* enemyEntry = localEnemyData;
 
 		for (i = 0; i < 0x40; i++) {
-			if (Game.m_monObjects[i] == 0) {
+			if (Game.m_monObjects[i] == 0 || Game.m_monObjects == 0) {
 				enemyEntry->m_baseDataIndex = 0;
 			} else {
 				const CRomWork* enemyData = &reinterpret_cast<const CRomWork*>(Game.unkCFlatData0[1])[

@@ -63,279 +63,6 @@ STATIC_ASSERT(offsetof(pppLaser, m_workArea) == 0x80);
 
 /*
  * --INFO--
- * PAL Address: 801766ec
- * PAL Size: 336b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
-{
-    f32 zero = LaserConst(kPppLaserZero);
-    LaserWork* work = GetLaserWork(laser, ctrlTable);
-    int particleIndex;
-    int playerIndex;
-    int hasSpecialInfo;
-    Vec playerPosition;
-    Vec targetCursorPosB;
-
-    work->m_length = LaserConst(kPppLaserZero);
-    work->m_graphValue3 = zero;
-    work->m_graphValue2 = zero;
-    work->m_halfWidth = zero;
-    work->m_graphValue1 = zero;
-    work->m_graphValue0 = zero;
-    work->m_lengthStep = zero;
-    work->m_points = 0;
-    work->m_origin.z = zero;
-    work->m_origin.y = zero;
-    work->m_origin.x = zero;
-
-    work->m_shapeReady = 0;
-    work->m_hitFrame = 0;
-    work->m_unused2E = 0;
-    work->m_shapeArg0 = 0;
-    work->m_shapeArg2 = 0;
-    work->m_shapeArg1 = 0;
-
-    work->m_shapeRotation = Math.RandF(LaserConst(kPppLaserTau));
-    work->m_spawnEnabled = 1;
-
-    hasSpecialInfo = Game.GetParticleSpecialInfo(ppvMng->m_hitParams, particleIndex, playerIndex);
-    if (hasSpecialInfo != 0) {
-        Game.GetTargetCursor(playerIndex, work->m_targetPosition, targetCursorPosB);
-
-        CGPartyObj* partyObj = Game.GetPartyObj(playerIndex);
-        playerPosition = partyObj->m_worldPosition;
-        if (particleIndex == 0x200) {
-            work->m_maxLength = PSVECDistance(&work->m_targetPosition, &playerPosition);
-        } else {
-            work->m_maxLength = LaserConst(kPppLaserMaxLengthDisabled);
-        }
-    } else {
-        work->m_maxLength = LaserConst(kPppLaserMaxLengthDisabled);
-        ppvMng->m_hitBgFlag = 1;
-        pppStopSe(ppvMng, &ppvMng->m_soundEffectData);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 801766a8
- * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstruct2Laser(pppLaser *laser, _pppCtrlTable *ctrlTable)
-{
-    f32 zero = LaserConst(kPppLaserZero);
-    LaserWork* work = GetLaserWork(laser, ctrlTable);
-
-    work->m_graphValue3 = LaserConst(kPppLaserZero);
-    work->m_graphValue2 = zero;
-    work->m_halfWidth = zero;
-    work->m_graphValue1 = zero;
-    work->m_graphValue0 = zero;
-    work->m_lengthStep = zero;
-    work->m_origin.z = zero;
-    work->m_origin.y = zero;
-    work->m_origin.x = zero;
-    work->m_shapeReady = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 8017665c
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
-{
-    LaserWork* work = GetLaserWork(laser, ctrlTable);
-    void* alloc = work->m_points;
-    if (alloc != 0) {
-        pppMemFree(alloc);
-        work->m_points = 0;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 801760a0
- * PAL Size: 1468b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void pppFrameLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable *ctrlTable)
-{
-    LaserWork* work;
-    Vec beamEndLocal;
-    Vec beamAxis;
-    Mtx laserWorldMtx;
-    Mtx charaMtx;
-
-    int emptyHistory;
-    int fillIndex;
-
-    if (ppvUserStopPartF != 0) {
-        return;
-    }
-    if (step->m_stepValue == 0xFFFF) {
-        return;
-    }
-
-    work = GetLaserWork(laser, ctrlTable);
-    emptyHistory = 0;
-    f32 maxLengthDisabled = LaserConst(kPppLaserMaxLengthDisabled);
-    if (maxLengthDisabled == work->m_maxLength) {
-        return;
-    }
-
-    if (work->m_points == 0) {
-        work->m_points = (Vec*)pppMemAlloc(
-            (u32)step->m_laser.m_pointCount * 0xc, ppvEnv->m_stagePtr, const_cast<char*>(s_pppLaser_cpp), 0x7d);
-        memset(work->m_points, 0, (u32)step->m_laser.m_pointCount * 0xc);
-        emptyHistory = 1;
-    }
-
-    CalcGraphValue((_pppPObject*)laser, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
-        step->m_laser.m_halfWidthBase, step->m_laser.m_halfWidthVelocity, step->m_laser.m_halfWidthAccel);
-    CalcGraphValue((_pppPObject*)laser, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
-        step->m_laser.m_lengthStepBase, step->m_laser.m_lengthStepVelocity, step->m_laser.m_lengthStepAccel);
-
-    pppCalcFrameShape(
-        static_cast<long*>(ppvEnv->m_shapeTablePtr[step->m_stepValue]->m_animData), work->m_shapeArg1,
-        work->m_shapeArg2, work->m_shapeArg0, step->m_laser.m_shapeFrameStep);
-
-    for (int i = 0; i < (int)(u32)(step->m_laser.m_historyFrameCount + 1); i++) {
-        int max = (int)step->m_laser.m_pointCount - 2;
-
-        for (int j = max; (int)i <= j; j--) {
-            pppCopyVector(work->m_points[j + 1], work->m_points[j]);
-        }
-
-        beamEndLocal.x = LaserConst(kPppLaserZero);
-        beamEndLocal.y = LaserConst(kPppLaserZero);
-        beamEndLocal.z = work->m_length;
-
-        if (i == 0) {
-            PSMTXConcat(ppvMng->m_matrix.value, laser->m_localMatrix.value, laserWorldMtx);
-            work->m_origin.x = laserWorldMtx[0][3];
-            work->m_origin.y = laserWorldMtx[1][3];
-            work->m_origin.z = laserWorldMtx[2][3];
-            PSMTXMultVec(laserWorldMtx, &beamEndLocal, work->m_points);
-        } else {
-            if (emptyHistory) {
-                continue;
-            }
-            s32 frameCount = step->m_laser.m_historyFrameCount + 1;
-            float t = LaserConst(kPppLaserMaxLengthDisabled) / (float)frameCount;
-            t *= (float)i;
-            if (GetCharaNodeFrameMatrix(ppvMng, t, charaMtx) == 0) {
-                emptyHistory = 1;
-                continue;
-            } else {
-                PSMTXConcat(charaMtx, laser->m_localMatrix.value, charaMtx);
-                PSMTXMultVec(charaMtx, &beamEndLocal, &work->m_points[i]);
-            }
-        }
-
-        pppSubVector(beamAxis, work->m_points[i], work->m_origin);
-        PSVECScale(&beamAxis, &beamAxis, LaserConst(kPppLaserAxisScale));
-
-        CMapCylinder cyl;
-        cyl.m_bottom = work->m_origin;
-        cyl.m_axis = beamAxis;
-        cyl.m_radius = LaserConst(kPppLaserZero);
-
-        int check = MapMng.CheckHitCylinderNear(&cyl, &beamAxis, 0xffffffff);
-        int hit = 0;
-        if (check != 0) {
-            hit = 1;
-            MapMng.m_hitMapObj->CalcHitPosition(&work->m_points[i]);
-            work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
-        } else if (i == 0) {
-            if (work->m_spawnEnabled != 0) {
-                if (work->m_maxLength - LaserConst(kPppLaserMaxLengthMargin) < work->m_length) {
-                    _pppMngSt* mngSt = ppvMng;
-                    s32 partIndex = static_cast<s32>(mngSt - PartMng.m_pppMng);
-                    work->m_length = work->m_maxLength - LaserConst(kPppLaserMaxLengthMargin);
-                    Game.ParticleFrameCallback(
-                        partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3, laser->m_graphId / 0x1000,
-                        work->m_points);
-                    work->m_spawnEnabled = 0;
-                }
-            }
-            if (work->m_spawnEnabled != 0) {
-                work->m_length += work->m_lengthStep;
-            }
-        }
-
-        if (i == 0) {
-            beamEndLocal.x = LaserConst(kPppLaserZero);
-            beamEndLocal.y = LaserConst(kPppLaserZero);
-            beamEndLocal.z = work->m_length;
-            PSMTXMultVec(laserWorldMtx, &beamEndLocal, &work->m_points[i]);
-        }
-
-        if (step->m_laser.m_disableHitCylinder == 0) {
-            pppHitCylinderSendSystem(
-                ppvMng, &work->m_origin, &beamAxis,
-                ppvMng->m_hitScale * step->m_laser.m_hitScale,
-                step->m_laser.m_hitRadius);
-        }
-
-        if (step->m_laser.m_disableHitObject == 0) {
-            int createHitObject = 0;
-            if (step->m_arg3 != -1) {
-                createHitObject = 1;
-            }
-            if (!hit) {
-                createHitObject = 0;
-            }
-
-            if (work->m_hitFrame < step->m_laser.m_hitInterval) {
-                work->m_hitFrame++;
-                createHitObject = 0;
-            } else {
-                work->m_hitFrame = 0;
-            }
-
-            if (createHitObject != 0) {
-                _pppPDataVal* dataVal = ppvMng->m_pppPDataVals + step->m_arg3;
-                _pppPObject* created;
-                if (dataVal == 0) {
-                    created = 0;
-                } else {
-                    created = pppCreatePObject(ppvMng, dataVal);
-                    created->m_link.m_previous = &laser->m_link;
-                }
-
-                Vec* createdPos = (Vec*)(created->m_workArea + step->m_laser.m_spawnPositionOffset);
-                createdPos->x = work->m_points[i].x;
-                createdPos->y = work->m_points[i].y + step->m_laser.m_spawnYOffset;
-                createdPos->z = work->m_points[i].z;
-            }
-        }
-    }
-
-    if (emptyHistory) {
-        for (fillIndex = 0; fillIndex < (int)(u32)step->m_laser.m_pointCount; fillIndex++) {
-            pppCopyVector(work->m_points[fillIndex], work->m_points[0]);
-        }
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: 801754e0
  * PAL Size: 3008b
  * EN Address: TODO
@@ -592,5 +319,278 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
             Graphic.DrawSphere(sphereMtx, color);
             pppInitBlendMode();
         }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 801760a0
+ * PAL Size: 1468b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void pppFrameLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable *ctrlTable)
+{
+    LaserWork* work;
+    Vec beamEndLocal;
+    Vec beamAxis;
+    Mtx laserWorldMtx;
+    Mtx charaMtx;
+
+    int emptyHistory;
+    int fillIndex;
+
+    if (ppvUserStopPartF != 0) {
+        return;
+    }
+    if (step->m_stepValue == 0xFFFF) {
+        return;
+    }
+
+    work = GetLaserWork(laser, ctrlTable);
+    emptyHistory = 0;
+    f32 maxLengthDisabled = LaserConst(kPppLaserMaxLengthDisabled);
+    if (maxLengthDisabled == work->m_maxLength) {
+        return;
+    }
+
+    if (work->m_points == 0) {
+        work->m_points = (Vec*)pppMemAlloc(
+            (u32)step->m_laser.m_pointCount * 0xc, ppvEnv->m_stagePtr, const_cast<char*>(s_pppLaser_cpp), 0x7d);
+        memset(work->m_points, 0, (u32)step->m_laser.m_pointCount * 0xc);
+        emptyHistory = 1;
+    }
+
+    CalcGraphValue((_pppPObject*)laser, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
+        step->m_laser.m_halfWidthBase, step->m_laser.m_halfWidthVelocity, step->m_laser.m_halfWidthAccel);
+    CalcGraphValue((_pppPObject*)laser, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
+        step->m_laser.m_lengthStepBase, step->m_laser.m_lengthStepVelocity, step->m_laser.m_lengthStepAccel);
+
+    pppCalcFrameShape(
+        static_cast<long*>(ppvEnv->m_shapeTablePtr[step->m_stepValue]->m_animData), work->m_shapeArg1,
+        work->m_shapeArg2, work->m_shapeArg0, step->m_laser.m_shapeFrameStep);
+
+    for (int i = 0; i < (int)(u32)(step->m_laser.m_historyFrameCount + 1); i++) {
+        int max = (int)step->m_laser.m_pointCount - 2;
+
+        for (int j = max; (int)i <= j; j--) {
+            pppCopyVector(work->m_points[j + 1], work->m_points[j]);
+        }
+
+        beamEndLocal.x = LaserConst(kPppLaserZero);
+        beamEndLocal.y = LaserConst(kPppLaserZero);
+        beamEndLocal.z = work->m_length;
+
+        if (i == 0) {
+            PSMTXConcat(ppvMng->m_matrix.value, laser->m_localMatrix.value, laserWorldMtx);
+            work->m_origin.x = laserWorldMtx[0][3];
+            work->m_origin.y = laserWorldMtx[1][3];
+            work->m_origin.z = laserWorldMtx[2][3];
+            PSMTXMultVec(laserWorldMtx, &beamEndLocal, work->m_points);
+        } else {
+            if (emptyHistory) {
+                continue;
+            }
+            s32 frameCount = step->m_laser.m_historyFrameCount + 1;
+            float t = LaserConst(kPppLaserMaxLengthDisabled) / (float)frameCount;
+            t *= (float)i;
+            if (GetCharaNodeFrameMatrix(ppvMng, t, charaMtx) == 0) {
+                emptyHistory = 1;
+                continue;
+            } else {
+                PSMTXConcat(charaMtx, laser->m_localMatrix.value, charaMtx);
+                PSMTXMultVec(charaMtx, &beamEndLocal, &work->m_points[i]);
+            }
+        }
+
+        pppSubVector(beamAxis, work->m_points[i], work->m_origin);
+        PSVECScale(&beamAxis, &beamAxis, LaserConst(kPppLaserAxisScale));
+
+        CMapCylinder cyl;
+        cyl.m_bottom = work->m_origin;
+        cyl.m_axis = beamAxis;
+        cyl.m_radius = LaserConst(kPppLaserZero);
+
+        int check = MapMng.CheckHitCylinderNear(&cyl, &beamAxis, 0xffffffff);
+        int hit = 0;
+        if (check != 0) {
+            hit = 1;
+            MapMng.m_hitMapObj->CalcHitPosition(&work->m_points[i]);
+            work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
+        } else if (i == 0) {
+            if (work->m_spawnEnabled != 0) {
+                if (work->m_maxLength - LaserConst(kPppLaserMaxLengthMargin) < work->m_length) {
+                    _pppMngSt* mngSt = ppvMng;
+                    s32 partIndex = static_cast<s32>(mngSt - PartMng.m_pppMng);
+                    work->m_length = work->m_maxLength - LaserConst(kPppLaserMaxLengthMargin);
+                    Game.ParticleFrameCallback(
+                        partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3, laser->m_graphId / 0x1000,
+                        work->m_points);
+                    work->m_spawnEnabled = 0;
+                }
+            }
+            if (work->m_spawnEnabled != 0) {
+                work->m_length += work->m_lengthStep;
+            }
+        }
+
+        if (i == 0) {
+            beamEndLocal.x = LaserConst(kPppLaserZero);
+            beamEndLocal.y = LaserConst(kPppLaserZero);
+            beamEndLocal.z = work->m_length;
+            PSMTXMultVec(laserWorldMtx, &beamEndLocal, &work->m_points[i]);
+        }
+
+        if (step->m_laser.m_disableHitCylinder == 0) {
+            pppHitCylinderSendSystem(
+                ppvMng, &work->m_origin, &beamAxis,
+                ppvMng->m_hitScale * step->m_laser.m_hitScale,
+                step->m_laser.m_hitRadius);
+        }
+
+        if (step->m_laser.m_disableHitObject == 0) {
+            int createHitObject = 0;
+            if (step->m_arg3 != -1) {
+                createHitObject = 1;
+            }
+            if (!hit) {
+                createHitObject = 0;
+            }
+
+            if (work->m_hitFrame < step->m_laser.m_hitInterval) {
+                work->m_hitFrame++;
+                createHitObject = 0;
+            } else {
+                work->m_hitFrame = 0;
+            }
+
+            if (createHitObject != 0) {
+                _pppPDataVal* dataVal = ppvMng->m_pppPDataVals + step->m_arg3;
+                _pppPObject* created;
+                if (dataVal == 0) {
+                    created = 0;
+                } else {
+                    created = pppCreatePObject(ppvMng, dataVal);
+                    created->m_link.m_previous = &laser->m_link;
+                }
+
+                Vec* createdPos = (Vec*)(created->m_workArea + step->m_laser.m_spawnPositionOffset);
+                createdPos->x = work->m_points[i].x;
+                createdPos->y = work->m_points[i].y + step->m_laser.m_spawnYOffset;
+                createdPos->z = work->m_points[i].z;
+            }
+        }
+    }
+
+    if (emptyHistory) {
+        for (fillIndex = 0; fillIndex < (int)(u32)step->m_laser.m_pointCount; fillIndex++) {
+            pppCopyVector(work->m_points[fillIndex], work->m_points[0]);
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 8017665c
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
+{
+    LaserWork* work = GetLaserWork(laser, ctrlTable);
+    void* alloc = work->m_points;
+    if (alloc != 0) {
+        pppMemFree(alloc);
+        work->m_points = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 801766a8
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct2Laser(pppLaser *laser, _pppCtrlTable *ctrlTable)
+{
+    f32 zero = LaserConst(kPppLaserZero);
+    LaserWork* work = GetLaserWork(laser, ctrlTable);
+
+    work->m_graphValue3 = LaserConst(kPppLaserZero);
+    work->m_graphValue2 = zero;
+    work->m_halfWidth = zero;
+    work->m_graphValue1 = zero;
+    work->m_graphValue0 = zero;
+    work->m_lengthStep = zero;
+    work->m_origin.z = zero;
+    work->m_origin.y = zero;
+    work->m_origin.x = zero;
+    work->m_shapeReady = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 801766ec
+ * PAL Size: 336b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
+{
+    f32 zero = LaserConst(kPppLaserZero);
+    LaserWork* work = GetLaserWork(laser, ctrlTable);
+    int particleIndex;
+    int playerIndex;
+    int hasSpecialInfo;
+    Vec playerPosition;
+    Vec targetCursorPosB;
+
+    work->m_length = LaserConst(kPppLaserZero);
+    work->m_graphValue3 = zero;
+    work->m_graphValue2 = zero;
+    work->m_halfWidth = zero;
+    work->m_graphValue1 = zero;
+    work->m_graphValue0 = zero;
+    work->m_lengthStep = zero;
+    work->m_points = 0;
+    work->m_origin.z = zero;
+    work->m_origin.y = zero;
+    work->m_origin.x = zero;
+
+    work->m_shapeReady = 0;
+    work->m_hitFrame = 0;
+    work->m_unused2E = 0;
+    work->m_shapeArg0 = 0;
+    work->m_shapeArg2 = 0;
+    work->m_shapeArg1 = 0;
+
+    work->m_shapeRotation = Math.RandF(LaserConst(kPppLaserTau));
+    work->m_spawnEnabled = 1;
+
+    hasSpecialInfo = Game.GetParticleSpecialInfo(ppvMng->m_hitParams, particleIndex, playerIndex);
+    if (hasSpecialInfo != 0) {
+        Game.GetTargetCursor(playerIndex, work->m_targetPosition, targetCursorPosB);
+
+        CGPartyObj* partyObj = Game.GetPartyObj(playerIndex);
+        playerPosition = partyObj->m_worldPosition;
+        if (particleIndex == 0x200) {
+            work->m_maxLength = PSVECDistance(&work->m_targetPosition, &playerPosition);
+        } else {
+            work->m_maxLength = LaserConst(kPppLaserMaxLengthDisabled);
+        }
+    } else {
+        work->m_maxLength = LaserConst(kPppLaserMaxLengthDisabled);
+        ppvMng->m_hitBgFlag = 1;
+        pppStopSe(ppvMng, &ppvMng->m_soundEffectData);
     }
 }

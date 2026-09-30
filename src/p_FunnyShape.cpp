@@ -10,7 +10,6 @@
 
 #include <string.h>
 
-static const char s_funnyShapeSpinner[5] = "|/-\\";
 static const char s_CFunnyShapePcsViewer[] = "CFunnyShapePcs(VIEWER)";
 static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 static const char s_funnyShapeFmt[] = "FunnyShape [%c]";
@@ -57,7 +56,7 @@ void CFunnyShapePcs::drawViewer()
         m_funnyShape.Render();
     }
 
-    static char* pFan = const_cast<char*>(s_funnyShapeSpinner);
+    static char* pFan = "|/-\\";
     static int alive = 0;
 
     alive++;

@@ -96,3 +96,16 @@ Download the latest release from [encounter/objdiff](https://github.com/encounte
 Select an object from the left sidebar to begin diffing. Changes to the project will rebuild automatically: changes to source files, headers, `configure.py`, `splits.txt` or `symbols.txt`.
 
 ![](assets/objdiff.png)
+
+### Finding function-order candidates
+
+After building, scan existing game objects for function-order differences:
+
+```sh
+python tools/mine_function_order.py --limit 20 --json build/function_order_candidates.json
+python tools/mine_function_order.py --unit main/p_light --details
+```
+
+The report compares retail split objects with compiled objects, computes a minimal set of function moves, and prioritizes small candidates without missing functions or size differences. It reads existing builds and does not edit sources. `--diff-json` can analyze a saved objdiff diff.
+
+Moves describe **compiled order**: deferred compilation can reverse source order. Generated special members are flagged for review; constant-pool layout requires separate investigation. These are candidates, not guaranteed byte gains. After changing a candidate, rebuild and compare the whole unit with objdiff before committing.

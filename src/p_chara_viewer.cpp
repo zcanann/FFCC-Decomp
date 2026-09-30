@@ -272,7 +272,6 @@ void CCharaPcs::calcViewer()
 {
     CCharaPcs* self = this;
     char pathBuf[256];
-    CFile::CHandle* fileHandle;
 
     if (self->m_viewerStoreSavedAnim != 0) {
         ReleaseShared(self->m_viewerSavedAnim);
@@ -286,7 +285,7 @@ void CCharaPcs::calcViewer()
         (self->m_viewerLoadAnimContinuous != 0)) {
         if (loadModel != 0) {
             System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerModelPath);
-            fileHandle = File.Open(self->m_viewerModelPath, 0, CFile::PRI_LOW);
+            CFile::CHandle* fileHandle = File.Open(self->m_viewerModelPath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 ReleaseShared(self->m_viewerModel[1]);
                 ReleaseShared(self->m_viewerAnim[1]);
@@ -313,7 +312,7 @@ void CCharaPcs::calcViewer()
 
         if ((self->m_viewerLoadDynamics != 0) && (self->m_viewerModel[0] != 0)) {
             System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerDynamicsPath);
-            fileHandle = File.Open(self->m_viewerDynamicsPath, 0, CFile::PRI_LOW);
+            CFile::CHandle* fileHandle = File.Open(self->m_viewerDynamicsPath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
@@ -334,7 +333,7 @@ void CCharaPcs::calcViewer()
 
             if (self->m_viewerLoadAnim != 0) {
                 System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerAnimPath);
-                fileHandle = File.Open(self->m_viewerAnimPath, 0, CFile::PRI_LOW);
+                CFile::CHandle* fileHandle = File.Open(self->m_viewerAnimPath, 0, CFile::PRI_LOW);
                 if (fileHandle != 0) {
                     File.Read(fileHandle);
                     File.SyncCompleted(fileHandle);
@@ -349,7 +348,7 @@ void CCharaPcs::calcViewer()
                 for (int animIndex = 0; animIndex < self->m_viewerAnimRequestedCount; animIndex++) {
                     sprintf(pathBuf, s_anim_path_fmt, self->m_viewerAnimPath, self->m_viewerAnimLoadedCount);
                     System.Printf(const_cast<char*>(s_calc_viewer_fmt), pathBuf);
-                    fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
+                    CFile::CHandle* fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
                     if (fileHandle != 0) {
                         CChara::CAnim* oldAnim = self->m_viewerAnimBank[self->m_viewerAnimLoadedCount];
                         if (oldAnim != 0) {
@@ -380,7 +379,7 @@ void CCharaPcs::calcViewer()
 
         if (self->m_viewerLoadTexture != 0) {
             System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerTexturePath);
-            fileHandle = File.Open(self->m_viewerTexturePath, 0, CFile::PRI_LOW);
+            CFile::CHandle* fileHandle = File.Open(self->m_viewerTexturePath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 ReleaseShared(self->m_viewerTextureSet[0]);
                 File.Read(fileHandle);
@@ -401,11 +400,11 @@ void CCharaPcs::calcViewer()
     {
         static int alive = 0;
         alive++;
-        Graphic.Printf("[%c] %s", (int)(char)pFan[(alive >> 4) % 4], USBPcs.m_rootPath);
+        Graphic.Printf("[%c] %s", pFan[(alive >> 4) % 4], USBPcs.m_rootPath);
     }
 
-    unsigned int heldButtons = Pad.GetButton(0);
-    unsigned int triggerButtons = Pad.GetButtonDown(0);
+    unsigned short heldButtons = Pad.GetButton(0);
+    unsigned short triggerButtons = Pad.GetButtonDown(0);
 
     if ((self->m_viewerModel[0] != 0) && (self->m_viewerResetIFrame != 0)) {
         if (self->m_viewerIFrameEnabled == 0) {
@@ -449,19 +448,8 @@ void CCharaPcs::calcViewer()
         }
         frameAdvance += step;
     } else {
-        float deltaY;
-        if ((heldButtons & 0x200) != 0) {
-            deltaY = -1.0f;
-        } else {
-            deltaY = 1.0f;
-        }
-        float speedScale;
-        if ((heldButtons & 0x100) != 0) {
-            speedScale = 0.25f;
-        } else {
-            speedScale = 1.0f;
-        }
-        frameAdvance = deltaY * speedScale;
+        frameAdvance = ((heldButtons & 0x100) ? 0.25f : 1.0f) *
+                       ((heldButtons & 0x200) ? -1.0f : 1.0f);
     }
 
     for (unsigned int i = 0; i < 2; i++) {
@@ -470,8 +458,8 @@ void CCharaPcs::calcViewer()
         }
 
         float translateX = 0.0f;
-        if ((i != 0) && (self->m_viewerModel[0] != 0)) {
-            int posQuant = ViewerModelPosQuant(self->m_viewerModel[0]);
+        if ((i != 0) && (self->m_viewerModel[i - 1] != 0)) {
+            int posQuant = ViewerModelPosQuant(self->m_viewerModel[i - 1]);
             translateX = static_cast<float>((1 << (15 - posQuant)) / 8);
         }
 
@@ -493,11 +481,10 @@ void CCharaPcs::calcViewer()
         if (self->m_viewerAnim[i] != 0) {
             if ((i == 0) && (self->m_viewerAnimLoadedCount != 0)) {
                 self->m_viewerModel[i]->SetFrame(ViewerModelTime(self->m_viewerModel[i]) + frameAdvance);
-                float animFrames = static_cast<float>(self->m_viewerAnim[i]->m_frameCount);
+                float animFrames = static_cast<float>(self->m_viewerAnim[0]->m_frameCount);
                 if (animFrames <= ViewerModelTime(self->m_viewerModel[0])) {
-                    int nextIndex = self->m_viewerAnimLoopIndex + 1;
-                    int animCount = self->m_viewerAnimLoadedCount;
-                    self->m_viewerAnimLoopIndex = nextIndex - (nextIndex / animCount) * animCount;
+                    self->m_viewerAnimLoopIndex =
+                        (self->m_viewerAnimLoopIndex + 1) % self->m_viewerAnimLoadedCount;
                     self->m_viewerModel[0]->AttachAnim(self->m_viewerAnimBank[self->m_viewerAnimLoopIndex], -1, -1, 0);
                     ReleaseShared(self->m_viewerAnim[0]);
                     self->m_viewerAnim[0] = self->m_viewerAnimBank[self->m_viewerAnimLoopIndex];
@@ -534,11 +521,10 @@ void CCharaPcs::calcViewer()
         if (Pad.m_debugPadLock != 0) {
             rotY = 0.0f;
         } else {
-            unsigned int padIndex = 4;
-            padIndex &= ~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 31);
+            unsigned int padIndex = (Pad.m_debugPadPort == 4) ? 0 : 4;
             rotY = Pad.GetPadInputs()[padIndex].substickXF;
         }
-        srt.m_rotation.y = srt.m_rotation.y + rotY;
+        srt.m_rotation.y += rotY;
         srt.m_position.x = translateX;
 
         Mtx modelMtx;

@@ -207,9 +207,9 @@ extern u8 lbl_0201D5C4[];
 extern u8 lbl_020204EC[];
 extern u8 lbl_02021D2C[];
 extern u8 lbl_02021D6C[];
-extern s16 lbl_0200EE10[];
-extern struct TextLayer lbl_0202BB94;
-extern struct Game lbl_0202C618;
+extern s16 gSinTable[];
+extern struct TextLayer gTextLayer;
+extern struct Game gGame;
 extern u8 lbl_0202C65A[];
 extern vu8 lbl_0202DFFE;
 extern u8 lbl_0202E000[];
@@ -223,12 +223,12 @@ extern vu16 lbl_03005254;
 extern vu16 lbl_03005256;
 extern u8 lbl_03005D65;
 extern u8 lbl_03005D67;
-extern struct Camera lbl_030060F8;
+extern struct Camera gCamera;
 extern struct Floor lbl_03006144;
 extern struct Route lbl_030063C8[];
 extern struct PointList lbl_030063E0[];
-extern u32 lbl_03006400[624];
-extern s32 lbl_03006DC0;
+extern u32 gMtState[624];
+extern s32 gMtIndex;
 
 void *memcpy(void *dst, const void *src, unsigned long n);
 s32 vsprintf(char *buf, const char *fmt, va_list ap);
@@ -238,19 +238,19 @@ void LZ77UnCompWram(void *src, void *dst);
 void LZ77UnCompVram(void *src, void *dst);
 void m4aSongNumStart(u16 n);
 
-void fn_020001A0(char *file, s32 line);
-void fn_02005E78();
-void fn_02005F88(struct Camera *cam, u16 pitch);
-void fn_02006438(struct Floor *floor);
+void AssertFailed(char *file, s32 line);
+void Camera_Follow();
+void Camera_SetPitch(struct Camera *cam, u16 pitch);
+void Floor_BuildDepths(struct Floor *floor);
 void fn_02006FC0(struct TextLayer *layer, u8 pal);
 void fn_02007184(struct TextLayer *layer, void *src);
 void fn_02007238(struct TextLayer *layer);
-s16 fn_020074D4(s16 a, s16 b);
-s16 fn_02007508(s16 a);
+s16 FixMul(s16 a, s16 b);
+s16 FixInv(s16 a);
 void fn_020075BC(struct Stream *s, u8 *buf);
 u32 fn_02007664(struct Stream *s);
 
-void fn_02005D28(struct Camera *cam)
+void Camera_Init(struct Camera *cam)
 {
     cam->pos.x = cam->pos.y = cam->pos.z = 0;
     cam->yaw = 0;
@@ -258,7 +258,7 @@ void fn_02005D28(struct Camera *cam)
     cam->centerX = 120;
     cam->centerY = 80;
     cam->focal = 240;
-    fn_02005F88(cam, 0xF600);
+    Camera_SetPitch(cam, 0xF600);
 }
 
 static inline s32 IsActive(s32 no)
@@ -266,7 +266,7 @@ static inline s32 IsActive(s32 no)
     return (1 << no) & lbl_03005D67;
 }
 
-void fn_02005D5C(struct Camera *cam)
+void Camera_Update(struct Camera *cam)
 {
     u16 keys = REG_KEYINPUT ^ 0x3FF;
     struct Actor *p;
@@ -286,21 +286,21 @@ void fn_02005D5C(struct Camera *cam)
     mode = lbl_03000000.mode;
     if (mode > 1) {
         if (mode <= 3) {
-            fn_02005E78(cam, &lbl_0202C618.players[cam->player].pos, lbl_0202C618.players[cam->player].angle, -2000, 0);
+            Camera_Follow(cam, &gGame.players[cam->player].pos, gGame.players[cam->player].angle, -2000, 0);
             return;
         }
     }
     if (lbl_03000000.mode > 3) {
         cam->yaw += 364;
-        p = &lbl_0202C618.players[cam->player];
+        p = &gGame.players[cam->player];
         if (cam->held & 0x100)
-            fn_02005E78(cam, &p->pos, *(u16 *)&lbl_0202C65A[cam->player * sizeof(struct Actor)], -2000, 0);
+            Camera_Follow(cam, &p->pos, *(u16 *)&lbl_0202C65A[cam->player * sizeof(struct Actor)], -2000, 0);
         else
-            fn_02005E78(cam, &p->pos, cam->yaw, -2000, 0);
+            Camera_Follow(cam, &p->pos, cam->yaw, -2000, 0);
     }
 }
 
-void fn_02005E78(cam, target, yaw, dist, near)
+void Camera_Follow(cam, target, yaw, dist, near)
     struct Camera *cam;
     struct Vec *target;
     u16 yaw;
@@ -312,11 +312,11 @@ void fn_02005E78(cam, target, yaw, dist, near)
     if (cam->held & 0x100)
         yaw += 0x8000;
     cam->yaw = yaw;
-    cam->yawSin = lbl_0200EE10[yaw >> 5];
-    cam->yawCos = lbl_0200EE10[(cam->yaw >> 5) + 512];
+    cam->yawSin = gSinTable[yaw >> 5];
+    cam->yawCos = gSinTable[(cam->yaw >> 5) + 512];
     yaw = -cam->yaw;
-    cam->yawSin2 = lbl_0200EE10[yaw >> 5];
-    cam->yawCos2 = lbl_0200EE10[(yaw >> 5) + 512];
+    cam->yawSin2 = gSinTable[yaw >> 5];
+    cam->yawCos2 = gSinTable[(yaw >> 5) + 512];
     if (near) {
         cam->dist = dist;
         cam->height = 70;
@@ -336,14 +336,14 @@ void fn_02005E78(cam, target, yaw, dist, near)
     cam->originZ = cam->pos.z + cam->yawCos * 32;
 }
 
-void fn_02005F88(struct Camera *cam, u16 pitch)
+void Camera_SetPitch(struct Camera *cam, u16 pitch)
 {
     cam->pitch = pitch;
-    cam->pitchSin = lbl_0200EE10[pitch >> 5];
-    cam->pitchCos = lbl_0200EE10[(pitch >> 5) + 512];
-    cam->pitchSin2 = lbl_0200EE10[(u16)-pitch >> 5];
-    cam->pitchCos2 = lbl_0200EE10[((u16)-pitch >> 5) + 512];
-    fn_02006438(&lbl_03006144);
+    cam->pitchSin = gSinTable[pitch >> 5];
+    cam->pitchCos = gSinTable[(pitch >> 5) + 512];
+    cam->pitchSin2 = gSinTable[(u16)-pitch >> 5];
+    cam->pitchCos2 = gSinTable[((u16)-pitch >> 5) + 512];
+    Floor_BuildDepths(&lbl_03006144);
 }
 
 static inline void RotateY(struct Camera *cam, struct Vec *in, struct Vec *out)
@@ -353,7 +353,7 @@ static inline void RotateY(struct Camera *cam, struct Vec *in, struct Vec *out)
     out->z = (cam->yawSin2 * in->x + cam->yawCos2 * in->z) >> 8;
 }
 
-void fn_02005FDC(struct Camera *cam, struct Vec *in, struct Vec *out)
+void Camera_Rotate(struct Camera *cam, struct Vec *in, struct Vec *out)
 {
     struct Vec tmp[1];
 
@@ -370,7 +370,7 @@ static inline void AddVec(struct Vec *out, struct Vec *a, struct Vec *b)
     out->z = a->z + b->z;
 }
 
-void fn_0200606C(struct Camera *cam, struct Vec *in, struct Vec *out)
+void Camera_ViewToWorld(struct Camera *cam, struct Vec *in, struct Vec *out)
 {
     struct Vec *eye = &cam->eye;
     struct Vec tmp[1];
@@ -380,18 +380,18 @@ void fn_0200606C(struct Camera *cam, struct Vec *in, struct Vec *out)
     tmp->y = in->y + eye->y;
     tmp->z = in->z + eye->z;
     v = *tmp;
-    fn_02005FDC(cam, &v, out);
+    Camera_Rotate(cam, &v, out);
     AddVec(out, out, &cam->target);
 }
 
-void fn_020060D8(struct Camera *cam, struct Vec *in, struct Vec *out)
+void Camera_ScreenToView(struct Camera *cam, struct Vec *in, struct Vec *out)
 {
     out->x = in->z * (in->x - cam->centerX) / cam->focal;
     out->y = in->z * (cam->centerY - in->y) / cam->focal;
     out->z = in->z;
 }
 
-u8 fn_02006130(struct Camera *cam, struct Vec *in, struct Vec *out)
+u8 Camera_WorldToScreen(struct Camera *cam, struct Vec *in, struct Vec *out)
 {
     s16 dx = in->x - cam->target.x;
     s16 dy = in->y - cam->target.y;
@@ -413,12 +413,12 @@ u8 fn_02006130(struct Camera *cam, struct Vec *in, struct Vec *out)
     return 1;
 }
 
-void fn_02006244(struct Camera *cam, struct Vec *in, struct Vec *out)
+void Camera_ScreenToWorld(struct Camera *cam, struct Vec *in, struct Vec *out)
 {
     struct Vec tmp;
 
-    fn_020060D8(cam, in, &tmp);
-    fn_0200606C(cam, &tmp, out);
+    Camera_ScreenToView(cam, in, &tmp);
+    Camera_ViewToWorld(cam, &tmp, out);
 }
 
 void fn_02006264(void)
@@ -468,10 +468,10 @@ void fn_02006374(void)
     REG_BG1VOFS = 16;
     lbl_03005256 = lbl_03005254 = 0;
     LZ77UnCompVram(lbl_0201627C, (void *)0x06007000);
-    fn_02007184(&lbl_0202BB94, lbl_0201619C);
+    fn_02007184(&gTextLayer, lbl_0201619C);
 }
 
-void fn_020063E4(struct Floor *floor, struct Vec *pos, struct Vec *dir, struct Vec *out)
+void Camera_RayFloor(struct Floor *floor, struct Vec *pos, struct Vec *dir, struct Vec *out)
 {
     out->x = pos->x - dir->x * pos->y / dir->y;
     out->y = pos->y - dir->y * pos->y / dir->y;
@@ -485,7 +485,7 @@ static inline void SetVec(struct Vec *v, s16 x, s16 y, s16 z)
     v->z = z;
 }
 
-void fn_02006438(struct Floor *floor)
+void Floor_BuildDepths(struct Floor *floor)
 {
     struct Vec zero;
     struct Vec v;
@@ -495,17 +495,17 @@ void fn_02006438(struct Floor *floor)
     struct Vec *eye;
 
     SetVec(&zero, 0, 0, 0);
-    fn_02005E78(&lbl_030060F8, &zero, 0, 0, 1);
-    eye = &lbl_030060F8.pos;
+    Camera_Follow(&gCamera, &zero, 0, 0, 1);
+    eye = &gCamera.pos;
     lbl_03000000.horizon = 0;
     for (i = 0; i < 160; i++) {
         SetVec(&v, 120, i, 160);
-        fn_02006244(&lbl_030060F8, &v, &out);
+        Camera_ScreenToWorld(&gCamera, &v, &out);
         out.x -= eye->x;
         out.y -= eye->y;
         out.z -= eye->z;
         if (out.y < 0) {
-            fn_020063E4(floor, eye, &out, &hit);
+            Camera_RayFloor(floor, eye, &out, &hit);
             if ((u16)hit.z <= 0x700)
                 goto found;
         }
@@ -521,8 +521,8 @@ void fn_02006438(struct Floor *floor)
 
 void fn_0200652C(struct Background *bg)
 {
-    s16 x = ((u16)((lbl_030060F8.originX - 0x6000) >> 7) & ~1) + 256;
-    s16 y = ((lbl_030060F8.originZ - 0x6000) >> 7) + 256;
+    s16 x = ((u16)((gCamera.originX - 0x6000) >> 7) & ~1) + 256;
+    s16 y = ((gCamera.originZ - 0x6000) >> 7) + 256;
     s16 top;
     s16 bottom;
     s16 left;
@@ -565,9 +565,9 @@ void fn_0200652C(struct Background *bg)
     }
 }
 
-void fn_02006794(struct Floor *floor)
+void Mode7_UpdateAffine(struct Floor *floor)
 {
-    struct Camera *cam = &lbl_030060F8;
+    struct Camera *cam = &gCamera;
     s16 *origin = &cam->originX;
     s16 *scale;
     u16 idx;
@@ -590,12 +590,12 @@ void fn_02006794(struct Floor *floor)
     lbl_03005256 = cam->yaw >> 6;
     scale = &cam->scaleX;
     idx = cam->yaw >> 5;
-    cos = lbl_0200EE10[idx + 512];
-    xx = fn_020074D4(cos, fn_02007508(scale[0]));
-    sin = lbl_0200EE10[idx];
-    xy = fn_020074D4(sin, fn_02007508(scale[0]));
-    yx = fn_020074D4(-lbl_0200EE10[idx], fn_02007508(scale[1]));
-    yy = fn_020074D4(cos, fn_02007508(scale[1]));
+    cos = gSinTable[idx + 512];
+    xx = FixMul(cos, FixInv(scale[0]));
+    sin = gSinTable[idx];
+    xy = FixMul(sin, FixInv(scale[0]));
+    yx = FixMul(-gSinTable[idx], FixInv(scale[1]));
+    yy = FixMul(cos, FixInv(scale[1]));
     ox = (u8)origin[0] * 16;
     oy = (origin[1] & 0x7F) * 16;
     aff = lbl_03004248;
@@ -936,7 +936,7 @@ void fn_020070F8(struct TextLayer *layer, s32 x, s32 y, u16 pal, u8 *str)
     layer->dirty = 1;
 }
 
-void fn_02007148(struct TextLayer *layer, s32 x, s32 y, const char *fmt, ...)
+void Text_Printf(struct TextLayer *layer, s32 x, s32 y, const char *fmt, ...)
 {
     va_list ap;
 
@@ -969,7 +969,7 @@ void fn_020071E4(struct TextLayer *layer)
     layer->dirty = 1;
 }
 
-void fn_0200720C(struct TextLayer *layer)
+void Text_Flush(struct TextLayer *layer)
 {
     if (layer->dirty) {
         CpuFastSet(layer, (void *)0x06006800, 0x140);
@@ -1009,12 +1009,12 @@ void fn_020072E4(void)
 
 void fn_020072E8(struct Vec *pos)
 {
-    struct Actor *actor = &lbl_0202C618.players[lbl_03005D65];
+    struct Actor *actor = &gGame.players[lbl_03005D65];
 
     *pos = actor->pos;
 }
 
-void fn_02007308(void *snd, u16 song, void *owner)
+void PlaySong(void *snd, u16 song, void *owner)
 {
     m4aSongNumStart(song);
 }
@@ -1023,49 +1023,49 @@ void fn_02007318(void)
 {
 }
 
-void fn_0200731C(u32 seed)
+void sgenrand(u32 seed)
 {
     s32 i;
 
     for (i = 0; i < 624; i++) {
-        lbl_03006400[i] = seed & 0xFFFF0000;
+        gMtState[i] = seed & 0xFFFF0000;
         seed = 69069 * seed + 1;
-        lbl_03006400[i] |= (seed & 0xFFFF0000) >> 16;
+        gMtState[i] |= (seed & 0xFFFF0000) >> 16;
         seed = 69069 * seed + 1;
     }
-    lbl_03006DC0 = 624;
+    gMtIndex = 624;
 }
 
-void fn_0200736C(u32 *seeds)
+void lsgenrand(u32 *seeds)
 {
     s32 i;
 
     for (i = 0; i < 624; i++)
-        lbl_03006400[i] = seeds[i];
-    lbl_03006DC0 = 624;
+        gMtState[i] = seeds[i];
+    gMtIndex = 624;
 }
 
-u32 fn_02007398(void)
+u32 genrand(void)
 {
     u32 y;
     s32 kk;
 
-    if (lbl_03006DC0 >= 624) {
-        if (lbl_03006DC0 == 625)
-            fn_0200731C(4357);
+    if (gMtIndex >= 624) {
+        if (gMtIndex == 625)
+            sgenrand(4357);
         for (kk = 0; kk < 624 - 397; kk++) {
-            y = (lbl_03006400[kk] & 0x80000000) | (lbl_03006400[kk + 1] & 0x7FFFFFFF);
-            lbl_03006400[kk] = lbl_03006400[kk + 397] ^ (y >> 1) ^ lbl_02015A4C[y & 1];
+            y = (gMtState[kk] & 0x80000000) | (gMtState[kk + 1] & 0x7FFFFFFF);
+            gMtState[kk] = gMtState[kk + 397] ^ (y >> 1) ^ lbl_02015A4C[y & 1];
         }
         for (; kk < 623; kk++) {
-            y = (lbl_03006400[kk] & 0x80000000) | (lbl_03006400[kk + 1] & 0x7FFFFFFF);
-            lbl_03006400[kk] = lbl_03006400[kk + (397 - 624)] ^ (y >> 1) ^ lbl_02015A4C[y & 1];
+            y = (gMtState[kk] & 0x80000000) | (gMtState[kk + 1] & 0x7FFFFFFF);
+            gMtState[kk] = gMtState[kk + (397 - 624)] ^ (y >> 1) ^ lbl_02015A4C[y & 1];
         }
-        y = (lbl_03006400[623] & 0x80000000) | (lbl_03006400[0] & 0x7FFFFFFF);
-        lbl_03006400[623] = lbl_03006400[396] ^ (y >> 1) ^ lbl_02015A4C[y & 1];
-        lbl_03006DC0 = 0;
+        y = (gMtState[623] & 0x80000000) | (gMtState[0] & 0x7FFFFFFF);
+        gMtState[623] = gMtState[396] ^ (y >> 1) ^ lbl_02015A4C[y & 1];
+        gMtIndex = 0;
     }
-    y = lbl_03006400[lbl_03006DC0++];
+    y = gMtState[gMtIndex++];
     y ^= y >> 11;
     y ^= (y << 7) & 0x9D2C5680;
     y ^= (y << 15) & 0xEFC60000;
@@ -1073,7 +1073,7 @@ u32 fn_02007398(void)
     return y;
 }
 
-s16 fn_020074D4(s16 a, s16 b)
+s16 FixMul(s16 a, s16 b)
 {
     s32 v = a * b;
 
@@ -1081,19 +1081,19 @@ s16 fn_020074D4(s16 a, s16 b)
     return v;
 }
 
-s16 fn_020074F0(s16 a, s16 b)
+s16 FixDiv(s16 a, s16 b)
 {
     return (a << 8) / b;
 }
 
-s16 fn_02007508(s16 a)
+s16 FixInv(s16 a)
 {
     s32 n = 0x10000;
 
     return n / a;
 }
 
-s16 fn_02007520(s16 a, s16 b)
+s16 AngleDiff(s16 a, s16 b)
 {
     s32 d = (a - b) & 0xFFFF;
 
@@ -1102,9 +1102,9 @@ s16 fn_02007520(s16 a, s16 b)
     return d;
 }
 
-s16 fn_02007540(s16 from, s16 to, s16 max)
+s16 TurnToward(s16 from, s16 to, s16 max)
 {
-    s16 d = fn_02007520(to, from);
+    s16 d = AngleDiff(to, from);
 
     if (d > 0) {
         if (d > max)
@@ -1120,7 +1120,7 @@ s16 fn_02007540(s16 from, s16 to, s16 max)
     return 0;
 }
 
-s16 fn_02007588(s16 a, s16 b, s16 t)
+s16 FixLerp(s16 a, s16 b, s16 t)
 {
     return a + (((s16)(b - a) * t) >> 8);
 }
@@ -1138,7 +1138,7 @@ struct Stream *fn_020075AC(struct Stream *s, u8 *buf)
 void fn_020075BC(struct Stream *s, u8 *buf)
 {
     if (buf == NULL)
-        fn_020001A0(lbl_02010210, 41);
+        AssertFailed(lbl_02010210, 41);
     s->base = buf;
     s->chunk = buf;
     s->offset = 0;

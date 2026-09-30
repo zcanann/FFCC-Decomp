@@ -170,20 +170,20 @@ extern char lbl_0200EDAC[];
 extern char lbl_0200EDC8[];
 extern struct Homing lbl_0200EDE8;
 extern struct Homing lbl_0200EDFC;
-extern s16 lbl_0200EE10[];
+extern s16 gSinTable[];
 extern u8 lbl_020159AC[];
 extern u8 lbl_020159AF[];
-extern struct Game lbl_0202C618;
+extern struct Game gGame;
 extern u8 lbl_030063C8[];
 extern u8 lbl_030063E0[];
 extern u8 lbl_030063F8[];
 extern struct Matrix lbl_03005048[];
-extern u8 lbl_030060F8[];
+extern u8 gCamera[];
 
-void fn_020001A0(char *file, s32 line);
+void AssertFailed(char *file, s32 line);
 struct OamNode *fn_020047E4(struct Game *game, struct OamData *src);
 void fn_020047AC(struct Game *game, struct OamNode *node, u16 prio);
-u8 fn_02006130(void *camera, void *src, struct Pos *out);
+u8 Camera_WorldToScreen(void *camera, void *src, struct Pos *out);
 void fn_020026EC(struct AnimState *anim, u16 id, u8 palette);
 u8 fn_02002700(struct AnimState *anim);
 void fn_020026B8(struct AnimState *anim, u16 id, u8 palette);
@@ -197,8 +197,8 @@ struct Actor *fn_020043E8(struct Game *game, struct Effect *e, s32 range, s16 *o
 s16 fn_02006C94(struct Route *route, u8 a, s16 x, s16 z, void *out);
 void fn_020054A4(struct Game *game, u8 type, ...);
 struct PointList *fn_02006EFC(void *list, s32 no);
-u32 fn_02007398(void);
-void fn_02007308(void *list, u8 no, struct Effect *e);
+u32 genrand(void);
+void PlaySong(void *list, u8 no, struct Effect *e);
 struct Actor *fn_02004218(struct Game *game, struct Effect *e, u8 a, s32 mask);
 void fn_02003D14(struct Actor *actor, u8 a);
 void fn_02003D40(struct Actor *actor, u8 a);
@@ -230,9 +230,9 @@ void fn_02004828(struct Game *game, struct AnimState *spr, struct Point *pos, s1
     struct OamNode *node;
 
     if (spr->id >= 72)
-        fn_020001A0(lbl_0200EDAC, 2023);
+        AssertFailed(lbl_0200EDAC, 2023);
     if (spr->frame >= 127)
-        fn_020001A0(lbl_0200EDAC, 2024);
+        AssertFailed(lbl_0200EDAC, 2024);
     cell = GetCell(game, GetFrame(GetAnim(game, spr->id), spr->frame)->cell);
     for (i = 0; i < cell->count; i++) {
         node = fn_020047E4(game, &cell->objs[i]);
@@ -258,7 +258,7 @@ void fn_02004930(game, animNo, pos, prio)
     struct OamNode *node;
 
     if (animNo >= 72)
-        fn_020001A0(lbl_0200EDAC, 2057);
+        AssertFailed(lbl_0200EDAC, 2057);
     cell = GetCell(game, GetAnim(game, animNo)->frames[0].cell);
     for (i = cell->count - 1; i >= 0; i--) {
         node = fn_020047E4(game, &cell->objs[i]);
@@ -282,9 +282,9 @@ void fn_02004A18(struct Game *game, struct AnimState *spr, struct Pos *pos)
     struct Matrix *mtx;
 
     if (spr->id >= 72)
-        fn_020001A0(lbl_0200EDAC, 2087);
+        AssertFailed(lbl_0200EDAC, 2087);
     if (spr->frame >= 127)
-        fn_020001A0(lbl_0200EDAC, 2088);
+        AssertFailed(lbl_0200EDAC, 2088);
     scale = pos->z;
     if (scale < 28) {
         cell = GetCell(game, GetFrame(GetAnim(game, spr->id), spr->frame)->cell);
@@ -317,7 +317,7 @@ void fn_02004B60(game, animNo, pos)
     if (scale < 28) {
         no = animNo;
         if (no >= 72)
-            fn_020001A0(lbl_0200EDAC, 2148);
+            AssertFailed(lbl_0200EDAC, 2148);
         cell = GetCell(game, GetAnim(game, no)->frames[0].cell);
         node = fn_020047E4(game, &cell->objs[0]);
         node->oam.matrixNum = scale;
@@ -333,7 +333,7 @@ void fn_02004C40(struct Game *game, struct AnimState *spr, void *src)
 {
     struct Pos pos;
 
-    if (fn_02006130(lbl_030060F8, src, &pos)) {
+    if (Camera_WorldToScreen(gCamera, src, &pos)) {
         if (pos.z >= 61 && pos.z < 0x4000 && (u16)(pos.x + 16) <= 272 && pos.y >= -16 && pos.y <= 176) {
             pos.z >>= 9;
             fn_02004A18(game, spr, &pos);
@@ -345,7 +345,7 @@ void fn_02004CAC(struct Game *game, u16 animNo, void *src)
 {
     struct Pos pos;
 
-    if (fn_02006130(lbl_030060F8, src, &pos)) {
+    if (Camera_WorldToScreen(gCamera, src, &pos)) {
         if (pos.z >= 61 && pos.z < 0x4000 && (u16)(pos.x + 16) <= 272 && pos.y >= -16 && pos.y <= 176) {
             pos.z >>= 9;
             fn_02004B60(game, (s16)animNo, &pos);
@@ -364,7 +364,7 @@ void fn_02004D1C(struct Game *game, u16 animNo, void *src, u16 dx, u16 dy, u16 p
     struct Pos pos;
     struct Point pt;
 
-    if (fn_02006130(lbl_030060F8, src, &pos)) {
+    if (Camera_WorldToScreen(gCamera, src, &pos)) {
         if (pos.z >= 61 && pos.z < 0x4000) {
             Offset(&pos, dx, dy);
             if ((u16)(pos.x + 16) <= 272 && pos.y >= -16 && pos.y <= 176) {
@@ -428,8 +428,8 @@ void fn_02004EF0(void)
 
 static inline void GetDir(struct Point *dir, u16 angle)
 {
-    dir->x = lbl_0200EE10[angle >> 5];
-    dir->y = lbl_0200EE10[(angle >> 5) + 512];
+    dir->x = gSinTable[angle >> 5];
+    dir->y = gSinTable[(angle >> 5) + 512];
 }
 
 static inline void Scale(struct Point *out, struct Point *in, s32 scale)
@@ -480,7 +480,7 @@ struct Effect *fn_02004F04(struct Game *game)
         if (!game->effects[i].active)
             return &game->effects[i];
     }
-    fn_020001A0(lbl_0200EDC8, 28);
+    AssertFailed(lbl_0200EDC8, 28);
     return NULL;
 }
 
@@ -492,7 +492,7 @@ struct Effect *fn_02004F34(struct Game *game)
         if (!game->effects[i].active)
             return &game->effects[i];
     }
-    fn_020001A0(lbl_0200EDC8, 42);
+    AssertFailed(lbl_0200EDC8, 42);
     return NULL;
 }
 
@@ -504,7 +504,7 @@ void fn_02004F68(struct Effect *e, va_list *ap)
     e->pos.x = pt->x;
     e->pos.z = pt->y;
     e->pos.y = 0;
-    e->w.idle.color = fn_02007398() % 3;
+    e->w.idle.color = genrand() % 3;
     fn_020026B8(&e->anim, lbl_020159AC[e->w.idle.color], 0xFF);
     e->unk8 = 80;
 }
@@ -517,7 +517,7 @@ void fn_02004FC0(struct Effect *e, va_list *ap)
     e->pos.x = pt->x;
     e->pos.z = pt->y;
     e->pos.y = 0;
-    e->w.idle.color = fn_02007398() % 8;
+    e->w.idle.color = genrand() % 8;
     fn_020026B8(&e->anim, lbl_020159AF[e->w.idle.color], 0xFF);
     e->unk8 = 80;
 }
@@ -554,14 +554,14 @@ void fn_020050F0(struct Effect *e, va_list *ap)
     fn_02005018(e, ap);
     fn_020026B8(&e->anim, 30, 0xFF);
     e->unk8 = 80;
-    fn_020054A4(&lbl_0202C618, 2, e, &e->w.chase.vel);
+    fn_020054A4(&gGame, 2, e, &e->w.chase.vel);
 }
 
 void fn_02005120(struct Effect *e, va_list *ap)
 {
     e->w.target = va_arg(*ap, struct Actor *);
     fn_020026B8(&e->anim, 32, 0xFF);
-    fn_02007308(lbl_030063F8, 12, e);
+    PlaySong(lbl_030063F8, 12, e);
 }
 
 void fn_02005150(struct Effect *e, va_list *ap)
@@ -579,14 +579,14 @@ void fn_02005180(struct Effect *e, va_list *ap)
     fn_02005018(e, ap);
     fn_020026B8(&e->anim, 31, 0xFF);
     e->unk8 = 80;
-    fn_020054A4(&lbl_0202C618, 5, e, &e->w.chase.vel);
+    fn_020054A4(&gGame, 5, e, &e->w.chase.vel);
 }
 
 void fn_020051B0(struct Effect *e, va_list *ap)
 {
     e->w.target = va_arg(*ap, struct Actor *);
     fn_020026B8(&e->anim, 39, 0xFF);
-    fn_02007308(lbl_030063F8, 11, e);
+    PlaySong(lbl_030063F8, 11, e);
 }
 
 void fn_020051E0(struct Effect *e, va_list *ap)
@@ -636,7 +636,7 @@ void fn_02005330(struct Effect *e, va_list *ap)
 {
     e->w.target = va_arg(*ap, struct Actor *);
     fn_020026B8(&e->anim, 33, 0xFF);
-    fn_02007308(lbl_030063F8, 10, e);
+    PlaySong(lbl_030063F8, 10, e);
 }
 
 void fn_02005360(struct Effect *e, va_list *ap)
@@ -695,7 +695,7 @@ void fn_02005398(struct Effect *e, u8 type, va_list *ap)
         fn_02005360(e, ap);
         break;
     default:
-        fn_020001A0(lbl_0200EDC8, 342);
+        AssertFailed(lbl_0200EDC8, 342);
         break;
     }
 }
@@ -789,14 +789,14 @@ void fn_020056E8(struct Effect *e)
     struct Actor *actor;
 
     if (e->unk19) {
-        actor = fn_02004218(&lbl_0202C618, e, e->unk8, -1);
+        actor = fn_02004218(&gGame, e, e->unk8, -1);
         if (actor != NULL) {
             fn_02003D14(actor, e->w.idle.color);
             e->unk19 = 0;
             e->w.idle.wait = 90;
         }
     } else if (--e->w.idle.wait == 0) {
-        e->w.idle.color = fn_02007398() % 3;
+        e->w.idle.color = genrand() % 3;
         fn_020026B8(&e->anim, lbl_020159AC[e->w.idle.color], 0xFF);
         e->unk19 = 1;
     }
@@ -807,14 +807,14 @@ void fn_02005750(struct Effect *e)
     struct Actor *actor;
 
     if (e->unk19) {
-        actor = fn_02004218(&lbl_0202C618, e, e->unk8, -1);
+        actor = fn_02004218(&gGame, e, e->unk8, -1);
         if (actor != NULL) {
             fn_02003D40(actor, e->w.idle.color);
             e->unk19 = 0;
             e->w.idle.wait = 90;
         }
     } else if (--e->w.idle.wait == 0) {
-        e->w.idle.color = fn_02007398() % 8;
+        e->w.idle.color = genrand() % 8;
         fn_020026B8(&e->anim, lbl_020159AF[e->w.idle.color], 0xFF);
         e->unk19 = 1;
     }
@@ -838,7 +838,7 @@ void fn_020057B8(struct Effect *e, struct Homing *param, s32 mask)
             s16 vx = (e->w.chase.vel.x << 8) / speed;
             s16 vz = (e->w.chase.vel.y << 8) / speed;
 
-            e->w.chase.target = fn_020043E8(&lbl_0202C618, e, 25000000, &out, vx, vz, 240, mask);
+            e->w.chase.target = fn_020043E8(&gGame, e, 25000000, &out, vx, vz, 240, mask);
             e->w.chase.unk4 = out;
         }
     } else {
@@ -877,9 +877,9 @@ void fn_02005944(struct Effect *e)
     struct Actor *actor;
 
     fn_020057B8(e, &lbl_0200EDE8, mask);
-    actor = fn_02004218(&lbl_0202C618, e, e->unk8, mask);
+    actor = fn_02004218(&gGame, e, e->unk8, mask);
     if (actor != NULL) {
-        fn_020054A4(&lbl_0202C618, 2, e, &e->w.chase.vel);
+        fn_020054A4(&gGame, 2, e, &e->w.chase.vel);
         fn_02005484(e, 4, actor);
     } else if (e->timer++ >= 150) {
         fn_02005484(e, 2, e, &e->w.chase.vel);
@@ -911,9 +911,9 @@ void fn_02005A34(struct Effect *e)
     struct Actor *actor;
 
     fn_020057B8(e, &lbl_0200EDFC, mask);
-    actor = fn_02004218(&lbl_0202C618, e, e->unk8, mask);
+    actor = fn_02004218(&gGame, e, e->unk8, mask);
     if (actor != NULL) {
-        fn_020054A4(&lbl_0202C618, 5, e, &e->w.chase.vel);
+        fn_020054A4(&gGame, 5, e, &e->w.chase.vel);
         fn_02005484(e, 7, actor);
     } else if (e->timer++ >= 150) {
         fn_02005484(e, 5, e, &e->w.chase.vel);
@@ -935,7 +935,7 @@ void fn_02005AF0(struct Effect *e)
 {
     struct Actor *actor;
 
-    actor = fn_02004218(&lbl_0202C618, e, e->unk8, ~(1 << e->w.chase.owner));
+    actor = fn_02004218(&gGame, e, e->unk8, ~(1 << e->w.chase.owner));
     if (actor != NULL) {
         fn_02005484(e, 10, actor);
     } else if (e->timer++ >= 10) {
@@ -959,7 +959,7 @@ void fn_02005B7C(struct Effect *e)
         mask = ~(1 << e->w.idle.owner);
     else
         mask = -1;
-    actor = fn_02004218(&lbl_0202C618, e, e->unk8, mask);
+    actor = fn_02004218(&gGame, e, e->unk8, mask);
     if (actor != NULL)
         fn_02005484(e, 10, actor);
     else if (e->timer++ >= 1200)
@@ -989,7 +989,7 @@ void fn_02005C1C(struct Effect *e)
     e->pos = target->pos;
     if (e->timer == 0 && target->unk32 == 0) {
         target->unk32 = 30;
-        if (fn_02007398() & 1)
+        if (genrand() & 1)
             target->unk30 = 0x2000;
         else
             target->unk30 = 0xE000;
@@ -1038,7 +1038,7 @@ void fn_02005C6C(struct Effect *e)
         fn_02005BD0(e);
         break;
     default:
-        fn_020001A0(lbl_0200EDC8, 876);
+        AssertFailed(lbl_0200EDC8, 876);
         break;
     }
 }

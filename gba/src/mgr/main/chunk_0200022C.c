@@ -137,14 +137,14 @@ extern vu16 lbl_03005256;
 extern vu8 lbl_03005C5C;
 extern u8 lbl_03000248[];
 extern u8 lbl_03004C48[];
-extern u8 lbl_0202BB94[];
+extern u8 gTextLayer[];
 extern u8 lbl_03000048[];
 extern u32 lbl_03005C68;
 extern u32 lbl_03005C6C;
-extern struct Unk030060F8 lbl_030060F8;
+extern struct Unk030060F8 gCamera;
 extern u8 lbl_030063C8[];
 extern u8 lbl_030063E0[];
-extern struct Unk0202C618 lbl_0202C618[];
+extern struct Unk0202C618 gGame[];
 extern u8 lbl_030063F8[];
 extern u8 lbl_0201DDCC[];
 extern u8 lbl_02030000[];
@@ -187,11 +187,11 @@ void m4aSoundVSyncOff(void);
 void m4aSoundVSyncOn(void);
 void RegisterRamReset(u32);
 void LZ77UnCompWram(const void *, void *);
-void fn_020012AC(struct Work *, u8);
-void fn_0200731C(u32);
+void SetGameState(struct Work *, u8);
+void sgenrand(u32);
 void fn_02006F0C(void *);
-void fn_02002070(void);
-void fn_02005D28(void *);
+void Link_InitState(void);
+void Camera_Init(void *);
 void fn_02006B30(void *);
 void fn_02006ED0(void *);
 void fn_02006268(void *);
@@ -199,7 +199,7 @@ void fn_02003E94(void *);
 void fn_020072E4(void *);
 void intr_main(void);
 int vsprintf(char *, const char *, va_list);
-void fn_02001BA8(void);
+void ReadKeys(void);
 void m4aSongNumStart(u16);
 void m4aSongNumStop(u16);
 void m4aMPlayFadeOut(void *, u16);
@@ -218,9 +218,9 @@ void m4aMPlayFadeOutTemporarily(void *, u16);
 void m4aMPlayFadeIn(void *, u16);
 void SoundBiasReset(void);
 void SoundBiasSet(void);
-void fn_02001540(struct Work *);
-void fn_02001774(struct Work *);
-void fn_020010FC(struct Work *);
+void PauseMenu(struct Work *);
+void PauseMenuInput(struct Work *);
+void DrawTimerAndRank(struct Work *);
 void fn_02006FC0(void *, s32);
 void fn_02006FF8(void *, s32, s32, s32, s32);
 void fn_02007088(void *, s32, s32, s32);
@@ -231,7 +231,7 @@ u32 fn_02004E38(void *, u8, u8);
 void fn_02007184(void *, const void *);
 void fn_020072E8(void *);
 void fn_0200455C(void *);
-void fn_02005D5C(void *);
+void Camera_Update(void *);
 void fn_02004930(void *, s16, struct Point *, s16);
 void fn_0200468C(void *);
 void fn_020045DC(void *);
@@ -240,27 +240,27 @@ void fn_02004DD0(void *, u8, u8, u32);
 void fn_02001934(struct Work *);
 void fn_020019A0(struct Point *, u8);
 void fn_02001518(struct Work *);
-void fn_020015F8(struct Work *);
-void fn_02007148();
+void SleepMode(struct Work *);
+void Text_Printf();
 void fn_020070F8();
 u32 fn_020044F4(void *, u8);
 void fn_0200652C(void *);
-void fn_02006794(void *);
+void Mode7_UpdateAffine(void *);
 void fn_020019C8(struct Work *);
-void fn_020005E0(struct Work *);
-void fn_020007F4(struct Work *);
-void fn_02002270(void);
-void fn_020025B0(void);
-void fn_0200720C(void *);
-void fn_0200027C(void);
+void InitGame(struct Work *);
+void UpdateGameState(struct Work *);
+void Link_ApplyRemotePads(void);
+void Link_BuildPadPacket(void);
+void Text_Flush(void *);
+void UpdateSound(void);
 
-void fn_0200022C(u32 frames)
+void WaitFrames(u32 frames)
 {
     u32 end = lbl_03005248 + frames;
 
     while (lbl_03005248 < end) {
         VBlankIntrWait();
-        fn_0200027C();
+        UpdateSound();
     }
 }
 
@@ -269,7 +269,7 @@ static inline void SetPlayerNo(struct Unk030060F8 *p, u8 no)
     p->unk4A = no;
 }
 
-void fn_02000254(const char *fmt, ...)
+void DebugPrintf(const char *fmt, ...)
 {
     char buf[512];
     va_list ap;
@@ -279,7 +279,7 @@ void fn_02000254(const char *fmt, ...)
     va_end(ap);
 }
 
-void fn_0200027C(void)
+void UpdateSound(void)
 {
     m4aSoundMain();
 }
@@ -291,26 +291,26 @@ void AgbMain(void)
 
     lbl_03005248 = 0;
     REG_IME = 0;
-    fn_020005E0(&lbl_03000000);
+    InitGame(&lbl_03000000);
     work = &lbl_03000000;
     for (;;) {
-        fn_02001BA8();
+        ReadKeys();
         keys = REG_KEYINPUT ^ 0x3FF;
         work->unk2 = keys & ~work->unk0;
         work->unk0 = keys;
         if (lbl_03005D61 != 0 && (u8)(work->unk4 - 2) <= 3) {
             fn_0200652C(lbl_03006144);
-            fn_02006794(lbl_03006144);
+            Mode7_UpdateAffine(lbl_03006144);
         }
         fn_020019C8(work);
-        fn_0200027C();
-        fn_020007F4(work);
+        UpdateSound();
+        UpdateGameState(work);
         while (lbl_03005248 == 0) {
             VBlankIntrWait();
         }
-        fn_0200027C();
-        fn_02002270();
-        fn_020025B0();
+        UpdateSound();
+        Link_ApplyRemotePads();
+        Link_BuildPadPacket();
         VBlankIntrWait();
         lbl_03005248 = 0;
         if (lbl_03000000.unk40) {
@@ -322,7 +322,7 @@ void AgbMain(void)
             lbl_03000000.unk41 = 0;
             DmaCopy32(lbl_03004C48, 0x07000000, 0x84000100);
         }
-        fn_0200720C(lbl_0202BB94);
+        Text_Flush(gTextLayer);
         if (lbl_03000000.unk38) {
             lbl_03000000.unk3C = lbl_03000000.unk3E;
         } else {
@@ -341,7 +341,7 @@ void AgbMain(void)
     }
 }
 
-void fn_02000424(void)
+void VBlankIntr(void)
 {
     REG_IE &= ~0x4;
     REG_DISPCNT &= ~0x400;
@@ -364,7 +364,7 @@ void fn_02000424(void)
     INTR_CHECK = 1;
 }
 
-void fn_020004F4(void)
+void VCountIntr(void)
 {
     u8 line;
     u32 vcount;
@@ -411,7 +411,7 @@ void fn_020005DC(void)
 {
 }
 
-void fn_020005E0(struct Work *work)
+void InitGame(struct Work *work)
 {
     RegisterRamReset(0xC2);
     DmaFill32(0, 0x03000000, 0x85001F80);
@@ -440,22 +440,22 @@ void fn_020005E0(struct Work *work)
     m4aSoundInit();
     m4aSoundVSyncOff();
     REG_DISPCNT = 0x1001;
-    fn_020012AC(work, 0);
+    SetGameState(work, 0);
     lbl_03005C5C = 0xFF;
     work->unk5 = 0;
     work->unk38 = work->unk39 = work->unk3A = work->unk3B = 0;
     lbl_03005C68 = 0;
     lbl_03005C6C = 0;
     DmaWait();
-    fn_0200731C(10000);
-    fn_02006F0C(lbl_0202BB94);
-    fn_02002070();
-    fn_02005D28(&lbl_030060F8);
+    sgenrand(10000);
+    fn_02006F0C(gTextLayer);
+    Link_InitState();
+    Camera_Init(&gCamera);
     fn_02006B30(lbl_030063C8);
     fn_02006ED0(lbl_030063E0);
     fn_02006268(lbl_03006144);
-    fn_02003E94(lbl_0202C618);
-    fn_02006F0C(lbl_0202BB94);
+    fn_02003E94(gGame);
+    fn_02006F0C(gTextLayer);
     fn_020072E4(lbl_030063F8);
     LZ77UnCompWram(lbl_0201DDCC, lbl_02030000);
     REG_IE = 0x2085;
@@ -464,7 +464,7 @@ void fn_020005E0(struct Work *work)
     m4aSoundVSyncOn();
 }
 
-void fn_020007F4(struct Work *work)
+void UpdateGameState(struct Work *work)
 {
     s32 i;
     s8 rank;
@@ -473,12 +473,12 @@ void fn_020007F4(struct Work *work)
 
     lbl_0300524C++;
     lbl_03005250++;
-    fn_02001774(work);
+    PauseMenuInput(work);
     switch (work->unk4) {
     case 0:
         if (work->unk2C == 0) {
-            fn_02006FC0(lbl_0202BB94, 15);
-            fn_02007148(lbl_0202BB94, 10, 9, lbl_0200ECF4);
+            fn_02006FC0(gTextLayer, 15);
+            Text_Printf(gTextLayer, 10, 9, lbl_0200ECF4);
             work->unk3A = 1;
         }
         work->unk2C++;
@@ -490,9 +490,9 @@ void fn_020007F4(struct Work *work)
         if (!ready) {
             return;
         }
-        fn_0200731C(10000);
-        SetPlayerNo(&lbl_030060F8, lbl_03005D65);
-        fn_020012AC(work, 1);
+        sgenrand(10000);
+        SetPlayerNo(&gCamera, lbl_03005D65);
+        SetGameState(work, 1);
         break;
     case 1:
         if (work->unk5) {
@@ -500,7 +500,7 @@ void fn_020007F4(struct Work *work)
         }
         work->unk34 &= lbl_03005D67;
         if (work->unk34 == lbl_03005D67) {
-            fn_020012AC(work, 2);
+            SetGameState(work, 2);
             break;
         }
         if (work->unk2C == 0) {
@@ -551,23 +551,23 @@ void fn_020007F4(struct Work *work)
             work->unk38 = 1;
             lbl_03005250 = 0;
             lbl_03005C5C = 0;
-            fn_02006FC0(lbl_0202BB94, 15);
+            fn_02006FC0(gTextLayer, 15);
         }
         if (work->unk2C == 11) {
             m4aSongNumStart(53);
         }
         if (work->unk2C == 80) {
-            fn_02006FF8(lbl_0202BB94, 13, 4, 5, 14);
+            fn_02006FF8(gTextLayer, 13, 4, 5, 14);
             m4aSongNumStart(4);
         } else if (work->unk2C == 110) {
-            fn_02006FF8(lbl_0202BB94, 13, 4, 6, 14);
+            fn_02006FF8(gTextLayer, 13, 4, 6, 14);
             m4aSongNumStart(4);
         } else if (work->unk2C == 140) {
-            fn_02006FF8(lbl_0202BB94, 13, 4, 7, 14);
+            fn_02006FF8(gTextLayer, 13, 4, 7, 14);
             m4aSongNumStart(4);
         } else if (work->unk2C == 170) {
-            fn_02006FF8(lbl_0202BB94, 11, 4, 8, 14);
-            fn_020012AC(work, 3);
+            fn_02006FF8(gTextLayer, 11, 4, 8, 14);
+            SetGameState(work, 3);
             m4aSongNumStart(5);
             lbl_030060F4 = 0xFF;
             goto race;
@@ -582,7 +582,7 @@ void fn_020007F4(struct Work *work)
         if (work->unk2C == 30) {
             m4aSongNumStart(50);
             if (work->unk2C == 30) {
-                fn_02006FC0(lbl_0202BB94, 15);
+                fn_02006FC0(gTextLayer, 15);
                 (lbl_0202C66D + lbl_03005D65)->unk0 &= ~0x10;
             }
         }
@@ -602,11 +602,11 @@ void fn_020007F4(struct Work *work)
                     }
                 }
                 work->unk15 = rank;
-                fn_02006FF8(lbl_0202BB94, 21, 0, 14, 14);
+                fn_02006FF8(gTextLayer, 21, 0, 14, 14);
                 if (work->unk9 == 3) {
-                    fn_02006FF8(lbl_0202BB94, 26, 0, 19, 14);
+                    fn_02006FF8(gTextLayer, 26, 0, 19, 14);
                 } else {
-                    fn_02006FF8(lbl_0202BB94, 26, 0, 18, 14);
+                    fn_02006FF8(gTextLayer, 26, 0, 18, 14);
                 }
                 work->unk17 = 1;
                 lbl_03005C5D = rank;
@@ -614,7 +614,7 @@ void fn_020007F4(struct Work *work)
                     lbl_03005C5D = work->unk9 - 1;
                 }
                 if (rank == work->unk9) {
-                    fn_020012AC(work, 4);
+                    SetGameState(work, 4);
                     break;
                 }
                 if (rank == work->unk9 - 1 && !work->unk16) {
@@ -622,29 +622,29 @@ void fn_020007F4(struct Work *work)
                     work->unk1A = 96;
                 }
             }
-            fn_020010FC(work);
-            if (fn_02004E20(lbl_0202C618, lbl_030060F8.unk4A)) {
+            DrawTimerAndRank(work);
+            if (fn_02004E20(gGame, gCamera.unk4A)) {
                 if (work->unk18 == 0 && work->unk1A == 0 && !lbl_03005C5E) {
-                    fn_02006FF8(lbl_0202BB94, 9, 5, 15, 14);
-                    fn_02006FF8(lbl_0202BB94, 15, 5, 16, 14);
-                    fn_02006FF8(lbl_0202BB94, 21, 5, 17, 14);
+                    fn_02006FF8(gTextLayer, 9, 5, 15, 14);
+                    fn_02006FF8(gTextLayer, 15, 5, 16, 14);
+                    fn_02006FF8(gTextLayer, 21, 5, 17, 14);
                     lbl_03005C5E = 1;
                 }
             } else if (lbl_03005C5E) {
-                fn_02007088(lbl_0202BB94, 9, 5, 15);
-                fn_02007088(lbl_0202BB94, 15, 5, 16);
-                fn_02007088(lbl_0202BB94, 21, 5, 17);
+                fn_02007088(gTextLayer, 9, 5, 15);
+                fn_02007088(gTextLayer, 15, 5, 16);
+                fn_02007088(gTextLayer, 21, 5, 17);
                 lbl_03005C5E = 0;
             }
-            lbl_03005C60 = fn_02004E38(lbl_0202C618, lbl_03005D65, 0);
-            lbl_03005C64 = fn_02004E38(lbl_0202C618, lbl_03005D65, 4);
+            lbl_03005C60 = fn_02004E38(gGame, lbl_03005D65, 0);
+            lbl_03005C64 = fn_02004E38(gGame, lbl_03005D65, 4);
         }
         if (work->unk1A) {
             if ((work->unk1A & 31) == 16) {
                 m4aSongNumStart(17);
-                fn_02006FF8(lbl_0202BB94, 11, 4, 20, 14);
+                fn_02006FF8(gTextLayer, 11, 4, 20, 14);
             } else if ((work->unk1A & 31) == 1) {
-                fn_02007088(lbl_0202BB94, 11, 4, 20);
+                fn_02007088(gTextLayer, 11, 4, 20);
             }
             work->unk1A--;
         }
@@ -658,46 +658,46 @@ void fn_020007F4(struct Work *work)
         }
         if (work->unk2C == 0) {
             lbl_03005D76 = work->unk14 | 0x1000;
-            fn_02006FF8(lbl_0202BB94, 9, 4, 9, 14);
+            fn_02006FF8(gTextLayer, 9, 4, 9, 14);
             work->unk18 = 1;
         }
-        fn_020010FC(work);
+        DrawTimerAndRank(work);
         if (work->unk2C == 60) {
-            fn_02007088(lbl_0202BB94, 9, 4, 9);
+            fn_02007088(gTextLayer, 9, 4, 9);
             work->unk18 = 0;
             switch (work->unk14) {
             case 0:
             case 1:
-                fn_02006FF8(lbl_0202BB94, 13, 4, 7, 14);
-                fn_02006FF8(lbl_0202BB94, 17, 6, 10, 14);
+                fn_02006FF8(gTextLayer, 13, 4, 7, 14);
+                fn_02006FF8(gTextLayer, 17, 6, 10, 14);
                 break;
             case 2:
-                fn_02006FF8(lbl_0202BB94, 13, 4, 6, 14);
-                fn_02006FF8(lbl_0202BB94, 17, 6, 11, 14);
+                fn_02006FF8(gTextLayer, 13, 4, 6, 14);
+                fn_02006FF8(gTextLayer, 17, 6, 11, 14);
                 break;
             case 3:
-                fn_02006FF8(lbl_0202BB94, 13, 4, 5, 14);
-                fn_02006FF8(lbl_0202BB94, 17, 6, 12, 14);
+                fn_02006FF8(gTextLayer, 13, 4, 5, 14);
+                fn_02006FF8(gTextLayer, 17, 6, 12, 14);
                 break;
             case 4:
-                fn_02006FF8(lbl_0202BB94, 14, 6, 4, 14);
-                fn_02006FF8(lbl_0202BB94, 16, 6, 13, 14);
+                fn_02006FF8(gTextLayer, 14, 6, 4, 14);
+                fn_02006FF8(gTextLayer, 16, 6, 13, 14);
                 break;
             case 5:
-                fn_02006FF8(lbl_0202BB94, 14, 6, 3, 14);
-                fn_02006FF8(lbl_0202BB94, 16, 6, 13, 14);
+                fn_02006FF8(gTextLayer, 14, 6, 3, 14);
+                fn_02006FF8(gTextLayer, 16, 6, 13, 14);
                 break;
             case 6:
-                fn_02006FF8(lbl_0202BB94, 14, 6, 2, 14);
-                fn_02006FF8(lbl_0202BB94, 16, 6, 13, 14);
+                fn_02006FF8(gTextLayer, 14, 6, 2, 14);
+                fn_02006FF8(gTextLayer, 16, 6, 13, 14);
                 break;
             case 7:
-                fn_02006FF8(lbl_0202BB94, 14, 6, 1, 14);
-                fn_02006FF8(lbl_0202BB94, 16, 6, 13, 14);
+                fn_02006FF8(gTextLayer, 14, 6, 1, 14);
+                fn_02006FF8(gTextLayer, 16, 6, 13, 14);
                 break;
             case 8:
-                fn_02006FF8(lbl_0202BB94, 14, 6, 0, 14);
-                fn_02006FF8(lbl_0202BB94, 16, 6, 13, 14);
+                fn_02006FF8(gTextLayer, 14, 6, 0, 14);
+                fn_02006FF8(gTextLayer, 16, 6, 13, 14);
                 break;
             }
         }
@@ -705,7 +705,7 @@ void fn_020007F4(struct Work *work)
         if (work->unk30.w != -1) {
             if (work->unk30.w == 122) {
                 lbl_03005D76 = 0x1100;
-                fn_020012AC(work, 5);
+                SetGameState(work, 5);
             } else {
                 work->unk30.w++;
             }
@@ -718,12 +718,12 @@ void fn_020007F4(struct Work *work)
         setup:
             work->unk36 = lbl_03005D60;
             if (work->unk36) {
-                fn_02007184(lbl_0202BB94, lbl_020163C0);
+                fn_02007184(gTextLayer, lbl_020163C0);
             } else {
-                fn_02007184(lbl_0202BB94, lbl_02016540);
+                fn_02007184(gTextLayer, lbl_02016540);
             }
         }
-        fn_020010FC(work);
+        DrawTimerAndRank(work);
         if (lbl_03005D60) {
             for (i = 0; i <= 3; i++) {
                 if ((work->unk35 >> i) & 1) {
@@ -743,7 +743,7 @@ void fn_020007F4(struct Work *work)
                             if (i == lbl_03005D65) {
                                 lbl_03005D76 = 0x1300;
                             }
-                            fn_020012AC(work, 1);
+                            SetGameState(work, 1);
                             goto end;
                         }
                     } else {
@@ -759,7 +759,7 @@ void fn_020007F4(struct Work *work)
             goto setup;
         } else if (lbl_03005D58[lbl_03005D65] & 0xFF) {
             m4aSongNumStart(0);
-            fn_020012AC(work, 1);
+            SetGameState(work, 1);
             break;
         }
         work->unk2C++;
@@ -768,12 +768,12 @@ void fn_020007F4(struct Work *work)
 end:
     fn_020072E8(lbl_030063F8);
     if (lbl_03005D64 && !work->unk5) {
-        fn_0200455C(lbl_0202C618);
-        fn_02005D5C(&lbl_030060F8);
+        fn_0200455C(gGame);
+        Camera_Update(&gCamera);
     }
 }
 
-void fn_02001084(struct Work *work, u32 frames, s32 x, s32 y, const char *fmt)
+void DrawTime(struct Work *work, u32 frames, s32 x, s32 y, const char *fmt)
 {
     u16 min, sec, frac;
     u16 total;
@@ -782,10 +782,10 @@ void fn_02001084(struct Work *work, u32 frames, s32 x, s32 y, const char *fmt)
     frac = (frames % 30) * 100 / 30;
     min = total / 60;
     sec = total % 60;
-    fn_02007148(lbl_0202BB94, x, y, fmt, min, sec, frac);
+    Text_Printf(gTextLayer, x, y, fmt, min, sec, frac);
 }
 
-void fn_020010FC(struct Work *work)
+void DrawTimerAndRank(struct Work *work)
 {
     const char *str;
     u8 rank;
@@ -795,9 +795,9 @@ void fn_020010FC(struct Work *work)
             work->unk24++;
             work->unk1C++;
             if ((lbl_03005250 & 15) > 4) {
-                fn_02001084(work, work->unk20, 0, 1, lbl_0200ED00);
+                DrawTime(work, work->unk20, 0, 1, lbl_0200ED00);
             } else {
-                fn_02007148(lbl_0202BB94, 0, 1, lbl_0200ED18);
+                Text_Printf(gTextLayer, 0, 1, lbl_0200ED18);
             }
             if (work->unk1C > 150) {
                 work->unk20 = -1;
@@ -805,9 +805,9 @@ void fn_020010FC(struct Work *work)
         } else {
             work->unk1C++;
             if ((lbl_03005250 & 15) > 4 || work->unk1C > 150) {
-                fn_02001084(work, work->unk20, 0, 1, lbl_0200ED00);
+                DrawTime(work, work->unk20, 0, 1, lbl_0200ED00);
             } else {
-                fn_02007148(lbl_0202BB94, 0, 1, lbl_0200ED18);
+                Text_Printf(gTextLayer, 0, 1, lbl_0200ED18);
             }
         }
     } else if (work->unk1C != work->unk20) {
@@ -815,13 +815,13 @@ void fn_020010FC(struct Work *work)
             work->unk24++;
             work->unk1C++;
         }
-        fn_02001084(work, work->unk1C, 0, 1, lbl_0200ED00);
+        DrawTime(work, work->unk1C, 0, 1, lbl_0200ED00);
     }
     if (work->unk24 != -1) {
-        fn_02001084(work, work->unk24, 0, 2, lbl_0200ED2C);
+        DrawTime(work, work->unk24, 0, 2, lbl_0200ED2C);
     }
     if (work->unk4 == 3) {
-        rank = fn_020044F4(lbl_0202C618, lbl_03005D65);
+        rank = fn_020044F4(gGame, lbl_03005D65);
     } else {
         rank = work->unk14;
     }
@@ -855,10 +855,10 @@ void fn_020010FC(struct Work *work)
         str = lbl_0200ED64;
         break;
     }
-    fn_020070F8(lbl_0202BB94, 25, 4, 14, str);
+    fn_020070F8(gTextLayer, 25, 4, 14, str);
 }
 
-void fn_020012AC(struct Work *work, u8 state)
+void SetGameState(struct Work *work, u8 state)
 {
     s16 *count;
     s32 i;
@@ -881,7 +881,7 @@ void fn_020012AC(struct Work *work, u8 state)
         }
         break;
     case 2:
-        SetPlayerNo(&lbl_030060F8, lbl_03005D65);
+        SetPlayerNo(&gCamera, lbl_03005D65);
         work->unk17 = 0;
         lbl_03005C5D = -1;
         work->unk20 = work->unk1C = work->unk24 = work->unk28 = -1;
@@ -889,20 +889,20 @@ void fn_020012AC(struct Work *work, u8 state)
         lbl_03005C60 = lbl_03005C64 = 0;
         work->unkA = lbl_0201C2F9;
         work->unk9 = lbl_0201C2FA;
-        fn_02003E28(lbl_0202C618);
+        fn_02003E28(gGame);
         for (i = 0; i <= 3; i++) {
             if ((u8)(1 << i) & lbl_03005D67) {
-                fn_02004E54(lbl_0202C618, i, work->unk30.ub[i]);
+                fn_02004E54(gGame, i, work->unk30.ub[i]);
             }
         }
-        fn_02004E8C(lbl_0202C618, work->unkA - lbl_03005D66);
+        fn_02004E8C(gGame, work->unkA - lbl_03005D66);
         count = fn_02006EFC(lbl_030063E0, 1);
         for (i = 0; i < *count; i++) {
-            fn_020054CC(lbl_0202C618, 0, i);
+            fn_020054CC(gGame, 0, i);
         }
         count = fn_02006EFC(lbl_030063E0, 2);
         for (i = 0; i < *count; i++) {
-            fn_020054CC(lbl_0202C618, 1, i);
+            fn_020054CC(gGame, 1, i);
         }
         work->unk2C = 0;
         work->unkB = 0;
@@ -954,7 +954,7 @@ void fn_020014BC(struct Work *work, u8 id)
     s32 bit = 1 << id;
 
     if (bit & lbl_03005D67) {
-        (lbl_0202C618 + id)->unkA = 0;
+        (gGame + id)->unkA = 0;
         lbl_03005D67 &= ~bit;
         lbl_03005D66 = 0;
         for (i = 0; i <= 3; i++) {
@@ -970,22 +970,22 @@ void fn_02001518(struct Work *work)
     lbl_030060F4 = 0xFF;
     lbl_030060F5 = 0xFF;
     work->unk5 = 0;
-    fn_020071E4(lbl_0202BB94);
+    fn_020071E4(gTextLayer);
 }
 
-void fn_02001540(struct Work *work)
+void PauseMenu(struct Work *work)
 {
     m4aSongNumStart(1);
     m4aMPlayFadeOut(lbl_02015850, 2);
     work->unk6 = 0;
     work->unk5 = 1;
-    fn_020071C8(lbl_0202BB94);
+    fn_020071C8(gTextLayer);
     switch (work->unk4) {
     case 3:
         if (work->unk7 == lbl_03005D65) {
-            fn_020072AC(lbl_0202BB94, lbl_03005D60);
+            fn_020072AC(gTextLayer, lbl_03005D60);
         } else {
-            fn_020070F8(lbl_0202BB94, 12, 5, 14, lbl_0200ED68);
+            fn_020070F8(gTextLayer, 12, 5, 14, lbl_0200ED68);
         }
         break;
     case 1:
@@ -996,15 +996,15 @@ void fn_02001540(struct Work *work)
         work->unk3C = 0x1000;
         REG_DMA0CNT_H = 0;
         REG_IE &= ~0x4;
-        fn_020072D4(lbl_0202BB94);
+        fn_020072D4(gTextLayer);
         break;
     }
 }
 
-void fn_020015F8(struct Work *work)
+void SleepMode(struct Work *work)
 {
-    fn_0200726C(lbl_0202BB94);
-    fn_0200720C(lbl_0202BB94);
+    fn_0200726C(gTextLayer);
+    Text_Flush(gTextLayer);
     {
         u8 save38 = work->unk38;
         u8 save39 = work->unk39;
@@ -1027,10 +1027,10 @@ void fn_020015F8(struct Work *work)
         if (work->unk4 == 3) {
             m4aMPlayFadeOutTemporarily(lbl_020157D0, 4);
         }
-        fn_0200022C(360);
+        WaitFrames(360);
         m4aSongNumStop(1);
         REG_DISPCNT &= 0xE0FF;
-        fn_0200022C(60);
+        WaitFrames(60);
         keycnt = REG_KEYCNT;
         REG_KEYCNT = 0xC304;
         REG_IE = 0x1000;
@@ -1039,23 +1039,23 @@ void fn_020015F8(struct Work *work)
         SoundBiasSet();
         REG_KEYCNT = keycnt;
         REG_IE = ie;
-        fn_0200022C(60);
+        WaitFrames(60);
         REG_KEYCNT = 0;
         REG_IE &= ~0x1000;
         work->unk38 = save38;
         work->unk39 = save39;
         work->unk3A = save3A;
         work->unk3B = save3B;
-        fn_02007238(lbl_0202BB94);
-        fn_020071E4(lbl_0202BB94);
+        fn_02007238(gTextLayer);
+        fn_020071E4(gTextLayer);
         if (work->unk4 == 3) {
             m4aMPlayFadeIn(lbl_020157D0, 4);
         }
-        fn_02001540(work);
+        PauseMenu(work);
     }
 }
 
-void fn_02001774(struct Work *work)
+void PauseMenuInput(struct Work *work)
 {
     u16 keys;
     u8 max;
@@ -1103,10 +1103,10 @@ void fn_02001774(struct Work *work)
                     if (work->unk7 == lbl_03005D65) {
                         lbl_03005D76 = 0x1300;
                     }
-                    fn_020012AC(work, 1);
+                    SetGameState(work, 1);
                     break;
                 case 2:
-                    fn_020015F8(work);
+                    SleepMode(work);
                     break;
                 }
                 break;
@@ -1123,7 +1123,7 @@ void fn_02001774(struct Work *work)
                     fn_02001518(work);
                     break;
                 case 1:
-                    fn_020015F8(work);
+                    SleepMode(work);
                     break;
                 }
                 break;
@@ -1137,13 +1137,13 @@ void fn_02001774(struct Work *work)
                 case 4:
                     if (!((work->unk8 >> i) & 1)) {
                         work->unk7 = i;
-                        fn_02001540(work);
+                        PauseMenu(work);
                     }
                     return;
                 case 1:
                     if (!lbl_03005D60) {
                         work->unk7 = i;
-                        fn_02001540(work);
+                        PauseMenu(work);
                     }
                     return;
                 }
@@ -1169,7 +1169,7 @@ void fn_02001934(struct Work *work)
             pos->y = work->unk6 * 16 + 78;
             break;
         }
-        fn_02004930(lbl_0202C618, 57, pos, 0);
+        fn_02004930(gGame, 57, pos, 0);
     }
 }
 
@@ -1177,7 +1177,7 @@ void fn_020019A0(struct Point *pos, u8 n)
 {
     u8 idx = n - 1;
 
-    fn_02004930(lbl_0202C618, idx + 62, pos, 0);
+    fn_02004930(gGame, idx + 62, pos, 0);
 }
 
 static inline void SetPoint(struct Point *p, s16 x, s16 y)
@@ -1199,10 +1199,10 @@ void fn_020019C8(struct Work *work)
     case 0:
         break;
     case 1:
-        fn_0200468C(lbl_0202C618);
+        fn_0200468C(gGame);
         if (work->unk5 == 0) {
             SetPoint(&pos, 64, 64);
-            fn_02004930(lbl_0202C618, 58, &pos, 0);
+            fn_02004930(gGame, 58, &pos, 0);
             for (i = 0; i <= 3; i++) {
                 x = 87;
                 pos.y = 55 + i * 32;
@@ -1215,13 +1215,13 @@ void fn_020019C8(struct Work *work)
                 fn_020019A0(&pos, data->unk12);
                 if (work->unk30.b[lbl_03005D65] == i) {
                     pos.x = 8;
-                    fn_02004930(lbl_0202C618, 57, &pos, 0);
+                    fn_02004930(gGame, 57, &pos, 0);
                 }
             }
         } else {
             fn_02001934(work);
         }
-        fn_020046E8(lbl_0202C618);
+        fn_020046E8(gGame);
         break;
     case 2:
     case 3:
@@ -1230,27 +1230,27 @@ void fn_020019C8(struct Work *work)
         if (lbl_03005D61 == 0) {
             break;
         }
-        fn_0200468C(lbl_0202C618);
-        fn_020045DC(lbl_0202C618);
+        fn_0200468C(gGame);
+        fn_020045DC(gGame);
         if (work->unk4 == 5) {
             if (lbl_03005D60 && work->unk30.ub[lbl_03005D65] != 0xFF) {
                 SetPoint(&cursor, 78, work->unk30.ub[lbl_03005D65] * 24 + 94);
-                fn_02004930(lbl_0202C618, 57, &cursor, 0);
+                fn_02004930(gGame, 57, &cursor, 0);
             }
         } else {
             SetPoint(&num, 208, 14);
             if (work->unk17 && lbl_03005C5D < work->unk9) {
                 if (lbl_03005C5D <= 0) {
-                    fn_02004930(lbl_0202C618, 41, &num, 0);
+                    fn_02004930(gGame, 41, &num, 0);
                 } else {
-                    fn_02004930(lbl_0202C618, lbl_03005C5D + 41, &num, 0);
+                    fn_02004930(gGame, lbl_03005C5D + 41, &num, 0);
                 }
             }
-            fn_02004DD0(lbl_0202C618, 0, lbl_03005D65, lbl_03005C60);
-            fn_02004DD0(lbl_0202C618, 1, lbl_03005D65, lbl_03005C64);
+            fn_02004DD0(gGame, 0, lbl_03005D65, lbl_03005C60);
+            fn_02004DD0(gGame, 1, lbl_03005D65, lbl_03005C64);
         }
         fn_02001934(work);
-        fn_020046E8(lbl_0202C618);
+        fn_020046E8(gGame);
         break;
     }
 }

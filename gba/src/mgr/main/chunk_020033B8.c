@@ -220,7 +220,7 @@ struct Anim {
     struct Frame *unk4;
 };
 
-extern struct Scene lbl_0202C618;
+extern struct Scene gGame;
 extern vu8 lbl_03005D65;
 extern struct ActorData lbl_020102E8[];
 extern char lbl_0200EDAC[];
@@ -245,13 +245,13 @@ extern struct Work lbl_03000000;
 extern u8 lbl_03005D67;
 extern struct Effect lbl_03005DF4[];
 extern const u16 lbl_02014014;
-extern s16 lbl_0200EE10[];
-extern struct Game lbl_03005C78;
+extern s16 gSinTable[];
+extern struct Game gJoyWork;
 extern s16 lbl_0201C304;
 extern s16 lbl_0201C306;
 extern u16 lbl_0201C308[];
 
-void fn_020001A0();
+void AssertFailed();
 void fn_02002CD0(struct Actor *);
 void fn_02002B88(void *);
 void fn_02002794(struct Actor *);
@@ -288,14 +288,14 @@ void fn_020033B8(struct Actor *actor)
     fn_02002CD0(actor);
     fn_02002B88(actor);
     if (actor->unk55_2) {
-        fn_02004CAC(&lbl_0202C618, 28, actor);
+        fn_02004CAC(&gGame, 28, actor);
     } else if (actor->unk55_3) {
-        fn_02004CAC(&lbl_0202C618, 29, actor);
+        fn_02004CAC(&gGame, 29, actor);
     }
     if (lbl_03005D65 != actor->unk52) {
-        fn_02004CAC(&lbl_0202C618, actor->unk52 + 22, actor);
+        fn_02004CAC(&gGame, actor->unk52 + 22, actor);
     } else if (actor->unk55_4) {
-        fn_02004D1C(&lbl_0202C618, actor->unk52 + 22, actor, -6, -8, -1);
+        fn_02004D1C(&gGame, actor->unk52 + 22, actor, -6, -8, -1);
     }
 }
 
@@ -317,7 +317,7 @@ void fn_02003454(struct Actor *a, struct Actor *b, s32 id)
         pos.x = ((*pa - *pb) >> 6) + 120;
         if (pos.x >= -16 && pos.x <= 256) {
             (&pos)->y = 150;
-            fn_02004828(&lbl_0202C618, id, &pos, 0);
+            fn_02004828(&gGame, id, &pos, 0);
         }
     }
 }
@@ -331,7 +331,7 @@ void fn_020034DC(struct Actor *actor, u8 type)
     fn_02002794(actor);
     actor->unk18 = &lbl_020102E8[type];
     if (actor->unk18->unkE > 1) {
-        fn_020001A0(lbl_0200EDAC, 0x428);
+        AssertFailed(lbl_0200EDAC, 0x428);
     }
     actor->unk4E = actor->unk18->unkE + 1;
     n = fn_02006B68(lbl_030063C8, actor->unk4E)->count;
@@ -412,7 +412,7 @@ void fn_020035B8(struct Actor *actor)
     path = fn_02006B68(lbl_030063C8, actor->unk4E);
     actor->unk4F = fn_02006DF0(path, actor->unk4F, actor->unk0, actor->unk4);
     if (actor->unk4F == 0xFF) {
-        fn_020001A0(lbl_0200EDAC, 0x468);
+        AssertFailed(lbl_0200EDAC, 0x468);
     }
     if ((s16)(nextPos = actor->unk4F + 1) >= path->count) {
         idx = 0;
@@ -523,8 +523,8 @@ move:
         (&dir)->y = (dz << 8) / len;
         if (actor->unk32 != 0) {
             angle = actor->unk30;
-            sin = lbl_0200EE10[angle >> 5];
-            cos = lbl_0200EE10[(angle >> 5) + 0x200];
+            sin = gSinTable[angle >> 5];
+            cos = gSinTable[(angle >> 5) + 0x200];
             dir.x = (cos * dir.x - sin * dir.y) >> 8;
             dir.y = (dir.x * sin + dir.y * cos) >> 8;
             actor->unk32--;
@@ -563,7 +563,7 @@ move:
     next.x = (actor->vel.x >> 4) + actor->unk0;
     (&next)->y = actor->unk2;
     (&next)->z = (actor->vel.z >> 4) + actor->unk4;
-    fn_0200411C(&lbl_0202C618, &next, actor);
+    fn_0200411C(&gGame, &next, actor);
     fn_02006A38(&lbl_03006144, &next, &actor->vel, &actor->speed);
     actor->unk0 += actor->vel.x >> 4;
     actor->unk4 += actor->vel.z >> 4;
@@ -582,8 +582,8 @@ s32 fn_02003CA8(struct Actor *actor)
     if (actor->unk4C != 0xFF) {
         angle = actor->unk26;
         p = &dir;
-        p->x = lbl_0200EE10[angle >> 5];
-        p->y = lbl_0200EE10[(angle >> 5) + 0x200];
+        p->x = gSinTable[angle >> 5];
+        p->y = gSinTable[(angle >> 5) + 0x200];
         return fn_02006E74(fn_02006B68(lbl_030063C8, actor->unk4B), actor->unk4C, p->x, p->y) <= 0;
     }
     return 0;
@@ -601,7 +601,7 @@ void fn_02003D40(struct Actor *actor, u8 idx)
 {
     u8 value;
 
-    value = lbl_03005C78.unk8C[actor->unk52][idx];
+    value = gJoyWork.unk8C[actor->unk52][idx];
     if (value >= lbl_0201C306) {
         if (lbl_03005D65 == actor->unk52) {
             m4aSongNumStart(15);
@@ -626,7 +626,7 @@ void fn_02003D40(struct Actor *actor, u8 idx)
 
 void fn_02003E14(struct Effect *effect)
 {
-    fn_02004CAC(&lbl_0202C618, effect->unkC, effect);
+    fn_02004CAC(&gGame, effect->unkC, effect);
 }
 
 void fn_02003E28(struct Scene *scene)
@@ -701,7 +701,7 @@ void fn_02003E94(struct Scene *scene)
     DmaFill32_3(0, lbl_03005048, sizeof(struct OamMatrix) * 32);
     matrix = lbl_03005048;
     for (j = 0; j < 28; j++) {
-        scale = (0x100 - lbl_0200EE10[((j << 14) / 26 + 0x4000) >> 5]) * 2 + 0x100;
+        scale = (0x100 - gSinTable[((j << 14) / 26 + 0x4000) >> 5]) * 2 + 0x100;
         matrix->d = scale;
         matrix->a = scale;
         matrix++;
@@ -721,7 +721,7 @@ void fn_02003E94(struct Scene *scene)
     for (n = 0; n < lbl_02014014; n++, effect++) {
         def = &lbl_02014018[n];
         if (def->type >= 72) {
-            fn_020001A0(lbl_0200EDAC, 0x661);
+            AssertFailed(lbl_0200EDAC, 0x661);
         }
         x = def->x;
         y = def->y;
@@ -1010,7 +1010,7 @@ void fn_020046E8(struct Scene *scene)
 void fn_020047AC(struct Scene *scene, struct Node *node, u16 index)
 {
     if (index >= 40) {
-        fn_020001A0(lbl_0200EDAC, 1999);
+        AssertFailed(lbl_0200EDAC, 1999);
     }
     node->next = scene->lists[index];
     scene->lists[index] = node;
@@ -1021,7 +1021,7 @@ struct Node *fn_020047E4(struct Scene *scene, void *data)
     struct Node *node;
 
     if (scene->freeNode >= (struct Node *)&scene->freeNode) {
-        fn_020001A0(lbl_0200EDAC, 2010);
+        AssertFailed(lbl_0200EDAC, 2010);
     }
     node = scene->freeNode++;
     DmaSet3(data, node->data, 0x84000002);

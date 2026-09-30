@@ -116,6 +116,7 @@ s32 ItemScreen_Main(void)
 {
     struct Window *win;
     s32 pal;
+    s32 mode;
 
     StatusWin_DrawIcon(0);
     Text_SetFill(1, 0);
@@ -133,13 +134,14 @@ s32 ItemScreen_Main(void)
         ItemScreen_UpdateActions();
         gSubState = 0;
     }
-    if (gSubMode && gSubState == 0) {
+    mode = gSubMode;
+    if (mode && gSubState == 0) {
         if (ItemScreen_OpenActions()) {
             gSubState++;
             gWindows[2].anim = 0;
             gWindows[2].keepFrame = 0;
         }
-    } else if (!gSubMode || gSubState == 1) {
+    } else if (!mode || gSubState == 1) {
         if (gMenuHasInput)
             ItemScreen_HandleInput();
         else if (gSubMode)

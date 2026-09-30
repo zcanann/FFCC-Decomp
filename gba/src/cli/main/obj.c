@@ -156,7 +156,8 @@ void Obj_Draw(s32 x, s32 y, s32 id, s32 frame, s32 pal, s32 prio, u32 flags)
     oam[sOamBufIndex][n * 2] = attr;
     tile = ((u32)cell->tiles - 0x06010000) >> 5;
     attr = tile + frame * (gObjShapeSizes[shape] / 32);
-    attr |= (((cell->palette >> 4) + pal) << 12) | (prio << 10);
+    tile = (cell->palette >> 4) + pal;
+    attr |= (tile << 12) | (prio << 10);
     oam[sOamBufIndex][n * 2 + 1] = attr;
     sOamCount = n + 1;
 }
@@ -268,7 +269,8 @@ s32 Obj_GetPalette(s32 idx, s32 pos)
     if (!(gDataFlags & DATA_OBJ))
         return 0;
 
-    p = (s8 *)((u8 *)gObjCells + (gObjHeader.palMapOffset - gObjHeader.cellsOffset));
+    sum = gObjHeader.palMapOffset - gObjHeader.cellsOffset;
+    p = (s8 *)((u8 *)gObjCells + sum);
     e = gObjCells;
     sum = 0;
     for (i = 0; i < idx; i++, e++)
@@ -336,6 +338,7 @@ void Obj_LoadToBg(s32 idx, s32 bank, s32 mode, s32 frame)
 
 void Obj_AllocPalette(s32 idx, s32 frame)
 {
+    struct ObjCell *cells;
     struct ObjCell *e;
     s32 count;
     u16 used;
@@ -348,7 +351,8 @@ void Obj_AllocPalette(s32 idx, s32 frame)
     if (!(gDataFlags & DATA_OBJ))
         return;
 
-    e = &gObjCells[idx];
+    cells = gObjCells;
+    e = &cells[idx];
     if (e->palLoaded)
         return;
 
@@ -358,11 +362,12 @@ void Obj_AllocPalette(s32 idx, s32 frame)
 
     used = 0;
     for (i = 3; i < gObjHeader.cellCount; i++) {
-        if (i != idx && gObjCells[i].palLoaded)
-            used |= 1 << (gObjCells[i].palette >> 4);
+        e = &cells[i];
+        if (i != idx && e->palLoaded)
+            used |= 1 << (e->palette >> 4);
     }
 
-    e = &gObjCells[idx];
+    e = &cells[idx];
     for (i = gObjHeader.paletteCount; i <= 15; i++) {
         if (!((used >> i) & 1))
             break;
@@ -370,7 +375,7 @@ void Obj_AllocPalette(s32 idx, s32 frame)
     e->palette = (i << 4) | 1;
     e->palLoaded = 1;
 
-    src = gSpMode == 0 ? (u8 *)gObjCells + (gObjHeader.cellPalettesOffset - gObjHeader.cellsOffset)
+    src = gSpMode == 0 ? (u8 *)cells + (gObjHeader.cellPalettesOffset - gObjHeader.cellsOffset)
                             : (u8 *)gSpObjPalettes[gObjHeader.paletteCount];
     if (frame < 0)
         src += e->firstPalette * 32;

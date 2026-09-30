@@ -552,11 +552,11 @@ void EquipScreen_PrintDesc(void)
         if (i < n)
             idx = i;
     } else {
-        idx = sEquipTop + win->cursor;
-        if (idx > 0) {
-            idx--;
+        i = sEquipTop + win->cursor;
+        if (i > 0) {
+            idx = i - 1;
             if (idx >= n)
-                goto end;
+                idx = -1;
         } else {
             idx = -1;
         }
@@ -574,14 +574,18 @@ void EquipScreen_PrintDesc(void)
         Text_Print(Msg_GetSystem(63), TEXT_DRAW);
     if (!(item->flags & 0x3000)) {
         Text_AddX(8);
-        Text_PrintNumber(item->count, Text_GetX(), 2);
+        x = Text_GetX();
+        Text_PrintNumber(item->count, x, 2);
     }
     if (!(item->flags & 0x100) && item->kind != 0) {
         if (item->flags & 0xE00)
             Text_AddX(8);
         Text_Print(Msg_GetStat(item->kind - 1), TEXT_DRAW);
         if ((item->flags & 0x3000) && item->count != 0 && item->kind != 16) {
-            msg = Item_IsPercentKind() ? 40 : 39;
+            i = Item_IsPercentKind(item->kind);
+            msg = 39;
+            if (i)
+                msg = 40;
             Text_AddX(8);
             Text_Print(Msg_GetSystem(msg), TEXT_DRAW);
             x = Text_GetX();

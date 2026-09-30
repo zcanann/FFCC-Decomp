@@ -1129,8 +1129,7 @@ s32 LetterAnswer_Init(void)
     if (sLetterSubInit == 0) {
         memset(win, 0, sizeof(struct Window));
         str = (char *)gDetailBuf;
-        len = strlen(str);
-        str += len + 1;
+        str = strlen(str) + gDetailBufNext;
         sLetterAnswers = Str_CountLines(str);
         Text_SetFill(1, 1);
         Text_Clear();
@@ -1437,17 +1436,15 @@ void LetterList_DrawRow(s32 idx, s32 row, s32 n, s32 pal)
     s32 tile = idx * (n * 2) + 128;
     u16 *map;
     s32 i;
-    u16 *bot;
 
     pal <<= 12;
     for (i = 0; i < n; i++) {
         buf[i] = tile++ | pal;
         buf[i + 30] = tile++ | pal;
     }
-    bot = &buf[30];
     map = Bg_GetMapPtr(gWindows[0].bg - 1, 2, row * 2 + 1);
     DmaCopy16(3, buf, map, n * 2);
-    DmaCopy16(3, bot, map + 32, n * 2);
+    DmaCopy16(3, &buf[30], map + 32, n * 2);
 }
 
 s32 LetterList_GetRowPalette(s32 idx)

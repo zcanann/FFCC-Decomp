@@ -242,6 +242,7 @@ void Text_LoadPalette(s32 no, s32 id, s32 base)
     u16 *dst;
     u8 *src;
     s32 i;
+    u16 c;
 
     if (gSpMode == 0) {
         tbl = (u16 *)&gTextGfx;
@@ -260,9 +261,10 @@ void Text_LoadPalette(s32 no, s32 id, s32 base)
     }
     DmaCopy16(3, src, buf, 32);
     for (i = 1; i <= 2; i++) {
-        buf[i | 4] = buf[i];
-        buf[i | 8] = buf[i];
-        buf[i | 12] = buf[i];
+        c = buf[i];
+        buf[i | 4] = c;
+        buf[i | 8] = c;
+        buf[i | 12] = c;
     }
     buf[4] = pal[4];
     buf[8] = pal[8];

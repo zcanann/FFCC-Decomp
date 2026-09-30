@@ -668,7 +668,7 @@ s32 CMakeGenderScreen_Init(void)
             p[i] = tile++ | pal;
             p[i + 30] = tile++ | pal;
         }
-        map = Bg_GetMapPtr(tmp.bg, tmp.x, tmp.y + (row * 2 + 1));
+        map = Bg_GetMapPtr(tmp.bg, tmp.x, tmp.y + 1 + row * 2);
         DmaSet(3, p, map, 0x80000000 | tmp.width);
         DmaSet(3, &buf[30], map + 32, 0x80000000 | tmp.width);
     }
@@ -827,14 +827,14 @@ s32 CMakeLookScreen_Init(void)
         Text_Print(Msg_GetTribe(row), TEXT_DRAW);
         Window_PutText(&tmp, row, 0);
         for (i = 0, p = buf; i < ARRAY_COUNT(buf); i++)
-            p[i] = 0x3FF;
+            buf[i] = 0x3FF;
         tile = tmp.width * (row * 2) + 128;
         pal = 0x7000;
         for (i = 0; i < tmp.width; i++) {
             p[i] = tile++ | pal;
             p[i + 30] = tile++ | pal;
         }
-        map = Bg_GetMapPtr(tmp.bg, tmp.x, tmp.y + (row * 2 + 1));
+        map = Bg_GetMapPtr(tmp.bg, tmp.x, tmp.y + 1 + row * 2);
         DmaSet(3, p, map, 0x80000000 | tmp.width);
         DmaSet(3, &buf[30], map + 32, 0x80000000 | tmp.width);
     }

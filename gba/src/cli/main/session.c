@@ -125,8 +125,9 @@ void Radar_OnPartyPos(s8 *p)
 {
     struct Marker *e = gPartyMarkers;
     u8 flags = p[1];
+    s8 first = p[1];
 
-    e[0].visible = p[1] & 1;
+    e[0].visible = first & 1;
     e[0].x = p[2];
     e[0].y = p[3];
     p += 4;
@@ -213,8 +214,8 @@ void Session_OnPlayerStat(u8 *p)
     memcpy(gSession.favorites, p, 8);
     p += 8;
     dst = (u8 *)&gSession.gil;
-    for (i = 4; i != 0; i--)
-        *dst++ = *p++;
+    for (i = 0; i < 4; i++)
+        dst[i] = *p++;
 
     n = gSession.appearance & 3;
     if (n != sBackdropTribe) {

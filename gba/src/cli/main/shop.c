@@ -699,7 +699,8 @@ void ShopList_DrawRow(s32 idx, s32 row, s32 flag)
     y = win->y + 1 + row * 2;
     w = win->width - 2;
     for (j = 0; j < 2; j++) {
-        t = (win->width << 1) * idx + 0x15C;
+        t = 0x15C;
+        t += (win->width << 1) * idx;
         t += j;
         for (i = 0; i < w; i++) {
             if (!(i & 1)) {
@@ -936,18 +937,17 @@ void InfoWin_ClearRows(s32 mode)
     u16 buf[2][30];
     struct Window *win = gWindows;
     s32 attr = 3 << 12;
-    s32 t = 0;
     s32 i;
     s32 size;
     u16 *map;
 
     for (i = 0; i < win->width; i++) {
         if (!(i & 1)) {
-            buf[0][i] = attr | t;
-            buf[1][i] = attr | (t + 1);
+            buf[0][i] = attr;
+            buf[1][i] = attr | 1;
         } else {
-            buf[0][i] = attr | (t + 2);
-            buf[1][i] = attr | (t + 3);
+            buf[0][i] = attr | 2;
+            buf[1][i] = attr | 3;
         }
     }
     map = Bg_GetMapPtr(win->bg, win->x + 1, win->y + 1);
@@ -1049,7 +1049,7 @@ void InfoWin_PrintNextRow(void)
                             Text_SetX(0);
                             Text_Print(Msg_GetStat(items->kind - 1), TEXT_DRAW);
                             if (items->count != 0 && items->kind != 16) {
-                                t = Item_IsPercentKind() ? 40 : 39;
+                                t = Item_IsPercentKind(items->kind) ? 40 : 39;
                                 w = Text_Print(Msg_GetSystem(t), TEXT_WIDTH);
                                 x = (gWindows->width - 2) * 8 - w;
                                 digits = 1;
@@ -1269,10 +1269,9 @@ void InfoWin_PrintTotal(void)
     s32 ofs = win->width * 64;
     u32 dst = win->width * 256 + 0x06009000;
     u8 *p = gListBuf;
-    u8 n;
     s32 x;
     s32 w;
-    s32 y;
+    s32 n;
 
     n = *p;
     p += 4;
@@ -1295,8 +1294,8 @@ void InfoWin_PrintTotal(void)
     x = (win->width - 3) * 8 - w;
     Text_SetX(x);
     Text_Print(Msg_GetSystem(15), TEXT_DRAW);
-    y = Text_GetX();
-    Text_PrintNumber(sShopQuantity, y, 2);
+    n = Text_GetX();
+    Text_PrintNumber(sShopQuantity, n, 2);
     Text_CopyToVram(dst, win->width);
 }
 

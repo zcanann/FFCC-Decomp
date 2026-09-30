@@ -241,6 +241,7 @@ s32 no;
     s32 y;
     s32 h;
     u32 size;
+    u32 dst;
 
     tiles = gBackdropTiles[no];
     pal_no = Link_GetPlayerNo();
@@ -254,14 +255,15 @@ s32 no;
     size = 64;
     h = 8;
     for (y = 0; y < h; y++) {
-        for (x = 0; x < 32; x += 8) {
+        for (x = 0; x < 32; x += h) {
             memcpy(&buf[x], &map[y * h], 16);
         }
         for (x = 0; x < 32; x++) {
             buf[x] += 0x2BF;
         }
-        for (x = y; x < 32; x += 8) {
-            DmaCopy16(3, buf, 0x0600F800 + x * size, size);
+        for (x = y; x < 32; x += h) {
+            dst = 0x0600F800 + x * size;
+            DmaCopy16(3, buf, dst, size);
         }
     }
 }

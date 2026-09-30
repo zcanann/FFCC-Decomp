@@ -575,8 +575,9 @@ inline void CMapMng::DestroyMapShadow()
  */
 inline void CMapMng::DestroyMapLightHolder()
 {
+    unsigned int j;
     for (int i = 0; i < 2; i++) {
-        for (unsigned int j = 0; j < static_cast<unsigned int>(GetMapLightHolderArray(i).GetSize()); j++) {
+        for (j = 0; j < static_cast<unsigned int>(GetMapLightHolderArray(i).GetSize()); j++) {
             if (GetMapLightHolderArray(i)[j] != 0) {
                 delete GetMapLightHolderArray(i)[j];
             }

@@ -720,19 +720,14 @@ void CGMonObj::initFinishedFuncDefault()
 	}
 
 	m_forcedAction = -1;
-	int forcedAction = 0;
-	for (int slotBase = 0; slotBase < 0x10; slotBase += 8) {
-		for (int slotOff = 0; slotOff < 8; slotOff += 2) {
-			int attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (slotBase + slotOff + 0xD0));
-			if ((attackId != 0xFFFF) &&
-				(static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE)) == 4)) {
-				m_forcedAction = forcedAction;
-				goto forcedDone;
-			}
-			forcedAction++;
+	for (int forcedAction = 0; forcedAction < 8; forcedAction++) {
+		int attackId = reinterpret_cast<CMonWork*>(m_scriptHandle)->m_actionItems[forcedAction];
+		if ((attackId != 0xFFFF) &&
+			(static_cast<int>(reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[attackId].m_actionType) == 4)) {
+			m_forcedAction = forcedAction;
+			break;
 		}
 	}
-forcedDone:;
 
 	setRepop(1);
 }

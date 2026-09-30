@@ -1137,7 +1137,8 @@ CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
     }
 
     stageBase += rand() % (artifactRank + 1);
-    return &artifactBase[stageIndex].m_entries[stageBase];
+    CBossArtifactEntry* entries = artifactBase[stageIndex].m_entries;
+    return &entries[stageBase];
 }
 
 /*

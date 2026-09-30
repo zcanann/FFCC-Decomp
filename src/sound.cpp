@@ -584,9 +584,10 @@ void CSound::Realloc(int isMinMemoryMode)
         }
     }
 
+    CFile::CHandle* handle;
     for (int i = 0; i < 4; i++) {
         sprintf(sePath, "dvd/sound/se/block/se%03d.seb", i);
-        CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
+        handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {
             File.Read(handle);
             File.SyncCompleted(handle);

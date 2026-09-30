@@ -32,7 +32,25 @@ libagbsyscall/VBlankIntrWait:
 	.text       start:0x0201C72C end:0x0201C734
 
 main:
-	.text       start:0x0201C734 end:0x0201C96C
+	.text       start:0x0201C734 end:0x0201C754
+
+libc/string/memcpy:
+	.text       start:0x0201C754 end:0x0201C7B4
+
+libc/string/memset:
+	.text       start:0x0201C7B4 end:0x0201C808
+
+libc/string/strcat:
+	.text       start:0x0201C808 end:0x0201C850
+
+libc/string/strchr:
+	.text       start:0x0201C850 end:0x0201C8DC
+
+libc/string/strcpy:
+	.text       start:0x0201C8DC end:0x0201C928
+
+libc/string/strlen:
+	.text       start:0x0201C928 end:0x0201C96C
 
 libgcc/_call_via_rX:
 	.text       start:0x0201C96C end:0x0201C9A8

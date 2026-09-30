@@ -18,3 +18,7 @@
   assembled once per routine (`L_<name>`) like pret's granular build. The programs
   link them in alphabetical (archive) order.
 - `asm/`: shared assembler includes for the library sources.
+- `libc/`: agbcc's newlib libc (`COPYING.NEWLIB`), only the sources and headers the
+  programs link. Built like agbcc's `libc/Makefile` (`old_agbcc -O2 -fno-builtin`, the
+  `mallocr.c` variants via `DEFINE_*`). In the minigame it comes from the error handler's
+  `vsprintf`; its `.data`/`.rodata`/`.bss` are placed at the recovered addresses.

@@ -143,7 +143,8 @@ extern volatile s8 lbl_03005C5D;
 extern u8 lbl_03005C5E;
 extern u32 lbl_03005C60;
 extern u32 lbl_03005C64;
-extern const u8 lbl_0201C2F8[4];
+extern const u8 lbl_0201C2F9;
+extern const u8 lbl_0201C2FA;
 extern u8 lbl_020157D0[];
 extern vu8 lbl_03005D60;
 extern vu16 lbl_03005D58[4];
@@ -481,6 +482,7 @@ void fn_020007F4(struct Work *work)
     s32 i;
     s8 rank;
     u8 ready;
+    u8 buf[16];
 
     lbl_0300524C++;
     lbl_03005250++;
@@ -521,29 +523,31 @@ void fn_020007F4(struct Work *work)
             fn_02006374(lbl_03006144);
         }
         if (work->unk2C > 15) {
-            for (i = 0; i <= 3; i++) {
-                if ((work->unk34 >> i) & 1) {
+            s32 j;
+
+            for (j = 0; j <= 3; j++) {
+                if ((work->unk34 >> j) & 1) {
                     continue;
                 }
-                if (lbl_03005D58[i] & 0x80) {
-                    if (++work->unk30.b[i] > 3) {
-                        work->unk30.b[i] = 0;
+                if (lbl_03005D58[j] & 0x80) {
+                    if (++work->unk30.b[j] > 3) {
+                        work->unk30.b[j] = 0;
                     }
-                    if (i == lbl_03005D65) {
+                    if (j == lbl_03005D65) {
                         m4aSongNumStart(0);
                     }
                 }
-                if (lbl_03005D58[i] & 0x40) {
-                    if (--work->unk30.b[i] < 0) {
-                        work->unk30.b[i] = 3;
+                if (lbl_03005D58[j] & 0x40) {
+                    if (--work->unk30.b[j] < 0) {
+                        work->unk30.b[j] = 3;
                     }
-                    if (i == lbl_03005D65) {
+                    if (j == lbl_03005D65) {
                         m4aSongNumStart(0);
                     }
                 }
-                if (lbl_03005D58[i] & 0x1) {
-                    work->unk34 |= 1 << i;
-                    if (i == lbl_03005D65) {
+                if (lbl_03005D58[j] & 0x1) {
+                    work->unk34 |= 1 << j;
+                    if (j == lbl_03005D65) {
                         m4aSongNumStart(1);
                     }
                 }
@@ -896,8 +900,8 @@ void fn_020012AC(struct Work *work, u8 state)
         work->unk20 = work->unk1C = work->unk24 = work->unk28 = -1;
         lbl_03005C5E = 0;
         lbl_03005C60 = lbl_03005C64 = 0;
-        work->unkA = lbl_0201C2F8[1];
-        work->unk9 = lbl_0201C2F8[2];
+        work->unkA = lbl_0201C2F9;
+        work->unk9 = lbl_0201C2FA;
         fn_02003E28(lbl_0202C618);
         for (i = 0; i <= 3; i++) {
             if ((u8)(1 << i) & lbl_03005D67) {
@@ -1012,59 +1016,56 @@ void fn_02001540(struct Work *work)
 
 void fn_020015F8(struct Work *work)
 {
-    u8 save38;
-    u8 save39;
-    u8 save3A;
-    u8 save3B;
-    u16 ie;
-    u16 keycnt;
-
     fn_0200726C(lbl_0202BB94);
     fn_0200720C(lbl_0202BB94);
-    save38 = work->unk38;
-    save39 = work->unk39;
-    save3A = work->unk3A;
-    save3B = work->unk3B;
-    ie = REG_IE;
-    REG_IE &= ~0x4;
-    work->unk38 = 0;
-    work->unk39 = 0;
-    work->unk3A = 1;
-    work->unk3B = 0;
-    work->unk3C = 0x1000;
-    REG_DISPCNT &= 0x81FF;
-    REG_DMA0CNT_H = 0;
-    m4aSongNumStop(3);
-    m4aSongNumStop(7);
-    m4aSongNumStop(9);
-    if (work->unk4 == 3) {
-        m4aMPlayFadeOutTemporarily(lbl_020157D0, 4);
+    {
+        u8 save38 = work->unk38;
+        u8 save39 = work->unk39;
+        u8 save3A = work->unk3A;
+        u8 save3B = work->unk3B;
+        u16 ie = REG_IE;
+        u16 keycnt;
+
+        REG_IE &= ~0x4;
+        work->unk38 = 0;
+        work->unk39 = 0;
+        work->unk3A = 1;
+        work->unk3B = 0;
+        work->unk3C = 0x1000;
+        REG_DISPCNT &= 0x81FF;
+        REG_DMA0CNT_H = 0;
+        m4aSongNumStop(3);
+        m4aSongNumStop(7);
+        m4aSongNumStop(9);
+        if (work->unk4 == 3) {
+            m4aMPlayFadeOutTemporarily(lbl_020157D0, 4);
+        }
+        fn_0200022C(360);
+        m4aSongNumStop(1);
+        REG_DISPCNT &= 0xE0FF;
+        fn_0200022C(60);
+        keycnt = REG_KEYCNT;
+        REG_KEYCNT = 0xC304;
+        REG_IE = 0x1000;
+        SoundBiasReset();
+        asm("swi 3");
+        SoundBiasSet();
+        REG_KEYCNT = keycnt;
+        REG_IE = ie;
+        fn_0200022C(60);
+        REG_KEYCNT = 0;
+        REG_IE &= ~0x1000;
+        work->unk38 = save38;
+        work->unk39 = save39;
+        work->unk3A = save3A;
+        work->unk3B = save3B;
+        fn_02007238(lbl_0202BB94);
+        fn_020071E4(lbl_0202BB94);
+        if (work->unk4 == 3) {
+            m4aMPlayFadeIn(lbl_020157D0, 4);
+        }
+        fn_02001540(work);
     }
-    fn_0200022C(360);
-    m4aSongNumStop(1);
-    REG_DISPCNT &= 0xE0FF;
-    fn_0200022C(60);
-    keycnt = REG_KEYCNT;
-    REG_KEYCNT = 0xC304;
-    REG_IE = 0x1000;
-    SoundBiasReset();
-    asm("swi 3");
-    SoundBiasSet();
-    REG_KEYCNT = keycnt;
-    REG_IE = ie;
-    fn_0200022C(60);
-    REG_KEYCNT = 0;
-    REG_IE &= ~0x1000;
-    work->unk38 = save38;
-    work->unk39 = save39;
-    work->unk3A = save3A;
-    work->unk3B = save3B;
-    fn_02007238(lbl_0202BB94);
-    fn_020071E4(lbl_0202BB94);
-    if (work->unk4 == 3) {
-        m4aMPlayFadeIn(lbl_020157D0, 4);
-    }
-    fn_02001540(work);
 }
 
 void fn_02001774(struct Work *work)
@@ -1207,6 +1208,8 @@ void fn_020019C8(struct Work *work)
     s32 i;
 
     switch (work->unk4) {
+    case 0:
+        break;
     case 1:
         fn_0200468C(lbl_0202C618);
         if (work->unk5 == 0) {

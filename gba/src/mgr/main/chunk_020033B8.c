@@ -244,10 +244,11 @@ extern struct SpeedInfo lbl_02010230[];
 extern struct Work lbl_03000000;
 extern u8 lbl_03005D67;
 extern struct Effect lbl_03005DF4[];
-extern u16 lbl_02014014;
+extern const u16 lbl_02014014;
 extern s16 lbl_0200EE10[];
 extern struct Game lbl_03005C78;
-extern s16 lbl_0201C304[2];
+extern s16 lbl_0201C304;
+extern s16 lbl_0201C306;
 extern u16 lbl_0201C308[];
 
 void fn_020001A0();
@@ -383,7 +384,9 @@ void fn_020035B8(struct Actor *actor)
     struct Path *path;
     struct PathNode *node;
     struct PathNode *nextNode;
+    u16 nextPos;
     u8 nextIndex;
+    s16 idx;
     s16 dx;
     s16 dz;
     s16 ex;
@@ -397,6 +400,7 @@ void fn_020035B8(struct Actor *actor)
     s16 rx;
     s16 rz;
     s32 leftDot;
+    s32 sq;
     s16 delta;
 
     if (lbl_03000000.unk4 <= 2) {
@@ -410,7 +414,12 @@ void fn_020035B8(struct Actor *actor)
     if (actor->unk4F == 0xFF) {
         fn_020001A0(lbl_0200EDAC, 0x468);
     }
-    nextIndex = (s16)(actor->unk4F + 1) < path->count ? actor->unk4F + 1 : 0;
+    if ((s16)(nextPos = actor->unk4F + 1) >= path->count) {
+        idx = 0;
+    } else {
+        idx = nextPos;
+    }
+    nextIndex = idx;
     node = &path->nodes[actor->unk4F];
     nextNode = &path->nodes[nextIndex];
     dx = nextNode->x - actor->unk0;
@@ -427,8 +436,10 @@ void fn_020035B8(struct Actor *actor)
         if (delta < range) {
             ex = target.x - actor->unk0;
             ez = target.z - actor->unk4;
-            if (ex * ex + ez * ez < maxDist && ex * dx + ez * dz > 0) {
-                dist = Sqrt(dx * dx + dz * dz);
+            sq = ex * ex + ez * ez;
+            if (sq < maxDist && ex * dx + ez * dz > 0) {
+                sq = dx * dx + dz * dz;
+                dist = Sqrt(sq);
                 px = dx * targetSpeed / dist;
                 pz = dz * targetSpeed / dist;
                 if (actor->unk54 == 0) {
@@ -591,14 +602,14 @@ void fn_02003D40(struct Actor *actor, u8 idx)
     u8 value;
 
     value = lbl_03005C78.unk8C[actor->unk52][idx];
-    if (value >= lbl_0201C304[1]) {
+    if (value >= lbl_0201C306) {
         if (lbl_03005D65 == actor->unk52) {
             m4aSongNumStart(15);
         }
         actor->unk55_2 = 1;
         actor->unk55_3 = 0;
         actor->unk34 = lbl_0201C308[(value - 1) / 10];
-    } else if (value <= lbl_0201C304[0]) {
+    } else if (value <= lbl_0201C304) {
         if (lbl_03005D65 == actor->unk52) {
             m4aSongNumStart(16);
         }
@@ -648,7 +659,6 @@ void fn_02003E94(struct Scene *scene)
     u32 m;
     s32 n;
     u16 scale;
-    u16 count;
     s32 x;
     s32 y;
     s32 z;
@@ -708,7 +718,7 @@ void fn_02003E94(struct Scene *scene)
     matrix->d = 128;
     matrix->a = 128;
     effect = lbl_03005DF4;
-    for (n = 0, count = lbl_02014014; n < count; n++, effect++) {
+    for (n = 0; n < lbl_02014014; n++, effect++) {
         def = &lbl_02014018[n];
         if (def->type >= 72) {
             fn_020001A0(lbl_0200EDAC, 0x661);

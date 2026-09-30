@@ -25,7 +25,13 @@ struct JoyWork {
     u32 unk10;
     u32 unk14;
     u8 send[0x60];
-    u8 recv[0x60];
+    union {
+        u8 raw[0x60];
+        struct {
+            u8 unk0[0x14];
+            u8 unk14[4][16];
+        } info;
+    } recv;
 };
 
 struct JoyRow {
@@ -51,12 +57,12 @@ struct Anim {
     u16 unk2;
     u16 count;
     u16 unk6;
-    struct AnimFrame frames[1];
+    struct AnimFrame frames[0];
 };
 
 struct AnimBank {
     u32 unk0;
-    u32 anims[1];
+    struct Anim *anims[0];
 };
 
 struct AnimState {
@@ -111,7 +117,7 @@ struct Actor {
     s16 unk2A;
     s16 unk2C;
     u16 unk2E;
-    u16 unk30;
+    s16 unk30;
     u16 unk32;
     u16 unk34;
     u16 unk36;
@@ -184,6 +190,10 @@ struct Item {
     u8 unk1E;
 };
 
+struct Game {
+    struct Actor players[4];
+};
+
 struct Work {
     u8 unk0[4];
     u8 unk4;
@@ -213,7 +223,7 @@ extern u16 lbl_03005D74;
 extern char lbl_0200ED80[];
 extern u8 lbl_0202BB94[];
 extern u8 lbl_030063C8[];
-extern struct Actor lbl_0202C618[];
+extern struct Game lbl_0202C618;
 extern u8 lbl_0202C662[];
 extern u8 lbl_0202CA38[];
 extern u8 lbl_0202DFFE;
@@ -245,7 +255,7 @@ extern struct JoyRecvLog lbl_03005D78;
 extern vu8 lbl_03005DEE;
 extern u8 lbl_03005DEF;
 extern vu8 lbl_03005DF0;
-extern u8 fn_02000000[];
+extern u8 start_vector[];
 extern struct AnimBank *lbl_0202D954;
 
 void fn_020001A0();
@@ -257,7 +267,7 @@ u8 fn_02006C94(struct Path *, u8, s16, s16, u16 *);
 struct MapPoints *fn_02006EFC(void *, s32);
 void fn_020035B8(struct Actor *);
 s16 ArcTan2(s16, s16);
-u16 Sqrt(u32);
+s32 Sqrt(s32);
 s16 fn_02007520(s16, s16);
 void fn_020054A4();
 void fn_0200411C(void *, struct Vec3 *, struct Actor *);
@@ -272,7 +282,7 @@ void fn_02009170(void);
 
 static inline struct Anim *GetAnim(u16 id)
 {
-    return (struct Anim *)lbl_0202D954->anims[id];
+    return lbl_0202D954->anims[id];
 }
 
 void fn_02001BA8(void)
@@ -313,7 +323,6 @@ u32 fn_02001BD8(u32 data)
 
 s32 fn_02001C48(u32 data)
 {
-    struct JoyRecvLog *log;
     s32 i;
 
     lbl_03005D6A = data;
@@ -346,16 +355,16 @@ s32 fn_02001C48(u32 data)
         case 0:
             lbl_03005C78.unk5 = 0;
             if (data == 0x30) {
-                lbl_03005C78.unk4 = data;
+                lbl_03005C78.unk4 = 0x30;
             } else if (data == 0x50) {
                 return 0;
             } else {
-                if (*(fn_02000000 + 0xC4) == 0 && lbl_03005C78.send[3] == 0)
+                if (*(start_vector + 4) == 0 && lbl_03005C78.send[3] == 0)
                     return 0;
                 if ((data & 0xFF) == 0x10) {
                     REG_JOY_TRANS = lbl_03005C58;
                     REG_JOYSTAT = 0x30;
-                    lbl_03005C78.unk4 = data;
+                    lbl_03005C78.unk4 = 0x10;
                 } else if ((data & 0xFF) == 0x70) {
                     lbl_03005D69++;
                     lbl_03005C78.unk4 = 0x40;
@@ -365,31 +374,30 @@ s32 fn_02001C48(u32 data)
         case 0x30:
             if (lbl_03005C78.unk5 >= 0x60)
                 return 0;
-            *(u32 *)&lbl_03005C78.recv[lbl_03005C78.unk5] = data;
+            *(u32 *)&lbl_03005C78.recv.raw[lbl_03005C78.unk5] = data;
             lbl_03005C78.unk5 += 4;
             if (lbl_03005C78.unk5 == 0x60) {
-                lbl_03005C78.recv[2] = lbl_03005C78.send[2];
-                *(u32 *)&lbl_03005C78.recv[12] = *(u32 *)&lbl_03005C78.send[12];
-                REG_JOY_TRANS = *(u32 *)&lbl_03005C78.recv[0];
+                lbl_03005C78.recv.raw[2] = lbl_03005C78.send[2];
+                *(u32 *)&lbl_03005C78.recv.raw[12] = *(u32 *)&lbl_03005C78.send[12];
+                REG_JOY_TRANS = *(u32 *)&lbl_03005C78.recv.raw[0];
                 lbl_03005C78.unk5 += 4;
             }
             break;
         case 0x40:
-            log = &lbl_03005D78;
             i = (data & 0xFF) - 0x40;
             if (i <= 4) {
-                log->rows[log->idx].data[i] = data;
-                log->rows[log->idx].valid[i] = 1;
-                log->mask |= 1 << i;
+                lbl_03005D78.rows[lbl_03005D78.idx].data[i] = data;
+                lbl_03005D78.rows[lbl_03005D78.idx].valid[i] = 1;
+                lbl_03005D78.mask |= 1 << i;
             }
             lbl_03005C78.unk5++;
-            if (log->mask == 0x1F) {
-                log->mask = 0;
+            if (lbl_03005D78.mask == 0x1F) {
+                lbl_03005D78.mask = 0;
                 REG_JOYSTAT = 0x20;
                 lbl_03005C78.unk4 = 0;
-                log->idx++;
-                if (log->idx > 3)
-                    log->idx = 0;
+                lbl_03005D78.idx++;
+                if (lbl_03005D78.idx > 3)
+                    lbl_03005D78.idx = 0;
                 lbl_03005DEF = 0;
             }
             break;
@@ -436,10 +444,10 @@ s32 fn_02001E04(void)
             if (lbl_03005C78.unk5 != 0xC0)
                 goto send;
             for (i = 0; i < 0x60; i += 4)
-                *(u32 *)&lbl_03005C78.send[i] = *(u32 *)&lbl_03005C78.recv[i];
+                *(u32 *)&lbl_03005C78.send[i] = *(u32 *)&lbl_03005C78.recv.raw[i];
             lbl_03005C78.unk4 = 0;
-            lbl_03005D65 = lbl_03005C78.recv[1];
-            lbl_03005D67 = lbl_03005C78.recv[0x11];
+            lbl_03005D65 = lbl_03005C78.recv.raw[1];
+            lbl_03005D67 = lbl_03005C78.recv.raw[0x11];
             lbl_03005DEE = 0;
             lbl_03005D66 = 0;
             for (j = 0; j < 4; j++) {
@@ -523,6 +531,8 @@ void fn_02002070(void)
     s32 j;
     u32 k;
     u16 ime;
+    s32 m;
+    s32 n;
 
     lbl_03005D60 = lbl_0201C2F8;
     lbl_03005D78.idx = 0;
@@ -568,9 +578,9 @@ void fn_02002070(void)
         lbl_03005D68 = 1;
         lbl_03005D6C = 0;
         lbl_03005D76 = 0xFFFF;
-        for (i = 0; i < 4; i++) {
-            for (j = 0; j < 8; j++)
-                lbl_03005C78.recv[0x14 + i * 16 + j] = j * 100 / 8 + 5;
+        for (m = 0; m < 4; m++) {
+            for (n = 0; n < 8; n++)
+                lbl_03005C78.recv.info.unk14[m][n] = n * 100 / 8 + 5;
         }
     }
 }
@@ -839,6 +849,7 @@ u16 fn_02002860(struct Actor *a)
 struct Actor *fn_0200287C(struct Actor *a, u8 mode)
 {
     s32 i;
+    s32 start;
     s32 end;
     u32 mask;
     u16 key;
@@ -848,24 +859,24 @@ struct Actor *fn_0200287C(struct Actor *a, u8 mode)
     struct Actor *result;
 
     if (mode == 0xFF) {
-        i = 4;
+        start = 4;
         end = lbl_0202DFFE + 4;
         mask = ~(1 << a->unk52);
     } else if (mode == 0) {
-        i = 0;
+        start = 0;
         end = 4;
         mask = lbl_03005D67 & ~(1 << a->unk52);
     } else {
-        i = 4;
+        start = 4;
         end = lbl_0202DFFE + 4;
         mask = ~(1 << a->unk52);
     }
     key = fn_02002860(a);
     best = 0;
     result = NULL;
-    for (; i < end; i++) {
+    for (i = start; i < end; i++) {
         if ((1 << i) & mask) {
-            other = &lbl_0202C618[(u8)i];
+            other = &lbl_0202C618.players[(u8)i];
             k = fn_02002860(other);
             if (k < key && best < k) {
                 best = k;
@@ -894,7 +905,7 @@ s32 fn_02002928(struct Actor *a, struct Vec *pos, u8 *outA, u16 *outB, u16 *outC
     found = NULL;
     for (i = 0; i < n; i++) {
         if ((1 << i) & mask) {
-            other = &lbl_0202C618[(u8)i];
+            other = &lbl_0202C618.players[(u8)i];
             d = lbl_0202C662[(u8)i * sizeof(struct Actor)] - a->unk4A;
             if (d >= 0 && best > d) {
                 best = d;
@@ -966,7 +977,8 @@ void fn_02002A88(struct Actor *a)
     lo = a->unk4D >> 2;
     hi = lo + (a->unk4D >> 1);
     if (a->unk4C <= lo && prev >= hi) {
-        if (++a->unk51 == lbl_03000000.unk9)
+        a->unk51++;
+        if (lbl_03000000.unk9 == a->unk51)
             fn_0200281C(a);
     } else if (a->unk4C >= hi && prev <= lo) {
         a->unk51--;
@@ -975,7 +987,7 @@ void fn_02002A88(struct Actor *a)
 
 void fn_02002B88(struct Actor *a)
 {
-    fn_02004C40(lbl_0202C618, &a->anim, a);
+    fn_02004C40(&lbl_0202C618, &a->anim, a);
 }
 
 static inline void GetDir(struct Dir *dir, u16 angle)
@@ -1037,21 +1049,26 @@ void fn_02002CD0(struct Actor *a)
     fn_020026EC(&a->anim, tbl[dir], 0xFF);
 }
 
+static inline void Vec3Add(struct Vec3 *dst, struct Vec3 *src)
+{
+    dst->x += src->x;
+    dst->y += src->y;
+    dst->z += src->z;
+}
+
 void fn_02002D0C(struct Actor *a)
 {
     s16 maxSpeed;
     s16 accel;
     u16 keys;
-    s16 v[3];
-    struct Vec3 *vel;
-    u16 angle;
-    u16 ax;
-    u16 ay;
+    struct Vec3 delta;
+    s16 angle;
+    s16 ax;
+    s16 ay;
     s16 turn;
-    s16 over;
-    s32 sound;
+    s32 over;
+    u8 sound;
     s32 moving;
-    u16 speed;
     s16 newSpeed;
     s16 oldSpeed;
     struct Dir dir;
@@ -1060,6 +1077,7 @@ void fn_02002D0C(struct Actor *a)
     u8 hit;
     s32 snd;
     s32 grip;
+    s16 pitch;
 
     if (a->unk4E != 0xFF) {
         fn_020035B8(a);
@@ -1102,48 +1120,50 @@ void fn_02002D0C(struct Actor *a)
         }
     }
 
-    v[2] = 0;
-    v[1] = 0;
-    v[0] = 0;
+    (&delta)->z = 0;
+    (&delta)->y = 0;
+    (&delta)->x = 0;
     a->unk26 += a->unk2A;
     angle = a->unk26;
     ax = a->vel.x;
-    if (a->vel.x < 0)
-        ax = -a->vel.x;
+    if (ax < 0)
+        ax = -ax;
     ay = a->vel.z;
-    if (a->vel.z < 0)
-        ay = -a->vel.z;
-    if ((s16)ax > 15 || (s16)ay > 15)
-        turn = fn_02007520(angle, ArcTan2(a->vel.z, a->vel.x));
-    else
+    if (ay < 0)
+        ay = -ay;
+    if (ax > 15 || ay > 15) {
+        turn = ArcTan2(a->vel.z, a->vel.x);
+        turn = fn_02007520(angle, turn);
+    } else {
         turn = 0;
-    a->unk44 = (s16)angle + turn;
+    }
+    a->unk44 = angle + turn;
     a->unk42 = angle;
     if (turn < 0)
         turn = -turn;
     if (lbl_03005D65 == a->unk52) {
-        sound = 0xFF;
         if ((s16)(turn - 0xAAA) > 0)
             sound = 7;
+        else
+            sound = 0xFF;
     }
-    over = turn - 0xAAA;
+    over = (s16)(turn - 0xAAA);
     if (over > 0) {
         a->unk46 -= over;
         if ((s16)a->unk46 < 0) {
             a->unk46 += 0x4000;
-            fn_020054A4(lbl_0202C618, 11, a, &a->vel);
+            fn_020054A4(&lbl_0202C618, 11, a, &a->vel);
         }
     }
     if (a->unk32 != 0) {
-        angle = (s16)angle + a->unk30;
+        angle += a->unk30;
         a->unk32--;
     }
     GetDir(&dir, angle);
     moving = 1;
-    speed = Sqrt(a->vel.x * a->vel.x + a->vel.z * a->vel.z);
-    a->unk40 = speed;
-    if ((s16)speed > maxSpeed) {
-        newSpeed = speed - a->unk22;
+    a->unk40 = Sqrt(a->vel.x * a->vel.x + a->vel.z * a->vel.z);
+    if ((s16)a->unk40 > maxSpeed) {
+        newSpeed = a->unk40 - a->unk22;
         if (newSpeed < maxSpeed)
             newSpeed = maxSpeed;
         a->vel.x = a->vel.x * newSpeed / (s16)a->unk40;
@@ -1153,12 +1173,9 @@ void fn_02002D0C(struct Actor *a)
     }
     keys = lbl_03005D50[a->unk52];
     if ((keys & 1) && !a->unk55_0 && moving) {
-        v[0] = dir.x * accel >> 8;
-        v[2] = dir.y * accel >> 8;
-        vel = &a->vel;
-        vel->x += v[0];
-        vel->y += v[1];
-        vel->z += v[2];
+        (&delta)->x = dir.x * accel >> 8;
+        (&delta)->z = dir.y * accel >> 8;
+        Vec3Add(&a->vel, &delta);
     } else if ((lbl_03005D50[a->unk52] & 2) && !a->unk55_0) {
         oldSpeed = a->unk40;
         a->unk40 = oldSpeed - a->unk1E;
@@ -1196,11 +1213,11 @@ void fn_02002D0C(struct Actor *a)
     a->vel.x = ((dir.x * grip >> 8) + a->vel.x * (256 - a->unk20)) >> 8;
     a->vel.z = ((dir.y * grip >> 8) + a->vel.z * (256 - a->unk20)) >> 8;
     old.x = a->pos.x;
-    old.z = a->pos.y;
+    (&old)->z = a->pos.y;
     next.x = a->pos.x + (a->vel.x >> 4);
-    next.y = a->pos.unk2;
-    next.z = a->pos.y + (a->vel.z >> 4);
-    fn_0200411C(lbl_0202C618, &next, a);
+    (&next)->y = a->pos.unk2;
+    (&next)->z = a->pos.y + (a->vel.z >> 4);
+    fn_0200411C(&lbl_0202C618, &next, a);
     fn_0200692C(lbl_03006144, &next, &a->vel, &a->unk40);
     a->pos.x += a->vel.x >> 4;
     a->pos.y += a->vel.z >> 4;
@@ -1223,8 +1240,10 @@ void fn_02002D0C(struct Actor *a)
                 m4aSongNumStart(snd);
             lbl_030060F4 = snd;
         }
-        if (snd != 0xFF)
-            m4aMPlayPitchControl(lbl_02015850, 0xFFFF, ((s16)a->unk40 << 8) / 320);
+        if (snd != 0xFF) {
+            pitch = ((s16)a->unk40 << 8) / 320;
+            m4aMPlayPitchControl(lbl_02015850, 0xFFFF, pitch);
+        }
     }
     fn_02002700(&a->anim);
     fn_02002A88(a);
@@ -1233,13 +1252,13 @@ void fn_02002D0C(struct Actor *a)
             fn_02007308(lbl_030063F8, 13, a);
         switch ((u8)a->unk53 % 3) {
         case 0:
-            fn_020054A4(lbl_0202C618, 3, a->unk52, a, a->unk44, a->unk4B, a->unk4C);
+            fn_020054A4(&lbl_0202C618, 3, a->unk52, a, a->unk44, a->unk4B, a->unk4C);
             break;
         case 1:
-            fn_020054A4(lbl_0202C618, 6, a->unk52, a, a->unk44, a->unk4B, a->unk4C);
+            fn_020054A4(&lbl_0202C618, 6, a->unk52, a, a->unk44, a->unk4B, a->unk4C);
             break;
         case 2:
-            fn_020054A4(lbl_0202C618, 8, a->unk52, a, a->unk44, &a->vel);
+            fn_020054A4(&lbl_0202C618, 8, a->unk52, a, a->unk44, &a->vel);
             break;
         }
         a->unk53 = 0xFF;

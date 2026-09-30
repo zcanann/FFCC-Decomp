@@ -4391,8 +4391,8 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
     unsigned char* data = reinterpret_cast<unsigned char*>(src);
     unsigned char* packet = reinterpret_cast<unsigned char*>(outBuffer);
     unsigned int crc = 0xFFFF;
-    unsigned char* cursor = data;
     int remaining = length;
+    unsigned char* cursor = data;
 
     while (--remaining >= 0) {
         crc = (((crc & 0xFFFF) << 8) ^ JoyBusCrcTable[((crc >> 8) & 0xFF) ^ *cursor++]) & 0xFFFF;

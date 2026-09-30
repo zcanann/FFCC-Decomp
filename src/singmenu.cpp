@@ -1066,7 +1066,15 @@ void CMenuPcs::SingMenuInit()
     int screenY = static_cast<int>(80.0f);
     boardEntry->m_transform.Identity();
     m_wm.m_worldObjData->m_active = 0;
-    float centerY = 88.0f * 0.5f + 88.0f - 224.0f;
+    float left = 440.0f;
+    float top = 88.0f;
+    float width = 96.0f;
+    left += 28.0f;
+    double half = 0.5;
+    float centerX = 4.0 + (width * half + left);
+    float centerY = top * half + top;
+    centerX -= 320.0;
+    centerY -= 224.0;
     m_wm.m_worldObjData->m_frameCounter = 0;
     m_wm.m_worldObjData->m_viewportX = 0;
     m_wm.m_worldObjData->m_viewportY = 0;
@@ -1079,9 +1087,9 @@ void CMenuPcs::SingMenuInit()
     m_wm.m_worldObjData->m_scissorY = 0;
     m_wm.m_worldObjData->m_scissorWidth = 0x280;
     m_wm.m_worldObjData->m_scissorHeight = 0x1C0;
-    m_wm.m_worldObjData->m_viewportX = static_cast<s16>(440.0f + 28.0f + 96.0f * 0.5f - 320.0f);
+    m_wm.m_worldObjData->m_viewportX = static_cast<s16>(centerX - 4.0);
     m_wm.m_worldObjData->m_viewportY = static_cast<s16>(static_cast<int>(centerY));
-    m_wm.m_worldObjData->m_scissorX = static_cast<int>(440.0f + 28.0f + 12.0f);
+    m_wm.m_worldObjData->m_scissorX = static_cast<int>(12.0f + left);
     m_wm.m_worldObjData->m_scissorY = screenY;
     m_wm.m_worldObjData->m_scissorWidth = 0x48;
     m_wm.m_worldObjData->m_scissorHeight = 0x58;
@@ -2775,6 +2783,7 @@ void CMenuPcs::DrawSingWin(short mode)
  */
 void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
 {
+    const char* text;
     CFont* font = m_fonts[0];
     font->SetMargin(1.0f);
     font->SetShadow(1);
@@ -2790,11 +2799,10 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     } else {
         lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
     }
-    char* dynamicText = s_DynamicMessStr;
     const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
 
     for (int i = 0; i < lineCount; i++) {
-        const char* text;
+        char* dynamicText = s_DynamicMessStr + i * 0x80;
         if (useDynamic == 0) {
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
         } else {
@@ -2804,7 +2812,6 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
         if (textWidth > maxWidth) {
             maxWidth = textWidth;
         }
-        dynamicText += 0x80;
     }
 
     MenuWindowInfo* win = m_menuWindowInfo;
@@ -2818,11 +2825,10 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     int lineStep = lineHeight + 3;
     float yOffset = 4.0f;
 
-    dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
+        char* dynamicText = s_DynamicMessStr + i * 0x80;
         font->SetTlut((activeMask & (1 << i)) != 0 ? 7 : 8);
 
-        const char* text;
         if (useDynamic == 0) {
             text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
         } else {
@@ -2836,7 +2842,6 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
             font->Draw(lineBuffer);
         }
 
-        dynamicText += 0x80;
         y += static_cast<float>(lineStep);
     }
 
@@ -2867,12 +2872,12 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
         lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
     }
     char* dynamicText = s_DynamicMessStr;
-    const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
+    const short* textId = s_singleMenuStaticMessages[messageNo].textIds;
 
     for (int i = 0; i < lineCount; i++) {
         const char* text;
         if (useDynamic == 0) {
-            text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
+            text = GetSingWinMessage(*textId, dynamicText, 0);
         } else {
             text = dynamicText;
         }
@@ -2880,6 +2885,7 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
         if (textWidth > maxWidth) {
             maxWidth = textWidth;
         }
+        textId++;
         dynamicText += 0x80;
     }
 
@@ -3109,31 +3115,8 @@ int CMenuPcs::GetSmithItem(int itemNo)
     int raceType = race & 3;
     SItemFlatRow* rec = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo];
     int smithItem = rec->m_smithResults[race & 3];
-    if (smithItem > 0) {
-        unsigned int genderMask = 0x10;
-        int flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[smithItem].m_equipFlags;
-        int raceFlags = flags & 0xF;
-        int genderFlags = flags & 0x30;
-        unsigned int raceMask = 1 << (SingleCaravanWork()->m_tribeId & 3);
-        if (SingleCaravanWork()->m_genderFlag != 0) {
-            genderMask = 0x20;
-        }
-
-        int valid;
-        if ((raceFlags != 0) && (genderFlags != 0)) {
-            if (((raceFlags & raceMask) != 0) && ((genderFlags & genderMask) != 0)) {
-                valid = 1;
-            } else {
-                valid = 0;
-            }
-        } else if (raceFlags != 0) {
-            valid = (raceFlags & raceMask) != 0;
-        } else {
-            valid = (genderFlags & genderMask) != 0;
-        }
-        if (valid != 0) {
-            return smithItem;
-        }
+    if (smithItem > 0 && ChkEquipPossible(smithItem)) {
+        return smithItem;
     }
 
     for (int i = 0; i < 4; i++) {

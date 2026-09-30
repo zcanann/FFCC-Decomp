@@ -191,6 +191,9 @@ void fn_0200276C(struct Effect *e);
 void fn_02005484(struct Effect *e, u8 type, ...);
 void fn_020057B8(struct Effect *e, struct Homing *param, s32 mask);
 struct Route *fn_02006B68(void *list, u8 no);
+u8 fn_02006DF0(struct Route *route, u8 idx, s16 x, s16 z);
+s16 Sqrt(s32 v);
+struct Actor *fn_020043E8(struct Game *game, struct Effect *e, s32 range, s16 *out, s16 dx, s16 dz, s32 angle, s32 mask);
 s16 fn_02006C94(struct Route *route, u8 a, s16 x, s16 z, void *out);
 void fn_020054A4(struct Game *game, u8 type, ...);
 struct PointList *fn_02006EFC(void *list, s32 no);
@@ -220,7 +223,7 @@ static inline struct Cell *GetCell(struct Game *game, u16 no)
     return game->cellTable->cells[no];
 }
 
-void fn_02004828(struct Game *game, struct AnimState *spr, struct Point *pos, u16 prio)
+void fn_02004828(struct Game *game, struct AnimState *spr, struct Point *pos, s16 prio)
 {
     struct Cell *cell;
     s32 i;
@@ -233,9 +236,9 @@ void fn_02004828(struct Game *game, struct AnimState *spr, struct Point *pos, u1
     cell = GetCell(game, GetFrame(GetAnim(game, spr->id), spr->frame)->cell);
     for (i = 0; i < cell->count; i++) {
         node = fn_020047E4(game, &cell->objs[i]);
-        if ((s16)prio < 0) {
+        if (prio < 0) {
             node->oam.affineMode = 3;
-            node->oam.matrixNum = 28 - (s16)prio;
+            node->oam.matrixNum = 28 - prio;
             prio = 0;
         }
         node->oam.y += pos->y;
@@ -248,7 +251,7 @@ void fn_02004930(game, animNo, pos, prio)
     struct Game *game;
     s16 animNo;
     struct Point *pos;
-    u16 prio;
+    s16 prio;
 {
     struct Cell *cell;
     s32 i;
@@ -261,9 +264,9 @@ void fn_02004930(game, animNo, pos, prio)
         node = fn_020047E4(game, &cell->objs[i]);
         node->oam.y += pos->y;
         node->oam.x += pos->x;
-        if ((s16)prio < 0) {
+        if (prio < 0) {
             node->oam.affineMode = 3;
-            node->oam.matrixNum = 28 - (s16)prio;
+            node->oam.matrixNum = 28 - prio;
             prio = 0;
         }
         fn_020047AC(game, node, prio);
@@ -366,7 +369,7 @@ void fn_02004D1C(struct Game *game, u16 animNo, void *src, u16 dx, u16 dy, u16 p
             Offset(&pos, dx, dy);
             if ((u16)(pos.x + 16) <= 272 && pos.y >= -16 && pos.y <= 176) {
                 pt.x = pos.x;
-                pt.y = pos.y;
+                (&pt)->y = pos.y;
                 fn_02004930(game, (s16)animNo, &pt, (s16)prio);
             }
         }
@@ -519,13 +522,13 @@ void fn_02005018(struct Effect *e, va_list *ap)
     struct Pos *pos;
     struct Point dir;
 
-    e->w.chase.unk6 = va_arg(*ap, s32);
+    e->w.chase.unk6 = va_arg(*ap, s32) & 0xFF;
     pos = va_arg(*ap, struct Pos *);
     GetDir(&dir, va_arg(*ap, s32));
     e->w.chase.target = NULL;
     Scale(&e->w.chase.vel, &dir, 4800);
-    e->w.chase.unk7 = va_arg(*ap, s32);
-    e->w.chase.owner = va_arg(*ap, s32);
+    e->w.chase.unk7 = va_arg(*ap, s32) & 0xFF;
+    e->w.chase.owner = va_arg(*ap, s32) & 0xFF;
     e->pos = *pos;
 }
 
@@ -586,7 +589,7 @@ void fn_020051E0(struct Effect *e, va_list *ap)
     u16 angle;
     struct Point dir;
 
-    e->w.chase.owner = va_arg(*ap, s32);
+    e->w.chase.owner = va_arg(*ap, s32) & 0xFF;
     pos = va_arg(*ap, struct Pos *);
     angle = va_arg(*ap, s32);
     vec = va_arg(*ap, struct Pos *);
@@ -606,14 +609,15 @@ void fn_02005274(struct Effect *e, va_list *ap)
     struct RoutePoint *pt;
     s16 v;
 
-    e->w.idle.owner = va_arg(*ap, s32);
+    e->w.idle.owner = va_arg(*ap, s32) & 0xFF;
     e->pos = *va_arg(*ap, struct Pos *);
     e->pos.y = 0;
     fn_020026B8(&e->anim, 34, 0xFF);
     e->unk8 = 120;
     route = fn_02006B68(lbl_030063C8, 0);
     pt = &route->pts[fn_02006C94(route, 0xFF, e->pos.x, e->pos.z, &e->w)];
-    v = pt->unk9 + (Distance(pt, &e->pos) << 4) / route->unk2;
+    v = Distance(pt, &e->pos);
+    v = pt->unk9 + (v << 4) / route->unk2;
     if (v > 255)
         v = 255;
     e->w.idle.color = v;
@@ -714,6 +718,63 @@ void fn_020054CC(struct Game *game, u8 type, ...)
     va_end(ap);
 }
 
+s16 fn_020054F4(struct Effect *e, u8 routeNo, u8 *routeIdx, struct Point *vel, struct Homing *param, struct Actor *target, s16 unused)
+{
+    struct Route *route;
+    struct RoutePoint *pt;
+    u16 next;
+    s16 idx;
+    s16 dx;
+    s16 dz;
+    s16 len;
+    s16 speed;
+    s32 f;
+    s32 sq;
+    struct Point acc;
+    struct Point dir;
+
+    route = fn_02006B68(lbl_030063C8, routeNo);
+    *routeIdx = fn_02006DF0(route, *routeIdx, e->pos.x, e->pos.z);
+    if ((s16)(next = *routeIdx + 1) >= route->count)
+        idx = 0;
+    else
+        idx = next;
+    pt = &route->pts[(u8)idx];
+    if (target != NULL) {
+        dx = target->pos.x - e->pos.x;
+        dz = target->pos.z - e->pos.z;
+    } else {
+        dx = pt->x - e->pos.x;
+        dz = pt->z - e->pos.z;
+    }
+    (&acc)->x = (&acc)->y = 0;
+    len = Sqrt(dx * dx + dz * dz);
+    if (len != 0) {
+        dir.x = (dx << 8) / len;
+        (&dir)->y = (dz << 8) / len;
+        sq = vel->x * vel->x + vel->y * vel->y;
+        f = param->turn * Sqrt(sq);
+        vel->x = (MulShift(dir.x, f) + vel->x * (256 - param->turn)) >> 8;
+        vel->y = (MulShift(dir.y, f) + vel->y * (256 - param->turn)) >> 8;
+        (&acc)->x = (dir.x * param->accel) >> 8;
+        (&acc)->y = (dir.y * param->accel) >> 8;
+        vel->x += (&acc)->x;
+        vel->y += (&acc)->y;
+        sq = vel->x * vel->x + vel->y * vel->y;
+        speed = Sqrt(sq);
+        if (speed > param->maxSpeed) {
+            vel->x = vel->x * param->maxSpeed / speed;
+            vel->y = vel->y * param->maxSpeed / speed;
+            speed = param->maxSpeed;
+        }
+    } else {
+        speed = 0;
+    }
+    e->pos.x += vel->x >> 4;
+    e->pos.z += vel->y >> 4;
+    return speed;
+}
+
 void fn_020056E8(struct Effect *e)
 {
     struct Actor *actor;
@@ -747,6 +808,49 @@ void fn_02005750(struct Effect *e)
         e->w.idle.color = fn_02007398() % 8;
         fn_020026B8(&e->anim, lbl_020159AF[e->w.idle.color], 0xFF);
         e->unk19 = 1;
+    }
+}
+
+void fn_020057B8(struct Effect *e, struct Homing *param, s32 mask)
+{
+    s16 speed;
+    struct Actor *target;
+    s16 dx;
+    s16 dz;
+    s32 dist2;
+    s16 dist;
+    s16 out;
+    s16 dot;
+
+    speed = fn_020054F4(e, e->w.chase.unk7, &e->w.chase.owner, &e->w.chase.vel, param, e->w.chase.target, e->w.chase.unk4);
+    target = e->w.chase.target;
+    if (target == NULL) {
+        if (!(e->timer & 3)) {
+            s16 vx = (e->w.chase.vel.x << 8) / speed;
+            s16 vz = (e->w.chase.vel.y << 8) / speed;
+
+            e->w.chase.target = fn_020043E8(&lbl_0202C618, e, 25000000, &out, vx, vz, 240, mask);
+            e->w.chase.unk4 = out;
+        }
+    } else {
+        s16 vx;
+        s16 vz;
+
+        dx = target->pos.x - e->pos.x;
+        if (dx < -499 || dx > 499)
+            return;
+        dz = target->pos.z - e->pos.z;
+        if (dz < -499 || dz > 499)
+            return;
+        dist2 = dx * dx + dz * dz;
+        if (dist2 >= 250000)
+            return;
+        dist = Sqrt(dist2);
+        vx = (e->w.chase.vel.x << 8) / speed;
+        vz = (e->w.chase.vel.y << 8) / speed;
+        dot = (dx * vx + dz * vz) / dist;
+        if (dot <= 220)
+            e->w.chase.target = NULL;
     }
 }
 

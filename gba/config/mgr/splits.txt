@@ -10,7 +10,7 @@ m4a/m4a_1:
 m4a/m4a:
 	.text       start:0x02007CB4 end:0x02009170
 
-main:
+joy_reset:
 	.text       start:0x02009170 end:0x02009190
 
 libagbsyscall/ArcTan2:

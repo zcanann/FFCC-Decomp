@@ -374,7 +374,7 @@ void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode* octNode)
 	}
 	for (i = 0; i < 8; i++) {
 		if (octNode->m_children[i] == 0) {
-			return;
+			break;
 		}
 		DrawCharaShadowTypeMeshFlag_r(octNode->m_children[i]);
 	}

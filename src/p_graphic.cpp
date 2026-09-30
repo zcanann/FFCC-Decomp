@@ -429,26 +429,24 @@ void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, in
 
     GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 0x80);
     const float z = kGraphicZero;
-    const u32 innerColorWord = *(u32*)&innerColor;
-    const u32 outerColorWord = *(u32*)&outerColor;
     for (int i = 0; i < 32; i++) {
         const float* cur = ringPoints[i];
         const float* nxt = ringPoints[(i + 1) % 32];
 
         GXPosition3f32(cur[0], cur[1], z);
-        GXColor1u32(innerColorWord);
+        GXColor1u32(*(u32*)&innerColor);
         GXTexCoord2u16(0, 0);
 
         GXPosition3f32(nxt[0], nxt[1], z);
-        GXColor1u32(innerColorWord);
+        GXColor1u32(*(u32*)&innerColor);
         GXTexCoord2u16(0, 0);
 
         GXPosition3f32(nxt[2], nxt[3], z);
-        GXColor1u32(outerColorWord);
+        GXColor1u32(*(u32*)&outerColor);
         GXTexCoord2u16(0, 0);
 
         GXPosition3f32(cur[2], cur[3], z);
-        GXColor1u32(outerColorWord);
+        GXColor1u32(*(u32*)&outerColor);
         GXTexCoord2u16(0, 0);
     }
 }

@@ -28,34 +28,34 @@ void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceStep* step
     s32 distanceOffset = GetCallBackDistanceDataOffsets(ctrlTable)->m_distanceOffset;
     f32* distancePtr = (f32*)(object->m_workArea + distanceOffset);
     f32 distance;
-    Vec local_1c;
-    Vec local_28;
+    Vec particlePos;
+    Vec worldPos;
 
-    local_1c.x = pppMngSt->m_matrix.value[0][3];
-    local_1c.y = pppMngSt->m_matrix.value[1][3];
-    local_1c.z = pppMngSt->m_matrix.value[2][3];
-    distance = PSVECDistance(&local_1c, &pppMngSt->m_paramVec0);
+    particlePos.x = pppMngSt->m_matrix.value[0][3];
+    particlePos.y = pppMngSt->m_matrix.value[1][3];
+    particlePos.z = pppMngSt->m_matrix.value[2][3];
+    distance = PSVECDistance(&particlePos, &pppMngSt->m_paramVec0);
 
     if ((distance <= step->m_dataValIndex) || (*distancePtr <= distance)) {
         s32 partIndex;
         s32 graphFrame;
-        s32 m_kind;
-        s32 m_nodeIndex;
-        s32 initWork;
+        s32 kind;
+        s32 nodeIndex;
+        s32 callbackType;
 
         pppMngSt = ppvMng;
-        local_28.x = pppMngSt->m_matrix.value[0][3];
-        local_28.y = pppMngSt->m_matrix.value[1][3];
-        local_28.z = pppMngSt->m_matrix.value[2][3];
-        PSMTXMultVec(ppvWorldMatrix, &local_28, &local_28);
+        worldPos.x = pppMngSt->m_matrix.value[0][3];
+        worldPos.y = pppMngSt->m_matrix.value[1][3];
+        worldPos.z = pppMngSt->m_matrix.value[2][3];
+        PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
 
         partIndex = static_cast<s32>(pppMngSt - PartMng.m_pppMng);
         graphFrame = object->m_graphId / 0x1000;
-        m_kind = pppMngSt->m_kind;
-        m_nodeIndex = pppMngSt->m_nodeIndex;
-        initWork = step->m_initWOrk;
+        kind = pppMngSt->m_kind;
+        nodeIndex = pppMngSt->m_nodeIndex;
+        callbackType = step->m_initWork;
 
-        Game.ParticleFrameCallback(partIndex, m_kind, m_nodeIndex, initWork, graphFrame, &local_28);
+        Game.ParticleFrameCallback(partIndex, kind, nodeIndex, callbackType, graphFrame, &worldPos);
     }
 }
 
@@ -85,18 +85,18 @@ void pppConstructCallBackDistance(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
     _pppMngSt* pppMngSt;
     CGObject* lookTarget;
-    Vec local_1c;
-    Vec local_28;
-    s32 dataOffset;
+    Vec paramPos;
+    Vec targetPos;
+    s32 distanceOffset;
     f32* distancePtr;
 
     pppMngSt = ppvMng;
-    dataOffset = GetCallBackDistanceDataOffsets(ctrlTable)->m_distanceOffset;
-    distancePtr = (f32*)(object->m_workArea + dataOffset);
+    distanceOffset = GetCallBackDistanceDataOffsets(ctrlTable)->m_distanceOffset;
+    distancePtr = (f32*)(object->m_workArea + distanceOffset);
     lookTarget = pppMngSt->m_lookTarget;
-    local_28 = lookTarget->m_worldPosition;
-    local_1c.x = pppMngSt->m_paramVec0.x;
-    local_1c.y = pppMngSt->m_paramVec0.y;
-    local_1c.z = pppMngSt->m_paramVec0.z;
-    *distancePtr = PSVECDistance(&local_28, &local_1c);
+    targetPos = lookTarget->m_worldPosition;
+    paramPos.x = pppMngSt->m_paramVec0.x;
+    paramPos.y = pppMngSt->m_paramVec0.y;
+    paramPos.z = pppMngSt->m_paramVec0.z;
+    *distancePtr = PSVECDistance(&targetPos, &paramPos);
 }

@@ -18,15 +18,13 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
+void CMapShadowInsertOctTree(CMapShadow::TARGET target, COctTree& octTree)
 {
 	CMapShadow* shadow;
-	int target;
 	int i;
 	u32 octTreeMask;
 	Vec pos;
 
-	target = (int)mapShadow;
 	octTree.ClearShadow();
 	if (octTree.GetMapObject()->m_shadowTarget != 0) {
 		for (i = 0; i < (u32)MapMng.m_mapShadowArray.GetSize(); i++) {
@@ -55,23 +53,23 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
  */
 void CMapShadow::Draw()
 {
-	Vec local_14;
-	Vec local_20;
-	Vec local_2c;
-	Vec VStack_38;
-	
-	local_14.x = m_modelA->m_worldMtx[0][3];
-	local_14.y = m_modelA->m_worldMtx[1][3];
-	local_14.z = m_modelA->m_worldMtx[2][3];
-	local_20.x = m_modelC->m_worldMtx[0][3];
-	local_20.y = m_modelC->m_worldMtx[1][3];
-	local_20.z = m_modelC->m_worldMtx[2][3];
-	local_2c.x = m_modelB->m_worldMtx[0][3];
-	local_2c.y = m_modelB->m_worldMtx[1][3];
-	local_2c.z = m_modelB->m_worldMtx[2][3];
-	PSVECSubtract(&local_20, &local_14, &local_20);
-	PSVECSubtract(&local_2c, &local_14, &VStack_38);
-	C_MTXLookAt(m_viewMtx, (Point3d*)&local_14, &local_20, (Point3d*)&local_2c);
+	Vec eye;
+	Vec up;
+	Vec at;
+	Vec lookDir;
+
+	eye.x = m_modelA->m_worldMtx[0][3];
+	eye.y = m_modelA->m_worldMtx[1][3];
+	eye.z = m_modelA->m_worldMtx[2][3];
+	up.x = m_modelC->m_worldMtx[0][3];
+	up.y = m_modelC->m_worldMtx[1][3];
+	up.z = m_modelC->m_worldMtx[2][3];
+	at.x = m_modelB->m_worldMtx[0][3];
+	at.y = m_modelB->m_worldMtx[1][3];
+	at.z = m_modelB->m_worldMtx[2][3];
+	PSVECSubtract(&up, &eye, &up);
+	PSVECSubtract(&at, &eye, &lookDir);
+	C_MTXLookAt(m_viewMtx, (Point3d*)&eye, &up, (Point3d*)&at);
 	PSMTXConcat(m_lightMtx, m_viewMtx, m_shadowMtx);
 }
 
@@ -120,15 +118,11 @@ void CMapShadow::Init()
 	m_materialMode = texture->m_wrapMode;
 	if (m_useFrustum != 0) {
 		float scale = m_shadowScale;
-		double scaleBias = 0.5;
-		float scaleStep = 0.5f;
 		C_MTXLightFrustum(m_lightMtx, -height, height, -width, width, m_frustumNear,
-		                  (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
+		                  (float)(0.5 * scale), 0.5f * scale, 0.5f, 0.5f);
 	} else {
 		float scale = m_shadowScale;
-		double scaleBias = 0.5;
-		float scaleStep = 0.5f;
 		C_MTXLightOrtho(m_lightMtx, -height, height, -width, width,
-		                (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
+		                (float)(0.5 * scale), 0.5f * scale, 0.5f, 0.5f);
 	}
 }

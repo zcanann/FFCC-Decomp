@@ -12,7 +12,6 @@
 #include <string.h>
 
 struct pppModelSt;
-struct PARTICLE_DATA;
 
 static const char s_pppBreathModel_cpp[] = "pppBreathModel.cpp";
 
@@ -199,11 +198,11 @@ inline int IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreat
  * PAL Address: 0x800db094
  * PAL Size: 248b
  */
-extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, _pppCtrlTable* param_2)
+extern "C" void pppDestructBreathModel(pppBreathModel* breathModel, _pppCtrlTable* ctrl)
 {
     BreathParticleGroup* group;
     VBreathModel* state =
-        reinterpret_cast<VBreathModel*>(pppBreathModel->m_workArea + GetBreathModelDataOffsets(param_2)->m_workOffset);
+        reinterpret_cast<VBreathModel*>(breathModel->m_workArea + GetBreathModelDataOffsets(ctrl)->m_workOffset);
 
     if (state->m_particleData != NULL) {
         pppMemFree(state->m_particleData);
@@ -248,9 +247,9 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, _pppCtrlT
  * PAL Address: 0x800db18c
  * PAL Size: 120b
  */
-extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, _pppCtrlTable* param_2)
+extern "C" void pppConstructBreathModel(pppBreathModel* breathModel, _pppCtrlTable* ctrl)
 {
-    VBreathModel* state = GetBreathModelWork(pppBreathModel, GetBreathModelDataOffsets(param_2)->m_workOffset);
+    VBreathModel* state = GetBreathModelWork(breathModel, GetBreathModelDataOffsets(ctrl)->m_workOffset);
     PSMTXIdentity(state->m_matrix);
     float zero = 0.0f;
 
@@ -279,9 +278,9 @@ extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, _pppCtrl
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, _pppCtrlTable* offsets)
+extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* step, _pppCtrlTable* ctrl)
 {
-    PBreathModel* params = pBreathModel;
+    PBreathModel* params = step;
     int workOffset;
     int colorOffset;
     VBreathModel* work;
@@ -307,8 +306,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     Mtx drawMtx;
     Mtx tempMtx;
 
-    workOffset = GetBreathModelDataOffsets(offsets)->m_workOffset;
-    colorOffset = GetBreathModelDataOffsets(offsets)->m_colorOffset;
+    workOffset = GetBreathModelDataOffsets(ctrl)->m_workOffset;
+    colorOffset = GetBreathModelDataOffsets(ctrl)->m_colorOffset;
     work = reinterpret_cast<VBreathModel*>(breathModel->m_workArea + workOffset);
     color = reinterpret_cast<VColor*>(breathModel->m_workArea + colorOffset);
     particleData = work->m_particleData;
@@ -480,7 +479,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
  * PAL Address: 0x800db6e0
  * PAL Size: 1264b
  */
-extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, _pppCtrlTable* offsets)
+extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* step, _pppCtrlTable* ctrl)
 {
     BreathParticleGroup* groupData;
     _pppMngSt* mngSt;
@@ -509,7 +508,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
 
     _pppPObject* object = breathModel;
 
-    dataOffsets = GetBreathModelDataOffsets(offsets);
+    dataOffsets = GetBreathModelDataOffsets(ctrl);
     mngSt = ppvMng;
     colorOffset = dataOffsets->m_colorOffset;
     work = reinterpret_cast<VBreathModel*>(object->m_workArea + dataOffsets->m_workOffset);
@@ -519,9 +518,9 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         BreathParticleGroup* groupTable;
         int i;
 
-        work->m_particleCount = pBreathModel->m_particleCount;
-        work->m_slotCount = pBreathModel->m_slotCount;
-        work->m_groupCount = pBreathModel->m_groupCount;
+        work->m_particleCount = step->m_particleCount;
+        work->m_slotCount = step->m_slotCount;
+        work->m_groupCount = step->m_groupCount;
 
         work->m_particleData =
             (PARTICLE_DATA*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_DATA)), ppvEnv->m_stagePtr,
@@ -546,22 +545,22 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
 
         work->m_groups =
             (BreathParticleGroup*)pppMemAlloc(
-                (unsigned long)((int)pBreathModel->m_groupCount * sizeof(BreathParticleGroup)),
+                (unsigned long)((int)step->m_groupCount * sizeof(BreathParticleGroup)),
                 ppvEnv->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x269);
         if (work->m_groups != NULL) {
-            memset(work->m_groups, 0, (unsigned long)((int)pBreathModel->m_groupCount * sizeof(BreathParticleGroup)));
+            memset(work->m_groups, 0, (unsigned long)((int)step->m_groupCount * sizeof(BreathParticleGroup)));
 
             groupTable = work->m_groups;
-            for (i = 0; i < (int)pBreathModel->m_groupCount; i++) {
+            for (i = 0; i < (int)step->m_groupCount; i++) {
                 groupTable->particleIndices = (signed char*)pppMemAlloc(
-                    (unsigned long)pBreathModel->m_slotCount,
+                    (unsigned long)step->m_slotCount,
                     ppvEnv->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x274);
-                memset(groupTable->particleIndices, -1, (unsigned long)pBreathModel->m_slotCount);
+                memset(groupTable->particleIndices, -1, (unsigned long)step->m_slotCount);
 
                 groupTable->particleStates = (signed char*)pppMemAlloc(
-                    (unsigned long)pBreathModel->m_slotCount,
+                    (unsigned long)step->m_slotCount,
                     ppvEnv->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x277);
-                memset(groupTable->particleStates, -1, (unsigned long)pBreathModel->m_slotCount);
+                memset(groupTable->particleStates, -1, (unsigned long)step->m_slotCount);
                 groupTable->active = 0;
                 groupTable++;
             }
@@ -574,15 +573,15 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     }
 
     PSMTXCopy(ppvMng->m_matrix.value, work->m_matrix);
-    UpdateAllParticle(breathModel, work, pBreathModel, color);
+    UpdateAllParticle(breathModel, work, step, color);
 
     particleWMat = work->m_particleWmats;
     groupData = work->m_groups;
-    for (groupIndex = 0; groupIndex < (int)pBreathModel->m_groupCount; groupIndex++) {
-        slotCount = pBreathModel->m_slotCount;
-        if (IsExistGroupParticle(pBreathModel, work, (short)groupIndex)) {
+    for (groupIndex = 0; groupIndex < (int)step->m_groupCount; groupIndex++) {
+        slotCount = step->m_slotCount;
+        if (IsExistGroupParticle(step, work, (short)groupIndex)) {
             firstParticle = -1;
-            scaledOwner = mngSt->m_hitScale * pBreathModel->m_groupOwnerScale;
+            scaledOwner = mngSt->m_hitScale * step->m_groupOwnerScale;
             for (particleSlot = 0; particleSlot < slotCount; particleSlot++) {
                 if (groupData->particleStates[particleSlot] != -1) {
                     firstParticle = groupData->particleIndices[particleSlot];
@@ -608,7 +607,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
             PSVECScale(&dir, &dir, groupData->speed);
             pppAddVector(target, origin, dir);
             pppSubVector(hitVector, target, origin);
-            pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner, pBreathModel->m_groupRadius);
+            pppHitCylinderSendSystem(mngSt, &origin, &hitVector, scaledOwner, step->m_groupRadius);
         }
         groupData++;
     }

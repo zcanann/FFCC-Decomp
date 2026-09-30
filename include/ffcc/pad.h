@@ -31,7 +31,7 @@ public:
         float substickYF;
         u16 lockedButton[3];
         u16 _pad36;
-        u32 holdOverride;
+        s32 holdOverride;
         u32 digitalStickOverride;
         s8 err;
         u8 _pad41[3];
@@ -125,7 +125,7 @@ public:
     PadInput* GetMergedPad() { return &GetPadInputs()[4]; }
     const PadInput* GetMergedPad() const { return &GetPadInputs()[4]; }
     PadInput m_padInputs[5];         // [0..3] per port, [4] = merged
-    unsigned int m_padConnectedMask; // one high bit per port; set on PAD_ERR_NONE/NOT_READY, cleared on NO_CONTROLLER/TRANSFER
+    unsigned int m_padConnectedMask; // one high bit per port; set on PAD_ERR_NONE/TRANSFER, cleared on NO_CONTROLLER/NOT_READY
     void* m_replayStage;             // CMemory::CStage* backing the replay buffer (gdev only)
     ReplayBuffer* m_replayBuffer;    // 0 when replay is disabled
     int m_replayPlayback;            // set by -r: play back /replay.dat instead of recording

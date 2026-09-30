@@ -18,7 +18,7 @@ void CFlatRuntime2_IsDispRadiusCC(CFlatRuntime2*);
 extern "C" {
 #endif
 
-void pppParHitSph(_pppPObject* param_1, ParHitSphParams* param_2);
+void pppParHitSph(_pppPObject* pObject, ParHitSphParams* params);
 
 #ifdef __cplusplus
 }

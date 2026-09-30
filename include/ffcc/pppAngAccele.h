@@ -23,8 +23,8 @@ struct pppAngAcceleStep {
 extern "C" {
 #endif
 
-void pppAngAccele(_pppPObject* obj, pppAngAcceleStep* param_2, _pppCtrlTable* param_3);
-void pppAngAcceleCon(_pppPObject* obj, _pppCtrlTable* param);
+void pppAngAccele(_pppPObject* obj, pppAngAcceleStep* step, _pppCtrlTable* ctrl);
+void pppAngAcceleCon(_pppPObject* obj, _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

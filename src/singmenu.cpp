@@ -3417,7 +3417,9 @@ void CMenuPcs::DrawSingLife()
                 phase = lifeTimer;
             }
         }
-        y += 64.0f * static_cast<float>(sin(angleScale * (phaseScale * static_cast<float>(phase))));
+        phaseScale *= static_cast<float>(phase);
+        angleScale *= phaseScale;
+        y += 64.0f * static_cast<float>(sin(angleScale));
     } else if (lifeTimer < 0x28) {
         y = 32.0f;
     } else {
@@ -3433,7 +3435,9 @@ void CMenuPcs::DrawSingLife()
                 phase = t;
             }
         }
-        y += 64.0f * static_cast<float>(sin(angleScale * (phaseScale * static_cast<float>(phase))));
+        phaseScale *= static_cast<float>(phase);
+        angleScale *= phaseScale;
+        y += 64.0f * static_cast<float>(sin(angleScale));
     }
 
     int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp) >> 1;

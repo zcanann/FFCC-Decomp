@@ -206,7 +206,7 @@ inline void CMenuPcs::LetterInit0()
  */
 void CMenuPcs::LetterInit1()
 {
-	float fVar1;
+	float uvOrigin;
 
 	memset(m_singleFadeState, 0, sizeof(*m_singleFadeState));
 	SingleFadeEntry* entry = m_singleFadeState->entries;
@@ -223,9 +223,9 @@ void CMenuPcs::LetterInit1()
 	double scale = DOUBLE_803330a8;
 	p->x = static_cast<s16>((0x280 - p->width) * scale);
 	p->y = static_cast<s16>((0x1C0 - p->height) * scale);
-	fVar1 = FLOAT_803330bc;
-	p->u = fVar1;
-	p->v = fVar1;
+	uvOrigin = FLOAT_803330bc;
+	p->u = uvOrigin;
+	p->v = uvOrigin;
 	p->startFrame = 0;
 	p->duration = 10;
 
@@ -235,8 +235,8 @@ void CMenuPcs::LetterInit1()
 	p->height = 0x60;
 	p->x = 0x20;
 	p->y = static_cast<s16>(0x1A0 - p->height);
-	p->u = fVar1;
-	p->v = fVar1;
+	p->u = uvOrigin;
+	p->v = uvOrigin;
 	p->startFrame = 0;
 	p->duration = 10;
 
@@ -1746,19 +1746,19 @@ int CMenuPcs::LetterCtrlCur()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::LetterLstBaseDraw(float param_1)
+void CMenuPcs::LetterLstBaseDraw(float openRatio)
 {
 	unsigned long flip;
 	int i;
 
-	if (param_1 <= FLOAT_803330bc) {
+	if (openRatio <= FLOAT_803330bc) {
 		return;
 	}
 
-	float x0 = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>((FLOAT_803330d0 * param_1) * DOUBLE_803330a8)) - DOUBLE_803330a8));
+	float x0 = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>((FLOAT_803330d0 * openRatio) * DOUBLE_803330a8)) - DOUBLE_803330a8));
 	float fy = FLOAT_803330e0;
 	float y0 = static_cast<float>(static_cast<int>(fy - DOUBLE_803330a8));
-	float w = static_cast<float>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + FLOAT_803330d0 * param_1)) - DOUBLE_803330e8));
+	float w = static_cast<float>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + FLOAT_803330d0 * openRatio)) - DOUBLE_803330e8));
 	float fh = FLOAT_803330f0;
 	float h = static_cast<float>(static_cast<int>(fh - DOUBLE_803330e8));
 
@@ -1896,7 +1896,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		}
 	}
 
-	if (!(param_1 < DOUBLE_803330e8)) {
+	if (!(openRatio < DOUBLE_803330e8)) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
 		MenuPcs.DrawRect(
 		    0, x0 - FLOAT_803330f4, y0 - FLOAT_80333108,

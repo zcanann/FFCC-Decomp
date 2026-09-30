@@ -35,11 +35,11 @@ struct EmissionState {
     u8 m_colorG;
     u8 m_colorB;
     u8 m_colorA;
-    float m_scale0;
-    float m_scale1;
-    float m_scale2;
-    float m_scale3;
-    u8 m_field1C;
+    float m_scaleValue;
+    float m_scaleVelocity;
+    float m_scaleAccel;
+    float m_savedLightAlpha;
+    u8 m_fadeOutAlphaStep;
 };
 
 struct EmissionParticle {
@@ -49,9 +49,9 @@ struct EmissionParticle {
     u8 m_colorG;
     u8 m_colorB;
     u8 m_colorA;
-    s16 m_fieldA;
-    s16 m_fieldC;
-    u8 m_fieldE;
+    s16 m_lifeFramesLeft;
+    s16 m_fadeInFramesLeft;
+    u8 m_fadeOutAlphaStep;
     u8 m_padF;
 };
 
@@ -59,8 +59,8 @@ STATIC_ASSERT(offsetof(EmissionMeshData, m_colors) == 0x28);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(CChara::CModel::CRefData, m_materialSet) == 0x24);
-STATIC_ASSERT(offsetof(EmissionState, m_scale0) == 0xC);
-STATIC_ASSERT(offsetof(EmissionState, m_field1C) == 0x1C);
+STATIC_ASSERT(offsetof(EmissionState, m_scaleValue) == 0xC);
+STATIC_ASSERT(offsetof(EmissionState, m_fadeOutAlphaStep) == 0x1C);
 STATIC_ASSERT(sizeof(EmissionState) == 0x20);
 STATIC_ASSERT(sizeof(EmissionParticle) == 0x10);
 STATIC_ASSERT(sizeof(EmissionDataOffsets) == 0xC);
@@ -127,17 +127,17 @@ void pppRenderEmission(pppEmission*, PEmission*, _pppCtrlTable*) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameEmission(pppEmission* pppEmission_, PEmission* param_2, _pppCtrlTable* param_3) {
+void pppFrameEmission(pppEmission* emission, PEmission* step, _pppCtrlTable* ctrl) {
     if (ppvUserStopPartF != 0) {
         return;
     }
 
-    EmissionState* state = GetEmissionState(pppEmission_, param_3);
-    VColor* color = GetEmissionColorData(pppEmission_, param_3);
+    EmissionState* state = GetEmissionState(emission, ctrl);
+    VColor* color = GetEmissionColorData(emission, ctrl);
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
-    SetEmissionModelCallbacks(model, state, param_2);
+    SetEmissionModelCallbacks(model, state, step);
 
     float alphaScale = (float)color->m_color.rgba[3] / 255.0f;
     state->m_colorR = color->m_color.rgba[0];
@@ -146,79 +146,79 @@ void pppFrameEmission(pppEmission* pppEmission_, PEmission* param_2, _pppCtrlTab
     state->m_colorA = color->m_color.rgba[3];
 
     CalcGraphValue(
-        pppEmission_, param_2->m_graphId,
-        state->m_scale0, state->m_scale1, state->m_scale2,
-        param_2->m_stepValue, param_2->m_arg3, param_2->m_emission.m_scaleAccelerationAdd);
+        emission, step->m_graphId,
+        state->m_scaleValue, state->m_scaleVelocity, state->m_scaleAccel,
+        step->m_stepValue, step->m_arg3, step->m_emission.m_scaleAccelerationAdd);
 
     if (ppvIsLoopCalc != 0) {
         return;
     }
 
     int textureIndex = 0;
-    if (param_2->m_dataValIndex == 0xFFFF) {
+    if (step->m_dataValIndex == 0xFFFF) {
         return;
     }
 
     state->m_texture =
-        ppvEnv->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
+        ppvEnv->m_mapMeshPtr[step->m_dataValIndex]->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
 
-    PEmissionPayload& payload = param_2->m_emission;
+    PEmissionPayload& payload = step->m_emission;
     if (payload.m_particleMode != 0) {
         if (state->m_particles == 0) {
-            state->m_field1C = payload.m_targetAlpha / payload.m_fadeOutFrames;
+            state->m_fadeOutAlphaStep = payload.m_targetAlpha / payload.m_fadeOutFrames;
             state->m_particles = static_cast<EmissionParticle*>(pppMemAlloc(
-                (unsigned long)param_2->m_initWOrk << 4,
+                (unsigned long)step->m_initWOrk << 4,
                 ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppEmission_cpp),
                 0x16F));
 
             EmissionParticle* particle = state->m_particles;
-            for (int i = 0; i < param_2->m_initWOrk; i++) {
+            for (int i = 0; i < step->m_initWOrk; i++) {
                 Math.RandF(1.0f);
 
                 s16 lifeJitter = (s16)(rand() % payload.m_lifeJitterFrames);
                 s16 safeJitter = (lifeJitter >= 1) ? lifeJitter : 1;
 
-                particle->m_fieldC = payload.m_fadeInFrames + safeJitter;
+                particle->m_fadeInFramesLeft = payload.m_fadeInFrames + safeJitter;
                 s16 fade = (u16)payload.m_fadeOutFrames + safeJitter;
-                particle->m_fieldA = particle->m_fieldC + safeJitter + fade;
+                particle->m_lifeFramesLeft = particle->m_fadeInFramesLeft + safeJitter + fade;
                 particle->m_scale = ((float)i * Math.RandF(payload.m_scaleRandomRange)) + 1.0f;
                 particle->m_alpha = 0;
-                particle->m_fieldE = (u8)((int)payload.m_targetAlpha / (int)fade);
+                particle->m_fadeOutAlphaStep = (u8)((int)payload.m_targetAlpha / (int)fade);
                 particle++;
             }
         }
 
         EmissionParticle* particle = state->m_particles;
-        for (int i = 0; i < param_2->m_initWOrk; i++) {
-            particle->m_scale = particle->m_scale + (state->m_scale0 + Math.RandF(payload.m_scaleRandomRange));
+        for (int i = 0; i < step->m_initWOrk; i++) {
+            particle->m_scale = particle->m_scale + (state->m_scaleValue + Math.RandF(payload.m_scaleRandomRange));
 
-            int delay = particle->m_fieldC;
+            int delay = particle->m_fadeInFramesLeft;
             if (delay > 0) {
-                particle->m_fieldC = delay - 1;
+                particle->m_fadeInFramesLeft = delay - 1;
                 particle->m_alpha = particle->m_alpha + (payload.m_targetAlpha / payload.m_fadeInFrames);
             } else {
-                if (payload.m_fadeOutFrames <= particle->m_fieldA) {
+                if (payload.m_fadeOutFrames <= particle->m_lifeFramesLeft) {
                     particle->m_alpha = payload.m_targetAlpha;
                 } else {
-                    particle->m_alpha = particle->m_alpha - particle->m_fieldE;
+                    particle->m_alpha = particle->m_alpha - particle->m_fadeOutAlphaStep;
                 }
             }
 
             int alpha = (int)((float)particle->m_alpha * alphaScale);
-            particle->m_fieldA--;
+            particle->m_lifeFramesLeft--;
 
-            if (particle->m_fieldA <= 0) {
+            if (particle->m_lifeFramesLeft <= 0) {
                 int jitter = 0;
                 if (payload.m_lifeJitterFrames != 0) {
                     jitter = rand() % payload.m_lifeJitterFrames;
                 }
 
-                particle->m_fieldC = payload.m_fadeInFrames;
-                particle->m_fieldA = payload.m_fadeInFrames + payload.m_holdFrames + jitter + payload.m_fadeOutFrames;
+                particle->m_fadeInFramesLeft = payload.m_fadeInFrames;
+                particle->m_lifeFramesLeft = payload.m_fadeInFrames + payload.m_holdFrames + jitter + payload.m_fadeOutFrames;
                 particle->m_scale = 1.0f + Math.RandF(payload.m_scaleRandomRange);
                 particle->m_alpha = 0;
-                particle->m_fieldE = payload.m_targetAlpha / payload.m_fadeOutFrames;
+                particle->m_fadeOutAlphaStep = payload.m_targetAlpha / payload.m_fadeOutFrames;
             }
 
             particle->m_colorR = color->m_color.rgba[0];
@@ -241,9 +241,9 @@ void pppFrameEmission(pppEmission* pppEmission_, PEmission* param_2, _pppCtrlTab
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructEmission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
+void pppDestructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale;
-    EmissionState* state = GetEmissionState(pppEmission_, param_2);
+    EmissionState* state = GetEmissionState(emission, ctrl);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
 
@@ -257,9 +257,9 @@ void pppDestructEmission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
     }
 
     baseScale = 0.0f;
-    state->m_scale2 = 0.0f;
-    state->m_scale1 = baseScale;
-    state->m_scale0 = baseScale;
+    state->m_scaleAccel = 0.0f;
+    state->m_scaleVelocity = baseScale;
+    state->m_scaleValue = baseScale;
 }
 
 /*
@@ -271,12 +271,12 @@ void pppDestructEmission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2Emission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
+void pppConstruct2Emission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale = 0.0f;
-    EmissionState* state = GetEmissionState(pppEmission_, param_2);
-    state->m_scale2 = baseScale;
-    state->m_scale1 = baseScale;
-    state->m_scale0 = baseScale;
+    EmissionState* state = GetEmissionState(emission, ctrl);
+    state->m_scaleAccel = baseScale;
+    state->m_scaleVelocity = baseScale;
+    state->m_scaleValue = baseScale;
 }
 
 /*
@@ -288,26 +288,26 @@ void pppConstruct2Emission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructEmission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
+void pppConstructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
     float baseScale = 0.0f;
-    EmissionState* state = GetEmissionState(pppEmission_, param_2);
+    EmissionState* state = GetEmissionState(emission, ctrl);
 
     state->m_texture = 0;
     state->m_colorR = 0x80;
     state->m_colorG = 0x80;
     state->m_colorB = 0x80;
     state->m_colorA = 0x80;
-    state->m_scale2 = baseScale;
-    state->m_scale1 = baseScale;
-    state->m_scale0 = baseScale;
+    state->m_scaleAccel = baseScale;
+    state->m_scaleVelocity = baseScale;
+    state->m_scaleValue = baseScale;
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
     model->SetDrawMeshDLCallback(Emission_DrawMeshDLCallback);
     model->SetAfterDrawMeshCallback(Emission_AfterDrawMeshCallback);
     state->m_particles = 0;
-    state->m_scale3 = model->m_lightAlpha;
-    state->m_field1C = 0;
+    state->m_savedLightAlpha = model->m_lightAlpha;
+    state->m_fadeOutAlphaStep = 0;
 }
 
 /*
@@ -319,11 +319,11 @@ void pppConstructEmission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIndex, float (*param_5)[4]) {
+void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* stateContext, void* stepContext, int meshIndex, float (*meshMtx)[4]) {
     Graphic.SetDrawDoneDebugData(0x66);
 
-    EmissionState* state = (EmissionState*)param_2;
-    PEmission* step = (PEmission*)param_3;
+    EmissionState* state = (EmissionState*)stateContext;
+    PEmission* step = (PEmission*)stepContext;
     EmissionMeshData* meshData = EmissionMeshAt(model, meshIndex);
     if ((strcmp(meshData->m_name, "obj2") == 0) && (state->m_colorA != 0)) {
         CTexture* texture = state->m_texture;
@@ -343,9 +343,9 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
             EmissionDisplayList* displayList;
             for (int i = 0; i < step->m_initWOrk; i++) {
                 float scale = 1.0f;
-                scale += (float)i * state->m_scale0;
+                scale += (float)i * state->m_scaleValue;
                 PSMTXScale(objMtx0, scale, scale, scale);
-                PSMTXConcat(param_5, objMtx0, objMtx0);
+                PSMTXConcat(meshMtx, objMtx0, objMtx0);
                 PSMTXCopy(CameraMatrix(), viewMtx0);
                 MaterialMan.SetObjMatrix(viewMtx0, objMtx0);
 
@@ -381,7 +381,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
             for (int i = 0; i < step->m_initWOrk; i++) {
                 float scale = particle->m_scale;
                 PSMTXScale(objMtx1, scale, scale, scale);
-                PSMTXConcat(param_5, objMtx1, objMtx1);
+                PSMTXConcat(meshMtx, objMtx1, objMtx1);
                 PSMTXCopy(CameraMatrix(), viewMtx1);
                 PSMTXConcat(viewMtx1, objMtx1, objMtx1);
                 GXLoadPosMtxImm(objMtx1, 0);

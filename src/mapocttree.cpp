@@ -374,7 +374,7 @@ void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode* octNode)
 	}
 	for (i = 0; i < 8; i++) {
 		if (octNode->m_children[i] == 0) {
-			return;
+			break;
 		}
 		DrawCharaShadowTypeMeshFlag_r(octNode->m_children[i]);
 	}
@@ -579,6 +579,8 @@ void COctTree::SetDrawFlag()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma inline_depth(6)
 void ClearLight_r(COctNode* octNode)
 {
 	int i;
@@ -593,6 +595,7 @@ void ClearLight_r(COctNode* octNode)
 		ClearLight_r(octNode->m_children[i]);
 	}
 }
+#pragma pop
 
 /*
  * --INFO--
@@ -747,6 +750,8 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma push
+#pragma inline_depth(6)
 void ClearShadow_r(COctNode* node)
 {
 	int i;
@@ -761,6 +766,7 @@ void ClearShadow_r(COctNode* node)
 		ClearShadow_r(node->m_children[i]);
 	}
 }
+#pragma pop
 
 /*
  * --INFO--

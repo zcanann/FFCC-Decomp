@@ -47,6 +47,7 @@ struct pppColumStep {
     u16 m_unkA;            // 0x0A
     union {
         u32 m_stepValue;       // 0x0C
+        f32 m_stepFloat;       // 0x0C
         u8 m_baseColor[4];     // 0x0C
     };
     u8 m_arg3;             // 0x10
@@ -78,10 +79,10 @@ struct pppColumStep {
 extern "C" {
 #endif
 
-void pppConstructColum(pppColum* column, _pppCtrlTable* param_2);
-void pppDestructColum(pppColum* column, _pppCtrlTable* param_2);
-void pppFrameColum(pppColum* column, pppColumStep* param_2, _pppCtrlTable* param_3);
-void pppRenderColum(pppColum* column, pppColumStep* param_2, _pppCtrlTable* param_3);
+void pppConstructColum(pppColum* column, _pppCtrlTable* ctrl);
+void pppDestructColum(pppColum* column, _pppCtrlTable* ctrl);
+void pppFrameColum(pppColum* column, pppColumStep* step, _pppCtrlTable* ctrl);
+void pppRenderColum(pppColum* column, pppColumStep* step, _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

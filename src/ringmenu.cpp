@@ -714,7 +714,7 @@ void CRingMenu::onDraw()
  */
 static void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* caravanWork, int cmdIndex, float angle, float alphaScale)
 {
-	float fVar1;
+	float unclampedAlpha;
 	float alphaProduct;
 	bool reverseDir;
 	int waveDirection;
@@ -785,10 +785,10 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 
 	font->SetScale(static_cast<float>(0.800000011920929 - 0.25 * fabs(static_cast<double>(angle))));
 	textWidth = static_cast<float>(font->GetWidth(commandLabel));
-	fVar1 = static_cast<float>(-(0.5 * fabs(static_cast<double>(angle)) - 1.0));
+	unclampedAlpha = static_cast<float>(-(0.5 * fabs(static_cast<double>(angle)) - 1.0));
 	textHeight = static_cast<float>(font->m_glyphHeight) * font->scaleY;
 
-	clampedAlpha = (fVar1 < 0.0f) ? 0.0f : ((1.0f < fVar1) ? 1.0f : fVar1);
+	clampedAlpha = (unclampedAlpha < 0.0f) ? 0.0f : ((1.0f < unclampedAlpha) ? 1.0f : unclampedAlpha);
 
 	alphaProduct = 255.0f * alphaScale;
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF,

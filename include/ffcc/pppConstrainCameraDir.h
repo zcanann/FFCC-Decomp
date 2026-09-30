@@ -23,10 +23,11 @@ struct pppConstrainCameraDirStep {
 extern "C" {
 #endif
 
-void pppConstructConstrainCameraDir(pppConstrainCameraDir* param1, _pppCtrlTable* param2);
-void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* param1, _pppCtrlTable* param2);
+void pppConstructConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, _pppCtrlTable* ctrl);
+void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, _pppCtrlTable* ctrl);
 void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*);
-void pppFrameConstrainCameraDir(pppConstrainCameraDir* param1, pppConstrainCameraDirStep* param2, _pppCtrlTable* param3);
+void pppFrameConstrainCameraDir(pppConstrainCameraDir* constrainCameraDir, pppConstrainCameraDirStep* step,
+                                _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

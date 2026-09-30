@@ -3342,13 +3342,13 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x22));
 	MenuPcs.DrawRect(0, xCorner, bottom, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
-	float yCorner = corner + y;
 	float innerH = (float)((double)h - 64.0);
+	float yCorner = corner + y;
 	MenuPcs.DrawRect(0, x, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
 	MenuPcs.DrawRect(0, right, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	MenuPcs.DrawRect(0, xCorner, yCorner, (float)((double)w - 64.0), innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.DrawRect(0, xCorner, yCorner, (float)((double)w - 64.0), (float)((double)h - 64.0), 0.0f, 0.0f, texScale, texScale, 0.0f);
 }
 
 /*
@@ -3391,9 +3391,11 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 
 	for (int i = 0; i < 8; i++) {
 		if (this->m_bonusState->m_phase == 4) {
-			float gray = 255.0f * (((((int)(signed char)s_Rinfo->m_selectedArtifactMask |
-			    (int)(signed char)s_Rinfo->m_missingArtifactMask) |
-			    s_Rinfo->m_party[partyIndex].m_ownedArtifactMask) & (1 << i)) != 0 ? 0.7f : 1.0f);
+			float gray = 255.0f;
+			int mask = (signed char)s_Rinfo->m_selectedArtifactMask;
+			mask |= (signed char)s_Rinfo->m_missingArtifactMask;
+			mask |= s_Rinfo->m_party[partyIndex].m_ownedArtifactMask;
+			gray *= (mask & (1 << i)) != 0 ? 0.7f : 1.0f;
 			color.r = (unsigned char)gray;
 			color.g = (unsigned char)gray;
 			color.b = (unsigned char)gray;
@@ -3420,13 +3422,13 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 	Sprt2* board = a;
 	Sprt2* icon = b;
 
-	s_Base->m_center.x = (float)(board->x + board->w * 0.5);
-	s_Base->m_center.y = (float)(board->y + board->h * 0.5);
+	s_Base->m_center.x = (float)(board->x + board->w / 2.0);
+	s_Base->m_center.y = (float)(board->y + board->h / 2.0);
 
 	float iconW = (float)icon->w;
 	float iconH = (float)icon->h;
 
-	float centerX = (float)((double)s_Base->m_center.x - (double)iconW * 0.5);
+	float centerX = (float)((double)s_Base->m_center.x - (double)iconW / 2.0);
 	float edgeY = (float)board->y;
 	for (int edge = 0; edge < 2; edge++) {
 		if (edge != 0) {
@@ -3442,7 +3444,7 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 	}
 
 	float edgeX = (float)board->x;
-	float centerY = (float)((double)s_Base->m_center.y - (double)iconH * 0.5);
+	float centerY = (float)((double)s_Base->m_center.y - (double)iconH / 2.0);
 	for (int edge = 0; edge < 2; edge++) {
 		if (edge != 0) {
 			edgeX = edgeX + ((float)board->w - iconW);
@@ -3457,10 +3459,10 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 	}
 
 	for (int row = 0; row < 2; row++) {
-		float slotX = (float)((double)(float)(board->x + board->w * 0.25) - (double)iconW * 0.5);
-		float slotY = (float)((double)(float)(board->y + board->h * 0.25) - (double)iconH * 0.5);
+		float slotX = (float)((double)(float)(board->x + board->w / 4.0) - (double)iconW / 2.0);
+		float slotY = (float)((double)(float)(board->y + board->h / 4.0) - (double)iconH / 2.0);
 		if (row != 0) {
-			slotY = (float)(board->h * 0.5 + slotY);
+			slotY += board->h / 2.0;
 		}
 		if (row == 0) {
 			s_Base->m_artifactPositions[5].x = slotX;
@@ -3469,7 +3471,7 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 			s_Base->m_artifactPositions[3].x = slotX;
 			s_Base->m_artifactPositions[3].y = slotY;
 		}
-		slotX = (float)(board->w * 0.5 + slotX);
+		slotX += board->w / 2.0;
 		if (row == 0) {
 			s_Base->m_artifactPositions[7].x = slotX;
 			s_Base->m_artifactPositions[7].y = slotY;

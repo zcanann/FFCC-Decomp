@@ -5817,10 +5817,11 @@ int JoyBus::SendSPMode(ThreadParam* threadParam)
     unsigned int cmd = 0;
     unsigned char* cmdBytes = (unsigned char*)&cmd;
     unsigned int mode = GbaQue.GetSPMode(threadParam->m_portIndex) & 0xFF;
-    const unsigned char bVar1 = (unsigned char)(((unsigned int)(-(int)mode | (int)mode)) >> 31);
+    // Branchless (mode != 0): -mode | mode has its sign bit set for every nonzero mode.
+    const unsigned char spModeOn = (unsigned char)(((unsigned int)(-(int)mode | (int)mode)) >> 31);
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x11;
-    cmdBytes[2] = bVar1;
+    cmdBytes[2] = spModeOn;
     unsigned int cmdWord = cmd;
     int result;
 
@@ -5847,10 +5848,11 @@ int JoyBus::SendSPMode(ThreadParam* threadParam)
         }
     }
 
-    // On success, update the threadParam flags
+    // On success, remember the SP mode we just told the GBA about, so the
+    // thread loop only resends when it actually changes (see m_flags[6] test).
     if (result == 0)
     {
-        threadParam->m_flags[6] = bVar1;
+        threadParam->m_flags[6] = spModeOn;
     }
 
     return result;
@@ -6560,14 +6562,15 @@ void JoyBus::RestartThread()
  * JP Address: TODO
  * JP Size: TODO
  */
-int JoyBus::SetCmdLst(int portIndex, int param_3, short param_4)
+int JoyBus::SetCmdLst(int portIndex, int cmdListIdx, short inventorySlot)
 {
     unsigned int cmd = 0;
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
-    unsigned short param = param_4;
+    unsigned short slotBits = inventorySlot;
     cmdBytes[0] = 0x1F;
-    cmdBytes[1] = static_cast<unsigned char>(param_3);
-    *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&param, 0);
+    cmdBytes[1] = static_cast<unsigned char>(cmdListIdx);
+    // The GBA is little-endian: __lhbrx byte-swaps the slot into its wire order.
+    *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&slotBits, 0);
     unsigned int result;
 
     result = SetSendQueue(&m_threadParams[portIndex], cmd);

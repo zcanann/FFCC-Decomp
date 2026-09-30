@@ -545,22 +545,20 @@ void CLightPcs::SetDiffuseColor(unsigned long idx, _GXColor color)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CLightPcs::EnableLight(int param_1, int param_2)
+void CLightPcs::EnableLight(int enable, int useRegMatColor)
 {
-    int enabled = param_1;
-    int colorSrcParam = param_2;
-    unsigned int light_mask;
+    unsigned int lightMask;
 
-    if (enabled != 0) {
-        light_mask = m_loadedLightMask;
+    if (enable != 0) {
+        lightMask = m_loadedLightMask;
     } else {
-        light_mask = 0;
+        lightMask = 0;
     }
 
-    GXSetChanCtrl((GXChannelID)0, enabled ? GX_TRUE : GX_FALSE, (GXColorSrc)0,
-                  colorSrcParam ? GX_SRC_REG : GX_SRC_VTX, light_mask, (GXDiffuseFn)2, (GXAttnFn)1);
-    GXSetChanCtrl((GXChannelID)2, enabled ? GX_TRUE : GX_FALSE, (GXColorSrc)0,
-                  colorSrcParam ? GX_SRC_REG : GX_SRC_VTX, 0, (GXDiffuseFn)0, (GXAttnFn)2);
+    GXSetChanCtrl((GXChannelID)0, enable ? GX_TRUE : GX_FALSE, (GXColorSrc)0,
+                  useRegMatColor ? GX_SRC_REG : GX_SRC_VTX, lightMask, (GXDiffuseFn)2, (GXAttnFn)1);
+    GXSetChanCtrl((GXChannelID)2, enable ? GX_TRUE : GX_FALSE, (GXColorSrc)0,
+                  useRegMatColor ? GX_SRC_REG : GX_SRC_VTX, 0, (GXDiffuseFn)0, (GXAttnFn)2);
 }
 
 /*

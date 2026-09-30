@@ -9,7 +9,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/gx/GXCpu2Efb.h>
 #include <dolphin/mtx.h>
-#include "PowerPC_EABI_Support/Runtime/runtime.h"
 
 STATIC_ASSERT(offsetof(LensFlareWork, m_projectedX) == 0x10);
 STATIC_ASSERT(offsetof(LensFlareWork, m_viewPosition) == 0x20);
@@ -44,52 +43,52 @@ static inline VColor* GetLensFlareColorWork(pppColum* obj, _pppCtrlTable* ctrlTa
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTable)
+void pppRenderLensFlare(pppColum* obj, pppColumStep* step, _pppCtrlTable* ctrlTable)
 {
 	LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);
 	VColor* colorWork = GetLensFlareColorWork(obj, ctrlTable);
-	s32 dataValIndex = unkB->m_dataValIndex;
+	s32 dataValIndex = step->m_dataValIndex;
 
 	if (dataValIndex != 0xFFFF) {
 		pppShapeSt* shape = ppvEnv->m_shapeTablePtr[dataValIndex];
 		if (work->m_alpha != 0) {
-			pppCVECTOR local_70;
-			Vec local_60;
-			Mtx local_54;
+			pppCVECTOR drawColor;
+			Vec viewPos;
+			Mtx drawMtx;
 			float scale;
 
-			PSMTXIdentity(local_54);
-			scale = *(float*)&unkB->m_stepValue;
-			local_54[0][0] = (ppvMng->m_scale.x * obj->m_drawMatrix.value[0][0]) * scale;
-			local_54[1][1] = (ppvMng->m_scale.y * obj->m_drawMatrix.value[1][1]) * scale;
-			local_54[2][2] = (ppvMng->m_scale.z * obj->m_drawMatrix.value[2][2]) * scale;
+			PSMTXIdentity(drawMtx);
+			scale = step->m_stepFloat;
+			drawMtx[0][0] = (ppvMng->m_scale.x * obj->m_drawMatrix.value[0][0]) * scale;
+			drawMtx[1][1] = (ppvMng->m_scale.y * obj->m_drawMatrix.value[1][1]) * scale;
+			drawMtx[2][2] = (ppvMng->m_scale.z * obj->m_drawMatrix.value[2][2]) * scale;
 
-			local_60.x = ppvMng->m_matrix.value[0][3];
-			local_60.y = ppvMng->m_matrix.value[1][3];
-			local_60.z = ppvMng->m_matrix.value[2][3];
+			viewPos.x = ppvMng->m_matrix.value[0][3];
+			viewPos.y = ppvMng->m_matrix.value[1][3];
+			viewPos.z = ppvMng->m_matrix.value[2][3];
 
-			PSMTXMultVec(ppvCameraMatrix, &local_60, &local_60);
+			PSMTXMultVec(ppvCameraMatrix, &viewPos, &viewPos);
 
-			local_54[0][3] = local_60.x;
-			local_54[1][3] = local_60.y;
-			local_54[2][3] = local_60.z;
+			drawMtx[0][3] = viewPos.x;
+			drawMtx[1][3] = viewPos.y;
+			drawMtx[2][3] = viewPos.z;
 
-			pppCopyVector(work->m_viewPosition, local_60);
+			pppCopyVector(work->m_viewPosition, viewPos);
 
-			GXLoadPosMtxImm(local_54, 0);
+			GXLoadPosMtxImm(drawMtx, 0);
 
-			local_70.rgba[0] = colorWork->m_color.rgba[0];
-			local_70.rgba[1] = colorWork->m_color.rgba[1];
-			local_70.rgba[2] = colorWork->m_color.rgba[2];
-			local_70.rgba[3] = work->m_alpha;
+			drawColor.rgba[0] = colorWork->m_color.rgba[0];
+			drawColor.rgba[1] = colorWork->m_color.rgba[1];
+			drawColor.rgba[2] = colorWork->m_color.rgba[2];
+			drawColor.rgba[3] = work->m_alpha;
 
 			pppSetDrawEnv(
-				&local_70, (pppFMATRIX*)0, 0.0f, unkB->m_lensFlare.m_drawEnvLightTarget, unkB->m_unk13,
-				unkB->m_unk12, 0, 1, 1, 0);
+				&drawColor, (pppFMATRIX*)0, 0.0f, step->m_lensFlare.m_drawEnvLightTarget, step->m_unk13,
+				step->m_unk12, 0, 1, 1, 0);
 
-			pppSetBlendMode(unkB->m_unk12);
+			pppSetBlendMode(step->m_unk12);
 			pppDrawShp(static_cast<long*>(shape->m_animData), work->m_shapeFrame1,
-			           ppvEnv->m_materialSetPtr, unkB->m_unk12);
+			           ppvEnv->m_materialSetPtr, step->m_unk12);
 			pppSetBlendMode(3);
 		}
 	}
@@ -104,15 +103,15 @@ void pppRenderLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTa
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTable)
+void pppFrameLensFlare(pppColum* obj, pppColumStep* step, _pppCtrlTable* ctrlTable)
 {
 	if (ppvUserStopPartF == 0) {
 		LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);
 		VColor* colorWork = GetLensFlareColorWork(obj, ctrlTable);
 		u8 sourceAlpha = colorWork->m_color.rgba[3];
-		float projX = ppvMng->m_matrix.value[0][3];
-		float projY = ppvMng->m_matrix.value[1][3];
-		float projZ = ppvMng->m_matrix.value[2][3];
+		float worldX = ppvMng->m_matrix.value[0][3];
+		float worldY = ppvMng->m_matrix.value[1][3];
+		float worldZ = ppvMng->m_matrix.value[2][3];
 		u32 zAtPixel;
 		Vec cameraPos;
 		Vec cameraLookAt;
@@ -124,13 +123,13 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTab
 		float viewport[6];
 		u8 flareWidth;
 		int halfWidth;
-		u32 z0;
+		u32 flareDepth;
 		int projectedXInt;
 		int projectedYInt;
 		int x;
 		int y;
-		int x0;
-		int y0;
+		int centerX;
+		int centerY;
 		s16 stepSize;
 		float alphaScale;
 
@@ -138,7 +137,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTab
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);
 		PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-		GXProject(projX, projY, projZ, cameraMtx, projection, viewport,
+		GXProject(worldX, worldY, worldZ, cameraMtx, projection, viewport,
 				  &work->m_projectedX, &work->m_projectedY, &work->m_projectedZ);
 
 		work->m_alpha = 0;
@@ -162,28 +161,28 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTab
 		projectedXInt = (int)work->m_projectedX;
 		projectedYInt = (int)work->m_projectedY;
 		zAtPixel = 0;
-		flareWidth = unkB->m_arg3;
+		flareWidth = step->m_arg3;
 		halfWidth = flareWidth >> 1;
-		z0 = __cvt_fp2unsigned((double)(16777215.0f * work->m_projectedZ));
-		y0 = (u16)projectedYInt;
-		x0 = (u16)projectedXInt;
-		stepSize = (s16)((u16)flareWidth / (u16)unkB->m_count);
+		flareDepth = (u32)(16777215.0f * work->m_projectedZ);
+		centerY = (u16)projectedYInt;
+		centerX = (u16)projectedXInt;
+		stepSize = (s16)((u16)flareWidth / (u16)step->m_count);
 
-		for (y = y0 - halfWidth; y <= (y0 + halfWidth); y += stepSize) {
-			for (x = x0 - halfWidth; x <= (x0 + halfWidth); x += stepSize) {
+		for (y = centerY - halfWidth; y <= (centerY + halfWidth); y += stepSize) {
+			for (x = centerX - halfWidth; x <= (centerX + halfWidth); x += stepSize) {
 				s16 xShort = (s16)x;
 				s16 yShort = (s16)y;
 
 				if ((xShort >= 0) && (yShort >= 0) && (xShort <= 0x280) && (yShort <= 0x1C0)) {
 					GXPeekZ((u16)xShort, (u16)yShort, &zAtPixel);
-					if (z0 <= zAtPixel) {
+					if (flareDepth <= zAtPixel) {
 						work->m_alpha = (u8)(work->m_alpha + 1);
 					}
 				}
 			}
 		}
 
-		int sampleCount = unkB->m_count + 1;
+		int sampleCount = step->m_count + 1;
 		sampleCount *= sampleCount;
 		if (work->m_alpha == sampleCount) {
 			work->m_alpha = 0xff;
@@ -200,10 +199,10 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTab
 		}
 
 		work->m_alpha = (u8)(int)((float)(u8)work->m_alpha * alphaScale);
-		if (unkB->m_dataValIndex != 0xffff) {
-			pppShapeSt* shape = ppvEnv->m_shapeTablePtr[unkB->m_dataValIndex];
+		if (step->m_dataValIndex != 0xffff) {
+			pppShapeSt* shape = ppvEnv->m_shapeTablePtr[step->m_dataValIndex];
 			pppCalcFrameShape(static_cast<long*>(shape->m_animData), work->m_shapeFrame0, work->m_shapeFrame1,
-			                  work->m_shapeFrame2, unkB->m_initWOrk);
+			                  work->m_shapeFrame2, step->m_initWOrk);
 		}
 	}
 }
@@ -215,7 +214,6 @@ void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTab
  */
 void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
 {
-	return;
 }
 
 /*

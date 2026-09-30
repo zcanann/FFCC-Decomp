@@ -971,13 +971,13 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		for (int materialIdx = 0; materialIdx < static_cast<int>(materialCount); materialIdx++) {
 			int foundSlot;
 			for (foundSlot = 0; foundSlot < 64; foundSlot++) {
-				CCaravanWork* materialWork = (*scriptFoodBase);
+				CCaravanWork* materialWork = Game.m_scriptFoodBase[channel];
 				if (materialWork->m_inventoryItems[foundSlot] == materialId) {
 					break;
 				}
 			}
 
-			(*scriptFoodBase)->DeleteItemIdx(foundSlot, 1);
+			Game.m_scriptFoodBase[channel]->DeleteItemIdx(foundSlot, 1);
 		}
 	}
 
@@ -988,7 +988,7 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 
 	const float smithRate = static_cast<float>(static_cast<double>((*scriptFoodBase)->m_shopParam) / 100.0);
 	const int gilCost = -static_cast<int>(static_cast<float>(itemRow->m_smithPrice) * smithRate);
-	const int addGilResult = (*scriptFoodBase)->AddGil(gilCost);
+	const int addGilResult = (*scriptFoodBase)->AddGil(gilCost) != 0;
 	if (addGilResult == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
@@ -1481,7 +1481,7 @@ void GbaQueue::LoadEnemyStat()
 		GbaQueueMapEntity* enemyEntry = localEnemyData;
 
 		for (i = 0; i < 0x40; i++) {
-			if (Game.m_monObjects[i] == 0) {
+			if (Game.m_monObjects[i] == 0 || Game.m_monObjects == 0) {
 				enemyEntry->m_baseDataIndex = 0;
 			} else {
 				const CRomWork* enemyData = &reinterpret_cast<const CRomWork*>(Game.unkCFlatData0[1])[
@@ -1951,16 +1951,26 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
  */
 unsigned int GbaQueue::GetScrFlg()
 {
-	for (int i = 0; i < 4; i++) {
-		OSWaitSemaphore(accessSemaphores + i);
-	}
+	int state;
+	int result;
+	int i;
 
-	bool flag = (m_scrInitEnd != 0);
-	for (int i = 0; i < 4; i++) {
-		OSSignalSemaphore(accessSemaphores + i);
-	}
+	i = 0;
+	do {
+		OSWaitSemaphore(&accessSemaphores[i]);
+		i++;
+	} while (i < 4);
 
-	return flag;
+	state = m_scrInitEnd;
+	result = state != 0 ? 1 : 0;
+
+	i = 0;
+	do {
+		OSSignalSemaphore(&accessSemaphores[i]);
+		i++;
+	} while (i < 4);
+
+	return result;
 }
 
 /*
@@ -2768,13 +2778,13 @@ void GbaQueue::InitCmakeInfo(int channel, int value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void GbaQueue::ClrCmakeInfo(int param_2)
+void GbaQueue::ClrCmakeInfo(int channel)
 {
-	BlockSem(param_2);
-	if (cmakeInfo[param_2].m_active != 0) {
-		memset(&cmakeInfo[param_2], 0, sizeof(cmakeInfo[param_2]));
+	BlockSem(channel);
+	if (cmakeInfo[channel].m_active != 0) {
+		memset(&cmakeInfo[channel], 0, sizeof(cmakeInfo[channel]));
 	}
-	ReleaseSem(param_2);
+	ReleaseSem(channel);
 }
 
 /*
@@ -2858,9 +2868,8 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 			OSSignalSemaphore(accessSemaphores + i);
 		}
 
-		char** nameTable = Game.m_cFlatDataArr[1].TableStrings(2);
 		for (int i = 0; i < 0x100; i++) {
-			if (strcmp(nameTable[i], localInfo.m_name) == 0) {
+			if (strcmp(Game.m_cFlatDataArr[1].TableStrings(2)[i], localInfo.m_name) == 0) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
 			}
@@ -2868,7 +2877,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 
 		for (int i = 0; i < 8; i++) {
 			if ((i != static_cast<signed char>(localInfo.m_playerSlot)) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
-			    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == '\0') &&
+			    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0U) &&
 			    (strcmp(reinterpret_cast<char*>(Game.m_caravanWorkArr[i].m_name), localInfo.m_name) == 0)) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
@@ -3542,8 +3551,8 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		work = (*foodBasePtr)->m_shopList[i];
-		strcpy(itemNameScratch, Game.m_cFlatDataArr[1].TableStrings(6)[work]);
+		const int nameItem = (*foodBasePtr)->m_shopList[i];
+		strcpy(itemNameScratch, Game.m_cFlatDataArr[1].TableStrings(6)[nameItem]);
 		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 
 		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
@@ -3615,10 +3624,9 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	}
 	totalSize += 0x200;
 
-	const float userRate =
-		0.25f *
-		static_cast<float>(
-			static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
+	float userRate = static_cast<float>(
+		static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
+	userRate *= 0.25f;
 	for (i = 0; i < 0x40; i++) {
 		work = (*foodBasePtr)->m_inventoryItems[i];
 		if (work > 0) {
@@ -3693,7 +3701,8 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	CCaravanWork** foodBasePtr = &Game.m_scriptFoodBase[channel];
 
 	char smithCount = 0;
-	for (int i = 0; i < 0x40; i++) {
+	int i;
+	for (i = 0; i < 0x40; i++) {
 		if ((*foodBasePtr)->m_inventoryItems[i] >= 401) {
 			smithIndices[smithCount++] = static_cast<unsigned char>(i);
 		}
@@ -3715,7 +3724,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	writePtr += work;
 	totalSize = work + 1;
 
-	for (int i = 0; i < 0x40; i++) {
+	for (i = 0; i < 0x40; i++) {
 		const int itemId = (*foodBasePtr)->m_inventoryItems[i];
 		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
@@ -3730,25 +3739,26 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			work = price;
 			itemBuf[0] = __lwbrx(&work, 0);
 
+			unsigned short* itemData = reinterpret_cast<unsigned short*>(itemBuf);
 			for (k = 3; k < 9; k++) {
-				reinterpret_cast<unsigned short*>(itemBuf)[k - 1] =
+				itemData[k - 1] =
 				    __lhbrx(itemBase, static_cast<short>(k) * 2 + 0x20);
 			}
 
-			for (int j = 0; j < 4; j++) {
+			for (k = 0; k < 4; k++) {
 				SItemFlatRow* recipeRow = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
-				reinterpret_cast<unsigned short*>(itemBuf)[8 + j] =
-				    __lhbrx(&recipeRow->m_smithResults[j], 0);
-				work = recipeRow->m_smithResults[j];
+				itemData[8 + k] =
+				    __lhbrx(&recipeRow->m_smithResults[k], 0);
+				work = recipeRow->m_smithResults[k];
 				if (work == 0) {
-					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 4] = 0;
-					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 4] = 0;
-					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 4] = 0;
+					itemData[12 + k * 4] = 0;
+					itemData[13 + k * 4] = 0;
+					itemData[14 + k * 4] = 0;
 				} else {
 					SItemFlatRow* materialBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[work];
-					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 4] = __lhbrx(&materialBase->m_equipFlags, 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 4] = __lhbrx(&materialBase->m_value, 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 4] = __lhbrx(&materialBase->m_attribute, 0);
+					itemData[12 + k * 4] = __lhbrx(&materialBase->m_equipFlags, 0);
+					itemData[13 + k * 4] = __lhbrx(&materialBase->m_value, 0);
+					itemData[14 + k * 4] = __lhbrx(&materialBase->m_attribute, 0);
 				}
 			}
 
@@ -3759,7 +3769,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		}
 	}
 
-	for (int i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++) {
 		work = __lwbrx(reinterpret_cast<unsigned int*>(&(*foodBasePtr)->m_shopArgs[i]), 0);
 		memcpy(writePtr, &work, 4);
 		writePtr += 4;
@@ -4248,8 +4258,7 @@ unsigned int GbaQueue::GetRadarMode(int channel)
 	OSWaitSemaphore(accessSemaphores + channel);
 	int radarMode = m_radarMode;
 	OSSignalSemaphore(accessSemaphores + channel);
-	unsigned int value = radarMode & (1 << channel);
-	return value != 0;
+	return (radarMode & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -4289,8 +4298,7 @@ unsigned int GbaQueue::GetChgRadarMode(int channel)
 	OSWaitSemaphore(accessSemaphores + channel);
 	int radarMode = m_chgRadarMode;
 	OSSignalSemaphore(accessSemaphores + channel);
-	unsigned int value = radarMode & (1 << channel);
-	return value != 0;
+	return (radarMode & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -4449,7 +4457,7 @@ unsigned int GbaQueue::GetChgHitFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int flag = m_chgHitFlags;
 	OSSignalSemaphore(semaphore);
-	return (flag & (1 << actualChannel)) != 0;
+	return (flag & (1 << actualChannel)) ? 1 : 0;
 }
 
 /*
@@ -4485,7 +4493,7 @@ unsigned int GbaQueue::GetChgScouFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int flag = m_chgScouFlags;
 	OSSignalSemaphore(semaphore);
-	return (flag & (1 << channel)) != 0;
+	return (flag & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -4629,7 +4637,7 @@ void GbaQueue::SetControllerMode(int controllerMode)
 unsigned int GbaQueue::GetControllerMode()
 {
 	char mode;
-	bool result;
+	int result;
 	int i;
 
 	i = 0;
@@ -4639,7 +4647,7 @@ unsigned int GbaQueue::GetControllerMode()
 	} while (i < 4);
 
 	mode = m_controllerMode;
-	result = mode != 0;
+	result = mode != 0 ? 1 : 0;
 
 	i = 0;
 	do {
@@ -4776,7 +4784,7 @@ void GbaQueue::SetPauseMode(int mode)
 unsigned int GbaQueue::GetPauseMode()
 {
 	char mode;
-	bool result;
+	int result;
 	int i;
 
 	i = 0;
@@ -4786,7 +4794,7 @@ unsigned int GbaQueue::GetPauseMode()
 	} while (i < 4);
 
 	mode = m_pauseMode;
-	result = mode != 0;
+	result = mode != 0 ? 1 : 0;
 
 	i = 0;
 	do {
@@ -4831,7 +4839,7 @@ unsigned int GbaQueue::GetSPModeFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_spModeFlags;
 	OSSignalSemaphore(semaphore);
-	return (value & (1 << channel)) != 0;
+	return (value & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -4866,7 +4874,7 @@ unsigned int GbaQueue::GetSPMode(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_spModeBits;
 	OSSignalSemaphore(semaphore);
-	return (value & (1 << channel)) != 0;
+	return (value & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -4884,7 +4892,7 @@ unsigned int GbaQueue::GetMemorysFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_memorysFlags;
 	OSSignalSemaphore(semaphore);
-	return (value & (1 << channel)) != 0;
+	return (value & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -4991,7 +4999,7 @@ unsigned int GbaQueue::GetPlayModeFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_playModeFlags;
 	OSSignalSemaphore(semaphore);
-	return (value & (1 << channel)) != 0;
+	return (value & (1 << channel)) ? 1 : 0;
 }
 
 /*
@@ -5052,7 +5060,7 @@ unsigned int GbaQueue::GetStartBonusFlg(int channel)
 	OSWaitSemaphore(semaphore);
 	int value = m_startBonusFlags;
 	OSSignalSemaphore(semaphore);
-	return (value & (1 << channel)) != 0;
+	return (value & (1 << channel)) ? 1 : 0;
 }
 
 /*

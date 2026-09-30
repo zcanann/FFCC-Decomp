@@ -14,17 +14,17 @@ struct PppAcceleDataOffsets {
 struct pppAcceleStep {
     s32 m_graphId;
     s32 m_field_04;
-    f32 m_initWOrk;
-    f32 m_stepValue;
-    f32 m_arg3;
+    f32 m_x;
+    f32 m_y;
+    f32 m_z;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppAccele(_pppPObject* obj, pppAcceleStep* param_2, _pppCtrlTable* param_3);
-void pppAcceleCon(_pppPObject* obj, _pppCtrlTable* param);
+void pppAccele(_pppPObject* obj, pppAcceleStep* step, _pppCtrlTable* ctrl);
+void pppAcceleCon(_pppPObject* obj, _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

@@ -27,27 +27,30 @@ static inline Vec* MoveLinePreviousPosition(_pppMngSt* mng)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppParMoveLine(_pppPObject* param_1, ParMoveLineParams* params)
+void pppParMoveLine(_pppPObject* obj, ParMoveLineParams* params)
 {
+    (void)obj;
     _pppMngSt* pppMngSt;
-    Vec local_1c;
-    Vec VStack_28;
-    float fVar1;
-    float x;
+    Vec moveDelta;
+    Vec direction;
+    float zero;
+    float positionX;
 
     pppMngSt = ppvMng;
-    PSVECSubtract(&ppvMng->m_paramVec0, MoveLinePreviousPosition(ppvMng), &local_1c);
+    // Line direction: from the base position toward m_paramVec0.
+    PSVECSubtract(&ppvMng->m_paramVec0, MoveLinePreviousPosition(ppvMng), &moveDelta);
 
-    x = pppMngSt->m_position.x;
-    fVar1 = kPppParMoveLineZero;
-    MoveLineCurrentPosition(pppMngSt)->x = x;
+    positionX = pppMngSt->m_position.x;
+    zero = kPppParMoveLineZero;
+    MoveLineCurrentPosition(pppMngSt)->x = positionX;
     MoveLineCurrentPosition(pppMngSt)->y = pppMngSt->m_position.y;
     MoveLineCurrentPosition(pppMngSt)->z = pppMngSt->m_position.z;
 
-    if ((fVar1 != local_1c.x) || (fVar1 != local_1c.y) || (fVar1 != local_1c.z)) {
-        PSVECNormalize(&local_1c, &VStack_28);
-        PSVECScale(&VStack_28, &local_1c, params->m_speed * pppMngSt->m_movementScale);
-        PSVECAdd(&local_1c, &pppMngSt->m_position, &pppMngSt->m_position);
+    if ((zero != moveDelta.x) || (zero != moveDelta.y) || (zero != moveDelta.z)) {
+        // Step along the line by speed * movement scale.
+        PSVECNormalize(&moveDelta, &direction);
+        PSVECScale(&direction, &moveDelta, params->m_speed * pppMngSt->m_movementScale);
+        PSVECAdd(&moveDelta, &pppMngSt->m_position, &pppMngSt->m_position);
     }
 
     ppvMng->m_matrix.value[0][3] = pppMngSt->m_position.x;

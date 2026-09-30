@@ -57,10 +57,10 @@ struct pppLocationTitleStep {
 extern "C" {
 #endif
 
-void pppConstructLocationTitle(pppLocationTitle* param_1, pppLocationTitleOffsets* param_2);
-void pppDestructLocationTitle(pppLocationTitle* param_1, pppLocationTitleOffsets* param_2);
-void pppFrameLocationTitle(pppLocationTitle* param_1, pppLocationTitleStep* param_2, pppLocationTitleOffsets* param_3);
-void pppRenderLocationTitle(pppLocationTitle* param_1, pppLocationTitleStep* param_2, pppLocationTitleOffsets* param_3);
+void pppConstructLocationTitle(pppLocationTitle* locationTitle, pppLocationTitleOffsets* offsets);
+void pppDestructLocationTitle(pppLocationTitle* locationTitle, pppLocationTitleOffsets* offsets);
+void pppFrameLocationTitle(pppLocationTitle* locationTitle, pppLocationTitleStep* step, pppLocationTitleOffsets* offsets);
+void pppRenderLocationTitle(pppLocationTitle* locationTitle, pppLocationTitleStep* step, pppLocationTitleOffsets* offsets);
 
 #ifdef __cplusplus
 }

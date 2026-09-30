@@ -59,6 +59,8 @@ public:
     unsigned int Hsb2Rgb(int, int, int);
     float DstRot(float, float);
 
+    MtxPtr GetLocalMtx() { return m_localMtx; }
+
 private:
     float m_localMtx[3][4];      // 0x04
     unsigned char m_scratch[0x30]; // 0x34

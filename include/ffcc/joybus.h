@@ -171,7 +171,7 @@ public:
     bool IsThreadRunning();
     void RestartThread();
 
-    int SetCmdLst(int portIndex, int, short);
+    int SetCmdLst(int portIndex, int cmdListIdx, short inventorySlot);
 	int SetTmpArti(int portIndex, int param3, int param4);
     int SendUseItem(int portIndex, char itemId);
     int SendHitEnemy(int portIndex, char enemyId, short hitValue);

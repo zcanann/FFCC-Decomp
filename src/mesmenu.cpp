@@ -87,16 +87,16 @@ void CMesMenu::CloseRequest(int closeReason)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, int unk3)
+void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int itemIndex, int nameIndex)
 {
-    float fVar1;
-    unsigned int uVar2;
-    bool bVar3;
+    float zero;
+    unsigned int menuIndex;
+    bool alignRight;
     float yPos;
 
-    fVar1 = 0.0f;
+    zero = 0.0f;
     m_offsetY = 0.0f;
-    m_offsetX = fVar1;
+    m_offsetX = zero;
     m_active = 1;
     m_closeReason = 0;
     m_flags = (unsigned int)flags;
@@ -105,72 +105,67 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
         m_baseX = (float)x;
         m_baseY = (float)y;
         m_fromScriptPosition = 1;
-        uVar2 = ((unsigned int)__cntlzw((unsigned int)(flags & 2))) >> 5;
-        fVar1 = 24.0f;
-        m_marginX = fVar1;
-        m_marginY = fVar1;
+        unsigned int shadowOn = ((unsigned int)__cntlzw((unsigned int)(flags & 2))) >> 5;
+        float margin = 24.0f;
+        m_marginX = margin;
+        m_marginY = margin;
         int flagMask = -(flags >> 1 & 1);
-        int displayOffset = 0x1C;
-        displayOffset &= flagMask;
-        m_mes.SetTlutBase(displayOffset);
-        m_mes.SetShadow(uVar2);
+        int tlutBase = 0x1C;
+        tlutBase &= flagMask;
+        m_mes.SetTlutBase(tlutBase);
+        m_mes.SetShadow(shadowOn);
     } else {
         MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(0);
-        fVar1 = 16.0f;
-        float scaleY = 8.0f;
-        m_marginX = fVar1;
-        m_marginY = scaleY;
+        float marginX = 16.0f;
+        float marginY = 8.0f;
+        m_marginX = marginX;
+        m_marginY = marginY;
     }
 
-    m_buttonMask = unk1;
-    m_itemIndex = unk2;
-    m_nameIndex = unk3;
+    m_buttonMask = buttonMask;
+    m_itemIndex = itemIndex;
+    m_nameIndex = nameIndex;
     m_mes.Set(script, flags & 0x20);
 
-    fVar1 = 2.0f;
+    float two = 2.0f;
     m_windowWidth = 2.0f * m_marginX + m_mes.GetMaxWidth();
-    m_windowHeight = fVar1 * m_marginY + m_mes.GetMaxHeight();
+    m_windowHeight = two * m_marginY + m_mes.GetMaxHeight();
 
     if (m_menuIndex >= 4) {
         if ((flags & 8) != 0) {
-            fVar1 = 0.5f;
+            float half = 0.5f;
             m_baseX = -(0.5f * m_windowWidth - m_baseX);
-            m_baseY = -(fVar1 * m_windowHeight - m_baseY);
+            m_baseY = -(half * m_windowHeight - m_baseY);
         } else if ((flags & 0x8000) != 0) {
             m_baseX -= m_windowWidth;
         }
     } else if ((flags & 0x100) == 0) {
-        fVar1 = m_windowWidth;
-        m_windowWidth = (fVar1 < 296.0f) ? 296.0f : fVar1;
+        float width = m_windowWidth;
+        m_windowWidth = (width < 296.0f) ? 296.0f : width;
     }
 
-    uVar2 = (unsigned int)m_menuIndex;
-    if ((int)uVar2 < 4) {
-        if ((uVar2 & 2) != 0) {
-            yPos = ((m_baseY - 44.0f) +
-                    m_offsetY + m_marginY) -
-                   m_windowHeight;
+    menuIndex = (unsigned int)m_menuIndex;
+    if ((int)menuIndex < 4) {
+        if ((menuIndex & 2) != 0) {
+            yPos = ((m_baseY - 44.0f) + m_offsetY + m_marginY) - m_windowHeight;
         } else {
-            yPos = (m_baseY + m_offsetY + m_marginY) +
-                   40.0f;
+            yPos = (m_baseY + m_offsetY + m_marginY) + 40.0f;
         }
     } else {
         yPos = (m_baseY + m_offsetY) + m_marginY;
     }
 
-    bVar3 = false;
-    if (((int)uVar2 < 4) && ((uVar2 & 1) != 0)) {
-        bVar3 = true;
+    alignRight = false;
+    if (((int)menuIndex < 4) && ((menuIndex & 1) != 0)) {
+        alignRight = true;
     }
-    if (bVar3) {
-        fVar1 = ((m_baseX + m_offsetX) +
-                 m_marginX) -
-                m_windowWidth;
+    float xPos;
+    if (alignRight) {
+        xPos = ((m_baseX + m_offsetX) + m_marginX) - m_windowWidth;
     } else {
-        fVar1 = (m_baseX + m_offsetX) +
-                m_marginX;
+        xPos = (m_baseX + m_offsetX) + m_marginX;
     }
-    m_mes.SetPosition(fVar1, yPos);
+    m_mes.SetPosition(xPos, yPos);
 
     unsigned int state;
     if (m_menuIndex < 4) {
@@ -1053,36 +1048,36 @@ void CMesMenu::onCalc()
                     closeReady = true;
                 }
                 if (closeReady) {
-                if (m_mes.mWaitActive != 0) {
-                    int wait5 = m_mes.GetWait();
-                    if (wait5 != 4) {
-                        m_closeReason = 0;
-                        if (m_state <= 1) {
-                            if ((m_flags & 0x40) != 0) {
-                                CFlatRuntime::CStack stack[2];
-                                m_mes.Set(0, 0);
-                                stack[0].m_word = m_menuIndex;
-                                stack[1].m_word = m_closeReason;
-                                gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
-                                m_state = 4;
-                                m_active = 0;
-                                if (m_menuIndex < 4) {
-                                    MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(1);
-                                }
-                            } else {
-                                m_state = 2;
-                                m_stateTimer = 0;
-                                m_stateTimerMax = 4;
-                                if (((m_flags & 1) == 0) &&
-                                    ((m_flags & 0x4000) == 0)) {
-                                    Sound.PlaySe(6, 0x40, 0x7F, 0);
+                    if (m_mes.mWaitActive != 0) {
+                        int wait5 = m_mes.GetWait();
+                        if (wait5 != 4) {
+                            m_closeReason = 0;
+                            if (m_state <= 1) {
+                                if ((m_flags & 0x40) != 0) {
+                                    CFlatRuntime::CStack stack[2];
+                                    m_mes.Set(0, 0);
+                                    stack[0].m_word = m_menuIndex;
+                                    stack[1].m_word = m_closeReason;
+                                    gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
+                                    m_state = 4;
+                                    m_active = 0;
+                                    if (m_menuIndex < 4) {
+                                        MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(1);
+                                    }
+                                } else {
+                                    m_state = 2;
+                                    m_stateTimer = 0;
+                                    m_stateTimerMax = 4;
+                                    if (((m_flags & 1) == 0) &&
+                                        ((m_flags & 0x4000) == 0)) {
+                                        Sound.PlaySe(6, 0x40, 0x7F, 0);
+                                    }
                                 }
                             }
                         }
+                    } else {
+                        m_mes.Next();
                     }
-                } else {
-                    m_mes.Next();
-                }
                 }
             }
         }

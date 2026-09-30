@@ -32,56 +32,56 @@ static inline Vec* ParHitSphMatPreviousPosition(_pppMngSt* mng)
  */
 void pppParHitSphMat(_pppPObject* pObject, pppParHitSphMatStep* step, _pppCtrlTable* ctrlTable)
 {
-    Vec local_88;
-    Vec local_94;
-    Vec local_a0;
+    Vec hitVector;
+    Vec origin;
+    Vec debugPos;
     Mtx sphereMtx;
     Mtx cameraMtx ATTRIBUTE_ALIGN(8);
-    _GXColor local_a8;
+    _GXColor debugColor;
     _pppMngSt* pppMngSt = (_pppMngSt*)ppvMng;
     float radius;
 
-    local_88.z = 0.0f;
-    local_88.y = 0.0f;
-    local_88.x = 0.0f;
+    hitVector.z = 0.0f;
+    hitVector.y = 0.0f;
+    hitVector.x = 0.0f;
 
     if (step->m_useWorkPosition != 0) {
         ParHitSphMatDataOffsets* offsets = GetParHitSphMatDataOffsets(ctrlTable);
-        Vec* src = (Vec*)(pObject->m_workArea + offsets->m_positionOffset);
-        PSMTXMultVec(pppMngSt->m_matrix.value, src, &local_94);
+        Vec* workPos = (Vec*)(pObject->m_workArea + offsets->m_positionOffset);
+        PSMTXMultVec(pppMngSt->m_matrix.value, workPos, &origin);
     } else {
-        local_94.x = ppvMng->m_matrix.value[0][3];
-        local_94.y = ppvMng->m_matrix.value[1][3];
-        local_94.z = ppvMng->m_matrix.value[2][3];
+        origin.x = ppvMng->m_matrix.value[0][3];
+        origin.y = ppvMng->m_matrix.value[1][3];
+        origin.z = ppvMng->m_matrix.value[2][3];
         ParHitSphMatDataOffsets* offsets = GetParHitSphMatDataOffsets(ctrlTable);
-        Vec* src = (Vec*)(pObject->m_workArea + offsets->m_positionOffset);
-        local_94.x += src->x;
-        local_94.y += src->y;
-        local_94.z += src->z;
+        Vec* workPos = (Vec*)(pObject->m_workArea + offsets->m_positionOffset);
+        origin.x += workPos->x;
+        origin.y += workPos->y;
+        origin.z += workPos->z;
     }
 
     if (step->m_height != 0.0f) {
-        PSVECSubtract(&pppMngSt->m_position, ParHitSphMatPreviousPosition(pppMngSt), &local_88);
+        PSVECSubtract(&pppMngSt->m_position, ParHitSphMatPreviousPosition(pppMngSt), &hitVector);
     }
 
     radius = pppMngSt->m_hitScale * step->m_radiusScale;
-    pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, step->m_height);
+    pppHitCylinderSendSystem(pppMngSt, &origin, &hitVector, radius, step->m_height);
 
     if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
-        local_a8.r = 0xFF;
-        local_a8.g = 0xFF;
-        local_a8.b = 0xFF;
-        local_a8.a = 0xFF;
+        debugColor.r = 0xFF;
+        debugColor.g = 0xFF;
+        debugColor.b = 0xFF;
+        debugColor.a = 0xFF;
         PSMTXIdentity(cameraMtx);
         PSMTXIdentity(sphereMtx);
         sphereMtx[0][0] = radius;
         sphereMtx[1][1] = radius;
         sphereMtx[2][2] = radius;
         PSMTXConcat(ppvCameraMatrix, cameraMtx, cameraMtx);
-        PSMTXMultVec(cameraMtx, &local_94, &local_a0);
-        sphereMtx[0][3] = local_a0.x;
-        sphereMtx[1][3] = local_a0.y;
-        sphereMtx[2][3] = local_a0.z;
-        Graphic.DrawSphere(sphereMtx, local_a8);
+        PSMTXMultVec(cameraMtx, &origin, &debugPos);
+        sphereMtx[0][3] = debugPos.x;
+        sphereMtx[1][3] = debugPos.y;
+        sphereMtx[2][3] = debugPos.z;
+        Graphic.DrawSphere(sphereMtx, debugColor);
     }
 }

@@ -14,7 +14,7 @@ struct ParMoveLineParams {
 extern "C" {
 #endif
 
-void pppParMoveLine(_pppPObject* param_1, ParMoveLineParams* param_2);
+void pppParMoveLine(_pppPObject* obj, ParMoveLineParams* params);
 
 #ifdef __cplusplus
 }

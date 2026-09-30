@@ -18,49 +18,51 @@ void pppParMoveMatrix(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrl
 	(void)stepData;
 	(void)ctrlTable;
 	_pppMngSt *pppMngSt;
-	Vec local_44;
-	Vec local_50;
-	Vec local_5c;
-	Vec local_68;
-	Mtx MStack_38;
-	
+	Vec moveDelta;
+	Vec right;
+	Vec up;
+	Vec forward;
+	Mtx scaleMtx;
+
 	pppMngSt = ppvMng;
 	Vec* previousPosition = &pppMngSt->UserPosition();
 	Vec* position = &pppMngSt->m_position;
-	PSVECSubtract(previousPosition, position, &local_44);
-	
+	PSVECSubtract(previousPosition, position, &moveDelta);
+
 	f32 initialZero = 0.0f;
-	if (((initialZero != local_44.x) || (initialZero != local_44.y)) || (initialZero != local_44.z)) {
-		PSVECNormalize(&local_44, &local_68);
-		local_50.x = local_68.z;
-		local_50.y = 0.0f;
-		local_50.z = -local_68.x;
+	if (((initialZero != moveDelta.x) || (initialZero != moveDelta.y)) || (initialZero != moveDelta.z)) {
+		// Build an orthonormal basis whose Z axis follows the movement direction.
+		PSVECNormalize(&moveDelta, &forward);
+		right.x = forward.z;
+		right.y = 0.0f;
+		right.z = -forward.x;
 		f32 zero = 0.0f;
-		f32 axisZ = local_68.z;
-		if ((zero == axisZ) && (zero == local_50.z)) {
-			local_50.y = 0.0f;
-			local_50.x = 1.0f;
-			local_50.z = 0.0f;
-			local_5c.x = 0.0f;
-			local_5c.y = 0.0f;
-			local_5c.z = 1.0f;
+		f32 forwardZ = forward.z;
+		if ((zero == forwardZ) && (zero == right.z)) {
+			// Movement is vertical; fall back to a fixed basis.
+			right.y = 0.0f;
+			right.x = 1.0f;
+			right.z = 0.0f;
+			up.x = 0.0f;
+			up.y = 0.0f;
+			up.z = 1.0f;
 		}
 		else {
-			PSVECNormalize(&local_50, &local_50);
-			PSVECCrossProduct(&local_68, &local_50, &local_5c);
-			PSVECNormalize(&local_5c, &local_5c);
+			PSVECNormalize(&right, &right);
+			PSVECCrossProduct(&forward, &right, &up);
+			PSVECNormalize(&up, &up);
 		}
-		ppvMng->m_matrix.value[0][0] = local_50.x;
-		ppvMng->m_matrix.value[1][0] = local_50.y;
-		ppvMng->m_matrix.value[2][0] = local_50.z;
-		ppvMng->m_matrix.value[0][1] = local_5c.x;
-		ppvMng->m_matrix.value[1][1] = local_5c.y;
-		ppvMng->m_matrix.value[2][1] = local_5c.z;
-		ppvMng->m_matrix.value[0][2] = local_68.x;
-		ppvMng->m_matrix.value[1][2] = local_68.y;
-		ppvMng->m_matrix.value[2][2] = local_68.z;
-		PSMTXScale(MStack_38, ppvMng->m_scale.x, ppvMng->m_scale.y, ppvMng->m_scale.z);
-		PSMTXConcat(MStack_38, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
+		ppvMng->m_matrix.value[0][0] = right.x;
+		ppvMng->m_matrix.value[1][0] = right.y;
+		ppvMng->m_matrix.value[2][0] = right.z;
+		ppvMng->m_matrix.value[0][1] = up.x;
+		ppvMng->m_matrix.value[1][1] = up.y;
+		ppvMng->m_matrix.value[2][1] = up.z;
+		ppvMng->m_matrix.value[0][2] = forward.x;
+		ppvMng->m_matrix.value[1][2] = forward.y;
+		ppvMng->m_matrix.value[2][2] = forward.z;
+		PSMTXScale(scaleMtx, ppvMng->m_scale.x, ppvMng->m_scale.y, ppvMng->m_scale.z);
+		PSMTXConcat(scaleMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 		ppvMng->m_matrix.value[0][3] = pppMngSt->m_position.x;
 		ppvMng->m_matrix.value[1][3] = pppMngSt->m_position.y;
 		ppvMng->m_matrix.value[2][3] = pppMngSt->m_position.z;

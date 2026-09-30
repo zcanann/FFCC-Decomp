@@ -18,7 +18,6 @@ static const char s_pppYmChangeTex_cpp[] = "pppYmChangeTex.cpp";
 static const float kPppYmChangeTexRampStart = 2.0f;
 static const float kPppYmChangeTexRampScale = 0.5f;
 static const float kPppYmChangeTexRampStep = 0.25f;
-static const double kPppYmChangeTexIntToDoubleBias = 4503601774854144.0;
 static const float kPppYmChangeTexInitZero = 0.0f;
 
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
@@ -39,8 +38,6 @@ STATIC_ASSERT(offsetof(pppYmChangeTexState, m_texture) == 0x1C);
 STATIC_ASSERT(offsetof(pppYmChangeTexState, m_context) == 0x24);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 STATIC_ASSERT(sizeof(GXColor) == 0x4);
-
-static inline float ChangeTexConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
 static inline MtxPtr ChangeTexModelMtx(CChara::CModel* model)
 {
@@ -110,8 +107,8 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	ChangeTexMeshRef* curMesh;
 	Mtx modelMtx;
 	pppYmChangeTexState* state;
-	int frame;
-	short frameShort;
+	int cutoffYFixed;
+	short cutoffY;
 	unsigned char fallbackAlpha;
 	u8 negativeRamp;
 
@@ -198,8 +195,8 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	}
 
 	curMesh = ChangeTexMeshes(model0);
-	frame = (int)(state->m_value0 * (float)(1 << model0->m_data->m_posQuant));
-	frameShort = (short)frame;
+	cutoffYFixed = (int)(state->m_value0 * (float)(1 << model0->m_data->m_posQuant));
+	cutoffY = (short)cutoffYFixed;
 	PSMTXCopy(ChangeTexModelMtx(model0), modelMtx);
 
 	if ((step->m_changeTex.m_mode == 2) || (step->m_changeTex.m_mode == 1)) {
@@ -213,7 +210,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++) {
 		GXColor* vertColors = state->m_meshColorArrays[meshIdx];
 		for (unsigned int v = 0; v < curMesh->m_data->m_vertexCount; v++) {
-			int delta = static_cast<int>(frameShort) - static_cast<int>(curMesh->m_workPositions[v].y);
+			int delta = static_cast<int>(cutoffY) - static_cast<int>(curMesh->m_workPositions[v].y);
 			if (delta >= 0) {
 				int level = 0;
 				float threshold = kPppYmChangeTexRampStart;
@@ -270,11 +267,11 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
 		ClearChangeTexModelCallbacks(model2);
 	}
 
-	ChangeTexDisplayListCopy*** stageArray = state->m_displayListArrays;
-	GXColor** meshArray;
-	if (stageArray != 0) {
-		meshArray = state->m_meshColorArrays;
-		if (meshArray != 0) {
+	ChangeTexDisplayListCopy*** displayListArrays = state->m_displayListArrays;
+	GXColor** meshColorArrays;
+	if (displayListArrays != 0) {
+		meshColorArrays = state->m_meshColorArrays;
+		if (meshColorArrays != 0) {
 			goto freeArrays;
 		}
 	}
@@ -282,11 +279,11 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
 
 freeArrays:
 	ChangeTexMeshRef* meshList = ChangeTexMeshes(model);
-	GXColor** meshArrayOrig = meshArray;
-	ChangeTexDisplayListCopy*** stageArrayOrig = stageArray;
+	GXColor** meshColorArraysStart = meshColorArrays;
+	ChangeTexDisplayListCopy*** displayListArraysStart = displayListArrays;
 	for (unsigned int i = 0; i < model->m_data->m_meshCount; i++, meshList++) {
 		ChangeTexMeshData* meshData = meshList->m_data;
-		ChangeTexDisplayListCopy** dlEntries = *stageArray;
+		ChangeTexDisplayListCopy** dlEntries = *displayListArrays;
 		for (unsigned int j = 0; j < meshData->m_displayListCount; j++) {
 			if ((*dlEntries)->m_data != 0) {
 				pppMemFree((*dlEntries)->m_data);
@@ -299,24 +296,24 @@ freeArrays:
 			dlEntries++;
 		}
 
-		if (*stageArray != 0) {
-			pppMemFree(*stageArray);
-			*stageArray = 0;
+		if (*displayListArrays != 0) {
+			pppMemFree(*displayListArrays);
+			*displayListArrays = 0;
 		}
-		if (*meshArray != 0) {
-			pppMemFree(*meshArray);
-			*meshArray = 0;
+		if (*meshColorArrays != 0) {
+			pppMemFree(*meshColorArrays);
+			*meshColorArrays = 0;
 		}
 
-		stageArray++;
-		meshArray++;
+		displayListArrays++;
+		meshColorArrays++;
 	}
 
-	if (stageArrayOrig != 0) {
-		pppMemFree(stageArrayOrig);
+	if (displayListArraysStart != 0) {
+		pppMemFree(displayListArraysStart);
 	}
-	if (meshArrayOrig != 0) {
-		pppMemFree(meshArrayOrig);
+	if (meshColorArraysStart != 0) {
+		pppMemFree(meshColorArraysStart);
 	}
 }
 
@@ -353,10 +350,10 @@ void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
+void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* callbackContext, void* callbackParam, int meshIdx, float (*) [4])
 {
-	pppYmChangeTexState* state = (pppYmChangeTexState*)param_2;
-	pppYmChangeTexStep* step = (pppYmChangeTexStep*)param_3;
+	pppYmChangeTexState* state = (pppYmChangeTexState*)callbackContext;
+	pppYmChangeTexStep* step = (pppYmChangeTexStep*)callbackParam;
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
 	int displayListIdx;
 	ChangeTexDisplayListCopy* displayListPtr;
@@ -374,7 +371,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 			meshColorArray = meshColorArrays[meshIdx];
 			if (meshColorArray != 0) {
 				MaterialMan.SetNRM(meshData->m_normals);
-				GXSetArray((GXAttr)0xb, meshColorArray, 4);
+				GXSetArray(GX_VA_CLR0, meshColorArray, sizeof(GXColor));
 
 				if ((step->m_changeTex.m_mode == 2) || (step->m_changeTex.m_mode == 3)) {
 					MaterialMan.SetEnvTexObj(0);
@@ -388,7 +385,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 					MaterialMan.SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x1000));
 					MaterialMan.LockEnv();
 
-					MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+					MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, GX_CS_SCALE_1);
 
 					displayListPtr = displayListCopies[displayListIdx];
 					GXCallDisplayList(displayListPtr->m_data, displayListPtr->m_size);
@@ -409,10 +406,10 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
  * JP Address: TODO
  * JP Size: TODO
  */
-void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, int displayListIdx, float (*) [4])
+void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* callbackContext, void* callbackParam, int meshIdx, int displayListIdx, float (*) [4])
 {
-	pppYmChangeTexState* state = (pppYmChangeTexState*)param_2;
-	pppYmChangeTexStep* step = (pppYmChangeTexStep*)param_3;
+	pppYmChangeTexState* state = (pppYmChangeTexState*)callbackContext;
+	pppYmChangeTexStep* step = (pppYmChangeTexStep*)callbackParam;
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
 	meshes += meshIdx;
 	ChangeTexMeshData* meshData = meshes->m_data;
@@ -427,7 +424,7 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 		MaterialMan.LockEnv();
 	}
 
-	MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+	MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, GX_CS_SCALE_1);
 
 	if ((step->m_changeTex.m_mode == 1) || (step->m_changeTex.m_mode == 0)) {
 		GXCallDisplayList(displayList->m_data, displayList->m_size);

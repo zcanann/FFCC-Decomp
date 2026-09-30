@@ -28,6 +28,9 @@ static const float kPppCharaBreakDegToRad = 0.017453292f;
 static const float kPppCharaBreakHalfTurnDegrees = 180.0f;
 static const float kPppCharaBreakWobbleRange = 0.8f;
 static const float kPppCharaBreakRandomSign = -1.0f;
+static const s32 kPppCharaBreakFullTurnDegrees = 0x168;
+static const s32 kPppCharaBreakMaxQuantizedCenter = 0x7530;
+static const s32 kPppCharaBreakSinTableQuarterTurn = 0x4000;
 
 static inline Mtx& CameraMatrix()
 {
@@ -60,16 +63,6 @@ static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
 static inline CChara::CModel::CRefData* ModelData(CChara::CModel* model)
 {
     return model->m_data;
-}
-
-static inline void* ModelNodes(CChara::CModel* model)
-{
-    return model->m_nodes;
-}
-
-static inline CharaBreakMeshRef* ModelMeshes(CChara::CModel* model)
-{
-    return model->m_meshes;
 }
 
 static inline CharaBreakMeshData* MeshData(CChara::CMesh* mesh)
@@ -189,18 +182,18 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
 
     CalcGraphValue(charaBreak,
                    step->m_graphId,
-                   work->m_value0,
-                   work->m_value1,
-                   work->m_value2,
+                   work->m_graphValue0,
+                   work->m_graphValue1,
+                   work->m_graphValue2,
                    step->m_dataValIndex,
                    step->m_graphInit,
                    step->m_graphStep);
 
     CalcGraphValue(charaBreak,
                    step->m_graphId,
-                   work->m_value3,
-                   work->m_value4,
-                   work->m_value5,
+                   work->m_payloadGraphValue0,
+                   work->m_payloadGraphValue1,
+                   work->m_payloadGraphValue2,
                    step->m_payloadGraphInit,
                    step->m_payloadGraphStep,
                    step->m_payloadGraphStepStep);
@@ -396,15 +389,15 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    float fVar1 = kPppCharaBreakZero;
+    float zero = kPppCharaBreakZero;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
-    work->m_value2 = kPppCharaBreakZero;
-    work->m_value1 = fVar1;
-    work->m_value0 = fVar1;
-    work->m_value5 = fVar1;
-    work->m_value4 = fVar1;
-    work->m_value3 = fVar1;
+    work->m_graphValue2 = zero;
+    work->m_graphValue1 = zero;
+    work->m_graphValue0 = zero;
+    work->m_payloadGraphValue2 = zero;
+    work->m_payloadGraphValue1 = zero;
+    work->m_payloadGraphValue0 = zero;
 }
 
 /*
@@ -418,16 +411,16 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    float fVar1 = kPppCharaBreakZero;
+    float zero = kPppCharaBreakZero;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
     work->m_meshBuffers = 0;
-    work->m_value2 = fVar1;
-    work->m_value1 = fVar1;
-    work->m_value0 = fVar1;
-    work->m_value5 = fVar1;
-    work->m_value4 = fVar1;
-    work->m_value3 = fVar1;
+    work->m_graphValue2 = zero;
+    work->m_graphValue1 = zero;
+    work->m_graphValue0 = zero;
+    work->m_payloadGraphValue2 = zero;
+    work->m_payloadGraphValue1 = zero;
+    work->m_payloadGraphValue0 = zero;
     work->m_enabled = 1;
 }
 
@@ -443,12 +436,11 @@ void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* model)
 {
     CharaBreakStep* stepData = (CharaBreakStep*)step;
-    CharaBreakWork* workData = work;
     CChara::CMesh* mesh = model->m_meshes;
     u32 meshIndex;
     s16 threshold;
 
-    threshold = (s32)((workData->m_value0 * (workData->m_bboxMax.y - workData->m_bboxMin.y)) *
+    threshold = (s32)((work->m_graphValue0 * (work->m_bboxMax.y - work->m_bboxMin.y)) *
                       (float)(1 << ModelData(model)->m_posQuant));
 
     for (meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++) {
@@ -462,7 +454,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
         for (int dl = MeshData(mesh)->m_displayListCount - 1; dl >= 0; dl--) {
             CharaBreakDisplayListPair** displayListPairs =
-                workData->m_meshBuffers[meshIndex];
+                work->m_meshBuffers[meshIndex];
             CharaBreakDisplayListPair* displayListPair = displayListPairs[dl];
             POLYGON_DATA* polygon = displayListPair->m_polygonData;
 
@@ -538,8 +530,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                     short avgY = (short)(sumY / 3);
                     short avgZ = (short)(sumZ / 3);
 
-                    if (avgX >= -0x7530 && avgX <= 0x7530 && avgY >= -0x7530 && avgY <= 0x7530 && avgZ >= -0x7530 &&
-                        avgZ <= 0x7530) {
+                    if (avgX >= -kPppCharaBreakMaxQuantizedCenter && avgX <= kPppCharaBreakMaxQuantizedCenter &&
+                        avgY >= -kPppCharaBreakMaxQuantizedCenter && avgY <= kPppCharaBreakMaxQuantizedCenter &&
+                        avgZ >= -kPppCharaBreakMaxQuantizedCenter && avgZ <= kPppCharaBreakMaxQuantizedCenter) {
                         Vec verts[3];
                         Vec axis;
                         Vec velocity;
@@ -560,7 +553,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         gUtil.ConvI2FVector(velocity, polygon->m_normalA, ModelData(model)->m_normQuant);
                         PSVECScale(&velocity, &velocity, stepData->m_velocityBase + Math.RandF(stepData->m_velocityRange));
 
-                        C_QUATRotAxisRad(&rotQuat, &axis, kPppCharaBreakDegToRad * (float)polygon->m_alpha);
+                        C_QUATRotAxisRad(&rotQuat, &axis, kPppCharaBreakDegToRad * (float)polygon->m_rotationDeg);
                         PSMTXQuat(rotMtx, &rotQuat);
                         cosValue = kPppCharaBreakZero;
                         sinValue = cosValue;
@@ -574,19 +567,19 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             }
 
                             s32 angle = *angleState;
-                            if (angle > 0x168) {
-                                angle -= 0x168;
+                            if (angle > kPppCharaBreakFullTurnDegrees) {
+                                angle -= kPppCharaBreakFullTurnDegrees;
                                 *angleState = angle;
                             }
                             angle = *angleState;
                             if (angle < 0) {
-                                angle += 0x168;
+                                angle += kPppCharaBreakFullTurnDegrees;
                                 *angleState = angle;
                             }
 
                             s32 sinIndex = (s32)(((float)((int)(*angleState << 15))) / kPppCharaBreakHalfTurnDegrees);
                             sinValue = ppvSinTbl[(sinIndex & 0xFFFC) >> 2];
-                            cosValue = ppvSinTbl[((sinIndex + 0x4000) & 0xFFFC) >> 2];
+                            cosValue = ppvSinTbl[((sinIndex + kPppCharaBreakSinTableQuarterTurn) & 0xFFFC) >> 2];
                         }
 
                         for (int i = 0; i < 3; i++) {
@@ -598,23 +591,23 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                             if (stepData->m_spinMode == 0) {
                                 verts[i].x += velocity.x;
-                                verts[i].y += velocity.y - stepData->m_gravity * (float)polygon->_pad2;
+                                verts[i].y += velocity.y - stepData->m_gravity * (float)polygon->m_fallFrames;
                                 verts[i].z += velocity.z;
                             } else if (stepData->m_spinMode == 1) {
                                 wobbleScale = kPppCharaBreakOne + Math.RandF(kPppCharaBreakWobbleRange);
                                 verts[i].x += cosValue * wobbleScale;
-                                verts[i].y += velocity.y - stepData->m_gravity * (float)polygon->_pad2;
+                                verts[i].y += velocity.y - stepData->m_gravity * (float)polygon->m_fallFrames;
                                 wobbleScale = kPppCharaBreakOne + Math.RandF(kPppCharaBreakWobbleRange);
                                 verts[i].z += sinValue * wobbleScale;
                             }
 
-                            verts[i].x += stepData->m_direction.x * workData->m_value3;
-                            verts[i].y += stepData->m_direction.y * workData->m_value3;
-                            verts[i].z += stepData->m_direction.z * workData->m_value3;
+                            verts[i].x += stepData->m_direction.x * work->m_payloadGraphValue0;
+                            verts[i].y += stepData->m_direction.y * work->m_payloadGraphValue0;
+                            verts[i].z += stepData->m_direction.z * work->m_payloadGraphValue0;
 
                             gUtil.ConvF2IVector(polygon->m_pos[i], verts[i], ModelData(model)->m_posQuant);
                         }
-                        polygon->_pad2++;
+                        polygon->m_fallFrames++;
                     }
                 }
 
@@ -640,24 +633,22 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
 {
     CharaBreakStep* stepData = (CharaBreakStep*)charaBreak;
     S16Vec* workNormals = mesh->m_workNormals;
-    u32 count = polygonCount;
-    CChara::CModel* modelPtr = model;
     POLYGON_DATA* polygon = polygonData;
     f32 zero = kPppCharaBreakZero;
 
-    for (u32 i = 0; i < count; i++) {
+    for (u32 i = 0; i < polygonCount; i++) {
         Vec normal;
         Vec up = {0.0f, 1.0f, 0.0f};
         Vec tangent;
 
-        int alpha = (int)stepData->m_alphaBase + rand() % stepData->m_alphaRange;
-        if (alpha > 0xFF) {
-            alpha = 0xFF;
+        int rotationDeg = (int)stepData->m_rotationBaseDeg + rand() % stepData->m_rotationRangeDeg;
+        if (rotationDeg > 0xFF) {
+            rotationDeg = 0xFF;
         }
 
-        polygon->m_alpha = (u8)alpha;
+        polygon->m_rotationDeg = (u8)rotationDeg;
         polygon->m_enabled = 0;
-        polygon->_pad2 = 0;
+        polygon->m_fallFrames = 0;
 
         if (stepData->m_clipMode == 2) {
             polygon->m_enabled = 1;
@@ -671,10 +662,10 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             normal.y *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
             normal.z *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
             PSVECNormalize(&normal, &normal);
-            gUtil.ConvF2IVector(polygon->m_normalA, normal, ModelData(modelPtr)->m_normQuant);
+            gUtil.ConvF2IVector(polygon->m_normalA, normal, ModelData(model)->m_normQuant);
         } else {
             polygon->m_normalA = workNormals[polygon->m_nrmIndices[0]];
-            gUtil.ConvI2FVector(normal, workNormals[polygon->m_nrmIndices[0]], ModelData(modelPtr)->m_normQuant);
+            gUtil.ConvI2FVector(normal, workNormals[polygon->m_nrmIndices[0]], ModelData(model)->m_normQuant);
         }
 
         PSVECCrossProduct(&up, &normal, &tangent);
@@ -700,7 +691,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             polygon->m_normalA.y = rand() % 2;
         }
 
-        gUtil.ConvF2IVector(polygon->m_normalB, tangent, ModelData(modelPtr)->m_normQuant);
+        gUtil.ConvF2IVector(polygon->m_normalB, tangent, ModelData(model)->m_normQuant);
         polygon++;
     }
 }
@@ -821,15 +812,15 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
  * JP Size: TODO
  */
 static void CharaBreak_AfterDrawMeshCallback(
-    CChara::CModel* modelPtr, void* modelData, void*, int meshIndex, float (*meshMtx)[4])
+    CChara::CModel* model, void* modelData, void*, int meshIndex, float (*meshMtx)[4])
 {
     Mtx cameraMtx;
     Mtx drawMtx;
 
-    CharaBreakWork* workData = reinterpret_cast<CharaBreakWork*>(modelData);
-    CChara::CMesh* meshArray = modelPtr->m_meshes;
+    CharaBreakWork* work = reinterpret_cast<CharaBreakWork*>(modelData);
+    CChara::CMesh* meshArray = model->m_meshes;
 
-    if (workData->m_enabled != 0) {
+    if (work->m_enabled != 0) {
         CChara::CMesh* meshRef = &meshArray[meshIndex];
         CharaBreakMeshData* meshData = MeshData(meshRef);
         CharaBreakDisplayList* materialData = meshData->m_displayLists;
@@ -839,12 +830,12 @@ static void CharaBreak_AfterDrawMeshCallback(
 
         for (; materialIndex >= 0; materialIndex--, materialData++) {
             CharaBreakDisplayListPair** meshTable =
-                workData->m_meshBuffers[meshIndex];
+                work->m_meshBuffers[meshIndex];
             CharaBreakDisplayListPair** displayListEntry = &meshTable[materialIndex];
             POLYGON_DATA* vertexData = (*displayListEntry)->m_polygonData;
 
             MaterialMan.SetMaterial(
-                (CMaterialSet*)ModelData(modelPtr)->m_materialSet, materialData->m_material, 0, GX_CS_SCALE_1);
+                (CMaterialSet*)ModelData(model)->m_materialSet, materialData->m_material, 0, GX_CS_SCALE_1);
 
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
             GXSetCullMode(GX_CULL_NONE);
@@ -854,8 +845,8 @@ static void CharaBreak_AfterDrawMeshCallback(
             GXSetVtxDesc((GXAttr)11, GX_INDEX16);
             GXSetVtxDesc((GXAttr)13, GX_INDEX16);
             GXSetVtxDesc((GXAttr)14, GX_INDEX16);
-            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, GX_POS_XYZ, GX_S16, ModelData(modelPtr)->m_posQuant & 0xFF);
-            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)10, GX_NRM_XYZ, GX_S16, ModelData(modelPtr)->m_normQuant & 0xFF);
+            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, GX_POS_XYZ, GX_S16, ModelData(model)->m_posQuant & 0xFF);
+            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)10, GX_NRM_XYZ, GX_S16, ModelData(model)->m_normQuant & 0xFF);
             GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)11, GX_CLR_RGBA, GX_RGBA8, 0);
             GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)13, GX_TEX_ST, GX_S16, 0xC);
             GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)14, GX_TEX_ST, GX_S16, 0xC);

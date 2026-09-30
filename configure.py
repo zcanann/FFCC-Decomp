@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Set
 
+from tools.gba_project import configure_gba
 from tools.project import (
     Object,
     ProgressCategory,
@@ -63,6 +64,12 @@ parser.add_argument(
     metavar="BINARY",
     type=Path,
     help="path to binutils (optional)",
+)
+parser.add_argument(
+    "--gba-binutils",
+    metavar="DIR",
+    type=Path,
+    help="directory containing arm-none-eabi binutils for the GBA programs (optional)",
 )
 parser.add_argument(
     "--compilers",
@@ -570,21 +577,21 @@ config.libs = [
             Object(NonMatching, "p_chara.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "p_chara_viewer.cpp", extra_cflags=["-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "p_dbgmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "p_FunnyShape.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "p_game.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
-            Object(NonMatching, "p_gba.cpp", cflags=[*cflags_game_cpp_exceptions, "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(NonMatching, "p_FunnyShape.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline noauto"]),
+            Object(Matching, "p_game.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(NonMatching, "p_gba.cpp", cflags=[*cflags_game_cpp_exceptions, "-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "p_graphic.cpp", cflags=[*cflags_game_cpp_exceptions, "-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-pooldata off"]),
             Object(NonMatching, "p_light.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "p_map.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "p_MaterialEditor.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
-            Object(NonMatching, "p_mc.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(Matching, "p_mc.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "p_menu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "p_minigame.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-common off", "-str reuse,readonly"]),
-            Object(NonMatching, "p_sample.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
-            Object(NonMatching, "p_sound.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
-            Object(NonMatching, "p_system.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(Matching, "p_sample.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(Matching, "p_sound.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(Matching, "p_system.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "p_tina.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "p_usb.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(NonMatching, "p_usb.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "pad.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "partMng.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
             Object(Matching, "pppsintbl.cpp"),
@@ -1317,6 +1324,8 @@ config.progress_report_args = [
 mode = trailing_mode or args.mode
 
 if mode == "configure":
+    # GBA multiboot programs are part of the PAL build and progress report
+    configure_gba(config, args.gba_binutils)
     # Write build.ninja and objdiff.json
     generate_build(config)
 elif mode == "progress":

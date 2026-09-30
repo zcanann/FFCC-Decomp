@@ -202,10 +202,10 @@ void CMenuPcs::CmdInit()
 	}
 
 	entry = GetCmdListEntries(this);
-	float fVar3 = 0.0f;
-	float fVar4 = 8.0f;
-	for (s32 iVar5 = 0; iVar5 < 8; iVar5++) {
-		if (iVar5 < caravanWork->m_numCmdListSlots) {
+	float texU = 0.0f;
+	float texV = 8.0f;
+	for (s32 slot = 0; slot < 8; slot++) {
+		if (slot < caravanWork->m_numCmdListSlots) {
 			entry->tex = 0x2D;
 		} else {
 			entry->tex = 0xFFFFFFFF;
@@ -214,15 +214,15 @@ void CMenuPcs::CmdInit()
 		entry->width = 200;
 		entry->height = 0x20;
 		entry->x = 0x74;
-		entry->y = static_cast<s16>(iVar5 * entry->height + 0x28);
-		entry->u = fVar3;
-		entry->v = fVar4;
+		entry->y = static_cast<s16>(slot * entry->height + 0x28);
+		entry->u = texU;
+		entry->v = texV;
 
-		if ((2 <= iVar5) && (caravanWork->m_commandListInventorySlotRef[iVar5] < 0)) {
+		if ((2 <= slot) && (caravanWork->m_commandListInventorySlotRef[slot] < 0)) {
 			entry->v += static_cast<float>(entry->height);
 		}
 
-		entry->startFrame = iVar5;
+		entry->startFrame = slot;
 		entry->duration = 3;
 		entry++;
 	}
@@ -1542,15 +1542,14 @@ unsigned int CMenuPcs::CmdOpen0()
 	CmdListEntry* entry = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
 	s32 doneCount = 0;
 	s32 entryCount = static_cast<s32>(GetCmdListStorage(this)->listEnd) - static_cast<s32>(GetCmdListStorage(this)->count);
-	const float fVar1 = 0.0f;
 
 	for (s32 i = 0; i < entryCount; i++) {
 		if (timer >= entry->startFrame) {
 			if (entry->startFrame + entry->duration <= timer) {
 				doneCount++;
 				entry->alpha = 1.0f;
-				entry->dx = fVar1;
-				entry->dy = fVar1;
+				entry->dx = 0.0f;
+				entry->dy = 0.0f;
 			} else {
 				entry->timer++;
 				const double step = 1.0 / static_cast<double>(entry->duration);
@@ -1842,8 +1841,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			if ((len1 == 2) && (selectedFlag != 0)) {
 				continue;
 			}
-			ok = 0;
-			k = 0;
+			k = ok = 0;
 			for (; k < len1 - 1; k++) {
 				const int slot = selected - (len1 - 1 - k);
 				if (candidates[slot] != 0) {
@@ -1855,16 +1853,14 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			}
 			if (ok == len1 - 1) {
 				matches[matchCount][0] = patIdx;
-				matches[matchCount][1] = selected - (len1 - 1);
-				matchCount++;
+				matches[matchCount++][1] = selected - (len1 - 1);
 			}
 		}
 	} else if (selectedFlag == 0) {
 		const int baseLen = static_cast<int>(s_Unite[0].count);
 		int start = selected - (baseLen - 1);
 		for (int i = 0; i < baseLen; i++, start++) {
-			ok = 0;
-			k = 0;
+			k = ok = 0;
 			for (; k < baseLen; k++) {
 				const int slot = i + (selected - ((baseLen - 1) - k));
 				if (candidates[slot] != 0) {
@@ -1876,8 +1872,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			}
 			if (ok == baseLen) {
 				matches[matchCount][0] = 0;
-				matches[matchCount][1] = start;
-				matchCount++;
+				matches[matchCount++][1] = start;
 			}
 		}
 	}
@@ -1895,8 +1890,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				start++;
 			}
 
-			ok = 0;
-			k = 0;
+			k = ok = 0;
 			for (; k < len; k++) {
 				const int slot = start + (selected - ((len - 1) - k));
 				if (candidates[slot] != 0) {
@@ -1909,8 +1903,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 			if (ok == len) {
 				matches[matchCount][0] = group;
-				matches[matchCount][1] = start + (selected - (len - 1));
-				matchCount++;
+				matches[matchCount++][1] = start + (selected - (len - 1));
 			}
 		}
 	}

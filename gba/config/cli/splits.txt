@@ -1,0 +1,10 @@
+crt0:
+	.text       start:0x02000000 end:0x0200025C
+
+main:
+	.text       start:0x0200025C end:0x0201CC48
+	.rodata     start:0x0201CC48 end:0x02036EF0
+
+bss:
+	.ewram_bss  start:0x02036EF0 end:0x02040003
+	.bss        start:0x03000000 end:0x030044C4

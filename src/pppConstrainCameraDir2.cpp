@@ -27,17 +27,18 @@ static inline ConstrainCameraDir2DataOffsets* GetConstrainCameraDir2DataOffsets(
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCameraDirStep* param_2,
-                                 _pppCtrlTable* param_3)
+void pppFrameConstrainCameraDir2(pppConstrainCameraDir* constrainCameraDir, pppConstrainCameraDirStep* step,
+                                 _pppCtrlTable* ctrl)
 {
     if (ppvUserStopPartF == 0) {
         _pppMngSt* pppMngSt = ppvMng;
-        float* value = (float*)(param_1->m_workArea + GetConstrainCameraDir2DataOffsets(param_3)->m_valueOffset);
+        float* value =
+            (float*)(constrainCameraDir->m_workArea + GetConstrainCameraDir2DataOffsets(ctrl)->m_valueOffset);
 
-        CalcGraphValue((_pppPObject*)param_1, param_2->m_graphId, value[0], value[1], value[2], param_2->m_dataValIndex,
-                       param_2->m_initWOrk, param_2->m_stepValue);
+        CalcGraphValue(constrainCameraDir, step->m_graphId, value[0], value[1], value[2], step->m_dataValIndex,
+                       step->m_initWOrk, step->m_stepValue);
 
-        if ((ppvIsLoopCalc != 1) && ((param_2->m_applyCameraInverse != 0 || param_2->m_applyPosition != 0))) {
+        if ((ppvIsLoopCalc != 1) && ((step->m_applyCameraInverse != 0 || step->m_applyPosition != 0))) {
             Vec resultPos;
             Vec cameraDir;
             cameraDir.x = CameraPcs.m_directionX;
@@ -63,13 +64,13 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
 
-            if (param_2->m_applyCameraInverse != 0) {
+            if (step->m_applyCameraInverse != 0) {
                 PSMTXInverse(cameraMtx, ppvMng->m_matrix.value);
             }
 
             PSMTXConcat(scaleMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 
-            if (param_2->m_applyPosition != 0) {
+            if (step->m_applyPosition != 0) {
                 resultPos.x = cameraPosX;
                 resultPos.y = cameraPosY;
                 resultPos.z = cameraPosZ;
@@ -78,8 +79,8 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
                 resultPos.z = cameraDir.z * *value + resultPos.z;
             }
 
-            localX = param_1->m_localMatrix.value[0][3];
-            localY = param_1->m_localMatrix.value[1][3];
+            localX = constrainCameraDir->m_localMatrix.value[0][3];
+            localY = constrainCameraDir->m_localMatrix.value[1][3];
 
             Vec direct0;
             Vec direct1;

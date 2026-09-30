@@ -1441,6 +1441,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
  */
 void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 {
+	int i;
 	_pppProgSetDef* table = (_pppProgSetDef*)(progOffsetReconstructionTable + 6);
 	int* pppProgRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]);
 	int* pdtRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]);
@@ -1453,7 +1454,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 
 	for (;;) {
 		table->m_next = (_pppProgSetDef*)((u8*)progOffsetReconstructionTable + (u32)table->m_next);
-		for (int i = 0; i < table->m_numStages; i++) {
+		for (i = 0; i < table->m_numStages; i++) {
 			_pppCtrlTable* entry = &table->m_stages[i];
 			entry->m_prog = pppProg + (u32)entry->m_prog;
 			entry->m_unk8 = (int)progOffsetReconstructionTable + entry->m_unk8;
@@ -1468,11 +1469,11 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 		table = next;
 	}
 
-	for (int i = 0; i < pppProgRelocCount; i++) {
+	for (i = 0; i < pppProgRelocCount; i++) {
 		pppProgRelocs[i] = (int)(pppProg + pppProgRelocs[i]);
 	}
 
-	for (int i = 0; i < pdtRelocCount; i++) {
+	for (i = 0; i < pdtRelocCount; i++) {
 		pdtRelocs[i] += (int)progOffsetReconstructionTable;
 	}
 }

@@ -1030,17 +1030,15 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
  */
 void CGraphic::makeSphere()
 {
-    float vertices[126];
-    float* rowVertex;
-    float* vertex;
+    float vertices[42][3];
+    float (*rowVertex)[3];
+    float (*vertex)[3];
 
     int vertexCount = 0;
-    vertices[0] = kGraphicSphereNegativeX;
-    vertices[1] = kGraphicZeroF;
-    vertices[vertexCount * 3 + 2] = kGraphicZeroF;
-
-    vertexCount++;
-    vertex = &vertices[vertexCount * 3];
+    vertices[0][0] = kGraphicSphereNegativeX;
+    vertices[0][1] = kGraphicZeroF;
+    vertices[vertexCount++][2] = kGraphicZeroF;
+    vertex = &vertices[vertexCount];
 
     for (int ring = 0; ring < 5; ring++) {
         float pitch = (kGraphicSpherePi * (float)(ring + 1)) / kGraphicSphereRingDivisor;
@@ -1049,19 +1047,18 @@ void CGraphic::makeSphere()
 
         rowVertex = vertex;
         for (int seg = 0; seg < 8; seg++) {
-            rowVertex[0] = x;
-            rowVertex[1] = radius * (float)sin(kGraphicSphereSegmentAngle * (float)seg);
-            vertices[vertexCount * 3 + 2] = radius * (float)cos(kGraphicSphereSegmentAngle * (float)seg);
-            vertex += 3;
-            rowVertex += 3;
-            vertexCount++;
+            (*rowVertex)[0] = x;
+            (*rowVertex)[1] = radius * (float)sin(kGraphicSphereSegmentAngle * (float)seg);
+            vertices[vertexCount++][2] = radius * (float)cos(kGraphicSphereSegmentAngle * (float)seg);
+            vertex++;
+            rowVertex++;
         }
     }
 
     m_sphereDisplayListSize = 0x880;
-    vertices[vertexCount * 3 + 0] = kGraphicOneF;
-    vertices[vertexCount * 3 + 1] = kGraphicZeroF;
-    vertices[vertexCount * 3 + 2] = kGraphicZeroF;
+    vertices[vertexCount][0] = kGraphicOneF;
+    vertices[vertexCount][1] = kGraphicZeroF;
+    vertices[vertexCount][2] = kGraphicZeroF;
 
     m_sphereDisplayList = new (m_graphicStage, const_cast<char*>(sGraphicSourceStrings), 0x41A) u8[m_sphereDisplayListSize];
 
@@ -1074,9 +1071,9 @@ void CGraphic::makeSphere()
     for (; ring < 5; ring++) {
         int current = ringStart;
         for (int seg = 0; seg < 8; seg++) {
-            GXPosition3f32(vertices[current * 3 + 1], vertices[current * 3], vertices[current * 3 + 2]);
+            GXPosition3f32(vertices[current][1], vertices[current][0], vertices[current][2]);
             int next = ringStart + (seg + 1) % 8;
-            GXPosition3f32(vertices[next * 3 + 1], vertices[next * 3], vertices[next * 3 + 2]);
+            GXPosition3f32(vertices[next][1], vertices[next][0], vertices[next][2]);
             current++;
         }
         ringStart += 8;
@@ -1087,9 +1084,9 @@ void CGraphic::makeSphere()
         int ringBase = 1;
         for (; ring < 6; ring++) {
             int current = ring == 0 ? 0 : (ring - 1) * 8 + seg + 1;
-            GXPosition3f32(vertices[current * 3 + 1], vertices[current * 3], vertices[current * 3 + 2]);
+            GXPosition3f32(vertices[current][1], vertices[current][0], vertices[current][2]);
             int next = ring + 1 == 6 ? 41 : seg + ringBase;
-            GXPosition3f32(vertices[next * 3 + 1], vertices[next * 3], vertices[next * 3 + 2]);
+            GXPosition3f32(vertices[next][1], vertices[next][0], vertices[next][2]);
             ringBase += 8;
         }
     }

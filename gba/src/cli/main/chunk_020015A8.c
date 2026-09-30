@@ -349,6 +349,7 @@ void fn_0200197C(void)
     u16 code;
     s32 cnt;
     u16 v;
+    s16 len;
 
     if (!(lbl_03002AEC & 2))
         return;
@@ -401,9 +402,9 @@ void fn_0200197C(void)
         if (col + 23 <= 32) {
             DmaCopy16(REG_DMA0, out, dst, 23 * 2);
         } else {
-            n = (s16)(32 - col);
-            DmaCopy16(REG_DMA0, out, dst, n * 2);
-            DmaCopy16(REG_DMA0, out + n, dst - col * 2, (23 - n) * 2);
+            len = 32 - col;
+            DmaCopy16(REG_DMA0, out, dst, len * 2);
+            DmaCopy16(REG_DMA0, out + len, dst - col * 2, (23 - len) * 2);
         }
         dst += 64;
         if (dst > 0x0600F7FF)

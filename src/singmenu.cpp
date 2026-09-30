@@ -3109,31 +3109,8 @@ int CMenuPcs::GetSmithItem(int itemNo)
     int raceType = race & 3;
     SItemFlatRow* rec = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo];
     int smithItem = rec->m_smithResults[race & 3];
-    if (smithItem > 0) {
-        unsigned int genderMask = 0x10;
-        int flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[smithItem].m_equipFlags;
-        int raceFlags = flags & 0xF;
-        int genderFlags = flags & 0x30;
-        unsigned int raceMask = 1 << (SingleCaravanWork()->m_tribeId & 3);
-        if (SingleCaravanWork()->m_genderFlag != 0) {
-            genderMask = 0x20;
-        }
-
-        int valid;
-        if ((raceFlags != 0) && (genderFlags != 0)) {
-            if (((raceFlags & raceMask) != 0) && ((genderFlags & genderMask) != 0)) {
-                valid = 1;
-            } else {
-                valid = 0;
-            }
-        } else if (raceFlags != 0) {
-            valid = (raceFlags & raceMask) != 0;
-        } else {
-            valid = (genderFlags & genderMask) != 0;
-        }
-        if (valid != 0) {
-            return smithItem;
-        }
+    if (smithItem > 0 && ChkEquipPossible(smithItem)) {
+        return smithItem;
     }
 
     for (int i = 0; i < 4; i++) {

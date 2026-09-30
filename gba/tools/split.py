@@ -18,7 +18,7 @@ from typing import Dict, List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).parent))
 from gbaanalysis import (  # noqa: E402
-    EWRAM_BASE, EWRAM_END, IWRAM_BASE, Analysis, Analyzer,
+    _ARM, EWRAM_BASE, EWRAM_END, IWRAM_BASE, Analysis, Analyzer,
 )
 
 ENTRY = EWRAM_BASE
@@ -212,7 +212,6 @@ class Emitter:
         a = self.a
         out = [
             "\t.syntax unified",
-            "\t.cpu arm7tdmi",
             "",
         ]
         ranges = [s for s in self.splits if s.unit == unit]
@@ -262,7 +261,7 @@ class Emitter:
                 size = at - start
                 # Alignment padding before the next function is not part of this one.
                 pad = at - 2
-                if (symbol.kind == "function" and size > 2 and at % 4 == 0 and a.half(pad) == 0
+                if (symbol.kind == "function" and symbol.thumb and size > 2 and at % 4 == 0 and a.half(pad) == 0
                         and pad not in a.code and (pad & ~3) not in a.literals and (pad & ~3) not in a.jump_tables):
                     size -= 2
                 out.append(f"\t.size {symbol.name}, 0x{size:X}")
@@ -324,7 +323,7 @@ class Emitter:
                     address += 2
                     continue
                 if not thumb_code and size == 4 and remaining >= 4:
-                    out.append(f"\t.inst 0x{a.word(address):08X}")
+                    out.append(self.arm_instruction(address, unit))
                     address += 4
                     continue
             if address % 4 == 0 and remaining >= 4 and not self.overlaps_code(address):
@@ -341,6 +340,19 @@ class Emitter:
             address += 1
         close(address)
         return out
+
+    def arm_instruction(self, address: int, unit: str) -> str:
+        """An ARM instruction; branches to functions are emitted symbolically for relocations."""
+        raw = self.a.word(address)
+        offset = address - self.a.base
+        insn = next(_ARM.disasm(self.a.data[offset:offset + 4], address, 1), None)
+        if insn is not None and re.match(r"^bl?(eq|ne|hs|lo|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|cs|cc)?$", insn.mnemonic) \
+                and insn.op_str.startswith("#"):
+            target = int(insn.op_str[1:], 0)
+            names = [s for s in self.by_address.get(target, []) if s.kind == "function" and not s.thumb]
+            if names and not (names[0].local and self.unit_at(target) != unit):
+                return f"\t{insn.mnemonic} {names[0].name}"
+        return f"\t.inst 0x{raw:08X}"
 
     def is_boundary(self, address: int) -> bool:
         a = self.a

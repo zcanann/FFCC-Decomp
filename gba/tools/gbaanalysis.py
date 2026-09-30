@@ -214,6 +214,9 @@ class Analyzer:
             reg = ops.strip()
             if reg in regs:
                 self._add_code_pointer(regs[reg])
+            # "mov lr, pc; bx rN" is an ARM indirect call that returns here.
+            if not thumb and insn.address - 4 in func.instructions and a.word(insn.address - 4) == 0xE1A0E00F:
+                return True
             return cond
 
         if base_mnem in ("mov", "add") and ops.startswith("pc,"):

@@ -54,8 +54,8 @@ CFLAGS = "-mthumb-interwork -O2 -fhex-asm"
 
 # Game units whose compiled source links into the checked image, per program.
 COMPLETE: Dict[str, List[str]] = {
-    "cli": ["m4a/m4a_1", "m4a/m4a"],
-    "mgr": ["m4a/m4a_1", "m4a/m4a"],
+    "cli": ["crt0", "m4a/m4a_1", "m4a/m4a"],
+    "mgr": ["crt0", "m4a/m4a_1", "m4a/m4a"],
 }
 
 # libgcc routines assembled from lib1thumb.asm; the rest are C.
@@ -65,6 +65,26 @@ LIBGCC_ASM = {"_udivsi3", "_divsi3", "_umodsi3", "_modsi3", "_dvmd_tls", "_call_
 def _units(config_dir: Path) -> List[str]:
     text = (config_dir / "splits.txt").read_text(encoding="utf-8")
     return list(dict.fromkeys(re.findall(r"^(\S+):\s*$", text, re.M)))
+
+
+def _arm_units(config_dir: Path) -> set:
+    """Units containing ARM-state functions (symbols without the thumb flag)."""
+    arm = []
+    for m in re.finditer(r"^\S+ = \.text:0x([0-9A-Fa-f]+); // type:function (.*)$",
+                         (config_dir / "symbols.txt").read_text(encoding="utf-8"), re.M):
+        if "thumb" not in m.group(2).split():
+            arm.append(int(m.group(1), 16))
+    units = set()
+    unit = None
+    for line in (config_dir / "splits.txt").read_text(encoding="utf-8").splitlines():
+        m = re.match(r"^(\S+):\s*$", line)
+        if m:
+            unit = m.group(1)
+            continue
+        m = re.match(r"^\s+\.text\s+start:0x([0-9A-Fa-f]+)\s+end:0x([0-9A-Fa-f]+)", line)
+        if m and any(int(m.group(1), 16) <= a < int(m.group(2), 16) for a in arm):
+            units.add(unit)
+    return units
 
 
 def _path(path: Any) -> str:
@@ -149,6 +169,18 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                                "paths": " ".join(info["disc_path"] for info in programs.values())})
         n.newline()
 
+        def assemble_arm(source: Path, stem: str, base: str) -> str:
+            """Assemble hand-written source that may contain ARM code."""
+            # For ARM-state bx under ARMv4T, as emits R_ARM_V4BX relocations, which
+            # objdiff cannot read. Assembling for v5t gives the same bytes without them;
+            # the v5t attributes are then dropped since objdiff rejects that arch too.
+            v5 = stem + ".v5.o"
+            n.build(v5, "gba_as", _path(source), implicit=binutils_stamp,
+                    variables={"asincludes": f"-I {_path(GBA_DIR / 'lib')} -I {_path(GBA_DIR / 'include')}",
+                               "gba_asflags": "-march=armv5t -mthumb-interwork"})
+            n.build(base, "gba_strip_attributes", v5, implicit=binutils_stamp)
+            return base
+
         def compile_source(unit: str, src_dir: Path, out: Path, info: Dict[str, str]) -> Optional[str]:
             """Emit rules for a unit's source; returns the compiled object or None."""
             base = _path(out / "src" / f"{unit}.o")
@@ -183,15 +215,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             if unit.startswith("m4a/"):
                 name = unit.split("/", 1)[1]
                 if (M4A_DIR / f"{name}.s").is_file():
-                    # For ARM-state bx under ARMv4T, as emits R_ARM_V4BX relocations, which
-                    # objdiff cannot read. Assembling for v5t gives the same bytes without them;
-                    # the v5t attributes are then dropped since objdiff rejects that arch too.
-                    v5 = stem + ".v5.o"
-                    n.build(v5, "gba_as", _path(M4A_DIR / f"{name}.s"), implicit=binutils_stamp,
-                            variables={"asincludes": f"-I {_path(GBA_DIR / 'lib')}",
-                                       "gba_asflags": "-march=armv5t -mthumb-interwork"})
-                    n.build(base, "gba_strip_attributes", v5, implicit=binutils_stamp)
-                    return base
+                    return assemble_arm(M4A_DIR / f"{name}.s", stem, base)
                 source = M4A_DIR / f"{name}.c"
                 if not source.is_file():
                     return None
@@ -205,6 +229,9 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                         variables={"cc": os.path.normpath(old_agbcc), "cflags": "-mthumb-interwork -O2"})
                 n.build(base, "gba_as", [asm, align], implicit=binutils_stamp)
                 return base
+            asm_source = src_dir / f"{unit}.s"
+            if asm_source.is_file():
+                return assemble_arm(asm_source, stem, base)
             # A unit's source is <unit>.c, or a directory of C files linked together.
             source = src_dir / f"{unit}.c"
             files = sorted(f for f in (src_dir / unit).glob("*.c") if not f.name.startswith("_")) if (src_dir / unit).is_dir() else []
@@ -233,6 +260,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             src_dir = GBA_DIR / "src" / info["config"]
             out = build / info["config"]
             units = _units(config_dir)
+            arm_units = _arm_units(config_dir)
             bases = {}
             if have_compilers:
                 for unit in units:
@@ -254,7 +282,11 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             linked = []
             for unit in units:
                 obj = _path(out / "obj" / f"{unit}.o")
-                n.build(obj, "gba_as", _path(out / "asm" / f"{unit}.s"), implicit=binutils_stamp)
+                if unit in arm_units:
+                    # Assembled like hand-written ARM source so branches keep their relocations.
+                    assemble_arm(out / "asm" / f"{unit}.s", _path(out / "obj" / unit), obj)
+                else:
+                    n.build(obj, "gba_as", _path(out / "asm" / f"{unit}.s"), implicit=binutils_stamp)
                 objects.append(obj)
                 linked.append(bases[unit] if unit in complete else obj)
                 unit_config: Dict[str, Any] = {
@@ -269,6 +301,8 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                     objects.append(bases[unit])
                     unit_config["base_path"] = bases[unit]
                     source = src_dir / f"{unit}.c"
+                    if not source.is_file():
+                        source = src_dir / f"{unit}.s"
                     if source.is_file():
                         unit_config["metadata"]["source_path"] = _path(source)
                     elif unit.startswith("m4a/"):

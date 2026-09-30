@@ -7,9 +7,9 @@ objdiff.json so the programs count toward the version's progress report.
 Units with source are compiled and diffed against their target objects:
 - gba/src/<program>/<unit>.c, built with agbcc
 - libgcc/<object>, built from gba/lib/libgcc like agbcc's own libgcc
-- libagbsyscall/<routine>, m4a/<file>: SDK libraries in gba/lib
-Units listed in COMPLETE, and all libgcc and libagbsyscall units, link their
-compiled objects into the checked image.
+- libagbsyscall/<routine>, libc/<dir>/<file>, m4a/<file>: libraries in gba/lib
+Units listed in COMPLETE, and all libgcc, libagbsyscall and libc units, link
+their compiled objects into the checked image.
 """
 
 import importlib.util
@@ -26,6 +26,26 @@ GBA_DIR = Path("gba")
 LIBGCC_DIR = GBA_DIR / "lib" / "libgcc"
 M4A_DIR = GBA_DIR / "lib" / "m4a"
 SYSCALL_DIR = GBA_DIR / "lib" / "libagbsyscall"
+LIBC_DIR = GBA_DIR / "lib" / "libc"
+# agbcc's libc (newlib) build: flags, and objects built from another source with defines.
+LIBC_CPPFLAGS = ("-I gba/lib/ginclude -I gba/lib/libc/include -nostdinc -undef -DABORT_PROVIDED "
+                 "-DHAVE_GETTIMEOFDAY -D__thumb__ -DARM_RDI_MONITOR -D__GNUC__ -DINTERNAL_NEWLIB "
+                 "-D__USER_LABEL_PREFIX__=")
+LIBC_VARIANTS = {
+    "stdlib/mallocr": ("stdlib/mallocr.c", "-DDEFINE_MALLOC"),
+    "stdlib/freer": ("stdlib/mallocr.c", "-DDEFINE_FREE"),
+    "stdlib/reallocr": ("stdlib/mallocr.c", "-DDEFINE_REALLOC"),
+    "stdlib/callocr": ("stdlib/mallocr.c", "-DDEFINE_CALLOC"),
+    "stdlib/cfreer": ("stdlib/mallocr.c", "-DDEFINE_CFREE"),
+    "stdlib/malignr": ("stdlib/mallocr.c", "-DDEFINE_MEMALIGN"),
+    "stdlib/vallocr": ("stdlib/mallocr.c", "-DDEFINE_VALLOC"),
+    "stdlib/pvallocr": ("stdlib/mallocr.c", "-DDEFINE_PVALLOC"),
+    "stdlib/mallinfor": ("stdlib/mallocr.c", "-DDEFINE_MALLINFO"),
+    "stdlib/mallstatsr": ("stdlib/mallocr.c", "-DDEFINE_MALLOC_STATS"),
+    "stdlib/msizer": ("stdlib/mallocr.c", "-DDEFINE_MALLOC_USABLE_SIZE"),
+    "stdlib/malloptr": ("stdlib/mallocr.c", "-DDEFINE_MALLOPT"),
+    "stdio/vfiprintf": ("stdio/vfprintf.c", "-DINTEGER_ONLY"),
+}
 
 # Programs per game version: category id -> program info.
 PROGRAMS: Dict[str, Dict[str, Dict[str, str]]] = {
@@ -212,6 +232,18 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 n.build(base, "gba_as", _path(SYSCALL_DIR / "libagbsyscall.s"), implicit=binutils_stamp,
                         variables={"asincludes": f"-I {_path(GBA_DIR / 'lib')} --defsym L_{name}=1"})
                 return base
+            if unit.startswith("libc/"):
+                name = unit.split("/", 1)[1]
+                source, defines = LIBC_VARIANTS.get(name, (f"{name}.c", ""))
+                extra = " -fshort-enums" if name == "stdlib/mbtowc_r" else ""
+                pre = stem + ".i"
+                asm = stem + ".s"
+                n.build(pre, "gba_cpp", _path(LIBC_DIR / source), implicit=binutils_stamp,
+                        variables={"cppflags": f"{LIBC_CPPFLAGS} {defines} -iquote {_path((LIBC_DIR / source).parent)}"})
+                n.build(asm, "gba_cc", pre,
+                        variables={"cc": os.path.normpath(old_agbcc), "cflags": f"-O2 -fno-builtin{extra}"})
+                n.build(base, "gba_as", [asm, align], implicit=binutils_stamp)
+                return base
             if unit.startswith("m4a/"):
                 name = unit.split("/", 1)[1]
                 if (M4A_DIR / f"{name}.s").is_file():
@@ -267,7 +299,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                     base = compile_source(unit, src_dir, out, info)
                     if base:
                         bases[unit] = base
-            complete = {u for u in bases if u.startswith(("libgcc/", "libagbsyscall/"))
+            complete = {u for u in bases if u.startswith(("libgcc/", "libagbsyscall/", "libc/"))
                         or u in COMPLETE.get(info["config"], [])}
 
             asm = [_path(out / "asm" / f"{u}.s") for u in units]

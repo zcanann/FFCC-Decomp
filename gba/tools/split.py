@@ -326,13 +326,14 @@ class Emitter:
                     out.append(self.arm_instruction(address, unit))
                     address += 4
                     continue
-            if address % 4 == 0 and remaining >= 4 and not self.overlaps_code(address):
+            inner = [i for i in (1, 2, 3) if address + i in self.by_address or address + i in labels]
+            if address % 4 == 0 and remaining >= 4 and not inner and not self.overlaps_code(address):
                 value = a.word(address)
                 expr = self.pointer(value, unit, address)
                 out.append(f"\t.4byte {expr}" if expr else f"\t.4byte 0x{value:08X}")
                 address += 4
                 continue
-            if address % 2 == 0 and remaining >= 2:
+            if address % 2 == 0 and remaining >= 2 and 1 not in inner:
                 out.append(f"\t.2byte 0x{a.half(address):04X}")
                 address += 2
                 continue
@@ -393,7 +394,9 @@ class Emitter:
         out += ["SECTIONS", "{"]
         sections: Dict[str, List[Split]] = {}
         for split in self.splits:
-            sections.setdefault(split.section, []).append(split)
+            # Initialized data is loaded with the rest of the image after the code.
+            output = ".rodata" if split.section == ".data" else split.section
+            sections.setdefault(output, []).append(split)
         for section in list(LOAD_SECTIONS) + list(BSS_SECTIONS):
             if section not in sections:
                 continue
@@ -402,7 +405,7 @@ class Emitter:
             out.append(f"\t{section} 0x{ordered[0].start:08X}{kind} :")
             out.append("\t{")
             for split in ordered:
-                name = section if split.unit in compiled else self.input_section(split)
+                name = split.section if split.unit in compiled else self.input_section(split)
                 out.append(f"\t\t{objects[split.unit]}({name})")
             # Alignment gaps between objects were zero-filled, not nop-filled.
             out.append("\t} =0" if section in LOAD_SECTIONS else "\t}")

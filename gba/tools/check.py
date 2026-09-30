@@ -83,7 +83,13 @@ def main():
             if not left:
                 print(f"{name}: not in target {unit}")
                 continue
-            percent = left[0].get("match_percent", 0.0)
+            percent = left[0].get("match_percent")
+            if percent is None:
+                # objdiff omits the score in two-object mode; derive it from the instruction diff.
+                li = left[0].get("instructions", [])
+                ri = right[0].get("instructions", []) if right else []
+                same = sum(1 for a, b in zip(li, ri) if not a.get("diff_kind") and not b.get("diff_kind"))
+                percent = 100.0 * same / max(len(li), len(ri), 1) if ri else 0.0
             total += percent
             print(f"{name}: {percent:.2f}%")
             if args.function and right and percent < 100:

@@ -2111,7 +2111,7 @@ void CGMonObj::isValidTarget()
 	}
 
 	{
-		int partyIndex = -1;
+		int partyIndex;
 		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) <
 			(Game.m_gameWork.m_soundOptionFlag != 0 ? kMonObjWideSoundRange : kMonObjNormalSoundRange)) {
 			int colIndex;
@@ -2119,10 +2119,9 @@ void CGMonObj::isValidTarget()
 			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
 			         static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xC8)),
 			         &hitScale, &colIndex);
-			partyIndex = colIndex;
-			if (partyIndex < 0) {
-				partyIndex = -1;
-			}
+			partyIndex = colIndex >= 0 ? colIndex : -1;
+		} else {
+			partyIndex = -1;
 		}
 
 		if (partyIndex >= 0) {

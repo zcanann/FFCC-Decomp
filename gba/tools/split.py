@@ -316,7 +316,10 @@ class Emitter:
                         out.append(f"\t.inst 0x{raw:08X}")
                 address += 4
                 continue
-            if is_code and address in a.code and not (address in a.literals or address in a.jump_tables):
+            # A zero halfword aligning a literal pool is padding, even if a path decoded it.
+            pool_pad = (address % 4 == 2 and a.half(address) == 0
+                        and (address + 2 in a.literals or address + 2 in a.jump_tables))
+            if is_code and address in a.code and not pool_pad and not (address in a.literals or address in a.jump_tables):
                 size = a.code[address]
                 if thumb_code and size == 2:
                     out.append(f"\t.inst.n 0x{a.half(address):04X}")

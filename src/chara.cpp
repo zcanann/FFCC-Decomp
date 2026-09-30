@@ -2434,7 +2434,8 @@ void CChara::CNode::CalcBind(CChara::CModel* model)
 	for (u32 i = 0; i < m_refData->m_childCount; i++) {
 		u16 nodeIndex = *reinterpret_cast<u16*>(
 		    reinterpret_cast<u8*>(model->m_data->m_bank) + m_refData->m_childBankOffset + i * 2);
-		model->m_nodes[nodeIndex].CalcBind(model);
+		CNode* child = &model->m_nodes[nodeIndex];
+		child->CalcBind(model);
 	}
 }
 

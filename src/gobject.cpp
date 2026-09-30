@@ -286,16 +286,6 @@ static inline int checkProbeHit(CMapCylinder* cylinder, CVector* base, CVector* 
  * Address:	TODO
  * Size:	TODO
  */
-float CGObject::onAlphaUpdate()
-{
-	return sAnimFrameOffset;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 int CGObject::GetCID()
 {
 	return 5;

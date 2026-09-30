@@ -1854,8 +1854,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			}
 			if (ok == len1 - 1) {
 				matches[matchCount][0] = patIdx;
-				matches[matchCount][1] = selected - (len1 - 1);
-				matchCount++;
+				matches[matchCount++][1] = selected - (len1 - 1);
 			}
 		}
 	} else if (selectedFlag == 0) {
@@ -1875,8 +1874,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			}
 			if (ok == baseLen) {
 				matches[matchCount][0] = 0;
-				matches[matchCount][1] = start;
-				matchCount++;
+				matches[matchCount++][1] = start;
 			}
 		}
 	}
@@ -1908,8 +1906,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 			if (ok == len) {
 				matches[matchCount][0] = group;
-				matches[matchCount][1] = start + (selected - (len - 1));
-				matchCount++;
+				matches[matchCount++][1] = start + (selected - (len - 1));
 			}
 		}
 	}

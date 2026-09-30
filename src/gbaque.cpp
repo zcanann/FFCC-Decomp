@@ -3701,7 +3701,8 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	CCaravanWork** foodBasePtr = &Game.m_scriptFoodBase[channel];
 
 	char smithCount = 0;
-	for (int i = 0; i < 0x40; i++) {
+	int i;
+	for (i = 0; i < 0x40; i++) {
 		if ((*foodBasePtr)->m_inventoryItems[i] >= 401) {
 			smithIndices[smithCount++] = static_cast<unsigned char>(i);
 		}
@@ -3723,7 +3724,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 	writePtr += work;
 	totalSize = work + 1;
 
-	for (int i = 0; i < 0x40; i++) {
+	for (i = 0; i < 0x40; i++) {
 		const int itemId = (*foodBasePtr)->m_inventoryItems[i];
 		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
@@ -3738,25 +3739,26 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 			work = price;
 			itemBuf[0] = __lwbrx(&work, 0);
 
+			unsigned short* itemData = reinterpret_cast<unsigned short*>(itemBuf);
 			for (k = 3; k < 9; k++) {
-				reinterpret_cast<unsigned short*>(itemBuf)[k - 1] =
+				itemData[k - 1] =
 				    __lhbrx(itemBase, static_cast<short>(k) * 2 + 0x20);
 			}
 
-			for (int j = 0; j < 4; j++) {
+			for (k = 0; k < 4; k++) {
 				SItemFlatRow* recipeRow = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
-				reinterpret_cast<unsigned short*>(itemBuf)[8 + j] =
-				    __lhbrx(&recipeRow->m_smithResults[j], 0);
-				work = recipeRow->m_smithResults[j];
+				itemData[8 + k] =
+				    __lhbrx(&recipeRow->m_smithResults[k], 0);
+				work = recipeRow->m_smithResults[k];
 				if (work == 0) {
-					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 4] = 0;
-					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 4] = 0;
-					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 4] = 0;
+					itemData[12 + k * 4] = 0;
+					itemData[13 + k * 4] = 0;
+					itemData[14 + k * 4] = 0;
 				} else {
 					SItemFlatRow* materialBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[work];
-					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 4] = __lhbrx(&materialBase->m_equipFlags, 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 4] = __lhbrx(&materialBase->m_value, 0);
-					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 4] = __lhbrx(&materialBase->m_attribute, 0);
+					itemData[12 + k * 4] = __lhbrx(&materialBase->m_equipFlags, 0);
+					itemData[13 + k * 4] = __lhbrx(&materialBase->m_value, 0);
+					itemData[14 + k * 4] = __lhbrx(&materialBase->m_attribute, 0);
 				}
 			}
 
@@ -3767,7 +3769,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		}
 	}
 
-	for (int i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++) {
 		work = __lwbrx(reinterpret_cast<unsigned int*>(&(*foodBasePtr)->m_shopArgs[i]), 0);
 		memcpy(writePtr, &work, 4);
 		writePtr += 4;

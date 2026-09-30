@@ -1542,6 +1542,7 @@ void GbaQueue::LoadEnemyStat()
 void GbaQueue::LoadMapItemStat()
 {
 	GbaQueueMapEntity localMapItems[16];
+	GbaQueueMapEntity* mapItemEntry;
 	char numMapItems;
 	CGObject* object;
 	int i;
@@ -1550,7 +1551,6 @@ void GbaQueue::LoadMapItemStat()
 	numMapItems = 0;
 
 	if (CFlat.m_initAllFinishedFlag != 0) {
-		GbaQueueMapEntity* mapItemEntry;
 		object = CFlat.FindGObjFirst();
 		mapItemEntry = localMapItems;
 

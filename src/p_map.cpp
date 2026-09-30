@@ -39,12 +39,6 @@ inline CRelProfile::~CRelProfile()
 {
 }
 
-static const char sMapPcsGameTableName[] = "CMapPcs(GAME)";
-static const char sMapPcsViewerTableName[] = "CMapPcs(VIEWER)";
-static const char sMapPcsPartTableName[] = "CMapPcs(PART)";
-static const char sMapPcsManagerClassName[] = "CManager";
-static const char sMapPcsProcessClassName[] = "CProcess";
-
 inline CMapPcs::CMapPcs()
 {
 }
@@ -53,7 +47,7 @@ CMapPcs MapPcs;
 
 CProcessCallbackTable CMapPcs::m_table[3] = {
     {
-        const_cast<char*>(sMapPcsGameTableName),
+        const_cast<char*>("CMapPcs(GAME)"),
         static_cast<CProcessCallback>(&CMapPcs::create),
         static_cast<CProcessCallback>(&CMapPcs::destroy),
         {
@@ -66,7 +60,7 @@ CProcessCallbackTable CMapPcs::m_table[3] = {
         },
     },
     {
-        const_cast<char*>(sMapPcsViewerTableName),
+        const_cast<char*>("CMapPcs(VIEWER)"),
         static_cast<CProcessCallback>(&CMapPcs::createViewer),
         static_cast<CProcessCallback>(&CMapPcs::destroy),
         {
@@ -79,7 +73,7 @@ CProcessCallbackTable CMapPcs::m_table[3] = {
         },
     },
     {
-        const_cast<char*>(sMapPcsPartTableName),
+        const_cast<char*>("CMapPcs(PART)"),
         static_cast<CProcessCallback>(&CMapPcs::createViewer),
         static_cast<CProcessCallback>(&CMapPcs::destroy),
         {
@@ -99,57 +93,9 @@ CRelProfile g_mapSection;
 CRelProfile g_hit_prof;
 unsigned char g_map_calc_prof ATTRIBUTE_ALIGN(4);
 unsigned char g_map_draw_prof ATTRIBUTE_ALIGN(4);
-static const float kPMapBoundMinInit = 10000000000.0f;
-static const float kPMapBoundMaxInit = -10000000000.0f;
-extern "C" const float DrawRangeDefault;
-extern "C" const float kMapBoundsCenterScale;
-extern "C" const float kMapCameraCenterYOffset;
 
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
-static const char s_p_map_cpp[] = "p_map.cpp";
-static const char s_map_load_ok_fmt[] =
-    "\n\n=============================================================\n"
-    "                   LoadMap [%s] OK\n"
-    "                   m_mapobj_n = %d\n"
-    "                   m_octtree_n = %d\n"
-    "                   memFree=%d Kbyte\n"
-    "=============================================================\n\n\n";
-static const char s_dvd_map_stage_map_fmt[] = "dvd/map/stg%03d/map%03d";
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapPcs::Init()
-{
-	m_forceMapReload = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapPcs::Quit()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CMapPcs::GetTable(unsigned long tableIndex)
-{
-	return reinterpret_cast<int>(&CMapPcs::m_table[tableIndex]);
-}
 
 /*
  * --INFO--
@@ -175,16 +121,6 @@ inline void mapInitDrawEnv()
     _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapPcs::drawShadow()
-{
-	// TODO
 }
 
 /*
@@ -307,7 +243,7 @@ void CMapPcs::drawViewer()
         Mtx cameraMtx;
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp), 0x2C4);
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2C4);
         }
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
@@ -338,7 +274,7 @@ void CMapPcs::drawViewer()
         MapMng.Draw();
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp), 0x2E0);
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2E0);
         }
     }
 }
@@ -361,7 +297,7 @@ void CMapPcs::drawBeforeViewer()
         Mtx cameraMtx;
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp), 0x298);
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x298);
         }
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
@@ -392,7 +328,7 @@ void CMapPcs::drawBeforeViewer()
         MapMng.DrawBefore();
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp), 0x2B2);
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2B2);
         }
     }
 }
@@ -414,7 +350,7 @@ void CMapPcs::draw()
         Mtx44 screenMtx;
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp), 0x2C4);
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2C4);
         }
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
@@ -445,7 +381,7 @@ void CMapPcs::draw()
         MapMng.Draw();
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp), 0x2E0);
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2E0);
         }
     }
 }
@@ -467,7 +403,7 @@ void CMapPcs::drawBefore()
         Mtx44 screenMtx;
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp), 0x298);
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x298);
         }
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
@@ -498,9 +434,22 @@ void CMapPcs::drawBefore()
         MapMng.DrawBefore();
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp), 0x2B2);
+            Graphic._WaitDrawDone(const_cast<char*>("p_map.cpp"), 0x2B2);
         }
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80035600
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapPcs::drawShadow()
+{
 }
 
 /*
@@ -549,8 +498,8 @@ void CMapPcs::calc()
     if (m_forceMapReload != 0) {
         MapMng.DestroyMap();
         LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
-        MapMng.SetDrawRangeOctTree(LoadFloat(DrawRangeDefault));
-        MapMng.SetDrawRangeMapObj(LoadFloat(DrawRangeDefault));
+        MapMng.SetDrawRangeOctTree(1000000000.0f);
+        MapMng.SetDrawRangeMapObj(1000000000.0f);
         MapMng.m_asyncLoadState.m_mapLoadStart = 0;
         MapMng.m_asyncLoadState.m_mapLoadCursor = 0;
         MapMng.m_asyncLoadState.m_mapLoadSize = 0;
@@ -568,11 +517,14 @@ void CMapPcs::calc()
                 COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
                     float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
-                    cameraPos.x = center * LoadFloat(kMapBoundsCenterScale);
+                    center *= 0.5f;
+                    cameraPos.x = center;
                     center = rootNode->m_bound.m_min.y + rootNode->m_bound.m_max.y;
-                    cameraPos.y = center * LoadFloat(kMapBoundsCenterScale);
+                    center *= 0.5f;
+                    cameraPos.y = center;
                     center = rootNode->m_bound.m_min.z + rootNode->m_bound.m_max.z;
-                    cameraPos.z = center * LoadFloat(kMapBoundsCenterScale);
+                    center *= 0.5f;
+                    cameraPos.z = center;
                 } else {
                     CMapObj* mapObj = MapMng.GetMapObj(1);
                     cameraPos.x = mapObj->m_localPosition.x;
@@ -580,7 +532,7 @@ void CMapPcs::calc()
                     cameraPos.z = mapObj->m_localPosition.z;
                 }
             }
-            cameraPos.y += LoadFloat(kMapCameraCenterYOffset);
+            cameraPos.y += 1.0f;
             CameraPcs.m_positionX = cameraPos.x;
             CameraPcs.m_positionY = cameraPos.y;
             CameraPcs.m_positionZ = cameraPos.z;
@@ -588,7 +540,12 @@ void CMapPcs::calc()
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
             System.Printf(
-                const_cast<char*>(s_map_load_ok_fmt),
+                const_cast<char*>("\n\n=============================================================\n"
+    "                   LoadMap [%s] OK\n"
+    "                   m_mapobj_n = %d\n"
+    "                   m_octtree_n = %d\n"
+    "                   memFree=%d Kbyte\n"
+    "=============================================================\n\n\n"),
                 m_mapName,
                 MapMng.m_mapObjCount,
                 MapMng.m_octTreeCount,
@@ -675,13 +632,13 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 
     reinterpret_cast<unsigned int&>(g_MapHitDrawMode) = stageNo;
     s_loadedMapNo__7CMapPcs = mapNo;
-    sprintf(mapPath, s_dvd_map_stage_map_fmt, stageNo, mapNo);
+    sprintf(mapPath, "dvd/map/stg%03d/map%03d", stageNo, mapNo);
 
     if (mode != 2) {
         MapMng.DestroyMap();
         LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
-        MapMng.SetDrawRangeOctTree(LoadFloat(DrawRangeDefault));
-        MapMng.SetDrawRangeMapObj(LoadFloat(DrawRangeDefault));
+        MapMng.SetDrawRangeOctTree(1000000000.0f);
+        MapMng.SetDrawRangeMapObj(1000000000.0f);
     }
 
     MapMng.m_asyncLoadState.m_mapLoadStart = mapPtr;
@@ -716,11 +673,14 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                 COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
                     float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
-                    cameraPos.x = center * LoadFloat(kMapBoundsCenterScale);
+                    center *= 0.5f;
+                    cameraPos.x = center;
                     center = rootNode->m_bound.m_min.y + rootNode->m_bound.m_max.y;
-                    cameraPos.y = center * LoadFloat(kMapBoundsCenterScale);
+                    center *= 0.5f;
+                    cameraPos.y = center;
                     center = rootNode->m_bound.m_min.z + rootNode->m_bound.m_max.z;
-                    cameraPos.z = center * LoadFloat(kMapBoundsCenterScale);
+                    center *= 0.5f;
+                    cameraPos.z = center;
                 } else {
                     CMapObj* mapObj = MapMng.GetMapObj(1);
                     cameraPos.x = mapObj->m_localPosition.x;
@@ -728,7 +688,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                     cameraPos.z = mapObj->m_localPosition.z;
                 }
             }
-            cameraPos.y += LoadFloat(kMapCameraCenterYOffset);
+            cameraPos.y += 1.0f;
             CameraPcs.m_positionX = cameraPos.x;
             CameraPcs.m_positionY = cameraPos.y;
             CameraPcs.m_positionZ = cameraPos.z;
@@ -736,7 +696,12 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
             System.Printf(
-                const_cast<char*>(s_map_load_ok_fmt),
+                const_cast<char*>("\n\n=============================================================\n"
+    "                   LoadMap [%s] OK\n"
+    "                   m_mapobj_n = %d\n"
+    "                   m_octtree_n = %d\n"
+    "                   memFree=%d Kbyte\n"
+    "=============================================================\n\n\n"),
                 mapPath,
                 static_cast<int>(MapMng.m_mapObjCount),
                 static_cast<int>(MapMng.m_octTreeCount),
@@ -793,4 +758,44 @@ void CMapPcs::create()
     m_useStoredViewMtx = 0;
 
     MapMng.Create();
+}
+/*
+ * --INFO--
+ * PAL Address: 0x80035E60
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMapPcs::GetTable(unsigned long tableIndex)
+{
+	return reinterpret_cast<int>(&CMapPcs::m_table[tableIndex]);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80035E74
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapPcs::Quit()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80035E78
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapPcs::Init()
+{
+	m_forceMapReload = 0;
 }

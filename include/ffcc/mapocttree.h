@@ -75,55 +75,9 @@ public:
 	 */
 	int CheckCross(CBound& other)
 	{
-		bool xyOverlap;
-		bool overlap;
-		int xOverlap;
-
-		overlap = false;
-		xyOverlap = overlap;
-		if (m_min.x < other.m_min.x) {
-			xOverlap = other.m_min.x <= m_max.x;
-		} else {
-			if (m_min.x > other.m_min.x) {
-				xOverlap = m_min.x <= other.m_max.x;
-			} else {
-				xOverlap = true;
-			}
-		}
-
-		if (xOverlap) {
-			if (m_min.y < other.m_min.y) {
-				xOverlap = other.m_min.y <= m_max.y;
-			} else {
-				if (m_min.y > other.m_min.y) {
-					xOverlap = m_min.y <= other.m_max.y;
-				} else {
-					xOverlap = true;
-				}
-			}
-
-			if (xOverlap) {
-				xyOverlap = true;
-			}
-		}
-
-		if (xyOverlap) {
-			if (m_min.z < other.m_min.z) {
-				xOverlap = other.m_min.z <= m_max.z;
-			} else {
-				if (m_min.z > other.m_min.z) {
-					xOverlap = m_min.z <= other.m_max.z;
-				} else {
-					xOverlap = true;
-				}
-			}
-
-			if (xOverlap) {
-				overlap = true;
-			}
-		}
-
-		return (unsigned char)overlap;
+		return (m_min.x < other.m_min.x ? other.m_min.x <= m_max.x : (m_min.x > other.m_min.x ? m_min.x <= other.m_max.x : 1)) &&
+		       (m_min.y < other.m_min.y ? other.m_min.y <= m_max.y : (m_min.y > other.m_min.y ? m_min.y <= other.m_max.y : 1)) &&
+		       (m_min.z < other.m_min.z ? other.m_min.z <= m_max.z : (m_min.z > other.m_min.z ? m_min.z <= other.m_max.z : 1));
 	}
 
 	Vec m_min;              // 0x00

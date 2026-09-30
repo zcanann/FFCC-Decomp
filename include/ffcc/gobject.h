@@ -83,7 +83,16 @@ public:
     float CalcSafePos(int, CGObject*, Vec*);
     void PutDropItem();
     virtual unsigned int IsDispRader();
-    virtual float onAlphaUpdate();
+    /*
+     * --INFO--
+     * PAL Address: 0x8007BE40
+     * PAL Size: 8b
+     * EN Address: TODO
+     * EN Size: TODO
+     * JP Address: TODO
+     * JP Size: TODO
+     */
+    virtual float onAlphaUpdate() { return 1.0f; }
     virtual void onAnimPoint(int, int);
     virtual int onHit(int, CGObject*, int, Vec*);
     virtual void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);

@@ -2868,9 +2868,8 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 			OSSignalSemaphore(accessSemaphores + i);
 		}
 
-		char** nameTable = Game.m_cFlatDataArr[1].TableStrings(2);
 		for (int i = 0; i < 0x100; i++) {
-			if (strcmp(nameTable[i], localInfo.m_name) == 0) {
+			if (strcmp(Game.m_cFlatDataArr[1].TableStrings(2)[i], localInfo.m_name) == 0) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
 			}
@@ -2878,7 +2877,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 
 		for (int i = 0; i < 8; i++) {
 			if ((i != static_cast<signed char>(localInfo.m_playerSlot)) && (Game.m_caravanWorkArr[i].m_shopState != 0) &&
-			    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == '\0') &&
+			    (Game.m_caravanWorkArr[i].m_caravanLocalFlags == 0U) &&
 			    (strcmp(reinterpret_cast<char*>(Game.m_caravanWorkArr[i].m_name), localInfo.m_name) == 0)) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;

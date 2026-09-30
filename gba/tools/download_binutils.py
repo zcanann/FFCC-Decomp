@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Download arm-none-eabi binutils (as, ld, objcopy, objdump) from the xPack release."""
+"""Download arm-none-eabi binutils and the C preprocessor from the xPack release."""
 
 import argparse
 import io
@@ -12,8 +12,9 @@ import zipfile
 from pathlib import Path
 
 VERSION = "15.2.1-1.1"
+STAMP = f"{VERSION}+cpp"
 BASE_URL = f"https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v{VERSION}"
-TOOLS = ("as", "ld", "objcopy", "objdump", "nm", "readelf")
+TOOLS = ("as", "ld", "objcopy", "objdump", "nm", "readelf", "cpp")
 
 
 def archive_name() -> str:
@@ -39,6 +40,9 @@ def wanted(name: str) -> bool:
     if parts[1] == "bin":
         stem = leaf[:-4] if leaf.endswith(".exe") else leaf
         return stem in {f"arm-none-eabi-{t}" for t in TOOLS} or leaf.endswith(".dll")
+    if parts[1] == "libexec":
+        # cpp runs cc1 -E.
+        return leaf in ("cc1", "cc1.exe") or leaf.endswith(".dll")
     return leaf.endswith((".dll", ".so")) or ".so." in leaf or leaf.endswith(".dylib")
 
 
@@ -48,7 +52,7 @@ def main() -> None:
     args = parser.parse_args()
 
     stamp = args.output / ".version"
-    if stamp.is_file() and stamp.read_text().strip() == VERSION:
+    if stamp.is_file() and stamp.read_text().strip() == STAMP:
         return
 
     name = archive_name()
@@ -76,7 +80,7 @@ def main() -> None:
                 member.name = "/".join(member.name.split("/")[1:])
                 archive.extract(member, args.output)
 
-    stamp.write_text(VERSION)
+    stamp.write_text(STAMP)
 
 
 if __name__ == "__main__":

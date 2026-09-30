@@ -41,6 +41,7 @@ class Symbol:
     kind: str  # function / object
     size: int
     thumb: bool = False
+    local: bool = False
 
 
 @dataclass
@@ -59,7 +60,8 @@ def parse_symbols(path: Path) -> List[Symbol]:
             continue
         attrs = dict(a.split(":", 1) if ":" in a else (a, "") for a in m.group(4).split())
         symbols.append(Symbol(m.group(1), m.group(2), int(m.group(3), 16), attrs.get("type", "object"),
-                              int(attrs.get("size", "0"), 0), "thumb" in attrs))
+                              int(attrs.get("size", "0"), 0), "thumb" in attrs,
+                              attrs.get("scope") == "local"))
     return sorted(symbols, key=lambda s: s.address)
 
 
@@ -80,7 +82,7 @@ def parse_splits(path: Path) -> List[Split]:
 def write_symbols(path: Path, symbols: List[Symbol]) -> None:
     lines = []
     for s in sorted(symbols, key=lambda s: s.address):
-        flags = " thumb" if s.thumb else ""
+        flags = (" thumb" if s.thumb else "") + (" scope:local" if s.local else "")
         lines.append(f"{s.name} = {s.section}:0x{s.address:08X}; // type:{s.kind} size:0x{s.size:X}{flags}")
     path.write_text("\n".join(lines) + "\n")
 
@@ -182,6 +184,9 @@ class Emitter:
     def expression(self, value: int, unit: str) -> Optional[str]:
         """Symbolic expression for an absolute pointer value, or None to emit it raw."""
         target = value & ~1
+        # Local symbols are only visible inside their own unit.
+        if self.unit_at(target) != unit and any(s.local for s in self.by_address.get(target, [])):
+            return None
         # Pointer to a Thumb function entry: the linker sets the Thumb bit.
         for s in self.by_address.get(target, []):
             if s.kind == "function" and s.thumb and value & 1:
@@ -190,6 +195,8 @@ class Emitter:
                 return s.name if value == s.address else None
         s = self.containing(value)
         if s is None:
+            return None
+        if s.local and self.unit_at(s.address) != unit:
             return None
         if not (s.kind == "function" and s.thumb):
             return f"{s.name}+0x{value - s.address:X}"
@@ -221,14 +228,16 @@ class Emitter:
         return "\n".join(out + body) + "\n"
 
     def emit_bss(self, split: Split) -> List[str]:
-        out = ["", f"\t.section {split.section},\"aw\",%nobits", "\t.balign 4"]
+        out = ["", f"\t.section {self.input_section(split)},\"aw\",%nobits", "\t.balign 4"]
         address = split.start
         for s in self.symbols:
             if s.section != split.section or not (split.start <= s.address < split.end):
                 continue
             if s.address > address:
                 out.append(f"\t.space 0x{s.address - address:X}")
-            out += [f"\t.global {s.name}", f"\t.type {s.name}, %object", f"{s.name}:"]
+            if not s.local:
+                out.append(f"\t.global {s.name}")
+            out += [f"\t.type {s.name}, %object", f"{s.name}:"]
             size = min(s.size, split.end - s.address)
             out += [f"\t.space 0x{size:X}", f"\t.size {s.name}, 0x{size:X}"]
             address = s.address + size
@@ -239,7 +248,7 @@ class Emitter:
     def emit_range(self, split: Split, unit: str) -> List[str]:
         a = self.a
         flags = "\"ax\",%progbits" if split.section == ".text" else "\"a\",%progbits"
-        out = ["", f"\t.section {split.section},{flags}"]
+        out = ["", f"\t.section {self.input_section(split)},{flags}"]
         is_code = split.section == ".text"
         mode = None
         open_symbol: Optional[Tuple[Symbol, int]] = None
@@ -249,7 +258,14 @@ class Emitter:
         def close(at: int) -> None:
             nonlocal open_symbol
             if open_symbol is not None:
-                out.append(f"\t.size {open_symbol[0].name}, . - {open_symbol[0].name}")
+                symbol, start = open_symbol
+                size = at - start
+                # Alignment padding before the next function is not part of this one.
+                pad = at - 2
+                if (symbol.kind == "function" and size > 2 and at % 4 == 0 and a.half(pad) == 0
+                        and pad not in a.code and (pad & ~3) not in a.literals and (pad & ~3) not in a.jump_tables):
+                    size -= 2
+                out.append(f"\t.size {symbol.name}, 0x{size:X}")
                 open_symbol = None
 
         while address < split.end:
@@ -263,12 +279,14 @@ class Emitter:
                     if mode != want:
                         out.append(f"\t.{want}")
                         mode = want
-                    out.append(f"\t.global {s.name}")
+                    if not s.local:
+                        out.append(f"\t.global {s.name}")
                     out.append(f"\t.type {s.name}, %function")
                     if s.thumb:
                         out.append("\t.thumb_func")
                 else:
-                    out.append(f"\t.global {s.name}")
+                    if not s.local:
+                        out.append(f"\t.global {s.name}")
                     out.append(f"\t.type {s.name}, %object")
                 out.append(f"{s.name}:")
                 open_symbol = (s, address)
@@ -280,6 +298,8 @@ class Emitter:
             if is_code and address in a.calls and remaining >= 4:
                 target, _ = a.calls[address]
                 names = [s for s in self.by_address.get(target, []) if s.kind == "function"]
+                if names and names[0].local and self.unit_at(target) != unit:
+                    names = []
                 if names and names[0].thumb == thumb_code:
                     out.append(f"\tbl {names[0].name}")
                 else:
@@ -342,7 +362,13 @@ class Emitter:
                     return s.name if off == 0 else f"{s.name}+0x{off:X}"
         return None
 
-    def linker_script(self, objects: Dict[str, str]) -> str:
+    def input_section(self, split: Split) -> str:
+        """Section name in the unit's assembly; distinct when a unit has several ranges in one section."""
+        count = sum(1 for s in self.splits if s.unit == split.unit and s.section == split.section)
+        return split.section if count == 1 else f"{split.section}.{split.start:08X}"
+
+    def linker_script(self, objects: Dict[str, str], compiled: Optional[set] = None) -> str:
+        compiled = compiled or set()
         out = ["SECTIONS", "{"]
         sections: Dict[str, List[Split]] = {}
         for split in self.splits:
@@ -355,7 +381,8 @@ class Emitter:
             out.append(f"\t{section} 0x{ordered[0].start:08X}{kind} :")
             out.append("\t{")
             for split in ordered:
-                out.append(f"\t\t{objects[split.unit]}({section})")
+                name = section if split.unit in compiled else self.input_section(split)
+                out.append(f"\t\t{objects[split.unit]}({name})")
             out.append("\t}")
         out.append("\t/DISCARD/ : { *(.ARM.attributes) *(.comment) }")
         out.append("}")
@@ -396,15 +423,18 @@ def main() -> None:
         for unit in units:
             text = emitter.emit_unit(unit)
             path = args.asm_dir / f"{unit}.s"
+            path.parent.mkdir(parents=True, exist_ok=True)
             if not path.exists() or path.read_text() != text:
                 path.write_text(text)
 
     if args.ldscript:
         objects = {unit: f"{args.object_dir}/{unit}.o" for unit in units}
+        compiled = set()
         for override in args.object:
             unit, path = override.split("=", 1)
             objects[unit] = path
-        text = emitter.linker_script(objects)
+            compiled.add(unit)
+        text = emitter.linker_script(objects, compiled)
         if not args.ldscript.exists() or args.ldscript.read_text() != text:
             args.ldscript.parent.mkdir(parents=True, exist_ok=True)
             args.ldscript.write_text(text)

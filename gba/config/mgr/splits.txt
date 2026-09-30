@@ -2,9 +2,56 @@ crt0:
 	.text       start:0x02000000 end:0x020001A0
 
 main:
-	.text       start:0x020001A0 end:0x0200EC98
+	.text       start:0x020001A0 end:0x0200D218
+
+libgcc/_call_via_rX:
+	.text       start:0x0200D218 end:0x0200D254
+
+libgcc/_divsi3:
+	.text       start:0x0200D254 end:0x0200D2E8
+
+libgcc/_dvmd_tls:
+	.text       start:0x0200D2E8 end:0x0200D2EC
+
+libgcc/_modsi3:
+	.text       start:0x0200D2EC end:0x0200D3BC
+
+libgcc/_udivsi3:
+	.text       start:0x0200D3BC end:0x0200D434
+
+libgcc/_umodsi3:
+	.text       start:0x0200D434 end:0x0200D4F4
+
+libgcc/dp-bit:
+	.text       start:0x0200D4F4 end:0x0200E290
+
+libgcc/fp-bit:
+	.text       start:0x0200E290 end:0x0200EBDC
+
+libgcc/_lshrdi3:
+	.text       start:0x0200EBDC end:0x0200EC10
+
+libgcc/_muldi3:
+	.text       start:0x0200EC10 end:0x0200EC80
+
+libgcc/_negdi2:
+	.text       start:0x0200EC80 end:0x0200EC98
+
+main:
 	.rodata     start:0x0200EC98 end:0x02021F78
 
 bss:
 	.ewram_bss  start:0x02021F78 end:0x0203FF35
-	.bss        start:0x03000000 end:0x03007B04
+	.bss        start:0x03000000 end:0x030070F8
+
+libgcc/dp-bit:
+	.bss        start:0x030070F8 end:0x0300710C
+
+bss:
+	.bss        start:0x0300710C end:0x03007110
+
+libgcc/fp-bit:
+	.bss        start:0x03007110 end:0x03007120
+
+bss:
+	.bss        start:0x03007120 end:0x03007B04

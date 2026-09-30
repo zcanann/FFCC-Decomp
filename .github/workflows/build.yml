@@ -53,7 +53,7 @@ jobs:
     - name: Build
       run: |
         python configure.py --map --version ${{ matrix.version }} \
-            --binutils /binutils --compilers /compilers --gba-binutils /usr/bin
+            --binutils /binutils --compilers /compilers --gba-binutils /usr/bin --gba-compilers /agbcc
         ninja all_source progress build/${{ matrix.version }}/report.json
 
     # Upload map files

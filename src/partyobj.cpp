@@ -2418,9 +2418,8 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
 		    m_worldPosition.z - radius <= obj->m_worldPosition.z &&
 		    m_worldPosition.x + radius >= obj->m_worldPosition.x &&
 		    m_worldPosition.z + radius >= obj->m_worldPosition.z) {
-			float yRange = FLOAT_80331ad4 * obj->m_bodyEllipsoidRadius;
-			if (m_worldPosition.y + yRange >= obj->m_worldPosition.y &&
-			    m_worldPosition.y - yRange <= obj->m_worldPosition.y) {
+			if (m_worldPosition.y + FLOAT_80331ad4 * obj->m_bodyEllipsoidRadius >= obj->m_worldPosition.y &&
+			    m_worldPosition.y - FLOAT_80331ad4 * obj->m_bodyEllipsoidRadius <= obj->m_worldPosition.y) {
 				Vec diff;
 				PSVECSubtract(&obj->m_worldPosition, &m_worldPosition, &diff);
 				diff.y = 0.0f;

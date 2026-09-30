@@ -4654,30 +4654,19 @@ void CGPartyObj::gpmCol()
 		cylinder.m_radius = halfHeight;
 
 		if (MapMng.CheckHitCylinderNear(&cylinder, diffVec, flags) != 0) {
-			int capped = i + 1;
-			if (activeTrailCount < capped) {
-				capped = activeTrailCount;
-			}
-			activeTrailCount = capped;
+			activeTrailCount = activeTrailCount < i + 1 ? activeTrailCount : i + 1;
 		} else {
-			trailBase[i].x = leader->m_worldPosition.x;
-			Vec* slot = &trailBase[i];
-			slot->y = leader->m_worldPosition.y;
-			slot->z = leader->m_worldPosition.z;
-			int idx = i;
-			int* trailIdxPtr = &m_ghostWork.trailIndex;
+			trailBase[i] = leader->m_worldPosition;
 			activeTrailCount = i + 1;
-			if (*trailIdxPtr < idx) {
-				idx = *trailIdxPtr;
-			}
-			*trailIdxPtr = idx;
+			m_ghostWork.trailIndex = m_ghostWork.trailIndex < i ? m_ghostWork.trailIndex : i;
 			break;
 		}
 		i++;
 	} while (static_cast<unsigned int>(i) < 5);
-	int lastTrailIndex = activeTrailCount - 1;
-	lastTrailIndex = lastTrailIndex < 0 ? 0 : lastTrailIndex;
-	m_ghostWork.trailIndex = m_ghostWork.trailIndex < lastTrailIndex ? m_ghostWork.trailIndex : lastTrailIndex;
+	int lastTrailIndex = activeTrailCount;
+	lastTrailIndex--;
+	m_ghostWork.trailIndex = m_ghostWork.trailIndex < (lastTrailIndex < 0 ? 0 : lastTrailIndex)
+	    ? m_ghostWork.trailIndex : (lastTrailIndex < 0 ? 0 : lastTrailIndex);
 }
 
 /*

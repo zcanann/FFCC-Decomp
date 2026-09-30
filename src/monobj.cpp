@@ -3692,18 +3692,18 @@ void CGMonObj::setActionParam(int state)
 	m_unk558 = m_unk554 + 1;
 	m_unk55C = m_unk558 + 1;
 
-	const SCharaItemRow* item = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
-	int actionType = item->m_actionType;
+	const SCharaItemRow* items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+	int actionType = items[m_itemId].m_actionType;
 	switch (actionType) {
 	case 0:
 	case 1:
 	case 3:
-		item = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
-		m_castFrameStart = item->m_attackStartFrame;
-		item = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
-		m_castFrameEnd = item->m_attackEndFrame;
-		item = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
-		m_castFrameCurrent = item->m_attackEndFrame;
+		items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+		m_castFrameStart = items[m_itemId].m_attackStartFrame;
+		items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+		m_castFrameEnd = items[m_itemId].m_attackEndFrame;
+		items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+		m_castFrameCurrent = items[m_itemId].m_attackEndFrame;
 		break;
 	case 2:
 		m_unk68C = CGCharaObj::calcCastTime(m_itemId);

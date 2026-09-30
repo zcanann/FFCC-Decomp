@@ -513,6 +513,7 @@ static int CreateWaterMesh(Vec* positions, Vec* normals, Vec2d* texCoords, unsig
     int rowCount;
     int colCount;
 
+    int vertexIndex = 0;
     normalY = 1.0f;
     zero = 0.0f;
     rowCount = 0;
@@ -522,17 +523,15 @@ static int CreateWaterMesh(Vec* positions, Vec* normals, Vec2d* texCoords, unsig
     for (z = radius; z >= -radius; z -= step) {
         colCount = 0;
         for (x = -radius; x <= radius; x += step) {
-            positions->x = x;
-            positions->y = zero;
-            positions->z = z;
-            positions++;
-            normals->x = zero;
-            normals->y = normalY;
-            normals->z = zero;
-            normals++;
-            texCoords->x = static_cast<float>(colCount) * uvStep;
-            texCoords->y = static_cast<float>(rowCount) * uvStep;
-            texCoords++;
+            positions[vertexIndex].x = x;
+            positions[vertexIndex].y = zero;
+            positions[vertexIndex].z = z;
+            normals[vertexIndex].x = zero;
+            normals[vertexIndex].y = normalY;
+            normals[vertexIndex].z = zero;
+            texCoords[vertexIndex].x = static_cast<float>(colCount) * uvStep;
+            texCoords[vertexIndex].y = static_cast<float>(rowCount) * uvStep;
+            vertexIndex++;
             colCount = colCount + 1;
         }
         rowCount = rowCount + 1;

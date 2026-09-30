@@ -3031,9 +3031,10 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
+    CMaterialSet* materialSet = ppvEnv->m_materialSetPtr;
     MaterialMan.LockEnv();
     MaterialMan.SetMaterialMenu(
-        ppvEnv->m_materialSetPtr,
+        materialSet,
         shape->m_entries[0].m_textureIndex, 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -3109,9 +3110,10 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
+    CMaterialSet* materialSet = ppvEnv->m_materialSetPtr;
     MaterialMan.LockEnv();
     MaterialMan.SetMaterialMenu(
-        ppvEnv->m_materialSetPtr,
+        materialSet,
         shape->m_entries[0].m_textureIndex, 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);

@@ -818,8 +818,7 @@ s32 fn_0200B614(void)
         fn_020038F4(36);
         fn_02003464(fn_0201A9DC(n + 6), 0);
         fn_020059D4(&tmp, row, 0);
-        p = buf;
-        for (i = 0; i < sizeof(buf) / sizeof(u16); i++)
+        for (i = 0, p = buf; i < sizeof(buf) / sizeof(u16); i++)
             buf[i] = 0x3FF;
         tile = tmp.unk14 * (row * 2) + 128;
         pal = 0x7000;

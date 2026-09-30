@@ -488,7 +488,8 @@ void fn_0200FFB0(void)
     for (i = 0; i < win->unkE; i++, y += 16) {
         id = lbl_03002CA0.unk5E[i];
         if (id >= 0) {
-            icon = fn_0201AB14(lbl_03002CA0.unk64[id]);
+            id = lbl_03002CA0.unk64[id];
+            icon = fn_0201AB14(id);
             pal = fn_02004030(0, icon);
             fn_02003C3C(x, y, 0, icon, pal, win->unk5, 0);
         }
@@ -498,7 +499,8 @@ void fn_0200FFB0(void)
         x = (win->unk10 + 2) * 8;
         y = (win->unk12 + 1) * 8;
         list = (s8 *)lbl_0203D800;
-        n = *list++ + 1;
+        n = *list++;
+        n++;
         for (i = 0; i < win->unkE; i++, y += 16) {
             idx = i + lbl_030027C6;
             if (idx == 0)
@@ -506,15 +508,17 @@ void fn_0200FFB0(void)
             if (idx >= n)
                 break;
             id = *(list + idx - 1);
-            icon = fn_0201AB14(lbl_03002CA0.unk64[id]);
+            id = lbl_03002CA0.unk64[id];
+            icon = fn_0201AB14(id);
             pal = fn_02004030(0, icon);
             fn_02003C3C(x, y, 0, icon, pal, win->unk5, 0);
         }
         x = (win->unk10 + 1) * 8;
         y = (win->unk12 + 1) * 8;
-        icon = 4;
         if ((lbl_03002C98 & 15) == 1)
             icon = 24;
+        else
+            icon = 4;
         pal = fn_02004030(2, icon);
         for (i = 0; i < win->unkE; i++, y += 16) {
             idx = i + lbl_030027C6;

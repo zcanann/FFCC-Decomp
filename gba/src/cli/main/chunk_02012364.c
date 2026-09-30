@@ -864,15 +864,17 @@ void fn_020134C8(s32 idx, s32 row, s32 n, s32 pal)
     s32 tile = idx * (n * 2) + 128;
     u16 *map;
     s32 i;
+    u16 *bot;
 
     pal <<= 12;
     for (i = 0; i < n; i++) {
         buf[i] = tile++ | pal;
         buf[i + 30] = tile++ | pal;
     }
+    bot = &buf[30];
     map = fn_02000A40(lbl_030030B0[0].unk5 - 1, 2, row * 2 + 1);
     DmaCopy16(DMA3, buf, map, n * 2);
-    DmaCopy16(DMA3, &buf[30], map + 32, n * 2);
+    DmaCopy16(DMA3, bot, map + 32, n * 2);
 }
 
 s32 fn_0201354C(s32 idx)

@@ -18,6 +18,8 @@
         DmaSet(dmaAddr, &tmp, dst, 0x85000000 | ((size) / 4)); \
     }
 
+#define DmaCopy16(dmaAddr, src, dst, size) DmaSet(dmaAddr, src, dst, 0x80000000 | ((size) >> 1))
+
 struct WinItem {
     s16 unk0;
     s16 unk2;
@@ -213,12 +215,14 @@ void fn_02019180(s32 idx, s32 pal)
     s32 j;
     s32 bg;
     s32 row;
+    u16 *map;
 
     if (lbl_03003090 == 2 && idx != 0)
         y++;
     w = lbl_030030B0[0].unk14 - 2;
     for (i = 0; i < 2; i++) {
-        t = (lbl_030030B0[0].unk14 << 1) * idx + 128 + i;
+        t = (lbl_030030B0[0].unk14 << 1) * idx + 128;
+        t += i;
         j = 0;
         bg = lbl_030030B0[0].unk5;
         row = y + i;
@@ -230,7 +234,8 @@ void fn_02019180(s32 idx, s32 pal)
                 t += 4;
             }
         }
-        DmaSet(DMA3, buf, fn_02000A40(bg, lbl_030030B0[0].unk10 + 1, row), 0x80000000 | w);
+        map = fn_02000A40(bg, lbl_030030B0[0].unk10 + 1, row);
+        DmaCopy16(DMA3, buf, map, w * 2);
     }
 }
 
@@ -852,8 +857,8 @@ void fn_0201A038(void)
     fn_020038F4(8);
     fn_02003464(buf, 1);
     fn_02003900(24);
-    i = lbl_03002840[lbl_03002848];
-    fn_02003464(fn_0201AAAC(i + 381), 0);
+    score = lbl_03002840[lbl_03002848];
+    fn_02003464(fn_0201AAAC(score + 381), 0);
     fn_020059D4(win, lbl_03002848, 0);
     i = lbl_03002848;
     if (i < win->unkE - 1) {
@@ -881,7 +886,9 @@ void fn_0201A100(s32 idx)
     map = fn_02000A40(win->unk5, win->unk10 + 1, y);
     attr = 3 << 12;
     for (i = 0; i < 2; i++) {
-        t = fn_02005A0C(0) + (win->unk14 << 1) * idx + i;
+        t = fn_02005A0C(0);
+        t += (win->unk14 << 1) * idx;
+        t += i;
         for (j = 0; j < w; j++) {
             if (j & 1) {
                 buf[j] = (t + 2) | attr;
@@ -890,7 +897,7 @@ void fn_0201A100(s32 idx)
                 buf[j] = attr | t;
             }
         }
-        DmaSet(DMA3, buf, map, 0x80000000 | w);
+        DmaCopy16(DMA3, buf, map, w * 2);
         map += 32;
     }
 }

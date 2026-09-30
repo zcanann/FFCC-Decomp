@@ -186,6 +186,10 @@ class Emitter:
     def expression(self, value: int, unit: str) -> Optional[str]:
         """Symbolic expression for an absolute pointer value, or None to emit it raw."""
         target = value & ~1
+        # A data symbol at exactly this (possibly odd) address.
+        for s in self.by_address.get(value, []):
+            if s.kind != "function" and not (s.local and self.unit_at(value) != unit):
+                return s.name
         # Local symbols are only visible inside their own unit.
         if self.unit_at(target) != unit and any(s.local for s in self.by_address.get(target, [])):
             return None
@@ -377,7 +381,7 @@ class Emitter:
 
     def pointer(self, value: int, unit: str, address: int) -> Optional[str]:
         a = self.a
-        if value in self.constants:
+        if value in self.constants or (value, unit) in self.constants:
             return None
         if a.contains(value & ~1):
             return self.expression(value, unit)
@@ -451,9 +455,12 @@ def main() -> None:
     constants = []
     if constants_path.is_file():
         for line in constants_path.read_text().splitlines():
-            line = line.split("#")[0].strip()
-            if line:
-                constants.append(int(line, 0))
+            fields = line.split("#")[0].split()
+            if len(fields) == 1:
+                constants.append(int(fields[0], 0))
+            elif len(fields) == 2:
+                # A constant only within one unit.
+                constants.append((int(fields[0], 0), fields[1]))
     emitter = Emitter(a, symbols, splits, constants)
     units = list(dict.fromkeys(s.unit for s in splits))
 

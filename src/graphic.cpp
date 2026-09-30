@@ -1067,16 +1067,16 @@ void CGraphic::makeSphere()
     GXBegin(GX_LINES, GX_VTXFMT0, 0xB0);
 
     int ring = 0;
-    int ringStart = 1;
+    vertexCount = 1;
     for (; ring < 5; ring++) {
-        int current = ringStart;
+        int current = vertexCount;
         for (int seg = 0; seg < 8; seg++) {
             GXPosition3f32(vertices[current][1], vertices[current][0], vertices[current][2]);
-            int next = ringStart + (seg + 1) % 8;
+            int next = vertexCount + (seg + 1) % 8;
             GXPosition3f32(vertices[next][1], vertices[next][0], vertices[next][2]);
             current++;
         }
-        ringStart += 8;
+        vertexCount += 8;
     }
 
     for (int seg = 0; seg < 8; seg++) {

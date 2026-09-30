@@ -573,8 +573,11 @@ int fn_020056A4(void)
                     lbl_03002ACC = 0;
                     lbl_03003090 = 3;
                 }
-            } else if (lbl_03003090 == 1 && ret > 0) {
-                lbl_03003090 = 2;
+            } else if (lbl_03003090 == 1) {
+                if (ret > 0)
+                    lbl_03003090 = 2;
+                else
+                    lbl_03003090 = 0;
             } else {
                 lbl_03003090 = 0;
             }

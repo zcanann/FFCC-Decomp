@@ -86,6 +86,7 @@ extern u32 lbl_03002AC8;
 extern u8 lbl_03002ACC;
 extern u16 lbl_03002AEC;
 extern u8 lbl_03002C98;
+extern char lbl_03002C9A[][18];
 extern struct Work lbl_03002CA0;
 extern s8 lbl_03003090;
 extern s8 lbl_03003098;
@@ -733,7 +734,7 @@ void fn_0200F0CC(void)
                 }
             }
         }
-        item = &lbl_0203D804[n];
+        item = lbl_0203D804 + n;
         if (item->flags & 0x100)
             fn_02003464(fn_0201A73C(16), 0);
         else if (item->flags & 0xE00)
@@ -913,7 +914,7 @@ void fn_0200F600(s32 idx)
             fn_020038F4(80);
         else
             fn_020038F4(56);
-        fn_02003464(lbl_03002CA0.names[idx - 1], 0);
+        fn_02003464(lbl_03002C9A[idx], 0);
     }
     fn_020037A8(fn_02009340(win, idx, 0), win->unk14);
 }

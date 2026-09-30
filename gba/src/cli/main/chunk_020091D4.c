@@ -705,22 +705,21 @@ void fn_02009D68(s32 bg, s32 idx)
 void fn_02009DA8(s32 bg, s32 idx)
 {
     u16 buf[30];
-    u16 fill;
     struct Window *win;
-    s32 old;
+    s32 val;
     u32 dst;
     s32 i;
 
-    fill = 0x2FF;
+    val = 0x2FF;
     if (bg <= 1)
-        fill = 0x3FF;
+        val = 0x3FF;
     for (i = 0; i < 30; i++)
-        buf[i] = fill;
+        buf[i] = val;
     win = &lbl_030030B0[idx];
-    old = win->unk5;
+    val = win->unk5;
     win->unk5 = bg;
     dst = fn_02000A40(bg, 0, 18);
-    win->unk5 = old;
+    win->unk5 = val;
     for (i = 0; i < 2; i++) {
         DmaCopy16(DMA0, buf, dst, 60);
         dst += 64;

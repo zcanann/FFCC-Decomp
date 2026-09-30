@@ -27,6 +27,19 @@ typedef char *va_list;
         dmaRegs[2]; \
     }
 
+#define DmaFill32(value, dst, cnt) \
+    { \
+        vu32 tmp = (vu32)(value); \
+        DmaCopy32(&tmp, dst, cnt); \
+    }
+
+#define DmaWait() \
+    { \
+        vu32 *dmaRegs = (vu32 *)0x040000D4; \
+        while (dmaRegs[2] & 0x80000000) \
+            ; \
+    }
+
 struct Work {
     u16 unk0;
     u16 unk2;
@@ -354,6 +367,7 @@ void fn_02000424(void)
 void fn_020004F4(void)
 {
     u8 line;
+    u32 vcount;
 
     switch (lbl_03005C5C) {
     case 0:
@@ -375,7 +389,8 @@ void fn_020004F4(void)
             REG_DISPCNT |= 0x400;
         }
         lbl_03005C5C = 2;
-        REG_VCOUNT_SET = REG_VCOUNT + 6;
+        vcount = REG_VCOUNT;
+        REG_VCOUNT_SET = vcount + 6;
         break;
     case 2:
         REG_DISPCNT &= ~0x200;
@@ -398,42 +413,15 @@ void fn_020005DC(void)
 
 void fn_020005E0(struct Work *work)
 {
-    vu32 fill;
-    vu32 *dma;
-
     RegisterRamReset(0xC2);
-    fill = 0;
-    dma = (vu32 *)0x040000D4;
-    dma[0] = (u32)&fill;
-    dma[1] = 0x03000000;
-    dma[2] = 0x85001F80;
-    dma[2];
+    DmaFill32(0, 0x03000000, 0x85001F80);
     REG_WAITCNT = 0x4014;
-    fill = 0;
-    dma[0] = (u32)&fill;
-    dma[1] = 0x06000000;
-    dma[2] = 0x85006000;
-    dma[2];
-    fill = 0xA0;
-    dma[0] = (u32)&fill;
-    dma[1] = 0x07000000;
-    dma[2] = 0x85000100;
-    dma[2];
-    fill = 0;
-    dma[0] = (u32)&fill;
-    dma[1] = 0x05000000;
-    dma[2] = 0x85000100;
-    dma[2];
-    dma[0] = (u32)intr_main;
-    dma[1] = (u32)lbl_03000048;
-    dma[2] = 0x84000080;
-    dma[2];
+    DmaFill32(0, 0x06000000, 0x85006000);
+    DmaFill32(0xA0, 0x07000000, 0x85000100);
+    DmaFill32(0, 0x05000000, 0x85000100);
+    DmaCopy32(intr_main, lbl_03000048, 0x84000080);
     INTR_VECTOR = lbl_03000048;
-    fill = 0xA0;
-    dma[0] = (u32)&fill;
-    dma[1] = (u32)lbl_03004C48;
-    dma[2] = 0x85000100;
-    dma[2];
+    DmaFill32(0xA0, lbl_03004C48, 0x85000100);
     *(vu16 *)0x04000010 = 0;
     *(vu16 *)0x04000012 = 0;
     *(vu16 *)0x04000014 = 0;
@@ -458,8 +446,7 @@ void fn_020005E0(struct Work *work)
     work->unk38 = work->unk39 = work->unk3A = work->unk3B = 0;
     lbl_03005C68 = 0;
     lbl_03005C6C = 0;
-    while (dma[2] & 0x80000000)
-        ;
+    DmaWait();
     fn_0200731C(10000);
     fn_02006F0C(lbl_0202BB94);
     fn_02002070();
@@ -1206,6 +1193,7 @@ void fn_020019C8(struct Work *work)
     struct Point num;
     struct Unk02010248 *data;
     s32 i;
+    s16 x;
 
     switch (work->unk4) {
     case 0:
@@ -1216,9 +1204,10 @@ void fn_020019C8(struct Work *work)
             SetPoint(&pos, 64, 64);
             fn_02004930(lbl_0202C618, 58, &pos, 0);
             for (i = 0; i <= 3; i++) {
+                x = 87;
                 pos.y = 55 + i * 32;
                 data = &lbl_02010248[i];
-                pos.x = 87;
+                pos.x = x;
                 fn_020019A0(&pos, data->unk10);
                 pos.x += 56;
                 fn_020019A0(&pos, data->unk11);

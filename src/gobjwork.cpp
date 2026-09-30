@@ -2468,11 +2468,12 @@ int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdL
 		short cmdId = m_commandListExtra[cmdListIdx];
 		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
 			firstCmdIdx = cmdListIdx;
+			SItemFlatRow* items = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 			int i = 0;
 			for (; groupedCount > 0; groupedCount--) {
 				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
 				short itemId = (short)m_inventoryItems[invSlot];
-				int itemType = GetItemDataPtr(itemId)->m_kind;
+				int itemType = items[itemId].m_kind;
 				if (itemType == 1) {
 					itemCmdListIdx = cmdListIdx + i;
 					return 1;

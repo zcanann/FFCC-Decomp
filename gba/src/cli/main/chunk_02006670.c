@@ -100,6 +100,7 @@ void fn_02006670(struct Window *win, s32 tile, s32 pal)
     s32 i;
     s32 t;
     s32 k;
+    s32 n;
     s32 odd;
     s32 attr;
     u16 *map;
@@ -143,13 +144,14 @@ void fn_02006670(struct Window *win, s32 tile, s32 pal)
             t = fn_02005A0C(win->unk6);
             if (lbl_03003094) {
                 odd = k & 1;
-                k >>= 1;
+                n = k >> 1;
             } else {
-                odd = ~k & 1;
-                k = (k - 1) >> 1;
+                odd = !(k & 1);
+                n = (k - 1) >> 1;
             }
-            t += win->unk14 * 2 * k + odd;
-            attr = win->items[k].unk0 ? 7 : 8;
+            t += win->unk14 * 2 * n;
+            t += odd;
+            attr = win->items[n].unk0 ? 7 : 8;
             attr <<= 12;
             for (i = 1; i < win->unk14 - 1; i++) {
                 if (i & 1) {
@@ -166,7 +168,7 @@ void fn_02006670(struct Window *win, s32 tile, s32 pal)
         }
     }
     if ((py >> 3) < win->unk12 + win->unk16 && win->unkA == 0) {
-        for (i = 0; i < win->unk14; i++) {
+        for (i = 0; i < win->unk14; i++, px += 8) {
             if (i == 0)
                 t = 6;
             else if (i + 1 >= win->unk14)
@@ -174,7 +176,6 @@ void fn_02006670(struct Window *win, s32 tile, s32 pal)
             else
                 t = 7;
             fn_02003C3C(px, py, 6, t, win->unk4, win->unk5 - 1, 0);
-            px += 8;
         }
     }
 }
@@ -189,7 +190,7 @@ void fn_02006920(struct Window *win, s32 tile, s32 pal)
     s32 n;
     s32 odd;
     s32 attr;
-    s8 hidden;
+    u8 hidden;
     u16 *map;
 
     px = win->unk10 * 8;
@@ -247,8 +248,9 @@ void fn_02006920(struct Window *win, s32 tile, s32 pal)
         n -= win->unk8;
         if (n > 0 && n <= win->unkE * 2) {
             t = fn_02005A0C(win->unk6);
-            odd = ~n & 1;
-            t += win->unk14 * 2 * ((n - 1) >> 1) + odd;
+            odd = !(n & 1);
+            t += win->unk14 * 2 * ((n - 1) >> 1);
+            t += odd;
             if (n <= 4)
                 attr = 7 << 12;
             else
@@ -296,6 +298,8 @@ void fn_02006BD4(struct Window *win, s32 tile, s32 pal)
     s32 i;
     s32 t;
     s32 k;
+    s32 odd;
+    s32 n;
     s32 attr;
     u16 *map;
 
@@ -307,7 +311,7 @@ void fn_02006BD4(struct Window *win, s32 tile, s32 pal)
     if (win->unk1 == 0) {
         for (i = 0; i < win->unk14; i++) {
             if (i == 0)
-                buf[i] = tile | pal;
+                buf[0] = pal | tile;
             else if (i != win->unk14 - 1) {
                 if (i & 1)
                     buf[i] = (tile + 1) | pal;
@@ -334,8 +338,11 @@ void fn_02006BD4(struct Window *win, s32 tile, s32 pal)
         if (k != 0) {
             t = fn_02005A0C(win->unk6);
             py = y + 8;
-            t += win->unk14 * 2 * ((k - 1) >> 1) + (~k & 1);
-            attr = fn_020059EC(win->items[(k - 1) >> 1].unk0, win->unk6);
+            odd = !(k & 1);
+            n = (k - 1) >> 1;
+            t += win->unk14 * 2 * n;
+            t += odd;
+            attr = fn_020059EC(win->items[n].unk0, win->unk6);
             for (i = 1; i < win->unk14 - 1; i++) {
                 if (i & 1) {
                     buf[i] = attr | t;
@@ -354,7 +361,8 @@ void fn_02006BD4(struct Window *win, s32 tile, s32 pal)
             map = fn_02000A40(win->unk5, win->unk10, py >> 3);
             DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
             py += 8;
-            if (py >= (win->unk12 + win->unk16) * 8 - 8) {
+            n = (win->unk16 + win->unk12) * 8 - 8;
+            if (py >= n) {
                 for (i = 0; i < win->unk14; i++) {
                     if (i == 0)
                         buf[i] = (tile + 8) | pal;
@@ -372,15 +380,14 @@ void fn_02006BD4(struct Window *win, s32 tile, s32 pal)
         }
     }
     if ((py >> 3) - win->unk12 - 1 < win->unk16) {
-        for (i = 0; i < win->unk14; i++) {
+        for (i = 0; i < win->unk14; i++, px += 8) {
             if (i == 0)
-                t = 8;
+                n = 8;
             else if (i != win->unk14 - 1)
-                t = 10;
+                n = 10;
             else
-                t = 11;
-            fn_02003C3C(px, py, 8, t, win->unk4, win->unk5, 0);
-            px += 8;
+                n = 11;
+            fn_02003C3C(px, py, 8, n, win->unk4, win->unk5, 0);
         }
     }
 }
@@ -442,7 +449,7 @@ void fn_02006F30(struct Window *win, s32 tile, s32 pal)
         }
     }
     if ((py >> 3) < win->unk12 + win->unk16) {
-        for (i = 0; i < win->unk14; i++) {
+        for (i = 0; i < win->unk14; i++, px += 8) {
             if (i == 0)
                 t = 6;
             else if (i + 1 >= win->unk14)
@@ -450,7 +457,6 @@ void fn_02006F30(struct Window *win, s32 tile, s32 pal)
             else
                 t = 7;
             fn_02003C3C(px, py, 9, t, win->unk4, win->unk5 - 1, 0);
-            px += 8;
         }
     }
 }
@@ -499,7 +505,8 @@ void fn_02007150(struct Window *win, s32 tile, s32 pal)
             DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
         }
     } else {
-        k = (win->unk1 >> 3) - 1 - win->unk8;
+        k = (win->unk1 >> 3) - 1;
+        k -= win->unk8;
         attr = 3 << 12;
         if (k < 0) {
             for (i = 1; i < win->unk14 - 1; i++) {
@@ -546,7 +553,7 @@ void fn_02007150(struct Window *win, s32 tile, s32 pal)
         }
     }
     if ((py >> 3) - win->unk12 < win->unk16 - 1) {
-        for (i = 0; i < win->unk14; i++) {
+        for (i = 0; i < win->unk14; i++, px += 8) {
             if (i == 0)
                 t = 28;
             else if (i + 1 >= win->unk14)
@@ -554,7 +561,6 @@ void fn_02007150(struct Window *win, s32 tile, s32 pal)
             else
                 t = 29;
             fn_02003C3C(px, py, 10, t, win->unk4, win->unk5 - 1, 0);
-            px += 8;
         }
     }
 }
@@ -771,6 +777,8 @@ void fn_020079FC(struct Window *win, s32 tile, s32 pal)
     s32 i;
     s32 t;
     s32 k;
+    s32 odd;
+    s32 n;
     s32 attr;
     u32 flags;
     u16 *map;
@@ -805,12 +813,16 @@ void fn_020079FC(struct Window *win, s32 tile, s32 pal)
         map = fn_02000A40(win->unk5, win->unk10, win->unk12 + 1);
         DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
     } else {
-        k = (win->unk1 >> 3) - win->unk8;
+        k = win->unk1 >> 3;
+        k -= win->unk8;
         if (k != 0) {
             t = fn_02005A0C(win->unk6);
             py = y;
-            t += win->unk14 * 2 * ((k - 1) >> 1) + (~k & 1);
-            attr = fn_020059EC(win->items[(k - 1) >> 1].unk0, win->unk6);
+            odd = !(k & 1);
+            n = (k - 1) >> 1;
+            t += win->unk14 * 2 * n;
+            t += odd;
+            attr = fn_020059EC(win->items[n].unk0, win->unk6);
             for (i = 1; i < win->unk14 - 1; i++) {
                 if (i & 1) {
                     buf[i] = attr | t;
@@ -819,20 +831,21 @@ void fn_020079FC(struct Window *win, s32 tile, s32 pal)
                     t += 4;
                 }
             }
-            k = win->unk1 >> 3;
-            if (k == 1 || k == win->unk16 - 2)
+            n = win->unk1 >> 3;
+            if (n == 1 || n == win->unk16 - 2)
                 buf[0] = (tile + 3) | pal;
             else
                 buf[0] = (tile + 4) | pal;
             buf[win->unk14 - 1] = buf[0] | 0x400;
-            if (k >= win->unk16 - 2) {
+            if (n >= win->unk14 - 2) {
                 buf[0] |= 0x800;
                 buf[win->unk14 - 1] |= 0x800;
             }
             map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
             py += 8;
-            if (py >= (win->unk16 + win->unk12) * 8 - 8) {
+            n = (win->unk16 + win->unk12) * 8 - 8;
+            if (py >= n) {
                 for (i = 0; i < win->unk14; i++) {
                     if (i == 0 || i == win->unk14 - 1)
                         buf[i] = pal | tile;
@@ -853,14 +866,14 @@ void fn_020079FC(struct Window *win, s32 tile, s32 pal)
         for (i = 0; i < win->unk14; i++, px += 8) {
             flags = 0x20000000;
             if (i == 0 || i == win->unk14 - 1)
-                t = 0;
+                n = 0;
             else if (i == 1 || i == win->unk14 - 2)
-                t = 1;
+                n = 1;
             else
-                t = 2;
+                n = 2;
             if (i >= win->unk14 - 2)
                 flags |= 0x10000000;
-            fn_02003C3C(px, py, 17, t, win->unk4, win->unk5, flags);
+            fn_02003C3C(px, py, 17, n, win->unk4, win->unk5, flags);
         }
     }
 }
@@ -1199,9 +1212,8 @@ void fn_020086A8(struct Window *win)
     s32 top;
     s32 last;
     s32 i;
-    u16 tile;
+    s32 tile;
     u16 *map;
-    s32 frame;
 
     px = win->unk10 * 8;
     top = win->unk12;
@@ -1229,14 +1241,14 @@ void fn_020086A8(struct Window *win)
             py -= 8;
             for (i = 0; i < win->unk14; i++, px += 8) {
                 if (i == 0)
-                    frame = 9;
+                    tile = 9;
                 else if (i == win->unk14 - 2)
-                    frame = 11;
+                    tile = 11;
                 else if (i >= win->unk14 - 1)
-                    frame = 12;
+                    tile = 12;
                 else
-                    frame = 10;
-                fn_02003C3C(px, py, 7, frame, win->unk4, win->unk5 - 1, 0);
+                    tile = 10;
+                fn_02003C3C(px, py, 7, tile, win->unk4, win->unk5 - 1, 0);
             }
         }
     }
@@ -1250,9 +1262,8 @@ void fn_020087E8(struct Window *win)
     s32 top;
     s32 last;
     s32 i;
-    u16 tile;
+    s32 tile;
     u16 *map;
-    s32 frame;
 
     px = win->unk10 * 8;
     top = win->unk12;
@@ -1273,12 +1284,12 @@ void fn_020087E8(struct Window *win)
             py -= 8;
             for (i = 0; i < win->unk14; i++, px += 8) {
                 if (i == 0)
-                    frame = 8;
+                    tile = 8;
                 else if (i != win->unk14 - 1)
-                    frame = 10;
+                    tile = 10;
                 else
-                    frame = 11;
-                fn_02003C3C(px, py, 8, frame, win->unk4, win->unk5, 0);
+                    tile = 11;
+                fn_02003C3C(px, py, 8, tile, win->unk4, win->unk5, 0);
             }
         }
     }
@@ -1396,9 +1407,8 @@ void fn_02008B8C(struct Window *win)
     s32 top;
     s32 last;
     s32 i;
-    u16 tile;
+    s32 tile;
     u16 *map;
-    s32 frame;
 
     px = win->unk10 * 8;
     top = win->unk12;
@@ -1418,19 +1428,19 @@ void fn_02008B8C(struct Window *win)
             py -= 8;
             for (i = 0; i < win->unk14; i++, px += 8) {
                 if (i == 0)
-                    frame = 32;
+                    tile = 32;
                 else if (i == 1)
-                    frame = 33;
+                    tile = 33;
                 else if (i > 1 && i <= win->unk14 - 3) {
                     if (i & 2)
-                        frame = 34;
+                        tile = 34;
                     else
-                        frame = 35;
+                        tile = 35;
                 } else if (i == win->unk14 - 2)
-                    frame = 36;
+                    tile = 36;
                 else
-                    frame = 37;
-                fn_02003C3C(px, py, 11, frame, win->unk4, win->unk5, 0);
+                    tile = 37;
+                fn_02003C3C(px, py, 11, tile, win->unk4, win->unk5, 0);
             }
         }
     }
@@ -1444,9 +1454,8 @@ void fn_02008CC0(struct Window *win)
     s32 top;
     s32 last;
     s32 i;
-    u16 tile;
+    s32 tile;
     u16 *map;
-    s32 frame;
 
     px = win->unk10 * 8;
     top = win->unk12;
@@ -1467,12 +1476,12 @@ void fn_02008CC0(struct Window *win)
             py -= 8;
             for (i = 0; i < win->unk14; i++, px += 8) {
                 if (i == 0)
-                    frame = 8;
+                    tile = 8;
                 else if (i != win->unk14 - 1)
-                    frame = 10;
+                    tile = 10;
                 else
-                    frame = 11;
-                fn_02003C3C(px, py, 12, frame, win->unk4, win->unk5, 0);
+                    tile = 11;
+                fn_02003C3C(px, py, 12, tile, win->unk4, win->unk5, 0);
             }
         }
     }
@@ -1533,16 +1542,15 @@ void fn_02008E88(s32 prio, s32 x, s32 y, s32 n, s32 offset, s32 mode)
     else
         id = 18;
     for (i = 0; i < n; i++, px += 8) {
-        s32 k = i;
-
+        x = i;
         if (i <= 2)
             frame = i;
         else if (i >= n - 3)
             frame = 7 - (n - i);
         else
             frame = 3;
-        fn_02003C3C(px, y, id, frame, 0, prio, k);
-        fn_02003C3C(px, y + 16, id, frame + 7, 0, prio, k);
+        fn_02003C3C(px, y, id, frame, 0, prio, x);
+        fn_02003C3C(px, y + 16, id, frame + 7, 0, prio, x);
     }
 }
 

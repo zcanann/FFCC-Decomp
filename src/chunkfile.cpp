@@ -4,20 +4,28 @@
 
 /*
  * --INFO--
- * PAL Address: 0x800128F8
- * PAL Size: 20b
- * EN Address: 0x800128D8
- * EN Size: 20b
+ * PAL Address: 0x80012BA8
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CChunkFile::Get4()
+CChunkFile::CChunkFile()
 {
-    unsigned int* value = (unsigned int*)m_cursor;
-
-    m_cursor += sizeof(unsigned int);
-
-    return *value;
+}
+/*
+ * --INFO--
+ * PAL Address: 0x80012B7C
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CChunkFile::CChunkFile(void* filePtr)
+{
+    SetBuf(filePtr);
 }
 
 /*
@@ -44,30 +52,12 @@ void CChunkFile::SetBuf(void* filePtr)
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
- */
-CChunkFile::CChunkFile()
-{
-}
-/*
- * --INFO--
- * PAL Address: 0x80012B7C
- * PAL Size: 44b
+ * PAL Address: 0x80012ABC
+ * PAL Size: 148b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
- */
-CChunkFile::CChunkFile(void* filePtr)
-{
-    SetBuf(filePtr);
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
  */
 void CChunkFile::PushChunk()
 {
@@ -85,8 +75,12 @@ void CChunkFile::PushChunk()
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x80012A48
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChunkFile::PopChunk()
 {
@@ -137,8 +131,12 @@ int CChunkFile::GetNextChunk(CChunk& outChunk)
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x80012980
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned char* CChunkFile::GetAddress()
 {
@@ -147,8 +145,12 @@ unsigned char* CChunkFile::GetAddress()
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x80012934
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChunkFile::Get(void* dest, long size)
 {
@@ -158,8 +160,12 @@ void CChunkFile::Get(void* dest, long size)
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x80012920
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned char CChunkFile::Get1()
 {
@@ -172,8 +178,12 @@ unsigned char CChunkFile::Get1()
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x8001290C
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned short CChunkFile::Get2()
 {
@@ -186,8 +196,30 @@ unsigned short CChunkFile::Get2()
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x800128F8
+ * PAL Size: 20b
+ * EN Address: 0x800128D8
+ * EN Size: 20b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned int CChunkFile::Get4()
+{
+    unsigned int* value = (unsigned int*)m_cursor;
+
+    m_cursor += sizeof(unsigned int);
+
+    return *value;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800128D4
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 float CChunkFile::GetF4()
 {
@@ -202,8 +234,12 @@ float CChunkFile::GetF4()
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x800128B0
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 char* CChunkFile::GetString()
 {
@@ -234,8 +270,12 @@ inline void CChunkFile::Skip(unsigned long size)
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x80012880
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChunkFile::Align(unsigned long alignment)
 {

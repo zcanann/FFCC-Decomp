@@ -688,18 +688,17 @@ void SmithForge_ClearRows(void)
     u16 buf[2][30];
     struct Window *win = gWindows;
     s32 attr = 3 << 12;
-    s32 t = 0;
     s32 i;
     s32 size;
     u16 *map;
 
     for (i = 0; i < win->width; i++) {
         if (!(i & 1)) {
-            buf[0][i] = attr | t;
-            buf[1][i] = attr | (t + 1);
+            buf[0][i] = attr;
+            buf[1][i] = attr | 1;
         } else {
-            buf[0][i] = attr | 2 | t;
-            buf[1][i] = attr | 3 | t;
+            buf[0][i] = attr | 2;
+            buf[1][i] = attr | 3;
         }
     }
     map = Bg_GetMapPtr(win->bg, win->x + 1, win->y + 1);

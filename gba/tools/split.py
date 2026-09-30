@@ -152,10 +152,12 @@ def bootstrap(data: bytes) -> Tuple[List[Symbol], List[Split]]:
 
 
 class Emitter:
-    def __init__(self, a: Analysis, symbols: List[Symbol], splits: List[Split], constants=()):
+    def __init__(self, a: Analysis, symbols: List[Symbol], splits: List[Split], constants=(), references=None):
         self.a = a
         # Literal values that are plain numbers even though they fall inside the image.
         self.constants = set(constants)
+        # Pointer values with a fixed expression, such as a folded negative offset.
+        self.references = dict(references or {})
         self.symbols = symbols
         self.splits = splits
         self.addresses = [s.address for s in symbols]
@@ -383,6 +385,8 @@ class Emitter:
         a = self.a
         if value in self.constants or (value, unit) in self.constants:
             return None
+        if value in self.references:
+            return self.references[value]
         if a.contains(value & ~1):
             return self.expression(value, unit)
         for name, (lo, hi) in BSS_SECTIONS.items():
@@ -461,7 +465,14 @@ def main() -> None:
             elif len(fields) == 2:
                 # A constant only within one unit.
                 constants.append((int(fields[0], 0), fields[1]))
-    emitter = Emitter(a, symbols, splits, constants)
+    references_path = args.config / "references.txt"
+    references = {}
+    if references_path.is_file():
+        for line in references_path.read_text().splitlines():
+            fields = line.split("#")[0].split()
+            if len(fields) == 2:
+                references[int(fields[0], 0)] = fields[1]
+    emitter = Emitter(a, symbols, splits, constants, references)
     units = list(dict.fromkeys(s.unit for s in splits))
 
     if args.asm_dir:

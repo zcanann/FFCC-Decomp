@@ -307,7 +307,8 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             overrides = " ".join(f"--object {u}={bases[u]}" for u in sorted(complete))
             n.build(asm + [ldscript], "gba_split", _path(bins[category]),
                     implicit=split_deps + [_path(config_dir / "symbols.txt"), _path(config_dir / "splits.txt")]
-                    + ([_path(config_dir / "constants.txt")] if (config_dir / "constants.txt").is_file() else []),
+                    + [_path(config_dir / name) for name in ("constants.txt", "references.txt")
+                       if (config_dir / name).is_file()],
                     variables={"bin": _path(bins[category]), "config": _path(config_dir),
                                "asmdir": _path(out / "asm"), "ldscript": ldscript,
                                "objdir": _path(out / "obj"), "overrides": overrides})

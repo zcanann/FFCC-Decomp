@@ -445,9 +445,10 @@ void Window_DrawRow(s32 idx, s32 bg, s32 row, s32 y, s32 pal)
     s32 j;
     s32 tile;
     u32 dst;
+    s32 ty;
 
     pal <<= 12;
-    y = win->y + y * 2 + 1;
+    ty = win->y + 1 + y * 2;
     w = win->width - 2;
     for (i = 0; i <= 1; i++) {
         tile = Window_GetTextTile(win->slot);
@@ -461,7 +462,7 @@ void Window_DrawRow(s32 idx, s32 bg, s32 row, s32 y, s32 pal)
                 tile += 4;
             }
         }
-        dst = (u32)Bg_GetMapPtr(bg, win->x + 1, y + i);
+        dst = (u32)Bg_GetMapPtr(bg, win->x + 1, ty + i);
         DmaCopy16(3, buf, dst, w << 1);
     }
 }

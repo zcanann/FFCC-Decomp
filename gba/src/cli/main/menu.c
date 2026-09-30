@@ -104,15 +104,14 @@ void MenuScreen_DrawCursor(void)
     struct Window *win = gWindows;
     s32 x = (win->x - 1) * 8;
     s32 y;
-    s8 col;
-    s8 row;
+    u32 n;
 
-    col = win->cursor / 5;
-    if (col)
+    n = win->cursor / 5;
+    if ((s8)n)
         x += 104;
     y = (win->y + 1) * 8;
-    row = win->cursor % 5;
-    y += 24 * row;
+    n = (s8)(win->cursor % 5);
+    y += 24 * n;
     Obj_Draw(x, y, 0, 0x2D, pal, win->bg, 0);
 }
 

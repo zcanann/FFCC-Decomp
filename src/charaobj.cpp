@@ -415,8 +415,8 @@ inline int CGCharaObj::scCheckTime(CCombi2Set* set, CGCharaObj* first, CGCharaOb
  */
 int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 {
-	int combiIndex = 0;
 	int found = -1;
+	int combiIndex = 0;
 	int lastSlot = count - 1;
 	outFallback = 0;
 

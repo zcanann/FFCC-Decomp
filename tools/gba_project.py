@@ -122,6 +122,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
         n.rule("gba_cc", "$cc $cflags $in -o $out", description="AGBCC $out")
         n.rule("gba_ld", f"{prefix_str}ld{exe} -T $ldscript -o $out --no-warn-rwx-segments -Map $map",
                description="LINK $out")
+        n.rule("gba_ld_r", f"{prefix_str}ld{exe} -r -o $out $in", description="LINK $out")
         n.rule("gba_objcopy", f"{prefix_str}objcopy{exe} -O binary -j .text -j .rodata $in $out",
                description="OBJCOPY $out")
         n.rule("gba_sha1", f"$python {_path(tools / 'check_sha1.py')} $in $sha1 $out",
@@ -164,15 +165,26 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(old_agbcc), "cflags": "-O2"})
                 n.build(base, "gba_as", [asm, align], implicit=binutils_stamp)
                 return base
+            # A unit's source is <unit>.c, or a directory of C files linked together.
             source = src_dir / f"{unit}.c"
-            if not source.is_file():
+            files = sorted((src_dir / unit).glob("*.c")) if (src_dir / unit).is_dir() else []
+            if source.is_file():
+                files = [source]
+            if not files:
                 return None
-            pre = stem + ".i"
-            asm = stem + ".s"
-            n.build(pre, "gba_cpp", _path(source), implicit=binutils_stamp,
-                    variables={"cppflags": f"{CPPFLAGS} -iquote {_path(src_dir)}"})
-            n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(agbcc), "cflags": CFLAGS})
-            n.build(base, "gba_as", asm, implicit=binutils_stamp)
+            objects = []
+            for file in files:
+                file_stem = stem if file == source else _path(out / "src" / unit / file.stem)
+                pre = file_stem + ".i"
+                asm = file_stem + ".s"
+                obj = file_stem + ".o" if file != source else base
+                n.build(pre, "gba_cpp", _path(file), implicit=binutils_stamp,
+                        variables={"cppflags": f"{CPPFLAGS} -iquote {_path(file.parent)}"})
+                n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(agbcc), "cflags": CFLAGS})
+                n.build(obj, "gba_as", asm, implicit=binutils_stamp)
+                objects.append(obj)
+            if files != [source]:
+                n.build(base, "gba_ld_r", objects, implicit=binutils_stamp)
             return base
 
         split_deps = [_path(tools / "split.py"), _path(tools / "gbaanalysis.py")]
@@ -215,8 +227,9 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 if unit in bases:
                     objects.append(bases[unit])
                     unit_config["base_path"] = bases[unit]
-                    if not unit.startswith("libgcc/"):
-                        unit_config["metadata"]["source_path"] = _path(src_dir / f"{unit}.c")
+                    source = src_dir / f"{unit}.c"
+                    if source.is_file():
+                        unit_config["metadata"]["source_path"] = _path(source)
                 else:
                     unit_config["metadata"]["auto_generated"] = True
                 config.extra_objdiff_units.append(unit_config)
@@ -236,6 +249,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             config.reconfig_deps = (config.reconfig_deps or []) + [config_dir / "splits.txt"]
             if src_dir.is_dir():
                 config.reconfig_deps.append(src_dir)
+                config.reconfig_deps += [d for d in src_dir.iterdir() if d.is_dir()]
 
     config.subninjas.append(ninja_path)
     config.reconfig_deps = (config.reconfig_deps or []) + [Path(__file__)]

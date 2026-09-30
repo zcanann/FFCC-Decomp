@@ -885,7 +885,7 @@ void fn_0201A100(s32 idx)
     w = win->unk14 - 2;
     map = fn_02000A40(win->unk5, win->unk10 + 1, y);
     attr = 3 << 12;
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < 2; i++, map += 32) {
         t = fn_02005A0C(0);
         t += (win->unk14 << 1) * idx;
         t += i;
@@ -898,7 +898,6 @@ void fn_0201A100(s32 idx)
             }
         }
         DmaCopy16(DMA3, buf, map, w * 2);
-        map += 32;
     }
 }
 

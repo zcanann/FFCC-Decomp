@@ -580,11 +580,13 @@ s32 fn_0201027C(void)
 
 void fn_020102B0(s32 idx, s32 row)
 {
-    s32 n = lbl_0203D800[0] + 1;
-    struct Window *win = &lbl_030030B0[1];
+    struct Window *win;
+    u8 *list = lbl_0203D800;
+    s32 n = *list++ + 1;
     const char *str;
     s32 id;
 
+    win = &lbl_030030B0[1];
     fn_02003394(1, 0);
     fn_020033F4();
     fn_020038F4(24);
@@ -593,7 +595,8 @@ void fn_020102B0(s32 idx, s32 row)
     } else if (idx >= n) {
         str = fn_0201A73C(0);
     } else {
-        id = lbl_03002CA0.unk64[lbl_0203D800[idx]];
+        id = lbl_0203D800[idx];
+        id = lbl_03002CA0.unk64[id];
         if (id > 0)
             str = fn_0201AAAC(id);
         else
@@ -623,7 +626,8 @@ s32 fn_02010334(s32 idx)
     size = n + 1;
     if (size & 3)
         size = ((size >> 2) + 1) << 2;
-    item = (struct ItemInfo *)(lbl_0203D800 + size) + (idx - 1);
+    item = (struct ItemInfo *)(lbl_0203D800 + size);
+    item += idx - 1;
     if (!fn_02004DA0((u16 *)item))
         return 0;
     mask = 0x100;
@@ -748,7 +752,7 @@ void fn_020105BC(void)
     lbl_030030B0[2].unk10 = 11;
     lbl_030030B0[2].unk12 = 8;
     lbl_030030B0[2].unkE = 4;
-    lbl_030030B0[2].unk16 = 10;
+    lbl_030030B0[2].unk16 = lbl_030030B0[2].unkE * 2 + 2;
     lbl_030030B0[2].unk3 = 3;
     lbl_030030B0[2].unk4 = 0;
     lbl_030030B0[2].unk5 = 1;

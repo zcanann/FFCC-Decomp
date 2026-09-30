@@ -67,15 +67,6 @@ static inline void ReleaseRefNonNull(CRef* object)
     }
 }
 
-static inline void ReleaseRef(CRef* object)
-{
-    if (object == 0) {
-        return;
-    }
-
-    ReleaseRefNonNull(object);
-}
-
 static inline int HighestSetBit(unsigned int value)
 {
     for (int bit = 31; bit >= 0; bit--) {
@@ -3521,12 +3512,16 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                 material->SetTevBit(static_cast<CMaterialMan::TEV_BIT>(1));
             } else {
                 for (int i = 0; i < material->GetNumTexture(); i++) {
-                    ReleaseRef(material->m_textureData.m_textures[i]);
-                    material->m_textureData.m_textures[i] = 0;
+                    if (material->m_textureData.m_textures[i] != 0) {
+                        ReleaseRefNonNull(material->m_textureData.m_textures[i]);
+                        material->m_textureData.m_textures[i] = 0;
+                    }
 
+                    if (textureSet == 0) {
+                        continue;
+                    }
                     unsigned long textureIndex = static_cast<unsigned long>(material->m_textureIndices[i]);
-                    if ((textureSet != 0) &&
-                        (static_cast<long>(textureIndex) >= 0) &&
+                    if ((static_cast<long>(textureIndex) >= 0) &&
                         (textureIndex < static_cast<unsigned long>(textureSet->GetNumTexture()))) {
                         material->m_textureData.m_textures[i] =
                             textureSet->GetTexture(textureIndex);

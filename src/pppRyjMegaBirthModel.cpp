@@ -162,145 +162,457 @@ static inline signed char random_signed_byte_span(u8 span)
 
 /*
  * --INFO--
- * PAL Address: 0x80087ce8
- * PAL Size: 520b
+ * PAL Address: 0x800841e4
+ * PAL Size: 124b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyjMegaBirthModelOffsets* offsets)
+void pppRyjMegaBirthModelDes(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
 {
-    float posX;
-    float posY;
-    float posZ;
-    s8 hasRequiredMemory;
     VRyjMegaBirthModel* work =
         reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + GetRyjMegaBirthModelDataOffsets(offsets)->m_workOffset);
-    VColor* color =
-        reinterpret_cast<VColor*>(pObject->m_workArea + GetRyjMegaBirthModelDataOffsets(offsets)->m_colorOffset);
-    u8* payload = (u8*)params;
 
-    if (work->m_particleBlock == 0) {
-        work->m_numParticles = params->m_maxParticles;
-        work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc(
-            work->m_numParticles * 0xA0, ppvEnv->m_stagePtr,
-            const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x8D);
-        if (work->m_particleBlock != NULL) {
-            memset(work->m_particleBlock, 0, work->m_numParticles * 0xA0);
-        }
-
-        if (params->m_enableWorldMatrix != 0) {
-            work->m_worldMatrixBlock = (_PARTICLE_WMAT*)pppMemAlloc(
-                work->m_numParticles * sizeof(_PARTICLE_WMAT), ppvEnv->m_stagePtr,
-                const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x97);
-            if (work->m_worldMatrixBlock != NULL) {
-                memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(_PARTICLE_WMAT));
-            }
-        }
-
-        if (params->m_enableParticleColor != 0) {
-            work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
-                work->m_numParticles * sizeof(_PARTICLE_COLOR), ppvEnv->m_stagePtr,
-                const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0xA2);
-            if (work->m_colorBlock != NULL) {
-                memset(work->m_colorBlock, 0, work->m_numParticles * sizeof(_PARTICLE_COLOR));
-            }
-        }
-
-        work->m_accelerationAxis = params->m_accelerationAxis;
-        PSVECNormalize(&work->m_accelerationAxis, &work->m_accelerationAxis);
-
-        posX = *f32_at(pObject, 0x1C);
-        posY = *f32_at(pObject, 0x2C);
-        posZ = *f32_at(pObject, 0x3C);
-        work->m_previousPosition.x = posX;
-        work->m_previousPosition.y = posY;
-        work->m_previousPosition.z = posZ;
-        work->m_currentPosition.x = posX;
-        work->m_currentPosition.y = posY;
-        work->m_currentPosition.z = posZ;
+    if (work->m_particleBlock != 0) {
+        pppMemFree(work->m_particleBlock);
+        work->m_particleBlock = 0;
     }
 
-    if (work->m_particleBlock == 0) {
-        hasRequiredMemory = false;
-    } else if ((params->m_enableWorldMatrix != 0) && (work->m_worldMatrixBlock == 0)) {
-        hasRequiredMemory = false;
-    } else if ((params->m_enableParticleColor != 0) && (work->m_colorBlock == 0)) {
-        hasRequiredMemory = false;
-    } else {
-        hasRequiredMemory = true;
+    if (work->m_worldMatrixBlock != 0) {
+        pppMemFree(work->m_worldMatrixBlock);
+        work->m_worldMatrixBlock = 0;
     }
 
-    if (hasRequiredMemory) {
-        calc_particle(pObject, work, params, color);
+    if (work->m_colorBlock != 0) {
+        pppMemFree(work->m_colorBlock);
+        work->m_colorBlock = 0;
     }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80087bac
- * PAL Size: 316b
+ * PAL Address: 0x80084260
+ * PAL Size: 132b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirthModel* params, VColor* color)
+void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
 {
-    _PARTICLE_DATA* particleData;
-    _PARTICLE_WMAT* particleWMat;
-    _PARTICLE_COLOR* particleColor;
-    s32 maxParticles;
-    s32 emitted;
-    s32 i;
-    u8* payload;
-    u16* emitTimer;
+    VRyjMegaBirthModel* work =
+        reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + GetRyjMegaBirthModelDataOffsets(offsets)->m_workOffset);
+    float value1;
+    float value0;
 
-    emitted = 0;
-    payload = (u8*)params;
-    particleData = work->m_particleBlock;
-    particleWMat = work->m_worldMatrixBlock;
-    particleColor = work->m_colorBlock;
-    maxParticles = work->m_numParticles;
-    emitTimer = &work->m_emitTimer;
+    memset(&work->m_accelerationAxis, 0, sizeof(work->m_accelerationAxis));
+    work->m_particleBlock = 0;
+    value0 = kPppRyjMegaBirthSharedZero;
+    work->m_worldMatrixBlock = 0;
+    value1 = kPppRyjMegaBirthModelInitialY;
+    work->m_colorBlock = 0;
+    work->m_numParticles = 0;
+    work->m_emitTimer = 10000;
+    work->m_unused1E = 0;
+    work->m_previousPosition.x = value0;
+    work->m_previousPosition.y = value1;
+    work->m_previousPosition.z = value0;
+    work->m_currentPosition.x = value0;
+    work->m_currentPosition.y = value1;
+    work->m_currentPosition.z = value0;
+}
 
-    if (ppvUserStopPartF == 0) {
-        float posX = pObject->m_localMatrix.value[0][3];
-        float posY = pObject->m_localMatrix.value[1][3];
-        float posZ = pObject->m_localMatrix.value[2][3];
+/*
+ * --INFO--
+ * PAL Address: 0x800842e4
+ * PAL Size: 3896b
+ * EN Address: 0x80098294
+ * EN Size: 4168b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMegaBirthModel* params,
+                _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, pppFMATRIX& out, unsigned char copyOut)
+{
+    Mtx scale;
+    Vec sharedPos;
 
-        work->m_previousPosition = work->m_currentPosition;
-        work->m_currentPosition.x = posX;
-        work->m_currentPosition.y = posY;
-        work->m_currentPosition.z = posZ;
-        *emitTimer = *emitTimer + 1;
+    if (params->m_matrixMode != 0) {
+        pppCopyMatrix(mtxB, *(pppFMATRIX*)&particleData->m_matrix);
+    } else {
+        pppUnitMatrix(mtxB);
+        sharedPos.x = particleData->m_matrix[0][3];
+        sharedPos.y = particleData->m_matrix[1][3];
+        sharedPos.z = particleData->m_matrix[2][3];
+        mtxB.value[0][3] = sharedPos.x;
+        mtxB.value[1][3] = sharedPos.y;
+        mtxB.value[2][3] = sharedPos.z;
+    }
 
-        for (i = 0; i < maxParticles; i = i + 1) {
-            if (*(u16*)((u8*)particleData + 0x30) != 0) {
-                calc(pObject, work, params, particleData, color, particleColor);
-            } else {
-                if ((params->m_emitInterval <= *emitTimer) && (emitted < (s32)(u32)params->m_emitCount)) {
-                    birth(pObject, work, params, color, particleData, particleWMat, particleColor);
-                    emitted = emitted + 1;
-                }
-            }
+    if (*s32_at(particleData, 0x38) != 0 ||
+        *s32_at(particleData, 0x3C) != 0 ||
+        *s32_at(particleData, 0x40) != 0) {
+        Vec rot;
+        rot.x = (kPppRyjMegaBirthPi * (float)*s32_at(particleData, 0x38)) / kPppRyjMegaBirthAngleIndexScale;
+        rot.y = (kPppRyjMegaBirthPi * (float)*s32_at(particleData, 0x3C)) / kPppRyjMegaBirthAngleIndexScale;
+        rot.z = (kPppRyjMegaBirthPi * (float)*s32_at(particleData, 0x40)) / kPppRyjMegaBirthAngleIndexScale;
+        pppFMATRIX r;
+        pppUnitMatrix(r);
+        pppRotMatrix(r, r, rot);
+        pppMulMatrix(mtxB, mtxB, r);
+    }
 
-            if (particleWMat) {
-                particleWMat++;
-            }
-            if (particleColor) {
-                particleColor = particleColor + 1;
-            }
-            particleData = (_PARTICLE_DATA*)((u8*)particleData + 0xA0);
+    PSMTXScale(scale, *f32_at(particleData, 0x5C), *f32_at(particleData, 0x60), *f32_at(particleData, 0x64));
+    pppMulMatrix(mtxB, mtxB, *(pppFMATRIX*)&scale);
+    pppCopyMatrix(*(pppFMATRIX*)&g_matKeep, mtxB);
+
+    switch (params->m_spawnMode) {
+    default:
+        if (particleWMat == NULL) {
+            pppMulMatrix(mtxB, pObject->m_localMatrix, mtxB);
+            pppMulMatrix(mtxB, ppvMng->m_matrix, mtxB);
+            pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix, mtxB);
+            pppCopyMatrix(pObject->m_drawMatrix, mtxB);
+        } else {
+            pppMulMatrix(mtxB, pObject->m_localMatrix, mtxB);
+            pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, mtxB);
+            pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix, mtxB);
+            pppCopyMatrix(pObject->m_drawMatrix, mtxB);
         }
-
-        if (emitted > 0) {
-            *emitTimer = 0;
+        if (copyOut != 0) {
+            pppCopyMatrix(out, mtxB);
         }
+        break;
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 9: {
+        Vec transformedPos;
+
+        sharedPos.x = mtxB.value[0][3];
+        sharedPos.y = mtxB.value[1][3];
+        sharedPos.z = mtxB.value[2][3];
+        pppApplyMatrix(transformedPos, mtxA, sharedPos);
+
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvWorldMatrixWood, mtxB);
+        mtxB.value[0][3] = transformedPos.x;
+        mtxB.value[1][3] = transformedPos.y;
+        mtxB.value[2][3] = transformedPos.z;
+        if (copyOut != 0) {
+            pppCopyMatrix(out, mtxB);
+        }
+        break;
+    }
+    }
+
+    if (params->m_matrixFinalizeMode != 0) {
+        Vec objectPos;
+        Vec endPos;
+
+        endPos.x = mtxB.value[0][3];
+        endPos.y = mtxB.value[1][3];
+        endPos.z = mtxB.value[2][3];
+
+        objectPos.x = pObject->m_localMatrix.value[0][3];
+        objectPos.y = pObject->m_localMatrix.value[1][3];
+        objectPos.z = pObject->m_localMatrix.value[2][3];
+        pppAddVector(endPos, endPos, objectPos);
+
+        pppUnitMatrix(mtxB);
+        PSMTXScaleApply(mtxB.value, pObject->m_drawMatrix.value,
+                        mtxB.value[0][0] * *f32_at(particleData, 0x5C) * ppvMng->m_scale.x,
+                        mtxB.value[1][1] * *f32_at(particleData, 0x60) * ppvMng->m_scale.y,
+                        mtxB.value[2][2] * *f32_at(particleData, 0x64) * ppvMng->m_scale.z);
+        PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
+
+        pppFMATRIX rot;
+
+        PSMTXRotRad(rot.value, 'z', kPppRyjMegaBirthModelDegToRad * (float)*s32_at(particleData, 0x40));
+        pppMulMatrix(pObject->m_drawMatrix, rot, pObject->m_drawMatrix);
+
+        pObject->m_drawMatrix.value[0][3] = endPos.x;
+        pObject->m_drawMatrix.value[1][3] = endPos.y;
+        pObject->m_drawMatrix.value[2][3] = endPos.z;
     }
 }
 
+static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* params, _PARTICLE_WMAT* worldMatrixBlock)
+{
+    pppUnitMatrix(out);
+    switch (params->m_spawnMode) {
+    default:
+        if (worldMatrixBlock == NULL) {
+            pppMulMatrix(out, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
+        }
+        break;
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 9:
+        pppMulMatrix(out, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
+        break;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8008521c
+ * PAL Size: 2076b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _pppCtrlTable* ctrlTable)
+{
+    PRyjMegaBirthModel* params = (PRyjMegaBirthModel*)stepData;
+    RyjMegaBirthModelDataOffsets* offsets = GetRyjMegaBirthModelDataOffsets(ctrlTable);
+    VRyjMegaBirthModel* work =
+        (VRyjMegaBirthModel*)(obj->m_workArea + offsets->m_workOffset);
+    VColor* baseColor = (VColor*)(obj->m_workArea + offsets->m_colorOffset);
+    _PARTICLE_DATA* particle = work->m_particleBlock;
+    s32 numParticles = work->m_numParticles;
+    _PARTICLE_WMAT* particleWorldMatrix = work->m_worldMatrixBlock;
+    _PARTICLE_COLOR* particleColor = work->m_colorBlock;
+    s8 hasRequiredMemory;
+
+    if (particle == NULL) {
+        hasRequiredMemory = 0;
+    } else if ((params->m_enableWorldMatrix != 0) && (particleWorldMatrix == NULL)) {
+        hasRequiredMemory = 0;
+    } else if ((params->m_enableParticleColor != 0) && (particleColor == NULL)) {
+        hasRequiredMemory = 0;
+    } else {
+        hasRequiredMemory = 1;
+    }
+
+    if (!hasRequiredMemory) {
+        return;
+    }
+
+    int modelIndex = params->m_modelIndex;
+    if (modelIndex == 0xFFFF) {
+        return;
+    }
+
+    pppFMATRIX emitterMatrix;
+    pppFMATRIX scratchMatrix;
+
+    init_matrix(obj, emitterMatrix, params, particleWorldMatrix);
+
+    int baseRed = baseColor->m_color.rgba[0];
+    int baseGreen = baseColor->m_color.rgba[1];
+    int baseBlue = baseColor->m_color.rgba[2];
+    int baseAlpha = baseColor->m_color.rgba[3];
+
+    for (int i = 0; i < numParticles; i++) {
+        if (*u16_at(particle, 0x30) != 0) {
+
+        pppFMATRIX drawMatrix;
+
+        pppUnitMatrix(scratchMatrix);
+        set_matrix(obj, emitterMatrix, scratchMatrix, params, particle, particleWorldMatrix, drawMatrix, params->m_useEnvDepth);
+
+        int red = baseRed + (int)*(s8*)((u8*)particle + 0x32);
+        int green = baseGreen + (int)*(s8*)((u8*)particle + 0x33);
+        int blue = baseBlue + (int)*(s8*)((u8*)particle + 0x34);
+        int alpha = (int)((float)baseAlpha + (float)(int)*(s8*)((u8*)particle + 0x35) - *f32_at(particle, 0x98));
+
+        if (particleColor) {
+            red += (int)particleColor->m_color[0];
+            green += (int)particleColor->m_color[1];
+            blue += (int)particleColor->m_color[2];
+            alpha += (int)particleColor->m_color[3];
+        }
+
+        if (red < 0) {
+            red = 0;
+        } else if (red > 0xFF) {
+            red = 0xFF;
+        }
+        if (green < 0) {
+            green = 0;
+        } else if (green > 0xFF) {
+            green = 0xFF;
+        }
+        if (blue < 0) {
+            blue = 0;
+        } else if (blue > 0xFF) {
+            blue = 0xFF;
+        }
+        if (alpha < 0) {
+            alpha = 0;
+        } else if (alpha > 0x7F) {
+            alpha = 0x7F;
+        }
+        pppCVECTOR drawColor;
+        drawColor.rgba[0] = (u8)red;
+        drawColor.rgba[1] = (u8)green;
+        drawColor.rgba[2] = (u8)blue;
+        drawColor.rgba[3] = (u8)alpha;
+
+        GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)drawColor.rgba);
+
+        pppCopyMatrix(*(pppFMATRIX*)&g_matTmp, obj->m_localMatrix);
+        pppMulMatrix(obj->m_localMatrix, obj->m_localMatrix, *(pppFMATRIX*)&g_matKeep);
+
+        pppSetDrawEnv(&drawColor, &obj->m_drawMatrix,
+                      params->m_useEnvDepth != 0 ? params->m_drawDepth : kPppRyjMegaBirthSharedZero,
+                      params->m_lightTarget, params->m_fogIndex, params->m_blendMode, params->m_cullMode,
+                      params->m_zEnable, 1, 0);
+        MaterialMan.SetTexScroll(*f32_at(particle, 0x88) + *f32_at(particle, 0x90),
+                                 *f32_at(particle, 0x8C) + *f32_at(particle, 0x94),
+                                 kPppRyjMegaBirthSharedZero, kPppRyjMegaBirthSharedZero);
+        pppSetBlendMode(params->m_blendMode);
+        pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[params->m_modelIndex], obj->m_drawMatrixPtr, 1);
+        pppCopyMatrix(obj->m_localMatrix, *(pppFMATRIX*)&g_matTmp);
+
+        }
+
+        if (particleWorldMatrix != NULL) {
+            particleWorldMatrix++;
+        }
+        if (particleColor) {
+            particleColor++;
+        }
+        particle = (_PARTICLE_DATA*)((u8*)particle + 0xA0);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80085a38
+ * PAL Size: 1432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
+          PRyjMegaBirthModel* pRyjMegaBirthModel, _PARTICLE_DATA* particleData,
+          VColor* vColor, _PARTICLE_COLOR* particleColor)
+{
+    (void)pppPObject;
+
+    int alpha = vColor->m_color.rgba[3];
+    u8* payload = (u8*)pRyjMegaBirthModel;
+    u8* p = (u8*)particleData;
+    Vec direction;
+    Vec position;
+    Vec step;
+
+    if (particleColor) {
+        particleColor->m_color[0] = particleColor->m_color[0] + particleColor->m_colorFrameDeltas[0];
+        particleColor->m_color[1] = particleColor->m_color[1] + particleColor->m_colorFrameDeltas[1];
+        particleColor->m_color[2] = particleColor->m_color[2] + particleColor->m_colorFrameDeltas[2];
+        particleColor->m_color[3] = particleColor->m_color[3] + particleColor->m_colorFrameDeltas[3];
+        particleColor->m_colorFrameDeltas[0] = particleColor->m_colorFrameDeltas[0] + pRyjMegaBirthModel->m_colorDeltaAdds[0];
+        particleColor->m_colorFrameDeltas[1] = particleColor->m_colorFrameDeltas[1] + pRyjMegaBirthModel->m_colorDeltaAdds[1];
+        particleColor->m_colorFrameDeltas[2] = particleColor->m_colorFrameDeltas[2] + pRyjMegaBirthModel->m_colorDeltaAdds[2];
+        particleColor->m_colorFrameDeltas[3] = particleColor->m_colorFrameDeltas[3] + pRyjMegaBirthModel->m_colorDeltaAdds[3];
+        alpha = (int)vColor->m_color.rgba[3] + (int)particleColor->m_color[3];
+        if (alpha > 0xFF) {
+            alpha = 0xFF;
+        }
+    }
+
+    *s32_at(p, 0x38) += *s32_at(p, 0x44);
+    *s32_at(p, 0x3C) += *s32_at(p, 0x48);
+    *s32_at(p, 0x40) += *s32_at(p, 0x4C);
+
+    if ((pRyjMegaBirthModel->m_scaleRandomFlags & 0x10) != 0) {
+        *s32_at(p, 0x44) += *s32_at(payload, 0x70) + *s32_at(p, 0x50);
+        *s32_at(p, 0x48) += *s32_at(payload, 0x74) + *s32_at(p, 0x54);
+        *s32_at(p, 0x4C) += *s32_at(payload, 0x78) + *s32_at(p, 0x58);
+    } else {
+        *s32_at(p, 0x44) += *s32_at(payload, 0x70);
+        *s32_at(p, 0x48) += *s32_at(payload, 0x74);
+        *s32_at(p, 0x4C) += *s32_at(payload, 0x78);
+    }
+
+    wrap_particle_rotation_triplet_s32(p, 0x38);
+
+    *f32_at(p, 0x5C) = *f32_at(p, 0x5C) + *f32_at(p, 0x68);
+    *f32_at(p, 0x60) = *f32_at(p, 0x60) + *f32_at(p, 0x6C);
+    *f32_at(p, 0x64) = *f32_at(p, 0x64) + *f32_at(p, 0x70);
+
+    if ((pRyjMegaBirthModel->m_rotationRandomFlags & 0x10) != 0) {
+        *f32_at(p, 0x68) += *(float*)(payload + 0xB0) + *f32_at(p, 0x74);
+        *f32_at(p, 0x6C) += *(float*)(payload + 0xB4) + *f32_at(p, 0x78);
+        *f32_at(p, 0x70) += *(float*)(payload + 0xB8) + *f32_at(p, 0x7C);
+    } else {
+        *f32_at(p, 0x68) += *(float*)(payload + 0xB0);
+        *f32_at(p, 0x6C) += *(float*)(payload + 0xB4);
+        *f32_at(p, 0x70) += *(float*)(payload + 0xB8);
+    }
+
+    *f32_at(p, 0x80) += pRyjMegaBirthModel->m_directionVelocityStep;
+    if (pRyjMegaBirthModel->m_clampDirectionalSpeed == 0) {
+        if ((kPppRyjMegaBirthSharedZero < pRyjMegaBirthModel->m_directionVelocityStart) &&
+            (pRyjMegaBirthModel->m_directionVelocityStep < kPppRyjMegaBirthSharedZero)) {
+            if (*f32_at(p, 0x80) < kPppRyjMegaBirthSharedZero) {
+                *f32_at(p, 0x80) = kPppRyjMegaBirthSharedZero;
+            }
+        } else {
+            if ((pRyjMegaBirthModel->m_directionVelocityStart < kPppRyjMegaBirthSharedZero) &&
+                (kPppRyjMegaBirthSharedZero < pRyjMegaBirthModel->m_directionVelocityStep) &&
+                (kPppRyjMegaBirthSharedZero < *f32_at(p, 0x80))) {
+                *f32_at(p, 0x80) = kPppRyjMegaBirthSharedZero;
+            }
+        }
+    }
+
+    *f32_at(p, 0x84) += pRyjMegaBirthModel->m_accelerationStep;
+    direction.x = particleData->m_matrix[0][1];
+    direction.y = particleData->m_matrix[1][1];
+    direction.z = particleData->m_matrix[2][1];
+    pppScaleVectorXYZ(step, direction, *f32_at(p, 0x80));
+    position.x = particleData->m_matrix[0][3];
+    position.y = particleData->m_matrix[1][3];
+    position.z = particleData->m_matrix[2][3];
+    pppAddVector(position, position, step);
+    pppScaleVectorXYZ(step, vRyjMegaBirthModel->m_accelerationAxis, *f32_at(p, 0x84));
+    pppAddVector(position, position, step);
+    particleData->m_matrix[0][3] = position.x;
+    particleData->m_matrix[1][3] = position.y;
+    particleData->m_matrix[2][3] = position.z;
+
+    *f32_at(p, 0x88) += *f32_at(p, 0x90);
+    *f32_at(p, 0x8C) += *f32_at(p, 0x94);
+    *f32_at(p, 0x90) += pRyjMegaBirthModel->m_texScrollUStepDelta;
+    *f32_at(p, 0x94) += pRyjMegaBirthModel->m_texScrollVStep;
+
+    if (pRyjMegaBirthModel->m_life != 0) {
+        *u16_at(p, 0x30) = *u16_at(p, 0x30) - 1;
+    }
+
+    *u8_at(p, 0x9c) = *u8_at(p, 0x9c) + 1;
+
+    if ((*u8_at(p, 0x9d) != 0) && (*u8_at(p, 0x9c) <= *u8_at(p, 0x9d))) {
+        float fadeAlpha = (float)alpha;
+        float fadeFrameCount = (float)(unsigned int)*u8_at(p, 0x9d);
+        float particleAlpha = *f32_at(p, 0x98);
+
+        *f32_at(p, 0x98) = particleAlpha - fadeAlpha / fadeFrameCount;
+    }
+
+    if ((*u8_at(p, 0x9e) != 0) && (*u16_at(p, 0x30) <= *u8_at(p, 0x9e))) {
+        float fadeAlpha = (float)alpha;
+        float fadeFrameCount = (float)(unsigned int)pRyjMegaBirthModel->m_fadeInFrames;
+        float particleAlpha = *f32_at(p, 0x98);
+
+        *f32_at(p, 0x98) = particleAlpha + fadeAlpha / fadeFrameCount;
+    }
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
 /*
  * --INFO--
  * PAL Address: 0x80085fd0
@@ -960,453 +1272,141 @@ join_position:
 
 /*
  * --INFO--
- * PAL Address: 0x80085a38
- * PAL Size: 1432b
+ * PAL Address: 0x80087bac
+ * PAL Size: 316b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
-          PRyjMegaBirthModel* pRyjMegaBirthModel, _PARTICLE_DATA* particleData,
-          VColor* vColor, _PARTICLE_COLOR* particleColor)
+void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirthModel* params, VColor* color)
 {
-    (void)pppPObject;
+    _PARTICLE_DATA* particleData;
+    _PARTICLE_WMAT* particleWMat;
+    _PARTICLE_COLOR* particleColor;
+    s32 maxParticles;
+    s32 emitted;
+    s32 i;
+    u8* payload;
+    u16* emitTimer;
 
-    int alpha = vColor->m_color.rgba[3];
-    u8* payload = (u8*)pRyjMegaBirthModel;
-    u8* p = (u8*)particleData;
-    Vec direction;
-    Vec position;
-    Vec step;
+    emitted = 0;
+    payload = (u8*)params;
+    particleData = work->m_particleBlock;
+    particleWMat = work->m_worldMatrixBlock;
+    particleColor = work->m_colorBlock;
+    maxParticles = work->m_numParticles;
+    emitTimer = &work->m_emitTimer;
 
-    if (particleColor) {
-        particleColor->m_color[0] = particleColor->m_color[0] + particleColor->m_colorFrameDeltas[0];
-        particleColor->m_color[1] = particleColor->m_color[1] + particleColor->m_colorFrameDeltas[1];
-        particleColor->m_color[2] = particleColor->m_color[2] + particleColor->m_colorFrameDeltas[2];
-        particleColor->m_color[3] = particleColor->m_color[3] + particleColor->m_colorFrameDeltas[3];
-        particleColor->m_colorFrameDeltas[0] = particleColor->m_colorFrameDeltas[0] + pRyjMegaBirthModel->m_colorDeltaAdds[0];
-        particleColor->m_colorFrameDeltas[1] = particleColor->m_colorFrameDeltas[1] + pRyjMegaBirthModel->m_colorDeltaAdds[1];
-        particleColor->m_colorFrameDeltas[2] = particleColor->m_colorFrameDeltas[2] + pRyjMegaBirthModel->m_colorDeltaAdds[2];
-        particleColor->m_colorFrameDeltas[3] = particleColor->m_colorFrameDeltas[3] + pRyjMegaBirthModel->m_colorDeltaAdds[3];
-        alpha = (int)vColor->m_color.rgba[3] + (int)particleColor->m_color[3];
-        if (alpha > 0xFF) {
-            alpha = 0xFF;
-        }
-    }
+    if (ppvUserStopPartF == 0) {
+        float posX = pObject->m_localMatrix.value[0][3];
+        float posY = pObject->m_localMatrix.value[1][3];
+        float posZ = pObject->m_localMatrix.value[2][3];
 
-    *s32_at(p, 0x38) += *s32_at(p, 0x44);
-    *s32_at(p, 0x3C) += *s32_at(p, 0x48);
-    *s32_at(p, 0x40) += *s32_at(p, 0x4C);
+        work->m_previousPosition = work->m_currentPosition;
+        work->m_currentPosition.x = posX;
+        work->m_currentPosition.y = posY;
+        work->m_currentPosition.z = posZ;
+        *emitTimer = *emitTimer + 1;
 
-    if ((pRyjMegaBirthModel->m_scaleRandomFlags & 0x10) != 0) {
-        *s32_at(p, 0x44) += *s32_at(payload, 0x70) + *s32_at(p, 0x50);
-        *s32_at(p, 0x48) += *s32_at(payload, 0x74) + *s32_at(p, 0x54);
-        *s32_at(p, 0x4C) += *s32_at(payload, 0x78) + *s32_at(p, 0x58);
-    } else {
-        *s32_at(p, 0x44) += *s32_at(payload, 0x70);
-        *s32_at(p, 0x48) += *s32_at(payload, 0x74);
-        *s32_at(p, 0x4C) += *s32_at(payload, 0x78);
-    }
-
-    wrap_particle_rotation_triplet_s32(p, 0x38);
-
-    *f32_at(p, 0x5C) = *f32_at(p, 0x5C) + *f32_at(p, 0x68);
-    *f32_at(p, 0x60) = *f32_at(p, 0x60) + *f32_at(p, 0x6C);
-    *f32_at(p, 0x64) = *f32_at(p, 0x64) + *f32_at(p, 0x70);
-
-    if ((pRyjMegaBirthModel->m_rotationRandomFlags & 0x10) != 0) {
-        *f32_at(p, 0x68) += *(float*)(payload + 0xB0) + *f32_at(p, 0x74);
-        *f32_at(p, 0x6C) += *(float*)(payload + 0xB4) + *f32_at(p, 0x78);
-        *f32_at(p, 0x70) += *(float*)(payload + 0xB8) + *f32_at(p, 0x7C);
-    } else {
-        *f32_at(p, 0x68) += *(float*)(payload + 0xB0);
-        *f32_at(p, 0x6C) += *(float*)(payload + 0xB4);
-        *f32_at(p, 0x70) += *(float*)(payload + 0xB8);
-    }
-
-    *f32_at(p, 0x80) += pRyjMegaBirthModel->m_directionVelocityStep;
-    if (pRyjMegaBirthModel->m_clampDirectionalSpeed == 0) {
-        if ((kPppRyjMegaBirthSharedZero < pRyjMegaBirthModel->m_directionVelocityStart) &&
-            (pRyjMegaBirthModel->m_directionVelocityStep < kPppRyjMegaBirthSharedZero)) {
-            if (*f32_at(p, 0x80) < kPppRyjMegaBirthSharedZero) {
-                *f32_at(p, 0x80) = kPppRyjMegaBirthSharedZero;
+        for (i = 0; i < maxParticles; i = i + 1) {
+            if (*(u16*)((u8*)particleData + 0x30) != 0) {
+                calc(pObject, work, params, particleData, color, particleColor);
+            } else {
+                if ((params->m_emitInterval <= *emitTimer) && (emitted < (s32)(u32)params->m_emitCount)) {
+                    birth(pObject, work, params, color, particleData, particleWMat, particleColor);
+                    emitted = emitted + 1;
+                }
             }
-        } else {
-            if ((pRyjMegaBirthModel->m_directionVelocityStart < kPppRyjMegaBirthSharedZero) &&
-                (kPppRyjMegaBirthSharedZero < pRyjMegaBirthModel->m_directionVelocityStep) &&
-                (kPppRyjMegaBirthSharedZero < *f32_at(p, 0x80))) {
-                *f32_at(p, 0x80) = kPppRyjMegaBirthSharedZero;
+
+            if (particleWMat) {
+                particleWMat++;
             }
+            if (particleColor) {
+                particleColor = particleColor + 1;
+            }
+            particleData = (_PARTICLE_DATA*)((u8*)particleData + 0xA0);
         }
-    }
 
-    *f32_at(p, 0x84) += pRyjMegaBirthModel->m_accelerationStep;
-    direction.x = particleData->m_matrix[0][1];
-    direction.y = particleData->m_matrix[1][1];
-    direction.z = particleData->m_matrix[2][1];
-    pppScaleVectorXYZ(step, direction, *f32_at(p, 0x80));
-    position.x = particleData->m_matrix[0][3];
-    position.y = particleData->m_matrix[1][3];
-    position.z = particleData->m_matrix[2][3];
-    pppAddVector(position, position, step);
-    pppScaleVectorXYZ(step, vRyjMegaBirthModel->m_accelerationAxis, *f32_at(p, 0x84));
-    pppAddVector(position, position, step);
-    particleData->m_matrix[0][3] = position.x;
-    particleData->m_matrix[1][3] = position.y;
-    particleData->m_matrix[2][3] = position.z;
-
-    *f32_at(p, 0x88) += *f32_at(p, 0x90);
-    *f32_at(p, 0x8C) += *f32_at(p, 0x94);
-    *f32_at(p, 0x90) += pRyjMegaBirthModel->m_texScrollUStepDelta;
-    *f32_at(p, 0x94) += pRyjMegaBirthModel->m_texScrollVStep;
-
-    if (pRyjMegaBirthModel->m_life != 0) {
-        *u16_at(p, 0x30) = *u16_at(p, 0x30) - 1;
-    }
-
-    *u8_at(p, 0x9c) = *u8_at(p, 0x9c) + 1;
-
-    if ((*u8_at(p, 0x9d) != 0) && (*u8_at(p, 0x9c) <= *u8_at(p, 0x9d))) {
-        float fadeAlpha = (float)alpha;
-        float fadeFrameCount = (float)(unsigned int)*u8_at(p, 0x9d);
-        float particleAlpha = *f32_at(p, 0x98);
-
-        *f32_at(p, 0x98) = particleAlpha - fadeAlpha / fadeFrameCount;
-    }
-
-    if ((*u8_at(p, 0x9e) != 0) && (*u16_at(p, 0x30) <= *u8_at(p, 0x9e))) {
-        float fadeAlpha = (float)alpha;
-        float fadeFrameCount = (float)(unsigned int)pRyjMegaBirthModel->m_fadeInFrames;
-        float particleAlpha = *f32_at(p, 0x98);
-
-        *f32_at(p, 0x98) = particleAlpha + fadeAlpha / fadeFrameCount;
+        if (emitted > 0) {
+            *emitTimer = 0;
+        }
     }
 }
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
- */
-static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* params, _PARTICLE_WMAT* worldMatrixBlock)
-{
-    pppUnitMatrix(out);
-    switch (params->m_spawnMode) {
-    default:
-        if (worldMatrixBlock == NULL) {
-            pppMulMatrix(out, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
-        }
-        break;
-    case 1:
-    case 3:
-    case 5:
-    case 7:
-    case 9:
-        pppMulMatrix(out, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
-        break;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8008521c
- * PAL Size: 2076b
+ * PAL Address: 0x80087ce8
+ * PAL Size: 520b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _pppCtrlTable* ctrlTable)
+void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyjMegaBirthModelOffsets* offsets)
 {
-    PRyjMegaBirthModel* params = (PRyjMegaBirthModel*)stepData;
-    RyjMegaBirthModelDataOffsets* offsets = GetRyjMegaBirthModelDataOffsets(ctrlTable);
-    VRyjMegaBirthModel* work =
-        (VRyjMegaBirthModel*)(obj->m_workArea + offsets->m_workOffset);
-    VColor* baseColor = (VColor*)(obj->m_workArea + offsets->m_colorOffset);
-    _PARTICLE_DATA* particle = work->m_particleBlock;
-    s32 numParticles = work->m_numParticles;
-    _PARTICLE_WMAT* particleWorldMatrix = work->m_worldMatrixBlock;
-    _PARTICLE_COLOR* particleColor = work->m_colorBlock;
+    float posX;
+    float posY;
+    float posZ;
     s8 hasRequiredMemory;
-
-    if (particle == NULL) {
-        hasRequiredMemory = 0;
-    } else if ((params->m_enableWorldMatrix != 0) && (particleWorldMatrix == NULL)) {
-        hasRequiredMemory = 0;
-    } else if ((params->m_enableParticleColor != 0) && (particleColor == NULL)) {
-        hasRequiredMemory = 0;
-    } else {
-        hasRequiredMemory = 1;
-    }
-
-    if (!hasRequiredMemory) {
-        return;
-    }
-
-    int modelIndex = params->m_modelIndex;
-    if (modelIndex == 0xFFFF) {
-        return;
-    }
-
-    pppFMATRIX emitterMatrix;
-    pppFMATRIX scratchMatrix;
-
-    init_matrix(obj, emitterMatrix, params, particleWorldMatrix);
-
-    int baseRed = baseColor->m_color.rgba[0];
-    int baseGreen = baseColor->m_color.rgba[1];
-    int baseBlue = baseColor->m_color.rgba[2];
-    int baseAlpha = baseColor->m_color.rgba[3];
-
-    for (int i = 0; i < numParticles; i++) {
-        if (*u16_at(particle, 0x30) != 0) {
-
-        pppFMATRIX drawMatrix;
-
-        pppUnitMatrix(scratchMatrix);
-        set_matrix(obj, emitterMatrix, scratchMatrix, params, particle, particleWorldMatrix, drawMatrix, params->m_useEnvDepth);
-
-        int red = baseRed + (int)*(s8*)((u8*)particle + 0x32);
-        int green = baseGreen + (int)*(s8*)((u8*)particle + 0x33);
-        int blue = baseBlue + (int)*(s8*)((u8*)particle + 0x34);
-        int alpha = (int)((float)baseAlpha + (float)(int)*(s8*)((u8*)particle + 0x35) - *f32_at(particle, 0x98));
-
-        if (particleColor) {
-            red += (int)particleColor->m_color[0];
-            green += (int)particleColor->m_color[1];
-            blue += (int)particleColor->m_color[2];
-            alpha += (int)particleColor->m_color[3];
-        }
-
-        if (red < 0) {
-            red = 0;
-        } else if (red > 0xFF) {
-            red = 0xFF;
-        }
-        if (green < 0) {
-            green = 0;
-        } else if (green > 0xFF) {
-            green = 0xFF;
-        }
-        if (blue < 0) {
-            blue = 0;
-        } else if (blue > 0xFF) {
-            blue = 0xFF;
-        }
-        if (alpha < 0) {
-            alpha = 0;
-        } else if (alpha > 0x7F) {
-            alpha = 0x7F;
-        }
-        pppCVECTOR drawColor;
-        drawColor.rgba[0] = (u8)red;
-        drawColor.rgba[1] = (u8)green;
-        drawColor.rgba[2] = (u8)blue;
-        drawColor.rgba[3] = (u8)alpha;
-
-        GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)drawColor.rgba);
-
-        pppCopyMatrix(*(pppFMATRIX*)&g_matTmp, obj->m_localMatrix);
-        pppMulMatrix(obj->m_localMatrix, obj->m_localMatrix, *(pppFMATRIX*)&g_matKeep);
-
-        pppSetDrawEnv(&drawColor, &obj->m_drawMatrix,
-                      params->m_useEnvDepth != 0 ? params->m_drawDepth : kPppRyjMegaBirthSharedZero,
-                      params->m_lightTarget, params->m_fogIndex, params->m_blendMode, params->m_cullMode,
-                      params->m_zEnable, 1, 0);
-        MaterialMan.SetTexScroll(*f32_at(particle, 0x88) + *f32_at(particle, 0x90),
-                                 *f32_at(particle, 0x8C) + *f32_at(particle, 0x94),
-                                 kPppRyjMegaBirthSharedZero, kPppRyjMegaBirthSharedZero);
-        pppSetBlendMode(params->m_blendMode);
-        pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[params->m_modelIndex], obj->m_drawMatrixPtr, 1);
-        pppCopyMatrix(obj->m_localMatrix, *(pppFMATRIX*)&g_matTmp);
-
-        }
-
-        if (particleWorldMatrix != NULL) {
-            particleWorldMatrix++;
-        }
-        if (particleColor) {
-            particleColor++;
-        }
-        particle = (_PARTICLE_DATA*)((u8*)particle + 0xA0);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800842e4
- * PAL Size: 3896b
- * EN Address: 0x80098294
- * EN Size: 4168b
- * JP Address: TODO
- * JP Size: TODO
- */
-void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMegaBirthModel* params,
-                _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, pppFMATRIX& out, unsigned char copyOut)
-{
-    Mtx scale;
-    Vec sharedPos;
-
-    if (params->m_matrixMode != 0) {
-        pppCopyMatrix(mtxB, *(pppFMATRIX*)&particleData->m_matrix);
-    } else {
-        pppUnitMatrix(mtxB);
-        sharedPos.x = particleData->m_matrix[0][3];
-        sharedPos.y = particleData->m_matrix[1][3];
-        sharedPos.z = particleData->m_matrix[2][3];
-        mtxB.value[0][3] = sharedPos.x;
-        mtxB.value[1][3] = sharedPos.y;
-        mtxB.value[2][3] = sharedPos.z;
-    }
-
-    if (*s32_at(particleData, 0x38) != 0 ||
-        *s32_at(particleData, 0x3C) != 0 ||
-        *s32_at(particleData, 0x40) != 0) {
-        Vec rot;
-        rot.x = (kPppRyjMegaBirthPi * (float)*s32_at(particleData, 0x38)) / kPppRyjMegaBirthAngleIndexScale;
-        rot.y = (kPppRyjMegaBirthPi * (float)*s32_at(particleData, 0x3C)) / kPppRyjMegaBirthAngleIndexScale;
-        rot.z = (kPppRyjMegaBirthPi * (float)*s32_at(particleData, 0x40)) / kPppRyjMegaBirthAngleIndexScale;
-        pppFMATRIX r;
-        pppUnitMatrix(r);
-        pppRotMatrix(r, r, rot);
-        pppMulMatrix(mtxB, mtxB, r);
-    }
-
-    PSMTXScale(scale, *f32_at(particleData, 0x5C), *f32_at(particleData, 0x60), *f32_at(particleData, 0x64));
-    pppMulMatrix(mtxB, mtxB, *(pppFMATRIX*)&scale);
-    pppCopyMatrix(*(pppFMATRIX*)&g_matKeep, mtxB);
-
-    switch (params->m_spawnMode) {
-    default:
-        if (particleWMat == NULL) {
-            pppMulMatrix(mtxB, pObject->m_localMatrix, mtxB);
-            pppMulMatrix(mtxB, ppvMng->m_matrix, mtxB);
-            pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix, mtxB);
-            pppCopyMatrix(pObject->m_drawMatrix, mtxB);
-        } else {
-            pppMulMatrix(mtxB, pObject->m_localMatrix, mtxB);
-            pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, mtxB);
-            pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix, mtxB);
-            pppCopyMatrix(pObject->m_drawMatrix, mtxB);
-        }
-        if (copyOut != 0) {
-            pppCopyMatrix(out, mtxB);
-        }
-        break;
-    case 1:
-    case 3:
-    case 5:
-    case 7:
-    case 9: {
-        Vec transformedPos;
-
-        sharedPos.x = mtxB.value[0][3];
-        sharedPos.y = mtxB.value[1][3];
-        sharedPos.z = mtxB.value[2][3];
-        pppApplyMatrix(transformedPos, mtxA, sharedPos);
-
-        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvWorldMatrixWood, mtxB);
-        mtxB.value[0][3] = transformedPos.x;
-        mtxB.value[1][3] = transformedPos.y;
-        mtxB.value[2][3] = transformedPos.z;
-        if (copyOut != 0) {
-            pppCopyMatrix(out, mtxB);
-        }
-        break;
-    }
-    }
-
-    if (params->m_matrixFinalizeMode != 0) {
-        Vec objectPos;
-        Vec endPos;
-
-        endPos.x = mtxB.value[0][3];
-        endPos.y = mtxB.value[1][3];
-        endPos.z = mtxB.value[2][3];
-
-        objectPos.x = pObject->m_localMatrix.value[0][3];
-        objectPos.y = pObject->m_localMatrix.value[1][3];
-        objectPos.z = pObject->m_localMatrix.value[2][3];
-        pppAddVector(endPos, endPos, objectPos);
-
-        pppUnitMatrix(mtxB);
-        PSMTXScaleApply(mtxB.value, pObject->m_drawMatrix.value,
-                        mtxB.value[0][0] * *f32_at(particleData, 0x5C) * ppvMng->m_scale.x,
-                        mtxB.value[1][1] * *f32_at(particleData, 0x60) * ppvMng->m_scale.y,
-                        mtxB.value[2][2] * *f32_at(particleData, 0x64) * ppvMng->m_scale.z);
-        PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
-
-        pppFMATRIX rot;
-
-        PSMTXRotRad(rot.value, 'z', kPppRyjMegaBirthModelDegToRad * (float)*s32_at(particleData, 0x40));
-        pppMulMatrix(pObject->m_drawMatrix, rot, pObject->m_drawMatrix);
-
-        pObject->m_drawMatrix.value[0][3] = endPos.x;
-        pObject->m_drawMatrix.value[1][3] = endPos.y;
-        pObject->m_drawMatrix.value[2][3] = endPos.z;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80084260
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
-{
     VRyjMegaBirthModel* work =
         reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + GetRyjMegaBirthModelDataOffsets(offsets)->m_workOffset);
-    float value1;
-    float value0;
+    VColor* color =
+        reinterpret_cast<VColor*>(pObject->m_workArea + GetRyjMegaBirthModelDataOffsets(offsets)->m_colorOffset);
+    u8* payload = (u8*)params;
 
-    memset(&work->m_accelerationAxis, 0, sizeof(work->m_accelerationAxis));
-    work->m_particleBlock = 0;
-    value0 = kPppRyjMegaBirthSharedZero;
-    work->m_worldMatrixBlock = 0;
-    value1 = kPppRyjMegaBirthModelInitialY;
-    work->m_colorBlock = 0;
-    work->m_numParticles = 0;
-    work->m_emitTimer = 10000;
-    work->m_unused1E = 0;
-    work->m_previousPosition.x = value0;
-    work->m_previousPosition.y = value1;
-    work->m_previousPosition.z = value0;
-    work->m_currentPosition.x = value0;
-    work->m_currentPosition.y = value1;
-    work->m_currentPosition.z = value0;
-}
+    if (work->m_particleBlock == 0) {
+        work->m_numParticles = params->m_maxParticles;
+        work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc(
+            work->m_numParticles * 0xA0, ppvEnv->m_stagePtr,
+            const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x8D);
+        if (work->m_particleBlock != NULL) {
+            memset(work->m_particleBlock, 0, work->m_numParticles * 0xA0);
+        }
 
-/*
- * --INFO--
- * PAL Address: 0x800841e4
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppRyjMegaBirthModelDes(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
-{
-    VRyjMegaBirthModel* work =
-        reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + GetRyjMegaBirthModelDataOffsets(offsets)->m_workOffset);
+        if (params->m_enableWorldMatrix != 0) {
+            work->m_worldMatrixBlock = (_PARTICLE_WMAT*)pppMemAlloc(
+                work->m_numParticles * sizeof(_PARTICLE_WMAT), ppvEnv->m_stagePtr,
+                const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x97);
+            if (work->m_worldMatrixBlock != NULL) {
+                memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(_PARTICLE_WMAT));
+            }
+        }
 
-    if (work->m_particleBlock != 0) {
-        pppMemFree(work->m_particleBlock);
-        work->m_particleBlock = 0;
+        if (params->m_enableParticleColor != 0) {
+            work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
+                work->m_numParticles * sizeof(_PARTICLE_COLOR), ppvEnv->m_stagePtr,
+                const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0xA2);
+            if (work->m_colorBlock != NULL) {
+                memset(work->m_colorBlock, 0, work->m_numParticles * sizeof(_PARTICLE_COLOR));
+            }
+        }
+
+        work->m_accelerationAxis = params->m_accelerationAxis;
+        PSVECNormalize(&work->m_accelerationAxis, &work->m_accelerationAxis);
+
+        posX = *f32_at(pObject, 0x1C);
+        posY = *f32_at(pObject, 0x2C);
+        posZ = *f32_at(pObject, 0x3C);
+        work->m_previousPosition.x = posX;
+        work->m_previousPosition.y = posY;
+        work->m_previousPosition.z = posZ;
+        work->m_currentPosition.x = posX;
+        work->m_currentPosition.y = posY;
+        work->m_currentPosition.z = posZ;
     }
 
-    if (work->m_worldMatrixBlock != 0) {
-        pppMemFree(work->m_worldMatrixBlock);
-        work->m_worldMatrixBlock = 0;
+    if (work->m_particleBlock == 0) {
+        hasRequiredMemory = false;
+    } else if ((params->m_enableWorldMatrix != 0) && (work->m_worldMatrixBlock == 0)) {
+        hasRequiredMemory = false;
+    } else if ((params->m_enableParticleColor != 0) && (work->m_colorBlock == 0)) {
+        hasRequiredMemory = false;
+    } else {
+        hasRequiredMemory = true;
     }
 
-    if (work->m_colorBlock != 0) {
-        pppMemFree(work->m_colorBlock);
-        work->m_colorBlock = 0;
+    if (hasRequiredMemory) {
+        calc_particle(pObject, work, params, color);
     }
 }

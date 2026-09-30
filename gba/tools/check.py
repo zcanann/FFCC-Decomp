@@ -67,6 +67,16 @@ def main():
 
     with tempfile.TemporaryDirectory() as tmp:
         obj = compile_c(source, Path(tmp))
+        # Units with several code ranges use per-range section names (.text.<addr>);
+        # objdiff pairs code by section name, so rename them to match the compiled object.
+        sections = subprocess.run([binutil("objdump"), "-h", str(target)], capture_output=True, text=True).stdout
+        renames = []
+        for name in re.findall(r"^\s*\d+\s+(\.text\.[0-9A-F]+)\s", sections, re.M):
+            renames += ["--rename-section", f"{name}=.text"]
+        if renames:
+            merged = Path(tmp) / "target.o"
+            subprocess.run([binutil("objcopy"), *renames, str(target), str(merged)], check=True)
+            target = merged
         names = [args.function] if args.function else defined_functions(obj)
         objdiff = str(TOOLS / f"objdiff-cli{EXE}")
         total = 0.0

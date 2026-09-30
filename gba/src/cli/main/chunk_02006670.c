@@ -12,6 +12,8 @@
         dmaRegs[2]; \
     }
 
+#define DmaCopy16(dmaAddr, src, dst, size) DmaSet(dmaAddr, src, dst, 0x80000000 | ((size) >> 1))
+
 struct Cmd {
     u8 unk[4];
 };
@@ -120,7 +122,7 @@ void fn_02006670(struct Window *win, s32 tile, s32 pal)
             buf[i] = t | pal;
         }
         map = fn_02000A40(win->unk5, win->unk10, win->unk12);
-        DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA0, buf, map, win->unk14 * 2);
     }
     if (lbl_03003094 || win->unk1) {
         if (win->unk1 && win->unkA == 0) {
@@ -136,7 +138,7 @@ void fn_02006670(struct Window *win, s32 tile, s32 pal)
                 buf[i] = t | pal;
             }
             map = fn_02000A40(win->unk5, win->unk10, (py - 8) >> 3);
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         }
         k = win->unk1 >> 3;
         k -= win->unk8;
@@ -164,7 +166,7 @@ void fn_02006670(struct Window *win, s32 tile, s32 pal)
             buf[0] = 0x3FF;
             buf[win->unk14 - 1] = 0x3FF;
             map = fn_02000A40(win->unk5 - 1, win->unk10, (py - 8) >> 3);
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         }
     }
     if ((py >> 3) < win->unk12 + win->unk16 && win->unkA == 0) {
@@ -190,15 +192,13 @@ void fn_02006920(struct Window *win, s32 tile, s32 pal)
     s32 n;
     s32 odd;
     s32 attr;
-    u8 hidden;
     u16 *map;
 
     px = win->unk10 * 8;
     py = win->unk12 * 8 + win->unk1 + 8;
     if ((py >> 3) > win->unk12 + win->unk16)
         return;
-    hidden = win->unkA;
-    if (win->unk1 == 0 && hidden == 0) {
+    if (win->unk1 == 0 && win->unkA == 0) {
         for (i = 0; i < win->unk14; i++) {
             if (i == 0)
                 t = tile;
@@ -211,7 +211,7 @@ void fn_02006920(struct Window *win, s32 tile, s32 pal)
             buf[i] = t | pal;
         }
         map = fn_02000A40(win->unk5, win->unk10, win->unk12);
-        DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA0, buf, map, win->unk14 * 2);
     } else {
         n = win->unk1 >> 3;
         for (i = 0; i < win->unk14; i++) {
@@ -241,9 +241,9 @@ void fn_02006920(struct Window *win, s32 tile, s32 pal)
             }
             buf[i] = t | pal;
         }
-        if (hidden == 0) {
+        if (win->unkA == 0) {
             map = fn_02000A40(win->unk5, win->unk10, (py - 8) >> 3);
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         }
         n -= win->unk8;
         if (n > 0 && n <= win->unkE * 2) {
@@ -271,7 +271,7 @@ void fn_02006920(struct Window *win, s32 tile, s32 pal)
                 buf[win->unk14 - 1] = 0x2FF;
             }
             map = fn_02000A40(win->unk5 - 1, win->unk10, (py - 8) >> 3);
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         }
     }
     if ((py >> 3) < win->unk12 + win->unk16 && win->unkA == 0) {
@@ -321,7 +321,7 @@ void fn_02006BD4(struct Window *win, s32 tile, s32 pal)
                 buf[i] = (tile + 3) | pal;
         }
         map = fn_02000A40(win->unk5, win->unk10, win->unk12);
-        DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         attr = fn_020059EC(win->items[0].unk0, win->unk6);
         for (i = 0; i < win->unk14; i++) {
             if (i & 1)
@@ -332,7 +332,7 @@ void fn_02006BD4(struct Window *win, s32 tile, s32 pal)
         buf[0] = pal | (tile + 4);
         buf[win->unk14 - 1] = pal | (tile + 5);
         map = fn_02000A40(win->unk5, win->unk10, win->unk12 + 1);
-        DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA0, buf, map, win->unk14 * 2);
     } else {
         k = win->unk1 >> 3;
         if (k != 0) {
@@ -359,7 +359,7 @@ void fn_02006BD4(struct Window *win, s32 tile, s32 pal)
                 buf[win->unk14 - 1] = (tile + 7) | pal;
             }
             map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            DmaCopy16(DMA3, buf, map, win->unk14 * 2);
             py += 8;
             n = (win->unk16 + win->unk12) * 8 - 8;
             if (py >= n) {
@@ -375,7 +375,7 @@ void fn_02006BD4(struct Window *win, s32 tile, s32 pal)
                         buf[i] = (tile + 11) | pal;
                 }
                 map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-                DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+                DmaCopy16(DMA3, buf, map, win->unk14 * 2);
             }
         }
     }
@@ -416,7 +416,7 @@ void fn_02006F30(struct Window *win, s32 tile, s32 pal)
             buf[i] = t | pal;
         }
         map = fn_02000A40(win->unk5, win->unk10, win->unk12);
-        DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA0, buf, map, win->unk14 * 2);
     }
     if (lbl_03003094 || win->unk1) {
         if (win->unk1) {
@@ -432,7 +432,7 @@ void fn_02006F30(struct Window *win, s32 tile, s32 pal)
                 buf[i] = t | pal;
             }
             map = fn_02000A40(win->unk5, win->unk10, (py - 8) >> 3);
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         }
         if ((py >> 3) - win->unk12 >= win->unk16 - 1) {
             for (i = 0; i < win->unk14; i++) {
@@ -445,7 +445,7 @@ void fn_02006F30(struct Window *win, s32 tile, s32 pal)
                 buf[i] = t | pal;
             }
             map = fn_02000A40(win->unk5, win->unk10, (py >> 3));
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         }
     }
     if ((py >> 3) < win->unk12 + win->unk16) {
@@ -502,7 +502,7 @@ void fn_02007150(struct Window *win, s32 tile, s32 pal)
                 buf[i] = (tile + t) | pal;
             }
             map = fn_02000A40(win->unk5, win->unk10, win->unk12 + j);
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         }
     } else {
         k = (win->unk1 >> 3) - 1;
@@ -537,7 +537,7 @@ void fn_02007150(struct Window *win, s32 tile, s32 pal)
             buf[win->unk14 - 1] = (tile + 27) | pal;
         }
         map = fn_02000A40(win->unk5, win->unk10, (y + 8) >> 3);
-        DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         if ((py >> 3) - win->unk12 >= win->unk16 - 1) {
             for (i = 0; i < win->unk14; i++) {
                 if (i == 0)
@@ -549,7 +549,7 @@ void fn_02007150(struct Window *win, s32 tile, s32 pal)
                 buf[i] = (tile + t) | pal;
             }
             map = fn_02000A40(win->unk5, win->unk10, (py >> 3));
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         }
     }
     if ((py >> 3) - win->unk12 < win->unk16 - 1) {
@@ -648,9 +648,9 @@ void fn_0200743C(struct Window *win, s32 tile, s32 pal)
         }
         map = fn_02000A40(win->unk5, win->unk10, y >> 3);
     }
-    DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+    DmaCopy16(DMA0, buf, map, win->unk14 * 2);
     if ((py >> 3) - win->unk12 < win->unk16) {
-        for (i = 0; i < win->unk14; i++) {
+        for (i = 0; i < win->unk14; i++, px += 8) {
             if (i == 0)
                 t = 32;
             else if (i == 1)
@@ -665,7 +665,6 @@ void fn_0200743C(struct Window *win, s32 tile, s32 pal)
             else
                 t = 37;
             fn_02003C3C(px, py, 11, t, win->unk4, win->unk5, 0);
-            px += 8;
         }
     }
 }
@@ -679,6 +678,8 @@ void fn_020076A4(struct Window *win, s32 tile, s32 pal)
     s32 i;
     s32 t;
     s32 k;
+    s32 odd;
+    s32 n;
     s32 attr;
     u16 *map;
 
@@ -690,7 +691,7 @@ void fn_020076A4(struct Window *win, s32 tile, s32 pal)
     if (win->unk1 == 0) {
         for (i = 0; i < win->unk14; i++) {
             if (i == 0)
-                buf[i] = tile | pal;
+                buf[i] = pal | tile;
             else if (i != win->unk14 - 1) {
                 if (i & 1)
                     buf[i] = (tile + 1) | pal;
@@ -700,8 +701,9 @@ void fn_020076A4(struct Window *win, s32 tile, s32 pal)
                 buf[i] = (tile + 3) | pal;
         }
         map = fn_02000A40(win->unk5, win->unk10, win->unk12);
-        DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
-        attr = (win->unk6 == 2 ? 5 : 6) << 12;
+        DmaCopy16(DMA0, buf, map, win->unk14 * 2);
+        attr = win->unk6 == 2 ? 5 : 6;
+        attr <<= 12;
         for (i = 0; i < win->unk14; i++) {
             if (i & 1)
                 buf[i] = (tile - 4) | attr;
@@ -711,14 +713,18 @@ void fn_020076A4(struct Window *win, s32 tile, s32 pal)
         buf[0] = pal | (tile + 4);
         buf[win->unk14 - 1] = pal | (tile + 5);
         map = fn_02000A40(win->unk5, win->unk10, win->unk12 + 1);
-        DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA0, buf, map, win->unk14 * 2);
     } else {
         k = win->unk1 >> 3;
         if (k != 0) {
             t = win->unk6 == 2 ? 0x238 : 0x29C;
             py = y;
-            t += win->unk14 * 2 * ((k - 1) >> 1) + (~k & 1);
-            attr = (win->unk6 == 2 ? 5 : 6) << 12;
+            odd = !(k & 1);
+            n = (k - 1) >> 1;
+            t += win->unk14 * 2 * n;
+            t += odd;
+            attr = win->unk6 == 2 ? 5 : 6;
+            attr <<= 12;
             for (i = 1; i < win->unk14 - 1; i++) {
                 if (i & 1) {
                     buf[i] = attr | t;
@@ -735,9 +741,9 @@ void fn_020076A4(struct Window *win, s32 tile, s32 pal)
                 buf[win->unk14 - 1] = (tile + 7) | pal;
             }
             map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            DmaCopy16(DMA3, buf, map, win->unk14 * 2);
             py += 8;
-            if (py >= (win->unk12 + win->unk16) * 8 - 8) {
+            if (py >= (win->unk16 + win->unk12) * 8 - 8) {
                 for (i = 0; i < win->unk14; i++) {
                     if (i == 0)
                         buf[i] = (tile + 8) | pal;
@@ -750,12 +756,12 @@ void fn_020076A4(struct Window *win, s32 tile, s32 pal)
                         buf[i] = (tile + 11) | pal;
                 }
                 map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-                DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+                DmaCopy16(DMA3, buf, map, win->unk14 * 2);
             }
         }
     }
     if ((py >> 3) - win->unk12 - 1 < win->unk16) {
-        for (i = 0; i < win->unk14; i++) {
+        for (i = 0; i < win->unk14; i++, px += 8) {
             if (i == 0)
                 t = 8;
             else if (i != win->unk14 - 1)
@@ -763,7 +769,6 @@ void fn_020076A4(struct Window *win, s32 tile, s32 pal)
             else
                 t = 11;
             fn_02003C3C(px, py, 12, t, win->unk4, win->unk5, 0);
-            px += 8;
         }
     }
 }
@@ -800,7 +805,7 @@ void fn_020079FC(struct Window *win, s32 tile, s32 pal)
                 buf[i] |= 0x400;
         }
         map = fn_02000A40(win->unk5, win->unk10, win->unk12);
-        DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         attr = fn_020059EC(win->items[0].unk0, win->unk6);
         for (i = 0; i < win->unk14; i++) {
             if (i & 1)
@@ -811,7 +816,7 @@ void fn_020079FC(struct Window *win, s32 tile, s32 pal)
         buf[0] = pal | (tile + 3);
         buf[win->unk14 - 1] = (pal | (tile + 3)) | 0x400;
         map = fn_02000A40(win->unk5, win->unk10, win->unk12 + 1);
-        DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA0, buf, map, win->unk14 * 2);
     } else {
         k = win->unk1 >> 3;
         k -= win->unk8;
@@ -842,7 +847,7 @@ void fn_020079FC(struct Window *win, s32 tile, s32 pal)
                 buf[win->unk14 - 1] |= 0x800;
             }
             map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-            DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+            DmaCopy16(DMA3, buf, map, win->unk14 * 2);
             py += 8;
             n = (win->unk16 + win->unk12) * 8 - 8;
             if (py >= n) {
@@ -858,7 +863,7 @@ void fn_020079FC(struct Window *win, s32 tile, s32 pal)
                     buf[i] |= 0x800;
                 }
                 map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-                DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+                DmaCopy16(DMA3, buf, map, win->unk14 * 2);
             }
         }
     }
@@ -882,13 +887,15 @@ void fn_02007D9C(struct Window *win, s32 tile, s32 pal)
 {
     u16 buf[30];
     s32 px;
-    s32 y;
     s32 py;
+    s32 y;
     s32 i;
     s32 t;
     s32 n;
+    s32 attr;
     u16 *map;
 
+    attr = 0xF000;
     px = win->unk10 * 8;
     y = win->unk12 * 8 + win->unk1;
     py = y + 8;
@@ -897,7 +904,7 @@ void fn_02007D9C(struct Window *win, s32 tile, s32 pal)
     if (win->unk1 == 0) {
         for (i = 0; i < win->unk14; i++) {
             if (i == 0)
-                buf[i] = tile | pal;
+                buf[i] = pal | tile;
             else if (i != win->unk14 - 1) {
                 if (i & 1)
                     buf[i] = (tile + 1) | pal;
@@ -907,38 +914,38 @@ void fn_02007D9C(struct Window *win, s32 tile, s32 pal)
                 buf[i] = (tile + 3) | pal;
         }
         map = fn_02000A40(0, win->unk10, win->unk12);
-        DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         for (i = 0; i < win->unk14; i++) {
             if (i & 1)
-                buf[i] = (tile - 4) | 0xF000;
+                buf[i] = (tile - 4) | attr;
             else
-                buf[i] = (tile - 2) | 0xF000;
+                buf[i] = (tile - 2) | attr;
         }
         buf[0] = pal | (tile + 4);
         buf[win->unk14 - 1] = pal | (tile + 5);
         map = fn_02000A40(0, win->unk10, win->unk12 + 1);
-        DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA0, buf, map, win->unk14 * 2);
     } else {
         n = win->unk1 >> 3;
         if (n == 1 || n == win->unkE * 2) {
             for (i = 0; i < win->unk14; i++) {
                 if (i & 1)
-                    buf[i] = (tile - 4) | 0xF000;
+                    buf[i] = (tile - 4) | attr;
                 else
-                    buf[i] = (tile - 2) | 0xF000;
+                    buf[i] = (tile - 2) | attr;
             }
             buf[0] = pal | (tile + 4);
             buf[win->unk14 - 1] = pal | (tile + 5);
-            map = fn_02000A40(0, win->unk10, y >> 3);
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            map = fn_02000A40(0, win->unk10, (py - 8) >> 3);
+            DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         } else {
             n--;
             t = win->unk14 * 2 * ((n - 1) >> 1) + 0x340 + (~n & 1);
             for (i = 1; i < win->unk14 - 1; i++) {
                 if (i & 1) {
-                    buf[i] = 0xF000 | t;
+                    buf[i] = attr | t;
                 } else {
-                    buf[i] = (t + 2) | 0xF000;
+                    buf[i] = (t + 2) | attr;
                     t += 4;
                 }
             }
@@ -949,8 +956,8 @@ void fn_02007D9C(struct Window *win, s32 tile, s32 pal)
                 buf[0] = (tile + 6) | pal;
                 buf[win->unk14 - 1] = (tile + 7) | pal;
             }
-            map = fn_02000A40(0, win->unk10, y >> 3);
-            DmaSet(DMA0, buf, map, 0x80000000 | win->unk14);
+            map = fn_02000A40(0, win->unk10, (py - 8) >> 3);
+            DmaCopy16(DMA0, buf, map, win->unk14 * 2);
         }
         if (py >= (win->unk12 + win->unk16) * 8 - 8) {
             for (i = 0; i < win->unk14; i++) {
@@ -965,11 +972,11 @@ void fn_02007D9C(struct Window *win, s32 tile, s32 pal)
                     buf[i] = (tile + 11) | pal;
             }
             map = fn_02000A40(0, win->unk10, (py >> 3));
-            DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+            DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         }
     }
     if ((py >> 3) - win->unk12 < win->unk16 - 1) {
-        for (i = 0; i < win->unk14; i++) {
+        for (i = 0; i < win->unk14; i++, px += 8) {
             if (i == 0)
                 t = 8;
             else if (i != win->unk14 - 1)
@@ -977,7 +984,6 @@ void fn_02007D9C(struct Window *win, s32 tile, s32 pal)
             else
                 t = 11;
             fn_02003C3C(px, py, 12, t, win->unk4, 0, 0);
-            px += 8;
         }
     }
 }
@@ -1084,7 +1090,7 @@ void fn_02008328(struct Window *win)
         tile = 0x3FF;
     else
         tile = 0x2FF;
-    cols = win->unk14 - ((win->unk1 >> 2) + 1);
+    cols = win->unk14 - (u8)((win->unk1 >> 2) + 1);
     map = fn_02000A40(win->unk5, px >> 3, win->unk12);
     if (cols >= 0) {
         for (i = 0; i < win->unk16; i++) {
@@ -1177,18 +1183,18 @@ void fn_02008540(struct Window *win)
         for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
             buf[i] = tile;
         map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-        DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         if ((py >> 3) - 1 <= win->unk12)
-            DmaSet(DMA3, buf, map - 32, 0x80000000 | win->unk14);
+            DmaCopy16(DMA3, buf, map - 32, win->unk14 * 2);
         if (win->unk5 == 2) {
             tile = 0x3FF;
             for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
                 buf[i] = tile;
         }
         map = fn_02000A40(win->unk5 - 1, win->unk10, py >> 3);
-        DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         if ((py >> 3) - 1 <= win->unk12 && lbl_03003094)
-            DmaSet(DMA3, buf, map - 32, 0x80000000 | win->unk14);
+            DmaCopy16(DMA3, buf, map - 32, win->unk14 * 2);
         if ((py >> 3) - 1 > win->unk12) {
             py -= 8;
             for (i = 0; i < win->unk14; i++, px += 8) {
@@ -1227,16 +1233,16 @@ void fn_020086A8(struct Window *win)
         for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
             buf[i] = tile;
         map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-        DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         if ((py >> 3) - 1 <= win->unk12)
-            DmaSet(DMA3, buf, map - 32, 0x80000000 | win->unk14);
+            DmaCopy16(DMA3, buf, map - 32, win->unk14 * 2);
         if (win->unk5 == 2) {
             tile = 0x3FF;
             for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
                 buf[i] = tile;
         }
         map = fn_02000A40(win->unk5 - 1, win->unk10, py >> 3);
-        DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         if ((py >> 3) - 1 > win->unk12) {
             py -= 8;
             for (i = 0; i < win->unk14; i++, px += 8) {
@@ -1277,9 +1283,9 @@ void fn_020087E8(struct Window *win)
         for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
             buf[i] = tile;
         map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-        DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         if ((py >> 3) - 1 <= win->unk12)
-            DmaSet(DMA3, buf, map - 32, 0x80000000 | win->unk14);
+            DmaCopy16(DMA3, buf, map - 32, win->unk14 * 2);
         if ((py >> 3) - 1 > win->unk12) {
             py -= 8;
             for (i = 0; i < win->unk14; i++, px += 8) {
@@ -1319,18 +1325,18 @@ void fn_020088E0(struct Window *win)
         for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
             buf[i] = tile;
         map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-        DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         if ((py >> 3) - 1 <= win->unk12)
-            DmaSet(DMA3, buf, map - 32, 0x80000000 | win->unk14);
+            DmaCopy16(DMA3, buf, map - 32, win->unk14 * 2);
         if (win->unk5 == 2) {
             tile = 0x3FF;
             for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
                 buf[i] = tile;
         }
         map = fn_02000A40(win->unk5 - 1, win->unk10, py >> 3);
-        DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         if ((py >> 3) - 1 <= win->unk12 && lbl_03003094)
-            DmaSet(DMA3, buf, map - 32, 0x80000000 | win->unk14);
+            DmaCopy16(DMA3, buf, map - 32, win->unk14 * 2);
         if ((py >> 3) - 1 > win->unk12) {
             py -= 8;
             for (i = 0; i < win->unk14; i++, px += 8) {
@@ -1370,18 +1376,18 @@ void fn_02008A48(struct Window *win)
         for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
             buf[i] = tile;
         map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-        DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         if (win->unk5 == 2) {
             tile = 0x3FF;
             for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
                 buf[i] = tile;
         }
         map = fn_02000A40(win->unk5 - 1, win->unk10, py >> 3);
-        DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         if ((py >> 3) - 2 <= win->unk12) {
             for (i = 0; i < 2; i++) {
                 map -= 32;
-                DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+                DmaCopy16(DMA3, buf, map, win->unk14 * 2);
             }
         }
         if ((py >> 3) - 2 > win->unk12) {
@@ -1419,11 +1425,11 @@ void fn_02008B8C(struct Window *win)
         for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
             buf[i] = tile;
         map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-        DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
             buf[i] = 0x3FF;
         map = fn_02000A40(win->unk5 - 1, win->unk10, py >> 3);
-        DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         if ((py >> 3) - 1 > win->unk12) {
             py -= 8;
             for (i = 0; i < win->unk14; i++, px += 8) {
@@ -1469,9 +1475,9 @@ void fn_02008CC0(struct Window *win)
         for (i = 0; i < sizeof(buf) / sizeof(buf[0]); i++)
             buf[i] = tile;
         map = fn_02000A40(win->unk5, win->unk10, py >> 3);
-        DmaSet(DMA3, buf, map, 0x80000000 | win->unk14);
+        DmaCopy16(DMA3, buf, map, win->unk14 * 2);
         if ((py >> 3) - 1 <= win->unk12)
-            DmaSet(DMA3, buf, map - 32, 0x80000000 | win->unk14);
+            DmaCopy16(DMA3, buf, map - 32, win->unk14 * 2);
         if ((py >> 3) - 1 > win->unk12) {
             py -= 8;
             for (i = 0; i < win->unk14; i++, px += 8) {
@@ -1491,17 +1497,14 @@ void fn_02008DB8(struct Window *win)
 {
     s32 px;
     s32 py;
-    s32 top;
-    s32 last;
     s32 i;
     s32 frame;
     u32 flags;
 
     px = win->unk10 * 8;
-    top = win->unk12;
-    last = win->unk16 - 1;
-    py = (last + top) * 8 - win->unk1;
-    if (py >> 3 > top) {
+    py = (win->unk16 - 1 + win->unk12) * 8;
+    py -= win->unk1;
+    if (py >> 3 > win->unk12) {
         fn_020098F0(win->unk5, win->unk10, py >> 3, win->unk14, 1);
         if ((py >> 3) - 1 <= win->unk12)
             fn_020098F0(win->unk5, win->unk10, (py >> 3) - 1, win->unk14, 1);
@@ -1526,15 +1529,16 @@ void fn_02008DB8(struct Window *win)
 void fn_02008E88(s32 prio, s32 x, s32 y, s32 n, s32 offset, s32 mode)
 {
     s32 px;
+    s32 py;
     s32 i;
     s32 id;
     s32 frame;
 
     px = x + offset;
-    id = y + 10;
+    py = y + 10;
     if (mode == 0) {
         for (i = 0; i <= 9; i++, px += 16)
-            fn_02003C3C(px, id, 22, i, 0, 0, 0);
+            fn_02003C3C(px, py, 22, i, 0, 0, 0);
     }
     px = x;
     if (mode == 0)

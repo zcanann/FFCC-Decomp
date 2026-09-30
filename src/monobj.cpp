@@ -2991,19 +2991,17 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 	int particleId = 0xFFFF;
 	int soundId = 0xFFFF;
 
-	if (param3 >= 0xC) goto animSkip;
-	if (param3 >= 0xA) goto animEnter;
-	goto animSkip;
-animEnter:
-	{
+	switch (param3) {
+	case 10:
+	case 11:
 		particleId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A4);
 		if ((particleId != 0xFFFF) && (param3 == 10)) {
 			particleId += 1;
 		}
 		soundId = *reinterpret_cast<unsigned short*>(
 			reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) + 0x1A6);
+		break;
 	}
-animSkip:
 
 	if (particleId != 0xFFFF) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();

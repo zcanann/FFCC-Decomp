@@ -3099,14 +3099,7 @@ void CGMonObj::onStatMagic()
 							object->m_rotTargetY = targetRot;
 						} else {
 							float delta = Math.DstRot(targetRot, object->m_homeRotY);
-							float clamped = -rotLimit;
-							if (!(delta < clamped)) {
-								if (rotLimit < delta) {
-									clamped = rotLimit;
-								} else {
-									clamped = delta;
-								}
-							}
+							float clamped = delta < -rotLimit ? -rotLimit : (rotLimit < delta ? rotLimit : delta);
 							object->m_rotTargetY = object->m_homeRotY + clamped;
 						}
 					}

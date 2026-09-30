@@ -186,6 +186,10 @@ class Emitter:
     def expression(self, value: int, unit: str) -> Optional[str]:
         """Symbolic expression for an absolute pointer value, or None to emit it raw."""
         target = value & ~1
+        # A data symbol at exactly this (possibly odd) address.
+        for s in self.by_address.get(value, []):
+            if s.kind != "function" and not (s.local and self.unit_at(value) != unit):
+                return s.name
         # Local symbols are only visible inside their own unit.
         if self.unit_at(target) != unit and any(s.local for s in self.by_address.get(target, [])):
             return None

@@ -443,6 +443,11 @@ static inline s32 MulShift(s32 a, s32 b)
     return (a * b) >> 8;
 }
 
+static inline struct RoutePoint *GetRoutePoint(struct Route *route, s16 no)
+{
+    return &route->pts[no];
+}
+
 static inline s16 Distance(struct RoutePoint *pt, struct Pos *pos)
 {
     s16 dx;
@@ -521,12 +526,14 @@ void fn_02005018(struct Effect *e, va_list *ap)
 {
     struct Pos *pos;
     struct Point dir;
+    s32 speed;
 
     e->w.chase.unk6 = va_arg(*ap, s32) & 0xFF;
     pos = va_arg(*ap, struct Pos *);
     GetDir(&dir, va_arg(*ap, s32));
+    speed = 4800;
     e->w.chase.target = NULL;
-    Scale(&e->w.chase.vel, &dir, 4800);
+    Scale(&e->w.chase.vel, &dir, speed);
     e->w.chase.unk7 = va_arg(*ap, s32) & 0xFF;
     e->w.chase.owner = va_arg(*ap, s32) & 0xFF;
     e->pos = *pos;
@@ -608,6 +615,7 @@ void fn_02005274(struct Effect *e, va_list *ap)
     struct Route *route;
     struct RoutePoint *pt;
     s16 v;
+    u8 base;
 
     e->w.idle.owner = va_arg(*ap, s32) & 0xFF;
     e->pos = *va_arg(*ap, struct Pos *);
@@ -615,9 +623,10 @@ void fn_02005274(struct Effect *e, va_list *ap)
     fn_020026B8(&e->anim, 34, 0xFF);
     e->unk8 = 120;
     route = fn_02006B68(lbl_030063C8, 0);
-    pt = &route->pts[fn_02006C94(route, 0xFF, e->pos.x, e->pos.z, &e->w)];
+    pt = GetRoutePoint(route, fn_02006C94(route, 0xFF, e->pos.x, e->pos.z, &e->w));
     v = Distance(pt, &e->pos);
-    v = pt->unk9 + (v << 4) / route->unk2;
+    base = pt->unk9;
+    v = (v << 4) / route->unk2 + base;
     if (v > 255)
         v = 255;
     e->w.idle.color = v;

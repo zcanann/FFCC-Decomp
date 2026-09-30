@@ -948,6 +948,11 @@ s32 fn_02002928(struct Actor *a, struct Vec *pos, u8 *outA, u16 *outB, u16 *outC
     return 1;
 }
 
+static inline struct PathNode *GetPathNode(struct Path *path, s16 no)
+{
+    return &path->nodes[no];
+}
+
 void fn_02002A88(struct Actor *a)
 {
     struct Path *path;
@@ -958,11 +963,12 @@ void fn_02002A88(struct Actor *a)
     s16 v;
     u8 lo;
     u8 hi;
+    u8 base;
 
     path = (struct Path *)fn_02006B68(lbl_030063C8, a->unk4B);
     prev = a->unk4C;
     a->unk4C = fn_02006C94(path, prev, a->pos.x, a->pos.y, &a->unk48);
-    node = &path->nodes[a->unk4C];
+    node = GetPathNode(path, a->unk4C);
     dx = node->x - a->pos.x;
     if (dx < 0)
         dx = -dx;
@@ -970,7 +976,8 @@ void fn_02002A88(struct Actor *a)
     if (dy < 0)
         dy = -dy;
     a->unk2E = dx + dy;
-    v = node->unk9 + (a->unk2E << 4) / path->unk2;
+    base = node->unk9;
+    v = (a->unk2E << 4) / path->unk2 + base;
     if (v > 255)
         v = 255;
     a->unk4A = v;

@@ -210,12 +210,13 @@ extern u8 lbl_02021D6C[];
 extern s16 lbl_0200EE10[];
 extern struct TextLayer lbl_0202BB94;
 extern struct Game lbl_0202C618;
-extern u8 lbl_0202DFFE;
+extern u8 lbl_0202C65A[];
+extern vu8 lbl_0202DFFE;
 extern u8 lbl_0202E000[];
 extern u8 lbl_02030000[];
 extern u8 lbl_02038000[];
 extern struct Work lbl_03000000;
-extern u8 lbl_03000248[];
+extern u8 lbl_03000248[128][128];
 extern struct BgAffine lbl_03004248[];
 extern char lbl_03005148[];
 extern vu16 lbl_03005254;
@@ -262,26 +263,29 @@ void fn_02005D28(struct Camera *cam)
 
 static inline s32 IsActive(s32 no)
 {
-    return lbl_03005D67 & (1 << no);
+    return (1 << no) & lbl_03005D67;
 }
 
 void fn_02005D5C(struct Camera *cam)
 {
     u16 keys = REG_KEYINPUT ^ 0x3FF;
     struct Actor *p;
+    u8 mode;
 
     cam->pressed = keys & ~cam->held;
     cam->held = keys;
     if (cam->pressed & 4) {
-    next:
-        cam->player++;
-        if (cam->player >= lbl_0202DFFE + 4)
-            cam->player = 0;
-        if (cam->player <= 3 && !IsActive(cam->player))
-            goto next;
+        for (;;) {
+            cam->player++;
+            if (cam->player >= lbl_0202DFFE + 4)
+                cam->player = 0;
+            if (cam->player > 3 || IsActive(cam->player))
+                break;
+        }
     }
-    if (lbl_03000000.mode > 1) {
-        if (lbl_03000000.mode <= 3) {
+    mode = lbl_03000000.mode;
+    if (mode > 1) {
+        if (mode <= 3) {
             fn_02005E78(cam, &lbl_0202C618.players[cam->player].pos, lbl_0202C618.players[cam->player].angle, -2000, 0);
             return;
         }
@@ -290,7 +294,7 @@ void fn_02005D5C(struct Camera *cam)
         cam->yaw += 364;
         p = &lbl_0202C618.players[cam->player];
         if (cam->held & 0x100)
-            fn_02005E78(cam, &p->pos, lbl_0202C618.players[cam->player].angle, -2000, 0);
+            fn_02005E78(cam, &p->pos, *(u16 *)&lbl_0202C65A[cam->player * sizeof(struct Actor)], -2000, 0);
         else
             fn_02005E78(cam, &p->pos, cam->yaw, -2000, 0);
     }
@@ -524,38 +528,40 @@ void fn_0200652C(struct Background *bg)
     s16 left;
     s16 right;
     u8 row;
+    s16 sy;
 
     if (y <= -128 || y >= 256 || x <= -128 || x >= 256) {
         DmaFill32(0x02020202, lbl_03000248, 0x85001000);
         return;
     }
-    top = 0;
     bottom = 128;
+    top = 0;
     if (y < 0) {
         top = -y;
         DmaFill32(0x02020202, lbl_03000248, 0x85000000 | (top * 32));
         y = 0;
     } else if (y > 128) {
         bottom = 256 - y;
-        DmaFill32(0x02020202, lbl_03000248 + bottom * 128, 0x85000000 | ((128 - bottom) * 32));
+        DmaFill32(0x02020202, lbl_03000248[bottom], 0x85000000 | ((128 - bottom) * 32));
     }
-    left = 0;
     right = 128;
+    left = 0;
     if (x < 0) {
         left = -x;
         for (row = top; row < bottom; row++)
-            DmaFill16(0x0202, lbl_03000248 + row * 128, 0x81000000 | (left / 2));
+            DmaFill16(0x0202, lbl_03000248[row], 0x81000000 | (left / 2));
         right = 128;
         x = 0;
     } else if (x > 128) {
         right = 256 - x;
         for (row = top; row < bottom; row++)
-            DmaFill16(0x0202, lbl_03000248 + right + row * 128, 0x81000000 | ((128 - right) / 2));
+            DmaFill16(0x0202, &lbl_03000248[row][right], 0x81000000 | ((128 - right) / 2));
         left = 0;
     }
+    sy = y;
     for (row = top; row < bottom; row++) {
-        DmaCopy16(bg->buf + y * 256 + x, lbl_03000248 + left + row * 128, 0x80000000 | ((right - left) / 2));
-        y++;
+        DmaCopy16(bg->buf + sy * 256 + x, &lbl_03000248[row][left], 0x80000000 | ((right - left) / 2));
+        sy++;
     }
 }
 
@@ -708,6 +714,11 @@ struct Route *fn_02006B68(struct Route *routes, s16 no)
     return &lbl_030063C8[no];
 }
 
+static inline struct RoutePoint *GetRoutePoint(struct Route *route, s16 no)
+{
+    return &route->pts[no];
+}
+
 static inline s16 NextPoint(struct Route *route, s16 i)
 {
     if (++i >= route->count)
@@ -776,20 +787,20 @@ s16 fn_02006C94(route, idx, x, z, dist)
 
     if (idx == 0xFF) {
         i = fn_02006B78(route, 0, x, z);
-        q = &route->pts[i];
+        q = GetRoutePoint(route, i);
         dx = x - q->x;
         dz = z - q->z;
         *dist = (dx * q->dx + dz * q->dz) >> 6;
         return i;
     }
-    p = &route->pts[idx];
+    p = GetRoutePoint(route, idx);
     dx = x - p->x;
     dz = z - p->z;
     *dist = (dx * p->dx + dz * p->dz) >> 6;
     if (dx * p->nx + dz * p->nz < 0)
         return PrevPoint(route, idx);
     i = NextPoint(route, idx);
-    q = &route->pts[i];
+    q = GetRoutePoint(route, i);
     dx = x - q->x;
     dz = z - q->z;
     if (dx * q->nx + dz * q->nz > 0)

@@ -2282,31 +2282,7 @@ void CShopMenu::SelectYesNo()
     return;
 
 sellBlock:
-    int itemIndex = m_selectedIndex;
-    int canTrade;
-    if (itemIndex == -1) {
-        canTrade = 0;
-    } else {
-        int tradeItem = getItemNo(itemIndex);
-        if (tradeItem <= 0) {
-            canTrade = 0;
-        } else if (m_listType == 0) {
-            canTrade = 1;
-        } else if (m_listType == 2) {
-            canTrade = 1;
-            if ((m_caravanWork->m_shopArgs[((int)(tradeItem - 0x191U) >> 5)] &
-                 (1 << ((tradeItem - 0x191U) & 0x1F))) != 0) {
-            } else {
-                canTrade = 0;
-            }
-        } else if (MenuPcs.EquipChk(itemIndex)) {
-            canTrade = 0;
-        } else if (tradeItem > 0x9E) {
-            canTrade = 1;
-        } else {
-            canTrade = 0;
-        }
-    }
+    int canTrade = CheckSell(m_selectedIndex);
 
     if (canTrade != 0) {
         Sound.PlaySe(0x50, 0x40, 0x7F, 0);

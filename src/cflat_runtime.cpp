@@ -389,7 +389,8 @@ inline CFlatRuntime::CFunc* CFlatRuntime::searchFunc(int classIndex, int systemK
 {
 	if ((classIndex >= 0)
 	    && (((systemKind == 2) || (systemKind == 3)) && (systemIndex >= 0))) {
-		const int funcIndex = m_classes[classIndex].m_functionTable[systemIndex];
+		const s32* functionTable = m_classes[classIndex].m_functionTable;
+		const int funcIndex = functionTable[systemIndex];
 		if (funcIndex >= 0) {
 			return m_funcs + funcIndex;
 		}

@@ -1872,7 +1872,8 @@ int CChara::CModel::SearchNode(char* name)
  */
 int CChara::CModel::SearchNodeSk(char* name)
 {
-	if (*name == '_') {
+	switch (*name) {
+	case '_':
 		if (name[1] == 's' && name[2] == 'k') {
 			CNode* node = ModelNodes(this);
 			u32 i = 0;
@@ -1892,7 +1893,8 @@ int CChara::CModel::SearchNodeSk(char* name)
 				}
 			}
 		}
-	} else {
+		break;
+	default:
 		return SearchNode(name);
 	}
 

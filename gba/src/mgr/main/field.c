@@ -152,7 +152,7 @@ void Mode7_UpdateAffine(struct Field *field)
     struct Camera *cam = &gCamera;
     s16 *origin = &cam->originX;
     s16 *scale;
-    u16 idx;
+    s16 idx;
     s16 cos;
     s16 sin;
     s16 xx;

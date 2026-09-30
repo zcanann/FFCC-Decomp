@@ -79,25 +79,23 @@ void UpdateSound(void)
 
 void AgbMain(void)
 {
-    struct Main *main;
     u16 keys;
 
     gVBlankCounter = 0;
     REG_IME = 0;
     InitGame(&gMain);
-    main = &gMain;
     for (;;) {
         ReadKeys();
         keys = REG_KEYINPUT ^ KEY_MASK;
-        main->newKeys = keys & ~main->heldKeys;
-        main->heldKeys = keys;
-        if (gLinkSynced != 0 && (u8)(main->state - STATE_COUNTDOWN) <= STATE_RETRY - STATE_COUNTDOWN) {
+        gMain.newKeys = keys & ~gMain.heldKeys;
+        gMain.heldKeys = keys;
+        if (gLinkSynced != 0 && (u8)(gMain.state - STATE_COUNTDOWN) <= STATE_RETRY - STATE_COUNTDOWN) {
             Field_UpdateMap(&gField);
             Mode7_UpdateAffine(&gField);
         }
-        DrawGameSprites(main);
+        DrawGameSprites(&gMain);
         UpdateSound();
-        UpdateGameState(main);
+        UpdateGameState(&gMain);
         while (gVBlankCounter == 0) {
             VBlankIntrWait();
         }
@@ -121,7 +119,7 @@ void AgbMain(void)
         } else {
             gMain.splitLine = 0x1000;
         }
-        if (main->textEnabled) {
+        if (gMain.textEnabled) {
             REG_DISPCNT |= 0x100;
         } else {
             REG_DISPCNT &= ~0x100;

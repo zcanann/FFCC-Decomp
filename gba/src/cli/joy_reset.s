@@ -3,10 +3,10 @@
 	.thumb
 
 @ Hard reset when running from JOY Bus boot with no cartridge inserted.
-	.global fn_0201C734
-	.type fn_0201C734, %function
+	.global JoyBus_HardReset
+	.type JoyBus_HardReset, %function
 	.thumb_func
-fn_0201C734:
+JoyBus_HardReset:
 	ldr	r3, =0x080000B2
 	ldrb	r0, [r3]
 	subs	r0, #0x96
@@ -21,4 +21,4 @@ fn_0201C734:
 	bx	lr
 	.align	2, 0
 	.pool
-	.size fn_0201C734, . - fn_0201C734
+	.size JoyBus_HardReset, . - JoyBus_HardReset

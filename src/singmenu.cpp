@@ -3537,8 +3537,9 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
     if (itemId <= 0x188) {
         return 7;
     }
-    if (itemId <= 0x190) {
-        return 8;
+    int type = 9;
+    if (itemId < 0x191) {
+        type = 8;
     }
-    return 9;
+    return type;
 }

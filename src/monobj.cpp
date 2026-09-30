@@ -89,7 +89,8 @@ inline void CGMonObj::setUndeadEffect(int weaponMode, int enabled)
 	if (enabled) {
 		for (int i = 0; i < count; i++) {
 			int dataNo = m_charaModelHandle->GetPdtSlot();
-			putParticleBindTrace((particleBase + i) | (dataNo << 8), m_particleSlots[12], this, kMonObjDefaultScale, 0);
+			int particleId = particleBase + i;
+			putParticleBindTrace(particleId | (dataNo << 8), m_particleSlots[12], this, kMonObjDefaultScale, 0);
 		}
 	} else if (isUndead && count != 0) {
 		int dataNo = m_charaModelHandle->GetPdtSlot();
@@ -476,9 +477,10 @@ void CGMonObj::setRepop(int mode)
 	void** scriptHandle = object->m_scriptHandle;
 	int classId = reinterpret_cast<int>(scriptHandle[4]);
 
+	int spawnIndex = reinterpret_cast<int>(scriptHandle[2]);
 	int option;
 	if ((mode != 0) && (option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue)), option < 9)) {
-		u64 bit = 1ULL << reinterpret_cast<int>(scriptHandle[2]);
+		u64 bit = 1ULL << spawnIndex;
 		u64 spawnBits = CFlatSpawnBits(option);
 		if ((spawnBits & bit) != 0) {
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) = 0;
@@ -564,10 +566,12 @@ void CGMonObj::setRepop(int mode)
 		}
 	}
 
-	if (classId == 0x55) {
+	switch (classId) {
+	case 0x55:
 		m_chaseState = 4;
 		m_chaseTimer = 0;
 		m_chaseDirty = 1;
+		break;
 	}
 
 	unsigned short countA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A8);
@@ -587,7 +591,8 @@ void CGMonObj::setRepop(int mode)
 		}
 
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();
-		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), m_particleSlots[16], object, kMonObjDefaultScale, 0);
+		int particleId = i + particleBase + 0x50;
+		reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(particleId | (dataNo << 8), m_particleSlots[16], object, kMonObjDefaultScale, 0);
 	}
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
@@ -2991,19 +2996,17 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 	int particleId = 0xFFFF;
 	int soundId = 0xFFFF;
 
-	if (param3 >= 0xC) goto animSkip;
-	if (param3 >= 0xA) goto animEnter;
-	goto animSkip;
-animEnter:
-	{
+	switch (param3) {
+	case 10:
+	case 11:
 		particleId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A4);
 		if ((particleId != 0xFFFF) && (param3 == 10)) {
 			particleId += 1;
 		}
 		soundId = *reinterpret_cast<unsigned short*>(
 			reinterpret_cast<unsigned char*>(*reinterpret_cast<void* volatile*>(&object->m_scriptHandle[9])) + 0x1A6);
+		break;
 	}
-animSkip:
 
 	if (particleId != 0xFFFF) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();

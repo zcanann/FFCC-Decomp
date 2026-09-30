@@ -669,21 +669,7 @@ void CSound::Frame()
                         System.Printf("\x1B[32mEnvSePlay: %06d\n\x1B[0m", se->m_soundId);
                     }
 
-                    int vol = volume;
-                    int seNo = se->m_soundId;
-                    int panValue = pan;
-                    if (seNo < 0) {
-                        System.Printf("Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n");
-                        seNo = -1;
-                    } else if (seNo < 4000) {
-                        int bank = seNo / 1000;
-                        seNo = m_redSound.SePlay(bank, seNo % 1000, panValue, 0, 0);
-                        m_redSound.SeVolume(seNo, vol, 0x1E);
-                    } else {
-                        seNo = m_redSound.SePlay(-1, seNo, panValue, 0, 0);
-                        m_redSound.SeVolume(seNo, vol, 0x1E);
-                    }
-                    se->m_playId = seNo;
+                    se->m_playId = PlaySe(se->m_soundId, pan, volume, 0x1E);
                     se->m_bits.m_paused = 0;
                 }
             } else {

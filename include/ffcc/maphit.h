@@ -122,14 +122,8 @@ public:
     CMapHitFace* m_faces;         // 0x20
 };
 
-struct CMapHitDrawMode
-{
-    unsigned char m_byte;
-};
-
 extern unsigned char s_bitMask;
 extern unsigned char s_bitMaskDrawFlags;
-extern CMapHitDrawMode g_MapHitDrawMode;
 extern int g_hit_edge_idx_min;
 extern float g_hit_t;
 extern float g_hit_t_min;

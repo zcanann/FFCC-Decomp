@@ -1302,7 +1302,7 @@ void CCameraPcs::draw()
         Graphic.DrawSphere(m_cameraMatrix, &TargetVec(), 5.0f, CColor(0xFF, 0xFF, 0xFF, 0xFF));
     }
 
-    if (g_map_draw_prof != 0) {
+    if (g_IsDbgDrawShadowPos != 0) {
         {
         Mtx cameraMtx;
         Mtx shadowMtx;

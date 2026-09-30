@@ -21,9 +21,6 @@ class CRelProfile
 {
 public:
     ~CRelProfile();
-
-private:
-    unsigned int m_data;
 };
 
 /*
@@ -87,12 +84,11 @@ CProcessCallbackTable CMapPcs::m_table[3] = {
     },
 };
 
-extern unsigned int s_loadedMapNo__7CMapPcs;
-CRelProfile g_mapStage;
-CRelProfile g_mapSection;
-CRelProfile g_hit_prof;
-unsigned char g_map_calc_prof ATTRIBUTE_ALIGN(4);
-unsigned char g_map_draw_prof ATTRIBUTE_ALIGN(4);
+unsigned int g_mapStage;
+unsigned int g_mapSection;
+CRelProfile g_hit_prof ATTRIBUTE_ALIGN(4);
+CRelProfile g_map_calc_prof ATTRIBUTE_ALIGN(4);
+CRelProfile g_map_draw_prof ATTRIBUTE_ALIGN(4);
 
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
@@ -625,13 +621,13 @@ int CMapPcs::IsLoadMapCompleted()
  */
 void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSize, unsigned char mode)
 {
-    unsigned int prevStageNo = reinterpret_cast<unsigned int&>(g_MapHitDrawMode);
-    unsigned int prevMapNo = s_loadedMapNo__7CMapPcs;
+    unsigned int prevStageNo = g_mapStage;
+    unsigned int prevMapNo = g_mapSection;
     Vec cameraPos;
     char mapPath[0x104];
 
-    reinterpret_cast<unsigned int&>(g_MapHitDrawMode) = stageNo;
-    s_loadedMapNo__7CMapPcs = mapNo;
+    g_mapStage = stageNo;
+    g_mapSection = mapNo;
     sprintf(mapPath, "dvd/map/stg%03d/map%03d", stageNo, mapNo);
 
     if (mode != 2) {
@@ -717,8 +713,8 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
     }
 
     if (mode == 2) {
-        reinterpret_cast<unsigned int&>(g_MapHitDrawMode) = prevStageNo;
-        s_loadedMapNo__7CMapPcs = prevMapNo;
+        g_mapStage = prevStageNo;
+        g_mapSection = prevMapNo;
     }
 }
 

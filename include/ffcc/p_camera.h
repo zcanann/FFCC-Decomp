@@ -325,5 +325,6 @@ public:
 };
 
 extern CCameraPcs CameraPcs;
+extern unsigned char g_IsDbgDrawShadowPos;
 
 #endif // _FFCC_P_CAMERA_H_

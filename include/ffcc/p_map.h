@@ -50,7 +50,7 @@ private:
 };
 
 extern CMapPcs MapPcs;
-extern unsigned char g_map_calc_prof;
-extern unsigned char g_map_draw_prof;
+extern unsigned int g_mapStage;
+extern unsigned int g_mapSection;
 
 #endif // _FFCC_P_MAP_H_

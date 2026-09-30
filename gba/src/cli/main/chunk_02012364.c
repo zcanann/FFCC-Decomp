@@ -216,7 +216,7 @@ s32 fn_02012558(void)
         win->unk12 = 7;
         win->unkE = 1;
         win->unk14 = w + 2;
-        win->unk16 = 4;
+        win->unk16 = win->unkE * 2 + 2;
         win->unk3 = 9;
         win->unk4 = 0;
         win->unk5 = 0;
@@ -561,8 +561,8 @@ s32 fn_02012D90(void)
     if (lbl_030027DB == 0) {
         memset(win, 0, sizeof(struct Window));
         str = lbl_0203D800;
-        str += strlen(str);
-        str++;
+        len = strlen(str);
+        str += len + 1;
         lbl_030027E4 = fn_02013B1C(str);
         fn_02003394(1, 1);
         fn_020033F4();

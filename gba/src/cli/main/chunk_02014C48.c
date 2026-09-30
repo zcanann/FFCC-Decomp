@@ -299,8 +299,7 @@ void fn_02014ED8(void)
 void fn_02014F4C(void)
 {
     s32 i;
-    u32 div;
-    s32 ret;
+    s32 n;
 
     DmaClear32(DMA0, 0, lbl_030030B0, sizeof(struct Window) * 5);
     lbl_030030B0[0].unk0 = 1;
@@ -348,18 +347,18 @@ void fn_02014F4C(void)
     fn_02004098(6, 1, 2, 0);
     fn_020038D8(0x06008400);
     lbl_03002800 = 0;
-    for (i = 1, div = 10; i <= 7 && lbl_03002CA0.unk104.word / div != 0; i++, div *= 10)
+    for (i = 1, n = 10; i <= 7 && lbl_03002CA0.unk104.word / n != 0; i++, n *= 10)
         ;
     lbl_03002804 = i;
-    ret = (lbl_030030B0[0].unk14 * 8 - 80) >> 1;
-    lbl_03002806 = (lbl_030030B0[0].unk10 << 3) + ret + 56;
+    n = (lbl_030030B0[0].unk14 * 8 - 80) >> 1;
+    lbl_03002806 = (lbl_030030B0[0].unk10 << 3) + n + 56;
     lbl_030032EC = 0;
     lbl_030030A4 = 0;
     lbl_03002809 = 0;
     lbl_03002808 = 0;
     for (i = 0; i <= 9; i++) {
-        ret = fn_02002FE4(21, 0, 0);
-        if (ret == 0)
+        n = fn_02002FE4(21, 0, 0);
+        if (n == 0)
             break;
     }
     lbl_030027FC = i <= 9;

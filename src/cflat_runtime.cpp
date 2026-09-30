@@ -459,8 +459,8 @@ inline void CFlatRuntime::push(CFlatRuntime::CObject* object, CFlatRuntime::CSta
 inline void CFlatRuntime::callSetup(CFlatRuntime::CObject* object, CFlatRuntime::CFunc* func, int callFlag)
 {
 	CCodeIndex prevCodePos = object->m_codeIndex;
-	const int prevCallFlag = object->m_flagBits.m_callFlag;
 	unsigned int* const prevLocalBase = object->m_localBase;
+	const int prevCallFlag = object->m_flagBits.m_callFlag;
 	const int prevWaitCounter = object->m_waitCounter;
 	const int prevRequestPending = object->m_requestPending;
 	const int prevArgCount = object->m_argCount;

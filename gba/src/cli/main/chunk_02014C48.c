@@ -308,8 +308,8 @@ void fn_02014F4C(void)
     lbl_030030B0[0].unk12 = 3;
     lbl_030030B0[0].unkE = 4;
     lbl_030030B0[0].unk14 = 12;
-    lbl_030030B0[0].unk16 = 8;
     lbl_030030B0[0].unk3 = 6;
+    lbl_030030B0[0].unk16 = 8;
     lbl_030030B0[0].unk4 = 0;
     lbl_030030B0[0].unk5 = 2;
     lbl_030030B0[0].unk6 = 0;
@@ -352,7 +352,7 @@ void fn_02014F4C(void)
         ;
     lbl_03002804 = i;
     ret = (lbl_030030B0[0].unk14 * 8 - 80) >> 1;
-    lbl_03002806 = lbl_030030B0[0].unk10 * 8 + ret + 56;
+    lbl_03002806 = (lbl_030030B0[0].unk10 << 3) + ret + 56;
     lbl_030032EC = 0;
     lbl_030030A4 = 0;
     lbl_03002809 = 0;
@@ -516,8 +516,11 @@ void fn_020154E0(void)
             u32 step = 1;
             s32 i;
 
-            for (i = 0; i < win->unk2; i++)
+            i = 0;
+            while (i < win->unk2) {
+                i++;
                 step *= 10;
+            }
             if (lbl_0300299C & 0x40) {
                 if (lbl_03002CA0.unk104.word >= lbl_03002800 + step)
                     lbl_03002800 += step;

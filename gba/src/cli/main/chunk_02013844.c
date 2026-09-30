@@ -290,7 +290,7 @@ void fn_0201396C(void)
             tiles[i + 30] = tile++ | attr;
         }
         x = win.unk10 + 2;
-        y = win.unk12 + lbl_030027DD * 2 + 1;
+        y = win.unk12 + 1 + lbl_030027DD * 2;
         dst = fn_02000A40(win.unk5, x, y);
         DmaCopy16(DMA3, tiles, dst, size);
         DmaCopy16(DMA3, tiles + 30, dst + 32, size);

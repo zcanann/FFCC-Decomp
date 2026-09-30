@@ -18,6 +18,8 @@
         DmaSet(dmaAddr, &tmp, dst, 0x85000000 | ((size) / 4)); \
     }
 
+#define DmaCopy16(dmaAddr, src, dst, size) DmaSet(dmaAddr, src, dst, 0x80000000 | ((size) >> 1))
+
 struct WinItem {
     s16 unk0;
     s16 unk2;
@@ -677,8 +679,6 @@ void fn_02016EDC(s32 idx, s32 row, s32 flag)
     s32 i;
     s32 j;
     s32 t;
-    s32 bg;
-    s32 py;
     u16 *map;
     struct Window *win = &lbl_030030B0[1];
 
@@ -686,13 +686,11 @@ void fn_02016EDC(s32 idx, s32 row, s32 flag)
     if (flag)
         attr = 5;
     attr <<= 12;
-    y = win->unk12 + (row * 2 + 1);
+    y = win->unk12 + 1 + row * 2;
     w = win->unk14 - 2;
     for (j = 0; j < 2; j++) {
-        t = win->unk14 * 2;
-        t = t * idx + 0x15C + j;
-        bg = win->unk5;
-        py = y + j;
+        t = (win->unk14 << 1) * idx + 0x15C;
+        t += j;
         for (i = 0; i < w; i++) {
             if (!(i & 1)) {
                 buf[i] = attr | t;
@@ -701,8 +699,8 @@ void fn_02016EDC(s32 idx, s32 row, s32 flag)
                 t += 4;
             }
         }
-        map = fn_02000A40(bg, win->unk10 + 1, py);
-        DmaSet(DMA3, buf, map, 0x80000000 | w);
+        map = fn_02000A40(win->unk5, win->unk10 + 1, y + j);
+        DmaCopy16(DMA3, buf, map, w * 2);
     }
 }
 
@@ -720,17 +718,17 @@ void fn_02016FB0(void)
 
 s32 fn_02016FF0(s32 idx)
 {
-    s16 *p;
-    s32 count;
+    u8 *p = (u8 *)&lbl_0203A800;
+    u8 count;
     u32 *vals;
     s32 n;
     s32 i;
 
-    count = lbl_0203A800.count;
-    p = lbl_0203A800.ids;
-    p += count;
+    count = *p;
+    p += 4;
+    p += count * 2;
     if (count & 1)
-        p++;
+        p += 2;
     vals = (u32 *)p;
     n = 0;
     for (i = 0; i < 64; i++) {
@@ -1123,7 +1121,7 @@ void fn_020174F4(void)
                         t += 4;
                     }
                 }
-                DmaSet(DMA3, buf, dst, 0x80000000 | w);
+                DmaCopy16(DMA3, buf, dst, w * 2);
                 dst += 64;
             }
         }

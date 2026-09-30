@@ -299,13 +299,13 @@ void fn_02017BC8(void)
     }
     if (id <= 0)
         return;
-    x = (lbl_030030B0[0].unk10 + 1) * 8;
-    y = (lbl_030030B0[0].unk12 + 1) * 8;
+    x = (lbl_030030B0[0].unk10 + 1) << 3;
+    y = (lbl_030030B0[0].unk12 + 1) << 3;
     frame = fn_0201AB14(id);
     fn_02003C3C(x, y, 0, frame, fn_02004030(0, frame), lbl_030030B0[0].unk5, 0);
     if (fn_02017CB8() && lbl_0300281D) {
-        x = (lbl_030030B0[0].unk10 + 12) * 8;
-        y = (lbl_030030B0[0].unk12 + lbl_030030B0[0].unk16 - 1) * 8;
+        x = (lbl_030030B0[0].unk10 + 12) << 3;
+        y = (lbl_030030B0[0].unk12 + lbl_030030B0[0].unk16 - 1) << 3;
         fn_02003C3C(x, y, 2, 5, fn_02004030(2, 5), lbl_030030B0[0].unk5, 0);
     }
 }
@@ -458,7 +458,6 @@ s32 fn_0201804C(void)
 {
     struct Window *win;
     s32 count;
-    s32 ofs;
     u8 *p;
     s32 idx;
     s32 ret;
@@ -475,10 +474,10 @@ s32 fn_0201804C(void)
     win = lbl_030030B0;
     count = (s8)lbl_0203A800[0];
     if (lbl_0300282D == 0) {
-        ofs = ((count + 1) >> 2) * 4;
+        idx = ((count + 1) >> 2) * 4;
         if ((count + 1) & 3)
-            ofs += 4;
-        p = &lbl_0203A800[ofs];
+            idx += 4;
+        p = &lbl_0203A800[idx];
         p += count * 56;
         memcpy(lbl_03002830, p, 16);
         lbl_0300282D = 1;
@@ -802,10 +801,9 @@ void fn_020189A8(void)
         win = &lbl_030030B0[3];
     x = (win->unk10 - 1) * 8;
     if (lbl_030032EC == 1)
-        y = win->unk12;
+        y = win->unk12 * 8 + win->unk2 * 16;
     else
-        y = win->unk12 + 1;
-    y = y * 8 + win->unk2 * 16;
+        y = (win->unk12 + 1) * 8 + win->unk2 * 16;
     fn_02003C3C(x, y, 0, 45, fn_02004030(0, 45), 1, 0);
 }
 
@@ -848,8 +846,9 @@ s32 fn_02018A0C(void)
                 case 0:
                     if (lbl_03003090 == 1) {
                         if (win->items[sel].unk0 != 0) {
+                            s32 slot = lbl_03002CA0.unk0 & 3;
                             p = &lbl_0203A800[lbl_03002823];
-                            fn_02002FE4(10, p[1], lbl_03002CA0.unk0 & 3);
+                            fn_02002FE4(10, p[1], slot);
                             lbl_03002825 = 1;
                             fn_02001578();
                             lbl_03002AF4 = 1;
@@ -917,7 +916,7 @@ void fn_02018C38(void)
     sel = lbl_03002CA0.unk0 & 3;
     fn_02003394(1, 0);
     fn_020033F4();
-    dst = win->unk14 * (lbl_03002821 * 64) + 0x06009000;
+    dst = win->unk14 * (lbl_03002821 << 6) + 0x06009000;
     if (lbl_03002821 == 0) {
         if (recipe->ids[sel] > 0) {
             lbl_0300282A = sel;

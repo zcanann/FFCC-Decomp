@@ -200,23 +200,12 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
  */
 void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, unsigned char blendMode)
 {
-    tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
+    pppShapeAnimFrame* frame = pppShapeAnim(animData)->m_frames;
+    frame += frameIndex;
+    tagOAN3_SHAPE* shape = reinterpret_cast<tagOAN3_SHAPE*>(
+        reinterpret_cast<unsigned char*>(animData) + frame->m_shapeOffset);
 
-    MaterialMan.LockEnv();
-    MaterialMan.SetMaterialPart(materialSet, shape->m_entries[0].m_textureIndex, 0);
-
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-
-    for (int shapeIndex = 0; shapeIndex < shape->m_shapeCount; shapeIndex++) {
-        tagOAN3_SHAPE_ENTRY* entry = &shape->m_entries[shapeIndex];
-        if (blendMode == 0xFF) {
-            pppSetBlendMode(entry->m_blendMode);
-        }
-        GXCallDisplayList(entry->m_displayList, 0x60);
-    }
+    pppDrawShp(shape, materialSet, blendMode);
 }
 
 /*

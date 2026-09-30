@@ -11,7 +11,7 @@ typedef char *va_list;
 #define REG_BG1VOFS (*(vu16 *)0x04000016)
 #define REG_KEYINPUT (*(vu16 *)0x04000130)
 
-#define DmaCopy16(src, dst, cnt) \
+#define DmaSet(src, dst, cnt) \
     { \
         vu32 *dmaRegs = (vu32 *)0x040000D4; \
         dmaRegs[0] = (u32)(src); \
@@ -20,33 +20,19 @@ typedef char *va_list;
         dmaRegs[2]; \
     }
 
-#define DmaCopy32(src, dst, cnt) \
-    { \
-        vu32 *dmaRegs = (vu32 *)0x040000D4; \
-        dmaRegs[0] = (u32)(src); \
-        dmaRegs[1] = (u32)(dst); \
-        dmaRegs[2] = (u32)(cnt); \
-        dmaRegs[2]; \
-    }
+#define DmaCopy16(src, dst, cnt) DmaSet(src, dst, cnt)
+#define DmaCopy32(src, dst, cnt) DmaSet(src, dst, cnt)
 
 #define DmaFill16(value, dst, cnt) \
     { \
         vu16 tmp = (vu16)(value); \
-        vu32 *dmaRegs = (vu32 *)0x040000D4; \
-        dmaRegs[0] = (u32)&tmp; \
-        dmaRegs[1] = (u32)(dst); \
-        dmaRegs[2] = (u32)(cnt); \
-        dmaRegs[2]; \
+        DmaSet(&tmp, dst, cnt); \
     }
 
 #define DmaFill32(value, dst, cnt) \
     { \
         vu32 tmp = (vu32)(value); \
-        vu32 *dmaRegs = (vu32 *)0x040000D4; \
-        dmaRegs[0] = (u32)&tmp; \
-        dmaRegs[1] = (u32)(dst); \
-        dmaRegs[2] = (u32)(cnt); \
-        dmaRegs[2]; \
+        DmaSet(&tmp, dst, cnt); \
     }
 
 struct Vec {
@@ -356,12 +342,6 @@ void fn_02005F88(struct Camera *cam, u16 pitch)
     fn_02006438(&lbl_03006144);
 }
 
-static inline void RotateX(struct Camera *cam, struct Vec *in, struct Vec *out)
-{
-    out->y = (cam->pitchCos2 * in->y - cam->pitchSin2 * in->z) >> 8;
-    out->z = (cam->pitchSin2 * in->y + cam->pitchCos2 * in->z) >> 8;
-}
-
 static inline void RotateY(struct Camera *cam, struct Vec *in, struct Vec *out)
 {
     out->x = (cam->yawCos2 * in->x - cam->yawSin2 * in->z) >> 8;
@@ -371,17 +351,12 @@ static inline void RotateY(struct Camera *cam, struct Vec *in, struct Vec *out)
 
 void fn_02005FDC(struct Camera *cam, struct Vec *in, struct Vec *out)
 {
-    struct Vec tmp;
+    struct Vec tmp[1];
 
-    tmp.x = in->x;
-    RotateX(cam, in, &tmp);
-    RotateY(cam, &tmp, out);
-}
-
-static inline void AddYZ(struct Vec *out, struct Vec *a, struct Vec *b)
-{
-    out->y = a->y + b->y;
-    out->z = a->z + b->z;
+    tmp->x = in->x;
+    tmp->y = (cam->pitchCos2 * in->y - cam->pitchSin2 * in->z) >> 8;
+    tmp->z = (cam->pitchSin2 * in->y + cam->pitchCos2 * in->z) >> 8;
+    RotateY(cam, tmp, out);
 }
 
 static inline void AddVec(struct Vec *out, struct Vec *a, struct Vec *b)
@@ -394,12 +369,13 @@ static inline void AddVec(struct Vec *out, struct Vec *a, struct Vec *b)
 void fn_0200606C(struct Camera *cam, struct Vec *in, struct Vec *out)
 {
     struct Vec *eye = &cam->eye;
-    struct Vec tmp;
+    struct Vec tmp[1];
     struct Vec v;
 
-    tmp.x = in->x + eye->x;
-    AddYZ(&tmp, in, eye);
-    v = tmp;
+    tmp->x = in->x + eye->x;
+    tmp->y = in->y + eye->y;
+    tmp->z = in->z + eye->z;
+    v = *tmp;
     fn_02005FDC(cam, &v, out);
     AddVec(out, out, &cam->target);
 }
@@ -595,6 +571,8 @@ void fn_02006794(struct Floor *floor)
     s16 xy;
     s16 yx;
     s16 yy;
+    s32 ox;
+    s32 oy;
     s32 x0;
     s32 y0;
     s16 i;
@@ -612,18 +590,20 @@ void fn_02006794(struct Floor *floor)
     xy = fn_020074D4(sin, fn_02007508(scale[0]));
     yx = fn_020074D4(-lbl_0200EE10[idx], fn_02007508(scale[1]));
     yy = fn_020074D4(cos, fn_02007508(scale[1]));
-    x0 = (u8)origin[0] * 16;
-    y0 = (origin[1] & 0x7F) * 16;
+    ox = (u8)origin[0] * 16;
+    oy = (origin[1] & 0x7F) * 16;
     aff = lbl_03004248;
-    x0 += cam->bgX;
-    y0 += cam->bgY;
+    x0 = cam->bgX;
+    y0 = cam->bgY;
+    x0 += ox;
+    y0 += oy;
     for (i = 0; i < 160; aff++, i++) {
         pa = (floor->depth2[i] * xx) >> 8;
         pc = (floor->depth2[i] * yx) >> 8;
         aff->pa = pa;
         aff->pc = pc;
         d = -floor->depth[i];
-        aff->x = x0 - 120 * pa - d * xy;
+        aff->x = x0 - 120 * pa - xy * d;
         aff->y = y0 - pc * 120 - yy * d;
     }
     lbl_03000000.unk40 = 1;
@@ -634,13 +614,20 @@ static inline struct Terrain *GetTerrain(struct Map *map, s32 x, s32 z)
     return &lbl_02013C14[map->cells[z >> 7][x >> 7]];
 }
 
-
 u8 fn_0200692C(struct Map *map, struct Vec *pos, struct Vec *vel, s16 *speed)
 {
     u16 flags;
+    s32 x;
+    s32 z;
+    s32 bx;
+    s32 bz;
 
-    flags = GetTerrain(map, pos->x + 0x4000, pos->z + 0x4000)->flags;
-    flags |= GetTerrain(map, pos->x - (vel->x >> 5) + 0x4000, pos->z - (vel->z >> 5) + 0x4000)->flags;
+    x = pos->x + 0x4000;
+    z = pos->z + 0x4000;
+    flags = GetTerrain(map, x, z)->flags;
+    bx = pos->x - (vel->x >> 5) + 0x4000;
+    bz = pos->z - (vel->z >> 5) + 0x4000;
+    flags |= GetTerrain(map, bx, bz)->flags;
     if (flags & 1) {
         vel->x = vel->z = 0;
         *speed = 0;
@@ -650,9 +637,14 @@ u8 fn_0200692C(struct Map *map, struct Vec *pos, struct Vec *vel, s16 *speed)
 
 u8 fn_020069A0(struct Map *map, struct Vec *pos, struct Vec *vel, s16 *speed)
 {
-    struct Terrain *t = &lbl_02013C14[map->cells[(pos->z + 0x4000) >> 7][(pos->x + 0x4000) >> 7]];
+    struct Terrain *t;
+    s32 x;
+    s32 z;
     s16 len;
 
+    x = pos->x + 0x4000;
+    z = pos->z + 0x4000;
+    t = GetTerrain(map, x, z);
     if (t->flags & 4) {
         *speed = Sqrt(vel->x * vel->x + vel->z * vel->z);
         len = *speed - (*speed >> 4);
@@ -666,13 +658,20 @@ u8 fn_020069A0(struct Map *map, struct Vec *pos, struct Vec *vel, s16 *speed)
 u8 fn_02006A38(struct Map *map, struct Vec *pos, struct Vec *vel, s16 *speed)
 {
     u16 flags;
-    s32 min;
+    s32 x;
+    s32 z;
+    s32 bx;
+    s32 bz;
+    s16 min;
     s32 shift;
     s16 len;
-    u16 n;
 
-    flags = GetTerrain(map, pos->x + 0x4000, pos->z + 0x4000)->flags;
-    flags |= GetTerrain(map, pos->x - (vel->x >> 5) + 0x4000, pos->z - (vel->z >> 5) + 0x4000)->flags;
+    x = pos->x + 0x4000;
+    z = pos->z + 0x4000;
+    flags = GetTerrain(map, x, z)->flags;
+    bx = pos->x - (vel->x >> 5) + 0x4000;
+    bz = pos->z - (vel->z >> 5) + 0x4000;
+    flags |= GetTerrain(map, bx, bz)->flags;
     if (flags & 1) {
         min = 64;
         shift = 1;
@@ -682,9 +681,7 @@ u8 fn_02006A38(struct Map *map, struct Vec *pos, struct Vec *vel, s16 *speed)
     } else {
         return flags;
     }
-    n = Sqrt(vel->x * vel->x + vel->z * vel->z);
-    *speed = n;
-    len = n - (*speed >> shift);
+    len = (*speed = Sqrt(vel->x * vel->x + vel->z * vel->z)) - (*speed >> shift);
     if (len < min)
         len = min;
     vel->x = vel->x * len / *speed;
@@ -718,12 +715,11 @@ static inline s16 NextPoint(struct Route *route, s16 i)
     return i;
 }
 
-static inline s32 Side(struct RoutePoint *p, s16 x, s16 z)
+static inline s16 PrevPoint(struct Route *route, s16 i)
 {
-    s16 dx = x - p->x;
-    s16 dz = z - p->z;
-
-    return dx * p->nx + dz * p->nz;
+    if (--i < 0)
+        return route->count - 1;
+    return i;
 }
 
 s16 fn_02006B78(route, start, x, z)
@@ -741,16 +737,19 @@ s16 fn_02006B78(route, start, x, z)
     s16 qx;
     s16 qz;
     s32 d;
+    s32 side;
 
     do {
         p = &route->pts[i];
         dx = x - p->x;
         dz = z - p->z;
-        if (dx * p->nx + dz * p->nz >= 0) {
+        side = dx * p->nx + dz * p->nz;
+        if (side >= 0) {
             q = &route->pts[next];
             qx = x - q->x;
             qz = z - q->z;
-            if (qx * q->nx + qz * q->nz <= 0) {
+            side = qx * q->nx + qz * q->nz;
+            if (side <= 0) {
                 d = dx * p->dx + dz * p->dz;
                 if (d > -0xA0000 && d < 0xA0000)
                     return i;
@@ -770,30 +769,30 @@ s16 fn_02006C94(route, idx, x, z, dist)
     s16 *dist;
 {
     struct RoutePoint *p;
+    struct RoutePoint *q;
     s16 dx;
     s16 dz;
     s16 i;
 
     if (idx == 0xFF) {
         i = fn_02006B78(route, 0, x, z);
-        p = &route->pts[i];
-        dx = x - p->x;
-        dz = z - p->z;
-        *dist = (dx * p->dx + dz * p->dz) >> 6;
+        q = &route->pts[i];
+        dx = x - q->x;
+        dz = z - q->z;
+        *dist = (dx * q->dx + dz * q->dz) >> 6;
         return i;
     }
     p = &route->pts[idx];
     dx = x - p->x;
     dz = z - p->z;
     *dist = (dx * p->dx + dz * p->dz) >> 6;
-    if (dx * p->nx + dz * p->nz < 0) {
-        i = idx - 1;
-        if (i < 0)
-            return route->count - 1;
-        return i;
-    }
+    if (dx * p->nx + dz * p->nz < 0)
+        return PrevPoint(route, idx);
     i = NextPoint(route, idx);
-    if (Side(&route->pts[i], x, z) > 0)
+    q = &route->pts[i];
+    dx = x - q->x;
+    dz = z - q->z;
+    if (dx * q->nx + dz * q->nz > 0)
         return i;
     if (*dist <= -0x2800 || *dist >= 0x2800)
         return fn_02006B78(route, i, x, z);
@@ -806,12 +805,18 @@ s16 fn_02006DF0(route, idx, x, z)
     s16 x;
     s16 z;
 {
+    struct RoutePoint *q;
+    s16 dx;
+    s16 dz;
     s16 i;
 
     if (idx == 0xFF)
         return fn_02006B78(route, 0, x, z);
     i = NextPoint(route, idx);
-    if (Side(&route->pts[i], x, z) >= 0)
+    q = &route->pts[i];
+    dx = x - q->x;
+    dz = z - q->z;
+    if (dx * q->nx + dz * q->nz >= 0)
         return i;
     return idx;
 }
@@ -1086,19 +1091,19 @@ s16 fn_02007520(s16 a, s16 b)
     return d;
 }
 
-s16 fn_02007540(s16 from, s16 to, u16 max)
+s16 fn_02007540(s16 from, s16 to, s16 max)
 {
-    s16 m = max;
     s16 d = fn_02007520(to, from);
 
     if (d > 0) {
-        if (d > m)
-            return m;
+        if (d > max)
+            return max;
         return d;
     }
     if (d < 0) {
-        if (d < (s16)-m)
-            return -m;
+        max = -max;
+        if (d < max)
+            return max;
         return d;
     }
     return 0;

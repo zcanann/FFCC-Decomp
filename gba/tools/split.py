@@ -152,8 +152,10 @@ def bootstrap(data: bytes) -> Tuple[List[Symbol], List[Split]]:
 
 
 class Emitter:
-    def __init__(self, a: Analysis, symbols: List[Symbol], splits: List[Split]):
+    def __init__(self, a: Analysis, symbols: List[Symbol], splits: List[Split], constants=()):
         self.a = a
+        # Literal values that are plain numbers even though they fall inside the image.
+        self.constants = set(constants)
         self.symbols = symbols
         self.splits = splits
         self.addresses = [s.address for s in symbols]
@@ -375,6 +377,8 @@ class Emitter:
 
     def pointer(self, value: int, unit: str, address: int) -> Optional[str]:
         a = self.a
+        if value in self.constants:
+            return None
         if a.contains(value & ~1):
             return self.expression(value, unit)
         for name, (lo, hi) in BSS_SECTIONS.items():
@@ -443,7 +447,14 @@ def main() -> None:
     symbols = parse_symbols(symbols_path)
     splits = parse_splits(splits_path)
     a = analyze(data, symbols)
-    emitter = Emitter(a, symbols, splits)
+    constants_path = args.config / "constants.txt"
+    constants = []
+    if constants_path.is_file():
+        for line in constants_path.read_text().splitlines():
+            line = line.split("#")[0].strip()
+            if line:
+                constants.append(int(line, 0))
+    emitter = Emitter(a, symbols, splits, constants)
     units = list(dict.fromkeys(s.unit for s in splits))
 
     if args.asm_dir:

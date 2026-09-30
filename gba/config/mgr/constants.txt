@@ -1,0 +1,2 @@
+# Literal values inside the image address range that are plain constants, not pointers.
+0x02020202  # tile fill pattern in fn_0200652C

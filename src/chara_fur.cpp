@@ -823,9 +823,9 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 	const int rowStride = width * 4;
 	for (int dy = -2; dy <= 2; dy++) {
 		int dx;
-		int py = centerY + dy;
 		for (dx = -2; dx <= 2; dx++) {
 			int px = centerX + dx;
+			int py = centerY + dy;
 			int distance;
 			int tileIndex;
 			unsigned short packed;
@@ -854,8 +854,8 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 
 			if (mode != 0) {
 				int reduce = (targetColor.a * (4 - distance)) / 4;
-				a = a - reduce;
-				a = a < 0 ? 0 : a;
+				int reducedAlpha = a - reduce;
+				a = reducedAlpha < 0 ? 0 : reducedAlpha;
 			} else {
 				float k = (float)(distance / 4) + (float)(7 - targetColor.a) / 7.0f;
 				k = k < 1.0f ? k : 1.0f;

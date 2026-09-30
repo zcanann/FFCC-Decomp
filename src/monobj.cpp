@@ -477,9 +477,10 @@ void CGMonObj::setRepop(int mode)
 	void** scriptHandle = object->m_scriptHandle;
 	int classId = reinterpret_cast<int>(scriptHandle[4]);
 
+	int spawnIndex = reinterpret_cast<int>(scriptHandle[2]);
 	int option;
 	if ((mode != 0) && (option = static_cast<int>(*reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue)), option < 9)) {
-		u64 bit = 1ULL << reinterpret_cast<int>(scriptHandle[2]);
+		u64 bit = 1ULL << spawnIndex;
 		u64 spawnBits = CFlatSpawnBits(option);
 		if ((spawnBits & bit) != 0) {
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) = 0;

@@ -1594,7 +1594,8 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int cachePriority)
  */
 static void pppCalcPartStd(_pppMngSt* pppMngSt)
 {
-	for (s32 i = 0; i < pppMngSt->m_numPrograms; i++)
+	s32 i, stage;
+	for (i = 0; i < pppMngSt->m_numPrograms; i++)
 	{
 		_pppPDataVal* pDataVal = &pppMngSt->m_pppPDataVals[i];
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0)
@@ -1604,7 +1605,7 @@ static void pppCalcPartStd(_pppMngSt* pppMngSt)
 
 			if (pDataVal->m_activeCount != 0)
 			{
-				for (s32 stage = 0; stage < progSet->m_numStages; stage++)
+				for (stage = 0; stage < progSet->m_numStages; stage++)
 				{
 					_pppCtrlTable* stageIter = &progSet->m_stages[stage];
 					pppProg* prog = stageIter->m_prog;

@@ -1841,8 +1841,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			if ((len1 == 2) && (selectedFlag != 0)) {
 				continue;
 			}
-			ok = 0;
-			k = 0;
+			k = ok = 0;
 			for (; k < len1 - 1; k++) {
 				const int slot = selected - (len1 - 1 - k);
 				if (candidates[slot] != 0) {
@@ -1861,8 +1860,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		const int baseLen = static_cast<int>(s_Unite[0].count);
 		int start = selected - (baseLen - 1);
 		for (int i = 0; i < baseLen; i++, start++) {
-			ok = 0;
-			k = 0;
+			k = ok = 0;
 			for (; k < baseLen; k++) {
 				const int slot = i + (selected - ((baseLen - 1) - k));
 				if (candidates[slot] != 0) {
@@ -1892,8 +1890,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				start++;
 			}
 
-			ok = 0;
-			k = 0;
+			k = ok = 0;
 			for (; k < len; k++) {
 				const int slot = start + (selected - ((len - 1) - k));
 				if (candidates[slot] != 0) {

@@ -74,8 +74,8 @@ CFLAGS = "-mthumb-interwork -O2 -fhex-asm"
 
 # Game units whose compiled source links into the checked image, per program.
 COMPLETE: Dict[str, List[str]] = {
-    "cli": ["crt0", "m4a/m4a_1", "m4a/m4a"],
-    "mgr": ["crt0", "m4a/m4a_1", "m4a/m4a"],
+    "cli": ["crt0", "joy_reset", "m4a/m4a_1", "m4a/m4a"],
+    "mgr": ["crt0", "joy_reset", "m4a/m4a_1", "m4a/m4a"],
 }
 
 # libgcc routines assembled from lib1thumb.asm; the rest are C.

@@ -2299,6 +2299,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 {
 	int finished;
 	float targetX;
+	double step = 12.8;
 
 	if (s_unitePanelCount == 0) {
 		return 1;
@@ -2315,7 +2316,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 				break;
 			}
 
-			entry->x = static_cast<s16>(static_cast<double>(entry->x) + 12.8);
+			entry->x = static_cast<s16>(static_cast<double>(entry->x) + step);
 			if (fabs(static_cast<double>(static_cast<float>(entry->x) - baseX)) >
 			    64.0) {
 				entry->x = static_cast<s16>(64.0f + baseX);
@@ -2334,7 +2335,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 					break;
 				}
 
-				entry->x = static_cast<s16>(static_cast<double>(entry->x) + 12.8);
+				entry->x = static_cast<s16>(static_cast<double>(entry->x) + step);
 				if (fabs(static_cast<double>(static_cast<float>(entry->x) - baseX)) >
 				    64.0) {
 					entry->x = static_cast<s16>(targetX);

@@ -454,11 +454,13 @@ void fn_020033F4(void)
 {
     s32 i;
     u8 *dst;
+    s32 count;
 
     lbl_030010D8 = 0;
+    count = 16;
     if (lbl_03001160 != 0) {
         dst = lbl_030008D8;
-        for (i = 0; i < 16; i++) {
+        for (i = 0; i < count; i++) {
             DmaCopy32(DMA0, lbl_030010E0, dst, 0x80);
             dst += 0x80;
         }

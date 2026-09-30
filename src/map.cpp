@@ -2855,7 +2855,7 @@ void CMapMng::GetFogEnable()
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapMng::~CMapMng()
+inline CMapMng::~CMapMng()
 {
 }
 

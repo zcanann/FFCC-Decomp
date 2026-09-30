@@ -10,8 +10,29 @@ m4a/m4a_1:
 m4a/m4a:
 	.text       start:0x0201B258 end:0x0201C714
 
+libagbsyscall/CpuFastSet:
+	.text       start:0x0201C714 end:0x0201C718
+
+libagbsyscall/CpuSet:
+	.text       start:0x0201C718 end:0x0201C71C
+
+libagbsyscall/LZ77UnCompVram:
+	.text       start:0x0201C71C end:0x0201C720
+
+libagbsyscall/LZ77UnCompWram:
+	.text       start:0x0201C720 end:0x0201C724
+
+libagbsyscall/MidiKey2Freq:
+	.text       start:0x0201C724 end:0x0201C728
+
+libagbsyscall/MusicPlayerContinue:
+	.text       start:0x0201C728 end:0x0201C72C
+
+libagbsyscall/VBlankIntrWait:
+	.text       start:0x0201C72C end:0x0201C734
+
 main:
-	.text       start:0x0201C714 end:0x0201C96C
+	.text       start:0x0201C734 end:0x0201C96C
 
 libgcc/_call_via_rX:
 	.text       start:0x0201C96C end:0x0201C9A8

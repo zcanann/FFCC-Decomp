@@ -14,3 +14,7 @@
   (`M4A_SOUND_FREQ`, set in `tools/gba_project.py`).
 - `align.s`: appended to compiler output before assembling, like pret and agbcc's
   libgcc, so sections end with zero-filled word alignment.
+- `libagbsyscall/`: BIOS call wrappers from pret/pokeemerald's `libagbsyscall.s`,
+  assembled once per routine (`L_<name>`) like pret's granular build. The programs
+  link them in alphabetical (archive) order.
+- `asm/`: shared assembler includes for the library sources.

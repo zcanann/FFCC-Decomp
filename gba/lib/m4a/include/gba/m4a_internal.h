@@ -410,7 +410,7 @@ void TrackStop(struct MusicPlayerInfo *mplayInfo, struct MusicPlayerTrack *track
 void MPlayMain(struct MusicPlayerInfo *);
 void RealClearChain(void *x);
 
-void MPlayContinue(struct MusicPlayerInfo *mplayInfo);
+void MusicPlayerContinue(struct MusicPlayerInfo *mplayInfo);
 void MPlayStart(struct MusicPlayerInfo *mplayInfo, struct SongHeader *songHeader);
 void m4aMPlayStop(struct MusicPlayerInfo *mplayInfo);
 void FadeOutBody(struct MusicPlayerInfo *mplayInfo);

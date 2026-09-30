@@ -79,7 +79,7 @@ void m4aSongNumStartOrContinue(u16 n)
     else if ((mplay->info->status & MUSICPLAYER_STATUS_TRACK) == 0)
         MPlayStart(mplay->info, song->header);
     else if (mplay->info->status & MUSICPLAYER_STATUS_PAUSE)
-        MPlayContinue(mplay->info);
+        MusicPlayerContinue(mplay->info);
 }
 
 void m4aSongNumStop(u16 n)
@@ -101,7 +101,7 @@ void m4aSongNumContinue(u16 n)
     const struct MusicPlayer *mplay = &mplayTable[song->ms];
 
     if (mplay->info->songHeader == song->header)
-        MPlayContinue(mplay->info);
+        MusicPlayerContinue(mplay->info);
 }
 
 void m4aMPlayAllStop(void)
@@ -122,7 +122,7 @@ void m4aMPlayAllContinue(void)
     s32 i;
 
     for (i = 0; i < NUM_MUSIC_PLAYERS; i++)
-        MPlayContinue(gMPlayTable[i].info);
+        MusicPlayerContinue(gMPlayTable[i].info);
 }
 
 void m4aMPlayFadeOut(struct MusicPlayerInfo *mplayInfo, u16 speed)

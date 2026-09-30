@@ -7,8 +7,9 @@ objdiff.json so the programs count toward the version's progress report.
 Units with source are compiled and diffed against their target objects:
 - gba/src/<program>/<unit>.c, built with agbcc
 - libgcc/<object>, built from gba/lib/libgcc like agbcc's own libgcc
-Units listed in COMPLETE, and all library units, link their compiled objects
-into the checked image.
+- libagbsyscall/<routine>, m4a/<file>: SDK libraries in gba/lib
+Units listed in COMPLETE, and all libgcc and libagbsyscall units, link their
+compiled objects into the checked image.
 """
 
 import importlib.util
@@ -24,6 +25,7 @@ from .project import ProgressCategory, ProjectConfig
 GBA_DIR = Path("gba")
 LIBGCC_DIR = GBA_DIR / "lib" / "libgcc"
 M4A_DIR = GBA_DIR / "lib" / "m4a"
+SYSCALL_DIR = GBA_DIR / "lib" / "libagbsyscall"
 
 # Programs per game version: category id -> program info.
 PROGRAMS: Dict[str, Dict[str, Dict[str, str]]] = {
@@ -172,6 +174,12 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(old_agbcc), "cflags": "-O2"})
                 n.build(base, "gba_as", [asm, align], implicit=binutils_stamp)
                 return base
+            if unit.startswith("libagbsyscall/"):
+                # One object per routine, like pret's granular libagbsyscall build.
+                name = unit.split("/", 1)[1]
+                n.build(base, "gba_as", _path(SYSCALL_DIR / "libagbsyscall.s"), implicit=binutils_stamp,
+                        variables={"asincludes": f"-I {_path(GBA_DIR / 'lib')} --defsym L_{name}=1"})
+                return base
             if unit.startswith("m4a/"):
                 name = unit.split("/", 1)[1]
                 if (M4A_DIR / f"{name}.s").is_file():
@@ -180,7 +188,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                     # the v5t attributes are then dropped since objdiff rejects that arch too.
                     v5 = stem + ".v5.o"
                     n.build(v5, "gba_as", _path(M4A_DIR / f"{name}.s"), implicit=binutils_stamp,
-                            variables={"asincludes": f"-I {_path(M4A_DIR)}",
+                            variables={"asincludes": f"-I {_path(GBA_DIR / 'lib')}",
                                        "gba_asflags": "-march=armv5t -mthumb-interwork"})
                     n.build(base, "gba_strip_attributes", v5, implicit=binutils_stamp)
                     return base
@@ -231,7 +239,8 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                     base = compile_source(unit, src_dir, out, info)
                     if base:
                         bases[unit] = base
-            complete = {u for u in bases if u.startswith("libgcc/") or u in COMPLETE.get(info["config"], [])}
+            complete = {u for u in bases if u.startswith(("libgcc/", "libagbsyscall/"))
+                        or u in COMPLETE.get(info["config"], [])}
 
             asm = [_path(out / "asm" / f"{u}.s") for u in units]
             ldscript = _path(out / "ldscript.ld")

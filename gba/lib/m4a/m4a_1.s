@@ -380,7 +380,7 @@ _081DDA46:
 	adds r1, r2, 0
 	ldrb r2, [r5, o_MusicPlayerTrack_pitM]
 	ldr r0, [r4, o_SoundChannel_wav]
-	bl MidiKeyToFreq
+	bl MidiKey2Freq
 	str r0, [r4, o_SoundChannel_freq]
 _081DDA52:
 	ldr r4, [r4, o_SoundChannel_np]
@@ -744,7 +744,7 @@ _081DDCCE:
 	ldrb r2, [r5, 0x9]
 	adds r1, r3, 0
 	adds r0, r7, 0
-	bl MidiKeyToFreq
+	bl MidiKey2Freq
 _081DDCDC:
 	str r0, [r4, 0x20]
 	movs r0, 0x80

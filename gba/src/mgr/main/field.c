@@ -105,8 +105,8 @@ void Floor_BuildDepths(struct Field *field)
 /* Copies the 128x128 window of the course map around the camera into the BG2 tile map */
 void Field_UpdateMap(struct Field *field)
 {
-    s16 x = ((u16)((gCamera.originX - 0x6000) >> 7) & ~1) + 256;
-    s16 y = ((gCamera.originZ - 0x6000) >> 7) + 256;
+    s16 x = gCamera.originX;
+    s16 y = gCamera.originZ;
     s16 top;
     s16 bottom;
     s16 left;
@@ -114,6 +114,8 @@ void Field_UpdateMap(struct Field *field)
     u8 row;
     s16 sy;
 
+    x = ((u16)((x - 0x6000) >> 7) & ~1) + 256;
+    y = ((y - 0x6000) >> 7) + 256;
     if (y <= -128 || y >= 256 || x <= -128 || x >= 256) {
         DmaFill32(0x02020202, gFieldTiles, 0x85001000);
         return;

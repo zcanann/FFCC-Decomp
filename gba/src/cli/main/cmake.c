@@ -1006,7 +1006,6 @@ s32 CMakeLookScreen_OpenLooks(void)
     s32 row;
     s32 half;
     s32 line;
-    s32 n;
     s32 i;
     s32 tile;
     s32 pal;
@@ -1029,10 +1028,10 @@ s32 CMakeLookScreen_OpenLooks(void)
         memcpy(&tmp, prev, sizeof(struct Window));
         tmp.bg--;
         Text_SetX(20);
-        n = prev->cursor * 8;
+        i = prev->cursor * 8;
         if (gCMakeData.look & 0x80)
-            n += 4;
-        Text_Print(Msg_GetLook(n + row), TEXT_DRAW);
+            i += 4;
+        Text_Print(Msg_GetLook(i + row), TEXT_DRAW);
         line = half + 3;
         Window_PutText(&tmp, line, 0);
         for (i = 0; i < ARRAY_COUNT(buf); i++)
@@ -1043,8 +1042,7 @@ s32 CMakeLookScreen_OpenLooks(void)
             buf[i] = tile++ | pal;
             buf[i + 30] = tile++ | pal;
         }
-        half = row * 2 + 1;
-        map = Bg_GetMapPtr(tmp.bg, win->x, win->y + half);
+        map = Bg_GetMapPtr(tmp.bg, win->x, win->y + 1 + row * 2);
         DmaSet(3, buf, map, 0x80000000 | win->width);
         DmaSet(3, &buf[30], map + 32, 0x80000000 | win->width);
     }

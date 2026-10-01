@@ -1620,8 +1620,7 @@ void LetterRead_PrintNextLine(void)
     char *nl = line;
     s32 i;
     s32 w;
-    s32 width;
-    s32 tile;
+    s32 n;
     s32 attr;
     s32 size;
     s32 x;
@@ -1657,15 +1656,15 @@ void LetterRead_PrintNextLine(void)
     Text_SetFill(0, 0);
     Text_Clear();
     if (sLetterAlign) {
-        width = Text_Print(buf, TEXT_WIDTH);
+        n = Text_Print(buf, TEXT_WIDTH);
         i = (win.width - 5) * 8;
-        if (width >= i) {
+        if (n >= i) {
             Text_SetX(0);
         } else {
-            width = i - width;
+            n = i - n;
             if (sLetterAlign == 1)
-                width >>= 1;
-            Text_SetX(width);
+                n >>= 1;
+            Text_SetX(n);
         }
     }
     Text_Print(buf, TEXT_DRAW);
@@ -1673,14 +1672,14 @@ void LetterRead_PrintNextLine(void)
     w = (w & 7) ? (w >> 3) + 1 : w >> 3;
     Window_PutText(&win, sLetterRow, 0);
     if (w) {
-        tile = (win.width << 1) * sLetterRow + 0x80;
+        n = (win.width << 1) * sLetterRow + 0x80;
         attr = 0x7000;
         if (w >= win.width - 5)
             w = win.width - 5;
         size = w * 2;
         for (i = 0; i < w; i++) {
-            tiles[i] = tile++ | attr;
-            tiles[i + 30] = tile++ | attr;
+            tiles[i] = n++ | attr;
+            tiles[i + 30] = n++ | attr;
         }
         x = win.x + 2;
         y = win.y + 1 + sLetterRow * 2;

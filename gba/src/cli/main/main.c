@@ -179,7 +179,6 @@ void Input_Init(void)
 void Input_Update(void)
 {
     u16 keys;
-    u16 pressed;
 
     keys = REG_KEYINPUT ^ KEY_MASK;
     if (sWaitKeyRelease != 0) {
@@ -194,12 +193,11 @@ void Input_Update(void)
     }
     gKeysPrev = gKeysHeld;
     gKeysHeld = keys;
-    pressed = keys & ~gKeysPrev;
-    gKeysNew = pressed;
-    gKeysCurrent = (keys & gKeysPrev) ^ pressed;
+    gKeysNew = keys & ~gKeysPrev;
+    gKeysCurrent = (keys & gKeysPrev) ^ gKeysNew;
     gKeysReleased = gKeysPrev & ~keys;
-    gKeysToggled ^= pressed;
-    gKeysRepeat = pressed;
+    gKeysToggled ^= gKeysNew;
+    gKeysRepeat = gKeysNew;
     if (gKeysPrev != gKeysHeld || gKeysPrev == 0) {
         sKeyRepeatTimer = 0;
     } else {
@@ -208,7 +206,7 @@ void Input_Update(void)
         sKeyRepeatTimer++;
         t = sKeyRepeatTimer - 20;
         if (sKeyRepeatTimer >= 20 && t % 5 == 0)
-            gKeysRepeat = pressed | (keys & 0x3F0);
+            gKeysRepeat |= keys & 0x3F0;
     }
     if (Link_IsConnected()) {
         Link_SendPad(keys);

@@ -444,10 +444,11 @@ void EquipScreen_PrintCandidate(s32 idx, s32 row)
 {
     struct Window *win;
     u8 *list = gDetailBuf;
-    s32 n = *list++ + 1;
+    s32 n = *list++;
     const char *str;
     s32 id;
 
+    n++;
     win = &gWindows[1];
     Text_SetFill(1, 0);
     Text_Clear();

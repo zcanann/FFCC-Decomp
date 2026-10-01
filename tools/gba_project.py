@@ -61,6 +61,12 @@ PROGRAMS: Dict[str, Dict[str, Dict[str, str]]] = {
             "disc_path": "dvd/gba/ffcc_cli.bin",
             "sha1": "ec0579f21b9211f2fec4d17fe5943f23309c5f4c",
             "m4a_defines": "-DM4A_SOUND_FREQ=SOUND_MODE_FREQ_13379",
+            # Each source file's .rodata and .data stay separate sections
+            # (.rodata.<file>) in the unit's object, as splits.txt splits the
+            # target's data at the original objects' boundaries. objdiff then
+            # resolves section-relative relocations, such as pointers to string
+            # literals, against the same object-local symbols on both sides.
+            "object_data_sections": "1",
         },
         "gba_mgr": {
             "config": "mgr",
@@ -210,6 +216,8 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
         n.rule("gba_ld", f"{prefix_str}ld{exe} -T $ldscript -o $out --no-warn-rwx-segments -Map $map",
                description="LINK $out")
         n.rule("gba_ld_r", f"{prefix_str}ld{exe} -r -o $out $in", description="LINK $out")
+        n.rule("gba_rename_data", f"{prefix_str}objcopy{exe} --rename-section .rodata=.rodata.$name "
+               "--rename-section .data=.data.$name $in $out", description="OBJCOPY $out")
         n.rule("gba_strip_attributes", f"{prefix_str}objcopy{exe} -R .ARM.attributes $in $out",
                description="OBJCOPY $out")
         n.rule("gba_objcopy", f"{prefix_str}objcopy{exe} -O binary -j .text -j .rodata $in $out",
@@ -249,6 +257,8 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             stem = _path(out / "src" / unit)
             # Like pret and agbcc's libgcc, compiler output ends with an explicit
             # zero-filled word alignment, so the section is padded with zeros.
+            # Its .bss is word-aligned too: the original objects' static
+            # variables (.lcomm) each start on a word boundary.
             align = _path(GBA_DIR / "lib" / "align.s")
             if unit.startswith("libgcc/"):
                 name = unit.split("/", 1)[1]
@@ -324,15 +334,20 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                     # Data modules; .incbin paths resolve against the extracted assets.
                     n.build(obj, "gba_as", _path(file), implicit=binutils_stamp + assets,
                             variables={"asincludes": f"-I {_path(out / 'assets')}"})
-                    objects.append(obj)
-                    continue
-                pre = file_stem + ".i"
-                asm = file_stem + ".s"
-                n.build(pre, "gba_cpp", _path(file), implicit=binutils_stamp,
-                        variables={"cppflags": f"{CPPFLAGS} -iquote {_path(file.parent)}"})
-                n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(agbcc),
-                                                       "cflags": f"{CFLAGS} {info.get('cflags', '')}".strip()})
-                n.build(obj, "gba_as", [asm, align], implicit=binutils_stamp)
+                else:
+                    pre = file_stem + ".i"
+                    asm = file_stem + ".s"
+                    n.build(pre, "gba_cpp", _path(file), implicit=binutils_stamp,
+                            variables={"cppflags": f"{CPPFLAGS} -iquote {_path(file.parent)}"})
+                    n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(agbcc),
+                                                           "cflags": f"{CFLAGS} {info.get('cflags', '')}".strip()})
+                    n.build(obj, "gba_as", [asm, align], implicit=binutils_stamp)
+                if file != source and info.get("object_data_sections"):
+                    # Keep each file's data in its own section (see PROGRAMS).
+                    renamed = file_stem + ".sections.o"
+                    n.build(renamed, "gba_rename_data", obj, implicit=binutils_stamp,
+                            variables={"name": file.stem})
+                    obj = renamed
                 objects.append(obj)
             if files != [source]:
                 n.build(base, "gba_ld_r", objects, implicit=binutils_stamp)

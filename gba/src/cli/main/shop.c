@@ -9,18 +9,18 @@
 #include "screen.h"
 #include "lists.h"
 
-extern s8 sShopResult;
-extern s8 sInfoItem;
-extern s8 sShopRow;
-extern s8 sShopTop;
-extern s8 sShopWaiting;
-extern s8 sInfoRow;
-extern s8 sInfoMode;
-extern s8 sShopQuantity;
-extern s8 sShopPrevQuantity;
-extern s8 sInfoArrow;
-extern s8 sInfoShowIcon;
-extern const char sSlashText[];
+static s8 sShopResult;
+static s8 sInfoItem;
+static s8 sShopRow;
+static s8 sShopTop;
+static s8 sShopWaiting;
+static s8 sInfoRow;
+static s8 sInfoMode;
+static s8 sShopQuantity;
+static s8 sShopPrevQuantity;
+static s8 sInfoArrow;
+static s8 sInfoShowIcon;
+const char sSlashText[] = "/";
 
 void ShopTopScreen_DrawCursor(void);
 s32 ShopTopScreen_HandleInput(void);

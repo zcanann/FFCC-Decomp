@@ -62,9 +62,14 @@ def parse_symbols(path: Path) -> List[Symbol]:
         if not m:
             continue
         attrs = dict(a.split(":", 1) if ":" in a else (a, "") for a in m.group(4).split())
-        symbols.append(Symbol(m.group(1), m.group(2), int(m.group(3), 16), attrs.get("type", "object"),
-                              int(attrs.get("size", "0"), 0), "thumb" in attrs,
-                              attrs.get("scope") == "local", "data" in attrs or attrs.get("asset") == ""))
+        # An anonymous compiler constant, such as a string literal, gets an
+        # assembler-local .L label: like compiler output, the object has no
+        # symbol for it and references to it are section-relative.
+        literal = "literal" in attrs
+        symbols.append(Symbol((".L" if literal else "") + m.group(1), m.group(2), int(m.group(3), 16),
+                              attrs.get("type", "object"), int(attrs.get("size", "0"), 0), "thumb" in attrs,
+                              literal or attrs.get("scope") == "local",
+                              "data" in attrs or attrs.get("asset") == ""))
     return sorted(symbols, key=lambda s: s.address)
 
 

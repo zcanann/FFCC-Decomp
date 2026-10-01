@@ -9,22 +9,22 @@
 #include "screen.h"
 #include "lists.h"
 
-extern s8 sSmithTop;
-extern s8 sSmithRow;
-extern s8 sSmithResult;
-extern s8 sSmithSel;
-extern s8 sSmithCanForge;
-extern s8 sSmithWaiting;
-extern s8 sSmithResultSlot;
-extern s8 sSmithCanEquip;
-extern s8 sSmithSlotsInit;
-extern s8 sSmithEquipPending;
-extern s8 sSmithVariant;
-extern s8 sSmithRowOffset;
-extern s8 sSmithListValid;
-extern s8 sSmithKnownLoaded;
-extern u32 sSmithKnown[4];
-extern const char sPluralText[];
+static s8 sSmithTop;
+static s8 sSmithRow;
+static s8 sSmithResult;
+static s8 sSmithSel;
+static s8 sSmithCanForge;
+static s8 sSmithWaiting;
+static s8 sSmithResultSlot;
+static s8 sSmithCanEquip;
+static s8 sSmithSlotsInit;
+static s8 sSmithEquipPending;
+static s8 sSmithVariant;
+static s8 sSmithRowOffset;
+static s8 sSmithListValid;
+static s8 sSmithKnownLoaded;
+static u32 sSmithKnown[4];
+const char sPluralText[] = "s";
 
 void SmithForge_DrawRow(s32, s32);
 s32 SmithForge_OpenConfirm(void);

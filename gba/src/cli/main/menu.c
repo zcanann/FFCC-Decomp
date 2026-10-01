@@ -6,8 +6,8 @@
 #include "window.h"
 #include "screen.h"
 
-extern s8 sMenuRow;
-extern u8 sMenuReturn;
+static s8 sMenuRow;
+static u8 sMenuReturn;
 
 void MenuScreen_DrawCursor(void);
 void MenuScreen_DrawIcons(void);

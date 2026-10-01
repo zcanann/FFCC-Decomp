@@ -8,12 +8,12 @@
 #include "window.h"
 #include "screen.h"
 
-extern s8 sGilSynced;
-extern u32 sGilAmount;
-extern u8 sGilDigits;
-extern s16 sGilCursorX;
-extern s8 sGilQuit;
-extern s8 sGilWaiting;
+static s8 sGilSynced;
+static u32 sGilAmount;
+static u8 sGilDigits;
+static s16 sGilCursorX;
+static s8 sGilQuit;
+static s8 sGilWaiting;
 
 void GilScreen_DrawCursor(void);
 void GilScreen_HandleInput(void);

@@ -11,22 +11,49 @@
 
 extern vu16 gBgScroll[4][2];
 
-extern u32 sKeyRepeatTimer;
-extern u32 sWaitKeyRelease;
-extern u32 sPrevMenuHasInput;
-extern s8 sShakeTimer;
-extern s8 sShakeX;
-extern s8 sShakeY;
-extern s8 sScrollDirty;
-extern s8 sAlarmTimer;
+static u32 sKeyRepeatTimer;
+static u32 sWaitKeyRelease;
+static u32 sPrevMenuHasInput;
+static s8 sShakeTimer;
+static s8 sShakeX;
+static s8 sShakeY;
+static s8 sScrollDirty;
+static s8 sAlarmTimer;
 extern u8 gIntrMainRam[];
-extern const char sMapLoadText[10] __attribute__((aligned(4)));
-extern const u8 sShakeAmpTable[];
-extern const s8 sShakeOffsetTable[];
-extern const char sPercentText[];
+
+typedef void (*IntrFunc)(void);
+
+const IntrFunc IntrTable[] = {
+    Link_JoyIntr,
+    VBlankIntr,
+    IntrDummy,
+    SoundIntr,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+};
+
+const s16 gSinTable[] = {
+    0, 49, 97, 142, 181, 212, 236, 251,
+    256, 251, 236, 212, 181, 142, 97, 49,
+    0, -49, -97, -142, -181, -212, -236, -251,
+    -256, -251, -236, -212, -181, -142, -97, -49,
+    0, 49, 97, 142, 181, 212, 236, 251,
+};
+
+const u8 sShakeAmpTable[] = { 4, 4, 4, 3, 3, 3, 2, 2, 2, 1, 1, 1 };
+const s8 sShakeOffsetTable[] = { 0, 0, 4, -4, 2, 3, -1, -4, 3, -2, 1, 2, -3, -1, 0, 0 };
+const char sMapLoadText[] = "MAP LOAD ";
+const char sPercentText[] = "%";
 extern const u16 gBackdropPalettes[];
-extern const u16 *const gBackdropTiles[];
-extern const u16 *const gBackdropMaps[];
+extern const u16 *gBackdropTiles[];
+extern const u16 *gBackdropMaps[];
 
 void AgbMain(void)
 {

@@ -14,11 +14,11 @@
             dst += 64; \
     }
 
-extern s32 sItemTop;
-extern s8 sItemQuit;
-extern s8 sItemRow;
-extern s8 sItemUnused;
-extern s16 sItemUnused2;
+static s32 sItemTop;
+static s8 sItemQuit;
+static s8 sItemRow;
+static s8 sItemUnused;
+static s16 sItemUnused2;
 
 s32 ItemScreen_OpenActions(void);
 s32 ItemScreen_CloseActions(void);

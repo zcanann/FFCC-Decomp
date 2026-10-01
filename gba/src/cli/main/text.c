@@ -32,12 +32,12 @@ extern struct TextGfx gTextGfx;
 extern u8 gSpFontPalettes[];
 extern u16 gSpTextPalettes[][16];
 
-extern u8 sTextCanvas[];
-extern u32 sTextX;
-extern struct Font *sFont;
-extern u8 sTextFill[];
-extern s32 sTextFillOn;
-extern u32 sNibbleMasks[];
+static u8 sTextCanvas[0x800];
+static u32 sTextX;
+static struct Font *sFont;
+static u8 sTextFill[0x80];
+static s32 sTextFillOn;
+extern u32 gNibbleMasks[];
 
 void Text_Init(void)
 {
@@ -178,11 +178,11 @@ s32 Text_Print(const char *str, s32 mode)
                         rs = 8 - shift;
                         v = bits;
                         if (rest == 0)
-                            v = sNibbleMasks[shift] & bits;
+                            v = gNibbleMasks[shift] & bits;
                         v = (v >> (shift * 4)) | (v << (32 - shift * 4));
-                        *dst |= v & ~sNibbleMasks[rs];
+                        *dst |= v & ~gNibbleMasks[rs];
                         if (rest != 0) {
-                            *dst2 |= v & sNibbleMasks[rs];
+                            *dst2 |= v & gNibbleMasks[rs];
                             if (rest > rs) {
                                 if (second)
                                     bits = (glyph[1] & 0xCCCCCCCC) >> 2;
@@ -190,11 +190,11 @@ s32 Text_Print(const char *str, s32 mode)
                                     bits = glyph[1] & 0x33333333;
                                 v = bits;
                                 if (over == 0)
-                                    v = sNibbleMasks[rest - rs] & bits;
+                                    v = gNibbleMasks[rest - rs] & bits;
                                 v = (v >> (shift * 4)) | (v << (32 - shift * 4));
-                                *dst2 |= v & ~sNibbleMasks[rs];
+                                *dst2 |= v & ~gNibbleMasks[rs];
                                 if (over != 0)
-                                    *dst3 |= v & sNibbleMasks[rs];
+                                    *dst3 |= v & gNibbleMasks[rs];
                             }
                         }
                     } else {
@@ -204,7 +204,7 @@ s32 Text_Print(const char *str, s32 mode)
                                 bits = (glyph[1] & 0xCCCCCCCC) >> 2;
                             else
                                 bits = glyph[1] & 0x33333333;
-                            *dst2 |= bits & sNibbleMasks[rest];
+                            *dst2 |= bits & gNibbleMasks[rest];
                         }
                     }
                 }

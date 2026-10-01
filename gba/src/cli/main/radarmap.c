@@ -12,14 +12,14 @@ struct MapInfo {
 };
 
 extern u8 gMapRowLenBase[];
-extern struct BgHeader *sMapHeader;
-extern struct MapInfo *sMapInfo;
-extern u8 *sMapRowLen;
-extern u16 *sMapData;
-extern s32 sMapX;
-extern s32 sMapY;
-extern u16 sMapScrollX;
-extern u16 sMapScrollY;
+static struct BgHeader *sMapHeader;
+static struct MapInfo *sMapInfo;
+static u8 *sMapRowLen;
+static u16 *sMapData;
+static s32 sMapX;
+static s32 sMapY;
+static u16 sMapScrollX;
+static u16 sMapScrollY;
 
 void Bg_LoadImage(u8 *data, void *tileDest, u16 *mapDest, u16 *palDest, s32 tileBase)
 {

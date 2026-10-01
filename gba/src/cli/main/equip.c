@@ -9,11 +9,11 @@
 #include "screen.h"
 #include "lists.h"
 
-extern s8 sEquipQuit;
-extern s8 sEquipRow;
-extern s8 sEquipTop;
-extern s8 sEquipRowOffset;
-extern s8 sEquipUseFlags;
+static s8 sEquipQuit;
+static s8 sEquipRow;
+static s8 sEquipTop;
+static s8 sEquipRowOffset;
+static s8 sEquipUseFlags;
 
 void EquipScreen_DrawCursor(void);
 void EquipScreen_HandleInput(void);

@@ -8,7 +8,7 @@
 #include "window.h"
 #include "screen.h"
 
-extern s8 sRadarMapShown;
+static s8 sRadarMapShown;
 
 void RadarScreen_DrawFrame(void);
 

@@ -55,20 +55,22 @@ union OamBuffer {
     struct OamAffine aff[32];
 };
 
-extern struct ObjHeader gObjHeader;
-extern struct ObjCell gObjCells[];
-extern u8 gObjPalettes[];
-extern u8 gObjPalUsage[];
-extern s16 gObjShapeSizes[];
+static union OamBuffer sOamBuf[2];
+static s32 sOamCount;
+static struct ObjCell sObjCells[0x700 / sizeof(struct ObjCell)];
+static u8 sObjPalettes[0x600];
+s16 gObjShapeSizes[] = {
+    32, 128, 512, 2048, 64, 128, 256, 1024, 64, 128, 256, 1024,
+};
 extern u16 gSpObjPalettes[][16];
 extern s16 gSinTable[];
-extern union OamBuffer sOamBuf[2];
-extern s32 sOamCount;
-extern s8 sOamBufIndex;
+static struct ObjHeader sObjHeader;
+static s8 sOamBufIndex;
+static s16 sAffineScaleX[32];
 
-extern s16 sAffineScaleX[];
-extern s16 sAffineScaleY[];
-extern s8 sAffineAngle[];
+static s16 sAffineScaleY[32];
+static s8 sAffineAngle[32];
+static u8 sObjPalUsage[24];
 
 void Obj_Init(void)
 {
@@ -91,22 +93,22 @@ void Obj_Init(void)
     if (gDataFlags & DATA_OBJ) {
         src = gDownloadData;
         LZ77UnCompVram(src, (void *)0x06010000);
-        memcpy(&gObjHeader, gDownloadBuf, 32);
-        CpuFastClear(0, gObjCells, 0x700);
-        src = gObjHeader.palettesOffset + (u32)gDownloadBuf;
-        size = gObjHeader.paletteCount * 32;
-        DmaCopy16(3, src, gObjPalettes, size);
-        src = gSpMode == 0 ? gObjPalettes : (u8 *)gSpObjPalettes;
+        memcpy(&sObjHeader, gDownloadBuf, 32);
+        CpuFastClear(0, sObjCells, 0x700);
+        src = sObjHeader.palettesOffset + (u32)gDownloadBuf;
+        size = sObjHeader.paletteCount * 32;
+        DmaCopy16(3, src, sObjPalettes, size);
+        src = gSpMode == 0 ? sObjPalettes : (u8 *)gSpObjPalettes;
         DmaCopy16(3, src, 0x05000200, size);
-        src = gObjHeader.cellsOffset + (u32)gDownloadBuf;
-        size = gObjHeader.palMapCount >> 1;
-        if (gObjHeader.palMapCount & 1)
+        src = sObjHeader.cellsOffset + (u32)gDownloadBuf;
+        size = sObjHeader.palMapCount >> 1;
+        if (sObjHeader.palMapCount & 1)
             size++;
         if (size & 3)
             size += 4 - size % 4;
-        size += gObjHeader.palMapOffset - gObjHeader.cellsOffset;
-        CpuFastCopy(src, gObjCells, size);
-        memset(gObjPalUsage, 0, 18);
+        size += sObjHeader.palMapOffset - sObjHeader.cellsOffset;
+        CpuFastCopy(src, sObjCells, size);
+        memset(sObjPalUsage, 0, 18);
     }
 }
 
@@ -138,7 +140,7 @@ void Obj_Draw(s32 x, s32 y, s32 id, s32 frame, s32 pal, s32 prio, u32 flags)
 
     if (!(gDataFlags & DATA_OBJ))
         return;
-    cell = &gObjCells[id];
+    cell = &sObjCells[id];
     if ((u32)(id - 3) <= 17 && cell->palLoaded == 0)
         return;
     Shake_GetOffset(&dx, &dy);
@@ -254,7 +256,7 @@ u8 Obj_GetFrameCount(s32 id)
 
     if (!(gDataFlags & DATA_OBJ))
         return 0;
-    cell = gObjCells;
+    cell = sObjCells;
     cell += id;
     return cell->frames;
 }
@@ -269,9 +271,9 @@ s32 Obj_GetPalette(s32 idx, s32 pos)
     if (!(gDataFlags & DATA_OBJ))
         return 0;
 
-    sum = gObjHeader.palMapOffset - gObjHeader.cellsOffset;
-    p = (s8 *)((u8 *)gObjCells + sum);
-    e = gObjCells;
+    sum = sObjHeader.palMapOffset - sObjHeader.cellsOffset;
+    p = (s8 *)((u8 *)sObjCells + sum);
+    e = sObjCells;
     sum = 0;
     for (i = 0; i < idx; i++, e++)
         sum += e->frames;
@@ -296,7 +298,7 @@ void Obj_LoadToBg(s32 idx, s32 bank, s32 mode, s32 frame)
     if (!(gDataFlags & DATA_OBJ))
         return;
 
-    e = gObjCells;
+    e = sObjCells;
     e += idx;
     size = e->frames * (gObjShapeSizes[e->shape] / 32 << 5);
     if (bank == 0) {
@@ -325,10 +327,10 @@ void Obj_LoadToBg(s32 idx, s32 bank, s32 mode, s32 frame)
     DmaSet(3, e->tiles, dest, 0x80000000 | (size >> 1));
 
     if (gSpMode == 0) {
-        src = (u8 *)gObjCells + (gObjHeader.cellPalettesOffset - gObjHeader.cellsOffset);
+        src = (u8 *)sObjCells + (sObjHeader.cellPalettesOffset - sObjHeader.cellsOffset);
     } else {
         src = (u8 *)gSpObjPalettes;
-        src += gObjHeader.paletteCount * 32;
+        src += sObjHeader.paletteCount * 32;
     }
     if (frame < 0) {
         size = e->paletteCount * 32;
@@ -355,7 +357,7 @@ void Obj_AllocPalette(s32 idx, s32 frame)
     if (!(gDataFlags & DATA_OBJ))
         return;
 
-    cells = gObjCells;
+    cells = sObjCells;
     e = &cells[idx];
     if (e->palLoaded)
         return;
@@ -365,14 +367,14 @@ void Obj_AllocPalette(s32 idx, s32 frame)
         count = e->paletteCount;
 
     used = 0;
-    for (i = 3; i < gObjHeader.cellCount; i++) {
+    for (i = 3; i < sObjHeader.cellCount; i++) {
         e = &cells[i];
         if (i != idx && e->palLoaded)
             used |= 1 << (e->palette >> 4);
     }
 
     e = &cells[idx];
-    for (i = gObjHeader.paletteCount; i <= 15; i++) {
+    for (i = sObjHeader.paletteCount; i <= 15; i++) {
         if (!((used >> i) & 1))
             break;
     }
@@ -380,10 +382,10 @@ void Obj_AllocPalette(s32 idx, s32 frame)
     e->palLoaded = 1;
 
     if (gSpMode == 0) {
-        src = (u8 *)gObjCells + (gObjHeader.cellPalettesOffset - gObjHeader.cellsOffset);
+        src = (u8 *)sObjCells + (sObjHeader.cellPalettesOffset - sObjHeader.cellsOffset);
     } else {
         src = (u8 *)gSpObjPalettes;
-        src += gObjHeader.paletteCount * 32;
+        src += sObjHeader.paletteCount * 32;
     }
     if (frame < 0)
         src += e->firstPalette * 32;
@@ -391,7 +393,7 @@ void Obj_AllocPalette(s32 idx, s32 frame)
         src += (e->firstPalette + frame) * 32;
     dest = 0x05000200 + i * 32;
     DmaSet(3, src, dest, 0x80000000 | (count * 16));
-    gObjPalUsage[idx - 3] = count;
+    sObjPalUsage[idx - 3] = count;
 }
 
 void Obj_FreePalette(s32 idx)
@@ -399,11 +401,11 @@ void Obj_FreePalette(s32 idx)
     struct ObjCell *e;
 
     if ((gDataFlags & DATA_OBJ) && idx > 2) {
-        e = gObjCells;
+        e = sObjCells;
         e += idx;
         e->palette = 0xFF;
         e->palLoaded = 0;
-        gObjPalUsage[idx - 3] = 0;
+        sObjPalUsage[idx - 3] = 0;
     }
 }
 
@@ -413,7 +415,7 @@ void Obj_FreeAllPalettes(void)
 
     for (i = 3; i <= 20; i++)
         Obj_FreePalette(i);
-    memset(gObjPalUsage, 0, 18);
+    memset(sObjPalUsage, 0, 18);
 }
 
 void Oam_Transfer(void)
@@ -426,7 +428,7 @@ void Obj_ReloadPalettes(void)
     u8 *src;
     s32 size;
 
-    src = gSpMode == 0 ? gObjPalettes : (u8 *)gSpObjPalettes[0];
-    size = gObjHeader.paletteCount * 32;
+    src = gSpMode == 0 ? sObjPalettes : (u8 *)gSpObjPalettes[0];
+    size = sObjHeader.paletteCount * 32;
     DmaSet(3, src, 0x05000200, 0x80000000 | (size >> 1));
 }

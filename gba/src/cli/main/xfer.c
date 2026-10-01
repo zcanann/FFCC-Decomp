@@ -11,13 +11,16 @@ struct StageNo {
     s8 map;
 };
 
-extern struct BulkXfer sBulkXfer;
-extern u16 gXferCrc[16];
-extern struct StageNo gStageNo;
+static struct BulkXfer sBulkXfer;
+static u16 sXferCrc[16];
+static struct StageNo sStageNo;
 
 extern s8 gReplyTimer;
 
-extern const s8 sStaticMapStages[12][2];
+const s8 sStaticMapStages[12][2] __attribute__((aligned(4))) = {
+    { 1, 0 }, { 1, 2 }, { 12, 0 }, { 13, 0 }, { 33, 0 }, { 34, 0 },
+    { 34, 1 }, { 34, 2 }, { 34, 3 }, { 34, 4 }, { 34, 5 }, { -1, -1 },
+};
 
 void Xfer_Init(void)
 {
@@ -26,11 +29,11 @@ void Xfer_Init(void)
     gDataFlags = 0;
     gXferActive = 0;
     for (i = 0; i < 16; i++) {
-        gXferCrc[i] = 0;
+        sXferCrc[i] = 0;
     }
     memset(&sBulkXfer, 0, sizeof(sBulkXfer));
-    gStageNo.area = 0;
-    gStageNo.map = 0;
+    sStageNo.area = 0;
+    sStageNo.map = 0;
     gStaticMap = 1;
     gNewLetter = 0;
     gXferErrorCount = 0;
@@ -42,7 +45,7 @@ s32 Xfer_CheckCrc(u32 packet)
     s32 result;
 
     if ((gDataFlags >> pkt->arg) & 1) {
-        result = (gXferCrc[pkt->arg] == pkt->value) ? 0 : -1;
+        result = (sXferCrc[pkt->arg] == pkt->value) ? 0 : -1;
         if (result) {
             gDataFlags &= ~(1 << pkt->arg);
         }
@@ -124,7 +127,7 @@ s32 Xfer_Receive(u32 packet, u8 *out)
             sBulkXfer.total = pkt->value;
             sBulkXfer.step++;
         } else if (sBulkXfer.step == 2) {
-            gXferCrc[sBulkXfer.type] = pkt->value;
+            sXferCrc[sBulkXfer.type] = pkt->value;
             sBulkXfer.step = 0;
             sBulkXfer.state = 1;
         } else {
@@ -200,7 +203,7 @@ u8 map;
     gDataFlags &= ~DATA_BASE_POS;
     Scouter_SetDirty(0);
     Header_Clear();
-    if (gStageNo.area != (s8)area && gScreen != 0) {
+    if (sStageNo.area != (s8)area && gScreen != 0) {
         if (gWasConnected) {
             gScreen = 0;
         } else {
@@ -213,11 +216,11 @@ u8 map;
     Screen_Reset();
     Radar_ClearMarkers();
     memset(&gMapObjs, 0, 0x188);
-    if (gStageNo.area != (s8)area || gStageNo.map != (s8)map) {
-        gStageNo.area = area;
-        gStageNo.map = map;
+    if (sStageNo.area != (s8)area || sStageNo.map != (s8)map) {
+        sStageNo.area = area;
+        sStageNo.map = map;
         gDataFlags &= ~DATA_MAP;
-        gXferCrc[1] = 0;
+        sXferCrc[1] = 0;
         gStaticMap = 0;
         for (i = 0; table[i][0] >= 0; i++) {
             if ((s8)area == table[i][0] && (s8)map == table[i][1]) {
@@ -230,8 +233,8 @@ u8 map;
 
 void Map_GetStage(s8 *area, s8 *map)
 {
-    *area = gStageNo.area;
-    *map = gStageNo.map;
+    *area = sStageNo.area;
+    *map = sStageNo.map;
 }
 
 void Reply_Clear(void)
@@ -276,9 +279,9 @@ struct BulkXfer *Xfer_GetWork(void)
 void Xfer_ClearLetterData(void)
 {
     gDataFlags &= ~DATA_LETTER_LIST;
-    gXferCrc[3] = 0;
+    sXferCrc[3] = 0;
     gDataFlags &= ~DATA_LETTER;
-    gXferCrc[2] = 0;
+    sXferCrc[2] = 0;
 }
 
 void Xfer_OnError(void)

@@ -8,23 +8,40 @@
 #include "window.h"
 #include "screen.h"
 
-extern s8 sCMakeResult;
-extern s8 sCMakeCursor[2];
-extern char sCMakeName[17];
-extern s8 sCMakeCharPage;
-extern s8 sCMakeNameLen;
-extern s8 sCMakeCharRow;
-extern char *gNameCharTables[];
-extern s8 sCMakeWaiting;
-extern s8 sCMakeBirthday[2];
-extern s8 sCMakeFoodOrder[8];
-extern s8 sCMakeTextRow;
-extern s8 sCMakeTileRow;
-extern s8 sCMakeSwapping;
-extern s8 sCMakeTop;
-extern const s8 sDaysInMonth[];
-extern u16 sDigitText;
-extern const char sCommaText[];
+static s8 sCMakeResult;
+static s8 sCMakeCursor[2];
+static s8 sCMakeBirthday[2];
+static char sCMakeName[17];
+static s8 sCMakeCharPage;
+static s8 sCMakeNameLen;
+static s8 sCMakeCharRow;
+static s8 sCMakeFoodOrder[8];
+static s8 sCMakeTextRow;
+static s8 sCMakeTileRow;
+static s8 sCMakeSwapping;
+static s8 sCMakeTop;
+static s8 sCMakeWaiting;
+char *gNameCharTables[] = {
+    "ABCDEFGHIJKL",
+    "MNOPQRSTUVWX",
+    "YZ \xC0\xC1\xC2\xC4\x8C\xC7\xC8\xC9\xCA",
+    "\xCB\xCC\xCD\xCE\xCF\xD1\xD2\xD3\xD4\xD6\xD9\xDA",
+    "\xDB\xDC\xDF         ",
+    "abcdefghijkl",
+    "mnopqrstuvwx",
+    "yz \xE0\xE1\xE2\xE4\x9C\xE7\xE8\xE9\xEA",
+    "\xEB\xEC\xED\xEE\xEF\xF1\xF2\xF3\xF4\xF6\xF9\xFA",
+    "\xFB\xFC\xDF         ",
+    "0123456789-#",
+    "!\xA1?\xBF%&\xB0\"'()@",
+    "*,./:;<=>[]_",
+    "|\xAB\xBB\x82\x84       ",
+    "            ",
+};
+
+const s8 sDaysInMonth[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+const char sDigitText[] = "0";
+const char sCommaText[] = ",";
 
 void CMakeNameScreen_DrawCursor(void);
 s32 CMakeNameScreen_HandleInput(void);
@@ -1196,7 +1213,7 @@ void CMakeBirthdayScreen_PrintDate(void)
     Text_SetFill(0, 0);
     Text_Clear();
     for (i = 0; i <= 2; i++) {
-        *(u16 *)str = sDigitText;
+        *(u16 *)str = *(const u16 *)sDigitText;
         if (i <= 1) {
             digit = (s8)(sCMakeBirthday[i] / 10);
             if (digit != 0) {

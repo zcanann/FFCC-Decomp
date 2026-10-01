@@ -8,9 +8,9 @@
 #include "window.h"
 #include "screen.h"
 
-extern s8 sScouterRow;
-extern s8 sScouterActive;
-extern struct ScouterHit sScouterShown;
+static s8 sScouterRow;
+static s8 sScouterActive;
+static struct ScouterHit sScouterShown;
 
 void ScouterScreen_PrintNextRow(void);
 void ScouterScreen_ClearRows(void);

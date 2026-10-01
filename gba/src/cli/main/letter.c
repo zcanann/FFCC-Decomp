@@ -9,30 +9,25 @@
 #include "screen.h"
 #include "lists.h"
 
-extern s8 sLetterState;
-extern s8 sLetterQuit;
-extern s8 sLetterStateInit;
-extern s8 sLetterSubInit;
-extern u8 sLetterTop;
-extern u8 sLetterRow;
-extern s8 sLetterLines;
-extern s16 sLetterSel;
-extern s8 sLetterSubState;
-extern s8 sLetterSubPhase;
-extern s8 sLetterAnswers;
-extern s8 sLetterResult;
-extern s8 sLetterAnswer;
-extern s8 sLetterFailed;
-extern s8 sLetterAlign;
-extern s8 sLetterAttachType;
-extern u32 sLetterAttachValue;
-extern s8 sLetterGiftTop;
-extern s16 sLetterPollTimer;
-extern const struct ScreenFuncs gLetterStates[];
-extern const struct ScreenFuncs gLetterReadStates[];
-extern const char sSpaceText[];
-extern const char sQuestionText[];
-extern const char sPeriodText[];
+static s8 sLetterState;
+static s8 sLetterQuit;
+static s8 sLetterStateInit;
+static s8 sLetterSubInit;
+static u8 sLetterTop;
+static u8 sLetterRow;
+static s8 sLetterLines;
+static s16 sLetterSel;
+static s8 sLetterSubState;
+static s8 sLetterSubPhase;
+static s8 sLetterAnswers;
+static s8 sLetterResult;
+static s8 sLetterAnswer;
+static s8 sLetterFailed;
+static s8 sLetterAlign;
+static s8 sLetterAttachType;
+static u32 sLetterAttachValue;
+static s8 sLetterGiftTop;
+static s16 sLetterPollTimer;
 extern char gDetailBufNext[];
 
 void LetterList_PrintRow(s32, s32);
@@ -49,6 +44,52 @@ void Letter_BuildText(char *, s32);
 s32 LetterGift_CanGive(s32 idx);
 void LetterGift_PrintItem(s32 idx, s32 row);
 s32 Str_CountLines(s8 *str);
+s32 LetterList_Init(void);
+s32 LetterList_Main(void);
+s32 LetterList_Exit(void);
+s32 LetterRead_Init(void);
+s32 LetterRead_Main(void);
+s32 LetterRead_Exit(void);
+s32 LetterGift_Init(void);
+s32 LetterGift_Main(void);
+s32 LetterGift_Exit(void);
+s32 LetterSend_Init(void);
+s32 LetterSend_Main(void);
+s32 LetterSend_Exit(void);
+s32 LetterError_Init(void);
+s32 LetterError_Main(void);
+s32 LetterError_Exit(void);
+s32 LetterTake_Init(void);
+s32 LetterTake_Main(void);
+s32 LetterTake_Exit(void);
+s32 LetterTaken_Init(void);
+s32 LetterTaken_Main(void);
+s32 LetterTaken_Exit(void);
+s32 LetterAnswer_Init(void);
+s32 LetterAnswer_Main(void);
+s32 LetterAnswer_Exit(void);
+s32 LetterAttach_Init(void);
+s32 LetterAttach_Main(void);
+s32 LetterAttach_Exit(void);
+
+struct ScreenFuncs gLetterStates[] = {
+    { LetterList_Init, LetterList_Main, LetterList_Exit },
+    { LetterRead_Init, LetterRead_Main, LetterRead_Exit },
+    { LetterGift_Init, LetterGift_Main, LetterGift_Exit },
+    { LetterSend_Init, LetterSend_Main, LetterSend_Exit },
+    { LetterError_Init, LetterError_Main, LetterError_Exit },
+};
+
+struct ScreenFuncs gLetterReadStates[] = {
+    { LetterTake_Init, LetterTake_Main, LetterTake_Exit },
+    { LetterTaken_Init, LetterTaken_Main, LetterTaken_Exit },
+    { LetterAnswer_Init, LetterAnswer_Main, LetterAnswer_Exit },
+    { LetterAttach_Init, LetterAttach_Main, LetterAttach_Exit },
+};
+
+const char sSpaceText[] = " ";
+const char sQuestionText[] = "?";
+const char sPeriodText[] = ".";
 
 void LetterScreen_Setup(void)
 {

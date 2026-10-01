@@ -15,12 +15,12 @@ struct CaravanNames {
 };
 
 extern struct CaravanNames gCaravanNames;
-extern u16 gBasePos[2];
-extern u16 gPrevBasePos[2];
-extern struct Marker gPartyMarkers[4];
-extern s8 sBackdropTribe;
+static u32 sMapObjDrawFlagsIn;
+static u16 sBasePos[2];
+static u16 sPrevBasePos[2];
+static struct Marker sPartyMarkers[4];
 extern u8 gUnusedBytes[8];
-extern u32 sMapObjDrawFlagsIn;
+static s8 sBackdropTribe;
 
 void Session_Init(void)
 {
@@ -38,8 +38,8 @@ void Session_Init(void)
     gScouterDirty = 0;
     gLanguage = 0;
     for (i = 0; i < 2; i++) {
-        gBasePos[i] = 0;
-        gPrevBasePos[i] = 0;
+        sBasePos[i] = 0;
+        sPrevBasePos[i] = 0;
     }
     for (i = 0; i < 8; i++)
         gUnusedBytes[i] |= 0xFF;
@@ -82,19 +82,19 @@ void Radar_SetBasePos(x, y)
 u16 x;
 u16 y;
 {
-    gBasePos[0] = x;
-    gBasePos[1] = y;
+    sBasePos[0] = x;
+    sBasePos[1] = y;
     if (!(gDataFlags & DATA_BASE_POS)) {
         gDataFlags |= DATA_BASE_POS;
-        gPrevBasePos[0] = x;
-        gPrevBasePos[1] = y;
+        sPrevBasePos[0] = x;
+        sPrevBasePos[1] = y;
     }
 }
 
 void Radar_GetBasePos(s16 *x, s16 *y)
 {
-    *x = gBasePos[0];
-    *y = gBasePos[1];
+    *x = sBasePos[0];
+    *y = sBasePos[1];
 }
 
 void Radar_GetBaseDelta(s16 *dx, s16 *dy)
@@ -104,26 +104,26 @@ void Radar_GetBaseDelta(s16 *dx, s16 *dy)
     if (!flag) {
         *dx = flag;
         *dy = flag;
-        gPrevBasePos[0] = gBasePos[0];
-        gPrevBasePos[1] = gBasePos[1];
+        sPrevBasePos[0] = sBasePos[0];
+        sPrevBasePos[1] = sBasePos[1];
     } else {
-        *dx = gBasePos[0] - gPrevBasePos[0];
-        *dy = gBasePos[1] - gPrevBasePos[1];
-        gPrevBasePos[0] = gBasePos[0];
-        gPrevBasePos[1] = gBasePos[1];
+        *dx = sBasePos[0] - sPrevBasePos[0];
+        *dy = sBasePos[1] - sPrevBasePos[1];
+        sPrevBasePos[0] = sBasePos[0];
+        sPrevBasePos[1] = sBasePos[1];
     }
 }
 
 void Radar_ClearMarkers(void)
 {
-    memset(gPartyMarkers, 0, sizeof(gPartyMarkers));
+    memset(sPartyMarkers, 0, sizeof(sPartyMarkers));
     memset(gEnemyMarkers, 0, sizeof(gEnemyMarkers));
     memset(gTreasureMarkers, 0, sizeof(gTreasureMarkers));
 }
 
 void Radar_OnPartyPos(s8 *p)
 {
-    struct Marker *e = gPartyMarkers;
+    struct Marker *e = sPartyMarkers;
     u8 flags = p[1];
     s8 first = p[1];
 
@@ -145,7 +145,7 @@ void Radar_OnPartyPos(s8 *p)
 
 struct Marker *Radar_GetPartyMarker(s32 idx)
 {
-    return &gPartyMarkers[idx];
+    return &sPartyMarkers[idx];
 }
 
 void Radar_OnEnemyPos(s8 *p)

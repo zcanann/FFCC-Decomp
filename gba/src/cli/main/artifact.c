@@ -8,13 +8,15 @@
 #include "window.h"
 #include "screen.h"
 
-extern s8 sArtifactTop;
-extern s8 sArtifactQuit;
-extern s8 sArtifactRow;
-extern s8 sArtifactUnused;
-extern s8 sArtifactPollTimer;
-extern s8 sArtifactLoaded;
-extern u16 sArtifactUnused2;
+static s8 sArtifactTop;
+static s8 sArtifactQuit;
+static s8 sArtifactRow;
+static s8 sArtifactUnused;
+static s8 sArtifactPollTimer;
+static s8 sArtifactLoaded;
+static u16 sArtifactUnused2;
+
+const u8 gCmdArtifactIds[] = { 223, 224, 225, 226, 227 };
 
 void ArtifactScreen_PrintRow(s32, s32);
 s32 Artifact_IsOwned(s32);

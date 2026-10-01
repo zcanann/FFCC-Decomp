@@ -59,9 +59,6 @@ enum RedStreamLayoutSize {
 	REDSOUND_STREAM_VOLUME_INPUT_SCALE_SHIFT = 8,
 };
 
-#define RedStreamVolumeFromInput(volume) (((volume + 1) * REDSOUND_VOLUME_BYTE_SCALE - 1) * REDSOUND_FIXED_ONE)
-#define RedStreamGetCurrentAramSampleStart(stream)                                                \
-	(((stream)->m_aramBuffer + (stream)->m_streamCursorBase) * REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE)
 
 STATIC_ASSERT(offsetof(RedStreamHEAD, m_signature) == REDSOUND_STREAM_HEAD_SIGNATURE_OFFSET);
 STATIC_ASSERT(sizeof(((RedStreamHEAD*)0)->m_signature) == REDSOUND_STREAM_SIGNATURE_SIZE);
@@ -459,149 +456,145 @@ void StreamStop(int streamID)
  */
 int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volume)
 {
-	int aramSize;
-	unsigned int aramOffset;
+	int workValue;
 	RedStreamADPCMHeader* adpcmHeader;
+	int bufferValue;
 	RedStreamDATA* streamData;
+	RedStreamFile* streamFile;
 
 	streamData = _SearchEmptyStreamData();
 	if (streamData != REDSOUND_STREAM_DATA_NONE) {
 
-	memcpy(&streamData->m_header, streamHeader, REDSOUND_STREAM_HEAD_SIZE);
-	streamData->m_track = SearchSeEmptyTrack(streamData->m_header.m_channelCount, REDSOUND_STREAM_ERASE_TRACK, 0);
-	streamData->m_buffer = (u8*)RedNew(REDSOUND_STREAM_TRANSFER_BUFFER_ALLOC_SIZE);
-	aramSize = RedStreamHeaderGetAramSize(&streamData->m_header);
-	if (c_RedMemory.GetABufferSize() < REDSOUND_STREAM_ARAM_HIGH_THRESHOLD) {
-		aramOffset = REDSOUND_STREAM_ARAM_LOW_OFFSET;
-	} else {
-		aramOffset = REDSOUND_STREAM_ARAM_HIGH_OFFSET;
-	}
-	streamData->m_aramBuffer = RedNewA(aramSize, 0, aramOffset);
-	if (RedStreamDataIsAramBufferEmpty(streamData)) {
-		c_RedEntry.WaveOldClear(0, aramOffset);
-		streamData->m_aramBuffer = RedNewA(aramSize, 0, aramOffset);
-	}
+		memcpy(&streamData->m_header, streamHeader, REDSOUND_STREAM_HEAD_SIZE);
+		streamData->m_track = SearchSeEmptyTrack(streamData->m_header.m_channelCount, REDSOUND_STREAM_ERASE_TRACK, 0);
+		streamData->m_buffer = (u8*)RedNew(REDSOUND_STREAM_TRANSFER_BUFFER_ALLOC_SIZE);
+		bufferValue = RedStreamHeaderGetAramSize(&streamData->m_header);
+		workValue = c_RedMemory.GetABufferSize() < REDSOUND_STREAM_ARAM_HIGH_THRESHOLD ?
+		    REDSOUND_STREAM_ARAM_LOW_OFFSET : REDSOUND_STREAM_ARAM_HIGH_OFFSET;
+		streamData->m_aramBuffer = RedNewA(bufferValue, 0, workValue);
+		if (RedStreamDataIsAramBufferEmpty(streamData)) {
+			c_RedEntry.WaveOldClear(0, workValue);
+			streamData->m_aramBuffer = RedNewA(bufferValue, 0, workValue);
+		}
 
-	if ((streamData->m_track != REDSOUND_STREAM_TRACK_NONE) &&
-	    RedStreamDataHasBuffer(streamData) &&
-	    RedStreamDataHasAramBuffer(streamData)) {
-		{
-			int adpcmSampleOffset;
-			RedStreamFile* streamFile;
-
-			adpcmSampleOffset = REDSOUND_STREAM_FILE_AUDIO_OFFSET;
+		if ((streamData->m_track != REDSOUND_STREAM_TRACK_NONE) &&
+		    RedStreamDataHasBuffer(streamData) &&
+		    RedStreamDataHasAramBuffer(streamData)) {
+			bufferValue = REDSOUND_STREAM_FILE_AUDIO_OFFSET;
 			streamFile = RedStreamFileFromHeader(streamHeader);
 			adpcmHeader = RedStreamFileGetAdpcm(streamFile, REDSOUND_STREAM_LEFT_CHANNEL);
-			adpcmHeader->m_data.pred_scale = RedStreamFileGetSampleByte(streamFile, adpcmSampleOffset);
+			adpcmHeader->m_data.pred_scale = RedStreamFileGetSampleByte(streamFile, bufferValue);
 			adpcmHeader->m_data.yn1 = adpcmHeader->m_data.yn2 = 0;
 			if (RedStreamHeaderIsStereo(&streamData->m_header)) {
 				if (RedStreamHeaderHasNoLoop(&streamData->m_header)) {
-					adpcmSampleOffset += REDSOUND_STREAM_PAGE_SIZE;
+					bufferValue += REDSOUND_STREAM_PAGE_SIZE;
 				} else {
-					adpcmSampleOffset += REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET;
+					bufferValue += REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET;
 				}
 				RedStreamAdpcmHeaderGetChannel(adpcmHeader, REDSOUND_STREAM_RIGHT_CHANNEL)->m_data.pred_scale =
-				    RedStreamFileGetSampleByte(streamFile, adpcmSampleOffset);
+				    RedStreamFileGetSampleByte(streamFile, bufferValue);
 				RedStreamAdpcmHeaderGetChannel(adpcmHeader, REDSOUND_STREAM_RIGHT_CHANNEL)->m_data.yn1 =
 				    RedStreamAdpcmHeaderGetChannel(adpcmHeader, REDSOUND_STREAM_RIGHT_CHANNEL)->m_data.yn2 = 0;
 			}
-		}
 
-		streamData->m_streamId = streamID;
-		streamData->m_fileCursor = 0;
-		streamData->m_readOffset = REDSOUND_STREAM_PAGE_SIZE;
-		streamData->m_streamCursor = 0;
-		streamData->m_voiceData = RedVoiceDataGet(streamData->m_track->m_trackNo);
-		streamData->m_fileData = RedStreamFileFromHeader(streamHeader);
-		streamData->m_fileSize = fileSize;
-		if (volume != 0) {
-			volume = RedStreamVolumeFromInput(volume);
-		}
-		streamData->m_volume.m_value = volume;
-		streamData->m_volume.m_stepCount = 0;
-		int streamPitch = PitchCompute(REDSOUND_STREAM_BASE_PITCH, 0, streamData->m_header.m_pitch, 0);
-		int channelIndex = 0;
-		do {
-			RedVoiceDATA* voice = RedStreamGetVoiceData(streamData, channelIndex);
-			voice->m_track = RedStreamGetTrack(streamData, channelIndex);
-			RedNoteAllocSetStream(voice->m_track->m_note.m_allocFlags);
-			voice->m_stateFlags |= REDSOUND_VOICE_STATE_STREAM;
-			voice->m_voiceSwitch = REDSOUND_VOICE_SWITCH_STREAM_DEFAULT;
-			if (streamData->m_header.m_flags != REDSOUND_STREAM_HEADER_REVERB_NONE) {
-				voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_STEREO;
+			streamData->m_streamId = streamID;
+			streamData->m_fileCursor = 0;
+			streamData->m_readOffset = REDSOUND_STREAM_PAGE_SIZE;
+			streamData->m_streamCursor = 0;
+			streamData->m_voiceData = RedVoiceDataGet(streamData->m_track->m_trackNo);
+			streamData->m_fileData = streamFile;
+			streamData->m_fileSize = fileSize;
+			if (volume != 0) {
+				volume += 1;
+				volume *= REDSOUND_VOLUME_BYTE_SCALE;
+				volume -= 1;
+				volume *= REDSOUND_FIXED_ONE;
 			}
-			voice->m_track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_LOOP;
-			voice->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
-			voice->m_waveData = RedStreamGetTrackData(streamData, channelIndex);
-			voice->m_targetPitch = streamPitch;
-			voice->m_track->m_reverbDepth = RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_SE);
-			voice->m_track->m_reverbDepthDelta = 0;
-			if (RedStreamHeaderIsStereo(&streamData->m_header)) {
-				if (channelIndex == REDSOUND_STREAM_LEFT_CHANNEL) {
-					streamData->m_pan.m_value = REDSOUND_STREAM_SILENT_PAN;
-					streamData->m_pan.m_stepCount = 0;
+			streamData->m_volume.m_value = volume;
+			streamData->m_volume.m_stepCount = 0;
+			workValue = PitchCompute(REDSOUND_STREAM_BASE_PITCH, 0, streamData->m_header.m_pitch, 0);
+			int channelIndex = 0;
+			do {
+				RedVoiceDATA* voice = RedStreamGetVoiceData(streamData, channelIndex);
+				voice->m_track = RedStreamGetTrack(streamData, channelIndex);
+				RedNoteAllocSetStream(voice->m_track->m_note.m_allocFlags);
+				voice->m_stateFlags |= REDSOUND_VOICE_STATE_STREAM;
+				voice->m_voiceSwitch = REDSOUND_VOICE_SWITCH_STREAM_DEFAULT;
+				if (streamData->m_header.m_flags != REDSOUND_STREAM_HEADER_REVERB_NONE) {
+					voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_STEREO;
+				}
+				voice->m_track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_LOOP;
+				voice->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
+				voice->m_waveData = RedStreamGetTrackData(streamData, channelIndex);
+				voice->m_targetPitch = workValue;
+				voice->m_track->m_reverbDepth = RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_SE);
+				voice->m_track->m_reverbDepthDelta = 0;
+				if (RedStreamHeaderIsStereo(&streamData->m_header)) {
+					if (channelIndex == REDSOUND_STREAM_LEFT_CHANNEL) {
+						streamData->m_pan.m_value = REDSOUND_STREAM_SILENT_PAN;
+						streamData->m_pan.m_stepCount = 0;
+					} else {
+						streamData->m_pan.m_value = REDSOUND_VOLUME_DEFAULT;
+						streamData->m_pan.m_stepCount = 0;
+					}
 				} else {
-					streamData->m_pan.m_value = REDSOUND_VOLUME_DEFAULT;
+					streamData->m_pan.m_value = pan << REDSOUND_FIXED_SHIFT;
 					streamData->m_pan.m_stepCount = 0;
 				}
-			} else {
-				streamData->m_pan.m_value = pan << REDSOUND_FIXED_SHIFT;
-				streamData->m_pan.m_stepCount = 0;
-			}
-			SetVoiceVolumeMix(RedStreamGetVoiceData(streamData, channelIndex), streamData->m_pan.m_value >> REDSOUND_FIXED_SHIFT,
-			                  streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT);
-			RedStreamGetTrack(streamData, channelIndex)->m_waveBase =
-			    RedStreamAramGetChannelPlane(streamData->m_aramBuffer, channelIndex);
-			memset(RedStreamGetTrackData(streamData, channelIndex), 0, REDSOUND_WAVE_DATA_SIZE);
-			memcpy(&RedStreamGetTrackData(streamData, channelIndex)->m_adpcm, RedStreamAdpcmHeaderGetChannel(adpcmHeader, channelIndex),
-			       REDSOUND_STREAM_ADPCM_HEADER_SIZE);
-			voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] = voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] =
-			    voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] = 0;
-			voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] = REDSOUND_VOLUME_MAX;
-			voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_DECAY] =
-			    voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN] = 0;
-			voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE] = REDSOUND_STREAM_ADSR_RELEASE_TIME;
-			RedStreamGetTrackData(streamData, channelIndex)->m_sampleStart = 0;
-			RedStreamGetTrackData(streamData, channelIndex)->m_loopEnd = REDSOUND_STREAM_INITIAL_LOOP_END;
-			RedStreamGetTrackData(streamData, channelIndex)->m_loopStart = REDSOUND_STREAM_LOOP_START_SAMPLE;
-			channelIndex += 1;
-		} while (channelIndex < streamData->m_header.m_channelCount);
+				SetVoiceVolumeMix(RedStreamGetVoiceData(streamData, channelIndex), streamData->m_pan.m_value >> REDSOUND_FIXED_SHIFT,
+				                  streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT);
+				bufferValue = RedStreamAramGetChannelPlane(streamData->m_aramBuffer, channelIndex);
+				RedStreamGetTrack(streamData, channelIndex)->m_waveBase = bufferValue;
+				memset(RedStreamGetTrackData(streamData, channelIndex), 0, REDSOUND_WAVE_DATA_SIZE);
+				memcpy(&RedStreamGetTrackData(streamData, channelIndex)->m_adpcm, RedStreamAdpcmHeaderGetChannel(adpcmHeader, channelIndex),
+				       REDSOUND_STREAM_ADPCM_HEADER_SIZE);
+				voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] = voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] =
+				    voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] = 0;
+				voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] = REDSOUND_VOLUME_MAX;
+				voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_DECAY] =
+				    voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN] = 0;
+				voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE] = REDSOUND_STREAM_ADSR_RELEASE_TIME;
+				RedStreamGetTrackData(streamData, channelIndex)->m_sampleStart = 0;
+				RedStreamGetTrackData(streamData, channelIndex)->m_loopEnd = REDSOUND_STREAM_INITIAL_LOOP_END;
+				RedStreamGetTrackData(streamData, channelIndex)->m_loopStart = REDSOUND_STREAM_LOOP_START_SAMPLE;
+				channelIndex += 1;
+			} while (channelIndex < streamData->m_header.m_channelCount);
 
-		if (RedStreamHeaderHasNoLoop(&streamData->m_header)) {
-			channelIndex = _ArrangeStreamDataNoLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
-		} else {
-			channelIndex = _ArrangeStreamDataLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
-		}
-		streamData->m_dmaId = channelIndex;
-		streamData->m_streamCursorBase = RedStreamBufferSideGetCursorBase(REDSOUND_STREAM_BUFFER_SIDE_B);
-		streamData->m_state = REDSOUND_STREAM_STATE_LOADING;
-	} else {
-		if (RedReportPrintIsEnabled()) {
-			OSReport(sRedStreamBufferDidntSecureFmt, sRedStreamLogPrefix, sRedStreamLogErrorColor, sRedStreamLogReset);
-			fflush(__files + 1);
-		}
-		if (RedStreamDataHasBuffer(streamData)) {
-			RedDelete(streamData->m_buffer);
+			if (RedStreamHeaderHasNoLoop(&streamData->m_header)) {
+				channelIndex = _ArrangeStreamDataNoLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
+			} else {
+				channelIndex = _ArrangeStreamDataLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
+			}
+			streamData->m_dmaId = channelIndex;
+			streamData->m_streamCursorBase = RedStreamBufferSideGetCursorBase(REDSOUND_STREAM_BUFFER_SIDE_B);
+			streamData->m_state = REDSOUND_STREAM_STATE_LOADING;
 		} else {
 			if (RedReportPrintIsEnabled()) {
-				OSReport(sRedStreamMainMemoryDidntCreateFmt,
-				         sRedStreamLogPrefix, sRedStreamLogWarnColor, REDSOUND_STREAM_TRANSFER_BUFFER_SIZE,
-				         sRedStreamLogReset);
+				OSReport(sRedStreamBufferDidntSecureFmt, sRedStreamLogPrefix, sRedStreamLogErrorColor, sRedStreamLogReset);
 				fflush(__files + 1);
 			}
-		}
-		if (RedStreamDataHasAramBuffer(streamData)) {
-			RedDeleteA(streamData->m_aramBuffer);
-		} else {
-			if (RedReportPrintIsEnabled()) {
-				OSReport(sRedStreamAramMemoryDidntCreateFmt,
-				         sRedStreamLogPrefix, sRedStreamLogWarnColor,
-				         RedStreamHeaderGetAramSize(&streamData->m_header),
-				         sRedStreamLogReset);
-				fflush(__files + 1);
+			if (RedStreamDataHasBuffer(streamData)) {
+				RedDelete(streamData->m_buffer);
+			} else {
+				if (RedReportPrintIsEnabled()) {
+					OSReport(sRedStreamMainMemoryDidntCreateFmt,
+					         sRedStreamLogPrefix, sRedStreamLogWarnColor, REDSOUND_STREAM_TRANSFER_BUFFER_SIZE,
+					         sRedStreamLogReset);
+					fflush(__files + 1);
+				}
+			}
+			if (RedStreamDataHasAramBuffer(streamData)) {
+				RedDeleteA(streamData->m_aramBuffer);
+			} else {
+				if (RedReportPrintIsEnabled()) {
+					OSReport(sRedStreamAramMemoryDidntCreateFmt,
+					         sRedStreamLogPrefix, sRedStreamLogWarnColor,
+					         RedStreamHeaderGetAramSize(&streamData->m_header),
+					         sRedStreamLogReset);
+					fflush(__files + 1);
+				}
 			}
 		}
-	}
 	}
 	return streamID;
 }
@@ -700,6 +693,7 @@ void StreamPause(int streamID, int pause)
 {
 	RedVoiceDATA* voiceData;
 	RedStreamDATA* streamData;
+	RedStreamFile* streamFile;
 	int volume;
 	int pan;
 
@@ -764,7 +758,9 @@ void StreamControl()
 				if (voiceData->m_axVoice->priority == 0) {
 					_StreamStop(streamData);
 				} else {
-					int currentBufferSampleStart = RedStreamGetCurrentAramSampleStart(streamData);
+					int currentBufferSampleStart = streamData->m_aramBuffer;
+					currentBufferSampleStart += streamData->m_streamCursorBase;
+					currentBufferSampleStart *= REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE;
 					int axSamplePosition = voiceData->m_axVoice->pb.addr.currentAddressHi;
 					axSamplePosition <<= REDSOUND_STREAM_AX_CURRENT_ADDRESS_HI_SHIFT;
 					axSamplePosition |= voiceData->m_axVoice->pb.addr.currentAddressLo;

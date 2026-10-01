@@ -60,7 +60,7 @@ void pppParHitSphMat(_pppPObject* pObject, pppParHitSphMatStep* step, _pppCtrlTa
         origin.z += workPos->z;
     }
 
-    if (step->m_height != 0.0f) {
+    if (step->m_height) {
         PSVECSubtract(&pppMngSt->m_position, ParHitSphMatPreviousPosition(pppMngSt), &hitVector);
     }
 

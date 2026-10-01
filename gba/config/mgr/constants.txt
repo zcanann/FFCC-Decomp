@@ -12,13 +12,3 @@
 0x02020090
 0x020200D0
 0x0201010A
-# gGame lives at a fixed EWRAM address, so its address and folded field addresses are plain literals.
-0x0202C618
-0x0202C65A
-0x0202C662
-0x0202C669
-0x0202C66D
-0x0202CA38
-0x0202D954
-0x0202DFFC
-0x0202DFFE

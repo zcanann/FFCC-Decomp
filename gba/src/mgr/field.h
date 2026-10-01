@@ -32,7 +32,7 @@ struct BgAffine {
 
 extern struct Field gField;
 extern const struct Terrain gTerrainTable[];
-extern u8 gFieldMap[FIELD_SIZE][FIELD_SIZE];
+#define gFieldMap (*(u8 (*)[FIELD_SIZE][FIELD_SIZE])0x02030000)
 extern const u8 gFieldMapLz[];
 extern const u8 gFieldTilesLz[];
 extern const u8 gSkyTilesLz[];

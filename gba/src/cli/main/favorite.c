@@ -166,19 +166,21 @@ void FavoriteScreen_DrawRow(s32 idx)
 {
     u16 buf[30];
     struct Window *win = gWindows;
-    u16 *map;
+    u32 map;
     s32 attr;
     s32 y;
     s32 w;
+    s32 step;
     s32 t;
     s32 i;
     s32 j;
 
     y = win->y + 1 + idx * 2;
     w = win->width - 2;
-    map = Bg_GetMapPtr(win->bg, win->x + 1, y);
+    map = (u32)Bg_GetMapPtr(win->bg, win->x + 1, y);
     attr = 3 << 12;
-    for (i = 0; i < 2; i++, map += 32) {
+    step = 64;
+    for (i = 0; i < 2; map += step, i++) {
         t = Window_GetTextTile(0);
         t += (win->width << 1) * idx;
         t += i;

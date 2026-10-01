@@ -2,7 +2,43 @@ crt0:
 	.text       start:0x02000000 end:0x020001A0
 
 main:
-	.text       start:0x020001A0 end:0x020076EC
+	.text       start:0x020001A0 end:0x02001BA8
+
+joybus:
+	.text       start:0x02001BA8 end:0x0200269C
+
+racer:
+	.text       start:0x0200269C end:0x02003E14
+
+obj:
+	.text       start:0x02003E14 end:0x02004F04
+
+effect:
+	.text       start:0x02004F04 end:0x02005D28
+
+camera:
+	.text       start:0x02005D28 end:0x02006268
+
+field:
+	.text       start:0x02006268 end:0x02006B30
+
+route:
+	.text       start:0x02006B30 end:0x02006F0C
+
+text:
+	.text       start:0x02006F0C end:0x020072E4
+
+sound:
+	.text       start:0x020072E4 end:0x0200731C
+
+random:
+	.text       start:0x0200731C end:0x020074D4
+
+fixmath:
+	.text       start:0x020074D4 end:0x020075A8
+
+chunk:
+	.text       start:0x020075A8 end:0x020076EC
 
 m4a/m4a_1:
 	.text       start:0x020076EC end:0x02007CB4
@@ -185,10 +221,37 @@ libgcc/_negdi2:
 	.text       start:0x0200EC80 end:0x0200EC98
 
 main:
-	.rodata     start:0x0200EC98 end:0x020139F8
+	.rodata     start:0x0200EC98 end:0x0200ED6E
+
+joybus:
+	.rodata     start:0x0200ED70 end:0x0200EDAA
+
+obj:
+	.rodata     start:0x0200EDAC end:0x0200EDC8
+
+effect:
+	.rodata     start:0x0200EDC8 end:0x0200EE10
+
+sintable:
+	.rodata     start:0x0200EE10 end:0x02010210
+
+chunk:
+	.rodata     start:0x02010210 end:0x0201022E
+
+param:
+	.rodata     start:0x02010230 end:0x02010388
+
+m4a_tables:
+	.rodata     start:0x02010388 end:0x020104EC
+
+sound_data:
+	.rodata     start:0x020104EC end:0x02010934
+
+sound_assets:
+	.rodata     start:0x02010934 end:0x020139F8
 
 libc/reent/impure:
-	.rodata     start:0x020139F8 end:0x020139FC
+	.rodata     start:0x020139F8 end:0x020139FA
 
 libc/stdio/vfprintf:
 	.rodata     start:0x020139FC end:0x02013A76
@@ -205,14 +268,23 @@ libc/stdlib/mprec:
 libc/arm/syscalls:
 	.rodata     start:0x02013BEC end:0x02013C11
 
-main:
+course:
 	.rodata     start:0x02013C14 end:0x02014684
 
 bss:
 	.bss        start:0x02014690 end:0x020159A4
 
-main:
-	.data       start:0x020159A4 end:0x02015A54
+racer:
+	.data       start:0x020159A4 end:0x020159AC
+
+effect:
+	.data       start:0x020159AC end:0x020159B7
+
+text:
+	.data       start:0x020159B8 end:0x02015A4C
+
+random:
+	.data       start:0x02015A4C end:0x02015A54
 
 libc/reent/impure:
 	.data       start:0x02015A54 end:0x02015D44
@@ -223,15 +295,56 @@ libc/locale/locale:
 libc/stdlib/mallocr:
 	.data       start:0x02015D58 end:0x0201619C
 
-main:
-	.rodata     start:0x0201619C end:0x02021F6C
-	.ctors      start:0x02021F6C end:0x02021F78
+menu_gfx:
+	.rodata     start:0x0201619C end:0x02017404
 
-bss:
-	.ewram_bss  start:0x02021F78 end:0x02040000
+obj_gfx:
+	.rodata     start:0x02017404 end:0x0201C2F8
+
+config:
+	.rodata     start:0x0201C2F8 end:0x0201C322
+
+field_gfx:
+	.rodata     start:0x0201C324 end:0x020204EC
+
+font_gfx:
+	.rodata     start:0x020204EC end:0x02021F6C
+
+obj:
+	.ctors      start:0x02021F6C end:0x02021F70
+
+camera:
+	.ctors      start:0x02021F70 end:0x02021F74
+
+sound:
+	.ctors      start:0x02021F74 end:0x02021F78
 
 main:
-	.bss        start:0x03000000 end:0x03007048
+	.bss        start:0x03000000 end:0x03005C78
+
+joybus:
+	.bss        start:0x03005C78 end:0x03005DF4
+
+obj:
+	.bss        start:0x03005DF4 end:0x030060F8
+
+camera:
+	.bss        start:0x030060F8 end:0x03006144
+
+field:
+	.bss        start:0x03006144 end:0x030063C8
+
+route:
+	.bss        start:0x030063C8 end:0x030063F8
+
+sound:
+	.bss        start:0x030063F8 end:0x03006400
+
+random:
+	.bss        start:0x03006400 end:0x03006DC8
+
+sound_data:
+	.bss        start:0x03006DC8 end:0x03007048
 
 libc/arm/syscalls:
 	.bss        start:0x03007048 end:0x030070F8

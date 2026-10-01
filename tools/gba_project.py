@@ -88,7 +88,12 @@ CFLAGS = "-mthumb-interwork -O2 -fhex-asm"
 # Game units whose compiled source links into the checked image, per program.
 COMPLETE: Dict[str, List[str]] = {
     "cli": ["crt0", "joy_reset", "m4a/m4a_1", "m4a/m4a"],
-    "mgr": ["crt0", "joy_reset", "m4a/m4a_1", "m4a/m4a"],
+    # obj, camera and sound were C++ files whose static initializers left .ctors
+    # entries, which agbcc (C) cannot emit.
+    "mgr": ["crt0", "main", "joybus", "racer", "effect", "field", "route", "text", "random",
+            "sintable", "fixmath", "chunk", "param", "m4a_tables", "sound_data", "sound_assets",
+            "m4a/m4a_1", "m4a/m4a", "joy_reset", "course", "menu_gfx", "obj_gfx", "config",
+            "field_gfx", "font_gfx"],
 }
 
 # libgcc routines assembled from lib1thumb.asm; the rest are C.
@@ -239,14 +244,19 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                                "paths": " ".join(info["disc_path"] for info in programs.values())})
         n.newline()
 
-        def assemble_arm(source: Path, stem: str, base: str) -> str:
+        def assemble_arm(source: Path, stem: str, base: str, assets_dir: Optional[Path] = None,
+                         assets: Optional[List[str]] = None) -> str:
             """Assemble hand-written source that may contain ARM code."""
             # For ARM-state bx under ARMv4T, as emits R_ARM_V4BX relocations, which
             # objdiff cannot read. Assembling for v5t gives the same bytes without them;
             # the v5t attributes are then dropped since objdiff rejects that arch too.
+            # Data modules .incbin files from the extracted assets.
             v5 = stem + ".v5.o"
-            n.build(v5, "gba_as", _path(source), implicit=binutils_stamp,
-                    variables={"asincludes": f"-I {_path(GBA_DIR / 'lib')} -I {_path(GBA_DIR / 'include')}",
+            includes = f"-I {_path(GBA_DIR / 'lib')} -I {_path(GBA_DIR / 'include')}"
+            if assets_dir is not None:
+                includes += f" -I {_path(assets_dir)}"
+            n.build(v5, "gba_as", _path(source), implicit=binutils_stamp + (assets or []),
+                    variables={"asincludes": includes,
                                "gba_asflags": "-march=armv5t -mthumb-interwork"})
             n.build(base, "gba_strip_attributes", v5, implicit=binutils_stamp)
             return base
@@ -317,7 +327,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 return base
             asm_source = src_dir / f"{unit}.s"
             if asm_source.is_file():
-                return assemble_arm(asm_source, stem, base)
+                return assemble_arm(asm_source, stem, base, out / "assets", assets)
             # A unit's source is <unit>.c, or a directory of C and assembly files
             # linked together in link order (see _link_order).
             source = src_dir / f"{unit}.c"

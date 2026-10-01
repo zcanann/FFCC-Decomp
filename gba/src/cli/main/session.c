@@ -275,25 +275,28 @@ void Radar_OnMapObj(u8 *p)
     }
 }
 
-void Radar_OnMapObjDrawFlags(u8 *p)
+void Radar_OnMapObjDrawFlags(u8 *msg)
 {
-    u8 *prev;
+    u8 *p;
     u16 sum;
     u16 crc;
     u32 val;
 
+    p = msg;
     if ((p[0] >> 6) == 0) {
         sMapObjDrawFlagsIn = *(u32 *)p;
         return;
     }
-    prev = (u8 *)&sMapObjDrawFlagsIn;
-    sum = prev[1] | (prev[2] << 8);
-    val = prev[3];
+    p = (u8 *)&sMapObjDrawFlagsIn;
+    sum = p[1] | (p[2] << 8);
+    val = p[3];
+    p = msg;
     val |= p[1] << 8;
     val |= p[2] << 16;
     val |= p[3] << 24;
+    p = (u8 *)&val;
     crc = 0xFFFF;
-    if (Crc16(4, (u8 *)&val, &crc) == sum)
+    if (Crc16(4, p, &crc) == sum)
         gMapObjs.drawFlags = val;
 }
 

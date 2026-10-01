@@ -1,0 +1,64 @@
+#include "gba/m4a_internal.h"
+
+extern struct MusicPlayerInfo gMPlayInfo_BGM;
+extern struct MusicPlayerInfo gMPlayInfo_SE1;
+
+static struct MusicPlayerTrack sMPlayTrackBgm[2];
+static struct MusicPlayerTrack sMPlayTrackSe[2];
+
+extern struct WaveData gWaveSample0;
+extern struct WaveData gWaveSample1;
+extern struct WaveData gWaveSample2;
+extern struct WaveData gWaveSample3;
+extern struct WaveData gWaveSample4;
+extern struct WaveData gWaveSample5;
+extern struct WaveData gWaveSample6;
+extern struct WaveData gWaveSample7;
+extern struct WaveData gWaveSample8;
+
+extern struct SongHeader gSong00;
+extern struct SongHeader gSong01;
+extern struct SongHeader gSong02;
+extern struct SongHeader gSong03;
+extern struct SongHeader gSong04;
+extern struct SongHeader gSong05;
+extern struct SongHeader gSong06;
+
+const struct ToneData gVoiceGroup0[] = {
+    { 0, 60, 0, 0, &gWaveSample0, 255, 0, 255, 0 },
+    { 0, 60, 0, 0, &gWaveSample2, 255, 0, 255, 0 },
+    { 0, 60, 0, 0, &gWaveSample3, 255, 0, 255, 0 },
+    { 0, 60, 0, 0, &gWaveSample1, 255, 0, 255, 0 },
+    { 0, 60, 0, 0, &gWaveSample4, 255, 0, 255, 0 },
+    { 0, 60, 0, 0, &gWaveSample6, 255, 0, 255, 0 },
+    { 0, 60, 0, 0, &gWaveSample8, 255, 0, 255, 0 },
+    { 0, 60, 0, 0, &gWaveSample7, 255, 0, 255, 0 },
+    { 0, 60, 0, 0, &gWaveSample5, 255, 0, 255, 0 },
+};
+
+const u8 gProgWave0[] = { 0x00, 0x11, 0x23, 0x56, 0x89, 0xAC, 0xDE, 0xEF, 0xFF, 0xEE, 0xDC, 0xA9, 0x86, 0x53, 0x21, 0x10 };
+const u8 gProgWave1[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10 };
+const u8 gProgWave2[] = { 0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00 };
+const u8 gProgWave3[] = { 0xFE, 0xDC, 0xBA, 0x99, 0x88, 0x88, 0x88, 0x88, 0x77, 0x77, 0x77, 0x77, 0x66, 0x54, 0x32, 0x10 };
+const u8 gProgWave4[] = { 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+const u8 gProgWave5[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+const u8 gProgWave6[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+const u8 gProgWave7[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+const u8 gProgWave8[] = { 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+const struct MusicPlayer gMPlayTable[] = {
+    { &gMPlayInfo_BGM, sMPlayTrackBgm, 2, 0 },
+    { &gMPlayInfo_SE1, sMPlayTrackSe, 2, 0 },
+};
+
+const struct Song gSongTable[] = {
+    { &gSong00, 0, 0 },
+    { &gSong01, 0, 0 },
+    { &gSong02, 0, 0 },
+    { &gSong03, 0, 0 },
+    { &gSong04, 0, 0 },
+    { &gSong05, 1, 1 },
+    { &gSong06, 0, 0 },
+};
+
+const u8 gDummySongHeader[] = { 0, 0, 0, 0 };

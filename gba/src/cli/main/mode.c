@@ -9,10 +9,108 @@
 #include "screen.h"
 
 extern u32 gScreenUnused;
-extern const struct ScreenFuncs gFieldScreens[];
-extern const struct ScreenFuncs gCMakeScreens[];
-extern const struct ScreenFuncs gShopScreens[];
-extern const struct ScreenFuncs gSmithScreens[];
+s32 CmdListScreen_Init(void);
+s32 CmdListScreen_Main(void);
+s32 CmdListScreen_Exit(void);
+s32 ItemScreen_Init(void);
+s32 ItemScreen_Main(void);
+s32 ItemScreen_Exit(void);
+s32 EquipScreen_Init(void);
+s32 EquipScreen_Main(void);
+s32 EquipScreen_Exit(void);
+s32 ArtifactScreen_Init(void);
+s32 ArtifactScreen_Main(void);
+s32 ArtifactScreen_Exit(void);
+s32 TmpArtifactScreen_Init(void);
+s32 TmpArtifactScreen_Main(void);
+s32 TmpArtifactScreen_Exit(void);
+s32 GilScreen_Init(void);
+s32 GilScreen_Main(void);
+s32 GilScreen_Exit(void);
+s32 FavoriteScreen_Init(void);
+s32 FavoriteScreen_Main(void);
+s32 FavoriteScreen_Exit(void);
+s32 FamilyScreen_Init(void);
+s32 FamilyScreen_Main(void);
+s32 FamilyScreen_Exit(void);
+s32 LetterScreen_Update(void);
+s32 MenuScreen_Init(void);
+s32 MenuScreen_Main(void);
+s32 MenuScreen_Exit(void);
+s32 CMakeNameScreen_Init(void);
+s32 CMakeNameScreen_Main(void);
+s32 CMakeNameScreen_Exit(void);
+s32 CMakeGenderScreen_Init(void);
+s32 CMakeGenderScreen_Main(void);
+s32 CMakeGenderScreen_Exit(void);
+s32 CMakeLookScreen_Init(void);
+s32 CMakeLookScreen_Main(void);
+s32 CMakeLookScreen_Exit(void);
+s32 CMakeJobScreen_Init(void);
+s32 CMakeJobScreen_Main(void);
+s32 CMakeJobScreen_Exit(void);
+s32 CMakeConfirmScreen_Init(void);
+s32 CMakeConfirmScreen_Main(void);
+s32 CMakeConfirmScreen_Exit(void);
+s32 ShopTopScreen_Init(void);
+s32 ShopTopScreen_Main(void);
+s32 ShopTopScreen_Exit(void);
+s32 ShopBuyScreen_Init(void);
+s32 ShopBuyScreen_Main(void);
+s32 ShopBuyScreen_Exit(void);
+s32 ShopSellScreen_Init(void);
+s32 ShopSellScreen_Main(void);
+s32 ShopSellScreen_Exit(void);
+s32 SmithTopScreen_Init(void);
+s32 SmithTopScreen_Main(void);
+s32 SmithTopScreen_Exit(void);
+s32 SmithForgeScreen_Init(void);
+s32 SmithForgeScreen_Main(void);
+s32 SmithForgeScreen_Exit(void);
+s32 SmithEquipScreen_Init(void);
+s32 SmithEquipScreen_Main(void);
+s32 SmithEquipScreen_Exit(void);
+
+struct ScreenFuncs gFieldScreens[] = {
+    { RadarScreen_Init, RadarScreen_Main, RadarScreen_Exit },
+    { CmdListScreen_Init, CmdListScreen_Main, CmdListScreen_Exit },
+    { ItemScreen_Init, ItemScreen_Main, ItemScreen_Exit },
+    { EquipScreen_Init, EquipScreen_Main, EquipScreen_Exit },
+    { ArtifactScreen_Init, ArtifactScreen_Main, ArtifactScreen_Exit },
+    { TmpArtifactScreen_Init, TmpArtifactScreen_Main, TmpArtifactScreen_Exit },
+    { GilScreen_Init, GilScreen_Main, GilScreen_Exit },
+    { FavoriteScreen_Init, FavoriteScreen_Main, FavoriteScreen_Exit },
+    { FamilyScreen_Init, FamilyScreen_Main, FamilyScreen_Exit },
+    { LetterScreen_Update, LetterScreen_Update, LetterScreen_Update },
+    { MenuScreen_Init, MenuScreen_Main, MenuScreen_Exit },
+    { MsgScreen_Init, MsgScreen_Main, MsgScreen_Main },
+    { NULL, NULL, NULL },
+    { MsgScreen_Init, MsgScreen_Main, MsgScreen_Main },
+    { NULL, NULL, NULL },
+};
+
+struct ScreenFuncs gCMakeScreens[] = {
+    { CMakeNameScreen_Init, CMakeNameScreen_Main, CMakeNameScreen_Exit },
+    { CMakeGenderScreen_Init, CMakeGenderScreen_Main, CMakeGenderScreen_Exit },
+    { CMakeLookScreen_Init, CMakeLookScreen_Main, CMakeLookScreen_Exit },
+    { CMakeJobScreen_Init, CMakeJobScreen_Main, CMakeJobScreen_Exit },
+    { CMakeConfirmScreen_Init, CMakeConfirmScreen_Main, CMakeConfirmScreen_Exit },
+    { Screen_Idle, Screen_Idle, Screen_Idle },
+};
+
+struct ScreenFuncs gShopScreens[] = {
+    { ShopTopScreen_Init, ShopTopScreen_Main, ShopTopScreen_Exit },
+    { ShopBuyScreen_Init, ShopBuyScreen_Main, ShopBuyScreen_Exit },
+    { ShopSellScreen_Init, ShopSellScreen_Main, ShopSellScreen_Exit },
+    { Screen_Idle, Screen_Idle, Screen_Idle },
+};
+
+struct ScreenFuncs gSmithScreens[] = {
+    { SmithTopScreen_Init, SmithTopScreen_Main, SmithTopScreen_Exit },
+    { SmithForgeScreen_Init, SmithForgeScreen_Main, SmithForgeScreen_Exit },
+    { SmithEquipScreen_Init, SmithEquipScreen_Main, SmithEquipScreen_Exit },
+    { Screen_Idle, Screen_Idle, Screen_Idle },
+};
 
 void Mode_Init(void)
 {

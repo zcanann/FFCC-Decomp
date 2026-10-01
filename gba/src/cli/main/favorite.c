@@ -7,9 +7,9 @@
 #include "window.h"
 #include "screen.h"
 
-extern s8 sFavoriteOrder[8];
-extern s8 sFavoriteRow;
-extern s8 sFavoriteRank;
+static s8 sFavoriteOrder[8];
+static s8 sFavoriteRow;
+static s8 sFavoriteRank;
 
 void FavoriteScreen_PrintNextRow(void);
 void FavoriteScreen_DrawRow(s32 idx);

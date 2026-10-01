@@ -7,8 +7,8 @@
 #include "window.h"
 #include "screen.h"
 
-extern s8 sFamilyQuit;
-extern s8 sFamilyRow;
+static s8 sFamilyQuit;
+static s8 sFamilyRow;
 extern char gRelationNameRows[][18];
 
 void FamilyScreen_HandleInput(void);

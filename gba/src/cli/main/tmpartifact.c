@@ -7,10 +7,10 @@
 #include "window.h"
 #include "screen.h"
 
-extern s8 sTmpArtifactUnused;
-extern s8 sTmpArtifactQuit;
-extern s8 sTmpArtifactRow;
-extern s8 sTmpArtifactUnused2;
+static s8 sTmpArtifactUnused;
+static s8 sTmpArtifactQuit;
+static s8 sTmpArtifactRow;
+static s8 sTmpArtifactUnused2;
 
 void TmpArtifactScreen_HandleInput(void);
 void TmpArtifactScreen_DrawIcons(void);

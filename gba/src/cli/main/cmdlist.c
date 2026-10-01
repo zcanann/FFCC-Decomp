@@ -10,14 +10,14 @@
 #include "screen.h"
 #include "lists.h"
 
-extern s32 sCmdTop;
-extern s8 sCmdRowOffset;
-extern s8 sCmdQuit;
-extern s8 sCmdLoaded;
-extern s8 sCmdPollTimer;
-extern s16 *sCmdCandidates;
-extern s16 sCmdCandidateCount;
-extern const u8 sCmdArtifactIds[];
+static s16 *sCmdCandidates;
+static s16 sCmdCandidateCount;
+static s32 sCmdTop;
+static s8 sCmdRowOffset;
+static s8 sCmdQuit;
+static s8 sCmdLoaded;
+static s8 sCmdPollTimer;
+extern const u8 gCmdArtifactIds[];
 
 void CmdListScreen_DrawCursor(void);
 void CmdListScreen_HandleInput(void);
@@ -439,14 +439,14 @@ void CmdListScreen_BuildCandidates(void)
     }
     count = 5;
     for (i = 0; i < count; i++) {
-        id = sCmdArtifactIds[i];
+        id = gCmdArtifactIds[i];
         if (gSession.artifacts[(id - 159) >> 5] & (1 << ((id - 159) & 31)))
             sCmdCandidates[n++] = id - 95;
     }
     for (i = 0; i < 4; i++) {
         if (gSession.stageArtifacts[i] != 0) {
             for (j = 0; j < count; j++) {
-                if (gSession.stageArtifacts[i] == sCmdArtifactIds[j])
+                if (gSession.stageArtifacts[i] == gCmdArtifactIds[j])
                     sCmdCandidates[n++] = i + 160;
             }
         }

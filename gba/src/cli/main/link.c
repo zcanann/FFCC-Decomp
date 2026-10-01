@@ -37,25 +37,59 @@ struct MsgXfer {
     u8 data[0x400];
 };
 
-extern struct LinkWork gLinkWork;
+static struct LinkWork sLinkWork;
 
-extern u16 sCrc16Table[];
-extern u32 sIdleCode;
-extern u32 sLinkUnused;
-extern s32 sTxCount;
-extern u32 sTxQueue[];
-extern s32 sRxIsrCount;
-extern u32 sRxIsrQueue[];
-extern u32 sRxBuf[];
-extern s32 sRxCount;
-extern s32 sRxDone;
-extern struct MsgXfer sMsgXfer;
-extern u16 sBasePosIn[];
-extern u8 sPartyPosSeq;
-extern u32 sPartyPosIn[];
-extern u32 sGilIn;
-extern s8 sGilOp;
-extern u32 sGilUnused;
+const u16 sCrc16Table[] = {
+    0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50A5, 0x60C6, 0x70E7,
+    0x8108, 0x9129, 0xA14A, 0xB16B, 0xC18C, 0xD1AD, 0xE1CE, 0xF1EF,
+    0x1231, 0x0210, 0x3273, 0x2252, 0x52B5, 0x4294, 0x72F7, 0x62D6,
+    0x9339, 0x8318, 0xB37B, 0xA35A, 0xD3BD, 0xC39C, 0xF3FF, 0xE3DE,
+    0x2462, 0x3443, 0x0420, 0x1401, 0x64E6, 0x74C7, 0x44A4, 0x5485,
+    0xA56A, 0xB54B, 0x8528, 0x9509, 0xE5EE, 0xF5CF, 0xC5AC, 0xD58D,
+    0x3653, 0x2672, 0x1611, 0x0630, 0x76D7, 0x66F6, 0x5695, 0x46B4,
+    0xB75B, 0xA77A, 0x9719, 0x8738, 0xF7DF, 0xE7FE, 0xD79D, 0xC7BC,
+    0x48C4, 0x58E5, 0x6886, 0x78A7, 0x0840, 0x1861, 0x2802, 0x3823,
+    0xC9CC, 0xD9ED, 0xE98E, 0xF9AF, 0x8948, 0x9969, 0xA90A, 0xB92B,
+    0x5AF5, 0x4AD4, 0x7AB7, 0x6A96, 0x1A71, 0x0A50, 0x3A33, 0x2A12,
+    0xDBFD, 0xCBDC, 0xFBBF, 0xEB9E, 0x9B79, 0x8B58, 0xBB3B, 0xAB1A,
+    0x6CA6, 0x7C87, 0x4CE4, 0x5CC5, 0x2C22, 0x3C03, 0x0C60, 0x1C41,
+    0xEDAE, 0xFD8F, 0xCDEC, 0xDDCD, 0xAD2A, 0xBD0B, 0x8D68, 0x9D49,
+    0x7E97, 0x6EB6, 0x5ED5, 0x4EF4, 0x3E13, 0x2E32, 0x1E51, 0x0E70,
+    0xFF9F, 0xEFBE, 0xDFDD, 0xCFFC, 0xBF1B, 0xAF3A, 0x9F59, 0x8F78,
+    0x9188, 0x81A9, 0xB1CA, 0xA1EB, 0xD10C, 0xC12D, 0xF14E, 0xE16F,
+    0x1080, 0x00A1, 0x30C2, 0x20E3, 0x5004, 0x4025, 0x7046, 0x6067,
+    0x83B9, 0x9398, 0xA3FB, 0xB3DA, 0xC33D, 0xD31C, 0xE37F, 0xF35E,
+    0x02B1, 0x1290, 0x22F3, 0x32D2, 0x4235, 0x5214, 0x6277, 0x7256,
+    0xB5EA, 0xA5CB, 0x95A8, 0x8589, 0xF56E, 0xE54F, 0xD52C, 0xC50D,
+    0x34E2, 0x24C3, 0x14A0, 0x0481, 0x7466, 0x6447, 0x5424, 0x4405,
+    0xA7DB, 0xB7FA, 0x8799, 0x97B8, 0xE75F, 0xF77E, 0xC71D, 0xD73C,
+    0x26D3, 0x36F2, 0x0691, 0x16B0, 0x6657, 0x7676, 0x4615, 0x5634,
+    0xD94C, 0xC96D, 0xF90E, 0xE92F, 0x99C8, 0x89E9, 0xB98A, 0xA9AB,
+    0x5844, 0x4865, 0x7806, 0x6827, 0x18C0, 0x08E1, 0x3882, 0x28A3,
+    0xCB7D, 0xDB5C, 0xEB3F, 0xFB1E, 0x8BF9, 0x9BD8, 0xABBB, 0xBB9A,
+    0x4A75, 0x5A54, 0x6A37, 0x7A16, 0x0AF1, 0x1AD0, 0x2AB3, 0x3A92,
+    0xFD2E, 0xED0F, 0xDD6C, 0xCD4D, 0xBDAA, 0xAD8B, 0x9DE8, 0x8DC9,
+    0x7C26, 0x6C07, 0x5C64, 0x4C45, 0x3CA2, 0x2C83, 0x1CE0, 0x0CC1,
+    0xEF1F, 0xFF3E, 0xCF5D, 0xDF7C, 0xAF9B, 0xBFBA, 0x8FD9, 0x9FF8,
+    0x6E17, 0x7E36, 0x4E55, 0x5E74, 0x2E93, 0x3EB2, 0x0ED1, 0x1EF0,
+};
+
+const char sIdleCode[4] = "RELS";
+static u32 sLinkUnused;
+static u32 sTxQueue[64];
+static s32 sTxCount;
+static u32 sRxIsrQueue[64];
+static s32 sRxIsrCount;
+static u32 sRxBuf[128];
+static s32 sRxCount;
+static s32 sRxDone;
+static struct MsgXfer sMsgXfer;
+static u16 sBasePosIn[2];
+static u8 sPartyPosSeq;
+static u32 sPartyPosIn[3];
+static u32 sGilIn;
+static s8 sGilOp;
+static u32 sGilUnused;
 
 u32 Crc8(u32 data)
 {
@@ -99,22 +133,22 @@ void Link_JoyIntr(void)
 
     if (((stat & 4) && !Link_Send()) || ((stat & 2) && !Link_Recv(REG_JOY_RECV))) {
         REG_JOYSTAT = 0;
-        gLinkWork.connected = 0;
-        gLinkWork.step = 0;
+        sLinkWork.connected = 0;
+        sLinkWork.step = 0;
         Link_JoyReset();
     }
     if (stat & 1) {
         Link_JoyReset();
-        if (gLinkWork.resetGap <= 2 && ++gLinkWork.resetCount >= 30)
+        if (sLinkWork.resetGap <= 2 && ++sLinkWork.resetCount >= 30)
             JoyBus_HardReset();
-        gLinkWork.resetGap = 0;
-    } else if (gLinkWork.resetGap >= 2) {
-        gLinkWork.resetCount = 0;
+        sLinkWork.resetGap = 0;
+    } else if (sLinkWork.resetGap >= 2) {
+        sLinkWork.resetCount = 0;
     } else {
-        gLinkWork.resetGap++;
+        sLinkWork.resetGap++;
     }
     REG_JOYCNT = stat;
-    gLinkWork.watchdog = 0;
+    sLinkWork.watchdog = 0;
 }
 
 void Link_Init(void)
@@ -123,20 +157,20 @@ void Link_Init(void)
     u32 i;
 
     REG_IME = 0;
-    for (i = 0; i < sizeof(gLinkWork); i++)
-        ((u8 *)&gLinkWork)[i] = 0;
-    gLinkWork.firstReset = 0xFF;
+    for (i = 0; i < sizeof(sLinkWork); i++)
+        ((u8 *)&sLinkWork)[i] = 0;
+    sLinkWork.firstReset = 0xFF;
     Link_Reset();
     REG_IE |= 0x80;
     if (*(u8 *)0x020000C4 != 0) {
-        gLinkWork.idleCode = gLinkWork.idleWord = *(u32 *)0x020000AC;
-        gLinkWork.bootMode = *(u8 *)0x020000C4;
-        gLinkWork.playerNo = *(u8 *)0x020000C5;
-        gLinkWork.multiboot = 1;
-        gLinkWork.hostId = *(u32 *)0x020000C8;
+        sLinkWork.idleCode = sLinkWork.idleWord = *(u32 *)0x020000AC;
+        sLinkWork.bootMode = *(u8 *)0x020000C4;
+        sLinkWork.playerNo = *(u8 *)0x020000C5;
+        sLinkWork.multiboot = 1;
+        sLinkWork.hostId = *(u32 *)0x020000C8;
     } else {
-        gLinkWork.idleWord = *(u32 *)0x080000AC;
-        gLinkWork.idleCode = sIdleCode;
+        sLinkWork.idleWord = *(u32 *)0x080000AC;
+        sLinkWork.idleCode = *(u32 *)sIdleCode;
     }
     gMenuHasInput = 0;
     gLinkStarted = 0;
@@ -149,7 +183,7 @@ void Link_Reset(void)
     s32 i;
 
     REG_IME = 0;
-    if (gLinkWork.firstReset == 0)
+    if (sLinkWork.firstReset == 0)
         REG_RCNT = 0x8000;
     REG_RCNT = 0xC000;
     REG_JOYSTAT = 0;
@@ -157,12 +191,12 @@ void Link_Reset(void)
     REG_JOY_TRANS = 0;
     REG_JOYCNT = 0x47;
     REG_IF = 0x80;
-    gLinkWork.watchdog = 0;
-    gLinkWork.connected = 0;
-    gLinkWork.step = 0;
-    gLinkWork.firstReset = 0;
-    gLinkWork.resetCount = 0;
-    gLinkWork.resetGap = 0;
+    sLinkWork.watchdog = 0;
+    sLinkWork.connected = 0;
+    sLinkWork.step = 0;
+    sLinkWork.firstReset = 0;
+    sLinkWork.resetCount = 0;
+    sLinkWork.resetGap = 0;
     sLinkUnused = 0;
     Link_ClearQueues();
     for (i = 0; i < 2; i++)
@@ -188,14 +222,14 @@ s32 Link_CheckTimeout(void)
     s32 ret;
     vu16 ime;
 
-    if (gLinkWork.watchdog > 10) {
-        gLinkWork.timedOut = 0xFF;
+    if (sLinkWork.watchdog > 10) {
+        sLinkWork.timedOut = 0xFF;
         Link_Reset();
         ret = -1;
     } else {
         ime = REG_IME;
         REG_IME = 0;
-        gLinkWork.watchdog++;
+        sLinkWork.watchdog++;
         REG_IME = ime;
         ret = 0;
     }
@@ -205,10 +239,10 @@ s32 Link_CheckTimeout(void)
 void Link_JoyReset(void)
 {
     REG_JOY_RECV;
-    REG_JOY_TRANS = gLinkWork.idleWord;
+    REG_JOY_TRANS = sLinkWork.idleWord;
     REG_JOYSTAT = 0x20;
-    gLinkWork.connected = 0;
-    gLinkWork.step = 1;
+    sLinkWork.connected = 0;
+    sLinkWork.step = 1;
     gLinkStarted = 0;
 }
 
@@ -219,33 +253,33 @@ s32 Link_Recv(u32 data)
     u32 pkt;
     u8 *p;
 
-    if (gLinkWork.connected == 0) {
+    if (sLinkWork.connected == 0) {
         gDataFlags &= ~(DATA_LETTER | DATA_LETTER_LIST);
-        if (gLinkWork.step == 2) {
-            gLinkWork.gameCode = data;
+        if (sLinkWork.step == 2) {
+            sLinkWork.gameCode = data;
             p = (u8 *)&pkt;
             p[0] = 1;
-            p[1] = (gLinkWork.bootMode << 6) | (gLinkWork.multiboot << 4) | gLinkWork.playerNo;
+            p[1] = (sLinkWork.bootMode << 6) | (sLinkWork.multiboot << 4) | sLinkWork.playerNo;
             p[2] = 0;
             p[3] = 0;
             REG_JOY_TRANS = pkt;
             REG_JOYSTAT = 0x20;
-            gLinkWork.step = 3;
+            sLinkWork.step = 3;
         } else {
             word = (u32 *)recv;
-            if (gLinkWork.step == 5) {
-                if (gLinkWork.hostId == data)
-                    gLinkWork.hostChanged = 0;
+            if (sLinkWork.step == 5) {
+                if (sLinkWork.hostId == data)
+                    sLinkWork.hostChanged = 0;
                 else
-                    gLinkWork.hostChanged = 1;
-                gLinkWork.hostId = *word;
+                    sLinkWork.hostChanged = 1;
+                sLinkWork.hostId = *word;
                 REG_JOYSTAT = 0x20;
-                gLinkWork.step = 6;
-            } else if (gLinkWork.step == 6) {
-                gLinkWork.playerNo = recv[1] & 0xF;
+                sLinkWork.step = 6;
+            } else if (sLinkWork.step == 6) {
+                sLinkWork.playerNo = recv[1] & 0xF;
                 REG_JOYSTAT = 0;
-                gLinkWork.connected = 0xFF;
-                gLinkWork.step = 0;
+                sLinkWork.connected = 0xFF;
+                sLinkWork.step = 0;
                 gLinkEstablished = 1;
             } else {
                 return 0;
@@ -259,15 +293,15 @@ s32 Link_Recv(u32 data)
 
 s32 Link_Send(void)
 {
-    if (gLinkWork.connected == 0) {
-        if (gLinkWork.step == 1) {
-            gLinkWork.step = 2;
-        } else if (gLinkWork.step == 3) {
-            REG_JOY_TRANS = gLinkWork.hostId;
+    if (sLinkWork.connected == 0) {
+        if (sLinkWork.step == 1) {
+            sLinkWork.step = 2;
+        } else if (sLinkWork.step == 3) {
+            REG_JOY_TRANS = sLinkWork.hostId;
             REG_JOYSTAT = 0x20;
-            gLinkWork.step = 4;
-        } else if (gLinkWork.step == 4) {
-            gLinkWork.step = 5;
+            sLinkWork.step = 4;
+        } else if (sLinkWork.step == 4) {
+            sLinkWork.step = 5;
         } else {
             return 0;
         }
@@ -279,7 +313,7 @@ s32 Link_Send(void)
 
 u8 Link_IsConnected(void)
 {
-    return gLinkWork.connected;
+    return sLinkWork.connected;
 }
 
 void Link_SendPad(u16 keys)
@@ -692,7 +726,7 @@ void Link_DispatchMessage(void)
 
 s32 Link_GetPlayerNo(void)
 {
-    return gLinkWork.playerNo;
+    return sLinkWork.playerNo;
 }
 
 s32 Link_SendRequest(u8 a, u8 b)

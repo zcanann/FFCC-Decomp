@@ -6,6 +6,8 @@
 
 CUtil gUtil;
 
+static void GetQuadTexCoords(float& u1, float& v, float& u2, float& v2, Vec2d* uv1, Vec2d* uv2);
+
 static inline void SendTexQuadVerts(Vec v1, Vec v0, GXColor quadColor, Vec2d* uv1, Vec2d* uv2)
 {
     float v2;
@@ -13,17 +15,7 @@ static inline void SendTexQuadVerts(Vec v1, Vec v0, GXColor quadColor, Vec2d* uv
     float v;
     float u1;
 
-    if (uv1 == 0 || uv2 == 0) {
-        u1 = 0.0f;
-        v = 0.0f;
-        u2 = 1.0f;
-        v2 = 1.0f;
-    } else {
-        u1 = uv1->x;
-        v = uv1->y;
-        u2 = uv2->x;
-        v2 = uv2->y;
-    }
+    GetQuadTexCoords(u1, v, u2, v2, uv1, uv2);
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
     GXWGFifo.f32 = v1.x;
@@ -1158,15 +1150,19 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
  */
 int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
+    int polygonCount;
+    u32 vertexFormat;
+    int count;
+    int running;
     u8* data = static_cast<u8*>(dlData);
-    int running = true;
-    int polygonCount = 0;
+    running = true;
+    polygonCount = 0;
 
     while (running) {
         u32 opcode = *data;
         u16 vertexCount = *(u16*)(data + 1);
-        int count = vertexCount;
-        u32 vertexFormat = opcode & 7;
+        count = vertexCount;
+        vertexFormat = opcode & 7;
         u32 primitive = opcode & 0xF8;
 
         data += 3;
@@ -1238,4 +1234,19 @@ void CUtil::InitConstantRegister()
         _GXSetTevSwapMode((GXTevStageID)i, (_GXTevSwapSel)0, (_GXTevSwapSel)0);
         i++;
     } while (i < 0x10);
+}
+
+static void GetQuadTexCoords(float& u1, float& v, float& u2, float& v2, Vec2d* uv1, Vec2d* uv2)
+{
+    if (uv1 == 0 || uv2 == 0) {
+        u1 = 0.0f;
+        v = 0.0f;
+        u2 = 1.0f;
+        v2 = 1.0f;
+    } else {
+        u1 = uv1->x;
+        v = uv1->y;
+        u2 = uv2->x;
+        v2 = uv2->y;
+    }
 }

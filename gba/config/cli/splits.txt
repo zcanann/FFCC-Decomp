@@ -71,8 +71,38 @@ libgcc/_umodsi3:
 	.text       start:0x0201CB88 end:0x0201CC48
 
 main:
-	.rodata     start:0x0201CC48 end:0x02036EF0
+	.rodata     start:0x0201CC48 end:0x0201CCF8
+	.rodata     start:0x0201CCF8 end:0x0201CD10
+	.rodata     start:0x0201CD10 end:0x0201CF14
+	.rodata     start:0x0201CF14 end:0x0201CF38
+	.rodata     start:0x0201CF38 end:0x0201CF40
+	.rodata     start:0x0201CF40 end:0x0201D044
+	.rodata     start:0x0201D044 end:0x0201D050
+	.rodata     start:0x0201D050 end:0x0201D054
+	.rodata     start:0x0201D054 end:0x0201D058
+	.rodata     start:0x0201D058 end:0x0201F614
+	.rodata     start:0x0201F614 end:0x0202702C
+	.rodata     start:0x0202702C end:0x02028768
+	.rodata     start:0x02028768 end:0x0202A1BC
+	.rodata     start:0x0202A1BC end:0x0202C4BC
+	.rodata     start:0x0202C4BC end:0x0202C620
+	.rodata     start:0x0202C620 end:0x0202F188
+	.rodata     start:0x0202F188 end:0x0202F2D8
+	.rodata     start:0x0202F2D8 end:0x0202FA20
+	.data       start:0x0202FA20 end:0x0202FA38
+	.data       start:0x0202FA38 end:0x0202FB94
+	.data       start:0x0202FB94 end:0x0202FBD0
+	.data       start:0x0202FBD0 end:0x0202FC3C
+	.data       start:0x0202FC3C end:0x02030B58
+	.data       start:0x02030B58 end:0x0203327C
+	.data       start:0x0203327C end:0x020341F4
+	.data       start:0x020341F4 end:0x02034678
+	.data       start:0x02034678 end:0x02034698
+	.data       start:0x02034698 end:0x02036EF0
+
+main:
+	.bss        start:0x03000000 end:0x03002990
 
 bss:
 	.ewram_bss  start:0x02036EF0 end:0x02040003
-	.bss        start:0x03000000 end:0x030044C4
+	.bss        start:0x03002990 end:0x030044C4

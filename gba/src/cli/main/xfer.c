@@ -59,8 +59,8 @@ void Xfer_Begin(void)
 {
     gXferActive = 1;
     memset(&sBulkXfer, 0, sizeof(sBulkXfer));
-    sBulkXfer.base = gDownloadBuf;
-    sBulkXfer.cur = gDownloadBuf;
+    sBulkXfer.base = DOWNLOAD_BUF;
+    sBulkXfer.cur = DOWNLOAD_BUF;
 }
 
 s32 Xfer_Receive(u32 packet, u8 *out)
@@ -106,9 +106,9 @@ s32 Xfer_Receive(u32 packet, u8 *out)
             sBulkXfer.type = pkt->arg;
             if (sBulkXfer.type == 3 || sBulkXfer.type == 6 || sBulkXfer.type == 7
                 || sBulkXfer.type == 8 || sBulkXfer.type == 9) {
-                sBulkXfer.cur = sBulkXfer.base = gListBuf;
+                sBulkXfer.cur = sBulkXfer.base = LIST_BUF;
             } else if (sBulkXfer.type == 2) {
-                sBulkXfer.cur = sBulkXfer.base = gDetailBuf;
+                sBulkXfer.cur = sBulkXfer.base = DETAIL_BUF;
             }
             if (sBulkXfer.type == 6) {
                 gDataFlags &= ~DATA_SELL_LIST;

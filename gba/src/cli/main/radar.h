@@ -48,7 +48,7 @@ struct ScouterHit {
     s16 hp;
 };
 
-/* Scouter record (message 11), 64 of them at the start of gListBuf. */
+/* Scouter record (message 11), 64 of them at the start of LIST_BUF. */
 struct ScouterInfo {
     u8 monster;
     s8 traits[3];

@@ -11,7 +11,6 @@ struct MapInfo {
     u8 rowLen[1];
 };
 
-extern u8 gMapRowLenBase[];
 static struct BgHeader *sMapHeader;
 static struct MapInfo *sMapInfo;
 static u8 *sMapRowLen;
@@ -77,12 +76,12 @@ void Radar_InitMap(void)
     struct MapInfo *info;
 
     if (gDataFlags & DATA_MAP) {
-        info = (struct MapInfo *)gDownloadData;
+        info = (struct MapInfo *)DOWNLOAD_DATA;
         LZ77UnCompVram(info, (void *)0x06008000);
-        sMapHeader = hdr = (struct BgHeader *)gDownloadBuf;
+        sMapHeader = hdr = (struct BgHeader *)DOWNLOAD_BUF;
         info = (struct MapInfo *)((u8 *)hdr + hdr->mapOffset);
         sMapInfo = info;
-        sMapRowLen = gMapRowLenBase + hdr->mapOffset;
+        sMapRowLen = DOWNLOAD_BUF + 8 + hdr->mapOffset;
         sMapData = (u16 *)((u8 *)info + info->dataOffset);
         tmp = 0x1000;
         DmaSet(0, &tmp, (void *)0x0600F000, 0x81000400);

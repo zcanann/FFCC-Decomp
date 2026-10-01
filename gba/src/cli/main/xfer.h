@@ -38,11 +38,11 @@ extern s8 gXferErrorCount;
 extern u8 gStaticMap;
 extern s8 gNewLetter;
 
-/* EWRAM download area */
-extern u8 gDownloadBuf[]; /* types 0 and 1 */
-extern u8 gDownloadData[]; /* gDownloadBuf past its 32-byte header */
-extern u8 gListBuf[];     /* lists: letters, shop, smith, artifacts, scouter */
-extern u8 gDetailBuf[];   /* letter body, equipment and command candidates */
+/* EWRAM download area: the GameCube writes bulk data straight to these addresses. */
+#define DOWNLOAD_BUF  ((u8 *)0x02038000) /* types 0 and 1 */
+#define DOWNLOAD_DATA (DOWNLOAD_BUF + 0x20) /* past the 32-byte header */
+#define LIST_BUF      ((u8 *)0x0203A800) /* lists: letters, shop, smith, artifacts, scouter */
+#define DETAIL_BUF    ((u8 *)0x0203D800) /* letter body, equipment and command candidates */
 
 void Xfer_DrawProgress(s32 show);
 void Xfer_Init(void);

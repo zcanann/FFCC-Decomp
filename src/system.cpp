@@ -72,217 +72,173 @@ extern const char s_systemTemplateDebug[28] = "systemTemplateDebug\n";
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800223dc
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int CSystem::IsGdev()
+void OSPanic(const char* file, int line, const char* msg, ...)
 {
-	return OSGetConsoleType() >> 0x1C & 1;
+	// TODO
 }
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-CSystem::COrder* CSystem::GetOrder(int index)
-{ 
-	COrder* nextOrder = (COrder*)nullptr;
+void CSystem::errorHandler(unsigned short, OSContext*, unsigned long, unsigned long)
+{
+	return;
+}
+/*
+ * --INFO--
+ * PAL Address: 0x80022080
+ * PAL Size: 856b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CSystem::Init()
+{
+    m_initialized = 1;
+    m_currentOrder = (COrder*)0;
+    m_currentOrderIndex = 0;
 
-	if (index < 0)
-	{
-		return nextOrder;
-	}
-	
-	nextOrder = (m_orderSentinel).m_next;
-	int foundIndex = 0;
-	
-	while (nextOrder)
-	{
-		if (foundIndex == index)
-		{
-			break;
-		}
-		
-		nextOrder = nextOrder->m_next;
-		foundIndex++;
-	}
-	
-	return nextOrder;
+    OSInit();
+
+    m_execParam = 3;
+    Memory.Init();
+    Sound.Init();
+    Math.Init();
+    File.Init();
+    Pad.Init();
+    Graphic.Init();
+    TextureMan.Init();
+    MaterialMan.Init();
+    FontMan.Init();
+    MemoryCardMan.Init();
+
+    m_orderCount = 0;
+    m_orderSentinel.m_previous = &m_orderSentinel;
+    m_orderSentinel.m_next = &m_orderSentinel;
+    m_orderSentinel.m_priority = 0xFF;
+    m_freeOrderHead.m_next = m_orderPool;
+    for (unsigned int i = 0; i < 0x80; i++)
+    {
+        m_orderPool[i].m_next = (i == 0x7F) ? &m_freeOrderHead : &m_orderPool[i + 1];
+    }
+
+    m_ownerThread = OSGetCurrentThread();
+    m_scenegraphStepMode = 0;
+    m_frameCounter = 0;
+    m_mapStage = (CStage*)0;
+    m_mapBuffer = (void*)0;
+    m_mapSize = 0;
+
+    OSSetErrorHandler(0, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(1, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(2, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(3, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(5, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(0xb, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(0xd, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(0xe, (OSErrorHandler)errorHandler);
+    OSSetErrorHandler(0xf, (OSErrorHandler)errorHandler);
+
+    if (OSGetConsoleSimulatedMemSize() == 0x3000000)
+    {
+        m_mapStage = (CStage*)Memory.CreateStage(0x400000, "CSystem", 1);
+        unsigned int count;
+        CFile::CHandle* fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
+        if (fileHandle != (CFile::CHandle*)0)
+        {
+            unsigned int remaining;
+            unsigned int mapSize;
+            unsigned int offset;
+
+            mapSize = File.GetLength(fileHandle);
+            m_mapSize = mapSize;
+            remaining = mapSize;
+            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(s_system_cpp), 0x123) unsigned char[mapSize];
+            for (offset = 0; (int)remaining != 0; remaining -= count)
+            {
+                if (remaining >= 0x100000)
+                {
+                    count = 0x100000;
+                }
+                else
+                {
+                    count = remaining;
+                }
+
+                fileHandle->m_chunkSize = count;
+                fileHandle->m_currentOffset = offset;
+                File.Read(fileHandle);
+                File.SyncCompleted(fileHandle);
+                memcpy((unsigned char*)m_mapBuffer + offset, File.m_readBuffer, count);
+
+                offset += count;
+            }
+            File.Close(fileHandle);
+            Printf(const_cast<char*>(s_compilerMapLoaded));
+        }
+    }
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CSystem::COrder* CSystem::GetNextOrder(CSystem::COrder* order)
-{ 
-	if (order->m_next == &m_orderSentinel)
-	{
-		return (COrder*)0x0;
-	}
-	
-	return order->m_next;
-}
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CSystem::COrder* CSystem::GetFirstOrder()
-{ 
-	COrder* order = m_orderSentinel.m_next;
-	
-	if (order == &m_orderSentinel)
-	{
-		return (COrder*)nullptr;
-	}
-	
-	return order;
-}
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSystem::MapChanged(int mapId, int mapVariant, int changedByForce)
-{
-	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
-	{
-		if (order->m_entry == order->m_descBlock->m_entries)
-		{
-			order->m_owner->MapChanged(mapId, mapVariant, changedByForce);
-		}
-	}
-}
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSystem::MapChanging(int mapId, int mapVariant)
-{
-	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
-	{
-		if (order->m_entry == order->m_descBlock->m_entries)
-		{
-			order->m_owner->MapChanging(mapId, mapVariant);
-		}
-	}
-}
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSystem::ScriptChanged(char* script, int value)
-{
-	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
-	{
-		if (order->m_entry == order->m_descBlock->m_entries)
-		{
-			order->m_owner->ScriptChanged(script, value);
-		}
-	}
-}
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSystem::ScriptChanging(char* script)
-{
-	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
-	{
-		if (order->m_entry == order->m_descBlock->m_entries)
-		{
-			order->m_owner->ScriptChanging(script);
-		}
-	}
-}
-/*
- * --INFO--
- * PAL Address: 0x80021760
+ * PAL Address: 0x80021fb4
  * PAL Size: 204b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CSystem::RemoveScenegraph(CProcess* process, int arg)
+void CSystem::Quit()
 {
-    CProcessCallbackTable* descBlock = (CProcessCallbackTable*)process->GetTable(arg);
-    COrder* current = m_orderSentinel.m_next;
-
-    do
+    if (m_mapBuffer != nullptr)
     {
-        COrder* next = current->m_next;
-        if (current->m_descBlock == descBlock)
-        {
-            current->m_previous->m_next = current->m_next;
-            current->m_next->m_previous = current->m_previous;
-            current->m_next = m_freeOrderHead.m_next;
-            m_freeOrderHead.m_next = current;
-            m_orderCount--;
-        }
-        current = next;
-    } while (current != &m_orderSentinel);
-
-    if (descBlock->m_destroy)
-    {
-        (process->*descBlock->m_destroy)();
+        delete[](unsigned char*)m_mapBuffer;
+        m_mapBuffer = nullptr;
     }
+
+    if (m_mapStage != nullptr)
+    {
+        Memory.DestroyStage((CMemory::CStage*)m_mapStage);
+    }
+
+    MemoryCardMan.Quit();
+    FontMan.Quit();
+    TextureMan.Quit();
+    MaterialMan.Quit();
+    Graphic.Quit();
+    Pad.Quit();
+    File.Quit();
+    Sound.Quit();
+    Memory.Quit();
+    Math.Quit();
 }
 /*
  * --INFO--
- * PAL Address: 0x8002182C
- * PAL Size: 264b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * Address:	TODO
+ * Size:	TODO
  */
-unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
+void CSystem::Printf(char* fmt, ...)
 {
-    CProcessCallbackTable* description = (CProcessCallbackTable*)process->GetTable(arg);
+    if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x1000) == 0)
+	{
+        return;
+	}
 
-    if (description->m_create)
-    {
-        (process->*description->m_create)();
-    }
-
-    CProcessCallbackTable::Entry* entry = description->m_entries;
-    int insertIndex = 0;
-    while (entry->m_callback)
-    {
-        COrder* first = m_orderSentinel.m_next;
-        COrder* current = first;
-        do
-        {
-            if (entry->m_priority < current->m_priority)
-            {
-                COrder* order = m_freeOrderHead.m_next;
-                m_freeOrderHead.m_next = order->m_next;
-                order->m_next = current;
-                order->m_previous = current->m_previous;
-                current->m_previous->m_next = order;
-                current->m_previous = order;
-                order->m_entry = entry;
-                order->m_insertIndex = insertIndex;
-                insertIndex++;
-                order->m_descBlock = description;
-                order->m_owner = process;
-                order->m_priority = entry->m_priority;
-                order->m_debugName = description->m_name;
-                m_orderCount++;
-                break;
-            }
-            current = current->m_next;
-        } while (current != first);
-
-        entry++;
-    }
-
-    return 1;
+    char buffer[0x20C];
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(buffer, fmt, args);
+    va_end(args);
+    OSReport(buffer);
+    USB.Printf(buffer);
 }
 /*
  * --INFO--
@@ -329,7 +285,7 @@ void CSystem::ExecScenegraph()
         {
             if ((stepTrigger & 8) != 0)
             {
-                m_scenegraphStepMode = !m_scenegraphStepMode;
+                m_scenegraphStepMode = m_scenegraphStepMode ? 0 : 1;
             }
             else if ((stepTrigger & 4) != 0)
             {
@@ -503,150 +459,87 @@ void CSystem::ExecScenegraph()
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002182C
+ * PAL Size: 264b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSystem::Printf(char* fmt, ...)
+unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
 {
-    if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x1000) == 0)
-	{
-        return;
-	}
+    CProcessCallbackTable* description = (CProcessCallbackTable*)process->GetTable(arg);
 
-    char buffer[0x20C];
-    va_list args;
-    va_start(args, fmt);
-    vsprintf(buffer, fmt, args);
-    va_end(args);
-    OSReport(buffer);
-    USB.Printf(buffer);
+    if (description->m_create)
+    {
+        (process->*description->m_create)();
+    }
+
+    CProcessCallbackTable::Entry* entry = description->m_entries;
+    int insertIndex = 0;
+    while (entry->m_callback)
+    {
+        COrder* first = m_orderSentinel.m_next;
+        COrder* current = first;
+        do
+        {
+            if (entry->m_priority < current->m_priority)
+            {
+                COrder* order = m_freeOrderHead.m_next;
+                m_freeOrderHead.m_next = order->m_next;
+                order->m_next = current;
+                order->m_previous = current->m_previous;
+                current->m_previous->m_next = order;
+                current->m_previous = order;
+                order->m_entry = entry;
+                order->m_insertIndex = insertIndex;
+                insertIndex++;
+                order->m_descBlock = description;
+                order->m_owner = process;
+                order->m_priority = entry->m_priority;
+                order->m_debugName = description->m_name;
+                m_orderCount++;
+                break;
+            }
+            current = current->m_next;
+        } while (current != first);
+
+        entry++;
+    }
+
+    return 1;
 }
 /*
  * --INFO--
- * PAL Address: 0x80021fb4
+ * PAL Address: 0x80021760
  * PAL Size: 204b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CSystem::Quit()
+void CSystem::RemoveScenegraph(CProcess* process, int arg)
 {
-    if (m_mapBuffer != nullptr)
+    CProcessCallbackTable* descBlock = (CProcessCallbackTable*)process->GetTable(arg);
+    COrder* current = m_orderSentinel.m_next;
+
+    do
     {
-        delete[](unsigned char*)m_mapBuffer;
-        m_mapBuffer = nullptr;
-    }
-
-    if (m_mapStage != nullptr)
-    {
-        Memory.DestroyStage((CMemory::CStage*)m_mapStage);
-    }
-
-    MemoryCardMan.Quit();
-    FontMan.Quit();
-    TextureMan.Quit();
-    MaterialMan.Quit();
-    Graphic.Quit();
-    Pad.Quit();
-    File.Quit();
-    Sound.Quit();
-    Memory.Quit();
-    Math.Quit();
-}
-/*
- * --INFO--
- * PAL Address: 0x80022080
- * PAL Size: 856b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CSystem::Init()
-{
-    m_initialized = 1;
-    m_currentOrder = (COrder*)0;
-    m_currentOrderIndex = 0;
-
-    OSInit();
-
-    m_execParam = 3;
-    Memory.Init();
-    Sound.Init();
-    Math.Init();
-    File.Init();
-    Pad.Init();
-    Graphic.Init();
-    TextureMan.Init();
-    MaterialMan.Init();
-    FontMan.Init();
-    MemoryCardMan.Init();
-
-    m_orderCount = 0;
-    m_orderSentinel.m_previous = &m_orderSentinel;
-    m_orderSentinel.m_next = &m_orderSentinel;
-    m_orderSentinel.m_priority = 0xFF;
-    m_freeOrderHead.m_next = m_orderPool;
-    for (unsigned int i = 0; i < 0x80; i++)
-    {
-        m_orderPool[i].m_next = (i == 0x7F) ? &m_freeOrderHead : &m_orderPool[i + 1];
-    }
-
-    m_ownerThread = OSGetCurrentThread();
-    m_scenegraphStepMode = 0;
-    m_frameCounter = 0;
-    m_mapStage = (CStage*)0;
-    m_mapBuffer = (void*)0;
-    m_mapSize = 0;
-
-    OSSetErrorHandler(0, (OSErrorHandler)errorHandler);
-    OSSetErrorHandler(1, (OSErrorHandler)errorHandler);
-    OSSetErrorHandler(2, (OSErrorHandler)errorHandler);
-    OSSetErrorHandler(3, (OSErrorHandler)errorHandler);
-    OSSetErrorHandler(5, (OSErrorHandler)errorHandler);
-    OSSetErrorHandler(0xb, (OSErrorHandler)errorHandler);
-    OSSetErrorHandler(0xd, (OSErrorHandler)errorHandler);
-    OSSetErrorHandler(0xe, (OSErrorHandler)errorHandler);
-    OSSetErrorHandler(0xf, (OSErrorHandler)errorHandler);
-
-    if (OSGetConsoleSimulatedMemSize() == 0x3000000)
-    {
-        m_mapStage = (CStage*)Memory.CreateStage(0x400000, "CSystem", 1);
-        unsigned int count;
-        CFile::CHandle* fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
-        if (fileHandle != (CFile::CHandle*)0)
+        COrder* next = current->m_next;
+        if (current->m_descBlock == descBlock)
         {
-            unsigned int remaining;
-            unsigned int mapSize;
-            unsigned int offset;
-
-            mapSize = File.GetLength(fileHandle);
-            m_mapSize = mapSize;
-            remaining = mapSize;
-            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(s_system_cpp), 0x123) unsigned char[mapSize];
-            for (offset = 0; (int)remaining != 0; remaining -= count)
-            {
-                if (remaining >= 0x100000)
-                {
-                    count = 0x100000;
-                }
-                else
-                {
-                    count = remaining;
-                }
-
-                fileHandle->m_chunkSize = count;
-                fileHandle->m_currentOffset = offset;
-                File.Read(fileHandle);
-                File.SyncCompleted(fileHandle);
-                memcpy((unsigned char*)m_mapBuffer + offset, File.m_readBuffer, count);
-
-                offset += count;
-            }
-            File.Close(fileHandle);
-            Printf(const_cast<char*>(s_compilerMapLoaded));
+            current->m_previous->m_next = current->m_next;
+            current->m_next->m_previous = current->m_previous;
+            current->m_next = m_freeOrderHead.m_next;
+            m_freeOrderHead.m_next = current;
+            m_orderCount--;
         }
+        current = next;
+    } while (current != &m_orderSentinel);
+
+    if (descBlock->m_destroy)
+    {
+        (process->*descBlock->m_destroy)();
     }
 }
 /*
@@ -654,20 +547,127 @@ void CSystem::Init()
  * Address:	TODO
  * Size:	TODO
  */
-void CSystem::errorHandler(unsigned short, OSContext*, unsigned long, unsigned long)
+void CSystem::ScriptChanging(char* script)
 {
-	return;
+	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
+	{
+		if (order->m_entry == order->m_descBlock->m_entries)
+		{
+			order->m_owner->ScriptChanging(script);
+		}
+	}
 }
 /*
  * --INFO--
- * PAL Address: 0x800223dc
- * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * Address:	TODO
+ * Size:	TODO
  */
-void OSPanic(const char* file, int line, const char* msg, ...)
+void CSystem::ScriptChanged(char* script, int value)
 {
-	// TODO
+	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
+	{
+		if (order->m_entry == order->m_descBlock->m_entries)
+		{
+			order->m_owner->ScriptChanged(script, value);
+		}
+	}
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CSystem::MapChanging(int mapId, int mapVariant)
+{
+	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
+	{
+		if (order->m_entry == order->m_descBlock->m_entries)
+		{
+			order->m_owner->MapChanging(mapId, mapVariant);
+		}
+	}
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CSystem::MapChanged(int mapId, int mapVariant, int changedByForce)
+{
+	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
+	{
+		if (order->m_entry == order->m_descBlock->m_entries)
+		{
+			order->m_owner->MapChanged(mapId, mapVariant, changedByForce);
+		}
+	}
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CSystem::COrder* CSystem::GetFirstOrder()
+{
+	COrder* order = m_orderSentinel.m_next;
+
+	if (order == &m_orderSentinel)
+	{
+		return (COrder*)nullptr;
+	}
+
+	return order;
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CSystem::COrder* CSystem::GetNextOrder(CSystem::COrder* order)
+{
+	if (order->m_next == &m_orderSentinel)
+	{
+		return (COrder*)0x0;
+	}
+
+	return order->m_next;
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CSystem::COrder* CSystem::GetOrder(int index)
+{
+	COrder* nextOrder = (COrder*)nullptr;
+
+	if (index < 0)
+	{
+		return nextOrder;
+	}
+
+	nextOrder = (m_orderSentinel).m_next;
+	int foundIndex = 0;
+
+	while (nextOrder)
+	{
+		if (foundIndex == index)
+		{
+			break;
+		}
+
+		nextOrder = nextOrder->m_next;
+		foundIndex++;
+	}
+
+	return nextOrder;
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int CSystem::IsGdev()
+{
+	return OSGetConsoleType() >> 0x1C & 1;
 }

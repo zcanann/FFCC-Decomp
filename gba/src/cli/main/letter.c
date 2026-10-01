@@ -28,7 +28,6 @@ static s8 sLetterAttachType;
 static u32 sLetterAttachValue;
 static s8 sLetterGiftTop;
 static s16 sLetterPollTimer;
-extern char gDetailBufNext[];
 
 void LetterList_PrintRow(s32, s32);
 void LetterList_DrawRow(s32, s32, s32, s32);
@@ -304,10 +303,10 @@ s32 LetterList_Main(void)
         }
         return 0;
     }
-    if (((struct LetterListHeader *)gListBuf)->count > gWindows[0].rows)
+    if (((struct LetterListHeader *)LIST_BUF)->count > gWindows[0].rows)
         n = gWindows[0].rows;
     else
-        n = ((struct LetterListHeader *)gListBuf)->count;
+        n = ((struct LetterListHeader *)LIST_BUF)->count;
     ret = 0;
     if (sLetterRow < n) {
         idx = sLetterTop + sLetterRow;
@@ -415,11 +414,11 @@ s32 LetterRead_Main(void)
         }
         return 0;
     }
-    list = (struct LetterListHeader *)gListBuf;
-    entries = gLetterEntries;
+    list = (struct LetterListHeader *)LIST_BUF;
+    entries = LETTER_ENTRIES;
     if (sLetterRow == 0) {
         entries[sLetterSel].flags |= 1;
-        sLetterLines = Str_CountLines(gDetailBuf);
+        sLetterLines = Str_CountLines(DETAIL_BUF);
     }
     if (sLetterRow < sLetterLines)
         LetterRead_PrintNextLine();
@@ -733,7 +732,7 @@ s32 LetterSend_Init(void)
 
 s32 LetterSend_Main(void)
 {
-    struct LetterEntry *entry = &gLetterEntries[sLetterSel];
+    struct LetterEntry *entry = &LETTER_ENTRIES[sLetterSel];
     struct Window *win = gWindows;
     s32 ret = 0;
 
@@ -892,7 +891,7 @@ s32 LetterTake_Init(void)
 
     if (sLetterSubInit == 0) {
         memset(win, 0, sizeof(struct Window));
-        entry = &gLetterEntries[sLetterSel];
+        entry = &LETTER_ENTRIES[sLetterSel];
         memset(buf, 0, sizeof(buf));
         if (mode != 1)
             strcpy(buf, Msg_GetLetter(0));
@@ -960,7 +959,7 @@ s32 LetterTake_Init(void)
 s32 LetterTake_Main(void)
 {
     s32 ret = 0;
-    struct LetterEntry *entry = &gLetterEntries[sLetterSel];
+    struct LetterEntry *entry = &LETTER_ENTRIES[sLetterSel];
     struct Window *win;
 
     if (gMenuHasInput) {
@@ -1053,7 +1052,7 @@ s32 LetterTaken_Init(void)
     if (sLetterSubInit == 0) {
         memset(win, 0, sizeof(struct Window));
         memset(buf, 0, sizeof(buf));
-        entry = &gLetterEntries[sLetterSel];
+        entry = &LETTER_ENTRIES[sLetterSel];
         if (!(gLanguage & 15))
             strcat(buf, Msg_GetLetter(8));
         if (entry->flags & 8) {
@@ -1169,8 +1168,8 @@ s32 LetterAnswer_Init(void)
 
     if (sLetterSubInit == 0) {
         memset(win, 0, sizeof(struct Window));
-        str = (char *)gDetailBuf;
-        str = strlen(str) + gDetailBufNext;
+        str = (char *)DETAIL_BUF;
+        str = strlen(str) + (char *)(DETAIL_BUF + 1);
         sLetterAnswers = Str_CountLines(str);
         Text_SetFill(1, 1);
         Text_Clear();
@@ -1232,7 +1231,8 @@ s32 LetterAnswer_Init(void)
             Text_Print(Msg_GetSystem(4), TEXT_DRAW);
         } else {
             memset(buf, 0, sizeof(buf));
-            str = (char *)&gDetailBuf[strlen((char *)gDetailBuf) + 1];
+            str = (char *)DETAIL_BUF;
+            str = strlen(str) + (char *)(DETAIL_BUF + 1);
             for (i = 0; i < w; i++) {
                 nl = strchr(str, '\n');
                 if (nl != NULL)
@@ -1446,8 +1446,8 @@ void LetterList_PrintRow(s32 idx, s32 row)
     char *src;
     struct LetterEntry *entry;
     s32 no;
-    struct LetterListHeader *list = (struct LetterListHeader *)gListBuf;
-    struct LetterEntry *entries = gLetterEntries;
+    struct LetterListHeader *list = (struct LetterListHeader *)LIST_BUF;
+    struct LetterEntry *entries = LETTER_ENTRIES;
     char *names = (char *)(entries + list->count);
     char *descs = names + list->subjectCount * 24;
 
@@ -1481,7 +1481,7 @@ void LetterList_DrawRow(s32 idx, s32 row, s32 n, s32 pal)
     pal <<= 12;
     for (i = 0; i < n; i++) {
         buf[i] = tile++ | pal;
-        buf[i + 30] = tile++ | pal;
+        (buf + 30)[i] = tile++ | pal;
     }
     map = Bg_GetMapPtr(gWindows[0].bg - 1, 2, row * 2 + 1);
     DmaCopy16(3, buf, map, n * 2);
@@ -1490,7 +1490,7 @@ void LetterList_DrawRow(s32 idx, s32 row, s32 n, s32 pal)
 
 s32 LetterList_GetRowPalette(s32 idx)
 {
-    struct LetterEntry *entry = &gLetterEntries[idx];
+    struct LetterEntry *entry = &LETTER_ENTRIES[idx];
     s32 pal;
 
     if (entry->flags & 4)
@@ -1547,7 +1547,7 @@ s32 LetterList_HandleInput(void)
 
     if (gKeysRepeat == 0)
         return 0;
-    list = (struct LetterListHeader *)gListBuf;
+    list = (struct LetterListHeader *)LIST_BUF;
     win = gWindows;
     if (gKeysRepeat & DPAD_UP) {
         if (win->cursor) {
@@ -1616,8 +1616,8 @@ s32 LetterList_HandleInput(void)
 
 void LetterList_DrawIcons(void)
 {
-    s32 *hdr = (s32 *)gListBuf;
-    struct LetterEntry *entry = gLetterEntries;
+    s32 *hdr = (s32 *)LIST_BUF;
+    struct LetterEntry *entry = LETTER_ENTRIES;
     s32 n;
     s32 x;
     s32 y;
@@ -1657,7 +1657,7 @@ void LetterRead_PrintNextLine(void)
     char buf[256];
     struct Window win;
     u16 tiles[60];
-    char *line = (char *)gDetailBuf;
+    char *line = (char *)DETAIL_BUF;
     char *nl = line;
     s32 i;
     s32 w;
@@ -1750,7 +1750,7 @@ s32 Str_CountLines(s8 *str)
 
 void LetterRead_DrawAttachIcon(void)
 {
-    struct LetterEntry *entry = &gLetterEntries[sLetterSel];
+    struct LetterEntry *entry = &LETTER_ENTRIES[sLetterSel];
     struct Window *win;
     s32 x;
     s32 y;
@@ -1944,8 +1944,8 @@ void LetterGift_PrintItem(s32 idx, s32 row)
 
 void Letter_BuildText(char *buf, s32 type)
 {
-    s32 *hdr = (s32 *)gListBuf;
-    struct LetterEntry *entry = gLetterEntries;
+    s32 *hdr = (s32 *)LIST_BUF;
+    struct LetterEntry *entry = LETTER_ENTRIES;
     s32 n = hdr[1] * 24;
     char *names = (char *)(entry + hdr[0]) + n;
     s32 mode;
@@ -1981,8 +1981,8 @@ void Letter_BuildText(char *buf, s32 type)
             strcpy(buf, Msg_GetLetter(6));
         else
             buf[0] = 0;
-        p = (char *)gDetailBuf;
-        p = strlen(p) + gDetailBufNext;
+        p = (char *)DETAIL_BUF;
+        p = strlen(p) + (char *)(DETAIL_BUF + 1);
         for (type = 0; type < sLetterAnswer; type++) {
             nl = strchr(p, '\n');
             if (nl)

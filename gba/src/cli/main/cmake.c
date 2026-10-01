@@ -779,7 +779,7 @@ void CMakeLookScreen_Setup(void)
     gWindows[0].y = 6;
     gWindows[0].rows = 4;
     gWindows[0].width = 12;
-    gWindows[0].height = 11;
+    gWindows[0].height = gWindows[0].rows * 2 + 3;
     gWindows[0].style = 8;
     gWindows[0].variant = 0;
     gWindows[0].bg = 2;

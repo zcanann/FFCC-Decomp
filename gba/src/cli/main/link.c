@@ -111,7 +111,7 @@ u32 Crc8(u32 data)
         }
         data >>= 8;
     }
-    for (i = 0; i < 8; i++) {
+    for (; i < 8; i++) {
         crc <<= 1;
         if (crc & 0x100)
             crc ^= 0xCD;
@@ -528,7 +528,10 @@ restart:
                 p = (u8 *)&pkt;
                 p[0] = 7;
                 p[1] = 0xFF;
-                goto send;
+                if (Link_Write(pkt) != 0) {
+                    sMsgXfer.pending = pkt;
+                    goto resend;
+                }
             }
         } else if ((msg[0] & 0x3F) == 13) {
             gXferActive = 0;
@@ -555,7 +558,10 @@ restart:
                 else
                     p[0] = 6;
                 p[1] = result;
-                goto send;
+                if (Link_Write(pkt) != 0) {
+                    sMsgXfer.pending = pkt;
+                    goto resend;
+                }
             }
         } else if ((msg[0] & 0x3F) == 14) {
             if (msg[1] == 1) {

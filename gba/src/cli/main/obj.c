@@ -370,13 +370,13 @@ void Obj_AllocPalette(s32 idx, s32 frame)
             used |= 1 << (e->palette >> 4);
     }
 
-    e = &cells[idx];
+    cells += idx;
     for (i = sObjHeader.paletteCount; i <= 15; i++) {
         if (!((used >> i) & 1))
             break;
     }
-    e->palette = (i << 4) | 1;
-    e->palLoaded = 1;
+    cells->palette = (i << 4) | 1;
+    cells->palLoaded = 1;
 
     if (gSpMode == 0) {
         src = (u8 *)sObjCells + (sObjHeader.cellPalettesOffset - sObjHeader.cellsOffset);
@@ -385,9 +385,9 @@ void Obj_AllocPalette(s32 idx, s32 frame)
         src += sObjHeader.paletteCount * 32;
     }
     if (frame < 0)
-        src += e->firstPalette * 32;
+        src += cells->firstPalette * 32;
     else
-        src += (e->firstPalette + frame) * 32;
+        src += (cells->firstPalette + frame) * 32;
     dest = 0x05000200 + i * 32;
     DmaSet(3, src, dest, 0x80000000 | (count * 16));
     sObjPalUsage[idx - 3] = count;

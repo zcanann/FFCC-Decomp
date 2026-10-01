@@ -1158,15 +1158,19 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
  */
 int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
+    int polygonCount;
+    u32 vertexFormat;
+    int count;
+    int running;
     u8* data = static_cast<u8*>(dlData);
-    int running = true;
-    int polygonCount = 0;
+    running = true;
+    polygonCount = 0;
 
     while (running) {
         u32 opcode = *data;
         u16 vertexCount = *(u16*)(data + 1);
-        int count = vertexCount;
-        u32 vertexFormat = opcode & 7;
+        count = vertexCount;
+        vertexFormat = opcode & 7;
         u32 primitive = opcode & 0xF8;
 
         data += 3;

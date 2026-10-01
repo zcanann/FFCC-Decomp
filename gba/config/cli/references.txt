@@ -1,3 +1,2 @@
 # Pointer literals with a fixed symbolic expression, where the compiler folded
 # a constant offset that lands outside the referenced object.
-0x0203A7FF gListBuf-1  # ScouterScreen_PrintNextRow: traits[row - 2] of a gListBuf entry

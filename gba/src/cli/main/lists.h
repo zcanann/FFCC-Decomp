@@ -2,8 +2,9 @@
 #define GUARD_LISTS_H
 
 #include "global.h"
+#include "xfer.h"
 
-/* Layouts of the lists the GameCube downloads into gListBuf / gDetailBuf. */
+/* Layouts of the lists the GameCube downloads into LIST_BUF / DETAIL_BUF. */
 
 /* Equipment attributes of an item (equip list, command list, shop, smith). */
 struct ItemInfo {
@@ -45,10 +46,10 @@ struct Recipe {
     struct ItemInfo items[4];
 };
 
-extern struct LetterEntry gLetterEntries[];
-extern s16 gBuyItemIds[];
-extern s8 gSmithItemSlots[];
-extern char gSellItemDescs[];
-extern struct ItemInfo gCmdItemInfo[];
+#define LETTER_ENTRIES   ((struct LetterEntry *)(LIST_BUF + sizeof(struct LetterListHeader)))
+#define BUY_ITEM_IDS     (((struct BuyList *)LIST_BUF)->ids)
+#define SMITH_ITEM_SLOTS ((s8 *)LIST_BUF + 1)
+#define SELL_ITEM_DESCS  ((char *)LIST_BUF + 0x300)
+#define CMD_ITEM_INFO    ((struct ItemInfo *)(DETAIL_BUF + 4))
 
 #endif

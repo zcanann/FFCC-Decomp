@@ -363,7 +363,7 @@ void Session_OnEquipList(u8 *p)
     if (size & 3)
         size = ((size >> 2) + 1) << 2;
     size += n * 8;
-    memcpy(gDetailBuf, p, size);
+    memcpy(DETAIL_BUF, p, size);
     gDataFlags |= DATA_EQUIP_LIST;
 }
 
@@ -565,7 +565,7 @@ void Scouter_OnInfo(u8 *p)
 {
     s32 size = 0x200;
 
-    memcpy(gListBuf, p, size);
+    memcpy(LIST_BUF, p, size);
     memset(&gScouterHit, 0xFF, sizeof(gScouterHit));
     gScouterDirty = 1;
     Scouter_SetDirty(1);
@@ -584,7 +584,7 @@ void Session_OnCmdList(u8 *p)
 {
     s32 size = p[0] * 8 + 1;
 
-    memcpy(gDetailBuf, p, size);
+    memcpy(DETAIL_BUF, p, size);
     gDataFlags |= DATA_CMD_LIST;
 }
 

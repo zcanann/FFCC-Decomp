@@ -91,16 +91,16 @@ void Obj_Init(void)
     }
     DmaCopy32(3, &sOamBuf[sOamBufIndex], 0x07000000, 0x400);
     if (gDataFlags & DATA_OBJ) {
-        src = gDownloadData;
+        src = DOWNLOAD_DATA;
         LZ77UnCompVram(src, (void *)0x06010000);
-        memcpy(&sObjHeader, gDownloadBuf, 32);
+        memcpy(&sObjHeader, DOWNLOAD_BUF, 32);
         CpuFastClear(0, sObjCells, 0x700);
-        src = sObjHeader.palettesOffset + (u32)gDownloadBuf;
+        src = sObjHeader.palettesOffset + (u32)DOWNLOAD_BUF;
         size = sObjHeader.paletteCount * 32;
         DmaCopy16(3, src, sObjPalettes, size);
         src = gSpMode == 0 ? sObjPalettes : (u8 *)gSpObjPalettes;
         DmaCopy16(3, src, 0x05000200, size);
-        src = sObjHeader.cellsOffset + (u32)gDownloadBuf;
+        src = sObjHeader.cellsOffset + (u32)DOWNLOAD_BUF;
         size = sObjHeader.palMapCount >> 1;
         if (sObjHeader.palMapCount & 1)
             size++;

@@ -276,7 +276,7 @@ s32 ShopBuyScreen_Main(void)
         return 0;
     }
     win = &gWindows[1];
-    list = (struct BuyList *)gListBuf;
+    list = (struct BuyList *)LIST_BUF;
     if (sShopRow < list->count && sShopRow < win->rows) {
         ShopList_PrintBuyItem(sShopRow, sShopRow);
         ShopList_DrawRow(sShopRow, sShopRow, Shop_CanBuy(sShopRow));
@@ -370,7 +370,7 @@ void ShopList_DrawCursor(void)
         win = &gWindows[1];
     }
     if (gScreen == 1)
-        n = ((struct BuyList *)gListBuf)->count;
+        n = ((struct BuyList *)LIST_BUF)->count;
     else
         n = 64;
     flags = sShopTop != 0;
@@ -395,7 +395,7 @@ s32 ShopList_HandleInput(void)
     if (gSubMode == 0) {
         max = 64;
         if (gScreen == 1)
-            max = ((struct BuyList *)gListBuf)->count;
+            max = ((struct BuyList *)LIST_BUF)->count;
     } else {
         max = win->rows;
     }
@@ -627,7 +627,7 @@ void ShopList_DrawIcons(void)
     s32 pal;
 
     if (gScreen == 1) {
-        list = (struct BuyList *)gListBuf;
+        list = (struct BuyList *)LIST_BUF;
         ids = list->ids;
     } else {
         list = 0;
@@ -673,7 +673,7 @@ void ShopList_PrintBuyItem(s32 idx, s32 slot)
     Text_SetFill(1, 0);
     Text_Clear();
     Text_SetX(16);
-    id = &gBuyItemIds[idx];
+    id = &BUY_ITEM_IDS[idx];
     if (*id > 0)
         Text_Print(Msg_GetItemName(*id), TEXT_DRAW);
     win = &gWindows[1];
@@ -729,7 +729,7 @@ void ShopList_RedrawRows(void)
 
 s32 Shop_CanBuy(s32 idx)
 {
-    u8 *p = gListBuf;
+    u8 *p = LIST_BUF;
     u8 count;
     u32 *vals;
     s32 n;
@@ -994,13 +994,13 @@ void InfoWin_PrintNextRow(void)
     if (sInfoRow > gWindows->rows)
         return;
     items = 0;
-    list = (struct BuyList *)gListBuf;
+    list = (struct BuyList *)LIST_BUF;
     if (gScreen == 1) {
         t = list->count;
         if (t & 1)
             t++;
-        vals = (u32 *)&gBuyItemIds[t];
-        id = gBuyItemIds[sInfoItem];
+        vals = (u32 *)&BUY_ITEM_IDS[t];
+        id = BUY_ITEM_IDS[sInfoItem];
     } else {
         items = (struct ItemInfo *)list;
         vals = (u32 *)(items + 64);
@@ -1142,7 +1142,7 @@ void InfoWin_PrintNextRow(void)
 
 void InfoWin_GetDescLine(s32 line, char *dst)
 {
-    char *p = (char *)gListBuf;
+    char *p = (char *)LIST_BUF;
     char *s;
     s32 len;
     s32 idx;
@@ -1151,13 +1151,14 @@ void InfoWin_GetDescLine(s32 line, char *dst)
     if (gScreen == 1) {
         u32 n = *(u8 *)p;
 
-        p = (char *)&gBuyItemIds[n];
+        p += 4;
+        p += n * 2;
         if (n & 1)
             p += 2;
         s = p + n * 4;
         idx = sInfoItem;
     } else {
-        s = gSellItemDescs;
+        s = SELL_ITEM_DESCS;
         if ((u32)Session_GetItemCategory(sInfoItem) <= 1)
             return;
         idx = sInfoItem;
@@ -1203,7 +1204,7 @@ s32 Shop_ChangeQuantity(s32 delta)
     if (sShopQuantity <= 0 || sShopQuantity > count)
         sShopQuantity = old;
     if (sShopQuantity != old) {
-        u8 *buf = gListBuf;
+        u8 *buf = LIST_BUF;
         s32 n = buf[0];
         s16 *items = (s16 *)(buf + 4);
         u32 *prices;
@@ -1230,7 +1231,7 @@ void InfoWin_DrawIcons(void)
     s32 frame;
 
     if (gScreen == 1) {
-        u8 *buf = gListBuf;
+        u8 *buf = LIST_BUF;
         s16 *items = (s16 *)(buf + 4);
 
         if (sInfoItem >= buf[0])
@@ -1267,7 +1268,7 @@ void InfoWin_PrintTotal(void)
     struct Window *win = gWindows;
     s32 ofs = win->width * 64;
     u32 dst = win->width * 256 + 0x06009000;
-    u8 *p = gListBuf;
+    u8 *p = LIST_BUF;
     s32 x;
     s32 w;
     s32 n;

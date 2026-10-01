@@ -210,7 +210,7 @@ void EquipScreen_HandleInput(void)
 
     if (gKeysRepeat == 0)
         return;
-    list = gDetailBuf;
+    list = DETAIL_BUF;
     if (gSubMode == 0) {
         win = &gWindows[2];
         n = win->rows;
@@ -360,7 +360,7 @@ void EquipScreen_DrawIcons(void)
         win = &gWindows[1];
         x = (win->x + 2) * 8;
         y = (win->y + 1) * 8;
-        list = (s8 *)gDetailBuf;
+        list = (s8 *)DETAIL_BUF;
         n = *list++;
         n++;
         for (i = 0; i < win->rows; i++, y += 16) {
@@ -443,7 +443,7 @@ s32 EquipScreen_ClosePicker(void)
 void EquipScreen_PrintCandidate(s32 idx, s32 row)
 {
     struct Window *win;
-    u8 *list = gDetailBuf;
+    u8 *list = DETAIL_BUF;
     s32 n = *list++;
     const char *str;
     s32 id;
@@ -458,7 +458,7 @@ void EquipScreen_PrintCandidate(s32 idx, s32 row)
     } else if (idx >= n) {
         str = Msg_GetSystem(0);
     } else {
-        id = gDetailBuf[idx];
+        id = DETAIL_BUF[idx];
         id = gSession.items[id];
         if (id > 0)
             str = Msg_GetItemName(id);
@@ -472,7 +472,8 @@ void EquipScreen_PrintCandidate(s32 idx, s32 row)
 s32 EquipScreen_CanUseCandidate(s32 idx)
 {
     s32 slot = gWindows[2].cursor;
-    s32 n = gDetailBuf[0];
+    u8 *list = DETAIL_BUF;
+    s32 n = *list++;
     s32 size;
     struct ItemInfo *item;
     s32 mask;
@@ -484,12 +485,12 @@ s32 EquipScreen_CanUseCandidate(s32 idx)
             return 0;
         return (s8)gSession.equipment[slot] >= 0;
     }
-    if (Session_IsItemInUse(gDetailBuf[idx]))
+    if (Session_IsItemInUse(list[idx - 1]))
         return 0;
     size = n + 1;
     if (size & 3)
         size = ((size >> 2) + 1) << 2;
-    item = (struct ItemInfo *)(gDetailBuf + size);
+    item = (struct ItemInfo *)(DETAIL_BUF + size);
     item += idx - 1;
     if (!Item_CanEquip((u16 *)item))
         return 0;
@@ -541,7 +542,7 @@ void EquipScreen_PrintDesc(void)
     if (mode == 0)
         i = 2;
     win = &gWindows[i];
-    list = (s8 *)gDetailBuf;
+    list = (s8 *)DETAIL_BUF;
     n = *list++;
     if (mode == 0) {
         id = (s8)gSession.equipment[win->cursor];

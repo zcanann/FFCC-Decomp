@@ -188,7 +188,7 @@ void ScouterScreen_PrintNextRow(void)
     idx = sScouterShown.enemy;
     if (idx < 0)
         return;
-    item = &((struct ScouterInfo *)gListBuf)[idx];
+    item = &((struct ScouterInfo *)LIST_BUF)[idx];
     row = sScouterRow;
     if (row >= win->rows)
         return;
@@ -216,7 +216,7 @@ void ScouterScreen_PrintNextRow(void)
             Text_Print(Msg_GetSystem(41), TEXT_DRAW);
         }
     } else if (row <= 4) {
-        if (item->traits[0] >= 0 && ((struct ScouterInfo *)gListBuf)[idx].traits[row - 2] >= 0) {
+        if (item->traits[0] >= 0 && ((struct ScouterInfo *)LIST_BUF)[idx].traits[row - 2] >= 0) {
             if (item->traits[0] <= 1) {
                 n = item->traits[0] * 2;
                 if (row == 2) {
@@ -229,7 +229,7 @@ void ScouterScreen_PrintNextRow(void)
                     Text_Print(buf, TEXT_DRAW);
                 }
             } else {
-                n = ((struct ScouterInfo *)gListBuf)[idx].traits[row - 2];
+                n = ((struct ScouterInfo *)LIST_BUF)[idx].traits[row - 2];
                 if (n >= 0) {
                     strcpy(buf, Msg_GetSystem(31));
                     strcat(buf, Msg_GetTrait(n + 3));

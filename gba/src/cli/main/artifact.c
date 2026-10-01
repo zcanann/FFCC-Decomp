@@ -114,7 +114,7 @@ s32 ArtifactScreen_Main(void)
         return 0;
     }
     if (sArtifactLoaded == 0) {
-        Session_OnArtifacts(gListBuf);
+        Session_OnArtifacts(LIST_BUF);
         sArtifactLoaded = 1;
     }
     Text_SetFill(1, 0);

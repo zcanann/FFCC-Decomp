@@ -423,7 +423,7 @@ void CmdListScreen_BuildCandidates(void)
     s32 count;
     u8 id;
 
-    sCmdCandidates = (s16 *)gListBuf;
+    sCmdCandidates = (s16 *)LIST_BUF;
     n = 0;
     for (i = 0; i < 64; i++) {
         type = Session_GetItemCategory(i);
@@ -659,7 +659,7 @@ void CmdListScreen_PrintDesc(void)
                 }
             }
         }
-        item = gCmdItemInfo + n;
+        item = CMD_ITEM_INFO + n;
         if (item->flags & 0x100)
             Text_Print(Msg_GetSystem(16), TEXT_DRAW);
         else if (item->flags & 0xE00)

@@ -47,13 +47,14 @@ void SmithEquip_DrawSlotIcons(void);
 
 static inline struct Recipe *GetRecipe(void)
 {
-    s32 n = (s8)gListBuf[0];
+    u8 *list = LIST_BUF;
+    s32 n = (s8)list[0];
     struct Recipe *p;
 
     n++;
     if (n & 3)
         n = ((n >> 2) + 1) << 2;
-    p = (struct Recipe *)(gListBuf + n);
+    p = (struct Recipe *)(list + n);
     return &p[sSmithSel];
 }
 
@@ -133,12 +134,12 @@ s32 SmithTopScreen_Main(void)
         return 0;
     }
     win = gWindows;
-    count = (s8)gListBuf[0];
+    count = (s8)LIST_BUF[0];
     if (sSmithKnownLoaded == 0) {
         idx = ((count + 1) >> 2) * 4;
         if ((count + 1) & 3)
             idx += 4;
-        p = &gListBuf[idx];
+        p = &LIST_BUF[idx];
         p += count * 56;
         memcpy(sSmithKnown, p, 16);
         sSmithKnownLoaded = 1;
@@ -197,7 +198,7 @@ s32 SmithTopScreen_HandleInput(void)
     s32 ret;
     s32 idx;
     s32 row;
-    u8 *list = gListBuf;
+    u8 *list = LIST_BUF;
 
     if (gKeysRepeat == 0)
         return 0;
@@ -279,7 +280,7 @@ void SmithTopScreen_DrawIcons(void)
     s32 y = (win->y + 1) * 8;
     s32 frame = 48;
     s32 pal = Obj_GetPalette(0, frame);
-    s32 count = (s8)gListBuf[0];
+    s32 count = (s8)LIST_BUF[0];
     s32 i;
     s32 flags;
 
@@ -509,7 +510,7 @@ s32 SmithForge_HandleInput(void)
                     if (gScreen == 1) {
                         if (win->items[sel].enabled != 0) {
                             s32 slot = gSession.appearance & 3;
-                            p = &gListBuf[sSmithSel];
+                            p = &LIST_BUF[sSmithSel];
                             Link_SendEvent(10, p[1], slot);
                             sSmithWaiting = 1;
                             Reply_Clear();
@@ -993,11 +994,11 @@ void SmithEquipScreen_PrintNextRow(void)
 
     if (sSmithRow >= win->rows)
         return;
-    n = (s8)gListBuf[0];
+    n = (s8)LIST_BUF[0];
     n++;
     if (n & 3)
         n = ((n >> 2) + 1) << 2;
-    recipe = (struct Recipe *)(gListBuf + n);
+    recipe = (struct Recipe *)(LIST_BUF + n);
     recipe = &recipe[sSmithSel];
     dst = Window_GetTextVram(win, sSmithRow, 0);
     flags = recipe->items[sSmithVariant].flags;
@@ -1159,7 +1160,7 @@ void SmithTopScreen_PrintRow(s32 idx, s32 row)
     Text_SetFill(1, 0);
     Text_Clear();
     Text_SetX(16);
-    id = gSession.items[gSmithItemSlots[idx]];
+    id = gSession.items[SMITH_ITEM_SLOTS[idx]];
     if (id > 0)
         Text_Print(Msg_GetItemName(id), TEXT_DRAW);
     Text_CopyToVram(gWindows[0].width * 64 * row + 0x06009000, gWindows[0].width);
@@ -1206,7 +1207,7 @@ void Item_FormatWearer(u16 *flags, char *dst)
 
 s32 Smith_IsRecipeKnown(s32 idx)
 {
-    s32 id = gSession.items[gSmithItemSlots[idx]];
+    s32 id = gSession.items[SMITH_ITEM_SLOTS[idx]];
     s32 q;
     s32 r;
 
@@ -1220,7 +1221,7 @@ s32 Smith_IsRecipeKnown(s32 idx)
 
 s32 Smith_GetItem(s32 idx)
 {
-    s8 *list = (s8 *)gListBuf;
+    s8 *list = (s8 *)LIST_BUF;
     s32 id;
 
     if (*list++ > idx) {

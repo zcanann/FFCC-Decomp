@@ -55,12 +55,10 @@ struct PYmMelt {
     f32 m_heightBias;
     f32 m_collisionYOffset;
     f32 m_maxDropDistance;
-    u8 _pad2C[2];
-    u8 m_hideWhenNoGround;
-    u8 _pad2F;
     u8 m_drawEnvColor0;
     u8 m_drawEnvColor1;
-    u8 _pad32[2];
+    u8 m_hideWhenNoGround;
+    u8 _pad2F;
 };
 
 #ifdef __cplusplus

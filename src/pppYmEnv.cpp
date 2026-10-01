@@ -255,7 +255,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     firstLat = latStep;
     firstRingSin = radius * (float)sin(firstLat);
     firstRingCos = radius * (float)cos(firstLat);
-    firstNormalZ = diameter * firstRingCos * firstRingCos;
+    firstNormalZ = 2.0f * firstRingCos * firstRingCos;
 
     GXPosition3f32(zero, zero, radius);
     GXNormal3f32(zero, zero, diameter);
@@ -281,9 +281,10 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
         upperSin = radius * (float)sin(upperLat);
         upperCos = radius * (float)cos(upperLat);
         lowerSin = radius * (float)sin(lowerLat);
-        lowerCos = radius * (float)cos(lowerLat);
-        upperNormalZ = diameter * upperCos * upperCos;
-        lowerNormalZ = diameter * lowerCos * lowerCos;
+        lowerCos = (float)cos(lowerLat);
+        lowerCos = radius * lowerCos;
+        upperNormalZ = 2.0f * upperCos * upperCos;
+        lowerNormalZ = 2.0f * lowerCos * lowerCos;
 
         if (fabs(upperCos) < (double)0.01f || fabs(lowerCos) < (double)0.01f) {
             break;

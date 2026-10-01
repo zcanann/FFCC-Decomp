@@ -169,7 +169,6 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaRenderStep* step, _pppC
 void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaFrameStep* step, _pppCtrlTable* ctrl)
 {
     VYmMiasma* work;
-    PARTICLE_DATA* particle;
     int i;
     Vec delta;
     Vec matrixPos;
@@ -193,7 +192,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaFrameStep* step, _pppCtr
             (unsigned long)step->m_particleCount * sizeof(PARTICLE_DATA), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmMiasma_cpp),
             0x18d);
-        particle = work->m_particles;
+        PARTICLE_DATA* particle = work->m_particles;
         for (i = 0; i < step->m_particleCount; i++) {
             InitParticleData(work, pppYmMiasma, step, particle);
             particle++;
@@ -240,7 +239,8 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaFrameStep* step, _pppCtr
     work->m_radiusVelocity = work->m_radiusVelocity + work->m_radiusAcceleration;
     work->m_radius = work->m_radius + work->m_radiusVelocity;
 
-    for (i = 0, particle = work->m_particles; i < step->m_particleCount; i++, particle++) {
+    PARTICLE_DATA* particle = work->m_particles;
+    for (i = 0; i < step->m_particleCount; particle++, i++) {
         UpdateParticleData(pppYmMiasma, ctrl, step, particle);
     }
 
@@ -250,7 +250,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaFrameStep* step, _pppCtr
 
     pppSubVector(delta, matrixPos, work->m_prevPosition);
     distance = PSVECDistance(&matrixPos, &work->m_prevPosition);
-    if (distance != 0.0f) {
+    if (distance) {
         work->m_prevPositionChanged = 0xff;
     } else {
         work->m_prevPositionChanged = 0;

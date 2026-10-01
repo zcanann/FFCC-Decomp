@@ -71,7 +71,7 @@ extern u8 gLinkWaitStart;
 extern u8 gLinkStarted;
 extern u8 gLinkFrameReady;
 extern vu8 gPlayerNo;
-extern vu8 gPlayerCount;
+extern u8 gPlayerCount;
 extern vu8 gPlayerMask;
 extern u8 gLinkFirstFrame;
 extern vu8 gJoyRecvFrames;
@@ -93,7 +93,7 @@ extern const char gJoyBusFileName[];
 
 static inline s32 IsActive(u16 no)
 {
-    return (1 << no) & *(u8 *)&gPlayerMask;
+    return (1 << no) & gPlayerMask;
 }
 
 static inline void CountPlayers(void)

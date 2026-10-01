@@ -712,10 +712,12 @@ void DrawTimerAndRank(struct Main *main)
     Text_Print(&gTextLayer, 25, 4, 14, str);
 }
 
-void SetGameState(struct Main *main, u8 state)
+void SetGameState(struct Main *main, enum GameState state)
 {
     struct PointList *points;
     s32 i;
+    s32 j;
+    s32 k;
 
     main->state = state;
     switch (main->state) {
@@ -751,12 +753,12 @@ void SetGameState(struct Main *main, u8 state)
         }
         Game_AddEnemies(&gGame, main->racerCount - gPlayerCount);
         points = PointList_Get(gPointLists, POINTS_ITEM_BOX);
-        for (i = 0; i < points->count; i++) {
-            Effect_SpawnLast(&gGame, EFFECT_ITEM_BOX, i);
+        for (j = 0; j < points->count; j++) {
+            Effect_SpawnLast(&gGame, EFFECT_ITEM_BOX, j);
         }
         points = PointList_Get(gPointLists, POINTS_PANEL);
-        for (i = 0; i < points->count; i++) {
-            Effect_SpawnLast(&gGame, EFFECT_PANEL, i);
+        for (k = 0; k < points->count; k++) {
+            Effect_SpawnLast(&gGame, EFFECT_PANEL, k);
         }
         main->timer = 0;
         main->finishCount = 0;

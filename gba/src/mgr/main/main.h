@@ -5,7 +5,7 @@
 #include "field.h"
 #include "obj.h"
 
-enum {
+enum GameState {
     STATE_LOADING,
     STATE_SELECT,
     STATE_COUNTDOWN,
@@ -116,7 +116,7 @@ void InitGame(struct Main *main);
 void UpdateGameState(struct Main *main);
 void DrawTime(struct Main *main, u32 frames, s32 x, s32 y, const char *fmt);
 void DrawTimerAndRank(struct Main *main);
-void SetGameState(struct Main *main, u8 state);
+void SetGameState(struct Main *main, enum GameState state);
 void RecordFinish(struct Main *main, u8 id);
 void RemovePlayer(struct Main *main, u8 id);
 void ClosePauseMenu(struct Main *main);

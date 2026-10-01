@@ -1,10 +1,16 @@
 #include "global.h"
 #include "main.h"
-#include "joybus.h"
 #include "obj.h"
 #include "camera.h"
 #include "fixmath.h"
 #include "field.h"
+
+extern u8 gPlayerMask;
+
+static inline s32 IsActive(u16 no)
+{
+    return (1 << no) & gPlayerMask;
+}
 
 struct Camera gCamera;
 

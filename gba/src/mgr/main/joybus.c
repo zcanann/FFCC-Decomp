@@ -13,7 +13,8 @@
 
 #define JOY_INFO_SIZE 0x60
 
-/* Pad packets carry a command instead of keys when bit 15 is set */
+/* Pad words from the GameCube carry a command instead of keys when any of
+   the top four bits is set; the fifth word of a packet is a status word */
 #define LINK_CMD_REMOVE_PLAYER 0x2001
 #define LINK_CMD_START         30
 
@@ -72,12 +73,12 @@ s32 Link_Recv(u32 data)
         } else if (gJoyWork.handshake == 3) {
             if (data != JOY_INFO_SIZE)
                 return 0;
-            REG_JOY_TRANS = *(u32 *)&gJoyWork.send[0];
+            REG_JOY_TRANS = *(u32 *)&gJoyWork.send.raw[0];
             gJoyWork.handshake = 4;
             gJoyWork.offset = 4;
         } else if (gJoyWork.handshake == 5) {
             REG_JOY_TRANS = data;
-            *(u32 *)&gJoyWork.send[8] = data;
+            gJoyWork.send.ctx.tick = data;
             gJoyWork.handshake = 6;
         } else {
             return 0;
@@ -91,7 +92,7 @@ s32 Link_Recv(u32 data)
             } else if (data == JOY_CMD_IDLE) {
                 return 0;
             } else {
-                if (*(start_vector + 4) == 0 && gJoyWork.send[3] == 0)
+                if (*(start_vector + 4) == 0 && gJoyWork.send.ctx.initialized == 0)
                     return 0;
                 if ((data & 0xFF) == JOY_CMD_SEND) {
                     REG_JOY_TRANS = gJoySendData;
@@ -109,8 +110,8 @@ s32 Link_Recv(u32 data)
             *(u32 *)&gJoyWork.recv.raw[gJoyWork.offset] = data;
             gJoyWork.offset += 4;
             if (gJoyWork.offset == JOY_INFO_SIZE) {
-                gJoyWork.recv.raw[2] = gJoyWork.send[2];
-                *(u32 *)&gJoyWork.recv.raw[12] = *(u32 *)&gJoyWork.send[12];
+                gJoyWork.recv.ctx.cartFixed = gJoyWork.send.ctx.cartFixed;
+                gJoyWork.recv.ctx.cartGameCode = gJoyWork.send.ctx.cartGameCode;
                 REG_JOY_TRANS = *(u32 *)&gJoyWork.recv.raw[0];
                 gJoyWork.offset += 4;
             }
@@ -151,7 +152,7 @@ s32 Link_Send(void)
         } else if (gJoyWork.handshake == 4) {
             if (gJoyWork.offset != JOY_INFO_SIZE)
                 goto send;
-            if (gJoyWork.send[3] != 0) {
+            if (gJoyWork.send.ctx.initialized != 0) {
                 gJoyWork.handshake = 5;
             } else {
                 gJoyWork.connected = 1;
@@ -176,10 +177,10 @@ s32 Link_Send(void)
             if (gJoyWork.offset != JOY_INFO_SIZE * 2)
                 goto send;
             for (i = 0; i < JOY_INFO_SIZE; i += 4)
-                *(u32 *)&gJoyWork.send[i] = *(u32 *)&gJoyWork.recv.raw[i];
+                *(u32 *)&gJoyWork.send.raw[i] = *(u32 *)&gJoyWork.recv.raw[i];
             gJoyWork.cmd = 0;
-            gPlayerNo = gJoyWork.recv.raw[1];
-            gPlayerMask = gJoyWork.recv.raw[0x11];
+            gPlayerNo = gJoyWork.recv.ctx.playerNo;
+            gPlayerMask = gJoyWork.recv.ctx.playerMask;
             gLinkWarmup = 0;
             gPlayerCount = 0;
             for (j = 0; j < 4; j++) {
@@ -193,7 +194,7 @@ s32 Link_Send(void)
     }
     return 1;
 send:
-    REG_JOY_TRANS = *(u32 *)&gJoyWork.send[gJoyWork.offset];
+    REG_JOY_TRANS = *(u32 *)&gJoyWork.send.raw[gJoyWork.offset];
     gJoyWork.offset += 4;
     return 1;
 }
@@ -212,14 +213,14 @@ void Link_JoyIntr(void)
     u16 stat;
 
     gJoyIntrCount++;
-    REG_IE &= ~0x80;
+    REG_IE &= ~INTR_FLAG_SERIAL;
     stat = REG_JOYCNT;
-    if (((stat & 4) && !Link_Send()) || ((stat & 2) && !Link_Recv(REG_JOY_RECV))) {
+    if (((stat & JOYCNT_SEND) && !Link_Send()) || ((stat & JOYCNT_RECV) && !Link_Recv(REG_JOY_RECV))) {
         REG_JOYSTAT = 0;
         gJoyWork.connected = 0;
         gJoyWork.handshake = 0;
     }
-    if (stat & 1) {
+    if (stat & JOYCNT_RESET) {
         Link_JoyReset();
         if (gJoyWork.idleCount <= 2 && ++gJoyWork.resetCount >= 30)
             JoyBus_HardReset();
@@ -231,7 +232,7 @@ void Link_JoyIntr(void)
     }
     REG_JOYCNT = stat;
     gJoyWork.timeout = 0;
-    REG_IE |= 0x80;
+    REG_IE |= INTR_FLAG_SERIAL;
 }
 
 void Link_Init(void)
@@ -246,7 +247,7 @@ void Link_Init(void)
     REG_JOY_RECV;
     REG_JOY_TRANS = 0;
     REG_JOYCNT = 0x47;
-    REG_IF = 0x80;
+    REG_IF = INTR_FLAG_SERIAL;
     gJoyWork.timeout = 0;
     gJoyWork.connected = 0;
     gJoyWork.handshake = 0;
@@ -283,11 +284,11 @@ void Link_InitState(void)
         gLinkWarmup = 0;
         gPlayerMask = 0;
         gLinkFirstFrame = 1;
-        lbl_03005D6C = 0;
+        gLinkUnused = 0;
         gJoySendPending = 0;
         gJoyRecvFrames = 0xFF;
         gJoyIntrCount = 0;
-        gLinkSendCmd = 0xFFFF;
+        gLinkSendCmd = PAD_CODE_NONE;
         ime = REG_IME;
         REG_IME = 0;
         for (k = 0; k < sizeof(gJoyWork); k++)
@@ -296,8 +297,8 @@ void Link_InitState(void)
         Link_Init();
         gJoyWork.agbId = gJoyAgbId;
         gJoyWork.expectedGcId = gJoyGcId;
-        gJoyWork.send[2] = *(u16 *)0x080000B2;
-        *(u32 *)&gJoyWork.send[12] = *(u32 *)0x080000AC;
+        gJoyWork.send.ctx.cartFixed = *(u16 *)0x080000B2;
+        gJoyWork.send.ctx.cartGameCode = *(u32 *)0x080000AC;
         REG_IME = ime;
     } else {
         gLinkSynced = 0;
@@ -307,11 +308,11 @@ void Link_InitState(void)
         gPlayerCount = 1;
         gPlayerMask = 1;
         gLinkFirstFrame = 1;
-        lbl_03005D6C = 0;
-        gLinkSendCmd = 0xFFFF;
+        gLinkUnused = 0;
+        gLinkSendCmd = PAD_CODE_NONE;
         for (m = 0; m < 4; m++) {
             for (n = 0; n < 8; n++)
-                gJoyWork.recv.info.panelTable[m][n] = n * 100 / 8 + 5;
+                gJoyWork.recv.ctx.foodLevels[m][n] = n * 100 / 8 + 5;
         }
     }
 }
@@ -460,10 +461,10 @@ void Link_BuildPadPacket(void)
     if (gLinkWarmup < 4)
         gLinkWarmup++;
     if (gJoySendPending == 0) {
-        if (gLinkSendCmd != 0xFFFF) {
-            v = gLinkSendCmd | 0x8000;
+        if (gLinkSendCmd != PAD_CODE_NONE) {
+            v = gLinkSendCmd | PAD_CODE_FLAG;
             gJoySendData = (Crc8(v) << 24) | (v << 8) | 0x20;
-            gLinkSendCmd = 0xFFFF;
+            gLinkSendCmd = PAD_CODE_NONE;
         } else {
             gJoySendData = (Crc8(gHeldKeys) << 24) | (gHeldKeys << 8) | 0x20;
         }

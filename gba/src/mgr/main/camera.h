@@ -31,7 +31,6 @@ struct Camera {
     u16 yaw;
     u16 pitch;
     u8 player;
-    u8 unk4B;
 };
 
 extern struct Camera gCamera;

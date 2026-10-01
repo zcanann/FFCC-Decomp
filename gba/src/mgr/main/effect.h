@@ -3,17 +3,9 @@
 
 #include "obj.h"
 
-/* Steering parameters of a homing shot */
-struct HomingParams {
-    s16 accel;
-    s16 unk2;
-    s16 unk4;
-    s16 turn;
-    s16 maxSpeed;
-};
-
-extern const struct HomingParams gFreezeShotParams;
-extern const struct HomingParams gSlipShotParams;
+/* Homing shots steer with racer handling parameters */
+extern const struct ActorData gFreezeShotParams;
+extern const struct ActorData gSlipShotParams;
 extern const u8 gItemBoxAnims[];
 extern const u8 gPanelAnims[];
 extern const char gEffectFileName[];
@@ -37,10 +29,10 @@ void Effect_Setup(struct Effect *e, u8 type, va_list *ap);
 void Effect_Set(struct Effect *e, u8 type, ...);
 void Effect_Spawn(struct Game *game, u8 type, ...);
 void Effect_SpawnLast(struct Game *game, u8 type, ...);
-s16 Effect_MoveAlongRoute(struct Effect *e, u8 routeNo, u8 *routeIdx, struct Point *vel, const struct HomingParams *params, struct Actor *target, s16 targetDist);
+s16 Effect_MoveAlongRoute(struct Effect *e, u8 routeNo, u8 *routeIdx, struct Point *vel, const struct ActorData *params, struct Actor *target, s16 targetDist);
 void Effect_UpdateItemBox(struct Effect *e);
 void Effect_UpdatePanel(struct Effect *e);
-void Effect_UpdateHoming(struct Effect *e, const struct HomingParams *params, s32 mask);
+void Effect_UpdateHoming(struct Effect *e, const struct ActorData *params, s32 mask);
 void Effect_UpdateFreezeTrail(struct Effect *e);
 void Effect_UpdateFreezeShot(struct Effect *e);
 void Effect_UpdateFreeze(struct Effect *e);

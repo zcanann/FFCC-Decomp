@@ -14,7 +14,6 @@ struct Field {
 
 struct Terrain {
     u16 flags;
-    u16 unk2;
 };
 
 #define TERRAIN_WALL  1

@@ -80,7 +80,7 @@ void Effect_InitItemBox(struct Effect *e, va_list *ap)
     e->pos.x = pt->x;
     e->pos.z = pt->y;
     e->pos.y = 0;
-    e->u.box.kind = genrand() % 3;
+    e->u.box.kind = genrand() % ITEM_COUNT;
     AnimState_Set(&e->anim, gItemBoxAnims[e->u.box.kind], 0xFF);
     e->radius = 80;
 }
@@ -93,7 +93,7 @@ void Effect_InitPanel(struct Effect *e, va_list *ap)
     e->pos.x = pt->x;
     e->pos.z = pt->y;
     e->pos.y = 0;
-    e->u.box.kind = genrand() % 8;
+    e->u.box.kind = genrand() % FOOD_COUNT;
     AnimState_Set(&e->anim, gPanelAnims[e->u.box.kind], 0xFF);
     e->radius = 80;
 }
@@ -137,7 +137,7 @@ void Effect_InitFreeze(struct Effect *e, va_list *ap)
 {
     e->u.target = va_arg(*ap, struct Actor *);
     AnimState_Set(&e->anim, 32, 0xFF);
-    PlaySong(&gSound, 12, e);
+    PlaySong(&gSound, SE_FREEZE, e);
 }
 
 void Effect_InitSlipTrail(struct Effect *e, va_list *ap)
@@ -162,7 +162,7 @@ void Effect_InitSlip(struct Effect *e, va_list *ap)
 {
     e->u.target = va_arg(*ap, struct Actor *);
     AnimState_Set(&e->anim, 39, 0xFF);
-    PlaySong(&gSound, 11, e);
+    PlaySong(&gSound, SE_SLIP, e);
 }
 
 void Effect_InitTrapThrow(struct Effect *e, va_list *ap)
@@ -202,7 +202,7 @@ void Effect_InitTrap(struct Effect *e, va_list *ap)
     pt = GetRoutePoint(route, Route_Track(route, 0xFF, e->pos.x, e->pos.z, &e->u.trap.routePos));
     v = Distance(pt, &e->pos);
     base = pt->progress;
-    v = (v << 4) / route->scale + base;
+    v = (v << 4) / route->length + base;
     if (v > 255)
         v = 255;
     e->u.trap.progress = v;
@@ -212,7 +212,7 @@ void Effect_InitSpin(struct Effect *e, va_list *ap)
 {
     e->u.target = va_arg(*ap, struct Actor *);
     AnimState_Set(&e->anim, 33, 0xFF);
-    PlaySong(&gSound, 10, e);
+    PlaySong(&gSound, SE_SPIN, e);
 }
 
 void Effect_InitDust(struct Effect *e, va_list *ap)
@@ -304,7 +304,7 @@ void Effect_SpawnLast(struct Game *game, u8 type, ...)
 }
 
 /* Steers toward the target, or along the route when there is none; returns the new speed */
-s16 Effect_MoveAlongRoute(struct Effect *e, u8 routeNo, u8 *routeIdx, struct Point *vel, const struct HomingParams *params, struct Actor *target, s16 targetDist)
+s16 Effect_MoveAlongRoute(struct Effect *e, u8 routeNo, u8 *routeIdx, struct Point *vel, const struct ActorData *params, struct Actor *target, s16 targetDist)
 {
     struct Route *route;
     struct RoutePoint *pt;
@@ -339,9 +339,9 @@ s16 Effect_MoveAlongRoute(struct Effect *e, u8 routeNo, u8 *routeIdx, struct Poi
         dir.x = (dx << 8) / len;
         (&dir)->y = (dz << 8) / len;
         sq = vel->x * vel->x + vel->y * vel->y;
-        f = params->turn * (s16)Sqrt(sq);
-        vel->x = (MulShift(dir.x, f) + vel->x * (256 - params->turn)) >> 8;
-        vel->y = (MulShift(dir.y, f) + vel->y * (256 - params->turn)) >> 8;
+        f = params->grip * (s16)Sqrt(sq);
+        vel->x = (MulShift(dir.x, f) + vel->x * (256 - params->grip)) >> 8;
+        vel->y = (MulShift(dir.y, f) + vel->y * (256 - params->grip)) >> 8;
         (&acc)->x = (dir.x * params->accel) >> 8;
         (&acc)->y = (dir.y * params->accel) >> 8;
         vel->x += (&acc)->x;
@@ -373,7 +373,7 @@ void Effect_UpdateItemBox(struct Effect *e)
             e->u.box.wait = 90;
         }
     } else if (--e->u.box.wait == 0) {
-        e->u.box.kind = genrand() % 3;
+        e->u.box.kind = genrand() % ITEM_COUNT;
         AnimState_Set(&e->anim, gItemBoxAnims[e->u.box.kind], 0xFF);
         e->visible = 1;
     }
@@ -391,13 +391,13 @@ void Effect_UpdatePanel(struct Effect *e)
             e->u.box.wait = 90;
         }
     } else if (--e->u.box.wait == 0) {
-        e->u.box.kind = genrand() % 8;
+        e->u.box.kind = genrand() % FOOD_COUNT;
         AnimState_Set(&e->anim, gPanelAnims[e->u.box.kind], 0xFF);
         e->visible = 1;
     }
 }
 
-void Effect_UpdateHoming(struct Effect *e, const struct HomingParams *params, s32 mask)
+void Effect_UpdateHoming(struct Effect *e, const struct ActorData *params, s32 mask)
 {
     s16 speed;
     struct Actor *target;

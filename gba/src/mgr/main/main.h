@@ -29,7 +29,6 @@ struct Main {
     u8 finalLapShown;
     u8 showLap;
     u8 bannerShown;
-    u8 unk19;
     u16 finalLapTimer;
     u32 lapTime;
     u32 lastLapTime;
@@ -44,7 +43,7 @@ struct Main {
     u8 readyMask;
     u8 answeredMask;
     u8 retryLinked;
-    u8 unk37;
+    u8 unused;
     vu8 mode7Enabled;
     vu8 skyEnabled;
     vu8 textEnabled;
@@ -67,8 +66,8 @@ extern volatile s8 gShownLap;
 extern u8 gWrongWayShown;
 extern struct Actor *gChaserPlayer;
 extern struct Actor *gChaserEnemy;
-extern u32 lbl_03005C68;
-extern u32 lbl_03005C6C;
+extern u32 gMainUnused;
+extern u32 gMainUnused2;
 extern const char *gAssertFile;
 extern s32 gAssertLine;
 extern u16 gHeldKeys;

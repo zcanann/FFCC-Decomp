@@ -3,6 +3,30 @@
 
 #include "global.h"
 
+/* Pad codes sent to the GameCube in place of the keys */
+#define PAD_CODE_FLAG     0x8000
+#define PAD_CODE_RESULT   0x1000 /* | finishing position */
+#define PAD_CODE_RACE_END 0x1100
+#define PAD_CODE_QUIT     0x1200
+#define PAD_CODE_CONTINUE 0x1300
+#define PAD_CODE_NONE     0xFFFF
+
+/* Session context exchanged with the GameCube during the handshake */
+struct LinkContext {
+    u8 booted;        /* the GameCube downloaded this program */
+    u8 playerNo;
+    u8 cartFixed;     /* fixed header byte of an inserted cartridge */
+    u8 initialized;
+    u32 sessionId;
+    u32 tick;
+    u32 cartGameCode;
+    u8 mode;
+    u8 playerMask;
+    u8 pad[2];
+    u8 foodLevels[4][16]; /* each player's liking (1-100) of the panel foods */
+    u8 pad2[12];
+};
+
 struct JoyWork {
     vu8 connected;
     vu8 handshake;
@@ -13,17 +37,16 @@ struct JoyWork {
     vu8 firstInit;
     u8 resetCount;
     u8 idleCount;
-    u8 unk9[3];
     u32 agbId;
     u32 gcId;
     u32 expectedGcId;
-    u8 send[0x60];
     union {
         u8 raw[0x60];
-        struct {
-            u8 unk0[0x14];
-            u8 panelTable[4][16];
-        } info;
+        struct LinkContext ctx;
+    } send;
+    union {
+        u8 raw[0x60];
+        struct LinkContext ctx;
     } recv;
 };
 
@@ -36,7 +59,6 @@ struct JoyRecvQueue {
     vu8 write;
     vu8 read;
     vu8 mask;
-    u8 unk3;
     struct JoyRecvRow rows[4];
 };
 
@@ -56,7 +78,7 @@ extern vu8 gPlayerMask;
 extern u8 gLinkFirstFrame;
 extern vu8 gJoyRecvFrames;
 extern u8 gJoyLastRecv;
-extern u32 lbl_03005D6C;
+extern u32 gLinkUnused;
 extern u16 gLinkWaitCount;
 extern u16 gLinkFrameCmd;
 extern u16 gLinkSendCmd;

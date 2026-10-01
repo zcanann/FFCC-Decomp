@@ -12,19 +12,15 @@
 
 #define IWRAM 0x03000000
 
-/* Songs */
-#define SE_CURSOR      0
-#define SE_SELECT      1
-#define BGM_RACE       3
-#define SE_COUNTDOWN   4
-#define SE_GO          5
-#define SE_FINAL_LAP   17
-#define BGM_START      50
-#define BGM_WIN        51
-#define BGM_LOSE       52
-#define BGM_READY      53
-
-/* Glyphs */
+/* Glyphs; the digits 1-3 are large, 4-8 small */
+#define GLYPH_DIGIT(n)    (8 - (n))
+#define GLYPH_GO          8
+#define GLYPH_FINISH      9
+#define GLYPH_ST          10
+#define GLYPH_ND          11
+#define GLYPH_RD          12
+#define GLYPH_TH          13
+#define GLYPH_LAP         14
 #define GLYPH_WRONG_WAY_1 15
 #define GLYPH_WRONG_WAY_2 16
 #define GLYPH_WRONG_WAY_3 17
@@ -120,25 +116,25 @@ void AgbMain(void)
             gMain.splitLine = 0x1000;
         }
         if (gMain.textEnabled) {
-            REG_DISPCNT |= 0x100;
+            REG_DISPCNT |= DISPCNT_BG0_ON;
         } else {
-            REG_DISPCNT &= ~0x100;
+            REG_DISPCNT &= ~DISPCNT_BG0_ON;
         }
         if (gMain.objEnabled) {
-            REG_DISPCNT |= 0x1000;
+            REG_DISPCNT |= DISPCNT_OBJ_ON;
         } else {
-            REG_DISPCNT &= ~0x1000;
+            REG_DISPCNT &= ~DISPCNT_OBJ_ON;
         }
     }
 }
 
 void VBlankIntr(void)
 {
-    REG_IE &= ~0x4;
-    REG_DISPCNT &= ~0x400;
+    REG_IE &= ~INTR_FLAG_VCOUNT;
+    REG_DISPCNT &= ~DISPCNT_BG2_ON;
     m4aSoundVSync();
     if (gMain.skyEnabled) {
-        REG_DISPCNT |= 0x200;
+        REG_DISPCNT |= DISPCNT_BG1_ON;
         if (gVBlankCounter == 0) {
             REG_BG1HOFS = (gSkyScroll + gSkyScrollPrev) >> 1;
         } else {
@@ -146,11 +142,11 @@ void VBlankIntr(void)
             gSkyScrollPrev = gSkyScroll;
         }
     } else {
-        REG_DISPCNT &= ~0x200;
+        REG_DISPCNT &= ~DISPCNT_BG1_ON;
     }
     gVBlankCounter++;
     if (gMain.mode7Enabled) {
-        REG_IE |= 0x4;
+        REG_IE |= INTR_FLAG_VCOUNT;
     }
     INTR_CHECK = 1;
 }
@@ -178,14 +174,14 @@ void VCountIntr(void)
         }
     case 1:
         if (gMain.mode7Enabled) {
-            REG_DISPCNT |= 0x400;
+            REG_DISPCNT |= DISPCNT_BG2_ON;
         }
         gVCountPhase = 2;
         vcount = REG_VCOUNT;
         REG_VCOUNT_MATCH = vcount + 6;
         break;
     case 2:
-        REG_DISPCNT &= ~0x200;
+        REG_DISPCNT &= ~DISPCNT_BG1_ON;
         gVCountPhase = 0;
         REG_VCOUNT_MATCH = 0;
         gVCountPhase = 3;
@@ -236,8 +232,8 @@ void InitGame(struct Main *main)
     gVCountPhase = 0xFF;
     main->paused = 0;
     main->mode7Enabled = main->skyEnabled = main->textEnabled = main->objEnabled = 0;
-    lbl_03005C68 = 0;
-    lbl_03005C6C = 0;
+    gMainUnused = 0;
+    gMainUnused2 = 0;
     DmaWait();
     sgenrand(10000);
     Text_Init(&gTextLayer);
@@ -250,7 +246,7 @@ void InitGame(struct Main *main)
     Text_Init(&gTextLayer);
     Sound_Init(&gSound);
     LZ77UnCompWram(gFieldMapLz, gFieldMap);
-    REG_IE = 0x2085;
+    REG_IE = INTR_FLAG_GAMEPAK | INTR_FLAG_SERIAL | INTR_FLAG_VCOUNT | INTR_FLAG_VBLANK;
     REG_DISPSTAT = 0x28;
     REG_IME = 1;
     m4aSoundVSyncOn();
@@ -349,19 +345,19 @@ void UpdateGameState(struct Main *main)
             m4aSongNumStart(BGM_READY);
         }
         if (main->timer == 80) {
-            Text_DrawGlyph(&gTextLayer, 13, 4, 5, 14);
+            Text_DrawGlyph(&gTextLayer, 13, 4, GLYPH_DIGIT(3), 14);
             m4aSongNumStart(SE_COUNTDOWN);
         } else if (main->timer == 110) {
-            Text_DrawGlyph(&gTextLayer, 13, 4, 6, 14);
+            Text_DrawGlyph(&gTextLayer, 13, 4, GLYPH_DIGIT(2), 14);
             m4aSongNumStart(SE_COUNTDOWN);
         } else if (main->timer == 140) {
-            Text_DrawGlyph(&gTextLayer, 13, 4, 7, 14);
+            Text_DrawGlyph(&gTextLayer, 13, 4, GLYPH_DIGIT(1), 14);
             m4aSongNumStart(SE_COUNTDOWN);
         } else if (main->timer == 170) {
-            Text_DrawGlyph(&gTextLayer, 11, 4, 8, 14);
+            Text_DrawGlyph(&gTextLayer, 11, 4, GLYPH_GO, 14);
             SetGameState(main, STATE_RACE);
             m4aSongNumStart(SE_GO);
-            gEngineSong = 0xFF;
+            gEngineSong = SONG_NONE;
             goto race;
         }
         main->timer++;
@@ -372,10 +368,10 @@ void UpdateGameState(struct Main *main)
             break;
         }
         if (main->timer == 30) {
-            m4aSongNumStart(BGM_START);
+            m4aSongNumStart(BGM_RACE);
             if (main->timer == 30) {
                 Text_Clear(&gTextLayer, 15);
-                (gActorFlags + gPlayerNo)->value &= ~0x10;
+                (gActorFlags + gPlayerNo)->value &= ~ACTOR_FLAG_SHOW_MARKER;
             }
         }
         if (main->timer > 29) {
@@ -394,7 +390,7 @@ void UpdateGameState(struct Main *main)
                     }
                 }
                 main->lap = lap;
-                Text_DrawGlyph(&gTextLayer, 21, 0, 14, 14);
+                Text_DrawGlyph(&gTextLayer, 21, 0, GLYPH_LAP, 14);
                 if (main->lapCount == 3) {
                     Text_DrawGlyph(&gTextLayer, 26, 0, 19, 14);
                 } else {
@@ -449,54 +445,54 @@ void UpdateGameState(struct Main *main)
             break;
         }
         if (main->timer == 0) {
-            gLinkSendCmd = main->result | 0x1000;
-            Text_DrawGlyph(&gTextLayer, 9, 4, 9, 14);
+            gLinkSendCmd = main->result | PAD_CODE_RESULT;
+            Text_DrawGlyph(&gTextLayer, 9, 4, GLYPH_FINISH, 14);
             main->bannerShown = 1;
         }
         DrawTimerAndRank(main);
         if (main->timer == 60) {
-            Text_EraseGlyph(&gTextLayer, 9, 4, 9);
+            Text_EraseGlyph(&gTextLayer, 9, 4, GLYPH_FINISH);
             main->bannerShown = 0;
             switch (main->result) {
             case 0:
             case 1:
-                Text_DrawGlyph(&gTextLayer, 13, 4, 7, 14);
-                Text_DrawGlyph(&gTextLayer, 17, 6, 10, 14);
+                Text_DrawGlyph(&gTextLayer, 13, 4, GLYPH_DIGIT(1), 14);
+                Text_DrawGlyph(&gTextLayer, 17, 6, GLYPH_ST, 14);
                 break;
             case 2:
-                Text_DrawGlyph(&gTextLayer, 13, 4, 6, 14);
-                Text_DrawGlyph(&gTextLayer, 17, 6, 11, 14);
+                Text_DrawGlyph(&gTextLayer, 13, 4, GLYPH_DIGIT(2), 14);
+                Text_DrawGlyph(&gTextLayer, 17, 6, GLYPH_ND, 14);
                 break;
             case 3:
-                Text_DrawGlyph(&gTextLayer, 13, 4, 5, 14);
-                Text_DrawGlyph(&gTextLayer, 17, 6, 12, 14);
+                Text_DrawGlyph(&gTextLayer, 13, 4, GLYPH_DIGIT(3), 14);
+                Text_DrawGlyph(&gTextLayer, 17, 6, GLYPH_RD, 14);
                 break;
             case 4:
-                Text_DrawGlyph(&gTextLayer, 14, 6, 4, 14);
-                Text_DrawGlyph(&gTextLayer, 16, 6, 13, 14);
+                Text_DrawGlyph(&gTextLayer, 14, 6, GLYPH_DIGIT(4), 14);
+                Text_DrawGlyph(&gTextLayer, 16, 6, GLYPH_TH, 14);
                 break;
             case 5:
-                Text_DrawGlyph(&gTextLayer, 14, 6, 3, 14);
-                Text_DrawGlyph(&gTextLayer, 16, 6, 13, 14);
+                Text_DrawGlyph(&gTextLayer, 14, 6, GLYPH_DIGIT(5), 14);
+                Text_DrawGlyph(&gTextLayer, 16, 6, GLYPH_TH, 14);
                 break;
             case 6:
-                Text_DrawGlyph(&gTextLayer, 14, 6, 2, 14);
-                Text_DrawGlyph(&gTextLayer, 16, 6, 13, 14);
+                Text_DrawGlyph(&gTextLayer, 14, 6, GLYPH_DIGIT(6), 14);
+                Text_DrawGlyph(&gTextLayer, 16, 6, GLYPH_TH, 14);
                 break;
             case 7:
-                Text_DrawGlyph(&gTextLayer, 14, 6, 1, 14);
-                Text_DrawGlyph(&gTextLayer, 16, 6, 13, 14);
+                Text_DrawGlyph(&gTextLayer, 14, 6, GLYPH_DIGIT(7), 14);
+                Text_DrawGlyph(&gTextLayer, 16, 6, GLYPH_TH, 14);
                 break;
             case 8:
-                Text_DrawGlyph(&gTextLayer, 14, 6, 0, 14);
-                Text_DrawGlyph(&gTextLayer, 16, 6, 13, 14);
+                Text_DrawGlyph(&gTextLayer, 14, 6, GLYPH_DIGIT(8), 14);
+                Text_DrawGlyph(&gTextLayer, 16, 6, GLYPH_TH, 14);
                 break;
             }
         }
         main->timer++;
         if (main->select.wait != -1) {
             if (main->select.wait == 122) {
-                gLinkSendCmd = 0x1100;
+                gLinkSendCmd = PAD_CODE_RACE_END;
                 SetGameState(main, STATE_RETRY);
             } else {
                 main->select.wait++;
@@ -533,7 +529,7 @@ void UpdateGameState(struct Main *main)
                         main->answeredMask |= 1 << i;
                         if (main->readyMask == gPlayerMask) {
                             if (i == gPlayerNo) {
-                                gLinkSendCmd = 0x1300;
+                                gLinkSendCmd = PAD_CODE_CONTINUE;
                             }
                             SetGameState(main, STATE_SELECT);
                             goto end;
@@ -541,7 +537,7 @@ void UpdateGameState(struct Main *main)
                     } else {
                         main->select.answer[i] |= 0xFF;
                         if (i == gPlayerNo) {
-                            gLinkSendCmd = 0x1200;
+                            gLinkSendCmd = PAD_CODE_QUIT;
                         }
                         main->answeredMask |= 1 << i;
                     }
@@ -661,10 +657,10 @@ void SetGameState(struct Main *main, u8 state)
         main->timer = 0;
         break;
     case STATE_SELECT:
-        m4aSongNumStop(BGM_RACE);
-        m4aSongNumStop(8);
-        m4aSongNumStop(7);
-        m4aSongNumStop(9);
+        m4aSongNumStop(SE_ENGINE);
+        m4aSongNumStop(SE_ENGINE_ROUGH);
+        m4aSongNumStop(SE_SKID);
+        m4aSongNumStop(SE_ITEM_GET);
         m4aMPlayFadeOut(&gMPlayBgm, 4);
         main->timer = 0;
         main->readyMask = 0;
@@ -712,7 +708,7 @@ void SetGameState(struct Main *main, u8 state)
         main->timer = 0;
         main->select.wait = -1;
         main->result = main->finishCount;
-        m4aSongNumStart(BGM_RACE);
+        m4aSongNumStart(SE_ENGINE);
         if (main->result <= 1) {
             m4aSongNumStart(BGM_WIN);
         } else {
@@ -760,8 +756,8 @@ void RemovePlayer(struct Main *main, u8 id)
 
 void ClosePauseMenu(struct Main *main)
 {
-    gEngineSong = 0xFF;
-    gSkidSong = 0xFF;
+    gEngineSong = SONG_NONE;
+    gSkidSong = SONG_NONE;
     main->paused = 0;
     Text_Restore(&gTextLayer);
 }
@@ -769,7 +765,7 @@ void ClosePauseMenu(struct Main *main)
 void PauseMenu(struct Main *main)
 {
     m4aSongNumStart(SE_SELECT);
-    m4aMPlayFadeOut(&gMPlaySe, 2);
+    m4aMPlayFadeOut(&gMPlayEngine, 2);
     main->menuCursor = 0;
     main->paused = 1;
     Text_Save(&gTextLayer);
@@ -788,7 +784,7 @@ void PauseMenu(struct Main *main)
         main->objEnabled = 1;
         main->splitLine = 0x1000;
         REG_DMA0CNT_H = 0;
-        REG_IE &= ~0x4;
+        REG_IE &= ~INTR_FLAG_VCOUNT;
         Text_LoadSelectPauseMenu(&gTextLayer);
         break;
     }
@@ -806,7 +802,7 @@ void SleepMode(struct Main *main)
         u16 ie = REG_IE;
         u16 keycnt;
 
-        REG_IE &= ~0x4;
+        REG_IE &= ~INTR_FLAG_VCOUNT;
         main->mode7Enabled = 0;
         main->skyEnabled = 0;
         main->textEnabled = 1;
@@ -814,9 +810,9 @@ void SleepMode(struct Main *main)
         main->splitLine = 0x1000;
         REG_DISPCNT &= 0x81FF;
         REG_DMA0CNT_H = 0;
-        m4aSongNumStop(BGM_RACE);
-        m4aSongNumStop(7);
-        m4aSongNumStop(9);
+        m4aSongNumStop(SE_ENGINE);
+        m4aSongNumStop(SE_SKID);
+        m4aSongNumStop(SE_ITEM_GET);
         if (main->state == STATE_RACE) {
             m4aMPlayFadeOutTemporarily(&gMPlayBgm, 4);
         }
@@ -826,7 +822,7 @@ void SleepMode(struct Main *main)
         WaitFrames(60);
         keycnt = REG_KEYCNT;
         REG_KEYCNT = 0xC304;
-        REG_IE = 0x1000;
+        REG_IE = INTR_FLAG_KEYPAD;
         SoundBiasReset();
         asm("swi 3");
         SoundBiasSet();
@@ -834,7 +830,7 @@ void SleepMode(struct Main *main)
         REG_IE = ie;
         WaitFrames(60);
         REG_KEYCNT = 0;
-        REG_IE &= ~0x1000;
+        REG_IE &= ~INTR_FLAG_KEYPAD;
         main->mode7Enabled = mode7Enabled;
         main->skyEnabled = skyEnabled;
         main->textEnabled = textEnabled;
@@ -894,7 +890,7 @@ void PauseMenuInput(struct Main *main)
                 case 1:
                     main->paused = 0;
                     if (main->menuPlayer == gPlayerNo) {
-                        gLinkSendCmd = 0x1300;
+                        gLinkSendCmd = PAD_CODE_CONTINUE;
                     }
                     SetGameState(main, STATE_SELECT);
                     break;

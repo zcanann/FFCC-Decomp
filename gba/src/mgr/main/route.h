@@ -13,20 +13,22 @@ struct RoutePoint {
     s8 dz;
     s8 speedType;
     u8 progress;
-    u8 unkA[6];
+    /* Distance to the next point and from the start, in 1/16 units */
+    u16 segLength;
+    u32 distance;
 };
 
 struct Route {
     s16 count;
-    s16 scale;
+    s16 length;
     struct RoutePoint *pts;
 };
 
 struct RouteData {
     s16 count;
-    u8 unk2[0xA];
-    s16 scale;
-    u8 unkE[2];
+    u8 pad[0xA];
+    s16 length;
+    u8 pad2[2];
     struct RoutePoint pts[0];
 };
 
@@ -42,7 +44,6 @@ struct PointData {
 
 struct RouteSpeed {
     s16 value;
-    u16 unk2;
 };
 
 enum {

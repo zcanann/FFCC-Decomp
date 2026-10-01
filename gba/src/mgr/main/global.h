@@ -51,6 +51,21 @@ typedef char *va_list;
 #define REG_ADDR_DMA0 0x040000B0
 #define REG_ADDR_DMA3 0x040000D4
 
+#define INTR_FLAG_VBLANK  0x0001
+#define INTR_FLAG_VCOUNT  0x0004
+#define INTR_FLAG_SERIAL  0x0080
+#define INTR_FLAG_KEYPAD  0x1000
+#define INTR_FLAG_GAMEPAK 0x2000
+
+#define DISPCNT_BG0_ON 0x0100
+#define DISPCNT_BG1_ON 0x0200
+#define DISPCNT_BG2_ON 0x0400
+#define DISPCNT_OBJ_ON 0x1000
+
+#define JOYCNT_RESET 0x1
+#define JOYCNT_RECV  0x2
+#define JOYCNT_SEND  0x4
+
 #define INTR_CHECK  (*(vu16 *)0x03007FF8)
 #define INTR_VECTOR (*(void **)0x03007FFC)
 

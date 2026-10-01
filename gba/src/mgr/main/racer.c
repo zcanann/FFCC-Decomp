@@ -87,7 +87,7 @@ void Racer_Reset(struct Actor *a)
     a->routeCount = n;
     a->routeIdx = n - 1;
     a->lap = -1;
-    a->item = -1;
+    a->item = ITEM_NONE;
     a->skidCounter = 0;
     Obj_Reset((struct Obj *)a);
     a->radius = 100;
@@ -249,7 +249,7 @@ void Racer_UpdateProgress(struct Actor *a)
         dz = -dz;
     a->nodeDist = dx + dz;
     base = node->progress;
-    v = (a->nodeDist << 4) / route->scale + base;
+    v = (a->nodeDist << 4) / route->length + base;
     if (v > 255)
         v = 255;
     a->progress = v;
@@ -422,9 +422,9 @@ void Racer_UpdatePlayer(struct Actor *a)
         turn = -turn;
     if (gPlayerNo == a->id) {
         if ((s16)(turn - 0xAAA) > 0)
-            skidSong = 7;
+            skidSong = SE_SKID;
         else
-            skidSong = 0xFF;
+            skidSong = SONG_NONE;
     }
     over = (s16)(turn - 0xAAA);
     if (over > 0) {
@@ -465,7 +465,7 @@ void Racer_UpdatePlayer(struct Actor *a)
         } else {
             a->vel.x = a->vel.x * (s16)a->speed / oldSpeed;
             a->vel.z = a->vel.z * (s16)a->speed / oldSpeed;
-            skidSong = 6;
+            skidSong = SE_BRAKE;
         }
     } else {
         oldSpeed = a->speed;
@@ -480,7 +480,7 @@ void Racer_UpdatePlayer(struct Actor *a)
         }
     }
     if (gPlayerNo == a->id && (gFrameCounter & 15) == gPlayerNo && gSkidSong != skidSong) {
-        if (skidSong == 0xFF) {
+        if (skidSong == SONG_NONE) {
             m4aSongNumStop(gSkidSong);
             gEngineSong = skidSong;
         } else {
@@ -507,40 +507,40 @@ void Racer_UpdatePlayer(struct Actor *a)
     }
     if (gPlayerNo == a->id && gEngineSong != 5) {
         if ((s16)a->speed <= 4)
-            engineSong = 0xFF;
+            engineSong = SONG_NONE;
         else if (hit & TERRAIN_ROUGH)
-            engineSong = 8;
+            engineSong = SE_ENGINE_ROUGH;
         else
-            engineSong = 3;
+            engineSong = SE_ENGINE;
         if (gEngineSong != engineSong) {
-            if (engineSong == 0xFF)
+            if (engineSong == SONG_NONE)
                 m4aSongNumStop(gEngineSong);
             else
                 m4aSongNumStart(engineSong);
             gEngineSong = engineSong;
         }
-        if (engineSong != 0xFF) {
+        if (engineSong != SONG_NONE) {
             pitch = ((s16)a->speed << 8) / 320;
-            m4aMPlayPitchControl(&gMPlaySe, 0xFFFF, pitch);
+            m4aMPlayPitchControl(&gMPlayEngine, 0xFFFF, pitch);
         }
     }
     AnimState_Update(&a->anim);
     Racer_UpdateProgress(a);
-    if ((gPadNew[a->id] & L_BUTTON) && (u8)a->item != 0xFF) {
+    if ((gPadNew[a->id] & L_BUTTON) && (u8)a->item != ITEM_NONE) {
         if (gPlayerNo == a->id)
-            PlaySong(&gSound, 13, a);
-        switch ((u8)a->item % 3) {
-        case 0:
+            PlaySong(&gSound, SE_ITEM_USE, a);
+        switch ((u8)a->item % ITEM_COUNT) {
+        case ITEM_FREEZE:
             Effect_Spawn(&gGame, EFFECT_FREEZE_SHOT, a->id, &a->pos, a->facing, a->routeNo, a->routeIdx);
             break;
-        case 1:
+        case ITEM_SLIP:
             Effect_Spawn(&gGame, EFFECT_SLIP_SHOT, a->id, &a->pos, a->facing, a->routeNo, a->routeIdx);
             break;
-        case 2:
+        case ITEM_TRAP:
             Effect_Spawn(&gGame, EFFECT_TRAP_THROW, a->id, &a->pos, a->facing, &a->vel);
             break;
         }
-        a->item = 0xFF;
+        a->item = ITEM_NONE;
     }
     a->slipping = 0;
     a->frozen = 0;
@@ -850,33 +850,33 @@ s32 Racer_IsWrongWay(struct Actor *a)
 void Racer_SetItem(struct Actor *a, u8 item)
 {
     if (gPlayerNo == a->id) {
-        m4aSongNumStart(9);
+        m4aSongNumStart(SE_ITEM_GET);
     }
     a->item = item;
 }
 
-/* The panel roll table comes from the GameCube: high rolls boost, low rolls slow down */
-void Racer_ApplyPanel(struct Actor *a, u8 kind)
+/* The GameCube sends how much each player likes each food: liked foods boost, disliked ones slow down */
+void Racer_ApplyPanel(struct Actor *a, u8 food)
 {
     u8 value;
 
-    value = gJoyWork.recv.info.panelTable[a->id][kind];
+    value = gJoyWork.recv.ctx.foodLevels[a->id][food];
     if (value >= gPanelBoostThreshold) {
         if (gPlayerNo == a->id) {
-            m4aSongNumStart(15);
+            m4aSongNumStart(SE_BOOST);
         }
         a->boosted = 1;
         a->slowed = 0;
         a->speedEffectTimer = gSpeedEffectDurations[(value - 1) / 10];
     } else if (value <= gPanelSlowThreshold) {
         if (gPlayerNo == a->id) {
-            m4aSongNumStart(16);
+            m4aSongNumStart(SE_SLOW);
         }
         a->boosted = 0;
         a->slowed = 1;
         a->speedEffectTimer = gSpeedEffectDurations[(value - 1) / 10];
     } else {
-        m4aSongNumStart(18);
+        m4aSongNumStart(SE_PANEL);
         a->boosted = 0;
         a->slowed = 0;
         a->speedEffectTimer = 0;

@@ -4,13 +4,13 @@
 void Route_Init(struct Route *routes)
 {
     routes[0].count = gRouteData0.count;
-    routes[0].scale = gRouteData0.scale;
+    routes[0].length = gRouteData0.length;
     routes[0].pts = gRouteData0.pts;
     routes[1].count = gRouteData1.count;
-    routes[1].scale = gRouteData1.scale;
+    routes[1].length = gRouteData1.length;
     routes[1].pts = gRouteData1.pts;
     routes[2].count = gRouteData2.count;
-    routes[2].scale = gRouteData2.scale;
+    routes[2].length = gRouteData2.length;
     routes[2].pts = gRouteData2.pts;
 }
 

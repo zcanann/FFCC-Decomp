@@ -529,7 +529,7 @@ config.libs = [
             Object(Matching, "chunkfile.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "cmake.cpp"),
             Object(Matching, "color.cpp"),
-            Object(NonMatching, "file.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "file.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
             Object(Matching, "strcase.c"),
             Object(NonMatching, "fontman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "FS_USB_Process.cpp", cflags=cflags_game_cpp_exceptions),

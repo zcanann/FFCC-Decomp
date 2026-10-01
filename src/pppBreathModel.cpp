@@ -280,6 +280,7 @@ extern "C" void pppConstructBreathModel(pppBreathModel* breathModel, _pppCtrlTab
  */
 extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* step, _pppCtrlTable* ctrl)
 {
+    BreathParticleGroup* debugGroupData;
     PBreathModel* params = step;
     int workOffset;
     int colorOffset;
@@ -404,14 +405,14 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     }
 
     if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
-        BreathParticleGroup* debugGroupData = groupData;
-        for (i = 0; i < (int)params->m_groupCount; i++, debugGroupData++) {
+        debugGroupData = groupData;
+        for (int groupIndex = 0; groupIndex < (int)params->m_groupCount; debugGroupData++, groupIndex++) {
             if (debugGroupData->active == 1) {
                 int firstParticle;
                 int j;
                 float groupScale;
 
-                switch (i) {
+                switch (groupIndex) {
                 case 0:
                     debugColor.r = 0x80;
                     debugColor.g = 0x00;
@@ -482,17 +483,16 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
 extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* step, _pppCtrlTable* ctrl)
 {
     BreathParticleGroup* groupData;
-    _pppMngSt* mngSt;
+    PARTICLE_WMAT* particleMtx;
     int colorOffset;
     BreathModelDataOffsets* dataOffsets;
     VColor* color;
     VBreathModel* work;
+    _pppMngSt* mngSt;
     PARTICLE_WMAT* particleWMat;
-    PARTICLE_WMAT* particleMtx;
     int groupIndex;
     int firstParticle;
     int particleSlot;
-    int slotCount;
     float scaledOwner;
     Mtx scaleMtx;
     Mtx worldMtx;
@@ -578,11 +578,10 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* s
     particleWMat = work->m_particleWmats;
     groupData = work->m_groups;
     for (groupIndex = 0; groupIndex < (int)step->m_groupCount; groupIndex++) {
-        slotCount = step->m_slotCount;
         if (IsExistGroupParticle(step, work, (short)groupIndex)) {
             firstParticle = -1;
             scaledOwner = mngSt->m_hitScale * step->m_groupOwnerScale;
-            for (particleSlot = 0; particleSlot < slotCount; particleSlot++) {
+            for (particleSlot = 0; particleSlot < (int)step->m_slotCount; particleSlot++) {
                 if (groupData->particleStates[particleSlot] != -1) {
                     firstParticle = groupData->particleIndices[particleSlot];
                     break;

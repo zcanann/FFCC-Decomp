@@ -49,11 +49,6 @@ static inline VRain* GetRainWork(pppRain* rain, _pppCtrlTable* data)
     return reinterpret_cast<VRain*>(rain->m_workArea + GetRainDataOffsets(data)->m_workOffset);
 }
 
-static inline VColor* GetRainColorData(pppRain* rain, _pppCtrlTable* data)
-{
-    return reinterpret_cast<VColor*>(rain->m_workArea + GetRainDataOffsets(data)->m_colorDataOffset);
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -73,7 +68,6 @@ inline void InitRainData(VRain*, PRain* rain, RAIN_DATA* drop)
     float lengthDelta;
     s16 lifeBase;
     u16 lifeRange;
-    int lifeJitter;
     int lifeRemainder;
 
     int randA = rand();
@@ -100,11 +94,7 @@ inline void InitRainData(VRain*, PRain* rain, RAIN_DATA* drop)
     lifeBase = rain->m_lifeBase;
     lifeRemainder = randA % lifeRange;
     drop->life = lifeBase;
-    lifeJitter = -lifeRemainder;
-    if (randA % 2 == 0) {
-        lifeJitter = lifeRemainder;
-    }
-    drop->life = (s16)(drop->life + lifeJitter);
+    drop->life += (randA % 2 == 0) ? lifeRemainder : -lifeRemainder;
 }
 
 /*
@@ -146,8 +136,10 @@ void pppRenderRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
     float baseZ;
     Vec segment;
 
-    work = GetRainWork(rain, data);
-    colorData = GetRainColorData(rain, data);
+    int workOffset = GetRainDataOffsets(data)->m_workOffset;
+    work = reinterpret_cast<VRain*>(rain->m_workArea + workOffset);
+    int colorOffset = GetRainDataOffsets(data)->m_colorDataOffset;
+    colorData = reinterpret_cast<VColor*>(rain->m_workArea + colorOffset);
     pppSetBlendMode(pRain->m_blendMode);
     pppSetDrawEnv(
         &colorData->m_color,
@@ -221,7 +213,8 @@ void pppFrameRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
         return;
     }
 
-    work = GetRainWork(rain, data);
+    i = GetRainDataOffsets(data)->m_workOffset;
+    work = reinterpret_cast<VRain*>(rain->m_workArea + i);
     if (work->drops == 0) {
         work->drops = (RAIN_DATA*)pppMemAlloc(
             pRain->m_dropCount * sizeof(RAIN_DATA),

@@ -104,6 +104,8 @@ void pppRenderYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCt
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
+    f32 uvMin = 0.0f;
+    f32 uvMax = 1.0f;
     int textureIndex[2];
 
     dataValIndex = step->m_dataValIndex;
@@ -162,19 +164,19 @@ void pppRenderYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCt
                     GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
                     GXPosition3f32(poly->to.x, poly->to.y, poly->to.z);
                     GXColor1u32(*(u32*)&colorTop);
-                    GXTexCoord2f32(uTop, 1.0f);
+                    GXTexCoord2f32(uTop, uvMax);
 
                     GXPosition3f32(poly->from.x, poly->from.y, poly->from.z);
                     GXColor1u32(*(u32*)&colorTop);
-                    GXTexCoord2f32(uTop, 0.0f);
+                    GXTexCoord2f32(uTop, uvMin);
 
                     GXPosition3f32(next->to.x, next->to.y, next->to.z);
                     GXColor1u32(*(u32*)&colorBottom);
-                    GXTexCoord2f32(uBottom, 1.0f);
+                    GXTexCoord2f32(uBottom, uvMax);
 
                     GXPosition3f32(next->from.x, next->from.y, next->from.z);
                     GXColor1u32(*(u32*)&colorBottom);
-                    GXTexCoord2f32(uBottom, 0.0f);
+                    GXTexCoord2f32(uBottom, uvMin);
                 }
                 poly++;
             }

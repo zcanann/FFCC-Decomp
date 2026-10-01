@@ -517,12 +517,13 @@ void CGame::clearWork()
 
     CPtrArray<CMapLightHolder*>* mapLightHolderArr = &MapMng.GetMapLightHolderArray(0);
 
-    if (mapLightHolderArr->GetSize() > 0) {
+    if (mapLightHolderArr->GetSize() != 0) {
         _GXColor holderColor;
         Vec holderVec;
 
-        if (0U < static_cast<unsigned int>(mapLightHolderArr->GetSize())) {
-            (*mapLightHolderArr)[0]->GetLightHolder(&holderColor, 0);
+        unsigned int mapLightHolderIndex = 0;
+        if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
+            (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(&holderColor, 0);
         }
 
         for (i = 0; i < 2; i++) {

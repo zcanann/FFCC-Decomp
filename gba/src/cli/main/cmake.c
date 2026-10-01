@@ -1360,7 +1360,7 @@ void CMakeFavoriteScreen_Setup(void)
     }
     for (i = 0; i <= 7; i++) {
         if (i & 1)
-            idx = gCMakeData.favorites[i >> 1] >> 4;
+            idx = (gCMakeData.favorites[i >> 1] >> 4) & 15;
         else
             idx = gCMakeData.favorites[i >> 1] & 15;
         sCMakeFoodOrder[idx] = i;

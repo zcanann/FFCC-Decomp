@@ -150,11 +150,8 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
     Vec subVec;
     Vec interp[50];
     Vec scaled;
-    Vec* startPos;
-    Vec* interpWrite;
     Vec* interpRead;
     int startIndex;
-    LocationTitleParticle* dst;
     LocationTitleWork* work;
     VColor* colorData;
     int graphFrame;
@@ -174,8 +171,10 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
         return;
     }
 
-    work = GetLocationTitleWork(pppLocationTitle, offsets);
-    colorData = GetLocationTitleColorBlock(pppLocationTitle, offsets);
+    work = reinterpret_cast<LocationTitleWork*>(
+        pppLocationTitle->m_workArea + GetLocationTitleDataOffsets(offsets)->m_workOffset);
+    colorData = reinterpret_cast<VColor*>(
+        pppLocationTitle->m_workArea + GetLocationTitleDataOffsets(offsets)->m_colorOffset);
     rand();
 
     if (step->m_dataValIndex == 0xFFFF) {
@@ -240,16 +239,14 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
             if (work->m_count > 1) {
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
-                startPos = &particles[startIndex].m_pos;
                 stepScale = 1.0f / (float)(step->m_stepCount + 1);
-                PSVECSubtract(&particles[startIndex + 1].m_pos, startPos, &subVec);
+                PSVECSubtract(&particles[startIndex + 1].m_pos, &particles[startIndex].m_pos, &subVec);
                 interpRead = interp;
-                interpWrite = interpRead;
 
                 for (int i = 0; i < step->m_stepCount; i++) {
                     t = stepScale * (float)(i + 1);
                     PSVECScale(&subVec, &scaled, t);
-                    PSVECAdd(startPos, &scaled, interpWrite);
+                    PSVECAdd(&particles[startIndex].m_pos, &scaled, &interp[i]);
                     inserted++;
                     work->m_count++;
 
@@ -260,19 +257,16 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
                             break;
                         }
                     }
-
-                    interpWrite++;
                 }
 
                 pppCopyVector(particles[startIndex + 1 + inserted].m_pos,
                               particles[startIndex + 1].m_pos);
 
                 for (int i = 0; i < inserted; i++) {
-                    dst = &particles[startIndex + (i + 1)];
-
-                    pppCopyVector(dst->m_pos, *interpRead);
-                    memcpy(&dst->m_color, &colorData->m_color, 4);
-                    dst->m_frame = work->m_cur;
+                    int index = startIndex + (i + 1);
+                    pppCopyVector(particles[index].m_pos, *interpRead);
+                    memcpy(&particles[index].m_color, &colorData->m_color, 4);
+                    particles[index].m_frame = work->m_cur;
                     interpRead++;
                 }
             }

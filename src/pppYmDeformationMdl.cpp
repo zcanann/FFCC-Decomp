@@ -166,10 +166,16 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     pppSetBlendMode(0);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
+    u8 zEnable;
+    if (step->m_disableZ) {
+        zEnable = 0;
+    } else {
+        zEnable = 1;
+    }
     pppSetDrawEnv(
         &colorInfo->m_color, &pppYmDeformationMdl->m_drawMatrix, step->m_envDepth, step->m_lightTarget,
         step->m_fogIndex, step->m_blendMode, step->m_cullMode,
-        static_cast<u8>(static_cast<u32>(__cntlzw(static_cast<u32>(step->m_disableZ))) >> 5), 1, 0);
+        zEnable, 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);
@@ -210,12 +216,12 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         PSMTX44Copy(CameraScreenMatrix(), screenMtx);
         PSMTXCopy(CameraMatrix(), cameraMtx);
 
+        texMtx[0][0] = screenMtx[0][0];
         texMtx[1][0] = screenMtx[1][0];
         texMtx[2][0] = screenMtx[2][0];
         texMtx[0][1] = screenMtx[0][1];
-        texMtx[2][1] = screenMtx[2][1];
-        texMtx[0][0] = screenMtx[0][0];
         texMtx[1][1] = screenMtx[1][1];
+        texMtx[2][1] = screenMtx[2][1];
         texMtx[0][2] = screenMtx[0][2];
         texMtx[1][2] = screenMtx[1][2];
         texMtx[2][2] = screenMtx[2][2];

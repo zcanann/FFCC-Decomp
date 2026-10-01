@@ -1214,7 +1214,8 @@ s32 Shop_ChangeQuantity(s32 delta)
         if (n & 1)
             n++;
         prices = (u32 *)&items[n];
-        if (prices[sInfoItem] * sShopQuantity > gSession.gil)
+        n = prices[sInfoItem];
+        if (n * sShopQuantity > gSession.gil)
             sShopQuantity = old;
     }
     return sShopQuantity != old;

@@ -180,7 +180,6 @@ void ScouterScreen_PrintNextRow(void)
     s32 idx;
     s32 row;
     s32 x;
-    s32 n;
     s32 pal;
 
     Text_SetFill(0, 0);
@@ -192,9 +191,10 @@ void ScouterScreen_PrintNextRow(void)
     row = sScouterRow;
     if (row >= win->rows)
         return;
-    if (row == 0) {
-        Text_Print(Msg_GetMonsterName(item->monster), TEXT_DRAW);
-    } else if (row == 1) {
+    if (sScouterRow == 0) {
+        idx = item->monster;
+        Text_Print(Msg_GetMonsterName(idx), TEXT_DRAW);
+    } else if (sScouterRow == 1) {
         x = win->width * 8 - 86;
         x = x - Text_Print(Msg_GetSystem(18), TEXT_CHAR) - 8;
         x -= Text_Print(Msg_GetSystem(30), TEXT_WIDTH);
@@ -215,41 +215,41 @@ void ScouterScreen_PrintNextRow(void)
             Text_SetX(x + 8);
             Text_Print(Msg_GetSystem(41), TEXT_DRAW);
         }
-    } else if (row <= 4) {
+    } else if (sScouterRow <= 4) {
         if (item->traits[0] >= 0 && ((struct ScouterInfo *)LIST_BUF)[idx].traits[row - 2] >= 0) {
             if (item->traits[0] <= 1) {
-                n = item->traits[0] * 2;
-                if (row == 2) {
+                idx = item->traits[0] * 2;
+                if (sScouterRow == 2) {
                     strcpy(buf, Msg_GetSystem(31));
-                    strcat(buf, Msg_GetTrait(n));
+                    strcat(buf, Msg_GetTrait(idx));
                     Text_Print(buf, TEXT_DRAW);
-                } else if (row == 3) {
+                } else if (sScouterRow == 3) {
                     strcpy(buf, Msg_GetSystem(31));
-                    strcat(buf, Msg_GetTrait(n + 1));
+                    strcat(buf, Msg_GetTrait(idx + 1));
                     Text_Print(buf, TEXT_DRAW);
                 }
             } else {
-                n = ((struct ScouterInfo *)LIST_BUF)[idx].traits[row - 2];
-                if (n >= 0) {
+                idx = ((struct ScouterInfo *)LIST_BUF)[idx].traits[row - 2];
+                if (idx >= 0) {
                     strcpy(buf, Msg_GetSystem(31));
-                    strcat(buf, Msg_GetTrait(n + 3));
+                    strcat(buf, Msg_GetTrait(idx + 3));
                     Text_Print(buf, TEXT_DRAW);
                 }
             }
         }
-    } else if (row == 5) {
+    } else if (sScouterRow == 5) {
         strcpy(buf, Msg_GetSystem(31));
         strcat(buf, Msg_GetSystem(32));
         Text_Print(buf, TEXT_DRAW);
     } else {
         Text_SetX(24);
-        n = item->dropItem;
-        if (n < 0)
+        idx = item->dropItem;
+        if (idx < 0)
             Text_Print(Msg_GetSystem(41), TEXT_DRAW);
-        else if (n == 0)
+        else if (idx == 0)
             Text_Print(Msg_GetSystem(62), TEXT_DRAW);
         else
-            Text_Print(Msg_GetItemName(n), TEXT_DRAW);
+            Text_Print(Msg_GetItemName(idx), TEXT_DRAW);
     }
     pal = win->bg;
     win->bg--;

@@ -1006,6 +1006,7 @@ void SmithEquipScreen_PrintNextRow(void)
     s32 n;
     s32 msg;
     s32 digits;
+    s32 x;
     char *str;
 
     if (sSmithRow >= win->rows)
@@ -1046,10 +1047,11 @@ void SmithEquipScreen_PrintNextRow(void)
                     digits = 2;
                 else
                     digits = 3;
-                n = (win->width - 2) * 8 - digits * 9 - n;
-                Text_SetX(n);
+                x = (win->width - 2) * 8 - digits * 9 - n;
+                Text_SetX(x);
                 Text_Print(Msg_GetSystem(msg), TEXT_DRAW);
-                Text_PrintNumber(count, Text_GetX(), digits);
+                x = Text_GetX();
+                Text_PrintNumber(count, x, digits);
             }
         } else {
             if (flags & 0x100)

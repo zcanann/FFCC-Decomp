@@ -390,7 +390,7 @@ public:
     CMaterialSet();
     ~CMaterialSet();
     void* operator new(unsigned long, CMemory::CStage*, char*, int);
-    void GetFreeMaterielIdx();
+    unsigned long GetFreeMaterielIdx();
     void Create(CChunkFile&, CTextureSet*, CMaterialMan::TEV_BIT, CLightPcs::CBumpLight*);
     void SetTextureSet(CTextureSet*);
     void Calc();

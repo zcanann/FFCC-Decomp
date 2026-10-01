@@ -3233,6 +3233,27 @@ void* CMaterialSet::operator new(unsigned long size, CMemory::CStage*, char* fil
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline unsigned long CMaterialSet::GetFreeMaterielIdx()
+{
+    unsigned long i;
+    int idx;
+    for (i = 0; (idx = i) < static_cast<unsigned long>(m_materials.GetSize()); i++) {
+        if (m_materials[idx] == 0) {
+            return i;
+        }
+    }
+    return m_materials.GetSize();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8003CDBC
  * PAL Size: 2748b
  * EN Address: 0x8004D5F0
@@ -3262,7 +3283,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
 
     CMaterial* material = 0;
     CChunkFile::CChunk chunk;
-    unsigned long materialIndex;
+    int materialIndex;
     short bumpIndex;
     unsigned char bumpLightDirect;
 
@@ -3279,27 +3300,10 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
         while (chunkFile.GetNextChunk(chunk) != 0) {
             switch (chunk.m_id) {
             case CHUNK_TIDX: {
-                {
-                    unsigned long i;
-                    int idx;
-                    for (i = 0; (idx = i) < static_cast<unsigned long>(m_materials.GetSize()); i++) {
-                        if (m_materials[idx] == 0) {
-                            goto slotFound;
-                        }
-                    }
-                    i = m_materials.GetSize();
-                slotFound:
-                    materialIndex = i;
-                }
+                materialIndex = GetFreeMaterielIdx();
 
                 material = AllocMaterial();
-                material->m_tevBit = static_cast<unsigned long>(tevBit);
-                material->m_bumpLight = 0;
-                material->m_textureCount = 0;
-                material->m_scaleV = 1.0f;
-                material->m_scaleU = 1.0f;
-                material->m_singleTextureFlag = 0;
-                material->m_textureCount = static_cast<unsigned short>(chunk.m_arg0);
+                material->Create(chunk.m_arg0, tevBit);
 
                 if (static_cast<int>(material->m_textureCount) == 0) {
                     material->m_tevBit |= 1;

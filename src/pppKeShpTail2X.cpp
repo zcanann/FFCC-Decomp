@@ -8,11 +8,6 @@
 #include <dolphin/types.h>
 #include <string.h>
 
-static inline float LoadFloat(const float& value)
-{
-    return value;
-}
-
 STATIC_ASSERT(offsetof(struct pppKeShpTail2X, m_object.m_workArea) == 0x80);
 
 struct KeShpTail2XWork {
@@ -111,18 +106,24 @@ void pppKeShpTail2XCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
  */
 void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _pppCtrlTable* ctrlTable)
 {
+    Vec* history;
+    s32 curIndex;
     KeShpTail2XWork* work;
     pppShapeSt* shape;
     tagOAN3_SHAPE* shapeEntry;
     s32 count;
+    s32 nextIndex;
+    s32 lastIndex;
     float alphaMul;
-    pppFVECTOR4 colorStart;
+    float curX;
     pppFVECTOR4 colorEnd;
     float colorStepR;
     float colorStepG;
     float colorStepB;
     float colorStepA;
-    float countMinusOne;
+    float diffR;
+    float diffG;
+    float diffB;
     float diffA;
     pppFMATRIX localBase;
     pppFMATRIX initMtx;
@@ -132,28 +133,25 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     Vec pos;
     Vec zeroVecB;
     Vec seg;
-    float segLen;
-    float segRemain;
+    pppFVECTOR4 colorStart;
+    float curY;
+    float curZ;
+    float countMinusOne;
+    float nextBaseX;
     float segDx;
     float segDy;
     float segDz;
-    register float curX;
-    register float curY;
-    register float curZ;
+    float nextBaseY;
+    float nextBaseZ;
+    float segLen;
+    float trailStep;
     float segBaseX;
     float segBaseY;
     float segBaseZ;
-    float nextBaseX;
-    float nextBaseY;
-    float nextBaseZ;
+    float segRemain;
     float drawScale;
-    float trailStep;
     float scaleStepDelta;
-    Vec* history;
-    s32 curIndex;
-    s32 nextIndex;
-    s32 lastIndex;
-    int zEnable;
+    u8 zEnable;
     float segCursor = 0.0f;
     s32 dataValIndex;
 
@@ -163,21 +161,24 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     }
 
     count = step->m_drawCount;
+    countMinusOne = (float)(count - 1);
     alphaMul = (float)GetKeShpTail2XAlphaWork(&obj->m_object, ctrlTable)->m_alpha / 16384.0f;
     U8ToF32(&colorStart, &step->m_colorStartR);
     U8ToF32(&colorEnd, &step->m_colorEndR);
     colorStart.w *= alphaMul;
     colorEnd.w *= alphaMul;
     diffA = colorStart.w - colorEnd.w;
-    countMinusOne = (float)(step->m_drawCount - 1);
+    diffR = colorStart.x - colorEnd.x;
+    diffG = colorStart.y - colorEnd.y;
+    diffB = colorStart.z - colorEnd.z;
     if (countMinusOne != segCursor) {
-        colorStepR = (colorStart.x - colorEnd.x) / countMinusOne;
-        colorStepG = (colorStart.y - colorEnd.y) / countMinusOne;
-        colorStepB = (colorStart.z - colorEnd.z) / countMinusOne;
+        colorStepR = diffR / countMinusOne;
+        colorStepG = diffG / countMinusOne;
+        colorStepB = diffB / countMinusOne;
         colorStepA = diffA / countMinusOne;
     } else {
         colorStepR = 0.5f;
-        colorStepG = LoadFloat(0.5f);
+        colorStepG = colorStepR;
         colorStepB = colorStepR;
         colorStepA = colorStepR;
     }
@@ -257,7 +258,11 @@ draw_loop:
     drawMtx.value[1][3] = pos.y;
     drawMtx.value[2][3] = pos.z;
 
-    zEnable = (step->m_zDisable == 0);
+    if (step->m_zDisable) {
+        zEnable = 0;
+    } else {
+        zEnable = 1;
+    }
     pppSetDrawEnv(0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : 0.0f, 0,
                   step->m_drawA, step->m_blendMode, 0, zEnable, 1, 0);
 
@@ -289,9 +294,12 @@ update_step:
     }
 advance_segment:
     if (segRemain >= trailStep) {
-        curX = (segDx * segCursor) / segLen + segBaseX;
-        curY = (segDy * segCursor) / segLen + segBaseY;
-        curZ = (segDz * segCursor) / segLen + segBaseZ;
+        curX = (segDx * segCursor) / segLen;
+        curY = (segDy * segCursor) / segLen;
+        curZ = (segDz * segCursor) / segLen;
+        curX += segBaseX;
+        curY += segBaseY;
+        curZ += segBaseZ;
         segCursor += trailStep;
         segRemain -= trailStep;
         goto draw_loop;
@@ -309,12 +317,9 @@ move_next_segment:
     segBaseX = nextBaseX;
     segBaseY = nextBaseY;
     segBaseZ = nextBaseZ;
-    nextBaseY = history[nextIndex].y;
-    nextBaseZ = history[nextIndex].z;
-    nextBaseX = history[nextIndex].x;
-    segDy = nextBaseY - segBaseY;
-    segDz = nextBaseZ - segBaseZ;
-    segDx = nextBaseX - segBaseX;
+    segDy = (nextBaseY = history[nextIndex].y) - segBaseY;
+    segDz = (nextBaseZ = history[nextIndex].z) - segBaseZ;
+    segDx = (nextBaseX = history[nextIndex].x) - segBaseX;
     zeroVecB.z = 0.0f;
     zeroVecB.y = 0.0f;
     zeroVecB.x = 0.0f;

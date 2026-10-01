@@ -180,7 +180,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float segDy;
     float segDz;
     float invCountMinusOne;
-    float drawScale;
     float posZ;
     int life;
     s32 shapeFrameDuration;
@@ -274,13 +273,11 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     }
 
 draw_loop:
-    drawScale = shapeScale;
-
     {
         u32 lcg = (u32)rng * 0x80du + 7u;
         rng = (u16)lcg;
         float random = (float)rng / kPppKeShpTail3XRandomMax;
-        drawScale *= -(random * step->m_randomScale - kPppKeShpTail3XOne);
+        shapeScale *= -(random * step->m_randomScale - kPppKeShpTail3XOne);
         {
             u32 shapeIdx = (u32)(life + rng) / shapeFrameDuration;
             shapeIdx %= (u32)shapeFrameCount;
@@ -294,9 +291,9 @@ draw_loop:
 
     if (step->m_worldSpaceMode == 0) {
         PSMTXScaleApply(obj->m_object.m_localMatrix.value, obj->m_object.m_drawMatrix.value,
-                        localBase.value[0][0] * (drawScale * ppvMng->m_scale.x),
-                        localBase.value[1][1] * (drawScale * ppvMng->m_scale.y),
-                        localBase.value[2][2] * (drawScale * ppvMng->m_scale.z));
+                        localBase.value[0][0] * (shapeScale * ppvMng->m_scale.x),
+                        localBase.value[1][1] * (shapeScale * ppvMng->m_scale.y),
+                        localBase.value[2][2] * (shapeScale * ppvMng->m_scale.z));
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
             PSMTXRotRad(rotMtxA.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
             pppMulMatrix(obj->m_object.m_drawMatrix, rotMtxA, obj->m_object.m_drawMatrix);
@@ -305,9 +302,9 @@ draw_loop:
         PSMTXCopy(obj->m_object.m_drawMatrix.value, drawMtx.value);
     } else if (step->m_worldSpaceMode == 1) {
         pppUnitMatrix(drawMtx);
-        drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * ppvMng->m_scale.x);
-        drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * ppvMng->m_scale.y);
-        drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * ppvMng->m_scale.z);
+        drawMtx.value[0][0] = shapeScale * (localBase.value[0][0] * ppvMng->m_scale.x);
+        drawMtx.value[1][1] = shapeScale * (localBase.value[1][1] * ppvMng->m_scale.y);
+        drawMtx.value[2][2] = shapeScale * (localBase.value[2][2] * ppvMng->m_scale.z);
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
             PSMTXRotRad(rotMtxB.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
             pppMulMatrix(drawMtx, rotMtxB, drawMtx);

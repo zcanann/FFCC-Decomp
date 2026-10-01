@@ -169,11 +169,11 @@ void Mode7_UpdateAffine(struct Field *field)
     s16 pa;
     s16 pc;
     struct BgAffine *aff;
-    s32 d;
+    s16 d;
 
+    idx = cam->yaw >> 5;
     gSkyScroll = cam->yaw >> 6;
     scale = &cam->scaleX;
-    idx = cam->yaw >> 5;
     cos = gSinTable[idx + 512];
     xx = FixMul(cos, FixInv(scale[0]));
     sin = gSinTable[idx];
@@ -188,13 +188,14 @@ void Mode7_UpdateAffine(struct Field *field)
     x0 += ox;
     y0 += oy;
     for (i = 0; i < 160; aff++, i++) {
-        pa = (field->scale[i] * xx) >> 8;
-        pc = (field->scale[i] * yx) >> 8;
+        d = field->scale[i];
+        pa = (xx * d) >> 8;
+        pc = (yx * d) >> 8;
         aff->pa = pa;
         aff->pc = pc;
-        d = -field->depth[i];
-        aff->x = x0 - 120 * pa - xy * d;
-        aff->y = y0 - pc * 120 - yy * d;
+        d = field->depth[i];
+        aff->x = x0 - 120 * pa - xy * -d;
+        aff->y = y0 - pc * 120 - yy * -d;
     }
     gMain.mode7Dirty = 1;
 }

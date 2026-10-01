@@ -41,7 +41,7 @@ STATIC_ASSERT(offsetof(CMapCylinder, m_bound) == 0x28);
 
 static inline f32 LaserConst(const f32& value)
 {
-    return *reinterpret_cast<const f32*>(&value);
+    return value;
 }
 
 static inline pppLaserDataOffsets* GetLaserDataOffsets(_pppCtrlTable* ctrlTable)

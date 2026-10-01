@@ -557,7 +557,7 @@ config.libs = [
             Object(Matching, "mapshadow.cpp", cflags=cflags_game_cpp_exceptions, extra_cflags=["-sdata2 8"]),
             Object(Matching, "maptexanim.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),
             Object(NonMatching, "materialman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
-            Object(NonMatching, "math.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "math.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "ME_AppRequest.cpp"),
             Object(NonMatching, "ME_USB_process.cpp", cflags=[*cflags_game_cpp_exceptions, "-sdata2 8"]),
             Object(NonMatching, "memory.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),

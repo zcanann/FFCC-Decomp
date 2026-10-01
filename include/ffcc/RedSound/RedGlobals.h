@@ -260,7 +260,7 @@ extern RedKeyOnDATA* volatile p_KeyOnData;
 extern int m_SoundPlayMode;
 #define RedSoundPlayModeGet() (m_SoundPlayMode)
 #define RedSoundPlayModeSet(mode) (m_SoundPlayMode = (mode))
-extern int m_SoundMasterControl;
+extern volatile int m_SoundMasterControl;
 #define RedSoundMasterControlGet() (m_SoundMasterControl)
 #define RedSoundMasterControlSet(control) (m_SoundMasterControl = (control))
 extern volatile int m_ReportPrint;
@@ -268,7 +268,7 @@ extern volatile int m_ReportPrint;
 #define RedReportPrintSet(value) (m_ReportPrint = (value))
 #define RedReportPrintIsEnabled() (RedReportPrintGet() != REDSOUND_REPORT_PRINT_OFF)
 #define RedReportPrintIsDisabled() (RedReportPrintGet() == REDSOUND_REPORT_PRINT_OFF)
-extern int m_MusicFastSpeed;
+extern volatile int m_MusicFastSpeed;
 #define RedMusicFastSpeedGet() (m_MusicFastSpeed)
 #define RedMusicFastSpeedSet(speed) (m_MusicFastSpeed = (speed))
 extern volatile int m_MusicSkipLine;
@@ -277,7 +277,7 @@ extern volatile int m_MusicSkipLine;
 #define RedMusicSkipLineDec() (m_MusicSkipLine--)
 #define RedMusicSkipLineIsActive() (RedMusicSkipLineGet() != 0)
 #define RedMusicSkipLineIsComplete() (RedMusicSkipLineGet() <= 0)
-extern int m_MusicKeySignature;
+extern volatile int m_MusicKeySignature;
 #define RedMusicKeySignatureGet() (m_MusicKeySignature)
 #define RedMusicKeySignatureSet(enabled) (m_MusicKeySignature = (enabled))
 #define RedMusicKeySignatureIsEnabled() (RedMusicKeySignatureGet() != 0)
@@ -310,7 +310,7 @@ extern int m_MusicPhraseStop;
 #define RedMusicPhraseStopClear() RedMusicPhraseStopSet(REDSOUND_MUSIC_PHRASE_STOP_OFF)
 #define RedMusicPhraseStopIsOn() (RedMusicPhraseStopGet() == REDSOUND_MUSIC_PHRASE_STOP_ON)
 #define RedMusicPhraseStopIsOff() (RedMusicPhraseStopGet() == REDSOUND_MUSIC_PHRASE_STOP_OFF)
-extern int m_CrossTime;
+extern volatile int m_CrossTime;
 #define RedCrossTimeGet() (m_CrossTime)
 #define RedCrossTimeSet(time) (m_CrossTime = (time))
 #define RedCrossTimeClear() RedCrossTimeSet(0)

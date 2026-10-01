@@ -20,14 +20,18 @@ STATIC_ASSERT(offsetof(CMaterialEditorPcs, m_readRsdIndex) == 0x9C);
 STATIC_ASSERT(offsetof(CMaterialEditorPcs, m_rsdItem) == 0xBC);
 STATIC_ASSERT(sizeof(CMaterialEditorPcs) == 0x3E0);
 
-static const char s_ME_USB_process_cpp[] = "ME_USB_process.cpp";
-extern "C" const char sMemAllocErrorSizeFmt[] = "MemAlloc Error!!! size=%d\n";
-
-extern const float kMapEditorZero = 0.0f;
-extern const float kMapEditorOne = 1.0f;
-extern const double kMapEditorS32ToDoubleBias = 4503601774854144.0;
-
 namespace {
+
+static inline s16 Swap16(s16 value)
+{
+    return __lhbrx(&value, 0);
+}
+
+static inline f32 SwapFloat(f32 value)
+{
+    u32 swapped = __lwbrx(&value, 0);
+    return *reinterpret_cast<f32*>(&swapped);
+}
 
 static inline CMemory::CStage* MaterialEditorStage()
 {
@@ -37,43 +41,6 @@ static inline CMemory::CStage* MaterialEditorStage()
 static inline u32 LoadSwap32(u32 value)
 {
     return __lwbrx(&value, 0);
-}
-
-static inline void StoreSwap32(u32* value)
-{
-    u32 raw = *value;
-
-    *value = __lwbrx(&raw, 0);
-}
-
-static inline void StoreSwapFloat(f32* value)
-{
-    f32 raw = *value;
-    u32 swapped = __lwbrx(&raw, 0);
-
-    *value = *reinterpret_cast<f32*>(&swapped);
-}
-
-static inline void StoreSwapNegFloat(f32* value)
-{
-    f32 raw = *value;
-    u32 swapped = __lwbrx(&raw, 0);
-
-    *value = -*reinterpret_cast<f32*>(&swapped);
-}
-
-static inline void StoreSwapU16(u16* value)
-{
-    u16 raw = *value;
-
-    *value = __lhbrx(&raw, 0);
-}
-
-static inline void StoreSwapS16(s16* value)
-{
-    s16 raw = *value;
-
-    *value = __lhbrx(&raw, 0);
 }
 
 }
@@ -125,18 +92,18 @@ void CMaterialEditorPcs::SetUSBData()
         rsdItem->countA = usb.m_sizeBytes;
         u32 allocSize = usb.m_sizeBytes * 0xC;
         void* allocData = Memory._Alloc(
-            allocSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+            allocSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
         if (allocData == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
+            System.Printf("MemAlloc Error!!! size=%d\n", allocSize);
         }
         rsdItem->m_positions = static_cast<Vec*>(allocData);
 
         memcpy(rsdItem->m_positions, usb.m_data, usb.m_sizeBytes * 0xC);
 
         for (u32 i = 0; i < usb.m_sizeBytes; i++) {
-            StoreSwapFloat(&rsdItem->m_positions[i].x);
-            StoreSwapNegFloat(&rsdItem->m_positions[i].y);
-            StoreSwapNegFloat(&rsdItem->m_positions[i].z);
+            rsdItem->m_positions[i].x = SwapFloat(rsdItem->m_positions[i].x);
+            rsdItem->m_positions[i].y = -SwapFloat(rsdItem->m_positions[i].y);
+            rsdItem->m_positions[i].z = -SwapFloat(rsdItem->m_positions[i].z);
         }
         DCStoreRange(rsdItem->m_positions, usb.m_sizeBytes * 0xC);
 
@@ -146,7 +113,7 @@ void CMaterialEditorPcs::SetUSBData()
         s32 yDiff = static_cast<s32>(maxPos.z - minPos.z);
 
         srt.Identity();
-        srt.m_position.x = kMapEditorZero;
+        srt.m_position.x = 0.0f;
         srt.m_position.y = static_cast<f32>(-xDiff / 2);
         srt.m_position.z = static_cast<f32>(-yDiff * (xDiff / 0x14) - 10);
         CameraPcs.SetViewerSRT(&srt);
@@ -163,9 +130,9 @@ void CMaterialEditorPcs::SetUSBData()
         rsdItem->countC = usb.m_sizeBytes;
         u32 allocSize = usb.m_sizeBytes * 0x70;
         void* allocData = Memory._Alloc(
-            allocSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+            allocSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
         if (allocData == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
+            System.Printf("MemAlloc Error!!! size=%d\n", allocSize);
         }
         rsdItem->m_polygons = static_cast<MaterialEditorPolygon*>(allocData);
 
@@ -173,27 +140,27 @@ void CMaterialEditorPcs::SetUSBData()
         memcpy(rsdItem->m_polygons, usb.m_data, usb.m_sizeBytes * 0x70);
 
         for (u32 i = 0; i < usb.m_sizeBytes; i++) {
-            StoreSwapS16(&rsdItem->m_polygons[i].flags);
-            StoreSwapU16(&rsdItem->m_polygons[i].blendMode);
-            StoreSwap32(&rsdItem->m_polygons[i]._04);
-            StoreSwapU16(&rsdItem->m_polygons[i].index0);
-            StoreSwapU16(&rsdItem->m_polygons[i].index1);
-            StoreSwapU16(&rsdItem->m_polygons[i].index2);
-            StoreSwapU16(&rsdItem->m_polygons[i].index3);
-            StoreSwapU16(&rsdItem->m_polygons[i]._10);
-            StoreSwapU16(&rsdItem->m_polygons[i]._12);
-            StoreSwapU16(&rsdItem->m_polygons[i]._14);
-            StoreSwapU16(&rsdItem->m_polygons[i]._16);
-            StoreSwapS16(&rsdItem->m_polygons[i]._1c);
-            StoreSwapS16(&rsdItem->m_polygons[i].textureIndex);
-            StoreSwapS16(&rsdItem->m_polygons[i].u0);
-            StoreSwapS16(&rsdItem->m_polygons[i].v0);
-            StoreSwapS16(&rsdItem->m_polygons[i].u1);
-            StoreSwapS16(&rsdItem->m_polygons[i].v1);
-            StoreSwapS16(&rsdItem->m_polygons[i].u2);
-            StoreSwapS16(&rsdItem->m_polygons[i].v2);
-            StoreSwapS16(&rsdItem->m_polygons[i].u3);
-            StoreSwapS16(&rsdItem->m_polygons[i].v3);
+            rsdItem->m_polygons[i].flags = Swap16(rsdItem->m_polygons[i].flags);
+            rsdItem->m_polygons[i].blendMode = Swap16(rsdItem->m_polygons[i].blendMode);
+            rsdItem->m_polygons[i]._04 = LoadSwap32(rsdItem->m_polygons[i]._04);
+            rsdItem->m_polygons[i].index0 = Swap16(rsdItem->m_polygons[i].index0);
+            rsdItem->m_polygons[i].index1 = Swap16(rsdItem->m_polygons[i].index1);
+            rsdItem->m_polygons[i].index2 = Swap16(rsdItem->m_polygons[i].index2);
+            rsdItem->m_polygons[i].index3 = Swap16(rsdItem->m_polygons[i].index3);
+            rsdItem->m_polygons[i]._10 = Swap16(rsdItem->m_polygons[i]._10);
+            rsdItem->m_polygons[i]._12 = Swap16(rsdItem->m_polygons[i]._12);
+            rsdItem->m_polygons[i]._14 = Swap16(rsdItem->m_polygons[i]._14);
+            rsdItem->m_polygons[i]._16 = Swap16(rsdItem->m_polygons[i]._16);
+            rsdItem->m_polygons[i]._1c = Swap16(rsdItem->m_polygons[i]._1c);
+            rsdItem->m_polygons[i].textureIndex = Swap16(rsdItem->m_polygons[i].textureIndex);
+            rsdItem->m_polygons[i].u0 = Swap16(rsdItem->m_polygons[i].u0);
+            rsdItem->m_polygons[i].v0 = Swap16(rsdItem->m_polygons[i].v0);
+            rsdItem->m_polygons[i].u1 = Swap16(rsdItem->m_polygons[i].u1);
+            rsdItem->m_polygons[i].v1 = Swap16(rsdItem->m_polygons[i].v1);
+            rsdItem->m_polygons[i].u2 = Swap16(rsdItem->m_polygons[i].u2);
+            rsdItem->m_polygons[i].v2 = Swap16(rsdItem->m_polygons[i].v2);
+            rsdItem->m_polygons[i].u3 = Swap16(rsdItem->m_polygons[i].u3);
+            rsdItem->m_polygons[i].v3 = Swap16(rsdItem->m_polygons[i].v3);
         }
         DCStoreRange(rsdItem->m_polygons, usb.m_sizeBytes * 0x70);
         break;
@@ -221,56 +188,56 @@ void CMaterialEditorPcs::SetUSBData()
         rsdItem->countB = usb.m_sizeBytes;
         u32 allocSize = usb.m_sizeBytes * 0xC;
         void* allocData = Memory._Alloc(
-            allocSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+            allocSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
         if (allocData == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
+            System.Printf("MemAlloc Error!!! size=%d\n", allocSize);
         }
         rsdItem->m_normals = static_cast<Vec*>(allocData);
 
         memcpy(rsdItem->m_normals, usb.m_data, usb.m_sizeBytes * 0xC);
 
         for (u32 i = 0; i < usb.m_sizeBytes; i++) {
-            StoreSwapFloat(&rsdItem->m_normals[i].x);
-            StoreSwapNegFloat(&rsdItem->m_normals[i].y);
-            StoreSwapNegFloat(&rsdItem->m_normals[i].z);
+            rsdItem->m_normals[i].x = SwapFloat(rsdItem->m_normals[i].x);
+            rsdItem->m_normals[i].y = -SwapFloat(rsdItem->m_normals[i].y);
+            rsdItem->m_normals[i].z = -SwapFloat(rsdItem->m_normals[i].z);
         }
         DCStoreRange(rsdItem->m_normals, usb.m_sizeBytes * 0xC);
         break;
     }
     case 1: {
         memcpy(&m_usbTransform, usb.m_data, sizeof(m_usbTransform));
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[0][0]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[0][1]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[0][2]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[0][3]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[1][0]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[1][1]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[1][2]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[1][3]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[2][0]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[2][1]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[2][2]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[2][3]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[3][0]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[3][1]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[3][2]);
-        StoreSwapFloat(&m_usbTransform.m_modelMatrix[3][3]);
-        StoreSwapFloat(&m_usbTransform.m_viewMatrix[0][0]);
-        StoreSwapFloat(&m_usbTransform.m_viewMatrix[0][1]);
-        StoreSwapFloat(&m_usbTransform.m_viewMatrix[0][2]);
-        StoreSwapFloat(&m_usbTransform.m_viewMatrix[0][3]);
-        StoreSwapFloat(&m_usbTransform.m_viewMatrix[1][0]);
-        StoreSwapFloat(&m_usbTransform.m_viewMatrix[1][1]);
-        StoreSwapFloat(&m_usbTransform.m_viewMatrix[1][2]);
-        StoreSwapFloat(&m_usbTransform.m_viewMatrix[1][3]);
-        StoreSwapFloat(&m_usbTransform.m_viewMatrix[2][0]);
-        StoreSwapFloat(&m_usbTransform.m_viewMatrix[2][1]);
-        StoreSwapFloat(&m_usbTransform.m_viewMatrix[2][2]);
-        StoreSwapFloat(&m_usbTransform.m_viewMatrix[2][3]);
-        StoreSwapFloat(&m_usbTransform.m_cameraPosition.x);
-        StoreSwapFloat(&m_usbTransform.m_cameraPosition.y);
-        StoreSwapFloat(&m_usbTransform.m_cameraPosition.z);
-        StoreSwapFloat(&m_usbTransform.m_cameraDistance);
+        m_usbTransform.m_modelMatrix[0][0] = SwapFloat(m_usbTransform.m_modelMatrix[0][0]);
+        m_usbTransform.m_modelMatrix[0][1] = SwapFloat(m_usbTransform.m_modelMatrix[0][1]);
+        m_usbTransform.m_modelMatrix[0][2] = SwapFloat(m_usbTransform.m_modelMatrix[0][2]);
+        m_usbTransform.m_modelMatrix[0][3] = SwapFloat(m_usbTransform.m_modelMatrix[0][3]);
+        m_usbTransform.m_modelMatrix[1][0] = SwapFloat(m_usbTransform.m_modelMatrix[1][0]);
+        m_usbTransform.m_modelMatrix[1][1] = SwapFloat(m_usbTransform.m_modelMatrix[1][1]);
+        m_usbTransform.m_modelMatrix[1][2] = SwapFloat(m_usbTransform.m_modelMatrix[1][2]);
+        m_usbTransform.m_modelMatrix[1][3] = SwapFloat(m_usbTransform.m_modelMatrix[1][3]);
+        m_usbTransform.m_modelMatrix[2][0] = SwapFloat(m_usbTransform.m_modelMatrix[2][0]);
+        m_usbTransform.m_modelMatrix[2][1] = SwapFloat(m_usbTransform.m_modelMatrix[2][1]);
+        m_usbTransform.m_modelMatrix[2][2] = SwapFloat(m_usbTransform.m_modelMatrix[2][2]);
+        m_usbTransform.m_modelMatrix[2][3] = SwapFloat(m_usbTransform.m_modelMatrix[2][3]);
+        m_usbTransform.m_modelMatrix[3][0] = SwapFloat(m_usbTransform.m_modelMatrix[3][0]);
+        m_usbTransform.m_modelMatrix[3][1] = SwapFloat(m_usbTransform.m_modelMatrix[3][1]);
+        m_usbTransform.m_modelMatrix[3][2] = SwapFloat(m_usbTransform.m_modelMatrix[3][2]);
+        m_usbTransform.m_modelMatrix[3][3] = SwapFloat(m_usbTransform.m_modelMatrix[3][3]);
+        m_usbTransform.m_viewMatrix[0][0] = SwapFloat(m_usbTransform.m_viewMatrix[0][0]);
+        m_usbTransform.m_viewMatrix[0][1] = SwapFloat(m_usbTransform.m_viewMatrix[0][1]);
+        m_usbTransform.m_viewMatrix[0][2] = SwapFloat(m_usbTransform.m_viewMatrix[0][2]);
+        m_usbTransform.m_viewMatrix[0][3] = SwapFloat(m_usbTransform.m_viewMatrix[0][3]);
+        m_usbTransform.m_viewMatrix[1][0] = SwapFloat(m_usbTransform.m_viewMatrix[1][0]);
+        m_usbTransform.m_viewMatrix[1][1] = SwapFloat(m_usbTransform.m_viewMatrix[1][1]);
+        m_usbTransform.m_viewMatrix[1][2] = SwapFloat(m_usbTransform.m_viewMatrix[1][2]);
+        m_usbTransform.m_viewMatrix[1][3] = SwapFloat(m_usbTransform.m_viewMatrix[1][3]);
+        m_usbTransform.m_viewMatrix[2][0] = SwapFloat(m_usbTransform.m_viewMatrix[2][0]);
+        m_usbTransform.m_viewMatrix[2][1] = SwapFloat(m_usbTransform.m_viewMatrix[2][1]);
+        m_usbTransform.m_viewMatrix[2][2] = SwapFloat(m_usbTransform.m_viewMatrix[2][2]);
+        m_usbTransform.m_viewMatrix[2][3] = SwapFloat(m_usbTransform.m_viewMatrix[2][3]);
+        m_usbTransform.m_cameraPosition.x = SwapFloat(m_usbTransform.m_cameraPosition.x);
+        m_usbTransform.m_cameraPosition.y = SwapFloat(m_usbTransform.m_cameraPosition.y);
+        m_usbTransform.m_cameraPosition.z = SwapFloat(m_usbTransform.m_cameraPosition.z);
+        m_usbTransform.m_cameraDistance = SwapFloat(m_usbTransform.m_cameraDistance);
         memcpy(&m_unkMatrix, m_usbTransform.m_modelMatrix, 0x30);
         DCStoreRange(&m_usbTransform, sizeof(m_usbTransform));
         break;
@@ -278,10 +245,10 @@ void CMaterialEditorPcs::SetUSBData()
     case 0x31: {
         u32 allocSize = usb.m_sizeBytes;
         u8* dstBuffer = static_cast<u8*>(
-            Memory._Alloc(allocSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0));
+            Memory._Alloc(allocSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0));
 
         if (dstBuffer == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
+            System.Printf("MemAlloc Error!!! size=%d\n", allocSize);
         }
 
         u8* src = dstBuffer;
@@ -299,38 +266,38 @@ void CMaterialEditorPcs::SetUSBData()
     }
     case 0x20: {
         u32 allocSize = usb.m_sizeBytes;
-        void* mem = Memory._Alloc(allocSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+        void* mem = Memory._Alloc(allocSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
 
         if (mem == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
+            System.Printf("MemAlloc Error!!! size=%d\n", allocSize);
         }
 
         s16* headerBuffer = static_cast<s16*>(mem);
         void* headerDst =
-            Memory._Alloc(0x10, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+            Memory._Alloc(0x10, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
         if (headerDst == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), 0x10);
+            System.Printf("MemAlloc Error!!! size=%d\n", 0x10);
         }
 
         this->m_textureHeader[this->m_loadedTextureCount] = static_cast<s16*>(headerDst);
         memcpy(headerBuffer, usb.m_data, usb.m_sizeBytes);
-        StoreSwapS16(&headerBuffer[0]);
-        StoreSwapS16(&headerBuffer[1]);
-        StoreSwapS16(&headerBuffer[2]);
-        StoreSwapS16(&headerBuffer[3]);
-        StoreSwapS16(&headerBuffer[4]);
-        StoreSwapS16(&headerBuffer[5]);
-        StoreSwapS16(&headerBuffer[6]);
-        StoreSwapS16(&headerBuffer[7]);
+        headerBuffer[0] = Swap16(headerBuffer[0]);
+        headerBuffer[1] = Swap16(headerBuffer[1]);
+        headerBuffer[2] = Swap16(headerBuffer[2]);
+        headerBuffer[3] = Swap16(headerBuffer[3]);
+        headerBuffer[4] = Swap16(headerBuffer[4]);
+        headerBuffer[5] = Swap16(headerBuffer[5]);
+        headerBuffer[6] = Swap16(headerBuffer[6]);
+        headerBuffer[7] = Swap16(headerBuffer[7]);
         DCFlushRange(headerBuffer, 0x10);
         memcpy(this->m_textureHeader[this->m_loadedTextureCount], headerBuffer, 0x10);
 
         if (headerBuffer[1] == 0x20) {
             u32 dataBytes = usb.m_sizeBytes;
             void* texData = Memory._Alloc(
-                dataBytes - 0x10, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+                dataBytes - 0x10, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
             if (texData == 0) {
-                System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), dataBytes - 0x10);
+                System.Printf("MemAlloc Error!!! size=%d\n", dataBytes - 0x10);
             }
             this->m_textureData[this->m_loadedTextureCount] = texData;
             memcpy(this->m_textureData[this->m_loadedTextureCount], headerBuffer + 8, usb.m_sizeBytes - 0x10);
@@ -341,10 +308,10 @@ void CMaterialEditorPcs::SetUSBData()
             int tlutDataSize = tlutEntries * 4;
             int imageDataSize = static_cast<int>(usb.m_sizeBytes) - 0x10 - tlutDataSize;
             void* texData = memory._Alloc(
-                imageDataSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+                imageDataSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
 
             if (texData == 0) {
-                System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), imageDataSize);
+                System.Printf("MemAlloc Error!!! size=%d\n", imageDataSize);
             }
             this->m_textureData[this->m_loadedTextureCount] = texData;
             memcpy(this->m_textureData[this->m_loadedTextureCount], headerBuffer + 8,
@@ -353,9 +320,9 @@ void CMaterialEditorPcs::SetUSBData()
                 static_cast<int>(usb.m_sizeBytes) - 0x10 - tlutDataSize);
 
             void* tlutData = Memory._Alloc(
-                tlutDataSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+                tlutDataSize, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
             if (tlutData == 0) {
-                System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), tlutDataSize);
+                System.Printf("MemAlloc Error!!! size=%d\n", tlutDataSize);
             }
             this->m_tlutData[this->m_loadedTextureCount] = tlutData;
 
@@ -370,23 +337,23 @@ void CMaterialEditorPcs::SetUSBData()
         }
 
         void* texObj =
-            Memory._Alloc(0x20, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+            Memory._Alloc(0x20, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
         if (texObj == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), 0x20);
+            System.Printf("MemAlloc Error!!! size=%d\n", 0x20);
         }
         this->m_texObj[this->m_loadedTextureCount] = static_cast<GXTexObj*>(texObj);
 
         void* tlutObj0 =
-            Memory._Alloc(0xC, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+            Memory._Alloc(0xC, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
         if (tlutObj0 == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), 0xC);
+            System.Printf("MemAlloc Error!!! size=%d\n", 0xC);
         }
         this->m_tlutObj0[this->m_loadedTextureCount] = static_cast<GXTlutObj*>(tlutObj0);
 
         void* tlutObj1 =
-            Memory._Alloc(0xC, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+            Memory._Alloc(0xC, MaterialEditorStage(), "ME_USB_process.cpp", 0x31, 0);
         if (tlutObj1 == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), 0xC);
+            System.Printf("MemAlloc Error!!! size=%d\n", 0xC);
         }
         this->m_tlutObj1[this->m_loadedTextureCount] = static_cast<GXTlutObj*>(tlutObj1);
 

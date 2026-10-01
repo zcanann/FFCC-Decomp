@@ -980,7 +980,7 @@ void InfoWin_PrintNextRow(void)
     struct ItemInfo *items;
     u32 *vals;
     u32 dst;
-    s32 id;
+    s32 n;
     s32 w;
     s32 x;
     s32 t;
@@ -1000,11 +1000,11 @@ void InfoWin_PrintNextRow(void)
         if (t & 1)
             t++;
         vals = (u32 *)&BUY_ITEM_IDS[t];
-        id = BUY_ITEM_IDS[sInfoItem];
+        n = BUY_ITEM_IDS[sInfoItem];
     } else {
         items = (struct ItemInfo *)list;
         vals = (u32 *)(items + 64);
-        id = gSession.items[sInfoItem];
+        n = gSession.items[sInfoItem];
     }
     Text_SetFill(1, 2);
     Text_Clear();
@@ -1012,28 +1012,29 @@ void InfoWin_PrintNextRow(void)
     if (sInfoRow < gWindows->rows)
         dst = sInfoRow * 64 * gWindows->width + 0x06009000;
     if (sInfoRow == 0) {
-        if (id > 0) {
+        if (n > 0) {
             Text_SetX(16);
-            Text_Print(Msg_GetItemName(id), TEXT_DRAW);
+            Text_Print(Msg_GetItemName(n), TEXT_DRAW);
         }
         Text_CopyToVram(dst, gWindows->width);
     } else if (sInfoRow == 1) {
-        if ((gScreen == 1 && id > 0) || (gScreen == 2 && id > 158)) {
-            w = Text_Print(Msg_GetSystem(13), TEXT_WIDTH) + 72;
-            x = (gWindows->width - 2) * 8 - w;
+        if ((gScreen == 1 && n > 0) || (gScreen == 2 && n > 158)) {
+            n = Text_Print(Msg_GetSystem(13), TEXT_WIDTH) + 72;
+            x = (gWindows->width - 2) * 8 - n;
             Text_SetX(x);
-            Text_PrintNumber(vals[sInfoItem], x, 8);
+            n = sInfoItem;
+            Text_PrintNumber(vals[n], x, 8);
             Text_Print(Msg_GetSystem(13), TEXT_DRAW);
-        } else if (id > 0 && gScreen == 2 && id <= 158) {
-            w = Text_Print(Msg_GetSystem(38), TEXT_WIDTH);
-            x = (gWindows->width - 2) * 8 - w;
+        } else if (n > 0 && gScreen == 2 && n <= 158) {
+            n = Text_Print(Msg_GetSystem(38), TEXT_WIDTH);
+            x = (gWindows->width - 2) * 8 - n;
             Text_SetX(x);
             Text_Print(Msg_GetSystem(38), TEXT_DRAW);
         }
         Text_CopyToVram(dst, gWindows->width);
     } else if (sInfoRow <= 5) {
         if (sInfoMode == 0) {
-            if (id > 0) {
+            if (n > 0) {
                 kind = 0;
                 if (gScreen != 1)
                     kind = Session_GetItemCategory(sInfoItem);
@@ -1083,7 +1084,7 @@ void InfoWin_PrintNextRow(void)
                     }
                 }
             }
-        } else if (id > 0) {
+        } else if (n > 0) {
             if (sInfoRow == 2) {
                 w = Text_Print(Msg_GetSystem(14), TEXT_WIDTH);
                 x = (gWindows->width - 2) * 8 - w;
@@ -1121,7 +1122,8 @@ void InfoWin_PrintNextRow(void)
         w = gWindows->width - 2;
         for (i = 0; i < sInfoRow; i++) {
             for (j = 0; j < 2; j++) {
-                t = gWindows->width * 2 * i + 0x80 + j;
+                t = (gWindows->width << 1) * i + 0x80;
+                t += j;
                 for (k = 0; k < w; k++) {
                     if (!(k & 1)) {
                         buf[k] = attr | t;

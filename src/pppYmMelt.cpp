@@ -29,9 +29,9 @@ STATIC_ASSERT(sizeof(YmMeltWork) == 0x18);
 STATIC_ASSERT(offsetof(VColor, m_color) == 0x08);
 STATIC_ASSERT(sizeof(VColor) == 0x0C);
 STATIC_ASSERT(sizeof(Vec2d) == 0x08);
-STATIC_ASSERT(sizeof(PYmMelt) == 0x34);
-STATIC_ASSERT(offsetof(PYmMelt, m_drawEnvColor0) == 0x30);
-STATIC_ASSERT(offsetof(PYmMelt, m_drawEnvColor1) == 0x31);
+STATIC_ASSERT(sizeof(PYmMelt) == 0x30);
+STATIC_ASSERT(offsetof(PYmMelt, m_drawEnvColor0) == 0x2C);
+STATIC_ASSERT(offsetof(PYmMelt, m_drawEnvColor1) == 0x2D);
 STATIC_ASSERT(offsetof(PYmMelt, m_gridSize) == 0x0A);
 STATIC_ASSERT(offsetof(PYmMelt, m_stepValue) == 0x0C);
 STATIC_ASSERT(offsetof(PYmMelt, m_heightBias) == 0x20);
@@ -56,11 +56,6 @@ static inline YmMeltWork* GetYmMeltWork(pppYmMelt* ymMelt, PYmMeltDataOffsets* o
     return reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + GetYmMeltDataOffsets(offsets)->m_workOffset);
 }
 
-static inline VColor* GetYmMeltColorWork(pppYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
-{
-    return reinterpret_cast<VColor*>(ymMelt->m_workArea + GetYmMeltDataOffsets(offsets)->m_colorWorkOffset);
-}
-
 void CalcPolygonHeight(PYmMelt*, VERTEX_DATA*, _GXColor*, float);
 
 /*
@@ -74,12 +69,22 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA*, _GXColor*, float);
  */
 void pppRenderYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offsets)
 {
-    YmMeltWork* work;
-    VERTEX_DATA* vertexData;
-    VColor* colorWork;
-    pppShapeSt* shape;
-    CTexture* texture;
+    VERTEX_DATA* p3Data;
+    int gridWork;
     int textureIndex;
+    u32 colorValue;
+    int idx0;
+    VERTEX_DATA* p2Data;
+    VERTEX_DATA* p0Data;
+    VERTEX_DATA* p1Data;
+    VColor* colorWork;
+    YmMeltWork* work;
+    CTexture* texture;
+    int x;
+    pppShapeSt* shape;
+    int z;
+    VERTEX_DATA* vertexData;
+    int idx1;
     Vec2d uvMin;
     Vec2d uvMax;
     u16 grid;
@@ -88,10 +93,13 @@ void pppRenderYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offse
     float worldZ;
     float uStep;
     float vStep;
+    float v1;
+    float v0;
     float phaseLerp;
 
-    work = GetYmMeltWork(ymMelt, offsets);
-    colorWork = GetYmMeltColorWork(ymMelt, offsets);
+    YmMeltDataOffsets* dataOffsets = GetYmMeltDataOffsets(offsets);
+    work = reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + dataOffsets->m_workOffset);
+    colorWork = reinterpret_cast<VColor*>(ymMelt->m_workArea + dataOffsets->m_colorWorkOffset);
     if (ctrl->m_dataValIndex == 0xFFFF) {
         return;
     }
@@ -148,25 +156,24 @@ void pppRenderYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offse
     vStep = vStep / (f32)grid;
     GXBegin((GXPrimitive)0x80, GX_VTXFMT7, (u16)((grid * grid * 4) & 0xFFFC));
 
-    for (int z = 0; z < ctrl->m_gridSize; z++) {
-        float v1 = (f32)(z + 1) * vStep;
-        float v0 = (f32)z * vStep;
-        for (int x = 0; x < ctrl->m_gridSize; x++) {
-            int gridWork = ctrl->m_gridSize;
-            int idx0 = x + z * (gridWork + 1);
-            int idx1 = x + (z + 1) * (gridWork + 1);
-            VERTEX_DATA* p0Data = &vertexData[idx1];
+    for (z = 0; z < ctrl->m_gridSize; z++) {
+        v1 = (f32)(z + 1) * vStep;
+        v0 = (f32)z * vStep;
+        for (x = 0; x < ctrl->m_gridSize; x++) {
+            gridWork = ctrl->m_gridSize;
+            idx0 = x + z * (gridWork + 1);
+            idx1 = x + (z + 1) * (gridWork + 1);
+            p0Data = &vertexData[idx1];
             Vec vtx0;
-            u32 colorValue;
 
             pppCopyVector(vtx0, p0Data->m_position);
-            VERTEX_DATA* p1Data = &vertexData[idx0];
+            p1Data = &vertexData[idx0];
             Vec vtx1;
             pppCopyVector(vtx1, p1Data->m_position);
-            VERTEX_DATA* p3Data = &vertexData[idx1 + 1];
+            p3Data = &vertexData[idx1 + 1];
             Vec vtx3;
             pppCopyVector(vtx3, p3Data->m_position);
-            VERTEX_DATA* p2Data = &vertexData[idx0 + 1];
+            p2Data = &vertexData[idx0 + 1];
             Vec vtx2;
             pppCopyVector(vtx2, p2Data->m_position);
 
@@ -244,14 +251,15 @@ inline void InitPolygonData(PYmMelt* ctrl, VERTEX_DATA* vertexData, s16 phaseOff
 {
     VERTEX_DATA* rowVertex;
     VERTEX_DATA* vertex;
-    float step;
-    float halfWidth;
-    float x;
     float rot;
+    float halfWidth;
+    float step;
+    float x;
     float z;
     Mtx rotMtx;
 
-    halfWidth = ctrl->m_stepValue * 0.5f;
+    halfWidth = ctrl->m_stepValue;
+    halfWidth *= 0.5f;
     step = ctrl->m_stepValue / (f32)ctrl->m_gridSize;
     rot = 0.017453292f * (f32)phaseOffset;
     vertex = vertexData;
@@ -298,8 +306,9 @@ void pppFrameYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offset
         return;
     }
 
-    work = GetYmMeltWork(ymMelt, offsets);
-    colorWork = GetYmMeltColorWork(ymMelt, offsets);
+    YmMeltDataOffsets* dataOffsets = GetYmMeltDataOffsets(offsets);
+    work = reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + dataOffsets->m_workOffset);
+    colorWork = reinterpret_cast<VColor*>(ymMelt->m_workArea + dataOffsets->m_colorWorkOffset);
     gridCount = ctrl->m_gridSize + 1;
     vertexCount = gridCount * gridCount;
     matrixY = ppvMng->m_matrix.value[1][3];

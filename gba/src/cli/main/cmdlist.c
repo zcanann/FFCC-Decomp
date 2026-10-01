@@ -420,6 +420,7 @@ void CmdListScreen_BuildCandidates(void)
     s32 i;
     s32 j;
     s32 type;
+    s32 k;
     s32 count;
     u8 id;
 
@@ -432,7 +433,8 @@ void CmdListScreen_BuildCandidates(void)
         if (type == 1) {
             s32 w = gSession.items[i];
             s32 party = gSession.appearance & 3;
-            if (Item_GetIcon(w) != party)
+            k = Item_GetIcon(w);
+            if (k != party)
                 continue;
         }
         sCmdCandidates[n++] = (s8)i;
@@ -440,7 +442,8 @@ void CmdListScreen_BuildCandidates(void)
     count = 5;
     for (i = 0; i < count; i++) {
         id = gCmdArtifactIds[i];
-        if (gSession.artifacts[(id - 159) >> 5] & (1 << ((id - 159) & 31)))
+        k = id - 159;
+        if (gSession.artifacts[k >> 5] & (1 << (k & 31)))
             sCmdCandidates[n++] = id - 95;
     }
     for (i = 0; i < 4; i++) {

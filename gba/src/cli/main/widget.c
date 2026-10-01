@@ -159,6 +159,8 @@ s32 StatusWin_Open(s32 idx)
     struct Window *win = &gWindows[idx];
     s32 row;
     u32 addr;
+    s32 n;
+    s32 x;
 
     Text_SetFill(1, 0);
     Text_Clear();
@@ -169,13 +171,17 @@ s32 StatusWin_Open(s32 idx)
         row--;
         if (row <= 2) {
             Text_Print(Msg_GetSystem(row + 6), TEXT_DRAW);
-            Text_PrintNumber(gSession.stats[row], win->width * 8 - 34, 2);
+            n = gSession.stats[row];
+            x = win->width * 8 - 34;
+            Text_PrintNumber(n, x, 2);
         } else if (row == 4) {
             addr = Window_GetTextVram(win, 4, 0);
             Text_Print(Msg_GetSystem(1), TEXT_DRAW);
             Text_CopyToVram(addr, win->width);
         } else if (row == 5) {
-            Text_PrintNumber(gSession.memories, win->width * 8 - 43, 3);
+            n = gSession.memories;
+            x = win->width * 8 - 43;
+            Text_PrintNumber(n, x, 3);
         }
         Window_PutText(win, row, 0);
         row++;
@@ -196,16 +202,22 @@ void StatusWin_Refresh(s32 idx)
 {
     struct Window *win = &gWindows[idx];
     s32 i;
+    s32 n;
+    s32 x;
 
     Text_SetFill(1, 0);
     for (i = 0; i <= 2; i++) {
         Text_Clear();
         Text_Print(Msg_GetSystem(i + 6), TEXT_DRAW);
-        Text_PrintNumber(gSession.stats[i], win->width * 8 - 34, 2);
+        n = gSession.stats[i];
+        x = win->width * 8 - 34;
+        Text_PrintNumber(n, x, 2);
         Text_CopyToVram(Window_GetTextVram(win, i, 0), win->width);
     }
     Text_Clear();
-    Text_PrintNumber(gSession.memories, win->width * 8 - 43, 3);
+    n = gSession.memories;
+    x = win->width * 8 - 43;
+    Text_PrintNumber(n, x, 3);
     Window_PutText(win, 5, 0);
     Text_CopyToVram(Window_GetTextVram(win, 5, 0), win->width);
 }

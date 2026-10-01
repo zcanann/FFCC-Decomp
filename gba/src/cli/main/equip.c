@@ -529,7 +529,8 @@ void EquipScreen_PrintDesc(void)
     s32 mode;
     s32 idx;
     s32 i;
-    s8 id;
+    s32 j;
+    s32 id;
     s32 size;
     s32 msg;
     s32 x;
@@ -546,17 +547,16 @@ void EquipScreen_PrintDesc(void)
     n = *list++;
     if (mode == 0) {
         id = (s8)gSession.equipment[win->cursor];
-        for (i = 0; i < n; i++) {
-            if (id == list[i])
+        for (j = 0; j < n; j++) {
+            if (id == list[j])
                 break;
         }
         idx = -1;
-        if (i < n)
-            idx = i;
+        if (j < n)
+            idx = j;
     } else {
-        i = sEquipTop + win->cursor;
-        if (i > 0) {
-            idx = i - 1;
+        if (sEquipTop + win->cursor > 0) {
+            idx = sEquipTop + win->cursor - 1;
             if (idx >= n)
                 idx = -1;
         } else {

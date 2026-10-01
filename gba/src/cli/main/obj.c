@@ -135,12 +135,11 @@ void Obj_Draw(s32 x, s32 y, s32 id, s32 frame, s32 pal, s32 prio, u32 flags)
     u32 attr;
     u32 tile;
     u8 shape;
-    s32 n;
-    u32 (*oam)[256];
 
     if (!(gDataFlags & DATA_OBJ))
         return;
-    cell = &sObjCells[id];
+    cell = sObjCells;
+    cell += id;
     if ((u32)(id - 3) <= 17 && cell->palLoaded == 0)
         return;
     Shake_GetOffset(&dx, &dy);
@@ -153,15 +152,13 @@ void Obj_Draw(s32 x, s32 y, s32 id, s32 frame, s32 pal, s32 prio, u32 flags)
     else
         flags &= 0x30000C00;
     attr |= flags;
-    oam = (void *)sOamBuf;
-    n = sOamCount;
-    oam[sOamBufIndex][n * 2] = attr;
+    sOamBuf[sOamBufIndex].obj[sOamCount].attr01 = attr;
     tile = ((u32)cell->tiles - 0x06010000) >> 5;
     attr = tile + frame * (gObjShapeSizes[shape] / 32);
     tile = (cell->palette >> 4) + pal;
     attr |= (tile << 12) | (prio << 10);
-    oam[sOamBufIndex][n * 2 + 1] = attr;
-    sOamCount = n + 1;
+    sOamBuf[sOamBufIndex].obj[sOamCount].attr23 = attr;
+    sOamCount++;
 }
 
 void Obj_Nop(void)

@@ -1539,6 +1539,7 @@ void Window_CloseStyle0Horz(struct Window *win)
             }
             map += 32;
         }
+        cols *= 8;
         flags = 0;
         for (i = 0; i < win->height; i++, py += 8) {
             if (i == 0 || i + 1 >= win->height)
@@ -1552,7 +1553,7 @@ void Window_CloseStyle0Horz(struct Window *win)
             if (i >= win->height >> 1)
                 flags = 0x20000000;
             Obj_Draw(px, py, 3, frame, 0, win->bg, flags);
-            Obj_Draw(px + cols * 8, py, 3, frame, 0, win->bg, flags | 0x10000000);
+            Obj_Draw(px + cols, py, 3, frame, 0, win->bg, flags | 0x10000000);
         }
     }
 }

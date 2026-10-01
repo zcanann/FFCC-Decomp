@@ -75,7 +75,7 @@ u32 Crc8(u32 data)
         }
         data >>= 8;
     }
-    for (i = 0; i < 8; i++) {
+    for (; i < 8; i++) {
         crc <<= 1;
         if (crc & 0x100)
             crc ^= 0xCD;
@@ -203,8 +203,11 @@ s32 Link_Send(void)
         case JOY_CMD_INFO:
             if (gJoyWork.offset < JOY_INFO_SIZE)
                 return 0;
-            if (gJoyWork.offset != JOY_INFO_SIZE * 2)
-                goto send;
+            if (gJoyWork.offset != JOY_INFO_SIZE * 2) {
+                REG_JOY_TRANS = *(u32 *)&gJoyWork.send.raw[gJoyWork.offset];
+                gJoyWork.offset += 4;
+                break;
+            }
             for (i = 0; i < JOY_INFO_SIZE; i += 4)
                 *(u32 *)&gJoyWork.send.raw[i] = *(u32 *)&gJoyWork.recv.raw[i];
             gJoyWork.cmd = 0;

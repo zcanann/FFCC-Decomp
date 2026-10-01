@@ -20,9 +20,16 @@ public:
 	class CHandle
 	{
 	public:
-		CHandle() {}
 		void Reset();
+		void SetReadSize(int size, int offset)
+		{
+			m_chunkSize = size;
+			m_currentOffset = offset;
+		}
+		int GetReadSize() { return m_chunkSize; }
 		
+	private:
+		friend class CFile;
 		CHandle* m_next;
 		CHandle* m_previous;
 		unsigned int m_flags;
@@ -38,6 +45,7 @@ public:
 		unsigned int m_currentOffset;
 		unsigned int m_nextOffset;
 
+	public:
 		void SyncCompleted();
 		void Read();
 		void Close();

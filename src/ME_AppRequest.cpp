@@ -132,19 +132,18 @@ int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
 inline void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount)
 {
     ZCANMGRP* entry = *colAnmData;
-
-    if (entry != (ZCANMGRP*)0) {
-        int i = 0;
-        while (i < colAnmCount) {
-            if (entry->ptr != (u8*)0) {
+    if (entry != 0) {
+        for (int i = 0; i < colAnmCount; entry++, i++) {
+            if (entry->ptr != 0) {
                 delete[] entry->ptr;
-                entry->ptr = (u8*)0;
+                entry->ptr = 0;
             }
-            entry = entry + 1;
-            i = i + 1;
         }
-        delete[] reinterpret_cast<u8*>(*colAnmData);
-        *colAnmData = (ZCANMGRP*)0;
+        if (*colAnmData != 0) {
+            delete[] reinterpret_cast<u8*>(*colAnmData);
+            *colAnmData = 0;
+        }
+        *colAnmData = 0;
     }
 }
 
@@ -178,8 +177,9 @@ inline void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
             delete[] rsdItem->m_polygons;
             rsdItem->m_polygons = 0;
         }
-        delete rsdItem;
-        listItem->rsdItem = (RSDITEM*)0;
+        if (rsdItem != 0) {
+            delete rsdItem;
+        }
     }
 
     DeleteColAnmData(&listItem->colAnmData, listItem->colAnmCount);
@@ -213,54 +213,13 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 {
     ZLIST* list;
     _ZLISTITEM* it;
-    RSDITEM* rsdItem;
-    int i;
-    ZCANMGRP* colAnmData;
-    int colAnmCount;
     RSDLISTITEM* listItem;
 
     list = zlist;
     it = list->m_root.m_previous;
     while (it != (_ZLISTITEM*)0) {
         listItem = (RSDLISTITEM*)list->GetDataNext(&it);
-        rsdItem = listItem->rsdItem;
-        if (rsdItem != (RSDITEM*)0) {
-            if (rsdItem->ptrC != (void*)0) {
-                delete[] static_cast<u8*>(rsdItem->ptrC);
-                rsdItem->ptrC = 0;
-            }
-            if (rsdItem->m_positions != (void*)0) {
-                delete[] rsdItem->m_positions;
-                rsdItem->m_positions = 0;
-            }
-            if (rsdItem->m_normals != (void*)0) {
-                delete[] rsdItem->m_normals;
-                rsdItem->m_normals = 0;
-            }
-            if (rsdItem->m_polygons != (void*)0) {
-                delete[] rsdItem->m_polygons;
-                rsdItem->m_polygons = 0;
-            }
-            if (rsdItem != (RSDITEM*)0) {
-                delete rsdItem;
-            }
-        }
-        colAnmCount = listItem->colAnmCount;
-        colAnmData = listItem->colAnmData;
-        if (colAnmData != (ZCANMGRP*)0) {
-            for (i = 0; i < colAnmCount; colAnmData++, i++) {
-                if (colAnmData->ptr != (u8*)0) {
-                    delete[] colAnmData->ptr;
-                    colAnmData->ptr = (u8*)0;
-                }
-            }
-            if (listItem->colAnmData != (ZCANMGRP*)0) {
-                delete[] reinterpret_cast<u8*>(listItem->colAnmData);
-                listItem->colAnmData = (ZCANMGRP*)0;
-            }
-            listItem->colAnmData = (ZCANMGRP*)0;
-        }
-        delete listItem;
+        DeleteRsdItem(listItem);
     }
     list->DeleteList();
 }

@@ -174,8 +174,7 @@ void CSystem::Init()
                     count = remaining;
                 }
 
-                fileHandle->m_chunkSize = count;
-                fileHandle->m_currentOffset = offset;
+                fileHandle->SetReadSize(count, offset);
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
                 memcpy((unsigned char*)m_mapBuffer + offset, File.m_readBuffer, count);

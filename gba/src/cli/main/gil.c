@@ -31,8 +31,8 @@ void GilScreen_Setup(void)
     gWindows[0].y = 3;
     gWindows[0].rows = 4;
     gWindows[0].width = 12;
+    gWindows[0].height = gWindows[0].width / 2 + 2;
     gWindows[0].style = 6;
-    gWindows[0].height = 8;
     gWindows[0].variant = 0;
     gWindows[0].bg = 2;
     gWindows[0].slot = 0;

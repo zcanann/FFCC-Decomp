@@ -342,6 +342,7 @@ void SmithForgeScreen_Setup(void)
     }
     gSubMode = 0;
     sSmithResult = 0;
+    gSubMode = 0;
     sSmithRow = 0;
     sSmithCanForge = 1;
     sSmithWaiting = 0;
@@ -855,6 +856,7 @@ void SmithEquipScreen_Setup(void)
     }
     gSubMode = 0;
     sSmithResult = 0;
+    gSubMode = 0;
     sSmithRow = 0;
     sSmithCanForge = 1;
     sSmithWaiting = 0;

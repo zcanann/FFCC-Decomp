@@ -488,7 +488,8 @@ void Window_OpenStyle1(struct Window *win, s32 tile, s32 pal)
         map = (u16 *)Bg_GetMapPtr(win->bg, win->x, py >> 3);
         DmaCopy16(3, buf, map, win->width * 2);
         py += 8;
-        if (py < Window_RowToY(win, win->height) - 8)
+        n = Window_RowToY(win, win->height) - 8;
+        if (py < n)
             goto sprites;
         for (i = 0; i < win->width; i++) {
             if (i == 0)

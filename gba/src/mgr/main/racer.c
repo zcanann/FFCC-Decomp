@@ -13,7 +13,7 @@ u8 gDirAnims[] = { 4, 5, 26, 27, 0, 1, 2, 3 };
 
 static inline struct Anim *GetAnim(u16 id)
 {
-    return gGameAnimTable->entries[id];
+    return gGame.animTable->entries[id];
 }
 
 void AnimState_Clear(struct AnimState *s)
@@ -137,7 +137,7 @@ struct Actor *Racer_FindChaser(struct Actor *a, u8 mode)
 
     if (mode == 0xFF) {
         start = 4;
-        end = gGameEnemyCount + 4;
+        end = gGame.enemyCount + 4;
         mask = ~(1 << a->id);
     } else if (mode == 0) {
         start = 0;
@@ -145,7 +145,7 @@ struct Actor *Racer_FindChaser(struct Actor *a, u8 mode)
         mask = gPlayerMask & ~(1 << a->id);
     } else {
         start = 4;
-        end = gGameEnemyCount + 4;
+        end = gGame.enemyCount + 4;
         mask = ~(1 << a->id);
     }
     key = Racer_GetProgress(a);
@@ -176,25 +176,26 @@ u8 Racer_FindObstacle(struct Actor *a, struct Vec3 *pos, u8 *progress, s16 *rout
     struct Effect *trap;
     struct Effect *e;
     s32 i;
+    s32 j;
 
-    n = gGameEnemyCount + 4;
+    n = gGame.enemyCount + 4;
     mask = ~(1 << a->id);
     best = 0x7F;
     found = NULL;
     for (i = 0; i < n; i++) {
         if ((1 << i) & mask) {
             other = &gGame.actors[(u8)i];
-            d = (gActorProgress + (u8)i)->value - a->progress;
+            d = other->progress - a->progress;
             if (d >= 0 && best > d) {
                 best = d;
                 found = other;
             }
         }
     }
-    e = gGameEffects;
+    e = gGame.effects;
     trap = NULL;
     /* the original steps 28 bytes instead of sizeof(struct Effect) */
-    for (i = 0; i < 64; i++, e = (struct Effect *)((u8 *)e + 28)) {
+    for (j = 0; j < 64; j++, e = (struct Effect *)((u8 *)e + 28)) {
         if (e->active && e->type == EFFECT_TRAP) {
             d = e->u.trap.progress - a->progress;
             if (d >= 0 && best > d) {
@@ -309,7 +310,7 @@ void Racer_InitPlayer(struct Actor *a, u8 id, u8 chara)
     Racer_InitParams(a);
     a->id = id;
     a->pos.y = 0;
-    pt = &PointList_Get(gPointLists, POINTS_START)->pts[gGameActiveCount];
+    pt = &PointList_Get(gPointLists, POINTS_START)->pts[gGame.activeCount];
     a->pos.x = pt->x;
     a->pos.z = pt->y;
     if (a->data->palette <= 3)
@@ -606,7 +607,7 @@ void Racer_InitEnemy(struct Actor *a, u8 no)
     a->direction = (gStartHeading << 15) / 180;
     a->id = no + 4;
     a->pos.y = 0;
-    pt = &PointList_Get(gPointLists, POINTS_START)->pts[gGameActiveCount % 8];
+    pt = &PointList_Get(gPointLists, POINTS_START)->pts[gGame.activeCount % 8];
     a->pos.x = pt->x;
     a->pos.z = pt->y;
     if (a->data->palette <= 3) {

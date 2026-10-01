@@ -170,7 +170,9 @@ void Session_OnPlayerStat(u8 *p)
 {
     s32 i;
     s32 n;
+    s32 k;
     u8 *dst;
+    u8 *q;
 
     memset(&gSession, 0, sizeof(gSession));
     memset(gParty, 0, sizeof(gParty));
@@ -213,9 +215,9 @@ void Session_OnPlayerStat(u8 *p)
     p += n;
     memcpy(gSession.favorites, p, 8);
     p += 8;
-    dst = (u8 *)&gSession.gil;
-    for (i = 0; i < 4; i++)
-        dst[i] = *p++;
+    q = (u8 *)&gSession.gil;
+    for (k = 4; k != 0; k--)
+        *q++ = *p++;
 
     n = gSession.appearance & 3;
     if (n != sBackdropTribe) {

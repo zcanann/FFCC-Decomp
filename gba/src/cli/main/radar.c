@@ -194,19 +194,20 @@ void RadarScreen_DrawFrame(void)
 void Radar_DrawMapObjs(void)
 {
     s16 x, y;
-    s32 left, top, right, bottom;
+    s32 origin[2];
+    s32 right, bottom;
     s32 i;
 
     if (gMapObjs.count == 0)
         return;
     Radar_GetBasePos(&x, &y);
-    left = x - 80;
-    top = y - 64;
+    origin[0] = x - 80;
+    origin[1] = y - 64;
     right = x + 80;
     bottom = y + 64;
     for (i = 0; i < gMapObjs.count; i++) {
         s32 frame = gMapObjs.entries[i].type;
-        s32 dx, dy, n, stepx, stepy, ox, oy;
+        s32 dx, dy, n, stepx, stepy, j;
 
         if (!(gMapObjs.drawFlags & (1 << i)))
             continue;
@@ -226,21 +227,15 @@ void Radar_DrawMapObjs(void)
                 n++;
         }
         n++;
-        if (n <= 0)
-            continue;
-        oy = 0;
-        ox = 0;
-        do {
-            x = gMapObjs.entries[i].x0 + ox;
-            y = gMapObjs.entries[i].y0 + oy;
-            if (x >= left && right >= x && y >= top && bottom >= y) {
-                x -= left;
-                y -= top;
+        for (j = 0; j < n; j++) {
+            x = gMapObjs.entries[i].x0 + j * stepx;
+            y = gMapObjs.entries[i].y0 + j * stepy;
+            if (x >= origin[0] && right >= x && y >= origin[1] && bottom >= y) {
+                x -= origin[0];
+                y -= origin[1];
                 Obj_Draw(x - 4, y - 4, 2, frame, Obj_GetPalette(2, frame), 2, 0);
             }
-            oy += stepy;
-            ox += stepx;
-        } while (--n != 0);
+        }
     }
 }
 

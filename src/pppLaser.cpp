@@ -41,7 +41,7 @@ STATIC_ASSERT(offsetof(CMapCylinder, m_bound) == 0x28);
 
 static inline f32 LaserConst(const f32& value)
 {
-    return *reinterpret_cast<const f32*>(&value);
+    return value;
 }
 
 static inline pppLaserDataOffsets* GetLaserDataOffsets(_pppCtrlTable* ctrlTable)
@@ -63,264 +63,109 @@ STATIC_ASSERT(offsetof(pppLaser, m_workArea) == 0x80);
 
 /*
  * --INFO--
- * PAL Address: 801754e0
- * PAL Size: 3008b
+ * PAL Address: 801766ec
+ * PAL Size: 336b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable *ctrlTable)
+void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
 {
+    f32 zero = LaserConst(kPppLaserZero);
     LaserWork* work = GetLaserWork(laser, ctrlTable);
-    VColor* colorData = GetLaserColorData(laser, ctrlTable);
-    s32 dataValIndex = step->m_dataValIndex;
-    u32 count;
-    s32 i;
-    s32 alphaStep;
-    char alphaMax;
-    float negHalfWidth;
-    float length;
-    float halfWidth;
-    float u0;
-    float u1;
-    float uvStep;
-    pppFMATRIX mtxOut;
-    pppFMATRIX unitMtx;
-    Mtx shapeMtx;
-    Mtx rotateMtx;
-    Mtx debugMtx ATTRIBUTE_ALIGN(8);
-    Mtx pointMtx;
-    Mtx sphereMtx;
-    Vec shapePos;
-    Vec spherePos;
-    Vec debugSource;
-    _GXColor color;
-    CTexture* texture;
+    int particleIndex;
+    int playerIndex;
+    int hasSpecialInfo;
+    Vec playerPosition;
+    Vec targetCursorPosB;
 
-    if (dataValIndex == 0xFFFF) {
-        return;
-    }
+    work->m_length = LaserConst(kPppLaserZero);
+    work->m_graphValue3 = zero;
+    work->m_graphValue2 = zero;
+    work->m_halfWidth = zero;
+    work->m_graphValue1 = zero;
+    work->m_graphValue0 = zero;
+    work->m_lengthStep = zero;
+    work->m_points = 0;
+    work->m_origin.z = zero;
+    work->m_origin.y = zero;
+    work->m_origin.x = zero;
 
-    texture = GetTextureFromRSD(dataValIndex, ppvEnv);
-    pppSetBlendMode(step->m_laser.m_blendMode);
-    _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    pppSetDrawEnv(
-        &colorData->m_color, &laser->m_localMatrix, LaserConst(kPppLaserZero), step->m_laser.m_drawEnvColor1,
-        step->m_laser.m_drawEnvColor0, step->m_laser.m_blendMode, 0, 1, 1, 0);
-    GXSetNumTevStages(1);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    GXSetCullMode(GX_CULL_NONE);
-    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
-    color = *(_GXColor*)&colorData->m_color;
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
-    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
-    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
-    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    gUtil.SetVtxFmt_POS_CLR_TEX();
-    GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
+    work->m_shapeReady = 0;
+    work->m_hitFrame = 0;
+    work->m_unused2E = 0;
+    work->m_shapeArg0 = 0;
+    work->m_shapeArg2 = 0;
+    work->m_shapeArg1 = 0;
 
-    halfWidth = work->m_halfWidth;
-    length = work->m_length;
-    negHalfWidth = -halfWidth;
+    work->m_shapeRotation = Math.RandF(LaserConst(kPppLaserTau));
+    work->m_spawnEnabled = 1;
 
-    pppUnitMatrix(unitMtx);
-    pppMulMatrix(mtxOut, ppvMng->m_matrix, laser->m_localMatrix);
-    pppMulMatrix(mtxOut, *(pppFMATRIX*)&ppvCameraMatrix, mtxOut);
-    GXLoadPosMtxImm(mtxOut.value, 0);
+    hasSpecialInfo = Game.GetParticleSpecialInfo(ppvMng->m_hitParams, particleIndex, playerIndex);
+    if (hasSpecialInfo != 0) {
+        Game.GetTargetCursor(playerIndex, work->m_targetPosition, targetCursorPosB);
 
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(negHalfWidth, LaserConst(kPppLaserZero), LaserConst(kPppLaserZero));
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserZero), LaserConst(kPppLaserZero));
-    GXPosition3f32(negHalfWidth, LaserConst(kPppLaserZero), length);
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserZero), work->m_length);
-    GXPosition3f32(halfWidth, LaserConst(kPppLaserZero), LaserConst(kPppLaserZero));
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserOne), LaserConst(kPppLaserZero));
-    GXPosition3f32(halfWidth, LaserConst(kPppLaserZero), length);
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserOne), work->m_length);
-
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(LaserConst(kPppLaserZero), negHalfWidth, LaserConst(kPppLaserZero));
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserZero), LaserConst(kPppLaserZero));
-    GXPosition3f32(LaserConst(kPppLaserZero), negHalfWidth, length);
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserZero), work->m_length);
-    GXPosition3f32(LaserConst(kPppLaserZero), halfWidth, LaserConst(kPppLaserZero));
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserOne), LaserConst(kPppLaserZero));
-    GXPosition3f32(LaserConst(kPppLaserZero), halfWidth, length);
-    GXColor1u32(*(u32*)&color);
-    GXTexCoord2f32(LaserConst(kPppLaserOne), work->m_length);
-
-    if (step->m_stepValue != 0xFFFF) {
-        pppShapeSt* shape = ppvEnv->m_shapeTablePtr[step->m_stepValue];
-        PSMTXIdentity(shapeMtx);
-        shapeMtx[0][0] = step->m_laser.m_shapeScale * ppvMng->m_scale.x;
-        shapeMtx[1][1] = step->m_laser.m_shapeScale * ppvMng->m_scale.y;
-        shapeMtx[2][2] = shapeMtx[0][0];
-        if (LaserConst(kPppLaserZero) != work->m_shapeRotation) {
-            PSMTXRotRad(rotateMtx, 'z', work->m_shapeRotation);
-            PSMTXConcat(shapeMtx, rotateMtx, shapeMtx);
-        }
-        PSMTXMultVec(ppvCameraMatrix, work->m_points, &shapePos);
-        shapeMtx[0][3] = shapePos.x;
-        shapeMtx[1][3] = shapePos.y;
-        shapeMtx[2][3] = shapePos.z;
-        GXLoadPosMtxImm(shapeMtx, GX_PNMTX0);
-        pppDrawShp(static_cast<long*>(shape->m_animData), work->m_shapeArg2, ppvEnv->m_materialSetPtr,
-                   step->m_laser.m_blendMode);
-
-        count = step->m_laser.m_pointCount;
-        uvStep = LaserConst(kPppLaserOne) / (float)count;
-        if (step->m_initWOrk == 0xFFFF) {
-            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-            _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+        CGPartyObj* partyObj = Game.GetPartyObj(playerIndex);
+        playerPosition = partyObj->m_worldPosition;
+        if (particleIndex == 0x200) {
+            work->m_maxLength = PSVECDistance(&work->m_targetPosition, &playerPosition);
         } else {
-            texture = GetTextureFromRSD(step->m_initWOrk, ppvEnv);
-            _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-            GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
+            work->m_maxLength = LaserConst(kPppLaserMaxLengthDisabled);
         }
-
-        GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);
-        alphaMax = step->m_laser.m_trailAlpha;
-        alphaStep = (u8)((u8)alphaMax / (s32)step->m_laser.m_pointCount);
-        color.r = step->m_laser.m_trailColorR;
-        color.g = step->m_laser.m_trailColorG;
-        color.b = step->m_laser.m_trailColorB;
-        color.a = alphaMax;
-
-        GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 3));
-        u8 trailColorR = color.r;
-        u8 trailColorG = color.g;
-        u8 trailColorB = color.b;
-        for (int j = 0; j < (int)(step->m_laser.m_pointCount - 1); j++) {
-            u0 = uvStep * (float)j;
-            u1 = uvStep * (float)(j + 1);
-            _GXColor trailStartColor;
-            trailStartColor.r = trailColorR;
-            trailStartColor.g = trailColorG;
-            trailStartColor.b = trailColorB;
-            trailStartColor.a = (u8)alphaMax - alphaStep * j;
-
-            GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
-            GXColor1u32(*(u32*)&trailStartColor);
-            GXTexCoord2f32(u0, LaserConst(kPppLaserOne));
-
-            GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
-            GXColor1u32(*(u32*)&trailStartColor);
-            GXTexCoord2f32(u0, LaserConst(kPppLaserZero));
-
-            _GXColor trailEndColor;
-            trailEndColor.r = trailColorR;
-            trailEndColor.g = trailColorG;
-            trailEndColor.b = trailColorB;
-            trailEndColor.a = (u8)alphaMax - alphaStep * (j + 1);
-            GXPosition3f32(work->m_points[j + 1].x, work->m_points[j + 1].y, work->m_points[j + 1].z);
-            GXColor1u32(*(u32*)&trailEndColor);
-            GXTexCoord2f32(u1, LaserConst(kPppLaserZero));
-        }
-
-        if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
-            gUtil.SetVtxFmt_POS_CLR();
-            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-            _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-            GXSetNumTexGens(0);
-            pppSetBlendMode(1);
-
-            color.r = 0x80;
-            color.g = 0xFF;
-            color.b = 0x80;
-            color.a = 0xFF;
-            GXSetChanAmbColor(GX_COLOR0A0, color);
-            GXSetPointSize(0x28, GX_TO_ZERO);
-            GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(step->m_laser.m_pointCount - 1));
-            for (int j = 0; j < (int)(step->m_laser.m_pointCount - 1); j++) {
-                GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
-                GXColor1u32(*(u32*)&color);
-            }
-
-            color.r = 0x80;
-            color.g = 0x80;
-            color.b = 0xFF;
-            color.a = 0xFF;
-            GXSetChanAmbColor(GX_COLOR0A0, color);
-            GXSetLineWidth(0x14, GX_TO_ZERO);
-            GXBegin(GX_LINES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 4));
-            for (int j = 0; j < (int)(step->m_laser.m_pointCount - 1); j++) {
-                GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
-                GXColor1u32(*(u32*)&color);
-                GXPosition3f32(work->m_points[j + 1].x, work->m_points[j + 1].y, work->m_points[j + 1].z);
-                GXColor1u32(*(u32*)&color);
-                GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
-                GXColor1u32(*(u32*)&color);
-                GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
-                GXColor1u32(*(u32*)&color);
-            }
-
-            GXSetLineWidth(8, GX_TO_ZERO);
-            GXSetPointSize(8, GX_TO_ZERO);
-            GXSetZMode(1, GX_LEQUAL, 0);
-
-            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
-                float radius = ppvMng->m_hitScale * step->m_laser.m_hitScale;
-                float distance = PSVECDistance(work->m_points, &work->m_origin);
-                debugSource.x = LaserConst(kPppLaserZero);
-                debugSource.y = LaserConst(kPppLaserZero);
-                debugSource.z = LaserConst(kPppLaserOne);
-                color.r = 0xFF;
-                color.g = 0xFF;
-                color.b = 0xFF;
-                color.a = 0xFF;
-                PSMTXIdentity(debugMtx);
-                debugMtx[0][0] = radius;
-                debugMtx[1][1] = radius;
-                debugMtx[2][2] = distance;
-                PSMTXConcat(laser->m_localMatrix.value, debugMtx, debugMtx);
-                PSMTXConcat(ppvMng->m_matrix.value, debugMtx, debugMtx);
-                PSMTXConcat(ppvCameraMatrix, debugMtx, debugMtx);
-                PSMTXMultVec(debugMtx, &debugSource, &spherePos);
-                debugMtx[0][3] = spherePos.x;
-                debugMtx[1][3] = spherePos.y;
-                debugMtx[2][3] = spherePos.z;
-                Graphic.DrawSphere(debugMtx, color);
-            }
-
-            GXLoadPosMtxImm(laser->m_drawMatrix.value, GX_PNMTX0);
-            color.r = 0xFF;
-            color.g = 0xFF;
-            color.b = 0xFF;
-            color.a = 0xFF;
-            for (i = 0; i < (int)(u32)step->m_laser.m_pointCount; i++) {
-                if ((work->m_points[i].x == LaserConst(kPppLaserZero)) && (work->m_points[i].y == LaserConst(kPppLaserZero)) && (work->m_points[i].z == LaserConst(kPppLaserZero))) {
-                    continue;
-                }
-                PSMTXScale(
-                    pointMtx, LaserConst(kPppLaserDebugPointScale), LaserConst(kPppLaserDebugPointScale),
-                    LaserConst(kPppLaserDebugPointScale));
-                pointMtx[0][3] = work->m_points[i].x;
-                pointMtx[1][3] = work->m_points[i].y;
-                pointMtx[2][3] = work->m_points[i].z;
-                PSMTXConcat(ppvCameraMatrix, pointMtx, sphereMtx);
-                Graphic.DrawSphere(sphereMtx, color);
-            }
-
-            pointMtx[0][3] = work->m_origin.x;
-            pointMtx[1][3] = work->m_origin.y;
-            pointMtx[2][3] = work->m_origin.z;
-            PSMTXConcat(ppvCameraMatrix, pointMtx, sphereMtx);
-            Graphic.DrawSphere(sphereMtx, color);
-            pppInitBlendMode();
-        }
+    } else {
+        work->m_maxLength = LaserConst(kPppLaserMaxLengthDisabled);
+        ppvMng->m_hitBgFlag = 1;
+        pppStopSe(ppvMng, &ppvMng->m_soundEffectData);
     }
 }
+
+/*
+ * --INFO--
+ * PAL Address: 801766a8
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct2Laser(pppLaser *laser, _pppCtrlTable *ctrlTable)
+{
+    f32 zero = LaserConst(kPppLaserZero);
+    LaserWork* work = GetLaserWork(laser, ctrlTable);
+
+    work->m_graphValue3 = LaserConst(kPppLaserZero);
+    work->m_graphValue2 = zero;
+    work->m_halfWidth = zero;
+    work->m_graphValue1 = zero;
+    work->m_graphValue0 = zero;
+    work->m_lengthStep = zero;
+    work->m_origin.z = zero;
+    work->m_origin.y = zero;
+    work->m_origin.x = zero;
+    work->m_shapeReady = 0;
+}
+
+
+/*
+ * --INFO--
+ * PAL Address: 8017665c
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
+{
+    LaserWork* work = GetLaserWork(laser, ctrlTable);
+    void* alloc = work->m_points;
+    if (alloc != 0) {
+        pppMemFree(alloc);
+        work->m_points = 0;
+    }
+}
+
 
 /*
  * --INFO--
@@ -491,106 +336,265 @@ extern "C" void pppFrameLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable
     }
 }
 
+
 /*
  * --INFO--
- * PAL Address: 8017665c
- * PAL Size: 76b
+ * PAL Address: 801754e0
+ * PAL Size: 3008b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
+extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTable *ctrlTable)
 {
     LaserWork* work = GetLaserWork(laser, ctrlTable);
-    void* alloc = work->m_points;
-    if (alloc != 0) {
-        pppMemFree(alloc);
-        work->m_points = 0;
+    VColor* colorData = GetLaserColorData(laser, ctrlTable);
+    s32 dataValIndex = step->m_dataValIndex;
+    u32 count;
+    s32 i;
+    s32 alphaStep;
+    char alphaMax;
+    float negHalfWidth;
+    float length;
+    float halfWidth;
+    float u0;
+    float u1;
+    float uvStep;
+    pppFMATRIX mtxOut;
+    pppFMATRIX unitMtx;
+    Mtx shapeMtx;
+    Mtx rotateMtx;
+    Mtx debugMtx ATTRIBUTE_ALIGN(8);
+    Mtx pointMtx;
+    Mtx sphereMtx;
+    Vec shapePos;
+    Vec spherePos;
+    Vec debugSource;
+    _GXColor color;
+    CTexture* texture;
+
+    if (dataValIndex == 0xFFFF) {
+        return;
     }
-}
 
-/*
- * --INFO--
- * PAL Address: 801766a8
- * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstruct2Laser(pppLaser *laser, _pppCtrlTable *ctrlTable)
-{
-    f32 zero = LaserConst(kPppLaserZero);
-    LaserWork* work = GetLaserWork(laser, ctrlTable);
+    texture = GetTextureFromRSD(dataValIndex, ppvEnv);
+    pppSetBlendMode(step->m_laser.m_blendMode);
+    _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    pppSetDrawEnv(
+        &colorData->m_color, &laser->m_localMatrix, LaserConst(kPppLaserZero), step->m_laser.m_drawEnvColor1,
+        step->m_laser.m_drawEnvColor0, step->m_laser.m_blendMode, 0, 1, 1, 0);
+    GXSetNumTevStages(1);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    GXSetCullMode(GX_CULL_NONE);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+    color = *(_GXColor*)&colorData->m_color;
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
+    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
+    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
+    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    gUtil.SetVtxFmt_POS_CLR_TEX();
+    GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
 
-    work->m_graphValue3 = LaserConst(kPppLaserZero);
-    work->m_graphValue2 = zero;
-    work->m_halfWidth = zero;
-    work->m_graphValue1 = zero;
-    work->m_graphValue0 = zero;
-    work->m_lengthStep = zero;
-    work->m_origin.z = zero;
-    work->m_origin.y = zero;
-    work->m_origin.x = zero;
-    work->m_shapeReady = 0;
-}
+    halfWidth = work->m_halfWidth;
+    length = work->m_length;
+    negHalfWidth = -halfWidth;
 
-/*
- * --INFO--
- * PAL Address: 801766ec
- * PAL Size: 336b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructLaser(pppLaser *laser, _pppCtrlTable *ctrlTable)
-{
-    f32 zero = LaserConst(kPppLaserZero);
-    LaserWork* work = GetLaserWork(laser, ctrlTable);
-    int particleIndex;
-    int playerIndex;
-    int hasSpecialInfo;
-    Vec playerPosition;
-    Vec targetCursorPosB;
+    pppUnitMatrix(unitMtx);
+    pppMulMatrix(mtxOut, ppvMng->m_matrix, laser->m_localMatrix);
+    pppMulMatrix(mtxOut, *(pppFMATRIX*)&ppvCameraMatrix, mtxOut);
+    GXLoadPosMtxImm(mtxOut.value, 0);
 
-    work->m_length = LaserConst(kPppLaserZero);
-    work->m_graphValue3 = zero;
-    work->m_graphValue2 = zero;
-    work->m_halfWidth = zero;
-    work->m_graphValue1 = zero;
-    work->m_graphValue0 = zero;
-    work->m_lengthStep = zero;
-    work->m_points = 0;
-    work->m_origin.z = zero;
-    work->m_origin.y = zero;
-    work->m_origin.x = zero;
+    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+    GXPosition3f32(negHalfWidth, LaserConst(kPppLaserZero), LaserConst(kPppLaserZero));
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(LaserConst(kPppLaserZero), LaserConst(kPppLaserZero));
+    GXPosition3f32(negHalfWidth, LaserConst(kPppLaserZero), length);
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(LaserConst(kPppLaserZero), work->m_length);
+    GXPosition3f32(halfWidth, LaserConst(kPppLaserZero), LaserConst(kPppLaserZero));
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(LaserConst(kPppLaserOne), LaserConst(kPppLaserZero));
+    GXPosition3f32(halfWidth, LaserConst(kPppLaserZero), length);
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(LaserConst(kPppLaserOne), work->m_length);
 
-    work->m_shapeReady = 0;
-    work->m_hitFrame = 0;
-    work->m_unused2E = 0;
-    work->m_shapeArg0 = 0;
-    work->m_shapeArg2 = 0;
-    work->m_shapeArg1 = 0;
+    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+    GXPosition3f32(LaserConst(kPppLaserZero), negHalfWidth, LaserConst(kPppLaserZero));
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(LaserConst(kPppLaserZero), LaserConst(kPppLaserZero));
+    GXPosition3f32(LaserConst(kPppLaserZero), negHalfWidth, length);
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(LaserConst(kPppLaserZero), work->m_length);
+    GXPosition3f32(LaserConst(kPppLaserZero), halfWidth, LaserConst(kPppLaserZero));
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(LaserConst(kPppLaserOne), LaserConst(kPppLaserZero));
+    GXPosition3f32(LaserConst(kPppLaserZero), halfWidth, length);
+    GXColor1u32(*(u32*)&color);
+    GXTexCoord2f32(LaserConst(kPppLaserOne), work->m_length);
 
-    work->m_shapeRotation = Math.RandF(LaserConst(kPppLaserTau));
-    work->m_spawnEnabled = 1;
-
-    hasSpecialInfo = Game.GetParticleSpecialInfo(ppvMng->m_hitParams, particleIndex, playerIndex);
-    if (hasSpecialInfo != 0) {
-        Game.GetTargetCursor(playerIndex, work->m_targetPosition, targetCursorPosB);
-
-        CGPartyObj* partyObj = Game.GetPartyObj(playerIndex);
-        playerPosition = partyObj->m_worldPosition;
-        if (particleIndex == 0x200) {
-            work->m_maxLength = PSVECDistance(&work->m_targetPosition, &playerPosition);
-        } else {
-            work->m_maxLength = LaserConst(kPppLaserMaxLengthDisabled);
+    if (step->m_stepValue != 0xFFFF) {
+        pppShapeSt* shape = ppvEnv->m_shapeTablePtr[step->m_stepValue];
+        PSMTXIdentity(shapeMtx);
+        shapeMtx[0][0] = step->m_laser.m_shapeScale * ppvMng->m_scale.x;
+        shapeMtx[1][1] = step->m_laser.m_shapeScale * ppvMng->m_scale.y;
+        shapeMtx[2][2] = shapeMtx[0][0];
+        if (LaserConst(kPppLaserZero) != work->m_shapeRotation) {
+            PSMTXRotRad(rotateMtx, 'z', work->m_shapeRotation);
+            PSMTXConcat(shapeMtx, rotateMtx, shapeMtx);
         }
-    } else {
-        work->m_maxLength = LaserConst(kPppLaserMaxLengthDisabled);
-        ppvMng->m_hitBgFlag = 1;
-        pppStopSe(ppvMng, &ppvMng->m_soundEffectData);
+        PSMTXMultVec(ppvCameraMatrix, work->m_points, &shapePos);
+        shapeMtx[0][3] = shapePos.x;
+        shapeMtx[1][3] = shapePos.y;
+        shapeMtx[2][3] = shapePos.z;
+        GXLoadPosMtxImm(shapeMtx, GX_PNMTX0);
+        pppDrawShp(static_cast<long*>(shape->m_animData), work->m_shapeArg2, ppvEnv->m_materialSetPtr,
+                   step->m_laser.m_blendMode);
+
+        count = step->m_laser.m_pointCount;
+        uvStep = LaserConst(kPppLaserOne) / (float)count;
+        if (step->m_initWOrk == 0xFFFF) {
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+        } else {
+            texture = GetTextureFromRSD(step->m_initWOrk, ppvEnv);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+            GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
+        }
+
+        GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);
+        alphaMax = step->m_laser.m_trailAlpha;
+        alphaStep = (u8)((u8)alphaMax / (s32)step->m_laser.m_pointCount);
+        color.r = step->m_laser.m_trailColorR;
+        color.g = step->m_laser.m_trailColorG;
+        color.b = step->m_laser.m_trailColorB;
+        color.a = alphaMax;
+
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 3));
+        u8 trailColorR = color.r;
+        u8 trailColorG = color.g;
+        u8 trailColorB = color.b;
+        for (int j = 0; j < (int)(step->m_laser.m_pointCount - 1); j++) {
+            u0 = uvStep * (float)j;
+            u1 = uvStep * (float)(j + 1);
+            _GXColor trailStartColor;
+            trailStartColor.r = trailColorR;
+            trailStartColor.g = trailColorG;
+            trailStartColor.b = trailColorB;
+            trailStartColor.a = (u8)alphaMax - alphaStep * j;
+
+            _GXColor trailEndColor;
+            trailEndColor.r = trailColorR;
+            trailEndColor.g = trailColorG;
+            trailEndColor.b = trailColorB;
+            trailEndColor.a = (u8)alphaMax - alphaStep * (j + 1);
+
+            GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
+            GXColor1u32(*(u32*)&trailStartColor);
+            GXTexCoord2f32(u0, LaserConst(kPppLaserOne));
+
+            GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
+            GXColor1u32(*(u32*)&trailStartColor);
+            GXTexCoord2f32(u0, LaserConst(kPppLaserZero));
+
+            GXPosition3f32(work->m_points[j + 1].x, work->m_points[j + 1].y, work->m_points[j + 1].z);
+            GXColor1u32(*(u32*)&trailEndColor);
+            GXTexCoord2f32(u1, LaserConst(kPppLaserZero));
+        }
+
+        if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
+            gUtil.SetVtxFmt_POS_CLR();
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+            GXSetNumTexGens(0);
+            pppSetBlendMode(1);
+
+            color.r = 0x80;
+            color.g = 0xFF;
+            color.b = 0x80;
+            color.a = 0xFF;
+            GXSetChanAmbColor(GX_COLOR0A0, color);
+            GXSetPointSize(0x28, GX_TO_ZERO);
+            GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(step->m_laser.m_pointCount - 1));
+            for (int j = 0; j < (int)(step->m_laser.m_pointCount - 1); j++) {
+                GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
+                GXColor1u32(*(u32*)&color);
+            }
+
+            color.r = 0x80;
+            color.g = 0x80;
+            color.b = 0xFF;
+            color.a = 0xFF;
+            GXSetChanAmbColor(GX_COLOR0A0, color);
+            GXSetLineWidth(0x14, GX_TO_ZERO);
+            GXBegin(GX_LINES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 4));
+            for (int j = 0; j < (int)(step->m_laser.m_pointCount - 1); j++) {
+                GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
+                GXColor1u32(*(u32*)&color);
+                GXPosition3f32(work->m_points[j + 1].x, work->m_points[j + 1].y, work->m_points[j + 1].z);
+                GXColor1u32(*(u32*)&color);
+                GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
+                GXColor1u32(*(u32*)&color);
+                GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
+                GXColor1u32(*(u32*)&color);
+            }
+
+            GXSetLineWidth(8, GX_TO_ZERO);
+            GXSetPointSize(8, GX_TO_ZERO);
+            GXSetZMode(1, GX_LEQUAL, 0);
+
+            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
+                float radius = ppvMng->m_hitScale * step->m_laser.m_hitScale;
+                float distance = PSVECDistance(work->m_points, &work->m_origin);
+                debugSource.x = LaserConst(kPppLaserZero);
+                debugSource.y = LaserConst(kPppLaserZero);
+                debugSource.z = LaserConst(kPppLaserOne);
+                color.r = 0xFF;
+                color.g = 0xFF;
+                color.b = 0xFF;
+                color.a = 0xFF;
+                PSMTXIdentity(debugMtx);
+                debugMtx[0][0] = radius;
+                debugMtx[1][1] = radius;
+                debugMtx[2][2] = distance;
+                PSMTXConcat(laser->m_localMatrix.value, debugMtx, debugMtx);
+                PSMTXConcat(ppvMng->m_matrix.value, debugMtx, debugMtx);
+                PSMTXConcat(ppvCameraMatrix, debugMtx, debugMtx);
+                PSMTXMultVec(debugMtx, &debugSource, &spherePos);
+                debugMtx[0][3] = spherePos.x;
+                debugMtx[1][3] = spherePos.y;
+                debugMtx[2][3] = spherePos.z;
+                Graphic.DrawSphere(debugMtx, color);
+            }
+
+            GXLoadPosMtxImm(laser->m_drawMatrix.value, GX_PNMTX0);
+            color.r = 0xFF;
+            color.g = 0xFF;
+            color.b = 0xFF;
+            color.a = 0xFF;
+            for (i = 0; i < (int)(u32)step->m_laser.m_pointCount; i++) {
+                if ((work->m_points[i].x == LaserConst(kPppLaserZero)) && (work->m_points[i].y == LaserConst(kPppLaserZero)) && (work->m_points[i].z == LaserConst(kPppLaserZero))) {
+                    continue;
+                }
+                PSMTXScale(
+                    pointMtx, LaserConst(kPppLaserDebugPointScale), LaserConst(kPppLaserDebugPointScale),
+                    LaserConst(kPppLaserDebugPointScale));
+                pointMtx[0][3] = work->m_points[i].x;
+                pointMtx[1][3] = work->m_points[i].y;
+                pointMtx[2][3] = work->m_points[i].z;
+                PSMTXConcat(ppvCameraMatrix, pointMtx, sphereMtx);
+                Graphic.DrawSphere(sphereMtx, color);
+            }
+
+            pointMtx[0][3] = work->m_origin.x;
+            pointMtx[1][3] = work->m_origin.y;
+            pointMtx[2][3] = work->m_origin.z;
+            PSMTXConcat(ppvCameraMatrix, pointMtx, sphereMtx);
+            Graphic.DrawSphere(sphereMtx, color);
+            pppInitBlendMode();
+        }
     }
 }

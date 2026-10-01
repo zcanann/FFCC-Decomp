@@ -680,7 +680,7 @@ void Window_OpenStyle4(struct Window *win, s32 tile, s32 pal)
         if (n > 0 && n <= win->rows * 2) {
             t = Window_GetTextTile(win->slot);
             odd = !(n & 1);
-            t += win->width * 2 * ((n - 1) >> 1);
+            t += ((n - 1) >> 1) * win->width * 2;
             t += odd;
             if (n <= 4)
                 attr = 7 << 12;

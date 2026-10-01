@@ -60,7 +60,7 @@ void Camera_RayFloor(struct Field *field, struct Vec3 *pos, struct Vec3 *dir, st
     out->z = pos->z - dir->z * pos->y / dir->y;
 }
 
-static inline void SetVec(struct Vec3 *v, s16 x, s16 y, s16 z)
+static inline void SetVec(s16 x, s16 y, s16 z, struct Vec3 *v)
 {
     v->x = x;
     v->y = y;
@@ -77,12 +77,12 @@ void Floor_BuildDepths(struct Field *field)
     s32 i;
     struct Vec3 *eye;
 
-    SetVec(&zero, 0, 0, 0);
+    SetVec(0, 0, 0, &zero);
     Camera_Follow(&gCamera, &zero, 0, 0, 1);
     eye = &gCamera.pos;
     gMain.horizon = 0;
     for (i = 0; i < 160; i++) {
-        SetVec(&v, 120, i, 160);
+        SetVec(120, i, 160, &v);
         Camera_ScreenToWorld(&gCamera, &v, &out);
         out.x -= eye->x;
         out.y -= eye->y;

@@ -748,7 +748,7 @@ config.libs = [
             Object(Matching, "pppYmCallBack.cpp"),
             Object(NonMatching, "pppYmChangeTex.cpp"),
             Object(Matching, "pppYmCheckBGHeight.cpp"),
-            Object(NonMatching, "pppYmDeformationMdl.cpp"),
+            Object(Matching, "pppYmDeformationMdl.cpp"),
             Object(Matching, "pppYmDeformationScreen.cpp"),
             Object(NonMatching, "pppYmDeformationShp.cpp"),
             Object(NonMatching, "pppYmDrawMdlTexAnm.cpp"),

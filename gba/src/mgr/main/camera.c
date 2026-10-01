@@ -19,11 +19,6 @@ void Camera_Init(struct Camera *cam)
     Camera_SetPitch(cam, 0xF600);
 }
 
-static inline s32 IsActive(s32 no)
-{
-    return (1 << no) & *(u8 *)&gPlayerMask;
-}
-
 void Camera_Update(struct Camera *cam)
 {
     u16 keys = REG_KEYINPUT ^ KEY_MASK;

@@ -19,16 +19,6 @@ CPad Pad;
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
 
-static const char s_CPad[] = "CPad";
-static const char s_replay_dat[] = "/replay.dat";
-static const char s_replay_host_msg[] = {
-    0x43, 0x50, 0x61, 0x64, 0x2E, 0x49, 0x6E, 0x69, 0x74, 0x3A, 0x20, 0x68, 0x6F,
-    0x73, 0x74, 0x82, 0xA9, 0x82, 0xE7, 0x96, 0xF1, 0x25, 0x64, 0x95, 0x62, 0x82,
-    0xCC, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x8C, 0x83, 0x43, 0x83, 0x66, 0x81, 0x5B,
-    0x83, 0x5E, 0x82, 0xF0, 0x93, 0xC7, 0x82, 0xDD, 0x8D, 0x9E, 0x82, 0xDD, 0x82,
-    0xDC, 0x82, 0xB5, 0x82, 0xBD, 0x81, 0x42, 0x0A, 0x00, 0x00, 0x00, 0x00,
-};
-
 extern "C" {
 PADStatus g_pad[4];
 }
@@ -42,27 +32,81 @@ typedef char CPad_m_replayFrame_offset_check[(offsetof(CPad, m_replayFrame) == 0
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 156b
+ * PAL Address: 0x80021008
+ * PAL Size: 416b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CPad::SaveReplayData()
+void CPad::Init()
 {
-    ReplayBuffer* replay = m_replayBuffer;
+	FILE* fp;
+	int frames;
+	int size;
 
-    if ((replay != 0) && (replay->recordMode != 0) && (replay->cursor <= sizeof(ReplayBuffer)) &&
-        (replay->frameCount != 0)) {
-        FILE* fp = fopen(s_replay_dat, "wb");
-        if (fp != 0) {
-            fwrite(replay, 1, replay->cursor, fp);
-            fclose(fp);
-        }
-    }
+	PADInit();
+	memset(m_padInputs, 0, sizeof(m_padInputs));
+	m_padConnectedMask = 0;
+	m_replayStage = 0;
+	m_replayBuffer = 0;
+	m_replayFrame = 0;
+	m_debugPadPort = 0xFFFFFFFF;
+	m_stickDigitalThreshold = 1;
+
+	if (System.IsGdev())
+	{
+		m_replayStage = Memory.CreateStage(0x800000, "CPad", 1);
+		if (m_replayStage != 0)
+		{
+			m_replayBuffer = reinterpret_cast<ReplayBuffer*>(new (reinterpret_cast<CMemory::CStage*>(m_replayStage), "pad.cpp", 0x54)
+				unsigned char[sizeof(ReplayBuffer)]);
+			if ((m_replayPlayback != 0) && ((fp = fopen("/replay.dat", "rb")) != 0))
+			{
+				fseek(fp, 0, 2);
+				size = ftell(fp);
+				fseek(fp, 0, 0);
+				fread(m_replayBuffer, 1, size, fp);
+				fclose(fp);
+				m_replayBuffer->recordMode = 0;
+				frames = m_replayBuffer->frameCount;
+				System.Printf("CPad.Init: host\x82\xA9\x82\xE7\x96\xF1%d\x95\x62\x82\xCC"
+					"\x83\x8A\x83\x76\x83\x8C\x83\x43\x83\x66\x81\x5B\x83\x5E\x82\xF0"
+					"\x93\xC7\x82\xDD\x8D\x9E\x82\xDD\x82\xDC\x82\xB5\x82\xBD\x81\x42\n", frames / 30);
+			}
+			else
+			{
+				m_replayBuffer->cursor = 0xC;
+				m_replayBuffer->frameCount = 0;
+				m_replayBuffer->recordMode = 1;
+			}
+		}
+	}
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80020fb0
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPad::Quit()
+{
+	if (m_replayBuffer != 0)
+	{
+		delete[] reinterpret_cast<unsigned char*>(m_replayBuffer);
+		m_replayBuffer = 0;
+	}
+
+	CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(m_replayStage);
+	if (stage != 0)
+	{
+		Memory.DestroyStage(stage);
+	}
+}
 
 /*
  * --INFO--
@@ -134,10 +178,10 @@ void CPad::Frame()
 			if (static_cast<u8>(Joybus.GBAReady(port)) == 0) {
 				resetMask |= mask;
 			}
-			m_padConnectedMask &= ~mask;
+			m_padConnectedMask = m_padConnectedMask & ~mask;
 			break;
 		case PAD_ERR_NOT_READY:
-			m_padConnectedMask &= ~mask;
+			m_padConnectedMask = m_padConnectedMask & ~mask;
 			break;
 		}
 	}
@@ -147,7 +191,6 @@ void CPad::Frame()
 
 	u32 port;
 	PadInput* input;
-	s8 axisValue;
 
 	const float zero = 0.0f;
 	merged->buttonPrev[0] = merged->button[0];
@@ -180,7 +223,7 @@ void CPad::Frame()
 	merged->lockedButton[1] = 0;
 	merged->lockedButton[0] = 0;
 	merged->activeMask = 0;
-	do
+	while (port < 4)
 	{
 		input = &m_padInputs[port];
 		for (int channel = 0; channel < 2; channel++)
@@ -368,28 +411,24 @@ void CPad::Frame()
 						static_cast<u16>(merged->lockedButton[0] | input->lockedButton[0]);
 					merged->lockedButton[2] =
 						static_cast<u16>(merged->lockedButton[2] | input->lockedButton[2]);
-					axisValue = input->stickX;
-					if (__abs(merged->stickX) < __abs(axisValue))
+					if (__abs(merged->stickX) < __abs(input->stickX))
 					{
-						merged->stickX = axisValue;
+						merged->stickX = input->stickX;
 						merged->stickXF = input->stickXF;
 					}
-					axisValue = input->stickY;
-					if (__abs(merged->stickY) < __abs(axisValue))
+					if (__abs(merged->stickY) < __abs(input->stickY))
 					{
-						merged->stickY = axisValue;
+						merged->stickY = input->stickY;
 						merged->stickYF = input->stickYF;
 					}
-					axisValue = input->substickX;
-					if (__abs(merged->substickX) < __abs(axisValue))
+					if (__abs(merged->substickX) < __abs(input->substickX))
 					{
-						merged->substickX = axisValue;
+						merged->substickX = input->substickX;
 						merged->substickXF = input->substickXF;
 					}
-					axisValue = input->substickY;
-					if (__abs(merged->substickY) < __abs(axisValue))
+					if (__abs(merged->substickY) < __abs(input->substickY))
 					{
-						merged->substickY = axisValue;
+						merged->substickY = input->substickY;
 						merged->substickYF = input->substickYF;
 					}
 					if (merged->triggerLeft < input->triggerLeft)
@@ -408,7 +447,7 @@ void CPad::Frame()
 		port = port + 1;
 		rawPad++;
 		gba++;
-	} while (port < 4);
+	}
 
 	if (m_replayFrame >= 0)
 	{
@@ -419,76 +458,23 @@ void CPad::Frame()
 
 /*
  * --INFO--
- * PAL Address: 0x80020fb0
- * PAL Size: 88b
+ * PAL Address: UNUSED
+ * PAL Size: 156b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPad::Quit()
+inline void CPad::SaveReplayData()
 {
-	if (m_replayBuffer != 0)
-	{
-		delete[] reinterpret_cast<unsigned char*>(m_replayBuffer);
-		m_replayBuffer = 0;
-	}
+    ReplayBuffer* replay = m_replayBuffer;
 
-	CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(m_replayStage);
-	if (stage != 0)
-	{
-		Memory.DestroyStage(stage);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80021008
- * PAL Size: 416b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPad::Init()
-{
-	FILE* fp;
-	int frames;
-	int size;
-
-	PADInit();
-	memset(m_padInputs, 0, sizeof(m_padInputs));
-	m_padConnectedMask = 0;
-	m_replayStage = 0;
-	m_replayBuffer = 0;
-	m_replayFrame = 0;
-	m_debugPadPort = 0xFFFFFFFF;
-	m_stickDigitalThreshold = 1;
-
-	if (System.IsGdev())
-	{
-		m_replayStage = Memory.CreateStage(0x800000, const_cast<char*>(s_CPad), 1);
-		if (m_replayStage != 0)
-		{
-			m_replayBuffer = reinterpret_cast<ReplayBuffer*>(new (reinterpret_cast<CMemory::CStage*>(m_replayStage), "pad.cpp", 0x54)
-				unsigned char[sizeof(ReplayBuffer)]);
-			if ((m_replayPlayback != 0) && ((fp = fopen(s_replay_dat, "rb")) != 0))
-			{
-				fseek(fp, 0, 2);
-				size = ftell(fp);
-				fseek(fp, 0, 0);
-				fread(m_replayBuffer, 1, size, fp);
-				fclose(fp);
-				m_replayBuffer->recordMode = 0;
-				frames = m_replayBuffer->frameCount;
-				System.Printf(const_cast<char*>(s_replay_host_msg), frames / 30);
-			}
-			else
-			{
-				m_replayBuffer->cursor = 0xC;
-				m_replayBuffer->frameCount = 0;
-				m_replayBuffer->recordMode = 1;
-			}
-		}
-	}
+    if ((replay != 0) && (replay->recordMode != 0) && (replay->cursor <= sizeof(ReplayBuffer)) &&
+        (replay->frameCount != 0)) {
+        FILE* fp = fopen("/replay.dat", "wb");
+        if (fp != 0) {
+            fwrite(replay, 1, replay->cursor, fp);
+            fclose(fp);
+        }
+    }
 }

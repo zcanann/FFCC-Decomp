@@ -777,13 +777,14 @@ u32 d;
 
     for (i = 0; i < 9; i++)
         buf[i] = 0;
-    buf[0] = a;
-    buf[1] = b;
-    buf[2] = c;
-    buf[3] = d >> 24;
-    buf[4] = d >> 16;
-    buf[5] = d >> 8;
-    buf[6] = d;
+    i = 0;
+    buf[i++] = a;
+    buf[i++] = b;
+    buf[i++] = c;
+    buf[i++] = d >> 24;
+    buf[i++] = d >> 16;
+    buf[i++] = d >> 8;
+    buf[i++] = d;
     crc = 0xFFFF;
     sum = Crc16(7, buf, &crc);
     packet = 0;
@@ -791,21 +792,22 @@ u32 d;
     p[0] = 21;
     p[1] = sum >> 8;
     p[2] = sum;
-    p[3] = buf[0];
+    i = 0;
+    p[3] = buf[i++];
     if (Link_Write(packet) != 0)
         return -1;
     packet = 0;
     p[0] = 0x55;
-    p[1] = buf[1];
-    p[2] = buf[2];
-    p[3] = buf[3];
+    p[1] = buf[i++];
+    p[2] = buf[i++];
+    p[3] = buf[i++];
     if (Link_Write(packet) != 0)
         return -1;
     packet = 0;
     p[0] = 0x95;
-    p[1] = buf[4];
-    p[2] = buf[5];
-    p[3] = buf[6];
+    p[1] = buf[i++];
+    p[2] = buf[i++];
+    p[3] = buf[i++];
     return Link_Write(packet);
 }
 

@@ -232,10 +232,8 @@ void Text_LoadPalette(s32 no, s32 id, s32 base)
     u16 buf[16];
     u16 *tbl;
     u16 *pal;
-    u16 *dst;
     u8 *src;
     s32 i;
-    u16 c;
 
     if (gSpMode == 0) {
         tbl = (u16 *)&gTextGfx;
@@ -244,7 +242,7 @@ void Text_LoadPalette(s32 no, s32 id, s32 base)
         tbl = gSpTextPalettes[0];
     }
     pal = tbl + base * 16;
-    dst = (u16 *)(0x05000000 + no * 32);
+    tbl = (u16 *)(0x05000000 + no * 32);
     if (gSpMode == 0) {
         src = gFont.palettes + (u8 *)&gFont;
         src += id * 32;
@@ -254,15 +252,14 @@ void Text_LoadPalette(s32 no, s32 id, s32 base)
     }
     DmaCopy16(3, src, buf, 32);
     for (i = 1; i <= 2; i++) {
-        c = buf[i];
-        buf[i | 4] = c;
-        buf[i | 8] = c;
-        buf[i | 12] = c;
+        *(buf + (i | 4)) = *(buf + i);
+        *(buf + (i | 8)) = *(buf + i);
+        *(buf + (i | 12)) = *(buf + i);
     }
     buf[4] = pal[4];
     buf[8] = pal[8];
     buf[12] = pal[12];
-    DmaCopy16(3, buf, dst, 32);
+    DmaCopy16(3, buf, tbl, 32);
 }
 
 void Font_LoadPalette(u32 dst, s32 no)

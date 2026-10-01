@@ -91,6 +91,22 @@ extern const char gJoyAgbId[];
 extern const char gJoyGcId[];
 extern const char gJoyBusFileName[];
 
+static inline s32 IsActive(s32 no)
+{
+    return (1 << no) & *(u8 *)&gPlayerMask;
+}
+
+static inline void CountPlayers(void)
+{
+    s32 i;
+
+    gPlayerCount = 0;
+    for (i = 0; i < 4; i++) {
+        if ((gPlayerMask >> i) & 1)
+            gPlayerCount++;
+    }
+}
+
 void ReadKeys(void);
 u32 Crc8(u32 data);
 s32 Link_Recv(u32 data);

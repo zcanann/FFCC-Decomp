@@ -623,6 +623,7 @@ void Window_OpenStyle4(struct Window *win, s32 tile, s32 pal)
     s32 t;
     s32 n;
     s32 odd;
+    s32 grp;
     s32 attr;
     u16 *map;
 
@@ -681,7 +682,8 @@ void Window_OpenStyle4(struct Window *win, s32 tile, s32 pal)
         if (n > 0 && n <= win->rows * 2) {
             t = Window_GetTextTile(win->slot);
             odd = !(n & 1);
-            t += ((n - 1) >> 1) * win->width * 2;
+            grp = (n - 1) >> 1;
+            t += win->width * 2 * grp;
             t += odd;
             if (n <= 4)
                 attr = 7 << 12;

@@ -180,7 +180,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float segDy;
     float segDz;
     float invCountMinusOne;
-    float drawScale;
     float posZ;
     int life;
     s32 shapeFrameDuration;
@@ -213,7 +212,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     xDiff = colorStart.x - colorEnd.x;
     yDiff = colorStart.y - colorEnd.y;
     zDiff = colorStart.z - colorEnd.z;
-    if (invCountMinusOne != kPppKeShpTail3XZero) {
+    if (invCountMinusOne != segCursor) {
         colorStepY = yDiff / invCountMinusOne;
         colorStepZ = zDiff / invCountMinusOne;
         colorStepW = wDiff / invCountMinusOne;
@@ -274,19 +273,15 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     }
 
 draw_loop:
-    drawScale = shapeScale;
-
     {
         u32 lcg = (u32)rng * 0x80du + 7u;
         rng = (u16)lcg;
-        drawScale *= -(((float)rng / kPppKeShpTail3XRandomMax) * step->m_randomScale - kPppKeShpTail3XOne);
+        float random = (float)rng / kPppKeShpTail3XRandomMax;
+        shapeScale *= -(random * step->m_randomScale - kPppKeShpTail3XOne);
         {
             u32 shapeIdx = (u32)(life + rng) / shapeFrameDuration;
-            u32 shapeOffset = (shapeIdx % (u32)shapeFrameCount) * sizeof(pppShapeAnimFrame) +
-                              offsetof(pppShapeAnimData, m_frames);
-            pppShapeAnimFrame* frame = reinterpret_cast<pppShapeAnimFrame*>(
-                reinterpret_cast<u8*>(shapeAnim) + shapeOffset);
-            shapeEntry = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + frame->m_shapeOffset);
+            shapeIdx %= (u32)shapeFrameCount;
+            shapeEntry = pppShapeFrame(shapeAnim, shapeIdx);
         }
     }
 
@@ -296,9 +291,9 @@ draw_loop:
 
     if (step->m_worldSpaceMode == 0) {
         PSMTXScaleApply(obj->m_object.m_localMatrix.value, obj->m_object.m_drawMatrix.value,
-                        localBase.value[0][0] * (drawScale * ppvMng->m_scale.x),
-                        localBase.value[1][1] * (drawScale * ppvMng->m_scale.y),
-                        localBase.value[2][2] * (drawScale * ppvMng->m_scale.z));
+                        localBase.value[0][0] * (shapeScale * ppvMng->m_scale.x),
+                        localBase.value[1][1] * (shapeScale * ppvMng->m_scale.y),
+                        localBase.value[2][2] * (shapeScale * ppvMng->m_scale.z));
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
             PSMTXRotRad(rotMtxA.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
             pppMulMatrix(obj->m_object.m_drawMatrix, rotMtxA, obj->m_object.m_drawMatrix);
@@ -307,9 +302,9 @@ draw_loop:
         PSMTXCopy(obj->m_object.m_drawMatrix.value, drawMtx.value);
     } else if (step->m_worldSpaceMode == 1) {
         pppUnitMatrix(drawMtx);
-        drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * ppvMng->m_scale.x);
-        drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * ppvMng->m_scale.y);
-        drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * ppvMng->m_scale.z);
+        drawMtx.value[0][0] = shapeScale * (localBase.value[0][0] * ppvMng->m_scale.x);
+        drawMtx.value[1][1] = shapeScale * (localBase.value[1][1] * ppvMng->m_scale.y);
+        drawMtx.value[2][2] = shapeScale * (localBase.value[2][2] * ppvMng->m_scale.z);
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
             PSMTXRotRad(rotMtxB.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
             pppMulMatrix(drawMtx, rotMtxB, drawMtx);
@@ -321,7 +316,11 @@ draw_loop:
     drawMtx.value[1][3] = pos.y;
     drawMtx.value[2][3] = pos.z;
 
-    zEnable = (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5);
+    if (step->m_zDisable) {
+        zEnable = 0;
+    } else {
+        zEnable = 1;
+    }
     pppSetDrawEnv(
         0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : kPppKeShpTail3XZero, 0, step->m_drawA,
         step->m_blendMode, 0, zEnable, 1, 0);
@@ -378,18 +377,15 @@ advance_segment:
     startY = nextBaseY;
     startZ = nextBaseZ;
     segCursor -= segLen;
-    nextBaseY = history[nextIndex].y;
-    nextBaseZ = history[nextIndex].z;
-    nextBaseX = history[nextIndex].x;
-    segDy = nextBaseY - startY;
-    segDz = nextBaseZ - startZ;
-    segDx = nextBaseX - startX;
-    seg.y = segDy;
-    seg.z = segDz;
-    seg.x = segDx;
+    segDy = (nextBaseY = history[nextIndex].y) - startY;
+    segDz = (nextBaseZ = history[nextIndex].z) - startZ;
+    segDx = (nextBaseX = history[nextIndex].x) - startX;
     zeroVecB.z = kPppKeShpTail3XZero;
     zeroVecB.y = kPppKeShpTail3XZero;
     zeroVecB.x = kPppKeShpTail3XZero;
+    seg.x = segDx;
+    seg.y = segDy;
+    seg.z = segDz;
     segLen = PSVECDistance(&zeroVecB, &seg);
     segRemain += segLen;
     goto advance_segment;

@@ -598,7 +598,7 @@ config.libs = [
             Object(Matching, "p_system.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "p_tina.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "p_usb.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
-            Object(NonMatching, "pad.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(Matching, "pad.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "partMng.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
             Object(Matching, "pppsintbl.cpp"),
             Object(NonMatching, "partyobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),

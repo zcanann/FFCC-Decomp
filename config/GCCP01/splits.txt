@@ -67,6 +67,7 @@ math.cpp:
 	extabindex  start:0x8000B1F4 end:0x8000B2CC
 	.text       start:0x8001A230 end:0x8001C2F0
 	.ctors      start:0x801D53B0 end:0x801D53B4
+	.rodata     start:0x801D6498 end:0x801D64A8
 	.data       start:0x801E8450 end:0x801E846C
 	.bss        start:0x8023C4D8 end:0x8023C884
 	.sdata      start:0x8032E400 end:0x8032E410
@@ -99,7 +100,7 @@ p_usb.cpp:
 	extabindex  start:0x8000B440 end:0x8000B4AC
 	.text       start:0x8001FF6C end:0x80020494
 	.ctors      start:0x801D53BC end:0x801D53C0
-	.rodata     start:0x801D6CF0 end:0x801D6D24
+	.rodata     start:0x801D6CF0 end:0x801D6D28
 	.data       start:0x801E8690 end:0x801E8854
 	.bss        start:0x80244028 end:0x8024413C
 	.sdata      start:0x8032E440 end:0x8032E458
@@ -111,7 +112,7 @@ pad.cpp:
 	extabindex  start:0x8000B4AC end:0x8000B4D0
 	.text       start:0x80020494 end:0x800211D4
 	.ctors      start:0x801D53C0 end:0x801D53C4
-	.rodata     start:0x801D6D34 end:0x801D6D80
+	.rodata     start:0x801D6D28 end:0x801D6D80
 	.data       start:0x801E8858 end:0x801E8874
 	.bss        start:0x80244140 end:0x8024433C
 	.sdata      start:0x8032E458 end:0x8032E468

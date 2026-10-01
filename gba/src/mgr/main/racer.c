@@ -191,9 +191,10 @@ u8 Racer_FindObstacle(struct Actor *a, struct Vec3 *pos, u8 *progress, s16 *rout
             }
         }
     }
-    trap = NULL;
     e = gGameEffects;
-    for (i = 0; i < 64; i++) {
+    trap = NULL;
+    /* the original steps 28 bytes instead of sizeof(struct Effect) */
+    for (i = 0; i < 64; i++, e = (struct Effect *)((u8 *)e + 28)) {
         if (e->active && e->type == EFFECT_TRAP) {
             d = e->u.trap.progress - a->progress;
             if (d >= 0 && best > d) {
@@ -202,8 +203,6 @@ u8 Racer_FindObstacle(struct Actor *a, struct Vec3 *pos, u8 *progress, s16 *rout
                 found = NULL;
             }
         }
-        /* the original steps 28 bytes instead of sizeof(struct Effect) */
-        e = (struct Effect *)((u8 *)e + 28);
     }
     if (trap != NULL) {
         *pos = trap->pos;

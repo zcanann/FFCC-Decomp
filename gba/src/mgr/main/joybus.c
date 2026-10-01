@@ -47,6 +47,19 @@ vu8 gLinkWarmup;
 u8 gJoySendPending;
 vu8 gJoyIntrCount;
 
+static inline void Link_SendNext(void)
+{
+    REG_JOY_TRANS = *(u32 *)&gJoyWork.send.raw[gJoyWork.offset];
+    gJoyWork.offset += 4;
+}
+
+static inline void Link_Connect(void)
+{
+    gJoyWork.connected = 1;
+    gJoyWork.cmd = 0;
+    gJoyWork.handshake = 0;
+}
+
 void ReadKeys(void)
 {
     u16 keys = REG_KEYINPUT ^ KEY_MASK;
@@ -173,7 +186,6 @@ s32 Link_Recv(u32 data)
 s32 Link_Send(void)
 {
     u32 i;
-    s32 j;
 
     if (gJoyWork.connected == 0) {
         if (gJoyWork.handshake == 1) {
@@ -184,14 +196,10 @@ s32 Link_Send(void)
             if (gJoyWork.send.ctx.initialized != 0) {
                 gJoyWork.handshake = 5;
             } else {
-                gJoyWork.connected = 1;
-                gJoyWork.cmd = 0;
-                gJoyWork.handshake = 0;
+                Link_Connect();
             }
         } else if (gJoyWork.handshake == 6) {
-            gJoyWork.connected = 1;
-            gJoyWork.cmd = 0;
-            gJoyWork.handshake = 0;
+            Link_Connect();
         } else {
             return 0;
         }
@@ -204,8 +212,7 @@ s32 Link_Send(void)
             if (gJoyWork.offset < JOY_INFO_SIZE)
                 return 0;
             if (gJoyWork.offset != JOY_INFO_SIZE * 2) {
-                REG_JOY_TRANS = *(u32 *)&gJoyWork.send.raw[gJoyWork.offset];
-                gJoyWork.offset += 4;
+                Link_SendNext();
                 break;
             }
             for (i = 0; i < JOY_INFO_SIZE; i += 4)
@@ -214,11 +221,7 @@ s32 Link_Send(void)
             gPlayerNo = gJoyWork.recv.ctx.playerNo;
             gPlayerMask = gJoyWork.recv.ctx.playerMask;
             gLinkWarmup = 0;
-            gPlayerCount = 0;
-            for (j = 0; j < 4; j++) {
-                if ((gPlayerMask >> j) & 1)
-                    gPlayerCount++;
-            }
+            CountPlayers();
             break;
         default:
             return 0;
@@ -226,8 +229,7 @@ s32 Link_Send(void)
     }
     return 1;
 send:
-    REG_JOY_TRANS = *(u32 *)&gJoyWork.send.raw[gJoyWork.offset];
-    gJoyWork.offset += 4;
+    Link_SendNext();
     return 1;
 }
 

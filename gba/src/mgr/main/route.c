@@ -79,26 +79,28 @@ s16 Route_Track(struct Route *route, s16 idx, s16 x, s16 z, s16 *pos)
     s16 dx;
     s16 dz;
     s16 i;
+    s32 d;
 
     if (idx == 0xFF) {
         i = Route_FindSegment(route, 0, x, z);
-        q = GetRoutePoint(route, i);
-        dx = x - q->x;
-        dz = z - q->z;
-        *pos = (dx * q->dx + dz * q->dz) >> 6;
+        dx = x - GetRoutePoint(route, i)->x;
+        dz = z - GetRoutePoint(route, i)->z;
+        *pos = (dx * GetRoutePoint(route, i)->dx + dz * GetRoutePoint(route, i)->dz) >> 6;
         return i;
     }
     p = GetRoutePoint(route, idx);
     dx = x - p->x;
     dz = z - p->z;
     *pos = (dx * p->dx + dz * p->dz) >> 6;
-    if (dx * p->nx + dz * p->nz < 0)
+    d = dx * p->nx + dz * p->nz;
+    if (d < 0)
         return PrevPoint(route, idx);
     i = NextPoint(route, idx);
     q = GetRoutePoint(route, i);
     dx = x - q->x;
     dz = z - q->z;
-    if (dx * q->nx + dz * q->nz > 0)
+    d = dx * q->nx + dz * q->nz;
+    if (d > 0)
         return i;
     if (*pos <= -0x2800 || *pos >= 0x2800)
         return Route_FindSegment(route, i, x, z);

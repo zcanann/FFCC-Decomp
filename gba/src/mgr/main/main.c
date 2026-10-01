@@ -805,18 +805,12 @@ void RecordFinish(struct Main *main, u8 id)
 /* Drops a player that left the link session */
 void RemovePlayer(struct Main *main, u8 id)
 {
-    s32 i;
     s32 bit = 1 << id;
 
     if (bit & gPlayerMask) {
         (gGame.actors + id)->active = 0;
         gPlayerMask &= ~bit;
-        gPlayerCount = 0;
-        for (i = 0; i <= 3; i++) {
-            if ((gPlayerMask >> i) & 1) {
-                gPlayerCount++;
-            }
-        }
+        CountPlayers();
     }
 }
 

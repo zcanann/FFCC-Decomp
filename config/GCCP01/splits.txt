@@ -42,7 +42,7 @@ game.cpp:
 	.bss        start:0x8021EEB0 end:0x80230E48
 	.sdata      start:0x8032E3D0 end:0x8032E3E8
 	.sbss       start:0x8032EC40 end:0x8032EC45
-	.sdata2     start:0x8032F630 end:0x8032F6A0
+	.sdata2     start:0x8032F630 end:0x8032F6C0
 
 graphic.cpp:
 	extab       start:0x800057E0 end:0x80005920

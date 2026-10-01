@@ -170,7 +170,7 @@ void CGame::Init()
     memset(m_startScriptName, 0, sizeof(m_startScriptName));
     m_frameCounterEnable = 1;
     gCFlatRuntime().CFlatRuntime::Init();
-    unkFloat_0xca10 = 0.001f;
+    unkFloat_0xca10 = 1000.0f;
 }
 
 /*

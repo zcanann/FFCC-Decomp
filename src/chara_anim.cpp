@@ -102,9 +102,10 @@ inline void CChara::CAnimNode::Create(CChunkFile& chunkFile)
 			break;
 		case 0x44415441: {
 			int type;
-			int mode;
+			int shift;
 			int i = 0;
-			int shift = 0;
+			int mode;
+			shift = 0;
 			do {
 				type = chunkFile.Get4();
 
@@ -121,7 +122,8 @@ inline void CChara::CAnimNode::Create(CChunkFile& chunkFile)
 					m_dataOffset = dataOffset;
 				}
 
-				m_flagsBits.m_channelModes |= static_cast<unsigned int>(mode) << shift;
+				mode <<= shift;
+				m_flagsBits.m_channelModes |= mode;
 
 				if ((i >= 6) && (type != 0)) {
 					m_flagsBits.m_hasScale = 1;
@@ -152,140 +154,50 @@ inline void CChara::CAnimNode::mapping(CChara::CAnim*)
 
 /*
  * --INFO--
- * PAL Address: 0x800BF620
- * PAL Size: 660b
+ * PAL Address: 0x800BFDE0
+ * PAL Size: 152b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
+CChara::CAnim::CAnim()
 {
-	if (anim->m_bank == 0) {
-		while (anim->m_bank == 0) {
-			anim->m_bank =
-			    Memory._Alloc(anim->m_bankSize, anim->m_stage, "chara_anim.cpp", 0x160, 1);
-
-			if (anim->m_bank != 0) {
-				break;
-			}
-			if (CharaPcs.TryReleaseAnimBank(anim->m_bankSize) == 0) {
-				return;
-			}
-		}
-
-		Memory.SetGroup(anim->m_bank, 1);
-		Memory.CopyFromAMemorySync(anim->m_bank,
-		                           reinterpret_cast<void*>(anim->m_bankAddress + Chara.GetAmemBaseAddress()),
-		                           anim->m_bankSize);
-	}
-
-	int frameInt = static_cast<int>(frame);
-	anim->m_lastFrame = 0;
-
-	float frameFrac = frame - static_cast<float>(frameInt);
-	if (frameInt == anim->m_frameCount - 1) {
-		frameFrac = 0.0f;
-	}
-
-	register int flags = static_cast<int>(m_flagsBits.m_channelModes);
-	register unsigned int dataOffset = m_dataOffset;
-	register unsigned short* inData =
-	    reinterpret_cast<unsigned short*>(static_cast<unsigned char*>(anim->m_bank) + dataOffset);
-	register float* outData = reinterpret_cast<float*>(srt);
-
-	for (int i = 0; i < 3; i++) {
-		if ((flags & 3) != 0) {
-			if ((flags & 3) == 1) {
-				i2f_5(outData, inData);
-				inData++;
-			} else {
-				i2f2_5(outData, inData + frameInt, frameFrac);
-				inData += anim->m_frameCount + 1;
-			}
-		} else {
-			*outData = 0.0f;
-		}
-		flags >>= 2;
-		outData++;
-	}
-
-	for (int i = 0; i < 3; i++) {
-		if ((flags & 3) != 0) {
-			if ((flags & 3) == 1) {
-				i2f_6(outData, inData);
-				inData++;
-			} else {
-				i2f2_6(outData, inData + frameInt, frameFrac);
-				inData += anim->m_frameCount + 1;
-			}
-		} else {
-			*outData = 0.0f;
-		}
-		flags >>= 2;
-		outData++;
-	}
-
-	for (int i = 0; i < 3; i++) {
-		if ((flags & 3) != 0) {
-			if ((flags & 3) == 1) {
-				i2f_7(outData, inData);
-				inData++;
-			} else {
-				i2f2_7(outData, inData + frameInt, frameFrac);
-				inData += anim->m_frameCount + 1;
-			}
-		} else {
-			*outData = 1.0f;
-		}
-		flags >>= 2;
-		outData++;
-	}
+	m_nodeCount = 0;
+	m_nodes = 0;
+	m_bank = 0;
+	m_flagsBits.m_blendEnabled = 1;
+	m_flagsBits.m_clampFrames = 0;
+	m_quantizeX = 5;
+	m_quantizeY = 0xB;
+	m_quantizeZ = 10;
+	m_interp = 0;
+	m_interpOffset = 0;
+	m_bankAddress = 0;
+	m_bankSize = 0;
+	m_stage = reinterpret_cast<CMemory::CStage*>(0);
+	m_lastFrame = 0;
 }
 /*
  * --INFO--
- * PAL Address: 0x800BF8B4
- * PAL Size: 60b
+ * PAL Address: 0x800BFD44
+ * PAL Size: 156b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CChara::CAnimNode::~CAnimNode()
+CChara::CAnim::~CAnim()
 {
-}
+	if (m_nodes != 0) {
+		delete[] m_nodes;
+		m_nodes = 0;
+	}
 
-/*
- * --INFO--
- * PAL Address: 0x800BF8F0
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CChara::CAnimNode::CAnimNode()
-{
-	m_flagsBits.m_hasScale = 0;
-	m_flagsBits.m_channelModes = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800BF910
- * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CChara::CAnim::InitQuantize()
-{
-	unsigned long qx = ((unsigned long)m_quantizeX << 0x18) | 0x70000 | ((unsigned long)m_quantizeX << 8) | 7;
-	unsigned long qy = ((unsigned long)m_quantizeY << 0x18) | 0x70000 | ((unsigned long)m_quantizeY << 8) | 7;
-	unsigned long qz = ((unsigned long)m_quantizeZ << 0x18) | 0x70000 | ((unsigned long)m_quantizeZ << 8) | 7;
-
-	Chara.gqrInit(qx, qy, qz);
+	if (m_bank != 0) {
+		delete[] static_cast<unsigned char*>(m_bank);
+		m_bank = 0;
+	}
 }
 
 /*
@@ -380,49 +292,139 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 
 /*
  * --INFO--
- * PAL Address: 0x800BFD44
- * PAL Size: 156b
+ * PAL Address: 0x800BF910
+ * PAL Size: 116b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CChara::CAnim::~CAnim()
+void CChara::CAnim::InitQuantize()
 {
-	if (m_nodes != 0) {
-		delete[] m_nodes;
-		m_nodes = 0;
-	}
+	unsigned long qx = ((unsigned long)m_quantizeX << 0x18) | 0x70000 | ((unsigned long)m_quantizeX << 8) | 7;
+	unsigned long qy = ((unsigned long)m_quantizeY << 0x18) | 0x70000 | ((unsigned long)m_quantizeY << 8) | 7;
+	unsigned long qz = ((unsigned long)m_quantizeZ << 0x18) | 0x70000 | ((unsigned long)m_quantizeZ << 8) | 7;
 
-	if (m_bank != 0) {
-		delete[] static_cast<unsigned char*>(m_bank);
-		m_bank = 0;
-	}
+	Chara.gqrInit(qx, qy, qz);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800BFDE0
- * PAL Size: 152b
+ * PAL Address: 0x800BF8F0
+ * PAL Size: 32b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CChara::CAnim::CAnim()
+CChara::CAnimNode::CAnimNode()
 {
-	m_nodeCount = 0;
-	m_nodes = 0;
-	m_bank = 0;
-	m_flagsBits.m_blendEnabled = 1;
-	m_flagsBits.m_clampFrames = 0;
-	m_quantizeX = 5;
-	m_quantizeY = 0xB;
-	m_quantizeZ = 10;
-	m_interp = 0;
-	m_interpOffset = 0;
-	m_bankAddress = 0;
-	m_bankSize = 0;
-	m_stage = reinterpret_cast<CMemory::CStage*>(0);
-	m_lastFrame = 0;
+	m_flagsBits.m_hasScale = 0;
+	m_flagsBits.m_channelModes = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800BF8B4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CChara::CAnimNode::~CAnimNode()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800BF620
+ * PAL Size: 660b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
+{
+	if (anim->m_bank == 0) {
+		while (anim->m_bank == 0) {
+			anim->m_bank =
+			    Memory._Alloc(anim->m_bankSize, anim->m_stage, "chara_anim.cpp", 0x160, 1);
+
+			if (anim->m_bank != 0) {
+				break;
+			}
+			if (CharaPcs.TryReleaseAnimBank(anim->m_bankSize) == 0) {
+				return;
+			}
+		}
+
+		Memory.SetGroup(anim->m_bank, 1);
+		Memory.CopyFromAMemorySync(anim->m_bank,
+		                           reinterpret_cast<void*>(anim->m_bankAddress + Chara.GetAmemBaseAddress()),
+		                           anim->m_bankSize);
+	}
+
+	int frameInt = static_cast<int>(frame);
+	anim->m_lastFrame = 0;
+
+	float frameFrac = frame - static_cast<float>(frameInt);
+	if (frameInt == anim->m_frameCount - 1) {
+		frameFrac = 0.0f;
+	}
+
+	register int flags = static_cast<int>(m_flagsBits.m_channelModes);
+	register unsigned int dataOffset = m_dataOffset;
+	register unsigned short* inData =
+	    reinterpret_cast<unsigned short*>(static_cast<unsigned char*>(anim->m_bank) + dataOffset);
+	register float* outData = reinterpret_cast<float*>(srt);
+
+	for (int i = 0; i < 3; i++) {
+		if ((flags & 3) != 0) {
+			if ((flags & 3) == 1) {
+				i2f_5(outData, inData);
+				inData++;
+			} else {
+				i2f2_5(outData, inData + frameInt, frameFrac);
+				inData += anim->m_frameCount + 1;
+			}
+		} else {
+			*outData = 0.0f;
+		}
+		flags >>= 2;
+		outData++;
+	}
+
+	for (int i = 0; i < 3; i++) {
+		if ((flags & 3) != 0) {
+			if ((flags & 3) == 1) {
+				i2f_6(outData, inData);
+				inData++;
+			} else {
+				i2f2_6(outData, inData + frameInt, frameFrac);
+				inData += anim->m_frameCount + 1;
+			}
+		} else {
+			*outData = 0.0f;
+		}
+		flags >>= 2;
+		outData++;
+	}
+
+	for (int i = 0; i < 3; i++) {
+		if ((flags & 3) != 0) {
+			if ((flags & 3) == 1) {
+				i2f_7(outData, inData);
+				inData++;
+			} else {
+				i2f2_7(outData, inData + frameInt, frameFrac);
+				inData += anim->m_frameCount + 1;
+			}
+		} else {
+			*outData = 1.0f;
+		}
+		flags >>= 2;
+		outData++;
+	}
 }

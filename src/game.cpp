@@ -1106,6 +1106,9 @@ CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
     static float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
     static s16 s_top[] = {0, 2, 4};
 
+    int scaledAmount;
+    int artifactRank;
+
     int stage =
         Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
     if (2 < stage) {
@@ -1114,14 +1117,14 @@ CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
 
     CBossArtifactStage* artifactBase;
     int stageBase = s_top[stage];
-    int scaledAmount = (int)((float)amount * s_ratio[ratioIndex - 1]);
+    scaledAmount = (int)((float)amount * s_ratio[ratioIndex - 1]);
 
     u16 thresholds[4];
     memset(thresholds, 0, sizeof(thresholds));
 
     int stageIndex = (int)Game.m_gameWork.m_bossArtifactStageIndex;
     artifactBase = Game.m_bossArtifactBase;
-    int artifactRank = 3;
+    artifactRank = 3;
 
     thresholds[1] = artifactBase[stageIndex].m_rankThresholds[1];
     thresholds[2] = artifactBase[stageIndex].m_rankThresholds[2];

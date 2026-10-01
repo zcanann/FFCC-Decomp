@@ -22,6 +22,9 @@ public:
 
     static void* operator new(unsigned long, CMemory::CStage*, char*, int);
 
+    unsigned int GetWidth() { return m_width; }
+    unsigned int GetHeight() { return m_height; }
+
     void InitTexObj();
     void Create(CChunkFile&, CMemory::CStage*, CAmemCacheSet*, int, int);
     void CacheLoadTexture(CAmemCacheSet*);

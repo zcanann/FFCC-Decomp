@@ -287,9 +287,7 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 		return -1;
 	}
 
-	float centerX = pos->x;
 	obj->type = 1;
-	float centerZ = pos->z;
 	obj->flagBits.active = 1;
 
 	int id = m_nextId;
@@ -307,12 +305,12 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 	obj->radius = radius;
 	obj->radiusSq = radius * radius;
 
-	obj->centerX = centerX;
-	obj->centerZ = centerZ;
-	obj->minX = centerX - radius;
-	obj->minZ = centerZ - radius;
-	obj->maxX = centerX + radius;
-	obj->maxZ = centerZ + radius;
+	obj->centerX = pos->x;
+	obj->centerZ = pos->z;
+	obj->minX = pos->x - radius;
+	obj->minZ = pos->z - radius;
+	obj->maxX = pos->x + radius;
+	obj->maxZ = pos->z + radius;
 
 	return obj->id;
 }

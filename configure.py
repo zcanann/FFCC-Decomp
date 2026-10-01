@@ -608,7 +608,7 @@ config.libs = [
             Object(Matching, "pppAngle.cpp"),
             Object(Matching, "pppAngMove.cpp"),
             Object(Matching, "pppBindOnlyPos.cpp"),
-            Object(NonMatching, "pppBlurChara.cpp"),
+            Object(Matching, "pppBlurChara.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "pppBreathModel.cpp"),
             Object(Matching, "pppCallBackDistance.cpp"),
             Object(Matching, "pppChangeBGColor.cpp"),

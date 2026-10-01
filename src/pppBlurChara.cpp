@@ -18,19 +18,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-static const char s_pppBlurChara_cpp[] = "pppBlurChara.cpp";
-
-extern const float kPppBlurZero;
-extern const float kPppBlurProjScaleX;
-extern const float kPppBlurProjScaleY;
-extern const float kPppBlurOne;
-extern const float kPppBlurNegOne;
-extern const float kPppScreenAspect;
-extern const float kPppScreenWidth;
-extern const float kPppScreenHeight;
-extern const float kPppHalfScreenWidth;
-extern const float kPppHalfScreenHeight;
-
 struct pppBlurCharaWork {
     void* m_captureBuffer;
     CGObject* m_ownerObj;
@@ -116,7 +103,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtr
 
     pppInitBlendMode();
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    pppSetDrawEnv(&colorData->m_color, (pppFMATRIX*)0, kPppBlurZero, step->m_alpha, 0, 0, 0, 1, 1, 0);
+    pppSetDrawEnv(&colorData->m_color, (pppFMATRIX*)0, 0.0f, step->m_alpha, 0, 0, 0, 1, 1, 0);
     ownerObj = work->m_ownerObj;
 
     PSMTXIdentity(identityMtx);
@@ -127,9 +114,9 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtr
     cameraTarget.x = CameraPcs.m_targetX;
     cameraTarget.y = CameraPcs.m_targetY;
     cameraTarget.z = CameraPcs.m_targetZ;
-    cameraTarget.y = cameraPos.y = kPppBlurZero;
+    cameraTarget.y = cameraPos.y = 0.0f;
     PSVECSubtract(&cameraTarget, &cameraPos, &cameraDir);
-    cameraDir.y = kPppBlurZero;
+    cameraDir.y = 0.0f;
 
     GXGetProjectionv(gxProjection);
     GXGetViewportv(viewport);
@@ -138,7 +125,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtr
 
     objPos = ownerObj->m_worldPosition;
 
-    GXProject(cameraPos.x + objPos.x, kPppBlurZero, cameraPos.z + objPos.z, cameraMtx, gxProjection, viewport,
+    GXProject(cameraPos.x + objPos.x, 0.0f, cameraPos.z + objPos.z, cameraMtx, gxProjection, viewport,
               &projX, &projY, &projZ);
 
     gUtil.BeginQuadEnv();
@@ -184,12 +171,12 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtr
     GXSetCurrentMtx(0);
 
     PSMTX44Identity(projection);
-    projection[0][0] = kPppBlurProjScaleX;
-    projection[1][1] = kPppBlurProjScaleY;
-    projection[2][2] = kPppBlurOne;
-    projection[0][3] = kPppBlurNegOne;
+    projection[0][0] = 0.003125f;
+    projection[1][1] = -0.004464f;
+    projection[2][2] = 1.0f;
+    projection[0][3] = -1.0f;
     projection[1][3] = projection[2][2];
-    projection[2][3] = kPppBlurZero;
+    projection[2][3] = 0.0f;
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
@@ -197,24 +184,24 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtr
     depth -= step->m_stepValue;
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-    inVec.x = kPppBlurZero;
-    inVec.y = kPppBlurZero;
+    inVec.x = 0.0f;
+    inVec.y = 0.0f;
     inVec.z = -depth;
-    inVec.w = kPppBlurOne;
+    inVec.w = 1.0f;
     Math.MTX44MultVec4(screenMtx, &inVec, &outVec);
 
-    if (outVec.w != kPppBlurZero) {
+    if (outVec.w) {
         outVec.z = outVec.z / outVec.w;
     }
 
     float expandY = step->m_arg3;
     float quadZ = outVec.z;
-    float expandX = kPppScreenAspect * expandY;
+    float expandX = 1.3333334f * expandY;
     quadA.y = -expandY;
     quadA.z = quadZ;
     quadA.x = -expandX;
-    quadB.x = kPppScreenWidth + expandX;
-    quadB.y = kPppScreenHeight + expandY;
+    quadB.x = 640.0f + expandX;
+    quadB.y = 448.0f + expandY;
     quadB.z = quadZ;
 
     gUtil.RenderQuad(quadA, quadB, drawColor, 0, 0);
@@ -254,9 +241,9 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* step, _pppCtrl
         unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
 
         work->m_captureBuffer = pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr,
-                                            const_cast<char*>(s_pppBlurChara_cpp), 0xD5);
+                                            "pppBlurChara.cpp", 0xD5);
         work->m_smallTexObj = static_cast<GXTexObj*>(
-            pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp), 0xD7));
+            pppMemAlloc(0x20, ppvEnv->m_stagePtr, "pppBlurChara.cpp", 0xD7));
 
         model->m_callbackContext = work;
         model->m_callbackParam = step;
@@ -335,6 +322,8 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void
 {
     pppBlurCharaWork* work = reinterpret_cast<pppBlurCharaWork*>(context);
     pppBlurCharaStep* step = reinterpret_cast<pppBlurCharaStep*>(param);
+    float screenWidth = 320.0f;
+    float screenHeight = 224.0f;
     int width;
     int height;
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(work->m_ownerObj, 0);
@@ -344,8 +333,8 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void
     _GXColor quadColor;
 
     GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
-    width = (int)kPppHalfScreenWidth;
-    height = (int)kPppHalfScreenHeight;
+    width = (int)screenWidth;
+    height = (int)screenHeight;
 
     Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 
@@ -355,20 +344,20 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void
     quadColor.b = 0;
     quadColor.a = 0xFF;
 
-    posA.x = kPppBlurZero;
-    posA.y = kPppBlurZero;
-    posA.z = kPppBlurZero;
+    posA.x = 0.0f;
+    posA.y = 0.0f;
+    posA.z = 0.0f;
     posB.x = (float)width;
     posB.y = (float)height;
-    posB.z = kPppBlurZero;
+    posB.z = 0.0f;
 
     gUtil.BeginQuadEnv();
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     gUtil.RenderQuadNoTex(posA, posB, quadColor);
     gUtil.EndQuadEnv();
 
-    GXSetViewport(kPppBlurZero, kPppBlurZero, kPppHalfScreenWidth, kPppHalfScreenHeight, kPppBlurZero, kPppBlurOne);
-    GXSetScissor(0, 0, (unsigned int)kPppHalfScreenWidth, (unsigned int)kPppHalfScreenHeight);
+    GXSetViewport(0.0f, 0.0f, screenWidth, screenHeight, 0.0f, 1.0f);
+    GXSetScissor(0, 0, (unsigned int)screenWidth, (unsigned int)screenHeight);
 
     model->SetBeforeMeshLockEnvCallback(BlurChara_SetBeforeMeshLockEnvCallback);
     model->m_afterDrawModelCallback = 0;
@@ -384,10 +373,10 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void
         float scaledOffsetY;
         {
             float offsetY = step->m_afterDrawOffsetY;
-            scaledOffsetY = kPppScreenAspect * offsetY;
+            scaledOffsetY = 1.3333334f * offsetY;
 
-            gUtil.RenderTextureQuad(-scaledOffsetY, -offsetY, kPppHalfScreenWidth + scaledOffsetY,
-                                    kPppHalfScreenHeight + offsetY,
+            gUtil.RenderTextureQuad(-scaledOffsetY, -offsetY, screenWidth + scaledOffsetY,
+                                    screenHeight + offsetY,
                                     work->m_smallTexObj, 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
         }
 
@@ -406,10 +395,10 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void
         float offsetY = step->m_afterDrawOffsetY;
         posA.x = scaledOffsetY;
         posA.y = offsetY;
-        posA.z = kPppBlurZero;
-        posB.x = kPppHalfScreenWidth - scaledOffsetY;
-        posB.y = kPppHalfScreenHeight - offsetY;
-        posB.z = kPppBlurZero;
+        posA.z = 0.0f;
+        posB.x = screenWidth - scaledOffsetY;
+        posB.y = screenHeight - offsetY;
+        posB.z = 0.0f;
 
         _GXSetBlendMode(GX_BM_SUBTRACT, GX_BL_ONE, GX_BL_ONE, GX_LO_OR);
         gUtil.RenderQuad(posA, posB, quadColor, 0, 0);
@@ -418,7 +407,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* context, void
         Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_I8, 0);
     }
 
-    gUtil.RenderTextureQuad(kPppBlurZero, kPppBlurZero, kPppHalfScreenWidth, kPppHalfScreenHeight, &backTexObj, 0, 0, 0,
+    gUtil.RenderTextureQuad(0.0f, 0.0f, screenWidth, screenHeight, &backTexObj, 0, 0, 0,
                             GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
 
@@ -436,14 +425,3 @@ void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
     MaterialMan.SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x10000));
 }
-
-extern const float kPppBlurZero = 0.0f;
-extern const float kPppBlurProjScaleX = 0.003125f;
-extern const float kPppBlurProjScaleY = -0.004464f;
-extern const float kPppBlurOne = 1.0f;
-extern const float kPppBlurNegOne = -1.0f;
-extern const float kPppScreenAspect = 1.3333334f;
-extern const float kPppScreenWidth = 640.0f;
-extern const float kPppScreenHeight = 448.0f;
-extern const float kPppHalfScreenWidth = 320.0f;
-extern const float kPppHalfScreenHeight = 224.0f;

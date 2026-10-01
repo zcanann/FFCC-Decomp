@@ -804,8 +804,7 @@ void CSound::loadWaveFrame()
 
             unsigned int curOffset = (unsigned int)waveOffset;
             CFile::CHandle* handle = waveFile;
-            handle->m_chunkSize = readSize;
-            handle->m_currentOffset = curOffset;
+            handle->SetReadSize(readSize, curOffset);
             File.ReadASync(waveFile);
 
             if (waveSyncMode != 0) {
@@ -816,7 +815,7 @@ void CSound::loadWaveFrame()
             waveOffset += (int)readSize;
             waveState = 1;
         } else if (waveState == 1 && File.IsCompleted(waveFile)) {
-            m_redSound.SetWaveData(waveID, File.m_readBuffer, (int)waveFile->m_chunkSize);
+            m_redSound.SetWaveData(waveID, File.m_readBuffer, waveFile->GetReadSize());
 
             while (Sound.m_redSound.ReportStandby(0) != 0) {
             }
@@ -857,8 +856,7 @@ void CSound::loadWaveFrame()
                 if (readSize != 0) {
                     unsigned int curOffset = (unsigned int)streamOffset;
                     CFile::CHandle* handle = streamFile;
-                    handle->m_chunkSize = (unsigned int)readSize;
-                    handle->m_currentOffset = curOffset;
+                    handle->SetReadSize(readSize, curOffset);
                     File.ReadASync(streamFile);
 
                     streamOffset += readSize;
@@ -1947,8 +1945,7 @@ void CSound::LoadStream(int streamID)
         m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
         if (m_streamFile != 0) {
             CFile::CHandle* streamFile = m_streamFile;
-            streamFile->m_chunkSize = 0x20000;
-            streamFile->m_currentOffset = 0;
+            streamFile->SetReadSize(0x20000, 0);
             File.Read(m_streamFile);
             File.SyncCompleted(m_streamFile);
             memcpy(m_streamBuffer, File.m_readBuffer, 0x20000);

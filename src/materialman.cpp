@@ -2445,17 +2445,17 @@ void CMaterialMan::SetPosition(
     float (*viewMtx)[4],
     int ignoreFrustumCheck)
 {
-    unsigned int i;
     CBound searchBound(position, rangeXZ, rangeY);
 
+    CPtrArray<CMapShadow*>* mapShadowArray;
     if (target == static_cast<CMapShadow::TARGET>(0)) {
         ShadowCandidate shadowCandidates[128];
         ShadowCandidate* candidateWrite = shadowCandidates;
-        CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
+        mapShadowArray = &MapMng.GetMapShadowArray();
         int candidateCount = 0;
 
         int idx;
-        for (i = 0; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+        for (unsigned int i = 0; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
             CMapShadow* shadow = (*mapShadowArray)[idx];
 
             if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
@@ -2507,9 +2507,9 @@ void CMaterialMan::SetPosition(
         }
 
         float maxDist = 20000000000000.0f;
-        float candidateDist;
         ShadowCandidate* nearest = 0;
         float nearestDist = 100000000000000000000.0f;
+        float candidateDist;
         ShadowCandidate* candidateRead = shadowCandidates;
         for (int i = 0; i < candidateCount; i++) {
             candidateDist = candidateRead->distance;
@@ -2525,9 +2525,9 @@ void CMaterialMan::SetPosition(
             SetShadow(*nearest->shadow, viewMtx, nearest->index, 0xFFFFFFFF);
         }
     } else {
-        i = 0;
+        unsigned int i = 0;
         int idx;
-        CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
+        mapShadowArray = &MapMng.GetMapShadowArray();
         for (; (idx = i) < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
             CMapShadow* shadow = (*mapShadowArray)[idx];
 

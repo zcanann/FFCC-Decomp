@@ -3,6 +3,8 @@
 #include "joybus.h"
 #include "sound.h"
 
+struct Sound gSound;
+
 void Sound_Init(struct Sound *sound)
 {
 }

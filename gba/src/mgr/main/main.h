@@ -2,6 +2,8 @@
 #define GUARD_MAIN_H
 
 #include "global.h"
+#include "field.h"
+#include "obj.h"
 
 enum {
     STATE_LOADING,
@@ -29,7 +31,6 @@ struct Main {
     u8 finalLapShown;
     u8 showLap;
     u8 bannerShown;
-    u8 unk19;
     u16 finalLapTimer;
     u32 lapTime;
     u32 lastLapTime;
@@ -44,7 +45,7 @@ struct Main {
     u8 readyMask;
     u8 answeredMask;
     u8 retryLinked;
-    u8 unk37;
+    u8 unused;
     vu8 mode7Enabled;
     vu8 skyEnabled;
     vu8 textEnabled;
@@ -56,23 +57,30 @@ struct Main {
 };
 
 extern struct Main gMain;
+extern u16 gHeldKeys;
+extern u16 gNewKeys;
+extern u8 gIntrMainRam[];
+extern u8 gFieldTiles[128][128];
+extern struct BgAffine gBgAffine[];
+extern struct OamData gOamBuffer[];
+extern struct OamMatrix gOamMatrices[];
+extern char gPrintBuffer[];
 extern vu32 gVBlankCounter;
 extern s32 gFrameCounter;
 extern s32 gRaceFrameCounter;
 extern vu16 gSkyScrollPrev;
 extern vu16 gSkyScroll;
-extern u8 gIntrMainRam[];
+extern u8 gBgAffineHdma[];
+extern u32 gJoySendData;
 extern vu8 gVCountPhase;
 extern volatile s8 gShownLap;
 extern u8 gWrongWayShown;
 extern struct Actor *gChaserPlayer;
 extern struct Actor *gChaserEnemy;
-extern u32 lbl_03005C68;
-extern u32 lbl_03005C6C;
+extern u32 gMainUnused;
+extern u32 gMainUnused2;
 extern const char *gAssertFile;
 extern s32 gAssertLine;
-extern u16 gHeldKeys;
-extern u16 gNewKeys;
 
 extern const u8 gConfigLinkMode;
 extern const u8 gConfigRacerCount;

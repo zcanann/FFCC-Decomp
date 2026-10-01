@@ -54,7 +54,7 @@ extern u16 sBasePosIn[];
 extern u8 sPartyPosSeq;
 extern u32 sPartyPosIn[];
 extern u32 sGilIn;
-extern u8 sGilOp;
+extern s8 sGilOp;
 extern u32 sGilUnused;
 
 u32 Crc8(u32 data)
@@ -386,12 +386,14 @@ void Link_ProcessRecv(void)
     u16 crc;
     u8 result;
     u32 pkt;
+    u8 *p;
     s32 done;
     s32 i;
     s32 k;
     u8 *msg;
     u8 v;
     s32 n;
+    s32 ret;
 
     ie = REG_IE;
     REG_IE = 0;
@@ -410,10 +412,8 @@ void Link_ProcessRecv(void)
     sRxCount += sRxIsrCount;
     sRxIsrCount = 0;
     REG_IE = ie;
-    if (sRxCount > 0) {
-        for (i = sRxCount; i != 0; i--)
-            ;
-    }
+    for (i = 0; i < sRxCount; i++)
+        ;
     done = 0;
 restart:
     for (i = sRxDone; i < sRxCount; i++) {
@@ -433,13 +433,14 @@ restart:
             else
                 gLinkStarted = 0;
         } else if ((msg[0] & 0x3F) == 5) {
-            if ((msg[0] & 0xC0) == 0) {
+            v = msg[0] & 0xC0;
+            if (v == 0) {
                 memset(&sMsgXfer, 0, sizeof(sMsgXfer));
                 sMsgXfer.count++;
                 sMsgXfer.total = msg[1];
                 ((u8 *)&sMsgXfer.crc)[0] = msg[2];
                 ((u8 *)&sMsgXfer.crc)[1] = msg[3];
-            } else if ((msg[0] >> 6) == 1 && sMsgXfer.count == 1) {
+            } else if ((v >> 6) == 1 && sMsgXfer.count == 1) {
                 if (sMsgXfer.pending != 0)
                     goto resend;
                 sMsgXfer.count++;
@@ -452,10 +453,13 @@ restart:
                     goto resend;
                 sMsgXfer.count++;
                 if (sMsgXfer.pos + 3 > sizeof(sMsgXfer.data)) {
-                    ((u8 *)&pkt)[0] = 7;
-                    ((u8 *)&pkt)[1] = 0;
-                    if (Link_Write(pkt) != 0)
-                        goto pend;
+                    p = (u8 *)&pkt;
+                    p[0] = 7;
+                    p[1] = 0;
+                    if (Link_Write(pkt) != 0) {
+                        sMsgXfer.pending = pkt;
+                        goto resend;
+                    }
                 }
                 sMsgXfer.data[sMsgXfer.pos++] = msg[1];
                 sMsgXfer.data[sMsgXfer.pos++] = msg[2];
@@ -463,16 +467,20 @@ restart:
             check:
                 if (sMsgXfer.count == sMsgXfer.total) {
                     crc = 0xFFFF;
-                    if (sMsgXfer.crc != Crc16(sMsgXfer.size, sMsgXfer.data, &crc)
+                    if (Crc16(sMsgXfer.size, sMsgXfer.data, &crc) != sMsgXfer.crc
                         || sMsgXfer.size > sMsgXfer.pos) {
-                        ((u8 *)&pkt)[0] = 7;
-                        ((u8 *)&pkt)[1] = 0;
-                        if (Link_Write(pkt) != 0)
-                            goto pend;
+                        p = (u8 *)&pkt;
+                        p[0] = 7;
+                        p[1] = 0;
+                        if (Link_Write(pkt) != 0) {
+                            sMsgXfer.pending = pkt;
+                            goto resend;
+                        }
                     } else {
                         pkt = 0;
-                        ((u8 *)&pkt)[0] = 6;
-                        ((u8 *)&pkt)[1] = 0;
+                        p = (u8 *)&pkt;
+                        p[0] = 6;
+                        p[1] = 0;
                         if (Link_Write(pkt) != 0) {
                             sMsgXfer.pending = pkt;
                             done = 1;
@@ -483,30 +491,36 @@ restart:
                 }
             } else {
                 pkt = 0;
-                ((u8 *)&pkt)[0] = 7;
-                ((u8 *)&pkt)[1] = 0xFF;
+                p = (u8 *)&pkt;
+                p[0] = 7;
+                p[1] = 0xFF;
                 goto send;
             }
         } else if ((msg[0] & 0x3F) == 13) {
             gXferActive = 0;
             if (Xfer_CheckCrc(*(u32 *)msg) != 0) {
-                ((u8 *)&pkt)[0] = 7;
-                ((u8 *)&pkt)[1] = 3;
+                p = (u8 *)&pkt;
+                p[0] = 7;
+                p[1] = 3;
                 goto send;
             }
-            ((u8 *)&pkt)[0] = 6;
-            ((u8 *)&pkt)[1] = 3;
-            if (Link_Write(pkt) != 0)
-                goto pend;
+            p = (u8 *)&pkt;
+            p[0] = 6;
+            p[1] = 3;
+            if (Link_Write(pkt) != 0) {
+                sMsgXfer.pending = pkt;
+                goto resend;
+            }
         } else if ((msg[0] & 0x3F) == 11) {
-            n = Xfer_Receive(*(u32 *)msg, &result);
-            if (n != 0) {
+            ret = Xfer_Receive(*(u32 *)msg, &result);
+            if (ret != 0) {
+                p = (u8 *)&pkt;
                 pkt = 0;
-                if (n < 0)
-                    ((u8 *)&pkt)[0] = 7;
+                if (ret < 0)
+                    p[0] = 7;
                 else
-                    ((u8 *)&pkt)[0] = 6;
-                ((u8 *)&pkt)[1] = result;
+                    p[0] = 6;
+                p[1] = result;
                 goto send;
             }
         } else if ((msg[0] & 0x3F) == 14) {
@@ -530,10 +544,13 @@ restart:
         } else if ((msg[0] & 0x3F) == 17) {
             n = msg[0] >> 6;
             if (n != 0 && n - 1 != (s8)sPartyPosSeq) {
-                ((u8 *)&pkt)[0] = 7;
-                ((u8 *)&pkt)[1] = 0xFF;
-                if (Link_Write(pkt) != 0)
-                    goto pend;
+                p = (u8 *)&pkt;
+                p[0] = 7;
+                p[1] = 0xFF;
+                if (Link_Write(pkt) != 0) {
+                    sMsgXfer.pending = pkt;
+                    goto resend;
+                }
             }
             sPartyPosSeq = n;
             sPartyPosIn[n] = sRxBuf[i];
@@ -557,7 +574,7 @@ restart:
         } else if ((msg[0] & 0x3F) == 20) {
             if (msg[1] == 1) {
                 if (gScreen == 9) {
-                    gNewLetter = msg[1];
+                    gNewLetter = 1;
                     gDataFlags &= ~DATA_LETTER_LIST;
                 }
             } else if (msg[1] == 12) {
@@ -590,9 +607,11 @@ restart:
                 sGilIn |= msg[3] << 16;
             } else {
                 v = sGilOp;
-                if ((s8)sGilOp == 0) {
-                    if (Link_SendEvent(21, 0, 0) != 0)
-                        goto pend;
+                if (sGilOp == 0) {
+                    if (Link_SendEvent(21, 0, 0) != 0) {
+                        sMsgXfer.pending = pkt;
+                        goto resend;
+                    }
                 } else {
                     sGilIn |= msg[1] << 8;
                     sGilIn |= msg[2];
@@ -605,11 +624,11 @@ restart:
         } else if ((msg[0] & 0x3F) == 24) {
             Session_OnMask(*(struct JoyBytes *)&sRxBuf[i]);
             pkt = 0;
-            ((u8 *)&pkt)[0] = 6;
-            ((u8 *)&pkt)[1] = 24;
+            p = (u8 *)&pkt;
+            p[0] = 6;
+            p[1] = 24;
         send:
             if (Link_Write(pkt) != 0) {
-            pend:
                 sMsgXfer.pending = pkt;
                 goto resend;
             }
@@ -627,16 +646,16 @@ restart:
             Scouter_OnHitEnemy(sRxBuf[i]);
         }
     }
-    if (done == 0) {
-        memset(sRxBuf, 0, 0x200);
-        sRxCount = done;
-        sRxDone = done;
-    } else {
+    if (done != 0) {
     resend:
         for (k = 0; k < sRxCount - (1 + i); k++)
             sRxBuf[k] = sRxBuf[k + i + 1];
         sRxCount = sRxCount - (1 + i);
         sRxDone = 0;
+    } else {
+        memset(sRxBuf, 0, 0x200);
+        sRxCount = done;
+        sRxDone = done;
     }
     sRxDone = sRxCount;
 }

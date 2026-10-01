@@ -1,6 +1,8 @@
 #include "global.h"
 #include "chunk.h"
 
+const char gChunkFileName[] = "C:/FFF/miniGame/mgr/chunk.cpp";
+
 void Chunk_Construct(struct Chunk *c)
 {
 }

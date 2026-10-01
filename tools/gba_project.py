@@ -6,10 +6,15 @@ objdiff.json so the programs count toward the version's progress report.
 
 Units with source are compiled and diffed against their target objects:
 - gba/src/<program>/<unit>.c, built with agbcc
+- gba/src/<program>/<unit>/: C and assembly files linked with ld -r, in the
+  order given by gba/config/<program>/link_order.txt (data layout follows it)
 - libgcc/<object>, built from gba/lib/libgcc like agbcc's own libgcc
 - libagbsyscall/<routine>, libc/<dir>/<file>, m4a/<file>: libraries in gba/lib
 Units listed in COMPLETE, and all libgcc, libagbsyscall and libc units, link
 their compiled objects into the checked image.
+Symbols marked `asset` (or `asset:asm`) in symbols.txt are extracted from the
+retail image into build/<version>/gba/<program>/assets/ (gba/tools/assets.py),
+for assembly files in the source directory to .incbin (or .include).
 """
 
 import importlib.util
@@ -63,13 +68,15 @@ PROGRAMS: Dict[str, Dict[str, Dict[str, str]]] = {
             "disc_path": "dvd/minigame/mgr/mgr00.bin",
             "sha1": "6ef574cc6ae34e8a05bccb1a28f78e833fde58fa",
             "m4a_defines": "-DM4A_SOUND_FREQ=SOUND_MODE_FREQ_15768",
+            # Built from C++ originally: globals are defined in .bss, never common.
+            "cflags": "-fno-common",
         },
     },
 }
 
 DISC_IMAGES = {"GCCP01": "FFCC_PAL.iso"}
 ASFLAGS = "-mcpu=arm7tdmi -mthumb-interwork"
-CPPFLAGS = "-undef -nostdinc -Wno-trigraphs -I gba/include"
+CPPFLAGS = "-undef -nostdinc -Wno-trigraphs -I gba/include -I gba/lib/m4a/include -I gba/lib/ginclude"
 CFLAGS = "-mthumb-interwork -O2 -fhex-asm"
 
 # Game units whose compiled source links into the checked image, per program.
@@ -105,6 +112,39 @@ def _arm_units(config_dir: Path) -> set:
         if m and any(int(m.group(1), 16) <= a < int(m.group(2), 16) for a in arm):
             units.add(unit)
     return units
+
+
+def _link_order(config_dir: Path) -> Dict[str, List[str]]:
+    """Per-unit source file link order from link_order.txt ("unit:" then indented files)."""
+    path = config_dir / "link_order.txt"
+    order: Dict[str, List[str]] = {}
+    if not path.is_file():
+        return order
+    unit = None
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.split("#")[0].rstrip()
+        m = re.match(r"^(\S+):$", line)
+        if m:
+            unit = m.group(1)
+            order[unit] = []
+        elif line.strip() and unit is not None:
+            order[unit].append(line.strip())
+    return order
+
+
+def _unit_files(unit_dir: Path, order: List[str]) -> List[Path]:
+    """A source directory's files: listed ones in link order, then the rest sorted by name."""
+    files = sorted(f for f in unit_dir.iterdir()
+                   if f.suffix in (".c", ".s") and not f.name.startswith("_"))
+    listed = [unit_dir / name for name in order if (unit_dir / name) in files]
+    return listed + [f for f in files if f not in listed]
+
+
+def _assets(config_dir: Path) -> List[str]:
+    """Files extracted for symbols marked asset (<name>.bin) or asset:asm (<name>.inc)."""
+    return [f"{name}.inc" if kind else f"{name}.bin" for name, kind in
+            re.findall(r"^(\S+) = \.\w+:0x[0-9A-Fa-f]+; //.*\basset(:asm)?(?:\s|$)",
+                       (config_dir / "symbols.txt").read_text(encoding="utf-8"), re.M)]
 
 
 def _path(path: Any) -> str:
@@ -157,6 +197,8 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                description="TOOL $out")
         n.rule("gba_extract", f"$python {_path(tools / 'extract.py')} $in $outdir $paths",
                description="EXTRACT $out")
+        n.rule("gba_assets", f"$python {_path(tools / 'assets.py')} $in $config $outdir",
+               description="ASSETS $config")
         n.rule("gba_split",
                f"$python {_path(tools / 'split.py')} $bin $config --asm-dir $asmdir "
                "--ldscript $ldscript --object-dir $objdir $overrides",
@@ -235,6 +277,8 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             if unit.startswith("libc/"):
                 name = unit.split("/", 1)[1]
                 source, defines = LIBC_VARIANTS.get(name, (f"{name}.c", ""))
+                if not (LIBC_DIR / source).is_file():
+                    return None
                 extra = " -fshort-enums" if name == "stdlib/mbtowc_r" else ""
                 pre = stem + ".i"
                 asm = stem + ".s"
@@ -264,9 +308,10 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             asm_source = src_dir / f"{unit}.s"
             if asm_source.is_file():
                 return assemble_arm(asm_source, stem, base)
-            # A unit's source is <unit>.c, or a directory of C files linked together.
+            # A unit's source is <unit>.c, or a directory of C and assembly files
+            # linked together in link order (see _link_order).
             source = src_dir / f"{unit}.c"
-            files = sorted(f for f in (src_dir / unit).glob("*.c") if not f.name.startswith("_")) if (src_dir / unit).is_dir() else []
+            files = _unit_files(src_dir / unit, link_order.get(unit, [])) if (src_dir / unit).is_dir() else []
             if source.is_file():
                 files = [source]
             if not files:
@@ -274,12 +319,19 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             objects = []
             for file in files:
                 file_stem = stem if file == source else _path(out / "src" / unit / file.stem)
+                obj = file_stem + ".o" if file != source else base
+                if file.suffix == ".s":
+                    # Data modules; .incbin paths resolve against the extracted assets.
+                    n.build(obj, "gba_as", _path(file), implicit=binutils_stamp + assets,
+                            variables={"asincludes": f"-I {_path(out / 'assets')}"})
+                    objects.append(obj)
+                    continue
                 pre = file_stem + ".i"
                 asm = file_stem + ".s"
-                obj = file_stem + ".o" if file != source else base
                 n.build(pre, "gba_cpp", _path(file), implicit=binutils_stamp,
                         variables={"cppflags": f"{CPPFLAGS} -iquote {_path(file.parent)}"})
-                n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(agbcc), "cflags": CFLAGS})
+                n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(agbcc),
+                                                       "cflags": f"{CFLAGS} {info.get('cflags', '')}".strip()})
                 n.build(obj, "gba_as", [asm, align], implicit=binutils_stamp)
                 objects.append(obj)
             if files != [source]:
@@ -293,6 +345,16 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             out = build / info["config"]
             units = _units(config_dir)
             arm_units = _arm_units(config_dir)
+            link_order = _link_order(config_dir)
+            # Binary assets (symbols marked "asset") are extracted from the retail
+            # image into the build directory, never committed.
+            assets = [_path(out / "assets" / name) for name in _assets(config_dir)]
+            if assets:
+                n.build(assets, "gba_assets", _path(bins[category]),
+                        implicit=split_deps + [_path(tools / "assets.py")]
+                        + [_path(config_dir / name) for name in ("symbols.txt", "splits.txt", "constants.txt",
+                                                                 "references.txt") if (config_dir / name).is_file()],
+                        variables={"config": _path(config_dir), "outdir": _path(out / "assets")})
             bases = {}
             if have_compilers:
                 for unit in units:
@@ -357,7 +419,10 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
 
             config.extra_source_inputs += objects + [ok]
             config.progress_categories.append(ProgressCategory(category, info["name"]))
-            config.reconfig_deps = (config.reconfig_deps or []) + [config_dir / "splits.txt"]
+            config.reconfig_deps = (config.reconfig_deps or []) + [config_dir / "splits.txt",
+                                                                   config_dir / "symbols.txt"]
+            if (config_dir / "link_order.txt").is_file():
+                config.reconfig_deps.append(config_dir / "link_order.txt")
             if src_dir.is_dir():
                 config.reconfig_deps.append(src_dir)
                 config.reconfig_deps += [d for d in src_dir.iterdir() if d.is_dir()]

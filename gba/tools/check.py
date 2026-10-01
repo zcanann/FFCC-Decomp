@@ -20,7 +20,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 EXE = ".exe" if sys.platform == "win32" else ""
 TOOLS = ROOT / "build" / "tools"
-CPPFLAGS = ["-undef", "-nostdinc", "-Wno-trigraphs", "-I", str(ROOT / "gba" / "include")]
+CPPFLAGS = ["-undef", "-nostdinc", "-Wno-trigraphs", "-I", str(ROOT / "gba" / "include"),
+            "-I", str(ROOT / "gba" / "lib" / "m4a" / "include"), "-I", str(ROOT / "gba" / "lib" / "ginclude")]
 CFLAGS = ["-mthumb-interwork", "-O2", "-fhex-asm"]
 
 

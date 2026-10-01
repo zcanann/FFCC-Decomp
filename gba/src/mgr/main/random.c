@@ -1,6 +1,12 @@
 #include "global.h"
 #include "random.h"
 
+u32 gMtMag01[2] = { 0, 0x9908B0DF };
+
+u32 gMtState[MT_N];
+s32 gMtIndex;
+u32 gUnused_03006DC4;
+
 void sgenrand(u32 seed)
 {
     s32 i;

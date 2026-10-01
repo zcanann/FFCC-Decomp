@@ -98,12 +98,6 @@ inline int CGBaseObj::GetCID()
  * JP Size: TODO
  */
 inline CGame::CGame()
-    : m_partyMinX(1.0E+10f)
-    , m_partyMinY(1.0E+10f)
-    , m_partyMinZ(1.0E+10f)
-    , m_partyMaxX(-1.0E+10f)
-    , m_partyMaxY(-1.0E+10f)
-    , m_partyMaxZ(-1.0E+10f)
 {
 }
 
@@ -517,12 +511,13 @@ void CGame::clearWork()
 
     CPtrArray<CMapLightHolder*>* mapLightHolderArr = &MapMng.GetMapLightHolderArray(0);
 
-    if (mapLightHolderArr->GetSize() > 0) {
+    if (mapLightHolderArr->GetSize() != 0) {
         _GXColor holderColor;
         Vec holderVec;
 
-        if (0U < static_cast<unsigned int>(mapLightHolderArr->GetSize())) {
-            (*mapLightHolderArr)[0]->GetLightHolder(&holderColor, 0);
+        unsigned int mapLightHolderIndex = 0;
+        if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
+            (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(&holderColor, 0);
         }
 
         for (i = 0; i < 2; i++) {
@@ -863,23 +858,23 @@ void CGame::Calc()
         m_gameWork.m_frameCounter++;
     }
 
-    m_partyMinZ = 1.0E+10f;
-    m_partyMinY = 1.0E+10f;
-    m_partyMinX = 1.0E+10f;
-    m_partyMaxZ = -1.0E+10f;
-    m_partyMaxY = -1.0E+10f;
-    m_partyMaxX = -1.0E+10f;
+    m_partyBound.m_min.z = 1.0E+10f;
+    m_partyBound.m_min.y = 1.0E+10f;
+    m_partyBound.m_min.x = 1.0E+10f;
+    m_partyBound.m_max.z = -1.0E+10f;
+    m_partyBound.m_max.y = -1.0E+10f;
+    m_partyBound.m_max.x = -1.0E+10f;
 
     for (int i = 0; i < 4; i++) {
         CGPartyObj* partyObj = m_partyObjArr[i];
 
         if (partyObj != 0) {
-            m_partyMinX = (m_partyMinX < partyObj->m_worldPosition.x) ? m_partyMinX : partyObj->m_worldPosition.x;
-            m_partyMinY = (m_partyMinY < partyObj->m_worldPosition.y) ? m_partyMinY : partyObj->m_worldPosition.y;
-            m_partyMinZ = (m_partyMinZ < partyObj->m_worldPosition.z) ? m_partyMinZ : partyObj->m_worldPosition.z;
-            m_partyMaxX = (m_partyMaxX > partyObj->m_worldPosition.x) ? m_partyMaxX : partyObj->m_worldPosition.x;
-            m_partyMaxY = (m_partyMaxY > partyObj->m_worldPosition.y) ? m_partyMaxY : partyObj->m_worldPosition.y;
-            m_partyMaxZ = (m_partyMaxZ > partyObj->m_worldPosition.z) ? m_partyMaxZ : partyObj->m_worldPosition.z;
+            m_partyBound.m_min.x = (m_partyBound.m_min.x < partyObj->m_worldPosition.x) ? m_partyBound.m_min.x : partyObj->m_worldPosition.x;
+            m_partyBound.m_min.y = (m_partyBound.m_min.y < partyObj->m_worldPosition.y) ? m_partyBound.m_min.y : partyObj->m_worldPosition.y;
+            m_partyBound.m_min.z = (m_partyBound.m_min.z < partyObj->m_worldPosition.z) ? m_partyBound.m_min.z : partyObj->m_worldPosition.z;
+            m_partyBound.m_max.x = (m_partyBound.m_max.x > partyObj->m_worldPosition.x) ? m_partyBound.m_max.x : partyObj->m_worldPosition.x;
+            m_partyBound.m_max.y = (m_partyBound.m_max.y > partyObj->m_worldPosition.y) ? m_partyBound.m_max.y : partyObj->m_worldPosition.y;
+            m_partyBound.m_max.z = (m_partyBound.m_max.z > partyObj->m_worldPosition.z) ? m_partyBound.m_max.z : partyObj->m_worldPosition.z;
         }
     }
 
@@ -1111,6 +1106,9 @@ CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
     static float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
     static s16 s_top[] = {0, 2, 4};
 
+    int scaledAmount;
+    int artifactRank;
+
     int stage =
         Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
     if (2 < stage) {
@@ -1119,14 +1117,14 @@ CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
 
     CBossArtifactStage* artifactBase;
     int stageBase = s_top[stage];
-    int scaledAmount = (int)((float)amount * s_ratio[ratioIndex - 1]);
+    scaledAmount = (int)((float)amount * s_ratio[ratioIndex - 1]);
 
     u16 thresholds[4];
     memset(thresholds, 0, sizeof(thresholds));
 
     int stageIndex = (int)Game.m_gameWork.m_bossArtifactStageIndex;
     artifactBase = Game.m_bossArtifactBase;
-    int artifactRank = 3;
+    artifactRank = 3;
 
     thresholds[1] = artifactBase[stageIndex].m_rankThresholds[1];
     thresholds[2] = artifactBase[stageIndex].m_rankThresholds[2];

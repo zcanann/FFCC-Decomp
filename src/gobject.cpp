@@ -3050,9 +3050,9 @@ void CGObject::move()
                 const s32 cflatCenterState = CFlatCenterState();
                 if (cflatCenterState == 1) {
                     Vec partyCenter;
-                    partyCenter.x = (Game.m_partyMinX + Game.m_partyMaxX) * sBgAttrNormal;
-                    partyCenter.y = (Game.m_partyMinY + Game.m_partyMaxY) * sBgAttrNormal;
-                    partyCenter.z = (Game.m_partyMinZ + Game.m_partyMaxZ) * sBgAttrNormal;
+                    partyCenter.x = (Game.m_partyBound.m_min.x + Game.m_partyBound.m_max.x) * sBgAttrNormal;
+                    partyCenter.y = (Game.m_partyBound.m_min.y + Game.m_partyBound.m_max.y) * sBgAttrNormal;
+                    partyCenter.z = (Game.m_partyBound.m_min.z + Game.m_partyBound.m_max.z) * sBgAttrNormal;
 
                     Vec centerDelta;
                     PSVECSubtract(&m_worldPosition, &partyCenter, &centerDelta);

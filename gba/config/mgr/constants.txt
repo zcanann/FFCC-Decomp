@@ -1,3 +1,14 @@
 # Literal values inside the image address range that are plain constants, not pointers.
 # "value unit" limits the entry to one unit.
-0x02020202  # tile fill pattern in fn_0200652C
+0x02020202  # tile fill pattern in Field_UpdateMap
+# gGlyphs entries whose packed bytes look like pointers.
+0x020200F2
+0x020200BD
+0x020200BB
+0x020200B9
+0x020200B7
+0x02020010
+0x02020050
+0x02020090
+0x020200D0
+0x0201010A

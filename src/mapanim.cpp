@@ -260,10 +260,12 @@ inline void CMapAnimNode::interp(Vec* out, CMapAnimKey* keys, int trackCount, in
         unsigned int i = 0;
 
         for (; i < trackCount; i++) {
+            unsigned int frameRange;
+            unsigned int currentFrame;
+            unsigned int endFrame;
             CMapAnimKey* current = &keys[i];
             unsigned int nextIndex = (trackCount <= (i + 1)) ? 0 : (i + 1);
             CMapAnimKey* next = keys + nextIndex;
-            unsigned int endFrame;
 
             if (nextIndex != 0) {
                 endFrame = next->frame;
@@ -272,10 +274,10 @@ inline void CMapAnimNode::interp(Vec* out, CMapAnimKey* keys, int trackCount, in
                     static_cast<unsigned int>((m_mapAnim->m_endFrame - m_mapAnim->m_startFrame) + 1);
             }
 
-            unsigned int currentFrame = current->frame;
+            currentFrame = current->frame;
             if ((currentFrame <= static_cast<unsigned int>(frameInLoop)) &&
                 (frameInLoop < static_cast<int>(endFrame))) {
-                unsigned int frameRange = endFrame - currentFrame;
+                frameRange = endFrame - currentFrame;
                 float t;
                 Vec currentScaled;
                 Vec nextScaled;

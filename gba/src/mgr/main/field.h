@@ -14,7 +14,6 @@ struct Field {
 
 struct Terrain {
     u16 flags;
-    u16 unk2;
 };
 
 #define TERRAIN_WALL  1
@@ -34,9 +33,6 @@ struct BgAffine {
 extern struct Field gField;
 extern const struct Terrain gTerrainTable[];
 extern u8 gFieldMap[FIELD_SIZE][FIELD_SIZE];
-extern u8 gFieldTiles[128][128];
-extern struct BgAffine gBgAffine[];
-extern u8 gBgAffineHdma[];
 extern const u8 gFieldMapLz[];
 extern const u8 gFieldTilesLz[];
 extern const u8 gSkyTilesLz[];

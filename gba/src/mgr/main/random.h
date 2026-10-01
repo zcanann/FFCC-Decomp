@@ -9,7 +9,7 @@
 
 extern u32 gMtState[MT_N];
 extern s32 gMtIndex;
-extern const u32 gMtMag01[2];
+extern u32 gMtMag01[2];
 
 void sgenrand(u32 seed);
 void lsgenrand(u32 *seeds);

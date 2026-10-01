@@ -13,26 +13,28 @@ struct RoutePoint {
     s8 dz;
     s8 speedType;
     u8 progress;
-    u8 unkA[6];
+    /* Distance to the next point and from the start, in 1/16 units */
+    u16 segLength;
+    u32 distance;
 };
 
 struct Route {
     s16 count;
-    s16 scale;
-    struct RoutePoint *pts;
+    s16 length;
+    const struct RoutePoint *pts;
 };
 
 struct RouteData {
     s16 count;
-    u8 unk2[0xA];
-    s16 scale;
-    u8 unkE[2];
+    u8 pad[0xA];
+    s16 length;
+    u8 pad2[2];
     struct RoutePoint pts[0];
 };
 
 struct PointList {
     s16 count;
-    struct Point *pts;
+    const struct Point *pts;
 };
 
 struct PointData {
@@ -42,7 +44,6 @@ struct PointData {
 
 struct RouteSpeed {
     s16 value;
-    u16 unk2;
 };
 
 enum {
@@ -53,15 +54,15 @@ enum {
 
 extern struct Route gRoutes[];
 extern struct PointList gPointLists[];
-extern struct RouteData gRouteData0;
-extern struct RouteData gRouteData1;
-extern struct RouteData gRouteData2;
-extern struct PointData gStartPoints;
-extern struct PointData gItemBoxPoints;
-extern struct PointData gPanelPoints;
+extern const struct RouteData gRouteData0;
+extern const struct RouteData gRouteData1;
+extern const struct RouteData gRouteData2;
+extern const struct PointData gStartPoints;
+extern const struct PointData gItemBoxPoints;
+extern const struct PointData gPanelPoints;
 extern const struct RouteSpeed gRouteSpeedTable[];
 
-static inline struct RoutePoint *GetRoutePoint(struct Route *route, s16 no)
+static inline const struct RoutePoint *GetRoutePoint(struct Route *route, s16 no)
 {
     return &route->pts[no];
 }

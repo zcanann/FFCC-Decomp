@@ -185,25 +185,19 @@ libgcc/_negdi2:
 	.text       start:0x0200EC80 end:0x0200EC98
 
 main:
-	.rodata     start:0x0200EC98 end:0x020139FC
+	.rodata     start:0x0200EC98 end:0x020139F8
+
+libc/reent/impure:
+	.rodata     start:0x020139F8 end:0x020139FC
 
 libc/stdio/vfprintf:
 	.rodata     start:0x020139FC end:0x02013A76
 
-main:
-	.rodata     start:0x02013A76 end:0x02013A78
-
 libc/stdlib/dtoa:
 	.rodata     start:0x02013A78 end:0x02013A8A
 
-main:
-	.rodata     start:0x02013A8A end:0x02013A8C
-
 libc/locale/locale:
 	.rodata     start:0x02013A8C end:0x02013AC6
-
-main:
-	.rodata     start:0x02013AC6 end:0x02013AC8
 
 libc/stdlib/mprec:
 	.rodata     start:0x02013AC8 end:0x02013BEC
@@ -212,7 +206,16 @@ libc/arm/syscalls:
 	.rodata     start:0x02013BEC end:0x02013C11
 
 main:
-	.rodata     start:0x02013C11 end:0x02015D44
+	.rodata     start:0x02013C14 end:0x02014684
+
+bss:
+	.bss        start:0x02014690 end:0x020159A4
+
+main:
+	.data       start:0x020159A4 end:0x02015A54
+
+libc/reent/impure:
+	.data       start:0x02015A54 end:0x02015D44
 
 libc/locale/locale:
 	.data       start:0x02015D44 end:0x02015D58
@@ -221,10 +224,13 @@ libc/stdlib/mallocr:
 	.data       start:0x02015D58 end:0x0201619C
 
 main:
-	.rodata     start:0x0201619C end:0x02021F78
+	.rodata     start:0x0201619C end:0x02021F6C
+	.ctors      start:0x02021F6C end:0x02021F78
 
 bss:
-	.ewram_bss  start:0x02021F78 end:0x0203FF35
+	.ewram_bss  start:0x02021F78 end:0x02040000
+
+main:
 	.bss        start:0x03000000 end:0x03007048
 
 libc/arm/syscalls:
@@ -233,11 +239,5 @@ libc/arm/syscalls:
 libgcc/dp-bit:
 	.bss        start:0x030070F8 end:0x0300710C
 
-bss:
-	.bss        start:0x0300710C end:0x03007110
-
 libgcc/fp-bit:
 	.bss        start:0x03007110 end:0x03007120
-
-bss:
-	.bss        start:0x03007120 end:0x03007B04

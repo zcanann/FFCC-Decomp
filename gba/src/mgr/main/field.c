@@ -5,6 +5,8 @@
 #include "text.h"
 #include "fixmath.h"
 
+struct Field gField;
+
 void Field_Init(struct Field *field)
 {
     field->map = gFieldMap;

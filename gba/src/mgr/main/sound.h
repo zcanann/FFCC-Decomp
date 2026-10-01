@@ -3,10 +3,36 @@
 
 #include "global.h"
 
+enum {
+    SE_CURSOR = 0,
+    SE_SELECT = 1,
+    SE_ENGINE = 3,
+    SE_COUNTDOWN = 4,
+    SE_GO = 5,
+    SE_BRAKE = 6,
+    SE_SKID = 7,
+    SE_ENGINE_ROUGH = 8,
+    SE_ITEM_GET = 9,
+    SE_SPIN = 10,
+    SE_SLIP = 11,
+    SE_FREEZE = 12,
+    SE_ITEM_USE = 13,
+    SE_BUMP = 14,
+    SE_BOOST = 15,
+    SE_SLOW = 16,
+    SE_FINAL_LAP = 17,
+    SE_PANEL = 18,
+    BGM_RACE = 50,
+    BGM_WIN = 51,
+    BGM_LOSE = 52,
+    BGM_READY = 53,
+    SONG_NONE = 0xFF,
+};
+
 struct MusicPlayerInfo;
 
 extern struct MusicPlayerInfo gMPlayBgm;
-extern struct MusicPlayerInfo gMPlaySe;
+extern struct MusicPlayerInfo gMPlayEngine;
 
 void m4aSoundInit(void);
 void m4aSoundMain(void);

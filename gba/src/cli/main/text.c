@@ -84,7 +84,7 @@ void Text_Clear(void)
 
 s32 Text_Print(const char *str, s32 mode)
 {
-    u32 height;
+    s32 height;
     s32 shift;
     s32 rest;
     s32 over;
@@ -92,27 +92,23 @@ s32 Text_Print(const char *str, s32 mode)
     s32 total;
     u32 len;
     s32 mapLen;
+    u32 *dst3;
     char *map;
     u8 *widths;
     u8 *glyphs;
     s32 second;
     struct Font *font;
-    const char *p;
     u32 i;
-    s32 base;
-    s32 limit;
-    s32 k;
+    const char *p;
     u32 index;
     u32 *glyph;
     s32 w;
-    s32 first;
+    s32 m;
     u32 *dst;
     u32 *dst2;
-    u32 *dst3;
-    u32 row;
+    s32 k;
     u32 bits;
     s32 v;
-    s32 num;
     s32 rs;
 
     if (str == NULL)
@@ -126,59 +122,59 @@ s32 Text_Print(const char *str, s32 mode)
     glyphs = (u8 *)font + font->glyphs;
     mapLen = strlen(map);
     total = 0;
-    for (i = 0; i < len; i++) {
-        base = font->first;
-        limit = mapLen - base * 2;
+    for (i = 0; i < len; i++, p++) {
+        w = font->first;
+        m = mapLen - w * 2;
         if (*p == ' ') {
             if (mode == TEXT_WIDTH)
                 total += 6;
             else
                 sTextX += 6;
         } else {
-            for (k = 0; k < limit && map[base * 2 + k] != *p; k++)
+            for (k = 0; k < m && map[w * 2 + k] != *p; k++)
                 ;
-            index = base + k;
+            index = w + k;
             if (mode == TEXT_WIDTH) {
                 total += widths[index];
             } else {
                 if (mode == TEXT_CHAR)
                     return widths[index];
                 second = index >= font->split;
-                num = index;
+                k = index;
                 if (second)
-                    num = index - font->split;
-                glyph = (u32 *)(glyphs + (font->glyphWidth >> 1) * font->height * num);
+                    k = index - font->split;
+                glyph = (u32 *)(glyphs + (font->glyphWidth >> 1) * font->height * k);
                 w = widths[index];
                 pad = 0;
                 if (mode != TEXT_DRAW && w <= 8) {
-                    first = 9 - w;
-                    pad = first >> 1;
+                    m = 9 - w;
+                    pad = m >> 1;
                     sTextX += pad;
                 }
-                first = 8 - (sTextX & 7);
-                if (first >= w) {
-                    shift = first;
+                m = 8 - (sTextX & 7);
+                if (m >= w) {
+                    shift = m;
                     over = 0;
                     rest = 0;
                 } else {
-                    shift = first;
-                    rest = w - first;
+                    shift = m;
+                    rest = w - m;
                     over = 0;
                     if (rest & 8) {
                         over = rest & 7;
                         rest = 8;
                     }
                 }
-                first &= 7;
+                m &= 7;
                 dst = (u32 *)&sTextCanvas[(sTextX >> 3) * 64];
-                for (row = height; row != 0; row--) {
-                    dst2 = dst + 16;
-                    dst3 = dst2 + 16;
+                dst2 = dst + 16;
+                dst3 = dst2 + 16;
+                for (k = 0; k < height; k++, glyph += 2, dst++, dst2++, dst3++) {
                     if (second)
                         bits = (glyph[0] & 0xCCCCCCCC) >> 2;
                     else
                         bits = glyph[0] & 0x33333333;
-                    if (first != 0) {
+                    if (m != 0) {
                         rs = 8 - shift;
                         v = bits;
                         if (rest == 0)
@@ -211,8 +207,6 @@ s32 Text_Print(const char *str, s32 mode)
                             *dst2 |= bits & sNibbleMasks[rest];
                         }
                     }
-                    glyph += 2;
-                    dst++;
                 }
                 if (mode != TEXT_DRAW)
                     sTextX += 9 - pad;
@@ -220,7 +214,6 @@ s32 Text_Print(const char *str, s32 mode)
                     sTextX += widths[index];
             }
         }
-        p++;
     }
     if (mode == TEXT_WIDTH)
         return total;

@@ -6,6 +6,13 @@
 #include "camera.h"
 #include "fixmath.h"
 #include "chunk.h"
+#include "sound.h"
+
+const char gObjFileName[] = "C:/FFF/miniGame/mgr/obj.cpp";
+
+struct Scenery gScenery[48];
+u8 gEngineSong;
+u8 gSkidSong;
 
 #define ANIM_COUNT 72
 
@@ -116,12 +123,12 @@ void Game_Init(struct Game *game)
         scenery->pos.y = y;
         scenery->pos.z = z;
         scenery->animNo = animNo;
-        scenery->unkD = 0;
+        scenery->unused2 = 0;
     }
     Game_Reset(game);
     gMain.oamDirty = 0;
-    gEngineSong = 0xFF;
-    gSkidSong = 0xFF;
+    gEngineSong = SONG_NONE;
+    gSkidSong = SONG_NONE;
 }
 
 /* Pushes two overlapping racers apart */
@@ -140,7 +147,7 @@ void Game_CollideRacer(struct Game *game, struct Vec3 *pos, struct Actor *actor)
     other = Game_HitTest(game, pos, 100, -2 << actor->id);
     if (other != NULL) {
         if (actor->id == gPlayerNo || other->id == gPlayerNo) {
-            m4aSongNumStart(14);
+            m4aSongNumStart(SE_BUMP);
         }
         dx = other->pos.x - actor->pos.x;
         dz = other->pos.z - actor->pos.z;

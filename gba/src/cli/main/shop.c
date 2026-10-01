@@ -981,7 +981,6 @@ void InfoWin_PrintNextRow(void)
     u32 *vals;
     u32 dst;
     s32 id;
-    s32 n;
     s32 w;
     s32 x;
     s32 t;
@@ -997,10 +996,10 @@ void InfoWin_PrintNextRow(void)
     items = 0;
     list = (struct BuyList *)gListBuf;
     if (gScreen == 1) {
-        n = list->count;
-        if (n & 1)
-            n++;
-        vals = (u32 *)&gBuyItemIds[n];
+        t = list->count;
+        if (t & 1)
+            t++;
+        vals = (u32 *)&gBuyItemIds[t];
         id = gBuyItemIds[sInfoItem];
     } else {
         items = (struct ItemInfo *)list;

@@ -34,7 +34,6 @@ struct OamNode {
 /* A sprite made of several OAM entries */
 struct Cell {
     u16 count;
-    u16 unk2;
     struct OamData oams[0];
 };
 
@@ -44,10 +43,9 @@ struct AnimFrame {
 };
 
 struct Anim {
-    u16 unk0;
-    u16 unk2;
+    u16 width;
+    u16 height;
     u16 count;
-    u16 unk6;
     struct AnimFrame frames[0];
 };
 
@@ -72,7 +70,6 @@ struct AnimState {
     struct Vec3 pos;          \
     u16 radius;               \
     u8 active;                \
-    u8 unkB;                  \
     struct AnimState anim;
 
 struct Obj {
@@ -94,7 +91,7 @@ struct ActorData {
 
 struct Actor {
     OBJ_FIELDS
-    struct ActorData *data;
+    const struct ActorData *data;
     u16 accel;
     u16 brake;
     s16 grip;
@@ -108,7 +105,6 @@ struct Actor {
     s16 spinAngle;
     u16 spinTimer;
     u16 speedEffectTimer;
-    u16 unk36;
     struct Vec3 vel;
     u16 speed;
     u16 heading;
@@ -134,6 +130,17 @@ struct Actor {
 };
 
 enum {
+    ITEM_FREEZE,
+    ITEM_SLIP,
+    ITEM_TRAP,
+    ITEM_COUNT,
+    ITEM_NONE = 0xFF,
+};
+
+/* Panels show one of eight foods */
+#define FOOD_COUNT 8
+
+enum {
     EFFECT_ITEM_BOX,
     EFFECT_PANEL,
     EFFECT_FREEZE_TRAIL,
@@ -157,7 +164,6 @@ struct Effect {
         struct {
             u16 wait;
             u8 kind;
-            u8 unk3;
         } box;
         struct {
             struct Actor *target;
@@ -185,9 +191,9 @@ struct Effect {
 /* Static decoration sprite placed on the course */
 struct Scenery {
     struct Vec3 pos;
-    u8 unk8[4];
+    u8 unused[4];
     u8 animNo;
-    u8 unkD;
+    u8 unused2;
 };
 
 struct SceneryDef {
@@ -233,18 +239,17 @@ extern struct ActorU16 gActorHeading[];
 extern struct ActorU8 gActorProgress[];
 extern struct ActorS8 gActorLap[];
 extern struct ActorU8 gActorFlags[];
+#define ACTOR_FLAG_SHOW_MARKER 0x10
 extern struct Effect gGameEffects[];
 extern struct Table *gGameAnimTable;
 extern u8 gGameActiveCount;
 extern vu8 gGameEnemyCount;
 
-extern struct OamData gOamBuffer[];
-extern struct OamMatrix gOamMatrices[];
 extern struct Scenery gScenery[];
 extern const u16 gSceneryCount;
 extern const struct SceneryDef gSceneryDefs[];
-extern struct ActorData gPlayerData[];
-extern struct ActorData gEnemyData[];
+extern const struct ActorData gPlayerData[];
+extern const struct ActorData gEnemyData[];
 extern const u8 gCharaTable[];
 extern const s16 gStartHeading;
 /* Speed modifiers: [0] while boosted, [1] while slowed down */
@@ -253,7 +258,7 @@ extern const s16 gSpeedEffectAccel[2];
 extern const s16 gPanelSlowThreshold;
 extern const s16 gPanelBoostThreshold;
 extern const u16 gSpeedEffectDurations[];
-extern const u8 gDirAnims[];
+extern u8 gDirAnims[];
 extern u8 gEngineSong;
 extern u8 gSkidSong;
 extern const char gObjFileName[];
@@ -288,7 +293,7 @@ void Racer_InitEnemy(struct Actor *a, u8 no);
 void Racer_UpdateEnemy(struct Actor *a);
 s32 Racer_IsWrongWay(struct Actor *a);
 void Racer_SetItem(struct Actor *a, u8 item);
-void Racer_ApplyPanel(struct Actor *a, u8 kind);
+void Racer_ApplyPanel(struct Actor *a, u8 food);
 
 /* game */
 void Scenery_Draw(struct Scenery *s);

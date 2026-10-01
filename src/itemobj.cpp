@@ -844,9 +844,9 @@ void CGItemObj::onFrameStat()
 				if (static_cast<int>(CFlatCenterState()) == 1) {
 					Vec partyCenter;
 
-					partyCenter.x = (Game.m_partyMinX + Game.m_partyMaxX) * kItemObjHalf;
-					partyCenter.y = (Game.m_partyMinY + Game.m_partyMaxY) * kItemObjHalf;
-					partyCenter.z = (Game.m_partyMinZ + Game.m_partyMaxZ) * kItemObjHalf;
+					partyCenter.x = (Game.m_partyBound.m_min.x + Game.m_partyBound.m_max.x) * kItemObjHalf;
+					partyCenter.y = (Game.m_partyBound.m_min.y + Game.m_partyBound.m_max.y) * kItemObjHalf;
+					partyCenter.z = (Game.m_partyBound.m_min.z + Game.m_partyBound.m_max.z) * kItemObjHalf;
 					distance = PSVECDistance(&m_worldPosition, &partyCenter);
 				}
 			}

@@ -4,6 +4,7 @@
 #include "global.h"
 
 #include "ffcc/cflat_data.h"
+#include "ffcc/mapocttree.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/manager.h"
 #include "ffcc/memory.h"
@@ -17,7 +18,6 @@ class CGPartyObj;
 class CCombi2;
 class CGObjWork;
 class CMapLightHolder;
-class CBound;
 class PPPIFPARAM;
 
 class CGame : public CManager
@@ -175,12 +175,7 @@ public:
     int m_currentSceneId;                   // 0xC7F0
     char m_currentScriptName[256];          // 0xC7F4
     char m_startScriptName[256];            // 0xC8F4
-    float m_partyMinX;                      // 0xC9F4
-    float m_partyMinY;                      // 0xC9F8
-    float m_partyMinZ;                      // 0xC9FC
-    float m_partyMaxX;                      // 0xCA00
-    float m_partyMaxY;                      // 0xCA04
-    float m_partyMaxZ;                      // 0xCA08
+    CBound m_partyBound;                    // 0xC9F4
     int m_frameCounterEnable;               // 0xCA0C
     float unkFloat_0xca10;                  // 0xCA10
     unsigned char m_cfdLoadedFlag;          // 0xCA14

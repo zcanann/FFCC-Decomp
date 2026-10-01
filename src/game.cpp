@@ -98,12 +98,6 @@ inline int CGBaseObj::GetCID()
  * JP Size: TODO
  */
 inline CGame::CGame()
-    : m_partyMinX(1.0E+10f)
-    , m_partyMinY(1.0E+10f)
-    , m_partyMinZ(1.0E+10f)
-    , m_partyMaxX(-1.0E+10f)
-    , m_partyMaxY(-1.0E+10f)
-    , m_partyMaxZ(-1.0E+10f)
 {
 }
 
@@ -864,23 +858,23 @@ void CGame::Calc()
         m_gameWork.m_frameCounter++;
     }
 
-    m_partyMinZ = 1.0E+10f;
-    m_partyMinY = 1.0E+10f;
-    m_partyMinX = 1.0E+10f;
-    m_partyMaxZ = -1.0E+10f;
-    m_partyMaxY = -1.0E+10f;
-    m_partyMaxX = -1.0E+10f;
+    m_partyBound.m_min.z = 1.0E+10f;
+    m_partyBound.m_min.y = 1.0E+10f;
+    m_partyBound.m_min.x = 1.0E+10f;
+    m_partyBound.m_max.z = -1.0E+10f;
+    m_partyBound.m_max.y = -1.0E+10f;
+    m_partyBound.m_max.x = -1.0E+10f;
 
     for (int i = 0; i < 4; i++) {
         CGPartyObj* partyObj = m_partyObjArr[i];
 
         if (partyObj != 0) {
-            m_partyMinX = (m_partyMinX < partyObj->m_worldPosition.x) ? m_partyMinX : partyObj->m_worldPosition.x;
-            m_partyMinY = (m_partyMinY < partyObj->m_worldPosition.y) ? m_partyMinY : partyObj->m_worldPosition.y;
-            m_partyMinZ = (m_partyMinZ < partyObj->m_worldPosition.z) ? m_partyMinZ : partyObj->m_worldPosition.z;
-            m_partyMaxX = (m_partyMaxX > partyObj->m_worldPosition.x) ? m_partyMaxX : partyObj->m_worldPosition.x;
-            m_partyMaxY = (m_partyMaxY > partyObj->m_worldPosition.y) ? m_partyMaxY : partyObj->m_worldPosition.y;
-            m_partyMaxZ = (m_partyMaxZ > partyObj->m_worldPosition.z) ? m_partyMaxZ : partyObj->m_worldPosition.z;
+            m_partyBound.m_min.x = (m_partyBound.m_min.x < partyObj->m_worldPosition.x) ? m_partyBound.m_min.x : partyObj->m_worldPosition.x;
+            m_partyBound.m_min.y = (m_partyBound.m_min.y < partyObj->m_worldPosition.y) ? m_partyBound.m_min.y : partyObj->m_worldPosition.y;
+            m_partyBound.m_min.z = (m_partyBound.m_min.z < partyObj->m_worldPosition.z) ? m_partyBound.m_min.z : partyObj->m_worldPosition.z;
+            m_partyBound.m_max.x = (m_partyBound.m_max.x > partyObj->m_worldPosition.x) ? m_partyBound.m_max.x : partyObj->m_worldPosition.x;
+            m_partyBound.m_max.y = (m_partyBound.m_max.y > partyObj->m_worldPosition.y) ? m_partyBound.m_max.y : partyObj->m_worldPosition.y;
+            m_partyBound.m_max.z = (m_partyBound.m_max.z > partyObj->m_worldPosition.z) ? m_partyBound.m_max.z : partyObj->m_worldPosition.z;
         }
     }
 

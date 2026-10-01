@@ -564,27 +564,26 @@ void SmithForgeScreen_PrintNextRow(void)
     char buf[64];
     struct Window *win = gWindows;
     struct Recipe *recipe;
-    s32 sel;
     u32 dst;
     s32 i, j;
     s32 id;
-    s32 count;
+    s32 n;
     s32 w;
     s32 pal;
 
     if (sSmithRow >= win->rows)
         return;
     recipe = GetRecipe();
-    sel = gSession.appearance & 3;
+    n = gSession.appearance & 3;
     Text_SetFill(1, 0);
     Text_Clear();
     dst = win->width * (sSmithRow << 6) + 0x06009000;
     if (sSmithRow == 0) {
-        if (recipe->ids[sel] > 0) {
-            sSmithVariant = sel;
+        if (recipe->ids[n] > 0) {
+            sSmithVariant = n;
         } else {
             for (i = 0; i <= 3; i++) {
-                if (i != sel && recipe->ids[i] != 0) {
+                if (i != n && recipe->ids[i] != 0) {
                     sSmithVariant = i;
                     break;
                 }
@@ -605,12 +604,12 @@ void SmithForgeScreen_PrintNextRow(void)
                 sSmithCanForge = 0;
             if (sSmithCanForge) {
                 for (i = 0; i < 3 && recipe->materials[i] != 0; i++) {
-                    count = 0;
+                    n = 0;
                     for (j = 0; j < 64; j++) {
                         if (gSession.items[j] == recipe->materials[i])
-                            count++;
+                            n++;
                     }
-                    if (recipe->counts[i] > count)
+                    if (recipe->counts[i] > n)
                         sSmithCanForge = 0;
                 }
             }
@@ -662,10 +661,10 @@ void SmithForgeScreen_PrintNextRow(void)
             sSmithRow = win->rows;
             return;
         }
-        count = 0;
+        n = 0;
         for (j = 0; j < 64; j++) {
             if (gSession.items[j] == id)
-                count++;
+                n++;
         }
         w = Text_Print(Msg_GetItemName(id), TEXT_WIDTH);
         Text_SetX(104 - w);
@@ -675,9 +674,9 @@ void SmithForgeScreen_PrintNextRow(void)
         Text_PrintNumber(recipe->counts[sSmithRow - 5], 126, 2);
         Text_SetX(152);
         Text_Print(Msg_GetSystem(18), TEXT_DRAW);
-        Text_PrintNumber(count, 166, 2);
+        Text_PrintNumber(n, 166, 2);
         Text_CopyToVram(dst, win->width);
-        pal = recipe->counts[sSmithRow - 5] > count ? 5 : 3;
+        pal = recipe->counts[sSmithRow - 5] > n ? 5 : 3;
         SmithForge_DrawRow(sSmithRow, pal);
     }
     sSmithRow++;

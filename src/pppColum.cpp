@@ -99,11 +99,11 @@ void pppRenderColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
                 float offsetY;
                 u8 alpha;
 
-                center.z = 0.0f;
                 offsetX = segmentDir.x * (float)(i + 1);
                 center.x = baseX + positionScale * offsetX;
                 offsetY = segmentDir.y * (float)(i + 1);
                 center.y = baseY + positionScale * offsetY;
+                center.z = 0.0f;
 
                 PSVECSubtract(&center, &positionWork->m_position, &offset);
                 {

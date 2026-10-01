@@ -618,7 +618,7 @@ config.libs = [
             Object(Matching, "pppColAccele.cpp"),
             Object(Matching, "pppColMove.cpp"),
             Object(Matching, "pppColor.cpp"),
-            Object(NonMatching, "pppColum.cpp"),
+            Object(Matching, "pppColum.cpp"),
             Object(Matching, "pppConformBGNormal.cpp"),
             Object(NonMatching, "pppConstrainCameraDir.cpp", cflags=cflags_game_cpp_exceptions),
             Object(Matching, "pppConstrainCameraDir2.cpp", cflags=cflags_game_cpp_exceptions),

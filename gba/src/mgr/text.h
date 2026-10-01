@@ -18,7 +18,7 @@ struct Glyph {
     u8 h;
 };
 
-extern struct TextLayer gTextLayer;
+#define gTextLayer (*(struct TextLayer *)0x0202BB94)
 extern u8 gCharset[];
 extern struct Glyph gGlyphs[];
 extern const u8 gFontTilesLz[];
@@ -31,7 +31,7 @@ extern const u8 gPauseLinkRowsLz[];
 extern const u8 gSelectPauseScreenLz[];
 extern const u8 gRetryLinkScreenLz[];
 extern const u8 gRetrySoloScreenLz[];
-extern u8 gTileBuffer[];
+#define gTileBuffer ((u8 *)0x0202E000)
 
 void Text_Init(struct TextLayer *layer);
 void Text_Clear(struct TextLayer *layer, u8 palette);

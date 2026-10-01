@@ -141,7 +141,7 @@ void intr_main(void);
 void JoyBus_HardReset(void);
 
 /* Scratch buffer for decompressing data before DMA to VRAM */
-extern u8 gDecompBuffer[];
+#define gDecompBuffer ((u8 *)0x02038000)
 
 void AssertFailed(const char *file, s32 line);
 

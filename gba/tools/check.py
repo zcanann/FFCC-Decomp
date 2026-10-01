@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Compile one GBA C file and report per-function matches against its target unit.
 
-    python gba/tools/check.py gba/src/mgr/main/sound.c            # all functions in the file
-    python gba/tools/check.py gba/src/mgr/main/sound.c fn_0200022C  # instruction diff for one
+    python gba/tools/check.py gba/src/mgr/sound.c            # all functions in the file
+    python gba/tools/check.py gba/src/mgr/sound.c fn_0200022C  # instruction diff for one
 
 Works without ninja (safe to run in parallel): the file is compiled into a private
 temporary directory with the same cpp/agbcc/as pipeline as the build, and diffed

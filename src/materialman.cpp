@@ -1908,6 +1908,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
         }
 
         if ((tevBit & 0x200) != 0) {
+            IncTexMapIdCur();
             GXColor tevColor3;
             GXColor tevColor2;
             tevColor2.r = 0xFF;
@@ -1918,7 +1919,6 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
             tevColor3.g = 0;
             tevColor3.b = 0xFF;
             tevColor3.a = 0xFF;
-            m_texMapIdCur = m_texMapIdCur + 1;
             GXSetTevColor(static_cast<_GXTevRegID>(2), tevColor2);
             GXSetTevColor(static_cast<_GXTevRegID>(3), tevColor3);
 
@@ -2037,7 +2037,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                         texCoordId = m_texScroll1TexCoord;
                     } else {
                         m_texCoordIdCur = m_texCoordIdCur + 1;
-                        texCoordId = m_texCoordIdCur;
+                        texCoordId = GetTexCoordIdCur();
                         GXSetTexCoordGen2(static_cast<_GXTexCoordID>(texCoordId), static_cast<_GXTexGenType>(1),
                                           static_cast<_GXTexGenSrc>(5), 0x3C, 0, 0x7D);
                     }
@@ -3564,15 +3564,15 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                     (material->m_textureData.m_textures[0] != 0) &&
                     (material->m_textureData.m_textures[1] != 0)) {
                     material->m_texShiftU = static_cast<char>(HighestSetBit(
-                        material->m_textureData.m_textures[0]->m_width /
-                        material->m_textureData.m_textures[1]->m_width));
+                        material->m_textureData.m_textures[0]->GetWidth() /
+                        material->m_textureData.m_textures[1]->GetWidth()));
                     if (static_cast<unsigned char>(material->m_texShiftU) == 0xFF) {
                         material->m_texShiftU = 0;
                     }
 
                     material->m_texShiftV = static_cast<char>(HighestSetBit(
-                        material->m_textureData.m_textures[0]->m_height /
-                        material->m_textureData.m_textures[1]->m_height));
+                        material->m_textureData.m_textures[0]->GetHeight() /
+                        material->m_textureData.m_textures[1]->GetHeight()));
                     if (static_cast<unsigned char>(material->m_texShiftV) == 0xFF) {
                         material->m_texShiftV = 0;
                     }

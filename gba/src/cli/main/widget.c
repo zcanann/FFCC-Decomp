@@ -10,13 +10,11 @@
 
 static inline u32 GetBgVram(s32 bg)
 {
-    u32 addr = 0x06000000;
-
     if (bg != 0) {
         if (bg != 1)
-            addr = 0x06008000;
+            return 0x06008000;
     }
-    return addr;
+    return 0x06000000;
 }
 
 void MsgBox_Layout(void)
@@ -133,7 +131,7 @@ u32 Window_GetTextVram(struct Window *win, s32 row, s32 half)
     n = 1;
     if (half == 0)
         n = 2;
-    addr += n * 32 * win->width * row;
+    addr += win->width * 32 * n * row;
     return addr;
 }
 

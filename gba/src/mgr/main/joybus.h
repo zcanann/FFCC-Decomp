@@ -91,7 +91,7 @@ extern const char gJoyAgbId[];
 extern const char gJoyGcId[];
 extern const char gJoyBusFileName[];
 
-static inline s32 IsActive(s32 no)
+static inline s32 IsActive(u16 no)
 {
     return (1 << no) & *(u8 *)&gPlayerMask;
 }

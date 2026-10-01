@@ -437,11 +437,11 @@ void UpdateGameState(struct Main *main)
             m4aSongNumStart(BGM_RACE);
             if (main->timer == 30) {
                 Text_Clear(&gTextLayer, 15);
-                (gActorFlags + gPlayerNo)->value &= ~ACTOR_FLAG_SHOW_MARKER;
+                gGame.actors[gPlayerNo].showMarker = 0;
             }
         }
         if (main->timer > 29) {
-            lap = (gActorLap + gPlayerNo)->value;
+            lap = gGame.actors[gPlayerNo].lap;
             if (main->lap != lap) {
                 if ((s8)(lap - gShownLap) > 0 && lap >= 0) {
                     if (main->bestLapTime > main->lapTime) {
@@ -808,7 +808,7 @@ void RemovePlayer(struct Main *main, u8 id)
     s32 bit = 1 << id;
 
     if (bit & gPlayerMask) {
-        (gGame.actors + id)->active = 0;
+        gGame.actors[id].active = 0;
         gPlayerMask &= ~bit;
         CountPlayers();
     }

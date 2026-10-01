@@ -30,7 +30,7 @@ void Camera_Update(struct Camera *cam)
     if (cam->pressed & SELECT_BUTTON) {
         for (;;) {
             cam->player++;
-            if (cam->player >= gGameEnemyCount + 4)
+            if (cam->player >= *(vu8 *)&gGame.enemyCount + 4)
                 cam->player = 0;
             if (cam->player > 3 || IsActive(cam->player))
                 break;
@@ -47,7 +47,7 @@ void Camera_Update(struct Camera *cam)
         cam->yaw += 364;
         p = &gGame.actors[cam->player];
         if (cam->held & R_BUTTON)
-            Camera_Follow(cam, &p->pos, (gActorHeading + cam->player)->value, -2000, 0);
+            Camera_Follow(cam, &p->pos, p->heading, -2000, 0);
         else
             Camera_Follow(cam, &p->pos, cam->yaw, -2000, 0);
     }

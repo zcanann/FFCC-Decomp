@@ -218,32 +218,7 @@ struct Game {
     u8 actorCount;
 };
 
-extern struct Game gGame;
-/* Fields of gGame referenced through their own symbols */
-struct ActorU8 {
-    u8 value;
-    u8 pad[sizeof(struct Actor) - 1];
-};
-
-struct ActorS8 {
-    s8 value;
-    u8 pad[sizeof(struct Actor) - 1];
-};
-
-struct ActorU16 {
-    u16 value;
-    u8 pad[sizeof(struct Actor) - 2];
-};
-
-extern struct ActorU16 gActorHeading[];
-extern struct ActorU8 gActorProgress[];
-extern struct ActorS8 gActorLap[];
-extern struct ActorU8 gActorFlags[];
-#define ACTOR_FLAG_SHOW_MARKER 0x10
-extern struct Effect gGameEffects[];
-extern struct Table *gGameAnimTable;
-extern u8 gGameActiveCount;
-extern vu8 gGameEnemyCount;
+#define gGame (*(struct Game *)0x0202C618)
 
 extern struct Scenery gScenery[];
 extern const u16 gSceneryCount;

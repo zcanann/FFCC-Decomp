@@ -192,7 +192,7 @@ void FavoriteScreen_DrawRow(s32 idx)
                 buf[j] = attr | t;
             }
         }
-        DmaCopy16(3, buf, map, w * 2);
+        DmaCopy16(3, buf, map, w << 1);
     }
 }
 

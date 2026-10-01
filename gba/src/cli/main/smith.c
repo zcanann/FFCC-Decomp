@@ -760,7 +760,7 @@ void SmithForge_DrawRow(s32 idx, s32 pal)
             }
         }
         map = Bg_GetMapPtr(bg, gWindows[0].x + 1, row);
-        DmaCopy16(3, buf, map, w * 2);
+        DmaCopy16(3, buf, map, w << 1);
     }
 }
 

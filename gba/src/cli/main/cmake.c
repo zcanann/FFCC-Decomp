@@ -1947,8 +1947,8 @@ void CMakeJobScreen_DrawNextRow(void)
         x = win->x + 2;
         y = win->y + 2 + sCMakeTileRow * 2;
         map = Bg_GetMapPtr(win->bg - 1, x, y);
-        DmaCopy16(3, buf, map, len * 2);
-        DmaCopy16(3, &buf[30], map + 32, len * 2);
+        DmaCopy16(3, buf, map, len << 1);
+        DmaCopy16(3, &buf[30], map + 32, len << 1);
         sCMakeTileRow++;
     }
 }
@@ -2254,8 +2254,8 @@ void CMakeConfirmScreen_DrawNextRow(void)
         x = win->x + 2;
         y = win->y + 2 + sCMakeTileRow * 2;
         map = Bg_GetMapPtr(win->bg - 1, x, y);
-        DmaCopy16(3, buf, map, len * 2);
-        DmaCopy16(3, &buf[30], map + 32, len * 2);
+        DmaCopy16(3, buf, map, len << 1);
+        DmaCopy16(3, &buf[30], map + 32, len << 1);
         sCMakeTileRow++;
     }
 }

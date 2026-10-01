@@ -711,7 +711,7 @@ void ShopList_DrawRow(s32 idx, s32 row, s32 flag)
             }
         }
         map = Bg_GetMapPtr(win->bg, win->x + 1, y + j);
-        DmaCopy16(3, buf, map, w * 2);
+        DmaCopy16(3, buf, map, w << 1);
     }
 }
 
@@ -1132,7 +1132,7 @@ void InfoWin_PrintNextRow(void)
                         t += 4;
                     }
                 }
-                DmaCopy16(3, buf, dst, w * 2);
+                DmaCopy16(3, buf, dst, w << 1);
                 dst += 64;
             }
         }

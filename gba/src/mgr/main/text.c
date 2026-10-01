@@ -1,5 +1,32 @@
 #include "global.h"
+#include "main.h"
 #include "text.h"
+
+u8 gCharset[] = "!@#$%^&()-+*/=:abcdefg0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ. ";
+
+struct Glyph gGlyphs[] = {
+    { 0xF2, 2, 2 },
+    { 0xBD, 2, 2 },
+    { 0xBB, 2, 2 },
+    { 0xB9, 2, 2 },
+    { 0xB7, 2, 2 },
+    { 0x4, 4, 4 },
+    { 0x8, 4, 4 },
+    { 0xC, 4, 4 },
+    { 0x80, 10, 6 },
+    { 0x140, 15, 6 },
+    { 0x10, 2, 2 },
+    { 0x50, 2, 2 },
+    { 0x90, 2, 2 },
+    { 0xD0, 2, 2 },
+    { 0x12, 4, 2 },
+    { 0x8A, 6, 2 },
+    { 0xCA, 6, 2 },
+    { 0x10A, 1, 2 },
+    { 0x16, 3, 3 },
+    { 0x19, 3, 3 },
+    { 0x12F, 11, 2 },
+};
 
 void Text_Init(struct TextLayer *layer)
 {

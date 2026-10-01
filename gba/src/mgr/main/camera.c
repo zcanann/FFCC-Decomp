@@ -6,6 +6,8 @@
 #include "fixmath.h"
 #include "field.h"
 
+struct Camera gCamera;
+
 void Camera_Init(struct Camera *cam)
 {
     cam->pos.x = cam->pos.y = cam->pos.z = 0;

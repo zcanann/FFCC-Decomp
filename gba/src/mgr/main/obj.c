@@ -8,6 +8,12 @@
 #include "chunk.h"
 #include "sound.h"
 
+const char gObjFileName[] = "C:/FFF/miniGame/mgr/obj.cpp";
+
+struct Scenery gScenery[48];
+u8 gEngineSong;
+u8 gSkidSong;
+
 #define ANIM_COUNT 72
 
 void Scenery_Draw(struct Scenery *s)

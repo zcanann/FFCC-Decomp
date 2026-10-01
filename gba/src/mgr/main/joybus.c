@@ -18,6 +18,35 @@
 #define LINK_CMD_REMOVE_PLAYER 0x2001
 #define LINK_CMD_START         30
 
+const char gJoyAgbId[] = "AMGR";
+const char gJoyGcId[] = "GMGR";
+const char gJoyBusFileName[] = "C:/FFF/miniGame/mgr/MgJoyBus/MgJoyBus.cpp";
+
+struct JoyWork gJoyWork;
+vu16 gPadHeld[4];
+vu16 gPadNew[4];
+vu8 gLinkMode;
+u8 gLinkSynced;
+u8 gLinkWaitStart;
+u8 gLinkStarted;
+u8 gLinkFrameReady;
+vu8 gPlayerNo;
+vu8 gPlayerCount;
+vu8 gPlayerMask;
+u8 gLinkFirstFrame;
+vu8 gJoyRecvFrames;
+u8 gJoyLastRecv;
+u32 gLinkUnused;
+u16 gLinkWaitCount;
+u16 gUnused_03005D72;
+u16 gLinkFrameCmd;
+u16 gLinkSendCmd;
+struct JoyRecvQueue gJoyRecvQueue;
+u16 gLinkFrameCount;
+vu8 gLinkWarmup;
+u8 gJoySendPending;
+vu8 gJoyIntrCount;
+
 void ReadKeys(void)
 {
     u16 keys = REG_KEYINPUT ^ KEY_MASK;
@@ -295,8 +324,8 @@ void Link_InitState(void)
             ((u8 *)&gJoyWork)[k] = 0;
         gJoyWork.firstInit = 1;
         Link_Init();
-        gJoyWork.agbId = gJoyAgbId;
-        gJoyWork.expectedGcId = gJoyGcId;
+        gJoyWork.agbId = *(const u32 *)gJoyAgbId;
+        gJoyWork.expectedGcId = *(const u32 *)gJoyGcId;
         gJoyWork.send.ctx.cartFixed = *(u16 *)0x080000B2;
         gJoyWork.send.ctx.cartGameCode = *(u32 *)0x080000AC;
         REG_IME = ime;

@@ -91,7 +91,7 @@ struct ActorData {
 
 struct Actor {
     OBJ_FIELDS
-    struct ActorData *data;
+    const struct ActorData *data;
     u16 accel;
     u16 brake;
     s16 grip;
@@ -245,13 +245,11 @@ extern struct Table *gGameAnimTable;
 extern u8 gGameActiveCount;
 extern vu8 gGameEnemyCount;
 
-extern struct OamData gOamBuffer[];
-extern struct OamMatrix gOamMatrices[];
 extern struct Scenery gScenery[];
 extern const u16 gSceneryCount;
 extern const struct SceneryDef gSceneryDefs[];
-extern struct ActorData gPlayerData[];
-extern struct ActorData gEnemyData[];
+extern const struct ActorData gPlayerData[];
+extern const struct ActorData gEnemyData[];
 extern const u8 gCharaTable[];
 extern const s16 gStartHeading;
 /* Speed modifiers: [0] while boosted, [1] while slowed down */
@@ -260,7 +258,7 @@ extern const s16 gSpeedEffectAccel[2];
 extern const s16 gPanelSlowThreshold;
 extern const s16 gPanelBoostThreshold;
 extern const u16 gSpeedEffectDurations[];
-extern const u8 gDirAnims[];
+extern u8 gDirAnims[];
 extern u8 gEngineSong;
 extern u8 gSkidSong;
 extern const char gObjFileName[];

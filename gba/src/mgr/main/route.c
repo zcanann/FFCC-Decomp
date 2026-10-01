@@ -1,6 +1,9 @@
 #include "global.h"
 #include "route.h"
 
+struct Route gRoutes[3];
+struct PointList gPointLists[3];
+
 void Route_Init(struct Route *routes)
 {
     routes[0].count = gRouteData0.count;
@@ -38,8 +41,8 @@ s16 Route_FindSegment(struct Route *route, s16 start, s16 x, s16 z)
 {
     s16 i = start;
     s16 next = NextPoint(route, i);
-    struct RoutePoint *p;
-    struct RoutePoint *q;
+    const struct RoutePoint *p;
+    const struct RoutePoint *q;
     s16 dx;
     s16 dz;
     s16 qx;
@@ -71,8 +74,8 @@ s16 Route_FindSegment(struct Route *route, s16 start, s16 x, s16 z)
 
 s16 Route_Track(struct Route *route, s16 idx, s16 x, s16 z, s16 *pos)
 {
-    struct RoutePoint *p;
-    struct RoutePoint *q;
+    const struct RoutePoint *p;
+    const struct RoutePoint *q;
     s16 dx;
     s16 dz;
     s16 i;
@@ -104,7 +107,7 @@ s16 Route_Track(struct Route *route, s16 idx, s16 x, s16 z, s16 *pos)
 
 s16 Route_Advance(struct Route *route, s16 idx, s16 x, s16 z)
 {
-    struct RoutePoint *q;
+    const struct RoutePoint *q;
     s16 dx;
     s16 dz;
     s16 i;
@@ -122,8 +125,8 @@ s16 Route_Advance(struct Route *route, s16 idx, s16 x, s16 z)
 
 s32 Route_Dot(struct Route *route, s16 idx, s16 vx, s16 vz)
 {
-    struct RoutePoint *p = &route->pts[idx];
-    struct RoutePoint *q = &route->pts[NextPoint(route, idx)];
+    const struct RoutePoint *p = &route->pts[idx];
+    const struct RoutePoint *q = &route->pts[NextPoint(route, idx)];
 
     return vx * (q->x - p->x) + vz * (q->z - p->z);
 }

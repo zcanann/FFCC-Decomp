@@ -19,9 +19,8 @@ struct Glyph {
 };
 
 extern struct TextLayer gTextLayer;
-extern char gPrintBuffer[];
-extern const u8 gCharset[];
-extern const struct Glyph gGlyphs[];
+extern u8 gCharset[];
+extern struct Glyph gGlyphs[];
 extern const u8 gFontTilesLz[];
 extern const u8 gFontPalette[];
 extern const u8 gBgTilesLz[];

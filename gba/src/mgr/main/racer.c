@@ -9,6 +9,8 @@
 #include "sound.h"
 #include "fixmath.h"
 
+u8 gDirAnims[] = { 4, 5, 26, 27, 0, 1, 2, 3 };
+
 static inline struct Anim *GetAnim(u16 id)
 {
     return gGameAnimTable->entries[id];
@@ -228,7 +230,7 @@ u8 Racer_FindObstacle(struct Actor *a, struct Vec3 *pos, u8 *progress, s16 *rout
 void Racer_UpdateProgress(struct Actor *a)
 {
     struct Route *route;
-    struct RoutePoint *node;
+    const struct RoutePoint *node;
     u8 prev;
     s16 dx;
     s16 dz;
@@ -277,7 +279,7 @@ static inline void GetDir(struct Point *dir, u16 angle)
 
 void Racer_InitParams(struct Actor *a)
 {
-    struct ActorData *d = a->data;
+    const struct ActorData *d = a->data;
     struct Point dir;
 
     a->accel = d->accel;
@@ -299,7 +301,7 @@ void Racer_InitParams(struct Actor *a)
 
 void Racer_InitPlayer(struct Actor *a, u8 id, u8 chara)
 {
-    struct Point *pt;
+    const struct Point *pt;
 
     a->aiRouteNo = 0xFF;
     a->routeNo = 0;
@@ -589,7 +591,7 @@ void Racer_DrawChaserMarker(struct Actor *a, struct Actor *chaser, struct AnimSt
 void Racer_InitEnemy(struct Actor *a, u8 no)
 {
     s32 n;
-    struct Point *pt;
+    const struct Point *pt;
 
     a->routeNo = 0;
     Racer_Reset(a);
@@ -640,8 +642,8 @@ void Racer_UpdateEnemy(struct Actor *a)
     struct Point dir;
     struct Vec3 next;
     struct Route *route;
-    struct RoutePoint *node;
-    struct RoutePoint *nextNode;
+    const struct RoutePoint *node;
+    const struct RoutePoint *nextNode;
     u16 nextPos;
     u8 nextIndex;
     s16 idx;

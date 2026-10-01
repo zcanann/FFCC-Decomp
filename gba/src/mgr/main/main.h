@@ -2,6 +2,8 @@
 #define GUARD_MAIN_H
 
 #include "global.h"
+#include "field.h"
+#include "obj.h"
 
 enum {
     STATE_LOADING,
@@ -55,12 +57,21 @@ struct Main {
 };
 
 extern struct Main gMain;
+extern u16 gHeldKeys;
+extern u16 gNewKeys;
+extern u8 gIntrMainRam[];
+extern u8 gFieldTiles[128][128];
+extern struct BgAffine gBgAffine[];
+extern struct OamData gOamBuffer[];
+extern struct OamMatrix gOamMatrices[];
+extern char gPrintBuffer[];
 extern vu32 gVBlankCounter;
 extern s32 gFrameCounter;
 extern s32 gRaceFrameCounter;
 extern vu16 gSkyScrollPrev;
 extern vu16 gSkyScroll;
-extern u8 gIntrMainRam[];
+extern u8 gBgAffineHdma[];
+extern u32 gJoySendData;
 extern vu8 gVCountPhase;
 extern volatile s8 gShownLap;
 extern u8 gWrongWayShown;
@@ -70,8 +81,6 @@ extern u32 gMainUnused;
 extern u32 gMainUnused2;
 extern const char *gAssertFile;
 extern s32 gAssertLine;
-extern u16 gHeldKeys;
-extern u16 gNewKeys;
 
 extern const u8 gConfigLinkMode;
 extern const u8 gConfigRacerCount;

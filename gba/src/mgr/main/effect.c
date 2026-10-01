@@ -7,6 +7,14 @@
 #include "sound.h"
 #include "random.h"
 
+const char gEffectFileName[] = "C:/FFF/miniGame/mgr/effect.cpp";
+
+u8 gItemBoxAnims[] = { 35, 37, 36 };
+u8 gPanelAnims[] = { 8, 9, 10, 11, 12, 13, 14, 71 };
+
+const struct ActorData gFreezeShotParams = { 40, 0, 0, 32, 4800, 0, 0, 0, 0, { 0, 0, 0, 0 } };
+const struct ActorData gSlipShotParams = { 40, 0, 0, 32, 4800, 0, 0, 0, 0, { 0, 0, 0, 0 } };
+
 static inline void GetDir(struct Point *dir, u16 angle)
 {
     dir->x = gSinTable[angle >> 5];
@@ -24,7 +32,7 @@ static inline s32 MulShift(s32 a, s32 b)
     return (a * b) >> 8;
 }
 
-static inline s16 Distance(struct RoutePoint *pt, struct Vec3 *pos)
+static inline s16 Distance(const struct RoutePoint *pt, struct Vec3 *pos)
 {
     s16 dx;
     s16 dz;
@@ -75,7 +83,7 @@ struct Effect *Effect_AllocLast(struct Game *game)
 void Effect_InitItemBox(struct Effect *e, va_list *ap)
 {
     s32 no = va_arg(*ap, s32);
-    struct Point *pt = &PointList_Get(gPointLists, POINTS_ITEM_BOX)->pts[(s16)no];
+    const struct Point *pt = &PointList_Get(gPointLists, POINTS_ITEM_BOX)->pts[(s16)no];
 
     e->pos.x = pt->x;
     e->pos.z = pt->y;
@@ -88,7 +96,7 @@ void Effect_InitItemBox(struct Effect *e, va_list *ap)
 void Effect_InitPanel(struct Effect *e, va_list *ap)
 {
     s32 no = va_arg(*ap, s32);
-    struct Point *pt = &PointList_Get(gPointLists, POINTS_PANEL)->pts[(s16)no];
+    const struct Point *pt = &PointList_Get(gPointLists, POINTS_PANEL)->pts[(s16)no];
 
     e->pos.x = pt->x;
     e->pos.z = pt->y;
@@ -189,7 +197,7 @@ void Effect_InitTrapThrow(struct Effect *e, va_list *ap)
 void Effect_InitTrap(struct Effect *e, va_list *ap)
 {
     struct Route *route;
-    struct RoutePoint *pt;
+    const struct RoutePoint *pt;
     s16 v;
     u8 base;
 
@@ -307,7 +315,7 @@ void Effect_SpawnLast(struct Game *game, u8 type, ...)
 s16 Effect_MoveAlongRoute(struct Effect *e, u8 routeNo, u8 *routeIdx, struct Point *vel, const struct ActorData *params, struct Actor *target, s16 targetDist)
 {
     struct Route *route;
-    struct RoutePoint *pt;
+    const struct RoutePoint *pt;
     u16 next;
     s16 idx;
     s16 dx;

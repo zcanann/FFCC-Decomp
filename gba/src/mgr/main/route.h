@@ -21,7 +21,7 @@ struct RoutePoint {
 struct Route {
     s16 count;
     s16 length;
-    struct RoutePoint *pts;
+    const struct RoutePoint *pts;
 };
 
 struct RouteData {
@@ -34,7 +34,7 @@ struct RouteData {
 
 struct PointList {
     s16 count;
-    struct Point *pts;
+    const struct Point *pts;
 };
 
 struct PointData {
@@ -54,15 +54,15 @@ enum {
 
 extern struct Route gRoutes[];
 extern struct PointList gPointLists[];
-extern struct RouteData gRouteData0;
-extern struct RouteData gRouteData1;
-extern struct RouteData gRouteData2;
-extern struct PointData gStartPoints;
-extern struct PointData gItemBoxPoints;
-extern struct PointData gPanelPoints;
+extern const struct RouteData gRouteData0;
+extern const struct RouteData gRouteData1;
+extern const struct RouteData gRouteData2;
+extern const struct PointData gStartPoints;
+extern const struct PointData gItemBoxPoints;
+extern const struct PointData gPanelPoints;
 extern const struct RouteSpeed gRouteSpeedTable[];
 
-static inline struct RoutePoint *GetRoutePoint(struct Route *route, s16 no)
+static inline const struct RoutePoint *GetRoutePoint(struct Route *route, s16 no)
 {
     return &route->pts[no];
 }

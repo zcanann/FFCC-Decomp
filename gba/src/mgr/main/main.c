@@ -12,6 +12,72 @@
 
 #define IWRAM 0x03000000
 
+typedef void (*IntrFunc)(void);
+
+const u32 lbl_0200EC98[2] = { 0, 0 };
+
+/* Interrupt handlers dispatched by intr_main, highest priority first */
+const IntrFunc IntrTable[] = {
+    Link_JoyIntr,
+    VBlankIntr,
+    VCountIntr,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+    IntrDummy,
+};
+
+const char gAssertText[] = "ASSERT";
+const char gAssertFileFmt[] = "FILE=%s";
+const char gAssertLineFmt[] = "LINE=%d";
+const char gAssertCountFmt[] = "CNT=%d";
+const char gLoadingText[] = "LOADING...";
+const char gLapTimeFmt[] = "LAP   %d:%02d:%02d   ";
+const char gBlankTimeText[] = "                   ";
+const char gTotalTimeFmt[] = "TOTAL %d:%02d:%02d   ";
+const char gRank1stText[] = "1ST";
+const char gRank2ndText[] = "2ND";
+const char gRank3rdText[] = "3RD";
+const char gRank4thText[] = "4TH";
+const char gRank5thText[] = "5TH";
+const char gRank6thText[] = "6TH";
+const char gRank7thText[] = "7TH";
+const char gRank8thText[] = "8TH";
+const char gRankNoneText[] = "---";
+const char gPauseText[] = "PAUSE";
+
+struct Main gMain;
+u16 gHeldKeys;
+u16 gNewKeys;
+u8 gIntrMainRam[0x200];
+u8 gFieldTiles[128][128];
+struct BgAffine gBgAffine[160];
+struct OamData gOamBuffer[128];
+struct OamMatrix gOamMatrices[32];
+char gPrintBuffer[256];
+vu32 gVBlankCounter;
+s32 gFrameCounter;
+s32 gRaceFrameCounter;
+vu16 gSkyScrollPrev;
+vu16 gSkyScroll;
+u8 gBgAffineHdma[0xA00];
+u32 gJoySendData;
+vu8 gVCountPhase;
+volatile s8 gShownLap;
+u8 gWrongWayShown;
+struct Actor *gChaserPlayer;
+struct Actor *gChaserEnemy;
+u32 gMainUnused;
+u32 gMainUnused2;
+const char *gAssertFile;
+s32 gAssertLine;
+
 /* Glyphs; the digits 1-3 are large, 4-8 small */
 #define GLYPH_DIGIT(n)    (8 - (n))
 #define GLYPH_GO          8
@@ -980,7 +1046,7 @@ void DrawGameSprites(struct Main *main)
     struct Point pos;
     struct Point cursor;
     struct Point num;
-    struct ActorData *data;
+    const struct ActorData *data;
     s32 i;
     s16 x;
 

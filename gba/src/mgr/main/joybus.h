@@ -63,8 +63,6 @@ struct JoyRecvQueue {
 };
 
 extern struct JoyWork gJoyWork;
-extern struct JoyRecvQueue gJoyRecvQueue;
-extern u32 gJoySendData;
 extern vu16 gPadHeld[4];
 extern vu16 gPadNew[4];
 extern vu8 gLinkMode;
@@ -80,15 +78,17 @@ extern vu8 gJoyRecvFrames;
 extern u8 gJoyLastRecv;
 extern u32 gLinkUnused;
 extern u16 gLinkWaitCount;
+extern u16 gUnused_03005D72;
 extern u16 gLinkFrameCmd;
 extern u16 gLinkSendCmd;
+extern struct JoyRecvQueue gJoyRecvQueue;
 extern u16 gLinkFrameCount;
 extern vu8 gLinkWarmup;
 extern u8 gJoySendPending;
 extern vu8 gJoyIntrCount;
 
-extern const u32 gJoyAgbId;
-extern const u32 gJoyGcId;
+extern const char gJoyAgbId[];
+extern const char gJoyGcId[];
 extern const char gJoyBusFileName[];
 
 void ReadKeys(void);

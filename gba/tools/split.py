@@ -42,6 +42,9 @@ class Symbol:
     size: int
     thumb: bool = False
     local: bool = False
+    # Raw bytes (dtk's data:<type>, or an extracted asset): values that look like
+    # pointers are emitted as numbers, not relocations.
+    raw: bool = False
 
 
 @dataclass
@@ -61,7 +64,7 @@ def parse_symbols(path: Path) -> List[Symbol]:
         attrs = dict(a.split(":", 1) if ":" in a else (a, "") for a in m.group(4).split())
         symbols.append(Symbol(m.group(1), m.group(2), int(m.group(3), 16), attrs.get("type", "object"),
                               int(attrs.get("size", "0"), 0), "thumb" in attrs,
-                              attrs.get("scope") == "local"))
+                              attrs.get("scope") == "local", "data" in attrs or attrs.get("asset") == ""))
     return sorted(symbols, key=lambda s: s.address)
 
 
@@ -82,7 +85,7 @@ def parse_splits(path: Path) -> List[Split]:
 def write_symbols(path: Path, symbols: List[Symbol]) -> None:
     lines = []
     for s in sorted(symbols, key=lambda s: s.address):
-        flags = (" thumb" if s.thumb else "") + (" scope:local" if s.local else "")
+        flags = (" thumb" if s.thumb else "") + (" scope:local" if s.local else "") + (" data:byte" if s.raw else "")
         lines.append(f"{s.name} = {s.section}:0x{s.address:08X}; // type:{s.kind} size:0x{s.size:X}{flags}")
     path.write_text("\n".join(lines) + "\n")
 
@@ -235,7 +238,9 @@ class Emitter:
         return "\n".join(out + body) + "\n"
 
     def emit_bss(self, split: Split) -> List[str]:
-        out = ["", f"\t.section {self.input_section(split)},\"aw\",%nobits", "\t.balign 4"]
+        # Common symbols are aligned up to 16 bytes, so a range can start past a gap.
+        align = next(n for n in (16, 8, 4) if split.start % n == 0) if split.start % 4 == 0 else 4
+        out = ["", f"\t.section {self.input_section(split)},\"aw\",%nobits", f"\t.balign {align}"]
         address = split.start
         for s in self.symbols:
             if s.section != split.section or not (split.start <= s.address < split.end):
@@ -254,9 +259,14 @@ class Emitter:
 
     def emit_range(self, split: Split, unit: str) -> List[str]:
         a = self.a
-        flags = "\"ax\",%progbits" if split.section == ".text" else "\"a\",%progbits"
+        flags = {".text": "\"ax\",%progbits", ".rodata": "\"a\",%progbits"}.get(split.section, "\"aw\",%progbits")
         out = ["", f"\t.section {self.input_section(split)},{flags}"]
         is_code = split.section == ".text"
+        if not is_code:
+            # Data starts at its own alignment; the gap before it is the linker's padding.
+            align = next(n for n in (4, 2, 1) if split.start % n == 0)
+            if align > 1:
+                out.append(f"\t.balign {align}")
         mode = None
         open_symbol: Optional[Tuple[Symbol, int]] = None
         address = split.start
@@ -267,6 +277,9 @@ class Emitter:
             if open_symbol is not None:
                 symbol, start = open_symbol
                 size = at - start
+                # A data object's padding before the next symbol is not part of it.
+                if symbol.kind != "function" and 0 < symbol.size < size:
+                    size = symbol.size
                 # Alignment padding before the next function is not part of this one.
                 pad = at - 2
                 if (symbol.kind == "function" and symbol.thumb and size > 2 and at % 4 == 0 and a.half(pad) == 0
@@ -340,7 +353,8 @@ class Emitter:
             inner = [i for i in (1, 2, 3) if address + i in self.by_address or address + i in labels]
             if address % 4 == 0 and remaining >= 4 and not inner and not self.overlaps_code(address):
                 value = a.word(address)
-                expr = self.pointer(value, unit, address)
+                raw = open_symbol is not None and open_symbol[0].raw and address < open_symbol[1] + open_symbol[0].size
+                expr = None if raw else self.pointer(value, unit, address)
                 out.append(f"\t.4byte {expr}" if expr else f"\t.4byte 0x{value:08X}")
                 address += 4
                 continue
@@ -410,7 +424,8 @@ class Emitter:
         sections: Dict[str, List[Split]] = {}
         for split in self.splits:
             # Initialized data is loaded with the rest of the image after the code.
-            output = ".rodata" if split.section == ".data" else split.section
+            # So is anything allocated inside the image, such as common symbols.
+            output = split.section if split.section == ".text" or split.start >= self.a.end else ".rodata"
             sections.setdefault(output, []).append(split)
         for section in list(LOAD_SECTIONS) + list(BSS_SECTIONS):
             if section not in sections:
@@ -427,6 +442,31 @@ class Emitter:
         out.append("\t/DISCARD/ : { *(.ARM.attributes) *(.comment) }")
         out.append("}")
         return "\n".join(out) + "\n"
+
+
+def load_emitter(data: bytes, config: Path) -> "Emitter":
+    """The emitter for an image and its config directory."""
+    symbols = parse_symbols(config / "symbols.txt")
+    splits = parse_splits(config / "splits.txt")
+    a = analyze(data, symbols)
+    constants_path = config / "constants.txt"
+    constants = []
+    if constants_path.is_file():
+        for line in constants_path.read_text().splitlines():
+            fields = line.split("#")[0].split()
+            if len(fields) == 1:
+                constants.append(int(fields[0], 0))
+            elif len(fields) == 2:
+                # A constant only within one unit.
+                constants.append((int(fields[0], 0), fields[1]))
+    references_path = config / "references.txt"
+    references = {}
+    if references_path.is_file():
+        for line in references_path.read_text().splitlines():
+            fields = line.split("#")[0].split()
+            if len(fields) == 2:
+                references[int(fields[0], 0)] = fields[1]
+    return Emitter(a, symbols, splits, constants, references)
 
 
 def main() -> None:
@@ -452,27 +492,8 @@ def main() -> None:
         write_splits(splits_path, splits)
         return
 
-    symbols = parse_symbols(symbols_path)
-    splits = parse_splits(splits_path)
-    a = analyze(data, symbols)
-    constants_path = args.config / "constants.txt"
-    constants = []
-    if constants_path.is_file():
-        for line in constants_path.read_text().splitlines():
-            fields = line.split("#")[0].split()
-            if len(fields) == 1:
-                constants.append(int(fields[0], 0))
-            elif len(fields) == 2:
-                # A constant only within one unit.
-                constants.append((int(fields[0], 0), fields[1]))
-    references_path = args.config / "references.txt"
-    references = {}
-    if references_path.is_file():
-        for line in references_path.read_text().splitlines():
-            fields = line.split("#")[0].split()
-            if len(fields) == 2:
-                references[int(fields[0], 0)] = fields[1]
-    emitter = Emitter(a, symbols, splits, constants, references)
+    emitter = load_emitter(data, args.config)
+    symbols, splits = emitter.symbols, emitter.splits
     units = list(dict.fromkeys(s.unit for s in splits))
 
     if args.asm_dir:

@@ -753,7 +753,7 @@ config.libs = [
             Object(NonMatching, "pppYmDeformationShp.cpp"),
             Object(NonMatching, "pppYmDrawMdlTexAnm.cpp"),
             Object(NonMatching, "pppYmEnv.cpp"),
-            Object(NonMatching, "pppYmLaser.cpp"),
+            Object(NonMatching, "pppYmLaser.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "pppYmLookOn.cpp"),
             Object(NonMatching, "pppYmMana.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "pppYmMegaBirthShpTail2.cpp"),

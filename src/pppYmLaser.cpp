@@ -53,6 +53,247 @@ static inline VColor* GetYmLaserColorData(pppYmLaser* laser, _pppCtrlTable* ctrl
 
 STATIC_ASSERT(offsetof(pppYmLaser, m_workArea) == 0x80);
 
+static const f32 kPppYmLaserHistoryBackstep = -1.0f;
+static const f32 kPppYmLaserHitRayScale = 1.2f;
+static const f32 kPppYmLaserFullTurn = 6.2831855f;
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d3780
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
+{
+	f32 zero = kPppYmLaserZero;
+	f32 randArg = kPppYmLaserFullTurn;
+	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
+
+	work->m_length = zero;
+	work->m_graphValue3 = zero;
+	work->m_graphValue2 = zero;
+	work->m_halfWidth = zero;
+	work->m_graphValue1 = zero;
+	work->m_graphValue0 = zero;
+	work->m_lengthStep = zero;
+	work->m_points = 0;
+	work->m_origin.z = zero;
+	work->m_origin.y = zero;
+	work->m_origin.x = zero;
+	work->m_shapeReady = 0;
+	work->m_hitFrame = 0;
+	work->m_unused2E = 0;
+	work->m_shapeArg0 = 0;
+	work->m_shapeArg2 = 0;
+	work->m_shapeArg1 = 0;
+	work->m_shapeRotation = Math.RandF(randArg);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d373c
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
+{
+	f32 zero = kPppYmLaserZero;
+	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
+
+	work->m_graphValue3 = zero;
+	work->m_graphValue2 = zero;
+	work->m_halfWidth = zero;
+	work->m_graphValue1 = zero;
+	work->m_graphValue0 = zero;
+	work->m_lengthStep = zero;
+	work->m_origin.z = zero;
+	work->m_origin.y = zero;
+	work->m_origin.x = zero;
+	work->m_shapeReady = 0;
+}
+
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d36f0
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
+{
+	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
+	void* stage = work->m_points;
+
+	if (stage != 0) {
+		pppMemFree(stage);
+		work->m_points = 0;
+	}
+}
+
+
+/*
+ * --INFO--
+ * PAL Address: 0x800d31d4
+ * PAL Size: 1308b
+ * EN Address: 0x800D29A0
+ * EN Size: 1308b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlTable* data)
+{
+	pppYmLaserWork* work;
+	Vec localB;
+	Vec localA;
+	Mtx tempMtx;
+	Mtx charaMtx;
+	int emptyHistory;
+	int fillIndex;
+
+	if ((ppvUserStopPartF == 0) && (step->m_stepValue != 0xFFFF)) {
+	work = GetYmLaserWork(laser, data);
+	emptyHistory = 0;
+
+	if (work->m_points == 0) {
+		work->m_points = (Vec*)pppMemAlloc(
+			(u32)step->m_laser.m_pointCount * 0xc, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmLaser_cpp), 0x5d);
+		memset(work->m_points, 0, (u32)step->m_laser.m_pointCount * 0xc);
+		emptyHistory = 1;
+	}
+
+	CalcGraphValue(
+		(_pppPObject*)laser, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
+		step->m_laser.m_halfWidthBase,
+		step->m_laser.m_halfWidthVelocity, step->m_laser.m_halfWidthAccel);
+	CalcGraphValue(
+		(_pppPObject*)laser, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
+		step->m_laser.m_lengthStepBase,
+		step->m_laser.m_lengthStepVelocity, step->m_laser.m_lengthStepAccel);
+
+	pppCalcFrameShape(
+		static_cast<long*>(ppvEnv->m_shapeTablePtr[step->m_stepValue]->m_animData), work->m_shapeArg1,
+		work->m_shapeArg2, work->m_shapeArg0, step->m_laser.m_shapeFrameStep);
+
+	for (int i = 0; i < (int)((u32)step->m_laser.m_historyFrameCount + 1); i++) {
+		int max = (int)step->m_laser.m_pointCount - 2;
+
+		for (int j = max; (int)i <= j; j--) {
+			pppCopyVector(work->m_points[j + 1], work->m_points[j]);
+		}
+
+		localB.x = LoadLaserFloat(kPppYmLaserZero);
+		localB.y = LoadLaserFloat(kPppYmLaserZero);
+		localB.z = work->m_length;
+
+		if (i == 0) {
+			PSMTXConcat(ppvMng->m_matrix.value, laser->m_localMatrix.value, tempMtx);
+			work->m_origin.x = tempMtx[0][3];
+			work->m_origin.y = tempMtx[1][3];
+			work->m_origin.z = tempMtx[2][3];
+			PSMTXMultVec(tempMtx, &localB, work->m_points);
+		} else {
+			if (emptyHistory) {
+				continue;
+			}
+
+			s32 frameCount = step->m_laser.m_historyFrameCount + 1;
+			float t = LoadLaserFloat(kPppYmLaserHistoryBackstep) / (float)frameCount;
+			t *= (float)i;
+			if (GetCharaNodeFrameMatrix(ppvMng, t, charaMtx) == 0) {
+				emptyHistory = 1;
+				continue;
+			} else {
+				PSMTXConcat(charaMtx, laser->m_localMatrix.value, charaMtx);
+				PSMTXMultVec(charaMtx, &localB, &work->m_points[i]);
+			}
+		}
+
+		pppSubVector(localA, work->m_points[i], work->m_origin);
+		PSVECScale(&localA, &localA, LoadLaserFloat(kPppYmLaserHitRayScale));
+
+		CMapCylinder cyl;
+		cyl.m_bottom = work->m_origin;
+		cyl.m_axis = localA;
+		cyl.m_radius = LoadLaserFloat(kPppYmLaserZero);
+
+		int check = MapMng.CheckHitCylinderNear(&cyl, &localA, 0xffffffff);
+		int hit = 0;
+		if (check != 0) {
+			hit = 1;
+			MapMng.m_hitMapObj->CalcHitPosition(&work->m_points[i]);
+			work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
+		} else {
+			if (i == 0) {
+				work->m_length += work->m_lengthStep;
+			}
+		}
+
+		if (i == 0) {
+			localB.x = LoadLaserFloat(kPppYmLaserZero);
+			localB.y = LoadLaserFloat(kPppYmLaserZero);
+			localB.z = work->m_length;
+			PSMTXMultVec(tempMtx, &localB, &work->m_points[i]);
+		}
+
+		if (step->m_laser.m_disableHitCylinder == 0) {
+			pppHitCylinderSendSystem(
+				ppvMng, &work->m_origin, &localA,
+				ppvMng->m_hitScale * step->m_laser.m_hitScale,
+				step->m_laser.m_hitRadius);
+		}
+
+		if (step->m_laser.m_disableHitObject == 0) {
+			int createHitObject = 0;
+			if (step->m_arg3 != -1) {
+				createHitObject = 1;
+			}
+			if (!hit) {
+				createHitObject = 0;
+			}
+
+			if (work->m_hitFrame < step->m_laser.m_hitInterval) {
+				work->m_hitFrame++;
+				createHitObject = 0;
+			} else {
+				work->m_hitFrame = 0;
+			}
+
+			if (createHitObject != 0) {
+				_pppPDataVal* dataVal = ppvMng->m_pppPDataVals + step->m_arg3;
+				_pppPObject* created;
+				if (dataVal == 0) {
+					created = 0;
+				} else {
+					created = pppCreatePObject(ppvMng, dataVal);
+					created->m_link.m_previous = &laser->m_link;
+				}
+
+				Vec* createdPos = (Vec*)(created->m_workArea + step->m_laser.m_spawnPositionOffset);
+				createdPos->x = work->m_points[i].x;
+				createdPos->y = work->m_points[i].y + step->m_laser.m_spawnYOffset;
+				createdPos->z = work->m_points[i].z;
+			}
+		}
+	}
+
+	if (emptyHistory) {
+		for (fillIndex = 0; fillIndex < (int)(u32)step->m_laser.m_pointCount; fillIndex++) {
+			pppCopyVector(work->m_points[fillIndex], work->m_points[0]);
+		}
+	}
+}
+}
+
+
 /*
  * --INFO--
  * PAL Address: 0x800d2614
@@ -312,242 +553,4 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 			pppInitBlendMode();
 		}
 	}
-}
-
-static const f32 kPppYmLaserHistoryBackstep = -1.0f;
-static const f32 kPppYmLaserHitRayScale = 1.2f;
-static const f32 kPppYmLaserFullTurn = 6.2831855f;
-
-/*
- * --INFO--
- * PAL Address: 0x800d31d4
- * PAL Size: 1308b
- * EN Address: 0x800D29A0
- * EN Size: 1308b
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlTable* data)
-{
-	pppYmLaserWork* work;
-	Vec localB;
-	Vec localA;
-	Mtx tempMtx;
-	Mtx charaMtx;
-	int emptyHistory;
-	int fillIndex;
-
-	if ((ppvUserStopPartF == 0) && (step->m_stepValue != 0xFFFF)) {
-	work = GetYmLaserWork(laser, data);
-	emptyHistory = 0;
-
-	if (work->m_points == 0) {
-		work->m_points = (Vec*)pppMemAlloc(
-			(u32)step->m_laser.m_pointCount * 0xc, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmLaser_cpp), 0x5d);
-		memset(work->m_points, 0, (u32)step->m_laser.m_pointCount * 0xc);
-		emptyHistory = 1;
-	}
-
-	CalcGraphValue(
-		(_pppPObject*)laser, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
-		step->m_laser.m_halfWidthBase,
-		step->m_laser.m_halfWidthVelocity, step->m_laser.m_halfWidthAccel);
-	CalcGraphValue(
-		(_pppPObject*)laser, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
-		step->m_laser.m_lengthStepBase,
-		step->m_laser.m_lengthStepVelocity, step->m_laser.m_lengthStepAccel);
-
-	pppCalcFrameShape(
-		static_cast<long*>(ppvEnv->m_shapeTablePtr[step->m_stepValue]->m_animData), work->m_shapeArg1,
-		work->m_shapeArg2, work->m_shapeArg0, step->m_laser.m_shapeFrameStep);
-
-	for (int i = 0; i < (int)((u32)step->m_laser.m_historyFrameCount + 1); i++) {
-		int max = (int)step->m_laser.m_pointCount - 2;
-
-		for (int j = max; (int)i <= j; j--) {
-			pppCopyVector(work->m_points[j + 1], work->m_points[j]);
-		}
-
-		localB.x = LoadLaserFloat(kPppYmLaserZero);
-		localB.y = LoadLaserFloat(kPppYmLaserZero);
-		localB.z = work->m_length;
-
-		if (i == 0) {
-			PSMTXConcat(ppvMng->m_matrix.value, laser->m_localMatrix.value, tempMtx);
-			work->m_origin.x = tempMtx[0][3];
-			work->m_origin.y = tempMtx[1][3];
-			work->m_origin.z = tempMtx[2][3];
-			PSMTXMultVec(tempMtx, &localB, work->m_points);
-		} else {
-			if (emptyHistory) {
-				continue;
-			}
-
-			s32 frameCount = step->m_laser.m_historyFrameCount + 1;
-			float t = LoadLaserFloat(kPppYmLaserHistoryBackstep) / (float)frameCount;
-			t *= (float)i;
-			if (GetCharaNodeFrameMatrix(ppvMng, t, charaMtx) == 0) {
-				emptyHistory = 1;
-				continue;
-			} else {
-				PSMTXConcat(charaMtx, laser->m_localMatrix.value, charaMtx);
-				PSMTXMultVec(charaMtx, &localB, &work->m_points[i]);
-			}
-		}
-
-		pppSubVector(localA, work->m_points[i], work->m_origin);
-		PSVECScale(&localA, &localA, LoadLaserFloat(kPppYmLaserHitRayScale));
-
-		CMapCylinder cyl;
-		cyl.m_bottom = work->m_origin;
-		cyl.m_axis = localA;
-		cyl.m_radius = LoadLaserFloat(kPppYmLaserZero);
-
-		int check = MapMng.CheckHitCylinderNear(&cyl, &localA, 0xffffffff);
-		int hit = 0;
-		if (check != 0) {
-			hit = 1;
-			MapMng.m_hitMapObj->CalcHitPosition(&work->m_points[i]);
-			work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
-		} else {
-			if (i == 0) {
-				work->m_length += work->m_lengthStep;
-			}
-		}
-
-		if (i == 0) {
-			localB.x = LoadLaserFloat(kPppYmLaserZero);
-			localB.y = LoadLaserFloat(kPppYmLaserZero);
-			localB.z = work->m_length;
-			PSMTXMultVec(tempMtx, &localB, &work->m_points[i]);
-		}
-
-		if (step->m_laser.m_disableHitCylinder == 0) {
-			pppHitCylinderSendSystem(
-				ppvMng, &work->m_origin, &localA,
-				ppvMng->m_hitScale * step->m_laser.m_hitScale,
-				step->m_laser.m_hitRadius);
-		}
-
-		if (step->m_laser.m_disableHitObject == 0) {
-			int createHitObject = 0;
-			if (step->m_arg3 != -1) {
-				createHitObject = 1;
-			}
-			if (!hit) {
-				createHitObject = 0;
-			}
-
-			if (work->m_hitFrame < step->m_laser.m_hitInterval) {
-				work->m_hitFrame++;
-				createHitObject = 0;
-			} else {
-				work->m_hitFrame = 0;
-			}
-
-			if (createHitObject != 0) {
-				_pppPDataVal* dataVal = ppvMng->m_pppPDataVals + step->m_arg3;
-				_pppPObject* created;
-				if (dataVal == 0) {
-					created = 0;
-				} else {
-					created = pppCreatePObject(ppvMng, dataVal);
-					created->m_link.m_previous = &laser->m_link;
-				}
-
-				Vec* createdPos = (Vec*)(created->m_workArea + step->m_laser.m_spawnPositionOffset);
-				createdPos->x = work->m_points[i].x;
-				createdPos->y = work->m_points[i].y + step->m_laser.m_spawnYOffset;
-				createdPos->z = work->m_points[i].z;
-			}
-		}
-	}
-
-	if (emptyHistory) {
-		for (fillIndex = 0; fillIndex < (int)(u32)step->m_laser.m_pointCount; fillIndex++) {
-			pppCopyVector(work->m_points[fillIndex], work->m_points[0]);
-		}
-	}
-}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800d36f0
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
-{
-	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
-	void* stage = work->m_points;
-
-	if (stage != 0) {
-		pppMemFree(stage);
-		work->m_points = 0;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800d373c
- * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
-{
-	f32 zero = kPppYmLaserZero;
-	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
-
-	work->m_graphValue3 = zero;
-	work->m_graphValue2 = zero;
-	work->m_halfWidth = zero;
-	work->m_graphValue1 = zero;
-	work->m_graphValue0 = zero;
-	work->m_lengthStep = zero;
-	work->m_origin.z = zero;
-	work->m_origin.y = zero;
-	work->m_origin.x = zero;
-	work->m_shapeReady = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800d3780
- * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
-{
-	f32 zero = kPppYmLaserZero;
-	f32 randArg = kPppYmLaserFullTurn;
-	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
-
-	work->m_length = zero;
-	work->m_graphValue3 = zero;
-	work->m_graphValue2 = zero;
-	work->m_halfWidth = zero;
-	work->m_graphValue1 = zero;
-	work->m_graphValue0 = zero;
-	work->m_lengthStep = zero;
-	work->m_points = 0;
-	work->m_origin.z = zero;
-	work->m_origin.y = zero;
-	work->m_origin.x = zero;
-	work->m_shapeReady = 0;
-	work->m_hitFrame = 0;
-	work->m_unused2E = 0;
-	work->m_shapeArg0 = 0;
-	work->m_shapeArg2 = 0;
-	work->m_shapeArg1 = 0;
-	work->m_shapeRotation = Math.RandF(randArg);
 }

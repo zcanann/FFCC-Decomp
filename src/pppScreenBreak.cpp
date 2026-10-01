@@ -81,11 +81,11 @@ static inline VColor* GetScreenBreakColorData(pppScreenBreak* screenBreak, s32 o
 
 static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive; }
 
-int SB_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
-void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
-void SB_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
-void InitPieceData(CChara::CModel*, PScreenBreak*, VScreenBreak*);
-void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
+static int SB_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
+static void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
+static void SB_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+static void InitPieceData(CChara::CModel*, PScreenBreak*, VScreenBreak*);
+static void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 
 /*
  * --INFO--
@@ -320,7 +320,7 @@ void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* ctrl)
  * JP Address: TODO
  * JP Size: TODO
  */
-void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
+static void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
     GXSetZMode(GX_TRUE, (GXCompare)7, GX_TRUE);
 }
@@ -334,21 +334,23 @@ void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work)
+static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work)
 {
     ScreenBreakPiece* piece;
     S16Vec globalMax;
 
     memset(work->m_pieces, 0, ScreenBreakModelRef(model)->m_meshCount * sizeof(ScreenBreakPiece));
     float translationRandLimit = kScreenBreakTranslationRandLimit;
-    CChara::CMesh* mesh = model->m_meshes;
+    CChara::CMesh* meshBase = model->m_meshes;
     float negativeRandLimit = -translationRandLimit;
-    piece = work->m_pieces;
+    ScreenBreakPiece* pieceBase = work->m_pieces;
     globalMax.x = -0x7FFF;
     globalMax.y = -0x7FFF;
     globalMax.z = -0x7FFF;
 
     for (u32 i = 0; i < model->m_data->m_meshCount; i++) {
+        CChara::CMesh* mesh = &meshBase[i];
+        piece = &pieceBase[i];
         ScreenBreakMeshData* meshData = mesh->m_data;
         CChara::CNode* node = &model->m_nodes[ScreenBreakMeshNodeIndex(meshData)];
         node->m_flagsBits.m_flag_80 = 0;
@@ -406,10 +408,9 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         piece->m_timer = kScreenBreakZero;
 
         float angle = Math.RandF(static_cast<float>(step->m_angleRand));
-        mesh++;
-        piece->m_angle = kScreenBreakDegToRad * (kScreenBreakExtentScale + angle);
+        angle = kScreenBreakExtentScale + angle;
+        piece->m_angle = kScreenBreakDegToRad * angle;
         piece->m_active = 0;
-        piece++;
     }
 
     gUtil.ConvI2FVector(work->m_extent, globalMax, ScreenBreakModelRef(model)->m_posQuant);
@@ -424,7 +425,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
  * JP Address: TODO
  * JP Size: TODO
  */
-void SB_DrawMeshDLCallback(CChara::CModel* model, void* workContext, void*, int meshIndex, int drawListIndex, float (*) [4])
+static void SB_DrawMeshDLCallback(CChara::CModel* model, void* workContext, void*, int meshIndex, int drawListIndex, float (*) [4])
 {
     VScreenBreak* work = static_cast<VScreenBreak*>(workContext);
     ScreenBreakMeshRef* mesh = model->m_meshes;
@@ -485,7 +486,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* workContext, void*, int 
  * JP Address: TODO
  * JP Size: TODO
  */
-void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
+static void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 {
     Vec lightDir;
     GXLightObj lightObj;
@@ -515,12 +516,12 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
  * JP Address: TODO
  * JP Size: TODO
  */
-int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext, void* stepContext)
+static int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext, void* stepContext)
 {
     float zero = kScreenBreakZero;
     VScreenBreak* work = static_cast<VScreenBreak*>(workContext);
     PScreenBreak* step = static_cast<PScreenBreak*>(stepContext);
-    ScreenBreakPiece* piece = work->m_pieces;
+    ScreenBreakPiece* pieceBase = work->m_pieces;
     Vec translation;
     Vec cameraForward;
     Vec cameraPos;
@@ -582,6 +583,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext, void* 
     }
 
     for (u32 i = 0; i < ScreenBreakModelRef(model)->m_meshCount; i++) {
+        ScreenBreakPiece* piece = &pieceBase[i];
         ScreenBreakMeshData* meshData = mesh->m_data;
         if (piece->m_active != 0) {
             MtxPtr nodeMtx = model->m_nodes[ScreenBreakMeshNodeIndex(meshData)].m_localRuntimeMtx;
@@ -630,7 +632,6 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* workContext, void* 
         }
 
         mesh++;
-        piece++;
     }
 
     return 1;

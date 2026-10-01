@@ -265,14 +265,17 @@ void BonusWin_Show(s32 idx, s32 pal)
     s32 i;
     s32 j;
     s32 tile;
+    s32 blank;
     u32 dst;
 
     pal <<= 12;
+    blank = 0x3FF;
     for (i = 0; i <= 3; i++) {
         for (j = 0; j < 30; j++)
-            buf[j] = 0x3FF;
+            buf[j] = blank;
         tile = Window_GetTextTile(win->slot);
-        tile += win->width * 2 * (i >> 1);
+        j = i >> 1;
+        tile += win->width * 2 * j;
         tile += i & 1;
         for (j = 0; j < win->width; j++) {
             if (j & 1) {

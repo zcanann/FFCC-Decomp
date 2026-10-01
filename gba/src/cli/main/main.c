@@ -264,10 +264,13 @@ s32 no;
     s32 pal_no;
     s32 x;
     s32 y;
+    s32 w;
     s32 h;
     u32 size;
     u32 dst;
 
+    w = 8;
+    h = 8;
     tiles = gBackdropTiles[no];
     pal_no = Link_GetPlayerNo();
     if (gSpMode) {
@@ -278,10 +281,9 @@ s32 no;
     DmaCopy16(3, tiles, 0x0600D7E0, 0x800);
     DmaCopy16(3, pal, 0x05000000, 32);
     size = 64;
-    h = 8;
     for (y = 0; y < h; y++) {
-        for (x = 0; x < 32; x += h) {
-            memcpy(&buf[x], &map[y * h], 16);
+        for (x = 0; x < 32; x += w) {
+            memcpy(&buf[x], &map[y * w], 16);
         }
         for (x = 0; x < 32; x++) {
             buf[x] += 0x2BF;
@@ -298,19 +300,21 @@ void Bg_CopyBackdropToRadar(void)
     u16 buf[40];
     s32 i;
     s32 j;
-    s32 w;
+    s32 size;
+    s32 n;
     u32 ofs;
     u32 dst;
 
     DmaCopy16(0, 0x0600D7E0, 0x06007060, 0x800);
-    w = 12;
+    size = 24;
     for (i = 0; i < 16; i++) {
-        DmaCopy16(0, 0x0600F800 + i * 64 + 40, buf, w * 2);
-        for (j = 0; j < w; j++) {
+        DmaCopy16(0, 0x0600F800 + i * 64 + 40, buf, size);
+        n = size / 2;
+        for (j = 0; j < n; j++) {
             buf[j] += 0xC4;
         }
         dst = 0x0600E800 + (i * 32 + 20) * 2;
-        DmaCopy16(0, buf, dst, w * 2);
+        DmaCopy16(0, buf, dst, size);
     }
     for (i = 16; i < 32; i++) {
         ofs = i * 64;

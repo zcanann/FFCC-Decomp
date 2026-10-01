@@ -566,16 +566,24 @@ void SmithForgeScreen_PrintNextRow(void)
     char buf[64];
     struct Window *win = gWindows;
     struct Recipe *recipe;
+    u8 *list;
     u32 dst;
     s32 i, j;
     s32 id;
     s32 n;
+    s32 cnt;
     s32 w;
-    s32 pal;
+    s32 x;
 
     if (sSmithRow >= win->rows)
         return;
-    recipe = GetRecipe();
+    list = LIST_BUF;
+    x = (s8)list[0];
+    x++;
+    if (x & 3)
+        x = ((x >> 2) + 1) << 2;
+    recipe = (struct Recipe *)(list + x);
+    recipe += sSmithSel;
     n = gSession.appearance & 3;
     Text_SetFill(1, 0);
     Text_Clear();
@@ -595,7 +603,8 @@ void SmithForgeScreen_PrintNextRow(void)
         Text_SetX(16);
         Text_Print(Msg_GetItemName(id), TEXT_DRAW);
         Text_CopyToVram(dst, win->width);
-        if (Item_CanEquip(&recipe->items[sSmithVariant].flags)) {
+        x = Item_CanEquip(&recipe->items[sSmithVariant].flags);
+        if (x) {
             sSmithCanEquip = 1;
         } else {
             sSmithCanEquip = 0;
@@ -605,32 +614,34 @@ void SmithForgeScreen_PrintNextRow(void)
             if (recipe->price > gSession.gil)
                 sSmithCanForge = 0;
             if (sSmithCanForge) {
-                for (i = 0; i < 3 && recipe->materials[i] != 0; i++) {
-                    n = 0;
+                for (i = 0; i < 3 && (x = recipe->materials[i]) != 0; i++) {
+                    cnt = 0;
                     for (j = 0; j < 64; j++) {
-                        if (gSession.items[j] == recipe->materials[i])
-                            n++;
+                        if (gSession.items[j] == x)
+                            cnt++;
                     }
-                    if (recipe->counts[i] > n)
+                    if (recipe->counts[i] > cnt)
                         sSmithCanForge = 0;
                 }
             }
         }
-        pal = sSmithCanForge ? 4 : 5;
-        SmithForge_DrawRow(sSmithRow, pal);
+        n = sSmithCanForge ? 4 : 5;
+        SmithForge_DrawRow(sSmithRow, n);
     } else if (sSmithRow == 1) {
         w = Text_Print(Msg_GetSystem(17), TEXT_WIDTH);
-        Text_SetX(104 - w);
+        x = 104;
+        Text_SetX(x - w);
         Text_Print(Msg_GetSystem(17), TEXT_DRAW);
         Text_SetX(108);
         Item_FormatWearer(&recipe->items[sSmithVariant].flags, buf);
         Text_Print(buf, TEXT_DRAW);
         Text_CopyToVram(dst, win->width);
-        pal = sSmithCanEquip ? 3 : 5;
-        SmithForge_DrawRow(sSmithRow, pal);
+        n = sSmithCanEquip ? 3 : 5;
+        SmithForge_DrawRow(sSmithRow, n);
     } else if (sSmithRow == 2) {
         w = Text_Print(Msg_GetSystem(22), TEXT_WIDTH);
-        Text_SetX(104 - w);
+        x = 104 - w;
+        Text_SetX(x);
         Text_Print(Msg_GetSystem(22), TEXT_DRAW);
         Text_SetX(112);
         Text_Print(Msg_GetSystem(18), TEXT_DRAW);
@@ -640,18 +651,21 @@ void SmithForgeScreen_PrintNextRow(void)
         SmithForge_DrawRow(sSmithRow, 3);
     } else if (sSmithRow == 3) {
         w = Text_Print(Msg_GetSystem(13), TEXT_WIDTH) + 72;
-        Text_PrintNumber(recipe->price, 104 - w, 8);
+        x = 104 - w;
+        Text_PrintNumber(recipe->price, x, 8);
         Text_Print(Msg_GetSystem(13), TEXT_DRAW);
         Text_SetX(112);
         Text_Print(Msg_GetSystem(18), TEXT_DRAW);
-        Text_PrintNumber(gSession.gil, (win->width - 2) * 8 - w, 8);
+        x = (win->width - 2) * 8 - w;
+        Text_PrintNumber(gSession.gil, x, 8);
         Text_Print(Msg_GetSystem(13), TEXT_DRAW);
         Text_CopyToVram(dst, win->width);
-        pal = recipe->price > gSession.gil ? 5 : 3;
-        SmithForge_DrawRow(sSmithRow, pal);
+        x = recipe->price > gSession.gil ? 5 : 3;
+        SmithForge_DrawRow(sSmithRow, x);
     } else if (sSmithRow == 4) {
         w = Text_Print(Msg_GetSystem(23), TEXT_WIDTH);
-        Text_SetX(104 - w);
+        x = 104 - w;
+        Text_SetX(x);
         Text_Print(Msg_GetSystem(23), TEXT_DRAW);
         Text_SetX(152);
         Text_Print(Msg_GetSystem(24), TEXT_DRAW);
@@ -663,23 +677,24 @@ void SmithForgeScreen_PrintNextRow(void)
             sSmithRow = win->rows;
             return;
         }
-        n = 0;
-        for (j = 0; j < 64; j++) {
-            if (gSession.items[j] == id)
-                n++;
+        cnt = 0;
+        for (i = 0; i < 64; i++) {
+            if (gSession.items[i] == id)
+                cnt++;
         }
         w = Text_Print(Msg_GetItemName(id), TEXT_WIDTH);
-        Text_SetX(104 - w);
+        x = 104 - w;
+        Text_SetX(x);
         Text_Print(Msg_GetItemName(id), TEXT_DRAW);
         Text_SetX(112);
         Text_Print(Msg_GetSystem(20), TEXT_DRAW);
         Text_PrintNumber(recipe->counts[sSmithRow - 5], 126, 2);
         Text_SetX(152);
         Text_Print(Msg_GetSystem(18), TEXT_DRAW);
-        Text_PrintNumber(n, 166, 2);
+        Text_PrintNumber(cnt, 166, 2);
         Text_CopyToVram(dst, win->width);
-        pal = recipe->counts[sSmithRow - 5] > n ? 5 : 3;
-        SmithForge_DrawRow(sSmithRow, pal);
+        x = recipe->counts[sSmithRow - 5] > cnt ? 5 : 3;
+        SmithForge_DrawRow(sSmithRow, x);
     }
     sSmithRow++;
 }
@@ -990,17 +1005,17 @@ void SmithEquipScreen_PrintNextRow(void)
     s32 id;
     s32 n;
     s32 msg;
-    s32 x;
     s32 digits;
     char *str;
 
     if (sSmithRow >= win->rows)
         return;
-    n = (s8)LIST_BUF[0];
+    str = (char *)LIST_BUF;
+    n = (s8)str[0];
     n++;
     if (n & 3)
         n = ((n >> 2) + 1) << 2;
-    recipe = (struct Recipe *)(LIST_BUF + n);
+    recipe = (struct Recipe *)(str + n);
     recipe = &recipe[sSmithSel];
     dst = Window_GetTextVram(win, sSmithRow, 0);
     flags = recipe->items[sSmithVariant].flags;
@@ -1020,19 +1035,19 @@ void SmithEquipScreen_PrintNextRow(void)
         if (flags & 0x3000) {
             Text_Print(Msg_GetStat(kind - 1), TEXT_DRAW);
             if (count != 0 && kind != 16) {
-                x = Item_IsPercentKind(kind);
+                n = Item_IsPercentKind(kind);
                 msg = 39;
-                if (x)
+                if (n)
                     msg = 40;
-                x = Text_Print(Msg_GetSystem(msg), TEXT_WIDTH);
+                n = Text_Print(Msg_GetSystem(msg), TEXT_WIDTH);
                 if (count <= 9)
                     digits = 1;
                 else if (count <= 99)
                     digits = 2;
                 else
                     digits = 3;
-                x = (win->width - 2) * 8 - digits * 9 - x;
-                Text_SetX(x);
+                n = (win->width - 2) * 8 - digits * 9 - n;
+                Text_SetX(n);
                 Text_Print(Msg_GetSystem(msg), TEXT_DRAW);
                 Text_PrintNumber(count, Text_GetX(), digits);
             }
@@ -1043,16 +1058,18 @@ void SmithEquipScreen_PrintNextRow(void)
                 str = Msg_GetSystem(63);
             Text_SetX(0);
             Text_Print(str, TEXT_DRAW);
-            x = win->width * 8 - 34;
-            Text_PrintNumber(count, x, 2);
+            n = win->width * 8 - 34;
+            Text_PrintNumber(count, n, 2);
         }
         Text_CopyToVram(dst, win->width);
     } else if (sSmithRow == 3 && (flags & 0xE00)) {
         if (kind != 0) {
             Text_SetX(0);
             Text_Print(Msg_GetStat(kind - 1), TEXT_DRAW);
+            Text_CopyToVram(dst, win->width);
+        } else {
+            Text_CopyToVram(dst, win->width);
         }
-        Text_CopyToVram(dst, win->width);
     } else {
         Text_CopyToVram(dst, win->width);
     }

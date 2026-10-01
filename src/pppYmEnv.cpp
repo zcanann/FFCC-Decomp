@@ -17,22 +17,6 @@
 
 #include <math.h>
 
-extern const float kYmEnvRenderZero;
-extern const float kYmEnvRenderOne;
-extern const float kYmEnvNegativeOne;
-extern const float kYmEnvOrthoFarZ;
-extern const float kYmEnvTwo;
-extern const float kYmEnvFrustumExtent;
-extern const float kYmEnvFrustumNegExtent;
-extern const float kYmEnvFrustumScale;
-extern const float kYmEnvDegToRadF;
-extern const float kYmEnvPi;
-extern const float kYmEnvParaboloidNormalScale;
-extern const float kYmEnvNegativeTwoPi;
-extern const double kYmEnvCosEpsilon;
-extern const float kYmEnvTwoPi;
-extern const char s_Exiting_803311CC[8];
-
 /*
  * --INFO--
  * PAL Address: 0x800e46dc
@@ -53,12 +37,17 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     const char s_xAxisIds[] = {'y', 'y', 'y', 'y', 'x', 'x'};
     const float s_yAxisAngles[] = {0.0f, 180.0f};
 
-    const unsigned int texWidth = GXGetTexObjWidth(targetTexObj);
+    unsigned short width = GXGetTexObjWidth(targetTexObj);
+    unsigned short height = GXGetTexObjHeight(targetTexObj);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    const unsigned int texHeight = GXGetTexObjHeight(targetTexObj);
 
+    unsigned int originalWidth = width;
+    unsigned int originalHeight = height;
     const unsigned int modeOffset = mode * 5;
 
+    const unsigned char* texObjIndices = s_texObjIndices;
+    const unsigned char* xAxisRotIndices = s_xAxisRotIndices;
+    const unsigned char* yAxisRotIndices = s_yAxisRotIndices;
     _GXColor color;
     GXLightObj lightObj;
     Mtx44 orthoMtx;
@@ -67,33 +56,33 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     Mtx lightFrustumMtx;
     Mtx tempMtx;
 
-    color.r = 0;
-    color.g = 0;
-    color.b = 0;
-    color.a = 0xFF;
     const Vec s_cameraPos = {0.0f, 0.0f, 6.0f};
     const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
     const Vec s_cameraLook = {0.0f, 0.0f, 0.0f};
 
-    gUtil.RenderColorQuad(kYmEnvRenderZero, kYmEnvRenderZero, texWidth, texHeight, color);
+    color.r = 0;
+    color.g = 0;
+    color.b = 0;
+    color.a = 0xFF;
 
-    const unsigned short rtHeight = GXGetTexObjHeight(targetTexObj);
-    const unsigned short rtWidth = GXGetTexObjWidth(targetTexObj);
+    gUtil.RenderColorQuad(0.0f, 0.0f, originalWidth, originalHeight, color);
+
+    width = GXGetTexObjWidth(targetTexObj);
+    height = GXGetTexObjHeight(targetTexObj);
     const GXTexFmt targetFmt = GXGetTexObjFmt(targetTexObj);
     void* targetData = GXGetTexObjData(targetTexObj);
 
-    C_MTXOrtho(orthoMtx, kYmEnvRenderOne, kYmEnvNegativeOne, kYmEnvNegativeOne, kYmEnvRenderOne,
-               kYmEnvRenderOne, kYmEnvOrthoFarZ);
+    C_MTXOrtho(orthoMtx, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 100.0f);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
     C_MTXLookAt(cameraMtx, &s_cameraPos, &s_cameraUp, &s_cameraLook);
     GXLoadPosMtxImm(cameraMtx, 0);
 
     GXSetCullMode(GX_CULL_BACK);
-    GXSetViewport(kYmEnvRenderZero, kYmEnvRenderZero, rtWidth, rtHeight, kYmEnvRenderZero, kYmEnvRenderOne);
-    GXSetScissor(0, 0, rtWidth, rtHeight);
-    GXSetTexCopySrc(0, 0, rtWidth, rtHeight);
-    GXSetTexCopyDst(rtWidth, rtHeight, targetFmt, GX_FALSE);
+    GXSetViewport(0.0f, 0.0f, width, height, 0.0f, 1.0f);
+    GXSetScissor(0, 0, width, height);
+    GXSetTexCopySrc(0, 0, width, height);
+    GXSetTexCopyDst(width, height, targetFmt, GX_FALSE);
 
     GXSetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_NONE, GX_AF_SPEC);
 
@@ -108,10 +97,10 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     color.g = 0;
     color.r = 0;
     GXSetChanAmbColor(GX_COLOR0A0, color);
-    GXInitLightAttnA(&lightObj, kYmEnvRenderZero, kYmEnvTwo, kYmEnvRenderZero);
-    GXInitLightAttnK(&lightObj, kYmEnvRenderZero, kYmEnvRenderOne, kYmEnvRenderZero);
-    GXInitLightPos(&lightObj, kYmEnvRenderZero, kYmEnvRenderZero, kYmEnvNegativeOne);
-    GXInitLightDir(&lightObj, kYmEnvRenderZero, kYmEnvRenderZero, kYmEnvNegativeOne);
+    GXInitLightAttnA(&lightObj, 0.0f, 2.0f, 0.0f);
+    GXInitLightAttnK(&lightObj, 0.0f, 1.0f, 0.0f);
+    GXInitLightPos(&lightObj, 0.0f, 0.0f, -1.0f);
+    GXInitLightDir(&lightObj, 0.0f, 0.0f, -1.0f);
     GXLoadLightObjImm(&lightObj, GX_LIGHT0);
 
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_NRM, 0x1E, GX_FALSE, GX_PTIDENTITY);
@@ -124,9 +113,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     GXSetNumTexGens(1);
     GXSetNumChans(1);
 
-    C_MTXLightFrustum(lightFrustumMtx, kYmEnvFrustumExtent, kYmEnvFrustumNegExtent, kYmEnvFrustumExtent,
-                      kYmEnvFrustumNegExtent, kYmEnvRenderOne, kYmEnvFrustumScale, kYmEnvFrustumScale,
-                      kYmEnvFrustumScale, kYmEnvFrustumScale);
+    C_MTXLightFrustum(lightFrustumMtx, 1.02f, -1.02f, 1.02f, -1.02f, 1.0f, 0.5f, 0.5f, 0.5f, 0.5f);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
 
@@ -162,12 +149,11 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
 
-    const float kDegToRad = kYmEnvDegToRadF;
-    const float kZero = kYmEnvRenderZero;
+    const float kDegToRad = 0.01745329238474369f;
     for (int i = 0; i < 5; i++) {
-        const unsigned char texObjIdx = s_texObjIndices[modeOffset + i];
-        const unsigned char xRotIdx = s_xAxisRotIndices[modeOffset + i];
-        const unsigned char yRotIdx = s_yAxisRotIndices[modeOffset + i];
+        const unsigned char texObjIdx = texObjIndices[modeOffset + i];
+        const unsigned char xRotIdx = xAxisRotIndices[modeOffset + i];
+        const unsigned char yRotIdx = yAxisRotIndices[modeOffset + i];
 
         if (blendTexObj != 0) {
             GXLoadTexObj(&texObjs[texObjIdx], GX_TEXMAP1);
@@ -178,8 +164,8 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
         PSMTXIdentity(objectMtx);
 
         const float yAxisAngle = s_yAxisAngles[yRotIdx];
-        if (yAxisAngle != kZero) {
-            PSMTXRotRad(tempMtx, 'y', kYmEnvDegToRadF * yAxisAngle);
+        if (yAxisAngle) {
+            PSMTXRotRad(tempMtx, 'y', 0.01745329238474369f * yAxisAngle);
             PSMTXConcat(objectMtx, tempMtx, objectMtx);
         }
 
@@ -192,7 +178,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
         GXCallDisplayList(displayList, displayListSize);
     }
 
-    Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, rtWidth, rtHeight, 0, GX_LINEAR, GX_TF_RGB565, 0);
+    Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_RGB565, 0);
     GXSetScissor(0, 0, 0x280, 0x1C0);
     Graphic.SetViewport();
 
@@ -200,14 +186,14 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
         Vec2d uvMin;
         Vec2d uvMax;
 
-        uvMin.x = kYmEnvRenderOne;
-        uvMin.y = kYmEnvRenderZero;
-        uvMax.x = kYmEnvRenderZero;
-        uvMax.y = kYmEnvRenderOne;
+        uvMin.x = 1.0f;
+        uvMin.y = 0.0f;
+        uvMax.x = 0.0f;
+        uvMax.y = 1.0f;
 
-        gUtil.RenderTextureQuad(kYmEnvRenderZero, kYmEnvRenderZero, rtWidth, rtHeight, targetTexObj, &uvMin, &uvMax,
+        gUtil.RenderTextureQuad(0.0f, 0.0f, width, height, targetTexObj, &uvMin, &uvMax,
                                 0, (GXBlendFactor)4, (GXBlendFactor)5);
-        Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, texWidth, texHeight, 0, GX_LINEAR, GX_TF_RGB565, 0);
+        Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, originalWidth, originalHeight, 0, GX_LINEAR, GX_TF_RGB565, 0);
     }
 }
 
@@ -236,71 +222,98 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     GXSetVtxAttrFmt((GXVtxFmt)vtxFmt, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt((GXVtxFmt)vtxFmt, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
 
+    float upperLat;
+    float z;
+    float lowerCos;
+    float lowerNormalZ;
+    float firstLat;
+    float lowerSin;
+    float lowerLat;
+    float lx;
+    float ly;
+    float upperSin;
+    float upperCos;
+    float latStep;
+    float zero;
+    float firstRingCos;
+    float uy;
+    float lon;
+    float upperNormalZ;
+    float x;
+    float y;
+    float diameter;
+    float firstNormalZ;
+    float radius;
+    float ux;
+    float firstRingSin;
+    zero = 0.0f;
+    radius = 1.0f;
+    diameter = 2.0f;
     GXBegin(GX_TRIANGLEFAN, GX_VTXFMT7, detail + 2);
 
-    const float latStep = kYmEnvPi / (float)detail;
-    const float firstLat = latStep;
-    const float firstRingSin = kYmEnvRenderOne * (float)sin(firstLat);
-    const float firstRingCos = kYmEnvRenderOne * (float)cos(firstLat);
-    const float firstNormalZ = kYmEnvTwo * firstRingCos * firstRingCos;
+    latStep = 3.1415927f / (float)detail;
+    firstLat = latStep;
+    firstRingSin = radius * (float)sin(firstLat);
+    firstRingCos = radius * (float)cos(firstLat);
+    firstNormalZ = diameter * firstRingCos * firstRingCos;
 
-    GXPosition3f32(kYmEnvRenderZero, kYmEnvRenderZero, kYmEnvRenderOne);
-    GXNormal3f32(kYmEnvRenderZero, kYmEnvRenderZero, kYmEnvTwo);
+    GXPosition3f32(zero, zero, radius);
+    GXNormal3f32(zero, zero, diameter);
 
     int i = 0;
-    float lon = kYmEnvRenderZero;
+    lon = zero;
     while (i <= (int)detail) {
-        const float x = firstRingSin * (float)cos(lon);
-        const float y = firstRingSin * (float)sin(lon);
-        const float z = firstRingCos;
+        x = firstRingSin * (float)cos(lon);
+        y = firstRingSin * (float)sin(lon);
+        z = firstRingCos;
 
         GXPosition3f32(x, y, z);
-        GXNormal3f32(kYmEnvParaboloidNormalScale * x * z, kYmEnvParaboloidNormalScale * y * z, firstNormalZ);
+        GXNormal3f32(-2.0f * x * z, -2.0f * y * z, firstNormalZ);
 
         i++;
-        lon = (kYmEnvNegativeTwoPi * (float)i) / (float)detail;
+        lon = (-6.2831855f * (float)i) / (float)detail;
     }
 
     for (int ring = 2; ring < (int)detail; ring++) {
-        const float lowerLat = (kYmEnvPi * (float)ring) / (float)detail;
-        const float upperLat = (kYmEnvPi * (float)(ring - 1)) / (float)detail;
+        lowerLat = (3.1415927f * (float)ring) / (float)detail;
+        upperLat = (3.1415927f * (float)(ring - 1)) / (float)detail;
 
-        const float upperSin = kYmEnvRenderOne * (float)sin(upperLat);
-        const float upperCos = kYmEnvRenderOne * (float)cos(upperLat);
-        const float lowerSin = kYmEnvRenderOne * (float)sin(lowerLat);
-        const float lowerCos = kYmEnvRenderOne * (float)cos(lowerLat);
-        const float upperNormalZ = kYmEnvTwo * upperCos * upperCos;
-        const float lowerNormalZ = kYmEnvTwo * lowerCos * lowerCos;
+        upperSin = radius * (float)sin(upperLat);
+        upperCos = radius * (float)cos(upperLat);
+        lowerSin = radius * (float)sin(lowerLat);
+        lowerCos = radius * (float)cos(lowerLat);
+        upperNormalZ = diameter * upperCos * upperCos;
+        lowerNormalZ = diameter * lowerCos * lowerCos;
 
-        if (fabs(upperCos) < kYmEnvCosEpsilon || fabs(lowerCos) < kYmEnvCosEpsilon) {
+        if (fabs(upperCos) < (double)0.01f || fabs(lowerCos) < (double)0.01f) {
             break;
         }
 
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, ringVertexCount * 2);
         i = 0;
-        lon = kYmEnvRenderZero;
+        lon = zero;
         while (i <= (int)detail) {
-            const float lx = lowerSin * (float)cos(lon);
-            const float ly = lowerSin * (float)sin(lon);
+            lx = lowerSin * (float)cos(lon);
+            ly = lowerSin * (float)sin(lon);
             GXPosition3f32(lx, ly, lowerCos);
-            GXNormal3f32(kYmEnvParaboloidNormalScale * lx * lowerCos,
-                         kYmEnvParaboloidNormalScale * ly * lowerCos, lowerNormalZ);
+            GXNormal3f32(-2.0f * lx * lowerCos,
+                         -2.0f * ly * lowerCos, lowerNormalZ);
 
-            const float ux = upperSin * (float)cos(lon);
-            const float uy = upperSin * (float)sin(lon);
+            ux = upperSin * (float)cos(lon);
+            uy = upperSin * (float)sin(lon);
             GXPosition3f32(ux, uy, upperCos);
-            GXNormal3f32(kYmEnvParaboloidNormalScale * ux * upperCos,
-                         kYmEnvParaboloidNormalScale * uy * upperCos, upperNormalZ);
+            GXNormal3f32(-2.0f * ux * upperCos,
+                         -2.0f * uy * upperCos, upperNormalZ);
 
             i++;
-            lon = (kYmEnvTwoPi * (float)i) / (float)detail;
+            lon = (6.2831855f * (float)i) / (float)detail;
         }
     }
 
     *outDisplayListSize = GXEndDisplayList();
     if (*outDisplayListSize > displayListSize) {
         OSReport(s_display_list_alloc_error, displayListSize, *outDisplayListSize);
-        OSPanic(s_pppYmEnv_cpp, 0x19f, s_Exiting_803311CC);
+        OSPanic(s_pppYmEnv_cpp, 0x19f, "Exiting");
     }
 
     DCFlushRange(displayListBuffer, *outDisplayListSize);
@@ -388,12 +401,12 @@ void DisableIndWarp(_GXTevStageID tevStage, _GXIndTexStageID indStage)
     GXSetNumIndStages(0);
     GXSetIndTexCoordScale((GXIndTexStageID)indStage, GX_ITS_1, GX_ITS_1);
 
-    indMtx[0][0] = kYmEnvRenderZero;
-    indMtx[0][1] = kYmEnvRenderZero;
-    indMtx[0][2] = kYmEnvRenderZero;
-    indMtx[1][0] = kYmEnvRenderZero;
-    indMtx[1][1] = kYmEnvRenderZero;
-    indMtx[1][2] = kYmEnvRenderZero;
+    indMtx[0][0] = 0.0f;
+    indMtx[0][1] = 0.0f;
+    indMtx[0][2] = 0.0f;
+    indMtx[1][0] = 0.0f;
+    indMtx[1][1] = 0.0f;
+    indMtx[1][2] = 0.0f;
     GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 }
 
@@ -570,12 +583,12 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     animFrameMax = (int)(float)animFrameCount;
     int frameDiv = frameInt / animFrameMax;
     frame = (float)(frameInt - frameDiv * animFrameMax);
-    if (frame < kYmEnvTwo) {
+    if (frame < 2.0f) {
         return 0;
     }
 
-    if (frame != kYmEnvRenderZero) {
-        frame -= kYmEnvRenderOne;
+    if (frame) {
+        frame -= 1.0f;
     }
 
     model->CalcFrameMatrix(frame + frameAdd, node, outMatrix);
@@ -643,7 +656,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
             outMatrix[2][3] += ppvMng->m_position.z;
             PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
 
-            if (kYmEnvRenderOne != mngSt->m_scale.x) {
+            if (1.0f != mngSt->m_scale.x) {
                 localB8.x = localMatrix.value[0][0];
                 localB8.y = localMatrix.value[1][0];
                 localB8.z = localMatrix.value[2][0];
@@ -652,7 +665,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][0] = localB8.y;
                 localMatrix.value[2][0] = localB8.z;
             }
-            if (kYmEnvRenderOne != mngSt->m_scale.y) {
+            if (1.0f != mngSt->m_scale.y) {
                 localC4.x = localMatrix.value[0][1];
                 localC4.y = localMatrix.value[1][1];
                 localC4.z = localMatrix.value[2][1];
@@ -661,7 +674,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][1] = localC4.y;
                 localMatrix.value[2][1] = localC4.z;
             }
-            if (kYmEnvRenderOne != mngSt->m_scale.z) {
+            if (1.0f != mngSt->m_scale.z) {
                 localD0.x = localMatrix.value[0][2];
                 localD0.y = localMatrix.value[1][2];
                 localD0.z = localMatrix.value[2][2];
@@ -681,7 +694,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
             PSMTXMultVecSR(outMatrix, &ppvMng->m_position, &local88);
             PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
 
-            if (kYmEnvRenderOne != mngSt->m_scale.x) {
+            if (1.0f != mngSt->m_scale.x) {
                 localDC.x = localMatrix.value[0][0];
                 localDC.y = localMatrix.value[1][0];
                 localDC.z = localMatrix.value[2][0];
@@ -690,7 +703,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][0] = localDC.y;
                 localMatrix.value[2][0] = localDC.z;
             }
-            if (kYmEnvRenderOne != mngSt->m_scale.y) {
+            if (1.0f != mngSt->m_scale.y) {
                 localE8.x = localMatrix.value[0][1];
                 localE8.y = localMatrix.value[1][1];
                 localE8.z = localMatrix.value[2][1];
@@ -699,7 +712,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][1] = localE8.y;
                 localMatrix.value[2][1] = localE8.z;
             }
-            if (kYmEnvRenderOne != mngSt->m_scale.z) {
+            if (1.0f != mngSt->m_scale.z) {
                 localF4.x = localMatrix.value[0][2];
                 localF4.y = localMatrix.value[1][2];
                 localF4.z = localMatrix.value[2][2];
@@ -714,7 +727,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         break;
     }
 
-    if (kYmEnvRenderOne != mngSt->m_scale.x) {
+    if (1.0f != mngSt->m_scale.x) {
         local100.x = localMatrix.value[0][0];
         local100.y = localMatrix.value[1][0];
         local100.z = localMatrix.value[2][0];
@@ -723,7 +736,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         localMatrix.value[1][0] = local100.y;
         localMatrix.value[2][0] = local100.z;
     }
-    if (kYmEnvRenderOne != mngSt->m_scale.y) {
+    if (1.0f != mngSt->m_scale.y) {
         local10C.x = localMatrix.value[0][1];
         local10C.y = localMatrix.value[1][1];
         local10C.z = localMatrix.value[2][1];
@@ -732,7 +745,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         localMatrix.value[1][1] = local10C.y;
         localMatrix.value[2][1] = local10C.z;
     }
-    if (kYmEnvRenderOne != mngSt->m_scale.z) {
+    if (1.0f != mngSt->m_scale.z) {
         local118.x = localMatrix.value[0][2];
         local118.y = localMatrix.value[1][2];
         local118.z = localMatrix.value[2][2];
@@ -778,19 +791,3 @@ CChara::CModel* GetModelPtr(CGObject* gObject)
 
     return 0;
 }
-
-extern const float kYmEnvRenderZero = 0.0f;
-extern const float kYmEnvRenderOne = 1.0f;
-extern const float kYmEnvNegativeOne = -1.0f;
-extern const float kYmEnvOrthoFarZ = 100.0f;
-extern const float kYmEnvTwo = 2.0f;
-extern const float kYmEnvFrustumExtent = 1.0199999809265137f;
-extern const float kYmEnvFrustumNegExtent = -1.0199999809265137f;
-extern const float kYmEnvFrustumScale = 0.5f;
-extern const float kYmEnvDegToRadF = 0.01745329238474369f;
-extern const float kYmEnvPi = 3.1415927410125732f;
-extern const float kYmEnvParaboloidNormalScale = -2.0f;
-extern const float kYmEnvNegativeTwoPi = -6.2831854820251465f;
-extern const double kYmEnvCosEpsilon = 0.009999999776482582;
-extern const float kYmEnvTwoPi = 6.2831854820251465f;
-extern const char s_Exiting_803311CC[8] = "Exiting";

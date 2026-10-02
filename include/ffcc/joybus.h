@@ -212,7 +212,7 @@ public:
     uchar m_threadInitFlag;
     signed char m_binLoaded;
     bool m_exitThreadFlag;
-    uchar m_threadRunningMask;
+    char m_threadRunningMask;
 
     unsigned int* m_fileBaseA;
     unsigned int* m_fileBaseB;

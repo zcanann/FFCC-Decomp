@@ -60,10 +60,12 @@ void AgbMain(void)
     u8 prevMode;
     u8 connected;
     s32 i;
-    s32 icon;
+    s32 value;
 
     REG_WAITCNT = 0x4014;
-    DmaClear32(0, 0, 0x03000000, (s32)__builtin_frame_address(0));
+    /* Keep the live stack intact while clearing IWRAM. */
+    __asm__ volatile ("mov %0, sp" : "=r" (value));
+    DmaClear32(0, 0, 0x03000000, value);
     DmaClear32(3, 0, 0x03007E00, 0x1A0);
     DmaClear16(0, 0, 0x05000000, 0x400);
     DmaClear16(0, 0, 0x06000000, 0x18000);
@@ -123,11 +125,12 @@ void AgbMain(void)
         Shake_Update();
         Alarm_Update();
         if (gDataFlags & DATA_OBJ) {
-            icon = 35;
             if (gMenuHasInput == 0) {
-                icon = 34;
+                value = 34;
+            } else {
+                value = 35;
             }
-            Obj_Draw(216, 144, 0, icon, Obj_GetPalette(0, icon), 0, 0);
+            Obj_Draw(216, 144, 0, value, Obj_GetPalette(0, value), 0, 0);
         }
         connected = Link_IsConnected();
         if (connected && gLinkStarted && gMode != MODE_FIELD && gMode != MODE_CONTROLLER && gMenuHasInput != 1) {

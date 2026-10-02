@@ -122,26 +122,24 @@ void Radar_DrawMap(void)
 {
     u16 out[24];
     u16 line[256];
+    u16 *data;
+    u16 *src;
     s16 x;
     s16 y;
     s16 tx;
     s16 ty;
+    s16 mapW;
+    s16 mapH;
     s32 row;
     s32 col;
     s32 dst;
-    u16 *data;
-    s16 mapW;
-    s16 mapH;
-    s32 sum;
     s32 i;
     s32 k;
     s32 m;
     s32 n;
-    s32 r;
-    s32 c;
     u16 code;
     s32 cnt;
-    u16 v;
+    s16 v;
     s16 len;
 
     if (!(gDataFlags & DATA_MAP))
@@ -164,16 +162,16 @@ void Radar_DrawMap(void)
     dst += col * 2;
     mapW = sMapHeader->width >> 3;
     mapH = sMapHeader->height >> 3;
-    sum = 0;
+    k = 0;
     for (i = 0; i < ty - 1 && i < mapH; i++)
-        sum += sMapRowLen[i];
-    data = sMapData + sum;
+        k += sMapRowLen[i];
+    data = sMapData + k;
     for (i = -1; i <= 16; i++) {
-        r = i + ty;
-        if (r >= 0 && r < mapH) {
+        if (i + ty >= 0 && i + ty < mapH) {
             n = 0;
-            for (k = 0; k < sMapRowLen[r]; k++) {
-                code = data[k];
+            src = data;
+            for (k = 0; k < sMapRowLen[i + ty]; src++, k++) {
+                code = *src;
                 if (code & 0x8000) {
                     cnt = code & 0x3FF;
                     v = (code >> 10) & 3;
@@ -186,11 +184,10 @@ void Radar_DrawMap(void)
             data += sMapRowLen[i + ty];
         }
         for (m = -1; m <= 21; m++) {
-            c = m + tx;
-            if (r < 0 || c < 0 || r >= mapH || c >= mapW)
+            if (i + ty < 0 || m + tx < 0 || i + ty >= mapH || m + tx >= mapW)
                 out[m + 1] = 0x1000;
             else
-                out[m + 1] = line[c];
+                out[m + 1] = line[m + tx];
         }
         if (col + 23 <= 32) {
             DmaCopy16(0, out, dst, 23 * 2);
@@ -209,6 +206,8 @@ void Radar_ScrollMap(s32 dx, s32 dy)
 {
     u16 out[24];
     u16 line[256];
+    u16 *data;
+    u16 *src;
     s16 tx;
     s16 ty;
     s16 mapW;
@@ -216,10 +215,8 @@ void Radar_ScrollMap(s32 dx, s32 dy)
     u16 oldX;
     u16 oldY;
     s32 dst;
-    u16 *data;
     s32 i;
     s32 k;
-    s32 m;
     s32 n;
     s32 c;
     s32 r;
@@ -267,11 +264,11 @@ void Radar_ScrollMap(s32 dx, s32 dy)
             col += 32;
         dst += col * 2;
         for (i = -1; i <= 16; i++) {
-            r = i + ty;
-            if (r >= 0 && r < mapH) {
+            if (i + ty >= 0 && i + ty < mapH) {
                 n = 0;
-                for (k = 0; k < sMapRowLen[i + ty]; k++) {
-                    code = data[k];
+                src = data;
+                for (k = 0; k < sMapRowLen[i + ty]; src++, k++) {
+                    code = *src;
                     if (code & 0x8000) {
                         cnt = code & 0x3FF;
                         v = (code >> 10) & 3;
@@ -290,7 +287,7 @@ void Radar_ScrollMap(s32 dx, s32 dy)
                 }
                 data += sMapRowLen[i + ty];
             }
-            if (r < 0 || c < 0 || r >= mapH || c >= mapW)
+            if (i + ty < 0 || c < 0 || i + ty >= mapH || c >= mapW)
                 *(u16 *)dst = 0x1000;
             else
                 *(u16 *)dst = line[0];
@@ -313,8 +310,9 @@ void Radar_ScrollMap(s32 dx, s32 dy)
         data = sMapData + k;
         if (r >= 0 && r < mapH) {
             n = 0;
-            for (k = 0; k < sMapRowLen[r]; k++) {
-                code = data[k];
+            src = data;
+            for (k = 0; k < sMapRowLen[r]; src++, k++) {
+                code = *src;
                 if (code & 0x8000) {
                     cnt = code & 0x3FF;
                     v = (code >> 10) & 3;
@@ -328,12 +326,11 @@ void Radar_ScrollMap(s32 dx, s32 dy)
             for (u = 0; u < 256; u++)
                 line[u] = 0x1000;
         }
-        for (m = -1; m <= 21; m++) {
-            c = m + tx;
-            if (r < 0 || c < 0 || r >= mapH || c >= mapW)
-                out[m + 1] = 0x1000;
+        for (i = -1; i <= 21; i++) {
+            if (r < 0 || i + tx < 0 || r >= mapH || i + tx >= mapW)
+                out[i + 1] = 0x1000;
             else
-                out[m + 1] = line[c];
+                out[i + 1] = line[i + tx];
         }
         n = r % 32;
         if (n < 0)

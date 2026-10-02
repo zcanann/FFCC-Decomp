@@ -157,10 +157,13 @@ public:
     {
         m_manaReflectionVec = reflectionVec;
     }
-    void SetManaParaboloidTexObjs(_GXTexObj* texObj0, _GXTexObj* texObj1)
+    void SetManaParaboloidTexObj0(_GXTexObj* texObj)
     {
-        m_manaParaboloidTexObj0 = texObj0;
-        m_manaParaboloidTexObj1 = texObj1;
+        m_manaParaboloidTexObj0 = texObj;
+    }
+    void SetManaParaboloidTexObj1(_GXTexObj* texObj)
+    {
+        m_manaParaboloidTexObj1 = texObj;
     }
     void ClearManaParaboloidTexObjs()
     {

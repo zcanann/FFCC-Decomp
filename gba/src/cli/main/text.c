@@ -96,7 +96,7 @@ s32 Text_Print(const char *str, s32 mode)
     char *map;
     u8 *widths;
     u8 *glyphs;
-    s32 second;
+    u8 second;
     struct Font *font;
     u32 i;
     const char *p;
@@ -123,27 +123,28 @@ s32 Text_Print(const char *str, s32 mode)
     mapLen = strlen(map);
     total = 0;
     for (i = 0; i < len; i++, p++) {
-        w = font->first;
-        m = mapLen - w * 2;
+        index = font->first;
+        m = mapLen - index * 2;
         if (*p == ' ') {
             if (mode == TEXT_WIDTH)
                 total += 6;
             else
                 sTextX += 6;
         } else {
-            for (k = 0; k < m && map[w * 2 + k] != *p; k++)
+            w = index * 2;
+            for (k = 0; k < m && *(map + w + k) != *p; k++)
                 ;
-            index = w + k;
+            index += k;
             if (mode == TEXT_WIDTH) {
                 total += widths[index];
             } else {
                 if (mode == TEXT_CHAR)
                     return widths[index];
                 second = index >= font->split;
-                k = index;
+                w = index;
                 if (second)
-                    k = index - font->split;
-                glyph = (u32 *)(glyphs + (font->glyphWidth >> 1) * font->height * k);
+                    w = index - font->split;
+                glyph = (u32 *)(glyphs + (font->glyphWidth >> 1) * font->height * w);
                 w = widths[index];
                 pad = 0;
                 if (mode != TEXT_DRAW && w <= 8) {
@@ -166,7 +167,8 @@ s32 Text_Print(const char *str, s32 mode)
                     }
                 }
                 m &= 7;
-                dst = (u32 *)&sTextCanvas[(sTextX >> 3) * 64];
+                w = sTextX >> 3;
+                dst = (u32 *)&sTextCanvas[w * 64];
                 dst2 = dst + 16;
                 dst3 = dst2 + 16;
                 for (k = 0; k < height; k++, glyph += 2, dst++, dst2++, dst3++) {

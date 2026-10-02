@@ -10,6 +10,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/p_map.h"
 extern "C" {
 extern const char kAStarGroupDebugFormat[] = "A* GROUP=%d";
 extern const char kAStarPortalDebugFormat[] = "addAStar(%.5f, %.5f, %.5f, %d, %d, 0, 0);\n";
@@ -36,6 +37,28 @@ struct CABlock
 
 CAStar AStar;
 
+inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
+{
+    CMapCylinder cylinder;
+
+    cylinder.m_bottom = *cylinderBottom;
+    cylinder.m_axis = *direction;
+    cylinder.m_radius = radius;
+
+    return MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
+}
+
+static inline int getHitPolygonGroup(Vec* pos, unsigned long hitAttributeMask)
+{
+	if (MapPcs.CheckHitCylinderNear(CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z),
+	                                CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ),
+	                                kPolyGroupBaseXZ, hitAttributeMask) != 0)
+	{
+		return gMapHitFace->m_groupIndex;
+	}
+
+	return 0;
+}
 /*
  * --INFO--
  * PAL Address: 0x80141550
@@ -49,43 +72,17 @@ int CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
 	if ((AStar.m_flags & 1) != 0)
 	{
-		unsigned int mask = m_hitAttributeMask;
-		const CVector& baseVec =
-		    CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
-		const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
-		Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
-		Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
-		CMapCylinder cyl;
-		cyl.m_bottom = *top;
-		cyl.m_axis = *base;
-		cyl.m_radius = kPolyGroupBaseXZ;
-
-		if (MapMng.CheckHitCylinderNear(&cyl, base, mask) != 0)
-		{
-			return gMapHitFace->m_groupIndex;
-		}
-
-		return 0;
+		return getHitPolygonGroup(pos, m_hitAttributeMask);
 	}
-	else
+
+	if (MapPcs.CheckHitCylinderNear(CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z),
+	                                CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ),
+	                                kPolyGroupBaseXZ, hitAttributeMask) != 0)
 	{
-		const CVector& baseVec =
-		    CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
-		const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
-		Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
-		Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
-		CMapCylinder cyl;
-		cyl.m_bottom = *top;
-		cyl.m_axis = *base;
-		cyl.m_radius = kPolyGroupBaseXZ;
-
-		if (MapMng.CheckHitCylinderNear(&cyl, base, hitAttributeMask) != 0)
-		{
-			return gMapHitFace->m_groupIndex;
-		}
-
-		return 0;
+		return gMapHitFace->m_groupIndex;
 	}
+
+	return 0;
 }
 /*
  * --INFO--
@@ -98,23 +95,41 @@ int CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
  */
 int CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
-	unsigned int mask = m_hitAttributeMask;
-	const CVector& baseVec =
-	    CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
-	const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
-	Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
-	Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
-	CMapCylinder cyl;
-	cyl.m_bottom = *top;
-	cyl.m_axis = *base;
-	cyl.m_radius = kPolyGroupBaseXZ;
-
-	if (MapMng.CheckHitCylinderNear(&cyl, base, mask) != 0)
+	if (MapPcs.CheckHitCylinderNear(CVector(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z),
+	                                CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ),
+	                                kPolyGroupBaseXZ, m_hitAttributeMask) != 0)
 	{
 		return gMapHitFace->m_groupIndex;
 	}
 
 	return 0;
+}
+static inline int IsValidPortal(CAStar::CAPos& portal)
+{
+	bool result = false;
+	if (portal.m_groupA != 0 && portal.m_groupB != 0)
+	{
+		result = true;
+	}
+	return result;
+}
+static inline int IsPortalOfGroup(CAStar::CAPos& portal, int group)
+{
+	bool result = false;
+	if (portal.m_groupA == group || portal.m_groupB == group)
+	{
+		result = true;
+	}
+	return result;
+}
+static inline int GetPortalOtherGroup(CAStar::CAPos& portal, int group)
+{
+	unsigned char others = portal.m_groupA;
+	if (others == group)
+	{
+		others = portal.m_groupB;
+	}
+	return others;
 }
 /*
  * --INFO--
@@ -139,29 +154,10 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 	do
 	{
-		unsigned char otherGroup = m_portals[i].m_groupA;
-		bool exists = false;
-
-		if (otherGroup != 0 && m_portals[i].m_groupB != 0)
+		if (IsValidPortal(m_portals[i]) && IsPortalOfGroup(m_portals[i], startGroup))
 		{
-			exists = true;
-		}
-
-		if (exists)
-		{
-			bool connected = false;
-
-			if (otherGroup == startGroup || m_portals[i].m_groupB == startGroup)
 			{
-				connected = true;
-			}
-
-			if (connected)
-			{
-				if (otherGroup == startGroup)
-				{
-					otherGroup = m_portals[i].m_groupB;
-				}
+				int otherGroup = GetPortalOtherGroup(m_portals[i], startGroup);
 
 				if (forbiddenGroup != otherGroup)
 				{
@@ -198,6 +194,91 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	}
 
 	return behindBest;
+}
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 668b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CAStar::addAstar(Vec& pos, int groupA, int groupB)
+{
+	if (groupB < groupA)
+	{
+		int groupSwap = groupA;
+		groupA = groupB;
+		groupB = groupSwap;
+	}
+
+	int index = 0;
+
+	for (; index < 64; ++index)
+	{
+		CAPos& p = m_portals[index];
+
+		if (p.m_groupA == groupA && p.m_groupB == groupB)
+		{
+			break;
+		}
+	}
+
+	if (index == 64)
+	{
+		index = 0;
+
+		for (; index < 64; ++index)
+		{
+			if (!IsValidPortal(m_portals[index]))
+			{
+				m_portalCount++;
+				break;
+			}
+		}
+	}
+
+	m_portals[index].m_position = pos;
+	m_portals[index].m_groupA = groupA;
+	m_portals[index].m_groupB = groupB;
+}
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CAStar::dumpAStar()
+{
+	System.Printf(const_cast<char*>(kAStarGroupDebugLabel));
+
+	for (int i = 0; i < 64; ++i)
+	{
+		CAPos& p = m_portals[i];
+
+		bool used = false;
+		if (m_portals[i].m_groupA != 0 && m_portals[i].m_groupB != 0)
+		{
+			used = true;
+		}
+
+		if (used)
+		{
+			System.Printf(
+				const_cast<char*>(kAStarPortalDebugFormat),
+				static_cast<double>(p.m_position.x),
+				static_cast<double>(p.m_position.y),
+				static_cast<double>(p.m_position.z),
+				p.m_groupA,
+				p.m_groupB
+			);
+		}
+	}
+
 }
 /*
  * --INFO--
@@ -265,89 +346,9 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		return;
 	}
 
-	int groupLow;
-	int groupHigh;
+	addAstar(m_lastGroupPos, m_currentGroup, m_previousGroup);
 
-	groupHigh = m_previousGroup;
-	groupLow = m_currentGroup;
-
-	if (groupHigh < groupLow)
-	{
-		int groupSwap = groupLow;
-		groupLow = groupHigh;
-		groupHigh = groupSwap;
-	}
-
-	int portalIndex = 0;
-
-	// Look for an existing portal (groupLow, groupHigh)
-	for (; portalIndex < 64; ++portalIndex)
-	{
-		CAPos& p = m_portals[portalIndex];
-
-		if (p.m_groupA == groupLow && p.m_groupB == groupHigh)
-		{
-			break;
-		}
-	}
-
-	// If none, find a free slot
-	if (portalIndex == 64)
-	{
-		portalIndex = 0;
-
-		for (; portalIndex < 64; ++portalIndex)
-		{
-			CAPos& p = m_portals[portalIndex];
-
-			bool used = false;
-			if (p.m_groupA != 0 && p.m_groupB != 0)
-			{
-				used = true;
-			}
-
-			if (!used)
-			{
-				m_portalCount++;
-				break;
-			}
-		}
-	}
-
-	CAPos& portal = m_portals[portalIndex];
-
-	portal.m_position.x = m_lastGroupPos.x;
-	portal.m_position.y = m_lastGroupPos.y;
-	portal.m_position.z = m_lastGroupPos.z;
-
-	m_portals[portalIndex].m_groupA = groupLow;
-	m_portals[portalIndex].m_groupB = groupHigh;
-
-	System.Printf(const_cast<char*>(kAStarGroupDebugLabel));
-
-	for (int i = 0; i < 64; ++i)
-	{
-		CAPos& p = m_portals[i];
-
-		bool used = false;
-		if (m_portals[i].m_groupA != 0 && m_portals[i].m_groupB != 0)
-		{
-			used = true;
-		}
-
-		if (used)
-		{
-			System.Printf(
-				const_cast<char*>(kAStarPortalDebugFormat),
-				static_cast<double>(p.m_position.x),
-				static_cast<double>(p.m_position.y),
-				static_cast<double>(p.m_position.z),
-				p.m_groupA,
-				p.m_groupB
-			);
-		}
-	}
-
+	dumpAStar();
 	calcAStar();
 }
 /*
@@ -369,10 +370,7 @@ void CAStar::drawAStar()
 
 			do
 			{
-				int b = static_cast<unsigned char>(Math.Rand(0xff));
-				int g = static_cast<unsigned char>(Math.Rand(0xff));
-				int r = static_cast<unsigned char>(Math.Rand(0xff));
-				MapMng.SetIdGrpColor(group, 0, CColor(r, g, b, 0xFF).color);
+				MapMng.SetIdGrpColor(group, 0, CColor(Math.Rand(0xff), Math.Rand(0xff), Math.Rand(0xff), 0xFF).color);
 				++group;
 			} while (group < 64);
 		}
@@ -394,14 +392,7 @@ void CAStar::drawAStar()
 
 		do
 		{
-			bool exists = false;
-
-			if (m_portals[i].m_groupA != 0 && m_portals[i].m_groupB != 0)
-			{
-				exists = true;
-			}
-
-			if (exists)
+			if (IsValidPortal(m_portals[i]))
 			{
 				Graphic.DrawSphere(drawMtx, &m_portals[i].m_position, kDrawAStarSphereRadius, CColor(0xFF, 0xFF, 0x00, 0xFF));
 
@@ -420,23 +411,9 @@ void CAStar::drawAStar()
 						{
 							if (i != j)
 							{
-								bool otherExists = false;
-
-								if (m_portals[j].m_groupA != 0 && m_portals[j].m_groupB != 0)
+								if (IsValidPortal(m_portals[j]))
 								{
-									otherExists = true;
-								}
-
-								if (otherExists)
-								{
-									bool matches = false;
-
-									if (m_portals[j].m_groupA == groupId || m_portals[j].m_groupB == groupId)
-									{
-										matches = true;
-									}
-
-									if (matches)
+									if (IsPortalOfGroup(m_portals[j], groupId))
 									{
 										GXLoadPosMtxImm(drawMtx, GX_PNMTX0);
 										GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 2);
@@ -876,67 +853,6 @@ void CAStar::CATemp::operator= (const CAStar::CATemp& other)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 668b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CAStar::addAstar(Vec& pos, int groupA, int groupB)
-{
-	int groupLow = groupA;
-	int groupHigh = groupB;
-
-	if (groupB < groupA)
-	{
-		groupLow = groupB;
-		groupHigh = groupA;
-	}
-
-	int index = 0;
-
-	for (; index < 64; ++index)
-	{
-		CAPos& p = m_portals[index];
-
-		if (p.m_groupA == groupLow && p.m_groupB == groupHigh)
-		{
-			break;
-		}
-	}
-
-	if (index == 64)
-	{
-		index = 0;
-
-		for (; index < 64; ++index)
-		{
-			bool used = false;
-
-			if (m_portals[index].m_groupA != 0 && m_portals[index].m_groupB != 0)
-			{
-				used = true;
-			}
-
-			if (!used)
-			{
-				m_portalCount++;
-				break;
-			}
-		}
-	}
-
-	CAPos& portal = m_portals[index];
-
-	portal.m_position.x = pos.x;
-	portal.m_position.y = pos.y;
-	portal.m_position.z = pos.z;
-	m_portals[index].m_groupA = static_cast<unsigned char>(groupLow);
-	m_portals[index].m_groupB = static_cast<unsigned char>(groupHigh);
-}
-/*
- * --INFO--
  * PAL Address: 0x80142ce8
  * PAL Size: 668b
  * EN Address: TODO
@@ -946,56 +862,7 @@ inline void CAStar::addAstar(Vec& pos, int groupA, int groupB)
  */
 void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 {
-	int groupLow = groupA;
-	int groupHigh = groupB;
-	const CVector& pos = CVector(x, y, z);
-
-	if (groupB < groupA)
-	{
-		groupLow = groupB;
-		groupHigh = groupA;
-	}
-
-	int index = 0;
-
-	for (; index < 64; ++index)
-	{
-		CAPos& p = m_portals[index];
-
-		if (p.m_groupA == groupLow && p.m_groupB == groupHigh)
-		{
-			break;
-		}
-	}
-
-	if (index == 64)
-	{
-		index = 0;
-
-		for (; index < 64; ++index)
-		{
-			bool used = false;
-
-			if (m_portals[index].m_groupA != 0 && m_portals[index].m_groupB != 0)
-			{
-				used = true;
-			}
-
-			if (!used)
-			{
-				m_portalCount++;
-				break;
-			}
-		}
-	}
-
-	CAPos& portal = m_portals[index];
-
-	portal.m_position.x = pos.x;
-	portal.m_position.y = pos.y;
-	portal.m_position.z = pos.z;
-	m_portals[index].m_groupA = static_cast<unsigned char>(groupLow);
-	m_portals[index].m_groupB = static_cast<unsigned char>(groupHigh);
+	addAstar(CVector(x, y, z), groupA, groupB);
 }
 /*
  * --INFO--

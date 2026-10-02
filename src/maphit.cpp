@@ -85,12 +85,10 @@ void CMapHit::DrawWire()
             i++;
         }
 
-        const unsigned short firstIndex = face->m_vertexIndices[0];
+        Vec* firstVertex = m_vertices + face->m_vertexIndices[0];
+        GXPosition3f32(firstVertex->x, firstVertex->y, firstVertex->z);
         face++;
         faceIndex++;
-
-        Vec* firstVertex = m_vertices + firstIndex;
-        GXPosition3f32(firstVertex->x, firstVertex->y, firstVertex->z);
     }
 }
 
@@ -113,6 +111,7 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_NRM, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
+    int i;
     int faceIndex = 0;
     CMapHitFace* face = m_faces;
     while (faceIndex < m_faceCount) {
@@ -122,7 +121,7 @@ void CMapHit::Draw()
             GXColor colorBBytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            int i = 0;
+            i = 0;
             while (i < static_cast<int>(face->m_vertexCount)) {
                 Vec* vertex = m_vertices + face->m_vertexIndices[i];
                 GXPosition3f32(vertex->x, vertex->y, vertex->z);
@@ -164,7 +163,7 @@ void CMapHit::Draw()
         face->m_drawFlags = 0;
 
         GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-        int i = 0;
+        i = 0;
         while (i < static_cast<int>(face->m_vertexCount)) {
             Vec* vertex = m_vertices + face->m_vertexIndices[i];
             GXPosition3f32(vertex->x, vertex->y, vertex->z);
@@ -194,16 +193,13 @@ void CMapHit::Draw()
  */
 void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
 {
-    unsigned int faceIndex = startFace;
-    int endFace = static_cast<unsigned short>(faceCount + startFace);
-
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
 
-    while (static_cast<int>(faceIndex) < endFace) {
+    faceCount += startFace;
+    for (int faceIndex = startFace; faceIndex < faceCount; faceIndex++) {
         g_hit_lpface = &m_faces[faceIndex];
         CheckHitFaceCylinder(mask);
-        faceIndex++;
     }
 }
 
@@ -230,21 +226,17 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
  */
 int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
 {
-    unsigned int faceIndex = startFace;
-    int endFace = static_cast<unsigned short>(faceCount + startFace);
-
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
 
-    while (static_cast<int>(faceIndex) < endFace) {
+    faceCount += startFace;
+    for (int faceIndex = startFace; faceIndex < faceCount; faceIndex++) {
         g_hit_lpface = &m_faces[faceIndex];
         g_hit_t_min = kMapHitInitialTMin;
 
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;
         }
-
-        faceIndex++;
     }
 
     return 0;
@@ -419,50 +411,11 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     CMapCylinder& cyl = g_hit_cyl;
-    unsigned char boundsOverlap = 0;
-    unsigned char partialOverlap = 0;
-    int axisOverlap;
-    if (g_hit_lpface->m_boundsMin.x < g_hit_cyl.m_bound.m_min.x) {
-        axisOverlap = g_hit_cyl.m_bound.m_min.x <= g_hit_lpface->m_boundsMax.x;
-    } else if (g_hit_lpface->m_boundsMin.x > g_hit_cyl.m_bound.m_min.x) {
-        axisOverlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_bound.m_max.x;
-    } else {
-        axisOverlap = 1;
-    }
-
-    if (axisOverlap) {
-        if (g_hit_lpface->m_boundsMin.y < g_hit_cyl.m_bound.m_min.y) {
-            axisOverlap = g_hit_cyl.m_bound.m_min.y <= g_hit_lpface->m_boundsMax.y;
-        } else if (g_hit_lpface->m_boundsMin.y > g_hit_cyl.m_bound.m_min.y) {
-            axisOverlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_bound.m_max.y;
-        } else {
-            axisOverlap = 1;
-        }
-
-        if (axisOverlap) {
-            partialOverlap = 1;
-        }
-    }
-
-    if (partialOverlap) {
-        if (g_hit_lpface->m_boundsMin.z < g_hit_cyl.m_bound.m_min.z) {
-            axisOverlap = g_hit_cyl.m_bound.m_min.z <= g_hit_lpface->m_boundsMax.z;
-        } else if (g_hit_lpface->m_boundsMin.z > g_hit_cyl.m_bound.m_min.z) {
-            axisOverlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_bound.m_max.z;
-        } else {
-            axisOverlap = 1;
-        }
-
-        if (axisOverlap) {
-            boundsOverlap = 1;
-        }
-    }
-
-    if (!boundsOverlap) {
+    if (g_hit_lpface->m_bound.CheckCross(g_hit_cyl.m_bound) == 0) {
         return 0;
     }
 
-    Vec* hitDirection = &cyl.m_axis;
+    Vec* hitDirection = &g_hit_cyl.m_axis;
     float dot = PSVECDotProduct(hitDirection, &g_hit_lpface->m_normal);
     if (dot >= kMapHitZero) {
         return 0;
@@ -484,7 +437,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 
     {
         PSVECScale(hitDirection, &g_hit_hpv, hitT);
-        PSVECAdd(&cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
+        PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
         Vec pushedHit;
         Vec scaledNormal;
@@ -631,13 +584,13 @@ edge_loop:
                 Vec edge;
                 PSVECSubtract(&current, &previous, &edge);
 
-                Vec rayDirection = cyl.m_axis;
-                Vec rayStart = cyl.m_bottom;
+                Vec rayStart = g_hit_cyl.m_bottom;
+                Vec rayDirection = *hitDirection;
 
                 CMapCylinder edgeCylinder;
                 edgeCylinder.m_bottom = previous;
                 edgeCylinder.m_axis = edge;
-                edgeCylinder.m_radius = cyl.m_radius;
+                edgeCylinder.m_radius = g_hit_cyl.m_radius;
 
                 float edgeT;
                 if (FindIntersection(rayStart, rayDirection, edgeCylinder, edgeT) != 0 &&
@@ -768,22 +721,22 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     face.m_vertexIndices[i] = chunkFile.Get2();
 
                     const Vec& v = m_vertices[face.m_vertexIndices[i]];
-                    face.m_boundsMin.x = (face.m_boundsMin.x < v.x) ? face.m_boundsMin.x : v.x;
-                    face.m_boundsMin.y = (face.m_boundsMin.y < v.y) ? face.m_boundsMin.y : v.y;
-                    face.m_boundsMin.z = (face.m_boundsMin.z < v.z) ? face.m_boundsMin.z : v.z;
+                    face.m_bound.m_min.x = (face.m_bound.m_min.x < v.x) ? face.m_bound.m_min.x : v.x;
+                    face.m_bound.m_min.y = (face.m_bound.m_min.y < v.y) ? face.m_bound.m_min.y : v.y;
+                    face.m_bound.m_min.z = (face.m_bound.m_min.z < v.z) ? face.m_bound.m_min.z : v.z;
 
-                    face.m_boundsMax.x = (face.m_boundsMax.x > v.x) ? face.m_boundsMax.x : v.x;
-                    face.m_boundsMax.y = (face.m_boundsMax.y > v.y) ? face.m_boundsMax.y : v.y;
-                    face.m_boundsMax.z = (face.m_boundsMax.z > v.z) ? face.m_boundsMax.z : v.z;
+                    face.m_bound.m_max.x = (face.m_bound.m_max.x > v.x) ? face.m_bound.m_max.x : v.x;
+                    face.m_bound.m_max.y = (face.m_bound.m_max.y > v.y) ? face.m_bound.m_max.y : v.y;
+                    face.m_bound.m_max.z = (face.m_bound.m_max.z > v.z) ? face.m_bound.m_max.z : v.z;
                 }
 
                 face.m_radiusScale *= radiusScale;
-                face.m_boundsMin.x -= (offsetScale + face.m_radiusScale);
-                face.m_boundsMin.y -= (offsetScale + face.m_radiusScale);
-                face.m_boundsMin.z -= (offsetScale + face.m_radiusScale);
-                face.m_boundsMax.x += (offsetScale + face.m_radiusScale);
-                face.m_boundsMax.y += (offsetScale + face.m_radiusScale);
-                face.m_boundsMax.z += (offsetScale + face.m_radiusScale);
+                face.m_bound.m_min.x -= (offsetScale + face.m_radiusScale);
+                face.m_bound.m_min.y -= (offsetScale + face.m_radiusScale);
+                face.m_bound.m_min.z -= (offsetScale + face.m_radiusScale);
+                face.m_bound.m_max.x += (offsetScale + face.m_radiusScale);
+                face.m_bound.m_max.y += (offsetScale + face.m_radiusScale);
+                face.m_bound.m_max.z += (offsetScale + face.m_radiusScale);
                 face.m_radiusScale = static_cast<float>(radiusBase - face.m_radiusScale);
             }
             break;
@@ -806,13 +759,6 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
  */
 CMapHitFace::CMapHitFace()
 {
-    m_boundsMin.z = kMapHitBoundsMinInit;
-    m_boundsMin.y = kMapHitBoundsMinInit;
-    m_boundsMin.x = kMapHitBoundsMinInit;
-
-    m_boundsMax.z = kMapHitBoundsMaxInit;
-    m_boundsMax.y = kMapHitBoundsMaxInit;
-    m_boundsMax.x = kMapHitBoundsMaxInit;
 }
 
 /*

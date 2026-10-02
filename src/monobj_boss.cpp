@@ -705,14 +705,10 @@ void CGMonObj::logicFuncRamoe()
  */
 void CGMonObj::damagedFuncDuct()
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	void* scriptKind = object->m_scriptHandle[4];
-	CCharaPcs::CLoadPdt* loadPdt = object->m_charaModelHandle->m_pdtLoadRef;
-	int slot = reinterpret_cast<int>(scriptKind) - 0x8E;
-	int pdtNo = loadPdt != 0 ? loadPdt->m_pdtSlot : -1;
-	reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 2, 0, reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0);
+	int slot = reinterpret_cast<int>(m_scriptHandle[4]) - 0x8E;
+	putParticle((m_charaModelHandle->GetPdtSlot() << 8) | 2, 0, this, kMonObjBossOne, 0);
 
-	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x1C) == 0) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 		CGObject* bossObj = *reinterpret_cast<CGObject**>(CGMonObj::m_boss + 0x68);
 		CChara::CModel* model = bossObj->m_charaModelHandle->m_model;
 		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(CGMonObj::m_boss);
@@ -811,13 +807,9 @@ void CGMonObj::logicFuncMeteoParasite()
 		switch (reinterpret_cast<int>(object->m_scriptHandle[4])) {
 		case 0x87:
 			if (work->m_coreIndex == 2 && m_actionBranch < 2) {
-				if (work->m_objs[3]->m_lastStateId >= 100) {
+				if (work->m_objs[3]->m_lastStateId >= 100 || work->bits.m_bit80) {
 					return;
 				}
-				if (!work->bits.m_bit80) {
-					goto do_logic;
-				}
-				return;
 			}
 			break;
 		}
@@ -827,7 +819,7 @@ void CGMonObj::logicFuncMeteoParasite()
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
 		return;
 	}
-do_logic:
+
 	logicFuncDefault();
 }
 
@@ -855,7 +847,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 			prgObj->changeStat(0, 0, 0);
 		}
 		break;
-	case 0x65:
+	case 0x66:
 		if (prgObj->m_stateFrame == 0) {
 			prgObj->reqAnim(0xC, 0, 0);
 		} else if (prgObj->isLoopAnim() != 0) {
@@ -863,7 +855,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 			prgObj->changeStat(0, 0, 0);
 		}
 		break;
-	case 0x66:
+	case 0x65:
 		if (prgObj->m_stateFrame == 0) {
 			prgObj->reqAnim(0xD, 0, 0);
 		} else if (prgObj->isLoopAnim() != 0) {
@@ -924,8 +916,7 @@ void CGMonObj::alwaysFuncMeteoParasite()
 			MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
 			for (int i = 0; i < 12; i++) {
 				float angle = kMonObjBossTwo * (kMonObjBossPi * static_cast<float>(i + 3)) / kMonObjBossTwelve;
-				angle += aaa;
-				work->m_rotObjects[i]->m_rotTargetY = angle;
+				work->m_rotObjects[i]->m_rotTargetY = angle + aaa;
 			}
 
 			aaa += kMonObjBossScaleStep;
@@ -1168,7 +1159,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 		}
 		return;
 	}
-	default:
+	case 0x66:
 		if (prgObj->m_stateFrame == 0) {
 			reinterpret_cast<CGCharaObj*>(this)->damageDelete();
 			reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)
@@ -1245,10 +1236,9 @@ void CGMonObj::initFinishedFuncMeteoParasiteC()
 	*reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x74) = this;
 
 	if (strcmp(Game.m_currentScriptName, sMeteoParasiteScriptName) == 0) {
-		MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss);
 		CGObject* object = reinterpret_cast<CGObject*>(this);
-		work->bits.m_meteo3 = 1;
-		work->m_index = 3;
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 = 1;
+		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_index = 3;
 		*reinterpret_cast<u16*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) = 1;
 		object->SetAnimSlot(0x35, 0);
 		reinterpret_cast<CGPrgObj*>(this)->reqAnim(0x35, 1, 0);
@@ -1489,9 +1479,9 @@ void CGMonObj::frameStatFuncTetsukyojin()
 	switch (state) {
 	case 100:
 		if (prgObj->m_stateFrame == 0) {
+			Vec attackVec;
 			CVector partyPos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
 			CVector attackDir(-partyPos.x, -partyPos.y, -partyPos.z);
-			Vec attackVec;
 			attackVec.x = attackDir.x;
 			attackVec.y = attackDir.y;
 			attackVec.z = attackDir.z;
@@ -1969,10 +1959,11 @@ void CGMonObj::frameStatFuncLKShooter()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 
-	int cooldown0 = *reinterpret_cast<int*>(CGMonObj::m_boss + 0xC) - 1;
-	int cooldown1 = *reinterpret_cast<int*>(CGMonObj::m_boss + 0x10) - 1;
-	*reinterpret_cast<int*>(CGMonObj::m_boss + 0xC) = cooldown0 & ~(cooldown0 >> 31);
-	*reinterpret_cast<int*>(CGMonObj::m_boss + 0x10) = cooldown1 & ~(cooldown1 >> 31);
+	LKShooterBossWork* work = reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss);
+	int cooldown0 = work->m_leftCooldown - 1;
+	work->m_leftCooldown = cooldown0 & ~(cooldown0 >> 31);
+	int cooldown1 = work->m_rightCooldown - 1;
+	work->m_rightCooldown = cooldown1 & ~(cooldown1 >> 31);
 
 	const int state = *reinterpret_cast<int*>(self + 0x520);
 	switch (state) {
@@ -2009,7 +2000,7 @@ void CGMonObj::frameStatFuncLKShooter()
 			rotTarget(m_targetPartyIndex, kMonObjBossTurnAroundDeg);
 		}
 		if ((reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit80 != 0) ||
-		    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < kMonObjBossFrameThreshold)) {
+		    (m_partyDistance[m_partyRank[0]] < kMonObjBossFrameThreshold)) {
 			reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 		}
 		return;
@@ -2018,12 +2009,12 @@ void CGMonObj::frameStatFuncLKShooter()
 	if (m_actionBranch == 1) {
 		m_actionBranch = 0;
 		reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit20 = 0;
-		*reinterpret_cast<int*>(CGMonObj::m_boss + 0x10) = 0xFA;
+		work->m_rightCooldown = 0xFA;
 	}
 	if (m_actionBranch == 2) {
 		m_actionBranch = 0;
 		reinterpret_cast<LKShooterBossWork*>(CGMonObj::m_boss)->bits.m_bit40 = 0;
-		*reinterpret_cast<int*>(CGMonObj::m_boss + 0xC) = 0xFA;
+		work->m_leftCooldown = 0xFA;
 	}
 }
 
@@ -2060,9 +2051,9 @@ void CGMonObj::moveFrameFuncSaw()
 	const float wave = kMonObjBossQuarter * (kMonObjBossOne + sinf(*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4))) + kMonObjBossHalf;
 	m_moveWork.m_targetPos.x = wave * (kMonObjBossWaveXRadius * sinf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
 	m_moveWork.m_targetPos.z = wave * (kMonObjBossAttackRange * cosf(*reinterpret_cast<float*>(CGMonObj::m_boss)));
-	*reinterpret_cast<float*>(CGMonObj::m_boss) = *reinterpret_cast<float*>(CGMonObj::m_boss) +
-	    (kMonObjBossWavePhaseAccel * (kMonObjBossHalf - (wave - kMonObjBossHalf)) + kMonObjBossScaleStep);
-	*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) = *reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) + kMonObjBossWavePhaseStep;
+	*reinterpret_cast<float*>(CGMonObj::m_boss) +=
+	    kMonObjBossWavePhaseAccel * (kMonObjBossHalf - (wave - kMonObjBossHalf)) + kMonObjBossScaleStep;
+	*reinterpret_cast<float*>(CGMonObj::m_boss + 0x4) += kMonObjBossWavePhaseStep;
 }
 
 /*
@@ -2509,7 +2500,8 @@ void CGMonObj::frameStatFuncGolem()
 		return;
 	case 0x66:
 	case 0x68: {
-		if ((m_stateFrame == 0x14) ||
+		int frame = m_stateFrame;
+		if ((frame == 0x14) ||
 		    (m_stateFlags0Bits.unk1 != 0) ||
 		    ((state == 0x66) &&
 		     (m_partyDistance[m_targetPartyIndex] <
@@ -2517,7 +2509,7 @@ void CGMonObj::frameStatFuncGolem()
 			m_rotTargetY = getTargetRot(Game.m_partyObjArr[m_targetPartyIndex]);
 			setAttackAfter(m_itemId);
 		} else {
-			if (m_stateFrame == 0) {
+			if (frame == 0) {
 				float turnOffset;
 				switch (state) {
 				case 0x66:

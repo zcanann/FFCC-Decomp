@@ -58,13 +58,13 @@ void m4aMPlayPitchControl(struct MusicPlayerInfo *mplayInfo, u16 trackBits, s16 
 struct Sound {
     Sound() {}
 
+    void Init();
+    void UpdateListener();
+    void PlaySong(u16 song, void *source);
+
     struct Vec3 listener;
 };
 
 extern struct Sound gSound;
-
-void Sound_Init(struct Sound *sound);
-void Sound_UpdateListener(struct Sound *sound);
-void PlaySong(struct Sound *sound, u16 song, void *source);
 
 #endif

@@ -1,4 +1,3 @@
-extern "C" {
 #include "global.h"
 #include "main.h"
 #include "camera.h"
@@ -79,12 +78,12 @@ void Floor_BuildDepths(struct Field *field)
     struct Vec3 *eye;
 
     SetVec(&zero, 0, 0, 0);
-    Camera_Follow(&gCamera, &zero, 0, 0, 1);
+    gCamera.Follow(&zero, 0, 0, 1);
     eye = &gCamera.pos;
     gMain.horizon = 0;
     for (i = 0; i < 160; i++) {
         SetVec(&v, 120, i, 160);
-        Camera_ScreenToWorld(&gCamera, &v, &out);
+        gCamera.ScreenToWorld(&v, &out);
         out.x -= eye->x;
         out.y -= eye->y;
         out.z -= eye->z;
@@ -277,5 +276,4 @@ u8 Field_CheckWallAI(struct Field *field, struct Vec3 *pos, struct Vec3 *vel, s1
     vel->z = vel->z * len / *speed;
     *speed = len;
     return flags;
-}
 }

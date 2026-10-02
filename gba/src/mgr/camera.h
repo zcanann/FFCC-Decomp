@@ -6,6 +6,16 @@
 struct Camera {
     Camera() {}
 
+    void Init();
+    void Update();
+    void Follow(struct Vec3 *at, u16 angle, s16 distance, u8 near);
+    void SetPitch(u16 angle);
+    void Rotate(struct Vec3 *in, struct Vec3 *out);
+    void ViewToWorld(struct Vec3 *in, struct Vec3 *out);
+    void ScreenToView(struct Vec3 *in, struct Vec3 *out);
+    u8 WorldToScreen(struct Vec3 *in, struct Vec3 *out);
+    void ScreenToWorld(struct Vec3 *in, struct Vec3 *out);
+
     struct Vec3 pos;
     struct Vec3 target;
     struct Vec3 eye;
@@ -36,16 +46,5 @@ struct Camera {
 };
 
 extern struct Camera gCamera;
-
-
-void Camera_Init(struct Camera *cam);
-void Camera_Update(struct Camera *cam);
-void Camera_Follow(struct Camera *cam, struct Vec3 *target, u16 yaw, s16 dist, u8 near);
-void Camera_SetPitch(struct Camera *cam, u16 pitch);
-void Camera_Rotate(struct Camera *cam, struct Vec3 *in, struct Vec3 *out);
-void Camera_ViewToWorld(struct Camera *cam, struct Vec3 *in, struct Vec3 *out);
-void Camera_ScreenToView(struct Camera *cam, struct Vec3 *in, struct Vec3 *out);
-u8 Camera_WorldToScreen(struct Camera *cam, struct Vec3 *in, struct Vec3 *out);
-void Camera_ScreenToWorld(struct Camera *cam, struct Vec3 *in, struct Vec3 *out);
 
 #endif

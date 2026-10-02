@@ -1,4 +1,3 @@
-extern "C" {
 #include "global.h"
 #include "main.h"
 #include "link.h"
@@ -544,7 +543,7 @@ void Racer_UpdatePlayer(struct Actor *a)
     Racer_UpdateProgress(a);
     if ((gPadNew[a->id] & L_BUTTON) && (u8)a->item != ITEM_NONE) {
         if (gPlayerNo == a->id)
-            PlaySong(&gSound, SE_ITEM_USE, a);
+            gSound.PlaySong(SE_ITEM_USE, a);
         switch ((u8)a->item % ITEM_COUNT) {
         case ITEM_FREEZE:
             Effect_Spawn(&gGame, EFFECT_FREEZE_SHOT, a->id, &a->pos, a->facing, a->routeNo, a->routeIdx);
@@ -927,7 +926,6 @@ void Game_Reset(struct Game *game)
 
 void Game_Init(struct Game *game)
 {
-    struct Chunk reader;
     struct ChunkHeader hdr;
     struct OamData *oam;
     struct Cell *cell;
@@ -949,12 +947,12 @@ void Game_Init(struct Game *game)
     DmaSet(gDecompBuffer, VRAM + 0x10000, 0x84002000);
     LZ77UnCompWram(gObjPaletteLz, gDecompBuffer);
     DmaSet(gDecompBuffer, PLTT + 0x200, 0x84000080);
-    Chunk_Construct(&reader);
-    Chunk_SetBuffer(&reader, gObjData);
-    while (Chunk_Next(&reader, &hdr)) {
+    struct Chunk reader;
+    reader.SetBuffer(gObjData);
+    while (reader.Next(&hdr)) {
         switch (hdr.id) {
         case CHUNK_ID('O', 'B', 'J', ' '):
-            game->cellTable = (struct Table *)Chunk_GetData(&reader);
+            game->cellTable = (struct Table *)reader.GetData();
             for (i = 0; i < game->cellTable->count; i++) {
                 game->cellTable->entries[i] = (u8 *)game->cellTable + (u32)game->cellTable->entries[i];
                 cell = (struct Cell *)game->cellTable->entries[i];
@@ -969,7 +967,7 @@ void Game_Init(struct Game *game)
             }
             break;
         case CHUNK_ID('A', 'N', 'I', 'M'):
-            game->animTable = (struct Table *)Chunk_GetData(&reader);
+            game->animTable = (struct Table *)reader.GetData();
             for (m = 0; m < game->animTable->count; m++) {
                 game->animTable->entries[m] = (u8 *)game->animTable + (u32)game->animTable->entries[m];
             }
@@ -1419,7 +1417,7 @@ void Sprite_DrawAnim3D(struct Game *game, struct AnimState *anim, struct Vec3 *p
 {
     struct Vec3 screen;
 
-    if (Camera_WorldToScreen(&gCamera, pos, &screen)) {
+    if (gCamera.WorldToScreen(pos, &screen)) {
         if (screen.z >= 61 && screen.z < 0x4000 && (u16)(screen.x + 16) <= 272 && screen.y >= -16 && screen.y <= 176) {
             screen.z >>= 9;
             Sprite_DrawAnimScaled(game, anim, &screen);
@@ -1431,7 +1429,7 @@ void Sprite_Draw3D(struct Game *game, u16 animNo, struct Vec3 *pos)
 {
     struct Vec3 screen;
 
-    if (Camera_WorldToScreen(&gCamera, pos, &screen)) {
+    if (gCamera.WorldToScreen(pos, &screen)) {
         if (screen.z >= 61 && screen.z < 0x4000 && (u16)(screen.x + 16) <= 272 && screen.y >= -16 && screen.y <= 176) {
             screen.z >>= 9;
             Sprite_DrawScaled(game, (s16)animNo, &screen);
@@ -1451,7 +1449,7 @@ void Sprite_Draw3DOffset(struct Game *game, u16 animNo, struct Vec3 *pos, s16 dx
     struct Vec3 screen;
     struct Point pt;
 
-    if (Camera_WorldToScreen(&gCamera, pos, &screen)) {
+    if (gCamera.WorldToScreen(pos, &screen)) {
         if (screen.z >= 61 && screen.z < 0x4000) {
             Offset(&screen, dx, dy);
             if ((u16)(screen.x + 16) <= 272 && screen.y >= -16 && screen.y <= 176) {
@@ -1503,5 +1501,4 @@ void Game_AddEnemies(struct Game *game, s32 count)
         game->enemyCount++;
     }
     game->actorCount = game->enemyCount + 4;
-}
 }

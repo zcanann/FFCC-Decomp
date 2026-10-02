@@ -1,4 +1,3 @@
-extern "C" {
 #include "global.h"
 #include "route.h"
 
@@ -147,5 +146,4 @@ void PointList_Init(struct PointList *lists)
 struct PointList *PointList_Get(struct PointList *lists, s16 no)
 {
     return &gPointLists[no];
-}
 }

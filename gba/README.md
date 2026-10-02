@@ -50,6 +50,9 @@ Requirements:
 ## Layout
 
 - `config/<program>/symbols.txt`: symbol names, addresses, sizes; `thumb` marks Thumb functions.
+  C++ functions carry their g++ 2.9 mangled names (`Init__6Camera`, `Crc8__FUi`).
+  After changing a C++ signature, `python gba/tools/syncnames.py <program> --defined --apply`
+  renames the entries to what the compiled objects define.
 - `config/<program>/splits.txt`: address ranges per unit. Units become objdiff units.
 - `tools/split.py`: generates per-unit assembly and the linker script. Instructions are
   emitted with `.inst`, and calls and pointers become relocations against symbols,

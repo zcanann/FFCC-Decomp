@@ -860,36 +860,45 @@ void Window_OpenStyle6(struct Window *win, s32 tile, s32 pal)
         map = Bg_GetMapPtr(win->bg, win->x, win->y);
         DmaCopy16(0, buf, map, win->width << 1);
     }
-    if (gMode || win->anim) {
-        if (win->anim) {
-            for (i = 0; i < win->width; i++) {
-                if (i == 0)
-                    t = tile + 3;
-                else if (i + 1 >= win->width)
-                    t = tile + 5;
-                else
-                    t = tile + 4;
-                if ((py >> 3) >= win->y + win->height)
-                    t += 3;
-                buf[i] = t | pal;
-            }
-            map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
-            DmaCopy16(0, buf, map, win->width << 1);
-        }
-        if ((py >> 3) - win->y >= win->height - 1) {
-            for (i = 0; i < win->width; i++) {
-                if (i == 0)
-                    t = tile + 6;
-                else if (i + 1 >= win->width)
-                    t = tile + 8;
-                else
-                    t = tile + 7;
-                buf[i] = t | pal;
-            }
-            map = Bg_GetMapPtr(win->bg, win->x, (py >> 3));
-            DmaCopy16(0, buf, map, win->width << 1);
-        }
+    if (gMode == MODE_FIELD) {
+        if (win->anim != 0)
+            goto draw_animated_rows;
+        goto draw_sprites;
     }
+    if (win->anim == 0)
+        goto draw_bottom_border;
+
+draw_animated_rows:
+    for (i = 0; i < win->width; i++) {
+        if (i == 0)
+            t = tile + 3;
+        else if (i + 1 >= win->width)
+            t = tile + 5;
+        else
+            t = tile + 4;
+        if ((py >> 3) >= win->y + win->height)
+            t += 3;
+        buf[i] = t | pal;
+    }
+    map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
+    DmaCopy16(0, buf, map, win->width << 1);
+
+draw_bottom_border:
+    if ((py >> 3) - win->y >= win->height - 1) {
+        for (i = 0; i < win->width; i++) {
+            if (i == 0)
+                t = tile + 6;
+            else if (i + 1 >= win->width)
+                t = tile + 8;
+            else
+                t = tile + 7;
+            buf[i] = t | pal;
+        }
+        map = Bg_GetMapPtr(win->bg, win->x, (py >> 3));
+        DmaCopy16(0, buf, map, win->width << 1);
+    }
+
+draw_sprites:
     if ((py >> 3) < win->y + win->height) {
         for (i = 0; i < win->width; i++, px += 8) {
             if (i == 0)

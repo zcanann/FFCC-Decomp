@@ -768,10 +768,10 @@ void ShopList_ScrollRows(s32 dir)
     s32 step;
     s32 i;
     s32 j;
-    u16 *src;
-    u16 *dst;
+    u32 src;
+    u32 dst;
 
-    step = 32;
+    step = 64;
     if (dir) {
         to = win->rows * 2;
         from = to - 2;
@@ -780,11 +780,11 @@ void ShopList_ScrollRows(s32 dir)
         from = 3;
         to = 1;
     }
-    src = Bg_GetMapPtr(win->bg, win->x + 1, from);
-    dst = Bg_GetMapPtr(win->bg, win->x + 1, to);
+    src = (u32)Bg_GetMapPtr(win->bg, win->x + 1, from);
+    dst = (u32)Bg_GetMapPtr(win->bg, win->x + 1, to);
     for (i = 0; i < win->rows - 1; i++) {
         for (j = 0; j < 2; j++) {
-            DmaSet(0, src, dst, 0x80000000 | (win->width - 2));
+            DmaCopy16(0, src, dst, (win->width - 2) << 1);
             src += step;
             dst += step;
         }
@@ -975,6 +975,7 @@ void InfoWin_ClearRows(s32 mode)
 void InfoWin_PrintNextRow(void)
 {
     char str[32];
+    struct Window *win = gWindows;
     u16 buf[30];
     struct BuyList *list;
     struct ItemInfo *items;
@@ -991,7 +992,7 @@ void InfoWin_PrintNextRow(void)
     s32 j;
     s32 k;
 
-    if (sInfoRow > gWindows->rows)
+    if (sInfoRow > win->rows)
         return;
     items = 0;
     list = (struct BuyList *)LIST_BUF;
@@ -1009,29 +1010,29 @@ void InfoWin_PrintNextRow(void)
     Text_SetFill(1, 2);
     Text_Clear();
     dst = 0x06009000;
-    if (sInfoRow < gWindows->rows)
-        dst = sInfoRow * 64 * gWindows->width + 0x06009000;
+    if (sInfoRow < win->rows)
+        dst = sInfoRow * 64 * win->width + 0x06009000;
     if (sInfoRow == 0) {
         if (n > 0) {
             Text_SetX(16);
             Text_Print(Msg_GetItemName(n), TEXT_DRAW);
         }
-        Text_CopyToVram(dst, gWindows->width);
+        Text_CopyToVram(dst, win->width);
     } else if (sInfoRow == 1) {
         if ((gScreen == 1 && n > 0) || (gScreen == 2 && n > 158)) {
             n = Text_Print(Msg_GetSystem(13), TEXT_WIDTH) + 72;
-            x = (gWindows->width - 2) * 8 - n;
+            x = (win->width - 2) * 8 - n;
             Text_SetX(x);
             n = sInfoItem;
             Text_PrintNumber(vals[n], x, 8);
             Text_Print(Msg_GetSystem(13), TEXT_DRAW);
         } else if (n > 0 && gScreen == 2 && n <= 158) {
             n = Text_Print(Msg_GetSystem(38), TEXT_WIDTH);
-            x = (gWindows->width - 2) * 8 - n;
+            x = (win->width - 2) * 8 - n;
             Text_SetX(x);
             Text_Print(Msg_GetSystem(38), TEXT_DRAW);
         }
-        Text_CopyToVram(dst, gWindows->width);
+        Text_CopyToVram(dst, win->width);
     } else if (sInfoRow <= 5) {
         if (sInfoMode == 0) {
             if (n > 0) {
@@ -1051,7 +1052,7 @@ void InfoWin_PrintNextRow(void)
                             if (items->count != 0 && items->kind != 16) {
                                 t = Item_IsPercentKind(items->kind) ? 40 : 39;
                                 w = Text_Print(Msg_GetSystem(t), TEXT_WIDTH);
-                                x = (gWindows->width - 2) * 8 - w;
+                                x = (win->width - 2) * 8 - w;
                                 digits = 1;
                                 if (items->count > 9) {
                                     digits = 3;
@@ -1073,7 +1074,7 @@ void InfoWin_PrintNextRow(void)
                                 s = Msg_GetSystem(63);
                             Text_SetX(0);
                             Text_Print(s, TEXT_DRAW);
-                            x = gWindows->width * 8 - 34;
+                            x = win->width * 8 - 34;
                             Text_PrintNumber(items->count, x, 2);
                         }
                     } else if (sInfoRow == 3) {
@@ -1087,14 +1088,14 @@ void InfoWin_PrintNextRow(void)
         } else if (n > 0) {
             if (sInfoRow == 2) {
                 w = Text_Print(Msg_GetSystem(14), TEXT_WIDTH);
-                x = (gWindows->width - 2) * 8 - w;
+                x = (win->width - 2) * 8 - w;
                 Text_SetX(x >> 1);
                 Text_Print(Msg_GetSystem(14), TEXT_DRAW);
             } else if (sInfoRow == 3) {
                 strcpy(str, Msg_GetSystem(13));
                 strcat(str, sSlashText);
                 w = Text_Print(str, TEXT_WIDTH) + 72;
-                x = (gWindows->width - 2) * 8 - w;
+                x = (win->width - 2) * 8 - w;
                 Text_SetX(x);
                 Text_PrintNumber(gSession.gil, x, 8);
                 Text_Print(str, TEXT_DRAW);
@@ -1102,27 +1103,27 @@ void InfoWin_PrintNextRow(void)
                 strcpy(str, Msg_GetSystem(13));
                 strcat(str, sSlashText);
                 w = Text_Print(str, TEXT_WIDTH) + 72;
-                x = (gWindows->width - 2) * 8 - w;
+                x = (win->width - 2) * 8 - w;
                 Text_SetX(x);
                 Text_PrintNumber(vals[sInfoItem], x, 8);
                 Text_Print(Msg_GetSystem(13), TEXT_DRAW);
             } else if (sInfoRow == 5) {
                 w = Text_Print(Msg_GetSystem(15), TEXT_WIDTH) + 18;
-                x = (gWindows->width - 3) * 8 - w;
+                x = (win->width - 3) * 8 - w;
                 Text_SetX(x);
                 Text_Print(Msg_GetSystem(15), TEXT_DRAW);
                 x = Text_GetX();
                 Text_PrintNumber(sShopQuantity, x, 2);
             }
         }
-        Text_CopyToVram(dst, gWindows->width);
+        Text_CopyToVram(dst, win->width);
     } else {
-        dst = (u32)Bg_GetMapPtr(gWindows->bg, gWindows->x + 1, gWindows->y + 1);
+        dst = (u32)Bg_GetMapPtr(win->bg, win->x + 1, win->y + 1);
         attr = 3 << 12;
-        w = gWindows->width - 2;
+        w = win->width - 2;
         for (i = 0; i < sInfoRow; i++) {
             for (j = 0; j < 2; j++) {
-                t = (gWindows->width << 1) * i + 0x80;
+                t = (win->width << 1) * i + 0x80;
                 t += j;
                 for (k = 0; k < w; k++) {
                     if (!(k & 1)) {
@@ -1138,7 +1139,7 @@ void InfoWin_PrintNextRow(void)
         }
         sInfoShowIcon = 1;
     }
-    if (sInfoRow <= gWindows->rows)
+    if (sInfoRow <= win->rows)
         sInfoRow++;
 }
 

@@ -732,8 +732,9 @@ void SmithForge_ClearRows(void)
 void SmithForge_DrawRow(s32 idx, s32 pal)
 {
     u16 buf[30];
+    struct Window *win = gWindows;
     s32 attr = pal << 12;
-    s32 y = gWindows[0].y + 1 + idx * 2;
+    s32 y = win->y + 1 + idx * 2;
     s32 w;
     s32 t;
     s32 i;
@@ -744,12 +745,12 @@ void SmithForge_DrawRow(s32 idx, s32 pal)
 
     if (gScreen == 2 && idx != 0)
         y++;
-    w = gWindows[0].width - 2;
+    w = win->width - 2;
     for (i = 0; i < 2; i++) {
-        t = (gWindows[0].width << 1) * idx + 128;
+        t = (win->width << 1) * idx + 128;
         t += i;
         j = 0;
-        bg = gWindows[0].bg;
+        bg = win->bg;
         row = y + i;
         for (; j < w; j++) {
             if (!(j & 1)) {
@@ -759,7 +760,7 @@ void SmithForge_DrawRow(s32 idx, s32 pal)
                 t += 4;
             }
         }
-        map = Bg_GetMapPtr(bg, gWindows[0].x + 1, row);
+        map = Bg_GetMapPtr(bg, win->x + 1, row);
         DmaCopy16(3, buf, map, w << 1);
     }
 }

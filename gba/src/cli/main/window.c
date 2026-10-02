@@ -15,6 +15,12 @@ static inline s32 Window_RowToY(struct Window *win, s32 row)
     return (win->y + row) * 8;
 }
 
+/* Text tile base of a window in slot 2 or 3 */
+static inline s32 Window_SlotTextTile(struct Window *win)
+{
+    return win->slot == 2 ? 0x238 : 0x29C;
+}
+
 void Window_PrintNextItem(struct Window *win)
 {
     s32 i;
@@ -1121,6 +1127,7 @@ void Window_OpenStyle9(struct Window *win, s32 tile, s32 pal)
     s32 t;
     s32 k;
     s32 odd;
+    s32 n;
     s32 attr;
     u16 *map;
 
@@ -1158,11 +1165,11 @@ void Window_OpenStyle9(struct Window *win, s32 tile, s32 pal)
     } else {
         k = win->anim >> 3;
         if (k != 0) {
-            t = win->slot == 2 ? 0x238 : 0x29C;
+            t = Window_SlotTextTile(win);
             py = y;
             odd = !(k & 1);
-            attr = (k - 1) >> 1;
-            t += win->width * 2 * attr;
+            n = (k - 1) >> 1;
+            t += win->width * 2 * n;
             t += odd;
             attr = win->slot == 2 ? 5 : 6;
             attr <<= 12;
@@ -1184,7 +1191,8 @@ void Window_OpenStyle9(struct Window *win, s32 tile, s32 pal)
             map = Bg_GetMapPtr(win->bg, win->x, py >> 3);
             DmaCopy16(3, buf, map, win->width << 1);
             py += 8;
-            if (py >= Window_RowToY(win, win->height) - 8) {
+            n = Window_RowToY(win, win->height) - 8;
+            if (py >= n) {
                 for (i = 0; i < win->width; i++) {
                     if (i == 0)
                         buf[i] = (tile + 8) | pal;

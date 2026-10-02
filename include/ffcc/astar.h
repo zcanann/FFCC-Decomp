@@ -53,6 +53,7 @@ public:
 	void check(int current, int goal, CATemp& temp);
 	void calcAStar();
 	void drawAStar();
+	void dumpAStar();
 	void addRealTime(CGPartyObj* gPartyObj);
 	CAPos* getEscapePos(Vec& from, Vec& base, int startGroup, int forbiddenGroup);
 	int calcSpecialPolygonGroup(Vec* pos);

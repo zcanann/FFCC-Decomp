@@ -152,6 +152,8 @@ public:
     char* GetMonArts(int);
     char* GetMonName(int, int);
     char* GetSysMes(int);
+    int GetEvtFlag(int);
+    void SetEvtFlag(int, int);
 
     // void* vtable;                        // 0x00
     int unk_0x4;                            // 0x04
@@ -193,6 +195,32 @@ public:
     CMemory::CStage* m_debugStage;          // 0xCC34
     CFlatData m_cFlatDataArr[4];            // 0xCC38 stride 0x14D4, total 0x5350
 }; // Size 0x11F88
+
+inline int CGame::GetEvtFlag(int evtFlagIndex)
+{
+    int byteIndex = evtFlagIndex / 8;
+    unsigned char value = m_gameWork.m_eventFlags[byteIndex];
+    int mask = 1 << (evtFlagIndex % 8);
+    unsigned int flag = value & mask;
+
+    return flag != 0;
+}
+
+inline void CGame::SetEvtFlag(int evtFlagIndex, int value)
+{
+    if (value != 0) {
+        int byteIndex = evtFlagIndex / 8;
+        int bit = 1 << (evtFlagIndex % 8);
+        m_gameWork.m_eventFlags[byteIndex] |= bit;
+        return;
+    }
+
+    {
+        int byteIndex = evtFlagIndex / 8;
+        int bit = 1 << (evtFlagIndex % 8);
+        m_gameWork.m_eventFlags[byteIndex] &= ~bit;
+    }
+}
 
 STATIC_ASSERT(sizeof(CGame::CGameWork) == 0x13E8);
 STATIC_ASSERT(offsetof(CGame::CGameWork, m_mcSerial) == 0x13E0);

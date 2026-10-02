@@ -180,29 +180,6 @@ static inline unsigned int ReadGameCFlatSystemValue(int systemValue)
     return rows[rowIndex * 0x24 + valueGroup];
 }
 
-static inline unsigned int GetGameWorkEventFlagBitIndex(int systemValue)
-{
-    return static_cast<unsigned int>(systemValue + 0x9F3);
-}
-
-static inline int GetGameWorkEventFlagByteIndex(unsigned int bitIndex)
-{
-    return (static_cast<int>(bitIndex) / 8) + 8;
-}
-
-static inline unsigned int GetGameWorkEventFlagMask(unsigned int bitIndex)
-{
-    return 1U << (static_cast<int>(bitIndex) % 8);
-}
-
-static inline unsigned int ReadGameWorkEventFlag(const CGame::CGameWork& gameWork, int systemValue)
-{
-    unsigned int bitIndex = GetGameWorkEventFlagBitIndex(systemValue);
-    const unsigned char* eventFlags = reinterpret_cast<const unsigned char*>(gameWork.m_eventFlags);
-    unsigned int mask = GetGameWorkEventFlagMask(bitIndex);
-    return ((eventFlags[GetGameWorkEventFlagByteIndex(bitIndex)] & mask) != 0);
-}
-
 static inline CFlatRuntime::CObject* ResolveRuntimeObjectById(CFlatRuntime2* runtime, int objectId)
 {
     CFlatRuntime::CObject* const root =
@@ -217,20 +194,6 @@ static inline CFlatRuntime::CObject* ResolveRuntimeObjectById(CFlatRuntime2* run
     }
 
     return 0;
-}
-
-static inline void WriteGameWorkEventFlag(CGame::CGameWork& gameWork, int systemValue, unsigned int value)
-{
-    unsigned int bitIndex = GetGameWorkEventFlagBitIndex(systemValue);
-    unsigned char* eventFlags = reinterpret_cast<unsigned char*>(gameWork.m_eventFlags);
-    unsigned char& flagByte = eventFlags[GetGameWorkEventFlagByteIndex(bitIndex)];
-    unsigned int mask = GetGameWorkEventFlagMask(bitIndex);
-
-    if (value == 0) {
-        flagByte &= static_cast<unsigned char>(~mask);
-    } else {
-        flagByte |= static_cast<unsigned char>(mask);
-    }
 }
 
 /*
@@ -1421,9 +1384,9 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 unsigned int* slot = &object->m_localBase[i + 3];
                 if (spec[0] == '%') {
                     int fmtIndex = 1;
-                    int width = 0;
                     char* digits = spec + 1;
                     int started = spec[1] == '0';
+                    int width = 0;
                     for (; (*digits >= '0') && (*digits <= '9'); digits++) {
                         fmtIndex++;
                         width = (*digits - '0') + width * 10;
@@ -1451,8 +1414,9 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
                 {
                     char* scan = spec + 1;
-                    while (*scan != '\0') {
-                        switch (*scan) {
+                    char c;
+                    while ((c = *scan) != '\0') {
+                        switch (c) {
                         case 'd':
                         case 'x':
                             sprintf(rendered, spec, *slot);
@@ -1599,11 +1563,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0x14: {
-        int value = *object->m_localBase;
-        if (value < 0) {
-            value = -value;
-        }
-        this->push(object, value);
+        this->push(object, __abs(static_cast<int>(*object->m_localBase)));
         outResult = 0;
         break;
     }
@@ -1765,10 +1725,8 @@ renderedDone:
                     float scaleA = p1->m_distance - p0->m_distance;
                     float scaleB = p2->m_distance - p1->m_distance;
                     float scaleC = p3->m_distance - p2->m_distance;
-                    float segmentT = kCFlatPadStickZero;
-                    if (kCFlatPadStickZero != scaleB) {
-                        segmentT = (pathDistance - p1->m_distance) / scaleB;
-                    }
+                    float segmentT =
+                        (kCFlatPadStickZero == scaleB) ? kCFlatPadStickZero : (pathDistance - p1->m_distance) / scaleB;
 
                     Vec result;
                     Math.CalcSpline(&result, &p0->m_position, &p1->m_position, &p2->m_position, &p3->m_position,
@@ -3025,23 +2983,23 @@ renderedDone:
         outResult = 0;
         break;
     case -0x9C: {
+        int cameraIndex = *object->m_localBase;
         int cameraFrame = object->m_localBase[1];
-        CCharaPcs::CCameraFrame*& cameraSlotRef = CharaPcs.m_cameraData[*object->m_localBase];
-        if ((cameraSlotRef == 0) || (cameraFrame < 0) ||
-            (CharaPcs.m_cameraFrameCount[*object->m_localBase] <= cameraFrame)) {
+        if ((CharaPcs.m_cameraData[cameraIndex] == 0) || (cameraFrame < 0) ||
+            (CharaPcs.m_cameraFrameCount[cameraIndex] <= cameraFrame)) {
             this->push(object, 0);
             outResult = 0;
         }
 
-        *reinterpret_cast<float*>(object->m_localBase[2]) = cameraSlotRef[cameraFrame].m_values[0].m_float;
-        *reinterpret_cast<float*>(object->m_localBase[3]) = -cameraSlotRef[cameraFrame].m_values[1].m_float;
-        *reinterpret_cast<float*>(object->m_localBase[4]) = -cameraSlotRef[cameraFrame].m_values[2].m_float;
-        *reinterpret_cast<float*>(object->m_localBase[5]) = cameraSlotRef[cameraFrame].m_values[3].m_float;
-        *reinterpret_cast<float*>(object->m_localBase[6]) = -cameraSlotRef[cameraFrame].m_values[4].m_float;
-        *reinterpret_cast<float*>(object->m_localBase[7]) = -cameraSlotRef[cameraFrame].m_values[5].m_float;
-        *reinterpret_cast<float*>(object->m_localBase[8]) = cameraSlotRef[cameraFrame].m_values[6].m_float;
+        *reinterpret_cast<float*>(object->m_localBase[2]) = CharaPcs.m_cameraData[cameraIndex][cameraFrame].m_values[0].m_float;
+        *reinterpret_cast<float*>(object->m_localBase[3]) = -CharaPcs.m_cameraData[cameraIndex][cameraFrame].m_values[1].m_float;
+        *reinterpret_cast<float*>(object->m_localBase[4]) = -CharaPcs.m_cameraData[cameraIndex][cameraFrame].m_values[2].m_float;
+        *reinterpret_cast<float*>(object->m_localBase[5]) = CharaPcs.m_cameraData[cameraIndex][cameraFrame].m_values[3].m_float;
+        *reinterpret_cast<float*>(object->m_localBase[6]) = -CharaPcs.m_cameraData[cameraIndex][cameraFrame].m_values[4].m_float;
+        *reinterpret_cast<float*>(object->m_localBase[7]) = -CharaPcs.m_cameraData[cameraIndex][cameraFrame].m_values[5].m_float;
+        *reinterpret_cast<float*>(object->m_localBase[8]) = CharaPcs.m_cameraData[cameraIndex][cameraFrame].m_values[6].m_float;
         *reinterpret_cast<float*>(object->m_localBase[9]) =
-            -((3.1415927f * cameraSlotRef[cameraFrame].m_values[7].m_float) / 180.0f);
+            -((3.1415927f * CharaPcs.m_cameraData[cameraIndex][cameraFrame].m_values[7].m_float) / 180.0f);
         this->push(object, 1);
         outResult = 0;
         break;
@@ -3810,11 +3768,8 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         }
         FlatLastResult(this) = result;
     } else if (systemValue <= -500) {
-        int bitIndex = systemValue + 0x9F3;
-        int byteIndex = bitIndex / 8;
-        unsigned int mask = 1U << (bitIndex % 8);
-        unsigned int flag = static_cast<unsigned int>(static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[byteIndex])) & mask;
-        FlatLastResult(this) = flag != 0;
+        FlatLastResult(this) = Game.GetEvtFlag(systemValue + 0x9F3);
+
     } else if (systemValue <= -200) {
         int workIndex = systemValue + 0x1C7;
         FlatLastResult(this) = static_cast<unsigned int>(static_cast<int>(gameWork.m_eventWork[workIndex]));
@@ -3967,33 +3922,23 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
     CGame::CGameWork* gameWork = &Game.m_gameWork;
     if (systemValue > -0x1000) {
         if (systemValue <= -500) {
-            int bitIndex = systemValue + 0x9F3;
-            int byteIndex = bitIndex / 8;
-            unsigned char* flagByte = reinterpret_cast<unsigned char*>(Game.m_gameWork.m_eventFlags) + byteIndex;
-            unsigned char flagBits = *flagByte;
-            unsigned int mask = 1U << (bitIndex % 8);
-            unsigned int flag = flagBits & mask;
-            int value = flag != 0;
+            int flagIndex = systemValue + 0x9F3;
+            int value = Game.GetEvtFlag(flagIndex);
             stack[-1].m_word = value;
 
-            int result = value;
             switch (setMode) {
             case -1:
-                result = value - stack->m_word;
+                value = value - stack->m_word;
                 break;
             case 0:
-                result = stack->m_word;
+                value = stack->m_word;
                 break;
             case 1:
-                result = value + stack->m_word;
+                value = value + stack->m_word;
                 break;
             }
 
-            if (result != 0) {
-                *flagByte |= mask;
-            } else {
-                *flagByte &= ~mask;
-            }
+            Game.SetEvtFlag(flagIndex, value);
         } else if (systemValue <= -200) {
             int workIndex = systemValue + 0x1C7;
             stack[-1].m_word = gameWork->m_eventWork[workIndex];

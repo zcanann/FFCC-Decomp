@@ -92,9 +92,10 @@ int CMenuPcs::EquipClose0()
 {
 	float moveT;
 	double one;
-	int doneCount;
+	EquipOpenAnim* item;
 	int timer;
 	int itemCount;
+	int doneCount;
 
 	m_equipState->frame = m_equipState->frame + 1;
 	timer = static_cast<int>(m_equipState->frame);
@@ -103,10 +104,9 @@ int CMenuPcs::EquipClose0()
 		selectedItem->x = selectedItem->x + 0x13;
 	}
 
-	EquipOpenAnimList* list = m_equipList;
 	doneCount = 0;
-	itemCount = (int)list->listEnd - (int)list->count;
-	EquipOpenAnim* item = &list->entries[list->count];
+	item = &m_equipList->entries[m_equipList->count];
+	itemCount = (int)m_equipList->listEnd - (int)m_equipList->count;
 	for (int i = 0; i < itemCount; i++) {
 		moveT = 0.0f;
 		if (timer >= item->startFrame) {
@@ -121,7 +121,8 @@ int CMenuPcs::EquipClose0()
 				double recip = 1.0 / (double)item->duration;
 				item->alpha = (float)-(recip * (double)item->step - 1.0);
 				if ((item->flags & 2) == 0) {
-					moveT = (float)-((one / (double)item->duration) * (double)item->step - one);
+					recip = one / (double)item->duration;
+					moveT = (float)-(recip * (double)item->step - one);
 					float dx = item->targetX - (float)item->x;
 					float dy = item->targetY - (float)item->y;
 					item->dx = dx * moveT;
@@ -135,7 +136,8 @@ int CMenuPcs::EquipClose0()
 	int result = 0;
 	if (itemCount == doneCount) {
 		EquipOpenAnim* selected = &m_equipList->entries[m_equipState->selected[0]];
-		selected->x = (s16)(int)(216.0 - (double)selected->w * 0.5);
+		double half = 0.5;
+		selected->x = (s16)(int)(216.0 - (double)selected->w * half);
 		result = 1;
 	}
 
@@ -153,6 +155,7 @@ int CMenuPcs::EquipClose0()
  */
 int CMenuPcs::EquipOpen0()
 {
+	EquipOpenAnim* item;
 	float moveT;
 	double one;
 	int timer;
@@ -168,7 +171,7 @@ int CMenuPcs::EquipOpen0()
 	}
 
 	doneCount = 0;
-	EquipOpenAnim* item = &m_equipList->entries[m_equipList->count];
+	item = &m_equipList->entries[m_equipList->count];
 	itemCount = (int)m_equipList->listEnd - (int)m_equipList->count;
 
 	for (int i = 0; i < itemCount; i++) {
@@ -185,7 +188,8 @@ int CMenuPcs::EquipOpen0()
 				double recip = 1.0 / (double)item->duration;
 				item->alpha = (float)(recip * (double)item->step);
 				if ((item->flags & 2) == 0) {
-					moveT = (float)((one / (double)item->duration) * (double)item->step);
+					recip = one / (double)item->duration;
+					moveT = (float)(recip * (double)item->step);
 					float dx = item->targetX - (float)item->x;
 					float dy = item->targetY - (float)item->y;
 					item->dx = dx * moveT;
@@ -345,7 +349,7 @@ int CMenuPcs::EquipCtrlCur()
 void CMenuPcs::EquipDraw()
 {
 	int helpItem;
-	int helpFound = 0;
+	bool helpFound = false;
 	float w;
 	float h;
 
@@ -353,7 +357,7 @@ void CMenuPcs::EquipDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	int mode = static_cast<int>(m_equipState->mode);
-	unsigned int listState = static_cast<int>(m_equipState->listState);
+	int listState = static_cast<int>(m_equipState->listState);
 	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 	EquipOpenAnim* item = m_equipList->entries;
 
@@ -404,15 +408,14 @@ void CMenuPcs::EquipDraw()
 	font->DrawInit();
 
 	item = m_equipList->entries;
-	for (unsigned int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
-			CColor color(0xff, 0xff, 0xff, (u8)(255.0f * item->alpha));
-			font->SetColor(color.color);
+			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(255.0f * item->alpha)).color);
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			char* str = Game.m_cFlatDataArr[1].TableStrings(0)[itemIdx * 5 + 4];
 			if ((m_equipState->mode == 0) && (i == static_cast<int>(m_equipState->selected[0]))) {
 				helpItem = itemIdx;
-				helpFound = 1;
+				helpFound = true;
 			}
 			float width = font->GetWidth(str);
 			float textY = (float)(item->y + 0xb);
@@ -491,7 +494,7 @@ void CMenuPcs::EquipDraw()
 								alpha = (float)(0.5 * (double)listItem->alpha);
 							}
 						} else {
-							unsigned int chk = idx - 1;
+							int chk = idx - 1;
 							bool equipped = EquipChk((int)letter[chk + 1]);
 							if (((chk + 1) >= letterCount) || equipped || !ChkEquipActive(chk + 1)) {
 								if (equipped) {
@@ -546,8 +549,7 @@ void CMenuPcs::EquipDraw()
 		EquipOpenAnim* textItem = listStart;
 		int idx;
 		for (int i = 0; (i < 8) && ((idx = i + m_equipState->scroll) < letterCount); i++) {
-			CColor color(0xff, 0xff, 0xff, (u8)(colorMax * listStart->alpha));
-			font->SetColor(color.color);
+			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(colorMax * listStart->alpha)).color);
 
 			char* str;
 			if (idx == 0) {
@@ -564,7 +566,7 @@ void CMenuPcs::EquipDraw()
 				str = Game.m_cFlatDataArr[1].TableStrings(0)[itemIdx * 5 + 4];
 				if (idx == static_cast<int>(m_equipState->selected[1]) + static_cast<int>(m_equipState->scroll)) {
 					helpItem = itemIdx;
-					helpFound = 1;
+					helpFound = true;
 				}
 			}
 
@@ -629,7 +631,7 @@ void CMenuPcs::EquipDraw()
 
 	EquipMenuState* state = m_equipState;
 	s16 endMode = state->mode;
-	unsigned int listIndex = static_cast<int>(state->selected[endMode]) + static_cast<int>(state->scroll);
+	int listIndex = static_cast<int>(state->selected[endMode]) + static_cast<int>(state->scroll);
 	int helpEntryIndex;
 	if (endMode == 1) {
 		helpEntryIndex = m_equipList->count;
@@ -648,17 +650,13 @@ void CMenuPcs::EquipDraw()
 		helpItem = 0x267;
 	}
 
-	CColor helpColor(0xff, 0xff, 0xff, (u8)helpAlpha);
-	int helpX = (int)(320.0f - w * 0.5f);
-	float helpYf = 352.0f;
-	unsigned int helpY = (int)helpYf;
-	DrawHelpMessage(helpItem, helpFont, helpX, helpY, helpColor.color, 10,
+	float helpY = 352.0f;
+	DrawHelpMessage(helpItem, helpFont, (int)(320.0f - w * 0.5f), (int)helpY, CColor(0xff, 0xff, 0xff, (u8)helpAlpha).color, 10,
 	                1.0f, 3.0f);
 	if (m_equipState->mode == 1) {
 		int listHelpAlpha = (int)(255.0f * m_equipList->entries[m_equipList->count].alpha);
 		if (listIndex < 1) {
-			CColor listHelpColor(0xff, 0xff, 0xff, (u8)listHelpAlpha);
-			DrawHelpMessage(0x265, helpFont, helpX, helpY, listHelpColor.color, 10,
+			DrawHelpMessage(0x265, helpFont, (int)(320.0f - w * 0.5f), (int)helpY, CColor(0xff, 0xff, 0xff, (u8)listHelpAlpha).color, 10,
 			                1.0f, 3.0f);
 		}
 	}
@@ -886,9 +884,10 @@ int CMenuPcs::EquipOpen()
  */
 void CMenuPcs::EquipInit1()
 {
+	EquipOpenAnim* e;
 	int i = (int)m_equipList->count;
 
-	EquipOpenAnim* e = &m_equipList->entries[i++];
+	e = &m_equipList->entries[i++];
 	e->tex = 0x2e;
 	e->x = 0xb8;
 	e->y = 0x28;
@@ -936,15 +935,13 @@ void CMenuPcs::EquipInit1()
 	e->startFrame = 0;
 	e->duration = 5;
 
-	int yOff = 0;
 	EquipOpenAnim* anchor = &m_equipList->entries[m_equipList->count];
 	for (int n = 0; n < 8; n++) {
 		e = &m_equipList->entries[i];
 		e->flags = 2;
 		e->tex = 0x37;
 		e->x = anchor->x + 0x24;
-		e->y = anchor->y + yOff;
-		yOff += 0x20;
+		e->y = anchor->y + n * 0x20;
 		e->w = 200;
 		e->h = 0x28;
 		e->u = 0.0f;

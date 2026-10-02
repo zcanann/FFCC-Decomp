@@ -189,8 +189,9 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 
 						const int argIndex = i + 1;
 						unsigned int* const arg = object->m_localBase + argIndex;
+						char* scan;
 						if (spec[0] == '%') {
-							char* scan = spec + 1;
+							scan = spec + 1;
 							int fmtIndex = 1;
 							int width = 0;
 							s32 started = static_cast<u32>(__cntlzw(static_cast<u32>(0x30 - spec[1]))) >> 5 & 0xFF;
@@ -216,28 +217,28 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 								}
 								rendered[outLen] = '\0';
 								strcat(rendered, &spec[fmtIndex + 1]);
-							} else {
-								scan = spec + 1;
-								while (*scan != '\0') {
-									switch (*scan) {
-									case 'd':
-									case 'x':
-										sprintf(rendered, spec, *arg);
-										goto renderedDone;
-									case 'f':
-										sprintf(rendered, spec, static_cast<double>(*reinterpret_cast<float*>(arg)));
-										goto renderedDone;
-									case 's':
-										sprintf(rendered, spec, m_strBlob + m_strOffsets[*arg]);
-										goto renderedDone;
-									default:
-										scan++;
-										break;
-									}
-								}
-							renderedDone:;
+								goto renderedDone;
 							}
 						}
+						scan = spec + 1;
+						while (*scan != '\0') {
+							switch (*scan) {
+							case 'd':
+							case 'x':
+								sprintf(rendered, spec, *arg);
+								goto renderedDone;
+							case 'f':
+								sprintf(rendered, spec, static_cast<double>(*reinterpret_cast<float*>(arg)));
+								goto renderedDone;
+							case 's':
+								sprintf(rendered, spec, m_strBlob + m_strOffsets[*arg]);
+								goto renderedDone;
+							default:
+								scan++;
+								break;
+							}
+						}
+					renderedDone:
 
 						strcat(line, rendered);
 					}
@@ -442,7 +443,8 @@ inline void CFlatRuntime::push(CFlatRuntime::CObject* object, CFlatRuntime::CSta
 {
 	int copiedArgs;
 	for (copiedArgs = 0; copiedArgs < argCount; copiedArgs++) {
-		reinterpret_cast<CStack*>(object->m_sp)[copiedArgs] = args[copiedArgs];
+		CStack* dst = &reinterpret_cast<CStack*>(object->m_sp)[copiedArgs];
+		*dst = args[copiedArgs];
 	}
 	object->m_sp += copiedArgs;
 }
@@ -544,8 +546,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		goto callSystemFunction;
 	}
 
-	code = m_funcs[object->m_codeIndex.m_codeFunc].m_code
-	    + object->m_codeIndex.m_codeOffset;
+	CFunc* func = &m_funcs[object->m_codeIndex.m_codeFunc];
+	code = func->m_code + object->m_codeIndex.m_codeOffset;
 
 	while (true) {
 		m_previousCodePos = m_currentCodePos;
@@ -758,8 +760,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 					*object->m_sp = 1;
 					object->m_sp++;
 				}
-				const int delta = static_cast<int>(jumpArg & 0x00FFFFFF)
-				    - object->m_codeIndex.m_codeOffset;
+				CCodeIndex* const view = &object->m_codeIndex;
+				const int delta = static_cast<int>(jumpArg & 0x00FFFFFF) - view->m_codeOffset;
 				code += delta;
 				object->m_codeIndex.m_codeOffset = object->m_codeIndex.m_codeOffset + delta;
 				continue;
@@ -775,8 +777,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 					*object->m_sp = 0;
 					object->m_sp++;
 				}
-				const int delta = static_cast<int>(jumpArg & 0x00FFFFFF)
-				    - object->m_codeIndex.m_codeOffset;
+				CCodeIndex* const view = &object->m_codeIndex;
+				const int delta = static_cast<int>(jumpArg & 0x00FFFFFF) - view->m_codeOffset;
 				code += delta;
 				object->m_codeIndex.m_codeOffset = object->m_codeIndex.m_codeOffset + delta;
 				continue;
@@ -826,8 +828,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			continue;
 		case 0x0B: {
 			CObject* newObject = createObject(*reinterpret_cast<int*>(code + 1));
-			CFunc* func = m_funcs
-			              + m_classes[newObject->m_activeClassIndex].m_functionTable[0];
+			CClass* cls = &m_classes[newObject->m_activeClassIndex];
+			CFunc* func = m_funcs + cls->m_functionTable[0];
 
 			for (int i = 0; i < func->m_argCount; i++) {
 				newObject->m_sp[i] = object->m_sp[i - func->m_argCount];
@@ -895,12 +897,13 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		case 0x13:
 		case 0x16: {
 			unsigned int* sp = object->m_sp;
-			unsigned int* top = --object->m_sp;
+			int valIndex;
+			unsigned int* top = sp - 1;
+			object->m_sp = top;
 			const u32 systemValue = sp[-2];
-			const int valIndex = static_cast<int>(systemValue) >> 13;
+			valIndex = static_cast<int>(systemValue) >> 13;
 			if (((systemValue >> 12) & 1) != 0) {
-				CObject* target = reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF));
-				onSetClassSystemVal(valIndex, target, reinterpret_cast<CStack*>(top), 0);
+				onSetClassSystemVal(valIndex, reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF)), reinterpret_cast<CStack*>(top), 0);
 			} else {
 				onSetSystemVal(valIndex, reinterpret_cast<CStack*>(top), 0);
 			}
@@ -909,12 +912,13 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		case 0x14:
 		case 0x17: {
 			unsigned int* sp = object->m_sp;
-			unsigned int* top = --object->m_sp;
+			int valIndex;
+			unsigned int* top = sp - 1;
+			object->m_sp = top;
 			const u32 systemValue = sp[-2];
-			const int valIndex = static_cast<int>(systemValue) >> 13;
+			valIndex = static_cast<int>(systemValue) >> 13;
 			if (((systemValue >> 12) & 1) != 0) {
-				CObject* target = reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF));
-				onSetClassSystemVal(valIndex, target, reinterpret_cast<CStack*>(top), 1);
+				onSetClassSystemVal(valIndex, reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF)), reinterpret_cast<CStack*>(top), 1);
 			} else {
 				onSetSystemVal(valIndex, reinterpret_cast<CStack*>(top), 1);
 			}
@@ -923,12 +927,13 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		case 0x15:
 		case 0x18: {
 			unsigned int* sp = object->m_sp;
-			unsigned int* top = --object->m_sp;
+			int valIndex;
+			unsigned int* top = sp - 1;
+			object->m_sp = top;
 			const u32 systemValue = sp[-2];
-			const int valIndex = static_cast<int>(systemValue) >> 13;
+			valIndex = static_cast<int>(systemValue) >> 13;
 			if (((systemValue >> 12) & 1) != 0) {
-				CObject* target = reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF));
-				onSetClassSystemVal(valIndex, target, reinterpret_cast<CStack*>(top), -1);
+				onSetClassSystemVal(valIndex, reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF)), reinterpret_cast<CStack*>(top), -1);
 			} else {
 				onSetSystemVal(valIndex, reinterpret_cast<CStack*>(top), -1);
 			}
@@ -956,77 +961,75 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			calc(object, code[0]);
 			break;
 		case 0x2C: {
-			unsigned int* sp = object->m_sp;
-			unsigned int* top = --object->m_sp;
-			top[-1] = (__cntlzw(*top - sp[-2]) >> 5) & 0xFF;
+			int* sp = reinterpret_cast<int*>(object->m_sp);
+			int* top = reinterpret_cast<int*>(--object->m_sp);
+			top[-1] = sp[-2] == *top;
 			break;
 		}
 		case 0x2D: {
-			unsigned int* sp = object->m_sp;
-			unsigned int* top = --object->m_sp;
-			top[-1] = ((sp[-1] - sp[-2]) | (sp[-2] - sp[-1])) >> 31;
+			int* sp = reinterpret_cast<int*>(object->m_sp);
+			int* top = reinterpret_cast<int*>(--object->m_sp);
+			top[-1] = sp[-2] != sp[-1];
 			break;
 		}
 		case 0x2E: {
-			unsigned int* sp = object->m_sp;
-			unsigned int* top = --object->m_sp;
-			const u32 value = sp[-1] ^ sp[-2];
-			top[-1] = static_cast<u32>((static_cast<int>(value) >> 1) - static_cast<int>(value & sp[-1])) >> 31;
+			int* sp = reinterpret_cast<int*>(object->m_sp);
+			int* top = reinterpret_cast<int*>(--object->m_sp);
+			top[-1] = sp[-2] < sp[-1];
 			break;
 		}
 		case 0x2F: {
-			unsigned int* sp = object->m_sp;
-			unsigned int* top = --object->m_sp;
-			top[-1] = (static_cast<int>(sp[-1]) >> 31) + (sp[-2] >> 31) + (sp[-2] <= sp[-1]) & 0xFF;
+			int* sp = reinterpret_cast<int*>(object->m_sp);
+			int* top = reinterpret_cast<int*>(--object->m_sp);
+			top[-1] = sp[-2] <= sp[-1];
 			break;
 		}
 		case 0x30: {
-			unsigned int* sp = object->m_sp;
-			unsigned int* top = --object->m_sp;
-			const u32 value = sp[-2] ^ sp[-1];
-			top[-1] = static_cast<u32>((static_cast<int>(value) >> 1) - static_cast<int>(value & sp[-2])) >> 31;
+			int* sp = reinterpret_cast<int*>(object->m_sp);
+			int* top = reinterpret_cast<int*>(--object->m_sp);
+			top[-1] = sp[-2] > sp[-1];
 			break;
 		}
 		case 0x31: {
-			unsigned int* sp = object->m_sp;
-			unsigned int* top = --object->m_sp;
-			top[-1] = (static_cast<int>(sp[-2]) >> 31) + (sp[-1] >> 31) + (sp[-1] <= sp[-2]) & 0xFF;
+			int* sp = reinterpret_cast<int*>(object->m_sp);
+			int* top = reinterpret_cast<int*>(--object->m_sp);
+			top[-1] = sp[-2] >= sp[-1];
 			break;
 		}
 		case 0x32: {
 			float* sp = reinterpret_cast<float*>(object->m_sp);
-			--object->m_sp;
-			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-2] == sp[-1]));
+			float* top = reinterpret_cast<float*>(--object->m_sp);
+			top[-1] = static_cast<float>(static_cast<unsigned int>(sp[-2] == sp[-1]));
 			break;
 		}
 		case 0x33: {
 			float* sp = reinterpret_cast<float*>(object->m_sp);
-			--object->m_sp;
-			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-2] != sp[-1]));
+			float* top = reinterpret_cast<float*>(--object->m_sp);
+			top[-1] = static_cast<float>(static_cast<unsigned int>(sp[-2] != sp[-1]));
 			break;
 		}
 		case 0x34: {
 			float* sp = reinterpret_cast<float*>(object->m_sp);
-			--object->m_sp;
-			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-2] < sp[-1]));
+			float* top = reinterpret_cast<float*>(--object->m_sp);
+			top[-1] = static_cast<float>(static_cast<unsigned int>(sp[-2] < sp[-1]));
 			break;
 		}
 		case 0x35: {
 			float* sp = reinterpret_cast<float*>(object->m_sp);
-			--object->m_sp;
-			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-2] <= sp[-1]));
+			float* top = reinterpret_cast<float*>(--object->m_sp);
+			top[-1] = static_cast<float>(static_cast<unsigned int>(sp[-2] <= sp[-1]));
 			break;
 		}
 		case 0x36: {
 			float* sp = reinterpret_cast<float*>(object->m_sp);
-			--object->m_sp;
-			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-2] > sp[-1]));
+			float* top = reinterpret_cast<float*>(--object->m_sp);
+			top[-1] = static_cast<float>(static_cast<unsigned int>(sp[-2] > sp[-1]));
 			break;
 		}
 		case 0x37: {
 			float* sp = reinterpret_cast<float*>(object->m_sp);
-			--object->m_sp;
-			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-2] >= sp[-1]));
+			float* top = reinterpret_cast<float*>(--object->m_sp);
+			top[-1] = static_cast<float>(static_cast<unsigned int>(sp[-2] >= sp[-1]));
 			break;
 		}
 		case 0x39: {
@@ -1040,7 +1043,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			--object->m_sp;
 			object->m_thisBase = reinterpret_cast<unsigned int*>(*object->m_sp);
 			--object->m_sp;
-			*object->m_sp++ = returnValue;
+			*object->m_sp = returnValue;
+			object->m_sp++;
 			break;
 		}
 		case 0x3A:
@@ -1088,8 +1092,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				return 1;
 			}
 
-			code = m_funcs[object->m_codeIndex.m_codeFunc].m_code
-			    + object->m_codeIndex.m_codeOffset;
+			CFunc* func = &m_funcs[object->m_codeIndex.m_codeFunc];
+			code = func->m_code + object->m_codeIndex.m_codeOffset;
 			break;
 		}
 		case 0x3D:
@@ -1105,7 +1109,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		const int step = (code[0] < 0x0C) ? 5 : 1;
 		code += step;
 		--watchdog;
-		object->m_codeIndex.m_codeOffset += step;
+		object->m_codeIndex.m_codeOffset = object->m_codeIndex.m_codeOffset + step;
 	}
 
 addWait:

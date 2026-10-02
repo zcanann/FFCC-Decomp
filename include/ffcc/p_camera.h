@@ -20,8 +20,8 @@ void dbgDrawSphere(float, float, float, float, unsigned char, unsigned char, uns
 class CFullScreenShadow
 {
 public:
-    void* m_shadowTexture;   // 0x00
-    u8* m_rampTexture;       // 0x04
+    void* m_shadowTexture[1]; // 0x00
+    u8* m_rampTexture[1];    // 0x04
     GXTexObj m_texObjs[2];   // 0x08
     float m_rotX;            // 0x48
     float m_rotY;            // 0x4C

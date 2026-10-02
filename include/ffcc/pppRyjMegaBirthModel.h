@@ -51,13 +51,13 @@ struct PRyjMegaBirthModel
     u8 m_texScaleRandomMode;      // 0x134
     u8 m_matrixMode;              // 0x135
     u8 m_enableWorldMatrix;       // 0x136
-    u8 m_matrixFinalizeMode;      // 0x137
-    u8 _pad138[0x02];
+    u8 _pad137;
+    s16 m_pathIndex;              // 0x138
     u8 m_zEnable;                 // 0x13A
     u8 m_clampDirectionalSpeed;   // 0x13B
     u8 m_blendMode;               // 0x13C
     u8 m_cullMode;                // 0x13D
-    u8 _pad13E;
+    u8 m_matrixFinalizeMode;      // 0x13E
     u8 m_lightTarget;             // 0x13F
 }; // Size 0x140
 

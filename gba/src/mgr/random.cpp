@@ -1,3 +1,4 @@
+extern "C" {
 #include "global.h"
 #include "random.h"
 
@@ -55,4 +56,5 @@ u32 genrand(void)
     y ^= (y << 15) & 0xEFC60000;
     y ^= y >> 18;
     return y;
+}
 }

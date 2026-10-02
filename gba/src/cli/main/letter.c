@@ -1484,8 +1484,8 @@ void LetterList_DrawRow(s32 idx, s32 row, s32 n, s32 pal)
         (buf + 30)[i] = tile++ | pal;
     }
     map = Bg_GetMapPtr(gWindows[0].bg - 1, 2, row * 2 + 1);
-    DmaCopy16(3, buf, map, n * 2);
-    DmaCopy16(3, &buf[30], map + 32, n * 2);
+    DmaCopy16(3, buf, map, n << 1);
+    DmaCopy16(3, &buf[30], map + 32, n << 1);
 }
 
 s32 LetterList_GetRowPalette(s32 idx)

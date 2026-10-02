@@ -1,3 +1,4 @@
+extern "C" {
 #include "global.h"
 #include "obj.h"
 #include "effect.h"
@@ -7,13 +8,10 @@
 #include "sound.h"
 #include "random.h"
 
-const char gEffectFileName[] = "C:/FFF/miniGame/mgr/effect.cpp";
+#define EFFECT_FILE "C:/FFF/miniGame/mgr/effect.cpp"
 
 u8 gItemBoxAnims[] = { 35, 37, 36 };
 u8 gPanelAnims[] = { 8, 9, 10, 11, 12, 13, 14, 71 };
-
-const struct ActorData gFreezeShotParams = { 40, 0, 0, 32, 4800, 0, 0, 0, 0, { 0, 0, 0, 0 } };
-const struct ActorData gSlipShotParams = { 40, 0, 0, 32, 4800, 0, 0, 0, 0, { 0, 0, 0, 0 } };
 
 static inline void GetDir(struct Point *dir, u16 angle)
 {
@@ -64,7 +62,7 @@ struct Effect *Effect_Alloc(struct Game *game)
         if (!game->effects[i].active)
             return &game->effects[i];
     }
-    AssertFailed(gEffectFileName, 28);
+    AssertFailed(EFFECT_FILE, 28);
     return NULL;
 }
 
@@ -76,7 +74,7 @@ struct Effect *Effect_AllocLast(struct Game *game)
         if (!game->effects[i].active)
             return &game->effects[i];
     }
-    AssertFailed(gEffectFileName, 42);
+    AssertFailed(EFFECT_FILE, 42);
     return NULL;
 }
 
@@ -279,7 +277,7 @@ void Effect_Setup(struct Effect *e, u8 type, va_list *ap)
         Effect_InitDust(e, ap);
         break;
     default:
-        AssertFailed(gEffectFileName, 342);
+        AssertFailed(EFFECT_FILE, 342);
         break;
     }
 }
@@ -404,6 +402,10 @@ void Effect_UpdatePanel(struct Effect *e)
         e->visible = 1;
     }
 }
+
+/* Homing shots steer with racer handling parameters */
+const struct ActorData gFreezeShotParams = { 40, 0, 0, 32, 4800, 0, 0, 0, 0, { 0, 0, 0, 0 } };
+const struct ActorData gSlipShotParams = { 40, 0, 0, 32, 4800, 0, 0, 0, 0, { 0, 0, 0, 0 } };
 
 void Effect_UpdateHoming(struct Effect *e, const struct ActorData *params, s32 mask)
 {
@@ -558,7 +560,7 @@ void Effect_UpdateDust(struct Effect *e)
     e->pos.x += e->u.vel.x >> 4;
     e->pos.z += e->u.vel.y >> 4;
     e->timer++;
-    if (!(e->timer & 1)) {
+    if ((e->timer & 1) == 0) {
         frame = e->timer >> 1;
         if (frame == 5)
             e->active = 0;
@@ -623,7 +625,8 @@ void Effect_Update(struct Effect *e)
         Effect_UpdateDust(e);
         break;
     default:
-        AssertFailed(gEffectFileName, 876);
+        AssertFailed(EFFECT_FILE, 876);
         break;
     }
+}
 }

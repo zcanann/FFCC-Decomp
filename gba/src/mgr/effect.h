@@ -3,12 +3,10 @@
 
 #include "obj.h"
 
-/* Homing shots steer with racer handling parameters */
 extern const struct ActorData gFreezeShotParams;
 extern const struct ActorData gSlipShotParams;
 extern u8 gItemBoxAnims[];
 extern u8 gPanelAnims[];
-extern const char gEffectFileName[];
 
 struct Effect *Effect_Alloc(struct Game *game);
 struct Effect *Effect_AllocLast(struct Game *game);

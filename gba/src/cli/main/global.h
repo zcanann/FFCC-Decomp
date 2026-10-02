@@ -55,7 +55,7 @@
         dmaRegs[2];                                       \
     }
 
-#define DmaCopy16(dmaNo, src, dst, size) DmaSet(dmaNo, src, dst, 0x80000000 | ((size) >> 1))
+#define DmaCopy16(dmaNo, src, dst, size) DmaSet(dmaNo, src, dst, 0x80000000 | ((size) / (16 / 8)))
 #define DmaCopy32(dmaNo, src, dst, size) DmaSet(dmaNo, src, dst, 0x84000000 | ((size) / 4))
 
 #define DmaClear16(dmaNo, value, dst, size)                         \

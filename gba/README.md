@@ -30,12 +30,16 @@ Requirements:
 - `agbcc` and `old_agbcc` from [pret/agbcc](https://github.com/pret/agbcc), in
   `build/tools/gba-agbcc/` or `--gba-compilers <dir>`. Without them, sources are not
   compiled and the GBA units stay unmatched.
+- `cc1plus`, the C++ compiler from agbcc's original 2.9-arm tree, built by
+  `tools/build_cc1plus.sh`, next to agbcc. Without it, C++ sources are not compiled.
 - The images are extracted from `orig/GCCP01/FFCC_PAL.iso` into `orig/GCCP01/gba/`;
   pre-extracted images there are used as-is.
 
 ## Sources
 
-- `src/<program>/<unit>.c`: game code, compiled with `agbcc -mthumb-interwork -O2`.
+- `src/<program>/<unit>.c`: C code, compiled with `agbcc -mthumb-interwork -O2`.
+- `src/<program>/<unit>.cpp`: C++ code (the minigame's game code), compiled with
+  `cc1plus -mthumb-interwork -O2 -fno-exceptions`.
   Add the unit to `COMPLETE` in `tools/gba_project.py` once every function matches,
   so it links into the checked image.
 - `lib/libgcc/`: agbcc's libgcc, built like agbcc does. Units named `libgcc/<object>`

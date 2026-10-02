@@ -1,6 +1,7 @@
+extern "C" {
 #include "global.h"
 #include "main.h"
-#include "joybus.h"
+#include "link.h"
 #include "obj.h"
 #include "effect.h"
 #include "camera.h"
@@ -11,8 +12,6 @@
 #include "random.h"
 
 #define IWRAM 0x03000000
-
-typedef void (*IntrFunc)(void);
 
 const u32 lbl_0200EC98[2] = { 0, 0 };
 
@@ -32,25 +31,6 @@ const IntrFunc IntrTable[] = {
     IntrDummy,
     IntrDummy,
 };
-
-const char gAssertText[] = "ASSERT";
-const char gAssertFileFmt[] = "FILE=%s";
-const char gAssertLineFmt[] = "LINE=%d";
-const char gAssertCountFmt[] = "CNT=%d";
-const char gLoadingText[] = "LOADING...";
-const char gLapTimeFmt[] = "LAP   %d:%02d:%02d   ";
-const char gBlankTimeText[] = "                   ";
-const char gTotalTimeFmt[] = "TOTAL %d:%02d:%02d   ";
-const char gRank1stText[] = "1ST";
-const char gRank2ndText[] = "2ND";
-const char gRank3rdText[] = "3RD";
-const char gRank4thText[] = "4TH";
-const char gRank5thText[] = "5TH";
-const char gRank6thText[] = "6TH";
-const char gRank7thText[] = "7TH";
-const char gRank8thText[] = "8TH";
-const char gRankNoneText[] = "---";
-const char gPauseText[] = "PAUSE";
 
 struct Main gMain;
 u16 gHeldKeys;
@@ -98,12 +78,12 @@ void AssertFailed(const char *file, s32 line)
 
     gAssertFile = file;
     gAssertLine = line;
-    Text_Printf(&gTextLayer, 0, 5, gAssertText);
-    Text_Printf(&gTextLayer, 0, 6, gAssertFileFmt, file + 16);
-    Text_Printf(&gTextLayer, 0, 7, gAssertLineFmt, line);
+    Text_Printf(&gTextLayer, 0, 5, "ASSERT");
+    Text_Printf(&gTextLayer, 0, 6, "FILE=%s", file + 16);
+    Text_Printf(&gTextLayer, 0, 7, "LINE=%d", line);
     gMain.textEnabled = 1;
     for (i = 0;; i++) {
-        Text_Printf(&gTextLayer, 0, 8, gAssertCountFmt, i % 10);
+        Text_Printf(&gTextLayer, 0, 8, "CNT=%d", i % 10);
         Text_Flush(&gTextLayer);
         VBlankIntrWait();
     }
@@ -332,7 +312,7 @@ void UpdateGameState(struct Main *main)
     case STATE_LOADING:
         if (main->timer == 0) {
             Text_Clear(&gTextLayer, 15);
-            Text_Printf(&gTextLayer, 10, 9, gLoadingText);
+            Text_Printf(&gTextLayer, 10, 9, "LOADING...");
             main->textEnabled = 1;
         }
         main->timer++;
@@ -649,9 +629,9 @@ void DrawTimerAndRank(struct Main *main)
             main->totalTime++;
             main->lapTime++;
             if ((gRaceFrameCounter & 15) > 4) {
-                DrawTime(main, main->lastLapTime, 0, 1, gLapTimeFmt);
+                DrawTime(main, main->lastLapTime, 0, 1, "LAP   %d:%02d:%02d   ");
             } else {
-                Text_Printf(&gTextLayer, 0, 1, gBlankTimeText);
+                Text_Printf(&gTextLayer, 0, 1, "                   ");
             }
             if (main->lapTime > 150) {
                 main->lastLapTime = -1;
@@ -659,9 +639,9 @@ void DrawTimerAndRank(struct Main *main)
         } else {
             main->lapTime++;
             if ((gRaceFrameCounter & 15) > 4 || main->lapTime > 150) {
-                DrawTime(main, main->lastLapTime, 0, 1, gLapTimeFmt);
+                DrawTime(main, main->lastLapTime, 0, 1, "LAP   %d:%02d:%02d   ");
             } else {
-                Text_Printf(&gTextLayer, 0, 1, gBlankTimeText);
+                Text_Printf(&gTextLayer, 0, 1, "                   ");
             }
         }
     } else if (main->lapTime != main->lastLapTime) {
@@ -669,10 +649,10 @@ void DrawTimerAndRank(struct Main *main)
             main->totalTime++;
             main->lapTime++;
         }
-        DrawTime(main, main->lapTime, 0, 1, gLapTimeFmt);
+        DrawTime(main, main->lapTime, 0, 1, "LAP   %d:%02d:%02d   ");
     }
     if (main->totalTime != -1) {
-        DrawTime(main, main->totalTime, 0, 2, gTotalTimeFmt);
+        DrawTime(main, main->totalTime, 0, 2, "TOTAL %d:%02d:%02d   ");
     }
     if (main->state == STATE_RACE) {
         rank = Game_GetRank(&gGame, gPlayerNo);
@@ -682,31 +662,31 @@ void DrawTimerAndRank(struct Main *main)
     switch (rank) {
     case 0:
     case 1:
-        str = gRank1stText;
+        str = "1ST";
         break;
     case 2:
-        str = gRank2ndText;
+        str = "2ND";
         break;
     case 3:
-        str = gRank3rdText;
+        str = "3RD";
         break;
     case 4:
-        str = gRank4thText;
+        str = "4TH";
         break;
     case 5:
-        str = gRank5thText;
+        str = "5TH";
         break;
     case 6:
-        str = gRank6thText;
+        str = "6TH";
         break;
     case 7:
-        str = gRank7thText;
+        str = "7TH";
         break;
     case 8:
-        str = gRank8thText;
+        str = "8TH";
         break;
     default:
-        str = gRankNoneText;
+        str = "---";
         break;
     }
     Text_Print(&gTextLayer, 25, 4, 14, str);
@@ -836,7 +816,7 @@ void PauseMenu(struct Main *main)
         if (main->menuPlayer == gPlayerNo) {
             Text_LoadPauseMenu(&gTextLayer, gLinkMode);
         } else {
-            Text_Print(&gTextLayer, 12, 5, 14, gPauseText);
+            Text_Print(&gTextLayer, 12, 5, 14, "PAUSE");
         }
         break;
     case STATE_SELECT:
@@ -986,7 +966,7 @@ void PauseMenuInput(struct Main *main)
                 switch (main->state) {
                 case STATE_RACE:
                 case STATE_FINISH:
-                    if (!((main->finishedMask >> i) & 1)) {
+                    if (((main->finishedMask >> i) & 1) == 0) {
                         main->menuPlayer = i;
                         PauseMenu(main);
                     }
@@ -1104,4 +1084,5 @@ void DrawGameSprites(struct Main *main)
         Oam_Flush(&gGame);
         break;
     }
+}
 }

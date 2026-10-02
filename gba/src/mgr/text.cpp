@@ -1,3 +1,4 @@
+extern "C" {
 #include "global.h"
 #include "main.h"
 #include "text.h"
@@ -170,4 +171,5 @@ void Text_LoadPauseMenu(struct TextLayer *layer, u8 linked)
 void Text_LoadSelectPauseMenu(struct TextLayer *layer)
 {
     Text_LoadScreen(layer, gSelectPauseScreenLz);
+}
 }

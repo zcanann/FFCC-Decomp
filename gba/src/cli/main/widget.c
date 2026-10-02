@@ -442,7 +442,7 @@ void Window_ScrollRows(s32 dir, s32 idx, s32 bg)
     dst = (u32)Bg_GetMapPtr(bg, win->x + 1, y1);
     for (i = 0; i < win->rows - 1; i++) {
         for (j = 0; j < 2; j++) {
-            DmaCopy16(0, src, dst, (win->width - 2) * 2);
+            DmaCopy16(0, src, dst, (win->width - 2) << 1);
             src += step;
             dst += step;
         }

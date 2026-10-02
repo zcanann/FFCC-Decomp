@@ -86,24 +86,10 @@ extern const u8 gConfigLinkMode;
 extern const u8 gConfigRacerCount;
 extern const u8 gConfigLapCount;
 
-extern const char gAssertText[];
-extern const char gAssertFileFmt[];
-extern const char gAssertLineFmt[];
-extern const char gAssertCountFmt[];
-extern const char gLoadingText[];
-extern const char gLapTimeFmt[];
-extern const char gBlankTimeText[];
-extern const char gTotalTimeFmt[];
-extern const char gRank1stText[];
-extern const char gRank2ndText[];
-extern const char gRank3rdText[];
-extern const char gRank4thText[];
-extern const char gRank5thText[];
-extern const char gRank6thText[];
-extern const char gRank7thText[];
-extern const char gRank8thText[];
-extern const char gRankNoneText[];
-extern const char gPauseText[];
+typedef void (*IntrFunc)(void);
+
+extern const u32 lbl_0200EC98[2];
+extern const IntrFunc IntrTable[];
 
 void WaitFrames(u32 frames);
 void DebugPrintf(const char *fmt, ...);

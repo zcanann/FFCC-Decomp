@@ -6,7 +6,9 @@ objdiff.json so the programs count toward the version's progress report.
 
 Units with source are compiled and diffed against their target objects:
 - gba/src/<program>/<unit>.c, built with agbcc
-- gba/src/<program>/<unit>/: C and assembly files linked with ld -r, in the
+- gba/src/<program>/<unit>.cpp, built with cc1plus (the C++ compiler from
+  agbcc's 2.9-arm tree, built by gba/tools/build_cc1plus.sh)
+- gba/src/<program>/<unit>/: C, C++ and assembly files linked with ld -r, in the
   order given by gba/config/<program>/link_order.txt (data layout follows it)
 - libgcc/<object>, built from gba/lib/libgcc like agbcc's own libgcc
 - libagbsyscall/<routine>, libc/<dir>/<file>, m4a/<file>: libraries in gba/lib
@@ -74,7 +76,8 @@ PROGRAMS: Dict[str, Dict[str, Dict[str, str]]] = {
             "disc_path": "dvd/minigame/mgr/mgr00.bin",
             "sha1": "6ef574cc6ae34e8a05bccb1a28f78e833fde58fa",
             "m4a_defines": "-DM4A_SOUND_FREQ=SOUND_MODE_FREQ_15768",
-            # Built from C++ originally: globals are defined in .bss, never common.
+            # The game code is C++, whose globals are defined in .bss; the sound
+            # tables' C globals sit there too, never in common.
             "cflags": "-fno-common",
         },
     },
@@ -84,16 +87,21 @@ DISC_IMAGES = {"GCCP01": "FFCC_PAL.iso"}
 ASFLAGS = "-mcpu=arm7tdmi -mthumb-interwork"
 CPPFLAGS = "-undef -nostdinc -Wno-trigraphs -I gba/include -I gba/lib/m4a/include -I gba/lib/ginclude"
 CFLAGS = "-mthumb-interwork -O2 -fhex-asm"
+# C++ is preprocessed as C (the binutils cpp has no C++ front end to hand off to),
+# with the macros g++ 2.9 predefines for C++.
+CXX_CPPFLAGS = f"-x c -D__cplusplus -D__GNUG__=2 {CPPFLAGS}"
+# Without exception handling: with it, register copies are not propagated across
+# calls (regmove), which the retail code shows they were.
+CXXFLAGS = "-quiet -mthumb-interwork -O2 -fno-exceptions"
+SOURCE_SUFFIXES = (".c", ".cpp", ".s")
 
 # Game units whose compiled source links into the checked image, per program.
 COMPLETE: Dict[str, List[str]] = {
     "cli": ["crt0", "joy_reset", "m4a/m4a_1", "m4a/m4a"],
-    # obj, camera and sound were C++ files whose static initializers left .ctors
-    # entries, which agbcc (C) cannot emit.
-    "mgr": ["crt0", "main", "joybus", "racer", "effect", "field", "route", "text", "random",
-            "sintable", "fixmath", "chunk", "param", "m4a_tables", "sound_data", "sound_assets",
-            "m4a/m4a_1", "m4a/m4a", "joy_reset", "course", "menu_gfx", "obj_gfx", "config",
-            "field_gfx", "font_gfx"],
+    "mgr": ["crt0", "main", "MgJoyBus", "obj", "effect", "camera", "field", "route", "text",
+            "sound", "random", "sintable", "fixmath", "chunk", "param", "m4a_tables", "sound_data",
+            "sound_assets", "m4a/m4a_1", "m4a/m4a", "joy_reset", "course", "menu_gfx", "obj_gfx",
+            "config", "field_gfx", "font_gfx"],
 }
 
 # libgcc routines assembled from lib1thumb.asm; the rest are C.
@@ -146,9 +154,17 @@ def _link_order(config_dir: Path) -> Dict[str, List[str]]:
 def _unit_files(unit_dir: Path, order: List[str]) -> List[Path]:
     """A source directory's files: listed ones in link order, then the rest sorted by name."""
     files = sorted(f for f in unit_dir.iterdir()
-                   if f.suffix in (".c", ".s") and not f.name.startswith("_"))
+                   if f.suffix in SOURCE_SUFFIXES and not f.name.startswith("_"))
     listed = [unit_dir / name for name in order if (unit_dir / name) in files]
     return listed + [f for f in files if f not in listed]
+
+
+def _unit_source(src_dir: Path, unit: str) -> Optional[Path]:
+    """A unit's single C or C++ source file, if it has one."""
+    for suffix in (".c", ".cpp"):
+        if (src_dir / f"{unit}{suffix}").is_file():
+            return src_dir / f"{unit}{suffix}"
+    return None
 
 
 def _assets(config_dir: Path) -> List[str]:
@@ -194,6 +210,14 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
         print(
             f"Warning: agbcc/old_agbcc not found in {compilers_dir}; GBA sources are not "
             "compiled (build pret/agbcc and pass --gba-compilers)",
+            file=sys.stderr,
+        )
+    cc1plus = compilers_dir / f"cc1plus{exe}"
+    have_cxx = have_compilers and cc1plus.is_file()
+    if have_compilers and not have_cxx:
+        print(
+            f"Warning: cc1plus not found in {compilers_dir}; GBA C++ sources are not "
+            "compiled (build it with gba/tools/build_cc1plus.sh)",
             file=sys.stderr,
         )
 
@@ -328,13 +352,13 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             asm_source = src_dir / f"{unit}.s"
             if asm_source.is_file():
                 return assemble_arm(asm_source, stem, base, out / "assets", assets)
-            # A unit's source is <unit>.c, or a directory of C and assembly files
-            # linked together in link order (see _link_order).
-            source = src_dir / f"{unit}.c"
+            # A unit's source is <unit>.c or <unit>.cpp, or a directory of C, C++ and
+            # assembly files linked together in link order (see _link_order).
+            source = _unit_source(src_dir, unit)
             files = _unit_files(src_dir / unit, link_order.get(unit, [])) if (src_dir / unit).is_dir() else []
-            if source.is_file():
+            if source is not None:
                 files = [source]
-            if not files:
+            if not files or (not have_cxx and any(f.suffix == ".cpp" for f in files)):
                 return None
             objects = []
             for file in files:
@@ -344,6 +368,14 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                     # Data modules; .incbin paths resolve against the extracted assets.
                     n.build(obj, "gba_as", _path(file), implicit=binutils_stamp + assets,
                             variables={"asincludes": f"-I {_path(out / 'assets')}"})
+                elif file.suffix == ".cpp":
+                    pre = file_stem + ".ii"
+                    asm = file_stem + ".s"
+                    n.build(pre, "gba_cpp", _path(file), implicit=binutils_stamp,
+                            variables={"cppflags": f"{CXX_CPPFLAGS} -iquote {_path(file.parent)}"})
+                    n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(cc1plus),
+                                                           "cflags": CXXFLAGS})
+                    n.build(obj, "gba_as", [asm, align], implicit=binutils_stamp)
                 else:
                     pre = file_stem + ".i"
                     asm = file_stem + ".s"
@@ -421,9 +453,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 if unit in bases:
                     objects.append(bases[unit])
                     unit_config["base_path"] = bases[unit]
-                    source = src_dir / f"{unit}.c"
-                    if not source.is_file():
-                        source = src_dir / f"{unit}.s"
+                    source = _unit_source(src_dir, unit) or src_dir / f"{unit}.s"
                     if source.is_file():
                         unit_config["metadata"]["source_path"] = _path(source)
                     elif unit.startswith("m4a/"):

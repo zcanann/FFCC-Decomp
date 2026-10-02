@@ -309,7 +309,7 @@ void Bg_CopyBackdropToRadar(void)
     size = 24;
     for (i = 0; i < 16; i++) {
         DmaCopy16(0, 0x0600F800 + i * 64 + 40, buf, size);
-        n = size / 2;
+        n = size / sizeof(u16);
         for (j = 0; j < n; j++) {
             buf[j] += 0xC4;
         }

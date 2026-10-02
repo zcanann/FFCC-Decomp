@@ -1,6 +1,7 @@
+extern "C" {
 #include "global.h"
 #include "obj.h"
-#include "joybus.h"
+#include "link.h"
 #include "sound.h"
 
 struct Sound gSound;
@@ -20,7 +21,4 @@ void PlaySong(struct Sound *sound, u16 song, void *source)
 {
     m4aSongNumStart(song);
 }
-
-void Sound_StaticInit(void)
-{
 }

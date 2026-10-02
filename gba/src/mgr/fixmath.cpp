@@ -1,3 +1,4 @@
+extern "C" {
 #include "global.h"
 #include "fixmath.h"
 
@@ -51,4 +52,5 @@ s16 TurnToward(s16 from, s16 to, s16 max)
 s16 FixLerp(s16 a, s16 b, s16 t)
 {
     return a + (((s16)(b - a) * t) >> 8);
+}
 }

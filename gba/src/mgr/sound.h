@@ -29,6 +29,10 @@ enum {
     SONG_NONE = 0xFF,
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct MusicPlayerInfo;
 
 extern struct MusicPlayerInfo gMPlayBgm;
@@ -46,8 +50,14 @@ void m4aMPlayFadeOutTemporarily(struct MusicPlayerInfo *mplayInfo, u16 speed);
 void m4aMPlayFadeIn(struct MusicPlayerInfo *mplayInfo, u16 speed);
 void m4aMPlayPitchControl(struct MusicPlayerInfo *mplayInfo, u16 trackBits, s16 pitch);
 
+#ifdef __cplusplus
+}
+#endif
+
 /* Positional sound listener (follows the local player) */
 struct Sound {
+    Sound() {}
+
     struct Vec3 listener;
 };
 
@@ -56,6 +66,5 @@ extern struct Sound gSound;
 void Sound_Init(struct Sound *sound);
 void Sound_UpdateListener(struct Sound *sound);
 void PlaySong(struct Sound *sound, u16 song, void *source);
-void Sound_StaticInit(void);
 
 #endif

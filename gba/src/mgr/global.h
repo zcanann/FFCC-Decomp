@@ -3,6 +3,11 @@
 
 #include "gba_types.h"
 
+#ifdef __cplusplus
+#undef NULL
+#define NULL 0
+#endif
+
 typedef char *va_list;
 #define __va_rounded_size(type) (((sizeof(type) + sizeof(int) - 1) / sizeof(int)) * sizeof(int))
 #define va_start(ap, last) ((ap) = (va_list)__builtin_next_arg(last))
@@ -120,6 +125,10 @@ struct Point {
     s16 y;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* BIOS calls */
 void VBlankIntrWait(void);
 void RegisterRamReset(u32 flags);
@@ -139,6 +148,10 @@ int vsprintf(char *buf, const char *fmt, va_list ap);
 extern u8 start_vector[];
 void intr_main(void);
 void JoyBus_HardReset(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /* Scratch buffer for decompressing data before DMA to VRAM */
 #define gDecompBuffer ((u8 *)0x02038000)

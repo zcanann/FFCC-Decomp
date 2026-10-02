@@ -40,7 +40,7 @@ void Bg_LoadImage(u8 *data, void *tileDest, u16 *mapDest, u16 *palDest, s32 tile
     src = buf;
     dst = mapDest;
     for (i = 0; i < h; i++) {
-        DmaCopy16(0, src, dst, w * sizeof(u16));
+        DmaCopy16(0, src, dst, w << 1);
         src += w;
         dst += 32;
     }
@@ -196,8 +196,8 @@ void Radar_DrawMap(void)
             DmaCopy16(0, out, dst, 23 * 2);
         } else {
             len = 32 - col;
-            DmaCopy16(0, out, dst, len * 2);
-            DmaCopy16(0, out + len, dst - col * 2, (23 - len) * 2);
+            DmaCopy16(0, out, dst, len << 1);
+            DmaCopy16(0, out + len, dst - col * 2, (23 - len) << 1);
         }
         dst += 64;
         if (dst > 0x0600F7FF)
@@ -347,8 +347,8 @@ void Radar_ScrollMap(s32 dx, s32 dy)
             DmaCopy16(0, out, dst, 23 * 2);
         } else {
             n = 32 - col;
-            DmaCopy16(0, out, dst, n * 2);
-            DmaCopy16(0, out + n, dst - col * 2, (23 - n) * 2);
+            DmaCopy16(0, out, dst, n << 1);
+            DmaCopy16(0, out + n, dst - col * 2, (23 - n) << 1);
         }
     }
 }

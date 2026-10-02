@@ -75,7 +75,7 @@ parser.add_argument(
     "--gba-compilers",
     metavar="DIR",
     type=Path,
-    help="directory containing agbcc and old_agbcc for the GBA programs (optional)",
+    help="directory containing cc1, cc1plus, gcc2-cpp and old_agbcc for GBA (optional)",
 )
 parser.add_argument(
     "--compilers",
@@ -592,7 +592,7 @@ config.libs = [
             Object(Matching, "p_MaterialEditor.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "p_mc.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "p_menu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "p_minigame.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-common off", "-str reuse,readonly"]),
+            Object(NonMatching, "p_minigame.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-common off", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "p_sample.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(Matching, "p_sound.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(Matching, "p_system.cpp", extra_cflags=["-pooldata off", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),

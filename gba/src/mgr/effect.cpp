@@ -1,4 +1,3 @@
-extern "C" {
 #include "global.h"
 #include "obj.h"
 #include "effect.h"
@@ -143,7 +142,7 @@ void Effect_InitFreeze(struct Effect *e, va_list *ap)
 {
     e->u.target = va_arg(*ap, struct Actor *);
     AnimState_Set(&e->anim, 32, 0xFF);
-    PlaySong(&gSound, SE_FREEZE, e);
+    gSound.PlaySong(SE_FREEZE, e);
 }
 
 void Effect_InitSlipTrail(struct Effect *e, va_list *ap)
@@ -168,7 +167,7 @@ void Effect_InitSlip(struct Effect *e, va_list *ap)
 {
     e->u.target = va_arg(*ap, struct Actor *);
     AnimState_Set(&e->anim, 39, 0xFF);
-    PlaySong(&gSound, SE_SLIP, e);
+    gSound.PlaySong(SE_SLIP, e);
 }
 
 void Effect_InitTrapThrow(struct Effect *e, va_list *ap)
@@ -218,7 +217,7 @@ void Effect_InitSpin(struct Effect *e, va_list *ap)
 {
     e->u.target = va_arg(*ap, struct Actor *);
     AnimState_Set(&e->anim, 33, 0xFF);
-    PlaySong(&gSound, SE_SPIN, e);
+    gSound.PlaySong(SE_SPIN, e);
 }
 
 void Effect_InitDust(struct Effect *e, va_list *ap)
@@ -628,5 +627,4 @@ void Effect_Update(struct Effect *e)
         AssertFailed(EFFECT_FILE, 876);
         break;
     }
-}
 }

@@ -1,4 +1,3 @@
-extern "C" {
 #include "global.h"
 #include "main.h"
 #include "link.h"
@@ -284,13 +283,13 @@ void InitGame(struct Main *main)
     sgenrand(10000);
     Text_Init(&gTextLayer);
     Link_InitState();
-    Camera_Init(&gCamera);
+    gCamera.Init();
     Route_Init(gRoutes);
     PointList_Init(gPointLists);
     Field_Init(&gField);
     Game_Init(&gGame);
     Text_Init(&gTextLayer);
-    Sound_Init(&gSound);
+    gSound.Init();
     LZ77UnCompWram(gFieldMapLz, gFieldMap);
     REG_IE = INTR_FLAG_GAMEPAK | INTR_FLAG_SERIAL | INTR_FLAG_VCOUNT | INTR_FLAG_VBLANK;
     REG_DISPSTAT = 0x28;
@@ -600,10 +599,10 @@ void UpdateGameState(struct Main *main)
         break;
     }
 end:
-    Sound_UpdateListener(&gSound);
+    gSound.UpdateListener();
     if (gLinkFrameReady && !main->paused) {
         Game_Update(&gGame);
-        Camera_Update(&gCamera);
+        gCamera.Update();
     }
 }
 
@@ -1084,5 +1083,4 @@ void DrawGameSprites(struct Main *main)
         Oam_Flush(&gGame);
         break;
     }
-}
 }

@@ -5,7 +5,7 @@
     python gba/tools/check.py gba/src/mgr/sound.cpp fn_0200022C  # instruction diff for one
 
 Works without ninja (safe to run in parallel): the file is compiled into a private
-temporary directory with the same cpp/agbcc (or cc1plus)/as pipeline as the build, and diffed
+temporary directory with the same gcc2-cpp/cc1 (or cc1plus)/as pipeline as the build, and diffed
 against the unit's target object in build/GCCP01/gba (run `ninja` once first).
 """
 
@@ -17,15 +17,14 @@ import sys
 import tempfile
 from pathlib import Path
 
+from preprocess import preprocess
+
 ROOT = Path(__file__).resolve().parents[2]
 EXE = ".exe" if sys.platform == "win32" else ""
 TOOLS = ROOT / "build" / "tools"
-CPPFLAGS = ["-undef", "-nostdinc", "-Wno-trigraphs", "-I", str(ROOT / "gba" / "include"),
-            "-I", str(ROOT / "gba" / "lib" / "m4a" / "include"), "-I", str(ROOT / "gba" / "lib" / "ginclude")]
-CFLAGS = ["-mthumb-interwork", "-O2", "-fhex-asm"]
+CFLAGS = ["-quiet", "-mthumb-interwork", "-O2"]
 # Per-program extra C flags, as in tools/gba_project.py.
 PROGRAM_CFLAGS = {"mgr": ["-fno-common"]}
-CXX_CPPFLAGS = ["-x", "c", "-D__cplusplus", "-D__GNUG__=2"]
 CXXFLAGS = ["-quiet", "-mthumb-interwork", "-O2", "-fno-exceptions"]
 
 
@@ -33,18 +32,19 @@ def binutil(name):
     return str(TOOLS / "gba-binutils" / "bin" / f"arm-none-eabi-{name}{EXE}")
 
 
-def compile_c(source: Path, out_dir: Path, program: str) -> Path:
+def compile_c(source: Path, out_dir: Path, program: str,
+              compilers: Path = TOOLS / "gba-agbcc") -> Path:
     pre = out_dir / "a.i"
     asm = out_dir / "a.s"
     obj = out_dir / "a.o"
+    preprocess(compilers / f"gcc2-cpp{EXE}", source, pre,
+               [ROOT / "gba/include", ROOT / "gba/lib/m4a/include", ROOT / "gba/lib/ginclude"],
+               language="c++" if source.suffix == ".cpp" else "c")
     if source.suffix == ".cpp":
-        cpp = [*CXX_CPPFLAGS, *CPPFLAGS]
-        cc = [str(TOOLS / "gba-agbcc" / f"cc1plus{EXE}"), *CXXFLAGS]
+        cc = [str(compilers / f"cc1plus{EXE}"), *CXXFLAGS]
     else:
-        cpp = CPPFLAGS
-        cc = [str(TOOLS / "gba-agbcc" / f"agbcc{EXE}"), *CFLAGS, *PROGRAM_CFLAGS.get(program, [])]
+        cc = [str(compilers / f"cc1{EXE}"), *CFLAGS, *PROGRAM_CFLAGS.get(program, [])]
     steps = [
-        [binutil("cpp"), *cpp, "-iquote", str(source.parent), str(source), "-o", str(pre)],
         [*cc, str(pre), "-o", str(asm)],
         [binutil("as"), "-mcpu=arm7tdmi", "-mthumb-interwork", "-o", str(obj), str(asm), str(ROOT / "gba" / "lib" / "align.s")],
     ]
@@ -66,6 +66,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
     parser.add_argument("function", nargs="?")
+    parser.add_argument("--gba-compilers", type=Path, default=TOOLS / "gba-agbcc",
+                        help="compiler directory, as passed to configure.py")
     args = parser.parse_args()
 
     source = args.source.resolve()
@@ -77,7 +79,7 @@ def main():
         sys.exit(f"{target} missing; run ninja first")
 
     with tempfile.TemporaryDirectory() as tmp:
-        obj = compile_c(source, Path(tmp), program)
+        obj = compile_c(source, Path(tmp), program, args.gba_compilers)
         # Units with several code ranges use per-range section names (.text.<addr>);
         # objdiff pairs code by section name, so rename them to match the compiled object.
         sections = subprocess.run([binutil("objdump"), "-h", str(target)], capture_output=True, text=True).stdout

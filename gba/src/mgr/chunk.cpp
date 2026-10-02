@@ -1,115 +1,112 @@
-extern "C" {
 #include "global.h"
 #include "chunk.h"
 
 #define CHUNK_FILE "C:/FFF/miniGame/mgr/chunk.cpp"
 
-void Chunk_Construct(struct Chunk *c)
+Chunk::Chunk()
 {
 }
 
-struct Chunk *Chunk_Create(struct Chunk *c, const void *buf)
+Chunk::Chunk(const void *buf)
 {
-    Chunk_SetBuffer(c, buf);
-    return c;
+    SetBuffer(buf);
 }
 
-void Chunk_SetBuffer(struct Chunk *c, const void *buf)
+void Chunk::SetBuffer(const void *buf)
 {
     if (buf == NULL)
         AssertFailed(CHUNK_FILE, 41);
-    c->base = (u8 *)buf;
-    c->chunk = (u8 *)buf;
-    c->offset = 0;
-    c->size = -1;
+    base = (u8 *)buf;
+    chunk = (u8 *)buf;
+    offset = 0;
+    size = -1;
 }
 
-u8 Chunk_Next(struct Chunk *c, struct ChunkHeader *hdr)
+u8 Chunk::Next(struct ChunkHeader *hdr)
 {
-    s32 skip = c->size < 0 ? 0 : c->size + 8;
+    s32 skip = size < 0 ? 0 : size + 8;
 
-    c->offset += skip;
-    c->chunk += skip;
-    c->pos = c->chunk;
-    hdr->id = Chunk_ReadU32(c);
+    offset += skip;
+    chunk += skip;
+    pos = chunk;
+    hdr->id = ReadU32();
     if (hdr->id == CHUNK_ID('E', 'N', 'D', ' '))
         return 0;
-    hdr->size = Chunk_ReadU32(c);
-    c->size = hdr->size;
+    hdr->size = ReadU32();
+    size = hdr->size;
     return 1;
 }
 
-void *Chunk_GetData(struct Chunk *c)
+void *Chunk::GetData()
 {
-    return c->pos;
+    return pos;
 }
 
-void Chunk_Read(struct Chunk *c, void *dst, u32 n)
+void Chunk::Read(void *dst, u32 n)
 {
-    memcpy(dst, c->pos, n);
-    c->pos += n;
+    memcpy(dst, pos, n);
+    pos += n;
 }
 
-u8 Chunk_ReadU8(struct Chunk *c)
+u8 Chunk::ReadU8()
 {
-    return *c->pos++;
+    return *pos++;
 }
 
-u16 Chunk_ReadU16(struct Chunk *c)
+u16 Chunk::ReadU16()
 {
-    u16 v = *(u16 *)c->pos;
+    u16 v = *(u16 *)pos;
 
-    c->pos += 2;
+    pos += 2;
     return v;
 }
 
-u32 Chunk_ReadU32(struct Chunk *c)
+u32 Chunk::ReadU32()
 {
-    u32 v = *(u32 *)c->pos;
+    u32 v = *(u32 *)pos;
 
-    c->pos += 4;
+    pos += 4;
     return v;
 }
 
-u32 Chunk_ReadS32(struct Chunk *c)
+u32 Chunk::ReadS32()
 {
-    return Chunk_ReadU32(c);
+    return ReadU32();
 }
 
-u32 Chunk_ReadVarInt(struct Chunk *c)
+u32 Chunk::ReadVarInt()
 {
     s32 shift = 0;
     u32 v = 0;
     u8 b;
 
     do {
-        b = Chunk_ReadU8(c);
+        b = ReadU8();
         v += b << shift;
         shift += 7;
     } while (b & 0x80);
     return v;
 }
 
-char *Chunk_ReadString(struct Chunk *c)
+char *Chunk::ReadString()
 {
-    char *str = (char *)c->pos;
+    char *str = (char *)pos;
 
-    while (Chunk_ReadU8(c) != 0)
+    while (ReadU8() != 0)
         ;
     return str;
 }
 
-void Chunk_Align(struct Chunk *c, u32 align)
+void Chunk::Align(u32 align)
 {
-    s32 n = c->pos - c->base;
+    s32 n = pos - base;
 
     n += align - 1;
     n -= n % align;
-    c->pos = c->base + n;
+    pos = base + n;
 }
 
-void Chunk_Skip(struct Chunk *c, s32 n)
+void Chunk::Skip(s32 n)
 {
-    c->pos += n;
-}
+    pos += n;
 }

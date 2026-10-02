@@ -38,7 +38,7 @@ inline CMiniGamePcs::CMiniGamePcs()
     STATIC_ASSERT(offsetof(CMiniGamePcs, m_gbaParams) == 0x138C);
     STATIC_ASSERT(offsetof(CMiniGamePcs, m_gbaContexts) == 0x16AC);
     STATIC_ASSERT(offsetof(CMiniGamePcs, m_gbaThreads) == 0x1830);
-    STATIC_ASSERT(offsetof(CMiniGamePcs, m_flags) == 0x6484);
+    STATIC_ASSERT(offsetof(CMiniGamePcs, m_gbaStack) == 0x2490);
     STATIC_ASSERT(offsetof(CMiniGamePcs, m_playerMessageReady) == 0x6490);
     STATIC_ASSERT(offsetof(CMiniGamePcs, m_workerStoppedMask) == 0x649D);
     STATIC_ASSERT(sizeof(CMiniGamePcs) == 0x64A0);
@@ -87,6 +87,13 @@ static const char s_miniGameRecvStatusFmt[] = "ret=%d  status=0x%02x  step=%d  c
 static const char s_miniGameFlagsRetryFmt[] = "GBA_JSTAT_FLAGS_MASK retry chan=%d\n";
 static const char s_miniGamePsf1RetryFmt[] = "GBA_JSTAT_PSF1 retry chan=%d\n\0\0";
 
+enum {
+    GBA_PADCODE_RACE_RESULT = 0x1000,
+    GBA_PADCODE_RACE_END = 0x1100,
+    GBA_PADCODE_MGR_END = 0x1200,
+    GBA_PADCODE_MGR_CONTINUE = 0x1300,
+};
+
 struct MiniGameAlarm {
     OSAlarm alarm;
     OSThread* thread;
@@ -121,12 +128,16 @@ static inline bool MiniGameThreadTimedOut(OSTime start, OSTime timeout)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void ChgHL16(unsigned short)
+inline unsigned short ChgHL16(unsigned short value)
 {
-	// TODO
+    return (value << 8) | (value >> 8);
 }
 
 /*
@@ -164,7 +175,7 @@ inline void MiniGameFileRead(char* path, void* destination, unsigned long& size)
 inline void AdjustGbaImageRegistry(char* image, char* tag)
 {
     signed char* bytes = reinterpret_cast<signed char*>(image);
-    int offset = 0xA0;
+    long offset = 0xA0;
     int checksum = 0xE7;
 
     bytes[0xAC] = tag[0];
@@ -226,16 +237,6 @@ inline void getKoubutsuList(unsigned char* food, int player)
             food[i] = 5 + i * 100 / 8;
         }
     }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GbaThreadReadInitialCode(MgGbaThreadParam*)
-{
-	// TODO
 }
 
 /*
@@ -384,8 +385,8 @@ inline void CMiniGamePcs::CallMiniGameParam(int code, int param1, int param2)
  */
 inline unsigned long CalcCrc(unsigned long value)
 {
-    unsigned int crc = 0;
     unsigned int data = ((value >> 16) & 0xFF) | (value & 0xFF00);
+    unsigned int crc = 0;
 
     for (int byte = 0; byte < 2; byte++)
     {
@@ -427,538 +428,190 @@ inline unsigned long CalcCrc(unsigned long value)
 
 /*
  * --INFO--
- * PAL Address: 0x80127b74
- * PAL Size: 2560b
+ * PAL Address: 0x8012b188
+ * PAL Size: 20b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMiniGamePcs::MngThreadMain(void*)
+int CMiniGamePcs::GetTable(unsigned long index)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    for (int i = 0; i < 4; i++)
-    {
-        int mode = Game.m_gameWork.m_spModeFlags[i];
-        unsigned long imageSize = mode == 0 ? m_managerImageSize : m_managerSpImageSize;
-        unsigned char* image = mode == 0 ? m_managerImage : m_managerSpImage;
-        GbaThreadInit(i, &m_gbaParams[i], &m_gbaThreads[i], self + 0x2490 + (i + 1) * 0x1000,
-                      0x1000, 7, _OpenCallback, image, imageSize);
-    }
-
-    OSTime startTime = OSGetTime();
-    unsigned int loopCounter = 0;
-
-    while (true)
-    {
-        GbaThreadSleep(OSMillisecondsToTicks(1));
-
-        if (m_managerThreadStop != 0)
-        {
-            m_workerStoppedMask = 0;
-
-            for (int i = 0; i <= 3; i++)
-            {
-                GbaThreadSleep(OSMillisecondsToTicks(100));
-
-                OSSendMessage(&m_gbaParams[i].m_queue, reinterpret_cast<OSMessage>(1), 1);
-            }
-
-            GbaThreadSleep(OSMillisecondsToTicks(200));
-
-            while (m_workerStoppedMask != 0x0F)
-            {
-                GbaThreadSleep(OSMillisecondsToTicks(100));
-            }
-
-            do
-            {
-                int count = 0;
-                for (;;)
-                {
-                    if (OSIsThreadTerminated(&m_gbaThreads[count]) == 0)
-                    {
-                        break;
-                    }
-                    count++;
-                    if (count > 3)
-                    {
-                        GbaThreadSleep(OSMillisecondsToTicks(100));
-
-                        m_managerThreadStop = 0;
-                        OSExitThread(0);
-                        return;
-                    }
-                }
-            } while (true);
-        }
-
-        if (m_playerMask != 0)
-        {
-            unsigned char successMask = 0;
-            int i = 0;
-            do
-            {
-                unsigned int bit = 1U << i;
-                if ((m_playerMask & bit) != 0 && m_gbaParams[i].m_busy == 0)
-                {
-                    if (m_gbaParams[i].m_deviceType == 0x40000)
-                    {
-                        switch ((s32)m_gbaParams[i].m_result)
-                        {
-                        case 0:
-                            if (m_gbaParams[i].m_connected == 0)
-                            {
-                                if (m_gbaParams[i].m_connectionReset != 0)
-                                {
-                                    goto disconnect_player;
-                                }
-                                m_statusCode = 0;
-                                if (i == -1)
-                                {
-                                    OSSendMessage(&m_gbaParams[i].m_queue, reinterpret_cast<OSMessage>(8), 1);
-                                }
-                                else
-                                {
-                                    OSSendMessage(&m_gbaParams[i].m_queue, reinterpret_cast<OSMessage>(7), 1);
-                                }
-                            }
-                            else if (m_gbaParams[i].m_connectionReady != 0)
-                            {
-                                m_gbaParams[i].m_connectionReset = 1;
-                                m_playerMessageReady[i] = 1;
-                                successMask |= bit;
-                                m_receivedWords[i] = 0;
-                            }
-                            else
-                            {
-                                if (m_gbaParams[i].m_transferComplete != 0)
-                                {
-                                    unsigned int packet = m_gbaParams[i].m_receivedPacket;
-                                    unsigned int crc = CalcCrc(packet);
-                                    if ((packet & 0xFF) == (crc & 0xFF))
-                                    {
-                                        m_playerMessageReady[i] = m_gbaParams[i].m_transferComplete;
-                                        successMask |= bit;
-                                        m_receivedWords[i] =
-                                            m_gbaParams[i].m_receivedPacket & 0xFFFF00;
-                                    }
-                                }
-                            }
-                            break;
-                        case 3:
-                            m_gbaParams[i].m_deviceType = 0;
-                            break;
-                        default:
-                            m_gbaParams[i].m_deviceType = 0;
-                            break;
-                        }
-                    }
-                    else if (m_gbaParams[i].m_deviceType == 0 || (int)(loopCounter & 0x1F) == 0)
-                    {
-                        OSTime now = OSGetTime();
-                        if ((s64)OSMillisecondsToTicks(5000) < now - startTime)
-                        {
-disconnect_player:
-                            if ((m_playerMask & bit) != 0)
-                            {
-                                m_playerMask = static_cast<unsigned char>(m_playerMask & ~bit);
-                                if (m_playerMask == 0)
-                                {
-                                    m_miniGameFailed = 1;
-                                    goto next_player;
-                                }
-                                m_playerMessageReady[i] = 1;
-                                m_receivedWords[i] = 0x40000000;
-                                m_receivedWords[i] |= 0x12000;
-                                unsigned long crc = CalcCrc(m_receivedWords[i]);
-                                m_receivedWords[i] |= crc & 0xFF;
-                            }
-                        }
-                        OSSendMessage(&m_gbaParams[i].m_queue, reinterpret_cast<OSMessage>(6), 1);
-                    }
-                }
-next_player:
-                i++;
-            } while (i <= 3);
-
-            if (successMask == (m_playerMask & 0xF))
-            {
-                m_miniGameReady = 1;
-                int j = 0;
-                do
-                {
-                    unsigned int word = m_receivedWords[j];
-                    unsigned int masked = word & 0xFFFF00;
-                    if ((word & 0x8000) != 0)
-                    {
-                        PadCodeProc(j, static_cast<unsigned short>(masked | ((int)(unsigned short)(masked >> 8) >> 8)));
-                    }
-                    unsigned int crc = 0;
-                    m_broadcastWords[j] = (j + 0x40) * 0x1000000;
-                    m_broadcastWords[j] =
-                        m_broadcastWords[j] | masked;
-                    crc = CalcCrc(m_broadcastWords[j]);
-                    m_broadcastWords[j] = m_broadcastWords[j] | (crc & 0xFF);
-                    j++;
-                } while (j < 4);
-
-                unsigned int seqCrc = 0;
-                m_broadcastWords[4] = 0x44000000;
-                m_broadcastWords[4] =
-                    m_broadcastWords[4] |
-                    (static_cast<unsigned int>(static_cast<unsigned short>(
-                         m_statusCode >> 8 |
-                         m_statusCode << 8)) << 8);
-                seqCrc = CalcCrc(m_broadcastWords[4]);
-                int k = 0;
-                m_broadcastWords[4] =
-                    m_broadcastWords[4] | (seqCrc & 0xFF);
-                do
-                {
-                    if ((successMask & (1U << k)) != 0)
-                    {
-                        m_gbaParams[k].m_connectionReady = 0;
-                        memcpy(m_gbaParams[k].m_sendPackets, m_broadcastWords, sizeof(m_broadcastWords));
-                        OSSendMessage(&m_gbaParams[k].m_queue, reinterpret_cast<OSMessage>(10), 1);
-                    }
-                    k++;
-                } while (k < 4);
-
-                m_statusCode = static_cast<short>(m_statusCode + 1);
-                if (0x0FFF <= m_statusCode)
-                {
-                    m_statusCode = 0x0FFF;
-                }
-            }
-        }
-
-        loopCounter += 1;
-    }
+    return reinterpret_cast<int>(&m_table + index);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80128574
- * PAL Size: 44b
+ * PAL Address: 0x8012b184
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-static void _MngThreadMain(void* param)
+void CMiniGamePcs::Init()
 {
-    MiniGamePcs.MngThreadMain(param);
+    return;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x801285a0
- * PAL Size: 592b
+ * PAL Address: 0x8012b180
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
+void CMiniGamePcs::Quit()
 {
-    unsigned int rawPadCode = padCode;
-    unsigned short codeType = rawPadCode & 0x7F00;
-
-    switch (codeType) {
-    case 0x1000:
-        if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(g_MsgFlashy);
-        }
-        if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_miniGamePadRaceResultFmt), player, rawPadCode & 0xFF);
-        }
-        if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(g_MsgFlashy);
-        }
-        m_miniGameParams[player] = static_cast<signed char>(rawPadCode);
-        break;
-    case 0x1100:
-        if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(g_MsgFlashy);
-        }
-        if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_miniGamePadRaceEndText));
-        }
-        if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(g_MsgFlashy);
-        }
-        m_raceEnded = 1;
-        break;
-    case 0x1200:
-        if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(g_MsgFlashy);
-        }
-        if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_miniGamePadMgrEndText));
-        }
-        if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(g_MsgFlashy);
-        }
-        m_miniGameFailed = 1;
-        break;
-    case 0x1300:
-        if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(g_MsgFlashy);
-        }
-        if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_miniGamePadMgrContinueText));
-        }
-        if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(g_MsgFlashy);
-        }
-        m_continueRequested = 1;
-        break;
-    }
+    return;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x801287f0
- * PAL Size: 1244b
+ * PAL Address: 0x8012b0d4
+ * PAL Size: 172b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-
-void CMiniGamePcs::calc()
+void CMiniGamePcs::create()
 {
-    switch (m_managerState) {
-    case 1:
-        Joybus.ExitThread();
-        m_managerState = 2;
-    case 2:
-        if (!Joybus.IsThreadRunning())
-        {
-            char managerFile[256];
-            char managerSpFile[256];
-
-            sprintf(managerFile, s_miniGameManagerFileFmt, s_miniGameManagerDir, m_managerIndex);
-            sprintf(managerSpFile, s_miniGameManagerSpFileFmt, s_miniGameManagerDir, m_managerIndex);
-
-            if ((unsigned int)System.m_execParam >= 3)
-            {
-                System.Printf(const_cast<char*>(s_miniGameFileInfoFmt), managerFile, managerSpFile);
-            }
-
-            MiniGameGo(managerFile, managerSpFile);
-            m_managerState = 3;
-        }
-
-        break;
-    case 3:
-        if (m_raceEnded != 0)
-        {
-            System.Printf(const_cast<char*>(s_miniGameRaceHeader));
-            for (int i = 0; i < 4; i++)
-            {
-                System.Printf(const_cast<char*>(s_miniGameRaceResultFmt), i + 1, static_cast<int>(m_miniGameParams[i]));
-            }
-            System.Printf(const_cast<char*>(s_miniGameSeparator));
-
-            CallMiniGameParam(0x3000, 0, 0);
-            m_raceEnded = 0;
-        }
-
-        if (m_continueRequested != 0)
-        {
-            m_miniGameParams[0] = -1;
-            m_miniGameParams[1] = -1;
-            m_miniGameParams[2] = -1;
-            m_miniGameParams[3] = -1;
-            if ((unsigned int)System.m_execParam >= 3)
-            {
-                System.Printf(const_cast<char*>(s_miniGameContinueText));
-            }
-
-            CallMiniGameParam(0x3002, 0, 0);
-            m_continueRequested = 0;
-        }
-
-        if (m_miniGameFailed == 0)
-        {
-            return;
-        }
-
-        if (1 <= (unsigned int)System.m_execParam)
-        {
-            System.Printf(const_cast<char*>(s_miniGameMgrEndStartText));
-        }
-
-        CallMiniGameParam(0x3001, 0, 0);
-
-        if (1 <= (unsigned int)System.m_execParam)
-        {
-            System.Printf(const_cast<char*>(s_miniGameMgrEndEndText));
-        }
-
-        MiniGameEnd();
-
-        if (1 <= (unsigned int)System.m_execParam)
-        {
-            System.Printf(g_MsgFlashy);
-        }
-
-        if (1 <= (unsigned int)System.m_execParam)
-        {
-            System.Printf(const_cast<char*>(s_miniGameEndBannerText));
-        }
-
-        if (1 <= (unsigned int)System.m_execParam)
-        {
-            System.Printf(g_MsgFlashy);
-        }
-
-        m_miniGameFailed = 0;
-        m_managerState = 0;
-        break;
-    case 0:
-    default:
-        break;
-    }
+    m_managerState = 0;
+    m_managerIndex = 0;
+    m_managerImage = 0;
+    m_managerSpImage = 0;
+    m_managerMode = 0;
+    m_playerMask = 0xF;
+    m_managerThreadStop = 0;
+    SetNumPlayer();
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80128ccc
- * PAL Size: 980b
+ * PAL Address: 0x8012b0d0
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
+void CMiniGamePcs::destroy()
 {
-    int doWrite = 1;
-    unsigned char swapByte;
-    int swapWord;
-    unsigned int baseTick;
-    int wasResync = 0;
-
-    if (param->m_connected != 0)
-    {
-        System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), static_cast<int>(param->m_channel), 0x3E1);
-    }
-    param->m_connected = 0;
-    param->m_connectionReset = 0;
-    param->m_result = 3;
-    baseTick = param->m_context.m_tick;
-    param->m_context.m_tick = m_gbaContexts[param->m_channel].m_tick;
-
-    if (param->m_context.m_initialConnect == 0)
-    {
-        if (param->m_context.m_initialized == 0)
-        {
-            GbaThreadInitGbaContext(param, 1);
-            m_gbaContexts[param->m_channel].m_portId = param->m_context.m_portId;
-            m_gbaContexts[param->m_channel].m_transferId = param->m_context.m_transferId;
-            param->m_lastTick = OSGetTick();
-            m_gbaContexts[param->m_channel].m_tick = param->m_lastTick;
-
-            if (param->m_connected != 0)
-            {
-                System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), static_cast<int>(param->m_channel), 0x3FC);
-            }
-            System.Printf(const_cast<char*>(s_miniGameSetPortFmt), static_cast<int>(param->m_channel), MG_GBA_THREAD_MSG_SETPORT_ct);
-            OSSendMessage(&param->m_queue, reinterpret_cast<OSMessage>(5), 1);
-        }
-        else
-        {
-            int compareResult = memcmp(&param->m_context, &m_gbaContexts[param->m_channel], 0x60);
-            if (compareResult == 0)
-            {
-                unsigned int savedTick = m_gbaContexts[param->m_channel].m_tick;
-                if (baseTick == savedTick || baseTick == param->m_lastTick)
-                {
-                    m_gbaContexts[param->m_channel].m_tick = baseTick;
-                    param->m_lastTick = baseTick;
-                    doWrite = 0;
-                }
-            }
-            if (doWrite)
-            {
-                wasResync = 1;
-                OSSendMessage(&param->m_queue, reinterpret_cast<OSMessage>(4), 1);
-            }
-        }
-    }
-    else
-    {
-        swapByte = param->m_context.m_portId;
-
-        param->m_context.m_portId = m_gbaContexts[param->m_channel].m_portId;
-        swapWord = param->m_context.m_transferId;
-        param->m_context.m_transferId = m_gbaContexts[param->m_channel].m_transferId;
-
-        int compareResult = memcmp(&param->m_context, &m_gbaContexts[param->m_channel], 0x60);
-        if (compareResult == 0)
-        {
-            unsigned int savedTick = m_gbaContexts[param->m_channel].m_tick;
-            if (baseTick == savedTick || baseTick == param->m_lastTick)
-            {
-                m_gbaContexts[param->m_channel].m_tick = baseTick;
-                param->m_lastTick = baseTick;
-                m_gbaContexts[param->m_channel].m_portId = swapByte;
-                m_gbaContexts[param->m_channel].m_transferId = swapWord;
-                doWrite = 0;
-            }
-        }
-        if (doWrite)
-        {
-            OSSendMessage(&param->m_queue, reinterpret_cast<OSMessage>(3), 1);
-        }
-    }
-
-    if ((!doWrite || wasResync) && GBAGetStatus(static_cast<int>(param->m_channel), &param->m_status) == 0 && param->m_status == 0x30u)
-    {
-        unsigned int sendTick;
-        int readTick;
-        int readStatus;
-
-        if (wasResync)
-        {
-            sendTick = baseTick;
-        }
-        else
-        {
-            sendTick = OSGetTick();
-            m_gbaContexts[param->m_channel].m_tick = sendTick;
-        }
-
-        if (GBAWrite(static_cast<int>(param->m_channel), reinterpret_cast<u8*>(&sendTick), &param->m_status) == 0 &&
-            (param->m_status & 0x30) == 0x30 &&
-            GBAGetStatus(static_cast<int>(param->m_channel), &param->m_status) == 0 && param->m_status == 0x38u &&
-            (readStatus = GBARead(static_cast<int>(param->m_channel), reinterpret_cast<u8*>(&readTick), &param->m_status), !wasResync) &&
-            readStatus == 0 &&
-            sendTick == readTick && (param->m_status & 0x30) == 0x30)
-        {
-            param->m_lastTick = sendTick;
-            param->m_connected = 1;
-            param->m_bootRetries = 0;
-            param->m_connectionReady = 1;
-            param->m_result = 0;
-        }
-    }
+    return;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x801290a0
- * PAL Size: 44b
+ * PAL Address: 0x8012b09c
+ * PAL Size: 52b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-static void _GbaThreadMain(void* param)
+static void _OpenCallback(MgGbaThreadParam* param, void* context)
 {
-    MiniGamePcs.GbaThreadMain(param);
+    MiniGamePcs.OpenCallback(param, context);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012aac8
+ * PAL Size: 1492b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
+{
+    EndThread();
+
+    m_miniGameParams[0] = -1;
+    m_miniGameParams[1] = -1;
+    m_miniGameParams[2] = -1;
+    m_miniGameParams[3] = -1;
+    m_miniGameFailed = 0;
+    m_raceEnded = 0;
+    m_continueRequested = 0;
+    m_statusCode = 0;
+    m_miniGameReady = 0;
+
+    m_managerImage =
+        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1) unsigned char[0x40000];
+    m_managerSpImage =
+        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2) unsigned char[0x40000];
+
+    m_sessionId = OSGetTick();
+    *reinterpret_cast<unsigned int*>(m_managerImage + 200) = m_sessionId;
+    *reinterpret_cast<unsigned int*>(m_managerSpImage + 200) = m_sessionId;
+
+    strncpy(m_managerTag, s_miniGameManagerTag, 4);
+
+    MiniGameFileRead(managerFilePath, m_managerImage, m_managerImageSize);
+    AdjustGbaImageRegistry(reinterpret_cast<char*>(m_managerImage), m_managerTag);
+    MiniGameFileRead(managerSpFilePath, m_managerSpImage, m_managerSpImageSize);
+    AdjustGbaImageRegistry(reinterpret_cast<char*>(m_managerSpImage), m_managerTag);
+
+    u8 gbaStatus[8];
+    GBAReset(0, gbaStatus);
+
+    memset(&m_managerThread, 0, sizeof(m_managerThread));
+    memset(&m_managerQueue, 0, sizeof(m_managerQueue));
+    memset(&m_managerMessage, 0, sizeof(m_managerMessage));
+    OSInitMessageQueue(&m_managerQueue, &m_managerMessage, 1);
+    OSCreateThread(&m_managerThread,
+                   reinterpret_cast<void* (*)(void*)>(_MngThreadMain), 0,
+                   m_managerStack + sizeof(m_managerStack), sizeof(m_managerStack), 8, 1);
+    OSResumeThread(&m_managerThread);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012a5f4
+ * PAL Size: 1236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode)
+{
+    MgGbaContext* gbaContext = &m_gbaContexts[param->m_channel];
+
+    memset(gbaContext, 0, sizeof(MgGbaContext));
+    if (initMode == 0)
+    {
+        gbaContext->m_initialConnect = 1;
+    }
+
+    gbaContext->m_channel = param->m_channel;
+    gbaContext->m_initialized = 1;
+    gbaContext->m_sessionId = m_sessionId;
+    gbaContext->m_managerMode = m_managerMode;
+    gbaContext->m_playerMask = m_playerMask;
+
+    getKoubutsuList(gbaContext->m_foodLevels[0], 0);
+    getKoubutsuList(gbaContext->m_foodLevels[1], 1);
+    getKoubutsuList(gbaContext->m_foodLevels[2], 2);
+    getKoubutsuList(gbaContext->m_foodLevels[3], 3);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012a5d0
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void GbaThreadAlarmHandler(OSAlarm* alarm, OSContext*)
+{
+    OSResumeThread(reinterpret_cast<MiniGameAlarm*>(alarm)->thread);
 }
 
 /*
@@ -1176,7 +829,7 @@ context_proc:
             }
             else
             {
-                writeSrc = reinterpret_cast<u8*>(&m_gbaContexts[channel]) + (step - 1) * 4;
+                writeSrc = &m_gbaContextBytes[channel][(step - 1) * 4];
             }
             ret = GBAWrite(channel, writeSrc, &param->m_status);
             if (!(ret == 0 && (param->m_status & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
@@ -1194,7 +847,7 @@ context_proc:
                 retryLine = 0x2AA;
                 goto retry_loop;
             }
-            ret = GBARead(channel, reinterpret_cast<u8*>(&param->m_context) + contextRecvOffset, &param->m_status);
+            ret = GBARead(channel, &param->m_contextBytes[contextRecvOffset], &param->m_status);
             if (!(ret == 0 && (param->m_status & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK))
             {
                 System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x2B2);
@@ -1388,7 +1041,7 @@ write_done7:;
                                 failed = 1;
                                 goto ctx_done7;
                             }
-                            st = GBARead(channel, reinterpret_cast<u8*>(&param->m_context) + i, &param->m_status);
+                            st = GBARead(channel, &param->m_contextBytes[i], &param->m_status);
                             if (st != 0 || (param->m_status & GBA_JSTAT_FLAGS_MASK) != GBA_JSTAT_FLAGS_MASK)
                             {
                                 failed = 1;
@@ -1522,7 +1175,7 @@ write_done8:;
                             failed = 1;
                             goto ctx_done8;
                         }
-                        st = GBARead(channel, reinterpret_cast<u8*>(&param->m_context) + i, &param->m_status);
+                        st = GBARead(channel, &param->m_contextBytes[i], &param->m_status);
                         if (st != 0 || (param->m_status & GBA_JSTAT_FLAGS_MASK) != GBA_JSTAT_FLAGS_MASK)
                         {
                             failed = 1;
@@ -1673,210 +1326,524 @@ write_next:
 
 /*
  * --INFO--
- * PAL Address: 0x8012a5d0
- * PAL Size: 36b
+ * PAL Address: 0x801290a0
+ * PAL Size: 44b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-static void GbaThreadAlarmHandler(OSAlarm* alarm, OSContext*)
+static void _GbaThreadMain(void* param)
 {
-    OSResumeThread(reinterpret_cast<MiniGameAlarm*>(alarm)->thread);
+    MiniGamePcs.GbaThreadMain(param);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012a5f4
- * PAL Size: 1236b
+ * PAL Address: 0x80128ccc
+ * PAL Size: 980b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode)
+void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
 {
-    MgGbaContext* gbaContext = &m_gbaContexts[param->m_channel];
+    int doWrite = 1;
+    unsigned char swapByte;
+    int swapWord;
+    unsigned int baseTick;
+    int wasResync = 0;
 
-    memset(gbaContext, 0, sizeof(MgGbaContext));
-    if (initMode == 0)
+    if (param->m_connected != 0)
     {
-        gbaContext->m_initialConnect = 1;
+        System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), static_cast<int>(param->m_channel), 0x3E1);
+    }
+    param->m_connected = 0;
+    param->m_connectionReset = 0;
+    param->m_result = 3;
+    baseTick = param->m_context.m_tick;
+    param->m_context.m_tick = m_gbaContexts[param->m_channel].m_tick;
+
+    if (param->m_context.m_initialConnect == 0)
+    {
+        if (param->m_context.m_initialized == 0)
+        {
+            GbaThreadInitGbaContext(param, 1);
+            m_gbaContexts[param->m_channel].m_portId = param->m_context.m_portId;
+            m_gbaContexts[param->m_channel].m_transferId = param->m_context.m_transferId;
+            param->m_lastTick = OSGetTick();
+            m_gbaContexts[param->m_channel].m_tick = param->m_lastTick;
+
+            if (param->m_connected != 0)
+            {
+                System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), static_cast<int>(param->m_channel), 0x3FC);
+            }
+            System.Printf(const_cast<char*>(s_miniGameSetPortFmt), static_cast<int>(param->m_channel), MG_GBA_THREAD_MSG_SETPORT_ct);
+            OSSendMessage(&param->m_queue, reinterpret_cast<OSMessage>(5), 1);
+        }
+        else
+        {
+            int compareResult = memcmp(&param->m_context, &m_gbaContexts[param->m_channel], 0x60);
+            if (compareResult == 0)
+            {
+                unsigned int savedTick = m_gbaContexts[param->m_channel].m_tick;
+                if (baseTick == savedTick || baseTick == param->m_lastTick)
+                {
+                    m_gbaContexts[param->m_channel].m_tick = baseTick;
+                    param->m_lastTick = baseTick;
+                    doWrite = 0;
+                }
+            }
+            if (doWrite)
+            {
+                wasResync = 1;
+                OSSendMessage(&param->m_queue, reinterpret_cast<OSMessage>(4), 1);
+            }
+        }
+    }
+    else
+    {
+        swapByte = param->m_context.m_portId;
+
+        param->m_context.m_portId = m_gbaContexts[param->m_channel].m_portId;
+        swapWord = param->m_context.m_transferId;
+        param->m_context.m_transferId = m_gbaContexts[param->m_channel].m_transferId;
+
+        int compareResult = memcmp(&param->m_context, &m_gbaContexts[param->m_channel], 0x60);
+        if (compareResult == 0)
+        {
+            unsigned int savedTick = m_gbaContexts[param->m_channel].m_tick;
+            if (baseTick == savedTick || baseTick == param->m_lastTick)
+            {
+                m_gbaContexts[param->m_channel].m_tick = baseTick;
+                param->m_lastTick = baseTick;
+                m_gbaContexts[param->m_channel].m_portId = swapByte;
+                m_gbaContexts[param->m_channel].m_transferId = swapWord;
+                doWrite = 0;
+            }
+        }
+        if (doWrite)
+        {
+            OSSendMessage(&param->m_queue, reinterpret_cast<OSMessage>(3), 1);
+        }
     }
 
-    gbaContext->m_channel = param->m_channel;
-    gbaContext->m_initialized = 1;
-    gbaContext->m_sessionId = m_sessionId;
-    gbaContext->m_managerMode = m_managerMode;
-    gbaContext->m_playerMask = m_playerMask;
+    if ((!doWrite || wasResync) && GBAGetStatus(static_cast<int>(param->m_channel), &param->m_status) == 0 && param->m_status == 0x30u)
+    {
+        unsigned int sendTick;
+        int readTick;
+        int readStatus;
 
-    getKoubutsuList(gbaContext->m_foodLevels[0], 0);
-    getKoubutsuList(gbaContext->m_foodLevels[1], 1);
-    getKoubutsuList(gbaContext->m_foodLevels[2], 2);
-    getKoubutsuList(gbaContext->m_foodLevels[3], 3);
+        if (wasResync)
+        {
+            sendTick = baseTick;
+        }
+        else
+        {
+            sendTick = OSGetTick();
+            m_gbaContexts[param->m_channel].m_tick = sendTick;
+        }
+
+        if (GBAWrite(static_cast<int>(param->m_channel), reinterpret_cast<u8*>(&sendTick), &param->m_status) == 0 &&
+            (param->m_status & 0x30) == 0x30 &&
+            GBAGetStatus(static_cast<int>(param->m_channel), &param->m_status) == 0 && param->m_status == 0x38u &&
+            (readStatus = GBARead(static_cast<int>(param->m_channel), reinterpret_cast<u8*>(&readTick), &param->m_status), !wasResync) &&
+            readStatus == 0 &&
+            sendTick == readTick && (param->m_status & 0x30) == 0x30)
+        {
+            param->m_lastTick = sendTick;
+            param->m_connected = 1;
+            param->m_bootRetries = 0;
+            param->m_connectionReady = 1;
+            param->m_result = 0;
+        }
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::GbaThreadWriteInitialCode(MgGbaThreadParam*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::GbaThreadReadContext(MgGbaThreadParam*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012aac8
- * PAL Size: 1492b
+ * PAL Address: 0x801287f0
+ * PAL Size: 1244b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
+
+void CMiniGamePcs::calc()
 {
-    EndThread();
+    switch (m_managerState) {
+    case 1:
+        Joybus.ExitThread();
+        m_managerState = 2;
+    case 2:
+        if (!Joybus.IsThreadRunning())
+        {
+            char managerFile[256];
+            char managerSpFile[256];
 
-    m_miniGameParams[0] = -1;
-    m_miniGameParams[1] = -1;
-    m_miniGameParams[2] = -1;
-    m_miniGameParams[3] = -1;
-    m_miniGameFailed = 0;
-    m_raceEnded = 0;
-    m_continueRequested = 0;
-    m_statusCode = 0;
-    m_miniGameReady = 0;
+            sprintf(managerFile, s_miniGameManagerFileFmt, s_miniGameManagerDir, m_managerIndex);
+            sprintf(managerSpFile, s_miniGameManagerSpFileFmt, s_miniGameManagerDir, m_managerIndex);
 
-    m_managerImage =
-        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1) unsigned char[0x40000];
-    m_managerSpImage =
-        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2) unsigned char[0x40000];
+            if ((unsigned int)System.m_execParam >= 3)
+            {
+                System.Printf(const_cast<char*>(s_miniGameFileInfoFmt), managerFile, managerSpFile);
+            }
 
-    m_sessionId = OSGetTick();
-    *reinterpret_cast<unsigned int*>(m_managerImage + 200) = m_sessionId;
-    *reinterpret_cast<unsigned int*>(m_managerSpImage + 200) = m_sessionId;
+            MiniGameGo(managerFile, managerSpFile);
+            m_managerState = 3;
+        }
 
-    strncpy(m_managerTag, s_miniGameManagerTag, 4);
+        break;
+    case 3:
+        if (m_raceEnded != 0)
+        {
+            System.Printf(const_cast<char*>(s_miniGameRaceHeader));
+            for (int i = 0; i < 4; i++)
+            {
+                System.Printf(const_cast<char*>(s_miniGameRaceResultFmt), i + 1, static_cast<int>(m_miniGameParams[i]));
+            }
+            System.Printf(const_cast<char*>(s_miniGameSeparator));
 
-    MiniGameFileRead(managerFilePath, m_managerImage, m_managerImageSize);
-    AdjustGbaImageRegistry(reinterpret_cast<char*>(m_managerImage), m_managerTag);
-    MiniGameFileRead(managerSpFilePath, m_managerSpImage, m_managerSpImageSize);
-    AdjustGbaImageRegistry(reinterpret_cast<char*>(m_managerSpImage), m_managerTag);
+            CallMiniGameParam(0x3000, 0, 0);
+            m_raceEnded = 0;
+        }
 
-    u8 gbaStatus[8];
-    GBAReset(0, gbaStatus);
+        if (m_continueRequested != 0)
+        {
+            m_miniGameParams[0] = -1;
+            m_miniGameParams[1] = -1;
+            m_miniGameParams[2] = -1;
+            m_miniGameParams[3] = -1;
+            if ((unsigned int)System.m_execParam >= 3)
+            {
+                System.Printf(const_cast<char*>(s_miniGameContinueText));
+            }
 
-    memset(&m_managerThread, 0, sizeof(m_managerThread));
-    memset(&m_managerQueue, 0, sizeof(m_managerQueue));
-    memset(&m_managerMessage, 0, sizeof(m_managerMessage));
-    OSInitMessageQueue(&m_managerQueue, &m_managerMessage, 1);
-    OSCreateThread(&m_managerThread,
-                   reinterpret_cast<void* (*)(void*)>(_MngThreadMain), 0,
-                   m_managerStack + sizeof(m_managerStack), sizeof(m_managerStack), 8, 1);
-    OSResumeThread(&m_managerThread);
+            CallMiniGameParam(0x3002, 0, 0);
+            m_continueRequested = 0;
+        }
+
+        if (m_miniGameFailed == 0)
+        {
+            return;
+        }
+
+        if (1 <= (unsigned int)System.m_execParam)
+        {
+            System.Printf(const_cast<char*>(s_miniGameMgrEndStartText));
+        }
+
+        CallMiniGameParam(0x3001, 0, 0);
+
+        if (1 <= (unsigned int)System.m_execParam)
+        {
+            System.Printf(const_cast<char*>(s_miniGameMgrEndEndText));
+        }
+
+        MiniGameEnd();
+
+        if (1 <= (unsigned int)System.m_execParam)
+        {
+            System.Printf(g_MsgFlashy);
+        }
+
+        if (1 <= (unsigned int)System.m_execParam)
+        {
+            System.Printf(const_cast<char*>(s_miniGameEndBannerText));
+        }
+
+        if (1 <= (unsigned int)System.m_execParam)
+        {
+            System.Printf(g_MsgFlashy);
+        }
+
+        m_miniGameFailed = 0;
+        m_managerState = 0;
+        break;
+    case 0:
+    default:
+        break;
+    }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012b09c
- * PAL Size: 52b
+ * PAL Address: 0x801285a0
+ * PAL Size: 592b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-static void _OpenCallback(MgGbaThreadParam* param, void* context)
+void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
 {
-    MiniGamePcs.OpenCallback(param, context);
+    unsigned int rawPadCode = padCode;
+    unsigned short codeType = rawPadCode & 0x7F00;
+
+    switch (codeType) {
+    case GBA_PADCODE_RACE_RESULT:
+        if (1 <= (unsigned int)System.m_execParam) {
+            System.Printf(g_MsgFlashy);
+        }
+        if (1 <= (unsigned int)System.m_execParam) {
+            System.Printf(const_cast<char*>(s_miniGamePadRaceResultFmt), player, rawPadCode & 0xFF);
+        }
+        if (1 <= (unsigned int)System.m_execParam) {
+            System.Printf(g_MsgFlashy);
+        }
+        m_miniGameParams[player] = static_cast<signed char>(rawPadCode);
+        break;
+    case GBA_PADCODE_RACE_END:
+        if (1 <= (unsigned int)System.m_execParam) {
+            System.Printf(g_MsgFlashy);
+        }
+        if (1 <= (unsigned int)System.m_execParam) {
+            System.Printf(const_cast<char*>(s_miniGamePadRaceEndText));
+        }
+        if (1 <= (unsigned int)System.m_execParam) {
+            System.Printf(g_MsgFlashy);
+        }
+        m_raceEnded = 1;
+        break;
+    case GBA_PADCODE_MGR_END:
+        if (1 <= (unsigned int)System.m_execParam) {
+            System.Printf(g_MsgFlashy);
+        }
+        if (1 <= (unsigned int)System.m_execParam) {
+            System.Printf(const_cast<char*>(s_miniGamePadMgrEndText));
+        }
+        if (1 <= (unsigned int)System.m_execParam) {
+            System.Printf(g_MsgFlashy);
+        }
+        m_miniGameFailed = 1;
+        break;
+    case GBA_PADCODE_MGR_CONTINUE:
+        if (1 <= (unsigned int)System.m_execParam) {
+            System.Printf(g_MsgFlashy);
+        }
+        if (1 <= (unsigned int)System.m_execParam) {
+            System.Printf(const_cast<char*>(s_miniGamePadMgrContinueText));
+        }
+        if (1 <= (unsigned int)System.m_execParam) {
+            System.Printf(g_MsgFlashy);
+        }
+        m_continueRequested = 1;
+        break;
+    }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012b0d0
- * PAL Size: 4b
+ * PAL Address: 0x80128574
+ * PAL Size: 44b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMiniGamePcs::destroy()
+static void _MngThreadMain(void* param)
 {
-    return;
+    MiniGamePcs.MngThreadMain(param);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012b0d4
- * PAL Size: 172b
+ * PAL Address: 0x80127b74
+ * PAL Size: 2560b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMiniGamePcs::create()
+void CMiniGamePcs::MngThreadMain(void*)
 {
-    m_managerState = 0;
-    m_managerIndex = 0;
-    m_managerImage = 0;
-    m_managerSpImage = 0;
-    m_managerMode = 0;
-    m_playerMask = 0xF;
-    m_managerThreadStop = 0;
-    SetNumPlayer();
-}
+    for (int i = 0; i <= 3; i++)
+    {
+        int mode = Game.m_gameWork.m_spModeFlags[i];
+        unsigned long imageSize = mode == 0 ? m_managerImageSize : m_managerSpImageSize;
+        unsigned char* image = mode == 0 ? m_managerImage : m_managerSpImage;
+        GbaThreadInit(i, &m_gbaParams[i], &m_gbaThreads[i], &m_gbaStack[i * 0x1000 + 0x1000],
+                      0x1000, 7, _OpenCallback, image, imageSize);
+    }
 
-/*
- * --INFO--
- * PAL Address: 0x8012b180
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMiniGamePcs::Quit()
-{
-    return;
-}
+    OSTime startTime = OSGetTime();
+    unsigned int loopCounter = 0;
 
-/*
- * --INFO--
- * PAL Address: 0x8012b184
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMiniGamePcs::Init()
-{
-    return;
-}
+    while (true)
+    {
+        GbaThreadSleep(OSMillisecondsToTicks(1));
 
-/*
- * --INFO--
- * PAL Address: 0x8012b188
- * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMiniGamePcs::GetTable(unsigned long index)
-{
-    return reinterpret_cast<int>(&m_table + index);
+        if (m_managerThreadStop != 0)
+        {
+            m_workerStoppedMask = 0;
+
+            for (int i = 0; i <= 3; i++)
+            {
+                GbaThreadSleep(OSMillisecondsToTicks(100));
+
+                OSSendMessage(&m_gbaParams[i].m_queue, reinterpret_cast<OSMessage>(1), 1);
+            }
+
+            GbaThreadSleep(OSMillisecondsToTicks(200));
+
+            while (m_workerStoppedMask != 0x0F)
+            {
+                GbaThreadSleep(OSMillisecondsToTicks(100));
+            }
+
+            do
+            {
+                int count = 0;
+                for (;;)
+                {
+                    if (OSIsThreadTerminated(&m_gbaThreads[count]) == 0)
+                    {
+                        break;
+                    }
+                    count++;
+                    if (count > 3)
+                    {
+                        GbaThreadSleep(OSMillisecondsToTicks(100));
+
+                        m_managerThreadStop = 0;
+                        OSExitThread(0);
+                        return;
+                    }
+                }
+            } while (true);
+        }
+
+        if (m_playerMask != 0)
+        {
+            int i;
+            unsigned char successMask;
+
+            successMask = 0;
+            i = 0;
+            do
+            {
+                if ((m_playerMask & (1 << i)) != 0 && m_gbaParams[i].m_busy == 0)
+                {
+                    if (m_gbaParams[i].m_deviceType == 0x40000)
+                    {
+                        switch ((s32)m_gbaParams[i].m_result)
+                        {
+                        case 0:
+                            if (m_gbaParams[i].m_connected == 0)
+                            {
+                                if (m_gbaParams[i].m_connectionReset != 0)
+                                {
+                                    goto disconnect_player;
+                                }
+                                m_statusCode = 0;
+                                if (i == -1)
+                                {
+                                    OSSendMessage(&m_gbaParams[i].m_queue, reinterpret_cast<OSMessage>(8), 1);
+                                }
+                                else
+                                {
+                                    OSSendMessage(&m_gbaParams[i].m_queue, reinterpret_cast<OSMessage>(7), 1);
+                                }
+                            }
+                            else if (m_gbaParams[i].m_connectionReady != 0)
+                            {
+                                m_gbaParams[i].m_connectionReset = 1;
+                                m_playerMessageReady[i] = 1;
+                                m_receivedWords[i] = 0;
+                                successMask |= (1 << i);
+                            }
+                            else if (m_gbaParams[i].m_transferComplete != 0)
+                            {
+                                unsigned int crc = CalcCrc(m_gbaParams[i].m_receivedPacket);
+                                if ((m_gbaParams[i].m_receivedPacket & 0xFF) == (crc & 0xFF))
+                                {
+                                    m_playerMessageReady[i] = m_gbaParams[i].m_transferComplete;
+                                    successMask |= (1 << i);
+                                    m_receivedWords[i] = m_gbaParams[i].m_receivedPacket & 0xFFFF00;
+                                }
+                            }
+                            break;
+                        case 3:
+                            m_gbaParams[i].m_deviceType = 0;
+                            break;
+                        default:
+                            m_gbaParams[i].m_deviceType = 0;
+                            break;
+                        }
+                    }
+                    else if (m_gbaParams[i].m_deviceType == 0 || (int)(loopCounter & 0x1F) == 0)
+                    {
+                        OSTime now = OSGetTime();
+                        if ((s64)(now - startTime) > (s64)OSMillisecondsToTicks(5000))
+                        {
+disconnect_player:
+                            if ((m_playerMask & (1 << i)) != 0)
+                            {
+                                m_playerMask = static_cast<unsigned char>(m_playerMask & ~(1 << i));
+                                if (m_playerMask == 0)
+                                {
+                                    m_miniGameFailed = 1;
+                                    goto next_player;
+                                }
+                                m_playerMessageReady[i] = 1;
+                                m_receivedWords[i] = 0x40000000;
+                                m_receivedWords[i] |= 0x12000;
+                                unsigned long crc = CalcCrc(m_receivedWords[i]);
+                                m_receivedWords[i] |= crc & 0xFF;
+                            }
+                        }
+                        OSSendMessage(&m_gbaParams[i].m_queue, reinterpret_cast<OSMessage>(6), 1);
+                    }
+                }
+next_player:
+                i++;
+            } while (i <= 3);
+
+            if (successMask == (m_playerMask & 0xF))
+            {
+                m_miniGameReady = 1;
+                i = 0;
+                do
+                {
+                    unsigned int word = m_receivedWords[i];
+                    unsigned int masked = word & 0xFFFF00;
+                    if ((word & 0x8000) != 0)
+                    {
+                        PadCodeProc(i, ChgHL16(masked >> 8));
+                    }
+                    m_broadcastWords[i] = (i + 0x40) * 0x1000000;
+                    m_broadcastWords[i] |= masked;
+                    m_broadcastWords[i] |= CalcCrc(m_broadcastWords[i]) & 0xFF;
+                    i++;
+                } while (i < 4);
+
+                m_broadcastWords[4] = 0x44000000;
+                m_broadcastWords[4] |= ChgHL16(m_statusCode) << 8;
+                m_broadcastWords[4] |= CalcCrc(m_broadcastWords[4]) & 0xFF;
+                i = 0;
+                do
+                {
+                    if ((successMask & (1U << i)) != 0)
+                    {
+                        m_gbaParams[i].m_connectionReady = 0;
+                        memcpy(m_gbaParams[i].m_sendPackets, m_broadcastWords, sizeof(m_broadcastWords));
+                        OSSendMessage(&m_gbaParams[i].m_queue, reinterpret_cast<OSMessage>(10), 1);
+                    }
+                    i++;
+                } while (i < 4);
+
+                m_statusCode = static_cast<short>(m_statusCode + 1);
+                if (0x0FFF <= m_statusCode)
+                {
+                    m_statusCode = 0x0FFF;
+                }
+            }
+        }
+
+        loopCounter += 1;
+    }
 }
 
 #pragma pool_data off

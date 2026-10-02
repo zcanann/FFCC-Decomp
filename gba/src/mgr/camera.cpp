@@ -1,4 +1,3 @@
-extern "C" {
 #include "global.h"
 #include "main.h"
 #include "obj.h"
@@ -15,89 +14,89 @@ static inline s32 IsActive(u16 no)
 
 struct Camera gCamera;
 
-void Camera_Init(struct Camera *cam)
+void Camera::Init()
 {
-    cam->pos.x = cam->pos.y = cam->pos.z = 0;
-    cam->yaw = 0;
-    cam->scaleX = cam->scaleY = 0x180;
-    cam->centerX = 120;
-    cam->centerY = 80;
-    cam->focal = 240;
-    Camera_SetPitch(cam, 0xF600);
+    pos.x = pos.y = pos.z = 0;
+    yaw = 0;
+    scaleX = scaleY = 0x180;
+    centerX = 120;
+    centerY = 80;
+    focal = 240;
+    SetPitch(0xF600);
 }
 
-void Camera_Update(struct Camera *cam)
+void Camera::Update()
 {
     u16 keys = REG_KEYINPUT ^ KEY_MASK;
     struct Actor *p;
     u8 state;
 
-    cam->pressed = keys & ~cam->held;
-    cam->held = keys;
-    if (cam->pressed & SELECT_BUTTON) {
+    pressed = keys & ~held;
+    held = keys;
+    if (pressed & SELECT_BUTTON) {
         for (;;) {
-            cam->player++;
-            if (cam->player >= *(vu8 *)&gGame.enemyCount + 4)
-                cam->player = 0;
-            if (cam->player > 3 || IsActive(cam->player))
+            player++;
+            if (player >= *(vu8 *)&gGame.enemyCount + 4)
+                player = 0;
+            if (player > 3 || IsActive(player))
                 break;
         }
     }
     state = gMain.state;
     if (state > STATE_SELECT) {
         if (state <= STATE_RACE) {
-            Camera_Follow(cam, &gGame.actors[cam->player].pos, gGame.actors[cam->player].heading, -2000, 0);
+            Follow(&gGame.actors[player].pos, gGame.actors[player].heading, -2000, 0);
             return;
         }
     }
     if (gMain.state > STATE_RACE) {
-        cam->yaw += 364;
-        p = &gGame.actors[cam->player];
-        if (cam->held & R_BUTTON)
-            Camera_Follow(cam, &p->pos, p->heading, -2000, 0);
+        yaw += 364;
+        p = &gGame.actors[player];
+        if (held & R_BUTTON)
+            Follow(&p->pos, p->heading, -2000, 0);
         else
-            Camera_Follow(cam, &p->pos, cam->yaw, -2000, 0);
+            Follow(&p->pos, yaw, -2000, 0);
     }
 }
 
-void Camera_Follow(struct Camera *cam, struct Vec3 *target, u16 yaw, s16 dist, u8 near)
+void Camera::Follow(struct Vec3 *at, u16 angle, s16 distance, u8 near)
 {
-    cam->target = *target;
-    cam->target.y = 0;
-    if (cam->held & R_BUTTON)
-        yaw += 0x8000;
-    cam->yaw = yaw;
-    cam->yawSin = gSinTable[yaw >> 5];
-    cam->yawCos = gSinTable[(cam->yaw >> 5) + 512];
-    yaw = -cam->yaw;
-    cam->yawSin2 = gSinTable[yaw >> 5];
-    cam->yawCos2 = gSinTable[(yaw >> 5) + 512];
+    target = *at;
+    target.y = 0;
+    if (held & R_BUTTON)
+        angle += 0x8000;
+    yaw = angle;
+    yawSin = gSinTable[angle >> 5];
+    yawCos = gSinTable[(yaw >> 5) + 512];
+    angle = -yaw;
+    yawSin2 = gSinTable[angle >> 5];
+    yawCos2 = gSinTable[(angle >> 5) + 512];
     if (near) {
-        cam->dist = dist;
-        cam->height = 70;
+        dist = distance;
+        height = 70;
     } else {
-        cam->dist = dist;
-        cam->height = 280;
+        dist = distance;
+        height = 280;
     }
-    cam->pos.x = cam->target.x + ((cam->dist * cam->yawSin) >> 8);
-    cam->pos.y = cam->target.y + cam->height;
-    cam->pos.z = cam->target.z + ((cam->dist * cam->yawCos) >> 8);
-    cam->eye.x = 0;
-    cam->eye.y = cam->height;
-    cam->eye.z = cam->dist;
-    cam->bgX = -(cam->yawSin << 9) + 0x20000;
-    cam->bgY = 0x20000 - cam->yawCos * 512;
-    cam->originX = cam->pos.x + cam->yawSin * 32;
-    cam->originZ = cam->pos.z + cam->yawCos * 32;
+    pos.x = target.x + ((dist * yawSin) >> 8);
+    pos.y = target.y + height;
+    pos.z = target.z + ((dist * yawCos) >> 8);
+    eye.x = 0;
+    eye.y = height;
+    eye.z = dist;
+    bgX = -(yawSin << 9) + 0x20000;
+    bgY = 0x20000 - yawCos * 512;
+    originX = pos.x + yawSin * 32;
+    originZ = pos.z + yawCos * 32;
 }
 
-void Camera_SetPitch(struct Camera *cam, u16 pitch)
+void Camera::SetPitch(u16 angle)
 {
-    cam->pitch = pitch;
-    cam->pitchSin = gSinTable[pitch >> 5];
-    cam->pitchCos = gSinTable[(pitch >> 5) + 512];
-    cam->pitchSin2 = gSinTable[(u16)-pitch >> 5];
-    cam->pitchCos2 = gSinTable[((u16)-pitch >> 5) + 512];
+    pitch = angle;
+    pitchSin = gSinTable[angle >> 5];
+    pitchCos = gSinTable[(angle >> 5) + 512];
+    pitchSin2 = gSinTable[(u16)-angle >> 5];
+    pitchCos2 = gSinTable[((u16)-angle >> 5) + 512];
     Floor_BuildDepths(&gField);
 }
 
@@ -108,14 +107,14 @@ static inline void RotateY(struct Camera *cam, struct Vec3 *in, struct Vec3 *out
     out->z = (cam->yawSin2 * in->x + cam->yawCos2 * in->z) >> 8;
 }
 
-void Camera_Rotate(struct Camera *cam, struct Vec3 *in, struct Vec3 *out)
+void Camera::Rotate(struct Vec3 *in, struct Vec3 *out)
 {
     struct Vec3 tmp[1];
 
     tmp->x = in->x;
-    tmp->y = (cam->pitchCos2 * in->y - cam->pitchSin2 * in->z) >> 8;
-    tmp->z = (cam->pitchSin2 * in->y + cam->pitchCos2 * in->z) >> 8;
-    RotateY(cam, tmp, out);
+    tmp->y = (pitchCos2 * in->y - pitchSin2 * in->z) >> 8;
+    tmp->z = (pitchSin2 * in->y + pitchCos2 * in->z) >> 8;
+    RotateY(this, tmp, out);
 }
 
 static inline void AddVec(struct Vec3 *out, struct Vec3 *a, struct Vec3 *b)
@@ -125,54 +124,53 @@ static inline void AddVec(struct Vec3 *out, struct Vec3 *a, struct Vec3 *b)
     out->z = a->z + b->z;
 }
 
-void Camera_ViewToWorld(struct Camera *cam, struct Vec3 *in, struct Vec3 *out)
+void Camera::ViewToWorld(struct Vec3 *in, struct Vec3 *out)
 {
-    struct Vec3 *eye = &cam->eye;
+    struct Vec3 *ofs = &eye;
     struct Vec3 tmp[1];
     struct Vec3 v;
 
-    tmp->x = in->x + eye->x;
-    tmp->y = in->y + eye->y;
-    tmp->z = in->z + eye->z;
+    tmp->x = in->x + ofs->x;
+    tmp->y = in->y + ofs->y;
+    tmp->z = in->z + ofs->z;
     v = *tmp;
-    Camera_Rotate(cam, &v, out);
-    AddVec(out, out, &cam->target);
+    Rotate(&v, out);
+    AddVec(out, out, &target);
 }
 
-void Camera_ScreenToView(struct Camera *cam, struct Vec3 *in, struct Vec3 *out)
+void Camera::ScreenToView(struct Vec3 *in, struct Vec3 *out)
 {
-    out->x = in->z * (in->x - cam->centerX) / cam->focal;
-    out->y = in->z * (cam->centerY - in->y) / cam->focal;
+    out->x = in->z * (in->x - centerX) / focal;
+    out->y = in->z * (centerY - in->y) / focal;
     out->z = in->z;
 }
 
-u8 Camera_WorldToScreen(struct Camera *cam, struct Vec3 *in, struct Vec3 *out)
+u8 Camera::WorldToScreen(struct Vec3 *in, struct Vec3 *out)
 {
-    s16 dx = in->x - cam->target.x;
-    s16 dy = in->y - cam->target.y;
-    s16 dz = in->z - cam->target.z;
+    s16 dx = in->x - target.x;
+    s16 dy = in->y - target.y;
+    s16 dz = in->z - target.z;
     s16 t;
 
-    t = (cam->yawSin * dx + cam->yawCos * dz) >> 8;
-    out->z = ((cam->pitchSin * dy + cam->pitchCos * t) >> 8) - cam->eye.z;
+    t = (yawSin * dx + yawCos * dz) >> 8;
+    out->z = ((pitchSin * dy + pitchCos * t) >> 8) - eye.z;
     if (out->z <= 0x400 || out->z >= 0x3000)
         return 0;
-    out->x = ((dx * cam->yawCos - dz * cam->yawSin) >> 8) - cam->eye.x;
+    out->x = ((dx * yawCos - dz * yawSin) >> 8) - eye.x;
     if (out->x >= out->z || out->x <= -out->z)
         return 0;
-    out->y = ((cam->pitchCos * dy - cam->pitchSin * t) >> 8) - cam->eye.y;
+    out->y = ((pitchCos * dy - pitchSin * t) >> 8) - eye.y;
     if (out->y >= out->z || out->y <= -out->z)
         return 0;
-    out->x = cam->centerX + out->x * cam->focal / out->z;
-    out->y = cam->centerY - out->y * cam->focal / out->z;
+    out->x = centerX + out->x * focal / out->z;
+    out->y = centerY - out->y * focal / out->z;
     return 1;
 }
 
-void Camera_ScreenToWorld(struct Camera *cam, struct Vec3 *in, struct Vec3 *out)
+void Camera::ScreenToWorld(struct Vec3 *in, struct Vec3 *out)
 {
     struct Vec3 tmp;
 
-    Camera_ScreenToView(cam, in, &tmp);
-    Camera_ViewToWorld(cam, &tmp, out);
-}
+    ScreenToView(in, &tmp);
+    ViewToWorld(&tmp, out);
 }

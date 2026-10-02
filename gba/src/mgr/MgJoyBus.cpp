@@ -1,4 +1,3 @@
-extern "C" {
 #include "global.h"
 #include "main.h"
 #include "MgJoyBus.h"
@@ -522,5 +521,4 @@ void Link_BuildPadPacket(void)
     }
     if (gLinkSynced)
         gLinkFrameCount++;
-}
 }

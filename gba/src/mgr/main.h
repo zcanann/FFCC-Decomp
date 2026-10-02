@@ -94,7 +94,8 @@ extern const IntrFunc IntrTable[];
 void WaitFrames(u32 frames);
 void DebugPrintf(const char *fmt, ...);
 void UpdateSound(void);
-void AgbMain(void);
+/* Entry point, called from crt0 */
+extern "C" void AgbMain(void);
 void VBlankIntr(void);
 void VCountIntr(void);
 void IntrDummy(void);

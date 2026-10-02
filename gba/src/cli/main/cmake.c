@@ -40,8 +40,6 @@ char *gNameCharTables[] = {
 };
 
 const s8 sDaysInMonth[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-const char sDigitText[] = "0";
-const char sCommaText[] = ",";
 
 void CMakeNameScreen_DrawCursor(void);
 s32 CMakeNameScreen_HandleInput(void);
@@ -1213,7 +1211,7 @@ void CMakeBirthdayScreen_PrintDate(void)
     Text_SetFill(0, 0);
     Text_Clear();
     for (i = 0; i <= 2; i++) {
-        *(u16 *)str = *(const u16 *)sDigitText;
+        strcpy(str, "0");
         if (i <= 1) {
             digit = (s8)(sCMakeBirthday[i] / 10);
             if (digit != 0) {
@@ -2212,7 +2210,7 @@ void CMakeConfirmScreen_PrintNextRow(void)
         } else if (sCMakeTextRow == 2) {
             n = gCMakeData.look & 3;
             strcpy(buf, Msg_GetTribe(n));
-            strcat(buf, sCommaText);
+            strcat(buf, ",");
             Text_Print(buf, TEXT_DRAW);
             Text_AddX(8);
             idx = n * 8;

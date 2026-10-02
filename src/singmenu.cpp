@@ -2206,7 +2206,7 @@ void CMenuPcs::SingleCalcCtrl()
         if (proc == 0) {
             result = CompaOpen();
         } else if (proc == 1) {
-            CompaCtrl();
+            result = CompaCtrl();
         } else {
             result = CompaClose();
         }

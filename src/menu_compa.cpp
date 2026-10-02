@@ -39,27 +39,52 @@ STATIC_ASSERT(sizeof(CompaOpenAnimList) == 0x1008);
  */
 void CMenuPcs::CompaDraw()
 {
-	int i;
-	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
+	CCaravanWork* caravanWork;
 	GXColor colors[4];
 	CompaOpenAnimList* compaList;
+	CFont* font;
 	int familyCount;
 	int yStep;
 	float end;
 	float fillW;
-	CompaOpenAnim* entry = this->m_compaList->entries;
+	int tex;
+	float x;
+	float y;
+	float w;
+	float h;
+	float u;
+	float v;
+	int tileH;
+	float alpha;
+	float rowY;
+	int drawIndex;
+	int shown;
+	int i;
+	float iconX;
+	float iconY;
+	int scan;
+	const u8* foodPtr;
+	CompaOpenAnim* entry;
+	int icon;
+	const char* name;
+	const char* value;
+	const char* job;
+	float jobY;
+
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+	caravanWork = Game.m_scriptFoodBase[0];
+	entry = this->m_compaList->entries;
 	for (i = 0; i < this->m_compaList->count; i++) {
-		int tex = entry->tex;
+		tex = entry->tex;
 		if (tex >= 0) {
-			float x = static_cast<float>(entry->x);
-			float y = static_cast<float>(entry->y);
-			float w = static_cast<float>(entry->w);
-			float h = static_cast<float>(entry->h);
-			float u = entry->u;
-			float v = entry->v;
+			x = static_cast<float>(entry->x);
+			y = static_cast<float>(entry->y);
+			w = static_cast<float>(entry->w);
+			h = static_cast<float>(entry->h);
+			u = entry->u;
+			v = entry->v;
 
 			if (i < 3) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
@@ -79,11 +104,7 @@ void CMenuPcs::CompaDraw()
 						yStep = static_cast<int>(y);
 						end = y + h;
 						while (static_cast<float>(yStep) < end) {
-							float diff = end - static_cast<float>(yStep);
-							int tileH = static_cast<int>(diff);
-							if (diff >= kCompaTileHeight) {
-								tileH = 0x18;
-							}
+							tileH = (end - static_cast<float>(yStep) >= kCompaTileHeight) ? 0x18 : static_cast<int>(end - static_cast<float>(yStep));
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								fillW, static_cast<float>(tileH), u, v,
@@ -114,11 +135,7 @@ void CMenuPcs::CompaDraw()
 						yStep = static_cast<int>(y);
 						end = y + h;
 						while (static_cast<float>(yStep) < end) {
-							float diff = end - static_cast<float>(yStep);
-							int tileH = static_cast<int>(diff);
-							if (diff >= kCompaTileHeight) {
-								tileH = 0x18;
-							}
+							tileH = (end - static_cast<float>(yStep) >= kCompaTileHeight) ? 0x18 : static_cast<int>(end - static_cast<float>(yStep));
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								fillW, static_cast<float>(tileH), u, v,
@@ -134,7 +151,7 @@ void CMenuPcs::CompaDraw()
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			} else {
-				float alpha = entry->alpha;
+				alpha = entry->alpha;
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
@@ -169,9 +186,8 @@ void CMenuPcs::CompaDraw()
 		familyCount = 4;
 	}
 
-	int yOffset;
 	for (i = 0; i < familyCount; i++) {
-		float rowY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(i * 0x28);
+		rowY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(i * 0x28);
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
@@ -180,15 +196,14 @@ void CMenuPcs::CompaDraw()
 			kCompaOne, kCompaZero);
 	}
 
-	int drawIndex = 0;
-	int shown = 0;
-	yOffset = drawIndex * 0x28;
+	drawIndex = 0;
+	shown = 0;
 	for (i = shown; i < 8 && shown < familyCount; i++) {
-		float iconX = static_cast<float>(compaList->entries[0].x + 0x128);
-		float iconY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(yOffset);
+		iconX = static_cast<float>(compaList->entries[0].x + 0x128);
+		iconY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(shown * 0x28);
 
 		if (i >= 2) {
-			int scan = drawIndex;
+			scan = drawIndex;
 			for (; scan < 7; scan++) {
 				if (caravanWork->m_evtWordArr[19 + scan] != 0) {
 					drawIndex = scan;
@@ -202,13 +217,12 @@ void CMenuPcs::CompaDraw()
 			drawIndex = i;
 		}
 
-		const u8* foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][1 + drawIndex];
+		foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][1 + drawIndex];
 		if (*foodPtr == 0 && static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1E0,
 			              shown);
 		}
 		unsigned int food = *foodPtr;
-		int icon;
 		if (food <= 0x14) {
 			icon = 0x21;
 		} else if (food <= 0x28) {
@@ -227,12 +241,11 @@ void CMenuPcs::CompaDraw()
 			static_cast<int>(iconY),
 			compaList->entries[0].alpha, 1, kCompaOne);
 
-		yOffset += 0x28;
 		shown++;
 		drawIndex++;
 	}
 
-	CFont* font = m_fonts[4];
+	font = m_fonts[4];
 	compaList = this->m_compaList;
 	font->SetMargin(kCompaOne);
 	font->SetShadow(0);
@@ -245,10 +258,9 @@ void CMenuPcs::CompaDraw()
 	caravanWork = Game.m_scriptFoodBase[0];
 	drawIndex = 0;
 	shown = 0;
-	yOffset = drawIndex * 0x28;
 	for (i = shown; i < 8 && shown < familyCount; i++) {
 		if (i >= 2) {
-			int scan = drawIndex;
+			scan = drawIndex;
 			for (; scan < 7; scan++) {
 				if (caravanWork->m_evtWordArr[19 + scan] > 0) {
 					drawIndex = scan;
@@ -262,20 +274,19 @@ void CMenuPcs::CompaDraw()
 			drawIndex = i;
 		}
 
-		const char* name = GetMenuStr(drawIndex + 0x16);
-		float x = static_cast<float>(compaList->entries[0].x + 0x18);
-		float y = static_cast<float>(compaList->entries[0].y + 0x45) + static_cast<float>(yOffset);
+		name = GetMenuStr(drawIndex + 0x16);
+		x = static_cast<float>(compaList->entries[0].x + 0x18);
+		y = static_cast<float>(compaList->entries[0].y + 0x45) + static_cast<float>(shown * 0x28);
 		font->SetPosX(x);
 		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(name);
 
 		short food = caravanWork->m_evtWordArr[19 + drawIndex];
-		const char* value = Game.m_cFlatDataArr[1].TableStrings(2)[food];
+		value = Game.m_cFlatDataArr[1].TableStrings(2)[food];
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
 		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(value);
 
-		yOffset += 0x28;
 		shown++;
 		drawIndex++;
 	}
@@ -288,9 +299,9 @@ void CMenuPcs::CompaDraw()
 	compaList = this->m_compaList;
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
 
-	const char* job = GetJobStr(caravanWork->m_jobType);
+	job = GetJobStr(caravanWork->m_jobType);
 	font->GetWidth(job);
-	float jobY = static_cast<float>(compaList->entries[0].y + 0x20);
+	jobY = static_cast<float>(compaList->entries[0].y + 0x20);
 	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
 	font->SetPosY(jobY - kCompaTextYOffset - kCompaJobYOffset);
 	font->Draw(job);
@@ -434,11 +445,13 @@ inline int CMenuPcs::CompaCtrlCur()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CompaCtrl()
+int CMenuPcs::CompaCtrl()
 {
-	if (CompaCtrlCur()) {
+	int result = CompaCtrlCur();
+	if (result) {
 		CompaInit0();
 	}
+	return result;
 }
 
 /*

@@ -67,7 +67,6 @@ STATIC_ASSERT(sizeof(m_objMon) == sizeof(CGMonObj) * kFlatMonObjCount);
 
 int gCFlatRuntime2DebugDrawOverflowFrame = 0;
 char gCFlatRuntime2DebugDrawOverflowInit = 0;
-static const float sCFlatRuntime2ForwardVec[] = { 0.0f, 0.0f, 1.0f };
 static const char sCFlatRuntime2LayerMissingMsg[] =
 	"layer\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42%s\n";
 static const char sCFlatRuntime2TexturePathFmt[] = "dvd/%s%s.tex";
@@ -93,16 +92,9 @@ static inline void InitFlatObjectSlot(CGBaseObj* object, u16 particleId)
 	object->m_particleId = particleId;
 }
 
-static inline CFlatRuntime::CObject* FlatObjectRoot(CFlatRuntime2* runtime)
-{
-	return &runtime->m_objectSentinel;
-}
-
 static inline CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, int cidMask)
 {
-	CFlatRuntime::CObject* const root = FlatObjectRoot(runtime);
-
-	while (object != root) {
+	while (object != &runtime->m_objectSentinel) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & cidMask) == cidMask) {
@@ -187,11 +179,6 @@ static inline u8* MenuPcsRaw()
 	return reinterpret_cast<u8*>(&MenuPcs);
 }
 
-static inline u8* CameraPcsRaw()
-{
-	return reinterpret_cast<u8*>(&CameraPcs);
-}
-
 static inline u8* DbgMenuPcsRaw()
 {
 	return reinterpret_cast<u8*>(&DbgMenuPcs);
@@ -215,11 +202,6 @@ static inline int& DebugDrawCCCount(u8* runtime)
 static inline CFlatRuntime2::CDebugDrawCC* DebugDrawCCEntries(u8* runtime)
 {
 	return reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries;
-}
-
-static inline CFlatRuntime::CObject* FlatObjectFirst(CFlatRuntime2* runtime)
-{
-	return runtime->m_objectSentinel.m_next;
 }
 
 static inline u32 Swap32(u32 value)
@@ -488,7 +470,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 			}
 			obj += 0x50;
 		}
-		return count;
+		break;
 	}
 	case 1: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objQuad);
@@ -498,7 +480,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 			}
 			obj += 0xAC;
 		}
-		return count;
+		break;
 	}
 	case 2: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_obj);
@@ -508,7 +490,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 			}
 			obj += 0x518;
 		}
-		return count;
+		break;
 	}
 	case 3: {
 		CGPartyObj* obj = reinterpret_cast<CGPartyObj*>(m_objParty);
@@ -517,7 +499,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 				count++;
 			}
 		}
-		return count;
+		break;
 	}
 	case 4: {
 		CGMonObj* obj = reinterpret_cast<CGMonObj*>(m_objMon);
@@ -526,7 +508,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 				count++;
 			}
 		}
-		return count;
+		break;
 	}
 	case 5: {
 		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objItem);
@@ -536,11 +518,11 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 			}
 			obj += 0x57C;
 		}
-		return count;
+		break;
 	}
-	default:
-		return count;
 	}
+
+	return count;
 }
 
 /*
@@ -654,62 +636,6 @@ void* CFlatRuntime2::intToClass(int classId)
 
 /*
  * --INFO--
- * PAL Address: 0x8006CADC
- * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CGObject* CFlatRuntime2::FindGObjFirst()
-{
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
-	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
-
-	while (object != root) {
-		if (object->m_classIndex >= 0) {
-			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
-					return reinterpret_cast<CGObject*>(object);
-				}
-			}
-		}
-		object = object->m_next;
-	}
-
-	return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8006CA38
- * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
-{
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
-	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
-
-	while (object != root) {
-		if (object->m_classIndex >= 0) {
-			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
-					return reinterpret_cast<CGObject*>(object);
-				}
-			}
-		}
-		object = object->m_next;
-	}
-
-	return 0;
-}
-
-/*
- * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 164b
  * EN Address: 0x8007B204
@@ -719,10 +645,9 @@ CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
  */
 inline CGBaseObj* CFlatRuntime2::FindGBaseObjFirst()
 {
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
-	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
+	CFlatRuntime::CObject* object = m_objectSentinel.m_next->m_next;
 
-	while (object != root) {
+	while (object != &m_objectSentinel) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 1) == 1) {
@@ -747,10 +672,9 @@ inline CGBaseObj* CFlatRuntime2::FindGBaseObjFirst()
  */
 inline CGBaseObj* CFlatRuntime2::FindGBaseObjNext(CGBaseObj* gObject)
 {
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
 
-	while (object != root) {
+	while (object != &m_objectSentinel) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 1) == 1) {
@@ -785,10 +709,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 		for (CGObject* obj = CFlat.FindGObjFirst(); obj != 0; obj = CFlat.FindGObjNext(obj)) {
 			obj->Frame();
 		}
-		goto done;
-	}
-
-	if (mode == 1) {
+	} else if (mode == 1) {
 		watch.Reset();
 		watch.Start();
 		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
@@ -832,31 +753,29 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->copy();
 		}
-		goto done;
+	} else {
+		_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
+		GXSetZCompLoc(GX_FALSE);
+		_GXSetAlphaCompare((_GXCompare)6, 1, (_GXAlphaOp)0, (_GXCompare)7, 0);
+		GXSetZMode(GX_TRUE, (_GXCompare)3, GX_TRUE);
+		GXSetCullMode(GX_CULL_FRONT);
+		GXSetNumTevStages(1);
+		_GXSetTevOp((_GXTevStageID)0, (_GXTevMode)4);
+		_GXSetTevOrder((_GXTevStageID)0, (_GXTexCoordID)0xFF, (_GXTexMapID)0xFF, (_GXChannelID)4);
+		GXSetNumChans(1);
+		GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+		GXSetChanCtrl(
+			GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+		GXClearVtxDesc();
+		GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+		AStar.drawAStar();
+
+		for (CGBaseObj* obj = CFlat.FindGBaseObjFirst(); obj != 0; obj = CFlat.FindGBaseObjNext(obj)) {
+			obj->Draw();
+		}
 	}
 
-	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
-	GXSetZCompLoc(GX_FALSE);
-	_GXSetAlphaCompare((_GXCompare)6, 1, (_GXAlphaOp)0, (_GXCompare)7, 0);
-	GXSetZMode(GX_TRUE, (_GXCompare)3, GX_TRUE);
-	GXSetCullMode(GX_CULL_FRONT);
-	GXSetNumTevStages(1);
-	_GXSetTevOp((_GXTevStageID)0, (_GXTevMode)4);
-	_GXSetTevOrder((_GXTevStageID)0, (_GXTexCoordID)0xFF, (_GXTexMapID)0xFF, (_GXChannelID)4);
-	GXSetNumChans(1);
-	GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
-	GXSetChanCtrl(
-		GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-	GXClearVtxDesc();
-	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-	AStar.drawAStar();
-
-	for (CGBaseObj* obj = CFlat.FindGBaseObjFirst(); obj != 0; obj = CFlat.FindGBaseObjNext(obj)) {
-		obj->Draw();
-	}
-
-done:
 	return 1;
 }
 
@@ -916,6 +835,60 @@ int CFlatRuntime2::Load(char* fileName)
 
 /*
  * --INFO--
+ * PAL Address: 0x8006CADC
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CGObject* CFlatRuntime2::FindGObjFirst()
+{
+	CFlatRuntime::CObject* object = m_objectSentinel.m_next->m_next;
+
+	while (object != &m_objectSentinel) {
+		if (object->m_classIndex >= 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
+					return reinterpret_cast<CGObject*>(object);
+				}
+			}
+		}
+		object = object->m_next;
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8006CA38
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
+{
+	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
+
+	while (object != &m_objectSentinel) {
+		if (object->m_classIndex >= 0) {
+			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
+					return reinterpret_cast<CGObject*>(object);
+				}
+			}
+		}
+		object = object->m_next;
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8006C994
  * PAL Size: 164b
  * EN Address: TODO
@@ -925,10 +898,9 @@ int CFlatRuntime2::Load(char* fileName)
  */
 CGQuadObj* CFlatRuntime2::FindGQuadObjFirst()
 {
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
-	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
+	CFlatRuntime::CObject* object = m_objectSentinel.m_next->m_next;
 
-	while (object != root) {
+	while (object != &m_objectSentinel) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 3) == 3) {
@@ -953,10 +925,9 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjFirst()
  */
 CGQuadObj* CFlatRuntime2::FindGQuadObjNext(CGQuadObj* gQuadObj)
 {
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gQuadObj)->m_next;
 
-	while (object != root) {
+	while (object != &m_objectSentinel) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 3) == 3) {
@@ -981,10 +952,9 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjNext(CGQuadObj* gQuadObj)
  */
 CGMonObj* CFlatRuntime2::FindGMonObjFirst()
 {
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
-	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
+	CFlatRuntime::CObject* object = m_objectSentinel.m_next->m_next;
 
-	while (object != root) {
+	while (object != &m_objectSentinel) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0xAD) == 0xAD) {
@@ -1009,10 +979,9 @@ CGMonObj* CFlatRuntime2::FindGMonObjFirst()
  */
 CGMonObj* CFlatRuntime2::FindGMonObjNext(CGMonObj* gMonObj)
 {
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gMonObj)->m_next;
 
-	while (object != root) {
+	while (object != &m_objectSentinel) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0xAD) == 0xAD) {
@@ -1037,10 +1006,9 @@ CGMonObj* CFlatRuntime2::FindGMonObjNext(CGMonObj* gMonObj)
  */
 CGItemObj* CFlatRuntime2::FindGItemObjFirst()
 {
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
-	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
+	CFlatRuntime::CObject* object = m_objectSentinel.m_next->m_next;
 
-	while (object != root) {
+	while (object != &m_objectSentinel) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0x1D) == 0x1D) {
@@ -1065,10 +1033,9 @@ CGItemObj* CFlatRuntime2::FindGItemObjFirst()
  */
 CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
 {
-	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gItemObj)->m_next;
 
-	while (object != root) {
+	while (object != &m_objectSentinel) {
 		if (object->m_classIndex >= 0) {
 			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
 				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0x1D) == 0x1D) {
@@ -1261,7 +1228,7 @@ void CFlatRuntime2::Draw()
 	font->SetZMode(0, 0);
 	font->SetPosZ(0.0f);
 	Mtx44 projection;
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection);
+	PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 
 	font = MenuPcs.m_fonts[0];
@@ -1282,11 +1249,11 @@ void CFlatRuntime2::Draw()
 	font->SetZMode(0, 0);
 	font->SetPosZ(0.0f);
 	Mtx44 projection2;
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), projection2);
+	PSMTX44Copy(CameraPcs.m_screenMatrix, projection2);
 	GXSetProjection(projection2, GX_PERSPECTIVE);
 
 	Mtx cameraMtx;
-	PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcsRaw() + 0x4), cameraMtx);
+	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
 	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
 	GXSetZCompLoc(GX_FALSE);
@@ -1337,7 +1304,6 @@ void CFlatRuntime2::Draw()
 		redColor.g = 0x00;
 		redColor.b = 0x00;
 		redColor.a = 0xFF;
-		static Vec worldUp = {0.0f, 1.0f, 0.0f};
 		float ringVerts[24];
 		float* verts = ringVerts;
 
@@ -1358,7 +1324,7 @@ void CFlatRuntime2::Draw()
 
 			Mtx orientMtx;
 			PSMTXIdentity(orientMtx);
-			Vec up = worldUp;
+			Vec up = {0.0f, 0.0f, 1.0f};
 			PSVECNormalize(&entry->m_to, &entry->m_to);
 
 			const float dot = PSVECDotProduct(&up, &entry->m_to);
@@ -1380,8 +1346,9 @@ void CFlatRuntime2::Draw()
 			GXLoadPosMtxImm(orientMtx, GX_PNMTX0);
 
 			GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 0x20);
-			float* vtx = verts;
-			for (int j = 0; j < 8; j++) {
+			int j;
+			float* vtx;
+			for (j = 0, vtx = verts; j < 8; j++) {
 				const float angle = 0.7853982f * static_cast<float>(j);
 				vtx[0] = entry->m_radius * sinf(angle);
 				vtx[1] = entry->m_radius * cosf(angle);
@@ -1401,8 +1368,7 @@ void CFlatRuntime2::Draw()
 				vtx += 3;
 			}
 
-			vtx = verts;
-			for (int j = 0; j < 8; j++) {
+			for (j = 0, vtx = verts; j < 8; j++) {
 				const float angle = 0.7853982f * static_cast<float>(j);
 				vtx[0] = entry->m_radius * sinf(angle);
 				vtx[1] = entry->m_radius * cosf(angle);
@@ -1689,24 +1655,14 @@ void CFlatRuntime2::drawLayer(
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
 	int tevStage = TextureMan.SetTextureTev(texture);
 
-	scaleY = static_cast<float>(height) * scaleY;
 	scaleX = static_cast<float>(width) * scaleX;
+	scaleY = static_cast<float>(height) * scaleY;
 	int u1 = texU + width;
 	int v1 = texV + height;
-	float xAnchor;
-	if ((flags & 1) != 0) {
-		xAnchor = 0.5f * scaleX;
-	} else {
-		xAnchor = 0.0f;
-	}
-	const float x0 = static_cast<float>(x) - xAnchor;
-	float yAnchor;
-	if ((flags & 1) != 0) {
-		yAnchor = 0.5f * scaleY;
-	} else {
-		yAnchor = 0.0f;
-	}
-	const float y0 = static_cast<float>(y) - yAnchor;
+	float fx = static_cast<float>(x);
+	const float x0 = fx - (((flags & 1) != 0) ? 0.5f * scaleX : 0.0f);
+	float fy = static_cast<float>(y);
+	const float y0 = fy - (((flags & 1) != 0) ? 0.5f * scaleY : 0.0f);
 	const float x1 = x0 + scaleX;
 	const float y1 = y0 + scaleY;
 	float z = 0.0f;
@@ -1744,11 +1700,10 @@ void CFlatRuntime2::drawLayer(
 		_GXSetTevAlphaOp((_GXTevStageID)tevStage, (_GXTevOp)0, (_GXTevBias)0, (_GXTevScale)0, 1, (_GXTevRegID)0);
 
 		for (int quad = 0; quad < 4; quad++) {
-			CColor backColor;
-			CColor rectColor;
+			CColor colors[2];
 
-			int rectW = static_cast<int>(scaleX * 0.5f);
-			int rectH = static_cast<int>(scaleY * 0.5f);
+			int rectW = static_cast<int>(scaleX / 2.0f);
+			int rectH = static_cast<int>(scaleY / 2.0f);
 
 			float bx;
 			if ((quad & 1) != 0) {
@@ -1765,17 +1720,15 @@ void CFlatRuntime2::drawLayer(
 			}
 			int rectY = static_cast<int>(by);
 
-			unsigned int quadU0;
 			if ((quad & 1) != 0) {
-				quadU0 = texU + rectW;
+				width = texU + rectW;
 			} else {
-				quadU0 = texU;
+				width = texU;
 			}
-			int quadV0;
 			if ((quad & 2) != 0) {
-				quadV0 = texV + rectH;
+				height = texV + rectH;
 			} else {
-				quadV0 = texV;
+				height = texV;
 			}
 
 			_GXTexObj* backTex = Graphic.GetBackBufferRect(rectX, rectY, rectW, rectH, 0);
@@ -1784,24 +1737,24 @@ void CFlatRuntime2::drawLayer(
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 
 			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY), z);
-			GXTexCoord2s16(quadU0, quadV0);
+			GXTexCoord2s16(width, height);
 			GXTexCoord2s16(0, 0);
 
 			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY), z);
-			GXTexCoord2s16(quadU0 + rectW, quadV0);
+			GXTexCoord2s16(width + rectW, height);
 			GXTexCoord2s16(2, 0);
 
 			GXPosition3f32(static_cast<float>(rectX + rectW), static_cast<float>(rectY + rectH), z);
-			GXTexCoord2s16(quadU0 + rectW, quadV0 + rectH);
+			GXTexCoord2s16(width + rectW, height + rectH);
 			GXTexCoord2s16(2, 2);
 
 			GXPosition3f32(static_cast<float>(rectX), static_cast<float>(rectY + rectH), z);
-			GXTexCoord2s16(quadU0, quadV0 + rectH);
+			GXTexCoord2s16(width, height + rectH);
 			GXTexCoord2s16(0, 2);
 		}
 	}
 
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcsRaw() + 0x94), ortho);
+	PSMTX44Copy(CameraPcs.m_screenMatrix, ortho);
 	GXSetProjection(ortho, GX_PERSPECTIVE);
 
 	} else {

@@ -984,7 +984,6 @@ void InfoWin_PrintNextRow(void)
     s32 n;
     s32 w;
     s32 x;
-    s32 t;
     s32 kind;
     s32 digits;
     s32 attr;
@@ -996,10 +995,10 @@ void InfoWin_PrintNextRow(void)
     items = 0;
     list = (struct BuyList *)LIST_BUF;
     if (gScreen == 1) {
-        t = list->count;
-        if (t & 1)
-            t++;
-        vals = (u32 *)&BUY_ITEM_IDS[t];
+        i = list->count;
+        if (i & 1)
+            i++;
+        vals = (u32 *)&BUY_ITEM_IDS[i];
         n = BUY_ITEM_IDS[sInfoItem];
     } else {
         items = (struct ItemInfo *)list;
@@ -1027,8 +1026,8 @@ void InfoWin_PrintNextRow(void)
             Text_Print(Msg_GetSystem(13), TEXT_DRAW);
         } else if (n > 0 && gScreen == 2 && n <= 158) {
             n = Text_Print(Msg_GetSystem(38), TEXT_WIDTH);
-            x = (win->width - 2) * 8 - n;
-            Text_SetX(x);
+            i = (win->width - 2) * 8 - n;
+            Text_SetX(i);
             Text_Print(Msg_GetSystem(38), TEXT_DRAW);
         }
         Text_CopyToVram(dst, win->width);
@@ -1049,20 +1048,21 @@ void InfoWin_PrintNextRow(void)
                             Text_SetX(0);
                             Text_Print(Msg_GetStat(items->kind - 1), TEXT_DRAW);
                             if (items->count != 0 && items->kind != 16) {
-                                t = Item_IsPercentKind(items->kind) ? 40 : 39;
-                                w = Text_Print(Msg_GetSystem(t), TEXT_WIDTH);
-                                x = (win->width - 2) * 8 - w;
+                                n = Item_IsPercentKind(items->kind);
+                                x = n ? 40 : 39;
+                                w = Text_Print(Msg_GetSystem(x), TEXT_WIDTH);
+                                i = (win->width - 2) * 8 - w;
                                 digits = 1;
                                 if (items->count > 9) {
                                     digits = 3;
                                     if (items->count <= 99)
                                         digits = 2;
                                 }
-                                x -= digits * 9;
-                                Text_SetX(x);
-                                Text_Print(Msg_GetSystem(t), TEXT_DRAW);
-                                x = Text_GetX();
-                                Text_PrintNumber(items->count, x, digits);
+                                i -= digits * 9;
+                                Text_SetX(i);
+                                Text_Print(Msg_GetSystem(x), TEXT_DRAW);
+                                i = Text_GetX();
+                                Text_PrintNumber(items->count, i, digits);
                             }
                         } else {
                             char *s;
@@ -1073,8 +1073,8 @@ void InfoWin_PrintNextRow(void)
                                 s = Msg_GetSystem(63);
                             Text_SetX(0);
                             Text_Print(s, TEXT_DRAW);
-                            x = win->width * 8 - 34;
-                            Text_PrintNumber(items->count, x, 2);
+                            i = win->width * 8 - 34;
+                            Text_PrintNumber(items->count, i, 2);
                         }
                     } else if (sInfoRow == 3) {
                         if ((items->flags & 0xE00) && items->kind != 0) {
@@ -1087,32 +1087,33 @@ void InfoWin_PrintNextRow(void)
         } else if (n > 0) {
             if (sInfoRow == 2) {
                 w = Text_Print(Msg_GetSystem(14), TEXT_WIDTH);
-                x = (win->width - 2) * 8 - w;
-                Text_SetX(x >> 1);
+                i = (win->width - 2) * 8 - w;
+                Text_SetX(i >> 1);
                 Text_Print(Msg_GetSystem(14), TEXT_DRAW);
             } else if (sInfoRow == 3) {
                 strcpy(str, Msg_GetSystem(13));
                 strcat(str, sSlashText);
-                x = Text_Print(str, TEXT_WIDTH) + 72;
-                x = (win->width - 2) * 8 - x;
-                Text_SetX(x);
-                Text_PrintNumber(gSession.gil, x, 8);
+                i = Text_Print(str, TEXT_WIDTH) + 72;
+                i = (win->width - 2) * 8 - i;
+                Text_SetX(i);
+                Text_PrintNumber(gSession.gil, i, 8);
                 Text_Print(str, TEXT_DRAW);
             } else if (sInfoRow == 4) {
                 strcpy(str, Msg_GetSystem(13));
                 strcat(str, sSlashText);
                 w = Text_Print(str, TEXT_WIDTH) + 72;
-                x = (win->width - 2) * 8 - w;
-                Text_SetX(x);
-                Text_PrintNumber(vals[sInfoItem], x, 8);
+                i = (win->width - 2) * 8 - w;
+                Text_SetX(i);
+                n = sInfoItem;
+                Text_PrintNumber(vals[n], i, 8);
                 Text_Print(Msg_GetSystem(13), TEXT_DRAW);
             } else if (sInfoRow == 5) {
                 w = Text_Print(Msg_GetSystem(15), TEXT_WIDTH) + 18;
-                x = (win->width - 3) * 8 - w;
-                Text_SetX(x);
+                i = (win->width - 3) * 8 - w;
+                Text_SetX(i);
                 Text_Print(Msg_GetSystem(15), TEXT_DRAW);
-                x = Text_GetX();
-                Text_PrintNumber(sShopQuantity, x, 2);
+                i = Text_GetX();
+                Text_PrintNumber(sShopQuantity, i, 2);
             }
         }
         Text_CopyToVram(dst, win->width);
@@ -1122,14 +1123,14 @@ void InfoWin_PrintNextRow(void)
         w = gWindows[0].width - 2;
         for (i = 0; i < sInfoRow; i++) {
             for (x = 0; x < 2; x++) {
-                t = (gWindows[0].width << 1) * i + 0x80;
-                t += x;
+                n = (gWindows[0].width << 1) * i + 0x80;
+                n += x;
                 for (k = 0; k < w; k++) {
                     if (!(k & 1)) {
-                        buf[k] = attr | t;
+                        buf[k] = attr | n;
                     } else {
-                        buf[k] = (t + 2) | attr;
-                        t += 4;
+                        buf[k] = (n + 2) | attr;
+                        n += 4;
                     }
                 }
                 DmaCopy16(3, buf, dst, w << 1);

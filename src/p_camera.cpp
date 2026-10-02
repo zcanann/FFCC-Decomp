@@ -475,8 +475,7 @@ void CCameraPcs::SetFullScreenShadow(float (*matrix)[4], long flags)
 void CCameraPcs::drawShadowChrBegin()
 {
     if (m_fullScreenShadowEnabled != 0) {
-        float shadowX = m_fullScreenShadow.m_depthScaleMtx[0][3];
-        m_fullScreenShadow.m_depthScaleMtx[0][3] = shadowX * 1.5f;
+        m_fullScreenShadow.m_depthScaleMtx[0][3] *= 1.5f;
         m_fullScreenShadow.m_depthScaleMtx[1][3] *= 1.5f;
         PSMTXConcat(m_fullScreenShadow.m_depthScaleMtx,
                     m_shadowCamera.m_cameraMatrix,
@@ -498,17 +497,15 @@ void CCameraPcs::drawShadowEnd()
     int y1;
     int x0;
     int x1;
-    int x2;
 
     if (m_fullScreenShadowEnabled == 0) {
         return;
     }
 
-    float negHalf = -240.0f;
+    float half = 240.0f;
     float nearZ = m_shadowCamera.m_nearZ;
     float farZ = m_shadowCamera.m_farZ;
-    C_MTXOrtho(proj, 240.0f, negHalf, 240.0f, negHalf,
-               nearZ, farZ);
+    C_MTXOrtho(proj, half, -half, half, -half, nearZ, farZ);
     GXSetProjection(proj, GX_ORTHOGRAPHIC);
     GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
     PSMTXIdentity(ident);
@@ -540,11 +537,13 @@ void CCameraPcs::drawShadowEnd()
     }
 
     z = -farZ + nearZ;
-    x0 = static_cast<int>(negHalf - 2.0f);
-    x1 = static_cast<int>(-238.0f);
-    y0 = static_cast<int>(242.0f);
-    y1 = static_cast<int>(238.0f);
-    x2 = static_cast<int>(242.0f);
+    float innerLeft = -238.0f;
+    float outer = 242.0f;
+    float inner = 238.0f;
+    x0 = static_cast<int>(-half - 2.0f);
+    x1 = static_cast<int>(innerLeft);
+    y0 = static_cast<int>(outer);
+    y1 = static_cast<int>(inner);
 
     GXBegin(GX_QUADS, GX_VTXFMT0, 16);
     GXPosition3f32(static_cast<float>(x0), static_cast<float>(y0), z);
@@ -553,23 +552,23 @@ void CCameraPcs::drawShadowEnd()
     GXPosition3f32(static_cast<float>(x0), static_cast<float>(x0), z);
 
     GXPosition3f32(static_cast<float>(y1), static_cast<float>(y0), z);
-    GXPosition3f32(static_cast<float>(x2), static_cast<float>(y0), z);
-    GXPosition3f32(static_cast<float>(x2), static_cast<float>(x0), z);
+    GXPosition3f32(static_cast<float>(y0), static_cast<float>(y0), z);
+    GXPosition3f32(static_cast<float>(y0), static_cast<float>(x0), z);
     GXPosition3f32(static_cast<float>(y1), static_cast<float>(x0), z);
 
     GXPosition3f32(static_cast<float>(x0), static_cast<float>(y0), z);
-    GXPosition3f32(static_cast<float>(x2), static_cast<float>(y0), z);
-    GXPosition3f32(static_cast<float>(x2), static_cast<float>(y1), z);
+    GXPosition3f32(static_cast<float>(y0), static_cast<float>(y0), z);
+    GXPosition3f32(static_cast<float>(y0), static_cast<float>(y1), z);
     GXPosition3f32(static_cast<float>(x0), static_cast<float>(y1), z);
 
     GXPosition3f32(static_cast<float>(x0), static_cast<float>(x1), z);
-    GXPosition3f32(static_cast<float>(x2), static_cast<float>(x1), z);
-    GXPosition3f32(static_cast<float>(x2), static_cast<float>(x0), z);
+    GXPosition3f32(static_cast<float>(y0), static_cast<float>(x1), z);
+    GXPosition3f32(static_cast<float>(y0), static_cast<float>(x0), z);
     GXPosition3f32(static_cast<float>(x0), static_cast<float>(x0), z);
 
     GXSetTexCopySrc(0, 0, 0x1E0, 0x1E0);
     GXSetTexCopyDst(0x1E0, 0x1E0, GX_TF_Z8, GX_FALSE);
-    GXCopyTex(m_fullScreenShadow.m_shadowTexture, GX_TRUE);
+    GXCopyTex(m_fullScreenShadow.m_shadowTexture[0], GX_TRUE);
     GXSetCullMode(GX_CULL_FRONT);
 
     {
@@ -595,7 +594,7 @@ void CCameraPcs::drawShadowEnd()
     GXSetColorUpdate(GX_TRUE);
     GXSetZMode(GX_TRUE, GX_LESS, GX_TRUE);
     GXPixModeSync();
-    GXInitTexObj(&m_fullScreenShadow.m_texObjs[0], m_fullScreenShadow.m_shadowTexture,
+    GXInitTexObj(&m_fullScreenShadow.m_texObjs[0], m_fullScreenShadow.m_shadowTexture[0],
                  0x1E0, 0x1E0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(&m_fullScreenShadow.m_texObjs[0], GX_NEAR, GX_NEAR, 0.0f,
                     0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
@@ -630,8 +629,9 @@ void CCameraPcs::drawShadowBegin()
 
     GXInvalidateTexAll();
 
-    m_savedCamera = CurrentCameraState();
-    m_shadowCamera = CurrentCameraState();
+    CameraState& cur = CurrentCameraState();
+    m_savedCamera = cur;
+    m_shadowCamera = cur;
 
     if (Game.m_currentSceneId == 3) {
         float stickX = (Pad.m_debugPadLock != 0) ? 0.0f : CameraPadInput(1).stickXF;
@@ -690,7 +690,7 @@ void CCameraPcs::drawShadowBegin()
             m_fullScreenShadowDepth = depth;
         } else {
             depth -= currentDepth;
-            float blended = depth * 0.25f;
+            float blended = depth / 4.0f;
             m_fullScreenShadowDepth = currentDepth + blended;
         }
     } else {
@@ -766,6 +766,7 @@ void CCameraPcs::drawShadowBegin()
  */
 int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
 {
+    CGObject* gObject;
     int count = 0;
     Mtx invView;
     Mtx frustumMtx;
@@ -782,7 +783,7 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
                     1.0f);
     CBound::SetFrustum(eyePos, frustumMtx);
 
-    for (CGObject* gObject = CFlatRuntime2Storage().FindGObjFirst(); gObject != 0;
+    for (gObject = CFlatRuntime2Storage().FindGObjFirst(); gObject != 0;
          gObject = CFlatRuntime2Storage().FindGObjNext(gObject))
     {
         unsigned int displayFlags;
@@ -853,14 +854,18 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
  */
 void CCameraPcs::destroyFullShadow()
 {
-    if (m_fullScreenShadow.m_shadowTexture != 0) {
-        delete static_cast<u8*>(m_fullScreenShadow.m_shadowTexture);
-        m_fullScreenShadow.m_shadowTexture = 0;
+    for (int i = 0; i < 1; i++) {
+        if (m_fullScreenShadow.m_shadowTexture[i] != 0) {
+            delete static_cast<u8*>(m_fullScreenShadow.m_shadowTexture[i]);
+            m_fullScreenShadow.m_shadowTexture[i] = 0;
+        }
     }
 
-    if (m_fullScreenShadow.m_rampTexture != 0) {
-        delete m_fullScreenShadow.m_rampTexture;
-        m_fullScreenShadow.m_rampTexture = 0;
+    for (int i = 0; i < 1; i++) {
+        if (m_fullScreenShadow.m_rampTexture[i] != 0) {
+            delete m_fullScreenShadow.m_rampTexture[i];
+            m_fullScreenShadow.m_rampTexture[i] = 0;
+        }
     }
 }
 
@@ -875,16 +880,18 @@ void CCameraPcs::destroyFullShadow()
  */
 inline void CCameraPcs::createRampTex8()
 {
-    CMapMng* map = &MapMng;
-    char* file = "p_camera.cpp";
-    m_fullScreenShadow.m_rampTexture = 0;
-    unsigned int rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
-    unsigned char* rampTex = new (map->m_stage, file, 0x361) u8[rampTexSize];
-    m_fullScreenShadow.m_rampTexture = rampTex;
+    unsigned char* rampTex;
+    unsigned int rampTexSize;
+
+    for (int i = 0; i < 1; i++) {
+        m_fullScreenShadow.m_rampTexture[i] = 0;
+        rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
+        rampTex = new (MapMng.m_stage, "p_camera.cpp", 0x361) u8[rampTexSize];
+        m_fullScreenShadow.m_rampTexture[i] = rampTex;
+    }
 
     for (unsigned int i = 0; i < 0x100; i++) {
-        rampTex[((i & 0x80) >> 2) + ((i >> 4) & 7) + ((i & 0xC) << 4) + ((i & 3) << 3)] =
-            static_cast<unsigned char>(i);
+        rampTex[((i & 0x80) >> 2) + ((i & 0x70) >> 4) + ((i & 0xC) << 4) + ((i & 3) << 3)] = i;
     }
 
     GXInitTexObj(&m_fullScreenShadow.m_texObjs[1], rampTex, 0x10, 0x10, GX_TF_I8,
@@ -906,12 +913,12 @@ inline void CCameraPcs::createRampTex8()
  */
 void CCameraPcs::createFullShadow()
 {
-    CMapMng* map = &MapMng;
-    char* file = "p_camera.cpp";
-    m_fullScreenShadow.m_shadowTexture = 0;
-    m_fullScreenShadow.m_shadowTexture =
-        new (map->m_stage, file, 0x3A5)
-            u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
+    for (int i = 0; i < 1; i++) {
+        m_fullScreenShadow.m_shadowTexture[i] = 0;
+        m_fullScreenShadow.m_shadowTexture[i] =
+            new (MapMng.m_stage, "p_camera.cpp", 0x3A5)
+                u8[GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0)];
+    }
 
     createRampTex8();
 
@@ -976,9 +983,9 @@ void CCameraPcs::calcMap()
 
     if ((buttons & 0x100) != 0) {
         PSVECScale(&DirectionVec(), &moveDelta, 4.0f);
+        moveDelta.y = 0.0f;
     }
 
-    moveDelta.y = 0.0f;
     if ((buttons & 0x800) != 0) {
         PSVECScale(&DirectionVec(), &moveDelta, -4.0f);
         moveDelta.y = 0.0f;
@@ -1440,12 +1447,12 @@ void CCameraPcs::calc()
         float moveInOut = Pad.GetTriggerRight(0);
         lateral -= 5.0f * moveInOut;
 
-        float sinY;
         float yaw = m_yaw;
         float pitch = m_pitch;
-        sinY = static_cast<float>(cos(pitch));
-        const float sinXCosY = sinY * static_cast<float>(sin(yaw));
-        sinY = static_cast<float>(sin(pitch));
+        float cosPitch = static_cast<float>(cos(pitch));
+        float sinYaw = static_cast<float>(sin(yaw));
+        const float sinXCosY = sinYaw * cosPitch;
+        float sinY = static_cast<float>(sin(pitch));
         const float cosXCosY = static_cast<float>(cos(yaw)) * static_cast<float>(cos(pitch));
 
         float panStick = ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1))
@@ -1489,7 +1496,8 @@ void CCameraPcs::calc()
             const double t = static_cast<double>(3.1415927f *
                 (1.0f - static_cast<float>(m_worldMapEffect.m_timer) /
                 static_cast<float>(m_worldMapEffect.m_duration)));
-            const float f = 0.5f * (1.0f + static_cast<float>(cos(t)));
+            float f = static_cast<float>(cos(t));
+            f = 0.5f * (1.0f + f);
 
             PSMTXRotRad(tempMtx, 'x', m_worldMapEffect.m_rotX * f);
             PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);

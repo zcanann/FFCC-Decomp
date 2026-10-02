@@ -536,7 +536,7 @@ config.libs = [
             Object(NonMatching, "FunnyShape.cpp"),
             Object(NonMatching, "game.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "gbaque.cpp", extra_cflags=["-str reuse,readonly"]),
-            Object(NonMatching, "gobject.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "gobject.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "gobjwork.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "goout.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "graphic.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),

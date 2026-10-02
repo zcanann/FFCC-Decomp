@@ -429,6 +429,7 @@ void Link_ProcessRecv(void)
     u8 v;
     s32 n;
     s32 ret;
+    u32 mask;
 
     ie = REG_IE;
     REG_IE = 0;
@@ -541,12 +542,14 @@ restart:
                 p = (u8 *)&pkt;
                 p[0] = 7;
                 p[1] = 3;
-                goto send;
+                ret = Link_Write(pkt);
+            } else {
+                p = (u8 *)&pkt;
+                p[0] = 6;
+                p[1] = 3;
+                ret = Link_Write(pkt);
             }
-            p = (u8 *)&pkt;
-            p[0] = 6;
-            p[1] = 3;
-            if (Link_Write(pkt) != 0) {
+            if (ret != 0) {
                 sMsgXfer.pending = pkt;
                 goto resend;
             }
@@ -657,7 +660,9 @@ restart:
                 } else {
                     sGilIn |= msg[1] << 8;
                     sGilIn |= msg[2];
-                    if (!(v & 7))
+                    mask = 7;
+                    mask &= v;
+                    if (mask == 0)
                         Session_SetGil(sGilIn);
                 }
                 sGilOp = 0;
@@ -669,7 +674,6 @@ restart:
             p = (u8 *)&pkt;
             p[0] = 6;
             p[1] = 24;
-        send:
             if (Link_Write(pkt) != 0) {
                 sMsgXfer.pending = pkt;
                 goto resend;

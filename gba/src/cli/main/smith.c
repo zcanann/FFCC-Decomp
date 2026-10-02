@@ -475,7 +475,7 @@ s32 SmithForge_HandleInput(void)
 {
     struct Window *win;
     s32 ret;
-    s32 sel;
+    s8 sel;
     u8 *p;
 
     if (gKeysRepeat == 0)
@@ -495,20 +495,26 @@ s32 SmithForge_HandleInput(void)
     if (gSubMode == 0 || !(gKeysRepeat & (DPAD_UP | DPAD_DOWN))) {
         if (gKeysNew & A_BUTTON) {
             if (gSubMode == 0) {
-                if (gScreen != 1 && sSmithCanEquip == 0) {
-                    sSmithResult = 1;
-                    ret = 1;
-                } else if (gScreen == 1 && sSmithCanForge == 0) {
-                    m4aSongNumStart(0);
-                    return 0;
+                if (gScreen == 1) {
+                    if (sSmithCanForge == 0) {
+                        m4aSongNumStart(0);
+                        return 0;
+                    } else {
+                        gSubMode++;
+                    }
                 } else {
-                    gSubMode = 1;
+                    if (sSmithCanEquip == 0) {
+                        sSmithResult = 1;
+                        ret = 1;
+                    } else {
+                        gSubMode++;
+                    }
                 }
             } else if (gSubMode == 1) {
-                sel = win->cursor;
-                switch (sel) {
+                switch (win->cursor) {
                 case 0:
                     if (gScreen == 1) {
+                        sel = win->cursor;
                         if (win->items[sel].enabled != 0) {
                             s32 slot = gSession.appearance & 3;
                             p = &LIST_BUF[sSmithSel];
@@ -525,7 +531,7 @@ s32 SmithForge_HandleInput(void)
                             sSmithResult = 1;
                             gInputLockFrames = 6;
                         } else {
-                            sSmithSlotsInit = sel;
+                            sSmithSlotsInit = 0;
                             sSmithEquipPending = 1;
                         }
                         gSubState++;

@@ -78,6 +78,21 @@ static inline CFlatRuntime2* ItemCFlatRuntime()
 	return &CFlat;
 }
 
+static inline bool ItemIsMultiBossStage()
+{
+	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF;
+}
+
+static inline bool ItemIsMultiBossCaravan(CGObject* const& obj)
+{
+	return ItemIsMultiBossStage() && obj->IsKindOf(0x6D);
+}
+
+static inline bool ItemIsGbaCaravan(CGObject* const& obj)
+{
+	return ItemIsMultiBossCaravan(obj) && reinterpret_cast<CCaravanWork*>(obj->m_scriptHandle)->m_joybusCaravanId != 0;
+}
+
 STATIC_ASSERT(offsetof(LastBossWork, m_capsules) == 0x08);
 STATIC_ASSERT(offsetof(LastBossWork, m_targetPosition) == 0x18);
 STATIC_ASSERT(offsetof(LastBossWork, m_phaseTimer) == 0x24);
@@ -436,8 +451,8 @@ void CGItemObj::onFrameAlways()
 
 	if (countdown != 0) {
 		const float& scale = kItemObjWobblePhaseScale;
-		int next = countdown - 1;
-		m_itemJumpCountdown = next < 0 ? 0 : next;
+		countdown--;
+		m_itemJumpCountdown = countdown < 0 ? 0 : countdown;
 		float radius = m_savedBodyRadius * (float)(8 - m_itemJumpCountdown);
 		m_bodyEllipsoidRadius = radius * scale;
 	}
@@ -446,10 +461,8 @@ void CGItemObj::onFrameAlways()
 		int canUseTrace;
 
 		if (static_cast<int>(Game.m_gameWork.m_gameInitFlag) != 0 &&
-		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) != 0 &&
-		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) != 0 &&
+		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit3 != 0 &&
+		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit2 != 0 &&
 		    m_weaponNodeFlagBits.m_prg != 0 &&
 		    static_cast<int>(CFlatCenterState()) == 0 && m_owner == 0) {
 			canUseTrace = true;
@@ -494,31 +507,12 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 {
 	CFlatRuntime::CStack stack[3];
 	int canSystemCall;
-	unsigned char canSystemCall8;
 
 	if (carryState == 0) {
-		canSystemCall = 0;
-		bool isStageCarry = false;
-		bool isMenuBossStage = false;
-
-		if (Game.m_gameWork.m_menuStageMode != 0 &&
-			Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			isMenuBossStage = true;
-		}
-		if (isMenuBossStage) {
-			unsigned short cid = static_cast<short>(partyObj->GetCID());
-			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
-			if (((stageCarry >> 5) & 0xFF) != 0) {
-				isStageCarry = true;
-			}
-		}
-		if (isStageCarry && reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId != 0) {
-			canSystemCall = 1;
-		}
+		canSystemCall = ItemIsGbaCaravan(partyObj);
 
 		m_owner = partyObj;
 		m_carryFrame = carryMode;
-		canSystemCall8 = static_cast<unsigned char>(canSystemCall);
 
 		if (carryMode == 0) {
 			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
@@ -526,25 +520,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			bool useBossAttachName = false;
 
 			if (Game.m_gameWork.m_menuStageMode != 0) {
-				bool condA = false;
-				bool condB = false;
-				bool condC = false;
-
-				if (Game.m_gameWork.m_menuStageMode != 0 &&
-					Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-					condC = true;
-				}
-				if (condC) {
-					unsigned short cid = static_cast<unsigned short>(partyObj->GetCID());
-					unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
-					if (((stageCarry >> 5) & 0xFF) != 0) {
-						condB = true;
-					}
-				}
-				if (condB && reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle)->m_joybusCaravanId != 0) {
-					condA = true;
-				}
-				if (condA) {
+				if (ItemIsGbaCaravan(partyObj)) {
 					useBossAttachName = true;
 				}
 			}
@@ -557,28 +533,9 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			changeStat(0xB, 0, 0);
 		}
 	} else if (carryState == 1 || carryState == 2) {
-		canSystemCall = 0;
-		bool isStageCarry = false;
-		bool isMenuBossStage = false;
-
-		if (Game.m_gameWork.m_menuStageMode != 0 &&
-			Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			isMenuBossStage = true;
-		}
-		if (isMenuBossStage) {
-			CGObject* carryObj = m_owner;
-			unsigned short cid = static_cast<unsigned short>(carryObj->GetCID());
-			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
-			if (((stageCarry >> 5) & 0xFF) != 0) {
-				isStageCarry = true;
-			}
-		}
-		if (isStageCarry && reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId != 0) {
-			canSystemCall = 1;
-		}
+		canSystemCall = ItemIsGbaCaravan(m_owner);
 
 		m_carryFrame = carryMode;
-		canSystemCall8 = static_cast<unsigned char>(canSystemCall);
 
 		if (carryMode == 0) {
 			Vec safePos;
@@ -604,7 +561,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		m_lifeTimer = 0x1194;
 	}
 
-	if ((m_objectFlags & 0x10) != 0 && canSystemCall8 != 0) {
+	if ((m_objectFlags & 0x10) != 0 && canSystemCall != 0) {
 		stack[0].m_word = 3;
 		stack[1].m_word = carryState != 0;
 		stack[2].m_word = 0;
@@ -647,12 +604,14 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 		if (bestItemObj != 0) {
 			runtime->deleteObject(bestItemObj);
-			deletedCount++;
 		} else {
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrNoDeletableObjectMsg);
 			}
+			goto printDeleted;
 		}
+		deletedCount++;
+	printDeleted:
 
 		System.Printf(itemObjStrings + kItemObjStrNumDeleteItemFmt, deletedCount);
 		if (deletedCount == 0) {
@@ -822,7 +781,9 @@ void CGItemObj::onFrameStat()
 	switch (stateId) {
 	case 0x1b:
 		if (m_stateFrame <= 8) {
-			float wobble = (float)sin((double)(kItemObjHalfPi * (float)m_stateFrame * kItemObjWobblePhaseScale));
+			float wobble = kItemObjHalfPi * (float)m_stateFrame;
+			wobble *= kItemObjWobblePhaseScale;
+			wobble = (float)sin((double)wobble);
 
 			m_rotationZ = wobble;
 			m_rotationY = wobble;
@@ -865,37 +826,17 @@ void CGItemObj::onFrameStat()
 	case 0xB:
 		if (m_stateFrame == m_carryFrame) {
 			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
-			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
 			bool useBossAttachName = false;
 
 			if (Game.m_gameWork.m_menuStageMode != 0) {
-				bool condA = false;
-				bool condB = false;
-				bool condC = false;
-
-				if (Game.m_gameWork.m_menuStageMode != 0 &&
-				    Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-					condC = true;
-				}
-				if (condC) {
-					unsigned int cid = static_cast<unsigned short>(m_owner->GetCID());
-					unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
-					if (((stageCarry >> 5) & 0xFF) != 0) {
-						condB = true;
-					}
-				}
-				if (condB &&
-				    reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle)->m_joybusCaravanId != 0) {
-					condA = true;
-				}
-				if (condA) {
+				if (ItemIsGbaCaravan(m_owner)) {
 					useBossAttachName = true;
 				}
 			}
 
 			CGObject* attachOwner = m_owner;
 			CGObject* attachSelf = this;
-			attachSelf->Attach(attachOwner, const_cast<char*>(useBossAttachName ? s_itemAttachCenterItem3 : s_itemAttachLeftItem), attachOffsetPtr);
+			attachSelf->Attach(attachOwner, const_cast<char*>(useBossAttachName ? s_itemAttachCenterItem3 : s_itemAttachLeftItem), reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset)));
 			changeStat(0, 0, 0);
 			m_bodyEllipsoidRadius = kItemObjZero;
 		}
@@ -979,16 +920,12 @@ void CGItemObj::onFrameStat()
 
 		if (7 < m_stateFrame) {
 			m_rotTargetY += kItemObjMotionStep;
-			m_worldPosition.x =
-			    kItemObjMotionStep * (m_owner->m_worldPosition.x - m_worldPosition.x) + m_worldPosition.x;
-			m_worldPosition.y =
-			    kItemObjMotionStep * (kItemObjHalf * m_owner->unk_0x188 + m_owner->m_worldPosition.y - m_worldPosition.y) +
-			    m_worldPosition.y;
-			m_worldPosition.z =
-			    kItemObjMotionStep * (m_owner->m_worldPosition.z - m_worldPosition.z) + m_worldPosition.z;
-			m_rotationX = m_rotationX * kItemObjRotationDamping;
-			m_rotationY = m_rotationY * kItemObjRotationDamping;
-			m_rotationZ = m_rotationZ * kItemObjRotationDamping;
+			m_worldPosition.x += kItemObjMotionStep * (m_owner->m_worldPosition.x - m_worldPosition.x);
+			m_worldPosition.y += kItemObjMotionStep * (kItemObjHalf * m_owner->unk_0x188 + m_owner->m_worldPosition.y - m_worldPosition.y);
+			m_worldPosition.z += kItemObjMotionStep * (m_owner->m_worldPosition.z - m_worldPosition.z);
+			m_rotationX *= kItemObjRotationDamping;
+			m_rotationY *= kItemObjRotationDamping;
+			m_rotationZ *= kItemObjRotationDamping;
 		}
 		break;
 	case 9:
@@ -999,35 +936,40 @@ void CGItemObj::onFrameStat()
 	case 0x1F:
 		PartMng.pppSetLocSlot(m_particleSlot, &m_worldPosition);
 
-		if (m_subState != 1) {
-			if (m_subState < 1 && 0 <= m_subState && m_subFrame == 0) {
-			int particleNoA;
-			int particleNoB;
+		switch (m_subState) {
+		case 0:
+			if (m_subFrame == 0) {
+				int particleNoA;
+				int particleNoB;
 
-			if (m_worldParamA == 0xE) {
-				particleNoA = 0x19;
-				particleNoB = 0x1E;
-			} else {
-				particleNoA = 0x18;
-				particleNoB = 0x1D;
+				if (m_worldParamA == 0xE) {
+					particleNoA = 0x19;
+					particleNoB = 0x1E;
+				} else {
+					particleNoA = 0x18;
+					particleNoB = 0x1D;
+				}
+
+				putParticle(particleNoA | 0x100, 0, &m_worldPosition, kItemObjUnitScale, 0);
+				putParticle(particleNoB | 0x100, m_particleSlot, &m_worldPosition, kItemObjUnitScale, 0);
+				playSe3D(0x1A, 0x32, 0x96, 0, 0);
+				m_displayFlags &= ~1;
+				m_bgColMask &= 0xFFFFFFF1;
+				m_moveOffset.z = zero;
+				m_moveOffset.x = zero;
+				m_bgColMask |= 0x80000;
+
+				const CVector& damageOffset = CVector(zero, zero, zero);
+				SetDamageCol(0, itemObjStrings + kItemObjStrF051Root, kItemObjDamageRadius, kItemObjDamageRadius,
+				             reinterpret_cast<Vec*>(const_cast<CVector*>(&damageOffset)));
+				m_damageColliders[0].m_hitMask = 9;
 			}
-
-			putParticle(particleNoA | 0x100, 0, &m_worldPosition, kItemObjUnitScale, 0);
-			putParticle(particleNoB | 0x100, m_particleSlot, &m_worldPosition, kItemObjUnitScale, 0);
-			playSe3D(0x1A, 0x32, 0x96, 0, 0);
-			m_displayFlags &= ~1;
-			m_bgColMask &= 0xFFFFFFF1;
-			m_moveOffset.z = zero;
-			m_moveOffset.x = zero;
-			m_bgColMask |= 0x80000;
-
-			const CVector& damageOffset = CVector(zero, zero, zero);
-			SetDamageCol(0, itemObjStrings + kItemObjStrF051Root, kItemObjDamageRadius, kItemObjDamageRadius,
-			             reinterpret_cast<Vec*>(const_cast<CVector*>(&damageOffset)));
-			m_damageColliders[0].m_hitMask = 9;
+			break;
+		case 1:
+			if (m_subFrame == 0x7D) {
+				ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 			}
-		} else if (m_subFrame == 0x7D) {
-			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
+			break;
 		}
 		break;
 	case 0x23:
@@ -1038,7 +980,9 @@ void CGItemObj::onFrameStat()
 			}
 
 			if (m_subFrame <= 8) {
-				float wobble = (float)sin((double)(kItemObjHalfPi * (float)m_subFrame * kItemObjWobblePhaseScale));
+				float wobble = kItemObjHalfPi * (float)m_subFrame;
+				wobble *= kItemObjWobblePhaseScale;
+				wobble = (float)sin((double)wobble);
 
 				m_rotationZ = wobble;
 				m_rotationY = wobble;
@@ -1062,20 +1006,9 @@ void CGItemObj::onFrameStat()
 			m_groundHitOffset.y = -(kItemObjBounceAccel * m_moveTimer - m_groundHitOffset.y);
 		}
 
-		{
-			float timer = m_moveTimer;
-			float current = m_groundHitOffset.y;
-			float clamped = kItemObjDouble * -timer;
-
-			if (!(current < clamped)) {
-				float maxClamp = kItemObjDouble * timer;
-				clamped = current;
-				if (maxClamp < current) {
-					clamped = maxClamp;
-				}
-			}
-			m_groundHitOffset.y = clamped;
-		}
+		m_groundHitOffset.y = (m_groundHitOffset.y < kItemObjDouble * -m_moveTimer)
+		                          ? kItemObjDouble * -m_moveTimer
+		                          : ((kItemObjDouble * m_moveTimer < m_groundHitOffset.y) ? kItemObjDouble * m_moveTimer : m_groundHitOffset.y);
 
 		m_rotTargetY += kItemObjFineStep;
 		m_groundHitOffset.x =

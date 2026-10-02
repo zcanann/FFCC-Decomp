@@ -1,3 +1,4 @@
+extern "C" {
 #include "global.h"
 #include "main.h"
 #include "obj.h"
@@ -14,3 +15,4 @@ const u16 gSpeedEffectDurations[] = { 150, 120, 90, 90, 90, 90, 90, 120, 150, 18
 
 const u8 gCharaTable[] = { 0, 1, 2, 3 };
 const s16 gStartHeading = 0;
+}

@@ -19,7 +19,6 @@ struct ChunkHeader {
     u32 size;
 };
 
-extern const char gChunkFileName[];
 
 void Chunk_Construct(struct Chunk *c);
 struct Chunk *Chunk_Create(struct Chunk *c, const void *buf);

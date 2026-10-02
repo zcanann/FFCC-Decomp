@@ -190,6 +190,10 @@ struct Effect {
 
 /* Static decoration sprite placed on the course */
 struct Scenery {
+#ifdef __cplusplus
+    Scenery() {}
+#endif
+
     struct Vec3 pos;
     u8 unused[4];
     u8 animNo;
@@ -236,7 +240,6 @@ extern const u16 gSpeedEffectDurations[];
 extern u8 gDirAnims[];
 extern u8 gEngineSong;
 extern u8 gSkidSong;
-extern const char gObjFileName[];
 extern const u8 gObjData[];
 extern const u8 gObjTilesLz[];
 extern const u8 gObjPaletteLz[];
@@ -286,7 +289,6 @@ u8 Game_IsWrongWay(struct Game *game, u8 no);
 struct Actor *Game_FindChaser(struct Game *game, u8 no, u8 mode);
 void Game_AddPlayer(struct Game *game, u8 no, u8 chara);
 void Game_AddEnemies(struct Game *game, s32 count);
-void Obj_StaticInit(void);
 
 /* sprites */
 void Oam_Clear(struct Game *game);
@@ -296,9 +298,9 @@ struct OamNode *Oam_AllocNode(struct Game *game, struct OamData *oam);
 void Sprite_DrawAnim(struct Game *game, struct AnimState *anim, struct Point *pos, s16 prio);
 void Sprite_Draw(struct Game *game, s16 animNo, struct Point *pos, s16 prio);
 void Sprite_DrawAnimScaled(struct Game *game, struct AnimState *anim, struct Vec3 *pos);
-void Sprite_DrawScaled(struct Game *game, int animNo, struct Vec3 *pos);
+void Sprite_DrawScaled(struct Game *game, s16 animNo, struct Vec3 *pos);
 void Sprite_DrawAnim3D(struct Game *game, struct AnimState *anim, struct Vec3 *pos);
 void Sprite_Draw3D(struct Game *game, u16 animNo, struct Vec3 *pos);
-void Sprite_Draw3DOffset(struct Game *game, int animNo, struct Vec3 *pos, int dx, int dy, int prio);
+void Sprite_Draw3DOffset(struct Game *game, u16 animNo, struct Vec3 *pos, s16 dx, s16 dy, s16 prio);
 
 #endif

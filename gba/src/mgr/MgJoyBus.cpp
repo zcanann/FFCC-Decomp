@@ -1,6 +1,7 @@
+extern "C" {
 #include "global.h"
 #include "main.h"
-#include "joybus.h"
+#include "MgJoyBus.h"
 #include "text.h"
 
 /* JOY Bus commands from the GameCube */
@@ -18,9 +19,7 @@
 #define LINK_CMD_REMOVE_PLAYER 0x2001
 #define LINK_CMD_START         30
 
-const char gJoyAgbId[] = "AMGR";
-const char gJoyGcId[] = "GMGR";
-const char gJoyBusFileName[] = "C:/FFF/miniGame/mgr/MgJoyBus/MgJoyBus.cpp";
+#define JOYBUS_FILE "C:/FFF/miniGame/mgr/MgJoyBus/MgJoyBus.cpp"
 
 struct JoyWork gJoyWork;
 vu16 gPadHeld[4];
@@ -46,6 +45,22 @@ u16 gLinkFrameCount;
 vu8 gLinkWarmup;
 u8 gJoySendPending;
 vu8 gJoyIntrCount;
+
+static inline s32 IsActive(u16 no)
+{
+    return (1 << no) & gPlayerMask;
+}
+
+static inline void CountPlayers(void)
+{
+    s32 i;
+
+    gPlayerCount = 0;
+    for (i = 0; i < 4; i++) {
+        if (((gPlayerMask >> i) & 1) == 1)
+            gPlayerCount++;
+    }
+}
 
 static inline void Link_SendNext(void)
 {
@@ -329,8 +344,8 @@ void Link_InitState(void)
             ((u8 *)&gJoyWork)[k] = 0;
         gJoyWork.firstInit = 1;
         Link_Init();
-        gJoyWork.agbId = *(const u32 *)gJoyAgbId;
-        gJoyWork.expectedGcId = *(const u32 *)gJoyGcId;
+        gJoyWork.agbId = *(const u32 *)"AMGR";
+        gJoyWork.expectedGcId = *(const u32 *)"GMGR";
         gJoyWork.send.ctx.cartFixed = *(u16 *)0x080000B2;
         gJoyWork.send.ctx.cartGameCode = *(u32 *)0x080000AC;
         REG_IME = ime;
@@ -430,11 +445,11 @@ void Link_ApplyRemotePads(void)
                         gPadHeld[i] = keys;
                     }
                 } else {
-                    AssertFailed(gJoyBusFileName, 839);
+                    AssertFailed(JOYBUS_FILE, 839);
                 }
             } else if ((u32)(1 << i) & gPlayerMask) {
                 if (gLinkSynced)
-                    AssertFailed(gJoyBusFileName, 844);
+                    AssertFailed(JOYBUS_FILE, 844);
                 goto fail;
             }
             gJoyRecvQueue.rows[gJoyRecvQueue.read].valid[i] = 0;
@@ -507,4 +522,5 @@ void Link_BuildPadPacket(void)
     }
     if (gLinkSynced)
         gLinkFrameCount++;
+}
 }

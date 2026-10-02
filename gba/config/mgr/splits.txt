@@ -4,14 +4,11 @@ crt0:
 main:
 	.text       start:0x020001A0 end:0x02001BA8
 
-joybus:
+MgJoyBus:
 	.text       start:0x02001BA8 end:0x0200269C
 
-racer:
-	.text       start:0x0200269C end:0x02003E14
-
 obj:
-	.text       start:0x02003E14 end:0x02004F04
+	.text       start:0x0200269C end:0x02004F04
 
 effect:
 	.text       start:0x02004F04 end:0x02005D28
@@ -223,7 +220,7 @@ libgcc/_negdi2:
 main:
 	.rodata     start:0x0200EC98 end:0x0200ED6E
 
-joybus:
+MgJoyBus:
 	.rodata     start:0x0200ED70 end:0x0200EDAA
 
 obj:
@@ -274,7 +271,7 @@ course:
 bss:
 	.bss        start:0x02014690 end:0x020159A4
 
-racer:
+obj:
 	.data       start:0x020159A4 end:0x020159AC
 
 effect:
@@ -322,7 +319,7 @@ sound:
 main:
 	.bss        start:0x03000000 end:0x03005C78
 
-joybus:
+MgJoyBus:
 	.bss        start:0x03005C78 end:0x03005DF4
 
 obj:

@@ -1,3 +1,4 @@
+extern "C" {
 #include "global.h"
 #include "obj.h"
 #include "route.h"
@@ -33,3 +34,4 @@ const struct ActorData gEnemyData[] = {
     { 10, 64, 8, 32, 1936, 0, 0, 1, 1, { 5, 9, 0, 0 } },
     { 24, 64, 8, 32, 1984, 0, 0, 0, 0, { 5, 9, 0, 0 } },
 };
+}

@@ -1,3 +1,4 @@
+extern "C" {
 #include "global.h"
 #include "main.h"
 #include "obj.h"
@@ -59,12 +60,7 @@ void Camera_Update(struct Camera *cam)
     }
 }
 
-void Camera_Follow(cam, target, yaw, dist, near)
-    struct Camera *cam;
-    struct Vec3 *target;
-    u16 yaw;
-    u16 dist;
-    u8 near;
+void Camera_Follow(struct Camera *cam, struct Vec3 *target, u16 yaw, s16 dist, u8 near)
 {
     cam->target = *target;
     cam->target.y = 0;
@@ -179,7 +175,4 @@ void Camera_ScreenToWorld(struct Camera *cam, struct Vec3 *in, struct Vec3 *out)
     Camera_ScreenToView(cam, in, &tmp);
     Camera_ViewToWorld(cam, &tmp, out);
 }
-
-void Camera_StaticInit(void)
-{
 }

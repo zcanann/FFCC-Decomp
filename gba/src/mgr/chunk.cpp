@@ -1,7 +1,8 @@
+extern "C" {
 #include "global.h"
 #include "chunk.h"
 
-const char gChunkFileName[] = "C:/FFF/miniGame/mgr/chunk.cpp";
+#define CHUNK_FILE "C:/FFF/miniGame/mgr/chunk.cpp"
 
 void Chunk_Construct(struct Chunk *c)
 {
@@ -16,7 +17,7 @@ struct Chunk *Chunk_Create(struct Chunk *c, const void *buf)
 void Chunk_SetBuffer(struct Chunk *c, const void *buf)
 {
     if (buf == NULL)
-        AssertFailed(gChunkFileName, 41);
+        AssertFailed(CHUNK_FILE, 41);
     c->base = (u8 *)buf;
     c->chunk = (u8 *)buf;
     c->offset = 0;
@@ -110,4 +111,5 @@ void Chunk_Align(struct Chunk *c, u32 align)
 void Chunk_Skip(struct Chunk *c, s32 n)
 {
     c->pos += n;
+}
 }

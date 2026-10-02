@@ -200,7 +200,7 @@ public:
     char m_animSlots[64];             // 0x9D
     unsigned char m_animQueuePos;     // 0xDD
     char m_animQueue[4];              // 0xDE
-    unsigned char m_animStateMisc;    // 0xE2
+    signed char m_animStateMisc;      // 0xE2
     char m_currentAnimSlot;           // 0xE3
     char m_animSlotSel;               // 0xE4
     unsigned char m_dispItemTimer;    // 0xE5

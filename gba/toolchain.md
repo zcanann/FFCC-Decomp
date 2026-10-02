@@ -84,9 +84,21 @@ remain open questions.
 ## What the matching link establishes
 
 The generated linker script concatenates input object sections in reconstructed
-order. It fixes output section origins, rather than pinning every function to
-its retail address. A byte-identical linked image therefore checks code, data,
+order. Loaded read-only and writable ranges retain separate output sections;
+repeated ranges, such as minigame graphics after writable data, use numbered
+section suffixes. Binary export includes all of these ranges. The linker fixes
+output section origins, rather than pinning every function to its retail address.
+A byte-identical linked image therefore checks code, data,
 relocations, section sizes, alignment and ordering together. GBA unit names and
 boundaries are reconstructed; there is no shipped GBA MAP identifying the
 original build orchestrator. Exact matches do not establish whether the original
 project used Make, an IDE, or another build system.
+
+The minigame's sound work area is part of the downloaded image. Its seven typed
+objects in `sound_data.c` have explicit zero initializers, which this compiler
+emits in declaration order in `.data`. The following 260 bytes remain unclaimed.
+These reconstructed unit boundaries do not establish the original source files.
+The SDK still supplies tentative common definitions for four sound globals;
+binutils warns that their default 16-byte common alignment exceeds the source
+object's 4-byte alignment. All four final addresses are 16-byte aligned and match
+the retail references; the checked image also verifies their placement.

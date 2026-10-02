@@ -869,20 +869,23 @@ chara.cpp:
 	extabindex  start:0x8000D4C8 end:0x8000D69C
 	.text       start:0x8006EB04 end:0x80073AF4
 	.ctors      start:0x801D5410 end:0x801D5414
+	.rodata     start:0x801D9078 end:0x801D9128
 	.data       start:0x801FCCD0 end:0x801FCD38
 	.bss        start:0x802E78E0 end:0x802E9958
 	.sdata      start:0x8032E6D8 end:0x8032E708
 	.sbss       start:0x8032EDA0 end:0x8032EDA8
+	.sdata2     start:0x803301A8 end:0x80330228
 
 p_chara.cpp:
 	extab       start:0x800075E0 end:0x80007838
 	extabindex  start:0x8000D69C end:0x8000D9A8
 	.text       start:0x80073AF4 end:0x8007BB90
 	.ctors      start:0x801D5414 end:0x801D5418
+	.rodata     start:0x801D9128 end:0x801D9B70
 	.data       start:0x801FCD38 end:0x801FD340
 	.bss        start:0x802E9958 end:0x802EA080
 	.sdata      start:0x8032E708 end:0x8032E768
-	.sdata2     start:0x80330240 end:0x80330330
+	.sdata2     start:0x80330228 end:0x80330330
 
 pppDrawMng.cpp:
 	extab       start:0x80007838 end:0x80007850
@@ -897,7 +900,7 @@ gobject.cpp:
 	.rodata     start:0x801D9BD0 end:0x801D9BDC
 	.data       start:0x801FD360 end:0x801FD3A4
 	.sdata      start:0x8032E768 end:0x8032E780
-	.sdata2     start:0x80330370 end:0x80330448
+	.sdata2     start:0x80330338 end:0x80330448
 
 pppRyjMegaBirth.cpp:
 	extab       start:0x80007988 end:0x800079C0

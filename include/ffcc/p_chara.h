@@ -61,6 +61,7 @@ public:
         ~CHandle();
 
         void Add();
+        void Remove();
 
         void ChangeTexture(int, unsigned long, unsigned long, int, int);
         int LoadModel(int, unsigned long, unsigned long, unsigned long, int, int, int);
@@ -126,7 +127,7 @@ public:
         ~CLoadModel();
 
         int m_keyTag;                   // 0x08
-        int m_keyId;                    // 0x0C
+        unsigned long m_keyId;          // 0x0C
         int m_mergeFileId;              // 0x10
         int m_mergeFlags;               // 0x14
         CChara::CModel* m_model;        // 0x18
@@ -147,7 +148,7 @@ public:
         ~CLoadAnim();
 
         int m_keyTag;                   // 0x08
-        int m_keyId;                    // 0x0C
+        unsigned long m_keyId;          // 0x0C
         int m_mergeFileId;              // 0x10
         int m_mergeFlags;               // 0x14
         char m_name[16];                // 0x18
@@ -173,10 +174,10 @@ public:
         ~CLoadTexture();
 
         int m_keyTag;                   // 0x08
-        int m_keyId;                    // 0x0C
+        unsigned long m_keyId;          // 0x0C
         int m_mergeFileId;              // 0x10
         int m_mergeFlags;               // 0x14
-        int m_variantTag;               // 0x18
+        unsigned long m_variantTag;     // 0x18
         CTextureSet* m_textureSet;      // 0x1C
         int m_streamMode;               // 0x20
         unsigned int m_streamOffset;    // 0x24
@@ -209,7 +210,6 @@ public:
     static CProcessCallbackTable m_table[3];
     static const char* m_modelTable[6][3];
 
-    CCharaPcs();
     ~CCharaPcs();
 
     void Init();
@@ -246,17 +246,17 @@ public:
     int releaseUnuseLoadModel(int);
     void releaseUnuseLoadAnim(CCharaPcs::CLoadAnim*, int);
     void DumpLoad();
-    void searchModel(int, int);
-    void searchTexture(int, int, int);
-    void searchAnim(int, int, char*);
-    void searchPdt(int, int, int);
+    CLoadModel* searchModel(int, int);
+    CLoadTexture* searchTexture(int, int, int);
+    CLoadAnim* searchAnim(int, int, char*);
+    CLoadPdt* searchPdt(int, int, int);
     void LoadCam(int, char*);
     void LoadMergeFile(int, int, int);
     void FreeMergeFile(int);
     void isCached(int, int);
-    void loadModel(void*, int, int, int, int, int, int);
-    void loadTexture(void*, int, int, int, int, int, int, int);
-    void loadAnimBuffer(void*, char*, int, int, int, int);
+    CLoadModel* loadModel(void*, int, int, int, int, int, int);
+    CLoadTexture* loadTexture(void*, int, int, int, int, int, int, int);
+    CLoadAnim* loadAnimBuffer(void*, char*, int, int, int, int);
     void drawOverlap();
     int LoadAnim(int, int, char*, int, int, int);
     void GetAnimStage();

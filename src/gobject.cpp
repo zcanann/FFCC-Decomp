@@ -88,10 +88,6 @@ static inline bool HasLoadedModel(CCharaPcs::CHandle* handle)
     return handle != 0 && handle->m_model != 0;
 }
 
-extern "C" const float sZeroFloat;
-extern "C" const double DOUBLE_803303B0; // 0.5
-extern "C" const double DOUBLE_803303B8; // 3.0
-extern "C" const double DOUBLE_803303C0; // 0.0
 
 static inline float GObjSqrtf(float x)
 {
@@ -103,14 +99,14 @@ static inline float GObjSqrtf(float x)
 
     if (x > 0.0f) {
         double guess = __frsqrte((double)x);
-        guess = DOUBLE_803303B0 * guess * (DOUBLE_803303B8 - guess * guess * x);
-        guess = DOUBLE_803303B0 * guess * (DOUBLE_803303B8 - guess * guess * x);
-        guess = DOUBLE_803303B0 * guess * (DOUBLE_803303B8 - guess * guess * x);
+        guess = 0.5 * guess * (3.0 - guess * guess * x);
+        guess = 0.5 * guess * (3.0 - guess * guess * x);
+        guess = 0.5 * guess * (3.0 - guess * guess * x);
         x = (float)(x * guess);
         return x;
     }
 
-    if ((double)x < DOUBLE_803303C0) {
+    if ((double)x < 0.0) {
         x = NAN;
         return x;
     }
@@ -192,71 +188,18 @@ static inline double ClampDouble(double value, double minValue, double maxValue)
     return value;
 }
 
-extern "C" const float sAnimFrameOffset;
-extern "C" const float sZeroFloat;
-
 static inline float WrapAnimFrame(float value, float span)
 {
-    if (value < sZeroFloat) {
-        return (span - sAnimFrameOffset) - fmodf(-value, span);
+    if (value < 0.0f) {
+        return (span - 1.0f) - fmodf(-value, span);
     }
     return fmodf(value, span);
 }
 
-static const float sBgDefaultGravityY = 0.0;
 static const char s_gobject_cpp[] = "gobject.cpp";
-static const char s_l_item2[] = "l_item2";
-static const char s_r_item[] = "r_item";
 static const char s_noTurnMotion[36] =
     "\203\136\201\133\203\223\203\202\201\133\203\126\203\207\203\223"
     "\202\315\202\240\202\350\202\334\202\271\202\361\201\102\012";
-extern "C" const float sAnimFrameOffset;                    // FLOAT_80330338
-extern "C" const float sQuarterTurn;         // FLOAT_80330344
-extern "C" const double sLoopBias;                    // DOUBLE_80330378
-extern "C" const float sZeroFloat;                    // FLOAT_80330350
-extern "C" const float sPushDistance;           // FLOAT_80330354
-extern "C" const float sDownUnitY;                // FLOAT_80330358 = c4fa0000 (binary-verified -2000.0f)
-extern "C" const float sDownProbeDistance;    // FLOAT_8033035c
-extern "C" const float sStepProbeHeight;           // FLOAT_80330360
-extern "C" const float sBgAttrSlow;               // FLOAT_80330364
-extern "C" const float sBgAttrNormal;              // FLOAT_80330368
-extern "C" const float sBgAttrFast;               // FLOAT_8033036c
-static const float sDebugScreenY = 320.0f;            // FLOAT_80330370
-static const float sDebugScreenX = 224.0f;            // FLOAT_80330374
-extern "C" const float sNegativeOne;              // FLOAT_80330390
-extern "C" const float sLargeDistance;      // FLOAT_80330394
-extern "C" const float sDefaultMoveBaseSpeed;      // FLOAT_803303d4
-extern "C" const float sHitProbeHeight;          // FLOAT_80330410
-extern "C" const float sHitMoveScale;       // FLOAT_80330414
-extern "C" const float sJumpLift;                 // FLOAT_80330418
-extern "C" const float sLandingDampenCutoff;      // FLOAT_8033041c
-static const float sMinGroundClamp = -4.0f;           // FLOAT_80330420
-extern "C" const float sCrossCheckOuterRadius;    // FLOAT_80330424
-static const float sGroundOffsetFloor = -5.0f;        // FLOAT_80330428
-static const float sAnalogSpeedScale = 4.0f;          // FLOAT_8033042c
-static const float sSlideThreshold = 0.01f;           // FLOAT_80330430
-extern "C" const float sDefaultAttackColRadius;    // FLOAT_80330434
-extern "C" const float sDefaultBodyColRadius;      // FLOAT_80330438
-extern "C" const float FLOAT_8033043C;
-extern "C" const float FLOAT_803303FC;            // 1.2f // FLOAT_8033043c
-extern "C" const float sDefaultBgDownDist; // FLOAT_80330440
-extern "C" const float sRadiusWobbleScale;         // FLOAT_80330398 (0.8)
-extern "C" const float sWobbleBiasLarge;           // FLOAT_8033039c (0.3)
-extern "C" const float sWobbleBiasSmall;           // FLOAT_803303a0 (0.05)
-extern "C" const float sRadiusWobbleDecay;         // FLOAT_803303a4 (0.95)
-extern "C" const float sPiFloat;                   // FLOAT_803303a8
-extern "C" const float sRadiusCtrlStep;            // FLOAT_803303ac (0.1)
-extern "C" const float sTiltDivisor;               // FLOAT_803303c8 (3.0)
-extern "C" const float sSwayImpulse;               // FLOAT_803303cc (0.2)
-extern "C" const float sSwayDotLimit;              // FLOAT_803303d0 (0.9999)
-extern "C" const float sSwayDamping;               // FLOAT_803303d8 (0.9)
-extern "C" const float sNegWobbleBiasSmall;        // FLOAT_803303dc (-0.05)
-extern "C" const double sYawLookCutoff = 1.5707963705062866;   // DOUBLE_803303e0 = 3ff921fb60000000 = (double)(pi/2 f)
-extern "C" const double sPitchLookCutoff = 0.7853981852531433; // DOUBLE_803303e8 = 3fe921fb60000000 = (double)(pi/4 f)
-extern "C" const float sLookBlendScale;            // FLOAT_803303f0 (0.001)
-extern "C" const float sFarVisibleDepth;           // FLOAT_803303f4 (10000)
-extern "C" const float sNearVisibleDepth;          // FLOAT_803303f8 (750)
-// DOUBLE_80330400 defined at end of file
 
 static inline CVector vecScale(const CVector& v, float scale)
 {
@@ -276,7 +219,7 @@ static inline int checkProbeHit(CMapCylinder* cylinder, CVector* base, CVector* 
     cylinder->m_axis.x = move->x;
     cylinder->m_axis.y = move->y;
     cylinder->m_axis.z = move->z;
-    cylinder->m_radius = sZeroFloat;
+    cylinder->m_radius = 0.0f;
 
     return mapMng->CheckHitCylinderNear(cylinder, reinterpret_cast<Vec*>(move), mask);
 }
@@ -392,7 +335,7 @@ void CGObject::PutDropItem()
                 createMode = 0;
             }
 
-            CGItemObj::CreateFromScript(createMode, 4, dropCode, this, sQuarterTurn * (float)dropCount, 0);
+            CGItemObj::CreateFromScript(createMode, 4, dropCode, this, 1.5707964f * (float)dropCount, 0);
             dropCount++;
         }
     }
@@ -411,7 +354,7 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
 {
     Vec centerPos;
     Vec hitMove;
-    float safeDistance = sZeroFloat;
+    float safeDistance = 0.0f;
 
     centerPos.x = other->m_worldPosition.x;
     if (other->m_worldPosition.y > m_worldPosition.y) {
@@ -423,13 +366,13 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     centerPos.z = other->m_worldPosition.z;
 
     PSVECSubtract(&m_worldPosition, &centerPos, &hitMove);
-    hitMove.y = sZeroFloat;
+    hitMove.y = 0.0f;
 
     const float hitRadius = m_capsuleHalfHeight;
     CMapCylinder hitCylinder;
     hitCylinder.m_bottom = centerPos;
     hitCylinder.m_axis.x = hitMove.x;
-    hitCylinder.m_axis.y = sZeroFloat;
+    hitCylinder.m_axis.y = 0.0f;
     hitCylinder.m_axis.z = hitMove.z;
     hitCylinder.m_radius = hitRadius;
 
@@ -441,10 +384,9 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     } else {
         *outSafePos = m_worldPosition;
         hitMove.x = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) * (float)sin((double)other->m_rotBaseY);
-        hitMove.y = sZeroFloat;
-        const float cosRot = (float)cos((double)other->m_rotBaseY);
+        hitMove.y = 0.0f;
+        hitMove.z = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) * (float)cos((double)other->m_rotBaseY);
         const float safeRadius = m_capsuleHalfHeight;
-        hitMove.z = (safeRadius + other->m_capsuleHalfHeight) * cosRot;
 
         CMapCylinder safeCylinder;
         safeCylinder.m_bottom = centerPos;
@@ -608,21 +550,21 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
     if (m_weaponNodeFlagBits.m_unk10 && (Game.m_currentMapId != 0x21)) {
         {
             Vec bottom = m_worldPosition;
-            const float bottomY = (useCapsuleOffset != 0 ? m_capsuleHalfHeight : sPushDistance) + bottom.y;
+            const float bottomY = (useCapsuleOffset != 0 ? m_capsuleHalfHeight : 1000.0f) + bottom.y;
             bottom.y = bottomY;
             Vec direction = bottom;
-            direction.x = sZeroFloat;
-            direction.y = sDownUnitY;
-            direction.z = sZeroFloat;
+            direction.x = 0.0f;
+            direction.z = 0.0f;
+            direction.y = -2000.0f;
             const u32 hitMask = m_bgHitMask;
             CMapCylinder bodyCylinder;
             bodyCylinder.m_bottom.x = bottom.x;
             bodyCylinder.m_bottom.y = bottomY;
             bodyCylinder.m_bottom.z = bottom.z;
-            bodyCylinder.m_axis.y = sDownUnitY;
-            bodyCylinder.m_axis.x = sZeroFloat;
-            bodyCylinder.m_axis.z = sZeroFloat;
-            bodyCylinder.m_radius = sZeroFloat;
+            bodyCylinder.m_axis.x = 0.0f;
+            bodyCylinder.m_axis.y = -2000.0f;
+            bodyCylinder.m_axis.z = 0.0f;
+            bodyCylinder.m_radius = 0.0f;
 
             if (MapMng.CheckHitCylinderNear(
                     &bodyCylinder, &direction,
@@ -637,26 +579,26 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
         }
         if (hasModel) {
             if (checkProbeHit(&CMapCylinder(),
-                    &CVector(m_worldPosition.x, sStepProbeHeight + m_worldPosition.y, m_worldPosition.z),
-                    &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat), 0x78000000) != 0) {
+                    &CVector(m_worldPosition.x, 5.0f + m_worldPosition.y, m_worldPosition.z),
+                    &CVector(0.0f, -10000.0f, 0.0f), 0x78000000) != 0) {
                 switch (gMapHitFace->m_groupIndex - 0x28) {
                 case 0:
-                    m_bgAttrValue = sBgAttrSlow;
+                    m_bgAttrValue = 0.75f;
                     break;
                 case 1:
-                    m_bgAttrValue = sBgAttrNormal;
+                    m_bgAttrValue = 0.5f;
                     break;
                 case 2:
-                    m_bgAttrValue = sBgAttrFast;
+                    m_bgAttrValue = 0.25f;
                     break;
                 case 3:
-                    m_bgAttrValue = sZeroFloat;
+                    m_bgAttrValue = 0.0f;
                     break;
                 default:
                     break;
                 }
             } else {
-                m_bgAttrValue = sAnimFrameOffset;
+                m_bgAttrValue = 1.0f;
             }
         }
         m_animBlend = m_bgAttrValue;
@@ -674,15 +616,15 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
  */
 void CGObject::DrawDebug(CFont* font)
 {
-    if (m_weaponNodeFlagBits.m_unk20 && (sZeroFloat < m_screenDepth)) {
-        float invDepth = sAnimFrameOffset / m_screenDepth;
-        float xProd = sDebugScreenX * m_projection.z;
-        float yProd = sDebugScreenY * m_projection.y;
+    if (m_weaponNodeFlagBits.m_unk20 && (0.0f < m_screenDepth)) {
+        float invDepth = 1.0f / m_screenDepth;
+        float xProd = 224.0f * m_projection.z;
+        float yProd = 320.0f * m_projection.y;
         float screenX[2];
-        screenX[0] = -(xProd * invDepth - sDebugScreenX);
+        screenX[0] = -(xProd * invDepth - 224.0f);
 
         onDrawDebug(font,
-                    yProd * invDepth + sDebugScreenY,
+                    yProd * invDepth + 320.0f,
                     screenX[0],
                     m_projection.w * invDepth);
     }
@@ -733,8 +675,7 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
     }
 
     m_shieldNodeFlagBits.m_bit08 = 1;
-    const float& zero = sZeroFloat;
-    m_turnSpeed = zero;
+    m_turnSpeed = 0.0f;
 }
 
 /*
@@ -750,7 +691,7 @@ void CGObject::CancelAnim(int keepFacing)
 {
     m_currentAnimSlot = -1;
     m_shieldNodeFlagBits.m_bit40 = 0;
-    m_turnSpeed = sZeroFloat;
+    m_turnSpeed = 0.0f;
 
     if (keepFacing != 0) {
         m_rotTargetY = m_rotBaseY;
@@ -784,33 +725,28 @@ int CGObject::IsLoopAnim(int mode)
 
     CChara::CModel& model = *handle->m_model;
     if (model.m_anim != 0) {
-        const float span = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
+        float span = 1.0f + (model.m_animEnd - model.m_animStart);
 
-        if (sAnimFrameOffset == span) {
+        if (1.0f == span) {
             return 1;
         }
 
-        float base;
+        float frame;
         if (mode != 0) {
-            base = m_turnSpeed;
+            frame = m_turnSpeed;
         } else {
-            base = model.m_time;
+            frame = model.m_time;
         }
-
-        double threshold = static_cast<double>(base);
 
         if (mode == 2) {
-            threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
+            frame += 1.2;
         }
 
-        const float lastAttr = m_lastBgAttr;
-
-        if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat)) {
-            return static_cast<double>(sZeroFloat) >= threshold;
+        if (m_lastBgAttr < 0.0f) {
+            return 0.0f >= frame;
         }
 
-        const double diff = static_cast<double>(span - sAnimFrameOffset);
-        return diff < threshold;
+        return span - 1.0f < frame;
     }
 
     return 1;
@@ -893,7 +829,7 @@ void CGObject::LoadShield(int itemId)
 
         m_shieldModelHandle->LoadModel(4, static_cast<unsigned long>(itemId), 0, textureVariant, -1, 0, 1);
         m_shieldAttachNodeIndex =
-            m_charaModelHandle->m_model->SearchNode(const_cast<char*>(s_l_item2));
+            m_charaModelHandle->m_model->SearchNode("l_item2");
     }
 }
 
@@ -924,7 +860,7 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
         m_weaponModelHandle->LoadModel(
             4, static_cast<unsigned long>(itemId), static_cast<unsigned long>(itemVariant), textureVariant, -1, 0, 1);
         m_weaponAttachNode =
-            m_charaModelHandle->m_model->SearchNode(const_cast<char*>(s_r_item));
+            m_charaModelHandle->m_model->SearchNode("r_item");
     }
 }
 
@@ -1019,8 +955,7 @@ void CGObject::SetTexAnim(char* name)
     if (hasModel) {
         texAnimSet = handle->m_model->m_texAnimSet;
         if (texAnimSet != (CTexAnimSet*)0) {
-            const float& zero = sZeroFloat;
-            texAnimSet->Change(name, zero, (CTexAnimSet::ANIM_TYPE)-2);
+            texAnimSet->Change(name, 0.0f, (CTexAnimSet::ANIM_TYPE)-2);
         }
     }
 }
@@ -1102,7 +1037,7 @@ void CGObject::Turn(float targetRot, int turnFrames)
         Math.DstRot(m_rotBaseY, m_rotTargetY) / static_cast<float>(turnFrames);
     m_turnAnimFrames = turnFrames;
 
-    PlayAnim((m_turnBaseSpeed < sZeroFloat) ? 2 : 3, 0, 0, -1, -1, 0);
+    PlayAnim((m_turnBaseSpeed < 0.0f) ? 2 : 3, 0, 0, -1, -1, 0);
 }
 
 /*
@@ -1125,10 +1060,10 @@ void CGObject::boundCheck()
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTXCopy(cameraMtx, clipMtx);
-    clipMtx[3][2] = sZeroFloat;
-    clipMtx[3][1] = sZeroFloat;
-    clipMtx[3][0] = sZeroFloat;
-    clipMtx[3][3] = sAnimFrameOffset;
+    clipMtx[3][2] = 0.0f;
+    clipMtx[3][1] = 0.0f;
+    clipMtx[3][0] = 0.0f;
+    clipMtx[3][3] = 1.0f;
 
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     PSMTX44Concat(screenMtx, clipMtx, screenMtx);
@@ -1137,9 +1072,9 @@ void CGObject::boundCheck()
         float clipLimit;
         float oneF;
         float zero;
-        zero = sZeroFloat;
-        oneF = sAnimFrameOffset;
-        clipLimit = sNegativeOne;
+        zero = 0.0f;
+        oneF = 1.0f;
+        clipLimit = -1.0f;
 
         clipMask = 0x1F;
         s32 i = 0;
@@ -1362,13 +1297,13 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
 
     PSVECSubtract(targetPos, &origin, &toTarget);
     const float maxDist = PSVECMag(&toTarget);
-    if (static_cast<double>(sZeroFloat) == static_cast<double>(maxDist)) {
+    if (0.0f == maxDist) {
         return 0;
     }
 
     PSVECNormalize(&toTarget, &targetDir);
     const float maxAngle = static_cast<float>(atan2(static_cast<double>(radius), static_cast<double>(maxDist)));
-    float bestDist = sLargeDistance;
+    float bestDist = 10000000.0f;
     best = 0;
 
     for (CGObject* other = CFlat.FindGObjFirst(); other != 0;
@@ -1390,12 +1325,12 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
 
         PSVECSubtract(&other->m_worldPosition, &origin, &toOther);
         const float dist = PSVECMag(&toOther);
-        float extraAngle = sZeroFloat;
+        float extraAngle = 0.0f;
         if ((extraAngle < dist) && (dist < maxDist)) {
             if (useBodyRadius != 0) {
                 extraAngle = static_cast<float>(atan(static_cast<double>((other->m_bodyEllipsoidRadius * dist / maxDist) / dist)));
             }
-            PSVECScale(&toOther, &toOther, sAnimFrameOffset / dist);
+            PSVECScale(&toOther, &toOther, 1.0f / dist);
             const float angle = static_cast<float>(acos(static_cast<double>(PSVECDotProduct(&toOther, &targetDir))));
             if ((static_cast<double>(angle) < static_cast<double>(maxAngle + extraAngle)) && (dist < bestDist)) {
                 bestDist = dist;
@@ -1479,12 +1414,12 @@ void CGObject::moveVectorH(Vec* moveVec, float moveTimer, int turnFrames)
 {
     Vec unitVec;
     const float mag = PSVECMag(moveVec);
-    if (sZeroFloat == mag) {
-        unitVec.x = sZeroFloat;
-        unitVec.y = sZeroFloat;
-        unitVec.z = sZeroFloat;
+    if (0.0f == mag) {
+        unitVec.x = 0.0f;
+        unitVec.y = 0.0f;
+        unitVec.z = 0.0f;
     } else {
-        PSVECScale(moveVec, &unitVec, sAnimFrameOffset / mag);
+        PSVECScale(moveVec, &unitVec, 1.0f / mag);
     }
 
     m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
@@ -1510,12 +1445,12 @@ void CGObject::moveVector(Vec* moveVec, float moveTimer, int turnFrames)
 {
     Vec unitVec;
     const float mag = PSVECMag(moveVec);
-    if (sZeroFloat == mag) {
-        unitVec.x = sZeroFloat;
-        unitVec.y = sZeroFloat;
-        unitVec.z = sZeroFloat;
+    if (0.0f == mag) {
+        unitVec.x = 0.0f;
+        unitVec.y = 0.0f;
+        unitVec.z = 0.0f;
     } else {
-        PSVECScale(moveVec, &unitVec, sAnimFrameOffset / mag);
+        PSVECScale(moveVec, &unitVec, 1.0f / mag);
     }
 
     m_weaponNodeFlagAll.m_bits1.m_bit20 = 1;
@@ -1627,14 +1562,14 @@ void CGObject::onDraw()
 
     if (((CFlat.m_debugFlags & 0x2) != 0) && ((m_bgColMask & 0x2) != 0)) {
         CVector capsuleOffset;
-        if (sZeroFloat != m_bodyEllipsoidOffset) {
+        if (0.0f != m_bodyEllipsoidOffset) {
             capsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);
-            capsuleOffset.y = sZeroFloat;
+            capsuleOffset.y = 0.0f;
             capsuleOffset.z = m_bodyEllipsoidOffset * -cosf(m_rotBaseY);
         } else {
-            capsuleOffset.z = sZeroFloat;
-            capsuleOffset.y = sZeroFloat;
-            capsuleOffset.x = sZeroFloat;
+            capsuleOffset.z = 0.0f;
+            capsuleOffset.y = 0.0f;
+            capsuleOffset.x = 0.0f;
         }
 
         Mtx scaleMtx;
@@ -1831,7 +1766,7 @@ void CGObject::copy()
 void CGObject::update()
 {
     const unsigned int dbgFlags = DbgMenuPcs.GetDbgFlagsRaw();
-    const int miniGameModelPass = (dbgFlags & 0x8000) == 0;
+    const int miniGameModelPass = !(dbgFlags & 0x8000);
     unsigned char& weaponFlagsLo = m_weaponNodeFlagBytes.m_flags0;
     unsigned char& weaponFlagsHi = m_weaponNodeFlagBytes.m_flags1;
 
@@ -1856,8 +1791,8 @@ void CGObject::update()
 
         if (m_charaModelHandle->SetAnim(animIndex, startFrame, endFrame, blendMode, forceSet) != 0 &&
             m_currentAnimSlot != -1) {
-            float frame = sZeroFloat;
-            if (m_lastBgAttr < sZeroFloat) {
+            float frame = 0.0f;
+            if (m_lastBgAttr < 0.0f) {
                 frame = m_charaModelHandle->m_model->m_animStart;
                 frame = m_charaModelHandle->m_model->m_animEnd - frame;
             }
@@ -1876,7 +1811,7 @@ void CGObject::update()
         const double turnLimit = fabs(m_turnBaseSpeed);
         const double negLimit = -turnLimit;
         turnDelta = ClampDouble(turnDelta, negLimit, turnLimit);
-        turnFactor = sAnimFrameOffset;
+        turnFactor = 1.0f;
     } else {
         turnFactor = m_turnFactor;
     }
@@ -1902,9 +1837,9 @@ void CGObject::update()
         modelMtx[2][3] = m_worldPosition.z;
     } else {
         SRT srt;
-        const float scaleInit = sAnimFrameOffset;
-        srt.m_position.x = srt.m_position.y = srt.m_position.z = sZeroFloat;
-        srt.m_rotation.x = srt.m_rotation.y = srt.m_rotation.z = sZeroFloat;
+        const float scaleInit = 1.0f;
+        srt.m_position.x = srt.m_position.y = srt.m_position.z = 0.0f;
+        srt.m_rotation.x = srt.m_rotation.y = srt.m_rotation.z = 0.0f;
         srt.m_scale.x = srt.m_scale.y = srt.m_scale.z = scaleInit;
         srt.m_position = m_worldPosition;
         PSVECAdd(&srt.m_position, &m_extraMoveVec, &srt.m_position);
@@ -1918,16 +1853,16 @@ void CGObject::update()
 
         if (m_worldParamA == 0x20 || m_worldParamA == 0x13 || m_worldParamA == 0x15 ||
             m_worldParamA == 0x16 || m_worldParamA == 0x17 || m_worldParamA == 0x14) {
-            const float wobbleBias = m_worldParamA == 0x20 ? sWobbleBiasLarge : sWobbleBiasSmall;
-            m_swayTarget.y += sRadiusWobbleScale * m_swayTarget.x + wobbleBias;
-            m_swayTarget.x *= sRadiusWobbleDecay;
+            const float wobbleBias = m_worldParamA == 0x20 ? 0.3f : 0.05f;
+            m_swayTarget.y += 0.8f * m_swayTarget.x + wobbleBias;
+            m_swayTarget.x *= 0.95f;
             srt.m_rotation.y += m_swayTarget.y;
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             const float cameraYaw = CameraPcs.m_yaw;
-            srt.m_rotation.y = sPiFloat - cameraYaw;
-            srt.m_rotation.y += sBgAttrNormal * cosf(sBgAttrNormal * m_swayTarget.x);
-            srt.m_position.y += sAnimFrameOffset + sinf(m_swayTarget.x);
-            m_swayTarget.x += sRadiusCtrlStep;
+            srt.m_rotation.y = 3.1415927f - cameraYaw;
+            srt.m_rotation.y += 0.5f * cosf(0.5f * m_swayTarget.x);
+            srt.m_position.y += 1.0f + sinf(m_swayTarget.x);
+            m_swayTarget.x += 0.1f;
         }
 
         Math.SRTToMatrix(modelMtx, &srt);
@@ -1935,13 +1870,13 @@ void CGObject::update()
         Mtx rotScratch;
         if (m_stateFlags0Bits.unk3) {
             Mtx tiltMtx;
-            if (m_groundHitOffset.x != sZeroFloat || m_groundHitOffset.z != sZeroFloat) {
+            if (m_groundHitOffset.x || m_groundHitOffset.z) {
                 Vec axis;
                 const float slideMagSq =
                     m_groundHitOffset.x * m_groundHitOffset.x + m_groundHitOffset.z * m_groundHitOffset.z;
                 const float slideMag = GObjSqrtf(slideMagSq);
-                PSVECCrossProduct(&m_groundHitOffset, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &axis);
-                PSMTXRotAxisRad(rotScratch, &axis, -slideMag / sTiltDivisor);
+                PSVECCrossProduct(&m_groundHitOffset, CVector(0.0f, 1.0f, 0.0f), &axis);
+                PSMTXRotAxisRad(rotScratch, &axis, -slideMag / 3.0f);
                 PSMTXQuat(tiltMtx, &m_bgCollisionQtrn);
                 PSMTXConcat(rotScratch, tiltMtx, tiltMtx);
                 C_QUATMtx(&m_bgCollisionQtrn, tiltMtx);
@@ -1952,46 +1887,46 @@ void CGObject::update()
             const float tx = modelMtx[0][3];
             const float ty = modelMtx[1][3];
             const float tz = modelMtx[2][3];
-            modelMtx[0][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).x;
-            modelMtx[1][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).y;
-            modelMtx[2][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).z;
+            modelMtx[0][3] = CVector(0.0f, 0.0f, 0.0f).x;
+            modelMtx[1][3] = CVector(0.0f, 0.0f, 0.0f).y;
+            modelMtx[2][3] = CVector(0.0f, 0.0f, 0.0f).z;
             PSMTXConcat(tiltMtx, modelMtx, modelMtx);
             modelMtx[0][3] = tx;
             modelMtx[1][3] = ty;
             modelMtx[2][3] = tz;
         } else if ((m_objectFlags & 0x90) != 0 && m_stateFlags0Bits.unk0) {
-            if (m_groundHitOffset.x != sZeroFloat || m_groundHitOffset.z != sZeroFloat) {
-                m_swayTarget.x += sSwayImpulse * m_groundHitOffset.x;
-                m_swayTarget.z += sSwayImpulse * m_groundHitOffset.z;
+            if (m_groundHitOffset.x || m_groundHitOffset.z) {
+                m_swayTarget.x += 0.2f * m_groundHitOffset.x;
+                m_swayTarget.z += 0.2f * m_groundHitOffset.z;
             }
 
             const float swayDx = m_swayTarget.z - m_swayDirection.z;
             const float swayDz = m_swayTarget.x - m_swayDirection.x;
             const float swayMag = GObjSqrtf(swayDz * swayDz + swayDx * swayDx);
-            m_swayDirection.x += sBgAttrNormal * swayDz;
-            m_swayDirection.z += sBgAttrNormal * swayDx;
+            m_swayDirection.x += 0.5f * swayDz;
+            m_swayDirection.z += 0.5f * swayDx;
 
             float mtx0;
             float mtx1;
             float mtx2;
             Vec swayDir;
             PSVECNormalize(&m_swayDirection, &swayDir);
-            const float swayDot = PSVECDotProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat));
-            if (swayDot < sSwayDotLimit) {
+            const float swayDot = PSVECDotProduct(&swayDir, CVector(0.0f, 1.0f, 0.0f));
+            if (swayDot < 0.9999f) {
                 const float negSwayAngle = -acosf(swayDot);
                 Vec swayAxis;
-                PSVECCrossProduct(&swayDir, CVector(sZeroFloat, sAnimFrameOffset, sZeroFloat), &swayAxis);
+                PSVECCrossProduct(&swayDir, CVector(0.0f, 1.0f, 0.0f), &swayAxis);
                 PSMTXRotAxisRad(rotScratch, &swayAxis, negSwayAngle);
 
                 mtx0 = modelMtx[0][3];
                 mtx1 = modelMtx[1][3];
                 mtx2 = modelMtx[2][3];
-                modelMtx[0][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).x;
-                modelMtx[1][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).y;
-                modelMtx[2][3] = CVector(sZeroFloat, sZeroFloat, sZeroFloat).z;
+                modelMtx[0][3] = CVector(0.0f, 0.0f, 0.0f).x;
+                modelMtx[1][3] = CVector(0.0f, 0.0f, 0.0f).y;
+                modelMtx[2][3] = CVector(0.0f, 0.0f, 0.0f).z;
                 PSMTXConcat(rotScratch, modelMtx, modelMtx);
                 const float swayTan = tan(negSwayAngle);
-                const float swayTanScaled = sDefaultMoveBaseSpeed * swayTan;
+                const float swayTanScaled = 2.0f * swayTan;
                 modelMtx[0][3] = mtx0;
                 modelMtx[2][3] = mtx2;
                 mtx1 -= swayTanScaled;
@@ -2000,14 +1935,14 @@ void CGObject::update()
 
             const float swayRy = m_swayTarget.x;
             const float swayRx = m_swayTarget.z;
-            float swayClamp = swayDot < sAnimFrameOffset ? swayDot : sAnimFrameOffset;
-            swayClamp = swayClamp < sZeroFloat ? sZeroFloat : swayClamp;
+            float swayClamp = swayDot < 1.0f ? swayDot : 1.0f;
+            swayClamp = swayClamp < 0.0f ? 0.0f : swayClamp;
             const float swaySin = sinf(swayClamp);
             const float swayCos = cosf(swayClamp);
             m_swayTarget.x = swayCos * swayRy - swaySin * swayRx;
             m_swayTarget.z = swaySin * swayRy + swayCos * swayRx;
-            m_swayTarget.x *= sSwayDamping;
-            m_swayTarget.z *= sSwayDamping;
+            m_swayTarget.x *= 0.9f;
+            m_swayTarget.z *= 0.9f;
         }
     }
 
@@ -2039,7 +1974,7 @@ void CGObject::update()
             float interp = static_cast<float>(m_moveMode) / static_cast<float>(m_moveModePrevious);
             Vec fromOwner;
             Vec fromSelf;
-            PSVECScale(&attachPos, &fromOwner, sAnimFrameOffset - interp);
+            PSVECScale(&attachPos, &fromOwner, 1.0f - interp);
             PSVECScale(&m_worldPosition, &fromSelf, interp);
             PSVECAdd(&fromOwner, &fromSelf, &m_worldPosition);
             m_moveMode--;
@@ -2051,7 +1986,7 @@ void CGObject::update()
     }
 
     if (HasLoadedModel(m_charaModelHandle)) {
-        m_animBlend += ClampFloat(m_bgAttrValue - m_animBlend, sNegWobbleBiasSmall, sWobbleBiasSmall);
+        m_animBlend += ClampFloat(m_bgAttrValue - m_animBlend, -0.05f, 0.05f);
 
         float lookYaw = m_lookAtAccumYaw;
         float lookPitch = m_lookAtAccumPitch;
@@ -2068,12 +2003,12 @@ void CGObject::update()
             lookDelta.y += unk_0x184 - targetNodeY;
 
             const float lookDistance = PSVECMag(&lookDelta);
-            if (sZeroFloat != lookDistance) {
+            if (0.0f != lookDistance) {
                 const float targetYaw = atan2f(-lookDelta.x, -lookDelta.z);
                 const float yawDelta = Math.DstRot(targetYaw, m_rotBaseY);
-                if (fabs(yawDelta) < sYawLookCutoff) {
+                if (fabs(yawDelta) < 1.5707964f) {
                     const float pitchDelta = (float)atan2(lookDelta.y, lookDistance);
-                    if (fabs(pitchDelta) < sPitchLookCutoff) {
+                    if (fabs(pitchDelta) < 0.7853982f) {
                         lookYaw += yawDelta;
                         lookPitch += pitchDelta;
                     }
@@ -2083,7 +2018,7 @@ void CGObject::update()
 
         const unsigned char lookBlendByte = m_field_0x56;
         CChara::CModel* chestModel = m_charaModelHandle->m_model;
-        float lookBlend = sLookBlendScale * static_cast<float>(lookBlendByte);
+        float lookBlend = 0.001f * static_cast<float>(lookBlendByte);
         float currentYaw = chestModel->m_chestTilt;
         float currentPitch = chestModel->m_chestAmp;
         currentYaw = lookBlend * (lookYaw - currentYaw) + currentYaw;
@@ -2092,7 +2027,7 @@ void CGObject::update()
         chestModel->m_chestAmp = currentPitch;
         CChara::CModel* twistModel = m_charaModelHandle->m_model;
         const float twistAngle = twistModel->m_twistAngle;
-        twistModel->m_twistAngle = sBgAttrFast * (m_twistTarget - twistAngle) + twistAngle;
+        twistModel->m_twistAngle = 0.25f * (m_twistTarget - twistAngle) + twistAngle;
 
         m_charaModelHandle->m_model->SetMatrix(modelMtx);
 
@@ -2105,24 +2040,24 @@ void CGObject::update()
 
         boundCheck();
 
-        float visibleScale = sAnimFrameOffset;
+        float visibleScale = 1.0f;
         if (Game.m_currentMapId == 0x21) {
-            visibleScale = m_screenDepth > sFarVisibleDepth ? sZeroFloat : sAnimFrameOffset;
+            visibleScale = m_screenDepth > 10000.0f ? 0.0f : 1.0f;
         } else {
-            visibleScale = m_screenDepth > sNearVisibleDepth ? sZeroFloat : sAnimFrameOffset;
+            visibleScale = m_screenDepth > 750.0f ? 0.0f : 1.0f;
         }
 
         const float alphaTarget = m_alphaTarget * onAlphaUpdate();
         const float alphaStep = ClampFloat(alphaTarget * visibleScale - m_currentAlpha, -m_alphaStep, m_alphaStep);
         m_currentAlpha += alphaStep;
-        m_currentAlpha = ClampFloat(m_currentAlpha, sZeroFloat, sAnimFrameOffset);
-        const float worldParamStep = m_worldParam - sWobbleBiasSmall;
-        m_worldParam = worldParamStep < sZeroFloat ? sZeroFloat : worldParamStep;
+        m_currentAlpha = ClampFloat(m_currentAlpha, 0.0f, 1.0f);
+        const float worldParamStep = m_worldParam - 0.05f;
+        m_worldParam = worldParamStep < 0.0f ? 0.0f : worldParamStep;
         if ((m_displayFlags & 0x1000) != 0) {
             m_currentAlpha = alphaTarget;
         }
 
-        if (sZeroFloat == m_currentAlpha) {
+        if (0.0f == m_currentAlpha) {
             m_weaponNodeFlagBits.m_unk20 = 0;
         }
         m_weaponNodeFlagBits.m_unk40 |= m_weaponNodeFlagBits.m_unk20;
@@ -2149,26 +2084,27 @@ void CGObject::update()
         if ((m_displayFlags & 2) != 0) {
             float frameStep;
             if (m_animSlotSel != -1 && m_shieldNodeFlagBits.m_bit40) {
+                float turnRate;
                 if (m_charaModelHandle->m_model->m_anim != 0) {
                     const unsigned short frameCount = m_charaModelHandle->m_model->m_anim->m_frameCount;
-                    frameStep = static_cast<float>(frameCount) /
-                                 static_cast<float>(m_turnAnimFrames) + m_turnSpeed;
+                    turnRate = static_cast<float>(frameCount) / static_cast<float>(m_turnAnimFrames);
                 } else {
                     if (static_cast<unsigned int>(System.m_execParam) >= 2) {
                         System.Printf(const_cast<char*>(s_noTurnMotion));
                     }
-                    frameStep = sAnimFrameOffset + m_turnSpeed;
+                    turnRate = 1.0f;
                 }
+                frameStep = m_turnSpeed + turnRate;
             } else {
                 float frameDelta = m_lastBgAttr;
                 const int activeAnimIndex = m_charaModelHandle->m_currentAnimIndex;
                 if (activeAnimIndex >= 0 &&
                     (m_charaModelHandle->m_animSlot[activeAnimIndex]->m_playbackFlags &
                      0x4) != 0) {
-                    frameDelta = frameDelta < sZeroFloat ? sNegativeOne : sAnimFrameOffset;
+                    frameDelta = frameDelta < 0.0f ? -1.0f : 1.0f;
                 }
-                frameDelta = frameDelta * FLOAT_803303FC;
-                frameStep = frameDelta + m_turnSpeed;
+                frameDelta *= 1.2f;
+                frameStep = m_turnSpeed + frameDelta;
             }
 
             const float prevTime = m_charaModelHandle->m_model->m_time;
@@ -2180,12 +2116,12 @@ void CGObject::update()
                 const unsigned short pointCount = animRef->m_pointCount;
                 if (pointCount > 0) {
                     const float animSpan =
-                        sAnimFrameOffset + (m_charaModelHandle->m_model->m_animEnd - m_charaModelHandle->m_model->m_animStart);
+                        1.0f + (m_charaModelHandle->m_model->m_animEnd - m_charaModelHandle->m_model->m_animStart);
                     float prevWrapped = WrapAnimFrame(prevTime, animSpan);
                     float nextWrapped = WrapAnimFrame(frameStep, animSpan);
                     if (frameStep < prevTime) {
-                        prevWrapped = (animSpan - sAnimFrameOffset) - prevWrapped;
-                        nextWrapped = (animSpan - sAnimFrameOffset) - nextWrapped;
+                        prevWrapped = (animSpan - 1.0f) - prevWrapped;
+                        nextWrapped = (animSpan - 1.0f) - nextWrapped;
                     }
 
                     for (int i = 0; i < animRef->m_pointCount; i++) {
@@ -2212,15 +2148,15 @@ void CGObject::update()
             if (!hasAnimModel || animSlotNow == -1) {
                 animFinished = 1;
             } else if (m_charaModelHandle->m_model->m_anim != 0) {
-                const float animSpan = sAnimFrameOffset + (m_charaModelHandle->m_model->m_animEnd - m_charaModelHandle->m_model->m_animStart);
-                if (sAnimFrameOffset == animSpan) {
+                const float animSpan = 1.0f + (m_charaModelHandle->m_model->m_animEnd - m_charaModelHandle->m_model->m_animStart);
+                if (1.0f == animSpan) {
                     animFinished = 1;
                 } else {
                     const float modelTime = m_charaModelHandle->m_model->m_time;
-                    if (m_lastBgAttr < sZeroFloat) {
-                        animFinished = sZeroFloat >= modelTime;
+                    if (m_lastBgAttr < 0.0f) {
+                        animFinished = 0.0f >= modelTime;
                     } else {
-                        animFinished = animSpan - sAnimFrameOffset < modelTime;
+                        animFinished = animSpan - 1.0f < modelTime;
                     }
                 }
             } else {
@@ -2239,11 +2175,11 @@ void CGObject::update()
                         m_shieldNodeFlagBits.m_bit02 = 0;
                         m_shieldNodeFlagBits.m_bit80 = 0;
                         m_shieldNodeFlagBits.m_bit08 = 1;
-                        m_turnSpeed = sZeroFloat;
+                        m_turnSpeed = 0.0f;
                     } else {
                         m_currentAnimSlot = -1;
                         m_shieldNodeFlagBits.m_bit40 = 0;
-                        m_turnSpeed = sZeroFloat;
+                        m_turnSpeed = 0.0f;
                         m_rotTargetY = m_rotBaseY;
                         m_shieldNodeFlagBits.m_bit08 = 0;
                         m_shieldNodeFlagBits.m_bit80 = 0;
@@ -2252,7 +2188,7 @@ void CGObject::update()
                 } else {
                     m_currentAnimSlot = -1;
                     m_shieldNodeFlagBits.m_bit40 = 0;
-                    m_turnSpeed = sZeroFloat;
+                    m_turnSpeed = 0.0f;
                     m_rotTargetY = m_rotBaseY;
                     m_shieldNodeFlagBits.m_bit08 = 0;
                     m_shieldNodeFlagBits.m_bit80 = 0;
@@ -2291,19 +2227,17 @@ void CGObject::update()
             }
         }
     }
-
-    extern const double DOUBLE_80330400;
     m_groundHitOffset.x *= m_moveOffset.x;
     m_groundHitOffset.y *= m_moveOffset.y;
     m_groundHitOffset.z *= m_moveOffset.z;
-    if (fabs(m_groundHitOffset.x) < DOUBLE_80330400) {
-        m_groundHitOffset.x = sZeroFloat;
+    if (fabs(m_groundHitOffset.x) < 0.001f) {
+        m_groundHitOffset.x = 0.0f;
     }
-    if (fabs(m_groundHitOffset.y) < DOUBLE_80330400) {
-        m_groundHitOffset.y = sZeroFloat;
+    if (fabs(m_groundHitOffset.y) < 0.001f) {
+        m_groundHitOffset.y = 0.0f;
     }
-    if (fabs(m_groundHitOffset.z) < DOUBLE_80330400) {
-        m_groundHitOffset.z = sZeroFloat;
+    if (fabs(m_groundHitOffset.z) < 0.001f) {
+        m_groundHitOffset.z = 0.0f;
     }
 
     if (m_stateFlags0Bits.unk0) {
@@ -2372,7 +2306,7 @@ void CGObject::hit()
             continue;
         }
 
-        const float zero = sZeroFloat;
+        const float zero = 0.0f;
 
         AttackCol* attackCur = m_attackColliders;
         for (int attackIndex = 0; attackIndex < 8; attackIndex++, attackCur++) {
@@ -2383,8 +2317,8 @@ void CGObject::hit()
             DamageCol* damageCur = other->m_damageColliders;
             for (int damageIndex = 0; damageIndex < 8; damageIndex++, damageCur++) {
                 if (((attackCur->m_hitMask & damageCur->m_hitMask) == 0) ||
-                    (sZeroFloat == damageCur->m_horizontalRadius) ||
-                    (sZeroFloat == damageCur->m_verticalRadius)) {
+                    (0.0f == damageCur->m_horizontalRadius) ||
+                    (0.0f == damageCur->m_verticalRadius)) {
                     continue;
                 }
 
@@ -2442,8 +2376,8 @@ void CGObject::bgAttribCollision()
 
     if ((m_displayFlags & 4) != 0) {
         if (checkProbeHit(&CMapCylinder(),
-                &CVector(m_worldPosition.x, sHitProbeHeight + m_worldPosition.y, m_worldPosition.z),
-                &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat),
+                &CVector(m_worldPosition.x, 100.0f + m_worldPosition.y, m_worldPosition.z),
+                &CVector(0.0f, -10000.0f, 0.0f),
                 0x80000000) != 0) {
             Vec hitPos;
             MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
@@ -2458,30 +2392,30 @@ void CGObject::bgAttribCollision()
     }
 
     {
-        const float cmpZero = sZeroFloat;
+        const float cmpZero = 0.0f;
         if ((cmpZero != m_groundHitOffset.x) || (cmpZero != m_groundHitOffset.z)) {
             if (HasLoadedModel(m_charaModelHandle)) {
                 if (checkProbeHit(&CMapCylinder(),
-                        &CVector(m_worldPosition.x, sStepProbeHeight + m_worldPosition.y, m_worldPosition.z),
-                        &CVector(sZeroFloat, sDownProbeDistance, sZeroFloat), 0x78000000) != 0) {
+                        &CVector(m_worldPosition.x, 5.0f + m_worldPosition.y, m_worldPosition.z),
+                        &CVector(0.0f, -10000.0f, 0.0f), 0x78000000) != 0) {
                     switch (gMapHitFace->m_groupIndex - 0x28) {
                     case 0:
-                        m_bgAttrValue = sBgAttrSlow;
+                        m_bgAttrValue = 0.75f;
                         break;
                     case 1:
-                        m_bgAttrValue = sBgAttrNormal;
+                        m_bgAttrValue = 0.5f;
                         break;
                     case 2:
-                        m_bgAttrValue = sBgAttrFast;
+                        m_bgAttrValue = 0.25f;
                         break;
                     case 3:
-                        m_bgAttrValue = sZeroFloat;
+                        m_bgAttrValue = 0.0f;
                         break;
                     default:
                         break;
                     }
                 } else {
-                    m_bgAttrValue = sAnimFrameOffset;
+                    m_bgAttrValue = 1.0f;
                 }
             }
         }
@@ -2502,12 +2436,12 @@ void CGObject::bgWorldCollision()
 {
     CVector radial = CVector(m_worldPosition) + CVector(m_groundHitOffset);
 
-    if (PSVECMag(radial) > sZeroFloat) {
+    if (PSVECMag(radial) > 0.0f) {
         radial.Normalize();
     }
-    PSVECScale(radial, radial, sPushDistance);
+    PSVECScale(radial, radial, 1000.0f);
 
-    CVector hitMove = vecScale(CVector(-radial.x, -radial.y, -radial.z), sHitMoveScale);
+    CVector hitMove = vecScale(CVector(-radial.x, -radial.y, -radial.z), 0.16000001f);
 
     const u32 hitMask = m_bgHitMask;
     CMapCylinder bodyCylinder;
@@ -2515,12 +2449,11 @@ void CGObject::bgWorldCollision()
     bodyCylinder.m_axis.x = hitMove.x;
     bodyCylinder.m_axis.y = hitMove.y;
     bodyCylinder.m_axis.z = hitMove.z;
-    bodyCylinder.m_radius = sZeroFloat;
+    bodyCylinder.m_radius = 0.0f;
 
     if (MapMng.CheckHitCylinderNear(&bodyCylinder, hitMove, hitMask) != 0) {
         MapMng.m_hitMapObj->CalcHitPosition(radial);
-        CVector delta = radial - CVector(m_worldPosition);
-        m_groundHitOffset = delta;
+        m_groundHitOffset = radial - CVector(m_worldPosition);
 
         if ((MapMng.GetMapIdGrpArray()[gMapHitFace->m_groupIndex].m_mask & 0x20) == 0) {
             m_stateFlags0Bits.unk0 = 1;
@@ -2546,29 +2479,28 @@ void CGObject::bgWorldCollision()
  */
 void CGObject::bgNormalCollision()
 {
-    extern const double DOUBLE_80330400;
-    if (fabs(static_cast<double>(m_groundHitOffset.x)) < DOUBLE_80330400) {
-        m_groundHitOffset.x = sZeroFloat;
+    if (fabs(static_cast<double>(m_groundHitOffset.x)) < 0.001f) {
+        m_groundHitOffset.x = 0.0f;
     }
-    if (fabs(static_cast<double>(m_groundHitOffset.y)) < DOUBLE_80330400) {
-        m_groundHitOffset.y = sZeroFloat;
+    if (fabs(static_cast<double>(m_groundHitOffset.y)) < 0.001f) {
+        m_groundHitOffset.y = 0.0f;
     }
-    if (fabs(static_cast<double>(m_groundHitOffset.z)) < DOUBLE_80330400) {
-        m_groundHitOffset.z = sZeroFloat;
+    if (fabs(static_cast<double>(m_groundHitOffset.z)) < 0.001f) {
+        m_groundHitOffset.z = 0.0f;
     }
 
-    if ((sZeroFloat == m_groundHitOffset.x) && (sZeroFloat == m_groundHitOffset.y) && (sZeroFloat == m_groundHitOffset.z)) {
+    if ((0.0f == m_groundHitOffset.x) && (0.0f == m_groundHitOffset.y) && (0.0f == m_groundHitOffset.z)) {
         return;
     }
 
     Vec move = m_groundHitOffset;
     move.y = 0.0f;
     Vec pos = m_worldPosition;
-    pos.y += sStepProbeHeight + m_capsuleHalfHeight;
+    pos.y += 5.0f + m_capsuleHalfHeight;
 
     unsigned int retry = 4;
     double epsilon;
-    epsilon = DOUBLE_80330400;
+    epsilon = 0.001f;
     do {
         const unsigned long hitMask = m_bgHitMask;
         const float radius = m_capsuleHalfHeight;
@@ -2582,25 +2514,25 @@ void CGObject::bgNormalCollision()
         }
 
         m_stateFlags0Bits.unk1 = 1;
-        MapMng.m_hitMapObj->CalcHitSlide(&move, sJumpLift);
+        MapMng.m_hitMapObj->CalcHitSlide(&move, 10.0f);
 
         if (fabs(static_cast<double>(move.x)) < epsilon) {
-            move.x = sZeroFloat;
+            move.x = 0.0f;
         }
         if (fabs(static_cast<double>(move.y)) < epsilon) {
-            move.y = sZeroFloat;
+            move.y = 0.0f;
         }
         if (fabs(static_cast<double>(move.z)) < epsilon) {
-            move.z = sZeroFloat;
+            move.z = 0.0f;
         }
 
         --retry;
     } while (retry != 0);
 
     if (retry == 0) {
-        m_groundHitOffset.z = sZeroFloat;
-        m_groundHitOffset.y = sZeroFloat;
-        m_groundHitOffset.x = sZeroFloat;
+        m_groundHitOffset.z = 0.0f;
+        m_groundHitOffset.y = 0.0f;
+        m_groundHitOffset.x = 0.0f;
         return;
     }
 
@@ -2608,18 +2540,18 @@ void CGObject::bgNormalCollision()
     move.x = m_groundHitOffset.x;
     move.y = m_groundHitOffset.y;
     move.z = m_groundHitOffset.z;
-    move.y = m_groundHitOffset.y - sStepProbeHeight;
-    move.x = sZeroFloat;
-    move.z = sZeroFloat;
+    move.y = m_groundHitOffset.y - 5.0f;
+    move.x = 0.0f;
+    move.z = 0.0f;
 
     {
         const unsigned long stepHitMask = m_bgHitMask;
         const float stepRadius = m_capsuleHalfHeight;
         CMapCylinder stepCylinder;
         stepCylinder.m_bottom = pos;
-        stepCylinder.m_axis.x = sZeroFloat;
+        stepCylinder.m_axis.x = 0.0f;
         stepCylinder.m_axis.y = move.y;
-        stepCylinder.m_axis.z = sZeroFloat;
+        stepCylinder.m_axis.z = 0.0f;
         stepCylinder.m_radius = stepRadius;
 
         if (MapMng.CheckHitCylinderNear(&stepCylinder, &move, stepHitMask) == 0) {
@@ -2638,7 +2570,7 @@ void CGObject::bgNormalCollision()
         MapMng.m_hitMapObj->GetHitFaceNormal(&HitFaceNormal());
     }
 
-    if (MapMng.m_hitMapObj->CalcHitSlide(&move, sBgAttrNormal) != 0) {
+    if (MapMng.m_hitMapObj->CalcHitSlide(&move, 0.5f) != 0) {
         const unsigned long slideHitMask = m_bgHitMask;
         const float slideRadius = m_capsuleHalfHeight;
         CMapCylinder hitCylinder;
@@ -2656,16 +2588,16 @@ void CGObject::bgNormalCollision()
     pos.y -= m_capsuleHalfHeight;
     PSVECAdd(&pos, &move, &pos);
 
-    if (!(m_jumpLandingDampening > sZeroFloat) || !(m_groundHitOffset.y < sLandingDampenCutoff)) {
+    if (!(m_jumpLandingDampening > 0.0f) || !(m_groundHitOffset.y < -1.5f)) {
         goto simple;
     }
 
-    float oldY = (m_groundHitOffset.y < sMinGroundClamp) ? sMinGroundClamp : m_groundHitOffset.y;
+    float oldY = (m_groundHitOffset.y < -4.0f) ? -4.0f : m_groundHitOffset.y;
     float delta = oldY - move.y;
-    float clampedY = (m_groundHitOffset.y < sMinGroundClamp) ? sMinGroundClamp : m_groundHitOffset.y;
+    float clampedY = (m_groundHitOffset.y < -4.0f) ? -4.0f : m_groundHitOffset.y;
 
     m_worldPosition.y = pos.y;
-    m_groundHitOffset.y = sZeroFloat;
+    m_groundHitOffset.y = 0.0f;
     m_groundHitOffset.x = pos.x - m_worldPosition.x;
     m_groundHitOffset.z = pos.z - m_worldPosition.z;
     m_gravityY = m_jumpLandingDampening * -((clampedY - delta) + delta);
@@ -2674,8 +2606,8 @@ void CGObject::bgNormalCollision()
         Sound.PlaySe3D(
             0x26,
             &m_worldPosition,
-            sCrossCheckOuterRadius + (sCrossCheckOuterRadius * m_gravityY) / sStepProbeHeight,
-            sHitProbeHeight + (sHitProbeHeight * m_gravityY) / sStepProbeHeight,
+            50.0f + (50.0f * m_gravityY) / 5.0f,
+            100.0f + (100.0f * m_gravityY) / 5.0f,
             0);
     }
     return;
@@ -2703,7 +2635,7 @@ void CGObject::bgCollision()
     m_stateFlags0Bits.unk1 = 0;
 
     m_bgGroupMask = 0;
-    m_gravityY = sZeroFloat;
+    m_gravityY = 0.0f;
 
     bgAttribCollision();
 
@@ -2748,7 +2680,7 @@ void CGObject::objectCollision()
     self.obj = this;
     PSVECAdd(&m_worldPosition, &m_groundHitOffset, &self.basePos);
     self.capsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);
-    self.capsuleOffset.y = sZeroFloat;
+    self.capsuleOffset.y = 0.0f;
     self.capsuleOffset.z = m_bodyEllipsoidOffset * -cosf(m_rotBaseY);
     PSVECAdd(&self.basePos, &self.capsuleOffset, &self.capsulePos);
 
@@ -2772,12 +2704,12 @@ void CGObject::objectCollision()
         info.obj = other;
         PSVECAdd(&other->m_worldPosition, &other->m_groundHitOffset, &info.basePos);
         info.capsuleOffset.x = other->m_bodyEllipsoidOffset * -sinf(other->m_rotBaseY);
-        info.capsuleOffset.y = sZeroFloat;
+        info.capsuleOffset.y = 0.0f;
         info.capsuleOffset.z = other->m_bodyEllipsoidOffset * -cosf(other->m_rotBaseY);
         PSVECAdd(&info.basePos, &info.capsuleOffset, &info.capsulePos);
 
         const float capsuleDistance = PSVECDistance(&info.capsulePos, &self.capsulePos);
-        if ((sZeroFloat == capsuleDistance)
+        if ((0.0f == capsuleDistance)
             || ((m_nearColRadius + other->m_nearColRadius) < capsuleDistance)) {
             continue;
         }
@@ -2827,24 +2759,24 @@ void CGObject::objectCollision()
 
                 if (capsuleDistance < bodyDistanceLimit) {
                     if (usePushTimers
-                        && ((sZeroFloat != m_groundHitOffset.x) || (sZeroFloat != m_groundHitOffset.z)
-                            || (sZeroFloat != other->m_groundHitOffset.x) || (sZeroFloat != other->m_groundHitOffset.z))) {
+                        && ((0.0f != m_groundHitOffset.x) || (0.0f != m_groundHitOffset.z)
+                            || (0.0f != other->m_groundHitOffset.x) || (0.0f != other->m_groundHitOffset.z))) {
                         keepPushTimer = true;
                     }
 
                     if (!usePushTimers || (m_collisionPushTimerMax != 0) || (other->m_collisionPushTimerMax == 0)) {
                         const float thisPush = static_cast<float>(m_pushParamA + m_pushParamB);
                         const float otherPush = static_cast<float>(other->m_pushParamA + other->m_pushParamB);
-                        const float rawSplit = sBgAttrNormal + (thisPush - otherPush) / sCrossCheckOuterRadius;
-                        float split = (rawSplit < sZeroFloat)
-                            ? sZeroFloat
-                            : ((sAnimFrameOffset < rawSplit) ? sAnimFrameOffset : rawSplit);
+                        const float rawSplit = 0.5f + (thisPush - otherPush) / 50.0f;
+                        float split = (rawSplit < 0.0f)
+                            ? 0.0f
+                            : ((1.0f < rawSplit) ? 1.0f : rawSplit);
 
                         Vec& delta = scratch;
                         Vec scaledDelta;
                         PSVECSubtract(&self.capsulePos, &info.capsulePos, &delta);
                         PSVECScale(&delta, &delta, (bodyDistanceLimit - capsuleDistance) / bodyDistanceLimit);
-                        PSVECScale(&delta, &scaledDelta, sAnimFrameOffset - split);
+                        PSVECScale(&delta, &scaledDelta, 1.0f - split);
                         PSVECAdd(&self.capsulePos, &scaledDelta, &self.capsulePos);
                         PSVECScale(&delta, &scaledDelta, -split);
                         PSVECAdd(&info.capsulePos, &scaledDelta, &info.capsulePos);
@@ -2895,11 +2827,11 @@ void CGObject::move()
 
     if (Game.m_currentMapId != 0x21 && m_weaponNodeFlagBits.m_unk10 && !m_weaponNodeFlagBits.m_control3) {
         PSVECAdd(&m_groundHitOffset, &m_bodyOffset, &m_groundHitOffset);
-        if (m_groundHitOffset.y < sGroundOffsetFloor) {
-            m_groundHitOffset.y = sGroundOffsetFloor;
+        if (m_groundHitOffset.y < -5.0f) {
+            m_groundHitOffset.y = -5.0f;
         }
     } else if (m_weaponNodeFlagBits.m_unk04) {
-        m_groundHitOffset.y = sZeroFloat;
+        m_groundHitOffset.y = 0.0f;
     }
 
     int movingWithScript = 0;
@@ -2916,16 +2848,16 @@ void CGObject::move()
         }
 
         if ((Game.m_currentMapId != 0x21) && !m_weaponNodeFlagAll.m_bits1.m_bit02) {
-            moveVec.y = sZeroFloat;
+            moveVec.y = 0.0f;
         }
 
-        const double moveMag = static_cast<double>(PSVECMag(&moveVec));
-        if (static_cast<double>(sZeroFloat) == moveMag) {
+        const float moveMag = PSVECMag(&moveVec);
+        if (0.0f == moveMag) {
             scriptMoveEnd = 1;
         } else if (m_weaponNodeFlagAll.m_bits1.m_bit10) {
             PSVECNormalize(&moveVec, &moveVec);
             PSVECScale(&moveVec, &moveVec, static_cast<float>(m_moveTimer));
-        } else if (moveMag < static_cast<double>(m_moveTimer)) {
+        } else if (moveMag < m_moveTimer) {
             scriptMoveEnd = 1;
         } else {
             PSVECNormalize(&moveVec, &moveVec);
@@ -2941,77 +2873,79 @@ void CGObject::move()
             || (m_weaponNodeFlagAll.m_bits1.m_bit10 && (scriptMoveEnd == 2))) {
             m_weaponNodeFlagAll.m_bits1.m_bit20 = 0;
             CFlatRuntime::CStack stack;
-            stack.m_word = scriptMoveEnd == 2;
+            stack.m_word = (scriptMoveEnd == 2) ? 1 : 0;
             gCFlatRuntime().SystemCall(this, 2, 7, 1, &stack, 0);
         }
 
         movingWithScript = 1;
     } else {
-        const unsigned char animMiscRaw = m_animStateMisc;
-        const int player = static_cast<s8>(animMiscRaw);
-        if ((static_cast<s8>(animMiscRaw) >= 0)
-            && (static_cast<s8>(animMiscRaw) < 4)
-            && m_weaponNodeFlagAll.m_bits1.m_shield
-            && m_weaponNodeFlagAll.m_bits1.m_menuReady
-            && ((Game.m_gameWork.m_menuStageMode == 0) || (Game.m_gameWork.m_menuStageMode == 0) || (static_cast<s8>(animMiscRaw) == 0))) {
-            u16 buttons = Pad.GetButton(player);
-            const u16 buttonsDown = Pad.GetButtonDown(player);
-            const u16 buttonsRepeat = GetMovePadButtonUp(player);
+        if (!((m_animStateMisc >= 0)
+              && (m_animStateMisc < 4)
+              && m_weaponNodeFlagAll.m_bits1.m_shield
+              && m_weaponNodeFlagAll.m_bits1.m_menuReady
+              && ((Game.m_gameWork.m_menuStageMode == 0)
+                  || ((Game.m_gameWork.m_menuStageMode != 0) && (m_animStateMisc == 0))))) {
+            goto calcAnimSlot;
+        }
 
-            if ((buttons != 0) && (buttonsRepeat != 0)) {
-                buttons |= buttonsRepeat;
+        u16 buttons = Pad.GetButton(static_cast<s8>(m_animStateMisc));
+        const u16 buttonsDown = Pad.GetButtonDown(static_cast<s8>(m_animStateMisc));
+        const u16 buttonsRepeat = GetMovePadButtonUp(static_cast<s8>(m_animStateMisc));
+
+        if ((buttons != 0) && (buttonsRepeat != 0)) {
+            buttons |= buttonsRepeat;
+        }
+
+        moveVec.z = 0.0f;
+        moveVec.y = 0.0f;
+        moveVec.x = 0.0f;
+
+        u32 miniGameFlags = DbgMenuPcs.GetDbgFlagsRaw();
+        if ((miniGameFlags & 0x100) != 0 && moveVec.x == 0.0f && moveVec.x == 0.0f) {
+            const float stickX = GetMovePadStickX(static_cast<s8>(m_animStateMisc));
+            moveVec.x = moveVec.x - stickX;
+            const float stickY = GetMovePadStickY(static_cast<s8>(m_animStateMisc));
+            moveVec.z = moveVec.z + stickY;
+            if (moveVec.x || moveVec.z) {
+                hasStickInput = 1;
             }
+        }
 
-            moveVec.z = sZeroFloat;
-            moveVec.y = sZeroFloat;
-            moveVec.x = sZeroFloat;
-
-            u32 miniGameFlags = DbgMenuPcs.GetDbgFlagsRaw();
-            if ((miniGameFlags & 0x100) != 0 && moveVec.x == sZeroFloat && moveVec.x == sZeroFloat) {
-                const float stickX = GetMovePadStickX(static_cast<s8>(m_animStateMisc));
-                moveVec.x = moveVec.x - stickX;
-                const float stickY = GetMovePadStickY(static_cast<s8>(m_animStateMisc));
-                moveVec.z = moveVec.z + stickY;
-                if ((moveVec.x != 0.0f) || (moveVec.z != 0.0f)) {
-                    hasStickInput = 1;
-                }
+        if (!hasStickInput) {
+            if ((buttons & 1) != 0) {
+                moveVec.x += 1.0f;
             }
-
-            if (!hasStickInput) {
-                if ((buttons & 1) != 0) {
-                    moveVec.x += sAnimFrameOffset;
-                }
-                if ((buttons & 2) != 0) {
-                    moveVec.x -= sAnimFrameOffset;
-                }
-                if ((buttons & 8) != 0) {
-                    moveVec.z += sAnimFrameOffset;
-                }
-                if ((buttons & 4) != 0) {
-                    moveVec.z -= sAnimFrameOffset;
-                }
+            if ((buttons & 2) != 0) {
+                moveVec.x -= 1.0f;
             }
-
-            if (((miniGameFlags & 0x40) == 0) && ((buttonsDown & 0x1000) != 0)) {
-                if (m_weaponNodeFlagBits.m_unk10) {
-                    PSVECAdd(&m_groundHitOffset, &m_jumpOffset, &m_groundHitOffset);
-                } else {
-                    m_worldPosition.y += sJumpLift;
-                }
+            if ((buttons & 8) != 0) {
+                moveVec.z += 1.0f;
             }
-
-            if (Game.m_currentMapId == 0x21) {
-                Mtx cameraWorldMtx;
-                PSMTXCopy(CameraPcs.m_cameraWorldMtx, cameraWorldMtx);
-                moveVec.x = -moveVec.x;
-                moveVec.y = sZeroFloat;
-                moveVec.z = -moveVec.z;
-                PSMTXMultVec(cameraWorldMtx, &moveVec, &moveVec);
+            if ((buttons & 4) != 0) {
+                moveVec.z -= 1.0f;
             }
+        }
+
+        if (((miniGameFlags & 0x40) == 0) && ((buttonsDown & 0x1000) != 0)) {
+            if (m_weaponNodeFlagBits.m_unk10) {
+                PSVECAdd(&m_groundHitOffset, &m_jumpOffset, &m_groundHitOffset);
+            } else {
+                m_worldPosition.y += 10.0f;
+            }
+        }
+
+        if (Game.m_currentMapId == 0x21) {
+            Mtx cameraWorldMtx;
+            PSMTXCopy(CameraPcs.m_cameraWorldMtx, cameraWorldMtx);
+            moveVec.x = -moveVec.x;
+            moveVec.y = 0.0f;
+            moveVec.z = -moveVec.z;
+            PSMTXMultVec(cameraWorldMtx, &moveVec, &moveVec);
         }
     }
 
-    if ((moveVec.x != sZeroFloat) || (moveVec.z != sZeroFloat) || (moveVec.y != sZeroFloat)) {
+    if (moveVec.x || moveVec.z || moveVec.y) {
+        float inputYawF;
         float cameraYaw;
         if (movingWithScript) {
             cameraYaw = 0.0f;
@@ -3020,7 +2954,7 @@ void CGObject::move()
         }
 
         const double inputYaw = atan2(static_cast<double>(moveVec.x), static_cast<double>(moveVec.z));
-        const float inputYawF = static_cast<float>(inputYaw);
+        inputYawF = static_cast<float>(inputYaw);
 
         const float sinYaw = static_cast<float>(sin(static_cast<double>(cameraYaw)));
         const float cosYaw = static_cast<float>(cos(static_cast<double>(cameraYaw)));
@@ -3035,7 +2969,7 @@ void CGObject::move()
             float speed = m_moveBaseSpeed;
             if (hasStickInput && ((DbgMenuPcs.GetDbgFlagsRaw() & 0x200) != 0)) {
                 const float mag = PSVECMag(&moveVec);
-                speed *= sAnalogSpeedScale * mag;
+                speed *= 4.0f * mag;
             }
 
             PSVECNormalize(&moveVec, &moveVec);
@@ -3044,15 +2978,15 @@ void CGObject::move()
                 && m_weaponNodeFlagAll.m_bits1.m_menuReady
                 && (m_ownerType == 0)) {
                 if ((DbgMenuPcs.GetDbgFlagsRaw() & 2) != 0) {
-                    speed *= sAnalogSpeedScale;
+                    speed *= 4.0f;
                 }
 
                 const s32 cflatCenterState = CFlatCenterState();
                 if (cflatCenterState == 1) {
                     Vec partyCenter;
-                    partyCenter.x = (Game.m_partyBound.m_min.x + Game.m_partyBound.m_max.x) * sBgAttrNormal;
-                    partyCenter.y = (Game.m_partyBound.m_min.y + Game.m_partyBound.m_max.y) * sBgAttrNormal;
-                    partyCenter.z = (Game.m_partyBound.m_min.z + Game.m_partyBound.m_max.z) * sBgAttrNormal;
+                    partyCenter.x = (Game.m_partyBound.m_min.x + Game.m_partyBound.m_max.x) / 2.0f;
+                    partyCenter.y = (Game.m_partyBound.m_min.y + Game.m_partyBound.m_max.y) / 2.0f;
+                    partyCenter.z = (Game.m_partyBound.m_min.z + Game.m_partyBound.m_max.z) / 2.0f;
 
                     Vec centerDelta;
                     PSVECSubtract(&m_worldPosition, &partyCenter, &centerDelta);
@@ -3060,18 +2994,16 @@ void CGObject::move()
                     PSVECNormalize(&centerDelta, &centerDelta);
 
                     const float dirDot = PSVECDotProduct(&moveVec, &centerDelta);
-                    if (sZeroFloat < dirDot) {
+                    if (0.0f < dirDot) {
                         centerDist /= CFlatCenterDistanceScale();
-                        if (!(centerDist < sZeroFloat)) {
-                            float clampDist = (sAnimFrameOffset < centerDist) ? sAnimFrameOffset : centerDist;
-                            speed *= -((clampDist * clampDist) - sAnimFrameOffset);
-                        }
+                        const float clampDist = ClampFloat(centerDist, 0.0f, 1.0f);
+                        speed *= -((clampDist * clampDist) - 1.0f);
                     }
                 }
             }
 
             if ((m_bgGroupMask & 0x400000) != 0) {
-                speed *= sBgAttrSlow;
+                speed *= 0.75f;
             }
 
             PSVECScale(&moveVec, &moveVec, speed);
@@ -3082,7 +3014,7 @@ void CGObject::move()
         if (!movingWithScript || m_weaponNodeFlagAll.m_bits1.m_bit08) {
             if (Game.m_currentMapId == 0x21) {
                 const float slideSq = PSVECSquareMag(&m_groundHitOffset);
-                if (sSlideThreshold < slideSq) {
+                if (0.01f < slideSq) {
                     Mtx yawMtx;
                     Mtx pitchMtx;
                     Vec worldUp;
@@ -3110,7 +3042,7 @@ void CGObject::move()
                     float targetRot = acosf(tanDot);
 
                     PSVECCrossProduct(&tangent, &moveNorm, &cross);
-                    if (PSVECDotProduct(&worldPosNorm, &cross) < sZeroFloat) {
+                    if (PSVECDotProduct(&worldPosNorm, &cross) < 0.0f) {
                         targetRot = -targetRot;
                     }
                     m_rotTargetY = targetRot;
@@ -3128,8 +3060,9 @@ void CGObject::move()
         return;
     }
 
+calcAnimSlot:
     const double rotDelta = static_cast<double>(Math.DstRot(m_rotTargetY, m_rotBaseY));
-    m_animSlotSel = m_animSlots[(fabs(rotDelta) <= sPitchLookCutoff) ? 0 : 1];
+    m_animSlotSel = m_animSlots[(fabs(rotDelta) <= 0.7853982f) ? 0 : 1];
 }
 
 /*
@@ -3185,49 +3118,49 @@ void CGObject::onDestroy()
 void CGObject::onCreate()
 {
     int cFill = -1;
-    m_worldPosition.z = sZeroFloat;
-    m_worldPosition.y = sZeroFloat;
-    m_worldPosition.x = sZeroFloat;
-    m_groundHitOffset.z = sZeroFloat;
-    m_groundHitOffset.y = sZeroFloat;
-    m_groundHitOffset.x = sZeroFloat;
+    m_worldPosition.z = 0.0f;
+    m_worldPosition.y = 0.0f;
+    m_worldPosition.x = 0.0f;
+    m_groundHitOffset.z = 0.0f;
+    m_groundHitOffset.y = 0.0f;
+    m_groundHitOffset.x = 0.0f;
 
-    m_rotBaseZ = sZeroFloat;
-    m_rotBaseY = sZeroFloat;
-    m_rotBaseX = sZeroFloat;
-    m_rotTargetZ = sZeroFloat;
-    m_rotTargetY = sZeroFloat;
-    m_rotTargetX = sZeroFloat;
+    m_rotBaseZ = 0.0f;
+    m_rotBaseY = 0.0f;
+    m_rotBaseX = 0.0f;
+    m_rotTargetZ = 0.0f;
+    m_rotTargetY = 0.0f;
+    m_rotTargetX = 0.0f;
 
-    m_bodyOffset.x = sZeroFloat;
-    m_bodyOffset.y = sNegativeOne;
-    m_bodyOffset.z = sZeroFloat;
-    m_jumpOffset.x = sZeroFloat;
-    m_jumpOffset.y = sJumpLift;
-    m_jumpOffset.z = sZeroFloat;
-    m_moveOffset.x = sZeroFloat;
-    m_moveOffset.y = sAnimFrameOffset;
-    m_moveOffset.z = sZeroFloat;
+    m_bodyOffset.x = 0.0f;
+    m_bodyOffset.y = -1.0f;
+    m_bodyOffset.z = 0.0f;
+    m_jumpOffset.x = 0.0f;
+    m_jumpOffset.y = 10.0f;
+    m_jumpOffset.z = 0.0f;
+    m_moveOffset.x = 0.0f;
+    m_moveOffset.y = 1.0f;
+    m_moveOffset.z = 0.0f;
 
     m_charaModelHandle = 0;
     m_weaponModelHandle = 0;
     m_shieldModelHandle = 0;
 
-    *reinterpret_cast<char*>(&m_animStateMisc) = cFill;
+    m_animStateMisc = cFill;
     m_weaponNodeFlagAll.m_bits1.m_shield = 0;
     m_weaponNodeFlagAll.m_bits1.m_menuReady = 1;
 
-    m_moveBaseSpeed = sDefaultMoveBaseSpeed;
+    m_moveBaseSpeed = 2.0f;
     m_currentAnimSlot = cFill;
 
-    m_bodyEllipsoidRadius = sStepProbeHeight;
-    m_bodyEllipsoidOffset = sZeroFloat;
-    m_bodyEllipsoidAspect = sAnimFrameOffset;
-    m_capsuleHalfHeight = sStepProbeHeight;
+    m_bodyEllipsoidRadius = 5.0f;
+    m_bodyEllipsoidOffset = 0.0f;
+    m_bodyEllipsoidAspect = 1.0f;
+    m_capsuleHalfHeight = 5.0f;
 
-    m_attackColRadius = sDefaultAttackColRadius;
-    m_bodyColRadius = sDefaultBodyColRadius;
-    m_nearColRadius = sJumpLift;
+    m_attackColRadius = 7.0f;
+    m_bodyColRadius = 6.0f;
+    m_nearColRadius = 10.0f;
     m_bgColMask = 0;
 
     m_weaponNodeFlagAll.m_bits1.m_bit20 = 0;
@@ -3237,48 +3170,48 @@ void CGObject::onCreate()
 
     m_objectFlags = 1;
     m_displayFlags = 3;
-    m_rotationX = sAnimFrameOffset;
-    m_rotationY = sAnimFrameOffset;
-    m_rotationZ = sAnimFrameOffset;
+    m_rotationX = 1.0f;
+    m_rotationY = 1.0f;
+    m_rotationZ = 1.0f;
     m_attrFlags = 0;
     m_ownerType = cFill;
     m_classWorkIndex = 0;
     m_scriptHandle = 0;
 
-    unk_0x184 = sZeroFloat;
-    unk_0x188 = sZeroFloat;
+    unk_0x184 = 0.0f;
+    unk_0x188 = 0.0f;
     m_weaponNodeFlagBits.m_attached = 0;
     m_weaponNodeFlagBits.m_unk20 = 1;
     m_weaponNodeFlagBits.m_unk40 = 0;
     m_bgHitMask = cFill;
     m_animSlotSel = cFill;
-    m_turnSpeed = sZeroFloat;
+    m_turnSpeed = 0.0f;
     m_pushParamB = 0;
     m_pushParamA = 0;
 
     m_shieldNodeFlagBits.m_bit40 = 0;
-    m_frontHitAngle = FLOAT_8033043C;
+    m_frontHitAngle = 0.7853982f;
     m_lookAtTarget = 0;
-    m_alphaTarget = sAnimFrameOffset;
-    m_currentAlpha = sAnimFrameOffset;
+    m_alphaTarget = 1.0f;
+    m_currentAlpha = 1.0f;
     m_shieldNodeFlagBits.m_bit20 = 0;
-    m_animBlend = sAnimFrameOffset;
-    m_bgAttrValue = sAnimFrameOffset;
-    m_bounceFactor = sAnimFrameOffset;
-    m_gravityY = sZeroFloat;
-    m_jumpLandingDampening = sZeroFloat;
+    m_animBlend = 1.0f;
+    m_bgAttrValue = 1.0f;
+    m_bounceFactor = 1.0f;
+    m_gravityY = 0.0f;
+    m_jumpLandingDampening = 0.0f;
 
     m_stateFlags0Bits.unk3 = 0;
 
-    m_bgCollisionQtrn.z = sZeroFloat;
-    m_bgCollisionQtrn.y = sZeroFloat;
-    m_bgCollisionQtrn.x = sZeroFloat;
-    m_bgCollisionQtrn.w = sAnimFrameOffset;
+    m_bgCollisionQtrn.z = 0.0f;
+    m_bgCollisionQtrn.y = 0.0f;
+    m_bgCollisionQtrn.x = 0.0f;
+    m_bgCollisionQtrn.w = 1.0f;
 
     m_shieldNodeFlagBits.m_bit10 = 0;
     m_dispItemTimer = 0;
     m_shieldNodeFlagBits.m_bit80 = 0;
-    m_lastBgAttr = sAnimFrameOffset;
+    m_lastBgAttr = 1.0f;
     m_shieldNodeFlagBits.m_bit08 = 0;
     m_shieldNodeFlagBits.m_bit04 = 0;
     m_collisionPushTimerMax = 0x32;
@@ -3289,36 +3222,36 @@ void CGObject::onCreate()
     m_stateFlags0Bits.unk4 = 0;
     m_ownerSlot = 0;
     m_stateFlags0Bits.unk0 = 0;
-    m_swayTarget.z = sZeroFloat;
-    m_swayTarget.x = sZeroFloat;
-    m_swayTarget.y = sAnimFrameOffset;
+    m_swayTarget.z = 0.0f;
+    m_swayTarget.x = 0.0f;
+    m_swayTarget.y = 1.0f;
     m_swayDirection.x = m_swayTarget.x;
     m_swayDirection.y = m_swayTarget.y;
     m_swayDirection.z = m_swayTarget.z;
 
-    m_turnFactor = sBgAttrFast;
-    m_alphaStep = sDefaultBgDownDist;
+    m_turnFactor = 0.25f;
+    m_alphaStep = 0.033333335f;
     m_moveMode = 0;
     m_moveModePrevious = 4;
-    m_hitFaceNormal.z = sZeroFloat;
-    m_hitFaceNormal.y = sZeroFloat;
-    m_hitFaceNormal.x = sZeroFloat;
-    m_worldParam = sZeroFloat;
+    m_hitFaceNormal.z = 0.0f;
+    m_hitFaceNormal.y = 0.0f;
+    m_hitFaceNormal.x = 0.0f;
+    m_worldParam = 0.0f;
 
     m_lookAtTargetNodeIndex = cFill;
     m_worldParamA = 0;
-    m_lookAtAccumYaw = sZeroFloat;
-    m_lookAtAccumPitch = sZeroFloat;
+    m_lookAtAccumYaw = 0.0f;
+    m_lookAtAccumPitch = 0.0f;
     m_weaponAttachNode = cFill;
     m_shieldAttachNodeIndex = cFill;
     m_motionMode = 0;
     m_weaponNodeFlagBits.m_prg = 0;
-    m_extraMoveVec.z = sZeroFloat;
-    m_extraMoveVec.y = sZeroFloat;
-    m_extraMoveVec.x = sZeroFloat;
+    m_extraMoveVec.z = 0.0f;
+    m_extraMoveVec.y = 0.0f;
+    m_extraMoveVec.x = 0.0f;
     m_shieldNodeFlagBits.m_bit01 = 0;
     m_field_0x56 = 0x7D;
-    m_twistTarget = sZeroFloat;
+    m_twistTarget = 0.0f;
 
     for (unsigned int i = 0; i < sizeof(m_animSlots); i++) {
         m_animSlots[i] = cFill;
@@ -3329,4 +3262,3 @@ void CGObject::onCreate()
     memset(m_dropItemCodes, 0, sizeof(m_dropItemCodes));
 }
 
-extern const double DOUBLE_80330400 = 0.0010000000474974513;

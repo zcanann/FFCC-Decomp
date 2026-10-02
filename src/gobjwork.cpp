@@ -373,31 +373,30 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
  */
 void CCaravanWork::FGLetterOpen(int letterIdx)
 {
-	CLetterWork* letter = &m_letters[letterIdx];
 	CFlatRuntime::CStack stack[2];
 
-	stack[0].m_word = letter->MessageType();
-	stack[1].m_word = letter->SenderId();
+	stack[0].m_word = m_letters[letterIdx].m_bits.m_messageType;
+	stack[1].m_word = m_letters[letterIdx].m_bits.m_senderId;
 	gCFlatRuntime().SystemCall(
 		Game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
 	for (int i = 0; i < 4; i++) {
 		CMes::m_tempVar[i] = m_letters[letterIdx].m_half.m_tempVars[i];
 	}
-	CMes::m_tempVar[4] = letter->MessageType();
-	CMes::m_tempVar[5] = letter->SenderId();
+	CMes::m_tempVar[4] = m_letters[letterIdx].m_bits.m_messageType;
+	CMes::m_tempVar[5] = m_letters[letterIdx].m_bits.m_senderId;
 
 	int money;
-	if (letter->AttachmentIsGil()) {
+	if (m_letters[letterIdx].m_bits.m_attachmentIsGil) {
 		money = 0;
 	} else {
-		money = letter->AttachmentValue();
+		money = m_letters[letterIdx].m_bits.m_attachValue;
 	}
 	CMes::m_tempVar[6] = money;
 
 	int gil;
-	if (letter->AttachmentIsGil()) {
-		gil = letter->AttachmentValue() * 100;
+	if (m_letters[letterIdx].m_bits.m_attachmentIsGil) {
+		gil = m_letters[letterIdx].m_bits.m_attachValue * 100;
 	} else {
 		gil = 0;
 	}
@@ -405,7 +404,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 
 	CMes::m_tempVar[8] = m_saveSlot;
 
-	letter->SetOpened();
+	m_letters[letterIdx].m_bits.m_opened = 1;
 }
 
 /*
@@ -2604,22 +2603,11 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier(stageRank * 2 + 0x44));
 	}
 
-	int* backupParam = Game.m_gameWork.m_wmBackupParams;
 	memberCount = 0;
-	if (*backupParam >= 0) {
-		memberCount = 1;
-	}
-	backupParam++;
-	if (*backupParam >= 0) {
-		memberCount++;
-	}
-	backupParam++;
-	if (*backupParam >= 0) {
-		memberCount++;
-	}
-	backupParam++;
-	if (*backupParam >= 0) {
-		memberCount++;
+	for (int i = 0; i < 4; i++) {
+		if (Game.m_gameWork.m_wmBackupParams[i] >= 0) {
+			memberCount++;
+		}
 	}
 
 	int scaledMemberCount = memberCount;

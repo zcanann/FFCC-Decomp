@@ -977,31 +977,32 @@ void InfoWin_PrintNextRow(void)
     char str[32];
     struct Window *win = gWindows;
     u16 buf[30];
-    struct BuyList *list;
+    char *p;
     struct ItemInfo *items;
     u32 *vals;
     u32 dst;
     s32 n;
     s32 w;
     s32 x;
-    s32 kind;
+    s32 k;
     s32 digits;
     s32 attr;
     s32 i;
-    s32 k;
 
     if (sInfoRow > win->rows)
         return;
     items = 0;
-    list = (struct BuyList *)LIST_BUF;
+    p = (char *)LIST_BUF;
     if (gScreen == 1) {
-        i = list->count;
+        s16 *ids = ((struct BuyList *)p)->ids;
+
+        i = ((struct BuyList *)p)->count;
         if (i & 1)
             i++;
-        vals = (u32 *)&BUY_ITEM_IDS[i];
-        n = BUY_ITEM_IDS[sInfoItem];
+        vals = (u32 *)&ids[i];
+        n = ids[sInfoItem];
     } else {
-        items = (struct ItemInfo *)list;
+        items = (struct ItemInfo *)p;
         vals = (u32 *)(items + 64);
         n = gSession.items[sInfoItem];
     }
@@ -1009,7 +1010,7 @@ void InfoWin_PrintNextRow(void)
     Text_Clear();
     dst = 0x06009000;
     if (sInfoRow < win->rows)
-        dst = sInfoRow * 64 * win->width + 0x06009000;
+        dst = win->width * 64 * sInfoRow + 0x06009000;
     if (sInfoRow == 0) {
         if (n > 0) {
             Text_SetX(16);
@@ -1034,10 +1035,10 @@ void InfoWin_PrintNextRow(void)
     } else if (sInfoRow <= 5) {
         if (sInfoMode == 0) {
             if (n > 0) {
-                kind = 0;
+                k = 0;
                 if (gScreen != 1)
-                    kind = Session_GetItemCategory(sInfoItem);
-                if (gScreen == 1 || kind != 1) {
+                    k = Session_GetItemCategory(sInfoItem);
+                if (gScreen == 1 || k != 1) {
                     InfoWin_GetDescLine(sInfoRow - 2, str);
                     Text_SetX(0);
                     Text_Print(str, TEXT_DRAW);
@@ -1050,10 +1051,11 @@ void InfoWin_PrintNextRow(void)
                             if (items->count != 0 && items->kind != 16) {
                                 n = Item_IsPercentKind(items->kind);
                                 x = n ? 40 : 39;
-                                w = Text_Print(Msg_GetSystem(x), TEXT_WIDTH);
-                                i = (win->width - 2) * 8 - w;
-                                digits = 1;
-                                if (items->count > 9) {
+                                k = Text_Print(Msg_GetSystem(x), TEXT_WIDTH);
+                                i = (win->width - 2) * 8 - k;
+                                if (items->count <= 9) {
+                                    digits = 1;
+                                } else {
                                     digits = 3;
                                     if (items->count <= 99)
                                         digits = 2;
@@ -1065,16 +1067,14 @@ void InfoWin_PrintNextRow(void)
                                 Text_PrintNumber(items->count, i, digits);
                             }
                         } else {
-                            char *s;
-
                             if (items->flags & 0x100)
-                                s = Msg_GetSystem(16);
+                                p = Msg_GetSystem(16);
                             else
-                                s = Msg_GetSystem(63);
+                                p = Msg_GetSystem(63);
                             Text_SetX(0);
-                            Text_Print(s, TEXT_DRAW);
-                            i = win->width * 8 - 34;
-                            Text_PrintNumber(items->count, i, 2);
+                            Text_Print(p, TEXT_DRAW);
+                            n = win->width * 8 - 34;
+                            Text_PrintNumber(items->count, n, 2);
                         }
                     } else if (sInfoRow == 3) {
                         if ((items->flags & 0xE00) && items->kind != 0) {
@@ -1086,34 +1086,34 @@ void InfoWin_PrintNextRow(void)
             }
         } else if (n > 0) {
             if (sInfoRow == 2) {
-                w = Text_Print(Msg_GetSystem(14), TEXT_WIDTH);
-                i = (win->width - 2) * 8 - w;
+                n = Text_Print(Msg_GetSystem(14), TEXT_WIDTH);
+                i = (win->width - 2) * 8 - n;
                 Text_SetX(i >> 1);
                 Text_Print(Msg_GetSystem(14), TEXT_DRAW);
             } else if (sInfoRow == 3) {
                 strcpy(str, Msg_GetSystem(13));
                 strcat(str, sSlashText);
-                i = Text_Print(str, TEXT_WIDTH) + 72;
-                i = (win->width - 2) * 8 - i;
+                n = Text_Print(str, TEXT_WIDTH) + 72;
+                i = (win->width - 2) * 8 - n;
                 Text_SetX(i);
                 Text_PrintNumber(gSession.gil, i, 8);
                 Text_Print(str, TEXT_DRAW);
             } else if (sInfoRow == 4) {
                 strcpy(str, Msg_GetSystem(13));
                 strcat(str, sSlashText);
-                w = Text_Print(str, TEXT_WIDTH) + 72;
-                i = (win->width - 2) * 8 - w;
+                n = Text_Print(str, TEXT_WIDTH) + 72;
+                i = (win->width - 2) * 8 - n;
                 Text_SetX(i);
                 n = sInfoItem;
                 Text_PrintNumber(vals[n], i, 8);
                 Text_Print(Msg_GetSystem(13), TEXT_DRAW);
             } else if (sInfoRow == 5) {
-                w = Text_Print(Msg_GetSystem(15), TEXT_WIDTH) + 18;
-                i = (win->width - 3) * 8 - w;
+                n = Text_Print(Msg_GetSystem(15), TEXT_WIDTH) + 18;
+                i = (win->width - 3) * 8 - n;
                 Text_SetX(i);
                 Text_Print(Msg_GetSystem(15), TEXT_DRAW);
-                i = Text_GetX();
-                Text_PrintNumber(sShopQuantity, i, 2);
+                n = Text_GetX();
+                Text_PrintNumber(sShopQuantity, n, 2);
             }
         }
         Text_CopyToVram(dst, win->width);

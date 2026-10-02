@@ -1,8 +1,12 @@
 #include "gba/m4a_internal.h"
 
-extern struct MusicPlayerInfo gMPlayBgm;
-extern struct MusicPlayerInfo gMPlaySe;
-extern struct MusicPlayerInfo gMPlayEngine;
+struct SoundInfo gSoundInfo = {0};
+MPlayFunc gMPlayJumpTable[36] = {0};
+struct CgbChannel gCgbChans[4] = {0};
+struct MusicPlayerInfo gMPlayBgm = {0};
+struct MusicPlayerInfo gMPlaySe = {0};
+struct MusicPlayerInfo gMPlayEngine = {0};
+u8 gMPlayMemAccArea[0x10] = {0};
 
 struct MusicPlayerTrack gMPlayTrackBgm[4];
 struct MusicPlayerTrack gMPlayTrackSe[2];

@@ -25,7 +25,7 @@ ENTRY = EWRAM_BASE
 # The top of IWRAM holds the BIOS interrupt vector and stacks, not program data.
 IWRAM_DATA_END = 0x03007E00
 
-LOAD_SECTIONS = (".text", ".rodata")
+LOAD_SECTIONS = (".text", ".rodata", ".data")
 BSS_SECTIONS = {".ewram_bss": (EWRAM_BASE, EWRAM_END), ".bss": (IWRAM_BASE, IWRAM_DATA_END)}
 
 _SYMBOL = re.compile(r"^(\S+)\s*=\s*(\.\w+):0x([0-9A-Fa-f]+);\s*//(.*)$")
@@ -426,18 +426,27 @@ class Emitter:
         # Absolute symbols, such as link-time constants from configuration tables.
         out = [f"{s.name} = 0x{s.address:X};" for s in self.symbols if s.section == ".abs"]
         out += ["SECTIONS", "{"]
-        sections: Dict[str, List[Split]] = {}
-        for split in self.splits:
-            # Initialized data is loaded with the rest of the image after the code.
-            # So is anything allocated inside the image, such as common symbols.
-            output = split.section if split.section == ".text" or split.start >= self.a.end else ".rodata"
-            sections.setdefault(output, []).append(split)
-        for section in list(LOAD_SECTIONS) + list(BSS_SECTIONS):
-            if section not in sections:
-                continue
-            ordered = sorted(sections[section], key=lambda s: s.start)
+        # Loaded data and read-only data can alternate (the minigame places
+        # graphics after writable data). Keep each contiguous output range,
+        # rather than merging nonadjacent ranges into overlapping sections.
+        groups = []
+        for split in sorted(self.splits, key=lambda s: s.start):
+            output = split.section
+            if split.start < self.a.end:
+                if output in BSS_SECTIONS:
+                    output = ".data"
+                elif output not in LOAD_SECTIONS:
+                    output = ".rodata"
+            if not groups or groups[-1][0] != output:
+                groups.append((output, []))
+            groups[-1][1].append(split)
+        counts = {}
+        for section, ordered in groups:
+            count = counts.get(section, 0)
+            counts[section] = count + 1
+            name = section if count == 0 else f"{section}.{count}"
             kind = " (NOLOAD)" if section in BSS_SECTIONS else ""
-            out.append(f"\t{section} 0x{ordered[0].start:08X}{kind} :")
+            out.append(f"\t{name} 0x{ordered[0].start:08X}{kind} :")
             out.append("\t{")
             for split in ordered:
                 name = split.section if split.unit in compiled else self.input_section(split)

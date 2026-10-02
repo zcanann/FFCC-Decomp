@@ -251,7 +251,7 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                "--rename-section .data=.data.$name $in $out", description="OBJCOPY $out")
         n.rule("gba_strip_attributes", f"{prefix_str}objcopy{exe} -R .ARM.attributes $in $out",
                description="OBJCOPY $out")
-        n.rule("gba_objcopy", f"{prefix_str}objcopy{exe} -O binary -j .text -j .rodata $in $out",
+        n.rule("gba_objcopy", f'{prefix_str}objcopy{exe} -O binary -j ".text*" -j ".rodata*" -j ".data*" $in $out',
                description="OBJCOPY $out")
         n.rule("gba_sha1", f"$python {_path(tools / 'check_sha1.py')} $in $sha1 $out",
                description="CHECK $in")

@@ -268,8 +268,11 @@ libc/arm/syscalls:
 course:
 	.rodata     start:0x02013C14 end:0x02014684
 
+sound_data:
+	.data       start:0x02014690 end:0x020158A0
+
 bss:
-	.bss        start:0x02014690 end:0x020159A4
+	.bss        start:0x020158A0 end:0x020159A4
 
 obj:
 	.data       start:0x020159A4 end:0x020159AC

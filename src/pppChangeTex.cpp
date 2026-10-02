@@ -92,14 +92,38 @@ void pppRenderChangeTex(pppChangeTex*, ChangeTexStep* step, _pppCtrlTable*)
  */
 void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTable* data)
 {
+	ChangeTexWork* work;
+	VColor* colorBlock;
+	CCharaPcs::CHandle* handle0;
+	CChara::CModel* model0;
+	CCharaPcs::CHandle* handle1;
+	CCharaPcs::CHandle* handle2;
+	CChara::CModel* model1;
+	CChara::CModel* model2;
+	CTexture* texture;
+	GXColor** colorArray;
+	unsigned int meshIdx;
+	ChangeTexMeshRef* meshList;
+	ChangeTexMeshData* meshData;
+	ChangeTexDisplayList* dlInfo;
+	ChangeTexDisplayListCopy** dlEntry;
+	int dlIdx;
+	ChangeTexDisplayListCopy* dlPair;
+	float currentValue;
+	short splitY;
+	double alphaBase;
+	GXColor* colors;
+	unsigned int vertCount;
+	unsigned int v;
+
 	if (ppvUserStopPartF != 0) {
 		return;
 	}
 
-	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
-	VColor* colorBlock = GetChangeTexColorBlock(changeTex, data);
-	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(ppvMng->m_owner, 0);
-	CChara::CModel* model0 = GetCharaModelPtr(handle0);
+	work = GetChangeTexWork(changeTex, data);
+	colorBlock = GetChangeTexColorBlock(changeTex, data);
+	handle0 = GetCharaHandlePtr(ppvMng->m_owner, 0);
+	model0 = GetCharaModelPtr(handle0);
 
 	CalcGraphValue(
 	    changeTex, step->m_graphId, work->m_value0, work->m_value1, work->m_value2, step->m_initWOrk,
@@ -111,18 +135,18 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 
 	work->m_texture = GetTextureFromRSD(step->m_dataValIndex, ppvEnv);
 
-	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr(work->m_charaObj, 1);
-	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr(work->m_charaObj, 2);
+	handle1 = GetCharaHandlePtr(work->m_charaObj, 1);
+	handle2 = GetCharaHandlePtr(work->m_charaObj, 2);
 
 	if (handle1 != 0) {
-		CChara::CModel* model1 = GetCharaModelPtr(handle1);
+		model1 = GetCharaModelPtr(handle1);
 		if (model1 != 0) {
 			SetChangeTexModelCallbacks(model1, work, step);
 		}
 	}
 
 	if (handle2 != 0) {
-		CChara::CModel* model2 = GetCharaModelPtr(handle2);
+		model2 = GetCharaModelPtr(handle2);
 		if (model2 != 0) {
 			SetChangeTexModelCallbacks(model2, work, step);
 		}
@@ -132,13 +156,13 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 		return;
 	}
 
-	CTexture* texture = GetTextureFromRSD(step->m_dataValIndex, ppvEnv);
+	texture = GetTextureFromRSD(step->m_dataValIndex, ppvEnv);
 	if (texture == 0) {
 		return;
 	}
 	work->m_texture = texture;
 
-	ChangeTexMeshRef* meshList = ChangeTexMeshes(model0);
+	meshList = ChangeTexMeshes(model0);
 	if ((work->m_meshColorArrays == 0) && (work->m_displayListArrays == 0)) {
 		work->m_cachedValue = -10000.0f;
 		work->m_meshColorArrays = static_cast<GXColor**>(pppMemAlloc(
@@ -148,9 +172,9 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 		    model0->m_data->m_meshCount * sizeof(ChangeTexDisplayListCopy**), ppvEnv->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp), 0x166));
 
-		GXColor** colorArray = work->m_meshColorArrays;
-		for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++, meshList++) {
-			ChangeTexMeshData* meshData = meshList->m_data;
+		colorArray = work->m_meshColorArrays;
+		for (meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++, meshList++) {
+			meshData = meshList->m_data;
 			if (strcmp(meshData->m_name, "obj") == 0) {
 				gUtil.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax, meshList->m_workPositions,
 				    meshData->m_vertexCount, model0->m_data->m_posQuant);
@@ -160,11 +184,11 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 			    pppMemAlloc(meshList->m_data->m_displayListCount * sizeof(ChangeTexDisplayListCopy*), ppvEnv->m_stagePtr,
 			                const_cast<char*>(s_pppChangeTex_cpp), 0x181));
 
-			int dlIdx = meshList->m_data->m_displayListCount - 1;
-			ChangeTexDisplayList* dlInfo = meshList->m_data->m_displayLists;
-			ChangeTexDisplayListCopy** dlEntry = &work->m_displayListArrays[meshIdx][dlIdx];
+			dlIdx = meshList->m_data->m_displayListCount - 1;
+			dlInfo = meshList->m_data->m_displayLists;
+			dlEntry = &work->m_displayListArrays[meshIdx][dlIdx];
 			for (; dlIdx >= 0; dlIdx--, dlInfo++) {
-				ChangeTexDisplayListCopy* dlPair = static_cast<ChangeTexDisplayListCopy*>(
+				dlPair = static_cast<ChangeTexDisplayListCopy*>(
 				    pppMemAlloc(sizeof(ChangeTexDisplayListCopy), ppvEnv->m_stagePtr,
 				                const_cast<char*>(s_pppChangeTex_cpp), 0x18B));
 				*dlEntry = dlPair;
@@ -189,22 +213,21 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 		return;
 	}
 
-	float currentValue = work->m_value0 * (work->m_bboxMax.y - work->m_bboxMin.y) + work->m_bboxMin.y;
+	currentValue = work->m_value0 * (work->m_bboxMax.y - work->m_bboxMin.y) + work->m_bboxMin.y;
 
-	short splitY = (short)(int)(currentValue * (float)(1 << model0->m_data->m_posQuant));
+	splitY = (short)(int)(currentValue * (float)(1 << model0->m_data->m_posQuant));
 	if (work->m_cachedValue == currentValue) {
 		return;
 	}
 
 	work->m_cachedValue = currentValue;
 
-	double alphaBase = (double)(255.0f * ((float)colorBlock->m_color.rgba[3] / 255.0f));
+	alphaBase = (double)(255.0f * ((float)colorBlock->m_color.rgba[3] / 255.0f));
 
 	meshList = ChangeTexMeshes(model0);
-	for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++, meshList++) {
-		GXColor* colors = work->m_meshColorArrays[meshIdx];
-		unsigned int vertCount;
-		for (unsigned int v = 0; (vertCount = meshList->m_data->m_vertexCount, v < vertCount); v++) {
+	for (meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++, meshList++) {
+		colors = work->m_meshColorArrays[meshIdx];
+		for (v = 0; (vertCount = meshList->m_data->m_vertexCount, v < vertCount); v++) {
 			if (step->m_changeTex.m_mode == 1) {
 				if (meshList->m_workPositions[v].y < splitY) {
 					colors[v].a = (u8)(int)alphaBase;
@@ -235,32 +258,48 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
  */
 void pppDestructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
+	GXColor** colorArrays;
+	ChangeTexDisplayListCopy*** dlArrays;
+	ChangeTexWork* work;
+	CCharaPcs::CHandle* handle2;
+	CCharaPcs::CHandle* handle1;
+	CChara::CModel* model;
+	CChara::CModel* model1;
+	CChara::CModel* model2;
+	ChangeTexMeshRef* meshList;
+	GXColor** colorArraysBase;
+	ChangeTexDisplayListCopy*** dlArraysBase;
+	unsigned int i;
+	ChangeTexMeshData* meshData;
+	CCharaPcs::CHandle* handle0;
+	ChangeTexDisplayListCopy** dlEntries;
+	unsigned int j;
+
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppChangeTex_cpp), 0x9d);
-	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
-	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(work->m_charaObj, 0);
-	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr(work->m_charaObj, 1);
-	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr(work->m_charaObj, 2);
-	CChara::CModel* model = 0;
+	work = GetChangeTexWork(changeTex, data);
+	handle0 = GetCharaHandlePtr(work->m_charaObj, 0);
+	handle1 = GetCharaHandlePtr(work->m_charaObj, 1);
+	handle2 = GetCharaHandlePtr(work->m_charaObj, 2);
+	model = 0;
 
 	if (handle0 != 0) {
 		model = GetCharaModelPtr(handle0);
 		ClearChangeTexModelCallbacks(model);
 	}
 	if (handle1 != 0) {
-		CChara::CModel* model1 = GetCharaModelPtr(handle1);
+		model1 = GetCharaModelPtr(handle1);
 		if (model1 != 0) {
 			ClearChangeTexModelCallbacks(model1);
 		}
 	}
 	if (handle2 != 0) {
-		CChara::CModel* model2 = GetCharaModelPtr(handle2);
+		model2 = GetCharaModelPtr(handle2);
 		if (model2 != 0) {
 			ClearChangeTexModelCallbacks(model2);
 		}
 	}
 
-	ChangeTexDisplayListCopy*** dlArrays = work->m_displayListArrays;
-	GXColor** colorArrays;
+	dlArrays = work->m_displayListArrays;
 	if (dlArrays != 0) {
 		colorArrays = work->m_meshColorArrays;
 		if (colorArrays != 0) {
@@ -270,13 +309,13 @@ void pppDestructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 	return;
 
 freeArrays:
-	ChangeTexMeshRef* meshList = ChangeTexMeshes(model);
-	GXColor** colorArraysBase = colorArrays;
-	ChangeTexDisplayListCopy*** dlArraysBase = dlArrays;
-	for (unsigned int i = 0; i < model->m_data->m_meshCount; i++, meshList++) {
-		ChangeTexMeshData* meshData = meshList->m_data;
-		ChangeTexDisplayListCopy** dlEntries = *dlArrays;
-		for (unsigned int j = 0; j < meshData->m_displayListCount; j++) {
+	meshList = ChangeTexMeshes(model);
+	colorArraysBase = colorArrays;
+	dlArraysBase = dlArrays;
+	for (i = 0; i < model->m_data->m_meshCount; i++, meshList++) {
+		meshData = meshList->m_data;
+		dlEntries = *dlArrays;
+		for (j = 0; j < meshData->m_displayListCount; j++) {
 			if ((*dlEntries)->m_data != 0) {
 				pppMemFree((*dlEntries)->m_data);
 				(*dlEntries)->m_data = 0;

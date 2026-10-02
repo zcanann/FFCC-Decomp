@@ -564,51 +564,62 @@ void Window_OpenStyle3(struct Window *win, s32 tile, s32 pal)
         map = Bg_GetMapPtr(win->bg, win->x, win->y);
         DmaCopy16(0, buf, map, win->width << 1);
     }
-    if (gMode || win->anim) {
-        if (win->anim && win->keepFrame == 0) {
-            for (i = 0; i < win->width; i++) {
-                if (i == 0)
-                    t = tile + 3;
-                else if (i + 1 >= win->width)
-                    t = tile + 5;
-                else
-                    t = tile + 4;
-                if ((py >> 3) >= win->y + win->height)
-                    t += 3;
-                buf[i] = t | pal;
-            }
-            map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
-            DmaCopy16(0, buf, map, win->width << 1);
-        }
-        k = win->anim >> 3;
-        k -= win->skipRows;
-        if ((gMode == MODE_FIELD ? k > 0 : k >= 0) && k <= win->rows * 2) {
-            t = Window_GetTextTile(win->slot);
-            if (gMode) {
-                odd = k & 1;
-                n = k >> 1;
-            } else {
-                odd = !(k & 1);
-                n = (k - 1) >> 1;
-            }
-            t += win->width * 2 * n;
-            t += odd;
-            attr = win->items[n].enabled ? 7 : 8;
-            attr <<= 12;
-            for (i = 1; i < win->width - 1; i++) {
-                if (i & 1) {
-                    buf[i] = attr | t;
-                } else {
-                    buf[i] = (t + 2) | attr;
-                    t += 4;
-                }
-            }
-            buf[0] = 0x3FF;
-            buf[win->width - 1] = 0x3FF;
-            map = Bg_GetMapPtr(win->bg - 1, win->x, (py - 8) >> 3);
-            DmaCopy16(0, buf, map, win->width << 1);
-        }
+    if (gMode == MODE_FIELD) {
+        if (win->anim != 0)
+            goto draw_animated_rows;
+        goto draw_sprites;
     }
+    if (win->anim == 0)
+        goto draw_text_rows;
+
+draw_animated_rows:
+    if (win->keepFrame == 0) {
+        for (i = 0; i < win->width; i++) {
+            if (i == 0)
+                t = tile + 3;
+            else if (i + 1 >= win->width)
+                t = tile + 5;
+            else
+                t = tile + 4;
+            if ((py >> 3) >= win->y + win->height)
+                t += 3;
+            buf[i] = t | pal;
+        }
+        map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
+        DmaCopy16(0, buf, map, win->width << 1);
+    }
+
+draw_text_rows:
+    k = win->anim >> 3;
+    k -= win->skipRows;
+    if ((gMode == MODE_FIELD ? k > 0 : k >= 0) && k <= win->rows * 2) {
+        t = Window_GetTextTile(win->slot);
+        if (gMode) {
+            odd = k & 1;
+            n = k >> 1;
+        } else {
+            odd = !(k & 1);
+            n = (k - 1) >> 1;
+        }
+        t += win->width * 2 * n;
+        t += odd;
+        attr = win->items[n].enabled ? 7 : 8;
+        attr <<= 12;
+        for (i = 1; i < win->width - 1; i++) {
+            if (i & 1) {
+                buf[i] = attr | t;
+            } else {
+                buf[i] = (t + 2) | attr;
+                t += 4;
+            }
+        }
+        buf[0] = 0x3FF;
+        buf[win->width - 1] = 0x3FF;
+        map = Bg_GetMapPtr(win->bg - 1, win->x, (py - 8) >> 3);
+        DmaCopy16(0, buf, map, win->width << 1);
+    }
+
+draw_sprites:
     if ((py >> 3) < win->y + win->height && win->keepFrame == 0) {
         for (i = 0; i < win->width; i++, px += 8) {
             if (i == 0)

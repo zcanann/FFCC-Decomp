@@ -122,6 +122,8 @@ void Radar_DrawMap(void)
 {
     u16 out[24];
     u16 line[256];
+    u16 *data;
+    u16 *src;
     s16 x;
     s16 y;
     s16 tx;
@@ -129,19 +131,15 @@ void Radar_DrawMap(void)
     s32 row;
     s32 col;
     s32 dst;
-    u16 *data;
     s16 mapW;
     s16 mapH;
-    s32 sum;
     s32 i;
     s32 k;
     s32 m;
     s32 n;
-    s32 r;
-    s32 c;
     u16 code;
     s32 cnt;
-    u16 v;
+    s16 v;
     s16 len;
 
     if (!(gDataFlags & DATA_MAP))
@@ -164,16 +162,16 @@ void Radar_DrawMap(void)
     dst += col * 2;
     mapW = sMapHeader->width >> 3;
     mapH = sMapHeader->height >> 3;
-    sum = 0;
+    k = 0;
     for (i = 0; i < ty - 1 && i < mapH; i++)
-        sum += sMapRowLen[i];
-    data = sMapData + sum;
+        k += sMapRowLen[i];
+    data = sMapData + k;
     for (i = -1; i <= 16; i++) {
-        r = i + ty;
-        if (r >= 0 && r < mapH) {
+        if (i + ty >= 0 && i + ty < mapH) {
             n = 0;
-            for (k = 0; k < sMapRowLen[r]; k++) {
-                code = data[k];
+            src = data;
+            for (k = 0; k < sMapRowLen[i + ty]; src++, k++) {
+                code = *src;
                 if (code & 0x8000) {
                     cnt = code & 0x3FF;
                     v = (code >> 10) & 3;
@@ -186,11 +184,10 @@ void Radar_DrawMap(void)
             data += sMapRowLen[i + ty];
         }
         for (m = -1; m <= 21; m++) {
-            c = m + tx;
-            if (r < 0 || c < 0 || r >= mapH || c >= mapW)
+            if (i + ty < 0 || m + tx < 0 || i + ty >= mapH || m + tx >= mapW)
                 out[m + 1] = 0x1000;
             else
-                out[m + 1] = line[c];
+                out[m + 1] = line[m + tx];
         }
         if (col + 23 <= 32) {
             DmaCopy16(0, out, dst, 23 * 2);

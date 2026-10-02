@@ -63,7 +63,6 @@ s16 gObjShapeSizes[] = {
     32, 128, 512, 2048, 64, 128, 256, 1024, 64, 128, 256, 1024,
 };
 extern u16 gSpObjPalettes[][16];
-extern s16 gSinTable[];
 static struct ObjHeader sObjHeader;
 static s8 sOamBufIndex;
 static s16 sAffineScaleX[32];

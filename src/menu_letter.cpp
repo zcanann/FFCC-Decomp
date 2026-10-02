@@ -118,7 +118,7 @@ enum {
 
 static inline char* GetLetterItemName(int itemId)
 {
-	return Game.m_cFlatDataArr[1].TableStrings(0)[itemId];
+	return Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
 }
 
 static inline CCaravanWork* GetLetterCaravanWork()
@@ -306,16 +306,13 @@ inline int CMenuPcs::LetterLstOpen()
 					panel->dy = progress;
 				} else {
 					panel->elapsed = panel->elapsed + 1;
-					panel->alpha =
-						static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-						                   static_cast<double>(static_cast<float>(panel->elapsed)));
+					panel->alpha = (1.0 / (float)panel->duration) * (float)panel->elapsed;
 					if ((panel->flags & 2) == 0) {
-						progress = static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(panel->duration))) *
-						                           static_cast<double>(static_cast<float>(panel->elapsed)));
-						float dx = (panel->targetX - static_cast<float>(panel->x)) * progress;
-						float dy = (panel->targetY - static_cast<float>(panel->y)) * progress;
-						panel->dx = dx;
-						panel->dy = dy;
+						progress = (1.0 / (float)panel->duration) * (float)panel->elapsed;
+						float dx = panel->targetX - static_cast<float>(panel->x);
+						float dy = panel->targetY - static_cast<float>(panel->y);
+						panel->dx = dx * progress;
+						panel->dy = dy * progress;
 					}
 				}
 			}
@@ -358,18 +355,13 @@ inline int CMenuPcs::LetterLstClose()
 				entry->dy = f;
 			} else {
 				entry->elapsed = entry->elapsed + 1;
-				entry->alpha =
-				    static_cast<float>(DOUBLE_803330e8 -
-				                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(entry->duration))) *
-				                           static_cast<double>(static_cast<float>(entry->elapsed)));
+				entry->alpha = 1.0 - (1.0 / (float)entry->duration) * (float)entry->elapsed;
 				if ((entry->flags & 2) == 0) {
-					f = static_cast<float>(DOUBLE_803330e8 -
-					                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(entry->duration))) *
-					                           static_cast<double>(static_cast<float>(entry->elapsed)));
-					float dx = (entry->targetX - static_cast<float>(entry->x)) * f;
-					float dy = (entry->targetY - static_cast<float>(entry->y)) * f;
-					entry->dx = dx;
-					entry->dy = dy;
+					f = 1.0 - (1.0 / (float)entry->duration) * (float)entry->elapsed;
+					float dx = entry->targetX - static_cast<float>(entry->x);
+					float dy = entry->targetY - static_cast<float>(entry->y);
+					entry->dx = dx * f;
+					entry->dy = dy * f;
 				}
 			}
 		}
@@ -393,9 +385,9 @@ inline int CMenuPcs::LetterLstClose()
  */
 inline int CMenuPcs::LetterMessOpen()
 {
-	CCaravanWork::CLetterWork* letter = &GetLetterCaravanWork()->m_letters[s_SelLetter];
-	if (!letter->IsOpened()) {
-		letter->SetOpened();
+	CCaravanWork* caravanWork = GetLetterCaravanWork();
+	if (!caravanWork->m_letters[s_SelLetter].m_bits.m_opened) {
+		caravanWork->m_letters[s_SelLetter].m_bits.m_opened = 1;
 	}
 	return LetterLstOpen();
 }
@@ -429,13 +421,12 @@ inline int CMenuPcs::LetterItemWinOpen()
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
 	if (m_letterMenuState->dialogInitialized == '\0') {
 		char info[0x80];
-		char right[0x10];
 		char left[0x10];
-		s16 winH;
+		char right[0x10];
 		s16 winW;
-		CCaravanWork::CLetterWork* selectedLetter = &caravanWork->m_letters[s_SelLetter];
-		if (selectedLetter->AttachmentIsGil()) {
-			int gil = static_cast<int>(selectedLetter->AttachmentValue()) * 100;
+		s16 winH;
+		if (caravanWork->m_letters[s_SelLetter].m_bits.m_attachmentIsGil) {
+			int gil = caravanWork->m_letters[s_SelLetter].m_bits.m_attachValue * 100;
 			if (lang == 2) {
 				sprintf(info, s_fmt_pctd_sp_pcts_pcts,
 				        gil,
@@ -448,20 +439,20 @@ inline int CMenuPcs::LetterItemWinOpen()
 				        GetMenuStr(4));
 			}
 		} else {
-			int value = selectedLetter->AttachmentValue();
+			int value = caravanWork->m_letters[s_SelLetter].m_bits.m_attachValue;
 			if (lang == 2) {
 				sprintf(info, s_letterItemInfoFmt,
 				        GetMenuStr(0x23),
-				        GetLetterItemName(value * 5 + 4),
+				        GetLetterItemName(value),
 				        GetMenuStr(0x24),
 				        GetMenuStr(0x22));
 			} else {
-				sprintf(info, s_fmt_pcts_pcts_q, GetMenuStr(0x22), GetLetterItemName(value * 5 + 4));
+				sprintf(info, s_fmt_pcts_pcts_q, GetMenuStr(0x22), GetLetterItemName(value));
 			}
 		}
-		strcpy(left, "  ");
+		strcpy(left, s_fmt_two_spaces);
 		strcat(left, GetMenuStr(1));
-		strcpy(right, "  ");
+		strcpy(right, s_fmt_two_spaces);
 		strcat(right, GetMenuStr(2));
 		SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
 		GetSingWinSize(0, &winW, &winH, 1);
@@ -489,8 +480,8 @@ inline int CMenuPcs::LetterItemWinOpen()
 inline int CMenuPcs::LetterAttachWinOpen()
 {
 	if (m_letterMenuState->dialogInitialized == '\0') {
-		s16 winH;
 		s16 winW;
+		s16 winH;
 		GetSingWinSize(2, &winW, &winH, 0);
 		SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
 		m_menuWindowInfo->state = 0;
@@ -616,17 +607,32 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 {
 	unsigned long flip;
 	int i;
+	float xw;
+	float yh;
+	float x0;
+	float y0;
+	float h;
+	float x1;
+	float w;
+	float y1;
 
 	if (openRatio <= FLOAT_803330bc) {
 		return;
 	}
 
-	float x0 = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>((FLOAT_803330d0 * openRatio) * DOUBLE_803330a8)) - DOUBLE_803330a8));
-	float fy = FLOAT_803330e0;
-	float y0 = static_cast<float>(static_cast<int>(fy - DOUBLE_803330a8));
-	float w = static_cast<float>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + FLOAT_803330d0 * openRatio)) - DOUBLE_803330e8));
-	float fh = FLOAT_803330f0;
-	float h = static_cast<float>(static_cast<int>(fh - DOUBLE_803330e8));
+	float grow = FLOAT_803330d0 * openRatio;
+	float left = FLOAT_803330d4 - static_cast<float>(grow / 2.0);
+	float top = FLOAT_803330e0;
+	float width = DOUBLE_803330d8 + grow;
+	float height = FLOAT_803330f0;
+	int leftPx = static_cast<int>(static_cast<double>(left) - 0.5);
+	int topPx = static_cast<int>(static_cast<double>(top) - 0.5);
+	int widthPx = static_cast<int>(static_cast<double>(width) - 1.0);
+	int heightPx = static_cast<int>(static_cast<double>(height) - 1.0);
+	x0 = static_cast<float>(leftPx);
+	y0 = static_cast<float>(topPx);
+	w = static_cast<float>(widthPx);
+	h = static_cast<float>(heightPx);
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white;
@@ -636,10 +642,10 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	white.a = 0xFF;
 	GXSetChanMatColor(GX_COLOR0A0, white);
 
-	float xw = x0 + w;
-	float yh = y0 + h;
-	float x1 = xw - FLOAT_803330f4;
-	float y1 = yh - FLOAT_803330f4;
+	xw = x0 + w;
+	yh = y0 + h;
+	x1 = xw - FLOAT_803330f4;
+	y1 = yh - FLOAT_803330f4;
 
 	for (i = 0; i < 4; ++i) {
 		int tex;
@@ -844,11 +850,10 @@ int CMenuPcs::LetterCtrlCur()
 				} else {
 					m_letterMenuState->step = m_letterMenuState->step + 1;
 					s_SelLetter = m_letterMenuState->topIndex + m_letterMenuState->listCursor;
-					CCaravanWork::CLetterWork* selectedLetter = &caravanWork->m_letters[s_SelLetter];
-					CMes::m_tempVar[0] = selectedLetter->TempVar(0);
-					CMes::m_tempVar[1] = selectedLetter->TempVar(1);
-					CMes::m_tempVar[2] = selectedLetter->TempVar(2);
-					CMes::m_tempVar[3] = selectedLetter->TempVar(3);
+					CMes::m_tempVar[0] = caravanWork->m_letters[s_SelLetter].m_half.m_tempVars[0];
+					CMes::m_tempVar[1] = caravanWork->m_letters[s_SelLetter].m_half.m_tempVars[1];
+					CMes::m_tempVar[2] = caravanWork->m_letters[s_SelLetter].m_half.m_tempVars[2];
+					CMes::m_tempVar[3] = caravanWork->m_letters[s_SelLetter].m_half.m_tempVars[3];
 
 					LetterInit2();
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -861,14 +866,12 @@ int CMenuPcs::LetterCtrlCur()
 		}
 	} else if (menuMode == 1) {
 		if ((press & 0x100) != 0) {
-			CCaravanWork::CLetterWork* selectedLetter = &caravanWork->m_letters[s_SelLetter];
-			if ((selectedLetter->AttachmentValue() != 0) &&
-			    !selectedLetter->IsAttachmentClaimed()) {
+			if ((caravanWork->m_letters[s_SelLetter].m_bits.m_attachValue != 0) &&
+			    !caravanWork->m_letters[s_SelLetter].m_bits.m_attachmentClaimed) {
 				m_letterMenuState->action = 1;
 				m_letterMenuState->messageMask = 5;
-				selectedLetter = &caravanWork->m_letters[s_SelLetter];
-				int value = selectedLetter->AttachmentValue();
-				if (selectedLetter->AttachmentIsGil()) {
+				int value = caravanWork->m_letters[s_SelLetter].m_bits.m_attachValue;
+				if (caravanWork->m_letters[s_SelLetter].m_bits.m_attachmentIsGil) {
 					if (caravanWork->CanAddGil(value * 100) != 0) {
 						m_letterMenuState->messageMask |= 2;
 					}
@@ -880,8 +883,8 @@ int CMenuPcs::LetterCtrlCur()
 				m_letterMenuState->step = m_letterMenuState->step + 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			} else if ((CFlatLetterEventEnabled() != 0) &&
-			    selectedLetter->HasReply() &&
-			    !selectedLetter->IsReplySent()) {
+			    caravanWork->m_letters[s_SelLetter].m_bits.m_hasReply &&
+			    !caravanWork->m_letters[s_SelLetter].m_bits.m_replySent) {
 				m_letterMenuState->action = 2;
 				m_letterMenuState->step = m_letterMenuState->step + 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -904,9 +907,8 @@ int CMenuPcs::LetterCtrlCur()
 			s16 sel = m_letterMenuState->choiceCursor;
 			if ((static_cast<int>(m_letterMenuState->messageMask) & (1 << (sel + 1))) != 0) {
 				if (sel == 0) {
-					CCaravanWork::CLetterWork* selectedLetter = &caravanWork->m_letters[s_SelLetter];
-					int value = selectedLetter->AttachmentValue();
-					if (selectedLetter->AttachmentIsGil()) {
+					int value = caravanWork->m_letters[s_SelLetter].m_bits.m_attachValue;
+					if (caravanWork->m_letters[s_SelLetter].m_bits.m_attachmentIsGil) {
 						caravanWork->AddGil(value * 100);
 					} else {
 						caravanWork->AddItem(value, 0);
@@ -915,8 +917,8 @@ int CMenuPcs::LetterCtrlCur()
 				}
 
 				if ((CFlatLetterEventEnabled() != 0) &&
-				    caravanWork->m_letters[s_SelLetter].HasReply() &&
-				    !caravanWork->m_letters[s_SelLetter].IsReplySent()) {
+				    caravanWork->m_letters[s_SelLetter].m_bits.m_hasReply &&
+				    !caravanWork->m_letters[s_SelLetter].m_bits.m_replySent) {
 					m_letterMenuState->action = 1;
 				} else {
 					m_letterMenuState->action = -1;
@@ -929,8 +931,8 @@ int CMenuPcs::LetterCtrlCur()
 			}
 		} else if ((press & 0x200) != 0) {
 			if ((CFlatLetterEventEnabled() != 0) &&
-			    caravanWork->m_letters[s_SelLetter].HasReply() &&
-			    !caravanWork->m_letters[s_SelLetter].IsReplySent()) {
+			    caravanWork->m_letters[s_SelLetter].m_bits.m_hasReply &&
+			    !caravanWork->m_letters[s_SelLetter].m_bits.m_replySent) {
 				m_letterMenuState->action = 1;
 			} else {
 				m_letterMenuState->action = -1;
@@ -1114,6 +1116,7 @@ void CMenuPcs::LetterMessDraw()
 	float x1, x0;
 	float y0, y1;
 	float u, v;
+	GXColor colors[4];
 
 	SingleFadeEntry* panel = m_singleFadeState->entries;
 	for (int i = 0; i < m_singleFadeState->count; ++i, ++panel) {
@@ -1128,13 +1131,11 @@ void CMenuPcs::LetterMessDraw()
 		y1 = static_cast<float>(panel->height);
 		u = panel->u;
 		v = panel->v;
-		u8 alpha = static_cast<u8>(FLOAT_803330a0 * panel->alpha);
-		GXColor color;
-		color.r = 0xFF;
-		color.g = 0xFF;
-		color.b = 0xFF;
-		color.a = alpha;
-		GXSetChanMatColor(GX_COLOR0A0, color);
+		colors[0].r = 0xFF;
+		colors[0].g = 0xFF;
+		colors[0].b = 0xFF;
+		colors[0].a = static_cast<u8>(FLOAT_803330a0 * panel->alpha);
+		GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(panel->tex));
 		MenuPcs.DrawRect(
 		    0, x0, y0, x1,
@@ -1193,14 +1194,13 @@ void CMenuPcs::LetterMessDraw()
 
 	DrawInit();
 
-	CCaravanWork::CLetterWork* selectedLetter = &caravanWork->m_letters[s_SelLetter];
-	if (selectedLetter->AttachmentValue() != 0) {
+	if (caravanWork->m_letters[s_SelLetter].m_bits.m_attachValue != 0) {
 		x0 = FLOAT_8033314c;
 		y0 = FLOAT_80333150;
 		int iconX = static_cast<int>(x0);
 		int iconY = static_cast<int>(y0);
 		int icon = 0x26 +
-		           (selectedLetter->IsAttachmentClaimed() ? 1 : 0);
+		           (caravanWork->m_letters[s_SelLetter].m_bits.m_attachmentClaimed ? 1 : 0);
 		DrawSingleIcon(
 		    icon, iconX, iconY,
 		    animState->entries[0].alpha, 1, FLOAT_80333154);
@@ -1283,8 +1283,7 @@ void CMenuPcs::LetterListDraw()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * panels[1].alpha)).color);
 
 	char* menuTitle = GetMenuStr(0x1D);
-	float titleX = static_cast<float>((FLOAT_80333158 - font->GetWidth(menuTitle)) *
-	                                  DOUBLE_803330a8);
+	float titleX = static_cast<float>((FLOAT_80333158 - font->GetWidth(menuTitle)) / 2.0);
 	DrawShadowFont(font, menuTitle, titleX, FLOAT_8033315c, 0x18, 0x12);
 
 	if (static_cast<double>(panels[1].alpha) < DOUBLE_803330e8) {
@@ -1361,7 +1360,7 @@ void CMenuPcs::LetterListDraw()
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x43));
 
 		const float iconSize = FLOAT_803330b8;
-		const double iconOffset = (iconSize - iconSize * markScale) * DOUBLE_803330a8;
+		const double iconOffset = (iconSize - iconSize * markScale) / 2.0;
 		markX += iconOffset;
 		markY += iconOffset;
 
@@ -1382,7 +1381,8 @@ void CMenuPcs::LetterListDraw()
 	}
 
 	int iconY = 0x5B;
-	const int iconX = static_cast<int>(*static_cast<const volatile float*>(&FLOAT_80333168));
+	float iconXf = FLOAT_80333168;
+	const int iconX = static_cast<int>(iconXf);
 	const int iconTopRow = static_cast<int>(m_letterMenuState->topIndex);
 	int iconLetterIndex;
 	for (int row = 0; row < 9 && (iconLetterIndex = iconTopRow + row) < caravanWork->m_letterCount; ++row) {
@@ -1433,45 +1433,47 @@ int CMenuPcs::LetterConfirmOpen()
 	if (m_letterMenuState->dialogInitialized == '\0') {
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
+		int lineCount = 0;
 		switch (languageId) {
 		case 2: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], s_fmt_pcts_pcts, title, GetMenuStr(0x26));
+			sprintf(lines[lineCount], s_fmt_pcts_pcts, title, GetMenuStr(0x26));
 			break;
 		}
 		case 4: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], s_fmt_pcts_pcts_pcts, GetMenuStr(0x26), title, GetMenuStr(0x25));
+			sprintf(lines[lineCount], s_fmt_pcts_pcts_pcts, GetMenuStr(0x26), title, GetMenuStr(0x25));
 			break;
 		}
 		case 3: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], s_fmt_pcts_pcts, GetMenuStr(0x26), title);
+			sprintf(lines[lineCount], s_fmt_pcts_pcts, GetMenuStr(0x26), title);
 			break;
 		}
 		case 5: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], s_fmt_pcts_sp_pcts_dot, GetMenuStr(0x26), title);
+			sprintf(lines[lineCount], s_fmt_pcts_sp_pcts_dot, GetMenuStr(0x26), title);
 			break;
 		}
 		case 1:
 		default: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], s_fmt_pcts_sp_pcts_pcts, GetMenuStr(0x25), title, GetMenuStr(0x26));
+			sprintf(lines[lineCount], s_fmt_pcts_sp_pcts_pcts, GetMenuStr(0x25), title, GetMenuStr(0x26));
 			break;
 		}
 		}
+		lineCount++;
 
 		switch (languageId) {
 		case 2:
-			sprintf(lines[1], s_letterItemInfoFmt,
+			sprintf(lines[lineCount], s_letterItemInfoFmt,
 			        GetMenuStr(0x23),
 			        s_ReplyStr,
 			        GetMenuStr(0x24),
 			        GetMenuStr(0x27));
 			break;
 		case 3:
-			sprintf(lines[1], s_pctspctspctspcts,
+			sprintf(lines[lineCount], s_pctspctspctspcts,
 			        GetMenuStr(0x25),
 			        GetMenuStr(0x23),
 			        s_ReplyStr,
@@ -1480,11 +1482,11 @@ int CMenuPcs::LetterConfirmOpen()
 		case 1:
 		case 4:
 		default:
-			sprintf(lines[1], s_fmt_pcts_pcts_pcts, GetMenuStr(0x23), s_ReplyStr, GetMenuStr(0x24));
+			sprintf(lines[lineCount], s_fmt_pcts_pcts_pcts, GetMenuStr(0x23), s_ReplyStr, GetMenuStr(0x24));
 			break;
 		}
+		lineCount++;
 
-		int lineCount = 2;
 		if (s_Attach != 2) {
 			switch (languageId) {
 			case 2:
@@ -1510,7 +1512,7 @@ int CMenuPcs::LetterConfirmOpen()
 				}
 				break;
 			}
-			lineCount = 3;
+			lineCount++;
 		}
 
 		strcat(lines[lineCount], GetMenuStr(0x21));
@@ -1550,13 +1552,15 @@ int CMenuPcs::LetterConfirmOpen()
 int CMenuPcs::LetterReplyWinOpen()
 {
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
+	char* srcText;
+	char* workText;
 	int languageId = Game.m_gameWork.m_languageId;
 	if (m_letterMenuState->dialogInitialized == '\0') {
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
 
-		char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x323) char[kLetterTextScratchSize];
-		char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x325) char[kLetterTextScratchSize];
+		srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x323) char[kLetterTextScratchSize];
+		workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x325) char[kLetterTextScratchSize];
 
 		memset(srcText, 0, kLetterTextScratchSize);
 		memset(workText, 0, kLetterTextScratchSize);
@@ -1589,14 +1593,14 @@ int CMenuPcs::LetterReplyWinOpen()
 			curLine = newline + 1;
 		} while (i < 7);
 
-		delete[] workText;
 		delete[] srcText;
+		delete[] workText;
 
 		const char* closeText = GetMenuStr(3);
 		int lineIndex = static_cast<signed char>(s_ReplyMax++);
 		strcat(lines[lineIndex], closeText);
 
-		SetSingDynamicWinMessInfo(static_cast<signed char>(s_ReplyMax),
+		SetSingDynamicWinMessInfo(s_ReplyMax,
 			lines[0],
 			lines[1],
 			lines[2],
@@ -1819,10 +1823,10 @@ int CMenuPcs::LetterCtrl()
 	}
 
 	if (ret != 0) {
-		if (s_Attach == 2) {
-			LetterInit2();
-		} else {
+		if (s_Attach != 2) {
 			LetterInit4();
+		} else {
+			LetterInit2();
 		}
 	}
 	return ret;
@@ -1837,7 +1841,7 @@ int CMenuPcs::LetterCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::LetterOpen()
+int CMenuPcs::LetterOpen()
 {
 	int attachMode;
 
@@ -1865,7 +1869,7 @@ bool CMenuPcs::LetterOpen()
 		s_BackUpTopPos = 0;
 		SetSingWinScl(FLOAT_803330f8);
 	}
-	bool allFinished = LetterLstOpen() != 0;
+	int allFinished = LetterLstOpen();
 	if (allFinished) {
 		attachMode = SingGetLetterAttachflg();
 		if (attachMode >= 0) {

@@ -57,8 +57,7 @@ extern const u16 *gBackdropMaps[];
 
 void AgbMain(void)
 {
-    u8 prevMode;
-    u8 connected;
+    s32 prevMode;
     s32 i;
     s32 value;
 
@@ -66,7 +65,8 @@ void AgbMain(void)
     /* Keep the live stack intact while clearing IWRAM. */
     __asm__ volatile ("mov %0, sp" : "=r" (value));
     DmaClear32(0, 0, 0x03000000, value);
-    DmaClear32(3, 0, 0x03007E00, 0x1A0);
+    value = 0x1A0;
+    DmaClear32(3, 0, 0x03007E00, value);
     DmaClear16(0, 0, 0x05000000, 0x400);
     DmaClear16(0, 0, 0x06000000, 0x18000);
     DmaClear32(0, 32, 0x07000000, 0x400);
@@ -132,12 +132,12 @@ void AgbMain(void)
             }
             Obj_Draw(216, 144, 0, value, Obj_GetPalette(0, value), 0, 0);
         }
-        connected = Link_IsConnected();
-        if (connected && gLinkStarted && gMode != MODE_FIELD && gMode != MODE_CONTROLLER && gMenuHasInput != 1) {
+        value = Link_IsConnected();
+        if (value && gLinkStarted && gMode != MODE_FIELD && gMode != MODE_CONTROLLER && gMenuHasInput != 1) {
             gMenuHasInput = 1;
         }
-        if (gWasConnected != connected) {
-            if (connected) {
+        if (gWasConnected != value) {
+            if (value) {
                 gReconnectPending = 1;
             } else {
                 gSession.outsideMiasma = 0;
@@ -157,7 +157,7 @@ void AgbMain(void)
                 gScreen = 13;
             }
             Bg_LoadBackdrop(gSession.appearance & 3);
-            gWasConnected = connected;
+            gWasConnected = value;
         }
         Mode_Update();
         Oam_Commit();

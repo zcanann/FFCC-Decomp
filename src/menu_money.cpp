@@ -15,7 +15,7 @@ typedef signed short s16;
 typedef unsigned short u16;
 
 static unsigned int s_Money = 0;
-static signed char s_place[16];
+static signed char s_place[2][8];
 
 /*
  * --INFO--
@@ -33,32 +33,31 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	int digitIndex;
 	int started;
 	int gil;
-	signed char* place;
 
-	digitPlace *= 10000000;
+	for (digitIndex = 0; digitIndex < 7; digitIndex++) {
+		digitPlace *= 10;
+	}
 	if (row != 0) {
 		gil = s_Money;
 	} else {
 		gil = caravanWork->m_gil;
 	}
 	digitIndex = started = 0;
-	place = &s_place[row * 8];
 
 	while (digitIndex < 8) {
 		if ((!started) && (gil >= digitPlace)) {
 			started = 1;
 		}
 		if (((!started) && (gil < digitPlace)) && (digitIndex < 7)) {
-			*place = -1;
+			s_place[row][digitIndex] = -1;
 		} else {
 			int digit = gil / digitPlace;
 			if (9 < digit) {
 				digit = 9;
 			}
-			*place = static_cast<signed char>(digit);
+			s_place[row][digitIndex] = digit;
 			gil = gil % digitPlace;
 		}
-		place++;
 		digitIndex++;
 		digitPlace /= 10;
 	}
@@ -106,8 +105,11 @@ STATIC_ASSERT(sizeof(MoneyMenuAnimList) == 0x1008);
  */
 int CMenuPcs::MoneyCtrlCur()
 {
-	s16 press = Pad.GetButtonDown(0);
-	s16 hold = Pad.GetButtonRepeat(0);
+	s16 hold;
+	s16 press;
+
+	press = Pad.GetButtonDown(0);
+	hold = Pad.GetButtonRepeat(0);
 
 	if (hold == 0) {
 		return 0;
@@ -288,18 +290,29 @@ int CMenuPcs::MoneyCtrlCur()
  */
 void CMenuPcs::MoneyDraw()
 {
+	int i;
+	int j;
+	CFont* font;
+	float x;
+	int mode;
+	float y;
+	const char* label;
+	int selectionState;
+	GXColor entryColor;
+	float w;
+	float h;
+	MoneyMenuAnim* entry;
+	float u;
+	GXColor panelColor;
+	GXColor cursorColor;
+	float v;
+
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	int i;
-	int selectionState = this->m_moneyState->listState;
-	MoneyMenuAnim* entry = this->m_moneyPanel->anims;
-	GXColor entryColor;
-	GXColor panelColor;
-	GXColor cursorColor;
-	float x;
-	float y;
-	int mode = this->m_moneyState->mode;
+	selectionState = this->m_moneyState->listState;
+	entry = this->m_moneyPanel->anims;
+	mode = this->m_moneyState->mode;
 
 	for (i = 0; i < this->m_moneyPanel->count; i++, entry++) {
 		int tex = entry->tex;
@@ -309,10 +322,10 @@ void CMenuPcs::MoneyDraw()
 
 		x = (float)entry->x;
 		y = (float)entry->y;
-		float w = (float)entry->w;
-		float h = (float)entry->h;
-		float u = entry->u;
-		float v = entry->v;
+		w = (float)entry->w;
+		h = (float)entry->h;
+		u = entry->u;
+		v = entry->v;
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		entryColor.r = 0xFF;
 		entryColor.g = 0xFF;
@@ -323,21 +336,19 @@ void CMenuPcs::MoneyDraw()
 		MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
 	}
 
-	MoneyMenuAnim* drawBase = this->m_moneyPanel->anims;
+	entry = this->m_moneyPanel->anims;
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5D));
-	{
-		panelColor.r = 0xFF;
-		panelColor.g = 0xFF;
-		panelColor.b = 0xFF;
-		panelColor.a = (u8)(255.0f * drawBase->alpha);
-		GXSetChanMatColor(GX_COLOR0A0, panelColor);
-	}
+	panelColor.r = 0xFF;
+	panelColor.g = 0xFF;
+	panelColor.b = 0xFF;
+	panelColor.a = (u8)(255.0f * entry->alpha);
+	GXSetChanMatColor(GX_COLOR0A0, panelColor);
 
 	for (i = 0; i < 2; i++) {
-		y = (float)(drawBase->y + 0x18) + 32.0f * (float)i;
-		x = (float)(drawBase->x + 0x20);
-		for (int j = 0; j < 8; j++) {
-			signed char digit = s_place[i * 8 + j];
+		y = (float)(entry->y + 0x18) + 32.0f * (float)i;
+		x = (float)(entry->x + 0x20);
+		for (j = 0; j < 8; j++) {
+			signed char digit = s_place[i][j];
 			if (digit >= 0) {
 				MenuPcs.DrawRect(0, x, y, 24.0f, 32.0f,
 				                 24.0f * (float)digit, 32.0f * (float)i,
@@ -349,32 +360,31 @@ void CMenuPcs::MoneyDraw()
 
 	if ((mode == 0) && (selectionState == 1)) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x48));
-		{
-			cursorColor.r = 0xFF;
-			cursorColor.g = 0xFF;
-			cursorColor.b = 0xFF;
-			cursorColor.a = (u8)(255.0f * drawBase->alpha);
-			GXSetChanMatColor(GX_COLOR0A0, cursorColor);
-		}
+		cursorColor.r = 0xFF;
+		cursorColor.g = 0xFF;
+		cursorColor.b = 0xFF;
+		cursorColor.a = (u8)(255.0f * entry->alpha);
+		GXSetChanMatColor(GX_COLOR0A0, cursorColor);
 
-			MenuPcs.DrawRect(0, (float)(drawBase->x + ((7 - this->m_moneyState->selections[0]) * 0x12 + 0x24)),
-		                 (float)(drawBase->y + 0x5C), 16.0f, 24.0f,
+		entry = this->m_moneyPanel->anims;
+		MenuPcs.DrawRect(0, (float)(entry->x + ((7 - this->m_moneyState->selections[0]) * 0x12 + 0x24)),
+		                 (float)(entry->y + 0x5C), 16.0f, 24.0f,
 		                 0.0f, 0.0f, 1.0f,
 		                 1.0f, 0.0f);
 	}
 
-	CFont* font = this->m_fonts[4];
+	font = this->m_fonts[4];
 	font->SetMargin(1.0f);
 	font->SetShadow(0);
 	font->SetScale(0.9f);
 	font->DrawInit();
 
-	font->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(255.0f * drawBase->alpha)).color);
+	font->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(255.0f * entry->alpha)).color);
 
-	const char* label = GetMenuStr(0x15);
+	label = GetMenuStr(0x15);
 	for (i = 0; i < 2; i++) {
-		y = (32.0f + ((float)(drawBase->y + 0x18) + 32.0f * (float)i)) - 19.8f;
-		font->SetPosX((float)(drawBase->x + 0xB6));
+		y = (32.0f + ((float)(entry->y + 0x18) + 32.0f * (float)i)) - 19.8f;
+		font->SetPosX((float)(entry->x + 0xB6));
 		font->SetPosY(y - 4.0f);
 		font->Draw(label);
 	}
@@ -509,35 +519,35 @@ int CMenuPcs::MoneyCtrl()
  */
 int CMenuPcs::MoneyOpen()
 {
+	int i;
+	MoneyMenuAnim* anim;
+
 	if (this->m_moneyState->initialized == '\0') {
 		memset(this->m_moneyPanel, 0, sizeof(*this->m_moneyPanel));
 
-		MoneyMenuAnim* initAnim = this->m_moneyPanel->anims;
-		for (int i = 0; i < 64; i++, initAnim++) {
-			initAnim->uvScale = 1.0f;
+		anim = this->m_moneyPanel->anims;
+		for (i = 0; i < 64; i++, anim++) {
+			anim->uvScale = 1.0f;
 		}
 
-		int entryIndex = 0;
-		MoneyMenuAnim* firstAnim = &this->m_moneyPanel->anims[entryIndex++];
-		firstAnim->tex = 0x3b;
-		firstAnim->y = 0x68;
-		firstAnim->w = 0xf8;
-		firstAnim->h = 0x88;
-		firstAnim->x =
-			static_cast<short>(static_cast<int>(216.0 - (double)firstAnim->w * 0.5));
-		firstAnim->u = 0.0f;
-		firstAnim->v = 0.0f;
-		firstAnim->uvScale = 1.0f;
-		firstAnim->startFrame = 0;
-		firstAnim->duration = 10;
-		this->m_moneyPanel->count = entryIndex;
+		i = 0;
+		anim = &this->m_moneyPanel->anims[i++];
+		anim->tex = 0x3b;
+		anim->y = 0x68;
+		anim->w = 0xf8;
+		anim->h = 0x88;
+		anim->x = 216.0 - anim->w / 2.0;
+		anim->u = 0.0f;
+		anim->v = 0.0f;
+		anim->uvScale = 1.0f;
+		anim->startFrame = 0;
+		anim->duration = 10;
+		this->m_moneyPanel->count = i;
 
-		entryIndex = 0;
-		s_Money = entryIndex;
-		do {
-			MoneySetPlace(entryIndex);
-			entryIndex++;
-		} while (entryIndex < 2);
+		s_Money = 0;
+		for (i = 0; i < 2; i++) {
+			MoneySetPlace(i);
+		}
 
 		this->m_moneyState->selections[0] = 0;
 		this->m_moneyState->initialized = 1;
@@ -546,12 +556,12 @@ int CMenuPcs::MoneyOpen()
 	this->m_moneyState->frame++;
 
 	MoneyMenuAnimList* panel = this->m_moneyPanel;
-	MoneyMenuAnim* anim = panel->anims;
+	anim = panel->anims;
 	int finished = 0;
 	int count = panel->count;
 	int frame = this->m_moneyState->frame;
 
-	for (int i = 0; i < count; i++, anim++) {
+	for (i = 0; i < count; i++, anim++) {
 		if (frame >= anim->startFrame) {
 			if (anim->startFrame + anim->duration <= frame) {
 				finished++;
@@ -560,16 +570,9 @@ int CMenuPcs::MoneyOpen()
 				anim->dy = 0.0f;
 			} else {
 				anim->frame++;
-				double one = 1.0;
-				double duration = (double)anim->duration;
-				double animFrame = (double)anim->frame;
-				double rate = 1.0 / duration;
-				anim->alpha = (float)(rate * animFrame);
+				anim->alpha = (1.0 / anim->duration) * anim->frame;
 				if ((anim->flags & 2) == 0) {
-					duration = (double)anim->duration;
-					animFrame = (double)anim->frame;
-					rate = one / duration;
-					float ratio = (float)(rate * animFrame);
+					float ratio = (1.0 / anim->duration) * anim->frame;
 					float dx = anim->targetX - (float)anim->x;
 					float dy = anim->targetY - (float)anim->y;
 					anim->dx = dx * ratio;

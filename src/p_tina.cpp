@@ -166,6 +166,12 @@ signed char s_debugSpinnerFrameCounterPad2;
 
 static const int kPppFieldParticleNoAutoCreate = -0x1000;
 
+struct _pppFieldPdtData
+{
+    _pppDataHead m_head;
+    _pppFieldParticleData m_particles[1];
+};
+
 CProfile g_par_calc_prof(const_cast<char*>(sNoNameProfileLabel));
 CProfile g_par_draw_prof(const_cast<char*>(sNoNameProfileLabel));
 
@@ -1047,9 +1053,8 @@ static void LoadFieldPdt0(int mapId, int floorId)
             createParam = PartMng.pppGetDefaultCreateParam();
             i = 0;
             for (; i < static_cast<int>((unsigned int)pppDataHead->m_partCount); i++) {
-                _pppFieldParticleData* fieldParticles = reinterpret_cast<_pppFieldParticleData*>(
-                    PartMng.m_pdtSlots[0].m_pppDataHead + 1);
-                if (fieldParticles[i].m_autoCreateMarker != kPppFieldParticleNoAutoCreate) {
+                _pppFieldPdtData* fieldPdt = reinterpret_cast<_pppFieldPdtData*>(PartMng.m_pdtSlots[0].m_pppDataHead);
+                if (fieldPdt->m_particles[i].m_autoCreateMarker != kPppFieldParticleNoAutoCreate) {
                     PartMng.pppCreate(0, i, createParam, 0);
                 }
             }

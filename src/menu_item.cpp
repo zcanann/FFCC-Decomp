@@ -25,7 +25,6 @@ static const float kItemTextYOffset = 4.0f;
 static const float kItemHelpCenterX = 320.0f;
 static const float kItemHelpY = 352.0f;
 static const float kItemHelpScale = 3.0f;
-static const float kItemHalf = 0.5f;
 static const float kItemInitU = 128.0f;
 static const float kItemInitV = 8.0f;
 static const float kItemSmallScale = 0.75f;
@@ -102,8 +101,11 @@ STATIC_ASSERT(sizeof(ItemMenuAnimList) == 0x1008);
 int CMenuPcs::ItemCtrlCur()
 {
     CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
-    s16 press = Pad.GetButtonDown(0);
-    s16 hold = Pad.GetButtonRepeat(0);
+    s16 hold;
+    s16 press;
+
+    press = Pad.GetButtonDown(0);
+    hold = Pad.GetButtonRepeat(0);
 
     if (hold == 0) {
         return 0;
@@ -216,17 +218,15 @@ int CMenuPcs::ItemCtrlCur()
         }
     } else {
         if ((hold & 8) != 0) {
-            int cursor = this->m_itemMenuState->cursorIndex[mode];
-            if (cursor != 0) {
-                this->m_itemMenuState->cursorIndex[mode] = cursor - 1;
+            if (this->m_itemMenuState->cursorIndex[mode] != 0) {
+                this->m_itemMenuState->cursorIndex[mode]--;
             } else {
                 this->m_itemMenuState->cursorIndex[mode] = 3;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((hold & 4) != 0) {
-            int cursor = this->m_itemMenuState->cursorIndex[mode];
-            if (cursor < 3) {
-                this->m_itemMenuState->cursorIndex[mode] = cursor + 1;
+            if (this->m_itemMenuState->cursorIndex[mode] < 3) {
+                this->m_itemMenuState->cursorIndex[mode]++;
             } else {
                 this->m_itemMenuState->cursorIndex[mode] = 0;
             }
@@ -280,29 +280,46 @@ int CMenuPcs::ItemCtrlCur()
  */
 void CMenuPcs::ItemDraw()
 {
-    int foundSelected = 0;
+    s16 listState;
     int selectedItemId;
     float x;
+    int mode;
+    MenuItemOpenAnim* entry;
+    CCaravanWork* caravanWork;
+    MenuItemOpenAnim* textEntry;
+    float itemAlpha;
+    s16 itemId;
+    MenuItemOpenAnim* iconEntry;
+    CFont* helpFont;
+    int drawIndex;
+    int tex;
+    CFont* listFont;
     float y;
+    int menuIndex;
     float w;
     float h;
+    int hasLetterAttach;
+    int texId;
+    int i;
+    int foundSelected;
+    GXColor colors[4];
     float u;
     float v;
-    GXColor colors[4];
 
+    foundSelected = 0;
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
-    s16 listState = this->m_itemMenuState->listState;
-    int mode = this->m_itemMenuState->mode;
-    MenuItemOpenAnim* entry = this->m_itemList->anims;
-    int drawIndex = 0;
-    int hasLetterAttach = (SingGetLetterAttachflg() >= 0) ? 1 : 0;
+    caravanWork = Game.m_scriptFoodBase[0];
+    listState = m_itemMenuState->listState;
+    mode = m_itemMenuState->mode;
+    entry = m_itemList->anims;
+    drawIndex = 0;
+    hasLetterAttach = (SingGetLetterAttachflg() >= 0) ? 1 : 0;
 
-    for (int i = 0; i < this->m_itemList->count; i++, entry++) {
-        int texCheck = entry->tex;
-        if (texCheck < 0) {
+    for (i = 0; i < m_itemList->count; i++, entry++) {
+        tex = entry->tex;
+        if (tex < 0) {
             continue;
         }
 
@@ -333,12 +350,11 @@ void CMenuPcs::ItemDraw()
             colors[3].g = 0xFF;
             colors[3].b = 0xFF;
             colors[3].a = 0xFF;
-
             GXSetChanMatColor(GX_COLOR0A0, colors[0]);
+
             w = entry->alpha * w;
             if (w > kItemZero) {
-                MenuPcs.DrawRect(
-                    0, x, y, w, h, u, v, colors, kItemOne, kItemOne, kItemZero);
+                MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, kItemOne, kItemOne, kItemZero);
                 x += w;
                 u += w;
             }
@@ -352,19 +368,17 @@ void CMenuPcs::ItemDraw()
                 colors[3].g = 0xFF;
                 colors[3].b = 0xFF;
                 colors[3].a = 0;
-
-                float widthFrac = (float)(kItemOneDouble / (double)entry->duration);
-                w = widthFrac * (float)entry->w;
-                MenuPcs.DrawRect(
-                    0, x, y, w, h, u, v, colors, kItemOne, kItemOne, kItemZero);
+                w = (float)(kItemOneDouble / (double)entry->duration);
+                w = w * entry->w;
+                MenuPcs.DrawRect(0, x, y, w, h, u, v, colors, kItemOne, kItemOne, kItemZero);
             }
 
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         } else {
-            int tex = texCheck;
-            float itemAlpha = entry->alpha;
+            texId = tex;
+            itemAlpha = entry->alpha;
             if (tex == 0x37) {
-                int menuIndex = drawIndex + this->m_itemMenuState->scroll;
+                menuIndex = drawIndex + m_itemMenuState->scroll;
                 if (menuIndex >= 0x40) {
                     menuIndex -= 0x40;
                 }
@@ -372,61 +386,55 @@ void CMenuPcs::ItemDraw()
                 if ((caravanWork->m_inventoryItems[menuIndex] <= 0) || EquipChk(menuIndex) ||
                     (hasLetterAttach && (caravanWork->m_inventoryItems[menuIndex] < 0x125))) {
                     if (EquipChk(menuIndex)) {
-                        int markX = (int)(x - kItemMarkXOffset);
-                        int markY = (int)((h - kItemMarkHeight) * kItemHalfDouble + y);
-                        DrawEquipMark(markX, markY, entry->alpha);
+                        DrawEquipMark((int)(x - kItemMarkXOffset), (int)((h - kItemMarkHeight) / 2.0 + y),
+                                      entry->alpha);
                     }
-                    tex = 0x34;
+                    texId = 0x34;
                     itemAlpha = (float)((double)entry->alpha * kItemHalfDouble);
                 }
 
-                if (tex == 0x37 && drawIndex == this->m_itemMenuState->cursorIndex[0]) {
+                if (texId == 0x37 && drawIndex == m_itemMenuState->cursorIndex[0]) {
                     v += h;
                 }
                 drawIndex++;
             }
 
-            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(texId));
             colors[0].r = 0xFF;
             colors[0].g = 0xFF;
             colors[0].b = 0xFF;
-            colors[0].a = (u8)(itemAlpha * kItemColorMax);
+            colors[0].a = (u8)(kItemColorMax * itemAlpha);
             GXSetChanMatColor(GX_COLOR0A0, colors[0]);
             MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, kItemZero);
         }
     }
 
-    CFont* listFont = this->m_fonts[4];
+    listFont = m_fonts[4];
     listFont->SetMargin(kItemOne);
     listFont->SetShadow(0);
     listFont->SetScale(kItemListFontScale);
     listFont->DrawInit();
 
-    {
-        ItemMenuAnimList* list = this->m_itemList;
-        int listCount = list->count;
-        for (int i = 0; i < listCount; i++) {
-            entry = &list->anims[i];
-            if (entry->tex == 0x37) {
-                break;
-            }
+    for (i = 0; i < m_itemList->count; i++) {
+        entry = &m_itemList->anims[i];
+        if (entry->tex == 0x37) {
+            break;
         }
     }
 
-    float colorMax = kItemColorMax;
-    MenuItemOpenAnim* textEntry = entry;
-    for (int i = 0; i < 8; i++, textEntry++) {
-        int menuIndex = i + this->m_itemMenuState->scroll;
+    textEntry = entry;
+    for (i = 0; i < 8; i++) {
+        menuIndex = i + m_itemMenuState->scroll;
         if (menuIndex >= 0x40) {
             menuIndex -= 0x40;
         }
 
-        listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(colorMax * entry->alpha)).color);
+        listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, (u8)(kItemColorMax * entry->alpha)).color);
 
-        s16 itemId = caravanWork->m_inventoryItems[menuIndex];
+        itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
-            const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
-            int selectedIndex = this->m_itemMenuState->cursorIndex[0] + this->m_itemMenuState->scroll;
+            char* text = Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
+            int selectedIndex = m_itemMenuState->cursorIndex[0] + m_itemMenuState->scroll;
             if (selectedIndex >= 0x40) {
                 selectedIndex -= 0x40;
             }
@@ -436,34 +444,36 @@ void CMenuPcs::ItemDraw()
             }
 
             listFont->GetWidth(text);
-            float textX = (float)(textEntry->x + 0x1C);
-            float textY = (float)(textEntry->y + 0xB);
-            listFont->SetPosX(textX);
-            listFont->SetPosY(textY - kItemTextYOffset);
+            x = (float)(textEntry->x + 0x1C);
+            y = (float)(textEntry->y + 0xB);
+            listFont->SetPosX(x);
+            listFont->SetPosY(y - kItemTextYOffset);
             listFont->Draw(text);
         }
+        textEntry++;
     }
 
     DrawInit();
 
-    MenuItemOpenAnim* iconEntry = entry;
-    for (int i = 0; i < 8; i++, iconEntry++) {
-        int menuIndex = i + this->m_itemMenuState->scroll;
+    iconEntry = entry;
+    for (i = 0; i < 8; i++) {
+        menuIndex = i + m_itemMenuState->scroll;
         if (menuIndex >= 0x40) {
             menuIndex -= 0x40;
         }
 
-        s16 itemId = caravanWork->m_inventoryItems[menuIndex];
+        itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
             int iconY = (int)((float)(iconEntry->y + 6) - kItemOne);
-            int iconX = (int)(float)(iconEntry->x + iconEntry->w - 0x10);
-            DrawSingleIcon(itemId, iconX, iconY, entry->alpha, 0, kItemZero);
+            int iconX = (int)((float)(iconEntry->x + iconEntry->w - 0x10));
+            DrawSingleIcon(itemId, iconX, iconY, entry->alpha, 0, kItemOne);
         }
+        iconEntry++;
     }
 
     if (listState == 1) {
-        entry = this->m_itemList->anims;
-        float mark = CalcListPos(this->m_itemMenuState->scroll, 0x40, 1);
+        entry = m_itemList->anims;
+        float mark = CalcListPos(m_itemMenuState->scroll, 0x40, 1);
         if (mark > kItemZero) {
             DrawListPosMark((float)entry->x, (float)entry->y, mark);
         }
@@ -471,61 +481,44 @@ void CMenuPcs::ItemDraw()
 
     if (mode == 1) {
         DrawSingWin(-1);
-        if (this->m_itemMenuState->optionFrame == 1) {
-            DrawSingWinMess(0, this->m_itemMenuState->optionFlags, 0);
+        if (m_itemMenuState->optionFrame == 1) {
+            DrawSingWinMess(0, m_itemMenuState->optionFlags, 0);
         }
     }
 
-    if ((mode == 0 && listState == 1) || (mode != 0 && this->m_itemMenuState->optionFrame == 1)) {
-        float cursorX;
-        float cursorY;
-
+    if ((mode == 0 && listState == 1) || (mode != 0 && m_itemMenuState->optionFrame == 1)) {
         if (mode == 0) {
-            ItemMenuAnimList* list = this->m_itemList;
-            int cursorCount = list->count;
-            for (int i = 0; i < cursorCount; i++) {
-                entry = &list->anims[i];
-                if (list->anims[i].tex == 0x37) {
+            for (i = 0; i < m_itemList->count; i++) {
+                entry = &m_itemList->anims[i];
+                if (m_itemList->anims[i].tex == 0x37) {
                     break;
                 }
             }
 
-            entry += this->m_itemMenuState->cursorIndex[0];
-            cursorX = (float)(entry->x - 0x14);
-            cursorY = (float)((double)(entry->h - 0x20) * kItemHalfDouble + (double)entry->y);
+            entry += m_itemMenuState->cursorIndex[0];
+            x = (float)(entry->x - 0x14);
+            y = (float)((entry->h - 0x20) / 2.0 + entry->y);
         } else {
-            MenuWindowInfo* window = this->m_menuWindowInfo;
-            cursorX = (float)window->x;
-            cursorY = (float)(window->y + 0x20);
-            int messageHeight = SingWinMessHeight();
-            cursorY += (float)(this->m_itemMenuState->cursorIndex[1] * messageHeight);
+            x = (float)m_menuWindowInfo->x;
+            y = (float)(m_menuWindowInfo->y + 0x20);
+            y += (float)(m_itemMenuState->cursorIndex[1] * SingWinMessHeight());
         }
 
-        int cursorAnim = (int)System.m_frameCounter % 8;
-        cursorX += (float)cursorAnim;
-        DrawCursor((int)cursorX, (int)cursorY, kItemOne);
+        x += (float)((int)System.m_frameCounter % 8);
+        DrawCursor((int)x, (int)y, kItemOne);
     }
 
     DrawInit();
     DrawSingLife();
 
-    CFont* helpFont = this->m_fonts[0];
-    s8 helpAlpha = (s8)(entry->alpha * kItemColorMax);
+    helpFont = m_fonts[0];
+    s8 helpAlpha = (s8)(kItemColorMax * entry->alpha);
     if (!foundSelected) {
         selectedItemId = -1;
     }
-    GXColor helpColor = CColor(0xFF, 0xFF, 0xFF, helpAlpha).color;
-    int helpX = (int)(kItemHelpCenterX - kItemHalf * w);
-    int helpY = (int)kItemHelpY;
-    DrawHelpMessage(
-        selectedItemId,
-        helpFont,
-        helpX,
-        helpY,
-        helpColor,
-        10,
-        kItemOne,
-        kItemHelpScale);
+    float helpY = kItemHelpY;
+    DrawHelpMessage(selectedItemId, helpFont, (int)(kItemHelpCenterX - w / 2), (int)helpY,
+                    CColor(0xFF, 0xFF, 0xFF, helpAlpha).color, 10, kItemOne, kItemHelpScale);
 }
 
 /*
@@ -553,18 +546,15 @@ int CMenuPcs::ItemClose()
         }
 
         if (anim->startFrame + anim->duration <= frame) {
-            float zero = kItemZero;
             finished++;
-            anim->alpha = zero;
-            anim->dx = zero;
-            anim->dy = zero;
+            anim->alpha = 0.0f;
+            anim->dx = 0.0f;
+            anim->dy = 0.0f;
         } else {
             anim->frame++;
-            double one = kItemOneDouble;
-            anim->alpha =
-                (float)-((kItemOneDouble / (double)anim->duration) * (double)anim->frame - kItemOneDouble);
+            anim->alpha = 1.0 - (1.0 / anim->duration) * anim->frame;
             if ((anim->flags & 2) == 0) {
-                float ratio = (float)-((one / (double)anim->duration) * (double)anim->frame - one);
+                float ratio = 1.0 - (1.0 / anim->duration) * anim->frame;
                 float dx = anim->targetX - (float)anim->x;
                 float dy = anim->targetY - (float)anim->y;
                 anim->dx = dx * ratio;
@@ -652,10 +642,9 @@ int CMenuPcs::ItemOpen()
                 anim->dy = kItemZero;
             } else {
                 anim->frame++;
-                double one = kItemOneDouble;
-                anim->alpha = (float)((one / (double)anim->duration) * (double)anim->frame);
+                anim->alpha = (1.0 / anim->duration) * anim->frame;
                 if ((anim->flags & 2) == 0) {
-                    float ratio = (float)((one / (double)anim->duration) * (double)anim->frame);
+                    float ratio = (1.0 / anim->duration) * anim->frame;
                     float dx = anim->targetX - (float)anim->x;
                     float dy = anim->targetY - (float)anim->y;
                     anim->dx = dx * ratio;
@@ -684,10 +673,8 @@ int CMenuPcs::ItemOpen()
 void CMenuPcs::ItemInit1()
 {
     float progress;
-    int count;
     int index;
     MenuItemOpenAnim* entry;
-    ItemMenuAnimList* itemList;
 
     index = 0;
     entry = &this->m_itemList->anims[index++];
@@ -748,12 +735,11 @@ void CMenuPcs::ItemInit1()
     entry->tex = 0x37;
     entry->startFrame = 0;
     entry->duration = 5;
-    itemList = this->m_itemList;
-    count = itemList->count;
-    entry = itemList->anims;
-    for (unsigned int i = 0; i < count; i++, entry++) {
+    entry = this->m_itemList->anims;
+    for (index = this->m_itemList->count; index > 0; index--) {
         entry->frame = 0;
         entry->alpha = progress;
+        entry++;
     }
 }
 

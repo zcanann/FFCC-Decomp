@@ -274,13 +274,13 @@ void CRingMenu::drawGBA()
 {
 	float sinA;
 	float sinB;
-	float angle;
 	float gbaAnim;
-	float showScale;
+	float angle;
 	float posX;
+	float showScale;
+	float cycle;
 	float posY;
 	float sizePulse;
-	float cycle;
 
 	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1))) {
 		return;
@@ -437,14 +437,14 @@ void CRingMenu::onDraw()
 	float iconAlphaScale;
 	float posAltX;
 
-	alphaScaleBase = 255.0f * showScale * transitionScale;
-	const float glowOffset = 32.0f * (1.0f - static_cast<float>(pulse));
 	iconAlphaScale = showScale * transitionScale;
-	posAltX = 472.0f + glowOffset;
+	const float glowOffset = 32.0f * (1.0f - static_cast<float>(pulse));
+	alphaScaleBase = 255.0f * showScale * transitionScale;
 	posLeft = -glowOffset;
+	posAltX = 472.0f + glowOffset;
 	posAltY = 256.0f + glowOffset;
-	posMainX = posAltX - 40.0f;
 	posMainY = 192.0f + glowOffset;
+	posMainX = posAltX - 40.0f;
 
 	for (int group = 2; group >= 0; group--) {
 		float posX;
@@ -667,9 +667,9 @@ void CRingMenu::onDraw()
 					    && (static_cast<signed char>(
 					            static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 30) & 0xC0000000) >> 31)
 					        == 0)) {
-						const float barY = 20.0f + textY;
 						const float fullAlpha = showScale * (255.0f * fade * transitionScale);
 						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
+						const float barY = 20.0f + textY;
 
 						for (int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
 							int selected = caravanWork->IsSelectedCmdList(i);
@@ -714,9 +714,9 @@ void CRingMenu::onDraw()
  */
 static void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* caravanWork, int cmdIndex, float angle, float alphaScale)
 {
-	float unclampedAlpha;
 	float alphaProduct;
-	bool reverseDir;
+	float unclampedAlpha;
+	float textHeight;
 	int waveDirection;
 	float clampedAlpha;
 	int tlut;
@@ -725,7 +725,7 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 	double waveX;
 	float waveY;
 	float textWidth;
-	float textHeight;
+	bool reverseDir;
 	float waveSinY;
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {

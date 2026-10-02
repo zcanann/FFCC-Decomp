@@ -2,6 +2,7 @@
 """Run the GCC 2.9 preprocessor with the thumb-elf driver's definitions."""
 
 import argparse
+import os
 import subprocess
 from pathlib import Path
 
@@ -30,7 +31,9 @@ def preprocess(cpp: Path, source: Path, output: Path, includes: list,
     # The historical preprocessor recognizes '/' as a directory separator on
     # every host; backslashes break its quoted-header search on Windows.
     mode, predefined = LANGUAGES[language]
-    command = [cpp.as_posix(), f"-lang-{mode}", "-undef", "-nostdinc"]
+    # The executable itself needs a native path: Windows can't launch a
+    # relative path written with '/'.
+    command = [os.path.normpath(cpp), f"-lang-{mode}", "-undef", "-nostdinc"]
     if mode == "asm":
         command.append("-$")
     command += [f"-D{definition}" for definition in (*predefined, *defines)]

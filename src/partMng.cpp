@@ -163,21 +163,6 @@ enum PppChunkId {
 
 /*
  * --INFO--
- * PAL Address: 0x8005f61c
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-void CPtrArray<CTexture*>::SetGrow(int growCapacity)
-{
-    m_growCapacity = growCapacity;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80059220
  * PAL Size: 24b
  * EN Address: TODO
@@ -621,8 +606,9 @@ inline void CPartMng::pppReleasePmng(int pdtSlotIndex)
     PppPdtSlot* pdtSlot = &m_pdtSlots[pdtSlotIndex];
     ppvEnv = &pdtSlot->m_env;
     for (int i = 0; i < 0x180; i++) {
-        if (m_pppMng[i].m_pppResSet == pdtSlot) {
-            _pppAllFreePObject(&m_pppMng[i]);
+        _pppMngSt* mng = &m_pppMng[i];
+        if (mng->m_pppResSet == pdtSlot) {
+            _pppAllFreePObject(mng);
         }
     }
 }
@@ -758,22 +744,39 @@ inline CPartMng::PppPdtSlot* CPartMng::pppGetFreePppDataMngSt()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 248b
+ * EN Address: 0x80066E18
+ * EN Size: 324b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::drawLine(int, int, int, int, _GXColor&)
+inline void CPartMng::drawLine(int x0, int y0, int x1, int y1, _GXColor& color)
 {
-	// TODO
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
+    float z = 0.0f;
+    GXBegin(GX_LINES, GX_VTXFMT5, 2);
+    GXPosition3f32((float)x0, (float)y0, z);
+    GXPosition3f32((float)x1, (float)y1, z);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 172b
+ * EN Address: 0x80066FA8
+ * EN Size: 204b
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::drawLine3D(Vec*, Vec*, _GXColor&)
+inline void CPartMng::drawLine3D(Vec* start, Vec* end, _GXColor& color)
 {
-	// TODO
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetChanMatColor((GXChannelID)4, color);
+    GXBegin(GX_LINES, GX_VTXFMT5, 2);
+    GXPosition3f32(start->x, start->y, start->z);
+    GXPosition3f32(end->x, end->y, end->z);
 }
 
 /*
@@ -824,47 +827,22 @@ void CPartMng::drawCursor()
     color.a = 0xff;
     int cursorX = m_editorCursorX;
     int cursorY = m_editorCursorY;
-    float zero = 0.0f;
 
-    GXSetChanAmbColor((GXChannelID)4, color);
-    GXSetChanMatColor((GXChannelID)4, color);
-    GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x140), (float)(cursorY + 0xd6), zero);
-    GXPosition3f32((float)(cursorX + 0x140), (float)(cursorY + 0xea), zero);
+    drawLine(cursorX + 0x140, cursorY + 0xd6, cursorX + 0x140, cursorY + 0xea, color);
 
-    GXSetChanAmbColor((GXChannelID)4, color);
-    GXSetChanMatColor((GXChannelID)4, color);
-    GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x13f), (float)(cursorY + 0xd6), zero);
-    GXPosition3f32((float)(cursorX + 0x13f), (float)(cursorY + 0xea), zero);
+    drawLine(cursorX + 0x13f, cursorY + 0xd6, cursorX + 0x13f, cursorY + 0xea, color);
 
-    GXSetChanAmbColor((GXChannelID)4, color);
-    GXSetChanMatColor((GXChannelID)4, color);
-    GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x12c), (float)(cursorY + 0xe0), zero);
-    GXPosition3f32((float)(cursorX + 0x154), (float)(cursorY + 0xe0), zero);
+    drawLine(cursorX + 0x12c, cursorY + 0xe0, cursorX + 0x154, cursorY + 0xe0, color);
 
     color.r = 0x00;
     color.g = 0x00;
     color.b = 0x00;
     color.a = 0xff;
-    GXSetChanAmbColor((GXChannelID)4, color);
-    GXSetChanMatColor((GXChannelID)4, color);
-    GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x141), (float)(cursorY + 0xd7), zero);
-    GXPosition3f32((float)(cursorX + 0x141), (float)(cursorY + 0xeb), zero);
+    drawLine(cursorX + 0x141, cursorY + 0xd7, cursorX + 0x141, cursorY + 0xeb, color);
 
-    GXSetChanAmbColor((GXChannelID)4, color);
-    GXSetChanMatColor((GXChannelID)4, color);
-    GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x142), (float)(cursorY + 0xd7), zero);
-    GXPosition3f32((float)(cursorX + 0x142), (float)(cursorY + 0xeb), zero);
+    drawLine(cursorX + 0x142, cursorY + 0xd7, cursorX + 0x142, cursorY + 0xeb, color);
 
-    GXSetChanAmbColor((GXChannelID)4, color);
-    GXSetChanMatColor((GXChannelID)4, color);
-    GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x12d), (float)(cursorY + 0xe1), zero);
-    GXPosition3f32((float)(cursorX + 0x155), (float)(cursorY + 0xe1), zero);
+    drawLine(cursorX + 0x12d, cursorY + 0xe1, cursorX + 0x155, cursorY + 0xe1, color);
 
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 }
@@ -912,36 +890,44 @@ void CPartMng::render3Dcursor()
     float y = m_editorCursorPosition.y;
     float z = m_editorCursorPosition.z;
 
+    Vec start;
+    Vec end;
     _GXColor color;
     color.r = 0xff;
     color.g = 0x80;
     color.b = 0x80;
     color.a = 0xff;
-    GXSetChanAmbColor((GXChannelID)4, color);
-    GXSetChanMatColor((GXChannelID)4, color);
-    GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32(x - 100.0f, y, z);
-    GXPosition3f32(x + 100.0f, y, z);
+    start.x = x - 100.0f;
+    start.y = y;
+    start.z = z;
+    end.x = x + 100.0f;
+    end.y = y;
+    end.z = z;
+    drawLine3D(&start, &end, color);
 
     color.r = 0x80;
     color.g = 0xff;
     color.b = 0x80;
     color.a = 0xff;
-    GXSetChanAmbColor((GXChannelID)4, color);
-    GXSetChanMatColor((GXChannelID)4, color);
-    GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32(x, y - 100.0f, z);
-    GXPosition3f32(x, y + 100.0f, z);
+    start.x = x;
+    start.y = y - 100.0f;
+    start.z = z;
+    end.x = x;
+    end.y = y + 100.0f;
+    end.z = z;
+    drawLine3D(&start, &end, color);
 
     color.r = 0xff;
     color.g = 0xff;
     color.b = 0x80;
     color.a = 0xff;
-    GXSetChanAmbColor((GXChannelID)4, color);
-    GXSetChanMatColor((GXChannelID)4, color);
-    GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32(x, y, z - 100.0f);
-    GXPosition3f32(x, y, z + 100.0f);
+    start.x = x;
+    start.y = y;
+    start.z = z - 100.0f;
+    end.x = x;
+    end.y = y;
+    end.z = z + 100.0f;
+    drawLine3D(&start, &end, color);
 }
 
 /*
@@ -1029,9 +1015,7 @@ void CPartMng::setProcSpeed(ProcSpdSt*, int)
 void CPartMng::drawEnd()
 {
     gPppHeapUseRateWords[0] = pppHeapUseRate(ppvEnv->m_stagePtr);
-    int heapCheckCount = gPppHeapUseRateWords[2];
-    gPppHeapUseRateWords[2] = heapCheckCount - 1;
-    if ((heapCheckCount == 0) || (gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1])) {
+    if ((gPppHeapUseRateWords[2]-- == 0) || (gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1])) {
         gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
         gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
     }
@@ -1167,9 +1151,13 @@ void CPartMng::SetFp()
  */
 inline void CPartMng::fpIDon(unsigned short selectedId)
 {
-    _pppMngSt* mng = m_pppMng;
-    _pppFieldParticleData* fp = reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer);
-    for (int i = m_editParticleCount; i != 0; i--) {
+    int i;
+    _pppFieldParticleData* fp;
+    _pppMngSt* mng;
+
+    mng = m_pppMng;
+    fp = reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer);
+    for (i = m_editParticleCount; i != 0; i--) {
         if (fp->m_fieldId == selectedId) {
             mng->m_baseTime = 0;
         }
@@ -1189,9 +1177,13 @@ inline void CPartMng::fpIDon(unsigned short selectedId)
  */
 inline void CPartMng::fpIDoff(unsigned short selectedId)
 {
-    _pppMngSt* mng = m_pppMng;
-    _pppFieldParticleData* fp = reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer);
-    for (int i = m_editParticleCount; i != 0; i--) {
+    int i;
+    _pppFieldParticleData* fp;
+    _pppMngSt* mng;
+
+    mng = m_pppMng;
+    fp = reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer);
+    for (i = m_editParticleCount; i != 0; i--) {
         if (fp->m_fieldId == selectedId) {
             mng->m_particleEnded = 1;
         }
@@ -1493,7 +1485,7 @@ void CPartMng::pppEditAllReleaseResource()
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline void CheckSum(char* packet, unsigned long code, unsigned long packetSize)
+static inline char* CheckSum(char* packet, unsigned long code, unsigned long packetSize)
 {
     int checkSum = 0x12345678;
     char* cursor = packet + 0x20;
@@ -1504,10 +1496,13 @@ static inline void CheckSum(char* packet, unsigned long code, unsigned long pack
         remaining--;
     }
 
-    if (static_cast<unsigned int>(checkSum) != *reinterpret_cast<unsigned int*>(packet)) {
-        Graphic.Printf(const_cast<char*>(sPartMngChecksumErrorFmt), code);
-        Graphic.DrawDebugString();
+    if (static_cast<unsigned int>(checkSum) == *reinterpret_cast<unsigned int*>(packet)) {
+        return packet + 0x20;
     }
+
+    Graphic.Printf(const_cast<char*>(sPartMngChecksumErrorFmt), code);
+    Graphic.DrawDebugString();
+    return packet + 0x20;
 }
 
 /*
@@ -1538,8 +1533,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     static const int kCharaVisToggleOffset = 0x1C0;
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    CheckSum(packet, code, packetSize);
-    char* payload = packet + 0x20;
+    char* payload = CheckSum(packet, code, packetSize);
     float* payloadFloats = reinterpret_cast<float*>(payload);
     int* payloadWords = reinterpret_cast<int*>(payload);
     if (payload == 0) {
@@ -1779,11 +1773,10 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
 
             memcpy(m_editTextBuffers[slotIndex], payload, packetSize - 0x20);
-            int* groupData = reinterpret_cast<int*>(m_editTextBuffers[slotIndex]);
             pppShapeGroupRaw* group = &m_editShapeGroups[slotIndex];
-            group->m_meshIndex = static_cast<short>(groupData[1]);
-            group->m_vertexCount = static_cast<short>(groupData[2]);
-            group->m_vertexIndices = reinterpret_cast<u16*>(groupData + 3);
+            group->m_meshIndex = static_cast<short>(reinterpret_cast<int*>(m_editTextBuffers[slotIndex])[1]);
+            group->m_vertexCount = static_cast<short>(reinterpret_cast<int*>(m_editTextBuffers[slotIndex])[2]);
+            group->m_vertexIndices = reinterpret_cast<u16*>(reinterpret_cast<int*>(m_editTextBuffers[slotIndex]) + 3);
         }
         return;
     case 0x0B:
@@ -1941,11 +1934,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     case 0x21:
         MapMng.ShowMapMeshID(payloadWords[1], payloadWords[0]);
         return;
-    case 0x1f:
     case 0xfe:
-    case 0xff:
-    default:
-        return;
+        break;
     }
 }
 
@@ -2305,6 +2295,60 @@ void CPartMng::pppEditPartCalc()
     }
 }
 
+static inline void pppDrawCulledPart(_pppMngSt* mng, Vec& cameraPos)
+{
+    Vec viewPos;
+    Vec partPos;
+    Vec cameraDelta;
+
+    ppvMng = mng;
+    partPos.x = mng->m_matrix.value[0][3];
+    partPos.y = mng->m_matrix.value[1][3];
+    partPos.z = mng->m_matrix.value[2][3];
+
+    if ((double)mng->m_cullRadiusSq != -1.0) {
+        goto checkCull;
+    }
+
+drawPart:
+    PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
+    mng->m_sortDepth = viewPos.z;
+    ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
+    ppvMng = mng;
+    pppSetFpMatrix(mng);
+    _pppDrawPart(mng);
+    return;
+
+checkCull:
+    PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+    if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
+        CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
+        if (bound.CheckFrustum(cameraPos, ppvCameraMatrix, -100000000.0f) != 0) {
+            goto drawPart;
+        }
+    }
+}
+
+static inline void pppDrawPass(CPartMng* manager, unsigned char drawMode)
+{
+    Mtx invCamera;
+    Vec cameraPos;
+
+    PSMTXInverse(ppvCameraMatrix, invCamera);
+    cameraPos.x = invCamera[0][3];
+    cameraPos.y = invCamera[1][3];
+    cameraPos.z = invCamera[2][3];
+
+    for (int i = 0; i < 0x180; i++) {
+        _pppMngSt* mng = &manager->m_pppMng[i];
+        if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000
+            && (signed char)mng->m_drawPass == drawMode && mng->m_baseTime < 0
+            && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
+            pppDrawCulledPart(mng, cameraPos);
+        }
+    }
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8005b5b4
@@ -2321,104 +2365,13 @@ void CPartMng::pppEditDrawShadow()
     }
 
     if (m_editProgramData[0] != 0 && m_editDrawMode <= 3) {
-        Mtx invCamera;
-        Vec cameraPos;
-        Vec cameraDelta;
-        Vec partPos;
-        Vec viewPos;
-
-        PSMTXInverse(ppvCameraMatrix, invCamera);
-        cameraPos.x = invCamera[0][3];
-        cameraPos.y = invCamera[1][3];
-        cameraPos.z = invCamera[2][3];
-
-        for (int i = 0; i < 0x180; i++) {
-            _pppMngSt* mng = &m_pppMng[i];
-            if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass == 3
-                && mng->m_baseTime < 0 && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
-                ppvMng = mng;
-                partPos.x = mng->m_matrix.value[0][3];
-                partPos.y = mng->m_matrix.value[1][3];
-                partPos.z = mng->m_matrix.value[2][3];
-
-                if ((double)mng->m_cullRadiusSq != -1.0) {
-                    goto checkCull;
-                }
-
-            drawPart:
-                PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-                mng->m_sortDepth = viewPos.z;
-                ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-                ppvMng = mng;
-                pppSetFpMatrix(mng);
-                _pppDrawPart(mng);
-                continue;
-
-            checkCull:
-                PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                    CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
-                    if (bound.CheckFrustum(
-                            cameraPos, ppvCameraMatrix, -100000000.0f) != 0) {
-                        goto drawPart;
-                    }
-                }
-            }
-        }
+        pppDrawPass(this, 3);
     }
 
     ppvScreenMatrix[2][3] = ppvScreenMatrixZbuff;
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 }
 
-static inline void pppEditDrawPass(CPartMng* manager, unsigned char drawMode)
-{
-    Mtx invCamera;
-    Vec cameraPos;
-    Vec cameraDelta;
-    Vec partPos;
-    Vec viewPos;
-
-    PSMTXInverse(ppvCameraMatrix, invCamera);
-    cameraPos.x = invCamera[0][3];
-    cameraPos.y = invCamera[1][3];
-    cameraPos.z = invCamera[2][3];
-
-    for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* mng = &manager->m_pppMng[i];
-        if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000
-            && (signed char)mng->m_drawPass == drawMode && mng->m_baseTime < 0
-            && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
-            ppvMng = mng;
-            partPos.x = mng->m_matrix.value[0][3];
-            partPos.y = mng->m_matrix.value[1][3];
-            partPos.z = mng->m_matrix.value[2][3];
-
-            if ((double)mng->m_cullRadiusSq != -1.0) {
-                goto checkCull;
-            }
-
-        drawPart:
-            PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-            mng->m_sortDepth = viewPos.z;
-            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-            ppvMng = mng;
-            pppSetFpMatrix(mng);
-            _pppDrawPart(mng);
-            continue;
-
-        checkCull:
-            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-            if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
-                if (bound.CheckFrustum(
-                        cameraPos, ppvCameraMatrix, -100000000.0f) != 0) {
-                    goto drawPart;
-                }
-            }
-        }
-    }
-}
 
 /*
  * --INFO--
@@ -2441,11 +2394,11 @@ void CPartMng::pppEditDraw()
     Vec viewPos;
     if (m_editProgramData[0] != 0) {
         if (m_editDrawMode <= 3) {
-            pppEditDrawPass(this, 8);
-            pppEditDrawPass(this, 4);
+            pppDrawPass(this, 8);
+            pppDrawPass(this, 4);
             pppDraw();
-            pppEditDrawPass(this, 6);
-            pppEditDrawPass(this, 7);
+            pppDrawPass(this, 6);
+            pppDrawPass(this, 7);
         } else {
             for (int i = 0; i < m_editParticleCount; i++) {
                 _pppMngSt* mng = &m_pppMng[i];
@@ -2492,9 +2445,9 @@ void CPartMng::pppEditPartDrawAfter()
         m_debugCounter = 0;
         if (m_editProgramData[0] != 0
             && m_editDrawMode <= 3) {
-            pppEditDrawPass(this, 5);
-            pppEditDrawPass(this, 6);
-            pppEditDrawPass(this, 7);
+            pppDrawPass(this, 5);
+            pppDrawPass(this, 6);
+            pppDrawPass(this, 7);
         }
     }
 
@@ -2713,58 +2666,20 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
 {
     Mtx invCamera;
     Vec cameraPos;
-    Vec cameraDelta;
-    Vec partPos;
-    Vec viewPos;
-    _pppMngSt* mng;
-    int i;
 
     PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    for (i = 0; i < 0x180; i++) {
-        mng = &m_pppMng[i];
+    for (int i = 0; i < 0x180; i++) {
+        _pppMngSt* mng = &m_pppMng[i];
         if (mng->m_nodeIndex == nodeIndex && mng->m_kind == kind && mng->m_hitBgFlag == 0
             && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass == drawMode && mng->m_baseTime < 0) {
-            if (mng->m_slotVisible == 0) {
-                break;
+            if (mng->m_slotVisible != 0) {
+                pppDrawCulledPart(mng, cameraPos);
             }
-
-            ppvMng = mng;
-            partPos.x = mng->m_matrix.value[0][3];
-            partPos.y = mng->m_matrix.value[1][3];
-            partPos.z = mng->m_matrix.value[2][3];
-
-            {
-
-                if ((double)mng->m_cullRadiusSq != -1.0) {
-                    goto checkCull;
-                }
-
-            drawPart:
-                PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-                mng->m_sortDepth = viewPos.z;
-                ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-                ppvMng = mng;
-                pppSetFpMatrix(mng);
-                _pppDrawPart(mng);
-                break;
-
-            checkCull:
-                PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                if (!(PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq)) {
-                    break;
-                }
-
-                CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
-                if (bound.CheckFrustum(
-                        cameraPos, ppvCameraMatrix, -100000000.0f) != 0) {
-                    goto drawPart;
-                }
-                break;
-            }
+            break;
         }
     }
     if (drawMode < 8) {
@@ -2921,59 +2836,12 @@ void CPartMng::pppDraw()
  */
 void CPartMng::pppPartDrawAfter()
 {
-    Mtx invCamera;
-    Vec cameraPos;
-    Vec cameraDelta;
-    Vec partPos;
-    Vec viewPos;
-
-    PSMTXInverse(ppvCameraMatrix, invCamera);
-    cameraPos.x = invCamera[0][3];
-    cameraPos.y = invCamera[1][3];
-    cameraPos.z = invCamera[2][3];
-
-    for (int i = 0; i < 0x180; i++) {
-        _pppMngSt* mng = &m_pppMng[i];
-        if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass == 5
-            && mng->m_baseTime < 0 && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
-            ppvMng = mng;
-            partPos.x = mng->m_matrix.value[0][3];
-            partPos.y = mng->m_matrix.value[1][3];
-            partPos.z = mng->m_matrix.value[2][3];
-
-            if ((double)mng->m_cullRadiusSq != -1.0) {
-                goto checkCull;
-            }
-
-        drawPart:
-            PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-            mng->m_sortDepth = viewPos.z;
-            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-            ppvMng = mng;
-            pppSetFpMatrix(mng);
-            _pppDrawPart(mng);
-            continue;
-
-        checkCull:
-            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-            if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
-                if (bound.CheckFrustum(
-                        cameraPos, ppvCameraMatrix, -100000000.0f) != 0) {
-                    goto drawPart;
-                }
-            }
-        }
-    }
+    pppDrawPass(this, 5);
 
     gPppHeapUseRateWords[0] = pppHeapUseRate(ppvEnv->m_stagePtr);
-    {
-        int prevInterval = gPppHeapUseRateWords[2];
-        gPppHeapUseRateWords[2] = prevInterval - 1;
-        if (prevInterval == 0 || gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1]) {
-            gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
-            gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
-        }
+    if ((gPppHeapUseRateWords[2]-- == 0) || (gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1])) {
+        gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
+        gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
     }
 }
 
@@ -3155,6 +3023,9 @@ void CPartMng::LoadPartNoSyncCalc()
  */
 int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode, void* readBuffer, int readBufferSize)
 {
+    CTextureSet* textureSet;
+    CMaterialSet* materialSet;
+
     ppvAmemCacheSet.CacheClear();
     PartPcs.m_usbStreamState.m_stageLoad->setDefaultParam(pdtSlotIndex);
 
@@ -3183,14 +3054,14 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
 
     if (m_textureSet == 0) {
         m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xC10) CTextureSet;
-        CTextureSet* textureSet = m_textureSet;
+        textureSet = m_textureSet;
         textureSet->m_textureArray.SetDefaultSize(0x180);
         textureSet->m_textureArray.SetGrow(0);
     }
 
     if (m_materialSet == 0) {
         m_materialSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xC14) CMaterialSet;
-        CMaterialSet* materialSet = m_materialSet;
+        materialSet = m_materialSet;
         materialSet->m_materials.SetDefaultSize(0x180);
         materialSet->m_materials.SetGrow(0);
         m_pppEnvSt.m_materialSetPtr = m_materialSet;
@@ -3248,7 +3119,6 @@ inline pppModelSt* CParModelSet::GetFree()
  */
 inline void CParModelSet::Create(CChunkFile& chunkFile, int cachePriority, int addReference)
 {
-    pppModelSt* modelArray = m_models;
     pppModelSt* targetModel = 0;
 
     CChunkFile::CChunk innerChunk;
@@ -3257,21 +3127,7 @@ inline void CParModelSet::Create(CChunkFile& chunkFile, int cachePriority, int a
         case kChunkNAME: {
             char* name = chunkFile.GetString();
 
-            pppModelSt* searchModel = modelArray;
-            unsigned int i = 0;
-            for (;;) {
-                if (searchModel->m_isUsed != 0 && strcmp(searchModel->m_name, name) == 0) {
-                    break;
-                }
-                i++;
-                searchModel++;
-                if (i >= 0x100) {
-                    searchModel = 0;
-                    break;
-                }
-            }
-
-            if (searchModel != 0) {
+            if (Find(name, 0) != 0) {
                 targetModel = 0;
                 break;
             }
@@ -3399,7 +3255,6 @@ inline pppShapeSt* CParShapeSet::GetFree()
  */
 inline void CParShapeSet::Create(CChunkFile& chunkFile, int addReference)
 {
-    pppShapeSt* shapeArray = m_shapes;
     pppShapeSt* targetShape = 0;
 
     CChunkFile::CChunk innerChunk;
@@ -3408,21 +3263,7 @@ inline void CParShapeSet::Create(CChunkFile& chunkFile, int addReference)
         case kChunkNAME: {
             char* name = chunkFile.GetString();
 
-            pppShapeSt* searchShape = shapeArray;
-            unsigned int i = 0;
-            for (;;) {
-                if (searchShape->m_inUse != 0 && strcmp(searchShape->m_name, name) == 0) {
-                    break;
-                }
-                i++;
-                searchShape++;
-                if (i >= 0x100) {
-                    searchShape = 0;
-                    break;
-                }
-            }
-
-            if (searchShape != 0) {
+            if (Find(name, 0) != 0) {
                 targetShape = 0;
                 break;
             }
@@ -4024,7 +3865,9 @@ PPPIFPARAM* CPartMng::pppGetIfDt(short index)
  */
 void CPartMng::pppShowIdx(short index, unsigned char visible)
 {
-	m_pppMng[index].m_slotVisible = visible;
+    _pppMngSt* mng = &m_pppMng[index];
+
+    mng->m_slotVisible = visible;
 }
 
 /*

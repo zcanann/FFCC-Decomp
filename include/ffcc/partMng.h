@@ -10,6 +10,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
+#include <string.h>
 
 class CChara;
 class CChunkFile;
@@ -77,6 +78,17 @@ public:
     pppModelSt* GetFree();
     void Create(CChunkFile&, int, int);
     int GetNumModel() { return 0x100; }
+    pppModelSt* Find(char* name, int)
+    {
+        pppModelSt* model = m_models;
+        for (unsigned int i = 0; i < GetNumModel(); i++) {
+            if (model->m_isUsed != 0 && strcmp(model->m_name, name) == 0) {
+                return model;
+            }
+            model++;
+        }
+        return 0;
+    }
 
     pppModelSt m_models[0x100];
 };
@@ -89,6 +101,18 @@ public:
     pppShapeSt* GetFree();
     void Create(CChunkFile&, int);
     int GetNumShape() { return 0x100; }
+    pppShapeSt* Find(char* name, int)
+    {
+        unsigned int i;
+        pppShapeSt* shape = m_shapes;
+        for (i = 0; i < GetNumShape(); i++) {
+            if (shape->m_inUse != 0 && strcmp(shape->m_name, name) == 0) {
+                return shape;
+            }
+            shape++;
+        }
+        return 0;
+    }
 
     pppShapeSt m_shapes[0x100];
 };

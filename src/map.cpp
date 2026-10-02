@@ -30,6 +30,8 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 CMapMng MapMng;
+unsigned char s_bitMask;
+unsigned char s_bitMaskDrawFlags;
 char g_StrTmp[0x400];
 
 

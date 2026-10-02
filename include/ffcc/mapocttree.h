@@ -9,14 +9,6 @@ class CMapCylinder;
 class CMapObj;
 class COctNode;
 
-void ClearLight_r(COctNode*);
-void InsertLight_r(COctNode*);
-void ClearShadow_r(COctNode*);
-void SetShadow_r(COctNode*);
-void InsertShadow_r(COctNode*);
-void ClearFlag_r(COctNode*);
-void setbit32(unsigned long*, unsigned long);
-
 class CBound
 {
 public:

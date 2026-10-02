@@ -10,6 +10,32 @@
 #include "ffcc/p_light.h"
 #include "ffcc/system.h"
 
+/*
+ * --INFO--
+ * PAL Address: 8002d9fc
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void setbit32(unsigned long* arg0, unsigned long arg1)
+{
+	unsigned long offset;
+	unsigned long mask;
+
+	offset = arg1 & 0x1f;
+	mask = 1UL << offset;
+	arg0[arg1 >> 5] |= mask;
+}
+
+static void ClearLight_r(COctNode*);
+static void InsertLight_r(COctNode*);
+static void ClearShadow_r(COctNode*);
+static void SetShadow_r(COctNode*);
+static void InsertShadow_r(COctNode*);
+static void ClearFlag_r(COctNode*);
+
 static const float kMapOctTreeRadiusPad = 1.0f;
 static const float kMapOctTreeDefaultOffsetZ = 0.0f;
 
@@ -21,10 +47,6 @@ static unsigned long s_insertShadowBitIndex = 0;
 static int s_light_no = 0;
 static unsigned long s_shadow_no = 0;
 static unsigned long InsertShadow_level = 0;
-static unsigned long clear_flag_mask = 0;
-unsigned char s_bitMask;
-unsigned char s_bitMaskDrawFlags;
-static unsigned long octtree_draw_node_ct = 0;
 
 static const char sMapOctTreeNodeMeshTypeFmt[] =
     "\n\n===============================================\n\n\t\t\tm_node=%d   m_meshtype=%d\n\n\n"
@@ -98,6 +120,439 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
 
 /*
  * --INFO--
+ * PAL Address: 0x8002c8a8
+ * PAL Size: 896b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
+{
+	int i;
+
+	if (octNode->m_bound.CheckCross(s_cyl.m_bound) == 0) {
+		return;
+	}
+	if (octNode->m_meshCount != 0) {
+		static_cast<CMapHit*>(m_mapObject->m_mapData)
+			->CheckHitCylinderNear(&s_cyl, &s_mvec,
+								   octNode->m_meshStart,
+								   octNode->m_meshCount,
+								   InsertShadow_level);
+	}
+	for (i = 0; i < 8; i++) {
+		if (octNode->m_children[i] == 0) {
+			return;
+		}
+		CheckHitCylinderNear_r(octNode->m_children[i]);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002cd38
+ * PAL Size: 440b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long flag)
+{
+	float radiusPad;
+	Mtx inverseMtx;
+	CMapHit* mapHit;
+
+	if (m_type == 2) {
+		mapHit = static_cast<CMapHit*>(m_mapObject->m_mapData);
+		if (mapHit != 0) {
+			PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
+			PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
+			PSMTXMultVec(inverseMtx, &cylinder->m_top, &s_cyl.m_top);
+			PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &s_cyl.m_axis);
+			PSMTXMultVecSR(inverseMtx, move, &s_mvec);
+
+			s_cyl.m_radius = cylinder->m_radius;
+			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
+			if (s_cyl.m_bottom.x < s_cyl.m_top.x) {
+				s_cyl.m_bound.m_min.x = s_cyl.m_bottom.x - radiusPad;
+				s_cyl.m_bound.m_max.x = s_cyl.m_top.x + radiusPad;
+			} else {
+				s_cyl.m_bound.m_min.x = s_cyl.m_top.x - radiusPad;
+				s_cyl.m_bound.m_max.x = s_cyl.m_bottom.x + radiusPad;
+			}
+
+			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
+			if (s_cyl.m_bottom.y < s_cyl.m_top.y) {
+				s_cyl.m_bound.m_min.y = s_cyl.m_bottom.y - radiusPad;
+				s_cyl.m_bound.m_max.y = s_cyl.m_top.y + radiusPad;
+			} else {
+				s_cyl.m_bound.m_min.y = s_cyl.m_top.y - radiusPad;
+				s_cyl.m_bound.m_max.y = s_cyl.m_bottom.y + radiusPad;
+			}
+
+			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
+			if (s_cyl.m_bottom.z < s_cyl.m_top.z) {
+				s_cyl.m_bound.m_min.z = s_cyl.m_bottom.z - radiusPad;
+				s_cyl.m_bound.m_max.z = s_cyl.m_top.z + radiusPad;
+			} else {
+				s_cyl.m_bound.m_min.z = s_cyl.m_top.z - radiusPad;
+				s_cyl.m_bound.m_max.z = s_cyl.m_bottom.z + radiusPad;
+			}
+			InsertShadow_level = flag;
+			if (CheckHitCylinder_r(m_nodePool) != 0) {
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002cef0
+ * PAL Size: 1004b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int COctTree::CheckHitCylinder_r(COctNode* node)
+{
+	int i;
+
+	if (node->m_bound.CheckCross(s_cyl.m_bound) != 0) {
+		if ((node->m_meshCount != 0) &&
+			(static_cast<CMapHit*>(m_mapObject->m_mapData)
+				 ->CheckHitCylinder(&s_cyl, &s_mvec,
+									node->m_meshStart,
+									node->m_meshCount,
+									InsertShadow_level) != 0)) {
+			return 1;
+		}
+
+		for (i = 0; i < 8; i++) {
+			if (node->m_children[i] == 0) {
+				break;
+			}
+			if (CheckHitCylinder_r(node->m_children[i]) != 0) {
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 8002d2dc
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void COctTree::ClearFlag(unsigned long flag)
+{
+	s_shadow_no = ~flag;
+	ClearFlag_r(m_nodePool);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002d308
+ * PAL Size: 584b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void ClearFlag_r(COctNode* node)
+{
+	int i;
+
+	if (node->m_meshCount != 0) {
+		node->m_drawFlags &= s_shadow_no;
+	}
+	for (i = 0; i < 8; i++) {
+		if (node->m_children[i] == 0) {
+			return;
+		}
+		ClearFlag_r(node->m_children[i]);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002d550
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
+{
+	Vec localPosition;
+	Mtx inverseMtx;
+
+	if (m_type == 0) {
+		s_insertShadowBitIndex = bitIndex;
+		PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
+		PSMTXMultVec(inverseMtx, &position, &localPosition);
+
+		s_bound = bound;
+
+		PSVECAdd(&s_bound.m_min, &localPosition, &s_bound.m_min);
+		PSVECAdd(&s_bound.m_max, &localPosition, &s_bound.m_max);
+
+		s_light_no = 0;
+		InsertShadow_r(m_nodePool);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002d628
+ * PAL Size: 980b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void InsertShadow_r(COctNode* node)
+{
+	int i;
+
+	if (node->m_bound.CheckCross(s_bound) == 0) {
+		return;
+	}
+	if ((s_light_no >= 3) && (node->m_meshCount != 0)) {
+		setbit32(&node->m_shadowFlags, s_insertShadowBitIndex);
+	}
+	for (i = 0; i < 8; i++) {
+		if (node->m_children[i] == 0) {
+			return;
+		}
+		s_light_no++;
+		InsertShadow_r(node->m_children[i]);
+		s_light_no--;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: UNUSED
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void COctTree::SetShadow(long bitIndex)
+{
+	s_shadow_no = bitIndex;
+	SetShadow_r(m_nodePool);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 500b
+ * EN Address: UNUSED
+ * EN Size: 156b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline void SetShadow_r(COctNode* node)
+{
+	if (node->m_meshCount != 0) {
+		setbit32(&node->m_shadowFlags, s_shadow_no);
+	}
+	for (int i = 0; i < 8; i++) {
+		if (node->m_children[i] == 0) {
+			return;
+		}
+		SetShadow_r(node->m_children[i]);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 8002da1c
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void COctTree::ClearShadow()
+{
+	ClearShadow_r(m_nodePool);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002da40
+ * PAL Size: 408b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma push
+#pragma inline_depth(6)
+static void ClearShadow_r(COctNode* node)
+{
+	int i;
+
+	if (node->m_meshCount != 0) {
+		node->m_shadowFlags = 0;
+	}
+	for (i = 0; i < 8; i++) {
+		if (node->m_children[i] == 0) {
+			return;
+		}
+		ClearShadow_r(node->m_children[i]);
+	}
+}
+#pragma pop
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002dbd8
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned long mask)
+{
+	Mtx inverseMtx;
+	Vec localPosition;
+	if (m_type != 0) {
+		return;
+	}
+
+	if ((m_mapObject->m_lightSetIndex & mask) == 0) {
+		return;
+	}
+
+	s_insertLightBitIndex = bitIndex;
+	PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
+	PSMTXMultVec(inverseMtx, &position, &localPosition);
+
+	s_bound.m_min.x = localPosition.x - radius;
+	s_bound.m_min.y = localPosition.y - radius;
+	s_bound.m_min.z = localPosition.z - radius;
+	s_bound.m_max.x = localPosition.x + radius;
+	s_bound.m_max.y = localPosition.y + radius;
+	s_bound.m_max.z = localPosition.z + radius;
+
+	InsertLight_r(m_nodePool);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002dca8
+ * PAL Size: 860b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void InsertLight_r(COctNode* node)
+{
+	int i;
+
+	if (node->m_bound.CheckCross(s_bound) == 0) {
+		return;
+	}
+	if (node->m_meshCount != 0) {
+		setbit32(&node->m_lightFlags, s_insertLightBitIndex);
+	}
+	for (i = 0; i < 8; i++) {
+		if (node->m_children[i] == 0) {
+			return;
+		}
+		InsertLight_r(node->m_children[i]);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 8002e004
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void COctTree::ClearLight()
+{
+	ClearLight_r(m_nodePool);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002e028
+ * PAL Size: 408b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma push
+#pragma inline_depth(6)
+static void ClearLight_r(COctNode* octNode)
+{
+	int i;
+
+	if (octNode->m_meshCount != 0) {
+		octNode->m_lightFlags = 0;
+	}
+	for (i = 0; i < 8; i++) {
+		if (octNode->m_children[i] == 0) {
+			return;
+		}
+		ClearLight_r(octNode->m_children[i]);
+	}
+}
+#pragma pop
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002e1c0
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void COctTree::SetDrawFlag()
+{
+	Mtx localMtx;
+
+	if (((m_drawFlags & 1) == 0) && (m_mapObject->m_mapDataType == 1)) {
+		PSMTXConcat(MapMng.m_scaledViewMtxPrimary, m_mapObject->m_worldMtx, m_cullMtx);
+		PSMTXConcat(MapMng.m_viewMtx,
+		            m_mapObject->m_worldMtx, localMtx);
+		PSMTXInverse(localMtx, localMtx);
+
+		m_localPos.x = localMtx[0][3];
+		m_localPos.y = localMtx[1][3];
+		m_localPos.z = localMtx[2][3];
+		ClearFlag(1);
+		DrawTypeMesh_r(m_nodePool);
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8002e27c
  * PAL Size: 188b
  * EN Address: TODO
@@ -136,247 +591,50 @@ void COctTree::DrawCharaShadow(unsigned char drawType)
 
 /*
  * --INFO--
- * PAL Address: 8002d9fc
- * PAL Size: 32b
+ * PAL Address: 0x8002e338
+ * PAL Size: 344b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void setbit32(unsigned long* arg0, unsigned long arg1)
+void COctTree::Draw(unsigned char drawType)
 {
-	unsigned long offset;
-	unsigned long mask;
+	CMapObj* mapObj;
 
-	offset = arg1 & 0x1f;
-	mask = 1UL << offset;
-	arg0[arg1 >> 5] |= mask;
-}
+	if (m_type == 0) {
+		mapObj = m_mapObject;
+		unsigned char mapDrawType = mapObj->m_drawPriority;
+		unsigned char targetDrawType = drawType;
+		if ((mapDrawType == targetDrawType) && ((mapObj->m_showFlags & 1) != 0)) {
+			if ((MapMng.m_underWaterTexPending != 0) &&
+			    ((mapObj->m_bumpLight != 0) &&
+			     (reinterpret_cast<CLightPcs::CBumpLight*>(mapObj->m_bumpLight)->m_useViewSpace == 2))) {
+				MaterialMan.SetUnderWaterTex();
+				MapMng.m_underWaterTexPending = 0;
+			}
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-COctTree::COctTree()
-{
-	m_nodePool = 0;
-	m_mapObject = 0;
-	m_drawFlags = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002f384
- * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-COctTree::~COctTree()
-{
-	COctNode* rootNode = m_nodePool;
-
-	if (rootNode != 0) {
-		delete[] rootNode;
-		m_nodePool = 0;
-	}
-
-	m_mapObject = 0;
-	m_nodeCount = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002ef9c
- * PAL Size: 952b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
-{
-    CChunkFile::CChunk chunk;
-    int nodeCount;
-
-    m_unk01 = 0;
-    chunkFile.PushChunk();
-
-    while (chunkFile.GetNextChunk(chunk)) {
-        switch (chunk.m_id) {
-        case 'TYPE':
-            m_type = static_cast<unsigned char>(chunkFile.Get2());
-            break;
-
-        case 'OBJN': {
-            unsigned short objIndex = chunkFile.Get2();
-
-            m_mapObject = GetMapObjByIndex(objIndex);
-            signed char meshType = m_mapObject->m_meshType;
-            if (meshType == 4) {
-                m_mapObject->m_drawPriority = 0xFF;
-                m_mapObject->m_baseDrawPriority = 0xFF;
-                m_mapObject->m_enableFullScreenShadow = 0;
-            } else if (meshType == 3) {
-                m_mapObject->m_enableFullScreenShadow = 0;
-            }
-            break;
-        }
-
-        case 'NODN': {
-            m_nodeCount = chunkFile.Get2();
-            signed char mapObjType = m_mapObject->m_meshType;
-            if ((mapObjType != 1) && (static_cast<unsigned int>(System.m_execParam) >= 3U)) {
-                System.Printf(const_cast<char*>(sMapOctTreeNodeMeshTypeFmt), m_nodeCount, mapObjType);
-            }
-
-            nodeCount = m_nodeCount;
-            m_nodePool = new (MapMng.m_stage, const_cast<char*>(s_mapocttree_cpp), 0x59)
-                COctNode[nodeCount];
-            break;
-        }
-
-        case 'INFO':
-            m_unk01 = chunkFile.Get1();
-            break;
-
-        case 'TREE':
-            chunkFile.PushChunk();
-            while (chunkFile.GetNextChunk(chunk)) {
-                if (chunk.m_id == 'NODE') {
-                    COctNode* node;
-
-                    chunkFile.PushChunk();
-                    while (chunkFile.GetNextChunk(chunk)) {
-                        switch (chunk.m_id) {
-                        case 'OBJ ': {
-                            node = m_nodePool + static_cast<unsigned short>(chunkFile.Get2());
-                            node->m_meshCount = chunkFile.Get2();
-                            node->m_meshStart = chunkFile.Get2();
-                            break;
-                        }
-
-                        case 'BOND':
-                            node->m_bound.m_min.x = chunkFile.GetF4();
-                            node->m_bound.m_min.y = chunkFile.GetF4();
-                            node->m_bound.m_min.z = chunkFile.GetF4();
-                            node->m_bound.m_max.x = chunkFile.GetF4();
-                            node->m_bound.m_max.y = chunkFile.GetF4();
-                            node->m_bound.m_max.z = chunkFile.GetF4();
-                            break;
-
-                        case 'CHLD':
-                            int childCount = 0;
-
-                            for (int i = 0; i < 8; i++) {
-                                short childIndex = chunkFile.Get2();
-
-                                if (childIndex != -1) {
-                                    node->m_children[childCount] = m_nodePool + static_cast<unsigned short>(childIndex);
-                                    childCount++;
-                                }
-                            }
-
-                            for (int i = childCount; i < 8; i++) {
-                                node->m_children[i] = 0;
-                            }
-                            break;
-                        }
-                    }
-                    chunkFile.PopChunk();
-                }
-            }
-            chunkFile.PopChunk();
-            break;
-        }
-    }
-
-    chunkFile.PopChunk();
-    return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002ebc0
- * PAL Size: 868b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
-{
-	if ((octNode->m_meshCount != 0) &&
-	    ((octNode->m_drawFlags & 1) != 0)) {
-		MaterialMan.InitEnv();
-		if (m_mapObject->m_enableFullScreenShadow != 0) {
-			CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
+			mapObj = m_mapObject;
+			LightPcs.SetBumpTexMatirx(mapObj->m_worldMtx,
+			                          reinterpret_cast<CLightPcs::CBumpLight*>(mapObj->m_bumpLight),
+			                          reinterpret_cast<Vec*>(&mapObj->m_transRateX),
+			                          mapObj->m_bumpTexMatrixMode);
+			if (kMapOctTreeDefaultOffsetZ != m_mapObject->m_zBufferOffset) {
+				CameraPcs.SetOffsetZBuff(m_mapObject->m_zBufferOffset);
+			}
+			if (m_mapObject->m_disableZWrite != 0) {
+				GXSetZMode(1, (GXCompare)3, 0);
+			}
+			static_cast<CMapMesh*>(m_mapObject->m_mapData)->SetRenderArray();
+			DrawTypeMeshFlag_r(m_nodePool);
+			if (m_mapObject->m_disableZWrite != 0) {
+				GXSetZMode(1, (GXCompare)3, 1);
+			}
+			float offsetZ = m_mapObject->m_zBufferOffset;
+			if (kMapOctTreeDefaultOffsetZ != offsetZ) {
+				CameraPcs.SetOffsetZBuff(kMapOctTreeDefaultOffsetZ);
+			}
 		}
-		if (m_mapObject->m_shadowTarget != 0) {
-			MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &octNode->m_shadowFlags,
-			                           m_mapObject->m_worldMtx);
-		}
-		MaterialMan.LockEnv();
-		LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &octNode->m_lightFlags);
-		m_mapObject->SetDrawEnv();
-		static_cast<CMapMesh*>(m_mapObject->m_mapData)
-			->DrawMesh(octNode->m_meshStart,
-			           octNode->m_meshCount);
-	}
-	for (int i = 0; i < 8; i++) {
-		if (octNode->m_children[i] == 0) {
-			return;
-		}
-		DrawTypeMeshFlag_r(octNode->m_children[i]);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002e758
- * PAL Size: 572b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
-{
-	if (octNode->m_meshCount != 0) {
-		octNode->m_drawFlags |= 1;
-	}
-	for (int i = 0; i < 8; i++) {
-		if (octNode->m_children[i] == 0) {
-			return;
-		}
-		DrawTypeMeshFrustumIn_r(octNode->m_children[i]);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002e994
- * PAL Size: 556b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode* octNode)
-{
-	int i;
-
-	if ((octNode->m_meshCount != 0) && ((octNode->m_drawFlags & 1) != 0)) {
-		static_cast<CMapMesh*>(m_mapObject->m_mapData)
-			->DrawMeshCharaShadow(octNode->m_meshStart, octNode->m_meshCount);
-	}
-	for (i = 0; i < 8; i++) {
-		if (octNode->m_children[i] == 0) {
-			break;
-		}
-		DrawCharaShadowTypeMeshFlag_r(octNode->m_children[i]);
 	}
 }
 
@@ -496,485 +754,195 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 
 /*
  * --INFO--
- * PAL Address: 0x8002e338
- * PAL Size: 344b
+ * PAL Address: 0x8002e758
+ * PAL Size: 572b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void COctTree::Draw(unsigned char drawType)
+void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 {
-	CMapObj* mapObj;
-
-	if (m_type == 0) {
-		mapObj = m_mapObject;
-		unsigned char mapDrawType = mapObj->m_drawPriority;
-		unsigned char targetDrawType = drawType;
-		if ((mapDrawType == targetDrawType) && ((mapObj->m_showFlags & 1) != 0)) {
-			if ((MapMng.m_underWaterTexPending != 0) &&
-			    ((mapObj->m_bumpLight != 0) &&
-			     (reinterpret_cast<CLightPcs::CBumpLight*>(mapObj->m_bumpLight)->m_useViewSpace == 2))) {
-				MaterialMan.SetUnderWaterTex();
-				MapMng.m_underWaterTexPending = 0;
-			}
-
-			mapObj = m_mapObject;
-			LightPcs.SetBumpTexMatirx(mapObj->m_worldMtx,
-			                          reinterpret_cast<CLightPcs::CBumpLight*>(mapObj->m_bumpLight),
-			                          reinterpret_cast<Vec*>(&mapObj->m_transRateX),
-			                          mapObj->m_bumpTexMatrixMode);
-			if (kMapOctTreeDefaultOffsetZ != m_mapObject->m_zBufferOffset) {
-				CameraPcs.SetOffsetZBuff(m_mapObject->m_zBufferOffset);
-			}
-			if (m_mapObject->m_disableZWrite != 0) {
-				GXSetZMode(1, (GXCompare)3, 0);
-			}
-			static_cast<CMapMesh*>(m_mapObject->m_mapData)->SetRenderArray();
-			DrawTypeMeshFlag_r(m_nodePool);
-			if (m_mapObject->m_disableZWrite != 0) {
-				GXSetZMode(1, (GXCompare)3, 1);
-			}
-			float offsetZ = m_mapObject->m_zBufferOffset;
-			if (kMapOctTreeDefaultOffsetZ != offsetZ) {
-				CameraPcs.SetOffsetZBuff(kMapOctTreeDefaultOffsetZ);
-			}
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002e1c0
- * PAL Size: 188b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void COctTree::SetDrawFlag()
-{
-	Mtx localMtx;
-
-	if (((m_drawFlags & 1) == 0) && (m_mapObject->m_mapDataType == 1)) {
-		PSMTXConcat(MapMng.m_scaledViewMtxPrimary, m_mapObject->m_worldMtx, m_cullMtx);
-		PSMTXConcat(MapMng.m_viewMtx,
-		            m_mapObject->m_worldMtx, localMtx);
-		PSMTXInverse(localMtx, localMtx);
-
-		m_localPos.x = localMtx[0][3];
-		m_localPos.y = localMtx[1][3];
-		m_localPos.z = localMtx[2][3];
-		ClearFlag(1);
-		DrawTypeMesh_r(m_nodePool);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002e028
- * PAL Size: 408b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma push
-#pragma inline_depth(6)
-void ClearLight_r(COctNode* octNode)
-{
-	int i;
-
 	if (octNode->m_meshCount != 0) {
-		octNode->m_lightFlags = 0;
-	}
-	for (i = 0; i < 8; i++) {
-		if (octNode->m_children[i] == 0) {
-			return;
-		}
-		ClearLight_r(octNode->m_children[i]);
-	}
-}
-#pragma pop
-
-/*
- * --INFO--
- * PAL Address: 8002e004
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void COctTree::ClearLight()
-{
-	ClearLight_r(m_nodePool);
-}
-
-
-/*
- * --INFO--
- * PAL Address: 0x8002c8a8
- * PAL Size: 896b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
-{
-	int i;
-
-	if (octNode->m_bound.CheckCross(s_cyl.m_bound) == 0) {
-		return;
-	}
-	if (octNode->m_meshCount != 0) {
-		static_cast<CMapHit*>(m_mapObject->m_mapData)
-			->CheckHitCylinderNear(&s_cyl, &s_mvec,
-								   octNode->m_meshStart,
-								   octNode->m_meshCount,
-								   InsertShadow_level);
-	}
-	for (i = 0; i < 8; i++) {
-		if (octNode->m_children[i] == 0) {
-			return;
-		}
-		CheckHitCylinderNear_r(octNode->m_children[i]);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002cef0
- * PAL Size: 1004b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int COctTree::CheckHitCylinder_r(COctNode* node)
-{
-	int i;
-
-	if (node->m_bound.CheckCross(s_cyl.m_bound) != 0) {
-		if ((node->m_meshCount != 0) &&
-			(static_cast<CMapHit*>(m_mapObject->m_mapData)
-				 ->CheckHitCylinder(&s_cyl, &s_mvec,
-									node->m_meshStart,
-									node->m_meshCount,
-									InsertShadow_level) != 0)) {
-			return 1;
-		}
-
-		for (i = 0; i < 8; i++) {
-			if (node->m_children[i] == 0) {
-				break;
-			}
-			if (CheckHitCylinder_r(node->m_children[i]) != 0) {
-				return 1;
-			}
-		}
-	}
-
-	return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002dca8
- * PAL Size: 860b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void InsertLight_r(COctNode* node)
-{
-	int i;
-
-	if (node->m_bound.CheckCross(s_bound) == 0) {
-		return;
-	}
-	if (node->m_meshCount != 0) {
-		setbit32(&node->m_lightFlags, s_insertLightBitIndex);
-	}
-	for (i = 0; i < 8; i++) {
-		if (node->m_children[i] == 0) {
-			return;
-		}
-		InsertLight_r(node->m_children[i]);
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002dbd8
- * PAL Size: 208b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned long mask)
-{
-	Mtx inverseMtx;
-	Vec localPosition;
-	if (m_type != 0) {
-		return;
-	}
-
-	if ((m_mapObject->m_lightSetIndex & mask) == 0) {
-		return;
-	}
-
-	s_insertLightBitIndex = bitIndex;
-	PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
-	PSMTXMultVec(inverseMtx, &position, &localPosition);
-
-	s_bound.m_min.x = localPosition.x - radius;
-	s_bound.m_min.y = localPosition.y - radius;
-	s_bound.m_min.z = localPosition.z - radius;
-	s_bound.m_max.x = localPosition.x + radius;
-	s_bound.m_max.y = localPosition.y + radius;
-	s_bound.m_max.z = localPosition.z + radius;
-
-	InsertLight_r(m_nodePool);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002da40
- * PAL Size: 408b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-#pragma push
-#pragma inline_depth(6)
-void ClearShadow_r(COctNode* node)
-{
-	int i;
-
-	if (node->m_meshCount != 0) {
-		node->m_shadowFlags = 0;
-	}
-	for (i = 0; i < 8; i++) {
-		if (node->m_children[i] == 0) {
-			return;
-		}
-		ClearShadow_r(node->m_children[i]);
-	}
-}
-#pragma pop
-
-/*
- * --INFO--
- * PAL Address: 8002da1c
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void COctTree::ClearShadow()
-{
-	ClearShadow_r(m_nodePool);
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 500b
- * EN Address: UNUSED
- * EN Size: 156b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void SetShadow_r(COctNode* node)
-{
-	if (node->m_meshCount != 0) {
-		setbit32(&node->m_shadowFlags, s_shadow_no);
+		octNode->m_drawFlags |= 1;
 	}
 	for (int i = 0; i < 8; i++) {
-		if (node->m_children[i] == 0) {
+		if (octNode->m_children[i] == 0) {
 			return;
 		}
-		SetShadow_r(node->m_children[i]);
+		DrawTypeMeshFrustumIn_r(octNode->m_children[i]);
 	}
 }
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 40b
- * EN Address: UNUSED
- * EN Size: 60b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void COctTree::SetShadow(long bitIndex)
-{
-	s_shadow_no = bitIndex;
-	SetShadow_r(m_nodePool);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002d628
- * PAL Size: 980b
+ * PAL Address: 0x8002e994
+ * PAL Size: 556b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void InsertShadow_r(COctNode* node)
+void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode* octNode)
 {
 	int i;
 
-	if (node->m_bound.CheckCross(s_bound) == 0) {
-		return;
-	}
-	if ((s_light_no >= 3) && (node->m_meshCount != 0)) {
-		setbit32(&node->m_shadowFlags, s_insertShadowBitIndex);
+	if ((octNode->m_meshCount != 0) && ((octNode->m_drawFlags & 1) != 0)) {
+		static_cast<CMapMesh*>(m_mapObject->m_mapData)
+			->DrawMeshCharaShadow(octNode->m_meshStart, octNode->m_meshCount);
 	}
 	for (i = 0; i < 8; i++) {
-		if (node->m_children[i] == 0) {
+		if (octNode->m_children[i] == 0) {
+			break;
+		}
+		DrawCharaShadowTypeMeshFlag_r(octNode->m_children[i]);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002ebc0
+ * PAL Size: 868b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
+{
+	if ((octNode->m_meshCount != 0) &&
+	    ((octNode->m_drawFlags & 1) != 0)) {
+		MaterialMan.InitEnv();
+		if (m_mapObject->m_enableFullScreenShadow != 0) {
+			CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
+		}
+		if (m_mapObject->m_shadowTarget != 0) {
+			MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &octNode->m_shadowFlags,
+			                           m_mapObject->m_worldMtx);
+		}
+		MaterialMan.LockEnv();
+		LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &octNode->m_lightFlags);
+		m_mapObject->SetDrawEnv();
+		static_cast<CMapMesh*>(m_mapObject->m_mapData)
+			->DrawMesh(octNode->m_meshStart,
+			           octNode->m_meshCount);
+	}
+	for (int i = 0; i < 8; i++) {
+		if (octNode->m_children[i] == 0) {
 			return;
 		}
-		s_light_no++;
-		InsertShadow_r(node->m_children[i]);
-		s_light_no--;
+		DrawTypeMeshFlag_r(octNode->m_children[i]);
 	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8002d550
- * PAL Size: 216b
+ * PAL Address: 0x8002ef9c
+ * PAL Size: 952b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
+int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 {
-	Vec localPosition;
-	Mtx inverseMtx;
+    CChunkFile::CChunk chunk;
+    int nodeCount;
 
-	if (m_type == 0) {
-		s_insertShadowBitIndex = bitIndex;
-		PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
-		PSMTXMultVec(inverseMtx, &position, &localPosition);
+    m_unk01 = 0;
+    chunkFile.PushChunk();
 
-		s_bound = bound;
+    while (chunkFile.GetNextChunk(chunk)) {
+        switch (chunk.m_id) {
+        case 'TYPE':
+            m_type = static_cast<unsigned char>(chunkFile.Get2());
+            break;
 
-		PSVECAdd(&s_bound.m_min, &localPosition, &s_bound.m_min);
-		PSVECAdd(&s_bound.m_max, &localPosition, &s_bound.m_max);
+        case 'OBJN': {
+            unsigned short objIndex = chunkFile.Get2();
 
-		s_light_no = 0;
-		InsertShadow_r(m_nodePool);
-	}
-}
+            m_mapObject = GetMapObjByIndex(objIndex);
+            signed char meshType = m_mapObject->m_meshType;
+            if (meshType == 4) {
+                m_mapObject->m_drawPriority = 0xFF;
+                m_mapObject->m_baseDrawPriority = 0xFF;
+                m_mapObject->m_enableFullScreenShadow = 0;
+            } else if (meshType == 3) {
+                m_mapObject->m_enableFullScreenShadow = 0;
+            }
+            break;
+        }
 
-/*
- * --INFO--
- * PAL Address: 0x8002d308
- * PAL Size: 584b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void ClearFlag_r(COctNode* node)
-{
-	int i;
+        case 'NODN': {
+            m_nodeCount = chunkFile.Get2();
+            signed char mapObjType = m_mapObject->m_meshType;
+            if ((mapObjType != 1) && (static_cast<unsigned int>(System.m_execParam) >= 3U)) {
+                System.Printf(const_cast<char*>(sMapOctTreeNodeMeshTypeFmt), m_nodeCount, mapObjType);
+            }
 
-	if (node->m_meshCount != 0) {
-		node->m_drawFlags &= s_shadow_no;
-	}
-	for (i = 0; i < 8; i++) {
-		if (node->m_children[i] == 0) {
-			return;
-		}
-		ClearFlag_r(node->m_children[i]);
-	}
-}
+            nodeCount = m_nodeCount;
+            m_nodePool = new (MapMng.m_stage, const_cast<char*>(s_mapocttree_cpp), 0x59)
+                COctNode[nodeCount];
+            break;
+        }
 
-/*
- * --INFO--
- * PAL Address: 8002d2dc
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void COctTree::ClearFlag(unsigned long flag)
-{
-	s_shadow_no = ~flag;
-	ClearFlag_r(m_nodePool);
-}
+        case 'INFO':
+            m_unk01 = chunkFile.Get1();
+            break;
 
-/*
- * --INFO--
- * PAL Address: 0x8002cd38
- * PAL Size: 440b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long flag)
-{
-	float radiusPad;
-	Mtx inverseMtx;
-	CMapHit* mapHit;
+        case 'TREE':
+            chunkFile.PushChunk();
+            while (chunkFile.GetNextChunk(chunk)) {
+                if (chunk.m_id == 'NODE') {
+                    COctNode* node;
 
-	if (m_type == 2) {
-		mapHit = static_cast<CMapHit*>(m_mapObject->m_mapData);
-		if (mapHit != 0) {
-			PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
-			PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
-			PSMTXMultVec(inverseMtx, &cylinder->m_top, &s_cyl.m_top);
-			PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &s_cyl.m_axis);
-			PSMTXMultVecSR(inverseMtx, move, &s_mvec);
+                    chunkFile.PushChunk();
+                    while (chunkFile.GetNextChunk(chunk)) {
+                        switch (chunk.m_id) {
+                        case 'OBJ ': {
+                            node = m_nodePool + static_cast<unsigned short>(chunkFile.Get2());
+                            node->m_meshCount = chunkFile.Get2();
+                            node->m_meshStart = chunkFile.Get2();
+                            break;
+                        }
 
-			s_cyl.m_radius = cylinder->m_radius;
-			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
-			if (s_cyl.m_bottom.x < s_cyl.m_top.x) {
-				s_cyl.m_bound.m_min.x = s_cyl.m_bottom.x - radiusPad;
-				s_cyl.m_bound.m_max.x = s_cyl.m_top.x + radiusPad;
-			} else {
-				s_cyl.m_bound.m_min.x = s_cyl.m_top.x - radiusPad;
-				s_cyl.m_bound.m_max.x = s_cyl.m_bottom.x + radiusPad;
-			}
+                        case 'BOND':
+                            node->m_bound.m_min.x = chunkFile.GetF4();
+                            node->m_bound.m_min.y = chunkFile.GetF4();
+                            node->m_bound.m_min.z = chunkFile.GetF4();
+                            node->m_bound.m_max.x = chunkFile.GetF4();
+                            node->m_bound.m_max.y = chunkFile.GetF4();
+                            node->m_bound.m_max.z = chunkFile.GetF4();
+                            break;
 
-			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
-			if (s_cyl.m_bottom.y < s_cyl.m_top.y) {
-				s_cyl.m_bound.m_min.y = s_cyl.m_bottom.y - radiusPad;
-				s_cyl.m_bound.m_max.y = s_cyl.m_top.y + radiusPad;
-			} else {
-				s_cyl.m_bound.m_min.y = s_cyl.m_top.y - radiusPad;
-				s_cyl.m_bound.m_max.y = s_cyl.m_bottom.y + radiusPad;
-			}
+                        case 'CHLD':
+                            int childCount = 0;
 
-			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
-			if (s_cyl.m_bottom.z < s_cyl.m_top.z) {
-				s_cyl.m_bound.m_min.z = s_cyl.m_bottom.z - radiusPad;
-				s_cyl.m_bound.m_max.z = s_cyl.m_top.z + radiusPad;
-			} else {
-				s_cyl.m_bound.m_min.z = s_cyl.m_top.z - radiusPad;
-				s_cyl.m_bound.m_max.z = s_cyl.m_bottom.z + radiusPad;
-			}
-			InsertShadow_level = flag;
-			if (CheckHitCylinder_r(m_nodePool) != 0) {
-				return 1;
-			}
-		}
-	}
+                            for (int i = 0; i < 8; i++) {
+                                short childIndex = chunkFile.Get2();
 
-	return 0;
+                                if (childIndex != -1) {
+                                    node->m_children[childCount] = m_nodePool + static_cast<unsigned short>(childIndex);
+                                    childCount++;
+                                }
+                            }
+
+                            for (int i = childCount; i < 8; i++) {
+                                node->m_children[i] = 0;
+                            }
+                            break;
+                        }
+                    }
+                    chunkFile.PopChunk();
+                }
+            }
+            chunkFile.PopChunk();
+            break;
+        }
+    }
+
+    chunkFile.PopChunk();
+    return 1;
 }
 
 /*
@@ -986,4 +954,37 @@ COctNode::COctNode()
 {
 	m_lightFlags = 0;
 	m_shadowFlags = 0;
+}
+/*
+ * --INFO--
+ * PAL Address: 0x8002f384
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+COctTree::~COctTree()
+{
+	COctNode* rootNode = m_nodePool;
+
+	if (rootNode != 0) {
+		delete[] rootNode;
+		m_nodePool = 0;
+	}
+
+	m_mapObject = 0;
+	m_nodeCount = 0;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+COctTree::COctTree()
+{
+	m_nodePool = 0;
+	m_mapObject = 0;
+	m_drawFlags = 0;
 }

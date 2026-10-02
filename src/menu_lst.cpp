@@ -51,69 +51,68 @@ STATIC_ASSERT(offsetof(MenuLstState, cursor) == 0x26);
  */
 void CMenuPcs::MLstDraw()
 {
+	MenuLstEntry* item;
+	CFont* font;
+	short menuMode;
+	int i;
+	float y;
+	float h;
+	float w;
+	float x;
+	float v;
+	GXColor colors[4];
+
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	short menuMode = this->m_menuLstState->mode;
-	MenuLstEntry* item = this->m_menuLstList->entries;
-	float rowHeight;
+	menuMode = this->m_menuLstState->mode;
+	item = this->m_menuLstList->entries;
 
-	for (int i = 0; i < this->m_menuLstList->count; i++, item++) {
+	for (i = 0; i < this->m_menuLstList->count; i++, item++) {
 		int tex = item->tex;
 		if (tex >= 0) {
-			float x = (float)item->x;
+			x = (float)item->x;
 			float zero = kMLstZero;
-			float v = zero;
-			float y = (float)item->y;
-			float w = (float)item->width;
-			float h = (float)item->height;
+			v = zero;
+			y = (float)item->y;
+			w = (float)item->width;
+			h = (float)item->height;
 			float alpha = item->alpha;
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
-			GXColor color;
-			color.r = 0xff;
-			color.g = 0xff;
-			color.b = 0xff;
-			color.a = (unsigned char)(kMLstColorMax * alpha);
-			GXSetChanMatColor(GX_COLOR0A0, color);
+			colors[0].r = 0xff;
+			colors[0].g = 0xff;
+			colors[0].b = 0xff;
+			colors[0].a = (unsigned char)(kMLstColorMax * alpha);
+			GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 			if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
-				x = (float)(x + kMLstSelectedOffsetX);
+				x += kMLstSelectedOffsetX;
 				v += (float)item->height;
 			}
 
 			MenuPcs.DrawRect(0, x, y, w, h, zero, v, item->z, item->z, zero);
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5c));
-			rowHeight = kMLstRowHeight;
-			float iconX = (float)((double)item->x - kMLstRowHeight * kMLstHalfDouble);
+			w = kMLstRowHeight;
+			float iconX = item->x - w / 2.0;
 			float iconY = (float)(item->y - 6);
 			v = zero;
 			if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
 				v += (float)item->height;
 			}
-			MenuPcs.DrawRect(
-				0,
-				iconX,
-				iconY,
-				rowHeight,
-				rowHeight,
-				zero,
-				v,
-				item->z,
-				item->z,
-				zero);
+			MenuPcs.DrawRect(0, iconX, iconY, w, w, zero, v, item->z, item->z, zero);
 		}
 	}
 
-	CFont* font = this->m_fonts[4];
+	font = this->m_fonts[4];
 	font->SetMargin(kMLstOne);
 	font->SetShadow(0);
 	font->SetScale(kMLstOne);
 	font->DrawInit();
 
 	item = this->m_menuLstList->entries;
-	for (int i = 0; i < this->m_menuLstList->count; i++) {
+	for (i = 0; i < this->m_menuLstList->count; i++, item++) {
 		font->SetColor(CColor(0xff, 0xff, 0xff, (unsigned char)(kMLstColorMax * item->alpha)).color);
 
 		const char* text = GetMenuStr(i + 0x2e);
@@ -122,20 +121,18 @@ void CMenuPcs::MLstDraw()
 		float textX = (float)(item->x + 0x28);
 		float textY = (float)(item->y + 3);
 		if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
-			textX = (float)(textX + kMLstSelectedOffsetX);
+			textX += kMLstSelectedOffsetX;
 		}
 
 		font->SetPosX(textX);
 		font->SetPosY(textY - kMLstTextYOffset);
 		font->Draw(text);
-
-		item++;
 	}
 
 	DrawInit();
 	if (menuMode == 1) {
 		MenuLstEntry* curItem = &this->m_menuLstList->entries[this->m_menuLstState->cursor];
-		float cursorYF = (float)((double)(curItem->height - 0x20) * kMLstHalfDouble + (double)curItem->y);
+		float cursorYF = (curItem->height - 0x20) / 2.0 + curItem->y;
 		int cursorY = (int)cursorYF;
 		int cursorX = (int)((float)(curItem->x - 0x38) + (float)((int)System.m_frameCounter % 8));
 		DrawCursor(cursorX, cursorY, kMLstOne);
@@ -144,7 +141,7 @@ void CMenuPcs::MLstDraw()
 	DrawInit();
 	int helpMessageId = this->m_menuLstState->cursor + 0x25c;
 	CFont* helpFont = this->m_fonts[0];
-	float helpX = (float)-(rowHeight * kMLstHalf - kMLstHelpCenterX);
+	float helpX = kMLstHelpCenterX - w / 2;
 	float helpY = kMLstHelpY;
 	DrawHelpMessage(
 		helpMessageId,
@@ -227,9 +224,6 @@ int CMenuPcs::MLstCtrl()
 	float one;
 	short press;
 	short hold;
-	unsigned int itemCount;
-	unsigned int chunkCount;
-	int i;
 	int startFrame;
 	int duration;
 	int result;
@@ -243,7 +237,7 @@ int CMenuPcs::MLstCtrl()
 		if ((hold & 0x48) != 0) {
 			MenuLstState* st = this->m_menuLstState;
 			if (st->cursor != 0) {
-				st->cursor = st->cursor - 1;
+				st->cursor--;
 			} else {
 				st->cursor = 8;
 			}
@@ -251,7 +245,7 @@ int CMenuPcs::MLstCtrl()
 		} else if ((hold & 0x24) != 0) {
 			MenuLstState* st = this->m_menuLstState;
 			if (st->cursor < 8) {
-				st->cursor = st->cursor + 1;
+				st->cursor++;
 			} else {
 				st->cursor = 0;
 			}
@@ -278,7 +272,7 @@ int CMenuPcs::MLstCtrl()
 	if (result != 0) {
 		one = kMLstOne;
 		MenuLstEntry* entry = this->m_menuLstList->entries;
-		for (i = 0; (itemCount = (unsigned int)this->m_menuLstList->count), i < (int)itemCount; i++) {
+		for (int j = 0; j < this->m_menuLstList->count; j++) {
 			entry->alpha = one;
 			entry->z = one;
 			entry++;
@@ -318,7 +312,7 @@ int CMenuPcs::MLstOpen()
 
 	if (this->m_menuLstState->initialized == '\0') {
 		int i;
-		short initializedCount;
+		int initializedCount;
 		short yPos;
 		double itemCenter;
 		double xOrigin;
@@ -337,9 +331,8 @@ int CMenuPcs::MLstOpen()
 		initializedCount = 0;
 		yPos = 0x18;
 		for (i = 0; i < 9; i++) {
-			entry = &this->m_menuLstList->entries[i];
+			entry = &this->m_menuLstList->entries[initializedCount++];
 			entry->unk_2C = 2;
-			initializedCount++;
 			entry->tex = 0x5B;
 			entry->width = 0xE0;
 			entry->height = 0x28;

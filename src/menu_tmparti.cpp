@@ -148,17 +148,25 @@ inline void CMenuPcs::TmpArtiInit()
  */
 void CMenuPcs::TmpArtiDraw()
 {
+	TmpArtiEntry* entry;
+	const CCaravanWork* caravanWork;
+	CFont* font;
+	int i;
+	GXColor colors[4];
+	float left;
+	float top;
+
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	TmpArtiEntry* entry = m_tmpArtiList->entries;
-	const CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
+	caravanWork = Game.m_scriptFoodBase[0];
+	entry = m_tmpArtiList->entries;
 
-	for (int i = 0; i < m_tmpArtiList->count; i++) {
+	for (i = 0; i < m_tmpArtiList->count; i++) {
 		if (entry->tex >= 0) {
 			int tex = entry->tex;
-			float left = (float)entry->x;
-			float top = (float)entry->y;
+			left = (float)entry->x;
+			top = (float)entry->y;
 			float width = (float)entry->width;
 			float height = (float)entry->height;
 			float s = entry->s;
@@ -173,12 +181,11 @@ void CMenuPcs::TmpArtiDraw()
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 
-			GXColor color;
-			color.r = 0xFF;
-			color.g = 0xFF;
-			color.b = 0xFF;
-			color.a = (unsigned char)(int)(kTmpArtiColorMax * alpha);
-			GXSetChanMatColor(GX_COLOR0A0, color);
+			colors[0].r = 0xFF;
+			colors[0].g = 0xFF;
+			colors[0].b = 0xFF;
+			colors[0].a = (unsigned char)(int)(kTmpArtiColorMax * alpha);
+			GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 			float z = entry->z;
 			MenuPcs.DrawRect(0, left, top, width, height, s, t, z, z, kTmpArtiZero);
@@ -187,36 +194,35 @@ void CMenuPcs::TmpArtiDraw()
 	}
 
 	entry = m_tmpArtiList->entries;
-	for (int i = 0; i < 4; i++) {
-		short icon = caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i];
-		if (icon >= 0) {
+	for (i = 0; i < 4; i++) {
+		if (caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] >= 0) {
 			int posX = (int)static_cast<float>(entry->x + entry->width - 0x10);
 			int posY = (int)(static_cast<float>(entry->y + 6) - kTmpArtiOne);
-			DrawSingleIcon(icon, posX, posY, entry->alpha, 0, kTmpArtiZero);
+			DrawSingleIcon(caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i], posX, posY,
+			               entry->alpha, 0, kTmpArtiOne);
 		}
 		entry++;
 	}
 
-	CFont* font = m_fonts[4];
+	font = m_fonts[4];
 	font->SetMargin(kTmpArtiOne);
 	font->SetShadow(0);
 	font->SetScale(kTmpArtiFontScale);
 	font->DrawInit();
 
 	entry = m_tmpArtiList->entries;
-	for (int i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++) {
 		if (caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] >= 0) {
 			float alpha = entry->alpha;
-			CColor textColor(0xFF, 0xFF, 0xFF, kTmpArtiColorMax * alpha);
-			font->SetColor(textColor.color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, kTmpArtiColorMax * alpha).color);
 
 			const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[caravanWork->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + i] * 5 + 4];
 			float width = font->GetWidth(text);
-			float posX = (float)((((float)entry->width - width) * kTmpArtiHalfDouble) + (float)entry->x);
-			float posY = (float)(entry->y + 11);
+			float posX = (entry->width - width) / 2.0 + entry->x;
+			top = (float)(entry->y + 11);
 
 			font->SetPosX(posX);
-			font->SetPosY(posY - kTmpArtiTextYOffset);
+			font->SetPosY(top - kTmpArtiTextYOffset);
 			font->Draw(text);
 		}
 		entry++;
@@ -335,8 +341,8 @@ int CMenuPcs::TmpArtiCtrl()
  */
 unsigned int CMenuPcs::TmpArtiOpen()
 {
-	int completedItems;
 	TmpArtiEntry* entry;
+	int completedItems;
 	int itemCount;
 	int currentFrame;
 	unsigned int result;
@@ -357,8 +363,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 				entry->alpha = kTmpArtiOne;
 			} else {
 				entry->timer = entry->timer + 1;
-				double ratio = kTmpArtiOneDouble / (double)entry->duration;
-				entry->alpha = (float)(ratio * (double)entry->timer);
+				entry->alpha = (1.0 / entry->duration) * entry->timer;
 			}
 		}
 		entry++;
@@ -366,7 +371,14 @@ unsigned int CMenuPcs::TmpArtiOpen()
 
 	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
-		TmpArtiInit0();
+		float one = kTmpArtiOne;
+		entry = this->m_tmpArtiList->entries;
+		for (int count = itemCount; count > 0; count--) {
+			entry->startFrame = 0;
+			entry->duration = 1;
+			entry->alpha = one;
+			entry++;
+		}
 		result = 1;
 	}
 

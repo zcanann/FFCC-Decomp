@@ -4,8 +4,6 @@
 #include "types.h"
 #include "dolphin/gx/GXStruct.h"
 
-struct DVDFileInfo;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -16,22 +14,12 @@ s32 THPSimpleOpen(const char*);
 s32 THPSimpleClose(void);
 s32 THPSimpleCalcNeedMemory(void);
 s32 THPSimpleSetBuffer(u8*);
-void ReadFrameAsync();
-void __THPSimpleDVDCallback__FlP11DVDFileInfo(long, DVDFileInfo*);
 s32 THPSimplePreLoad(s32);
 void THPSimpleAudioStart(void);
 void THPSimpleAudioStop(void);
 s32 THPSimpleLoadStop(void);
 s32 THPSimpleDecode(s32);
-void CheckPrefetch();
-void VideoDecode(unsigned char*);
 s32 THPSimpleDrawCurrentFrame(GXRenderModeObj*, int, int, int, int);
-void MixAudio__FPsPsUl(short*, short*, unsigned long);
-void THPAudioMixCallback__Fv();
-
-#define MixAudio MixAudio__FPsPsUl
-#define THPAudioMixCallback THPAudioMixCallback__Fv
-#define __THPSimpleDVDCallback __THPSimpleDVDCallback__FlP11DVDFileInfo
 
 #ifdef __cplusplus
 }

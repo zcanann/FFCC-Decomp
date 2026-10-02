@@ -514,7 +514,7 @@ config.libs = [
             Object(
                 NonMatching,
                 "cflat_r2system.cpp",
-                extra_cflags=["-str reuse,nopool,readonly", "-use_lmw_stmw on"],
+                extra_cflags=["-str reuse,nopool,readonly", "-use_lmw_stmw on", "-inline auto,deferred"],
             ),
             Object(NonMatching, "cflat_runtime.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
             Object(NonMatching, "cflat_runtime2.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
@@ -784,7 +784,7 @@ config.libs = [
                     "-use_lmw_stmw on",
                 ],
             ),
-            Object(NonMatching, "THPSimple.cpp"),
+            Object(NonMatching, "THPSimple.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "usb.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "USBStreamData.cpp"),
             Object(Matching, "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),

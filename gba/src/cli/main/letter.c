@@ -1697,15 +1697,15 @@ void LetterRead_PrintNextLine(void)
     Text_SetFill(0, 0);
     Text_Clear();
     if (sLetterAlign) {
-        n = Text_Print(buf, TEXT_WIDTH);
+        s32 width = Text_Print(buf, TEXT_WIDTH);
         i = (win.width - 5) * 8;
-        if (n >= i) {
+        if (width >= i) {
             Text_SetX(0);
         } else {
-            n = i - n;
+            s32 offset = i - width;
             if (sLetterAlign == 1)
-                n >>= 1;
-            Text_SetX(n);
+                offset >>= 1;
+            Text_SetX(offset);
         }
     }
     Text_Print(buf, TEXT_DRAW);

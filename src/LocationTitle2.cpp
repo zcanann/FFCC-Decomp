@@ -47,13 +47,6 @@ static inline LocationTitle2Work* GetLocationTitle2Work(pppLocationTitle2* locat
         locationTitle->m_workArea + GetLocationTitle2DataOffsets(offsets)->m_workOffset);
 }
 
-static inline LocationTitle2ColorBlock* GetLocationTitle2ColorBlock(
-    pppLocationTitle2* locationTitle, pppLocationTitle2Offsets* offsets)
-{
-    return reinterpret_cast<LocationTitle2ColorBlock*>(
-        locationTitle->m_workArea + GetLocationTitle2DataOffsets(offsets)->m_colorOffset);
-}
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -208,34 +201,37 @@ static const char s_locationNodeName[] = "loc";
  */
 extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Step* unkB, pppLocationTitle2Offsets* unkC)
 {
-    LocationTitle2Particle* particles;
-    CGObject* owner;
-    CCharaPcs::CHandle* handle;
-    CChara::CModel* model;
-    int nodeIndex;
     CChara::CNode* node;
-    float zOffset;
-    u32 frameIndex;
-    int i;
-    Vec stepDir;
-    Vec scaled;
-    Vec interp[21];
+    Vec* interpWrite;
+    int j;
     LocationTitle2Particle* startParticle;
     Vec* interpRead;
-    Vec* interpWrite;
     LocationTitle2Particle* dst;
-    int startIndex;
-    int inserted;
-    float stepScale;
+    int i;
+    CCharaPcs::CHandle* handle;
+    Vec stepDir;
+    int nodeIndex;
     LocationTitle2Work* work;
+    float stepScale;
+    float zOffset;
     LocationTitle2ColorBlock* colorData;
+    LocationTitle2Particle* particles;
+    Vec interp[21];
+    Vec scaled;
+    CChara::CModel* model;
+    u32 frameIndex;
+    int inserted;
+    CGObject* owner;
+    int startIndex;
 
     if (ppvUserStopPartF != 0) {
         return;
     }
 
-    work = GetLocationTitle2Work(locationTitle, unkC);
-    colorData = GetLocationTitle2ColorBlock(locationTitle, unkC);
+    work = reinterpret_cast<LocationTitle2Work*>(
+        locationTitle->m_workArea + GetLocationTitle2DataOffsets(unkC)->m_workOffset);
+    colorData = reinterpret_cast<LocationTitle2ColorBlock*>(
+        locationTitle->m_workArea + GetLocationTitle2DataOffsets(unkC)->m_colorOffset);
     rand();
 
     if (unkB->m_dataValIndex == 0xFFFF) {
@@ -333,8 +329,8 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
 
                 pppCopyVector(particles[startIndex + 1 + inserted].m_pos, startParticle[1].m_pos);
 
-                for (i = 0; i < inserted; i++) {
-                    dst = &particles[startIndex + (i + 1)];
+                for (j = 0; j < inserted; j++) {
+                    dst = &particles[startIndex + 1 + j];
                     interpRead->z += zOffset;
                     pppCopyVector(dst->m_pos, *interpRead);
                     memcpy(&dst->m_color, &colorData->m_color, 4);

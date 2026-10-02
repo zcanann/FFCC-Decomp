@@ -80,25 +80,79 @@ void calc(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, _PARTICLE_
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShpTail3* stepData, _pppCtrlTable* offsets)
+void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShpTail3* step, _pppCtrlTable* offsets)
 {
-    PYmMegaBirthShpTail3* step = stepData;
-    YmMegaBirthShpTail3DataOffsets* serializedOffsets = GetYmMegaBirthShpTail3DataOffsets(offsets);
-    const s32 colorOffset = serializedOffsets->m_colorOffset;
-    const s32 particleDataOffset = serializedOffsets->m_workOffset;
-    s32 trailReadIndex;
-    VYmMegaBirthShpTail3* work = reinterpret_cast<VYmMegaBirthShpTail3*>(object->m_workArea + particleDataOffset);
-    VColor* colorWork = (VColor*)(object->m_workArea + colorOffset);
-    u8* particle = reinterpret_cast<u8*>(work->m_particles);
+    s32 startIndex;
+    VYmMegaBirthShpTail3* work;
+    VColor* colorWork;
+    u8* particle;
     _PARTICLE_WMAT* wmats;
-    _PARTICLE_COLOR* colors = work->m_colors;
+    _PARTICLE_COLOR* colors;
+    tagOAN3_SHAPE* shape;
+    pppShapeAnimData* shapeAnim;
+    u32 i;
+    float colorStepR;
+    float segDz;
+    float nextY;
+    s32 count;
+    float nextZ;
+    s32 nextIndex;
+    s32 lastIndex;
+    float diffG;
+    float segLen;
+    u8 zEnable;
+    _PARTICLE_DATA* particlesBase;
+    _PARTICLE_WMAT* wmatsBase;
+    float colorStepG;
+    u32 particleShapeFrame;
+    float baseX;
+    float baseY;
+    float diffR;
+    float colorStepB;
+    float alphaMul;
+    float baseZ;
+    float segCursor;
+    float segRemain;
+    float drawScale;
+    float nextX;
+    Vec* history;
+    float diffA;
+    float segDx;
+    u32 workRand;
+    u32 shapeFrameStep;
+    float segDy;
+    float colorStepA;
+    float curX;
+    float diffB;
+    u32 shapeFrameCount;
     s8 hasRequiredMemory;
+    float curY;
+    float curZ;
+    float scaleStep;
+    float countMinusOne;
+    pppFVECTOR4 colorStart;
+    pppFVECTOR4 colorEnd;
+    pppFMATRIX drawMtx;
+    Vec zeroVec;
+    Vec seg;
+    pppFVECTOR4 camPos;
+    pppFVECTOR4 pos;
+    pppFVECTOR4 mngPos;
+    Vec zeroVecB;
+    Vec segB;
+    GXColor amb;
 
-    wmats = work->m_wmats;
+    work = (VYmMegaBirthShpTail3*)(object->m_workArea + GetYmMegaBirthShpTail3DataOffsets(offsets)->m_workOffset);
+    colorWork = (VColor*)(object->m_workArea + GetYmMegaBirthShpTail3DataOffsets(offsets)->m_colorOffset);
+    particlesBase = work->m_particles;
+    colors = work->m_colors;
+    wmatsBase = work->m_wmats;
+    particle = (u8*)particlesBase;
+    wmats = wmatsBase;
 
-    if (particle == 0) {
+    if (particlesBase == 0) {
         hasRequiredMemory = false;
-    } else if (wmats == 0) {
+    } else if (wmatsBase == 0) {
         hasRequiredMemory = false;
     } else {
         hasRequiredMemory = true;
@@ -109,227 +163,181 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
     if (step->m_shapeIndex == 0xFFFF) {
         return;
     }
-    const u32 dataValIndex = step->m_shapeIndex;
 
-    pppShapeAnimData* shapeAnim =
-        static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[dataValIndex]->m_animData);
-    pppSetDrawEnv(
-        0, &object->m_drawMatrix, step->m_depth, step->m_lightTarget, step->m_fogIndex,
-        step->m_blendMode, 0, step->m_disableDepthTest == 0, 1, 0);
+    shapeAnim = static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[step->m_shapeIndex]->m_animData);
+    if (step->m_disableDepthTest != 0) {
+        zEnable = 0;
+    } else {
+        zEnable = 1;
+    }
+    pppSetDrawEnv(0, &object->m_drawMatrix, step->m_depth, step->m_lightTarget, step->m_fogIndex,
+                  step->m_blendMode, 0, zEnable, 1, 0);
     pppSetBlendMode(step->m_blendMode);
 
-    for (u32 i = 0; i < work->m_maxParticles; i++) {
+    for (i = 0; i < work->m_maxParticles; i++) {
         if (*(u16*)(particle + 0x22) != 0) {
-            const u32 frameCountRaw = step->m_drawCount;
-                u32 frameCount = frameCountRaw;
-                pppFMATRIX drawMtx;
-                Vec zeroVec;
-                Vec segVec;
-                Vec cameraPos;
-                Vec trailPos;
-                Vec managerPos;
-                GXColor amb;
-                Vec* curHist;
-                tagOAN3_SHAPE* shape;
-                u32 particleShapeFrame;
-                u32 shapeFrameStep;
-                const float alphaScale = (float)colorWork->m_alpha / 16384.0f;
-                const float stepDivisor = (float)(s32)(frameCountRaw - 1);
-                s32 trailNextIndex;
-                const s32 trailMaxIndex = *(u8*)(particle + 0x37) - 1;
-                float drawScale;
-                float fadeR = (float)(work->m_colorStart[0] >> 7);
-                float fadeG = (float)(work->m_colorStart[1] >> 7);
-                float fadeB = (float)(work->m_colorStart[2] >> 7);
-                float fadeA = (float)(work->m_colorStart[3] >> 7) * alphaScale;
-                const float fadeAEnd = (float)(work->m_colorEnd[3] >> 7) * alphaScale;
-                const float fadeANum = fadeA - fadeAEnd;
-                trailReadIndex = *(u8*)(particle + 0x38);
-                const float fadeRNum = fadeR - (float)(work->m_colorEnd[0] >> 7);
-                const float fadeGNum = fadeG - (float)(work->m_colorEnd[1] >> 7);
-                const float fadeBNum = fadeB - (float)(work->m_colorEnd[2] >> 7);
-                float fadeRStep;
-                float fadeGStep;
-                float fadeBStep;
-                float fadeAStep;
-                if (stepDivisor != 0.0f) {
-                    fadeRStep = fadeRNum / stepDivisor;
-                    fadeGStep = fadeGNum / stepDivisor;
-                    fadeBStep = fadeBNum / stepDivisor;
-                    fadeAStep = fadeANum / stepDivisor;
-                }
-                drawScale = step->m_drawScaleStart;
-                trailNextIndex = trailReadIndex + 1;
-                const float drawScaleStep =
-                    (drawScale - step->m_drawScaleEnd) / stepDivisor;
-                Vec* history = (Vec*)(particle + 0x80);
-                u32 workRand;
-                u32 shapeFrameCount;
-                float trailX, trailY, trailZ;
-                float camX;
-                float segX, segY, segZ;
-                float camY, camZ;
-                float segLen;
-                float startX, startY, startZ;
-                float spacingAccum;
-                float segProgress;
+            count = step->m_drawCount;
+            countMinusOne = (float)(count - 1);
+            alphaMul = (float)colorWork->m_alpha / 16384.0f;
+            lastIndex = *(u8*)(particle + 0x37) - 1;
+            colorStart.x = (float)(work->m_colorStart[0] >> 7);
+            colorStart.y = (float)(work->m_colorStart[1] >> 7);
+            colorStart.z = (float)(work->m_colorStart[2] >> 7);
+            colorStart.w = (float)(work->m_colorStart[3] >> 7);
+            colorEnd.x = (float)(work->m_colorEnd[0] >> 7);
+            colorEnd.y = (float)(work->m_colorEnd[1] >> 7);
+            colorEnd.z = (float)(work->m_colorEnd[2] >> 7);
+            colorEnd.w = (float)(work->m_colorEnd[3] >> 7);
+            colorStart.w *= alphaMul;
+            colorEnd.w *= alphaMul;
+            diffA = colorStart.w - colorEnd.w;
+            startIndex = *(u8*)(particle + 0x38);
+            segCursor = step->m_segmentLength;
+            diffR = colorStart.x - colorEnd.x;
+            diffG = colorStart.y - colorEnd.y;
+            diffB = colorStart.z - colorEnd.z;
+            if (countMinusOne != 0.0f) {
+                colorStepR = diffR / countMinusOne;
+                colorStepG = diffG / countMinusOne;
+                colorStepB = diffB / countMinusOne;
+                colorStepA = diffA / countMinusOne;
+            }
 
-                spacingAccum = step->m_segmentLength;
-                {
-                    Vec* p = &history[trailReadIndex];
-                    trailX = p->x;
-                    trailY = p->y;
-                    trailZ = p->z;
-                }
-                if (trailReadIndex == trailMaxIndex) {
-                    trailNextIndex = 0;
-                }
-                {
-                    Vec* p = &history[trailNextIndex];
-                    camX = p->x;
-                    camY = p->y;
-                    camZ = p->z;
-                }
-                segX = camX - trailX;
-                segY = camY - trailY;
-                segZ = camZ - trailZ;
-                zeroVec.z = 0.0f;
-                zeroVec.y = 0.0f;
-                zeroVec.x = 0.0f;
-                segVec.x = segX;
-                segVec.y = segY;
-                segVec.z = segZ;
-                startZ = trailZ;
-                startY = trailY;
-                startX = trailX;
-                segLen = PSVECDistance(&zeroVec, &segVec);
-                segProgress = segLen;
+            drawScale = step->m_drawScaleStart;
+            history = (Vec*)(particle + 0x80);
+            curX = history[startIndex].x;
+            curY = history[startIndex].y;
+            curZ = history[startIndex].z;
+            nextIndex = startIndex + 1;
+            scaleStep = (drawScale - step->m_drawScaleEnd) / countMinusOne;
+            baseX = curX;
+            baseY = curY;
+            baseZ = curZ;
+            if (startIndex == lastIndex) {
+                nextIndex = 0;
+            }
+            nextX = history[nextIndex].x;
+            nextY = history[nextIndex].y;
+            nextZ = history[nextIndex].z;
+            segDx = nextX - curX;
+            segDy = nextY - curY;
+            segDz = nextZ - curZ;
+            zeroVec.z = 0.0f;
+            zeroVec.y = 0.0f;
+            zeroVec.x = 0.0f;
+            seg.x = segDx;
+            seg.y = segDy;
+            seg.z = segDz;
+            segLen = PSVECDistance(&zeroVec, &seg);
+            segRemain = segLen;
 
-                if (step->m_drawHead == 0) {
-                    goto fade_dec;
-                }
-                particleShapeFrame = *(u16*)(particle + 0x1C);
-                workRand = work->m_randomSeed;
-                shapeFrameStep = (u32)shapeAnim->m_frames[0].m_duration;
-                shapeFrameCount = (u32)shapeAnim->m_frameCount;
+            if (step->m_drawHead == 0) {
+                goto update_step;
+            }
 
-                for (frameCount = step->m_drawCount; 0 < (s32)frameCount; frameCount--) {
-                    curHist = &history[trailNextIndex];
-                    if ((0.0f != curHist->x) ||
-                        (0.0f != curHist->y) ||
-                        (0.0f != curHist->z)) {
-                        {
-                            workRand = (workRand * 0x80d + 7) & 0xFFFF;
-                            const u32 shapeFrame = (particleShapeFrame + workRand) / shapeFrameStep;
-                            shape = pppShapeFrame(shapeAnim, shapeFrame % shapeFrameCount);
+            particleShapeFrame = *(u16*)(particle + 0x1C);
+            workRand = work->m_randomSeed;
+            shapeFrameStep = shapeAnim->m_frames[0].m_duration;
+            shapeFrameCount = shapeAnim->m_frameCount;
 
-                            pppUnitMatrix(drawMtx);
-                            drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;
-                            drawMtx.value[1][1] = drawScale * ppvMng->m_scale.y;
-                            drawMtx.value[2][2] = drawScale * ppvMng->m_scale.z;
+            for (count = step->m_drawCount; count > 0; count--) {
+                if ((0.0f != ((Vec*)(particle + 0x80))[nextIndex].x) ||
+                    (0.0f != ((Vec*)(particle + 0x80))[nextIndex].y) ||
+                    (0.0f != ((Vec*)(particle + 0x80))[nextIndex].z)) {
+                    workRand = (workRand * 0x80d + 7) & 0xFFFF;
+                    shape = pppShapeFrame(shapeAnim, ((particleShapeFrame + workRand) / shapeFrameStep) % shapeFrameCount);
 
-                            if (step->m_rotationEnabled != 0) {
-                                pppFMATRIX rotMtx;
-                                PSMTXRotRad(rotMtx.value, 'z',
-                                            0.017453292f *
-                                                (float)*(u16*)(particle + frameCount * sizeof(u16) + 0x40));
-                                pppMulMatrix(drawMtx, rotMtx, drawMtx);
-                            }
+                    pppUnitMatrix(drawMtx);
+                    drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;
+                    drawMtx.value[1][1] = drawScale * ppvMng->m_scale.y;
+                    drawMtx.value[2][2] = drawScale * ppvMng->m_scale.z;
 
-                            trailPos.x = trailX;
-                            trailPos.y = trailY;
-                            trailPos.z = trailZ;
-                            if (step->m_matrixMode == 0) {
-                                PSMTXMultVec(ppvWorldMatrix, &trailPos, &cameraPos);
-                            } else if (step->m_matrixMode == 1) {
-                                managerPos.x = ppvMng->m_matrix.value[0][3];
-                                managerPos.y = ppvMng->m_matrix.value[1][3];
-                                managerPos.z = ppvMng->m_matrix.value[2][3];
-                                PSVECAdd(&managerPos, &trailPos, &trailPos);
-                                PSMTXMultVec(ppvCameraMatrix, &trailPos, &cameraPos);
-                            }
-
-                            drawMtx.value[0][3] = cameraPos.x;
-                            drawMtx.value[1][3] = cameraPos.y;
-                            drawMtx.value[2][3] = cameraPos.z;
-                            GXLoadPosMtxImm(drawMtx.value, 0);
-
-                            amb.r = (s8)fadeR;
-                            amb.g = (u8)fadeG;
-                            amb.b = (u8)fadeB;
-                            amb.a = (u8)(fadeA * (0.00787f * (127.0f - *(float*)(particle + 0x30))));
-                            if (amb.a > 0x7F) {
-                                amb.a = 0x7F;
-                            }
-                            GXSetChanAmbColor(GX_COLOR0A0, amb);
-                            pppDrawShp(shape, ppvEnv->m_materialSetPtr, step->m_blendMode);
-                        }
-
-                    fade_dec:
-                        fadeR -= fadeRStep;
-                        fadeG -= fadeGStep;
-                        fadeB -= fadeBStep;
-                        fadeA -= fadeAStep;
-                        drawScale -= drawScaleStep;
-                        if (step->m_segmentLength <= 0.0f) {
-                            break;
-                        }
-
-                        for (;;) {
-                            Vec innerZero;
-                            Vec innerSeg;
-                            const float spacing = step->m_segmentLength;
-                            if (segProgress >= spacing) {
-                                const float t = spacingAccum / segLen;
-                                float mx = segX * t;
-                                float my = segY * t;
-                                float mz = segZ * t;
-                                trailX = mx + startX;
-                                trailY = my + startY;
-                                trailZ = mz + startZ;
-                                spacingAccum = spacingAccum + spacing;
-                                segProgress = segProgress - spacing;
-                                break;
-                            }
-
-                            {
-                                s32 prevNext = trailNextIndex;
-                                trailNextIndex++;
-                                if (prevNext == trailMaxIndex) {
-                                    trailNextIndex = 0;
-                                }
-                            }
-                            if (trailNextIndex == trailReadIndex) {
-                                goto next_particle;
-                            }
-
-                            startX = camX;
-                            startY = camY;
-                            startZ = camZ;
-                            spacingAccum = spacingAccum - segLen;
-                            {
-                                Vec* p = &history[trailNextIndex];
-                                camY = p->y;
-                                camZ = p->z;
-                                camX = p->x;
-                                segY = camY - startY;
-                                segZ = camZ - startZ;
-                                segX = camX - startX;
-                            }
-                            innerZero.z = 0.0f;
-                            innerZero.y = 0.0f;
-                            innerZero.x = 0.0f;
-                            innerSeg.x = segX;
-                            innerSeg.y = segY;
-                            innerSeg.z = segZ;
-                            segLen = PSVECDistance(&innerZero, &innerSeg);
-                            segProgress = segProgress + segLen;
-                        }
+                    if (step->m_rotationEnabled != 0) {
+                        pppFMATRIX rotMtx;
+                        PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)*(u16*)(particle + count * sizeof(u16) + 0x40));
+                        pppMulMatrix(drawMtx, rotMtx, drawMtx);
                     }
-                }
-                next_particle:;
-        }
 
+                    pos.x = curX;
+                    pos.y = curY;
+                    pos.z = curZ;
+
+                    if (step->m_matrixMode == 0) {
+                        PSMTXMultVec(ppvWorldMatrix, (Vec*)&pos, (Vec*)&camPos);
+                    } else if (step->m_matrixMode == 1) {
+                        mngPos.x = ppvMng->m_matrix.value[0][3];
+                        mngPos.y = ppvMng->m_matrix.value[1][3];
+                        mngPos.z = ppvMng->m_matrix.value[2][3];
+                        PSVECAdd((Vec*)&mngPos, (Vec*)&pos, (Vec*)&pos);
+                        PSMTXMultVec(ppvCameraMatrix, (Vec*)&pos, (Vec*)&camPos);
+                    }
+
+                    drawMtx.value[0][3] = camPos.x;
+                    drawMtx.value[1][3] = camPos.y;
+                    drawMtx.value[2][3] = camPos.z;
+                    GXLoadPosMtxImm(drawMtx.value, 0);
+
+                    amb.r = (u8)colorStart.x;
+                    amb.g = (u8)colorStart.y;
+                    amb.b = (u8)colorStart.z;
+                    amb.a = (u8)(colorStart.w * (0.00787f * (127.0f - *(float*)(particle + 0x30))));
+                    if (amb.a > 0x7F) {
+                        amb.a = 0x7F;
+                    }
+                    GXSetChanAmbColor(GX_COLOR0A0, amb);
+                    pppDrawShp(shape, ppvEnv->m_materialSetPtr, step->m_blendMode);
+
+                update_step:
+                    colorStart.x -= colorStepR;
+                    colorStart.y -= colorStepG;
+                    colorStart.z -= colorStepB;
+                    colorStart.w -= colorStepA;
+                    drawScale -= scaleStep;
+                    if (step->m_segmentLength <= 0.0f) {
+                        goto next_particle;
+                    }
+
+                advance_segment:
+                    if (segRemain >= step->m_segmentLength) {
+                        float t = segCursor / segLen;
+                        curX = segDx * t;
+                        curY = segDy * t;
+                        curZ = segDz * t;
+                        curX += baseX;
+                        curY += baseY;
+                        curZ += baseZ;
+                        segCursor += step->m_segmentLength;
+                        segRemain -= step->m_segmentLength;
+                        continue;
+                    }
+
+                    if (nextIndex++ == lastIndex) {
+                        nextIndex = 0;
+                    }
+                    if (nextIndex == startIndex) {
+                        goto next_particle;
+                    }
+
+                    baseX = nextX;
+                    baseY = nextY;
+                    baseZ = nextZ;
+                    segCursor -= segLen;
+                    segDy = (nextY = history[nextIndex].y) - baseY;
+                    segDz = (nextZ = history[nextIndex].z) - baseZ;
+                    segDx = (nextX = history[nextIndex].x) - baseX;
+                    zeroVecB.z = 0.0f;
+                    zeroVecB.y = 0.0f;
+                    zeroVecB.x = 0.0f;
+                    segB.x = segDx;
+                    segB.y = segDy;
+                    segB.z = segDz;
+                    segLen = PSVECDistance(&zeroVecB, &segB);
+                    segRemain += segLen;
+                    goto advance_segment;
+                }
+            }
+        }
+    next_particle:
         if (wmats != 0) {
             wmats = wmats + 1;
         }
@@ -355,10 +363,10 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     s8 hasRequiredMemory;
     u32 i;
     int colorOffset;
-    u8* particleData;
+    int spawnCount;
     _PARTICLE_COLOR* particleColor;
     _PARTICLE_WMAT* worldMat;
-    int spawnCount;
+    u8* particleData;
 
     YmMegaBirthShpTail3DataOffsets* serializedOffsets = GetYmMegaBirthShpTail3DataOffsets(offsets);
     colorOffset = serializedOffsets->m_colorOffset;
@@ -496,11 +504,11 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             break;
         }
 
-        i = 0;
+        spawnCount = 0;
+        i = spawnCount;
         particleData = (u8*)work->m_particles;
         worldMat = work->m_wmats;
         particleColor = work->m_colors;
-        spawnCount = i;
 
         if ((ppvUserStopPartF == 0) && (param->m_shapeIndex != 0xffff)) {
             work->m_emitTimer = work->m_emitTimer + 1;
@@ -632,7 +640,15 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         memset(particleColor, 0, sizeof(_PARTICLE_COLOR));
     }
 
-    if ((s32)pYmMegaBirthShpTail3->m_spawnMode < 8 && (s32)pYmMegaBirthShpTail3->m_spawnMode >= 0) {
+    switch (pYmMegaBirthShpTail3->m_spawnMode) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7: {
         Vec baseDir;
         pppIVECTOR4 angles;
         pppFMATRIX rot;
@@ -658,20 +674,12 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         reinterpret_cast<Vec*>(particleData->m_matrix[1])->z *= pYmMegaBirthShpTail3->m_spawnScale.z;
         pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]),
                      *reinterpret_cast<Vec*>(particleData->m_matrix[1]));
+        break;
+    }
     }
 
-    if ((s32)pYmMegaBirthShpTail3->m_spawnMode < 6) {
-        if ((s32)pYmMegaBirthShpTail3->m_spawnMode >= 4) {
-            goto mode_4_5;
-        }
-        goto scalar;
-    }
-    if ((s32)pYmMegaBirthShpTail3->m_spawnMode >= 10) {
-        goto scalar;
-    }
-    goto path;
-
-scalar:
+    switch (pYmMegaBirthShpTail3->m_spawnMode) {
+    default:
     {
         if (0.0f != pYmMegaBirthShpTail3->m_spawnRange) {
             float scale = pYmMegaBirthShpTail3->m_spawnRange;
@@ -715,13 +723,14 @@ scalar:
             Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
             pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[0]), velocity, scale);
         }
-        goto done;
+        break;
     }
 
-mode_4_5:
+    case 4:
+    case 5:
     {
         if (0.0f == pYmMegaBirthShpTail3->m_spawnRange) {
-            goto done;
+            break;
         }
         float speedRandHalf = 0.5f * pYmMegaBirthShpTail3->m_spawnRange;
 
@@ -812,10 +821,13 @@ mode_4_5:
         particleData->m_matrix[0][0] *= pYmMegaBirthShpTail3->m_spawnScale.x;
         particleData->m_matrix[0][1] *= pYmMegaBirthShpTail3->m_spawnScale.y;
         particleData->m_matrix[0][2] *= pYmMegaBirthShpTail3->m_spawnScale.z;
-        goto done;
+        break;
     }
 
-path:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
     {
         Vec* pathBase = pppPObject->m_drawMatrixPtr;
 
@@ -913,10 +925,11 @@ path:
                 }
             }
         }
-        goto done;
+        break;
     }
 
-done:
+    }
+
 
     if (pYmMegaBirthShpTail3->m_fadeInFrames != 0) {
         *(float*)(particleBytes + 0x30) = (float)vColor->m_color.rgba[3];

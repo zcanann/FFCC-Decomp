@@ -10,12 +10,6 @@
 
 #include <string.h>
 
-static const float kPppMiasmaMinRadius = -1000.0f;
-static const float kPppMiasmaDefaultRadius = 1200.0f;
-static const float kPppMiasmaCameraInsidePadding = 10.0f;
-static const float kPppMiasmaZero = 0.0f;
-static const float kPppMiasmaOne = 1.0f;
-
 union PackedMiasmaColor {
     GXColor color;
     u32 raw;
@@ -106,8 +100,7 @@ static inline void _GXSetTevAlphaOp(int stage, int op, int bias, int scale, int 
 
 static inline float CalcSphereRadius(Vec* vertices, u16 count)
 {
-    const float& minRadius = kPppMiasmaMinRadius;
-    float radius = minRadius;
+    float radius = -1000.0f;
 
     for (u16 i = 0; i < count; i++) {
         if (radius < vertices[i].x) {
@@ -226,54 +219,58 @@ void pppConstructMiasma(pppMiasma* pppMiasma, _pppCtrlTable* ctrl)
  */
 void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTable* ctrl)
 {
-    pppModelSt* model;
-    MiasmaFrameWork* work;
-    VColor* colorWork;
-    MiasmaRadiusWork* radiusWork;
     pppCVECTOR drawColor;
-    PackedMiasmaColor packedWork;
-    int textureIndex;
-    PackedMiasmaColor packedColor;
-    Vec quadA;
-    Vec quadB;
-    Vec cameraPos;
-    Vec managerPos;
-    float secondaryScale;
-    float maxRadius;
-    float scaledRadius;
-    int texWidth;
-    int texHeight;
-    u32 scissorWidth;
-    u32 scissorHeight;
-    int sceneTexSize;
-    int maskTexSize;
-    int yOffset;
-    float yPos;
-    int slice;
-    int tevSwapChannel;
-    int tevAlphaScale;
-    int tevStageCount;
     int texGenCount;
-    int isCameraInside;
-    CGraphic* graphicPtr;
-    GXTexObj backSceneTex;
-    GXTexObj miasmaMaskTex;
-    GXTexObj secondaryMaskTex;
+    int yOffset;
+    Vec quadA;
+    MiasmaRadiusWork* radiusWork;
+    float width;
+    PackedMiasmaColor packedWork;
     Mtx44 screenMtx;
+    Vec quadB;
+    float yPos;
+    int tevSwapChannel;
+    int texWidth;
+    u32 scissorWidth;
+    int texHeight;
+    int textureIndex;
+    int sceneTexSize;
+    Vec cameraPos;
+    PackedMiasmaColor packedColor;
     Mtx firstLocalMtx;
+    float height;
+    float scaledRadius;
     Mtx firstScaleMtx;
+    float maxRadius;
+    GXTexObj backSceneTex;
+    int secondaryOffset;
+    VColor* colorWork;
+    int maskTexSize;
+    int maskOffset;
+    Vec managerPos;
+    pppModelSt* model;
+    int tevStageCount;
+    int tevStage;
+    int tevAlphaScale;
+    int isCameraInside;
+    GXTexObj miasmaMaskTex;
+    float secondaryScale;
+    GXTexObj secondaryMaskTex;
     Mtx secondLocalMtx;
-    Mtx secondScaleMtx;
     GXColor stepColor;
+    Mtx secondScaleMtx;
+    CGraphic* graphicPtr;
+    u32 scissorHeight;
+    MiasmaFrameWork* work;
+    int slice;
 
     Graphic.SetDrawDoneDebugData(0x31);
 
     work = GetMiasmaFrameWork(pppMiasma, ctrl);
     colorWork = GetMiasmaColorWork(pppMiasma, ctrl);
     radiusWork = GetMiasmaRadiusWork(pppMiasma, ctrl);
-
+    tevStage = 0;
     textureIndex = 0;
-    slice = 0;
     model = (pppModelSt*)ppvEnv->m_mapMeshPtr[step->m_dataValIndex];
     model->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
 
@@ -290,8 +287,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
     packedWork.bytes[2] = (u8)(work->m_position[2] >> 7);
     packedWork.bytes[3] = (u8)(work->m_position[3] >> 7);
 
-    sceneTexSize = GXGetTexBufferSize(640, 224, GX_TF_RGBA8, GX_FALSE, 0);
-    maskTexSize = GXGetTexBufferSize(640, 224, GX_CTF_R8, GX_FALSE, 0);
+    width = 640.0f;
+    height = 224.0f;
+    sceneTexSize = GXGetTexBufferSize(width, height, GX_TF_RGBA8, GX_FALSE, 0);
+    maskTexSize = GXGetTexBufferSize(width, height, GX_CTF_R8, GX_FALSE, 0);
 
     managerPos.x = ppvMng->m_matrix.value[0][3];
     managerPos.y = ppvMng->m_matrix.value[1][3];
@@ -307,8 +306,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         cameraPos.x = CameraPcs.m_positionX;
         cameraPos.y = CameraPcs.m_positionY;
         cameraPos.z = CameraPcs.m_positionZ;
-        const float& defaultRadius = kPppMiasmaDefaultRadius;
-        maxRadius = defaultRadius;
+        maxRadius = 1200.0f;
     }
 
     scaledRadius = maxRadius * radiusWork->m_scale;
@@ -316,22 +314,23 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         Game.unkFloat_0xca10 = scaledRadius;
     }
 
-    const float& cameraInsidePadding = kPppMiasmaCameraInsidePadding;
-    if ((cameraInsidePadding + scaledRadius) > PSVECDistance(&cameraPos, &managerPos)) {
+    if ((10.0f + scaledRadius) > PSVECDistance(&cameraPos, &managerPos)) {
         isCameraInside = 1;
     }
 
-    texHeight = 224;
-    texWidth = 640;
-    scissorHeight = 224;
-    scissorWidth = 640;
-    const float yStep = 224.0f;
     graphicPtr = &Graphic;
+    texHeight = height;
+    texWidth = width;
+    scissorHeight = height;
+    scissorWidth = width;
+    secondaryOffset = sceneTexSize + maskTexSize;
+    slice = 0;
+    maskOffset = sceneTexSize;
     do {
-        yPos = (float)slice * yStep;
+        yPos = (float)slice * height;
         yOffset = (int)yPos;
 
-        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backSceneTex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR,
+        Graphic.GetBackBufferRect2(graphicPtr->m_scratchTextureBuffer, &backSceneTex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR,
                                    GX_TF_RGBA8, 0);
         GXSetScissor(0, (u32)yPos, scissorWidth, scissorHeight);
 
@@ -346,11 +345,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             drawColor.rgba[2] = 0;
             drawColor.rgba[3] = 0xFF;
         }
-        gUtil.RenderColorQuad(kPppMiasmaZero, yPos, 640.0f,
-                              224.0f, *(GXColor*)drawColor.rgba);
+        gUtil.RenderColorQuad(0.0f, yPos, width,
+                              height, *(GXColor*)drawColor.rgba);
 
         pppSetDrawEnv(
-            &drawColor, &pppMiasma->m_drawMatrix, kPppMiasmaZero, 0, 0, 1, 0, 1, 1, 1);
+            &drawColor, &pppMiasma->m_drawMatrix, 0.0f, 0, 0, 1, 0, 1, 1, 1);
 
         _GXSetTevOrder(0, 0xFF, 0xFF, 4);
         GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -377,12 +376,12 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         GXSetNumTexGens(0);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         GXSetProjection(screenMtx, GX_PERSPECTIVE);
-        PSMTXScale(firstScaleMtx, kPppMiasmaOne, kPppMiasmaOne, kPppMiasmaOne);
+        PSMTXScale(firstScaleMtx, 1.0f, 1.0f, 1.0f);
         PSMTXConcat(firstScaleMtx, pppMiasma->m_localMatrix.value, firstLocalMtx);
         PSMTXConcat(ppvWorldMatrix, firstLocalMtx, pppMiasma->m_drawMatrix.value);
         GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
 
-        GXSetTevDirect(GX_TEVSTAGE0);
+        GXSetTevDirect((GXTevStageID)tevStage);
         pppInitBlendMode();
         pppSetBlendMode(1);
         GXSetCullMode(GX_CULL_FRONT);
@@ -405,6 +404,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         GXSetTevDirect(GX_TEVSTAGE0);
         GXSetCullMode(GX_CULL_BACK);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+        tevStage = 0;
         _GXSetTevColorIn(
             0, 0xF, 0xF, 0xF, 0xC);
         _GXSetTevColorOp(0, 0, 0, 2, 1, 0);
@@ -414,9 +414,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
 
         Graphic.SetDrawDoneDebugData(0x34);
         pppDrawMesh(model, pppMiasma->m_drawMatrixPtr, 0);
-        graphicPtr->SetDrawDoneDebugData(0x35);
+        Graphic.SetDrawDoneDebugData(0x35);
 
-        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &miasmaMaskTex, 0, yOffset, texWidth, texHeight, sceneTexSize,
+        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &miasmaMaskTex, 0, yOffset, texWidth, texHeight, maskOffset,
                                    GX_LINEAR, GX_CTF_R8, 0);
         if (step->m_miasma.m_useSecondaryMask != 0) {
             if (isCameraInside) {
@@ -430,8 +430,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
                 drawColor.rgba[2] = 0;
                 drawColor.rgba[3] = 0xFF;
             }
-            gUtil.RenderColorQuad(kPppMiasmaZero, yPos, 640.0f,
-                                  224.0f, *(GXColor*)drawColor.rgba);
+            gUtil.RenderColorQuad(0.0f, yPos, width,
+                                  height, *(GXColor*)drawColor.rgba);
             GXClearVtxDesc();
             GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
             GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
@@ -454,7 +454,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             GXSetCullMode(GX_CULL_FRONT);
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-            secondaryScale = kPppMiasmaOne - step->m_stepValue;
+            secondaryScale = 1.0f - step->m_stepValue;
             PSMTXScale(secondScaleMtx, secondaryScale, secondaryScale, secondaryScale);
             PSMTXConcat(secondScaleMtx, pppMiasma->m_localMatrix.value, secondLocalMtx);
             PSMTXConcat(ppvWorldMatrix, secondLocalMtx, pppMiasma->m_drawMatrix.value);
@@ -472,6 +472,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
                 pppDrawMesh(model, pppMiasma->m_drawMatrixPtr, 0);
                 Graphic.SetDrawDoneDebugData(0x37);
             }
+            tevStage = 0;
 
             GXSetTevDirect(GX_TEVSTAGE0);
             pppInitBlendMode();
@@ -490,12 +491,12 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             Graphic.SetDrawDoneDebugData(0x39);
 
             Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &secondaryMaskTex, 0, yOffset, texWidth, texHeight,
-                                       sceneTexSize + maskTexSize, GX_LINEAR, GX_CTF_R8, 0);
+                                       secondaryOffset, GX_LINEAR, GX_CTF_R8, 0);
         }
 
         Graphic.SetViewport();
-        gUtil.RenderTextureQuad(kPppMiasmaZero, yPos, 640.0f,
-                                224.0f, &backSceneTex, 0, 0,
+        gUtil.RenderTextureQuad(0.0f, yPos, width,
+                                height, &backSceneTex, 0, 0,
                                 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
@@ -572,12 +573,12 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
             _GXSetTevAlphaOp(4, 0, 0, 0, 1, 0);
             GXSetNumTevStages(5);
 
-            quadA.x = kPppMiasmaZero;
+            quadA.x = 0.0f;
             quadA.y = yPos;
-            quadA.z = kPppMiasmaZero;
-            quadB.x = 640.0f;
-            quadB.y = yPos + 224.0f;
-            quadB.z = kPppMiasmaZero;
+            quadA.z = 0.0f;
+            quadB.x = width;
+            quadB.y = yPos + height;
+            quadB.z = 0.0f;
 
             pppInitBlendMode();
             pppSetBlendMode(0);
@@ -683,12 +684,12 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
 
             GXSetNumTevStages(tevStageCount);
             GXSetNumTexGens(texGenCount);
-            quadA.x = kPppMiasmaZero;
+            quadA.x = 0.0f;
             quadA.y = yPos;
-            quadA.z = kPppMiasmaZero;
-            quadB.x = 640.0f;
-            quadB.y = yPos + 224.0f;
-            quadB.z = kPppMiasmaZero;
+            quadA.z = 0.0f;
+            quadB.x = width;
+            quadB.y = yPos + height;
+            quadB.z = 0.0f;
             gUtil.RenderQuad(quadA, quadB, packedWork.color, 0, 0);
         }
 

@@ -897,7 +897,7 @@ gobject.cpp:
 	.rodata     start:0x801D9BD0 end:0x801D9BDC
 	.data       start:0x801FD360 end:0x801FD3A4
 	.sdata      start:0x8032E768 end:0x8032E780
-	.sdata2     start:0x80330370 end:0x80330458
+	.sdata2     start:0x80330370 end:0x80330448
 
 pppRyjMegaBirth.cpp:
 	extab       start:0x80007988 end:0x800079C0
@@ -906,7 +906,7 @@ pppRyjMegaBirth.cpp:
 	.rodata     start:0x801D9C00 end:0x801D9C14
 	.data       start:0x801FD3A8 end:0x801FD3D0
 	.bss        start:0x802EA080 end:0x802EA0B0
-	.sdata2     start:0x80330458 end:0x803304A8
+	.sdata2     start:0x80330448 end:0x80330498
 
 pppRyjMegaBirthModel.cpp:
 	extab       start:0x800079C0 end:0x80007A00
@@ -915,7 +915,7 @@ pppRyjMegaBirthModel.cpp:
 	.rodata     start:0x801D9C18 end:0x801D9C31
 	.data       start:0x801FD3D0 end:0x801FD420
 	.bss        start:0x802EA0B0 end:0x802EA110
-	.sdata2     start:0x803304A8 end:0x803304EC
+	.sdata2     start:0x80330498 end:0x803304EC
 
 pppDrawMdlTs.cpp:
 	extab       start:0x80007A00 end:0x80007A08

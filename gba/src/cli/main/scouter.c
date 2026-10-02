@@ -180,7 +180,6 @@ void ScouterScreen_PrintNextRow(void)
     s32 idx;
     s32 row;
     s32 x;
-    s32 x2;
 
     Text_SetFill(0, 0);
     Text_Clear();
@@ -195,8 +194,9 @@ void ScouterScreen_PrintNextRow(void)
         idx = item->monster;
         Text_Print(Msg_GetMonsterName(idx), TEXT_DRAW);
     } else if (sScouterRow == 1) {
-        x = win->width * 8 - 86;
-        x = x - Text_Print(Msg_GetSystem(18), TEXT_CHAR) - 8;
+        x = win->width * 8;
+        x -= 86;
+        x -= 8 + Text_Print(Msg_GetSystem(18), TEXT_CHAR);
         x -= Text_Print(Msg_GetSystem(30), TEXT_WIDTH);
         Text_SetX(x);
         Text_Print(Msg_GetSystem(30), TEXT_DRAW);
@@ -208,11 +208,11 @@ void ScouterScreen_PrintNextRow(void)
             Text_Print(Msg_GetSystem(41), TEXT_DRAW);
         }
         Text_Print(Msg_GetSystem(18), TEXT_DRAW);
-        x2 = Text_GetX();
+        x = Text_GetX();
         if (item->monster != 154) {
-            Text_PrintNumber(item->maxHp, x2 + 8, 3);
+            Text_PrintNumber(item->maxHp, x + 8, 3);
         } else {
-            Text_SetX(x2 + 8);
+            Text_SetX(x + 8);
             Text_Print(Msg_GetSystem(41), TEXT_DRAW);
         }
     } else if (sScouterRow <= 4) {

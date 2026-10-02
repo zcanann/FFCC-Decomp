@@ -738,7 +738,7 @@ public:
     inline void LetterInit2();
     inline void LetterInit3();
     inline void LetterInit4();
-    bool LetterOpen();
+    int LetterOpen();
     int LetterCtrl();
     int LetterClose();
     inline int LetterLstOpen();

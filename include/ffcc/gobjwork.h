@@ -168,6 +168,16 @@ public:
             unsigned short m_pad : 7;
             unsigned short m_value : 9;
         };
+        struct LetterBits {
+            unsigned int m_opened : 1;
+            unsigned int m_attachmentClaimed : 1;
+            unsigned int m_replySent : 1;
+            unsigned int m_hasReply : 1;
+            unsigned int m_attachmentIsGil : 1;
+            unsigned int m_messageType : 9;
+            unsigned int m_senderId : 9;
+            unsigned int m_attachValue : 9;
+        };
         struct WordBits {
             unsigned int m_pad : 14;
             unsigned int m_senderId : 9;
@@ -220,6 +230,7 @@ public:
             Halfwords m_half;
             Words m_words;
             SplitWords m_split;
+            LetterBits m_bits;
         };
     };
 

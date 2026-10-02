@@ -711,18 +711,7 @@ void CMemoryCardMan::SetMcIconImage()
 {
     if (m_saveBuffer == (char*)nullptr)
     {
-        if (m_saveBuffer == (char*)nullptr)
-        {
-            m_saveBuffer = new (m_stage, "memorycard.cpp", 0x2AB)
-                char[kMemoryCardSaveBufferSize];
-
-            if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
-            {
-                System.Printf("%s(%d): Error: memory allocation error\n", "memorycard.cpp", 0x2AD);
-            }
-        }
-
-        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
+        CreateMcBuff();
     }
 
     char path[136];
@@ -1052,16 +1041,7 @@ void CMemoryCardMan::MakeSaveData()
 {
     if (m_saveBuffer == (char*)nullptr)
     {
-        if (m_saveBuffer == (char*)nullptr)
-        {
-            m_saveBuffer = new (m_stage, "memorycard.cpp", 0x2AB)
-                char[kMemoryCardSaveBufferSize];
-            if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
-            {
-                System.Printf("%s(%d): Error: memory allocation error\n", "memorycard.cpp", 0x2AD);
-            }
-        }
-        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
+        CreateMcBuff();
     }
     else
     {
@@ -1313,7 +1293,7 @@ void CMemoryCardMan::SetLoadData()
     for (int c = 0; c < 8; c++)
     {
         Mc::CharaDat& savedCharacter = saveDat->m_characters[c];
-        CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
+        CCaravanWork* caravanWork = &g->m_caravanWorkArr[c];
 
         for (i = count = 0; i < 64; i++)
         {
@@ -1604,18 +1584,7 @@ int CMemoryCardMan::DummySave()
             return m_result;
         }
 
-        if (m_saveBuffer == 0)
-        {
-            m_saveBuffer = new (m_stage, "memorycard.cpp", 0x2AB)
-                char[kMemoryCardSaveBufferSize];
-
-            if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
-            {
-                System.Printf("%s(%d): Error: memory allocation error\n", "memorycard.cpp", 0x2AD);
-            }
-        }
-
-        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
+        CreateMcBuff();
 
         SetMcIconImage();
 
@@ -1676,18 +1645,7 @@ int CMemoryCardMan::DummySave()
     }
     else
     {
-        if (m_saveBuffer == 0)
-        {
-            m_saveBuffer = new (m_stage, "memorycard.cpp", 0x2AB)
-                char[kMemoryCardSaveBufferSize];
-
-            if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
-            {
-                System.Printf("%s(%d): Error: memory allocation error\n", "memorycard.cpp", 0x2AD);
-            }
-        }
-
-        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
+        CreateMcBuff();
     }
 
     MakeSaveData();
@@ -1834,18 +1792,7 @@ int CMemoryCardMan::DummyLoad()
         return m_result;
     }
 
-    if (m_saveBuffer == 0)
-    {
-        m_saveBuffer = new (m_stage, "memorycard.cpp", 0x2AB)
-            char[kMemoryCardSaveBufferSize];
-
-        if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
-        {
-            System.Printf("%s(%d): Error: memory allocation error\n", "memorycard.cpp", 0x2AD);
-        }
-    }
-
-    memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
+    CreateMcBuff();
     McRead(m_saveBuffer, kMemoryCardSaveBufferSize, 0x4000);
 
     // Wait for read to finish

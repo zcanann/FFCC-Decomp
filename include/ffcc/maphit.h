@@ -83,8 +83,7 @@ public:
 
     Vec m_normal;                   // 0x00
     float m_planeD;                 // 0x0c
-    Vec m_boundsMin;                // 0x10
-    Vec m_boundsMax;                // 0x1c
+    CBound m_bound;                 // 0x10
     float m_radiusScale;            // 0x28
     float m_vertexOffsets[3][2];    // 0x2c
     unsigned char m_edgeFlags;      // 0x44

@@ -105,15 +105,11 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
         m_baseX = (float)x;
         m_baseY = (float)y;
         m_fromScriptPosition = 1;
-        unsigned int shadowOn = ((unsigned int)__cntlzw((unsigned int)(flags & 2))) >> 5;
         float margin = 24.0f;
         m_marginX = margin;
         m_marginY = margin;
-        int flagMask = -(flags >> 1 & 1);
-        int tlutBase = 0x1C;
-        tlutBase &= flagMask;
-        m_mes.SetTlutBase(tlutBase);
-        m_mes.SetShadow(shadowOn);
+        m_mes.SetTlutBase(((flags & 2) != 0) ? 0x1C : 0);
+        m_mes.SetShadow(((flags & 2) != 0) ? 0 : 1);
     } else {
         MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(0);
         float marginX = 16.0f;
@@ -256,8 +252,8 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         for (int heartIndex = 0; heartIndex < (int)((unsigned int)scriptFood->m_maxHp >> 1); heartIndex++) {
             int heartValue = m_heartValue - heartIndex * 0xC;
             float heartTimer = (float)m_heartGrowTimers[heartIndex];
-            float heartPulse =
-                pulseAmp * (float)sin(pulseSinScale * -(heartTimer * pulseTimerScale - pulseOne)) + pulseOne;
+            float heartPulse = (float)sin(pulseSinScale * -(heartTimer * pulseTimerScale - pulseOne));
+            heartPulse = pulseAmp * heartPulse + pulseOne;
             heartPulse *= pulseBase;
 
             int heartSubTimer = m_heartDropTimers[heartIndex];
@@ -268,7 +264,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
                 heartShakeX = (heartSubTimer >> 2) * s_mesMenuShakePattern[(heartSubTimer + 1) & 3];
             }
 
-            float heartX = heartBaseX + (float)heartShakeX;
+            float shakeX = (float)heartShakeX;
             int heartShakeY;
             if (heartSubTimer == 0) {
                 heartShakeY = 0;
@@ -276,6 +272,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
                 heartShakeY = (heartSubTimer >> 2) * s_mesMenuShakePattern[heartSubTimer & 3];
             }
 
+            float heartX = heartBaseX + shakeX;
             float heartY = heartBaseY + (float)heartShakeY;
 
             MenuPcs.DrawRect(
@@ -605,7 +602,7 @@ void CMesMenu::onDraw()
             CCaravanWork* heartFood =
                 Game.m_scriptFoodBase[m_menuIndex];
             if ((heartFood != 0) && (0.0f < stageBlend)) {
-                MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).Ref());
+                MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * stageBlend)).Ref());
                 MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
 
                 int heartOffset = 0x4C;
@@ -613,21 +610,20 @@ void CMesMenu::onDraw()
                     heartOffset = 0x30;
                 }
 
+                float pulseSinScale = 3.1415927f;
                 float heartBaseX = frameX + (float)heartOffset;
                 float heartBaseY = 12.0f + frameY;
-                float pulseSinScale = 3.1415927f;
-                float pulseTimerScale = 0.0625f;
-                float pulseOne = 1.0f;
-                float pulseAmp = 0.2f;
-                float pulseBase = 0.8f;
                 float heartZero = 0.0f;
+                float pulseBase = 0.8f;
+                float pulseAmp = 0.2f;
+                float pulseOne = 1.0f;
+                float pulseTimerScale = 0.0625f;
 
-                for (int heartIndex = 0; heartIndex < (int)((unsigned int)heartFood->m_maxHp >> 1);
-                     heartIndex++) {
+                for (int heartIndex = 0; heartIndex < (int)((unsigned int)heartFood->m_maxHp >> 1); heartIndex++) {
                     int heartValue = m_heartValue - heartIndex * 0xC;
                     float heartTimer = (float)m_heartGrowTimers[heartIndex];
-                    float heartPulse =
-                        pulseAmp * (float)sin(pulseSinScale * -(heartTimer * pulseTimerScale - pulseOne)) + pulseOne;
+                    float heartPulse = (float)sin(pulseSinScale * -(heartTimer * pulseTimerScale - pulseOne));
+                    heartPulse = pulseAmp * heartPulse + pulseOne;
                     heartPulse *= pulseBase;
 
                     int heartSubTimer = m_heartDropTimers[heartIndex];
@@ -638,7 +634,7 @@ void CMesMenu::onDraw()
                         heartShakeX = (heartSubTimer >> 2) * s_mesMenuShakePattern[(heartSubTimer + 1) & 3];
                     }
 
-                    float heartX = heartBaseX + (float)heartShakeX;
+                    float shakeX = (float)heartShakeX;
                     int heartShakeY;
                     if (heartSubTimer == 0) {
                         heartShakeY = 0;
@@ -646,6 +642,7 @@ void CMesMenu::onDraw()
                         heartShakeY = (heartSubTimer >> 2) * s_mesMenuShakePattern[heartSubTimer & 3];
                     }
 
+                    float heartX = heartBaseX + shakeX;
                     float heartY = heartBaseY + (float)heartShakeY;
 
                     MenuPcs.DrawRect(
@@ -714,11 +711,8 @@ void CMesMenu::onDraw()
             float alphaF = stateAlpha * stageBlend;
             MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).Ref());
 
-            int tex = 0xB;
-            if ((m_flags & 0x200) != 0) {
-                tex = 2;
-            }
-            MenuPcs.DrawWindow(drawX, drawY, width, height, static_cast<CMenuPcs::TEX>(tex), 32.0f);
+            MenuPcs.DrawWindow(drawX, drawY, width, height,
+                               static_cast<CMenuPcs::TEX>(((m_flags & 0x200) != 0) ? 2 : 0xB), 32.0f);
 
             if ((m_itemIndex >= 0) || (m_nameIndex >= 0)) {
                 unsigned int iconAnchor = (m_flags >> 10) & 7;
@@ -797,14 +791,14 @@ void CMesMenu::onDraw()
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
             float alpha255 = 255.0f * windowScale;
             MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>((0.5f * alpha255) * stageBlend)).Ref());
+            float fadeScale = 1.0f - pulseScale;
+            float rotation = 0.2f * (2.0f * (time - 0.5f));
             float promptX = (float)(int)(40.0f + drawX);
             float promptY = (float)(int)(32.0f + drawY);
             float driftX = 5.0f * (pulseScale * sinX);
             float driftY = 10.0f * (pulseScale * sinY);
             float waveX = promptX + driftX;
             float waveY = promptY - driftY;
-            float fadeScale = 1.0f - pulseScale;
-            float rotation = 0.2f * (2.0f * (time - 0.5f));
             MenuPcs.DrawRect(
                 3, 8.0f + waveX, 8.0f + waveY, 80.0f, 48.0f, 0.0f,
                 0.0f, 0.75f * (1.0f + fadeScale), 0.75f * (pulseScale + fadeScale),

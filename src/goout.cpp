@@ -598,7 +598,6 @@ struct CGoOutSaveDatLayout
     CGoOutSaveCaravan m_caravan[8];
 };
 
-static inline unsigned char ReadGoOutU8(CGoOutMenu& menu, int offset) { return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&menu) + offset); }
 
 static inline GoOutMenuState& MenuGoOutState()
 {
@@ -656,12 +655,18 @@ void CGoOutMenu::CharaSelClose()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGoOutMenu::SetMemCardSlot(int, int)
+inline void CGoOutMenu::SetMemCardSlot(int cardChannel, int saveIndex)
 {
-	// TODO
+    m_cardChannel = cardChannel;
+    m_saveIndex = saveIndex;
+    MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
 }
 
 /*
@@ -893,7 +898,11 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
     winMessage = MenuPcs.GetWinMess(m_menuStringSlot + 0x22);
     winMessage->m_lineCount = lineCount;
 
-    indexBase = m_menuStringSlot == 0 ? 0 : 10;
+    if (m_menuStringSlot == 0) {
+        indexBase = 0;
+    } else {
+        indexBase = 10;
+    }
     va_start(args, lineCount);
     winMessageBuffer = (const char**)MenuPcs.GetMcWinMessBuff(2);
     for (i = 0; i < lineCount; i++) {
@@ -967,8 +976,8 @@ inline void CGoOutMenu::DrawMenu()
     if (m_currentMessage != -1) {
         MenuPcs.DrawMcWin(-1, 0);
         if (MenuPcs.m_menuWindowInfo->state == 1) {
-            const int message = static_cast<int>(m_currentMessage);
-            MenuPcs.DrawMcWinMess(message, (message >= 0x1E) ? 2 : 0);
+            const unsigned int message = static_cast<unsigned int>(m_currentMessage);
+            MenuPcs.DrawMcWinMess(message, (m_currentMessage < 0x1E) ? 0 : 2);
         }
     }
 }
@@ -1334,13 +1343,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             MemoryCardMan.Odekake(0, *static_cast<Mc::SaveDat*>(MenuPcs.m_goOutTransferWork), m_selectedTransferChara, *MenuPcs.m_goOutTransferSaveData, freeCaravanIdx);
         }
 
-        {
-        const int cardChannel = m_accessCardChannel;
-        const int saveIndex = m_accessSaveIndex;
-        m_saveIndex = static_cast<char>(saveIndex);
-        m_cardChannel = static_cast<char>(cardChannel);
-        MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
-        }
+        SetMemCardSlot(m_accessCardChannel, m_accessSaveIndex);
         m_memCardBuffer = MenuPcs.m_goOutTransferSaveData;
         m_memCardResult = static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(static_cast<unsigned char>(m_cardChannel));
         if (m_memCardResult == 1) {
@@ -2134,17 +2137,20 @@ card_connected:;
  */
 inline void CGoOutMenu::DrawGoOut()
 {
-
-    if (ReadGoOutU8(*this, 0x29) != 0) {
+    if (m_saveLoadMenuOpen != 0) {
         MenuPcs.DrawInit();
         MenuPcs.DrawCMakeMenu();
     }
 
-    if (m_deleteMode > 0xD && m_deleteMode < 0xF) {
+    switch (m_goOutMode) {
+    case 0xE:
         MenuPcs.DrawLoadMenu();
+        break;
+    case 0xF:
+        break;
     }
 
-    if (m_deleteMode == 1 && MenuGoOutState().m_resultSelect != 0) {
+    if (m_goOutMode == 1 && MenuGoOutState().m_resultSelect != 0) {
         MenuGoOutState().m_closeMode = 8;
         SetMainMode(1);
         MenuGoOutState().m_resultSelect = 0;
@@ -2614,10 +2620,9 @@ void CGoOutMenu::CalcDel()
  */
 inline void CGoOutMenu::DrawDel()
 {
-
     MenuPcs.DrawInit();
     MenuPcs.DrawCMakeMenu();
-    if (m_currentMessage == 1 && MenuGoOutState().m_resultSelect != 0) {
+    if (m_deleteMode == 1 && MenuGoOutState().m_resultSelect != 0) {
         MenuGoOutState().m_closeMode = 8;
         SetMainMode(1);
         MenuGoOutState().m_resultSelect = 0;
@@ -2896,17 +2901,17 @@ void CalcGoOutMenu()
  */
 inline void CGoOutMenu::DrawSelectYesNo()
 {
-
     if (MenuPcs.m_menuWindowInfo->state == 1 && m_drawCursor != 0) {
-        const int cursorY = MenuPcs.m_menuWindowInfo->y + MenuPcs.m_menuWindowInfo->height - 0x3E;
+        const float cursorY = (float)(MenuPcs.m_menuWindowInfo->y +
+            MenuPcs.m_menuWindowInfo->height - 0x3E);
+        float cursorX = (float)(MenuPcs.m_menuWindowInfo->x + 0x20);
 
-        if (m_cursorMode == 0) {
-            const int cursorX = MenuPcs.GetYesNoXPos(m_cursorChoice);
-            MenuPcs.DrawCursor(cursorX, cursorY, 1.0f);
+        if (m_cursorMode != 0) {
+            const int localY = m_cursorListY1 + m_cursorChoice * 0x1E;
+            MenuPcs.DrawCursor((int)cursorX, localY, 1.0f);
         } else {
-            const int cursorX = MenuPcs.m_menuWindowInfo->x + 0x20;
-            const int localY = m_cursorListY0 + m_cursorChoice * 0x1E;
-            MenuPcs.DrawCursor(cursorX, localY, 1.0f);
+            cursorX = (float)MenuPcs.GetYesNoXPos(m_cursorChoice);
+            MenuPcs.DrawCursor((int)cursorX, (int)cursorY, 1.0f);
         }
     }
 }
@@ -2922,10 +2927,13 @@ inline void CGoOutMenu::DrawSelectYesNo()
  */
 inline void CGoOutMenu::Draw()
 {
-    if (m_messageState == 3) {
-        DrawDel();
-    } else if (m_messageState == 2) {
+    switch (m_mainMode) {
+    case 2:
         DrawGoOut();
+        break;
+    case 3:
+        DrawDel();
+        break;
     }
 
     DrawMenu();
@@ -2978,60 +2986,5 @@ inline void CGoOutMenu::EndMemCardProc()
 void DrawGoOutMenu()
 {
     g_pGoOutMenu = &g_GoOutMenu;
-    CGoOutMenu& goOutMenu = *g_pGoOutMenu;
-    char mode = goOutMenu.m_mainMode;
-
-    switch (mode) {
-    case 2:
-        if (goOutMenu.m_saveLoadMenuOpen != 0) {
-            MenuPcs.DrawInit();
-            MenuPcs.DrawCMakeMenu();
-        }
-        switch (goOutMenu.m_goOutMode) {
-        case 0xE:
-            MenuPcs.DrawLoadMenu();
-            break;
-        case 0xF:
-            break;
-        }
-        if (goOutMenu.m_goOutMode == 1 &&
-            MenuGoOutState().m_resultSelect != 0) {
-            MenuGoOutState().m_closeMode = 8;
-            goOutMenu.SetMainMode(1);
-            MenuGoOutState().m_resultSelect = 0;
-        }
-        break;
-    case 3:
-        MenuPcs.DrawInit();
-        MenuPcs.DrawCMakeMenu();
-        if (goOutMenu.m_deleteMode == 1 &&
-            MenuGoOutState().m_resultSelect != 0) {
-            MenuGoOutState().m_closeMode = 8;
-            goOutMenu.SetMainMode(1);
-            MenuGoOutState().m_resultSelect = 0;
-        }
-        break;
-    }
-
-    if (goOutMenu.m_currentMessage != -1) {
-        MenuPcs.DrawMcWin(-1, 0);
-        if (MenuPcs.m_menuWindowInfo->state == 1) {
-            const unsigned int message = static_cast<unsigned int>(goOutMenu.m_currentMessage);
-            MenuPcs.DrawMcWinMess(message, (goOutMenu.m_currentMessage < 0x1E) ? 0 : 2);
-        }
-    }
-
-    if (MenuPcs.m_menuWindowInfo->state == 1 && goOutMenu.m_drawCursor != 0) {
-        const float cursorY = (float)(MenuPcs.m_menuWindowInfo->y +
-            MenuPcs.m_menuWindowInfo->height - 0x3E);
-        float cursorX = (float)(MenuPcs.m_menuWindowInfo->x + 0x20);
-
-        if (goOutMenu.m_cursorMode != 0) {
-            const int localY = goOutMenu.m_cursorListY1 + goOutMenu.m_cursorChoice * 0x1E;
-            MenuPcs.DrawCursor((int)cursorX, localY, 1.0f);
-        } else {
-            cursorX = (float)MenuPcs.GetYesNoXPos(goOutMenu.m_cursorChoice);
-            MenuPcs.DrawCursor((int)cursorX, (int)cursorY, 1.0f);
-        }
-    }
+    g_pGoOutMenu->Draw();
 }

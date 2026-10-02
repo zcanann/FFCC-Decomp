@@ -989,7 +989,6 @@ void InfoWin_PrintNextRow(void)
     s32 digits;
     s32 attr;
     s32 i;
-    s32 j;
     s32 k;
 
     if (sInfoRow > win->rows)
@@ -1021,10 +1020,10 @@ void InfoWin_PrintNextRow(void)
     } else if (sInfoRow == 1) {
         if ((gScreen == 1 && n > 0) || (gScreen == 2 && n > 158)) {
             n = Text_Print(Msg_GetSystem(13), TEXT_WIDTH) + 72;
-            x = (win->width - 2) * 8 - n;
-            Text_SetX(x);
+            i = (win->width - 2) * 8 - n;
+            Text_SetX(i);
             n = sInfoItem;
-            Text_PrintNumber(vals[n], x, 8);
+            Text_PrintNumber(vals[n], i, 8);
             Text_Print(Msg_GetSystem(13), TEXT_DRAW);
         } else if (n > 0 && gScreen == 2 && n <= 158) {
             n = Text_Print(Msg_GetSystem(38), TEXT_WIDTH);
@@ -1094,8 +1093,8 @@ void InfoWin_PrintNextRow(void)
             } else if (sInfoRow == 3) {
                 strcpy(str, Msg_GetSystem(13));
                 strcat(str, sSlashText);
-                w = Text_Print(str, TEXT_WIDTH) + 72;
-                x = (win->width - 2) * 8 - w;
+                x = Text_Print(str, TEXT_WIDTH) + 72;
+                x = (win->width - 2) * 8 - x;
                 Text_SetX(x);
                 Text_PrintNumber(gSession.gil, x, 8);
                 Text_Print(str, TEXT_DRAW);
@@ -1118,13 +1117,13 @@ void InfoWin_PrintNextRow(void)
         }
         Text_CopyToVram(dst, win->width);
     } else {
-        dst = (u32)Bg_GetMapPtr(win->bg, win->x + 1, win->y + 1);
+        dst = (u32)Bg_GetMapPtr(gWindows[0].bg, gWindows[0].x + 1, gWindows[0].y + 1);
         attr = 3 << 12;
-        w = win->width - 2;
+        w = gWindows[0].width - 2;
         for (i = 0; i < sInfoRow; i++) {
-            for (j = 0; j < 2; j++) {
-                t = (win->width << 1) * i + 0x80;
-                t += j;
+            for (x = 0; x < 2; x++) {
+                t = (gWindows[0].width << 1) * i + 0x80;
+                t += x;
                 for (k = 0; k < w; k++) {
                     if (!(k & 1)) {
                         buf[k] = attr | t;

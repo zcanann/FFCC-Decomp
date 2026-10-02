@@ -418,6 +418,7 @@ void Link_ProcessRecv(void)
 {
     vu16 ie;
     u16 crc;
+    u16 sum;
     u8 result;
     u32 pkt;
     u8 *p;
@@ -501,7 +502,8 @@ restart:
             check:
                 if (sMsgXfer.count == sMsgXfer.total) {
                     crc = 0xFFFF;
-                    if (Crc16(sMsgXfer.size, sMsgXfer.data, &crc) != sMsgXfer.crc
+                    sum = Crc16(sMsgXfer.size, sMsgXfer.data, &crc);
+                    if (sMsgXfer.crc != sum
                         || sMsgXfer.size > sMsgXfer.pos) {
                         p = (u8 *)&pkt;
                         p[0] = 7;

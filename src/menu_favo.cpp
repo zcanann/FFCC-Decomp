@@ -29,20 +29,34 @@ STATIC_ASSERT(sizeof(s_rank) == 0x20);
  */
 void CMenuPcs::FavoDraw()
 {
+	FavoEntry* entry;
+	CFont* font;
+	int i;
+	FoodRank* rankBase;
+	FavoEntry* drawEntry;
+	FoodRank* rank;
+	float x;
+	float y;
+	float w;
+	float h;
+	float u;
+	float v;
+	GXColor colors[4];
+	char textBuf[0x10];
+
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	FavoEntry* entry = m_favoList->entries;
-	for (int i = 0; i < m_favoList->count; i++) {
+	entry = m_favoList->entries;
+	for (i = 0; i < m_favoList->count; i++, entry++) {
 		if (entry->tex >= 0) {
-			float x = static_cast<float>(entry->x);
-			float y = static_cast<float>(entry->y);
-			float w = static_cast<float>(entry->w);
-			float h = static_cast<float>(entry->h);
-			float u = entry->u;
-			float v = entry->v;
+			x = static_cast<float>(entry->x);
+			y = static_cast<float>(entry->y);
+			w = static_cast<float>(entry->w);
+			h = static_cast<float>(entry->h);
+			u = entry->u;
+			v = entry->v;
 
-			GXColor colors[4];
 			if (i < 3) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
@@ -65,8 +79,8 @@ void CMenuPcs::FavoDraw()
 				colors[3].a = 0xFF;
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
-				float fillW = entry->alpha * w;
-				if (fillW > 0.0f) {
+				w = entry->alpha * w;
+				if (w > 0.0f) {
 					if (entry->tex == 0x32) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
@@ -78,20 +92,19 @@ void CMenuPcs::FavoDraw()
 								tileH = static_cast<int>(end - static_cast<float>(yStep));
 							}
 							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-							                 fillW, static_cast<float>(tileH), u, v, colors, entry->uvScale,
-							                 1.0f, 0.0f);
+							                 w, static_cast<float>(tileH), u, v, colors, entry->uvScale, 1.0f, 0.0f);
 							yStep += 0x20;
 						}
 					} else {
-						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v, colors,
+						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
 						                 entry->uvScale, 1.0f, 0.0f);
 					}
 
-					u += fillW;
-					x += fillW * entry->uvScale;
+					u += w;
+					x += w * entry->uvScale;
 				}
 
-				if (fillW > 0.0f && fillW < static_cast<float>(entry->w)) {
+				if (w > 0.0f && w < static_cast<float>(entry->w)) {
 					colors[1].r = 0xFF;
 					colors[1].g = 0xFF;
 					colors[1].b = 0xFF;
@@ -100,8 +113,8 @@ void CMenuPcs::FavoDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					float remainW =
-					    static_cast<float>(1.0 / static_cast<double>(entry->duration)) * static_cast<float>(entry->w);
+					w = 1.0 / entry->duration;
+					w = w * entry->w;
 					if (entry->tex == 0x32) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
@@ -113,13 +126,12 @@ void CMenuPcs::FavoDraw()
 								tileH = static_cast<int>(end - static_cast<float>(yStep));
 							}
 							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-							                 remainW, static_cast<float>(tileH), u, v, colors, entry->uvScale,
-							                 1.0f, 0.0f);
+							                 w, static_cast<float>(tileH), u, v, colors, entry->uvScale, 1.0f, 0.0f);
 							yStep += 0x20;
 						}
 					} else {
-						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,
-						                 colors, entry->uvScale, 1.0f, 0.0f);
+						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
+						                 entry->uvScale, 1.0f, 0.0f);
 					}
 				}
 
@@ -135,22 +147,19 @@ void CMenuPcs::FavoDraw()
 				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, 0.0f);
 			}
 		}
-
-		entry++;
 	}
 
-	int count = m_favoList->count;
-	for (int k = 0; k < count; k++) {
-		entry = &m_favoList->entries[k];
+	for (i = 0; i < m_favoList->count; i++) {
+		entry = &m_favoList->entries[i];
 		if (entry->tex == 0x37) {
 			break;
 		}
 	}
 
-	FoodRank* rankBase = s_rank;
-	FavoEntry* drawEntry = entry;
-	FoodRank* rank = rankBase;
-	for (int i = 0; i < 8; i++) {
+	rankBase = s_rank;
+	drawEntry = entry;
+	rank = rankBase;
+	for (i = 0; i < 8; i++) {
 		int barX = static_cast<int>(static_cast<float>(drawEntry->x + drawEntry->w + 0x18));
 		float barHalfH = static_cast<float>(drawEntry->h) - 24.0f;
 		float barYf = static_cast<float>(drawEntry->y);
@@ -162,7 +171,7 @@ void CMenuPcs::FavoDraw()
 
 	rank = rankBase;
 	drawEntry = entry;
-	for (int i = 0; i < 8; i++) {
+	for (i = 0; i < 8; i++) {
 		int iconX = static_cast<int>(static_cast<float>(drawEntry->x + drawEntry->w - 0x10));
 		float iconHalfH = static_cast<float>(drawEntry->h) - 32.0f;
 		float iconYf = static_cast<float>(drawEntry->y);
@@ -172,55 +181,53 @@ void CMenuPcs::FavoDraw()
 		rank++;
 	}
 
-	CFont* rankFont = m_fonts[0];
-	rankFont->SetShadow(1);
-	rankFont->SetScale(1.0f);
-	rankFont->DrawInit();
+	font = m_fonts[0];
+	font->SetShadow(1);
+	font->SetScale(1.0f);
+	font->DrawInit();
 
-	char textBuf[0x10];
 	memset(textBuf, 0, sizeof(textBuf));
 	rank = rankBase;
 	drawEntry = entry;
-	for (int i = 0; i < 8; i++) {
-		rankFont->SetTlut(6);
-		rankFont->SetColor(
-		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
-		float posX = static_cast<float>(drawEntry->x - 0xC);
-		float posY = static_cast<float>(drawEntry->y + 0xA);
-		rankFont->renderFlags.fixedWidth = 1;
-		rankFont->SetMargin(1.0f);
+	for (i = 0; i < 8; i++) {
+		font->SetTlut(6);
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
+		x = static_cast<float>(drawEntry->x - 0xC);
+		y = static_cast<float>(drawEntry->y + 0xA);
+		font->renderFlags.fixedWidth = 1;
+		font->SetMargin(1.0f);
 		sprintf(textBuf, "%d", static_cast<int>(rank->place));
-		rankFont->SetPosX(posX);
-		rankFont->SetPosY(posY - 4.0f);
-		rankFont->Draw(textBuf);
-		rankFont->SetShadow(0);
+		font->SetPosX(x);
+		font->SetPosY(y - 4.0f);
+		font->Draw(textBuf);
+		font->SetShadow(0);
 		drawEntry++;
 		rank++;
 	}
 
-	CFont* nameFont = m_fonts[4];
-	nameFont->SetShadow(0);
-	nameFont->SetScale(0.9f);
-	nameFont->SetMargin(1.0f);
-	nameFont->DrawInit();
+	font = m_fonts[4];
+	font->SetShadow(0);
+	font->SetScale(0.9f);
+	font->SetMargin(1.0f);
+	font->DrawInit();
 	memset(textBuf, 0, sizeof(textBuf));
 
 	rank = rankBase;
-	for (int i = 0; i < 8; i++) {
-		nameFont->SetColor(
-		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry->alpha)).color);
+	for (i = 0; i < 8; i++) {
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry->alpha)).color);
 		const char* name = Game.m_cFlatDataArr[1].TableStrings(0)[(static_cast<char>(rank->foodId) + 0x17D) * 5 + 4];
-		float posY = static_cast<float>(entry->y + 0xB);
-		float posX = static_cast<float>(entry->x + 0x1C);
-		nameFont->SetPosX(posX);
-		nameFont->SetPosY(posY - 4.0f);
-		nameFont->Draw(const_cast<char*>(name));
+		y = static_cast<float>(entry->y + 0xB);
+		x = static_cast<float>(entry->x + 0x1C);
+		font->SetPosX(x);
+		font->SetPosY(y - 4.0f);
+		font->Draw(const_cast<char*>(name));
 		entry++;
 		rank++;
 	}
 
 	DrawInit();
 }
+
 /*
  * --INFO--
  * PAL Address: 0x80162d18
@@ -469,167 +476,142 @@ void CMenuPcs::FavoInit0()
  */
 void CMenuPcs::FavoInit()
 {
-	float uvZero;
-	float wideTexWidth;
-	int rowOffsetY;
-	int entryCount;
 	int i;
 	int idx;
-
+	int index;
+	FavoEntry* entry;
 	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
+
 	memset(m_favoList, 0, sizeof(*m_favoList));
-	FavoEntry* entry = m_favoList->entries;
-	for (i = 64; i > 0; i--) {
+	entry = m_favoList->entries;
+	for (i = 0; i < 64; i++, entry++) {
 		entry->uvScale = 1.0f;
-		entry++;
 	}
 
-	FavoListStorage* list = m_favoList;
-	int entryIndex = 0;
-	FavoEntry* setupEntry = &list->entries[entryIndex++];
-	setupEntry->tex = 0x33;
-	setupEntry->drawFlags = 4;
-	setupEntry->x = 0x30;
-	setupEntry->y = 0x28;
-	setupEntry->w = 0x158;
-	setupEntry->h = 0x20;
-	uvZero = 0.0f;
-	wideTexWidth = kFavoWideTextureWidth;
-	setupEntry->u = uvZero;
-	setupEntry->v = uvZero;
-	setupEntry->uvScale = wideTexWidth / (float)setupEntry->w;
-	setupEntry->startFrame = 5;
-	setupEntry->duration = 5;
+	index = 0;
+	entry = &m_favoList->entries[index++];
+	entry->tex = 0x33;
+	entry->drawFlags = 4;
+	entry->x = 0x30;
+	entry->y = 0x28;
+	entry->w = 0x158;
+	entry->h = 0x20;
+	entry->u = 0.0f;
+	entry->v = 0.0f;
+	entry->uvScale = kFavoWideTextureWidth / entry->w;
+	entry->startFrame = 5;
+	entry->duration = 5;
 
-	list = m_favoList;
-	setupEntry = &list->entries[entryIndex++];
-	setupEntry->tex = 0x32;
-	setupEntry->x = 0x30;
-	setupEntry->y = 0x48;
-	setupEntry->w = 0x158;
-	setupEntry->h = 200;
-	setupEntry->u = uvZero;
-	setupEntry->v = uvZero;
-	setupEntry->uvScale = wideTexWidth / (float)setupEntry->w;
-	setupEntry->startFrame = 5;
-	setupEntry->duration = 5;
+	entry = &m_favoList->entries[index++];
+	entry->tex = 0x32;
+	entry->x = 0x30;
+	entry->y = 0x48;
+	entry->w = 0x158;
+	entry->h = 200;
+	entry->u = 0.0f;
+	entry->v = 0.0f;
+	entry->uvScale = kFavoWideTextureWidth / entry->w;
+	entry->startFrame = 5;
+	entry->duration = 5;
 
-	list = m_favoList;
-	setupEntry = &list->entries[entryIndex++];
-	setupEntry->tex = 0x33;
-	setupEntry->x = 0x30;
-	setupEntry->y = 0x110;
-	setupEntry->w = 0x158;
-	setupEntry->h = 0x20;
-	setupEntry->u = uvZero;
-	setupEntry->v = uvZero;
-	setupEntry->uvScale = wideTexWidth / (float)setupEntry->w;
-	setupEntry->startFrame = 5;
-	setupEntry->duration = 5;
+	entry = &m_favoList->entries[index++];
+	entry->tex = 0x33;
+	entry->x = 0x30;
+	entry->y = 0x110;
+	entry->w = 0x158;
+	entry->h = 0x20;
+	entry->u = 0.0f;
+	entry->v = 0.0f;
+	entry->uvScale = kFavoWideTextureWidth / entry->w;
+	entry->startFrame = 5;
+	entry->duration = 5;
 
-	rowOffsetY = 0;
-	entryCount = 6;
-	list = m_favoList;
-	setupEntry = &list->entries[entryIndex++];
-	setupEntry->tex = 0x45;
-	setupEntry->x = 0x18;
-	setupEntry->y = 0xe;
-	setupEntry->w = 0x30;
-	setupEntry->h = 0x30;
-	setupEntry->u = uvZero;
-	setupEntry->v = uvZero;
-	setupEntry->uvScale = 1.0f;
-	setupEntry->startFrame = 0;
-	setupEntry->duration = 5;
+	entry = &m_favoList->entries[index++];
+	entry->tex = 0x45;
+	entry->x = 0x18;
+	entry->y = 0xe;
+	entry->w = 0x30;
+	entry->h = 0x30;
+	entry->u = 0.0f;
+	entry->v = 0.0f;
+	entry->uvScale = 1.0f;
+	entry->startFrame = 0;
+	entry->duration = 5;
 
-	list = m_favoList;
-	setupEntry = &list->entries[entryIndex++];
-	setupEntry->tex = 0x45;
-	setupEntry->x = 0x1d;
-	setupEntry->w = 0x30;
-	setupEntry->h = 0x30;
-	setupEntry->y = static_cast<short>(0x150 - setupEntry->h);
-	setupEntry->u = uvZero;
-	setupEntry->v = uvZero;
-	setupEntry->uvScale = kFavoIconUvScale;
-	setupEntry->startFrame = 0;
-	setupEntry->duration = 5;
+	entry = &m_favoList->entries[index++];
+	entry->tex = 0x45;
+	entry->x = 0x1d;
+	entry->w = 0x30;
+	entry->h = 0x30;
+	entry->y = 0x150 - entry->h;
+	entry->u = 0.0f;
+	entry->v = 0.0f;
+	entry->uvScale = kFavoIconUvScale;
+	entry->startFrame = 0;
+	entry->duration = 5;
 
-	list = m_favoList;
-	setupEntry = &list->entries[entryIndex++];
-	setupEntry->flags = 2;
-	setupEntry->tex = 0x2e;
-	setupEntry->x = 0x18;
-	setupEntry->y = 8;
-	setupEntry->w = 0x48;
-	setupEntry->h = 0x140;
-	setupEntry->u = uvZero;
-	setupEntry->v = uvZero;
-	setupEntry->startFrame = 0;
-	setupEntry->duration = 5;
+	entry = &m_favoList->entries[index++];
+	entry->flags = 2;
+	entry->tex = 0x2e;
+	entry->x = 0x18;
+	entry->y = 8;
+	entry->w = 0x48;
+	entry->h = 0x140;
+	entry->u = 0.0f;
+	entry->v = 0.0f;
+	entry->startFrame = 0;
+	entry->duration = 5;
 
-	FavoEntry* firstEntry = &m_favoList->entries[0];
-	for (idx = 6; idx < 14; idx++) {
-		setupEntry = &m_favoList->entries[idx];
-		setupEntry->flags = 2;
-		setupEntry->tex = 0x37;
-		entryCount++;
-		setupEntry->x = firstEntry->x + 0x28;
-		setupEntry->y = firstEntry->y + rowOffsetY;
-		rowOffsetY += 0x20;
-		setupEntry->w = 200;
-		setupEntry->h = 0x28;
-		setupEntry->u = uvZero;
-		setupEntry->v = uvZero;
-		setupEntry->startFrame = 7;
-		setupEntry->duration = 5;
+	FavoEntry* firstEntry = m_favoList->entries;
+	for (idx = 0; idx < 8; idx++) {
+		entry = &m_favoList->entries[index++];
+		entry->flags = 2;
+		entry->tex = 0x37;
+		entry->x = firstEntry->x + 0x28;
+		entry->y = firstEntry->y + idx * 0x20;
+		entry->w = 200;
+		entry->h = 0x28;
+		entry->u = 0.0f;
+		entry->v = 0.0f;
+		entry->startFrame = 7;
+		entry->duration = 5;
 	}
 
-	m_favoList->count = entryCount;
+	m_favoList->count = index;
 
 	memset(s_rank, 0, sizeof(s_rank));
-	FoodRank* ranks = s_rank;
-	for (int foodId = 0; foodId < 8; foodId++) {
-		ranks[foodId].foodId = foodId;
-		ranks[foodId].score = caravanWork->m_letterMeta[foodId];
+	for (i = 0; i < 8; i++) {
+		s_rank[i].foodId = i;
+		s_rank[i].score = caravanWork->m_letterMeta[i];
 	}
 
-	int rankIndex = 0;
-	FoodRank* rank = ranks;
-	do {
-		idx = rankIndex + 1;
-		FoodRank* compareRank = ranks + idx;
-		for (i = idx; i < 8; i++) {
-			if (rank->score < compareRank->score) {
-				signed char place = rank->place;
-				signed char foodId = rank->foodId;
-				short score = rank->score;
+	for (i = 0; i < 8; i++) {
+		for (idx = i + 1; idx < 8; idx++) {
+			if (s_rank[i].score < s_rank[idx].score) {
+				signed char place = s_rank[i].place;
+				unsigned char foodId = s_rank[i].foodId;
+				short score = s_rank[i].score;
 
-				rank->place = compareRank->place;
-				rank->foodId = compareRank->foodId;
-				rank->score = compareRank->score;
+				s_rank[i].place = s_rank[idx].place;
+				s_rank[i].foodId = s_rank[idx].foodId;
+				s_rank[i].score = s_rank[idx].score;
 
-				compareRank->place = place;
-				compareRank->foodId = foodId;
-				compareRank->score = score;
+				s_rank[idx].place = place;
+				s_rank[idx].foodId = foodId;
+				s_rank[idx].score = score;
 			}
-			compareRank++;
 		}
-		rankIndex++;
-		rank++;
-	} while (rankIndex < 8);
+	}
 
 	int place = 0;
-	idx = 0;
-	rank = ranks;
+	i = 0;
 	do {
-		if ((idx != 0) && (rank[-1].score != rank->score)) {
-			place = idx;
+		if ((i != 0) && (s_rank[i - 1].score != s_rank[i].score)) {
+			place = i;
 		}
-		rank->place = place + 1;
-		rank++;
-		idx++;
-	} while (idx < 8);
+		s_rank[i].place = place + 1;
+		i++;
+	} while (i < 8);
 
 	m_singMenuState->selectedIndex = 0;
 	m_singMenuState->initialized = 1;

@@ -30,8 +30,9 @@ Requirements:
 - `agbcc` and `old_agbcc` from [pret/agbcc](https://github.com/pret/agbcc), in
   `build/tools/gba-agbcc/` or `--gba-compilers <dir>`. Without them, sources are not
   compiled and the GBA units stay unmatched.
-- `cc1plus`, the C++ compiler from agbcc's original 2.9-arm tree, built by
-  `tools/build_cc1plus.sh`, next to agbcc. Without it, C++ sources are not compiled.
+- `cc1plus` and `gcc2-cpp`, the C++ compiler and preprocessor from the pinned
+  2.9-arm tree, built by `gba/tools/build_cc1plus.sh`, next to agbcc. Both are
+  required to compile C++ sources. See [the toolchain notes](toolchain.md).
 - The images are extracted from `orig/GCCP01/FFCC_PAL.iso` into `orig/GCCP01/gba/`;
   pre-extracted images there are used as-is.
 

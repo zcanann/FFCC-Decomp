@@ -87,9 +87,7 @@ DISC_IMAGES = {"GCCP01": "FFCC_PAL.iso"}
 ASFLAGS = "-mcpu=arm7tdmi -mthumb-interwork"
 CPPFLAGS = "-undef -nostdinc -Wno-trigraphs -I gba/include -I gba/lib/m4a/include -I gba/lib/ginclude"
 CFLAGS = "-mthumb-interwork -O2 -fhex-asm"
-# C++ is preprocessed as C (the binutils cpp has no C++ front end to hand off to),
-# with the macros g++ 2.9 predefines for C++.
-CXX_CPPFLAGS = f"-x c -D__cplusplus -D__GNUG__=2 {CPPFLAGS}"
+CXX_CPPFLAGS = "-I gba/include -I gba/lib/m4a/include -I gba/lib/ginclude"
 # Without exception handling: with it, register copies are not propagated across
 # calls (regmove), which the retail code shows they were.
 CXXFLAGS = "-quiet -mthumb-interwork -O2 -fno-exceptions"
@@ -213,11 +211,12 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
             file=sys.stderr,
         )
     cc1plus = compilers_dir / f"cc1plus{exe}"
-    have_cxx = have_compilers and cc1plus.is_file()
+    cxx_cpp = compilers_dir / f"gcc2-cpp{exe}"
+    have_cxx = have_compilers and cc1plus.is_file() and cxx_cpp.is_file()
     if have_compilers and not have_cxx:
         print(
-            f"Warning: cc1plus not found in {compilers_dir}; GBA C++ sources are not "
-            "compiled (build it with gba/tools/build_cc1plus.sh)",
+            f"Warning: cc1plus/gcc2-cpp not found in {compilers_dir}; GBA C++ sources are not "
+            "compiled (build both with gba/tools/build_cc1plus.sh)",
             file=sys.stderr,
         )
 
@@ -241,6 +240,9 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
         n.rule("gba_as", f"{prefix_str}as{exe} $gba_asflags $asincludes -o $out $in", description="AS $out")
         n.rule("gba_cpp", f"{prefix_str}cpp{exe} $cppflags -MMD -MT $out -MF $out.d $in -o $out",
                description="CPP $in", depfile="$out.d", deps="gcc")
+        n.rule("gba_cxx_cpp", f"$python {_path(tools / 'preprocess.py')} "
+               f'--cpp "{_path(cxx_cpp)}" $cppflags --depfile $out.d $in -o $out',
+               description="CPP C++ $in", depfile="$out.d", deps="gcc")
         n.rule("gba_cc", "$cc $cflags $in -o $out", description="AGBCC $out")
         n.rule("gba_ld", f"{prefix_str}ld{exe} -T $ldscript -o $out --no-warn-rwx-segments -Map $map",
                description="LINK $out")
@@ -371,9 +373,11 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                 elif file.suffix == ".cpp":
                     pre = file_stem + ".ii"
                     asm = file_stem + ".s"
-                    n.build(pre, "gba_cpp", _path(file), implicit=binutils_stamp,
-                            variables={"cppflags": f"{CXX_CPPFLAGS} -iquote {_path(file.parent)}"})
-                    n.build(asm, "gba_cc", pre, variables={"cc": os.path.normpath(cc1plus),
+                    n.build(pre, "gba_cxx_cpp", _path(file),
+                            implicit=[_path(cxx_cpp), _path(tools / "preprocess.py")],
+                            variables={"cppflags": CXX_CPPFLAGS})
+                    n.build(asm, "gba_cc", pre, implicit=[_path(cc1plus)],
+                            variables={"cc": os.path.normpath(cc1plus),
                                                            "cflags": CXXFLAGS})
                     n.build(obj, "gba_as", [asm, align], implicit=binutils_stamp)
                 else:

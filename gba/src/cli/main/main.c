@@ -57,8 +57,8 @@ extern const u16 *gBackdropMaps[];
 
 void AgbMain(void)
 {
-    u8 prevMode;
-    u8 connected;
+    s32 prevMode;
+    s32 connected;
     s32 i;
     s32 value;
 

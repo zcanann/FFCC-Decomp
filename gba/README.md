@@ -12,7 +12,7 @@ disc are the same program with different data (tens digit: language, units digit
 variant; `sp` is a per-player variant).
 
 The images load at `0x02000000` (EWRAM) and are mostly Thumb code, built with
-agbcc (`-O2 -mthumb-interwork`). There are no symbols; `fn_`/`lbl_` names are
+the GCC 2.9 ARM/Thumb family (`-O2 -mthumb-interwork`). There are no symbols; `fn_`/`lbl_` names are
 placeholders until real names are recovered.
 
 ## Building
@@ -25,20 +25,19 @@ categories.
 Requirements:
 - Python package `capstone` (`pip install capstone`). Without it, configure prints a
   warning and leaves the GBA programs out.
-- arm-none-eabi binutils and cpp: downloaded into `build/tools/gba-binutils` unless
+- arm-none-eabi binutils: downloaded into `build/tools/gba-binutils` unless
   `--gba-binutils <dir>` is given.
-- `agbcc` and `old_agbcc` from [pret/agbcc](https://github.com/pret/agbcc), in
-  `build/tools/gba-agbcc/` or `--gba-compilers <dir>`. Without them, sources are not
-  compiled and the GBA units stay unmatched.
-- `cc1plus` and `gcc2-cpp`, the C++ compiler and preprocessor from the pinned
-  2.9-arm tree, built by `gba/tools/build_cc1plus.sh`, next to agbcc. Both are
-  required to compile C++ sources. See [the toolchain notes](toolchain.md).
+- `cc1`, `cc1plus` and `gcc2-cpp`, the C/C++ compilers and preprocessor from the
+  pinned 2.9-arm tree, built by `gba/tools/build_cc1plus.sh`, plus `old_agbcc`
+  from [pret/agbcc](https://github.com/pret/agbcc) for libraries. Place them in
+  `build/tools/gba-agbcc/` or `--gba-compilers <dir>`. Without the required tools,
+  sources are not compiled. See [the toolchain notes](toolchain.md).
 - The images are extracted from `orig/GCCP01/FFCC_PAL.iso` into `orig/GCCP01/gba/`;
   pre-extracted images there are used as-is.
 
 ## Sources
 
-- `src/<program>/<unit>.c`: C code, compiled with `agbcc -mthumb-interwork -O2`.
+- `src/<program>/<unit>.c`: C code, compiled with `cc1 -mthumb-interwork -O2`.
 - `src/<program>/<unit>.cpp`: C++ code (the minigame's game code), compiled with
   `cc1plus -mthumb-interwork -O2 -fno-exceptions`.
   Add the unit to `COMPLETE` in `tools/gba_project.py` once every function matches,

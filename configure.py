@@ -75,7 +75,7 @@ parser.add_argument(
     "--gba-compilers",
     metavar="DIR",
     type=Path,
-    help="directory containing agbcc and old_agbcc for the GBA programs (optional)",
+    help="directory containing cc1, cc1plus, gcc2-cpp and old_agbcc for GBA (optional)",
 )
 parser.add_argument(
     "--compilers",

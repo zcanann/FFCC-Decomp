@@ -49,11 +49,39 @@ jobs:
         key: ${{ runner.os }}-${{ matrix.version }}-${{ github.sha }}
         restore-keys: ${{ runner.os }}-${{ matrix.version }}-
 
+    # Build the original GBA frontends instead of depending on the private
+    # container's compiler snapshot. The existing build cache retains them.
+    - name: Prepare GBA compilers
+      run: |
+        tool_dir="$GITHUB_WORKSPACE/build/tools/gba-agbcc"
+        source_key=$(sha256sum gba/tools/build_cc1plus.sh | cut -d ' ' -f 1)
+        if [ ! -f "$tool_dir/.source-key" ] || \
+           [ "$(cat "$tool_dir/.source-key")" != "$source_key" ] || \
+           [ ! -x "$tool_dir/cc1" ] || [ ! -x "$tool_dir/cc1plus" ] || \
+           [ ! -x "$tool_dir/gcc2-cpp" ]; then
+          apk add --no-cache bash make bison m4 binutils coreutils curl xz
+          work_dir=$(mktemp -d)
+          curl --fail --location --retry 3 \
+            https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz \
+            -o "$work_dir/zig.tar.xz"
+          echo "d45312e61ebcc48032b77bc4cf7fd6915c11fa16e4aad116b66c9468211230ea  $work_dir/zig.tar.xz" \
+            | sha256sum -c -
+          tar -xf "$work_dir/zig.tar.xz" -C "$work_dir"
+          ZIG="$work_dir/zig-linux-x86_64-0.13.0/zig" \
+            bash gba/tools/build_cc1plus.sh "$work_dir/compiler" "$tool_dir"
+          echo "$source_key" > "$tool_dir/.source-key"
+        fi
+        cp -p /agbcc/old_agbcc "$tool_dir/old_agbcc"
+        for tool in cc1 cc1plus gcc2-cpp old_agbcc; do
+          test -x "$tool_dir/$tool" || exit 1
+        done
+
     # Build the project
     - name: Build
       run: |
         python configure.py --map --version ${{ matrix.version }} \
-            --binutils /binutils --compilers /compilers --gba-binutils /usr/bin --gba-compilers /agbcc
+            --binutils /binutils --compilers /compilers --gba-binutils /usr/bin \
+            --gba-compilers build/tools/gba-agbcc
         ninja all_source progress build/${{ matrix.version }}/report.json
 
     # Upload map files

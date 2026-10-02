@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the original C++ compiler and preprocessor for the GBA C++ units.
+# Build the original C/C++ compilers and preprocessor for the GBA game units.
 #
 # pret/agbcc identifies itself as 2.9-arm-000512 (Cygnus GCC 2.9x). Its first
 # commits (476b5c8, "get it to compile") still contain that tree's C++ front end
@@ -12,6 +12,7 @@
 # Requirements: git, make, bison, m4, python3, zig (0.13.0; ZIG=/path/to/zig), and a pret/agbcc
 # clone (AGBCC_REPO, default: clones https://github.com/pret/agbcc).
 # Hosts are 32-bit like the original (the 2.9x tree assumes 32-bit host types):
+#   out/cc1[.exe]   C compiler (both hosts)
 #   out/cc1plus      static i386 Linux (musl)
 #   out/cc1plus.exe  i386 Windows
 #   out/gcc2-cpp[.exe]  original preprocessor (both hosts)
@@ -88,11 +89,16 @@ mkdir -p "$WORK/libiberty-build" && (cd "$WORK/libiberty-build" &&
 make -j"$JOBS" cc1 cc1plus cpp xgcc CC="$WORK/cc-linux" HOST_CC="$WORK/cc-linux" CFLAGS=-O2 > make.log 2>&1 ||
     { tail -20 make.log; exit 1; }
 cp cc1plus "$OUT/cc1plus"
+cp cc1 "$OUT/cc1"
 cp cc1 "$OUT/cc1-reference"
 cp cpp "$OUT/gcc2-cpp"
 cp xgcc "$OUT/thumb-elf-gcc-reference"
 ./xgcc -B./ -E -dM -x c++ -O2 -mthumb-interwork -fno-exceptions -nostdinc /dev/null \
     | sort > "$OUT/cxx-predefines.txt"
+./xgcc -B./ -E -dM -x c -O2 -mthumb-interwork -nostdinc /dev/null \
+    | sort > "$OUT/c-predefines.txt"
+./xgcc -B./ -E -dM -x assembler-with-cpp -mthumb-interwork -nostdinc /dev/null \
+    | sort > "$OUT/asm-predefines.txt"
 
 # Windows host: reuse the generated sources and generator programs.
 cp -a "$WORK/build" "$WORK/build-win" && cd "$WORK/build-win"
@@ -116,9 +122,10 @@ for f in gen* s-*; do
 done
 make -j"$JOBS" $KEEP $(sed 's#\.\./##g' stamp-objlist) c-common.o c-pragma.o hash.o obstack.o \
     CC="$WORK/cc-windows" HOST_CC="$WORK/cc-linux" CFLAGS=-O2 > make.log 2>&1 || { tail -20 make.log; exit 1; }
-make $KEEP cc1plus cpp CC="$WORK/cc-windows" HOST_CC="$WORK/cc-linux" CFLAGS=-O2 >> make.log 2>&1 ||
+make $KEEP cc1 cc1plus cpp CC="$WORK/cc-windows" HOST_CC="$WORK/cc-linux" CFLAGS=-O2 >> make.log 2>&1 ||
     { tail -20 make.log; exit 1; }
 cp cc1plus "$OUT/cc1plus.exe"
+cp cc1 "$OUT/cc1.exe"
 cp cpp "$OUT/gcc2-cpp.exe"
 cp "$SRC/gcc/COPYING" "$OUT/COPYING"
 python3 - "$OUT" "$REVISION" <<'EOF'
@@ -128,7 +135,7 @@ import pathlib
 import sys
 
 out = pathlib.Path(sys.argv[1])
-names = ("cc1-reference", "cc1plus", "cc1plus.exe", "gcc2-cpp", "gcc2-cpp.exe",
+names = ("cc1", "cc1.exe", "cc1-reference", "cc1plus", "cc1plus.exe", "gcc2-cpp", "gcc2-cpp.exe",
          "thumb-elf-gcc-reference")
 manifest = {
     "source": "https://github.com/pret/agbcc",

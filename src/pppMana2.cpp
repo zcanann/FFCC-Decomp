@@ -30,7 +30,8 @@ STATIC_ASSERT(offsetof(pppMana2Step, m_sourceTextureIds) == 0x04);
 STATIC_ASSERT(offsetof(pppMana2Step, m_type) == 0x1C);
 STATIC_ASSERT(offsetof(pppMana2Step, m_envTextureId0) == 0x24);
 STATIC_ASSERT(offsetof(pppMana2Step, m_envTextureId1) == 0x28);
-STATIC_ASSERT(offsetof(pppMana2Step, m_waterScale) == 0x30);
+STATIC_ASSERT(offsetof(pppMana2Step, m_waterScale) == 0x2C);
+STATIC_ASSERT(offsetof(pppMana2Step, m_waterOffset) == 0x30);
 STATIC_ASSERT(offsetof(pppMana2Step, m_rippleLevel) == 0x38);
 
 // The mana water surface is a 17 x 17 vertex grid: 289 vertices, 16 x 16 quads = 512 triangles.
@@ -447,6 +448,9 @@ static int UpdateWaterMesh(VMana2* mana2)
     float currentScale;
     Vec origin;
     Vec* positions;
+    int row;
+    int col;
+    int index;
     float* waterHeightB;
     float* waterHeightA;
 
@@ -457,11 +461,11 @@ static int UpdateWaterMesh(VMana2* mana2)
         return 0;
     }
 
-    for (int row = 1; row < kWaterGridQuads; row++) {
+    for (row = 1; row < kWaterGridQuads; row++) {
         currentScale = 0.0f;
         neighborScale = 0.5f;
-        for (int col = 1; col < kWaterGridQuads; col++) {
-            int index = row * kWaterGridStride + col;
+        for (col = 1; col < kWaterGridQuads; col++) {
+            index = row * kWaterGridStride + col;
             float* center = &waterHeightA[index];
             waterHeightB[index] = currentScale * center[0] +
                                   neighborScale * (waterHeightA[index - kWaterGridStride] + waterHeightA[index + kWaterGridStride] +
@@ -507,11 +511,10 @@ static int CreateWaterMesh(Vec* positions, Vec* normals, Vec2d* texCoords, unsig
     float step;
     float radius;
     float uvStep;
-    int rowCount;
-    int colCount;
     int indexOffset;
-    int rowBase;
     int quadIndex;
+    int colCount;
+    int rowCount;
 
     int vertexIndex = 0;
     normalY = 1.0f;
@@ -538,11 +541,9 @@ static int CreateWaterMesh(Vec* positions, Vec* normals, Vec2d* texCoords, unsig
         rowCount = rowCount + 1;
     }
     indexOffset = 0;
-    rowCount = 0;
-    rowBase = 0;
-    do {
-        quadIndex = rowBase;
-        for (int col = 0; col < kWaterGridQuads; col++, quadIndex++) {
+    for (rowCount = 0; rowCount < kWaterGridQuads; rowCount++) {
+        for (int col = 0; col < kWaterGridQuads; col++) {
+            quadIndex = rowCount * kWaterGridStride + col;
             indices[indexOffset++] = quadIndex;
             indices[indexOffset++] = quadIndex + 1;
             indices[indexOffset++] = quadIndex + kWaterGridStride + 1;
@@ -550,9 +551,7 @@ static int CreateWaterMesh(Vec* positions, Vec* normals, Vec2d* texCoords, unsig
             indices[indexOffset++] = quadIndex + kWaterGridStride;
             indices[indexOffset++] = quadIndex;
         }
-        rowCount = rowCount + 1;
-        rowBase = rowBase + kWaterGridStride;
-    } while (rowCount < kWaterGridQuads);
+    }
     return 1;
 }
 
@@ -673,20 +672,17 @@ static void CalcReflectionVector2(
             C_VECReflect(&cameraVector, &objSpaceNormal, vtxReflection);
 
             float absAxis[3];
-            float* absAxisPtr = absAxis;
-            absAxisPtr[1] = fabsf(vtxReflection->y);
-            absAxisPtr[0] = fabsf(vtxReflection->x);
-            absAxisPtr[2] = fabsf(vtxReflection->z);
+            absAxis[0] = fabsf(vtxReflection->x);
+            absAxis[1] = fabsf(vtxReflection->y);
+            absAxis[2] = fabsf(vtxReflection->z);
 
             axis = 0;
-            if (absAxisPtr[1] > absAxisPtr[0]) {
-                axis = 1;
-                maxAxis = absAxisPtr[1];
-            } else {
-                maxAxis = absAxisPtr[0];
-            }
-            if (absAxisPtr[2] > maxAxis) {
-                axis = 2;
+            maxAxis = absAxis[0];
+            for (int j = 1; j < 3; j++) {
+                if (absAxis[j] > maxAxis) {
+                    maxAxis = absAxis[j];
+                    axis = j;
+                }
             }
             CVector reflected(vtxReflection->x, vtxReflection->y, vtxReflection->z);
 
@@ -709,18 +705,18 @@ static void CalcReflectionVector2(
                     vtxColor->r = (u8)(vtxColor->r + 0x7F);
                     uv.x = half - reflected.z / invAxis;
                     uv.y = half - reflected.y / invAxis;
-                    uv.x = uv.x * 0.25f;
-                    uv.y = uv.y * 0.25f;
-                    uv.x = uv.x + 0.25f;
-                    uv.y = uv.y + 0.25f;
+                    uv.x *= 0.25f;
+                    uv.y *= 0.25f;
+                    uv.x += 0.25f;
+                    uv.y += 0.25f;
                 } else {
                     vtxColor->r = (u8)(vtxColor->r - 0x7F);
                     uv.x = half - reflected.z / invAxis;
                     uv.y = half + reflected.y / invAxis;
-                    uv.x = uv.x * 0.25f;
-                    uv.y = uv.y * 0.25f;
-                    uv.x = uv.x + 0.75f;
-                    uv.y = uv.y + 0.25f;
+                    uv.x *= 0.25f;
+                    uv.y *= 0.25f;
+                    uv.x += 0.75f;
+                    uv.y += 0.25f;
                 }
                 break;
             case 1:
@@ -731,18 +727,18 @@ static void CalcReflectionVector2(
                 if (vtxReflection->y >= 0.0f) {
                     vtxColor->g = (u8)(vtxColor->g + 0x7F);
                     uv.x = half + reflected.x / invAxis;
+                    uv.x *= 0.25f;
                     uv.y = half + reflected.z / invAxis;
-                    uv.x = uv.x * 0.25f;
-                    uv.y = uv.y * 0.25f;
-                    uv.x = uv.x + half;
+                    uv.y *= 0.25f;
+                    uv.x += half;
                 } else {
                     vtxColor->g = (u8)(vtxColor->g - 0x7F);
                     uv.x = half - reflected.x / invAxis;
+                    uv.x *= 0.25f;
                     uv.y = half + reflected.z / invAxis;
-                    uv.x = uv.x * 0.25f;
-                    uv.y = uv.y * 0.25f;
-                    uv.x = uv.x + 0.25f;
-                    uv.y = uv.y + half;
+                    uv.y *= 0.25f;
+                    uv.x += 0.25f;
+                    uv.y += half;
                 }
                 break;
             case 2:
@@ -754,17 +750,17 @@ static void CalcReflectionVector2(
                     vtxColor->b = (u8)(vtxColor->b + 0x7F);
                     uv.x = half + reflected.x / invAxis;
                     uv.y = half - reflected.y / invAxis;
-                    uv.y = uv.y * 0.25f;
-                    uv.x = uv.x * 0.25f;
-                    uv.y = uv.y + 0.25f;
+                    uv.y *= 0.25f;
+                    uv.x *= 0.25f;
+                    uv.y += 0.25f;
                 } else {
                     vtxColor->b = (u8)(vtxColor->b - 0x7F);
                     uv.x = half + reflected.x / invAxis;
                     uv.y = half + reflected.y / invAxis;
-                    uv.x = uv.x * 0.25f;
-                    uv.y = uv.y * 0.25f;
-                    uv.x = uv.x + half;
-                    uv.y = uv.y + 0.25f;
+                    uv.x *= 0.25f;
+                    uv.y *= 0.25f;
+                    uv.x += half;
+                    uv.y += 0.25f;
                 }
                 break;
             }
@@ -842,8 +838,8 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
         centerPos.y = gObject->m_worldPosition.y;
         centerPos.z = gObject->m_worldPosition.z;
     }
-    centerPos.y = 5.0f + centerPos.y;
     centerPos.x = centerPos.x;
+    centerPos.y = 5.0f + centerPos.y;
     centerPos.z = centerPos.z;
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
@@ -945,7 +941,7 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
         quadMin.x = 0.0f;
         quadMin.y = 0.0f;
         quadMin.z = 0.0f;
-        gUtil.RenderTextureQuad(0.0f, 0.0f, 128.0f,
+        gUtil.RenderTextureQuad(quadMin.x, quadMin.y, 128.0f,
                                 128.0f, &sceneTexObj, 0, 0, 0, GX_BL_SRCALPHA,
                                 GX_BL_INVSRCALPHA);
         mana2->m_paraboloidReady = 1;
@@ -1095,9 +1091,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                 static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1F6));
         }
         dstTexObj = mana2Work->m_baseParaboloidTexObjs;
-        for (i = 0; i < 6; i++) {
+        for (i = 0; i < 6; i++, dstTexObj++) {
             memcpy(dstTexObj, &mana2Work->m_sourceTextures[i]->m_texObj, sizeof(GXTexObj));
-            dstTexObj++;
         }
 
         CTexture* envTexture0 = mana2Work->m_envTexture0;
@@ -1128,10 +1123,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                         Vec* reflectionVec = mana2Work->m_meshReflectionVec;
                         float zero = 0.0f;
                         for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
-                            reflectionVec->z = zero;
-                            reflectionVec->y = zero;
-                            reflectionVec->x = zero;
-                            reflectionVec++;
+                            reflectionVec[vertexIndex].z = zero;
+                            reflectionVec[vertexIndex].y = zero;
+                            reflectionVec[vertexIndex].x = zero;
                         }
                     }
 
@@ -1141,11 +1135,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                                                               const_cast<char*>(s_pppMana2_cpp), 0x23B));
                         GXColor* color = mana2Work->m_meshColors;
                         for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
-                            color->r = 0xFF;
-                            color->g = 0xFF;
-                            color->b = 0xFF;
-                            color->a = 0xFF;
-                            color++;
+                            color[vertexIndex].r = 0xFF;
+                            color[vertexIndex].g = 0xFF;
+                            color[vertexIndex].b = 0xFF;
+                            color[vertexIndex].a = 0xFF;
                         }
                     }
 
@@ -1153,11 +1146,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                         mana2Work->m_meshTexCoords =
                             static_cast<S16Vec2d*>(pppMemAlloc(meshData->m_vertexCount * 6, ppvEnv->m_stagePtr,
                                                                const_cast<char*>(s_pppMana2_cpp), 0x244));
-                        u16* texCoord = reinterpret_cast<u16*>(mana2Work->m_meshTexCoords);
+                        S16Vec* texCoord = reinterpret_cast<S16Vec*>(mana2Work->m_meshTexCoords);
                         for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
-                            texCoord[1] = 0;
-                            texCoord[0] = 0;
-                            texCoord += 3;
+                            texCoord[vertexIndex].x = texCoord[vertexIndex].y = 0;
                         }
                     }
 
@@ -1261,7 +1252,6 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* ctrl)
     CChara::CMesh* mesh;
     pppMana2Step* step;
     u32 i;
-    u32 j;
 
     work = GetMana2Work(pppMana2, ctrl);
     MaterialMan.ClearManaParaboloidTexObjs();
@@ -1355,7 +1345,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* ctrl)
 
         if (stepType == 1) {
             if (strcmp(meshData->m_name, "obj5") == 0) {
-                for (j = 0; j < meshData->m_displayListCount; j++) {
+                for (u32 j = 0; j < meshData->m_displayListCount; j++) {
                     if (work->m_displayListCopies != NULL && work->m_displayListCopies[j] != NULL) {
                         pppMemFree(work->m_displayListCopies[j]);
                         work->m_displayListCopies[j] = 0;
@@ -1368,7 +1358,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* ctrl)
             }
         } else if (stepType == 2) {
             if (strcmp(meshData->m_name, "obj3") == 0) {
-                for (j = 0; j < meshData->m_displayListCount; j++) {
+                for (u32 j = 0; j < meshData->m_displayListCount; j++) {
                     if (work->m_displayListCopies != NULL && work->m_displayListCopies[j] != NULL) {
                         pppMemFree(work->m_displayListCopies[j]);
                         work->m_displayListCopies[j] = 0;
@@ -1380,7 +1370,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* ctrl)
                 }
             }
         } else if (stepType == 3 && strcmp(meshData->m_name, "obj1") == 0) {
-            for (j = 0; j < meshData->m_displayListCount; j++) {
+            for (u32 j = 0; j < meshData->m_displayListCount; j++) {
                 if (work->m_displayListCopies != NULL && work->m_displayListCopies[j] != NULL) {
                     pppMemFree(work->m_displayListCopies[j]);
                     work->m_displayListCopies[j] = 0;
@@ -1477,7 +1467,7 @@ static void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* st
     CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
     VMana2* mana2 = (VMana2*)work;
     CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
-    unsigned int draw = 0;
+    int draw = 0;
     pppMana2Step* stepData = static_cast<pppMana2Step*>(step);
     int type = stepData->m_type;
 
@@ -1524,7 +1514,7 @@ static void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* st
         offset.z = 0.0f;
         offset.y = 0.0f;
         offset.x = 0.0f;
-        offset.y = stepData->m_waterScale;
+        offset.y = stepData->m_waterOffset;
         PSMTXMultVec(mtx, &offset, &offset);
 
         y = y - offset.y;

@@ -65,7 +65,9 @@ static inline tagOAN3_SHAPE* pppShapeFrame(pppShapeAnimData* animData, int frame
 
 static inline tagOAN3_SHAPE* pppShapeFrame(long* animData, short frameIndex)
 {
-    return pppShapeFrame(pppShapeAnim(animData), frameIndex);
+    pppShapeAnimFrame* frame = &pppShapeAnim(animData)->m_frames[frameIndex];
+    return reinterpret_cast<tagOAN3_SHAPE*>(
+        reinterpret_cast<unsigned char*>(animData) + frame->m_shapeOffset);
 }
 
 void pppDrawShp(long*, short, CMaterialSet*, unsigned char);

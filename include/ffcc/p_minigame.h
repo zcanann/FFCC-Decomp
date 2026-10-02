@@ -10,7 +10,7 @@ class OSAlarm;
 class OSContext;
 class OSThread;
 
-void ChgHL16(unsigned short);
+unsigned short ChgHL16(unsigned short);
 void MiniGameFileRead(char*, void*, unsigned long&);
 unsigned long CalcCrc(unsigned long);
 void AdjustGbaImageRegistry(char*, char*);
@@ -40,7 +40,11 @@ public:
     OSMessageQueue m_queue;
     OSMessage m_message;
     void (*m_openCallback)(MgGbaThreadParam*, void*);
-    MgGbaContext m_context;
+    union
+    {
+        MgGbaContext m_context;
+        u8 m_contextBytes[sizeof(MgGbaContext)];
+    };
     unsigned int m_lastTick;
     unsigned char* m_image;
     unsigned int m_imageSize;
@@ -125,15 +129,13 @@ private:
     unsigned int m_receivedWords[4]; // 0x1368
     unsigned int m_broadcastWords[5]; // 0x1378
     MgGbaThreadParam m_gbaParams[4]; // 0x138C
-    MgGbaContext m_gbaContexts[4]; // 0x16AC
+    union
+    {
+        MgGbaContext m_gbaContexts[4]; // 0x16AC
+        u8 m_gbaContextBytes[4][sizeof(MgGbaContext)];
+    };
     OSThread m_gbaThreads[4]; // 0x1830
-    u8 m_work2490[0x6484 - 0x2490];
-
-public:
-    unsigned int m_flags; // 0x6484
-
-private:
-    u8 m_work6488[8];
+    u8 m_gbaStack[4 * 0x1000]; // 0x2490
     u8 m_playerMessageReady[4]; // 0x6490
     unsigned char m_miniGameReady; // 0x6494
     unsigned char m_miniGameFailed; // 0x6495

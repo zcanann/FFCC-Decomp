@@ -59,6 +59,14 @@ static inline YmMegaBirthShpTail2DataOffsets* GetYmMegaBirthShpTail2DataOffsets(
     return reinterpret_cast<YmMegaBirthShpTail2DataOffsets*>(offsets->m_serializedDataOffsets);
 }
 
+inline void U8ToF32(pppFVECTOR4* dest, u8* src)
+{
+    dest->x = src[0];
+    dest->y = src[1];
+    dest->z = src[2];
+    dest->w = src[3];
+}
+
 void birth(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
 void calc(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 
@@ -72,22 +80,73 @@ void calc(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShpTail2* stepData, _pppCtrlTable* offsets)
+void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShpTail2* step, _pppCtrlTable* offsets)
 {
-    PYmMegaBirthShpTail2* step = stepData;
-    YmMegaBirthShpTail2DataOffsets* serializedOffsets = GetYmMegaBirthShpTail2DataOffsets(offsets);
-    const s32 colorOffset = serializedOffsets->m_colorOffset;
-    const s32 particleDataOffset = serializedOffsets->m_workOffset;
-    VYmMegaBirthShpTail2* work =
-        (VYmMegaBirthShpTail2*)(object->m_workArea + particleDataOffset);
-    VColor* colorWork = (VColor*)(object->m_workArea + colorOffset);
-    _PARTICLE_DATA* const particlesBase = work->m_particles;
-    _PARTICLE_WMAT* const wmatsBase = work->m_wmats;
-    _PARTICLE_COLOR* const colorsBase = work->m_colors;
-    _PARTICLE_DATA* particles = particlesBase;
-    _PARTICLE_WMAT* wmats = wmatsBase;
-    _PARTICLE_COLOR* colors = colorsBase;
+    VYmMegaBirthShpTail2* work;
+    VColor* colorWork;
+    u8* particle;
+    _PARTICLE_WMAT* wmats;
+    _PARTICLE_COLOR* colors;
+    tagOAN3_SHAPE* shape;
+    pppShapeAnimData* shapeAnim;
+    u32 i;
+    s32 count;
+    s32 startIndex;
+    float segLen;
+    s32 nextIndex;
+    s32 lastIndex;
+    float baseX;
+    float baseY;
+    _PARTICLE_DATA* particlesBase;
+    _PARTICLE_WMAT* wmatsBase;
+    _PARTICLE_COLOR* colorsBase;
+    float colorStepG;
+    float baseZ;
+    float colorStepB;
+    Vec* history;
+    float diffR;
+    float segCursor;
+    float segRemain;
+    float drawScale;
+    float diffG;
     s8 hasRequiredMemory;
+    float nextZ;
+    float nextY;
+    float curY;
+    float curZ;
+    float countMinusOne;
+    float colorStepR;
+    float nextX;
+    float colorStepA;
+    float segDx;
+    float alphaMul;
+    u8 zEnable;
+    float segDy;
+    float diffB;
+    float diffA;
+    float segDz;
+    float curX;
+    float scaleStep;
+    pppFVECTOR4 colorStart;
+    pppFVECTOR4 colorEnd;
+    pppFMATRIX drawMtx;
+    Vec zeroVec;
+    Vec seg;
+    pppFVECTOR4 camPos;
+    pppFVECTOR4 pos;
+    pppFVECTOR4 mngPos;
+    Vec zeroVecB;
+    Vec segB;
+    GXColor amb;
+
+    work = (VYmMegaBirthShpTail2*)(object->m_workArea + GetYmMegaBirthShpTail2DataOffsets(offsets)->m_workOffset);
+    colorWork = (VColor*)(object->m_workArea + GetYmMegaBirthShpTail2DataOffsets(offsets)->m_colorOffset);
+    particlesBase = work->m_particles;
+    wmatsBase = work->m_wmats;
+    colorsBase = work->m_colors;
+    particle = (u8*)particlesBase;
+    wmats = wmatsBase;
+    colors = colorsBase;
 
     if (particlesBase == 0) {
         hasRequiredMemory = false;
@@ -104,209 +163,172 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
     if (step->m_shapeIndex == 0xFFFF) {
         return;
     }
-    const u32 dataValIndex = step->m_shapeIndex;
 
-    pppShapeAnimData* shapeAnim =
-        static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[dataValIndex]->m_animData);
-    pppSetDrawEnv(
-        0, &object->m_drawMatrix, step->m_depth, step->m_lightTarget, step->m_fogIndex,
-        step->m_blendMode, 0, step->m_disableDepthTest == 0, 1, 0);
+    shapeAnim = static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[step->m_shapeIndex]->m_animData);
+    if (step->m_disableDepthTest != 0) {
+        zEnable = 0;
+    } else {
+        zEnable = 1;
+    }
+    pppSetDrawEnv(0, &object->m_drawMatrix, step->m_depth, step->m_lightTarget, step->m_fogIndex,
+                  step->m_blendMode, 0, zEnable, 1, 0);
     pppSetBlendMode(step->m_blendMode);
 
-    for (u32 i = 0; i < work->m_maxParticles; i++) {
-        u8* particle = (u8*)particles + i * 0x1B8;
+    for (i = 0; i < work->m_maxParticles; i++) {
         if (*(u16*)(particle + 0x22) != 0) {
-            const s32 drawCount = step->m_drawCount;
-            s32 frameCount = drawCount;
-            pppFMATRIX drawMtx;
-            Vec zeroVec;
-            Vec segVec;
-            Vec cameraPos;
-            Vec trailPos;
-            Vec managerPos;
-            GXColor amb;
-            const s32 shapeFrameIndex = *(u16*)(particle + 0x20);
-            pppShapeAnimFrame* shapeFrame = &shapeAnim->m_frames[shapeFrameIndex];
-            tagOAN3_SHAPE* shape =
-                reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + shapeFrame->m_shapeOffset);
-            const s32 trailReadIndex = *(u8*)(particle + 0x38);
-            const s32 trailMaxIndex = *(u8*)(particle + 0x37) - 1;
-            s32 trailNextIndex;
-            const float stepDivisor = (float)((s32)drawCount - 1);
-            const float alphaScale = (float)colorWork->m_alpha / 16384.0f;
-            float fadeA = (float)step->m_colorStart.a * alphaScale;
-            const float fadeANum = fadeA - (float)step->m_colorEnd.a * alphaScale;
-            float fadeRGB[3];
-            fadeRGB[0] = (float)step->m_colorStart.r;
-            fadeRGB[1] = (float)step->m_colorStart.g;
-            fadeRGB[2] = (float)step->m_colorStart.b;
-            const float fadeRNum = fadeRGB[0] - (float)step->m_colorEnd.r;
-            const float fadeGNum = fadeRGB[1] - (float)step->m_colorEnd.g;
-            const float fadeBNum = fadeRGB[2] - (float)step->m_colorEnd.b;
-            float fadeRStep;
-            float fadeGStep;
-            float fadeBStep;
-            float fadeAStep;
-            if (stepDivisor != 0.0f) {
-                fadeGStep = fadeGNum / stepDivisor;
-                fadeBStep = fadeBNum / stepDivisor;
-                fadeAStep = fadeANum / stepDivisor;
-                fadeRStep = fadeRNum / stepDivisor;
+            segCursor = 0.0f;
+            count = step->m_drawCount;
+            countMinusOne = (float)(count - 1);
+            alphaMul = (float)colorWork->m_alpha / 16384.0f;
+            U8ToF32(&colorStart, (u8*)&step->m_colorStart);
+            U8ToF32(&colorEnd, (u8*)&step->m_colorEnd);
+            colorStart.w *= alphaMul;
+            colorEnd.w *= alphaMul;
+            diffA = colorStart.w - colorEnd.w;
+            diffR = colorStart.x - colorEnd.x;
+            diffG = colorStart.y - colorEnd.y;
+            diffB = colorStart.z - colorEnd.z;
+            lastIndex = *(u8*)(particle + 0x37) - 1;
+            nextIndex = *(u8*)(particle + 0x38);
+            shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) +
+                                                     shapeAnim->m_frames[*(u16*)(particle + 0x20)].m_shapeOffset);
+            if (countMinusOne != segCursor) {
+                colorStepR = diffR / countMinusOne;
+                colorStepG = diffG / countMinusOne;
+                colorStepB = diffB / countMinusOne;
+                colorStepA = diffA / countMinusOne;
             } else {
-                fadeRStep = 0.5f;
-                fadeGStep = 0.5f;
-                fadeBStep = 0.5f;
-                fadeAStep = 0.5f;
+                colorStepR = 0.5f;
+                colorStepG = colorStepR;
+                colorStepB = colorStepR;
+                colorStepA = colorStepR;
             }
-            Vec* history;
-            float drawScale;
-            float drawScaleStep;
-            s32 trailStartIndex;
-            float segLen;
-            float segProgress = 0.0f;
-            float segRemaining;
-            float trailX, trailY, trailZ;
-            float drawX, drawY, drawZ;
-            float camX, camY, camZ;
-            float segX, segY, segZ;
 
             pppUnitMatrix(drawMtx);
-            history = (Vec*)(particle + 0x40);
-            trailStartIndex = *(u8*)(particle + 0x38);
             drawScale = step->m_drawScaleStart;
-            drawScaleStep = (drawScale - step->m_drawScaleEnd) / stepDivisor;
-            {
-                Vec* p = &history[trailReadIndex];
-                trailX = p->x;
-                trailY = p->y;
-                trailZ = p->z;
+            scaleStep = (drawScale - step->m_drawScaleEnd) / countMinusOne;
+
+            history = (Vec*)(particle + 0x40);
+            startIndex = *(u8*)(particle + 0x38);
+            curX = history[nextIndex].x;
+            curY = history[nextIndex].y;
+            curZ = history[nextIndex].z;
+            baseX = curX;
+            baseY = curY;
+            baseZ = curZ;
+            if (nextIndex++ == lastIndex) {
+                nextIndex = 0;
             }
-            drawX = trailX;
-            drawY = trailY;
-            drawZ = trailZ;
-            trailNextIndex = trailReadIndex + 1;
-            if (trailReadIndex == trailMaxIndex) {
-                trailNextIndex = 0;
-            }
-            {
-                Vec* p = &history[trailNextIndex];
-                camX = p->x;
-                camY = p->y;
-                camZ = p->z;
-            }
-            segX = camX - trailX;
-            segY = camY - trailY;
-            segZ = camZ - trailZ;
+            nextX = history[nextIndex].x;
+            nextY = history[nextIndex].y;
+            nextZ = history[nextIndex].z;
+            segDx = nextX - curX;
+            segDy = nextY - curY;
+            segDz = nextZ - curZ;
             zeroVec.z = 0.0f;
             zeroVec.y = 0.0f;
             zeroVec.x = 0.0f;
-            segVec.x = segX;
-            segVec.y = segY;
-            segVec.z = segZ;
-            segLen = PSVECDistance(&zeroVec, &segVec);
-            segRemaining = segLen;
+            seg.x = segDx;
+            seg.y = segDy;
+            seg.z = segDz;
+            segLen = PSVECDistance(&zeroVec, &seg);
+            segRemain = segLen;
 
             if (step->m_drawHead == 0) {
-                goto step_advance;
+                goto update_step;
             }
-            for (frameCount = step->m_drawCount; frameCount > 0; frameCount--) {
-                Vec* testPos = &((Vec*)(particle + 0x40))[trailNextIndex];
-                if ((testPos->x != 0.0f) || (testPos->y != 0.0f) || (testPos->z != 0.0f)) {
+
+            for (count = step->m_drawCount; count > 0; count--) {
+                if ((0.0f != ((Vec*)(particle + 0x40))[nextIndex].x) ||
+                    (0.0f != ((Vec*)(particle + 0x40))[nextIndex].y) ||
+                    (0.0f != ((Vec*)(particle + 0x40))[nextIndex].z)) {
                     pppUnitMatrix(drawMtx);
                     drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;
                     drawMtx.value[1][1] = drawScale * ppvMng->m_scale.y;
                     drawMtx.value[2][2] = drawScale * ppvMng->m_scale.z;
-                    trailPos.x = trailX;
-                    trailPos.y = trailY;
-                    trailPos.z = trailZ;
+                    pos.x = curX;
+                    pos.y = curY;
+                    pos.z = curZ;
 
                     if (step->m_matrixMode == 0) {
-                        PSMTXMultVec(ppvWorldMatrix, &trailPos, &cameraPos);
+                        PSMTXMultVec(ppvWorldMatrix, (Vec*)&pos, (Vec*)&camPos);
                     } else if (step->m_matrixMode == 1) {
-                        managerPos.x = ppvMng->m_matrix.value[0][3];
-                        managerPos.y = ppvMng->m_matrix.value[1][3];
-                        managerPos.z = ppvMng->m_matrix.value[2][3];
-                        PSVECAdd(&managerPos, &trailPos, &trailPos);
-                        PSMTXMultVec(ppvCameraMatrix, &trailPos, &cameraPos);
+                        mngPos.x = ppvMng->m_matrix.value[0][3];
+                        mngPos.y = ppvMng->m_matrix.value[1][3];
+                        mngPos.z = ppvMng->m_matrix.value[2][3];
+                        PSVECAdd((Vec*)&mngPos, (Vec*)&pos, (Vec*)&pos);
+                        PSMTXMultVec(ppvCameraMatrix, (Vec*)&pos, (Vec*)&camPos);
                     }
 
-                    drawMtx.value[0][3] = cameraPos.x;
-                    drawMtx.value[1][3] = cameraPos.y;
-                    drawMtx.value[2][3] = cameraPos.z;
+                    drawMtx.value[0][3] = camPos.x;
+                    drawMtx.value[1][3] = camPos.y;
+                    drawMtx.value[2][3] = camPos.z;
                     GXLoadPosMtxImm(drawMtx.value, 0);
 
-                    amb.r = (u8)fadeRGB[0];
-                    amb.g = (u8)fadeRGB[1];
-                    amb.b = (u8)fadeRGB[2];
-                    amb.a = (u8)(fadeA * (0.00787f * (127.0f - *(float*)(particle + 0x30))));
+                    amb.r = (u8)colorStart.x;
+                    amb.g = (u8)colorStart.y;
+                    amb.b = (u8)colorStart.z;
+                    amb.a = (u8)(colorStart.w * (0.00787f * (127.0f - *(float*)(particle + 0x30))));
                     GXSetChanAmbColor(GX_COLOR0A0, amb);
                     pppDrawShp(shape, ppvEnv->m_materialSetPtr, step->m_blendMode);
-                }
-            step_advance:
-                fadeRGB[0] -= fadeRStep;
-                fadeRGB[1] -= fadeGStep;
-                fadeRGB[2] -= fadeBStep;
-                fadeA -= fadeAStep;
-                drawScale -= drawScaleStep;
 
-                if (step->m_segmentLength <= 0.0f) {
-                    break;
-                }
-
-                for (;;) {
-                    Vec innerZero;
-                    Vec innerSeg;
-                    s32 prevNext;
-
-                    if (segRemaining >= step->m_segmentLength) {
-                        trailX = segX * segProgress / segLen + drawX;
-                        trailY = segY * segProgress / segLen + drawY;
-                        trailZ = segZ * segProgress / segLen + drawZ;
-                        segProgress += step->m_segmentLength;
-                        segRemaining -= step->m_segmentLength;
-                        break;
-                    }
-
-                    prevNext = trailNextIndex;
-                    trailNextIndex++;
-                    if (prevNext == trailMaxIndex) {
-                        trailNextIndex = 0;
-                    }
-                    if (trailNextIndex == trailStartIndex) {
+                update_step:
+                    colorStart.x -= colorStepR;
+                    colorStart.y -= colorStepG;
+                    colorStart.z -= colorStepB;
+                    colorStart.w -= colorStepA;
+                    drawScale -= scaleStep;
+                    if (step->m_segmentLength <= 0.0f) {
                         goto next_particle;
                     }
 
-                    segProgress -= segLen;
-                    drawX = camX;
-                    drawY = camY;
-                    drawZ = camZ;
-                    {
-                        Vec* p = &history[trailNextIndex];
-                        camY = p->y;
-                        camZ = p->z;
-                        camX = p->x;
+                advance_segment:
+                    if (segRemain >= step->m_segmentLength) {
+                        curX = (segDx * segCursor) / segLen;
+                        curY = (segDy * segCursor) / segLen;
+                        curZ = (segDz * segCursor) / segLen;
+                        curX += baseX;
+                        curY += baseY;
+                        curZ += baseZ;
+                        segCursor += step->m_segmentLength;
+                        segRemain -= step->m_segmentLength;
+                        continue;
                     }
-                    segY = camY - drawY;
-                    segZ = camZ - drawZ;
-                    segX = camX - drawX;
-                    innerZero.z = 0.0f;
-                    innerZero.y = 0.0f;
-                    innerZero.x = 0.0f;
-                    innerSeg.x = segX;
-                    innerSeg.y = segY;
-                    innerSeg.z = segZ;
-                    segLen = PSVECDistance(&innerZero, &innerSeg);
-                    segRemaining += segLen;
+
+                    if (nextIndex++ == lastIndex) {
+                        nextIndex = 0;
+                    }
+                    if (nextIndex == startIndex) {
+                        goto next_particle;
+                    }
+
+                    baseX = nextX;
+                    baseY = nextY;
+                    baseZ = nextZ;
+                    segCursor -= segLen;
+                    segDy = (nextY = history[nextIndex].y) - baseY;
+                    segDz = (nextZ = history[nextIndex].z) - baseZ;
+                    segDx = (nextX = history[nextIndex].x) - baseX;
+                    zeroVecB.z = 0.0f;
+                    zeroVecB.y = 0.0f;
+                    zeroVecB.x = 0.0f;
+                    segB.x = segDx;
+                    segB.y = segDy;
+                    segB.z = segDz;
+                    segLen = PSVECDistance(&zeroVecB, &segB);
+                    segRemain += segLen;
+                    goto advance_segment;
                 }
             }
         }
-        next_particle:;
+    next_particle:
         if (wmats != 0) {
             wmats = wmats + 1;
         }
         if (colors != 0) {
             colors = colors + 1;
         }
+        particle += 0x1B8;
     }
 }
 
@@ -559,11 +581,16 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
  * JP Address: TODO
  * JP Size: TODO
  */
-void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpTail2* param, VColor* vColor,
-           _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, _PARTICLE_COLOR* particleColor)
+void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
+           PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, VColor* vColor,
+           _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat,
+           _PARTICLE_COLOR* particleColor)
 {
     u8* particleBytes = (u8*)particleData;
-    float spread = (float)param->m_spread;
+    float vx;
+    float vy;
+    float vz;
+    float spread = (float)pYmMegaBirthShpTail2->m_spread;
     float spreadRange = 2.0f * spread;
 
     memset(particleData, 0, 0x1b8);
@@ -574,77 +601,82 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         memset(particleColor, 0, sizeof(_PARTICLE_COLOR));
     }
 
-    if ((s32)param->m_spawnMode < 8 && (s32)param->m_spawnMode >= 0) {
+    switch (pYmMegaBirthShpTail2->m_spawnMode) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7: {
         Vec baseDir;
         pppIVECTOR4 angles;
         pppFMATRIX rot;
 
-        baseDir.x = param->m_baseDirection.x;
-        baseDir.y = param->m_baseDirection.y;
-        baseDir.z = param->m_baseDirection.z;
+        baseDir.x = pYmMegaBirthShpTail2->m_baseDirection.x;
+        baseDir.y = pYmMegaBirthShpTail2->m_baseDirection.y;
+        baseDir.z = pYmMegaBirthShpTail2->m_baseDirection.z;
         angles.x = (s32)(spreadRange * Math.RandF() - spread);
         angles.x = (s32)((float)(angles.x << 15) / 180.0f);
         angles.y = (s32)(spreadRange * Math.RandF() - spread);
         angles.y = (s32)((float)(angles.y << 15) / 180.0f);
         angles.z = (s32)(spreadRange * Math.RandF() - spread);
         angles.z = (s32)((float)(angles.z << 15) / 180.0f);
-        if ((param->m_spawnMode == 2) || (param->m_spawnMode == 3)) {
+        if ((pYmMegaBirthShpTail2->m_spawnMode == 2) || (pYmMegaBirthShpTail2->m_spawnMode == 3)) {
             angles.x = 0;
             angles.y = 0;
         }
 
         pppGetRotMatrixXYZ(rot, &angles);
         PSMTXMultVecSR(rot.value, &baseDir, reinterpret_cast<Vec*>(particleData->m_matrix[1]));
-        particleData->m_matrix[1][0] *= param->m_spawnScale.x;
-        particleData->m_matrix[1][1] *= param->m_spawnScale.y;
-        particleData->m_matrix[1][2] *= param->m_spawnScale.z;
+        reinterpret_cast<Vec*>(particleData->m_matrix[1])->x *= pYmMegaBirthShpTail2->m_spawnScale.x;
+        reinterpret_cast<Vec*>(particleData->m_matrix[1])->y *= pYmMegaBirthShpTail2->m_spawnScale.y;
+        reinterpret_cast<Vec*>(particleData->m_matrix[1])->z *= pYmMegaBirthShpTail2->m_spawnScale.z;
         pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]),
                      *reinterpret_cast<Vec*>(particleData->m_matrix[1]));
+        break;
+    }
     }
 
-    if ((s32)param->m_spawnMode < 6) {
-        if ((s32)param->m_spawnMode >= 4) {
-            goto mode_4_5;
-        }
-        goto scalar;
-    }
-    if ((s32)param->m_spawnMode >= 10) {
-        goto scalar;
-    }
-    goto path;
-
-scalar:
+    switch (pYmMegaBirthShpTail2->m_spawnMode) {
+    default:
     {
-        float speedRandRange = param->m_spawnRange;
-        if (speedRandRange != 0.0f) {
-            float scale = speedRandRange;
+        if (0.0f != pYmMegaBirthShpTail2->m_spawnRange) {
+            float scale = pYmMegaBirthShpTail2->m_spawnRange;
 
-            switch (param->m_randType) {
+            switch (pYmMegaBirthShpTail2->m_randType) {
             case 1:
                 Math.RandF();
-                scale = param->m_spawnRange * Math.RandF();
+                scale = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
                 break;
-            case 2: {
-                float a = Math.RandF();
-                scale = a * (param->m_spawnRange * Math.RandF());
-                break;
-            }
-            case 3: {
-                float a = Math.RandF();
-                scale = param->m_spawnRange - 0.7f * (a * (param->m_spawnRange * Math.RandF()));
+            case 2:
+            {
+                float rand1 = Math.RandF();
+                scale = (pYmMegaBirthShpTail2->m_spawnRange * Math.RandF()) * rand1;
                 break;
             }
-            case 4: {
-                float a = Math.RandF();
-                float b = Math.RandF();
-                float c = Math.RandF();
-                scale = Math.RandF() * (c * (a * (param->m_spawnRange * b)));
+            case 3:
+            {
+                float rand1 = Math.RandF();
+                float rand2 = Math.RandF();
+                scale = pYmMegaBirthShpTail2->m_spawnRange - 0.7f * ((pYmMegaBirthShpTail2->m_spawnRange * rand2) * rand1);
                 break;
             }
-            case 5: {
-                float a = Math.RandF();
-                float b = Math.RandF();
-                scale = param->m_spawnRange - 0.5f * (Math.RandF() * (a * (param->m_spawnRange * b)));
+            case 4:
+            {
+                float rand1 = Math.RandF();
+                float rand2 = Math.RandF();
+                float rand3 = Math.RandF();
+                scale = Math.RandF() * (rand3 * ((pYmMegaBirthShpTail2->m_spawnRange * rand2) * rand1));
+                break;
+            }
+            case 5:
+            {
+                float rand1 = Math.RandF();
+                float rand2 = Math.RandF();
+                float rand3 = Math.RandF();
+                scale = pYmMegaBirthShpTail2->m_spawnRange - 0.5f * (rand3 * ((pYmMegaBirthShpTail2->m_spawnRange * rand2) * rand1));
                 break;
             }
             }
@@ -652,168 +684,184 @@ scalar:
             Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
             pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[0]), velocity, scale);
         }
-        goto done;
+        break;
     }
 
-mode_4_5:
+    case 4:
+    case 5:
     {
-        if (param->m_spawnRange == 0.0f) {
-            goto done;
+        if (0.0f == pYmMegaBirthShpTail2->m_spawnRange) {
+            break;
         }
-        float speedRandHalf = 0.5f * param->m_spawnRange;
+        float speedRandHalf = 0.5f * pYmMegaBirthShpTail2->m_spawnRange;
 
-        switch (param->m_randType) {
+        {
+        float rand1;
+        float rand2;
+        float rand3;
+        switch (pYmMegaBirthShpTail2->m_randType) {
         default:
-            particleData->m_matrix[0][0] = param->m_spawnRange * Math.RandF();
+            particleData->m_matrix[0][0] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
             particleData->m_matrix[0][0] -= speedRandHalf;
-            particleData->m_matrix[0][1] = param->m_spawnRange * Math.RandF();
+            particleData->m_matrix[0][1] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
             particleData->m_matrix[0][1] -= speedRandHalf;
-            particleData->m_matrix[0][2] = param->m_spawnRange * Math.RandF();
+            particleData->m_matrix[0][2] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
             particleData->m_matrix[0][2] -= speedRandHalf;
             break;
         case 1:
             Math.RandF();
-            particleData->m_matrix[0][0] = param->m_spawnRange * Math.RandF();
+            particleData->m_matrix[0][0] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
             particleData->m_matrix[0][0] -= speedRandHalf;
-            particleData->m_matrix[0][1] = param->m_spawnRange * Math.RandF();
+            particleData->m_matrix[0][1] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
             particleData->m_matrix[0][1] -= speedRandHalf;
-            particleData->m_matrix[0][2] = param->m_spawnRange * Math.RandF();
+            particleData->m_matrix[0][2] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
             particleData->m_matrix[0][2] -= speedRandHalf;
             break;
-        case 2: {
-            float a0 = Math.RandF();
-            particleData->m_matrix[0][0] = a0 * (param->m_spawnRange * Math.RandF());
+        case 2:
+            rand1 = Math.RandF();
+            particleData->m_matrix[0][0] = (pYmMegaBirthShpTail2->m_spawnRange * Math.RandF()) * rand1;
             particleData->m_matrix[0][0] -= speedRandHalf;
-            float a1 = Math.RandF();
-            particleData->m_matrix[0][1] = a1 * (param->m_spawnRange * Math.RandF());
+            rand1 = Math.RandF();
+            particleData->m_matrix[0][1] = (pYmMegaBirthShpTail2->m_spawnRange * Math.RandF()) * rand1;
             particleData->m_matrix[0][1] -= speedRandHalf;
-            float a2 = Math.RandF();
-            particleData->m_matrix[0][2] = a2 * (param->m_spawnRange * Math.RandF());
+            rand1 = Math.RandF();
+            particleData->m_matrix[0][2] = (pYmMegaBirthShpTail2->m_spawnRange * Math.RandF()) * rand1;
             particleData->m_matrix[0][2] -= speedRandHalf;
             break;
-        }
-        case 3: {
-            float a0 = Math.RandF();
-            particleData->m_matrix[0][0] = param->m_spawnRange - 0.7f * (a0 * (param->m_spawnRange * Math.RandF()));
+        case 3:
+            rand1 = Math.RandF();
+            rand2 = Math.RandF();
+            particleData->m_matrix[0][0] = pYmMegaBirthShpTail2->m_spawnRange - 0.7f * ((pYmMegaBirthShpTail2->m_spawnRange * rand2) * rand1);
             particleData->m_matrix[0][0] -= speedRandHalf;
-            float a1 = Math.RandF();
-            particleData->m_matrix[0][1] = param->m_spawnRange - 0.7f * (a1 * (param->m_spawnRange * Math.RandF()));
+            rand1 = Math.RandF();
+            rand2 = Math.RandF();
+            particleData->m_matrix[0][1] = pYmMegaBirthShpTail2->m_spawnRange - 0.7f * ((pYmMegaBirthShpTail2->m_spawnRange * rand2) * rand1);
             particleData->m_matrix[0][1] -= speedRandHalf;
-            float a2 = Math.RandF();
-            particleData->m_matrix[0][2] = param->m_spawnRange - 0.7f * (a2 * (param->m_spawnRange * Math.RandF()));
+            rand1 = Math.RandF();
+            rand2 = Math.RandF();
+            particleData->m_matrix[0][2] = pYmMegaBirthShpTail2->m_spawnRange - 0.7f * ((pYmMegaBirthShpTail2->m_spawnRange * rand2) * rand1);
             particleData->m_matrix[0][2] -= speedRandHalf;
             break;
-        }
-        case 4: {
-            float a0 = Math.RandF();
-            float b0 = Math.RandF();
-            float c0 = Math.RandF();
-            particleData->m_matrix[0][0] = Math.RandF() * (c0 * (a0 * (param->m_spawnRange * b0)));
+        case 4:
+            rand1 = Math.RandF();
+            rand2 = Math.RandF();
+            rand3 = Math.RandF();
+            particleData->m_matrix[0][0] = Math.RandF() * (rand3 * ((pYmMegaBirthShpTail2->m_spawnRange * rand2) * rand1));
             particleData->m_matrix[0][0] -= speedRandHalf;
-            float a1 = Math.RandF();
-            float b1 = Math.RandF();
-            float c1 = Math.RandF();
-            particleData->m_matrix[0][1] = Math.RandF() * (c1 * (a1 * (param->m_spawnRange * b1)));
+            rand1 = Math.RandF();
+            rand2 = Math.RandF();
+            rand3 = Math.RandF();
+            particleData->m_matrix[0][1] = Math.RandF() * (rand3 * ((pYmMegaBirthShpTail2->m_spawnRange * rand2) * rand1));
             particleData->m_matrix[0][1] -= speedRandHalf;
-            float a2 = Math.RandF();
-            float b2 = Math.RandF();
-            float c2 = Math.RandF();
-            particleData->m_matrix[0][2] = Math.RandF() * (c2 * (a2 * (param->m_spawnRange * b2)));
+            rand1 = Math.RandF();
+            rand2 = Math.RandF();
+            rand3 = Math.RandF();
+            particleData->m_matrix[0][2] = Math.RandF() * (rand3 * ((pYmMegaBirthShpTail2->m_spawnRange * rand2) * rand1));
             particleData->m_matrix[0][2] -= speedRandHalf;
             break;
-        }
-        case 5: {
-            float a0 = Math.RandF();
-            float b0 = Math.RandF();
-            particleData->m_matrix[0][0] = param->m_spawnRange - 0.5f * (Math.RandF() * (a0 * (param->m_spawnRange * b0)));
+        case 5:
+            rand1 = Math.RandF();
+            rand2 = Math.RandF();
+            rand3 = Math.RandF();
+            particleData->m_matrix[0][0] = pYmMegaBirthShpTail2->m_spawnRange - 0.5f * (rand3 * ((pYmMegaBirthShpTail2->m_spawnRange * rand2) * rand1));
             particleData->m_matrix[0][0] -= speedRandHalf;
-            float a1 = Math.RandF();
-            float b1 = Math.RandF();
-            particleData->m_matrix[0][1] = param->m_spawnRange - 0.5f * (Math.RandF() * (a1 * (param->m_spawnRange * b1)));
+            rand1 = Math.RandF();
+            rand2 = Math.RandF();
+            rand3 = Math.RandF();
+            particleData->m_matrix[0][1] = pYmMegaBirthShpTail2->m_spawnRange - 0.5f * (rand3 * ((pYmMegaBirthShpTail2->m_spawnRange * rand2) * rand1));
             particleData->m_matrix[0][1] -= speedRandHalf;
-            float a2 = Math.RandF();
-            float b2 = Math.RandF();
-            particleData->m_matrix[0][2] = param->m_spawnRange - 0.5f * (Math.RandF() * (a2 * (param->m_spawnRange * b2)));
+            rand1 = Math.RandF();
+            rand2 = Math.RandF();
+            rand3 = Math.RandF();
+            particleData->m_matrix[0][2] = pYmMegaBirthShpTail2->m_spawnRange - 0.5f * (rand3 * ((pYmMegaBirthShpTail2->m_spawnRange * rand2) * rand1));
             particleData->m_matrix[0][2] -= speedRandHalf;
             break;
         }
         }
 
-        particleData->m_matrix[0][0] *= param->m_spawnScale.x;
-        particleData->m_matrix[0][1] *= param->m_spawnScale.y;
-        particleData->m_matrix[0][2] *= param->m_spawnScale.z;
-        goto done;
+        particleData->m_matrix[0][0] *= pYmMegaBirthShpTail2->m_spawnScale.x;
+        particleData->m_matrix[0][1] *= pYmMegaBirthShpTail2->m_spawnScale.y;
+        particleData->m_matrix[0][2] *= pYmMegaBirthShpTail2->m_spawnScale.z;
+        break;
     }
 
-path:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
     {
         Vec* pathBase = pppPObject->m_drawMatrixPtr;
 
-        if (param->m_pathIndex >= 0) {
-            pppShapeGroupRaw* pathInfo = &ppvEnv->m_shapeGroupPtr[param->m_pathIndex];
+        if (pYmMegaBirthShpTail2->m_pathIndex >= 0) {
+            pppShapeGroupRaw* pathInfo = &ppvEnv->m_shapeGroupPtr[pYmMegaBirthShpTail2->m_pathIndex];
 
             if (pathBase == 0) {
                 pathBase = ppvEnv->m_mapMeshPtr[pathInfo->m_meshIndex]->m_vertices;
             }
 
             {
-                float vx;
-                float vy;
-                float vz;
                 float sampleT;
 
-                switch (param->m_randType) {
+                switch (pYmMegaBirthShpTail2->m_randType) {
                 default:
-                    if ((int)work->m_pathIndex >= pathInfo->m_vertexCount) {
-                        work->m_pathIndex = 0;
+                    if ((int)vYmMegaBirthShpTail2->m_pathIndex >= pathInfo->m_vertexCount) {
+                        vYmMegaBirthShpTail2->m_pathIndex = 0;
                     }
 
                     if (pathBase != 0) {
-                        int sampleIndex = work->m_pathIndex;
+                        u16 sampleIndex = vYmMegaBirthShpTail2->m_pathIndex;
                         u16* indices = pathInfo->m_vertexIndices;
-                        work->m_pathIndex = sampleIndex + 1;
+                        vYmMegaBirthShpTail2->m_pathIndex = sampleIndex + 1;
 
-                        Vec* pathVec = &pathBase[indices[(u16)sampleIndex]];
+                        Vec* pathVec = &pathBase[indices[sampleIndex]];
                         vx = pathVec->x;
                         vy = pathVec->y;
                         vz = pathVec->z;
                     }
-                    goto path_apply;
+                    goto path_store;
                 case 1:
                     Math.RandF();
                     sampleT = Math.RandF();
                     break;
-                case 2: {
-                    float a = Math.RandF();
-                    float b = Math.RandF();
-                    sampleT = a * b * Math.RandF();
+                case 2:
+                {
+                    float r0 = Math.RandF();
+                    float r1 = Math.RandF();
+                    float r2 = Math.RandF();
+                    sampleT = r2 * (r1 * r0);
                     break;
                 }
-                case 3: {
-                    float a = Math.RandF();
-                    float b = Math.RandF();
-                    sampleT = static_cast<float>(1.0 - (a * b * Math.RandF()));
+                case 3:
+                {
+                    float r0 = Math.RandF();
+                    float r1 = Math.RandF();
+                    float r2 = Math.RandF();
+                    sampleT = static_cast<float>(1.0 - (r2 * (r1 * r0)));
                     break;
                 }
-                case 4: {
-                    float a = Math.RandF();
-                    float b = Math.RandF();
-                    float c = Math.RandF();
-                    sampleT = a * (b * (c * Math.RandF()));
+                case 4:
+                {
+                    float r0 = Math.RandF();
+                    float r1 = Math.RandF();
+                    float r2 = Math.RandF();
+                    float r3 = Math.RandF();
+                    sampleT = r3 * (r2 * (r1 * r0));
                     break;
                 }
-                case 5: {
-                    float a = Math.RandF();
-                    float b = Math.RandF();
-                    float c = Math.RandF();
-                    float d = Math.RandF();
-                    sampleT = static_cast<float>(1.0 - (a * (b * (c * (d * Math.RandF())))));
+                case 5:
+                {
+                    float r0 = Math.RandF();
+                    float r1 = Math.RandF();
+                    float r2 = Math.RandF();
+                    float r3 = Math.RandF();
+                    float r4 = Math.RandF();
+                    sampleT = static_cast<float>(1.0 - (r4 * (r3 * (r2 * (r1 * r0)))));
                     break;
                 }
                 }
 
-                if ((int)work->m_pathIndex >= pathInfo->m_vertexCount) {
-                    work->m_pathIndex = 0;
+                if ((int)vYmMegaBirthShpTail2->m_pathIndex >= pathInfo->m_vertexCount) {
+                    vYmMegaBirthShpTail2->m_pathIndex = 0;
                 }
 
                 if (pathBase != 0) {
@@ -823,50 +871,54 @@ path:
                     vy = pathVec->y;
                     vz = pathVec->z;
                 }
+                path_store:
 
-            path_apply:
-                particleData->m_matrix[0][0] = vx * param->m_spawnScale.x;
-                particleData->m_matrix[0][1] = vy * param->m_spawnScale.y;
-                particleData->m_matrix[0][2] = vz * param->m_spawnScale.z;
+                particleData->m_matrix[0][0] = vx * pYmMegaBirthShpTail2->m_spawnScale.x;
+                particleData->m_matrix[0][1] = vy * pYmMegaBirthShpTail2->m_spawnScale.y;
+                particleData->m_matrix[0][2] = vz * pYmMegaBirthShpTail2->m_spawnScale.z;
 
-                if ((param->m_spawnMode == 8) || (param->m_spawnMode == 9)) {
+                if ((pYmMegaBirthShpTail2->m_spawnMode == 8) || (pYmMegaBirthShpTail2->m_spawnMode == 9)) {
                     Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[0]);
                     pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity);
                 }
             }
         }
-        goto done;
+        break;
     }
 
-done:
-    if (param->m_fadeInFrames != 0) {
+    }
+
+
+    if (pYmMegaBirthShpTail2->m_fadeInFrames != 0) {
         *(float*)(particleBytes + 0x30) = (float)vColor->m_color.rgba[3];
-        particleBytes[0x35] = param->m_fadeInFrames;
+        particleBytes[0x35] = pYmMegaBirthShpTail2->m_fadeInFrames;
     }
-    if (param->m_fadeOutFrames != 0) {
-        particleBytes[0x36] = param->m_fadeOutFrames;
+    if (pYmMegaBirthShpTail2->m_fadeOutFrames != 0) {
+        particleBytes[0x36] = pYmMegaBirthShpTail2->m_fadeOutFrames;
     }
 
-    particleData->m_matrix[2][2] = param->m_speed;
-    particleData->m_matrix[2][3] = param->m_tailSpeed;
-    if (param->m_speedRandom != 0.0f) {
+    particleData->m_matrix[2][2] = pYmMegaBirthShpTail2->m_speed;
+    particleData->m_matrix[2][3] = pYmMegaBirthShpTail2->m_tailSpeed;
+    if (pYmMegaBirthShpTail2->m_speedRandom != 0.0f) {
+        float rand1 = Math.RandF();
         particleData->m_matrix[2][2] +=
-            (2.0f * param->m_speedRandom) * Math.RandF() - param->m_speedRandom;
+            (2.0f * pYmMegaBirthShpTail2->m_speedRandom) * rand1 -
+            pYmMegaBirthShpTail2->m_speedRandom;
     }
 
-    if (param->m_life == 0) {
-        *(u16*)(particleBytes + 0x22) = 0xFFFF;
+    if (pYmMegaBirthShpTail2->m_life == 0) {
+        *(u16*)((u8*)particleData + 0x22) = 0xFFFF;
     } else {
-        *(u16*)(particleBytes + 0x22) = param->m_life;
+        *(s16*)((u8*)particleData + 0x22) = pYmMegaBirthShpTail2->m_life;
     }
     particleBytes[0x34] = 0;
 
-    switch ((s32)param->m_matrixMode) {
+    switch (pYmMegaBirthShpTail2->m_matrixMode) {
     case 0:
-        pppCopyMatrix(*(pppFMATRIX*)particleWMat, work->m_emitterMatrix);
+        pppCopyMatrix(*(pppFMATRIX*)particleWMat, vYmMegaBirthShpTail2->m_emitterMatrix);
         break;
     case 1:
-        pppCopyMatrix(*(pppFMATRIX*)particleWMat, work->m_emitterMatrix);
+        pppCopyMatrix(*(pppFMATRIX*)particleWMat, vYmMegaBirthShpTail2->m_emitterMatrix);
         break;
     }
 

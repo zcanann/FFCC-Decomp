@@ -238,10 +238,11 @@ void Text_LoadPalette(s32 no, s32 id, s32 base)
     if (gSpMode == 0) {
         tbl = (u16 *)&gTextGfx;
         tbl += 8;
+        pal = tbl + base * 16;
     } else {
         tbl = gSpTextPalettes[0];
+        pal = tbl + base * 16;
     }
-    pal = tbl + base * 16;
     tbl = (u16 *)(0x05000000 + no * 32);
     if (gSpMode == 0) {
         src = gFont.palettes + (u8 *)&gFont;
@@ -313,17 +314,23 @@ void Text_CopyToObj(s32 which, s32 n, s32 color)
     memset(buf, 0, sizeof(buf));
     size = n * 128;
     if (color != 0) {
-        for (i = 0, p = buf; i < size; p++, i++) {
-            v = src[i];
-            hi = v & 0xF0;
-            if (hi != 0)
-                t = hi + (color << 6);
-            else
-                t = 0;
-            *p = t;
-            lo = v & 0x0F;
-            if (lo != 0)
-                *p = (lo + (color << 2)) | t;
+        i = 0;
+        if (i < size) {
+            p = buf;
+            do {
+                v = src[i];
+                hi = v & 0xF0;
+                if (hi != 0)
+                    t = hi + (color << 6);
+                else
+                    t = 0;
+                *p = t;
+                lo = v & 0x0F;
+                if (lo != 0)
+                    *p = (lo + (color << 2)) | t;
+                p++;
+                i++;
+            } while (i < size);
         }
     } else {
         memcpy(buf, src, size);

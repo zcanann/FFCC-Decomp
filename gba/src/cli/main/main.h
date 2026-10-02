@@ -18,6 +18,8 @@ extern u8 gReconnectPending;
 extern u8 gInputLockFrames;
 extern u8 gSpMode;
 
+extern const s16 gSinTable[];
+
 void AgbMain(void);
 void IntrDummy(void);
 void VBlankIntr(void);

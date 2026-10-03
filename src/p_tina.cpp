@@ -8,10 +8,6 @@
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/stopwatch.h"
-extern "C" {
-extern const char sDebugSpinnerText[5];
-extern const float kPppHeapUseRateDivisor;
-}
 #include "ffcc/linkage.h"
 #include "ffcc/USBStreamData.h"
 #include <string.h>
@@ -965,7 +961,7 @@ void CPartPcs::drawAfterViewer()
 	pppClearDrawEnv();
 
 	if (sDebugSpinnerTextPtrInit == 0) {
-		sDebugSpinnerTextPtr = sDebugSpinnerText;
+		sDebugSpinnerTextPtr = "|/-\\";
 		sDebugSpinnerTextPtrInit = 1;
 	}
 	if (s_debugSpinnerFrameCounterInit == 0) {
@@ -989,8 +985,8 @@ void CPartPcs::drawAfterViewer()
 		(double)g_par_draw_prof.GetMax());
 	Graphic.Printf(
 		const_cast<char*>(sPartPcsHeapProfileFmt),
-		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),
-		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
+		(double)((float)gPppHeapUseRateWords[0] / 100.0f),
+		(double)((float)gPppHeapUseRateWords[1] / 100.0f));
 }
 
 static inline unsigned int IsPartAsyncIdle(CPartMng* partMng)

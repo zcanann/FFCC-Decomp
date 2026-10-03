@@ -40,8 +40,6 @@ static const float kFunnyShapeDefaultOffsetY = 336.0f;
 static const float kFunnyShapeTextureViewportOrigin = 20.0f;
 static const float kFunnyShapePi = 3.14f;
 static const float kFunnyShapeHalfTurnDegrees = 180.0f;
-extern const char sDebugSpinnerText[5] ATTRIBUTE_ALIGN(8);
-extern const float kPppHeapUseRateDivisor;
 
 namespace {
 static inline s16 S16At(const u8* p, u32 offset)
@@ -776,6 +774,3 @@ CFunnyShape::CFunnyShape()
 
     m_textureCount = 0;
 }
-
-extern const char sDebugSpinnerText[5] ATTRIBUTE_ALIGN(8) = "|/-\\";
-extern const float kPppHeapUseRateDivisor = 100.0f;

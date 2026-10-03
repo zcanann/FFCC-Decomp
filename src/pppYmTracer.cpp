@@ -69,11 +69,6 @@ static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
     dst->alpha = src->alpha;
 }
 
-static inline YmTracerWork* GetYmTracerWork(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
-{
-    return reinterpret_cast<YmTracerWork*>(tracer->m_workArea + GetYmTracerDataOffsets(ctrl)->m_workOffset);
-}
-
 static inline float* GetYmTracerDataValueWork(int dataValueIndex, int offset)
 {
     return reinterpret_cast<float*>(
@@ -109,7 +104,7 @@ void pppRenderYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCt
     int textureIndex[2];
 
     dataValIndex = step->m_dataValIndex;
-    work = GetYmTracerWork(tracer, ctrl);
+    work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + GetYmTracerDataOffsets(ctrl)->m_workOffset);
     colorOffset = GetYmTracerDataOffsets(ctrl)->m_colorOffset;
     poly = work->entries;
     mapMesh = ppvEnv->m_mapMeshPtr[dataValIndex];
@@ -195,10 +190,9 @@ void pppRenderYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCt
  */
 void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtrl* ctrl)
 {
+    YmTracerWork* work;
     TRACE_POLYGON* entries;
     TRACE_POLYGON* entry;
-    TRACE_POLYGON* poly;
-    YmTracerWork* work;
     f32 val;
     s32 i;
     TRACE_POLYGON* entriesPtr;
@@ -207,7 +201,7 @@ void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtr
         return;
     }
 
-    work = GetYmTracerWork(tracer, ctrl);
+    work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + GetYmTracerDataOffsets(ctrl)->m_workOffset);
     entriesPtr = work->entries;
     entries = entriesPtr;
     if (entriesPtr == 0) {
@@ -278,16 +272,13 @@ void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtr
             Vec splineFrom[4];
             Vec splineTo[4];
             s16 splineCount = 0;
-            f32 t;
             f32 stepScale = 1.0f / (f32)(step->m_tracer.m_splineCount + 1);
 
             for (i = 0; i < (s32)(u32)step->m_tracer.m_splineCount; i++) {
-                t = stepScale * (f32)(i + 1);
-
                 gUtil.GetSplinePos(splineFrom[(step->m_tracer.m_splineCount - 1) - i], entries[3].from, entries[2].from,
-                                          entries[1].from, entries[0].from, t, 1.0f);
+                                          entries[1].from, entries[0].from, stepScale * (f32)(i + 1), 1.0f);
                 gUtil.GetSplinePos(splineTo[(step->m_tracer.m_splineCount - 1) - i], entries[3].to, entries[2].to,
-                                          entries[1].to, entries[0].to, t, 1.0f);
+                                          entries[1].to, entries[0].to, stepScale * (f32)(i + 1), 1.0f);
 
                 splineCount++;
                 work->count++;
@@ -302,33 +293,28 @@ void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtr
                 }
             }
 
-            TRACE_POLYGON* splineEntry = entries;
             for (i = 0; i < splineCount; i++) {
-                s32 idx = i + 2;
-                splineEntry[2].alpha = step->m_tracer.m_entryAlpha - idx * splineEntry[2].decay;
-                pppCopyVector(entries[idx].from, splineFrom[i]);
-                pppCopyVector(entries[idx].to, splineTo[i]);
-                splineEntry++;
+                entries[i + 2].alpha = step->m_tracer.m_entryAlpha - (i + 2) * entries[i + 2].decay;
+                pppCopyVector(entries[i + 2].from, splineFrom[i]);
+                pppCopyVector(entries[i + 2].to, splineTo[i]);
             }
         }
     }
 
-    poly = entries;
     for (i = 0; i < (s32)(u32)work->count; i++) {
-        if (poly->life > 0) {
-            if ((s32)((u32)poly->alpha - (u32)poly->decay) <= 0) {
-                poly->alpha = 0;
+        if (entries[i].life > 0) {
+            if ((s32)((u32)entries[i].alpha - (u32)entries[i].decay) <= 0) {
+                entries[i].alpha = 0;
             } else {
-                poly->alpha -= poly->decay;
+                entries[i].alpha -= entries[i].decay;
             }
 
-            poly->life--;
-            if (poly->life <= 0) {
+            entries[i].life--;
+            if (entries[i].life <= 0) {
                 work->count--;
-                poly->life = 0;
+                entries[i].life = 0;
             }
         }
-        poly++;
     }
 }
 
@@ -343,7 +329,7 @@ void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtr
  */
 void pppDestructYmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
 {
-    YmTracerWork* work = GetYmTracerWork(tracer, ctrl);
+    YmTracerWork* work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + GetYmTracerDataOffsets(ctrl)->m_workOffset);
     if (work->entries != 0) {
         pppMemFree(work->entries);
     }
@@ -362,7 +348,7 @@ void pppConstruct2YmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
 {
     YmTracerWork* work;
 
-    work = GetYmTracerWork(tracer, ctrl);
+    work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + GetYmTracerDataOffsets(ctrl)->m_workOffset);
     work->_pad2e = 0;
     work->count = 0;
 }
@@ -382,7 +368,7 @@ void pppConstructYmTracer(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
     YmTracerWork* work;
 
     zero = 0.0f;
-    work = GetYmTracerWork(tracer, ctrl);
+    work = reinterpret_cast<YmTracerWork*>(tracer->m_workArea + GetYmTracerDataOffsets(ctrl)->m_workOffset);
 
     work->entries = 0;
     work->arg3Work = 0;

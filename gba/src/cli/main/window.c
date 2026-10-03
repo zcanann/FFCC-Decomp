@@ -1042,28 +1042,30 @@ void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
     s32 a;
     s32 k;
     s32 attr;
+    s32 baseTile;
     u8 n;
     u16 *map;
 
     px = win->x * 8;
     py = win->y * 8 + win->anim + 8;
     n = win->anim >> 3;
+    baseTile = tile;
     if (n >= win->height)
         return;
     if (n <= 1) {
         for (i = 0; i < win->width; i++) {
             if (i == 0)
-                k = tile;
+                k = baseTile;
             else if (i == 1)
-                k = tile + 1;
+                k = baseTile + 1;
             else if (i == win->width - 2)
-                k = tile + 4;
+                k = baseTile + 4;
             else if (i >= win->width - 1)
-                k = tile + 5;
+                k = baseTile + 5;
             else if (i & 2)
-                k = tile + 2;
+                k = baseTile + 2;
             else
-                k = tile + 3;
+                k = baseTile + 3;
             if (win->anim != 0)
                 k += 6;
             buf[i] = k | pal;
@@ -1080,15 +1082,15 @@ void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
                     a = i + 12;
                 else
                     a = i - win->width + 16;
-                t = tile + a;
+                t = baseTile + a;
                 if (k)
                     t += 4;
                 a = pal;
             } else {
                 if (!(i & 2))
-                    t = tile - 4;
+                    t = baseTile - 4;
                 else
-                    t = tile - 2;
+                    t = baseTile - 2;
                 if (k)
                     t += 1;
                 a = attr;
@@ -1100,17 +1102,17 @@ void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
     } else {
         for (i = 0; i < win->width; i++) {
             if (i == 0)
-                k = tile + 20;
+                k = baseTile + 20;
             else if (i == 1)
-                k = tile + 21;
+                k = baseTile + 21;
             else if (i == win->width - 2)
-                k = tile + 24;
+                k = baseTile + 24;
             else if (i >= win->width - 1)
-                k = tile + 25;
+                k = baseTile + 25;
             else if (i & 2)
-                k = tile + 22;
+                k = baseTile + 22;
             else
-                k = tile + 23;
+                k = baseTile + 23;
             k += (n - (win->height - 3)) * 6;
             buf[i] = k | pal;
         }

@@ -202,19 +202,24 @@ void Oam_UpdateAffine(void)
     s16 m[4];
     s32 i;
     s32 j;
+    s16 value;
 
     aff = sOamBuf[sOamBufIndex].aff;
     for (i = 0; i < 32; i++, aff++) {
         j = 0;
-        m[j++] = FixMul(gSinTable[sAffineAngle[i] + 8], FixInverse(sAffineScaleX[i]));
-        m[j++] = FixMul(gSinTable[sAffineAngle[i]], FixInverse(sAffineScaleX[i]));
-        m[j++] = FixMul(-gSinTable[sAffineAngle[i]], FixInverse(sAffineScaleY[i]));
-        m[j++] = FixMul(gSinTable[sAffineAngle[i] + 8], FixInverse(sAffineScaleY[i]));
+        value = FixMul(gSinTable[sAffineAngle[i] + 8], FixInverse(sAffineScaleX[i]));
+        m[j++] = value;
+        value = FixMul(gSinTable[sAffineAngle[i]], FixInverse(sAffineScaleX[i]));
+        m[j++] = value;
+        value = FixMul(-gSinTable[sAffineAngle[i]], FixInverse(sAffineScaleY[i]));
+        m[j++] = value;
+        value = FixMul(gSinTable[sAffineAngle[i] + 8], FixInverse(sAffineScaleY[i]));
+        m[j++] = value;
         j = 0;
         aff->pa = m[j++];
         aff->pb = m[j++];
         aff->pc = m[j++];
-        aff->pd = m[j++];
+        aff->pd = value;
     }
 }
 

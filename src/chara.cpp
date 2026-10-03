@@ -2948,21 +2948,4 @@ inline void CChara::CSkin::Create(CChunkFile& chunk, CMemory::CStage* stage)
 	m_nodeIndex = chunk.Get4();
 }
 
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 0b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CChara::CModel::CalcNodeWorldMatrix(float (*outMtx)[4], CChara::CNode* node)
-{
-	PSMTXCopy(node->m_mtx, outMtx);
-	outMtx[0][3] += m_drawMtx[0][3];
-	outMtx[1][3] += m_drawMtx[1][3];
-	outMtx[2][3] += m_drawMtx[2][3];
-}
-
 CChara Chara;

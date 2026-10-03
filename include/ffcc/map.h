@@ -170,8 +170,8 @@ public:
     void DestroyMapLightHolder();
     void DestroyMap();
     void Destroy();
-    void MapFileRead(char*, unsigned long&);
-    void MapCheckFileRead(char*);
+    void* MapFileRead(char*, unsigned long&);
+    int MapCheckFileRead(char*);
     void LoadMapNoSyncCalc();
     int IsLoadMap()
     {

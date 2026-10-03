@@ -355,7 +355,13 @@ public:
 		void CalcSkin();
 		float calcNowFrame();
 		void calcMatrix();
-		void CalcNodeWorldMatrix(float (*) [4], CChara::CNode*);
+		void CalcNodeWorldMatrix(float (*outMtx)[4], CChara::CNode* node)
+		{
+			PSMTXCopy(node->m_mtx, outMtx);
+			outMtx[0][3] += m_drawMtx[0][3];
+			outMtx[1][3] += m_drawMtx[1][3];
+			outMtx[2][3] += m_drawMtx[2][3];
+		}
 		void CalcFrameMatrix(float, CChara::CNode*, float (*)[4]);
 		void dynamics(CChara::CNode*, CChara::CNode*);
 		void calcSkin();

@@ -91,7 +91,6 @@ CRelProfile g_map_calc_prof ATTRIBUTE_ALIGN(4);
 CRelProfile g_map_draw_prof ATTRIBUTE_ALIGN(4);
 
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
-extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
 
 /*
  * --INFO--
@@ -477,7 +476,7 @@ void CMapPcs::calc()
     Mtx cameraMtx;
     Mtx44 screenMtx;
 
-    MapFileRead__7CMapMngFPcRUl(&MapMng);
+    MapMng.LoadMapNoSyncCalc();
     MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
     MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
     MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;

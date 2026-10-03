@@ -19,7 +19,7 @@ static s8 sShakeX;
 static s8 sShakeY;
 static s8 sScrollDirty;
 static s8 sAlarmTimer;
-extern u8 gIntrMainRam[];
+u8 gIntrMainRam[0x100];
 
 typedef void (*IntrFunc)(void);
 
@@ -77,7 +77,7 @@ void AgbMain(void)
     gSpMode = 0;
     DmaClear16(0, 0x3FF, 0x0600E000, 0x1000);
     DmaClear16(0, 0x2FF, 0x0600F000, 0x1000);
-    DmaCopy32(3, intr_main, gIntrMainRam, 0x100);
+    DmaCopy32(3, intr_main, gIntrMainRam, sizeof(gIntrMainRam));
     INTR_VECTOR = gIntrMainRam;
     REG_IE = 0x2005;
     REG_DISPSTAT = 0x28;

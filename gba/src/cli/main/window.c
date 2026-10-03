@@ -2022,8 +2022,8 @@ void Obj_DrawBanner(s32 prio, s32 x, s32 y, s32 n, s32 offset, s32 mode)
     px = x + offset;
     t = y + 10;
     if (mode == 0) {
-        for (i = 0; i <= 9; i++, px += 16)
-            Obj_Draw(px, t, 22, i, 0, 0, 0);
+        for (frame = 0; frame <= 9; frame++, px += 16)
+            Obj_Draw(px, t, 22, frame, 0, 0, 0);
     }
     px = x;
     t = mode;

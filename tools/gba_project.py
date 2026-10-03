@@ -91,7 +91,7 @@ COMPLETE: Dict[str, List[str]] = {
     "cli": [
         "crt0", "joy_reset", "m4a/m4a_1", "m4a/m4a",
         "main/main", "main/xfer", "main/link", "main/text", "main/obj", "main/mode", "main/widget",
-        "main/artifact", "main/cmdlist", "main/family", "main/item", "main/letter", "main/menu",
+        "main/artifact", "main/cmdlist", "main/equip", "main/family", "main/item", "main/letter", "main/menu",
         "main/radar", "main/gil", "main/scouter", "main/smith", "main/favorite",
         "main/tmpartifact", "main/msg", "main/textmask", "main/msg_sys", "main/msg_item",
         "main/msg_monster", "main/backdrop_gfx", "main/m4a_tables", "main/sound_assets",

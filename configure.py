@@ -541,7 +541,7 @@ config.libs = [
             Object(NonMatching, "goout.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "graphic.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline auto,deferred"]),
             Object(Matching, "gxfunc.cpp"),
-            Object(NonMatching, "itemobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "itemobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "joybus.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "KeLns.cpp"),
             Object(NonMatching, "LocationTitle2.cpp"),

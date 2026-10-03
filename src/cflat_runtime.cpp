@@ -452,6 +452,26 @@ inline void CFlatRuntime::push(CFlatRuntime::CObject* object, CFlatRuntime::CSta
 /*
  * --INFO--
  * PAL Address: UNUSED
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CFlatRuntime::initVal(int count, CFlatRuntime::CVal* vals, CFlatRuntime::CStack* stack, int clearAll)
+{
+	for (int i = 0; i < count; i++) {
+		if ((clearAll != 0) || ((vals->m_flags & 0x20) == 0)) {
+			stack->m_word = 0;
+		}
+		vals++;
+		stack++;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
  * PAL Size: 452b
  * EN Address: TODO
  * EN Size: TODO
@@ -525,6 +545,34 @@ inline int CFlatRuntime::getTopBit(unsigned int value)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CFlatRuntime::CFunc* CFlatRuntime::toFunc(CFlatRuntime::CCodeIndex& codeIndex)
+{
+	return &m_funcs[codeIndex.m_codeFunc];
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline u8* CFlatRuntime::toCode(CFlatRuntime::CCodeIndex& codeIndex)
+{
+	return toFunc(codeIndex)->m_code + codeIndex.m_codeOffset;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800663fc
  * PAL Size: 5600b
  * EN Address: 0x80077904
@@ -546,8 +594,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		goto callSystemFunction;
 	}
 
-	CFunc* func = &m_funcs[object->m_codeIndex.m_codeFunc];
-	code = func->m_code + object->m_codeIndex.m_codeOffset;
+	code = toCode(object->m_codeIndex);
 
 	while (true) {
 		m_previousCodePos = m_currentCodePos;
@@ -823,8 +870,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			goto returnFromCall;
 		}
 		recomputeCode:
-			code = m_funcs[object->m_codeIndex.m_codeFunc].m_code
-			    + object->m_codeIndex.m_codeOffset;
+			code = toCode(object->m_codeIndex);
 			continue;
 		case 0x0B: {
 			CObject* newObject = createObject(*reinterpret_cast<int*>(code + 1));
@@ -1092,8 +1138,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				return 1;
 			}
 
-			CFunc* func = &m_funcs[object->m_codeIndex.m_codeFunc];
-			code = func->m_code + object->m_codeIndex.m_codeOffset;
+			code = toCode(object->m_codeIndex);
 			break;
 		}
 		case 0x3D:
@@ -1379,12 +1424,12 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 
 	const int classLocalCount = (classIndex == -1) ? 0 : classBase->m_localCount;
 
-	const int requiredWords = classLocalCount + 0x60;
 	CStackBlock* scanNode = m_stackBlocks.m_next;
+	const int requiredWords = classLocalCount + 0x60;
 	const int noScan = static_cast<u8>(scanNode == &m_stackBlocks);
 	for (;;) {
 		if (noScan != 0 ||
-		    scanNode->m_size + requiredWords + scanNode->m_offset <= scanNode->m_next->m_offset) {
+		    scanNode->m_offset + scanNode->m_size + requiredWords <= scanNode->m_next->m_offset) {
 			CStackBlock* const freeNode = m_freeStackBlocks.m_next;
 			m_freeStackBlocks.m_next = freeNode->m_next;
 			freeNode->m_previous = scanNode;
@@ -1425,17 +1470,9 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 
 	const int allowKeep = (classIndex == -1) ? static_cast<u8>(m_0x970 == 0) : 1;
 
-	unsigned int* write = object->m_thisBase;
-	CVal* defs = (classIndex == -1) ? m_permanentVarDefs : 0;
-	int clearCount = (classIndex == -1) ? m_permanentVarCount : classBase->m_localCount;
-	while (clearCount > 0) {
-		if ((allowKeep != 0) || ((defs->m_flags & 0x20) == 0)) {
-			*write = 0;
-		}
-		defs++;
-		write++;
-		clearCount--;
-	}
+	initVal((classIndex == -1) ? m_permanentVarCount : classBase->m_localCount,
+	        (classIndex == -1) ? m_permanentVarDefs : 0,
+	        reinterpret_cast<CStack*>(object->m_thisBase), allowKeep);
 
 	if (classIndex == -1) {
 		request(object, 1, 0, 0, 0);
@@ -2081,16 +2118,6 @@ void CFlatRuntime::callCleanup(CFlatRuntime::CObject*)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::initVal(int, CFlatRuntime::CVal*, CFlatRuntime::CStack*, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CFlatRuntime::pushAddress(CFlatRuntime::CObject*, CFlatRuntime::CStack*)
 {
 	// TODO
@@ -2132,26 +2159,6 @@ void CFlatRuntime::systemVal(CFlatRuntime::CObject*, int, int)
  * Size:	TODO
  */
 void CFlatRuntime::setSystemVal(CFlatRuntime::CObject*, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime::toFunc(CFlatRuntime::CCodeIndex&)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime::toCode(CFlatRuntime::CCodeIndex&)
 {
 	// TODO
 }

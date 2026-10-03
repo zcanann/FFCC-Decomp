@@ -269,7 +269,9 @@ public:
     void SearchRomLetterWork(CRomLetterWork**, int);
     int ShopRequest(int, int, int, int, int, int, int);
     void CallShop(int, int, int, int, int);
+    void CalcArtifactStatus(int, int, int&, int&, int&, int&, int&);
     void SafeDeleteTempItem();
+    void ClampStatus(short&, unsigned short&);
     void CalcStatus();
     int CanPlayerUseItem();
     void ValidCmdList(int);

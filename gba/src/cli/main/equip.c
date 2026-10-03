@@ -531,9 +531,8 @@ void EquipScreen_PrintDesc(void)
     s32 i;
     s32 j;
     s32 id;
-    s32 size;
     s32 msg;
-    s32 x;
+    s32 offset;
     s32 digits;
 
     Text_SetFill(0, 0);
@@ -565,19 +564,20 @@ void EquipScreen_PrintDesc(void)
     }
     if (idx < 0)
         goto end;
-    size = n + 1;
-    if (size & 3)
-        size = ((size >> 2) + 1) << 2;
-    list += size - 1;
-    item = (struct ItemInfo *)list + idx;
+    offset = n + 1;
+    if (offset & 3)
+        offset = ((offset >> 2) + 1) << 2;
+    list += offset - 1;
+    item = (struct ItemInfo *)list;
+    item += idx;
     if (item->flags & 0x100)
         Text_Print(Msg_GetSystem(16), TEXT_DRAW);
     else if (item->flags & 0xE00)
         Text_Print(Msg_GetSystem(63), TEXT_DRAW);
     if (!(item->flags & 0x3000)) {
         Text_AddX(8);
-        x = Text_GetX();
-        Text_PrintNumber(item->count, x, 2);
+        offset = Text_GetX();
+        Text_PrintNumber(item->count, offset, 2);
     }
     if (!(item->flags & 0x100) && item->kind != 0) {
         if (item->flags & 0xE00)
@@ -590,14 +590,14 @@ void EquipScreen_PrintDesc(void)
                 msg = 40;
             Text_AddX(8);
             Text_Print(Msg_GetSystem(msg), TEXT_DRAW);
-            x = Text_GetX();
+            offset = Text_GetX();
             if (item->count <= 9)
                 digits = 1;
             else if (item->count <= 99)
                 digits = 2;
             else
                 digits = 3;
-            Text_PrintNumber(item->count, x, digits);
+            Text_PrintNumber(item->count, offset, digits);
         }
     }
 end:

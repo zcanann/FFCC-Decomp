@@ -124,7 +124,7 @@ last row (1204), so those crafts read heap memory past the end of the table.
 - **GameCube:** `SetSmithData` sends an error reply if `AddItem` fails or if
   `AddGil` returns 0. `AddGil` returns the amount it actually changed, so a
   **price of 0 counts as a failure**. A success reply is then sent anyway
-  ([gbaque.cpp:946-957](../../src/gbaque.cpp#L946-L957)). A zero-price craft
+  ([gbaque.cpp:946-959](../../src/gbaque.cpp#L946-L959)). A zero-price craft
   gives the item and sends **error, then success**.
 - **GBA:** `Reply_Set` keeps only the latest reply
   ([xfer.c:248](../../gba/src/cli/main/xfer.c#L248)). The forge checks once per

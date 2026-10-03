@@ -81,6 +81,44 @@ older library compiler; identical version strings do not justify replacing it.
 The original SDK revision and the provenance of these older backend differences
 remain open questions.
 
+## Assembler and linker comparison
+
+An audit with unmodified [GNU binutils 2.10 source](https://ftp.gnu.org/gnu/binutils/binutils-2.10.tar.gz)
+reproduces both retail image hashes using the current compiler assembly and
+retail assembly fallbacks. The audit uses a 32-bit Linux host build; it does not
+identify the original retail binutils release. The production tools remain the
+current binutils package.
+
+To repeat the image comparison after building the project, supply native tools
+and a new output directory:
+
+```sh
+python3 gba/tools/audit_binutils.py --assembler /path/to/as --linker /path/to/ld \
+  --objcopy /path/to/objcopy --work-dir build/gba-binutils-audit
+```
+
+The checker preserves generated source assembly, including preprocessed assembly.
+For other objects it uses the generated retail assembly, expressing raw instructions as
+`.hword` or `.word` instead of the newer `.inst` directive. Its JSON report records
+which inputs took each path, tool hashes, and image hashes. This checks assembly
+and linking; it does not replace objdiff or certify every handwritten assembly
+file against an older assembler. Historical Thumb function symbols also use a
+different ELF representation, so directly linking modern objects with the old
+linker is not a valid substitute for reassembling them.
+
+COMMON placement requires particular care. Binutils 2.10 and the current linker
+produce the same allocation order for a sixteen-global probe, regardless of
+declaration order. The old BFD symbol hash predicts that order. Renaming globals
+or changing their ownership can affect placement; changing declaration order
+alone is not a general solution.
+
+Default COMMON alignment does differ: the 2.10 assembler aligns a twelve-byte
+object to eight bytes, while the current assembler aligns it to sixteen. The
+2.12 source retains the older rounding behavior. Existing recovered COMMON
+objects have the same alignment under both assemblers. Verify this distinction
+against retail placement when recovering small non-power-of-two objects, rather
+than compensating with artificial source padding or per-object alignment hacks.
+
 ## What the matching link establishes
 
 The generated linker script concatenates input object sections in reconstructed

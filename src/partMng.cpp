@@ -2295,7 +2295,16 @@ void CPartMng::pppEditPartCalc()
     }
 }
 
-static inline void pppDrawCulledPart(_pppMngSt* mng, Vec& cameraPos)
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 292b
+ * EN Address: 0x8006a494
+ * EN Size: 296b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CPartMng::pppDrawPppMngSt(Vec& cameraPos, _pppMngSt* mng)
 {
     Vec viewPos;
     Vec partPos;
@@ -2344,7 +2353,7 @@ static inline void pppDrawPass(CPartMng* manager, unsigned char drawMode)
         if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000
             && (signed char)mng->m_drawPass == drawMode && mng->m_baseTime < 0
             && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
-            pppDrawCulledPart(mng, cameraPos);
+            manager->pppDrawPppMngSt(cameraPos, mng);
         }
     }
 }
@@ -2587,16 +2596,6 @@ void CPartMng::pppPartCalc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartMng::pppDrawPppMngSt(Vec&, _pppMngSt*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8005a4f4
  * PAL Size: 456b
  * EN Address: 0x80059E94
@@ -2608,9 +2607,6 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
 {
     Mtx invCamera;
     Vec cameraPos;
-    Vec cameraDelta;
-    Vec partPos;
-    Vec viewPos;
 
     PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
@@ -2622,33 +2618,7 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
         if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000
             && (signed char)mng->m_drawPass == drawMode && mng->m_baseTime < 0
             && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
-            ppvMng = mng;
-            partPos.x = mng->m_matrix.value[0][3];
-            partPos.y = mng->m_matrix.value[1][3];
-            partPos.z = mng->m_matrix.value[2][3];
-
-            if ((double)mng->m_cullRadiusSq != -1.0) {
-                goto checkCull;
-            }
-
-        drawPart:
-            PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-            mng->m_sortDepth = viewPos.z;
-            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-            ppvMng = mng;
-            pppSetFpMatrix(mng);
-            _pppDrawPart(mng);
-            continue;
-
-        checkCull:
-            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-            if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
-                if (bound.CheckFrustum(
-                        cameraPos, ppvCameraMatrix, -100000000.0f) != 0) {
-                    goto drawPart;
-                }
-            }
+            pppDrawPppMngSt(cameraPos, mng);
         }
     }
 }
@@ -2677,9 +2647,9 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
         if (mng->m_nodeIndex == nodeIndex && mng->m_kind == kind && mng->m_hitBgFlag == 0
             && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass == drawMode && mng->m_baseTime < 0) {
             if (mng->m_slotVisible != 0) {
-                pppDrawCulledPart(mng, cameraPos);
+                pppDrawPppMngSt(cameraPos, mng);
             }
-            break;
+            return;
         }
     }
     if (drawMode < 8) {
@@ -2700,9 +2670,6 @@ void CPartMng::pppDrawIdx(int partIndex)
 {
     Mtx invCamera;
     Vec cameraPos;
-    Vec cameraDelta;
-    Vec partPos;
-    Vec viewPos;
 
     PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
@@ -2720,36 +2687,7 @@ void CPartMng::pppDrawIdx(int partIndex)
         return;
     }
 
-    ppvMng = mng;
-    partPos.x = mng->m_matrix.value[0][3];
-    partPos.y = mng->m_matrix.value[1][3];
-    partPos.z = mng->m_matrix.value[2][3];
-
-    if ((double)mng->m_cullRadiusSq != -1.0) {
-        goto checkCull;
-    }
-
-drawPart:
-    PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-    mng->m_sortDepth = viewPos.z;
-    ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
-    ppvMng = mng;
-    pppSetFpMatrix(mng);
-    _pppDrawPart(mng);
-    return;
-
-checkCull:
-    PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-    if (!(PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq)) {
-        return;
-    }
-
-    {
-        CBound bound(&partPos, mng->m_cullRadius, mng->m_cullYOffset);
-        if (bound.CheckFrustum(cameraPos, ppvCameraMatrix, -100000000.0f) != 0) {
-            goto drawPart;
-        }
-    }
+    pppDrawPppMngSt(cameraPos, mng);
 }
 
 /*

@@ -1977,17 +1977,20 @@ void Window_CloseStyle14(struct Window *win)
 {
     s32 px;
     s32 py;
-    s32 coord;
+    s32 last;
     s32 i;
-    s32 n;
+    s32 frame;
+    s32 bottom;
+    s32 top;
     u32 flags;
 
-    coord = win->x;
-    px = coord * 8;
-    n = win->y;
-    coord = win->height - 1;
-    py = (coord + n) * 8 - win->anim;
-    if (py >> 3 > win->y) {
+    px = win->x * 8;
+    bottom = win->y;
+    top = bottom;
+    last = win->height - 1;
+    bottom = (last + bottom) * 8;
+    py = bottom - win->anim;
+    if (py >> 3 > top) {
         Bg_FillBlank(win->bg, win->x, py >> 3, win->width, 1);
         if ((py >> 3) - 1 <= win->y)
             Bg_FillBlank(win->bg, win->x, (py >> 3) - 1, win->width, 1);
@@ -1996,14 +1999,14 @@ void Window_CloseStyle14(struct Window *win)
             for (i = 0; i < win->width; i++, px += 8) {
                 flags = 0x20000000;
                 if (i == 0 || i == win->width - 1)
-                    n = 0;
+                    frame = 0;
                 else if (i == 1 || i == win->width - 2)
-                    n = 1;
+                    frame = 1;
                 else
-                    n = 2;
+                    frame = 2;
                 if (i >= win->width - 2)
                     flags |= 0x10000000;
-                Obj_Draw(px, py, 17, n, win->variant, win->bg, flags);
+                Obj_Draw(px, py, 17, frame, win->variant, win->bg, flags);
             }
         }
     }

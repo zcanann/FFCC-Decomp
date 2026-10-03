@@ -1329,6 +1329,8 @@ void CMakeFavoriteScreen_Setup(void)
     struct Window *win;
     s32 i;
     s32 idx;
+    char *str;
+    char **dst;
 
     DmaClear32(0, 0, gWindows, sizeof(struct Window) * 5);
     win = gWindows;
@@ -1356,7 +1358,9 @@ void CMakeFavoriteScreen_Setup(void)
     win[1].textX = 0;
     for (i = 0; i < gWindows[0].rows; i++) {
         gWindows[0].items[i].enabled = 1;
-        gWindows[0].items[i].text = Msg_GetSystem(0);
+        str = Msg_GetSystem(0);
+        dst = &gWindows[0].items[i].text;
+        *dst = str;
     }
     for (i = 0; i <= 7; i++) {
         if (i & 1)

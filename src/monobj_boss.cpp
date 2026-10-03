@@ -302,7 +302,7 @@ void CGMonObj::teleport(
 
 	if (stateFrame <= blendStartFrame) {
 		if (startFrame <= stateFrame) {
-			const float angle = kMonObjBossHalfPi * (static_cast<float>(stateFrame - startFrame) * kMonObjBossOneEighth);
+			const float angle = kMonObjBossHalfPi * (static_cast<float>(stateFrame - startFrame) / 8.0f);
 			const float wave = static_cast<float>(cos(angle));
 			m_rotationZ = wave;
 			m_rotationX = wave;
@@ -325,7 +325,8 @@ void CGMonObj::teleport(
 			}
 
 			const float ratio = static_cast<float>(stateFrame - blendStartFrame) / static_cast<float>(blendFrameCount);
-			const float blend = kMonObjBossHalf * (kMonObjBossOne + static_cast<float>(cos(kMonObjBossPi * ratio)));
+			float blend = static_cast<float>(cos(kMonObjBossPi * ratio));
+			blend = kMonObjBossHalf * (kMonObjBossOne + blend);
 			m_worldPosition = CVector(m_worldPosition) * blend +
 				CVector(teleportPoints[teleportIndex]) * (kMonObjBossOne - blend);
 
@@ -353,7 +354,7 @@ void CGMonObj::teleport(
 				}
 			}
 
-			const float angle = kMonObjBossHalfPi * (kMonObjBossOne - static_cast<float>(stateFrame - blendEndFrame) * kMonObjBossOneEighth);
+			const float angle = kMonObjBossHalfPi * (kMonObjBossOne - static_cast<float>(stateFrame - blendEndFrame) / 8.0f);
 			const float wave = static_cast<float>(cos(angle));
 			m_rotationZ = wave;
 			m_rotationX = wave;
@@ -429,13 +430,9 @@ int CGMonObj::calcBranchFuncLastBoss(int)
 void CGMonObj::frameStatFuncLastBoss()
 {
 	Mtx nodeMtx;
-	CChara::CModel* model = m_charaModelHandle->m_model;
-	PSMTXCopy(reinterpret_cast<LastBossWork*>(m_boss)->m_node->m_mtx, nodeMtx);
+	m_charaModelHandle->m_model->CalcNodeWorldMatrix(nodeMtx, reinterpret_cast<LastBossWork*>(m_boss)->m_node);
 
 	Vec* bossPos = &reinterpret_cast<LastBossWork*>(m_boss)->m_targetPosition;
-	nodeMtx[0][3] += model->m_drawMtx[0][3];
-	nodeMtx[1][3] += model->m_drawMtx[1][3];
-	nodeMtx[2][3] += model->m_drawMtx[2][3];
 	bossPos->x = nodeMtx[0][3];
 	bossPos->y = nodeMtx[1][3];
 	bossPos->z = nodeMtx[2][3];
@@ -1355,7 +1352,7 @@ void CGMonObj::frameStatFuncWifeLamia()
 	case 100:
 		if (prgObj->m_subState == 0) {
 			if (prgObj->m_subFrame == 0) {
-				memset(&m_moveWork, 0, sizeof(m_moveWork));
+				m_moveWork.Clear();
 				m_moveWork.m_flags = 0x10022;
 
 				const CVector& attackOffset =
@@ -1510,7 +1507,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 				cappedDistance = distance;
 			}
 
-			memset(&m_moveWork, 0, sizeof(m_moveWork));
+			m_moveWork.Clear();
 			m_moveWork.m_flags = 0x2114;
 			m_moveWork.m_targetPos = attackVec;
 			m_moveWork.m_speed = kMonObjBossTwo;
@@ -1521,7 +1518,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 		return;
 	case 0x67:
 		if (prgObj->m_stateFrame == 0x10) {
-			memset(&m_moveWork, 0, sizeof(m_moveWork));
+			m_moveWork.Clear();
 			m_moveWork.m_flags = 0x2410;
 
 			const CVector& storedVec = CVector(*reinterpret_cast<Vec*>(CGMonObj::m_boss + 0x4));
@@ -1970,7 +1967,7 @@ void CGMonObj::frameStatFuncLKShooter()
 	case 100:
 		reinterpret_cast<CGCharaObj*>(this)->m_unk63CBits.m_bit80 = 1;
 		if (*reinterpret_cast<int*>(self + 0x528) == 0) {
-			memset(&m_moveWork, 0, sizeof(m_moveWork));
+			m_moveWork.Clear();
 			m_moveWork.m_flags = 0x322;
 
 			const CVector* targetPos;
@@ -2114,7 +2111,7 @@ void CGMonObj::frameStatFuncSaw()
 
 				prgObj->putParticle(pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), reinterpret_cast<CGObject*>(this), kMonObjBossOne, 0x1C52C);
 				prgObj->playSe3D(0x1C52B, 0x32, 0x96, 0, 0);
-				memset(&m_moveWork, 0, sizeof(m_moveWork));
+				m_moveWork.Clear();
 				m_moveWork.m_flags = 0x1402;
 			} else if (prgObj->isLoopAnim() != 0) {
 				prgObj->addSubStat();

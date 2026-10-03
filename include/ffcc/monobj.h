@@ -3,6 +3,8 @@
 
 #include "ffcc/charaobj.h"
 
+#include <string.h>
+
 class CFont;
 class CGPrgObj;
 class CGPartyObj;
@@ -23,7 +25,7 @@ public:
     class CMoveWork
     {
     public:
-        void Clear();
+        void Clear() { memset(this, 0, sizeof(CMoveWork)); }
 
         unsigned int m_flags;       // 0x00
         unsigned int m_stateFlags;  // 0x04

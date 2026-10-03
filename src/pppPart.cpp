@@ -1284,8 +1284,9 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
  */
 inline void pppCacheLoadModel(short* modelList, _pppDataHead* head)
 {
+	short i;
 	short modelCount = *modelList++;
-	for (short i = 0; i < modelCount; i++)
+	for (i = 0; i < modelCount; i++)
 	{
 		pppModelSt* mapMesh = head->m_models[*modelList++];
 		if (ppvAmemCacheSet.IsEnable(mapMesh->m_cacheId) == 0)
@@ -1311,17 +1312,10 @@ inline void pppCacheLoadModel(short* modelList, _pppDataHead* head)
  */
 void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 {
-	short shapeCount = *shapeList;
-	short i = 0;
-	shapeList = shapeList + 1;
-
-	while (i < shapeCount) {
-		short shapeIndex = *shapeList;
-		shapeList = shapeList + 1;
-		pppCacheLoadShapeTexture(
-		    pppDataHead->m_shapes[shapeIndex],
-		    PartMng.m_materialSet);
-		++i;
+	short shapeCount = *shapeList++;
+	for (short i = 0; i < shapeCount; i++)
+	{
+		pppCacheLoadShapeTexture(pppDataHead->m_shapes[*shapeList++], PartMng.m_materialSet);
 	}
 }
 
@@ -1808,19 +1802,17 @@ void _pppInitPart(_pppMngSt* pppMngSt)
 
 /*
  * --INFO--
- * PAL Address: 0x80054698
- * PAL Size: 340b
+ * PAL Address: UNUSED
+ * PAL Size: 264b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void _pppCalcPart(_pppMngSt* pppMngSt)
+inline void pppPlaySe(_pppMngSt* pppMngSt, PPPSEST* se)
 {
-	PPPSEST* se = &pppMngSt->m_soundEffectData;
 	pppFMATRIX* mtx = &pppMngSt->m_matrix;
 
-	ppvMng = pppMngSt;
 	if (se->m_soundEffectSlot >= 0 &&
 		pppMngSt->m_currentFrame >= se->m_soundEffectStartFrame)
 	{
@@ -1854,6 +1846,19 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 		}
 	}
 
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 352b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline void apeaPObject(_pppMngSt* pppMngSt)
+{
 	for (s32 i = 0; i < pppMngSt->m_numPrograms; i++)
 	{
 		_pppPDataVal* pDataVals = pppMngSt->m_pppPDataVals;
@@ -1870,7 +1875,22 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 			pObject->m_field7C = 0;
 		}
 	}
+}
 
+/*
+ * --INFO--
+ * PAL Address: 0x80054698
+ * PAL Size: 340b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void _pppCalcPart(_pppMngSt* pppMngSt)
+{
+	ppvMng = pppMngSt;
+	pppPlaySe(pppMngSt, &pppMngSt->m_soundEffectData);
+	apeaPObject(pppMngSt);
 	pppCalcPartStd(pppMngSt);
 }
 

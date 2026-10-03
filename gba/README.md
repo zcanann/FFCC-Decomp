@@ -59,6 +59,10 @@ reconstructed units; no original GBA MAP is available. Gaps between objects are
 linker padding and are excluded from the per-unit data totals. Unclaimed common
 storage remains in the separate `bss` unit.
 
+The client's fixed download workspace occupies `0x02038000–0x02040000`, as
+bounded by `Xfer_Receive`. It remains an anonymous reservation; the gap between
+the loaded image and that workspace is not counted as a source object.
+
 ## Layout
 
 - `config/<program>/symbols.txt`: symbol names, addresses, sizes; `thumb` marks Thumb functions.

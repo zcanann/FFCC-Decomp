@@ -152,10 +152,12 @@ def bootstrap(data: bytes) -> Tuple[List[Symbol], List[Split]]:
         addresses = sorted(found)
         lo = a.end if name == ".ewram_bss" else BSS_SECTIONS[name][0]
         addresses = sorted(set([lo] + addresses))
+        # A byte pointer near the bank end does not imply four available bytes.
+        range_end = min(addresses[-1] + 4, BSS_SECTIONS[name][1])
         for index, address in enumerate(addresses):
-            end = addresses[index + 1] if index + 1 < len(addresses) else address + 4
+            end = addresses[index + 1] if index + 1 < len(addresses) else range_end
             symbols.append(Symbol(f"lbl_{address:08X}", name, address, "object", end - address))
-        splits.append(Split("bss", name, lo, addresses[-1] + 4))
+        splits.append(Split("bss", name, lo, range_end))
     return symbols, splits
 
 

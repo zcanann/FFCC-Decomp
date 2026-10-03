@@ -409,9 +409,9 @@ void CRingMenu::onDraw()
 
 	float transitionScale;
 	if (m_animDirection != 0) {
-		transitionScale = -(static_cast<float>(m_transitionCounter) * 0.0625f - 1.0f);
+		transitionScale = 1.0f - m_transitionCounter / 16.0f;
 	} else {
-		transitionScale = static_cast<float>(m_transitionCounter) * 0.0625f;
+		transitionScale = m_transitionCounter / 16.0f;
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
@@ -420,14 +420,15 @@ void CRingMenu::onDraw()
 
 	float cycle = static_cast<float>(fmod(static_cast<double>(0.05f * static_cast<float>(m_commonFrameCounter)),
 	                                      2.0));
+	float cycleAngle = 3.1415927410125732f;
 	if (cycle > 1.0f) {
 		cycle = 2.0f - cycle;
 	}
-	float cycleAngle = 3.1415927410125732f * cycle;
+	cycleAngle = cycleAngle * cycle;
 	sin(static_cast<double>(cycleAngle));
 	sin(static_cast<double>(-1.5707963705062866f + cycleAngle));
 
-	const double pulse = sin(static_cast<double>(1.5707963705062866f * showScale));
+	const float pulse = sin(static_cast<double>(1.5707963705062866f * showScale));
 
 	float posLeft;
 	float posAltY;
@@ -438,7 +439,7 @@ void CRingMenu::onDraw()
 	float posAltX;
 
 	iconAlphaScale = showScale * transitionScale;
-	const float glowOffset = 32.0f * (1.0f - static_cast<float>(pulse));
+	const float glowOffset = 32.0f * (1.0f - pulse);
 	alphaScaleBase = 255.0f * showScale * transitionScale;
 	posLeft = -glowOffset;
 	posAltX = 472.0f + glowOffset;
@@ -719,7 +720,6 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 	float textHeight;
 	int waveDirection;
 	float clampedAlpha;
-	int tlut;
 	char** cmdNameTable;
 	const char* commandLabel;
 	double waveX;
@@ -733,35 +733,31 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 		commandLabel = cmdNameTable[cmdIndex + 0x1E];
 	} else if (cmdIndex < 2) {
 		cmdNameTable = Game.m_cFlatDataArr[1].TableStrings(4);
-		tlut = 9;
-		if (cmdIndex == 0) {
-			tlut = 1;
-		}
-		commandLabel = cmdNameTable[tlut];
+		commandLabel = cmdNameTable[(cmdIndex == 0) ? 1 : 9];
 	} else {
 		commandLabel = caravanWork->GetCmdListItemName(cmdIndex);
 	}
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+		int color = 7;
 		switch (cmdIndex) {
 		case 0:
-			tlut = 2;
+			color = 2;
 			break;
 		case 1:
-			tlut = 1;
+			color = 1;
 			break;
 		case 2:
-			tlut = 4;
+			color = 4;
 			break;
 		case 3:
-			tlut = 6;
+			color = 6;
 			break;
 		case 4:
-		default:
-			tlut = 7;
+			color = 7;
 			break;
 		}
-		font->SetTlut(tlut);
+		font->SetTlut(color);
 	} else if (cmdIndex == 0) {
 		font->SetTlut(7);
 	} else {
@@ -780,12 +776,12 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 	}
 	waveY = static_cast<float>(waveDirection) * (10.0f * waveSinY);
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-		waveY = waveY + 2.0f;
+		waveY += 2.0f;
 	}
 
-	font->SetScale(static_cast<float>(0.800000011920929 - 0.25 * fabs(static_cast<double>(angle))));
+	font->SetScale(static_cast<float>(0.800000011920929 - fabs(static_cast<double>(angle)) / 4.0));
 	textWidth = static_cast<float>(font->GetWidth(commandLabel));
-	unclampedAlpha = static_cast<float>(-(0.5 * fabs(static_cast<double>(angle)) - 1.0));
+	unclampedAlpha = static_cast<float>(-(fabs(static_cast<double>(angle)) / 2.0 - 1.0));
 	textHeight = static_cast<float>(font->m_glyphHeight) * font->scaleY;
 
 	clampedAlpha = (unclampedAlpha < 0.0f) ? 0.0f : ((1.0f < unclampedAlpha) ? 1.0f : unclampedAlpha);
@@ -794,9 +790,9 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF,
 		static_cast<unsigned char>(alphaProduct * clampedAlpha)).color);
 	font->SetPosX(static_cast<float>(waveX) +
-		((64.0f + posX) - textWidth * 0.5f));
+		((64.0f + posX) - textWidth / 2.0f));
 	font->SetPosY(10.0f +
-		(waveY + ((4.0f + posY) - textHeight * 0.5f)));
+		(waveY + ((4.0f + posY) - textHeight / 2.0f)));
 	font->SetPosZ(0.0f);
 	font->Draw(commandLabel);
 }

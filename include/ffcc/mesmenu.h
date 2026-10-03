@@ -21,6 +21,7 @@ public:
     void onScriptChanging(char*);
     void onScriptChanged(char*, int);
     void Open(char*, int, int, int, int, int, int);
+    void close(int);
     void CloseRequest(int);
     void SetPos(float, float);
     int IsUse();

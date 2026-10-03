@@ -400,7 +400,7 @@ FunnyShape.cpp:
 	extab       start:0x80006BF0 end:0x80006C40
 	extabindex  start:0x8000C898 end:0x8000C910
 	.text       start:0x8005051C end:0x80051F38
-	.sdata2     start:0x8032FD58 end:0x8032FDBC
+	.sdata2     start:0x8032FD58 end:0x8032FDB0
 
 p_tina.cpp:
 	extab       start:0x80006C40 end:0x80006D48
@@ -412,7 +412,7 @@ p_tina.cpp:
 	.bss        start:0x80273928 end:0x80273A68
 	.sdata      start:0x8032E698 end:0x8032E6B4
 	.sbss       start:0x8032ED38 end:0x8032ED50
-	.sdata2     start:0x8032FDC0 end:0x8032FDD8
+	.sdata2     start:0x8032FDB0 end:0x8032FDD8
 
 pppPart.cpp:
 	extab       start:0x80006D48 end:0x80006E80

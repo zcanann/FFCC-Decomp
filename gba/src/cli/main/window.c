@@ -2018,29 +2018,32 @@ void Obj_DrawBanner(s32 prio, s32 x, s32 y, s32 n, s32 offset, s32 mode)
     s32 t;
     s32 i;
     s32 frame;
+    s32 count;
+    s32 palette;
 
     px = x + offset;
     t = y + 10;
     if (mode == 0) {
-        for (frame = 0; frame <= 9; frame++, px += 16)
-            Obj_Draw(px, t, 22, frame, 0, 0, 0);
+        for (i = 0; i <= 9; i++, px += 16)
+            Obj_Draw(px, t, 22, i, 0, 0, 0);
     }
+    count = n;
     px = x;
     t = mode;
     if (t == 0)
         t = 15;
     else
         t = 18;
-    for (i = 0; i < n; i++, px += 8) {
-        x = i;
+    palette = 0;
+    for (i = 0; i < count; i++, px += 8) {
         if (i <= 2)
             frame = i;
-        else if (i >= n - 3)
-            frame = 7 - (n - i);
+        else if (i >= count - 3)
+            frame = 7 - (count - i);
         else
             frame = 3;
-        Obj_Draw(px, y, t, frame, 0, prio, x);
-        Obj_Draw(px, y + 16, t, frame + 7, 0, prio, x);
+        Obj_Draw(px, y, t, frame, palette, prio, 0);
+        Obj_Draw(px, y + 16, t, frame + 7, palette, prio, 0);
     }
 }
 

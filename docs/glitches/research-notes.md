@@ -45,6 +45,12 @@ letters) are already documented and give speed, not routing.
 4. Which field drives the weapon lunge (movement range −1)?
 5. What exact frame window lets a letter pause hide menu 11 (joybus state
    machine)?
+6. EN character creation: why does a GBA power-off on the last frame build
+   the wiped record? Needs the EN `CalcCharaSelect`
+   (see [character-creation-disconnect.md](character-creation-disconnect.md)).
+7. Guest return power-off: test on hardware
+   (see [guest-transfer.md](guest-transfer.md)). Also check whether guests get
+   a family in Tipa.
 
 ## Process note
 

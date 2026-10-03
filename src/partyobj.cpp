@@ -20,6 +20,7 @@
 #include "ffcc/itemobj.h"
 #include "ffcc/monobj.h"
 #include "ffcc/mesmenu.h"
+#include "ffcc/p_map.h"
 
 #include <math.h>
 #include "ffcc/fontman.h"
@@ -217,42 +218,6 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 	}
 }
 
-static unsigned short getPadHeldForSlot(int slot)
-{
-	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
-	if (blocked) {
-		return 0;
-	}
-
-	int selectedPort = Pad.m_debugPadPort;
-	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
-	return Pad.GetPadInputs()[idx].button[0];
-}
-
-static unsigned short getPadTrigForSlot(int slot)
-{
-	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
-	if (blocked) {
-		return 0;
-	}
-
-	int selectedPort = Pad.m_debugPadPort;
-	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
-	return Pad.GetPadInputs()[idx].buttonDown[0];
-}
-
-static unsigned short getPadGbaTrigForSlot(int slot)
-{
-	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
-	if (blocked) {
-		return 0;
-	}
-
-	int selectedPort = Pad.m_debugPadPort;
-	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
-	return Pad.GetPadInputs()[idx].buttonDown[1];
-}
-
 static int getPadConnectedForSlot(int slot)
 {
 	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
@@ -263,18 +228,6 @@ static int getPadConnectedForSlot(int slot)
 	int selectedPort = Pad.m_debugPadPort;
 	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
 	return Pad.GetPadInputs()[idx].gbaMode;
-}
-
-static unsigned short getPadButtonUpForSlot(int slot)
-{
-	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
-	if (blocked) {
-		return 0;
-	}
-
-	int selectedPort = Pad.m_debugPadPort;
-	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
-	return Pad.GetPadInputs()[idx].buttonUp;
 }
 
 static bool isMenuPcsCommandBusy()
@@ -299,30 +252,6 @@ static unsigned short getItemKindFromCfd(int itemId)
 	}
 
 	return *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
-}
-
-static float getPadLeftStickXForSlot(int slot)
-{
-	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
-	if (blocked) {
-		return 0.0f;
-	}
-
-	int selectedPort = Pad.m_debugPadPort;
-	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
-	return Pad.GetPadInputs()[idx].stickXF;
-}
-
-static float getPadLeftStickYForSlot(int slot)
-{
-	bool blocked = Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1);
-	if (blocked) {
-		return 0.0f;
-	}
-
-	int selectedPort = Pad.m_debugPadPort;
-	unsigned int idx = slot & ~((int)~(selectedPort - slot | slot - selectedPort) >> 31);
-	return Pad.GetPadInputs()[idx].stickYF;
 }
 
 static bool isBossArtifactStage()
@@ -383,9 +312,30 @@ static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
 	return anim;
 }
 
-static CMapObj* getMapHitObject()
+inline void CMapPcs::CalcHitPosition(Vec* hitPosition)
 {
-	return MapMng.m_hitMapObj;
+	MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
+}
+
+inline void CMapPcs::GetHitFaceNormal(Vec* normal)
+{
+	MapMng.m_hitMapObj->GetHitFaceNormal(normal);
+}
+
+inline int CMapPcs::CalcHitSlide(Vec* move, float scale)
+{
+	return MapMng.m_hitMapObj->CalcHitSlide(move, scale);
+}
+
+inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
+{
+	CMapCylinder cylinder;
+
+	cylinder.m_bottom = *cylinderBottom;
+	cylinder.m_axis = *direction;
+	cylinder.m_radius = radius;
+
+	return MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
 }
 
 // Original passes only two args at both statCharge/checkTargetParticle call
@@ -839,7 +789,7 @@ void CGPartyObj::menu()
 		}
 
 		if (Game.m_gameWork.m_menuStageMode == 0) {
-			unsigned short trig = getPadGbaTrigForSlot(static_cast<char>(m_animStateMisc));
+			unsigned short trig = Pad.GetGbaButtonDown(m_animStateMisc);
 			if ((trig & 0x10) != 0) {
 				goto openMenu;
 			}
@@ -849,7 +799,7 @@ void CGPartyObj::menu()
 			return;
 		}
 
-		if ((getPadTrigForSlot(static_cast<char>(m_animStateMisc)) & 0x800) == 0) {
+		if ((Pad.GetButtonDown(m_animStateMisc) & 0x800) == 0) {
 			return;
 		}
 
@@ -1069,7 +1019,7 @@ void CGPartyObj::onFramePreCalc()
 
 	if (m_unk63CBits.m_bit80 != 0 && party.flags.commandActive == 0) {
 		if (m_weaponNodeFlagAll.m_bits1.m_menuReady == 0) {
-			unsigned short held = getPadHeldForSlot(m_animStateMisc);
+			unsigned short held = Pad.GetButton(m_animStateMisc);
 			if (held != 0) {
 				changeStat(0, 0, 0);
 			}
@@ -1169,11 +1119,11 @@ void CGPartyObj::command()
 	    Joybus.GetCtrlMode(m_animStateMisc) != 1) {
 		int cmdDir = 0;
 
-		if ((getPadHeldForSlot(padSlot) & 0x60) == 0x60) {
+		if ((Pad.GetButton(padSlot) & 0x60) == 0x60) {
 			caravan->SetIdxCmdList(0);
-		} else if ((getPadTrigForSlot(padSlot) & 0x20) != 0) {
+		} else if ((Pad.GetButtonDown(padSlot) & 0x20) != 0) {
 			cmdDir = 1;
-		} else if ((getPadTrigForSlot(padSlot) & 0x40) != 0) {
+		} else if ((Pad.GetButtonDown(padSlot) & 0x40) != 0) {
 			cmdDir = -1;
 		}
 
@@ -1331,9 +1281,9 @@ void CGPartyObj::command()
 			secondaryCommand = 0x1A;
 			primaryAvailable = false;
 			int cmdDir = 0;
-			if ((getPadTrigForSlot(padSlot) & 0x20) != 0) {
+			if ((Pad.GetButtonDown(padSlot) & 0x20) != 0) {
 				cmdDir = 1;
-			} else if ((getPadTrigForSlot(padSlot) & 0x40) != 0) {
+			} else if ((Pad.GetButtonDown(padSlot) & 0x40) != 0) {
 				cmdDir = -1;
 			}
 			if (cmdDir != 0) {
@@ -1366,7 +1316,7 @@ void CGPartyObj::command()
 		return;
 	}
 
-	const unsigned short trig = getPadTrigForSlot(padSlot);
+	const unsigned short trig = Pad.GetButtonDown(padSlot);
 	if ((trig & 0x100) != 0) {
 		if (primaryAvailable) {
 			if (primaryCommand == 0x1B) {
@@ -1490,7 +1440,7 @@ void CGPartyObj::command()
 		return;
 	}
 
-	if ((getPadTrigForSlot(padSlot) & 0x200) == 0) {
+	if ((Pad.GetButtonDown(padSlot) & 0x200) == 0) {
 		return;
 	}
 	if (!secondaryAvailable) {
@@ -1768,9 +1718,9 @@ void CGPartyObj::onFrameStat()
 			CGPartyObj* gbaParty = Game.m_partyObjArr[1];
 			CGObject* chaliceObj = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
 			if (gbaParty != nullptr && gbaParty->m_lastStateId == 0) {
-				unsigned short held = getPadHeldForSlot(m_animStateMisc);
+				unsigned short held = Pad.GetButton(m_animStateMisc);
 				int heldMask = held & 0x400;
-				unsigned short up = getPadButtonUpForSlot(m_animStateMisc);
+				unsigned short up = Pad.GetButtonUp(m_animStateMisc);
 				if ((up & 0x400) != 0) {
 					if (CGPartyObj::m_ghostWork.holdTimer < 10 &&
 					    party.carryObject != chaliceObj) {
@@ -1801,14 +1751,14 @@ void CGPartyObj::onFrameStat()
 		if (m_stateFrame == 0) {
 			party.unk6D0 = 0;
 		}
-		if ((getPadHeldForSlot(m_animStateMisc) & 0x100) == 0) {
+		if ((Pad.GetButton(m_animStateMisc) & 0x100) == 0) {
 			changeStat(1, 0, 0);
 		} else {
 			party.unk6D0++;
 			if (party.unk6D0 >= 6) {
 				changeStat(6, 0, 0);
 			} else {
-				if ((getPadTrigForSlot(m_animStateMisc) & 0x200) != 0) {
+				if ((Pad.GetButtonDown(m_animStateMisc) & 0x200) != 0) {
 					changeStat(0, 0, 0);
 				}
 			}
@@ -1924,7 +1874,7 @@ void CGPartyObj::onFrameStat()
 				reqAnim(0x16, 1, 0);
 				enableDamageCol(0);
 			}
-			if ((getPadHeldForSlot(m_animStateMisc) & 0x100) == 0) {
+			if ((Pad.GetButton(m_animStateMisc) & 0x100) == 0) {
 				if (m_subFrame >= 0x19) {
 					playSe3D(0x30, 0x32, 0x96, 0, 0);
 				}
@@ -2299,13 +2249,13 @@ void CGPartyObj::statCharge()
 
 	if (m_subState <= 1) {
 		int slot = m_animStateMisc;
-		if ((getPadHeldForSlot(slot) & 0x100) == 0) {
+		if ((Pad.GetButton(slot) & 0x100) == 0) {
 			if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {
 				changeStat(0, 0, 0);
 			} else {
 				m_comboFrame++;
 			}
-		} else if ((getPadHeldForSlot(slot) & 0x200) != 0) {
+		} else if ((Pad.GetButton(slot) & 0x200) != 0) {
 			changeStat(0, 0, 0);
 		}
 	}
@@ -2322,7 +2272,7 @@ inline void CGPartyObj::statAttackSel()
 		putTargetParticle(0, 1);
 	}
 
-	unsigned short trig = getPadTrigForSlot(m_animStateMisc);
+	unsigned short trig = Pad.GetButtonDown(m_animStateMisc);
 	if ((trig & 0x200) != 0) {
 		changeStat(0, 0, 0);
 		return;
@@ -2438,11 +2388,11 @@ void CGPartyObj::onStatAttack(int chargeType)
 
 	if (m_stateFrame >= attackEntry->m_comboStartFrame &&
 	    m_stateFrame <= attackEntry->m_comboEndFrame) {
-		if ((getPadTrigForSlot(m_animStateMisc) & 0x100) != 0) {
+		if ((Pad.GetButtonDown(m_animStateMisc) & 0x100) != 0) {
 			party.commandFlagBits.commandActive = 1;
 		}
 	} else {
-		if ((getPadTrigForSlot(m_animStateMisc) & 0x100) != 0) {
+		if ((Pad.GetButtonDown(m_animStateMisc) & 0x100) != 0) {
 			party.commandFlagBits.flag40 = 1;
 		}
 	}
@@ -2537,33 +2487,15 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 			radius = FLOAT_80331A88;
 		}
 
-		CVector startPos = CVector(m_worldPosition) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-
-		CVector startPosCopy(startPos);
-		Vec* copyPtr = startPosCopy;
-
-		CMapCylinder hitCylinder;
-		hitCylinder.m_bottom.x = copyPtr->x;
-		hitCylinder.m_bottom.y = copyPtr->y;
-		hitCylinder.m_bottom.z = copyPtr->z;
-		hitCylinder.m_axis = rayDir;
-		hitCylinder.m_radius = radius;
-
-		if (MapMng.CheckHitCylinderNear(&hitCylinder, &rayDir, 0x30) != 0) {
-			getMapHitObject()->CalcHitPosition(&m_comboCenter);
+		if (MapPcs.CheckHitCylinderNear(CVector(m_worldPosition) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78), &rayDir, radius, 0x30) != 0) {
+			MapPcs.CalcHitPosition(&m_comboCenter);
 		} else {
-			CVector startPos2 = CVector(m_worldPosition) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-			PSVECAdd(CVector(startPos2), &rayDir, &m_comboCenter);
+			PSVECAdd(CVector(m_worldPosition) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78), &rayDir, &m_comboCenter);
 		}
-		const CVector& down = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
-		CMapCylinder floorCylinder;
-		floorCylinder.m_bottom = m_comboCenter;
-		floorCylinder.m_axis = *(Vec*)&down;
-		floorCylinder.m_radius = FLOAT_80331a78;
-		if (MapMng.CheckHitCylinderNear(&floorCylinder, (Vec*)&down, 0x30) != 0) {
-			getMapHitObject()->CalcHitPosition(&m_comboCenter);
+		if (MapPcs.CheckHitCylinderNear(&m_comboCenter, CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78), FLOAT_80331a78, 0x30) != 0) {
+			MapPcs.CalcHitPosition(&m_comboCenter);
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosA = m_comboCenter;
-			getMapHitObject()->GetHitFaceNormal(&faceNormal);
+			MapPcs.GetHitFaceNormal(&faceNormal);
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosB = faceNormal;
 		}
 		m_comboTarget = m_comboCenter;
@@ -2657,12 +2589,12 @@ void CGPartyObj::checkTargetParticle()
 	    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
 	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) == 0)) {
 		if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
-			input.x -= getPadLeftStickXForSlot(m_animStateMisc);
-			input.z += getPadLeftStickYForSlot(m_animStateMisc);
+			input.x -= Pad.GetLeftStickX(m_animStateMisc);
+			input.z += Pad.GetLeftStickY(m_animStateMisc);
 		}
 
 			if (input.x == 0.0f && input.z == 0.0f) {
-				unsigned short held = getPadHeldForSlot(m_animStateMisc);
+				unsigned short held = Pad.GetButton(m_animStateMisc);
 			if ((held & 1) != 0) {
 				input.x += kMonObjOne;
 			}
@@ -2742,14 +2674,14 @@ void CGPartyObj::checkTargetParticle()
 			maxRange = zero + (base + static_cast<float>(vFlag));
 		}
 
-		CVector fromCenter = CVector(*targetPos) - CVector(m_worldPosition);
+		CVector move = CVector(*targetPos) - CVector(m_worldPosition);
 		if (dist > maxRange) {
 			Vec scaled;
-			PSVECScale(fromCenter, &scaled, maxRange / dist);
+			PSVECScale(move, &scaled, maxRange / dist);
 			PSVECAdd(&m_worldPosition, &scaled, targetPos);
 		}
 
-		CVector move = CVector(*targetPos) - CVector(*centerPos);
+		move = CVector(*targetPos) - CVector(*centerPos);
 		int iter = 4;
 		do {
 			float radius;
@@ -2759,14 +2691,7 @@ void CGPartyObj::checkTargetParticle()
 				radius = FLOAT_80331A88;
 			}
 
-			CVector bottom = CVector(*centerPos) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-
-			CMapCylinder hitCylinder;
-			hitCylinder.m_bottom = bottom;
-			hitCylinder.m_axis = move;
-			hitCylinder.m_radius = radius;
-
-			if (MapMng.CheckHitCylinderNear(&hitCylinder, move, 0x30) == 0) {
+			if (MapPcs.CheckHitCylinderNear(CVector(*centerPos) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78), move, radius, 0x30) == 0) {
 				break;
 			}
 			if (iter == 1) {
@@ -2774,28 +2699,19 @@ void CGPartyObj::checkTargetParticle()
 				move.y = FLOAT_80331a78;
 				move.z = FLOAT_80331a78;
 			} else {
-				getMapHitObject()->CalcHitSlide(move, FLOAT_80331A98);
+				MapPcs.CalcHitSlide(move, FLOAT_80331A98);
 			}
 			iter--;
 		} while (iter > 0);
 
-		CVector centerPlusUp = CVector(*centerPos) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-		PSVECAdd(centerPlusUp, move, targetPos);
+		PSVECAdd(CVector(*centerPos) + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78), move, targetPos);
 
-		const CVector& down = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
-		CMapCylinder floorCylinder;
-		floorCylinder.m_bottom.x = targetPos->x;
-		floorCylinder.m_bottom.y = targetPos->y;
-		floorCylinder.m_bottom.z = targetPos->z;
-		floorCylinder.m_axis = *(Vec*)&down;
-		floorCylinder.m_radius = FLOAT_80331a78;
-
-		if (MapMng.CheckHitCylinderNear(&floorCylinder, (Vec*)&down, 0x30) != 0) {
-			getMapHitObject()->CalcHitPosition(targetPos);
+		if (MapPcs.CheckHitCylinderNear(targetPos, CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78), FLOAT_80331a78, 0x30) != 0) {
+			MapPcs.CalcHitPosition(targetPos);
 			{
 				Vec faceNormal;
 				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosA = *targetPos;
-				getMapHitObject()->GetHitFaceNormal(&faceNormal);
+				MapPcs.GetHitFaceNormal(&faceNormal);
 				reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_targetCursorPosB = faceNormal;
 			}
 		}
@@ -2834,18 +2750,11 @@ void CGPartyObj::moveCenterTargetParticle()
 
 	CVector hitPos = CVector(m_comboTarget) + (CVector(m_comboCenter) - CVector(m_comboTarget)) * wave;
 
-	const CVector& moveVec = CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 	Vec hitNormal;
-	CVector bottomResult = hitPos + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
-
-	CMapCylinder hitCylinder;
-	hitCylinder.m_bottom = bottomResult;
-	hitCylinder.m_axis = *(Vec*)&moveVec;
-	hitCylinder.m_radius = FLOAT_80331a78;
-
-	if (MapMng.CheckHitCylinderNear(&hitCylinder, (Vec*)&moveVec, 0x30) != 0) {
-		getMapHitObject()->CalcHitPosition(hitPos);
-		getMapHitObject()->GetHitFaceNormal(&hitNormal);
+	if (MapPcs.CheckHitCylinderNear(hitPos + CVector(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78),
+	                                CVector(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78), FLOAT_80331a78, 0x30) != 0) {
+		MapPcs.CalcHitPosition(hitPos);
+		MapPcs.GetHitFaceNormal(&hitNormal);
 
 		CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 		work->m_targetCursorPosB = hitNormal;
@@ -2930,7 +2839,7 @@ void CGPartyObj::onStatMagic()
 	int magicReady = (m_itemId == 0x103) ? 1 : 0;
 
 	if (!isGhostPartyTargetMode(this)) {
-		unsigned short held = getPadHeldForSlot(m_animStateMisc);
+		unsigned short held = Pad.GetButton(m_animStateMisc);
 		if ((held & 0x100) == 0) {
 			if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {
 				if (magicReady == 0) {
@@ -2945,7 +2854,7 @@ void CGPartyObj::onStatMagic()
 				m_comboFrame++;
 			}
 		} else {
-			unsigned short trig = getPadHeldForSlot(m_animStateMisc);
+			unsigned short trig = Pad.GetButton(m_animStateMisc);
 			if ((trig & 0x200) != 0 && magicReady == 0) {
 				changeStat(0, 0, 0);
 			}
@@ -3022,7 +2931,7 @@ inline void CGPartyObj::statAlive()
 	}
 
 	if (m_lastStateId == 0) {
-		unsigned short held = getPadHeldForSlot(m_animStateMisc);
+		unsigned short held = Pad.GetButton(m_animStateMisc);
 		if ((held & 0x100) == 0 && m_subState == 1) {
 			changeSubStat(0);
 		}
@@ -3201,7 +3110,7 @@ inline void CGPartyObj::statCarry()
 		reqAnim(0x1D, 0, 0);
 	}
 
-	unsigned short trig = getPadTrigForSlot(m_animStateMisc);
+	unsigned short trig = Pad.GetButtonDown(m_animStateMisc);
 	if ((trig & 0x200) != 0) {
 		carry(2, (CGObject*)0, 1);
 		changeStat(0, 0, 0);
@@ -3312,7 +3221,7 @@ inline void CGPartyObj::statPickup()
 		reqAnim(0x21, 0, 0);
 	}
 
-	unsigned short trig = getPadTrigForSlot(m_animStateMisc);
+	unsigned short trig = Pad.GetButtonDown(m_animStateMisc);
 	if ((trig & 0x200) != 0) {
 		changeStat(0, 0, 0);
 		return;
@@ -3573,7 +3482,7 @@ canUse:
 void CGPartyObj::canPlayerGoMenu()
 {
 	PartyObjOverlay& party = PartyData(this);
-	unsigned short trig = getPadTrigForSlot(m_animStateMisc);
+	unsigned short trig = Pad.GetButtonDown(m_animStateMisc);
 	if (m_lastStateId == 0 && (trig & 0x200) != 0) {
 		party.partyFlags |= 0x10;
 	} else if ((m_lastStateId != 0) || ((trig & 0x200) == 0)) {
@@ -4588,20 +4497,8 @@ void CGPartyObj::gpmCol()
 
 		CVector diffVec = CVector(leader->m_worldPosition) - CVector(*pos);
 
-		unsigned int flags = leader->m_bgHitMask & ~0x10U;
-		float halfHeight = m_capsuleHalfHeight;
-		const CVector& bottom = CVector(pos->x, FLOAT_80331A98 + pos->y, pos->z);
-
-		CMapCylinder cylinder;
-		cylinder.m_bottom.x = bottom.x;
-		cylinder.m_bottom.y = bottom.y;
-		cylinder.m_bottom.z = bottom.z;
-		cylinder.m_axis.x = diffVec.x;
-		cylinder.m_axis.y = diffVec.y;
-		cylinder.m_axis.z = diffVec.z;
-		cylinder.m_radius = halfHeight;
-
-		if (MapMng.CheckHitCylinderNear(&cylinder, diffVec, flags) != 0) {
+		if (MapPcs.CheckHitCylinderNear(CVector(pos->x, FLOAT_80331A98 + pos->y, pos->z), diffVec, m_capsuleHalfHeight,
+		                                leader->m_bgHitMask & ~0x10U) != 0) {
 			activeTrailCount = activeTrailCount < i + 1 ? activeTrailCount : i + 1;
 		} else {
 			trailBase[i] = leader->m_worldPosition;

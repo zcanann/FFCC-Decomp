@@ -85,6 +85,7 @@ public:
     float GetTriggerRight(long);
     unsigned short GetButtonRepeat(long);
     unsigned short GetButton(long);
+    unsigned short GetButtonUp(long);
     int IsGba(long);
     /*
      * --INFO--
@@ -463,6 +464,34 @@ inline unsigned short CPad::GetGbaButtonDown(long padIndex)
     } else {
         unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
         result = GetPadInputs()[resolvedIndex].buttonDown[1];
+    }
+
+    return static_cast<unsigned short>(result);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline unsigned short CPad::GetButtonUp(long padIndex)
+{
+    bool shouldZero = false;
+    unsigned int result;
+
+    if (m_debugPadLock != 0 || (padIndex == 0 && m_debugPadPort != -1)) {
+        shouldZero = true;
+    }
+
+    if (shouldZero) {
+        result = 0;
+    } else {
+        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
+        result = GetPadInputs()[resolvedIndex].buttonUp;
     }
 
     return static_cast<unsigned short>(result);

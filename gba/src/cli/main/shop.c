@@ -1180,7 +1180,8 @@ void InfoWin_GetDescLine(s32 line, char *dst)
             } else {
                 len = s - p;
                 memcpy(dst, p, len);
-                dst[len] = 0;
+                s = dst + len;
+                *s = 0;
             }
             break;
         }

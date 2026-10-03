@@ -786,41 +786,23 @@ void GbaQueue::ExecutQueue()
 				} else if (cmd == 0x0C) {
 					if (Game.m_scriptFoodBase[channel] != 0) {
 						if (cmdBytes[1] == 3) {
-							OSWaitSemaphore(accessSemaphores + channel);
-							m_letterDatFlg &= ~(1 << channel);
-							OSSignalSemaphore(accessSemaphores + channel);
-							Joybus.SetLetterSize(channel, 0);
+							ClrLetterLstFlg(channel);
 							MakeLetterList(channel, Joybus.GetLetterBuffer(channel));
 						} else if (cmdBytes[1] == 2) {
-							OSWaitSemaphore(accessSemaphores + channel);
-							m_letterDatFlg &= ~(1 << channel);
-							OSSignalSemaphore(accessSemaphores + channel);
-							Joybus.SetLetterSize(channel, 0);
+							ClrLetterLstFlg(channel);
 							Game.m_scriptFoodBase[channel]->FGLetterOpen(cmdBytes[2]);
 							MakeLetterData(channel, Joybus.GetLetterBuffer(channel), cmdBytes[2]);
 						} else if (cmdBytes[1] == 6) {
-							OSWaitSemaphore(accessSemaphores + channel);
-							m_letterDatFlg &= ~(1 << channel);
-							OSSignalSemaphore(accessSemaphores + channel);
-							Joybus.SetLetterSize(channel, 0);
+							ClrLetterLstFlg(channel);
 							MakeSellData(channel, Joybus.GetLetterBuffer(channel));
 						} else if (cmdBytes[1] == 7) {
-							OSWaitSemaphore(accessSemaphores + channel);
-							m_letterDatFlg &= ~(1 << channel);
-							OSSignalSemaphore(accessSemaphores + channel);
-							Joybus.SetLetterSize(channel, 0);
+							ClrLetterLstFlg(channel);
 							MakeBuyData(channel, Joybus.GetLetterBuffer(channel));
 						} else if (cmdBytes[1] == 8) {
-							OSWaitSemaphore(accessSemaphores + channel);
-							m_letterDatFlg &= ~(1 << channel);
-							OSSignalSemaphore(accessSemaphores + channel);
-							Joybus.SetLetterSize(channel, 0);
+							ClrLetterLstFlg(channel);
 							MakeSmithData(channel, Joybus.GetLetterBuffer(channel));
 						} else if (cmdBytes[1] == 9) {
-							OSWaitSemaphore(accessSemaphores + channel);
-							m_letterDatFlg &= ~(1 << channel);
-							OSSignalSemaphore(accessSemaphores + channel);
-							Joybus.SetLetterSize(channel, 0);
+							ClrLetterLstFlg(channel);
 							MakeArtiData(channel, Joybus.GetLetterBuffer(channel));
 						}
 					}
@@ -1893,28 +1875,31 @@ int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 		itemList[i] = __lhbrx(&localPlayerData.m_items[i], 0);
 	}
 	memcpy(outData, itemList, sizeof(itemList));
+	outData += sizeof(itemList);
 
 	for (int i = 0; i < 3; i++) {
 		artifacts[i] = __lwbrx(&localPlayerData.m_artifacts[i], 0);
 	}
-	memcpy(outData + 0x80, artifacts, sizeof(artifacts));
+	memcpy(outData, artifacts, sizeof(artifacts));
+	outData += sizeof(artifacts);
 
 	for (int i = 0; i < 4; i++) {
 		tmpArtifacts[i] = __lhbrx(&localPlayerData.m_tmpArtifacts[i], 0);
 	}
-	memcpy(outData + 0x8C, tmpArtifacts, sizeof(tmpArtifacts));
+	memcpy(outData, tmpArtifacts, sizeof(tmpArtifacts));
+	outData += sizeof(tmpArtifacts);
 
-	outData[0x94] = localPlayerData.m_equipment[0];
-	outData[0x95] = localPlayerData.m_equipment[1];
-	outData[0x96] = localPlayerData.m_equipment[2];
-	outData[0x97] = localPlayerData.m_equipment[3];
+	for (int i = 0; i < 4; i++) {
+		*outData++ = localPlayerData.m_equipment[i];
+	}
 
 	for (int i = 0; i < 8; i++) {
 		commandSlots[i] = __lhbrx(&localPlayerData.m_commandSlots[i], 0);
 	}
-	memcpy(outData + 0x98, commandSlots, sizeof(commandSlots));
+	memcpy(outData, commandSlots, sizeof(commandSlots));
+	outData += sizeof(commandSlots);
 
-	outData[0xA8] = localPlayerData.m_commandSlotCount;
+	*outData = localPlayerData.m_commandSlotCount;
 	return 0xA9;
 }
 
@@ -4039,6 +4024,8 @@ void GbaQueue::ClrArtiDatFlg(int channel)
  */
 int GbaQueue::MakeArtiData(int channel, char* outData)
 {
+	CCaravanWork** foodBasePtr;
+	int totalSize;
 	char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x100F) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
@@ -4059,21 +4046,28 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	}
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
+	CCaravanWork** foodBaseArr = Game.m_scriptFoodBase;
+	foodBasePtr = foodBaseArr + channel;
+	char* writePtr = outData;
 	unsigned int artifactData[3];
 
+	totalSize = 0;
 	OSWaitSemaphore(accessSemaphores + channel);
 	for (int i = 0; i < 3; i++) {
 		artifactData[i] = __lwbrx(&m_playerData[channel].m_artifacts[i], 0);
 	}
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	memcpy(outData, artifactData, sizeof(artifactData));
+	memcpy(writePtr, artifactData, sizeof(artifactData));
+	writePtr += sizeof(artifactData);
+	totalSize += sizeof(artifactData);
+
 	delete[] agbStringScratch;
 	delete[] itemNameScratch;
 
 	m_artiDatFlags = static_cast<unsigned char>(m_artiDatFlags | (1 << channel));
-	Joybus.SetLetterSize(channel, 0xC);
-	return 0xC;
+	Joybus.SetLetterSize(channel, totalSize);
+	return totalSize;
 }
 
 /*

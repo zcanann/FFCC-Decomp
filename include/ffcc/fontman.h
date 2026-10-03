@@ -62,6 +62,9 @@ public:
 	void SetTlut(int);
 	void SetTlutColor(int, int, _GXColor);
 	void FlushTlutColor();
+	_GXColor GetDefaultTlutColor(int index) { return texturePtr->GetTlutColor(index); }
+	void SetDefaultTlutColor(int index, _GXColor color) { texturePtr->SetTlutColor(index, color); }
+	void FlushDefaultTlutColor() { texturePtr->FlushTlut(); }
 
 	void DrawInit();
 	void DrawQuit();

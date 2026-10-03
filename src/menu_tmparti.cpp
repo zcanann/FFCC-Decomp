@@ -348,7 +348,36 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	unsigned int result;
 
 	if (this->m_tmpArtiState->initialized == '\0') {
-		TmpArtiInit();
+		memset(m_tmpArtiList, 0, sizeof(TmpArtiList));
+		float one = kTmpArtiOne;
+		entry = m_tmpArtiList->entries;
+		for (int k = 64; k != 0; k--) {
+			entry->z = one;
+			entry++;
+		}
+
+		double half = kTmpArtiHalfDouble;
+		double center = kTmpArtiCenterX;
+		float zero = kTmpArtiZero;
+		int row = 0;
+		entry = m_tmpArtiList->entries;
+		for (int k = 4; k != 0; k--) {
+			entry->tex = 0x37;
+			entry->width = 200;
+			entry->height = 0x28;
+			entry->x = (short)(int)-((double)entry->width * half - center);
+			entry->y = row * (entry->height - 8) + 0x60;
+			entry->s = zero;
+			entry->t = zero;
+			entry->startFrame = row;
+			row++;
+			entry->duration = 3;
+			entry++;
+		}
+
+		m_tmpArtiList->count = 4;
+		m_tmpArtiState->unk_26 = 0;
+		m_tmpArtiState->initialized = 1;
 	}
 
 	completedItems = 0;

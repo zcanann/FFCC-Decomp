@@ -975,8 +975,6 @@ static inline const char* GetSingWinMessage(int staticText, const char* dynamicT
  */
 void CMenuPcs::destroySingleMenu()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (gSingMenuAsyncFileHandle != 0) {
         File.Close(gSingMenuAsyncFileHandle);
         gSingMenuAsyncFileHandle = 0;
@@ -1036,12 +1034,10 @@ void CMenuPcs::destroySingleMenu()
  */
 void CMenuPcs::SingMenuInit()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     Graphic._WaitDrawDone(s_singmenu_cpp, 0x5C2);
     Graphic.DestroyTempBuffer();
 
-    m_stageF4 = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<u8*>(&Graphic) + 8);
+    m_stageF4 = Graphic.GetTempStage();
     memset(&m_singleMenuTextureLoadIndex, 0, 8);
     m_wm.m_handles[0] = 0;
 
@@ -1177,7 +1173,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
             loadCompleted = 1;
         } else {
             if (m_singleMenuTextureLoadState == 0) {
-                char path[260];
+                char path[256];
                 sprintf(path, s_singMenuTexturePathFmt, Game.GetLangString(), PTR_s_solo1.entries[loadIndex]);
                 gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
                 File.ReadASync(gSingMenuAsyncFileHandle);
@@ -1190,7 +1186,8 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
 
                 m_textureSets[loadIndex + 5] = new (Game.m_gameWork.m_menuStageMode != 0 ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage, s_singmenu_cpp, 0x748) CTextureSet;
 
-                m_textureSets[loadIndex + 5]->Create(File.m_readBuffer, Game.m_gameWork.m_menuStageMode != 0 ? m_stageF4 : m_menuStage, 0, 0, 0, 0);
+                void* buffer = File.m_readBuffer;
+                m_textureSets[loadIndex + 5]->Create(buffer, Game.m_gameWork.m_menuStageMode != 0 ? m_stageF4 : m_menuStage, 0, 0, 0, 0);
                 File.Close(gSingMenuAsyncFileHandle);
                 gSingMenuAsyncFileHandle = 0;
                 m_singleMenuTextureLoadState = 0;
@@ -1265,8 +1262,6 @@ post_texture_load:
  */
 void CMenuPcs::createSingleMenu()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     m_singleMenuPhase = 0;
     gSingMenuAsyncLoadCompleted = 0;
     if (Game.m_gameWork.m_menuStageMode == 0) {
@@ -1320,8 +1315,6 @@ void CMenuPcs::createSingleMenu()
  */
 void CMenuPcs::drawSingleMenu()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if ((Game.m_gameWork.m_menuStageMode != 0) &&
         (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)) {
         DrawInit();
@@ -1584,26 +1577,24 @@ void CMenuPcs::drawSingleMenu()
  */
 inline void CMenuPcs::SingCalcChara(float frameStep)
 {
-    CChara::CModel* model = m_wm.m_handles[0]->m_model;
-
-    if (model->m_time < model->m_animEnd) {
-        model->AddFrame(frameStep);
+    if (m_wm.m_handles[0]->m_model->GetNowFrame() < m_wm.m_handles[0]->m_model->GetEndFrame()) {
+        m_wm.m_handles[0]->m_model->AddFrame(frameStep);
     } else {
-        model->SetFrame(0.0f);
+        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
     }
 
     unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = 0.0f;
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[2][3] = 0.0f;
 
-    model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-    model->SetMatrix(scaleMtx);
-    model->CalcMatrix();
-    model->CalcSkin();
+    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
+    m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
+    m_wm.m_handles[0]->m_model->CalcMatrix();
+    m_wm.m_handles[0]->m_model->CalcSkin();
 }
 
 /*
@@ -1921,24 +1912,7 @@ void CMenuPcs::SingleCalcFadeIn()
         entry = entry + 1;
     }
 
-    if (m_wm.m_handles[0]->m_model->m_time < m_wm.m_handles[0]->m_model->m_animEnd) {
-        m_wm.m_handles[0]->m_model->AddFrame(1.0f);
-    } else {
-        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
-    }
-
-    unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
-    float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
-    Mtx scaleMtx;
-    PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[0][3] = 0.0f;
-    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
-    scaleMtx[2][3] = 0.0f;
-
-    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
-    m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
-    m_wm.m_handles[0]->m_model->CalcMatrix();
-    m_wm.m_handles[0]->m_model->CalcSkin();
+    SingCalcChara(1.0f);
 
     if (m_singleFadeState->count == completed) {
         m_singleFadeState->done = 1;
@@ -2022,24 +1996,7 @@ void CMenuPcs::SingleCalcFadeOut()
         entry = entry + 1;
     }
 
-    if (m_wm.m_handles[0]->m_model->m_time < m_wm.m_handles[0]->m_model->m_animEnd) {
-        m_wm.m_handles[0]->m_model->AddFrame(1.0f);
-    } else {
-        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
-    }
-
-    unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
-    float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
-    Mtx scaleMtx;
-    PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[0][3] = 0.0f;
-    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
-    scaleMtx[2][3] = 0.0f;
-
-    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
-    m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
-    m_wm.m_handles[0]->m_model->CalcMatrix();
-    m_wm.m_handles[0]->m_model->CalcSkin();
+    SingCalcChara(1.0f);
 
     if (m_singleFadeState->count == completed) {
         m_singleFadeState->done = 1;
@@ -2079,8 +2036,6 @@ inline void CMenuPcs::SingleDrawFadeOut()
  */
 void CMenuPcs::SingleCalcCtrl()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (gSingMenuAsyncLoadCompleted == 0) {
         return;
     }
@@ -2090,24 +2045,7 @@ void CMenuPcs::SingleCalcCtrl()
     }
 
     int result = 0;
-    if (m_wm.m_handles[0]->m_model->m_time < m_wm.m_handles[0]->m_model->m_animEnd) {
-        m_wm.m_handles[0]->m_model->AddFrame(1.0f);
-    } else {
-        m_wm.m_handles[0]->m_model->SetFrame(0.0f);
-    }
-
-    unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
-    float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
-    Mtx scaleMtx;
-    PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[0][3] = 0.0f;
-    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
-    scaleMtx[2][3] = 0.0f;
-
-    m_wm.m_handles[0]->m_model->m_flags10CBits.m_flag10C_80 = 1;
-    m_wm.m_handles[0]->m_model->SetMatrix(scaleMtx);
-    m_wm.m_handles[0]->m_model->CalcMatrix();
-    m_wm.m_handles[0]->m_model->CalcSkin();
+    SingCalcChara(1.0f);
 
     switch (m_singleMenuMode) {
     case 0: {
@@ -2228,17 +2166,7 @@ void CMenuPcs::SingleCalcCtrl()
     MenuPcs.m_battleMesMenus[0]->CalcHeart();
     m_singMenuState->result = result;
 
-    bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
-    unsigned short press;
-    if (hasInput) {
-        press = 0;
-    } else {
-        int padIndex = 0;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
-        press = Pad.GetPadInputs()[padIndex].buttonDown[0];
-    }
-
-    if ((press & 0x800) != 0) {
+    if ((Pad.GetButtonDown(0) & 0x800) != 0) {
         m_singleFadeState->done = 1;
     }
 }
@@ -2643,6 +2571,8 @@ void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
  */
 void CMenuPcs::DrawSingWin(short mode)
 {
+    int i;
+
     if (mode >= 0 && m_menuWindowInfo->state != mode) {
         m_menuWindowInfo->state = mode;
     }
@@ -2693,7 +2623,7 @@ void CMenuPcs::DrawSingWin(short mode)
     float x1 = x0 + w - 32.0f;
     float y1 = y0 + h - 32.0f;
     unsigned long uvFlag;
-    for (unsigned int i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
         uvFlag = 0;
         float x;
         if ((i & 1) != 0) {
@@ -2717,11 +2647,11 @@ void CMenuPcs::DrawSingWin(short mode)
     float innerX = 32.0f + x0;
     float yy = y0;
     float innerWf = static_cast<float>(innerW);
-    for (int i = 0; i < 2; i++) {
+    for (i = 0; i < 2; i++) {
         uvFlag = 0;
         if (i != 0) {
-            uvFlag |= 4;
             yy = y1;
+            uvFlag |= 4;
         }
         MenuPcs.DrawRect(uvFlag, innerX, yy, innerWf, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
@@ -2731,11 +2661,11 @@ void CMenuPcs::DrawSingWin(short mode)
     float innerY = 32.0f + y0;
     float xx = x0;
     float innerHf = static_cast<float>(innerH);
-    for (int i = 0; i < 2; i++) {
+    for (i = 0; i < 2; i++) {
         uvFlag = 0;
         if (i != 0) {
-            uvFlag |= 8;
             xx = x1;
+            uvFlag |= 8;
         }
         MenuPcs.DrawRect(uvFlag, xx, innerY, 32.0f, innerHf, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
     }
@@ -3100,7 +3030,7 @@ int CMenuPcs::GetEquipType(int itemNo)
  */
 int CMenuPcs::GetSmithItem(int itemNo)
 {
-    CCaravanWork* caravanWork = SingleCaravanWork();
+    CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 
     GetItemType(itemNo, 1);
     u16 race = caravanWork->m_tribeId;

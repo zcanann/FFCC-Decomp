@@ -370,6 +370,8 @@ public:
 		CMesh* GetMesh();
 		void AddFrame(float);
 		void SetFrame(float);
+		float GetNowFrame() { return m_time; }
+		float GetEndFrame() { return m_animEnd; }
 		void CalcFurColor();
 		void InitMogFurTex();
 		void CopyFurTex(int loadFromTexture);

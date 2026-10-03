@@ -377,7 +377,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	register int flags = static_cast<int>(m_flagsBits.m_channelModes);
 	register unsigned int dataOffset = m_dataOffset;
 	register unsigned short* inData =
-	    reinterpret_cast<unsigned short*>(static_cast<unsigned char*>(anim->m_bank) + dataOffset);
+	    reinterpret_cast<unsigned short*>(dataOffset + reinterpret_cast<unsigned int>(anim->m_bank));
 	register float* outData = reinterpret_cast<float*>(srt);
 
 	for (int i = 0; i < 3; i++) {

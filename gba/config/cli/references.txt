@@ -1,2 +1,4 @@
 # Pointer literals with a fixed symbolic expression, where the compiler folded
 # a constant offset that lands outside the referenced object.
+# FamilyScreen_PrintRow: relationNames[idx - 1], with row size 0x12 at offset 0xC.
+0x0200F6A4 gSession-0x6

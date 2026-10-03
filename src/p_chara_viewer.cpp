@@ -419,8 +419,8 @@ void CCharaPcs::calcViewer()
         frameAdvance += (triggerButtons & 0x100) ? 1.0f : 0.0f;
         frameAdvance += (triggerButtons & 0x200) ? -1.0f : 0.0f;
     } else {
-        frameAdvance = ((heldButtons & 0x100) ? 0.25f : 1.0f) *
-                       ((heldButtons & 0x200) ? -1.0f : 1.0f);
+        frameAdvance = (heldButtons & 0x200) ? -1.0f : 1.0f;
+        frameAdvance *= (heldButtons & 0x100) ? 0.25f : 1.0f;
     }
 
     for (unsigned int i = 0; i < 2; i++) {

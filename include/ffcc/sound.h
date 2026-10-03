@@ -121,7 +121,7 @@ public:
     void PlayStreamASync();
     void StopStream();
     void SetStreamVolume(int, int);
-    void IsPlayStream();
+    bool IsPlayStream();
     void IsDebugPrint(int);
     void PauseAllSe(int);
     void AddNoFreeSeGroup(int);

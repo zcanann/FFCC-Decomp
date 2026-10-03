@@ -224,38 +224,34 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 
     float upperLat;
     float z;
-    float lowerCos;
-    float lowerNormalZ;
-    float firstLat;
-    float lowerSin;
-    float lowerLat;
+    float ringLat;
     float lx;
     float ly;
     float upperSin;
     float upperCos;
     float latStep;
     float zero;
-    float firstRingCos;
+    float ringCos;
     float uy;
     float lon;
     float upperNormalZ;
     float x;
     float y;
     float diameter;
-    float firstNormalZ;
+    float ringNormalZ;
     float radius;
     float ux;
-    float firstRingSin;
+    float ringSin;
     zero = 0.0f;
     radius = 1.0f;
     diameter = 2.0f;
     GXBegin(GX_TRIANGLEFAN, GX_VTXFMT7, detail + 2);
 
     latStep = 3.1415927f / (float)detail;
-    firstLat = latStep;
-    firstRingSin = radius * (float)sin(firstLat);
-    firstRingCos = radius * (float)cos(firstLat);
-    firstNormalZ = 2.0f * firstRingCos * firstRingCos;
+    ringLat = latStep;
+    ringSin = radius * (float)sin(ringLat);
+    ringCos = radius * (float)cos(ringLat);
+    ringNormalZ = 2.0f * ringCos * ringCos;
 
     GXPosition3f32(zero, zero, radius);
     GXNormal3f32(zero, zero, diameter);
@@ -263,30 +259,30 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     int i = 0;
     lon = zero;
     while (i <= (int)detail) {
-        x = firstRingSin * (float)cos(lon);
-        y = firstRingSin * (float)sin(lon);
-        z = firstRingCos;
+        x = ringSin * (float)cos(lon);
+        y = ringSin * (float)sin(lon);
+        z = ringCos;
 
         GXPosition3f32(x, y, z);
-        GXNormal3f32(-2.0f * x * z, -2.0f * y * z, firstNormalZ);
+        GXNormal3f32(-2.0f * x * z, -2.0f * y * z, ringNormalZ);
 
         i++;
         lon = (-6.2831855f * (float)i) / (float)detail;
     }
 
     for (int ring = 2; ring < (int)detail; ring++) {
-        lowerLat = (3.1415927f * (float)ring) / (float)detail;
+        ringLat = (3.1415927f * (float)ring) / (float)detail;
         upperLat = (3.1415927f * (float)(ring - 1)) / (float)detail;
 
         upperSin = radius * (float)sin(upperLat);
         upperCos = radius * (float)cos(upperLat);
-        lowerSin = radius * (float)sin(lowerLat);
-        lowerCos = (float)cos(lowerLat);
-        lowerCos = radius * lowerCos;
+        ringSin = radius * (float)sin(ringLat);
+        ringCos = (float)cos(ringLat);
+        ringCos = radius * ringCos;
         upperNormalZ = 2.0f * upperCos * upperCos;
-        lowerNormalZ = 2.0f * lowerCos * lowerCos;
+        ringNormalZ = 2.0f * ringCos * ringCos;
 
-        if (fabs(upperCos) < (double)0.01f || fabs(lowerCos) < (double)0.01f) {
+        if (fabs(upperCos) < (double)0.01f || fabs(ringCos) < (double)0.01f) {
             break;
         }
 
@@ -294,11 +290,11 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
         i = 0;
         lon = zero;
         while (i <= (int)detail) {
-            lx = lowerSin * (float)cos(lon);
-            ly = lowerSin * (float)sin(lon);
-            GXPosition3f32(lx, ly, lowerCos);
-            GXNormal3f32(-2.0f * lx * lowerCos,
-                         -2.0f * ly * lowerCos, lowerNormalZ);
+            lx = ringSin * (float)cos(lon);
+            ly = ringSin * (float)sin(lon);
+            GXPosition3f32(lx, ly, ringCos);
+            GXNormal3f32(-2.0f * lx * ringCos,
+                         -2.0f * ly * ringCos, ringNormalZ);
 
             ux = upperSin * (float)cos(lon);
             uy = upperSin * (float)sin(lon);

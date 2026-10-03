@@ -106,8 +106,8 @@ void pppKeShpTail2XCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
  */
 void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _pppCtrlTable* ctrlTable)
 {
-    Vec* history;
     s32 curIndex;
+    Vec* history;
     KeShpTail2XWork* work;
     pppShapeSt* shape;
     tagOAN3_SHAPE* shapeEntry;
@@ -183,7 +183,8 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
         colorStepA = colorStepR;
     }
 
-    work = GetKeShpTail2XWork(&obj->m_object, ctrlTable);
+    work = reinterpret_cast<KeShpTail2XWork*>(
+        obj->m_object.m_workArea + GetKeShpTail2XDataOffsets(ctrlTable)->m_workOffset);
     shape = ppvEnv->m_shapeTablePtr[dataValIndex];
     pppShapeAnimData* shapeAnim = static_cast<pppShapeAnimData*>(shape->m_animData);
     {
@@ -308,7 +309,7 @@ advance_segment:
     if (nextIndex++ == lastIndex) {
         nextIndex = 0;
     }
-    if (curIndex == nextIndex) {
+    if (nextIndex == curIndex) {
         return;
     }
 

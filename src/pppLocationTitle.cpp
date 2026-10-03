@@ -151,7 +151,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
     Vec interp[50];
     Vec scaled;
     Vec* interpRead;
-    int startIndex;
+    int i;
     LocationTitleWork* work;
     VColor* colorData;
     int graphFrame;
@@ -166,6 +166,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
     float stepScale;
     float t;
     int nextCount;
+    int startIndex;
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -243,7 +244,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
                 PSVECSubtract(&particles[startIndex + 1].m_pos, &particles[startIndex].m_pos, &subVec);
                 interpRead = interp;
 
-                for (int i = 0; i < step->m_stepCount; i++) {
+                for (i = 0; i < step->m_stepCount; i++) {
                     t = stepScale * (float)(i + 1);
                     PSVECScale(&subVec, &scaled, t);
                     PSVECAdd(&particles[startIndex].m_pos, &scaled, &interp[i]);
@@ -262,8 +263,8 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
                 pppCopyVector(particles[startIndex + 1 + inserted].m_pos,
                               particles[startIndex + 1].m_pos);
 
-                for (int i = 0; i < inserted; i++) {
-                    int index = startIndex + (i + 1);
+                for (i = 0; i < inserted; i++) {
+                    int index = startIndex + 1 + i;
                     pppCopyVector(particles[index].m_pos, *interpRead);
                     memcpy(&particles[index].m_color, &colorData->m_color, 4);
                     particles[index].m_frame = work->m_cur;

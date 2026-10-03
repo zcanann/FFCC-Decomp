@@ -125,9 +125,10 @@ inline void UpdateRain(VRain* work, PRain* rain, RAIN_DATA* drop)
  */
 void pppRenderRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
 {
-    int i;
+    RAIN_DATA* currentDrop;
     VRain* work;
     VColor* colorData;
+    int i;
     RAIN_DATA* drop;
     float tex1;
     float tex0;
@@ -165,32 +166,29 @@ void pppRenderRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
     baseX = ppvMng->m_matrix.value[0][3];
     baseY = ppvMng->m_matrix.value[1][3];
     baseZ = ppvMng->m_matrix.value[2][3];
-    tex0 = 0.0f;
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((pRain->m_dropCount & 0x7fff) << 1));
     tex0 = 0.0f;
     tex1 = 1.0f;
-    {
-        RAIN_DATA* currentDrop = drop;
-        for (i = 0; i < (int)(u32)pRain->m_dropCount; i++, currentDrop++) {
-            float x = baseX + currentDrop->position.x;
-            float y = baseY + currentDrop->position.y;
-            float z = baseZ + currentDrop->position.z;
+    currentDrop = drop;
+    for (i = 0; i < pRain->m_dropCount; currentDrop++, i++) {
+        float x = baseX + currentDrop->position.x;
+        float y = baseY + currentDrop->position.y;
+        float z = baseZ + currentDrop->position.z;
 
-            PSVECScale(&currentDrop->direction, &segment, currentDrop->length);
-            GXWGFifo.f32 = x;
-            GXWGFifo.f32 = y;
-            GXWGFifo.f32 = z;
-            GXWGFifo.u32 = *(u32*)&colorData->m_color;
-            GXWGFifo.f32 = tex0;
-            GXWGFifo.f32 = tex0;
+        PSVECScale(&currentDrop->direction, &segment, currentDrop->length);
+        GXWGFifo.f32 = x;
+        GXWGFifo.f32 = y;
+        GXWGFifo.f32 = z;
+        GXWGFifo.u32 = *(u32*)&colorData->m_color;
+        GXWGFifo.f32 = tex0;
+        GXWGFifo.f32 = tex0;
 
-            GXWGFifo.f32 = x + segment.x;
-            GXWGFifo.f32 = y + segment.y;
-            GXWGFifo.f32 = z + segment.z;
-            GXWGFifo.u32 = *(u32*)&colorData->m_color;
-            GXWGFifo.f32 = tex1;
-            GXWGFifo.f32 = tex1;
-        }
+        GXWGFifo.f32 = x + segment.x;
+        GXWGFifo.f32 = y + segment.y;
+        GXWGFifo.f32 = z + segment.z;
+        GXWGFifo.u32 = *(u32*)&colorData->m_color;
+        GXWGFifo.f32 = tex1;
+        GXWGFifo.f32 = tex1;
     }
     GXSetLineWidth(8, GX_TO_ZERO);
 }

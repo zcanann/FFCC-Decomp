@@ -9,7 +9,6 @@
 
 static s8 sFamilyQuit;
 static s8 sFamilyRow;
-extern char gRelationNameRows[][18];
 
 void FamilyScreen_HandleInput(void);
 void FamilyScreen_PrintRow(s32);
@@ -140,7 +139,7 @@ void FamilyScreen_PrintRow(s32 idx)
             Text_SetX(80);
         else
             Text_SetX(56);
-        Text_Print(gRelationNameRows[idx], TEXT_DRAW);
+        Text_Print(gSession.relationNames[idx - 1], TEXT_DRAW);
     }
     Text_CopyToVram(Window_GetTextVram(win, idx, 0), win->width);
 }

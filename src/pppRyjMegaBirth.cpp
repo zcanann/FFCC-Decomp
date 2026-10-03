@@ -782,7 +782,7 @@ void birth(
 	case 5:
 	case 6:
 	case 7: {
-		Vec baseDir;
+		pppFVECTOR4 baseDir;
 		pppIVECTOR4 angles;
 		pppFMATRIX rot;
 
@@ -801,7 +801,7 @@ void birth(
 		}
 
 		pppGetRotMatrixXYZ(rot, &angles);
-		PSMTXMultVecSR(rot.value, &baseDir, reinterpret_cast<Vec*>(particle->m_matrix[1]));
+		PSMTXMultVecSR(rot.value, (Vec*)&baseDir, reinterpret_cast<Vec*>(particle->m_matrix[1]));
 		reinterpret_cast<Vec*>(particle->m_matrix[1])->x *= param->m_directionScale.x;
 		reinterpret_cast<Vec*>(particle->m_matrix[1])->y *= param->m_directionScale.y;
 		reinterpret_cast<Vec*>(particle->m_matrix[1])->z *= param->m_directionScale.z;
@@ -814,24 +814,27 @@ void birth(
 	default:
 	{
 		if (0.0f != param->m_directionSpeed) {
-			float scale = param->m_directionSpeed;
+			float scale;
 
 			switch (param->m_randomMode) {
+			default:
+				scale = param->m_directionSpeed;
+				break;
 			case 1:
 				Math.RandF();
 				scale = param->m_directionSpeed * Math.RandF();
 				break;
 			case 2:
 			{
-				float rand1 = Math.RandF();
-				scale = (param->m_directionSpeed * Math.RandF()) * rand1;
+				scale = param->m_directionSpeed * Math.RandF() * Math.RandF();
 				break;
 			}
 			case 3:
 			{
 				float rand1 = Math.RandF();
 				float rand2 = Math.RandF();
-				scale = param->m_directionSpeed - 0.7f * ((param->m_directionSpeed * rand2) * rand1);
+				scale = param->m_directionSpeed * rand2;
+				scale = param->m_directionSpeed - 0.7f * (scale * rand1);
 				break;
 			}
 			case 4:
@@ -839,7 +842,9 @@ void birth(
 				float rand1 = Math.RandF();
 				float rand2 = Math.RandF();
 				float rand3 = Math.RandF();
-				scale = Math.RandF() * (rand3 * ((param->m_directionSpeed * rand2) * rand1));
+				float rand4 = Math.RandF();
+				scale = param->m_directionSpeed * rand2;
+				scale = rand4 * (rand3 * (scale * rand1));
 				break;
 			}
 			case 5:
@@ -847,7 +852,8 @@ void birth(
 				float rand1 = Math.RandF();
 				float rand2 = Math.RandF();
 				float rand3 = Math.RandF();
-				scale = param->m_directionSpeed - 0.5f * (rand3 * ((param->m_directionSpeed * rand2) * rand1));
+				scale = param->m_directionSpeed * rand2;
+				scale = param->m_directionSpeed - 0.5f * (rand3 * (scale * rand1));
 				break;
 			}
 			}
@@ -869,6 +875,7 @@ void birth(
 		float rand1;
 		float rand2;
 		float rand3;
+		float rand4;
 		switch (param->m_randomMode) {
 		default:
 			particle->m_matrix[0][0] = param->m_directionSpeed * Math.RandF();
@@ -888,62 +895,71 @@ void birth(
 			particle->m_matrix[0][2] -= speedRandHalf;
 			break;
 		case 2:
-			rand1 = Math.RandF();
-			particle->m_matrix[0][0] = (param->m_directionSpeed * Math.RandF()) * rand1;
+			particle->m_matrix[0][0] = param->m_directionSpeed * Math.RandF() * Math.RandF();
 			particle->m_matrix[0][0] -= speedRandHalf;
-			rand1 = Math.RandF();
-			particle->m_matrix[0][1] = (param->m_directionSpeed * Math.RandF()) * rand1;
+			particle->m_matrix[0][1] = param->m_directionSpeed * Math.RandF() * Math.RandF();
 			particle->m_matrix[0][1] -= speedRandHalf;
-			rand1 = Math.RandF();
-			particle->m_matrix[0][2] = (param->m_directionSpeed * Math.RandF()) * rand1;
+			particle->m_matrix[0][2] = param->m_directionSpeed * Math.RandF() * Math.RandF();
 			particle->m_matrix[0][2] -= speedRandHalf;
 			break;
 		case 3:
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
-			particle->m_matrix[0][0] = param->m_directionSpeed - 0.7f * ((param->m_directionSpeed * rand2) * rand1);
+			rand2 = param->m_directionSpeed * rand2;
+			particle->m_matrix[0][0] = param->m_directionSpeed - 0.7f * (rand2 * rand1);
 			particle->m_matrix[0][0] -= speedRandHalf;
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
-			particle->m_matrix[0][1] = param->m_directionSpeed - 0.7f * ((param->m_directionSpeed * rand2) * rand1);
+			rand2 = param->m_directionSpeed * rand2;
+			particle->m_matrix[0][1] = param->m_directionSpeed - 0.7f * (rand2 * rand1);
 			particle->m_matrix[0][1] -= speedRandHalf;
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
-			particle->m_matrix[0][2] = param->m_directionSpeed - 0.7f * ((param->m_directionSpeed * rand2) * rand1);
+			rand2 = param->m_directionSpeed * rand2;
+			particle->m_matrix[0][2] = param->m_directionSpeed - 0.7f * (rand2 * rand1);
 			particle->m_matrix[0][2] -= speedRandHalf;
 			break;
 		case 4:
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand3 = Math.RandF();
-			particle->m_matrix[0][0] = Math.RandF() * (rand3 * ((param->m_directionSpeed * rand2) * rand1));
+			rand4 = Math.RandF();
+			rand2 = param->m_directionSpeed * rand2;
+			particle->m_matrix[0][0] = rand4 * (rand3 * (rand2 * rand1));
 			particle->m_matrix[0][0] -= speedRandHalf;
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand3 = Math.RandF();
-			particle->m_matrix[0][1] = Math.RandF() * (rand3 * ((param->m_directionSpeed * rand2) * rand1));
+			rand4 = Math.RandF();
+			rand2 = param->m_directionSpeed * rand2;
+			particle->m_matrix[0][1] = rand4 * (rand3 * (rand2 * rand1));
 			particle->m_matrix[0][1] -= speedRandHalf;
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand3 = Math.RandF();
-			particle->m_matrix[0][2] = Math.RandF() * (rand3 * ((param->m_directionSpeed * rand2) * rand1));
+			rand4 = Math.RandF();
+			rand2 = param->m_directionSpeed * rand2;
+			particle->m_matrix[0][2] = rand4 * (rand3 * (rand2 * rand1));
 			particle->m_matrix[0][2] -= speedRandHalf;
 			break;
 		case 5:
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand3 = Math.RandF();
-			particle->m_matrix[0][0] = param->m_directionSpeed - 0.5f * (rand3 * ((param->m_directionSpeed * rand2) * rand1));
+			rand2 = param->m_directionSpeed * rand2;
+			particle->m_matrix[0][0] = param->m_directionSpeed - 0.5f * (rand3 * (rand2 * rand1));
 			particle->m_matrix[0][0] -= speedRandHalf;
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand3 = Math.RandF();
-			particle->m_matrix[0][1] = param->m_directionSpeed - 0.5f * (rand3 * ((param->m_directionSpeed * rand2) * rand1));
+			rand2 = param->m_directionSpeed * rand2;
+			particle->m_matrix[0][1] = param->m_directionSpeed - 0.5f * (rand3 * (rand2 * rand1));
 			particle->m_matrix[0][1] -= speedRandHalf;
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand3 = Math.RandF();
-			particle->m_matrix[0][2] = param->m_directionSpeed - 0.5f * (rand3 * ((param->m_directionSpeed * rand2) * rand1));
+			rand2 = param->m_directionSpeed * rand2;
+			particle->m_matrix[0][2] = param->m_directionSpeed - 0.5f * (rand3 * (rand2 * rand1));
 			particle->m_matrix[0][2] -= speedRandHalf;
 			break;
 		}

@@ -15,6 +15,7 @@ struct CaravanNames {
 };
 
 struct Session gSession;
+struct ScouterHit gScouterHit;
 extern struct CaravanNames gCaravanNames;
 static u32 sMapObjDrawFlagsIn;
 static u16 sBasePos[2];

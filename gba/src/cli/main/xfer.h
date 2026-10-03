@@ -53,7 +53,7 @@ struct BulkXfer *Xfer_GetWork(void);
 void Xfer_ClearLetterData(void);
 void Xfer_OnError(void);
 
-void Map_SetStage();
+void Map_SetStage(s32 area, s32 map);
 void Map_GetStage(s8 *area, s8 *map);
 
 #endif

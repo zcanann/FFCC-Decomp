@@ -32,8 +32,7 @@ void Header_Clear(void);
 void Header_Print(const char *str);
 void Header_DrawBar(void);
 
-/* Called with and without an argument (the look screen passes none). */
-void Bg_LoadBackdrop();
+void Bg_LoadBackdrop(s32 no);
 void Bg_CopyBackdropToRadar(void);
 void Bg_ClearMaps(void);
 void Bg_LoadPlayerPalette(void);
@@ -52,8 +51,7 @@ s16 FixMul(s16 a, s16 b);
 s16 FixDiv(s16 a, s16 b);
 s16 FixInverse(s16 a);
 void Str_GetChar(const char *str, s32 n, char *out);
-/* Called with an extra argument by the name entry screen. */
-s32 Str_IsWideChar();
+s32 Str_IsWideChar(const char *str, s32 n);
 s32 Str_Length(const char *str);
 
 void Alarm_Update(void);

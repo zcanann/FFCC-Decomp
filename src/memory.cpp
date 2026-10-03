@@ -263,10 +263,9 @@ static inline void stageReleaseMode2BufferBase(CMemory::CStage* stage, const cha
 
 static inline void stageDestroyAndPool(CMemory* memory, CMemory::CStage* stage, const char* strBase)
 {
-    int mode = stageGetAllocationMode(stage);
-    CMemory::CMode& modeData = memory->Mode(mode);
+    CMemory::CMode& modeData = memory->Mode(stage->m_allocationMode);
 
-    if (mode != 2) {
+    if (stage->m_allocationMode != 2) {
         if (stageHasUnfreedBlocks(stage)) {
             System.Printf(const_cast<char*>(strBase + 0x5d4), stageGetSourceName(stage));
             stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
@@ -534,11 +533,11 @@ void CMemory::Draw()
             Graphic.InitDebugString();
         }
 
+        CMode* modeData = m_modes;
         int y = 0x20;
         int unuseTotalKB = 0;
         int useTotalKB = 0;
 
-        CMode* modeData = m_modes;
         for (int mode = 0; mode < 3; mode++, modeData++) {
             if (((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) && (mode != 2)) {
                 CMemory::CStage* head = &modeData->m_activeList;
@@ -590,6 +589,43 @@ void CMemory::SetGroup(void* ptr, int group)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMemory::CStage::initBlock()
+{
+    unsigned char* fill = reinterpret_cast<unsigned char*>(m_heapTop);
+    while (fill < reinterpret_cast<unsigned char*>(m_heapBottom)) {
+        *fill = 0xCD;
+        fill++;
+    }
+
+    m_heapHead = m_heapTop;
+    m_heapTail = m_heapBottom - 0x40;
+
+    stageBlockAt(m_heapHead)->m_flags = 5;
+    stageBlockAt(m_heapHead)->m_prev = 0;
+    stageBlockAt(m_heapHead)->m_next = stageBlockAt(m_heapHead) + 1;
+
+    (stageBlockAt(m_heapHead) + 1)->m_magicStart = kMemoryBlockStartMagic;
+    (stageBlockAt(m_heapHead) + 1)->m_magicEnd = kMemoryBlockEndMagic;
+    (stageBlockAt(m_heapHead) + 1)->m_flags = 0;
+    (stageBlockAt(m_heapHead) + 1)->m_size = m_heapTail - reinterpret_cast<unsigned long>(stageBlockAt(m_heapHead) + 2);
+    (stageBlockAt(m_heapHead) + 1)->m_prev = stageBlockAt(m_heapHead);
+    (stageBlockAt(m_heapHead) + 1)->m_next = stageBlockAt(m_heapTail);
+
+    stageBlockAt(m_heapTail)->m_flags = 6;
+    stageBlockAt(m_heapTail)->m_prev = stageBlockAt(m_heapHead) + 1;
+    stageBlockAt(m_heapTail)->m_next = 0;
+    m_allocCount = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8001EA28
  * PAL Size: 600b
  * EN Address: TODO
@@ -636,32 +672,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                     stage->m_allocationMode = mode;
 
                     if (mode != 2) {
-                        unsigned char* fill = reinterpret_cast<unsigned char*>(
-                            stage->m_heapTop);
-                        while (fill < reinterpret_cast<unsigned char*>(
-                                          stage->m_heapBottom)) {
-                            *fill = 0xCD;
-                            fill++;
-                        }
-
-                        stage->m_heapHead = stage->m_heapTop;
-                        stage->m_heapTail = stage->m_heapBottom - 0x40;
-
-                        stageBlockAt(stage->m_heapHead)->m_flags = 5;
-                        stageBlockAt(stage->m_heapHead)->m_prev = 0;
-                        stageBlockAt(stage->m_heapHead)->m_next = stageBlockAt(stage->m_heapHead) + 1;
-
-                        (stageBlockAt(stage->m_heapHead) + 1)->m_magicStart = kMemoryBlockStartMagic;
-                        (stageBlockAt(stage->m_heapHead) + 1)->m_magicEnd = kMemoryBlockEndMagic;
-                        (stageBlockAt(stage->m_heapHead) + 1)->m_flags = 0;
-                        (stageBlockAt(stage->m_heapHead) + 1)->m_size = stage->m_heapTail - reinterpret_cast<unsigned long>(stageBlockAt(stage->m_heapHead) + 2);
-                        (stageBlockAt(stage->m_heapHead) + 1)->m_prev = stageBlockAt(stage->m_heapHead);
-                        (stageBlockAt(stage->m_heapHead) + 1)->m_next = stageBlockAt(stage->m_heapTail);
-
-                        stageBlockAt(stage->m_heapTail)->m_flags = 6;
-                        stageBlockAt(stage->m_heapTail)->m_prev = stageBlockAt(stage->m_heapHead) + 1;
-                        stageBlockAt(stage->m_heapTail)->m_next = 0;
-                        stage->m_allocCount = 0;
+                        stage->initBlock();
                     }
 
                     if (mode == 2) {
@@ -740,6 +751,23 @@ void CMemory::HeapWalker()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMemory::CStage::quitBlock()
+{
+    if (stageHasUnfreedBlocks(this)) {
+        System.Printf(const_cast<char*>(sStageQuitBlockUnfreedAllocFmt), stageGetSourceName(this));
+        heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8001E834
  * PAL Size: 404b
  * EN Address: TODO
@@ -749,14 +777,10 @@ void CMemory::HeapWalker()
  */
 void CMemory::DestroyStage(CMemory::CStage* stage)
 {
-    int mode = stageGetAllocationMode(stage);
-    CMode& modeData = Mode(mode);
+    CMode& modeData = m_modes[stage->m_allocationMode];
 
-    if (mode != 2) {
-        if (stageHasUnfreedBlocks(stage)) {
-            System.Printf(const_cast<char*>(sStageQuitBlockUnfreedAllocFmt), stageGetSourceName(stage));
-            stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
-        }
+    if (stage->m_allocationMode != 2) {
+        stage->quitBlock();
     } else {
         stageReleaseMode2Buffer(stage);
     }
@@ -905,26 +929,6 @@ void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
  * Size:	TODO
  */
 void CMemory::IsCopyCompleted(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemory::CStage::initBlock()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemory::CStage::quitBlock()
 {
 	// TODO
 }

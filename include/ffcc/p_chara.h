@@ -253,13 +253,14 @@ public:
     void LoadCam(int, char*);
     void LoadMergeFile(int, int, int);
     void FreeMergeFile(int);
-    void isCached(int, int);
+    int isCached(int, int);
     CLoadModel* loadModel(void*, int, int, int, int, int, int);
     CLoadTexture* loadTexture(void*, int, int, int, int, int, int, int);
     CLoadAnim* loadAnimBuffer(void*, char*, int, int, int, int);
     void drawOverlap();
     int LoadAnim(int, int, char*, int, int, int);
-    void GetAnimStage();
+    CMemory::CStage* GetAnimStage() { return m_loadStages[LOAD_STAGE_ANIM]; }
+    int GetCharaAllocStage() { return m_charaAllocStage; }
     void drawViewer();
     void calcViewer();
     void createViewer();

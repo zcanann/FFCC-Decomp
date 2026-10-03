@@ -8,6 +8,10 @@
 #include "window.h"
 #include "screen.h"
 
+struct Window gWindows[5];
+s8 gOpenMenuReq;
+u16 gMask;
+
 extern u32 gScreenUnused;
 s32 CmdListScreen_Init(void);
 s32 CmdListScreen_Main(void);

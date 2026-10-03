@@ -69,8 +69,7 @@ void ItemScreen_RefreshItem(s32 idx);
 void ShopList_RefreshSellItem(s32 idx);
 void Smith_SetResultSlot(s8 slot);
 void Smith_ResetList(void);
-/* Called with and without the row. */
-void TmpArtifactScreen_PrintRow();
+void TmpArtifactScreen_PrintRow(s32 idx, s32 row);
 void TmpArtifactScreen_RefreshRow(s32 row);
 void CMake_Reset(void);
 void Letter_SetGilAttachment(s32 ok, u32 gil);

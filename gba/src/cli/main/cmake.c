@@ -8,6 +8,8 @@
 #include "window.h"
 #include "screen.h"
 
+struct CMakeData gCMakeData;
+
 static s8 sCMakeResult;
 static s8 sCMakeCursor[2];
 static s8 sCMakeBirthday[2];
@@ -935,7 +937,7 @@ s32 CMakeLookScreen_Exit(void)
         } else {
             ret = 1;
             gCMakeData.look = (gCMakeData.look & ~0xF) | ((win->cursor & 3) | ((win[1].cursor & 3) << 2));
-            Bg_LoadBackdrop();
+            Bg_LoadBackdrop(win->cursor & 3);
         }
     }
     Obj_DrawBanner(2, 8, 7, 20, 0, 1);

@@ -71,6 +71,14 @@ public:
 		PSVECScale((const Vec*)this, (Vec*)&out, scale);
 		return out;
 	}
+	void operator+=(const CVector& other)
+	{
+		PSVECAdd((const Vec*)this, (const Vec*)&other, (Vec*)this);
+	}
+	void operator*=(float scale)
+	{
+		PSVECScale((const Vec*)this, (Vec*)this, scale);
+	}
 	operator Vec&() { return *reinterpret_cast<Vec*>(this); }
 	operator Vec*() { return reinterpret_cast<Vec*>(this); }
 

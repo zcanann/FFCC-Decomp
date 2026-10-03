@@ -257,8 +257,7 @@ void Header_Init(void)
     Header_Clear();
 }
 
-void Bg_LoadBackdrop(no)
-s32 no;
+void Bg_LoadBackdrop(s32 no)
 {
     u16 buf[40];
     const u16 *tiles;
@@ -617,7 +616,7 @@ void Str_GetChar(const char *str, s32 n, char *out)
     }
 }
 
-s32 Str_IsWideChar(const char *str)
+s32 Str_IsWideChar(const char *str, s32 n)
 {
     if (strlen(str) == 0) {
         return -1;

@@ -123,8 +123,8 @@ public:
          * JP Size: TODO
          */
         int IsBanked() { return m_bank != 0; }
-        void SetLastFrame(int);
-        void SetInterp(int);
+        void SetLastFrame(int lastFrame) { m_flagsBits.m_clampFrames = lastFrame; }
+        void SetInterp(int interp) { m_flagsBits.m_blendEnabled = interp; }
         void InitQuantize();
 
 		union {
@@ -160,7 +160,7 @@ public:
 
 		void Create(CChunkFile&);
 		void mapping(CChara::CAnim*);
-		void IsScale();
+		int IsScale() { return m_flagsBits.m_hasScale; }
 		void Interp(CChara::CAnim*, SRT*, float);
 
 		char m_name[0x10];              // 0x00
@@ -352,7 +352,7 @@ public:
 		void calcBindMatrix();
 		void CalcMatrix();
 		void CalcSkin();
-		void calcNowFrame();
+		float calcNowFrame();
 		void calcMatrix();
 		void CalcNodeWorldMatrix(float (*) [4], CChara::CNode*);
 		void CalcFrameMatrix(float, CChara::CNode*, float (*)[4]);
@@ -363,7 +363,7 @@ public:
 		int SearchNodeSk(char*);
 		void Draw(float (*)[4], int, int);
 		void DrawShadow(float (*)[4], int);
-		void CalcInterpFrame();
+		int CalcInterpFrame();
 		void CalcSafeNodeWorldMatrix(float (*)[4], CChara::CNode*);
 		void AttachAnim(CChara::CAnim*, int, int, int);
 		void AttachTextureSet(CTextureSet*);
@@ -380,7 +380,7 @@ public:
 		void DrawFur(float (*)[4], int);
 		int GetDispIndex(CChara::CNode*);
 		void GetMatrix();
-		void GetMatrix(float(*)[4]);
+		void GetMatrix(float (*mtx)[4]) { PSMTXCopy(m_matrix, mtx); }
 		void GetMatrixT(float (*)[4]);
 		void SetBeforeMeshLockEnvCallback(void (*callback)(CChara::CModel*, void*, void*, int))
 		{
@@ -415,10 +415,10 @@ public:
 			u8 m_flagsA0;
 			struct
 			{
-				u8 m_flagA0_80 : 1;
-				u8 m_flagA0_40 : 1;
-				u8 m_flagA0_20 : 1;
-				u8 m_flagA0_lo : 5;
+				s8 m_flagA0_80 : 1;
+				s8 m_flagA0_40 : 1;
+				s8 m_flagA0_20 : 1;
+				s8 m_flagA0_lo : 5;
 			} m_flagsA0Bits;
 		};
 		u8 m_attachMode;

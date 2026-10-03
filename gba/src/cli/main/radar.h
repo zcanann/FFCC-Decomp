@@ -72,7 +72,7 @@ void Radar_LoadPalette(void);
 void Radar_DrawMap(void);
 void Radar_ScrollMap(s32 dx, s32 dy);
 
-void Radar_SetBasePos();
+void Radar_SetBasePos(s32 x, s32 y);
 void Radar_GetBasePos(s16 *x, s16 *y);
 void Radar_GetBaseDelta(s16 *dx, s16 *dy);
 void Radar_ClearMarkers(void);

@@ -554,10 +554,10 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
                 }
             }
 
-            m_textureSets[textureSetStart + i] =
+            m_textureSets[i + textureSetStart] =
                 new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
 
-            m_textureSets[textureSetStart + i]->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
+            m_textureSets[i + textureSetStart]->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
 
             File.Close(fileHandle);
         }
@@ -568,7 +568,7 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
             m_textureSets[tmp[i].m_textureSetIndex]->Find(tmp[i].m_textureName));
         CTexture* texture = m_textureSets[tmp[i].m_textureSetIndex]->GetTexture(textureIndex);
         texture->AddRef();
-        m_textures[textureStart + i] = texture;
+        m_textures[i + textureStart] = texture;
     }
 }
 
@@ -701,35 +701,7 @@ void CMenuPcs::calc()
  */
 void CMenuPcs::draw()
 {
-    Mtx44 orthoMtx;
-    Mtx modelMtx;
-    Mtx44 screenMtx;
-    Mtx texMtx;
-
-    PSMTXIdentity(modelMtx);
-    GXLoadPosMtxImm(modelMtx, 0);
-    C_MTXOrtho(orthoMtx, 0.0f, 448.0f, 0.0f,
-               640.0f, 0.0f, -100.0f);
-    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-    GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-    GXSetChanAmbColor(GX_COLOR0A0, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
-    GXSetZCompLoc(GX_FALSE);
-    GXSetCurrentMtx(0);
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetNumTexGens(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    DrawInit();
 
     switch (m_mode) {
     case 0:
@@ -744,30 +716,8 @@ void CMenuPcs::draw()
         break;
     }
 
-    if (((CFlatEventFlags() & 0x10) != 0) && (System.m_scenegraphStepMode == 2)) {
-        CTexture* texture = m_textures[1];
-        TextureMan.SetTexture(GX_TEXMAP0, texture);
-
-        float width = static_cast<float>(texture->m_width);
-        float height = static_cast<float>(texture->m_height);
-        PSMTXScale(texMtx, 1.0f / width, 1.0f / height, 1.0f);
-        GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
-        GXSetNumTexGens(1);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-
-        TextureMan.SetTextureTev(texture);
-
-        {
-            CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * (0.5f * (1.0f + sinf(static_cast<int>(System.m_frameCounter) * 0.1f)))));
-            GXSetChanMatColor(GX_COLOR0A0, color.color);
-            DrawRect(3, 320.0f, 224.0f, 120.0f,
-                     56.0f, 0.0f, 0.0f,
-                     1.0f, 1.0f, 0.0f);
-        }
-    }
-
-    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+    drawPause();
+    DrawQuit();
 }
 
 /*
@@ -956,9 +906,7 @@ void CMenuPcs::onMapChanging(int mapNo, int)
  */
 void CMenuPcs::onMapChanged(int, int, int)
 {
-    CGame* game = &Game;
-
-    changeMode(static_cast<CMenuPcs::MENUMODE>((u32)__cntlzw((u32)(0x21 - game->m_currentMapId)) >> 5));
+    changeMode(static_cast<CMenuPcs::MENUMODE>((Game.m_currentMapId == 0x21) ? 1 : 0));
 }
 
 /*
@@ -1202,35 +1150,23 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBase, float alpha)
+inline void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBase, float height)
 {
+    float capW = 8.0f;
+
     if (width <= 0.0f) {
         return;
     }
 
-    const float capW = 8.0f;
-    const float barH = 8.0f;
-    float midW = width - (capW * 2.0f);
-    if (midW < 0.0f) {
-        midW = 0.0f;
-    }
+    float midW = width - capW * 2.0f;
+    midW = (midW < 0.0f) ? 0.0f : midW;
 
-    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
-    SetAttrFmt(FMT(0));
-
-    const u8 alphaU8 = static_cast<u8>(255.0f * alpha);
-    const CColor color(0xFF, 0xFF, 0xFF, alphaU8);
-    GXSetChanMatColor(GX_COLOR0A0, color.color);
-
-    const int tex = static_cast<int>(texBase);
-    SetTexture(static_cast<TEX>(tex));
-    DrawRect(0, x, y, capW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    SetTexture(static_cast<TEX>(tex + 1));
-    DrawRect(0, x + capW, y, midW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    SetTexture(static_cast<TEX>(tex + 2));
-    DrawRect(8, x + width - capW, y, capW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    SetTexture(texBase);
+    DrawRect(0, x, y, capW, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    SetTexture(static_cast<TEX>(texBase + 1));
+    DrawRect(0, x + capW, y, midW, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    SetTexture(static_cast<TEX>(texBase + 2));
+    DrawRect(0, (x + width) - capW, y, capW, height, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -1350,8 +1286,7 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
 void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
 {
     for (int i = 0; i < 0x10; i++) {
-        _GXColor tlutColor = m_fonts[fontNo + 2]->texturePtr->GetTlutColor(i);
-        _GXColor out = tlutColor;
+        _GXColor out = m_fonts[fontNo + 2]->GetDefaultTlutColor(i);
 
         if (i < 9) {
             out.r = color.r;
@@ -1364,11 +1299,10 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
             out.b = static_cast<u8>(-(static_cast<float>(0xF5 - color.b) * blend - 245.0f));
         }
 
-        CTexture* texture = m_fonts[fontNo + 2]->texturePtr;
-        texture->SetTlutColor(i, out);
+        m_fonts[fontNo + 2]->SetDefaultTlutColor(i, out);
     }
 
-    m_fonts[fontNo + 2]->texturePtr->FlushTlut();
+    m_fonts[fontNo + 2]->FlushDefaultTlutColor();
 }
 
 /*
@@ -1386,25 +1320,10 @@ inline void CMenuPcs::drawPause()
         return;
     }
 
-    CTexture* texture = m_textures[1];
-    TextureMan.SetTexture(GX_TEXMAP0, texture);
-
-    if (texture != nullptr) {
-        Mtx texMtx;
-        float width = static_cast<float>(texture->m_width);
-        float height = static_cast<float>(texture->m_height);
-        PSMTXScale(texMtx, 1.0f / width, 1.0f / height, 1.0f);
-        GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
-        GXSetNumTexGens(1);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-    }
-
-    TextureMan.SetTextureTev(texture);
-
-    int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * 0.1f)));
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
-    GXSetChanMatColor(GX_COLOR0A0, color.color);
-    DrawRect(3, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    SetTexture(static_cast<TEX>(1));
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * (0.5f * (1.0f + sinf(static_cast<int>(System.m_frameCounter) * 0.1f)))));
+    SetColor(color);
+    DrawRect(3, 320.0f, 224.0f, 120.0f, 56.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -1573,7 +1492,7 @@ void CMenuPcs::drawBattle()
 {
     if (m_battleHud.m_visible != 0) {
         const float frame = static_cast<float>(m_battleHud.m_fadeCounter);
-        float fade = frame * 0.015625f;
+        float fade = frame / 64.0f;
         if (m_battleHud.m_visible != 0) {
             fade = 1.0f - fade;
         }
@@ -1606,61 +1525,20 @@ void CMenuPcs::drawBattle()
                                       ? 16.0f
                                       : ((432.0f < screenY) ? 432.0f : screenY);
 
-            const float alphaF = 255.0f * fade;
             const float left = markerX - static_cast<float>(halfWidth);
             const float bodyLeft = left + 8.0f;
 
             int fillWidth = ((totalWidth - 16) * m_battleHud.m_gaugeValue) / m_battleHud.m_gaugeMax;
-            const CColor frameColor(0xFF, 0xFF, 0xFF, static_cast<u8>(alphaF));
+            const CColor frameColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * fade));
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
+            MenuPcs.DrawBar(left, markerY, static_cast<float>(totalWidth), static_cast<CMenuPcs::TEX>(0x1A), 8.0f);
 
-            if (!(static_cast<float>(totalWidth) <= 0.0f)) {
-                float bodyWidth = static_cast<float>(totalWidth) - 16.0f;
-                bodyWidth = (bodyWidth < 0.0f) ? 0.0f : bodyWidth;
-
-                CTexture* tex = MenuPcs.m_textures[0x1A];
-                TextureMan.SetTexture(GX_TEXMAP0, tex);
-                u32 width = tex->m_width;
-                u32 height = tex->m_height;
-                Mtx texMtx0;
-                PSMTXScale(texMtx0, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
-                GXLoadTexMtxImm(texMtx0, GX_TEXMTX0, GX_MTX2x4);
-                GXSetNumTexGens(1);
-                GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-                TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, left, markerY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-                tex = MenuPcs.m_textures[0x1B];
-                TextureMan.SetTexture(GX_TEXMAP0, tex);
-                width = tex->m_width;
-                height = tex->m_height;
-                Mtx texMtx1;
-                PSMTXScale(texMtx1, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
-                GXLoadTexMtxImm(texMtx1, GX_TEXMTX0, GX_MTX2x4);
-                GXSetNumTexGens(1);
-                GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-                TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, left + 8.0f, markerY, bodyWidth, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-                tex = MenuPcs.m_textures[0x1C];
-                TextureMan.SetTexture(GX_TEXMAP0, tex);
-                width = tex->m_width;
-                height = tex->m_height;
-                Mtx texMtx2;
-                PSMTXScale(texMtx2, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
-                GXLoadTexMtxImm(texMtx2, GX_TEXMTX0, GX_MTX2x4);
-                GXSetNumTexGens(1);
-                GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-                TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - 8.0f, markerY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-            }
-
-            const CColor fillTop(0xFF, (m_battleHud.m_gaugeCounter * 0xFF) / 16, (m_battleHud.m_gaugeCounter * 0xFF) / 16, static_cast<u8>(alphaF));
+            const CColor fillTop(0xFF, (m_battleHud.m_gaugeCounter * 0xFF) / 16, (m_battleHud.m_gaugeCounter * 0xFF) / 16, static_cast<u8>(255.0f * fade));
             GXSetChanMatColor(GX_COLOR0A0, fillTop.color);
             TextureMan.SetTextureTev(0);
             DrawRect(0, bodyLeft, (markerY + 3.0f) - 1.0f, static_cast<float>(fillWidth), 4.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-            const CColor fillBottom(0xFF, ((m_battleHud.m_gaugeCounter * 0x7F) / 16) + 0x80, (m_battleHud.m_gaugeCounter * 0xFF) / 16, static_cast<u8>(alphaF));
+            const CColor fillBottom(0xFF, ((m_battleHud.m_gaugeCounter * 0x7F) / 16) + 0x80, (m_battleHud.m_gaugeCounter * 0xFF) / 16, static_cast<u8>(255.0f * fade));
             GXSetChanMatColor(GX_COLOR0A0, fillBottom.color);
             DrawRect(0, bodyLeft, markerY + 3.0f, static_cast<float>(fillWidth), 2.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
         }

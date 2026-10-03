@@ -93,6 +93,7 @@ public:
 
     void CreateTempBuffer();
     void DestroyTempBuffer();
+    CMemory::CStage* GetTempStage() { return m_scratchStage; }
 
     CMemory::CStage* m_graphicStage;
     CMemory::CStage* m_scratchStage;

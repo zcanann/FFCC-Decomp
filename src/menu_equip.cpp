@@ -219,8 +219,9 @@ int CMenuPcs::EquipOpen0()
 int CMenuPcs::EquipCtrlCur()
 {
 	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
-	int press = static_cast<s16>(Pad.GetButtonDown(0));
-	int hold = static_cast<s16>(Pad.GetButtonRepeat(0));
+	s16 hold;
+	s16 press = Pad.GetButtonDown(0);
+	hold = Pad.GetButtonRepeat(0);
 
 	if (hold == 0) {
 		return 0;
@@ -419,7 +420,7 @@ void CMenuPcs::EquipDraw()
 			}
 			float width = font->GetWidth(str);
 			float textY = (float)(item->y + 0xb);
-			font->SetPosX((float)((((float)item->w - width) * 0.5) + (double)item->x));
+			font->SetPosX((float)((((float)item->w - width) / 2.0) + (double)item->x));
 			font->SetPosY(textY - 4.0f);
 			font->Draw(str);
 		}
@@ -783,8 +784,6 @@ int CMenuPcs::EquipOpen()
 	float one;
 	int doneCount;
 	s16* letterBuffer;
-	s16* entryCursor;
-	s16 entryCount;
 	int itemCount;
 	EquipOpenAnim* entry;
 	double duration;
@@ -819,18 +818,16 @@ int CMenuPcs::EquipOpen()
 
 		m_equipList->count = 4;
 		EquipInit1();
-		entryCursor = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		idx = 0;
-		entryCount = 0;
-		int letterMax = 0x40;
-		while (idx < letterMax) {
-			int itemType = GetItemType(idx, 0);
-			if (itemType == 1) {
+		s16 entryCount;
+		int i;
+		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+		s16* entryCursor = letter;
+		for (i = entryCount = 0; i < 0x40; i++) {
+			if (GetItemType(i, 0) == 1) {
 				entryCursor++;
-				*entryCursor = (s16)idx;
+				*entryCursor = (s16)i;
 				entryCount++;
 			}
-			idx++;
 		}
 
 		letterBuffer = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
@@ -885,7 +882,14 @@ int CMenuPcs::EquipOpen()
 void CMenuPcs::EquipInit1()
 {
 	EquipOpenAnim* e;
-	int i = (int)m_equipList->count;
+	EquipOpenAnim* anchor;
+	int n;
+	int i;
+	EquipOpenAnim* listEntry;
+	int k;
+	float zeroAlpha;
+
+	i = (int)m_equipList->count;
 
 	e = &m_equipList->entries[i++];
 	e->tex = 0x2e;
@@ -935,8 +939,8 @@ void CMenuPcs::EquipInit1()
 	e->startFrame = 0;
 	e->duration = 5;
 
-	EquipOpenAnim* anchor = &m_equipList->entries[m_equipList->count];
-	for (int n = 0; n < 8; n++) {
+	anchor = &m_equipList->entries[m_equipList->count];
+	for (n = 0; n < 8; n++) {
 		e = &m_equipList->entries[i];
 		e->flags = 2;
 		e->tex = 0x37;
@@ -952,10 +956,10 @@ void CMenuPcs::EquipInit1()
 	}
 
 	m_equipList->listEnd = i;
-	float zeroAlpha = 0.0f;
-	int n = (int)m_equipList->listEnd - (int)m_equipList->count;
-	EquipOpenAnim* listEntry = &m_equipList->entries[m_equipList->count];
-	for (int k = n; k > 0; k--) {
+	zeroAlpha = 0.0f;
+	n = (int)m_equipList->listEnd - (int)m_equipList->count;
+	listEntry = &m_equipList->entries[m_equipList->count];
+	for (k = n; k > 0; k--) {
 		listEntry->step = 0;
 		listEntry->alpha = zeroAlpha;
 		listEntry++;

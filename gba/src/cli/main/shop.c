@@ -1118,9 +1118,10 @@ void InfoWin_PrintNextRow(void)
         }
         Text_CopyToVram(dst, win->width);
     } else {
-        dst = (u32)Bg_GetMapPtr(gWindows[0].bg, gWindows[0].x + 1, gWindows[0].y + 1);
+        win = gWindows;
+        dst = (u32)Bg_GetMapPtr(win->bg, win->x + 1, win->y + 1);
         attr = 3 << 12;
-        w = gWindows[0].width - 2;
+        w = win->width - 2;
         for (i = 0; i < sInfoRow; i++) {
             for (x = 0; x < 2; x++) {
                 n = (gWindows[0].width << 1) * i + 0x80;

@@ -83,6 +83,7 @@ jobs:
             --binutils /binutils --compilers /compilers --gba-binutils /usr/bin \
             --gba-compilers build/tools/gba-agbcc
         ninja all_source progress build/${{ matrix.version }}/report.json
+        python -m unittest tools.tests.test_gba_common -v
 
     # Upload map files
     - name: Upload map

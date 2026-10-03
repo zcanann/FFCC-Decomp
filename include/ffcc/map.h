@@ -173,6 +173,15 @@ public:
     void MapFileRead(char*, unsigned long&);
     void MapCheckFileRead(char*);
     void LoadMapNoSyncCalc();
+    int IsLoadMap()
+    {
+        for (int i = 0; i < 16; i++) {
+            if (m_asyncLoadState.m_asyncHandles[i] != 0) {
+                return 0;
+            }
+        }
+        return 1;
+    }
     CMapObj* SearchChildMapObj(CMapObj*, CMapObj*);
     CMapObj* SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE);
     void AttachMapHit(CMapHit*, char*);

@@ -496,8 +496,7 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 		seTrack = SearchSeEmptyTrack((int)tracksToStart, seInfo->m_eraseTrack, eraseAttrMask);
 		eraseAttrMask = 0;
 		if (seTrack != 0) {
-			int trackNo = seTrack->m_trackNo;
-			voice = RedVoiceDataGet(trackNo);
+			voice = RedVoiceDataGet(seTrack->m_trackNo);
 			do {
 				seTrack->m_waveBankData = waveHead;
 				seTrack->m_command = sequenceCommandData;
@@ -587,7 +586,7 @@ int SeBlockPlay(int seId, int bank, int sequenceNo, int pan, int volume)
 	RedSeBlockHEAD* seBlock;
 	int blockSequence;
 	int* entries;
-	RedSeINFO* seInfo;
+	int seInfoAddress;
 	RedSeINFO* playInfo;
 
 	bank = bank & REDSOUND_SE_BLOCK_BANK_MASK;
@@ -603,8 +602,10 @@ int SeBlockPlay(int seId, int bank, int sequenceNo, int pan, int volume)
 			entries = seBlock->m_entries;
 
 			if (entries[blockSequence] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
-				seInfo = RedSeBlockGetInfoFromEntry(seBlock, entries, blockSequence);
-				playInfo = seInfo;
+				seInfoAddress = entries[blockSequence] & REDSOUND_SE_BLOCK_ENTRY_MASK;
+				seInfoAddress += RedSeBlockGetSeCount(seBlock) * REDSOUND_SE_BLOCK_ENTRY_SIZE;
+				seInfoAddress = (int)entries + seInfoAddress;
+				playInfo = (RedSeINFO*)seInfoAddress;
 
 				if (RedSeBlockIdIsBlockData((unsigned int)entries[blockSequence])) {
 					playInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;

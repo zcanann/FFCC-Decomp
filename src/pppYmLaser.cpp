@@ -41,16 +41,6 @@ static inline pppLaserDataOffsets* GetYmLaserDataOffsets(_pppCtrlTable* ctrlTabl
 	return reinterpret_cast<pppLaserDataOffsets*>(ctrlTable->m_serializedDataOffsets);
 }
 
-static inline pppYmLaserWork* GetYmLaserWork(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(ctrlTable)->m_workOffset);
-}
-
-static inline VColor* GetYmLaserColorData(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
-{
-	return reinterpret_cast<VColor*>(laser->m_workArea + GetYmLaserDataOffsets(ctrlTable)->m_colorBlockOffset);
-}
-
 STATIC_ASSERT(offsetof(pppYmLaser, m_workArea) == 0x80);
 
 static const f32 kPppYmLaserHistoryBackstep = -1.0f;
@@ -70,7 +60,7 @@ extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
 	f32 zero = kPppYmLaserZero;
 	f32 randArg = kPppYmLaserFullTurn;
-	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
+	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(ctrlTable)->m_workOffset);
 
 	work->m_length = zero;
 	work->m_graphValue3 = zero;
@@ -104,7 +94,7 @@ extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
 	f32 zero = kPppYmLaserZero;
-	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
+	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(ctrlTable)->m_workOffset);
 
 	work->m_graphValue3 = zero;
 	work->m_graphValue2 = zero;
@@ -130,7 +120,7 @@ extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable
  */
 extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
+	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(ctrlTable)->m_workOffset);
 	void* stage = work->m_points;
 
 	if (stage != 0) {
@@ -157,10 +147,10 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 	Mtx tempMtx;
 	Mtx charaMtx;
 	int emptyHistory;
-	int fillIndex;
+	int i;
 
 	if ((ppvUserStopPartF == 0) && (step->m_stepValue != 0xFFFF)) {
-	work = GetYmLaserWork(laser, data);
+	work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(data)->m_workOffset);
 	emptyHistory = 0;
 
 	if (work->m_points == 0) {
@@ -183,7 +173,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 		static_cast<long*>(ppvEnv->m_shapeTablePtr[step->m_stepValue]->m_animData), work->m_shapeArg1,
 		work->m_shapeArg2, work->m_shapeArg0, step->m_laser.m_shapeFrameStep);
 
-	for (int i = 0; i < (int)((u32)step->m_laser.m_historyFrameCount + 1); i++) {
+	for (i = 0; i < (int)((u32)step->m_laser.m_historyFrameCount + 1); i++) {
 		int max = (int)step->m_laser.m_pointCount - 2;
 
 		for (int j = max; (int)i <= j; j--) {
@@ -286,8 +276,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 	}
 
 	if (emptyHistory) {
-		for (fillIndex = 0; fillIndex < (int)(u32)step->m_laser.m_pointCount; fillIndex++) {
-			pppCopyVector(work->m_points[fillIndex], work->m_points[0]);
+		for (i = 0; i < (int)(u32)step->m_laser.m_pointCount; i++) {
+			pppCopyVector(work->m_points[i], work->m_points[0]);
 		}
 	}
 }
@@ -305,8 +295,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
  */
 extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlTable* data)
 {
-	pppYmLaserWork* work = GetYmLaserWork(laser, data);
-	VColor* colorData = GetYmLaserColorData(laser, data);
+	pppYmLaserWork* work = reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(data)->m_workOffset);
+	VColor* colorData = reinterpret_cast<VColor*>(laser->m_workArea + GetYmLaserDataOffsets(data)->m_colorBlockOffset);
 	s32 dataValIndex = step->m_dataValIndex;
 	u32 count;
 	s32 i;
@@ -399,7 +389,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 		shapeMtx[0][0] = step->m_laser.m_shapeScale * ppvMng->m_scale.x;
 		shapeMtx[1][1] = step->m_laser.m_shapeScale * ppvMng->m_scale.y;
 		shapeMtx[2][2] = shapeMtx[0][0];
-		if (LoadLaserFloat(kPppYmLaserZero) != work->m_shapeRotation) {
+		if (kPppYmLaserZero != work->m_shapeRotation) {
 			PSMTXRotRad(rotateMtx, 'z', work->m_shapeRotation);
 			PSMTXConcat(shapeMtx, rotateMtx, shapeMtx);
 		}

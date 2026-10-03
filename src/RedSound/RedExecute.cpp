@@ -662,7 +662,8 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
     }
 
     noteIndex = (pitchValue >> REDSOUND_PITCH_NOTE_SHIFT) & REDSOUND_PITCH_NOTE_MASK;
-    octaveAdjust += noteIndex / REDSOUND_NOTES_PER_OCTAVE;
+    pitchOutput = noteIndex / REDSOUND_NOTES_PER_OCTAVE;
+    octaveAdjust += pitchOutput;
     noteIndex %= REDSOUND_NOTES_PER_OCTAVE;
     pitchOutput = RedTonePitchGet(noteIndex) >> (REDSOUND_PITCH_TONE_SHIFT - octaveAdjust);
     pitchOutput *= RedFinePitchGet(pitchValue & REDSOUND_PITCH_FINE_MASK);
@@ -1240,10 +1241,12 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
     int tremoloWave;
     int panPosition;
     int volumeScaleValue;
+    int baseVolume;
 
     if (volume != 0) {
         volume = volume + 1;
     }
+    baseVolume = volume;
 
     volume *= (*voice->m_trackExpression >> REDSOUND_FIXED_SHIFT) + 1;
     volume >>= REDSOUND_VOLUME_MOD_SCALE_SHIFT;
@@ -1360,26 +1363,20 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
  */
 static void _PitchExecute(RedVoiceDATA* voice)
 {
-    int adjustedPitchDelta = 0;
     int vibratoPitchDelta = 0;
     int pitchWork;
     int basePitch;
     int vibratoWave;
+    int pitch = 0;
 
     if ((voice->m_track->m_vibrateFunc != 0) && (voice->m_pitchModDelay == 0)) {
         pitchWork = voice->m_track->m_vibrateDepth >> REDSOUND_FIXED_SHIFT;
-        if (pitchWork < REDSOUND_PITCH_MOD_DEPTH_SPLIT) {
-            vibratoPitchDelta = (pitchWork + 1) * REDSOUND_PITCH_MOD_SHALLOW_SCALE;
-        } else {
-            vibratoPitchDelta = ((pitchWork & REDSOUND_PAN_BYTE_MASK) + 1) * REDSOUND_PITCH_MOD_DEEP_SCALE;
-        }
-
-        pitchWork = voice->m_track->m_keyTranspose + voice->m_track->m_pitchBend + vibratoPitchDelta;
-        if (RedVoiceIsPlaying(voice)) {
-            basePitch = voice->m_basePitch + voice->m_track->m_pitch;
-        } else {
-            basePitch = voice->m_basePitch + RedMusicPitchControlGetValue();
-        }
+        pitchWork = (pitchWork < REDSOUND_PITCH_MOD_DEPTH_SPLIT)
+                        ? (pitchWork + 1) * REDSOUND_PITCH_MOD_SHALLOW_SCALE
+                        : ((pitchWork & REDSOUND_PAN_BYTE_MASK) + 1) * REDSOUND_PITCH_MOD_DEEP_SCALE;
+        pitchWork = pitchWork + voice->m_track->m_keyTranspose + voice->m_track->m_pitchBend;
+        basePitch = RedVoiceIsPlaying(voice) ? voice->m_basePitch + voice->m_track->m_pitch
+                                             : voice->m_basePitch + RedMusicPitchControlGetValue();
         pitchWork = PitchCompute(basePitch, pitchWork, voice->m_waveData->m_pitch, voice->m_track->m_fineTune);
 
         pitchWork -= voice->m_pitch;
@@ -1396,14 +1393,8 @@ static void _PitchExecute(RedVoiceDATA* voice)
             }
         }
 
-        if (pitchWork < 0) {
-            adjustedPitchDelta = pitchWork >> REDSOUND_PITCH_MOD_NEGATIVE_HALF_SHIFT;
-        } else {
-            adjustedPitchDelta = pitchWork;
-        }
-
+        vibratoPitchDelta = (pitchWork < 0) ? pitchWork >> REDSOUND_PITCH_MOD_NEGATIVE_HALF_SHIFT : pitchWork;
         voice->m_pitchModPhase += voice->m_track->m_vibrateRate;
-        vibratoPitchDelta = adjustedPitchDelta;
     }
 
     voice->m_targetPitch = vibratoPitchDelta + voice->m_pitch + voice->m_randomPitch;
@@ -1600,12 +1591,10 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
 skipModSetup:
 
     if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_PITCH) != 0) {
-        unsigned int random = GetRandomData();
+        workValue = GetRandomData();
         pitchWork = voice->m_track->m_fuzzyPitchDepth;
-        workValue = voice->m_pitch * pitchWork;
-        workValue *= (int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1;
-        pitchWork = workValue >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
-        if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) != 0) {
+        pitchWork = (voice->m_pitch * pitchWork * (workValue + 1)) >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
+        if ((workValue & REDSOUND_RANDOM_BYTE_SIGN_BIT) != 0) {
             voice->m_randomPitch = -(pitchWork >> REDSOUND_RANDOM_PITCH_NEGATIVE_HALF_SHIFT);
         } else {
             voice->m_randomPitch = pitchWork;
@@ -1840,7 +1829,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
         }
         voice->m_adsrCurrentLevel = prevLevel;
         nextLevel |= REDSOUND_FIXED_HALF;
-        voice->m_adsrStepAdd = (nextLevel - prevLevel) / stepFrames;
+        stage[REDSOUND_ADSR_STATE_STEP_ADD] = (nextLevel - prevLevel) / stepFrames;
     } else {
         voice->m_adsrCurrentLevel = nextLevel;
     }
@@ -2494,10 +2483,10 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
             if (voiceData->m_track == track) {
                 voiceData->m_basePitch += step;
                 if (voiceData->m_waveData != 0) {
-                    int pitchOffset = (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend;
+                    int pitchOffset = track->m_keyTranspose + track->m_pitchBend;
                     int basePitch = voiceData->m_basePitch + RedMusicPitchControlGetValue();
                     voiceData->m_pitch =
-                        PitchCompute(basePitch, pitchOffset, voiceData->m_waveData->m_pitch, (s8)track->m_fineTune);
+                        PitchCompute(basePitch, pitchOffset, voiceData->m_waveData->m_pitch, track->m_fineTune);
                 }
             }
             voiceData++;
@@ -3096,7 +3085,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	}
 
 	if (((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0) && (voice->m_waveData != 0)) {
-		int pitchOffset = (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend;
+		int pitchOffset = track->m_keyTranspose + track->m_pitchBend;
 		int basePitch = voice->m_basePitch + track->m_pitch;
 		voice->m_pitch =
 			PitchCompute(basePitch, pitchOffset, voice->m_waveData->m_pitch, track->m_fineTune);

@@ -602,12 +602,7 @@ void CMapPcs::destroy()
  */
 int CMapPcs::IsLoadMapCompleted()
 {
-    for (int i = 0; i < 16; i++) {
-        if (MapMng.m_asyncLoadState.m_asyncHandles[i] != 0) {
-            return 0;
-        }
-    }
-    return 1;
+    return MapMng.IsLoadMap();
 }
 
 /*

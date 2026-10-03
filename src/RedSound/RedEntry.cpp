@@ -679,15 +679,16 @@ success:
 int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 {
 	int waveNo;
-	int existingWaveBankIndex;
+	int work;
 	int waveAramAddress;
 	int remainingWaveSize;
+	int transferSize;
 	u8* waveBodyData;
 
 	waveNo = 0;
 	if (waveDataSize == 0) {
-		if ((m_waveLoadNo >= 0) && ((waveNo = SearchWaveSequence(m_waveLoadNo)) >= 0)) {
-			WaveDelete(RedEntryWaveBankGet(this, waveNo));
+		if ((m_waveLoadNo >= 0) && ((waveBankNo = SearchWaveSequence(m_waveLoadNo)) >= 0)) {
+			WaveDelete(RedEntryWaveBankGet(this, waveBankNo));
 		}
 
 		m_waveLoadNo = REDSOUND_WAVE_NO_NONE;
@@ -702,21 +703,17 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 			WaveDelete(RedEntryWaveBankGet(this, waveBankNo));
 		}
 
-		existingWaveBankIndex = SearchWaveSequence(waveNo);
-		if (existingWaveBankIndex >= 0) {
-			if ((waveBankNo >= 0) && (existingWaveBankIndex != waveBankNo)) {
-				RedEntryWaveBankGet(this, waveBankNo)->m_id =
-				    RedEntryWaveBankGet(this, existingWaveBankIndex)->m_id;
-				RedEntryWaveBankGet(this, waveBankNo)->m_historyNo =
-				    RedEntryWaveBankGet(this, existingWaveBankIndex)->m_historyNo;
-				RedEntryWaveBankGet(this, waveBankNo)->m_address =
-				    RedEntryWaveBankGet(this, existingWaveBankIndex)->m_address;
-				RedEntryWaveBankGet(this, waveBankNo)->m_size =
-				    RedEntryWaveBankGet(this, existingWaveBankIndex)->m_size;
-				existingWaveBankIndex = waveBankNo;
+		work = SearchWaveSequence(waveNo);
+		if (work >= 0) {
+			if ((waveBankNo >= 0) && (work != waveBankNo)) {
+				RedEntryWaveBankGet(this, waveBankNo)->m_id = RedEntryWaveBankGet(this, work)->m_id;
+				RedEntryWaveBankGet(this, waveBankNo)->m_historyNo = RedEntryWaveBankGet(this, work)->m_historyNo;
+				RedEntryWaveBankGet(this, waveBankNo)->m_address = RedEntryWaveBankGet(this, work)->m_address;
+				RedEntryWaveBankGet(this, waveBankNo)->m_size = RedEntryWaveBankGet(this, work)->m_size;
+				work = waveBankNo;
 			}
 
-			WaveHistoryChoice(RedEntryWaveBankGet(this, existingWaveBankIndex));
+			WaveHistoryChoice(RedEntryWaveBankGet(this, work));
 		} else {
 			m_waveLoadNo = RedWaveHeadFromData(waveData)->m_waveNo;
 			waveAramAddress = WaveHeadAdd(waveBankNo, RedWaveHeadFromData(waveData), waveNo);
@@ -726,12 +723,13 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 				return REDSOUND_WAVE_NO_NONE;
 			}
 
-			int waveHeaderCopySize = RedWaveHeadGetToneSize(RedWaveHeadFromData(waveData));
-			waveHeaderCopySize +=
-			    RedWaveHeadGetTableSize(RedWaveHeadFromData(waveData)) + REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
+			transferSize = RedWaveHeadGetToneSize(RedWaveHeadFromData(waveData));
+			work = RedWaveHeadGetTableSize(RedWaveHeadFromData(waveData));
+			work += transferSize;
+			work += REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
 			remainingWaveSize = RedWaveHeadFromData(waveData)->m_waveSize;
-			waveDataSize -= waveHeaderCopySize;
-			waveBodyData = RedWaveHeadGetBodyData(waveData, waveHeaderCopySize);
+			waveDataSize -= work;
+			waveBodyData = RedWaveHeadGetBodyData(waveData, work);
 		}
 	} else {
 		waveAramAddress = m_waveLoadAddress;
@@ -740,18 +738,13 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 	}
 
 	if ((waveAramAddress != 0) && (waveDataSize > 0)) {
-		int waveTransferSize;
-		if (remainingWaveSize > waveDataSize) {
-			waveTransferSize = waveDataSize;
-		} else {
-			waveTransferSize = remainingWaveSize;
-		}
+		transferSize = (remainingWaveSize > waveDataSize) ? waveDataSize : remainingWaveSize;
 
 		int dmaId = RedDmaEntry(REDSOUND_DMA_FLAGS_WAVE_LOAD, REDSOUND_DMA_DIRECTION_TO_ARAM,
-		                        RedDmaMainMemoryAddress(waveBodyData), waveAramAddress, waveTransferSize, REDSOUND_DMA_CALLBACK_NONE,
+		                        RedDmaMainMemoryAddress(waveBodyData), waveAramAddress, transferSize, REDSOUND_DMA_CALLBACK_NONE,
 		                        REDSOUND_DMA_CALLBACK_DATA_NONE);
-		remainingWaveSize -= waveTransferSize;
-		waveAramAddress += waveTransferSize;
+		remainingWaveSize -= transferSize;
+		waveAramAddress += transferSize;
 		m_waveLoadSize = remainingWaveSize;
 		m_waveLoadAddress = waveAramAddress;
 
@@ -1026,13 +1019,10 @@ void CRedEntry::DisplayWaveInfo()
 		aBufferEnd = previousBlockEnd + c_RedMemory.GetABufferSize();
 		do {
 			if (aMemoryBlock->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
-				int nextFreeSize = RedMemoryBlockGetEndAddress(aMemoryBlock);
-				if (RedMemoryBlockGetNext(aMemoryBlock)->m_size > 0) {
-					nextFreeSize = RedMemoryBlockGetNext(aMemoryBlock)->m_address - nextFreeSize;
-				} else {
-					nextFreeSize = aBufferEnd - nextFreeSize;
-				}
-				int reportFreeSize = nextFreeSize;
+				int reportFreeSize = RedMemoryBlockGetEndAddress(aMemoryBlock);
+				reportFreeSize = (RedMemoryBlockGetNext(aMemoryBlock)->m_size > 0)
+				                     ? RedMemoryBlockGetNext(aMemoryBlock)->m_address - reportFreeSize
+				                     : aBufferEnd - reportFreeSize;
 
 				RedHistoryBANK* waveBank = m_waveBankBase;
 				do {
@@ -1067,8 +1057,8 @@ void CRedEntry::DisplayWaveInfo()
 				if (maxFreeSize < aMemoryBlock->m_address - previousBlockEnd) {
 					maxFreeSize = aMemoryBlock->m_address - previousBlockEnd;
 				}
-				totalAllocatedSize += aMemoryBlock->m_size;
 				previousBlockEnd = RedMemoryBlockGetEndAddress(aMemoryBlock);
+				totalAllocatedSize += aMemoryBlock->m_size;
 			}
 			aMemoryBlock++;
 		} while (aMemoryBlock < RedMemoryBankGetEnd(aMemoryBlocks));
@@ -1467,6 +1457,7 @@ void CRedEntry::DisplaySePlayInfo()
 		RedTrackDATA** seTrackBasePtr = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 		RedTrackDATA* seTrack = *seTrackBasePtr;
 		int displayWaveNo;
+		u8* data;
 		do {
 			if (seTrack->m_command != REDSOUND_TRACK_COMMAND_NONE) {
 				if (RedSeBlockIdIsBlockData(seTrack->m_seSepId)) {
@@ -1474,19 +1465,20 @@ void CRedEntry::DisplaySePlayInfo()
 					seBlockId &= REDSOUND_SE_BLOCK_ENTRY_MASK;
 					int seBlockBankNo = RedSeBlockIdGetBankNo(seBlockId);
 					int seBlockSequenceNo = RedSeBlockIdGetSequenceNo(seBlockId);
-					RedSeBlockHEAD* seBlockHead = RedSeBlockDataGet(seBlockBankNo);
-					int* seBlockEntries = seBlockHead->m_entries;
-					RedSeINFO* blockSeInfo = RedSeBlockGetInfoFromEntries(seBlockHead, seBlockEntries, seBlockSequenceNo);
-					displayWaveNo = RedSeInfoGetWaveNo(blockSeInfo);
-
+					data = (u8*)RedSeBlockDataGet(seBlockBankNo);
+					displayWaveNo = ((RedSeBlockHEAD*)data)->m_seCount;
+					data = (u8*)((RedSeBlockHEAD*)data)->m_entries;
+					seBlockId = ((int*)data)[seBlockSequenceNo] & REDSOUND_SE_BLOCK_ENTRY_MASK;
+					data += displayWaveNo * REDSOUND_SE_BLOCK_ENTRY_SIZE;
+					data += seBlockId;
+					displayWaveNo = RedSeInfoGetWaveNo((RedSeINFO*)data);
 					OSReport(sRedEntrySeBlockPlayInfoFmt, sRedEntryLogPrefix,
 					         (seTrack - *seTrackBasePtr) + REDSOUND_SE_VOICE_BASE_INDEX, seBlockBankNo,
 					         seBlockSequenceNo, displayWaveNo);
 					fflush(__files + 1);
 				} else {
-					RedHistoryBANK* seSepBank = SearchSeSepBank(seTrack->m_seSepId);
-					RedSeSepHEAD* seSepHead = seSepBank->m_seSepHead;
-					displayWaveNo = RedSeSepGetWaveNo(seSepHead);
+					data = (u8*)SearchSeSepBank(seTrack->m_seSepId)->m_seSepHead;
+					displayWaveNo = RedSeSepGetWaveNo((RedSeSepHEAD*)data);
 					OSReport(sRedEntrySeSepPlayInfoFmt, sRedEntryLogPrefix,
 					         (seTrack - *seTrackBasePtr) + REDSOUND_SE_VOICE_BASE_INDEX, seTrack->m_seSepId, displayWaveNo);
 					fflush(__files + 1);
@@ -1856,14 +1848,10 @@ void CRedEntry::DisplayMMemoryInfo()
 	do {
 		if (bankEntry->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 			int matched = REDSOUND_ENTRY_SEARCH_NOT_FOUND;
-			int blockEnd = RedMemoryBlockGetEndAddress(bankEntry);
-
-			if (RedMemoryBlockGetNext(bankEntry)->m_size > 0) {
-				blockEnd = RedMemoryBlockGetNext(bankEntry)->m_address - blockEnd;
-			} else {
-				blockEnd = bufferTop - blockEnd;
-			}
-			freeSize = blockEnd;
+			freeSize = RedMemoryBlockGetEndAddress(bankEntry);
+			freeSize = (RedMemoryBlockGetNext(bankEntry)->m_size > 0)
+			               ? RedMemoryBlockGetNext(bankEntry)->m_address - freeSize
+			               : bufferTop - freeSize;
 
 			history = m_musicBankBase;
 			do {
@@ -1937,8 +1925,8 @@ void CRedEntry::DisplayMMemoryInfo()
 			}
 
 			entryCount++;
-			totalSize += bankEntry->m_size;
 			nextAddress = RedMemoryBlockGetEndAddress(bankEntry);
+			totalSize += bankEntry->m_size;
 		}
 
 		bankEntry++;

@@ -8,6 +8,8 @@
 #include "window.h"
 #include "screen.h"
 
+struct Window gWindows[5];
+
 extern u32 gScreenUnused;
 s32 CmdListScreen_Init(void);
 s32 CmdListScreen_Main(void);

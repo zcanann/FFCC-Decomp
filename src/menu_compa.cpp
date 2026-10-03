@@ -28,6 +28,28 @@ static const char s_menu_compa_cpp[] = "menu_compa.cpp";
 
 STATIC_ASSERT(sizeof(CompaOpenAnimList) == 0x1008);
 
+static inline void CompaDrawWindow(CompaOpenAnim* entry, float x, float y, float w, float h, float u, float v, GXColor* colors)
+{
+	if (entry->tex == 0x51) {
+		int yStep = static_cast<int>(y);
+		float end = y + h;
+		while (static_cast<float>(yStep) < end) {
+			int tileH;
+			if (end - static_cast<float>(yStep) >= kCompaTileHeight) {
+				tileH = 0x18;
+			} else {
+				tileH = static_cast<int>(end - static_cast<float>(yStep));
+			}
+			MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
+			                 w, static_cast<float>(tileH), u, v, colors, kCompaOne, kCompaOne, kCompaZero);
+			yStep += 0x18;
+		}
+	} else {
+		MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
+		                 kCompaOne, kCompaOne, kCompaZero);
+	}
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80160edc
@@ -44,8 +66,6 @@ void CMenuPcs::CompaDraw()
 	CompaOpenAnimList* compaList;
 	CFont* font;
 	int familyCount;
-	int yStep;
-	float end;
 	float fillW;
 	int tex;
 	float x;
@@ -54,9 +74,7 @@ void CMenuPcs::CompaDraw()
 	float h;
 	float u;
 	float v;
-	int tileH;
 	float alpha;
-	float rowY;
 	int drawIndex;
 	int shown;
 	int i;
@@ -76,7 +94,7 @@ void CMenuPcs::CompaDraw()
 
 	caravanWork = Game.m_scriptFoodBase[0];
 	entry = this->m_compaList->entries;
-	for (i = 0; i < this->m_compaList->count; i++) {
+	for (i = 0; i < this->m_compaList->count; i++, entry++) {
 		tex = entry->tex;
 		if (tex >= 0) {
 			x = static_cast<float>(entry->x);
@@ -100,22 +118,7 @@ void CMenuPcs::CompaDraw()
 
 				fillW = entry->alpha * w;
 				if (fillW > kCompaZero) {
-					if (entry->tex == 0x51) {
-						yStep = static_cast<int>(y);
-						end = y + h;
-						while (static_cast<float>(yStep) < end) {
-							tileH = (end - static_cast<float>(yStep) >= kCompaTileHeight) ? 0x18 : static_cast<int>(end - static_cast<float>(yStep));
-							MenuPcs.DrawRect(
-								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-								fillW, static_cast<float>(tileH), u, v,
-								colors, kCompaOne, kCompaOne, kCompaZero);
-							yStep += 0x18;
-						}
-					} else {
-						MenuPcs.DrawRect(
-							static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v,
-							colors, kCompaOne, kCompaOne, kCompaZero);
-					}
+					CompaDrawWindow(entry, x, y, fillW, h, u, v, colors);
 
 					u += fillW;
 					x += fillW * entry->uvScale;
@@ -130,23 +133,9 @@ void CMenuPcs::CompaDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					fillW = static_cast<float>(1.0 / (double)entry->duration) * static_cast<float>(entry->w);
-					if (entry->tex == 0x51) {
-						yStep = static_cast<int>(y);
-						end = y + h;
-						while (static_cast<float>(yStep) < end) {
-							tileH = (end - static_cast<float>(yStep) >= kCompaTileHeight) ? 0x18 : static_cast<int>(end - static_cast<float>(yStep));
-							MenuPcs.DrawRect(
-								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-								fillW, static_cast<float>(tileH), u, v,
-								colors, kCompaOne, kCompaOne, kCompaZero);
-							yStep += 0x18;
-						}
-					} else {
-						MenuPcs.DrawRect(
-							static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v,
-							colors, kCompaOne, kCompaOne, kCompaZero);
-					}
+					fillW = 1.0 / entry->duration;
+					fillW = fillW * entry->w;
+					CompaDrawWindow(entry, x, y, fillW, h, u, v, colors);
 				}
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -161,8 +150,6 @@ void CMenuPcs::CompaDraw()
 				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, kCompaZero);
 			}
 		}
-
-		entry++;
 	}
 
 	colors[0].r = 0xFF;
@@ -187,11 +174,12 @@ void CMenuPcs::CompaDraw()
 	}
 
 	for (i = 0; i < familyCount; i++) {
-		rowY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(i * 0x28);
+		y = static_cast<float>(compaList->entries[0].y + 0x40);
+		y += static_cast<float>(i * 0x28);
 		MenuPcs.DrawRect(
 			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
-			rowY,
+			y,
 			kCompaFoodIconWidth, kCompaFoodIconHeight, kCompaZero, kCompaZero, kCompaOne,
 			kCompaOne, kCompaZero);
 	}
@@ -200,7 +188,8 @@ void CMenuPcs::CompaDraw()
 	shown = 0;
 	for (i = shown; i < 8 && shown < familyCount; i++) {
 		iconX = static_cast<float>(compaList->entries[0].x + 0x128);
-		iconY = static_cast<float>(compaList->entries[0].y + 0x40) + static_cast<float>(shown * 0x28);
+		iconY = static_cast<float>(compaList->entries[0].y + 0x40);
+		iconY += static_cast<float>(shown * 0x28);
 
 		if (i >= 2) {
 			scan = drawIndex;
@@ -276,7 +265,8 @@ void CMenuPcs::CompaDraw()
 
 		name = GetMenuStr(drawIndex + 0x16);
 		x = static_cast<float>(compaList->entries[0].x + 0x18);
-		y = static_cast<float>(compaList->entries[0].y + 0x45) + static_cast<float>(shown * 0x28);
+		y = static_cast<float>(compaList->entries[0].y + 0x45);
+		y += static_cast<float>(shown * 0x28);
 		font->SetPosX(x);
 		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(name);

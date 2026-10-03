@@ -168,11 +168,11 @@ void Radar_OnTreasurePos(s8 *p)
     gTreasureMarkers[idx].y = p[3];
 }
 
-void Session_OnPlayerStat(u8 *p)
+void Session_OnPlayerStat(u8 *data)
 {
     s32 i;
     s32 n;
-    s32 k;
+    u8 *p;
     u8 *dst;
     u8 *q;
 
@@ -186,6 +186,7 @@ void Session_OnPlayerStat(u8 *p)
         gParty[i].name = Msg_GetSystem(0);
     }
 
+    p = data;
     memcpy(&gCaravanNames, p, sizeof(gCaravanNames));
     p += sizeof(gCaravanNames);
     for (i = 0; i < 8; i++) {
@@ -218,7 +219,7 @@ void Session_OnPlayerStat(u8 *p)
     memcpy(gSession.favorites, p, 8);
     p += 8;
     q = (u8 *)&gSession.gil;
-    for (k = 4; k != 0; k--)
+    for (i = 4; i != 0; i--)
         *q++ = *p++;
 
     n = gSession.appearance & 3;

@@ -767,20 +767,15 @@ void CGraphic::DrawDebugString()
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
 
-    int y;
-    u32 i = 0;
-    y = 0x10;
-    for (; i < static_cast<u32>(m_debugStringCount); ++i) {
+    for (u32 i = 0; i < static_cast<u32>(m_debugStringCount); ++i) {
         s16 xCell = m_debugStringPositions[i].x;
 
         if (xCell == -1) {
-            DrawDebugStringDirect(0x10, static_cast<u32>(y), m_debugStrings[i], 0xC);
+            DrawDebugStringDirect(0x10, i * 0xC + 0x10, m_debugStrings[i], 0xC);
         } else {
             s16 yCell = m_debugStringPositions[i].y;
             DrawDebugStringDirect(static_cast<u32>(xCell * 0xC + 0x10), static_cast<u32>(yCell * 0xC + 0x10), m_debugStrings[i], 0xC);
         }
-
-        y += 0xC;
     }
 }
 
@@ -1083,7 +1078,7 @@ void CGraphic::makeSphere()
         int ring = 0;
         int ringBase = 1;
         for (; ring < 6; ring++) {
-            int current = ring == 0 ? 0 : (ring - 1) * 8 + seg + 1;
+            int current = ring == 0 ? 0 : 1 + (ring - 1) * 8 + seg;
             GXPosition3f32(vertices[current][1], vertices[current][0], vertices[current][2]);
             int next = ring + 1 == 6 ? 41 : seg + ringBase;
             GXPosition3f32(vertices[next][1], vertices[next][0], vertices[next][2]);
@@ -1284,10 +1279,7 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
     if (((xEnd - x) != 0) && ((yEnd - y) != 0)) {
         int texFormat = 6;
         int textureSize = width * height * 4;
-        int maxTextureSize =
-            (((static_cast<int>(m_renderMode->fbWidth) + 0xF) & 0xFFF0) *
-                 static_cast<int>(m_renderMode->efbHeight) * 2) +
-            0x46000;
+        int maxTextureSize = (u16)((m_renderMode->fbWidth + 0xF) & ~0xF) * m_renderMode->efbHeight * 2 + 0x46000;
         if (maxTextureSize < textureSize) {
             texFormat = 4;
             textureSize /= 2;

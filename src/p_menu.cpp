@@ -273,7 +273,6 @@ void CMenuPcs::create()
         { 1, const_cast<char*>(sMenuTexWinKazari) },
         { 0, const_cast<char*>(sMenuTexButton) }
     };
-    u8* self = reinterpret_cast<u8*>(this);
 
     unsigned long menuHeapSize = 0xC4000;
     if (FontMan.m_font != 0) {
@@ -330,23 +329,8 @@ void CMenuPcs::create()
 void CMenuPcs::destroy()
 {
     changeMode(static_cast<CMenuPcs::MENUMODE>(-1));
-    u8* self = reinterpret_cast<u8*>(this);
 
-    int i = 0;
-    CTexture** textureSlot = m_textures;
-    do {
-        ReleaseRefSlot(reinterpret_cast<void**>(textureSlot));
-        textureSlot++;
-        i++;
-    } while (i < 0x16);
-
-    i = 0;
-    CTextureSet** textureSetSlot = m_textureSets;
-    do {
-        ReleaseRefSlot(reinterpret_cast<void**>(textureSetSlot));
-        textureSetSlot++;
-        i++;
-    } while (i < 2);
+    freeTexture(0, 2, 0, 0x16);
 
     CFont* font = m_fonts[0];
     if (font != nullptr) {
@@ -543,7 +527,6 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
                            int textureStart, int textureCount, int stageSelect)
 {
     char texPath[0x104];
-    u8* self = reinterpret_cast<u8*>(this);
 
     for (int i = 0; i < textureSetCount; i++) {
         const char* language = Game.GetLangString();
@@ -633,7 +616,6 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
 void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
 {
     int currentMode;
-    CMenuPcs* menu;
     int i;
 
     if (m_mode != static_cast<int>(mode)) {
@@ -644,38 +626,15 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
             break;
         case 0:
             ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[1]));
+            freeTexture(2, 2, 0x16, 10);
 
-            i = 0;
-            menu = this;
-            do {
-                ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_textures[0x16]));
-                i++;
-                menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-            } while (i < 10);
+            for (i = 0; i < 4; i++) {
+                ReleaseRefSlot(reinterpret_cast<void**>(&m_battleRingMenus[i]));
+            }
 
-            i = 0;
-            menu = this;
-            do {
-                ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_textureSets[2]));
-                i++;
-                menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-            } while (i < 2);
-
-            i = 0;
-            menu = this;
-            do {
-                ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_battleRingMenus[0]));
-                i++;
-                menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-            } while (i < 4);
-
-            i = 0;
-            menu = this;
-            do {
-                ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_battleMesMenus[0]));
-                i++;
-                menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-            } while (i < 12);
+            for (i = 0; i < 12; i++) {
+                ReleaseRefSlot(reinterpret_cast<void**>(&m_battleMesMenus[i]));
+            }
 
             destroySingleMenu();
             destroyVillageMenu();
@@ -718,47 +677,10 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
  */
 void CMenuPcs::calc()
 {
-    u8* self = reinterpret_cast<u8*>(this);
     switch (m_mode) {
         case 0:
-        {
-            CMenuPcs* menu;
-            int i;
-
-            i = 0;
-            menu = this;
-            do {
-                menu->m_battleRingMenus[0]->Calc();
-                i++;
-                menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-            } while (i < 4);
-
-            i = 0;
-            menu = this;
-            do {
-                menu->m_battleMesMenus[0]->Calc();
-                i++;
-                menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
-            } while (i < 0xc);
-
-            int current = m_battleHud.m_gaugeValue;
-            int value = current - 1;
-            int limit = m_battleHud.m_gaugeTarget - current;
-            limit = current + limit;
-            if (limit >= value) {
-                int next = current + 1;
-                value = (next < limit) ? next : limit;
-            }
-            m_battleHud.m_gaugeValue = value;
-
-            u32 counter = m_battleHud.m_fadeCounter - 1;
-            m_battleHud.m_fadeCounter = counter & ~((int)counter >> 31);
-            counter = m_battleHud.m_gaugeCounter - 1;
-            m_battleHud.m_gaugeCounter = counter & ~((int)counter >> 31);
-
-            calcVillageMenu();
+            calcBattle();
             break;
-        }
         case 1:
             CalcDiaryMenu();
             break;
@@ -986,7 +908,6 @@ u16 CMenuPcs::GetButtonRepeat(int port)
  */
 void CMenuPcs::onScriptChanging(char* script)
 {
-    u8* self = reinterpret_cast<u8*>(this);
 
     switch (m_mode) {
     case 0:
@@ -1580,24 +1501,22 @@ void CMenuPcs::createBattle()
  */
 inline void CMenuPcs::destroyBattle()
 {
-    void** slot = reinterpret_cast<void**>(&m_textures[0x16]);
-    for (int i = 0; i < 10; i++, slot++) {
-        ReleaseRefSlot(slot);
+    int i;
+
+    for (i = 0; i < 10; i++) {
+        ReleaseRefSlot(reinterpret_cast<void**>(m_textures + 0x16 + i));
     }
 
-    slot = reinterpret_cast<void**>(&m_textureSets[2]);
-    for (int i = 0; i < 2; i++, slot++) {
-        ReleaseRefSlot(slot);
+    for (i = 0; i < 2; i++) {
+        ReleaseRefSlot(reinterpret_cast<void**>(m_textureSets + 2 + i));
     }
 
-    slot = reinterpret_cast<void**>(m_battleRingMenus);
-    for (int i = 0; i < 4; i++, slot++) {
-        ReleaseRefSlot(slot);
+    for (i = 0; i < 4; i++) {
+        ReleaseRefSlot(reinterpret_cast<void**>(&m_battleRingMenus[i]));
     }
 
-    slot = reinterpret_cast<void**>(m_battleMesMenus);
-    for (int i = 0; i < 12; i++, slot++) {
-        ReleaseRefSlot(slot);
+    for (i = 0; i < 12; i++) {
+        ReleaseRefSlot(reinterpret_cast<void**>(&m_battleMesMenus[i]));
     }
 
     destroySingleMenu();
@@ -1623,16 +1542,15 @@ inline void CMenuPcs::calcBattle()
         reinterpret_cast<CMenu*>(m_battleMesMenus[i])->Calc();
     }
 
-    int limit = m_battleHud.m_gaugeTarget;
-    int value = m_battleHud.m_gaugeValue - 1;
-    if (value <= limit) {
-        int alt = m_battleHud.m_gaugeValue + 1;
-        value = limit;
-        if (alt < limit) {
-            value = alt;
-        }
-    }
-    m_battleHud.m_gaugeValue = value;
+    int value;
+    int current;
+    int limit;
+
+    current = m_battleHud.m_gaugeValue;
+    value = current - 1;
+    limit = m_battleHud.m_gaugeTarget - current;
+    limit = current + limit;
+    m_battleHud.m_gaugeValue = (limit < value) ? value : ((current + 1 < limit) ? current + 1 : limit);
 
     u32 counter = m_battleHud.m_fadeCounter - 1;
     m_battleHud.m_fadeCounter = counter & ~((int)counter >> 31);
@@ -1770,7 +1688,6 @@ void CMenuPcs::drawBattle()
  */
 void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
 {
-    u8* self = reinterpret_cast<u8*>(this);
     const int mode = m_mode;
 
     if ((mode != 2) && (mode != 1)) {

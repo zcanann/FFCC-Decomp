@@ -24,6 +24,12 @@ static inline float GetStatusMultiplier(int offset)
 	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * 0.01f) +
 		   0.0000001f;
 }
+
+static inline float GetStatusMultiplier(int offset, int index)
+{
+	return ((float)((unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset))[index] * 0.01f) +
+		   0.0000001f;
+}
 }
 
 STATIC_ASSERT(offsetof(CRomLetterWork, m_priorityFlags) == 0x06);
@@ -60,6 +66,30 @@ static const char sUnnamedItemName[] = {
 	(char)0x81, (char)0x69, (char)0x82, (char)0xC8, (char)0x82, (char)0xDC, (char)0x82, (char)0xA6,
 	(char)0x82, (char)0xC8, (char)0x82, (char)0xB5, (char)0x81, (char)0x6A, 0x00, 0x00
 };
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 472b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGObjWork::CalcStatus()
+{
+	if (m_statusTimers[6] != 0) {
+		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x38));
+		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x38));
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x38));
+	}
+	if (m_statusTimers[1] != 0) {
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x3E));
+	}
+	if (m_statusTimers[3] != 0) {
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
+	}
+}
 
 /*
  * --INFO--
@@ -1552,6 +1582,67 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CCaravanWork::ClampStatus(short& cmdSlots, unsigned short& hpMax)
+{
+	short cap = 8;
+	if (cmdSlots < 8) {
+		cap = cmdSlots;
+	}
+	cmdSlots = cap;
+	hpMax = (hpMax < 0x10) ? hpMax : 0x10;
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CCaravanWork::CalcArtifactStatus(int includeTemp, int, int& hp, int& cmdSlots, int& strength, int& magic, int& defense)
+{
+	for (int artifactIndex = 0; artifactIndex < kArtifactCount; artifactIndex++) {
+		if (artifactIndex < kPermanentArtifactCount || includeTemp != 0) {
+			int artifactId = m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactIndex];
+			if (artifactId > 0) {
+				SItemFlatRow* artifactData = GetItemDataPtr(artifactId);
+				unsigned short value = artifactData->m_value;
+				switch (artifactData->m_kind) {
+				case 0x9F:
+					strength += value;
+					break;
+				case 0xB6:
+					magic += value;
+					break;
+				case 0xCC:
+					defense += value;
+					break;
+				case 0xDB:
+					cmdSlots += value;
+					break;
+				case 0xDF:
+					magic += value;
+					break;
+				case 0xE4:
+					hp += value;
+					break;
+				}
+			}
+		}
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800a0210
  * PAL Size: 936b
  * EN Address: 0x800B48F0
@@ -1565,28 +1656,12 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
 	}
 
+	int hp = 0;
 	int totalSlots = 0;
-	for (int artifactIndex = 0; artifactIndex < kArtifactCount; artifactIndex++) {
-		if (artifactIndex < kPermanentArtifactCount) {
-			int artifactId = m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactIndex];
-			if (artifactId > 0) {
-				SItemFlatRow* artifactData = GetItemDataPtr(artifactId);
-				unsigned short slots = artifactData->m_value;
-				switch (artifactData->m_kind) {
-				case 0xDB:
-					totalSlots += slots;
-					break;
-				case 0x9F:
-				case 0xB6:
-				case 0xCC:
-				case 0xDF:
-				case 0xE4:
-				default:
-					break;
-				}
-			}
-		}
-	}
+	int strength = 0;
+	int magic = 0;
+	int defense = 0;
+	CalcArtifactStatus(0, 0, hp, totalSlots, strength, magic, defense);
 
 	totalSlots += (short)m_baseCmdListSlots;
 	for (int slotIndex = totalSlots; slotIndex < 8; slotIndex++) {
@@ -1703,35 +1778,7 @@ void CCaravanWork::CalcStatus()
 	int strBonus = 0;
 	int magBonus = 0;
 	int defBonus = 0;
-	for (int i = 0; i < kArtifactCount; i++) {
-		int artifactId = m_inventoryItems[CCaravanWork::kPermanentArtifactStart + i];
-		if (artifactId > 0) {
-			SItemFlatRow* artifactData = GetItemDataPtr(artifactId);
-			int artifactEffect = artifactData->m_kind;
-			int value = artifactData->m_value;
-
-			switch (artifactEffect) {
-			case 0x9F:
-				strBonus += value;
-				break;
-			case 0xB6:
-				magBonus += value;
-				break;
-			case 0xCC:
-				defBonus += value;
-				break;
-			case 0xDB:
-				cmdBonus += value;
-				break;
-			case 0xDF:
-				magBonus += value;
-				break;
-			case 0xE4:
-				hpBonus += value;
-				break;
-			}
-		}
-	}
+	CalcArtifactStatus(1, 0, hpBonus, cmdBonus, strBonus, magBonus, defBonus);
 
 	m_strength += strBonus;
 	m_baseStrength += strBonus;
@@ -1742,13 +1789,7 @@ void CCaravanWork::CalcStatus()
 	m_numCmdListSlots += cmdBonus;
 	m_maxHp += hpBonus;
 
-	short cmdSlotCap = 8;
-	if ((short)m_numCmdListSlots < 8) {
-		cmdSlotCap = m_numCmdListSlots;
-	}
-	m_numCmdListSlots = cmdSlotCap;
-
-	m_maxHp = (m_maxHp < 0x10) ? m_maxHp : 0x10;
+	ClampStatus(m_numCmdListSlots, m_maxHp);
 
 	for (int equipIdx = 0; equipIdx < 4; equipIdx++) {
 		int equipSlot = m_equipment[equipIdx];
@@ -1852,17 +1893,7 @@ void CCaravanWork::CalcStatus()
 		m_hp = m_maxHp;
 	}
 
-	if (m_statusTimers[6] != 0) {
-		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x38));
-		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x38));
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x38));
-	}
-	if (m_statusTimers[1] != 0) {
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x3E));
-	}
-	if (m_statusTimers[3] != 0) {
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
-	}
+	CGObjWork::CalcStatus();
 
 	m_strength = (m_strength > 99) ? 99 : m_strength;
 	m_defense = (m_defense > 99) ? 99 : m_defense;
@@ -2496,32 +2527,14 @@ int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdL
  */
 int CCaravanWork::GetArtifactIncludeHpMax()
 {
-	SItemFlatRow* artifactDataBase = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
 	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
 	int hpMax = 0;
+	int cmdSlots = 0;
+	int strength = 0;
+	int magic = 0;
+	int defense = 0;
 
-	for (int artifactIndex = 0; artifactIndex < kArtifactCount; artifactIndex++) {
-		if (artifactIndex < kPermanentArtifactCount) {
-			int artifactId = m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactIndex];
-			if (artifactId > 0) {
-				SItemFlatRow* artifactData = &artifactDataBase[artifactId];
-				unsigned short artifactType = artifactData->m_kind;
-				unsigned short artifactValue = artifactData->m_value;
-
-				switch (artifactType) {
-				case 0x9F:
-				case 0xB6:
-				case 0xCC:
-				case 0xDB:
-				case 0xDF:
-					break;
-				case 0xE4:
-					hpMax = artifactValue + hpMax;
-					break;
-				}
-			}
-		}
-	}
+	CalcArtifactStatus(0, 0, hpMax, cmdSlots, strength, magic, defense);
 
 	hpMax += baseData->m_maxHp;
 	if (hpMax >= 0x10) {
@@ -2565,7 +2578,6 @@ CMonWork::~CMonWork()
 void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 {
 	int stageRank;
-	int memberCount;
 
 	m_baseDataIndex = baseDataIndex;
 	m_id = romWork->m_id;
@@ -2589,7 +2601,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 	memset(m_actionItems, 0, sizeof(m_actionItems));
 	memset(m_actionAnimations, 0, sizeof(m_actionAnimations));
 
-	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+	if (Game.m_gameWork.IsBattleStage()) {
 		int rank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
 		stageRank = 2;
 		if (rank < stageRank) {
@@ -2600,27 +2612,20 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 	}
 
 	if (stageRank > 0) {
-		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier(stageRank * 2 + 0x44));
+		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier(0x44, stageRank));
 	}
 
-	memberCount = 0;
-	for (int i = 0; i < 4; i++) {
-		if (Game.m_gameWork.m_wmBackupParams[i] >= 0) {
-			memberCount++;
-		}
-	}
-
-	int scaledMemberCount = memberCount;
+	int numPlayer = Game.m_gameWork.GetNumPlayer();
 	if (Game.m_gameWork.m_menuStageMode != 0) {
-		scaledMemberCount = 1;
+		numPlayer = 1;
 	}
 
-	if (scaledMemberCount > 1) {
-		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier((int)(scaledMemberCount * 2 + 0x5E)));
+	if (numPlayer > 1) {
+		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier(0x5E, numPlayer));
 	}
 
 	if ((static_cast<int>(Game.m_gameWork.m_scriptSysVal0) == 1) &&
-		(Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
+		(Game.m_gameWork.IsBattleStage())) {
 		m_maxHp = (unsigned short)((float)m_maxHp *
 								   ((((float)Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entries[8].m_values[0]) * 0.01f) + 0.0000001f));
 	}
@@ -2648,7 +2653,7 @@ void CMonWork::CalcStatus()
 	m_defense = baseData->m_defense;
 
 	int stageRank;
-	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+	if (Game.m_gameWork.IsBattleStage()) {
 		int rank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
 		stageRank = 2;
 		if (rank < stageRank) {
@@ -2659,24 +2664,12 @@ void CMonWork::CalcStatus()
 	}
 
 	if (stageRank > 0) {
-		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(stageRank * 2 + 0x48));
-		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(stageRank * 2 + 0x4C));
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(stageRank * 2 + 0x50));
+		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x48, stageRank));
+		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x4C, stageRank));
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x50, stageRank));
 	}
 
-	if (m_statusTimers[6] != 0) {
-		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x38));
-		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(0x38));
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x38));
-	}
-
-	if (m_statusTimers[1] != 0) {
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x3E));
-	}
-
-	if (m_statusTimers[3] != 0) {
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
-	}
+	CGObjWork::CalcStatus();
 }
 
 /*

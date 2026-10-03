@@ -198,12 +198,12 @@ public:
         ShieldNodeFlagBits m_shieldNodeFlagBits;
     };
     char m_animSlots[64];             // 0x9D
-    unsigned char m_animQueuePos;     // 0xDD
+    char m_animQueuePos;              // 0xDD
     char m_animQueue[4];              // 0xDE
     signed char m_animStateMisc;      // 0xE2
     char m_currentAnimSlot;           // 0xE3
     char m_animSlotSel;               // 0xE4
-    unsigned char m_dispItemTimer;    // 0xE5
+    char m_dispItemTimer;             // 0xE5
     unsigned char m_pushParamA;       // 0xE6
     unsigned char m_pushParamB;       // 0xE7
     char m_lastBgGroup;               // 0xE8

@@ -212,6 +212,7 @@ public:
 		void Create(CChunkFile&, CChara::CModel*, CChara::CNode::TYPE, CMemory::CStage*);
 		void Duplicate(CChara::CNode*, CMemory::CStage*);
 		void CalcBind(CChara::CModel*);
+		float (*GetWorldMatrix())[4] { return m_mtx; }
 
 		CRefData* m_refData;
 		CMesh* m_displayMesh;
@@ -372,6 +373,9 @@ public:
 		void SetFrame(float);
 		float GetNowFrame() { return m_time; }
 		float GetEndFrame() { return m_animEnd; }
+		float GetStartFrame() { return m_animStart; }
+		void SetDynaVector(Vec* vec) { m_dynJitter = CVector(*vec); }
+		CNode* GetNode(unsigned long index) { return &m_nodes[index]; }
 		void CalcFurColor();
 		void InitMogFurTex();
 		void CopyFurTex(int loadFromTexture);

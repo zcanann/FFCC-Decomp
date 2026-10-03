@@ -55,6 +55,10 @@ public:
 		PSVECSubtract((const Vec*)this, (const Vec*)&other, (Vec*)&out);
 		return out;
 	}
+	CVector operator-() const
+	{
+		return CVector(-x, -y, -z);
+	}
 	/*
 	 * --INFO--
 	 * PAL Address: UNUSED

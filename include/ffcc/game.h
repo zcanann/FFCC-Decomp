@@ -39,6 +39,18 @@ public:
         void ClearScriptChange();
         void ClearEvtWork();
 
+        int GetNumPlayer()
+        {
+            int numPlayer = 0;
+            for (int i = 0; i < 4; i++) {
+                if (m_wmBackupParams[i] >= 0) {
+                    numPlayer++;
+                }
+            }
+            return numPlayer;
+        }
+        bool IsBattleStage() { return m_bossArtifactStageIndex < 0xF; }
+
         unsigned char m_menuStageMode;                   // 0x00
         unsigned char m_gameInitFlag;                    // 0x01
         unsigned char m_spModeFlags[4];                  // 0x02

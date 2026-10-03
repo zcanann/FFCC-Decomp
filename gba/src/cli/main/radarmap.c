@@ -137,7 +137,6 @@ void Radar_DrawMap(void)
     s32 k;
     s32 m;
     s32 n;
-    u16 code;
     s32 cnt;
     s16 v;
     s16 len;
@@ -171,14 +170,13 @@ void Radar_DrawMap(void)
             n = 0;
             src = data;
             for (k = 0; k < sMapRowLen[i + ty]; src++, k++) {
-                code = *src;
-                if (code & 0x8000) {
-                    cnt = code & 0x3FF;
-                    v = (code >> 10) & 3;
+                if (*src & 0x8000) {
+                    cnt = *src & 0x3FF;
+                    v = (*src >> 10) & 3;
                     for (; cnt != 0; cnt--)
                         line[n++] = v | 0x1000;
                 } else {
-                    line[n++] = code;
+                    line[n++] = *src;
                 }
             }
             data += sMapRowLen[i + ty];
@@ -224,7 +222,6 @@ void Radar_ScrollMap(s32 dx, s32 dy)
     u32 u;
     s32 fine;
     s32 oldFine;
-    u16 code;
     s32 cnt;
     u16 v;
 
@@ -268,10 +265,9 @@ void Radar_ScrollMap(s32 dx, s32 dy)
                 n = 0;
                 src = data;
                 for (k = 0; k < sMapRowLen[i + ty]; src++, k++) {
-                    code = *src;
-                    if (code & 0x8000) {
-                        cnt = code & 0x3FF;
-                        v = (code >> 10) & 3;
+                    if (*src & 0x8000) {
+                        cnt = *src & 0x3FF;
+                        v = (*src >> 10) & 3;
                         n += cnt;
                         if (n > c) {
                             line[0] = v | 0x1000;
@@ -279,7 +275,7 @@ void Radar_ScrollMap(s32 dx, s32 dy)
                         }
                     } else {
                         if (n == c) {
-                            line[0] = code;
+                            line[0] = *src;
                             break;
                         }
                         n++;
@@ -312,14 +308,13 @@ void Radar_ScrollMap(s32 dx, s32 dy)
             n = 0;
             src = data;
             for (k = 0; k < sMapRowLen[r]; src++, k++) {
-                code = *src;
-                if (code & 0x8000) {
-                    cnt = code & 0x3FF;
-                    v = (code >> 10) & 3;
+                if (*src & 0x8000) {
+                    cnt = *src & 0x3FF;
+                    v = (*src >> 10) & 3;
                     for (; cnt != 0; cnt--)
                         line[n++] = v | 0x1000;
                 } else {
-                    line[n++] = code;
+                    line[n++] = *src;
                 }
             }
         } else {

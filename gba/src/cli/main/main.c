@@ -616,7 +616,7 @@ void Str_GetChar(const char *str, s32 n, char *out)
     }
 }
 
-s32 Str_IsWideChar(const char *str)
+s32 Str_IsWideChar(const char *str, s32 n)
 {
     if (strlen(str) == 0) {
         return -1;

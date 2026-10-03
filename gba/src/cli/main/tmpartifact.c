@@ -88,7 +88,7 @@ s32 TmpArtifactScreen_Main(void)
     Text_Clear();
     win = &gWindows[1];
     if (sTmpArtifactRow < win->rows) {
-        TmpArtifactScreen_PrintRow(sTmpArtifactRow);
+        TmpArtifactScreen_PrintRow(sTmpArtifactRow, sTmpArtifactRow);
         pal = 5;
         Window_DrawRow(1, win->bg, sTmpArtifactRow, sTmpArtifactRow, pal);
         sTmpArtifactRow++;

@@ -51,8 +51,7 @@ s16 FixMul(s16 a, s16 b);
 s16 FixDiv(s16 a, s16 b);
 s16 FixInverse(s16 a);
 void Str_GetChar(const char *str, s32 n, char *out);
-/* Called with an extra argument by the name entry screen. */
-s32 Str_IsWideChar();
+s32 Str_IsWideChar(const char *str, s32 n);
 s32 Str_Length(const char *str);
 
 void Alarm_Update(void);

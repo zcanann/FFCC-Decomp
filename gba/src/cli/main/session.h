@@ -71,8 +71,7 @@ void Session_OnUseItem(u32 data);
 s32 Item_CanEquip(u16 *p);
 s32 Item_IsEquipped(s32 id);
 void Session_OnStrength(u32 data);
-/* Called with and without the item kind. */
-s32 Item_IsPercentKind();
+s32 Item_IsPercentKind(s32 id);
 void Session_OnArtifacts(u8 *p);
 void Session_OnTmpArtifacts(u8 *p);
 void Session_OnCmdList(u8 *p);

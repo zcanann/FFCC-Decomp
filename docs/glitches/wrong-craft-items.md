@@ -140,26 +140,33 @@ The guide's own gil math shows the Dreamcatcher and Sun Pendant rows also cost
 0. So those crafts can hit the same split; it just didn't happen in the runs
 the guide is based on.
 
-### Where the second item comes from (hypothesis)
+### What makes gil 4296 different (hypothesis)
 
-With the window still up, the cursor is on "Yes". The next A press sends the
-same request, which reads the gil slot again. By then the first craft has set
-gil to 65,535 − price × rate.
+The guide's math shows the Dreamcatcher and Sun Pendant rows also cost 0, yet
+only Firaga +2 keeps the window up. Besides the result and price, a row
+supplies up to three **materials** and their **counts**
+([gbaque.cpp:924-945](../../src/gbaque.cpp#L924-L945)). For heap rows these
+are arbitrary numbers. Three ways they could leave the GBA holding an error:
 
-- **If the first craft cost 0:** gil is 65,535, which is row −1. That reads the
-  heap block header in front of the table. The Lilty result there is a byte of
-  the source name `cflat_data.cpp`, which is 0, so you'd get `DUMMY-US`, not
-  an Ultima Lance.
-- **If it timed out instead and cost something:** with the guide's rate of 90%
-  (Crystal Mail cost 450 instead of 500), gil can't drop below 6,554. So the
-  second craft reads a row at least 6,554, deep in the heap, where a value of
-  31 (Ultima Lance) would be chance.
+1. **Split replies.** A price of 0 sends error, then success. If they reach the
+   GBA on different frames, the error is what the forge acts on.
+2. **Timeout.** For each unit of each material, the GameCube searches all 64
+   inventory slots. With counts up to 65,535 that's millions of checks. If
+   that stalls the GameCube for 30 GBA frames, the GBA gives up and leaves the
+   window up.
+3. **Dropped success.** Each deleted material sends the GBA an item update.
+   The send queue holds 64 messages and silently drops anything past that
+   ([joybus.cpp](../../src/joybus.cpp), `SetSendQueue`). If the queue fills
+   between the error and the success, only the error arrives.
 
-Neither explanation is clean. The guide is also for the JP version, which
-isn't decompiled.
+With the window up and the cursor on "Yes", the next A press sends the same
+request. That reads the gil left by the first craft, 65,535 − price × rate, as
+the next row. That second row's Lilty result has to be 31 (Ultima Lance). If
+the first craft cost 0, that row is −1: the heap header before the table,
+whose Lilty result reads as 0 (`DUMMY-US`). So the Firaga +2 row most likely
+has a nonzero price, which points to cause 2 or 3 rather than 1.
 
-**To settle it:** note the GameCube gil (or the GBA gil after a resync)
-immediately after the double craft, and whether a third A press crafts again.
-From that gil and the price rule, the row of the second craft can be worked
-out. A RAM dump around the item table at that point would then show the exact
-bytes.
+**To settle it:** capture a Dolphin save state just before the Firaga +2
+craft, on the version the guide uses. Row 4296 (result, price, materials,
+counts) and the row the second craft lands on can be read straight from
+MEM1. Writing down the gil right after the double craft narrows it down too.

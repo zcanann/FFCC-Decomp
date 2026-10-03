@@ -1,6 +1,6 @@
 # Literal values inside the image address range that are plain constants, not pointers.
 # "value unit" limits the entry to one unit.
-0x020000AC main  # multiboot header fields read by address in fn_02002218
-0x020000C4 main
-0x020000C5 main
-0x020000C8 main
+0x020000AC main/link  # multiboot header fields read by address in fn_02002218
+0x020000C4 main/link
+0x020000C5 main/link
+0x020000C8 main/link

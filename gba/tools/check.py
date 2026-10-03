@@ -73,8 +73,12 @@ def main():
     source = args.source.resolve()
     parts = source.relative_to(ROOT / "gba" / "src").parts
     program = parts[0]
-    unit = parts[1] if len(parts) > 2 else Path(parts[1]).stem
+    unit = Path(*parts[1:]).with_suffix("").as_posix()
     target = ROOT / "build" / "GCCP01" / "gba" / program / "obj" / f"{unit}.o"
+    if not target.exists() and len(parts) > 2:
+        # A directory can also represent an aggregate unit.
+        unit = parts[1]
+        target = ROOT / "build" / "GCCP01" / "gba" / program / "obj" / f"{unit}.o"
     if not target.exists():
         sys.exit(f"{target} missing; run ninja first")
 

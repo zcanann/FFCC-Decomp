@@ -63,12 +63,6 @@ PROGRAMS: Dict[str, Dict[str, Dict[str, str]]] = {
             "disc_path": "dvd/gba/ffcc_cli.bin",
             "sha1": "ec0579f21b9211f2fec4d17fe5943f23309c5f4c",
             "m4a_defines": "-DM4A_SOUND_FREQ=SOUND_MODE_FREQ_13379",
-            # Each source file's .rodata and .data stay separate sections
-            # (.rodata.<file>) in the unit's object, as splits.txt splits the
-            # target's data at the original objects' boundaries. objdiff then
-            # resolves section-relative relocations, such as pointers to string
-            # literals, against the same object-local symbols on both sides.
-            "object_data_sections": "1",
         },
         "gba_mgr": {
             "config": "mgr",
@@ -94,7 +88,15 @@ SOURCE_SUFFIXES = (".c", ".cpp", ".s")
 
 # Game units whose compiled source links into the checked image, per program.
 COMPLETE: Dict[str, List[str]] = {
-    "cli": ["crt0", "joy_reset", "m4a/m4a_1", "m4a/m4a"],
+    "cli": [
+        "crt0", "joy_reset", "m4a/m4a_1", "m4a/m4a",
+        "main/main", "main/xfer", "main/link", "main/text", "main/mode", "main/widget",
+        "main/artifact", "main/cmdlist", "main/family", "main/item", "main/letter", "main/menu",
+        "main/radar", "main/gil", "main/scouter", "main/smith", "main/favorite",
+        "main/tmpartifact", "main/msg", "main/textmask", "main/msg_sys", "main/msg_item",
+        "main/msg_monster", "main/backdrop_gfx", "main/m4a_tables", "main/sound_assets",
+        "main/sound_data", "main/sound_assets_2", "main/backdrop", "main/font_gfx",
+    ],
     "mgr": ["crt0", "main", "MgJoyBus", "obj", "effect", "camera", "field", "route", "text",
             "sound", "random", "sintable", "fixmath", "chunk", "param", "m4a_tables", "sound_data",
             "sound_assets", "m4a/m4a_1", "m4a/m4a", "joy_reset", "course", "menu_gfx", "obj_gfx",

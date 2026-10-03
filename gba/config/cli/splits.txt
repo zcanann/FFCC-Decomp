@@ -1,8 +1,83 @@
 crt0:
 	.text       start:0x02000000 end:0x0200025C
 
-main:
-	.text       start:0x0200025C end:0x0201AC90
+main/main:
+	.text       start:0x0200025C end:0x02001028
+
+main/xfer:
+	.text       start:0x02001028 end:0x0200168C
+
+main/radarmap:
+	.text       start:0x0200168C end:0x020020C0
+
+main/link:
+	.text       start:0x020020C0 end:0x02003338
+
+main/text:
+	.text       start:0x02003338 end:0x02003AA0
+
+main/obj:
+	.text       start:0x02003AA0 end:0x020043FC
+
+main/session:
+	.text       start:0x020043FC end:0x020050E8
+
+main/mode:
+	.text       start:0x020050E8 end:0x02005968
+
+main/window:
+	.text       start:0x02005968 end:0x020091D4
+
+main/widget:
+	.text       start:0x020091D4 end:0x02009FA4
+
+main/artifact:
+	.text       start:0x02009FA4 end:0x0200A7EC
+
+main/cmake:
+	.text       start:0x0200A7EC end:0x0200E184
+
+main/cmdlist:
+	.text       start:0x0200E184 end:0x0200F3C8
+
+main/family:
+	.text       start:0x0200F3C8 end:0x0200F778
+
+main/equip:
+	.text       start:0x0200F778 end:0x020105BC
+
+main/item:
+	.text       start:0x020105BC end:0x020112CC
+
+main/letter:
+	.text       start:0x020112CC end:0x02014354
+
+main/menu:
+	.text       start:0x02014354 end:0x0201476C
+
+main/radar:
+	.text       start:0x0201476C end:0x02014F4C
+
+main/gil:
+	.text       start:0x02014F4C end:0x0201583C
+
+main/scouter:
+	.text       start:0x0201583C end:0x02015E48
+
+main/shop:
+	.text       start:0x02015E48 end:0x02017EAC
+
+main/smith:
+	.text       start:0x02017EAC end:0x02019DA0
+
+main/favorite:
+	.text       start:0x02019DA0 end:0x0201A2BC
+
+main/tmpartifact:
+	.text       start:0x0201A2BC end:0x0201A6D4
+
+main/msg:
+	.text       start:0x0201A6D4 end:0x0201AC90
 
 m4a/m4a_1:
 	.text       start:0x0201AC90 end:0x0201B258
@@ -70,39 +145,161 @@ libgcc/_udivsi3:
 libgcc/_umodsi3:
 	.text       start:0x0201CB88 end:0x0201CC48
 
-main:
-	.rodata     start:0x0201CC48 end:0x0201CCF8
-	.rodata     start:0x0201CCF8 end:0x0201CD10
-	.rodata     start:0x0201CD10 end:0x0201CF14
-	.rodata     start:0x0201CF14 end:0x0201CF38
-	.rodata     start:0x0201CF38 end:0x0201CF40
-	.rodata     start:0x0201CF40 end:0x0201D044
-	.rodata     start:0x0201D044 end:0x0201D050
-	.rodata     start:0x0201D050 end:0x0201D054
-	.rodata     start:0x0201D054 end:0x0201D058
-	.rodata     start:0x0201D058 end:0x0201F614
-	.rodata     start:0x0201F614 end:0x0202702C
-	.rodata     start:0x0202702C end:0x02028768
-	.rodata     start:0x02028768 end:0x0202A1BC
-	.rodata     start:0x0202A1BC end:0x0202C4BC
-	.rodata     start:0x0202C4BC end:0x0202C620
-	.rodata     start:0x0202C620 end:0x0202F188
-	.rodata     start:0x0202F188 end:0x0202F2D8
-	.rodata     start:0x0202F2D8 end:0x0202FA20
-	.data       start:0x0202FA20 end:0x0202FA38
-	.data       start:0x0202FA38 end:0x0202FB94
-	.data       start:0x0202FB94 end:0x0202FBD0
-	.data       start:0x0202FBD0 end:0x0202FC3C
-	.data       start:0x0202FC3C end:0x02030B58
-	.data       start:0x02030B58 end:0x0203327C
-	.data       start:0x0203327C end:0x020341F4
-	.data       start:0x020341F4 end:0x02034678
-	.data       start:0x02034678 end:0x02034698
-	.data       start:0x02034698 end:0x02036EF0
+main/main:
+	.rodata     start:0x0201CC48 end:0x0201CCF6
 
-main:
-	.bss        start:0x03000000 end:0x03002990
+main/xfer:
+	.rodata     start:0x0201CCF8 end:0x0201CD10
+
+main/link:
+	.rodata     start:0x0201CD10 end:0x0201CF14
+
+main/textmask:
+	.rodata     start:0x0201CF14 end:0x0201CF38
+
+main/artifact:
+	.rodata     start:0x0201CF38 end:0x0201CF3D
+
+main/cmake:
+	.rodata     start:0x0201CF40 end:0x0201D042
+
+main/letter:
+	.rodata     start:0x0201D044 end:0x0201D04E
+
+main/shop:
+	.rodata     start:0x0201D050 end:0x0201D052
+
+main/smith:
+	.rodata     start:0x0201D054 end:0x0201D056
+
+main/msg_sys:
+	.rodata     start:0x0201D058 end:0x0201F612
+
+main/msg_item:
+	.rodata     start:0x0201F614 end:0x0202702A
+
+main/msg_monster:
+	.rodata     start:0x0202702C end:0x02028765
+
+main/msg:
+	.rodata     start:0x02028768 end:0x0202A1BB
+
+main/backdrop_gfx:
+	.rodata     start:0x0202A1BC end:0x0202C4BC
+
+main/m4a_tables:
+	.rodata     start:0x0202C4BC end:0x0202C620
+
+main/sound_assets:
+	.rodata     start:0x0202C620 end:0x0202F188
+
+main/sound_data:
+	.rodata     start:0x0202F188 end:0x0202F2D8
+
+main/sound_assets_2:
+	.rodata     start:0x0202F2D8 end:0x0202FA20
+
+main/obj:
+	.data       start:0x0202FA20 end:0x0202FA38
+
+main/mode:
+	.data       start:0x0202FA38 end:0x0202FB94
+
+main/cmake:
+	.data       start:0x0202FB94 end:0x0202FBD0
+
+main/letter:
+	.data       start:0x0202FBD0 end:0x0202FC3C
+
+main/msg_sys:
+	.data       start:0x0202FC3C end:0x02030B58
+
+main/msg_item:
+	.data       start:0x02030B58 end:0x0203327C
+
+main/msg_monster:
+	.data       start:0x0203327C end:0x020341F4
+
+main/msg:
+	.data       start:0x020341F4 end:0x02034678
+
+main/backdrop:
+	.data       start:0x02034678 end:0x02034698
+
+main/font_gfx:
+	.data       start:0x02034698 end:0x02036EF0
 
 bss:
 	.ewram_bss  start:0x02036EF0 end:0x02040003
+
+main/main:
+	.bss        start:0x03000000 end:0x03000011
+
+main/xfer:
+	.bss        start:0x03000018 end:0x03000054
+
+main/radarmap:
+	.bss        start:0x03000054 end:0x03000070
+
+main/link:
+	.bss        start:0x03000070 end:0x030008D8
+
+main/text:
+	.bss        start:0x030008D8 end:0x03001164
+
+main/obj:
+	.bss        start:0x03001168 end:0x03002750
+
+main/session:
+	.bss        start:0x03002750 end:0x03002771
+
+main/artifact:
+	.bss        start:0x03002774 end:0x0300277C
+
+main/cmake:
+	.bss        start:0x03002780 end:0x030027AD
+
+main/cmdlist:
+	.bss        start:0x030027B0 end:0x030027C0
+
+main/family:
+	.bss        start:0x030027C0 end:0x030027C2
+
+main/equip:
+	.bss        start:0x030027C4 end:0x030027C9
+
+main/item:
+	.bss        start:0x030027CC end:0x030027D6
+
+main/letter:
+	.bss        start:0x030027D8 end:0x030027F4
+
+main/menu:
+	.bss        start:0x030027F4 end:0x030027F6
+
+main/radar:
+	.bss        start:0x030027F8 end:0x030027F9
+
+main/gil:
+	.bss        start:0x030027FC end:0x0300280A
+
+main/scouter:
+	.bss        start:0x0300280C end:0x03002814
+
+main/shop:
+	.bss        start:0x03002814 end:0x0300281F
+
+main/smith:
+	.bss        start:0x03002820 end:0x03002840
+
+main/favorite:
+	.bss        start:0x03002840 end:0x0300284A
+
+main/tmpartifact:
+	.bss        start:0x0300284C end:0x03002850
+
+main/sound_data:
+	.bss        start:0x03002850 end:0x03002990
+
+bss:
 	.bss        start:0x03002990 end:0x030044C4

@@ -94,6 +94,12 @@ public:
     void CreateTempBuffer();
     void DestroyTempBuffer();
     CMemory::CStage* GetTempStage() { return m_scratchStage; }
+    _GXColor GetFogColor() { return m_fogColor; }
+    void GetFogParam(float& start, float& end)
+    {
+        start = m_fogStart;
+        end = m_fogEnd;
+    }
 
     CMemory::CStage* m_graphicStage;
     CMemory::CStage* m_scratchStage;

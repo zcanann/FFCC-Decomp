@@ -111,3 +111,55 @@ unknown.
 item table by its first row and read the block headers on either side. Each
 header names its source file and line, so the neighbours are easy to
 identify.
+
+## The double craft (partly confirmed)
+
+The [Lilty minimalist guide](https://rentry.co/4gioz) gets a free Ultima
+Lance when it wrong-crafts Firaga +2 at gil 4296: the craft window stays up
+and a second item appears. Gil 4296, 4545 and 4735 are all past the table's
+last row (1204), so those crafts read heap memory past the end of the table.
+
+### Why the window stays up (confirmed in code)
+
+- **GameCube:** `SetSmithData` sends an error reply if `AddItem` fails or if
+  `AddGil` returns 0. `AddGil` returns the amount it actually changed, so a
+  **price of 0 counts as a failure**. A success reply is then sent anyway
+  ([gbaque.cpp:946-957](../../src/gbaque.cpp#L946-L957)). A zero-price craft
+  gives the item and sends **error, then success**.
+- **GBA:** `Reply_Set` keeps only the latest reply
+  ([xfer.c:248](../../gba/src/cli/main/xfer.c#L248)). The forge checks once per
+  frame. On success it moves on; on an error it plays the error sound and
+  **stays on the confirm prompt**
+  ([smith.c:398](../../gba/src/cli/main/smith.c#L398)). If both replies land in
+  the same GBA frame, the success wins and nothing odd happens. If they land a
+  frame apart, the window stays up. That's timing luck, which fits it being
+  rare.
+- A reply timeout (30 GBA frames without an answer) also leaves the window up.
+
+The guide's own gil math shows the Dreamcatcher and Sun Pendant rows also cost
+0. So those crafts can hit the same split; it just didn't happen in the runs
+the guide is based on.
+
+### Where the second item comes from (hypothesis)
+
+With the window still up, the cursor is on "Yes". The next A press sends the
+same request, which reads the gil slot again. By then the first craft has set
+gil to 65,535 − price × rate.
+
+- **If the first craft cost 0:** gil is 65,535, which is row −1. That reads the
+  heap block header in front of the table. The Lilty result there is a byte of
+  the source name `cflat_data.cpp`, which is 0, so you'd get `DUMMY-US`, not
+  an Ultima Lance.
+- **If it timed out instead and cost something:** with the guide's rate of 90%
+  (Crystal Mail cost 450 instead of 500), gil can't drop below 6,554. So the
+  second craft reads a row at least 6,554, deep in the heap, where a value of
+  31 (Ultima Lance) would be chance.
+
+Neither explanation is clean. The guide is also for the JP version, which
+isn't decompiled.
+
+**To settle it:** note the GameCube gil (or the GBA gil after a resync)
+immediately after the double craft, and whether a third A press crafts again.
+From that gil and the price rule, the row of the second craft can be worked
+out. A RAM dump around the item table at that point would then show the exact
+bytes.

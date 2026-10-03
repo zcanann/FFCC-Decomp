@@ -771,9 +771,9 @@ config.libs = [
             Object(NonMatching, "ringmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "shopmenu.cpp"),
             Object(NonMatching, "singmenu.cpp", extra_cflags=["-pool off"]),
-            Object(NonMatching, "sound.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-str reuse,nopool,readonly", "-sdata 8"]),
+            Object(Matching, "sound.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-str reuse,nopool,readonly", "-sdata 8"]),
             Object(Matching, "stopwatch.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
-            Object(NonMatching, "system.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
+            Object(Matching, "system.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "texanim.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,nopool,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "textureman.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on", "-sdata 8", "-str reuse,nopool,readonly"]),
             Object(
@@ -789,7 +789,7 @@ config.libs = [
             Object(Matching, "USBStreamData.cpp"),
             Object(Matching, "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "vector.cpp"),
-            Object(NonMatching, "wind.cpp"),
+            Object(Matching, "wind.cpp"),
             Object(NonMatching, "wm_menu.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
             # Retail addresses local message tables separately and stores literals read-only.
             Object(Matching, "wmm_str.cpp", extra_cflags=["-str reuse,readonly", "-pooldata off", "-inline auto,deferred"]),

@@ -486,7 +486,6 @@ void CWind::Frame()
     u32 rnd;
     float f0;
     float f1;
-    float f2;
 
     obj = m_objects;
     i = 0;
@@ -495,14 +494,7 @@ void CWind::Frame()
         if (obj->flagBits.active != 0) {
             rnd = Math.Rand(10);
             if (rnd == 0) {
-                rnd = Math.Rand(3);
-                if (rnd == 0) {
-                    f2 = kWindHalf;
-                } else {
-                    f2 = kWindQuarterNegative;
-                }
-
-                obj->targetPower = f2 * obj->basePower + obj->targetPower;
+                obj->targetPower += obj->basePower * (((rnd = Math.Rand(3)) == 0) ? kWindHalf : kWindQuarterNegative);
                 f0 = obj->targetPower;
                 f1 = kWindZero;
                 f1 = (f0 < f1) ? f1 : ((obj->basePower < f0) ? obj->basePower : f0);

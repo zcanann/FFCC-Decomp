@@ -61,14 +61,6 @@ extern const unsigned char s_systemDebugResources[0x194] = {
     0x00, 0x00, 0x00, 0x00, 0x95, 0x82, 0x93, 0xAE, 0x8F, 0xAC, 0x90, 0x94,
     0x93, 0x5F, 0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00,
 };
-static const char s_system_cpp[12] = "system.cpp";
-static const char s_gamePalM_map[16] = "gamePalM.map";
-static const char s_compilerMapLoaded[] =
-    "\203\122\203\223\203\160\203\103\203\211\202\314\155\141\160\217\356"
-    "\225\361\202\360\147\141\155\145\120\141\154\115\056\155\141\160\202"
-    "\251\202\347\223\307\202\335\215\236\202\335\202\334\202\265\202\275"
-    "\201\102\012";
-extern const char s_systemTemplateDebug[28] = "systemTemplateDebug\n";
 
 /*
  * --INFO--
@@ -91,6 +83,20 @@ void OSPanic(const char* file, int line, const char* msg, ...)
 void CSystem::errorHandler(unsigned short, OSContext*, unsigned long, unsigned long)
 {
 	return;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 72b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void systemTemplateDebug()
+{
+    System.Printf("systemTemplateDebug\n");
 }
 /*
  * --INFO--
@@ -152,7 +158,7 @@ void CSystem::Init()
     {
         m_mapStage = (CStage*)Memory.CreateStage(0x400000, "CSystem", 1);
         unsigned int count;
-        CFile::CHandle* fileHandle = File.Open(const_cast<char*>(s_gamePalM_map), 0, CFile::PRI_LOW);
+        CFile::CHandle* fileHandle = File.Open("gamePalM.map", 0, CFile::PRI_LOW);
         if (fileHandle != (CFile::CHandle*)0)
         {
             unsigned int remaining;
@@ -162,7 +168,7 @@ void CSystem::Init()
             mapSize = File.GetLength(fileHandle);
             m_mapSize = mapSize;
             remaining = mapSize;
-            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, const_cast<char*>(s_system_cpp), 0x123) unsigned char[mapSize];
+            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, "system.cpp", 0x123) unsigned char[mapSize];
             for (offset = 0; (int)remaining != 0; remaining -= count)
             {
                 if (remaining >= 0x100000)
@@ -182,7 +188,10 @@ void CSystem::Init()
                 offset += count;
             }
             File.Close(fileHandle);
-            Printf(const_cast<char*>(s_compilerMapLoaded));
+            Printf("\203\122\203\223\203\160\203\103\203\211\202\314\155\141\160\217\356"
+                   "\225\361\202\360\147\141\155\145\120\141\154\115\056\155\141\160\202"
+                   "\251\202\347\223\307\202\335\215\236\202\335\202\334\202\265\202\275"
+                   "\201\102\012");
         }
     }
 }
@@ -259,7 +268,7 @@ void CSystem::ExecScenegraph()
 
         if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.m_gameWork.m_gamePaused)
         {
-            Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x219);
+            Graphic._WaitDrawDone("system.cpp", 0x219);
             Game.m_gameWork.m_gamePaused = Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag;
             if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag == 1)
             {
@@ -433,7 +442,7 @@ void CSystem::ExecScenegraph()
                 watch.Start();
                 if (perfEnabled != 0)
                 {
-                    Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x2CA);
+                    Graphic._WaitDrawDone("system.cpp", 0x2CA);
                     GXReadGP0Metric();
                     GXReadGP1Metric();
                 }
@@ -454,7 +463,7 @@ void CSystem::ExecScenegraph()
         m_frameCounter++;
     } while (m_exitFlag == 0);
 
-    Graphic._WaitDrawDone(const_cast<char*>(s_system_cpp), 0x2F6);
+    Graphic._WaitDrawDone("system.cpp", 0x2F6);
 }
 /*
  * --INFO--

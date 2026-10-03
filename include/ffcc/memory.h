@@ -169,7 +169,7 @@ public:
     void AmemPrev();
     short GetFree();
     int GetData(short, char*, int);
-    int SetData(void*, int, CAmemCache::TYPE, int);
+    short SetData(void*, int, CAmemCache::TYPE, int);
     int IsEnable(short);
     void AddRef(short);
     void Release(short);

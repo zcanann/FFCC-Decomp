@@ -18,6 +18,28 @@ STATIC_ASSERT(sizeof(FavoListStorage) == 0x1008);
 STATIC_ASSERT(sizeof(FoodRank) == 4);
 STATIC_ASSERT(sizeof(s_rank) == 0x20);
 
+static inline void FavoDrawWindow(FavoEntry* entry, float x, float y, float w, float h, float u, float v, GXColor* colors)
+{
+	if (entry->tex == 0x32) {
+		int yStep = static_cast<int>(y);
+		float end = y + h;
+		while (static_cast<float>(yStep) < end) {
+			int tileH;
+			if (end - static_cast<float>(yStep) >= 32.0f) {
+				tileH = 0x20;
+			} else {
+				tileH = static_cast<int>(end - static_cast<float>(yStep));
+			}
+			MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
+			                 w, static_cast<float>(tileH), u, v, colors, entry->uvScale, 1.0f, 0.0f);
+			yStep += 0x20;
+		}
+	} else {
+		MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
+		                 entry->uvScale, 1.0f, 0.0f);
+	}
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80162360
@@ -32,9 +54,6 @@ void CMenuPcs::FavoDraw()
 	FavoEntry* entry;
 	CFont* font;
 	int i;
-	FoodRank* rankBase;
-	FavoEntry* drawEntry;
-	FoodRank* rank;
 	float x;
 	float y;
 	float w;
@@ -81,24 +100,7 @@ void CMenuPcs::FavoDraw()
 
 				w = entry->alpha * w;
 				if (w > 0.0f) {
-					if (entry->tex == 0x32) {
-						int yStep = static_cast<int>(y);
-						float end = y + h;
-						while (static_cast<float>(yStep) < end) {
-							int tileH;
-							if (end - static_cast<float>(yStep) >= 32.0f) {
-								tileH = 0x20;
-							} else {
-								tileH = static_cast<int>(end - static_cast<float>(yStep));
-							}
-							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-							                 w, static_cast<float>(tileH), u, v, colors, entry->uvScale, 1.0f, 0.0f);
-							yStep += 0x20;
-						}
-					} else {
-						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
-						                 entry->uvScale, 1.0f, 0.0f);
-					}
+					FavoDrawWindow(entry, x, y, w, h, u, v, colors);
 
 					u += w;
 					x += w * entry->uvScale;
@@ -115,24 +117,7 @@ void CMenuPcs::FavoDraw()
 					colors[3].a = 0;
 					w = 1.0 / entry->duration;
 					w = w * entry->w;
-					if (entry->tex == 0x32) {
-						int yStep = static_cast<int>(y);
-						float end = y + h;
-						while (static_cast<float>(yStep) < end) {
-							int tileH;
-							if (end - static_cast<float>(yStep) >= 32.0f) {
-								tileH = 0x20;
-							} else {
-								tileH = static_cast<int>(end - static_cast<float>(yStep));
-							}
-							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-							                 w, static_cast<float>(tileH), u, v, colors, entry->uvScale, 1.0f, 0.0f);
-							yStep += 0x20;
-						}
-					} else {
-						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, w, h, u, v, colors,
-						                 entry->uvScale, 1.0f, 0.0f);
-					}
+					FavoDrawWindow(entry, x, y, w, h, u, v, colors);
 				}
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -156,29 +141,20 @@ void CMenuPcs::FavoDraw()
 		}
 	}
 
-	rankBase = s_rank;
-	drawEntry = entry;
-	rank = rankBase;
 	for (i = 0; i < 8; i++) {
-		int barX = static_cast<int>(static_cast<float>(drawEntry->x + drawEntry->w + 0x18));
-		float barHalfH = static_cast<float>(drawEntry->h) - 24.0f;
-		float barYf = static_cast<float>(drawEntry->y);
+		int barX = static_cast<int>(static_cast<float>(entry[i].x + entry[i].w + 0x18));
+		float barHalfH = static_cast<float>(entry[i].h) - 24.0f;
+		float barYf = static_cast<float>(entry[i].y);
 		int barY = static_cast<int>(static_cast<float>(barHalfH / 2.0 + barYf));
-		DrawSingBar(barX, barY, rank->score, drawEntry->alpha);
-		drawEntry++;
-		rank++;
+		DrawSingBar(barX, barY, s_rank[i].score, entry[i].alpha);
 	}
 
-	rank = rankBase;
-	drawEntry = entry;
 	for (i = 0; i < 8; i++) {
-		int iconX = static_cast<int>(static_cast<float>(drawEntry->x + drawEntry->w - 0x10));
-		float iconHalfH = static_cast<float>(drawEntry->h) - 32.0f;
-		float iconYf = static_cast<float>(drawEntry->y);
+		int iconX = static_cast<int>(static_cast<float>(entry[i].x + entry[i].w - 0x10));
+		float iconHalfH = static_cast<float>(entry[i].h) - 32.0f;
+		float iconYf = static_cast<float>(entry[i].y);
 		int iconY = static_cast<int>(static_cast<float>(iconHalfH / 2.0 + iconYf));
-		DrawSingleIcon(static_cast<char>(rank->foodId) + 0x14, iconX, iconY, drawEntry->alpha, 1, 1.0f);
-		drawEntry++;
-		rank++;
+		DrawSingleIcon(static_cast<char>(s_rank[i].foodId) + 0x14, iconX, iconY, entry[i].alpha, 1, 1.0f);
 	}
 
 	font = m_fonts[0];
@@ -187,22 +163,18 @@ void CMenuPcs::FavoDraw()
 	font->DrawInit();
 
 	memset(textBuf, 0, sizeof(textBuf));
-	rank = rankBase;
-	drawEntry = entry;
 	for (i = 0; i < 8; i++) {
 		font->SetTlut(6);
-		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
-		x = static_cast<float>(drawEntry->x - 0xC);
-		y = static_cast<float>(drawEntry->y + 0xA);
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry[i].alpha)).color);
+		x = static_cast<float>(entry[i].x - 0xC);
+		y = static_cast<float>(entry[i].y + 0xA);
 		font->renderFlags.fixedWidth = 1;
 		font->SetMargin(1.0f);
-		sprintf(textBuf, "%d", static_cast<int>(rank->place));
+		sprintf(textBuf, "%d", static_cast<int>(s_rank[i].place));
 		font->SetPosX(x);
 		font->SetPosY(y - 4.0f);
 		font->Draw(textBuf);
 		font->SetShadow(0);
-		drawEntry++;
-		rank++;
 	}
 
 	font = m_fonts[4];
@@ -212,17 +184,15 @@ void CMenuPcs::FavoDraw()
 	font->DrawInit();
 	memset(textBuf, 0, sizeof(textBuf));
 
-	rank = rankBase;
 	for (i = 0; i < 8; i++) {
 		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry->alpha)).color);
-		const char* name = Game.m_cFlatDataArr[1].TableStrings(0)[(static_cast<char>(rank->foodId) + 0x17D) * 5 + 4];
+		const char* name = Game.m_cFlatDataArr[1].TableStrings(0)[(static_cast<char>(s_rank[i].foodId) + 0x17D) * 5 + 4];
 		y = static_cast<float>(entry->y + 0xB);
 		x = static_cast<float>(entry->x + 0x1C);
 		font->SetPosX(x);
 		font->SetPosY(y - 4.0f);
 		font->Draw(const_cast<char*>(name));
 		entry++;
-		rank++;
 	}
 
 	DrawInit();
@@ -478,8 +448,8 @@ void CMenuPcs::FavoInit()
 {
 	int i;
 	int idx;
-	int index;
 	FavoEntry* entry;
+	int index;
 	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 
 	memset(m_favoList, 0, sizeof(*m_favoList));
@@ -603,15 +573,13 @@ void CMenuPcs::FavoInit()
 		}
 	}
 
-	int place = 0;
-	i = 0;
-	do {
+	int place;
+	for (i = place = 0; i < 8; i++) {
 		if ((i != 0) && (s_rank[i - 1].score != s_rank[i].score)) {
 			place = i;
 		}
 		s_rank[i].place = place + 1;
-		i++;
-	} while (i < 8);
+	}
 
 	m_singMenuState->selectedIndex = 0;
 	m_singMenuState->initialized = 1;

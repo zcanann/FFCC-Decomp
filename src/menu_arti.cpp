@@ -273,7 +273,7 @@ void CMenuPcs::ArtiDraw()
 	textEntry = entry;
 	for (i = 0; i < 8; i++) {
 		float colorMax = kArtiColorMax;
-		u8 alpha = (u8)(colorMax * textEntry->alpha);
+		u8 alpha = (u8)(colorMax * entry->alpha);
 		int menuIndex = i + m_artiState->scrollOffset;
 		listFont->SetColor(CColor(0xFF, 0xFF, 0xFF, alpha).color);
 

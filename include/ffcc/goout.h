@@ -39,10 +39,10 @@ public:
     void SetMenuForceClose();
     void CalcLoadMenu();
     void SetMainMode(unsigned char);
-    void SelectYesNo(int, int, int);
+    unsigned char SelectYesNo(int, int, int);
     void InitSelectYesNo();
-    void HitAnyKey();
-    void HitCanncel();
+    bool HitAnyKey();
+    bool HitCanncel();
     void Init();
     void Destroy();
     void SetGoOutMode(unsigned char);

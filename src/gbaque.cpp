@@ -2462,10 +2462,10 @@ void GbaQueue::LoadMapObj()
 					unsigned int drawMask = drawFlag != 0 ? mask : 0;
 					mask = ~mask;
 					mapObjWork.m_entries[count].m_type = static_cast<unsigned char>(mapObj->m_type);
-					mapObjWork.m_entries[count].m_x = static_cast<short>(static_cast<int>(mapObj->m_x / 3.0f));
-					mapObjWork.m_entries[count].m_y = static_cast<short>(static_cast<int>(mapObj->m_y / 3.0f));
-					mapObjWork.m_entries[count].m_z = static_cast<short>(static_cast<int>(mapObj->m_z / 3.0f));
-					mapObjWork.m_entries[count].m_radius = static_cast<short>(static_cast<int>(mapObj->m_radius / 3.0f));
+					mapObjWork.m_entries[count].m_x = static_cast<short>(mapObj->m_x / 3.0f);
+					mapObjWork.m_entries[count].m_y = static_cast<short>(mapObj->m_y / 3.0f);
+					mapObjWork.m_entries[count].m_z = static_cast<short>(mapObj->m_z / 3.0f);
+					mapObjWork.m_entries[count].m_radius = static_cast<short>(mapObj->m_radius / 3.0f);
 
 					mapObjWork.m_drawFlags = (mapObjWork.m_drawFlags & mask) | drawMask;
 					mapObjWork.m_count = static_cast<unsigned char>(mapObjWork.m_count + 1);

@@ -46,6 +46,23 @@ Requirements:
   in `splits.txt` build from it and always link.
 - `include/`: shared headers.
 
+The client game files are separate units under `gba/cli/main/`, so a fully
+matched file can link independently of the remaining holdouts. For example:
+
+```sh
+python gba/tools/check.py gba/src/cli/main/main.c AgbMain
+```
+
+Their section boundaries follow the compiled objects' sizes and alignments,
+checked against the recovered symbol addresses and retail image. These are
+reconstructed units; no original GBA MAP is available. Gaps between objects are
+linker padding and are excluded from the per-unit data totals. Unclaimed common
+storage remains in the separate `bss` unit.
+
+The client's fixed download workspace occupies `0x02038000–0x02040000`, as
+bounded by `Xfer_Receive`. It remains an anonymous reservation; the gap between
+the loaded image and that workspace is not counted as a source object.
+
 ## Layout
 
 - `config/<program>/symbols.txt`: symbol names, addresses, sizes; `thumb` marks Thumb functions.

@@ -1268,7 +1268,7 @@ void CMapObj::Draw(unsigned char priority)
         GXSetZMode(1, GX_LEQUAL, 1);
     }
     if (0.0f != m_zBufferOffset) {
-        CameraPcs.SetOffsetZBuff(m_zBufferOffset);
+        CameraPcs.SetOffsetZBuff(0.0f);
     }
 }
 
@@ -1371,8 +1371,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         localCylinder.m_radius = cylinder->m_radius;
         localCylinder.CalcBound();
 
-        CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-        if (mapHit->m_bound.CheckCross(localCylinder.m_bound)) {
+        if (reinterpret_cast<CMapHit*>(m_mapData)->m_bound.CheckCross(localCylinder.m_bound)) {
             Vec localMove;
             PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &localCylinder.m_axis);
             PSMTXMultVecSR(inverseMtx, move, &localMove);
@@ -1408,8 +1407,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         localCylinder.m_radius = cylinder->m_radius;
         localCylinder.CalcBound();
 
-        CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-        if (mapHit->m_bound.CheckCross(localCylinder.m_bound)) {
+        if (reinterpret_cast<CMapHit*>(m_mapData)->m_bound.CheckCross(localCylinder.m_bound)) {
             PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &localCylinder.m_axis);
             PSMTXMultVecSR(inverseMtx, move, &localMove);
             reinterpret_cast<CMapHit*>(m_mapData)->CheckHitCylinderNear(&localCylinder, &localMove, mask);

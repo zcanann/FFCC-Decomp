@@ -161,13 +161,12 @@ inline int SearchIndex(PBreathModel* pBreathModel, VBreathModel* vBreathModel, s
 
     for (g = 0; g < pBreathModel->m_groupCount; g++) {
         for (s = 0; s < pBreathModel->m_slotCount; s++) {
-            if ((int)particleIndex == (int)groupTable->particleIndices[s]) {
+            if ((int)particleIndex == (int)groupTable[g].particleIndices[s]) {
                 groupIndex = g;
                 slotIndex = s;
                 return true;
             }
         }
-        groupTable++;
     }
 
     return false;

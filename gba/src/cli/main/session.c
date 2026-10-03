@@ -14,6 +14,7 @@ struct CaravanNames {
     s8 slotMap[4];
 };
 
+struct Session gSession;
 extern struct CaravanNames gCaravanNames;
 static u32 sMapObjDrawFlagsIn;
 static u16 sBasePos[2];

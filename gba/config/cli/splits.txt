@@ -303,4 +303,10 @@ main/sound_data:
 	.bss        start:0x03002850 end:0x03002990
 
 bss:
-	.bss        start:0x03002990 end:0x030044D0
+	.bss        start:0x03002990 end:0x03002CA0
+
+main/session:
+	.common     start:0x03002CA0 end:0x03002DCC align:16
+
+bss:
+	.bss        start:0x03002DCC end:0x030044D0

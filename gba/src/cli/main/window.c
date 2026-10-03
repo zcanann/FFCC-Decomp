@@ -1977,16 +1977,16 @@ void Window_CloseStyle14(struct Window *win)
 {
     s32 px;
     s32 py;
-    s32 last;
+    s32 coord;
     s32 i;
     s32 n;
     u32 flags;
 
-    n = win->x;
-    px = n * 8;
+    coord = win->x;
+    px = coord * 8;
     n = win->y;
-    last = win->height - 1;
-    py = (last + n) * 8 - win->anim;
+    coord = win->height - 1;
+    py = (coord + n) * 8 - win->anim;
     if (py >> 3 > win->y) {
         Bg_FillBlank(win->bg, win->x, py >> 3, win->width, 1);
         if ((py >> 3) - 1 <= win->y)

@@ -8,6 +8,8 @@
 #include "window.h"
 #include "screen.h"
 
+struct CMakeData gCMakeData;
+
 static s8 sCMakeResult;
 static s8 sCMakeCursor[2];
 static s8 sCMakeBirthday[2];

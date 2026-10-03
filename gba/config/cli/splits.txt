@@ -315,10 +315,16 @@ main/session:
 	.common     start:0x03002CA0 end:0x03002DD0 align:16
 
 bss:
-	.bss        start:0x03002DD0 end:0x030030B0
+	.bss        start:0x03002DD0 end:0x03002FB0
 
-main/mode:
-	.common     start:0x030030B0 end:0x030032E0 align:16
+main/cmake:
+	.common     start:0x03002FB0 end:0x03002FCC align:16
 
 bss:
-	.bss        start:0x030032E0 end:0x030044D0
+	.bss        start:0x03002FD0 end:0x030030B0
+
+main/mode:
+	.common     start:0x030030B0 end:0x030032E8 align:16
+
+bss:
+	.bss        start:0x030032E8 end:0x030044D0

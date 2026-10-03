@@ -106,7 +106,7 @@ s32 MsgBox_Close(void)
 
 void CMake_Reset(void)
 {
-    memset(&gCMakeData, 0, 28);
+    memset(&gCMakeData, 0, sizeof(gCMakeData));
     gCMakeData.favorites[0] = 0x10;
     gCMakeData.favorites[1] = 0x32;
     gCMakeData.favorites[2] = 0x54;

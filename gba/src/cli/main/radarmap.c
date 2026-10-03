@@ -219,8 +219,9 @@ void Radar_ScrollMap(s32 dx, s32 dy)
     s32 c;
     s32 r;
     s32 col;
+    s32 row;
     u32 u;
-    s32 fine;
+    s32 tmp;
     s32 oldFine;
     s32 cnt;
     u16 v;
@@ -241,9 +242,9 @@ void Radar_ScrollMap(s32 dx, s32 dy)
     mapW = sMapHeader->width >> 3;
     mapH = sMapHeader->height >> 3;
 
-    fine = sMapScrollX & 7;
+    tmp = sMapScrollX & 7;
     oldFine = oldX & 7;
-    if (dx != 0 && ((oldFine <= 3 && fine > 3) || (oldFine > 4 && fine <= 4))) {
+    if (dx != 0 && ((oldFine <= 3 && tmp > 3) || (oldFine > 4 && tmp <= 4))) {
         if (dx < 0)
             c = tx - 1;
         else
@@ -252,12 +253,14 @@ void Radar_ScrollMap(s32 dx, s32 dy)
         for (i = 0; i < ty - 1 && i < mapH; i++)
             k += sMapRowLen[i];
         data = sMapData + k;
-        n = (ty - 1) % 32;
-        if (n < 0)
-            n += 32;
-        dst = 0x0600F000 + n * 64;
-        col = c % 32;
-        if (col < 0)
+        tmp = (ty - 1) % 32;
+        row = tmp;
+        if (tmp < 0)
+            row += 32;
+        dst = 0x0600F000 + row * 64;
+        tmp = c % 32;
+        col = tmp;
+        if (tmp < 0)
             col += 32;
         dst += col * 2;
         for (i = -1; i <= 16; i++) {
@@ -293,9 +296,9 @@ void Radar_ScrollMap(s32 dx, s32 dy)
         }
     }
 
-    fine = sMapScrollY & 7;
+    tmp = sMapScrollY & 7;
     oldFine = oldY & 7;
-    if (dy != 0 && ((oldFine <= 3 && fine > 3) || (oldFine > 4 && fine <= 4))) {
+    if (dy != 0 && ((oldFine <= 3 && tmp > 3) || (oldFine > 4 && tmp <= 4))) {
         if (dy < 0)
             r = ty - 1;
         else
@@ -327,20 +330,22 @@ void Radar_ScrollMap(s32 dx, s32 dy)
             else
                 out[i + 1] = line[i + tx];
         }
-        n = r % 32;
-        if (n < 0)
-            n += 32;
-        dst = 0x0600F000 + n * 64;
-        col = (tx - 1) % 32;
-        if (col < 0)
+        tmp = r % 32;
+        row = tmp;
+        if (tmp < 0)
+            row += 32;
+        dst = 0x0600F000 + row * 64;
+        tmp = (tx - 1) % 32;
+        col = tmp;
+        if (tmp < 0)
             col += 32;
         dst += col * 2;
         if (col + 23 <= 32) {
             DmaCopy16(0, out, dst, 23 * 2);
         } else {
-            n = 32 - col;
-            DmaCopy16(0, out, dst, n << 1);
-            DmaCopy16(0, out + n, dst - col * 2, (23 - n) << 1);
+            tmp = 32 - col;
+            DmaCopy16(0, out, dst, tmp << 1);
+            DmaCopy16(0, out + tmp, dst - col * 2, (23 - tmp) << 1);
         }
     }
 }

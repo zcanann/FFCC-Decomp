@@ -100,667 +100,154 @@ STATIC_ASSERT(offsetof(CGObject, m_lifeTimer) == 0x94);
 
 /*
  * --INFO--
- * PAL Address: 0x80124b78
- * PAL Size: 8b
+ * PAL Address: 0x80126f94
+ * PAL Size: 116b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGItemObj::GetCID()
+void CGItemObj::onCreate()
 {
-	return 0x1d;
+	CGPrgObj::onCreate();
+	m_flagBits.bits.unk0 = 0;
+	m_owner = 0;
+	m_scriptArg = 0;
+	m_createFlags = 0;
+	unk_0x562 = 0;
+	m_pendingModelHandle = 0;
+	m_itemJumpCountdown = 0;
+	memset(&m_memoryCapsuleNameIndex, 0,
+	       sizeof(m_memoryCapsuleNameIndex) + sizeof(m_pendingAnimFlags) + sizeof(m_pendingAnimName));
+	m_particleSlot = ItemCFlatRuntime()->GetFreeParticleSlot();
 }
+
 /*
  * --INFO--
- * PAL Address: 0x80124b80
- * PAL Size: 8b
+ * PAL Address: 0x80126f3c
+ * PAL Size: 88b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGPrgObj::getReplaceStat(int state)
+void CGItemObj::onDestroy()
 {
-	return state;
+	if (m_pendingModelHandle != 0) {
+		delete m_pendingModelHandle;
+	}
+
+	ItemCFlatRuntime()->DeleteParticleSlot(m_particleSlot, 0);
+	CGPrgObj::onDestroy();
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80124b88
- * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::DispAllFieldItem(int show)
-{
-	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
-	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
-		if (itemObj->m_owner == 0 &&
-		    itemObj->m_stateFlags0Bits.unk4 != 0) {
-			if (show != 0) {
-				itemObj->m_displayFlags &= 0xffbfffff;
-			} else {
-				itemObj->m_displayFlags |= 0x400000;
-			}
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124c2c
- * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::DeleteAllFieldItem()
-{
-	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
-	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
-		if (itemObj->m_owner == 0 &&
-		    itemObj->m_stateFlags0Bits.unk4 != 0) {
-			itemObj->CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124cb8
- * PAL Size: 332b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::ItemJump(int state, float jump)
-{
-	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
-	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
-		CGObject* object = itemObj;
-
-		if ((object->m_objectFlags & 0x10) == 0) {
-			Vec bottom = object->m_worldPosition;
-			bottom.y += kItemObjHeightOffset;
-			Vec move;
-
-			move.x = kItemObjZero;
-			move.z = kItemObjZero;
-			move.y = kItemObjGroundProbeDown;
-			unsigned int mapMask = object->m_bgHitMask;
-			CMapCylinder cylinder;
-			cylinder.m_bottom = bottom;
-			cylinder.m_axis.x = kItemObjZero;
-			cylinder.m_axis.y = kItemObjGroundProbeDown;
-			cylinder.m_axis.z = kItemObjZero;
-			cylinder.m_radius = kItemObjZero;
-
-			if (MapMng.CheckHitCylinderNear(&cylinder, &move, mapMask) != 0 &&
-			    g_hit_f->m_groupIndex == state) {
-				object->m_groundHitOffset.y += jump;
-			}
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124e04
- * PAL Size: 424b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::DrawOmoideName(CFont* font)
-{
-	if (m_weaponNodeFlagBits.m_unk20 != 0) {
-		CCharaPcs::CHandle* charaHandle = m_charaModelHandle;
-		bool hasModel = false;
-		if (charaHandle != 0 && charaHandle->m_model != 0) {
-			hasModel = true;
-		}
-
-		if (hasModel && m_worldParamA == 0xCB && 0.0f < m_screenDepth &&
-		    0.0f != m_currentAlpha) {
-			font->SetTlut(7);
-
-			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * m_currentAlpha).color);
-
-			const char* name = Game.m_cFlatDataArr[1].TableStrings(2)[m_memoryCapsuleNameIndex];
-			float width = font->GetWidth(name);
-			float depthScale = kItemObjUnitScale / (m_screenDepth - kItemObjHeightOffset);
-			float posY = 224.0f - 224.0f * m_projection.z * depthScale;
-			float posZ = m_projection.w * depthScale;
-			float posX =
-			    -(0.5f * width - (320.0f * m_projection.y * depthScale + 320.0f));
-
-			font->SetPosX(posX);
-			font->SetPosY(posY - 11.0f);
-			font->SetPosZ(posZ);
-			font->Draw(name);
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124fac
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::onNewFinished()
-{
-	m_savedBodyRadius = m_bodyEllipsoidRadius;
-	m_createFlags = static_cast<u16>((g_tempFlag >> 3) & 1);
-	loadModel();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124FE0
- * PAL Size: 700b
- * EN Address: 0x80146A20
- * EN Size: 892b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::loadModel()
-{
-	int modelNo = -1;
-	int modelVariant = 0;
-	int modelFlag = 0;
-	unsigned long animFlags = (unsigned long)-1;
-	char* standAnim = const_cast<char*>(sStandAnim);
-	int useParticleTable = 1;
-	int itemType = m_worldParamA;
-
-	switch (itemType) {
-	case 0xA:
-		modelNo = 8;
-		useParticleTable = 0;
-		break;
-	case 0xC:
-		modelNo = 0x27;
-		useParticleTable = 0;
-		break;
-	case 0xD:
-		modelNo = 0x33;
-		useParticleTable = 0;
-		break;
-	case 0xE:
-		modelNo = 0x33;
-		modelVariant = 1;
-		useParticleTable = 0;
-		break;
-	case 0x12:
-	case 0x13:
-	case 0x14:
-	case 0x15:
-	case 0x16:
-	case 0x17:
-	case 0x1F:
-	case 0x20:
-	case 0x21:
-	case 0x24: {
-		const SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
-		int itemEntry = itemRows[m_worldParamB].m_model;
-
-		m_ownerSlot = 1;
-		modelNo = itemEntry & 0xFFF;
-		modelVariant = itemEntry >> 0xC;
-		m_stateFlags0Bits.unk4 = 1;
-		m_lifeTimer = 0x1194;
-		animFlags = 0x12;
-		modelFlag = 1;
-		break;
-	}
-	case 0xCB:
-	default:
-		break;
-	}
-
-	if (modelNo >= 0) {
-		LoadModel(3, modelNo, modelVariant, modelFlag);
-		LoadAnim(standAnim, 0, 0, 3, animFlags);
-		SetAnimSlot(0, 0);
-		PlayAnim(0, 1, 0, -1, -1, 0);
-	}
-
-	if (m_worldParamA == 0x12) {
-		DispCharaParts(0);
-		m_stateFlags0Bits.unk3 = 1;
-	}
-
-	if (useParticleTable != 0) {
-		for (int i = 0; i < 3; i++) {
-			if (i != 0 || m_createFlags != 1) {
-				const SItemFlatRow* itemRow = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[m_worldParamB];
-				int particleNo = itemRow->m_particles[i];
-
-				if (particleNo != 0xFFFF) {
-					const float& particleScaleStep = kItemObjFineStep;
-					const float& particleScaleBase = kItemObjParticleScaleBase;
-					float particleScale =
-					    particleScaleStep * static_cast<float>(itemRow->m_fineValue) + particleScaleBase;
-					putParticle(particleNo | 0x100, m_particleSlot, this, particleScale, 0);
-				}
-			}
-		}
-	}
-
-	if (m_worldParamA == 0xCB) {
-		const float& randBase = kItemObjMotionStep;
-		const float& randRange = kItemObjParticleRandomRange;
-		m_moveTimer = randBase - Math.RandF(randRange);
-		m_weaponNodeFlagBits.m_unk04 = 0;
-	}
-
-	m_flagBits.bits.unk0 = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012529C
- * PAL Size: 556b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* hitParam)
-{
-	int worldParamA = m_worldParamA;
-	SItemFlatRow* particleRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
-	int particleAttr = particleRows[hitParam->m_particleIndex].m_attribute;
-
-	if (worldParamA == 0xD || worldParamA == 0xE) {
-		if (((particleAttr == 0 || particleAttr == 4) && worldParamA == 0xD) ||
-		    (particleAttr == 1 && worldParamA == 0xE)) {
-			int particleNo;
-			int classControl;
-
-			switch (particleAttr) {
-			case 1:
-				particleNo = 0x20;
-				classControl = 0x491;
-				break;
-			case 0:
-				particleNo = 0x1F;
-				classControl = 0x492;
-				break;
-			case 4:
-				particleNo = 0x2F;
-				classControl = 0x493;
-				break;
-			}
-
-			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
-			ItemCFlatRuntime()->ResetParticleWork(particleNo | 0x100, m_particleSlot);
-			ItemCFlatRuntime()->SetParticleWorkPos(m_worldPosition, kItemObjZero);
-			ItemCFlatRuntime()->SetParticleWorkCol(9, 0, kItemObjUnitScale);
-			ItemCFlatRuntime()->SetParticleWorkParam(classControl, this);
-			ItemCFlatRuntime()->PutParticleWork();
-			m_bgColMask &= 0xFFF7FFFF;
-			addSubStat();
-		}
-	} else if ((worldParamA == 0xCB && m_lastStateId == 0x24) || m_lastStateId == 0x25) {
-		if ((static_cast<unsigned int>(particleAttr - 0x66) <= 1U) || (particleAttr == 0x65)) {
-			int classId = hitParam->m_classId;
-			CGObject* classObj;
-
-			if (classId != 0) {
-				classObj = reinterpret_cast<CGObject*>(ItemCFlatRuntime()->intToClass(classId));
-			} else {
-				classObj = 0;
-			}
-
-			unsigned short cid = classObj->GetCID();
-
-			if ((cid & 0x6D) == 0x6D && m_owner == classObj) {
-				changeStat(0x26, 0, 0);
-			}
-		}
-	} else {
-		return;
-	}
-
-	ItemCFlatRuntime()->IgnoreParticle(effectIndex, this);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801254cc
- * PAL Size: 384b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::onFrameAlways()
-{
-	int countdown = m_itemJumpCountdown;
-
-	if (countdown != 0) {
-		const float& scale = kItemObjWobblePhaseScale;
-		countdown--;
-		m_itemJumpCountdown = countdown < 0 ? 0 : countdown;
-		float radius = m_savedBodyRadius * (float)(8 - m_itemJumpCountdown);
-		m_bodyEllipsoidRadius = radius * scale;
-	}
-
-	if (m_worldParamA == 0xA) {
-		int canUseTrace;
-
-		if (static_cast<int>(Game.m_gameWork.m_gameInitFlag) != 0 &&
-		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit3 != 0 &&
-		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit2 != 0 &&
-		    m_weaponNodeFlagBits.m_prg != 0 &&
-		    static_cast<int>(CFlatCenterState()) == 0 && m_owner == 0) {
-			canUseTrace = true;
-		} else {
-			canUseTrace = false;
-		}
-
-		if (canUseTrace && CFlatItemTraceParticleSlot() == 0) {
-			CFlatItemTraceParticleSlot() = ItemCFlatRuntime()->GetFreeParticleSlot();
-			putParticleTrace(0x141, CFlatItemTraceParticleSlot(), this, kItemObjUnitScale, 0);
-		} else if (!canUseTrace && CFlatItemTraceParticleSlot() != 0) {
-			ItemCFlatRuntime()->EndParticleSlot(CFlatItemTraceParticleSlot(), 0);
-			CFlatItemTraceParticleSlot() = 0;
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012564c
+ * PAL Address: 0x80126f38
  * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onChangePrg(int)
+void CGItemObj::onFramePreCalc()
 {
 	// TODO
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80125650
- * PAL Size: 916b
+ * PAL Address: 0x80126f08
+ * PAL Size: 48b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
+void CGItemObj::onFramePostCalc()
 {
-	CFlatRuntime::CStack stack[3];
-	int canSystemCall;
-
-	if (carryState == 0) {
-		canSystemCall = ItemIsGbaCaravan(partyObj);
-
-		m_owner = partyObj;
-		m_carryFrame = carryMode;
-
-		if (carryMode == 0) {
-			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
-			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
-			bool useBossAttachName = false;
-
-			if (Game.m_gameWork.m_menuStageMode != 0) {
-				if (ItemIsGbaCaravan(partyObj)) {
-					useBossAttachName = true;
-				}
-			}
-
-			CGObject* attachSelf = this;
-			attachSelf->Attach(partyObj, const_cast<char*>(useBossAttachName ? s_itemAttachCenterItem3 : s_itemAttachLeftItem), attachOffsetPtr);
-			changeStat(0, 0, 0);
-			m_bodyEllipsoidRadius = kItemObjZero;
-		} else {
-			changeStat(0xB, 0, 0);
-		}
-	} else if (carryState == 1 || carryState == 2) {
-		canSystemCall = ItemIsGbaCaravan(m_owner);
-
-		m_carryFrame = carryMode;
-
-		if (carryMode == 0) {
-			Vec safePos;
-			float safeDist = CalcSafePos(0x41, m_owner, &safePos);
-			if (safeDist > kItemObjZero) {
-				CGObject* carryObj = m_owner;
-				carryObj->moveVectorHRot(
-					kItemObjPi + carryObj->m_rotBaseY,
-					kItemObjZero,
-					safeDist / kItemObjSafeMoveDivisor,
-					3);
-			}
-			Detach();
-			m_worldPosition = safePos;
-			m_owner = 0;
-			changeStat(0, 0, 0);
-			m_itemJumpCountdown = 8;
-			m_bodyEllipsoidRadius = kItemObjZero;
-		} else {
-			changeStat(carryState == 1 ? 0xC : 0xD, 0, 0);
-		}
-
-		m_lifeTimer = 0x1194;
-	}
-
-	if ((m_objectFlags & 0x10) != 0 && canSystemCall != 0) {
-		stack[0].m_word = 3;
-		stack[1].m_word = carryState != 0;
-		stack[2].m_word = 0;
-		gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
+	if (m_stateFlags0Bits.unk4 != 0 &&
+	    m_owner == 0) {
+		m_lifeTimer = m_lifeTimer - 1;
 	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x801259e4
- * PAL Size: 1168b
+ * PAL Address: 0x80126ee0
+ * PAL Size: 40b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CGPrgObj* CGItemObj::CreateFromScript(
-    int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
+void CGItemObj::onChangeStat(int state)
 {
-	char* itemObjStrings = const_cast<char*>(sItemObjStringTableBase);
-	int freeItemCount = ItemCFlatRuntime()->getNumFreeObject(5);
-	System.Printf(itemObjStrings + kItemObjStrNumFreeItemFmt, freeItemCount);
-
-	if (freeItemCount == 0) {
-		int shortestLifetime = 0x00989680;
-		CGItemObj* bestItemObj = 0;
-		int deletedCount = 0;
-		CFlatRuntime2* runtime = ItemCFlatRuntime();
-
-		for (CGItemObj* itemObj = runtime->FindGItemObjFirst();
-			 itemObj != 0;
-		     itemObj = runtime->FindGItemObjNext(itemObj)) {
-			if (itemObj->m_owner == 0 &&
-			    itemObj->m_stateFlags0Bits.unk4 != 0 &&
-			    (itemObj->m_ownerSlot & 1) != 0 && itemObj->m_lifeTimer < shortestLifetime) {
-				shortestLifetime = itemObj->m_lifeTimer;
-				bestItemObj = itemObj;
-			}
-		}
-
-		if (bestItemObj != 0) {
-			runtime->deleteObject(bestItemObj);
-		} else {
-			if ((unsigned int)System.m_execParam >= 3U) {
-				System.Printf(itemObjStrings + kItemObjStrNoDeletableObjectMsg);
-			}
-			goto printDeleted;
-		}
-		deletedCount++;
-	printDeleted:
-
-		System.Printf(itemObjStrings + kItemObjStrNumDeleteItemFmt, deletedCount);
-		if (deletedCount == 0) {
-			if ((unsigned int)System.m_execParam >= 3U) {
-				System.Printf(itemObjStrings + kItemObjStrCreateFailedMsg);
-			}
-			return 0;
-		}
+	if (state < 0x28 && state >= 0x26) {
+		m_bgColMask &= 0xfff7fffe;
 	}
-
-	CFlatRuntime::CStack inStack[5];
-	CFlatRuntime::CStack outStack;
-	inStack[0].m_word = createMode;
-	inStack[1].m_word = createFlags;
-	inStack[2].m_word = scriptArg;
-	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
-	inStack[4].m_float = launchAngle;
-	g_tempFlag = createFlags;
-	gCFlatRuntime().SystemCall(0, 1, 7, 5, inStack, &outStack);
-
-	if (createMode != 1) {
-		CGItemObj* newItem = static_cast<CGItemObj*>(CFlat.intToClass((int)outStack.m_word));
-
-		if (createMode == 2) {
-			newItem->m_scriptArg = scriptArg;
-			newItem->m_swayTarget.x = kItemObjUnitScale;
-		}
-
-		newItem->changeStat(0x1B, 0, 0);
-
-		if ((createFlags & 1) != 0) {
-			float safePosDist;
-			Vec safePos;
-			float yRot = owner->m_rotBaseY + Math.RandFPM(kItemObjMotionStep);
-
-			newItem->m_worldPosition.x = kItemObjHeightOffset * (float)sin((double)yRot) + owner->m_worldPosition.x;
-			newItem->m_worldPosition.y = kItemObjHeightOffset + owner->m_worldPosition.y;
-			newItem->m_worldPosition.z = kItemObjHeightOffset * (float)cos((double)yRot) + owner->m_worldPosition.z;
-
-			safePosDist = newItem->CalcSafePos(0x41, owner, &safePos);
-			if (safePosDist > kItemObjZero) {
-				owner->moveVectorHRot(kItemObjPi + owner->m_rotBaseY, kItemObjZero,
-				                       safePosDist / kItemObjSafeMoveDivisor, 3);
-			}
-
-			newItem->m_worldPosition = safePos;
-			newItem->SetPosBG(&safePos, 1);
-		}
-
-		if ((createFlags & 4) != 0) {
-			newItem->m_worldPosition = owner->m_worldPosition;
-			newItem->SetPosBG(&newItem->m_worldPosition, 1);
-
-			const CVector& moveVec = CVector((float)sin((double)launchAngle), kItemObjHeightOffset, (float)cos((double)launchAngle));
-			newItem->MoveVector((Vec*)const_cast<CVector*>(&moveVec), kItemObjLaunchSpeed, 1, 0, 1, 0);
-		}
-
-		if ((createFlags & 2) != 0) {
-			newItem->changeStat(0x23, 0, 0);
-			newItem->m_worldPosition.x = owner->m_worldPosition.x;
-			newItem->m_worldPosition.y = owner->m_worldPosition.y + kItemObjLaunchYOffset;
-			newItem->m_worldPosition.z = owner->m_worldPosition.z;
-			newItem->m_owner = owner;
-
-			int ownerScriptSlot = reinterpret_cast<CCaravanWork*>(owner->m_scriptHandle)->m_joybusCaravanId;
-			if ((unsigned int)System.m_execParam >= 3U) {
-				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleCreateFmt, ownerScriptSlot);
-			}
-			reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_capsules[ownerScriptSlot] = newItem;
-
-			CCharaPcs::CHandle* handle =
-			    new (Game.m_mainStage, itemObjStrings + kItemObjStrItemobjCpp, 0x28E) CCharaPcs::CHandle;
-			newItem->m_pendingModelHandle = handle;
-			newItem->m_pendingModelHandle->Add();
-
-			newItem->m_pendingModelHandle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
-
-			if ((unsigned int)System.m_execParam >= 3U) {
-				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleAsyncStartMsg);
-			}
-
-			newItem->m_pendingAnimFlags = ccfs->m_pendingAnimFlags;
-			newItem->m_pendingAnimName = ccfs->m_pendingAnimName;
-			newItem->m_memoryCapsuleNameIndex = ccfs->m_memoryCapsuleNameIndex;
-		}
-
-		return newItem;
-	}
-
-	return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80125e74
- * PAL Size: 56b
+ * PAL Address: 0x80126eb4
+ * PAL Size: 44b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CGItemObj::CanCreateFromScript()
+void CGItemObj::onCancelStat(int)
 {
-	int numFreeObjects = ItemCFlatRuntime()->getNumFreeObject(5);
-
-	return numFreeObjects > 0;
+	if (m_lastStateId == 0x1b) {
+		m_bgColMask |= 2;
+		m_rotationZ = kItemObjUnitScale;
+		m_rotationY = kItemObjUnitScale;
+		m_rotationX = kItemObjUnitScale;
+	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80125eac
- * PAL Size: 260b
+ * PAL Address: 0x80126d08
+ * PAL Size: 428b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObject*, CFlatRuntime::CObject*)
+void CGItemObj::onFrame()
 {
-	int deletedCount = 0;
+	CCharaPcs::CHandle* handle = m_pendingModelHandle;
 
-	while (deletedCount < maxDeleteCount) {
-		CGItemObj* bestItemObj = 0;
-		int shortestLifetime = 0x00989680;
-
-		for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst();
-			 itemObj != 0;
-			 itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
-			if (itemObj->m_owner == 0 &&
-				itemObj->m_stateFlags0Bits.unk4 != 0 &&
-				(((int)(char)itemObj->m_ownerSlot & deleteMask) != 0) && itemObj->m_lifeTimer < shortestLifetime) {
-				shortestLifetime = itemObj->m_lifeTimer;
-				bestItemObj = itemObj;
-			}
+	if (handle != 0 && handle->IsLoadModelASyncCompleted()) {
+		if ((unsigned int)System.m_execParam >= 3U) {
+			System.Printf(const_cast<char*>(sItemMemoryCapsuleAsyncEndMsg));
 		}
 
-		if (bestItemObj != 0) {
-			gCFlatRuntime().deleteObject(bestItemObj);
-		} else {
-			if ((unsigned int)System.m_execParam >= 3U) {
-				System.Printf(const_cast<char*>(sItemNoDeletableObjectMsg));
-			}
-			break;
-		}
+		m_charaModelHandle = m_pendingModelHandle;
+		m_pendingModelHandle = 0;
 
-		deletedCount++;
+		if (m_worldParamA == 0xCB) {
+			LoadAnim(m_pendingAnimName, 0, 0, 2, m_pendingAnimFlags);
+			SetAnimSlot(0, 0);
+			PlayAnim(0, 1, 0, -1, -1, 0);
+
+			CCaravanWork* ownerData = reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle);
+			int soundEntry = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
+
+			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
+			putParticle((soundEntry << 8) | ownerData->m_joybusCaravanId, m_particleSlot, this, particleScale, 0x12909);
+
+			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), kItemObjMemoryRadius, kItemObjMemoryRadius,
+			             CVector(kItemObjZero, kItemObjZero, kItemObjZero));
+			m_damageColliders[0].m_hitMask = 8;
+			addSubStat();
+		}
 	}
 
-	return deletedCount;
+	CGPrgObj::onFrame();
 }
 
 /*
@@ -844,7 +331,6 @@ void CGItemObj::onFrameStat()
 	case 0xC:
 	case 0xD:
 		if (m_stateFrame == m_carryFrame) {
-			Vec safePos;
 			float launchSpeed;
 
 			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_menuStageMode != 0 &&
@@ -864,29 +350,7 @@ void CGItemObj::onFrameStat()
 				launchSpeed = kItemObjSafeMoveDivisor;
 			}
 
-			float safeDist = CalcSafePos(0x41, m_owner, &safePos);
-
-			if (safeDist > kItemObjZero) {
-				m_owner->moveVectorHRot(kItemObjPi + m_owner->m_rotBaseY, kItemObjZero,
-				                        safeDist / kItemObjSafeMoveDivisor, 3);
-			}
-
-			Detach();
-			m_worldPosition = safePos;
-
-			float moveSpeed;
-			if (m_lastStateId == 0xC) {
-				moveSpeed = launchSpeed;
-			} else {
-				moveSpeed = kItemObjThrowMoveSpeed;
-			}
-
-			float ownerCos = (float)cos((double)m_owner->m_rotTargetY);
-			float ownerSin = (float)sin((double)m_owner->m_rotTargetY);
-			const CVector& moveVec = CVector(ownerSin, kItemObjMotionStep, ownerCos);
-			MoveVector(reinterpret_cast<Vec*>(const_cast<CVector*>(&moveVec)), moveSpeed, 1, 0, 1, 0);
-
-			m_owner = 0;
+			safeDetach(1, launchSpeed);
 			m_itemJumpCountdown = 8;
 			m_bodyEllipsoidRadius = kItemObjZero;
 		}
@@ -1125,152 +589,668 @@ void CGItemObj::onFrameStat()
 
 /*
  * --INFO--
- * PAL Address: 0x80126d08
- * PAL Size: 428b
+ * PAL Address: 0x80125eac
+ * PAL Size: 260b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onFrame()
+int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObject*, CFlatRuntime::CObject*)
 {
-	CCharaPcs::CHandle* handle = m_pendingModelHandle;
+	int deletedCount = 0;
 
-	if (handle != 0 && handle->IsLoadModelASyncCompleted()) {
-		if ((unsigned int)System.m_execParam >= 3U) {
-			System.Printf(const_cast<char*>(sItemMemoryCapsuleAsyncEndMsg));
+	while (deletedCount < maxDeleteCount) {
+		CGItemObj* bestItemObj = 0;
+		int shortestLifetime = 0x00989680;
+
+		for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst();
+			 itemObj != 0;
+			 itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
+			if (itemObj->m_owner == 0 &&
+				itemObj->m_stateFlags0Bits.unk4 != 0 &&
+				(((int)(char)itemObj->m_ownerSlot & deleteMask) != 0) && itemObj->m_lifeTimer < shortestLifetime) {
+				shortestLifetime = itemObj->m_lifeTimer;
+				bestItemObj = itemObj;
+			}
 		}
 
-		m_charaModelHandle = m_pendingModelHandle;
-		m_pendingModelHandle = 0;
+		if (bestItemObj != 0) {
+			gCFlatRuntime().deleteObject(bestItemObj);
+		} else {
+			if ((unsigned int)System.m_execParam >= 3U) {
+				System.Printf(const_cast<char*>(sItemNoDeletableObjectMsg));
+			}
+			break;
+		}
 
-		if (m_worldParamA == 0xCB) {
-			LoadAnim(m_pendingAnimName, 0, 0, 2, m_pendingAnimFlags);
-			SetAnimSlot(0, 0);
-			PlayAnim(0, 1, 0, -1, -1, 0);
+		deletedCount++;
+	}
 
-			CCaravanWork* ownerData = reinterpret_cast<CCaravanWork*>(m_owner->m_scriptHandle);
-			int soundEntry = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtSlot();
+	return deletedCount;
+}
 
-			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
-			float particleScale = kItemObjFineStep * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + kItemObjParticleScaleBase;
-			putParticle((soundEntry << 8) | ownerData->m_joybusCaravanId, m_particleSlot, this, particleScale, 0x12909);
+/*
+ * --INFO--
+ * PAL Address: 0x80125e74
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned int CGItemObj::CanCreateFromScript()
+{
+	int numFreeObjects = ItemCFlatRuntime()->getNumFreeObject(5);
 
-			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), kItemObjMemoryRadius, kItemObjMemoryRadius,
-			             CVector(kItemObjZero, kItemObjZero, kItemObjZero));
-			m_damageColliders[0].m_hitMask = 8;
-			addSubStat();
+	return numFreeObjects > 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801259e4
+ * PAL Size: 1168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CGPrgObj* CGItemObj::CreateFromScript(
+    int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
+{
+	char* itemObjStrings = const_cast<char*>(sItemObjStringTableBase);
+	int freeItemCount = ItemCFlatRuntime()->getNumFreeObject(5);
+	System.Printf(itemObjStrings + kItemObjStrNumFreeItemFmt, freeItemCount);
+
+	if (freeItemCount == 0) {
+		int deletedCount = DeleteOld(1, 1, 0, 0);
+
+		System.Printf(itemObjStrings + kItemObjStrNumDeleteItemFmt, deletedCount);
+		if (deletedCount == 0) {
+			if ((unsigned int)System.m_execParam >= 3U) {
+				System.Printf(itemObjStrings + kItemObjStrCreateFailedMsg);
+			}
+			return 0;
 		}
 	}
 
-	CGPrgObj::onFrame();
+	CFlatRuntime::CStack inStack[5];
+	CFlatRuntime::CStack outStack;
+	inStack[0].m_word = createMode;
+	inStack[1].m_word = createFlags;
+	inStack[2].m_word = scriptArg;
+	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
+	inStack[4].m_float = launchAngle;
+	g_tempFlag = createFlags;
+	gCFlatRuntime().SystemCall(0, 1, 7, 5, inStack, &outStack);
+
+	if (createMode != 1) {
+		CGItemObj* newItem = static_cast<CGItemObj*>(CFlat.intToClass((int)outStack.m_word));
+
+		if (createMode == 2) {
+			newItem->m_scriptArg = scriptArg;
+			newItem->m_swayTarget.x = kItemObjUnitScale;
+		}
+
+		newItem->changeStat(0x1B, 0, 0);
+
+		if ((createFlags & 1) != 0) {
+			float safePosDist;
+			Vec safePos;
+			float yRot = owner->m_rotBaseY + Math.RandFPM(kItemObjMotionStep);
+
+			newItem->m_worldPosition.x = kItemObjHeightOffset * (float)sin((double)yRot) + owner->m_worldPosition.x;
+			newItem->m_worldPosition.y = kItemObjHeightOffset + owner->m_worldPosition.y;
+			newItem->m_worldPosition.z = kItemObjHeightOffset * (float)cos((double)yRot) + owner->m_worldPosition.z;
+
+			safePosDist = newItem->CalcSafePos(0x41, owner, &safePos);
+			if (safePosDist > kItemObjZero) {
+				owner->moveVectorHRot(kItemObjPi + owner->m_rotBaseY, kItemObjZero,
+				                       safePosDist / kItemObjSafeMoveDivisor, 3);
+			}
+
+			newItem->m_worldPosition = safePos;
+			newItem->SetPosBG(&safePos, 1);
+		}
+
+		if ((createFlags & 4) != 0) {
+			newItem->m_worldPosition = owner->m_worldPosition;
+			newItem->SetPosBG(&newItem->m_worldPosition, 1);
+
+			const CVector& moveVec = CVector((float)sin((double)launchAngle), kItemObjHeightOffset, (float)cos((double)launchAngle));
+			newItem->MoveVector((Vec*)const_cast<CVector*>(&moveVec), kItemObjLaunchSpeed, 1, 0, 1, 0);
+		}
+
+		if ((createFlags & 2) != 0) {
+			newItem->changeStat(0x23, 0, 0);
+			newItem->m_worldPosition.x = owner->m_worldPosition.x;
+			newItem->m_worldPosition.y = owner->m_worldPosition.y + kItemObjLaunchYOffset;
+			newItem->m_worldPosition.z = owner->m_worldPosition.z;
+			newItem->m_owner = owner;
+
+			int ownerScriptSlot = reinterpret_cast<CCaravanWork*>(owner->m_scriptHandle)->m_joybusCaravanId;
+			if ((unsigned int)System.m_execParam >= 3U) {
+				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleCreateFmt, ownerScriptSlot);
+			}
+			reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_capsules[ownerScriptSlot] = newItem;
+
+			CCharaPcs::CHandle* handle =
+			    new (Game.m_mainStage, itemObjStrings + kItemObjStrItemobjCpp, 0x28E) CCharaPcs::CHandle;
+			newItem->m_pendingModelHandle = handle;
+			newItem->m_pendingModelHandle->Add();
+
+			newItem->m_pendingModelHandle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
+
+			if ((unsigned int)System.m_execParam >= 3U) {
+				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleAsyncStartMsg);
+			}
+
+			newItem->m_pendingAnimFlags = ccfs->m_pendingAnimFlags;
+			newItem->m_pendingAnimName = ccfs->m_pendingAnimName;
+			newItem->m_memoryCapsuleNameIndex = ccfs->m_memoryCapsuleNameIndex;
+		}
+
+		return newItem;
+	}
+
+	return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80126eb4
- * PAL Size: 44b
+ * PAL Address: UNUSED
+ * PAL Size: 336b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onCancelStat(int)
+inline void CGItemObj::safeDetach(int throwItem, float speed)
 {
-	if (m_lastStateId == 0x1b) {
-		m_bgColMask |= 2;
-		m_rotationZ = kItemObjUnitScale;
-		m_rotationY = kItemObjUnitScale;
-		m_rotationX = kItemObjUnitScale;
+	Vec safePos;
+	float safeDist = CalcSafePos(0x41, m_owner, &safePos);
+
+	if (safeDist > kItemObjZero) {
+		m_owner->moveVectorHRot(kItemObjPi + m_owner->m_rotBaseY, kItemObjZero,
+		                        safeDist / kItemObjSafeMoveDivisor, 3);
 	}
+
+	Detach();
+	m_worldPosition = safePos;
+
+	if (throwItem != 0) {
+		float moveSpeed;
+		if (m_lastStateId == 0xC) {
+			moveSpeed = speed;
+		} else {
+			moveSpeed = kItemObjThrowMoveSpeed;
+		}
+
+		float ownerCos = (float)cos((double)m_owner->m_rotTargetY);
+		float ownerSin = (float)sin((double)m_owner->m_rotTargetY);
+		const CVector& moveVec = CVector(ownerSin, kItemObjMotionStep, ownerCos);
+		MoveVector(reinterpret_cast<Vec*>(const_cast<CVector*>(&moveVec)), moveSpeed, 1, 0, 1, 0);
+	}
+
+	m_owner = 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80126ee0
- * PAL Size: 40b
+ * PAL Address: 0x80125650
+ * PAL Size: 916b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onChangeStat(int state)
+void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 {
-	if (state < 0x28 && state >= 0x26) {
-		m_bgColMask &= 0xfff7fffe;
+	CFlatRuntime::CStack stack[3];
+	int canSystemCall;
+
+	if (carryState == 0) {
+		canSystemCall = ItemIsGbaCaravan(partyObj);
+
+		m_owner = partyObj;
+		m_carryFrame = carryMode;
+
+		if (carryMode == 0) {
+			const CVector& attachOffset = CVector(kItemObjZero, kItemObjZero, kItemObjZero);
+			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
+			bool useBossAttachName = false;
+
+			if (Game.m_gameWork.m_menuStageMode != 0) {
+				if (ItemIsGbaCaravan(partyObj)) {
+					useBossAttachName = true;
+				}
+			}
+
+			CGObject* attachSelf = this;
+			attachSelf->Attach(partyObj, const_cast<char*>(useBossAttachName ? s_itemAttachCenterItem3 : s_itemAttachLeftItem), attachOffsetPtr);
+			changeStat(0, 0, 0);
+			m_bodyEllipsoidRadius = kItemObjZero;
+		} else {
+			changeStat(0xB, 0, 0);
+		}
+	} else if (carryState == 1 || carryState == 2) {
+		canSystemCall = ItemIsGbaCaravan(m_owner);
+
+		m_carryFrame = carryMode;
+
+		if (carryMode == 0) {
+			safeDetach(0, kItemObjZero);
+			changeStat(0, 0, 0);
+			m_itemJumpCountdown = 8;
+			m_bodyEllipsoidRadius = kItemObjZero;
+		} else {
+			changeStat(carryState == 1 ? 0xC : 0xD, 0, 0);
+		}
+
+		m_lifeTimer = 0x1194;
+	}
+
+	if ((m_objectFlags & 0x10) != 0 && canSystemCall != 0) {
+		stack[0].m_word = 3;
+		stack[1].m_word = carryState != 0;
+		stack[2].m_word = 0;
+		gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80126f08
- * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::onFramePostCalc()
-{
-	if (m_stateFlags0Bits.unk4 != 0 &&
-	    m_owner == 0) {
-		m_lifeTimer = m_lifeTimer - 1;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80126f38
+ * PAL Address: 0x8012564c
  * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onFramePreCalc()
+void CGItemObj::onChangePrg(int)
 {
 	// TODO
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80126f3c
- * PAL Size: 88b
+ * PAL Address: 0x801254cc
+ * PAL Size: 384b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onDestroy()
+void CGItemObj::onFrameAlways()
 {
-	if (m_pendingModelHandle != 0) {
-		delete m_pendingModelHandle;
+	int countdown = m_itemJumpCountdown;
+
+	if (countdown != 0) {
+		const float& scale = kItemObjWobblePhaseScale;
+		countdown--;
+		m_itemJumpCountdown = countdown < 0 ? 0 : countdown;
+		float radius = m_savedBodyRadius * (float)(8 - m_itemJumpCountdown);
+		m_bodyEllipsoidRadius = radius * scale;
 	}
 
-	ItemCFlatRuntime()->DeleteParticleSlot(m_particleSlot, 0);
-	CGPrgObj::onDestroy();
+	if (m_worldParamA == 0xA) {
+		int canUseTrace;
+
+		if (static_cast<int>(Game.m_gameWork.m_gameInitFlag) != 0 &&
+		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit3 != 0 &&
+		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit2 != 0 &&
+		    m_weaponNodeFlagBits.m_prg != 0 &&
+		    static_cast<int>(CFlatCenterState()) == 0 && m_owner == 0) {
+			canUseTrace = true;
+		} else {
+			canUseTrace = false;
+		}
+
+		if (canUseTrace && CFlatItemTraceParticleSlot() == 0) {
+			CFlatItemTraceParticleSlot() = ItemCFlatRuntime()->GetFreeParticleSlot();
+			putParticleTrace(0x141, CFlatItemTraceParticleSlot(), this, kItemObjUnitScale, 0);
+		} else if (!canUseTrace && CFlatItemTraceParticleSlot() != 0) {
+			ItemCFlatRuntime()->EndParticleSlot(CFlatItemTraceParticleSlot(), 0);
+			CFlatItemTraceParticleSlot() = 0;
+		}
+	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80126f94
- * PAL Size: 116b
+ * PAL Address: 0x8012529C
+ * PAL Size: 556b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onCreate()
+void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* hitParam)
 {
-	CGPrgObj::onCreate();
-	m_flagBits.bits.unk0 = 0;
-	m_owner = 0;
-	m_scriptArg = 0;
-	m_createFlags = 0;
-	unk_0x562 = 0;
-	m_pendingModelHandle = 0;
-	m_itemJumpCountdown = 0;
-	memset(&m_memoryCapsuleNameIndex, 0,
-	       sizeof(m_memoryCapsuleNameIndex) + sizeof(m_pendingAnimFlags) + sizeof(m_pendingAnimName));
-	m_particleSlot = ItemCFlatRuntime()->GetFreeParticleSlot();
+	int worldParamA = m_worldParamA;
+	SItemFlatRow* particleRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+	int particleAttr = particleRows[hitParam->m_particleIndex].m_attribute;
+
+	if (worldParamA == 0xD || worldParamA == 0xE) {
+		if (((particleAttr == 0 || particleAttr == 4) && worldParamA == 0xD) ||
+		    (particleAttr == 1 && worldParamA == 0xE)) {
+			int particleNo;
+			int classControl;
+
+			switch (particleAttr) {
+			case 1:
+				particleNo = 0x20;
+				classControl = 0x491;
+				break;
+			case 0:
+				particleNo = 0x1F;
+				classControl = 0x492;
+				break;
+			case 4:
+				particleNo = 0x2F;
+				classControl = 0x493;
+				break;
+			}
+
+			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
+			ItemCFlatRuntime()->ResetParticleWork(particleNo | 0x100, m_particleSlot);
+			ItemCFlatRuntime()->SetParticleWorkPos(m_worldPosition, kItemObjZero);
+			ItemCFlatRuntime()->SetParticleWorkCol(9, 0, kItemObjUnitScale);
+			ItemCFlatRuntime()->SetParticleWorkParam(classControl, this);
+			ItemCFlatRuntime()->PutParticleWork();
+			m_bgColMask &= 0xFFF7FFFF;
+			addSubStat();
+		}
+	} else if ((worldParamA == 0xCB && m_lastStateId == 0x24) || m_lastStateId == 0x25) {
+		if ((static_cast<unsigned int>(particleAttr - 0x66) <= 1U) || (particleAttr == 0x65)) {
+			int classId = hitParam->m_classId;
+			CGObject* classObj;
+
+			if (classId != 0) {
+				classObj = reinterpret_cast<CGObject*>(ItemCFlatRuntime()->intToClass(classId));
+			} else {
+				classObj = 0;
+			}
+
+			unsigned short cid = classObj->GetCID();
+
+			if ((cid & 0x6D) == 0x6D && m_owner == classObj) {
+				changeStat(0x26, 0, 0);
+			}
+		}
+	} else {
+		return;
+	}
+
+	ItemCFlatRuntime()->IgnoreParticle(effectIndex, this);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124FE0
+ * PAL Size: 700b
+ * EN Address: 0x80146A20
+ * EN Size: 892b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::loadModel()
+{
+	int modelNo = -1;
+	int modelVariant = 0;
+	int modelFlag = 0;
+	unsigned long animFlags = (unsigned long)-1;
+	char* standAnim = const_cast<char*>(sStandAnim);
+	int useParticleTable = 1;
+	int itemType = m_worldParamA;
+
+	switch (itemType) {
+	case 0xA:
+		modelNo = 8;
+		useParticleTable = 0;
+		break;
+	case 0xC:
+		modelNo = 0x27;
+		useParticleTable = 0;
+		break;
+	case 0xD:
+		modelNo = 0x33;
+		useParticleTable = 0;
+		break;
+	case 0xE:
+		modelNo = 0x33;
+		modelVariant = 1;
+		useParticleTable = 0;
+		break;
+	case 0x12:
+	case 0x13:
+	case 0x14:
+	case 0x15:
+	case 0x16:
+	case 0x17:
+	case 0x1F:
+	case 0x20:
+	case 0x21:
+	case 0x24: {
+		const SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+		int itemEntry = itemRows[m_worldParamB].m_model;
+
+		m_ownerSlot = 1;
+		modelNo = itemEntry & 0xFFF;
+		modelVariant = itemEntry >> 0xC;
+		m_stateFlags0Bits.unk4 = 1;
+		m_lifeTimer = 0x1194;
+		animFlags = 0x12;
+		modelFlag = 1;
+		break;
+	}
+	case 0xCB:
+	default:
+		break;
+	}
+
+	if (modelNo >= 0) {
+		LoadModel(3, modelNo, modelVariant, modelFlag);
+		LoadAnim(standAnim, 0, 0, 3, animFlags);
+		SetAnimSlot(0, 0);
+		PlayAnim(0, 1, 0, -1, -1, 0);
+	}
+
+	if (m_worldParamA == 0x12) {
+		DispCharaParts(0);
+		m_stateFlags0Bits.unk3 = 1;
+	}
+
+	if (useParticleTable != 0) {
+		for (int i = 0; i < 3; i++) {
+			if (i != 0 || m_createFlags != 1) {
+				const SItemFlatRow* itemRow = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[m_worldParamB];
+				int particleNo = itemRow->m_particles[i];
+
+				if (particleNo != 0xFFFF) {
+					const float& particleScaleStep = kItemObjFineStep;
+					const float& particleScaleBase = kItemObjParticleScaleBase;
+					float particleScale =
+					    particleScaleStep * static_cast<float>(itemRow->m_fineValue) + particleScaleBase;
+					putParticle(particleNo | 0x100, m_particleSlot, this, particleScale, 0);
+				}
+			}
+		}
+	}
+
+	if (m_worldParamA == 0xCB) {
+		const float& randBase = kItemObjMotionStep;
+		const float& randRange = kItemObjParticleRandomRange;
+		m_moveTimer = randBase - Math.RandF(randRange);
+		m_weaponNodeFlagBits.m_unk04 = 0;
+	}
+
+	m_flagBits.bits.unk0 = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124fac
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::onNewFinished()
+{
+	m_savedBodyRadius = m_bodyEllipsoidRadius;
+	m_createFlags = static_cast<u16>((g_tempFlag >> 3) & 1);
+	loadModel();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124e04
+ * PAL Size: 424b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::DrawOmoideName(CFont* font)
+{
+	if (m_weaponNodeFlagBits.m_unk20 != 0) {
+		CCharaPcs::CHandle* charaHandle = m_charaModelHandle;
+		bool hasModel = false;
+		if (charaHandle != 0 && charaHandle->m_model != 0) {
+			hasModel = true;
+		}
+
+		if (hasModel && m_worldParamA == 0xCB && 0.0f < m_screenDepth &&
+		    0.0f != m_currentAlpha) {
+			font->SetTlut(7);
+
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * m_currentAlpha).color);
+
+			const char* name = Game.m_cFlatDataArr[1].TableStrings(2)[m_memoryCapsuleNameIndex];
+			float width = font->GetWidth(name);
+			float depthScale = kItemObjUnitScale / (m_screenDepth - kItemObjHeightOffset);
+			float posY = 224.0f - 224.0f * m_projection.z * depthScale;
+			float posZ = m_projection.w * depthScale;
+			float posX =
+			    -(0.5f * width - (320.0f * m_projection.y * depthScale + 320.0f));
+
+			font->SetPosX(posX);
+			font->SetPosY(posY - 11.0f);
+			font->SetPosZ(posZ);
+			font->Draw(name);
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124cb8
+ * PAL Size: 332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::ItemJump(int state, float jump)
+{
+	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
+	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
+		CGObject* object = itemObj;
+
+		if ((object->m_objectFlags & 0x10) == 0) {
+			Vec bottom = object->m_worldPosition;
+			bottom.y += kItemObjHeightOffset;
+			Vec move;
+
+			move.x = kItemObjZero;
+			move.z = kItemObjZero;
+			move.y = kItemObjGroundProbeDown;
+			unsigned int mapMask = object->m_bgHitMask;
+			CMapCylinder cylinder;
+			cylinder.m_bottom = bottom;
+			cylinder.m_axis.x = kItemObjZero;
+			cylinder.m_axis.y = kItemObjGroundProbeDown;
+			cylinder.m_axis.z = kItemObjZero;
+			cylinder.m_radius = kItemObjZero;
+
+			if (MapMng.CheckHitCylinderNear(&cylinder, &move, mapMask) != 0 &&
+			    g_hit_f->m_groupIndex == state) {
+				object->m_groundHitOffset.y += jump;
+			}
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124c2c
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::DeleteAllFieldItem()
+{
+	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
+	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
+		if (itemObj->m_owner == 0 &&
+		    itemObj->m_stateFlags0Bits.unk4 != 0) {
+			itemObj->CFlatRuntime::CObject::m_flagBits.m_deleteFlag = 1;
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124b88
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::DispAllFieldItem(int show)
+{
+	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
+	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
+		if (itemObj->m_owner == 0 &&
+		    itemObj->m_stateFlags0Bits.unk4 != 0) {
+			if (show != 0) {
+				itemObj->m_displayFlags &= 0xffbfffff;
+			} else {
+				itemObj->m_displayFlags |= 0x400000;
+			}
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124b80
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGPrgObj::getReplaceStat(int state)
+{
+	return state;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124b78
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGItemObj::GetCID()
+{
+	return 0x1d;
 }

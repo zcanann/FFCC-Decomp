@@ -116,6 +116,7 @@ public:
 	static unsigned int CanCreateFromScript();
 	static CGPrgObj* CreateFromScript(int, int, int, CGObject*, float, CGItemObj::CCFS*);
 	void carry(CGPartyObj*, int, int);
+	void safeDetach(int, float);
 	void onChangePrg(int);
 	void onFrameAlways();
 	void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);

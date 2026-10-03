@@ -192,8 +192,8 @@ public:
 	void setSystemVal(CFlatRuntime::CObject*, int);
 	int objectFrame(CFlatRuntime::CObject*);
 
-	void toFunc(CFlatRuntime::CCodeIndex&);
-	void toCode(CFlatRuntime::CCodeIndex&);
+	CFlatRuntime::CFunc* toFunc(CFlatRuntime::CCodeIndex&);
+	u8* toCode(CFlatRuntime::CCodeIndex&);
 	int systemFunc(CFlatRuntime::CObject*, int, int, int&);
 
 	void ResetPerformance();

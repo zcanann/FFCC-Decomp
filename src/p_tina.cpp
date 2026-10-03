@@ -993,6 +993,17 @@ void CPartPcs::drawAfterViewer()
 		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
 }
 
+static inline unsigned int IsPartAsyncIdle(CPartMng* partMng)
+{
+    for (int i = 0; i < 16; i++) {
+        if (partMng->m_partAsyncBusy[i] != 0) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80052660
@@ -1004,13 +1015,7 @@ void CPartPcs::drawAfterViewer()
  */
 unsigned int CPartPcs::IsLoadPartCompleted()
 {
-    for (int i = 0; i < 16; i++) {
-        if (PartMng.m_partAsyncBusy[i] != 0) {
-            return 0;
-        }
-    }
-
-    return 1;
+    return IsPartAsyncIdle(&PartMng);
 }
 
 /*

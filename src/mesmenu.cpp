@@ -42,6 +42,30 @@ void CMesMenu::SetPos(float x, float y)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMesMenu::close(int closeReason)
+{
+    CFlatRuntime::CStack stack[2];
+
+    m_mes.Set(0, 0);
+    stack[0].m_word = m_menuIndex;
+    stack[1].m_word = m_closeReason;
+    gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
+    m_state = 4;
+    m_active = 0;
+    if (m_menuIndex < 4) {
+        MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(1);
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8009b4f0
  * PAL Size: 268b
  * EN Address: TODO
@@ -51,21 +75,10 @@ void CMesMenu::SetPos(float x, float y)
  */
 void CMesMenu::CloseRequest(int closeReason)
 {
-    CFlatRuntime::CStack stack[2];
-
     m_closeReason = closeReason;
     if (m_state <= 1) {
         if ((m_flags & 0x40) != 0) {
-            m_mes.Set(0, 0);
-            stack[0].m_word = m_menuIndex;
-            stack[1].m_word = m_closeReason;
-            gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
-            m_state = 4;
-            m_active = 0;
-            if (m_menuIndex < 4) {
-                int menuIndex = m_menuIndex;
-                MenuPcs.m_battleRingMenus[menuIndex]->SetFade(1);
-            }
+            close(m_closeReason);
         } else {
             m_state = 2;
             m_stateTimer = 0;
@@ -272,11 +285,10 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
                 heartShakeY = (heartSubTimer >> 2) * s_mesMenuShakePattern[heartSubTimer & 3];
             }
 
-            float heartX = heartBaseX + shakeX;
-            float heartY = heartBaseY + (float)heartShakeY;
+            float shakeY = (float)heartShakeY;
 
             MenuPcs.DrawRect(
-                3, heartX, heartY, 24.0f, 24.0f, heartZero, heartZero,
+                3, heartBaseX + shakeX, heartBaseY + shakeY, 24.0f, 24.0f, heartZero, heartZero,
                 heartPulse, heartPulse, heartZero);
 
             if (heartValue > 0) {
@@ -288,7 +300,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
                 float u = (float)((scriptFood->m_statusTimers[2] != 0) ? 0 : 0x18);
                 float v = (float)((0x0C - fillAmount) * 0x18);
                 MenuPcs.DrawRect(
-                    3, heartX, heartY, 24.0f, 24.0f, u, v, heartPulse, heartPulse,
+                    3, heartBaseX + shakeX, heartBaseY + shakeY, 24.0f, 24.0f, u, v, heartPulse, heartPulse,
                     0.0f);
             }
 
@@ -438,7 +450,7 @@ void CMesMenu::onDraw()
     font->SetShadow(1);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    float stageBlend = (float)m_stageFadeTimer * 0.0625f;
+    float stageBlend = (float)m_stageFadeTimer / 16.0f;
     if (m_stageFadeOut != 0) {
         stageBlend = 1.0f - stageBlend;
     }
@@ -481,7 +493,8 @@ void CMesMenu::onDraw()
             pulseX = -pulse;
         }
         int maskY = m_menuIndex & 2;
-        float baseX = (m_baseX + m_offsetX) + pulseX;
+        float posX = m_baseX + m_offsetX;
+        float baseX = posX + pulseX;
         float pulseY;
         if (maskY != 0) {
             pulseY = pulse;
@@ -842,7 +855,6 @@ void CMesMenu::onDraw()
  */
 void CMesMenu::onCalc()
 {
-    CFlatRuntime::CStack stack2[2];
     if (Game.m_gameWork.m_menuStageMode != 0) {
         if ((m_menuIndex >= 1) && (m_menuIndex < 4)) {
             return;
@@ -966,9 +978,9 @@ void CMesMenu::onCalc()
 
             int wait = m_mes.GetWait();
             if (wait == 3) {
+                int altCursor = m_mes.mRubyOffset;
                 int cursor = m_mes.mRubyHeight;
                 int cursorMax = m_mes.mRubyLine;
-                int altCursor = m_mes.mRubyOffset;
                 if ((repeatMask & 8) != 0) {
                     cursor--;
                     if (cursor < 0) {
@@ -1027,9 +1039,10 @@ void CMesMenu::onCalc()
                         (m_mes.mWaitActive == 0) && ((m_flags & 0x4000) == 0)) {
                         Sound.PlaySe(0xC, 0x40, 0x7F, 0);
                     }
-                }
 
-                if (m_mes.mFadeEnabled == 0) {
+                    if (m_mes.mFadeEnabled != 0) {
+                        goto close;
+                    }
                     m_mes.mFadeEnabled = 1;
                     m_mes.mFadeCursor = 0;
                 }
@@ -1042,32 +1055,11 @@ void CMesMenu::onCalc()
                     closeReady = true;
                 }
                 if (closeReady) {
+                close:
                     if (m_mes.mWaitActive != 0) {
                         int wait5 = m_mes.GetWait();
                         if (wait5 != 4) {
-                            m_closeReason = 0;
-                            if (m_state <= 1) {
-                                if ((m_flags & 0x40) != 0) {
-                                    CFlatRuntime::CStack stack[2];
-                                    m_mes.Set(0, 0);
-                                    stack[0].m_word = m_menuIndex;
-                                    stack[1].m_word = m_closeReason;
-                                    gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
-                                    m_state = 4;
-                                    m_active = 0;
-                                    if (m_menuIndex < 4) {
-                                        MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(1);
-                                    }
-                                } else {
-                                    m_state = 2;
-                                    m_stateTimer = 0;
-                                    m_stateTimerMax = 4;
-                                    if (((m_flags & 1) == 0) &&
-                                        ((m_flags & 0x4000) == 0)) {
-                                        Sound.PlaySe(6, 0x40, 0x7F, 0);
-                                    }
-                                }
-                            }
+                            CloseRequest(0);
                         }
                     } else {
                         m_mes.Next();
@@ -1078,7 +1070,8 @@ void CMesMenu::onCalc()
         break;
     case 3: {
         float step = 1.0f - (float)m_stateTimer / (float)m_stateTimerMax;
-        m_windowScale = 0.5f * (1.0f + (float)sin(3.1415927f * step + (-1.5707964f)));
+        float wave = (float)sin(3.1415927f * step + (-1.5707964f));
+        m_windowScale = 0.5f * (1.0f + wave);
         break;
     }
     }
@@ -1101,15 +1094,7 @@ void CMesMenu::onCalc()
             m_state = 4;
             m_stateTimer = 0;
             m_stateTimerMax = 0;
-            m_mes.Set(0, 0);
-            stack2[0].m_word = m_menuIndex;
-            stack2[1].m_word = m_closeReason;
-            gCFlatRuntime().SystemCall(0, 1, 3, 2, stack2, 0);
-            m_state = 4;
-            m_active = 0;
-            if (m_menuIndex < 4) {
-                MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(1);
-            }
+            close(m_closeReason);
             break;
         }
         }

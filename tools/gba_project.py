@@ -112,6 +112,19 @@ def _units(config_dir: Path) -> List[str]:
     return list(dict.fromkeys(re.findall(r"^(\S+):\s*$", text, re.M)))
 
 
+def _common_units(config_dir: Path) -> set:
+    """Units with recovered COMMON storage, materialized only for objdiff."""
+    units = set()
+    unit = None
+    for line in (config_dir / "splits.txt").read_text(encoding="utf-8").splitlines():
+        match = re.match(r"^(\S+):\s*$", line)
+        if match:
+            unit = match.group(1)
+        elif unit is not None and re.match(r"^\s+\.common\s", line):
+            units.add(unit)
+    return units
+
+
 def _arm_units(config_dir: Path) -> set:
     """Units containing ARM-state functions (symbols without the thumb flag)."""
     arm = []
@@ -249,6 +262,8 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
         n.rule("gba_ld", f"{prefix_str}ld{exe} -T $ldscript -o $out --no-warn-rwx-segments -Map $map",
                description="LINK $out")
         n.rule("gba_ld_r", f"{prefix_str}ld{exe} -r -o $out $in", description="LINK $out")
+        n.rule("gba_common_view", f"{prefix_str}ld{exe} -r -d -T {_path(tools / 'common.ld')} -o $out $in",
+               description="COMMON $out")
         n.rule("gba_rename_data", f"{prefix_str}objcopy{exe} --rename-section .rodata=.rodata.$name "
                "--rename-section .data=.data.$name $in $out", description="OBJCOPY $out")
         n.rule("gba_strip_attributes", f"{prefix_str}objcopy{exe} -R .ARM.attributes $in $out",
@@ -427,6 +442,15 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                         bases[unit] = base
             complete = {u for u in bases if u.startswith(("libgcc/", "libagbsyscall/", "libc/"))
                         or u in COMPLETE.get(info["config"], [])}
+            # Objdiff needs section-backed storage to compare COMMON symbols.
+            # Keep this view separate: linking it would turn tentative definitions
+            # into strong definitions and prevent normal cross-object coalescing.
+            comparison_bases = dict(bases)
+            for unit in sorted(_common_units(config_dir) & bases.keys()):
+                view = _path(out / "src" / f"{unit}.common.o")
+                n.build(view, "gba_common_view", bases[unit],
+                        implicit=binutils_stamp + [_path(tools / "common.ld")])
+                comparison_bases[unit] = view
 
             asm = [_path(out / "asm" / f"{u}.s") for u in units]
             ldscript = _path(out / "ldscript.ld")
@@ -458,8 +482,8 @@ def configure_gba(config: ProjectConfig, binutils_dir: Optional[Path], compilers
                     },
                 }
                 if unit in bases:
-                    objects.append(bases[unit])
-                    unit_config["base_path"] = bases[unit]
+                    objects.append(comparison_bases[unit])
+                    unit_config["base_path"] = comparison_bases[unit]
                     source = _unit_source(src_dir, unit) or src_dir / f"{unit}.s"
                     if source.is_file():
                         unit_config["metadata"]["source_path"] = _path(source)

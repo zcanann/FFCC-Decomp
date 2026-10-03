@@ -271,8 +271,11 @@ course:
 sound_data:
 	.data       start:0x02014690 end:0x020158A0
 
+libc/reent/sbrkr:
+	.common     start:0x020158A0 end:0x020158A4 align:4
+
 bss:
-	.bss        start:0x020158A0 end:0x020159A4
+	.bss        start:0x020158A4 end:0x020159A4
 
 obj:
 	.data       start:0x020159A4 end:0x020159AC

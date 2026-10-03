@@ -30,7 +30,8 @@ BSS_SECTIONS = {".ewram_bss": (EWRAM_BASE, EWRAM_END), ".bss": (IWRAM_BASE, IWRA
 
 _SYMBOL = re.compile(r"^(\S+)\s*=\s*(\.\w+):0x([0-9A-Fa-f]+);\s*//(.*)$")
 _UNIT = re.compile(r"^(\S+):\s*$")
-_RANGE = re.compile(r"^\s+(\.\w+)\s+start:0x([0-9A-Fa-f]+)\s+end:0x([0-9A-Fa-f]+)\s*$")
+_RANGE = re.compile(r"^\s+(\.\w+)\s+start:0x([0-9A-Fa-f]+)\s+end:0x([0-9A-Fa-f]+)"
+                    r"(?:\s+align:(0x[0-9A-Fa-f]+|[0-9]+))?\s*$")
 
 
 @dataclass
@@ -53,6 +54,7 @@ class Split:
     section: str
     start: int
     end: int
+    alignment: Optional[int] = None
 
 
 def parse_symbols(path: Path) -> List[Symbol]:
@@ -83,7 +85,10 @@ def parse_splits(path: Path) -> List[Split]:
             continue
         m = _RANGE.match(line)
         if m and unit:
-            splits.append(Split(unit, m.group(1), int(m.group(2), 16), int(m.group(3), 16)))
+            alignment = int(m.group(4), 0) if m.group(4) else None
+            if alignment is not None and (alignment <= 0 or alignment & (alignment - 1)):
+                raise ValueError(f"Invalid section alignment: {line.strip()}")
+            splits.append(Split(unit, m.group(1), int(m.group(2), 16), int(m.group(3), 16), alignment))
     return splits
 
 
@@ -104,7 +109,8 @@ def write_splits(path: Path, splits: List[Split]) -> None:
                 out.append("")
             out.append(f"{s.unit}:")
             unit = s.unit
-        out.append(f"\t{s.section:<12}start:0x{s.start:08X} end:0x{s.end:08X}")
+        alignment = f" align:{s.alignment}" if s.alignment is not None else ""
+        out.append(f"\t{s.section:<12}start:0x{s.start:08X} end:0x{s.end:08X}{alignment}")
     path.write_text("\n".join(out) + "\n")
 
 
@@ -238,7 +244,7 @@ class Emitter:
         for _ in range(2):
             body = []
             for split in ranges:
-                if split.section in BSS_SECTIONS:
+                if split.section in BSS_SECTIONS or split.section == ".common":
                     body.extend(self.emit_bss(split))
                 else:
                     body.extend(self.emit_range(split, unit))
@@ -247,6 +253,8 @@ class Emitter:
     def emit_bss(self, split: Split) -> List[str]:
         # Common symbols are aligned up to 16 bytes, so a range can start past a gap.
         align = next(n for n in (16, 8, 4) if split.start % n == 0) if split.start % 4 == 0 else 4
+        if split.alignment is not None:
+            align = split.alignment
         out = ["", f"\t.section {self.input_section(split)},\"aw\",%nobits", f"\t.balign {align}"]
         address = split.start
         for s in self.symbols:
@@ -271,7 +279,7 @@ class Emitter:
         is_code = split.section == ".text"
         if not is_code:
             # Data starts at its own alignment; the gap before it is the linker's padding.
-            align = next(n for n in (4, 2, 1) if split.start % n == 0)
+            align = split.alignment or next(n for n in (4, 2, 1) if split.start % n == 0)
             if align > 1:
                 out.append(f"\t.balign {align}")
         mode = None
@@ -413,7 +421,7 @@ class Emitter:
         for name, (lo, hi) in BSS_SECTIONS.items():
             if lo <= value < hi:
                 s = self.containing(value)
-                if s is not None and s.section == name:
+                if s is not None and s.section in (name, ".common"):
                     off = value - s.address
                     return s.name if off == 0 else f"{s.name}+0x{off:X}"
         return None
@@ -434,6 +442,8 @@ class Emitter:
         groups = []
         for split in sorted(self.splits, key=lambda s: s.start):
             output = split.section
+            if output == ".common":
+                output = ".ewram_bss" if EWRAM_BASE <= split.start < EWRAM_END else ".bss"
             if split.start < self.a.end:
                 if output in BSS_SECTIONS:
                     output = ".data"
@@ -442,8 +452,13 @@ class Emitter:
             if not groups or groups[-1][0] != output:
                 groups.append((output, []))
             groups[-1][1].append(split)
+        # Without an explicit fallback, ld puts every unclaimed COMMON symbol
+        # in the first output section mentioning COMMON, even when that selector
+        # names one object. Keep unclaimed storage after the IWRAM BSS ranges.
+        common_fallback = next((i for i in range(len(groups) - 1, -1, -1)
+                                if groups[i][0] == ".bss"), None)
         counts = {}
-        for section, ordered in groups:
+        for index, (section, ordered) in enumerate(groups):
             count = counts.get(section, 0)
             counts[section] = count + 1
             name = section if count == 0 else f"{section}.{count}"
@@ -452,7 +467,11 @@ class Emitter:
             out.append("\t{")
             for split in ordered:
                 name = split.section if split.unit in compiled else self.input_section(split)
+                if split.section == ".common" and split.unit in compiled:
+                    name = "COMMON"
                 out.append(f"\t\t{objects[split.unit]}({name})")
+            if index == common_fallback:
+                out.append("\t\t*(COMMON)")
             # Alignment gaps between objects were zero-filled, not nop-filled.
             out.append("\t} =0" if section in LOAD_SECTIONS else "\t}")
         out.append("\t/DISCARD/ : { *(.ARM.attributes) *(.comment) }")

@@ -96,7 +96,11 @@ project used Make, an IDE, or another build system.
 
 The minigame's sound work area is part of the downloaded image. Its seven typed
 objects in `sound_data.c` have explicit zero initializers, which this compiler
-emits in declaration order in `.data`. The following 260 bytes remain unclaimed.
+emits in declaration order in `.data`. Newlib's four-byte `errno` follows at
+`0x020158A0`, allocated from the original
+`libc/reent/sbrkr.o` common definition. Its objdiff view materializes that storage
+with `ld -r -d`; this comparison object is never used in the final link.
+The following 256 bytes remain unclaimed.
 These reconstructed unit boundaries do not establish the original source files.
 The SDK still supplies tentative common definitions for four sound globals;
 binutils warns that their default 16-byte common alignment exceeds the source

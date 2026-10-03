@@ -752,20 +752,20 @@ void StreamControl()
 	do {
 		RedVoiceDATA* voiceData;
 		int streamResult;
+		int work;
 		if (RedStreamDataIsPlaying(streamData)) {
 			voiceData = streamData->m_voiceData;
 			if (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE) {
 				if (voiceData->m_axVoice->priority == 0) {
 					_StreamStop(streamData);
 				} else {
-					int currentBufferSampleStart = streamData->m_aramBuffer;
-					currentBufferSampleStart += streamData->m_streamCursorBase;
-					currentBufferSampleStart *= REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE;
+					work = streamData->m_aramBuffer + streamData->m_streamCursorBase;
+					work *= REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE;
 					int axSamplePosition = voiceData->m_axVoice->pb.addr.currentAddressHi;
 					axSamplePosition <<= REDSOUND_STREAM_AX_CURRENT_ADDRESS_HI_SHIFT;
 					axSamplePosition |= voiceData->m_axVoice->pb.addr.currentAddressLo;
-					if ((axSamplePosition >= currentBufferSampleStart) &&
-					    (axSamplePosition < RedStreamAramSampleGetEnd(currentBufferSampleStart))) {
+					if ((axSamplePosition >= work) &&
+					    (axSamplePosition < RedStreamAramSampleGetEnd(work))) {
 						streamResult = 0;
 						if (RedStreamHeaderHasNoLoop(&streamData->m_header)) {
 							streamData->m_header.m_loopEnd = streamData->m_header.m_loopEnd - REDSOUND_STREAM_SAMPLE_ADVANCE;
@@ -781,19 +781,19 @@ void StreamControl()
 
 						if (streamResult == 0) {
 							if (streamData->m_streamCursorBase != 0) {
-								streamResult = REDSOUND_STREAM_BUFFER_SIDE_A;
+								work = REDSOUND_STREAM_BUFFER_SIDE_A;
 								streamData->m_streamCursorBase = RedStreamBufferSideGetCursorBase(REDSOUND_STREAM_BUFFER_SIDE_A);
 							} else {
-								streamResult = REDSOUND_STREAM_BUFFER_SIDE_B;
+								work = REDSOUND_STREAM_BUFFER_SIDE_B;
 								streamData->m_streamCursorBase = RedStreamBufferSideGetCursorBase(REDSOUND_STREAM_BUFFER_SIDE_B);
 							}
 
 							if (RedStreamHeaderHasNoLoop(&streamData->m_header)) {
-								streamResult = _ArrangeStreamDataNoLoop(streamData, streamResult, REDSOUND_STREAM_PAGE_SIZE);
+								work = _ArrangeStreamDataNoLoop(streamData, work, REDSOUND_STREAM_PAGE_SIZE);
 							} else {
-								streamResult = _ArrangeStreamDataLoop(streamData, streamResult, REDSOUND_STREAM_PAGE_SIZE);
+								work = _ArrangeStreamDataLoop(streamData, work, REDSOUND_STREAM_PAGE_SIZE);
 							}
-							streamData->m_dmaId = streamResult;
+							streamData->m_dmaId = work;
 						}
 					}
 

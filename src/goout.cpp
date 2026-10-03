@@ -1105,12 +1105,37 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 584b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGoOutMenu::SelectYesNo(int, int, int)
+inline unsigned char CGoOutMenu::SelectYesNo(int cursorY0, int cursorY1, int cursorMode)
 {
-	// TODO
+    m_drawCursor = 1;
+    m_cursorListY0 = cursorY0;
+    m_cursorListY1 = cursorY1;
+    m_cursorMode = cursorMode;
+
+    if (MenuPcs.m_menuWindowInfo->state != 1) {
+        return 0;
+    }
+
+    if ((Pad.GetButtonDown(0) & 3) != 0) {
+        m_cursorChoice ^= 1;
+        Sound.PlaySe(1, 0x40, 0x7f, 0);
+    } else if ((Pad.GetButtonDown(0) & 0x100) != 0) {
+        if (m_cursorChoice == 0) {
+            Sound.PlaySe(2, 0x40, 0x7f, 0);
+        } else if (m_cursorChoice == 1) {
+            Sound.PlaySe(3, 0x40, 0x7f, 0);
+        }
+        return m_cursorChoice + 1;
+    }
+
+    return 0;
 }
 
 /*
@@ -1125,22 +1150,40 @@ void CGoOutMenu::InitSelectYesNo()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGoOutMenu::HitAnyKey()
+inline bool CGoOutMenu::HitAnyKey()
 {
-	// TODO
+    if ((Pad.GetButtonDown(0) & 0x100) != 0) {
+        Sound.PlaySe(2, 0x40, 0x7f, 0);
+        return true;
+    }
+
+    return false;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGoOutMenu::HitCanncel()
+inline bool CGoOutMenu::HitCanncel()
 {
-	// TODO
+    if ((Pad.GetButtonDown(0) & 0x200) != 0) {
+        Sound.PlaySe(3, 0x40, 0x7f, 0);
+        return true;
+    }
+
+    return false;
 }
 
 /*
@@ -1489,9 +1532,6 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
  */
 void CGoOutMenu::CalcGoOut()
 {
-    unsigned short input;
-    unsigned char next;
-
     if (m_watchCardDisconnect != 0 && m_modeFrame >= 0x14 && (m_modeFrame & 0xF) == 0) {
         if ((m_modeFrame & 0x10) != 0) {
             if (static_cast<McCtrl*>(&MenuPcs.m_mcCtrl)->ChkConnect(0) == 1) {
@@ -1535,21 +1575,11 @@ card_connected:;
             break;
         }
 
-        input = Pad.GetButtonDown(0);
-        {
-            bool pressed;
-            if ((input & 0x100) != 0) {
-                Sound.PlaySe(2, 0x40, 0x7f, 0);
-                pressed = true;
+        if (HitAnyKey()) {
+            if (m_returnGoOutMode == -1) {
+                SetMainMode(1);
             } else {
-                pressed = false;
-            }
-            if (pressed) {
-                if (m_returnGoOutMode == -1) {
-                    SetMainMode(1);
-                } else {
-                    SetGoOutMode(m_returnGoOutMode);
-                }
+                SetGoOutMode(m_returnGoOutMode);
             }
         }
         break;
@@ -1558,18 +1588,8 @@ card_connected:;
             break;
         }
 
-        input = Pad.GetButtonDown(0);
-        {
-            bool pressed;
-            if ((input & 0x100) != 0) {
-                Sound.PlaySe(2, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
-                SetMainMode(1);
-            }
+        if (HitAnyKey()) {
+            SetMainMode(1);
         }
         break;
     case 7:
@@ -1577,18 +1597,8 @@ card_connected:;
             break;
         }
 
-        input = Pad.GetButtonDown(0);
-        {
-            bool pressed;
-            if ((input & 0x100) != 0) {
-                Sound.PlaySe(2, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
-                SetGoOutMode(8);
-            }
+        if (HitAnyKey()) {
+            SetGoOutMode(8);
         }
         break;
     case 8:
@@ -1632,11 +1642,7 @@ card_connected:;
                 SetGoOutMode(0);
             } else {
                 m_accessCardChannel = 0;
-                const int cardChannel = m_accessCardChannel;
-                const int saveIndex = m_accessSaveIndex;
-                m_saveIndex = static_cast<char>(saveIndex);
-                m_cardChannel = static_cast<char>(cardChannel);
-                MenuPcs.m_mcCtrl.m_cardChannel = cardChannel;
+                SetMemCardSlot(m_accessCardChannel, m_accessSaveIndex);
                 SetGoOutMode(10);
             }
         }
@@ -1778,94 +1784,24 @@ card_connected:;
             break;
         }
 
-        input = Pad.GetButtonDown(0);
-        {
-            bool pressed;
-            if ((input & 0x200) != 0) {
-                Sound.PlaySe(3, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
-                SetGoOutMode(0xf);
-                break;
-            }
+        if (HitCanncel()) {
+            SetGoOutMode(0xf);
+            break;
         }
 
-        {
-            unsigned char sel;
-            if (m_returnTransfer == 0) {
-                m_drawCursor = 1;
-                m_cursorListY0 = 0xb1;
-                m_cursorListY1 = 0xdc;
-                m_cursorMode = 0;
-
-                if (MenuPcs.m_menuWindowInfo->state != 1) {
-                    next = 0;
-                    goto go10_done1;
-                }
-
-                input = Pad.GetButtonDown(0);
-                if ((input & 3) != 0) {
-                    m_cursorChoice ^= 1;
-                    Sound.PlaySe(1, 0x40, 0x7f, 0);
-                } else {
-                    input = Pad.GetButtonDown(0);
-                    if ((input & 0x100) != 0) {
-                        if (m_cursorChoice == 0) {
-                            Sound.PlaySe(2, 0x40, 0x7f, 0);
-                        } else if (m_cursorChoice == 1) {
-                            Sound.PlaySe(3, 0x40, 0x7f, 0);
-                        }
-                        next = static_cast<unsigned char>(m_cursorChoice + 1);
-                        goto go10_done1;
-                    }
-                }
-
-                next = 0;
-            go10_done1:
-                sel = next;
-            } else {
-                m_drawCursor = 1;
-                m_cursorListY0 = 0x8b;
-                m_cursorListY1 = 0xdc;
-                m_cursorMode = 0;
-
-                if (MenuPcs.m_menuWindowInfo->state != 1) {
-                    next = 0;
-                    goto go10_done2;
-                }
-
-                input = Pad.GetButtonDown(0);
-                if ((input & 3) != 0) {
-                    m_cursorChoice ^= 1;
-                    Sound.PlaySe(1, 0x40, 0x7f, 0);
-                } else {
-                    input = Pad.GetButtonDown(0);
-                    if ((input & 0x100) != 0) {
-                        if (m_cursorChoice == 0) {
-                            Sound.PlaySe(2, 0x40, 0x7f, 0);
-                        } else if (m_cursorChoice == 1) {
-                            Sound.PlaySe(3, 0x40, 0x7f, 0);
-                        }
-                        next = static_cast<unsigned char>(m_cursorChoice + 1);
-                        goto go10_done2;
-                    }
-                }
-
-                next = 0;
-            go10_done2:
-                sel = next;
-            }
-            switch (sel) {
-            case 1:
-                SetGoOutMode(0x11);
-                break;
-            case 2:
-                SetGoOutMode(0xf);
-                break;
-            }
+        unsigned char sel;
+        if (m_returnTransfer == 0) {
+            sel = SelectYesNo(0xb1, 0xdc, 0);
+        } else {
+            sel = SelectYesNo(0x8b, 0xdc, 0);
+        }
+        switch (sel) {
+        case 1:
+            SetGoOutMode(0x11);
+            break;
+        case 2:
+            SetGoOutMode(0xf);
+            break;
         }
         break;
     case 0x11:
@@ -1873,58 +1809,18 @@ card_connected:;
             break;
         }
 
-        input = Pad.GetButtonDown(0);
-        {
-            bool pressed;
-            if ((input & 0x200) != 0) {
-                Sound.PlaySe(3, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
-                SetGoOutMode(0xf);
-                break;
-            }
+        if (HitCanncel()) {
+            SetGoOutMode(0xf);
+            break;
         }
 
-        m_drawCursor = 1;
-        m_cursorListY0 = 0xd3;
-        m_cursorListY1 = 0xe9;
-        m_cursorMode = 0;
-        {
-            if (MenuPcs.m_menuWindowInfo->state != 1) {
-                next = 0;
-                goto do_switch_go11;
-            }
-
-            input = Pad.GetButtonDown(0);
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
-                input = Pad.GetButtonDown(0);
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
-                    }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
-                    goto do_switch_go11;
-                }
-            }
-
-            next = 0;
-        do_switch_go11:
-            switch (next) {
-            case 1:
-                SetGoOutMode(0x12);
-                break;
-            case 2:
-                SetGoOutMode(0xf);
-                break;
-            }
+        switch (SelectYesNo(0xd3, 0xe9, 0)) {
+        case 1:
+            SetGoOutMode(0x12);
+            break;
+        case 2:
+            SetGoOutMode(0xf);
+            break;
         }
         break;
     case 0x12:
@@ -1945,15 +1841,7 @@ card_connected:;
         break;
     case 0x14:
         if (m_messageWindowOpen != 0) {
-            input = Pad.GetButtonDown(0);
-            bool pressed;
-            if ((input & 0x100) != 0) {
-                Sound.PlaySe(2, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
+            if (HitAnyKey()) {
                 MenuPcs.SetCaravanWork(MenuPcs.m_goOutTransferSaveData);
                 MenuPcs.ChgAllModel();
                 SetGoOutMode(1);
@@ -1965,44 +1853,13 @@ card_connected:;
             break;
         }
 
-        m_drawCursor = 1;
-        m_cursorListY0 = 0xcf;
-        m_cursorListY1 = 0xe7;
-        m_cursorMode = 0;
-        {
-            if (MenuPcs.m_menuWindowInfo->state != 1) {
-                next = 0;
-                goto do_switch_go3;
-            }
-
-            input = Pad.GetButtonDown(0);
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
-                input = Pad.GetButtonDown(0);
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
-                    }
-
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
-                    goto do_switch_go3;
-                }
-            }
-
-            next = 0;
-        do_switch_go3:
-            switch (next) {
-            case 1:
-                SetGoOutMode(4);
-                break;
-            case 2:
-                SetMainMode(1);
-                break;
-            }
+        switch (SelectYesNo(0xcf, 0xe7, 0)) {
+        case 1:
+            SetGoOutMode(4);
+            break;
+        case 2:
+            SetMainMode(1);
+            break;
         }
         break;
     case 4:
@@ -2010,44 +1867,13 @@ card_connected:;
             break;
         }
 
-        m_drawCursor = 1;
-        m_cursorListY0 = 0xce;
-        m_cursorListY1 = 0xde;
-        m_cursorMode = 0;
-        {
-            if (MenuPcs.m_menuWindowInfo->state != 1) {
-                next = 0;
-                goto do_switch_go4;
-            }
-
-            input = Pad.GetButtonDown(0);
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
-                input = Pad.GetButtonDown(0);
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
-                    }
-
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
-                    goto do_switch_go4;
-                }
-            }
-
-            next = 0;
-        do_switch_go4:
-            switch (next) {
-            case 1:
-                SetGoOutMode(5);
-                break;
-            case 2:
-                SetMainMode(1);
-                break;
-            }
+        switch (SelectYesNo(0xce, 0xde, 0)) {
+        case 1:
+            SetGoOutMode(5);
+            break;
+        case 2:
+            SetMainMode(1);
+            break;
         }
         break;
     case 5:
@@ -2065,18 +1891,8 @@ card_connected:;
             break;
         }
 
-        input = Pad.GetButtonDown(0);
-        {
-            bool pressed;
-            if ((input & 0x100) != 0) {
-                Sound.PlaySe(2, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
-                SetMainMode(1);
-            }
+        if (HitAnyKey()) {
+            SetMainMode(1);
         }
         break;
     default:
@@ -2299,24 +2115,13 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
  */
 void CGoOutMenu::CalcDel()
 {
-
     const unsigned char selInit = static_cast<unsigned char>(__cntlzw(2 - static_cast<int>(m_deleteMode)) >> 5 & 0xFF);
     const int selResult = MenuPcs.CalcGoOutSelChar(selInit, 0);
-    unsigned short input;
-    unsigned char next;
 
     switch (m_deleteMode) {
     case 0:
         if (m_messageWindowOpen != 0) {
-            input = Pad.GetButtonDown(0);
-            bool pressed;
-            if ((input & 0x100) != 0) {
-                Sound.PlaySe(2, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
+            if (HitAnyKey()) {
                 if (m_prevDeleteMode == -1) {
                     SetMainMode(1);
                 } else {
@@ -2342,57 +2147,17 @@ void CGoOutMenu::CalcDel()
             return;
         }
 
-        input = Pad.GetButtonDown(0);
-        {
-            bool pressed;
-            if ((input & 0x200) != 0) {
-                Sound.PlaySe(3, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
-                SetDelMode(2);
-            }
+        if (HitCanncel()) {
+            SetDelMode(2);
         }
 
-        m_drawCursor = 1;
-        m_cursorListY0 = 0xad;
-        m_cursorListY1 = 0xbc;
-        m_cursorMode = 0;
-        {
-            if (MenuPcs.m_menuWindowInfo->state != 1) {
-                next = 0;
-                goto do_switch_del3;
-            }
-
-            input = Pad.GetButtonDown(0);
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
-                input = Pad.GetButtonDown(0);
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
-                    }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
-                    goto do_switch_del3;
-                }
-            }
-
-            next = 0;
-        do_switch_del3:
-            switch (next) {
-            case 1:
-                SetDelMode(4);
-                break;
-            case 2:
-                SetDelMode(2);
-                break;
-            }
+        switch (SelectYesNo(0xad, 0xbc, 0)) {
+        case 1:
+            SetDelMode(4);
+            break;
+        case 2:
+            SetDelMode(2);
+            break;
         }
         break;
     case 4:
@@ -2400,70 +2165,22 @@ void CGoOutMenu::CalcDel()
             return;
         }
 
-        input = Pad.GetButtonDown(0);
-        {
-            bool pressed;
-            if ((input & 0x200) != 0) {
-                Sound.PlaySe(3, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
-                SetDelMode(2);
-            }
+        if (HitCanncel()) {
+            SetDelMode(2);
         }
 
-        m_drawCursor = 1;
-        m_cursorListY0 = 0xc2;
-        m_cursorListY1 = 0xd1;
-        m_cursorMode = 0;
-        {
-            if (MenuPcs.m_menuWindowInfo->state != 1) {
-                next = 0;
-                goto do_switch_del4;
-            }
-
-            input = Pad.GetButtonDown(0);
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
-                input = Pad.GetButtonDown(0);
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
-                    }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
-                    goto do_switch_del4;
-                }
-            }
-
-            next = 0;
-        do_switch_del4:
-            switch (next) {
-            case 1:
-                SetDelMode(5);
-                break;
-            case 2:
-                SetDelMode(2);
-                break;
-            }
+        switch (SelectYesNo(0xc2, 0xd1, 0)) {
+        case 1:
+            SetDelMode(5);
+            break;
+        case 2:
+            SetDelMode(2);
+            break;
         }
         break;
     case 5:
         if (m_messageWindowOpen != 0 && static_cast<int>(MenuPcs.IsMenuCharaAnimIdle(m_selectedChara)) != 0) {
-            input = Pad.GetButtonDown(0);
-            bool pressed;
-            if ((input & 0x100) != 0) {
-                Sound.PlaySe(2, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
+            if (HitAnyKey()) {
                 CCaravanWork& caravanWork = Game.m_caravanWorkArr[m_selectedChara];
                 caravanWork.m_shopState = 0;
                 memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0x8A4, 0, 0x100);
@@ -2477,57 +2194,17 @@ void CGoOutMenu::CalcDel()
             return;
         }
 
-        input = Pad.GetButtonDown(0);
-        {
-            bool pressed;
-            if ((input & 0x200) != 0) {
-                Sound.PlaySe(3, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
-                SetDelMode(2);
-            }
+        if (HitCanncel()) {
+            SetDelMode(2);
         }
 
-        m_drawCursor = 1;
-        m_cursorListY0 = 0x97;
-        m_cursorListY1 = 0xe9;
-        m_cursorMode = 0;
-        {
-            if (MenuPcs.m_menuWindowInfo->state != 1) {
-                next = 0;
-                goto do_switch_del6;
-            }
-
-            input = Pad.GetButtonDown(0);
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
-                input = Pad.GetButtonDown(0);
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
-                    }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
-                    goto do_switch_del6;
-                }
-            }
-
-            next = 0;
-        do_switch_del6:
-            switch (next) {
-            case 1:
-                SetDelMode(7);
-                break;
-            case 2:
-                SetDelMode(2);
-                break;
-            }
+        switch (SelectYesNo(0x97, 0xe9, 0)) {
+        case 1:
+            SetDelMode(7);
+            break;
+        case 2:
+            SetDelMode(2);
+            break;
         }
         break;
     case 7:
@@ -2535,71 +2212,23 @@ void CGoOutMenu::CalcDel()
             return;
         }
 
-        input = Pad.GetButtonDown(0);
-        {
-            bool pressed;
-            if ((input & 0x200) != 0) {
-                Sound.PlaySe(3, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
-                SetDelMode(2);
-            }
+        if (HitCanncel()) {
+            SetDelMode(2);
         }
 
-        m_drawCursor = 1;
-        m_cursorListY0 = 0x9f;
-        m_cursorListY1 = 0xdb;
-        m_cursorMode = 0;
-        {
-            if (MenuPcs.m_menuWindowInfo->state != 1) {
-                next = 0;
-                goto do_switch_del7;
-            }
-
-            input = Pad.GetButtonDown(0);
-            if ((input & 3) != 0) {
-                m_cursorChoice ^= 1;
-                Sound.PlaySe(1, 0x40, 0x7f, 0);
-            } else {
-                input = Pad.GetButtonDown(0);
-                if ((input & 0x100) != 0) {
-                    if (m_cursorChoice == 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    } else if (m_cursorChoice == 1) {
-                        Sound.PlaySe(3, 0x40, 0x7f, 0);
-                    }
-                    next = static_cast<unsigned char>(m_cursorChoice + 1);
-                    goto do_switch_del7;
-                }
-            }
-
-            next = 0;
-        do_switch_del7:
-            switch (next) {
-            case 1:
-                Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag = 0;
-                SetDelMode(8);
-                break;
-            case 2:
-                SetDelMode(2);
-                break;
-            }
+        switch (SelectYesNo(0x9f, 0xdb, 0)) {
+        case 1:
+            Game.m_caravanWorkArr[m_selectedChara].m_shopBusyFlag = 0;
+            SetDelMode(8);
+            break;
+        case 2:
+            SetDelMode(2);
+            break;
         }
         break;
     case 8:
         if (m_messageWindowOpen != 0 && static_cast<int>(MenuPcs.IsMenuCharaAnimIdle(m_selectedChara)) != 0) {
-            input = Pad.GetButtonDown(0);
-            bool pressed;
-            if ((input & 0x100) != 0) {
-                Sound.PlaySe(2, 0x40, 0x7f, 0);
-                pressed = true;
-            } else {
-                pressed = false;
-            }
-            if (pressed) {
+            if (HitAnyKey()) {
                 SetDelMode(1);
             }
         }
@@ -2679,15 +2308,7 @@ void CGoOutMenu::Calc()
         switch (mode) {
         case 0:
             if (m_messageWindowOpen != 0) {
-                input = Pad.GetButtonDown(0);
-                bool pressed;
-                if ((input & 0x100) != 0) {
-                    Sound.PlaySe(2, 0x40, 0x7f, 0);
-                    pressed = true;
-                } else {
-                    pressed = false;
-                }
-                if (pressed) {
+                if (HitAnyKey()) {
                     SetMainMode(m_nextMainMode);
                 }
             }

@@ -704,37 +704,42 @@ void birth(
     switch (params->m_spawnMode) {
     default:
         if (0.0f != params->m_speed) {
-            float speedScalar = params->m_speed;
+            float speedScalar;
 
             switch (params->m_speedMode) {
             default:
+                speedScalar = params->m_speed;
                 break;
             case 1:
                 Math.RandF();
                 speedScalar = params->m_speed * Math.RandF();
                 break;
             case 2: {
-speedScalar = (params->m_speed * Math.RandF()) * Math.RandF();
+                speedScalar = params->m_speed * Math.RandF() * Math.RandF();
                 break;
             }
             case 3: {
                 float rand1 = Math.RandF();
                 float rand2 = Math.RandF();
-                speedScalar = params->m_speed - 0.7f * ((params->m_speed * rand2) * rand1);
+                speedScalar = params->m_speed * rand2;
+                speedScalar = params->m_speed - 0.7f * (speedScalar * rand1);
                 break;
             }
             case 4: {
                 float rand1 = Math.RandF();
                 float rand2 = Math.RandF();
                 float rand3 = Math.RandF();
-                speedScalar = Math.RandF() * (rand3 * ((params->m_speed * rand2) * rand1));
+                float rand4 = Math.RandF();
+                speedScalar = params->m_speed * rand2;
+                speedScalar = rand4 * (rand3 * (speedScalar * rand1));
                 break;
             }
             case 5: {
                 float rand1 = Math.RandF();
                 float rand2 = Math.RandF();
                 float rand3 = Math.RandF();
-                speedScalar = params->m_speed - 0.5f * (rand3 * ((params->m_speed * rand2) * rand1));
+                speedScalar = params->m_speed * rand2;
+                speedScalar = params->m_speed - 0.5f * (rand3 * (speedScalar * rand1));
                 break;
             }
             }
@@ -761,6 +766,7 @@ speedScalar = (params->m_speed * Math.RandF()) * Math.RandF();
             float r1;
             float r2;
             float r3;
+            float r4;
 
             switch (speedMode) {
             default:
@@ -811,14 +817,11 @@ speedScalar = (params->m_speed * Math.RandF()) * Math.RandF();
                 rowPos.y = t;
                 t = particleData->m_matrix[2][3];
                 rowPos.z = t;
-                r3 = Math.RandF();
-                rowPos.x = (params->m_speed * Math.RandF()) * r3;
+                rowPos.x = params->m_speed * Math.RandF() * Math.RandF();
                 rowPos.x -= halfSpeed;
-                r3 = Math.RandF();
-                rowPos.y = (params->m_speed * Math.RandF()) * r3;
+                rowPos.y = params->m_speed * Math.RandF() * Math.RandF();
                 rowPos.y -= halfSpeed;
-                r3 = Math.RandF();
-                rowPos.z = (params->m_speed * Math.RandF()) * r3;
+                rowPos.z = params->m_speed * Math.RandF() * Math.RandF();
                 rowPos.z -= halfSpeed;
                 t = rowPos.x;
                 particleData->m_matrix[0][3] = t;
@@ -836,15 +839,18 @@ speedScalar = (params->m_speed * Math.RandF()) * Math.RandF();
                 rowPos.z = t;
                 r3 = Math.RandF();
                 r2 = Math.RandF();
-                rowPos.x = params->m_speed - 0.7f * ((params->m_speed * r2) * r3);
+                r2 = params->m_speed * r2;
+                rowPos.x = params->m_speed - 0.7f * (r2 * r3);
                 rowPos.x -= halfSpeed;
                 r3 = Math.RandF();
                 r2 = Math.RandF();
-                rowPos.y = params->m_speed - 0.7f * ((params->m_speed * r2) * r3);
+                r2 = params->m_speed * r2;
+                rowPos.y = params->m_speed - 0.7f * (r2 * r3);
                 rowPos.y -= halfSpeed;
                 r3 = Math.RandF();
                 r2 = Math.RandF();
-                rowPos.z = params->m_speed - 0.7f * ((params->m_speed * r2) * r3);
+                r2 = params->m_speed * r2;
+                rowPos.z = params->m_speed - 0.7f * (r2 * r3);
                 rowPos.z -= halfSpeed;
                 t = rowPos.x;
                 particleData->m_matrix[0][3] = t;
@@ -863,17 +869,23 @@ speedScalar = (params->m_speed * Math.RandF()) * Math.RandF();
                 r1 = Math.RandF();
                 r2 = Math.RandF();
                 r3 = Math.RandF();
-                rowPos.x = Math.RandF() * (r3 * ((params->m_speed * r2) * r1));
+                r4 = Math.RandF();
+                r2 = params->m_speed * r2;
+                rowPos.x = r4 * (r3 * (r2 * r1));
                 rowPos.x -= halfSpeed;
                 r1 = Math.RandF();
                 r2 = Math.RandF();
                 r3 = Math.RandF();
-                rowPos.y = Math.RandF() * (r3 * ((params->m_speed * r2) * r1));
+                r4 = Math.RandF();
+                r2 = params->m_speed * r2;
+                rowPos.y = r4 * (r3 * (r2 * r1));
                 rowPos.y -= halfSpeed;
                 r1 = Math.RandF();
                 r2 = Math.RandF();
                 r3 = Math.RandF();
-                rowPos.z = Math.RandF() * (r3 * ((params->m_speed * r2) * r1));
+                r4 = Math.RandF();
+                r2 = params->m_speed * r2;
+                rowPos.z = r4 * (r3 * (r2 * r1));
                 rowPos.z -= halfSpeed;
                 t = rowPos.x;
                 particleData->m_matrix[0][3] = t;
@@ -892,17 +904,20 @@ speedScalar = (params->m_speed * Math.RandF()) * Math.RandF();
                 r2 = Math.RandF();
                 r3 = Math.RandF();
                 r1 = Math.RandF();
-                rowPos.x = params->m_speed - 0.5f * (r1 * ((params->m_speed * r3) * r2));
+                r3 = params->m_speed * r3;
+                rowPos.x = params->m_speed - 0.5f * (r1 * (r3 * r2));
                 rowPos.x -= halfSpeed;
                 r2 = Math.RandF();
                 r3 = Math.RandF();
                 r1 = Math.RandF();
-                rowPos.y = params->m_speed - 0.5f * (r1 * ((params->m_speed * r3) * r2));
+                r3 = params->m_speed * r3;
+                rowPos.y = params->m_speed - 0.5f * (r1 * (r3 * r2));
                 rowPos.y -= halfSpeed;
                 r2 = Math.RandF();
                 r3 = Math.RandF();
                 r1 = Math.RandF();
-                rowPos.z = params->m_speed - 0.5f * (r1 * ((params->m_speed * r3) * r2));
+                r3 = params->m_speed * r3;
+                rowPos.z = params->m_speed - 0.5f * (r1 * (r3 * r2));
                 rowPos.z -= halfSpeed;
                 t = rowPos.x;
                 particleData->m_matrix[0][3] = t;
@@ -913,9 +928,12 @@ speedScalar = (params->m_speed * Math.RandF()) * Math.RandF();
                 break;
             }
 
-            float x = particleData->m_matrix[0][3] * params->m_directionScale.x;
-            float y = particleData->m_matrix[1][3] * params->m_directionScale.y;
-            float z = particleData->m_matrix[2][3] * params->m_directionScale.z;
+            float x = particleData->m_matrix[0][3];
+            float y = particleData->m_matrix[1][3];
+            float z = particleData->m_matrix[2][3];
+            x *= params->m_directionScale.x;
+            y *= params->m_directionScale.y;
+            z *= params->m_directionScale.z;
             particleData->m_matrix[0][3] = x;
             particleData->m_matrix[1][3] = y;
             particleData->m_matrix[2][3] = z;

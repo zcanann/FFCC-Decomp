@@ -257,8 +257,7 @@ void Header_Init(void)
     Header_Clear();
 }
 
-void Bg_LoadBackdrop(no)
-s32 no;
+void Bg_LoadBackdrop(s32 no)
 {
     u16 buf[40];
     const u16 *tiles;

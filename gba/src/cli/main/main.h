@@ -32,8 +32,7 @@ void Header_Clear(void);
 void Header_Print(const char *str);
 void Header_DrawBar(void);
 
-/* Called with and without an argument (the look screen passes none). */
-void Bg_LoadBackdrop();
+void Bg_LoadBackdrop(s32 no);
 void Bg_CopyBackdropToRadar(void);
 void Bg_ClearMaps(void);
 void Bg_LoadPlayerPalette(void);

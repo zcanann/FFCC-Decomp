@@ -937,7 +937,7 @@ s32 CMakeLookScreen_Exit(void)
         } else {
             ret = 1;
             gCMakeData.look = (gCMakeData.look & ~0xF) | ((win->cursor & 3) | ((win[1].cursor & 3) << 2));
-            Bg_LoadBackdrop();
+            Bg_LoadBackdrop(win->cursor & 3);
         }
     }
     Obj_DrawBanner(2, 8, 7, 20, 0, 1);

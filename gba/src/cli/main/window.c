@@ -1042,30 +1042,28 @@ void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
     s32 a;
     s32 k;
     s32 attr;
-    s32 baseTile;
     u8 n;
     u16 *map;
 
     px = win->x * 8;
     py = win->y * 8 + win->anim + 8;
     n = win->anim >> 3;
-    baseTile = tile;
     if (n >= win->height)
         return;
     if (n <= 1) {
         for (i = 0; i < win->width; i++) {
             if (i == 0)
-                k = baseTile;
+                k = tile;
             else if (i == 1)
-                k = baseTile + 1;
+                k = tile + 1;
             else if (i == win->width - 2)
-                k = baseTile + 4;
+                k = tile + 4;
             else if (i >= win->width - 1)
-                k = baseTile + 5;
+                k = tile + 5;
             else if (i & 2)
-                k = baseTile + 2;
+                k = tile + 2;
             else
-                k = baseTile + 3;
+                k = tile + 3;
             if (win->anim != 0)
                 k += 6;
             buf[i] = k | pal;
@@ -1073,51 +1071,54 @@ void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
         k = win->y + (win->anim >> 3);
         map = Bg_GetMapPtr(win->bg, win->x, k);
         DmaCopy16(0, buf, map, win->width << 1);
-    } else if (n < win->height - 3) {
-        k = n & 1;
-        attr = Window_GetItemPalette(1, win->slot);
-        for (i = 0; i < win->width; i++) {
-            if (i <= 1 || i >= win->width - 2) {
-                if (i <= 1)
-                    a = i + 12;
-                else
-                    a = i - win->width + 16;
-                t = baseTile + a;
-                if (k)
-                    t += 4;
-                a = pal;
-            } else {
-                if (!(i & 2))
-                    t = baseTile - 4;
-                else
-                    t = baseTile - 2;
-                if (k)
-                    t += 1;
-                a = attr;
-            }
-            buf[i] = t | a;
-        }
-        map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
-        DmaCopy16(0, buf, map, win->width << 1);
     } else {
-        for (i = 0; i < win->width; i++) {
-            if (i == 0)
-                k = baseTile + 20;
-            else if (i == 1)
-                k = baseTile + 21;
-            else if (i == win->width - 2)
-                k = baseTile + 24;
-            else if (i >= win->width - 1)
-                k = baseTile + 25;
-            else if (i & 2)
-                k = baseTile + 22;
-            else
-                k = baseTile + 23;
-            k += (n - (win->height - 3)) * 6;
-            buf[i] = k | pal;
+        s32 row = win->anim >> 3;
+        if (row < win->height - 3) {
+            k = row & 1;
+            attr = Window_GetItemPalette(1, win->slot);
+            for (i = 0; i < win->width; i++) {
+                if (i <= 1 || i >= win->width - 2) {
+                    if (i <= 1)
+                        a = i + 12;
+                    else
+                        a = i - win->width + 16;
+                    t = tile + a;
+                    if (k)
+                        t += 4;
+                    a = pal;
+                } else {
+                    if (!(i & 2))
+                        t = tile - 4;
+                    else
+                        t = tile - 2;
+                    if (k)
+                        t += 1;
+                    a = attr;
+                }
+                buf[i] = t | a;
+            }
+            map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
+            DmaCopy16(0, buf, map, win->width << 1);
+        } else {
+            for (i = 0; i < win->width; i++) {
+                if (i == 0)
+                    k = tile + 20;
+                else if (i == 1)
+                    k = tile + 21;
+                else if (i == win->width - 2)
+                    k = tile + 24;
+                else if (i >= win->width - 1)
+                    k = tile + 25;
+                else if (i & 2)
+                    k = tile + 22;
+                else
+                    k = tile + 23;
+                k += (row - (win->height - 3)) * 6;
+                buf[i] = k | pal;
+            }
+            map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
+            DmaCopy16(0, buf, map, win->width << 1);
         }
-        map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
-        DmaCopy16(0, buf, map, win->width << 1);
     }
     if ((py >> 3) - win->y < win->height) {
         for (i = 0; i < win->width; i++, px += 8) {

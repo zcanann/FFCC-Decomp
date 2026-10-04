@@ -209,6 +209,33 @@ def relocated_bytes(section, address, placements, known):
     return bytes(result), evidence
 
 
+def absolute_candidates(section, image, base, placements, known, limit):
+    """Locate initialized pointers only after resolving every ABS32 target.
+
+    ABS32 bytes do not depend on the section's own address. PC-relative or
+    unresolved relocations therefore cannot supply this search pattern. The
+    ordinary byte/relocation and definition-dependency checks still apply.
+    """
+    if not section.relocations or any(r['type'] != 2 for r in section.relocations):
+        return None
+    try:
+        needle, _ = relocated_bytes(section, 0, placements, known)
+    except ValueError:
+        return None
+    matches = []
+    position = 0
+    while True:
+        position = image.find(needle, position)
+        if position < 0:
+            return matches
+        address = base + position
+        position += 1
+        if address % section.alignment == 0:
+            matches.append(address)
+            if len(matches) > limit:
+                return matches
+
+
 def mapping_ranges(section, address):
     mappings = sorted((s['value'], s['name'][1]) for s in section.symbols
                       if s['name'].split('.')[0] in ('$a', '$t', '$d'))
@@ -217,16 +244,18 @@ def mapping_ranges(section, address):
                  kind=kind) for i, (start, kind) in enumerate(mappings)]
 
 
-def symbol_line(symbol, section, address):
+def symbol_line(symbol, section, address, raw=False):
     kind = 'function' if symbol['kind'] == 'STT_FUNC' else 'object'
     flags = ' thumb' if kind == 'function' and symbol['value'] & 1 else ''
     if symbol['binding'] == 'STB_LOCAL':
         flags += ' scope:local'
+    if raw:
+        flags += ' data:byte'
     return (f"{symbol['name']} = {section}:0x{address:08X}; // type:{kind} "
             f"size:0x{symbol['size']:X}{flags}")
 
 
-def proposals(unit, section, address, symbols, splits):
+def proposals(unit, section, address, symbols, splits, image_range=None):
     end = address + section.size
     overlaps = [s for s in splits if s.start < end and address < s.end]
     blockers = [s for s in overlaps if s.unit != unit and not s.unit.startswith('regional_')]
@@ -254,10 +283,40 @@ def proposals(unit, section, address, symbols, splits):
             continue
         old = [s for s in symbols if s.address == at and s.kind ==
                ('function' if symbol['kind'] == 'STT_FUNC' else 'object')]
+        offset = symbol_offset(symbol)
+        # Numeric tables can contain values resembling image addresses. Only
+        # ELF relocation sites identify pointers; preserve literal object bytes
+        # when no such site intersects this object's extent.
+        raw = symbol['kind'] == 'STT_OBJECT' and not any(
+            r['type'] != 40 and r['offset'] < offset + symbol['size']
+            and offset < r['offset'] + 4 for r in section.relocations)
+        if symbol['kind'] == 'STT_OBJECT' and not raw:
+            # data:byte applies to an entire object. For a mixed pointer/numeric
+            # object neither setting preserves relocation semantics if a numeric
+            # field resembles a pointer. Withhold the whole section proposal;
+            # the independent complete-byte proof remains useful to reviewers.
+            ranges = [(s.start, s.end) for s in splits]
+            ranges += [(s.address, s.address + max(s.size, 1)) for s in symbols
+                       if s.section != '.abs']
+            if image_range is not None:
+                ranges.append(image_range)
+            conflicts = []
+            first = offset + (-(address + offset) % 4)
+            for word in range(first, offset + symbol['size'] - 3, 4):
+                if any(r['type'] != 40 and r['offset'] < word + 4
+                       and word < r['offset'] + 4 for r in section.relocations):
+                    continue
+                value = struct.unpack_from('<I', section.data, word)[0]
+                if any(lo <= value < hi or lo <= (value & ~1) < hi for lo, hi in ranges):
+                    conflicts.append(dict(symbol=symbol['name'], offset=word,
+                                          address=address + word, value=value))
+            if conflicts:
+                return dict(blocked='nonrelocated pointer-like word in mixed object',
+                            conflicts=conflicts)
         definitions.append(dict(action='replace_symbol' if old else 'define_symbol',
                                 name=symbol['name'], address=at,
                                 existing_names=[s.name for s in old],
-                                line=symbol_line(symbol, section.name, at)))
+                                line=symbol_line(symbol, section.name, at, raw)))
     false_entries = []
     for symbol in symbols:
         if symbol.kind != 'function':
@@ -274,6 +333,7 @@ def audit_object(unit, path, image, base, symbols, splits, limit=128):
     raw, sections, common = read_object(path)
     known = known_symbols(symbols, splits, unit)
     candidates, reasons, fixed = {}, {}, {}
+    placement_methods = {}
     hints = defaultdict(set)
     hint_sources = defaultdict(set)
     # Repeated rounds allow an ABS32 reference in a uniquely placed section to
@@ -281,6 +341,7 @@ def audit_object(unit, path, image, base, symbols, splits, limit=128):
     # both sections pass complete relocation/byte validation below.
     for _ in range(len(sections) + 1):
         old_hints = {k: set(v) for k, v in hints.items()}
+        old_candidates = dict(candidates)
         for index, section in sections.items():
             if section.nobits:
                 continue
@@ -288,6 +349,15 @@ def audit_object(unit, path, image, base, symbols, splits, limit=128):
                 candidates[index], fixed[index], reason = candidate_addresses(
                     section, image, base, known, hints[index], limit)
                 reasons[index] = reason
+                if reason == 'insufficient fixed bytes without an identity/reference anchor':
+                    provisional = {i: addresses[0] for i, addresses in candidates.items()
+                                   if len(addresses) == 1}
+                    matches = absolute_candidates(section, image, base, provisional, known, limit)
+                    if matches is not None:
+                        candidates[index] = matches
+                        reasons[index] = ('candidate limit exceeded; ambiguity retained'
+                                          if len(matches) > limit else None)
+                        placement_methods[index] = 'resolved_absolute_relocations'
             except ValueError as error:
                 candidates[index], reasons[index] = [], str(error)
             if len(candidates[index]) != 1:
@@ -304,7 +374,7 @@ def audit_object(unit, path, image, base, symbols, splits, limit=128):
                         inferred = value - addend - symbol['value']
                     hints[symbol['section']].add(inferred & 0xFFFFFFFF)
                     hint_sources[symbol['section']].add(index)
-        if dict(hints) == old_hints:
+        if dict(hints) == old_hints and candidates == old_candidates:
             break
     placements = {i: addresses[0] for i, addresses in candidates.items() if len(addresses) == 1}
     for index, section in sections.items():
@@ -315,6 +385,8 @@ def audit_object(unit, path, image, base, symbols, splits, limit=128):
     for index, section in sections.items():
         row = dict(section=section.name, size=section.size, alignment=section.alignment,
                    fixed_bytes=fixed.get(index, 0), candidates=candidates.get(index, []))
+        if index in placement_methods:
+            row['placement_method'] = placement_methods[index]
         if section.nobits:
             row.update(status='unverified_storage_extent', references=sorted(hints[index]),
                        reason='source NOBITS size does not prove retail allocation extent')
@@ -358,7 +430,8 @@ def audit_object(unit, path, image, base, symbols, splits, limit=128):
             row['status'] = 'conditional'
             row['reason'] = 'referenced source sections lack verified regional extents'
         else:
-            row['proposal'] = proposals(unit, section, row['address'], symbols, splits)
+            row['proposal'] = proposals(unit, section, row['address'], symbols, splits,
+                                        (base, base + len(image)))
         row['dependencies'] = [sections[i].name for i in sorted(dependencies[index])]
     return dict(unit=unit, object=str(path), sha256=hashlib.sha256(raw).hexdigest(),
                 sections=records, common=[dict(name=s['name'], source_size=s['size'],

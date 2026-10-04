@@ -139,7 +139,13 @@ edits, input hashes, and reasons for rejecting candidates. A proposed initialize
 section must reproduce every retail byte, including its supported relocations.
 Ambiguous placements, unsupported relocations, and conflicting ownership block
 proposals. Compiler mapping symbols identify literal pools that were mistaken
-for functions. BSS and COMMON sizes remain unverified storage extents.
+for functions. Fully resolved absolute relocations can locate small pointer-only
+sections such as constructor tables, with the same uniqueness and dependency
+checks. Object symbols without relocations receive raw-byte annotations so
+numeric values resembling addresses do not become spurious pointers. Mixed
+objects whose numeric words could be mistaken for pointers require manual
+metadata recovery and block proposals. BSS and COMMON sizes remain unverified
+storage extents.
 
 This is a dry run: it changes neither configuration nor completion claims.
 Review the proposed edits, rebuild, and check objdiff plus the full regional

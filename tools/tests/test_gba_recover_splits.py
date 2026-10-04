@@ -253,6 +253,217 @@ odd_data: .byte 0x34,0x56,0x78
         with self.assertRaisesRegex(ValueError, 'source object missing'):
             objects_from_project(project, 'cli')
 
+    def constructor_fixture(self, external=False):
+        obj = self.assemble('constructor', '''
+.text
+.thumb
+.global Init
+.type Init,%function
+.thumb_func
+Init: mov r0,#47
+mov r1,#53
+mov r2,#59
+mov r3,#61
+add r0,r1
+bx lr
+.size Init, .-Init
+.section .ctors,"aw"
+.align 2
+.word ''' + ('Missing' if external else 'Init') + '\n')
+        image = self.image([obj], '''Missing = 0x02000101; SECTIONS {
+ .text 0x02000000 : { *(.text) }
+ .ctors 0x02000080 : { *(.ctors) }
+}''')
+        symbols = [Symbol('Init', '.text', BASE, 'function', 12, True)]
+        splits = [Split('constructor', '.text', BASE, BASE + 12),
+                  Split('regional_data', '.rodata', BASE + 0x80, BASE + len(image))]
+        return obj, image, symbols, splits
+
+    def test_relocation_only_constructor_table_has_unique_verified_placement(self):
+        obj, image, symbols, splits = self.constructor_fixture()
+        result = audit([('constructor', obj)], image, symbols, splits)
+        ctor = next(s for s in result['objects'][0]['sections'] if s['section'] == '.ctors')
+        self.assertEqual(ctor['status'], 'verified')
+        self.assertEqual(ctor['fixed_bytes'], 0)
+        self.assertEqual(ctor['placement_method'], 'resolved_absolute_relocations')
+        self.assertEqual(ctor['address'], BASE + 0x80)
+        self.assertEqual(ctor['dependencies'], ['.text'])
+        self.assertTrue(any(e['action'] == 'add_range' and e['section'] == '.ctors'
+                            for e in result['batch_split_edits']))
+
+    def test_relocation_only_search_preserves_ambiguity_and_definition_dependency(self):
+        obj, image, symbols, splits = self.constructor_fixture()
+        duplicated = image + image[-4:]
+        result = audit([('constructor', obj)], duplicated, symbols, splits)
+        ctor = next(s for s in result['objects'][0]['sections'] if s['section'] == '.ctors')
+        self.assertEqual(ctor['status'], 'ambiguous')
+        self.assertEqual(ctor['candidates'], [BASE + 0x80, BASE + 0x84])
+        self.assertNotIn('proposal', ctor)
+        corrupt = bytearray(image)
+        corrupt[0] ^= 1
+        result = audit([('constructor', obj)], bytes(corrupt), symbols, splits)
+        ctor = next(s for s in result['objects'][0]['sections'] if s['section'] == '.ctors')
+        self.assertEqual(ctor['status'], 'conditional')
+        self.assertEqual(ctor['unverified_dependencies'], ['.text'])
+        self.assertNotIn('proposal', ctor)
+
+    def test_relocation_only_search_does_not_infer_unknown_external_targets(self):
+        obj, image, symbols, splits = self.constructor_fixture(external=True)
+        result = audit([('constructor', obj)], image, symbols, splits)
+        ctor = next(s for s in result['objects'][0]['sections'] if s['section'] == '.ctors')
+        self.assertEqual(ctor['status'], 'unresolved')
+        self.assertEqual(ctor['candidates'], [])
+        self.assertNotIn('proposal', ctor)
+
+    def test_numeric_objects_remain_raw_while_pointer_objects_keep_relocations(self):
+        from gba.tools.split import Emitter, analyze, parse_symbols
+        obj = self.assemble('tables', '''
+.text
+.arm
+.global Entry
+.type Entry,%function
+Entry: bx lr
+.size Entry, .-Entry
+.data
+.global NumericWords, PointerWords
+.type NumericWords,%object
+NumericWords: .word 0x02000000, 0x02000004
+.size NumericWords, .-NumericWords
+.type PointerWords,%object
+PointerWords: .word Entry, NumericWords
+.size PointerWords, .-PointerWords
+''')
+        image = self.image([obj], '''SECTIONS {
+ .text 0x02000000 : { *(.text) }
+ .data 0x02000040 : { *(.data) }
+}''')
+        symbols = [Symbol('Entry', '.text', BASE, 'function', 4),
+                   Symbol('NumericWords', '.data', BASE + 0x40, 'object', 1, raw=True),
+                   Symbol('PointerWords', '.data', BASE + 0x48, 'object', 1, raw=True)]
+        splits = [Split('tables', '.text', BASE, BASE + 4),
+                  Split('regional_data', '.data', BASE + 0x40, BASE + 0x50)]
+        rows = audit([('tables', obj)], image, symbols, splits)['objects'][0]['sections']
+        self.assertTrue(all(s['status'] == 'verified' for s in rows))
+        lines = [e['line'] for s in rows for e in s['proposal']['symbol_edits']
+                 if e['action'] in ('replace_symbol', 'define_symbol')]
+        self.assertIn('data:byte', next(s for s in lines if s.startswith('NumericWords ')))
+        self.assertNotIn('data:byte', next(s for s in lines if s.startswith('PointerWords ')))
+        config = self.work / 'symbols.txt'
+        config.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+        recovered = parse_symbols(config)
+        owned = [Split('tables', s.section, s.start, s.end) for s in splits]
+        emitter = Emitter(analyze(image, recovered), recovered, owned)
+        assembly = emitter.emit_unit('tables')
+        target = self.assemble('recovered', assembly)
+        _, source_sections, _ = read_object(obj)
+        _, target_sections, _ = read_object(target)
+        source = next(s for s in source_sections.values() if s.name == '.data')
+        result = next(s for s in target_sections.values() if s.name == '.data')
+        self.assertEqual(result.data, source.data)
+        self.assertEqual([(r['offset'], r['type'], r['symbol']['name']) for r in result.relocations],
+                         [(r['offset'], r['type'], r['symbol']['name']) for r in source.relocations])
+
+    def test_mixed_numeric_pointer_word_blocks_metadata_not_byte_proof(self):
+        from gba.tools.split import Emitter, analyze
+        obj = self.assemble('mixed', '''
+.text
+.arm
+.global Entry
+.type Entry,%function
+Entry: bx lr
+.size Entry, .-Entry
+.data
+.global Mixed
+.type Mixed,%object
+Mixed: .word Entry, 0x02000000
+.size Mixed, .-Mixed
+''')
+        image = self.image([obj], '''SECTIONS {
+ .text 0x02000000 : { *(.text) }
+ .data 0x02000040 : { *(.data) }
+}''')
+        symbols = [Symbol('Entry', '.text', BASE, 'function', 4),
+                   Symbol('Mixed', '.data', BASE + 0x40, 'object', 8)]
+        splits = [Split('mixed', '.text', BASE, BASE + 4),
+                  Split('regional_data', '.data', BASE + 0x40, BASE + 0x48)]
+        # The same linked value denotes a pointer and an integer. Removing the
+        # object's raw flag would make the splitter invent a second relocation.
+        owned = [Split('mixed', s.section, s.start, s.end) for s in splits]
+        unsafe = self.assemble('unsafe', Emitter(analyze(image, symbols), symbols, owned).emit_unit('mixed'))
+        _, source_sections, _ = read_object(obj)
+        _, target_sections, _ = read_object(unsafe)
+        source = next(s for s in source_sections.values() if s.name == '.data')
+        target = next(s for s in target_sections.values() if s.name == '.data')
+        self.assertEqual([r['offset'] for r in source.relocations], [0])
+        self.assertEqual([r['offset'] for r in target.relocations], [0, 4])
+        result = audit([('mixed', obj)], image, symbols, splits)
+        row = next(s for s in result['objects'][0]['sections'] if s['section'] == '.data')
+        self.assertEqual(row['status'], 'verified')
+        self.assertEqual(row['verified_bytes'], 8)
+        self.assertEqual(row['proposal'], dict(
+            blocked='nonrelocated pointer-like word in mixed object',
+            conflicts=[dict(symbol='Mixed', offset=4, address=BASE + 0x44, value=BASE)]))
+        self.assertNotIn('symbol_edits', row['proposal'])
+        self.assertFalse(any(e['section'] == '.data' for e in result['batch_split_edits']))
+
+    def test_mixed_object_with_nonpointer_integer_remains_accepted(self):
+        obj = self.assemble('mixed_small', '''
+.text
+.arm
+.global Entry
+.type Entry,%function
+Entry: bx lr
+.size Entry, .-Entry
+.data
+.global Mixed
+.type Mixed,%object
+Mixed: .word Entry, 1234, 0
+.size Mixed, .-Mixed
+''')
+        image = self.image([obj], '''SECTIONS {
+ .text 0x02000000 : { *(.text) }
+ .data 0x02000040 : { *(.data) }
+}''')
+        symbols = [Symbol('Entry', '.text', BASE, 'function', 4),
+                   Symbol('Mixed', '.data', BASE + 0x40, 'object', 12),
+                   Symbol('AbsoluteZero', '.abs', 0, 'object', 0)]
+        splits = [Split('mixed_small', '.text', BASE, BASE + 4),
+                  Split('regional_data', '.data', BASE + 0x40, BASE + 0x4C)]
+        result = audit([('mixed_small', obj)], image, symbols, splits)
+        row = next(s for s in result['objects'][0]['sections'] if s['section'] == '.data')
+        self.assertEqual(row['status'], 'verified')
+        self.assertNotIn('blocked', row['proposal'])
+        self.assertNotIn('data:byte', row['proposal']['symbol_edits'][0]['line'])
+
+    def test_mixed_word_bootstrap_without_configured_symbols_or_ranges(self):
+        obj = self.assemble('mixed_bootstrap', '''
+.text
+.arm
+.global Entry
+.type Entry,%function
+Entry:
+mov r0, #17
+mov r1, #23
+mov r2, #41
+bx lr
+.size Entry, .-Entry
+.data
+.global Mixed
+.type Mixed,%object
+Mixed: .word Entry, 0x02000000
+.size Mixed, .-Mixed
+''')
+        image = self.image([obj], '''SECTIONS {
+ .text 0x02000000 : { *(.text) }
+ .data 0x02000040 : { *(.data) }
+}''')
+        result = audit([('mixed_bootstrap', obj)], image, [], [])
+        row = next(s for s in result['objects'][0]['sections'] if s['section'] == '.data')
+        self.assertEqual(row['status'], 'verified')
+        self.assertEqual(row['proposal']['blocked'], 'nonrelocated pointer-like word in mixed object')
+        self.assertEqual(row['proposal']['conflicts'][0]['value'], BASE)
+        self.assertFalse(result['batch_split_edits'])
+
     def test_known_function_placements_must_agree(self):
         obj = self.assemble('two', '''
 .arm

@@ -55,10 +55,35 @@ public:
     char GET_1(char**);
     int GetWait();
     void SetPlayerIndex(int index) { m_playerIndex = index; }
-    float GetMaxWidth() const { return mMaxWidth; }
-    float GetMaxHeight() const { return mMaxHeight; }
-    void SetTlutBase(int tlutBase) { mTlutBase = tlutBase; }
-    void SetShadow(int shadow) { mShadow = shadow; }
+    float GetWidth() { return mMaxWidth; }
+    float GetHeight() { return mMaxHeight; }
+    float GetPosX() { return mBaseX; }
+    float GetPosY() { return mBaseY; }
+    void SetTlut(int tlutBase, int shadow)
+    {
+        mTlutBase = tlutBase;
+        mShadow = shadow;
+    }
+    int GetIdxSelect() { return mRubyHeight; }
+    void SetIdxSelect(int index) { mRubyHeight = index; }
+    int GetNumSelect() { return mRubyLine; }
+    int GetDefaultSelect() { return mRubyOffset; }
+    float GetYSelect() { return mRubyY; }
+    float GetHSelect() { return mRubySpacing; }
+    void SetValue(int index, int value) { mFlagVars[index] = value; }
+    int IsEnd() { return mWaitActive; }
+    int IsFadeOut() { return mFadeEnabled; }
+    void FadeOut()
+    {
+        mFadeEnabled = 1;
+        mFadeCursor = 0;
+    }
+    bool IsFadeOutCompleted() { return (mFadeEnabled != 0) && (mFadeCursor == mFadeFrames); }
+    void Skip()
+    {
+        mDrawCursor = mRevealCursor + 1000;
+        useFlag(mFlagCount, 1);
+    }
     void Calc();
     void Draw();
     void SetPosition(float, float);

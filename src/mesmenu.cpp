@@ -27,6 +27,20 @@ int s_mesMenuIconFrames[4] = {1, 6, 7, 6};
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::SetTlut(CMenuPcs::TEX tex, _GXColor* tlut)
+{
+    m_textures[tex]->SetExternalTlut(tlut, 1);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8009b4e4
  * PAL Size: 12b
  * EN Address: TODO
@@ -60,7 +74,7 @@ inline void CMesMenu::close(int closeReason)
     m_state = 4;
     m_active = 0;
     if (m_menuIndex < 4) {
-        MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(1);
+        MenuPcs.GetRingMenu(m_menuIndex)->SetFade(1);
     }
 }
 
@@ -121,10 +135,9 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
         float margin = 24.0f;
         m_marginX = margin;
         m_marginY = margin;
-        m_mes.SetTlutBase(((flags & 2) != 0) ? 0x1C : 0);
-        m_mes.SetShadow(((flags & 2) != 0) ? 0 : 1);
+        m_mes.SetTlut(((flags & 2) != 0) ? 0x1C : 0, ((flags & 2) != 0) ? 0 : 1);
     } else {
-        MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(0);
+        MenuPcs.GetRingMenu(m_menuIndex)->SetFade(0);
         float marginX = 16.0f;
         float marginY = 8.0f;
         m_marginX = marginX;
@@ -137,8 +150,8 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int buttonMask, int i
     m_mes.Set(script, flags & 0x20);
 
     float two = 2.0f;
-    m_windowWidth = 2.0f * m_marginX + m_mes.GetMaxWidth();
-    m_windowHeight = two * m_marginY + m_mes.GetMaxHeight();
+    m_windowWidth = 2.0f * m_marginX + m_mes.GetWidth();
+    m_windowHeight = two * m_marginY + m_mes.GetHeight();
 
     if (m_menuIndex >= 4) {
         if ((flags & 8) != 0) {
@@ -222,7 +235,7 @@ void CMesMenu::onScriptChanging(char*)
     m_active = 0;
     menuIndex = m_menuIndex;
     if (menuIndex < 4) {
-        MenuPcs.m_battleRingMenus[menuIndex]->SetFade(1);
+        MenuPcs.GetRingMenu(menuIndex)->SetFade(1);
     }
 }
 
@@ -484,7 +497,7 @@ void CMesMenu::onDraw()
         }
 
         float pulse = 32.0f * (1.0f - sinf(1.5707964f * stageBlend));
-        MenuPcs.m_battleRingMenus[m_menuIndex]->GetDispCounter();
+        MenuPcs.GetRingMenu(m_menuIndex)->GetDispCounter();
         int maskX = m_menuIndex & 1;
         float pulseX;
         if (maskX != 0) {
@@ -571,7 +584,7 @@ void CMesMenu::onDraw()
                     int itemV = (itemIndex / 8) * 0x30;
                     MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).Ref());
                     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-                    MenuPcs.m_textures[0x18]->SetExternalTlut(0, 1);
+                    MenuPcs.SetTlut(static_cast<CMenuPcs::TEX>(0x18), 0);
                     int itemMaskX = m_menuIndex & 1;
                     int itemOffsetX = 83;
                     if (itemMaskX != 0) {
@@ -701,8 +714,7 @@ void CMesMenu::onDraw()
         float shakeY = (float)foodShakeY;
         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).Ref());
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-        MenuPcs.m_textures[0x18]->SetExternalTlut(
-            (scriptFood->m_hp != 0) ? 0 : (void*)MenuPcs.m_externalFontTlut, 1);
+        MenuPcs.SetTlut(static_cast<CMenuPcs::TEX>(0x18), (scriptFood->m_hp != 0) ? 0 : MenuPcs.GetFaceTlut());
         int foodMaskX = m_menuIndex & 1;
         int foodOffsetX = 5;
         if (foodMaskX != 0) {
@@ -773,7 +785,7 @@ void CMesMenu::onDraw()
                         int itemV = (itemIndex / 8) * 0x30;
                         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).Ref());
                         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-                        MenuPcs.m_textures[0x18]->SetExternalTlut(0, 1);
+                        MenuPcs.SetTlut(static_cast<CMenuPcs::TEX>(0x18), 0);
                         int itemOffsetX = 83;
                         if (anchorX != 0) {
                             itemOffsetX = 13;
@@ -835,9 +847,9 @@ void CMesMenu::onDraw()
             MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * stageBlend)).Ref());
 
             MenuPcs.DrawRect(
-                0, (-12.0f) + m_mes.mBaseX,
-                (float)m_mes.mRubyHeight * m_mes.mRubySpacing +
-                    (2.0f + m_mes.mBaseY + m_mes.mRubyY),
+                0, (-12.0f) + m_mes.GetPosX(),
+                (float)m_mes.GetIdxSelect() * m_mes.GetHSelect() +
+                    (2.0f + m_mes.GetPosY() + m_mes.GetYSelect()),
                 32.0f, 32.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
         }
         break;
@@ -1010,25 +1022,22 @@ void CMesMenu::onCalc()
                     }
                 }
 
-                m_mes.mRubyHeight = cursor;
+                m_mes.SetIdxSelect(cursor);
                 if ((altCursor >= 0) && (cursor == altCursor)) {
                     cursor = -1;
                 }
-                m_mes.mFlagVars[0] = cursor;
+                m_mes.SetValue(0, cursor);
             } else {
                 int wait1 = m_mes.GetWait();
-                if (((wait1 == 1) || (m_mes.GetWait() == 5)) &&
-                    (m_mes.mFadeEnabled == 0)) {
-                    m_mes.mFadeEnabled = 1;
-                    m_mes.mFadeCursor = 0;
+                if (((wait1 == 1) || (m_mes.GetWait() == 5)) && !m_mes.IsFadeOut()) {
+                    m_mes.FadeOut();
                 }
             }
 
             if ((downMask & 0x100) != 0) {
                 int wait2 = m_mes.GetWait();
                 if (wait2 == 0) {
-                    m_mes.mDrawCursor = m_mes.mRevealCursor + 1000;
-                    m_mes.useFlag(m_mes.mFlagCount, 1);
+                    m_mes.Skip();
                 } else {
                     int wait3 = m_mes.GetWait();
                     if ((wait3 == 3) && ((m_flags & 0x4000) == 0)) {
@@ -1036,27 +1045,21 @@ void CMesMenu::onCalc()
                     }
                     int wait4 = m_mes.GetWait();
                     if ((wait4 != 1) && (m_mes.GetWait() != 5) &&
-                        (m_mes.mWaitActive == 0) && ((m_flags & 0x4000) == 0)) {
+                        !m_mes.IsEnd() && ((m_flags & 0x4000) == 0)) {
                         Sound.PlaySe(0xC, 0x40, 0x7F, 0);
                     }
 
-                    if (m_mes.mFadeEnabled != 0) {
+                    if (m_mes.IsFadeOut()) {
                         goto close;
                     }
-                    m_mes.mFadeEnabled = 1;
-                    m_mes.mFadeCursor = 0;
+                    m_mes.FadeOut();
                 }
             }
 
-            int msgState = m_mes.mFadeEnabled;
-            if (msgState != 0) {
-                bool closeReady = false;
-                if ((msgState != 0) && (m_mes.mFadeCursor == m_mes.mFadeFrames)) {
-                    closeReady = true;
-                }
-                if (closeReady) {
+            if (m_mes.IsFadeOut()) {
+                if (m_mes.IsFadeOutCompleted()) {
                 close:
-                    if (m_mes.mWaitActive != 0) {
+                    if (m_mes.IsEnd()) {
                         int wait5 = m_mes.GetWait();
                         if (wait5 != 4) {
                             CloseRequest(0);

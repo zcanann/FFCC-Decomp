@@ -426,6 +426,8 @@ public:
 
     void LoadExtraFont(int, char*);
     void SetExtraFontTlut(int, _GXColor);
+    _GXColor* GetFaceTlut() { return reinterpret_cast<_GXColor*>(m_externalFontTlut); }
+    void SetTlut(TEX, _GXColor*);
 
     void drawPause();
 
@@ -595,6 +597,7 @@ public:
     int ArtiClose();
     void ArtiDraw();
     int ArtiCtrlCur();
+    void EquipInit0();
     void EquipInit1();
     int EquipOpen();
     int EquipCtrl();
@@ -627,6 +630,7 @@ public:
     int MoneyClose();
     void MoneyDraw();
     int MoneyCtrlCur();
+    void MoneyInit();
     inline void MoneySetPlace(int);
     void MLstInit();
     void MLstInit1();
@@ -634,7 +638,7 @@ public:
     int MLstCtrl();
     int MLstClose();
     void MLstDraw();
-    void MLstCtrlCur();
+    int MLstCtrlCur();
     void CmdInit();
     void CmdInit0();
     void CmdInit1();
@@ -658,7 +662,7 @@ public:
     unsigned int CmdClose1();
     unsigned int CmdOpen2();
     unsigned int CmdClose2();
-    void GetFontItem();
+    CFont* GetFontItem() { return m_fonts[4]; }
     char* GetAttrStr(int);
     void SetParty();
     void SetCMakeEnd(int);
@@ -806,6 +810,8 @@ public:
     void BindMcObj();
     void DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char);
     CFont* GetFont22();
+    CFont* GetFont23() { return m_fonts[1]; }
+    CRingMenu* GetRingMenu(int index) { return m_battleRingMenus[index]; }
     CMesMenu* GetMesMenu(int);
     void CopyNowCaravanDat(Mc::SaveDat*);
     void SetCaravanWork(Mc::SaveDat*);

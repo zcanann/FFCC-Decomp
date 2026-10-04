@@ -480,16 +480,6 @@ unsigned int CMenuPcs::CmdClose2()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::GetFontItem()
-{
-	return;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8014ad90
  * PAL Size: 1204b
  * EN Address: TODO

@@ -126,7 +126,7 @@ jobs:
         done
 
     - name: Install split audit dependencies
-      run: apk add --no-cache py3-pyelftools
+      run: apk add --no-cache py3-elftools
 
     # Build the project
     - name: Build

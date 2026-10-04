@@ -483,6 +483,7 @@ public:
     void SingMenuInit();
     void CreateShopMenu();
     void CreateSmithMenu();
+    void DestroyShopMenu();
     void SingMenuEnd();
     void destroyVillageMenu();
     /*

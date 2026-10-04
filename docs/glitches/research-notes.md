@@ -51,6 +51,20 @@ letters) are already documented and give speed, not routing.
 7. Guest return power-off: test on hardware
    (see [guest-transfer.md](guest-transfer.md)). Also check whether guests get
    a family in Tipa.
+8. Double craft: confirm whether the material loop at gil 4296 trips the GBA's
+   30-frame reply timeout (see [wrong-craft-items.md](wrong-craft-items.md)).
+9. Meteor Parasite core: what the boss script does if the core dies before
+   its later phases (see [weapon-swing.md](weapon-swing.md)).
+10. Particles: what a junk particle definition does beyond being drawn.
+
+## Live memory (JP, Dolphin)
+
+- Item table `0x80979FC0`; caravan *n* at `0x8023BBB0 + n × 0xC30`; particle
+  slot table `0x802B4600`. JP globals sit about `0x1B900` above PAL's.
+- PAL GBA client symbols (`gba/config/cli/symbols.txt`) match the JP client's
+  `.bss`, for example `gSession` at `0x03002CA0`.
+- Dolphin keeps each GBA's EWRAM and IWRAM in one 0x48000-byte private region,
+  tagged `GCCJGC` at +0xAC with the port number at +0xC5.
 
 ## Process note
 

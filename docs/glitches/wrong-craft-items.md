@@ -15,8 +15,8 @@ item.
 - **Ultimite, the unused magicite (Holy, Ultima, Flare, Meteor…), the
   "Extra" items and designs 94–100 can't be reached** with gil 0–1204.
 - **Gil 1205 and up reads past the end of the table, and 32768 and up reads
-  before it.** What's there depends on the heap layout. It's probably the same
-  every boot, but it needs a memory dump to confirm.
+  before it.** The memory on both sides was mapped live on JP (below): some of
+  it is fixed, and some changes with the map.
 
 ## Gil after the craft (confirmed)
 
@@ -77,96 +77,124 @@ items for Clavat. For example, gil 1–15 gives "Slow" and gil 18–31 gives
 
 Clavat and Yuke reach almost nothing unusual in this range.
 
-## What's next to the table (partly confirmed)
+## Gil values outside 0–1204 (confirmed on JP)
 
-The table is copied into the **main heap stage** (`Game.m_mainStage`,
-0x106000 bytes) by `CFlatData::Create`
-([cflat_data.cpp:71](../../src/cflat_data.cpp#L71)). This happens once, at
-the first real script load (`CGame::loadCfd`,
-[game.cpp:807](../../src/game.cpp#L807)), and it's never freed. The allocator
-is first-fit. It rounds each size up to 0x40 and puts a 0x40-byte header in
-front ([memory.cpp:945](../../src/memory.cpp#L945)).
+### The lookup is signed
 
-Allocation order:
+Retail `SetSmithData` loads the gil slot with `lha` (sign-extending) and
+multiplies by 72 (`mulli`). So gil 32,768–65,535 is rows −32,768 to −1:
+memory **before** the table, read backwards. Gil 65,535 is the row just in
+front of it. The old GES viewer read forward for these values, so its
+"Unlikely to work" entries showed memory the game never reads.
 
-1. `param.cfd` chunk 0: player base data (3,712 bytes).
-2. `param.cfd` chunk 1: monster base data (91,872 bytes, `CRomWork`).
-3. **The item table** (86,760 bytes).
-4. `c_system.cfd` string tables, then `mail_tbl.cfd`, then `newbattle.cfd`.
+The smith materials are the opposite: they're loaded unsigned (`lhz`), so a
+material of `0xFFFF` is 65,535, not −1. Only a material of 0 ends the material
+loop.
 
-Each `DATA` chunk also allocates two empty 0x40-byte string blocks. Those can
-fill earlier holes in the heap, so the exact gap between neighbours is
-unknown.
+### What lies around the table
 
-- **Gil 32768–65535 (negative rows)** most likely read **monster base data**.
-  It's the same in every PAL language, so it would be repeatable. But the hits
-  move with the gap. Two plausible gaps (0x60 or 0x160 bytes) both give unused items
-  around gil 64,000–65,500, such as Holy magicite, Equip. 195/205/210,
-  design 100 and Extra 24/33. Those exact values aren't reliable.
-- **Gil 1205 and up** reads leftover padding, block headers (heap pointers and
-  the source name `cflat_data.cpp`), then language-specific text. It won't
-  carry over between languages.
+Read from a live JP game (`GCCJGC`) in Dolphin. JP addresses:
 
-**To settle the layout:** dump MEM1 in Dolphin after loading a save. Find the
-item table by its first row and read the block headers on either side. Each
-header names its source file and line, so the neighbours are easy to
-identify.
+- Item table: `0x80979FC0`.
+- Caravan member *n*: `0x8023BBB0 + n × 0xC30`. The GES viewer's slot
+  addresses point 0x20 bytes earlier.
+- Each heap block has a 0x40-byte header that names the source file and line
+  that allocated it, so the layout below comes straight from those headers.
 
-## The double craft (partly confirmed)
+| Rows / item IDs | Memory | Stable? |
+|---|---|---|
+| below about −1,276 | Other heap blocks, including script memory | No |
+| about −1,276 to −1 | `param.cfd` chunk 1: **monster base data** (`cflat_data.cpp:69`, 0x16700 bytes) | **Yes.** Loaded once from disc, never freed. |
+| 0–1,204 | The item table | Yes |
+| 1,206 to about 4,173 | Boot-time text: `c_system` string tables, `MES` text, `mail_tbl`, `newbattle` (`cflat_data.cpp`) | **Yes.** 2,967 of 2,968 rows matched across a town and two dungeon maps. |
+| about 4,174 and up | **Script memory** (`cflat_runtime.cpp`) | **No.** It changes per map, and the same data turns up at different offsets on different maps. |
 
-The [Lilty minimalist guide](https://rentry.co/4gioz) gets a free Ultima
-Lance when it wrong-crafts Firaga +2 at gil 4296: the craft window stays up
-and a second item appears. Gil 4296, 4545 and 4735 are all past the table's
-last row (1204), so those crafts read heap memory past the end of the table.
+There are two small 0x40-byte blocks (empty string lists) between the monster
+block and the table.
 
-### Why the window stays up (confirmed in code)
+So a gil value is only reliable if its **recipe row** sits in a stable range.
+The **item** it gives has to sit in a stable range too: its row is read again
+every time it's swung or worn.
 
-- **GameCube:** `SetSmithData` sends an error reply if `AddItem` fails or if
-  `AddGil` returns 0. `AddGil` returns the amount it actually changed, so a
-  **price of 0 counts as a failure**. A success reply is then sent anyway
-  ([gbaque.cpp:946-959](../../src/gbaque.cpp#L946-L959)). A zero-price craft
-  gives the item and sends **error, then success**.
-- **GBA:** `Reply_Set` keeps only the latest reply
-  ([xfer.c:248](../../gba/src/cli/main/xfer.c#L248)). The forge checks once per
-  frame. On success it moves on; on an error it plays the error sound and
-  **stays on the confirm prompt**
-  ([smith.c:398](../../gba/src/cli/main/smith.c#L398)). If both replies land in
-  the same GBA frame, the success wins and nothing odd happens. If they land a
-  frame apart, the window stays up. That's timing luck, which fits it being
-  rare.
-- A reply timeout (30 GBA frames without an answer) also leaves the window up.
+### Rare items in reach
 
-The guide's own gil math shows the Dreamcatcher and Sun Pendant rows also cost
-0. So those crafts can hit the same split; it just didn't happen in the runs
-the guide is based on.
+A full scan of all 65,536 gil values in a town snapshot found every one of
+these somewhere: Ultimite, Dark Sphere, all the unused magicite (Holy, Ultima,
+Flare, Meteor, Stop, Gravity…), Ribbon, Extra 24–33, designs 94–100,
+Equip. 187–210, and the Test swords. Almost all of those gil values read
+script memory, so they only hold for the map where the snapshot was taken.
+Also note:
 
-### What makes gil 4296 different (hypothesis)
+- Items 256–292 (all magicite) are deleted by `SafeDeleteTempItem`
+  ([gobjwork.cpp:1653](../../src/gobjwork.cpp#L1653)).
+- Negative item IDs don't survive leaving a map (below).
 
-The guide's math shows the Dreamcatcher and Sun Pendant rows also cost 0, yet
-only Firaga +2 keeps the window up. Besides the result and price, a row
-supplies up to three **materials** and their **counts**
-([gbaque.cpp:924-945](../../src/gbaque.cpp#L924-L945)). For heap rows these
-are arbitrary numbers. Three ways they could leave the GBA holding an error:
+### Negative item IDs
 
-1. **Split replies.** A price of 0 sends error, then success. If they reach the
-   GBA on different frames, the error is what the forge acts on.
-2. **Timeout.** For each unit of each material, the GameCube searches all 64
-   inventory slots. With counts up to 65,535 that's millions of checks. If
-   that stalls the GameCube for 30 GBA frames, the GBA gives up and leaves the
-   window up.
-3. **Dropped success.** Each deleted material sends the GBA an item update.
-   The send queue holds 64 messages and silently drops anything past that
-   ([joybus.cpp](../../src/joybus.cpp), `SetSendQueue`). If the queue fills
-   between the error and the success, only the error arrives.
+`AddItem` stores the result as a signed 16-bit value, so a result of
+0x8000–0xFFFE becomes a negative item. Its row is read from before the table,
+which for IDs −1 to about −1,276 is the stable monster block.
 
-With the window up and the cursor on "Yes", the next A press sends the same
-request. That reads the gil left by the first craft, 65,535 − price × rate, as
-the next row. That second row's Lilty result has to be 31 (Ultima Lance). If
-the first craft cost 0, that row is −1: the heap header before the table,
-whose Lilty result reads as 0 (`DUMMY-US`). So the Firaga +2 row most likely
-has a nonzero price, which points to cause 2 or 3 rather than 1.
+They get wiped by the sort that runs when you leave a map,
+`SortBeforeReturnWorldMap` ([gobjwork.cpp:2305](../../src/gobjwork.cpp#L2305)),
+called from the end-of-stage bonus screen. It treats any item ≤ 0 as an empty
+slot:
 
-**To settle it:** capture a Dolphin save state just before the Firaga +2
-craft, on the version the guide uses. Row 4296 (result, price, materials,
-counts) and the row the second craft lands on can be read straight from
-MEM1. Writing down the gil right after the double craft narrows it down too.
+- When it finds a positive item in a later slot, it moves that item into the
+  "empty" slot and writes `0xFFFF` behind it.
+- Equipment pointers follow the moved item. A negative weapon in slot 0 is
+  replaced by whatever slides in, such as Travel Clothes.
+- A negative item survives only if no positive item is left after it once the
+  sort is done, for example as the last or only item.
+- Item 0 (`DUMMY-US`) is wiped the same way.
+
+### Side effect: the item counter
+
+Each wrong craft "deletes" slot 166 (gil), which decrements
+`m_inventoryItemCount` without removing an item. One test caravan held 9 items
+while the counter read 6.
+
+## The double craft (confirmed on JP)
+
+The [Lilty minimalist guide](https://rentry.co/4gioz) wrong-crafts Firaga +2
+at gil 4296 and also gets a free Ultima Lance. On a live JP game, the guide's
+values give exactly its items for a Lilty:
+
+| Gil | Lilty result | Price field | Materials | Memory |
+|---|---|---|---|---|
+| 4296 | Firaga +2 (534) | **0xFFFF** | 3 × `0xFFFF`, counts 3 × `0xFFFF` | script block `cflat_runtime.cpp:158` |
+| 4545 | Dreamcatcher (60) | 0 | first material 0 (loop ends) | `cflat_runtime.cpp:217` |
+| 4735 | Sun Pendant (231) | 0 | first material 0 | `cflat_runtime.cpp:217` |
+| 6554 | **Ultima Lance (31)** | 14,851 | first material 0 | script memory |
+
+**The second item is a normal follow-up craft.**
+
+1. Gil 4296 is first overwritten to 65,535.
+2. Row 4296's price of 65,535 at the guide's 90% rate (Crystal Mail cost 450
+   rather than 500) is 58,981, which leaves **6,554** gil.
+3. A second request then reads row 6554, whose Lilty result is the Ultima
+   Lance.
+
+This isn't unique to 4296. In the same snapshot, 6,052 gil values have price
+`0xFFFF`, and all of them leave 6,554.
+
+**Why there's a second request (hypothesis).** The GameCube runs each request
+once, and the GBA only sends one per A press. So the second craft is another
+A press while the confirm window is still up. Row 4296 is the only one of the
+guide's rows with a material loop: 3 × 65,535 lookups, each scanning 64
+inventory slots, before the GameCube replies. The leading explanation is that
+this stalls long enough for the GBA's 30-frame reply timeout. On a timeout the
+GBA plays the error sound, keeps the window up, and leaves the cursor on Yes.
+A rough estimate puts the stall under 30 frames, so this isn't settled.
+
+Other ways the window can stay up (confirmed in code):
+
+- **Split replies.** A zero-price craft sends an error reply and then a
+  success ([gbaque.cpp:946-959](../../src/gbaque.cpp#L946-L959)), because
+  `AddGil(0)` returns 0. The GBA keeps only the latest reply
+  ([xfer.c:248](../../gba/src/cli/main/xfer.c#L248)). If the error arrives on
+  its own frame, the forge stays on the prompt
+  ([smith.c:398](../../gba/src/cli/main/smith.c#L398)).
+- **Dropped messages.** Each deleted material sends an item update, and the
+  send queue silently drops anything past 64 entries
+  ([joybus.cpp](../../src/joybus.cpp), `SetSendQueue`).

@@ -121,143 +121,6 @@ static inline void SetupSelectCloseSpriteMotion(CMenuPcs::Sprt2* sprite)
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 572b
- * EN Address: 0x8015CE84
- * EN Size: 672b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprite, int value)
-{
-	int digits[3];
-	int digitCount;
-
-	if (value >= 100) {
-		digitCount = 3;
-		digits[0] = value / 100;
-		value %= 100;
-		digits[1] = value / 10;
-		digits[2] = value % 10;
-	} else if (value >= 10) {
-		digitCount = 2;
-		digits[0] = value / 10;
-		digits[1] = value % 10;
-	} else {
-		digitCount = 1;
-		digits[0] = value;
-	}
-
-	float digitX = (float)((3.0 * (double)sprite->w - (float)(digitCount * sprite->w)) * 0.5 + (double)sprite->x);
-	float digitW = (float)sprite->w;
-	int* dp = digits;
-	for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
-		MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
-		    (float)(sprite->w * *dp), sprite->mulY,
-		    sprite->depth, sprite->depth, 0.0f);
-		digitX += digitW;
-		dp++;
-	}
-}
-
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 372b
- * EN Address: 0x8015D868
- * EN Size: 560b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::DrawBonusChkMark(float artiAlpha)
-{
-	if (!((double)artiAlpha <= 0.0)) {
-		_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-		GXColor markColor;
-		markColor.r = 0xFF;
-		markColor.g = 0xFF;
-		markColor.b = 0xFF;
-		markColor.a = (unsigned char)(255.0f * artiAlpha);
-		GXSetChanMatColor(GX_COLOR0A0, markColor);
-		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
-
-		unsigned int activeMask = 0;
-		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-			int selection = s_Rinfo->m_party[i].m_selectedSlot;
-			if (selection >= 0) {
-				activeMask |= 1 << selection;
-			}
-		}
-
-		{
-			int i = 0;
-			for (; i < 8; i++) {
-				if ((activeMask & (1 << i)) == 0) {
-					continue;
-				}
-				float x = s_Base->m_artifactPositions[i].x + 28.0f;
-				float y = s_Base->m_artifactPositions[i].y + 20.0f;
-				MenuPcs.DrawRect(0, x, y, 56.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-			}
-		}
-	}
-}
-
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 32b
- * EN Address: 0x8015CE5C
- * EN Size: 40b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::DrawSelectCloseAnim()
-{
-	DrawSelectOpenAnim();
-}
-
-
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 32b
- * EN Address: 0x8015C0C4
- * EN Size: 40b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void CMenuPcs::DrawSelectWait()
-{
-	DrawSelectOpenAnim();
-}
-
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 152b
- * EN Address: 0x8015DED0
- * EN Size: 132b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline unsigned int CMenuPcs::GetAllPadOn()
-{
-	unsigned int buttons = 0;
-	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-		buttons |= Pad.GetButtonDown(s_Rinfo->m_party[i].m_partySlot);
-	}
-	return buttons;
-}
-
-
-/*
- * --INFO--
  * PAL Address: 0x8013E280
  * PAL Size: 20b
  * EN Address: 0x801541E8
@@ -271,6 +134,7 @@ void CMenuPcs::BonusInit()
 	m_bonusAnim = 0;
 	s_Base = 0;
 }
+
 /*
  * --INFO--
  * PAL Address: 0x8013D59C
@@ -284,7 +148,7 @@ void CMenuPcs::createBonus()
 {
 	char fontPath[128];
 
-	Pad.m_stickDigitalThreshold = 0x28;
+	Pad.SetAnalogDepth(0x28);
 	for (int i = 0; i < 4; i++) {
 		GbaQue.OpenMenu(i, 0, 0);
 		GbaQue.SetRadarMode(i, 0);
@@ -383,19 +247,8 @@ void CMenuPcs::createBonus()
 			    Game.m_partyObjArr[i]->m_charaModelHandle;
 			s_Rinfo->m_party[activeCount].m_partyHandle->m_model->m_lightAlpha = 0.0f;
 			s_Rinfo->m_party[activeCount].m_bonusCondition = (int)Game.m_scriptFoodBase[i]->m_bonusCondition;
-			int foodValue =  (int)(unsigned int)((int)Game.m_scriptFoodBase[i]->m_artifactRelated[3] + (int)Game.m_scriptFoodBase[i]->m_artifactRelated[4]);
-			int foodClamped;
-			if (foodValue < 0) {
-				foodClamped = 0;
-			} else {
-				foodClamped = 100;
-				if (foodValue <= 100) {
-					foodClamped = foodValue;
-				}
-			}
-			s_Rinfo->m_party[activeCount].m_foodValue = foodClamped;
-			s_Rinfo->m_party[activeCount].m_artifactValue =
-			    (int)Game.m_scriptFoodBase[i]->m_artifactRelated[0] + (int)Game.m_scriptFoodBase[i]->m_artifactRelated[1] - (int)Game.m_scriptFoodBase[i]->m_artifactRelated[2];
+			s_Rinfo->m_party[activeCount].m_foodValue = Game.m_scriptFoodBase[i]->GetTotalBonus();
+			s_Rinfo->m_party[activeCount].m_artifactValue = Game.m_scriptFoodBase[i]->GetTotalBonus2();
 			s_Rinfo->m_party[activeCount].m_totalValue =
 			    s_Rinfo->m_party[activeCount].m_foodValue + s_Rinfo->m_party[activeCount].m_artifactValue;
 			s_Rinfo->m_party[activeCount].m_selectedItemId = -1;
@@ -456,7 +309,7 @@ void CMenuPcs::createBonus()
 						if ((*slot)->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + artifactSlot] == s_Rinfo->m_artifacts[artifactIndex]) {
 							s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 						}
-					} else if ((*slot)->m_inventoryItemCount + 1 > 0x40) {
+					} else if (!(*slot)->CanAddItem(1)) {
 						s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 					}
 				}
@@ -561,12 +414,7 @@ void CMenuPcs::createBonus()
 	}
 
 	GbaQue.SetStartBonusFlg();
-	for (int i = 0; i < 4; i++) {
-		if (Game.m_scriptFoodBase[i] != 0) {
-			Game.m_scriptFoodBase[i]->SafeDeleteTempItem();
-			Game.m_scriptFoodBase[i]->SortBeforeReturnWorldMap();
-		}
-	}
+	ClrBattleItem();
 	this->m_menuWindowInfo->state = 3;
 	s_CntTop = 0;
 	s_ArtiTop = 0;
@@ -588,7 +436,7 @@ void CMenuPcs::createBonus()
  */
 void CMenuPcs::destroyBonus()
 {
-	Pad.m_stickDigitalThreshold = 1;
+	Pad.ResetAnalogDepth();
 
 	if (this->m_fonts[1] != 0) {
 		CFont* font = m_fonts[1];
@@ -650,48 +498,6 @@ void CMenuPcs::destroyBonus()
 
 /*
  * --INFO--
- * PAL Address: 0x8013D1C8
- * PAL Size: 216b
- * EN Address: 0x80155704
- * EN Size: 232b
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::drawBonus()
-{
-	gUtil.ClearZBufferRect(0.0f, 0.0f, 640.0f, 448.0f);
-
-	if ((unsigned int)System.m_execParam >= 1) {
-		System.Printf("draw Bonus (%d)\n", (int)this->m_bonusState->m_phase);
-	}
-
-	switch (this->m_bonusState->m_phase) {
-	case 0:
-		DrawResultOpenAnim();
-		break;
-	case 1:
-		DrawResultCountAnim();
-		break;
-	case 2:
-		DrawResultCloseAnim();
-		break;
-	case 3:
-		DrawSelectOpenAnim();
-		break;
-	case 4:
-		DrawSelectWait();
-		break;
-	case 5:
-		DrawSelectCloseAnim();
-		break;
-	case 6:
-		break;
-	}
-}
-
-
-/*
- * --INFO--
  * PAL Address: 0x8013D2A0
  * PAL Size: 368b
  * EN Address: 0x8015558C
@@ -735,12 +541,7 @@ void CMenuPcs::calcBonus()
 		}
 		break;
 	case 6:
-		for (int i = 0; i < 4; i++) {
-			if (Game.m_scriptFoodBase[i] != 0) {
-				Game.m_scriptFoodBase[i]->SafeDeleteTempItem();
-				Game.m_scriptFoodBase[i]->SortBeforeReturnWorldMap();
-			}
-		}
+		ClrBattleItem();
 		changeMode(static_cast<CMenuPcs::MENUMODE>(0));
 		break;
 	default:
@@ -748,6 +549,46 @@ void CMenuPcs::calcBonus()
 	}
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8013D1C8
+ * PAL Size: 216b
+ * EN Address: 0x80155704
+ * EN Size: 232b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::drawBonus()
+{
+	gUtil.ClearZBufferRect(0.0f, 0.0f, 640.0f, 448.0f);
+
+	if ((unsigned int)System.m_execParam >= 1) {
+		System.Printf("draw Bonus (%d)\n", (int)this->m_bonusState->m_phase);
+	}
+
+	switch (this->m_bonusState->m_phase) {
+	case 0:
+		DrawResultOpenAnim();
+		break;
+	case 1:
+		DrawResultCountAnim();
+		break;
+	case 2:
+		DrawResultCloseAnim();
+		break;
+	case 3:
+		DrawSelectOpenAnim();
+		break;
+	case 4:
+		DrawSelectWait();
+		break;
+	case 5:
+		DrawSelectCloseAnim();
+		break;
+	case 6:
+		break;
+	}
+}
 
 /*
  * --INFO--
@@ -1200,10 +1041,8 @@ void CMenuPcs::DrawResultOpenAnim()
 		DrawInit();
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-		modelIndex = 0;
 		lastKind = 0;
-		i = 0;
-		for (; i < (int)m_bonusAnim->header.count; i++) {
+		for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 			sprite = &m_bonusAnim->sprites[i];
 
 			if (sprite->kind >= 0 || sprite->kind == -2) {
@@ -1294,11 +1133,11 @@ void CMenuPcs::DrawResultOpenAnim()
 							colors[3].g = 0xFF;
 							colors[3].b = 0xFF;
 							colors[3].a = 0;
-							MenuPcs.DrawRect(0, x, y, (float)(1.0 / (double)sprite->duration) * (float)sprite->w, (float)sprite->h,
+							MenuPcs.DrawRect(0, x, y, (float)sprite->w * (float)(1.0 / (double)sprite->duration), (float)sprite->h,
 							    fillWidth, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
 						}
 					} else {
-						if (i >= s_CntTop && i < s_CntTop + activePartyCount) {
+						if (s_CntTop <= i && i < s_CntTop + activePartyCount) {
 							DrawBonusCnt(sprite, 0);
 						} else {
 							MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
@@ -1319,11 +1158,10 @@ void CMenuPcs::DrawResultOpenAnim()
 		font->SetTlut(7);
 		font->DrawInit();
 
-		int textIndex = 0;
+		int textIndex;
 		char text[128];
 		{
-			int i = 0;
-			for (; i < (int)m_bonusAnim->header.count; i++) {
+			for (i = textIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 				CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i];
 				if (sprite->kind == -1) {
 					font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)).color);
@@ -1336,7 +1174,7 @@ void CMenuPcs::DrawResultOpenAnim()
 					} else {
 						CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
 						int strIdx = (int)caravanWork->m_bonusCondition * 2 + 1;
-						strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[strIdx]);
+						strcpy(text, Game.GetBonusName(strIdx));
 					}
 
 					float x = (float)sprite->x + sprite->motionX;
@@ -1537,12 +1375,12 @@ void CMenuPcs::DrawResultCountAnim()
 	DrawInit();
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	int modelIndex = 0;
+	int modelIndex;
 	int lastKind = 0;
-	int i = 0;
+	int i;
 
 	int doubleCount = activePartyCount * 2;
-	for (; i < (int)m_bonusAnim->header.count; i++) {
+	for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i];
 
 		if (sprite->kind >= 0 || sprite->kind == -2) {
@@ -1613,9 +1451,9 @@ void CMenuPcs::DrawResultCountAnim()
 	font->SetTlut(7);
 	font->DrawInit();
 
-	int textIndex = 0;
+	int textIndex;
 	char text[128];
-	for (i = 0; i < (int)m_bonusAnim->header.count; i++) {
+	for (i = textIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		Sprt2* sprite = &m_bonusAnim->sprites[i];
 		if (sprite->kind == -1) {
 			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
@@ -1944,10 +1782,11 @@ void CMenuPcs::DrawResultCloseAnim()
 	DrawInit();
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	int modelIndex = 0;
+	int modelIndex;
 	int lastKind = 0;
+	int i;
 
-	for (int i = 0; i < (int)m_bonusAnim->header.count; i++) {
+	for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i];
 
 		if (sprite->kind >= 0 || sprite->kind == -2) {
@@ -2076,11 +1915,10 @@ void CMenuPcs::DrawResultCloseAnim()
 	font0->SetTlut(7);
 	font0->DrawInit();
 
-	int textIndex = 0;
+	int textIndex;
 	char text[128];
 	{
-		int i = 0;
-		for (; i < (int)m_bonusAnim->header.count; i++) {
+		for (i = textIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i];
 			if (sprite->kind == -1) {
 				font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)).color);
@@ -2556,14 +2394,14 @@ void CMenuPcs::DrawSelectOpenAnim()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	int doubleCount;
-	int modelIndex = 0;
+	int modelIndex;
 	int i;
 	int kind;
 	doubleCount = activePartyCount * 2;
 
-	int lastKind =  (int)(unsigned int)(0);
+	int lastKind = 0;
 	CMenuPcs::Sprt2* artiSprite = 0;
-	for (i = 0; i < (int)m_bonusAnim->header.count; i++) {
+	for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 		sprite = &m_bonusAnim->sprites[i];
 		kind = sprite->kind;
 		if (kind >= 0 || kind != -1) {
@@ -2645,11 +2483,11 @@ void CMenuPcs::DrawSelectOpenAnim()
 	font->SetTlut(7);
 	font->DrawInit();
 
-	int textIndex = 0;
+	int textIndex;
 	char text[268];
 	{
-		int i = 0;
-		for (; i < (int)m_bonusAnim->header.count && textIndex < activePartyCount; i++) {
+		int i;
+		for (i = textIndex = 0; i < (int)m_bonusAnim->header.count && textIndex < activePartyCount; i++) {
 			sprite = &m_bonusAnim->sprites[i];
 			if (sprite->kind != -1) {
 				continue;
@@ -3016,6 +2854,19 @@ void CMenuPcs::CalcSelectWait()
 	}
 }
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 32b
+ * EN Address: 0x8015C0C4
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::DrawSelectWait()
+{
+	DrawSelectOpenAnim();
+}
 
 /*
  * --INFO--
@@ -3275,6 +3126,60 @@ void CMenuPcs::CalcSelectCloseAnim()
 	}
 }
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 32b
+ * EN Address: 0x8015CE5C
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::DrawSelectCloseAnim()
+{
+	DrawSelectOpenAnim();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 572b
+ * EN Address: 0x8015CE84
+ * EN Size: 672b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprite, int value)
+{
+	int digits[3];
+	int digitCount;
+
+	if (value >= 100) {
+		digitCount = 3;
+		digits[0] = value / 100;
+		value %= 100;
+		digits[1] = value / 10;
+		digits[2] = value % 10;
+	} else if (value >= 10) {
+		digitCount = 2;
+		digits[0] = value / 10;
+		digits[1] = value % 10;
+	} else {
+		digitCount = 1;
+		digits[0] = value;
+	}
+
+	float digitX = (float)((3.0 * (double)sprite->w - (float)(digitCount * sprite->w)) * 0.5 + (double)sprite->x);
+	float digitW = (float)sprite->w;
+	int* dp = digits;
+	for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
+		MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
+		    (float)(sprite->w * *dp), sprite->mulY,
+		    sprite->depth, sprite->depth, 0.0f);
+		digitX += digitW;
+		dp++;
+	}
+}
 
 /*
  * --INFO--
@@ -3407,6 +3312,49 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	}
 }
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 372b
+ * EN Address: 0x8015D868
+ * EN Size: 560b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::DrawBonusChkMark(float artiAlpha)
+{
+	if (!((double)artiAlpha <= 0.0)) {
+		_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+		GXColor markColor;
+		markColor.r = 0xFF;
+		markColor.g = 0xFF;
+		markColor.b = 0xFF;
+		markColor.a = (unsigned char)(255.0f * artiAlpha);
+		GXSetChanMatColor(GX_COLOR0A0, markColor);
+		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
+
+		unsigned int activeMask = 0;
+		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
+			int selection = s_Rinfo->m_party[i].m_selectedSlot;
+			if (selection >= 0) {
+				activeMask |= 1 << selection;
+			}
+		}
+
+		{
+			int i = 0;
+			for (; i < 8; i++) {
+				if ((activeMask & (1 << i)) == 0) {
+					continue;
+				}
+				float x = s_Base->m_artifactPositions[i].x + 28.0f;
+				float y = s_Base->m_artifactPositions[i].y + 20.0f;
+				MenuPcs.DrawRect(0, x, y, 56.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+			}
+		}
+	}
+}
 
 /*
  * --INFO--
@@ -3482,6 +3430,23 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 	}
 }
 
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 152b
+ * EN Address: 0x8015DED0
+ * EN Size: 132b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline unsigned int CMenuPcs::GetAllPadOn()
+{
+	unsigned int buttons = 0;
+	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
+		buttons |= Pad.GetButtonDown(s_Rinfo->m_party[i].m_partySlot);
+	}
+	return buttons;
+}
 
 /*
  * --INFO--
@@ -3519,3 +3484,4 @@ void CMenuPcs::ClrBattleItem()
 		}
 	}
 }
+

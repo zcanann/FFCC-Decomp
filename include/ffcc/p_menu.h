@@ -417,6 +417,10 @@ public:
     void DrawSingLife();
     float CalcCenteringPos(char*, CFont*);
     float CalcCenteringPos2(char*, float, float);
+    float CalcCenteringPos(char*, int);
+    float GetFontWidth(char*, float, float);
+    int GetLongHelpString(CFont*, int, int);
+    void CalcHelpLine(int, int&, int&);
     void DrawFont(int, int, _GXColor, int, char*, float, float);
     void DrawFont2(int, int, _GXColor, int, char*, float, float, float);
     void DrawHelpMessageUS(int, CFont*, int, int, _GXColor, int, float, float);

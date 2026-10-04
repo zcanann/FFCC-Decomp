@@ -508,7 +508,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "astar.cpp"),
             Object(Matching, "baseobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "bonus_menu.cpp", extra_cflags=["-sdata 8", "-str reuse,readonly"]),
+            Object(NonMatching, "bonus_menu.cpp", extra_cflags=["-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "cflat_data.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "cflat_r2class.cpp"),
             Object(
@@ -573,7 +573,7 @@ config.libs = [
             Object(NonMatching, "menu_lst.cpp"),
             Object(NonMatching, "menu_money.cpp"),
             Object(NonMatching, "menu_tmparti.cpp"),
-            Object(NonMatching, "MenuUtil.cpp", extra_cflags=["-sdata2 8", "-char unsigned", "-str reuse,readonly"]),
+            Object(NonMatching, "MenuUtil.cpp", extra_cflags=["-sdata2 8", "-char unsigned", "-str reuse,readonly", "-inline noauto,deferred"]),
             Object(NonMatching, "mes.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "mesmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "monobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),

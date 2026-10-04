@@ -91,6 +91,8 @@ public:
     void addFlag(class CFlag&);
     static void MakeAgbString(char*, char*, int, int);
     static unsigned long drawTagString(CFont*, char*, int, int, int);
+    static unsigned long GetTagStringWidth(CFont* font, char* text) { return drawTagString(font, text, 0, 0, 0); }
+    static unsigned long DrawTagString(CFont* font, char* text) { return drawTagString(font, text, 1, 0, 0); }
     static void SetTempValue(int, int);
     static int m_tempVar[0x14];
 

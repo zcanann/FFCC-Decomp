@@ -105,11 +105,6 @@ static inline CColor& MesColorRef(const CColor& color)
 	return (CColor&)color;
 }
 
-static inline char* FlatNameDirect(int tableIndex, int entryIndex)
-{
-	return Game.m_cFlatDataArr[1].TableStrings(tableIndex)[entryIndex];
-}
-
 
 /*
  * --INFO--
@@ -234,10 +229,10 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			{
 			case 9:
 			case 0x37:
-				strcpy(out, FlatNameDirect(0, value * 5 + 1));
+				strcpy(out, Game.GetItemName(value));
 				break;
 			case 0x39:
-				strcpy(out, FlatNameDirect(0, value * 5 + 3));
+				strcpy(out, Game.GetItemNames(value));
 				break;
 			case 0x3B:
 				Game.MakeArtItemName(out, value, 1);
@@ -257,7 +252,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 				break;
 			}
 			case 0x1D:
-				strcpy(out, FlatNameDirect(0, value * 5));
+				strcpy(out, Game.GetItemArt(value));
 				break;
 			}
 			ApplyCaseMode(out, caseMode);
@@ -279,10 +274,10 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			{
 			case 0x2A:
 			case 0x38:
-				strcpy(out, FlatNameDirect(1, value * 5 + 1));
+				strcpy(out, Game.GetMonName(value));
 				break;
 			case 0x3A:
-				strcpy(out, FlatNameDirect(1, value * 5 + 3));
+				strcpy(out, Game.GetMonNames(value));
 				break;
 			case 0x3C:
 				Game.MakeArtMonName(out, value, 1);
@@ -302,7 +297,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 				break;
 			}
 			case 0x1E:
-				strcpy(out, FlatNameDirect(1, value * 5));
+				strcpy(out, Game.GetMonArt(value));
 				break;
 			}
 			ApplyCaseMode(out, caseMode);
@@ -313,7 +308,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2B:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
-			strcpy(out, FlatNameDirect(2, CMes::m_tempVar[varIndex]));
+			strcpy(out, Game.GetNPCName(CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 4;
 			break;
@@ -321,7 +316,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2C:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)(op + 2));
-			strcpy(out, FlatNameDirect(3, CMes::m_tempVar[varIndex]));
+			strcpy(out, Game.GetPlaceName(CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 4;
 			break;
@@ -337,7 +332,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2E:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)op);
-			strcpy(out, FlatNameDirect(5, CMes::m_tempVar[varIndex]));
+			strcpy(out, Game.GetLetterSubject(CMes::m_tempVar[varIndex]));
 			out += strlen(out);
 			src += 2;
 			break;
@@ -983,10 +978,10 @@ void CMes::addString(char** text, int branchMode)
 			{
 			case 9:
 			case 0x37:
-				strcpy(namePtr, FlatNameDirect(0, value * 5 + 1));
+				strcpy(namePtr, Game.GetItemName(value));
 				break;
 			case 0x39:
-				strcpy(namePtr, FlatNameDirect(0, value * 5 + 3));
+				strcpy(namePtr, Game.GetItemNames(value));
 				break;
 			case 0x3B:
 				Game.MakeArtItemName(namePtr, value, 1);
@@ -1001,7 +996,7 @@ void CMes::addString(char** text, int branchMode)
 				Game.MakeNumItemName(namePtr, value, mFlagVars[GET_1(text)] & 0xFFFF);
 				break;
 			case 0x1D:
-				strcpy(namePtr, FlatNameDirect(0, value * 5));
+				strcpy(namePtr, Game.GetItemArt(value));
 				break;
 			}
 			ApplyCaseMode(namePtr, caseMode);
@@ -1030,10 +1025,10 @@ void CMes::addString(char** text, int branchMode)
 			{
 			case 0x2A:
 			case 0x38:
-				strcpy(namePtr, FlatNameDirect(1, value * 5 + 1));
+				strcpy(namePtr, Game.GetMonName(value));
 				break;
 			case 0x3A:
-				strcpy(namePtr, FlatNameDirect(1, value * 5 + 3));
+				strcpy(namePtr, Game.GetMonNames(value));
 				break;
 			case 0x3C:
 				Game.MakeArtMonName(namePtr, value, 1);
@@ -1048,7 +1043,7 @@ void CMes::addString(char** text, int branchMode)
 				Game.MakeNumMonName(namePtr, value, mFlagVars[GET_1(text)] & 0xFFFF);
 				break;
 			case 0x1E:
-				strcpy(namePtr, FlatNameDirect(1, value * 5));
+				strcpy(namePtr, Game.GetMonArt(value));
 				break;
 			default:
 				break;
@@ -1066,8 +1061,9 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 6;
 			}
-			char* namePtr;
-			strcpy(namePtr = nameTag2B, FlatNameDirect(2, mFlagVars[GET_1(text)] & 0xFFFF));
+			int value = mFlagVars[GET_1(text)] & 0xFFFF;
+			char* namePtr = nameTag2B;
+			strcpy(namePtr, Game.GetNPCName(value));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
@@ -1081,8 +1077,9 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 4;
 			}
-			char* namePtr;
-			strcpy(namePtr = nameTag2C, FlatNameDirect(3, mFlagVars[GET_1(text)] & 0xFFFF));
+			int value = mFlagVars[GET_1(text)] & 0xFFFF;
+			char* namePtr = nameTag2C;
+			strcpy(namePtr, Game.GetPlaceName(value));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
@@ -1096,8 +1093,9 @@ void CMes::addString(char** text, int branchMode)
 			{
 				mColor = 3;
 			}
-			char* namePtr;
-			strcpy(namePtr = nameTag2D, FlatNameDirect(3, (mFlagVars[GET_1(text)] & 0xFFFF) + 0x3C));
+			int value = mFlagVars[GET_1(text)] & 0xFFFF;
+			char* namePtr = nameTag2D;
+			strcpy(namePtr, Game.GetPlaceName(value + 0x3C));
 			ApplyCaseMode(namePtr, caseMode);
 			addString(&namePtr, branchMode);
 			mColor = oldColor;
@@ -1105,7 +1103,7 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x2E:
 		{
-			char* flatText = FlatNameDirect(5, mFlagVars[GET_1(text)] & 0xFFFF);
+			char* flatText = Game.GetLetterSubject(mFlagVars[GET_1(text)] & 0xFFFF);
 			addString(&flatText, branchMode);
 			break;
 		}
@@ -1119,7 +1117,8 @@ void CMes::addString(char** text, int branchMode)
 		{
 			char number[256];
 			char* numberPtr;
-			sprintf(numberPtr = number, "%d", mFlagVars[GET_1(text)]);
+			sprintf(number, "%d", mFlagVars[GET_1(text)]);
+			numberPtr = number;
 			addString(&numberPtr, branchMode);
 			break;
 		}
@@ -1329,7 +1328,7 @@ void CMes::addString(char** text, int branchMode)
 		}
 		case 0x21:
 		{
-			char vowel = *FlatNameDirect(2, mFlagVars[GET_1(text)]);
+			char vowel = *Game.GetNPCName(mFlagVars[GET_1(text)]);
 			if ((vowel == 'A') || (vowel == 'I') || (vowel == 'U') ||
 			    (vowel == 'E') || (vowel == 'O') || (vowel == 'Y'))
 			{

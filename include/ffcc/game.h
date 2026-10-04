@@ -51,6 +51,7 @@ public:
         }
         bool IsBattleStage() { return m_bossArtifactStageIndex < 0xF; }
         bool IsMogStage() { return m_bossArtifactStageIndex == 0x19; }
+        bool IsBonusStage() { return m_bossArtifactStageIndex < 0xE; }
 
         unsigned char m_menuStageMode;                   // 0x00
         unsigned char m_gameInitFlag;                    // 0x01
@@ -159,8 +160,11 @@ public:
     char* GetItemNames(int);
     char* GetItemArts(int);
     char* GetItemName(int, int);
+    int GetGbaSP(int idx) { return m_gameWork.m_spModeFlags[idx]; }
     char* GetShortItemName(int itemIndex) { return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 4]; }
     char* GetRingName(int ringIndex) { return m_cFlatDataArr[1].TableStrings(4)[ringIndex]; }
+    char* GetHelpName(int helpIndex) { return m_cFlatDataArr[1].TableStrings(6)[helpIndex]; }
+    char* GetBonusName(int bonusIndex) { return m_cFlatDataArr[1].TableStrings(7)[bonusIndex]; }
     char* GetNPCName(int npcIndex) { return m_cFlatDataArr[1].TableStrings(2)[npcIndex]; }
     char* GetLetterSubject(int subjectIndex) { return m_cFlatDataArr[1].TableStrings(5)[subjectIndex]; }
     char* GetLetter(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x10); }

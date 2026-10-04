@@ -21,8 +21,9 @@ struct GbaCMakeInfo
     unsigned char m_jobType;
 };
 
-struct GbaQueueHitInfo
+class HitEInfo
 {
+public:
     short m_enemyId;
     short m_enemyType;
 };
@@ -45,7 +46,7 @@ struct GbaQueueMapObjWork
     GbaQueueMapObjEntry m_entries[32];
 };
 
-struct GbaQueuePlayerDataView
+struct GbaPInfo
 {
     signed char m_saveSlot;
     unsigned char m_hasPartyObj;
@@ -71,11 +72,6 @@ struct GbaQueuePlayerDataView
     unsigned char m_jobType;
     char m_itemFlags;
     unsigned char m_equipment[4];
-};
-
-struct GbaPInfo
-{
-    GbaQueuePlayerDataView m_players[4];
 };
 
 struct GbaQueueMapEntity
@@ -240,8 +236,8 @@ private:
     int m_mapNo;                      // 0x0448
     unsigned char m_stageFlags;       // 0x044C
     unsigned char _pad44D[0x7];       // 0x044D
-    GbaQueuePlayerDataView m_playerData[4]; // 0x0454
-    GbaQueuePlayerDataView m_playerHistory[4]; // 0x07C4
+    GbaPInfo m_playerData[4]; // 0x0454
+    GbaPInfo m_playerHistory[4]; // 0x07C4
     GbaQueueMapEntity m_enemies[64];            // 0x0B34
     GbaQueueMapEntity m_enemyHistory[4][64];    // 0x1034
     GbaQueueMapEntity m_mapItems[16];           // 0x2434
@@ -279,7 +275,7 @@ private:
     char m_radarMode;                 // 0x2D41
     char m_chgRadarMode;              // 0x2D42
     unsigned char _pad2D43;           // 0x2D43
-    GbaQueueHitInfo m_hitInfo[4];      // 0x2D44
+    HitEInfo m_hitInfo[4];             // 0x2D44
     char m_chgHitFlags;               // 0x2D54
     char m_chgScouFlags;              // 0x2D55
     char m_singleMode;                // 0x2D56

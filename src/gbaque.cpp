@@ -30,17 +30,17 @@ STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_radarEnabled) == 2);
 STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_hp) == 4);
 STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_posX) == 8);
 STATIC_ASSERT(offsetof(GbaQueueMapEntity, m_dropItemCodes) == 0xC);
-STATIC_ASSERT(sizeof(GbaQueuePlayerDataView) == 0xDC);
-STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_appearance) == 2);
-STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_items) == 0x3A);
-STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_active) == 3);
-STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_hp) == 0x17);
-STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_compatibility) == 4);
-STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_mapPosition) == 0x36);
-STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_commandSlots) == 0xC2);
-STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_commandSlotCount) == 0xD3);
-STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_jobType) == 0xD5);
-STATIC_ASSERT(offsetof(GbaQueuePlayerDataView, m_equipment) == 0xD7);
+STATIC_ASSERT(sizeof(GbaPInfo) == 0xDC);
+STATIC_ASSERT(offsetof(GbaPInfo, m_appearance) == 2);
+STATIC_ASSERT(offsetof(GbaPInfo, m_items) == 0x3A);
+STATIC_ASSERT(offsetof(GbaPInfo, m_active) == 3);
+STATIC_ASSERT(offsetof(GbaPInfo, m_hp) == 0x17);
+STATIC_ASSERT(offsetof(GbaPInfo, m_compatibility) == 4);
+STATIC_ASSERT(offsetof(GbaPInfo, m_mapPosition) == 0x36);
+STATIC_ASSERT(offsetof(GbaPInfo, m_commandSlots) == 0xC2);
+STATIC_ASSERT(offsetof(GbaPInfo, m_commandSlotCount) == 0xD3);
+STATIC_ASSERT(offsetof(GbaPInfo, m_jobType) == 0xD5);
+STATIC_ASSERT(offsetof(GbaPInfo, m_equipment) == 0xD7);
 
 STATIC_ASSERT(sizeof(GbaCMakeInfo) == 0x20);
 STATIC_ASSERT(offsetof(GbaCMakeInfo, m_packetCount) == 2);
@@ -56,7 +56,7 @@ STATIC_ASSERT(sizeof(GbaQueueMapObjWork) == 0x188);
 enum {
 	kGbaQueueScratchTextSize = 0x400,
 	kGbaQueuePlayerDataChannelCount = 4,
-	kGbaQueuePlayerDataBlockBytes = sizeof(GbaQueuePlayerDataView) * kGbaQueuePlayerDataChannelCount,
+	kGbaQueuePlayerDataBlockBytes = sizeof(GbaPInfo) * kGbaQueuePlayerDataChannelCount,
 	kGbaQueueCaravanNameBlockBytes = 0x80,
 	kGbaQueueEnemyDataBytes = 0x500,
 	kGbaQueueEnemyHistoryBlockBytes = kGbaQueueEnemyDataBytes * kGbaQueuePlayerDataChannelCount,
@@ -74,7 +74,6 @@ enum {
 };
 
 STATIC_ASSERT(kGbaQueuePlayerDataBlockBytes == 0x370);
-STATIC_ASSERT(sizeof(GbaPInfo) == kGbaQueuePlayerDataBlockBytes);
 STATIC_ASSERT(kGbaQueueEnemyHistoryBlockBytes == 0x1400);
 STATIC_ASSERT(kGbaQueueMapItemHistoryBlockBytes == 0x500);
 STATIC_ASSERT(sizeof(GbaQueueMapObjWork) == kGbaQueueMapObjWorkBytes);
@@ -362,7 +361,7 @@ void GbaQueue::LoadAll()
 
 	spModeBits = 0;
 	for (i = 0; i < 4; i++) {
-		if (static_cast<int>(Game.m_gameWork.m_spModeFlags[i]) != 0) {
+		if (Game.GetGbaSP(i) != 0) {
 			spModeBits = static_cast<char>(spModeBits | (1 << i));
 		}
 	}
@@ -379,7 +378,7 @@ void GbaQueue::LoadAll()
 		OSSignalSemaphore(&accessSemaphores[i]);
 	}
 
-	cflatFlag = CFlat.m_initAllFinishedFlag;
+	cflatFlag = CFlat.IsInitFinished();
 
 	LoadPlayerStat();
 	LoadEnemyStat();
@@ -1098,16 +1097,11 @@ void GbaQueue::SetRadarType()
 	if (static_cast<signed char>(m_radarTypeFlags) != 0) {
 		return;
 	}
-	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+	if (Game.m_gameWork.IsMogStage()) {
 		return;
 	}
 
-	validMemberCount = 0;
-	for (i = 0; i < 4; i++) {
-		if (Game.m_gameWork.m_wmBackupParams[i] >= 0) {
-			validMemberCount++;
-		}
-	}
+	validMemberCount = Game.m_gameWork.GetNumPlayer();
 
 	activeMask = 0;
 	for (i = 0; i < 4; i++) {
@@ -1148,7 +1142,7 @@ void GbaQueue::SetRadarType()
 	}
 
 	m_radarTypeFlags = 1;
-	if (Game.m_gameWork.m_bossArtifactStageIndex >= 0xF) {
+	if (!Game.m_gameWork.IsBattleStage()) {
 		m_radarType[0] = 0;
 		m_radarType[1] = 0;
 		m_radarType[2] = 0;
@@ -1213,7 +1207,7 @@ inline void GbaQueue::LoadAllStat()
 void GbaQueue::LoadPlayerStat()
 {
 	unsigned char localNames[kGbaQueueCaravanNameBlockBytes];
-	GbaQueuePlayerDataView localPlayerStat[4];
+	GbaPInfo localPlayerStat[4];
 	unsigned int outOfShoukiMask;
 	int i;
 
@@ -1224,8 +1218,8 @@ void GbaQueue::LoadPlayerStat()
 		memcpy(localNames + (i * 0x10), Game.m_caravanWorkArr[i].m_name, 0x10);
 	}
 
-	if (CFlat.m_initAllFinishedFlag != 0) {
-		GbaQueuePlayerDataView* entry = localPlayerStat;
+	if (CFlat.IsInitFinished() != 0) {
+		GbaPInfo* entry = localPlayerStat;
 		outOfShoukiMask = 0;
 		for (i = 0; i < 4; i++) {
 			char menuStageMode = m_singleMode;
@@ -1335,7 +1329,7 @@ void GbaQueue::LoadPlayerStat()
 					entry->m_equipment[j] = static_cast<unsigned char>(caravanWork->m_equipment[j]);
 				}
 
-				entry->m_useItem = 1;
+				entry->m_useItem = caravanWork->IsUseItem();
 				entry->m_radarVisible = static_cast<unsigned char>(partyObj->IsDispRader() != 0);
 
 				if ((caravanWork->IsOutOfShouki() != 0) && (entry->m_hp != 0)) {
@@ -1376,8 +1370,8 @@ void GbaQueue::LoadPlayerStat()
 	m_outOfShoukiFlags = static_cast<unsigned char>(outOfShoukiMask);
 
 	for (i = 0; i < 4; i++) {
-		const GbaQueuePlayerDataView& oldPlayer = m_playerHistory[i];
-		const GbaQueuePlayerDataView& newPlayer = m_playerData[i];
+		const GbaPInfo& oldPlayer = m_playerHistory[i];
+		const GbaPInfo& newPlayer = m_playerData[i];
 		int j;
 
 		if (memcmp(oldPlayer.m_letterMeta, newPlayer.m_letterMeta, sizeof(oldPlayer.m_letterMeta)) != 0) {
@@ -1442,7 +1436,7 @@ void GbaQueue::LoadEnemyStat()
 
 	memset(localEnemyData, 0, sizeof(localEnemyData));
 
-	if (CFlat.m_initAllFinishedFlag != 0) {
+	if (CFlat.IsInitFinished() != 0) {
 		for (i = 0; i < 0x40; i++) {
 			if (Game.m_monObjects[i] == 0 || Game.m_monObjects == 0) {
 				localEnemyData[i].m_baseDataIndex = 0;
@@ -1510,7 +1504,7 @@ void GbaQueue::LoadMapItemStat()
 	memset(localMapItems, 0, sizeof(localMapItems));
 	numMapItems = 0;
 
-	if (CFlat.m_initAllFinishedFlag != 0) {
+	if (CFlat.IsInitFinished() != 0) {
 		object = CFlat.FindGObjFirst();
 
 		while (object != 0) {
@@ -1573,7 +1567,7 @@ void GbaQueue::LoadMapItemStat()
  */
 void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 {
-	GbaQueuePlayerDataView localPlayerData[4];
+	GbaPInfo localPlayerData[4];
 	unsigned char packet[0xC];
 	int i;
 	unsigned char nearbyMask;
@@ -1594,8 +1588,8 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 	packet[4] = 0x51;
 	packet[8] = 0x91;
 
-	const GbaQueuePlayerDataView* player = localPlayerData;
-	const GbaQueuePlayerDataView* basePlayer = &player[channel];
+	const GbaPInfo* player = localPlayerData;
+	const GbaPInfo* basePlayer = &player[channel];
 
 	nearbyMask = 0;
 	for (i = 0; i < 4; i++) {
@@ -1824,7 +1818,7 @@ int GbaQueue::GetMapObjInfo(int channel, unsigned char* outData)
 void GbaQueue::GetPlayerStat(int channel, GbaPInfo* outInfo)
 {
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(outInfo, m_playerData, sizeof(*outInfo));
+	memcpy(outInfo, m_playerData, sizeof(m_playerData));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -1861,7 +1855,7 @@ void GbaQueue::GetCaravanName(char* outName)
  */
 int GbaQueue::GetItemAll(int channel, unsigned char* outData)
 {
-	GbaQueuePlayerDataView localPlayerData;
+	GbaPInfo localPlayerData;
 	unsigned short itemList[0x40];
 	unsigned int artifacts[3];
 	unsigned short tmpArtifacts[4];
@@ -2086,7 +2080,7 @@ System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp)
 			}
 
 			memset(tempName, 0, sizeof(tempName));
-			strcpy(tempName, Game.m_cFlatDataArr[1].TableStrings(2)[(cur->Word0() >> 9) & 0x1FF]);
+			strcpy(tempName, Game.GetNPCName((cur->Word0() >> 9) & 0x1FF));
 			memcpy(npcWrite, tempName, kGbaQueueLetterNpcNameEntryBytes);
 			npcWrite += kGbaQueueLetterNpcNameEntryBytes;
 			(reinterpret_cast<unsigned char*>(entryWrite))[5] = static_cast<unsigned char>(npcCount++);
@@ -2101,7 +2095,7 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 			}
 
 			memset(tempName, 0, sizeof(tempName));
-			strcpy(tempName, Game.m_cFlatDataArr[1].TableStrings(5)[(cur->HeaderWord() >> 2) & 0x1FF]);
+			strcpy(tempName, Game.GetLetterSubject((cur->HeaderWord() >> 2) & 0x1FF));
 			memcpy(subjectWrite, tempName, kGbaQueueLetterSubjectNameEntryBytes);
 			subjectWrite += kGbaQueueLetterSubjectNameEntryBytes;
 			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount++);
@@ -2145,7 +2139,7 @@ System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque
 	header[0] = __lwbrx(&letterCount, 0);
 	header[1] = __lwbrx(&subjectCount, 0);
 	header[2] = __lwbrx(&npcCount, 0);
-	header[3] = reinterpret_cast<unsigned int*>(&CFlat)[0x4102];
+	header[3] = CFlat.CanReplyLetter();
 
 	memcpy(outData, header, sizeof(header));
 
@@ -2825,7 +2819,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		}
 
 		for (i = 0; i < 0x100; i++) {
-			if (strcmp(Game.m_cFlatDataArr[1].TableStrings(2)[i], localInfo.m_name) == 0) {
+			if (strcmp(Game.GetNPCName(i), localInfo.m_name) == 0) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
 			}
@@ -3111,8 +3105,8 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 
 	outCompatibility[1] = count;
 	writePtr = outCompatibility + 2;
-	selectedCount = 0;
 	outSize = 2;
+	selectedCount = 0;
 	for (slot = 1; (selectedCount < count) && (slot < 8); slot++) {
 		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
 			writePtr[0] = static_cast<unsigned char>(slot);
@@ -3126,7 +3120,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	selectedCount = 0;
 	for (slot = 1; (selectedCount < count) && (slot < 8); slot++) {
 		if ((selectedCount < 2) || ((selectedCount >= 2) && (compatibilityData[slot] != 0))) {
-			src = Game.m_cFlatDataArr[1].TableStrings(2)[compatibilityData[slot]];
+			src = Game.GetNPCName(compatibilityData[slot]);
 			int len = strlen(src);
 			memcpy(writePtr, src, len + 1);
 			writePtr += len + 1;
@@ -3167,7 +3161,7 @@ void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
  */
 int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 {
-	GbaQueuePlayerDataView localPlayerData;
+	GbaPInfo localPlayerData;
 	unsigned short cmdData[4];
 	int i;
 	int size;
@@ -3220,7 +3214,7 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
  */
 int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 {
-	GbaQueuePlayerDataView localPlayerData;
+	GbaPInfo localPlayerData;
 	char equipIndices[0x40];
 	int indexBytes;
 	int dataSize;
@@ -3428,7 +3422,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
 		const int nameItem = (*foodBasePtr)->m_shopList[i];
-		strcpy(itemNameScratch, Game.m_cFlatDataArr[1].TableStrings(6)[nameItem]);
+		strcpy(itemNameScratch, Game.GetHelpName(nameItem));
 		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 
 		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
@@ -3530,7 +3524,7 @@ System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<c
 
 		work = (*foodBasePtr)->m_inventoryItems[i];
 		if (work > 0) {
-			strcpy(itemNameScratch, Game.m_cFlatDataArr[1].TableStrings(6)[work]);
+			strcpy(itemNameScratch, Game.GetHelpName(work));
 			CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 			packed = strlen(agbStringScratch) + 1;
 			memcpy(writePtr, agbStringScratch, packed);
@@ -3857,7 +3851,7 @@ void GbaQueue::ClrArtifactFlg(int channel)
  */
 int GbaQueue::GetArtifactData(int channel, unsigned char* outData)
 {
-	GbaQueuePlayerDataView localPlayerData;
+	GbaPInfo localPlayerData;
 	unsigned int artifactData[3];
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -4081,7 +4075,7 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
  */
 int GbaQueue::GetTmpArtifactData(int channel, unsigned char* outData)
 {
-	GbaQueuePlayerDataView localPlayerData;
+	GbaPInfo localPlayerData;
 	unsigned short tmpArtifacts[4];
 
 	OSWaitSemaphore(accessSemaphores + channel);
@@ -4406,20 +4400,19 @@ void GbaQueue::ClrChgScouFlg(int channel)
  */
 void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
 {
-	short enemyId;
-	short enemyType;
+	HitEInfo info;
 
 	if (enemyIdx >= 0) {
-		enemyId = static_cast<short>(enemyIdx);
-		enemyType = static_cast<short>(Game.m_monWorkRefs[enemyIdx]->m_hp);
+		info.m_enemyId = static_cast<short>(enemyIdx);
+		info.m_enemyType = static_cast<short>(Game.m_monWorkRefs[enemyIdx]->m_hp);
 	} else {
-		enemyType = enemyId = -1;
+		info.m_enemyId = -1;
+		info.m_enemyType = -1;
 	}
 
 	OSSemaphore* semaphore = accessSemaphores + channel;
 	OSWaitSemaphore(semaphore);
-	m_hitInfo[channel].m_enemyId = enemyId;
-	m_hitInfo[channel].m_enemyType = enemyType;
+	m_hitInfo[channel] = info;
 	m_chgHitFlags = static_cast<unsigned char>(m_chgHitFlags | (1 << channel));
 	OSSignalSemaphore(semaphore);
 }
@@ -4551,39 +4544,11 @@ unsigned int GbaQueue::GetControllerMode()
  */
 void GbaQueue::OpenMenu(int channel, int menuId, int controlMode)
 {
-	int i;
 	int retries;
 	unsigned int isSingleMode;
-	OSSemaphore* semaphoreIter;
 
 	if (menuId == 999) {
-		i = 0;
-		semaphoreIter = accessSemaphores;
-		do {
-			OSWaitSemaphore(semaphoreIter);
-			i++;
-			semaphoreIter++;
-		} while (i < 4);
-
-		m_controllerMode = 1;
-
-		i = 0;
-		semaphoreIter = accessSemaphores;
-		do {
-			OSSignalSemaphore(semaphoreIter);
-			i++;
-			semaphoreIter++;
-		} while (i < 4);
-
-		for (i = 0; i < 4; i++) {
-			retries = 0;
-			do {
-				if (Joybus.SetMType(i, 4) == 0) {
-					break;
-				}
-				retries++;
-			} while (retries < 10);
-		}
+		SetControllerMode(1);
 		return;
 	}
 

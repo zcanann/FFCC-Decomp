@@ -123,7 +123,6 @@ void Radar_DrawMap(void)
     u16 out[24];
     u16 line[256];
     u16 *data;
-    u16 *src;
     s16 x;
     s16 y;
     s16 tx;
@@ -168,15 +167,14 @@ void Radar_DrawMap(void)
     for (i = -1; i <= 16; i++) {
         if (i + ty >= 0 && i + ty < mapH) {
             n = 0;
-            src = data;
-            for (k = 0; k < sMapRowLen[i + ty]; src++, k++) {
-                if (*src & 0x8000) {
-                    cnt = *src & 0x3FF;
-                    v = (*src >> 10) & 3;
+            for (m = 0; m < sMapRowLen[i + ty]; m++) {
+                if (data[m] & 0x8000) {
+                    cnt = data[m] & 0x3FF;
+                    v = (data[m] >> 10) & 3;
                     for (; cnt != 0; cnt--)
                         line[n++] = v | 0x1000;
                 } else {
-                    line[n++] = *src;
+                    line[n++] = data[m];
                 }
             }
             data += sMapRowLen[i + ty];
@@ -205,7 +203,6 @@ void Radar_ScrollMap(s32 dx, s32 dy)
     u16 out[24];
     u16 line[256];
     u16 *data;
-    u16 *src;
     s16 tx;
     s16 ty;
     s16 mapW;
@@ -216,11 +213,9 @@ void Radar_ScrollMap(s32 dx, s32 dy)
     s32 i;
     s32 k;
     s32 n;
-    s32 c;
-    s32 r;
+    s32 edge;
     s32 col;
     s32 row;
-    u32 u;
     s32 tmp;
     s32 oldFine;
     s32 cnt;
@@ -246,9 +241,9 @@ void Radar_ScrollMap(s32 dx, s32 dy)
     oldFine = oldX & 7;
     if (dx != 0 && ((oldFine <= 3 && tmp > 3) || (oldFine > 4 && tmp <= 4))) {
         if (dx < 0)
-            c = tx - 1;
+            edge = tx - 1;
         else
-            c = tx + 21;
+            edge = tx + 21;
         k = 0;
         for (i = 0; i < ty - 1 && i < mapH; i++)
             k += sMapRowLen[i];
@@ -258,7 +253,7 @@ void Radar_ScrollMap(s32 dx, s32 dy)
         if (tmp < 0)
             row += 32;
         dst = 0x0600F000 + row * 64;
-        tmp = c % 32;
+        tmp = edge % 32;
         col = tmp;
         if (tmp < 0)
             col += 32;
@@ -271,12 +266,12 @@ void Radar_ScrollMap(s32 dx, s32 dy)
                         cnt = data[k] & 0x3FF;
                         v = (data[k] >> 10) & 3;
                         n += cnt;
-                        if (n > c) {
+                        if (n > edge) {
                             line[0] = v | 0x1000;
                             break;
                         }
                     } else {
-                        if (n == c) {
+                        if (n == edge) {
                             line[0] = data[k];
                             break;
                         }
@@ -285,7 +280,7 @@ void Radar_ScrollMap(s32 dx, s32 dy)
                 }
                 data += sMapRowLen[i + ty];
             }
-            if (i + ty < 0 || c < 0 || i + ty >= mapH || c >= mapW)
+            if (i + ty < 0 || edge < 0 || i + ty >= mapH || edge >= mapW)
                 *(u16 *)dst = 0x1000;
             else
                 *(u16 *)dst = line[0];
@@ -299,37 +294,36 @@ void Radar_ScrollMap(s32 dx, s32 dy)
     oldFine = oldY & 7;
     if (dy != 0 && ((oldFine <= 3 && tmp > 3) || (oldFine > 4 && tmp <= 4))) {
         if (dy < 0)
-            r = ty - 1;
+            edge = ty - 1;
         else
-            r = ty + 16;
+            edge = ty + 16;
         k = 0;
-        for (i = 0; i < r && i < mapH; i++)
+        for (i = 0; i < edge && i < mapH; i++)
             k += sMapRowLen[i];
         data = sMapData + k;
-        if (r >= 0 && r < mapH) {
+        if (edge >= 0 && edge < mapH) {
             n = 0;
-            src = data;
-            for (k = 0; k < sMapRowLen[r]; src++, k++) {
-                if (*src & 0x8000) {
-                    cnt = *src & 0x3FF;
-                    v = (*src >> 10) & 3;
-                    for (; cnt != 0; cnt--)
+            for (i = 0; i < sMapRowLen[edge]; i++) {
+                if (data[i] & 0x8000) {
+                    cnt = data[i] & 0x3FF;
+                    v = (data[i] >> 10) & 3;
+                    for (k = 0; k < cnt; k++)
                         line[n++] = v | 0x1000;
                 } else {
-                    line[n++] = *src;
+                    line[n++] = data[i];
                 }
             }
         } else {
-            for (u = 0; u < 256; u++)
-                line[u] = 0x1000;
+            for (i = 0; i < ARRAY_COUNT(line); i++)
+                line[i] = 0x1000;
         }
         for (i = -1; i <= 21; i++) {
-            if (r < 0 || i + tx < 0 || r >= mapH || i + tx >= mapW)
+            if (edge < 0 || i + tx < 0 || edge >= mapH || i + tx >= mapW)
                 out[i + 1] = 0x1000;
             else
                 out[i + 1] = line[i + tx];
         }
-        tmp = r % 32;
+        tmp = edge % 32;
         row = tmp;
         if (tmp < 0)
             row += 32;

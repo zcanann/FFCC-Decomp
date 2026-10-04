@@ -29,6 +29,8 @@ public:
 	virtual void onDestroy(); // vtable entry 0x20
     virtual void onDraw();    // vtable entry 0x28
 
+    void GetPos(Vec* pos) { *pos = m_worldPosition; }
+
     void move();
     void objectCollision();
     void bgCollision();

@@ -50,6 +50,7 @@ public:
             return numPlayer;
         }
         bool IsBattleStage() { return m_bossArtifactStageIndex < 0xF; }
+        bool IsMogStage() { return m_bossArtifactStageIndex == 0x19; }
 
         unsigned char m_menuStageMode;                   // 0x00
         unsigned char m_gameInitFlag;                    // 0x01
@@ -151,13 +152,15 @@ public:
     const char* GetLangString();
     void SetNextScript(CGame::CNextScript* nextScript);
     void SetNextScriptNewGame();
-    int IsWorldMap();
+    int IsWorldMap() { return m_currentMapId == 0x21; }
     int IsPartyExist(int);
     char* GetItemName(int);
     char* GetItemArt(int);
     char* GetItemNames(int);
     char* GetItemArts(int);
     char* GetItemName(int, int);
+    char* GetShortItemName(int itemIndex) { return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 4]; }
+    char* GetRingName(int ringIndex) { return m_cFlatDataArr[1].TableStrings(4)[ringIndex]; }
     char* GetMonName(int);
     char* GetMonArt(int);
     char* GetMonNames(int);

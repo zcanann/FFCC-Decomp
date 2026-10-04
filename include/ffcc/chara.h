@@ -213,6 +213,9 @@ public:
 		void Duplicate(CChara::CNode*, CMemory::CStage*);
 		void CalcBind(CChara::CModel*);
 		float (*GetWorldMatrix())[4] { return m_mtx; }
+		void GetWorldMatrix(float (*mtx)[4]) { PSMTXCopy(m_mtx, mtx); }
+		float (*GetLocalMatrix())[4] { return m_localRuntimeMtx; }
+		void GetLocalMatrix(float (*mtx)[4]) { PSMTXCopy(m_localRuntimeMtx, mtx); }
 
 		CRefData* m_refData;
 		CMesh* m_displayMesh;
@@ -299,8 +302,9 @@ public:
 		void Duplicate(CChara::CMesh*, CMemory::CStage*);
 		void skin(int, int, int, CChara::CSkin*, void*, void*, void*, S16Vec*, S16Vec*, S16Vec*, S16Vec*);
 		void Calc(CChara::CModel*);
-		CRefData* GetRefData();
-		S16Vec* GetVertex();
+		CRefData* GetRefData() { return m_data; }
+		S16Vec* GetVertex() { return m_workPositions; }
+		S16Vec* GetNormal() { return m_workNormals; }
 
 		CRefData* m_data;
 		S16Vec* m_workPositions;
@@ -374,7 +378,8 @@ public:
 		void CalcSafeNodeWorldMatrix(float (*)[4], CChara::CNode*);
 		void AttachAnim(CChara::CAnim*, int, int, int);
 		void AttachTextureSet(CTextureSet*);
-		CMesh* GetMesh();
+		CMesh* GetMesh() { return m_meshes; }
+		CRefData* GetRefData() { return m_data; }
 		void AddFrame(float);
 		void SetFrame(float);
 		float GetNowFrame() { return m_time; }
@@ -391,10 +396,22 @@ public:
 		int GetDispIndex(CChara::CNode*);
 		void GetMatrix();
 		void GetMatrix(float (*mtx)[4]) { PSMTXCopy(m_matrix, mtx); }
-		void GetMatrixT(float (*)[4]);
+		void GetMatrixT(float (*mtx)[4]) { PSMTXCopy(m_drawMtx, mtx); }
+		void SetBeforeDrawCallback(void (*callback)(CChara::CModel*, void*, void*, float (*)[4], int))
+		{
+			m_beforeDrawModelCallback = callback;
+		}
 		void SetBeforeMeshLockEnvCallback(void (*callback)(CChara::CModel*, void*, void*, int))
 		{
 			m_beforeMeshLockEnvCallback = callback;
+		}
+		void SetBeforeDrawShadowLockEnvCallback(void (*callback)(CChara::CModel*, void*, void*, int))
+		{
+			m_beforeDrawShadowLockEnvCallback = callback;
+		}
+		void SetDrawShadowMeshDLCallback(void (*callback)(CChara::CModel*, void*, void*, int, int, float (*)[4]))
+		{
+			m_drawShadowMeshDLCallback = callback;
 		}
 		void SetDrawMeshDLCallback(void (*callback)(CChara::CModel*, void*, void*, int, int, float (*)[4]))
 		{

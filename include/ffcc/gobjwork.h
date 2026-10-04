@@ -276,6 +276,7 @@ public:
     int CanPlayerUseItem();
     void ValidCmdList(int);
     int GetIdxCmdList();
+    int GetNumCmdList() { return m_numCmdListSlots; }
     void SetIdxCmdList(int);
     int IsUseCmdList(int);
     unsigned int IsSelectedCmdList(int);

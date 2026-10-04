@@ -86,14 +86,28 @@ inline int CMenuPcs::TmpArtiCtrlCur()
  */
 inline void CMenuPcs::TmpArtiInit0()
 {
-    TmpArtiEntry* entry = m_tmpArtiList->entries;
-    float alpha = kTmpArtiOne;
+    float alpha;
+    int i;
+    TmpArtiEntry* entry;
+    int startFrame;
+    int itemCount;
+    const CCaravanWork* caravanWork;
 
-    for (int count = m_tmpArtiList->count; count > 0; count--) {
-        entry->startFrame = 0;
-        entry->duration = 1;
+    alpha = kTmpArtiOne;
+    caravanWork = Game.m_scriptFoodBase[0];
+    entry = this->m_tmpArtiList->entries;
+    for (i = 0; i < this->m_tmpArtiList->count; i++) {
         entry->alpha = alpha;
+        entry->z = alpha;
         entry++;
+    }
+
+    itemCount = caravanWork->m_numCmdListSlots;
+    startFrame = 0;
+    for (int idx = itemCount - 1; idx >= 0; idx--) {
+        entry = &this->m_tmpArtiList->entries[idx];
+        entry->startFrame = startFrame++;
+        entry->duration = 3;
     }
 }
 
@@ -148,8 +162,8 @@ inline void CMenuPcs::TmpArtiInit()
  */
 void CMenuPcs::TmpArtiDraw()
 {
-	TmpArtiEntry* entry;
 	const CCaravanWork* caravanWork;
+	TmpArtiEntry* entry;
 	CFont* font;
 	int i;
 	GXColor colors[4];
@@ -204,7 +218,7 @@ void CMenuPcs::TmpArtiDraw()
 		entry++;
 	}
 
-	font = m_fonts[4];
+	font = GetFontItem();
 	font->SetMargin(kTmpArtiOne);
 	font->SetShadow(0);
 	font->SetScale(kTmpArtiFontScale);
@@ -300,31 +314,12 @@ unsigned int CMenuPcs::TmpArtiClose()
 int CMenuPcs::TmpArtiCtrl()
 {
 	int hasInput;
-	int itemCount;
-	int startFrame;
 
 	this->m_tmpArtiState->selection = this->m_tmpArtiState->prevSelection;
 	hasInput = TmpArtiCtrlCur();
 
 	if (hasInput) {
-		float alpha = kTmpArtiOne;
-		const CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
-
-		TmpArtiEntry* entry = this->m_tmpArtiList->entries;
-		for (int i = 0; i < this->m_tmpArtiList->count; i = i + 1) {
-			entry->alpha = alpha;
-			entry->z = alpha;
-			entry++;
-		}
-
-		itemCount = caravanWork->m_numCmdListSlots;
-		startFrame = 0;
-		for (int setupIndex = itemCount - 1; setupIndex >= 0; setupIndex--) {
-			TmpArtiEntry* setupEntry = &this->m_tmpArtiList->entries[setupIndex];
-			setupEntry->startFrame = startFrame;
-			startFrame = startFrame + 1;
-			setupEntry->duration = 3;
-		}
+		TmpArtiInit0();
 	}
 
 	return hasInput;

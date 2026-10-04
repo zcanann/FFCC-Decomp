@@ -30,11 +30,6 @@ static const s32 kPppCharaBreakFullTurnDegrees = 0x168;
 static const s32 kPppCharaBreakMaxQuantizedCenter = 0x7530;
 static const s32 kPppCharaBreakSinTableQuarterTurn = 0x4000;
 
-static inline Mtx& CameraMatrix()
-{
-    return CameraPcs.m_cameraMatrix;
-}
-
 STATIC_ASSERT(sizeof(POLYGON_DATA) == 0x34);
 STATIC_ASSERT(sizeof(CharaBreakStep) == 0x44);
 STATIC_ASSERT(sizeof(CharaBreakWork) == 0x48);
@@ -56,21 +51,6 @@ STATIC_ASSERT(offsetof(CharaBreakStep, m_worldSpaceMode) == 0x42);
 static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
 {
     return model->m_matrix;
-}
-
-static inline CChara::CModel::CRefData* ModelData(CChara::CModel* model)
-{
-    return model->m_data;
-}
-
-static inline CharaBreakMeshData* MeshData(CChara::CMesh* mesh)
-{
-    return reinterpret_cast<CharaBreakMeshData*>(mesh->m_data);
-}
-
-static inline CharaBreakDisplayListPair*** MeshDisplayListPairs(CharaBreakWork* work)
-{
-    return work->m_meshBuffers;
 }
 
 static void CharaBreak_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
@@ -174,13 +154,13 @@ static void CharaBreak_AfterDrawMeshCallback(
     Mtx drawMtx;
 
     CharaBreakWork* work = reinterpret_cast<CharaBreakWork*>(modelData);
-    CChara::CMesh* meshRef = model->m_meshes;
+    CChara::CMesh* meshRef = model->GetMesh();
 
     if (work->m_enabled != 0) {
         meshRef += meshIndex;
-        CharaBreakMeshData* meshData = MeshData(meshRef);
+        CharaBreakMeshData* meshData = meshRef->GetRefData();
         CharaBreakDisplayList* materialData = meshData->m_displayLists;
-        PSMTXCopy(CameraMatrix(), cameraMtx);
+        CameraPcs.GetViewMatrix(cameraMtx);
 
         s32 materialIndex = meshData->m_displayListCount - 1;
 
@@ -191,7 +171,7 @@ static void CharaBreak_AfterDrawMeshCallback(
             POLYGON_DATA* vertexData = (*displayListEntry)->m_polygonData;
 
             MaterialMan.SetMaterial(
-                (CMaterialSet*)ModelData(model)->m_materialSet, materialData->m_material, 0, GX_CS_SCALE_1);
+                (CMaterialSet*)model->GetRefData()->m_materialSet, materialData->m_material, 0, GX_CS_SCALE_1);
 
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
             GXSetCullMode(GX_CULL_NONE);
@@ -201,13 +181,13 @@ static void CharaBreak_AfterDrawMeshCallback(
             GXSetVtxDesc((GXAttr)11, GX_INDEX16);
             GXSetVtxDesc((GXAttr)13, GX_INDEX16);
             GXSetVtxDesc((GXAttr)14, GX_INDEX16);
-            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, GX_POS_XYZ, GX_S16, ModelData(model)->m_posQuant & 0xFF);
-            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)10, GX_NRM_XYZ, GX_S16, ModelData(model)->m_normQuant & 0xFF);
+            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, GX_POS_XYZ, GX_S16, model->GetRefData()->m_posQuant & 0xFF);
+            GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)10, GX_NRM_XYZ, GX_S16, model->GetRefData()->m_normQuant & 0xFF);
             GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)11, GX_CLR_RGBA, GX_RGBA8, 0);
             GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)13, GX_TEX_ST, GX_S16, 0xC);
             GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)14, GX_TEX_ST, GX_S16, 0xC);
 
-            if (MeshData(meshRef)->m_skinCount == 0) {
+            if (meshRef->GetRefData()->m_skinCount == 0) {
                 GXLoadPosMtxImm(cameraMtx, 0);
             } else {
                 PSMTXConcat(cameraMtx, meshMtx, drawMtx);
@@ -270,16 +250,16 @@ static void CharaBreak_AfterDrawMeshCallback(
  */
 void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
-    CharaBreakMeshData* meshData = MeshData(mesh);
+    CharaBreakMeshData* meshData = mesh->GetRefData();
     S16Vec* workPositions;
     s32 isRigid = 0;
     Mtx meshMtx;
 
     if (meshData->m_skinCount == 0) {
         isRigid = 1;
-        PSMTXConcat(ModelDrawMtx(model), model->m_nodes[meshData->m_nodeIndex].m_mtx, meshMtx);
+        PSMTXConcat(ModelDrawMtx(model), model->GetNode(meshData->m_nodeIndex)->GetWorldMatrix(), meshMtx);
     }
-    workPositions = mesh->m_workPositions;
+    workPositions = mesh->GetVertex();
     u16* stream = (u16*)displayList;
 
     s32 keepReading = 1;
@@ -322,10 +302,10 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                     S16Vec posQuantized = *sourcePos;
                     Vec posFloat;
 
-                    gUtil.ConvI2FVector(posFloat, posQuantized, ModelData(model)->m_posQuant);
+                    gUtil.ConvI2FVector(posFloat, posQuantized, model->GetRefData()->m_posQuant);
                     PSMTXMultVec(meshMtx, &posFloat, &posFloat);
                     gUtil.ConvF2IVector(polygonData->m_pos[outVertex], posFloat,
-                        ModelData(model)->m_posQuant);
+                        model->GetRefData()->m_posQuant);
                 } else {
                     polygonData->m_pos[outVertex] = workPositions[posIndex];
                 }
@@ -378,7 +358,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
                           CChara::CModel* model, CChara::CMesh* mesh)
 {
     CharaBreakStep* stepData = (CharaBreakStep*)charaBreak;
-    S16Vec* workNormals = mesh->m_workNormals;
+    S16Vec* workNormals = mesh->GetNormal();
     POLYGON_DATA* polygon = polygonData;
     f32 zero = kPppCharaBreakZero;
 
@@ -400,7 +380,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             polygon->m_enabled = 1;
         }
 
-        if (MeshData(mesh)->m_skinCount == 0) {
+        if (mesh->GetRefData()->m_skinCount == 0) {
             normal.x = Math.RandF(kPppCharaBreakOne);
             normal.y = Math.RandF(kPppCharaBreakOne);
             normal.z = Math.RandF(kPppCharaBreakOne);
@@ -408,21 +388,14 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             normal.y *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
             normal.z *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSign;
             PSVECNormalize(&normal, &normal);
-            gUtil.ConvF2IVector(polygon->m_normalA, normal, ModelData(model)->m_normQuant);
+            gUtil.ConvF2IVector(polygon->m_normalA, normal, model->GetRefData()->m_normQuant);
         } else {
             polygon->m_normalA = workNormals[polygon->m_nrmIndices[0]];
-            gUtil.ConvI2FVector(normal, workNormals[polygon->m_nrmIndices[0]], ModelData(model)->m_normQuant);
+            gUtil.ConvI2FVector(normal, workNormals[polygon->m_nrmIndices[0]], model->GetRefData()->m_normQuant);
         }
 
         PSVECCrossProduct(&up, &normal, &tangent);
-        float tangentMag = PSVECMag(&tangent);
-        if (zero == tangentMag) {
-            tangent.x = zero;
-            tangent.y = zero;
-            tangent.z = zero;
-        } else {
-            PSVECScale(&tangent, &tangent, kPppCharaBreakOne / tangentMag);
-        }
+        VECNormalizeZero(&tangent, &tangent);
 
         if (zero == tangent.x && zero == tangent.y && zero == tangent.z) {
             tangent.x = kPppCharaBreakOne;
@@ -437,7 +410,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             polygon->m_normalA.y = rand() % 2;
         }
 
-        gUtil.ConvF2IVector(polygon->m_normalB, tangent, ModelData(model)->m_normQuant);
+        gUtil.ConvF2IVector(polygon->m_normalB, tangent, model->GetRefData()->m_normQuant);
         polygon++;
     }
 }
@@ -455,23 +428,23 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 {
     POLYGON_DATA* polygon;
     CharaBreakStep* stepData = (CharaBreakStep*)step;
-    CChara::CMesh* mesh = model->m_meshes;
+    CChara::CMesh* mesh = model->GetMesh();
     u32 meshIndex;
     s16 threshold;
 
     threshold = (s32)((work->m_graphValue0 * (work->m_bboxMax.y - work->m_bboxMin.y)) *
-                      (float)(1 << ModelData(model)->m_posQuant));
+                      (float)(1 << model->GetRefData()->m_posQuant));
 
-    for (meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++) {
+    for (meshIndex = 0; meshIndex < model->GetRefData()->m_meshCount; meshIndex++, mesh++) {
         s32 needsMtxUpdate = 0;
         Mtx meshToWorld;
 
-        if (MeshData(mesh)->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
+        if (mesh->GetRefData()->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
             needsMtxUpdate = 1;
-            PSMTXConcat(model->m_matrix, model->m_nodes[MeshData(mesh)->m_nodeIndex].m_mtx, meshToWorld);
+            PSMTXConcat(model->m_matrix, model->GetNode(mesh->GetRefData()->m_nodeIndex)->GetWorldMatrix(), meshToWorld);
         }
 
-        for (int dl = MeshData(mesh)->m_displayListCount - 1; dl >= 0; dl--) {
+        for (int dl = mesh->GetRefData()->m_displayListCount - 1; dl >= 0; dl--) {
             CharaBreakDisplayListPair** displayListPairs =
                 work->m_meshBuffers[meshIndex];
             polygon = displayListPairs[dl]->m_polygonData;
@@ -484,13 +457,13 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                     for (int i = 0; i < 3; i++) {
                         if (needsMtxUpdate) {
-                            S16Vec* srcPos = mesh->m_workPositions + polygon->m_posIndices[i];
+                            S16Vec* srcPos = mesh->GetVertex() + polygon->m_posIndices[i];
                             Vec transformedPos;
-                            gUtil.ConvI2FVector(transformedPos, *srcPos, ModelData(model)->m_posQuant);
+                            gUtil.ConvI2FVector(transformedPos, *srcPos, model->GetRefData()->m_posQuant);
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
-                            gUtil.ConvF2IVector(transformed[i], transformedPos, ModelData(model)->m_posQuant);
+                            gUtil.ConvF2IVector(transformed[i], transformedPos, model->GetRefData()->m_posQuant);
                         } else {
-                            transformed[i] = mesh->m_workPositions[polygon->m_posIndices[i]];
+                            transformed[i] = mesh->GetVertex()[polygon->m_posIndices[i]];
                         }
 
                         if (stepData->m_clipMode == 0) {
@@ -559,14 +532,14 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                         for (int i = 0; i < 3; i++) {
                             S16Vec pos = polygon->m_pos[i];
-                            gUtil.ConvI2FVector(verts[i], pos, ModelData(model)->m_posQuant);
+                            gUtil.ConvI2FVector(verts[i], pos, model->GetRefData()->m_posQuant);
                             PSVECAdd(&center, &verts[i], &center);
                         }
 
                         PSVECScale(&center, &center, kPppCharaBreakTriangleCenterScale);
 
-                        gUtil.ConvI2FVector(axis, polygon->m_normalB, ModelData(model)->m_normQuant);
-                        gUtil.ConvI2FVector(velocity, polygon->m_normalA, ModelData(model)->m_normQuant);
+                        gUtil.ConvI2FVector(axis, polygon->m_normalB, model->GetRefData()->m_normQuant);
+                        gUtil.ConvI2FVector(velocity, polygon->m_normalA, model->GetRefData()->m_normQuant);
                         PSVECScale(&velocity, &velocity, stepData->m_velocityBase + Math.RandF(stepData->m_velocityRange));
 
                         C_QUATRotAxisRad(&rotQuat, &axis, kPppCharaBreakDegToRad * (float)polygon->m_rotationDeg);
@@ -621,7 +594,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             verts[i].y += stepData->m_direction.y * work->m_payloadGraphValue0;
                             verts[i].z += stepData->m_direction.z * work->m_payloadGraphValue0;
 
-                            gUtil.ConvF2IVector(polygon->m_pos[i], verts[i], ModelData(model)->m_posQuant);
+                            gUtil.ConvF2IVector(polygon->m_pos[i], verts[i], model->GetRefData()->m_posQuant);
                         }
                         polygon->m_fallFrames++;
                     }
@@ -631,7 +604,6 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
             }
         }
 
-        mesh++;
     }
 }
 
@@ -710,14 +682,14 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 
     ClearCharaBreakModelCallbacks(model);
 
-    perMeshBuffers = MeshDisplayListPairs(work);
-    meshBufferSlot = perMeshBuffers;
-    mesh = model->m_meshes;
+    meshBufferSlot = work->m_meshBuffers;
+    perMeshBuffers = meshBufferSlot;
+    mesh = model->GetMesh();
 
     if (perMeshBuffers != NULL) {
-        for (meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++, mesh++) {
+        for (meshIndex = 0; meshIndex < model->GetRefData()->m_meshCount; meshIndex++, mesh++) {
             dlEntryBase = *meshBufferSlot;
-            meshData = MeshData(mesh);
+            meshData = mesh->GetRefData();
             if (dlEntryBase != NULL) {
                 dlEntries = dlEntryBase;
                 for (dlIndex = 0; dlIndex < meshData->m_displayListCount; dlIndex++) {
@@ -764,8 +736,8 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtrlTable* data)
 {
     CharaBreakWork* work;
-    CChara::CModel* model;
     CChara::CMesh* mesh;
+    CChara::CModel* model;
     CGObject* handle;
     u32 i;
     CharaBreakDisplayList* displayList;
@@ -818,35 +790,35 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
         }
     }
 
-    mesh = model->m_meshes;
+    mesh = model->GetMesh();
 
     if (work->m_meshBuffers == NULL) {
         work->m_miscValue = kPppCharaBreakInitialMiscValue;
         work->m_meshBuffers =
             static_cast<CharaBreakDisplayListPair***>(
-                pppMemAllocNoReport(ModelData(model)->m_meshCount << 2,
+                pppMemAllocNoReport(model->GetRefData()->m_meshCount << 2,
                                 ppvEnv->m_stagePtr, "pppCharaBreak.cpp", 0x3D0));
         if (work->m_meshBuffers == NULL) {
             goto fail;
         }
 
-        for (i = 0; i < ModelData(model)->m_meshCount; i++) {
+        for (u32 i = 0; i < model->GetRefData()->m_meshCount; i++) {
             work->m_meshBuffers[i] = 0;
         }
 
-        for (i = 0; i < ModelData(model)->m_meshCount; i++, mesh++) {
+        for (i = 0; i < model->GetRefData()->m_meshCount; i++, mesh++) {
             {
-                CharaBreakMeshData* meshData = MeshData(mesh);
+                CharaBreakMeshData* meshData = mesh->GetRefData();
 
                 if (strcmp(meshData->m_name, "obj") == 0) {
                     gUtil.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax,
-                        mesh->m_workPositions, meshData->m_vertexCount,
-                        ModelData(model)->m_posQuant);
+                        mesh->GetVertex(), meshData->m_vertexCount,
+                        model->GetRefData()->m_posQuant);
                 }
             }
 
             work->m_meshBuffers[i] = static_cast<CharaBreakDisplayListPair**>(pppMemAllocNoReport(
-                MeshData(mesh)->m_displayListCount << 2, ppvEnv->m_stagePtr,
+                mesh->GetRefData()->m_displayListCount << 2, ppvEnv->m_stagePtr,
                 "pppCharaBreak.cpp", 0x3E9));
             CharaBreakDisplayListPair** meshBuffer = work->m_meshBuffers[i];
             if (meshBuffer == 0) {
@@ -854,7 +826,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
             }
 
             {
-                int displayListCount = MeshData(mesh)->m_displayListCount;
+                int displayListCount = mesh->GetRefData()->m_displayListCount;
                 CharaBreakDisplayListPair** dlEntries = meshBuffer;
                 for (int dl = displayListCount - 1; dl >= 0; dl--) {
                     dlEntries[dl] = 0;
@@ -862,8 +834,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
             }
 
             {
-                int displayListCount = MeshData(mesh)->m_displayListCount;
-                displayList = MeshData(mesh)->m_displayLists;
+                int displayListCount = mesh->GetRefData()->m_displayListCount;
+                displayList = mesh->GetRefData()->m_displayLists;
                 dl = displayListCount - 1;
                 dlEntries = meshBuffer + dl;
                 for (; dl >= 0; dl--, displayList++) {

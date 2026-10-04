@@ -51,10 +51,10 @@ STATIC_ASSERT(offsetof(MenuLstState, cursor) == 0x26);
  */
 void CMenuPcs::MLstDraw()
 {
-	MenuLstEntry* item;
 	CFont* font;
 	short menuMode;
 	int i;
+	MenuLstEntry* item;
 	float y;
 	float h;
 	float w;
@@ -105,7 +105,7 @@ void CMenuPcs::MLstDraw()
 		}
 	}
 
-	font = this->m_fonts[4];
+	font = GetFontItem();
 	font->SetMargin(kMLstOne);
 	font->SetShadow(0);
 	font->SetScale(kMLstOne);
@@ -212,6 +212,95 @@ int CMenuPcs::MLstClose()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 348b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::MLstInit1()
+{
+	float one;
+	int i;
+	MenuLstEntry* entry;
+	int startFrame;
+	int duration;
+
+	one = kMLstOne;
+	entry = this->m_menuLstList->entries;
+	for (i = 0; i < this->m_menuLstList->count; i++) {
+		entry->alpha = one;
+		entry->z = one;
+		entry++;
+	}
+
+	startFrame = 0;
+	duration = 4;
+	for (int idx = this->m_menuLstList->count - 1; idx >= 0; idx--) {
+		entry = &this->m_menuLstList->entries[idx];
+		entry->startFrame = startFrame++;
+		entry->duration = duration;
+	}
+
+	this->m_menuLstState->frame = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 540b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::MLstCtrlCur()
+{
+	short press;
+	short hold;
+
+	press = Pad.GetButtonDown(0);
+	hold = Pad.GetButtonRepeat(0);
+
+	if (hold == 0) {
+		return 0;
+	}
+
+	if ((hold & 0x48) != 0) {
+		MenuLstState* st = this->m_menuLstState;
+		if (st->cursor != 0) {
+			st->cursor--;
+		} else {
+			st->cursor = 8;
+		}
+		Sound.PlaySe(1, 0x40, 0x7f, 0);
+	} else if ((hold & 0x24) != 0) {
+		MenuLstState* st = this->m_menuLstState;
+		if (st->cursor < 8) {
+			st->cursor++;
+		} else {
+			st->cursor = 0;
+		}
+		Sound.PlaySe(1, 0x40, 0x7f, 0);
+	}
+
+	if ((hold & 0x6c) == 0) {
+		if ((press & 0x100) != 0) {
+			Sound.PlaySe(2, 0x40, 0x7f, 0);
+			return 1;
+		}
+		if ((press & 0x200) != 0) {
+			this->m_menuLstState->closeRequested = (char)0xFF;
+			Sound.PlaySe(3, 0x40, 0x7f, 0);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80174e94
  * PAL Size: 892b
  * EN Address: TODO
@@ -221,74 +310,62 @@ int CMenuPcs::MLstClose()
  */
 int CMenuPcs::MLstCtrl()
 {
-	float one;
-	short press;
-	short hold;
-	int startFrame;
-	int duration;
-	int result;
-
-	press = Pad.GetButtonDown(0);
-	hold = Pad.GetButtonRepeat(0);
-
-	if (hold == 0) {
-		result = 0;
-	} else {
-		if ((hold & 0x48) != 0) {
-			MenuLstState* st = this->m_menuLstState;
-			if (st->cursor != 0) {
-				st->cursor--;
-			} else {
-				st->cursor = 8;
-			}
-			Sound.PlaySe(1, 0x40, 0x7f, 0);
-		} else if ((hold & 0x24) != 0) {
-			MenuLstState* st = this->m_menuLstState;
-			if (st->cursor < 8) {
-				st->cursor++;
-			} else {
-				st->cursor = 0;
-			}
-			Sound.PlaySe(1, 0x40, 0x7f, 0);
-		}
-
-		if ((hold & 0x6c) == 0) {
-			if ((press & 0x100) != 0) {
-				Sound.PlaySe(2, 0x40, 0x7f, 0);
-				result = 1;
-			} else if ((press & 0x200) != 0) {
-				this->m_menuLstState->closeRequested = (char)0xFF;
-				Sound.PlaySe(3, 0x40, 0x7f, 0);
-				result = 1;
-			} else {
-				goto fail;
-			}
-		} else {
-		fail:
-			result = 0;
-		}
-	}
+	int result = MLstCtrlCur();
 
 	if (result != 0) {
-		one = kMLstOne;
-		MenuLstEntry* entry = this->m_menuLstList->entries;
-		for (int j = 0; j < this->m_menuLstList->count; j++) {
-			entry->alpha = one;
-			entry->z = one;
-			entry++;
-		}
-
-		startFrame = 0;
-		duration = 4;
-		for (int idx = this->m_menuLstList->count - 1; idx >= 0; idx--) {
-			MenuLstEntry* closeEntry = &this->m_menuLstList->entries[idx];
-			closeEntry->startFrame = startFrame++;
-			closeEntry->duration = duration;
-		}
-
-		this->m_menuLstState->frame = 0;
+		MLstInit1();
 	}
 	return result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::MLstInit()
+{
+	int i;
+	short yPos;
+	int initializedCount;
+	double itemCenter;
+	double xOrigin;
+	float zero;
+	float one;
+	MenuLstEntry* entry;
+
+	memset(this->m_menuLstList, 0, sizeof(MenuLstList));
+	one = kMLstOne;
+	entry = this->m_menuLstList->entries;
+	for (i = 0; i < 64; i++, entry++) {
+		entry->z = one;
+	}
+
+	xOrigin = kMLstWindowCenterX;
+	itemCenter = kMLstHalfDouble;
+	zero = kMLstZero;
+	initializedCount = 0;
+	yPos = 0x18;
+	for (i = 0; i < 9; i++) {
+		entry = &this->m_menuLstList->entries[initializedCount++];
+		entry->unk_2C = 2;
+		entry->tex = 0x5B;
+		entry->width = 0xE0;
+		entry->height = 0x28;
+		entry->x = (short)(int)-(((double)entry->width * itemCenter) - xOrigin);
+		entry->y = yPos;
+		yPos += 0x20;
+		entry->s = zero;
+		entry->t = zero;
+		entry->startFrame = i;
+		entry->duration = 4;
+	}
+	this->m_menuLstList->count = initializedCount;
+	this->m_menuLstState->initialized = 1;
 }
 
 /*
@@ -303,49 +380,14 @@ int CMenuPcs::MLstCtrl()
 int CMenuPcs::MLstOpen()
 {
 	float one;
-	float zero;
-	int completedItems;
 	MenuLstEntry* entry;
+	int completedItems;
 	int itemCount;
 	int currentFrame;
 	int count;
 
 	if (this->m_menuLstState->initialized == '\0') {
-		int i;
-		int initializedCount;
-		short yPos;
-		double itemCenter;
-		double xOrigin;
-		float zero;
-
-		memset(this->m_menuLstList, 0, sizeof(MenuLstList));
-		one = kMLstOne;
-		entry = this->m_menuLstList->entries;
-		for (i = 0; i < 64; i++, entry++) {
-			entry->z = one;
-		}
-
-		xOrigin = kMLstWindowCenterX;
-		itemCenter = kMLstHalfDouble;
-		zero = kMLstZero;
-		initializedCount = 0;
-		yPos = 0x18;
-		for (i = 0; i < 9; i++) {
-			entry = &this->m_menuLstList->entries[initializedCount++];
-			entry->unk_2C = 2;
-			entry->tex = 0x5B;
-			entry->width = 0xE0;
-			entry->height = 0x28;
-			entry->x = (short)(int)-(((double)entry->width * itemCenter) - xOrigin);
-			entry->y = yPos;
-			yPos += 0x20;
-			entry->s = zero;
-			entry->t = zero;
-			entry->startFrame = i;
-			entry->duration = 4;
-		}
-		this->m_menuLstList->count = initializedCount;
-		this->m_menuLstState->initialized = 1;
+		MLstInit();
 	}
 
 	completedItems = 0;

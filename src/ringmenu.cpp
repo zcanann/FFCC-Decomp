@@ -511,11 +511,11 @@ void CRingMenu::onDraw()
 			CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 			if (partyObj != 0) {
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
-				int cmdIndex = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				int cmdIndex = (Game.m_gameWork.IsMogStage())
 				                   ? Chara.MogFur().m_commandIndex
 				                   : caravanWork->GetIdxCmdList();
 
-				CFont* font = MenuPcs.m_fonts[1];
+				CFont* font = MenuPcs.GetFont23();
 				font->DrawInit();
 				font->SetMargin(-4.0f);
 				font->SetShadow(1);
@@ -525,14 +525,14 @@ void CRingMenu::onDraw()
 				float labelAlpha = 1.0f;
 				for (;;) {
 					if (scroll >= labelAlpha) {
-						if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+						if (Game.m_gameWork.IsMogStage()) {
 							cmdIndex = (cmdIndex + 1) % 5;
 						} else {
 							cmdIndex = caravanWork->GetNextCmdListIdx(cmdIndex, -1);
 						}
 						scroll -= 1.0f;
 					} else if (scroll <= -1.0f) {
-						if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+						if (Game.m_gameWork.IsMogStage()) {
 							cmdIndex = (cmdIndex + 4) % 5;
 						} else {
 							cmdIndex = caravanWork->GetNextCmdListIdx(cmdIndex, 1);
@@ -552,20 +552,20 @@ void CRingMenu::onDraw()
 				}
 				labelAlpha = static_cast<float>(labelAlphaD);
 
-				int prev1 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				int prev1 = (Game.m_gameWork.IsMogStage())
 				                ? (cmdIndex + 4) % 5
 				                : caravanWork->GetNextCmdListIdx(cmdIndex, -1);
-				int prev2 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				int prev2 = (Game.m_gameWork.IsMogStage())
 				                ? (prev1 + 4) % 5
 				                : caravanWork->GetNextCmdListIdx(prev1, -1);
 
 				labelAlpha *= iconAlphaScale;
 				drawCommand(m_menuIndex, font, posX, posY, caravanWork, prev2, scroll - 2.0f, labelAlpha);
 				drawCommand(m_menuIndex, font, posX, posY, caravanWork, prev1, scroll - 1.0f, labelAlpha);
-				int next1 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				int next1 = (Game.m_gameWork.IsMogStage())
 				                ? (cmdIndex + 1) % 5
 				                : caravanWork->GetNextCmdListIdx(cmdIndex, 1);
-				int next2 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				int next2 = (Game.m_gameWork.IsMogStage())
 				                ? (next1 + 1) % 5
 				                : caravanWork->GetNextCmdListIdx(next1, 1);
 				drawCommand(m_menuIndex, font, posX, posY, caravanWork, next2, 2.0f + scroll, labelAlpha);
@@ -581,7 +581,7 @@ void CRingMenu::onDraw()
 		const float textX1 = (56.0f + drawX) + 20.0f;
 		const float textY1 = (3.0f + drawY) - 4.0f;
 		const float textY2 = 6.0f + drawY;
-		CFont* font = MenuPcs.m_fonts[1];
+		CFont* font = MenuPcs.GetFont23();
 		for (int button = 1; button >= 0; button--) {
 			const int buttonValue = (&m_battleButtons[group * 2 + 2])[button];
 			if (buttonValue < 0) {
@@ -590,9 +590,9 @@ void CRingMenu::onDraw()
 
 			const char* label;
 			if ((buttonValue & 0x8000) != 0) {
-				label = Game.m_cFlatDataArr[1].TableStrings(0)[(buttonValue & ~0x8000) * 5 + 4];
+				label = Game.GetShortItemName(buttonValue & ~0x8000);
 			} else {
-				label = Game.m_cFlatDataArr[1].TableStrings(4)[buttonValue];
+				label = Game.GetRingName(buttonValue);
 			}
 
 			float fade = static_cast<float>((&m_buttonTimers[group * 3])[button]) * 0.125f;
@@ -672,7 +672,7 @@ void CRingMenu::onDraw()
 						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
 						const float barY = 20.0f + textY;
 
-						for (int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
+						for (int i = 0; i < caravanWork->GetNumCmdList(); i++) {
 							int selected = caravanWork->IsSelectedCmdList(i);
 
 							float blink;
@@ -689,7 +689,7 @@ void CRingMenu::onDraw()
 
 							MenuPcs.DrawRect(3,
 								4.0f +
-									((textX2 - static_cast<float>((caravanWork->m_numCmdListSlots * 8) / 2)) +
+									((textX2 - static_cast<float>((caravanWork->GetNumCmdList() * 8) / 2)) +
 									 static_cast<float>(i * 8)),
 								barY, 8.0f, 8.0f,
 								8.0f * (8.0f + blink), 56.0f,
@@ -720,7 +720,6 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 	float textHeight;
 	int waveDirection;
 	float clampedAlpha;
-	char** cmdNameTable;
 	const char* commandLabel;
 	double waveX;
 	float waveY;
@@ -728,17 +727,15 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 	bool reverseDir;
 	float waveSinY;
 
-	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-		cmdNameTable = Game.m_cFlatDataArr[1].TableStrings(4);
-		commandLabel = cmdNameTable[cmdIndex + 0x1E];
+	if (Game.m_gameWork.IsMogStage()) {
+		commandLabel = Game.GetRingName(cmdIndex + 0x1E);
 	} else if (cmdIndex < 2) {
-		cmdNameTable = Game.m_cFlatDataArr[1].TableStrings(4);
-		commandLabel = cmdNameTable[(cmdIndex == 0) ? 1 : 9];
+		commandLabel = Game.GetRingName((cmdIndex == 0) ? 1 : 9);
 	} else {
 		commandLabel = caravanWork->GetCmdListItemName(cmdIndex);
 	}
 
-	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+	if (Game.m_gameWork.IsMogStage()) {
 		int color = 7;
 		switch (cmdIndex) {
 		case 0:
@@ -775,7 +772,7 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
 		waveDirection = -1;
 	}
 	waveY = static_cast<float>(waveDirection) * (10.0f * waveSinY);
-	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+	if (Game.m_gameWork.IsMogStage()) {
 		waveY += 2.0f;
 	}
 
@@ -861,11 +858,11 @@ void CRingMenu::onCalc()
 		CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 		if (partyObj != 0) {
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
-			int currentCmd = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+			int currentCmd = (Game.m_gameWork.IsMogStage())
 			                     ? Chara.MogFur().m_commandIndex
 			                     : caravanWork->GetIdxCmdList();
 
-			int* trackedCmd = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+			int* trackedCmd = (Game.m_gameWork.IsMogStage())
 			                      ? &Chara.MogFur().m_trackedCommandIndex
 			                      : &m_currentCommandIndex;
 
@@ -873,10 +870,10 @@ void CRingMenu::onCalc()
 			int prev = currentCmd;
 			if (*trackedCmd != currentCmd) {
 				for (int step = 1; step < 4; step++) {
-					next = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+					next = (Game.m_gameWork.IsMogStage())
 					           ? (currentCmd + 1) % 5
 					           : caravanWork->GetNextCmdListIdx(next, 1);
-					prev = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+					prev = (Game.m_gameWork.IsMogStage())
 					           ? (currentCmd + 4) % 5
 					           : caravanWork->GetNextCmdListIdx(prev, -1);
 

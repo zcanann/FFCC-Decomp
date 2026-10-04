@@ -28,11 +28,11 @@ static signed char s_place[2][8];
  */
 inline void CMenuPcs::MoneySetPlace(int row)
 {
-	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
-	int digitPlace = 1;
 	int digitIndex;
-	int started;
+	int digitPlace = 1;
 	int gil;
+	int started;
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 
 	for (digitIndex = 0; digitIndex < 7; digitIndex++) {
 		digitPlace *= 10;
@@ -157,8 +157,8 @@ int CMenuPcs::MoneyCtrlCur()
 				if (gil == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					if (0 <= (int)(s_Money - placeValue)) {
-						gil = (int)(s_Money - placeValue);
+					if (0 <= (int)s_Money - (int)placeValue) {
+						gil = s_Money - placeValue;
 					}
 					s_Money = gil;
 					MoneySetPlace(1);
@@ -298,13 +298,11 @@ void CMenuPcs::MoneyDraw()
 	float y;
 	const char* label;
 	int selectionState;
-	GXColor entryColor;
+	GXColor colors[4];
 	float w;
 	float h;
 	MoneyMenuAnim* entry;
 	float u;
-	GXColor panelColor;
-	GXColor cursorColor;
 	float v;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -327,26 +325,26 @@ void CMenuPcs::MoneyDraw()
 		u = entry->u;
 		v = entry->v;
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
-		entryColor.r = 0xFF;
-		entryColor.g = 0xFF;
-		entryColor.b = 0xFF;
-		entryColor.a = (u8)(255.0f * entry->alpha);
-		GXSetChanMatColor(GX_COLOR0A0, entryColor);
+		colors[0].r = 0xFF;
+		colors[0].g = 0xFF;
+		colors[0].b = 0xFF;
+		colors[0].a = (u8)(255.0f * entry->alpha);
+		GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 		float uvScale = entry->uvScale;
 		MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
 	}
 
 	entry = this->m_moneyPanel->anims;
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5D));
-	panelColor.r = 0xFF;
-	panelColor.g = 0xFF;
-	panelColor.b = 0xFF;
-	panelColor.a = (u8)(255.0f * entry->alpha);
-	GXSetChanMatColor(GX_COLOR0A0, panelColor);
+	colors[0].r = 0xFF;
+	colors[0].g = 0xFF;
+	colors[0].b = 0xFF;
+	colors[0].a = (u8)(255.0f * entry->alpha);
+	GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 	for (i = 0; i < 2; i++) {
-		y = (float)(entry->y + 0x18) + 32.0f * (float)i;
 		x = (float)(entry->x + 0x20);
+		y = (float)(entry->y + 0x18) + 32.0f * (float)i;
 		for (j = 0; j < 8; j++) {
 			signed char digit = s_place[i][j];
 			if (digit >= 0) {
@@ -360,11 +358,11 @@ void CMenuPcs::MoneyDraw()
 
 	if ((mode == 0) && (selectionState == 1)) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x48));
-		cursorColor.r = 0xFF;
-		cursorColor.g = 0xFF;
-		cursorColor.b = 0xFF;
-		cursorColor.a = (u8)(255.0f * entry->alpha);
-		GXSetChanMatColor(GX_COLOR0A0, cursorColor);
+		colors[0].r = 0xFF;
+		colors[0].g = 0xFF;
+		colors[0].b = 0xFF;
+		colors[0].a = (u8)(255.0f * entry->alpha);
+		GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 		entry = this->m_moneyPanel->anims;
 		MenuPcs.DrawRect(0, (float)(entry->x + ((7 - this->m_moneyState->selections[0]) * 0x12 + 0x24)),
@@ -373,7 +371,7 @@ void CMenuPcs::MoneyDraw()
 		                 1.0f, 0.0f);
 	}
 
-	font = this->m_fonts[4];
+	font = GetFontItem();
 	font->SetMargin(1.0f);
 	font->SetShadow(0);
 	font->SetScale(0.9f);
@@ -510,6 +508,50 @@ int CMenuPcs::MoneyCtrl()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 540b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::MoneyInit()
+{
+	int i;
+	MoneyMenuAnim* anim;
+
+	memset(this->m_moneyPanel, 0, sizeof(*this->m_moneyPanel));
+
+	anim = this->m_moneyPanel->anims;
+	for (i = 0; i < 64; i++, anim++) {
+		anim->uvScale = 1.0f;
+	}
+
+	i = 0;
+	anim = &this->m_moneyPanel->anims[i++];
+	anim->tex = 0x3b;
+	anim->y = 0x68;
+	anim->w = 0xf8;
+	anim->h = 0x88;
+	anim->x = 216.0 - anim->w / 2.0;
+	anim->u = 0.0f;
+	anim->v = 0.0f;
+	anim->uvScale = 1.0f;
+	anim->startFrame = 0;
+	anim->duration = 10;
+	this->m_moneyPanel->count = i;
+
+	s_Money = 0;
+	for (i = 0; i < 2; i++) {
+		MoneySetPlace(i);
+	}
+
+	this->m_moneyState->selections[0] = 0;
+	this->m_moneyState->initialized = 1;
+}
+
+/*
+ * --INFO--
  * PAL Address: 8015f688
  * PAL Size: 928b
  * EN Address: TODO
@@ -523,34 +565,7 @@ int CMenuPcs::MoneyOpen()
 	MoneyMenuAnim* anim;
 
 	if (this->m_moneyState->initialized == '\0') {
-		memset(this->m_moneyPanel, 0, sizeof(*this->m_moneyPanel));
-
-		anim = this->m_moneyPanel->anims;
-		for (i = 0; i < 64; i++, anim++) {
-			anim->uvScale = 1.0f;
-		}
-
-		i = 0;
-		anim = &this->m_moneyPanel->anims[i++];
-		anim->tex = 0x3b;
-		anim->y = 0x68;
-		anim->w = 0xf8;
-		anim->h = 0x88;
-		anim->x = 216.0 - anim->w / 2.0;
-		anim->u = 0.0f;
-		anim->v = 0.0f;
-		anim->uvScale = 1.0f;
-		anim->startFrame = 0;
-		anim->duration = 10;
-		this->m_moneyPanel->count = i;
-
-		s_Money = 0;
-		for (i = 0; i < 2; i++) {
-			MoneySetPlace(i);
-		}
-
-		this->m_moneyState->selections[0] = 0;
-		this->m_moneyState->initialized = 1;
+		MoneyInit();
 	}
 
 	this->m_moneyState->frame++;

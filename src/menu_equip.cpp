@@ -402,7 +402,7 @@ void CMenuPcs::EquipDraw()
 		item++;
 	}
 
-	CFont* font = m_fonts[4];
+	CFont* font = GetFontItem();
 	font->SetMargin(1.0f);
 	font->SetShadow(0);
 	font->SetScale(0.9f);
@@ -413,7 +413,7 @@ void CMenuPcs::EquipDraw()
 		if (caravanWork->m_equipment[i] >= 0) {
 			font->SetColor(CColor(0xff, 0xff, 0xff, (u8)(255.0f * item->alpha)).color);
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
-			char* str = Game.m_cFlatDataArr[1].TableStrings(0)[itemIdx * 5 + 4];
+			char* str = Game.GetShortItemName(itemIdx);
 			if ((m_equipState->mode == 0) && (i == static_cast<int>(m_equipState->selected[0]))) {
 				helpItem = itemIdx;
 				helpFound = true;
@@ -529,7 +529,7 @@ void CMenuPcs::EquipDraw()
 	}
 
 	if (mode == 1) {
-		font = m_fonts[4];
+		font = GetFontItem();
 		font->SetMargin(1.0f);
 		font->SetShadow(0);
 		font->SetScale(0.9f);
@@ -564,7 +564,7 @@ void CMenuPcs::EquipDraw()
 					continue;
 				}
 				int itemIdx = caravanWork->m_inventoryItems[entry];
-				str = Game.m_cFlatDataArr[1].TableStrings(0)[itemIdx * 5 + 4];
+				str = Game.GetShortItemName(itemIdx);
 				if (idx == static_cast<int>(m_equipState->selected[1]) + static_cast<int>(m_equipState->scroll)) {
 					helpItem = itemIdx;
 					helpFound = true;
@@ -716,6 +716,42 @@ int CMenuPcs::EquipClose()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 356b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::EquipInit0()
+{
+	float one;
+	int i;
+	EquipOpenAnim* entry;
+	int idx;
+	int itemCount;
+	CCaravanWork* caravanWork;
+
+	one = 1.0f;
+	caravanWork = Game.m_scriptFoodBase[0];
+	entry = m_equipList->entries;
+	for (i = 0; i < m_equipList->count; i++) {
+		entry->alpha = one;
+		entry->scale = one;
+		entry++;
+	}
+
+	itemCount = caravanWork->m_numCmdListSlots;
+	idx = 0;
+	for (int k = itemCount - 1; k >= 0; k--) {
+		entry = &m_equipList->entries[k];
+		entry->startFrame = idx++;
+		entry->duration = 3;
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8015ceb4
  * PAL Size: 596b
  * EN Address: TODO
@@ -745,23 +781,7 @@ int CMenuPcs::EquipCtrl()
 	}
 
 	if (state) {
-		float one = 1.0f;
-		CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
-
-		EquipOpenAnim* entry = m_equipList->entries;
-		for (int i = 0; i < m_equipList->count; i++) {
-			entry->alpha = one;
-			entry->scale = one;
-			entry++;
-		}
-
-		int idx = 0;
-		for (int k = caravanWork->m_numCmdListSlots - 1; k >= 0; k--) {
-			EquipOpenAnim* e = &m_equipList->entries[k];
-			e->startFrame = idx;
-			idx++;
-			e->duration = 3;
-		}
+		EquipInit0();
 	}
 	return state;
 }

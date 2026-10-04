@@ -24,6 +24,8 @@ public:
 
     unsigned int GetWidth() { return m_width; }
     unsigned int GetHeight() { return m_height; }
+    GXTexObj* GetTexObj() { return &m_texObj; }
+    void SetWrapMode(GXTexWrapMode wrapMode) { m_wrapMode = wrapMode; }
 
     void InitTexObj();
     void Create(CChunkFile&, CMemory::CStage*, CAmemCacheSet*, int, int);

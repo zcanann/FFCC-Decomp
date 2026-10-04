@@ -1502,16 +1502,6 @@ inline void CGame::CGameWork::ClearScriptChange()
  * Address:	TODO
  * Size:	TODO
  */
-inline int CGame::IsWorldMap()
-{
-    return m_currentMapId == 0x21;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 inline int CGame::IsPartyExist(int index)
 {
     return index >= 0 && index < 4 && GetPartyObj(index) != 0;

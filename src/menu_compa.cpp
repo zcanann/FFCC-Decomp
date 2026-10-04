@@ -63,8 +63,6 @@ void CMenuPcs::CompaDraw()
 {
 	CCaravanWork* caravanWork;
 	GXColor colors[4];
-	CompaOpenAnimList* compaList;
-	CFont* font;
 	int familyCount;
 	float fillW;
 	int tex;
@@ -76,7 +74,9 @@ void CMenuPcs::CompaDraw()
 	float v;
 	float alpha;
 	int drawIndex;
+	CompaOpenAnimList* compaList;
 	int shown;
+	CFont* font;
 	int i;
 	float iconX;
 	float iconY;
@@ -184,8 +184,7 @@ void CMenuPcs::CompaDraw()
 			kCompaOne, kCompaZero);
 	}
 
-	drawIndex = 0;
-	shown = 0;
+	shown = drawIndex = 0;
 	for (i = shown; i < 8 && shown < familyCount; i++) {
 		iconX = static_cast<float>(compaList->entries[0].x + 0x128);
 		iconY = static_cast<float>(compaList->entries[0].y + 0x40);
@@ -234,7 +233,7 @@ void CMenuPcs::CompaDraw()
 		drawIndex++;
 	}
 
-	font = m_fonts[4];
+	font = GetFontItem();
 	compaList = this->m_compaList;
 	font->SetMargin(kCompaOne);
 	font->SetShadow(0);
@@ -245,8 +244,7 @@ void CMenuPcs::CompaDraw()
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(kCompaColorMax * compaList->entries[0].alpha)).color);
 
 	caravanWork = Game.m_scriptFoodBase[0];
-	drawIndex = 0;
-	shown = 0;
+	shown = drawIndex = 0;
 	for (i = shown; i < 8 && shown < familyCount; i++) {
 		if (i >= 2) {
 			scan = drawIndex;
@@ -271,8 +269,7 @@ void CMenuPcs::CompaDraw()
 		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(name);
 
-		short food = caravanWork->m_evtWordArr[19 + drawIndex];
-		value = Game.m_cFlatDataArr[1].TableStrings(2)[food];
+		value = Game.GetNPCName(caravanWork->m_evtWordArr[19 + drawIndex]);
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
 		font->SetPosY(y - kCompaTextYOffset);
 		font->Draw(value);

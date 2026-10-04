@@ -148,8 +148,6 @@ void CMenuPcs::ArtiDraw()
 	int selectedArtifactId;
 	int hasSelectedArtifact;
 	CFont* listFont;
-	ArtiOpenAnim* iconEntry;
-	ArtiOpenAnim* textEntry;
 	char* text;
 	int i;
 	int drawIndex;
@@ -257,7 +255,7 @@ void CMenuPcs::ArtiDraw()
 		}
 	}
 
-	listFont = m_fonts[4];
+	listFont = GetFontItem();
 	listFont->SetMargin(kArtiOne);
 	listFont->SetShadow(0);
 	listFont->SetScale(kArtiListFontScale);
@@ -270,7 +268,6 @@ void CMenuPcs::ArtiDraw()
 		}
 	}
 
-	textEntry = entry;
 	for (i = 0; i < 8; i++) {
 		float colorMax = kArtiColorMax;
 		u8 alpha = (u8)(colorMax * entry->alpha);
@@ -281,7 +278,7 @@ void CMenuPcs::ArtiDraw()
 			text = GetMenuStr(0x14);
 		} else {
 			short itemCount = caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + menuIndex];
-			text = Game.m_cFlatDataArr[1].TableStrings(0)[itemCount * 5 + 4];
+			text = Game.GetShortItemName(itemCount);
 			if (menuIndex == (int)m_artiState->selections[0] + (int)m_artiState->scrollOffset) {
 				selectedArtifactId = itemCount;
 				hasSelectedArtifact = 1;
@@ -289,25 +286,22 @@ void CMenuPcs::ArtiDraw()
 		}
 
 		listFont->GetWidth(text);
-		x = (float)(textEntry->x + 0x1c);
-		y = (float)(textEntry->y + 0xb);
+		x = (float)(entry[i].x + 0x1c);
+		y = (float)(entry[i].y + 0xb);
 		listFont->SetPosX(x);
 		listFont->SetPosY(y - kArtiTextYOffset);
 		listFont->Draw(text);
-		textEntry++;
 	}
 
 	DrawInit();
 
-	iconEntry = entry;
 	for (i = 0; i < 8; i++) {
 		if (caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + (i + m_artiState->scrollOffset)] > 0) {
-			int iconY = (int)((float)(iconEntry->y + 6) - kArtiOne);
-			int iconX = (int)((float)(iconEntry->x + iconEntry->w - 0x10));
+			int iconY = (int)((float)(entry[i].y + 6) - kArtiOne);
+			int iconX = (int)((float)(entry[i].x + entry[i].w - 0x10));
 			DrawSingleIcon(caravanWork->m_inventoryItems[CCaravanWork::kPermanentArtifactStart + (i + m_artiState->scrollOffset)],
 			               iconX, iconY, entry->alpha, 0, kArtiOne);
 		}
-		iconEntry++;
 	}
 
 	if (artiState == 1) {
@@ -327,12 +321,13 @@ void CMenuPcs::ArtiDraw()
 		}
 
 		entry += m_artiState->selections[0];
-		int cursorY = (int)(float)((entry->h - 0x20) / 2.0 + entry->y);
-		int cursorX = (int)((float)(entry->x - 0x14) + (float)((int)System.m_frameCounter % 8));
-		DrawCursor(cursorX, cursorY, kArtiOne);
+		x = (float)(entry->x - 0x14);
+		y = (float)((entry->h - 0x20) / 2.0 + entry->y);
+		x += (float)((int)System.m_frameCounter % 8);
+		DrawCursor((int)x, (int)y, kArtiOne);
 	}
 
-	helpFont = m_fonts[0];
+	helpFont = GetFont22();
 	s8 helpAlpha = (s8)(kArtiColorMax * m_artiList->entries[0].alpha);
 	if (!hasSelectedArtifact) {
 		selectedArtifactId = -1;

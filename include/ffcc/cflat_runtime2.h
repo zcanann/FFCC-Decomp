@@ -105,6 +105,7 @@ public:
 	void Draw();
 
 	void AddDebugDrawCC(Vec*, Vec*, float, int, int);
+	int CanReplyLetter() { return m_letterEventEnabled; }
 	int CcClass2D(int, int, Vec*, float, float, int, CGObject **);
 
 	void loadLayer(int, char*);

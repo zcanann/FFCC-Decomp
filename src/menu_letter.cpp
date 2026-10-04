@@ -116,11 +116,6 @@ enum {
 	kLetterTextScratchSize = 0x400,
 };
 
-static inline char* GetLetterItemName(int itemId)
-{
-	return Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
-}
-
 static inline CCaravanWork* GetLetterCaravanWork()
 {
 	return Game.m_scriptFoodBase[0];
@@ -289,12 +284,16 @@ inline void CMenuPcs::LetterInit4()
  */
 inline int CMenuPcs::LetterLstOpen()
 {
-	int done = 0;
-	m_letterMenuState->frame =
-		m_letterMenuState->frame + 1;
-	SingleFadeEntry* panel = m_singleFadeState->entries;
-	int count = static_cast<int>(m_singleFadeState->count);
-	int frame = static_cast<int>(m_letterMenuState->frame);
+	SingleFadeEntry* panel;
+	int done;
+	int count;
+	int frame;
+
+	done = 0;
+	m_letterMenuState->frame = m_letterMenuState->frame + 1;
+	count = static_cast<int>(m_singleFadeState->count);
+	panel = m_singleFadeState->entries;
+	frame = static_cast<int>(m_letterMenuState->frame);
 	for (int i = 0; i < count; ++i) {
 		{
 			float progress = FLOAT_803330bc;
@@ -443,11 +442,11 @@ inline int CMenuPcs::LetterItemWinOpen()
 			if (lang == 2) {
 				sprintf(info, s_letterItemInfoFmt,
 				        GetMenuStr(0x23),
-				        GetLetterItemName(value),
+				        Game.GetShortItemName(value),
 				        GetMenuStr(0x24),
 				        GetMenuStr(0x22));
 			} else {
-				sprintf(info, s_fmt_pcts_pcts_q, GetMenuStr(0x22), GetLetterItemName(value));
+				sprintf(info, s_fmt_pcts_pcts_q, GetMenuStr(0x22), Game.GetShortItemName(value));
 			}
 		}
 		strcpy(left, s_fmt_two_spaces);
@@ -882,7 +881,7 @@ int CMenuPcs::LetterCtrlCur()
 				}
 				m_letterMenuState->step = m_letterMenuState->step + 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
-			} else if ((CFlatLetterEventEnabled() != 0) &&
+			} else if ((CFlat.CanReplyLetter() != 0) &&
 			    caravanWork->m_letters[s_SelLetter].m_bits.m_hasReply &&
 			    !caravanWork->m_letters[s_SelLetter].m_bits.m_replySent) {
 				m_letterMenuState->action = 2;
@@ -916,7 +915,7 @@ int CMenuPcs::LetterCtrlCur()
 					caravanWork->m_letters[s_SelLetter].SetAttachmentClaimed();
 				}
 
-				if ((CFlatLetterEventEnabled() != 0) &&
+				if ((CFlat.CanReplyLetter() != 0) &&
 				    caravanWork->m_letters[s_SelLetter].m_bits.m_hasReply &&
 				    !caravanWork->m_letters[s_SelLetter].m_bits.m_replySent) {
 					m_letterMenuState->action = 1;
@@ -930,7 +929,7 @@ int CMenuPcs::LetterCtrlCur()
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 		} else if ((press & 0x200) != 0) {
-			if ((CFlatLetterEventEnabled() != 0) &&
+			if ((CFlat.CanReplyLetter() != 0) &&
 			    caravanWork->m_letters[s_SelLetter].m_bits.m_hasReply &&
 			    !caravanWork->m_letters[s_SelLetter].m_bits.m_replySent) {
 				m_letterMenuState->action = 1;
@@ -976,7 +975,7 @@ int CMenuPcs::LetterCtrlCur()
 
 			CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 			s16 msgIndex = letter->HeaderWord();
-			strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x11));
+			strcpy(srcText, Game.GetLetterReply((msgIndex & 0x7FC) >> 2));
 			CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
 
 			int i = 0;
@@ -1162,7 +1161,7 @@ void CMenuPcs::LetterMessDraw()
 
 	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 	u16 msgIndex = letter->HeaderWord();
-	strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
+	strcpy(srcText, Game.GetLetter((msgIndex & 0x7FC) >> 2));
 	CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
 	int y = 0x58;
 
@@ -1313,15 +1312,15 @@ void CMenuPcs::LetterListDraw()
 
 		font->SetTlut(tlut);
 
-		const char* from = Game.m_cFlatDataArr[1].TableStrings(5)[(letter->HeaderWord() & 0x7FC) >> 2];
+		const char* subject = Game.GetLetterSubject((letter->HeaderWord() & 0x7FC) >> 2);
 		font->SetPosX(FLOAT_80333160);
 		font->SetPosY(yf - FLOAT_80333148);
-		font->Draw(from);
+		font->Draw(subject);
 
-		const char* subject = Game.m_cFlatDataArr[1].TableStrings(2)[(letter->Word0() >> 9) & 0x1FF];
+		const char* npcName = Game.m_cFlatDataArr[1].TableStrings(2)[(letter->Word0() >> 9) & 0x1FF];
 		font->SetPosX(FLOAT_80333164);
 		font->SetPosY(static_cast<float>(y) - FLOAT_80333148);
-		font->Draw(subject);
+		font->Draw(npcName);
 
 		y += 0x20;
 	}
@@ -1436,28 +1435,28 @@ int CMenuPcs::LetterConfirmOpen()
 		int lineCount = 0;
 		switch (languageId) {
 		case 2: {
-			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
+			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].SenderId());
 			sprintf(lines[lineCount], s_fmt_pcts_pcts, title, GetMenuStr(0x26));
 			break;
 		}
 		case 4: {
-			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
+			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].SenderId());
 			sprintf(lines[lineCount], s_fmt_pcts_pcts_pcts, GetMenuStr(0x26), title, GetMenuStr(0x25));
 			break;
 		}
 		case 3: {
-			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
+			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].SenderId());
 			sprintf(lines[lineCount], s_fmt_pcts_pcts, GetMenuStr(0x26), title);
 			break;
 		}
 		case 5: {
-			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
+			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].SenderId());
 			sprintf(lines[lineCount], s_fmt_pcts_sp_pcts_dot, GetMenuStr(0x26), title);
 			break;
 		}
 		case 1:
 		default: {
-			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
+			const char* title = Game.GetNPCName(caravanWork->m_letters[s_SelLetter].SenderId());
 			sprintf(lines[lineCount], s_fmt_pcts_sp_pcts_pcts, GetMenuStr(0x25), title, GetMenuStr(0x26));
 			break;
 		}
@@ -1491,7 +1490,7 @@ int CMenuPcs::LetterConfirmOpen()
 			switch (languageId) {
 			case 2:
 				if (s_Attach == 0) {
-					const char* attachName = Game.m_cFlatDataArr[1].TableStrings(0)[s_AttachItem * 5 + 4];
+					const char* attachName = Game.GetShortItemName(s_AttachItem);
 					sprintf(lines[lineCount], s_fmt_pcts_pcts_pcts, GetMenuStr(0x23),
 					        attachName,
 					        GetMenuStr(0x24));
@@ -1505,7 +1504,7 @@ int CMenuPcs::LetterConfirmOpen()
 			default:
 				strcpy(lines[lineCount], GetMenuStr(0x28));
 				if (s_Attach == 0) {
-					strcat(lines[lineCount], Game.m_cFlatDataArr[1].TableStrings(0)[s_AttachItem * 5 + 4]);
+					strcat(lines[lineCount], Game.GetShortItemName(s_AttachItem));
 				} else if (s_Attach == 1) {
 					int offs = strlen(lines[lineCount]);
 					sprintf(lines[lineCount] + offs, s_fmt_pctd_sp_pcts, s_AttachItem, GetMenuStr(4));
@@ -1567,7 +1566,7 @@ int CMenuPcs::LetterReplyWinOpen()
 
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 		unsigned short msgIndex = letter->HeaderWord();
-		strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x11));
+		strcpy(srcText, Game.GetLetterReply((msgIndex & 0x7FC) >> 2));
 		CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
 
 		s_ReplyMax = 0;

@@ -58,6 +58,7 @@ public:
 	void SetScaleY(float);
 
 	void SetShadow(int);
+	void SetFixed(int fixed) { renderFlags.fixedWidth = fixed; }
 	void SetColor(_GXColor);
 	void SetTlut(int);
 	void SetTlutColor(int, int, _GXColor);

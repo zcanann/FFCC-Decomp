@@ -128,33 +128,93 @@ A(T) = itemTable + (signed)T × 0x48        (PAL item table 0x80955BC0)
 - **`T` of 1205 or more, or negative:** `A(T)` is in the heap. If something
   can be made to hold `0x017D` or `0x0186` at `A(T)`, the target becomes edible.
 
-**Example: a 32-bit float.** A float halfword is a large value. 5.0 is
-`0x40A00000`; its high half `0x40A0` (16,544) has `A = 0x80A788C0`, which held
-`0x4B12` in the sample. Eating a float's high half gives `0xFFFFxxxx`, a NaN.
-This fits the reported "huge hitbox" result from eating player data with
-`-1`. The exact field behind that result has not been identified in the decomp
-yet. It has to be in the caravan or monster work data in `Game`, because the
-party objects that hold the collision shapes are out of reach.
+## The hitbox target ("Big Chungus")
 
-### Making a fixed target edible (hypothesis)
+### The chain (confirmed)
 
-1. Read the target's value `T` and compute `A(T)`
-   (`tools/cles_scan.py target`).
-2. Dump memory on different maps and in different states, and check what lives
-   at `A(T)` each time. Heap allocations repeat in a fixed order per map, so
-   the same kind of object tends to land there again.
-3. Look for heap objects that hold item IDs and can be steered:
-   - item objects for food on the ground (`m_objItem` is a static pool, so
-     this only helps if the item's ID is copied into heap data)
-   - monster drop lists (`CGObject::m_dropItemCodes`)
-   - treasure and shop lists built at map load
-   - other loaded tables that list food IDs
+A caravan's body radius comes from its character data row:
 
-   If one of them puts a Striped Apple (`0x017D`) or Spring Water (`0x0186`) on
-   `A(T)`, the target becomes edible.
+- The player script sets body radius 0 to `0.01 × csys[-0x175]` (source line
+  493 of every map's `Player_for_Battle` code).
+- Per-object values `-0x175` to `-0x96` are read through the work struct's
+  `m_romWork` pointer ([cflat_r2class.cpp:784](../../src/cflat_r2class.cpp#L784)),
+  so the radius is `0.01 × m_romWork[0]`.
+- `m_romWork` is at caravan `+0x24`, next to the inventory. It is set in
+  [`CCaravanWork::LoadFinished`](../../src/gobjwork.cpp#L281):
 
-The sample `A(0x40A0)` value is a single snapshot. Whether any steerable object
-ever lands on a useful `A(T)` is untested.
+  ```cpp
+  m_baseDataIndex = (m_id / 100) - 1;
+  m_romWork = Game.unkCFlatData0[0] + m_baseDataIndex * 0x1D0 + 0x10;
+  ```
+
+  `m_id` is `100 × (row + 1) + appearance`, so the appearance is dropped and
+  there are 8 player rows, one per tribe and gender. All 8 hold 500 as the
+  first halfword (radius 5.0).
+
+Eating the pointer's **low half** (caravan `+0x26`, slot −72 from that
+caravan's own inventory) makes it `0x8093FFFF` in PAL, because all 8 rows share
+the high half `0x8093`. The first halfword read from there is `0xFF00`, so the
+radius becomes **652.8**. This matches the "huge hitbox" seen when the value
+was poked to `-1` by hand.
+
+### The 8 food-check slots (PAL)
+
+The low half `T` is one of 8 fixed values, so whether it is edible depends on 8
+fixed heap addresses. They are numbered by ascending address, which is also
+row order. They are exactly `0x8280` bytes apart (`0x1D0 × 0x48`).
+
+| Slot | Pointer low half `T` | Food-check address `A(T)` |
+|---|---|---|
+| 0 | `0xE3D0` | `0x808D6E40` |
+| 1 | `0xE5A0` | `0x808DF0C0` |
+| 2 | `0xE770` | `0x808E7340` |
+| 3 | `0xE940` | `0x808EF5C0` |
+| 4 | `0xEB10` | `0x808F7840` |
+| 5 | `0xECE0` | `0x808FFAC0` |
+| 6 | `0xEEB0` | `0x80907D40` |
+| 7 | `0xF080` | `0x8090FFC0` |
+
+The command list aims at the caravan's pointer halfword in `Game`, which is
+static and already in reach. What is missing is `0x017D` or `0x0186` at the
+slot's address at the moment of eating.
+
+### What occupies the slots (two dumps)
+
+Heap blocks have a 0x40-byte header (magic `0x4B41`, size, links, the source
+file and line that allocated it, end magic `0x4D49`), and new memory is filled
+with `0xCD`. Walking the headers:
+
+| Slot | `mine_0` | `kinoko_0` |
+|---|---|---|
+| 0 | Character draw buffer (`chara.cpp:64`, 352 KB), unused tail at `+0x52340` | same |
+| 1 | Lighting texture buffer (`p_light.cpp:315`) | same |
+| 2 | Free memory | same |
+| 3 | Start of a model-load record (`p_chara.cpp:1512`) | same |
+| 4 | Start of a model-load record | Header of a texture-load record (`p_chara.cpp:1545`) |
+| 5 | Start of a per-object model handle (`gobject.cpp:2561`, `CCharaPcs::CHandle`) | Header of a model handle |
+| 6 | Free memory | Start of a model handle |
+| 7 | Free memory | Free memory |
+
+Every value seen there is fill, a pointer half, 0, or the block magic.
+
+**Alignment.** The slot addresses, the block headers and every block's data are
+all 64-byte aligned. A slot can only be covered by a block header (always
+`0x4B41`) or by data at offset 0, `0x40`, `0x80`, … of a block. A small record
+can only help if its first field is an item ID; `CLoadModel`'s model ID at
+`+0x0E` can never line up.
+
+### Routes that remain (hypothesis)
+
+- **Large data blocks** covering a free slot (2, 7, and 6 on some maps).
+  Loaded file buffers hold arbitrary data at 64-byte boundaries, so a
+  `0x017D` or `0x0186` could line up on some map.
+- **Slot 0 in the draw buffer.** The buffer is rewritten every frame with GPU
+  commands, including 16-bit vertex indices. In a scene heavy enough to reach
+  `+0x52340`, the halfword there changes frame by frame. A value of 381–392 on
+  the right frame would make slot 0 edible for that frame.
+
+Other versions load the rows and item table at different addresses, so their
+8 slots need their own dump.
 
 ## In-reach values that reach 381–392 on their own
 
@@ -190,7 +250,7 @@ None of the heap extras matched an interesting field.
 python tools/cles_scan.py dump mem1.bin         # read MEM1 from a running Dolphin (Windows)
 python tools/cles_scan.py edible mem1.bin       # every value that is food right now
 python tools/cles_scan.py scan mem1.bin         # edible halfwords inside the CLES reach
-python tools/cles_scan.py target mem1.bin 0x40A0  # where a value's row lands and what is there
+python tools/cles_scan.py target mem1.bin 0xE3D0  # where a value's row lands and what is there
 ```
 
 For EN and JP, GES uses item tables at `0x80954B40` (EN) and `0x80979FC0`
@@ -198,9 +258,12 @@ For EN and JP, GES uses item tables at `0x80954B40` (EN) and `0x80979FC0`
 
 ## Open leads
 
-- Identify the field behind the reported "huge hitbox" result and compute
-  `A(T)` for each of its halfwords on each caravan.
-- Dump several maps and states and track what occupies those `A(T)` addresses.
-- Check whether any steerable heap object (dropped food, drop lists, shop
-  stock) can be placed on a chosen `A(T)`.
+- Dump busy maps (towns, boss rooms, many monsters) and record which
+  allocations cover the 8 slots, looking for large data blocks on slots 2, 6
+  and 7.
+- Measure how full the character draw buffer gets in heavy scenes, to see
+  whether slot 0 is ever written.
+- Dump EN and JP to get their 8 slots.
+- Monster work structs have their own `m_romWork` pointers (in reach), giving
+  more slots for giant monsters.
 - Map the 39 status-timer indices to statuses and durations.

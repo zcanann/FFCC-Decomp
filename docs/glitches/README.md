@@ -16,6 +16,7 @@ plain-language summary and gets more technical as it goes.
 | [Particle System](particles.md) | How particle sets are loaded into 32 slots, how particles spawn, update, draw and hit, and which slots change per map. |
 | [Character Creation Disconnect](character-creation-disconnect.md) | A GBA disconnect wipes that player's creation record to zeros, which would build a blacksmith in slot 1. PAL clears the record before it can be used; EN apparently doesn't (hypothesis). |
 | [Guest Transfer](guest-transfer.md) | Guests return only their artifacts, matched by character ID. "Restore" just clears the away flag, so orphaned guests can come back later. Powering off between the two saves during a return may sync artifacts while keeping the guest (hypothesis). |
+| [Event Script Glitches](scripts/README.md) | Findings from reading every CFlat event script: a Slot B format prompt where B formats the card, Mt. Kilanda's timed barriers, Meteor Parasite phase skips, a held-key re-pop, letters that can never arrive, road events, Mog and the chalice, and unused debug content. |
 
 Conventions:
 

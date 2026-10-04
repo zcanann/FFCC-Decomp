@@ -1068,8 +1068,8 @@ void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
                 k += 6;
             buf[i] = k | pal;
         }
-        k = win->y + (win->anim >> 3);
-        map = Bg_GetMapPtr(win->bg, win->x, k);
+        tile = win->y + (win->anim >> 3);
+        map = Bg_GetMapPtr(win->bg, win->x, tile);
         DmaCopy16(0, buf, map, win->width << 1);
     } else {
         s32 row = win->anim >> 3;
@@ -1123,19 +1123,19 @@ void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
     if ((py >> 3) - win->y < win->height) {
         for (i = 0; i < win->width; i++, px += 8) {
             if (i == 0)
-                tile = 32;
+                k = 32;
             else if (i == 1)
-                tile = 33;
+                k = 33;
             else if (i > 1 && i <= win->width - 3) {
                 if (i & 2)
-                    tile = 34;
+                    k = 34;
                 else
-                    tile = 35;
+                    k = 35;
             } else if (i == win->width - 2)
-                tile = 36;
+                k = 36;
             else
-                tile = 37;
-            Obj_Draw(px, py, 11, tile, win->variant, win->bg, 0);
+                k = 37;
+            Obj_Draw(px, py, 11, k, win->variant, win->bg, 0);
         }
     }
 }

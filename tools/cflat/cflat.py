@@ -492,6 +492,8 @@ def lift(script, func):
     pending = {}
     switches = []  # active: dict(subject, end, sites)
     targets = []   # objects entered with objcall
+    jump_node = {}  # label -> index of the first value-less jump node to it
+    else_starts = []
     skip_until = -1
 
     def add(kind, *data, pc=None):
@@ -502,7 +504,9 @@ def lift(script, func):
 
     def branch(target):
         if stack and target not in snapshots:
-            snapshots[target] = list(stack)
+            snapshots[target] = (list(stack), len(nodes))
+        if target not in jump_node:
+            jump_node[target] = len(nodes)
 
     for i, (pc, op, arg) in enumerate(insns):
         if i < skip_until:
@@ -519,8 +523,24 @@ def lift(script, func):
             live = False
             continue
         if pc in labels:
+            snap = snapshots.get(pc)
             if not live:
-                stack = list(snapshots.get(pc, []))
+                stack = list(snap[0]) if snap else []
+                else_from = jump_node.get(pc)
+                if else_from is not None:
+                    else_starts.append((else_from, len(stack)))
+            elif (snap and else_starts and len(snap[0]) == len(stack) and stack
+                  and snap[0][-1] is not stack[-1] and else_starts[-1][1] == len(stack) - 1):
+                # cond ? a : b  ->  then-value in the snapshot, else-value on the stack
+                if_idx, _ = else_starts.pop()
+                goto_idx = snap[1]
+                if (nodes[if_idx][0] == "if" and nodes[goto_idx][0] == "goto"):
+                    then_cond = negate(nodes[if_idx][1][0])
+                    a, b = snap[0][-1], stack.pop()
+                    stack.append(E("%s ? %s : %s" % (then_cond.wrap(4), a.wrap(4), b.wrap(3)), 3,
+                                   then_cond.effect or a.effect or b.effect))
+                    nodes[if_idx] = ("nop", (), None)
+                    nodes[goto_idx] = ("nop", (), None)
             add("label", pc)
         live = True
 
@@ -639,7 +659,7 @@ def lift(script, func):
 
 def _place_defaults(nodes):
     """Move 'default: goto D' to label D and drop empty defaults."""
-    out = list(nodes)
+    out = [n for n in nodes if n[0] != "nop"]
     k = 0
     while k < len(out):
         if out[k][0] == "default" and k + 1 < len(out) and out[k + 1][0] == "goto":

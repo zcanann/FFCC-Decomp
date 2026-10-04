@@ -16,11 +16,19 @@ the most mature matching target; USA and Japan retain partial recovered layouts
 and retail fallbacks. Passing hashes verifies the chosen source/fallback link,
 not 100% source recovery. Match and linkage claims are per region.
 
-Linux builds use wibo 1.2.0, which includes the upstream
+Linux builds use wibo 1.0.3, which includes the upstream
 [signed 16-bit handle compatibility fix](https://github.com/decompals/wibo/commit/ec0486f77f0f00021e62b5fdd50ca6f8ef034085).
 Older wibo builds can fail large regional links with "Can't read library file"
 even when the object exists: Metrowerks sign-extends handles at `0x8000`.
 This is a host compatibility issue; it requires no compiler or source tuning.
+
+The pin also preserves sjiswrap compatibility with older MWCC releases. Wibo
+1.2.0 returns null for the missing `FormatMessageA` export, which makes
+sjiswrap reject those compilers during loading; see
+[the upstream export fix](https://github.com/decompals/wibo/pull/139).
+Before upgrading the wrapper, validate every configured compiler through
+sjiswrap and the large USA/Japan links. Version 1.0.3 passes all 488 configured
+GameCube source compilations and both regional DOL checksum checks on Linux.
 
 ## Private inputs
 

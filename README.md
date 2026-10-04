@@ -3,8 +3,8 @@ Final Fantasy Crystal Chronicles Decompilation
 ===============================
 [Build Status]: https://github.com/zcanann/FFCC-Decomp/actions/workflows/build.yml/badge.svg
 [actions]: https://github.com/zcanann/FFCC-Decomp/actions/workflows/build.yml
-[Progress]: https://decomp.dev/zcanann/FFCC-Decomp.svg?mode=shield&measure=code&label=Code&category=all
-[progress site]: https://decomp.dev/zcanann/FFCC-Decomp
+[Progress]: https://decomp.dev/zcanann/FFCC-Decomp/GCCP01.svg?mode=shield&measure=code&label=Code&category=all
+[progress site]: https://decomp.dev/zcanann/FFCC-Decomp/GCCP01
 This is the decompilation for Final Fantasy Crystal Chronicles for the Nintendo GameCube.
 
 There are 3 versions of this game: JP, EN, and PAL (EU).
@@ -16,7 +16,7 @@ Fortunately, the EN build contains a debug symbol file, and the PAL version cont
 # Contribution Guide
 
 ## Beginners Contribution Guide
-The most direct way to contribute with minimal setup is to pick any non-perfect section from [the decomp tracker](https://decomp.dev/zcanann/FFCC-Decomp), then improve overall progress (code match, data match, or linkage).
+The most direct way to contribute with minimal setup is to pick any non-perfect section from [the decomp tracker](https://decomp.dev/zcanann/FFCC-Decomp/GCCP01), then improve overall progress (code match, data match, or linkage).
 
 Refer to the sections on building and diffing. Once set up, modify `.cpp`/`.h` files and, when needed, `configure.py` flags to improve output.
 
@@ -30,6 +30,10 @@ Avoid leaving hardcoded offset-based member access (for example `(this + 0x28)`)
 For experienced reverse-engineers, there are still quite a few harder tasks remaining.
 
 ### Regional builds
+
+Regional progress: [PAL](https://decomp.dev/zcanann/FFCC-Decomp/GCCP01),
+[USA](https://decomp.dev/zcanann/FFCC-Decomp/GCCE01),
+[Japan](https://decomp.dev/zcanann/FFCC-Decomp/GCCJGC).
 
 PAL, USA and Japan build from shared source with separate retail inputs, symbol
 configs, output directories and matching claims. PAL remains the primary target

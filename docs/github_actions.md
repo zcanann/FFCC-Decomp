@@ -16,6 +16,12 @@ the most mature matching target; USA and Japan retain partial recovered layouts
 and retail fallbacks. Passing hashes verifies the chosen source/fallback link,
 not 100% source recovery. Match and linkage claims are per region.
 
+Linux builds use wibo 1.2.0, which includes the upstream
+[signed 16-bit handle compatibility fix](https://github.com/decompals/wibo/commit/ec0486f77f0f00021e62b5fdd50ca6f8ef034085).
+Older wibo builds can fail large regional links with "Can't read library file"
+even when the object exists: Metrowerks sign-extends handles at `0x8000`.
+This is a host compatibility issue; it requires no compiler or source tuning.
+
 ## Private inputs
 
 The job image is `ghcr.io/zcanann/ffcc-decomp-build:main`, maintained in the

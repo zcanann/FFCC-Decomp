@@ -31,6 +31,8 @@ public:
 	void Init();
 	void Quit();
 	unsigned long GetInternal22Size();
+	int IsInternal22() { return m_font != 0 ? 1 : 0; }
+	CFont* GetInternal22() { return m_font; }
 
 	CMemory::CStage* m_stage;
 	CFont* m_font;

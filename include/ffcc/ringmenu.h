@@ -21,6 +21,7 @@ public:
     void SetBattleButton(int, int);
     void SetBattleCommand(int, int, int);
     void DrawIcon();
+    void SetIndex(int index) { m_menuIndex = index; }
 
     int m_menuIndex;
     int m_stateFlag;

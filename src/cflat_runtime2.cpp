@@ -92,22 +92,6 @@ static inline void InitFlatObjectSlot(CGBaseObj* object, u16 particleId)
 	object->m_particleId = particleId;
 }
 
-static inline CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, int cidMask)
-{
-	while (object != &runtime->m_objectSentinel) {
-		if (object->m_classIndex >= 0) {
-			if (object->m_flagBits.m_deleteFlag == 0 && object->m_flagBits.m_activeFlag == 0) {
-				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & cidMask) == cidMask) {
-					return reinterpret_cast<CGBaseObj*>(object);
-				}
-			}
-		}
-		object = object->m_next;
-	}
-
-	return 0;
-}
-
 CLine<64>::CLine()
 {
 	pointCount = 0;
@@ -699,6 +683,7 @@ inline CGBaseObj* CFlatRuntime2::FindGBaseObjNext(CGBaseObj* gObject)
  */
 int CFlatRuntime2::Frame(int arg0, int mode)
 {
+	CGObject* object;
 	CStopWatch watch("no name");
 
 	if (mode == 0) {
@@ -706,13 +691,13 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 		CGPartyObj::CheckGameOver();
 		reinterpret_cast<CFlatRuntime*>(this)->CFlatRuntime::Frame(arg0, mode);
 
-		for (CGObject* obj = CFlat.FindGObjFirst(); obj != 0; obj = CFlat.FindGObjNext(obj)) {
-			obj->Frame();
+		for (object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
+			object->Frame();
 		}
 	} else if (mode == 1) {
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
+		for (object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->move();
 		}
 		watch.Stop();
@@ -720,7 +705,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
+		for (object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->objectCollision();
 		}
 		watch.Stop();
@@ -728,7 +713,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
+		for (object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->bgCollision();
 		}
 		watch.Stop();
@@ -736,7 +721,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
+		for (object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->update();
 		}
 		watch.Stop();
@@ -744,13 +729,13 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 
 		watch.Reset();
 		watch.Start();
-		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
+		for (object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->hit();
 		}
 		watch.Stop();
 		CFlatHitTime() += watch.Get();
 
-		for (CGObject* object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
+		for (object = CFlat.FindGObjFirst(); object != 0; object = CFlat.FindGObjNext(object)) {
 			object->copy();
 		}
 	} else {
@@ -1208,7 +1193,7 @@ void CFlatRuntime2::Calc()
  */
 void CFlatRuntime2::Draw()
 {
-	CFont* font = MenuPcs.m_fonts[0];
+	CFont* font = MenuPcs.GetFont22();
 	font->SetScale(0.65f);
 	font->SetShadow(1);
 	font->SetMargin(1.0f);
@@ -1217,43 +1202,35 @@ void CFlatRuntime2::Draw()
 	font->SetTlut(7);
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
-	for (CGObject* object = reinterpret_cast<CGObject*>(
-			 FindNextGBaseObjByCidMask(this, m_objectSentinel.m_next->m_next, 5));
-		 object != 0;
-		 object = reinterpret_cast<CGObject*>(FindNextGBaseObjByCidMask(
-			 this, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5))) {
+	for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
 		object->DrawDebug(font);
 	}
 
 	font->SetZMode(0, 0);
 	font->SetPosZ(0.0f);
 	Mtx44 projection;
-	PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
+	CameraPcs.GetProjectionMatrix(projection);
 	GXSetProjection(projection, GX_PERSPECTIVE);
 
-	font = MenuPcs.m_fonts[0];
+	font = MenuPcs.GetFont22();
 	font->SetScale(0.85f);
 	font->SetShadow(1);
 	font->SetMargin(1.0f);
 	font->SetZMode(1, 1);
 	font->DrawInit();
 
-	for (CGItemObj* item = reinterpret_cast<CGItemObj*>(
-			 FindNextGBaseObjByCidMask(this, m_objectSentinel.m_next->m_next, 0x1D));
-		 item != 0;
-		 item = reinterpret_cast<CGItemObj*>(FindNextGBaseObjByCidMask(
-			 this, reinterpret_cast<CFlatRuntime::CObject*>(item)->m_next, 0x1D))) {
+	for (CGItemObj* item = FindGItemObjFirst(); item != 0; item = FindGItemObjNext(item)) {
 		item->DrawOmoideName(font);
 	}
 
 	font->SetZMode(0, 0);
 	font->SetPosZ(0.0f);
 	Mtx44 projection2;
-	PSMTX44Copy(CameraPcs.m_screenMatrix, projection2);
+	CameraPcs.GetProjectionMatrix(projection2);
 	GXSetProjection(projection2, GX_PERSPECTIVE);
 
 	Mtx cameraMtx;
-	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+	CameraPcs.GetViewMatrix(cameraMtx);
 
 	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
 	GXSetZCompLoc(GX_FALSE);
@@ -1271,8 +1248,7 @@ void CFlatRuntime2::Draw()
 	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 
-	u8* runtime = reinterpret_cast<u8*>(this);
-	if ((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleLines) != 0) {
+	if ((m_debugFlags & CFlatRuntimeDebugFlag_ParticleLines) != 0) {
 		GXColor lineColor;
 		lineColor.r = 0xFF;
 		lineColor.g = 0x80;
@@ -1286,9 +1262,9 @@ void CFlatRuntime2::Draw()
 		}
 	}
 
-	if ((((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0)
+	if ((((m_debugFlags & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0)
 			|| ((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0))
-		&& DebugDrawCCCount(runtime) != 0) {
+		&& m_debugDrawCCCount != 0) {
 		GXColor greenColor;
 		greenColor.r = 0x80;
 		greenColor.g = 0xFF;
@@ -1307,8 +1283,8 @@ void CFlatRuntime2::Draw()
 		float ringVerts[24];
 		float* verts = ringVerts;
 
-		CFlatRuntime2::CDebugDrawCC* entry = DebugDrawCCEntries(runtime);
-		for (int i = 0; i < DebugDrawCCCount(runtime); i++, entry++) {
+		CDebugDrawCC* entry = m_debugDrawCCEntries;
+		for (int i = 0; i < m_debugDrawCCCount; i++, entry++) {
 			GXColor* drawColor;
 			if (entry->m_flagBits.m_bit6 != 0) {
 				drawColor = &redColor;
@@ -1354,17 +1330,11 @@ void CFlatRuntime2::Draw()
 				vtx[1] = entry->m_radius * cosf(angle);
 				vtx[2] = length;
 				if (entry->m_flagBits.m_bit7 != 0) {
-					GXWGFifo.f32 = vtx[0];
-					GXWGFifo.f32 = vtx[1];
-					GXWGFifo.f32 = 0.0f;
+					GXPosition3f32(vtx[0], vtx[1], 0.0f);
 				} else {
-					GXWGFifo.f32 = 0.0f;
-					GXWGFifo.f32 = 0.0f;
-					GXWGFifo.f32 = 0.0f;
+					GXPosition3f32(0.0f, 0.0f, 0.0f);
 				}
-				GXWGFifo.f32 = vtx[0];
-				GXWGFifo.f32 = vtx[1];
-				GXWGFifo.f32 = vtx[2];
+				GXPosition3f32(vtx[0], vtx[1], vtx[2]);
 				vtx += 3;
 			}
 
@@ -1435,8 +1405,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 	const float radiusSq = radius * radius;
 	int count = 0;
 
-	CGObject* object = reinterpret_cast<CGObject*>(
-		FindNextGBaseObjByCidMask(&CFlat, CFlat.m_objectSentinel.m_next->m_next, 5));
+	CGObject* object = CFlat.FindGObjFirst();
 
 	while (object != 0) {
 		if (((object->m_attrFlags & static_cast<unsigned int>(classMask)) != 0) &&
@@ -1497,8 +1466,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float angle,
 		}
 
 	advance:
-		object = reinterpret_cast<CGObject*>(FindNextGBaseObjByCidMask(
-			&CFlat, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5));
+		object = CFlat.FindGObjNext(object);
 	}
 
 done:
@@ -1754,7 +1722,7 @@ void CFlatRuntime2::drawLayer(
 		}
 	}
 
-	PSMTX44Copy(CameraPcs.m_screenMatrix, ortho);
+	CameraPcs.GetProjectionMatrix(ortho);
 	GXSetProjection(ortho, GX_PERSPECTIVE);
 
 	} else {

@@ -12,6 +12,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+extern "C" int toupperLatin1(unsigned char character);
+
 class CGObject;
 class CGPrgObj;
 class CGPartyObj;
@@ -172,6 +174,12 @@ public:
     char* GetNPCName(int npcIndex) { return m_cFlatDataArr[1].TableStrings(2)[npcIndex]; }
     char* GetLetterSubject(int subjectIndex) { return m_cFlatDataArr[1].TableStrings(5)[subjectIndex]; }
     char* GetPlaceName(int placeIndex) { return m_cFlatDataArr[1].TableStrings(3)[placeIndex]; }
+    void UpperItemName(char* name)
+    {
+        if (name[0] != '\0') {
+            name[0] = toupperLatin1(name[0]);
+        }
+    }
     char* GetLetter(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x10); }
     char* GetLetterReply(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x11); }
     char* GetMonName(int);

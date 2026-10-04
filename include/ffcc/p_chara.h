@@ -70,6 +70,7 @@ public:
         void FreeModel();
         void FreeAnim(int);
         int SetAnim(int, int, int, int, int);
+        int GetCurrentAnimNumber() { return m_currentAnimIndex; }
         void Calc();
         void Draw(int);
         void draw(int, int);

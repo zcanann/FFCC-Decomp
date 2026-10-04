@@ -8,6 +8,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/p_sample.h"
 #include "ffcc/system.h"
+#include "ffcc/gxfunc.h"
 
 #include <dolphin/gx.h>
 
@@ -246,6 +247,8 @@ class CMenuPcs : public CProcess
 {
 public:
     static CProcessCallbackTable m_table;
+    static const unsigned int WMDATA_CHG_AREA = 1;
+    static const unsigned int WMDATA_CHG_YEAR = 2;
 
     struct BattleHudState
     {
@@ -1145,6 +1148,34 @@ STATIC_ASSERT(offsetof(CMenuPcs::WmFrameInfo, m_sprites) == 0x4);
 inline CFont* CMenuPcs::GetFontWorld()
 {
     return m_fonts[1];
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::AlphaNormal()
+{
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::AlphaAdd()
+{
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
 }
 
 #endif // _FFCC_P_MENU_H_

@@ -790,7 +790,7 @@ config.libs = [
             Object(Matching, "util.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(Matching, "vector.cpp"),
             Object(Matching, "wind.cpp"),
-            Object(NonMatching, "wm_menu.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),
+            Object(NonMatching, "wm_menu.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly", "-inline auto,deferred"]),
             # Retail addresses local message tables separately and stores literals read-only.
             Object(Matching, "wmm_str.cpp", extra_cflags=["-str reuse,readonly", "-pooldata off", "-inline auto,deferred"]),
             Object(Matching, "zlist.cpp"),

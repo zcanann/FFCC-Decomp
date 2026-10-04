@@ -53,6 +53,8 @@ STATIC_ASSERT(offsetof(McCtrl, m_serial) == 0x20);
 inline McCtrl::McCtrl()
 {
     Init();
+    m_cardChannel = 0;
+    m_saveIndex = 0;
 }
 
 /*
@@ -67,6 +69,8 @@ inline McCtrl::McCtrl()
 inline McCtrl::~McCtrl()
 {
     Init();
+    m_cardChannel = 0;
+    m_saveIndex = 0;
 }
 
 /*
@@ -86,8 +90,6 @@ inline void McCtrl::Init()
     m_iteration = 0;
     m_userBuffer = 0;
     m_createFlag = 0;
-    m_cardChannel = 0;
-    m_saveIndex = 0;
 }
 
 /*
@@ -101,7 +103,7 @@ inline void McCtrl::Init()
  */
 inline int McCtrl::GetDno()
 {
-    return m_cardChannel;
+    return m_saveIndex;
 }
 
 /*
@@ -129,7 +131,49 @@ inline u64 McCtrl::GetSerial()
  */
 inline int McCtrl::GetSlot()
 {
-    return m_saveIndex;
+    return m_cardChannel;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void McCtrl::SetDataBuff(char* buffer)
+{
+    m_userBuffer = buffer;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void McCtrl::SetDno(int dno)
+{
+    m_saveIndex = dno;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void McCtrl::SetSlot(int slot)
+{
+    m_cardChannel = slot;
 }
 
 #endif // _FFCC_MCCTRL_H_

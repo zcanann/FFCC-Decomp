@@ -109,6 +109,7 @@ public:
 
     bool AsyncFinished();
     int GetResult();
+    char* GetMcBuffer() { return m_saveBuffer; }
 
     void McMount(int chan);
     int McUnmount(int chan);

@@ -226,20 +226,6 @@ void CCameraPcs::SetFullScreenShadowCamLen(float len)
 
 /*
  * --INFO--
- * PAL Address: 0x800B8F98
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CFont* CMenuPcs::GetFont22()
-{
-    return m_fonts[0];
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B8FA8
  * PAL Size: 8b
  * EN Address: TODO

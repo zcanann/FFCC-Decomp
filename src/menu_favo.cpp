@@ -51,9 +51,9 @@ static inline void FavoDrawWindow(FavoEntry* entry, float x, float y, float w, f
  */
 void CMenuPcs::FavoDraw()
 {
-	FavoEntry* entry;
 	CFont* font;
 	int i;
+	FavoEntry* entry;
 	float x;
 	float y;
 	float w;
@@ -142,22 +142,20 @@ void CMenuPcs::FavoDraw()
 	}
 
 	for (i = 0; i < 8; i++) {
-		int barX = static_cast<int>(static_cast<float>(entry[i].x + entry[i].w + 0x18));
-		float barHalfH = static_cast<float>(entry[i].h) - 24.0f;
-		float barYf = static_cast<float>(entry[i].y);
-		int barY = static_cast<int>(static_cast<float>(barHalfH / 2.0 + barYf));
-		DrawSingBar(barX, barY, s_rank[i].score, entry[i].alpha);
+		x = entry[i].x + entry[i].w + 0x18;
+		y = entry[i].y;
+		y += (entry[i].h - 24.0f) / 2.0;
+		DrawSingBar(x, y, s_rank[i].score, entry[i].alpha);
 	}
 
 	for (i = 0; i < 8; i++) {
-		int iconX = static_cast<int>(static_cast<float>(entry[i].x + entry[i].w - 0x10));
-		float iconHalfH = static_cast<float>(entry[i].h) - 32.0f;
-		float iconYf = static_cast<float>(entry[i].y);
-		int iconY = static_cast<int>(static_cast<float>(iconHalfH / 2.0 + iconYf));
-		DrawSingleIcon(static_cast<char>(s_rank[i].foodId) + 0x14, iconX, iconY, entry[i].alpha, 1, 1.0f);
+		x = entry[i].x + entry[i].w - 0x10;
+		y = entry[i].y;
+		y += (entry[i].h - 32.0f) / 2.0;
+		DrawSingleIcon(static_cast<char>(s_rank[i].foodId) + 0x14, x, y, entry[i].alpha, 1, 1.0f);
 	}
 
-	font = m_fonts[0];
+	font = GetFont22();
 	font->SetShadow(1);
 	font->SetScale(1.0f);
 	font->DrawInit();
@@ -168,7 +166,7 @@ void CMenuPcs::FavoDraw()
 		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry[i].alpha)).color);
 		x = static_cast<float>(entry[i].x - 0xC);
 		y = static_cast<float>(entry[i].y + 0xA);
-		font->renderFlags.fixedWidth = 1;
+		font->SetFixed(1);
 		font->SetMargin(1.0f);
 		sprintf(textBuf, "%d", static_cast<int>(s_rank[i].place));
 		font->SetPosX(x);
@@ -177,7 +175,7 @@ void CMenuPcs::FavoDraw()
 		font->SetShadow(0);
 	}
 
-	font = m_fonts[4];
+	font = GetFontItem();
 	font->SetShadow(0);
 	font->SetScale(0.9f);
 	font->SetMargin(1.0f);
@@ -185,14 +183,13 @@ void CMenuPcs::FavoDraw()
 	memset(textBuf, 0, sizeof(textBuf));
 
 	for (i = 0; i < 8; i++) {
-		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry->alpha)).color);
-		const char* name = Game.m_cFlatDataArr[1].TableStrings(0)[(static_cast<char>(s_rank[i].foodId) + 0x17D) * 5 + 4];
-		y = static_cast<float>(entry->y + 0xB);
-		x = static_cast<float>(entry->x + 0x1C);
+		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * entry[i].alpha)).color);
+		char* name = Game.GetShortItemName(static_cast<char>(s_rank[i].foodId) + 0x17D);
+		y = static_cast<float>(entry[i].y + 0xB);
+		x = static_cast<float>(entry[i].x + 0x1C);
 		font->SetPosX(x);
 		font->SetPosY(y - 4.0f);
-		font->Draw(const_cast<char*>(name));
-		entry++;
+		font->Draw(name);
 	}
 
 	DrawInit();
@@ -558,17 +555,10 @@ void CMenuPcs::FavoInit()
 	for (i = 0; i < 8; i++) {
 		for (idx = i + 1; idx < 8; idx++) {
 			if (s_rank[i].score < s_rank[idx].score) {
-				signed char place = s_rank[i].place;
-				unsigned char foodId = s_rank[i].foodId;
-				short score = s_rank[i].score;
-
-				s_rank[i].place = s_rank[idx].place;
-				s_rank[i].foodId = s_rank[idx].foodId;
-				s_rank[i].score = s_rank[idx].score;
-
-				s_rank[idx].place = place;
-				s_rank[idx].foodId = foodId;
-				s_rank[idx].score = score;
+				FoodRank tmp;
+				tmp = s_rank[i];
+				s_rank[i] = s_rank[idx];
+				s_rank[idx] = tmp;
 			}
 		}
 	}

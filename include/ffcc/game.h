@@ -161,6 +161,10 @@ public:
     char* GetItemName(int, int);
     char* GetShortItemName(int itemIndex) { return m_cFlatDataArr[1].TableStrings(0)[itemIndex * 5 + 4]; }
     char* GetRingName(int ringIndex) { return m_cFlatDataArr[1].TableStrings(4)[ringIndex]; }
+    char* GetNPCName(int npcIndex) { return m_cFlatDataArr[1].TableStrings(2)[npcIndex]; }
+    char* GetLetterSubject(int subjectIndex) { return m_cFlatDataArr[1].TableStrings(5)[subjectIndex]; }
+    char* GetLetter(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x10); }
+    char* GetLetterReply(int letterType) { return m_cFlatDataArr[1].Message(letterType * 2 + 0x11); }
     char* GetMonName(int);
     char* GetMonArt(int);
     char* GetMonNames(int);

@@ -286,10 +286,8 @@ void CMenuPcs::ItemDraw()
     int mode;
     MenuItemOpenAnim* entry;
     CCaravanWork* caravanWork;
-    MenuItemOpenAnim* textEntry;
     float itemAlpha;
     s16 itemId;
-    MenuItemOpenAnim* iconEntry;
     CFont* helpFont;
     int drawIndex;
     int tex;
@@ -409,7 +407,7 @@ void CMenuPcs::ItemDraw()
         }
     }
 
-    listFont = m_fonts[4];
+    listFont = GetFontItem();
     listFont->SetMargin(kItemOne);
     listFont->SetShadow(0);
     listFont->SetScale(kItemListFontScale);
@@ -422,7 +420,6 @@ void CMenuPcs::ItemDraw()
         }
     }
 
-    textEntry = entry;
     for (i = 0; i < 8; i++) {
         menuIndex = i + m_itemMenuState->scroll;
         if (menuIndex >= 0x40) {
@@ -433,7 +430,7 @@ void CMenuPcs::ItemDraw()
 
         itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
-            char* text = Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
+            char* text = Game.GetShortItemName(itemId);
             int selectedIndex = m_itemMenuState->cursorIndex[0] + m_itemMenuState->scroll;
             if (selectedIndex >= 0x40) {
                 selectedIndex -= 0x40;
@@ -444,18 +441,16 @@ void CMenuPcs::ItemDraw()
             }
 
             listFont->GetWidth(text);
-            x = (float)(textEntry->x + 0x1C);
-            y = (float)(textEntry->y + 0xB);
+            x = (float)(entry[i].x + 0x1C);
+            y = (float)(entry[i].y + 0xB);
             listFont->SetPosX(x);
             listFont->SetPosY(y - kItemTextYOffset);
             listFont->Draw(text);
         }
-        textEntry++;
     }
 
     DrawInit();
 
-    iconEntry = entry;
     for (i = 0; i < 8; i++) {
         menuIndex = i + m_itemMenuState->scroll;
         if (menuIndex >= 0x40) {
@@ -464,11 +459,10 @@ void CMenuPcs::ItemDraw()
 
         itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
-            int iconY = (int)((float)(iconEntry->y + 6) - kItemOne);
-            int iconX = (int)((float)(iconEntry->x + iconEntry->w - 0x10));
+            int iconY = (int)((float)(entry[i].y + 6) - kItemOne);
+            int iconX = (int)((float)(entry[i].x + entry[i].w - 0x10));
             DrawSingleIcon(itemId, iconX, iconY, entry->alpha, 0, kItemOne);
         }
-        iconEntry++;
     }
 
     if (listState == 1) {
@@ -511,7 +505,7 @@ void CMenuPcs::ItemDraw()
     DrawInit();
     DrawSingLife();
 
-    helpFont = m_fonts[0];
+    helpFont = GetFont22();
     s8 helpAlpha = (s8)(kItemColorMax * entry->alpha);
     if (!foundSelected) {
         selectedItemId = -1;

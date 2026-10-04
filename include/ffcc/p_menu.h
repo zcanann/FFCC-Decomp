@@ -809,7 +809,7 @@ public:
     void BindMcObj(int);
     void BindMcObj();
     void DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char);
-    CFont* GetFont22();
+    CFont* GetFont22() { return m_fonts[0]; }
     CFont* GetFont23() { return m_fonts[1]; }
     CRingMenu* GetRingMenu(int index) { return m_battleRingMenus[index]; }
     CMesMenu* GetMesMenu(int);
